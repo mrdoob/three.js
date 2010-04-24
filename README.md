@@ -1,6 +1,4 @@
-Basic and modular javascript 3d engine.
-
-Can use <canvas> and/org <svg> as renderer.
+Basic and modular javascript 3d engine which can use <canvas> and/org <svg> as renderer.
 
 ### How to use
 
