@@ -43,6 +43,10 @@
 	
 ### Change Log
 
-2010 04 24 - **r001**
+2010 04 24 - **r002** (15.724 kb)
+
+* Improved Color handling
+
+2010 04 24 - **r001** (15.25 kb)
 
 * First alpha release
