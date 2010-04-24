@@ -2,31 +2,37 @@ Basic and modular javascript 3d engine which can use &lt;canvas&gt; and/org &lt;
 
 ### How to use
 
-	var SCREEN_WIDTH = window.innerWidth;
-	var SCREEN_HEIGHT = window.innerHeight;
+	var container;
+	var camera, scene, renderer;
 
-	var camera = new Camera(0, 0, 1000);
-
-	var scene = new Scene();
-	
-	var renderer = new CanvasRenderer();
-	renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
-
-	var material = new ColorMaterial(0xffffff, 1);
-
-	for (var i = 0; i < 1000; i++)
-	{
-		var particle = new Particle( material );
-		particle.position.x = Math.random() * 1000 - 500;
-		particle.position.y = Math.random() * 1000 - 500;
-		particle.position.z = Math.random() * 1000 - 500;
-		particle.updateMatrix();
-		scene.add( particle );
-	}
-
-	dom_element.appendChild(renderer.viewport);
-
+	init();
 	setInterval(loop, 1000 / 60);
+
+	function init()
+	{
+		camera = new Camera(0, 0, 1000);
+
+		scene = new Scene();
+	
+		renderer = new CanvasRenderer();
+		renderer.setSize(window.innerWidth, window.innerHeight);
+
+		for (var i = 0; i < 1000; i++)
+		{
+			var particle = new Particle( new ColorMaterial(Math.random() * 0x808008 + 0x808080, 1) );
+			particle.size = Math.random() * 10 + 5;
+			particle.position.x = Math.random() * 2000 - 1000;
+			particle.position.y = Math.random() * 2000 - 1000;
+			particle.position.z = Math.random() * 2000 - 1000;
+			particle.updateMatrix();
+			scene.add( particle );
+		}
+
+		container = document.createElement('div');
+		document.body.appendChild(container);
+
+		container.appendChild(renderer.viewport);
+	}
 
 	function loop()
 	{
@@ -35,6 +41,7 @@ Basic and modular javascript 3d engine which can use &lt;canvas&gt; and/org &lt;
 	
 ### Examples
 
+[![random.png](http://github.com/mrdoob/three.js/raw/master/examples/particles/random.png)](http://mrdoob.com/lab/javascript/three/particles/random.html)
 [![waves.png](http://github.com/mrdoob/three.js/raw/master/examples/particles/waves.png)](http://mrdoob.com/lab/javascript/three/particles/waves.html)
 [![floor.png](http://github.com/mrdoob/three.js/raw/master/examples/particles/floor.png)](http://mrdoob.com/lab/javascript/three/particles/floor.html)
 

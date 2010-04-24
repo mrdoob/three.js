@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - particles - floor</title>
+		<title>three.js - particles - random</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
 		<style type="text/css">
@@ -25,10 +25,6 @@
 
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
-
-			var SEPARATION = 100;
-			var AMOUNTX = 50;
-			var AMOUNTY = 50;
 
 			var stats;
 			var container;
@@ -65,20 +61,15 @@
 				renderer = new CanvasRenderer();
 				renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 
-				particles = new Array();
-
-				var material = new ColorMaterial(0xffffff, 1);
-
-				for (var ix = 0; ix < AMOUNTX; ix++)
+				for (var i = 0; i < 1000; i++)
 				{
-					for(var iy = 0; iy < AMOUNTY; iy++)
-					{
-						particle = new Particle( material );
-						particle.position.x = ix * SEPARATION - ((AMOUNTX * SEPARATION) / 2);
-						particle.position.z = iy * SEPARATION - ((AMOUNTY * SEPARATION) / 2);
-						particle.updateMatrix();
-						scene.add( particle );
-					}
+					particle = new Particle( new ColorMaterial(Math.random() * 0x808008 + 0x808080, 1) );
+					particle.size = Math.random() * 10 + 5;
+					particle.position.x = Math.random() * 2000 - 1000;
+					particle.position.y = Math.random() * 2000 - 1000;
+					particle.position.z = Math.random() * 2000 - 1000;
+					particle.updateMatrix();
+					scene.add( particle );
 				}
 
 				container.appendChild(renderer.viewport);

@@ -3,6 +3,7 @@
 	<head>
 		<title>three.js - particles - waves</title>
 		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
 		<style type="text/css">
 			body
 			{
@@ -46,6 +47,7 @@
 			var windowHalfY = window.innerHeight >> 1;
 
 			document.addEventListener('mousemove', onDocumentMouseMove, false);
+			document.addEventListener('touchstart', onDocumentTouchStart, false);
 
 			init();
 			setInterval(loop, 1000 / 60);
@@ -90,11 +92,54 @@
 				container.appendChild( stats.getDisplayElement() );
 			}
 
+			//
+
 			function onDocumentMouseMove(event)
 			{
-				mouseX = (event.clientX - windowHalfX);
-				mouseY = (event.clientY - windowHalfY);
+				mouseX = event.clientX - windowHalfX;
+				mouseY = event.clientY - windowHalfY;
 			}
+			
+			function onDocumentTouchStart( event )
+			{
+				if(event.touches.length == 1)
+				{
+					event.preventDefault();
+
+					mouseX = event.touches[0].pageX - windowHalfX;
+					mouseY = event.touches[0].pageY - windowHalfY;
+
+					document.addEventListener('touchmove', onDocumentTouchMove, false);
+					document.addEventListener('touchend', onDocumentTouchEnd, false);
+				}
+			}
+
+			function onDocumentTouchMove( event )
+			{
+				if(event.touches.length == 1)
+				{
+					event.preventDefault();
+					
+					mouseX = event.touches[0].pageX - windowHalfX;
+					mouseY = event.touches[0].pageY - windowHalfY;
+				}
+			}
+
+			function onDocumentTouchEnd( event )
+			{
+				if(event.touches.length == 0)
+				{
+					event.preventDefault();
+
+					mouseX = event.touches[0].pageX - windowHalfX;
+					mouseY = event.touches[0].pageY - windowHalfY;
+
+					document.removeEventListener('touchmove', onDocumentTouchMove, false);
+					document.removeEventListener('touchend', onDocumentTouchEnd, false);
+				}
+			}
+			
+			//
 
 			function loop()
 			{
