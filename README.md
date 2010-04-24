@@ -44,7 +44,7 @@
 	
 ### Change Log
 
-2010 04 24 - **r3** (16.679 kb)
+2010 04 24 - **r3** (16.392 kb)
 
 * Fixed incorrect rotation matrix transforms
 * Added Plane and Cube primitives
