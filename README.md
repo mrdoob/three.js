@@ -1,4 +1,4 @@
-(Very early stage) javascript 3D engine which can use &lt;canvas&gt; and/org &lt;svg&gt; as renderer.
+(Very early stage) javascript 3D engine which can use &lt;canvas&gt; and/org &lt;svg&gt; as renderer. The aim is to keep as simple and modular as possible. I would be implementing the WebGL renderer at a later stage but contributions for this (and anything else) are more than welcome.
 
 ### Examples
 
