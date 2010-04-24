@@ -171,30 +171,3 @@ Matrix4.rotationZMatrix = function(theta)
 
 	return rot;
 }
-
-Matrix4.rotationMatrix = function(ry, rx, rz)
-{
-	var sx, sy, sz;
-	var cx, cy, cz;
-
-	sx = Math.sin(rx);
-	sy = Math.sin(ry);
-	sz = Math.sin(rz);
-	cx = Math.cos(rx);
-	cy = Math.cos(ry);
-	cz = Math.cos(rz);
-
-	var rot = new Matrix4();
-
-	rot.n11 = cx * cz - sx * sy * sz;
-	rot.n12 = -cy * sz;
-	rot.n13 = sx * cz + cx * sy * sz;
-	rot.n21 = cx * sz + sx * sy * cz;
-	rot.n22 = cy * cz;
-	rot.n23 = sx * sz - cx * sy * cz;
-	rot.n31 = -sx * cy;
-	rot.n32 = sy;
-	rot.n33 = cx * cy;
-
-	return rot;
-}

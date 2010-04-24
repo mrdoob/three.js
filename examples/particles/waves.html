@@ -89,6 +89,7 @@
 				
 				document.addEventListener('mousemove', onDocumentMouseMove, false);
 				document.addEventListener('touchstart', onDocumentTouchStart, false);
+				document.addEventListener('touchmove', onDocumentTouchMove, false);				
 			}
 
 			//
@@ -107,9 +108,6 @@
 
 					mouseX = event.touches[0].pageX - windowHalfX;
 					mouseY = event.touches[0].pageY - windowHalfY;
-
-					document.addEventListener('touchmove', onDocumentTouchMove, false);
-					document.addEventListener('touchend', onDocumentTouchEnd, false);
 				}
 			}
 
@@ -121,17 +119,6 @@
 					
 					mouseX = event.touches[0].pageX - windowHalfX;
 					mouseY = event.touches[0].pageY - windowHalfY;
-				}
-			}
-
-			function onDocumentTouchEnd( event )
-			{
-				if(event.touches.length == 0)
-				{
-					event.preventDefault();
-
-					document.removeEventListener('touchmove', onDocumentTouchMove, false);
-					document.removeEventListener('touchend', onDocumentTouchEnd, false);
 				}
 			}
 			
