@@ -43,15 +43,11 @@
 			var mouseX = 0;
 			var mouseY = 0;
 
-			var windowHalfX = window.innerWidth >> 1;
-			var windowHalfY = window.innerHeight >> 1;
-
-			document.addEventListener('mousemove', onDocumentMouseMove, false);
-			document.addEventListener('touchstart', onDocumentTouchStart, false);
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
 
 			init();
 			setInterval(loop, 1000 / 60);
-
 
 			function init()
 			{
@@ -86,6 +82,9 @@
 
 				stats = new Stats();
 				container.appendChild( stats.getDisplayElement() );
+				
+				document.addEventListener('mousemove', onDocumentMouseMove, false);
+				document.addEventListener('touchstart', onDocumentTouchStart, false);
 			}
 
 			//
@@ -98,7 +97,7 @@
 			
 			function onDocumentTouchStart( event )
 			{
-				if(event.touches.length == 1)
+				if(event.touches.length > 1)
 				{
 					event.preventDefault();
 
@@ -126,9 +125,6 @@
 				if(event.touches.length == 0)
 				{
 					event.preventDefault();
-
-					mouseX = event.touches[0].pageX - windowHalfX;
-					mouseY = event.touches[0].pageY - windowHalfY;
 
 					document.removeEventListener('touchmove', onDocumentTouchMove, false);
 					document.removeEventListener('touchend', onDocumentTouchEnd, false);

@@ -18,6 +18,7 @@ var Camera = Vector3.extend
 		this.roll = 0;
 		
 		this.matrix = new Matrix4();
+		this.updateMatrix();
 	},
 	
 	updateMatrix: function()
