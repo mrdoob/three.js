@@ -7,6 +7,7 @@
 		<style type="text/css">
 			body
 			{
+				font-family: Monospace;
 				background-color: #ffffff;
 				margin: 0px;
 				overflow: hidden;
@@ -48,7 +49,15 @@
 			function init()
 			{
 				container = document.createElement('div');
-				document.body.appendChild(container);			
+				document.body.appendChild(container);
+				
+				var info = document.createElement('div');
+				info.style.position = 'absolute';
+				info.style.top = '10px';
+				info.style.width = '100%';
+				info.style.textAlign = 'center';
+				info.innerHTML = 'Drag to spin the cube';
+				container.appendChild(info);
 			
 				camera = new Camera(0, 150, 300);
 				camera.focus = 300;
