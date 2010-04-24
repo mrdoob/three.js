@@ -40,6 +40,6 @@ Basic and modular javascript 3d engine which can use <canvas> and/org <svg> as r
 
 ### Change Log
 
-2010 04 24 - **r011.2**
+2010 04 24 - **r001**
 
 * First alpha release
