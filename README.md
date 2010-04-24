@@ -37,8 +37,8 @@ Can use <canvas> and/org <svg> as renderer.
 	
 ### Examples
 
-[![waves.png](http://github.com/mrdoob/three.js/raw/master/examples/particles/waves.png)](http://github.com/mrdoob/three.js/raw/master/examples/particles/waves.html)
-[![floor.png](http://github.com/mrdoob/three.js/raw/master/examples/particles/floor.png)](http://github.com/mrdoob/three.js/raw/master/examples/particles/floor.html)
+[![waves.png](http://github.com/mrdoob/three.js/raw/master/examples/particles/waves.png)](http://mrdoob.com/lab/javascript/three/particles/waves.html)
+[![floor.png](http://github.com/mrdoob/three.js/raw/master/examples/particles/floor.png)](http://mrdoob.com/lab/javascript/three/particles/floor.html)
 
 ### Change Log
 
