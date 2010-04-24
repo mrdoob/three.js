@@ -18,6 +18,7 @@
 		</style>
 	</head>
 	<body>
+	
 		<script type="text/javascript" src="http://github.com/mrdoob/three.js/raw/master/build/three.js"></script>
 		<script type="text/javascript" src="http://github.com/mrdoob/stats.js/raw/master/build/stats.js"></script>
 
@@ -30,8 +31,8 @@
 			var AMOUNTX = 50;
 			var AMOUNTY = 50;
 
-			var stats;
 			var container;
+			var stats;
 
 			var particle;
 
@@ -55,7 +56,7 @@
 			function init()
 			{
 				container = document.createElement('div');
-				document.body.appendChild(container);				
+				document.body.appendChild(container);
 			
 				camera = new Camera(0, 0, 1000);
 				camera.focus = 200;

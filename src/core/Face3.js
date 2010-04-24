@@ -5,7 +5,6 @@ var Face3 = Vector3.extend
 	uv: null,
 	normal: null,
 	color: null,
-	colorString: null,
 
 	init: function(a, b, c, uv, normal, color)
 	{
@@ -20,12 +19,11 @@ var Face3 = Vector3.extend
 		this.uv = uv ? uv : [ [0, 0], [0, 0], [0, 0] ];
 		this.normal = normal ? normal : new Vector3();
 
-		this.color = color ? color : [0, 0, 0];
-		this.colorString = 'rgb(' + this.color[0] + ', ' + this.color[1] + ', ' + this.color[2] + ')';
+		this.color = color ? color : new Color();
 	},
 
 	toString: function()
 	{
-		return 'Face ( ' + this.a + ', ' + this.b + ', ' + this.c + ' )';
+		return 'Face3 ( ' + this.a + ', ' + this.b + ', ' + this.c + ' )';
 	}
 });

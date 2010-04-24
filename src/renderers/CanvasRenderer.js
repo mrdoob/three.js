@@ -34,7 +34,11 @@ var CanvasRenderer = Renderer.extend
 			
 			if (element.material instanceof ColorMaterial)
 			{
-				this.context.fillStyle = element.material.colorString;
+				this.context.fillStyle = element.material.color.styleString;
+			}
+			else if (element.material instanceof FaceColorMaterial)
+			{
+				this.context.fillStyle = element.color.styleString;
 			}
 			
 			if (element instanceof Face3)

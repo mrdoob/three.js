@@ -1,0 +1,3 @@
+var FaceColorMaterial = Class.extend
+({
+});
