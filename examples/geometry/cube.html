@@ -8,7 +8,7 @@
 			body
 			{
 				font-family: Monospace;
-				background-color: #ffffff;
+				background-color: #f0f0f0;
 				margin: 0px;
 				overflow: hidden;
 			}
@@ -79,7 +79,7 @@
 				
 				// Plane
 				
-				plane = new Mesh(new Plane(200, 200), new ColorMaterial(0xeeeeee));
+				plane = new Mesh(new Plane(200, 200), new ColorMaterial(0xe0e0e0));
 				plane.rotation.x = 90 * (Math.PI / 180);
 				plane.updateMatrix();
 				scene.add(plane);
@@ -114,7 +114,7 @@
 			{
 				mouseX = event.clientX - windowHalfX;
 				
-				targetRotation = targetRotationOnMouseDown + (mouseX - mouseXOnMouseDown) * 0.05;
+				targetRotation = targetRotationOnMouseDown + (mouseX - mouseXOnMouseDown) * 0.02;
 			}
 			
 			function onDocumentMouseUp( event )
