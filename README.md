@@ -8,7 +8,6 @@
 
 ### How to use
 
-	var container;
 	var camera, scene, renderer;
 
 	init();
@@ -34,10 +33,7 @@
 			scene.add( particle );
 		}
 
-		container = document.createElement('div');
-		document.body.appendChild(container);
-
-		container.appendChild(renderer.viewport);
+		document.body.appendChild(renderer.viewport);
 	}
 
 	function loop()
