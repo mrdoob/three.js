@@ -44,10 +44,17 @@
 	
 ### Change Log
 
-2010 04 24 - **r002** (15.724 kb)
+2010 04 24 - **r3** (16.679 kb)
+
+* Fixed incorrect rotation matrix transforms
+* Added Plane and Cube primitives
+
+
+2010 04 24 - **r2** (15.724 kb)
 
 * Improved Color handling
 
-2010 04 24 - **r001** (15.25 kb)
+
+2010 04 24 - **r1** (15.25 kb)
 
 * First alpha release
