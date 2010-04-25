@@ -9,6 +9,8 @@ At the moment the engine can render using &lt;canvas&gt; and &lt;svg&gt;. WebGL 
 
 Although this allows 3D for iPhoneOS and Android platforms the performance on these devices is not too good.
 
+[More info...](http://mrdoob.com/blog/post/693)
+
 ### Examples ###
 
 [![cube.png](http://github.com/mrdoob/three.js/raw/master/examples/geometry/cube.png)](http://mrdoob.com/lab/javascript/three/geometry/cube.html)
