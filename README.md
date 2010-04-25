@@ -5,7 +5,7 @@ three.js
 
 Currently the engine only supports particles and triangles/quads with flat colors. The aim is to keep the code as simple and modular as possible.
 
-At the moment the engine can render using &lt;canvas&gt; and &lt;svg&gt;. WebGL rendering would come at a later stage but contributions for this (and anything else) are more than welcome.
+At the moment the engine can render using &lt;canvas&gt; and &lt;svg&gt;. WebGL rendering would come at a later stage but feel free to fork the project and have a go.
 
 Although this allows 3D for iPhoneOS and Android platforms the performance on these devices is not too good.
 
@@ -18,13 +18,13 @@ Although this allows 3D for iPhoneOS and Android platforms the performance on th
 
 ### How to use ###
 
-We first include the library into our code.
+The library needs to be included first thing.
 
 	<script type="text/javascript" src="js/three.js"></script>
 
-After this we have access to all the engine classes and methods.
+Now we have access to the engine classes and methods.
 
-The next code initializes the engine, creates a CanvasRenderer and adds its viewport (&lt;canvas&gt;) directly into the document.body element.
+This code creates a camera, then creates a scene object, adds a bunch of random particles to the scene, creates a &lt;canvas&gt; renderer and adds its viewport the document.body element.
 
 	<script type="text/javascript">
 
