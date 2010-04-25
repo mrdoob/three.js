@@ -1,7 +1,7 @@
 three.js
 ========
 
-#### Javascript 3D engine ####
+#### Javascript 3D Engine ####
 
 Currently the engine only supports particles and triangles/quads with flat colors. The aim is to keep the code as simple and modular as possible.
 
