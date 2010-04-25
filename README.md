@@ -1,51 +1,69 @@
 three.js
 ========
 
-(Very early stage) javascript 3D engine which can use &lt;canvas&gt; and/org &lt;svg&gt; as renderer. The aim is to keep it as simple and modular as possible. I would be implementing the WebGL renderer at a later stage but contributions for this (and anything else) are more than welcome.
+#### Javascript 3D engine ####
 
-### Examples
+Currently the engine only supports particles and triangles/quads with flat colors. The aim is to keep the code as simple and modular as possible.
+
+At the moment the engine can render using <canvas> and <svg>. WebGL rendering would come at a later stage but contributions for this (and anything else) are more than welcome.
+
+Although this allows 3D for iPhoneOS and Android platforms the performance on these devices is not too good.
+
+### Examples ###
 
 [![cube.png](http://github.com/mrdoob/three.js/raw/master/examples/geometry/cube.png)](http://mrdoob.com/lab/javascript/three/geometry/cube.html)
 [![random.png](http://github.com/mrdoob/three.js/raw/master/examples/particles/random.png)](http://mrdoob.com/lab/javascript/three/particles/random.html)
 [![waves.png](http://github.com/mrdoob/three.js/raw/master/examples/particles/waves.png)](http://mrdoob.com/lab/javascript/three/particles/waves.html)
 [![floor.png](http://github.com/mrdoob/three.js/raw/master/examples/particles/floor.png)](http://mrdoob.com/lab/javascript/three/particles/floor.html)
 
-### How to use
+### How to use ###
 
-	var camera, scene, renderer;
+We first include the library into our code.
 
-	init();
-	setInterval(loop, 1000 / 60);
+	<script type="text/javascript" src="js/three.js"></script>
 
-	function init()
-	{
-		camera = new Camera(0, 0, 1000);
+After this we have access to all the engine classes and methods.
 
-		scene = new Scene();
-	
-		renderer = new CanvasRenderer();
-		renderer.setSize(window.innerWidth, window.innerHeight);
+The next code initializes the engine, creates a CanvasRenderer and adds its viewport (<canvas>) directly into the document.body element.
 
-		for (var i = 0; i < 1000; i++)
+	<script type="text/javascript">
+
+		var camera, scene, renderer;
+
+		init();
+		setInterval(loop, 1000 / 60);
+
+		function init()
 		{
-			var particle = new Particle( new ColorMaterial(Math.random() * 0x808008 + 0x808080, 1) );
-			particle.position.x = Math.random() * 2000 - 1000;
-			particle.position.y = Math.random() * 2000 - 1000;
-			particle.position.z = Math.random() * 2000 - 1000;
-			particle.size = Math.random() * 10 + 5;
-			particle.updateMatrix();
-			scene.add( particle );
+			camera = new Camera(0, 0, 1000);
+
+			scene = new Scene();
+	
+			renderer = new CanvasRenderer();
+			renderer.setSize(window.innerWidth, window.innerHeight);
+
+			for (var i = 0; i < 1000; i++)
+			{
+				var particle = new Particle( new ColorMaterial(Math.random() * 0x808008 + 0x808080, 1) );
+				particle.position.x = Math.random() * 2000 - 1000;
+				particle.position.y = Math.random() * 2000 - 1000;
+				particle.position.z = Math.random() * 2000 - 1000;
+				particle.size = Math.random() * 10 + 5;
+				particle.updateMatrix();
+				scene.add( particle );
+			}
+
+			document.body.appendChild(renderer.viewport);
 		}
 
-		document.body.appendChild(renderer.viewport);
-	}
+		function loop()
+		{
+			renderer.render(scene, camera);
+		}
 
-	function loop()
-	{
-		renderer.render(scene, camera);
-	}
+	</script>
 	
-### Change Log
+### Change Log ###
 
 2010 04 24 - **r3** (16.392 kb)
 
