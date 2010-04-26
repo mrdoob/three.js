@@ -64,6 +64,30 @@ This code creates a camera, then creates a scene object, adds a bunch of random 
 		}
 
 	</script>
+
+If you are interested on messing with the actual library, instead of importing the three.js compressed file, you can include the original files in this order:
+
+	<script type="text/javascript" src="src/Class.js"></script>
+	<script type="text/javascript" src="src/core/Color.js"></script>
+	<script type="text/javascript" src="src/core/Vector3.js"></script>
+	<script type="text/javascript" src="src/core/Matrix4.js"></script>
+	<script type="text/javascript" src="src/core/Vertex.js"></script>
+	<script type="text/javascript" src="src/core/Face3.js"></script>
+	<script type="text/javascript" src="src/core/Face4.js"></script>
+	<script type="text/javascript" src="src/core/Geometry.js"></script>
+	<script type="text/javascript" src="src/cameras/Camera.js"></script>
+	<script type="text/javascript" src="src/objects/Object3D.js"></script>
+	<script type="text/javascript" src="src/objects/Mesh.js"></script>
+	<script type="text/javascript" src="src/objects/primitives/Plane.js"></script>
+	<script type="text/javascript" src="src/objects/primitives/Cube.js"></script>
+	<script type="text/javascript" src="src/objects/Particle.js"></script>
+	<script type="text/javascript" src="src/materials/ColorMaterial.js"></script>
+	<script type="text/javascript" src="src/materials/FaceColorMaterial.js"></script>
+	<script type="text/javascript" src="src/scenes/Scene.js"></script>
+	<script type="text/javascript" src="src/renderers/Renderer.js"></script>
+	<script type="text/javascript" src="src/renderers/CanvasRenderer.js"></script>
+	<script type="text/javascript" src="src/renderers/SVGRenderer.js"></script>
+
 	
 ### Change Log ###
 
