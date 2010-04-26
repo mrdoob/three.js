@@ -67,6 +67,12 @@ This code creates a camera, then creates a scene object, adds a bunch of random 
 	
 ### Change Log ###
 
+2010 04 26 - **r4** (16.274 kb)
+
+* SVGRenderer Particle rendering
+* CanvasRenderer uses context.setTransform to avoid extra calculations
+
+
 2010 04 24 - **r3** (16.392 kb)
 
 * Fixed incorrect rotation matrix transforms

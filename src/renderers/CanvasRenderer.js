@@ -18,6 +18,8 @@ var CanvasRenderer = Renderer.extend
 
 		this.viewport.width = this.width;
 		this.viewport.height = this.height;
+		
+		this.context.setTransform(1, 0, 0, 1, this.widthHalf, this.heightHalf);
 	},
 
 	render: function( scene, camera )
@@ -26,7 +28,7 @@ var CanvasRenderer = Renderer.extend
 
 		var element , pi2 = Math.PI * 2;
 
-		this.context.clearRect (0, 0, this.width, this.height);
+		this.context.clearRect (-this.widthHalf, -this.heightHalf, this.width, this.height);
 		
 		for (j = 0; j < this.renderList.length; j++)
 		{
@@ -44,26 +46,26 @@ var CanvasRenderer = Renderer.extend
 			if (element instanceof Face3)
 			{
 				this.context.beginPath();
-				this.context.moveTo(element.a.screen.x + this.widthHalf, element.a.screen.y + this.heightHalf);
-				this.context.lineTo(element.b.screen.x + this.widthHalf, element.b.screen.y + this.heightHalf);
-				this.context.lineTo(element.c.screen.x + this.widthHalf, element.c.screen.y + this.heightHalf);
+				this.context.moveTo(element.a.screen.x, element.a.screen.y);
+				this.context.lineTo(element.b.screen.x, element.b.screen.y);
+				this.context.lineTo(element.c.screen.x, element.c.screen.y);
 				this.context.fill();
 				this.context.closePath();
 			}
 			else if (element instanceof Face4)
 			{
 				this.context.beginPath();
-				this.context.moveTo(element.a.screen.x + this.widthHalf, element.a.screen.y + this.heightHalf);
-				this.context.lineTo(element.b.screen.x + this.widthHalf, element.b.screen.y + this.heightHalf);
-				this.context.lineTo(element.c.screen.x + this.widthHalf, element.c.screen.y + this.heightHalf);
-				this.context.lineTo(element.d.screen.x + this.widthHalf, element.d.screen.y + this.heightHalf);
+				this.context.moveTo(element.a.screen.x, element.a.screen.y);
+				this.context.lineTo(element.b.screen.x, element.b.screen.y);
+				this.context.lineTo(element.c.screen.x, element.c.screen.y);
+				this.context.lineTo(element.d.screen.x, element.d.screen.y);
 				this.context.fill();
 				this.context.closePath();
 			}
 			else if (element instanceof Particle)
 			{
 				this.context.beginPath();
-				this.context.arc(element.screen.x + this.widthHalf, element.screen.y + this.heightHalf, element.size * element.screen.z, 0, pi2, true);
+				this.context.arc(element.screen.x, element.screen.y, element.size * element.screen.z, 0, pi2, true);
 				this.context.fill();
 				this.context.closePath();				
 			}
