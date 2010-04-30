@@ -27,6 +27,7 @@ files.append('scenes/Scene.js');
 files.append('renderers/Renderer.js');
 files.append('renderers/CanvasRenderer.js');
 files.append('renderers/SVGRenderer.js');
+files.append('renderers/GLRenderer.js');
 
 string = '';
 
