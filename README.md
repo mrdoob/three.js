@@ -11,6 +11,8 @@ Although this allows 3D for iPhoneOS and Android platforms the performance on th
 
 [More info...](http://mrdoob.com/blog/post/693)
 
+[![Flattr this](http://api.flattr.com/button/button-compact-static-100x17.png)](http://flattr.com/thing/287/three-js)
+
 ### Examples ###
 
 [![cube.png](http://github.com/mrdoob/three.js/raw/master/examples/geometry/cube.png)](http://mrdoob.com/lab/javascript/three/geometry/cube.html)
