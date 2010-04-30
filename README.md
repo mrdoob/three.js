@@ -3,6 +3,8 @@ three.js
 
 #### Javascript 3D Engine ####
 
+[![Flattr this](http://api.flattr.com/button/button-compact-static-100x17.png)](http://flattr.com/thing/287/three-js)
+
 Currently the engine only supports particles and triangles/quads with flat colors. The aim is to keep the code as simple and modular as possible.
 
 At the moment the engine can render using &lt;canvas&gt; and &lt;svg&gt;. WebGL rendering would come at a later stage but feel free to fork the project and have a go.
@@ -10,8 +12,6 @@ At the moment the engine can render using &lt;canvas&gt; and &lt;svg&gt;. WebGL 
 Although this allows 3D for iPhoneOS and Android platforms the performance on these devices is not too good.
 
 [More info...](http://mrdoob.com/blog/post/693)
-
-[![Flattr this](http://api.flattr.com/button/button-compact-static-100x17.png)](http://flattr.com/thing/287/three-js)
 
 ### Examples ###
 
