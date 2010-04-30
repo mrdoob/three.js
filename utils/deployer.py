@@ -9,6 +9,7 @@ files = [];
 files.append('Class.js');
 files.append('core/Color.js');
 files.append('core/Vector3.js');
+files.append('core/Vector4.js');
 files.append('core/Matrix4.js');
 files.append('core/Vertex.js');
 files.append('core/Face3.js');

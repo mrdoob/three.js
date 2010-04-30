@@ -126,6 +126,11 @@ var Vector3 = Class.extend
 		return new Vector3(this.x, this.y, this.z);
 	},	
 	
+	toVector4: function()
+	{
+		return new Vector4(this.x,this.y,this.z, 1.0);
+	},
+	
 	toString: function()
 	{
 		return 'Vector3 (' + this.x + ', ' + this.y + ', ' + this.z + ')';

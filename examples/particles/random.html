@@ -49,8 +49,8 @@
 				container = document.createElement('div');
 				document.body.appendChild(container);				
 			
-				camera = new Camera(0, 0, 1000);
-				camera.focus = 200;
+				camera = new Camera(0, 0, -1000);
+				camera.setProjectionMatrix(Matrix4.makePerspective(60, SCREEN_WIDTH/SCREEN_HEIGHT, 10, 10000));
 
 				scene = new Scene();
 				

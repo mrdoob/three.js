@@ -58,8 +58,8 @@
 				info.innerHTML = 'Drag to spin the cube';
 				container.appendChild(info);
 			
-				camera = new Camera(0, 150, 400);
-				camera.focus = 300;
+				camera = new Camera(0, 150, 600);
+				camera.setProjectionMatrix(Matrix4.makePerspective(45, SCREEN_WIDTH/SCREEN_HEIGHT, 0.001, 1000));
 				camera.target.y = 150;
 				camera.updateMatrix();
 

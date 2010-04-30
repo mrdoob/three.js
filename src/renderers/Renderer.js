@@ -32,7 +32,7 @@ var Renderer = Class.extend
 
 	sort: function(a, b)
 	{
-		return a.screen.z - b.screen.z;
+		return b.screen.z - a.screen.z;
 	},
 
 	render: function( scene, camera )
@@ -40,18 +40,18 @@ var Renderer = Class.extend
 		var vertex, face, object;
 		var face3count = 0, face4count = 0;
 
-		var focuszoom = camera.focus * camera.zoom;
-
 		this.renderList = new Array();
 
 		for (var i = 0; i < scene.objects.length; i++)
 		{
 			object = scene.objects[i];
 
+			
 			if (object instanceof Mesh)
 			{
+	
 				this.matrix.multiply( camera.matrix, object.matrix );
-
+				
 				// vertices
 
 				for (var j = 0; j < object.geometry.vertices.length; j++)
@@ -61,13 +61,13 @@ var Renderer = Class.extend
 					vertex.screen.copy( vertex );
 
 					this.matrix.transform( vertex.screen );
+					camera.projectionMatrix.transform( vertex.screen );
 
-					vertex.screen.z = focuszoom / (camera.focus + vertex.screen.z);
-
-					vertex.visible = vertex.screen.z > 0;					
-
-					vertex.screen.x *= vertex.screen.z;
-					vertex.screen.y *= vertex.screen.z; 
+					vertex.visible = vertex.screen.z > 0 && object.screen.z < 1;		
+					
+					//convert to screen coords
+					vertex.screen.x *= this.widthHalf;
+					vertex.screen.y *= this.heightHalf; 
 				}
 
 				// faces
@@ -75,7 +75,7 @@ var Renderer = Class.extend
 				for (j = 0; j < object.geometry.faces.length; j++)
 				{
 					face = object.geometry.faces[j];
-					
+
 					// TODO: Use normals for culling
 
 					if (face instanceof Face3)
@@ -85,7 +85,7 @@ var Renderer = Class.extend
 						   (face.c.screen.y - face.a.screen.y) * (face.b.screen.x - face.a.screen.x) > 0) )
 						{
 							face.screen.z = (face.a.screen.z + face.b.screen.z + face.c.screen.z) * 0.3;
-							
+
 							if (this.face3Pool[face3count] == null)
 								this.face3Pool[face3count] = new Face3(new Vertex(), new Vertex(), new Vertex());
 
@@ -131,19 +131,23 @@ var Renderer = Class.extend
 			}
 			else if (object instanceof Particle)
 			{
-				object.screen.copy(object.position);
-
+				object.screen=object.position.toVector4();
 				camera.matrix.transform( object.screen );
-
-				object.screen.z = focuszoom / (camera.focus + object.screen.z);
-
-				if (object.screen.z < 0)
-					continue;					
-
-				object.screen.x *= object.screen.z;
-				object.screen.y *= object.screen.z;
-
-				this.renderList.push( object );
+				camera.projectionMatrix.transform( object.screen );
+				
+				var size=object.screen.x/object.screen.w-(object.screen.x+camera.projectionMatrix.n11)/(object.screen.w+camera.projectionMatrix.n14);
+				object.zsize=Math.abs(size)*object.size;
+				
+				object.screen=object.screen.toVector3();
+				
+				if (object.screen.z >0 && object.screen.z < 1 
+				&& object.screen.x+object.zsize > -1 && object.screen.x-object.zsize < 1
+				&& object.screen.y+object.zsize > -1 && object.screen.y-object.zsize < 1){
+					object.zsize *=this.widthHalf;
+					object.screen.x *= this.widthHalf;
+					object.screen.y *= this.heightHalf; 
+					this.renderList.push( object );
+				}
 			}
 		}
 

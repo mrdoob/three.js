@@ -65,7 +65,7 @@ var CanvasRenderer = Renderer.extend
 			else if (element instanceof Particle)
 			{
 				this.context.beginPath();
-				this.context.arc(element.screen.x, element.screen.y, element.size * element.screen.z, 0, pi2, true);
+				this.context.arc(element.screen.x, element.screen.y, element.zsize, 0, pi2, true);
 				this.context.fill();
 				this.context.closePath();				
 			}

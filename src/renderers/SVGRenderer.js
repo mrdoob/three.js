@@ -51,7 +51,7 @@ var SVGRenderer = Renderer.extend
 				svgNode = this.getCircleNode(circleCount++);
 				svgNode.setAttribute('cx', element.screen.x);
 				svgNode.setAttribute('cy', element.screen.y);
-				svgNode.setAttribute('r', element.size * element.screen.z);
+				svgNode.setAttribute('r', element.zsize);
 			}
 
 			if (element.material instanceof ColorMaterial)
