@@ -40,6 +40,7 @@ This code creates a camera, then creates a scene object, adds a bunch of random 
 		function init()
 		{
 			camera = new Camera(0, 0, 1000);
+			camera.setProjectionMatrix(Matrix4.makePerspective(45, SCREEN_WIDTH/SCREEN_HEIGHT, 0.001, 1000));
 
 			scene = new Scene();
 	
