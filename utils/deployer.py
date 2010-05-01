@@ -3,7 +3,7 @@ import os
 
 # MERGER
 
-rev = 4;
+rev = 5;
 
 files = [];
 files.append('Class.js');
