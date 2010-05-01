@@ -38,7 +38,7 @@ var Matrix4 = Class.extend
 		this.y.copy(this.x);
 		this.y.cross(this.z);
 		this.y.normalize();
-		//this.y.negate(); //
+		this.y.negate(); //
 
 		this.n11 = this.x.x;
 		this.n12 = this.x.y;

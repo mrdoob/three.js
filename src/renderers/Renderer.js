@@ -67,7 +67,7 @@ var Renderer = Class.extend
 					
 					//convert to screen coords
 					vertex.screen.x *= this.widthHalf;
-					vertex.screen.y *= this.heightHalf; 
+					vertex.screen.y *= -this.heightHalf; // can't figure out why it's rendering upside down???
 				}
 
 				// faces
