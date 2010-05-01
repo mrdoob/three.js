@@ -3,13 +3,12 @@ import os
 
 # MERGER
 
-rev = 5;
+rev = 4;
 
 files = [];
 files.append('Class.js');
 files.append('core/Color.js');
 files.append('core/Vector3.js');
-files.append('core/Vector4.js');
 files.append('core/Matrix4.js');
 files.append('core/Vertex.js');
 files.append('core/Face3.js');
@@ -27,7 +26,6 @@ files.append('scenes/Scene.js');
 files.append('renderers/Renderer.js');
 files.append('renderers/CanvasRenderer.js');
 files.append('renderers/SVGRenderer.js');
-files.append('renderers/GLRenderer.js');
 
 string = '';
 

@@ -40,7 +40,6 @@ This code creates a camera, then creates a scene object, adds a bunch of random 
 		function init()
 		{
 			camera = new Camera(0, 0, 1000);
-			camera.setProjectionMatrix(Matrix4.makePerspective(45, SCREEN_WIDTH/SCREEN_HEIGHT, 0.001, 1000));
 
 			scene = new Scene();
 	
@@ -73,7 +72,6 @@ If you are interested on messing with the actual library, instead of importing t
 	<script type="text/javascript" src="src/Class.js"></script>
 	<script type="text/javascript" src="src/core/Color.js"></script>
 	<script type="text/javascript" src="src/core/Vector3.js"></script>
-	<script type="text/javascript" src="src/core/Vector4.js"></script>
 	<script type="text/javascript" src="src/core/Matrix4.js"></script>
 	<script type="text/javascript" src="src/core/Vertex.js"></script>
 	<script type="text/javascript" src="src/core/Face3.js"></script>
@@ -91,17 +89,9 @@ If you are interested on messing with the actual library, instead of importing t
 	<script type="text/javascript" src="src/renderers/Renderer.js"></script>
 	<script type="text/javascript" src="src/renderers/CanvasRenderer.js"></script>
 	<script type="text/javascript" src="src/renderers/SVGRenderer.js"></script>
-	<script type="text/javascript" src="src/renderers/GLRenderer.js"></script>
 
 	
 ### Change Log ###
-
-2010 05 01 - **r5** (23.104 kb)
-
-* Projection matrix ([supereggbert](http://github.com/supereggbert)) 
-* Particles culling ([supereggbert](http://github.com/supereggbert))
-* WIP GLRenderer ([supereggbert](http://github.com/supereggbert))
-
 
 2010 04 26 - **r4** (16.274 kb)
 

@@ -23,7 +23,9 @@ var GLRenderer = Renderer.extend
 		this.gl.depthFunc(this.gl.LESS);
 		this.gl.enable(this.gl.BLEND);
 		this.gl.blendFunc(this.gl.SRC_ALPHA,this.gl.ONE_MINUS_SRC_ALPHA);
+		this.gl.clearColor(0,0,0,0);
 		this.createProgram();
+		this.initParticles(32);
 	},
 	
 	setSize: function( width, height )
@@ -32,6 +34,82 @@ var GLRenderer = Renderer.extend
 
 		this.viewport.width = this.width;
 		this.viewport.height = this.height;
+		this.gl.viewport(0,0,this.width,this.height);
+	},
+	
+	initParticles: function (segments)
+	{
+		var gl=this.gl;
+		var x,y;
+		var vertexArray=[0,0,0];
+		var faceArray=[];
+		piStep=6.282/segments;
+		for(var i=0;i<segments;i++){
+			x=Math.sin(piStep*i);
+			y=Math.cos(piStep*i);
+			vertexArray.push(x,y,0);
+			if(i>0)
+			{
+				faceArray.push(0,i,i+1);
+			}
+		}
+		faceArray.push(0,i,1);
+		
+		var vtxShader=[
+		"attribute vec3 position;",
+		"uniform vec3 location;",
+		"uniform mat4 cameraMatrix;",
+		"uniform mat4 pMatrix;",
+		"uniform float size;",
+		"void main(){",
+		"vec4 pos=cameraMatrix*vec4(location,1.0);",
+		"pos=vec4(position*vec3(size),0.0)+pos;",
+		"gl_Position = pMatrix*pos;",
+		"}"
+		].join("");
+		
+		frgShader=[
+		"uniform vec4 color;",
+		"void main(){",
+		"gl_FragColor=color;",
+		"}"
+		].join("");
+		
+		var vertexShader=gl.createShader(gl.VERTEX_SHADER);
+		var fragmentShader=gl.createShader(gl.FRAGMENT_SHADER);
+
+		gl.shaderSource(vertexShader, vtxShader);
+		gl.compileShader(vertexShader);
+				
+		gl.shaderSource(fragmentShader,frgShader);
+		gl.compileShader(fragmentShader);
+		
+		this.particleProgram = gl.createProgram();
+		gl.attachShader(this.particleProgram, vertexShader);
+		gl.attachShader(this.particleProgram, fragmentShader);
+		gl.linkProgram(this.particleProgram);
+		
+		this.particleProgram.cameraMatrix=gl.getUniformLocation(this.particleProgram, "cameraMatrix");
+		this.particleProgram.pMatrix=gl.getUniformLocation(this.particleProgram, "pMatrix");
+		this.particleProgram.color=gl.getUniformLocation(this.particleProgram, "color");
+		this.particleProgram.size=gl.getUniformLocation(this.particleProgram, "size");
+		this.particleProgram.location=gl.getUniformLocation(this.particleProgram, "location");
+		this.particleProgram.position=gl.getAttribLocation(this.particleProgram, "position");
+		
+		this.particleProgram.mvMatrixArray=new WebGLFloatArray(16);
+		this.particleProgram.pMatrixArray=new WebGLFloatArray(16);
+		
+		this.particleProgram.webGLVertexBuffer = gl.createBuffer();
+		gl.bindBuffer( gl.ARRAY_BUFFER, this.particleProgram.webGLVertexBuffer );
+		gl.bufferData( gl.ARRAY_BUFFER, new WebGLFloatArray(vertexArray), gl.STATIC_DRAW );
+					
+		this.particleProgram.webGLFaceBuffer = gl.createBuffer();
+		gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, this.particleProgram.webGLFaceBuffer );
+		gl.bufferData( gl.ELEMENT_ARRAY_BUFFER, new WebGLUnsignedShortArray(faceArray), gl.STATIC_DRAW );	
+		this.particleProgram.faceNum=faceArray.length;
+		
+		this.particleProgram.cameraMatrixArray=new WebGLFloatArray(16);
+		this.particleProgram.pMatrixArray=new WebGLFloatArray(16);
 	},
 	
 	createProgram: function()
@@ -46,7 +124,7 @@ var GLRenderer = Renderer.extend
 		"varying vec4 vcolor;",
 		"void main(){",
 		"vcolor=color;",
-		"gl_Position = pMatrix*vec4((mvMatrix*vec4(position,1.0)).xyz,1.0);",
+		"gl_Position = pMatrix*mvMatrix*vec4(position,1.0);",
 		"}"
 		].join("");
 		
@@ -61,9 +139,11 @@ var GLRenderer = Renderer.extend
 		var fragmentShader=gl.createShader(gl.FRAGMENT_SHADER);
 
 		gl.shaderSource(vertexShader, vtxShader);
-		
+		gl.compileShader(vertexShader);
+	
 		gl.shaderSource(fragmentShader,frgShader);
 		gl.compileShader(fragmentShader);
+		
 		
 		this.program = gl.createProgram();
 		gl.attachShader(this.program, vertexShader);
@@ -103,8 +183,7 @@ var GLRenderer = Renderer.extend
 	{		
 		var gl=this.gl;
 		var vertexArray,colorArray,faceArray;
-		gl.viewport(0,0,this.width,this.height);
-		gl.clearColor(0,0,0,0);
+		
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		
 		for (var i = 0; i < scene.objects.length; i++)
@@ -113,12 +192,12 @@ var GLRenderer = Renderer.extend
 			if (object instanceof Mesh)
 			{
 				// Very inefficient but easiest way initially
+				
 				var vertexArray = [];
 				var faceArray = [];
 				var colorArray = [];
 				var vertexIndex = 0;
 				var color;
-				var vIndex, cIndex, findex;
 							
 				for (j = 0; j < object.geometry.faces.length; j++)
 				{
@@ -133,7 +212,6 @@ var GLRenderer = Renderer.extend
 					}
 					if (face instanceof Face3)
 					{
-						//vertexArray[vindex++];
 						vertexArray.push( face.a.x, face.a.y, face.a.z );
 						vertexArray.push( face.b.x, face.b.y, face.b.z );
 						vertexArray.push( face.c.x, face.c.y, face.c.z );
@@ -159,11 +237,11 @@ var GLRenderer = Renderer.extend
 					}
 				}
 
-				var vertexArray = new WebGLFloatArray(vertexArray);
-				var colorArray = new WebGLFloatArray(colorArray);
-				var faceArray = new WebGLUnsignedShortArray(faceArray);
+				vertexArray = new WebGLFloatArray(vertexArray);
+				colorArray = new WebGLFloatArray(colorArray);
+				faceArray = new WebGLUnsignedShortArray(faceArray);
 				
-					
+				
 				if (!object.WebGLVertexBuffer) object.WebGLVertexBuffer = gl.createBuffer();
 				gl.bindBuffer( gl.ARRAY_BUFFER, object.WebGLVertexBuffer );
 				gl.bufferData( gl.ARRAY_BUFFER, vertexArray, gl.DYNAMIC_DRAW );
@@ -175,15 +253,14 @@ var GLRenderer = Renderer.extend
 				if(!object.WebGLFaceBuffer) object.WebGLFaceBuffer = gl.createBuffer();
 				gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, object.WebGLFaceBuffer );
 				gl.bufferData( gl.ELEMENT_ARRAY_BUFFER, faceArray, gl.DYNAMIC_DRAW );
-				
-				
+					
 				gl.useProgram(this.program);
 			
 				this.matrix.multiply( camera.matrix, object.matrix );
 				
 				this.matrix2Array( this.matrix, this.program.mvMatrixArray );
 				this.matrix2Array( camera.projectionMatrix, this.program.pMatrixArray );
-				//alert([this.program.mvMatrixArray[0],this.program.mvMatrixArray[1],this.program.mvMatrixArray[2],this.program.mvMatrixArray[3],this.program.mvMatrixArray[4],this.program.mvMatrixArray[5],this.program.mvMatrixArray[6],this.program.mvMatrixArray[7],this.program.mvMatrixArray[8],this.program.mvMatrixArray[9],this.program.mvMatrixArray[10],this.program.mvMatrixArray[11],this.program.mvMatrixArray[12],this.program.mvMatrixArray[13],this.program.mvMatrixArray[14],this.program.mvMatrixArray[15]]);
+				
 				gl.uniformMatrix4fv(this.program.pMatrix, true, this.program.pMatrixArray);
 				gl.uniformMatrix4fv(this.program.mvMatrix, true, this.program.mvMatrixArray);
 				
@@ -201,7 +278,39 @@ var GLRenderer = Renderer.extend
 				gl.drawElements(gl.TRIANGLES,faceArray.length, gl.UNSIGNED_SHORT, 0);
 				
 			}
-			//TODO Particles!!
+			else if (object instanceof Particle)
+			{	
+				var color
+				if (object.material instanceof ColorMaterial)
+				{
+					color=object.material.color;
+				}
+				else if (object.material instanceof FaceColorMaterial)
+				{
+					color = face.color;
+				}
+					
+				gl.useProgram(this.particleProgram);
+				
+				gl.bindBuffer(gl.ARRAY_BUFFER, this.particleProgram.webGLVertexBuffer);
+				gl.enableVertexAttribArray(this.particleProgram.position);
+				gl.vertexAttribPointer(this.particleProgram.position, 3, gl.FLOAT, false, 0, 0);
+				
+				gl.uniform3f( this.particleProgram.location, object.position.x, object.position.y, object.position.z );
+				gl.uniform4f( this.particleProgram.color, color.r/255, color.g/255, color.b/255, color.a/255 );
+				gl.uniform1f( this.particleProgram.size, object.size);
+				
+				this.matrix2Array( camera.matrix, this.particleProgram.cameraMatrixArray );
+				this.matrix2Array( camera.projectionMatrix, this.particleProgram.pMatrixArray );
+				
+				gl.uniformMatrix4fv(this.particleProgram.pMatrix, true, this.particleProgram.pMatrixArray);
+				gl.uniformMatrix4fv(this.particleProgram.cameraMatrix, true, this.particleProgram.cameraMatrixArray);
+				
+				gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.particleProgram.webGLFaceBuffer);
+				gl.drawElements(gl.TRIANGLES,this.particleProgram.faceNum, gl.UNSIGNED_SHORT, 0);
+				
+			}
+			
 		}
 	}
 });
