@@ -42,6 +42,9 @@ var Renderer = Class.extend
 
 		var focuszoom = camera.focus * camera.zoom;
 
+		var matrixMultiply = this.matrix.multiply;
+		var matrixTransform = this.matrix.transform;
+
 		this.renderList = new Array();
 
 		for (var i = 0; i < scene.objects.length; i++)
@@ -50,7 +53,7 @@ var Renderer = Class.extend
 
 			if (object instanceof Mesh)
 			{
-				this.matrix.multiply( camera.matrix, object.matrix );
+				matrixMultiply( camera.matrix, object.matrix );
 
 				// vertices
 
@@ -60,7 +63,7 @@ var Renderer = Class.extend
 
 					vertex.screen.copy( vertex );
 
-					this.matrix.transform( vertex.screen );
+					matrixTransform( vertex.screen );
 
 					vertex.screen.z = focuszoom / (camera.focus + vertex.screen.z);
 
