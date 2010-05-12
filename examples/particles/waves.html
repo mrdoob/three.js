@@ -85,7 +85,9 @@
 				container.appendChild(renderer.viewport);
 
 				stats = new Stats();
-				container.appendChild( stats.getDisplayElement() );
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild(stats.domElement);
 				
 				document.addEventListener('mousemove', onDocumentMouseMove, false);
 				document.addEventListener('touchstart', onDocumentTouchStart, false);
