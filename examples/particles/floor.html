@@ -49,8 +49,8 @@
 			init();
 			setInterval(loop, 1000 / 60);
 
-			function init()
-			{
+			function init() {
+			
 				container = document.createElement('div');
 				document.body.appendChild(container);
 			
@@ -66,10 +66,10 @@
 
 				var material = new THREE.ColorFillMaterial(0xffffff, 1);
 
-				for (var ix = 0; ix < AMOUNTX; ix++)
-				{
-					for(var iy = 0; iy < AMOUNTY; iy++)
-					{
+				for (var ix = 0; ix < AMOUNTX; ix++) {
+				
+					for(var iy = 0; iy < AMOUNTY; iy++) {
+					
 						particle = new THREE.Particle( material );
 						particle.position.x = ix * SEPARATION - ((AMOUNTX * SEPARATION) / 2);
 						particle.position.z = iy * SEPARATION - ((AMOUNTY * SEPARATION) / 2);
@@ -92,16 +92,16 @@
 
 			//
 
-			function onDocumentMouseMove(event)
-			{
+			function onDocumentMouseMove(event) {
+			
 				mouseX = event.clientX - windowHalfX;
 				mouseY = event.clientY - windowHalfY;
 			}
 			
-			function onDocumentTouchStart( event )
-			{
-				if(event.touches.length > 1)
-				{
+			function onDocumentTouchStart( event ) {
+			
+				if(event.touches.length > 1) {
+				
 					event.preventDefault();
 
 					mouseX = event.touches[0].pageX - windowHalfX;
@@ -109,10 +109,10 @@
 				}
 			}
 
-			function onDocumentTouchMove( event )
-			{
-				if(event.touches.length == 1)
-				{
+			function onDocumentTouchMove( event ) {
+			
+				if(event.touches.length == 1) {
+				
 					event.preventDefault();
 					
 					mouseX = event.touches[0].pageX - windowHalfX;
@@ -122,8 +122,8 @@
 			
 			//
 
-			function loop()
-			{
+			function loop() {
+			
 				camera.position.x += (mouseX - camera.position.x) * .05;
 				camera.position.y += (-mouseY - camera.position.y) * .05;
 				camera.updateMatrix();
