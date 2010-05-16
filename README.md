@@ -101,7 +101,7 @@ If you are interested on messing with the actual library, instead of importing t
 	
 ### Change Log ###
 
-2010 05 16 - **r5** (17.979 kb)
+2010 05 16 - **r5** (19.026 kb)
 
 * Removed Class.js dependency
 * Added THREE namespace
