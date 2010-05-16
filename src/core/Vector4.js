@@ -9,6 +9,14 @@ THREE.Vector4 = function (x, y, z, w) {
 	this.z = z || 0;
 	this.w = w || 1;
 
+	this.set = function (x, y, z, w) {
+	
+		this.x = x;
+		this.y = y;
+		this.z = z;
+		this.w = w;
+	}
+
 	this.copy = function (v) {
 	
 		this.x = v.x;

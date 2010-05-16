@@ -9,6 +9,13 @@ THREE.Vector3 = function (x, y, z) {
 	this.y = y || 0;
 	this.z = z || 0;
 
+	this.set = function (x, y, z) {
+	
+		this.x = x;
+		this.y = y;
+		this.z = z;
+	}
+
 	this.copy = function (v) {
 	
 		this.x = v.x;
