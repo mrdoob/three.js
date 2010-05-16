@@ -1,3 +1,7 @@
+/**
+ * @author mr.doob / http://mrdoob.com/
+ */
+
 THREE.SVGRenderer = function () {
 
 	THREE.Renderer.call(this);

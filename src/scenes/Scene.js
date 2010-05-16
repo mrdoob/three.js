@@ -1,3 +1,7 @@
+/**
+ * @author mr.doob / http://mrdoob.com/
+ */
+
 THREE.Scene = function () {
 
 	this.objects = [];

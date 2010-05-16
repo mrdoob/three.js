@@ -1,3 +1,7 @@
+/**
+ * @author mr.doob / http://mrdoob.com/
+ */
+
 THREE.Color = function (hex) {
 
 	var _r, _g, _b, _a, _hex;

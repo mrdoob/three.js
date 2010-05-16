@@ -1,3 +1,7 @@
+/**
+ * @author mr.doob / http://mrdoob.com/
+ */
+
 THREE.Object3D = function (material) {
 
 	this.position = new THREE.Vector3(0, 0, 0);

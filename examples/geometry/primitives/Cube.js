@@ -1,3 +1,7 @@
+/**
+ * @author mr.doob / http://mrdoob.com/
+ */
+
 var Cube = function (width, height, depth) {
 
 	THREE.Geometry.call(this);

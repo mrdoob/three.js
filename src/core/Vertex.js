@@ -1,3 +1,7 @@
+/**
+ * @author mr.doob / http://mrdoob.com/
+ */
+
 THREE.Vertex = function (position, normal) {
 
 	this.position = position || new THREE.Vector3();

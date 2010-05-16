@@ -1,3 +1,7 @@
+/**
+ * @author mr.doob / http://mrdoob.com/
+ */
+
 THREE.Vector3 = function (x, y, z) {
 
 	this.x = x || 0;

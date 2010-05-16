@@ -1,3 +1,7 @@
+/**
+ * @author mr.doob / http://mrdoob.com/
+ */
+
 THREE.Face3 = function (a, b, c, uv, normal, color) {
 
 	this.a = a;

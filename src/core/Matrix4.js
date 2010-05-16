@@ -1,3 +1,8 @@
+/**
+ * @author supereggbert / http://www.paulbrunt.co.uk/
+ * @author mr.doob / http://mrdoob.com/
+ */
+
 THREE.Matrix4 = function () {
 
 	var x, y, z;

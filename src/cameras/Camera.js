@@ -1,3 +1,7 @@
+/**
+ * @author mr.doob / http://mrdoob.com/
+ */
+
 THREE.Camera = function (x, y, z) {
 
 	this.position = new THREE.Vector3(x, y, z);

@@ -1,3 +1,7 @@
+/**
+ * @author kile / http://kile.stravaganza.org/
+ */
+
 var Cylinder = function (numSegs, topRad, botRad, height, topOffset, botOffset) {
 
 	THREE.Geometry.call(this);

@@ -1,3 +1,7 @@
+/**
+ * @author mr.doob / http://mrdoob.com/
+ */
+
 THREE.RenderableFace3 = function () {
 
 	this.v1 = new THREE.Vector2();

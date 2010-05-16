@@ -1,3 +1,7 @@
+/**
+ * @author mr.doob / http://mrdoob.com/
+ */
+
 var Plane = function (width, height) {
 
 	THREE.Geometry.call(this);

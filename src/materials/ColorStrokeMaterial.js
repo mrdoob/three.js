@@ -1,3 +1,7 @@
+/**
+ * @author mr.doob / http://mrdoob.com/
+ */
+
 THREE.ColorStrokeMaterial = function (hex, opacity, lineWidth) {
 
 	this.lineWidth = lineWidth || 1;

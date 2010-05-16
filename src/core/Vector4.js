@@ -1,3 +1,7 @@
+/**
+ * @author supereggbert / http://www.paulbrunt.co.uk/
+ */
+
 THREE.Vector4 = function (x, y, z, w) {
 
 	this.x = x || 0;

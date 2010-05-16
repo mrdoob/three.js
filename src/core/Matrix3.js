@@ -1,3 +1,8 @@
+/**
+ * @author supereggbert / http://www.paulbrunt.co.uk/
+ * @author mr.doob / http://mrdoob.com/
+ */
+
 THREE.Matrix3 = function () {
 
 	this.n11 = 1; this.n12 = 0; this.n13 = 0;

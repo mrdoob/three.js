@@ -1,3 +1,7 @@
+/**
+ * @author mr.doob / http://mrdoob.com/
+ */
+
 THREE.Particle = function (material) {
 
 	THREE.Object3D.call(this, material);

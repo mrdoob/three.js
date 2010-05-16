@@ -1,3 +1,7 @@
+/**
+ * @author supereggbert / http://www.paulbrunt.co.uk/
+ */
+
 /* TODO: Refactoring */
 
 var GLRenderer = Renderer.extend

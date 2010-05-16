@@ -1,3 +1,7 @@
+/**
+ * @author mr.doob / http://mrdoob.com/
+ */
+
 THREE.Mesh = function (geometry, material) {
 
 	THREE.Object3D.call(this, material);
