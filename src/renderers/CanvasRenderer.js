@@ -1,75 +1,97 @@
-var CanvasRenderer = Renderer.extend
-({
-	context: null,
+THREE.CanvasRenderer = function () {
 
-	init: function()
-	{
-		this._super();
+	THREE.Renderer.call(this);
 
-		this.viewport = document.createElement("canvas");
-		this.viewport.style.position = "absolute";
-
-		this.context = this.viewport.getContext("2d");
-	},
-
-	setSize: function( width, height )
-	{
-		this._super( width, height );
-
-		this.viewport.width = this.width;
-		this.viewport.height = this.height;
+	var viewport = document.createElement("canvas"),
+	context = viewport.getContext("2d");
+	
+	this.setSize = function (width, height) {
+	
+		viewport.width = width;
+		viewport.height = height;
 		
-		this.context.setTransform(1, 0, 0, 1, this.widthHalf, this.heightHalf);
-	},
+		context.setTransform(1, 0, 0, 1, width / 2, height / 2);
+	}
+	
+	this.domElement = viewport;
 
-	render: function( scene, camera )
-	{
-		this._super( scene, camera );
+	this.render = function (scene, camera) {
+	
+		var i, j, element, pi2 = Math.PI * 2,
+		elementsLength, material, materialLength;
 
-		var element , pi2 = Math.PI * 2;
+		context.clearRect (-viewport.width / 2, -viewport.height / 2, viewport.width, viewport.height);
 
-		this.context.clearRect (-this.widthHalf, -this.heightHalf, this.width, this.height);
+		this.project(scene, camera);
+
+		elementsLength = this.renderList.length;
 		
-		for (j = 0; j < this.renderList.length; j++)
-		{
-			element = this.renderList[j];
+		for (i = 0; i < elementsLength; i++) {
+		
+			element = this.renderList[i];
+			materialLength = element.material.length;
+		
+			for (j = 0; j < materialLength; j++) {
+		
+				material = element.material[j];
 			
-			if (element.material instanceof ColorMaterial)
-			{
-				this.context.fillStyle = element.material.color.styleString;
-			}
-			else if (element.material instanceof FaceColorMaterial)
-			{
-				this.context.fillStyle = element.color.styleString;
-			}
+				context.beginPath();
+
+				if (element instanceof THREE.RenderableFace3) {
 			
-			if (element instanceof Face3)
-			{
-				this.context.beginPath();
-				this.context.moveTo(element.a.screen.x, element.a.screen.y);
-				this.context.lineTo(element.b.screen.x, element.b.screen.y);
-				this.context.lineTo(element.c.screen.x, element.c.screen.y);
-				this.context.fill();
-				this.context.closePath();
-			}
-			else if (element instanceof Face4)
-			{
-				this.context.beginPath();
-				this.context.moveTo(element.a.screen.x, element.a.screen.y);
-				this.context.lineTo(element.b.screen.x, element.b.screen.y);
-				this.context.lineTo(element.c.screen.x, element.c.screen.y);
-				this.context.lineTo(element.d.screen.x, element.d.screen.y);
-				this.context.fill();
-				this.context.closePath();
-			}
-			else if (element instanceof Particle)
-			{
-				this.context.beginPath();
-				this.context.arc(element.screen.x, element.screen.y, element.size * element.screen.z, 0, pi2, true);
-				this.context.fill();
-				this.context.closePath();				
-			}
+					context.moveTo(element.v1.x, element.v1.y);
+					context.lineTo(element.v2.x, element.v2.y);
+					context.lineTo(element.v3.x, element.v3.y);
+					context.lineTo(element.v1.x, element.v1.y);
+				
+				} else if (element instanceof THREE.RenderableFace4) {
+
+					context.moveTo(element.v1.x, element.v1.y);
+					context.lineTo(element.v2.x, element.v2.y);
+					context.lineTo(element.v3.x, element.v3.y);
+					context.lineTo(element.v4.x, element.v4.y);
+					context.lineTo(element.v1.x, element.v1.y);
+				
+				} else if (element instanceof THREE.RenderableParticle) {
 			
+					context.arc(element.x, element.y, element.size * element.screenZ, 0, pi2, true);
+				}
+				
+				
+				if (material instanceof THREE.ColorFillMaterial) {
+			
+					context.fillStyle = material.color.styleString;
+					context.fill();
+			
+				} else if (material instanceof THREE.FaceColorFillMaterial) {
+			
+					context.fillStyle = element.color.styleString;
+					context.fill();
+
+				} else if (material instanceof THREE.ColorStrokeMaterial) {
+				
+					context.lineWidth = material.lineWidth;
+					context.lineJoin = "round";
+					context.lineCap = "round";
+
+					context.strokeStyle = material.color.styleString;
+					context.stroke();
+				
+				} else if (material instanceof THREE.FaceColorStrokeMaterial) {
+				
+					context.lineWidth = material.lineWidth;
+					context.lineJoin = "round";
+					context.lineCap = "round";
+					
+					context.strokeStyle = element.color.styleString;					
+					context.stroke();
+				}
+				
+				context.closePath();			
+			}
 		}
 	}
-});
+}
+
+THREE.CanvasRenderer.prototype = new THREE.Renderer();
+THREE.CanvasRenderer.prototype.constructor = THREE.CanvasRenderer;

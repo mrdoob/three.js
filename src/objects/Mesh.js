@@ -1,14 +1,12 @@
-var Mesh = Object3D.extend
-({
-	geometry: null,
-	material: null,
-	
-	doubleSide: null,
+THREE.Mesh = function (geometry, material) {
 
-	init: function( geometry, material )
-	{
-		this._super();
-		this.geometry = geometry;
-		this.material = material;
-	}
-});
+	THREE.Object3D.call(this, material);
+	
+	this.geometry = geometry;
+	
+	this.doubleSided = false;
+
+}
+
+THREE.Mesh.prototype = new THREE.Object3D();
+THREE.Mesh.prototype.constructor = THREE.Mesh;

@@ -3,12 +3,14 @@ import os
 
 # MERGER
 
-rev = 4;
+rev = 5;
 
 files = [];
-files.append('Class.js');
+files.append('Three.js');
 files.append('core/Color.js');
+files.append('core/Vector2.js');
 files.append('core/Vector3.js');
+files.append('core/Vector4.js');
 files.append('core/Matrix4.js');
 files.append('core/Vertex.js');
 files.append('core/Face3.js');
@@ -16,16 +18,20 @@ files.append('core/Face4.js');
 files.append('core/Geometry.js');
 files.append('cameras/Camera.js');
 files.append('objects/Object3D.js');
+files.append('objects/Line.js');
 files.append('objects/Mesh.js');
 files.append('objects/Particle.js');
-files.append('objects/primitives/Plane.js');
-files.append('objects/primitives/Cube.js');
-files.append('materials/ColorMaterial.js');
-files.append('materials/FaceColorMaterial.js');
+files.append('materials/ColorFillMaterial.js');
+files.append('materials/ColorStrokeMaterial.js');
+files.append('materials/FaceColorFillMaterial.js');
+files.append('materials/FaceColorStrokeMaterial.js');
 files.append('scenes/Scene.js');
 files.append('renderers/Renderer.js');
 files.append('renderers/CanvasRenderer.js');
 files.append('renderers/SVGRenderer.js');
+files.append('renderers/renderables/RenderableFace3.js');
+files.append('renderers/renderables/RenderableFace4.js');
+files.append('renderers/renderables/RenderableParticle.js');
 
 string = '';
 

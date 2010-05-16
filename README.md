@@ -37,61 +37,82 @@ This code creates a camera, then creates a scene object, adds a bunch of random 
 		init();
 		setInterval(loop, 1000 / 60);
 
-		function init()
-		{
-			camera = new Camera(0, 0, 1000);
+		function init() {
+		
+			camera = new THREE.Camera(0, 0, 1000);
 
-			scene = new Scene();
+			scene = new THREE.Scene();
 	
-			renderer = new CanvasRenderer();
+			renderer = new THREE.CanvasRenderer();
 			renderer.setSize(window.innerWidth, window.innerHeight);
 
-			for (var i = 0; i < 1000; i++)
-			{
-				var particle = new Particle( new ColorMaterial(Math.random() * 0x808008 + 0x808080, 1) );
+			for (var i = 0; i < 1000; i++) {
+			
+				var particle = new THREE.Particle( new THREE.ColorMaterial(Math.random() * 0x808008 + 0x808080, 1) );
 				particle.size = Math.random() * 10 + 5;
 				particle.position.x = Math.random() * 2000 - 1000;
 				particle.position.y = Math.random() * 2000 - 1000;
 				particle.position.z = Math.random() * 2000 - 1000;
 				particle.updateMatrix();
 				scene.add( particle );
+				
 			}
 
 			document.body.appendChild(renderer.viewport);
+			
 		}
 
-		function loop()
-		{
+		function loop() {
+		
 			renderer.render(scene, camera);
+			
 		}
 
 	</script>
 
 If you are interested on messing with the actual library, instead of importing the three.js compressed file, you can include the original files in this order:
 
-	<script type="text/javascript" src="src/Class.js"></script>
-	<script type="text/javascript" src="src/core/Color.js"></script>
-	<script type="text/javascript" src="src/core/Vector3.js"></script>
-	<script type="text/javascript" src="src/core/Matrix4.js"></script>
-	<script type="text/javascript" src="src/core/Vertex.js"></script>
-	<script type="text/javascript" src="src/core/Face3.js"></script>
-	<script type="text/javascript" src="src/core/Face4.js"></script>
-	<script type="text/javascript" src="src/core/Geometry.js"></script>
-	<script type="text/javascript" src="src/cameras/Camera.js"></script>
-	<script type="text/javascript" src="src/objects/Object3D.js"></script>
-	<script type="text/javascript" src="src/objects/Mesh.js"></script>
-	<script type="text/javascript" src="src/objects/primitives/Plane.js"></script>
-	<script type="text/javascript" src="src/objects/primitives/Cube.js"></script>
-	<script type="text/javascript" src="src/objects/Particle.js"></script>
-	<script type="text/javascript" src="src/materials/ColorMaterial.js"></script>
-	<script type="text/javascript" src="src/materials/FaceColorMaterial.js"></script>
-	<script type="text/javascript" src="src/scenes/Scene.js"></script>
-	<script type="text/javascript" src="src/renderers/Renderer.js"></script>
-	<script type="text/javascript" src="src/renderers/CanvasRenderer.js"></script>
-	<script type="text/javascript" src="src/renderers/SVGRenderer.js"></script>
+	<script type="text/javascript" src="js/three/Three.js"></script>
+	<script type="text/javascript" src="js/three/core/Color.js"></script>
+	<script type="text/javascript" src="js/three/core/Vector2.js"></script>
+	<script type="text/javascript" src="js/three/core/Vector3.js"></script>
+	<script type="text/javascript" src="js/three/core/Vector4.js"></script>		
+	<script type="text/javascript" src="js/three/core/Matrix4.js"></script>
+	<script type="text/javascript" src="js/three/core/Vertex.js"></script>
+	<script type="text/javascript" src="js/three/core/Face3.js"></script>
+	<script type="text/javascript" src="js/three/core/Face4.js"></script>
+	<script type="text/javascript" src="js/three/core/Geometry.js"></script>
+	<script type="text/javascript" src="js/three/cameras/Camera.js"></script>
+	<script type="text/javascript" src="js/three/objects/Object3D.js"></script>
+	<script type="text/javascript" src="js/three/objects/Mesh.js"></script>
+	<script type="text/javascript" src="js/three/objects/Particle.js"></script>
+	<script type="text/javascript" src="js/three/materials/ColorFillMaterial.js"></script>
+	<script type="text/javascript" src="js/three/materials/ColorStrokeMaterial.js"></script>
+	<script type="text/javascript" src="js/three/materials/FaceColorFillMaterial.js"></script>
+	<script type="text/javascript" src="js/three/materials/FaceColorStrokeMaterial.js"></script>
+	<script type="text/javascript" src="js/three/scenes/Scene.js"></script>
+	<script type="text/javascript" src="js/three/renderers/Renderer.js"></script>
+	<script type="text/javascript" src="js/three/renderers/CanvasRenderer.js"></script>
+	<script type="text/javascript" src="js/three/renderers/SVGRenderer.js"></script>
+	<script type="text/javascript" src="js/three/renderers/renderables/RenderableFace3.js"></script>
+	<script type="text/javascript" src="js/three/renderers/renderables/RenderableFace4.js"></script>
+	<script type="text/javascript" src="js/three/renderers/renderables/RenderableParticle.js"></script>
 
 	
 ### Change Log ###
+
+2010 05 16 - **r5** (17.979 kb)
+
+* Removed Class.js dependency
+* Added THREE namespace
+* Camera.x -> Camera.position.x
+* Camera.target.x -> Camera.target.position.x
+* ColorMaterial -> ColorFillMaterial
+* FaceColorMaterial -> FaceColorFillMaterial
+* Materials are now multipass (use array)
+* Added ColorStrokeMaterial and FaceColorStrokeMaterial
+* geometry.faces.a are now indexes instead of links 
+
 
 2010 04 26 - **r4** (16.274 kb)
 

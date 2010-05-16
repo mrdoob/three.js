@@ -1,11 +1,9 @@
-var Particle = Object3D.extend
-({
-	size: 1,
-	material: null,
+THREE.Particle = function (material) {
 
-	init: function( material )
-	{
-		this._super();
-		this.material = material;
-	}
-});
+	THREE.Object3D.call(this, material);
+
+	this.size = 1;
+}
+
+THREE.Particle.prototype = new THREE.Object3D();
+THREE.Particle.prototype.constructor = THREE.Particle;

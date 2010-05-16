@@ -1,11 +1,6 @@
-var Geometry = Class.extend
-({
-	vertices: null,
-	faces: null,
+THREE.Geometry = function () {
 
-	init: function()
-	{
-		this.vertices = new Array();
-		this.faces = new Array();
-	}
-});
+	this.vertices = [];
+	this.faces = [];
+
+}

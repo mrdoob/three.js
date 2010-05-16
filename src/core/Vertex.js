@@ -1,18 +1,13 @@
-var Vertex = Vector3.extend
-({
-	u: null, v: null,
-	screen: null,
-	normal : null,
-	visible: null,
+THREE.Vertex = function (position, normal) {
 
-	init: function(x, y, z)
-	{
-		this._super(x, y, z);
-		this.screen = new Vector3();
-	},
+	this.position = position || new THREE.Vector3();
+	this.normal = normal || new THREE.Vector3();
+	this.screen = new THREE.Vector3();
+	
+	this.visible = true; // internal
 
-	toString: function()
-	{
-		return 'Vertex ( ' + this.x + ', ' + this.y + ', ' + this.z + ' )';
+	this.toString = function () {
+	
+		return 'THREE.Vertex ( ' + this.position + ', ' + this.normal + ' )';
 	}
-});
+}

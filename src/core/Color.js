@@ -1,55 +1,49 @@
-var Color = Class.extend
-({
-	r: null, g: null, b: null, a: null,
-	hex: null,
+THREE.Color = function (hex) {
+
+	var _r, _g, _b, _a, _hex;
 	
-	styleString: null,
+	this.styleString;
 	
+	this.setHex = function (hex) {
 	
-	init: function( hex )
-	{
-		this.setHex( hex ? hex : 0xff000000 );
-	},
-	
-	setHex: function( hex )
-	{
-		this.hex = hex;
+		_hex = hex;
 		this.updateRGBA();
 		this.updateStyleString();
-	},
+	}
 	
-	setRGBA: function( r, g, b, a )
-	{
-		this.r = r;
-		this.g = g;
-		this.b = b;
-		this.a = a;
+	this.setRGBA = function (r, g, b, a) {
+	
+		_r = r;
+		_g = g;
+		_b = b;
+		_a = a;
 		
 		this.updateHex();
 		this.updateStyleString();
-	},
-	
-	updateHex: function()
-	{
-		this.hex = this.a << 24 | this.r << 16 | this.g << 8 | this.b;
-	},
-	
-	updateRGBA: function()
-	{
-		this.r = this.hex >> 16 & 0xff;
-		this.g = this.hex >> 8 & 0xff;
-		this.b = this.hex & 0xff;
-		this.a = this.hex >> 24 & 0xff;		
-	},
-	
-	updateStyleString: function()
-	{
-		this.styleString = 'rgba(' + this.r + ',' + this.g + ',' + this.b + ',' + (this.a / 255) + ')';		
-	},
-	
-	toString: function()
-	{
-		return 'Color ( r: ' + this.r + ', g: ' + this.g + ', b: ' + this.b + ', a: ' + this.a + ', hex: ' + this.hex + ', style: ' + this.styleString + ' )';	
 	}
 	
-});
+	this.updateHex = function () {
+	
+		_hex = _a << 24 | _r << 16 | _g << 8 | _b;
+	}
+	
+	this.updateRGBA = function () {
+	
+		_r = _hex >> 16 & 0xff;
+		_g = _hex >> 8 & 0xff;
+		_b = _hex & 0xff;
+		_a = _hex >> 24 & 0xff;		
+	}
+	
+	this.updateStyleString = function () {
+	
+		this.styleString = 'rgba(' + _r + ',' + _g + ',' + _b + ',' + (_a / 255) + ')';	
+	}
+	
+	this.toString = function () {
+	
+		return 'THREE.Color ( r: ' + _r + ', g: ' + _g + ', b: ' + _b + ', a: ' + _a + ', hex: ' + _hex + ', style: ' + this.styleString + ' )';	
+	}
+	
+	this.setHex(hex);
+}

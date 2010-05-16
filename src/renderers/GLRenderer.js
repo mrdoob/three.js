@@ -1,6 +1,7 @@
+/* TODO: Refactoring */
+
 var GLRenderer = Renderer.extend
 ({
-	
 	init: function()
 	{
 		this._super();

@@ -17,6 +17,10 @@
 	<body>
 
 		<script type="text/javascript" src="../../build/three.js"></script>
+		
+		<script type="text/javascript" src="primitives/Cube.js"></script>
+		<script type="text/javascript" src="primitives/Plane.js"></script>
+		
 		<script type="text/javascript" src="http://github.com/mrdoob/stats.js/raw/master/build/stats.js"></script>
 
 		<script type="text/javascript">
@@ -45,8 +49,8 @@
 			init();
 			setInterval(loop, 1000/60);
 
-			function init()
-			{
+			function init() {
+			
 				container = document.createElement('div');
 				document.body.appendChild(container);
 				
@@ -58,36 +62,38 @@
 				info.innerHTML = 'Drag to spin the cube';
 				container.appendChild(info);
 			
-				camera = new Camera(0, 150, 400);
+				camera = new THREE.Camera(0, 150, 400);
 				camera.focus = 300;
-				camera.target.y = 150;
+				camera.target.position.y = 150;
 				camera.updateMatrix();
 
-				scene = new Scene();
+				scene = new THREE.Scene();
 
 				// Cube
 
 				geometry = new Cube(200, 200, 200);
 
-				for (var i = 0; i < geometry.faces.length; i++)
+				for (var i = 0; i < geometry.faces.length; i++) {
+				
 					geometry.faces[i].color.setRGBA( Math.floor( Math.random() * 128), Math.floor( Math.random() * 128 + 128), Math.floor( Math.random() * 128 + 128), 255 );
+				}
 								
-				cube = new Mesh(geometry, new FaceColorMaterial());
+				cube = new THREE.Mesh(geometry, new THREE.FaceColorFillMaterial());
 				cube.position.y = 150;
 				cube.updateMatrix();
 				scene.add(cube);
 				
 				// Plane
 				
-				plane = new Mesh(new Plane(200, 200), new ColorMaterial(0xe0e0e0));
+				plane = new THREE.Mesh(new Plane(200, 200), new THREE.ColorFillMaterial(0xe0e0e0));
 				plane.rotation.x = 90 * (Math.PI / 180);
 				plane.updateMatrix();
 				scene.add(plane);
 				
-				renderer = new CanvasRenderer();
+				renderer = new THREE.CanvasRenderer();
 				renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 
-				container.appendChild(renderer.viewport);
+				container.appendChild(renderer.domElement);
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
@@ -101,8 +107,8 @@
 
 			//
 
-			function onDocumentMouseDown( event )
-			{
+			function onDocumentMouseDown( event ) {
+			
 				event.preventDefault();
 				
 				document.addEventListener('mousemove', onDocumentMouseMove, false);
@@ -113,31 +119,31 @@
 				targetRotationOnMouseDown = targetRotation;
 			}
 
-			function onDocumentMouseMove( event )
-			{
+			function onDocumentMouseMove( event ) {
+			
 				mouseX = event.clientX - windowHalfX;
 				
 				targetRotation = targetRotationOnMouseDown + (mouseX - mouseXOnMouseDown) * 0.02;
 			}
 			
-			function onDocumentMouseUp( event )
-			{
+			function onDocumentMouseUp( event ) {
+			
 				document.removeEventListener('mousemove', onDocumentMouseMove, false);
 				document.removeEventListener('mouseup', onDocumentMouseUp, false);
 				document.removeEventListener('mouseout', onDocumentMouseOut, false);
 			}
 			
-			function onDocumentMouseOut( event )
-			{
+			function onDocumentMouseOut( event ) {
+			
 				document.removeEventListener('mousemove', onDocumentMouseMove, false);
 				document.removeEventListener('mouseup', onDocumentMouseUp, false);
 				document.removeEventListener('mouseout', onDocumentMouseOut, false);
 			}
 			
-			function onDocumentTouchStart( event )
-			{
-				if(event.touches.length == 1)
-				{
+			function onDocumentTouchStart( event ) {
+			
+				if(event.touches.length == 1) {
+				
 					event.preventDefault();
 
 					mouseXOnMouseDown = event.touches[0].pageX - windowHalfX;
@@ -145,10 +151,10 @@
 				}
 			}
 
-			function onDocumentTouchMove( event )
-			{
-				if(event.touches.length == 1)
-				{
+			function onDocumentTouchMove( event ) {
+			
+				if(event.touches.length == 1) {
+				
 					event.preventDefault();
 					
 					mouseX = event.touches[0].pageX - windowHalfX;
@@ -158,8 +164,8 @@
 
 			//
 
-			function loop()
-			{
+			function loop() {
+			
 				cube.rotation.y += (targetRotation - cube.rotation.y) * 0.05;
 				cube.updateMatrix();
 				
