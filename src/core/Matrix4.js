@@ -30,11 +30,11 @@ THREE.Matrix4 = function () {
 		z.normalize();
 
 		x.copy(z);
-		x.cross(up);
+		x.crossSelf(up);
 		x.normalize();
 
 		y.copy(x);
-		y.cross(z);
+		y.crossSelf(z);
 		y.normalize();
 		y.negate(); //
 

@@ -1,4 +1,5 @@
 /**
+ * @author kile / http://kile.stravaganza.org/
  * @author mr.doob / http://mrdoob.com/
  */
 
@@ -28,6 +29,13 @@ THREE.Vector3 = function (x, y, z) {
 		this.y += v.y;
 		this.z += v.z;
 	}
+	
+	this.addScalar = function (s) {
+	
+		this.x += s;
+		this.y += s;
+		this.z += s;
+	}	
 
 	this.sub = function(v1, v2) {
 	
@@ -43,7 +51,7 @@ THREE.Vector3 = function (x, y, z) {
 		this.z -= v.z;
 	}
 	
-	this.cross = function (v) {
+	this.crossSelf = function (v) {
 	
 		var tx = this.x, ty = this.y, tz = this.z;
 		
@@ -52,11 +60,23 @@ THREE.Vector3 = function (x, y, z) {
 		this.z = tx * v.y - ty * v.x;
 	}
 	
-	this.multiply = function (s) {
+	this.multiplySelf = function (v) {
+	
+		this.x *= v.x;
+		this.y *= v.y;
+		this.z *= v.z;
+	}	
+	
+	this.multiplyScalar = function (s) {
 	
 		this.x *= s;
 		this.y *= s;
 		this.z *= s;
+	}
+	
+	this.dot = function (v) {
+	
+		return this.x * v.x + this.y * v.y + this.z * v.z;
 	}
 	
 	this.distanceTo = function (v) {
@@ -92,22 +112,23 @@ THREE.Vector3 = function (x, y, z) {
 	
 		if (this.length() > 0) {
 		
-			this.multiply(1 / this.length());
+			this.multiplyScalar(1 / this.length());
 			
 		} else {
 		
-			this.multiply(0);
+			this.multiplyScalar(0);
 		}
 	}
 	
-	this.dot = function (v) {
+	this.isZero = function () {
 	
-		return this.x * v.x + this.y * v.y + this.z * v.z;
-	}
+		var almostZero = 0.0001;
+		return (Math.abs(this.x) < almostZero) && (Math.abs(this.y) < almostZero) && (Math.abs(this.z) < almostZero);
+	}	
 	
 	this.clone = function () {
 	
-		return new Vector3(this.x, this.y, this.z);
+		return new THREE.Vector3(this.x, this.y, this.z);
 	}
 	
 	this.toString = function () {

@@ -37,7 +37,7 @@ THREE.Vector2 = function (x, y) {
 		this.y = v1.y - v2.y;
 	}
 	
-	this.multiply = function (s) {
+	this.multiplyScalar = function (s) {
 	
 		this.x *= s;
 		this.y *= s;

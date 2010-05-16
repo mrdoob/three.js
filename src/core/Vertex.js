@@ -12,6 +12,6 @@ THREE.Vertex = function (position, normal) {
 
 	this.toString = function () {
 	
-		return 'THREE.Vertex ( ' + this.position + ', ' + this.normal + ' )';
+		return 'THREE.Vertex ( position: ' + this.position + ', normal: ' + this.normal + ' )';
 	}
 }
