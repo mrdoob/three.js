@@ -76,7 +76,8 @@ If you are interested on messing with the actual library, instead of importing t
 	<script type="text/javascript" src="js/three/core/Color.js"></script>
 	<script type="text/javascript" src="js/three/core/Vector2.js"></script>
 	<script type="text/javascript" src="js/three/core/Vector3.js"></script>
-	<script type="text/javascript" src="js/three/core/Vector4.js"></script>		
+	<script type="text/javascript" src="js/three/core/Vector4.js"></script>
+	<script type="text/javascript" src="js/three/core/Rectangle.js"></script>	
 	<script type="text/javascript" src="js/three/core/Matrix4.js"></script>
 	<script type="text/javascript" src="js/three/core/Vertex.js"></script>
 	<script type="text/javascript" src="js/three/core/Face3.js"></script>
@@ -100,6 +101,12 @@ If you are interested on messing with the actual library, instead of importing t
 
 	
 ### Change Log ###
+
+2010 05 17 - **r6** (21.003 kb)
+
+* 2d clipping on CanvasRenderer and SVGRenderer
+* clearRect optimisations on CanvasRenderer
+
 
 2010 05 16 - **r5** (19.026 kb)
 

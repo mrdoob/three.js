@@ -6,26 +6,39 @@ THREE.CanvasRenderer = function () {
 
 	THREE.Renderer.call(this);
 
-	var viewport = document.createElement("canvas"),
-	context = viewport.getContext("2d");
+	var _viewport = document.createElement("canvas"),
+	_context = _viewport.getContext("2d"),
+	_clipRect = new THREE.Rectangle(),
+	_clearRect = new THREE.Rectangle(),
+	_bboxRect = new THREE.Rectangle();
 	
 	this.setSize = function (width, height) {
 	
-		viewport.width = width;
-		viewport.height = height;
+		_viewport.width = width;
+		_viewport.height = height;
 		
-		context.setTransform(1, 0, 0, 1, width / 2, height / 2);
+		_context.setTransform(1, 0, 0, 1, width / 2, height / 2);
+		
+		_clipRect.set(-width / 2, -height / 2, width / 2, height / 2);
 	}
 	
-	this.domElement = viewport;
+	this.domElement = _viewport;
 
 	this.render = function (scene, camera) {
 	
 		var i, j, element, pi2 = Math.PI * 2,
-		elementsLength, material, materialLength;
+		elementsLength, material, materialLength,
+		v1x, v1y, v2x, v2y, v3x, v3y, v4x, v4y,
+		size;
 
-		context.clearRect (-viewport.width / 2, -viewport.height / 2, viewport.width, viewport.height);
+		_context.clearRect(_clearRect.getX() - 1, _clearRect.getY() - 1, _clearRect.getWidth() + 2, _clearRect.getHeight() + 2);
+		_clearRect.empty();
 
+		/*
+		_context.fillStyle = 'rgba(255, 255, 0, 0.5)';
+		_context.fillRect(_clipRect.getX(), _clipRect.getY(), _clipRect.getWidth(), _clipRect.getHeight());
+		*/
+		
 		this.project(scene, camera);
 
 		elementsLength = this.renderList.length;
@@ -39,59 +52,104 @@ THREE.CanvasRenderer = function () {
 		
 				material = element.material[j];
 			
-				context.beginPath();
+				_context.beginPath();
+				
+				_bboxRect.empty();
 
 				if (element instanceof THREE.RenderableFace3) {
-			
-					context.moveTo(element.v1.x, element.v1.y);
-					context.lineTo(element.v2.x, element.v2.y);
-					context.lineTo(element.v3.x, element.v3.y);
-					context.lineTo(element.v1.x, element.v1.y);
+					
+					v1x = element.v1.x; v1y = element.v1.y;
+					v2x = element.v2.x; v2y = element.v2.y;
+					v3x = element.v3.x; v3y = element.v3.y;
+					
+					_bboxRect.addPoint(v1x, v1y);
+					_bboxRect.addPoint(v2x, v2y);
+					_bboxRect.addPoint(v3x, v3y);
+					
+					if (!_clipRect.instersects(_bboxRect)) {
+					
+						continue;
+					}
+					
+					_clearRect.addRectangle(_bboxRect);
+					
+					_context.moveTo(v1x, v1y);
+					_context.lineTo(v2x, v2y);
+					_context.lineTo(v3x, v3y);
+					_context.lineTo(v1x, v1y);			
 				
 				} else if (element instanceof THREE.RenderableFace4) {
 
-					context.moveTo(element.v1.x, element.v1.y);
-					context.lineTo(element.v2.x, element.v2.y);
-					context.lineTo(element.v3.x, element.v3.y);
-					context.lineTo(element.v4.x, element.v4.y);
-					context.lineTo(element.v1.x, element.v1.y);
+					v1x = element.v1.x; v1y = element.v1.y;
+					v2x = element.v2.x; v2y = element.v2.y;
+					v3x = element.v3.x; v3y = element.v3.y;
+					v4x = element.v4.x; v4y = element.v4.y;
+					
+					_bboxRect.addPoint(v1x, v1y);
+					_bboxRect.addPoint(v2x, v2y);
+					_bboxRect.addPoint(v3x, v3y);
+					_bboxRect.addPoint(v4x, v4y);
+
+					if (!_clipRect.instersects(_bboxRect)) {
+					
+						continue;
+					}
+
+					_clearRect.addRectangle(_bboxRect);
+					
+					_context.moveTo(v1x, v1y);
+					_context.lineTo(v2x, v2y);
+					_context.lineTo(v3x, v3y);
+					_context.lineTo(v4x, v4y);					
+					_context.lineTo(v1x, v1y);					
 				
 				} else if (element instanceof THREE.RenderableParticle) {
-			
-					context.arc(element.x, element.y, element.size * element.screenZ, 0, pi2, true);
+					
+					size = element.size * element.screenZ;
+					
+					_bboxRect.set(element.x - size, element.y - size, element.x + size, element.y + size);
+
+					if (!_clipRect.instersects(_bboxRect)) {
+					
+						continue;
+					}
+					
+					_clearRect.addRectangle(_bboxRect);
+					
+					_context.arc(element.x, element.y, size, 0, pi2, true);
 				}
 				
 				
 				if (material instanceof THREE.ColorFillMaterial) {
 			
-					context.fillStyle = material.color.styleString;
-					context.fill();
+					_context.fillStyle = material.color.styleString;
+					_context.fill();
 			
 				} else if (material instanceof THREE.FaceColorFillMaterial) {
 			
-					context.fillStyle = element.color.styleString;
-					context.fill();
+					_context.fillStyle = element.color.styleString;
+					_context.fill();
 
 				} else if (material instanceof THREE.ColorStrokeMaterial) {
 				
-					context.lineWidth = material.lineWidth;
-					context.lineJoin = "round";
-					context.lineCap = "round";
+					_context.lineWidth = material.lineWidth;
+					_context.lineJoin = "round";
+					_context.lineCap = "round";
 
-					context.strokeStyle = material.color.styleString;
-					context.stroke();
+					_context.strokeStyle = material.color.styleString;
+					_context.stroke();
 				
 				} else if (material instanceof THREE.FaceColorStrokeMaterial) {
 				
-					context.lineWidth = material.lineWidth;
-					context.lineJoin = "round";
-					context.lineCap = "round";
+					_context.lineWidth = material.lineWidth;
+					_context.lineJoin = "round";
+					_context.lineCap = "round";
 					
-					context.strokeStyle = element.color.styleString;					
-					context.stroke();
+					_context.strokeStyle = element.color.styleString;					
+					_context.stroke();
 				}
 				
-				context.closePath();			
+				_context.closePath();			
 			}
 		}
 	}

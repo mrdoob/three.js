@@ -3,7 +3,7 @@ import os
 
 # MERGER
 
-rev = 5;
+rev = 6;
 
 files = [];
 files.append('Three.js');
@@ -11,6 +11,7 @@ files.append('core/Color.js');
 files.append('core/Vector2.js');
 files.append('core/Vector3.js');
 files.append('core/Vector4.js');
+files.append('core/Rectangle.js');
 files.append('core/Matrix4.js');
 files.append('core/Vertex.js');
 files.append('core/Face3.js');
