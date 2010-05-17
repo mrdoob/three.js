@@ -9,17 +9,7 @@ THREE.Rectangle = function (x1, y1, x2, y2) {
 	_width = _x2 - _x1, _height = _y2 - _y1,
 	_isEmpty = false;
 
-	this.set = function (x1, y1, x2, y2) {
-	
-		_isEmpty = false;
-		
-		_x1 = x1; _y1 = y1;
-		_x2 = x2; _y2 = y2;
-
-		this.resize();
-	}
-	
-	this.resize = function () {
+	function resize() {
 	
 		_width = _x2 - _x1;
 		_height = _y2 - _y1;
@@ -65,6 +55,16 @@ THREE.Rectangle = function (x1, y1, x2, y2) {
 		return _y2;
 	}
 
+	this.set = function (x1, y1, x2, y2) {
+	
+		_isEmpty = false;
+		
+		_x1 = x1; _y1 = y1;
+		_x2 = x2; _y2 = y2;
+
+		resize();
+	}
+	
 	this.addPoint = function (x, y) {
 	
 		if (_isEmpty) {
@@ -78,7 +78,7 @@ THREE.Rectangle = function (x1, y1, x2, y2) {
 			_y2 = Math.max(_y2, y);
 		}
 		
-		this.resize();
+		resize();
 	}
 	
 	this.addRectangle = function (r) {
@@ -94,14 +94,34 @@ THREE.Rectangle = function (x1, y1, x2, y2) {
 			_y2 = Math.max(_y2, r.getY2());
 		}
 		
-		this.resize();
+		resize();
 	}
+	
+	this.inflate = function (v) {
+	
+		_x1 -= v; _y1 -= v;
+		_x2 += v; _y2 += v;
+		
+		resize();
+	}
+
+	this.minSelf = function(r) {
+	
+		_x1 = Math.max(_x1, r.getX1());
+		_y1 = Math.max(_y1, r.getY1());
+		_x2 = Math.min(_x2, r.getX2());
+		_y2 = Math.min(_y2, r.getY2());
+		
+		resize();		
+	}	
+	
 	/*
 	this.containsPoint = function (x, y) {
 	
 		return x > _x1 && x < _x2 && y > _y1 && y < _y2;
 	}
 	*/
+	
 	this.instersects = function (r) {
 	
 		return Math.min(_x2, r.getX2()) - Math.max(_x1, r.getX1()) > 0 && Math.min(_y2, r.getY2()) - Math.max(_y1, r.getY1()) > 0;
@@ -114,7 +134,7 @@ THREE.Rectangle = function (x1, y1, x2, y2) {
 		_x1 = 0; _y1 = 0;
 		_x2 = 0, _y2 = 0;
 
-		this.resize();
+		resize();
 	}
 	
 	this.toString = function () {

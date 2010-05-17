@@ -9,7 +9,7 @@ THREE.CanvasRenderer = function () {
 	var _viewport = document.createElement("canvas"),
 	_context = _viewport.getContext("2d"),
 	_clipRect = new THREE.Rectangle(),
-	_clearRect = new THREE.Rectangle(),
+	_clearRect = new THREE.Rectangle(0, 0, 0, 0),
 	_bboxRect = new THREE.Rectangle();
 	
 	this.setSize = function (width, height) {
@@ -31,7 +31,9 @@ THREE.CanvasRenderer = function () {
 		v1x, v1y, v2x, v2y, v3x, v3y, v4x, v4y,
 		size;
 
-		_context.clearRect(_clearRect.getX() - 1, _clearRect.getY() - 1, _clearRect.getWidth() + 2, _clearRect.getHeight() + 2);
+		_clearRect.inflate(1);
+		_clearRect.minSelf(_clipRect);
+		_context.clearRect(_clearRect.getX(), _clearRect.getY(), _clearRect.getWidth(), _clearRect.getHeight());
 		_clearRect.empty();
 
 		/*
