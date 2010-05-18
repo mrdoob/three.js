@@ -58,7 +58,7 @@ This code creates a camera, then creates a scene object, adds a bunch of random 
 				
 			}
 
-			document.body.appendChild(renderer.viewport);
+			document.body.appendChild(renderer.domElement);
 			
 		}
 
