@@ -8,6 +8,6 @@ THREE.ColorFillMaterial = function (hex, opacity) {
 	
 	this.toString = function () {
 	
-		return 'THREE.ColorFillMaterial ( color: ' + this.color + ' )';	
+		return 'THREE.ColorFillMaterial ( color: ' + this.color + ' )';
 	}
 }

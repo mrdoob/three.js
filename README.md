@@ -15,10 +15,10 @@ Although this allows 3D for iPhoneOS and Android platforms the performance on th
 
 ### Examples ###
 
-[![cube.png](http://github.com/mrdoob/three.js/raw/master/examples/geometry/cube.png)](http://mrdoob.com/lab/javascript/three/geometry/cube.html)
-[![random.png](http://github.com/mrdoob/three.js/raw/master/examples/particles/random.png)](http://mrdoob.com/lab/javascript/three/particles/random.html)
-[![waves.png](http://github.com/mrdoob/three.js/raw/master/examples/particles/waves.png)](http://mrdoob.com/lab/javascript/three/particles/waves.html)
-[![floor.png](http://github.com/mrdoob/three.js/raw/master/examples/particles/floor.png)](http://mrdoob.com/lab/javascript/three/particles/floor.html)
+[![cube.png](http://github.com/mrdoob/three.js/raw/master/assets/examples/03_cube.png)](http://mrdoob.com/lab/javascript/three/geometry/cube.html)
+[![random.png](http://github.com/mrdoob/three.js/raw/master/assets/examples/02_random)](http://mrdoob.com/lab/javascript/three/particles/random.html)
+[![waves.png](http://github.com/mrdoob/three.js/raw/master/examples/particles/01_waves)](http://mrdoob.com/lab/javascript/three/particles/waves.html)
+[![floor.png](http://github.com/mrdoob/three.js/raw/master/examples/particles/00_floor)](http://mrdoob.com/lab/javascript/three/particles/floor.html)
 
 ### How to use ###
 

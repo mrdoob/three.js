@@ -6,7 +6,7 @@ var Cube = function (width, height, depth) {
 
 	THREE.Geometry.call(this);
 	
-	var scope = this,	
+	var scope = this,
 	width_half = width / 2,
 	height_half = height / 2,
 	depth_half = depth / 2;

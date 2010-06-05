@@ -106,19 +106,19 @@ THREE.SVGRenderer = function () {
 
 				if (material instanceof THREE.ColorFillMaterial) {
 				
-					svgNode.setAttribute('style', 'fill: ' + material.color.styleString + '; stroke-width:10');
+					svgNode.setAttribute('style', 'fill: ' + material.color.__svgStyleString + '; stroke-width:10');
 					
 				} else if (material instanceof THREE.FaceColorFillMaterial) {
 				
-					svgNode.setAttribute('style', 'fill: ' + element.color.styleString + '; stroke-width:10');
+					svgNode.setAttribute('style', 'fill: ' + element.color.__svgStyleString + '; stroke-width:10');
 					
 				} else if (material instanceof THREE.ColorStrokeMaterial) {
 				
-					svgNode.setAttribute('style', 'fill: none; stroke: ' + material.color.styleString + '; stroke-width: ' + material.lineWidth + '; stroke-linecap: round; stroke-linejoin: round');
+					svgNode.setAttribute('style', 'fill: none; stroke: ' + material.color.__svgStyleString + '; stroke-width: ' + material.lineWidth + '; stroke-linecap: round; stroke-linejoin: round');
 				
 				} else if (material instanceof THREE.FaceColorStrokeMaterial) {
 				
-					svgNode.setAttribute('style', 'fill: none; stroke: ' + element.color.styleString + '; stroke-width: ' + material.lineWidth + '; stroke-linecap: round; stroke-linejoin: round');
+					svgNode.setAttribute('style', 'fill: none; stroke: ' + element.color.__svgStyleString + '; stroke-width: ' + material.lineWidth + '; stroke-linecap: round; stroke-linejoin: round');
 				}
 				
 

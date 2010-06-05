@@ -3,7 +3,7 @@ import os
 
 # MERGER
 
-rev = 6;
+rev = 7;
 
 files = [];
 files.append('Three.js');
@@ -33,6 +33,7 @@ files.append('renderers/SVGRenderer.js');
 files.append('renderers/renderables/RenderableFace3.js');
 files.append('renderers/renderables/RenderableFace4.js');
 files.append('renderers/renderables/RenderableParticle.js');
+files.append('renderers/renderables/RenderableLine.js');
 
 string = '';
 

@@ -10,7 +10,7 @@ THREE.Object3D = function (material) {
 
 	this.matrix = new THREE.Matrix4();
 	this.screen = new THREE.Vector3(0, 0, 0);
-	
+
 	this.material = material instanceof Array ? material : [material];
 
 	this.updateMatrix = function () {
@@ -22,6 +22,6 @@ THREE.Object3D = function (material) {
 		this.matrix.multiplySelf(THREE.Matrix4.rotationYMatrix(this.rotation.y));
 		this.matrix.multiplySelf(THREE.Matrix4.rotationZMatrix(this.rotation.z));
 		this.matrix.multiplySelf(THREE.Matrix4.scaleMatrix(this.scale.x, this.scale.y, this.scale.z));
-		
+
 	}
 }
