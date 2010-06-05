@@ -23,7 +23,7 @@ Although this allows 3D for iPhoneOS and Android platforms the performance on th
 [![Space Cannon 3D](http://github.com/mrdoob/three.js/raw/master/assets/projects/02_spacecannon.png)](http://labs.brian-stoner.com/spacecannon/)
 [![DDD](http://github.com/mrdoob/three.js/raw/master/assets/projects/01_ddd.png)](http://the389.com/works/three/)
 [![jsflowfield4d](http://github.com/mrdoob/three.js/raw/master/assets/projects/00_jsflowfield4d.png)](http://test.sjeiti.com/jsflowfield4d/)
-[![spikeball](http://github.com/mrdoob/three.js/raw/master/assets/projects/04_spikeball.png)](http://kile.stravaganza.org/lab/js/spikeball/)
+[![spikeball](http://github.com/mrdoob/three.js/raw/master/assets/projects/03_spikeball.png)](http://kile.stravaganza.org/lab/js/spikeball/)
 
 ### How to use ###
 
