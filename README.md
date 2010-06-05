@@ -107,7 +107,7 @@ If you are interested on messing with the actual library, instead of importing t
 
 * Added Line Object
 * Workaround for WebKit not supporting rgba() in SVG yet
-* No need to call updateMatrix(). Use .autoUpdateMatrix = false if needed. (thx (Gregory Athons)[http://github.com/gregmax17])
+* No need to call updateMatrix(). Use .autoUpdateMatrix = false if needed. (thx [Gregory Athons](http://github.com/gregmax17))
 
 
 2010 05 17 - **r6** (21.003 kb)
