@@ -16,18 +16,12 @@ Although this allows 3D for iPhoneOS and Android platforms the performance on th
 ### Examples ###
 
 [![geometry/cube](http://github.com/mrdoob/three.js/raw/master/assets/examples/03_cube.png)](http://mrdoob.com/lab/javascript/three/geometry/cube.html)
-
 [![particles/random](http://github.com/mrdoob/three.js/raw/master/assets/examples/02_random.png)](http://mrdoob.com/lab/javascript/three/particles/random.html)
-
 [![particles/wave](http://github.com/mrdoob/three.js/raw/master/assets/examples/01_waves.png)](http://mrdoob.com/lab/javascript/three/particles/waves.html)
-
 [![particles/floor](http://github.com/mrdoob/three.js/raw/master/assets/examples/00_floor.png)](http://mrdoob.com/lab/javascript/three/particles/floor.html)
-  
-  
+
 [![Space Cannon 3D](http://github.com/mrdoob/three.js/raw/master/assets/projects/02_spacecannon.png)](http://labs.brian-stoner.com/spacecannon/)
-
 [![DDD](http://github.com/mrdoob/three.js/raw/master/assets/projects/01_ddd.png)](http://the389.com/works/three/)
-
 [![jsflowfield4d](http://github.com/mrdoob/three.js/raw/master/assets/projects/00_jsflowfield4d.png)](http://test.sjeiti.com/jsflowfield4d/)
 
 ### How to use ###
