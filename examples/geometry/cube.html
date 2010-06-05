@@ -5,8 +5,7 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>		
 		<style type="text/css">
-			body
-			{
+			body {
 				font-family: Monospace;
 				background-color: #f0f0f0;
 				margin: 0px;
@@ -17,10 +16,10 @@
 	<body>
 
 		<script type="text/javascript" src="../../build/three.js"></script>
-		
+
 		<script type="text/javascript" src="primitives/Cube.js"></script>
 		<script type="text/javascript" src="primitives/Plane.js"></script>
-		
+
 		<script type="text/javascript" src="http://github.com/mrdoob/stats.js/raw/master/build/stats.js"></script>
 
 		<script type="text/javascript">
@@ -36,7 +35,7 @@
 			var renderer;
 
 			var cube, plane;
-			
+
 			var targetRotation = 0;
 			var targetRotationOnMouseDown = 0;
 
@@ -50,10 +49,10 @@
 			setInterval(loop, 1000/60);
 
 			function init() {
-			
+
 				container = document.createElement('div');
 				document.body.appendChild(container);
-				
+
 				var info = document.createElement('div');
 				info.style.position = 'absolute';
 				info.style.top = '10px';
@@ -61,7 +60,7 @@
 				info.style.textAlign = 'center';
 				info.innerHTML = 'Drag to spin the cube';
 				container.appendChild(info);
-			
+
 				camera = new THREE.Camera(0, 150, 400);
 				camera.focus = 300;
 				camera.target.position.y = 150;
@@ -74,22 +73,20 @@
 				geometry = new Cube(200, 200, 200);
 
 				for (var i = 0; i < geometry.faces.length; i++) {
-				
+
 					geometry.faces[i].color.setRGBA( Math.floor( Math.random() * 128), Math.floor( Math.random() * 128 + 128), Math.floor( Math.random() * 128 + 128), 255 );
 				}
-								
+
 				cube = new THREE.Mesh(geometry, new THREE.FaceColorFillMaterial());
 				cube.position.y = 150;
-				cube.updateMatrix();
 				scene.add(cube);
-				
+
 				// Plane
-				
+
 				plane = new THREE.Mesh(new Plane(200, 200), new THREE.ColorFillMaterial(0xe0e0e0));
 				plane.rotation.x = 90 * (Math.PI / 180);
-				plane.updateMatrix();
 				scene.add(plane);
-				
+
 				renderer = new THREE.CanvasRenderer();
 				renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 
@@ -99,7 +96,7 @@
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
 				container.appendChild(stats.domElement);
-				
+
 				document.addEventListener('mousedown', onDocumentMouseDown, false);
 				document.addEventListener('touchstart', onDocumentTouchStart, false);
 				document.addEventListener('touchmove', onDocumentTouchMove, false);
@@ -108,42 +105,42 @@
 			//
 
 			function onDocumentMouseDown( event ) {
-			
+
 				event.preventDefault();
-				
+
 				document.addEventListener('mousemove', onDocumentMouseMove, false);
 				document.addEventListener('mouseup', onDocumentMouseUp, false);
 				document.addEventListener('mouseout', onDocumentMouseOut, false);
-				
+
 				mouseXOnMouseDown = event.clientX - windowHalfX;
 				targetRotationOnMouseDown = targetRotation;
 			}
 
 			function onDocumentMouseMove( event ) {
-			
+
 				mouseX = event.clientX - windowHalfX;
-				
+
 				targetRotation = targetRotationOnMouseDown + (mouseX - mouseXOnMouseDown) * 0.02;
 			}
-			
+
 			function onDocumentMouseUp( event ) {
-			
+
 				document.removeEventListener('mousemove', onDocumentMouseMove, false);
 				document.removeEventListener('mouseup', onDocumentMouseUp, false);
 				document.removeEventListener('mouseout', onDocumentMouseOut, false);
 			}
-			
+
 			function onDocumentMouseOut( event ) {
-			
+
 				document.removeEventListener('mousemove', onDocumentMouseMove, false);
 				document.removeEventListener('mouseup', onDocumentMouseUp, false);
 				document.removeEventListener('mouseout', onDocumentMouseOut, false);
 			}
-			
+
 			function onDocumentTouchStart( event ) {
-			
+
 				if(event.touches.length == 1) {
-				
+
 					event.preventDefault();
 
 					mouseXOnMouseDown = event.touches[0].pageX - windowHalfX;
@@ -152,11 +149,11 @@
 			}
 
 			function onDocumentTouchMove( event ) {
-			
+
 				if(event.touches.length == 1) {
-				
+
 					event.preventDefault();
-					
+
 					mouseX = event.touches[0].pageX - windowHalfX;
 					targetRotation = targetRotationOnMouseDown + (mouseX - mouseXOnMouseDown) * 0.05;
 				}
@@ -165,17 +162,15 @@
 			//
 
 			function loop() {
-			
+
 				cube.rotation.y += (targetRotation - cube.rotation.y) * 0.05;
-				cube.updateMatrix();
-				
+
 				plane.rotation.z = -cube.rotation.y;
-				plane.updateMatrix();
-				
+
 				renderer.render(scene, camera);
 				stats.update();
 			}
-	
+
 		</script>
 
 	</body>

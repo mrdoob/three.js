@@ -7,6 +7,7 @@ THREE.Particle = function (material) {
 	THREE.Object3D.call(this, material);
 
 	this.size = 1;
+	this.autoUpdateMatrix = false;
 }
 
 THREE.Particle.prototype = new THREE.Object3D();

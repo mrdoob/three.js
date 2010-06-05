@@ -13,6 +13,8 @@ THREE.Object3D = function (material) {
 
 	this.material = material instanceof Array ? material : [material];
 
+	this.autoUpdateMatrix = true;
+
 	this.updateMatrix = function () {
 
 		this.matrix.identity();

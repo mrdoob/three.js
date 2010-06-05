@@ -53,7 +53,6 @@ This code creates a camera, then creates a scene object, adds a bunch of random 
 				particle.position.x = Math.random() * 2000 - 1000;
 				particle.position.y = Math.random() * 2000 - 1000;
 				particle.position.z = Math.random() * 2000 - 1000;
-				particle.updateMatrix();
 				scene.add( particle );
 
 			}
@@ -104,10 +103,11 @@ If you are interested on messing with the actual library, instead of importing t
 
 ### Change Log ###
 
-2010 06 05 - **r7** (22.225 kb)
+2010 06 05 - **r7** (22.387 kb)
 
 * Added Line Object
 * Workaround for WebKit not supporting rgba() in SVG yet
+* No need to call updateMatrix(). Use .autoUpdateMatrix = false if needed. (thx (Gregory Athons)[http://github.com/gregmax17])
 
 
 2010 05 17 - **r6** (21.003 kb)
