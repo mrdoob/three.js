@@ -16,9 +16,9 @@ Although this allows 3D for iPhoneOS and Android platforms the performance on th
 ### Examples ###
 
 [![cube.png](http://github.com/mrdoob/three.js/raw/master/assets/examples/03_cube.png)](http://mrdoob.com/lab/javascript/three/geometry/cube.html)
-[![random.png](http://github.com/mrdoob/three.js/raw/master/assets/examples/02_random)](http://mrdoob.com/lab/javascript/three/particles/random.html)
-[![waves.png](http://github.com/mrdoob/three.js/raw/master/examples/particles/01_waves)](http://mrdoob.com/lab/javascript/three/particles/waves.html)
-[![floor.png](http://github.com/mrdoob/three.js/raw/master/examples/particles/00_floor)](http://mrdoob.com/lab/javascript/three/particles/floor.html)
+[![random.png](http://github.com/mrdoob/three.js/raw/master/assets/examples/02_random.png)](http://mrdoob.com/lab/javascript/three/particles/random.html)
+[![waves.png](http://github.com/mrdoob/three.js/raw/master/assets/examples/01_waves.png)](http://mrdoob.com/lab/javascript/three/particles/waves.html)
+[![floor.png](http://github.com/mrdoob/three.js/raw/master/assets/examples/00_floor.png)](http://mrdoob.com/lab/javascript/three/particles/floor.html)
 
 ### How to use ###
 
@@ -38,16 +38,16 @@ This code creates a camera, then creates a scene object, adds a bunch of random 
 		setInterval(loop, 1000 / 60);
 
 		function init() {
-		
+
 			camera = new THREE.Camera(0, 0, 1000);
 
 			scene = new THREE.Scene();
-	
+
 			renderer = new THREE.CanvasRenderer();
 			renderer.setSize(window.innerWidth, window.innerHeight);
 
 			for (var i = 0; i < 1000; i++) {
-			
+
 				var particle = new THREE.Particle( new THREE.ColorFillMaterial(Math.random() * 0x808008 + 0x808080, 1) );
 				particle.size = Math.random() * 10 + 5;
 				particle.position.x = Math.random() * 2000 - 1000;
@@ -55,17 +55,17 @@ This code creates a camera, then creates a scene object, adds a bunch of random 
 				particle.position.z = Math.random() * 2000 - 1000;
 				particle.updateMatrix();
 				scene.add( particle );
-				
+
 			}
 
 			document.body.appendChild(renderer.domElement);
-			
+
 		}
 
 		function loop() {
-		
+
 			renderer.render(scene, camera);
-			
+
 		}
 
 	</script>
@@ -77,7 +77,7 @@ If you are interested on messing with the actual library, instead of importing t
 	<script type="text/javascript" src="js/three/core/Vector2.js"></script>
 	<script type="text/javascript" src="js/three/core/Vector3.js"></script>
 	<script type="text/javascript" src="js/three/core/Vector4.js"></script>
-	<script type="text/javascript" src="js/three/core/Rectangle.js"></script>	
+	<script type="text/javascript" src="js/three/core/Rectangle.js"></script>
 	<script type="text/javascript" src="js/three/core/Matrix4.js"></script>
 	<script type="text/javascript" src="js/three/core/Vertex.js"></script>
 	<script type="text/javascript" src="js/three/core/Face3.js"></script>
@@ -87,6 +87,7 @@ If you are interested on messing with the actual library, instead of importing t
 	<script type="text/javascript" src="js/three/objects/Object3D.js"></script>
 	<script type="text/javascript" src="js/three/objects/Mesh.js"></script>
 	<script type="text/javascript" src="js/three/objects/Particle.js"></script>
+	<script type="text/javascript" src="js/three/objects/Line.js"></script>
 	<script type="text/javascript" src="js/three/materials/ColorFillMaterial.js"></script>
 	<script type="text/javascript" src="js/three/materials/ColorStrokeMaterial.js"></script>
 	<script type="text/javascript" src="js/three/materials/FaceColorFillMaterial.js"></script>
@@ -98,9 +99,16 @@ If you are interested on messing with the actual library, instead of importing t
 	<script type="text/javascript" src="js/three/renderers/renderables/RenderableFace3.js"></script>
 	<script type="text/javascript" src="js/three/renderers/renderables/RenderableFace4.js"></script>
 	<script type="text/javascript" src="js/three/renderers/renderables/RenderableParticle.js"></script>
+	<script type="text/javascript" src="js/three/renderers/renderables/RenderableLine.js"></script>
 
-	
+
 ### Change Log ###
+
+2010 06 05 - **r7** (22.225 kb)
+
+* Added Line Object
+* Workaround for WebKit not supporting rgba() in SVG yet
+
 
 2010 05 17 - **r6** (21.003 kb)
 
