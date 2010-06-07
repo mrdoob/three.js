@@ -204,20 +204,20 @@ THREE.CanvasRenderer = function () {
 					expand( suv2, suv3 );
 					expand( suv3, suv1 );
 
-					suv1.x = uv1.x == 0 ? 0 : suv1.x;
-					suv1.x = uv1.x == 1 ? bitmap_width : suv1.x;
-					suv1.y = uv1.y == 0 ? 0 : suv1.y;
-					suv1.y = uv1.y == 1 ? bitmap_height : suv1.y;
+					suv1.x = uv1.x == 0 ? 1 : suv1.x;
+					suv1.x = uv1.x == 1 ? bitmap_width - 1 : suv1.x;
+					suv1.y = uv1.y == 0 ? 1 : suv1.y;
+					suv1.y = uv1.y == 1 ? bitmap_height - 1 : suv1.y;
 
-					suv2.x = uv2.x == 0 ? 0 : suv2.x;
-					suv2.x = uv2.x == 1 ? bitmap_width : suv2.x;
-					suv2.y = uv2.y == 0 ? 0 : suv2.y;
-					suv2.y = uv2.y == 1 ? bitmap_height : suv2.y;
+					suv2.x = uv2.x == 0 ? 1 : suv2.x;
+					suv2.x = uv2.x == 1 ? bitmap_width - 1 : suv2.x;
+					suv2.y = uv2.y == 0 ? 1 : suv2.y;
+					suv2.y = uv2.y == 1 ? bitmap_height - 1 : suv2.y;
 
-					suv3.x = uv3.x == 0 ? 0 : suv3.x;
-					suv3.x = uv3.x == 1 ? bitmap_width : suv3.x;
-					suv3.y = uv3.y == 0 ? 0 : suv3.y;
-					suv3.y = uv3.y == 1 ? bitmap_height : suv3.y;
+					suv3.x = uv3.x == 0 ? 1 : suv3.x;
+					suv3.x = uv3.x == 1 ? bitmap_width - 1 : suv3.x;
+					suv3.y = uv3.y == 0 ? 1 : suv3.y;
+					suv3.y = uv3.y == 1 ? bitmap_height - 1 : suv3.y;
 
 					drawTexturedTriangle( bitmap, _bboxRect, v1x, v1y, v2x, v2y, v3x, v3y, suv1.x, suv1.y, suv2.x, suv2.y, suv3.x, suv3.y );
 
