@@ -13,6 +13,8 @@ Although this allows 3D for iPhoneOS and Android platforms the performance on th
 
 [More info...](http://mrdoob.com/blog/post/693)
 
+Similar projects: [pre3d](http://deanm.github.com/pre3d/), [pvjs](http://code.google.com/p/pvjswebgl/), [jsjl](http://tulrich.com/geekstuff/canvas/perspective.html), [k3d](http://www.kevs3d.co.uk/dev/canvask3d/k3d_test.html), ...
+
 ### Examples ###
 
 [![geometry/vr](http://github.com/mrdoob/three.js/raw/master/assets/examples/04_vr.png)](http://mrdoob.com/projects/three.js/examples/geometry/vr.html)
