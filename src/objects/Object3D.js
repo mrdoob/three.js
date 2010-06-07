@@ -2,16 +2,16 @@
  * @author mr.doob / http://mrdoob.com/
  */
 
-THREE.Object3D = function (material) {
+THREE.Object3D = function ( material ) {
 
-	this.position = new THREE.Vector3(0, 0, 0);
-	this.rotation = new THREE.Vector3(0, 0, 0);
-	this.scale = new THREE.Vector3(1, 1, 1);
+	this.position = new THREE.Vector3();
+	this.rotation = new THREE.Vector3();
+	this.scale = new THREE.Vector3( 1, 1, 1 );
 
 	this.matrix = new THREE.Matrix4();
-	this.screen = new THREE.Vector3(0, 0, 0);
+	this.screen = new THREE.Vector3();
 
-	this.material = material instanceof Array ? material : [material];
+	this.material = material instanceof Array ? material : [ material ];
 
 	this.autoUpdateMatrix = true;
 
@@ -26,4 +26,5 @@ THREE.Object3D = function (material) {
 		this.matrix.multiplySelf(THREE.Matrix4.scaleMatrix(this.scale.x, this.scale.y, this.scale.z));
 
 	}
+
 }

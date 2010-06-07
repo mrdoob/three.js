@@ -2,14 +2,14 @@
  * @author mr.doob / http://mrdoob.com/
  */
 
-THREE.Color = function (hex) {
+THREE.Color = function ( hex ) {
 
 	var _r, _g, _b, _a, _hex;
 
 	this.__styleString;
 	this.__svgStyleString; // Workaround for WebKit :(
 
-	this.setHex = function (hex) {
+	this.setHex = function ( hex ) {
 
 		_hex = hex;
 		this.updateRGBA();
@@ -17,7 +17,7 @@ THREE.Color = function (hex) {
 
 	}
 
-	this.setRGBA = function (r, g, b, a) {
+	this.setRGBA = function ( r, g, b, a ) {
 
 		_r = r;
 		_g = g;
@@ -46,8 +46,8 @@ THREE.Color = function (hex) {
 
 	this.updateStyleString = function () {
 
-		this.__styleString = 'rgba(' + _r + ',' + _g + ',' + _b + ',' + (_a / 255) + ')';
-		this.__svgStyleString = 'rgb(' + _r + ',' + _g + ',' + _b + '); opacity: '+(_a / 255);
+		this.__styleString = 'rgba(' + _r + ',' + _g + ',' + _b + ',' + ( _a / 255 ) + ')';
+		this.__svgStyleString = 'rgb(' + _r + ',' + _g + ',' + _b + '); opacity: ' + ( _a / 255 );
 
 	}
 
@@ -57,6 +57,6 @@ THREE.Color = function (hex) {
 
 	}
 
-	this.setHex(hex);
+	this.setHex( hex );
 
 }

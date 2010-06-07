@@ -96,6 +96,7 @@ If you are interested on messing with the actual library, instead of importing t
 	<script type="text/javascript" src="js/three/materials/ColorStrokeMaterial.js"></script>
 	<script type="text/javascript" src="js/three/materials/FaceColorFillMaterial.js"></script>
 	<script type="text/javascript" src="js/three/materials/FaceColorStrokeMaterial.js"></script>
+	<script type="text/javascript" src="js/three/materials/TextureUVMappingMaterial.js"></script>
 	<script type="text/javascript" src="js/three/scenes/Scene.js"></script>
 	<script type="text/javascript" src="js/three/renderers/Renderer.js"></script>
 	<script type="text/javascript" src="js/three/renderers/CanvasRenderer.js"></script>
@@ -108,11 +109,18 @@ If you are interested on messing with the actual library, instead of importing t
 
 ### Change Log ###
 
+2010 06 06 - **r8** (23.129 kb)
+
+* Moved UVs to Geometry.
+* CanvasRenderer expands screen space points (workaround for antialias gaps).
+* CanvasRenderer supports TextureUVMappingMaterial.
+
+
 2010 06 05 - **r7** (22.387 kb)
 
-* Added Line Object
-* Workaround for WebKit not supporting rgba() in SVG yet
-* No need to call updateMatrix(). Use .autoUpdateMatrix = false if needed. (thx [Gregory Athons](http://github.com/gregmax17))
+* Added Line Object.
+* Workaround for WebKit not supporting rgba() in SVG yet.
+* No need to call updateMatrix(). Use .autoUpdateMatrix = false if needed. (thx [Gregory Athons](http://github.com/gregmax17)).
 
 
 2010 05 17 - **r6** (21.003 kb)

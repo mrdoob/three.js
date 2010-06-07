@@ -2,10 +2,10 @@
  * @author mr.doob / http://mrdoob.com/
  */
 
-THREE.Line = function (geometry, material) {
+THREE.Line = function ( geometry, material ) {
 
-	THREE.Object3D.call(this, material);
-	
+	THREE.Object3D.call( this, material );
+
 	this.geometry = geometry;
 
 }

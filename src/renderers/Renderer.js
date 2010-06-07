@@ -62,7 +62,7 @@ THREE.Renderer = function() {
 
 					vertex.screen.z = focuszoom / (camerafocus + vertex.screen.z);
 
-					vertex.visible = vertex.screen.z > 0;
+					vertex.__visible = vertex.screen.z > 0;
 
 					vertex.screen.x *= vertex.screen.z;
 					vertex.screen.y *= vertex.screen.z; 
@@ -85,7 +85,7 @@ THREE.Renderer = function() {
 						v2 = object.geometry.vertices[face.b];
 						v3 = object.geometry.vertices[face.c];
 
-						if (v1.visible && v2.visible && v3.visible && (object.doubleSided ||
+						if (v1.__visible && v2.__visible && v3.__visible && (object.doubleSided ||
 						   (v3.screen.x - v1.screen.x) * (v2.screen.y - v1.screen.y) -
 						   (v3.screen.y - v1.screen.y) * (v2.screen.x - v1.screen.x) > 0) ) {
 
@@ -105,8 +105,9 @@ THREE.Renderer = function() {
 							face3Pool[face3count].v3.y = v3.screen.y;
 							face3Pool[face3count].screenZ = face.screen.z;
 
-							face3Pool[face3count].color = face.color;
 							face3Pool[face3count].material = object.material;
+							face3Pool[face3count].uvs = object.geometry.uvs[j];
+							face3Pool[face3count].color = face.color;
 
 							this.renderList.push(face3Pool[face3count]);
 
@@ -120,7 +121,7 @@ THREE.Renderer = function() {
 						v3 = object.geometry.vertices[face.c];
 						v4 = object.geometry.vertices[face.d];
 
-						if (v1.visible && v2.visible && v3.visible && v4.visible && (object.doubleSided ||
+						if (v1.__visible && v2.__visible && v3.__visible && v4.__visible && (object.doubleSided ||
 						   ((v4.screen.x - v1.screen.x) * (v2.screen.y - v1.screen.y) -
 						   (v4.screen.y - v1.screen.y) * (v2.screen.x - v1.screen.x) > 0 ||
 						   (v2.screen.x - v3.screen.x) * (v4.screen.y - v3.screen.y) -
@@ -144,8 +145,9 @@ THREE.Renderer = function() {
 							face4Pool[face4count].v4.y = v4.screen.y;
 							face4Pool[face4count].screenZ = face.screen.z;
 
-							face4Pool[face4count].color = face.color;
 							face4Pool[face4count].material = object.material;
+							face4Pool[face4count].uvs = object.geometry.uvs[j];
+							face4Pool[face4count].color = face.color;
 
 							this.renderList.push(face4Pool[face4count]);
 
