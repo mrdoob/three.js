@@ -15,6 +15,7 @@ Although this allows 3D for iPhoneOS and Android platforms the performance on th
 
 ### Examples ###
 
+[![geometry/vr](http://github.com/mrdoob/three.js/raw/master/assets/examples/04_vr.png)](http://mrdoob.com/projects/three.js/examples/geometry/vr.html)
 [![geometry/cube](http://github.com/mrdoob/three.js/raw/master/assets/examples/03_cube.png)](http://mrdoob.com/projects/three.js/examples/geometry/cube.html)
 [![particles/random](http://github.com/mrdoob/three.js/raw/master/assets/examples/02_random.png)](http://mrdoob.com/projects/three.js/examples/particles/random.html)
 [![particles/wave](http://github.com/mrdoob/three.js/raw/master/assets/examples/01_waves.png)](http://mrdoob.com/projects/three.js/examples/particles/waves.html)
