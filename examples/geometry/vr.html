@@ -112,7 +112,7 @@
 
 			function loadTexture( path ) {
 
-				var material = new THREE.TextureUVMappingMaterial( texture_placeholder );
+				var material = new THREE.BitmapUVMappingMaterial( texture_placeholder );
 
 				var texture = new Image();
 
@@ -125,7 +125,7 @@
 
 				texture.src = path;
 
-				// return [ material, new THREE.ColorStrokeMaterial(1, Math.random() * 0xffffff) ];
+				// return [ material, new THREE.ColorStrokeMaterial(1, Math.random() * 0xffffff, 0.2) ];
 				return material;
 			}
 

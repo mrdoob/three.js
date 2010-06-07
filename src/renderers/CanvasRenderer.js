@@ -11,9 +11,6 @@ THREE.CanvasRenderer = function () {
 	_clipRect = new THREE.Rectangle(),
 	_clearRect = new THREE.Rectangle( 0, 0, 0, 0 ),
 	_bboxRect = new THREE.Rectangle(),
-
-	_uvs, _bitmap, _bitmap_width, _bitmap_height,
-	_denom, _m11, _m12, _m21, _m22, _dx, _dy,
 	_vector2 = new THREE.Vector2();
 
 	this.setSize = function ( width, height ) {
@@ -34,6 +31,9 @@ THREE.CanvasRenderer = function () {
 		var i, j, element, pi2 = Math.PI * 2,
 		elementsLength, material, materialLength,
 		v1x, v1y, v2x, v2y, v3x, v3y, v4x, v4y,
+		uv1 = new THREE.Vector2(), uv2 = new THREE.Vector2(), uv3 = new THREE.Vector2(),
+		suv1 = new THREE.Vector2(), suv2 = new THREE.Vector2(), suv3 = new THREE.Vector2(),
+		bitmap, bitmap_width, bitmap_height,
 		size;
 
 		_clearRect.inflate( 1 );
@@ -187,17 +187,39 @@ THREE.CanvasRenderer = function () {
 
 					_bboxRect.inflate( _context.lineWidth );
 
-				} else if ( material instanceof THREE.TextureUVMappingMaterial ) {
+				} else if ( material instanceof THREE.BitmapUVMappingMaterial ) {
 
-					_uvs = element.uvs;
-					_bitmap = material.bitmap,
-					_bitmap_width = _bitmap.width,
-					_bitmap_height = _bitmap.height;
+					uv1.copy( element.uvs[ 0 ] ), uv2.copy( element.uvs[ 1 ] ), uv3.copy( element.uvs[ 2 ] ),
+					suv1.copy( uv1 ), suv2.copy( uv2 ), suv3.copy( uv3 ),
 
-					drawTexturedTriangle( _bitmap, _bboxRect, v1x, v1y, v2x, v2y, v3x, v3y,
-						_uvs[ 0 ].x * _bitmap_width, _uvs[ 0 ].y * _bitmap_height,
-						_uvs[ 1 ].x * _bitmap_width, _uvs[ 1 ].y * _bitmap_height,
-						_uvs[ 2 ].x * _bitmap_width, _uvs[ 2 ].y * _bitmap_height );
+					bitmap = material.bitmap,
+					bitmap_width = bitmap.width,
+					bitmap_height = bitmap.height;
+
+					suv1.x *= bitmap_width; suv1.y *= bitmap_height;
+					suv2.x *= bitmap_width; suv2.y *= bitmap_height;
+					suv3.x *= bitmap_width; suv3.y *= bitmap_height;
+
+					expand( suv1, suv2 );
+					expand( suv2, suv3 );
+					expand( suv3, suv1 );
+
+					suv1.x = uv1.x == 0 ? 0 : suv1.x;
+					suv1.x = uv1.x == 1 ? bitmap_width : suv1.x;
+					suv1.y = uv1.y == 0 ? 0 : suv1.y;
+					suv1.y = uv1.y == 1 ? bitmap_height : suv1.y;
+
+					suv2.x = uv2.x == 0 ? 0 : suv2.x;
+					suv2.x = uv2.x == 1 ? bitmap_width : suv2.x;
+					suv2.y = uv2.y == 0 ? 0 : suv2.y;
+					suv2.y = uv2.y == 1 ? bitmap_height : suv2.y;
+
+					suv3.x = uv3.x == 0 ? 0 : suv3.x;
+					suv3.x = uv3.x == 1 ? bitmap_width : suv3.x;
+					suv3.y = uv3.y == 0 ? 0 : suv3.y;
+					suv3.y = uv3.y == 1 ? bitmap_height : suv3.y;
+
+					drawTexturedTriangle( bitmap, _bboxRect, v1x, v1y, v2x, v2y, v3x, v3y, suv1.x, suv1.y, suv2.x, suv2.y, suv3.x, suv3.y );
 
 				}
 
@@ -218,22 +240,24 @@ THREE.CanvasRenderer = function () {
 	// Textured triangle drawing by Thatcher Ulrich.
 	// http://tulrich.com/geekstuff/canvas/jsgl.js
 
-	function drawTexturedTriangle( texture, bbox, x0, y0, x1, y1, x2, y2, sx0, sy0, sx1, sy1, sx2, sy2 ) {
+	function drawTexturedTriangle( image, bbox, x0, y0, x1, y1, x2, y2, sx0, sy0, sx1, sy1, sx2, sy2 ) {
+
+		var denom, m11, m12, m21, m22, dx, dy;
 
 		_context.save();
 		_context.clip();
 
-		_denom = sx0 * ( sy2 - sy1 ) - sx1 * sy2 + sx2 * sy1 + ( sx1 - sx2 ) * sy0;
-		_m11 = - ( sy0 * (x2 - x1 ) - sy1 * x2 + sy2 * x1 + ( sy1 - sy2 ) * x0 ) / _denom;
-		_m12 = ( sy1 * y2 + sy0 * ( y1 - y2 ) - sy2 * y1 + ( sy2 - sy1) * y0 ) / _denom;
-		_m21 = ( sx0 * ( x2 - x1 ) - sx1 * x2 + sx2 * x1 + ( sx1 - sx2 ) * x0 ) / _denom;
-		_m22 = - ( sx1 * y2 + sx0 * ( y1 - y2 ) - sx2 * y1 + ( sx2 - sx1 ) * y0 ) / _denom;
-		_dx = ( sx0 * ( sy2 * x1 - sy1 * x2 ) + sy0 * ( sx1 * x2 - sx2 * x1 ) + ( sx2 * sy1 - sx1 * sy2 ) * x0 ) / _denom;
-		_dy = ( sx0 * ( sy2 * y1 - sy1 * y2 ) + sy0 * ( sx1 * y2 - sx2 * y1 ) + ( sx2 * sy1 - sx1 * sy2 ) * y0 ) / _denom;
+		denom = sx0 * ( sy2 - sy1 ) - sx1 * sy2 + sx2 * sy1 + ( sx1 - sx2 ) * sy0;
+		m11 = - ( sy0 * (x2 - x1 ) - sy1 * x2 + sy2 * x1 + ( sy1 - sy2 ) * x0 ) / denom;
+		m12 = ( sy1 * y2 + sy0 * ( y1 - y2 ) - sy2 * y1 + ( sy2 - sy1) * y0 ) / denom;
+		m21 = ( sx0 * ( x2 - x1 ) - sx1 * x2 + sx2 * x1 + ( sx1 - sx2 ) * x0 ) / denom;
+		m22 = - ( sx1 * y2 + sx0 * ( y1 - y2 ) - sx2 * y1 + ( sx2 - sx1 ) * y0 ) / denom;
+		dx = ( sx0 * ( sy2 * x1 - sy1 * x2 ) + sy0 * ( sx1 * x2 - sx2 * x1 ) + ( sx2 * sy1 - sx1 * sy2 ) * x0 ) / denom;
+		dy = ( sx0 * ( sy2 * y1 - sy1 * y2 ) + sy0 * ( sx1 * y2 - sx2 * y1 ) + ( sx2 * sy1 - sx1 * sy2 ) * y0 ) / denom;
 
-		_context.transform( _m11, _m12, _m21, _m22, _dx, _dy );
+		_context.transform( m11, m12, m21, m22, dx, dy );
 
-		_context.drawImage( texture, 0, 0 );
+		_context.drawImage( image, 0, 0 );
 		_context.restore();
 
 	}
