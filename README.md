@@ -24,6 +24,7 @@ Similar projects: [pre3d](http://deanm.github.com/pre3d/), [pvjs](http://code.go
 [![particles/floor](http://github.com/mrdoob/three.js/raw/master/assets/examples/00_floor.png)](http://mrdoob.com/projects/three.js/examples/particles/floor.html)
 
 [![Space Cannon 3D](http://github.com/mrdoob/three.js/raw/master/assets/projects/02_spacecannon.png)](http://labs.brian-stoner.com/spacecannon/)
+[![Alocasia](http://github.com/mrdoob/three.js/raw/master/assets/projects/04_alocasia.png)](http://arithmetric.com/projects/alocasia/)
 [![DDD](http://github.com/mrdoob/three.js/raw/master/assets/projects/01_ddd.png)](http://the389.com/works/three/)
 [![jsflowfield4d](http://github.com/mrdoob/three.js/raw/master/assets/projects/00_jsflowfield4d.png)](http://test.sjeiti.com/jsflowfield4d/)
 [![spikeball](http://github.com/mrdoob/three.js/raw/master/assets/projects/03_spikeball.png)](http://kile.stravaganza.org/lab/js/spikeball/)
