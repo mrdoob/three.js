@@ -13,7 +13,7 @@ THREE.Renderer = function() {
 
 	this.renderList;
 
-	function sort(a, b) {
+	function painterSort(a, b) {
 
 		return a.screenZ - b.screenZ;
 
@@ -241,7 +241,7 @@ THREE.Renderer = function() {
 			}
 		}
 
-		this.renderList.sort(sort);
+		this.renderList.sort(painterSort);
 
 	}
 }
