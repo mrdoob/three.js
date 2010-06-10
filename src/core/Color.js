@@ -31,7 +31,7 @@ THREE.Color = function ( hex ) {
 
 	this.updateHex = function () {
 
-		_hex = _a << 24 | _r << 16 | _g << 8 | _b;
+		_hex = _a * 255 << 24 | _r << 16 | _g << 8 | _b;
 
 	}
 
@@ -40,20 +40,20 @@ THREE.Color = function ( hex ) {
 		_r = _hex >> 16 & 0xff;
 		_g = _hex >> 8 & 0xff;
 		_b = _hex & 0xff;
-		_a = _hex >> 24 & 0xff;
+		_a = (_hex >> 24 & 0xff) / 255;
 
 	}
 
 	this.updateStyleString = function () {
 
-		this.__styleString = 'rgba(' + _r + ',' + _g + ',' + _b + ',' + ( _a / 255 ) + ')';
-		this.__svgStyleString = 'rgb(' + _r + ',' + _g + ',' + _b + '); opacity: ' + ( _a / 255 );
+		this.__styleString = 'rgba(' + _r + ',' + _g + ',' + _b + ',' + _a + ')';
+		this.__svgStyleString = 'rgb(' + _r + ',' + _g + ',' + _b + '); opacity: ' + _a;
 
 	}
 
 	this.toString = function () {
 
-		return 'THREE.Color ( r: ' + _r + ', g: ' + _g + ', b: ' + _b + ', a: ' + _a + ', hex: ' + _hex + ', style: ' + this.styleString + ' )';
+		return 'THREE.Color ( r: ' + _r + ', g: ' + _g + ', b: ' + _b + ', a: ' + _a + ', hex: ' + _hex + ' )';
 
 	}
 
