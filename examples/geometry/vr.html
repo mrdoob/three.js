@@ -39,7 +39,8 @@
 
 			var camera, scene, renderer;
 
-			var texture_placeholder, isUserInteracting = false,
+			var texture_placeholder, wireframe,
+			isUserInteracting = false,
 			onMouseDownMouseX = 0, onMouseDownMouseY = 0,
 			lon = 90, onMouseDownLon = 0,
 			lat = 0, onMouseDownLat = 0,
@@ -61,6 +62,8 @@
 				texture_placeholder = document.createElement( 'canvas' );
 				texture_placeholder.width = 128;
 				texture_placeholder.height = 128;
+
+				wireframe = new THREE.ColorStrokeMaterial(1, 0xffffff, 0);
 
 				var context = texture_placeholder.getContext( '2d' );
 				context.fillStyle = 'rgba( 200, 200, 200, 1 )';
@@ -125,8 +128,7 @@
 
 				texture.src = path;
 
-				// return [ material, new THREE.ColorStrokeMaterial(1, Math.random() * 0xffffff, 0.2) ];
-				return material;
+				return [ material, wireframe ];
 			}
 
 			function onDocumentMouseDown( event ) {
@@ -134,6 +136,8 @@
 				event.preventDefault();
 
 				isUserInteracting = true;
+
+				wireframe.color.setRGBA(255, 255, 255, 64);
 
 				onPointerDownPointerX = event.clientX;
 				onPointerDownPointerY = event.clientY;
@@ -159,6 +163,8 @@
 
 				isUserInteracting = false;
 
+				wireframe.color.setRGBA(255, 255, 255, 0);
+				render();
 			}
 
 
