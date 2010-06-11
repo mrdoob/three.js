@@ -21,6 +21,11 @@
 
 		<script type="text/javascript" src="http://github.com/mrdoob/stats.js/raw/master/build/stats.js"></script>
 
+		<video id="video" autoplay="true" style="display:none">
+			<source src="textures/sintel.mp4" type="video/mp4">
+			<source src="textures/sintel.ogg" type="video/ogg">
+		</video>
+
 		<script type="text/javascript">
 
 			var SCREEN_WIDTH = window.innerWidth;
@@ -67,9 +72,7 @@
 
 				scene = new THREE.Scene();
 
-				video = document.createElement( 'video' );
-				video.src = 'textures/sintel.mp4';
-				video.play();
+				video = document.getElementById( 'video' );
 
 				// 
 
