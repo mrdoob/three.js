@@ -1,0 +1,167 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>three.js - geometry - cube</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
+		<style type="text/css">
+			body {
+				font-family: Monospace;
+				background-color: #f0f0f0;
+				margin: 0px;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+	<body>
+
+		<script type="text/javascript" src="../build/three.js"></script>
+
+		<script type="text/javascript" src="primitives/Plane.js"></script>
+
+		<script type="text/javascript" src="http://github.com/mrdoob/stats.js/raw/master/build/stats.js"></script>
+
+		<script type="text/javascript">
+
+			var SCREEN_WIDTH = window.innerWidth;
+			var SCREEN_HEIGHT = window.innerHeight;
+			var AMOUNT = 100;
+
+			var container, stats;
+
+			var camera, scene, renderer;
+
+			var video, texture, textureContext,
+			textureReflection, textureReflectionContext, textureReflectionGradient;
+
+			var mesh;
+
+			var mouseX = 0;
+			var mouseY = 0;
+
+			var windowHalfX = window.innerWidth >> 1;
+			var windowHalfY = window.innerHeight >> 1;
+
+
+			document.addEventListener('mousemove', onDocumentMouseMove, false);
+
+			init();
+			setInterval(loop, 1000/60);
+
+
+			function init() {
+
+				container = document.createElement('div');
+				document.body.appendChild(container);
+
+				camera = new THREE.Camera(0, 0, 500);
+				camera.focus = 300;
+
+				scene = new THREE.Scene();
+
+				video = document.createElement( 'video' );
+				video.src = 'textures/sintel.mp4';
+				video.loop = 'loop';
+				video.play();
+
+				// 
+
+				texture = document.createElement( 'canvas' );
+				texture.width = 480;
+				texture.height = 204;
+
+				textureContext = texture.getContext( '2d' );
+				textureContext.fillStyle = '#000000';
+				textureContext.fillRect( 0, 0, 480, 204 );
+
+				var material = new THREE.BitmapUVMappingMaterial( texture );
+
+				textureReflection = document.createElement( 'canvas' );
+				textureReflection.width = 480;
+				textureReflection.height = 204;
+
+				textureReflectionContext = textureReflection.getContext( '2d' );
+				textureReflectionContext.fillStyle = '#000000';
+				textureReflectionContext.fillRect( 0, 0, 480, 204 );
+
+				textureReflectionGradient = textureReflectionContext.createLinearGradient( 0, 0, 0, 204 );
+				textureReflectionGradient.addColorStop( 0.2, 'rgba(240, 240, 240, 1)' );
+				textureReflectionGradient.addColorStop( 1, 'rgba(240, 240, 240, 0.8)' );
+
+				var materialReflection = new THREE.BitmapUVMappingMaterial( textureReflection );
+
+				//
+
+				var plane = new Plane( 480, 204, 4, 4 );
+
+				mesh = new THREE.Mesh( plane, material );
+				mesh.scale.x = mesh.scale.y = mesh.scale.z = 1.5;
+				scene.add(mesh);
+
+				mesh = new THREE.Mesh( plane, materialReflection );
+				mesh.position.y = -306;
+				mesh.scale.x = mesh.scale.y = mesh.scale.z = 1.5;
+				mesh.rotation.x = 180 * Math.PI / 180;
+				mesh.doubleSided = true;
+				scene.add(mesh);
+
+				//
+
+				var separation = 150;
+				var amountx = 10;
+				var amounty = 10;
+
+				var material = new THREE.ColorFillMaterial(0x808080);
+
+				for (var ix = 0; ix < amountx; ix++) {
+
+					for(var iy = 0; iy < amounty; iy++) {
+
+						particle = new THREE.Particle( material );
+						particle.position.x = ix * separation - ((amountx * separation) / 2);
+						particle.position.y = -153
+						particle.position.z = iy * separation - ((amounty * separation) / 2);
+						scene.add( particle );
+					}
+				}
+
+				renderer = new THREE.CanvasRenderer();
+				renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+
+				container.appendChild(renderer.domElement);
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild(stats.domElement);
+
+			}
+
+			function onDocumentMouseMove(event) {
+
+				mouseX = (event.clientX - windowHalfX);
+				mouseY = (event.clientY - windowHalfY) * .2;
+
+			}
+
+			function loop() {
+
+				camera.position.x += (mouseX - camera.position.x) * .05;
+				camera.position.y += (-mouseY - camera.position.y) * .05;
+
+				textureContext.drawImage( video, 0, 0 );
+
+				textureReflectionContext.drawImage( texture, 0, 0 );
+				textureReflectionContext.fillStyle = textureReflectionGradient;
+				textureReflectionContext.fillRect(0, 0, 480, 204);
+
+				renderer.render(scene, camera);
+				stats.update();
+
+			}
+
+
+		</script>
+
+	</body>
+</html>

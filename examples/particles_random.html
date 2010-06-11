@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - particles - floor</title>
+		<title>three.js - particles - random</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
 		<style type="text/css">
@@ -18,7 +18,7 @@
 	</head>
 	<body>
 
-		<script type="text/javascript" src="../../build/three.js"></script>
+		<script type="text/javascript" src="../build/three.js"></script>
 
 		<script type="text/javascript" src="http://github.com/mrdoob/stats.js/raw/master/build/stats.js"></script>
 
@@ -27,12 +27,8 @@
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
 
-			var SEPARATION = 100;
-			var AMOUNTX = 50;
-			var AMOUNTY = 50;
-
-			var container;
 			var stats;
+			var container;
 
 			var particle;
 
@@ -45,6 +41,7 @@
 
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
+
 
 			init();
 			setInterval(loop, 1000 / 60);
@@ -62,19 +59,14 @@
 				renderer = new THREE.CanvasRenderer();
 				renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 
-				particles = new Array();
+				for (var i = 0; i < 1000; i++) {
 
-				var material = new THREE.ColorFillMaterial(0xffffff, 1);
-
-				for (var ix = 0; ix < AMOUNTX; ix++) {
-
-					for(var iy = 0; iy < AMOUNTY; iy++) {
-
-						particle = new THREE.Particle( material );
-						particle.position.x = ix * SEPARATION - ((AMOUNTX * SEPARATION) / 2);
-						particle.position.z = iy * SEPARATION - ((AMOUNTY * SEPARATION) / 2);
-						scene.add( particle );
-					}
+					particle = new THREE.Particle(new THREE.ColorFillMaterial(Math.random() * 0x808008 + 0x808080, 1));
+					particle.size = Math.random() * 10 + 5;
+					particle.position.x = Math.random() * 2000 - 1000;
+					particle.position.y = Math.random() * 2000 - 1000;
+					particle.position.z = Math.random() * 2000 - 1000;
+					scene.add(particle);
 				}
 
 				container.appendChild(renderer.domElement);
@@ -97,9 +89,9 @@
 				mouseY = event.clientY - windowHalfY;
 			}
 
-			function onDocumentTouchStart( event ) {
+			function onDocumentTouchStart(event) {
 
-				if(event.touches.length > 1) {
+				if(event.touches.length == 1) {
 
 					event.preventDefault();
 
@@ -108,7 +100,7 @@
 				}
 			}
 
-			function onDocumentTouchMove( event ) {
+			function onDocumentTouchMove(event) {
 
 				if(event.touches.length == 1) {
 
