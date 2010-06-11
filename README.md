@@ -17,11 +17,12 @@ Similar projects: [pre3d](http://deanm.github.com/pre3d/), [pvjs](http://code.go
 
 ### Examples ###
 
-[![geometry/vr](http://github.com/mrdoob/three.js/raw/master/assets/examples/04_vr.png)](http://mrdoob.com/projects/three.js/examples/geometry/vr.html)
-[![geometry/cube](http://github.com/mrdoob/three.js/raw/master/assets/examples/03_cube.png)](http://mrdoob.com/projects/three.js/examples/geometry/cube.html)
-[![particles/random](http://github.com/mrdoob/three.js/raw/master/assets/examples/02_random.png)](http://mrdoob.com/projects/three.js/examples/particles/random.html)
-[![particles/wave](http://github.com/mrdoob/three.js/raw/master/assets/examples/01_waves.png)](http://mrdoob.com/projects/three.js/examples/particles/waves.html)
-[![particles/floor](http://github.com/mrdoob/three.js/raw/master/assets/examples/00_floor.png)](http://mrdoob.com/projects/three.js/examples/particles/floor.html)
+[![materials_video](http://github.com/mrdoob/three.js/raw/master/assets/examples/05_video.png)](http://mrdoob.com/projects/three.js/examples/materials_video.html)
+[![geometry_vr](http://github.com/mrdoob/three.js/raw/master/assets/examples/04_vr.png)](http://mrdoob.com/projects/three.js/examples/geometry_vr.html)
+[![geometry_cube](http://github.com/mrdoob/three.js/raw/master/assets/examples/03_cube.png)](http://mrdoob.com/projects/three.js/examples/geometry_cube.html)
+[![particles_random](http://github.com/mrdoob/three.js/raw/master/assets/examples/02_random.png)](http://mrdoob.com/projects/three.js/examples/particles_random.html)
+[![particles_wave](http://github.com/mrdoob/three.js/raw/master/assets/examples/01_waves.png)](http://mrdoob.com/projects/three.js/examples/particles_waves.html)
+[![particles_floor](http://github.com/mrdoob/three.js/raw/master/assets/examples/00_floor.png)](http://mrdoob.com/projects/three.js/examples/particles_floor.html)
 
 [![Space Cannon 3D](http://github.com/mrdoob/three.js/raw/master/assets/projects/02_spacecannon.png)](http://labs.brian-stoner.com/spacecannon/)
 [![Alocasia](http://github.com/mrdoob/three.js/raw/master/assets/projects/04_alocasia.png)](http://arithmetric.com/projects/alocasia/)
