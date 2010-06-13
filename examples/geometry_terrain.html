@@ -31,7 +31,7 @@
 	<body>
 
 		<div id="container"><br /><br /><br /><br /><br />Generating...</div> 
-		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - terrain demo.</div> 
+		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - terrain demo. <a href="geometry_terrain.html">generate another</a></div> 
 
 		<script type="text/javascript" src="http://github.com/mrdoob/stats.js/raw/master/build/stats.js"></script>
 		<script type="text/javascript" src="../build/three.js"></script>
@@ -152,13 +152,13 @@
 				var plane = new Plane( 2000, 2000, quality, quality );
 
 				var data = heightMap.getContext( '2d' ).getImageData( 0, 0, heightMap.width, heightMap.height ).data;
-				var pixelsPerTriangle = Math.floor(heightMap.width / quality1);
+				var pixelsPerTriangle = Math.floor(heightMap.width / quality);
 
 				for ( var y = 0; y < quality1; y++ ) {
 
 					for (var x = 0; x < quality1; x++ ) {
 
-						plane.vertices[x + y * quality1].position.z = data[((x * pixelsPerTriangle) + (y * pixelsPerTriangle) * heightMap.width) * 4];
+						plane.vertices[x + y * quality1].position.z = data[((x * pixelsPerTriangle) + (y * pixelsPerTriangle) * heightMap.width) * 4] * 2;
 
 					}
 
@@ -230,7 +230,7 @@
 
 					for ( var i = 0; i < size; i ++ ) {
 
-						data[ i * 4 ] += Math.floor( perlin.noise( x / quality, yy, zz ) * quality + 10 );
+						data[ i * 4 ] += Math.floor( Math.abs( perlin.noise( x / quality, yy, zz ) * 0.5 ) * quality + 10 );
 
 						x++;
 
@@ -253,7 +253,13 @@
 			function shadow( texture ) {
 
 				var canvas, context, image, data, src_data,
-				index, level, diff, width = texture.width, height = texture.height;
+				index, level, diff, width = texture.width, height = texture.height,
+				vector3, sun;
+
+				vector3 = new THREE.Vector3( 0, 0, 0 );
+
+				sun = new THREE.Vector3( 1, 1, 1 );
+				sun.normalize();
 
 				canvas = document.createElement( 'canvas' );
 				canvas.width = width;
@@ -274,21 +280,16 @@
 
 						index = ( x + y * width ) * 4;
 
-						diff = 0;
-						level = width / 4;
+						vector3.x = src_data[ index - 4 ] - src_data[ index + 4 ];
+						vector3.y = 2;
+						vector3.z = src_data[ index - ( width * 4 ) ] - src_data[ index + ( width * 4 ) ];;
+						vector3.normalize();
 
-						while ( level > 4 ) {
+						var color = Math.max(0, vector3.dot(sun) );
 
-							diff += ( ( src_data[ index - level ] >>> 0 ) - ( src_data[ index + level ] >>> 0 ) ) +
-							( ( src_data[ index - ( width * level ) ] >>> 0 ) - ( src_data[ index + ( width * level ) ] >>> 0 ) ) + 32;
-
-							level /= 2;
-
-						}
-
-						data[ index ] = diff * 0.45;
-						data[ index + 1 ] = diff * 0.29;
-						data[ index + 2 ] = diff * 0.19;
+						data[ index ] = 96 + color * 128;
+						data[ index + 1 ] = 32 + color * 96 + src_data[ index ] * 0.1;
+						data[ index + 2 ] = color * 96 + src_data[ index ] * 0.1;
 
 					}
 				}
