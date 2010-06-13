@@ -17,6 +17,7 @@ Similar projects: [pre3d](http://deanm.github.com/pre3d/), [pvjs](http://code.go
 
 ### Examples ###
 
+[![geometry_terrain](http://github.com/mrdoob/three.js/raw/master/assets/examples/06_terrain.png)](http://mrdoob.com/projects/three.js/examples/geometry_terrain.html)
 [![materials_video](http://github.com/mrdoob/three.js/raw/master/assets/examples/05_video.png)](http://mrdoob.com/projects/three.js/examples/materials_video.html)
 [![geometry_vr](http://github.com/mrdoob/three.js/raw/master/assets/examples/04_vr.png)](http://mrdoob.com/projects/three.js/examples/geometry_vr.html)
 [![geometry_cube](http://github.com/mrdoob/three.js/raw/master/assets/examples/03_cube.png)](http://mrdoob.com/projects/three.js/examples/geometry_cube.html)
@@ -30,7 +31,7 @@ Similar projects: [pre3d](http://deanm.github.com/pre3d/), [pvjs](http://code.go
 [![jsflowfield4d](http://github.com/mrdoob/three.js/raw/master/assets/projects/00_jsflowfield4d.png)](http://test.sjeiti.com/jsflowfield4d/)
 [![spikeball](http://github.com/mrdoob/three.js/raw/master/assets/projects/03_spikeball.png)](http://kile.stravaganza.org/lab/js/spikeball/)
 
-### How to use ###
+### Usage ###
 
 The library needs to be included first thing.
 

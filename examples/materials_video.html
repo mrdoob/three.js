@@ -15,15 +15,14 @@
 	</head>
 	<body>
 
+		<script type="text/javascript" src="http://github.com/mrdoob/stats.js/raw/master/build/stats.js"></script>
 		<script type="text/javascript" src="../build/three.js"></script>
 
 		<script type="text/javascript" src="primitives/Plane.js"></script>
 
-		<script type="text/javascript" src="http://github.com/mrdoob/stats.js/raw/master/build/stats.js"></script>
-
-		<video id="video" autoplay="true" style="display:none">
-			<source src="textures/sintel.mp4" type="video/mp4">
-			<source src="textures/sintel.ogv" type="video/ogg">
+		<video id="video" autoplay style="display:none">
+			<source src="textures/sintel.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
+			<source src="textures/sintel.ogv" type='video/ogg; codecs="theora, vorbis"'>
 		</video>
 
 		<script type="text/javascript">
@@ -159,7 +158,10 @@
 				camera.position.x += (mouseX - camera.position.x) * .05;
 				camera.position.y += (-mouseY - camera.position.y) * .05;
 
-				textureContext.drawImage( video, 0, 0 );
+				if (video.readyState === video.HAVE_ENOUGH_DATA) {
+
+					textureContext.drawImage( video, 0, 0 );
+				}
 
 				textureReflectionContext.drawImage( texture, 0, 0 );
 				textureReflectionContext.fillStyle = textureReflectionGradient;

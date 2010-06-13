@@ -18,7 +18,7 @@ var Plane = function ( width, height, segments_width, segments_height ) {
 	segment_height = height / gridY;
 
 
-	for(var iy = 0; iy < gridY1; iy++) {
+	for( var iy = 0; iy < gridY1; iy++ ) {
 
 		for( var ix = 0; ix < gridX1; ix++ ) {
 
@@ -31,7 +31,7 @@ var Plane = function ( width, height, segments_width, segments_height ) {
 
 	}
 
-	for(  iy = 0; iy < gridY; iy++ ) {
+	for( iy = 0; iy < gridY; iy++ ) {
 
 		for( ix = 0; ix < gridX; ix++ ) {
 
