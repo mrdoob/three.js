@@ -254,7 +254,7 @@
 
 				var canvas, context, image, data, src_data,
 				index, level, diff, width = texture.width, height = texture.height,
-				vector3, sun;
+				vector3, sun, shade;
 
 				vector3 = new THREE.Vector3( 0, 0, 0 );
 
@@ -285,11 +285,11 @@
 						vector3.z = src_data[ index - ( width * 4 ) ] - src_data[ index + ( width * 4 ) ];;
 						vector3.normalize();
 
-						var color = Math.max(0, vector3.dot(sun) );
+						shade = vector3.dot(sun);
 
-						data[ index ] = 96 + color * 128;
-						data[ index + 1 ] = 32 + color * 96 + src_data[ index ] * 0.1;
-						data[ index + 2 ] = color * 96 + src_data[ index ] * 0.1;
+						data[ index ] = ( 96 + shade * 128 ) * ( src_data[ index ] * 0.007 );
+						data[ index + 1 ] = ( 32 + shade * 96 ) * ( src_data[ index ] * 0.007 );
+						data[ index + 2 ] = ( shade * 96 ) * ( src_data[ index ] * 0.007 );
 
 					}
 				}
