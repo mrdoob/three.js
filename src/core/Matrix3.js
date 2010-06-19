@@ -15,7 +15,7 @@ THREE.Matrix3 = function () {
 		this.n21 = 0; this.n22 = 1; this.n23 = 0;
 		this.n31 = 0; this.n32 = 0; this.n33 = 1;
 
-	}
+	};
 
 	this.assign = function ( m ) {
 
@@ -23,7 +23,7 @@ THREE.Matrix3 = function () {
 		this.n21 = m.n21; this.n22 = m.n22; this.n23 = m.n23;
 		this.n31 = m.n31; this.n32 = m.n32; this.n33 = m.n33;
 
-	}
+	};
 
 	this.multiplySelf = function ( m ) {
 
@@ -43,7 +43,7 @@ THREE.Matrix3 = function () {
 		this.n32 = n31 * m.n12 + n32 * m.n22 + n33 * m.n32;
 		this.n33 = n31 * m.n13 + n32 * m.n23 + n33 * m.n33;
 
-	}
+	};
 
 	this.inverse = function () {
 
@@ -55,7 +55,7 @@ THREE.Matrix3 = function () {
 		this.n21 = n12; this.n22 = n22; this.n23 = n32;
 		this.n31 = n13; this.n32 = n23; this.n33 = n33;
 
-	}
+	};
 
 	this.clone = function () {
 
@@ -67,7 +67,7 @@ THREE.Matrix3 = function () {
 
 		return m;
 
-	}
+	};
 
 	this.toString = function () {
 
@@ -75,6 +75,6 @@ THREE.Matrix3 = function () {
 			"| " + this.n21 + " " + this.n22 + " " + this.n23 + " |\n" +
 			"| " + this.n31 + " " + this.n32 + " " + this.n33 + " |";
 
-	}
+	};
 
-}
+};

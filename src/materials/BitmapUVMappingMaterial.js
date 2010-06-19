@@ -10,6 +10,6 @@ THREE.BitmapUVMappingMaterial = function ( bitmap ) {
 
 		return 'THREE.BitmapUVMappingMaterial ( bitmap: ' + this.bitmap + ' )';
 
-	}
+	};
 
-}
+};

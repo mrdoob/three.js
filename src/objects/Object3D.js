@@ -19,12 +19,12 @@ THREE.Object3D = function ( material ) {
 
 		this.matrix.identity();
 
-		this.matrix.multiplySelf(THREE.Matrix4.translationMatrix(this.position.x, this.position.y, this.position.z));
-		this.matrix.multiplySelf(THREE.Matrix4.rotationXMatrix(this.rotation.x));
-		this.matrix.multiplySelf(THREE.Matrix4.rotationYMatrix(this.rotation.y));
-		this.matrix.multiplySelf(THREE.Matrix4.rotationZMatrix(this.rotation.z));
-		this.matrix.multiplySelf(THREE.Matrix4.scaleMatrix(this.scale.x, this.scale.y, this.scale.z));
+		this.matrix.multiplySelf( THREE.Matrix4.translationMatrix( this.position.x, this.position.y, this.position.z ) );
+		this.matrix.multiplySelf( THREE.Matrix4.rotationXMatrix( this.rotation.x ) );
+		this.matrix.multiplySelf( THREE.Matrix4.rotationYMatrix( this.rotation.y ) );
+		this.matrix.multiplySelf( THREE.Matrix4.rotationZMatrix( this.rotation.z ) );
+		this.matrix.multiplySelf( THREE.Matrix4.scaleMatrix( this.scale.x, this.scale.y, this.scale.z ) );
 
-	}
+	};
 
-}
+};

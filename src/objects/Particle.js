@@ -9,7 +9,7 @@ THREE.Particle = function ( material ) {
 	this.size = 1;
 	this.autoUpdateMatrix = false;
 
-}
+};
 
 THREE.Particle.prototype = new THREE.Object3D();
 THREE.Particle.prototype.constructor = THREE.Particle;

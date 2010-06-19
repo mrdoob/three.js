@@ -8,7 +8,7 @@ THREE.Line = function ( geometry, material ) {
 
 	this.geometry = geometry;
 
-}
+};
 
 THREE.Line.prototype = new THREE.Object3D();
 THREE.Line.prototype.constructor = THREE.Line;

@@ -10,7 +10,7 @@ THREE.Mesh = function ( geometry, material ) {
 
 	this.doubleSided = false;
 
-}
+};
 
 THREE.Mesh.prototype = new THREE.Object3D();
 THREE.Mesh.prototype.constructor = THREE.Mesh;

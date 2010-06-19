@@ -22,7 +22,7 @@ THREE.Matrix4 = function () {
 		this.n21 = 0; this.n22 = 1; this.n23 = 0; this.n24 = 0;
 		this.n31 = 0; this.n32 = 0; this.n33 = 1; this.n34 = 0;
 		this.n41 = 0; this.n42 = 0; this.n43 = 0; this.n44 = 1;
-	}
+	};
 
 	this.lookAt = function ( eye, center, up ) {
 
@@ -50,11 +50,11 @@ THREE.Matrix4 = function () {
 		this.n32 = z.y;
 		this.n33 = z.z;
 		this.n34 = - z.dot( eye );
-	}
+	};
 
 	this.transform = function ( v ) {
 
-        	var vx = v.x, vy = v.y, vz = v.z, vw = ( v.w ? v.w : 1.0 );
+		var vx = v.x, vy = v.y, vz = v.z, vw = v.w ? v.w : 1.0;
 
 		v.x = this.n11 * vx + this.n12 * vy + this.n13 * vz + this.n14 * vw;
 		v.y = this.n21 * vx + this.n22 * vy + this.n23 * vz + this.n24 * vw;
@@ -73,7 +73,7 @@ THREE.Matrix4 = function () {
 			v.z = v.z / vw;
 
 		}
-	}
+	};
 
 	this.crossVector = function ( a ) {
 
@@ -87,7 +87,7 @@ THREE.Matrix4 = function () {
 
 		return v;
 
-	}
+	};
 
 	this.multiply = function ( a, b ) {
 
@@ -111,7 +111,7 @@ THREE.Matrix4 = function () {
 		this.n43 = a.n41 * b.n13 + a.n42 * b.n23 + a.n43 * b.n33 + a.n44 * b.n43;
 		this.n44 = a.n41 * b.n14 + a.n42 * b.n24 + a.n43 * b.n34 + a.n44 * b.n44;
 
-	}
+	};
 
 	this.multiplySelf = function ( m ) {
 
@@ -140,7 +140,7 @@ THREE.Matrix4 = function () {
 		this.n43 = n41 * m.n13 + n42 * m.n23 + n43 * m.n33 + n44 * m.n43;
 		this.n44 = n41 * m.n14 + n42 * m.n24 + n43 * m.n34 + n44 * m.n44;
 
-	}
+	};
 
 	this.clone = function () {
 
@@ -151,7 +151,7 @@ THREE.Matrix4 = function () {
 		m.n41 = this.n41; m.n42 = this.n42; m.n43 = this.n43; m.n44 = this.n44;
 		return m;
 
-	}
+	};
 
 	this.toString = function() {
 
@@ -160,9 +160,9 @@ THREE.Matrix4 = function () {
 			"| " + this.n31 + " " + this.n32 + " " + this.n33 + " " + this.n34 + " |\n" +
 			"| " + this.n41 + " " + this.n42 + " " + this.n43 + " " + this.n44 + " |";
 
-	}
+	};
 
-}
+};
 
 THREE.Matrix4.translationMatrix = function ( x, y, z ) {
 
@@ -174,7 +174,7 @@ THREE.Matrix4.translationMatrix = function ( x, y, z ) {
 
 	return m;
 
-}
+};
 
 THREE.Matrix4.scaleMatrix = function ( x, y, z ) {
 
@@ -186,7 +186,7 @@ THREE.Matrix4.scaleMatrix = function ( x, y, z ) {
 
 	return m;
 
-}
+};
 
 THREE.Matrix4.rotationXMatrix = function ( theta ) {
 
@@ -198,7 +198,7 @@ THREE.Matrix4.rotationXMatrix = function ( theta ) {
 
 	return rot;
 
-}
+};
 
 THREE.Matrix4.rotationYMatrix = function ( theta ) {
 
@@ -210,7 +210,7 @@ THREE.Matrix4.rotationYMatrix = function ( theta ) {
 
 	return rot;
 
-}
+};
 
 THREE.Matrix4.rotationZMatrix = function( theta ) {
 
@@ -222,7 +222,7 @@ THREE.Matrix4.rotationZMatrix = function( theta ) {
 
 	return rot;
 
-}
+};
 
 THREE.Matrix4.makeFrustum = function( left, right, bottom, top, near, far ) {
 
@@ -242,7 +242,7 @@ THREE.Matrix4.makeFrustum = function( left, right, bottom, top, near, far ) {
 
 	return m;
 
-}
+};
 
 THREE.Matrix4.makePerspective = function( fovy, aspect, near, far ) {
 
@@ -253,4 +253,4 @@ THREE.Matrix4.makePerspective = function( fovy, aspect, near, far ) {
 
 	return THREE.Matrix4.makeFrustum( xmin, xmax, ymin, ymax, near, far );
 
-}
+};

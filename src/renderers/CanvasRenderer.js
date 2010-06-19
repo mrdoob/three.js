@@ -13,6 +13,8 @@ THREE.CanvasRenderer = function () {
 	_bboxRect = new THREE.Rectangle(),
 	_vector2 = new THREE.Vector2();
 
+	this.domElement = _viewport;
+
 	this.setSize = function ( width, height ) {
 
 		_viewport.width = width;
@@ -22,9 +24,7 @@ THREE.CanvasRenderer = function () {
 
 		_clipRect.set( -width / 2, -height / 2, width / 2, height / 2 );
 
-	}
-
-	this.domElement = _viewport;
+	};
 
 	this.render = function ( scene, camera ) {
 
@@ -206,14 +206,14 @@ THREE.CanvasRenderer = function () {
 					expand( suv2, suv3 );
 					expand( suv3, suv1 );
 
-					suv1x = ( uv1.x == 0 ) ? 1 : ( uv1.x == 1 ) ? suv1.x - 1 : suv1.x;
-					suv1y = ( uv1.y == 0 ) ? 1 : ( uv1.y == 1 ) ? suv1.y - 1 : suv1.y;
+					suv1x = ( uv1.x === 0 ) ? 1 : ( uv1.x === 1 ) ? suv1.x - 1 : suv1.x;
+					suv1y = ( uv1.y === 0 ) ? 1 : ( uv1.y === 1 ) ? suv1.y - 1 : suv1.y;
 
-					suv2x = ( uv2.x == 0 ) ? 1 : ( uv2.x == 1 ) ? suv2.x - 1 : suv2.x;
-					suv2y = ( uv2.y == 0 ) ? 1 : ( uv2.y == 1 ) ? suv2.y - 1 : suv2.y;
+					suv2x = ( uv2.x === 0 ) ? 1 : ( uv2.x === 1 ) ? suv2.x - 1 : suv2.x;
+					suv2y = ( uv2.y === 0 ) ? 1 : ( uv2.y === 1 ) ? suv2.y - 1 : suv2.y;
 
-					suv3x = ( uv3.x == 0 ) ? 1 : ( uv3.x == 1 ) ? suv3.x - 1 : suv3.x;
-					suv3y = ( uv3.y == 0 ) ? 1 : ( uv3.y == 1 ) ? suv3.y - 1 : suv3.y;
+					suv3x = ( uv3.x === 0 ) ? 1 : ( uv3.x === 1 ) ? suv3.x - 1 : suv3.x;
+					suv3y = ( uv3.y === 0 ) ? 1 : ( uv3.y === 1 ) ? suv3.y - 1 : suv3.y;
 
 					// Textured triangle drawing by Thatcher Ulrich.
 					// http://tulrich.com/geekstuff/canvas/jsgl.js
@@ -249,7 +249,7 @@ THREE.CanvasRenderer = function () {
 		_context.strokeRect( _clearRect.getX(), _clearRect.getY(), _clearRect.getWidth(), _clearRect.getHeight() );
 		*/
 
-	}
+	};
 
 	function expand( a, b ) {
 
@@ -261,7 +261,7 @@ THREE.CanvasRenderer = function () {
 
 	}
 
-}
+};
 
 THREE.CanvasRenderer.prototype = new THREE.Renderer();
 THREE.CanvasRenderer.prototype.constructor = THREE.CanvasRenderer;

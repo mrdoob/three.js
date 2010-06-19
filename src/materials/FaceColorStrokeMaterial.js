@@ -10,6 +10,6 @@ THREE.FaceColorStrokeMaterial = function ( lineWidth ) {
 
 		return 'THREE.FaceColorStrokeMaterial ( lineWidth: ' + this.lineWidth + ' )';
 
-	}
+	};
 
-}
+};

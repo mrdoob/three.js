@@ -8,6 +8,6 @@ THREE.FaceColorFillMaterial = function () {
 
 		return 'THREE.FaceColorFillMaterial ( )';
 
-	}
+	};
 
-}
+};

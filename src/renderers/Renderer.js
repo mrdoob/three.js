@@ -11,13 +11,13 @@ THREE.Renderer = function() {
 
 	matrix = new THREE.Matrix4();
 
-	this.renderList;
-
 	function painterSort(a, b) {
 
 		return a.screenZ - b.screenZ;
 
 	}
+
+	this.renderList = null;
 
 	this.project = function (scene, camera) {
 
@@ -243,5 +243,6 @@ THREE.Renderer = function() {
 
 		this.renderList.sort(painterSort);
 
-	}
-}
+	};
+
+};

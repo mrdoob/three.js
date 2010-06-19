@@ -21,12 +21,12 @@ THREE.Geometry = function () {
 
 		for( f = 0; f < this.faces.length; f++ ) {
 
-			vA = this.vertices[ this.faces[f].a ],
-			vB = this.vertices[ this.faces[f].b ],
-			vC = this.vertices[ this.faces[f].c ],
+			vA = this.vertices[ this.faces[f].a ];
+			vB = this.vertices[ this.faces[f].b ];
+			vC = this.vertices[ this.faces[f].c ];
 
-			cb = new THREE.Vector3(),
-			ab = new THREE.Vector3(),
+			cb = new THREE.Vector3();
+			ab = new THREE.Vector3();
 			normal = new THREE.Vector3();
 
 			cb.sub(vC.position,vB.position);
@@ -53,6 +53,6 @@ THREE.Geometry = function () {
 
 		}
 
-	}
+	};
 
-}
+};

@@ -158,7 +158,7 @@
 
 					for (var x = 0; x < quality1; x++ ) {
 
-						plane.vertices[x + y * quality1].position.z = data[((x * pixelsPerTriangle) + (y * pixelsPerTriangle) * heightMap.width) * 4] * 2;
+						plane.vertices[x + y * quality1].position.z = data[((x * pixelsPerTriangle) + (y * pixelsPerTriangle) * heightMap.width) * 4] * 2 - 128;
 
 					}
 

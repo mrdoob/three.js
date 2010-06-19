@@ -4,11 +4,11 @@
 
 THREE.RenderableParticle = function () {
 
-	this.x;
-	this.y;
-	this.screenZ;
+	this.x = null;
+	this.y = null;
+	this.screenZ = null;
 
-	this.color;
-	this.material;
+	this.color = null;
+	this.material = null;
 
-}
+};

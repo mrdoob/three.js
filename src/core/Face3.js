@@ -17,6 +17,6 @@ THREE.Face3 = function ( a, b, c, normal, color ) {
 
 		return 'THREE.Face3 ( ' + this.a + ', ' + this.b + ', ' + this.c + ' )';
 
-	}
+	};
 
-}
+};

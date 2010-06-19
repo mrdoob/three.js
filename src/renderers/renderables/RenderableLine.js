@@ -7,9 +7,9 @@ THREE.RenderableLine = function () {
 	this.v1 = new THREE.Vector2();
 	this.v2 = new THREE.Vector2();
 
-	this.screenZ;
+	this.screenZ = null;
 
-	this.color;
-	this.material;
+	this.color = null;
+	this.material = null;
 
-}
+};

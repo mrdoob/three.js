@@ -9,9 +9,9 @@ THREE.RenderableFace4 = function () {
 	this.v3 = new THREE.Vector2();
 	this.v4 = new THREE.Vector2();
 
-	this.screenZ;
+	this.screenZ = null;
 
-	this.color;
-	this.material;
+	this.color = null;
+	this.material = null;
 
-}
+};

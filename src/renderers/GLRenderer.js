@@ -9,19 +9,19 @@ var GLRenderer = Renderer.extend
 	init: function()
 	{
 		this._super();
-		
+
 		this.viewport = document.createElement("canvas");
 		this.viewport.style.position = "absolute";
-		
+
 		try {
 			this.gl = this.viewport.getContext("experimental-webgl");
 		} catch(e) {}
-			
+
 		if (!this.gl) {
 			alert("WebGL not supported");
 			throw "cannot create webgl context";
 		}
-		
+
 		this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
 		this.gl.clearDepth(1.0);
 		this.gl.enable(this.gl.DEPTH_TEST);

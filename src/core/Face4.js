@@ -18,6 +18,6 @@ THREE.Face4 = function ( a, b, c, d, normal, color ) {
 
 		return 'THREE.Face4 ( ' + this.a + ', ' + this.b + ', ' + this.c + ' ' + this.d + ' )';
 
-	}
+	};
 
-}
+};
