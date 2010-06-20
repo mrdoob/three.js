@@ -13,6 +13,7 @@ THREE.SVGRenderer = function () {
 	_quality = 1;
 
 	this.domElement = _viewport;
+	this.autoClear = true;
 
 	this.setQuality = function( quality ) {
 
@@ -35,6 +36,16 @@ THREE.SVGRenderer = function () {
 
 	};
 
+	this.clear = function () {
+
+		while ( _viewport.childNodes.length > 0 ) {
+
+			_viewport.removeChild( _viewport.childNodes[ 0 ] );
+
+		}
+
+	};
+
 	this.render = function ( scene, camera ) {
 
 		var i, j, element, elementsLength, material, materialLength,
@@ -42,13 +53,9 @@ THREE.SVGRenderer = function () {
 		v1x, v1y, v2x, v2y, v3x, v3y, v4x, v4y,
 		size;
 
+		this.autoClear && this.clear();
+
 		this.project( scene, camera );
-
-		while ( _viewport.childNodes.length > 0 ) {
-
-			_viewport.removeChild( _viewport.childNodes[ 0 ] );
-
-		}
 
 		elementsLength = this.renderList.length;
 

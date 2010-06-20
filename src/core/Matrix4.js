@@ -36,20 +36,11 @@ THREE.Matrix4 = function () {
 		y.copy( x );
 		y.crossSelf( z );
 		y.normalize();
-		y.negate(); //
+		y.negate();
 
-		this.n11 = x.x;
-		this.n12 = x.y;
-		this.n13 = x.z;
-		this.n14 = - x.dot( eye );
-		this.n21 = y.x;
-		this.n22 = y.y;
-		this.n23 = y.z;
-		this.n24 = - y.dot( eye );
-		this.n31 = z.x;
-		this.n32 = z.y;
-		this.n33 = z.z;
-		this.n34 = - z.dot( eye );
+		this.n11 = x.x; this.n12 = x.y; this.n13 = x.z; this.n14 = - x.dot( eye );
+		this.n21 = y.x; this.n22 = y.y; this.n23 = y.z; this.n24 = - y.dot( eye );
+		this.n31 = z.x; this.n32 = z.y; this.n33 = z.z; this.n34 = - z.dot( eye );
 	};
 
 	this.transform = function ( v ) {

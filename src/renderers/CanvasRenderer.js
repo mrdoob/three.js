@@ -14,6 +14,7 @@ THREE.CanvasRenderer = function () {
 	_vector2 = new THREE.Vector2();
 
 	this.domElement = _viewport;
+	this.autoClear = true;
 
 	this.setSize = function ( width, height ) {
 
@@ -23,6 +24,15 @@ THREE.CanvasRenderer = function () {
 		_context.setTransform( 1, 0, 0, 1, width / 2, height / 2 );
 
 		_clipRect.set( -width / 2, -height / 2, width / 2, height / 2 );
+
+	};
+
+	this.clear = function () {
+
+		_clearRect.inflate( 1 );
+		_clearRect.minSelf( _clipRect );
+		_context.clearRect( _clearRect.getX(), _clearRect.getY(), _clearRect.getWidth(), _clearRect.getHeight() );
+		_clearRect.empty();
 
 	};
 
@@ -38,10 +48,7 @@ THREE.CanvasRenderer = function () {
 		bitmap, bitmap_width, bitmap_height,
 		size;
 
-		_clearRect.inflate( 1 );
-		_clearRect.minSelf( _clipRect );
-		_context.clearRect( _clearRect.getX(), _clearRect.getY(), _clearRect.getWidth(), _clearRect.getHeight() );
-		_clearRect.empty();
+		this.autoClear && this.clear();
 
 		/*
 		_context.fillStyle = 'rgba(255, 255, 0, 0.5)';

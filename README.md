@@ -55,7 +55,7 @@ This code creates a camera, then creates a scene object, adds a bunch of random 
 			scene = new THREE.Scene();
 
 			renderer = new THREE.CanvasRenderer();
-			renderer.setSize(window.innerWidth, window.innerHeight);
+			renderer.setSize( window.innerWidth, window.innerHeight );
 
 			for (var i = 0; i < 1000; i++) {
 
@@ -115,7 +115,14 @@ If you are interested on messing with the actual library, instead of importing t
 
 ### Change Log ###
 
-2010 06 06 - **r8** (23.597 kb)
+2010 06 20 - **r9** (23.641 kb)
+
+* JSLinted
+* autoClear property for renderers.
+* Removed SVG rgba() workaround for WebKit. (WebKit now supports it)
+
+
+2010 06 06 - **r8** (23.496 kb)
 
 * Moved UVs to Geometry.
 * CanvasRenderer expands screen space points (workaround for antialias gaps).

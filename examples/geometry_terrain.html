@@ -193,8 +193,8 @@
 
 			function loop() {
 
-				camera.position.x += (mouseX - camera.position.x) * .05;
-				camera.position.y += (-mouseY - camera.position.y) * .05;
+				camera.position.x += (mouseX - camera.position.x) * 0.05;
+				camera.position.y += (-mouseY - camera.position.y) * 0.05;
 
 				renderer.render(scene, camera);
 				stats.update();
@@ -282,7 +282,7 @@
 
 						vector3.x = src_data[ index - 4 ] - src_data[ index + 4 ];
 						vector3.y = 2;
-						vector3.z = src_data[ index - ( width * 4 ) ] - src_data[ index + ( width * 4 ) ];;
+						vector3.z = src_data[ index - ( width * 4 ) ] - src_data[ index + ( width * 4 ) ];
 						vector3.normalize();
 
 						shade = vector3.dot(sun);

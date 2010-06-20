@@ -3,7 +3,7 @@ import os
 
 # MERGER
 
-rev = 8;
+rev = 9;
 
 files = [];
 files.append('Three.js');
