@@ -46,9 +46,13 @@ THREE.CanvasRenderer = function () {
 		suv1 = new THREE.Vector2(), suv2 = new THREE.Vector2(), suv3 = new THREE.Vector2(),
 		suv1x, suv1y, suv2x, suv2y, suv3x, suv3y, denom, m11, m12, m21, m22, dx, dy,
 		bitmap, bitmap_width, bitmap_height,
-		size;
+		size, overdraw;
 
-		this.autoClear && this.clear();
+		if ( this.autoClear ) {
+
+			this.clear();
+
+		}
 
 		/*
 		_context.fillStyle = 'rgba(255, 255, 0, 0.5)';
@@ -63,106 +67,114 @@ THREE.CanvasRenderer = function () {
 
 			element = this.renderList[ i ];
 
-			_bboxRect.empty();
-
-			_context.beginPath();
-
-			if ( element instanceof THREE.RenderableParticle ) {
-
-				size = element.size * element.screenZ;
-
-				_bboxRect.set( element.x - size, element.y - size, element.x + size, element.y + size );
-
-				if ( !_clipRect.instersects( _bboxRect ) ) {
-
-					continue;
-
-				}
-
-				_context.arc( element.x, element.y, size, 0, pi2, true );
-
-			} else if ( element instanceof THREE.RenderableLine ) {
-
-				v1x = element.v1.x; v1y = element.v1.y;
-				v2x = element.v2.x; v2y = element.v2.y;
-
-				_bboxRect.addPoint( v1x, v1y );
-				_bboxRect.addPoint( v2x, v2y );
-
-				if ( !_clipRect.instersects( _bboxRect ) ) {
-
-					continue;
-
-				}
-
-				_context.moveTo( v1x, v1y );
-				_context.lineTo( v2x, v2y );
-
-			} else if ( element instanceof THREE.RenderableFace3 ) {
-
-				expand( element.v1, element.v2 );
-				expand( element.v2, element.v3 );
-				expand( element.v3, element.v1 );
-
-				v1x = element.v1.x; v1y = element.v1.y;
-				v2x = element.v2.x; v2y = element.v2.y;
-				v3x = element.v3.x; v3y = element.v3.y;
-
-				_bboxRect.addPoint( v1x, v1y );
-				_bboxRect.addPoint( v2x, v2y );
-				_bboxRect.addPoint( v3x, v3y );
-
-				if ( !_clipRect.instersects( _bboxRect ) ) {
-
-					continue;
-
-				}
-
-				_clearRect.addRectangle( _bboxRect );
-
-				_context.moveTo( v1x, v1y );
-				_context.lineTo( v2x, v2y );
-				_context.lineTo( v3x, v3y );
-				_context.lineTo( v1x, v1y );
-
-			} else if ( element instanceof THREE.RenderableFace4 ) {
-
-				expand( element.v1, element.v2 );
-				expand( element.v2, element.v3 );
-				expand( element.v3, element.v4 );
-				expand( element.v4, element.v1 );
-
-				v1x = element.v1.x; v1y = element.v1.y;
-				v2x = element.v2.x; v2y = element.v2.y;
-				v3x = element.v3.x; v3y = element.v3.y;
-				v4x = element.v4.x; v4y = element.v4.y;
-
-				_bboxRect.addPoint( v1x, v1y );
-				_bboxRect.addPoint( v2x, v2y );
-				_bboxRect.addPoint( v3x, v3y );
-				_bboxRect.addPoint( v4x, v4y );
-
-				if ( !_clipRect.instersects( _bboxRect ) ) {
-
-					continue;
-
-				}
-
-				_context.moveTo( v1x, v1y );
-				_context.lineTo( v2x, v2y );
-				_context.lineTo( v3x, v3y );
-				_context.lineTo( v4x, v4y );
-				_context.lineTo( v1x, v1y );
-
-			}
-
-			_context.closePath();
-
 			materialLength = element.material.length;
 
 			for ( j = 0; j < materialLength; j++ ) {
 
 				material = element.material[ j ];
+
+				overdraw = material instanceof THREE.ColorFillMaterial || material instanceof THREE.FaceColorFillMaterial || material instanceof THREE.BitmapUVMappingMaterial;
+
+				_bboxRect.empty();
+
+				_context.beginPath();
+
+				if ( element instanceof THREE.RenderableParticle ) {
+
+					size = element.size * element.screenZ;
+
+					_bboxRect.set( element.x - size, element.y - size, element.x + size, element.y + size );
+
+					if ( !_clipRect.instersects( _bboxRect ) ) {
+
+						continue;
+
+					}
+
+					_context.arc( element.x, element.y, size, 0, pi2, true );
+
+				} else if ( element instanceof THREE.RenderableLine ) {
+
+					v1x = element.v1.x; v1y = element.v1.y;
+					v2x = element.v2.x; v2y = element.v2.y;
+
+					_bboxRect.addPoint( v1x, v1y );
+					_bboxRect.addPoint( v2x, v2y );
+
+					if ( !_clipRect.instersects( _bboxRect ) ) {
+
+						continue;
+
+					}
+
+					_context.moveTo( v1x, v1y );
+					_context.lineTo( v2x, v2y );
+
+				} else if ( element instanceof THREE.RenderableFace3 ) {
+
+					if ( overdraw ) {
+
+						expand( element.v1, element.v2 );
+						expand( element.v2, element.v3 );
+						expand( element.v3, element.v1 );
+
+					}
+
+					v1x = element.v1.x; v1y = element.v1.y;
+					v2x = element.v2.x; v2y = element.v2.y;
+					v3x = element.v3.x; v3y = element.v3.y;
+
+					_bboxRect.addPoint( v1x, v1y );
+					_bboxRect.addPoint( v2x, v2y );
+					_bboxRect.addPoint( v3x, v3y );
+
+					if ( !_clipRect.instersects( _bboxRect ) ) {
+
+						continue;
+
+					}
+
+					_context.moveTo( v1x, v1y );
+					_context.lineTo( v2x, v2y );
+					_context.lineTo( v3x, v3y );
+					_context.lineTo( v1x, v1y );
+
+				} else if ( element instanceof THREE.RenderableFace4 ) {
+
+					if ( overdraw ) {
+
+						expand( element.v1, element.v2 );
+						expand( element.v2, element.v3 );
+						expand( element.v3, element.v4 );
+						expand( element.v4, element.v1 );
+
+					}
+
+					v1x = element.v1.x; v1y = element.v1.y;
+					v2x = element.v2.x; v2y = element.v2.y;
+					v3x = element.v3.x; v3y = element.v3.y;
+					v4x = element.v4.x; v4y = element.v4.y;
+
+					_bboxRect.addPoint( v1x, v1y );
+					_bboxRect.addPoint( v2x, v2y );
+					_bboxRect.addPoint( v3x, v3y );
+					_bboxRect.addPoint( v4x, v4y );
+
+					if ( !_clipRect.instersects( _bboxRect ) ) {
+
+						continue;
+
+					}
+
+					_context.moveTo( v1x, v1y );
+					_context.lineTo( v2x, v2y );
+					_context.lineTo( v3x, v3y );
+					_context.lineTo( v4x, v4y );
+					_context.lineTo( v1x, v1y );
+
+				}
+
+				_context.closePath();
 
 				if ( material instanceof THREE.ColorFillMaterial ) {
 
@@ -244,9 +256,9 @@ THREE.CanvasRenderer = function () {
 
 				}
 
-			}
+				_clearRect.addRectangle( _bboxRect );
 
-			_clearRect.addRectangle( _bboxRect );
+			}
 
 		}
 

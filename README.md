@@ -115,11 +115,13 @@ If you are interested on messing with the actual library, instead of importing t
 
 ### Change Log ###
 
-2010 06 20 - **r9** (23.641 kb)
+2010 06 20 - **r9** (23.753 kb)
 
 * JSLinted
 * autoClear property for renderers.
 * Removed SVG rgba() workaround for WebKit. (WebKit now supports it)
+* Fixed matrix bug (transformed objects outside the x axis would get infinitely tall :S)
+* Fixed overdraw when using stroke materials
 
 
 2010 06 06 - **r8** (23.496 kb)

@@ -11,7 +11,6 @@ THREE.Camera = function ( x, y, z ) {
 	this.projectionMatrix = THREE.Matrix4.makePerspective( 45, 1 /*SCREEN_WIDTH/SCREEN_HEIGHT*/, 0.001, 1000 );
 
 	this.up = new THREE.Vector3( 0, 1, 0 );
-	this.roll = 0;
 
 	// TODO: Need to remove this
 	this.zoom = 3;
