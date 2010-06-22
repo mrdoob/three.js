@@ -1,6 +1,6 @@
 /**
- * @author kile / http://kile.stravaganza.org/
  * @author mr.doob / http://mrdoob.com/
+ * @author kile / http://kile.stravaganza.org/
  */
 
 THREE.Vector3 = function ( x, y, z ) {
@@ -133,11 +133,11 @@ THREE.Vector3 = function ( x, y, z ) {
 
 		if (this.length() > 0) {
 
-			this.multiplyScalar(1 / this.length());
+			this.multiplyScalar( 1 / this.length() );
 
 		} else {
 
-			this.multiplyScalar(0);
+			this.multiplyScalar( 0 );
 
 		}
 
@@ -145,13 +145,13 @@ THREE.Vector3 = function ( x, y, z ) {
 
 	this.clone = function () {
 
-		return new THREE.Vector3(this.x, this.y, this.z);
+		return new THREE.Vector3( this.x, this.y, this.z );
 
 	};
 
 	this.toString = function () {
 
-		return 'THREE.Vector3 (' + this.x + ', ' + this.y + ', ' + this.z + ')';
+		return 'THREE.Vector3 ( ' + this.x + ', ' + this.y + ', ' + this.z + ' )';
 
 	};
 

@@ -30,7 +30,38 @@
 		<div id="container"></div> 
 		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - vr demo. skybox by <a href="http://www.zfight.com/" target="_blank">Jochum Skoglund</a></div>
 
-		<script type="text/javascript" src="../build/three.js"></script>
+		<!-- <script type="text/javascript" src="../build/three.js"></script> -->
+
+		<script type="text/javascript" src="../src/Three.js"></script>
+		<script type="text/javascript" src="../src/core/Color.js"></script>
+		<script type="text/javascript" src="../src/core/Vector2.js"></script>
+		<script type="text/javascript" src="../src/core/Vector3.js"></script>
+		<script type="text/javascript" src="../src/core/Vector4.js"></script>
+		<script type="text/javascript" src="../src/core/Rectangle.js"></script>
+		<script type="text/javascript" src="../src/core/Matrix4.js"></script>
+		<script type="text/javascript" src="../src/core/Vertex.js"></script>
+		<script type="text/javascript" src="../src/core/Face3.js"></script>
+		<script type="text/javascript" src="../src/core/Face4.js"></script>
+		<script type="text/javascript" src="../src/core/Geometry.js"></script>
+		<script type="text/javascript" src="../src/cameras/Camera.js"></script>
+		<script type="text/javascript" src="../src/objects/Object3D.js"></script>
+		<script type="text/javascript" src="../src/objects/Mesh.js"></script>
+		<script type="text/javascript" src="../src/objects/Particle.js"></script>
+		<script type="text/javascript" src="../src/objects/Line.js"></script>
+		<script type="text/javascript" src="../src/materials/BitmapUVMappingMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/ColorFillMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/ColorStrokeMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/FaceColorFillMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/FaceColorStrokeMaterial.js"></script>
+		<script type="text/javascript" src="../src/scenes/Scene.js"></script>
+		<script type="text/javascript" src="../src/renderers/Renderer.js"></script>
+		<script type="text/javascript" src="../src/renderers/CanvasRenderer.js"></script>
+		<script type="text/javascript" src="../src/renderers/SVGRenderer.js"></script>
+		<script type="text/javascript" src="../src/renderers/renderables/RenderableFace3.js"></script>
+		<script type="text/javascript" src="../src/renderers/renderables/RenderableFace4.js"></script>
+		<script type="text/javascript" src="../src/renderers/renderables/RenderableParticle.js"></script>
+		<script type="text/javascript" src="../src/renderers/renderables/RenderableLine.js"></script>
+
 		<script type="text/javascript" src="primitives/Plane.js"></script>
 
 		<script type="text/javascript">
@@ -54,8 +85,7 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.Camera();
-				camera.focus = 300;
+				camera = new THREE.Camera( 75, SCREEN_WIDTH / SCREEN_HEIGHT, 0.0001, 10000 );
 
 				scene = new THREE.Scene();
 
@@ -63,7 +93,7 @@
 				texture_placeholder.width = 128;
 				texture_placeholder.height = 128;
 
-				wireframe = new THREE.ColorStrokeMaterial(1, 0xffffff, 0);
+				wireframe = new THREE.ColorStrokeMaterial( 1, 0xffffff, 0 );
 
 				var context = texture_placeholder.getContext( '2d' );
 				context.fillStyle = 'rgba( 200, 200, 200, 1 )';
@@ -71,31 +101,37 @@
 
 				mesh = new THREE.Mesh( new Plane( 1000, 1000, 5, 5 ), loadTexture( 'textures/skymap_front1024.jpg' ) );
 				mesh.position.z = -500;
+				mesh.overdraw = true;
 				scene.add( mesh );
 
 				mesh = new THREE.Mesh( new Plane( 1000, 1000, 5, 5 ), loadTexture( 'textures/skymap_back1024.jpg' ) );
 				mesh.position.z = 500;
 				mesh.rotation.y = 180 * Math.PI / 180;
+				mesh.overdraw = true;
 				scene.add( mesh );
 
 				mesh = new THREE.Mesh( new Plane( 1000, 1000, 5, 5 ), loadTexture( 'textures/skymap_left1024.jpg' ) );
 				mesh.position.x = -500;
 				mesh.rotation.y = 90 * Math.PI / 180;
+				mesh.overdraw = true;
 				scene.add( mesh );
 
 				mesh = new THREE.Mesh( new Plane( 1000, 1000, 5, 5 ), loadTexture( 'textures/skymap_right1024.jpg' ) );
 				mesh.position.x = 500;
 				mesh.rotation.y = -90 * Math.PI / 180;
+				mesh.overdraw = true;
 				scene.add( mesh );
 
 				mesh = new THREE.Mesh( new Plane( 1000, 1000, 5, 5 ), loadTexture( 'textures/skymap_top1024.jpg' ) );
 				mesh.position.y = 500;
 				mesh.rotation.x = 90 * Math.PI / 180;
+				mesh.overdraw = true;
 				scene.add( mesh );
 
 				mesh = new THREE.Mesh( new Plane( 1000, 1000, 5, 5 ), loadTexture( 'textures/skymap_bottom1024.jpg' ) );
 				mesh.position.y = -500;
 				mesh.rotation.x = -90 * Math.PI / 180;
+				mesh.overdraw = true;
 				scene.add( mesh );
 
 
@@ -108,8 +144,8 @@
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.addEventListener( 'mouseup', onDocumentMouseUp, false );
 
-				document.addEventListener('touchstart', onDocumentTouchStart, false);
-				document.addEventListener('touchmove', onDocumentTouchMove, false);
+				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
+				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
 
 			}
 
@@ -149,7 +185,7 @@
 
 			function onDocumentMouseMove( event ) {
 
-				if (isUserInteracting) {
+				if ( isUserInteracting ) {
 
 					lon = ( onPointerDownPointerX - event.clientX ) * 0.1 + onPointerDownLon;
 					lat = ( event.clientY - onPointerDownPointerY ) * 0.1 + onPointerDownLat;
@@ -164,13 +200,14 @@
 				isUserInteracting = false;
 
 				wireframe.color.setRGBA(255, 255, 255, 0);
+
 				render();
 			}
 
 
 			function onDocumentTouchStart( event ) {
 
-				if(event.touches.length == 1) {
+				if( event.touches.length == 1 ) {
 
 					event.preventDefault();
 
@@ -184,7 +221,7 @@
 
 			function onDocumentTouchMove( event ) {
 
-				if(event.touches.length == 1) {
+				if( event.touches.length == 1 ) {
 
 					event.preventDefault();
 
@@ -202,11 +239,11 @@
 				phi = ( 90 - lat ) * Math.PI / 180;
 				theta = ( lon + 180 ) * Math.PI / 180;
 
-				camera.target.position.x = 500 * Math.sin(phi) * Math.cos(theta);
-				camera.target.position.y = 500 * Math.cos(phi);
-				camera.target.position.z = 500 * Math.sin(phi) * Math.sin(theta);
+				camera.target.position.x = 500 * Math.sin( phi ) * Math.cos( theta );
+				camera.target.position.y = 500 * Math.cos( phi );
+				camera.target.position.z = 500 * Math.sin( phi ) * Math.sin( theta );
 
-				renderer.render(scene, camera);
+				renderer.render( scene, camera );
 
 			}
 

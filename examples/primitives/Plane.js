@@ -25,7 +25,7 @@ var Plane = function ( width, height, segments_width, segments_height ) {
 			var x = ix * segment_width - width_half;
 			var y = iy * segment_height - height_half;
 
-			this.vertices.push( new THREE.Vertex( new THREE.Vector3( x, -y, 0 ) ) );
+			this.vertices.push( new THREE.Vertex( new THREE.Vector3( x, - y, 0 ) ) );
 
 		}
 

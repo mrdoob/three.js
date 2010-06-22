@@ -8,7 +8,7 @@ THREE.RenderableFace3 = function () {
 	this.v2 = new THREE.Vector2();
 	this.v3 = new THREE.Vector2();
 
-	this.screenZ = null;
+	this.z = null;
 
 	this.color = null;
 	this.material = null;

@@ -5,15 +5,11 @@ three.js
 
 [![Flattr this](http://api.flattr.com/button/button-compact-static-100x17.png)](http://flattr.com/thing/287/three-js)
 
-Currently the engine only supports particles and triangles/quads with flat colors. The aim is to keep the code as simple and modular as possible.
-
-At the moment the engine can render using &lt;canvas&gt; and &lt;svg&gt;. WebGL rendering would come at a later stage but feel free to fork the project and have a go.
-
-Although this allows 3D for iPhoneOS and Android platforms the performance on these devices is not too good.
+This project is work in progress. Before using it in a project be aware that the syntax may change from revision to revision without being backwards compatible. Currently there is no documentation, feel free to use the demos as a reference and/or read the source code. The engine can render using &lt;canvas&gt; and &lt;svg&gt; so far. WebGL renderer coming soon.
 
 [More info...](http://mrdoob.com/blog/post/693)
 
-Similar projects: [pre3d](http://deanm.github.com/pre3d/), [pvjs](http://code.google.com/p/pvjswebgl/), [jsjl](http://tulrich.com/geekstuff/canvas/perspective.html), [k3d](http://www.kevs3d.co.uk/dev/canvask3d/k3d_test.html), ...
+Other similar projects: [pre3d](http://deanm.github.com/pre3d/), [pvjs](http://code.google.com/p/pvjswebgl/), [jsgl](http://tulrich.com/geekstuff/canvas/perspective.html), [k3d](http://www.kevs3d.co.uk/dev/canvask3d/k3d_test.html), ...
 
 ### Examples ###
 
@@ -37,9 +33,7 @@ The library needs to be included first thing.
 
 	<script type="text/javascript" src="js/three.js"></script>
 
-Now we have access to the engine classes and methods.
-
-This code creates a camera, then creates a scene object, adds a bunch of random particles to the scene, creates a &lt;canvas&gt; renderer and adds its viewport the document.body element.
+This code creates a camera, then creates a scene object, adds a bunch of random particles to the scene, creates a &lt;canvas&gt; renderer and adds its viewport in the document.body element.
 
 	<script type="text/javascript">
 
@@ -50,7 +44,8 @@ This code creates a camera, then creates a scene object, adds a bunch of random 
 
 		function init() {
 
-			camera = new THREE.Camera( 0, 0, 1000 );
+			camera = new THREE.Camera( 75, SCREEN_WIDTH / SCREEN_HEIGHT, 0.0001, 10000 );
+			camera.position.z = 1000;
 
 			scene = new THREE.Scene();
 
@@ -115,13 +110,18 @@ If you are interested on messing with the actual library, instead of importing t
 
 ### Change Log ###
 
+2010 06 22 - **r10** (23.908 kb)
+
+* Changed Camera system. (Thx [Paul Brunt](http://github.com/supereggbert))
+* Object3D.overdraw = true to enable CanvasRenderer screen space point expansion hack.
+
+
 2010 06 20 - **r9** (23.753 kb)
 
-* JSLinted
+* JSLinted.
 * autoClear property for renderers.
 * Removed SVG rgba() workaround for WebKit. (WebKit now supports it)
-* Fixed matrix bug (transformed objects outside the x axis would get infinitely tall :S)
-* Fixed overdraw when using stroke materials
+* Fixed matrix bug. (transformed objects outside the x axis would get infinitely tall :S)
 
 
 2010 06 06 - **r8** (23.496 kb)
@@ -135,7 +135,7 @@ If you are interested on messing with the actual library, instead of importing t
 
 * Added Line Object.
 * Workaround for WebKit not supporting rgba() in SVG yet.
-* No need to call updateMatrix(). Use .autoUpdateMatrix = false if needed. (thx [Gregory Athons](http://github.com/gregmax17)).
+* No need to call updateMatrix(). Use .autoUpdateMatrix = false if needed. (Thx [Gregory Athons](http://github.com/gregmax17)).
 
 
 2010 05 17 - **r6** (21.003 kb)

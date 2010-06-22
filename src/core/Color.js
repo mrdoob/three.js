@@ -6,7 +6,7 @@ THREE.Color = function ( hex ) {
 
 	var _r, _g, _b, _a, _hex;
 
-	this.__styleString = "rgba(0,0,0,1)";
+	this.__styleString = "rgba(0, 0, 0, 1)";
 
 	this.setHex = function ( hex ) {
 
@@ -30,7 +30,7 @@ THREE.Color = function ( hex ) {
 
 	this.updateHex = function () {
 
-		_hex = _a * 255 << 24 | _r << 16 | _g << 8 | _b;
+		_hex = Math.floor( _a * 255 ) << 24 | _r << 16 | _g << 8 | _b;
 
 	};
 

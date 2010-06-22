@@ -69,12 +69,6 @@ THREE.Vector4 = function ( x, y, z, w ) {
 
 	};
 
-	this.toVector3 = function () {
-
-		return new THREE.Vector3( this.x / this.w, this.y / this.w, this.z / this.w );
-
-	};
-
 	this.toString = function () {
 
 		return 'THREE.Vector4 (' + this.x + ', ' + this.y + ', ' + this.z + ', ' + this.w + ')';

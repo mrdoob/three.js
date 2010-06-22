@@ -26,15 +26,15 @@ THREE.Matrix4 = function () {
 
 	this.lookAt = function ( eye, center, up ) {
 
-		z.sub( center, eye );
+		z.sub( eye, center );
 		z.normalize();
 
-		x.copy( z );
-		x.crossSelf( up );
+		x.copy( up );
+		x.crossSelf( z );
 		x.normalize();
 
-		y.copy( x );
-		y.crossSelf( z );
+		y.copy( z );
+		y.crossSelf( x );
 		y.normalize();
 		y.negate();
 
@@ -217,13 +217,14 @@ THREE.Matrix4.rotationZMatrix = function( theta ) {
 
 THREE.Matrix4.makeFrustum = function( left, right, bottom, top, near, far ) {
 
-	var m = new THREE.Matrix4(),
+	var m, x, y, a, b, c, d;
 
-	x = 2 * near / ( right - left ),
-	y = 2 * near / ( top - bottom ),
-	a = ( right + left ) / ( right - left ),
-	b = ( top + bottom ) / ( top - bottom ),
-	c = - ( far + near ) / ( far - near ),
+	m = new THREE.Matrix4();
+	x = 2 * near / ( right - left );
+	y = 2 * near / ( top - bottom );
+	a = ( right + left ) / ( right - left );
+	b = ( top + bottom ) / ( top - bottom );
+	c = - ( far + near ) / ( far - near );
 	d = - 2 * far * near / ( far - near );
 
 	m.n11 = x; m.n13 = a;
@@ -235,11 +236,13 @@ THREE.Matrix4.makeFrustum = function( left, right, bottom, top, near, far ) {
 
 };
 
-THREE.Matrix4.makePerspective = function( fovy, aspect, near, far ) {
+THREE.Matrix4.makePerspective = function( fov, aspect, near, far ) {
 
-	var ymax = near * Math.tan( fovy * 0.00872664625972 ),
-	ymin = - ymax,
-	xmin = ymin * aspect,
+	var ymax, ymin, xmin, xmax;
+
+	ymax = near * Math.tan( fov * Math.PI / 360 );
+	ymin = - ymax;
+	xmin = ymin * aspect;
 	xmax = ymax * aspect;
 
 	return THREE.Matrix4.makeFrustum( xmin, xmax, ymin, ymax, near, far );

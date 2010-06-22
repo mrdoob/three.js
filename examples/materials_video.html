@@ -66,8 +66,8 @@
 				info.innerHTML = '<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - video demo. playing <a href="http://durian.blender.org/" target="_blank">sintel</a> trailer';
 				container.appendChild(info);
 
-				camera = new THREE.Camera(0, 0, 500);
-				camera.focus = 300;
+				camera = new THREE.Camera( 45, SCREEN_WIDTH / SCREEN_HEIGHT, 0.0001, 10000 );
+				camera.position.z = 1000;
 
 				scene = new THREE.Scene();
 
@@ -105,6 +105,7 @@
 
 				mesh = new THREE.Mesh( plane, material );
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 1.5;
+				mesh.overdraw = true;
 				scene.add(mesh);
 
 				mesh = new THREE.Mesh( plane, materialReflection );
@@ -112,6 +113,7 @@
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 1.5;
 				mesh.rotation.x = 180 * Math.PI / 180;
 				mesh.doubleSided = true;
+				mesh.overdraw = true;
 				scene.add(mesh);
 
 				//

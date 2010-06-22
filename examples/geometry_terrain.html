@@ -137,8 +137,8 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.Camera(0, 0, 500);
-				camera.focus = 300;
+				camera = new THREE.Camera( 45, SCREEN_WIDTH / SCREEN_HEIGHT, 0.0001, 10000 );
+				camera.position.z = 1000;
 
 				scene = new THREE.Scene();
 
@@ -166,6 +166,7 @@
 
 				mesh = new THREE.Mesh( plane, material );
 				mesh.rotation.x = -90 * Math.PI / 180;
+				mesh.overdraw = true;
 				scene.add(mesh);
 
 				renderer = new THREE.CanvasRenderer();

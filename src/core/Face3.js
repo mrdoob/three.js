@@ -11,7 +11,7 @@ THREE.Face3 = function ( a, b, c, normal, color ) {
 	this.normal = normal || new THREE.Vector3();
 	this.screen = new THREE.Vector3();
 
-	this.color = color || new THREE.Color();
+	this.color = color || new THREE.Color( 0x000000 );
 
 	this.toString = function () {
 
