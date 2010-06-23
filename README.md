@@ -5,7 +5,9 @@ three.js
 
 [![Flattr this](http://api.flattr.com/button/button-compact-static-100x17.png)](http://flattr.com/thing/287/three-js)
 
-This project is work in progress. Before using it in a project be aware that the syntax may change from revision to revision without being backwards compatible. Currently there is no documentation, feel free to use the demos as a reference and/or read the source code. The engine can render using &lt;canvas&gt; and &lt;svg&gt; so far. WebGL renderer coming soon.
+The aim of this project is to create a 3D engine with a very low level of abstraction (aka for dummies). Currently there is no documentation available but feel free to use the examples as a reference and/or read the source code. However, be aware that the syntax may change from revision to revision breaking compatibility.
+
+The engine can render using &lt;canvas&gt; and &lt;svg&gt; by now and WebGL renderer will be available soon.
 
 [More info...](http://mrdoob.com/blog/post/693)
 
@@ -75,7 +77,7 @@ This code creates a camera, then creates a scene object, adds a bunch of random 
 
 	</script>
 
-If you are interested on messing with the actual library, instead of importing the three.js compressed file, you can include the original files in this order:
+For creating a customised version of the library, including the source files in this order would be a good way to start:
 
 	<script type="text/javascript" src="js/three/Three.js"></script>
 	<script type="text/javascript" src="js/three/core/Color.js"></script>
@@ -110,7 +112,7 @@ If you are interested on messing with the actual library, instead of importing t
 
 ### Change Log ###
 
-2010 06 22 - **r10** (23.908 kb)
+2010 06 22 - **r10** (23.959 kb)
 
 * Changed Camera system. (Thx [Paul Brunt](http://github.com/supereggbert))
 * Object3D.overdraw = true to enable CanvasRenderer screen space point expansion hack.

@@ -19,8 +19,6 @@ THREE.Camera = function ( fov, aspect, near, far ) {
 
 	};
 
-	this.updateMatrix();
-
 	this.toString = function () {
 
 		return 'THREE.Camera ( ' + this.position + ', ' + this.target.position + ' )';

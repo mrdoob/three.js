@@ -29,12 +29,10 @@ THREE.Matrix4 = function () {
 		z.sub( eye, center );
 		z.normalize();
 
-		x.copy( up );
-		x.crossSelf( z );
+		x.cross( up, z );
 		x.normalize();
 
-		y.copy( z );
-		y.crossSelf( x );
+		y.cross( z, x );
 		y.normalize();
 		y.negate();
 
