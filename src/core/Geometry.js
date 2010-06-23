@@ -1,6 +1,6 @@
 /**
- * @author kile / http://kile.stravaganza.org/
  * @author mr.doob / http://mrdoob.com/
+ * @author kile / http://kile.stravaganza.org/
  */
 
 THREE.Geometry = function () {

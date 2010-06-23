@@ -1,6 +1,6 @@
 /**
- * @author supereggbert / http://www.paulbrunt.co.uk/
  * @author mr.doob / http://mrdoob.com/
+ * @author supereggbert / http://www.paulbrunt.co.uk/
  */
 
 THREE.Matrix3 = function () {

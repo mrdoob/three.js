@@ -35,7 +35,7 @@ The library needs to be included first thing.
 
 	<script type="text/javascript" src="js/three.js"></script>
 
-This code creates a camera, then creates a scene object, adds a bunch of random particles to the scene, creates a &lt;canvas&gt; renderer and adds its viewport in the document.body element.
+This code creates a camera, then creates a scene object, adds a bunch of random particles in it, creates a &lt;canvas&gt; renderer and adds its viewport in the document.body element.
 
 	<script type="text/javascript">
 
@@ -46,13 +46,10 @@ This code creates a camera, then creates a scene object, adds a bunch of random 
 
 		function init() {
 
-			camera = new THREE.Camera( 75, SCREEN_WIDTH / SCREEN_HEIGHT, 0.0001, 10000 );
+			camera = new THREE.Camera( 75, window.innerWidth / window.innerHeight, 0.0001, 10000 );
 			camera.position.z = 1000;
 
 			scene = new THREE.Scene();
-
-			renderer = new THREE.CanvasRenderer();
-			renderer.setSize( window.innerWidth, window.innerHeight );
 
 			for (var i = 0; i < 1000; i++) {
 
@@ -64,6 +61,9 @@ This code creates a camera, then creates a scene object, adds a bunch of random 
 				scene.add( particle );
 
 			}
+
+			renderer = new THREE.CanvasRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
 
 			document.body.appendChild( renderer.domElement );
 
