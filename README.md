@@ -110,6 +110,13 @@ For creating a customised version of the library, including the source files in 
 	<script type="text/javascript" src="js/three/renderers/renderables/RenderableLine.js"></script>
 
 
+### Contributors ###
+
+Thanks to the power of the internets (and github <3) these people have kindly helped out with the project.
+
+[Paul Brunt](http://github.com/supereggbert), [Fernando Serrano](http://kile.stravaganza.org/), [kikko](http://github.com/kikko).
+
+
 ### Change Log ###
 
 2010 06 22 - **r10** (23.959 kb)
