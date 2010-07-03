@@ -1,5 +1,5 @@
-__author__ = "Mr.doob"
-__url__ = ("http://mrdoob.com")
+__author__ = "Mr.doob, Kikko"
+__url__ = ['http://mrdoob.com', 'http://github.com/kikko']
 __version__ = "1"
 __bpydoc__ = """\
 This script exports the selected object for the three.js engine.

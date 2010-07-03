@@ -23,6 +23,8 @@ Other similar projects: [pre3d](http://deanm.github.com/pre3d/), [pvjs](http://c
 [![particles_wave](http://github.com/mrdoob/three.js/raw/master/assets/examples/01_waves.png)](http://mrdoob.com/projects/three.js/examples/particles_waves.html)
 [![particles_floor](http://github.com/mrdoob/three.js/raw/master/assets/examples/00_floor.png)](http://mrdoob.com/projects/three.js/examples/particles_floor.html)
 
+[![Rat](http://github.com/mrdoob/three.js/raw/master/assets/projects/06_rat.png)](http://tech.lab212.org/2010/07/export-textured-models-from-blender2-5-to-three-js/)
+[![Failure](http://github.com/mrdoob/three.js/raw/master/assets/projects/05_failure.png)](http://www.is-real.net/experiments/three/failure/)
 [![Space Cannon 3D](http://github.com/mrdoob/three.js/raw/master/assets/projects/02_spacecannon.png)](http://labs.brian-stoner.com/spacecannon/)
 [![Alocasia](http://github.com/mrdoob/three.js/raw/master/assets/projects/04_alocasia.png)](http://arithmetric.com/projects/alocasia/)
 [![DDD](http://github.com/mrdoob/three.js/raw/master/assets/projects/01_ddd.png)](http://the389.com/works/three/)
@@ -58,7 +60,7 @@ This code creates a camera, then creates a scene object, adds a bunch of random 
 				particle.position.x = Math.random() * 2000 - 1000;
 				particle.position.y = Math.random() * 2000 - 1000;
 				particle.position.z = Math.random() * 2000 - 1000;
-				scene.add( particle );
+				scene.addObject( particle );
 
 			}
 
@@ -118,6 +120,14 @@ Thanks to the power of the internets (and github <3) these people have kindly he
 
 
 ### Change Log ###
+
+2010 07 03 - **r11** (23.541 kb)
+
+* Blender 2.5 exporter (utils/export_threejs.py) now exports UV and normals (Thx [kikko](http://github.com/kikko))
+* Scene.add > Scene.addObject
+* Enabled Scene.removeObject
+* Removed computeNormals() from Geometry
+
 
 2010 06 22 - **r10** (23.959 kb)
 

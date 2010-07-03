@@ -5,27 +5,33 @@
 THREE.Scene = function () {
 
 	this.objects = [];
+	// this.lights = [];
 
-	this.add = function (object) {
+	this.addObject = function ( object ) {
 
 		this.objects.push(object);
 
 	};
 
-	/*
-	this.remove = function (object) {
+	this.removeObject = function ( object ) {
 
-		var nrObjects = this.objects.length;
+		for ( var i = 0, l = this.objects.length; i < l; i++ ) {
 
-		for(var i = 0; i < nrObjects; i++) {
+			if ( object == this.objects[ i ] ) {
 
-			if(object == this.objects[i]) {
+				this.objects.splice( i, 1 );
+				return;
 
-				alert("yay");
 			}
 		}
 	}
-	*/
+
+	// Deprecated
+	this.add = function ( object ) {
+
+		this.addObject( object );
+
+	};
 
 	this.toString = function () {
 
