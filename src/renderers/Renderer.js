@@ -11,7 +11,7 @@ THREE.Renderer = function() {
 	particlePool = [],
 
 	vector4 = new THREE.Vector4(),
-	matrix = new THREE.Matrix4();
+	viewMatrix = new THREE.Matrix4();
 
 	function painterSort( a, b ) {
 
@@ -23,9 +23,8 @@ THREE.Renderer = function() {
 
 	this.project = function (scene, camera) {
 
-		var i, j, vertex, vertex2, face, object, v1, v2, v3, v4,
-		face3count = 0, face4count = 0, lineCount = 0, particleCount = 0,
-		verticesLength = 0, facesLength = 0;
+		var o, ol, v, vl, f, fl, vertex, vertex2, face, object, v1, v2, v3, v4,
+		face3count = 0, face4count = 0, lineCount = 0, particleCount = 0;
 
 		this.renderList = [];
 
@@ -35,9 +34,9 @@ THREE.Renderer = function() {
 
 		}
 
-		for ( i = 0; i < scene.objects.length; i++ ) {
+		for ( o = 0, ol = scene.objects.length; o < ol; o++ ) {
 
-			object = scene.objects[i];
+			object = scene.objects[ o ];
 
 			if( object.autoUpdateMatrix ) {
 
@@ -47,18 +46,16 @@ THREE.Renderer = function() {
 
 			if ( object instanceof THREE.Mesh ) {
 
-				matrix.multiply( camera.matrix, object.matrix );
+				viewMatrix.multiply( camera.matrix, object.matrix );
 
 				// vertices
 
-				verticesLength = object.geometry.vertices.length;
+				for ( v = 0, vl = object.geometry.vertices.length; v < vl; v++ ) {
 
-				for ( j = 0; j < verticesLength; j++ ) {
-
-					vertex = object.geometry.vertices[ j ];
+					vertex = object.geometry.vertices[ v ];
 					vertex.screen.copy( vertex.position );
 
-					matrix.transform( vertex.screen );
+					viewMatrix.transform( vertex.screen );
 					camera.projectionMatrix.transform( vertex.screen );
 
 					vertex.__visible = vertex.screen.z > 0 && vertex.screen.z < 1;
@@ -67,15 +64,13 @@ THREE.Renderer = function() {
 
 				// faces
 
-				facesLength = object.geometry.faces.length;
+				for ( f = 0, fl = object.geometry.faces.length; f < fl; f++ ) {
 
-				for ( j = 0; j < facesLength; j++ ) {
-
-					face = object.geometry.faces[ j ];
+					face = object.geometry.faces[ f ];
 
 					// TODO: Use normals for culling... maybe not?
 
-					if (face instanceof THREE.Face3) {
+					if ( face instanceof THREE.Face3 ) {
 
 						v1 = object.geometry.vertices[ face.a ];
 						v2 = object.geometry.vertices[ face.b ];
@@ -83,7 +78,7 @@ THREE.Renderer = function() {
 
 						if ( v1.__visible && v2.__visible && v3.__visible && ( object.doubleSided ||
 						   ( v3.screen.x - v1.screen.x ) * ( v2.screen.y - v1.screen.y ) -
-						   ( v3.screen.y - v1.screen.y ) * ( v2.screen.x - v1.screen.x ) > 0 ) ) {
+						   ( v3.screen.y - v1.screen.y ) * ( v2.screen.x - v1.screen.x ) < 0 ) ) {
 
 							face.screen.z = Math.max( v1.screen.z, Math.max( v2.screen.z, v3.screen.z ) );
 
@@ -103,7 +98,7 @@ THREE.Renderer = function() {
 
 							face3Pool[ face3count ].material = object.material;
 							face3Pool[ face3count ].overdraw = object.overdraw;
-							face3Pool[ face3count ].uvs = object.geometry.uvs[j];
+							face3Pool[ face3count ].uvs = object.geometry.uvs[ f ];
 							face3Pool[ face3count ].color = face.color;
 
 							this.renderList.push(face3Pool[face3count]);
@@ -120,9 +115,9 @@ THREE.Renderer = function() {
 
 						if ( v1.__visible && v2.__visible && v3.__visible && v4.__visible && (object.doubleSided ||
 						   ( ( v4.screen.x - v1.screen.x ) * ( v2.screen.y - v1.screen.y ) -
-						   ( v4.screen.y - v1.screen.y ) * ( v2.screen.x - v1.screen.x ) > 0 ||
+						   ( v4.screen.y - v1.screen.y ) * ( v2.screen.x - v1.screen.x ) < 0 ||
 						   ( v2.screen.x - v3.screen.x ) * ( v4.screen.y - v3.screen.y ) -
-						   ( v2.screen.y - v3.screen.y ) * ( v4.screen.x - v3.screen.x ) > 0 ) ) ) {
+						   ( v2.screen.y - v3.screen.y ) * ( v4.screen.x - v3.screen.x ) < 0 ) ) ) {
 
 							face.screen.z = Math.max( v1.screen.z, Math.max( v2.screen.z, Math.max( v3.screen.z, v4.screen.z ) ) );
 
@@ -144,7 +139,7 @@ THREE.Renderer = function() {
 
 							face4Pool[ face4count ].material = object.material;
 							face4Pool[ face4count ].overdraw = object.overdraw;
-							face4Pool[ face4count ].uvs = object.geometry.uvs[j];
+							face4Pool[ face4count ].uvs = object.geometry.uvs[ f ];
 							face4Pool[ face4count ].color = face.color;
 
 							this.renderList.push( face4Pool[ face4count ] );
@@ -156,23 +151,21 @@ THREE.Renderer = function() {
 
 			} else if ( object instanceof THREE.Line ) {
 
-				matrix.multiply( camera.matrix, object.matrix );
+				viewMatrix.multiply( camera.matrix, object.matrix );
 
-				verticesLength = object.geometry.vertices.length;
+				for ( v = 0, vl = object.geometry.vertices.length; v < vl; v++ ) {
 
-				for ( j = 0; j < verticesLength; j++ ) {
-
-					vertex = object.geometry.vertices[ j ];
+					vertex = object.geometry.vertices[ v ];
 					vertex.screen.copy( vertex.position );
 
-					matrix.transform( vertex.screen );
+					viewMatrix.transform( vertex.screen );
 					camera.projectionMatrix.transform( vertex.screen );
 
 					vertex.__visible = vertex.screen.z > 0 && vertex.screen.z < 1;
 
-					if ( j > 0 ) {
+					if ( v > 0 ) {
 
-						vertex2 = object.geometry.vertices[ j - 1 ];
+						vertex2 = object.geometry.vertices[ v - 1 ];
 
 						if ( vertex.__visible && vertex2.__visible ) {
 

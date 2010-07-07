@@ -4,13 +4,14 @@
 
 THREE.Color = function ( hex ) {
 
-	var _r, _g, _b, _a, _hex;
+	this.r; this.g; this.b; this.a;
+	this.hex;
 
-	this.__styleString = "rgba(0, 0, 0, 1)";
+	this.__styleString = 'rgba(0, 0, 0, 1)';
 
 	this.setHex = function ( hex ) {
 
-		_hex = hex;
+		this.hex = hex;
 		this.updateRGBA();
 		this.updateStyleString();
 
@@ -18,10 +19,10 @@ THREE.Color = function ( hex ) {
 
 	this.setRGBA = function ( r, g, b, a ) {
 
-		_r = r;
-		_g = g;
-		_b = b;
-		_a = a;
+		this.r = r;
+		this.g = g;
+		this.b = b;
+		this.a = a;
 
 		this.updateHex();
 		this.updateStyleString();
@@ -30,28 +31,28 @@ THREE.Color = function ( hex ) {
 
 	this.updateHex = function () {
 
-		_hex = Math.floor( _a * 255 ) << 24 | _r << 16 | _g << 8 | _b;
+		this.hex = Math.floor( this.a * 255 ) << 24 | Math.floor( this.r * 255 ) << 16 | Math.floor( this.g * 255 ) << 8 | Math.floor( this.b * 255 );
 
 	};
 
 	this.updateRGBA = function () {
 
-		_r = _hex >> 16 & 0xff;
-		_g = _hex >> 8 & 0xff;
-		_b = _hex & 0xff;
-		_a = (_hex >> 24 & 0xff) / 255;
+		this.a = ( this.hex >> 24 & 0xff ) / 0xff;
+		this.r = ( this.hex >> 16 & 0xff ) / 0xff;
+		this.g = ( this.hex >> 8 & 0xff ) / 0xff;
+		this.b = ( this.hex & 0xff ) / 0xff;
 
 	};
 
 	this.updateStyleString = function () {
 
-		this.__styleString = 'rgba(' + _r + ',' + _g + ',' + _b + ',' + _a + ')';
+		this.__styleString = 'rgba(' + Math.floor( this.r * 255 ) + ',' + Math.floor( this.g * 255 ) + ',' + Math.floor( this.b * 255 ) + ',' + this.a + ')';
 
 	};
 
 	this.toString = function () {
 
-		return 'THREE.Color ( r: ' + _r + ', g: ' + _g + ', b: ' + _b + ', a: ' + _a + ', hex: ' + _hex + ' )';
+		return 'THREE.Color ( r: ' + this.r + ', g: ' + this.g + ', b: ' + this.b + ', a: ' + this.a + ', hex: ' + this.hex + ' )';
 
 	};
 

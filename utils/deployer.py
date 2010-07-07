@@ -3,7 +3,7 @@ import os
 
 # MERGER
 
-rev = 11;
+rev = 12;
 
 files = [];
 files.append('Three.js');
@@ -31,6 +31,7 @@ files.append('scenes/Scene.js');
 files.append('renderers/Renderer.js');
 files.append('renderers/CanvasRenderer.js');
 files.append('renderers/SVGRenderer.js');
+files.append('renderers/WebGLRenderer.js');
 files.append('renderers/renderables/RenderableFace3.js');
 files.append('renderers/renderables/RenderableFace4.js');
 files.append('renderers/renderables/RenderableParticle.js');
@@ -42,15 +43,15 @@ for item in files:
 	src_file = open('../src/' + item,'r');
 	string += src_file.read() + "\n";
 
-dep_file = open('temp.js','w');
-dep_file.write(string);
-dep_file.close();
+tmp_file = open('temp.js','w');
+tmp_file.write(string);
+tmp_file.close();
 
 
 # YUICOMPRESSOR
 
 os.system("java -jar yuicompressor-2.4.2.jar temp.js -o ../build/three.js --charset utf-8 -v");
-
+os.unlink("temp.js");
 
 # HEADER
 

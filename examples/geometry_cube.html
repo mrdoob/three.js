@@ -61,7 +61,7 @@
 				info.innerHTML = 'Drag to spin the cube';
 				container.appendChild(info);
 
-				camera = new THREE.Camera( 70, SCREEN_WIDTH / SCREEN_HEIGHT, 0.0001, 10000 );
+				camera = new THREE.Camera( 70, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
 				camera.position.y = 150;
 				camera.position.z = 500;
 				camera.target.position.y = 150;
@@ -74,7 +74,7 @@
 
 				for (var i = 0; i < geometry.faces.length; i++) {
 
-					geometry.faces[i].color.setRGBA( Math.floor( Math.random() * 128), Math.floor( Math.random() * 128 + 128), Math.floor( Math.random() * 128 + 128), 255 );
+					geometry.faces[i].color.setRGBA( Math.random() * 0.5, Math.random() * 0.5 + 0.5, Math.random() * 0.5 + 0.5, 1 );
 				}
 
 				cube = new THREE.Mesh(geometry, new THREE.FaceColorFillMaterial());

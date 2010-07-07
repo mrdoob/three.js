@@ -5,9 +5,9 @@ three.js
 
 [![Flattr this](http://api.flattr.com/button/button-compact-static-100x17.png)](http://flattr.com/thing/287/three-js)
 
-The aim of this project is to create a 3D engine with a very low level of abstraction (aka for dummies). Currently there is no documentation available but feel free to use the examples as a reference and/or read the source code. However, be aware that the syntax may change from revision to revision breaking compatibility.
+The aim of this project is to create a 3D engine with a very low level of abstraction (aka for dummies). Currently there is no documentation available but feel free to use the examples as a reference and/or read the source code. However, be aware that the API may change from revision to revision breaking compatibility.
 
-The engine can render using &lt;canvas&gt; and &lt;svg&gt; by now and WebGL renderer will be available soon.
+The engine can render using &lt;canvas&gt; and &lt;svg&gt; and WebGL.
 
 [More info...](http://mrdoob.com/blog/post/693)
 
@@ -48,7 +48,7 @@ This code creates a camera, then creates a scene object, adds a bunch of random 
 
 		function init() {
 
-			camera = new THREE.Camera( 75, window.innerWidth / window.innerHeight, 0.0001, 10000 );
+			camera = new THREE.Camera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
 			camera.position.z = 1000;
 
 			scene = new THREE.Scene();
@@ -120,6 +120,13 @@ Thanks to the power of the internets (and github <3) these people have kindly he
 
 
 ### Change Log ###
+
+2010 07 07 - **r12** (28.494 kb)
+
+* First version of the WebGLRenderer (ColorFillMaterial and FaceColorFillMaterial by now)
+* Matrix4.lookAt fix (CanvasRenderer and SVGRenderer now handle the -Y)
+* Color class now using 0-1 floats instead of 0-255 integers
+
 
 2010 07 03 - **r11** (23.541 kb)
 

@@ -30,38 +30,7 @@
 		<div id="container"></div> 
 		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - vr demo. skybox by <a href="http://www.zfight.com/" target="_blank">Jochum Skoglund</a></div>
 
-		<!-- <script type="text/javascript" src="../build/three.js"></script> -->
-
-		<script type="text/javascript" src="../src/Three.js"></script>
-		<script type="text/javascript" src="../src/core/Color.js"></script>
-		<script type="text/javascript" src="../src/core/Vector2.js"></script>
-		<script type="text/javascript" src="../src/core/Vector3.js"></script>
-		<script type="text/javascript" src="../src/core/Vector4.js"></script>
-		<script type="text/javascript" src="../src/core/Rectangle.js"></script>
-		<script type="text/javascript" src="../src/core/Matrix4.js"></script>
-		<script type="text/javascript" src="../src/core/Vertex.js"></script>
-		<script type="text/javascript" src="../src/core/Face3.js"></script>
-		<script type="text/javascript" src="../src/core/Face4.js"></script>
-		<script type="text/javascript" src="../src/core/Geometry.js"></script>
-		<script type="text/javascript" src="../src/cameras/Camera.js"></script>
-		<script type="text/javascript" src="../src/objects/Object3D.js"></script>
-		<script type="text/javascript" src="../src/objects/Mesh.js"></script>
-		<script type="text/javascript" src="../src/objects/Particle.js"></script>
-		<script type="text/javascript" src="../src/objects/Line.js"></script>
-		<script type="text/javascript" src="../src/materials/BitmapUVMappingMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/ColorFillMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/ColorStrokeMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/FaceColorFillMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/FaceColorStrokeMaterial.js"></script>
-		<script type="text/javascript" src="../src/scenes/Scene.js"></script>
-		<script type="text/javascript" src="../src/renderers/Renderer.js"></script>
-		<script type="text/javascript" src="../src/renderers/CanvasRenderer.js"></script>
-		<script type="text/javascript" src="../src/renderers/SVGRenderer.js"></script>
-		<script type="text/javascript" src="../src/renderers/renderables/RenderableFace3.js"></script>
-		<script type="text/javascript" src="../src/renderers/renderables/RenderableFace4.js"></script>
-		<script type="text/javascript" src="../src/renderers/renderables/RenderableParticle.js"></script>
-		<script type="text/javascript" src="../src/renderers/renderables/RenderableLine.js"></script>
-
+		<script type="text/javascript" src="../build/three.js"></script>
 		<script type="text/javascript" src="primitives/Plane.js"></script>
 
 		<script type="text/javascript">
@@ -85,7 +54,7 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.Camera( 75, SCREEN_WIDTH / SCREEN_HEIGHT, 0.0001, 10000 );
+				camera = new THREE.Camera( 75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
 
 				scene = new THREE.Scene();
 
@@ -173,7 +142,7 @@
 
 				isUserInteracting = true;
 
-				wireframe.color.setRGBA(255, 255, 255, 0.2);
+				wireframe.color.setRGBA( 1, 1, 1, 0.2 );
 
 				onPointerDownPointerX = event.clientX;
 				onPointerDownPointerY = event.clientY;

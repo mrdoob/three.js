@@ -6,15 +6,15 @@ THREE.CanvasRenderer = function () {
 
 	THREE.Renderer.call( this );
 
-	var _viewport = document.createElement( "canvas" ),
-	_context = _viewport.getContext( "2d" ),
+	var _canvas = document.createElement( 'canvas' ),
+	_context = _canvas.getContext( '2d' ),
 	_width, _height, _widthHalf, _heightHalf,
 	_clipRect = new THREE.Rectangle(),
 	_clearRect = new THREE.Rectangle( 0, 0, 0, 0 ),
 	_bboxRect = new THREE.Rectangle(),
 	_vector2 = new THREE.Vector2();
 
-	this.domElement = _viewport;
+	this.domElement = _canvas;
 	this.autoClear = true;
 
 	this.setSize = function ( width, height ) {
@@ -22,10 +22,10 @@ THREE.CanvasRenderer = function () {
 		_width = width; _height = height;
 		_widthHalf = _width / 2; _heightHalf = _height / 2;
 
-		_viewport.width = _width;
-		_viewport.height = _height;
+		_canvas.width = _width;
+		_canvas.height = _height;
 
-		_context.setTransform( 1, 0, 0, 1, _widthHalf, _heightHalf );
+		_context.setTransform( 1, 0, 0, -1, _widthHalf, _heightHalf );
 
 		_clipRect.set( - _widthHalf, - _heightHalf, _widthHalf, _heightHalf );
 
@@ -42,8 +42,7 @@ THREE.CanvasRenderer = function () {
 
 	this.render = function ( scene, camera ) {
 
-		var i, j, element, pi2 = Math.PI * 2,
-		elementsLength, material, materialLength,
+		var e, el, m, ml, element, material, pi2 = Math.PI * 2,
 		v1x, v1y, v2x, v2y, v3x, v3y, v4x, v4y,
 
 		uv1 = new THREE.Vector2(), uv2 = new THREE.Vector2(), uv3 = new THREE.Vector2(),
@@ -64,13 +63,9 @@ THREE.CanvasRenderer = function () {
 
 		this.project( scene, camera );
 
-		elementsLength = this.renderList.length;
+		for ( e = 0, el = this.renderList.length; e < el; e++ ) {
 
-		for ( i = 0; i < elementsLength; i++ ) {
-
-			element = this.renderList[ i ];
-
-			materialLength = element.material.length;
+			element = this.renderList[ e ];
 
 			_bboxRect.empty();
 
@@ -183,9 +178,9 @@ THREE.CanvasRenderer = function () {
 
 			_context.closePath();
 
-			for ( j = 0; j < materialLength; j++ ) {
+			for ( m = 0, ml = element.material.length; m < ml; m++ ) {
 
-				material = element.material[ j ];
+				material = element.material[ m ];
 
 				if ( material instanceof THREE.ColorFillMaterial ) {
 

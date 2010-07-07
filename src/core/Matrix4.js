@@ -34,7 +34,6 @@ THREE.Matrix4 = function () {
 
 		y.cross( z, x );
 		y.normalize();
-		y.negate();
 
 		this.n11 = x.x; this.n12 = x.y; this.n13 = x.z; this.n14 = - x.dot( eye );
 		this.n21 = y.x; this.n22 = y.y; this.n23 = y.z; this.n24 = - y.dot( eye );
@@ -225,10 +224,10 @@ THREE.Matrix4.makeFrustum = function( left, right, bottom, top, near, far ) {
 	c = - ( far + near ) / ( far - near );
 	d = - 2 * far * near / ( far - near );
 
-	m.n11 = x; m.n13 = a;
-	m.n22 = y; m.n23 = b;
-	m.n33 = c; m.n34 = d;
-	m.n43 = - 1; m.n44 = 0;
+	m.n11 = x; m.n12 = 0; m.n13 = a; m.n14 = 0;
+	m.n21 = 0; m.n22 = y; m.n23 = b; m.n24 = 0;
+	m.n31 = 0; m.n32 = 0; m.n33 = c; m.n34 = d;
+	m.n41 = 0; m.n42 = 0; m.n43 = - 1; m.n44 = 0;
 
 	return m;
 

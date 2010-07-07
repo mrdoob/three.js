@@ -6,14 +6,14 @@ THREE.SVGRenderer = function () {
 
 	THREE.Renderer.call( this );
 
-	var _viewport = document.createElementNS('http://www.w3.org/2000/svg', 'svg'),
+	var _svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'),
 	_width, _height, _widthHalf, _heightHalf,
 	_clipRect = new THREE.Rectangle(),
 	_bboxRect = new THREE.Rectangle(),
 	_svgPathPool = [], _svgCirclePool = [],
 	_quality = 1;
 
-	this.domElement = _viewport;
+	this.domElement = _svg;
 	this.autoClear = true;
 
 	this.setQuality = function( quality ) {
@@ -32,9 +32,9 @@ THREE.SVGRenderer = function () {
 		_width = width; _height = height;
 		_widthHalf = _width / 2; _heightHalf = _height / 2;
 
-		_viewport.setAttribute( 'viewBox', ( - _widthHalf ) + ' ' + ( - _heightHalf ) + ' ' + _width + ' ' + _height );
-		_viewport.setAttribute( 'width', _width );
-		_viewport.setAttribute( 'height', _height );
+		_svg.setAttribute( 'viewBox', ( - _widthHalf ) + ' ' + ( - _heightHalf ) + ' ' + _width + ' ' + _height );
+		_svg.setAttribute( 'width', _width );
+		_svg.setAttribute( 'height', _height );
 
 		_clipRect.set( - _widthHalf, - _heightHalf, _widthHalf, _heightHalf );
 
@@ -42,9 +42,9 @@ THREE.SVGRenderer = function () {
 
 	this.clear = function () {
 
-		while ( _viewport.childNodes.length > 0 ) {
+		while ( _svg.childNodes.length > 0 ) {
 
-			_viewport.removeChild( _viewport.childNodes[ 0 ] );
+			_svg.removeChild( _svg.childNodes[ 0 ] );
 
 		}
 
@@ -52,7 +52,7 @@ THREE.SVGRenderer = function () {
 
 	this.render = function ( scene, camera ) {
 
-		var i, j, element, elementsLength, material, materialLength,
+		var e, el, m, ml, element, material,
 		pathCount = 0, circleCount = 0, svgNode,
 		v1x, v1y, v2x, v2y, v3x, v3y, v4x, v4y,
 		size;
@@ -65,22 +65,19 @@ THREE.SVGRenderer = function () {
 
 		this.project( scene, camera );
 
-		elementsLength = this.renderList.length;
+		for ( e = 0, el = this.renderList.length; e < el; e++ ) {
 
-		for ( i = 0; i < elementsLength; i++ ) {
+			element = this.renderList[ e ];
 
-			element = this.renderList[ i ];
-			materialLength = element.material.length;
+			for ( m = 0, ml = element.material.length; m < ml; m++ ) {
 
-			for ( j = 0; j < materialLength; j++ ) {
-
-				material = element.material[ j ];
+				material = element.material[ m ];
 
 				_bboxRect.empty();
 
 				if ( element instanceof THREE.RenderableParticle ) {
 
-					v1x = element.x * _widthHalf; v1y = element.y * _heightHalf;
+					v1x = element.x * _widthHalf; v1y = element.y * -_heightHalf;
 					size = element.size  * _widthHalf;
 
 					_bboxRect.set( v1x - size, v1y - size, v1x + size, v1y + size );
@@ -98,9 +95,9 @@ THREE.SVGRenderer = function () {
 
 				} else if ( element instanceof THREE.RenderableFace3 ) {
 
-					v1x = element.v1.x * _widthHalf; v1y = element.v1.y * _heightHalf;
-					v2x = element.v2.x * _widthHalf; v2y = element.v2.y * _heightHalf;
-					v3x = element.v3.x * _widthHalf; v3y = element.v3.y * _heightHalf;
+					v1x = element.v1.x * _widthHalf; v1y = element.v1.y * -_heightHalf;
+					v2x = element.v2.x * _widthHalf; v2y = element.v2.y * -_heightHalf;
+					v3x = element.v3.x * _widthHalf; v3y = element.v3.y * -_heightHalf;
 
 					_bboxRect.addPoint( v1x, v1y );
 					_bboxRect.addPoint( v2x, v2y );
@@ -117,10 +114,10 @@ THREE.SVGRenderer = function () {
 
 				} else if ( element instanceof THREE.RenderableFace4 ) {
 
-					v1x = element.v1.x * _widthHalf; v1y = element.v1.y * _heightHalf;
-					v2x = element.v2.x * _widthHalf; v2y = element.v2.y * _heightHalf;
-					v3x = element.v3.x * _widthHalf; v3y = element.v3.y * _heightHalf;
-					v4x = element.v4.x * _widthHalf; v4y = element.v4.y * _heightHalf;
+					v1x = element.v1.x * _widthHalf; v1y = element.v1.y * -_heightHalf;
+					v2x = element.v2.x * _widthHalf; v2y = element.v2.y * -_heightHalf;
+					v3x = element.v3.x * _widthHalf; v3y = element.v3.y * -_heightHalf;
+					v4x = element.v4.x * _widthHalf; v4y = element.v4.y * -_heightHalf;
 
 					_bboxRect.addPoint( v1x, v1y );
 					_bboxRect.addPoint( v2x, v2y );
@@ -158,7 +155,7 @@ THREE.SVGRenderer = function () {
 
 				}
 
-				_viewport.appendChild( svgNode );
+				_svg.appendChild( svgNode );
 
 			}
 

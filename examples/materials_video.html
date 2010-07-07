@@ -66,7 +66,7 @@
 				info.innerHTML = '<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - video demo. playing <a href="http://durian.blender.org/" target="_blank">sintel</a> trailer';
 				container.appendChild(info);
 
-				camera = new THREE.Camera( 45, SCREEN_WIDTH / SCREEN_HEIGHT, 0.0001, 10000 );
+				camera = new THREE.Camera( 45, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
 				camera.position.z = 1000;
 
 				scene = new THREE.Scene();
