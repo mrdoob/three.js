@@ -143,7 +143,7 @@ THREE.CanvasRenderer = function () {
 
 				v1x = element.v1.x; v1y = element.v1.y;
 				v2x = element.v2.x; v2y = element.v2.y;
-				v3x = element.v3.x; heightv3y = element.v3.y;
+				v3x = element.v3.x; v3y = element.v3.y;
 				v4x = element.v4.x; v4y = element.v4.y;
 
 				_bboxRect.addPoint( v1x, v1y );
