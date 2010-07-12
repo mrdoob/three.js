@@ -186,6 +186,7 @@ THREE.CanvasRenderer = function () {
 
 					_context.save();
 					_context.translate( v1x, v1y );
+					_context.rotate( - element.rotation );
 					_context.scale( width, height );
 					_context.arc( 0, 0, 1, 0, pi2, true );
 					_context.restore();
@@ -212,6 +213,7 @@ THREE.CanvasRenderer = function () {
 
 					_context.save();
 					_context.translate( v1x - width, v1y + height );
+					_context.rotate( - element.rotation );
 					_context.scale( element.scale.x * _widthHalf, - ( element.scale.y * _heightHalf ) );
 					_context.drawImage( bitmap, 0, 0 );
 					_context.restore();

@@ -129,6 +129,7 @@ Thanks to the power of the internets (and github <3) these people have kindly he
 * Added `ParticleCircleMaterial` and `ParticleBitmapMaterial`
 * `Particle` now use `ParticleCircleMaterial` instead of `ColorFillMaterial`
 * `Particle.size` > `Particle.scale.x` and `Particle.scale.y`
+* `Particle.rotation.z` for rotating the particle
 * `SVGRenderer` currently out of sync
 
 

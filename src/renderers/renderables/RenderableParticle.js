@@ -8,6 +8,7 @@ THREE.RenderableParticle = function () {
 	this.y = null;
 	this.z = null;
 
+	this.rotation = null;
 	this.scale = new THREE.Vector2();
 
 	this.color = null;
