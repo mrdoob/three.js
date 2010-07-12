@@ -3,7 +3,7 @@ import os
 
 # MERGER
 
-rev = 12;
+rev = 13;
 
 files = [];
 files.append('Three.js');
@@ -27,6 +27,8 @@ files.append('materials/ColorFillMaterial.js');
 files.append('materials/ColorStrokeMaterial.js');
 files.append('materials/FaceColorFillMaterial.js');
 files.append('materials/FaceColorStrokeMaterial.js');
+files.append('materials/ParticleBitmapMaterial.js');
+files.append('materials/ParticleCircleMaterial.js');
 files.append('scenes/Scene.js');
 files.append('renderers/Renderer.js');
 files.append('renderers/CanvasRenderer.js');

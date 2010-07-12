@@ -211,7 +211,8 @@ THREE.Renderer = function() {
 					particlePool[ particleCount ].y = object.screen.y;
 					particlePool[ particleCount ].z = object.screen.z;
 
-					particlePool[ particleCount ].size = object.size * Math.abs( vector4.x / vector4.w - ( vector4.x + camera.projectionMatrix.n11 ) / ( vector4.w + camera.projectionMatrix.n14 ) );
+					particlePool[ particleCount ].scale.x = object.scale.x * Math.abs( vector4.x / vector4.w - ( vector4.x + camera.projectionMatrix.n11 ) / ( vector4.w + camera.projectionMatrix.n14 ) );
+					particlePool[ particleCount ].scale.y = object.scale.y * Math.abs( vector4.y / vector4.w - ( vector4.y + camera.projectionMatrix.n22 ) / ( vector4.w + camera.projectionMatrix.n24 ) );
 					particlePool[ particleCount ].material = object.material;
 					particlePool[ particleCount ].color = object.color;
 

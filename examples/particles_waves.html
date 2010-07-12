@@ -64,14 +64,13 @@
 				particles = new Array();
 
 				var i = 0;
-				var material = new THREE.ColorFillMaterial(0xffffff, 1);
+				var material = new THREE.ParticleCircleMaterial(0xffffff, 1);
 
 				for (var ix = 0; ix < AMOUNTX; ix++) {
 
 					for(var iy = 0; iy < AMOUNTY; iy++) {
 
 						particle = particles[i++] = new THREE.Particle( material );
-						particle.size = 1;
 						particle.position.x = ix * SEPARATION - ((AMOUNTX * SEPARATION) / 2);
 						particle.position.z = iy * SEPARATION - ((AMOUNTY * SEPARATION) / 2);
 						scene.add( particle );
@@ -139,8 +138,8 @@
 					for(var iy = 0; iy < AMOUNTY; iy++) {
 
 						particle = particles[i++];
-						particle.size = (Math.sin((ix + count) * .3) + 1) * 2 + (Math.sin((iy + count) * .5) + 1) * 2;
 						particle.position.y = (Math.sin((ix + count) * .3) * 50) + (Math.sin((iy + count) * .5) * 50);
+						particle.scale.x = particle.scale.y = (Math.sin((ix + count) * .3) + 1) * 2 + (Math.sin((iy + count) * .5) + 1) * 2;
 
 					}
 				}

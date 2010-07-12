@@ -5,7 +5,7 @@ three.js
 
 [![Flattr this](http://api.flattr.com/button/button-compact-static-100x17.png)](http://flattr.com/thing/287/three-js)
 
-The aim of this project is to create a 3D engine with a very low level of abstraction (aka for dummies). Currently there is no documentation available but feel free to use the examples as a reference and/or read the source code. However, be aware that the API may change from revision to revision breaking compatibility.
+The aim of this project is to create a lightweight 3D engine with a very low level of abstraction (aka for dummies). Currently there is no documentation available but feel free to use the examples as a reference and/or read the source code. However, be aware that the API may change from revision to revision breaking compatibility.
 
 The engine can render using &lt;canvas&gt; and &lt;svg&gt; and WebGL.
 
@@ -33,7 +33,7 @@ Other similar projects: [pre3d](http://deanm.github.com/pre3d/), [pvjs](http://c
 
 ### Usage ###
 
-The library needs to be included first thing.
+Download the [compiled library](http://github.com/mrdoob/three.js/raw/master/build/three.js) and include it in your html.
 
 	<script type="text/javascript" src="js/three.js"></script>
 
@@ -102,10 +102,13 @@ For creating a customised version of the library, including the source files in 
 	<script type="text/javascript" src="js/three/materials/ColorStrokeMaterial.js"></script>
 	<script type="text/javascript" src="js/three/materials/FaceColorFillMaterial.js"></script>
 	<script type="text/javascript" src="js/three/materials/FaceColorStrokeMaterial.js"></script>
+	<script type="text/javascript" src="js/three/materials/ParticleBitmapMaterial.js"></script>
+	<script type="text/javascript" src="js/three/materials/ParticleCircleMaterial.js"></script>
 	<script type="text/javascript" src="js/three/scenes/Scene.js"></script>
 	<script type="text/javascript" src="js/three/renderers/Renderer.js"></script>
 	<script type="text/javascript" src="js/three/renderers/CanvasRenderer.js"></script>
 	<script type="text/javascript" src="js/three/renderers/SVGRenderer.js"></script>
+	<script type="text/javascript" src="js/three/renderers/WebGLRenderer.js"></script>
 	<script type="text/javascript" src="js/three/renderers/renderables/RenderableFace3.js"></script>
 	<script type="text/javascript" src="js/three/renderers/renderables/RenderableFace4.js"></script>
 	<script type="text/javascript" src="js/three/renderers/renderables/RenderableParticle.js"></script>
@@ -121,40 +124,48 @@ Thanks to the power of the internets (and github <3) these people have kindly he
 
 ### Change Log ###
 
+2010 07 12 - **r13** (29.410 kb)
+
+* Added `ParticleCircleMaterial` and `ParticleBitmapMaterial`
+* `Particle` now use `ParticleCircleMaterial` instead of `ColorFillMaterial`
+* `Particle.size` > `Particle.scale.x` and `Particle.scale.y`
+* `SVGRenderer` currently out of sync
+
+
 2010 07 07 - **r12** (28.494 kb)
 
-* First version of the WebGLRenderer (ColorFillMaterial and FaceColorFillMaterial by now)
-* Matrix4.lookAt fix (CanvasRenderer and SVGRenderer now handle the -Y)
-* Color class now using 0-1 floats instead of 0-255 integers
+* First version of the `WebGLRenderer` (`ColorFillMaterial` and `FaceColorFillMaterial` by now)
+* `Matrix4.lookAt` fix (`CanvasRenderer` and `SVGRenderer` now handle the -Y)
+* `Color` now using 0-1 floats instead of 0-255 integers
 
 
 2010 07 03 - **r11** (23.541 kb)
 
 * Blender 2.5 exporter (utils/export_threejs.py) now exports UV and normals (Thx [kikko](http://github.com/kikko))
-* Scene.add > Scene.addObject
-* Enabled Scene.removeObject
-* Removed computeNormals() from Geometry
+* `Scene.add` > `Scene.addObject`
+* Enabled `Scene.removeObject`
+* Removed `computeNormals()` from `Geometry`
 
 
 2010 06 22 - **r10** (23.959 kb)
 
 * Changed Camera system. (Thx [Paul Brunt](http://github.com/supereggbert))
-* Object3D.overdraw = true to enable CanvasRenderer screen space point expansion hack.
+* `Object3D.overdraw = true` to enable CanvasRenderer screen space point expansion hack.
 
 
 2010 06 20 - **r9** (23.753 kb)
 
 * JSLinted.
-* autoClear property for renderers.
+* `autoClear` property for renderers.
 * Removed SVG rgba() workaround for WebKit. (WebKit now supports it)
 * Fixed matrix bug. (transformed objects outside the x axis would get infinitely tall :S)
 
 
 2010 06 06 - **r8** (23.496 kb)
 
-* Moved UVs to Geometry.
-* CanvasRenderer expands screen space points (workaround for antialias gaps).
-* CanvasRenderer supports BitmapUVMappingMaterial.
+* Moved UVs to `Geometry`.
+* `CanvasRenderer` expands screen space points (workaround for antialias gaps).
+* `CanvasRenderer` supports `BitmapUVMappingMaterial`.
 
 
 2010 06 05 - **r7** (22.387 kb)
@@ -166,38 +177,38 @@ Thanks to the power of the internets (and github <3) these people have kindly he
 
 2010 05 17 - **r6** (21.003 kb)
 
-* 2d clipping on CanvasRenderer and SVGRenderer
-* clearRect optimisations on CanvasRenderer
+* 2d clipping on `CanvasRenderer` and `SVGRenderer`
+* `clearRect` optimisations on `CanvasRenderer`
 
 
 2010 05 16 - **r5** (19.026 kb)
 
 * Removed Class.js dependency
-* Added THREE namespace
-* Camera.x -> Camera.position.x
-* Camera.target.x -> Camera.target.position.x
-* ColorMaterial -> ColorFillMaterial
-* FaceColorMaterial -> FaceColorFillMaterial
+* Added `THREE` namespace
+* `Camera.x` -> `Camera.position.x`
+* `Camera.target.x` > `Camera.target.position.x`
+* `ColorMaterial` > `ColorFillMaterial`
+* `FaceColorMaterial` > `FaceColorFillMaterial`
 * Materials are now multipass (use array)
-* Added ColorStrokeMaterial and FaceColorStrokeMaterial
-* geometry.faces.a are now indexes instead of links 
+* Added `ColorStrokeMaterial` and `FaceColorStrokeMaterial`
+* `geometry.faces.a` are now indexes instead of references
 
 
 2010 04 26 - **r4** (16.274 kb)
 
-* SVGRenderer Particle rendering
-* CanvasRenderer uses context.setTransform to avoid extra calculations
+* `SVGRenderer` Particle rendering
+* `CanvasRenderer` uses `context.setTransform` to avoid extra calculations
 
 
 2010 04 24 - **r3** (16.392 kb)
 
 * Fixed incorrect rotation matrix transforms
-* Added Plane and Cube primitives
+* Added `Plane` and `Cube` primitives
 
 
 2010 04 24 - **r2** (15.724 kb)
 
-* Improved Color handling
+* Improved `Color` handling
 
 
 2010 04 24 - **r1** (15.25 kb)

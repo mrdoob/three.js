@@ -43,12 +43,12 @@ THREE.CanvasRenderer = function () {
 	this.render = function ( scene, camera ) {
 
 		var e, el, m, ml, element, material, pi2 = Math.PI * 2,
-		v1x, v1y, v2x, v2y, v3x, v3y, v4x, v4y,
+		v1x, v1y, v2x, v2y, v3x, v3y, v4x, v4y, width, height,
 
 		uv1 = new THREE.Vector2(), uv2 = new THREE.Vector2(), uv3 = new THREE.Vector2(),
 		suv1 = new THREE.Vector2(), suv2 = new THREE.Vector2(), suv3 = new THREE.Vector2(),
 		suv1x, suv1y, suv2x, suv2y, suv3x, suv3y, denom, m11, m12, m21, m22, dx, dy,
-		bitmap, bitmapWidth, bitmapHeight, size;
+		bitmap, bitmapWidth, bitmapHeight;
 
 		if ( this.autoClear ) {
 
@@ -74,17 +74,6 @@ THREE.CanvasRenderer = function () {
 			if ( element instanceof THREE.RenderableParticle ) {
 
 				v1x = element.x * _widthHalf; v1y = element.y * _heightHalf;
-				size = element.size * _widthHalf;
-
-				_bboxRect.set( v1x - size, v1y - size, v1x + size, v1y + size );
-
-				if ( !_clipRect.instersects( _bboxRect ) ) {
-
-					continue;
-
-				}
-
-				_context.arc( v1x, v1y, size, 0, pi2, true );
 
 			} else if ( element instanceof THREE.RenderableLine ) {
 
@@ -154,7 +143,7 @@ THREE.CanvasRenderer = function () {
 
 				v1x = element.v1.x; v1y = element.v1.y;
 				v2x = element.v2.x; v2y = element.v2.y;
-				v3x = element.v3.x; v3y = element.v3.y;
+				v3x = element.v3.x; heightv3y = element.v3.y;
 				v4x = element.v4.x; v4y = element.v4.y;
 
 				_bboxRect.addPoint( v1x, v1y );
@@ -182,7 +171,52 @@ THREE.CanvasRenderer = function () {
 
 				material = element.material[ m ];
 
-				if ( material instanceof THREE.ColorFillMaterial ) {
+				if ( material instanceof THREE.ParticleCircleMaterial ) {
+
+					width = element.scale.x * _widthHalf;
+					height = element.scale.y * _heightHalf;
+
+					_bboxRect.set( v1x - width, v1y - height, v1x + width, v1y + height );
+
+					if ( !_clipRect.instersects( _bboxRect ) ) {
+
+						continue;
+
+					}
+
+					_context.save();
+					_context.translate( v1x, v1y );
+					_context.scale( width, height );
+					_context.arc( 0, 0, 1, 0, pi2, true );
+					_context.restore();
+
+					_context.fillStyle = material.color.__styleString;
+					_context.fill();
+
+				} else if ( material instanceof THREE.ParticleBitmapMaterial ) {
+
+					bitmap = material.bitmap;
+					bitmapWidth = bitmap.width / 2;
+					bitmapHeight = bitmap.height / 2;
+
+					width = element.scale.x * _widthHalf * bitmapWidth;
+					height = element.scale.y * _heightHalf * bitmapHeight;
+
+					_bboxRect.set( v1x - width, v1y - height, v1x + width, v1y + height );
+
+					if ( !_clipRect.instersects( _bboxRect ) ) {
+
+						continue;
+
+					}
+
+					_context.save();
+					_context.translate( v1x - width, v1y + height );
+					_context.scale( element.scale.x * _widthHalf, - ( element.scale.y * _heightHalf ) );
+					_context.drawImage( bitmap, 0, 0 );
+					_context.restore();
+
+				} else if ( material instanceof THREE.ColorFillMaterial ) {
 
 					_context.fillStyle = material.color.__styleString;
 					_context.fill();
