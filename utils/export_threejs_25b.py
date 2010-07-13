@@ -22,7 +22,7 @@ def write(filename, scene, ob, \
     if not filename.lower().endswith('.js'):
         filename += '.js'
 
-    classname = filename.replace('.js','').split('/')[-1]
+    classname = filename.split('/')[-1].replace('.js','')
 
     if not ob:
         raise Exception("Error, Select the object to export")

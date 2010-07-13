@@ -56,8 +56,8 @@ THREE.CanvasRenderer = function () {
 
 		}
 
-		/*
-		_context.fillStyle = 'rgba(255, 255, 0, 0.5)';
+		/* DEBUG
+		_context.fillStyle = 'rgba(0, 255, 255, 0.5)';
 		_context.fillRect(_clipRect.getX(), _clipRect.getY(), _clipRect.getWidth(), _clipRect.getHeight());
 		*/
 
@@ -306,15 +306,21 @@ THREE.CanvasRenderer = function () {
 
 				}
 
+				/* DEBUG
+				_context.lineWidth = 1;
+				_context.strokeStyle = 'rgba( 0, 255, 0, 0.5 )';
+				_context.strokeRect( _bboxRect.getX(), _bboxRect.getY(), _bboxRect.getWidth(), _bboxRect.getHeight() );
+				*/
+
 				_clearRect.addRectangle( _bboxRect );
 
 			}
 
 		}
 
-		/*
+		/* DEBUG
 		_context.lineWidth = 1;
-		_context.strokeStyle = 'rgba( 0, 0, 255, 0.5 )';
+		_context.strokeStyle = 'rgba( 255, 0, 0, 0.5 )';
 		_context.strokeRect( _clearRect.getX(), _clearRect.getY(), _clearRect.getWidth(), _clearRect.getHeight() );
 		*/
 

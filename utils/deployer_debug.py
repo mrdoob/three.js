@@ -45,6 +45,16 @@ for item in files:
 	src_file = open('../src/' + item,'r')
 	string += src_file.read() + "\n"
 
+position = 0
+
+while True:
+	position = string.find("/* DEBUG", position)
+	if position == -1:
+		break
+	string = string[0:position] + string[position+8:]
+	position = string.find("*/", position)
+	string = string[0:position] + string[position+2:]
+
 tmp_file = open('temp.js','w')
 tmp_file.write(string)
 tmp_file.close()
@@ -52,16 +62,16 @@ tmp_file.close()
 
 # YUICOMPRESSOR
 
-os.system("java -jar yuicompressor-2.4.2.jar temp.js -o ../build/three.js --charset utf-8 -v")
-os.unlink("temp.js")
+os.system("java -jar yuicompressor-2.4.2.jar temp.js -o ../build/three_debug.js --charset utf-8 -v")
+os.unlink("temp.js");
 
 # HEADER
 
-output = '../build/three.js'
+output = '../build/three_debug.js'
 string = "// three.js r" + str(rev) + " - http://github.com/mrdoob/three.js\n"
 
 src_file = open(output,'r')
-string += src_file.read()
+string += src_file.read();
 
 dep_file = open(output,'w')
 dep_file.write(string)
