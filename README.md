@@ -33,7 +33,7 @@ Other similar projects: [pre3d](http://deanm.github.com/pre3d/), [pvjs](http://c
 
 ### Usage ###
 
-Download the [compiled library](http://github.com/mrdoob/three.js/raw/master/build/three.js) and include it in your html.
+Download the [compressed library](http://github.com/mrdoob/three.js/raw/master/build/three.js) and include it in your html.
 
 	<script type="text/javascript" src="js/three.js"></script>
 
@@ -124,7 +124,7 @@ Thanks to the power of the internets (and github <3) these people have kindly he
 
 ### Change Log ###
 
-2010 07 12 - **r13** (29.410 kb)
+2010 07 12 - **r13** (29.492 kb)
 
 * Added `ParticleCircleMaterial` and `ParticleBitmapMaterial`
 * `Particle` now use `ParticleCircleMaterial` instead of `ColorFillMaterial`
