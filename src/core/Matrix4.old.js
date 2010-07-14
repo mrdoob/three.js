@@ -3,32 +3,29 @@
  * @author mr.doob / http://mrdoob.com/
  */
 
-THREE.Matrix4 = function () {
+THREE.Matrix4Orig = function () {
 
-  this._x = new THREE.Vector3();
-  this._y = new THREE.Vector3();
-  this._z = new THREE.Vector3();
+  var x, y, z;
 
-};
+  x = new THREE.Vector3Orig();
+  y = new THREE.Vector3Orig();
+  z = new THREE.Vector3Orig();
 
-THREE.Matrix4.prototype = {
-  n11: 1, n12: 0, n13: 0, n14: 0,
-  n21: 0, n22: 1, n23: 0, n24: 0,
-  n31: 0, n32: 0, n33: 1, n34: 0,
-  n41: 0, n42: 0, n43: 0, n44: 1,
-    
-  identity: function () {
+  this.n11 = 1; this.n12 = 0; this.n13 = 0; this.n14 = 0;
+  this.n21 = 0; this.n22 = 1; this.n23 = 0; this.n24 = 0;
+  this.n31 = 0; this.n32 = 0; this.n33 = 1; this.n34 = 0;
+  this.n41 = 0; this.n42 = 0; this.n43 = 0; this.n44 = 1;
+
+  this.identity = function () {
 
     this.n11 = 1; this.n12 = 0; this.n13 = 0; this.n14 = 0;
     this.n21 = 0; this.n22 = 1; this.n23 = 0; this.n24 = 0;
     this.n31 = 0; this.n32 = 0; this.n33 = 1; this.n34 = 0;
     this.n41 = 0; this.n42 = 0; this.n43 = 0; this.n44 = 1;
-  },
+  };
 
-  lookAt: function ( eye, center, up ) {
+  this.lookAt = function ( eye, center, up ) {
 
-    var x = this._x, y = this._y, z = this._z;
-    
     z.sub( eye, center );
     z.normalize();
 
@@ -41,9 +38,9 @@ THREE.Matrix4.prototype = {
     this.n11 = x.x; this.n12 = x.y; this.n13 = x.z; this.n14 = - x.dot( eye );
     this.n21 = y.x; this.n22 = y.y; this.n23 = y.z; this.n24 = - y.dot( eye );
     this.n31 = z.x; this.n32 = z.y; this.n33 = z.z; this.n34 = - z.dot( eye );
-  },
+  };
 
-  transform: function ( v ) {
+  this.transform = function ( v ) {
 
     var vx = v.x, vy = v.y, vz = v.z, vw = v.w ? v.w : 1.0;
 
@@ -64,11 +61,11 @@ THREE.Matrix4.prototype = {
       v.z = v.z / vw;
 
     }
-  },
+  };
 
-  crossVector: function ( a ) {
+  this.crossVector = function ( a ) {
 
-    var v = new THREE.Vector4();
+    var v = new THREE.Vector4Orig();
 
     v.x = this.n11 * a.x + this.n12 * a.y + this.n13 * a.z + this.n14 * a.w;
     v.y = this.n21 * a.x + this.n22 * a.y + this.n23 * a.z + this.n24 * a.w;
@@ -78,9 +75,9 @@ THREE.Matrix4.prototype = {
 
     return v;
 
-  },
+  };
 
-  multiply: function ( a, b ) {
+  this.multiply = function ( a, b ) {
 
     this.n11 = a.n11 * b.n11 + a.n12 * b.n21 + a.n13 * b.n31 + a.n14 * b.n41;
     this.n12 = a.n11 * b.n12 + a.n12 * b.n22 + a.n13 * b.n32 + a.n14 * b.n42;
@@ -102,9 +99,9 @@ THREE.Matrix4.prototype = {
     this.n43 = a.n41 * b.n13 + a.n42 * b.n23 + a.n43 * b.n33 + a.n44 * b.n43;
     this.n44 = a.n41 * b.n14 + a.n42 * b.n24 + a.n43 * b.n34 + a.n44 * b.n44;
 
-  },
+  };
 
-  multiplySelf: function ( m ) {
+  this.multiplySelf = function ( m ) {
 
     var n11 = this.n11, n12 = this.n12, n13 = this.n13, n14 = this.n14,
     n21 = this.n21, n22 = this.n22, n23 = this.n23, n24 = this.n24,
@@ -131,33 +128,33 @@ THREE.Matrix4.prototype = {
     this.n43 = n41 * m.n13 + n42 * m.n23 + n43 * m.n33 + n44 * m.n43;
     this.n44 = n41 * m.n14 + n42 * m.n24 + n43 * m.n34 + n44 * m.n44;
 
-  },
+  };
 
-  clone: function () {
+  this.clone = function () {
 
-    var m = new THREE.Matrix4();
+    var m = new THREE.Matrix4Orig();
     m.n11 = this.n11; m.n12 = this.n12; m.n13 = this.n13; m.n14 = this.n14;
     m.n21 = this.n21; m.n22 = this.n22; m.n23 = this.n23; m.n24 = this.n24;
     m.n31 = this.n31; m.n32 = this.n32; m.n33 = this.n33; m.n34 = this.n34;
     m.n41 = this.n41; m.n42 = this.n42; m.n43 = this.n43; m.n44 = this.n44;
     return m;
 
-  },
+  };
 
-  toString: function() {
+  this.toString = function() {
 
     return "| " + this.n11 + " " + this.n12 + " " + this.n13 + " " + this.n14 + " |\n" +
       "| " + this.n21 + " " + this.n22 + " " + this.n23 + " " + this.n24 + " |\n" +
       "| " + this.n31 + " " + this.n32 + " " + this.n33 + " " + this.n34 + " |\n" +
       "| " + this.n41 + " " + this.n42 + " " + this.n43 + " " + this.n44 + " |";
 
-  }
-    
+  };
+
 };
 
-THREE.Matrix4.translationMatrix = function ( x, y, z ) {
+THREE.Matrix4Orig.translationMatrix = function ( x, y, z ) {
 
-  var m = new THREE.Matrix4();
+  var m = new THREE.Matrix4Orig();
 
   m.n14 = x;
   m.n24 = y;
@@ -167,9 +164,9 @@ THREE.Matrix4.translationMatrix = function ( x, y, z ) {
 
 };
 
-THREE.Matrix4.scaleMatrix = function ( x, y, z ) {
+THREE.Matrix4Orig.scaleMatrix = function ( x, y, z ) {
 
-  var m = new THREE.Matrix4();
+  var m = new THREE.Matrix4Orig();
 
   m.n11 = x;
   m.n22 = y;
@@ -179,9 +176,9 @@ THREE.Matrix4.scaleMatrix = function ( x, y, z ) {
 
 };
 
-THREE.Matrix4.rotationXMatrix = function ( theta ) {
+THREE.Matrix4Orig.rotationXMatrix = function ( theta ) {
 
-  var rot = new THREE.Matrix4();
+  var rot = new THREE.Matrix4Orig();
 
   rot.n22 = rot.n33 = Math.cos( theta );
   rot.n32 = Math.sin( theta );
@@ -191,9 +188,9 @@ THREE.Matrix4.rotationXMatrix = function ( theta ) {
 
 };
 
-THREE.Matrix4.rotationYMatrix = function ( theta ) {
+THREE.Matrix4Orig.rotationYMatrix = function ( theta ) {
 
-  var rot = new THREE.Matrix4();
+  var rot = new THREE.Matrix4Orig();
 
   rot.n11 = rot.n33 = Math.cos( theta );
   rot.n13 = Math.sin( theta );
@@ -203,9 +200,9 @@ THREE.Matrix4.rotationYMatrix = function ( theta ) {
 
 };
 
-THREE.Matrix4.rotationZMatrix = function( theta ) {
+THREE.Matrix4Orig.rotationZMatrix = function( theta ) {
 
-  var rot = new THREE.Matrix4();
+  var rot = new THREE.Matrix4Orig();
 
   rot.n11 = rot.n22 = Math.cos( theta );
   rot.n21 = Math.sin( theta );
@@ -215,11 +212,11 @@ THREE.Matrix4.rotationZMatrix = function( theta ) {
 
 };
 
-THREE.Matrix4.makeFrustum = function( left, right, bottom, top, near, far ) {
+THREE.Matrix4Orig.makeFrustum = function( left, right, bottom, top, near, far ) {
 
   var m, x, y, a, b, c, d;
 
-  m = new THREE.Matrix4();
+  m = new THREE.Matrix4Orig();
   x = 2 * near / ( right - left );
   y = 2 * near / ( top - bottom );
   a = ( right + left ) / ( right - left );
@@ -236,7 +233,7 @@ THREE.Matrix4.makeFrustum = function( left, right, bottom, top, near, far ) {
 
 };
 
-THREE.Matrix4.makePerspective = function( fov, aspect, near, far ) {
+THREE.Matrix4Orig.makePerspective = function( fov, aspect, near, far ) {
 
   var ymax, ymin, xmin, xmax;
 
@@ -245,6 +242,6 @@ THREE.Matrix4.makePerspective = function( fov, aspect, near, far ) {
   xmin = ymin * aspect;
   xmax = ymax * aspect;
 
-  return THREE.Matrix4.makeFrustum( xmin, xmax, ymin, ymax, near, far );
+  return THREE.Matrix4Orig.makeFrustum( xmin, xmax, ymin, ymax, near, far );
 
 };

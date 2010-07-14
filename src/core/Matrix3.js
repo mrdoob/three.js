@@ -3,7 +3,7 @@
  * @author supereggbert / http://www.paulbrunt.co.uk/
  */
 
-THREE.Matrix3 = function () {
+THREE.Matrix3Orig = function () {
 
 	this.n11 = 1; this.n12 = 0; this.n13 = 0;
 	this.n21 = 0; this.n22 = 1; this.n23 = 0;
