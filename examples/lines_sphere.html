@@ -58,9 +58,9 @@
 				renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 				container.appendChild(renderer.domElement);
 
-				// floor
+				// particles
 
-				material = new THREE.ColorFillMaterial(0xffffff, 1);
+				material = new THREE.ParticleCircleMaterial(0xffffff, 1);
 
 				for (var i = 0; i < 1000; i++) {
 

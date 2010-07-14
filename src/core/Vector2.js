@@ -1,5 +1,6 @@
 /**
  * @author mr.doob / http://mrdoob.com/
+ * @author philogb / http://blog.thejit.org/
  */
 
 THREE.Vector2 = function ( x, y ) {

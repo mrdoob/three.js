@@ -1,5 +1,6 @@
 /**
  * @author supereggbert / http://www.paulbrunt.co.uk/
+ * @author philogb / http://blog.thejit.org/
  */
 
 THREE.Vector4 = function ( x, y, z, w ) {
