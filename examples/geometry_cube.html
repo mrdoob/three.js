@@ -70,22 +70,22 @@
 
 				// Cube
 
-				geometry = new Cube(200, 200, 200);
+				geometry = new Cube( 200, 200, 200 );
 
 				for (var i = 0; i < geometry.faces.length; i++) {
 
 					geometry.faces[i].color.setRGBA( Math.random() * 0.5, Math.random() * 0.5 + 0.5, Math.random() * 0.5 + 0.5, 1 );
 				}
 
-				cube = new THREE.Mesh(geometry, new THREE.FaceColorFillMaterial());
+				cube = new THREE.Mesh(geometry, new THREE.MeshFaceColorFillMaterial() );
 				cube.position.y = 150;
-				scene.add(cube);
+				scene.addObject(cube);
 
 				// Plane
 
-				plane = new THREE.Mesh(new Plane(200, 200), new THREE.ColorFillMaterial(0xe0e0e0));
-				plane.rotation.x = -90 * (Math.PI / 180);
-				scene.add(plane);
+				plane = new THREE.Mesh( new Plane( 200, 200, 4, 4 ), new THREE.MeshColorFillMaterial( 0xe0e0e0 ) );
+				plane.rotation.x = -90 * ( Math.PI / 180 );
+				scene.addObject(plane);
 
 				renderer = new THREE.CanvasRenderer();
 				renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);

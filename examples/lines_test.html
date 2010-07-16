@@ -60,9 +60,10 @@
 
 				// particles
 
-				material = new THREE.ParticleCircleMaterial(0xffffff, 1);
+				material = new THREE.ParticleCircleMaterial( 0xffffff, 1 );
+				var geometry = new THREE.Geometry();
 
-				for (var i = 0; i < 1000; i++) {
+				for (var i = 0; i < 100; i++) {
 
 					particle = new THREE.Particle( material );
 					particle.position.x = Math.random() * 2 - 1;
@@ -70,30 +71,17 @@
 					particle.position.z = Math.random() * 2 - 1;
 					particle.position.normalize();
 					particle.position.multiplyScalar(Math.random() * 10 + 450);
+					particle.scale.x = particle.scale.y = 5;
 					scene.add( particle );
+
+					geometry.vertices.push( new THREE.Vertex( particle.position ) );
 
 				}
 
 				// lines
 
-				for (var i = 0; i < 300; i++) {
-
-					var geometry = new THREE.Geometry();
-
-					var vector = new THREE.Vector3( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 );
-					vector.normalize();
-					vector.multiplyScalar(450);
-
-					geometry.vertices.push(new THREE.Vertex(vector));
-
-					var vector2 = vector.clone();
-					vector2.multiplyScalar(Math.random() * 0.3 + 1);
-
-					geometry.vertices.push(new THREE.Vertex(vector2));
-
-					var line = new THREE.Line( geometry, new THREE.LineColorMaterial( 0xffffff, Math.random() ) );
-					scene.add(line);
-				}
+				var line = new THREE.Line( geometry, new THREE.LineColorMaterial( 0xffffff, Math.random(), 1 ) );
+				scene.add(line);
 
 				/*
 				stats = new Stats();

@@ -31,6 +31,7 @@
 		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - vr demo. skybox by <a href="http://www.zfight.com/" target="_blank">Jochum Skoglund</a></div>
 
 		<script type="text/javascript" src="../build/three.js"></script>
+
 		<script type="text/javascript" src="primitives/Plane.js"></script>
 
 		<script type="text/javascript">
@@ -62,7 +63,7 @@
 				texture_placeholder.width = 128;
 				texture_placeholder.height = 128;
 
-				wireframe = new THREE.ColorStrokeMaterial( 1, 0xffffff, 0 );
+				wireframe = new THREE.MeshColorStrokeMaterial( 0xffffff, 0 );
 
 				var context = texture_placeholder.getContext( '2d' );
 				context.fillStyle = 'rgba( 200, 200, 200, 1 )';
@@ -120,7 +121,7 @@
 
 			function loadTexture( path ) {
 
-				var material = new THREE.BitmapUVMappingMaterial( texture_placeholder );
+				var material = new THREE.MeshBitmapUVMappingMaterial( texture_placeholder );
 
 				var texture = new Image();
 
@@ -168,7 +169,7 @@
 
 				isUserInteracting = false;
 
-				wireframe.color.setRGBA(255, 255, 255, 0);
+				wireframe.color.setRGBA( 1, 1, 1, 0);
 
 				render();
 			}

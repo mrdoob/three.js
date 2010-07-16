@@ -147,7 +147,7 @@ THREE.Rectangle = function ( x1, y1, x2, y2 ) {
 
 	this.instersects = function ( r ) {
 
-		return Math.min( _x2, r.getX2() ) - Math.max( _x1, r.getX1() ) > 0 && Math.min( _y2, r.getY2() ) - Math.max( _y1, r.getY1() ) > 0;
+		return Math.min( _x2, r.getX2() ) - Math.max( _x1, r.getX1() ) >= 0 && Math.min( _y2, r.getY2() ) - Math.max( _y1, r.getY1() ) >= 0;
 
 	};
 

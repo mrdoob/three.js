@@ -1,0 +1,275 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>three.js - geometry - cube</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
+		<style type="text/css">
+			body {
+				font-family: Monospace;
+				background-color: #f0f0f0;
+				margin: 0px;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+	<body>
+
+		<!-- <script type="text/javascript" src="../build/three.js"></script> -->
+
+		<script type="text/javascript" src="../src/Three.js"></script>
+		<script type="text/javascript" src="../src/core/Color.js"></script>
+		<script type="text/javascript" src="../src/core/Vector2.js"></script>
+		<script type="text/javascript" src="../src/core/Vector3.js"></script>
+		<script type="text/javascript" src="../src/core/Vector4.js"></script>
+		<script type="text/javascript" src="../src/core/Rectangle.js"></script>
+		<script type="text/javascript" src="../src/core/Matrix4.js"></script>
+		<script type="text/javascript" src="../src/core/Vertex.js"></script>
+		<script type="text/javascript" src="../src/core/Face3.js"></script>
+		<script type="text/javascript" src="../src/core/Face4.js"></script>
+		<script type="text/javascript" src="../src/core/Geometry.js"></script>
+		<script type="text/javascript" src="../src/cameras/Camera.js"></script>
+		<script type="text/javascript" src="../src/objects/Object3D.js"></script>
+		<script type="text/javascript" src="../src/objects/Mesh.js"></script>
+		<script type="text/javascript" src="../src/objects/Particle.js"></script>
+		<script type="text/javascript" src="../src/objects/Line.js"></script>
+		<script type="text/javascript" src="../src/materials/LineColorMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/MeshBitmapUVMappingMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/MeshColorFillMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/MeshColorStrokeMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/MeshFaceColorFillMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/MeshFaceColorStrokeMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/ParticleCircleMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/ParticleBitmapMaterial.js"></script>
+		<script type="text/javascript" src="../src/scenes/Scene.js"></script>
+		<script type="text/javascript" src="../src/renderers/Renderer.js"></script>
+		<script type="text/javascript" src="../src/renderers/CanvasRenderer.js"></script>
+		<script type="text/javascript" src="../src/renderers/SVGRenderer.js"></script>
+		<script type="text/javascript" src="../src/renderers/WebGLRenderer.js"></script>
+		<script type="text/javascript" src="../src/renderers/renderables/RenderableFace3.js"></script>
+		<script type="text/javascript" src="../src/renderers/renderables/RenderableFace4.js"></script>
+		<script type="text/javascript" src="../src/renderers/renderables/RenderableParticle.js"></script>
+		<script type="text/javascript" src="../src/renderers/renderables/RenderableLine.js"></script>
+
+		<script type="text/javascript" src="cameras/FreeCamera.js"></script>
+
+		<script type="text/javascript" src="primitives/Cube.js"></script>
+		<script type="text/javascript" src="primitives/Plane.js"></script>
+
+		<script type="text/javascript" src="http://github.com/mrdoob/stats.js/raw/master/build/stats.js"></script>
+
+		<script type="text/javascript">
+
+			var SCREEN_WIDTH = window.innerWidth;
+			var SCREEN_HEIGHT = window.innerHeight;
+
+			var container;
+			var stats;
+
+			var camera;
+			var scene;
+			var renderer;
+
+			var cube, plane;
+
+			var targetRotation = 0;
+			var targetRotationOnMouseDown = 0;
+
+			var mouseX = 0;
+			var mouseXOnMouseDown = 0;
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+			var moveForward = false,
+			moveBackwards = false,
+			moveUp = false,
+			moveDown = false,
+			moveLeft = false,
+			moveRight = false,
+
+			yawLeft = false,
+			yawRight = false,
+			pitchUp = false,
+			pitchDown = false,
+			rollLeft = false,
+			rollRight = false;
+
+			var debugContext;
+
+			init();
+			setInterval(loop, 1000/60);
+
+			function init() {
+
+				container = document.createElement('div');
+				document.body.appendChild(container);
+
+				camera = new THREE.Camera( 45, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
+				camera.position.y = 150;
+				camera.position.z = 400;
+				camera.target.position.y = 150;
+
+				scene = new THREE.Scene();
+
+				// Cube
+
+				geometry = new Cube(200, 200, 200);
+
+				for (var i = 0; i < geometry.faces.length; i++) {
+
+					geometry.faces[i].color.setRGBA( Math.random() * 0.5, Math.random() * 0.5 + 0.5, Math.random() * 0.5 + 0.5, 1 );
+				}
+
+				for (var i = 0; i < 10; i ++ ) {
+
+					cube = new THREE.Mesh(geometry, new THREE.MeshFaceColorFillMaterial() );
+
+					cube.position.x = Math.random() * 1000 - 500;
+					cube.position.y = Math.random() * 1000 - 500;
+					cube.position.z = Math.random() * 1000 - 500;
+
+					cube.rotation.x = Math.random() * 200 - 100;
+					cube.rotation.y = Math.random() * 200 - 100;
+					cube.rotation.z = Math.random() * 200 - 100;
+
+					cube.scale.x = cube.scale.y = cube.scale.z = Math.random() + 0.5;
+
+					scene.add(cube);
+
+				}
+
+				// Plane
+
+				plane = new THREE.Mesh( new Plane( 1000, 1000, 10, 10 ), new THREE.MeshColorStrokeMaterial( 0x000000, 0.5, 1 ) );
+				plane.rotation.x = -90 * (Math.PI / 180);
+				scene.add(plane);
+
+				renderer = new THREE.CanvasRenderer();
+				renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+				renderer.autoClear = false;
+
+				container.appendChild(renderer.domElement);
+
+				var debugCanvas = document.createElement( 'canvas' );
+				debugCanvas.width = 512;
+				debugCanvas.height = 512;
+				debugCanvas.style.position = 'absolute';
+				debugCanvas.style.top = '0px';
+				debugCanvas.style.left = '0px';
+
+				container.appendChild( debugCanvas );
+
+				debugContext = debugCanvas.getContext( '2d' );
+				debugContext.setTransform( 1, 0, 0, 1, 256, 256 );
+				debugContext.strokeStyle = '#000000';
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild(stats.domElement);
+
+				document.addEventListener('keydown', onDocumentKeyDown, false);
+				document.addEventListener('keyup', onDocumentKeyUp, false);
+			}
+
+			function onDocumentKeyDown( event ) {
+
+				switch( event.keyCode ) {
+
+					case 38: moveForward = true; break; // up
+					case 40: moveBackwards = true; break; // down
+					case 37: moveLeft = true; break; // left
+					case 39: moveRight = true; break; // right
+					case 65: yawLeft = true; break; // a
+					case 68: yawRight = true; break; // d
+					case 87: moveUp/*pitchUp*/ = true; break; // w
+					case 83: moveDown/*pitchDown*/ = true; break; // s
+					case 90: rollLeft = true; break; // z
+					case 67: rollRight = true; break; // c
+
+				}
+
+			}
+
+			function onDocumentKeyUp( event ) {
+
+				switch( event.keyCode ) {
+
+					case 38: moveForward = false; break; // up
+					case 40: moveBackwards = false; break; // down
+					case 37: moveLeft = false; break; // left
+					case 39: moveRight = false; break; // right
+					case 65: yawLeft = false; break; // a
+					case 68: yawRight = false; break; // d
+					case 87: moveUp/*pitchUp*/ = false; break; // w
+					case 83: moveDown/*pitchDown*/ = false; break; // s
+					case 90: rollLeft = false; break; // z
+					case 67: rollRight = false; break; // c
+
+				}
+
+			}
+
+			//
+
+			function loop() {
+
+				if ( moveForward ) camera.position.z -= 5; // camera.moveZ( 5 );
+				if ( moveBackwards ) camera.position.z += 5; // camera.moveZ( - 5 );
+
+				if ( moveUp ) camera.position.y += 5; // camera.moveZ( 5 );
+				if ( moveDown ) camera.position.y -= 5; // camera.moveZ( - 5 );
+
+				if ( moveLeft ) camera.position.x -= 5; // camera.moveX( - 5 );
+				if ( moveRight ) camera.position.x += 5; // camera.moveX( 5 );
+
+				if ( pitchUp ) camera.rotation.x += 0.01; // camera.rotateX( 1 );
+				if ( pitchDown ) camera.rotation.x -= 0.01; // camera.rotateX( - 1 );
+
+				if ( yawLeft ) camera.target.position.x -= 5; // camera.rotation.y += 0.01; // camera.rotateY( 1 );
+				if ( yawRight ) camera.target.position.x += 5; // camera.rotation.y -= 0.01; // camera.rotateY( - 1 );
+
+				if ( rollLeft ) camera.rotation.z += 0.01; // camera.rotateZ( 1 );
+				if ( rollRight ) camera.rotation.z -= 0.01; // camera.rotateZ( - 1 );
+
+				debugContext.clearRect( -256, -256, 512, 512 );
+
+				debugContext.beginPath();
+
+				// center
+				debugContext.moveTo( -10, 0 );
+				debugContext.lineTo( 10, 0 );
+				debugContext.moveTo( 0, -10 );
+				debugContext.lineTo( 0, 10 );
+
+				// camera
+
+				debugContext.moveTo( camera.position.x * 0.1, camera.position.z * 0.1 );
+				debugContext.lineTo( camera.target.position.x * 0.1, camera.target.position.z * 0.1 );
+				debugContext.rect( camera.position.x * 0.1 - 5, camera.position.z * 0.1 - 5, 10, 10 );
+				debugContext.rect( camera.target.position.x * 0.1 - 5, camera.target.position.z * 0.1 - 5, 10, 10 );
+				debugContext.rect( - 50, - 50, 100, 100 );
+
+				for ( var i = 0; i < scene.objects.length; i++ ) {
+
+					var object = scene.objects[i];
+
+					debugContext.rect( object.position.x * 0.1 - 5, object.position.z * 0.1 - 5, 10, 10 );
+
+				}
+
+
+				debugContext.closePath();
+				debugContext.stroke();
+
+				renderer.clear();
+				renderer.render(scene, camera);
+
+				stats.update();
+			}
+
+		</script>
+
+	</body>
+</html>

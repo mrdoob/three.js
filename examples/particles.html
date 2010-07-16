@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - particles - floor</title>
+		<title>three.js - particles - random</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
 		<style type="text/css">
@@ -18,33 +18,35 @@
 	</head>
 	<body>
 
-		<script type="text/javascript" src="../build/three.js"></script> 
+		<script type="text/javascript" src="http://github.com/mrdoob/stats.js/raw/master/build/stats.js"></script>
+
+		<script type="text/javascript" src="../build/three.js"></script>
 
 		<script type="text/javascript">
 
-			var SCREEN_WIDTH = window.innerWidth,
-			SCREEN_HEIGHT = window.innerHeight,
+			var SCREEN_WIDTH = window.innerWidth;
+			var SCREEN_HEIGHT = window.innerHeight;
 
-			mouseX = 0, mouseY = 0,
+			var stats;
+			var container;
 
-			windowHalfX = window.innerWidth / 2,
-			windowHalfY = window.innerHeight / 2,
+			var particle;
 
-			SEPARATION = 200,
-			AMOUNTX = 10,
-			AMOUNTY = 10,
+			var camera;
+			var scene;
+			var renderer;
 
-			camera, scene, renderer,
+			var mouseX = 0;
+			var mouseY = 0;
 
-			stats;
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
 
 			init();
 			setInterval(loop, 1000 / 60);
 
 			function init() {
-
-				var container, separation = 100, amountX = 50, amountY = 50,
-				particles, particle, material;
 
 				container = document.createElement('div');
 				document.body.appendChild(container);
@@ -56,55 +58,57 @@
 
 				renderer = new THREE.CanvasRenderer();
 				renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
-				container.appendChild(renderer.domElement);
 
-				// particles
+				for (var i = 0; i < 500; i++) {
 
-				material = new THREE.ParticleCircleMaterial(0xffffff, 1);
+					particle = new THREE.Particle( new THREE.ParticleCircleMaterial( Math.random() * 0xff0000, 1 ) );
+					particle.position.x = Math.random() * 2000 - 1000;
+					particle.position.y = Math.random() * 2000 - 1000;
+					particle.position.z = Math.random() * 2000 - 1000;
+					particle.scale.x = particle.scale.y = Math.random() * 10 + 5;
+					scene.add(particle);
+				}
 
-				for (var i = 0; i < 1000; i++) {
+				var material = loadTexture( 'textures/Tree_01.png' );
+
+				for (var i = 0; i < 10; i++) {
 
 					particle = new THREE.Particle( material );
-					particle.position.x = Math.random() * 2 - 1;
-					particle.position.y = Math.random() * 2 - 1;
-					particle.position.z = Math.random() * 2 - 1;
-					particle.position.normalize();
-					particle.position.multiplyScalar(Math.random() * 10 + 450);
-					scene.add( particle );
-
+					particle.position.x = Math.random() * 2000 - 1000;
+					// particle.position.y = Math.random() * 2000 - 1000;
+					particle.position.z = Math.random() * 2000 - 1000;
+					// particle.rotation.z = 90 * Math.PI / 180;
+					// particle.scale.x = particle.scale.y = Math.random();
+					scene.add(particle);
 				}
 
-				// lines
+				container.appendChild(renderer.domElement);
 
-				for (var i = 0; i < 300; i++) {
-
-					var geometry = new THREE.Geometry();
-
-					var vector = new THREE.Vector3( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 );
-					vector.normalize();
-					vector.multiplyScalar(450);
-
-					geometry.vertices.push(new THREE.Vertex(vector));
-
-					var vector2 = vector.clone();
-					vector2.multiplyScalar(Math.random() * 0.3 + 1);
-
-					geometry.vertices.push(new THREE.Vertex(vector2));
-
-					var line = new THREE.Line( geometry, new THREE.LineColorMaterial( 0xffffff, Math.random() ) );
-					scene.add(line);
-				}
-
-				/*
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
 				container.appendChild(stats.domElement);
-				*/
 
 				document.addEventListener('mousemove', onDocumentMouseMove, false);
 				document.addEventListener('touchstart', onDocumentTouchStart, false);
 				document.addEventListener('touchmove', onDocumentTouchMove, false);
+			}
+
+			function loadTexture( path ) {
+
+				var material = new THREE.ParticleBitmapMaterial();
+
+				var texture = new Image();
+
+				texture.onload = function () {
+
+					material.bitmap = this;
+
+				};
+
+				texture.src = path;
+
+				return material;
 			}
 
 			//
@@ -115,9 +119,9 @@
 				mouseY = event.clientY - windowHalfY;
 			}
 
-			function onDocumentTouchStart( event ) {
+			function onDocumentTouchStart(event) {
 
-				if(event.touches.length > 1) {
+				if(event.touches.length == 1) {
 
 					event.preventDefault();
 
@@ -126,7 +130,7 @@
 				}
 			}
 
-			function onDocumentTouchMove( event ) {
+			function onDocumentTouchMove(event) {
 
 				if(event.touches.length == 1) {
 
@@ -142,12 +146,11 @@
 			function loop() {
 
 				camera.position.x += (mouseX - camera.position.x) * .05;
-				camera.position.y += (-mouseY + 200 - camera.position.y) * .05;
-				camera.updateMatrix();
+				camera.position.y += (-mouseY - camera.position.y) * .05;
 
 				renderer.render(scene, camera);
 
-				// stats.update();
+				stats.update();
 			}
 
 		</script>

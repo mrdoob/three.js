@@ -137,19 +137,19 @@ THREE.SVGRenderer = function () {
 
 				// TODO: Move out of materials loop
 
-				if ( material instanceof THREE.ColorFillMaterial ) {
+				if ( material instanceof THREE.MeshColorFillMaterial ) {
 
 					svgNode.setAttribute( 'style', 'fill: ' + material.color.__styleString );
 
-				} else if ( material instanceof THREE.FaceColorFillMaterial ) {
+				} else if ( material instanceof THREE.MeshFaceColorFillMaterial ) {
 
 					svgNode.setAttribute( 'style', 'fill: ' + element.color.__styleString );
 
-				} else if ( material instanceof THREE.ColorStrokeMaterial ) {
+				} else if ( material instanceof THREE.MeshColorStrokeMaterial ) {
 
 					svgNode.setAttribute( 'style', 'fill: none; stroke: ' + material.color.__styleString + '; stroke-width: ' + material.lineWidth + '; stroke-linecap: round; stroke-linejoin: round' );
 
-				} else if ( material instanceof THREE.FaceColorStrokeMaterial ) {
+				} else if ( material instanceof THREE.MeshFaceColorStrokeMaterial ) {
 
 					svgNode.setAttribute( 'style', 'fill: none; stroke: ' + element.color.__styleString + '; stroke-width: ' + material.lineWidth + '; stroke-linecap: round; stroke-linejoin: round' );
 

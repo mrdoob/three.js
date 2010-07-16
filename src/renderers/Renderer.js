@@ -68,8 +68,6 @@ THREE.Renderer = function() {
 
 					face = object.geometry.faces[ f ];
 
-					// TODO: Use normals for culling... maybe not?
-
 					if ( face instanceof THREE.Face3 ) {
 
 						v1 = object.geometry.vertices[ face.a ];
@@ -80,21 +78,16 @@ THREE.Renderer = function() {
 						   ( v3.screen.x - v1.screen.x ) * ( v2.screen.y - v1.screen.y ) -
 						   ( v3.screen.y - v1.screen.y ) * ( v2.screen.x - v1.screen.x ) < 0 ) ) {
 
-							face.screen.z = Math.max( v1.screen.z, Math.max( v2.screen.z, v3.screen.z ) );
-
 							if ( !face3Pool[ face3count ] ) {
 
 								face3Pool[ face3count ] = new THREE.RenderableFace3();
 
 							}
 
-							face3Pool[ face3count ].v1.x = v1.screen.x;
-							face3Pool[ face3count ].v1.y = v1.screen.y;
-							face3Pool[ face3count ].v2.x = v2.screen.x;
-							face3Pool[ face3count ].v2.y = v2.screen.y;
-							face3Pool[ face3count ].v3.x = v3.screen.x;
-							face3Pool[ face3count ].v3.y = v3.screen.y;
-							face3Pool[ face3count ].z = face.screen.z;
+							face3Pool[ face3count ].v1.copy( v1.screen );
+							face3Pool[ face3count ].v2.copy( v2.screen );
+							face3Pool[ face3count ].v3.copy( v3.screen );
+							face3Pool[ face3count ].z = Math.max( v1.screen.z, Math.max( v2.screen.z, v3.screen.z ) );
 
 							face3Pool[ face3count ].material = object.material;
 							face3Pool[ face3count ].overdraw = object.overdraw;
@@ -119,23 +112,17 @@ THREE.Renderer = function() {
 						   ( v2.screen.x - v3.screen.x ) * ( v4.screen.y - v3.screen.y ) -
 						   ( v2.screen.y - v3.screen.y ) * ( v4.screen.x - v3.screen.x ) < 0 ) ) ) {
 
-							face.screen.z = Math.max( v1.screen.z, Math.max( v2.screen.z, Math.max( v3.screen.z, v4.screen.z ) ) );
-
 							if ( !face4Pool[ face4count ] ) {
 
 								face4Pool[ face4count ] = new THREE.RenderableFace4();
 
 							}
 
-							face4Pool[ face4count ].v1.x = v1.screen.x;
-							face4Pool[ face4count ].v1.y = v1.screen.y;
-							face4Pool[ face4count ].v2.x = v2.screen.x;
-							face4Pool[ face4count ].v2.y = v2.screen.y;
-							face4Pool[ face4count ].v3.x = v3.screen.x;
-							face4Pool[ face4count ].v3.y = v3.screen.y;
-							face4Pool[ face4count ].v4.x = v4.screen.x;
-							face4Pool[ face4count ].v4.y = v4.screen.y;
-							face4Pool[ face4count ].z = face.screen.z;
+							face4Pool[ face4count ].v1.copy( v1.screen );
+							face4Pool[ face4count ].v2.copy( v2.screen );
+							face4Pool[ face4count ].v3.copy( v3.screen );
+							face4Pool[ face4count ].v4.copy( v4.screen );
+							face4Pool[ face4count ].z = Math.max( v1.screen.z, Math.max( v2.screen.z, Math.max( v3.screen.z, v4.screen.z ) ) );
 
 							face4Pool[ face4count ].material = object.material;
 							face4Pool[ face4count ].overdraw = object.overdraw;
@@ -146,7 +133,9 @@ THREE.Renderer = function() {
 
 							face4count++;
 						}
+
 					}
+
 				}
 
 			} else if ( object instanceof THREE.Line ) {
@@ -175,10 +164,8 @@ THREE.Renderer = function() {
 
 							}
 
-							linePool[ lineCount ].v1.x = vertex.screen.x;
-							linePool[ lineCount ].v1.y = vertex.screen.y;
-							linePool[ lineCount ].v2.x = vertex2.screen.x;
-							linePool[ lineCount ].v2.y = vertex2.screen.y;
+							linePool[ lineCount ].v1.copy( vertex.screen );
+							linePool[ lineCount ].v2.copy( vertex2.screen );
 							linePool[ lineCount ].z = Math.max( vertex.screen.z, vertex2.screen.z );
 							linePool[ lineCount ].material = object.material;
 
@@ -218,7 +205,7 @@ THREE.Renderer = function() {
 					particlePool[ particleCount ].material = object.material;
 					particlePool[ particleCount ].color = object.color;
 
-					this.renderList.push( particlePool[particleCount] );
+					this.renderList.push( particlePool[ particleCount ] );
 
 					particleCount++;
 

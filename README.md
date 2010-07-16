@@ -23,6 +23,8 @@ Other similar projects: [pre3d](http://deanm.github.com/pre3d/), [pvjs](http://c
 [![particles_wave](http://github.com/mrdoob/three.js/raw/master/assets/examples/01_waves.png)](http://mrdoob.com/projects/three.js/examples/particles_waves.html)
 [![particles_floor](http://github.com/mrdoob/three.js/raw/master/assets/examples/00_floor.png)](http://mrdoob.com/projects/three.js/examples/particles_floor.html)
 
+### Featured projects ###
+
 [![Rat](http://github.com/mrdoob/three.js/raw/master/assets/projects/06_rat.png)](http://tech.lab212.org/2010/07/export-textured-models-from-blender2-5-to-three-js/)
 [![Failure](http://github.com/mrdoob/three.js/raw/master/assets/projects/05_failure.png)](http://www.is-real.net/experiments/three/failure/)
 [![Space Cannon 3D](http://github.com/mrdoob/three.js/raw/master/assets/projects/02_spacecannon.png)](http://labs.brian-stoner.com/spacecannon/)
@@ -94,14 +96,15 @@ For creating a customised version of the library, including the source files in 
 	<script type="text/javascript" src="js/three/core/Geometry.js"></script>
 	<script type="text/javascript" src="js/three/cameras/Camera.js"></script>
 	<script type="text/javascript" src="js/three/objects/Object3D.js"></script>
+	<script type="text/javascript" src="js/three/objects/Line.js"></script>
 	<script type="text/javascript" src="js/three/objects/Mesh.js"></script>
 	<script type="text/javascript" src="js/three/objects/Particle.js"></script>
-	<script type="text/javascript" src="js/three/objects/Line.js"></script>
-	<script type="text/javascript" src="js/three/materials/BitmapUVMappingMaterial.js"></script>
-	<script type="text/javascript" src="js/three/materials/ColorFillMaterial.js"></script>
-	<script type="text/javascript" src="js/three/materials/ColorStrokeMaterial.js"></script>
-	<script type="text/javascript" src="js/three/materials/FaceColorFillMaterial.js"></script>
-	<script type="text/javascript" src="js/three/materials/FaceColorStrokeMaterial.js"></script>
+	<script type="text/javascript" src="js/three/materials/LineColorMaterial.js"></script>
+	<script type="text/javascript" src="js/three/materials/MeshBitmapUVMappingMaterial.js"></script>
+	<script type="text/javascript" src="js/three/materials/MeshColorFillMaterial.js"></script>
+	<script type="text/javascript" src="js/three/materials/MeshColorStrokeMaterial.js"></script>
+	<script type="text/javascript" src="js/three/materials/MeshFaceColorFillMaterial.js"></script>
+	<script type="text/javascript" src="js/three/materials/MeshFaceColorStrokeMaterial.js"></script>
 	<script type="text/javascript" src="js/three/materials/ParticleBitmapMaterial.js"></script>
 	<script type="text/javascript" src="js/three/materials/ParticleCircleMaterial.js"></script>
 	<script type="text/javascript" src="js/three/scenes/Scene.js"></script>
@@ -123,6 +126,20 @@ Thanks to the power of the internets (and github <3) these people have kindly he
 
 
 ### Change Log ###
+
+2010 07 17 - **r14** (32.162 kb)
+
+* Refactored `CanvasRenderer` (more duplicated code, but easier to handle)
+* `Face4` now supports `MeshBitmapUVMappingMaterial`
+* Changed order of `*StrokeMaterial` parameters. Now it's `color`, `opacity`, `lineWidth`.
+* `BitmapUVMappingMaterial` > `MeshBitmapUVMappingMaterial`
+* `ColorFillMaterial` > `MeshColorFillMaterial`
+* `ColorStrokeMaterial` > `MeshColorStrokeMaterial`
+* `FaceColorFillMaterial` > `MeshFaceColorFillMaterial`
+* `FaceColorStrokeMaterial` > `MeshFaceColorStrokeMaterial`
+* `ColorStrokeMaterial` > `LineColorMaterial`
+* `Rectangle.instersects` returned false with rectangles with 0px witdh or height
+
 
 2010 07 12 - **r13** (29.492 kb)
 

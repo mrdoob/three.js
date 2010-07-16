@@ -139,7 +139,7 @@ THREE.WebGLRenderer = function () {
 
 					material = object.material[ m ];
 
-					if ( material instanceof THREE.ColorFillMaterial ) {
+					if ( material instanceof THREE.MeshColorFillMaterial ) {
 
 						if ( !material.__webGLColorBuffer ) {
 
@@ -160,7 +160,7 @@ THREE.WebGLRenderer = function () {
 						_gl.bindBuffer( _gl.ARRAY_BUFFER, material.__webGLColorBuffer );
 						_gl.vertexAttribPointer( _program.color, 4, _gl.FLOAT, false, 0, 0 );
 
-					} else if ( material instanceof THREE.FaceColorFillMaterial ) {
+					} else if ( material instanceof THREE.MeshFaceColorFillMaterial ) {
 
 						_gl.bindBuffer( _gl.ARRAY_BUFFER, object.__webGLColorBuffer );
 						_gl.enableVertexAttribArray( _program.color );

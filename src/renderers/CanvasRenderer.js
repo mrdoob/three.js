@@ -45,9 +45,8 @@ THREE.CanvasRenderer = function () {
 		var e, el, m, ml, element, material, pi2 = Math.PI * 2,
 		v1x, v1y, v2x, v2y, v3x, v3y, v4x, v4y, width, height,
 
-		uv1 = new THREE.Vector2(), uv2 = new THREE.Vector2(), uv3 = new THREE.Vector2(),
-		suv1 = new THREE.Vector2(), suv2 = new THREE.Vector2(), suv3 = new THREE.Vector2(),
-		suv1x, suv1y, suv2x, suv2y, suv3x, suv3y, denom, m11, m12, m21, m22, dx, dy,
+		uv1 = new THREE.Vector2(), uv2 = new THREE.Vector2(), uv3 = new THREE.Vector2(), uv4 = new THREE.Vector2(),
+		suv1 = new THREE.Vector2(), suv2 = new THREE.Vector2(), suv3 = new THREE.Vector2(), suv4 = new THREE.Vector2(),
 		bitmap, bitmapWidth, bitmapHeight;
 
 		if ( this.autoClear ) {
@@ -58,7 +57,7 @@ THREE.CanvasRenderer = function () {
 
 		/* DEBUG
 		_context.fillStyle = 'rgba(0, 255, 255, 0.5)';
-		_context.fillRect(_clipRect.getX(), _clipRect.getY(), _clipRect.getWidth(), _clipRect.getHeight());
+		_context.fillRect( _clipRect.getX(), _clipRect.getY(), _clipRect.getWidth(), _clipRect.getHeight() );
 		*/
 
 		this.project( scene, camera );
@@ -69,11 +68,70 @@ THREE.CanvasRenderer = function () {
 
 			_bboxRect.empty();
 
-			_context.beginPath();
-
 			if ( element instanceof THREE.RenderableParticle ) {
 
 				v1x = element.x * _widthHalf; v1y = element.y * _heightHalf;
+
+				for ( m = 0, ml = element.material.length; m < ml; m++ ) {
+
+					material = element.material[ m ];
+
+					if ( material instanceof THREE.ParticleCircleMaterial ) {
+
+						width = element.scale.x * _widthHalf;
+						height = element.scale.y * _heightHalf;
+
+						_bboxRect.set( v1x - width, v1y - height, v1x + width, v1y + height );
+
+						if ( !_clipRect.instersects( _bboxRect ) ) {
+
+							continue;
+
+						}
+
+						_context.save();
+						_context.translate( v1x, v1y );
+						_context.rotate( - element.rotation );
+						_context.scale( width, height );
+
+						_context.beginPath();
+						_context.arc( 0, 0, 1, 0, pi2, true );
+						_context.closePath();
+
+						_context.fillStyle = material.color.__styleString;
+						_context.fill();
+
+						_context.restore();
+
+					} else if ( material instanceof THREE.ParticleBitmapMaterial ) {
+
+						bitmap = material.bitmap;
+						bitmapWidth = bitmap.width / 2;
+						bitmapHeight = bitmap.height / 2;
+
+						width = element.scale.x * _widthHalf * bitmapWidth;
+						height = element.scale.y * _heightHalf * bitmapHeight;
+
+						_bboxRect.set( v1x - width, v1y - height, v1x + width, v1y + height );
+
+						if ( !_clipRect.instersects( _bboxRect ) ) {
+
+							continue;
+
+						}
+
+						_context.save();
+						_context.translate( v1x - width, v1y + height );
+						_context.rotate( - element.rotation );
+						_context.scale( element.scale.x * _widthHalf, - ( element.scale.y * _heightHalf ) );
+
+						_context.drawImage( bitmap, 0, 0 );
+
+						_context.restore();
+
+					}
+
+				}
 
 			} else if ( element instanceof THREE.RenderableLine ) {
 
@@ -89,8 +147,29 @@ THREE.CanvasRenderer = function () {
 
 				}
 
+				_context.beginPath();
 				_context.moveTo( v1x, v1y );
 				_context.lineTo( v2x, v2y );
+				_context.closePath();
+
+				for ( m = 0, ml = element.material.length; m < ml; m++ ) {
+
+					material = element.material[ m ];
+
+					if ( material instanceof THREE.LineColorMaterial ) {
+
+						_context.lineWidth = material.lineWidth;
+						_context.lineJoin = "round";
+						_context.lineCap = "round";
+
+						_context.strokeStyle = material.color.__styleString;
+						_context.stroke();
+
+						_bboxRect.inflate( _context.lineWidth );
+
+					}
+
+				}
 
 			} else if ( element instanceof THREE.RenderableFace3 ) {
 
@@ -120,10 +199,108 @@ THREE.CanvasRenderer = function () {
 
 				}
 
-				_context.moveTo( v1x, v1y );
-				_context.lineTo( v2x, v2y );
-				_context.lineTo( v3x, v3y );
-				_context.lineTo( v1x, v1y );
+				for ( m = 0, ml = element.material.length; m < ml; m++ ) {
+
+					material = element.material[ m ];
+
+					if ( material instanceof THREE.MeshColorFillMaterial ) {
+
+						_context.beginPath();
+						_context.moveTo( v1x, v1y );
+						_context.lineTo( v2x, v2y );
+						_context.lineTo( v3x, v3y );
+						_context.lineTo( v1x, v1y );
+						_context.closePath();
+
+						_context.fillStyle = material.color.__styleString;
+						_context.fill();
+
+					} else if ( material instanceof THREE.MeshColorStrokeMaterial ) {
+
+						_context.beginPath();
+						_context.moveTo( v1x, v1y );
+						_context.lineTo( v2x, v2y );
+						_context.lineTo( v3x, v3y );
+						_context.lineTo( v1x, v1y );
+						_context.closePath();
+
+						_context.lineWidth = material.lineWidth;
+						_context.lineJoin = "round";
+						_context.lineCap = "round";
+
+						_context.strokeStyle = material.color.__styleString;
+						_context.stroke();
+
+						_bboxRect.inflate( _context.lineWidth );
+
+					} else if ( material instanceof THREE.MeshFaceColorFillMaterial ) {
+
+						_context.beginPath();
+						_context.moveTo( v1x, v1y );
+						_context.lineTo( v2x, v2y );
+						_context.lineTo( v3x, v3y );
+						_context.lineTo( v1x, v1y );
+						_context.closePath();
+
+						_context.fillStyle = element.color.__styleString;
+						_context.fill();
+
+					} else if ( material instanceof THREE.MeshFaceColorStrokeMaterial ) {
+
+						_context.beginPath();
+						_context.moveTo( v1x, v1y );
+						_context.lineTo( v2x, v2y );
+						_context.lineTo( v3x, v3y );
+						_context.lineTo( v1x, v1y );
+						_context.closePath();
+
+						_context.lineWidth = material.lineWidth;
+						_context.lineJoin = "round";
+						_context.lineCap = "round";
+
+						_context.strokeStyle = element.color.__styleString;
+						_context.stroke();
+
+						_bboxRect.inflate( _context.lineWidth );
+
+
+					} else if ( material instanceof THREE.MeshBitmapUVMappingMaterial ) {
+
+						bitmap = material.bitmap;
+						bitmapWidth = bitmap.width;
+						bitmapHeight = bitmap.height;
+
+						uv1.copy( element.uvs[ 0 ] ); uv2.copy( element.uvs[ 1 ] ); uv3.copy( element.uvs[ 2 ] );
+						suv1.copy( uv1 ); suv2.copy( uv2 ); suv3.copy( uv3 );
+
+						suv1.x *= bitmapWidth; suv1.y *= bitmapHeight;
+						suv2.x *= bitmapWidth; suv2.y *= bitmapHeight;
+						suv3.x *= bitmapWidth; suv3.y *= bitmapHeight;
+
+						/*
+						if ( element.overdraw ) {
+
+							expand( suv1, suv2 );
+							expand( suv2, suv3 );
+							expand( suv3, suv1 );
+
+							suv1.x = ( uv1.x === 0 ) ? 1 : ( uv1.x === 1 ) ? suv1.x - 1 : suv1.x;
+							suv1.y = ( uv1.y === 0 ) ? 1 : ( uv1.y === 1 ) ? suv1.y - 1 : suv1.y;
+
+							suv2.x = ( uv2.x === 0 ) ? 1 : ( uv2.x === 1 ) ? suv2.x - 1 : suv2.x;
+							suv2.y = ( uv2.y === 0 ) ? 1 : ( uv2.y === 1 ) ? suv2.y - 1 : suv2.y;
+
+							suv3.x = ( uv3.x === 0 ) ? 1 : ( uv3.x === 1 ) ? suv3.x - 1 : suv3.x;
+							suv3.y = ( uv3.y === 0 ) ? 1 : ( uv3.y === 1 ) ? suv3.y - 1 : suv3.y;
+
+						}
+						*/
+
+						drawTexturedTriangle( bitmap, v1x, v1y, v2x, v2y, v3x, v3y, suv1.x, suv1.y, suv2.x, suv2.y, suv3.x, suv3.y );
+
+					}
+
+				}
 
 			} else if ( element instanceof THREE.RenderableFace4 ) {
 
@@ -157,164 +334,127 @@ THREE.CanvasRenderer = function () {
 
 				}
 
-				_context.moveTo( v1x, v1y );
-				_context.lineTo( v2x, v2y );
-				_context.lineTo( v3x, v3y );
-				_context.lineTo( v4x, v4y );
-				_context.lineTo( v1x, v1y );
+				for ( m = 0, ml = element.material.length; m < ml; m++ ) {
 
-			}
+					material = element.material[ m ];
 
-			_context.closePath();
+					if ( material instanceof THREE.MeshColorFillMaterial ) {
 
-			for ( m = 0, ml = element.material.length; m < ml; m++ ) {
+						_context.beginPath();
+						_context.moveTo( v1x, v1y );
+						_context.lineTo( v2x, v2y );
+						_context.lineTo( v3x, v3y );
+						_context.lineTo( v4x, v4y );
+						_context.lineTo( v1x, v1y );
+						_context.closePath();
 
-				material = element.material[ m ];
+						_context.fillStyle = material.color.__styleString;
+						_context.fill();
 
-				if ( material instanceof THREE.ParticleCircleMaterial ) {
 
-					width = element.scale.x * _widthHalf;
-					height = element.scale.y * _heightHalf;
+					} else if ( material instanceof THREE.MeshColorStrokeMaterial ) {
 
-					_bboxRect.set( v1x - width, v1y - height, v1x + width, v1y + height );
+						_context.beginPath();
+						_context.moveTo( v1x, v1y );
+						_context.lineTo( v2x, v2y );
+						_context.lineTo( v3x, v3y );
+						_context.lineTo( v4x, v4y );
+						_context.lineTo( v1x, v1y );
+						_context.closePath();
 
-					if ( !_clipRect.instersects( _bboxRect ) ) {
+						_context.lineWidth = material.lineWidth;
+						_context.lineJoin = "round";
+						_context.lineCap = "round";
 
-						continue;
+						_context.strokeStyle = material.color.__styleString;
+						_context.stroke();
 
-					}
+						_bboxRect.inflate( _context.lineWidth );
 
-					_context.save();
-					_context.translate( v1x, v1y );
-					_context.rotate( - element.rotation );
-					_context.scale( width, height );
-					_context.arc( 0, 0, 1, 0, pi2, true );
-					_context.restore();
+					} else if ( material instanceof THREE.MeshFaceColorFillMaterial ) {
 
-					_context.fillStyle = material.color.__styleString;
-					_context.fill();
+						_context.beginPath();
+						_context.moveTo( v1x, v1y );
+						_context.lineTo( v2x, v2y );
+						_context.lineTo( v3x, v3y );
+						_context.lineTo( v4x, v4y );
+						_context.lineTo( v1x, v1y );
+						_context.closePath();
 
-				} else if ( material instanceof THREE.ParticleBitmapMaterial ) {
+						_context.fillStyle = element.color.__styleString;
+						_context.fill();
 
-					bitmap = material.bitmap;
-					bitmapWidth = bitmap.width / 2;
-					bitmapHeight = bitmap.height / 2;
+					} else if ( material instanceof THREE.MeshFaceColorStrokeMaterial ) {
 
-					width = element.scale.x * _widthHalf * bitmapWidth;
-					height = element.scale.y * _heightHalf * bitmapHeight;
+						_context.beginPath();
+						_context.moveTo( v1x, v1y );
+						_context.lineTo( v2x, v2y );
+						_context.lineTo( v3x, v3y );
+						_context.lineTo( v4x, v4y );
+						_context.lineTo( v1x, v1y );
+						_context.closePath();
 
-					_bboxRect.set( v1x - width, v1y - height, v1x + width, v1y + height );
+						_context.lineWidth = material.lineWidth;
+						_context.lineJoin = "round";
+						_context.lineCap = "round";
 
-					if ( !_clipRect.instersects( _bboxRect ) ) {
+						_context.strokeStyle = element.color.__styleString;
+						_context.stroke();
 
-						continue;
+						_bboxRect.inflate( _context.lineWidth );
 
-					}
+					} else if ( material instanceof THREE.MeshBitmapUVMappingMaterial ) {
 
-					_context.save();
-					_context.translate( v1x - width, v1y + height );
-					_context.rotate( - element.rotation );
-					_context.scale( element.scale.x * _widthHalf, - ( element.scale.y * _heightHalf ) );
-					_context.drawImage( bitmap, 0, 0 );
-					_context.restore();
+						bitmap = material.bitmap;
+						bitmapWidth = bitmap.width;
+						bitmapHeight = bitmap.height;
 
-				} else if ( material instanceof THREE.ColorFillMaterial ) {
+						uv1.copy( element.uvs[ 0 ] ); uv2.copy( element.uvs[ 1 ] ); uv3.copy( element.uvs[ 2 ] ); uv4.copy( element.uvs[ 3 ] );
+						suv1.copy( uv1 ); suv2.copy( uv2 ); suv3.copy( uv3 );  suv4.copy( uv4 );
 
-					_context.fillStyle = material.color.__styleString;
-					_context.fill();
+						suv1.x *= bitmapWidth; suv1.y *= bitmapHeight;
+						suv2.x *= bitmapWidth; suv2.y *= bitmapHeight;
+						suv3.x *= bitmapWidth; suv3.y *= bitmapHeight;
+						suv4.x *= bitmapWidth; suv4.y *= bitmapHeight;
 
-				} else if ( material instanceof THREE.FaceColorFillMaterial ) {
+						/*
+						if ( element.overdraw ) {
 
-					_context.fillStyle = element.color.__styleString;
-					_context.fill();
+							expand( suv1, suv2 );
+							expand( suv2, suv3 );
+							expand( suv3, suv4 );
+							expand( suv4, suv1 );
 
-				} else if ( material instanceof THREE.ColorStrokeMaterial ) {
+							suv1.x = ( uv1.x === 0 ) ? 1 : ( uv1.x === 1 ) ? suv1.x - 1 : suv1.x;
+							suv1.y = ( uv1.y === 0 ) ? 1 : ( uv1.y === 1 ) ? suv1.y - 1 : suv1.y;
 
-					_context.lineWidth = material.lineWidth;
-					_context.lineJoin = "round";
-					_context.lineCap = "round";
+							suv2.x = ( uv2.x === 0 ) ? 1 : ( uv2.x === 1 ) ? suv2.x - 1 : suv2.x;
+							suv2.y = ( uv2.y === 0 ) ? 1 : ( uv2.y === 1 ) ? suv2.y - 1 : suv2.y;
 
-					_context.strokeStyle = material.color.__styleString;
-					_context.stroke();
+							suv3.x = ( uv3.x === 0 ) ? 1 : ( uv3.x === 1 ) ? suv3.x - 1 : suv3.x;
+							suv3.y = ( uv3.y === 0 ) ? 1 : ( uv3.y === 1 ) ? suv3.y - 1 : suv3.y;
 
-					_bboxRect.inflate( _context.lineWidth );
+							suv4.x = ( uv4.x === 0 ) ? 1 : ( uv4.x === 1 ) ? suv4.x - 1 : suv4.x;
+							suv4.y = ( uv4.y === 0 ) ? 1 : ( uv4.y === 1 ) ? suv4.y - 1 : suv4.y;
+						}
+						*/
 
-				} else if ( material instanceof THREE.FaceColorStrokeMaterial ) {
-
-					_context.lineWidth = material.lineWidth;
-					_context.lineJoin = "round";
-					_context.lineCap = "round";
-
-					_context.strokeStyle = element.color.__styleString;
-					_context.stroke();
-
-					_bboxRect.inflate( _context.lineWidth );
-
-				} else if ( material instanceof THREE.BitmapUVMappingMaterial ) {
-
-					bitmap = material.bitmap;
-					bitmapWidth = bitmap.width;
-					bitmapHeight = bitmap.height;
-
-					uv1.copy( element.uvs[ 0 ] ); uv2.copy( element.uvs[ 1 ] ); uv3.copy( element.uvs[ 2 ] );
-					suv1.copy( uv1 ); suv2.copy( uv2 ); suv3.copy( uv3 );
-
-					suv1.x *= bitmapWidth; suv1.y *= bitmapHeight;
-					suv2.x *= bitmapWidth; suv2.y *= bitmapHeight;
-					suv3.x *= bitmapWidth; suv3.y *= bitmapHeight;
-
-					if ( element.overdraw ) {
-
-						expand( suv1, suv2 );
-						expand( suv2, suv3 );
-						expand( suv3, suv1 );
-
-						suv1.x = ( uv1.x === 0 ) ? 1 : ( uv1.x === 1 ) ? suv1.x - 1 : suv1.x;
-						suv1.y = ( uv1.y === 0 ) ? 1 : ( uv1.y === 1 ) ? suv1.y - 1 : suv1.y;
-
-						suv2.x = ( uv2.x === 0 ) ? 1 : ( uv2.x === 1 ) ? suv2.x - 1 : suv2.x;
-						suv2.y = ( uv2.y === 0 ) ? 1 : ( uv2.y === 1 ) ? suv2.y - 1 : suv2.y;
-
-						suv3.x = ( uv3.x === 0 ) ? 1 : ( uv3.x === 1 ) ? suv3.x - 1 : suv3.x;
-						suv3.y = ( uv3.y === 0 ) ? 1 : ( uv3.y === 1 ) ? suv3.y - 1 : suv3.y;
+						drawTexturedTriangle( bitmap, v1x, v1y, v2x, v2y, v4x, v4y, suv1.x, suv1.y, suv2.x, suv2.y, suv4.x, suv4.y );
+						drawTexturedTriangle( bitmap, v2x, v2y, v3x, v3y, v4x, v4y, suv2.x, suv2.y, suv3.x, suv3.y, suv4.x, suv4.y );
 
 					}
-
-					suv1x = suv1.x; suv1y = suv1.y;
-					suv2x = suv2.x; suv2y = suv2.y;
-					suv3x = suv3.x; suv3y = suv3.y;
-
-					// Textured triangle drawing by Thatcher Ulrich.
-					// http://tulrich.com/geekstuff/canvas/jsgl.js
-
-					_context.save();
-					_context.clip();
-
-					denom = suv1x * ( suv3y - suv2y ) - suv2x * suv3y + suv3x * suv2y + ( suv2x - suv3x ) * suv1y;
-
-					m11 = - ( suv1y * (v3x - v2x ) - suv2y * v3x + suv3y * v2x + ( suv2y - suv3y ) * v1x ) / denom;
-					m12 = ( suv2y * v3y + suv1y * ( v2y - v3y ) - suv3y * v2y + ( suv3y - suv2y) * v1y ) / denom;
-					m21 = ( suv1x * ( v3x - v2x ) - suv2x * v3x + suv3x * v2x + ( suv2x - suv3x ) * v1x ) / denom;
-					m22 = - ( suv2x * v3y + suv1x * ( v2y - v3y ) - suv3x * v2y + ( suv3x - suv2x ) * v1y ) / denom;
-					dx = ( suv1x * ( suv3y * v2x - suv2y * v3x ) + suv1y * ( suv2x * v3x - suv3x * v2x ) + ( suv3x * suv2y - suv2x * suv3y ) * v1x ) / denom;
-					dy = ( suv1x * ( suv3y * v2y - suv2y * v3y ) + suv1y * ( suv2x * v3y - suv3x * v2y ) + ( suv3x * suv2y - suv2x * suv3y ) * v1y ) / denom;
-
-					_context.transform( m11, m12, m21, m22, dx, dy );
-
-					_context.drawImage( bitmap, 0, 0 );
-					_context.restore();
 
 				}
 
-				/* DEBUG
-				_context.lineWidth = 1;
-				_context.strokeStyle = 'rgba( 0, 255, 0, 0.5 )';
-				_context.strokeRect( _bboxRect.getX(), _bboxRect.getY(), _bboxRect.getWidth(), _bboxRect.getHeight() );
-				*/
-
-				_clearRect.addRectangle( _bboxRect );
-
 			}
+
+			/* DEBUG
+			_context.lineWidth = 1;
+			_context.strokeStyle = 'rgba( 0, 255, 0, 0.5 )';
+			_context.strokeRect( _bboxRect.getX(), _bboxRect.getY(), _bboxRect.getWidth(), _bboxRect.getHeight() );
+			*/
+
+			_clearRect.addRectangle( _bboxRect );
 
 		}
 
@@ -325,6 +465,39 @@ THREE.CanvasRenderer = function () {
 		*/
 
 	};
+
+	function drawTexturedTriangle( bitmap, v1x, v1y, v2x, v2y, v3x, v3y, suv1x, suv1y, suv2x, suv2y, suv3x, suv3y )  {
+
+		// Textured triangle drawing by Thatcher Ulrich.
+		// http://tulrich.com/geekstuff/canvas/jsgl.js
+
+		var denom, m11, m12, m21, m22, dx, dy;
+
+		_context.beginPath();
+		_context.moveTo( v1x, v1y );
+		_context.lineTo( v2x, v2y );
+		_context.lineTo( v3x, v3y );
+		_context.lineTo( v1x, v1y );
+		_context.closePath();
+
+		_context.save();
+		_context.clip();
+
+		denom = suv1x * ( suv3y - suv2y ) - suv2x * suv3y + suv3x * suv2y + ( suv2x - suv3x ) * suv1y;
+
+		m11 = - ( suv1y * (v3x - v2x ) - suv2y * v3x + suv3y * v2x + ( suv2y - suv3y ) * v1x ) / denom;
+		m12 = ( suv2y * v3y + suv1y * ( v2y - v3y ) - suv3y * v2y + ( suv3y - suv2y) * v1y ) / denom;
+		m21 = ( suv1x * ( v3x - v2x ) - suv2x * v3x + suv3x * v2x + ( suv2x - suv3x ) * v1x ) / denom;
+		m22 = - ( suv2x * v3y + suv1x * ( v2y - v3y ) - suv3x * v2y + ( suv3x - suv2x ) * v1y ) / denom;
+		dx = ( suv1x * ( suv3y * v2x - suv2y * v3x ) + suv1y * ( suv2x * v3x - suv3x * v2x ) + ( suv3x * suv2y - suv2x * suv3y ) * v1x ) / denom;
+		dy = ( suv1x * ( suv3y * v2y - suv2y * v3y ) + suv1y * ( suv2x * v3y - suv3x * v2y ) + ( suv3x * suv2y - suv2x * suv3y ) * v1y ) / denom;
+
+		_context.transform( m11, m12, m21, m22, dx, dy );
+
+		_context.drawImage( bitmap, 0, 0 );
+		_context.restore();
+
+	}
 
 	function expand( a, b ) {
 

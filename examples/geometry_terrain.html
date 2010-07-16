@@ -34,6 +34,7 @@
 		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - terrain demo. <a href="geometry_terrain.html">generate another</a></div> 
 
 		<script type="text/javascript" src="http://github.com/mrdoob/stats.js/raw/master/build/stats.js"></script>
+
 		<script type="text/javascript" src="../build/three.js"></script>
 
 		<script type="text/javascript" src="primitives/Plane.js"></script>
@@ -144,7 +145,7 @@
 
 				var heightMap = height( 1024, 1024 );
 				var textureMap = shadow( heightMap );
-				var material = new THREE.BitmapUVMappingMaterial( textureMap );
+				var material = new THREE.MeshBitmapUVMappingMaterial( textureMap );
 
 				var quality = 20;
 				var quality1 = quality + 1;

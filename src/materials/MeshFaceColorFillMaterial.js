@@ -2,11 +2,11 @@
  * @author mr.doob / http://mrdoob.com/
  */
 
-THREE.FaceColorFillMaterial = function () {
+THREE.MeshFaceColorFillMaterial = function () {
 
 	this.toString = function () {
 
-		return 'THREE.FaceColorFillMaterial ( )';
+		return 'THREE.MeshFaceColorFillMaterial ( )';
 
 	};
 

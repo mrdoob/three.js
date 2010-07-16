@@ -2,7 +2,7 @@
  * @author mr.doob / http://mrdoob.com/
  */
 
-THREE.ColorStrokeMaterial = function ( lineWidth, hex, opacity ) {
+THREE.MeshColorStrokeMaterial = function ( hex, opacity, lineWidth ) {
 
 	this.lineWidth = lineWidth || 1;
 
@@ -10,7 +10,7 @@ THREE.ColorStrokeMaterial = function ( lineWidth, hex, opacity ) {
 
 	this.toString = function () {
 
-		return 'THREE.ColorStrokeMaterial ( lineWidth: ' + this.lineWidth + ', color: ' + this.color + ' )';
+		return 'THREE.MeshColorStrokeMaterial ( lineWidth: ' + this.lineWidth + ', color: ' + this.color + ' )';
 
 	};
 

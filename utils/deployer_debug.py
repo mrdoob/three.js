@@ -3,7 +3,7 @@ import os
 
 # MERGER
 
-rev = 13
+rev = 14
 
 files = []
 files.append('Three.js')
@@ -19,14 +19,15 @@ files.append('core/Face4.js')
 files.append('core/Geometry.js')
 files.append('cameras/Camera.js')
 files.append('objects/Object3D.js')
-files.append('objects/Particle.js')
 files.append('objects/Line.js')
 files.append('objects/Mesh.js')
-files.append('materials/BitmapUVMappingMaterial.js')
-files.append('materials/ColorFillMaterial.js')
-files.append('materials/ColorStrokeMaterial.js')
-files.append('materials/FaceColorFillMaterial.js')
-files.append('materials/FaceColorStrokeMaterial.js')
+files.append('objects/Particle.js')
+files.append('materials/LineColorMaterial.js')
+files.append('materials/MeshBitmapUVMappingMaterial.js')
+files.append('materials/MeshColorFillMaterial.js')
+files.append('materials/MeshColorStrokeMaterial.js')
+files.append('materials/MeshFaceColorFillMaterial.js')
+files.append('materials/MeshFaceColorStrokeMaterial.js')
 files.append('materials/ParticleBitmapMaterial.js')
 files.append('materials/ParticleCircleMaterial.js')
 files.append('scenes/Scene.js')
