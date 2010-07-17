@@ -127,7 +127,7 @@ Thanks to the power of the internets (and github <3) these people have kindly he
 
 ### Change Log ###
 
-2010 07 17 - **r14** (32.162 kb)
+2010 07 17 - **r14** (32.004 kb)
 
 * Refactored `CanvasRenderer` (more duplicated code, but easier to handle)
 * `Face4` now supports `MeshBitmapUVMappingMaterial`

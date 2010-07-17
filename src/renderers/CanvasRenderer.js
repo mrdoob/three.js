@@ -46,7 +46,6 @@ THREE.CanvasRenderer = function () {
 		v1x, v1y, v2x, v2y, v3x, v3y, v4x, v4y, width, height,
 
 		uv1 = new THREE.Vector2(), uv2 = new THREE.Vector2(), uv3 = new THREE.Vector2(), uv4 = new THREE.Vector2(),
-		suv1 = new THREE.Vector2(), suv2 = new THREE.Vector2(), suv3 = new THREE.Vector2(), suv4 = new THREE.Vector2(),
 		bitmap, bitmapWidth, bitmapHeight;
 
 		if ( this.autoClear ) {
@@ -270,33 +269,15 @@ THREE.CanvasRenderer = function () {
 						bitmapWidth = bitmap.width;
 						bitmapHeight = bitmap.height;
 
-						uv1.copy( element.uvs[ 0 ] ); uv2.copy( element.uvs[ 1 ] ); uv3.copy( element.uvs[ 2 ] );
-						suv1.copy( uv1 ); suv2.copy( uv2 ); suv3.copy( uv3 );
+						uv1.copy( element.uvs[ 0 ] );
+						uv2.copy( element.uvs[ 1 ] );
+						uv3.copy( element.uvs[ 2 ] );
 
-						suv1.x *= bitmapWidth; suv1.y *= bitmapHeight;
-						suv2.x *= bitmapWidth; suv2.y *= bitmapHeight;
-						suv3.x *= bitmapWidth; suv3.y *= bitmapHeight;
+						uv1.x *= bitmapWidth; uv1.y *= bitmapHeight;
+						uv2.x *= bitmapWidth; uv2.y *= bitmapHeight;
+						uv3.x *= bitmapWidth; uv3.y *= bitmapHeight;
 
-						/*
-						if ( element.overdraw ) {
-
-							expand( suv1, suv2 );
-							expand( suv2, suv3 );
-							expand( suv3, suv1 );
-
-							suv1.x = ( uv1.x === 0 ) ? 1 : ( uv1.x === 1 ) ? suv1.x - 1 : suv1.x;
-							suv1.y = ( uv1.y === 0 ) ? 1 : ( uv1.y === 1 ) ? suv1.y - 1 : suv1.y;
-
-							suv2.x = ( uv2.x === 0 ) ? 1 : ( uv2.x === 1 ) ? suv2.x - 1 : suv2.x;
-							suv2.y = ( uv2.y === 0 ) ? 1 : ( uv2.y === 1 ) ? suv2.y - 1 : suv2.y;
-
-							suv3.x = ( uv3.x === 0 ) ? 1 : ( uv3.x === 1 ) ? suv3.x - 1 : suv3.x;
-							suv3.y = ( uv3.y === 0 ) ? 1 : ( uv3.y === 1 ) ? suv3.y - 1 : suv3.y;
-
-						}
-						*/
-
-						drawTexturedTriangle( bitmap, v1x, v1y, v2x, v2y, v3x, v3y, suv1.x, suv1.y, suv2.x, suv2.y, suv3.x, suv3.y );
+						drawTexturedTriangle( bitmap, v1x, v1y, v2x, v2y, v3x, v3y, uv1.x, uv1.y, uv2.x, uv2.y, uv3.x, uv3.y );
 
 					}
 
@@ -409,38 +390,18 @@ THREE.CanvasRenderer = function () {
 						bitmapWidth = bitmap.width;
 						bitmapHeight = bitmap.height;
 
-						uv1.copy( element.uvs[ 0 ] ); uv2.copy( element.uvs[ 1 ] ); uv3.copy( element.uvs[ 2 ] ); uv4.copy( element.uvs[ 3 ] );
-						suv1.copy( uv1 ); suv2.copy( uv2 ); suv3.copy( uv3 );  suv4.copy( uv4 );
+						uv1.copy( element.uvs[ 0 ] );
+						uv2.copy( element.uvs[ 1 ] );
+						uv3.copy( element.uvs[ 2 ] );
+						uv4.copy( element.uvs[ 3 ] );
 
-						suv1.x *= bitmapWidth; suv1.y *= bitmapHeight;
-						suv2.x *= bitmapWidth; suv2.y *= bitmapHeight;
-						suv3.x *= bitmapWidth; suv3.y *= bitmapHeight;
-						suv4.x *= bitmapWidth; suv4.y *= bitmapHeight;
+						uv1.x *= bitmapWidth; uv1.y *= bitmapHeight;
+						uv2.x *= bitmapWidth; uv2.y *= bitmapHeight;
+						uv3.x *= bitmapWidth; uv3.y *= bitmapHeight;
+						uv4.x *= bitmapWidth; uv4.y *= bitmapHeight;
 
-						/*
-						if ( element.overdraw ) {
-
-							expand( suv1, suv2 );
-							expand( suv2, suv3 );
-							expand( suv3, suv4 );
-							expand( suv4, suv1 );
-
-							suv1.x = ( uv1.x === 0 ) ? 1 : ( uv1.x === 1 ) ? suv1.x - 1 : suv1.x;
-							suv1.y = ( uv1.y === 0 ) ? 1 : ( uv1.y === 1 ) ? suv1.y - 1 : suv1.y;
-
-							suv2.x = ( uv2.x === 0 ) ? 1 : ( uv2.x === 1 ) ? suv2.x - 1 : suv2.x;
-							suv2.y = ( uv2.y === 0 ) ? 1 : ( uv2.y === 1 ) ? suv2.y - 1 : suv2.y;
-
-							suv3.x = ( uv3.x === 0 ) ? 1 : ( uv3.x === 1 ) ? suv3.x - 1 : suv3.x;
-							suv3.y = ( uv3.y === 0 ) ? 1 : ( uv3.y === 1 ) ? suv3.y - 1 : suv3.y;
-
-							suv4.x = ( uv4.x === 0 ) ? 1 : ( uv4.x === 1 ) ? suv4.x - 1 : suv4.x;
-							suv4.y = ( uv4.y === 0 ) ? 1 : ( uv4.y === 1 ) ? suv4.y - 1 : suv4.y;
-						}
-						*/
-
-						drawTexturedTriangle( bitmap, v1x, v1y, v2x, v2y, v4x, v4y, suv1.x, suv1.y, suv2.x, suv2.y, suv4.x, suv4.y );
-						drawTexturedTriangle( bitmap, v2x, v2y, v3x, v3y, v4x, v4y, suv2.x, suv2.y, suv3.x, suv3.y, suv4.x, suv4.y );
+						drawTexturedTriangle( bitmap, v1x, v1y, v2x, v2y, v4x, v4y, uv1.x, uv1.y, uv2.x, uv2.y, uv4.x, uv4.y );
+						drawTexturedTriangle( bitmap, v2x, v2y, v3x, v3y, v4x, v4y, uv2.x, uv2.y, uv3.x, uv3.y, uv4.x, uv4.y );
 
 					}
 
