@@ -86,7 +86,7 @@ def write(filename, scene, ob, \
     if EXPORT_NORMALS:
         for f in mesh.faces:
             if len(f.verts) == 3:
-                file.write('\tf3n( %d, %d, %d, %.6f, %.6f, %.6f );\n' % (f.verts[0], f.verts[1], f.verts[2], f.normal[0], f.normal[1], f.normal[2]))
+                file.write('\tf3( %d, %d, %d, %.6f, %.6f, %.6f );\n' % (f.verts[0], f.verts[1], f.verts[2], f.normal[0], f.normal[1], f.normal[2]))
             else:
                 file.write('\tf4( %d, %d, %d, %d, %.6f, %.6f, %.6f );\n' % (f.verts[0], f.verts[1], f.verts[2], f.verts[3], f.normal[0], f.normal[1], f.normal[2]))
 
