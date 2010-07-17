@@ -70,7 +70,7 @@ def write(filename, scene, ob, \
             active_col_layer = active_col_layer.data
 
     # incase
-    color = uvcoord = uvcoord_key = normal = normal_key = None      
+    color = uvcoord = uvcoord_key = normal = normal_key = None
 
     file.write('var %s = function () {\n\n' % classname)
 
@@ -82,24 +82,23 @@ def write(filename, scene, ob, \
         file.write('\tv( %.6f, %.6f, %.6f );\n' % (v.co.x, v.co.z, -v.co.y)) # co
 
     file.write('\n')
-    
+
     if EXPORT_NORMALS:
         for f in mesh.faces:
             if len(f.verts) == 3:
                 file.write('\tf3n( %d, %d, %d, %.6f, %.6f, %.6f );\n' % (f.verts[0], f.verts[1], f.verts[2], f.normal[0], f.normal[1], f.normal[2]))
             else:
-                file.write('\tf3n( %d, %d, %d, %.6f, %.6f, %.6f );\n' % (f.verts[3], f.verts[1], f.verts[2], f.normal[0], f.normal[1], f.normal[2]))
-                file.write('\tf3n( %d, %d, %d, %.6f, %.6f, %.6f );\n' % (f.verts[1], f.verts[3], f.verts[0], f.normal[0], f.normal[1], f.normal[2]))
+                file.write('\tf4( %d, %d, %d, %d, %.6f, %.6f, %.6f );\n' % (f.verts[0], f.verts[1], f.verts[2], f.verts[3], f.normal[0], f.normal[1], f.normal[2]))
+
     else:
         for f in mesh.faces:
             if len(f.verts) == 3:
                 file.write('\tf3( %d, %d, %d );\n' % (f.verts[0], f.verts[1], f.verts[2]))
             else:
-                file.write('\tf3( %d, %d, %d );\n' % (f.verts[2], f.verts[1], f.verts[3]))
-                file.write('\tf3( %d, %d, %d );\n' % (f.verts[0], f.verts[3], f.verts[1]))
-               
+                file.write('\tf4( %d, %d, %d, %d );\n' % (f.verts[0], f.verts[1], f.verts[2], f.verts[3]))
+
     face_index_pairs = [ (face, index) for index, face in enumerate(mesh.faces)]
-            
+
     if EXPORT_UV:
         file.write('\n')
         for f, f_index in face_index_pairs:
@@ -107,29 +106,29 @@ def write(filename, scene, ob, \
             if len(f.verts) == 3:
                 file.write('\tuv( %.6f, %.6f, %.6f, %.6f, %.6f, %.6f );\n' % (tface.uv1[0], 1.0-tface.uv1[1], tface.uv2[0], 1.0-tface.uv2[1], tface.uv3[0], 1.0-tface.uv3[1]))
             else:
-                file.write('\tuv( %.6f, %.6f, %.6f, %.6f, %.6f, %.6f );\n' % (tface.uv4[0], 1.0-tface.uv4[1], tface.uv2[0], 1.0-tface.uv2[1], tface.uv3[0], 1.0-tface.uv3[1]))
-                file.write('\tuv( %.6f, %.6f, %.6f, %.6f, %.6f, %.6f );\n' % (tface.uv2[0], 1.0-tface.uv2[1], tface.uv4[0], 1.0-tface.uv4[1], tface.uv1[0], 1.0-tface.uv1[1]))
-            
+                file.write('\tuv( %.6f, %.6f, %.6f, %.6f, %.6f, %.6f, %.6f, %.6f );\n' % (tface.uv1[0], 1.0-tface.uv1[1], tface.uv2[0], 1.0-tface.uv2[1], tface.uv3[0], 1.0-tface.uv3[1], tface.uv4[0], 1.0-tface.uv4[1]))
+
     file.write('\n')
 
     file.write('\tfunction v( x, y, z ) {\n\n')
     file.write('\t\tscope.vertices.push( new THREE.Vertex( new THREE.Vector3( x, y, z ) ) );\n\n')
     file.write('\t}\n\n')
 
-    file.write('\tfunction f3( a, b, c ) {\n\n')
-    file.write('\t\tscope.faces.push( new THREE.Face3( a, b, c ) );\n\n')
+    file.write('\tfunction f3( a, b, c, nx, ny, nz ) {\n\n')
+    file.write('\t\tscope.faces.push( new THREE.Face3( a, b, c, nx && ny && nz ? new THREE.Vector3( nx, ny, nz ) : null ) );\n\n')
     file.write('\t}\n\n')
 
-    file.write('\tfunction f3n( a, b, c, nx, ny, nz ) {\n\n')
-    file.write('\t\tscope.faces.push( new THREE.Face3( a, b, c, new THREE.Vector3( nx, ny, nz ) ) );\n\n')
+    file.write('\tfunction f4( a, b, c, d, nx, ny, nz ) {\n\n')
+    file.write('\t\tscope.faces.push( new THREE.Face4( a, b, c, d, nx && ny && nz ? new THREE.Vector3( nx, ny, nz ) : null ) );\n\n')
     file.write('\t}\n\n')
 
-    file.write('\tfunction uv( u1, v1, u2, v2, u3, v3 ) {\n\n')
-    file.write('\t\tscope.uvs.push( [ \n\n')
-    file.write('\t\t\t new THREE.Vector2( u1, v1 ), \n')
-    file.write('\t\t\t new THREE.Vector2( u2, v2 ), \n')
-    file.write('\t\t\t new THREE.Vector2( u3, v3 ) \n')
-    file.write('\t\t]);\n')
+    file.write('\tfunction uv( u1, v1, u2, v2, u3, v3, u4, v4 ) {\n\n')
+    file.write('\t\tvar uv = [];\n')
+    file.write('\t\tuv.push( new THREE.UV( u1, v1 ) );\n')
+    file.write('\t\tuv.push( new THREE.UV( u2, v2 ) );\n')
+    file.write('\t\tuv.push( new THREE.UV( u3, v3 ) );\n')
+    file.write('\t\tif ( u4 && v4 ) uv.push( new THREE.UV( u4, v4 ) );\n')
+    file.write('\t\tscope.uvs.push( uv );\n')
     file.write('\t}\n\n')
 
     file.write('}\n\n')

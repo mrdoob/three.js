@@ -42,10 +42,10 @@ var Plane = function ( width, height, segments_width, segments_height ) {
 
 			this.faces.push( new THREE.Face4( a, b, c, d ) );
 			this.uvs.push( [
-						new THREE.Vector2( ix / gridX, iy / gridY ),
-						new THREE.Vector2( ix / gridX, ( iy + 1 ) / gridY ),
-						new THREE.Vector2( ( ix + 1 ) / gridX, ( iy + 1 ) / gridY ),
-						new THREE.Vector2( ( ix + 1 ) / gridX, iy / gridY )
+						new THREE.UV( ix / gridX, iy / gridY ),
+						new THREE.UV( ix / gridX, ( iy + 1 ) / gridY ),
+						new THREE.UV( ( ix + 1 ) / gridX, ( iy + 1 ) / gridY ),
+						new THREE.UV( ( ix + 1 ) / gridX, iy / gridY )
 					] );
 
 		}

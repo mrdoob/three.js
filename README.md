@@ -35,7 +35,7 @@ Other similar projects: [pre3d](http://deanm.github.com/pre3d/), [pvjs](http://c
 
 ### Usage ###
 
-Download the [compressed library](http://github.com/mrdoob/three.js/raw/master/build/three.js) and include it in your html.
+Download the [minified library](http://github.com/mrdoob/three.js/raw/master/build/three.js) and include it in your html.
 
 	<script type="text/javascript" src="js/three.js"></script>
 
@@ -93,6 +93,7 @@ For creating a customised version of the library, including the source files in 
 	<script type="text/javascript" src="js/three/core/Vertex.js"></script>
 	<script type="text/javascript" src="js/three/core/Face3.js"></script>
 	<script type="text/javascript" src="js/three/core/Face4.js"></script>
+	<script type="text/javascript" src="js/three/core/UV.js"></script>
 	<script type="text/javascript" src="js/three/core/Geometry.js"></script>
 	<script type="text/javascript" src="js/three/cameras/Camera.js"></script>
 	<script type="text/javascript" src="js/three/objects/Object3D.js"></script>
@@ -127,7 +128,7 @@ Thanks to the power of the internets (and github <3) these people have kindly he
 
 ### Change Log ###
 
-2010 07 17 - **r14** (32.004 kb)
+2010 07 17 - **r14** (32.093 kb)
 
 * Refactored `CanvasRenderer` (more duplicated code, but easier to handle)
 * `Face4` now supports `MeshBitmapUVMappingMaterial`
@@ -139,6 +140,7 @@ Thanks to the power of the internets (and github <3) these people have kindly he
 * `FaceColorStrokeMaterial` > `MeshFaceColorStrokeMaterial`
 * `ColorStrokeMaterial` > `LineColorMaterial`
 * `Rectangle.instersects` returned false with rectangles with 0px witdh or height
+* Using new object `UV` instead of `Vector2` where it should be used
 
 
 2010 07 12 - **r13** (29.492 kb)
@@ -162,7 +164,6 @@ Thanks to the power of the internets (and github <3) these people have kindly he
 * Blender 2.5 exporter (utils/export_threejs.py) now exports UV and normals (Thx [kikko](http://github.com/kikko))
 * `Scene.add` > `Scene.addObject`
 * Enabled `Scene.removeObject`
-* Removed `computeNormals()` from `Geometry`
 
 
 2010 06 22 - **r10** (23.959 kb)

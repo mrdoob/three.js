@@ -45,7 +45,7 @@ THREE.CanvasRenderer = function () {
 		var e, el, m, ml, element, material, pi2 = Math.PI * 2,
 		v1x, v1y, v2x, v2y, v3x, v3y, v4x, v4y, width, height,
 
-		uv1 = new THREE.Vector2(), uv2 = new THREE.Vector2(), uv3 = new THREE.Vector2(), uv4 = new THREE.Vector2(),
+		uv1 = new THREE.UV(), uv2 = new THREE.UV(), uv3 = new THREE.UV(), uv4 = new THREE.UV(),
 		bitmap, bitmapWidth, bitmapHeight;
 
 		if ( this.autoClear ) {
@@ -273,11 +273,11 @@ THREE.CanvasRenderer = function () {
 						uv2.copy( element.uvs[ 1 ] );
 						uv3.copy( element.uvs[ 2 ] );
 
-						uv1.x *= bitmapWidth; uv1.y *= bitmapHeight;
-						uv2.x *= bitmapWidth; uv2.y *= bitmapHeight;
-						uv3.x *= bitmapWidth; uv3.y *= bitmapHeight;
+						uv1.u *= bitmapWidth; uv1.v *= bitmapHeight;
+						uv2.u *= bitmapWidth; uv2.v *= bitmapHeight;
+						uv3.u *= bitmapWidth; uv3.v *= bitmapHeight;
 
-						drawTexturedTriangle( bitmap, v1x, v1y, v2x, v2y, v3x, v3y, uv1.x, uv1.y, uv2.x, uv2.y, uv3.x, uv3.y );
+						drawTexturedTriangle( bitmap, v1x, v1y, v2x, v2y, v3x, v3y, uv1.u, uv1.v, uv2.u, uv2.v, uv3.u, uv3.v );
 
 					}
 
@@ -395,13 +395,13 @@ THREE.CanvasRenderer = function () {
 						uv3.copy( element.uvs[ 2 ] );
 						uv4.copy( element.uvs[ 3 ] );
 
-						uv1.x *= bitmapWidth; uv1.y *= bitmapHeight;
-						uv2.x *= bitmapWidth; uv2.y *= bitmapHeight;
-						uv3.x *= bitmapWidth; uv3.y *= bitmapHeight;
-						uv4.x *= bitmapWidth; uv4.y *= bitmapHeight;
+						uv1.u *= bitmapWidth; uv1.v *= bitmapHeight;
+						uv2.u *= bitmapWidth; uv2.v *= bitmapHeight;
+						uv3.u *= bitmapWidth; uv3.v *= bitmapHeight;
+						uv4.u *= bitmapWidth; uv4.v *= bitmapHeight;
 
-						drawTexturedTriangle( bitmap, v1x, v1y, v2x, v2y, v4x, v4y, uv1.x, uv1.y, uv2.x, uv2.y, uv4.x, uv4.y );
-						drawTexturedTriangle( bitmap, v2x, v2y, v3x, v3y, v4x, v4y, uv2.x, uv2.y, uv3.x, uv3.y, uv4.x, uv4.y );
+						drawTexturedTriangle( bitmap, v1x, v1y, v2x, v2y, v4x, v4y, uv1.u, uv1.v, uv2.u, uv2.v, uv4.u, uv4.v );
+						drawTexturedTriangle( bitmap, v2x, v2y, v3x, v3y, v4x, v4y, uv2.u, uv2.v, uv3.u, uv3.v, uv4.u, uv4.v );
 
 					}
 
@@ -427,7 +427,7 @@ THREE.CanvasRenderer = function () {
 
 	};
 
-	function drawTexturedTriangle( bitmap, v1x, v1y, v2x, v2y, v3x, v3y, suv1x, suv1y, suv2x, suv2y, suv3x, suv3y )  {
+	function drawTexturedTriangle( bitmap, v1x, v1y, v2x, v2y, v3x, v3y, uv1u, uv1v, uv2u, uv2v, uv3u, uv3v )  {
 
 		// Textured triangle drawing by Thatcher Ulrich.
 		// http://tulrich.com/geekstuff/canvas/jsgl.js
@@ -444,14 +444,14 @@ THREE.CanvasRenderer = function () {
 		_context.save();
 		_context.clip();
 
-		denom = suv1x * ( suv3y - suv2y ) - suv2x * suv3y + suv3x * suv2y + ( suv2x - suv3x ) * suv1y;
+		denom = uv1u * ( uv3v - uv2v ) - uv2u * uv3v + uv3u * uv2v + ( uv2u - uv3u ) * uv1v;
 
-		m11 = - ( suv1y * (v3x - v2x ) - suv2y * v3x + suv3y * v2x + ( suv2y - suv3y ) * v1x ) / denom;
-		m12 = ( suv2y * v3y + suv1y * ( v2y - v3y ) - suv3y * v2y + ( suv3y - suv2y) * v1y ) / denom;
-		m21 = ( suv1x * ( v3x - v2x ) - suv2x * v3x + suv3x * v2x + ( suv2x - suv3x ) * v1x ) / denom;
-		m22 = - ( suv2x * v3y + suv1x * ( v2y - v3y ) - suv3x * v2y + ( suv3x - suv2x ) * v1y ) / denom;
-		dx = ( suv1x * ( suv3y * v2x - suv2y * v3x ) + suv1y * ( suv2x * v3x - suv3x * v2x ) + ( suv3x * suv2y - suv2x * suv3y ) * v1x ) / denom;
-		dy = ( suv1x * ( suv3y * v2y - suv2y * v3y ) + suv1y * ( suv2x * v3y - suv3x * v2y ) + ( suv3x * suv2y - suv2x * suv3y ) * v1y ) / denom;
+		m11 = - ( uv1v * (v3x - v2x ) - uv2v * v3x + uv3v * v2x + ( uv2v - uv3v ) * v1x ) / denom;
+		m12 = ( uv2v * v3y + uv1v * ( v2y - v3y ) - uv3v * v2y + ( uv3v - uv2v) * v1y ) / denom;
+		m21 = ( uv1u * ( v3x - v2x ) - uv2u * v3x + uv3u * v2x + ( uv2u - uv3u ) * v1x ) / denom;
+		m22 = - ( uv2u * v3y + uv1u * ( v2y - v3y ) - uv3u * v2y + ( uv3u - uv2u ) * v1y ) / denom;
+		dx = ( uv1u * ( uv3v * v2x - uv2v * v3x ) + uv1v * ( uv2u * v3x - uv3u * v2x ) + ( uv3u * uv2v - uv2u * uv3v ) * v1x ) / denom;
+		dy = ( uv1u * ( uv3v * v2y - uv2v * v3y ) + uv1v * ( uv2u * v3y - uv3u * v2y ) + ( uv3u * uv2v - uv2u * uv3v ) * v1y ) / denom;
 
 		_context.transform( m11, m12, m21, m22, dx, dy );
 
