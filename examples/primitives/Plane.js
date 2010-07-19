@@ -1,13 +1,13 @@
 /**
  * @author mr.doob / http://mrdoob.com/
- * based on Papervision3D's Plane.as
+ * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Plane.as
  */
 
 var Plane = function ( width, height, segments_width, segments_height ) {
 
 	THREE.Geometry.call( this );
 
-	var scope = this,
+	var ix, iy,
 	width_half = width / 2,
 	height_half = height / 2,
 	gridX = segments_width || 1,
@@ -18,9 +18,9 @@ var Plane = function ( width, height, segments_width, segments_height ) {
 	segment_height = height / gridY;
 
 
-	for( var iy = 0; iy < gridY1; iy++ ) {
+	for( iy = 0; iy < gridY1; iy++ ) {
 
-		for( var ix = 0; ix < gridX1; ix++ ) {
+		for( ix = 0; ix < gridX1; ix++ ) {
 
 			var x = ix * segment_width - width_half;
 			var y = iy * segment_height - height_half;

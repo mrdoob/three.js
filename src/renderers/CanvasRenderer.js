@@ -269,6 +269,25 @@ THREE.CanvasRenderer = function () {
 						bitmapWidth = bitmap.width;
 						bitmapHeight = bitmap.height;
 
+						/* DEBUG
+						if ( !element.uvs[ 0 ] || !element.uvs[ 1 ] || !element.uvs[ 2 ]) {
+
+							_context.beginPath();
+							_context.moveTo( v1x, v1y );
+							_context.lineTo( v2x, v2y );
+							_context.lineTo( v3x, v3y );
+							_context.lineTo( v4x, v4y );
+							_context.lineTo( v1x, v1y );
+							_context.closePath();
+
+							_context.fillStyle = 'rgb(0, 255, 0)';
+							_context.fill();
+
+							continue;
+
+						}
+						*/
+
 						uv1.copy( element.uvs[ 0 ] );
 						uv2.copy( element.uvs[ 1 ] );
 						uv3.copy( element.uvs[ 2 ] );
@@ -390,6 +409,25 @@ THREE.CanvasRenderer = function () {
 						bitmapWidth = bitmap.width;
 						bitmapHeight = bitmap.height;
 
+						/* DEBUG
+						if ( !element.uvs[ 0 ] || !element.uvs[ 1 ] || !element.uvs[ 2 ] || !element.uvs[ 3 ]) {
+
+							_context.beginPath();
+							_context.moveTo( v1x, v1y );
+							_context.lineTo( v2x, v2y );
+							_context.lineTo( v3x, v3y );
+							_context.lineTo( v4x, v4y );
+							_context.lineTo( v1x, v1y );
+							_context.closePath();
+
+							_context.fillStyle = 'rgb(255, 0, 255)';
+							_context.fill();
+
+							continue;
+
+						}
+						*/
+
 						uv1.copy( element.uvs[ 0 ] );
 						uv2.copy( element.uvs[ 1 ] );
 						uv3.copy( element.uvs[ 2 ] );
@@ -409,7 +447,7 @@ THREE.CanvasRenderer = function () {
 
 			}
 
-			/* DEBUG
+			/*
 			_context.lineWidth = 1;
 			_context.strokeStyle = 'rgba( 0, 255, 0, 0.5 )';
 			_context.strokeRect( _bboxRect.getX(), _bboxRect.getY(), _bboxRect.getWidth(), _bboxRect.getHeight() );
