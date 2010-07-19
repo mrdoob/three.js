@@ -12,7 +12,6 @@ THREE.Object3D = function ( material ) {
 	this.screen = new THREE.Vector3();
 
 	this.material = material instanceof Array ? material : [ material ];
-	this.overdraw = false;
 
 	this.autoUpdateMatrix = true;
 

@@ -74,9 +74,10 @@ THREE.Renderer = function() {
 						v2 = object.geometry.vertices[ face.b ];
 						v3 = object.geometry.vertices[ face.c ];
 
-						if ( v1.__visible && v2.__visible && v3.__visible && ( object.doubleSided ||
+						if ( v1.__visible && v2.__visible && v3.__visible &&
+						   ( object.doubleSided || ( object.flipSided !=
 						   ( v3.screen.x - v1.screen.x ) * ( v2.screen.y - v1.screen.y ) -
-						   ( v3.screen.y - v1.screen.y ) * ( v2.screen.x - v1.screen.x ) < 0 ) ) {
+						   ( v3.screen.y - v1.screen.y ) * ( v2.screen.x - v1.screen.x ) < 0 ) ) ) {
 
 							if ( !face3Pool[ face3count ] ) {
 
@@ -106,11 +107,12 @@ THREE.Renderer = function() {
 						v3 = object.geometry.vertices[ face.c ];
 						v4 = object.geometry.vertices[ face.d ];
 
-						if ( v1.__visible && v2.__visible && v3.__visible && v4.__visible && (object.doubleSided ||
+						if ( v1.__visible && v2.__visible && v3.__visible && v4.__visible &&
+						   ( object.doubleSided || ( object.flipSided !=
 						   ( ( v4.screen.x - v1.screen.x ) * ( v2.screen.y - v1.screen.y ) -
 						   ( v4.screen.y - v1.screen.y ) * ( v2.screen.x - v1.screen.x ) < 0 ||
 						   ( v2.screen.x - v3.screen.x ) * ( v4.screen.y - v3.screen.y ) -
-						   ( v2.screen.y - v3.screen.y ) * ( v4.screen.x - v3.screen.x ) < 0 ) ) ) {
+						   ( v2.screen.y - v3.screen.y ) * ( v4.screen.x - v3.screen.x ) < 0 ) ) ) ) {
 
 							if ( !face4Pool[ face4count ] ) {
 

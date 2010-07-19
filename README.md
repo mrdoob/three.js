@@ -129,7 +129,7 @@ Thanks to the power of the internets (and github <3) these people have kindly he
 
 ### Change Log ###
 
-2010 07 17 - **r14** (32.093 kb)
+2010 07 17 - **r14** (32.144 kb)
 
 * Refactored `CanvasRenderer` (more duplicated code, but easier to handle)
 * `Face4` now supports `MeshBitmapUVMappingMaterial`
@@ -142,6 +142,7 @@ Thanks to the power of the internets (and github <3) these people have kindly he
 * `ColorStrokeMaterial` > `LineColorMaterial`
 * `Rectangle.instersects` returned false with rectangles with 0px witdh or height
 * Using new object `UV` instead of `Vector2` where it should be used
+* Added Mesh.flipSided boolean (false by default)
 
 
 2010 07 12 - **r13** (29.492 kb)

@@ -8,7 +8,10 @@ THREE.Mesh = function ( geometry, material ) {
 
 	this.geometry = geometry;
 
+	this.flipSided = false;
 	this.doubleSided = false;
+
+	this.overdraw = false;
 
 };
 
