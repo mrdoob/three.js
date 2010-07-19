@@ -15,6 +15,7 @@ Other similar projects: [pre3d](http://deanm.github.com/pre3d/), [pvjs](http://c
 
 ### Examples ###
 
+[![geometry_earth](http://github.com/mrdoob/three.js/raw/master/assets/examples/07_earth.png)](http://mrdoob.com/projects/three.js/examples/geometry_earth.html)
 [![geometry_terrain](http://github.com/mrdoob/three.js/raw/master/assets/examples/06_terrain.png)](http://mrdoob.com/projects/three.js/examples/geometry_terrain.html)
 [![materials_video](http://github.com/mrdoob/three.js/raw/master/assets/examples/05_video.png)](http://mrdoob.com/projects/three.js/examples/materials_video.html)
 [![geometry_vr](http://github.com/mrdoob/three.js/raw/master/assets/examples/04_vr.png)](http://mrdoob.com/projects/three.js/examples/geometry_vr.html)
