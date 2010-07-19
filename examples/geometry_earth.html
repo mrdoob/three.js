@@ -5,12 +5,12 @@
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
-				color: #ffffff;
+				color: #808080;
 				font-family:Monospace;
 				font-size:13px;
 				text-align:center;
 
-				background-color: #000000;
+				background-color: #ffffff;
 				margin: 0px;
 				overflow: hidden;
 			}
@@ -37,6 +37,7 @@
 
 		<script type="text/javascript" src="../build/three.js"></script>
 
+		<script type="text/javascript" src="primitives/Plane.js"></script>
 		<script type="text/javascript" src="primitives/Sphere.js"></script>
 
 		<script type="text/javascript">
@@ -69,8 +70,13 @@
 
 				scene = new THREE.Scene();
 
+				mesh = new THREE.Mesh( new Plane( 300, 300, 3, 3 ), loadImage( 'textures/shadow.png' ) );
+				mesh.position.y = - 250;
+				mesh.rotation.x = - 90 * Math.PI / 180;
+				scene.addObject(mesh);
+
 				mesh = new THREE.Mesh( new Sphere( 200, 20, 20 ), loadImage( 'textures/land_ocean_ice_cloud_2048.jpg' ) );
-				scene.add(mesh);
+				scene.addObject(mesh);
 
 				renderer = new THREE.CanvasRenderer();
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
