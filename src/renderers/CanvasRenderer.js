@@ -266,8 +266,8 @@ THREE.CanvasRenderer = function () {
 					} else if ( material instanceof THREE.MeshBitmapUVMappingMaterial ) {
 
 						bitmap = material.bitmap;
-						bitmapWidth = bitmap.width;
-						bitmapHeight = bitmap.height;
+						bitmapWidth = bitmap.width - 1;
+						bitmapHeight = bitmap.height - 1;
 
 						/* DEBUG
 						if ( !element.uvs[ 0 ] || !element.uvs[ 1 ] || !element.uvs[ 2 ]) {
@@ -406,8 +406,8 @@ THREE.CanvasRenderer = function () {
 					} else if ( material instanceof THREE.MeshBitmapUVMappingMaterial ) {
 
 						bitmap = material.bitmap;
-						bitmapWidth = bitmap.width;
-						bitmapHeight = bitmap.height;
+						bitmapWidth = bitmap.width - 1;
+						bitmapHeight = bitmap.height - 1;
 
 						/* DEBUG
 						if ( !element.uvs[ 0 ] || !element.uvs[ 1 ] || !element.uvs[ 2 ] || !element.uvs[ 3 ]) {
