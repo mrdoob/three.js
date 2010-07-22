@@ -16,6 +16,12 @@ THREE.UV.prototype = {
 		this.u = uv.u;
 		this.v = uv.v;
 
+	},
+
+	toString: function () {
+
+		return 'THREE.UV (' + this.u + ', ' + this.v + ')';
+
 	}
 
 }

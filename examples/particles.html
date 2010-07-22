@@ -19,6 +19,7 @@
 	<body>
 
 		<script type="text/javascript" src="http://github.com/mrdoob/stats.js/raw/master/build/stats.js"></script>
+		<script type="text/javascript" src="http://github.com/mrdoob/tween.js/raw/master/build/tween.js"></script>
 
 		<script type="text/javascript" src="../build/three.js"></script>
 
@@ -30,7 +31,7 @@
 			var stats;
 			var container;
 
-			var particle;
+			var particles, particle;
 
 			var camera;
 			var scene;
@@ -70,16 +71,24 @@
 				}
 
 				var material = loadTexture( 'textures/Tree_01.png' );
+				material.offset.y = 219;
+
+				particles = [];
 
 				for (var i = 0; i < 10; i++) {
 
-					particle = new THREE.Particle( material );
+					particles[ i ] = particle = new THREE.Particle( material );
 					particle.position.x = Math.random() * 2000 - 1000;
 					// particle.position.y = Math.random() * 2000 - 1000;
 					particle.position.z = Math.random() * 2000 - 1000;
 					// particle.rotation.z = 90 * Math.PI / 180;
-					// particle.scale.x = particle.scale.y = Math.random();
+					particle.scale.x = particle.scale.y = Math.random();
+					// particle.scale.y = 0;
 					scene.add(particle);
+
+					// new TWEEN.Tween( particle.rotation ).to( 1, { z: Math.random() + 1 } );
+					new TWEEN.Tween( particle.scale ).to( 1, { x: Math.random() + 1, y: Math.random() + 1 } );
+
 				}
 
 				container.appendChild(renderer.domElement);
@@ -145,8 +154,18 @@
 
 			function loop() {
 
+				TWEEN_MANAGER.update();
+
 				camera.position.x += (mouseX - camera.position.x) * .05;
 				camera.position.y += (-mouseY - camera.position.y) * .05;
+
+				/*
+				for ( var i = 0, l = particles.length; i < l; i ++ ) {
+
+					particles[ i ].rotation.z += 0.01;
+
+				}
+				*/
 
 				renderer.render(scene, camera);
 

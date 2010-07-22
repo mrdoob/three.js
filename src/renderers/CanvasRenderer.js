@@ -43,7 +43,7 @@ THREE.CanvasRenderer = function () {
 	this.render = function ( scene, camera ) {
 
 		var e, el, m, ml, element, material, pi2 = Math.PI * 2,
-		v1x, v1y, v2x, v2y, v3x, v3y, v4x, v4y, width, height,
+		v1x, v1y, v2x, v2y, v3x, v3y, v4x, v4y, width, height, scaleX, scaleY,
 
 		uv1 = new THREE.UV(), uv2 = new THREE.UV(), uv3 = new THREE.UV(), uv4 = new THREE.UV(),
 		bitmap, bitmapWidth, bitmapHeight;
@@ -108,8 +108,13 @@ THREE.CanvasRenderer = function () {
 						bitmapWidth = bitmap.width / 2;
 						bitmapHeight = bitmap.height / 2;
 
-						width = element.scale.x * _widthHalf * bitmapWidth;
-						height = element.scale.y * _heightHalf * bitmapHeight;
+						scaleX = element.scale.x * _widthHalf;
+						scaleY = element.scale.y * _heightHalf;
+
+						width = scaleX * bitmapWidth;
+						height = scaleY * bitmapHeight;
+
+						// TODO: Rotations, offset break this...
 
 						_bboxRect.set( v1x - width, v1y - height, v1x + width, v1y + height );
 
@@ -120,13 +125,25 @@ THREE.CanvasRenderer = function () {
 						}
 
 						_context.save();
-						_context.translate( v1x - width, v1y + height );
+						_context.translate( v1x, v1y );
 						_context.rotate( - element.rotation );
-						_context.scale( element.scale.x * _widthHalf, - ( element.scale.y * _heightHalf ) );
+						_context.scale( scaleX, - scaleY );
+						_context.translate( - bitmapWidth + material.offset.x, - bitmapHeight - material.offset.y );
 
 						_context.drawImage( bitmap, 0, 0 );
 
 						_context.restore();
+
+						/*
+						_context.beginPath();
+						_context.moveTo( v1x - 10, v1y );
+						_context.lineTo( v1x + 10, v1y );
+						_context.moveTo( v1x, v1y - 10 );
+						_context.lineTo( v1x, v1y + 10 );
+						_context.closePath();
+						_context.strokeStyle = 'rgb(255,255,0)';
+						_context.stroke();
+						*/
 
 					}
 
@@ -454,6 +471,7 @@ THREE.CanvasRenderer = function () {
 			*/
 
 			_clearRect.addRectangle( _bboxRect );
+
 
 		}
 
