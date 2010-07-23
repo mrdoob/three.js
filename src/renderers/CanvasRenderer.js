@@ -139,7 +139,7 @@ THREE.CanvasRenderer = function () {
 
 						_context.restore();
 
-						/*
+						/* DEBUG
 						_context.beginPath();
 						_context.moveTo( v1x - 10, v1y );
 						_context.lineTo( v1x + 10, v1y );
