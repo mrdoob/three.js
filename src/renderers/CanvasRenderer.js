@@ -12,7 +12,10 @@ THREE.CanvasRenderer = function () {
 	_clipRect = new THREE.Rectangle(),
 	_clearRect = new THREE.Rectangle( 0, 0, 0, 0 ),
 	_bboxRect = new THREE.Rectangle(),
-	_vector2 = new THREE.Vector2();
+	_vector2 = new THREE.Vector2(),
+
+	v5 = new THREE.Vector2(), v6 = new THREE.Vector2(),
+	uv1 = new THREE.UV(), uv2 = new THREE.UV(), uv3 = new THREE.UV(), uv4 = new THREE.UV();
 
 	this.domElement = _canvas;
 	this.autoClear = true;
@@ -43,9 +46,8 @@ THREE.CanvasRenderer = function () {
 	this.render = function ( scene, camera ) {
 
 		var e, el, m, ml, element, material, pi2 = Math.PI * 2,
-		v1x, v1y, v2x, v2y, v3x, v3y, v4x, v4y, width, height, scaleX, scaleY,
-
-		uv1 = new THREE.UV(), uv2 = new THREE.UV(), uv3 = new THREE.UV(), uv4 = new THREE.UV(),
+		v1x, v1y, v2x, v2y, v3x, v3y, v4x, v4y, v5x, v5y, v6x, v6y,
+		width, height, scaleX, scaleY, offsetX, offsetY,
 		bitmap, bitmapWidth, bitmapHeight;
 
 		if ( this.autoClear ) {
@@ -114,9 +116,12 @@ THREE.CanvasRenderer = function () {
 						width = scaleX * bitmapWidth;
 						height = scaleY * bitmapHeight;
 
-						// TODO: Rotations, offset break this...
+						offsetX = material.offset.x * scaleX;
+						offsetY = material.offset.y * scaleY;
 
-						_bboxRect.set( v1x - width, v1y - height, v1x + width, v1y + height );
+						// TODO: Rotations break this...
+
+						_bboxRect.set( v1x + offsetX - width, v1y + offsetY - height, v1x + offsetX + width, v1y + offsetY + height );
 
 						if ( !_clipRect.instersects( _bboxRect ) ) {
 
@@ -326,19 +331,30 @@ THREE.CanvasRenderer = function () {
 				element.v3.x *= _widthHalf; element.v3.y *= _heightHalf;
 				element.v4.x *= _widthHalf; element.v4.y *= _heightHalf;
 
+				v5.copy( element.v2 ); v6.copy( element.v4 );
+
 				if ( element.overdraw ) {
 
 					expand( element.v1, element.v2 );
-					expand( element.v2, element.v3 );
-					expand( element.v3, element.v4 );
+					expand( element.v2, element.v4 );
 					expand( element.v4, element.v1 );
 
 				}
 
 				v1x = element.v1.x; v1y = element.v1.y;
 				v2x = element.v2.x; v2y = element.v2.y;
-				v3x = element.v3.x; v3y = element.v3.y;
 				v4x = element.v4.x; v4y = element.v4.y;
+
+				if ( element.overdraw ) {
+
+					expand( element.v3, v5 );
+					expand( element.v3, v6 );
+
+				}
+
+				v3x = element.v3.x; v3y = element.v3.y;
+				v5x = v5.x; v5y = v5.y;
+				v6x = v6.x; v6y = v6.y;
 
 				_bboxRect.addPoint( v1x, v1y );
 				_bboxRect.addPoint( v2x, v2y );
@@ -456,7 +472,7 @@ THREE.CanvasRenderer = function () {
 						uv4.u *= bitmapWidth; uv4.v *= bitmapHeight;
 
 						drawTexturedTriangle( bitmap, v1x, v1y, v2x, v2y, v4x, v4y, uv1.u, uv1.v, uv2.u, uv2.v, uv4.u, uv4.v );
-						drawTexturedTriangle( bitmap, v2x, v2y, v3x, v3y, v4x, v4y, uv2.u, uv2.v, uv3.u, uv3.v, uv4.u, uv4.v );
+						drawTexturedTriangle( bitmap, v5x, v5y, v3x, v3y, v6x, v6y, uv2.u, uv2.v, uv3.u, uv3.v, uv4.u, uv4.v );
 
 					}
 

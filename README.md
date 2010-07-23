@@ -129,6 +129,15 @@ Thanks to the power of the internets (and github <3) these people have kindly he
 
 ### Change Log ###
 
+2010 07 23 - **r15** (32.440 kb)
+
+* Using new object `UV` instead of `Vector2` where it should be used
+* Added `Mesh.flipSided` boolean (false by default)
+* `CanvasRenderer` was handling UVs at 1,1 as bitmapWidth, bitmapHeight (instead of bitmapWidth - 1, bitmapHeight - 1)
+* `ParticleBitmapMaterial.offset` added
+* Fixed gap when rendering `Face4` with `MeshBitmapUVMappingMaterial`
+
+
 2010 07 17 - **r14** (32.144 kb)
 
 * Refactored `CanvasRenderer` (more duplicated code, but easier to handle)
@@ -141,8 +150,6 @@ Thanks to the power of the internets (and github <3) these people have kindly he
 * `FaceColorStrokeMaterial` > `MeshFaceColorStrokeMaterial`
 * `ColorStrokeMaterial` > `LineColorMaterial`
 * `Rectangle.instersects` returned false with rectangles with 0px witdh or height
-* Using new object `UV` instead of `Vector2` where it should be used
-* Added Mesh.flipSided boolean (false by default)
 
 
 2010 07 12 - **r13** (29.492 kb)
