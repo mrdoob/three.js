@@ -54,12 +54,12 @@ tmp_file.close()
 
 # YUICOMPRESSOR
 
-os.system("java -jar yuicompressor-2.4.2.jar temp.js -o ../build/three.js --charset utf-8 -v")
+os.system("java -jar yuicompressor-2.4.2.jar temp.js -o ../build/Three.js --charset utf-8 -v")
 os.unlink("temp.js")
 
 # HEADER
 
-output = '../build/three.js'
+output = '../build/Three.js'
 string = "// three.js r" + str(rev) + " - http://github.com/mrdoob/three.js\n"
 
 src_file = open(output,'r')

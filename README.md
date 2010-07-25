@@ -26,6 +26,7 @@ Other similar projects: [pre3d](http://deanm.github.com/pre3d/), [pvjs](http://c
 
 ### Featured projects ###
 
+[![Or so they say...](http://github.com/mrdoob/three.js/raw/master/assets/projects/07_orsotheysay.png)](http://xplsv.com/prods/demos/online/xplsv_orsotheysay/)
 [![Rat](http://github.com/mrdoob/three.js/raw/master/assets/projects/06_rat.png)](http://tech.lab212.org/2010/07/export-textured-models-from-blender2-5-to-three-js/)
 [![Failure](http://github.com/mrdoob/three.js/raw/master/assets/projects/05_failure.png)](http://www.is-real.net/experiments/three/failure/)
 [![Space Cannon 3D](http://github.com/mrdoob/three.js/raw/master/assets/projects/02_spacecannon.png)](http://labs.brian-stoner.com/spacecannon/)
@@ -36,9 +37,9 @@ Other similar projects: [pre3d](http://deanm.github.com/pre3d/), [pvjs](http://c
 
 ### Usage ###
 
-Download the [minified library](http://github.com/mrdoob/three.js/raw/master/build/three.js) and include it in your html.
+Download the [minified library](http://github.com/mrdoob/three.js/raw/master/build/Three.js) and include it in your html.
 
-	<script type="text/javascript" src="js/three.js"></script>
+	<script type="text/javascript" src="js/Three.js"></script>
 
 This code creates a camera, then creates a scene object, adds a bunch of random particles in it, creates a &lt;canvas&gt; renderer and adds its viewport in the document.body element.
 
