@@ -3,6 +3,7 @@
  * @author supereggbert / http://www.paulbrunt.co.uk/
  * @author philogb / http://blog.thejit.org/
  * @author jordi_ros / http://plattsoft.com
+ * @author D1plo1d / http://github.com/D1plo1d
  */
 
 THREE.Matrix4 = function () {
@@ -139,6 +140,52 @@ THREE.Matrix4.prototype = {
 
 	},
 
+	multiplyScalar: function ( s ) {
+
+		this.n11 *= s; this.n12 *= s; this.n13 *= s; this.n14 *= s;
+		this.n21 *= s; this.n22 *= s; this.n23 *= s; this.n24 *= s;
+		this.n31 *= s; this.n32 *= s; this.n33 *= s; this.n34 *= s;
+		this.n41 *= s; this.n42 *= s; this.n43 *= s; this.n44 *= s;
+
+	},
+
+	determinant: function () {
+
+		//TODO: make this more efficient
+		//( based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm )
+		return (
+			this.n14 * this.n23 * this.n32 * this.n41-
+			this.n13 * this.n24 * this.n32 * this.n41-
+			this.n14 * this.n22 * this.n33 * this.n41+
+			this.n12 * this.n24 * this.n33 * this.n41+
+
+			this.n13 * this.n22 * this.n34 * this.n41-
+			this.n12 * this.n23 * this.n34 * this.n41-
+			this.n14 * this.n23 * this.n31 * this.n42+
+			this.n13 * this.n24 * this.n31 * this.n42+
+
+			this.n14 * this.n21 * this.n33 * this.n42-
+			this.n11 * this.n24 * this.n33 * this.n42-
+			this.n13 * this.n21 * this.n34 * this.n42+
+			this.n11 * this.n23 * this.n34 * this.n42+
+
+			this.n14 * this.n22 * this.n31 * this.n43-
+			this.n12 * this.n24 * this.n31 * this.n43-
+			this.n14 * this.n21 * this.n32 * this.n43+
+			this.n11 * this.n24 * this.n32 * this.n43+
+
+			this.n12 * this.n21 * this.n34 * this.n43-
+			this.n11 * this.n22 * this.n34 * this.n43-
+			this.n13 * this.n22 * this.n31 * this.n44+
+			this.n12 * this.n23 * this.n31 * this.n44+
+
+			this.n13 * this.n21 * this.n32 * this.n44-
+			this.n11 * this.n23 * this.n32 * this.n44-
+			this.n12 * this.n21 * this.n33 * this.n44+
+			this.n11 * this.n22 * this.n33 * this.n44 );
+
+	},
+
 	clone: function () {
 
 		var m = new THREE.Matrix4();
@@ -209,7 +256,7 @@ THREE.Matrix4.rotationYMatrix = function ( theta ) {
 
 };
 
-THREE.Matrix4.rotationZMatrix = function( theta ) {
+THREE.Matrix4.rotationZMatrix = function ( theta ) {
 
 	var rot = new THREE.Matrix4();
 
@@ -218,6 +265,34 @@ THREE.Matrix4.rotationZMatrix = function( theta ) {
 	rot.n12 = - rot.n21;
 
 	return rot;
+
+};
+
+THREE.Matrix4.makeInvert = function ( m1 ) {
+
+	//TODO: make this more efficient
+	//( based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm )
+	var m2 = new THREE.Matrix4();
+
+	m2.n11 = m1.n23*m1.n34*m1.n42 - m1.n24*m1.n33*m1.n42 + m1.n24*m1.n32*m1.n43 - m1.n22*m1.n34*m1.n43 - m1.n23*m1.n32*m1.n44 + m1.n22*m1.n33*m1.n44;
+	m2.n12 = m1.n14*m1.n33*m1.n42 - m1.n13*m1.n34*m1.n42 - m1.n14*m1.n32*m1.n43 + m1.n12*m1.n34*m1.n43 + m1.n13*m1.n32*m1.n44 - m1.n12*m1.n33*m1.n44;
+	m2.n13 = m1.n13*m1.n24*m1.n42 - m1.n14*m1.n23*m1.n42 + m1.n14*m1.n22*m1.n43 - m1.n12*m1.n24*m1.n43 - m1.n13*m1.n22*m1.n44 + m1.n12*m1.n23*m1.n44;
+	m2.n14 = m1.n14*m1.n23*m1.n32 - m1.n13*m1.n24*m1.n32 - m1.n14*m1.n22*m1.n33 + m1.n12*m1.n24*m1.n33 + m1.n13*m1.n22*m1.n34 - m1.n12*m1.n23*m1.n34;
+	m2.n21 = m1.n24*m1.n33*m1.n41 - m1.n23*m1.n34*m1.n41 - m1.n24*m1.n31*m1.n43 + m1.n21*m1.n34*m1.n43 + m1.n23*m1.n31*m1.n44 - m1.n21*m1.n33*m1.n44;
+	m2.n22 = m1.n13*m1.n34*m1.n41 - m1.n14*m1.n33*m1.n41 + m1.n14*m1.n31*m1.n43 - m1.n11*m1.n34*m1.n43 - m1.n13*m1.n31*m1.n44 + m1.n11*m1.n33*m1.n44;
+	m2.n23 = m1.n14*m1.n23*m1.n41 - m1.n13*m1.n24*m1.n41 - m1.n14*m1.n21*m1.n43 + m1.n11*m1.n24*m1.n43 + m1.n13*m1.n21*m1.n44 - m1.n11*m1.n23*m1.n44;
+	m2.n24 = m1.n13*m1.n24*m1.n31 - m1.n14*m1.n23*m1.n31 + m1.n14*m1.n21*m1.n33 - m1.n11*m1.n24*m1.n33 - m1.n13*m1.n21*m1.n34 + m1.n11*m1.n23*m1.n34;
+	m2.n31 = m1.n22*m1.n34*m1.n41 - m1.n24*m1.n32*m1.n41 + m1.n24*m1.n31*m1.n42 - m1.n21*m1.n34*m1.n42 - m1.n22*m1.n31*m1.n44 + m1.n21*m1.n32*m1.n44;
+	m2.n32 = m1.n14*m1.n32*m1.n41 - m1.n12*m1.n34*m1.n41 - m1.n14*m1.n31*m1.n42 + m1.n11*m1.n34*m1.n42 + m1.n12*m1.n31*m1.n44 - m1.n11*m1.n32*m1.n44;
+	m2.n33 = m1.n13*m1.n24*m1.n41 - m1.n14*m1.n22*m1.n41 + m1.n14*m1.n21*m1.n42 - m1.n11*m1.n24*m1.n42 - m1.n12*m1.n21*m1.n44 + m1.n11*m1.n22*m1.n44;
+	m2.n34 = m1.n14*m1.n22*m1.n31 - m1.n12*m1.n24*m1.n31 - m1.n14*m1.n21*m1.n32 + m1.n11*m1.n24*m1.n32 + m1.n12*m1.n21*m1.n34 - m1.n11*m1.n22*m1.n34;
+	m2.n41 = m1.n23*m1.n32*m1.n41 - m1.n22*m1.n33*m1.n41 - m1.n23*m1.n31*m1.n42 + m1.n21*m1.n33*m1.n42 + m1.n22*m1.n31*m1.n43 - m1.n21*m1.n32*m1.n43;
+	m2.n42 = m1.n12*m1.n33*m1.n41 - m1.n13*m1.n32*m1.n41 + m1.n13*m1.n31*m1.n42 - m1.n11*m1.n33*m1.n42 - m1.n12*m1.n31*m1.n43 + m1.n11*m1.n32*m1.n43;
+	m2.n43 = m1.n13*m1.n22*m1.n41 - m1.n12*m1.n23*m1.n41 - m1.n13*m1.n21*m1.n42 + m1.n11*m1.n23*m1.n42 + m1.n12*m1.n21*m1.n43 - m1.n11*m1.n22*m1.n43;
+	m2.n44 = m1.n12*m1.n23*m1.n31 - m1.n13*m1.n22*m1.n31 + m1.n13*m1.n21*m1.n32 - m1.n11*m1.n23*m1.n32 - m1.n12*m1.n21*m1.n33 + m1.n11*m1.n22*m1.n33;
+	m2.scale( 1 / m1.determinant() );
+
+	return m2;
 
 };
 
