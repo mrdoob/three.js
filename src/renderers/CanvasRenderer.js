@@ -10,7 +10,7 @@ THREE.CanvasRenderer = function () {
 	_context = _canvas.getContext( '2d' ),
 	_width, _height, _widthHalf, _heightHalf,
 	_clipRect = new THREE.Rectangle(),
-	_clearRect = new THREE.Rectangle( 0, 0, 0, 0 ),
+	_clearRect = new THREE.Rectangle(),
 	_bboxRect = new THREE.Rectangle(),
 	_vector2 = new THREE.Vector2(),
 
@@ -28,19 +28,29 @@ THREE.CanvasRenderer = function () {
 		_canvas.width = _width;
 		_canvas.height = _height;
 
-		_context.setTransform( 1, 0, 0, -1, _widthHalf, _heightHalf );
-
 		_clipRect.set( - _widthHalf, - _heightHalf, _widthHalf, _heightHalf );
 
 	};
 
 	this.clear = function () {
 
-		_clearRect.inflate( 1 );
-		_clearRect.minSelf( _clipRect );
-		_context.clearRect( _clearRect.getX(), _clearRect.getY(), _clearRect.getWidth(), _clearRect.getHeight() );
-		_clearRect.empty();
+		if ( !_clearRect.isEmpty() ) {
 
+			_clearRect.inflate( 1 );
+			_clearRect.minSelf( _clipRect );
+
+			/*
+			_context.setTransform( 1, 0, 0, - 1, _widthHalf, _heightHalf );
+			_context.clearRect( _clearRect.getX(), _clearRect.getY(), _clearRect.getWidth(), _clearRect.getHeight() );
+			*/
+
+			// Opera workaround
+			_context.setTransform( 1, 0, 0, 1, _widthHalf, _heightHalf );
+			_context.clearRect( _clearRect.getX(), - ( _clearRect.getHeight() + _clearRect.getY() ), _clearRect.getWidth(), _clearRect.getHeight() );
+
+			_clearRect.empty();
+
+		}
 	};
 
 	this.render = function ( scene, camera ) {
@@ -50,18 +60,20 @@ THREE.CanvasRenderer = function () {
 		width, height, scaleX, scaleY, offsetX, offsetY,
 		bitmap, bitmapWidth, bitmapHeight;
 
+		this.project( scene, camera );
+
 		if ( this.autoClear ) {
 
 			this.clear();
 
 		}
 
+		_context.setTransform( 1, 0, 0, - 1, _widthHalf, _heightHalf );
+
 		/* DEBUG
 		_context.fillStyle = 'rgba(0, 255, 255, 0.5)';
 		_context.fillRect( _clipRect.getX(), _clipRect.getY(), _clipRect.getWidth(), _clipRect.getHeight() );
 		*/
-
-		this.project( scene, camera );
 
 		for ( e = 0, el = this.renderList.length; e < el; e++ ) {
 
@@ -496,6 +508,8 @@ THREE.CanvasRenderer = function () {
 		_context.strokeStyle = 'rgba( 255, 0, 0, 0.5 )';
 		_context.strokeRect( _clearRect.getX(), _clearRect.getY(), _clearRect.getWidth(), _clearRect.getHeight() );
 		*/
+
+		_context.setTransform( 1, 0, 0, 1, 0, 0 );
 
 	};
 

@@ -3,7 +3,7 @@ import os
 
 # MERGER
 
-rev = 14
+rev = 16
 
 files = []
 files.append('Three.js')

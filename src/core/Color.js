@@ -4,8 +4,10 @@
 
 THREE.Color = function ( hex ) {
 
+	/*
 	this.r; this.g; this.b; this.a;
 	this.hex;
+	*/
 
 	this.__styleString = 'rgba(0, 0, 0, 1)';
 

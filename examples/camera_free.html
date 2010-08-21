@@ -148,7 +148,6 @@
 
 				renderer = new THREE.CanvasRenderer();
 				renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
-				renderer.autoClear = false;
 
 				container.appendChild(renderer.domElement);
 
@@ -264,7 +263,6 @@
 				debugContext.closePath();
 				debugContext.stroke();
 
-				renderer.clear();
 				renderer.render(scene, camera);
 
 				stats.update();

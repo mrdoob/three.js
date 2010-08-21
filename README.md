@@ -130,6 +130,12 @@ Thanks to the power of the internets (and github <3) these people have kindly he
 
 ### Change Log ###
 
+2010 08 21 - **r16** (35.592 kb)
+
+* Workaround for Opera bug (clearRect not working with context with negative scale)
+* Additional `Matrix4` and `Vector3` methods
+
+
 2010 07 23 - **r15** (32.440 kb)
 
 * Using new object `UV` instead of `Vector2` where it should be used

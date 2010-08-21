@@ -2,12 +2,11 @@
  * @author mr.doob / http://mrdoob.com/
  */
 
-THREE.Rectangle = function ( x1, y1, x2, y2 ) {
+THREE.Rectangle = function () {
 
-	var _x1 = x1, _y1 = y1,
-	_x2 = x2, _y2 = y2,
-	_width = _x2 - _x1, _height = _y2 - _y1,
-	_isEmpty = false;
+	var _x1, _y1, _x2, _y2,
+	_width, _height,
+	_isEmpty = true;
 
 	function resize() {
 
@@ -159,6 +158,12 @@ THREE.Rectangle = function ( x1, y1, x2, y2 ) {
 		_x2 = 0; _y2 = 0;
 
 		resize();
+
+	};
+
+	this.isEmpty = function () {
+
+		return _isEmpty;
 
 	};
 
