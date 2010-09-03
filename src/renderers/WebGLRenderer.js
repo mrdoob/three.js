@@ -108,15 +108,15 @@ THREE.WebGLRenderer = function () {
 
 					object.__webGLVertexBuffer = _gl.createBuffer();
 					_gl.bindBuffer( _gl.ARRAY_BUFFER, object.__webGLVertexBuffer );
-					_gl.bufferData( _gl.ARRAY_BUFFER, new WebGLFloatArray( vertexArray ), _gl.STATIC_DRAW );
+					_gl.bufferData( _gl.ARRAY_BUFFER, new Float32Array( vertexArray ), _gl.STATIC_DRAW );
 
 					object.__webGLColorBuffer = _gl.createBuffer();
 					_gl.bindBuffer( _gl.ARRAY_BUFFER, object.__webGLColorBuffer );
-					_gl.bufferData( _gl.ARRAY_BUFFER, new WebGLFloatArray( colorArray ), _gl.STATIC_DRAW );
+					_gl.bufferData( _gl.ARRAY_BUFFER, new Float32Array( colorArray ), _gl.STATIC_DRAW );
 
 					object.__webGLFaceBuffer = _gl.createBuffer();
 					_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, object.__webGLFaceBuffer );
-					_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, new WebGLUnsignedShortArray( faceArray ), _gl.STATIC_DRAW );
+					_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, new Uint16Array( faceArray ), _gl.STATIC_DRAW );
 
 					object.__webGLFaceCount = faceArray.length;
 
@@ -125,8 +125,8 @@ THREE.WebGLRenderer = function () {
 
 				viewMatrix.multiply( camera.matrix, object.matrix );
 
-				matrix2Array( viewMatrix, _program.viewMatrixArray );
-				matrix2Array( camera.projectionMatrix, _program.projectionMatrixArray );
+				_program.viewMatrixArray = new Float32Array( viewMatrix.flatten() );
+				_program.projectionMatrixArray = new Float32Array( camera.projectionMatrix.flatten() );
 
 				_gl.uniformMatrix4fv( _program.viewMatrix, false, _program.viewMatrixArray );
 				_gl.uniformMatrix4fv( _program.projectionMatrix, false, _program.projectionMatrixArray );
@@ -153,7 +153,7 @@ THREE.WebGLRenderer = function () {
 
 							material.__webGLColorBuffer = _gl.createBuffer();
 							_gl.bindBuffer( _gl.ARRAY_BUFFER, material.__webGLColorBuffer );
-							_gl.bufferData( _gl.ARRAY_BUFFER, new WebGLFloatArray( colorArray ), _gl.STATIC_DRAW );
+							_gl.bufferData( _gl.ARRAY_BUFFER, new Float32Array( colorArray ), _gl.STATIC_DRAW );
 
 						}
 
@@ -211,13 +211,17 @@ THREE.WebGLRenderer = function () {
 		_program = _gl.createProgram();
 
 		_gl.attachShader( _program, getShader( "fragment", [
+								"#ifdef GL_ES",
+								"precision highp float;",
+								"#endif",
+								
 								"varying vec4 vcolor;",
 
 								"void main(){",
 
 									"gl_FragColor = vcolor;",
 
-								"}"].join("") ) );
+								"}"].join("\n") ) );
 
 		_gl.attachShader( _program, getShader( "vertex", [
 								"attribute vec3 position;",
@@ -230,9 +234,9 @@ THREE.WebGLRenderer = function () {
 								"void main(void) {",
 
 									"vcolor = color;",
-									"gl_Position = projectionMatrix * viewMatrix * vec4( position, 1 );",
+									"gl_Position = projectionMatrix * viewMatrix * vec4( position, 1.0 );",
 
-								"}"].join("") ) );
+								"}"].join("\n") ) );
 
 		_gl.linkProgram( _program );
 
@@ -253,8 +257,8 @@ THREE.WebGLRenderer = function () {
 		_program.position = _gl.getAttribLocation( _program, "position" );
 		_gl.enableVertexAttribArray( _program.position );
 
-		_program.viewMatrixArray = new WebGLFloatArray( 16 );
-		_program.projectionMatrixArray = new WebGLFloatArray( 16 );
+		_program.viewMatrixArray = new Float32Array(16);
+		_program.projectionMatrixArray = new Float32Array(16);
 
 	}
 
@@ -283,17 +287,6 @@ THREE.WebGLRenderer = function () {
 		}
 
 		return shader;
-	}
-
-	function matrix2Array( matrix, array ) {
-
-		// Also flatten
-
-		array[ 0 ] = matrix.n11; array[ 1 ] = matrix.n21; array[ 2 ] = matrix.n31; array[ 3 ] = matrix.n41;
-		array[ 4 ] = matrix.n12; array[ 5 ] = matrix.n22; array[ 6 ] = matrix.n32; array[ 7 ] = matrix.n42;
-		array[ 8 ] = matrix.n13; array[ 9 ] = matrix.n23; array[ 10 ] = matrix.n33; array[ 11 ] = matrix.n43;
-		array[ 12 ] = matrix.n14; array[ 13 ] = matrix.n24; array[ 14 ] = matrix.n34; array[ 15 ] = matrix.n44;
-
 	}
 
 };
