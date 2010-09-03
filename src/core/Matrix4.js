@@ -196,6 +196,15 @@ THREE.Matrix4.prototype = {
 		return m;
 
 	},
+	
+	flatten: function() {
+
+	  return [this.n11, this.n21, this.n31, this.n41,
+	      this.n12, this.n22, this.n32, this.n42,
+	      this.n13, this.n23, this.n33, this.n43,
+	      this.n14, this.n24, this.n34, this.n44];
+	 
+	},
 
 	toString: function() {
 
