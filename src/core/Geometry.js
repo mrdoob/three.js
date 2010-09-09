@@ -11,7 +11,7 @@ THREE.Geometry = function () {
 
 	this.computeNormals = function () {
 
-		var v, f, vA, vB, vC, cb, ab, normal;
+		var v, f, vA, vB, vC, cb, ab;
 
 		for ( v = 0; v < this.vertices.length; v++ ) {
 
@@ -27,7 +27,6 @@ THREE.Geometry = function () {
 
 			cb = new THREE.Vector3();
 			ab = new THREE.Vector3();
-			normal = new THREE.Vector3();
 
 			cb.sub( vC.position, vB.position );
 			ab.sub( vA.position, vB.position );
@@ -40,16 +39,6 @@ THREE.Geometry = function () {
 			}
 
 			this.faces[ f ].normal = cb;
-
-			vA.normal.addSelf( normal );
-			vB.normal.addSelf( normal );
-			vC.normal.addSelf( normal );
-
-			if ( this.faces[ f ] instanceof THREE.Face4 ) {
-
-				this.vertices[ this.faces[ f ].d ].normal.addSelf( normal );
-
-			}
 
 		}
 
