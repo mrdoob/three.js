@@ -185,7 +185,24 @@ THREE.Matrix4.prototype = {
 			this.n11 * this.n22 * this.n33 * this.n44 );
 
 	},
-
+	
+  transpose: function () {
+    function swap(obj, p1, p2) {
+      var aux = obj[p1];
+      obj[p1] = obj[p2];
+      obj[p2] = aux;
+    }
+    
+    swap(this, 'n21', 'n12');
+    swap(this, 'n31', 'n13');
+    swap(this, 'n32', 'n23');
+    swap(this, 'n41', 'n14');
+    swap(this, 'n42', 'n24');
+    swap(this, 'n43', 'n34');
+    return this;
+    
+  },
+  
 	clone: function () {
 
 		var m = new THREE.Matrix4();
