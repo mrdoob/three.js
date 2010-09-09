@@ -236,25 +236,41 @@ THREE.WebGLRenderer = function () {
 								"precision highp float;",
 								"#endif",
 								
-								"varying vec4 vcolor;",
-
-								"void main(){",
-
-									"gl_FragColor = vcolor;",
-
-								"}"].join("\n") ) );
+							  "varying vec4 vcolor;",
+							  "varying vec3 lightWeighting;",
+							  
+							  "void main(){",
+							  
+							    "gl_FragColor = vec4(vcolor.rgb * lightWeighting, vcolor.a);",
+							  
+							  "}"
+							  ].join("\n") ) );
 
 		_gl.attachShader( _program, getShader( "vertex", [
 								"attribute vec3 position;",
                 "attribute vec3 normal;",
 								"attribute vec4 color;",
 
+							  "uniform bool enableLighting;",
+							  "uniform vec3 ambientColor;",
+							  "uniform vec3 directionalColor;",
+							  "uniform vec3 lightingDirection;",
+							  
 								"uniform mat4 viewMatrix;",
 								"uniform mat4 projectionMatrix;",
                 "uniform mat4 normalMatrix;",
 								"varying vec4 vcolor;",
+							  "varying vec3 lightWeighting;",
 
 								"void main(void) {",
+							  
+  						    "if(!enableLighting) {",
+  						      "lightWeighting = vec3(1.0, 1.0, 1.0);",
+  						    "} else {",
+  						      "vec4 transformedNormal = normalMatrix * vec4(normal, 1.0);",
+  						      "float directionalLightWeighting = max(dot(transformedNormal.xyz, lightingDirection), 0.0);",
+  						      "lightWeighting = ambientColor + directionalColor * directionalLightWeighting;",
+  						    "}",
 
 									"vcolor = color;",
 									"gl_Position = projectionMatrix * viewMatrix * vec4( position, 1.0 );",
