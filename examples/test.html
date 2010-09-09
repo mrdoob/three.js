@@ -40,6 +40,9 @@
 		<script type="text/javascript" src="../src/materials/MeshFaceColorStrokeMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/ParticleCircleMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/ParticleBitmapMaterial.js"></script>
+    <script type="text/javascript" src="../src/lights/Light.js"></script>
+    <script type="text/javascript" src="../src/lights/AmbientLight.js"></script>
+    <script type="text/javascript" src="../src/lights/DirectionalLight.js"></script>
 		<script type="text/javascript" src="../src/scenes/Scene.js"></script>
 		<script type="text/javascript" src="../src/renderers/Renderer.js"></script>
 		<script type="text/javascript" src="../src/renderers/CanvasRenderer.js"></script>
@@ -181,6 +184,14 @@
 					scene.add(particle);
 
 				}
+
+				// LIGHTS
+				
+				var ambient = new THREE.AmbientLight( new THREE.Color( Math.random() * 0xffffff ) );
+        scene.addLight(ambient);
+				var directional = new THREE.DirectionalLight( new THREE.Color( Math.random() * 0xffffff ), 
+						new THREE.Vector3( 600, 0, 0 ) );
+        scene.addLight(directional);
 
 				canvasRenderer = new THREE.CanvasRenderer();
 				canvasRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );

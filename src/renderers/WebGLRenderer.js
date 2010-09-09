@@ -94,9 +94,9 @@ THREE.WebGLRenderer = function () {
 							vertexArray.push( v2.x, v2.y, v2.z );
 							vertexArray.push( v3.x, v3.y, v3.z );
 
-              normalArray.push( n.x, n.y, n.z );
-              normalArray.push( n.x, n.y, n.z );
-              normalArray.push( n.x, n.y, n.z );
+              normalArray.push( normal.x, normal.y, normal.z );
+              normalArray.push( normal.x, normal.y, normal.z );
+              normalArray.push( normal.x, normal.y, normal.z );
 
 							colorArray.push( faceColor.r, faceColor.g, faceColor.b, faceColor.a );
 							colorArray.push( faceColor.r, faceColor.g, faceColor.b, faceColor.a );
@@ -118,10 +118,10 @@ THREE.WebGLRenderer = function () {
 							vertexArray.push( v3.x, v3.y, v3.z );
 							vertexArray.push( v4.x, v4.y, v4.z );
 
-              normalArray.push( n.x, n.y, n.z );
-              normalArray.push( n.x, n.y, n.z );
-              normalArray.push( n.x, n.y, n.z );
-              normalArray.push( n.x, n.y, n.z );
+              normalArray.push( normal.x, normal.y, normal.z );
+              normalArray.push( normal.x, normal.y, normal.z );
+              normalArray.push( normal.x, normal.y, normal.z );
+              normalArray.push( normal.x, normal.y, normal.z );
 
 							colorArray.push( faceColor.r, faceColor.g, faceColor.b, faceColor.a );
 							colorArray.push( faceColor.r, faceColor.g, faceColor.b, faceColor.a );
@@ -167,7 +167,7 @@ THREE.WebGLRenderer = function () {
 				_program.viewMatrixArray = new Float32Array( viewMatrix.flatten() );
 				_program.projectionMatrixArray = new Float32Array( camera.projectionMatrix.flatten() );
 
-		    normalMatrix = Matrix4.makeInvert(viewMatrix).transpose();
+		    normalMatrix =  THREE.Matrix4.makeInvert(viewMatrix).transpose();
 		    _program.normalMatrixArray = new Float32Array( normalMatrix.flatten() );
 		    
 				_gl.uniformMatrix4fv( _program.viewMatrix, false, _program.viewMatrixArray );
@@ -315,10 +315,10 @@ THREE.WebGLRenderer = function () {
 		_program.projectionMatrix = _gl.getUniformLocation( _program, "projectionMatrix" );
 		_program.normalMatrix = _gl.getUniformLocation( _program, "normalMatrix" );
 
-    _program.enableLighting = _gl.getUniformLocation(program, 'enableLighting');
-    _program.ambientColor = _gl.getUniformLocation(program, 'ambientColor');
-    _program.directionalColor = _gl.getUniformLocation(program, 'directionalColor');
-    _program.lightingDirection = _gl.getUniformLocation(program, 'lightingDirection');
+    _program.enableLighting = _gl.getUniformLocation(_program, 'enableLighting');
+    _program.ambientColor = _gl.getUniformLocation(_program, 'ambientColor');
+    _program.directionalColor = _gl.getUniformLocation(_program, 'directionalColor');
+    _program.lightingDirection = _gl.getUniformLocation(_program, 'lightingDirection');
     
 		_program.color = _gl.getAttribLocation( _program, "color" );
 		_gl.enableVertexAttribArray( _program.color );
