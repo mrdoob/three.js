@@ -30,9 +30,10 @@ THREE.WebGLRenderer = function () {
 
 	this.render = function ( scene, camera ) {
 
-		var face, faceColor, object, material, normal,
+		var face, faceColor, object, material, normal, lightColor, lightDirection, light,
 		vertexArray, faceArray, colorArray, normalArray, vertexIndex,
-		o, ol, f, fl, m, ml, i, v1, v2, v3, v4;
+		o, ol, f, fl, m, ml, i, v1, v2, v3, v4,
+		l, ll;
 
 		if ( this.autoClear ) {
 
@@ -40,7 +41,30 @@ THREE.WebGLRenderer = function () {
 
 		}
 
-		for ( o = 0, ol = scene.objects.length; o < ol; o++ ) {
+		//lighting
+		_gl.uniform1i( _program.enableLighting, scene.lights.length );
+    
+    for ( l = 0, ll = scene.lights.length; l < ll; l++ ) {
+      
+      light = scene.lights[ l ];
+      
+      if ( light instanceof THREE.AmbientLight ) {
+        
+        lightColor = light.color;
+        _gl.uniform3f( _program.ambientColor, lightColor.r, lightColor.g, lightColor.b );
+        
+      } else if( light instanceof THREE.DirectionalLight ) {
+        
+        lightColor = light.color;
+        lightDirection = light.direction;
+        _gl.uniform3f( _program.lightingDirection, lightDirection.x, lightDirection.y, lightDirection.z );
+        _gl.uniform3f( _program.directionalColor, lightColor.r, lightColor.g, lightColor.b );
+        
+      }
+      
+    }
+
+    for ( o = 0, ol = scene.objects.length; o < ol; o++ ) {
 
 			object = scene.objects[ o ];
 
@@ -291,6 +315,11 @@ THREE.WebGLRenderer = function () {
 		_program.projectionMatrix = _gl.getUniformLocation( _program, "projectionMatrix" );
 		_program.normalMatrix = _gl.getUniformLocation( _program, "normalMatrix" );
 
+    _program.enableLighting = _gl.getUniformLocation(program, 'enableLighting');
+    _program.ambientColor = _gl.getUniformLocation(program, 'ambientColor');
+    _program.directionalColor = _gl.getUniformLocation(program, 'directionalColor');
+    _program.lightingDirection = _gl.getUniformLocation(program, 'lightingDirection');
+    
 		_program.color = _gl.getAttribLocation( _program, "color" );
 		_gl.enableVertexAttribArray( _program.color );
 

@@ -5,7 +5,7 @@
 THREE.Scene = function () {
 
 	this.objects = [];
-	// this.lights = [];
+	this.lights = [];
 
 	this.addObject = function ( object ) {
 
@@ -24,7 +24,26 @@ THREE.Scene = function () {
 
 			}
 		}
-	}
+	};
+
+  this.addLight = function ( light ) {
+
+    this.lights.push(light);
+
+  };
+
+  this.removeLight = function ( light ) {
+
+    for ( var i = 0, l = this.lights.length; i < l; i++ ) {
+
+      if ( light == this.lights[ i ] ) {
+
+        this.lights.splice( i, 1 );
+        return;
+
+      }
+    }
+  };
 
 	// Deprecated
 	this.add = function ( object ) {
