@@ -294,6 +294,30 @@ THREE.Matrix4.rotationZMatrix = function ( theta ) {
 
 };
 
+THREE.Matrix4.rotationAxisAngleMatrix = function ( axis, angle ) {
+
+  //Based on http://www.gamedev.net/reference/articles/article1199.asp
+  
+  var rot = new THREE.Matrix4();
+  var c = Math.cos( angle );
+  var s = Math.sin( angle );
+  var t = 1 - c;
+  var x = axis.x, y = axis.y, z = axis.z;
+
+  rot.n11 = t * x * x + c;
+  rot.n12 = t * x * y - s * z;
+  rot.n13 = t * x * z + s * y;
+  rot.n21 = t * x * y + s * z;
+  rot.n22 = t * y * y + c;
+  rot.n23 = t * y * z - s * x;
+  rot.n31 = t * x * z - s * y;
+  rot.n32 = t * y * z + s * x;
+  rot.n33 = t * z * z + c;
+
+  return rot;
+
+};
+
 THREE.Matrix4.makeInvert = function ( m1 ) {
 
 	//TODO: make this more efficient
