@@ -11,8 +11,6 @@ THREE.Object3D = function ( material ) {
 	this.matrix = new THREE.Matrix4();
 	this.screen = new THREE.Vector3();
 
-	this.material = material instanceof Array ? material : [ material ];
-
 	this.autoUpdateMatrix = true;
 
 	this.updateMatrix = function () {

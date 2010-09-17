@@ -7,7 +7,7 @@ three.js
 
 The aim of this project is to create a lightweight 3D engine with a very low level of abstraction (aka for dummies). Currently there is no documentation available but feel free to use the examples as a reference and/or read the source code. However, be aware that the API may change from revision to revision breaking compatibility.
 
-The engine can render using &lt;canvas&gt; and &lt;svg&gt; and WebGL.
+The engine can render using &lt;canvas&gt;, &lt;svg&gt; and WebGL.
 
 [More info...](http://mrdoob.com/blog/post/693)
 
@@ -15,29 +15,32 @@ Other similar projects: [pre3d](http://deanm.github.com/pre3d/), [pvjs](http://c
 
 ### Examples ###
 
-[![geometry_earth](http://github.com/mrdoob/three.js/raw/master/assets/examples/07_earth.png)](http://mrdoob.com/projects/three.js/examples/geometry_earth.html)
-[![geometry_terrain](http://github.com/mrdoob/three.js/raw/master/assets/examples/06_terrain.png)](http://mrdoob.com/projects/three.js/examples/geometry_terrain.html)
-[![materials_video](http://github.com/mrdoob/three.js/raw/master/assets/examples/05_video.png)](http://mrdoob.com/projects/three.js/examples/materials_video.html)
-[![geometry_vr](http://github.com/mrdoob/three.js/raw/master/assets/examples/04_vr.png)](http://mrdoob.com/projects/three.js/examples/geometry_vr.html)
-[![geometry_cube](http://github.com/mrdoob/three.js/raw/master/assets/examples/03_cube.png)](http://mrdoob.com/projects/three.js/examples/geometry_cube.html)
-[![particles_random](http://github.com/mrdoob/three.js/raw/master/assets/examples/02_random.png)](http://mrdoob.com/projects/three.js/examples/particles_random.html)
-[![particles_wave](http://github.com/mrdoob/three.js/raw/master/assets/examples/01_waves.png)](http://mrdoob.com/projects/three.js/examples/particles_waves.html)
-[![particles_floor](http://github.com/mrdoob/three.js/raw/master/assets/examples/00_floor.png)](http://mrdoob.com/projects/three.js/examples/particles_floor.html)
+[![geometry_birds](http://mrdoob.github.com/three.js/assets/examples/08_birds.png)](http://mrdoob.github.com/three.js/examples/geometry_birds.html)
+[![geometry_earth](http://mrdoob.github.com/three.js/assets/examples/07_earth.png)](http://mrdoob.github.com/three.js/examples/geometry_earth.html)
+[![geometry_terrain](http://mrdoob.github.com/three.js/assets/examples/06_terrain.png)](http://mrdoob.github.com/three.js/examples/geometry_terrain.html)
+[![materials_video](http://mrdoob.github.com/three.js/assets/examples/05_video.png)](http://mrdoob.github.com/three.js/examples/materials_video.html)
+[![geometry_vr](http://mrdoob.github.com/three.js/assets/examples/04_vr.png)](http://mrdoob.github.com/three.js/examples/geometry_vr.html)
+[![geometry_cube](http://mrdoob.github.com/three.js/assets/examples/03_cube.png)](http://mrdoob.github.com/three.js/examples/geometry_cube.html)
+[![particles_random](http://mrdoob.github.com/three.js/assets/examples/02_random.png)](http://mrdoob.github.com/three.js/examples/particles_random.html)
+[![particles_wave](http://mrdoob.github.com/three.js/assets/examples/01_waves.png)](http://mrdoob.github.com/three.js/examples/particles_waves.html)
+[![particles_floor](http://mrdoob.github.com/three.js/assets/examples/00_floor.png)](http://mrdoob.github.com/three.js/examples/particles_floor.html)
 
 ### Featured projects ###
 
-[![Or so they say...](http://github.com/mrdoob/three.js/raw/master/assets/projects/07_orsotheysay.png)](http://xplsv.com/prods/demos/online/xplsv_orsotheysay/)
-[![Rat](http://github.com/mrdoob/three.js/raw/master/assets/projects/06_rat.png)](http://tech.lab212.org/2010/07/export-textured-models-from-blender2-5-to-three-js/)
-[![Failure](http://github.com/mrdoob/three.js/raw/master/assets/projects/05_failure.png)](http://www.is-real.net/experiments/three/failure/)
-[![Space Cannon 3D](http://github.com/mrdoob/three.js/raw/master/assets/projects/02_spacecannon.png)](http://labs.brian-stoner.com/spacecannon/)
-[![Alocasia](http://github.com/mrdoob/three.js/raw/master/assets/projects/04_alocasia.png)](http://arithmetric.com/projects/alocasia/)
-[![DDD](http://github.com/mrdoob/three.js/raw/master/assets/projects/01_ddd.png)](http://the389.com/works/three/)
-[![jsflowfield4d](http://github.com/mrdoob/three.js/raw/master/assets/projects/00_jsflowfield4d.png)](http://test.sjeiti.com/jsflowfield4d/)
-[![spikeball](http://github.com/mrdoob/three.js/raw/master/assets/projects/03_spikeball.png)](http://kile.stravaganza.org/lab/js/spikeball/)
+[![The Wilderness Downtown](http://mrdoob.github.com/three.js/assets/projects/08_wutw.png)](http://thewildernessdowntown.com/)
+[![CloudSCAD](http://mrdoob.github.com/three.js/assets/projects/08_cloudscad.png)](http://cloudscad.com/stl_viewer/)
+[![Or so they say...](http://mrdoob.github.com/three.js/assets/projects/07_orsotheysay.png)](http://xplsv.com/prods/demos/online/xplsv_orsotheysay/)
+[![Rat](http://mrdoob.github.com/three.js/assets/projects/06_rat.png)](http://tech.lab212.org/2010/07/export-textured-models-from-blender2-5-to-three-js/)
+[![Failure](http://mrdoob.github.com/three.js/assets/projects/05_failure.png)](http://www.is-real.net/experiments/three/failure/)
+[![Space Cannon 3D](http://mrdoob.github.com/three.js/assets/projects/02_spacecannon.png)](http://labs.brian-stoner.com/spacecannon/)
+[![Alocasia](http://mrdoob.github.com/three.js/assets/projects/04_alocasia.png)](http://arithmetric.com/projects/alocasia/)
+[![DDD](http://mrdoob.github.com/three.js/assets/projects/01_ddd.png)](http://the389.com/works/three/)
+[![jsflowfield4d](http://mrdoob.github.com/three.js/assets/projects/00_jsflowfield4d.png)](http://test.sjeiti.com/jsflowfield4d/)
+[![spikeball](http://mrdoob.github.com/three.js/assets/projects/03_spikeball.png)](http://kile.stravaganza.org/lab/js/spikeball/)
 
 ### Usage ###
 
-Download the [minified library](http://github.com/mrdoob/three.js/raw/master/build/Three.js) and include it in your html.
+Download the [minified library](http://mrdoob.github.com/three.js/build/Three.js) and include it in your html.
 
 	<script type="text/javascript" src="js/Three.js"></script>
 
@@ -102,6 +105,9 @@ For creating a customised version of the library, including the source files in 
 	<script type="text/javascript" src="js/three/objects/Line.js"></script>
 	<script type="text/javascript" src="js/three/objects/Mesh.js"></script>
 	<script type="text/javascript" src="js/three/objects/Particle.js"></script>
+	<script type="text/javascript" src="js/three/lights/Light.js"></script>
+	<script type="text/javascript" src="js/three/lights/AmbientLight.js"></script>
+	<script type="text/javascript" src="js/three/lights/DirectionalLight.js"></script>
 	<script type="text/javascript" src="js/three/materials/LineColorMaterial.js"></script>
 	<script type="text/javascript" src="js/three/materials/MeshBitmapUVMappingMaterial.js"></script>
 	<script type="text/javascript" src="js/three/materials/MeshColorFillMaterial.js"></script>
@@ -125,10 +131,16 @@ For creating a customised version of the library, including the source files in 
 
 Thanks to the power of the internets (and github <3) these people have kindly helped out with the project.
 
-[Paul Brunt](http://github.com/supereggbert), [Fernando Serrano](http://kile.stravaganza.org/), [kikko](http://github.com/kikko).
+[philogb](http://github.com/philogb), [supereggbert](http://github.com/supereggbert), [kikko](http://github.com/kikko), [kile](http://kile.stravaganza.org/), ...
 
 
 ### Change Log ###
+
+2010 09 17 - **r17** (39.005 kb)
+
+* Added `Light`, `AmbientLight` and `DirectionalLight` ([philogb](http://github.com/philogb))
+* `WebGLRenderer` basic lighting support ([philogb](http://github.com/philogb))
+
 
 2010 08 21 - **r16** (35.592 kb)
 

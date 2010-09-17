@@ -7,9 +7,8 @@ THREE.Color = function ( hex ) {
 	/*
 	this.r; this.g; this.b; this.a;
 	this.hex;
-	*/
-
 	this.__styleString = 'rgba(0, 0, 0, 1)';
+	*/
 
 	this.setHex = function ( hex ) {
 
@@ -39,10 +38,10 @@ THREE.Color = function ( hex ) {
 
 	this.updateRGBA = function () {
 
-		this.a = ( this.hex >> 24 & 0xff ) / 0xff;
-		this.r = ( this.hex >> 16 & 0xff ) / 0xff;
-		this.g = ( this.hex >> 8 & 0xff ) / 0xff;
-		this.b = ( this.hex & 0xff ) / 0xff;
+		this.a = ( this.hex >> 24 & 255 ) / 255;
+		this.r = ( this.hex >> 16 & 255 ) / 255;
+		this.g = ( this.hex >> 8 & 255 ) / 255;
+		this.b = ( this.hex & 255 ) / 255;
 
 	};
 

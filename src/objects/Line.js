@@ -4,9 +4,10 @@
 
 THREE.Line = function ( geometry, material ) {
 
-	THREE.Object3D.call( this, material );
+	THREE.Object3D.call( this );
 
 	this.geometry = geometry;
+	this.material = material instanceof Array ? material : [ material ];
 
 };
 

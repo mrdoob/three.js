@@ -1,9 +1,9 @@
 import sys
 import os
 
-# MERGER
+filename = 'ThreeCanvas.js'
 
-rev = 16
+# MERGER
 
 files = []
 files.append('Three.js')
@@ -23,6 +23,9 @@ files.append('objects/Object3D.js')
 files.append('objects/Line.js')
 files.append('objects/Mesh.js')
 files.append('objects/Particle.js')
+files.append('lights/Light.js')
+files.append('lights/AmbientLight.js')
+files.append('lights/DirectionalLight.js')
 files.append('materials/LineColorMaterial.js')
 files.append('materials/MeshBitmapUVMappingMaterial.js')
 files.append('materials/MeshColorFillMaterial.js')
@@ -34,8 +37,6 @@ files.append('materials/ParticleCircleMaterial.js')
 files.append('scenes/Scene.js')
 files.append('renderers/Renderer.js')
 files.append('renderers/CanvasRenderer.js')
-files.append('renderers/SVGRenderer.js')
-files.append('renderers/WebGLRenderer.js')
 files.append('renderers/renderables/RenderableFace3.js')
 files.append('renderers/renderables/RenderableFace4.js')
 files.append('renderers/renderables/RenderableParticle.js')
@@ -47,16 +48,6 @@ for item in files:
 	src_file = open('../src/' + item,'r')
 	string += src_file.read() + "\n"
 
-position = 0
-
-while True:
-	position = string.find("/* DEBUG", position)
-	if position == -1:
-		break
-	string = string[0:position] + string[position+8:]
-	position = string.find("*/", position)
-	string = string[0:position] + string[position+2:]
-
 tmp_file = open('temp.js','w')
 tmp_file.write(string)
 tmp_file.close()
@@ -64,16 +55,20 @@ tmp_file.close()
 
 # YUICOMPRESSOR
 
-os.system("java -jar yuicompressor-2.4.2.jar temp.js -o ../build/ThreeDebug.js --charset utf-8 -v")
-os.unlink("temp.js");
+os.system("java -jar yuicompressor-2.4.2.jar temp.js -o ../build/" + filename + " --charset utf-8 -v")
+os.unlink("temp.js")
+
 
 # HEADER
 
-output = '../build/ThreeDebug.js'
-string = "// three.js r" + str(rev) + " - http://github.com/mrdoob/three.js\n"
+rev_file = open('REVISION','r')
+rev = rev_file.read().rstrip()
+
+output = '../build/' + filename
+string = "// " + filename + " r" + rev + " - http://github.com/mrdoob/three.js\n"
 
 src_file = open(output,'r')
-string += src_file.read();
+string += src_file.read()
 
 dep_file = open(output,'w')
 dep_file.write(string)
