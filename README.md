@@ -27,7 +27,7 @@ Other similar projects: [pre3d](http://deanm.github.com/pre3d/), [pvjs](http://c
 
 ### Featured projects ###
 
-[![The Wilderness Downtown](http://mrdoob.github.com/three.js/assets/projects/08_wutw.png)](http://thewildernessdowntown.com/)
+[![The Wilderness Downtown](http://mrdoob.github.com/three.js/assets/projects/09_arcadefire.png)](http://thewildernessdowntown.com/)
 [![CloudSCAD](http://mrdoob.github.com/three.js/assets/projects/08_cloudscad.png)](http://cloudscad.com/stl_viewer/)
 [![Or so they say...](http://mrdoob.github.com/three.js/assets/projects/07_orsotheysay.png)](http://xplsv.com/prods/demos/online/xplsv_orsotheysay/)
 [![Rat](http://mrdoob.github.com/three.js/assets/projects/06_rat.png)](http://tech.lab212.org/2010/07/export-textured-models-from-blender2-5-to-three-js/)
