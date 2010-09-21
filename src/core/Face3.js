@@ -13,10 +13,14 @@ THREE.Face3 = function ( a, b, c, normal, color ) {
 
 	this.color = color || new THREE.Color( 0x000000 );
 
-	this.toString = function () {
+};
+
+THREE.Face3.prototype = {
+
+	toString: function () {
 
 		return 'THREE.Face3 ( ' + this.a + ', ' + this.b + ', ' + this.c + ' )';
 
-	};
+	}
 
-};
+}

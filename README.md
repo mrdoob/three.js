@@ -136,10 +136,11 @@ Thanks to the power of the internets (and github <3) these people have kindly he
 
 ### Change Log ###
 
-2010 09 17 - **r17** (39.005 kb)
+2010 09 17 - **r17** (39.487 kb)
 
 * Added `Light`, `AmbientLight` and `DirectionalLight` ([philogb](http://github.com/philogb))
 * `WebGLRenderer` basic lighting support ([philogb](http://github.com/philogb))
+* Memory optimisations
 
 
 2010 08 21 - **r16** (35.592 kb)

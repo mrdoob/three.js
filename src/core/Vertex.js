@@ -10,8 +10,12 @@ THREE.Vertex = function ( position, normal ) {
 
 	this.__visible = true;
 
-	this.toString = function () {
+}
+
+THREE.Vertex.prototype = {
+
+	toString: function () {
 
 		return 'THREE.Vertex ( position: ' + this.position + ', normal: ' + this.normal + ' )';
-	};
+	}
 };

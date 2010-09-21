@@ -185,24 +185,28 @@ THREE.Matrix4.prototype = {
 			this.n11 * this.n22 * this.n33 * this.n44 );
 
 	},
-	
-  transpose: function () {
-    function swap(obj, p1, p2) {
-      var aux = obj[p1];
-      obj[p1] = obj[p2];
-      obj[p2] = aux;
-    }
-    
-    swap(this, 'n21', 'n12');
-    swap(this, 'n31', 'n13');
-    swap(this, 'n32', 'n23');
-    swap(this, 'n41', 'n14');
-    swap(this, 'n42', 'n24');
-    swap(this, 'n43', 'n34');
-    return this;
-    
-  },
-  
+
+	transpose: function () {
+
+		function swap( obj, p1, p2 ) {
+
+			var aux = obj[ p1 ];
+			obj[ p1 ] = obj[ p2 ];
+			obj[ p2 ] = aux;
+
+		}
+
+		swap( this, 'n21', 'n12' );
+		swap( this, 'n31', 'n13' );
+		swap( this, 'n32', 'n23' );
+		swap( this, 'n41', 'n14' );
+		swap( this, 'n42', 'n24' );
+		swap( this, 'n43', 'n34' );
+
+		return this;
+
+	},
+
 	clone: function () {
 
 		var m = new THREE.Matrix4();
@@ -213,14 +217,14 @@ THREE.Matrix4.prototype = {
 		return m;
 
 	},
-	
+
 	flatten: function() {
 
 	  return [this.n11, this.n21, this.n31, this.n41,
 	      this.n12, this.n22, this.n32, this.n42,
 	      this.n13, this.n23, this.n33, this.n43,
 	      this.n14, this.n24, this.n34, this.n44];
-	 
+
 	},
 
 	toString: function() {
@@ -296,25 +300,25 @@ THREE.Matrix4.rotationZMatrix = function ( theta ) {
 
 THREE.Matrix4.rotationAxisAngleMatrix = function ( axis, angle ) {
 
-  //Based on http://www.gamedev.net/reference/articles/article1199.asp
-  
-  var rot = new THREE.Matrix4();
-  var c = Math.cos( angle );
-  var s = Math.sin( angle );
-  var t = 1 - c;
-  var x = axis.x, y = axis.y, z = axis.z;
+	//Based on http://www.gamedev.net/reference/articles/article1199.asp
 
-  rot.n11 = t * x * x + c;
-  rot.n12 = t * x * y - s * z;
-  rot.n13 = t * x * z + s * y;
-  rot.n21 = t * x * y + s * z;
-  rot.n22 = t * y * y + c;
-  rot.n23 = t * y * z - s * x;
-  rot.n31 = t * x * z - s * y;
-  rot.n32 = t * y * z + s * x;
-  rot.n33 = t * z * z + c;
+	var rot = new THREE.Matrix4(),
+	c = Math.cos( angle ),
+	s = Math.sin( angle ),
+	t = 1 - c,
+	x = axis.x, y = axis.y, z = axis.z;
 
-  return rot;
+	rot.n11 = t * x * x + c;
+	rot.n12 = t * x * y - s * z;
+	rot.n13 = t * x * z + s * y;
+	rot.n21 = t * x * y + s * z;
+	rot.n22 = t * y * y + c;
+	rot.n23 = t * y * z - s * x;
+	rot.n31 = t * x * z - s * y;
+	rot.n32 = t * y * z + s * x;
+	rot.n33 = t * z * z + c;
+
+	return rot;
 
 };
 

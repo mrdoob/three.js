@@ -8,10 +8,14 @@ THREE.LineColorMaterial = function ( hex, opacity, lineWidth ) {
 
 	this.color = new THREE.Color( ( opacity >= 0 ? ( opacity * 0xff ) << 24 : 0xff000000 ) | hex );
 
-	this.toString = function () {
+};
+
+THREE.LineColorMaterial.prototype = {
+
+	toString: function () {
 
 		return 'THREE.LineColorMaterial ( color: ' + this.color + ', lineWidth: ' + this.lineWidth + ' )';
 
-	};
+	}
 
 };

@@ -9,7 +9,11 @@ THREE.Geometry = function () {
 	this.faces = [];
 	this.uvs = [];
 
-	this.computeNormals = function () {
+};
+
+THREE.Geometry.prototype = {
+
+	computeNormals: function () {
 
 		var v, f, vA, vB, vC, cb, ab;
 
@@ -42,6 +46,12 @@ THREE.Geometry = function () {
 
 		}
 
-	};
+	},
+
+	toString: function () {
+
+		return 'THREE.Geometry ( vertices: ' + this.vertices + ', faces: ' + this.faces + ' )';
+
+	}
 
 };
