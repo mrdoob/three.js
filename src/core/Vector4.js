@@ -48,6 +48,8 @@ THREE.Vector4.prototype = {
 		this.z += v.z;
 		this.w += v.w;
 
+		return this;
+
 	},
 
 	sub: function ( v1, v2 ) {
@@ -65,6 +67,8 @@ THREE.Vector4.prototype = {
 		this.y -= v.y;
 		this.z -= v.z;
 		this.w -= v.w;
+
+		return this;
 
 	},
 

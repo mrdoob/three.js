@@ -30,6 +30,8 @@ THREE.Vector2.prototype = {
 
 		this.x += v.x;
 		this.y += v.y;
+		
+		return this;
 
 	},
 
@@ -45,6 +47,8 @@ THREE.Vector2.prototype = {
 		this.x -= v.x;
 		this.y -= v.y;
 
+		return this;
+
 	},
 
 	sub: function ( v1, v2 ) {
@@ -58,6 +62,8 @@ THREE.Vector2.prototype = {
 
 		this.x *= s;
 		this.y *= s;
+
+		return this;
 
 	},
 
