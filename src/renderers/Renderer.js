@@ -11,7 +11,8 @@ THREE.Renderer = function() {
 	particlePool = [],
 
 	vector4 = new THREE.Vector4(),
-	viewMatrix = new THREE.Matrix4();
+	projViewMatrix = new THREE.Matrix4();
+	projViewObjMatrix = new THREE.Matrix4();
 
 	function painterSort( a, b ) {
 
@@ -33,6 +34,8 @@ THREE.Renderer = function() {
 			camera.updateMatrix();
 
 		}
+		
+		projViewMatrix.multiply( camera.projectionMatrix, camera.matrix );
 
 		for ( o = 0, ol = scene.objects.length; o < ol; o++ ) {
 
@@ -46,7 +49,7 @@ THREE.Renderer = function() {
 
 			if ( object instanceof THREE.Mesh ) {
 
-				viewMatrix.multiply( camera.matrix, object.matrix );
+				projViewObjMatrix.multiply( projViewMatrix, object.matrix );
 
 				// vertices
 
@@ -55,8 +58,7 @@ THREE.Renderer = function() {
 					vertex = object.geometry.vertices[ v ];
 					vertex.screen.copy( vertex.position );
 
-					viewMatrix.transform( vertex.screen );
-					camera.projectionMatrix.transform( vertex.screen );
+					projViewObjMatrix.transform( vertex.screen );
 
 					vertex.__visible = vertex.screen.z > 0 && vertex.screen.z < 1;
 
@@ -142,15 +144,14 @@ THREE.Renderer = function() {
 
 			} else if ( object instanceof THREE.Line ) {
 
-				viewMatrix.multiply( camera.matrix, object.matrix );
+				projViewObjMatrix.multiply( projViewMatrix, object.matrix );
 
 				for ( v = 0, vl = object.geometry.vertices.length; v < vl; v++ ) {
 
 					vertex = object.geometry.vertices[ v ];
 					vertex.screen.copy( vertex.position );
 
-					viewMatrix.transform( vertex.screen );
-					camera.projectionMatrix.transform( vertex.screen );
+					projViewObjMatrix.transform( vertex.screen );
 
 					vertex.__visible = vertex.screen.z > 0 && vertex.screen.z < 1;
 
