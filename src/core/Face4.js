@@ -22,6 +22,13 @@ THREE.Face4.prototype = {
 
 		return 'THREE.Face4 ( ' + this.a + ', ' + this.b + ', ' + this.c + ' ' + this.d + ' )';
 
+	},
+	
+	getCenter : function(){
+
+	  return this.a.clone().addSelf(this.b).addSelf(this.c).addSelf(this.d).divideScalar(4);
+
 	}
 
+  
 }

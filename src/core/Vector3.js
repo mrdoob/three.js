@@ -44,6 +44,8 @@ THREE.Vector3.prototype = {
 		this.y += v.y;
 		this.z += v.z;
 
+		return this;
+
 	},
 
 	addScalar: function ( s ) {
@@ -51,6 +53,8 @@ THREE.Vector3.prototype = {
 		this.x += s;
 		this.y += s;
 		this.z += s;
+
+		return this;
 
 	},
 
@@ -67,6 +71,8 @@ THREE.Vector3.prototype = {
 		this.x -= v.x;
 		this.y -= v.y;
 		this.z -= v.z;
+
+		return this;
 
 	},
 
@@ -86,6 +92,8 @@ THREE.Vector3.prototype = {
 		this.y = tz * v.x - tx * v.z;
 		this.z = tx * v.y - ty * v.x;
 
+		return this;
+
 	},
 
 	multiplySelf: function ( v ) {
@@ -93,6 +101,8 @@ THREE.Vector3.prototype = {
 		this.x *= v.x;
 		this.y *= v.y;
 		this.z *= v.z;
+
+		return this;
 
 	},
 
@@ -102,6 +112,8 @@ THREE.Vector3.prototype = {
 		this.y *= s;
 		this.z *= s;
 
+		return this;
+
 	},
 
 	divideScalar: function ( s ) {
@@ -109,6 +121,8 @@ THREE.Vector3.prototype = {
 		this.x /= s;
 		this.y /= s;
 		this.z /= s;
+
+		return this;
 
 	},
 
@@ -148,6 +162,8 @@ THREE.Vector3.prototype = {
 		this.x = - this.x;
 		this.y = - this.y;
 		this.z = - this.z;
+
+		return this;
 
 	},
 
