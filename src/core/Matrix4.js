@@ -70,6 +70,8 @@ THREE.Matrix4.prototype = {
 			v.z = v.z / vw;
 
 		}
+		
+		return v;
 
 	},
 
