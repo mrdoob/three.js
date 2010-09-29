@@ -20,6 +20,8 @@ THREE.Vector4.prototype = {
 		this.y = y;
 		this.z = z;
 		this.w = w;
+		
+		return this;
 
 	},
 
@@ -30,6 +32,8 @@ THREE.Vector4.prototype = {
 		this.z = v.z;
 		this.w = v.w;
 
+		return this;
+
 	},
 
 	add: function ( v1, v2 ) {
@@ -38,6 +42,8 @@ THREE.Vector4.prototype = {
 		this.y = v1.y + v2.y;
 		this.z = v1.z + v2.z;
 		this.w = v1.w + v2.w;
+
+		return this;
 
 	},
 
@@ -58,6 +64,8 @@ THREE.Vector4.prototype = {
 		this.y = v1.y - v2.y;
 		this.z = v1.z - v2.z;
 		this.w = v1.w - v2.w;
+
+		return this;
 
 	},
 
