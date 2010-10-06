@@ -1,10 +1,9 @@
-THREE.DirectionalLight = function(color, direction) {
-  
-  THREE.Light.call(this, color);
-  
-  this.direction = direction || new Vector3(1, 1, 1);
-  
-  this.direction.normalize();
+THREE.DirectionalLight = function ( hex, intensity ) {
+
+	THREE.Light.call( this, hex );
+
+	this.position = new THREE.Vector3( 0, 1, 0 );
+	this.intensity = intensity || 1;
 
 };
 

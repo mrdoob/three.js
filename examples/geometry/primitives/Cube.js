@@ -37,6 +37,7 @@ var Cube = function (width, height, depth) {
 		scope.faces.push( new THREE.Face4( a, b, c, d ) );
 	}
 
+	this.computeCentroids();
 	this.computeNormals();
 
 }

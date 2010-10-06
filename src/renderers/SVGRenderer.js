@@ -4,12 +4,19 @@
 
 THREE.SVGRenderer = function () {
 
-	THREE.Renderer.call( this );
-
-	var _svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'),
+	var _renderList = null,
+	_projector = new THREE.Projector(),
+	_svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'),
 	_width, _height, _widthHalf, _heightHalf,
 	_clipRect = new THREE.Rectangle(),
 	_bboxRect = new THREE.Rectangle(),
+
+	_color = new THREE.Color( 0xffffffff ),
+	_light = new THREE.Color( 0xffffffff ),
+	_ambientLight = new THREE.Color( 0xffffffff ),
+
+	_vector3 = new THREE.Vector3(), // Needed for PointLight
+
 	_svgPathPool = [], _svgCirclePool = [],
 	_quality = 1;
 
@@ -63,11 +70,13 @@ THREE.SVGRenderer = function () {
 
 		}
 
-		this.project( scene, camera );
+		_renderList = _projector.projectScene( scene, camera );
 
-		for ( e = 0, el = this.renderList.length; e < el; e++ ) {
+		calculateAmbientLight( scene, _ambientLight );
 
-			element = this.renderList[ e ];
+		for ( e = 0, el = _renderList.length; e < el; e++ ) {
+
+			element = _renderList[ e ];
 
 			for ( m = 0, ml = element.material.length; m < ml; m++ ) {
 
@@ -135,23 +144,52 @@ THREE.SVGRenderer = function () {
 
 				}
 
+
 				// TODO: Move out of materials loop
 
 				if ( material instanceof THREE.MeshColorFillMaterial ) {
 
-					svgNode.setAttribute( 'style', 'fill: ' + material.color.__styleString );
+					_light.copyRGB( _ambientLight );
+					addLights( scene, element, _light );
+
+					_color.copyRGBA( material.color );
+					_color.multiplySelfRGB( _light );
+					_color.updateStyleString();
+
+					svgNode.setAttribute( 'style', 'fill: ' + _color.__styleString );
 
 				} else if ( material instanceof THREE.MeshFaceColorFillMaterial ) {
 
-					svgNode.setAttribute( 'style', 'fill: ' + element.color.__styleString );
+					_light.copyRGB( _ambientLight );
+					addLights( scene, element, _light );
+
+					_color.copyRGBA( element.color );
+					_color.multiplySelfRGB( _light );
+					_color.updateStyleString();
+
+					svgNode.setAttribute( 'style', 'fill: ' + _color.__styleString );
 
 				} else if ( material instanceof THREE.MeshColorStrokeMaterial ) {
 
-					svgNode.setAttribute( 'style', 'fill: none; stroke: ' + material.color.__styleString + '; stroke-width: ' + material.lineWidth + '; stroke-linecap: round; stroke-linejoin: round' );
+					_light.copyRGB( _ambientLight );
+					addLights( scene, element, _light );
+
+					_color.copyRGBA( material.color );
+					_color.multiplySelfRGB( _light );
+					_color.updateStyleString();
+
+					svgNode.setAttribute( 'style', 'fill: none; stroke: ' + _color.__styleString + '; stroke-width: ' + material.lineWidth + '; stroke-linecap: round; stroke-linejoin: round' );
 
 				} else if ( material instanceof THREE.MeshFaceColorStrokeMaterial ) {
 
-					svgNode.setAttribute( 'style', 'fill: none; stroke: ' + element.color.__styleString + '; stroke-width: ' + material.lineWidth + '; stroke-linecap: round; stroke-linejoin: round' );
+					_light.copyRGB( _ambientLight );
+					addLights( scene, element, _light );
+
+					_color.copyRGBA( element.color );
+					_color.multiplySelfRGB( _light );
+					_color.updateStyleString();
+
+					svgNode.setAttribute( 'style', 'fill: none; stroke: ' + _color.__styleString + '; stroke-width: ' + material.lineWidth + '; stroke-linecap: round; stroke-linejoin: round' );
 
 				}
 
@@ -162,6 +200,69 @@ THREE.SVGRenderer = function () {
 		}
 
 	};
+
+	function calculateAmbientLight( scene, color ) {
+
+		var l, ll, light;
+
+		color.setRGBA( 1, 1, 1, 1 );
+
+		for ( l = 0, ll = scene.lights.length; l < ll; l++ ) {
+
+			light = scene.lights[ l ];
+
+			if ( light instanceof THREE.AmbientLight ) {
+
+				color.r *= light.color.r;
+				color.g *= light.color.g;
+				color.b *= light.color.b;
+
+			}
+
+		}
+
+	}
+
+	function addLights( scene, element, color ) {
+
+		var l, ll, light, amount;
+
+		for ( l = 0, ll = scene.lights.length; l < ll; l++ ) {
+
+			light = scene.lights[ l ];
+
+			if ( light instanceof THREE.DirectionalLight ) {
+
+				amount = element.normalWorld.dot( light.position ) * light.intensity;
+
+				if ( amount > 0 ) {
+
+					color.r += light.color.r * amount;
+					color.g += light.color.g * amount;
+					color.b += light.color.b * amount;
+
+				}
+
+			} else if ( light instanceof THREE.PointLight ) {
+
+				_vector3.sub( light.position, element.centroidWorld );
+				_vector3.normalize();
+
+				amount = element.normalWorld.dot( _vector3 ) * light.intensity;
+
+				if ( amount > 0 ) {
+
+					color.r += light.color.r * amount;
+					color.g += light.color.g * amount;
+					color.b += light.color.b * amount;
+
+				}
+
+			}
+
+		}
+
+	}
 
 	function getPathNode( id ) {
 
@@ -204,6 +305,3 @@ THREE.SVGRenderer = function () {
 	}
 
 };
-
-THREE.SVGRenderer.prototype = new THREE.Renderer();
-THREE.SVGRenderer.prototype.constructor = THREE.CanvasRenderer;

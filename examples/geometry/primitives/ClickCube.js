@@ -38,6 +38,7 @@ var ClickCube = function (width, height, depth, onSelect) {
 		scope.faces.push(f);
 	}
 
+	this.computeCentroids();
 	this.computeNormals();
 
 };

@@ -86,6 +86,9 @@ var Sphere = function ( radius, segments_width, segments_height ) {
 			}
 		}
 	}
+
+	this.computeCentroids();
+	this.computeNormals();
 }
 
 Sphere.prototype = new THREE.Geometry();

@@ -30,6 +30,15 @@ THREE.Matrix4.prototype = {
 
 	},
 
+	copy: function ( m ) {
+
+		this.n11 = m.n11; this.n12 = m.n12; this.n13 = m.n13; this.n14 = m.n14;
+		this.n21 = m.n21; this.n22 = m.n22; this.n23 = m.n23; this.n24 = m.n24;
+		this.n31 = m.n31; this.n32 = m.n32; this.n33 = m.n33; this.n34 = m.n34;
+		this.n41 = m.n41; this.n42 = m.n42; this.n43 = m.n43; this.n44 = m.n44;
+
+	},
+
 	lookAt: function ( eye, center, up ) {
 
 		var x = this._x, y = this._y, z = this._z;
@@ -70,7 +79,7 @@ THREE.Matrix4.prototype = {
 			v.z = v.z / vw;
 
 		}
-		
+
 		return v;
 
 	},
@@ -222,19 +231,19 @@ THREE.Matrix4.prototype = {
 
 	flatten: function() {
 
-	  return [this.n11, this.n21, this.n31, this.n41,
-	      this.n12, this.n22, this.n32, this.n42,
-	      this.n13, this.n23, this.n33, this.n43,
-	      this.n14, this.n24, this.n34, this.n44];
+		return [this.n11, this.n21, this.n31, this.n41,
+			this.n12, this.n22, this.n32, this.n42,
+			this.n13, this.n23, this.n33, this.n43,
+			this.n14, this.n24, this.n34, this.n44];
 
 	},
 
 	toString: function() {
 
-		return "| " + this.n11 + " " + this.n12 + " " + this.n13 + " " + this.n14 + " |\n" +
-		"| " + this.n21 + " " + this.n22 + " " + this.n23 + " " + this.n24 + " |\n" +
-		"| " + this.n31 + " " + this.n32 + " " + this.n33 + " " + this.n34 + " |\n" +
-		"| " + this.n41 + " " + this.n42 + " " + this.n43 + " " + this.n44 + " |";
+		return  "| " + this.n11 + " " + this.n12 + " " + this.n13 + " " + this.n14 + " |\n" +
+			"| " + this.n21 + " " + this.n22 + " " + this.n23 + " " + this.n24 + " |\n" +
+			"| " + this.n31 + " " + this.n32 + " " + this.n33 + " " + this.n34 + " |\n" +
+			"| " + this.n41 + " " + this.n42 + " " + this.n43 + " " + this.n44 + " |";
 
 	}
 

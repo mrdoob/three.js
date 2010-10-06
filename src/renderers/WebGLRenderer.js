@@ -30,7 +30,7 @@ THREE.WebGLRenderer = function () {
 
 	this.render = function ( scene, camera ) {
 
-		var face, faceColor, object, material, normal, lightColor, lightDirection, light,
+		var face, faceColor, object, material, normal, lightColor, lightPosition, light,
 		vertexArray, faceArray, colorArray, normalArray, vertexIndex,
 		o, ol, f, fl, m, ml, i, v1, v2, v3, v4,
 		l, ll;
@@ -56,8 +56,8 @@ THREE.WebGLRenderer = function () {
 			} else if( light instanceof THREE.DirectionalLight ) {
 
 				lightColor = light.color;
-				lightDirection = light.direction;
-				_gl.uniform3f( _program.lightingDirection, lightDirection.x, lightDirection.y, lightDirection.z );
+				lightPosition = light.position;
+				_gl.uniform3f( _program.lightingDirection, lightPosition.x, lightPosition.y, lightPosition.z );
 				_gl.uniform3f( _program.directionalColor, lightColor.r, lightColor.g, lightColor.b );
 
 			}

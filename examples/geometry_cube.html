@@ -20,7 +20,7 @@
 		<script type="text/javascript" src="geometry/primitives/Cube.js"></script>
 		<script type="text/javascript" src="geometry/primitives/Plane.js"></script>
 
-		<script type="text/javascript" src="http://github.com/mrdoob/stats.js/raw/master/build/Stats.js"></script>
+		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
 
@@ -79,27 +79,27 @@
 
 				cube = new THREE.Mesh(geometry, new THREE.MeshFaceColorFillMaterial() );
 				cube.position.y = 150;
-				scene.addObject(cube);
+				scene.addObject( cube );
 
 				// Plane
 
-				plane = new THREE.Mesh( new Plane( 200, 200, 4, 4 ), new THREE.MeshColorFillMaterial( 0xe0e0e0 ) );
+				plane = new THREE.Mesh( new Plane( 200, 200 ), new THREE.MeshColorFillMaterial( 0xe0e0e0 ) );
 				plane.rotation.x = -90 * ( Math.PI / 180 );
-				scene.addObject(plane);
+				scene.addObject( plane );
 
 				renderer = new THREE.CanvasRenderer();
-				renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
-				container.appendChild(renderer.domElement);
+				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
-				container.appendChild(stats.domElement);
+				container.appendChild( stats.domElement );
 
-				document.addEventListener('mousedown', onDocumentMouseDown, false);
-				document.addEventListener('touchstart', onDocumentTouchStart, false);
-				document.addEventListener('touchmove', onDocumentTouchMove, false);
+				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
+				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
 			}
 
 			//
@@ -108,9 +108,9 @@
 
 				event.preventDefault();
 
-				document.addEventListener('mousemove', onDocumentMouseMove, false);
-				document.addEventListener('mouseup', onDocumentMouseUp, false);
-				document.addEventListener('mouseout', onDocumentMouseOut, false);
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.addEventListener( 'mouseup', onDocumentMouseUp, false );
+				document.addEventListener( 'mouseout', onDocumentMouseOut, false );
 
 				mouseXOnMouseDown = event.clientX - windowHalfX;
 				targetRotationOnMouseDown = targetRotation;
@@ -120,30 +120,30 @@
 
 				mouseX = event.clientX - windowHalfX;
 
-				targetRotation = targetRotationOnMouseDown + (mouseX - mouseXOnMouseDown) * 0.02;
+				targetRotation = targetRotationOnMouseDown + ( mouseX - mouseXOnMouseDown ) * 0.02;
 			}
 
 			function onDocumentMouseUp( event ) {
 
-				document.removeEventListener('mousemove', onDocumentMouseMove, false);
-				document.removeEventListener('mouseup', onDocumentMouseUp, false);
-				document.removeEventListener('mouseout', onDocumentMouseOut, false);
+				document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
+				document.removeEventListener( 'mouseout', onDocumentMouseOut, false );
 			}
 
 			function onDocumentMouseOut( event ) {
 
-				document.removeEventListener('mousemove', onDocumentMouseMove, false);
-				document.removeEventListener('mouseup', onDocumentMouseUp, false);
-				document.removeEventListener('mouseout', onDocumentMouseOut, false);
+				document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
+				document.removeEventListener( 'mouseout', onDocumentMouseOut, false );
 			}
 
 			function onDocumentTouchStart( event ) {
 
-				if(event.touches.length == 1) {
+				if ( event.touches.length == 1 ) {
 
 					event.preventDefault();
 
-					mouseXOnMouseDown = event.touches[0].pageX - windowHalfX;
+					mouseXOnMouseDown = event.touches[ 0 ].pageX - windowHalfX;
 					targetRotationOnMouseDown = targetRotation;
 
 				}
@@ -151,12 +151,12 @@
 
 			function onDocumentTouchMove( event ) {
 
-				if(event.touches.length == 1) {
+				if ( event.touches.length == 1 ) {
 
 					event.preventDefault();
 
-					mouseX = event.touches[0].pageX - windowHalfX;
-					targetRotation = targetRotationOnMouseDown + (mouseX - mouseXOnMouseDown) * 0.05;
+					mouseX = event.touches[ 0 ].pageX - windowHalfX;
+					targetRotation = targetRotationOnMouseDown + ( mouseX - mouseXOnMouseDown ) * 0.05;
 
 				}
 			}
@@ -165,7 +165,7 @@
 
 			function loop() {
 
-				plane.rotation.z = cube.rotation.y += (targetRotation - cube.rotation.y) * 0.05;
+				plane.rotation.z = cube.rotation.y += ( targetRotation - cube.rotation.y ) * 0.05;
 
 				renderer.render(scene, camera);
 				stats.update();

@@ -4,17 +4,23 @@
 
 THREE.CanvasRenderer = function () {
 
-	THREE.Renderer.call( this );
+	var _renderList = null,
+	_projector = new THREE.Projector(),
 
-	var _canvas = document.createElement( 'canvas' ),
+	_canvas = document.createElement( 'canvas' ),
 	_context = _canvas.getContext( '2d' ),
 	_width, _height, _widthHalf, _heightHalf,
 	_clipRect = new THREE.Rectangle(),
 	_clearRect = new THREE.Rectangle(),
 	_bboxRect = new THREE.Rectangle(),
-	_vector2 = new THREE.Vector2(),
 
-	v5 = new THREE.Vector2(), v6 = new THREE.Vector2(),
+	_color = new THREE.Color( 0xffffffff ),
+	_light = new THREE.Color( 0xffffffff ),
+	_ambientLight = new THREE.Color( 0xffffffff ),
+
+	_vector2 = new THREE.Vector2(), // Needed for expand
+	_vector3 = new THREE.Vector3(), // Needed for PointLight
+	v5 = new THREE.Vector2(), v6 = new THREE.Vector2(), // Needed for latter splitting tris to quads
 	uv1 = new THREE.UV(), uv2 = new THREE.UV(), uv3 = new THREE.UV(), uv4 = new THREE.UV();
 
 	this.domElement = _canvas;
@@ -39,14 +45,14 @@ THREE.CanvasRenderer = function () {
 			_clearRect.inflate( 1 );
 			_clearRect.minSelf( _clipRect );
 
-			/*
 			_context.setTransform( 1, 0, 0, - 1, _widthHalf, _heightHalf );
 			_context.clearRect( _clearRect.getX(), _clearRect.getY(), _clearRect.getWidth(), _clearRect.getHeight() );
-			*/
 
+			/*
 			// Opera workaround
 			_context.setTransform( 1, 0, 0, 1, _widthHalf, _heightHalf );
 			_context.clearRect( _clearRect.getX(), - ( _clearRect.getHeight() + _clearRect.getY() ), _clearRect.getWidth(), _clearRect.getHeight() );
+			*/
 
 			_clearRect.empty();
 
@@ -55,18 +61,18 @@ THREE.CanvasRenderer = function () {
 
 	this.render = function ( scene, camera ) {
 
-		var e, el, m, ml, element, material, pi2 = Math.PI * 2,
+		var e, el, element, m, ml, material, pi2 = Math.PI * 2,
 		v1x, v1y, v2x, v2y, v3x, v3y, v4x, v4y, v5x, v5y, v6x, v6y,
 		width, height, scaleX, scaleY, offsetX, offsetY,
 		bitmap, bitmapWidth, bitmapHeight;
-
-		this.project( scene, camera );
 
 		if ( this.autoClear ) {
 
 			this.clear();
 
 		}
+
+		_renderList = _projector.projectScene( scene, camera );
 
 		_context.setTransform( 1, 0, 0, - 1, _widthHalf, _heightHalf );
 
@@ -75,9 +81,11 @@ THREE.CanvasRenderer = function () {
 		_context.fillRect( _clipRect.getX(), _clipRect.getY(), _clipRect.getWidth(), _clipRect.getHeight() );
 		*/
 
-		for ( e = 0, el = this.renderList.length; e < el; e++ ) {
+		calculateAmbientLight( scene, _ambientLight );
 
-			element = this.renderList[ e ];
+		for ( e = 0, el = _renderList.length; e < el; e++ ) {
+
+			element = _renderList[ e ];
 
 			_bboxRect.empty();
 
@@ -90,6 +98,12 @@ THREE.CanvasRenderer = function () {
 					material = element.material[ m ];
 
 					if ( material instanceof THREE.ParticleCircleMaterial ) {
+
+						_light.copyRGB( _ambientLight );
+
+						_color.copyRGBA( material.color );
+						_color.multiplySelfRGB( _light );
+						_color.updateStyleString();
 
 						width = element.scale.x * _widthHalf;
 						height = element.scale.y * _heightHalf;
@@ -111,7 +125,7 @@ THREE.CanvasRenderer = function () {
 						_context.arc( 0, 0, 1, 0, pi2, true );
 						_context.closePath();
 
-						_context.fillStyle = material.color.__styleString;
+						_context.fillStyle = _color.__styleString;
 						_context.fill();
 
 						_context.restore();
@@ -191,11 +205,17 @@ THREE.CanvasRenderer = function () {
 
 					if ( material instanceof THREE.LineColorMaterial ) {
 
+						_light.copyRGB( _ambientLight );
+
+						_color.copyRGBA( material.color );
+						_color.multiplySelfRGB( _light );
+						_color.updateStyleString();
+
 						_context.lineWidth = material.lineWidth;
 						_context.lineJoin = "round";
 						_context.lineCap = "round";
 
-						_context.strokeStyle = material.color.__styleString;
+						_context.strokeStyle = _color.__styleString;
 						_context.stroke();
 
 						_bboxRect.inflate( _context.lineWidth );
@@ -238,6 +258,13 @@ THREE.CanvasRenderer = function () {
 
 					if ( material instanceof THREE.MeshColorFillMaterial ) {
 
+						_light.copyRGB( _ambientLight );
+						addLights( scene, element, _light );
+
+						_color.copyRGBA( material.color );
+						_color.multiplySelfRGB( _light );
+						_color.updateStyleString();
+
 						_context.beginPath();
 						_context.moveTo( v1x, v1y );
 						_context.lineTo( v2x, v2y );
@@ -245,10 +272,17 @@ THREE.CanvasRenderer = function () {
 						_context.lineTo( v1x, v1y );
 						_context.closePath();
 
-						_context.fillStyle = material.color.__styleString;
+						_context.fillStyle = _color.__styleString;
 						_context.fill();
 
 					} else if ( material instanceof THREE.MeshColorStrokeMaterial ) {
+
+						_light.copyRGB( _ambientLight );
+						addLights( scene, element, _light );
+
+						_color.copyRGBA( material.color );
+						_color.multiplySelfRGB( _light );
+						_color.updateStyleString();
 
 						_context.beginPath();
 						_context.moveTo( v1x, v1y );
@@ -261,13 +295,20 @@ THREE.CanvasRenderer = function () {
 						_context.lineJoin = "round";
 						_context.lineCap = "round";
 
-						_context.strokeStyle = material.color.__styleString;
+						_context.strokeStyle = _color.__styleString;
 						_context.stroke();
 
 						_bboxRect.inflate( _context.lineWidth );
 
 					} else if ( material instanceof THREE.MeshFaceColorFillMaterial ) {
 
+						_light.copyRGB( _ambientLight );
+						addLights( scene, element, _light );
+
+						_color.copyRGBA( element.color );
+						_color.multiplySelfRGB( _light );
+						_color.updateStyleString();
+
 						_context.beginPath();
 						_context.moveTo( v1x, v1y );
 						_context.lineTo( v2x, v2y );
@@ -275,10 +316,17 @@ THREE.CanvasRenderer = function () {
 						_context.lineTo( v1x, v1y );
 						_context.closePath();
 
-						_context.fillStyle = element.color.__styleString;
+						_context.fillStyle = _color.__styleString;
 						_context.fill();
 
 					} else if ( material instanceof THREE.MeshFaceColorStrokeMaterial ) {
+
+						_light.copyRGB( _ambientLight );
+						addLights( scene, element, _light );
+
+						_color.copyRGBA( element.color );
+						_color.multiplySelfRGB( _light );
+						_color.updateStyleString();
 
 						_context.beginPath();
 						_context.moveTo( v1x, v1y );
@@ -291,7 +339,7 @@ THREE.CanvasRenderer = function () {
 						_context.lineJoin = "round";
 						_context.lineCap = "round";
 
-						_context.strokeStyle = element.color.__styleString;
+						_context.strokeStyle = _color.__styleString;
 						_context.stroke();
 
 						_bboxRect.inflate( _context.lineWidth );
@@ -385,6 +433,13 @@ THREE.CanvasRenderer = function () {
 
 					if ( material instanceof THREE.MeshColorFillMaterial ) {
 
+						_light.copyRGB( _ambientLight );
+						addLights( scene, element, _light );
+
+						_color.copyRGBA( material.color );
+						_color.multiplySelfRGB( _light );
+						_color.updateStyleString();
+
 						_context.beginPath();
 						_context.moveTo( v1x, v1y );
 						_context.lineTo( v2x, v2y );
@@ -393,11 +448,18 @@ THREE.CanvasRenderer = function () {
 						_context.lineTo( v1x, v1y );
 						_context.closePath();
 
-						_context.fillStyle = material.color.__styleString;
+						_context.fillStyle = _color.__styleString;
 						_context.fill();
 
 
 					} else if ( material instanceof THREE.MeshColorStrokeMaterial ) {
+
+						_light.copyRGB( _ambientLight );
+						addLights( scene, element, _light );
+
+						_color.copyRGBA( material.color );
+						_color.multiplySelfRGB( _light );
+						_color.updateStyleString();
 
 						_context.beginPath();
 						_context.moveTo( v1x, v1y );
@@ -411,13 +473,20 @@ THREE.CanvasRenderer = function () {
 						_context.lineJoin = "round";
 						_context.lineCap = "round";
 
-						_context.strokeStyle = material.color.__styleString;
+						_context.strokeStyle = _color.__styleString;
 						_context.stroke();
 
 						_bboxRect.inflate( _context.lineWidth );
 
 					} else if ( material instanceof THREE.MeshFaceColorFillMaterial ) {
 
+						_light.copyRGB( _ambientLight );
+						addLights( scene, element, _light );
+
+						_color.copyRGBA( element.color );
+						_color.multiplySelfRGB( _light );
+						_color.updateStyleString();
+
 						_context.beginPath();
 						_context.moveTo( v1x, v1y );
 						_context.lineTo( v2x, v2y );
@@ -426,10 +495,17 @@ THREE.CanvasRenderer = function () {
 						_context.lineTo( v1x, v1y );
 						_context.closePath();
 
-						_context.fillStyle = element.color.__styleString;
+						_context.fillStyle = _color.__styleString;
 						_context.fill();
 
 					} else if ( material instanceof THREE.MeshFaceColorStrokeMaterial ) {
+
+						_light.copyRGB( _ambientLight );
+						addLights( scene, element, _light );
+
+						_color.copyRGBA( element.color );
+						_color.multiplySelfRGB( _light );
+						_color.updateStyleString();
 
 						_context.beginPath();
 						_context.moveTo( v1x, v1y );
@@ -443,7 +519,7 @@ THREE.CanvasRenderer = function () {
 						_context.lineJoin = "round";
 						_context.lineCap = "round";
 
-						_context.strokeStyle = element.color.__styleString;
+						_context.strokeStyle = _color.__styleString;
 						_context.stroke();
 
 						_bboxRect.inflate( _context.lineWidth );
@@ -513,7 +589,70 @@ THREE.CanvasRenderer = function () {
 
 	};
 
-	function drawTexturedTriangle( bitmap, v1x, v1y, v2x, v2y, v3x, v3y, uv1u, uv1v, uv2u, uv2v, uv3u, uv3v )  {
+	function calculateAmbientLight( scene, color ) {
+
+		var l, ll, light;
+
+		color.setRGBA( 1, 1, 1, 1 );
+
+		for ( l = 0, ll = scene.lights.length; l < ll; l++ ) {
+
+			light = scene.lights[ l ];
+
+			if ( light instanceof THREE.AmbientLight ) {
+
+				color.r *= light.color.r;
+				color.g *= light.color.g;
+				color.b *= light.color.b;
+
+			}
+
+		}
+
+	}
+
+	function addLights( scene, element, color ) {
+
+		var l, ll, light, amount;
+
+		for ( l = 0, ll = scene.lights.length; l < ll; l++ ) {
+
+			light = scene.lights[ l ];
+
+			if ( light instanceof THREE.DirectionalLight ) {
+
+				amount = element.normalWorld.dot( light.position ) * light.intensity;
+
+				if ( amount > 0 ) {
+
+					color.r += light.color.r * amount;
+					color.g += light.color.g * amount;
+					color.b += light.color.b * amount;
+
+				}
+
+			} else if ( light instanceof THREE.PointLight ) {
+
+				_vector3.sub( light.position, element.centroidWorld );
+				_vector3.normalize();
+
+				amount = element.normalWorld.dot( _vector3 ) * light.intensity;
+
+				if ( amount > 0 ) {
+
+					color.r += light.color.r * amount;
+					color.g += light.color.g * amount;
+					color.b += light.color.b * amount;
+
+				}
+
+			}
+
+		}
+
+	}
+
+	function drawTexturedTriangle( bitmap, v1x, v1y, v2x, v2y, v3x, v3y, uv1u, uv1v, uv2u, uv2v, uv3u, uv3v ) {
 
 		// Textured triangle drawing by Thatcher Ulrich.
 		// http://tulrich.com/geekstuff/canvas/jsgl.js
@@ -546,10 +685,13 @@ THREE.CanvasRenderer = function () {
 
 	}
 
+	// Hide anti-alias gaps
+
 	function expand( a, b ) {
 
 		_vector2.sub( b, a );
 		_vector2.unit();
+		_vector2.multiplyScalar( 0.75 );
 
 		b.addSelf( _vector2 );
 		a.subSelf( _vector2 );
@@ -557,6 +699,3 @@ THREE.CanvasRenderer = function () {
 	}
 
 };
-
-THREE.CanvasRenderer.prototype = new THREE.Renderer();
-THREE.CanvasRenderer.prototype.constructor = THREE.CanvasRenderer;

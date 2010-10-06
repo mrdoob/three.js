@@ -52,6 +52,7 @@ var Plane = function ( width, height, segments_width, segments_height ) {
 
 	}
 
+	this.computeCentroids();
 	this.computeNormals();
 
 }
