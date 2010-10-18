@@ -358,7 +358,6 @@ THREE.CanvasRenderer = function () {
 							_context.moveTo( v1x, v1y );
 							_context.lineTo( v2x, v2y );
 							_context.lineTo( v3x, v3y );
-							_context.lineTo( v4x, v4y );
 							_context.lineTo( v1x, v1y );
 							_context.closePath();
 
@@ -668,6 +667,10 @@ THREE.CanvasRenderer = function () {
 
 		_context.save();
 		_context.clip();
+        
+        // debug triangle outline
+        //_context.strokeStyle = "black";
+        //_context.stroke();
 
 		denom = uv1u * ( uv3v - uv2v ) - uv2u * uv3v + uv3u * uv2v + ( uv2u - uv3u ) * uv1v;
 

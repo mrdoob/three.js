@@ -96,7 +96,7 @@ THREE.Projector = function() {
 
 								_face3.z = Math.max( v1.positionScreen.z, Math.max( v2.positionScreen.z, v3.positionScreen.z ) );
 
-								_face3.material = object.material;
+								_face3.material = [ object.material[face.material] ];
 								_face3.overdraw = object.overdraw;
 								_face3.uvs = object.geometry.uvs[ f ];
 								_face3.color = face.color;
@@ -135,7 +135,7 @@ THREE.Projector = function() {
 
 								_face4.z = Math.max( v1.positionScreen.z, Math.max( v2.positionScreen.z, Math.max( v3.positionScreen.z, v4.positionScreen.z ) ) );
 
-								_face4.material = object.material;
+								_face4.material = [ object.material[face.material] ];
 								_face4.overdraw = object.overdraw;
 								_face4.uvs = object.geometry.uvs[ f ];
 								_face4.color = face.color;

@@ -43,7 +43,7 @@ var Sphere = function ( radius, segments_width, segments_height ) {
 
 	}
 
-	var iVerNum = aVtc.length;
+	var n1, n2, n3, iVerNum = aVtc.length;
 
 	for ( j = 0; j < iVerNum; j++ ) {
 
@@ -70,15 +70,31 @@ var Sphere = function ( radius, segments_width, segments_height ) {
 				var aP4uv = new THREE.UV( 1 - fI0, fJ1 );
 
 				if ( j < ( aVtc.length - 1 ) ) {
+                    n1 = this.vertices[aP1].position.clone();
+                    n2 = this.vertices[aP2].position.clone();
+                    n3 = this.vertices[aP3].position.clone();
+                    n1.normalize();
+                    n2.normalize();
+                    n3.normalize();
 
-					this.faces.push( new THREE.Face3( aP1, aP2, aP3 ) );
+					this.faces.push( new THREE.Face3( aP1, aP2, aP3, [new THREE.Vector3(n1.x,n1.y,n1.z), new THREE.Vector3(n2.x,n2.y,n2.z), new THREE.Vector3(n3.x,n3.y,n3.z)] ) );
+
+					//this.faces.push( new THREE.Face3( aP1, aP2, aP3 ) );
 					this.uvs.push( [ aP1uv, aP2uv, aP3uv ] );
 
 				}
 
 				if ( j > 1 ) {
 
-					this.faces.push( new THREE.Face3( aP1, aP3, aP4 ) );
+                    n1 = this.vertices[aP1].position.clone();
+                    n2 = this.vertices[aP3].position.clone();
+                    n3 = this.vertices[aP4].position.clone();
+                    n1.normalize();
+                    n2.normalize();
+                    n3.normalize();
+
+					this.faces.push( new THREE.Face3( aP1, aP3, aP4, [new THREE.Vector3(n1.x,n1.y,n1.z), new THREE.Vector3(n2.x,n2.y,n2.z), new THREE.Vector3(n3.x,n3.y,n3.z)] ) );
+					//this.faces.push( new THREE.Face3( aP1, aP3, aP4 ) );
 					this.uvs.push( [ aP1uv, aP3uv, aP4uv ] );
 
 				}
