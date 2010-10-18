@@ -5,17 +5,18 @@
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
-				background: #fff;
-				margin: 0px;
-				overflow: hidden;
+				background:#fff;
+                padding:0;
+				margin:0;
+				overflow:hidden;
                 font-family:georgia;
                 text-align:center;
 			}
             h1 { }
             a { color:skyblue }
-            canvas { pointer-events:none; z-index:10; position:relative }
-            #log { position:absolute; top:0 }
-            #d { text-align:center; margin:1em 0 -15em 0; z-index:0; position:relative; display:block }
+            canvas { pointer-events:none; z-index:10; position:relative; }
+            #log { position:absolute; top:0; display:none }
+            #d { text-align:center; margin:1em 0 -15.7em 0; z-index:0; position:relative; display:block }
             .button { background:#000; color:#fff; padding:0.2em 0.5em; cursor:pointer }
             .inactive { background:#999; color:#eee }
 		</style>
@@ -29,7 +30,9 @@
             <span id="rwebgl" class="button">WebGL renderer</span>
             <br/>
 
-            <p>Model by <a href="http://sketchup.google.com/3dwarehouse/details?mid=2c6fd128fca34052adc5f5b98d513da1">Reallusion iClone</a>.
+            <p>Models by <a href="http://sketchup.google.com/3dwarehouse/details?mid=2c6fd128fca34052adc5f5b98d513da1">Reallusion<a> 
+            <a href="http://sketchup.google.com/3dwarehouse/details?mid=f526cc4abf7cb68d76cab47c765b7255">iClone</a>.
+            
             <p>Using a modified version of <a href="http://github.com/alteredq/three.js">Three.js</a> by mrdoob.
             
             <br/>
@@ -97,7 +100,7 @@
 
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
-			var FLOOR = -200;
+			var FLOOR = -250;
 
 			var container;
 			var stats;
@@ -233,32 +236,52 @@
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
+                stats.domElement.style.zIndex = 100;
 				container.appendChild( stats.domElement );
                 
                 bcanvas.addEventListener("click", toggleCanvas, false);
                 bwebgl.addEventListener("click", toggleWebGL, false);
                                 
-                function createModel() {
+                function createModel1() {
                     
                     // MESH
                     
-                    geometry = new Female02( "obj/female02" );
+                    geometry = new Male02( "obj/male02" );
                     zmesh = new THREE.Mesh( geometry, geometry.materials, 1 );
+                    zmesh.position.x = 90;
                     zmesh.position.z = 50;
                     zmesh.position.y = FLOOR;
                     zmesh.scale.x = zmesh.scale.y = zmesh.scale.z = 3;
-                    //zmesh.doubleSided = true;
-                    //zmesh.flipSided = true;
                     zmesh.overdraw = true;
                     zmesh.updateMatrix();
                     scene.add(zmesh);
 
                     // PLANES with all materials from the model
                     
-                    createMaterialsPalette( geometry.materials, 100 );
+                    createMaterialsPalette( geometry.materials, 100, 105 );
                 }
-                
-                loadAsync( "obj/female02/female02.js", createModel);
+
+                function createModel2() {
+                    
+                    // MESH
+                    
+                    geometry = new Female02( "obj/female02" );
+                    zmesh = new THREE.Mesh( geometry, geometry.materials, 1 );
+                    zmesh.position.x = -80;
+                    zmesh.position.z = 50;
+                    zmesh.position.y = FLOOR;
+                    zmesh.scale.x = zmesh.scale.y = zmesh.scale.z = 3;
+                    zmesh.overdraw = true;
+                    zmesh.updateMatrix();
+                    scene.add(zmesh);
+
+                    // PLANES with all materials from the model
+                    
+                    createMaterialsPalette( geometry.materials, 100, 0 );
+                }
+
+                loadAsync( "obj/male02/male02.js", createModel1);
+                loadAsync( "obj/female02/female02.js", createModel2);
 
 			}
 
@@ -272,14 +295,14 @@
 
             }
             
-            function createMaterialsPalette( materials, size ) {
+            function createMaterialsPalette( materials, size, bottom ) {
                 
                 for ( var i=0; i<materials.length; ++i ) {
                     
                     // material
                     mesh = new THREE.Mesh( new Plane( size, size ), materials[i] );
                     mesh.position.x = i * (size + 5) - ( ( materials.length - 1 )* ( size + 5 )/2);
-                    mesh.position.y = FLOOR + size/2;
+                    mesh.position.y = FLOOR + size/2 + bottom;
                     mesh.position.z = -100;
                     mesh.scale.x = mesh.scale.y = mesh.scale.z = 1;
                     mesh.doubleSided = true;
@@ -301,7 +324,7 @@
                     
                     mesh = new THREE.Mesh( new Plane( size, size ), xm );
                     mesh.position.x = i * (size + 5) - ( ( materials.length - 1 )* ( size + 5 )/2);
-                    mesh.position.y = FLOOR + size/2;
+                    mesh.position.y = FLOOR + size/2 + bottom;
                     mesh.position.z = -99;
                     mesh.scale.x = mesh.scale.y = mesh.scale.z = 1;
                     mesh.doubleSided = true;
