@@ -655,7 +655,7 @@ def generate_face(f):
         if len(vi) == 3:
             return TEMPLATE_FACE3N % (vi[0]-1, vi[1]-1, vi[2]-1, f['material'], ni[0]-1, ni[1]-1, ni[2]-1)
         elif len(vi) == 4:
-            return TEMPLATE_FACE4N % (vi[0]-1, vi[1]-1, vi[2]-1, vi[3]-1, f['material'],  ni[0]-1, ni[1]-1, ni[2]-1, n[3]-1)
+            return TEMPLATE_FACE4N % (vi[0]-1, vi[1]-1, vi[2]-1, vi[3]-1, f['material'],  ni[0]-1, ni[1]-1, ni[2]-1, ni[3]-1)
     else:
         if len(vi) == 3:
             return TEMPLATE_FACE3 % (vi[0]-1, vi[1]-1, vi[2]-1, f['material'])
