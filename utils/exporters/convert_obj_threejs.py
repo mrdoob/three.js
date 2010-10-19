@@ -754,23 +754,23 @@ def convert(infile, outfile):
         uv_string = "\n".join([generate_uv(f, uvs) for f in faces])
             
 
-    mtl = {}
+    # default materials with debug colors for when
+    # there is no specified MTL, if loading failed
+    # or there were null materials
+    mtl = generate_mtl(materials)
+    
     if mtllib:
         # create full pathname for MTL (included from OBJ)
         path = os.path.dirname(infile)
         fname = os.path.join(path, mtllib)
         
         if file_exists(fname):
-            mtl = parse_mtl(fname)
+            # override default materials with real ones from MTL
+            # (where they exist, otherwise keep defaults)
+            mtl.update(parse_mtl(fname))
         
         else:
             print "Couldn't find [%s]" % fname
-    
-    if not mtl:
-        # if there is no specified MTL or if loading failed, 
-        # generate default materials with debug colors
-        mtl = generate_mtl(materials)
-        
     
     text = TEMPLATE_FILE % {
     "name"      : get_name(outfile),
