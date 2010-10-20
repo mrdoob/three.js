@@ -3,7 +3,7 @@
  * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Sphere.as
  */
 
-var Sphere = function ( radius, segments_width, segments_height ) {
+var Sphere = function ( radius, segments_width, segments_height, smooth ) {
 
 	THREE.Geometry.call( this );
 
@@ -77,9 +77,11 @@ var Sphere = function ( radius, segments_width, segments_height ) {
                     n2.normalize();
                     n3.normalize();
 
-					this.faces.push( new THREE.Face3( aP1, aP2, aP3, [new THREE.Vector3(n1.x,n1.y,n1.z), new THREE.Vector3(n2.x,n2.y,n2.z), new THREE.Vector3(n3.x,n3.y,n3.z)] ) );
-
-					//this.faces.push( new THREE.Face3( aP1, aP2, aP3 ) );
+                    if ( smooth )
+                        this.faces.push( new THREE.Face3( aP1, aP2, aP3, [new THREE.Vector3(n1.x,n1.y,n1.z), new THREE.Vector3(n2.x,n2.y,n2.z), new THREE.Vector3(n3.x,n3.y,n3.z)] ) );
+                    else
+                        this.faces.push( new THREE.Face3( aP1, aP2, aP3 ) );
+                    
 					this.uvs.push( [ aP1uv, aP2uv, aP3uv ] );
 
 				}
@@ -93,8 +95,11 @@ var Sphere = function ( radius, segments_width, segments_height ) {
                     n2.normalize();
                     n3.normalize();
 
-					this.faces.push( new THREE.Face3( aP1, aP3, aP4, [new THREE.Vector3(n1.x,n1.y,n1.z), new THREE.Vector3(n2.x,n2.y,n2.z), new THREE.Vector3(n3.x,n3.y,n3.z)] ) );
-					//this.faces.push( new THREE.Face3( aP1, aP3, aP4 ) );
+                    if ( smooth )
+                        this.faces.push( new THREE.Face3( aP1, aP3, aP4, [new THREE.Vector3(n1.x,n1.y,n1.z), new THREE.Vector3(n2.x,n2.y,n2.z), new THREE.Vector3(n3.x,n3.y,n3.z)] ) );
+                    else
+                        this.faces.push( new THREE.Face3( aP1, aP3, aP4 ) );
+                    
 					this.uvs.push( [ aP1uv, aP3uv, aP4uv ] );
 
 				}
