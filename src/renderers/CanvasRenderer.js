@@ -345,7 +345,8 @@ THREE.CanvasRenderer = function () {
 						_bboxRect.inflate( _context.lineWidth );
 
 
-					} else if ( material instanceof THREE.MeshBitmapUVMappingMaterial && m == element.materialIndex ) {
+					} else if ( material instanceof THREE.MeshBitmapUVMappingMaterial && 
+                                ( m == element.materialIndex || element.materialIndex == material.decalIndex ) ) {
 
 						bitmap = material.bitmap;
 						bitmapWidth = bitmap.width - 1;
@@ -523,7 +524,8 @@ THREE.CanvasRenderer = function () {
 
 						_bboxRect.inflate( _context.lineWidth );
 
-					} else if ( material instanceof THREE.MeshBitmapUVMappingMaterial && m == element.materialIndex ) {
+					} else if ( material instanceof THREE.MeshBitmapUVMappingMaterial &&                                 
+                                ( m == element.materialIndex || element.materialIndex == material.decalIndex ) ) {
 
 						bitmap = material.bitmap;
 						bitmapWidth = bitmap.width - 1;
