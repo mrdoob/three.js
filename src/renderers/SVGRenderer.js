@@ -11,6 +11,7 @@ THREE.SVGRenderer = function () {
 	_clipRect = new THREE.Rectangle(),
 	_bboxRect = new THREE.Rectangle(),
 
+	_enableLighting = false,
 	_color = new THREE.Color( 0xffffffff ),
 	_light = new THREE.Color( 0xffffffff ),
 	_ambientLight = new THREE.Color( 0xffffffff ),
@@ -72,7 +73,13 @@ THREE.SVGRenderer = function () {
 
 		_renderList = _projector.projectScene( scene, camera );
 
-		calculateAmbientLight( scene, _ambientLight );
+		_enableLighting = scene.lights.length > 0;
+
+		if ( _enableLighting ) {
+
+			calculateAmbientLight( scene, _ambientLight );
+
+		}
 
 		for ( e = 0, el = _renderList.length; e < el; e++ ) {
 
@@ -149,45 +156,77 @@ THREE.SVGRenderer = function () {
 
 				if ( material instanceof THREE.MeshColorFillMaterial ) {
 
-					_light.copyRGB( _ambientLight );
-					addLights( scene, element, _light );
+					if ( _enableLighting ) {
 
-					_color.copyRGBA( material.color );
-					_color.multiplySelfRGB( _light );
-					_color.updateStyleString();
+						_light.copyRGB( _ambientLight );
+						addLights( scene, element, _light );
+
+						_color.copyRGBA( material.color );
+						_color.multiplySelfRGB( _light );
+						_color.updateStyleString();
+
+					} else {
+
+							_color = material.color;
+
+					}
 
 					svgNode.setAttribute( 'style', 'fill: ' + _color.__styleString );
 
 				} else if ( material instanceof THREE.MeshFaceColorFillMaterial ) {
 
-					_light.copyRGB( _ambientLight );
-					addLights( scene, element, _light );
+					if ( _enableLighting ) {
 
-					_color.copyRGBA( element.color );
-					_color.multiplySelfRGB( _light );
-					_color.updateStyleString();
+						_light.copyRGB( _ambientLight );
+						addLights( scene, element, _light );
+
+						_color.copyRGBA( element.color );
+						_color.multiplySelfRGB( _light );
+						_color.updateStyleString();
+
+					} else {
+
+							_color = element.color;
+
+					}
 
 					svgNode.setAttribute( 'style', 'fill: ' + _color.__styleString );
 
 				} else if ( material instanceof THREE.MeshColorStrokeMaterial ) {
 
-					_light.copyRGB( _ambientLight );
-					addLights( scene, element, _light );
+					if ( _enableLighting ) {
 
-					_color.copyRGBA( material.color );
-					_color.multiplySelfRGB( _light );
-					_color.updateStyleString();
+						_light.copyRGB( _ambientLight );
+						addLights( scene, element, _light );
+
+						_color.copyRGBA( material.color );
+						_color.multiplySelfRGB( _light );
+						_color.updateStyleString();
+
+					} else {
+
+							_color = material.color;
+
+					}
 
 					svgNode.setAttribute( 'style', 'fill: none; stroke: ' + _color.__styleString + '; stroke-width: ' + material.lineWidth + '; stroke-linecap: round; stroke-linejoin: round' );
 
 				} else if ( material instanceof THREE.MeshFaceColorStrokeMaterial ) {
 
-					_light.copyRGB( _ambientLight );
-					addLights( scene, element, _light );
+					if ( _enableLighting ) {
 
-					_color.copyRGBA( element.color );
-					_color.multiplySelfRGB( _light );
-					_color.updateStyleString();
+						_light.copyRGB( _ambientLight );
+						addLights( scene, element, _light );
+
+						_color.copyRGBA( element.color );
+						_color.multiplySelfRGB( _light );
+						_color.updateStyleString();
+
+					} else {
+
+						_color = element.color;
+
+					}
 
 					svgNode.setAttribute( 'style', 'fill: none; stroke: ' + _color.__styleString + '; stroke-width: ' + material.lineWidth + '; stroke-linecap: round; stroke-linejoin: round' );
 

@@ -14,6 +14,7 @@ THREE.CanvasRenderer = function () {
 	_clearRect = new THREE.Rectangle(),
 	_bboxRect = new THREE.Rectangle(),
 
+	_enableLighting = false,
 	_color = new THREE.Color( 0xffffffff ),
 	_light = new THREE.Color( 0xffffffff ),
 	_ambientLight = new THREE.Color( 0xffffffff ),
@@ -81,7 +82,13 @@ THREE.CanvasRenderer = function () {
 		_context.fillRect( _clipRect.getX(), _clipRect.getY(), _clipRect.getWidth(), _clipRect.getHeight() );
 		*/
 
-		calculateAmbientLight( scene, _ambientLight );
+		_enableLighting = scene.lights.length > 0;
+
+		if ( _enableLighting ) {
+
+			calculateAmbientLight( scene, _ambientLight );
+
+		}
 
 		for ( e = 0, el = _renderList.length; e < el; e++ ) {
 
@@ -99,11 +106,19 @@ THREE.CanvasRenderer = function () {
 
 					if ( material instanceof THREE.ParticleCircleMaterial ) {
 
-						_light.copyRGB( _ambientLight );
+						if ( _enableLighting ) {
 
-						_color.copyRGBA( material.color );
-						_color.multiplySelfRGB( _light );
-						_color.updateStyleString();
+							_light.copyRGB( _ambientLight );
+
+							_color.copyRGBA( material.color );
+							_color.multiplySelfRGB( _light );
+							_color.updateStyleString();
+
+						} else {
+
+							_color = material.color;
+
+						}
 
 						width = element.scale.x * _widthHalf;
 						height = element.scale.y * _heightHalf;
@@ -205,11 +220,19 @@ THREE.CanvasRenderer = function () {
 
 					if ( material instanceof THREE.LineColorMaterial ) {
 
-						_light.copyRGB( _ambientLight );
+						if ( _enableLighting ) {
 
-						_color.copyRGBA( material.color );
-						_color.multiplySelfRGB( _light );
-						_color.updateStyleString();
+							_light.copyRGB( _ambientLight );
+
+							_color.copyRGBA( material.color );
+							_color.multiplySelfRGB( _light );
+							_color.updateStyleString();
+
+						} else {
+
+							_color = material.color;
+
+						}
 
 						_context.lineWidth = material.lineWidth;
 						_context.lineJoin = "round";
@@ -258,12 +281,20 @@ THREE.CanvasRenderer = function () {
 
 					if ( material instanceof THREE.MeshColorFillMaterial ) {
 
-						_light.copyRGB( _ambientLight );
-						addLights( scene, element, _light );
+						if ( _enableLighting ) {
 
-						_color.copyRGBA( material.color );
-						_color.multiplySelfRGB( _light );
-						_color.updateStyleString();
+							_light.copyRGB( _ambientLight );
+							addLights( scene, element, _light );
+
+							_color.copyRGBA( material.color );
+							_color.multiplySelfRGB( _light );
+							_color.updateStyleString();
+
+						} else {
+
+							_color = material.color;
+
+						}
 
 						_context.beginPath();
 						_context.moveTo( v1x, v1y );
@@ -277,12 +308,20 @@ THREE.CanvasRenderer = function () {
 
 					} else if ( material instanceof THREE.MeshColorStrokeMaterial ) {
 
-						_light.copyRGB( _ambientLight );
-						addLights( scene, element, _light );
+						if ( _enableLighting ) {
 
-						_color.copyRGBA( material.color );
-						_color.multiplySelfRGB( _light );
-						_color.updateStyleString();
+							_light.copyRGB( _ambientLight );
+							addLights( scene, element, _light );
+
+							_color.copyRGBA( material.color );
+							_color.multiplySelfRGB( _light );
+							_color.updateStyleString();
+
+						} else {
+
+							_color = material.color;
+
+						}
 
 						_context.beginPath();
 						_context.moveTo( v1x, v1y );
@@ -302,12 +341,20 @@ THREE.CanvasRenderer = function () {
 
 					} else if ( material instanceof THREE.MeshFaceColorFillMaterial ) {
 
-						_light.copyRGB( _ambientLight );
-						addLights( scene, element, _light );
+						if ( _enableLighting ) {
 
-						_color.copyRGBA( element.color );
-						_color.multiplySelfRGB( _light );
-						_color.updateStyleString();
+							_light.copyRGB( _ambientLight );
+							addLights( scene, element, _light );
+
+							_color.copyRGBA( element.color );
+							_color.multiplySelfRGB( _light );
+							_color.updateStyleString();
+
+						} else {
+
+							_color = element.color;
+
+						}
 
 						_context.beginPath();
 						_context.moveTo( v1x, v1y );
@@ -321,12 +368,20 @@ THREE.CanvasRenderer = function () {
 
 					} else if ( material instanceof THREE.MeshFaceColorStrokeMaterial ) {
 
-						_light.copyRGB( _ambientLight );
-						addLights( scene, element, _light );
+						if ( _enableLighting ) {
 
-						_color.copyRGBA( element.color );
-						_color.multiplySelfRGB( _light );
-						_color.updateStyleString();
+							_light.copyRGB( _ambientLight );
+							addLights( scene, element, _light );
+
+							_color.copyRGBA( element.color );
+							_color.multiplySelfRGB( _light );
+							_color.updateStyleString();
+
+						} else {
+
+							_color = element.color;
+
+						}
 
 						_context.beginPath();
 						_context.moveTo( v1x, v1y );
@@ -358,7 +413,6 @@ THREE.CanvasRenderer = function () {
 							_context.moveTo( v1x, v1y );
 							_context.lineTo( v2x, v2y );
 							_context.lineTo( v3x, v3y );
-							_context.lineTo( v4x, v4y );
 							_context.lineTo( v1x, v1y );
 							_context.closePath();
 
@@ -433,12 +487,20 @@ THREE.CanvasRenderer = function () {
 
 					if ( material instanceof THREE.MeshColorFillMaterial ) {
 
-						_light.copyRGB( _ambientLight );
-						addLights( scene, element, _light );
+						if ( _enableLighting ) {
 
-						_color.copyRGBA( material.color );
-						_color.multiplySelfRGB( _light );
-						_color.updateStyleString();
+							_light.copyRGB( _ambientLight );
+							addLights( scene, element, _light );
+
+							_color.copyRGBA( material.color );
+							_color.multiplySelfRGB( _light );
+							_color.updateStyleString();
+
+						} else {
+
+							_color = material.color;
+
+						}
 
 						_context.beginPath();
 						_context.moveTo( v1x, v1y );
@@ -454,12 +516,20 @@ THREE.CanvasRenderer = function () {
 
 					} else if ( material instanceof THREE.MeshColorStrokeMaterial ) {
 
-						_light.copyRGB( _ambientLight );
-						addLights( scene, element, _light );
+						if ( _enableLighting ) {
 
-						_color.copyRGBA( material.color );
-						_color.multiplySelfRGB( _light );
-						_color.updateStyleString();
+							_light.copyRGB( _ambientLight );
+							addLights( scene, element, _light );
+
+							_color.copyRGBA( material.color );
+							_color.multiplySelfRGB( _light );
+							_color.updateStyleString();
+
+						} else {
+
+							_color = material.color;
+
+						}
 
 						_context.beginPath();
 						_context.moveTo( v1x, v1y );
@@ -480,12 +550,20 @@ THREE.CanvasRenderer = function () {
 
 					} else if ( material instanceof THREE.MeshFaceColorFillMaterial ) {
 
-						_light.copyRGB( _ambientLight );
-						addLights( scene, element, _light );
+						if ( _enableLighting ) {
 
-						_color.copyRGBA( element.color );
-						_color.multiplySelfRGB( _light );
-						_color.updateStyleString();
+							_light.copyRGB( _ambientLight );
+							addLights( scene, element, _light );
+
+							_color.copyRGBA( element.color );
+							_color.multiplySelfRGB( _light );
+							_color.updateStyleString();
+
+						} else {
+
+							_color = element.color;
+
+						}
 
 						_context.beginPath();
 						_context.moveTo( v1x, v1y );
@@ -500,12 +578,20 @@ THREE.CanvasRenderer = function () {
 
 					} else if ( material instanceof THREE.MeshFaceColorStrokeMaterial ) {
 
-						_light.copyRGB( _ambientLight );
-						addLights( scene, element, _light );
+						if ( _enableLighting ) {
 
-						_color.copyRGBA( element.color );
-						_color.multiplySelfRGB( _light );
-						_color.updateStyleString();
+							_light.copyRGB( _ambientLight );
+							addLights( scene, element, _light );
+
+							_color.copyRGBA( element.color );
+							_color.multiplySelfRGB( _light );
+							_color.updateStyleString();
+
+						} else {
+
+							_color = element.color;
+
+						}
 
 						_context.beginPath();
 						_context.moveTo( v1x, v1y );
