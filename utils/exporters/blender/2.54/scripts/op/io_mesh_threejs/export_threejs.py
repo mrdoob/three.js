@@ -93,8 +93,9 @@ def save(operator, context, filepath="", use_modifiers=True, use_normals=True, u
     # incase
     color = uvcoord = uvcoord_key = normal = normal_key = None
 
-    file.write('// Generated with Blender 2.54 exporter\n\n')
-    
+    file.write('// Generated with Blender 2.54 exporter\n')
+    file.write('// http://github.com/mrdoob/three.js/tree/master/utils/exporters/blender\n\n')
+
     file.write('var %s = function () {\n\n' % classname)
 
     file.write('\tvar scope = this;\n\n')
@@ -154,7 +155,12 @@ def save(operator, context, filepath="", use_modifiers=True, use_normals=True, u
     file.write('\t\tscope.uvs.push( uv );\n')
     file.write('\t}\n\n')
 
-    file.write('}\n\n')
+    file.write('\tthis.computeCentroids();\n')
+
+    if not use_normals:
+        file.write('\tthis.computeNormals();\n')
+
+    file.write('\n}\n\n')
 
     file.write('%s.prototype = new THREE.Geometry();\n' % classname)
     file.write('%s.prototype.constructor = %s;' % (classname, classname))
@@ -164,116 +170,6 @@ def save(operator, context, filepath="", use_modifiers=True, use_normals=True, u
     print("writing", filepath, "done")
 
     if use_modifiers:
-        bpy.data.meshes.remove(mesh)    
-    
-    """
-    mesh_vertices = mesh.vertices # save a lookup
-    ply_vertices = [] # list of dictionaries
-    # vdict = {} # (index, normal, uv) -> new index
-    vdict = [{} for i in range(len(mesh_vertices))]
-    ply_faces = [[] for f in range(len(mesh.faces))]
-    vert_count = 0
-    for i, f in enumerate(mesh.faces):
-
-        smooth = f.use_smooth
-        if not smooth:
-            normal = tuple(f.normal)
-            normal_key = rvec3d(normal)
-
-        if faceUV:
-            uv = active_uv_layer[i]
-            uv = uv.uv1, uv.uv2, uv.uv3, uv.uv4 # XXX - crufty :/
-        if vertexColors:
-            col = active_col_layer[i]
-            col = col.color1, col.color2, col.color3, col.color4
-
-        f_vertices = f.vertices
-
-        pf = ply_faces[i]
-        for j, vidx in enumerate(f_vertices):
-            v = mesh_vertices[vidx]
-
-            if smooth:
-                normal = tuple(v.normal)
-                normal_key = rvec3d(normal)
-
-            if faceUV:
-                uvcoord = uv[j][0], 1.0 - uv[j][1]
-                uvcoord_key = rvec2d(uvcoord)
-            elif vertexUV:
-                uvcoord = v.uvco[0], 1.0 - v.uvco[1]
-                uvcoord_key = rvec2d(uvcoord)
-
-            if vertexColors:
-                color = col[j]
-                color = int(color[0] * 255.0), int(color[1] * 255.0), int(color[2] * 255.0)
-
-
-            key = normal_key, uvcoord_key, color
-
-            vdict_local = vdict[vidx]
-            pf_vidx = vdict_local.get(key) # Will be None initially
-
-            if pf_vidx == None: # same as vdict_local.has_key(key)
-                pf_vidx = vdict_local[key] = vert_count
-                ply_vertices.append((vidx, normal, uvcoord, color))
-                vert_count += 1
-
-            pf.append(pf_vidx)
-
-    file.write('ply\n')
-    file.write('format ascii 1.0\n')
-    file.write('comment Created by Blender %s - www.blender.org, source file: %r\n' % (bpy.app.version_string, os.path.basename(bpy.data.filepath)))
-
-    file.write('element vertex %d\n' % len(ply_vertices))
-
-    file.write('property float x\n')
-    file.write('property float y\n')
-    file.write('property float z\n')
-
-    if use_normals:
-        file.write('property float nx\n')
-        file.write('property float ny\n')
-        file.write('property float nz\n')
-    if use_uv_coords:
-        file.write('property float s\n')
-        file.write('property float t\n')
-    if use_colors:
-        file.write('property uchar red\n')
-        file.write('property uchar green\n')
-        file.write('property uchar blue\n')
-
-    file.write('element face %d\n' % len(mesh.faces))
-    file.write('property list uchar uint vertex_indices\n')
-    file.write('end_header\n')
-
-    for i, v in enumerate(ply_vertices):
-        file.write('%.6f %.6f %.6f ' % tuple(mesh_vertices[v[0]].co)) # co
-        if use_normals:
-            file.write('%.6f %.6f %.6f ' % v[1]) # no
-        if use_uv_coords:
-            file.write('%.6f %.6f ' % v[2]) # uv
-        if use_colors:
-            file.write('%u %u %u' % v[3]) # col
-        file.write('\n')
-
-    for pf in ply_faces:
-        if len(pf) == 3:
-            file.write('3 %d %d %d\n' % tuple(pf))
-        else:
-            file.write('4 %d %d %d %d\n' % tuple(pf))
-
-    file.close()
-    print("writing %r done" % filepath)
-
-    if use_modifiers:
         bpy.data.meshes.remove(mesh)
-    """
-    
-    # XXX
-    """
-    if is_editmode:
-        Blender.Window.EditMode(1, '', 0)
-    """
-    
+
     return {'FINISHED'}
