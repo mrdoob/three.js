@@ -225,16 +225,10 @@ THREE.Projector = function() {
 
 		}
 
-		_renderList.sort( painterSort );
+		_renderList.sort( function ( a, b ) { return b.z - a.z; } );
 
 		return _renderList;
 
 	};
-
-	function painterSort( a, b ) {
-
-		return b.z - a.z;
-
-	}
 
 };
