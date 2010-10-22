@@ -25,6 +25,7 @@ This script exports the selected object for the three.js engine.
 
 import bpy
 import os
+import os.path
 
 def save(operator, context, filepath="", use_modifiers=True, use_normals=True, use_uv_coords=True, use_colors=True):
     
@@ -39,8 +40,8 @@ def save(operator, context, filepath="", use_modifiers=True, use_normals=True, u
 
     if not filepath.lower().endswith('.js'):
         filepath += '.js'
-
-    classname = filepath.split('/')[-1].replace('.js','')
+    
+    classname = os.path.basename(filepath).split(".")[0]
 
     if not obj:
         raise Exception("Error, Select 1 active object")
