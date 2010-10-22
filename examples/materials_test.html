@@ -37,7 +37,7 @@
             <br/>
             <p>Best viewed in Chrome 7/8 or Firefox 4 using WebGL renderer.
             <p>Canvas renderer is very slow on anything other than Chrome.
-            <p>Multi-materials currently work only in canvas renderer.
+            <p><a href="http://code.google.com/p/chromium/issues/detail?id=60124">Line width is not set properly</a> on Chrome in Windows.
         </div>
         
         <div id="log"></div>
@@ -148,7 +148,10 @@
                 
                 sphere = new Sphere( 100, 16, 8, 1 );
                 for (var i=0; i<10; i++) {
-                    mesh = new THREE.Mesh( sphere, [new THREE.MeshColorFillMaterial( 0xffffff ), new THREE.MeshColorStrokeMaterial(0x000000, 1, 1.5)] );
+                    //mesh = new THREE.Mesh( sphere, new THREE.MeshColorFillMaterial( 0xffffff ) );
+                    mesh = new THREE.Mesh( sphere, [ new THREE.MeshColorFillMaterial( 0xffffff ), new THREE.MeshColorStrokeMaterial( 0x000000, 1, 1.5 ) ] );
+                    //mesh = new THREE.Mesh( sphere, new THREE.MeshColorStrokeMaterial( 0x00aa00, 1, 1.5 ) );
+                    //mesh = new THREE.Mesh( sphere, new THREE.MeshFaceColorStrokeMaterial( 2.5 ) );
                     mesh.position.x = 500 * (Math.random() - 0.5);
                     mesh.position.y = 500 * (Math.random() - 0.5);
                     mesh.position.z = 500 * (Math.random() - 0.5);
