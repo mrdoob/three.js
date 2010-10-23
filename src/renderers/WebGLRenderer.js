@@ -161,6 +161,8 @@ THREE.WebGLRenderer = function () {
 
 				}
 
+				camera.autoUpdateMatrix && camera.updateMatrix();
+				object.autoUpdateMatrix && object.updateMatrix();
 
 				viewMatrix.multiply( camera.matrix, object.matrix );
 
