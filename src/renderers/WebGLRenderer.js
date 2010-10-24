@@ -54,7 +54,14 @@ THREE.WebGLRenderer = function () {
 				_gl.uniform3f( _program.lightingDirection, lightPosition.x, lightPosition.y, lightPosition.z );
 				_gl.uniform3f( _program.directionalColor, lightColor.r, lightColor.g, lightColor.b );
 
-			}
+			} else if( light instanceof THREE.PointLight ) {
+
+				lightColor = light.color;
+				lightPosition = light.position;
+				_gl.uniform3f( _program.pointPosition, lightPosition.x, lightPosition.y, lightPosition.z );
+				_gl.uniform3f( _program.pointColor, lightColor.r, lightColor.g, lightColor.b );
+                
+            }
 
 		}
     };
@@ -263,8 +270,6 @@ THREE.WebGLRenderer = function () {
                     
                 }
                 
-                //if ( m == element.materialIndex || element.materialIndex == material.decalIndex )
-                
                 if ( material instanceof THREE.MeshColorFillMaterial ) {
 
                     color = material.color;
@@ -377,12 +382,13 @@ THREE.WebGLRenderer = function () {
         _program.viewMatrixArray = new Float32Array( _viewMatrix.flatten() );
         _program.projectionMatrixArray = new Float32Array( camera.projectionMatrix.flatten() );
 
-        _normalMatrix =  THREE.Matrix4.makeInvert( _viewMatrix ).transpose();
-        _program.normalMatrixArray = new Float32Array( _normalMatrix.flatten() );
-
+        _normalMatrix = THREE.Matrix4.makeInvert3x3( object.matrix ).transpose();
+        _program.normalMatrixArray = new Float32Array( _normalMatrix.m );
+        
         _gl.uniformMatrix4fv( _program.viewMatrix, false, _program.viewMatrixArray );
         _gl.uniformMatrix4fv( _program.projectionMatrix, false, _program.projectionMatrixArray );
-        _gl.uniformMatrix4fv( _program.normalMatrix, false, _program.normalMatrixArray );
+        _gl.uniformMatrix3fv( _program.normalMatrix, false, _program.normalMatrixArray );
+        _gl.uniformMatrix4fv( _program.objMatrix, false, new Float32Array( object.matrix.flatten() ) );
         
     };
     
@@ -485,6 +491,8 @@ THREE.WebGLRenderer = function () {
 			"varying vec4 vertexColor;",
 			"varying vec3 lightWeighting;",
 
+            "varying vec3 vNormal;",
+        
             "uniform int material;", // 0 - ColorFill, 1 - ColorStroke, 2 - FaceColorFill, 3 - FaceColorStroke, 4 - Bitmap
 
 			"void main(){",
@@ -503,6 +511,7 @@ THREE.WebGLRenderer = function () {
                 
                 "} else {", // triangle using uniform color
                     "gl_FragColor = vec4(uniformColor.rgb * lightWeighting, uniformColor.a);",
+                    //"gl_FragColor = vec4(vNormal, 1.0);",
                 "}",
 			"}"
 			].join("\n") ) );
@@ -518,27 +527,39 @@ THREE.WebGLRenderer = function () {
 			"uniform vec3 directionalColor;",
 			"uniform vec3 lightingDirection;",
 
+			"uniform vec3 pointColor;",
+			"uniform vec3 pointPosition;",
+
 			"uniform mat4 viewMatrix;",
 			"uniform mat4 projectionMatrix;",
-			"uniform mat4 normalMatrix;",
+			"uniform mat4 objMatrix;",
+			"uniform mat3 normalMatrix;",
 			
             "varying vec4 vertexColor;",
             "varying vec2 vertexUv;",
 			"varying vec3 lightWeighting;",
 
+            "varying vec3 vNormal;",
+            
 			"void main(void) {",
+                "vec4 mvPosition = viewMatrix * vec4( position, 1.0 );",
+                "vec4 mPosition = objMatrix * vec4( position, 1.0 );",
+                "vec3 transformedNormal = normalize(normalMatrix * normal);",
 
                 "if(!enableLighting) {",
                     "lightWeighting = vec3(1.0, 1.0, 1.0);",
                 "} else {",
-                    "vec4 transformedNormal = normalMatrix * vec4(normal, 1.0);",
-                    "float directionalLightWeighting = max(dot(normalize(transformedNormal.xyz), lightingDirection), 0.0);",
-                    "lightWeighting = ambientColor + directionalColor * directionalLightWeighting;",
+                    "vec3 pointLight = normalize(pointPosition.xyz - mPosition.xyz);",
+                    "float directionalLightWeighting = max(dot(transformedNormal, normalize(lightingDirection)), 0.0);",
+                    "float pointLightWeighting = max(dot(transformedNormal, pointLight), 0.0);",
+                    "lightWeighting = ambientColor + directionalColor * directionalLightWeighting + pointColor * pointLightWeighting;",
                 "}",
 
-				"vertexColor = color;",
+				"vNormal = transformedNormal;",
+                "vertexColor = color;",
 				"vertexUv = uv;",
-				"gl_Position = projectionMatrix * viewMatrix * vec4( position, 1.0 );",
+                
+				"gl_Position = projectionMatrix * mvPosition;",
 
 			"}"].join("\n") ) );
 
@@ -555,12 +576,16 @@ THREE.WebGLRenderer = function () {
 		_program.viewMatrix = _gl.getUniformLocation( _program, "viewMatrix" );
 		_program.projectionMatrix = _gl.getUniformLocation( _program, "projectionMatrix" );
 		_program.normalMatrix = _gl.getUniformLocation( _program, "normalMatrix" );
+		_program.objMatrix = _gl.getUniformLocation( _program, "objMatrix" );
 
 		_program.enableLighting = _gl.getUniformLocation(_program, 'enableLighting');
 		_program.ambientColor = _gl.getUniformLocation(_program, 'ambientColor');
 		_program.directionalColor = _gl.getUniformLocation(_program, 'directionalColor');
 		_program.lightingDirection = _gl.getUniformLocation(_program, 'lightingDirection');
 
+		_program.pointColor = _gl.getUniformLocation(_program, 'pointColor');
+		_program.pointPosition = _gl.getUniformLocation(_program, 'pointPosition');
+        
         _program.material = _gl.getUniformLocation(_program, 'material');
         _program.uniformColor = _gl.getUniformLocation(_program, 'uniformColor');
 
