@@ -361,6 +361,45 @@ THREE.Matrix4.makeInvert = function ( m1 ) {
 
 };
 
+THREE.Matrix4.makeInvert3x3 = function ( m1 ) {
+    
+    // input:  THREE.Matrix4
+    // output: THREE.Matrix3
+    
+    // ( based on http://code.google.com/p/webgl-mjs/ )
+    
+    var m2 = new THREE.Matrix3();
+
+    var m = m1.flatten();
+    
+    var a11 = m[10]*m[5]-m[6]*m[9],
+        a21 = -m[10]*m[1]+m[2]*m[9],
+        a31 = m[6]*m[1]-m[2]*m[5],
+        a12 = -m[10]*m[4]+m[6]*m[8],
+        a22 = m[10]*m[0]-m[2]*m[8],
+        a32 = -m[6]*m[0]+m[2]*m[4],
+        a13 = m[9]*m[4]-m[5]*m[8],
+        a23 = -m[9]*m[0]+m[1]*m[8],
+        a33 = m[5]*m[0]-m[1]*m[4];
+    var det = m[0]*(a11) + m[1]*(a12) + m[2]*(a13);
+    if (det == 0) // no inverse
+        throw "matrix not invertible";
+    var idet = 1.0 / det;
+
+    m2.m[0] = idet*a11;
+    m2.m[1] = idet*a21;
+    m2.m[2] = idet*a31;
+    m2.m[3] = idet*a12;
+    m2.m[4] = idet*a22;
+    m2.m[5] = idet*a32;
+    m2.m[6] = idet*a13;
+    m2.m[7] = idet*a23;
+    m2.m[8] = idet*a33;
+
+    return m2;
+    
+}
+
 THREE.Matrix4.makeFrustum = function( left, right, bottom, top, near, far ) {
 
 	var m, x, y, a, b, c, d;
@@ -415,3 +454,25 @@ THREE.Matrix4.makeOrtho = function( left, right, top, bottom, near, far ) {
 	return m;
 
 };
+
+THREE.Matrix3 = function () {
+
+	this.m = [];
+
+};
+
+THREE.Matrix3.prototype = {
+	
+    transpose: function () {
+    
+        var tmp;
+        
+        tmp = this.m[1]; this.m[1] = this.m[3]; this.m[3] = tmp;
+        tmp = this.m[2]; this.m[2] = this.m[6]; this.m[6] = tmp;
+        tmp = this.m[5]; this.m[5] = this.m[7]; this.m[7] = tmp;
+        
+        return this;
+
+    }
+    
+}
