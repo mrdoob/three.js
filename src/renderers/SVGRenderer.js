@@ -159,7 +159,7 @@ THREE.SVGRenderer = function () {
 					if ( _enableLighting ) {
 
 						_light.copyRGB( _ambientLight );
-						addLights( scene, element, _light );
+						calculateFaceLight( scene, element, _light );
 
 						_color.copyRGBA( material.color );
 						_color.multiplySelfRGB( _light );
@@ -178,7 +178,7 @@ THREE.SVGRenderer = function () {
 					if ( _enableLighting ) {
 
 						_light.copyRGB( _ambientLight );
-						addLights( scene, element, _light );
+						calculateFaceLight( scene, element, _light );
 
 						_color.copyRGBA( element.color );
 						_color.multiplySelfRGB( _light );
@@ -197,7 +197,7 @@ THREE.SVGRenderer = function () {
 					if ( _enableLighting ) {
 
 						_light.copyRGB( _ambientLight );
-						addLights( scene, element, _light );
+						calculateFaceLight( scene, element, _light );
 
 						_color.copyRGBA( material.color );
 						_color.multiplySelfRGB( _light );
@@ -216,7 +216,7 @@ THREE.SVGRenderer = function () {
 					if ( _enableLighting ) {
 
 						_light.copyRGB( _ambientLight );
-						addLights( scene, element, _light );
+						calculateFaceLight( scene, element, _light );
 
 						_color.copyRGBA( element.color );
 						_color.multiplySelfRGB( _light );
@@ -262,7 +262,7 @@ THREE.SVGRenderer = function () {
 
 	}
 
-	function addLights( scene, element, color ) {
+	function calculateFaceLight( scene, element, color ) {
 
 		var l, ll, light, amount;
 

@@ -377,6 +377,9 @@ THREE.WebGLRenderer = function () {
     
     this.setupMatrices = function ( object, camera ) {
         
+        camera.autoUpdateMatrix && camera.updateMatrix();
+        object.autoUpdateMatrix && object.updateMatrix();
+
         _viewMatrix.multiply( camera.matrix, object.matrix );
 
         _program.viewMatrixArray = new Float32Array( _viewMatrix.flatten() );

@@ -109,6 +109,7 @@ THREE.CanvasRenderer = function () {
 						if ( _enableLighting ) {
 
 							_light.copyRGB( _ambientLight );
+							calculateLight( scene, element, _light );
 
 							_color.copyRGBA( material.color );
 							_color.multiplySelfRGB( _light );
@@ -223,6 +224,7 @@ THREE.CanvasRenderer = function () {
 						if ( _enableLighting ) {
 
 							_light.copyRGB( _ambientLight );
+							calculateLight( scene, element, _light );
 
 							_color.copyRGBA( material.color );
 							_color.multiplySelfRGB( _light );
@@ -284,7 +286,7 @@ THREE.CanvasRenderer = function () {
 						if ( _enableLighting ) {
 
 							_light.copyRGB( _ambientLight );
-							addLights( scene, element, _light );
+							calculateFaceLight( scene, element, _light );
 
 							_color.copyRGBA( material.color );
 							_color.multiplySelfRGB( _light );
@@ -311,7 +313,7 @@ THREE.CanvasRenderer = function () {
 						if ( _enableLighting ) {
 
 							_light.copyRGB( _ambientLight );
-							addLights( scene, element, _light );
+							calculateFaceLight( scene, element, _light );
 
 							_color.copyRGBA( material.color );
 							_color.multiplySelfRGB( _light );
@@ -344,7 +346,7 @@ THREE.CanvasRenderer = function () {
 						if ( _enableLighting ) {
 
 							_light.copyRGB( _ambientLight );
-							addLights( scene, element, _light );
+							calculateFaceLight( scene, element, _light );
 
 							_color.copyRGBA( element.color );
 							_color.multiplySelfRGB( _light );
@@ -371,7 +373,7 @@ THREE.CanvasRenderer = function () {
 						if ( _enableLighting ) {
 
 							_light.copyRGB( _ambientLight );
-							addLights( scene, element, _light );
+							calculateFaceLight( scene, element, _light );
 
 							_color.copyRGBA( element.color );
 							_color.multiplySelfRGB( _light );
@@ -491,7 +493,7 @@ THREE.CanvasRenderer = function () {
 						if ( _enableLighting ) {
 
 							_light.copyRGB( _ambientLight );
-							addLights( scene, element, _light );
+							calculateFaceLight( scene, element, _light );
 
 							_color.copyRGBA( material.color );
 							_color.multiplySelfRGB( _light );
@@ -520,7 +522,7 @@ THREE.CanvasRenderer = function () {
 						if ( _enableLighting ) {
 
 							_light.copyRGB( _ambientLight );
-							addLights( scene, element, _light );
+							calculateFaceLight( scene, element, _light );
 
 							_color.copyRGBA( material.color );
 							_color.multiplySelfRGB( _light );
@@ -554,7 +556,7 @@ THREE.CanvasRenderer = function () {
 						if ( _enableLighting ) {
 
 							_light.copyRGB( _ambientLight );
-							addLights( scene, element, _light );
+							calculateFaceLight( scene, element, _light );
 
 							_color.copyRGBA( element.color );
 							_color.multiplySelfRGB( _light );
@@ -582,7 +584,7 @@ THREE.CanvasRenderer = function () {
 						if ( _enableLighting ) {
 
 							_light.copyRGB( _ambientLight );
-							addLights( scene, element, _light );
+							calculateFaceLight( scene, element, _light );
 
 							_color.copyRGBA( element.color );
 							_color.multiplySelfRGB( _light );
@@ -699,7 +701,33 @@ THREE.CanvasRenderer = function () {
 
 	}
 
-	function addLights( scene, element, color ) {
+	function calculateLight( scene, element, color ) {
+
+		var l, ll, light;
+
+		for ( l = 0, ll = scene.lights.length; l < ll; l++ ) {
+
+			light = scene.lights[ l ];
+
+			if ( light instanceof THREE.DirectionalLight ) {
+
+				color.r += light.color.r;
+				color.g += light.color.g;
+				color.b += light.color.b;
+
+			} else if ( light instanceof THREE.PointLight ) {
+
+				color.r += light.color.r;
+				color.g += light.color.g;
+				color.b += light.color.b;
+
+			}
+
+		}
+
+	}
+
+	function calculateFaceLight( scene, element, color ) {
 
 		var l, ll, light, amount;
 

@@ -17,7 +17,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 # Based on export_ply.py
-# Contributors: Mr.doob, Kikko
+# Contributors: Mr.doob, Kikko, alteredq
 
 """
 This script exports the selected object for the three.js engine.
@@ -28,19 +28,19 @@ import os
 import os.path
 
 def save(operator, context, filepath="", use_modifiers=True, use_normals=True, use_uv_coords=True, use_colors=True):
-    
+
     def rvec3d(v):
         return round(v[0], 6), round(v[1], 6), round(v[2], 6)
 
     def rvec2d(v):
         return round(v[0], 6), round(v[1], 6)
-    
+
     scene = context.scene
     obj = context.object
 
     if not filepath.lower().endswith('.js'):
         filepath += '.js'
-    
+
     classname = os.path.basename(filepath).split(".")[0]
 
     if not obj:
