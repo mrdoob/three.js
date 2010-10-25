@@ -34,7 +34,7 @@ THREE.WebGLRenderer = function () {
 
     this.setupLights = function ( scene ) {
         
-        var l, ll, lightColor, lightPosition, light;
+        var l, ll, lightColor, lightPosition, lightIntensity, light;
         
 		_gl.uniform1i( _program.enableLighting, scene.lights.length );
 
@@ -51,15 +51,17 @@ THREE.WebGLRenderer = function () {
 
 				lightColor = light.color;
 				lightPosition = light.position;
+                lightIntensity = light.intensity;
 				_gl.uniform3f( _program.lightingDirection, lightPosition.x, lightPosition.y, lightPosition.z );
-				_gl.uniform3f( _program.directionalColor, lightColor.r, lightColor.g, lightColor.b );
+				_gl.uniform3f( _program.directionalColor, lightColor.r * lightIntensity, lightColor.g * lightIntensity, lightColor.b * lightIntensity );
 
 			} else if( light instanceof THREE.PointLight ) {
 
 				lightColor = light.color;
 				lightPosition = light.position;
+                lightIntensity = light.intensity;
 				_gl.uniform3f( _program.pointPosition, lightPosition.x, lightPosition.y, lightPosition.z );
-				_gl.uniform3f( _program.pointColor, lightColor.r, lightColor.g, lightColor.b );
+				_gl.uniform3f( _program.pointColor, lightColor.r * lightIntensity, lightColor.g * lightIntensity, lightColor.b * lightIntensity );
                 
             }
 
