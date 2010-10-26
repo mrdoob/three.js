@@ -60,6 +60,22 @@ THREE.CanvasRenderer = function () {
 		}
 	};
 
+    this.isFullOverlay = function ( material, materialIndex, element ) {
+        
+        // these materials can be either the only material for whole mesh
+        // or if they are overlays in multimaterials, they apply only to
+        // group of faces with single material (specified by decalIndex)
+        
+        return ( ( material instanceof THREE.MeshBitmapUVMappingMaterial || 
+                   material instanceof THREE.MeshFaceColorFillMaterial ||
+                   material instanceof THREE.MeshColorFillMaterial
+                 ) 
+                 &&
+                 ! ( materialIndex == element.materialIndex || 
+                     element.materialIndex == material.decalIndex ) );
+        
+    };
+        
 	this.render = function ( scene, camera ) {
 
 		var e, el, element, m, ml, material, pi2 = Math.PI * 2,
@@ -280,7 +296,12 @@ THREE.CanvasRenderer = function () {
 				for ( m = 0, ml = element.material.length; m < ml; m++ ) {
 
 					material = element.material[ m ];
-
+                    
+                    if ( this.isFullOverlay( material, m, element ) ) {
+                        
+                        continue;
+                    }
+                    
 					if ( material instanceof THREE.MeshColorFillMaterial ) {
 
 						if ( _enableLighting ) {
@@ -402,8 +423,7 @@ THREE.CanvasRenderer = function () {
 						_bboxRect.inflate( _context.lineWidth );
 
 
-					} else if ( material instanceof THREE.MeshBitmapUVMappingMaterial && 
-                                ( m == element.materialIndex || element.materialIndex == material.decalIndex ) ) {
+					} else if ( material instanceof THREE.MeshBitmapUVMappingMaterial ) {
 
 						bitmap = material.bitmap;
 						bitmapWidth = bitmap.width - 1;
@@ -488,6 +508,11 @@ THREE.CanvasRenderer = function () {
 
 					material = element.material[ m ];
 
+                    if ( this.isFullOverlay( material, m, element ) ) {
+                        
+                        continue;
+                    }
+                    
 					if ( material instanceof THREE.MeshColorFillMaterial ) {
 
 						if ( _enableLighting ) {
@@ -613,8 +638,7 @@ THREE.CanvasRenderer = function () {
 
 						_bboxRect.inflate( _context.lineWidth );
 
-					} else if ( material instanceof THREE.MeshBitmapUVMappingMaterial &&                                 
-                                ( m == element.materialIndex || element.materialIndex == material.decalIndex ) ) {
+					} else if ( material instanceof THREE.MeshBitmapUVMappingMaterial ) {
 
 						bitmap = material.bitmap;
 						bitmapWidth = bitmap.width - 1;

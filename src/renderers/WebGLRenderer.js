@@ -265,8 +265,16 @@ THREE.WebGLRenderer = function () {
                 
                 material = object.material[ m ];
                 
-                if ( material instanceof THREE.MeshBitmapUVMappingMaterial &&
-                     !( m == mf || mf == material.decalIndex ) ) {
+                // these materials can be either the only material for whole mesh
+                // or if they are overlays in multimaterials, they apply only to
+                // group of faces with single material (specified by decalIndex)
+                
+                if ( ( material instanceof THREE.MeshBitmapUVMappingMaterial || 
+                       material instanceof THREE.MeshFaceColorFillMaterial ||
+                       material instanceof THREE.MeshColorFillMaterial
+                     ) 
+                    &&
+                     ! ( m == mf || mf == material.decalIndex ) ) {
                     
                     continue;
                     
