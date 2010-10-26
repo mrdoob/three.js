@@ -283,7 +283,7 @@ THREE.WebGLRenderer = function () {
                 if ( material instanceof THREE.MeshColorFillMaterial ) {
 
                     color = material.color;
-                    _gl.uniform4f( _program.uniformColor,  color.r, color.g, color.b, color.a );
+                    _gl.uniform4f( _program.uniformColor,  color.r * color.a, color.g * color.a, color.b * color.a, color.a );
                     
                     _gl.uniform1i( _program.material, COLORFILL );
                     
@@ -292,7 +292,7 @@ THREE.WebGLRenderer = function () {
                     lineWidth = material.lineWidth;
                     
                     color = material.color;
-                    _gl.uniform4f( _program.uniformColor,  color.r, color.g, color.b, color.a );
+                    _gl.uniform4f( _program.uniformColor,  color.r * color.a, color.g * color.a, color.b * color.a, color.a );
                     
                     _gl.uniform1i( _program.material, COLORSTROKE );
                     
@@ -509,20 +509,20 @@ THREE.WebGLRenderer = function () {
             "uniform int material;", // 0 - ColorFill, 1 - ColorStroke, 2 - FaceColorFill, 3 - FaceColorStroke, 4 - Bitmap
 
 			"void main(){",
-                "if(material==4) {", // texture
+                "if(material==4) {", // Bitmap: texture
                     "vec4 texelColor = texture2D(diffuse, vertexUv);",
                     "gl_FragColor = vec4(texelColor.rgb * lightWeighting, texelColor.a);",
                 
-                "} else if(material==3) {", // wireframe using vertex color 
+                "} else if(material==3) {", // FaceColorStroke: wireframe using vertex color 
                     "gl_FragColor = vec4(vertexColor.rgb * lightWeighting, vertexColor.a);",
                 
-                "} else if(material==2) {", // triangle using vertex color
+                "} else if(material==2) {", // FaceColorFill: triangle using vertex color
                     "gl_FragColor = vec4(vertexColor.rgb * lightWeighting, vertexColor.a);",
                 
-                "} else if(material==1) {", // wireframe using uniform color
+                "} else if(material==1) {", // ColorStroke: wireframe using uniform color
                     "gl_FragColor = vec4(uniformColor.rgb * lightWeighting, uniformColor.a);",
                 
-                "} else {", // triangle using uniform color
+                "} else {", // ColorFill: triangle using uniform color
                     "gl_FragColor = vec4(uniformColor.rgb * lightWeighting, uniformColor.a);",
                     //"gl_FragColor = vec4(vNormal, 1.0);",
                 "}",
