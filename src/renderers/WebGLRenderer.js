@@ -387,7 +387,6 @@ THREE.WebGLRenderer = function () {
     
     this.setupMatrices = function ( object, camera ) {
         
-        camera.autoUpdateMatrix && camera.updateMatrix();
         object.autoUpdateMatrix && object.updateMatrix();
 
         _viewMatrix.multiply( camera.matrix, object.matrix );
@@ -407,6 +406,8 @@ THREE.WebGLRenderer = function () {
     
 	this.render = function ( scene, camera ) {
         
+        camera.autoUpdateMatrix && camera.updateMatrix();
+
         var o, ol, object;
 
 		if ( this.autoClear ) {
