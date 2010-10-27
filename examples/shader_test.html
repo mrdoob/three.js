@@ -1,11 +1,12 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - multi-materials test</title>
+		<title>three.js - Shader test</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
-				background:#fff;
+				background:#000;
+                color:#fff;
                 padding:0;
 				margin:0;
 				overflow:hidden;
@@ -16,28 +17,27 @@
             a { color:skyblue }
             canvas { pointer-events:none; z-index:10; position:relative; }
             #log { position:absolute; top:50px; text-align:left; display:block; z-index:100 }
-            #d { text-align:center; margin:1em 0 -15.7em 0; z-index:0; position:relative; display:block }
-            .button { background:#000; color:#fff; padding:0.2em 0.5em; cursor:pointer }
+            #d { text-align:center; margin:1em 0 -19.7em 0; z-index:0; position:relative; display:block }
+            .button { background:orange; color:#fff; padding:0.2em 0.5em; cursor:pointer }
             .inactive { background:#999; color:#eee }
 		</style>
 	</head>
 	
     <body>
         <div id="d">
-            <h1>Multi-materials test</h1>
+            <h1>Shader test</h1>
 
             <span id="rcanvas" class="button inactive">2d canvas renderer</span>
             <span id="rwebgl" class="button">WebGL renderer</span>
             <br/>
-
-            <p>Model by <a href="http://sketchup.google.com/3dwarehouse/details?mid=2c6fd128fca34052adc5f5b98d513da1">Reallusion iClone</a> 
             
             <p>Using a modified version of <a href="http://github.com/alteredq/three.js">Three.js</a> by mrdoob.
             
             <br/>
             <p>Best viewed in Chrome 7/8 or Firefox 4 using WebGL renderer.
             <p>Canvas renderer is very slow on anything other than Chrome.
-            <p><a href="http://code.google.com/p/chromium/issues/detail?id=60124">Line width is not set properly</a> on Chrome in Windows.
+            <p>Blinn-Phong shader only works in WebGL, canvas has only diffuse materials.
+            <p>In Firefox 4 something is broken.
         </div>
         
         <div id="log"></div>
@@ -89,13 +89,12 @@
         -->
 		
 		<script type="text/javascript" src="geometry/primitives/Sphere.js"></script>
-		<script type="text/javascript" src="geometry/primitives/Plane.js"></script>
 
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
 
-			var SCREEN_WIDTH = window.innerWidth/2;
+			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
 			var FLOOR = -250;
 
@@ -106,7 +105,7 @@
 			var scene;
 			var canvasRenderer, webglRenderer;
 
-			var mesh, zmesh, geometry;
+			var mesh, zmesh, lightMesh, geometry;
             
             var directionalLight, pointLight;
             
@@ -128,11 +127,27 @@
             
 			loop();
             
-            //render_canvas = !has_gl;
+            render_canvas = !has_gl;
             bwebgl.style.display = has_gl ? "inline" : "none";
             bcanvas.className = render_canvas ? "button" : "button inactive";
             
 			setInterval(loop, 1000/60);
+            
+            function addMesh( geometry, scale, x, y, z, rx, ry, rz, material ) {
+                
+                mesh = new THREE.Mesh( geometry, material );
+                mesh.scale.x = mesh.scale.y = mesh.scale.z = scale;
+                mesh.position.x = x;
+                mesh.position.y = y;
+                mesh.position.z = z;
+                mesh.rotation.x = rx;
+                mesh.rotation.y = ry;
+                mesh.rotation.z = rz;
+                mesh.overdraw = true;
+                mesh.updateMatrix();
+                scene.add(mesh);
+                
+            }
             
 			function init() {
 
@@ -140,60 +155,64 @@
 				document.body.appendChild(container);
 
 				camera = new THREE.Camera( 75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
-                camera.position.z = 500;
+                camera.position.z = 1000;
                 camera.updateMatrix();
 
 				scene = new THREE.Scene();
-                
-                // SPHERES
-                
-                sphere = new Sphere( 100, 16, 8, 1 );
-                for (var i=0; i<10; i++) {
-                    //mesh = new THREE.Mesh( sphere, new THREE.MeshColorFillMaterial( 0xffffff ) );
-                    mesh = new THREE.Mesh( sphere, [ new THREE.MeshColorFillMaterial( 0xffffff ), new THREE.MeshColorStrokeMaterial( 0x000000, 1, 1.5 ) ] );
-                    //mesh = new THREE.Mesh( sphere, new THREE.MeshColorStrokeMaterial( 0x00aa00, 1, 1.5 ) );
-                    //mesh = new THREE.Mesh( sphere, new THREE.MeshFaceColorStrokeMaterial( 2.5 ) );
-                    mesh.position.x = 500 * (Math.random() - 0.5);
-                    mesh.position.y = 500 * (Math.random() - 0.5);
-                    mesh.position.z = 500 * (Math.random() - 0.5);
-                    mesh.scale.x = mesh.scale.y = mesh.scale.z = 0.25 * (Math.random() + 0.5);
-                    //mesh.doubleSided = true;
-                    mesh.overdraw = true;
-                    mesh.updateMatrix();
-                    scene.add(mesh);
-                }
-                
 
 				// LIGHTS
 
                 var ambient = new THREE.AmbientLight( 0x101010 );
 				scene.addLight( ambient );
 
-                directionalLight = new THREE.DirectionalLight( 0xffffff );
-                directionalLight.position.y = -70;
-                directionalLight.position.z = 100;
+                directionalLight = new THREE.DirectionalLight( 0xffffff, 1.0 );
+                directionalLight.position.x = 1;
+                directionalLight.position.y = 1;
+                directionalLight.position.z = 2;
 				directionalLight.position.normalize();
 				scene.addLight( directionalLight );
 
-				pointLight = new THREE.PointLight( 0xffaa00 );
+				pointLight = new THREE.PointLight( 0xffffff );
                 pointLight.position.x = 0;
                 pointLight.position.y = 0;
-                pointLight.position.z = 120;
-				//scene.addLight( pointLight );
+                pointLight.position.z = 0;
+				scene.addLight( pointLight );
 
 
-                mesh = new THREE.Mesh( sphere, new THREE.MeshColorFillMaterial( 0xff0000 ) );
-                mesh.scale.x = mesh.scale.y = mesh.scale.z = 0.1;
-                mesh.position = pointLight.position;
-                mesh.updateMatrix();
-                scene.add(mesh);
+                // light representation
+                sphere = new Sphere( 100, 16, 8, 1 );
+                lightMesh = new THREE.Mesh( sphere, new THREE.MeshColorFillMaterial( 0xffaa00 ) );
+                lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
+                lightMesh.position = pointLight.position;
+                lightMesh.overdraw = true;
+                lightMesh.updateMatrix();
+                scene.add(lightMesh);
 
+                // material samples
+                sphere = new Sphere( 100, 32, 32, 1 );
 
-                if( render_canvas ) {
-                    canvasRenderer = new THREE.CanvasRenderer();
-                    canvasRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-                    container.appendChild( canvasRenderer.domElement );
-                }
+                var y1 = 0, y2 = -200;
+                
+                addMesh( sphere, 1, -600, y1, 0, 0,0,0, new THREE.MeshPhongMaterial( 0x050505, 0x000000, 0x555555, 30, 1.0 ) );
+                addMesh( sphere, 1, -600, y2, 0, 0,0,0, new THREE.MeshColorFillMaterial( 0x050505 ) );
+
+                addMesh( sphere, 1, -400, y1, 0, 0,0,0, new THREE.MeshPhongMaterial( 0x000000, 0xffffff, 0x555555, 30, 1.0 ) );
+                addMesh( sphere, 1, -400, y2, 0, 0,0,0, new THREE.MeshColorFillMaterial( 0xffffff ) );
+
+                addMesh( sphere, 1, -200, y1, 0, 0,0,0, new THREE.MeshPhongMaterial( 0x000000, 0xff5500, 0x555555, 10, 1.0 ) );
+                addMesh( sphere, 1, -200, y2, 0, 0,0,0, new THREE.MeshColorFillMaterial( 0xff5500 ) );
+
+                addMesh( sphere, 1,    0, y1, 0, 0,0,0, new THREE.MeshPhongMaterial( 0x000000, 0xffaa00, 0x555555, 30, 1.0 ) );
+                addMesh( sphere, 1,    0, y2, 0, 0,0,0, new THREE.MeshColorFillMaterial( 0xffaa00 ) );
+
+                addMesh( sphere, 1,  200, y1, 0, 0,0,0, new THREE.MeshPhongMaterial( 0x000000, 0x55ff00, 0x555555, 30, 1.0 ) );
+                addMesh( sphere, 1,  200, y2, 0, 0,0,0, new THREE.MeshColorFillMaterial( 0x55ff00 ) );
+
+                addMesh( sphere, 1,  400, y1, 0, 0,0,0, new THREE.MeshPhongMaterial( 0x000000, 0x0055ff, 0x555555, 30, 1.0 ) );
+                addMesh( sphere, 1,  400, y2, 0, 0,0,0, new THREE.MeshColorFillMaterial( 0x0055ff ) );
+
+                addMesh( sphere, 1,  600, y1, 0, 0,0,0, new THREE.MeshPhongMaterial( 0x000000, 0x5500ff, 0x555555, 30, 1.0 ) );
+                addMesh( sphere, 1,  600, y2, 0, 0,0,0, new THREE.MeshColorFillMaterial( 0x5500ff ) );
 
                 if ( render_gl ) {
                     try {
@@ -205,6 +224,13 @@
                     catch (e) {
                     }
                 }
+                
+                if( render_canvas ) {
+                    canvasRenderer = new THREE.CanvasRenderer();
+                    canvasRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+                    container.appendChild( canvasRenderer.domElement );
+                }
+
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
@@ -215,75 +241,23 @@
                 bcanvas.addEventListener("click", toggleCanvas, false);
                 bwebgl.addEventListener("click", toggleWebGL, false);
 
-                function createModel2() {
+                function createModel() {
                     
-                    // MESH
+                    geometry = new Torus( );
                     
-                    geometry = new Female02( "obj/female02" );
+                    var s = 80, t = s + 20, y = 200;
                     
-                    // full-mesh wireframe overlay
-                    //geometry.materials.push ( new THREE.MeshColorStrokeMaterial(0xff0000, 1, 1.5) );
-                    
-                    // full-mesh color overlay
-                    var colorOverlay = new THREE.MeshColorFillMaterial(0xff0000, 0.5)
-                    colorOverlay.decalIndex = 4;
-                    geometry.materials.push ( colorOverlay );
-                    
-                    // PROCEDURAL TEXTURES (decals)
-                    
-                    var x1 = document.createElement( "canvas" );
-                    var xc1 = x1.getContext("2d");
-                    x1.width = x1.height = 256;
-                                    
-                    xc1.shadowBlur = 3;
-                    xc1.shadowColor = "#000";
-                    xc1.font = "7pt arial";
-                    xc1.fillStyle = "hsla("+0+",90%,50%,1);"
-                    xc1.fillText("Three", 57, 29);
-                    
-                    xc1.fillStyle = "hsla("+0+",90%,50%,0.15);"
-                    xc1.fillRect(40, 70, 60, 50);
-                    
-                    for(var i=0;i<500;i++) {
-                        xc1.fillStyle = "hsla("+60*Math.random()+",90%,50%,0.5);"
-                        xc1.fillRect(40+60*Math.random(), 118+10*Math.random(), 2, 10);
-                    }
+                    addMesh( geometry, s, -6*t, y, 0, 1.57,0,0, new THREE.MeshPhongMaterial( 0x000000, 0x000000, 0x333333, 10, 1.0 ) );
+                    addMesh( geometry, s, -4*t, y, 0, 1.57,0,0, new THREE.MeshPhongMaterial( 0x030303, 0x888888, 0x333333, 10, 1.0 ) );
+                    addMesh( geometry, s, -2*t, y, 0, 1.57,0,0, new THREE.MeshPhongMaterial( 0x030303, 0x030303, 0xff5500, 10, 1.0 ) );
+                    addMesh( geometry, s,    0, y, 0, 1.57,0,0, new THREE.MeshPhongMaterial( 0x030303, 0x030303, 0xffaa00, 10, 1.0 ) );
+                    addMesh( geometry, s,  2*t, y, 0, 1.57,0,0, new THREE.MeshPhongMaterial( 0x030303, 0x030303, 0x55ff00, 10, 1.0 ) );
+                    addMesh( geometry, s,  4*t, y, 0, 1.57,0,0, new THREE.MeshPhongMaterial( 0x030303, 0x030303, 0x0055ff, 10, 1.0 ) );
+                    addMesh( geometry, s,  6*t, y, 0, 1.57,0,0, new THREE.MeshPhongMaterial( 0x030303, 0x030303, 0x5500ff, 10, 1.0 ) );
 
-                    var x2 = document.createElement( "canvas" );
-                    var xc2 = x2.getContext("2d");
-                    x2.width = x2.height = 128;
-                    xc2.fillStyle = "rgba(0,0,0,0.5)";
-                    for(var i=0;i<14;i++) {
-                        xc2.fillRect(0, 5+i*4, 54, 2);
-                        xc2.fillRect(i*4, 5, 2, 54);
-                    }
-
-                    var xm1 = new THREE.MeshBitmapUVMappingMaterial( x1 );
-                    xm1.loaded = 1;
-                    xm1.decalIndex = 0; // index of the original UV mapped material 
-
-                    var xm2 = new THREE.MeshBitmapUVMappingMaterial( x2 );
-                    xm2.loaded = 1;
-                    xm2.decalIndex = 1; // index of the original UV mapped material 
-                    
-                    geometry.materials.push ( xm1 );
-                    geometry.materials.push ( xm2 );
-
-                    zmesh = new THREE.Mesh( geometry, geometry.materials, 1 );
-                    zmesh.position.x = -80;
-                    zmesh.position.z = 50;
-                    zmesh.position.y = FLOOR;
-                    zmesh.scale.x = zmesh.scale.y = zmesh.scale.z = 3;
-                    zmesh.overdraw = true;
-                    zmesh.updateMatrix();
-                    scene.add(zmesh);
-
-                    // PLANES with all materials from the model
-                    
-                    createMaterialsPalette( geometry.materials, 100, 0 );
                 }
 
-                loadAsync( "obj/female02/female02.js", createModel2);
+                loadAsync( "obj/torus/Torus.js", createModel);
 
 			}
 
@@ -296,45 +270,7 @@
                 document.getElementsByTagName("head")[0].appendChild(el);
 
             }
-            
-            function createMaterialsPalette( materials, size, bottom ) {
-                
-                for ( var i=0; i<materials.length; ++i ) {
-                    
-                    // material
-                    mesh = new THREE.Mesh( new Plane( size, size ), materials[i] );
-                    mesh.position.x = i * (size + 5) - ( ( materials.length - 1 )* ( size + 5 )/2);
-                    mesh.position.y = FLOOR + size/2 + bottom;
-                    mesh.position.z = -100;
-                    mesh.scale.x = mesh.scale.y = mesh.scale.z = 1;
-                    mesh.doubleSided = true;
-                    mesh.updateMatrix();
-                    scene.add(mesh);
-                    
-                    // number
-                    var x = document.createElement( "canvas" );
-                    var xc = x.getContext("2d");
-                    x.width = x.height = 128;
-                    xc.shadowColor = "#000";
-                    xc.shadowBlur = 7;
-                    xc.fillStyle = "orange";
-                    xc.font = "50pt arial bold";
-                    xc.fillText(i, 10, 64);
-                    
-                    var xm = new THREE.MeshBitmapUVMappingMaterial( x );
-                    xm.loaded = 1;
-                    
-                    mesh = new THREE.Mesh( new Plane( size, size ), xm );
-                    mesh.position.x = i * (size + 5) - ( ( materials.length - 1 )* ( size + 5 )/2);
-                    mesh.position.y = FLOOR + size/2 + bottom;
-                    mesh.position.z = -99;
-                    mesh.scale.x = mesh.scale.y = mesh.scale.z = 1;
-                    mesh.doubleSided = true;
-                    mesh.updateMatrix();
-                    scene.add(mesh);
-                }
-                
-            }
+
             
 			function onDocumentMouseMove(event) {
 
@@ -342,12 +278,28 @@
 				mouseY = ( event.clientY - windowHalfY );
 
 			}
+
+            var r = 0;
             
 			function loop() {
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 				camera.updateMatrix();
+               
+                
+                /*
+                for(var i=0; i<scene.objects.length; ++i) {
+                    scene.objects[i].rotation.x += 0.0025;                        
+                    scene.objects[i].updateMatrix();
+                }
+                */
+                lightMesh.position.x = 700*Math.cos(r);
+                lightMesh.position.z = 700*Math.sin(r);
+                lightMesh.updateMatrix();
+
+                r += 0.01;
+                
                 
 				if ( render_canvas ) canvasRenderer.render( scene, camera );
 				if ( render_gl && has_gl ) webglRenderer.render( scene, camera );
