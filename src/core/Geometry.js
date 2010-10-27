@@ -58,86 +58,97 @@ THREE.Geometry.prototype = {
 
 			face = this.faces[ f ];
 
-            if ( useVertexNormals && face.vertexNormals.length  ) {
-                
-                // set face normal to average of vertex normals
-                
-                cb.set( 0, 0, 0 );
+			if ( useVertexNormals && face.vertexNormals.length  ) {
 
-                for ( n = 0, nl = face.normal.length; n < nl; n++ ) {
-                    cb.x += face.vertexNormals[n].x;
-                    cb.y += face.vertexNormals[n].y;
-                    cb.z += face.vertexNormals[n].z;
-                }
+				cb.set( 0, 0, 0 );
 
-                cb.x /= 3;
-                cb.y /= 3;
-                cb.z /= 3;
+				for ( n = 0, nl = face.normal.length; n < nl; n++ ) {
 
-                if ( !cb.isZero() ) {
+					cd.addSelf( face.vertexNormals[n] );
 
-                    cb.normalize();
+				}
 
-                }
+				cb.divideScalar( 3 );
 
-                face.normal.copy( cb );
-            }
-            
-            else {
-                
-                vA = this.vertices[ face.a ];
-                vB = this.vertices[ face.b ];
-                vC = this.vertices[ face.c ];
+				if ( ! cb.isZero() ) {
 
-                cb.sub( vC.position, vB.position );
-                ab.sub( vA.position, vB.position );
-                cb.crossSelf( ab );
+					cb.normalize();
 
-                if ( !cb.isZero() ) {
+				}
 
-                    cb.normalize();
+				face.normal.copy( cb );
 
-                }
+			} else {
 
-                face.normal.copy( cb );
-            }
+				vA = this.vertices[ face.a ];
+				vB = this.vertices[ face.b ];
+				vC = this.vertices[ face.c ];
+
+				cb.sub( vC.position, vB.position );
+				ab.sub( vA.position, vB.position );
+				cb.crossSelf( ab );
+
+				if ( !cb.isZero() ) {
+
+				    cb.normalize();
+
+				}
+
+				face.normal.copy( cb );
+
+			}
 
 		}
 
 	},
-    
-    computeBoundingBox: function ( ) {
-        
-        if ( this.vertices.length > 0 ) {
-            
-            this.bbox = { 'x': [ this.vertices[ 0 ].position.x, this.vertices[ 0 ].position.x ], 
-                          'y': [ this.vertices[ 0 ].position.y, this.vertices[ 0 ].position.y ], 
-                          'z': [ this.vertices[ 0 ].position.z, this.vertices[ 0 ].position.z ] };
-            
-            var v, vl;
-            
-            for ( v = 1, vl = this.vertices.length; v < vl; v++ ) {
 
-                vertex = this.vertices[ v ];
-                
-                if ( vertex.position.x < this.bbox.x[ 0 ] )
-                    this.bbox.x[ 0 ] = vertex.position.x;
-                else if ( vertex.position.x > this.bbox.x[ 1 ] )
-                    this.bbox.x[ 1 ] = vertex.position.x;
+	computeBoundingBox: function ( ) {
 
-                if ( vertex.position.y < this.bbox.y[ 0 ] )
-                    this.bbox.y[ 0 ] = vertex.position.y;
-                else if ( vertex.position.y > this.bbox.y[ 1 ] )
-                    this.bbox.y[ 1 ] = vertex.position.y;
+		if ( this.vertices.length > 0 ) {
 
-                if ( vertex.position.z < this.bbox.z[ 0 ] )
-                    this.bbox.z[ 0 ] = vertex.position.z;
-                else if ( vertex.position.z > this.bbox.z[ 1 ] )
-                    this.bbox.z[ 1 ] = vertex.position.z;
+			this.bbox = { 'x': [ this.vertices[ 0 ].position.x, this.vertices[ 0 ].position.x ],
+			'y': [ this.vertices[ 0 ].position.y, this.vertices[ 0 ].position.y ], 
+			'z': [ this.vertices[ 0 ].position.z, this.vertices[ 0 ].position.z ] };
 
-            }
-        }
-    },
+			for ( var v = 1, vl = this.vertices.length; v < vl; v++ ) {
+
+				vertex = this.vertices[ v ];
+
+				if ( vertex.position.x < this.bbox.x[ 0 ] ) {
+
+					this.bbox.x[ 0 ] = vertex.position.x;
+
+				} else if ( vertex.position.x > this.bbox.x[ 1 ] ) {
+
+					this.bbox.x[ 1 ] = vertex.position.x;
+
+				}
+
+				if ( vertex.position.y < this.bbox.y[ 0 ] ) {
+
+					this.bbox.y[ 0 ] = vertex.position.y;
+
+				} else if ( vertex.position.y > this.bbox.y[ 1 ] ) {
+
+					this.bbox.y[ 1 ] = vertex.position.y;
+
+				}
+
+				if ( vertex.position.z < this.bbox.z[ 0 ] ) {
+
+					this.bbox.z[ 0 ] = vertex.position.z;
+
+				} else if ( vertex.position.z > this.bbox.z[ 1 ] ) {
+
+					this.bbox.z[ 1 ] = vertex.position.z;
+
+				}
+
+			}
+
+		}
+
+	},
 
 	toString: function () {
 

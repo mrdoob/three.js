@@ -33,15 +33,14 @@
 		<script type="text/javascript" src="../src/lights/DirectionalLight.js"></script>
 		<script type="text/javascript" src="../src/lights/PointLight.js"></script>
 		<script type="text/javascript" src="../src/objects/Object3D.js"></script>
-		<script type="text/javascript" src="../src/objects/Mesh.js"></script>
 		<script type="text/javascript" src="../src/objects/Particle.js"></script>
 		<script type="text/javascript" src="../src/objects/Line.js"></script>
+		<script type="text/javascript" src="../src/objects/Mesh.js"></script>
 		<script type="text/javascript" src="../src/materials/LineColorMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/MeshBitmapUVMappingMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/MeshBitmapMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/MeshColorFillMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/MeshColorStrokeMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/MeshFaceColorFillMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/MeshFaceColorStrokeMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/MeshFaceMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/ParticleCircleMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/ParticleBitmapMaterial.js"></script>
 		<script type="text/javascript" src="../src/scenes/Scene.js"></script>
@@ -104,7 +103,7 @@
 
 				// QRCODE
 
-				qrcode = mesh = new THREE.Mesh(new Qrcode(), new THREE.MeshFaceColorFillMaterial());
+				qrcode = mesh = new THREE.Mesh( new Qrcode(), new THREE.MeshFaceMaterial() );
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
 				mesh.updateMatrix();
 				scene.add(mesh);
@@ -155,22 +154,22 @@
 
 					var v = new THREE.Vector3( Math.random() * 1000 - 500, Math.random() * 1000 - 500, Math.random() * 1000 - 500 );
 
-					var v0 = new THREE.Vertex( new THREE.Vector3(Math.random() * 100 - 50, Math.random() * 100 - 50, Math.random() * 100 - 50 ) );
-					var v1 = new THREE.Vertex( new THREE.Vector3(Math.random() * 100 - 50, Math.random() * 100 - 50, Math.random() * 100 - 50 ) );
-					var v2 = new THREE.Vertex( new THREE.Vector3(Math.random() * 100 - 50, Math.random() * 100 - 50, Math.random() * 100 - 50 ) );
+					var v0 = new THREE.Vertex( new THREE.Vector3( Math.random() * 100 - 50, Math.random() * 100 - 50, Math.random() * 100 - 50 ) );
+					var v1 = new THREE.Vertex( new THREE.Vector3( Math.random() * 100 - 50, Math.random() * 100 - 50, Math.random() * 100 - 50 ) );
+					var v2 = new THREE.Vertex( new THREE.Vector3( Math.random() * 100 - 50, Math.random() * 100 - 50, Math.random() * 100 - 50 ) );
 
 					v0.position.addSelf( v );
 					v1.position.addSelf( v );
 					v2.position.addSelf( v );
 
-					var face = new THREE.Face3( geometry.vertices.push( v0 ) - 1, geometry.vertices.push( v1 ) - 1, geometry.vertices.push( v2 ) - 1 );
-					face.color.setRGBA( Math.random(), Math.random(), Math.random(), 1 );
+					var face = new THREE.Face3( geometry.vertices.push( v0 ) - 1, geometry.vertices.push( v1 ) - 1, geometry.vertices.push( v2 ) - 1, null, new THREE.MeshColorFillMaterial( Math.random() * 0xffffff ) );
+
 					geometry.faces.push( face );
 				}
 
 				geometry.computeNormals();
 
-				mesh = new THREE.Mesh( geometry, new THREE.MeshFaceColorFillMaterial() );
+				mesh = new THREE.Mesh( geometry, [ new THREE.MeshFaceMaterial(), new THREE.MeshColorStrokeMaterial( 0xff0000, 0.5, 10 ) ] );
 				mesh.doubleSided = true;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
 				scene.add(mesh);
@@ -239,7 +238,7 @@
 
 				canvasRenderer.render( scene, camera );
 				svgRenderer.render( scene, camera );
-				webglRenderer.render( scene, camera );
+				// webglRenderer.render( scene, camera ); // currently broken :/
 
 				stats.update();
 

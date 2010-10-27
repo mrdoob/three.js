@@ -74,10 +74,10 @@
 
 				for (var i = 0; i < geometry.faces.length; i++) {
 
-					geometry.faces[i].color.setRGBA( Math.random() * 0.5, Math.random() * 0.5 + 0.5, Math.random() * 0.5 + 0.5, 1 );
+					geometry.faces[i].material = [ new THREE.MeshColorFillMaterial( Math.random() * 0xffffff, 1 ) ];
 				}
 
-				cube = new THREE.Mesh(geometry, new THREE.MeshFaceColorFillMaterial() );
+				cube = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial() );
 				cube.position.y = 150;
 				scene.addObject( cube );
 

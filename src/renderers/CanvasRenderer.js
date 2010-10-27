@@ -19,10 +19,11 @@ THREE.CanvasRenderer = function () {
 	_light = new THREE.Color( 0xffffffff ),
 	_ambientLight = new THREE.Color( 0xffffffff ),
 
+	_pi2 = Math.PI * 2,
 	_vector2 = new THREE.Vector2(), // Needed for expand
 	_vector3 = new THREE.Vector3(), // Needed for PointLight
-	v5 = new THREE.Vector2(), v6 = new THREE.Vector2(), // Needed for latter splitting tris to quads
-	uv1 = new THREE.UV(), uv2 = new THREE.UV(), uv3 = new THREE.UV(), uv4 = new THREE.UV();
+	_uv1 = new THREE.UV(), _uv2 = new THREE.UV(), _uv3 = new THREE.UV(), _uv4 = new THREE.UV(),
+	v5 = new THREE.Vector2(), v6 = new THREE.Vector2(); // Needed for latter splitting tris to quads
 
 	this.domElement = _canvas;
 	this.autoClear = true;
@@ -49,36 +50,14 @@ THREE.CanvasRenderer = function () {
 			_context.setTransform( 1, 0, 0, - 1, _widthHalf, _heightHalf );
 			_context.clearRect( _clearRect.getX(), _clearRect.getY(), _clearRect.getWidth(), _clearRect.getHeight() );
 
-			/*
-			// Opera workaround
-			_context.setTransform( 1, 0, 0, 1, _widthHalf, _heightHalf );
-			_context.clearRect( _clearRect.getX(), - ( _clearRect.getHeight() + _clearRect.getY() ), _clearRect.getWidth(), _clearRect.getHeight() );
-			*/
-
 			_clearRect.empty();
 
 		}
 	};
 
-    this.isFullOverlay = function ( material, materialIndex, element ) {
-        
-        // these materials can be either the only material for whole mesh
-        // or if they are overlays in multimaterials, they apply only to
-        // group of faces with single material (specified by decalIndex)
-        
-        return ( ( material instanceof THREE.MeshBitmapUVMappingMaterial || 
-                   material instanceof THREE.MeshFaceColorFillMaterial ||
-                   material instanceof THREE.MeshColorFillMaterial
-                 ) 
-                 &&
-                 ! ( materialIndex == element.materialIndex || 
-                     element.materialIndex == material.decalIndex ) );
-        
-    };
-        
 	this.render = function ( scene, camera ) {
 
-		var e, el, element, m, ml, material, pi2 = Math.PI * 2,
+		var e, el, element, m, ml, fm, fml, material,
 		v1x, v1y, v2x, v2y, v3x, v3y, v4x, v4y, v5x, v5y, v6x, v6y,
 		width, height, scaleX, scaleY, offsetX, offsetY,
 		bitmap, bitmapWidth, bitmapHeight;
@@ -120,95 +99,7 @@ THREE.CanvasRenderer = function () {
 
 					material = element.material[ m ];
 
-					if ( material instanceof THREE.ParticleCircleMaterial ) {
-
-						if ( _enableLighting ) {
-
-							_light.copyRGB( _ambientLight );
-							calculateLight( scene, element, _light );
-
-							_color.copyRGBA( material.color );
-							_color.multiplySelfRGB( _light );
-							_color.updateStyleString();
-
-						} else {
-
-							_color = material.color;
-
-						}
-
-						width = element.scale.x * _widthHalf;
-						height = element.scale.y * _heightHalf;
-
-						_bboxRect.set( v1x - width, v1y - height, v1x + width, v1y + height );
-
-						if ( !_clipRect.instersects( _bboxRect ) ) {
-
-							continue;
-
-						}
-
-						_context.save();
-						_context.translate( v1x, v1y );
-						_context.rotate( - element.rotation );
-						_context.scale( width, height );
-
-						_context.beginPath();
-						_context.arc( 0, 0, 1, 0, pi2, true );
-						_context.closePath();
-
-						_context.fillStyle = _color.__styleString;
-						_context.fill();
-
-						_context.restore();
-
-					} else if ( material instanceof THREE.ParticleBitmapMaterial ) {
-
-						bitmap = material.bitmap;
-						bitmapWidth = bitmap.width / 2;
-						bitmapHeight = bitmap.height / 2;
-
-						scaleX = element.scale.x * _widthHalf;
-						scaleY = element.scale.y * _heightHalf;
-
-						width = scaleX * bitmapWidth;
-						height = scaleY * bitmapHeight;
-
-						offsetX = material.offset.x * scaleX;
-						offsetY = material.offset.y * scaleY;
-
-						// TODO: Rotations break this...
-
-						_bboxRect.set( v1x + offsetX - width, v1y + offsetY - height, v1x + offsetX + width, v1y + offsetY + height );
-
-						if ( !_clipRect.instersects( _bboxRect ) ) {
-
-							continue;
-
-						}
-
-						_context.save();
-						_context.translate( v1x, v1y );
-						_context.rotate( - element.rotation );
-						_context.scale( scaleX, - scaleY );
-						_context.translate( - bitmapWidth + material.offset.x, - bitmapHeight - material.offset.y );
-
-						_context.drawImage( bitmap, 0, 0 );
-
-						_context.restore();
-
-						/* DEBUG
-						_context.beginPath();
-						_context.moveTo( v1x - 10, v1y );
-						_context.lineTo( v1x + 10, v1y );
-						_context.moveTo( v1x, v1y - 10 );
-						_context.lineTo( v1x, v1y + 10 );
-						_context.closePath();
-						_context.strokeStyle = 'rgb(255,255,0)';
-						_context.stroke();
-						*/
-
-					}
+					renderParticle( v1x, v1y, element, material, scene );
 
 				}
 
@@ -235,33 +126,7 @@ THREE.CanvasRenderer = function () {
 
 					material = element.material[ m ];
 
-					if ( material instanceof THREE.LineColorMaterial ) {
-
-						if ( _enableLighting ) {
-
-							_light.copyRGB( _ambientLight );
-							calculateLight( scene, element, _light );
-
-							_color.copyRGBA( material.color );
-							_color.multiplySelfRGB( _light );
-							_color.updateStyleString();
-
-						} else {
-
-							_color = material.color;
-
-						}
-
-						_context.lineWidth = material.lineWidth;
-						_context.lineJoin = "round";
-						_context.lineCap = "round";
-
-						_context.strokeStyle = _color.__styleString;
-						_context.stroke();
-
-						_bboxRect.inflate( _context.lineWidth );
-
-					}
+					renderLine( v1x, v1y, v2x, v2y, element, material, scene );
 
 				}
 
@@ -293,171 +158,29 @@ THREE.CanvasRenderer = function () {
 
 				}
 
-				for ( m = 0, ml = element.material.length; m < ml; m++ ) {
+				m = 0; ml = element.meshMaterial.length;
 
-					material = element.material[ m ];
-                    
-                    if ( this.isFullOverlay( material, m, element ) ) {
-                        
-                        continue;
-                    }
-                    
-					if ( material instanceof THREE.MeshColorFillMaterial ) {
+				while ( m < ml ) {
 
-						if ( _enableLighting ) {
+					material = element.meshMaterial[ m ++ ];
 
-							_light.copyRGB( _ambientLight );
-							calculateFaceLight( scene, element, _light );
+					if ( material instanceof THREE.MeshFaceMaterial ) {
 
-							_color.copyRGBA( material.color );
-							_color.multiplySelfRGB( _light );
-							_color.updateStyleString();
+						fm = 0; fml = element.faceMaterial.length;
 
-						} else {
+						while ( fm < fml ) {
 
-							_color = material.color;
+							material = element.faceMaterial[ fm ++ ];
+
+							renderFace3( v1x, v1y, v2x, v2y, v3x, v3y, element, material, scene );
 
 						}
 
-						_context.beginPath();
-						_context.moveTo( v1x, v1y );
-						_context.lineTo( v2x, v2y );
-						_context.lineTo( v3x, v3y );
-						_context.lineTo( v1x, v1y );
-						_context.closePath();
-
-						_context.fillStyle = _color.__styleString;
-						_context.fill();
-
-					} else if ( material instanceof THREE.MeshColorStrokeMaterial ) {
-
-						if ( _enableLighting ) {
-
-							_light.copyRGB( _ambientLight );
-							calculateFaceLight( scene, element, _light );
-
-							_color.copyRGBA( material.color );
-							_color.multiplySelfRGB( _light );
-							_color.updateStyleString();
-
-						} else {
-
-							_color = material.color;
-
-						}
-
-						_context.beginPath();
-						_context.moveTo( v1x, v1y );
-						_context.lineTo( v2x, v2y );
-						_context.lineTo( v3x, v3y );
-						_context.lineTo( v1x, v1y );
-						_context.closePath();
-
-						_context.lineWidth = material.lineWidth;
-						_context.lineJoin = "round";
-						_context.lineCap = "round";
-
-						_context.strokeStyle = _color.__styleString;
-						_context.stroke();
-
-						_bboxRect.inflate( _context.lineWidth );
-
-					} else if ( material instanceof THREE.MeshFaceColorFillMaterial ) {
-
-						if ( _enableLighting ) {
-
-							_light.copyRGB( _ambientLight );
-							calculateFaceLight( scene, element, _light );
-
-							_color.copyRGBA( element.color );
-							_color.multiplySelfRGB( _light );
-							_color.updateStyleString();
-
-						} else {
-
-							_color = element.color;
-
-						}
-
-						_context.beginPath();
-						_context.moveTo( v1x, v1y );
-						_context.lineTo( v2x, v2y );
-						_context.lineTo( v3x, v3y );
-						_context.lineTo( v1x, v1y );
-						_context.closePath();
-
-						_context.fillStyle = _color.__styleString;
-						_context.fill();
-
-					} else if ( material instanceof THREE.MeshFaceColorStrokeMaterial ) {
-
-						if ( _enableLighting ) {
-
-							_light.copyRGB( _ambientLight );
-							calculateFaceLight( scene, element, _light );
-
-							_color.copyRGBA( element.color );
-							_color.multiplySelfRGB( _light );
-							_color.updateStyleString();
-
-						} else {
-
-							_color = element.color;
-
-						}
-
-						_context.beginPath();
-						_context.moveTo( v1x, v1y );
-						_context.lineTo( v2x, v2y );
-						_context.lineTo( v3x, v3y );
-						_context.lineTo( v1x, v1y );
-						_context.closePath();
-
-						_context.lineWidth = material.lineWidth;
-						_context.lineJoin = "round";
-						_context.lineCap = "round";
-
-						_context.strokeStyle = _color.__styleString;
-						_context.stroke();
-
-						_bboxRect.inflate( _context.lineWidth );
-
-
-					} else if ( material instanceof THREE.MeshBitmapUVMappingMaterial ) {
-
-						bitmap = material.bitmap;
-						bitmapWidth = bitmap.width - 1;
-						bitmapHeight = bitmap.height - 1;
-
-						/* DEBUG
-						if ( !element.uvs[ 0 ] || !element.uvs[ 1 ] || !element.uvs[ 2 ]) {
-
-							_context.beginPath();
-							_context.moveTo( v1x, v1y );
-							_context.lineTo( v2x, v2y );
-							_context.lineTo( v3x, v3y );
-							_context.lineTo( v1x, v1y );
-							_context.closePath();
-
-							_context.fillStyle = 'rgb(0, 255, 0)';
-							_context.fill();
-
-							continue;
-
-						}
-						*/
-
-						uv1.copy( element.uvs[ 0 ] );
-						uv2.copy( element.uvs[ 1 ] );
-						uv3.copy( element.uvs[ 2 ] );
-
-						uv1.u *= bitmapWidth; uv1.v *= bitmapHeight;
-						uv2.u *= bitmapWidth; uv2.v *= bitmapHeight;
-						uv3.u *= bitmapWidth; uv3.v *= bitmapHeight;
-
-						drawTexturedTriangle( bitmap, v1x, v1y, v2x, v2y, v3x, v3y, uv1.u, uv1.v, uv2.u, uv2.v, uv3.u, uv3.v );
+						continue;
 
 					}
+
+					renderFace3( v1x, v1y, v2x, v2y, v3x, v3y, element, material, scene );
 
 				}
 
@@ -504,179 +227,29 @@ THREE.CanvasRenderer = function () {
 
 				}
 
-				for ( m = 0, ml = element.material.length; m < ml; m++ ) {
+				m = 0; ml = element.meshMaterial.length;
 
-					material = element.material[ m ];
+				while ( m < ml ) {
 
-                    if ( this.isFullOverlay( material, m, element ) ) {
-                        
-                        continue;
-                    }
-                    
-					if ( material instanceof THREE.MeshColorFillMaterial ) {
+					material = element.meshMaterial[ m ++ ];
 
-						if ( _enableLighting ) {
+					if ( material instanceof THREE.MeshFaceMaterial ) {
 
-							_light.copyRGB( _ambientLight );
-							calculateFaceLight( scene, element, _light );
+						fm = 0; fml = element.faceMaterial.length;
 
-							_color.copyRGBA( material.color );
-							_color.multiplySelfRGB( _light );
-							_color.updateStyleString();
+						while ( fm < fml ) {
 
-						} else {
+							material = element.faceMaterial[ fm ++ ];
 
-							_color = material.color;
+							renderFace4( v1x, v1y, v2x, v2y, v3x, v3y, v4x, v4y, v5x, v5y, v6x, v6y, element, material, scene );
 
 						}
 
-						_context.beginPath();
-						_context.moveTo( v1x, v1y );
-						_context.lineTo( v2x, v2y );
-						_context.lineTo( v3x, v3y );
-						_context.lineTo( v4x, v4y );
-						_context.lineTo( v1x, v1y );
-						_context.closePath();
-
-						_context.fillStyle = _color.__styleString;
-						_context.fill();
-
-
-					} else if ( material instanceof THREE.MeshColorStrokeMaterial ) {
-
-						if ( _enableLighting ) {
-
-							_light.copyRGB( _ambientLight );
-							calculateFaceLight( scene, element, _light );
-
-							_color.copyRGBA( material.color );
-							_color.multiplySelfRGB( _light );
-							_color.updateStyleString();
-
-						} else {
-
-							_color = material.color;
-
-						}
-
-						_context.beginPath();
-						_context.moveTo( v1x, v1y );
-						_context.lineTo( v2x, v2y );
-						_context.lineTo( v3x, v3y );
-						_context.lineTo( v4x, v4y );
-						_context.lineTo( v1x, v1y );
-						_context.closePath();
-
-						_context.lineWidth = material.lineWidth;
-						_context.lineJoin = "round";
-						_context.lineCap = "round";
-
-						_context.strokeStyle = _color.__styleString;
-						_context.stroke();
-
-						_bboxRect.inflate( _context.lineWidth );
-
-					} else if ( material instanceof THREE.MeshFaceColorFillMaterial ) {
-
-						if ( _enableLighting ) {
-
-							_light.copyRGB( _ambientLight );
-							calculateFaceLight( scene, element, _light );
-
-							_color.copyRGBA( element.color );
-							_color.multiplySelfRGB( _light );
-							_color.updateStyleString();
-
-						} else {
-
-							_color = element.color;
-
-						}
-
-						_context.beginPath();
-						_context.moveTo( v1x, v1y );
-						_context.lineTo( v2x, v2y );
-						_context.lineTo( v3x, v3y );
-						_context.lineTo( v4x, v4y );
-						_context.lineTo( v1x, v1y );
-						_context.closePath();
-
-						_context.fillStyle = _color.__styleString;
-						_context.fill();
-
-					} else if ( material instanceof THREE.MeshFaceColorStrokeMaterial ) {
-
-						if ( _enableLighting ) {
-
-							_light.copyRGB( _ambientLight );
-							calculateFaceLight( scene, element, _light );
-
-							_color.copyRGBA( element.color );
-							_color.multiplySelfRGB( _light );
-							_color.updateStyleString();
-
-						} else {
-
-							_color = element.color;
-
-						}
-
-						_context.beginPath();
-						_context.moveTo( v1x, v1y );
-						_context.lineTo( v2x, v2y );
-						_context.lineTo( v3x, v3y );
-						_context.lineTo( v4x, v4y );
-						_context.lineTo( v1x, v1y );
-						_context.closePath();
-
-						_context.lineWidth = material.lineWidth;
-						_context.lineJoin = "round";
-						_context.lineCap = "round";
-
-						_context.strokeStyle = _color.__styleString;
-						_context.stroke();
-
-						_bboxRect.inflate( _context.lineWidth );
-
-					} else if ( material instanceof THREE.MeshBitmapUVMappingMaterial ) {
-
-						bitmap = material.bitmap;
-						bitmapWidth = bitmap.width - 1;
-						bitmapHeight = bitmap.height - 1;
-
-						/* DEBUG
-						if ( !element.uvs[ 0 ] || !element.uvs[ 1 ] || !element.uvs[ 2 ] || !element.uvs[ 3 ]) {
-
-							_context.beginPath();
-							_context.moveTo( v1x, v1y );
-							_context.lineTo( v2x, v2y );
-							_context.lineTo( v3x, v3y );
-							_context.lineTo( v4x, v4y );
-							_context.lineTo( v1x, v1y );
-							_context.closePath();
-
-							_context.fillStyle = 'rgb(255, 0, 255)';
-							_context.fill();
-
-							continue;
-
-						}
-						*/
-
-						uv1.copy( element.uvs[ 0 ] );
-						uv2.copy( element.uvs[ 1 ] );
-						uv3.copy( element.uvs[ 2 ] );
-						uv4.copy( element.uvs[ 3 ] );
-
-						uv1.u *= bitmapWidth; uv1.v *= bitmapHeight;
-						uv2.u *= bitmapWidth; uv2.v *= bitmapHeight;
-						uv3.u *= bitmapWidth; uv3.v *= bitmapHeight;
-						uv4.u *= bitmapWidth; uv4.v *= bitmapHeight;
-
-						drawTexturedTriangle( bitmap, v1x, v1y, v2x, v2y, v4x, v4y, uv1.u, uv1.v, uv2.u, uv2.v, uv4.u, uv4.v );
-						drawTexturedTriangle( bitmap, v5x, v5y, v3x, v3y, v6x, v6y, uv2.u, uv2.v, uv3.u, uv3.v, uv4.u, uv4.v );
+						continue;
 
 					}
+
+					renderFace4( v1x, v1y, v2x, v2y, v3x, v3y, v4x, v4y, v5x, v5y, v6x, v6y, element, material, scene );
 
 				}
 
@@ -792,7 +365,340 @@ THREE.CanvasRenderer = function () {
 
 	}
 
-	function drawTexturedTriangle( bitmap, v1x, v1y, v2x, v2y, v3x, v3y, uv1u, uv1v, uv2u, uv2v, uv3u, uv3v ) {
+	function renderParticle ( v1x, v1y, element, material, scene ) {
+
+		if ( material instanceof THREE.ParticleCircleMaterial ) {
+
+			if ( _enableLighting ) {
+
+				_light.copyRGB( _ambientLight );
+				calculateLight( scene, element, _light );
+
+				_color.copyRGBA( material.color );
+				_color.multiplySelfRGB( _light );
+				_color.updateStyleString();
+
+			} else {
+
+				_color = material.color;
+
+			}
+
+			width = element.scale.x * _widthHalf;
+			height = element.scale.y * _heightHalf;
+
+			_bboxRect.set( v1x - width, v1y - height, v1x + width, v1y + height );
+
+			if ( !_clipRect.instersects( _bboxRect ) ) {
+
+				return;
+
+			}
+
+			_context.save();
+			_context.translate( v1x, v1y );
+			_context.rotate( - element.rotation );
+			_context.scale( width, height );
+
+			_context.beginPath();
+			_context.arc( 0, 0, 1, 0, _pi2, true );
+			_context.closePath();
+
+			_context.fillStyle = _color.__styleString;
+			_context.fill();
+
+			_context.restore();
+
+		} else if ( material instanceof THREE.ParticleBitmapMaterial ) {
+
+			bitmap = material.bitmap;
+			bitmapWidth = bitmap.width / 2;
+			bitmapHeight = bitmap.height / 2;
+
+			scaleX = element.scale.x * _widthHalf;
+			scaleY = element.scale.y * _heightHalf;
+
+			width = scaleX * bitmapWidth;
+			height = scaleY * bitmapHeight;
+
+			offsetX = material.offset.x * scaleX;
+			offsetY = material.offset.y * scaleY;
+
+			// TODO: Rotations break this...
+
+			_bboxRect.set( v1x + offsetX - width, v1y + offsetY - height, v1x + offsetX + width, v1y + offsetY + height );
+
+			if ( !_clipRect.instersects( _bboxRect ) ) {
+
+				return;
+
+			}
+
+			_context.save();
+			_context.translate( v1x, v1y );
+			_context.rotate( - element.rotation );
+			_context.scale( scaleX, - scaleY );
+			_context.translate( - bitmapWidth + material.offset.x, - bitmapHeight - material.offset.y );
+
+			_context.drawImage( bitmap, 0, 0 );
+
+			_context.restore();
+
+			/* DEBUG
+			_context.beginPath();
+			_context.moveTo( v1x - 10, v1y );
+			_context.lineTo( v1x + 10, v1y );
+			_context.moveTo( v1x, v1y - 10 );
+			_context.lineTo( v1x, v1y + 10 );
+			_context.closePath();
+			_context.strokeStyle = 'rgb(255,255,0)';
+			_context.stroke();
+			*/
+
+		}
+
+	}
+
+	function renderLine( v1x, v1y, v2x, v2y, element, material, scene ) {
+
+		if ( material instanceof THREE.LineColorMaterial ) {
+
+			if ( _enableLighting ) {
+
+				_light.copyRGB( _ambientLight );
+				calculateLight( scene, element, _light );
+
+				_color.copyRGBA( material.color );
+				_color.multiplySelfRGB( _light );
+				_color.updateStyleString();
+
+			} else {
+
+				_color = material.color;
+
+			}
+
+			_context.lineWidth = material.lineWidth;
+			_context.lineJoin = "round";
+			_context.lineCap = "round";
+
+			_context.strokeStyle = _color.__styleString;
+			_context.stroke();
+
+			_bboxRect.inflate( _context.lineWidth );
+
+		}
+
+	}
+
+	function renderFace3( v1x, v1y, v2x, v2y, v3x, v3y, element, material, scene ) {
+
+		if ( material instanceof THREE.MeshColorFillMaterial ) {
+
+			if ( _enableLighting ) {
+
+				_light.copyRGB( _ambientLight );
+				calculateFaceLight( scene, element, _light );
+
+				_color.copyRGBA( material.color );
+				_color.multiplySelfRGB( _light );
+				_color.updateStyleString();
+
+			} else {
+
+				_color = material.color;
+
+			}
+
+			_context.beginPath();
+			_context.moveTo( v1x, v1y );
+			_context.lineTo( v2x, v2y );
+			_context.lineTo( v3x, v3y );
+			_context.lineTo( v1x, v1y );
+			_context.closePath();
+
+			_context.fillStyle = _color.__styleString;
+			_context.fill();
+
+		} else if ( material instanceof THREE.MeshColorStrokeMaterial ) {
+
+			if ( _enableLighting ) {
+
+				_light.copyRGB( _ambientLight );
+				calculateFaceLight( scene, element, _light );
+
+				_color.copyRGBA( material.color );
+				_color.multiplySelfRGB( _light );
+				_color.updateStyleString();
+
+			} else {
+
+				_color = material.color;
+
+			}
+
+			_context.beginPath();
+			_context.moveTo( v1x, v1y );
+			_context.lineTo( v2x, v2y );
+			_context.lineTo( v3x, v3y );
+			_context.lineTo( v1x, v1y );
+			_context.closePath();
+
+			_context.lineWidth = material.lineWidth;
+			_context.lineJoin = "round";
+			_context.lineCap = "round";
+
+			_context.strokeStyle = _color.__styleString;
+			_context.stroke();
+
+			_bboxRect.inflate( _context.lineWidth );
+
+		} else if ( material instanceof THREE.MeshBitmapMaterial ) {
+
+			bitmap = material.bitmap;
+			bitmapWidth = bitmap.width - 1;
+			bitmapHeight = bitmap.height - 1;
+
+			/* DEBUG
+			if ( !element.uvs[ 0 ] || !element.uvs[ 1 ] || !element.uvs[ 2 ]) {
+
+				_context.beginPath();
+				_context.moveTo( v1x, v1y );
+				_context.lineTo( v2x, v2y );
+				_context.lineTo( v3x, v3y );
+				_context.lineTo( v1x, v1y );
+				_context.closePath();
+
+				_context.fillStyle = 'rgb(0, 255, 0)';
+				_context.fill();
+
+				return;
+
+			}
+			*/
+
+			_uv1.copy( element.uvs[ 0 ] );
+			_uv2.copy( element.uvs[ 1 ] );
+			_uv3.copy( element.uvs[ 2 ] );
+
+			_uv1.u *= bitmapWidth; _uv1.v *= bitmapHeight;
+			_uv2.u *= bitmapWidth; _uv2.v *= bitmapHeight;
+			_uv3.u *= bitmapWidth; _uv3.v *= bitmapHeight;
+
+			drawTexturedTriangle( bitmap, v1x, v1y, v2x, v2y, v3x, v3y, _uv1.u, _uv1.v, _uv2.u, _uv2.v, _uv3.u, _uv3.v );
+
+		}
+
+	}
+
+	function renderFace4 ( v1x, v1y, v2x, v2y, v3x, v3y, v4x, v4y, v5x, v5y, v6x, v6y, element, material, scene ) {
+
+		if ( material instanceof THREE.MeshColorFillMaterial ) {
+
+			if ( _enableLighting ) {
+
+				_light.copyRGB( _ambientLight );
+				calculateFaceLight( scene, element, _light );
+
+				_color.copyRGBA( material.color );
+				_color.multiplySelfRGB( _light );
+				_color.updateStyleString();
+
+			} else {
+
+				_color = material.color;
+
+			}
+
+			_context.beginPath();
+			_context.moveTo( v1x, v1y );
+			_context.lineTo( v2x, v2y );
+			_context.lineTo( v3x, v3y );
+			_context.lineTo( v4x, v4y );
+			_context.lineTo( v1x, v1y );
+			_context.closePath();
+
+			_context.fillStyle = _color.__styleString;
+			_context.fill();
+
+
+		} else if ( material instanceof THREE.MeshColorStrokeMaterial ) {
+
+			if ( _enableLighting ) {
+
+				_light.copyRGB( _ambientLight );
+				calculateFaceLight( scene, element, _light );
+
+				_color.copyRGBA( material.color );
+				_color.multiplySelfRGB( _light );
+				_color.updateStyleString();
+
+			} else {
+
+				_color = material.color;
+
+			}
+
+			_context.beginPath();
+			_context.moveTo( v1x, v1y );
+			_context.lineTo( v2x, v2y );
+			_context.lineTo( v3x, v3y );
+			_context.lineTo( v4x, v4y );
+			_context.lineTo( v1x, v1y );
+			_context.closePath();
+
+			_context.lineWidth = material.lineWidth;
+			_context.lineJoin = "round";
+			_context.lineCap = "round";
+
+			_context.strokeStyle = _color.__styleString;
+			_context.stroke();
+
+			_bboxRect.inflate( _context.lineWidth );
+
+		} else if ( material instanceof THREE.MeshBitmapMaterial ) {
+
+			bitmap = material.bitmap;
+			bitmapWidth = bitmap.width - 1;
+			bitmapHeight = bitmap.height - 1;
+
+			/* DEBUG
+			if ( !element.uvs[ 0 ] || !element.uvs[ 1 ] || !element.uvs[ 2 ] || !element.uvs[ 3 ] || !element.uvs[ 4 ] ) {
+
+				_context.beginPath();
+				_context.moveTo( v1x, v1y );
+				_context.lineTo( v2x, v2y );
+				_context.lineTo( v3x, v3y );
+				_context.lineTo( v4x, v4y );
+				_context.lineTo( v1x, v1y );
+				_context.closePath();
+
+				_context.fillStyle = 'rgb(255, 0, 255)';
+				_context.fill();
+
+				return;
+
+			}
+			*/
+
+			_uv1.copy( element.uvs[ 0 ] );
+			_uv2.copy( element.uvs[ 1 ] );
+			_uv3.copy( element.uvs[ 2 ] );
+			_uv4.copy( element.uvs[ 3 ] );
+
+			_uv1.u *= bitmapWidth; _uv1.v *= bitmapHeight;
+			_uv2.u *= bitmapWidth; _uv2.v *= bitmapHeight;
+			_uv3.u *= bitmapWidth; _uv3.v *= bitmapHeight;
+			_uv4.u *= bitmapWidth; _uv4.v *= bitmapHeight;
+
+			drawTexturedTriangle( bitmap, v1x, v1y, v2x, v2y, v4x, v4y, _uv1.u, _uv1.v, _uv2.u, _uv2.v, _uv4.u, _uv4.v );
+			drawTexturedTriangle( bitmap, v5x, v5y, v3x, v3y, v6x, v6y, _uv2.u, _uv2.v, _uv3.u, _uv3.v, _uv4.u, _uv4.v );
+
+		}
+
+	}
+
+	function drawTexturedTriangle( bitmap, v1x, v1y, v2x, v2y, v3x, v3y, _uv1u, _uv1v, _uv2u, _uv2v, _uv3u, _uv3v ) {
 
 		// Textured triangle drawing by Thatcher Ulrich.
 		// http://tulrich.com/geekstuff/canvas/jsgl.js
@@ -808,19 +714,15 @@ THREE.CanvasRenderer = function () {
 
 		_context.save();
 		_context.clip();
-        
-        // debug triangle outline
-        //_context.strokeStyle = "black";
-        //_context.stroke();
 
-		denom = uv1u * ( uv3v - uv2v ) - uv2u * uv3v + uv3u * uv2v + ( uv2u - uv3u ) * uv1v;
+		denom = _uv1u * ( _uv3v - _uv2v ) - _uv2u * _uv3v + _uv3u * _uv2v + ( _uv2u - _uv3u ) * _uv1v;
 
-		m11 = - ( uv1v * (v3x - v2x ) - uv2v * v3x + uv3v * v2x + ( uv2v - uv3v ) * v1x ) / denom;
-		m12 = ( uv2v * v3y + uv1v * ( v2y - v3y ) - uv3v * v2y + ( uv3v - uv2v) * v1y ) / denom;
-		m21 = ( uv1u * ( v3x - v2x ) - uv2u * v3x + uv3u * v2x + ( uv2u - uv3u ) * v1x ) / denom;
-		m22 = - ( uv2u * v3y + uv1u * ( v2y - v3y ) - uv3u * v2y + ( uv3u - uv2u ) * v1y ) / denom;
-		dx = ( uv1u * ( uv3v * v2x - uv2v * v3x ) + uv1v * ( uv2u * v3x - uv3u * v2x ) + ( uv3u * uv2v - uv2u * uv3v ) * v1x ) / denom;
-		dy = ( uv1u * ( uv3v * v2y - uv2v * v3y ) + uv1v * ( uv2u * v3y - uv3u * v2y ) + ( uv3u * uv2v - uv2u * uv3v ) * v1y ) / denom;
+		m11 = - ( _uv1v * (v3x - v2x ) - _uv2v * v3x + _uv3v * v2x + ( _uv2v - _uv3v ) * v1x ) / denom;
+		m12 = ( _uv2v * v3y + _uv1v * ( v2y - v3y ) - _uv3v * v2y + ( _uv3v - _uv2v) * v1y ) / denom;
+		m21 = ( _uv1u * ( v3x - v2x ) - _uv2u * v3x + _uv3u * v2x + ( _uv2u - _uv3u ) * v1x ) / denom;
+		m22 = - ( _uv2u * v3y + _uv1u * ( v2y - v3y ) - _uv3u * v2y + ( _uv3u - _uv2u ) * v1y ) / denom;
+		dx = ( _uv1u * ( _uv3v * v2x - _uv2v * v3x ) + _uv1v * ( _uv2u * v3x - _uv3u * v2x ) + ( _uv3u * _uv2v - _uv2u * _uv3v ) * v1x ) / denom;
+		dy = ( _uv1u * ( _uv3v * v2y - _uv2v * v3y ) + _uv1v * ( _uv2u * v3y - _uv3u * v2y ) + ( _uv3u * _uv2v - _uv2u * _uv3v ) * v1y ) / denom;
 
 		_context.transform( m11, m12, m21, m22, dx, dy );
 

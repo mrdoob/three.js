@@ -83,7 +83,7 @@
 				textureContext.fillStyle = '#000000';
 				textureContext.fillRect( 0, 0, 480, 204 );
 
-				var material = new THREE.MeshBitmapUVMappingMaterial( texture );
+				var material = new THREE.MeshBitmapMaterial( texture );
 
 				textureReflection = document.createElement( 'canvas' );
 				textureReflection.width = 480;
@@ -97,7 +97,7 @@
 				textureReflectionGradient.addColorStop( 0.2, 'rgba(240, 240, 240, 1)' );
 				textureReflectionGradient.addColorStop( 1, 'rgba(240, 240, 240, 0.8)' );
 
-				var materialReflection = new THREE.MeshBitmapUVMappingMaterial( textureReflection );
+				var materialReflection = new THREE.MeshBitmapMaterial( textureReflection );
 
 				//
 
