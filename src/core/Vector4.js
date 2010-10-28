@@ -20,7 +20,7 @@ THREE.Vector4.prototype = {
 		this.y = y;
 		this.z = z;
 		this.w = w;
-		
+
 		return this;
 
 	},

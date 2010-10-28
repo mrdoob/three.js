@@ -11,7 +11,7 @@ THREE.Face4 = function ( a, b, c, d, normal, material ) {
 
 	this.centroid = new THREE.Vector3();
 	this.normal = normal instanceof THREE.Vector3 ? normal : new THREE.Vector3();
-    this.vertexNormals =  normal instanceof Array ? normal : [];
+	this.vertexNormals =  normal instanceof Array ? normal : [];
 
 	this.material = material instanceof Array ? material : [ material ];
 

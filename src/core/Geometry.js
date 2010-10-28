@@ -64,7 +64,7 @@ THREE.Geometry.prototype = {
 
 				for ( n = 0, nl = face.normal.length; n < nl; n++ ) {
 
-					cd.addSelf( face.vertexNormals[n] );
+					cb.addSelf( face.vertexNormals[n] );
 
 				}
 

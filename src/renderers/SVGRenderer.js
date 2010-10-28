@@ -62,8 +62,7 @@ THREE.SVGRenderer = function () {
 	this.render = function ( scene, camera ) {
 
 		var e, el, m, ml, fm, fml, element, material,
-		v1x, v1y, v2x, v2y, v3x, v3y, v4x, v4y,
-		size;
+		v1x, v1y, v2x, v2y, v3x, v3y, v4x, v4y;
 
 		if ( this.autoClear ) {
 
@@ -101,11 +100,11 @@ THREE.SVGRenderer = function () {
 
 				}
 
-			} else if ( element instanceof THREE.RenderableLine ) {
+			}/* else if ( element instanceof THREE.RenderableLine ) {
 
 				
 
-			} else if ( element instanceof THREE.RenderableFace3 ) {
+			}*/ else if ( element instanceof THREE.RenderableFace3 ) {
 
 				v1x = element.v1.x * _widthHalf; v1y = element.v1.y * -_heightHalf;
 				v2x = element.v2.x * _widthHalf; v2y = element.v2.y * -_heightHalf;
@@ -318,11 +317,13 @@ THREE.SVGRenderer = function () {
 
 	}
 	
+	/*
 	function renderLine ( ) {
 	
 		
 	
 	}
+	*/
 	
 	function renderFace3 ( v1x, v1y, v2x, v2y, v3x, v3y, element, material, scene ) {
 

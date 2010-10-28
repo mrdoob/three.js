@@ -8,8 +8,8 @@ THREE.CanvasRenderer = function () {
 	_projector = new THREE.Projector(),
 
 	_canvas = document.createElement( 'canvas' ),
+	_canvasWidth, _canvasHeight, _canvasWidthHalf, _canvasHeightHalf,
 	_context = _canvas.getContext( '2d' ),
-	_width, _height, _widthHalf, _heightHalf,
 	_clipRect = new THREE.Rectangle(),
 	_clearRect = new THREE.Rectangle(),
 	_bboxRect = new THREE.Rectangle(),
@@ -30,13 +30,13 @@ THREE.CanvasRenderer = function () {
 
 	this.setSize = function ( width, height ) {
 
-		_width = width; _height = height;
-		_widthHalf = _width / 2; _heightHalf = _height / 2;
+		_canvasWidth = width; _canvasHeight = height;
+		_canvasWidthHalf = _canvasWidth / 2; _canvasHeightHalf = _canvasHeight / 2;
 
-		_canvas.width = _width;
-		_canvas.height = _height;
+		_canvas.width = _canvasWidth;
+		_canvas.height = _canvasHeight;
 
-		_clipRect.set( - _widthHalf, - _heightHalf, _widthHalf, _heightHalf );
+		_clipRect.set( - _canvasWidthHalf, - _canvasHeightHalf, _canvasWidthHalf, _canvasHeightHalf );
 
 	};
 
@@ -47,7 +47,7 @@ THREE.CanvasRenderer = function () {
 			_clearRect.inflate( 1 );
 			_clearRect.minSelf( _clipRect );
 
-			_context.setTransform( 1, 0, 0, - 1, _widthHalf, _heightHalf );
+			_context.setTransform( 1, 0, 0, - 1, _canvasWidthHalf, _canvasHeightHalf );
 			_context.clearRect( _clearRect.getX(), _clearRect.getY(), _clearRect.getWidth(), _clearRect.getHeight() );
 
 			_clearRect.empty();
@@ -58,9 +58,7 @@ THREE.CanvasRenderer = function () {
 	this.render = function ( scene, camera ) {
 
 		var e, el, element, m, ml, fm, fml, material,
-		v1x, v1y, v2x, v2y, v3x, v3y, v4x, v4y, v5x, v5y, v6x, v6y,
-		width, height, scaleX, scaleY, offsetX, offsetY,
-		bitmap, bitmapWidth, bitmapHeight;
+		v1x, v1y, v2x, v2y, v3x, v3y, v4x, v4y, v5x, v5y, v6x, v6y;
 
 		if ( this.autoClear ) {
 
@@ -70,7 +68,7 @@ THREE.CanvasRenderer = function () {
 
 		_renderList = _projector.projectScene( scene, camera );
 
-		_context.setTransform( 1, 0, 0, - 1, _widthHalf, _heightHalf );
+		_context.setTransform( 1, 0, 0, - 1, _canvasWidthHalf, _canvasHeightHalf );
 
 		/* DEBUG
 		_context.fillStyle = 'rgba(0, 255, 255, 0.5)';
@@ -93,7 +91,7 @@ THREE.CanvasRenderer = function () {
 
 			if ( element instanceof THREE.RenderableParticle ) {
 
-				v1x = element.x * _widthHalf; v1y = element.y * _heightHalf;
+				v1x = element.x * _canvasWidthHalf; v1y = element.y * _canvasHeightHalf;
 
 				for ( m = 0, ml = element.material.length; m < ml; m++ ) {
 
@@ -105,8 +103,8 @@ THREE.CanvasRenderer = function () {
 
 			} else if ( element instanceof THREE.RenderableLine ) {
 
-				v1x = element.v1.x * _widthHalf; v1y = element.v1.y * _heightHalf;
-				v2x = element.v2.x * _widthHalf; v2y = element.v2.y * _heightHalf;
+				v1x = element.v1.x * _canvasWidthHalf; v1y = element.v1.y * _canvasHeightHalf;
+				v2x = element.v2.x * _canvasWidthHalf; v2y = element.v2.y * _canvasHeightHalf;
 
 				_bboxRect.addPoint( v1x, v1y );
 				_bboxRect.addPoint( v2x, v2y );
@@ -132,9 +130,9 @@ THREE.CanvasRenderer = function () {
 
 			} else if ( element instanceof THREE.RenderableFace3 ) {
 
-				element.v1.x *= _widthHalf; element.v1.y *= _heightHalf;
-				element.v2.x *= _widthHalf; element.v2.y *= _heightHalf;
-				element.v3.x *= _widthHalf; element.v3.y *= _heightHalf;
+				element.v1.x *= _canvasWidthHalf; element.v1.y *= _canvasHeightHalf;
+				element.v2.x *= _canvasWidthHalf; element.v2.y *= _canvasHeightHalf;
+				element.v3.x *= _canvasWidthHalf; element.v3.y *= _canvasHeightHalf;
 
 				if ( element.overdraw ) {
 
@@ -186,10 +184,10 @@ THREE.CanvasRenderer = function () {
 
 			} else if ( element instanceof THREE.RenderableFace4 ) {
 
-				element.v1.x *= _widthHalf; element.v1.y *= _heightHalf;
-				element.v2.x *= _widthHalf; element.v2.y *= _heightHalf;
-				element.v3.x *= _widthHalf; element.v3.y *= _heightHalf;
-				element.v4.x *= _widthHalf; element.v4.y *= _heightHalf;
+				element.v1.x *= _canvasWidthHalf; element.v1.y *= _canvasHeightHalf;
+				element.v2.x *= _canvasWidthHalf; element.v2.y *= _canvasHeightHalf;
+				element.v3.x *= _canvasWidthHalf; element.v3.y *= _canvasHeightHalf;
+				element.v4.x *= _canvasWidthHalf; element.v4.y *= _canvasHeightHalf;
 
 				v5.copy( element.v2 ); v6.copy( element.v4 );
 
@@ -366,6 +364,9 @@ THREE.CanvasRenderer = function () {
 	}
 
 	function renderParticle ( v1x, v1y, element, material, scene ) {
+	
+		var width, height, scaleX, scaleY, offsetX, offsetY,
+		bitmap, bitmapWidth, bitmapHeight;
 
 		if ( material instanceof THREE.ParticleCircleMaterial ) {
 
@@ -384,8 +385,8 @@ THREE.CanvasRenderer = function () {
 
 			}
 
-			width = element.scale.x * _widthHalf;
-			height = element.scale.y * _heightHalf;
+			width = element.scale.x * _canvasWidthHalf;
+			height = element.scale.y * _canvasHeightHalf;
 
 			_bboxRect.set( v1x - width, v1y - height, v1x + width, v1y + height );
 
@@ -415,8 +416,8 @@ THREE.CanvasRenderer = function () {
 			bitmapWidth = bitmap.width / 2;
 			bitmapHeight = bitmap.height / 2;
 
-			scaleX = element.scale.x * _widthHalf;
-			scaleY = element.scale.y * _heightHalf;
+			scaleX = element.scale.x * _canvasWidthHalf;
+			scaleY = element.scale.y * _canvasHeightHalf;
 
 			width = scaleX * bitmapWidth;
 			height = scaleY * bitmapHeight;
@@ -492,6 +493,8 @@ THREE.CanvasRenderer = function () {
 	}
 
 	function renderFace3( v1x, v1y, v2x, v2y, v3x, v3y, element, material, scene ) {
+
+		var bitmap, bitmapWidth, bitmapHeight;
 
 		if ( material instanceof THREE.MeshColorFillMaterial ) {
 
@@ -592,6 +595,8 @@ THREE.CanvasRenderer = function () {
 	}
 
 	function renderFace4 ( v1x, v1y, v2x, v2y, v3x, v3y, v4x, v4y, v5x, v5y, v6x, v6y, element, material, scene ) {
+
+		var bitmap, bitmapWidth, bitmapHeight;
 
 		if ( material instanceof THREE.MeshColorFillMaterial ) {
 
