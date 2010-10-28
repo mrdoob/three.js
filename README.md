@@ -134,7 +134,7 @@ For creating a customised version of the library, including the source files in 
 
 Thanks to the power of the internets (and github <3) these people have kindly helped out with the project.
 
-([alteredq](http://github.com/alteredq)), [philogb](http://github.com/philogb), [supereggbert](http://github.com/supereggbert), [kikko](http://github.com/kikko), [kile](http://kile.stravaganza.org/), ...
+[alteredq](http://github.com/alteredq), [philogb](http://github.com/philogb), [supereggbert](http://github.com/supereggbert), [kikko](http://github.com/kikko), [kile](http://kile.stravaganza.org/), ...
 
 
 ### Change Log ###

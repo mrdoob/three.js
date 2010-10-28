@@ -7,7 +7,7 @@ THREE.SVGRenderer = function () {
 	var _renderList = null,
 	_projector = new THREE.Projector(),
 	_svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'),
-	_width, _height, _widthHalf, _heightHalf,
+	_svgWidth, _svgHeight, _svgWidthHalf, _svgHeightHalf,
 	_clipRect = new THREE.Rectangle(),
 	_bboxRect = new THREE.Rectangle(),
 
@@ -38,14 +38,14 @@ THREE.SVGRenderer = function () {
 
 	this.setSize = function ( width, height ) {
 
-		_width = width; _height = height;
-		_widthHalf = _width / 2; _heightHalf = _height / 2;
+		_svgWidth = width; _svgHeight = height;
+		_svgWidthHalf = _svgWidth / 2; _svgHeightHalf = _svgHeight / 2;
 
-		_svg.setAttribute( 'viewBox', ( - _widthHalf ) + ' ' + ( - _heightHalf ) + ' ' + _width + ' ' + _height );
-		_svg.setAttribute( 'width', _width );
-		_svg.setAttribute( 'height', _height );
+		_svg.setAttribute( 'viewBox', ( - _svgWidthHalf ) + ' ' + ( - _svgHeightHalf ) + ' ' + _svgWidth + ' ' + _svgHeight );
+		_svg.setAttribute( 'width', _svgWidth );
+		_svg.setAttribute( 'height', _svgHeight );
 
-		_clipRect.set( - _widthHalf, - _heightHalf, _widthHalf, _heightHalf );
+		_clipRect.set( - _svgWidthHalf, - _svgHeightHalf, _svgWidthHalf, _svgHeightHalf );
 
 	};
 
@@ -90,7 +90,7 @@ THREE.SVGRenderer = function () {
 
 			if ( element instanceof THREE.RenderableParticle ) {
 
-				v1x = element.x * _widthHalf; v1y = element.y * -_heightHalf;
+				v1x = element.x * _svgWidthHalf; v1y = element.y * -_svgHeightHalf;
 
 				for ( m = 0, ml = element.material.length; m < ml; m++ ) {
 
@@ -106,9 +106,9 @@ THREE.SVGRenderer = function () {
 
 			}*/ else if ( element instanceof THREE.RenderableFace3 ) {
 
-				v1x = element.v1.x * _widthHalf; v1y = element.v1.y * -_heightHalf;
-				v2x = element.v2.x * _widthHalf; v2y = element.v2.y * -_heightHalf;
-				v3x = element.v3.x * _widthHalf; v3y = element.v3.y * -_heightHalf;
+				v1x = element.v1.x * _svgWidthHalf; v1y = element.v1.y * -_svgHeightHalf;
+				v2x = element.v2.x * _svgWidthHalf; v2y = element.v2.y * -_svgHeightHalf;
+				v3x = element.v3.x * _svgWidthHalf; v3y = element.v3.y * -_svgHeightHalf;
 
 				_bboxRect.addPoint( v1x, v1y );
 				_bboxRect.addPoint( v2x, v2y );
@@ -148,10 +148,10 @@ THREE.SVGRenderer = function () {
 
 			} else if ( element instanceof THREE.RenderableFace4 ) {
 
-				v1x = element.v1.x * _widthHalf; v1y = element.v1.y * -_heightHalf;
-				v2x = element.v2.x * _widthHalf; v2y = element.v2.y * -_heightHalf;
-				v3x = element.v3.x * _widthHalf; v3y = element.v3.y * -_heightHalf;
-				v4x = element.v4.x * _widthHalf; v4y = element.v4.y * -_heightHalf;
+				v1x = element.v1.x * _svgWidthHalf; v1y = element.v1.y * -_svgHeightHalf;
+				v2x = element.v2.x * _svgWidthHalf; v2y = element.v2.y * -_svgHeightHalf;
+				v3x = element.v3.x * _svgWidthHalf; v3y = element.v3.y * -_svgHeightHalf;
+				v4x = element.v4.x * _svgWidthHalf; v4y = element.v4.y * -_svgHeightHalf;
 
 				_bboxRect.addPoint( v1x, v1y );
 				_bboxRect.addPoint( v2x, v2y );
@@ -290,7 +290,7 @@ THREE.SVGRenderer = function () {
 		_svgNode = getCircleNode( _circleCount++ );
 		_svgNode.setAttribute( 'cx', v1x );
 		_svgNode.setAttribute( 'cy', v1y );
-		_svgNode.setAttribute( 'r', element.scale.x * _widthHalf );
+		_svgNode.setAttribute( 'r', element.scale.x * _svgWidthHalf );
 
 		if ( material instanceof THREE.ParticleCircleMaterial ) {
 
