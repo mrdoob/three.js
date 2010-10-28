@@ -12859,18 +12859,18 @@ var Male02 = function ( urlbase ) {
         scope.vertices.push( new THREE.Vertex( new THREE.Vector3( x, y, z ) ) );
     }
 
-    function f3( a, b, c, material ) {
-        var color = material_color(material);
-        scope.faces.push( new THREE.Face3( a, b, c, null, new THREE.Color(color), material ) );
+    function f3( a, b, c, mi ) {
+        var material = scope.materials[ mi ];
+        scope.faces.push( new THREE.Face3( a, b, c, null, material ) );
     }
 
-    function f4( a, b, c, d, material ) {
-        var color = material_color(material);
-        scope.faces.push( new THREE.Face4( a, b, c, d, null, new THREE.Color(color), material ) );
+    function f4( a, b, c, d, mi ) {
+        var material = scope.materials[ mi ];
+        scope.faces.push( new THREE.Face4( a, b, c, d, null, material ) );
     }
 
-    function f3n( a, b, c, material, n1, n2, n3 ) {
-        var color = material_color(material);
+    function f3n( a, b, c, mi, n1, n2, n3 ) {
+        var material = scope.materials[ mi ];
         var n1x = normals[n1][0];
         var n1y = normals[n1][1];
         var n1z = normals[n1][2];
@@ -12882,11 +12882,11 @@ var Male02 = function ( urlbase ) {
         var n3z = normals[n3][2];
         scope.faces.push( new THREE.Face3( a, b, c, 
                           [new THREE.Vector3( n1x, n1y, n1z ), new THREE.Vector3( n2x, n2y, n2z ), new THREE.Vector3( n3x, n3y, n3z )], 
-                          new THREE.Color(color), material ) );
+                          material ) );
     }
 
-    function f4n( a, b, c, d, material, n1, n2, n3, n4 ) {
-        var color = material_color(material);
+    function f4n( a, b, c, d, mi, n1, n2, n3, n4 ) {
+        var material = scope.materials[ mi ];
         var n1x = normals[n1][0];
         var n1y = normals[n1][1];
         var n1z = normals[n1][2];
@@ -12901,7 +12901,7 @@ var Male02 = function ( urlbase ) {
         var n4z = normals[n4][2];
         scope.faces.push( new THREE.Face4( a, b, c, d,
                           [new THREE.Vector3( n1x, n1y, n1z ), new THREE.Vector3( n2x, n2y, n2z ), new THREE.Vector3( n3x, n3y, n3z ), new THREE.Vector3( n4x, n4y, n4z )], 
-                          new THREE.Color(color), material ) );
+                          material ) );
     }
 
     function uv( u1, v1, u2, v2, u3, v3, u4, v4 ) {
@@ -12916,7 +12916,7 @@ var Male02 = function ( urlbase ) {
     function init_materials() {
         scope.materials = [];
         for(var i=0; i<materials.length; ++i) {
-            scope.materials[i] = create_material( materials[i], urlbase );
+            scope.materials[i] = [ create_material( materials[i], urlbase ) ];
         }
     }
     
@@ -12936,7 +12936,7 @@ var Male02 = function ( urlbase ) {
         if( m.map_diffuse && urlbase ) {
             var texture = document.createElement( 'canvas' );
             
-            material = new THREE.MeshBitmapUVMappingMaterial( texture );
+            material = new THREE.MeshBitmapMaterial( texture );
             var image = new Image();
             
             image.onload = function () {
@@ -12965,7 +12965,7 @@ var Male02 = function ( urlbase ) {
             material = new THREE.MeshColorFillMaterial( m.a_dbg_color );
         }
         else {
-            material = new THREE.MeshFaceColorFillMaterial( );
+            material = new THREE.MeshColorFillMaterial( 0xffeeeeee );
         }
 
         return material;

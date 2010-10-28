@@ -2,7 +2,7 @@
  * @author mr.doob / http://mrdoob.com/
  */
 
-THREE.Face4 = function ( a, b, c, d, normal, color, material ) {
+THREE.Face4 = function ( a, b, c, d, normal, material ) {
 
 	this.a = a;
 	this.b = b;
@@ -11,24 +11,14 @@ THREE.Face4 = function ( a, b, c, d, normal, color, material ) {
 
 	this.centroid = new THREE.Vector3();
 	this.normal = normal instanceof THREE.Vector3 ? normal : new THREE.Vector3();
+    this.vertexNormals =  normal instanceof Array ? normal : [];
 
-	this.color = color || new THREE.Color( 0xff000000 );
+	this.material = material instanceof Array ? material : [ material ];
 
-	this.vertexNormals = normal instanceof Array ? normal : [];
-    this.material = material || 0;
-    
 };
 
 
 THREE.Face4.prototype = {
-
-	// TODO: Dupe? (Geometry/computeCentroid)
-
-	getCenter : function(){
-
-		return this.a.clone().addSelf( this.b ).addSelf( this.c ).addSelf( this.d ).divideScalar( 4 );
-
-	},
 
 	toString: function () {
 

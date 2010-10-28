@@ -16,7 +16,7 @@ THREE.WebGLRenderer = function () {
 	initProgram();
 
     // material constants used in shader
-    var COLORFILL = 0, COLORSTROKE = 1, FACECOLORFILL = 2, FACECOLORSTROKE = 3, BITMAP = 4, PHONG = 5;
+    var COLORFILL = 0, COLORSTROKE = 1, BITMAP = 2, PHONG = 3;
     
 	this.setSize = function ( width, height ) {
 
@@ -68,29 +68,26 @@ THREE.WebGLRenderer = function () {
 		}
     };
     
-    this.createBuffers = function ( object, materialIndex ) {
+    this.createBuffers = function ( object, mf ) {
         
-        var materialFace = object.materialFaces[ materialIndex ];
-        var material = object.material[ materialIndex ];
+        var materialFaceGroup = object.materialFaceGroup[ mf ];
         
         var faceArray = [];
         var lineArray = [];
         
         var vertexArray = [];
-        var colorArray = [];
         var normalArray = [];
         var uvArray = [];
         
         var vertexIndex = 0;
 
-        var f, fl, fi, face, faceColor, vertexNormals, normal, uv, v1, v2, v3, v4;
+        var f, fl, fi, face, vertexNormals, normal, uv, v1, v2, v3, v4;
         
-        for ( f = 0, fl = materialFace.faces.length; f < fl; f++ ) {
+        for ( f = 0, fl = materialFaceGroup.faces.length; f < fl; f++ ) {
 
-            fi = materialFace.faces[f];
+            fi = materialFaceGroup.faces[f];
 
             face = object.geometry.faces[ fi ];
-            faceColor = face.color;
             vertexNormals = face.vertexNormals;
             normal = face.normal;
             uv = object.geometry.uvs[ fi ];
@@ -119,10 +116,6 @@ THREE.WebGLRenderer = function () {
                     normalArray.push( normal.x, normal.y, normal.z );
                     
                 }
-
-                colorArray.push( faceColor.r, faceColor.g, faceColor.b, faceColor.a );
-                colorArray.push( faceColor.r, faceColor.g, faceColor.b, faceColor.a );
-                colorArray.push( faceColor.r, faceColor.g, faceColor.b, faceColor.a );
 
                 if ( uv ) {
                     
@@ -171,11 +164,6 @@ THREE.WebGLRenderer = function () {
                     
                 }
 
-                colorArray.push( faceColor.r, faceColor.g, faceColor.b, faceColor.a );
-                colorArray.push( faceColor.r, faceColor.g, faceColor.b, faceColor.a );
-                colorArray.push( faceColor.r, faceColor.g, faceColor.b, faceColor.a );
-                colorArray.push( faceColor.r, faceColor.g, faceColor.b, faceColor.a );
-
                 if ( uv ) {
                     
                     uvArray.push( uv[0].u, uv[0].v );
@@ -206,48 +194,146 @@ THREE.WebGLRenderer = function () {
 
         }
         
-        materialFace.__webGLVertexBuffer = _gl.createBuffer();
-        _gl.bindBuffer( _gl.ARRAY_BUFFER, materialFace.__webGLVertexBuffer );
+        materialFaceGroup.__webGLVertexBuffer = _gl.createBuffer();
+        _gl.bindBuffer( _gl.ARRAY_BUFFER, materialFaceGroup.__webGLVertexBuffer );
         _gl.bufferData( _gl.ARRAY_BUFFER, new Float32Array( vertexArray ), _gl.STATIC_DRAW );
 
-        materialFace.__webGLNormalBuffer = _gl.createBuffer();
-        _gl.bindBuffer( _gl.ARRAY_BUFFER, materialFace.__webGLNormalBuffer );
+        materialFaceGroup.__webGLNormalBuffer = _gl.createBuffer();
+        _gl.bindBuffer( _gl.ARRAY_BUFFER, materialFaceGroup.__webGLNormalBuffer );
         _gl.bufferData( _gl.ARRAY_BUFFER, new Float32Array( normalArray ), _gl.STATIC_DRAW );
 
-        materialFace.__webGLColorBuffer = _gl.createBuffer();
-        _gl.bindBuffer( _gl.ARRAY_BUFFER, materialFace.__webGLColorBuffer );
-        _gl.bufferData( _gl.ARRAY_BUFFER, new Float32Array( colorArray ), _gl.STATIC_DRAW );
-
-        materialFace.__webGLUVBuffer = _gl.createBuffer();
-        _gl.bindBuffer( _gl.ARRAY_BUFFER, materialFace.__webGLUVBuffer );
+        materialFaceGroup.__webGLUVBuffer = _gl.createBuffer();
+        _gl.bindBuffer( _gl.ARRAY_BUFFER, materialFaceGroup.__webGLUVBuffer );
         _gl.bufferData( _gl.ARRAY_BUFFER, new Float32Array( uvArray ), _gl.STATIC_DRAW );
 
-        materialFace.__webGLFaceBuffer = _gl.createBuffer();
-        _gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, materialFace.__webGLFaceBuffer );
+        materialFaceGroup.__webGLFaceBuffer = _gl.createBuffer();
+        _gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, materialFaceGroup.__webGLFaceBuffer );
         _gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, new Uint16Array( faceArray ), _gl.STATIC_DRAW );
 
-        materialFace.__webGLLineBuffer = _gl.createBuffer();
-        _gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, materialFace.__webGLLineBuffer );
+        materialFaceGroup.__webGLLineBuffer = _gl.createBuffer();
+        _gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, materialFaceGroup.__webGLLineBuffer );
         _gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, new Uint16Array( lineArray ), _gl.STATIC_DRAW );
 
-        materialFace.__webGLFaceCount = faceArray.length;
-        materialFace.__webGLLineCount = lineArray.length;
+        materialFaceGroup.__webGLFaceCount = faceArray.length;
+        materialFaceGroup.__webGLLineCount = lineArray.length;
 
-    }
+    };
+    
+    this.renderBuffer = function ( material, materialFaceGroup ) {
+        
+        if ( material instanceof THREE.MeshPhongMaterial ) {
+
+            mAmbient  = material.ambient;
+            mDiffuse  = material.diffuse;
+            mSpecular = material.specular;
+            
+            _gl.uniform4f( _program.mAmbient,  mAmbient.r,  mAmbient.g,  mAmbient.b,  material.opacity );
+            _gl.uniform4f( _program.mDiffuse,  mDiffuse.r,  mDiffuse.g,  mDiffuse.b,  material.opacity );
+            _gl.uniform4f( _program.mSpecular, mSpecular.r, mSpecular.g, mSpecular.b, material.opacity );
+            
+            _gl.uniform1f( _program.mShininess, material.shininess );
+            
+            _gl.uniform1i( _program.material, PHONG );
+            
+        } else if ( material instanceof THREE.MeshColorFillMaterial ) {
+
+            color = material.color;
+            _gl.uniform4f( _program.uniformColor,  color.r * color.a, color.g * color.a, color.b * color.a, color.a );
+            
+            _gl.uniform1i( _program.material, COLORFILL );
+            
+        } else if ( material instanceof THREE.MeshColorStrokeMaterial ) {
+            
+            lineWidth = material.lineWidth;
+            
+            color = material.color;
+            _gl.uniform4f( _program.uniformColor,  color.r * color.a, color.g * color.a, color.b * color.a, color.a );
+            
+            _gl.uniform1i( _program.material, COLORSTROKE );
+        
+        } else if ( material instanceof THREE.MeshBitmapMaterial ) {
+            
+            if ( !material.__webGLTexture && material.loaded ) {
+                
+                material.__webGLTexture = _gl.createTexture();
+                _gl.bindTexture( _gl.TEXTURE_2D, material.__webGLTexture );
+                _gl.texImage2D( _gl.TEXTURE_2D, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, material.bitmap ) ;
+                _gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MAG_FILTER, _gl.LINEAR );
+                //_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, _gl.LINEAR_MIPMAP_NEAREST );
+                _gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, _gl.LINEAR_MIPMAP_LINEAR );
+                _gl.generateMipmap( _gl.TEXTURE_2D );
+                _gl.bindTexture( _gl.TEXTURE_2D, null );
+                
+            }
+            
+            _gl.activeTexture( _gl.TEXTURE0 );
+            _gl.bindTexture( _gl.TEXTURE_2D, material.__webGLTexture );
+            _gl.uniform1i( _program.diffuse,  0 );
+            
+            _gl.uniform1i( _program.material, BITMAP );
+            
+        }
+        
+
+        // vertices
+        _gl.bindBuffer( _gl.ARRAY_BUFFER, materialFaceGroup.__webGLVertexBuffer );
+        _gl.vertexAttribPointer( _program.position, 3, _gl.FLOAT, false, 0, 0 );
+
+        // normals
+        _gl.bindBuffer( _gl.ARRAY_BUFFER, materialFaceGroup.__webGLNormalBuffer );
+        _gl.vertexAttribPointer( _program.normal, 3, _gl.FLOAT, false, 0, 0 );
+        
+        // uvs
+        
+        if ( material instanceof THREE.MeshBitmapMaterial ) {
+            
+            _gl.bindBuffer( _gl.ARRAY_BUFFER, materialFaceGroup.__webGLUVBuffer );
+                
+            _gl.enableVertexAttribArray( _program.uv );
+            _gl.vertexAttribPointer( _program.uv, 2, _gl.FLOAT, false, 0, 0 );
+                
+        }
+        else {
+                
+            _gl.disableVertexAttribArray( _program.uv );
+                
+        }
+
+        // render triangles
+
+        if ( material instanceof THREE.MeshBitmapMaterial || 
+             material instanceof THREE.MeshColorFillMaterial ||
+             material instanceof THREE.MeshPhongMaterial ) {
+            
+            _gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, materialFaceGroup.__webGLFaceBuffer );
+            _gl.drawElements( _gl.TRIANGLES, materialFaceGroup.__webGLFaceCount, _gl.UNSIGNED_SHORT, 0 );
+            
+        } 
+        
+        // render lines
+        
+        else if ( material instanceof THREE.MeshColorStrokeMaterial ) {
+            
+            _gl.lineWidth( lineWidth );
+            _gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, materialFaceGroup.__webGLLineBuffer );
+            _gl.drawElements( _gl.LINES, materialFaceGroup.__webGLLineCount, _gl.UNSIGNED_SHORT, 0 );
+            
+        }
+    };
     
     this.renderMesh = function ( object, camera ) {
         
-        var m, ml, mf, material, materialFace, fi, lineWidth, mAmbient, mDiffuse, mSpecular;
+        var i, l, m, ml, mf, material, meshMaterial, materialFaceGroup, fi, lineWidth, mAmbient, mDiffuse, mSpecular;
 
         // create separate VBOs per material
-        for (var mf in object.materialFaces ) {
+        
+        for ( var mf in object.materialFaceGroup ) {
 
-            materialFace = object.materialFaces[ mf ];
-            material = object.material[ mf ];
-            if( !material ) continue;
-
+            materialFaceGroup = object.materialFaceGroup[ mf ];
+            
             // initialise on the first access
-            if( !materialFace.__webGLVertexBuffer ) {
+            
+            if( ! materialFaceGroup.__webGLVertexBuffer ) {
                 
                 this.createBuffers( object, mf );
                 
@@ -255,135 +341,20 @@ THREE.WebGLRenderer = function () {
             
             for ( m = 0, ml = object.material.length; m < ml; m++ ) {
                 
-                material = object.material[ m ];
+                meshMaterial = object.material[ m ];
                 
-                // these materials can be either the only material for whole mesh
-                // or if they are overlays in multimaterials, they apply only to
-                // group of faces with single material (specified by decalIndex)
-                
-                if ( ( material instanceof THREE.MeshBitmapUVMappingMaterial || 
-                       material instanceof THREE.MeshFaceColorFillMaterial ||
-                       material instanceof THREE.MeshColorFillMaterial
-                     ) 
-                    &&
-                     ! ( m == mf || mf == material.decalIndex ) ) {
+                if ( meshMaterial instanceof THREE.MeshFaceMaterial ) {
                     
-                    continue;
-                    
-                }
-                
-                if ( material instanceof THREE.MeshPhongMaterial ) {
-
-                    mAmbient  = material.ambient;
-                    mDiffuse  = material.diffuse;
-                    mSpecular = material.specular;
-                    
-                    _gl.uniform4f( _program.mAmbient,  mAmbient.r,  mAmbient.g,  mAmbient.b,  material.opacity );
-                    _gl.uniform4f( _program.mDiffuse,  mDiffuse.r,  mDiffuse.g,  mDiffuse.b,  material.opacity );
-                    _gl.uniform4f( _program.mSpecular, mSpecular.r, mSpecular.g, mSpecular.b, material.opacity );
-                    
-                    _gl.uniform1f( _program.mShininess, material.shininess );
-                    
-                    _gl.uniform1i( _program.material, PHONG );
-                    
-                } else if ( material instanceof THREE.MeshColorFillMaterial ) {
-
-                    color = material.color;
-                    _gl.uniform4f( _program.uniformColor,  color.r * color.a, color.g * color.a, color.b * color.a, color.a );
-                    
-                    _gl.uniform1i( _program.material, COLORFILL );
-                    
-                } else if ( material instanceof THREE.MeshColorStrokeMaterial ) {
-                    
-                    lineWidth = material.lineWidth;
-                    
-                    color = material.color;
-                    _gl.uniform4f( _program.uniformColor,  color.r * color.a, color.g * color.a, color.b * color.a, color.a );
-                    
-                    _gl.uniform1i( _program.material, COLORSTROKE );
-                    
-                } else if ( material instanceof THREE.MeshFaceColorFillMaterial ) {
-                    
-                    _gl.uniform1i( _program.material, FACECOLORFILL );
-                
-                } else if ( material instanceof THREE.MeshFaceColorStrokeMaterial ) {
-
-                    lineWidth = material.lineWidth;
-                    
-                    _gl.uniform1i( _program.material, FACECOLORSTROKE );
-
-                } else if ( material instanceof THREE.MeshBitmapUVMappingMaterial ) {
-                    
-                    if ( !material.__webGLTexture && material.loaded ) {
+                    for ( i = 0, l = materialFaceGroup.material.length; i < l; i++ ) {
                         
-                        material.__webGLTexture = _gl.createTexture();
-                        _gl.bindTexture( _gl.TEXTURE_2D, material.__webGLTexture );
-                        _gl.texImage2D( _gl.TEXTURE_2D, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, material.bitmap ) ;
-                        _gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MAG_FILTER, _gl.LINEAR );
-                        //_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, _gl.LINEAR_MIPMAP_NEAREST );
-                        _gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, _gl.LINEAR_MIPMAP_LINEAR );
-                        _gl.generateMipmap( _gl.TEXTURE_2D );
-                        _gl.bindTexture( _gl.TEXTURE_2D, null );
-                        
+                        material = materialFaceGroup.material[ i ];
+                        this.renderBuffer( material, materialFaceGroup );
                     }
                     
-                    _gl.activeTexture( _gl.TEXTURE0 );
-                    _gl.bindTexture( _gl.TEXTURE_2D, material.__webGLTexture );
-                    _gl.uniform1i( _program.diffuse,  0 );
+                } else {
                     
-                    _gl.uniform1i( _program.material, BITMAP );
-                    
-                }
-                
-
-                // vertices
-                _gl.bindBuffer( _gl.ARRAY_BUFFER, materialFace.__webGLVertexBuffer );
-                _gl.vertexAttribPointer( _program.position, 3, _gl.FLOAT, false, 0, 0 );
-
-                // normals
-                _gl.bindBuffer( _gl.ARRAY_BUFFER, materialFace.__webGLNormalBuffer );
-                _gl.vertexAttribPointer( _program.normal, 3, _gl.FLOAT, false, 0, 0 );
-
-                // colors
-                _gl.bindBuffer( _gl.ARRAY_BUFFER, materialFace.__webGLColorBuffer );
-                _gl.vertexAttribPointer( _program.color, 4, _gl.FLOAT, false, 0, 0 );
-                
-                // uvs
-                
-                if ( material instanceof THREE.MeshBitmapUVMappingMaterial ) {
-                    
-                    _gl.bindBuffer( _gl.ARRAY_BUFFER, materialFace.__webGLUVBuffer );
-                        
-                    _gl.enableVertexAttribArray( _program.uv );
-                    _gl.vertexAttribPointer( _program.uv, 2, _gl.FLOAT, false, 0, 0 );
-                        
-                }
-                else {
-                        
-                    _gl.disableVertexAttribArray( _program.uv );
-                        
-                }
-
-                // render triangles
-
-                if ( material instanceof THREE.MeshBitmapUVMappingMaterial || 
-                     material instanceof THREE.MeshFaceColorFillMaterial ||
-                     material instanceof THREE.MeshColorFillMaterial ||
-                     material instanceof THREE.MeshPhongMaterial ) {
-                    
-                    _gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, materialFace.__webGLFaceBuffer );
-                    _gl.drawElements( _gl.TRIANGLES, materialFace.__webGLFaceCount, _gl.UNSIGNED_SHORT, 0 );
-                    
-                } 
-                
-                // render lines
-                
-                else if ( material instanceof THREE.MeshColorStrokeMaterial ||
-                          material instanceof THREE.MeshFaceColorStrokeMaterial ) {
-                    
-                    _gl.lineWidth( lineWidth );
-                    _gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, materialFace.__webGLLineBuffer );
-                    _gl.drawElements( _gl.LINES, materialFace.__webGLLineCount, _gl.UNSIGNED_SHORT, 0 );
+                    material = meshMaterial;
+                    this.renderBuffer( material, materialFaceGroup );
                     
                 }
                 
@@ -513,12 +484,11 @@ THREE.WebGLRenderer = function () {
 			"uniform vec4 uniformColor;",
         
             "varying vec2 vertexUv;",
-			"varying vec4 vertexColor;",
 			"varying vec3 lightWeighting;",
 
             "varying vec3 vNormal;",
         
-            "uniform int material;", // 0 - ColorFill, 1 - ColorStroke, 2 - FaceColorFill, 3 - FaceColorStroke, 4 - Bitmap, 5 - Phong
+            "uniform int material;", // 0 - ColorFill, 1 - ColorStroke, 2 - Bitmap, 3 - Phong
 
             "uniform vec4 mAmbient;",
 			"uniform vec4 mDiffuse;",
@@ -533,7 +503,7 @@ THREE.WebGLRenderer = function () {
                 
                 // Blinn-Phong
                 // based on o3d example
-                "if(material==5) { ", 
+                "if(material==3) { ", 
                     "vec3 lightVectorPoint = normalize(pLightVectorPoint);",
                     "vec3 lightVectorDir = normalize(pLightVectorDirection);",
                     
@@ -571,17 +541,9 @@ THREE.WebGLRenderer = function () {
                     "gl_FragColor = vec4((pointLight.xyz + dirLight.xyz) * lightWeighting, 1.0);",                    
                     
                 // Bitmap: texture
-                "} else if(material==4) {", 
+                "} else if(material==2) {", 
                     "vec4 texelColor = texture2D(diffuse, vertexUv);",
                     "gl_FragColor = vec4(texelColor.rgb * lightWeighting, texelColor.a);",
-                
-                // FaceColorStroke: wireframe using vertex color 
-                "} else if(material==3) {", 
-                    "gl_FragColor = vec4(vertexColor.rgb * lightWeighting, vertexColor.a);",
-                
-                // FaceColorFill: triangle using vertex color
-                "} else if(material==2) {", 
-                    "gl_FragColor = vec4(vertexColor.rgb * lightWeighting, vertexColor.a);",
                 
                 // ColorStroke: wireframe using uniform color
                 "} else if(material==1) {", 
@@ -598,7 +560,6 @@ THREE.WebGLRenderer = function () {
 		_gl.attachShader( _program, getShader( "vertex", [
 			"attribute vec3 position;",
 			"attribute vec3 normal;",
-			"attribute vec4 color;",
             "attribute vec2 uv;",
 
 			"uniform bool enableLighting;",
@@ -653,7 +614,6 @@ THREE.WebGLRenderer = function () {
                 "}",
 
 				"vNormal = transformedNormal;",
-                "vertexColor = color;",
 				"vertexUv = uv;",
                 
 				"gl_Position = projectionMatrix * mvPosition;",
@@ -693,9 +653,6 @@ THREE.WebGLRenderer = function () {
         _program.mShininess = _gl.getUniformLocation(_program, 'mShininess');
         
         _program.cameraPosition = _gl.getUniformLocation(_program, 'cameraPosition');
-
-		_program.color = _gl.getAttribLocation( _program, "color" );
-		_gl.enableVertexAttribArray( _program.color );
 
 		_program.position = _gl.getAttribLocation( _program, "position" );
 		_gl.enableVertexAttribArray( _program.position );

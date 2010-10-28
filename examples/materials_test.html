@@ -69,11 +69,10 @@
 		<script type="text/javascript" src="../src/objects/Line.js"></script>
 		<script type="text/javascript" src="../src/materials/LineColorMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/MeshPhongMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/MeshBitmapUVMappingMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/MeshBitmapMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/MeshColorFillMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/MeshColorStrokeMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/MeshFaceColorFillMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/MeshFaceColorStrokeMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/MeshFaceMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/ParticleCircleMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/ParticleBitmapMaterial.js"></script>
 		<script type="text/javascript" src="../src/scenes/Scene.js"></script>
@@ -221,14 +220,6 @@
                     
                     geometry = new Female02( "obj/female02" );
                     
-                    // full-mesh wireframe overlay
-                    //geometry.materials.push ( new THREE.MeshColorStrokeMaterial(0xff0000, 1, 1.5) );
-                    
-                    // full-mesh color overlay
-                    var colorOverlay = new THREE.MeshColorFillMaterial(0xff0000, 0.5)
-                    colorOverlay.decalIndex = 4;
-                    geometry.materials.push ( colorOverlay );
-                    
                     // PROCEDURAL TEXTURES (decals)
                     
                     var x1 = document.createElement( "canvas" );
@@ -258,18 +249,26 @@
                         xc2.fillRect(i*4, 5, 2, 54);
                     }
 
-                    var xm1 = new THREE.MeshBitmapUVMappingMaterial( x1 );
-                    xm1.loaded = 1;
-                    xm1.decalIndex = 0; // index of the original UV mapped material 
+                    var xm1 = new THREE.MeshBitmapMaterial( x1 );
+                    xm1.loaded = 1; // this is procedurally generated texture
 
-                    var xm2 = new THREE.MeshBitmapUVMappingMaterial( x2 );
-                    xm2.loaded = 1;
-                    xm2.decalIndex = 1; // index of the original UV mapped material 
+                    var xm2 = new THREE.MeshBitmapMaterial( x2 );
+                    xm2.loaded = 1; // this is procedurally generated texture
                     
-                    geometry.materials.push ( xm1 );
-                    geometry.materials.push ( xm2 );
+                    geometry.materials[0].push ( xm1 ); // goes to faces with material 0
+                    geometry.materials[1].push ( xm2 ); // goes to faces with material 1
+                    
+                    geometry.materials[4].push ( new THREE.MeshColorFillMaterial(0xff0000, 0.5) );
 
-                    zmesh = new THREE.Mesh( geometry, geometry.materials, 1 );
+                    var materials = [ new THREE.MeshFaceMaterial() ];
+                    
+                    // full-mesh wireframe overlay
+                    //materials.push( new THREE.MeshColorStrokeMaterial(0xff0000, 1, 1.5) );
+                    
+                    // full-mesh color overlay
+                    //materials.push( new THREE.MeshColorFillMaterial(0xff0000, 0.5) );
+                    
+                    zmesh = new THREE.Mesh( geometry, materials, 1 );
                     zmesh.position.x = -80;
                     zmesh.position.z = 50;
                     zmesh.position.y = FLOOR;
@@ -321,7 +320,7 @@
                     xc.font = "50pt arial bold";
                     xc.fillText(i, 10, 64);
                     
-                    var xm = new THREE.MeshBitmapUVMappingMaterial( x );
+                    var xm = new THREE.MeshBitmapMaterial( x );
                     xm.loaded = 1;
                     
                     mesh = new THREE.Mesh( new Plane( size, size ), xm );

@@ -14,7 +14,7 @@ THREE.Mesh = function ( geometry, material, normUVs ) {
 
 	this.overdraw = false;
 
-    this.materialFaces = {};
+    this.materialFaceGroup = {};
         
     this.sortFacesByMaterial();
     if( normUVs ) this.normalizeUVs();
@@ -28,20 +28,50 @@ THREE.Mesh.prototype.constructor = THREE.Mesh;
 
 THREE.Mesh.prototype.sortFacesByMaterial = function () {
     
-    var f, fl, face, material;
+    // TODO
+        
+    // Should optimize by grouping faces with ColorFill / ColorStroke materials
+    // which could then use vertex color attributes instead of each being
+    // in its separate VBO
 
+    function materialHash( material ) {
+        
+        var i, l, hash_array = [];
+
+        for ( i = 0, l = material.length; i<l; i++ ) {
+            
+            if ( material[i] == undefined ) {
+                
+                hash_array.push( "undefined" );
+            
+            } else {
+                
+                hash_array.push( material[i].toString() );
+                
+            }
+        }
+
+        return hash_array.join("_");
+    }
+    
+    var i, f, fl, face, material;
+    
     for ( f = 0, fl = this.geometry.faces.length; f < fl; f++ ) {
-
+        
         face = this.geometry.faces[ f ];
         material = face.material;
+        
+        hash = materialHash( material);
+        
+        if ( this.materialFaceGroup[ hash ] == undefined ) {
+            
+            this.materialFaceGroup[ hash ] = { 'faces': [], 'material': material };
+        }
 
-        if ( this.materialFaces[material] == undefined ) 
-            this.materialFaces[material] = { 'faces': [] };
-
-        this.materialFaces[material].faces.push( f );
-
+        this.materialFaceGroup[ hash ].faces.push( f );
+        
     }
-
+    
 }
     
 THREE.Mesh.prototype.normalizeUVs = function () {
