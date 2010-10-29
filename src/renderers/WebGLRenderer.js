@@ -42,23 +42,23 @@ THREE.WebGLRenderer = function () {
 			if ( light instanceof THREE.AmbientLight ) {
 
 				lightColor = light.color;
-				_gl.uniform3f( _program.ambientColor, lightColor.r, lightColor.g, lightColor.b );
+				_gl.uniform3f( _program.ambientLightColor, lightColor.r, lightColor.g, lightColor.b );
 
 			} else if ( light instanceof THREE.DirectionalLight ) {
 
 				lightColor = light.color;
 				lightPosition = light.position;
 				lightIntensity = light.intensity;
-				_gl.uniform3f( _program.lightingDirection, lightPosition.x, lightPosition.y, lightPosition.z );
-				_gl.uniform3f( _program.directionalColor, lightColor.r * lightIntensity, lightColor.g * lightIntensity, lightColor.b * lightIntensity );
+				_gl.uniform3f( _program.directionalLightDirection, lightPosition.x, lightPosition.y, lightPosition.z );
+				_gl.uniform3f( _program.directionalLightColor, lightColor.r * lightIntensity, lightColor.g * lightIntensity, lightColor.b * lightIntensity );
 
 			} else if( light instanceof THREE.PointLight ) {
 
 				lightColor = light.color;
 				lightPosition = light.position;
 				lightIntensity = light.intensity;
-				_gl.uniform3f( _program.pointPosition, lightPosition.x, lightPosition.y, lightPosition.z );
-				_gl.uniform3f( _program.pointColor, lightColor.r * lightIntensity, lightColor.g * lightIntensity, lightColor.b * lightIntensity );
+				_gl.uniform3f( _program.pointLightPosition, lightPosition.x, lightPosition.y, lightPosition.z );
+				_gl.uniform3f( _program.pointLightColor, lightColor.r * lightIntensity, lightColor.g * lightIntensity, lightColor.b * lightIntensity );
 
 			}
 
@@ -233,7 +233,7 @@ THREE.WebGLRenderer = function () {
 		} else if ( material instanceof THREE.MeshColorFillMaterial ) {
 
 			color = material.color;
-			_gl.uniform4f( _program.uniformColor,  color.r * color.a, color.g * color.a, color.b * color.a, color.a );
+			_gl.uniform4f( _program.mColor,  color.r * color.a, color.g * color.a, color.b * color.a, color.a );
 			_gl.uniform1i( _program.material, COLORFILL );
 
 		} else if ( material instanceof THREE.MeshColorStrokeMaterial ) {
@@ -241,7 +241,7 @@ THREE.WebGLRenderer = function () {
 			lineWidth = material.lineWidth;
 
 			color = material.color;
-			_gl.uniform4f( _program.uniformColor,  color.r * color.a, color.g * color.a, color.b * color.a, color.a );
+			_gl.uniform4f( _program.mColor,  color.r * color.a, color.g * color.a, color.b * color.a, color.a );
 			_gl.uniform1i( _program.material, COLORSTROKE );
 
 		} else if ( material instanceof THREE.MeshBitmapMaterial ) {
@@ -261,21 +261,24 @@ THREE.WebGLRenderer = function () {
 
 			_gl.activeTexture( _gl.TEXTURE0 );
 			_gl.bindTexture( _gl.TEXTURE_2D, material.__webGLTexture );
-			_gl.uniform1i( _program.diffuse,  0 );
+			_gl.uniform1i( _program.tDiffuse,  0 );
 
 			_gl.uniform1i( _program.material, BITMAP );
 
 		}
 
 		// vertices
+        
 		_gl.bindBuffer( _gl.ARRAY_BUFFER, materialFaceGroup.__webGLVertexBuffer );
 		_gl.vertexAttribPointer( _program.position, 3, _gl.FLOAT, false, 0, 0 );
 
 		// normals
+        
 		_gl.bindBuffer( _gl.ARRAY_BUFFER, materialFaceGroup.__webGLNormalBuffer );
 		_gl.vertexAttribPointer( _program.normal, 3, _gl.FLOAT, false, 0, 0 );
 
 		// uvs
+        
 		if ( material instanceof THREE.MeshBitmapMaterial ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, materialFaceGroup.__webGLUVBuffer );
@@ -290,6 +293,7 @@ THREE.WebGLRenderer = function () {
 		}
 
 		// render triangles
+        
 		if ( material instanceof THREE.MeshBitmapMaterial || 
 
 			material instanceof THREE.MeshColorFillMaterial ||
@@ -299,6 +303,7 @@ THREE.WebGLRenderer = function () {
 			_gl.drawElements( _gl.TRIANGLES, materialFaceGroup.__webGLFaceCount, _gl.UNSIGNED_SHORT, 0 );
 
 		// render lines
+        
 		} else if ( material instanceof THREE.MeshColorStrokeMaterial ) {
 
 			_gl.lineWidth( lineWidth );
@@ -314,11 +319,13 @@ THREE.WebGLRenderer = function () {
 		var i, l, m, ml, mf, material, meshMaterial, materialFaceGroup;
 
 		// create separate VBOs per material
+        
 		for ( mf in object.materialFaceGroup ) {
 
 			materialFaceGroup = object.materialFaceGroup[ mf ];
 
-			// initialise on the first access
+			// initialise buffers on the first access
+            
 			if( ! materialFaceGroup.__webGLVertexBuffer ) {
 
 				this.createBuffers( object, mf );
@@ -361,7 +368,6 @@ THREE.WebGLRenderer = function () {
 		_program.modelViewMatrixArray = new Float32Array( _modelViewMatrix.flatten() );
 		_program.projectionMatrixArray = new Float32Array( camera.projectionMatrix.flatten() );
 
-		//_normalMatrix = THREE.Matrix4.makeInvert3x3( object.matrix ).transpose();
 		_normalMatrix = THREE.Matrix4.makeInvert3x3( _modelViewMatrix ).transpose();
 		_program.normalMatrixArray = new Float32Array( _normalMatrix.m );
 
@@ -467,99 +473,124 @@ THREE.WebGLRenderer = function () {
 			"#ifdef GL_ES",
 			"precision highp float;",
 			"#endif",
-
-			"uniform sampler2D diffuse;",
-			"uniform vec4 uniformColor;",
-
-			"varying vec2 vertexUv;",
-			"varying vec3 lightWeighting;",
-			"varying vec3 vNormal;",
+        
 			"uniform int material;", // 0 - ColorFill, 1 - ColorStroke, 2 - Bitmap, 3 - Phong
+
+            "uniform sampler2D tDiffuse;",
+			"uniform vec4 mColor;",
 
 			"uniform vec4 mAmbient;",
 			"uniform vec4 mDiffuse;",
 			"uniform vec4 mSpecular;",
 			"uniform float mShininess;",
 
-			"varying vec3 pLightVectorPoint;",
-			"varying vec3 pLightVectorDirection;",
-			"varying vec3 pViewPosition;",
+			"varying vec3 vNormal;",
+            "varying vec2 vUv;",
+            
+			"varying vec3 vLightWeighting;",
 
-			"void main(){",
+			"varying vec3 vPointLightVector;",
+			"varying vec3 vDirectionalLightVector;",
+			"varying vec3 vViewPosition;",
+
+			"void main() {",
 
 				// Blinn-Phong
 				// based on o3d example
-				"if(material==3) { ", 
+                
+				"if ( material == 3 ) { ", 
 
-					"vec3 lightVectorPoint = normalize(pLightVectorPoint);",
-					"vec3 lightVectorDir = normalize(pLightVectorDirection);",
+					"vec3 normal = normalize( vNormal );",
+					"vec3 viewPosition = normalize( vViewPosition );",
 
-					"vec3 normal = normalize(vNormal);",
-					"vec3 viewPosition = normalize(pViewPosition);",
+                    // point light
+                    
+					"vec3 pointVector = normalize( vPointLightVector );",
+					"vec3 pointHalfVector = normalize( vPointLightVector + vViewPosition );",
+                    
+					"float pointDotNormalHalf = dot( normal, pointHalfVector );",
 
-					"vec3 halfVectorPoint = normalize(pLightVectorPoint + pViewPosition);",
+					"float pointAmbientWeight = 1.0;",
+					"float pointDiffuseWeight = max( dot( normal, pointVector ), 0.0 );",
+                    
+                    // Ternary conditional is from the original o3d shader. Here it produces abrupt dark cutoff artefacts.
+                    // Using just pow works ok in Chrome, but makes different artefact in Firefox 4.
+                    // Zeroing on negative pointDotNormalHalf seems to work in both.
+                    
+					//"float specularCompPoint = dot( normal, pointVector ) < 0.0 || pointDotNormalHalf < 0.0 ? 0.0 : pow( pointDotNormalHalf, mShininess );",
+					//"float specularCompPoint = pow( pointDotNormalHalf, mShininess );",
+					"float pointSpecularWeight = pointDotNormalHalf < 0.0 ? 0.0 : pow( pointDotNormalHalf, mShininess );",
 
-					"float dotNormalHalfPoint = dot(normal, halfVectorPoint);",
+					"vec4 pointAmbient  = mAmbient  * pointAmbientWeight;",
+					"vec4 pointDiffuse  = mDiffuse  * pointDiffuseWeight;",
+					"vec4 pointSpecular = mSpecular * pointSpecularWeight;",
 
-					"float ambientCompPoint = 1.0;",
-					"float diffuseCompPoint = max(dot(normal, lightVectorPoint), 0.0);",
-					"float specularCompPoint = pow(dotNormalHalfPoint, mShininess);",
-					//"float specularCompPoint = dot(normal, lightVectorPoint) < 0.0 || dotNormalHalfPoint < 0.0 ? 0.0 : pow(dotNormalHalfPoint, mShininess);",
+                    // directional light
+                    
+					"vec3 dirVector = normalize( vDirectionalLightVector );",
+					"vec3 dirHalfVector = normalize( vDirectionalLightVector + vViewPosition );",
 
-					"vec4 ambientPoint  = mAmbient * ambientCompPoint;",
-					"vec4 diffusePoint  = mDiffuse * diffuseCompPoint;",
-					"vec4 specularPoint = mSpecular * specularCompPoint;",
+					"float dirDotNormalHalf = dot( normal, dirHalfVector );",
 
-					"vec3 halfVectorDir = normalize(pLightVectorDirection + pViewPosition);",
+					"float dirAmbientWeight = 1.0;",
+					"float dirDiffuseWeight = max( dot( normal, dirVector ), 0.0 );",                    
+					"float dirSpecularWeight = dirDotNormalHalf < 0.0 ? 0.0 : pow( dirDotNormalHalf, mShininess );",
 
-					"float dotNormalHalfDir = dot(normal, halfVectorDir);",
+					"vec4 dirAmbient  = mAmbient  * dirAmbientWeight;",
+					"vec4 dirDiffuse  = mDiffuse  * dirDiffuseWeight;",
+					"vec4 dirSpecular = mSpecular * dirSpecularWeight;",
 
-					"float ambientCompDir = 1.0;",
-					"float diffuseCompDir = max(dot(normal, lightVectorDir), 0.0);",
-					"float specularCompDir = pow(dotNormalHalfDir, mShininess);",
+                    // light contribution summation
+                    
+                    "vec4 totalLight = vec4( 0.0, 0.0, 0.0, 1.0 );",
+                    
+					"totalLight += pointAmbient + pointDiffuse + pointSpecular;",
+					"totalLight += dirAmbient + dirDiffuse + dirSpecular;",
 
-					"vec4 ambientDir  = mAmbient * ambientCompDir;",
-					"vec4 diffuseDir  = mDiffuse * diffuseCompDir;",
-					"vec4 specularDir = mSpecular * specularCompDir;",
-
-					"vec4 pointLight = ambientPoint + diffusePoint + specularPoint;",
-					"vec4 dirLight = ambientDir + diffuseDir + specularDir;",
-
-					"gl_FragColor = vec4((pointLight.xyz + dirLight.xyz) * lightWeighting, 1.0);",                    
+                    // looks nicer with weighting
+                    
+					"gl_FragColor = vec4( totalLight.xyz * vLightWeighting, 1.0 );",                    
+                    //"gl_FragColor = vec4( totalLight.xyz, 1.0 );", 
 
 				// Bitmap: texture
-				"} else if(material==2) {", 
+                
+				"} else if ( material==2 ) {", 
 
-					"vec4 texelColor = texture2D(diffuse, vertexUv);",
-					"gl_FragColor = vec4(texelColor.rgb * lightWeighting, texelColor.a);",
+					"vec4 texelColor = texture2D( tDiffuse, vUv );",
+					"gl_FragColor = vec4( texelColor.rgb * vLightWeighting, texelColor.a );",
 
 				// ColorStroke: wireframe using uniform color
-				"} else if(material==1) {", 
+                
+				"} else if ( material == 1 ) {", 
 
-					"gl_FragColor = vec4(uniformColor.rgb * lightWeighting, uniformColor.a);",
+					"gl_FragColor = vec4( mColor.rgb * vLightWeighting, mColor.a );",
 
 				// ColorFill: triangle using uniform color
+                
 				"} else {", 
 
-					"gl_FragColor = vec4(uniformColor.rgb * lightWeighting, uniformColor.a);",
-					//"gl_FragColor = vec4(vNormal, 1.0);",
+					"gl_FragColor = vec4( mColor.rgb * vLightWeighting, mColor.a );",
+					//"gl_FragColor = vec4( vNormal, 1.0 );",
 				"}",
 
 			"}"].join("\n") ) );
 
 		_gl.attachShader( _program, getShader( "vertex", [
-
+            
 			"attribute vec3 position;",
 			"attribute vec3 normal;",
 			"attribute vec2 uv;",
 
-			"uniform bool enableLighting;",
-			"uniform vec3 ambientColor;",
-			"uniform vec3 directionalColor;",
-			"uniform vec3 lightingDirection;",
+			"uniform vec3 cameraPosition;",
 
-			"uniform vec3 pointColor;",
-			"uniform vec3 pointPosition;",
+			"uniform bool enableLighting;",
+            
+			"uniform vec3 ambientLightColor;",
+			"uniform vec3 directionalLightColor;",
+			"uniform vec3 directionalLightDirection;",
+
+			"uniform vec3 pointLightColor;",
+			"uniform vec3 pointLightPosition;",
 
 			"uniform mat4 objMatrix;",
 			"uniform mat4 viewMatrix;",
@@ -567,48 +598,48 @@ THREE.WebGLRenderer = function () {
 			"uniform mat4 projectionMatrix;",
 			"uniform mat3 normalMatrix;",
 
-			"varying vec4 vertexColor;",
-			"varying vec2 vertexUv;",
-			"varying vec3 lightWeighting;",
-
 			"varying vec3 vNormal;",
+			"varying vec2 vUv;",
+            
+			"varying vec3 vLightWeighting;",
 
-			"varying vec3 pLightVectorPoint;",
-			"varying vec3 pLightVectorDirection;",
-			"varying vec3 pViewPosition;",
-
-			"uniform vec3 cameraPosition;",
+			"varying vec3 vPointLightVector;",
+			"varying vec3 vDirectionalLightVector;",
+			"varying vec3 vViewPosition;",
 
 			"void main(void) {",
 
+                // eye space
+                
 				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
-				"vec3 transformedNormal = normalize(normalMatrix * normal);",
+				"vec3 transformedNormal = normalize( normalMatrix * normal );",
 
-				// Blinn-Phong
-				"vec4 lPosition = viewMatrix * vec4( pointPosition, 1.0 );",
-				"vec4 lDirection = viewMatrix * vec4( lightingDirection, 0.0 );",
+				"vec4 lPosition = viewMatrix * vec4( pointLightPosition, 1.0 );",
+				"vec4 lDirection = viewMatrix * vec4( directionalLightDirection, 0.0 );",
 
-				"pLightVectorPoint = normalize(pointPosition.xyz - position.xyz);",
-				"pLightVectorDirection = normalize(lDirection.xyz);",
+				"vPointLightVector = normalize( lPosition.xyz - mvPosition.xyz );",
+				"vDirectionalLightVector = normalize( lDirection.xyz );",
 
-				"vec4 mPosition = objMatrix * vec4( position, 1.0 );",
-				"pViewPosition = cameraPosition - mPosition.xyz;",
+                // world space
+                
+                "vec4 mPosition = objMatrix * vec4( position, 1.0 );",
+				"vViewPosition = cameraPosition - mPosition.xyz;",
 
-				"if(!enableLighting) {",
+				"if( !enableLighting ) {",
 
-					"lightWeighting = vec3(1.0, 1.0, 1.0);",
+					"vLightWeighting = vec3( 1.0, 1.0, 1.0 );",
 
 				"} else {",
 
-					"vec3 pointLight = normalize(lPosition.xyz - mvPosition.xyz);",
-					"float directionalLightWeighting = max(dot(transformedNormal, normalize(lDirection.xyz)), 0.0);",
-					"float pointLightWeighting = max(dot(transformedNormal, pointLight), 0.0);",
-					"lightWeighting = ambientColor + directionalColor * directionalLightWeighting + pointColor * pointLightWeighting;",
+					"float directionalLightWeighting = max( dot( transformedNormal, normalize(lDirection.xyz ) ), 0.0 );",
+					"float pointLightWeighting = max( dot( transformedNormal, vPointLightVector ), 0.0 );",
+					
+                    "vLightWeighting = ambientLightColor + directionalLightColor * directionalLightWeighting + pointLightColor * pointLightWeighting;",
 
 				"}",
 
 				"vNormal = transformedNormal;",
-				"vertexUv = uv;",
+				"vUv = uv;",
 
 				"gl_Position = projectionMatrix * mvPosition;",
 
@@ -624,30 +655,49 @@ THREE.WebGLRenderer = function () {
 
 		_gl.useProgram( _program );
 
+        // matrices
+        
 		_program.viewMatrix = _gl.getUniformLocation( _program, "viewMatrix" );
 		_program.modelViewMatrix = _gl.getUniformLocation( _program, "modelViewMatrix" );
 		_program.projectionMatrix = _gl.getUniformLocation( _program, "projectionMatrix" );
 		_program.normalMatrix = _gl.getUniformLocation( _program, "normalMatrix" );
 		_program.objMatrix = _gl.getUniformLocation( _program, "objMatrix" );
 
+        _program.cameraPosition = _gl.getUniformLocation(_program, 'cameraPosition');
+
+        // lights
+        
 		_program.enableLighting = _gl.getUniformLocation(_program, 'enableLighting');
-		_program.ambientColor = _gl.getUniformLocation(_program, 'ambientColor');
-		_program.directionalColor = _gl.getUniformLocation(_program, 'directionalColor');
-		_program.lightingDirection = _gl.getUniformLocation(_program, 'lightingDirection');
+        
+		_program.ambientLightColor = _gl.getUniformLocation(_program, 'ambientLightColor');
+		_program.directionalLightColor = _gl.getUniformLocation(_program, 'directionalLightColor');
+		_program.directionalLightDirection = _gl.getUniformLocation(_program, 'directionalLightDirection');
 
-		_program.pointColor = _gl.getUniformLocation(_program, 'pointColor');
-		_program.pointPosition = _gl.getUniformLocation(_program, 'pointPosition');
+		_program.pointLightColor = _gl.getUniformLocation(_program, 'pointLightColor');
+		_program.pointLightPosition = _gl.getUniformLocation(_program, 'pointLightPosition');
 
+        // material
+        
 		_program.material = _gl.getUniformLocation(_program, 'material');
-		_program.uniformColor = _gl.getUniformLocation(_program, 'uniformColor');
+        
+        // material properties (ColorFill / ColorStroke shader)
+        
+		_program.mColor = _gl.getUniformLocation(_program, 'mColor');
 
+        // material properties (Blinn-Phong shader)
+        
 		_program.mAmbient = _gl.getUniformLocation(_program, 'mAmbient');
 		_program.mDiffuse = _gl.getUniformLocation(_program, 'mDiffuse');
 		_program.mSpecular = _gl.getUniformLocation(_program, 'mSpecular');
 		_program.mShininess = _gl.getUniformLocation(_program, 'mShininess');
 
-		_program.cameraPosition = _gl.getUniformLocation(_program, 'cameraPosition');
+        // texture (Bitmap shader)
+        
+		_program.tDiffuse = _gl.getUniformLocation( _program, "tDiffuse");
+		_gl.uniform1i( _program.tDiffuse,  0 );
 
+        // vertex arrays
+        
 		_program.position = _gl.getAttribLocation( _program, "position" );
 		_gl.enableVertexAttribArray( _program.position );
 
@@ -657,8 +707,6 @@ THREE.WebGLRenderer = function () {
 		_program.uv = _gl.getAttribLocation( _program, "uv" );
 		_gl.enableVertexAttribArray( _program.uv );
 
-		_program.diffuse = _gl.getUniformLocation( _program, "diffuse");
-		_gl.uniform1i( _program.diffuse,  0 );
 
 		_program.viewMatrixArray = new Float32Array(16);
 		_program.modelViewMatrixArray = new Float32Array(16);
