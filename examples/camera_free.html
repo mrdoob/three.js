@@ -123,7 +123,7 @@
 				plane = new THREE.Mesh( new Plane( 1000, 1000, 10, 10 ), new THREE.MeshColorStrokeMaterial( 0x000000, 0.5, 1 ) );
 				plane.rotation.x = - 90 * ( Math.PI / 180 );
 				plane.doubleSided = true;
-				scene.add( plane );
+				scene.addObject( plane );
 
 				// Spheres
 
@@ -144,7 +144,7 @@
 
 					cube.scale.x = cube.scale.y = cube.scale.z = Math.random() + 0.5;
 
-					scene.add(cube);
+					scene.addObject(cube);
 
 				}
 

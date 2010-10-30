@@ -108,7 +108,7 @@
 				qrcode = mesh = new THREE.Mesh( new Qrcode(), new THREE.MeshFaceMaterial() );
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
 				mesh.updateMatrix();
-				scene.add(mesh);
+				scene.addObject(mesh);
 
 				// CUBES
 
@@ -120,7 +120,7 @@
 				mesh.rotation.y = Math.random();
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
 				mesh.updateMatrix();
-				scene.add(mesh);
+				scene.addObject(mesh);
 
 				mesh = new THREE.Mesh( cube, new THREE.MeshColorFillMaterial( Math.random() * 0xffffff ) );
 				mesh.position.x = 500;
@@ -129,7 +129,7 @@
 				mesh.rotation.y = Math.random();
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
 				mesh.updateMatrix();
-				scene.add(mesh);
+				scene.addObject(mesh);
 
 				// PLANE
 
@@ -138,7 +138,7 @@
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
 				mesh.doubleSided = true;
 				mesh.updateMatrix();
-				scene.add(mesh);
+				scene.addObject(mesh);
 
 				// CYLINDER
 
@@ -146,7 +146,7 @@
 				mesh.position.x = -500;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
 				mesh.updateMatrix();
-				scene.add(mesh);
+				scene.addObject(mesh);
 
 				// POLYFIELD
 
@@ -174,7 +174,7 @@
 				mesh = new THREE.Mesh( geometry, [ new THREE.MeshFaceMaterial(), new THREE.MeshColorStrokeMaterial( 0xff0000, 0.5, 10 ) ] );
 				mesh.doubleSided = true;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
-				scene.add(mesh);
+				scene.addObject(mesh);
 
 				// PARTICLES
 
@@ -185,7 +185,7 @@
 					particle.position.y = Math.random() * 1000 - 500;
 					particle.position.z = Math.random() * 1000 - 500;
 					particle.scale.x = particle.scale.y = 10;
-					scene.add(particle);
+					scene.addObject(particle);
 
 				}
 

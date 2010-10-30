@@ -144,7 +144,7 @@
                 mesh.rotation.z = rz;
                 mesh.overdraw = true;
                 mesh.updateMatrix();
-                scene.add(mesh);
+                scene.addObject(mesh);
                 
             }
             
@@ -185,7 +185,7 @@
                 lightMesh.position = pointLight.position;
                 lightMesh.overdraw = true;
                 lightMesh.updateMatrix();
-                scene.add(lightMesh);
+                scene.addObject(lightMesh);
 
                 // material samples
                 sphere = new Sphere( 100, 32, 32, 1 );

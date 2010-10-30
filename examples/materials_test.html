@@ -160,7 +160,7 @@
                     //mesh.doubleSided = true;
                     mesh.overdraw = true;
                     mesh.updateMatrix();
-                    scene.add(mesh);
+                    scene.addObject(mesh);
                 }
                 
 
@@ -186,7 +186,7 @@
                 mesh.scale.x = mesh.scale.y = mesh.scale.z = 0.1;
                 mesh.position = pointLight.position;
                 mesh.updateMatrix();
-                scene.add(mesh);
+                scene.addObject(mesh);
 
 
                 if( render_canvas ) {
@@ -276,7 +276,7 @@
                     zmesh.scale.x = zmesh.scale.y = zmesh.scale.z = 3;
                     zmesh.overdraw = true;
                     zmesh.updateMatrix();
-                    scene.add(zmesh);
+                    scene.addObject(zmesh);
 
                     // PLANES with all materials from the model
                     
@@ -309,7 +309,7 @@
                     mesh.scale.x = mesh.scale.y = mesh.scale.z = 1;
                     mesh.doubleSided = true;
                     mesh.updateMatrix();
-                    scene.add(mesh);
+                    scene.addObject(mesh);
                     
                     // number
                     var x = document.createElement( "canvas" );
@@ -331,7 +331,7 @@
                     mesh.scale.x = mesh.scale.y = mesh.scale.z = 1;
                     mesh.doubleSided = true;
                     mesh.updateMatrix();
-                    scene.add(mesh);
+                    scene.addObject(mesh);
                 }
                 
             }

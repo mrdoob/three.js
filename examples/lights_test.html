@@ -154,7 +154,7 @@
                     mesh.scale.x = mesh.scale.y = mesh.scale.z = 0.25 * (Math.random() + 0.5);
                     mesh.overdraw = true;
                     mesh.updateMatrix();
-                    scene.add(mesh);
+                    scene.addObject(mesh);
                 }
                 
 
@@ -182,7 +182,7 @@
                 lightMesh.position = pointLight.position;
                 lightMesh.overdraw = true;
                 lightMesh.updateMatrix();
-                scene.add(lightMesh);
+                scene.addObject(lightMesh);
 
 
                 if( render_canvas ) {
@@ -223,7 +223,7 @@
                     zmesh.scale.x = zmesh.scale.y = zmesh.scale.z = 100;
                     zmesh.overdraw = true;
                     zmesh.updateMatrix();
-                    scene.add(zmesh);
+                    scene.addObject(zmesh);
                     
                 }
 
