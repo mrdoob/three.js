@@ -4,6 +4,8 @@
 
 THREE.Camera = function ( fov, aspect, near, far ) {
 
+	this.fov = fov;
+	this.aspect = aspect;
 	this.position = new THREE.Vector3( 0, 0, 0 );
 	this.target = { position: new THREE.Vector3( 0, 0, 0 ) };
 

@@ -4,19 +4,18 @@
 
 THREE.Color = function ( hex ) {
 
+	/*
+	this.r; this.g; this.b; this.a;
+	this.hex;
+	this.__styleString;
+	*/
+
+	this.autoUpdate = true;
 	this.setHex( hex );
 
 }
 
 THREE.Color.prototype = {
-
-	setHex: function ( hex ) {
-
-		this.hex = hex;
-		this.updateRGBA();
-		this.updateStyleString();
-
-	},
 
 	setRGBA: function ( r, g, b, a ) {
 
@@ -25,8 +24,50 @@ THREE.Color.prototype = {
 		this.b = b;
 		this.a = a;
 
-		this.updateHex();
-		this.updateStyleString();
+		if ( this.autoUpdate ) {
+
+			this.updateHex();
+			this.updateStyleString();
+
+		}
+
+	},
+
+	setHex: function ( hex ) {
+
+		this.hex = hex;
+
+		if ( this.autoUpdate ) {
+
+			this.updateRGBA();
+			this.updateStyleString();
+
+		}
+
+	},
+
+	copyRGB: function ( color ) {
+
+		this.r = color.r;
+		this.g = color.g;
+		this.b = color.b;
+
+	},
+
+	copyRGBA: function ( color ) {
+
+		this.r = color.r;
+		this.g = color.g;
+		this.b = color.b;
+		this.a = color.a;
+
+	},
+
+	multiplySelfRGB: function ( color ) {
+
+		this.r *= color.r;
+		this.g *= color.g;
+		this.b *= color.b;
 
 	},
 

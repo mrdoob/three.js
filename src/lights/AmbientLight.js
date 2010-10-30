@@ -1,6 +1,6 @@
-THREE.AmbientLight = function(color) {
-  
-  THREE.Light.call(this, color);
+THREE.AmbientLight = function ( hex ) {
+
+	THREE.Light.call( this, hex );
 
 };
 

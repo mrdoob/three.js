@@ -1,5 +1,5 @@
-THREE.Light = function(color) {
+THREE.Light = function ( hex ) {
 
-  this.color = color;
+	this.color = new THREE.Color( 0xff << 24 | hex );
 
 };

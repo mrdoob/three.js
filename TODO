@@ -1,16 +1,20 @@
-- Core
-	- Simple hierarchy system (look at D1plo1d and tamask branches)
-	- Interaction, 2D to 3D projection.
-- Examples
-	- DOMRenderer example
-- Materials
-	- MeshBitmapSphereMappingMaterial. http://en.wikipedia.org/wiki/Sphere_mapping
-	- MeshBitmapCubeMappingMaterial. http://en.wikipedia.org/wiki/Cube_mapping
-	- MeshShaderMaterial for WebGLRenderer
-	- Add MeshBitmapUVMappingMaterial to WebGLRenderer
-- Renderers
-	- Add Lights to Renderer (CanvasRenderer and SVGRenderer)
-	- FrustrumClipping near to Renderer (CanvasRenderer and SVGRenderer)
-- Utils
-	- Blender 2.5b4 plugin system has change considerably :/
+Core
+* Simple hierarchy system (look at D1plo1d and tamask branches)
+* Interaction, 2D to 3D projection. (look at mindlapse branch)
 
+Examples
+* DOMRenderer example
+
+Materials
+* MeshFaceMaterial? (Renderer would use face materials instead, MeshFaceColorFillFaceMaterial/MeshFaceColorStrokeMaterial wouldn't be needed?)
+* MeshBitmapSphereMappingMaterial. http://en.wikipedia.org/wiki/Sphere_mapping
+* MeshBitmapCubeMappingMaterial. http://en.wikipedia.org/wiki/Cube_mapping
+* MeshBitmapMaterial? (Merge all MeshBitmap*Materials and have a mode parameter like... MeshBitmapMaterial.UV_MAPPING)
+* MeshShaderMaterial for WebGLRenderer
+* Add MeshBitmapUVMappingMaterial to WebGLRenderer
+
+Renderers
+* Add PointLight to WebGLRenderer
+* WebGLRenderer support MeshBitmapUVMappingMaterial (look at alteredq branch)
+* Double check DirectionalLight WebGLRenderer code (doesn't seem correct)
+* FrustrumClipping near to Renderer (CanvasRenderer and SVGRenderer)

@@ -17,6 +17,8 @@ THREE.Vector2.prototype = {
 		this.x = x;
 		this.y = y;
 
+		return this;
+
 	},
 
 	copy: function ( v ) {
@@ -24,13 +26,15 @@ THREE.Vector2.prototype = {
 		this.x = v.x;
 		this.y = v.y;
 
+		return this;
+
 	},
 
 	addSelf: function ( v ) {
 
 		this.x += v.x;
 		this.y += v.y;
-		
+
 		return this;
 
 	},
@@ -39,6 +43,8 @@ THREE.Vector2.prototype = {
 
 		this.x = v1.x + v2.x;
 		this.y = v1.y + v2.y;
+
+		return this;
 
 	},
 
@@ -56,6 +62,8 @@ THREE.Vector2.prototype = {
 		this.x = v1.x - v2.x;
 		this.y = v1.y - v2.y;
 
+		return this;
+
 	},
 
 	multiplyScalar: function ( s ) {
@@ -70,6 +78,8 @@ THREE.Vector2.prototype = {
 	unit: function () {
 
 		this.multiplyScalar( 1 / this.length() );
+
+		return this;
 
 	},
 
@@ -89,6 +99,8 @@ THREE.Vector2.prototype = {
 
 		this.x = - this.x;
 		this.y = - this.y;
+
+		return this;
 
 	},
 

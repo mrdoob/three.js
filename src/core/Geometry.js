@@ -13,24 +13,54 @@ THREE.Geometry = function () {
 
 THREE.Geometry.prototype = {
 
-	computeNormals: function () {
+	computeCentroids: function () {
 
-		var v, f, vA, vB, vC, cb, ab;
+		var f, fl, face;
 
-		for ( v = 0; v < this.vertices.length; v++ ) {
+		for ( f = 0, fl = this.faces.length; f < fl; f++ ) {
 
-			this.vertices[ v ].normal.set( 0, 0, 0 );
+			face = this.faces[ f ];
+			face.centroid.set( 0, 0, 0 );
+
+			if ( face instanceof THREE.Face3 ) {
+
+				face.centroid.addSelf( this.vertices[ face.a ].position );
+				face.centroid.addSelf( this.vertices[ face.b ].position );
+				face.centroid.addSelf( this.vertices[ face.c ].position );
+				face.centroid.divideScalar( 3 );
+
+			} else if ( face instanceof THREE.Face4 ) {
+
+				face.centroid.addSelf( this.vertices[ face.a ].position );
+				face.centroid.addSelf( this.vertices[ face.b ].position );
+				face.centroid.addSelf( this.vertices[ face.c ].position );
+				face.centroid.addSelf( this.vertices[ face.d ].position );
+				face.centroid.divideScalar( 4 );
+
+			}
 
 		}
 
-		for ( f = 0; f < this.faces.length; f++ ) {
+	},
 
-			vA = this.vertices[ this.faces[ f ].a ];
-			vB = this.vertices[ this.faces[ f ].b ];
-			vC = this.vertices[ this.faces[ f ].c ];
+	computeNormals: function () {
 
-			cb = new THREE.Vector3();
-			ab = new THREE.Vector3();
+		var v, vl, vertex, f, fl, face, vA, vB, vC, cb = new THREE.Vector3(), ab = new THREE.Vector3();
+
+		for ( v = 0, vl = this.vertices.length; v < vl; v++ ) {
+
+			vertex = this.vertices[ v ];
+			vertex.normal.set( 0, 0, 0 );
+
+		}
+
+		for ( f = 0, fl = this.faces.length; f < fl; f++ ) {
+
+			face = this.faces[ f ];
+
+			vA = this.vertices[ face.a ];
+			vB = this.vertices[ face.b ];
+			vC = this.vertices[ face.c ];
 
 			cb.sub( vC.position, vB.position );
 			ab.sub( vA.position, vB.position );
@@ -42,7 +72,7 @@ THREE.Geometry.prototype = {
 
 			}
 
-			this.faces[ f ].normal = cb;
+			face.normal.copy( cb );
 
 		}
 

@@ -20,6 +20,8 @@ THREE.Vector3.prototype = {
 		this.y = y;
 		this.z = z;
 
+		return this;
+
 	},
 
 	copy: function ( v ) {
@@ -28,6 +30,8 @@ THREE.Vector3.prototype = {
 		this.y = v.y;
 		this.z = v.z;
 
+		return this;
+
 	},
 
 	add: function( v1, v2 ) {
@@ -35,6 +39,8 @@ THREE.Vector3.prototype = {
 		this.x = v1.x + v2.x;
 		this.y = v1.y + v2.y;
 		this.z = v1.z + v2.z;
+
+		return this;
 
 	},
 
@@ -64,6 +70,8 @@ THREE.Vector3.prototype = {
 		this.y = v1.y - v2.y;
 		this.z = v1.z - v2.z;
 
+		return this;
+
 	},
 
 	subSelf: function ( v ) {
@@ -81,6 +89,8 @@ THREE.Vector3.prototype = {
 		this.x = v1.y * v2.z - v1.z * v2.y;
 		this.y = v1.z * v2.x - v1.x * v2.z;
 		this.z = v1.x * v2.y - v1.y * v2.x;
+
+		return this;
 
 	},
 
@@ -178,6 +188,14 @@ THREE.Vector3.prototype = {
 			this.multiplyScalar( 0 );
 
 		}
+
+		return this;
+
+	},
+
+	setLength: function( len ) {
+
+		return this.normalize().multiplyScalar( len );
 
 	},
 

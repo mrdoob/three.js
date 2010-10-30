@@ -22,7 +22,7 @@ files.append('objects/Object3D.js')
 files.append('objects/Particle.js')
 files.append('materials/ParticleDOMMaterial.js')
 files.append('scenes/Scene.js')
-files.append('renderers/Renderer.js')
+files.append('renderers/Projector.js')
 files.append('renderers/DOMRenderer.js')
 files.append('renderers/renderables/RenderableParticle.js')
 

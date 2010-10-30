@@ -30,6 +30,10 @@
 		<script type="text/javascript" src="../src/core/UV.js"></script>
 		<script type="text/javascript" src="../src/core/Geometry.js"></script>
 		<script type="text/javascript" src="../src/cameras/Camera.js"></script>
+		<script type="text/javascript" src="../src/lights/Light.js"></script>
+		<script type="text/javascript" src="../src/lights/AmbientLight.js"></script>
+		<script type="text/javascript" src="../src/lights/DirectionalLight.js"></script>
+		<script type="text/javascript" src="../src/lights/PointLight.js"></script>
 		<script type="text/javascript" src="../src/objects/Object3D.js"></script>
 		<script type="text/javascript" src="../src/objects/Mesh.js"></script>
 		<script type="text/javascript" src="../src/objects/Particle.js"></script>
@@ -43,7 +47,7 @@
 		<script type="text/javascript" src="../src/materials/ParticleCircleMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/ParticleBitmapMaterial.js"></script>
 		<script type="text/javascript" src="../src/scenes/Scene.js"></script>
-		<script type="text/javascript" src="../src/renderers/Renderer.js"></script>
+		<script type="text/javascript" src="../src/renderers/Projector.js"></script>
 		<script type="text/javascript" src="../src/renderers/CanvasRenderer.js"></script>
 		<script type="text/javascript" src="../src/renderers/SVGRenderer.js"></script>
 		<script type="text/javascript" src="../src/renderers/WebGLRenderer.js"></script>
@@ -54,10 +58,10 @@
 
 		<script type="text/javascript" src="cameras/FreeCamera.js"></script>
 
-		<script type="text/javascript" src="geometry/primitives/Cube.js"></script>
+		<script type="text/javascript" src="geometry/primitives/Sphere.js"></script>
 		<script type="text/javascript" src="geometry/primitives/Plane.js"></script>
 
-		<script type="text/javascript" src="http://github.com/mrdoob/stats.js/raw/master/build/Stats.js"></script>
+		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
 
@@ -99,6 +103,7 @@
 			var debugContext;
 
 			init();
+			loop();
 			setInterval(loop, 1000/60);
 
 			function init() {
@@ -113,18 +118,21 @@
 
 				scene = new THREE.Scene();
 
-				// Cube
+				// Plane
 
-				geometry = new Cube(200, 200, 200);
+				plane = new THREE.Mesh( new Plane( 1000, 1000, 10, 10 ), new THREE.MeshColorStrokeMaterial( 0x000000, 0.5, 1 ) );
+				plane.rotation.x = - 90 * ( Math.PI / 180 );
+				plane.doubleSided = true;
+				scene.add( plane );
 
-				for (var i = 0; i < geometry.faces.length; i++) {
+				// Spheres
 
-					geometry.faces[i].color.setRGBA( Math.random() * 0.5, Math.random() * 0.5 + 0.5, Math.random() * 0.5 + 0.5, 1 );
-				}
+				geometry = new Sphere( 100, 16, 8 );
 
 				for (var i = 0; i < 10; i ++ ) {
 
-					cube = new THREE.Mesh(geometry, new THREE.MeshFaceColorFillMaterial() );
+					cube = new THREE.Mesh(geometry, new THREE.MeshColorFillMaterial( 0xffffff ) );
+					cube.overdraw = true;
 
 					cube.position.x = Math.random() * 1000 - 500;
 					cube.position.y = Math.random() * 1000 - 500;
@@ -140,16 +148,26 @@
 
 				}
 
-				// Plane
+				// Lights
 
-				plane = new THREE.Mesh( new Plane( 1000, 1000, 10, 10 ), new THREE.MeshColorStrokeMaterial( 0x000000, 0.5, 1 ) );
-				plane.rotation.x = -90 * (Math.PI / 180);
-				scene.add(plane);
+				var ambientLight = new THREE.AmbientLight( Math.random() * 0x202020 );
+				scene.addLight( ambientLight );
+
+				var directionalLight = new THREE.DirectionalLight( Math.random() * 0xffffff );
+				directionalLight.position.x = Math.random() - 0.5;
+				directionalLight.position.y = Math.random() - 0.5;
+				directionalLight.position.z = Math.random() - 0.5;
+				directionalLight.position.normalize();
+				scene.addLight( directionalLight );
+
+				var pointLight = new THREE.PointLight( 0xff0000, 1 );
+				scene.addLight( pointLight );
+
 
 				renderer = new THREE.CanvasRenderer();
-				renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
-				container.appendChild(renderer.domElement);
+				container.appendChild( renderer.domElement );
 
 				var debugCanvas = document.createElement( 'canvas' );
 				debugCanvas.width = 512;
@@ -169,8 +187,8 @@
 				stats.domElement.style.top = '0px';
 				container.appendChild(stats.domElement);
 
-				document.addEventListener('keydown', onDocumentKeyDown, false);
-				document.addEventListener('keyup', onDocumentKeyUp, false);
+				document.addEventListener( 'keydown', onDocumentKeyDown, false );
+				document.addEventListener( 'keyup', onDocumentKeyUp, false );
 			}
 
 			function onDocumentKeyDown( event ) {
@@ -251,9 +269,12 @@
 				debugContext.rect( camera.target.position.x * 0.1 - 5, camera.target.position.z * 0.1 - 5, 10, 10 );
 				debugContext.rect( - 50, - 50, 100, 100 );
 
-				for ( var i = 0; i < scene.objects.length; i++ ) {
+				for ( var i = 1; i < scene.objects.length; i++ ) {
 
 					var object = scene.objects[i];
+					object.rotation.x += 0.01;
+					object.rotation.y += 0.005;
+					object.position.y = Math.sin( object.rotation.x ) * 200;
 
 					debugContext.rect( object.position.x * 0.1 - 5, object.position.z * 0.1 - 5, 10, 10 );
 

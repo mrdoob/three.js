@@ -28,13 +28,14 @@
 		<script type="text/javascript" src="../src/core/UV.js"></script>
 		<script type="text/javascript" src="../src/core/Geometry.js"></script>
 		<script type="text/javascript" src="../src/cameras/Camera.js"></script>
+		<script type="text/javascript" src="../src/lights/Light.js"></script>
+		<script type="text/javascript" src="../src/lights/AmbientLight.js"></script>
+		<script type="text/javascript" src="../src/lights/DirectionalLight.js"></script>
+		<script type="text/javascript" src="../src/lights/PointLight.js"></script>
 		<script type="text/javascript" src="../src/objects/Object3D.js"></script>
 		<script type="text/javascript" src="../src/objects/Mesh.js"></script>
 		<script type="text/javascript" src="../src/objects/Particle.js"></script>
 		<script type="text/javascript" src="../src/objects/Line.js"></script>
-    <script type="text/javascript" src="../src/lights/Light.js"></script>
-    <script type="text/javascript" src="../src/lights/AmbientLight.js"></script>
-    <script type="text/javascript" src="../src/lights/DirectionalLight.js"></script>
 		<script type="text/javascript" src="../src/materials/LineColorMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/MeshBitmapUVMappingMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/MeshColorFillMaterial.js"></script>
@@ -44,7 +45,7 @@
 		<script type="text/javascript" src="../src/materials/ParticleCircleMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/ParticleBitmapMaterial.js"></script>
 		<script type="text/javascript" src="../src/scenes/Scene.js"></script>
-		<script type="text/javascript" src="../src/renderers/Renderer.js"></script>
+		<script type="text/javascript" src="../src/renderers/Projector.js"></script>
 		<script type="text/javascript" src="../src/renderers/CanvasRenderer.js"></script>
 		<script type="text/javascript" src="../src/renderers/SVGRenderer.js"></script>
 		<script type="text/javascript" src="../src/renderers/WebGLRenderer.js"></script>
@@ -58,7 +59,7 @@
 		<script type="text/javascript" src="geometry/primitives/Plane.js"></script>
 		<script type="text/javascript" src="geometry/primitives/Cylinder.js"></script>
 
-		<script type="text/javascript" src="http://github.com/mrdoob/stats.js/raw/master/build/Stats.js"></script>
+		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
 
@@ -73,7 +74,7 @@
 			var scene;
 			var canvasRenderer, svgRenderer, webglRenderer;
 
-			var mesh;
+			var mesh, qrcode;
 
 			var mouseX = 0;
 			var mouseY = 0;
@@ -103,7 +104,7 @@
 
 				// QRCODE
 
-				mesh = new THREE.Mesh(new Qrcode(), new THREE.MeshFaceColorFillMaterial());
+				qrcode = mesh = new THREE.Mesh(new Qrcode(), new THREE.MeshFaceColorFillMaterial());
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
 				mesh.updateMatrix();
 				scene.add(mesh);
@@ -167,6 +168,8 @@
 					geometry.faces.push( face );
 				}
 
+				geometry.computeNormals();
+
 				mesh = new THREE.Mesh( geometry, new THREE.MeshFaceColorFillMaterial() );
 				mesh.doubleSided = true;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
@@ -186,12 +189,12 @@
 				}
 
 				// LIGHTS
-				
-				var ambient = new THREE.AmbientLight( new THREE.Color( Math.random() * 0xffffff ) );
-        scene.addLight(ambient);
-				var directional = new THREE.DirectionalLight( new THREE.Color( Math.random() * 0xffffff ), 
-						new THREE.Vector3( 600, 0, 0 ) );
-        scene.addLight(directional);
+
+				var ambient = new THREE.AmbientLight( 0x80ffff );
+				scene.addLight( ambient );
+
+				var directional = new THREE.DirectionalLight( 0xffff00 );
+				scene.addLight( directional );
 
 				canvasRenderer = new THREE.CanvasRenderer();
 				canvasRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
@@ -228,6 +231,11 @@
 
 				mesh.rotation.y += 0.01;
 				mesh.updateMatrix();
+
+				/*
+				qrcode.rotation.x += 0.01;
+				qrcode.rotation.z += 0.02;
+				*/
 
 				canvasRenderer.render( scene, camera );
 				svgRenderer.render( scene, camera );

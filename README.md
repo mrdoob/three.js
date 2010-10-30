@@ -101,13 +101,14 @@ For creating a customised version of the library, including the source files in 
 	<script type="text/javascript" src="js/three/core/UV.js"></script>
 	<script type="text/javascript" src="js/three/core/Geometry.js"></script>
 	<script type="text/javascript" src="js/three/cameras/Camera.js"></script>
-	<script type="text/javascript" src="js/three/objects/Object3D.js"></script>
-	<script type="text/javascript" src="js/three/objects/Line.js"></script>
-	<script type="text/javascript" src="js/three/objects/Mesh.js"></script>
-	<script type="text/javascript" src="js/three/objects/Particle.js"></script>
 	<script type="text/javascript" src="js/three/lights/Light.js"></script>
 	<script type="text/javascript" src="js/three/lights/AmbientLight.js"></script>
 	<script type="text/javascript" src="js/three/lights/DirectionalLight.js"></script>
+	<script type="text/javascript" src="js/three/lights/PointLight.js"></script>
+	<script type="text/javascript" src="js/three/objects/Object3D.js"></script>
+	<script type="text/javascript" src="js/three/objects/Particle.js"></script>
+	<script type="text/javascript" src="js/three/objects/Line.js"></script>
+	<script type="text/javascript" src="js/three/objects/Mesh.js"></script>
 	<script type="text/javascript" src="js/three/materials/LineColorMaterial.js"></script>
 	<script type="text/javascript" src="js/three/materials/MeshBitmapUVMappingMaterial.js"></script>
 	<script type="text/javascript" src="js/three/materials/MeshColorFillMaterial.js"></script>
@@ -117,7 +118,7 @@ For creating a customised version of the library, including the source files in 
 	<script type="text/javascript" src="js/three/materials/ParticleBitmapMaterial.js"></script>
 	<script type="text/javascript" src="js/three/materials/ParticleCircleMaterial.js"></script>
 	<script type="text/javascript" src="js/three/scenes/Scene.js"></script>
-	<script type="text/javascript" src="js/three/renderers/Renderer.js"></script>
+	<script type="text/javascript" src="js/three/renderers/Projector.js"></script>
 	<script type="text/javascript" src="js/three/renderers/CanvasRenderer.js"></script>
 	<script type="text/javascript" src="js/three/renderers/SVGRenderer.js"></script>
 	<script type="text/javascript" src="js/three/renderers/WebGLRenderer.js"></script>
@@ -135,6 +136,15 @@ Thanks to the power of the internets (and github <3) these people have kindly he
 
 
 ### Change Log ###
+
+2010 10 06 - **r18** (44.420 kb)
+
+* Added `PointLight`
+* `CanvasRenderer` and `SVGRenderer` basic lighting support (ColorStroke/ColorFill only)
+* `Renderer` > `Projector`. `CanvasRenderer`, `SVGRenderer` and `DOMRenderer` do not extend anymore
+* Interactivity base code (hdi folder). To be refactored... ([mindlapse](http://github.com/mindlapse))
+* Added `computeCentroids` method to `Geometry`
+
 
 2010 09 17 - **r17** (39.487 kb)
 
