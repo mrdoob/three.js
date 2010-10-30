@@ -1,0 +1,192 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>three.js - point light WebGL</title>
+		<meta charset="utf-8">
+		<style type="text/css">
+			body {
+				background-color: #000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {			
+				position: absolute;
+				top: 0px; width: 100%;
+				color: #ffffff;
+				padding: 5px;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: center;
+			}
+
+			a {
+				color: #ff0080;
+				text-decoration: none;
+			}
+
+			a:hover {
+				color: #0080ff;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info">
+			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - point lights WebGL demo.<br />
+			Walt Disney head by <a href="http://www.davidoreilly.com/2009/01/walt-disneys-head-on-a-plate" target="_blank">David OReilly</a>
+		</div>
+
+        <!--
+		<script type="text/javascript" src="../build/Three.js"></script> 
+        -->
+        
+		<script type="text/javascript" src="../src/Three.js"></script>
+		<script type="text/javascript" src="../src/core/Color.js"></script>
+		<script type="text/javascript" src="../src/core/Vector2.js"></script>
+		<script type="text/javascript" src="../src/core/Vector3.js"></script>
+		<script type="text/javascript" src="../src/core/Vector4.js"></script>
+		<script type="text/javascript" src="../src/core/Rectangle.js"></script>
+		<script type="text/javascript" src="../src/core/Matrix3.js"></script>
+		<script type="text/javascript" src="../src/core/Matrix4.js"></script>
+		<script type="text/javascript" src="../src/core/Vertex.js"></script>
+		<script type="text/javascript" src="../src/core/Face3.js"></script>
+		<script type="text/javascript" src="../src/core/Face4.js"></script>
+		<script type="text/javascript" src="../src/core/UV.js"></script>
+		<script type="text/javascript" src="../src/core/Geometry.js"></script>
+		<script type="text/javascript" src="../src/cameras/Camera.js"></script>
+		<script type="text/javascript" src="../src/lights/Light.js"></script>
+		<script type="text/javascript" src="../src/lights/AmbientLight.js"></script>
+		<script type="text/javascript" src="../src/lights/DirectionalLight.js"></script>
+		<script type="text/javascript" src="../src/lights/PointLight.js"></script>
+		<script type="text/javascript" src="../src/objects/Object3D.js"></script>
+		<script type="text/javascript" src="../src/objects/Mesh.js"></script>
+		<script type="text/javascript" src="../src/objects/Particle.js"></script>
+		<script type="text/javascript" src="../src/objects/Line.js"></script>
+		<script type="text/javascript" src="../src/materials/LineColorMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/MeshPhongMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/MeshBitmapMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/MeshColorFillMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/MeshColorStrokeMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/MeshFaceMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/ParticleCircleMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/ParticleBitmapMaterial.js"></script>
+		<script type="text/javascript" src="../src/scenes/Scene.js"></script>
+		<script type="text/javascript" src="../src/renderers/Projector.js"></script>
+		<script type="text/javascript" src="../src/renderers/CanvasRenderer.js"></script>
+		<script type="text/javascript" src="../src/renderers/SVGRenderer.js"></script>
+		<script type="text/javascript" src="../src/renderers/WebGLRenderer.js"></script>
+		<script type="text/javascript" src="../src/renderers/renderables/RenderableFace3.js"></script>
+		<script type="text/javascript" src="../src/renderers/renderables/RenderableFace4.js"></script>
+		<script type="text/javascript" src="../src/renderers/renderables/RenderableParticle.js"></script>
+		<script type="text/javascript" src="../src/renderers/renderables/RenderableLine.js"></script>
+        <!--
+
+        -->
+		<script type="text/javascript" src="obj/walt/WaltHead.js"></script> 
+		<script type="text/javascript" src="geometry/primitives/Sphere.js"></script> 
+        
+		<script type="text/javascript" src="js/Stats.js"></script>
+
+		<script type="text/javascript">
+
+			var camera, scene, renderer,
+			particle1, particle2, particle2,
+			light1, light2, light3,
+			object;
+
+			init();
+			setInterval( loop, 1000 / 60 );
+
+			function init() {
+
+				var container = document.getElementById( 'container' );
+
+				camera = new THREE.Camera( 65, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.z = 100;
+
+				scene = new THREE.Scene();
+
+				//object = new THREE.Mesh( new WaltHead(), [ new THREE.MeshColorStrokeMaterial( 0xffffff ) ] );
+                //object = new THREE.Mesh( new WaltHead(), new THREE.MeshColorFillMaterial( 0xffffff ) );
+                object = new THREE.Mesh( new WaltHead(), new THREE.MeshPhongMaterial( 0x555555, 0x555555, 0xffffff, 50, 1.0  )  );
+                object.scale.x = object.scale.y = object.scale.z = 0.80;
+				object.overdraw = true;
+				scene.addObject( object );
+                
+                /*
+                var directionalLight = new THREE.DirectionalLight( 0x111111, 0.9 );
+                directionalLight.position.x = 1;
+                directionalLight.position.y = 1;
+                directionalLight.position.z = 2;
+				directionalLight.position.normalize();
+				scene.addLight( directionalLight );
+                */
+                
+				scene.addLight( new THREE.AmbientLight( 0x00020 ) );
+                scene.addLight( new THREE.AmbientLight( 0x00000 ) );
+
+				light1 = new THREE.PointLight( 0xff0040 );
+				scene.addLight( light1 );
+
+				light2 = new THREE.PointLight( 0x0040ff );
+				scene.addLight( light2 );
+
+				light3 = new THREE.PointLight( 0x80ff80 );
+				scene.addLight( light3 );
+
+                var l1 = new THREE.Mesh( new Sphere( 1, 16, 8, 1 ), new THREE.MeshColorFillMaterial( 0xff0040 ) );
+                l1.position = light1.position;
+                scene.addObject( l1 );
+                
+                var l2 = new THREE.Mesh( new Sphere( 1, 16, 8, 1 ), new THREE.MeshColorFillMaterial( 0x0040ff ) );
+                l2.position = light2.position;
+                scene.addObject( l2 );
+     
+                var l3 = new THREE.Mesh( new Sphere( 1, 16, 8, 1 ), new THREE.MeshColorFillMaterial( 0x80ff80 ) );
+                l3.position = light3.position;
+                scene.addObject( l3 );
+ 
+				//renderer = new THREE.CanvasRenderer();
+				renderer = new THREE.WebGLRenderer( );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+                
+                /*
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+                stats.domElement.style.zIndex = 100;
+				container.appendChild( stats.domElement );
+                */
+
+			}
+
+			function loop() {
+
+				var time = new Date().getTime() * 0.0005;
+
+				object.rotation.y -= 0.01;
+
+				light1.position.x = Math.sin( time * 0.7 ) * 30;
+				light1.position.y = Math.cos( time * 0.5 ) * 40;
+				light1.position.z = Math.cos( time * 0.3 ) * 30;
+
+				light2.position.x = Math.cos( time * 0.3 ) * 30;
+				light2.position.y = Math.sin( time * 0.5 ) * 40;
+				light2.position.z = Math.sin( time * 0.7 ) * 30;
+
+				light3.position.x = Math.sin( time * 0.7 ) * 30;
+				light3.position.y = Math.cos( time * 0.3 ) * 40;
+				light3.position.z = Math.sin( time * 0.5 ) * 30;
+
+				renderer.render(scene, camera);
+                
+                //stats.update();
+
+			}
+
+		</script>
+	</body>
+</html>
