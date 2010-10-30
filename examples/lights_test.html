@@ -15,7 +15,7 @@
             h1 { }
             a { color:skyblue }
             canvas { pointer-events:none; z-index:10; position:relative; }
-            #log { position:absolute; top:50px; text-align:left; display:block; z-index:100 }
+            #log { position:absolute; top:50px; text-align:left; display:block; z-index:100; }
             #d { text-align:center; margin:1em 0 -15.7em 0; z-index:0; position:relative; display:block }
             .button { background:#000; color:#fff; padding:0.2em 0.5em; cursor:pointer }
             .inactive { background:#999; color:#eee }
@@ -37,7 +37,7 @@
             <p>Canvas renderer is very slow on anything other than Chrome.
         </div>
         
-        <div id="log"></div>
+        <pre id="log"></pre>
 
 		<!--
         <script type="text/javascript" src="../build/Three.js"></script> 
@@ -193,7 +193,7 @@
 
                 if ( render_gl ) {
                     try {
-                        webglRenderer = new THREE.WebGLRenderer();
+                        webglRenderer = new THREE.WebGLRenderer( scene );
                         webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
                         container.appendChild( webglRenderer.domElement );
                         has_gl = 1;
