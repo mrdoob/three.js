@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - geometry - cube</title>
+		<title>three.js - camera - orthographic</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
 		<style type="text/css">
@@ -78,18 +78,18 @@
 				plane.rotation.x = - 90 * ( Math.PI / 180 );
 				scene.addObject( plane );
 
-				geometry = new Cube( 40, 40, 40 );
+				geometry = new Cube( 50, 50, 50 );
 
 				for (var i = 0; i < 100; i ++ ) {
 
-					cube = new THREE.Mesh(geometry, new THREE.MeshColorFillMaterial( 0xffffff ) );
+					cube = new THREE.Mesh(geometry, new THREE.MeshColorFillMaterial( 0xffffff, Math.random() * 0.5 + 0.5 ) );
 					cube.overdraw = true;
 
-					cube.scale.y = Math.random() * 2 + 1;
+					cube.scale.y = Math.floor( Math.random() * 2 + 1 );
 
-					cube.position.x = Math.random() * 1000 - 500;
-					cube.position.y = ( cube.scale.y * 40 ) / 2;
-					cube.position.z = Math.random() * 1000 - 500;
+					cube.position.x = Math.floor( ( Math.random() * 1000 - 500 ) / 50 ) * 50 + 25;
+					cube.position.y = ( cube.scale.y * 50 ) / 2;
+					cube.position.z = Math.floor( ( Math.random() * 1000 - 500 ) / 50 ) * 50 + 25;
 
 					scene.addObject(cube);
 
