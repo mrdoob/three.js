@@ -95,7 +95,7 @@
 				mesh = new THREE.Mesh( plane, material );
 				mesh.rotation.x = -90 * Math.PI / 180;
 				mesh.overdraw = true;
-				scene.add(mesh);
+				scene.addObject(mesh);
 
 				renderer = new THREE.CanvasRenderer();
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
