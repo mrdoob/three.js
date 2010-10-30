@@ -9,7 +9,7 @@ THREE.Scene = function () {
 
 	this.addObject = function ( object ) {
 
-		this.objects.push(object);
+		this.objects.push( object );
 
 	};
 
@@ -23,32 +23,29 @@ THREE.Scene = function () {
 				return;
 
 			}
+
 		}
+
 	};
 
-  this.addLight = function ( light ) {
+	this.addLight = function ( light ) {
 
-    this.lights.push(light);
+		this.lights.push( light );
 
-  };
+	};
 
-  this.removeLight = function ( light ) {
+	this.removeLight = function ( light ) {
 
-    for ( var i = 0, l = this.lights.length; i < l; i++ ) {
+		for ( var i = 0, l = this.lights.length; i < l; i++ ) {
 
-      if ( light == this.lights[ i ] ) {
+			if ( light == this.lights[ i ] ) {
 
-        this.lights.splice( i, 1 );
-        return;
+				this.lights.splice( i, 1 );
+				return;
 
-      }
-    }
-  };
+			}
 
-	// Deprecated
-	this.add = function ( object ) {
-
-		this.addObject( object );
+		}
 
 	};
 

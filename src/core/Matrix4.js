@@ -435,10 +435,10 @@ THREE.Matrix4.makeOrtho = function( left, right, top, bottom, near, far ) {
 
 	m = new THREE.Matrix4();
 	w = right - left;
-	h = bottom - top;
+	h = top - bottom;
 	p = far - near;
 	x = ( right + left ) / w;
-	y = ( bottom + top ) / h;
+	y = ( top + bottom ) / h;
 	z = ( far + near ) / p;
 
 	m.n11 = 2 / w; m.n12 = 0;     m.n13 = 0;      m.n14 = -x;

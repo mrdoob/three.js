@@ -15,6 +15,7 @@ Other similar projects: [pre3d](http://deanm.github.com/pre3d/), [pvjs](http://c
 
 ### Examples ###
 
+[![lights_pointlights](http://mrdoob.github.com/three.js/assets/examples/09_walthead.png)](http://mrdoob.github.com/three.js/examples/lights_pointlights.html)
 [![geometry_birds](http://mrdoob.github.com/three.js/assets/examples/08_birds.png)](http://mrdoob.github.com/three.js/examples/geometry_birds.html)
 [![geometry_earth](http://mrdoob.github.com/three.js/assets/examples/07_earth.png)](http://mrdoob.github.com/three.js/examples/geometry_earth.html)
 [![geometry_terrain](http://mrdoob.github.com/three.js/assets/examples/06_terrain.png)](http://mrdoob.github.com/three.js/examples/geometry_terrain.html)
