@@ -45,7 +45,8 @@ THREE.Geometry.prototype = {
 
 	computeNormals: function ( useVertexNormals ) {
 
-		var n, nl, v, vl, vertex, f, fl, face, vA, vB, vC, cb = new THREE.Vector3(), ab = new THREE.Vector3();
+		var n, nl, v, vl, vertex, f, fl, face, vA, vB, vC,
+		cb = new THREE.Vector3(), ab = new THREE.Vector3();
 
 		for ( v = 0, vl = this.vertices.length; v < vl; v++ ) {
 

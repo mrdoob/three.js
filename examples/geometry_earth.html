@@ -65,7 +65,7 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.Camera( 60, SCREEN_WIDTH / SCREEN_HEIGHT, 0.0001, 10000 );
+				camera = new THREE.Camera( 60, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
 				camera.position.z = 500;
 
 				scene = new THREE.Scene();
@@ -81,12 +81,12 @@
 				renderer = new THREE.CanvasRenderer();
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
-				container.appendChild(renderer.domElement);
+				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
-				container.appendChild(stats.domElement);
+				container.appendChild( stats.domElement );
 
 				document.addEventListener('mousemove', onDocumentMouseMove, false);
 
