@@ -39,7 +39,7 @@
             <p>Blinn-Phong shader only works in WebGL, canvas has only diffuse materials.
         </div>
         
-        <div id="log"></div>
+        <pre id="log"></pre>
 
 		<!--
         <script type="text/javascript" src="../build/Three.js"></script> 
@@ -177,7 +177,6 @@
                 pointLight.position.z = 0;
 				scene.addLight( pointLight );
 
-
                 // light representation
                 sphere = new Sphere( 100, 16, 8, 1 );
                 lightMesh = new THREE.Mesh( sphere, new THREE.MeshColorFillMaterial( 0xffaa00 ) );
@@ -215,7 +214,7 @@
 
                 if ( render_gl ) {
                     try {
-                        webglRenderer = new THREE.WebGLRenderer();
+                        webglRenderer = new THREE.WebGLRenderer( scene );
                         webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
                         container.appendChild( webglRenderer.domElement );
                         has_gl = 1;
