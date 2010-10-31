@@ -170,6 +170,7 @@
 				}
 
 				geometry.computeNormals();
+				geometry.computeCentroids();
 
 				mesh = new THREE.Mesh( geometry, [ new THREE.MeshFaceMaterial(), new THREE.MeshColorStrokeMaterial( 0xff0000, 0.5, 10 ) ] );
 				mesh.doubleSided = true;

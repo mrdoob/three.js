@@ -92,6 +92,9 @@
 
 				}
 
+				plane.computeNormals();
+				plane.computeCentroids();
+
 				mesh = new THREE.Mesh( plane, material );
 				mesh.rotation.x = -90 * Math.PI / 180;
 				mesh.overdraw = true;
