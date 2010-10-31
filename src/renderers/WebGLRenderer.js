@@ -551,6 +551,41 @@ THREE.WebGLRenderer = function ( scene ) {
 		}
 
 	};
+	
+	this.setFaceCulling = function( cullFace, frontFace ) {
+		
+		if ( cullFace ) {
+			
+			if ( !frontFace || frontFace == "ccw" ) {
+			
+				_gl.frontFace( _gl.CCW );
+				
+			} else {
+				
+				_gl.frontFace( _gl.CW );
+			}
+			
+			if( cullFace == "back" ) {
+					
+				_gl.cullFace( _gl.BACK );
+				
+			} else if( cullFace == "front" ) {
+				
+				_gl.cullFace( _gl.FRONT );
+			
+			} else {
+				
+				_gl.cullFace( _gl.FRONT_AND_BACK );
+			}
+			
+			_gl.enable( _gl.CULL_FACE );
+			
+		} else {
+			
+			_gl.disable( _gl.CULL_FACE );
+		}
+
+	};
 
 	function initGL() {
 
@@ -573,6 +608,10 @@ THREE.WebGLRenderer = function ( scene ) {
 		_gl.enable( _gl.DEPTH_TEST );
 		_gl.depthFunc( _gl.LEQUAL );
 
+		_gl.frontFace( _gl.CCW );
+		_gl.cullFace( _gl.BACK );
+		_gl.enable( _gl.CULL_FACE );		
+		
 		_gl.enable( _gl.BLEND );
 		//_gl.blendFunc( _gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA );
 		// _gl.blendFunc( _gl.SRC_ALPHA, _gl.ONE ); // cool!
