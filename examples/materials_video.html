@@ -106,7 +106,7 @@
 				mesh = new THREE.Mesh( plane, material );
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 1.5;
 				mesh.overdraw = true;
-				scene.add(mesh);
+				scene.addObject(mesh);
 
 				mesh = new THREE.Mesh( plane, materialReflection );
 				mesh.position.y = -306;
@@ -114,7 +114,7 @@
 				mesh.rotation.x = 180 * Math.PI / 180;
 				mesh.doubleSided = true;
 				mesh.overdraw = true;
-				scene.add(mesh);
+				scene.addObject(mesh);
 
 				//
 
@@ -132,7 +132,7 @@
 						particle.position.x = ix * separation - ((amountx * separation) / 2);
 						particle.position.y = -153
 						particle.position.z = iy * separation - ((amounty * separation) / 2);
-						scene.add( particle );
+						scene.addObject( particle );
 					}
 				}
 
