@@ -83,7 +83,7 @@
 				textureContext.fillStyle = '#000000';
 				textureContext.fillRect( 0, 0, 480, 204 );
 
-				var material = new THREE.MeshBitmapUVMappingMaterial( texture );
+				var material = new THREE.MeshBitmapMaterial( texture );
 
 				textureReflection = document.createElement( 'canvas' );
 				textureReflection.width = 480;
@@ -97,7 +97,7 @@
 				textureReflectionGradient.addColorStop( 0.2, 'rgba(240, 240, 240, 1)' );
 				textureReflectionGradient.addColorStop( 1, 'rgba(240, 240, 240, 0.8)' );
 
-				var materialReflection = new THREE.MeshBitmapUVMappingMaterial( textureReflection );
+				var materialReflection = new THREE.MeshBitmapMaterial( textureReflection );
 
 				//
 
@@ -106,7 +106,7 @@
 				mesh = new THREE.Mesh( plane, material );
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 1.5;
 				mesh.overdraw = true;
-				scene.add(mesh);
+				scene.addObject(mesh);
 
 				mesh = new THREE.Mesh( plane, materialReflection );
 				mesh.position.y = -306;
@@ -114,7 +114,7 @@
 				mesh.rotation.x = 180 * Math.PI / 180;
 				mesh.doubleSided = true;
 				mesh.overdraw = true;
-				scene.add(mesh);
+				scene.addObject(mesh);
 
 				//
 
@@ -132,7 +132,7 @@
 						particle.position.x = ix * separation - ((amountx * separation) / 2);
 						particle.position.y = -153
 						particle.position.z = iy * separation - ((amounty * separation) / 2);
-						scene.add( particle );
+						scene.addObject( particle );
 					}
 				}
 

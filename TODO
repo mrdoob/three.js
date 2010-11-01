@@ -6,15 +6,9 @@ Examples
 * DOMRenderer example
 
 Materials
-* MeshFaceMaterial? (Renderer would use face materials instead, MeshFaceColorFillFaceMaterial/MeshFaceColorStrokeMaterial wouldn't be needed?)
 * MeshBitmapSphereMappingMaterial. http://en.wikipedia.org/wiki/Sphere_mapping
 * MeshBitmapCubeMappingMaterial. http://en.wikipedia.org/wiki/Cube_mapping
-* MeshBitmapMaterial? (Merge all MeshBitmap*Materials and have a mode parameter like... MeshBitmapMaterial.UV_MAPPING)
 * MeshShaderMaterial for WebGLRenderer
-* Add MeshBitmapUVMappingMaterial to WebGLRenderer
 
 Renderers
-* Add PointLight to WebGLRenderer
-* WebGLRenderer support MeshBitmapUVMappingMaterial (look at alteredq branch)
-* Double check DirectionalLight WebGLRenderer code (doesn't seem correct)
 * FrustrumClipping near to Renderer (CanvasRenderer and SVGRenderer)

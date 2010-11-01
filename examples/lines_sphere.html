@@ -70,7 +70,7 @@
 					particle.position.z = Math.random() * 2 - 1;
 					particle.position.normalize();
 					particle.position.multiplyScalar(Math.random() * 10 + 450);
-					scene.add( particle );
+					scene.addObject( particle );
 
 				}
 
@@ -92,7 +92,7 @@
 					geometry.vertices.push(new THREE.Vertex(vector2));
 
 					var line = new THREE.Line( geometry, new THREE.LineColorMaterial( 0xffffff, Math.random() ) );
-					scene.add(line);
+					scene.addObject(line);
 				}
 
 				/*

@@ -24,8 +24,11 @@ This script exports the selected object for the three.js engine.
 """
 
 import bpy
+import mathutils
+
 import os
 import os.path
+import math
 
 def save(operator, context, filepath="", use_modifiers=True, use_normals=True, use_uv_coords=True, use_colors=True):
 
@@ -59,8 +62,11 @@ def save(operator, context, filepath="", use_modifiers=True, use_normals=True, u
     if not mesh:
         raise Exception("Error, could not get mesh data from active object")
 
-    # mesh.transform(obj.matrix_world) # XXX
-
+    # that's what Blender's native export_obj.py does
+    x_rot = mathutils.Matrix.Rotation(-math.pi/2, 4, 'X')
+    mesh.transform(x_rot * obj.matrix_world)
+    mesh.calc_normals()
+    
     faceUV = (len(mesh.uv_textures) > 0)
     vertexUV = (len(mesh.sticky) > 0)
     vertexColors = len(mesh.vertex_colors) > 0
@@ -104,7 +110,7 @@ def save(operator, context, filepath="", use_modifiers=True, use_normals=True, u
     file.write('\tTHREE.Geometry.call( this );\n\n')
 
     for v in mesh.vertices:
-        file.write('\tv( %.6f, %.6f, %.6f );\n' % (v.co.x, v.co.z, -v.co.y)) # co
+        file.write('\tv( %.6f, %.6f, %.6f );\n' % (v.co.x, v.co.y, v.co.z)) # co
 
     file.write('\n')
 
@@ -140,11 +146,11 @@ def save(operator, context, filepath="", use_modifiers=True, use_normals=True, u
     file.write('\t}\n\n')
 
     file.write('\tfunction f3( a, b, c, nx, ny, nz ) {\n\n')
-    file.write('\t\tscope.faces.push( new THREE.Face3( a, b, c, nx && ny && nz ? new THREE.Vector3( nx, ny, nz ) : null ) );\n\n')
+    file.write('\t\tscope.faces.push( new THREE.Face3( a, b, c, (nx || ny || nz) ? new THREE.Vector3( nx, ny, nz ) : null ) );\n\n')
     file.write('\t}\n\n')
 
     file.write('\tfunction f4( a, b, c, d, nx, ny, nz ) {\n\n')
-    file.write('\t\tscope.faces.push( new THREE.Face4( a, b, c, d, nx && ny && nz ? new THREE.Vector3( nx, ny, nz ) : null ) );\n\n')
+    file.write('\t\tscope.faces.push( new THREE.Face4( a, b, c, d, (nx || ny || nz) ? new THREE.Vector3( nx, ny, nz ) : null ) );\n\n')
     file.write('\t}\n\n')
 
     file.write('\tfunction uv( u1, v1, u2, v2, u3, v3, u4, v4 ) {\n\n')

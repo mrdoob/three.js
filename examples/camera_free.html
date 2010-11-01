@@ -23,6 +23,7 @@
 		<script type="text/javascript" src="../src/core/Vector3.js"></script>
 		<script type="text/javascript" src="../src/core/Vector4.js"></script>
 		<script type="text/javascript" src="../src/core/Rectangle.js"></script>
+		<script type="text/javascript" src="../src/core/Matrix3.js"></script>
 		<script type="text/javascript" src="../src/core/Matrix4.js"></script>
 		<script type="text/javascript" src="../src/core/Vertex.js"></script>
 		<script type="text/javascript" src="../src/core/Face3.js"></script>
@@ -39,11 +40,10 @@
 		<script type="text/javascript" src="../src/objects/Particle.js"></script>
 		<script type="text/javascript" src="../src/objects/Line.js"></script>
 		<script type="text/javascript" src="../src/materials/LineColorMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/MeshBitmapUVMappingMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/MeshBitmapMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/MeshColorFillMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/MeshColorStrokeMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/MeshFaceColorFillMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/MeshFaceColorStrokeMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/MeshFaceMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/ParticleCircleMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/ParticleBitmapMaterial.js"></script>
 		<script type="text/javascript" src="../src/scenes/Scene.js"></script>
@@ -55,8 +55,6 @@
 		<script type="text/javascript" src="../src/renderers/renderables/RenderableFace4.js"></script>
 		<script type="text/javascript" src="../src/renderers/renderables/RenderableParticle.js"></script>
 		<script type="text/javascript" src="../src/renderers/renderables/RenderableLine.js"></script>
-
-		<script type="text/javascript" src="cameras/FreeCamera.js"></script>
 
 		<script type="text/javascript" src="geometry/primitives/Sphere.js"></script>
 		<script type="text/javascript" src="geometry/primitives/Plane.js"></script>
@@ -103,7 +101,6 @@
 			var debugContext;
 
 			init();
-			loop();
 			setInterval(loop, 1000/60);
 
 			function init() {
@@ -123,7 +120,7 @@
 				plane = new THREE.Mesh( new Plane( 1000, 1000, 10, 10 ), new THREE.MeshColorStrokeMaterial( 0x000000, 0.5, 1 ) );
 				plane.rotation.x = - 90 * ( Math.PI / 180 );
 				plane.doubleSided = true;
-				scene.add( plane );
+				scene.addObject( plane );
 
 				// Spheres
 
@@ -144,7 +141,7 @@
 
 					cube.scale.x = cube.scale.y = cube.scale.z = Math.random() + 0.5;
 
-					scene.add(cube);
+					scene.addObject(cube);
 
 				}
 

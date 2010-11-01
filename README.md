@@ -15,6 +15,7 @@ Other similar projects: [pre3d](http://deanm.github.com/pre3d/), [pvjs](http://c
 
 ### Examples ###
 
+[![lights_pointlights](http://mrdoob.github.com/three.js/assets/examples/09_walthead.png)](http://mrdoob.github.com/three.js/examples/lights_pointlights.html)
 [![geometry_birds](http://mrdoob.github.com/three.js/assets/examples/08_birds.png)](http://mrdoob.github.com/three.js/examples/geometry_birds.html)
 [![geometry_earth](http://mrdoob.github.com/three.js/assets/examples/07_earth.png)](http://mrdoob.github.com/three.js/examples/geometry_earth.html)
 [![geometry_terrain](http://mrdoob.github.com/three.js/assets/examples/06_terrain.png)](http://mrdoob.github.com/three.js/examples/geometry_terrain.html)
@@ -94,6 +95,7 @@ For creating a customised version of the library, including the source files in 
 	<script type="text/javascript" src="js/three/core/Vector3.js"></script>
 	<script type="text/javascript" src="js/three/core/Vector4.js"></script>
 	<script type="text/javascript" src="js/three/core/Rectangle.js"></script>
+	<script type="text/javascript" src="js/three/core/Matrix3.js"></script>
 	<script type="text/javascript" src="js/three/core/Matrix4.js"></script>
 	<script type="text/javascript" src="js/three/core/Vertex.js"></script>
 	<script type="text/javascript" src="js/three/core/Face3.js"></script>
@@ -110,15 +112,16 @@ For creating a customised version of the library, including the source files in 
 	<script type="text/javascript" src="js/three/objects/Line.js"></script>
 	<script type="text/javascript" src="js/three/objects/Mesh.js"></script>
 	<script type="text/javascript" src="js/three/materials/LineColorMaterial.js"></script>
-	<script type="text/javascript" src="js/three/materials/MeshBitmapUVMappingMaterial.js"></script>
+	<script type="text/javascript" src="js/three/materials/MeshPhongMaterial.js"></script>
+	<script type="text/javascript" src="js/three/materials/MeshBitmapMaterial.js"></script>
 	<script type="text/javascript" src="js/three/materials/MeshColorFillMaterial.js"></script>
 	<script type="text/javascript" src="js/three/materials/MeshColorStrokeMaterial.js"></script>
-	<script type="text/javascript" src="js/three/materials/MeshFaceColorFillMaterial.js"></script>
-	<script type="text/javascript" src="js/three/materials/MeshFaceColorStrokeMaterial.js"></script>
+	<script type="text/javascript" src="js/three/materials/MeshFaceMaterial.js"></script>
 	<script type="text/javascript" src="js/three/materials/ParticleBitmapMaterial.js"></script>
 	<script type="text/javascript" src="js/three/materials/ParticleCircleMaterial.js"></script>
 	<script type="text/javascript" src="js/three/scenes/Scene.js"></script>
 	<script type="text/javascript" src="js/three/renderers/Projector.js"></script>
+	<script type="text/javascript" src="js/three/renderers/DOMRenderer.js"></script>
 	<script type="text/javascript" src="js/three/renderers/CanvasRenderer.js"></script>
 	<script type="text/javascript" src="js/three/renderers/SVGRenderer.js"></script>
 	<script type="text/javascript" src="js/three/renderers/WebGLRenderer.js"></script>
@@ -132,10 +135,19 @@ For creating a customised version of the library, including the source files in 
 
 Thanks to the power of the internets (and github <3) these people have kindly helped out with the project.
 
-[philogb](http://github.com/philogb), [supereggbert](http://github.com/supereggbert), [kikko](http://github.com/kikko), [kile](http://kile.stravaganza.org/), ...
+[alteredq](http://github.com/alteredq), [philogb](http://github.com/philogb), [supereggbert](http://github.com/supereggbert), [kikko](http://github.com/kikko), [kile](http://kile.stravaganza.org/), ...
 
 
 ### Change Log ###
+
+2010 10 28 - **r25** (54.480 kb)
+
+* `WebGLRenderer` now up to date with other renderers! ([alteredq](http://github.com/alteredq))
+* .obj to .js python converter ([alteredq](http://github.com/alteredq))
+* Blender 2.54 exporter
+* Added `MeshFaceMaterial` (multipass per face)
+* Reworked `CanvasRenderer` and `SVGRenderer` material handling
+
 
 2010 10 06 - **r18** (44.420 kb)
 
