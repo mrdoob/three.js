@@ -88,13 +88,16 @@ THREE.Projector = function() {
 								_face3.v2.copy( v2.positionScreen );
 								_face3.v3.copy( v3.positionScreen );
 
-								_face3.centroidWorld.copy( face.centroid );
-								object.matrix.transform( _face3.centroidWorld );
-
 								_face3.normalWorld.copy( face.normal );
 								object.matrixRotation.transform( _face3.normalWorld );
 
-								_face3.z = Math.max( v1.positionScreen.z, Math.max( v2.positionScreen.z, v3.positionScreen.z ) );
+								_face3.centroidWorld.copy( face.centroid );
+								objectMatrix.transform( _face3.centroidWorld );
+
+								_face3.centroidScreen.copy( _face3.centroidWorld );
+								_projScreenMatrix.transform( _face3.centroidScreen );
+
+								_face3.z = _face3.centroidScreen.z;
 
 								_face3.meshMaterial = object.material;
 								_face3.faceMaterial = face.material;
@@ -128,13 +131,16 @@ THREE.Projector = function() {
 								_face4.v3.copy( v3.positionScreen );
 								_face4.v4.copy( v4.positionScreen );
 
-								_face4.centroidWorld.copy( face.centroid );
-								object.matrix.transform( _face4.centroidWorld );
-
 								_face4.normalWorld.copy( face.normal );
 								object.matrixRotation.transform( _face4.normalWorld );
 
-								_face4.z = Math.max( v1.positionScreen.z, Math.max( v2.positionScreen.z, Math.max( v3.positionScreen.z, v4.positionScreen.z ) ) );
+								_face4.centroidWorld.copy( face.centroid );
+								objectMatrix.transform( _face4.centroidWorld );
+
+								_face4.centroidScreen.copy( _face4.centroidWorld );
+								_projScreenMatrix.transform( _face4.centroidScreen );
+
+								_face4.z = _face4.centroidScreen.z;
 
 								_face4.meshMaterial = object.material;
 								_face4.faceMaterial = face.material;
@@ -179,7 +185,10 @@ THREE.Projector = function() {
 							_line = _linePool[ _lineCount ] = _linePool[ _lineCount ] || new THREE.RenderableLine();
 							_line.v1.copy( vertex.positionScreen );
 							_line.v2.copy( vertex2.positionScreen );
+
+							// TODO: Use centriums here too.
 							_line.z = Math.max( vertex.positionScreen.z, vertex2.positionScreen.z );
+
 							_line.material = object.material;
 
 							_renderList.push( _line );

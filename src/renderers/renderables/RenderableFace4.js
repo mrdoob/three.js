@@ -10,6 +10,8 @@ THREE.RenderableFace4 = function () {
 	this.v4 = new THREE.Vector2();
 
 	this.centroidWorld = new THREE.Vector3();
+	this.centroidScreen = new THREE.Vector3();
+
 	this.normalWorld = new THREE.Vector3();
 
 	this.z = null;

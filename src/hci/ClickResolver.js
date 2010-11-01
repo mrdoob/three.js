@@ -3,7 +3,7 @@ THREE.ClickResolver = function( camera, scene ) {
 
 	this.camera = camera;
 	this.scene  = scene;
-	this._debug = true;
+	this._debug = false;
 	
 };
 
@@ -127,14 +127,12 @@ THREE.ClickResolver.prototype = {
 			
 			if ( this._debug ) {
 
-				/*
 				this.logLine( scene, a, new THREE.Vector3().add( a, new THREE.Vector3().addSelf( face.normal ).multiplyScalar( 100 ) ), 0x0000FF );
 				this.logLine( scene, lineStart, lineStart.clone().addSelf( lineDirection ), 0x55FF88 );
 				this.logPoint( scene, a, 0xFF0000 ); // r
 				this.logPoint( scene, b, 0x00FF00 ); // g
 				this.logPoint( scene, c, 0x0000FF ); // b
 				if ( d ) this.logPoint( scene, d, 0xFFFF00 ); // y
-				*/
 			}
 
 			if ( dot < 0 ) { // Math.abs( dot ) > 0.0001
@@ -146,11 +144,17 @@ THREE.ClickResolver.prototype = {
 
 				if ( d == null ) {
 
+					/*
 					var ab = isInsideBoundary( planeIntersect, a, b, c );
 					var bc = isInsideBoundary( planeIntersect, b, c, a );
 					var ca = isInsideBoundary( planeIntersect, c, a, b );
 
 					if ( ab && bc && ca ) {
+					*/
+
+					// console.log( f, ab, bc, ca );
+
+					if ( pointInFace3Fast( planeIntersect, a, b, c ) ) {
 
 						if ( this._debug ) this.logPoint( scene, planeIntersect, 0x0000ff );
 						logIntersect( planeIntersect, face );
@@ -159,12 +163,15 @@ THREE.ClickResolver.prototype = {
 
 				} else {
 
+					/*
 					var ab = isInsideBoundary( planeIntersect, a, b, c );
 					var bc = isInsideBoundary( planeIntersect, b, c, d );
 					var cd = isInsideBoundary( planeIntersect, c, d, a );
 					var da = isInsideBoundary( planeIntersect, d, a, b );
 
 					if ( ab && bc && cd && da ) {
+					*/
+					if ( pointInFace4( planeIntersect, a, b, c, d ) ) {
 
 						if ( this._debug ) this.logPoint( scene, planeIntersect, 0x000000 );
 						logIntersect( planeIntersect, face );
@@ -191,6 +198,7 @@ THREE.ClickResolver.prototype = {
 
 		}
 
+		/*
 		function isInsideBoundary( pointOnPlaneToCheck, pointInside, boundaryPointA, boundaryPointB ) {
 
 			var toB = boundaryPointB.clone().subSelf( boundaryPointA );
@@ -199,7 +207,43 @@ THREE.ClickResolver.prototype = {
 			var pointMirror = pointMid.subSelf( pointInside ).multiplyScalar( 2 ).addSelf( pointInside );
 
 			return pointOnPlaneToCheck.distanceToSquared( pointInside ) < pointOnPlaneToCheck.distanceToSquared( pointMirror );
-		};
+		}
+		*/
+
+		// http://www.blackpawn.com/texts/pointinpoly/default.html
+
+		function pointInFace3( p, a, b, c ) {
+
+			return sameSide( p, a, b, c ) && sameSide( p, b, a, c ) && sameSide( p, c, a, b );
+
+		}
+
+		function pointInFace3Fast( p, a, b, c ) {
+
+			var v0 = c.clone().subSelf( a ), v1 = b.clone().subSelf( a ), v2 = p.clone().subSelf( a ),
+			dot00 = v0.dot( v0 ), dot01 = v0.dot( v1 ), dot02 = v0.dot( v2 ), dot11 = v1.dot( v1 ), dot12 = v1.dot( v2 ),
+
+			invDenom = 1 / ( dot00 * dot11 - dot01 * dot01 ),
+			u = ( dot11 * dot02 - dot01 * dot12 ) * invDenom,
+			v = ( dot00 * dot12 - dot01 * dot02 ) * invDenom;
+
+			return ( u > 0 ) && ( v > 0 ) && ( u + v < 1 );
+
+		}
+
+		function pointInFace4( p, a, b, c, d ) {
+
+			return sameSide( p, a, b, c ) && sameSide( p, b, c, d ) && sameSide( p, c, d, a ) && sameSide( p, c, a, b );
+
+		}
+
+		function sameSide( p1, p2, a, b ) {
+
+			var cp1 = new THREE.Vector3().cross( b.clone().subSelf( a ), p1.clone().subSelf( a ) );
+			var cp2 = new THREE.Vector3().cross( b.clone().subSelf( a ), p2.clone().subSelf( a ) );
+			return cp1.dot( cp2 ) >= 0;
+
+		}
 
 		return intersect;
 	}
