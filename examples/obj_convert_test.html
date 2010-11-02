@@ -42,11 +42,10 @@
         
         <div id="log"></div>
 
-        <script type="text/javascript" src="../build/Three.js"></script> 
 		<!--
+        <script type="text/javascript" src="../build/Three.js"></script> 
         -->
 
-		<!--
 		<script type="text/javascript" src="../src/Three.js"></script>
 		<script type="text/javascript" src="../src/core/Color.js"></script>
 		<script type="text/javascript" src="../src/core/Vector2.js"></script>
@@ -86,6 +85,7 @@
 		<script type="text/javascript" src="../src/renderers/renderables/RenderableFace4.js"></script>
 		<script type="text/javascript" src="../src/renderers/renderables/RenderableParticle.js"></script>
 		<script type="text/javascript" src="../src/renderers/renderables/RenderableLine.js"></script>
+		<!--
         -->
 		
 
@@ -179,7 +179,6 @@
                 mesh.position.z = 0;
                 mesh.rotation.x = 1.57;
                 mesh.scale.x = mesh.scale.y = mesh.scale.z = 10;
-                mesh.doubleSided = true;
                 mesh.updateMatrix();
                 scene.addObject(mesh);
                 
@@ -192,7 +191,6 @@
                     mesh.position.y = 300 * (Math.random() - 0) + FLOOR;
                     mesh.position.z = 100 * (Math.random() - 1);
                     mesh.scale.x = mesh.scale.y = mesh.scale.z = 0.25 * (Math.random() + 0.5);
-                    //mesh.doubleSided = true;
                     mesh.overdraw = true;
                     mesh.updateMatrix();
                     scene.addObject(mesh);
@@ -217,6 +215,7 @@
                 if ( render_gl ) {
                     try {
                         webglRenderer = new THREE.WebGLRenderer();
+                        webglRenderer.setFaceCulling(0);
                         webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
                         container.appendChild( webglRenderer.domElement );
                         has_gl = 1;
