@@ -4,9 +4,11 @@
 How to use this converter
 -------------------------
 
-python convert_obj_threejs.py -i filename.obj -o filename.js [-a center|top|bottom]
+python convert_obj_threejs.py -i filename.obj -o filename.js [-a center|top|bottom] [-s smooth|flat]
 
-Note: by default, model is centered (middle of bounding box goes to 0,0,0).
+Note: by default, model is centered (middle of bounding box goes to 0,0,0) 
+      and uses smooth shading (if there were vertex normals in the original 
+      model).
  
 --------------------------------------------------
 How to use generated JS file in your HTML document
@@ -41,19 +43,16 @@ Current limitations
     - for the moment, only diffuse color and texture are used 
       (will need to extend shaders / renderers / materials in Three)
      
-    - models cannot have more than 65,536 vertices
-      (this comes from WebGL using just 16-bit indices,
-       could be worked around by expanding indexed
-       faces into full vertex definitions)
+    - models can have more than 65,536 vertices,
+      but in most cases it will not work well with browsers,
+      which currently seem to have troubles with handling
+      large JS files
        
     - texture coordinates can be wrong in canvas renderer
       (there is crude normalization, but it doesn't
        work for all cases)
        
-    - everything is using smoothing
-      (if you want flat shading for whole mesh, 
-       don't export normals, then Three will 
-       compute own normals)
+    - smoothing can be turned on/off only for the whole mesh
 
 ---------------------------------------------- 
 How to get proper OBJ + MTL files with Blender
@@ -112,6 +111,8 @@ import sys
 # Configuration
 # #####################################################
 ALIGN = "center" # center bottom top none
+
+SHADING = "smooth" # flat smooth
 
 # default colors for debugging (each material gets one distinct color): 
 # white, red, green, blue, yellow, cyan, magenta
@@ -651,7 +652,7 @@ def generate_uv(f, uvs):
     
 def generate_face(f):
     vi = f['vertex']
-    if f["normal"]:
+    if f["normal"] and SHADING == "smooth":
         ni = f['normal']
         if len(vi) == 3:
             return TEMPLATE_FACE3N % (vi[0]-1, vi[1]-1, vi[2]-1, f['material'], ni[0]-1, ni[1]-1, ni[2]-1)
@@ -775,12 +776,16 @@ def convert(infile, outfile):
         else:
             print "Couldn't find [%s]" % fname
     
+    normals_string = ""
+    if SHADING == "smooth":
+        normals_string = ",".join(generate_normal(n) for n in normals)
+        
     text = TEMPLATE_FILE % {
     "name"      : get_name(outfile),
     "vertices"  : "\n".join([generate_vertex(v) for v in vertices]),
     "faces"     : "\n".join([generate_face(f)   for f in faces]),
     "uvs"       : uv_string,
-    "normals"   : ",".join(generate_normal(n) for n in normals),
+    "normals"   : normals_string,
     
     "materials" : generate_materials(mtl, materials),
     
@@ -800,7 +805,7 @@ def convert(infile, outfile):
 # Helpers
 # #############################################################################
 def usage():
-    print "Usage: %s -i filename.obj -o filename.js [-a center|top|bottom]" % os.path.basename(sys.argv[0])
+    print "Usage: %s -i filename.obj -o filename.js [-a center|top|bottom] [-s flat|smooth]" % os.path.basename(sys.argv[0])
         
 # #####################################################
 # Main
@@ -809,7 +814,7 @@ if __name__ == "__main__":
     
     # get parameters from the command line
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hi:o:a:", ["help", "input=", "output=", "align="])
+        opts, args = getopt.getopt(sys.argv[1:], "hi:o:a:s:", ["help", "input=", "output=", "align=", "shading="])
     
     except getopt.GetoptError:
         usage()
@@ -831,7 +836,11 @@ if __name__ == "__main__":
         elif o in ("-a", "--align"):
             if a in ("top", "bottom", "center"):
                 ALIGN = a
-    
+
+        elif o in ("-s", "--shading"):
+            if a in ("flat", "smooth"):
+                SHADING = a
+
     if infile == "" or outfile == "":
         usage()
         sys.exit(2)
