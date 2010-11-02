@@ -5,6 +5,9 @@ Core
 Examples
 * DOMRenderer example
 
+Examples/Geometry/Primitives
+* Create more primitives. http://code.google.com/p/ogre-procedural/source/browse/#hg/library/src
+
 Materials
 * MeshBitmapSphereMappingMaterial. http://en.wikipedia.org/wiki/Sphere_mapping
 * MeshBitmapCubeMappingMaterial. http://en.wikipedia.org/wiki/Cube_mapping

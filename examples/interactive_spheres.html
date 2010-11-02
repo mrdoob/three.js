@@ -75,11 +75,7 @@
 
 			var cube, plane;
 
-			var targetRotation = 0;
-			var targetRotationOnMouseDown = 0;
-
-			var mouseX = 0;
-			var mouseXOnMouseDown = 0;
+			var mouseX = 0, mouseY = 0, projector;
 
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
@@ -130,7 +126,7 @@
 				cube.position.y = 150;
 				scene.addObject(cube);
 
-				geometry2 = new Sphere( 100 );
+				geometry2 = new Sphere( 100, 20, 20 );
 
 				for (var i = 0, l = geometry2.faces.length; i < l; i++) {
 
@@ -148,12 +144,11 @@
 				cube2.position.z = 300;
 				scene.addObject(cube2);
 
-				/*
 				var geometry = new THREE.Geometry();
 
 				for (var i = 0; i < 100; i ++) {
 
-					var v = new THREE.Vector3( Math.random() * 100 - 50, Math.random() * 100 - 50, Math.random() * 100 - 50 );
+					var v = new THREE.Vector3( Math.random() * 1000 - 500, Math.random() * 1000 - 500, Math.random() * 1000 - 500 );
 
 					var v0 = new THREE.Vertex( new THREE.Vector3( Math.random() * 100 - 50, Math.random() * 100 - 50, Math.random() * 100 - 50 ) );
 					var v1 = new THREE.Vertex( new THREE.Vector3( Math.random() * 100 - 50, Math.random() * 100 - 50, Math.random() * 100 - 50 ) );
@@ -172,10 +167,11 @@
 				geometry.computeCentroids();
 
 				var mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial() );
-				mesh.doubleSided = true;
-				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
+				// mesh.doubleSided = true;
+				// mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
 				scene.addObject(mesh);
-				*/
+
+				projector = new THREE.Projector();
 
 				renderer = new THREE.CanvasRenderer();
 				renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -188,29 +184,43 @@
 				container.appendChild(stats.domElement);
 
 				document.addEventListener('mousedown', onDocumentMouseDown, false);
+				// document.addEventListener('mousemove', onDocumentMouseMove, false);
 			}
 
 			function onDocumentMouseDown( event ) {
 
 				event.preventDefault();
 
-				document.getElementById("msg").innerHTML = ""; 
+				document.getElementById("msg").innerHTML = "";
 
-				clickResolver.findIntersectInScene(
-						event.clientX/window.innerWidth,
-						event.clientY/window.innerHeight);
+				clickResolver.findIntersectInScene( event.clientX / window.innerWidth, event.clientY / window.innerHeight );
+
+				var vector = projector.unprojectVector( new THREE.Vector3( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1, 0.95 ), camera );
+
+				var particle = new THREE.Particle( new THREE.ParticleCircleMaterial( 0xff0000 ) );
+				particle.position = vector;
+
+				scene.addObject( particle );
+			}
+
+			function onDocumentMouseMove( event ) {
+
+				mouseX = event.clientX / window.innerWidth;
+				mouseY = event.clientY / window.innerHeight;
 
 			}
 
 			var radius = 600;
 			var theta = 0;
-			
+
 			function loop() {
 
-				theta += 1;
+				theta += 0.2;
 				camera.position.x = radius * Math.sin( theta * Math.PI / 360 );
 				// camera.position.y = radius * Math.sin( theta * Math.PI / 360 );
 				camera.position.z = radius * Math.cos( theta * Math.PI / 360 );
+
+				// clickResolver.findIntersectInScene( mouseX, mouseY );
 
 				renderer.render(scene, camera);
 				stats.update();
