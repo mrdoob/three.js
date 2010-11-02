@@ -756,8 +756,10 @@ def convert(infile, outfile):
             
 
     # default materials with debug colors for when
-    # there is no specified MTL, if loading failed
-    # or there were null materials
+    # there is no specified MTL / MTL loading failed,
+    # or if there were no materials / null materials
+    if not materials:
+        materials = { 'default':0 }
     mtl = generate_mtl(materials)
     
     if mtllib:
