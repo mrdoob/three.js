@@ -32,11 +32,11 @@ THREE.Mesh.prototype.sortFacesByMaterial = function () {
 	// which could then use vertex color attributes instead of each being
 	// in its separate VBO
 
-	var i, l, f, fl, face, material, hash_array;
+	var i, l, f, fl, face, material, vertices, mhash, ghash, hash_map = {};
 
 	function materialHash( material ) {
 
-		hash_array = [];
+		var hash_array = [];
 
 		for ( i = 0, l = material.length; i < l; i++ ) {
 
@@ -60,20 +60,44 @@ THREE.Mesh.prototype.sortFacesByMaterial = function () {
 
 		face = this.geometry.faces[ f ];
 		material = face.material;
+		
+		mhash = materialHash( material );
 
-		hash = materialHash( material);
-
-		if ( this.materialFaceGroup[ hash ] == undefined ) {
-
-			this.materialFaceGroup[ hash ] = { 'faces': [], 'material': material };
-
+		if ( hash_map[ mhash ] == undefined ) {
+			
+			hash_map[ mhash ] = { 'hash': mhash, 'counter': 0 };
 		}
 
-		this.materialFaceGroup[ hash ].faces.push( f );
+		ghash = hash_map[ mhash ].hash + "_" + hash_map[ mhash ].counter;
+
+		if ( this.materialFaceGroup[ ghash ] == undefined ) {
+
+			this.materialFaceGroup[ ghash ] = { 'faces': [], 'material': material, 'vertices': 0 };
+
+		}
+		
+		vertices = face instanceof THREE.Face3 ? 3 : 4;
+
+		if ( this.materialFaceGroup[ ghash ].vertices + vertices > 65535 ) {
+			
+			hash_map[ mhash ].counter += 1;
+			ghash = hash_map[ mhash ].hash + "_" + hash_map[ mhash ].counter;
+			
+			if ( this.materialFaceGroup[ ghash ] == undefined ) {
+
+				this.materialFaceGroup[ ghash ] = { 'faces': [], 'material': material, 'vertices': 0 };
+
+			}
+			
+		}
+		
+		this.materialFaceGroup[ ghash ].faces.push( f );
+		this.materialFaceGroup[ ghash ].vertices += vertices;
+		
 
 	}
 
-}
+};
 
 THREE.Mesh.prototype.normalizeUVs = function () {
 
@@ -95,4 +119,4 @@ THREE.Mesh.prototype.normalizeUVs = function () {
 
 	}
 
-}
+};
