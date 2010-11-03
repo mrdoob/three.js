@@ -33,7 +33,7 @@
 			<p>Using a modified version of <a href="http://github.com/alteredq/three.js">Three.js</a> by mrdoob.
 			
 			<br/>
-			<p>Best viewed in Chrome 7/8 or Firefox 4 using WebGL renderer.
+			<p>Best viewed in Chrome 8/9 or Firefox 4 using WebGL renderer.
 			<p>Canvas renderer is very slow on anything other than Chrome.
 		</div>
 		
@@ -58,6 +58,7 @@
 		<script type="text/javascript" src="../src/core/UV.js"></script>
 		<script type="text/javascript" src="../src/core/Geometry.js"></script>
 		<script type="text/javascript" src="../src/cameras/Camera.js"></script>
+		<script type="text/javascript" src="../src/io/Loader.js"></script>
 		<script type="text/javascript" src="../src/lights/Light.js"></script>
 		<script type="text/javascript" src="../src/lights/AmbientLight.js"></script>
 		<script type="text/javascript" src="../src/lights/DirectionalLight.js"></script>
@@ -211,34 +212,24 @@
 				bcanvas.addEventListener("click", toggleCanvas, false);
 				bwebgl.addEventListener("click", toggleWebGL, false);
 
-				function createModel() {
-					
-					// MESH
-					
-					geometry = new Torus( );
-					zmesh = new THREE.Mesh( geometry, new THREE.MeshColorFillMaterial( 0xffffff ) );
-					zmesh.position.x = 0;
-					zmesh.position.z = 0;
-					zmesh.position.y = 0;
-					zmesh.scale.x = zmesh.scale.y = zmesh.scale.z = 100;
-					zmesh.overdraw = true;
-					zmesh.updateMatrix();
-					scene.addObject(zmesh);
-					
-				}
 
-				loadAsync( "obj/torus/Torus.js", createModel);
+				var loader = new THREE.Loader();
+				loader.loadAsync( "obj/torus/Torus.js", function() { createScene( new Torus() ) } );
+				//loader.loadWorker( "obj/torus/Torus_slim.js", function( geometry ) { createScene( geometry ) } );
 
 			}
 
-			function loadAsync( url, callback ) {
+			function createScene( geometry ) {
 				
-				var el = document.createElement( 'script' );
-				el.type = 'text/javascript';
-				el.onload = callback;
-				el.src = url;
-				document.getElementsByTagName("head")[0].appendChild(el);
-
+				zmesh = new THREE.Mesh( geometry, new THREE.MeshColorFillMaterial( 0xffffff ) );
+				zmesh.position.x = 0;
+				zmesh.position.z = 0;
+				zmesh.position.y = 0;
+				zmesh.scale.x = zmesh.scale.y = zmesh.scale.z = 100;
+				zmesh.overdraw = true;
+				zmesh.updateMatrix();
+				scene.addObject(zmesh);
+				
 			}
 
 			

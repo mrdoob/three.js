@@ -63,6 +63,7 @@
 		<script type="text/javascript" src="../src/core/UV.js"></script>
 		<script type="text/javascript" src="../src/core/Geometry.js"></script>
 		<script type="text/javascript" src="../src/cameras/Camera.js"></script>
+		<script type="text/javascript" src="../src/io/Loader.js"></script>
 		<script type="text/javascript" src="../src/lights/Light.js"></script>
 		<script type="text/javascript" src="../src/lights/AmbientLight.js"></script>
 		<script type="text/javascript" src="../src/lights/DirectionalLight.js"></script>
@@ -88,6 +89,7 @@
 		<script type="text/javascript" src="../src/renderers/renderables/RenderableFace4.js"></script>
 		<script type="text/javascript" src="../src/renderers/renderables/RenderableParticle.js"></script>
 		<script type="text/javascript" src="../src/renderers/renderables/RenderableLine.js"></script>
+		
 		-->
 		
 		<script type="text/javascript" src="geometry/primitives/Sphere.js"></script>
@@ -107,7 +109,7 @@
 			var scene;
 			var canvasRenderer, webglRenderer;
 
-			var mesh, zmesh, lightMesh, geometry;
+			var mesh, zmesh, lightMesh;
 			
 			var directionalLight, pointLight;
 			
@@ -217,36 +219,28 @@
 				bcanvas.addEventListener("click", toggleCanvas, false);
 				bwebgl.addEventListener("click", toggleWebGL, false);
 
-				function createModel() {
-					
-					geometry = new Lucy100k( );
-					
-					addMesh( geometry, 0.75, 900, 0, 0, 0,0,0, new THREE.MeshPhongMaterial( 0x030303, 0x030303, 0x990000, 30, 1.0 ) );
-					addMesh( geometry, 0.75, 300, 0, 0, 0,0,0, new THREE.MeshFaceMaterial( ) );
-					addMesh( geometry, 0.75, -300, 0, 0, 0,0,0, new THREE.MeshPhongMaterial( 0x030303, 0x111111, 0xffaa00, 10, 1.0 )  );
-					addMesh( geometry, 0.75, -900, 0, 0, 0,0,0, new THREE.MeshPhongMaterial( 0x030303, 0x555555, 0x666666, 10, 1.0 )  );
-					
-					/*
-					log( "geometry.vertices: " + geometry.vertices.length );
-					log( "geometry.faces: " + geometry.faces.length );
-					*/
 
-				}
-
-				loadAsync( "obj/lucy/Lucy100k.js", createModel );
-
-			}
-
-			function loadAsync( url, callback ) {
+				var s = (new Date).getTime();
 				
-				var el = document.createElement( 'script' );
-				el.type = 'text/javascript';
-				el.onload = callback;
-				el.src = url;
-				document.getElementsByTagName("head")[0].appendChild(el);
-
+				var loader = new THREE.Loader();
+				//loader.loadAsync( "obj/lucy/Lucy100k.js", function() { createScene( new Lucy100k(), s ) } );
+				loader.loadWorker( 'obj/lucy/Lucy100k_slim.js', function( geometry ) { createScene( geometry, s ) } );
+				
 			}
+			
+			function createScene( geometry, start ) {
+				
+				addMesh( geometry, 0.75, 900, 0, 0, 0,0,0, new THREE.MeshPhongMaterial( 0x030303, 0x030303, 0x990000, 30, 1.0 ) );
+				addMesh( geometry, 0.75, 300, 0, 0, 0,0,0, new THREE.MeshFaceMaterial( ) );
+				addMesh( geometry, 0.75, -300, 0, 0, 0,0,0, new THREE.MeshPhongMaterial( 0x030303, 0x111111, 0xffaa00, 10, 1.0 )  );
+				addMesh( geometry, 0.75, -900, 0, 0, 0,0,0, new THREE.MeshPhongMaterial( 0x030303, 0x555555, 0x666666, 10, 1.0 )  );
+				
+				log( "geometry.vertices: " + geometry.vertices.length );
+				log( "geometry.faces: " + geometry.faces.length );
 
+				log( "model loaded and created in " + ((new Date).getTime() - start) + " ms" );
+				
+			}
 			
 			function onDocumentMouseMove(event) {
 
