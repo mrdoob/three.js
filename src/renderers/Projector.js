@@ -240,13 +240,12 @@ THREE.Projector = function() {
 
 	this.unprojectVector = function ( vector, camera ) {
 
-		var vector2 = vector.clone(),
-		matrix = new THREE.Matrix4();
+		var matrix = new THREE.Matrix4();
 
 		matrix.multiply( THREE.Matrix4.makeInvert( camera.matrix ), THREE.Matrix4.makeInvert( camera.projectionMatrix ) );
-		matrix.transform( vector2 );
+		matrix.transform( vector );
 
-		return vector2;
+		return vector;
 
 	};
 

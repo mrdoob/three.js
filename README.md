@@ -94,6 +94,7 @@ For creating a customised version of the library, including the source files in 
 	<script type="text/javascript" src="js/three/core/Vector2.js"></script>
 	<script type="text/javascript" src="js/three/core/Vector3.js"></script>
 	<script type="text/javascript" src="js/three/core/Vector4.js"></script>
+	<script type="text/javascript" src="js/three/core/Ray.js"></script>
 	<script type="text/javascript" src="js/three/core/Rectangle.js"></script>
 	<script type="text/javascript" src="js/three/core/Matrix3.js"></script>
 	<script type="text/javascript" src="js/three/core/Matrix4.js"></script>
@@ -103,6 +104,7 @@ For creating a customised version of the library, including the source files in 
 	<script type="text/javascript" src="js/three/core/UV.js"></script>
 	<script type="text/javascript" src="js/three/core/Geometry.js"></script>
 	<script type="text/javascript" src="js/three/cameras/Camera.js"></script>
+	<script type="text/javascript" src="js/three/io/Loader.js"></script>
 	<script type="text/javascript" src="js/three/lights/Light.js"></script>
 	<script type="text/javascript" src="js/three/lights/AmbientLight.js"></script>
 	<script type="text/javascript" src="js/three/lights/DirectionalLight.js"></script>
@@ -131,14 +133,18 @@ For creating a customised version of the library, including the source files in 
 	<script type="text/javascript" src="js/three/renderers/renderables/RenderableLine.js"></script>
 
 
-### Contributors ###
-
-Thanks to the power of the internets (and github <3) these people have kindly helped out with the project.
-
-[alteredq](http://github.com/alteredq), [philogb](http://github.com/philogb), [supereggbert](http://github.com/supereggbert), [kikko](http://github.com/kikko), [kile](http://kile.stravaganza.org/), ...
-
-
 ### Change Log ###
+
+2010 11 04 - **r28** (62.802 kb)
+
+* `Loader` class allows load geometry asynchronously at runtime. ([alteredq](http://github.com/alteredq))
+* `MeshPhongMaterial' working with `WebGLRenderer`. ([alteredq](http://github.com/alteredq))
+* Support for *huge* objects. Max 500k polys and counting. ([alteredq](http://github.com/alteredq))
+* `Projector.unprojectVector` and `Ray` class to check intersections with faces (based on [mindlapse](https://github.com/mindlapse) work)
+* Fixed `CanvasRenderer` and `SVGRenderer` z-sorting (not as jumpy anymore).
+* Fixed Orthographic projection (was y-inverted).
+* Hmmm.. lib file size starting to get too big...
+
 
 2010 10 28 - **r25** (54.480 kb)
 

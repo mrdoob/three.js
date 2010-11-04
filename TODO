@@ -1,6 +1,5 @@
 Core
 * Simple hierarchy system (look at D1plo1d and tamask branches)
-* Interaction, 2D to 3D projection. (look at mindlapse branch)
 
 Examples
 * DOMRenderer example
