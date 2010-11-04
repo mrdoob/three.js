@@ -37,10 +37,11 @@ THREE.Ray.prototype = {
 
 	intersectObject: function ( object ) {
 
-		var f, fl, face, a, b, c, d, dot, s,
+		var f, fl, face, a, b, c, d, normal,
+		dot, scalar,
 		origin, direction,
 		geometry = object.geometry,
-		matrix = object.matrix,
+		vertices = geometry.vertices,
 		intersect, intersects = [],
 		intersectPoint;
 
@@ -48,21 +49,21 @@ THREE.Ray.prototype = {
 
 			face = geometry.faces[ f ];
 
-			// if ( !face.selectable ) continue;
-
-			a = matrix.transform( geometry.vertices[ face.a ].position.clone() );
-			b = matrix.transform( geometry.vertices[ face.b ].position.clone() );
-			c = matrix.transform( geometry.vertices[ face.c ].position.clone() );
-			d = face instanceof THREE.Face4 ? matrix.transform( geometry.vertices[ face.d ].position.clone() ) : null;
-
 			origin = this.origin.clone();
 			direction = this.direction.clone();
-			dot = face.normal.dot( direction );
+
+			a = object.matrix.transform( vertices[ face.a ].position.clone() );
+			b = object.matrix.transform( vertices[ face.b ].position.clone() );
+			c = object.matrix.transform( vertices[ face.c ].position.clone() );
+			d = face instanceof THREE.Face4 ? object.matrix.transform( vertices[ face.d ].position.clone() ) : null;
+
+			normal = object.matrixRotation.transform( face.normal.clone() );
+			dot = direction.dot( normal );
 
 			if ( dot < 0 ) { // Math.abs( dot ) > 0.0001
 
-				s = face.normal.dot( new THREE.Vector3().sub( a, origin ) ) / dot;
-				intersectPoint = origin.addSelf( direction.multiplyScalar( s ) );
+				scalar = normal.dot( new THREE.Vector3().sub( a, origin ) ) / dot;
+				intersectPoint = origin.addSelf( direction.multiplyScalar( scalar ) );
 
 				if ( face instanceof THREE.Face3 ) {
 
@@ -101,13 +102,13 @@ THREE.Ray.prototype = {
 				}
 
 			}
-			
+
 		}
-		
+
 		return intersects;
-		
+
 		// http://www.blackpawn.com/texts/pointinpoly/default.html
-		
+
 		function pointInFace3( p, a, b, c ) {
 
 			var v0 = c.clone().subSelf( a ), v1 = b.clone().subSelf( a ), v2 = p.clone().subSelf( a ),

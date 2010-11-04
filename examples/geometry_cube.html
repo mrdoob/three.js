@@ -50,16 +50,16 @@
 
 			function init() {
 
-				container = document.createElement('div');
-				document.body.appendChild(container);
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
 
-				var info = document.createElement('div');
+				var info = document.createElement( 'div' );
 				info.style.position = 'absolute';
 				info.style.top = '10px';
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
 				info.innerHTML = 'Drag to spin the cube';
-				container.appendChild(info);
+				container.appendChild( info );
 
 				camera = new THREE.Camera( 70, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
 				camera.position.y = 150;

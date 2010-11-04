@@ -160,7 +160,6 @@ For creating a customised version of the library, including the source files in 
 * Added `PointLight`
 * `CanvasRenderer` and `SVGRenderer` basic lighting support (ColorStroke/ColorFill only)
 * `Renderer` > `Projector`. `CanvasRenderer`, `SVGRenderer` and `DOMRenderer` do not extend anymore
-* Interactivity base code (hdi folder). To be refactored... ([mindlapse](http://github.com/mindlapse))
 * Added `computeCentroids` method to `Geometry`
 
 
