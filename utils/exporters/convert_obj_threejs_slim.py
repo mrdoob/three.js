@@ -143,28 +143,33 @@ var model = {
 
     'vertices': [%(vertices)s],
 
-    'uvs': [%(uvs)s],
+    'uvs_tri': [%(uvs_tri)s],
+    'uvs_quad': [%(uvs_quad)s],
 
-    'faces': [%(faces)s],
-    
+    'triangles': [%(triangles)s],
+    'triangles_n': [%(triangles_n)s],
+
+    'quads': [%(quads)s],
+    'quads_n': [%(quads_n)s],
+
     'end': (new Date).getTime()
     }
     
 postMessage( model );
 """
 
-TEMPLATE_VERTEX = "[%f,%f,%f]"
+TEMPLATE_VERTEX = "%f,%f,%f"
 
-TEMPLATE_UV3 = "[%f,%f,%f,%f,%f,%f]"
-TEMPLATE_UV4 = "[%f,%f,%f,%f,%f,%f,%f,%f]"
+TEMPLATE_UV_TRI = "%f,%f,%f,%f,%f,%f"
+TEMPLATE_UV_QUAD = "%f,%f,%f,%f,%f,%f,%f,%f"
 
-TEMPLATE_FACE3  = "[%d,%d,%d,%d]"
-TEMPLATE_FACE4  = "[%d,%d,%d,%d,%d]"
+TEMPLATE_TRI  = "%d,%d,%d,%d"
+TEMPLATE_QUAD  = "%d,%d,%d,%d,%d"
 
-TEMPLATE_FACE3N  = "[%d,%d,%d,%d,%d,%d,%d]"
-TEMPLATE_FACE4N  = "[%d,%d,%d,%d,%d,%d,%d,%d,%d]"
+TEMPLATE_TRI_N  = "%d,%d,%d,%d,%d,%d,%d"
+TEMPLATE_QUAD_N  = "%d,%d,%d,%d,%d,%d,%d,%d,%d"
 
-TEMPLATE_N = "[%f,%f,%f]"
+TEMPLATE_N = "%f,%f,%f"
 
 # #####################################################
 # Utils
@@ -509,37 +514,43 @@ def parse_obj(fname):
 def generate_vertex(v):
     return TEMPLATE_VERTEX % (v[0], v[1], v[2])
     
-def generate_uv(f, uvs):
+def generate_uv_tri(f, uvs):
     ui = f['uv']
-    if len(ui) == 3:
-        return TEMPLATE_UV3 % (uvs[ui[0]-1][0], 1.0 - uvs[ui[0]-1][1],
-                               uvs[ui[1]-1][0], 1.0 - uvs[ui[1]-1][1],
-                               uvs[ui[2]-1][0], 1.0 - uvs[ui[2]-1][1])
-    elif len(ui) == 4:
-        return TEMPLATE_UV4 % (uvs[ui[0]-1][0], 1.0 - uvs[ui[0]-1][1],
-                               uvs[ui[1]-1][0], 1.0 - uvs[ui[1]-1][1],
-                               uvs[ui[2]-1][0], 1.0 - uvs[ui[2]-1][1],
-                               uvs[ui[3]-1][0], 1.0 - uvs[ui[3]-1][1])
-    return ""
+    return TEMPLATE_UV_TRI % (uvs[ui[0]-1][0], 1.0 - uvs[ui[0]-1][1],
+                           uvs[ui[1]-1][0], 1.0 - uvs[ui[1]-1][1],
+                           uvs[ui[2]-1][0], 1.0 - uvs[ui[2]-1][1])
     
-def generate_face(f):
+def generate_uv_quad(f, uvs):
+    ui = f['uv']
+    return TEMPLATE_UV_QUAD % (uvs[ui[0]-1][0], 1.0 - uvs[ui[0]-1][1],
+                           uvs[ui[1]-1][0], 1.0 - uvs[ui[1]-1][1],
+                           uvs[ui[2]-1][0], 1.0 - uvs[ui[2]-1][1],
+                           uvs[ui[3]-1][0], 1.0 - uvs[ui[3]-1][1])
+
+def generate_triangle(f):
     vi = f['vertex']
-    if f["normal"] and SHADING == "smooth":
-        ni = f['normal']
-        if len(vi) == 3:
-            return TEMPLATE_FACE3N % (vi[0]-1, vi[1]-1, vi[2]-1, f['material'], ni[0]-1, ni[1]-1, ni[2]-1)
-        elif len(vi) == 4:
-            return TEMPLATE_FACE4N % (vi[0]-1, vi[1]-1, vi[2]-1, vi[3]-1, f['material'],  ni[0]-1, ni[1]-1, ni[2]-1, ni[3]-1)
-    else:
-        if len(vi) == 3:
-            return TEMPLATE_FACE3 % (vi[0]-1, vi[1]-1, vi[2]-1, f['material'])
-        elif len(vi) == 4:
-            return TEMPLATE_FACE4 % (vi[0]-1, vi[1]-1, vi[2]-1, vi[3]-1, f['material'])
-    return ""
+    return TEMPLATE_TRI % (vi[0]-1, vi[1]-1, vi[2]-1, f['material'])
+
+def generate_triangle_n(f):
+    vi = f['vertex']
+    ni = f['normal']
+    return TEMPLATE_TRI_N % (vi[0]-1, vi[1]-1, vi[2]-1, f['material'], ni[0]-1, ni[1]-1, ni[2]-1)
+
+def generate_quad(f):
+    vi = f['vertex']
+    return TEMPLATE_QUAD % (vi[0]-1, vi[1]-1, vi[2]-1, vi[3]-1, f['material'])
+
+def generate_quad_n(f):
+    vi = f['vertex']
+    ni = f['normal']
+    return TEMPLATE_QUAD_N % (vi[0]-1, vi[1]-1, vi[2]-1, vi[3]-1, f['material'],  ni[0]-1, ni[1]-1, ni[2]-1, ni[3]-1)
 
 def generate_normal(n):
     return TEMPLATE_N % (n[0], n[1], n[2])
 
+# #####################################################
+# Materials
+# #####################################################
 def generate_color(i):
     """Generate hex color corresponding to integer.
     
@@ -599,6 +610,21 @@ def generate_mtl(materials):
     return mtl
     
 # #####################################################
+# Faces
+# #####################################################
+def is_triangle_flat(f):
+    return len(f['vertex'])==3 and not (f["normal"] and SHADING == "smooth")
+    
+def is_triangle_smooth(f):
+    return len(f['vertex'])==3 and f["normal"] and SHADING == "smooth"
+    
+def is_quad_flat(f):
+    return len(f['vertex'])==4 and not (f["normal"] and SHADING == "smooth")
+    
+def is_quad_smooth(f):
+    return len(f['vertex'])==4 and f["normal"] and SHADING == "smooth"
+
+# #####################################################
 # API
 # #####################################################
 def convert(infile, outfile):
@@ -623,9 +649,11 @@ def convert(infile, outfile):
     
     random.seed(42) # to get well defined color order for materials
     
-    uv_string = ""
+    uv_string_tri = ""
+    uv_string_quad = ""
     if len(uvs)>0:
-        uv_string = ",".join([generate_uv(f, uvs) for f in faces])
+        uv_string_tri  = ",".join([generate_uv_tri(f, uvs)  for f in faces if len(f['uv']) == 3])
+        uv_string_quad = ",".join([generate_uv_quad(f, uvs) for f in faces if len(f['uv']) == 4])
             
 
     # default materials with debug colors for when
@@ -653,11 +681,15 @@ def convert(infile, outfile):
         normals_string = ",".join(generate_normal(n) for n in normals)
         
     text = TEMPLATE_FILE % {
-    "name"      : get_name(outfile),
-    "vertices"  : ",".join([generate_vertex(v) for v in vertices]),
-    "faces"     : ",".join([generate_face(f)   for f in faces]),
-    "uvs"       : uv_string,
-    "normals"   : normals_string,
+    "name"       : get_name(outfile),
+    "vertices"   : ",".join([generate_vertex(v) for v in vertices]),
+    "triangles"  : ",".join([generate_triangle(f) for f in faces if is_triangle_flat(f)]),
+    "triangles_n": ",".join([generate_triangle_n(f) for f in faces if is_triangle_smooth(f)]),
+    "quads"      : ",".join([generate_quad(f) for f in faces if is_quad_flat(f)]),
+    "quads_n"    : ",".join([generate_quad_n(f) for f in faces if is_quad_smooth(f)]),
+    "uvs_tri"    : uv_string_tri,
+    "uvs_quad"   : uv_string_quad,
+    "normals"    : normals_string,
     
     "materials" : generate_materials(mtl, materials),
     

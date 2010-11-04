@@ -50,12 +50,14 @@ THREE.Loader.prototype = {
 			
 			function init_vertices() {
 			
-				var i, l, d;
+				var i, l, x, y, z;
 				
-				for( i = 0, l = data.vertices.length; i < l; i++ ) {
+				for( i = 0, l = data.vertices.length/3; i < l; i++ ) {
 					
-					d = data.vertices[i];
-					v( d[0], d[1], d[2] );
+					x = data.vertices[ i*3     ];
+					y = data.vertices[ i*3 + 1 ];
+					z = data.vertices[ i*3 + 2 ];
+					v( x, y, z );
 					
 				}
 			
@@ -63,51 +65,104 @@ THREE.Loader.prototype = {
 
 			function init_uvs() {
 			
-				var i, l, d;
+				var i, l, d, ua, ub, uc, ud, va, vb, vc, vd;
 				
-				for( i = 0, l = data.uvs.length; i < l; i++ ) {
+				for( i = 0, l = data.uvs_tri.length; i < l; i++ ) {
 					
-					d = data.uvs[i];
-					if ( d.length == 6 ) {
-						
-						uv( d[0], d[1], d[2], d[3], d[4], d[5] );
-						
-					} else if ( d.length == 8 ) {
+					ua = data.uvs_tri[ i*6     ];
+					va = data.uvs_tri[ i*6 + 1 ];
 					
-						uv( d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7] );
+					ub = data.uvs_tri[ i*6 + 2 ];
+					vb = data.uvs_tri[ i*6 + 3 ];
 					
-					}
-						
+					uc = data.uvs_tri[ i*6 + 4 ];
+					vc = data.uvs_tri[ i*6 + 5 ];
+					
+					uv( ua, va, ub, vb, uc, vc );
+					
+				}
+				
+				for( i = 0, l = data.uvs_quad.length; i < l; i++ ) {
+					
+					ua = data.uvs_quad[ i*8     ];
+					va = data.uvs_quad[ i*8 + 1 ];
+					
+					ub = data.uvs_quad[ i*8 + 2 ];
+					vb = data.uvs_quad[ i*8 + 3 ];
+					
+					uc = data.uvs_quad[ i*8 + 4 ];
+					vc = data.uvs_quad[ i*8 + 5 ];
+					
+					ud = data.uvs_quad[ i*8 + 6 ];
+					vd = data.uvs_quad[ i*8 + 7 ];
+					
+					uv( ua, va, ub, vb, uc, vc, ud, vd );
+				
 				}
 			
 			}
 
 			function init_faces() {
 			
-				var i, l, d;
+				var i, l, a, b, c, d, m, na, nb, nc, nd;
+
+				for( i = 0, l = data.triangles.length/4; i < l; i++ ) {
+					
+					a = data.triangles[ i*4     ];
+					b = data.triangles[ i*4 + 1 ];
+					c = data.triangles[ i*4 + 2 ];
+					
+					m = data.triangles[ i*4 + 3 ];
+					
+					f3( a, b, c, m );
 				
-				for( i = 0, l = data.faces.length; i < l; i++ ) {
+				}
+
+				for( i = 0, l = data.triangles_n.length/7; i < l; i++ ) {
 					
-					d = data.faces[i];
+					a  = data.triangles_n[ i*7     ];
+					b  = data.triangles_n[ i*7 + 1 ];
+					c  = data.triangles_n[ i*7 + 2 ];
 					
-					if ( d.length == 4 ) {
-						
-						f3( d[0], d[1], d[2], d[3] );
-						
-					} else if ( d.length == 5 ) {
+					m  = data.triangles_n[ i*7 + 3 ];
 					
-						f4( d[0], d[1], d[2], d[3], d[4] );
+					na = data.triangles_n[ i*7 + 4 ];
+					nb = data.triangles_n[ i*7 + 5 ];
+					nc = data.triangles_n[ i*7 + 6 ];
 					
-					} else if ( d.length == 7 ) {
+					f3n( a, b, c, m, na, nb, nc );
+				
+				}
+				
+				for( i = 0, l = data.quads.length/5; i < l; i++ ) {
 					
-						f3n( d[0], d[1], d[2], d[3], d[4], d[5], d[6] );
+					a = data.quads[ i*5     ];
+					b = data.quads[ i*5 + 1 ];
+					c = data.quads[ i*5 + 2 ];
+					d = data.quads[ i*5 + 3 ];
 					
-					} else if ( d.length == 9 ) {
+					m = data.quads[ i*5 + 4 ];
 					
-						f4n( d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7], d[8] );
+					f4( a, b, c, d, m );
 					
-					}
-						
+				}
+
+				for( i = 0, l = data.quads_n.length/9; i < l; i++ ) {
+					
+					a  = data.quads_n[ i*9     ];
+					b  = data.quads_n[ i*9 + 1 ];
+					c  = data.quads_n[ i*9 + 2 ];
+					d  = data.quads_n[ i*9 + 3 ];
+					
+					m  = data.quads_n[ i*9 + 4 ];
+					
+					na = data.quads_n[ i*9 + 5 ];
+					nb = data.quads_n[ i*9 + 6 ];
+					nc = data.quads_n[ i*9 + 7 ];
+					nd = data.quads_n[ i*9 + 8 ];
+					
+					f4n( a, b, c, d, m, na, nb, nc, nd );
+				
 				}
 			
 			}
@@ -132,43 +187,48 @@ THREE.Loader.prototype = {
 				
 			}
 
-			function f3n( a, b, c, mi, n1, n2, n3 ) {
+			function f3n( a, b, c, mi, na, nb, nc ) {
 				
 				var material = scope.materials[ mi ],
-					n1x = data.normals[n1][0],
-					n1y = data.normals[n1][1],
-					n1z = data.normals[n1][2],
-					n2x = data.normals[n2][0],
-					n2y = data.normals[n2][1],
-					n2z = data.normals[n2][2],
-					n3x = data.normals[n3][0],
-					n3y = data.normals[n3][1],
-					n3z = data.normals[n3][2];
+					nax = data.normals[ na*3     ],
+					nay = data.normals[ na*3 + 1 ],
+					naz = data.normals[ na*3 + 2 ],
+				
+					nbx = data.normals[ nb*3     ],
+					nby = data.normals[ nb*3 + 1 ],
+					nbz = data.normals[ nb*3 + 2 ],
+				
+					ncx = data.normals[ nc*3     ],
+					ncy = data.normals[ nc*3 + 1 ],
+					ncz = data.normals[ nc*3 + 2 ];
 				
 				scope.faces.push( new THREE.Face3( a, b, c, 
-								  [new THREE.Vector3( n1x, n1y, n1z ), new THREE.Vector3( n2x, n2y, n2z ), new THREE.Vector3( n3x, n3y, n3z )], 
+								  [new THREE.Vector3( nax, nay, naz ), new THREE.Vector3( nbx, nby, nbz ), new THREE.Vector3( ncx, ncy, ncz )], 
 								  material ) );
 				
 			}
 
-			function f4n( a, b, c, d, mi, n1, n2, n3, n4 ) {
+			function f4n( a, b, c, d, mi, na, nb, nc, nd ) {
 				
 				var material = scope.materials[ mi ],
-					n1x = data.normals[n1][0],
-					n1y = data.normals[n1][1],
-					n1z = data.normals[n1][2],
-					n2x = data.normals[n2][0],
-					n2y = data.normals[n2][1],
-					n2z = data.normals[n2][2],
-					n3x = data.normals[n3][0],
-					n3y = data.normals[n3][1],
-					n3z = data.normals[n3][2],
-					n4x = data.normals[n4][0],
-					n4y = data.normals[n4][1],
-					n4z = data.normals[n4][2];
+					nax = data.normals[ na*3     ],
+					nay = data.normals[ na*3 + 1 ],
+					naz = data.normals[ na*3 + 2 ],
+				
+					nbx = data.normals[ nb*3     ],
+					nby = data.normals[ nb*3 + 1 ],
+					nbz = data.normals[ nb*3 + 2 ],
+				
+					ncx = data.normals[ nc*3     ],
+					ncy = data.normals[ nc*3 + 1 ],
+					ncz = data.normals[ nc*3 + 2 ],
+				
+					ndx = data.normals[ nd*3     ],
+					ndy = data.normals[ nd*3 + 1 ],
+					ndz = data.normals[ nd*3 + 2 ];
 				
 				scope.faces.push( new THREE.Face4( a, b, c, d,
-								  [new THREE.Vector3( n1x, n1y, n1z ), new THREE.Vector3( n2x, n2y, n2z ), new THREE.Vector3( n3x, n3y, n3z ), new THREE.Vector3( n4x, n4y, n4z )], 
+								  [new THREE.Vector3( nax, nay, naz ), new THREE.Vector3( nbx, nby, nbz ), new THREE.Vector3( ncx, ncy, ncz ), new THREE.Vector3( ndx, ndy, ndz )], 
 								  material ) );
 				
 			}
