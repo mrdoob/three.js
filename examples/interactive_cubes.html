@@ -24,15 +24,10 @@
 		<script type="text/javascript">
 
 			var container, stats;
-			var camera, scene, renderer;
-
-			var mouseX = 0, mouseY = 0, projector;
-
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
+			var camera, scene, projector, renderer;
 
 			init();
-			setInterval(loop, 1000/60);
+			setInterval( loop, 1000 / 60 );
 
 			function init() {
 
@@ -81,9 +76,9 @@
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
-				container.appendChild(stats.domElement);
+				container.appendChild( stats.domElement );
 
-				document.addEventListener('mousedown', onDocumentMouseDown, false);
+				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 
 			}
 
@@ -100,7 +95,7 @@
 
 				if ( intersects.length > 0 ) {
 
-					intersects.length && intersects[ 0 ].object.material[ 0 ].color.setHex( Math.random() * 0xffffff | 0x80000000 );
+					intersects[ 0 ].object.material[ 0 ].color.setHex( Math.random() * 0xffffff | 0x80000000 );
 
 					var particle = new THREE.Particle( new THREE.ParticleCircleMaterial( 0x000000 ) );
 					particle.position = intersects[ 0 ].point;
