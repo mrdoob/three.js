@@ -1,11 +1,15 @@
-var Particle = Object3D.extend
-({
-	size: 1,
-	material: null,
+/**
+ * @author mr.doob / http://mrdoob.com/
+ */
 
-	init: function( material )
-	{
-		this._super();
-		this.material = material;
-	}
-});
+THREE.Particle = function ( material ) {
+
+	THREE.Object3D.call( this );
+
+	this.material = material instanceof Array ? material : [ material ];
+	this.autoUpdateMatrix = false;
+
+};
+
+THREE.Particle.prototype = new THREE.Object3D();
+THREE.Particle.prototype.constructor = THREE.Particle;

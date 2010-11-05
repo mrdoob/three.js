@@ -1,0 +1,238 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>three.js - geometry - terrain</title>
+		<meta charset="utf-8">
+		<style type="text/css">
+			body {
+				color: #71544e;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+
+				background-color: #bfd1e5;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+			}
+
+			a {
+
+				color: #b07861;
+			}
+
+		</style>
+	</head>
+	<body>
+
+		<div id="container"><br /><br /><br /><br /><br />Generating...</div> 
+		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - terrain demo. <a href="geometry_terrain.html">generate another</a></div> 
+
+		<script type="text/javascript" src="js/Stats.js"></script>
+		<script type="text/javascript" src="js/ImprovedNoise.js"></script>
+
+		<script type="text/javascript" src="../build/Three.js"></script>
+
+		<script type="text/javascript" src="geometry/primitives/Plane.js"></script>
+
+		<script type="text/javascript">
+
+			var SCREEN_WIDTH = window.innerWidth, SCREEN_HEIGHT = window.innerHeight;
+
+			var container, stats;
+
+			var camera, scene, renderer;
+
+			var mesh;
+
+			var mouseX = 0;
+			var mouseY = 0;
+
+			var windowHalfX = window.innerWidth >> 1;
+			var windowHalfY = window.innerHeight >> 1;
+
+
+			init();
+			setInterval( loop, 1000 / 60 );
+
+
+			function init() {
+
+				container = document.getElementById( 'container' );
+
+				camera = new THREE.Camera( 60, SCREEN_WIDTH / SCREEN_HEIGHT, 0.0001, 10000 );
+				camera.position.z = 500;
+
+				scene = new THREE.Scene();
+
+				var heightMap = height( 1024, 1024 );
+				var textureMap = shadow( heightMap );
+				var material = new THREE.MeshBitmapMaterial( textureMap );
+
+				var quality = 20;
+				var quality1 = quality + 1;
+
+				var plane = new Plane( 2000, 2000, quality, quality );
+
+				var data = heightMap.getContext( '2d' ).getImageData( 0, 0, heightMap.width, heightMap.height ).data;
+				var pixelsPerTriangle = Math.floor(heightMap.width / quality);
+
+				for ( var y = 0; y < quality1; y++ ) {
+
+					for (var x = 0; x < quality1; x++ ) {
+
+						plane.vertices[x + y * quality1].position.z = data[((x * pixelsPerTriangle) + (y * pixelsPerTriangle) * heightMap.width) * 4] * 2 - 128;
+
+					}
+
+				}
+
+				plane.computeNormals();
+				plane.computeCentroids();
+
+				mesh = new THREE.Mesh( plane, material );
+				mesh.rotation.x = -90 * Math.PI / 180;
+				mesh.overdraw = true;
+				scene.addObject(mesh);
+
+				renderer = new THREE.CanvasRenderer();
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+
+				container.innerHTML = "";
+
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild(stats.domElement);
+
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+			}
+
+			function onDocumentMouseMove(event) {
+
+				mouseX = (event.clientX - windowHalfX);
+				mouseY = (event.clientY - windowHalfY);
+
+			}
+
+			function loop() {
+
+				camera.position.x += (mouseX - camera.position.x) * 0.05;
+				camera.position.y += (-mouseY - camera.position.y) * 0.05;
+
+				renderer.render(scene, camera);
+				stats.update();
+
+			}
+
+			function height(width, height) {
+
+				var canvas, context, image, data;
+
+				canvas = document.createElement( 'canvas' );
+				canvas.width = width;
+				canvas.height = height;
+
+				context = canvas.getContext( '2d' );
+				context.fillStyle = '#000';
+				context.fillRect( 0, 0, width, height );
+
+				image = context.getImageData( 0, 0, width, height );
+				data = image.data;
+
+				var perlin = new ImprovedNoise();
+
+				var size = width * height;
+				var quality = 2;
+				var zz = Math.random() * 100;
+
+				for ( var j = 0; j < 4; j ++ ) {
+
+					var x = 0, y = 0, yy = 0;
+
+					quality *= 4;
+
+					for ( var i = 0; i < size; i ++ ) {
+
+						data[ i * 4 ] += Math.floor( Math.abs( perlin.noise( x / quality, yy, zz ) * 0.5 ) * quality + 10 );
+
+						x++;
+
+						if (x == width)
+						{
+							x = 0;
+							y ++;
+							yy = y / quality;
+						}
+
+					}
+				}
+
+				context.putImageData( image, 0, 0 );
+
+				return canvas;
+
+			}
+
+			function shadow( texture ) {
+
+				var canvas, context, image, data, src_data,
+				index, level, diff, width = texture.width, height = texture.height,
+				vector3, sun, shade;
+
+				vector3 = new THREE.Vector3( 0, 0, 0 );
+
+				sun = new THREE.Vector3( 1, 1, 1 );
+				sun.normalize();
+
+				canvas = document.createElement( 'canvas' );
+				canvas.width = width;
+				canvas.height = height;
+
+				context = canvas.getContext( '2d' );
+				context.fillStyle = '#000';
+				context.fillRect( 0, 0, width, height );
+
+				image = context.getImageData( 0, 0, width, height );
+				data = image.data;
+
+				src_data = texture.getContext( '2d' ).getImageData( 0, 0, width, height ).data;
+
+				for ( var y = 0; y < height; y++ ) {
+
+					for ( var x = 0; x < width; x++ ) {
+
+						index = ( x + y * width ) * 4;
+
+						vector3.x = src_data[ index - 4 ] - src_data[ index + 4 ];
+						vector3.y = 2;
+						vector3.z = src_data[ index - ( width * 4 ) ] - src_data[ index + ( width * 4 ) ];
+						vector3.normalize();
+
+						shade = vector3.dot(sun);
+
+						data[ index ] = ( 96 + shade * 128 ) * ( src_data[ index ] * 0.007 );
+						data[ index + 1 ] = ( 32 + shade * 96 ) * ( src_data[ index ] * 0.007 );
+						data[ index + 2 ] = ( shade * 96 ) * ( src_data[ index ] * 0.007 );
+
+					}
+				}
+
+				context.putImageData( image, 0, 0 );
+
+				return canvas;
+			}
+
+
+		</script>
+
+	</body>
+</html>

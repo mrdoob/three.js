@@ -1,26 +1,57 @@
-var Scene = Class.extend
-({
-	objects: null,
+/**
+ * @author mr.doob / http://mrdoob.com/
+ */
 
-	init: function()
-	{
-		this.objects = new Array();
-	},
+THREE.Scene = function () {
 
-	add: function( object )
-	{
+	this.objects = [];
+	this.lights = [];
+
+	this.addObject = function ( object ) {
+
 		this.objects.push( object );
-	},
 
-	remove: function( object )
-	{
-		for(var i = 0; i < this.objects.length; i++)
-			if(object == this.objects[i])
-				alert("yay");
-	},
+	};
 
-	toString: function()
-	{
-		return 'Scene ( ' + this.objects + ' )';
-	}
-});
+	this.removeObject = function ( object ) {
+
+		for ( var i = 0, l = this.objects.length; i < l; i++ ) {
+
+			if ( object == this.objects[ i ] ) {
+
+				this.objects.splice( i, 1 );
+				return;
+
+			}
+
+		}
+
+	};
+
+	this.addLight = function ( light ) {
+
+		this.lights.push( light );
+
+	};
+
+	this.removeLight = function ( light ) {
+
+		for ( var i = 0, l = this.lights.length; i < l; i++ ) {
+
+			if ( light == this.lights[ i ] ) {
+
+				this.lights.splice( i, 1 );
+				return;
+
+			}
+
+		}
+
+	};
+
+	this.toString = function () {
+
+		return 'THREE.Scene ( ' + this.objects + ' )';
+	};
+
+};

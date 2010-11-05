@@ -1,85 +1,95 @@
-var Vector4 = Class.extend
-({
-	x: null, y: null, z: null, w: null,
-	// sx: null, sy: null, sz: null,
-	// userData: null,
+/**
+ * @author supereggbert / http://www.paulbrunt.co.uk/
+ * @author philogb / http://blog.thejit.org/
+ */
 
-	dx: null, dy: null, dz: null,
-	tx: null, ty: null, tz: null,
-	// oll: null,
+THREE.Vector4 = function ( x, y, z, w ) {
 
-	init: function(x, y, z, w)
-	{
-		this.x = x ? x : 0;
-		this.y = y ? y : 0;
-		this.z = z ? z : 0;
-		this.w = w ? w : 1;
+	this.x = x || 0;
+	this.y = y || 0;
+	this.z = z || 0;
+	this.w = w || 1;
+
+};
+
+THREE.Vector4.prototype = {
+
+	set: function ( x, y, z, w ) {
+
+		this.x = x;
+		this.y = y;
+		this.z = z;
+		this.w = w;
+
+		return this;
+
 	},
 
-	copy: function(v)
-	{
+	copy: function ( v ) {
+
 		this.x = v.x;
 		this.y = v.y;
 		this.z = v.z;
 		this.w = v.w;
+
+		return this;
+
 	},
 
-	addSelf: function(v)
-	{
-		this.x += v.x;
-		this.y += v.y;
-		this.z += v.z;
-		this.w += v.w;
-	},
+	add: function ( v1, v2 ) {
 
-	add: function(v1, v2)
-	{
 		this.x = v1.x + v2.x;
 		this.y = v1.y + v2.y;
 		this.z = v1.z + v2.z;
 		this.w = v1.w + v2.w;
+
+		return this;
+
 	},
 
-	subSelf: function(v)
-	{
-		this.x -= v.x;
-		this.y -= v.y;
-		this.z -= v.z;
-		this.w -= v.w;
+	addSelf: function ( v ) {
+
+		this.x += v.x;
+		this.y += v.y;
+		this.z += v.z;
+		this.w += v.w;
+
+		return this;
+
 	},
 
-	sub: function(v1, v2)
-	{
+	sub: function ( v1, v2 ) {
+
 		this.x = v1.x - v2.x;
 		this.y = v1.y - v2.y;
 		this.z = v1.z - v2.z;
 		this.w = v1.w - v2.w;
+
+		return this;
+
 	},
 
+	subSelf: function ( v ) {
 
-	clone: function()
-	{
-		return new Vector4(this.x, this.y, this.z, this.w);
-	},	
+		this.x -= v.x;
+		this.y -= v.y;
+		this.z -= v.z;
+		this.w -= v.w;
 
-	toString: function()
-	{
-		return 'Vector4 (' + this.x + ', ' + this.y + ', ' + this.z + ', ' + this.w + ')';
+		return this;
+
 	},
-	
-	toVector3: function()
-	{
-		return new Vector3(this.x/this.w,this.y/this.w,this.z/this.w);
+
+	clone: function () {
+
+		return new THREE.Vector4( this.x, this.y, this.z, this.w );
+
+	},
+
+	toString: function () {
+
+		return 'THREE.Vector4 (' + this.x + ', ' + this.y + ', ' + this.z + ', ' + this.w + ')';
+
 	}
 
-});
-
-Vector4.add = function(a, b)
-{
-	return new Vector3( a.x + b.x, a.y + b.y, a.z + b.z , a.w + b.w );
-}
-
-Vector4.sub = function(a, b)
-{
-	return new Vector3( a.x - b.x, a.y - b.y, a.z - b.z , a.w - b.w );
-}		
+};

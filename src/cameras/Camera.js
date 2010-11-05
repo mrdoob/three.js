@@ -1,33 +1,28 @@
-var Camera = Vector3.extend
-({
-	up: null,
-	target: null,
-	zoom: null,
-	focus: null,
-	roll: null,
-	
-	matrix: null,
-	
-	init: function(x, y, z)
-	{
-		this._super(x, y, z);
-		this.up = new Vector3( 0, 1, 0 );
-		this.target = new Vector3( 0, 0, 0 );
-		this.zoom = 3;
-		this.focus = 500;
-		this.roll = 0;
-		
-		this.matrix = new Matrix4();
-		this.updateMatrix();
-	},
-	
-	updateMatrix: function()
-	{
-		this.matrix.lookAt( this, this.target, this.up );
-	},
+/**
+ * @author mr.doob / http://mrdoob.com/
+ */
 
-	toString: function()
-	{
-		return 'Camera ( ' + this.x + ', ' + this.y + ', ' + this.z + ' )';
-	}
-});
+THREE.Camera = function ( fov, aspect, near, far ) {
+
+	this.position = new THREE.Vector3( 0, 0, 0 );
+	this.target = { position: new THREE.Vector3( 0, 0, 0 ) };
+
+	this.up = new THREE.Vector3( 0, 1, 0 );
+	this.matrix = new THREE.Matrix4();
+	this.projectionMatrix = THREE.Matrix4.makePerspective( fov, aspect, near, far );
+
+	this.autoUpdateMatrix = true;
+
+	this.updateMatrix = function () {
+
+		this.matrix.lookAt( this.position, this.target.position, this.up );
+
+	};
+
+	this.toString = function () {
+
+		return 'THREE.Camera ( ' + this.position + ', ' + this.target.position + ' )';
+
+	};
+
+};

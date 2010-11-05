@@ -1,18 +1,25 @@
-var Vertex = Vector3.extend
-({
-	u: null, v: null,
-	screen: null,
-	normal : null,
-	visible: null,
+/**
+ * @author mr.doob / http://mrdoob.com/
+ */
 
-	init: function(x, y, z)
-	{
-		this._super(x, y, z);
-		this.screen = new Vector3();
-	},
+THREE.Vertex = function ( position, normal ) {
 
-	toString: function()
-	{
-		return 'Vertex ( ' + this.x + ', ' + this.y + ', ' + this.z + ' )';
+	this.position = position || new THREE.Vector3();
+	this.positionWorld = new THREE.Vector3();
+	this.positionScreen = new THREE.Vector3();
+
+	this.normal = normal || new THREE.Vector3();
+	this.normalWorld = new THREE.Vector3();
+	this.normalScreen = new THREE.Vector3();
+
+	this.__visible = true;
+
+}
+
+THREE.Vertex.prototype = {
+
+	toString: function () {
+
+		return 'THREE.Vertex ( position: ' + this.position + ', normal: ' + this.normal + ' )';
 	}
-});
+};

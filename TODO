@@ -1,0 +1,16 @@
+Core
+* Simple hierarchy system (look at D1plo1d and tamask branches)
+
+Examples
+* DOMRenderer example
+
+Examples/Geometry/Primitives
+* Create more primitives. http://code.google.com/p/ogre-procedural/source/browse/#hg/library/src
+
+Materials
+* MeshBitmapSphereMappingMaterial. http://en.wikipedia.org/wiki/Sphere_mapping
+* MeshBitmapCubeMappingMaterial. http://en.wikipedia.org/wiki/Cube_mapping
+* MeshShaderMaterial for WebGLRenderer
+
+Renderers
+* FrustrumClipping near to Renderer (CanvasRenderer and SVGRenderer)

@@ -1,55 +1,101 @@
-var Color = Class.extend
-({
-	r: null, g: null, b: null, a: null,
-	hex: null,
-	
-	styleString: null,
-	
-	
-	init: function( hex )
-	{
-		this.setHex( hex ? hex : 0xff000000 );
-	},
-	
-	setHex: function( hex )
-	{
-		this.hex = hex;
-		this.updateRGBA();
-		this.updateStyleString();
-	},
-	
-	setRGBA: function( r, g, b, a )
-	{
+/**
+ * @author mr.doob / http://mrdoob.com/
+ */
+
+THREE.Color = function ( hex ) {
+
+	/*
+	this.r; this.g; this.b; this.a;
+	this.hex;
+	this.__styleString;
+	*/
+
+	this.autoUpdate = true;
+	this.setHex( hex );
+
+}
+
+THREE.Color.prototype = {
+
+	setRGBA: function ( r, g, b, a ) {
+
 		this.r = r;
 		this.g = g;
 		this.b = b;
 		this.a = a;
-		
-		this.updateHex();
-		this.updateStyleString();
+
+		if ( this.autoUpdate ) {
+
+			this.updateHex();
+			this.updateStyleString();
+
+		}
+
 	},
-	
-	updateHex: function()
-	{
-		this.hex = this.a << 24 | this.r << 16 | this.g << 8 | this.b;
+
+	setHex: function ( hex ) {
+
+		this.hex = hex;
+
+		if ( this.autoUpdate ) {
+
+			this.updateRGBA();
+			this.updateStyleString();
+
+		}
+
 	},
-	
-	updateRGBA: function()
-	{
-		this.r = this.hex >> 16 & 0xff;
-		this.g = this.hex >> 8 & 0xff;
-		this.b = this.hex & 0xff;
-		this.a = this.hex >> 24 & 0xff;		
+
+	copyRGB: function ( color ) {
+
+		this.r = color.r;
+		this.g = color.g;
+		this.b = color.b;
+
 	},
-	
-	updateStyleString: function()
-	{
-		this.styleString = 'rgba(' + this.r + ',' + this.g + ',' + this.b + ',' + (this.a / 255) + ')';		
+
+	copyRGBA: function ( color ) {
+
+		this.r = color.r;
+		this.g = color.g;
+		this.b = color.b;
+		this.a = color.a;
+
 	},
-	
-	toString: function()
-	{
-		return 'Color ( r: ' + this.r + ', g: ' + this.g + ', b: ' + this.b + ', a: ' + this.a + ', hex: ' + this.hex + ', style: ' + this.styleString + ' )';	
+
+	multiplySelfRGB: function ( color ) {
+
+		this.r *= color.r;
+		this.g *= color.g;
+		this.b *= color.b;
+
+	},
+
+	updateHex: function () {
+
+		this.hex = Math.floor( this.a * 255 ) << 24 | Math.floor( this.r * 255 ) << 16 | Math.floor( this.g * 255 ) << 8 | Math.floor( this.b * 255 );
+
+	},
+
+	updateRGBA: function () {
+
+		this.a = ( this.hex >> 24 & 255 ) / 255;
+		this.r = ( this.hex >> 16 & 255 ) / 255;
+		this.g = ( this.hex >> 8 & 255 ) / 255;
+		this.b = ( this.hex & 255 ) / 255;
+
+	},
+
+	updateStyleString: function () {
+
+		this.__styleString = 'rgba(' + Math.floor( this.r * 255 ) + ',' + Math.floor( this.g * 255 ) + ',' + Math.floor( this.b * 255 ) + ',' + this.a + ')';
+
+	},
+
+	toString: function () {
+
+		return 'THREE.Color ( r: ' + this.r + ', g: ' + this.g + ', b: ' + this.b + ', a: ' + this.a + ', hex: ' + this.hex + ' )';
+
 	}
-	
-});
+
+};
