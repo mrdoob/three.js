@@ -96,7 +96,7 @@ How to get proper OBJ + MTL files with Blender
 ------           
 Author 
 ------
-AlteredQualia http://alteredqualia.com            
+AlteredQualia http://alteredqualia.com
 
 """
 
@@ -806,7 +806,7 @@ def convert(infile, outfile):
 # #############################################################################
 def usage():
     print "Usage: %s -i filename.obj -o filename.js [-a center|top|bottom] [-s flat|smooth]" % os.path.basename(sys.argv[0])
-        
+
 # #####################################################
 # Main
 # #####################################################
