@@ -4,7 +4,7 @@
 
 THREE.ParticleCircleMaterial = function ( hex, opacity ) {
 
-	this.color = new THREE.Color( ( opacity >= 0 ? ( opacity * 0xff ) << 24 : 0xff000000 ) | hex );
+	this.color = new THREE.Color( ( opacity !== undefined ? opacity : 1 ) * 0xff << 24 ^ hex );
 
 	this.toString = function () {
 

@@ -52,7 +52,7 @@ THREE.Mesh.prototype.sortFacesByMaterial = function () {
 
 		}
 
-		return hash_array.join("_");
+		return hash_array.join( '_' );
 
 	}
 
@@ -60,40 +60,41 @@ THREE.Mesh.prototype.sortFacesByMaterial = function () {
 
 		face = this.geometry.faces[ f ];
 		material = face.material;
-		
+
 		mhash = materialHash( material );
 
 		if ( hash_map[ mhash ] == undefined ) {
-			
+
 			hash_map[ mhash ] = { 'hash': mhash, 'counter': 0 };
+
 		}
 
-		ghash = hash_map[ mhash ].hash + "_" + hash_map[ mhash ].counter;
+		ghash = hash_map[ mhash ].hash + '_' + hash_map[ mhash ].counter;
 
 		if ( this.materialFaceGroup[ ghash ] == undefined ) {
 
 			this.materialFaceGroup[ ghash ] = { 'faces': [], 'material': material, 'vertices': 0 };
 
 		}
-		
+
 		vertices = face instanceof THREE.Face3 ? 3 : 4;
 
 		if ( this.materialFaceGroup[ ghash ].vertices + vertices > 65535 ) {
-			
+
 			hash_map[ mhash ].counter += 1;
-			ghash = hash_map[ mhash ].hash + "_" + hash_map[ mhash ].counter;
-			
+			ghash = hash_map[ mhash ].hash + '_' + hash_map[ mhash ].counter;
+
 			if ( this.materialFaceGroup[ ghash ] == undefined ) {
 
 				this.materialFaceGroup[ ghash ] = { 'faces': [], 'material': material, 'vertices': 0 };
 
 			}
-			
+
 		}
-		
+
 		this.materialFaceGroup[ ghash ].faces.push( f );
 		this.materialFaceGroup[ ghash ].vertices += vertices;
-		
+
 
 	}
 

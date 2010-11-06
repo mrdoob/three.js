@@ -4,11 +4,12 @@
 
 THREE.MeshPhongMaterial = function ( ambient, diffuse, specular, shininess, opacity ) {
 
-	this.ambient = new THREE.Color( ( opacity >= 0 ? ( opacity * 0xff ) << 24 : 0xff000000 ) | ambient );
-	this.diffuse = new THREE.Color( ( opacity >= 0 ? ( opacity * 0xff ) << 24 : 0xff000000 ) | diffuse );
-	this.specular = new THREE.Color( ( opacity >= 0 ? ( opacity * 0xff ) << 24 : 0xff000000 ) | specular );
-    this.shininess = shininess;
-    this.opacity = opacity;
+	this.ambient = new THREE.Color( ( opacity !== undefined ? opacity : 1 ) * 0xff << 24 ^ ambient );
+	this.diffuse = new THREE.Color( ( opacity !== undefined ? opacity : 1 ) * 0xff << 24 ^ diffuse );
+	this.specular = new THREE.Color( ( opacity !== undefined ? opacity : 1 ) * 0xff << 24 ^ specular );
+
+	this.shininess = shininess;
+	this.opacity = opacity;
 
 	this.toString = function () {
 
