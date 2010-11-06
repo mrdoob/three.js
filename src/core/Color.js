@@ -4,12 +4,6 @@
 
 THREE.Color = function ( hex ) {
 
-	/*
-	this.r; this.g; this.b; this.a;
-	this.hex;
-	this.__styleString;
-	*/
-
 	this.autoUpdate = true;
 	this.setHex( hex );
 
@@ -73,7 +67,7 @@ THREE.Color.prototype = {
 
 	updateHex: function () {
 
-		this.hex = Math.floor( this.a * 255 ) << 24 | Math.floor( this.r * 255 ) << 16 | Math.floor( this.g * 255 ) << 8 | Math.floor( this.b * 255 );
+		this.hex = Math.floor( this.a * 255 ) << 24 ^ Math.floor( this.r * 255 ) << 16 ^ Math.floor( this.g * 255 ) << 8 ^ Math.floor( this.b * 255 );
 
 	},
 

@@ -9,7 +9,7 @@
 
 var model = {
     'materials': [	{
-	"a_dbg_color" : 0xffeeeeee,
+	"a_dbg_color" : 0xeeeeee,
 	"a_dbg_index" : 0,
 	"a_dbg_name" : "_03_-_Default1noCulli__03_-_Default1noCulli",
 	"col_ambient" : [0.0, 0.0, 0.0],
@@ -23,7 +23,7 @@ var model = {
 	},
 
 	{
-	"a_dbg_color" : 0xffee0000,
+	"a_dbg_color" : 0xee0000,
 	"a_dbg_index" : 1,
 	"a_dbg_name" : "_02_-_Default1noCulli__02_-_Default1noCulli",
 	"col_ambient" : [0.0, 0.0, 0.0],
@@ -37,7 +37,7 @@ var model = {
 	},
 
 	{
-	"a_dbg_color" : 0xff00ee00,
+	"a_dbg_color" : 0x00ee00,
 	"a_dbg_index" : 2,
 	"a_dbg_name" : "FrontColorNoCullingID__02_-_Default1noCulli",
 	"col_ambient" : [0.0, 0.0, 0.0],
@@ -51,7 +51,7 @@ var model = {
 	},
 
 	{
-	"a_dbg_color" : 0xff0000ee,
+	"a_dbg_color" : 0x0000ee,
 	"a_dbg_index" : 3,
 	"a_dbg_name" : "FrontColorNoCullingID__03_-_Default1noCulli",
 	"col_ambient" : [0.0, 0.0, 0.0],
@@ -65,7 +65,7 @@ var model = {
 	},
 
 	{
-	"a_dbg_color" : 0xffeeee00,
+	"a_dbg_color" : 0xeeee00,
 	"a_dbg_index" : 4,
 	"a_dbg_name" : "_01_-_Default1noCulli__01_-_Default1noCulli",
 	"col_ambient" : [0.0, 0.0, 0.0],
@@ -79,7 +79,7 @@ var model = {
 	},
 
 	{
-	"a_dbg_color" : 0xff00eeee,
+	"a_dbg_color" : 0x00eeee,
 	"a_dbg_index" : 5,
 	"a_dbg_name" : "FrontColorNoCullingID__01_-_Default1noCulli",
 	"col_ambient" : [0.0, 0.0, 0.0],

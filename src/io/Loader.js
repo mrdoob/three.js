@@ -552,7 +552,7 @@ THREE.Loader.prototype = {
 					
 				} else {
 					
-					material = new THREE.MeshColorFillMaterial( 0xffeeeeee );
+					material = new THREE.MeshColorFillMaterial( 0xeeeeee );
 					
 				}
 
@@ -848,7 +848,7 @@ THREE.Loader.prototype = {
 					
 				} else {
 					
-					material = new THREE.MeshColorFillMaterial( 0xffeeeeee );
+					material = new THREE.MeshColorFillMaterial( 0xeeeeee );
 					
 				}
 

@@ -12,7 +12,7 @@ var Torus = function ( urlbase ) {
     THREE.Geometry.call(this);
 
     var materials = [	{
-	"a_dbg_color" : 0xffeeeeee,
+	"a_dbg_color" : 0xeeeeee,
 	"a_dbg_index" : 0,
 	"a_dbg_name" : "(null)"
 	}];

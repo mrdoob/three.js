@@ -134,7 +134,7 @@ TYPE = "ascii"      # ascii binary
 
 # default colors for debugging (each material gets one distinct color): 
 # white, red, green, blue, yellow, cyan, magenta
-COLORS = [0xffeeeeee, 0xffee0000, 0xff00ee00, 0xff0000ee, 0xffeeee00, 0xff00eeee, 0xffee00ee]
+COLORS = [0xeeeeee, 0xee0000, 0x00ee00, 0x0000ee, 0xeeee00, 0x00eeee, 0xee00ee]
 
 # #####################################################
 # Templates
@@ -336,27 +336,27 @@ def parse_mtl(fname):
 
             # Diffuse color
             # Kd 1.000 1.000 1.000
-            if chunks[0] == "Kd" and len(chunks) == 4:                
+            if chunks[0] == "Kd" and len(chunks) == 4:
                 materials[identifier]["col_diffuse"] = [float(chunks[1]), float(chunks[2]), float(chunks[3])]
 
             # Ambient color
             # Ka 1.000 1.000 1.000
-            if chunks[0] == "Ka" and len(chunks) == 4:                
+            if chunks[0] == "Ka" and len(chunks) == 4:
                 materials[identifier]["col_ambient"] = [float(chunks[1]), float(chunks[2]), float(chunks[3])]
 
             # Specular color
             # Ks 1.000 1.000 1.000
-            if chunks[0] == "Ks" and len(chunks) == 4:                
+            if chunks[0] == "Ks" and len(chunks) == 4:
                 materials[identifier]["col_specular"] = [float(chunks[1]), float(chunks[2]), float(chunks[3])]
 
             # Specular coefficient
             # Ns 154.000
-            if chunks[0] == "Ns" and len(chunks) == 2:                
+            if chunks[0] == "Ns" and len(chunks) == 2:
                 materials[identifier]["specular_coef"] = float(chunks[1])
 
             # Transparency
             # Tr 0.9 or d 0.9
-            if (chunks[0] == "Tr" or chunks[0] == "d") and len(chunks) == 2:                
+            if (chunks[0] == "Tr" or chunks[0] == "d") and len(chunks) == 2:
                 materials[identifier]["transparency"] = float(chunks[1])
 
             # Optical density
@@ -595,9 +595,9 @@ def generate_color(i):
     """
     
     if i < len(COLORS):
-        return "0x%x" % COLORS[i]
+        return "0x%06x" % COLORS[i]
     else:
-        return "0x%x" % (int(0xffffff * random.random()) + 0xff000000)
+        return "0x%06x" % int(0xffffff * random.random())
         
 def value2string(v):
     if type(v)==str and v[0] != "0":
