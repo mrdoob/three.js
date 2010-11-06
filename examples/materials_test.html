@@ -37,7 +37,7 @@
 			<br/>
 			<p>Best viewed in Chrome 8/9 or Firefox 4 using WebGL renderer.
 			<p>Canvas renderer is very slow on anything other than Chrome.
-			<p><a href="http://code.google.com/p/chromium/issues/detail?id=60124">Line width is not set properly</a> on Chrome in Windows.
+
 		</div>
 		
 		<div id="log"></div>
@@ -215,8 +215,9 @@
 				bwebgl.addEventListener("click", toggleWebGL, false);
 
 				var loader = new THREE.Loader();
-				loader.loadAsync( "obj/female02/female02.js", function() { createScene( new Female02( "obj/female02" ) ) } );
-				//loader.loadWorker( "obj/female02/Female02_slim.js", function( geometry ) { createScene( geometry) }, "obj/female02" );
+				loader.loadAsciiOld( "obj/female02/female02.js", function() { createScene( new Female02( "obj/female02" ) ) } );
+				//loader.loadAscii( "obj/female02/Female02_slim.js", function( geometry ) { createScene( geometry) }, "obj/female02" );
+                //loader.loadBinary( "obj/female02/Female02_bin.js", function( geometry ) { createScene( geometry) }, "obj/female02" );
 
 			}
 

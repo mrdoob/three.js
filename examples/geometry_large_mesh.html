@@ -34,7 +34,7 @@
 			<p>Lucy model from <a href="http://graphics.stanford.edu/data/3Dscanrep/">Stanford 3d scanning repository</a> 
 			(decimated with <a href="http://meshlab.sourceforge.net/">Meshlab</a>).
 			
-			<p>Please be patient while the mesh is loading. It may take a while, it's 3.5MB file.
+			<p>Please be patient while the mesh is loading. It may take a while, it's 2MB file.
 			
 			<br/>
 			<p>Best viewed in Chrome 8/9 or Firefox 4 using WebGL renderer.
@@ -45,7 +45,7 @@
 		<pre id="log"></pre>
 
 		<script type="text/javascript" src="../build/Three.js"></script>
-		
+
 		<script type="text/javascript" src="geometry/primitives/Sphere.js"></script>
 
 		<script type="text/javascript" src="js/Stats.js"></script>
@@ -177,9 +177,10 @@
 				var s = (new Date).getTime();
 				
 				var loader = new THREE.Loader();
-				//loader.loadAsync( "obj/lucy/Lucy100k.js", function() { createScene( new Lucy100k(), s ) } );
-				loader.loadWorker( 'obj/lucy/Lucy100k_slim.js', function( geometry ) { createScene( geometry, s ) } );
-				
+				//loader.loadAsciiOld( "obj/lucy/Lucy100k.js", function() { createScene( new Lucy100k(), s ) } );
+				//loader.loadAscii( 'obj/lucy/Lucy100k_slim.js', function( geometry ) { createScene( geometry, s ) } );
+				loader.loadBinary( 'obj/lucy/Lucy100k_bin.js', function( geometry ) { createScene( geometry, s ) }, "obj/lucy" );
+
 			}
 			
 			function createScene( geometry, start ) {

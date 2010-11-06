@@ -241,8 +241,9 @@
 				bwebgl.addEventListener("click", toggleWebGL, false);
 
 				var loader = new THREE.Loader();
-				loader.loadAsync( "obj/torus/Torus.js", function() { createScene( new Torus() ) } );
-				//loader.loadWorker( "obj/torus/Torus_slim.js", function( geometry ) { createScene( geometry ) } );
+				loader.loadAsciiOld( "obj/torus/Torus.js", function() { createScene( new Torus() ) } );
+				//loader.loadAscii( "obj/torus/Torus_slim.js", function( geometry ) { createScene( geometry ) } );
+                //loader.loadBinary( "obj/torus/Torus_bin.js", function( geometry ) { createScene( geometry ) }, "obj/torus" );
 
 			}
 

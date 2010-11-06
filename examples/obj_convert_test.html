@@ -241,11 +241,14 @@
 				bwebgl.addEventListener("click", toggleWebGL, false);
 				
 				var loader = new THREE.Loader();
-				loader.loadAsync( "obj/male02/male02.js",     function() { createScene( new Male02( "obj/male02" ),      90, 50, FLOOR, 105 ) } );
-				loader.loadAsync( "obj/female02/female02.js", function() { createScene( new Female02( "obj/female02" ), -80, 50, FLOOR, 0 ) } );
+				loader.loadAsciiOld( "obj/male02/male02.js",     function() { createScene( new Male02( "obj/male02" ),      90, 50, FLOOR, 105 ) } );
+				loader.loadAsciiOld( "obj/female02/female02.js", function() { createScene( new Female02( "obj/female02" ), -80, 50, FLOOR, 0 ) } );
 				
-				//loader.loadWorker( "obj/male02/Male02_slim.js",     function( geometry ) { createScene( geometry,  90, 50, FLOOR, 105 ) }, "obj/male02" );
-				//loader.loadWorker( "obj/female02/Female02_slim.js", function( geometry ) { createScene( geometry, -80, 50, FLOOR, 0 ) },   "obj/female02" );
+				//loader.loadAscii( "obj/male02/Male02_slim.js",     function( geometry ) { createScene( geometry,  90, 50, FLOOR, 105 ) }, "obj/male02" );
+				//loader.loadAscii( "obj/female02/Female02_slim.js", function( geometry ) { createScene( geometry, -80, 50, FLOOR, 0 ) },   "obj/female02" );
+                
+                //loader.loadBinary( "obj/male02/Male02_bin.js",     function( geometry ) { createScene( geometry,  90, 50, FLOOR, 105 ) }, "obj/male02" );
+				//loader.loadBinary( "obj/female02/Female02_bin.js", function( geometry ) { createScene( geometry, -80, 50, FLOOR, 0 ) },   "obj/female02" );
 
 			}
 
@@ -261,6 +264,7 @@
 				scene.addObject(zmesh);
 				
 				createMaterialsPalette( geometry.materials, 100, b );
+                
 			}
 
 			function createMaterialsPalette( materials, size, bottom ) {

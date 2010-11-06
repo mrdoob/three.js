@@ -1,15 +1,21 @@
-"""Convert Wavefront OBJ / MTL files into Three.js (slim models version, to be used with web worker loader)
+"""Convert Wavefront OBJ / MTL files into Three.js (slim models version, to be used with web worker based ascii / binary loader)
 
 -------------------------
 How to use this converter
 -------------------------
 
-python convert_obj_threejs_slim.py -i filename.obj -o filename.js [-a center|top|bottom] [-s smooth|flat]
+python convert_obj_threejs_slim.py -i infile.obj -o outfile.js [-a center|top|bottom] [-s smooth|flat] [-t ascii|binary]
 
-Note: by default, model is centered (middle of bounding box goes to 0,0,0) 
-      and uses smooth shading (if there were vertex normals in the original 
-      model).
+Notes: 
+
+    - by default, model is centered (middle of bounding box goes to 0,0,0),
+      uses smooth shading (if there were vertex normals in the original 
+      model) and is in ASCII format.
  
+    - binary conversion will create two files: 
+        outfile.js  (materials)
+        outfile.bin (binary buffers)
+    
 --------------------------------------------------
 How to use generated JS file in your HTML document
 --------------------------------------------------
@@ -22,8 +28,13 @@ How to use generated JS file in your HTML document
         ...
         
         var loader = new THREE.Loader();
-        loader.loadWorker( "Model.js", function( geometry ) { createScene( geometry) }, path_to_textures );
         
+        // load ascii model
+        loader.loadAscii( "Model_slim.js", function( geometry ) { createScene( geometry) }, path_to_textures );
+
+        // load binary model
+        loader.loadBinary( "Model_bin.js", function( geometry ) { createScene( geometry) }, path_to_textures );
+
         function createScene( geometry ) {
             
             var normalizeUVsFlag = 1; // set to 1 if canvas render has missing materials
@@ -111,13 +122,15 @@ import random
 import os.path
 import getopt
 import sys
+import struct
+import math
 
 # #####################################################
 # Configuration
 # #####################################################
-ALIGN = "center" # center bottom top none
-
-SHADING = "smooth" # flat smooth
+ALIGN = "center"    # center bottom top none
+SHADING = "smooth"  # smooth flat 
+TYPE = "ascii"      # ascii binary
 
 # default colors for debugging (each material gets one distinct color): 
 # white, red, green, blue, yellow, cyan, magenta
@@ -126,7 +139,7 @@ COLORS = [0xffeeeeee, 0xffee0000, 0xff00ee00, 0xff0000ee, 0xffeeee00, 0xff00eeee
 # #####################################################
 # Templates
 # #####################################################
-TEMPLATE_FILE = u"""\
+TEMPLATE_FILE_ASCII = u"""\
 // Converted from: %(fname)s
 //  vertices: %(nvertex)d
 //  faces: %(nface)d 
@@ -151,6 +164,27 @@ var model = {
 
     'quads': [%(quads)s],
     'quads_n': [%(quads_n)s],
+
+    'end': (new Date).getTime()
+    }
+    
+postMessage( model );
+"""
+
+TEMPLATE_FILE_BIN = u"""\
+// Converted from: %(fname)s
+//  vertices: %(nvertex)d
+//  faces: %(nface)d 
+//  materials: %(nmaterial)d
+//
+//  Generated with OBJ -> Three.js converter
+//  http://github.com/alteredq/three.js/blob/master/utils/exporters/convert_obj_threejs_slim.py
+
+
+var model = {
+    'materials': [%(materials)s],
+
+    'buffers': '%(buffers)s',
 
     'end': (new Date).getTime()
     }
@@ -196,7 +230,7 @@ def get_name(fname):
     """
     
     return os.path.basename(fname).split(".")[0]
-  
+
 def bbox(vertices):
     """Compute bounding box of vertex array.
     """
@@ -609,53 +643,12 @@ def generate_mtl(materials):
         }
     return mtl
     
-# #####################################################
-# Faces
-# #####################################################
-def is_triangle_flat(f):
-    return len(f['vertex'])==3 and not (f["normal"] and SHADING == "smooth")
-    
-def is_triangle_smooth(f):
-    return len(f['vertex'])==3 and f["normal"] and SHADING == "smooth"
-    
-def is_quad_flat(f):
-    return len(f['vertex'])==4 and not (f["normal"] and SHADING == "smooth")
-    
-def is_quad_smooth(f):
-    return len(f['vertex'])==4 and f["normal"] and SHADING == "smooth"
-
-# #####################################################
-# API
-# #####################################################
-def convert(infile, outfile):
-    """Convert infile.obj to outfile.js
-    
-    Here is where everything happens. If you need to automate conversions,
-    just import this file as Python module and call this method.
+def generate_materials_string(materials, mtllib):
+    """Generate final materials string.
     """
-    
-    if not file_exists(infile):
-        print "Couldn't find [%s]" % infile
-        return
-        
-    faces, vertices, uvs, normals, materials, mtllib = parse_obj(infile)
-    
-    if ALIGN == "center":
-        center(vertices)
-    elif ALIGN == "bottom":
-        bottom(vertices)
-    elif ALIGN == "top":
-        top(vertices)
-    
+
     random.seed(42) # to get well defined color order for materials
     
-    uv_string_tri = ""
-    uv_string_quad = ""
-    if len(uvs)>0:
-        uv_string_tri  = ",".join([generate_uv_tri(f, uvs)  for f in faces if len(f['uv']) == 3])
-        uv_string_quad = ",".join([generate_uv_quad(f, uvs) for f in faces if len(f['uv']) == 4])
-            
-
     # default materials with debug colors for when
     # there is no specified MTL / MTL loading failed,
     # or if there were no materials / null materials
@@ -676,11 +669,57 @@ def convert(infile, outfile):
         else:
             print "Couldn't find [%s]" % fname
     
+    return generate_materials(mtl, materials)
+    
+# #####################################################
+# Faces
+# #####################################################
+def is_triangle_flat(f):
+    return len(f['vertex'])==3 and not (f["normal"] and SHADING == "smooth")
+    
+def is_triangle_smooth(f):
+    return len(f['vertex'])==3 and f["normal"] and SHADING == "smooth"
+    
+def is_quad_flat(f):
+    return len(f['vertex'])==4 and not (f["normal"] and SHADING == "smooth")
+    
+def is_quad_smooth(f):
+    return len(f['vertex'])==4 and f["normal"] and SHADING == "smooth"
+
+# #####################################################
+# API - ASCII converter
+# #####################################################
+def convert_ascii(infile, outfile):
+    """Convert infile.obj to outfile.js
+    
+    Here is where everything happens. If you need to automate conversions,
+    just import this file as Python module and call this method.
+    """
+    
+    if not file_exists(infile):
+        print "Couldn't find [%s]" % infile
+        return
+        
+    faces, vertices, uvs, normals, materials, mtllib = parse_obj(infile)
+    
+    if ALIGN == "center":
+        center(vertices)
+    elif ALIGN == "bottom":
+        bottom(vertices)
+    elif ALIGN == "top":
+        top(vertices)
+        
+    uv_string_tri = ""
+    uv_string_quad = ""
+    if len(uvs)>0:
+        uv_string_tri  = ",".join([generate_uv_tri(f, uvs)  for f in faces if len(f['uv']) == 3])
+        uv_string_quad = ",".join([generate_uv_quad(f, uvs) for f in faces if len(f['uv']) == 4])
+    
     normals_string = ""
     if SHADING == "smooth":
         normals_string = ",".join(generate_normal(n) for n in normals)
         
-    text = TEMPLATE_FILE % {
+    text = TEMPLATE_FILE_ASCII % {
     "name"       : get_name(outfile),
     "vertices"   : ",".join([generate_vertex(v) for v in vertices]),
     "triangles"  : ",".join([generate_triangle(f) for f in faces if is_triangle_flat(f)]),
@@ -691,7 +730,7 @@ def convert(infile, outfile):
     "uvs_quad"   : uv_string_quad,
     "normals"    : normals_string,
     
-    "materials" : generate_materials(mtl, materials),
+    "materials" : generate_materials_string(materials, mtllib),
     
     "fname"     : infile,
     "nvertex"   : len(vertices),
@@ -706,10 +745,255 @@ def convert(infile, outfile):
     print "%d vertices, %d faces, %d materials" % (len(vertices), len(faces), len(materials))
         
 # #############################################################################
+# API - Binary converter
+# #############################################################################
+def convert_binary(infile, outfile):
+    """Convert infile.obj to outfile.js + outfile.bin    
+    """
+    
+    if not file_exists(infile):
+        print "Couldn't find [%s]" % infile
+        return
+    
+    binfile = get_name(outfile) + ".bin"
+    
+    faces, vertices, uvs, normals, materials, mtllib = parse_obj(infile)
+    
+    if ALIGN == "center":
+        center(vertices)
+    elif ALIGN == "bottom":
+        bottom(vertices)
+    elif ALIGN == "top":
+        top(vertices)    
+    
+    # ###################
+    # generate JS file
+    # ###################
+    
+    text = TEMPLATE_FILE_BIN % {
+    "name"       : get_name(outfile),
+    
+    "materials" : generate_materials_string(materials, mtllib),
+    "buffers"   : binfile,
+    
+    "fname"     : infile,
+    "nvertex"   : len(vertices),
+    "nface"     : len(faces),
+    "nmaterial" : len(materials)
+    }
+    
+    out = open(outfile, "w")
+    out.write(text)
+    out.close()
+    
+    # ###################
+    # generate BIN file
+    # ###################
+        
+    # preprocess faces
+    triangles_flat = []
+    triangles_smooth = []
+    quads_flat = []
+    quads_smooth = []
+    faces_uv_tri = []
+    faces_uv_quad = []
+    for f in faces:
+        if is_triangle_flat(f):
+            triangles_flat.append(f)
+        elif is_triangle_smooth(f):
+            triangles_smooth.append(f)
+        elif is_quad_flat(f):
+            quads_flat.append(f)
+        elif is_quad_smooth(f):
+            quads_smooth.append(f)
+            
+        ui = f['uv']
+        if len(ui) == 3:
+            faces_uv_tri.append(f)
+        elif len(ui) == 4:
+            faces_uv_quad.append(f)
+    
+    if SHADING == "smooth":
+        nnormals = len(normals)
+    else:
+        nnormals = 0
+        
+    buffer = []
+
+    # header
+    # ------
+    header_bytes  = struct.calcsize('<8s')
+    header_bytes += struct.calcsize('<BBBBBBB')
+    header_bytes += struct.calcsize('<IIIIIIII')
+    
+    # signature
+    signature = struct.pack('<8s', 'Three.js')
+    
+    # metadata (all data is little-endian)
+    vertex_coordinate_bytes = 4
+    vertex_index_bytes = 4
+    normal_index_bytes = 4
+    material_index_bytes = 2
+    normal_coordinate_bytes = 1
+    uv_coordinate_bytes = 4
+    
+    # header_bytes            unsigned char   1
+    # vertex_coordinate_bytes unsigned char   1
+    # vertex_index_bytes      unsigned char   1
+    # normal_index_bytes      unsigned char   1
+    # material_index_bytes    unsigned char   1
+    # normal_coordinate_bytes unsigned char   1
+    # uv_coordinate_bytes     unsigned char   1
+    bdata = struct.pack('<BBBBBBB', header_bytes,
+                               vertex_coordinate_bytes, 
+                               vertex_index_bytes, 
+                               normal_index_bytes,
+                               material_index_bytes,
+                               normal_coordinate_bytes,
+                               uv_coordinate_bytes)
+                                   
+    # nvertices    unsigned int    4
+    # ntri_flat    unsigned int    4
+    # ntri_smooth  unsigned int    4
+    # nquad_flat   unsigned int    4
+    # nquad_smooth unsigned int    4
+    # nnormals     unsigned int    4
+    # nuvtri       unsigned int    4
+    # nuvquad      unsigned int    4
+    ndata = struct.pack('<IIIIIIII', len(vertices), 
+                               len(triangles_flat), 
+                               len(triangles_smooth),
+                               len(quads_flat),
+                               len(quads_smooth),
+                               nnormals,
+                               len(faces_uv_tri),
+                               len(faces_uv_quad)) 
+    buffer.append(signature)
+    buffer.append(bdata)
+    buffer.append(ndata)
+        
+    # 1. vertices
+    # ------------
+    # x float   4
+    # y float   4
+    # z float   4
+    for v in vertices:
+        data = struct.pack('<fff', v[0], v[1], v[2]) 
+        buffer.append(data)
+
+    # 2. normals
+    # ---------------
+    # x signed char 1
+    # y signed char 1
+    # z signed char 1
+    if SHADING == "smooth":
+        for n in normals:
+            normalize(n)
+            data = struct.pack('<bbb', math.floor(n[0]*127+0.5), math.floor(n[1]*127+0.5), math.floor(n[2]*127+0.5))
+            buffer.append(data)
+
+    
+    # 3. flat triangles
+    # ------------------
+    # a unsigned int   4
+    # b unsigned int   4
+    # c unsigned int   4
+    # m unsigned short 2
+    for f in triangles_flat:
+        vi = f['vertex']
+        data = struct.pack('<IIIH', vi[0]-1, vi[1]-1, vi[2]-1, f['material'])
+        buffer.append(data)
+
+    # 4. smooth triangles
+    # -------------------
+    # a  unsigned int   4
+    # b  unsigned int   4
+    # c  unsigned int   4
+    # m  unsigned short 2
+    # na unsigned int   4
+    # nb unsigned int   4
+    # nc unsigned int   4
+    for f in triangles_smooth:
+        vi = f['vertex']
+        ni = f['normal']
+        data = struct.pack('<IIIHIII', vi[0]-1, vi[1]-1, vi[2]-1, f['material'], ni[0]-1, ni[1]-1, ni[2]-1)
+        buffer.append(data)
+    
+    # 5. flat quads
+    # ------------------
+    # a unsigned int   4
+    # b unsigned int   4
+    # c unsigned int   4
+    # d unsigned int   4
+    # m unsigned short 2
+    for f in quads_flat:
+        vi = f['vertex']
+        data = struct.pack('<IIIIH', vi[0]-1, vi[1]-1, vi[2]-1, vi[3]-1, f['material'])
+        buffer.append(data)
+            
+    # 6. smooth quads
+    # -------------------
+    # a  unsigned int   4
+    # b  unsigned int   4
+    # c  unsigned int   4
+    # d  unsigned int   4
+    # m  unsigned short 2
+    # na unsigned int   4
+    # nb unsigned int   4
+    # nc unsigned int   4
+    # nd unsigned int   4
+    for f in quads_smooth:
+        vi = f['vertex']
+        ni = f['normal']
+        data = struct.pack('<IIIIHIIII', vi[0]-1, vi[1]-1, vi[2]-1, vi[3]-1, f['material'], ni[0]-1, ni[1]-1, ni[2]-1, ni[3]-1)
+        buffer.append(data)
+    
+    # 7. uvs triangles
+    # ----------------
+    # ua float      4
+    # va float      4
+    # ub float      4
+    # vb float      4
+    # uc float      4
+    # vc float      4
+    for f in faces_uv_tri:
+        ui = f['uv']
+        for i in ui:
+            u = uvs[i-1][0]
+            v = 1.0 - uvs[i-1][1]
+            data = struct.pack('<ff', u,v)
+            buffer.append(data)
+    
+    # 8. uvs quads
+    # ----------------
+    # ua float      4
+    # va float      4
+    # ub float      4
+    # vb float      4
+    # uc float      4
+    # vc float      4
+    # ud float      4
+    # vd float      4
+    for f in faces_uv_quad:
+        ui = f['uv']
+        for i in ui:
+            u = uvs[i-1][0]
+            v = 1.0 - uvs[i-1][1]
+            data = struct.pack('<ff', u,v)
+            buffer.append(data)
+
+    path = os.path.dirname(outfile)
+    fname = os.path.join(path, binfile)
+
+    out = open(fname, "wb")
+    out.write("".join(buffer))
+    out.close()
+
+# #############################################################################
 # Helpers
 # #############################################################################
 def usage():
-    print "Usage: %s -i filename.obj -o filename.js [-a center|top|bottom] [-s flat|smooth]" % os.path.basename(sys.argv[0])
+    print "Usage: %s -i filename.obj -o filename.js [-a center|top|bottom] [-s flat|smooth] [-t binary|ascii]" % os.path.basename(sys.argv[0])
         
 # #####################################################
 # Main
@@ -718,7 +1002,7 @@ if __name__ == "__main__":
     
     # get parameters from the command line
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hi:o:a:s:", ["help", "input=", "output=", "align=", "shading="])
+        opts, args = getopt.getopt(sys.argv[1:], "hi:o:a:s:t:", ["help", "input=", "output=", "align=", "shading=", "type="])
     
     except getopt.GetoptError:
         usage()
@@ -744,12 +1028,19 @@ if __name__ == "__main__":
         elif o in ("-s", "--shading"):
             if a in ("flat", "smooth"):
                 SHADING = a
+                
+        elif o in ("-t", "--type"):
+            if a in ("binary", "ascii"):
+                TYPE = a
 
     if infile == "" or outfile == "":
         usage()
         sys.exit(2)
     
     print "Converting [%s] into [%s] ..." % (infile, outfile)
-    convert(infile, outfile)
     
+    if TYPE == "ascii":
+        convert_ascii(infile, outfile)
+    elif TYPE == "binary":
+        convert_binary(infile, outfile)
     
