@@ -53,15 +53,35 @@ def addHeader(text, endFilename):
 	return ("// %s r%s - http://github.com/mrdoob/three.js\n" % (endFilename, revision)) + text
 
 
-def build(files, outputFilename):
+def makeDebug(text):
+	position = 0
+	while True:
+		position = text.find("/* DEBUG", position)
+		if position == -1:
+			break
+		text = text[0:position] + text[position+8:]
+		position = text.find("*/", position)
+		text = text[0:position] + text[position+2:]
+	return text
+
+
+def build(files, debug, outputFilename):
 	print "=" * 40
-	print "Compiling", outputFilename
+	print "Compiling", outputFilename, ("(debug = %d)" % debug)
 	print "=" * 40
 
-	output(addHeader(compress(merge(files)), outputFilename), outputFilename)
+	text = merge(files)
+
+	if debug:
+		text = makeDebug(text)
+		outputFilename = outputFilename + 'Debug'
+	
+	outputFilename = outputFilename + '.js'
+
+	output(addHeader(compress(text), outputFilename), outputFilename)
 
 
-def buildFull():
+def buildFull(debug):
 	files = [
 		'Three.js',
 		'core/Color.js',
@@ -108,10 +128,10 @@ def buildFull():
 		'renderers/renderables/RenderableLine.js'
 	]
 
-	build(files, 'Three.js')
+	build(files, debug, 'Three')
 
 
-def buildCanvas():
+def buildCanvas(debug):
 
 	files = [
 		'Three.js',
@@ -155,10 +175,10 @@ def buildCanvas():
 		'renderers/renderables/RenderableLine.js'
 	]
 
-	build(files, 'ThreeCanvas.js')
+	build(files, debug, 'ThreeCanvas')
 
 
-def buildWebGL():
+def buildWebGL(debug):
 
 	files = [
 		'Three.js',
@@ -197,10 +217,10 @@ def buildWebGL():
 		'renderers/WebGLRenderer.js',
 	]
 
-	build(files, 'ThreeWebGL.js')
+	build(files, debug, 'ThreeWebGL')
 
 
-def buildSVG():
+def buildSVG(debug):
 	
 	files = [
 		'Three.js',
@@ -243,10 +263,10 @@ def buildSVG():
 		'renderers/renderables/RenderableLine.js'
 	]
 
-	build(files, 'ThreeSVG.js')
+	build(files, debug, 'ThreeSVG')
 
 
-def buildDOM():
+def buildDOM(debug):
 
 	files = [
 		'Three.js',
@@ -276,75 +296,7 @@ def buildDOM():
 		'renderers/renderables/RenderableParticle.js',
 	]
 
-	build(files, 'ThreeDOM.js')
-
-
-def buildDebug():
-
-	outputFilename = 'ThreeDebug.js'
-
-	print "=" * 40
-	print "Compiling", outputFilename
-	print "=" * 40
-
-	files = [
-		'Three.js',
-		'core/Color.js',
-		'core/Vector2.js',
-		'core/Vector3.js',
-		'core/Vector4.js',
-		'core/Ray.js',
-		'core/Rectangle.js',
-		'core/Matrix3.js',
-		'core/Matrix4.js',
-		'core/Vertex.js',
-		'core/Face3.js',
-		'core/Face4.js',
-		'core/UV.js',
-		'core/Geometry.js',
-		'cameras/Camera.js',
-		'io/Loader.js',
-		'lights/Light.js',
-		'lights/AmbientLight.js',
-		'lights/DirectionalLight.js',
-		'lights/PointLight.js',
-		'objects/Object3D.js',
-		'objects/Particle.js',
-		'objects/Line.js',
-		'objects/Mesh.js',
-		'materials/LineColorMaterial.js',
-		'materials/MeshPhongMaterial.js',
-		'materials/MeshBitmapMaterial.js',
-		'materials/MeshColorFillMaterial.js',
-		'materials/MeshColorStrokeMaterial.js',
-		'materials/MeshFaceMaterial.js',
-		'materials/ParticleBitmapMaterial.js',
-		'materials/ParticleCircleMaterial.js',
-		'materials/ParticleDOMMaterial.js',
-		'scenes/Scene.js',
-		'renderers/Projector.js',
-		'renderers/DOMRenderer.js',
-		'renderers/CanvasRenderer.js',
-		'renderers/SVGRenderer.js',
-		'renderers/WebGLRenderer.js',
-		'renderers/renderables/RenderableFace3.js',
-		'renderers/renderables/RenderableFace4.js',
-		'renderers/renderables/RenderableParticle.js',
-		'renderers/renderables/RenderableLine.js'
-	]
-
-	text = merge(files)
-
-	position = 0
-	while True:
-		position = text.find("/* DEBUG", position)
-		if position == -1:
-			break
-		text = text[0:position] + text[position+8:]
-		position = text.find("*/", position)
-		text = text[0:position] + text[position+2:]
-
-	output(addHeader(compress(text), outputFilename), outputFilename)
+	build(files, debug, 'ThreeDOM')
 
 
 def parse_args():
@@ -356,7 +308,7 @@ def parse_args():
 		parser.add_argument('--webgl', help='Build ThreeWebGL.js', action='store_true')
 		parser.add_argument('--svg', help='Build ThreeSVG.js', action='store_true')
 		parser.add_argument('--dom', help='Build ThreeDOM.js', action='store_true')
-		parser.add_argument('--debug', help='Build ThreeDebug.js', action='store_true')
+		parser.add_argument('--debug', help='Generate debug versions', action='store_const', const=True, default=False)
 		parser.add_argument('--all', help='Build all Three.js versions', action='store_true')
 
 		args = parser.parse_args()
@@ -368,7 +320,7 @@ def parse_args():
 		parser.add_option('--webgl', dest='webgl', help='Build ThreeWebGL.js', action='store_true')
 		parser.add_option('--svg', dest='svg', help='Build ThreeSVG.js', action='store_true')
 		parser.add_option('--dom', dest='dom', help='Build ThreeDOM.js', action='store_true')
-		parser.add_option('--debug', dest='debug', help='Build ThreeDebug.js', action='store_true')
+		parser.add_option('--debug', dest='debug', help='Generate debug versions', action='store_const', const=True, default=False)
 		parser.add_option('--all', dest='all', help='Build all Three.js versions', action='store_true')
 
 		args, remainder = parser.parse_args()
@@ -380,24 +332,23 @@ def main(argv=None):
 
 	args = parse_args()
 
+	debug = args.debug
+
+
 	if args.full or args.all:
-		buildFull()
+		buildFull(debug)
 
 	if args.canvas or args.all:
-		buildCanvas()
+		buildCanvas(debug)
 
 	if args.webgl or args.all:
-		buildWebGL()
+		buildWebGL(debug)
 
 	if args.svg or args.all:
-		buildSVG()
+		buildSVG(debug)
 
 	if args.dom or args.all:
-		buildDOM()
-
-	if args.debug or args.all:
-		buildDebug()
-
+		buildDOM(debug)
 
 if __name__ == "__main__":
 	main()
