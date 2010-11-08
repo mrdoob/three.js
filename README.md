@@ -142,7 +142,7 @@ For creating a customised version of the library, including the source files in 
 2010 11 04 - **r28** (62.802 kb)
 
 * `Loader` class allows load geometry asynchronously at runtime. ([alteredq](http://github.com/alteredq))
-* `MeshPhongMaterial' working with `WebGLRenderer`. ([alteredq](http://github.com/alteredq))
+* `MeshPhongMaterial` working with `WebGLRenderer`. ([alteredq](http://github.com/alteredq))
 * Support for *huge* objects. Max 500k polys and counting. ([alteredq](http://github.com/alteredq))
 * `Projector.unprojectVector` and `Ray` class to check intersections with faces (based on [mindlapse](https://github.com/mindlapse) work)
 * Fixed `CanvasRenderer` and `SVGRenderer` z-sorting (not as jumpy anymore).
