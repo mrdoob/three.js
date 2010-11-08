@@ -213,6 +213,20 @@ THREE.Loader.prototype = {
 				log( "nquad_smooth: " + metaData.nquad_smooth );
 				log( "nquad_flat_uv: " + metaData.nquad_flat_uv );
 				log( "nquad_smooth_uv: " + metaData.nquad_smooth_uv );
+				
+				var total = metaData.header_bytes
+						  + metaData.nvertices * metaData.vertex_coordinate_bytes * 3
+						  + metaData.nnormals * metaData.normal_coordinate_bytes * 3
+						  + metaData.nuvs * metaData.uv_coordinate_bytes * 2
+						  + metaData.ntri_flat * ( metaData.vertex_index_bytes*3 + metaData.material_index_bytes )
+						  + metaData.ntri_smooth * ( metaData.vertex_index_bytes*3 + metaData.material_index_bytes + metaData.normal_index_bytes*3 )
+						  + metaData.ntri_flat_uv * ( metaData.vertex_index_bytes*3 + metaData.material_index_bytes + metaData.uv_index_bytes*3 )
+						  + metaData.ntri_smooth_uv * ( metaData.vertex_index_bytes*3 + metaData.material_index_bytes + metaData.normal_index_bytes*3 + metaData.uv_index_bytes*3 )
+						  + metaData.nquad_flat * ( metaData.vertex_index_bytes*4 + metaData.material_index_bytes )
+						  + metaData.nquad_smooth * ( metaData.vertex_index_bytes*4 + metaData.material_index_bytes + metaData.normal_index_bytes*4 )
+						  + metaData.nquad_flat_uv * ( metaData.vertex_index_bytes*4 + metaData.material_index_bytes + metaData.uv_index_bytes*4 )
+						  + metaData.nquad_smooth_uv * ( metaData.vertex_index_bytes*4 + metaData.material_index_bytes + metaData.normal_index_bytes*4 + metaData.uv_index_bytes*4 );
+				log( "total bytes: " + total );
 				*/
 				
 				return metaData;
