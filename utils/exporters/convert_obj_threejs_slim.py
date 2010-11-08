@@ -156,14 +156,17 @@ var model = {
 
     'vertices': [%(vertices)s],
 
-    'uvs_tri': [%(uvs_tri)s],
-    'uvs_quad': [%(uvs_quad)s],
+    'uvs': [%(uvs)s],
 
     'triangles': [%(triangles)s],
     'triangles_n': [%(triangles_n)s],
+    'triangles_uv': [%(triangles_uv)s],
+    'triangles_n_uv': [%(triangles_n_uv)s],
 
     'quads': [%(quads)s],
     'quads_n': [%(quads_n)s],
+    'quads_uv': [%(quads_uv)s],
+    'quads_n_uv': [%(quads_n_uv)s],
 
     'end': (new Date).getTime()
     }
@@ -197,13 +200,20 @@ TEMPLATE_VERTEX = "%f,%f,%f"
 TEMPLATE_UV_TRI = "%f,%f,%f,%f,%f,%f"
 TEMPLATE_UV_QUAD = "%f,%f,%f,%f,%f,%f,%f,%f"
 
-TEMPLATE_TRI  = "%d,%d,%d,%d"
-TEMPLATE_QUAD  = "%d,%d,%d,%d,%d"
+TEMPLATE_TRI = "%d,%d,%d,%d"
+TEMPLATE_QUAD = "%d,%d,%d,%d,%d"
 
-TEMPLATE_TRI_N  = "%d,%d,%d,%d,%d,%d,%d"
-TEMPLATE_QUAD_N  = "%d,%d,%d,%d,%d,%d,%d,%d,%d"
+TEMPLATE_TRI_UV = "%d,%d,%d,%d,%d,%d,%d"
+TEMPLATE_QUAD_UV = "%d,%d,%d,%d,%d,%d,%d,%d,%d"
+
+TEMPLATE_TRI_N = "%d,%d,%d,%d,%d,%d,%d"
+TEMPLATE_QUAD_N = "%d,%d,%d,%d,%d,%d,%d,%d,%d"
+
+TEMPLATE_TRI_N_UV = "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d"
+TEMPLATE_QUAD_N_UV = "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d"
 
 TEMPLATE_N = "%f,%f,%f"
+TEMPLATE_UV = "%f,%f"
 
 # #####################################################
 # Utils
@@ -548,39 +558,67 @@ def parse_obj(fname):
 def generate_vertex(v):
     return TEMPLATE_VERTEX % (v[0], v[1], v[2])
     
-def generate_uv_tri(f, uvs):
-    ui = f['uv']
-    return TEMPLATE_UV_TRI % (uvs[ui[0]-1][0], 1.0 - uvs[ui[0]-1][1],
-                           uvs[ui[1]-1][0], 1.0 - uvs[ui[1]-1][1],
-                           uvs[ui[2]-1][0], 1.0 - uvs[ui[2]-1][1])
-    
-def generate_uv_quad(f, uvs):
-    ui = f['uv']
-    return TEMPLATE_UV_QUAD % (uvs[ui[0]-1][0], 1.0 - uvs[ui[0]-1][1],
-                           uvs[ui[1]-1][0], 1.0 - uvs[ui[1]-1][1],
-                           uvs[ui[2]-1][0], 1.0 - uvs[ui[2]-1][1],
-                           uvs[ui[3]-1][0], 1.0 - uvs[ui[3]-1][1])
-
 def generate_triangle(f):
-    vi = f['vertex']
-    return TEMPLATE_TRI % (vi[0]-1, vi[1]-1, vi[2]-1, f['material'])
+    v = f['vertex']
+    return TEMPLATE_TRI % (v[0]-1, v[1]-1, v[2]-1, 
+                           f['material'])
+
+def generate_triangle_uv(f):
+    v = f['vertex']
+    uv = f['uv']
+    return TEMPLATE_TRI_UV % (v[0]-1, v[1]-1, v[2]-1, 
+                              f['material'], 
+                              uv[0]-1, uv[1]-1, uv[2]-1)
 
 def generate_triangle_n(f):
-    vi = f['vertex']
-    ni = f['normal']
-    return TEMPLATE_TRI_N % (vi[0]-1, vi[1]-1, vi[2]-1, f['material'], ni[0]-1, ni[1]-1, ni[2]-1)
+    v = f['vertex']
+    n = f['normal']
+    return TEMPLATE_TRI_N % (v[0]-1, v[1]-1, v[2]-1, 
+                             f['material'], 
+                             n[0]-1, n[1]-1, n[2]-1)
+
+def generate_triangle_n_uv(f):
+    v = f['vertex']
+    n = f['normal']
+    uv = f['uv']
+    return TEMPLATE_TRI_N_UV % (v[0]-1, v[1]-1, v[2]-1, 
+                                f['material'], 
+                                n[0]-1, n[1]-1, n[2]-1, 
+                                uv[0]-1, uv[1]-1, uv[2]-1)
 
 def generate_quad(f):
     vi = f['vertex']
-    return TEMPLATE_QUAD % (vi[0]-1, vi[1]-1, vi[2]-1, vi[3]-1, f['material'])
+    return TEMPLATE_QUAD % (vi[0]-1, vi[1]-1, vi[2]-1, vi[3]-1, 
+                            f['material'])
+
+def generate_quad_uv(f):
+    v = f['vertex']
+    uv = f['uv']
+    return TEMPLATE_QUAD_UV % (v[0]-1, v[1]-1, v[2]-1, v[3]-1, 
+                               f['material'], 
+                               uv[0]-1, uv[1]-1, uv[2]-1, uv[3]-1)
 
 def generate_quad_n(f):
-    vi = f['vertex']
-    ni = f['normal']
-    return TEMPLATE_QUAD_N % (vi[0]-1, vi[1]-1, vi[2]-1, vi[3]-1, f['material'],  ni[0]-1, ni[1]-1, ni[2]-1, ni[3]-1)
+    v = f['vertex']
+    n = f['normal']
+    return TEMPLATE_QUAD_N % (v[0]-1, v[1]-1, v[2]-1, v[3]-1, 
+                              f['material'],
+                              n[0]-1, n[1]-1, n[2]-1, n[3]-1)
+
+def generate_quad_n_uv(f):
+    v = f['vertex']
+    n = f['normal']
+    uv = f['uv']
+    return TEMPLATE_QUAD_N_UV % (v[0]-1, v[1]-1, v[2]-1, v[3]-1, 
+                                 f['material'],
+                                 n[0]-1, n[1]-1, n[2]-1, n[3]-1,
+                                 uv[0]-1, uv[1]-1, uv[2]-1, uv[3]-1)
 
 def generate_normal(n):
     return TEMPLATE_N % (n[0], n[1], n[2])
+
+def generate_uv(uv):
+    return TEMPLATE_UV % (uv[0], 1.0 - uv[1])
 
 # #####################################################
 # Materials
@@ -675,16 +713,28 @@ def generate_materials_string(materials, mtllib):
 # Faces
 # #####################################################
 def is_triangle_flat(f):
-    return len(f['vertex'])==3 and not (f["normal"] and SHADING == "smooth")
+    return len(f['vertex'])==3 and not (f["normal"] and SHADING == "smooth") and not f['uv']
     
+def is_triangle_flat_uv(f):
+    return len(f['vertex'])==3 and not (f["normal"] and SHADING == "smooth") and len(f['uv'])==3
+
 def is_triangle_smooth(f):
-    return len(f['vertex'])==3 and f["normal"] and SHADING == "smooth"
+    return len(f['vertex'])==3 and f["normal"] and SHADING == "smooth" and not f['uv']
     
+def is_triangle_smooth_uv(f):
+    return len(f['vertex'])==3 and f["normal"] and SHADING == "smooth" and len(f['uv'])==3
+
 def is_quad_flat(f):
-    return len(f['vertex'])==4 and not (f["normal"] and SHADING == "smooth")
+    return len(f['vertex'])==4 and not (f["normal"] and SHADING == "smooth") and not f['uv']
     
+def is_quad_flat_uv(f):
+    return len(f['vertex'])==4 and not (f["normal"] and SHADING == "smooth") and len(f['uv'])==4
+
 def is_quad_smooth(f):
-    return len(f['vertex'])==4 and f["normal"] and SHADING == "smooth"
+    return len(f['vertex'])==4 and f["normal"] and SHADING == "smooth" and not f['uv']
+
+def is_quad_smooth_uv(f):
+    return len(f['vertex'])==4 and f["normal"] and SHADING == "smooth" and len(f['uv'])==4
 
 # #####################################################
 # API - ASCII converter
@@ -708,27 +758,24 @@ def convert_ascii(infile, outfile):
         bottom(vertices)
     elif ALIGN == "top":
         top(vertices)
-        
-    uv_string_tri = ""
-    uv_string_quad = ""
-    if len(uvs)>0:
-        uv_string_tri  = ",".join([generate_uv_tri(f, uvs)  for f in faces if len(f['uv']) == 3])
-        uv_string_quad = ",".join([generate_uv_quad(f, uvs) for f in faces if len(f['uv']) == 4])
     
     normals_string = ""
     if SHADING == "smooth":
         normals_string = ",".join(generate_normal(n) for n in normals)
         
     text = TEMPLATE_FILE_ASCII % {
-    "name"       : get_name(outfile),
-    "vertices"   : ",".join([generate_vertex(v) for v in vertices]),
-    "triangles"  : ",".join([generate_triangle(f) for f in faces if is_triangle_flat(f)]),
-    "triangles_n": ",".join([generate_triangle_n(f) for f in faces if is_triangle_smooth(f)]),
-    "quads"      : ",".join([generate_quad(f) for f in faces if is_quad_flat(f)]),
-    "quads_n"    : ",".join([generate_quad_n(f) for f in faces if is_quad_smooth(f)]),
-    "uvs_tri"    : uv_string_tri,
-    "uvs_quad"   : uv_string_quad,
-    "normals"    : normals_string,
+    "name"          : get_name(outfile),
+    "vertices"      : ",".join([generate_vertex(v) for v in vertices]),
+    "triangles"     : ",".join([generate_triangle(f) for f in faces if is_triangle_flat(f)]),
+    "triangles_n"   : ",".join([generate_triangle_n(f) for f in faces if is_triangle_smooth(f)]),
+    "triangles_uv"  : ",".join([generate_triangle_uv(f) for f in faces if is_triangle_flat_uv(f)]),
+    "triangles_n_uv": ",".join([generate_triangle_n_uv(f) for f in faces if is_triangle_smooth_uv(f)]),
+    "quads"         : ",".join([generate_quad(f) for f in faces if is_quad_flat(f)]),
+    "quads_n"       : ",".join([generate_quad_n(f) for f in faces if is_quad_smooth(f)]),
+    "quads_uv"      : ",".join([generate_quad_uv(f) for f in faces if is_quad_flat_uv(f)]),
+    "quads_n_uv"    : ",".join([generate_quad_n_uv(f) for f in faces if is_quad_smooth_uv(f)]),
+    "uvs"           : ",".join([generate_uv(uv) for uv in uvs]),
+    "normals"       : normals_string,
     
     "materials" : generate_materials_string(materials, mtllib),
     

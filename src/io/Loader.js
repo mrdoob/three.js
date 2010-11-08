@@ -579,7 +579,6 @@ THREE.Loader.prototype = {
 			
 			init_materials();
 			init_vertices();
-			init_uvs();
 			init_faces();
 			
 			this.computeCentroids();
@@ -600,108 +599,177 @@ THREE.Loader.prototype = {
 			
 			}
 
-			function init_uvs() {
-			
-				var i, l, ua, ub, uc, ud, va, vb, vc, vd;
-				
-				for( i = 0, l = data.uvs_tri.length; i < l; i++ ) {
-					
-					ua = data.uvs_tri[ i*6     ];
-					va = data.uvs_tri[ i*6 + 1 ];
-					
-					ub = data.uvs_tri[ i*6 + 2 ];
-					vb = data.uvs_tri[ i*6 + 3 ];
-					
-					uc = data.uvs_tri[ i*6 + 4 ];
-					vc = data.uvs_tri[ i*6 + 5 ];
-					
-					uv( ua, va, ub, vb, uc, vc );
-					
-				}
-				
-				for( i = 0, l = data.uvs_quad.length; i < l; i++ ) {
-					
-					ua = data.uvs_quad[ i*8     ];
-					va = data.uvs_quad[ i*8 + 1 ];
-					
-					ub = data.uvs_quad[ i*8 + 2 ];
-					vb = data.uvs_quad[ i*8 + 3 ];
-					
-					uc = data.uvs_quad[ i*8 + 4 ];
-					vc = data.uvs_quad[ i*8 + 5 ];
-					
-					ud = data.uvs_quad[ i*8 + 6 ];
-					vd = data.uvs_quad[ i*8 + 7 ];
-					
-					uv( ua, va, ub, vb, uc, vc, ud, vd );
-				
-				}
-			
-			}
-
 			function init_faces() {
 			
-				var i, l, a, b, c, d, m, na, nb, nc, nd;
+				var i, l;
 
-				for( i = 0, l = data.triangles.length/4; i < l; i++ ) {
+				function add_tri( src, i, stride ) {
+
+					var a, b, c, m;
 					
-					a = data.triangles[ i*4     ];
-					b = data.triangles[ i*4 + 1 ];
-					c = data.triangles[ i*4 + 2 ];
+					a = src[ i*stride     ];
+					b = src[ i*stride + 1 ];
+					c = src[ i*stride + 2 ];
 					
-					m = data.triangles[ i*4 + 3 ];
+					m = src[ i*stride + 3 ];
 					
 					f3( a, b, c, m );
-				
+					
 				}
 
-				for( i = 0, l = data.triangles_n.length/7; i < l; i++ ) {
+				function add_tri_n( src, i, stride ) {
 					
-					a  = data.triangles_n[ i*7     ];
-					b  = data.triangles_n[ i*7 + 1 ];
-					c  = data.triangles_n[ i*7 + 2 ];
+					var a, b, c, m, na, nb, nc;
 					
-					m  = data.triangles_n[ i*7 + 3 ];
+					a  = src[ i*stride     ];
+					b  = src[ i*stride + 1 ];
+					c  = src[ i*stride + 2 ];
 					
-					na = data.triangles_n[ i*7 + 4 ];
-					nb = data.triangles_n[ i*7 + 5 ];
-					nc = data.triangles_n[ i*7 + 6 ];
+					m  = src[ i*stride + 3 ];
+					
+					na = src[ i*stride + 4 ];
+					nb = src[ i*stride + 5 ];
+					nc = src[ i*stride + 6 ];
 					
 					f3n( a, b, c, m, na, nb, nc );
-				
+					
 				}
 				
-				for( i = 0, l = data.quads.length/5; i < l; i++ ) {
+				function add_quad( src, i, stride ) {
 					
-					a = data.quads[ i*5     ];
-					b = data.quads[ i*5 + 1 ];
-					c = data.quads[ i*5 + 2 ];
-					d = data.quads[ i*5 + 3 ];
+					var a, b, c, d, m;
 					
-					m = data.quads[ i*5 + 4 ];
+					a = src[ i*stride     ];
+					b = src[ i*stride + 1 ];
+					c = src[ i*stride + 2 ];
+					d = src[ i*stride + 3 ];
+					
+					m = src[ i*stride + 4 ];
 					
 					f4( a, b, c, d, m );
 					
 				}
 
-				for( i = 0, l = data.quads_n.length/9; i < l; i++ ) {
+				function add_quad_n( src, i, stride ) {
 					
-					a  = data.quads_n[ i*9     ];
-					b  = data.quads_n[ i*9 + 1 ];
-					c  = data.quads_n[ i*9 + 2 ];
-					d  = data.quads_n[ i*9 + 3 ];
+					var a, b, c, d, m, na, nb, nc, nd;
 					
-					m  = data.quads_n[ i*9 + 4 ];
+					a  = src[ i*stride     ];
+					b  = src[ i*stride + 1 ];
+					c  = src[ i*stride + 2 ];
+					d  = src[ i*stride + 3 ];
 					
-					na = data.quads_n[ i*9 + 5 ];
-					nb = data.quads_n[ i*9 + 6 ];
-					nc = data.quads_n[ i*9 + 7 ];
-					nd = data.quads_n[ i*9 + 8 ];
+					m  = src[ i*stride + 4 ];
+
+					na = src[ i*stride + 5 ];
+					nb = src[ i*stride + 6 ];
+					nc = src[ i*stride + 7 ];
+					nd = src[ i*stride + 8 ];
 					
 					f4n( a, b, c, d, m, na, nb, nc, nd );
+					
+				}
+				
+				function add_uv3( src, i, stride, offset ) {
+					
+					var uva, uvb, uvc, u1, u2, u3, v1, v2, v3;
+
+					uva = src[ i*stride + offset ];
+					uvb = src[ i*stride + offset + 1 ];
+					uvc = src[ i*stride + offset + 2 ];
+					
+					u1 = data.uvs[ uva*2 ];
+					v1 = data.uvs[ uva*2 + 1 ];
+					
+					u2 = data.uvs[ uvb*2 ];
+					v2 = data.uvs[ uvb*2 + 1 ];
+					
+					u3 = data.uvs[ uvc*2 ];
+					v3 = data.uvs[ uvc*2 + 1 ];
+					
+					uv( u1, v1, u2, v2, u3, v3 );
+					
+				}
+				
+				function add_uv4( src, i, stride, offset ) {
+					
+					var uva, uvb, uvc, uvd, u1, u2, u3, u4, v1, v2, v3, v4;
+					
+					uva = src[ i*stride + offset ];
+					uvb = src[ i*stride + offset + 1 ];
+					uvc = src[ i*stride + offset + 2 ];
+					uvd = src[ i*stride + offset + 3 ];
+					
+					u1 = data.uvs[ uva*2 ];
+					v1 = data.uvs[ uva*2 + 1 ];
+					
+					u2 = data.uvs[ uvb*2 ];
+					v2 = data.uvs[ uvb*2 + 1 ];
+					
+					u3 = data.uvs[ uvc*2 ];
+					v3 = data.uvs[ uvc*2 + 1 ];
+					
+					u4 = data.uvs[ uvd*2 ];
+					v4 = data.uvs[ uvd*2 + 1 ];
+					
+					uv( u1, v1, u2, v2, u3, v3, u4, v4 );
+					
+				}
+				
+				
+				for( i = 0, l = data.triangles.length/4; i < l; i++ ) {
+				
+					add_tri( data.triangles, i, 4 );
+					
+				}
+
+				for( i = 0, l = data.triangles_uv.length/7; i < l; i++ ) {
+					
+					add_tri( data.triangles_uv, i, 7 );	
+					add_uv3( data.triangles_uv, i, 7, 4 );
 				
 				}
-			
+
+				for( i = 0, l = data.triangles_n.length/7; i < l; i++ ) {
+					
+					add_tri_n( data.triangles_n, i, 7 );
+					
+				}
+
+				for( i = 0, l = data.triangles_n_uv.length/10; i < l; i++ ) {
+					
+					add_tri_n( data.triangles_n_uv, i, 10 );
+					add_uv3( data.triangles_n_uv, i, 10, 7 );
+				
+				}
+
+				
+				for( i = 0, l = data.quads.length/5; i < l; i++ ) {
+					
+					add_quad( data.quads, i, 5 );
+					
+				}
+
+				for( i = 0, l = data.quads_uv.length/9; i < l; i++ ) {
+					
+					add_quad( data.quads_uv, i, 9 );
+					add_uv4( data.quads_uv, i, 9, 5 );
+				
+				}
+
+				for( i = 0, l = data.quads_n.length/9; i < l; i++ ) {
+					
+					add_quad_n( data.quads_n, i, 9 );
+					
+				}
+
+				for( i = 0, l = data.quads_n_uv.length/13; i < l; i++ ) {
+					
+					add_quad_n( data.quads_n_uv, i, 13 );
+					add_uv4( data.quads_n_uv, i, 13, 9 );
+				
+				}
+				
 			}
 			
 			function v( x, y, z ) {
@@ -709,14 +777,14 @@ THREE.Loader.prototype = {
 				scope.vertices.push( new THREE.Vertex( new THREE.Vector3( x, y, z ) ) );
 				
 			}
-
+			
 			function f3( a, b, c, mi ) {
 				
 				var material = scope.materials[ mi ];
 				scope.faces.push( new THREE.Face3( a, b, c, null, material ) );
 				
 			}
-
+			
 			function f4( a, b, c, d, mi ) {
 				
 				var material = scope.materials[ mi ];
@@ -769,7 +837,7 @@ THREE.Loader.prototype = {
 								  material ) );
 				
 			}
-
+			
 			function uv( u1, v1, u2, v2, u3, v3, u4, v4 ) {
 				
 				var uv = [];
