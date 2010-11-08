@@ -16,7 +16,7 @@ Other similar projects: [pre3d](http://deanm.github.com/pre3d/), [pvjs](http://c
 ### Examples ###
 
 [![large_mesh](http://mrdoob.github.com/three.js/assets/examples/12_large_mesh.png)](http://mrdoob.github.com/three.js/examples/geometry_large_mesh.html)
-[![interactive_voxelpainter](http://mrdoob.github.com/three.js/assets/examples/13_voxelpainter.png)](http://mrdoob.github.com/three.js/examples/interactive_voxelpainter.html)
+[![interactive_cubes](http://mrdoob.github.com/three.js/assets/examples/11_interactive.png)](http://mrdoob.github.com/three.js/examples/interactive_cubes.html)
 [![camera_ortographic](http://mrdoob.github.com/three.js/assets/examples/10_orthographic.png)](http://mrdoob.github.com/three.js/examples/camera_orthographic.html)
 [![lights_pointlights](http://mrdoob.github.com/three.js/assets/examples/09_walthead.png)](http://mrdoob.github.com/three.js/examples/lights_pointlights.html)
 [![geometry_birds](http://mrdoob.github.com/three.js/assets/examples/08_birds.png)](http://mrdoob.github.com/three.js/examples/geometry_birds.html)
@@ -31,6 +31,7 @@ Other similar projects: [pre3d](http://deanm.github.com/pre3d/), [pvjs](http://c
 
 ### Featured projects ###
 
+[![Voxels](http://mrdoob.github.com/three.js/assets/projects/10_voxels.png)](http://mrdoob.com/projects/voxels/)
 [![The Wilderness Downtown](http://mrdoob.github.com/three.js/assets/projects/09_arcadefire.png)](http://thewildernessdowntown.com/)
 [![CloudSCAD](http://mrdoob.github.com/three.js/assets/projects/08_cloudscad.png)](http://cloudscad.com/stl_viewer/)
 [![Or so they say...](http://mrdoob.github.com/three.js/assets/projects/07_orsotheysay.png)](http://xplsv.com/prods/demos/xplsv_orsotheysay/)
@@ -141,7 +142,7 @@ For creating a customised version of the library, including the source files in 
 2010 11 04 - **r28** (62.802 kb)
 
 * `Loader` class allows load geometry asynchronously at runtime. ([alteredq](http://github.com/alteredq))
-* `MeshPhongMaterial' working with `WebGLRenderer`. ([alteredq](http://github.com/alteredq))
+* `MeshPhongMaterial` working with `WebGLRenderer`. ([alteredq](http://github.com/alteredq))
 * Support for *huge* objects. Max 500k polys and counting. ([alteredq](http://github.com/alteredq))
 * `Projector.unprojectVector` and `Ray` class to check intersections with faces (based on [mindlapse](https://github.com/mindlapse) work)
 * Fixed `CanvasRenderer` and `SVGRenderer` z-sorting (not as jumpy anymore).
