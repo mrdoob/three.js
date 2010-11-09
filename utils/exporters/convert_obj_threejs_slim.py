@@ -736,6 +736,40 @@ def is_quad_smooth(f):
 def is_quad_smooth_uv(f):
     return len(f['vertex'])==4 and f["normal"] and SHADING == "smooth" and len(f['uv'])==4
 
+def sort_faces(faces):
+    data = {
+    'triangles_flat': [],
+    'triangles_flat_uv': [],
+    'triangles_smooth': [],
+    'triangles_smooth_uv': [],
+    
+    'quads_flat': [],
+    'quads_flat_uv': [],
+    'quads_smooth': [],
+    'quads_smooth_uv': []
+    }
+    
+    for f in faces:
+        if is_triangle_flat(f):
+            data['triangles_flat'].append(f)
+        elif is_triangle_flat_uv(f):
+            data['triangles_flat_uv'].append(f)
+        elif is_triangle_smooth(f):
+            data['triangles_smooth'].append(f)
+        elif is_triangle_smooth_uv(f):
+            data['triangles_smooth_uv'].append(f)
+        
+        elif is_quad_flat(f):
+            data['quads_flat'].append(f)
+        elif is_quad_flat_uv(f):
+            data['quads_flat_uv'].append(f)
+        elif is_quad_smooth(f):
+            data['quads_smooth'].append(f)
+        elif is_quad_smooth_uv(f):
+            data['quads_smooth_uv'].append(f)
+
+    return data
+
 # #####################################################
 # API - ASCII converter
 # #####################################################
@@ -763,18 +797,20 @@ def convert_ascii(infile, outfile):
     if SHADING == "smooth":
         normals_string = ",".join(generate_normal(n) for n in normals)
         
+    sfaces = sort_faces(faces)
+    
     text = TEMPLATE_FILE_ASCII % {
     "name"          : get_name(outfile),
-    "vertices"      : ",".join([generate_vertex(v) for v in vertices]),
-    "triangles"     : ",".join([generate_triangle(f) for f in faces if is_triangle_flat(f)]),
-    "triangles_n"   : ",".join([generate_triangle_n(f) for f in faces if is_triangle_smooth(f)]),
-    "triangles_uv"  : ",".join([generate_triangle_uv(f) for f in faces if is_triangle_flat_uv(f)]),
-    "triangles_n_uv": ",".join([generate_triangle_n_uv(f) for f in faces if is_triangle_smooth_uv(f)]),
-    "quads"         : ",".join([generate_quad(f) for f in faces if is_quad_flat(f)]),
-    "quads_n"       : ",".join([generate_quad_n(f) for f in faces if is_quad_smooth(f)]),
-    "quads_uv"      : ",".join([generate_quad_uv(f) for f in faces if is_quad_flat_uv(f)]),
-    "quads_n_uv"    : ",".join([generate_quad_n_uv(f) for f in faces if is_quad_smooth_uv(f)]),
-    "uvs"           : ",".join([generate_uv(uv) for uv in uvs]),
+    "vertices"      : ",".join(generate_vertex(v) for v in vertices),
+    "triangles"     : ",".join(generate_triangle(f) for f in sfaces['triangles_flat']),
+    "triangles_n"   : ",".join(generate_triangle_n(f) for f in sfaces['triangles_smooth']),
+    "triangles_uv"  : ",".join(generate_triangle_uv(f) for f in sfaces['triangles_flat_uv']),
+    "triangles_n_uv": ",".join(generate_triangle_n_uv(f) for f in sfaces['triangles_smooth_uv']),
+    "quads"         : ",".join(generate_quad(f) for f in sfaces['quads_flat']),
+    "quads_n"       : ",".join(generate_quad_n(f) for f in sfaces['quads_smooth']),
+    "quads_uv"      : ",".join(generate_quad_uv(f) for f in sfaces['quads_flat_uv']),
+    "quads_n_uv"    : ",".join(generate_quad_n_uv(f) for f in sfaces['quads_smooth_uv']),
+    "uvs"           : ",".join(generate_uv(uv) for uv in uvs),
     "normals"       : normals_string,
     
     "materials" : generate_materials_string(materials, mtllib),
@@ -791,6 +827,7 @@ def convert_ascii(infile, outfile):
     
     print "%d vertices, %d faces, %d materials" % (len(vertices), len(faces), len(materials))
         
+    
 # #############################################################################
 # API - Binary converter
 # #############################################################################
@@ -812,6 +849,8 @@ def convert_binary(infile, outfile):
         bottom(vertices)
     elif ALIGN == "top":
         top(vertices)    
+    
+    sfaces = sort_faces(faces)
     
     # ###################
     # generate JS file
@@ -836,37 +875,6 @@ def convert_binary(infile, outfile):
     # ###################
     # generate BIN file
     # ###################
-        
-    # preprocess faces
-    
-    triangles_flat = []
-    triangles_flat_uv = []
-    triangles_smooth = []
-    triangles_smooth_uv = []
-    
-    quads_flat = []
-    quads_flat_uv = []
-    quads_smooth = []
-    quads_smooth_uv = []
-    
-    for f in faces:
-        if is_triangle_flat(f):
-            triangles_flat.append(f)
-        elif is_triangle_flat_uv(f):
-            triangles_flat_uv.append(f)
-        elif is_triangle_smooth(f):
-            triangles_smooth.append(f)
-        elif is_triangle_smooth_uv(f):
-            triangles_smooth_uv.append(f)
-        
-        elif is_quad_flat(f):
-            quads_flat.append(f)
-        elif is_quad_flat_uv(f):
-            quads_flat_uv.append(f)
-        elif is_quad_smooth(f):
-            quads_smooth.append(f)
-        elif is_quad_smooth_uv(f):
-            quads_smooth_uv.append(f)
     
     if SHADING == "smooth":
         nnormals = len(normals)
@@ -929,14 +937,14 @@ def convert_binary(infile, outfile):
     ndata = struct.pack('<IIIIIIIIIII', len(vertices), 
                                nnormals,
                                len(uvs),
-                               len(triangles_flat), 
-                               len(triangles_smooth),
-                               len(triangles_flat_uv), 
-                               len(triangles_smooth_uv),
-                               len(quads_flat),
-                               len(quads_smooth),
-                               len(quads_flat_uv),
-                               len(quads_smooth_uv))
+                               len(sfaces['triangles_flat']), 
+                               len(sfaces['triangles_smooth']),
+                               len(sfaces['triangles_flat_uv']), 
+                               len(sfaces['triangles_smooth_uv']),
+                               len(sfaces['quads_flat']),
+                               len(sfaces['quads_smooth']),
+                               len(sfaces['quads_flat_uv']),
+                               len(sfaces['quads_smooth_uv']))
     buffer.append(signature)
     buffer.append(bdata)
     buffer.append(ndata)
@@ -977,7 +985,7 @@ def convert_binary(infile, outfile):
     # b unsigned int   4
     # c unsigned int   4
     # m unsigned short 2
-    for f in triangles_flat:
+    for f in sfaces['triangles_flat']:
         vi = f['vertex']
         data = struct.pack('<IIIH', 
                             vi[0]-1, vi[1]-1, vi[2]-1, 
@@ -993,7 +1001,7 @@ def convert_binary(infile, outfile):
     # na unsigned int   4
     # nb unsigned int   4
     # nc unsigned int   4
-    for f in triangles_smooth:
+    for f in sfaces['triangles_smooth']:
         vi = f['vertex']
         ni = f['normal']
         data = struct.pack('<IIIHIII', 
@@ -1011,7 +1019,7 @@ def convert_binary(infile, outfile):
     # ua unsigned int    4
     # ub unsigned int    4
     # uc unsigned int    4
-    for f in triangles_flat_uv:
+    for f in sfaces['triangles_flat_uv']:
         vi = f['vertex']
         ui = f['uv']
         data = struct.pack('<IIIHIII', 
@@ -1032,7 +1040,7 @@ def convert_binary(infile, outfile):
     # ua unsigned int    4
     # ub unsigned int    4
     # uc unsigned int    4
-    for f in triangles_smooth_uv:
+    for f in sfaces['triangles_smooth_uv']:
         vi = f['vertex']
         ni = f['normal']
         ui = f['uv']
@@ -1050,7 +1058,7 @@ def convert_binary(infile, outfile):
     # c unsigned int   4
     # d unsigned int   4
     # m unsigned short 2
-    for f in quads_flat:
+    for f in sfaces['quads_flat']:
         vi = f['vertex']
         data = struct.pack('<IIIIH', 
                             vi[0]-1, vi[1]-1, vi[2]-1, vi[3]-1, 
@@ -1068,7 +1076,7 @@ def convert_binary(infile, outfile):
     # nb unsigned int   4
     # nc unsigned int   4
     # nd unsigned int   4
-    for f in quads_smooth:
+    for f in sfaces['quads_smooth']:
         vi = f['vertex']
         ni = f['normal']
         data = struct.pack('<IIIIHIIII', 
@@ -1088,7 +1096,7 @@ def convert_binary(infile, outfile):
     # ub unsigned int  4
     # uc unsigned int  4
     # ud unsigned int  4
-    for f in quads_flat_uv:
+    for f in sfaces['quads_flat_uv']:
         vi = f['vertex']
         ui = f['uv']
         data = struct.pack('<IIIIHIIII', 
@@ -1112,7 +1120,7 @@ def convert_binary(infile, outfile):
     # ub unsigned int   4
     # uc unsigned int   4
     # ud unsigned int   4
-    for f in quads_smooth_uv:
+    for f in sfaces['quads_smooth_uv']:
         vi = f['vertex']
         ni = f['normal']
         ui = f['uv']
