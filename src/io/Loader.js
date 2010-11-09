@@ -86,7 +86,6 @@ THREE.Loader.prototype = {
 	// https://groups.google.com/group/o3d-discuss/browse_thread/thread/a8967bc9ce1e0978
 
 	loadAjaxBuffers: function( buffers, materials, callback, urlbase ) {
-	
 
 		var xhr = new XMLHttpRequest(),
 			url = urlbase + "/" + buffers;
@@ -129,7 +128,7 @@ THREE.Loader.prototype = {
 			
 			THREE.Geometry.call(this);
 			
-			init_materials();
+			THREE.Loader.prototype.init_materials( scope, materials, urlbase );
 			
 			md = parseMetaData( data, currentOffset );
 			currentOffset += md.header_bytes;
@@ -298,7 +297,8 @@ THREE.Loader.prototype = {
 					x = parseFloat32( data, start + i*stride );
 					y = parseFloat32( data, start + i*stride + md.vertex_coordinate_bytes );
 					z = parseFloat32( data, start + i*stride + md.vertex_coordinate_bytes*2 );
-					scope.vertices.push( new THREE.Vertex( new THREE.Vector3( x, y, z ) ) );
+					
+					THREE.Loader.prototype.v( scope, x, y, z );
 					
 				}
 				
@@ -345,7 +345,7 @@ THREE.Loader.prototype = {
 			
 			function add_tri( start, i, stride ) {
 				
-				var a, b, c, m, material;
+				var a, b, c, m;
 				
 				a = parseUInt32( data, start + i*stride );
 				b = parseUInt32( data, start + i*stride + md.vertex_index_bytes );
@@ -353,15 +353,13 @@ THREE.Loader.prototype = {
 				
 				m = parseUInt16( data, start + i*stride + md.vertex_index_bytes*3 );
 				
-				material = scope.materials[ m ];
-				scope.faces.push( new THREE.Face3( a, b, c, null, material ) );
+				THREE.Loader.prototype.f3( scope, a, b, c, m );
 				
 			}
 			
 			function add_tri_n( start, i, stride ) {
 				
-				var a, b, c, m, na, nb, nc, material,
-					nax, nay, naz, nbx, nby, nbz, ncx, ncy, ncz;
+				var a, b, c, m, na, nb, nc;
 				
 				a  = parseUInt32( data, start + i*stride );
 				b  = parseUInt32( data, start + i*stride + md.vertex_index_bytes );
@@ -373,31 +371,13 @@ THREE.Loader.prototype = {
 				nb = parseUInt32( data, start + i*stride + md.vertex_index_bytes*3 + md.material_index_bytes + md.normal_index_bytes );
 				nc = parseUInt32( data, start + i*stride + md.vertex_index_bytes*3 + md.material_index_bytes + md.normal_index_bytes*2 );
 				
-				material = scope.materials[ m ];
-				
-				nax = normals[ na*3     ],
-				nay = normals[ na*3 + 1 ],
-				naz = normals[ na*3 + 2 ],
+				THREE.Loader.prototype.f3n( scope, normals, a, b, c, m, na, nb, nc );
 			
-				nbx = normals[ nb*3     ],
-				nby = normals[ nb*3 + 1 ],
-				nbz = normals[ nb*3 + 2 ],
-			
-				ncx = normals[ nc*3     ],
-				ncy = normals[ nc*3 + 1 ],
-				ncz = normals[ nc*3 + 2 ];
-			
-				scope.faces.push( new THREE.Face3( a, b, c, 
-							  [new THREE.Vector3( nax, nay, naz ), 
-							   new THREE.Vector3( nbx, nby, nbz ), 
-							   new THREE.Vector3( ncx, ncy, ncz )], 
-							  material ) );
-							  
 			}
 			
 			function add_quad( start, i, stride ) {
 				
-				var a, b, c, d, m, material;
+				var a, b, c, d, m;
 				
 				a = parseUInt32( data, start + i*stride );
 				b = parseUInt32( data, start + i*stride + md.vertex_index_bytes );
@@ -406,15 +386,13 @@ THREE.Loader.prototype = {
 				
 				m = parseUInt16( data, start + i*stride + md.vertex_index_bytes*4 );
 				
-				material = scope.materials[ m ];
-				scope.faces.push( new THREE.Face4( a, b, c, d, null, material ) );
+				THREE.Loader.prototype.f4( scope, a, b, c, d, m );
 				
 			}
 			
 			function add_quad_n( start, i, stride ) {
 				
-				var a, b, c, d, m, na, nb, nc, nd, material,
-					nax, nay, naz, nbx, nby, nbz, ncx, ncy, ncz, ndx, ndy, ndz;
+				var a, b, c, d, m, na, nb, nc, nd;
 				
 				a  = parseUInt32( data, start + i*stride );
 				b  = parseUInt32( data, start + i*stride + md.vertex_index_bytes );
@@ -428,40 +406,17 @@ THREE.Loader.prototype = {
 				nc = parseUInt32( data, start + i*stride + md.vertex_index_bytes*4 + md.material_index_bytes + md.normal_index_bytes*2 );
 				nd = parseUInt32( data, start + i*stride + md.vertex_index_bytes*4 + md.material_index_bytes + md.normal_index_bytes*3 );
 				
-				material = scope.materials[ m ];
-				
-				nax = normals[ na*3     ],
-				nay = normals[ na*3 + 1 ],
-				naz = normals[ na*3 + 2 ],
+				THREE.Loader.prototype.f4n( scope, normals, a, b, c, d, m, na, nb, nc, nd );
 			
-				nbx = normals[ nb*3     ],
-				nby = normals[ nb*3 + 1 ],
-				nbz = normals[ nb*3 + 2 ],
-			
-				ncx = normals[ nc*3     ],
-				ncy = normals[ nc*3 + 1 ],
-				ncz = normals[ nc*3 + 2 ];
-
-				ndx = normals[ nd*3     ],
-				ndy = normals[ nd*3 + 1 ],
-				ndz = normals[ nd*3 + 2 ];
-
-				scope.faces.push( new THREE.Face4( a, b, c, d,
-							  [new THREE.Vector3( nax, nay, naz ), 
-							   new THREE.Vector3( nbx, nby, nbz ), 
-							   new THREE.Vector3( ncx, ncy, ncz ),
-							   new THREE.Vector3( ndx, ndy, ndz )], 
-							  material ) );
-
 			}
 			
 			function add_uv3( start, i, stride, offset ) {
 				
-				var uva, uvb, uvc, u1, u2, u3, v1, v2, v3, uv;
+				var uva, uvb, uvc, u1, u2, u3, v1, v2, v3;
 				
 				uva = parseUInt32( data, start + i*stride + offset );
 				uvb = parseUInt32( data, start + i*stride + offset + md.uv_index_bytes );
-				uvc = parseUInt32( data, start + i*stride + offset + md.uv_index_bytes * 2 );					
+				uvc = parseUInt32( data, start + i*stride + offset + md.uv_index_bytes * 2 );
 				
 				u1 = uvs[ uva*2 ];
 				v1 = uvs[ uva*2 + 1];
@@ -472,23 +427,18 @@ THREE.Loader.prototype = {
 				u3 = uvs[ uvc*2 ];
 				v3 = uvs[ uvc*2 + 1];
 				
-				uv = [];
-				uv.push( new THREE.UV( u1, v1 ) );
-				uv.push( new THREE.UV( u2, v2 ) );
-				uv.push( new THREE.UV( u3, v3 ) );
-				
-				scope.uvs.push( uv );
+				THREE.Loader.prototype.uv( scope, u1, v1, u2, v2, u3, v3 );				
 				
 			}
 			
 			function add_uv4( start, i, stride, offset ) {
 				
-				var uva, uvb, uvc, uvd, u1, u2, u3, u4, v1, v2, v3, v4, uv;
+				var uva, uvb, uvc, uvd, u1, u2, u3, u4, v1, v2, v3, v4;
 				
 				uva = parseUInt32( data, start + i*stride + offset );
 				uvb = parseUInt32( data, start + i*stride + offset + md.uv_index_bytes );
-				uvc = parseUInt32( data, start + i*stride + offset + md.uv_index_bytes * 2 );					
-				uvd = parseUInt32( data, start + i*stride + offset + md.uv_index_bytes * 3 );					
+				uvc = parseUInt32( data, start + i*stride + offset + md.uv_index_bytes * 2 );
+				uvd = parseUInt32( data, start + i*stride + offset + md.uv_index_bytes * 3 );
 				
 				u1 = uvs[ uva*2 ];
 				v1 = uvs[ uva*2 + 1];
@@ -502,13 +452,7 @@ THREE.Loader.prototype = {
 				u4 = uvs[ uvd*2 ];
 				v4 = uvs[ uvd*2 + 1];
 				
-				uv = [];
-				uv.push( new THREE.UV( u1, v1 ) );
-				uv.push( new THREE.UV( u2, v2 ) );
-				uv.push( new THREE.UV( u3, v3 ) );
-				uv.push( new THREE.UV( u4, v4 ) );
-				
-				scope.uvs.push( uv );
+				THREE.Loader.prototype.uv( scope, u1, v1, u2, v2, u3, v3, u4, v4 );				
 				
 			}
 			
@@ -516,7 +460,7 @@ THREE.Loader.prototype = {
 				
 				var i, stride = md.vertex_index_bytes * 3 + md.material_index_bytes;
 				
-				for( i = 0; i < md.ntri_flat; ++i ) {					
+				for( i = 0; i < md.ntri_flat; ++i ) {
 					
 					add_tri( start, i, stride );
 					
@@ -608,7 +552,7 @@ THREE.Loader.prototype = {
 				
 				for( i = 0; i < md.nquad_smooth; ++i ) {
 					
-					add_quad_n( start, i, stride );					
+					add_quad_n( start, i, stride );
 				}
 				
 				return md.nquad_smooth * stride;
@@ -623,87 +567,11 @@ THREE.Loader.prototype = {
 				for( i = 0; i < md.nquad_smooth_uv; ++i ) {
 					
 					add_quad_n( start, i, stride );
-					add_uv4( start, i, stride, offset );					
+					add_uv4( start, i, stride, offset );
+					
 				}
 				
 				return md.nquad_smooth * stride;
-				
-			}
-			
-			function init_materials() {
-				
-				scope.materials = [];
-				for( var i = 0; i < materials.length; ++i ) {
-					scope.materials[i] = [ create_material( materials[i], urlbase ) ];
-				}
-				
-				//log( "materials: " + scope.materials.length );
-				
-			}
-			
-			function is_pow2( n ) {
-				
-				var l = Math.log(n) / Math.LN2;
-				return Math.floor(l) == l;
-				
-			}
-			
-			function nearest_pow2(n) {
-				
-				var l = Math.log(n) / Math.LN2;
-				return Math.pow( 2, Math.round(l) );
-				
-			}
-			
-			function create_material( m ) {
-				
-				var material, texture, image, color;
-				
-				if( m.map_diffuse && urlbase ) {
-					
-					texture = document.createElement( 'canvas' );
-					material = new THREE.MeshBitmapMaterial( texture );
-					
-					image = new Image();
-					image.onload = function () {
-						
-						if ( !is_pow2( this.width ) || !is_pow2( this.height ) ) {
-						
-							var w = nearest_pow2( this.width ),
-								h = nearest_pow2( this.height );
-							
-							material.bitmap.width = w;
-							material.bitmap.height = h;
-							material.bitmap.getContext("2d").drawImage( this, 0, 0, w, h );
-							
-						} else {
-							
-							material.bitmap = this;
-							
-						}
-						
-						material.loaded = 1;
-						
-					};
-					
-					image.src = urlbase + "/" + m.map_diffuse;
-					
-				} else if( m.col_diffuse ) {
-					
-					color = (m.col_diffuse[0]*255 << 16) + (m.col_diffuse[1]*255 << 8) + m.col_diffuse[2]*255;
-					material = new THREE.MeshColorFillMaterial( color, m.transparency );
-					
-				} else if( m.a_dbg_color ) {
-					
-					material = new THREE.MeshColorFillMaterial( m.a_dbg_color );
-					
-				} else {
-					
-					material = new THREE.MeshColorFillMaterial( 0xeeeeee );
-					
-				}
-
-				return material;
 				
 			}
 			
@@ -724,7 +592,8 @@ THREE.Loader.prototype = {
 
 			THREE.Geometry.call(this);
 			
-			init_materials();
+			THREE.Loader.prototype.init_materials( scope, data.materials, urlbase );
+			
 			init_vertices();
 			init_faces();
 			
@@ -740,7 +609,8 @@ THREE.Loader.prototype = {
 					x = data.vertices[ i*3     ];
 					y = data.vertices[ i*3 + 1 ];
 					z = data.vertices[ i*3 + 2 ];
-					v( x, y, z );
+					
+					THREE.Loader.prototype.v( scope, x, y, z );
 					
 				}
 			
@@ -758,7 +628,7 @@ THREE.Loader.prototype = {
 					
 					m = src[ i*stride + 3 ];
 					
-					f3( a, b, c, m );
+					THREE.Loader.prototype.f3( scope, a, b, c, m );
 					
 				}
 
@@ -776,7 +646,7 @@ THREE.Loader.prototype = {
 					nb = src[ i*stride + 5 ];
 					nc = src[ i*stride + 6 ];
 					
-					f3n( a, b, c, m, na, nb, nc );
+					THREE.Loader.prototype.f3n( scope, data.normals, a, b, c, m, na, nb, nc );
 					
 				}
 				
@@ -791,7 +661,7 @@ THREE.Loader.prototype = {
 					
 					m = src[ i*stride + 4 ];
 					
-					f4( a, b, c, d, m );
+					THREE.Loader.prototype.f4( scope, a, b, c, d, m );
 					
 				}
 
@@ -811,7 +681,7 @@ THREE.Loader.prototype = {
 					nc = src[ i*stride + 7 ];
 					nd = src[ i*stride + 8 ];
 					
-					f4n( a, b, c, d, m, na, nb, nc, nd );
+					THREE.Loader.prototype.f4n( scope, data.normals, a, b, c, d, m, na, nb, nc, nd );
 					
 				}
 				
@@ -832,7 +702,7 @@ THREE.Loader.prototype = {
 					u3 = data.uvs[ uvc*2 ];
 					v3 = data.uvs[ uvc*2 + 1 ];
 					
-					uv( u1, v1, u2, v2, u3, v3 );
+					THREE.Loader.prototype.uv( scope, u1, v1, u2, v2, u3, v3 );
 					
 				}
 				
@@ -857,7 +727,7 @@ THREE.Loader.prototype = {
 					u4 = data.uvs[ uvd*2 ];
 					v4 = data.uvs[ uvd*2 + 1 ];
 					
-					uv( u1, v1, u2, v2, u3, v3, u4, v4 );
+					THREE.Loader.prototype.uv( scope, u1, v1, u2, v2, u3, v3, u4, v4 );
 					
 				}
 				
@@ -916,158 +786,7 @@ THREE.Loader.prototype = {
 				
 				}
 				
-			}
-			
-			function v( x, y, z ) {
-				
-				scope.vertices.push( new THREE.Vertex( new THREE.Vector3( x, y, z ) ) );
-				
-			}
-			
-			function f3( a, b, c, mi ) {
-				
-				var material = scope.materials[ mi ];
-				scope.faces.push( new THREE.Face3( a, b, c, null, material ) );
-				
-			}
-			
-			function f4( a, b, c, d, mi ) {
-				
-				var material = scope.materials[ mi ];
-				scope.faces.push( new THREE.Face4( a, b, c, d, null, material ) );
-				
-			}
-
-			function f3n( a, b, c, mi, na, nb, nc ) {
-				
-				var material = scope.materials[ mi ],
-					nax = data.normals[ na*3     ],
-					nay = data.normals[ na*3 + 1 ],
-					naz = data.normals[ na*3 + 2 ],
-				
-					nbx = data.normals[ nb*3     ],
-					nby = data.normals[ nb*3 + 1 ],
-					nbz = data.normals[ nb*3 + 2 ],
-				
-					ncx = data.normals[ nc*3     ],
-					ncy = data.normals[ nc*3 + 1 ],
-					ncz = data.normals[ nc*3 + 2 ];
-				
-				scope.faces.push( new THREE.Face3( a, b, c, 
-								  [new THREE.Vector3( nax, nay, naz ), new THREE.Vector3( nbx, nby, nbz ), new THREE.Vector3( ncx, ncy, ncz )], 
-								  material ) );
-				
-			}
-
-			function f4n( a, b, c, d, mi, na, nb, nc, nd ) {
-				
-				var material = scope.materials[ mi ],
-					nax = data.normals[ na*3     ],
-					nay = data.normals[ na*3 + 1 ],
-					naz = data.normals[ na*3 + 2 ],
-				
-					nbx = data.normals[ nb*3     ],
-					nby = data.normals[ nb*3 + 1 ],
-					nbz = data.normals[ nb*3 + 2 ],
-				
-					ncx = data.normals[ nc*3     ],
-					ncy = data.normals[ nc*3 + 1 ],
-					ncz = data.normals[ nc*3 + 2 ],
-				
-					ndx = data.normals[ nd*3     ],
-					ndy = data.normals[ nd*3 + 1 ],
-					ndz = data.normals[ nd*3 + 2 ];
-				
-				scope.faces.push( new THREE.Face4( a, b, c, d,
-								  [new THREE.Vector3( nax, nay, naz ), new THREE.Vector3( nbx, nby, nbz ), new THREE.Vector3( ncx, ncy, ncz ), new THREE.Vector3( ndx, ndy, ndz )], 
-								  material ) );
-				
-			}
-			
-			function uv( u1, v1, u2, v2, u3, v3, u4, v4 ) {
-				
-				var uv = [];
-				uv.push( new THREE.UV( u1, v1 ) );
-				uv.push( new THREE.UV( u2, v2 ) );
-				uv.push( new THREE.UV( u3, v3 ) );
-				if ( u4 && v4 ) uv.push( new THREE.UV( u4, v4 ) );
-				scope.uvs.push( uv );
-				
-			}
-			
-			function init_materials() {
-				
-				scope.materials = [];
-				for( var i = 0; i < data.materials.length; ++i ) {
-					scope.materials[i] = [ create_material( data.materials[i], urlbase ) ];
-				}
-				
-			}
-		
-			function is_pow2( n ) {
-				
-				var l = Math.log(n) / Math.LN2;
-				return Math.floor(l) == l;
-				
-			}
-			
-			function nearest_pow2(n) {
-				
-				var l = Math.log(n) / Math.LN2;
-				return Math.pow( 2, Math.round(l) );
-				
-			}
-			
-			function create_material( m ) {
-				
-				var material, texture, image, color;
-				
-				if( m.map_diffuse && urlbase ) {
-					
-					texture = document.createElement( 'canvas' );
-					material = new THREE.MeshBitmapMaterial( texture );
-					
-					image = new Image();
-					image.onload = function () {
-						
-						if ( !is_pow2( this.width ) || !is_pow2( this.height ) ) {
-						
-							var w = nearest_pow2( this.width ),
-								h = nearest_pow2( this.height );
-							
-							material.bitmap.width = w;
-							material.bitmap.height = h;
-							material.bitmap.getContext("2d").drawImage( this, 0, 0, w, h );
-							
-						} else {
-							
-							material.bitmap = this;
-							
-						}
-						
-						material.loaded = 1;
-						
-					};
-					
-					image.src = urlbase + "/" + m.map_diffuse;
-					
-				} else if( m.col_diffuse ) {
-					
-					color = (m.col_diffuse[0]*255 << 16) + (m.col_diffuse[1]*255 << 8) + m.col_diffuse[2]*255;
-					material = new THREE.MeshColorFillMaterial( color, m.transparency );
-					
-				} else if( m.a_dbg_color ) {
-					
-					material = new THREE.MeshColorFillMaterial( m.a_dbg_color );
-					
-				} else {
-					
-					material = new THREE.MeshColorFillMaterial( 0xeeeeee );
-					
-				}
-
-				return material;
-			}
+			}			
 			
 		}
 
@@ -1076,6 +795,166 @@ THREE.Loader.prototype = {
 		
 		callback( new Model( urlbase ) );
 
+	},
+
+	v: function( scope, x, y, z ) {
+	
+		scope.vertices.push( new THREE.Vertex( new THREE.Vector3( x, y, z ) ) );
+	
+	},
+	
+	f3: function( scope, a, b, c, mi ) {
+		
+		var material = scope.materials[ mi ];
+		scope.faces.push( new THREE.Face3( a, b, c, null, material ) );
+		
+	},
+	
+	f4: function( scope, a, b, c, d, mi ) {
+		
+		var material = scope.materials[ mi ];
+		scope.faces.push( new THREE.Face4( a, b, c, d, null, material ) );
+		
+	},
+	
+	f3n: function( scope, normals, a, b, c, mi, na, nb, nc ) {
+		
+		var material = scope.materials[ mi ],
+			nax = normals[ na*3     ],
+			nay = normals[ na*3 + 1 ],
+			naz = normals[ na*3 + 2 ],
+		
+			nbx = normals[ nb*3     ],
+			nby = normals[ nb*3 + 1 ],
+			nbz = normals[ nb*3 + 2 ],
+		
+			ncx = normals[ nc*3     ],
+			ncy = normals[ nc*3 + 1 ],
+			ncz = normals[ nc*3 + 2 ];
+		
+		scope.faces.push( new THREE.Face3( a, b, c, 
+						  [new THREE.Vector3( nax, nay, naz ), 
+						   new THREE.Vector3( nbx, nby, nbz ), 
+						   new THREE.Vector3( ncx, ncy, ncz )], 
+						  material ) );
+		
+	},
+	
+	f4n: function( scope, normals, a, b, c, d, mi, na, nb, nc, nd ) {
+		
+		var material = scope.materials[ mi ],
+			nax = normals[ na*3     ],
+			nay = normals[ na*3 + 1 ],
+			naz = normals[ na*3 + 2 ],
+		
+			nbx = normals[ nb*3     ],
+			nby = normals[ nb*3 + 1 ],
+			nbz = normals[ nb*3 + 2 ],
+		
+			ncx = normals[ nc*3     ],
+			ncy = normals[ nc*3 + 1 ],
+			ncz = normals[ nc*3 + 2 ],
+		
+			ndx = normals[ nd*3     ],
+			ndy = normals[ nd*3 + 1 ],
+			ndz = normals[ nd*3 + 2 ];
+		
+		scope.faces.push( new THREE.Face4( a, b, c, d,
+						  [new THREE.Vector3( nax, nay, naz ), 
+						   new THREE.Vector3( nbx, nby, nbz ), 
+						   new THREE.Vector3( ncx, ncy, ncz ), 
+						   new THREE.Vector3( ndx, ndy, ndz )], 
+						  material ) );
+		
+	},
+	
+	uv: function( scope, u1, v1, u2, v2, u3, v3, u4, v4 ) {
+		
+		var uv = [];
+		uv.push( new THREE.UV( u1, v1 ) );
+		uv.push( new THREE.UV( u2, v2 ) );
+		uv.push( new THREE.UV( u3, v3 ) );
+		if ( u4 && v4 ) uv.push( new THREE.UV( u4, v4 ) );
+		scope.uvs.push( uv );
+		
+	},
+	
+	init_materials: function( scope, materials, urlbase ) {
+		
+		scope.materials = [];
+		
+		for( var i = 0; i < materials.length; ++i ) {
+			
+			scope.materials[i] = [ THREE.Loader.prototype.createMaterial( materials[i], urlbase ) ];
+			
+		}
+		
+	},
+	
+	createMaterial: function( m, urlbase ) {
+	
+		function is_pow2( n ) {
+			
+			var l = Math.log(n) / Math.LN2;
+			return Math.floor(l) == l;
+			
+		}
+		
+		function nearest_pow2( n ) {
+			
+			var l = Math.log(n) / Math.LN2;
+			return Math.pow( 2, Math.round(l) );
+			
+		}
+
+		var material, texture, image, color;
+		
+		if( m.map_diffuse && urlbase ) {
+			
+			texture = document.createElement( 'canvas' );
+			material = new THREE.MeshBitmapMaterial( texture );
+			
+			image = new Image();
+			image.onload = function () {
+				
+				if ( !is_pow2( this.width ) || !is_pow2( this.height ) ) {
+				
+					var w = nearest_pow2( this.width ),
+						h = nearest_pow2( this.height );
+					
+					material.bitmap.width = w;
+					material.bitmap.height = h;
+					material.bitmap.getContext("2d").drawImage( this, 0, 0, w, h );
+					
+				} else {
+					
+					material.bitmap = this;
+					
+				}
+				
+				material.loaded = 1;
+				
+			};
+			
+			image.src = urlbase + "/" + m.map_diffuse;
+			
+		} else if( m.col_diffuse ) {
+			
+			color = (m.col_diffuse[0]*255 << 16) + (m.col_diffuse[1]*255 << 8) + m.col_diffuse[2]*255;
+			material = new THREE.MeshColorFillMaterial( color, m.transparency );
+			
+		} else if( m.a_dbg_color ) {
+			
+			material = new THREE.MeshColorFillMaterial( m.a_dbg_color );
+			
+		} else {
+			
+			material = new THREE.MeshColorFillMaterial( 0xeeeeee );
+			
+		}
+
+		return material;
+		
 	}
 	
 };
