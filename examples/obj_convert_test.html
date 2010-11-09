@@ -15,7 +15,7 @@
 			h1 { }
 			a { color:skyblue }
 			canvas { pointer-events:none; z-index:10; position:relative; }
-			#log { position:absolute; top:0; display:none }
+			#log { position:absolute; top:0; display:block; text-align:left; z-index:1000 }
 			#d { text-align:center; margin:1em 0 -15.7em 0; z-index:0; position:relative; display:block }
 			.button { background:#000; color:#fff; padding:0.2em 0.5em; cursor:pointer }
 			.inactive { background:#999; color:#eee }
@@ -40,7 +40,7 @@
 			<p>Canvas renderer is very slow on anything other than Chrome.
 		</div>
 		
-		<div id="log"></div>
+		<pre id="log"></pre>
 
 		<script type="text/javascript" src="../build/Three.js"></script> 
 		<!--
@@ -244,11 +244,11 @@
 				//loader.loadAsciiOld( "obj/male02/male02.js",     function() { createScene( new Male02( "obj/male02" ),      90, 50, FLOOR, 105 ) } );
 				//loader.loadAsciiOld( "obj/female02/female02.js", function() { createScene( new Female02( "obj/female02" ), -80, 50, FLOOR, 0 ) } );
 				
-				loader.loadAscii( "obj/male02/Male02_slim.js",     function( geometry ) { createScene( geometry,  90, 50, FLOOR, 105 ) }, "obj/male02" );
-				loader.loadAscii( "obj/female02/Female02_slim.js", function( geometry ) { createScene( geometry, -80, 50, FLOOR, 0 ) },   "obj/female02" );
+				//loader.loadAscii( "obj/male02/Male02_slim.js",     function( geometry ) { createScene( geometry,  90, 50, FLOOR, 105 ) }, "obj/male02" );
+				//loader.loadAscii( "obj/female02/Female02_slim.js", function( geometry ) { createScene( geometry, -80, 50, FLOOR, 0 ) },   "obj/female02" );
                 
-                //loader.loadBinary( "obj/male02/Male02_bin.js",     function( geometry ) { createScene( geometry,  90, 50, FLOOR, 105 ) }, "obj/male02" );
-				//loader.loadBinary( "obj/female02/Female02_bin.js", function( geometry ) { createScene( geometry, -80, 50, FLOOR, 0 ) },   "obj/female02" );
+                loader.loadBinary( "obj/male02/Male02_bin.js",     function( geometry ) { createScene( geometry,  90, 50, FLOOR, 105 ) }, "obj/male02" );
+				loader.loadBinary( "obj/female02/Female02_bin.js", function( geometry ) { createScene( geometry, -80, 50, FLOOR, 0 ) },   "obj/female02" );
 
 			}
 
