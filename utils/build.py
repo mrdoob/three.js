@@ -66,17 +66,18 @@ def makeDebug(text):
 
 
 def build(files, debug, outputFilename):
-	print "=" * 40
-	print "Compiling", outputFilename, ("(debug = %d)" % debug)
-	print "=" * 40
 
 	text = merge(files)
 
 	if debug:
 		text = makeDebug(text)
 		outputFilename = outputFilename + 'Debug'
-	
+
 	outputFilename = outputFilename + '.js'
+
+	print "=" * 40
+	print "Compiling", outputFilename
+	print "=" * 40
 
 	output(addHeader(compress(text), outputFilename), outputFilename)
 

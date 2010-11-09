@@ -1,2 +1,2 @@
-python build.py --full
-python build.py --full --debug
+python build.py
+python build.py --debug
