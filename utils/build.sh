@@ -1,19 +1,6 @@
 #!/bin/sh
 
-echo Compiling Three.js
-python Builder.py
+python build.py
+python build.py --debug
 
-echo Compiling ThreeDebug.js
-python BuilderDebug.py
-
-# echo Compiling ThreeDOM.js
-# python BuilderDOM.py
-
-# echo Compiling ThreeCanvas.js
-# python BuilderCanvas.py
-
-# echo Compiling ThreeSVG.js
-# python BuilderSVG.py
-
-# echo Compiling ThreeWebGL.js
-# python BuilderWebGL.py
+# python build.py --help
