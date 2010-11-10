@@ -314,7 +314,7 @@ def bottom(vertices):
     cy = bb['y'][0] 
     cz = bb['z'][0] + (bb['z'][1] - bb['z'][0])/2.0
     
-    translate(vertices, [-cx,cy,-cz])
+    translate(vertices, [-cx,-cy,-cz])
 
 def normalize(v):
     """Normalize 3d vector"""
