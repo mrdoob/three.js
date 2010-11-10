@@ -12,7 +12,7 @@ var Male02 = function ( urlbase ) {
     THREE.Geometry.call(this);
 
     var materials = [	{
-	"a_dbg_color" : 0xffeeeeee,
+	"a_dbg_color" : 0xeeeeee,
 	"a_dbg_index" : 0,
 	"a_dbg_name" : "male-02-1noCullingID_male-02-1noCulling.JP",
 	"col_ambient" : [0.0, 0.0, 0.0],
@@ -26,7 +26,7 @@ var Male02 = function ( urlbase ) {
 	},
 
 	{
-	"a_dbg_color" : 0xffee0000,
+	"a_dbg_color" : 0xee0000,
 	"a_dbg_index" : 1,
 	"a_dbg_name" : "orig_02_-_Defaul1noCu_orig_02_-_Defaul1noCu",
 	"col_ambient" : [0.0, 0.0, 0.0],
@@ -40,7 +40,7 @@ var Male02 = function ( urlbase ) {
 	},
 
 	{
-	"a_dbg_color" : 0xff00ee00,
+	"a_dbg_color" : 0x00ee00,
 	"a_dbg_index" : 2,
 	"a_dbg_name" : "FrontColorNoCullingID_orig_02_-_Defaul1noCu",
 	"col_ambient" : [0.0, 0.0, 0.0],
@@ -54,7 +54,7 @@ var Male02 = function ( urlbase ) {
 	},
 
 	{
-	"a_dbg_color" : 0xff0000ee,
+	"a_dbg_color" : 0x0000ee,
 	"a_dbg_index" : 3,
 	"a_dbg_name" : "_01_-_Default1noCulli__01_-_Default1noCulli",
 	"col_ambient" : [0.0, 0.0, 0.0],
@@ -68,7 +68,7 @@ var Male02 = function ( urlbase ) {
 	},
 
 	{
-	"a_dbg_color" : 0xffeeee00,
+	"a_dbg_color" : 0xeeee00,
 	"a_dbg_index" : 4,
 	"a_dbg_name" : "FrontColorNoCullingID_male-02-1noCulling.JP",
 	"col_ambient" : [0.0, 0.0, 0.0],

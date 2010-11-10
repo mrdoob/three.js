@@ -102,7 +102,7 @@ THREE.SVGRenderer = function () {
 
 			}/* else if ( element instanceof THREE.RenderableLine ) {
 
-				
+
 
 			}*/ else if ( element instanceof THREE.RenderableFace3 ) {
 
@@ -200,7 +200,7 @@ THREE.SVGRenderer = function () {
 
 		var l, ll, light;
 
-		color.setRGBA( 1, 1, 1, 1 );
+		color.setRGBA( 0, 0, 0, 1 );
 
 		for ( l = 0, ll = scene.lights.length; l < ll; l++ ) {
 
@@ -208,9 +208,9 @@ THREE.SVGRenderer = function () {
 
 			if ( light instanceof THREE.AmbientLight ) {
 
-				color.r *= light.color.r;
-				color.g *= light.color.g;
-				color.b *= light.color.b;
+				color.r += light.color.r;
+				color.g += light.color.g;
+				color.b += light.color.b;
 
 			}
 

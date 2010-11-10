@@ -4,9 +4,11 @@
 How to use this converter
 -------------------------
 
-python convert_obj_threejs.py -i filename.obj -o filename.js [-a center|top|bottom]
+python convert_obj_threejs.py -i filename.obj -o filename.js [-a center|top|bottom] [-s smooth|flat]
 
-Note: by default, model is centered (middle of bounding box goes to 0,0,0).
+Note: by default, model is centered (middle of bounding box goes to 0,0,0) 
+      and uses smooth shading (if there were vertex normals in the original 
+      model).
  
 --------------------------------------------------
 How to use generated JS file in your HTML document
@@ -41,19 +43,16 @@ Current limitations
     - for the moment, only diffuse color and texture are used 
       (will need to extend shaders / renderers / materials in Three)
      
-    - models cannot have more than 65,536 vertices
-      (this comes from WebGL using just 16-bit indices,
-       could be worked around by expanding indexed
-       faces into full vertex definitions)
+    - models can have more than 65,536 vertices,
+      but in most cases it will not work well with browsers,
+      which currently seem to have troubles with handling
+      large JS files
        
     - texture coordinates can be wrong in canvas renderer
       (there is crude normalization, but it doesn't
        work for all cases)
        
-    - everything is using smoothing
-      (if you want flat shading for whole mesh, 
-       don't export normals, then Three will 
-       compute own normals)
+    - smoothing can be turned on/off only for the whole mesh
 
 ---------------------------------------------- 
 How to get proper OBJ + MTL files with Blender
@@ -97,7 +96,7 @@ How to get proper OBJ + MTL files with Blender
 ------           
 Author 
 ------
-AlteredQualia http://alteredqualia.com            
+AlteredQualia http://alteredqualia.com
 
 """
 
@@ -113,9 +112,11 @@ import sys
 # #####################################################
 ALIGN = "center" # center bottom top none
 
+SHADING = "smooth" # flat smooth
+
 # default colors for debugging (each material gets one distinct color): 
 # white, red, green, blue, yellow, cyan, magenta
-COLORS = [0xffeeeeee, 0xffee0000, 0xff00ee00, 0xff0000ee, 0xffeeee00, 0xff00eeee, 0xffee00ee]
+COLORS = [0xeeeeee, 0xee0000, 0x00ee00, 0x0000ee, 0xeeee00, 0x00eeee, 0xee00ee]
 
 # #####################################################
 # Templates
@@ -424,22 +425,22 @@ def parse_mtl(fname):
 
             # Diffuse color
             # Kd 1.000 1.000 1.000
-            if chunks[0] == "Kd" and len(chunks) == 4:                
+            if chunks[0] == "Kd" and len(chunks) == 4:
                 materials[identifier]["col_diffuse"] = [float(chunks[1]), float(chunks[2]), float(chunks[3])]
 
             # Ambient color
             # Ka 1.000 1.000 1.000
-            if chunks[0] == "Ka" and len(chunks) == 4:                
+            if chunks[0] == "Ka" and len(chunks) == 4:
                 materials[identifier]["col_ambient"] = [float(chunks[1]), float(chunks[2]), float(chunks[3])]
 
             # Specular color
             # Ks 1.000 1.000 1.000
-            if chunks[0] == "Ks" and len(chunks) == 4:                
+            if chunks[0] == "Ks" and len(chunks) == 4:
                 materials[identifier]["col_specular"] = [float(chunks[1]), float(chunks[2]), float(chunks[3])]
 
             # Specular coefficient
             # Ns 154.000
-            if chunks[0] == "Ns" and len(chunks) == 2:                
+            if chunks[0] == "Ns" and len(chunks) == 2:
                 materials[identifier]["specular_coef"] = float(chunks[1])
 
             # Transparency
@@ -449,12 +450,12 @@ def parse_mtl(fname):
 
             # Optical density
             # Ni 1.0
-            if chunks[0] == "Ni" and len(chunks) == 2:                
+            if chunks[0] == "Ni" and len(chunks) == 2:
                 materials[identifier]["optical_density"] = float(chunks[1])
 
             # Diffuse texture
             # map_Kd texture_diffuse.jpg
-            if chunks[0] == "map_Kd" and len(chunks) == 2:                
+            if chunks[0] == "map_Kd" and len(chunks) == 2:
                 materials[identifier]["map_diffuse"] = chunks[1]
 
             # Ambient texture
@@ -651,7 +652,7 @@ def generate_uv(f, uvs):
     
 def generate_face(f):
     vi = f['vertex']
-    if f["normal"]:
+    if f["normal"] and SHADING == "smooth":
         ni = f['normal']
         if len(vi) == 3:
             return TEMPLATE_FACE3N % (vi[0]-1, vi[1]-1, vi[2]-1, f['material'], ni[0]-1, ni[1]-1, ni[2]-1)
@@ -677,9 +678,9 @@ def generate_color(i):
     """
     
     if i < len(COLORS):
-        return "0x%x" % COLORS[i]
+        return "0x%06x" % COLORS[i]
     else:
-        return "0x%x" % (int(0xffffff * random.random()) + 0xff000000)
+        return "0x%06x" % int(0xffffff * random.random())
         
 def value2string(v):
     if type(v)==str and v[0] != "0":
@@ -756,8 +757,10 @@ def convert(infile, outfile):
             
 
     # default materials with debug colors for when
-    # there is no specified MTL, if loading failed
-    # or there were null materials
+    # there is no specified MTL / MTL loading failed,
+    # or if there were no materials / null materials
+    if not materials:
+        materials = { 'default':0 }
     mtl = generate_mtl(materials)
     
     if mtllib:
@@ -773,12 +776,16 @@ def convert(infile, outfile):
         else:
             print "Couldn't find [%s]" % fname
     
+    normals_string = ""
+    if SHADING == "smooth":
+        normals_string = ",".join(generate_normal(n) for n in normals)
+        
     text = TEMPLATE_FILE % {
     "name"      : get_name(outfile),
     "vertices"  : "\n".join([generate_vertex(v) for v in vertices]),
     "faces"     : "\n".join([generate_face(f)   for f in faces]),
     "uvs"       : uv_string,
-    "normals"   : ",".join(generate_normal(n) for n in normals),
+    "normals"   : normals_string,
     
     "materials" : generate_materials(mtl, materials),
     
@@ -798,8 +805,8 @@ def convert(infile, outfile):
 # Helpers
 # #############################################################################
 def usage():
-    print "Usage: %s -i filename.obj -o filename.js [-a center|top|bottom]" % os.path.basename(sys.argv[0])
-        
+    print "Usage: %s -i filename.obj -o filename.js [-a center|top|bottom] [-s flat|smooth]" % os.path.basename(sys.argv[0])
+
 # #####################################################
 # Main
 # #####################################################
@@ -807,7 +814,7 @@ if __name__ == "__main__":
     
     # get parameters from the command line
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hi:o:a:", ["help", "input=", "output=", "align="])
+        opts, args = getopt.getopt(sys.argv[1:], "hi:o:a:s:", ["help", "input=", "output=", "align=", "shading="])
     
     except getopt.GetoptError:
         usage()
@@ -829,7 +836,11 @@ if __name__ == "__main__":
         elif o in ("-a", "--align"):
             if a in ("top", "bottom", "center"):
                 ALIGN = a
-    
+
+        elif o in ("-s", "--shading"):
+            if a in ("flat", "smooth"):
+                SHADING = a
+
     if infile == "" or outfile == "":
         usage()
         sys.exit(2)

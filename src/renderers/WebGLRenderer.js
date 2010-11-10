@@ -974,6 +974,7 @@ THREE.WebGLRenderer = function ( scene ) {
 		
 	};
 
+	/* DEBUG
 	function getGLParams() {
 		
 		var params  = {
@@ -1003,5 +1004,6 @@ THREE.WebGLRenderer = function ( scene ) {
 		
 		return str;
 	}
-	
+	*/
+
 };

@@ -278,7 +278,7 @@ THREE.CanvasRenderer = function () {
 
 		var l, ll, light;
 
-		color.setRGBA( 1, 1, 1, 1 );
+		color.setRGBA( 0, 0, 0, 1 );
 
 		for ( l = 0, ll = scene.lights.length; l < ll; l++ ) {
 
@@ -286,9 +286,9 @@ THREE.CanvasRenderer = function () {
 
 			if ( light instanceof THREE.AmbientLight ) {
 
-				color.r *= light.color.r;
-				color.g *= light.color.g;
-				color.b *= light.color.b;
+				color.r += light.color.r;
+				color.g += light.color.g;
+				color.b += light.color.b;
 
 			}
 

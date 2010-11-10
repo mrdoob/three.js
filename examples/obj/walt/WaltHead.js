@@ -12,7 +12,7 @@ var WaltHead = function ( urlbase ) {
     THREE.Geometry.call(this);
 
     var materials = [	{
-	"a_dbg_color" : 0xffeeeeee,
+	"a_dbg_color" : 0xeeeeee,
 	"a_dbg_index" : 0,
 	"a_dbg_name" : "lambert2SG.001",
 	"col_ambient" : [0.0, 0.0, 0.0],

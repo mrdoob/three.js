@@ -38,10 +38,10 @@
 			Walt Disney head by <a href="http://www.davidoreilly.com/2009/01/walt-disneys-head-on-a-plate" target="_blank">David OReilly</a>
 		</div>
 
-        <!--
+		<!--
 		<script type="text/javascript" src="../build/Three.js"></script> 
-        -->
-        
+		-->
+		
 		<script type="text/javascript" src="../src/Three.js"></script>
 		<script type="text/javascript" src="../src/core/Color.js"></script>
 		<script type="text/javascript" src="../src/core/Vector2.js"></script>
@@ -56,6 +56,7 @@
 		<script type="text/javascript" src="../src/core/UV.js"></script>
 		<script type="text/javascript" src="../src/core/Geometry.js"></script>
 		<script type="text/javascript" src="../src/cameras/Camera.js"></script>
+		<script type="text/javascript" src="../src/io/Loader.js"></script>
 		<script type="text/javascript" src="../src/lights/Light.js"></script>
 		<script type="text/javascript" src="../src/lights/AmbientLight.js"></script>
 		<script type="text/javascript" src="../src/lights/DirectionalLight.js"></script>
@@ -81,12 +82,11 @@
 		<script type="text/javascript" src="../src/renderers/renderables/RenderableFace4.js"></script>
 		<script type="text/javascript" src="../src/renderers/renderables/RenderableParticle.js"></script>
 		<script type="text/javascript" src="../src/renderers/renderables/RenderableLine.js"></script>
-        <!--
+		<!--
 
-        -->
-		<script type="text/javascript" src="obj/walt/WaltHead.js"></script> 
+		-->
 		<script type="text/javascript" src="geometry/primitives/Sphere.js"></script> 
-        
+		
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
@@ -108,24 +108,52 @@
 
 				scene = new THREE.Scene();
 
-				//object = new THREE.Mesh( new WaltHead(), [ new THREE.MeshColorStrokeMaterial( 0xffffff ) ] );
-                //object = new THREE.Mesh( new WaltHead(), new THREE.MeshColorFillMaterial( 0xffffff ) );
-                object = new THREE.Mesh( new WaltHead(), new THREE.MeshPhongMaterial( 0x555555, 0x555555, 0xffffff, 50, 1.0  )  );
-                object.scale.x = object.scale.y = object.scale.z = 0.80;
-				object.overdraw = true;
-				scene.addObject( object );
+				var loader = new THREE.Loader();
                 
+				loader.loadAsciiOld( "obj/walt/WaltHead.js", function() {
+				
+					//object = new THREE.Mesh( new WaltHead(), [ new THREE.MeshColorStrokeMaterial( 0xffffff ) ] );
+					//object = new THREE.Mesh( new WaltHead(), new THREE.MeshColorFillMaterial( 0xffffff ) );
+					object = new THREE.Mesh( new WaltHead(), new THREE.MeshPhongMaterial( 0x555555, 0x555555, 0xffffff, 50, 1.0  )  );
+					object.scale.x = object.scale.y = object.scale.z = 0.80;
+					object.overdraw = true;
+					scene.addObject( object );
+					
+				});
+                
+				/*
+				loader.loadAscii( "obj/walt/WaltHead_slim.js", function( geometry ) {
+				
+					object = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( 0x555555, 0x555555, 0xffffff, 50, 1.0  )  );
+					object.scale.x = object.scale.y = object.scale.z = 0.80;
+					object.overdraw = true;
+					scene.addObject( object );
+					
+				});
+				*/
+
                 /*
-                var directionalLight = new THREE.DirectionalLight( 0x111111, 0.9 );
-                directionalLight.position.x = 1;
-                directionalLight.position.y = 1;
-                directionalLight.position.z = 2;
-				directionalLight.position.normalize();
-				scene.addLight( directionalLight );
+				loader.loadBinary( "obj/walt/WaltHead_bin.js", function( geometry ) {
+				
+					object = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( 0x555555, 0x555555, 0xffffff, 50, 1.0  )  );
+					object.scale.x = object.scale.y = object.scale.z = 0.80;
+					object.overdraw = true;
+					scene.addObject( object );
+					
+				}, "obj/walt");
                 */
                 
+				/*
+				var directionalLight = new THREE.DirectionalLight( 0x111111, 0.9 );
+				directionalLight.position.x = 1;
+				directionalLight.position.y = 1;
+				directionalLight.position.z = 2;
+				directionalLight.position.normalize();
+				scene.addLight( directionalLight );
+				*/
+				
 				scene.addLight( new THREE.AmbientLight( 0x00020 ) );
-                scene.addLight( new THREE.AmbientLight( 0x00000 ) );
+				scene.addLight( new THREE.AmbientLight( 0x00000 ) );
 
 				light1 = new THREE.PointLight( 0xff0040 );
 				scene.addLight( light1 );
@@ -136,30 +164,30 @@
 				light3 = new THREE.PointLight( 0x80ff80 );
 				scene.addLight( light3 );
 
-                var l1 = new THREE.Mesh( new Sphere( 1, 16, 8, 1 ), new THREE.MeshColorFillMaterial( 0xff0040 ) );
-                l1.position = light1.position;
-                scene.addObject( l1 );
-                
-                var l2 = new THREE.Mesh( new Sphere( 1, 16, 8, 1 ), new THREE.MeshColorFillMaterial( 0x0040ff ) );
-                l2.position = light2.position;
-                scene.addObject( l2 );
-     
-                var l3 = new THREE.Mesh( new Sphere( 1, 16, 8, 1 ), new THREE.MeshColorFillMaterial( 0x80ff80 ) );
-                l3.position = light3.position;
-                scene.addObject( l3 );
+				var l1 = new THREE.Mesh( new Sphere( 1, 16, 8, 1 ), new THREE.MeshColorFillMaterial( 0xff0040 ) );
+				l1.position = light1.position;
+				scene.addObject( l1 );
+				
+				var l2 = new THREE.Mesh( new Sphere( 1, 16, 8, 1 ), new THREE.MeshColorFillMaterial( 0x0040ff ) );
+				l2.position = light2.position;
+				scene.addObject( l2 );
+	 
+				var l3 = new THREE.Mesh( new Sphere( 1, 16, 8, 1 ), new THREE.MeshColorFillMaterial( 0x80ff80 ) );
+				l3.position = light3.position;
+				scene.addObject( l3 );
  
 				//renderer = new THREE.CanvasRenderer();
 				renderer = new THREE.WebGLRenderer( );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
-                
-                /*
+				
+				/*
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
-                stats.domElement.style.zIndex = 100;
+				stats.domElement.style.zIndex = 100;
 				container.appendChild( stats.domElement );
-                */
+				*/
 
 			}
 
@@ -182,10 +210,13 @@
 				light3.position.z = Math.sin( time * 0.5 ) * 30;
 
 				renderer.render(scene, camera);
-                
-                //stats.update();
+				
+				//stats.update();
 
 			}
+            
+            function log() {
+            }
 
 		</script>
 	</body>

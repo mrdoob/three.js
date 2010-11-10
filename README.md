@@ -15,6 +15,9 @@ Other similar projects: [pre3d](http://deanm.github.com/pre3d/), [pvjs](http://c
 
 ### Examples ###
 
+[![large_mesh](http://mrdoob.github.com/three.js/assets/examples/12_large_mesh.png)](http://mrdoob.github.com/three.js/examples/geometry_large_mesh.html)
+[![interactive_cubes](http://mrdoob.github.com/three.js/assets/examples/11_interactive.png)](http://mrdoob.github.com/three.js/examples/interactive_cubes.html)
+[![camera_ortographic](http://mrdoob.github.com/three.js/assets/examples/10_orthographic.png)](http://mrdoob.github.com/three.js/examples/camera_orthographic.html)
 [![lights_pointlights](http://mrdoob.github.com/three.js/assets/examples/09_walthead.png)](http://mrdoob.github.com/three.js/examples/lights_pointlights.html)
 [![geometry_birds](http://mrdoob.github.com/three.js/assets/examples/08_birds.png)](http://mrdoob.github.com/three.js/examples/geometry_birds.html)
 [![geometry_earth](http://mrdoob.github.com/three.js/assets/examples/07_earth.png)](http://mrdoob.github.com/three.js/examples/geometry_earth.html)
@@ -28,9 +31,10 @@ Other similar projects: [pre3d](http://deanm.github.com/pre3d/), [pvjs](http://c
 
 ### Featured projects ###
 
+[![Voxels](http://mrdoob.github.com/three.js/assets/projects/10_voxels.png)](http://mrdoob.com/projects/voxels/)
 [![The Wilderness Downtown](http://mrdoob.github.com/three.js/assets/projects/09_arcadefire.png)](http://thewildernessdowntown.com/)
 [![CloudSCAD](http://mrdoob.github.com/three.js/assets/projects/08_cloudscad.png)](http://cloudscad.com/stl_viewer/)
-[![Or so they say...](http://mrdoob.github.com/three.js/assets/projects/07_orsotheysay.png)](http://xplsv.com/prods/demos/online/xplsv_orsotheysay/)
+[![Or so they say...](http://mrdoob.github.com/three.js/assets/projects/07_orsotheysay.png)](http://xplsv.com/prods/demos/xplsv_orsotheysay/)
 [![Rat](http://mrdoob.github.com/three.js/assets/projects/06_rat.png)](http://tech.lab212.org/2010/07/export-textured-models-from-blender2-5-to-three-js/)
 [![Failure](http://mrdoob.github.com/three.js/assets/projects/05_failure.png)](http://www.is-real.net/experiments/three/failure/)
 [![Space Cannon 3D](http://mrdoob.github.com/three.js/assets/projects/02_spacecannon.png)](http://labs.brian-stoner.com/spacecannon/)
@@ -94,6 +98,7 @@ For creating a customised version of the library, including the source files in 
 	<script type="text/javascript" src="js/three/core/Vector2.js"></script>
 	<script type="text/javascript" src="js/three/core/Vector3.js"></script>
 	<script type="text/javascript" src="js/three/core/Vector4.js"></script>
+	<script type="text/javascript" src="js/three/core/Ray.js"></script>
 	<script type="text/javascript" src="js/three/core/Rectangle.js"></script>
 	<script type="text/javascript" src="js/three/core/Matrix3.js"></script>
 	<script type="text/javascript" src="js/three/core/Matrix4.js"></script>
@@ -103,6 +108,7 @@ For creating a customised version of the library, including the source files in 
 	<script type="text/javascript" src="js/three/core/UV.js"></script>
 	<script type="text/javascript" src="js/three/core/Geometry.js"></script>
 	<script type="text/javascript" src="js/three/cameras/Camera.js"></script>
+	<script type="text/javascript" src="js/three/io/Loader.js"></script>
 	<script type="text/javascript" src="js/three/lights/Light.js"></script>
 	<script type="text/javascript" src="js/three/lights/AmbientLight.js"></script>
 	<script type="text/javascript" src="js/three/lights/DirectionalLight.js"></script>
@@ -131,14 +137,18 @@ For creating a customised version of the library, including the source files in 
 	<script type="text/javascript" src="js/three/renderers/renderables/RenderableLine.js"></script>
 
 
-### Contributors ###
-
-Thanks to the power of the internets (and github <3) these people have kindly helped out with the project.
-
-[alteredq](http://github.com/alteredq), [philogb](http://github.com/philogb), [supereggbert](http://github.com/supereggbert), [kikko](http://github.com/kikko), [kile](http://kile.stravaganza.org/), ...
-
-
 ### Change Log ###
+
+2010 11 04 - **r28** (62.802 kb)
+
+* `Loader` class allows load geometry asynchronously at runtime. ([alteredq](http://github.com/alteredq))
+* `MeshPhongMaterial` working with `WebGLRenderer`. ([alteredq](http://github.com/alteredq))
+* Support for *huge* objects. Max 500k polys and counting. ([alteredq](http://github.com/alteredq))
+* `Projector.unprojectVector` and `Ray` class to check intersections with faces (based on [mindlapse](https://github.com/mindlapse) work)
+* Fixed `CanvasRenderer` and `SVGRenderer` z-sorting (not as jumpy anymore).
+* Fixed Orthographic projection (was y-inverted).
+* Hmmm.. lib file size starting to get too big...
+
 
 2010 10 28 - **r25** (54.480 kb)
 
@@ -154,7 +164,6 @@ Thanks to the power of the internets (and github <3) these people have kindly he
 * Added `PointLight`
 * `CanvasRenderer` and `SVGRenderer` basic lighting support (ColorStroke/ColorFill only)
 * `Renderer` > `Projector`. `CanvasRenderer`, `SVGRenderer` and `DOMRenderer` do not extend anymore
-* Interactivity base code (hdi folder). To be refactored... ([mindlapse](http://github.com/mindlapse))
 * Added `computeCentroids` method to `Geometry`
 
 
