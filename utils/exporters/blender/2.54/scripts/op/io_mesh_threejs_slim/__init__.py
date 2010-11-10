@@ -37,6 +37,9 @@ class ExportTHREEJSSlim(bpy.types.Operator, ExportHelper):
     use_modifiers = BoolProperty(name="Apply Modifiers", description="Apply modifiers to the exported mesh", default=True)
     use_normals = BoolProperty(name="Normals", description="Export normals", default=True)
     use_uv_coords = BoolProperty(name="UVs", description="Export texture coordinates", default=True)
+    
+    align_types = [("None","None","None"), ("Center","Center","Center"), ("Bottom","Bottom","Bottom"), ("Top","Top","Top")]
+    align_model = EnumProperty(name="Align model", description="Align model", items=align_types, default="Center")
 
     @classmethod
     def poll(cls, context):
@@ -57,9 +60,12 @@ class ExportTHREEJSSlim(bpy.types.Operator, ExportHelper):
 
         row = layout.row()
         row.prop(self.properties, "use_modifiers")
+        row = layout.row()
         row.prop(self.properties, "use_normals")
         row = layout.row()
         row.prop(self.properties, "use_uv_coords")
+        row = layout.row()
+        row.prop(self.properties, "align_model")
         
 
 def menu_func(self, context):
