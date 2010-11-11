@@ -55,7 +55,7 @@ TEMPLATE_FILE_ASCII = """\
 //  faces: %(nface)d 
 //  materials: %(nmaterial)d
 //
-//  Generated with Blender 2.54 slim exporter
+//  Generated with Blender slim exporter (compatible with Blender 2.54 / 2.55)
 //  https://github.com/alteredq/three.js/tree/master/utils/exporters/blender/
 
 
@@ -453,31 +453,32 @@ def extract_materials(mesh, scene):
 
     materials = {}
     for m in mesh.materials:
-        materials[m.name] = {}
-        materials[m.name]['col_diffuse'] = [m.diffuse_intensity * m.diffuse_color[0], 
-                                            m.diffuse_intensity * m.diffuse_color[1], 
-                                            m.diffuse_intensity * m.diffuse_color[2]]
-                                            
-        materials[m.name]['col_specular'] = [m.specular_intensity * m.specular_color[0], 
-                                             m.specular_intensity * m.specular_color[1], 
-                                             m.specular_intensity * m.specular_color[2]]
-                                             
-        materials[m.name]['col_ambient'] = [m.ambient * world.ambient_color[0], 
-                                            m.ambient * world.ambient_color[1], 
-                                            m.ambient * world.ambient_color[2]]
-                                            
-        materials[m.name]['transparency'] = m.alpha
-        
-        # not sure about mapping values to Blinn-Phong shader
-        # Blender uses INT from [1,511] with default 0
-        # http://www.blender.org/documentation/blender_python_api_2_54_0/bpy.types.Material.html#bpy.types.Material.specular_hardness
-        materials[m.name]["specular_coef"] = m.specular_hardness 
-        
-        if m.active_texture and m.active_texture.type == 'IMAGE':
-            fn = bpy.path.abspath(m.active_texture.image.filepath)
-            fn = os.path.normpath(fn)
-            fn_strip = os.path.basename(fn)
-            materials[m.name]['map_diffuse'] = fn_strip
+        if m:
+            materials[m.name] = {}
+            materials[m.name]['col_diffuse'] = [m.diffuse_intensity * m.diffuse_color[0], 
+                                                m.diffuse_intensity * m.diffuse_color[1], 
+                                                m.diffuse_intensity * m.diffuse_color[2]]
+                                                
+            materials[m.name]['col_specular'] = [m.specular_intensity * m.specular_color[0], 
+                                                 m.specular_intensity * m.specular_color[1], 
+                                                 m.specular_intensity * m.specular_color[2]]
+                                                 
+            materials[m.name]['col_ambient'] = [m.ambient * world.ambient_color[0], 
+                                                m.ambient * world.ambient_color[1], 
+                                                m.ambient * world.ambient_color[2]]
+                                                
+            materials[m.name]['transparency'] = m.alpha
+            
+            # not sure about mapping values to Blinn-Phong shader
+            # Blender uses INT from [1,511] with default 0
+            # http://www.blender.org/documentation/blender_python_api_2_54_0/bpy.types.Material.html#bpy.types.Material.specular_hardness
+            materials[m.name]["specular_coef"] = m.specular_hardness 
+            
+            if m.active_texture and m.active_texture.type == 'IMAGE':
+                fn = bpy.path.abspath(m.active_texture.image.filepath)
+                fn = os.path.normpath(fn)
+                fn_strip = os.path.basename(fn)
+                materials[m.name]['map_diffuse'] = fn_strip
             
     return materials
         
@@ -486,8 +487,13 @@ def generate_materials_string(mesh, scene):
     random.seed(42) # to get well defined color order for debug materials
 
     materials = {}
-    for i, m in enumerate(mesh.materials):
-        materials[m.name] = i
+    if mesh.materials:
+        for i, m in enumerate(mesh.materials):
+            if m:
+                materials[m.name] = i
+            else:
+                materials["undefined_dummy_%0d" % i] = i
+                
     
     if not materials:
         materials = { 'default':0 }
