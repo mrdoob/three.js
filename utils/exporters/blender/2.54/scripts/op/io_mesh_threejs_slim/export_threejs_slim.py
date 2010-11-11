@@ -55,7 +55,7 @@ TEMPLATE_FILE_ASCII = """\
 //  faces: %(nface)d 
 //  materials: %(nmaterial)d
 //
-//  Generated with Blender 2.54 slim exporter
+//  Generated with Blender slim exporter (compatible with Blender 2.54 / 2.55)
 //  https://github.com/alteredq/three.js/tree/master/utils/exporters/blender/
 
 
