@@ -290,13 +290,14 @@ THREE.Loader.prototype = {
 			function init_vertices( start ) {
 
 				var i, x, y, z, 
-					stride = md.vertex_coordinate_bytes * 3;
+					stride = md.vertex_coordinate_bytes * 3,
+					end = start + md.nvertices * stride;
 
-				for( i = 0; i < md.nvertices; ++i ) {
+				for( i = start; i < end; i += stride ) {
 
-					x = parseFloat32( data, start + i*stride );
-					y = parseFloat32( data, start + i*stride + md.vertex_coordinate_bytes );
-					z = parseFloat32( data, start + i*stride + md.vertex_coordinate_bytes*2 );
+					x = parseFloat32( data, i );
+					y = parseFloat32( data, i + md.vertex_coordinate_bytes );
+					z = parseFloat32( data, i + md.vertex_coordinate_bytes*2 );
 
 					THREE.Loader.prototype.v( scope, x, y, z );
 
@@ -309,13 +310,14 @@ THREE.Loader.prototype = {
 			function init_normals( start ) {
 
 				var i, x, y, z, 
-					stride = md.normal_coordinate_bytes * 3;
+					stride = md.normal_coordinate_bytes * 3.
+					end = start + md.nnormals * stride;
 
-				for( i = 0; i < md.nnormals; ++i ) {
+				for( i = start; i < end; i += stride ) {
 
-					x = parseSChar8( data, start + i*stride );
-					y = parseSChar8( data, start + i*stride + md.normal_coordinate_bytes );
-					z = parseSChar8( data, start + i*stride + md.normal_coordinate_bytes*2 );
+					x = parseSChar8( data, i );
+					y = parseSChar8( data, i + md.normal_coordinate_bytes );
+					z = parseSChar8( data, i + md.normal_coordinate_bytes*2 );
 
 					normals.push( x/127, y/127, z/127 );
 
@@ -328,129 +330,130 @@ THREE.Loader.prototype = {
 			function init_uvs( start ) {
 
 				var i, u, v, 
-					stride = md.uv_coordinate_bytes * 2;
+					stride = md.uv_coordinate_bytes * 2,
+					end = start + md.nuvs * stride;
 
-				for( i = 0; i < md.nuvs; ++i ) {
+				for( i = start; i < end; i += stride ) {
 
-					u = parseFloat32( data, start + i*stride );
-					v = parseFloat32( data, start + i*stride + md.uv_coordinate_bytes );
+					u = parseFloat32( data, i );
+					v = parseFloat32( data, i + md.uv_coordinate_bytes );
 
 					uvs.push( u, v );
 
 				}
-
+				
 				return md.nuvs * stride;
 
 			}
 
-			function add_tri( start, i, stride ) {
+			function add_tri( i ) {
 
 				var a, b, c, m;
 
-				a = parseUInt32( data, start + i*stride );
-				b = parseUInt32( data, start + i*stride + md.vertex_index_bytes );
-				c = parseUInt32( data, start + i*stride + md.vertex_index_bytes*2 );
+				a = parseUInt32( data, i );
+				b = parseUInt32( data, i + md.vertex_index_bytes );
+				c = parseUInt32( data, i + md.vertex_index_bytes*2 );
 
-				m = parseUInt16( data, start + i*stride + md.vertex_index_bytes*3 );
+				m = parseUInt16( data, i + md.vertex_index_bytes*3 );
 
 				THREE.Loader.prototype.f3( scope, a, b, c, m );
 
 			}
 
-			function add_tri_n( start, i, stride ) {
+			function add_tri_n( i ) {
 
 				var a, b, c, m, na, nb, nc;
 
-				a  = parseUInt32( data, start + i*stride );
-				b  = parseUInt32( data, start + i*stride + md.vertex_index_bytes );
-				c  = parseUInt32( data, start + i*stride + md.vertex_index_bytes*2 );
+				a  = parseUInt32( data, i );
+				b  = parseUInt32( data, i + md.vertex_index_bytes );
+				c  = parseUInt32( data, i + md.vertex_index_bytes*2 );
 
-				m  = parseUInt16( data, start + i*stride + md.vertex_index_bytes*3 );
+				m  = parseUInt16( data, i + md.vertex_index_bytes*3 );
 
-				na = parseUInt32( data, start + i*stride + md.vertex_index_bytes*3 + md.material_index_bytes );
-				nb = parseUInt32( data, start + i*stride + md.vertex_index_bytes*3 + md.material_index_bytes + md.normal_index_bytes );
-				nc = parseUInt32( data, start + i*stride + md.vertex_index_bytes*3 + md.material_index_bytes + md.normal_index_bytes*2 );
+				na = parseUInt32( data, i + md.vertex_index_bytes*3 + md.material_index_bytes );
+				nb = parseUInt32( data, i + md.vertex_index_bytes*3 + md.material_index_bytes + md.normal_index_bytes );
+				nc = parseUInt32( data, i + md.vertex_index_bytes*3 + md.material_index_bytes + md.normal_index_bytes*2 );
 
 				THREE.Loader.prototype.f3n( scope, normals, a, b, c, m, na, nb, nc );
 
 			}
 
-			function add_quad( start, i, stride ) {
+			function add_quad( i ) {
 
 				var a, b, c, d, m;
 
-				a = parseUInt32( data, start + i*stride );
-				b = parseUInt32( data, start + i*stride + md.vertex_index_bytes );
-				c = parseUInt32( data, start + i*stride + md.vertex_index_bytes*2 );
-				d = parseUInt32( data, start + i*stride + md.vertex_index_bytes*3 );
+				a = parseUInt32( data, i );
+				b = parseUInt32( data, i + md.vertex_index_bytes );
+				c = parseUInt32( data, i + md.vertex_index_bytes*2 );
+				d = parseUInt32( data, i + md.vertex_index_bytes*3 );
 
-				m = parseUInt16( data, start + i*stride + md.vertex_index_bytes*4 );
+				m = parseUInt16( data, i + md.vertex_index_bytes*4 );
 
 				THREE.Loader.prototype.f4( scope, a, b, c, d, m );
 
 			}
 
-			function add_quad_n( start, i, stride ) {
+			function add_quad_n( i ) {
 
 				var a, b, c, d, m, na, nb, nc, nd;
 
-				a  = parseUInt32( data, start + i*stride );
-				b  = parseUInt32( data, start + i*stride + md.vertex_index_bytes );
-				c  = parseUInt32( data, start + i*stride + md.vertex_index_bytes*2 );
-				d  = parseUInt32( data, start + i*stride + md.vertex_index_bytes*3 );
+				a  = parseUInt32( data, i );
+				b  = parseUInt32( data, i + md.vertex_index_bytes );
+				c  = parseUInt32( data, i + md.vertex_index_bytes*2 );
+				d  = parseUInt32( data, i + md.vertex_index_bytes*3 );
 
-				m  = parseUInt16( data, start + i*stride + md.vertex_index_bytes*4 );
+				m  = parseUInt16( data, i + md.vertex_index_bytes*4 );
 
-				na = parseUInt32( data, start + i*stride + md.vertex_index_bytes*4 + md.material_index_bytes );
-				nb = parseUInt32( data, start + i*stride + md.vertex_index_bytes*4 + md.material_index_bytes + md.normal_index_bytes );
-				nc = parseUInt32( data, start + i*stride + md.vertex_index_bytes*4 + md.material_index_bytes + md.normal_index_bytes*2 );
-				nd = parseUInt32( data, start + i*stride + md.vertex_index_bytes*4 + md.material_index_bytes + md.normal_index_bytes*3 );
+				na = parseUInt32( data, i + md.vertex_index_bytes*4 + md.material_index_bytes );
+				nb = parseUInt32( data, i + md.vertex_index_bytes*4 + md.material_index_bytes + md.normal_index_bytes );
+				nc = parseUInt32( data, i + md.vertex_index_bytes*4 + md.material_index_bytes + md.normal_index_bytes*2 );
+				nd = parseUInt32( data, i + md.vertex_index_bytes*4 + md.material_index_bytes + md.normal_index_bytes*3 );
 
 				THREE.Loader.prototype.f4n( scope, normals, a, b, c, d, m, na, nb, nc, nd );
 
 			}
 
-			function add_uv3( start, i, stride, offset ) {
+			function add_uv3( i ) {
 
 				var uva, uvb, uvc, u1, u2, u3, v1, v2, v3;
 
-				uva = parseUInt32( data, start + i*stride + offset );
-				uvb = parseUInt32( data, start + i*stride + offset + md.uv_index_bytes );
-				uvc = parseUInt32( data, start + i*stride + offset + md.uv_index_bytes * 2 );
+				uva = parseUInt32( data, i );
+				uvb = parseUInt32( data, i + md.uv_index_bytes );
+				uvc = parseUInt32( data, i + md.uv_index_bytes * 2 );
 
 				u1 = uvs[ uva*2 ];
-				v1 = uvs[ uva*2 + 1];
+				v1 = uvs[ uva*2 + 1 ];
 
 				u2 = uvs[ uvb*2 ];
-				v2 = uvs[ uvb*2 + 1];
+				v2 = uvs[ uvb*2 + 1 ];
 
 				u3 = uvs[ uvc*2 ];
-				v3 = uvs[ uvc*2 + 1];
+				v3 = uvs[ uvc*2 + 1 ];
 
 				THREE.Loader.prototype.uv( scope, u1, v1, u2, v2, u3, v3 );
 
 			}
 
-			function add_uv4( start, i, stride, offset ) {
+			function add_uv4( i ) {
 
 				var uva, uvb, uvc, uvd, u1, u2, u3, u4, v1, v2, v3, v4;
 
-				uva = parseUInt32( data, start + i*stride + offset );
-				uvb = parseUInt32( data, start + i*stride + offset + md.uv_index_bytes );
-				uvc = parseUInt32( data, start + i*stride + offset + md.uv_index_bytes * 2 );
-				uvd = parseUInt32( data, start + i*stride + offset + md.uv_index_bytes * 3 );
+				uva = parseUInt32( data, i );
+				uvb = parseUInt32( data, i + md.uv_index_bytes );
+				uvc = parseUInt32( data, i + md.uv_index_bytes * 2 );
+				uvd = parseUInt32( data, i + md.uv_index_bytes * 3 );
 
 				u1 = uvs[ uva*2 ];
-				v1 = uvs[ uva*2 + 1];
+				v1 = uvs[ uva*2 + 1 ];
 
 				u2 = uvs[ uvb*2 ];
-				v2 = uvs[ uvb*2 + 1];
+				v2 = uvs[ uvb*2 + 1 ];
 
 				u3 = uvs[ uvc*2 ];
-				v3 = uvs[ uvc*2 + 1];
+				v3 = uvs[ uvc*2 + 1 ];
 
 				u4 = uvs[ uvd*2 ];
-				v4 = uvs[ uvd*2 + 1];
+				v4 = uvs[ uvd*2 + 1 ];
 
 				THREE.Loader.prototype.uv( scope, u1, v1, u2, v2, u3, v3, u4, v4 );
 
@@ -458,120 +461,128 @@ THREE.Loader.prototype = {
 
 			function init_triangles_flat( start ) {
 
-				var i, stride = md.vertex_index_bytes * 3 + md.material_index_bytes;
+				var i, stride = md.vertex_index_bytes * 3 + md.material_index_bytes,
+					end = start + md.ntri_flat * stride;
 
-				for( i = 0; i < md.ntri_flat; ++i ) {
+				for( i = start; i < end; i += stride ) {
 
-					add_tri( start, i, stride );
+					add_tri( i );
 
 				}
 
-				return md.ntri_flat * stride;
+				return end - start;
 
 			}
 
 			function init_triangles_flat_uv( start ) {
 
 				var i, offset = md.vertex_index_bytes * 3 + md.material_index_bytes,
-					stride = offset + md.uv_index_bytes * 3;
+					stride = offset + md.uv_index_bytes * 3
+					end = start + md.ntri_flat_uv * stride;
 
-				for( i = 0; i < md.ntri_flat_uv; ++i ) {
+				for( i = start; i < end; i += stride ) {
 
-					add_tri( start, i, stride );
-					add_uv3( start, i, stride, md.vertex_index_bytes*3 + md.material_index_bytes );
+					add_tri( i );
+					add_uv3( i + offset );
 
 				}
 
-				return md.ntri_flat_uv * stride;
+				return end - start;
 
 			}
 
 			function init_triangles_smooth( start ) {
 
-				var i, stride = md.vertex_index_bytes * 3 + md.material_index_bytes + md.normal_index_bytes * 3;
+				var i, stride = md.vertex_index_bytes * 3 + md.material_index_bytes + md.normal_index_bytes * 3,
+					end = start + md.ntri_smooth * stride;
 
-				for( i = 0; i < md.ntri_smooth; ++i ) {
+				for( i = start; i < end; i += stride ) {
 
-					add_tri_n( start, i, stride );
+					add_tri_n( i );
 
 				}
 
-				return md.ntri_smooth * stride;
+				return end - start;
 
 			}
 
 			function init_triangles_smooth_uv( start ) {
 
 				var i, offset = md.vertex_index_bytes * 3 + md.material_index_bytes + md.normal_index_bytes * 3,
-					stride = offset + md.uv_index_bytes * 3;
+					stride = offset + md.uv_index_bytes * 3,
+					end = start + md.ntri_smooth_uv * stride;
 
-				for( i = 0; i < md.ntri_smooth_uv; ++i ) {
+				for( i = start; i < end; i += stride ) {
 
-					add_tri_n( start, i, stride );
-					add_uv3( start, i, stride, offset );
+					add_tri_n( i );
+					add_uv3( i + offset );
 
 				}
 
-				return md.ntri_smooth * stride;
+				return end - start;
 
 			}
 
 			function init_quads_flat( start ) {
 
-				var i, stride = md.vertex_index_bytes * 4 + md.material_index_bytes;
+				var i, stride = md.vertex_index_bytes * 4 + md.material_index_bytes,
+					end = start + md.nquad_flat * stride;
 
-				for( i = 0; i < md.nquad_flat; ++i ) {
+				for( i = start; i < end; i += stride ) {
 
-					add_quad( start, i, stride );
+					add_quad( i );
 
 				}
 
-				return md.nquad_flat * stride;
+				return end - start;
 
 			}
 
 			function init_quads_flat_uv( start ) {
 
 				var i, offset = md.vertex_index_bytes * 4 + md.material_index_bytes,
-					stride = offset + md.uv_index_bytes * 4;
+					stride = offset + md.uv_index_bytes * 4,
+					end = start + md.nquad_flat_uv * stride;
 
-				for( i = 0; i < md.nquad_flat_uv; ++i ) {
+				for( i = start; i < end; i += stride ) {
 
-					add_quad( start, i, stride );
-					add_uv4( start, i, offset );
+					add_quad( i );
+					add_uv4( i + offset );
 
 				}
 
-				return md.nquad_flat * stride;
+				return end - start;
 
 			}
 
 			function init_quads_smooth( start ) {
 
-				var i, stride = md.vertex_index_bytes * 4 + md.material_index_bytes + md.normal_index_bytes * 4;
+				var i, stride = md.vertex_index_bytes * 4 + md.material_index_bytes + md.normal_index_bytes * 4,
+					end = start + md.nquad_smooth * stride;
 
-				for( i = 0; i < md.nquad_smooth; ++i ) {
+				for( i = start; i < end; i += stride ) {
 
-					add_quad_n( start, i, stride );
+					add_quad_n( i );
 				}
 
-				return md.nquad_smooth * stride;
+				return end - start;
 
 			}
 
 			function init_quads_smooth_uv( start ) {
 
 				var i, offset = md.vertex_index_bytes * 4 + md.material_index_bytes + md.normal_index_bytes * 4, 
-					stride =  offset + md.uv_index_bytes * 4;
+					stride =  offset + md.uv_index_bytes * 4,
+					end = start + md.nquad_smooth_uv * stride;
 
-				for( i = 0; i < md.nquad_smooth_uv; ++i ) {
+				for( i = start; i < end; i += stride ) {
 
-					add_quad_n( start, i, stride );
-					add_uv4( start, i, stride, offset );
+					add_quad_n( i );
+					add_uv4( i + offset );
 
 				}
 
-				return md.nquad_smooth * stride;
+				return end - start;
 
 			}
 
