@@ -2,7 +2,7 @@
  * @author mr.doob / http://mrdoob.com/
  *
  * params = {
- * 	color: new THREE.Color(),
+ * 	diffuse_color: new THREE.Color(),
  * 	line_width: Number
  * }
  */
