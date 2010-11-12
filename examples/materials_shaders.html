@@ -70,10 +70,9 @@
 		<script type="text/javascript" src="../src/objects/Particle.js"></script>
 		<script type="text/javascript" src="../src/objects/Line.js"></script>
 		<script type="text/javascript" src="../src/materials/LineColorMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/MeshBasicMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/MeshLambertMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/MeshPhongMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/MeshBitmapMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/MeshColorFillMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/MeshColorStrokeMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/MeshFaceMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/ParticleCircleMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/ParticleBitmapMaterial.js"></script>
@@ -180,7 +179,7 @@
 
 				// light representation
 				sphere = new Sphere( 100, 16, 8, 1 );
-				lightMesh = new THREE.Mesh( sphere, new THREE.MeshColorFillMaterial( 0xffaa00 ) );
+				lightMesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffaa00 } );
 				lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
 				lightMesh.position = pointLight.position;
 				lightMesh.overdraw = true;
@@ -192,26 +191,26 @@
 
 				var y1 = 0, y2 = -200;
 				
-				addMesh( sphere, 1, -600, y1, 0, 0,0,0, new THREE.MeshPhongMaterial( 0x050505, 0x000000, 0x555555, 30, 1.0 ) );
-				addMesh( sphere, 1, -600, y2, 0, 0,0,0, new THREE.MeshColorFillMaterial( 0x050505 ) );
+				addMesh( sphere, 1, -600, y1, 0, 0,0,0, new THREE.MeshPhongMaterial( { ambient: 0x050505, diffuse: 0x000000, specular: 0x555555, shininess: 30 } );
+				addMesh( sphere, 1, -600, y2, 0, 0,0,0, new THREE.MeshLambertMaterial( { diffuse: 0x050505 } );
 
-				addMesh( sphere, 1, -400, y1, 0, 0,0,0, new THREE.MeshPhongMaterial( 0x000000, 0xffffff, 0x555555, 30, 1.0 ) );
-				addMesh( sphere, 1, -400, y2, 0, 0,0,0, new THREE.MeshColorFillMaterial( 0xffffff ) );
+				addMesh( sphere, 1, -400, y1, 0, 0,0,0, new THREE.MeshPhongMaterial( { ambient: 0x000000, diffuse: 0xffffff, specular: 0x555555, shininess: 30 } );
+				addMesh( sphere, 1, -400, y2, 0, 0,0,0, new THREE.MeshLambertMaterial( { diffuse: 0xffffff } );
 
-				addMesh( sphere, 1, -200, y1, 0, 0,0,0, new THREE.MeshPhongMaterial( 0x000000, 0xff5500, 0x555555, 10, 1.0 ) );
-				addMesh( sphere, 1, -200, y2, 0, 0,0,0, new THREE.MeshColorFillMaterial( 0xff5500 ) );
+				addMesh( sphere, 1, -200, y1, 0, 0,0,0, new THREE.MeshPhongMaterial( { ambient: 0x000000, diffuse: 0xff5500, specular: 0x555555, shininess: 10 } );
+				addMesh( sphere, 1, -200, y2, 0, 0,0,0, new THREE.MeshLambertMaterial( { diffuse: 0xff5500 } );
 
-				addMesh( sphere, 1,    0, y1, 0, 0,0,0, new THREE.MeshPhongMaterial( 0x000000, 0xffaa00, 0x555555, 30, 1.0 ) );
-				addMesh( sphere, 1,    0, y2, 0, 0,0,0, new THREE.MeshColorFillMaterial( 0xffaa00 ) );
+				addMesh( sphere, 1,    0, y1, 0, 0,0,0, new THREE.MeshPhongMaterial( { ambient: 0x000000, diffuse: 0xffaa00, specular: 0x555555, shininess: 30 } );
+				addMesh( sphere, 1,    0, y2, 0, 0,0,0, new THREE.MeshLambertMaterial( { diffuse: 0xffaa00 } );
 
-				addMesh( sphere, 1,  200, y1, 0, 0,0,0, new THREE.MeshPhongMaterial( 0x000000, 0x55ff00, 0x555555, 30, 1.0 ) );
-				addMesh( sphere, 1,  200, y2, 0, 0,0,0, new THREE.MeshColorFillMaterial( 0x55ff00 ) );
+				addMesh( sphere, 1,  200, y1, 0, 0,0,0, new THREE.MeshPhongMaterial( { ambient: 0x000000, diffuse: 0x55ff00, specular: 0x555555, shininess: 30 } );
+				addMesh( sphere, 1,  200, y2, 0, 0,0,0, new THREE.MeshLambertMaterial( { diffuse: 0x55ff00 } );
 
-				addMesh( sphere, 1,  400, y1, 0, 0,0,0, new THREE.MeshPhongMaterial( 0x000000, 0x0055ff, 0x555555, 30, 1.0 ) );
-				addMesh( sphere, 1,  400, y2, 0, 0,0,0, new THREE.MeshColorFillMaterial( 0x0055ff ) );
+				addMesh( sphere, 1,  400, y1, 0, 0,0,0, new THREE.MeshPhongMaterial( { ambient: 0x000000, diffuse: 0x0055ff, specular: 0x555555, shininess: 30 } );
+				addMesh( sphere, 1,  400, y2, 0, 0,0,0, new THREE.MeshLambertMaterial( { diffuse: 0x0055ff } );
 
-				addMesh( sphere, 1,  600, y1, 0, 0,0,0, new THREE.MeshPhongMaterial( 0x000000, 0x5500ff, 0x555555, 30, 1.0 ) );
-				addMesh( sphere, 1,  600, y2, 0, 0,0,0, new THREE.MeshColorFillMaterial( 0x5500ff ) );
+				addMesh( sphere, 1,  600, y1, 0, 0,0,0, new THREE.MeshPhongMaterial( { ambient: 0x000000, diffuse: 0x5500ff, specular: 0x555555, shininess: 30 } );
+				addMesh( sphere, 1,  600, y2, 0, 0,0,0, new THREE.MeshLambertMaterial( { diffuse: 0x5500ff } );
 
 				if ( render_gl ) {
 					try {

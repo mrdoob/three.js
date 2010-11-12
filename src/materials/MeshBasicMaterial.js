@@ -3,7 +3,7 @@
  * @author alteredq / http://alteredqualia.com/
  
  * params = {
- * 	color: new THREE.Color(),
+ * 	color: hex,
  *  bitmap: new THREE.UVMap( <Image> ),
  *  alpha: float,
  *  blending: THREE.AdditiveBlending,
@@ -41,8 +41,9 @@ THREE.MeshBasicMaterial.setDefaultParams = function ( override ) {
         
     if ( override != undefined ) {
         
-        if( override.color != undefined ) params.color = override.color;
+        if( override.color != undefined ) params.color = new THREE.Color( override.color );
         if( override.bitmap != undefined ) params.bitmap = override.bitmap;
+        
         if( override.alpha != undefined ) params.alpha = override.alpha;
         if( override.blending != undefined ) params.blending = override.blending;
         if( override.wireframe != undefined ) params.wireframe = override.wireframe;
