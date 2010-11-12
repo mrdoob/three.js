@@ -5,8 +5,7 @@
 THREE.Rectangle = function () {
 
 	var _left, _top, _right, _bottom,
-	_width, _height,
-	_isEmpty = true;
+	_width, _height, _isEmpty = true;
 
 	function resize() {
 
@@ -171,7 +170,7 @@ THREE.Rectangle = function () {
 
 	this.toString = function () {
 
-		return "THREE.Rectangle (x1: " + _left + ", y1: " + _bottom + ", x2: " + _right + ", y1: " + _top + ", width: " + _width + ", height: " + _height + ")";
+		return "THREE.Rectangle ( left: " + _left + ", right: " + _right + ", top: " + _top + ", bottom: " + _bottom + ", width: " + _width + ", height: " + _height + " )";
 
 	};
 
