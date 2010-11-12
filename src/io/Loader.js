@@ -123,7 +123,10 @@ THREE.Loader.prototype = {
 				currentOffset = 0, 
 				md,
 				normals = [],
-				uvs = [];
+				uvs = [],
+				tri_b, tri_c, tri_m, tri_na, tri_nb, tri_nc,
+				quad_b, quad_c, quad_d, quad_m, quad_na, quad_nb, quad_nc, quad_nd,
+				tri_uvb, tri_uvc, quad_uvb, quad_uvc, quad_uvd;
 
 
 			THREE.Geometry.call(this);
@@ -133,6 +136,31 @@ THREE.Loader.prototype = {
 			md = parseMetaData( data, currentOffset );
 			currentOffset += md.header_bytes;
 
+			// cache offsets
+			
+			tri_b   = md.vertex_index_bytes, 
+			tri_c   = md.vertex_index_bytes*2, 
+			tri_m   = md.vertex_index_bytes*3,
+			tri_na  = md.vertex_index_bytes*3 + md.material_index_bytes,
+			tri_nb  = md.vertex_index_bytes*3 + md.material_index_bytes + md.normal_index_bytes,
+			tri_nc  = md.vertex_index_bytes*3 + md.material_index_bytes + md.normal_index_bytes*2,
+		
+			quad_b  = md.vertex_index_bytes,
+			quad_c  = md.vertex_index_bytes*2,
+			quad_d  = md.vertex_index_bytes*3,
+			quad_m  = md.vertex_index_bytes*4,
+			quad_na = md.vertex_index_bytes*4 + md.material_index_bytes,
+			quad_nb = md.vertex_index_bytes*4 + md.material_index_bytes + md.normal_index_bytes,
+			quad_nc = md.vertex_index_bytes*4 + md.material_index_bytes + md.normal_index_bytes*2,
+			quad_nd = md.vertex_index_bytes*4 + md.material_index_bytes + md.normal_index_bytes*3,
+		
+			tri_uvb = md.uv_index_bytes,
+			tri_uvc = md.uv_index_bytes * 2,
+		
+			quad_uvb = md.uv_index_bytes,
+			quad_uvc = md.uv_index_bytes * 2,
+			quad_uvd = md.uv_index_bytes * 3;
+			
 			currentOffset += init_vertices( currentOffset );
 			currentOffset += init_normals( currentOffset );
 			currentOffset += init_uvs( currentOffset );
@@ -310,7 +338,7 @@ THREE.Loader.prototype = {
 			function init_normals( start ) {
 
 				var i, x, y, z, 
-					stride = md.normal_coordinate_bytes * 3.
+					stride = md.normal_coordinate_bytes * 3,
 					end = start + md.nnormals * stride;
 
 				for( i = start; i < end; i += stride ) {
@@ -344,17 +372,17 @@ THREE.Loader.prototype = {
 				
 				return md.nuvs * stride;
 
-			}
-
+			}			
+			
 			function add_tri( i ) {
 
 				var a, b, c, m;
 
 				a = parseUInt32( data, i );
-				b = parseUInt32( data, i + md.vertex_index_bytes );
-				c = parseUInt32( data, i + md.vertex_index_bytes*2 );
+				b = parseUInt32( data, i + tri_b );
+				c = parseUInt32( data, i + tri_c );
 
-				m = parseUInt16( data, i + md.vertex_index_bytes*3 );
+				m = parseUInt16( data, i + tri_m );
 
 				THREE.Loader.prototype.f3( scope, a, b, c, m );
 
@@ -365,14 +393,14 @@ THREE.Loader.prototype = {
 				var a, b, c, m, na, nb, nc;
 
 				a  = parseUInt32( data, i );
-				b  = parseUInt32( data, i + md.vertex_index_bytes );
-				c  = parseUInt32( data, i + md.vertex_index_bytes*2 );
+				b  = parseUInt32( data, i + tri_b );
+				c  = parseUInt32( data, i + tri_c );
 
-				m  = parseUInt16( data, i + md.vertex_index_bytes*3 );
+				m  = parseUInt16( data, i + tri_m );
 
-				na = parseUInt32( data, i + md.vertex_index_bytes*3 + md.material_index_bytes );
-				nb = parseUInt32( data, i + md.vertex_index_bytes*3 + md.material_index_bytes + md.normal_index_bytes );
-				nc = parseUInt32( data, i + md.vertex_index_bytes*3 + md.material_index_bytes + md.normal_index_bytes*2 );
+				na = parseUInt32( data, i + tri_na );
+				nb = parseUInt32( data, i + tri_nb );
+				nc = parseUInt32( data, i + tri_nc );
 
 				THREE.Loader.prototype.f3n( scope, normals, a, b, c, m, na, nb, nc );
 
@@ -383,11 +411,11 @@ THREE.Loader.prototype = {
 				var a, b, c, d, m;
 
 				a = parseUInt32( data, i );
-				b = parseUInt32( data, i + md.vertex_index_bytes );
-				c = parseUInt32( data, i + md.vertex_index_bytes*2 );
-				d = parseUInt32( data, i + md.vertex_index_bytes*3 );
+				b = parseUInt32( data, i + quad_b );
+				c = parseUInt32( data, i + quad_c );
+				d = parseUInt32( data, i + quad_d );
 
-				m = parseUInt16( data, i + md.vertex_index_bytes*4 );
+				m = parseUInt16( data, i + quad_m );
 
 				THREE.Loader.prototype.f4( scope, a, b, c, d, m );
 
@@ -398,16 +426,16 @@ THREE.Loader.prototype = {
 				var a, b, c, d, m, na, nb, nc, nd;
 
 				a  = parseUInt32( data, i );
-				b  = parseUInt32( data, i + md.vertex_index_bytes );
-				c  = parseUInt32( data, i + md.vertex_index_bytes*2 );
-				d  = parseUInt32( data, i + md.vertex_index_bytes*3 );
+				b  = parseUInt32( data, i + quad_b );
+				c  = parseUInt32( data, i + quad_c );
+				d  = parseUInt32( data, i + quad_d );
 
-				m  = parseUInt16( data, i + md.vertex_index_bytes*4 );
+				m  = parseUInt16( data, i + quad_m );
 
-				na = parseUInt32( data, i + md.vertex_index_bytes*4 + md.material_index_bytes );
-				nb = parseUInt32( data, i + md.vertex_index_bytes*4 + md.material_index_bytes + md.normal_index_bytes );
-				nc = parseUInt32( data, i + md.vertex_index_bytes*4 + md.material_index_bytes + md.normal_index_bytes*2 );
-				nd = parseUInt32( data, i + md.vertex_index_bytes*4 + md.material_index_bytes + md.normal_index_bytes*3 );
+				na = parseUInt32( data, i + quad_na );
+				nb = parseUInt32( data, i + quad_nb );
+				nc = parseUInt32( data, i + quad_nc );
+				nd = parseUInt32( data, i + quad_nd );
 
 				THREE.Loader.prototype.f4n( scope, normals, a, b, c, d, m, na, nb, nc, nd );
 
@@ -418,8 +446,8 @@ THREE.Loader.prototype = {
 				var uva, uvb, uvc, u1, u2, u3, v1, v2, v3;
 
 				uva = parseUInt32( data, i );
-				uvb = parseUInt32( data, i + md.uv_index_bytes );
-				uvc = parseUInt32( data, i + md.uv_index_bytes * 2 );
+				uvb = parseUInt32( data, i + tri_uvb );
+				uvc = parseUInt32( data, i + tri_uvc );
 
 				u1 = uvs[ uva*2 ];
 				v1 = uvs[ uva*2 + 1 ];
@@ -439,9 +467,9 @@ THREE.Loader.prototype = {
 				var uva, uvb, uvc, uvd, u1, u2, u3, u4, v1, v2, v3, v4;
 
 				uva = parseUInt32( data, i );
-				uvb = parseUInt32( data, i + md.uv_index_bytes );
-				uvc = parseUInt32( data, i + md.uv_index_bytes * 2 );
-				uvd = parseUInt32( data, i + md.uv_index_bytes * 3 );
+				uvb = parseUInt32( data, i + quad_uvb );
+				uvc = parseUInt32( data, i + quad_uvc );
+				uvd = parseUInt32( data, i + quad_uvd );
 
 				u1 = uvs[ uva*2 ];
 				v1 = uvs[ uva*2 + 1 ];
@@ -477,7 +505,7 @@ THREE.Loader.prototype = {
 			function init_triangles_flat_uv( start ) {
 
 				var i, offset = md.vertex_index_bytes * 3 + md.material_index_bytes,
-					stride = offset + md.uv_index_bytes * 3
+					stride = offset + md.uv_index_bytes * 3,
 					end = start + md.ntri_flat_uv * stride;
 
 				for( i = start; i < end; i += stride ) {
