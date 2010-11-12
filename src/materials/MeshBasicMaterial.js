@@ -13,7 +13,7 @@
 
 THREE.MeshBasicMaterial = function ( params ) {
 
-    this.id = THREE.MeshBasicMaterial.value ++;
+    this.id = THREE.MeshBasicMaterialCounter.value ++;
     
     this.params = this.setDefaultParams( params );
 
@@ -29,7 +29,7 @@ THREE.MeshBasicMaterial = function ( params ) {
 
 };
 
-THREE.MeshBasicMaterial.setDefaultParams = function ( override ) {
+THREE.MeshBasicMaterial.prototype.setDefaultParams = function ( override ) {
     
     var params = {
         color: new THREE.Color( 0xeeeeee ),
@@ -54,4 +54,4 @@ THREE.MeshBasicMaterial.setDefaultParams = function ( override ) {
     
 };
 
-THREE.MeshBasicMaterial = { value: 0 };
+THREE.MeshBasicMaterialCounter = { value: 0 };

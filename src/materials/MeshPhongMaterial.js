@@ -18,7 +18,7 @@
 
 THREE.MeshPhongMaterial = function ( ambient, diffuse, specular, shininess, opacity ) {
 
-	this.id = THREE.MeshPhongMaterial.value ++;
+	this.id = THREE.MeshPhongMaterialCounter.value ++;
 	
 	this.params = this.setDefaultParams( params );
 	
@@ -31,14 +31,14 @@ THREE.MeshPhongMaterial = function ( ambient, diffuse, specular, shininess, opac
 				+ ', <br/>alpha: ' + this.params.alpha
 				+ ', <br/>shading: ' + this.params.shading
 				+ ', <br/>wireframe: ' + this.params.wireframe
-				+ ', <br/>id: ' + this.params.id        
+				+ ', <br/>id: ' + this.id        
 				+ ')';
 
 	};
 
 };
 
-THREE.MeshPhongMaterial.setDefaultParams = function ( override ) {
+THREE.MeshPhongMaterial.prototype.setDefaultParams = function ( override ) {
 	
 	var params = {
 		ambient: new THREE.Color( 0x050505 ),
@@ -75,4 +75,4 @@ THREE.MeshPhongMaterial.setDefaultParams = function ( override ) {
 	
 };
 
-THREE.MeshPhongMaterial = { value: 0 };
+THREE.MeshPhongMaterialCounter = { value: 0 };

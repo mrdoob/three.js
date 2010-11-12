@@ -14,7 +14,7 @@
 
 THREE.MeshLambertMaterial = function ( params ) {
 
-	this.id = THREE.MeshLambertMaterial.value ++;
+	this.id = THREE.MeshLambertMaterialCounter.value ++;
 	
 	this.params = this.setDefaultParams( params );
 	
@@ -31,7 +31,7 @@ THREE.MeshLambertMaterial = function ( params ) {
 
 };
 
-THREE.MeshLambertMaterial.setDefaultParams = function ( override ) {
+THREE.MeshLambertMaterial.prototype.setDefaultParams = function ( override ) {
 	
 	var params = {
 		diffuse: new THREE.Color( 0xeeeeee ),
@@ -58,4 +58,4 @@ THREE.MeshLambertMaterial.setDefaultParams = function ( override ) {
 	
 };
 
-THREE.MeshLambertMaterial = { value: 0 };
+THREE.MeshLambertMaterialCounter = { value: 0 };
