@@ -4,26 +4,26 @@
 
 THREE.Rectangle = function () {
 
-	var _x1, _y1, _x2, _y2,
+	var _left, _top, _right, _bottom,
 	_width, _height,
 	_isEmpty = true;
 
 	function resize() {
 
-		_width = _x2 - _x1;
-		_height = _y2 - _y1;
+		_width = _right - _left;
+		_height = _bottom - _top;
 
 	}
 
 	this.getX = function () {
 
-		return _x1;
+		return _left;
 
 	};
 
 	this.getY = function () {
 
-		return _y1;
+		return _top;
 
 	};
 
@@ -39,36 +39,36 @@ THREE.Rectangle = function () {
 
 	};
 
-	this.getX1 = function() {
+	this.getLeft = function() {
 
-		return _x1;
-
-	};
-
-	this.getY1 = function() {
-
-		return _y1;
+		return _left;
 
 	};
 
-	this.getX2 = function() {
+	this.getTop = function() {
 
-		return _x2;
-
-	};
-
-	this.getY2 = function() {
-
-		return _y2;
+		return _top;
 
 	};
 
-	this.set = function ( x1, y1, x2, y2 ) {
+	this.getRight = function() {
+
+		return _right;
+
+	};
+
+	this.getBottom = function() {
+
+		return _bottom;
+
+	};
+
+	this.set = function ( left, top, right, bottom ) {
 
 		_isEmpty = false;
 
-		_x1 = x1; _y1 = y1;
-		_x2 = x2; _y2 = y2;
+		_left = left; _top = top;
+		_right = right; _bottom = bottom;
 
 		resize();
 
@@ -79,15 +79,15 @@ THREE.Rectangle = function () {
 		if ( _isEmpty ) {
 
 			_isEmpty = false;
-			_x1 = x; _y1 = y;
-			_x2 = x; _y2 = y;
+			_left = x; _top = y;
+			_right = x; _bottom = y;
 
 		} else {
 
-			_x1 = Math.min( _x1, x );
-			_y1 = Math.min( _y1, y );
-			_x2 = Math.max( _x2, x );
-			_y2 = Math.max( _y2, y );
+			_left = Math.min( _left, x );
+			_top = Math.min( _top, y );
+			_right = Math.max( _right, x );
+			_bottom = Math.max( _bottom, y );
 
 		}
 
@@ -100,15 +100,15 @@ THREE.Rectangle = function () {
 		if ( _isEmpty ) {
 
 			_isEmpty = false;
-			_x1 = r.getX1(); _y1 = r.getY1();
-			_x2 = r.getX2(); _y2 = r.getY2();
+			_left = r.getLeft(); _top = r.getTop();
+			_right = r.getRight(); _bottom = r.getBottom();
 
 		} else {
 
-			_x1 = Math.min(_x1, r.getX1());
-			_y1 = Math.min(_y1, r.getY1());
-			_x2 = Math.max(_x2, r.getX2());
-			_y2 = Math.max(_y2, r.getY2());
+			_left = Math.min(_left, r.getLeft());
+			_top = Math.min(_top, r.getTop());
+			_right = Math.max(_right, r.getRight());
+			_bottom = Math.max(_bottom, r.getBottom());
 
 		}
 
@@ -118,35 +118,37 @@ THREE.Rectangle = function () {
 
 	this.inflate = function ( v ) {
 
-		_x1 -= v; _y1 -= v;
-		_x2 += v; _y2 += v;
+		_left -= v; _top -= v;
+		_right += v; _bottom += v;
 
 		resize();
 
 	};
 
-	this.minSelf = function( r ) {
+	this.minSelf = function ( r ) {
 
-		_x1 = Math.max( _x1, r.getX1() );
-		_y1 = Math.max( _y1, r.getY1() );
-		_x2 = Math.min( _x2, r.getX2() );
-		_y2 = Math.min( _y2, r.getY2() );
+		_left = Math.max( _left, r.getLeft() );
+		_top = Math.max( _top, r.getTop() );
+		_right = Math.min( _right, r.getRight() );
+		_bottom = Math.min( _bottom, r.getBottom() );
 
 		resize();
 
 	};
 
 	/*
-	this.containsPoint = function (x, y) {
+	this.contains = function ( x, y ) {
 
-		return x > _x1 && x < _x2 && y > _y1 && y < _y2;
+		return x > _left && x < _right && y > _top && y < _bottom;
 
-	}
+	};
 	*/
 
 	this.instersects = function ( r ) {
 
-		return Math.min( _x2, r.getX2() ) - Math.max( _x1, r.getX1() ) >= 0 && Math.min( _y2, r.getY2() ) - Math.max( _y1, r.getY1() ) >= 0;
+		// return this.contains( r.getLeft(), r.getTop() ) || this.contains( r.getRight(), r.getTop() ) || this.contains( r.getLeft(), r.getBottom() ) || this.contains( r.getRight(), r.getBottom() );
+
+		return Math.min( _right, r.getRight() ) - Math.max( _left, r.getLeft() ) >= 0 && Math.min( _bottom, r.getBottom() ) - Math.max( _top, r.getTop() ) >= 0;
 
 	};
 
@@ -154,8 +156,8 @@ THREE.Rectangle = function () {
 
 		_isEmpty = true;
 
-		_x1 = 0; _y1 = 0;
-		_x2 = 0; _y2 = 0;
+		_left = 0; _top = 0;
+		_right = 0; _bottom = 0;
 
 		resize();
 
@@ -169,7 +171,7 @@ THREE.Rectangle = function () {
 
 	this.toString = function () {
 
-		return "THREE.Rectangle (x1: " + _x1 + ", y1: " + _y2 + ", x2: " + _x2 + ", y1: " + _y1 + ", width: " + _width + ", height: " + _height + ")";
+		return "THREE.Rectangle (x1: " + _left + ", y1: " + _bottom + ", x2: " + _right + ", y1: " + _top + ", width: " + _width + ", height: " + _height + ")";
 
 	};
 
