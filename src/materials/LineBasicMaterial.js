@@ -3,21 +3,21 @@
  *
  * params = {
  * 	color: new THREE.Color(),
- * 	line_width: [ 0 - 100 ]
+ * 	line_width: Number
  * }
  */
 
-THREE.LineColorMaterial = function ( params ) {
+THREE.LineBasicMaterial = function ( params ) {
 
 	this.params = params;
 
 };
 
-THREE.LineColorMaterial.prototype = {
+THREE.LineBasicMaterial.prototype = {
 
 	toString: function () {
 
-		return 'THREE.LineColorMaterial ( params: ' + this.params + ' )';
+		return 'THREE.LineBasicMaterial ( params: ' + this.params + ' )';
 
 	}
 
