@@ -1,10 +1,10 @@
 var Qrcode = function () {
 
-	THREE.Geometry.call(this);
+	THREE.Geometry.call( this );
 
 	var scope = this,
-	m1 = new THREE.MeshColorFillMaterial( 0x000000 ),
-	m2 = new THREE.MeshColorFillMaterial( 0xc0c0c0 );
+	m1 = new THREE.MeshBasicMaterial( { color: 0x000000 } ),
+	m2 = new THREE.MeshBasicMaterial( { color: 0xc0c0c0 } );
 
 	v(-54,134,58);
 	v(-54,146,58);

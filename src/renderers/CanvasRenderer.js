@@ -107,8 +107,7 @@ THREE.CanvasRenderer = function () {
 				for ( m = 0, ml = element.material.length; m < ml; m++ ) {
 
 					material = element.material[ m ];
-
-					renderParticle( v1x, v1y, element, material, scene );
+					material && renderParticle( v1x, v1y, element, material, scene );
 
 				}
 
@@ -131,8 +130,7 @@ THREE.CanvasRenderer = function () {
 				while ( m < ml ) {
 
 					material = element.material[ m ++ ];
-
-					renderLine( v1x, v1y, v2x, v2y, element, material, scene );
+					material && renderLine( v1x, v1y, v2x, v2y, element, material, scene );
 
 				}
 
@@ -177,8 +175,7 @@ THREE.CanvasRenderer = function () {
 						while ( fm < fml ) {
 
 							material = element.faceMaterial[ fm ++ ];
-
-							renderFace3( v1x, v1y, v2x, v2y, v3x, v3y, element, material, scene );
+							material && renderFace3( v1x, v1y, v2x, v2y, v3x, v3y, element, material, scene );
 
 						}
 
@@ -246,8 +243,7 @@ THREE.CanvasRenderer = function () {
 						while ( fm < fml ) {
 
 							material = element.faceMaterial[ fm ++ ];
-
-							renderFace4( v1x, v1y, v2x, v2y, v3x, v3y, v4x, v4y, v5x, v5y, v6x, v6y, element, material, scene );
+							material && renderFace4( v1x, v1y, v2x, v2y, v3x, v3y, v4x, v4y, v5x, v5y, v6x, v6y, element, material, scene );
 
 						}
 
@@ -383,6 +379,12 @@ THREE.CanvasRenderer = function () {
 
 		var width, height, scaleX, scaleY, offsetX, offsetY,
 		bitmap, bitmapWidth, bitmapHeight;
+
+		if ( _contextGlobalAlpha != material.opacity ) {
+
+			_context.globalAlpha = _contextGlobalAlpha = material.opacity;
+
+		}
 
 		if ( material instanceof THREE.ParticleBasicMaterial ) {
 
@@ -525,7 +527,7 @@ THREE.CanvasRenderer = function () {
 
 		if ( material.map ) {
 
-			bitmap = material.map;
+			bitmap = material.map.image;
 			bitmapWidth = bitmap.width - 1;
 			bitmapHeight = bitmap.height - 1;
 
@@ -617,7 +619,7 @@ THREE.CanvasRenderer = function () {
 
 		if ( material.map ) {
 
-			bitmap = material.map;
+			bitmap = material.map.image;
 			bitmapWidth = bitmap.width - 1;
 			bitmapHeight = bitmap.height - 1;
 

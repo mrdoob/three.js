@@ -20,6 +20,7 @@
 		<script type="text/javascript" src="../src/core/Vector2.js"></script>
 		<script type="text/javascript" src="../src/core/Vector3.js"></script>
 		<script type="text/javascript" src="../src/core/Vector4.js"></script>
+		<script type="text/javascript" src="../src/core/Ray.js"></script>
 		<script type="text/javascript" src="../src/core/Rectangle.js"></script>
 		<script type="text/javascript" src="../src/core/Matrix3.js"></script>
 		<script type="text/javascript" src="../src/core/Matrix4.js"></script>
@@ -34,17 +35,18 @@
 		<script type="text/javascript" src="../src/lights/DirectionalLight.js"></script>
 		<script type="text/javascript" src="../src/lights/PointLight.js"></script>
 		<script type="text/javascript" src="../src/objects/Object3D.js"></script>
+		<script type="text/javascript" src="../src/objects/Mesh.js"></script>
 		<script type="text/javascript" src="../src/objects/Particle.js"></script>
 		<script type="text/javascript" src="../src/objects/Line.js"></script>
-		<script type="text/javascript" src="../src/objects/Mesh.js"></script>
-		<script type="text/javascript" src="../src/materials/LineColorMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/Material.js"></script>
+		<script type="text/javascript" src="../src/materials/LineBasicMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/MeshBasicMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/MeshLambertMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/MeshPhongMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/MeshBitmapMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/MeshColorFillMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/MeshColorStrokeMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/MeshFaceMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/ParticleBasicMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/ParticleCircleMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/ParticleBitmapMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/Texture.js"></script>
 		<script type="text/javascript" src="../src/scenes/Scene.js"></script>
 		<script type="text/javascript" src="../src/renderers/Projector.js"></script>
 		<script type="text/javascript" src="../src/renderers/CanvasRenderer.js"></script>
@@ -80,11 +82,11 @@
 			var mouseX = 0;
 			var mouseY = 0;
 
-			var windowHalfX = window.innerWidth >> 1;
-			var windowHalfY = window.innerHeight >> 1;
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
 
 
-			document.addEventListener('mousemove', onDocumentMouseMove, false);
+			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
 			init();
 			// loop();
@@ -114,7 +116,7 @@
 
 				var cube = new Cube(100, 100, 100);
 
-				mesh = new THREE.Mesh( cube, new THREE.MeshColorFillMaterial( 0x0000ff, 0.5 ) );
+				mesh = new THREE.Mesh( cube, new THREE.MeshBasicMaterial( { color: 0x0000ff, opacity: 0.5 } ) );
 				mesh.position.x = 500;
 				mesh.rotation.x = Math.random();
 				mesh.rotation.y = Math.random();
@@ -122,7 +124,7 @@
 				mesh.updateMatrix();
 				scene.addObject(mesh);
 
-				mesh = new THREE.Mesh( cube, new THREE.MeshColorFillMaterial( Math.random() * 0xffffff ) );
+				mesh = new THREE.Mesh( cube, new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } ) );
 				mesh.position.x = 500;
 				mesh.position.y = 500;
 				mesh.rotation.x = Math.random();
@@ -133,7 +135,7 @@
 
 				// PLANE
 
-				mesh = new THREE.Mesh( new Plane( 100, 100 ), new THREE.MeshColorFillMaterial( Math.random() * 0xffffff ) );
+				mesh = new THREE.Mesh( new Plane( 100, 100 ), new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } ) );
 				mesh.position.y = -500;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
 				mesh.doubleSided = true;
@@ -142,7 +144,7 @@
 
 				// CYLINDER
 
-				mesh = new THREE.Mesh( new Cylinder( 10, 20, 100, 200, - 50, - 20 ), new THREE.MeshColorFillMaterial( Math.random() * 0xffffff ) );
+				mesh = new THREE.Mesh( new Cylinder( 10, 20, 100, 200, - 50, - 20 ), new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } ) );
 				mesh.position.x = -500;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
 				mesh.updateMatrix();
@@ -164,7 +166,7 @@
 					v1.position.addSelf( v );
 					v2.position.addSelf( v );
 
-					var face = new THREE.Face3( geometry.vertices.push( v0 ) - 1, geometry.vertices.push( v1 ) - 1, geometry.vertices.push( v2 ) - 1, null, new THREE.MeshColorFillMaterial( Math.random() * 0xffffff ) );
+					var face = new THREE.Face3( geometry.vertices.push( v0 ) - 1, geometry.vertices.push( v1 ) - 1, geometry.vertices.push( v2 ) - 1, null, new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } ) );
 
 					geometry.faces.push( face );
 				}
@@ -172,21 +174,21 @@
 				geometry.computeNormals();
 				geometry.computeCentroids();
 
-				mesh = new THREE.Mesh( geometry, [ new THREE.MeshFaceMaterial(), new THREE.MeshColorStrokeMaterial( 0xff0000, 0.5, 10 ) ] );
+				mesh = new THREE.Mesh( geometry, [ new THREE.MeshFaceMaterial(), new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, linewidth: 10 } ) ] );
 				mesh.doubleSided = true;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
-				scene.addObject(mesh);
+				scene.addObject( mesh );
 
 				// PARTICLES
 
-				for (var i = 0; i < 100; i ++) {
+				for ( var i = 0; i < 100; i ++ ) {
 
-					particle = new THREE.Particle( new THREE.ParticleCircleMaterial( Math.random() * 0xffffff ) );
+					particle = new THREE.Particle( new THREE.ParticleCircleMaterial( { color: Math.random() * 0xffffff } ) );
 					particle.position.x = Math.random() * 1000 - 500;
 					particle.position.y = Math.random() * 1000 - 500;
 					particle.position.z = Math.random() * 1000 - 500;
 					particle.scale.x = particle.scale.y = 10;
-					scene.addObject(particle);
+					scene.addObject( particle );
 
 				}
 

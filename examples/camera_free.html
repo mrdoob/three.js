@@ -39,6 +39,7 @@
 		<script type="text/javascript" src="../src/objects/Mesh.js"></script>
 		<script type="text/javascript" src="../src/objects/Particle.js"></script>
 		<script type="text/javascript" src="../src/objects/Line.js"></script>
+		<script type="text/javascript" src="../src/materials/Material.js"></script>
 		<script type="text/javascript" src="../src/materials/LineBasicMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/MeshBasicMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/MeshLambertMaterial.js"></script>
@@ -46,6 +47,7 @@
 		<script type="text/javascript" src="../src/materials/MeshFaceMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/ParticleBasicMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/ParticleCircleMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/Texture.js"></script>
 		<script type="text/javascript" src="../src/scenes/Scene.js"></script>
 		<script type="text/javascript" src="../src/renderers/Projector.js"></script>
 		<script type="text/javascript" src="../src/renderers/CanvasRenderer.js"></script>
@@ -129,7 +131,7 @@
 				geometry = new Sphere( 100, 16, 8 );
 				material = new THREE.MeshLambertMaterial( { color: 0xffffff, opacity: 1 } );
 
-				for (var i = 0; i < 10; i ++ ) {
+				for ( var i = 0; i < 10; i ++ ) {
 
 					cube = new THREE.Mesh( geometry, material );
 					cube.overdraw = true;

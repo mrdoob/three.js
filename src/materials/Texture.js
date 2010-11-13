@@ -6,7 +6,7 @@
 THREE.Texture = function ( image, mapping ) {
 
 	this.image = image;
-	this.mapping = mapping;
+	this.mapping = mapping ? mapping : THREE.UVMapping;
 
 	this.toString = function () {
 

@@ -14,7 +14,49 @@
 	</head>
 	<body>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<!-- <script type="text/javascript" src="../build/Three.js"></script> -->
+
+		<script type="text/javascript" src="../src/Three.js"></script>
+		<script type="text/javascript" src="../src/core/Color.js"></script>
+		<script type="text/javascript" src="../src/core/Vector2.js"></script>
+		<script type="text/javascript" src="../src/core/Vector3.js"></script>
+		<script type="text/javascript" src="../src/core/Vector4.js"></script>
+		<script type="text/javascript" src="../src/core/Ray.js"></script>
+		<script type="text/javascript" src="../src/core/Rectangle.js"></script>
+		<script type="text/javascript" src="../src/core/Matrix3.js"></script>
+		<script type="text/javascript" src="../src/core/Matrix4.js"></script>
+		<script type="text/javascript" src="../src/core/Vertex.js"></script>
+		<script type="text/javascript" src="../src/core/Face3.js"></script>
+		<script type="text/javascript" src="../src/core/Face4.js"></script>
+		<script type="text/javascript" src="../src/core/UV.js"></script>
+		<script type="text/javascript" src="../src/core/Geometry.js"></script>
+		<script type="text/javascript" src="../src/cameras/Camera.js"></script>
+		<script type="text/javascript" src="../src/lights/Light.js"></script>
+		<script type="text/javascript" src="../src/lights/AmbientLight.js"></script>
+		<script type="text/javascript" src="../src/lights/DirectionalLight.js"></script>
+		<script type="text/javascript" src="../src/lights/PointLight.js"></script>
+		<script type="text/javascript" src="../src/objects/Object3D.js"></script>
+		<script type="text/javascript" src="../src/objects/Mesh.js"></script>
+		<script type="text/javascript" src="../src/objects/Particle.js"></script>
+		<script type="text/javascript" src="../src/objects/Line.js"></script>
+		<script type="text/javascript" src="../src/materials/Material.js"></script>
+		<script type="text/javascript" src="../src/materials/LineBasicMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/MeshBasicMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/MeshLambertMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/MeshPhongMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/MeshFaceMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/ParticleBasicMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/ParticleCircleMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/Texture.js"></script>
+		<script type="text/javascript" src="../src/scenes/Scene.js"></script>
+		<script type="text/javascript" src="../src/renderers/Projector.js"></script>
+		<script type="text/javascript" src="../src/renderers/CanvasRenderer.js"></script>
+		<script type="text/javascript" src="../src/renderers/SVGRenderer.js"></script>
+		<script type="text/javascript" src="../src/renderers/WebGLRenderer.js"></script>
+		<script type="text/javascript" src="../src/renderers/renderables/RenderableFace3.js"></script>
+		<script type="text/javascript" src="../src/renderers/renderables/RenderableFace4.js"></script>
+		<script type="text/javascript" src="../src/renderers/renderables/RenderableParticle.js"></script>
+		<script type="text/javascript" src="../src/renderers/renderables/RenderableLine.js"></script>
 
 		<script type="text/javascript" src="../src/extras/primitives/Cube.js"></script>
 		<script type="text/javascript" src="../src/extras/primitives/Plane.js"></script>
@@ -58,13 +100,15 @@
 				geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( - 500, 0, 0 ) ) );
 				geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( 500, 0, 0 ) ) );
 
+				var material = new THREE.LineBasicMaterial( { color: 0x000000, opacity: 0.2 } );
+
 				for ( var i = 0; i <= 20; i ++ ) {
 
-					var line = new THREE.Line( geometry, new THREE.LineColorMaterial( 0x000000, 0.2 ) );
+					var line = new THREE.Line( geometry, material );
 					line.position.z = ( i * 50 ) - 500;
 					scene.addObject( line );
 
-					var line = new THREE.Line( geometry, new THREE.LineColorMaterial( 0x000000, 0.2 ) );
+					var line = new THREE.Line( geometry, material );
 					line.position.x = ( i * 50 ) - 500;
 					line.rotation.y = 90 * Math.PI / 180;
 					scene.addObject( line );
@@ -145,7 +189,7 @@
 
 						var position = new THREE.Vector3().add( intersects[ 0 ].point, intersects[ 0 ].object.matrixRotation.transform( intersects[ 0 ].face.normal.clone() ) );
 
-						var voxel = new THREE.Mesh( new Cube( 50, 50, 50 ), [ new THREE.MeshColorFillMaterial( 0x00ff80, 1 ), new THREE.MeshFaceMaterial() ] );
+						var voxel = new THREE.Mesh( new Cube( 50, 50, 50 ), [ new THREE.MeshLambertMaterial( { color: 0x00ff80, opacity: 1 } ), new THREE.MeshFaceMaterial() ] );
 						voxel.position.x = Math.floor( position.x / 50 ) * 50 + 25;
 						voxel.position.y = Math.floor( position.y / 50 ) * 50 + 25;
 						voxel.position.z = Math.floor( position.z / 50 ) * 50 + 25;
@@ -205,7 +249,7 @@
 
 						if ( rollOveredFace ) rollOveredFace.material = [];
 						rollOveredFace = intersects[ 0 ].face;
-						rollOveredFace.material = [ new THREE.MeshColorFillMaterial( 0xff0000, 0.5 ) ];
+						rollOveredFace.material = [ new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5 } ) ];
 					}
 				} else if ( rollOveredFace ) {
 

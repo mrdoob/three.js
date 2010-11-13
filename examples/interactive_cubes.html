@@ -50,7 +50,7 @@
 
 				for ( var i = 0; i < 10; i ++ ) {
 
-					var object = new THREE.Mesh( geometry, [ new THREE.MeshBasicMaterial( { diffuse_color: Math.random() * 0xffffff, opacity: 0.5 } ), new THREE.MeshBasicMaterial( { diffuse_color: 0xffffff, opacity: 0.5, wireframe: true } ) ] );
+					var object = new THREE.Mesh( geometry, [ new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, opacity: 0.5 } ), new THREE.MeshBasicMaterial( { color: 0xffffff, opacity: 0.5, wireframe: true } ) ] );
 					object.position.x = Math.random() * 800 - 400;
 					object.position.y = Math.random() * 800 - 400;
 					object.position.z = Math.random() * 800 - 400;
@@ -95,7 +95,7 @@
 
 					intersects[ 0 ].object.material[ 0 ].color.setHex( Math.random() * 0xffffff | 0x80000000 );
 
-					var particle = new THREE.Particle( new THREE.ParticleCircleMaterial( 0x000000 ) );
+					var particle = new THREE.Particle( new THREE.ParticleCircleMaterial( { color: 0x000000 } ) );
 					particle.position = intersects[ 0 ].point;
 					particle.scale.x = particle.scale.y = 8;
 					scene.addObject( particle );
