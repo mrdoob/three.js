@@ -306,6 +306,8 @@ THREE.CanvasRenderer = function () {
 
 	}
 
+	// TODO: This can be done just once
+
 	function calculateLight( scene, element, color ) {
 
 		var l, ll, light, lightColor,
@@ -441,7 +443,7 @@ THREE.CanvasRenderer = function () {
 
 			} else {
 
-				_color = material.color;
+				_color.__styleString = material.color.__styleString;
 
 			}
 
@@ -554,12 +556,20 @@ THREE.CanvasRenderer = function () {
 
 		} else if ( material instanceof THREE.MeshLambertMaterial ) {
 
-			_light.copyRGB( _ambientLight );
-			calculateFaceLight( scene, element, _light );
+			if ( _enableLighting ) {
 
-			_color.copyRGBA( material.color );
-			_color.multiplySelfRGB( _light );
-			_color.updateStyleString();
+				_light.copyRGB( _ambientLight );
+				calculateFaceLight( scene, element, _light );
+
+				_color.copyRGBA( material.color );
+				_color.multiplySelfRGB( _light );
+				_color.updateStyleString();
+
+			} else {
+
+				_color.__styleString = material.color.__styleString;
+
+			}
 
 		}
 
@@ -642,12 +652,20 @@ THREE.CanvasRenderer = function () {
 
 		} else if ( material instanceof THREE.MeshLambertMaterial ) {
 
-			_light.copyRGB( _ambientLight );
-			calculateFaceLight( scene, element, _light );
+			if ( _enableLighting ) {
 
-			_color.copyRGBA( material.color );
-			_color.multiplySelfRGB( _light );
-			_color.updateStyleString();
+				_light.copyRGB( _ambientLight );
+				calculateFaceLight( scene, element, _light );
+
+				_color.copyRGBA( material.color );
+				_color.multiplySelfRGB( _light );
+				_color.updateStyleString();
+
+			} else {
+
+				_color.__styleString = material.color.__styleString;
+
+			}
 
 		}
 

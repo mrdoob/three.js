@@ -21,7 +21,7 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 
 	this.id = THREE.MeshPhongMaterialCounter.value ++;
 
-	this.color = new THREE.Color( 0xeeeeee );
+	this.color = new THREE.Color( 0xff0000 );
 	this.map = null;
 	this.ambient = new THREE.Color( 0x050505 );
 	this.specular = new THREE.Color( 0x111111 );

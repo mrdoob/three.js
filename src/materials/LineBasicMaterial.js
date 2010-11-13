@@ -4,14 +4,14 @@
  * parameters = {
  *  color: <hex>,
  *  opacity: <float>,
- *  blending: THREE.NormalBlending, 
+ *  blending: THREE.NormalBlending,
  *  linewidth: <float>
  * }
  */
 
 THREE.LineBasicMaterial = function ( parameters ) {
 
-	this.color = new THREE.Color( 0xeeeeee );
+	this.color = new THREE.Color( 0xff0000 );
 	this.opacity = 1;
 	this.blending = THREE.NormalBlending;
 	this.linewidth = 1;
@@ -27,7 +27,12 @@ THREE.LineBasicMaterial = function ( parameters ) {
 
 	this.toString = function () {
 
-		return 'THREE.LineBasicMaterial ( params: ' + this.params + ' )';
+		return 'THREE.LineBasicMaterial (<br/>' +
+			'color: ' + this.color + '<br/>' +
+			'opacity: ' + this.opacity + '<br/>' +
+			'blending: ' + this.blending + '<br/>' +
+			'linewidth: ' + this.linewidth +'<br/>' +
+			')';
 
 	};
 

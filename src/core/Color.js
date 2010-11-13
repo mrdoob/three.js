@@ -29,7 +29,7 @@ THREE.Color.prototype = {
 
 	setHex: function ( hex ) {
 
-		this.hex = Math.floor( hex ).toString(16).length < 8 ? 0xff << 24 ^ hex : hex;
+		this.hex = ( ~~hex ).toString( 16 ).length < 8 ? 0xff << 24 ^ hex : hex;
 
 		if ( this.autoUpdate ) {
 
@@ -67,7 +67,7 @@ THREE.Color.prototype = {
 
 	updateHex: function () {
 
-		this.hex = Math.floor( this.a * 255 ) << 24 ^ Math.floor( this.r * 255 ) << 16 ^ Math.floor( this.g * 255 ) << 8 ^ Math.floor( this.b * 255 );
+		this.hex = ~~( this.a * 255 ) << 24 ^ ~~( this.r * 255 ) << 16 ^ ~~( this.g * 255 ) << 8 ^ ~~( this.b * 255 );
 
 	},
 
@@ -82,7 +82,7 @@ THREE.Color.prototype = {
 
 	updateStyleString: function () {
 
-		this.__styleString = 'rgba(' + Math.floor( this.r * 255 ) + ',' + Math.floor( this.g * 255 ) + ',' + Math.floor( this.b * 255 ) + ',' + this.a + ')';
+		this.__styleString = 'rgba(' + ~~( this.r * 255 ) + ',' + ~~( this.g * 255 ) + ',' + ~~( this.b * 255 ) + ',' + this.a + ')';
 
 	},
 
