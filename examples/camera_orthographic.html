@@ -57,11 +57,11 @@
 
 				for ( var i = 0; i <= 20; i ++ ) {
 
-					var line = new THREE.Line( geometry, new THREE.LineColorMaterial( 0x000000, 0.2 ) );
+					var line = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0x000000, opacity: 0.2 } ) );
 					line.position.z = ( i * 50 ) - 500;
 					scene.addObject( line );
 
-					var line = new THREE.Line( geometry, new THREE.LineColorMaterial( 0x000000, 0.2 ) );
+					var line = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0x000000, opacity: 0.2 } ) );
 					line.position.x = ( i * 50 ) - 500;
 					line.rotation.y = 90 * Math.PI / 180;
 					scene.addObject( line );
@@ -74,7 +74,7 @@
 
 				for ( var i = 0; i < 100; i ++ ) {
 
-					var cube = new THREE.Mesh( geometry, new THREE.MeshColorFillMaterial( 0xffffff, Math.random() * 0.5 + 0.5 ) );
+					var cube = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: 0xffffff, opacity: Math.random() * 0.5 + 0.5 } ) );
 					cube.overdraw = true;
 
 					cube.scale.y = Math.floor( Math.random() * 2 + 1 );

@@ -29,7 +29,7 @@ THREE.Color.prototype = {
 
 	setHex: function ( hex ) {
 
-		this.hex = hex;
+		this.hex = Math.floor( hex ).toString(16).length < 8 ? 0xff << 24 ^ hex : hex;
 
 		if ( this.autoUpdate ) {
 

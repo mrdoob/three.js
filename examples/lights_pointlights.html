@@ -60,19 +60,19 @@
 
 				scene = new THREE.Scene();
 
-				object = new THREE.Mesh( new WaltHead(), new THREE.MeshColorFillMaterial( 0xffffff ) );
+				object = new THREE.Mesh( new WaltHead(), new THREE.MeshLambertMaterial( { color: 0xffffff } ) );
 				object.overdraw = true;
 				scene.addObject( object );
 
-				particle1 = new THREE.Particle( new THREE.ParticleCircleMaterial( 0xff0040 ) );
+				particle1 = new THREE.Particle( new THREE.ParticleCircleMaterial( { color: 0xff0040 } ) );
 				particle1.scale.x = particle1.scale.y = particle1.scale.z = 0.5;
 				scene.addObject( particle1 );
 
-				particle2 = new THREE.Particle( new THREE.ParticleCircleMaterial( 0x0040ff ) );
+				particle2 = new THREE.Particle( new THREE.ParticleCircleMaterial( { color: 0x0040ff } ) );
 				particle2.scale.x = particle2.scale.y = particle2.scale.z = 0.5;
 				scene.addObject( particle2 );
 
-				particle3 = new THREE.Particle( new THREE.ParticleCircleMaterial( 0x80ff80 ) );
+				particle3 = new THREE.Particle( new THREE.ParticleCircleMaterial( { color: 0x80ff80 } ) );
 				particle3.scale.x = particle3.scale.y = particle3.scale.z = 0.5;
 				scene.addObject( particle3 );
 

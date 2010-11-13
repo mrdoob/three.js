@@ -3,7 +3,6 @@
 	<head>
 		<title>three.js - geometry - cube</title>
 		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
 		<style type="text/css">
 			body {
 				font-family: Monospace;
@@ -40,13 +39,13 @@
 		<script type="text/javascript" src="../src/objects/Mesh.js"></script>
 		<script type="text/javascript" src="../src/objects/Particle.js"></script>
 		<script type="text/javascript" src="../src/objects/Line.js"></script>
-		<script type="text/javascript" src="../src/materials/LineColorMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/MeshBitmapMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/MeshColorFillMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/MeshColorStrokeMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/LineBasicMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/MeshBasicMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/MeshLambertMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/MeshPhongMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/MeshFaceMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/ParticleBasicMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/ParticleCircleMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/ParticleBitmapMaterial.js"></script>
 		<script type="text/javascript" src="../src/scenes/Scene.js"></script>
 		<script type="text/javascript" src="../src/renderers/Projector.js"></script>
 		<script type="text/javascript" src="../src/renderers/CanvasRenderer.js"></script>
@@ -118,7 +117,9 @@
 
 				// Plane
 
-				plane = new THREE.Mesh( new Plane( 1000, 1000, 10, 10 ), new THREE.MeshColorStrokeMaterial( 0x000000, 0.5, 1 ) );
+				var material = new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 0.5, wireframe: true, wireframe_size: 1 } );
+
+				plane = new THREE.Mesh( new Plane( 1000, 1000, 10, 10 ), material );
 				plane.rotation.x = - 90 * ( Math.PI / 180 );
 				plane.doubleSided = true;
 				scene.addObject( plane );
@@ -126,10 +127,11 @@
 				// Spheres
 
 				geometry = new Sphere( 100, 16, 8 );
+				material = new THREE.MeshLambertMaterial( { color: 0xffffff, opacity: 1 } );
 
 				for (var i = 0; i < 10; i ++ ) {
 
-					cube = new THREE.Mesh(geometry, new THREE.MeshColorFillMaterial( 0xffffff ) );
+					cube = new THREE.Mesh( geometry, material );
 					cube.overdraw = true;
 
 					cube.position.x = Math.random() * 1000 - 500;

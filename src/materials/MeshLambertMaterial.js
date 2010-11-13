@@ -1,61 +1,57 @@
 /**
  * @author mr.doob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
- 
- * params = {
- * 	diffuse: hex,
- *  diffuse_map: new THREE.UVMap( <Image> ),
- *  alpha: float,
- *  shading: THREE.Gourad,
- *  blending: THREE.AdditiveBlending,
- *  wireframe: false
+ *
+ * parameters = {
+ *  color: <hex>,
+ *  map: new THREE.UVMap( <Image> ),
+ *  opacity: <float>,
+ *  shading: THREE.GouraudShading,
+ *  blending: THREE.NormalBlending,
+ *  wireframe: <boolean>,
+ *  wireframe_linewidth: <float>
  * }
  */
 
-THREE.MeshLambertMaterial = function ( params ) {
+THREE.MeshLambertMaterial = function ( parameters ) {
 
 	this.id = THREE.MeshLambertMaterialCounter.value ++;
-	
-	this.params = this.setDefaultParams( params );
-	
+
+	this.color = new THREE.Color( 0xff0000 );
+	this.map = null;
+	this.opacity = 1;
+	this.shading = THREE.GouraudShading;
+	this.blending = THREE.NormalBlending;
+	this.wireframe = false;
+	this.wireframe_linewidth = 1;
+
+	if ( parameters ) {
+
+		if ( parameters.color !== undefined ) this.color.setHex( parameters.color );
+		if ( parameters.map !== undefined ) this.map = parameters.map;
+		if ( parameters.opacity !== undefined ) this.opacity  = parameters.opacity;
+		if ( parameters.shading !== undefined ) this.shading = parameters.shading;
+		if ( parameters.blending !== undefined ) this.blending = parameters.blending;
+		if ( parameters.wireframe !== undefined ) this.wireframe = parameters.wireframe;
+		if ( parameters.wireframe_linewidth !== undefined ) this.wireframe_linewidth = parameters.wireframe_linewidth;
+
+	}
+
 	this.toString = function () {
 
-		return 'THREE.MeshLambertMaterial ( diffuse: ' + this.params.diffuse 
-		+ ', alpha: ' + this.params.alpha 
-		+ ', shading: ' + this.params.shading 
-		+ ', blending: ' + this.params.blending 
-		+ ', wireframe: ' + this.params.wireframe 
-		+ ', id: ' + this.id +' )';
+		return 'THREE.MeshLambertMaterial (<br/>' +
+			'id: ' + this.id + '<br/>' +
+			'color: ' + this.color + '<br/>' +
+			'map: ' + this.map + '<br/>' +
+			'opacity: ' + this.opacity + '<br/>' +
+			'shading: ' + this.shading + '<br/>' +
+			'blending: ' + this.blending + '<br/>' +
+			'wireframe: ' + this.wireframe + '<br/>' +
+			'wireframe_size: ' + this.wireframe_linewidth + '<br/>' +
+			' )';
 
 	};
 
-};
-
-THREE.MeshLambertMaterial.prototype.setDefaultParams = function ( override ) {
-	
-	var params = {
-		diffuse: new THREE.Color( 0xeeeeee ),
-		diffuse_map: null,
-		alpha: 1.0,
-		shading: THREE.Gourad,
-		blending: THREE.AdditiveBlending,
-		wireframe: false
-	};
-		
-	if ( override != undefined ) {
-		
-		if( override.diffuse != undefined ) params.diffuse = new THREE.Color( override.diffuse );
-		if( override.diffuse_map != undefined ) params.diffuse_map = override.diffuse_map;
-		
-		if( override.alpha != undefined ) params.alpha = override.alpha;
-		if( override.shading != undefined ) params.shading = override.shading;
-		if( override.blending != undefined ) params.blending = override.blending;
-		if( override.wireframe != undefined ) params.wireframe = override.wireframe;
-		
-	}
-	
-	return params;
-	
 };
 
 THREE.MeshLambertMaterialCounter = { value: 0 };

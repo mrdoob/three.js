@@ -1,78 +1,72 @@
 /**
  * @author mr.doob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
- 
- * params = {
- * 	ambient: hex,
- * 	diffuse: hex,
- * 	specular: hex,
- *  diffuse_map: new THREE.UVMap( <Image> ),
+ *
+ * parameters = {
+ *  ambient: <hex>,
+ *  color: <hex>,
+ *  specular: <hex>,
+ *  map: new THREE.UVMap( <Image> ),
  *  specular_map: new THREE.UVMap( <Image> ),
- *  shininess: float,
- *  alpha: float,
- *  shading: THREE.Phong,
+ *  shininess: <float>,
+ *  opacity: <float>,
+ *  shading: THREE.PhongShading,
  *  blending: THREE.AdditiveBlending,
- *  wireframe: false
+ *  wireframe: <boolean>,
+ *  wireframe_linewidth: <float>
  * }
  */
 
-THREE.MeshPhongMaterial = function ( ambient, diffuse, specular, shininess, opacity ) {
+THREE.MeshPhongMaterial = function ( parameters ) {
 
 	this.id = THREE.MeshPhongMaterialCounter.value ++;
-	
-	this.params = this.setDefaultParams( params );
-	
+
+	this.color = new THREE.Color( 0xeeeeee );
+	this.map = null;
+	this.ambient = new THREE.Color( 0x050505 );
+	this.specular = new THREE.Color( 0x111111 );
+	this.specular_map = null;
+	this.shininess = 30;
+	this.opacity = 1;
+	this.shading = THREE.GouraudShading;
+	this.blending = THREE.NormalBlending;
+	this.wireframe = false;
+	this.wireframe_linewidth = 1;
+
+	if ( parameters ) {
+
+		if ( parameters.color !== undefined ) this.color = new THREE.Color( parameters.color );
+		if ( parameters.map !== undefined ) this.map = parameters.map;
+		if ( parameters.ambient !== undefined ) this.ambient = new THREE.Color( parameters.ambient );
+		if ( parameters.specular !== undefined ) this.specular_color = new THREE.Color( parameters.specular );
+		if ( parameters.specular_map !== undefined ) this.specular_map = parameters.specular_map;
+		if ( parameters.shininess !== undefined ) this.shininess = parameters.shininess;
+		if ( parameters.opacity !== undefined ) this.opacity = parameters.opacity;
+		if ( parameters.shading !== undefined ) this.shading = parameters.shading;
+		if ( parameters.blending !== undefined ) this.blending = parameters.blending;
+		if ( parameters.wireframe !== undefined ) this.wireframe = parameters.wireframe;
+		if ( parameters.wireframe_linewidth !== undefined ) this.wireframe_linewidth = parameters.wireframe_linewidth;
+
+	}
+
 	this.toString = function () {
 
-		return 'THREE.MeshPhongMaterial ( <br/>ambient: ' + this.params.ambient_color
-				+ ', <br/>diffuse: ' + this.params.diffuse 
-				+ ', <br/>specular: ' + this.params.specular 
-				+ ', <br/>shininess: ' + this.params.shininess 
-				+ ', <br/>alpha: ' + this.params.alpha
-				+ ', <br/>shading: ' + this.params.shading
-				+ ', <br/>wireframe: ' + this.params.wireframe
-				+ ', <br/>id: ' + this.id        
-				+ ')';
+		return 'THREE.MeshPhongMaterial (<br/>' +
+			'id: ' + this.id + '<br/>' +
+			'color: ' + this.color + '<br/>' +
+			'map: ' + this.map + '<br/>' +
+			'ambient: ' + this.ambient + '<br/>' +
+			'specular: ' + this.specular + '<br/>' +
+			'specular_map: ' + this.specular_map + '<br/>' +
+			'shininess: ' + this.shininess + '<br/>' +
+			'alpha: ' + this.opacity + '<br/>' +
+			'shading: ' + this.shading + '<br/>' +
+			'wireframe: ' + this.wireframe + '<br/>' +
+			'wireframe_linewidth: ' + this.wireframe_linewidth + '<br/>' +
+			+ ')';
 
 	};
 
-};
-
-THREE.MeshPhongMaterial.prototype.setDefaultParams = function ( override ) {
-	
-	var params = {
-		ambient: new THREE.Color( 0x050505 ),
-		diffuse: new THREE.Color( 0xeeeeee ),
-		specular: new THREE.Color( 0x111111 ),
-		diffuse_map: null,
-		specular_map: null,
-		shininess: 30,
-		alpha: 1.0,
-		shading: THREE.Gourad,
-		blending: THREE.AdditiveBlending,
-		wireframe: false
-	};
-		
-	if ( override != undefined ) {
-		
-		if( override.ambient != undefined ) params.ambient = new THREE.Color( override.ambient );
-		if( override.diffuse != undefined ) params.diffuse = new THREE.Color( override.diffuse );
-		if( override.specular != undefined ) params.specular = new THREE.Color( override.specular );
-		
-		if( override.diffuse_map != undefined ) params.diffuse_map = override.diffuse_map;
-		if( override.specular_map != undefined ) params.specular_map = override.specular_map;
-		
-		if( override.shininess != undefined ) params.shininess = override.shininess;
-		
-		if( override.alpha != undefined ) params.alpha = override.alpha;
-		if( override.shading != undefined ) params.shading = override.shading;
-		if( override.blending != undefined ) params.blending = override.blending;
-		if( override.wireframe != undefined ) params.wireframe = override.wireframe;
-		
-	}
-	
-	return params;
-	
 };
 
 THREE.MeshPhongMaterialCounter = { value: 0 };

@@ -65,18 +65,18 @@
 
 				geometry = new Cube( 200, 200, 200 );
 
-				for (var i = 0; i < geometry.faces.length; i++) {
+				for ( var i = 0; i < geometry.faces.length; i++ ) {
 
-					geometry.faces[i].material = [ new THREE.MeshColorFillMaterial( Math.random() * 0xffffff, 1 ) ];
+					geometry.faces[ i ].material = [ new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, opacity: 1 } ) ];
 				}
 
-				cube = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial() );
+				cube = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial() );
 				cube.position.y = 150;
 				scene.addObject( cube );
 
 				// Plane
 
-				plane = new THREE.Mesh( new Plane( 200, 200 ), new THREE.MeshColorFillMaterial( 0xe0e0e0 ) );
+				plane = new THREE.Mesh( new Plane( 200, 200 ), new THREE.MeshBasicMaterial( { color: 0xe0e0e0 } ) );
 				plane.rotation.x = -90 * ( Math.PI / 180 );
 				scene.addObject( plane );
 
