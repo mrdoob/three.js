@@ -95,8 +95,7 @@ THREE.SVGRenderer = function () {
 				for ( m = 0, ml = element.material.length; m < ml; m++ ) {
 
 					material = element.material[ m ];
-
-					renderParticle( v1x, v1y, element, material, scene );
+					material && renderParticle( v1x, v1y, element, material, scene );
 
 				}
 
@@ -133,8 +132,7 @@ THREE.SVGRenderer = function () {
 						while ( fm < fml ) {
 
 							material = element.faceMaterial[ fm ++ ];
-
-							renderFace3( v1x, v1y, v2x, v2y, v3x, v3y, element, material, scene );
+							material && renderFace3( v1x, v1y, v2x, v2y, v3x, v3y, element, material, scene );
 
 						}
 
@@ -142,7 +140,7 @@ THREE.SVGRenderer = function () {
 
 					}
 
-					renderFace3( v1x, v1y, v2x, v2y, v3x, v3y, element, material, scene );
+					material && renderFace3( v1x, v1y, v2x, v2y, v3x, v3y, element, material, scene );
 
 				}
 
@@ -177,8 +175,7 @@ THREE.SVGRenderer = function () {
 						while ( fm < fml ) {
 
 							material = element.faceMaterial[ fm ++ ];
-
-							renderFace4( v1x, v1y, v2x, v2y, v3x, v3y, v4x, v4y, element, material, scene );
+							material && renderFace4( v1x, v1y, v2x, v2y, v3x, v3y, v4x, v4y, element, material, scene );
 
 						}
 
@@ -186,7 +183,7 @@ THREE.SVGRenderer = function () {
 
 					}
 
-					renderFace4( v1x, v1y, v2x, v2y, v3x, v3y, v4x, v4y, element, material, scene );
+					material && renderFace4( v1x, v1y, v2x, v2y, v3x, v3y, v4x, v4y, element, material, scene );
 
 				}
 
@@ -316,21 +313,25 @@ THREE.SVGRenderer = function () {
 		_svg.appendChild( _svgNode );
 
 	}
-	
+
 	/*
 	function renderLine ( ) {
-	
+
 		
-	
+
 	}
 	*/
-	
+
 	function renderFace3 ( v1x, v1y, v2x, v2y, v3x, v3y, element, material, scene ) {
 
 		_svgNode = getPathNode( _pathCount ++ );
 		_svgNode.setAttribute( 'd', 'M ' + v1x + ' ' + v1y + ' L ' + v2x + ' ' + v2y + ' L ' + v3x + ',' + v3y + 'z' );
 
-		if ( material instanceof THREE.MeshColorFillMaterial ) {
+		if ( material instanceof THREE.MeshBasicMaterial ) {
+
+			_color.__styleString = material.color.__styleString;
+
+		} else if ( material instanceof THREE.MeshLambertMaterial ) {
 
 			if ( _enableLighting ) {
 
@@ -343,30 +344,19 @@ THREE.SVGRenderer = function () {
 
 			} else {
 
-				_color = material.color;
+				_color.__styleString = material.color.__styleString;
 
 			}
 
-			_svgNode.setAttribute( 'style', 'fill: ' + _color.__styleString );
+		}
 
-		} else if ( material instanceof THREE.MeshColorStrokeMaterial ) {
+		if ( material.wireframe ) {
 
-			if ( _enableLighting ) {
+			_svgNode.setAttribute( 'style', 'fill: none; stroke: ' + _color.__styleString + '; stroke-width: ' + material.wireframe_linewidth + '; stroke-opacity: ' + material.opacity + '; stroke-linecap: round; stroke-linejoin: round' );
 
-				_light.copyRGB( _ambientLight );
-				calculateFaceLight( scene, element, _light );
+		} else {
 
-				_color.copyRGBA( material.color );
-				_color.multiplySelfRGB( _light );
-				_color.updateStyleString();
-
-			} else {
-
-				_color = material.color;
-
-			}
-
-			_svgNode.setAttribute( 'style', 'fill: none; stroke: ' + _color.__styleString + '; stroke-width: ' + material.lineWidth + '; stroke-linecap: round; stroke-linejoin: round' );
+			_svgNode.setAttribute( 'style', 'fill: ' + _color.__styleString + '; fill-opacity: ' + material.opacity );
 
 		}
 
@@ -379,7 +369,11 @@ THREE.SVGRenderer = function () {
 		_svgNode = getPathNode( _pathCount ++ );
 		_svgNode.setAttribute( 'd', 'M ' + v1x + ' ' + v1y + ' L ' + v2x + ' ' + v2y + ' L ' + v3x + ',' + v3y + ' L ' + v4x + ',' + v4y + 'z' );
 
-		if ( material instanceof THREE.MeshColorFillMaterial ) {
+		if ( material instanceof THREE.MeshBasicMaterial ) {
+
+			_color.__styleString = material.color.__styleString;
+
+		} else if ( material instanceof THREE.MeshLambertMaterial ) {
 
 			if ( _enableLighting ) {
 
@@ -392,30 +386,19 @@ THREE.SVGRenderer = function () {
 
 			} else {
 
-				_color = material.color;
+				_color.__styleString = material.color.__styleString;
 
 			}
 
-			_svgNode.setAttribute( 'style', 'fill: ' + _color.__styleString );
+		}
 
-		} else if ( material instanceof THREE.MeshColorStrokeMaterial ) {
+		if ( material.wireframe ) {
 
-			if ( _enableLighting ) {
+			_svgNode.setAttribute( 'style', 'fill: none; stroke: ' + _color.__styleString + '; stroke-width: ' + material.wireframe_linewidth + '; stroke-opacity: ' + material.opacity + '; stroke-linecap: round; stroke-linejoin: round' );
 
-				_light.copyRGB( _ambientLight );
-				calculateFaceLight( scene, element, _light );
+		} else {
 
-				_color.copyRGBA( material.color );
-				_color.multiplySelfRGB( _light );
-				_color.updateStyleString();
-
-			} else {
-
-				_color = material.color;
-
-			}
-
-			_svgNode.setAttribute( 'style', 'fill: none; stroke: ' + _color.__styleString + '; stroke-width: ' + material.lineWidth + '; stroke-linecap: round; stroke-linejoin: round' );
+			_svgNode.setAttribute( 'style', 'fill: ' + _color.__styleString + '; fill-opacity: ' + material.opacity );
 
 		}
 
