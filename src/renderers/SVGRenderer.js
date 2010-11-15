@@ -16,6 +16,7 @@ THREE.SVGRenderer = function () {
 	_light = new THREE.Color( 0xffffffff ),
 	_ambientLight = new THREE.Color( 0xffffffff ),
 
+	_w, // z-buffer to w-buffer
 	_vector3 = new THREE.Vector3(), // Needed for PointLight
 
 	_svgPathPool = [], _svgCirclePool = [],
@@ -330,6 +331,11 @@ THREE.SVGRenderer = function () {
 		if ( material instanceof THREE.MeshBasicMaterial ) {
 
 			_color.__styleString = material.color.__styleString;
+
+		} else if ( material instanceof THREE.MeshDepthMaterial ) {
+
+			_w = 1 - ( material.__2near / (material.__farPlusNear - element.z * material.__farMinusNear) );
+			_color.setRGBA( _w, _w, _w, 1 );
 
 		} else if ( material instanceof THREE.MeshLambertMaterial ) {
 

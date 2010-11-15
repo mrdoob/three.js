@@ -3,10 +3,6 @@
  * }
  */
 
-THREE.UVMapping = 0;
-THREE.ReflectionMap = 1;
-THREE.CubeMap = 2;
-
 THREE.FlatShading = 0;
 THREE.GouraudShading = 1;
 THREE.PhongShading = 2;

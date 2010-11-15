@@ -18,3 +18,7 @@ THREE.Texture = function ( image, mapping ) {
 	};
 
 };
+
+THREE.UVMapping = 0;
+THREE.ReflectionMap = 1;
+THREE.CubeMap = 2;

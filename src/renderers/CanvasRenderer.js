@@ -26,6 +26,7 @@ THREE.CanvasRenderer = function () {
 	_ambientLight = new THREE.Color( 0xff000000 ),
 
 	_pi2 = Math.PI * 2,
+	_w, // z-buffer to w-buffer
 	_vector2 = new THREE.Vector2(), // Needed for expand
 	_vector3 = new THREE.Vector3(), // Needed for PointLight
 	_uv1 = new THREE.UV(), _uv2 = new THREE.UV(), _uv3 = new THREE.UV(), _uv4 = new THREE.UV(),
@@ -556,6 +557,11 @@ THREE.CanvasRenderer = function () {
 
 			_color.__styleString = material.color.__styleString;
 
+		} else if ( material instanceof THREE.MeshDepthMaterial ) {
+
+			_w = 1 - ( material.__2near / (material.__farPlusNear - element.z * material.__farMinusNear ) );
+			_color.setRGBA( _w, _w, _w, 1 );
+
 		} else if ( material instanceof THREE.MeshLambertMaterial ) {
 
 			if ( _enableLighting ) {
@@ -652,6 +658,11 @@ THREE.CanvasRenderer = function () {
 
 			_color.__styleString = material.color.__styleString;
 
+		} else if ( material instanceof THREE.MeshDepthMaterial ) {
+
+			_w = 1 - ( material.__2near / (material.__farPlusNear - element.z * material.__farMinusNear ) );
+			_color.setRGBA( _w, _w, _w, 1 );
+
 		} else if ( material instanceof THREE.MeshLambertMaterial ) {
 
 			if ( _enableLighting ) {
@@ -703,37 +714,41 @@ THREE.CanvasRenderer = function () {
 
 	}
 
-	function drawTexturedTriangle( bitmap, v1x, v1y, v2x, v2y, v3x, v3y, _uv1u, _uv1v, _uv2u, _uv2v, _uv3u, _uv3v ) {
+	function drawTexturedTriangle( bitmap, x0, y0, x1, y1, x2, y2, u0, v0, u1, v1, u2, v2 ) {
 
-		// Textured triangle drawing by Thatcher Ulrich.
-		// http://tulrich.com/geekstuff/canvas/jsgl.js
-
-		var denom, m11, m12, m21, m22, dx, dy;
+		// http://extremelysatisfactorytotalitarianism.com/blog/?p=2120
 
 		_context.beginPath();
-		_context.moveTo( v1x, v1y );
-		_context.lineTo( v2x, v2y );
-		_context.lineTo( v3x, v3y );
-		_context.lineTo( v1x, v1y );
+		_context.moveTo( x0, y0 );
+		_context.lineTo( x1, y1 );
+		_context.lineTo( x2, y2 );
 		_context.closePath();
 
+		x1 -= x0;
+		y1 -= y0;
+		x2 -= x0;
+		y2 -= y0;
+
+		u1 -= u0;
+		v1 -= v0;
+		u2 -= u0;
+		v2 -= v0;
+
+		var det = 1 / ( u1 * v2 - u2 * v1 ),
+
+		a = ( v2 * x1 - v1 * x2 ) * det,
+		b = ( v2 * y1 - v1 * y2 ) * det,
+		c = ( u1 * x2 - u2 * x1 ) * det,
+		d = ( u1 * y2 - u2 * y1 ) * det,
+
+		e = x0 - a * u0 - c * v0,
+		f = y0 - b * u0 - d * v0;
+
 		_context.save();
+		_context.transform( a, b, c, d, e, f );
 		_context.clip();
-
-		denom = _uv1u * ( _uv3v - _uv2v ) - _uv2u * _uv3v + _uv3u * _uv2v + ( _uv2u - _uv3u ) * _uv1v;
-
-		m11 = - ( _uv1v * (v3x - v2x ) - _uv2v * v3x + _uv3v * v2x + ( _uv2v - _uv3v ) * v1x ) / denom;
-		m12 = ( _uv2v * v3y + _uv1v * ( v2y - v3y ) - _uv3v * v2y + ( _uv3v - _uv2v) * v1y ) / denom;
-		m21 = ( _uv1u * ( v3x - v2x ) - _uv2u * v3x + _uv3u * v2x + ( _uv2u - _uv3u ) * v1x ) / denom;
-		m22 = - ( _uv2u * v3y + _uv1u * ( v2y - v3y ) - _uv3u * v2y + ( _uv3u - _uv2u ) * v1y ) / denom;
-		dx = ( _uv1u * ( _uv3v * v2x - _uv2v * v3x ) + _uv1v * ( _uv2u * v3x - _uv3u * v2x ) + ( _uv3u * _uv2v - _uv2u * _uv3v ) * v1x ) / denom;
-		dy = ( _uv1u * ( _uv3v * v2y - _uv2v * v3y ) + _uv1v * ( _uv2u * v3y - _uv3u * v2y ) + ( _uv3u * _uv2v - _uv2u * _uv3v ) * v1y ) / denom;
-
-		_context.transform( m11, m12, m21, m22, dx, dy );
-
 		_context.drawImage( bitmap, 0, 0 );
 		_context.restore();
-
 	}
 
 	// Hide anti-alias gaps
