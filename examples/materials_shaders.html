@@ -41,11 +41,10 @@
 		
 		<pre id="log"></pre>
 
-		<script type="text/javascript" src="../build/Three.js"></script> 
 		<!--
+		<script type="text/javascript" src="../build/Three.js"></script> 
 		-->
 
-		<!--
 		<script type="text/javascript" src="../src/Three.js"></script>
 		<script type="text/javascript" src="../src/core/Color.js"></script>
 		<script type="text/javascript" src="../src/core/Vector2.js"></script>
@@ -69,13 +68,15 @@
 		<script type="text/javascript" src="../src/objects/Mesh.js"></script>
 		<script type="text/javascript" src="../src/objects/Particle.js"></script>
 		<script type="text/javascript" src="../src/objects/Line.js"></script>
-		<script type="text/javascript" src="../src/materials/LineColorMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/Material.js"></script>
+		<script type="text/javascript" src="../src/materials/LineBasicMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/MeshBasicMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/MeshLambertMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/MeshPhongMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/MeshFaceMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/ParticleCircleMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/ParticleBitmapMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/ParticleBasicMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/Texture.js"></script>
 		<script type="text/javascript" src="../src/scenes/Scene.js"></script>
 		<script type="text/javascript" src="../src/renderers/Projector.js"></script>
 		<script type="text/javascript" src="../src/renderers/CanvasRenderer.js"></script>
@@ -85,6 +86,7 @@
 		<script type="text/javascript" src="../src/renderers/renderables/RenderableFace4.js"></script>
 		<script type="text/javascript" src="../src/renderers/renderables/RenderableParticle.js"></script>
 		<script type="text/javascript" src="../src/renderers/renderables/RenderableLine.js"></script>
+		<!--
 		-->
 		
 		<script type="text/javascript" src="../src/extras/primitives/Sphere.js"></script>
@@ -179,7 +181,7 @@
 
 				// light representation
 				sphere = new Sphere( 100, 16, 8, 1 );
-				lightMesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffaa00 } );
+				lightMesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) );
 				lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
 				lightMesh.position = pointLight.position;
 				lightMesh.overdraw = true;
@@ -191,26 +193,26 @@
 
 				var y1 = 0, y2 = -200;
 				
-				addMesh( sphere, 1, -600, y1, 0, 0,0,0, new THREE.MeshPhongMaterial( { ambient: 0x050505, diffuse: 0x000000, specular: 0x555555, shininess: 30 } );
-				addMesh( sphere, 1, -600, y2, 0, 0,0,0, new THREE.MeshLambertMaterial( { diffuse: 0x050505 } );
+				addMesh( sphere, 1, -600, y1, 0, 0,0,0, new THREE.MeshPhongMaterial( { ambient: 0x050505, color: 0x000000, specular: 0x555555, shininess: 30 } ) );
+				addMesh( sphere, 1, -600, y2, 0, 0,0,0, new THREE.MeshLambertMaterial( { color: 0x050505 } ) );
 
-				addMesh( sphere, 1, -400, y1, 0, 0,0,0, new THREE.MeshPhongMaterial( { ambient: 0x000000, diffuse: 0xffffff, specular: 0x555555, shininess: 30 } );
-				addMesh( sphere, 1, -400, y2, 0, 0,0,0, new THREE.MeshLambertMaterial( { diffuse: 0xffffff } );
+				addMesh( sphere, 1, -400, y1, 0, 0,0,0, new THREE.MeshPhongMaterial( { ambient: 0x000000, color: 0xffffff, specular: 0x555555, shininess: 30 } ) );
+				addMesh( sphere, 1, -400, y2, 0, 0,0,0, new THREE.MeshLambertMaterial( { color: 0xffffff } ) );
 
-				addMesh( sphere, 1, -200, y1, 0, 0,0,0, new THREE.MeshPhongMaterial( { ambient: 0x000000, diffuse: 0xff5500, specular: 0x555555, shininess: 10 } );
-				addMesh( sphere, 1, -200, y2, 0, 0,0,0, new THREE.MeshLambertMaterial( { diffuse: 0xff5500 } );
+				addMesh( sphere, 1, -200, y1, 0, 0,0,0, new THREE.MeshPhongMaterial( { ambient: 0x000000, color: 0xff5500, specular: 0x555555, shininess: 10 } ) );
+				addMesh( sphere, 1, -200, y2, 0, 0,0,0, new THREE.MeshLambertMaterial( { color: 0xff5500 } ) );
 
-				addMesh( sphere, 1,    0, y1, 0, 0,0,0, new THREE.MeshPhongMaterial( { ambient: 0x000000, diffuse: 0xffaa00, specular: 0x555555, shininess: 30 } );
-				addMesh( sphere, 1,    0, y2, 0, 0,0,0, new THREE.MeshLambertMaterial( { diffuse: 0xffaa00 } );
+				addMesh( sphere, 1,    0, y1, 0, 0,0,0, new THREE.MeshPhongMaterial( { ambient: 0x000000, color: 0xffaa00, specular: 0x555555, shininess: 30 } ) );
+				addMesh( sphere, 1,    0, y2, 0, 0,0,0, new THREE.MeshLambertMaterial( { color: 0xffaa00 } ) );
 
-				addMesh( sphere, 1,  200, y1, 0, 0,0,0, new THREE.MeshPhongMaterial( { ambient: 0x000000, diffuse: 0x55ff00, specular: 0x555555, shininess: 30 } );
-				addMesh( sphere, 1,  200, y2, 0, 0,0,0, new THREE.MeshLambertMaterial( { diffuse: 0x55ff00 } );
+				addMesh( sphere, 1,  200, y1, 0, 0,0,0, new THREE.MeshPhongMaterial( { ambient: 0x000000, color: 0x55ff00, specular: 0x555555, shininess: 30 } ) );
+				addMesh( sphere, 1,  200, y2, 0, 0,0,0, new THREE.MeshLambertMaterial( { color: 0x55ff00 } ) );
 
-				addMesh( sphere, 1,  400, y1, 0, 0,0,0, new THREE.MeshPhongMaterial( { ambient: 0x000000, diffuse: 0x0055ff, specular: 0x555555, shininess: 30 } );
-				addMesh( sphere, 1,  400, y2, 0, 0,0,0, new THREE.MeshLambertMaterial( { diffuse: 0x0055ff } );
+				addMesh( sphere, 1,  400, y1, 0, 0,0,0, new THREE.MeshPhongMaterial( { ambient: 0x000000, color: 0x0055ff, specular: 0x555555, shininess: 30 } ) );
+				addMesh( sphere, 1,  400, y2, 0, 0,0,0, new THREE.MeshLambertMaterial( { color: 0x0055ff } ) );
 
-				addMesh( sphere, 1,  600, y1, 0, 0,0,0, new THREE.MeshPhongMaterial( { ambient: 0x000000, diffuse: 0x5500ff, specular: 0x555555, shininess: 30 } );
-				addMesh( sphere, 1,  600, y2, 0, 0,0,0, new THREE.MeshLambertMaterial( { diffuse: 0x5500ff } );
+				addMesh( sphere, 1,  600, y1, 0, 0,0,0, new THREE.MeshPhongMaterial( { ambient: 0x000000, color: 0x5500ff, specular: 0x555555, shininess: 30 } ) );
+				addMesh( sphere, 1,  600, y2, 0, 0,0,0, new THREE.MeshLambertMaterial( { color: 0x5500ff } ) );
 
 				if ( render_gl ) {
 					try {
@@ -240,9 +242,8 @@
 				bwebgl.addEventListener("click", toggleWebGL, false);
 
 				var loader = new THREE.Loader();
-				loader.loadAsciiOld( "obj/torus/Torus.js", function() { createScene( new Torus() ) } );
-				//loader.loadAscii( "obj/torus/Torus_slim.js", function( geometry ) { createScene( geometry ) } );
-                //loader.loadBinary( "obj/torus/Torus_bin.js", function( geometry ) { createScene( geometry ) }, "obj/torus" );
+				loader.loadAscii( "obj/torus/Torus_slim.js", function( geometry ) { createScene( geometry ) } );
+				//loader.loadBinary( "obj/torus/Torus_bin.js", function( geometry ) { createScene( geometry ) }, "obj/torus" );
 
 			}
 
@@ -250,23 +251,13 @@
 				
 				var s = 80, t = s + 20, y = 200;
 				
-				addMesh( geometry, s, -6*t, y, 0, 1.57,0,0, new THREE.MeshPhongMaterial( 0x000000, 0x000000, 0x333333, 10, 1.0 ) );
-				addMesh( geometry, s, -4*t, y, 0, 1.57,0,0, new THREE.MeshPhongMaterial( 0x030303, 0x888888, 0x333333, 10, 1.0 ) );
-				addMesh( geometry, s, -2*t, y, 0, 1.57,0,0, new THREE.MeshPhongMaterial( 0x030303, 0x030303, 0xff5500, 10, 1.0 ) );
-				addMesh( geometry, s,    0, y, 0, 1.57,0,0, new THREE.MeshPhongMaterial( 0x030303, 0x030303, 0xffaa00, 10, 1.0 ) );
-				addMesh( geometry, s,  2*t, y, 0, 1.57,0,0, new THREE.MeshPhongMaterial( 0x030303, 0x030303, 0x55ff00, 10, 1.0 ) );
-				addMesh( geometry, s,  4*t, y, 0, 1.57,0,0, new THREE.MeshPhongMaterial( 0x030303, 0x030303, 0x0055ff, 10, 1.0 ) );
-				addMesh( geometry, s,  6*t, y, 0, 1.57,0,0, new THREE.MeshPhongMaterial( 0x030303, 0x030303, 0x5500ff, 10, 1.0 ) );
-
-			}
-
-			function loadAsync( url, callback ) {
-				
-				var el = document.createElement( 'script' );
-				el.type = 'text/javascript';
-				el.onload = callback;
-				el.src = url;
-				document.getElementsByTagName("head")[0].appendChild(el);
+				addMesh( geometry, s, -6*t, y, 0, 1.57,0,0, new THREE.MeshPhongMaterial( { ambient: 0x000000, color: 0x000000, specular: 0x333333, shininess: 10 } ) );
+				addMesh( geometry, s, -4*t, y, 0, 1.57,0,0, new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0x888888, specular: 0x333333, shininess: 10 } ) );
+				addMesh( geometry, s, -2*t, y, 0, 1.57,0,0, new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0x030303, specular: 0xff5500, shininess: 10 } ) );
+				addMesh( geometry, s,    0, y, 0, 1.57,0,0, new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0x030303, specular: 0xffaa00, shininess: 10 } ) );
+				addMesh( geometry, s,  2*t, y, 0, 1.57,0,0, new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0x030303, specular: 0x55ff00, shininess: 10 } ) );
+				addMesh( geometry, s,  4*t, y, 0, 1.57,0,0, new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0x030303, specular: 0x0055ff, shininess: 10 } ) );
+				addMesh( geometry, s,  6*t, y, 0, 1.57,0,0, new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0x030303, specular: 0x5500ff, shininess: 10 } ) );
 
 			}
 
@@ -285,14 +276,7 @@
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 				camera.updateMatrix();
-			   
 				
-				/*
-				for(var i=0; i<scene.objects.length; ++i) {
-					scene.objects[i].rotation.x += 0.0025;                        
-					scene.objects[i].updateMatrix();
-				}
-				*/
 				lightMesh.position.x = 700*Math.cos(r);
 				lightMesh.position.z = 700*Math.sin(r);
 				lightMesh.updateMatrix();

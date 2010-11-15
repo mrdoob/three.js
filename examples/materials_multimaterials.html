@@ -42,11 +42,10 @@
 		
 		<div id="log"></div>
 
-		<script type="text/javascript" src="../build/Three.js"></script> 
 		<!--
+		<script type="text/javascript" src="../build/Three.js"></script> 
 		-->
 
-		<!--
 		<script type="text/javascript" src="../src/Three.js"></script>
 		<script type="text/javascript" src="../src/core/Color.js"></script>
 		<script type="text/javascript" src="../src/core/Vector2.js"></script>
@@ -70,14 +69,15 @@
 		<script type="text/javascript" src="../src/objects/Mesh.js"></script>
 		<script type="text/javascript" src="../src/objects/Particle.js"></script>
 		<script type="text/javascript" src="../src/objects/Line.js"></script>
-		<script type="text/javascript" src="../src/materials/LineColorMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/Material.js"></script>
+		<script type="text/javascript" src="../src/materials/LineBasicMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/MeshBasicMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/MeshLambertMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/MeshPhongMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/MeshBitmapMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/MeshColorFillMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/MeshColorStrokeMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/MeshFaceMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/ParticleCircleMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/ParticleBitmapMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/ParticleBasicMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/Texture.js"></script>
 		<script type="text/javascript" src="../src/scenes/Scene.js"></script>
 		<script type="text/javascript" src="../src/renderers/Projector.js"></script>
 		<script type="text/javascript" src="../src/renderers/CanvasRenderer.js"></script>
@@ -87,6 +87,7 @@
 		<script type="text/javascript" src="../src/renderers/renderables/RenderableFace4.js"></script>
 		<script type="text/javascript" src="../src/renderers/renderables/RenderableParticle.js"></script>
 		<script type="text/javascript" src="../src/renderers/renderables/RenderableLine.js"></script>
+		<!--
 		-->
 
 		<script type="text/javascript" src="../src/extras/primitives/Sphere.js"></script>
@@ -150,10 +151,11 @@
 				
 				sphere = new Sphere( 100, 16, 8, 1 );
 				for (var i=0; i<10; i++) {
-					//mesh = new THREE.Mesh( sphere, new THREE.MeshColorFillMaterial( 0xffffff ) );
-					mesh = new THREE.Mesh( sphere, [ new THREE.MeshColorFillMaterial( 0xffffff ), new THREE.MeshColorStrokeMaterial( 0x000000, 1, 1.5 ) ] );
-					//mesh = new THREE.Mesh( sphere, new THREE.MeshColorStrokeMaterial( 0x00aa00, 1, 1.5 ) );
-					//mesh = new THREE.Mesh( sphere, new THREE.MeshFaceColorStrokeMaterial( 2.5 ) );
+					//mesh = new THREE.Mesh( sphere, new THREE.MeshLambertMaterial( ) );
+					mesh = new THREE.Mesh( sphere, [ new THREE.MeshLambertMaterial( { color: 0xffffff } ), 
+													 new THREE.MeshLambertMaterial( { color: 0x000000, wireframe: true,  wireframe_linewidth: 1.5 } ) ] );
+					//mesh = new THREE.Mesh( sphere, new THREE.MeshLambertMaterial( { color: 0x00aa00, wireframe: true,  wireframe_linewidth: 1.5 } ) );
+					//mesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { wireframe: true,  wireframe_linewidth: 2.5 } ) );
 					mesh.position.x = 500 * (Math.random() - 0.5);
 					mesh.position.y = 500 * (Math.random() - 0.5);
 					mesh.position.z = 500 * (Math.random() - 0.5);
@@ -182,7 +184,7 @@
 				pointLight.position.z = 120;
 				//scene.addLight( pointLight );
 
-				mesh = new THREE.Mesh( sphere, new THREE.MeshColorFillMaterial( 0xff0000 ) );
+				mesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xff0000 } ) );
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 0.1;
 				mesh.position = pointLight.position;
 				mesh.updateMatrix();
@@ -215,9 +217,8 @@
 				bwebgl.addEventListener("click", toggleWebGL, false);
 
 				var loader = new THREE.Loader();
-				loader.loadAsciiOld( "obj/female02/female02.js", function() { createScene( new Female02( "obj/female02" ) ) } );
-				//loader.loadAscii( "obj/female02/Female02_slim.js", function( geometry ) { createScene( geometry) }, "obj/female02" );
-                //loader.loadBinary( "obj/female02/Female02_bin.js", function( geometry ) { createScene( geometry) }, "obj/female02" );
+				loader.loadAscii( "obj/female02/Female02_slim.js", function( geometry ) { createScene( geometry) }, "obj/female02" );
+				//loader.loadBinary( "obj/female02/Female02_bin.js", function( geometry ) { createScene( geometry) }, "obj/female02" );
 
 			}
 
@@ -252,24 +253,24 @@
 					xc2.fillRect(i*4, 5, 2, 54);
 				}
 
-				var xm1 = new THREE.MeshBitmapMaterial( x1 );
-				xm1.loaded = 1; // this is procedurally generated texture
+				var xm1 = new THREE.MeshLambertMaterial( { map: new THREE.Texture( x1 ) } );
+				xm1.map.loaded = 1; // this is procedurally generated texture
 
-				var xm2 = new THREE.MeshBitmapMaterial( x2 );
-				xm2.loaded = 1; // this is procedurally generated texture
+				var xm2 = new THREE.MeshLambertMaterial( { map: new THREE.Texture( x2 ) } );
+				xm2.map.loaded = 1; // this is procedurally generated texture
 				
 				geometry.materials[0].push ( xm1 ); // goes to faces with material 0
 				geometry.materials[1].push ( xm2 ); // goes to faces with material 1
 				
-				geometry.materials[4].push ( new THREE.MeshColorFillMaterial(0xff0000, 0.5) );
+				geometry.materials[4].push ( new THREE.MeshLambertMaterial( { color: 0xff0000, opacity:0.5 } ) );
 
 				var materials = [ new THREE.MeshFaceMaterial() ];
 				
 				// full-mesh wireframe overlay
-				//materials.push( new THREE.MeshColorStrokeMaterial(0xff0000, 1, 1.5) );
+				//materials.push( new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true, wireframe_linewidth: 1.5 } ) );
 				
 				// full-mesh color overlay
-				//materials.push( new THREE.MeshColorFillMaterial(0xff0000, 0.5) );
+				//materials.push( new THREE.MeshBasicMaterial { color: 0xff0000, opacity: 0.5 } ) );
 				
 				zmesh = new THREE.Mesh( geometry, materials, 1 );
 				zmesh.position.x = -80;
@@ -283,6 +284,7 @@
 				// PLANES with all materials from the model
 				
 				createMaterialsPalette( geometry.materials, 100, 0 );
+				
 			}
 			
 			function createMaterialsPalette( materials, size, bottom ) {
@@ -309,8 +311,8 @@
 					xc.font = "50pt arial bold";
 					xc.fillText(i, 10, 64);
 					
-					var xm = new THREE.MeshBitmapMaterial( x );
-					xm.loaded = 1;
+					var xm = new THREE.MeshBasicMaterial( { map: new THREE.Texture( x ) } );
+					xm.map.loaded = 1;
 					
 					mesh = new THREE.Mesh( new Plane( size, size ), xm );
 					mesh.position.x = i * (size + 5) - ( ( materials.length - 1 )* ( size + 5 )/2);

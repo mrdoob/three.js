@@ -17,7 +17,7 @@ THREE.MeshLambertMaterial = function ( parameters ) {
 
 	this.id = THREE.MeshLambertMaterialCounter.value ++;
 
-	this.color = new THREE.Color( 0xff0000 );
+	this.color = new THREE.Color( 0xeeeeee );
 	this.map = null;
 	this.opacity = 1;
 	this.shading = THREE.GouraudShading;

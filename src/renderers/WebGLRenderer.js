@@ -18,7 +18,7 @@ THREE.WebGLRenderer = function ( scene ) {
 	var _canvas = document.createElement( 'canvas' ), _gl, _program,
 	_modelViewMatrix = new THREE.Matrix4(), _normalMatrix,
 	
-	COLORFILL = 0, COLORSTROKE = 1, BITMAP = 2, PHONG = 3, // material constants used in shader
+	BASIC = 0, LAMBERT = 1, PHONG = 2, // material constants used in shader
 	
 	maxLightCount = allocateLights( scene, 5 );
 	
@@ -91,7 +91,7 @@ THREE.WebGLRenderer = function ( scene ) {
 	this.setupLights = function ( scene ) {
 
 		var l, ll, light, r, g, b,
-		    ambientLights = [], pointLights = [], directionalLights = [],
+			ambientLights = [], pointLights = [], directionalLights = [],
 			colors = [], positions = [];
 
 		_gl.uniform1i( _program.enableLighting, scene.lights.length );
@@ -334,42 +334,58 @@ THREE.WebGLRenderer = function ( scene ) {
 
 	this.renderBuffer = function ( material, materialFaceGroup ) {
 
+		var mColor, mOpacity, mWireframe, mLineWidth, mBlending,
+			mAmbient, mSpecular, mShininess,
+			mMap;
+		
+		if ( material instanceof THREE.MeshPhongMaterial ||
+			 material instanceof THREE.MeshLambertMaterial ||
+			 material instanceof THREE.MeshBasicMaterial ) {
+		
+			mColor = material.color;
+			mOpacity = material.opacity;
+			
+			mWireframe = material.wireframe;
+			mLineWidth = material.wireframe_linewidth;
+			
+			mBlending = material.blending;
+		
+			mMap = material.map;
+			
+			_gl.uniform4f( _program.mColor,  mColor.r * mOpacity, mColor.g * mOpacity, mColor.b * mOpacity, mOpacity );
+		
+		}
+		
 		if ( material instanceof THREE.MeshPhongMaterial ) {
 
 			mAmbient  = material.ambient;
-			mDiffuse  = material.diffuse;
 			mSpecular = material.specular;
-
-			_gl.uniform4f( _program.mAmbient,  mAmbient.r,  mAmbient.g,  mAmbient.b,  material.opacity );
-			_gl.uniform4f( _program.mDiffuse,  mDiffuse.r,  mDiffuse.g,  mDiffuse.b,  material.opacity );
-			_gl.uniform4f( _program.mSpecular, mSpecular.r, mSpecular.g, mSpecular.b, material.opacity );
-
-			_gl.uniform1f( _program.mShininess, material.shininess );
+			mShininess = material.shininess;
+			
+			_gl.uniform4f( _program.mAmbient,  mAmbient.r,  mAmbient.g,  mAmbient.b,  mOpacity );
+			_gl.uniform4f( _program.mSpecular, mSpecular.r, mSpecular.g, mSpecular.b, mOpacity );
+			_gl.uniform1f( _program.mShininess, mShininess );
+			
 			_gl.uniform1i( _program.material, PHONG );
 
-		} else if ( material instanceof THREE.MeshColorFillMaterial ) {
+		} else if ( material instanceof THREE.MeshLambertMaterial ) {
+			
+			_gl.uniform1i( _program.material, LAMBERT );
 
-			color = material.color;
-			_gl.uniform4f( _program.mColor,  color.r * color.a, color.g * color.a, color.b * color.a, color.a );
-			_gl.uniform1i( _program.material, COLORFILL );
+		} else if ( material instanceof THREE.MeshBasicMaterial ) {
 
-		} else if ( material instanceof THREE.MeshColorStrokeMaterial ) {
+			_gl.uniform1i( _program.material, BASIC );
 
-			lineWidth = material.lineWidth;
+		} 
+		
+		if ( mMap ) {
 
-			color = material.color;
-			_gl.uniform4f( _program.mColor,  color.r * color.a, color.g * color.a, color.b * color.a, color.a );
-			_gl.uniform1i( _program.material, COLORSTROKE );
-
-		} else if ( material instanceof THREE.MeshBitmapMaterial ) {
-
-			if ( !material.__webGLTexture && material.loaded ) {
+			if ( !material.__webGLTexture && material.map.loaded ) {
 
 				material.__webGLTexture = _gl.createTexture();
 				_gl.bindTexture( _gl.TEXTURE_2D, material.__webGLTexture );
-				_gl.texImage2D( _gl.TEXTURE_2D, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, material.bitmap ) ;
+				_gl.texImage2D( _gl.TEXTURE_2D, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, material.map.image ) ;
 				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MAG_FILTER, _gl.LINEAR );
-				//_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, _gl.LINEAR_MIPMAP_NEAREST );
 				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, _gl.LINEAR_MIPMAP_LINEAR );
 				_gl.generateMipmap( _gl.TEXTURE_2D );
 				_gl.bindTexture( _gl.TEXTURE_2D, null );
@@ -378,11 +394,16 @@ THREE.WebGLRenderer = function ( scene ) {
 
 			_gl.activeTexture( _gl.TEXTURE0 );
 			_gl.bindTexture( _gl.TEXTURE_2D, material.__webGLTexture );
-			_gl.uniform1i( _program.tDiffuse,  0 );
+			_gl.uniform1i( _program.tMap,  0 );
 
-			_gl.uniform1i( _program.material, BITMAP );
+			_gl.uniform1i( _program.enableMap, 1 );
 
+		} else {
+			
+			_gl.uniform1i( _program.enableMap, 0 );
+			
 		}
+		
 
 		// vertices
 		
@@ -396,7 +417,7 @@ THREE.WebGLRenderer = function ( scene ) {
 
 		// uvs
 		
-		if ( material instanceof THREE.MeshBitmapMaterial ) {
+		if ( mMap ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, materialFaceGroup.__webGLUVBuffer );
 
@@ -411,19 +432,16 @@ THREE.WebGLRenderer = function ( scene ) {
 
 		// render triangles
 		
-		if ( material instanceof THREE.MeshBitmapMaterial || 
-
-			material instanceof THREE.MeshColorFillMaterial ||
-			material instanceof THREE.MeshPhongMaterial ) {
+		if ( ! mWireframe ) {
 
 			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, materialFaceGroup.__webGLFaceBuffer );
 			_gl.drawElements( _gl.TRIANGLES, materialFaceGroup.__webGLFaceCount, _gl.UNSIGNED_SHORT, 0 );
 
 		// render lines
 		
-		} else if ( material instanceof THREE.MeshColorStrokeMaterial ) {
+		} else {
 
-			_gl.lineWidth( lineWidth );
+			_gl.lineWidth( mLineWidth );
 			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, materialFaceGroup.__webGLLineBuffer );
 			_gl.drawElements( _gl.LINES, materialFaceGroup.__webGLLineCount, _gl.UNSIGNED_SHORT, 0 );
 
@@ -631,13 +649,14 @@ THREE.WebGLRenderer = function ( scene ) {
 			maxDirLights   ? "#define MAX_DIR_LIGHTS " + maxDirLights     : "",
 			maxPointLights ? "#define MAX_POINT_LIGHTS " + maxPointLights : "",
 		
-			"uniform int material;", // 0 - ColorFill, 1 - ColorStroke, 2 - Bitmap, 3 - Phong
+			"uniform int material;", // 0 - Basic, 1 - Lambert, 2 - Phong
 
-			"uniform sampler2D tDiffuse;",
+			"uniform bool enableMap;",
+		
+			"uniform sampler2D tMap;",
 			"uniform vec4 mColor;",
 
 			"uniform vec4 mAmbient;",
-			"uniform vec4 mDiffuse;",
 			"uniform vec4 mSpecular;",
 			"uniform float mShininess;",
 
@@ -658,10 +677,18 @@ THREE.WebGLRenderer = function ( scene ) {
 
 			"void main() {",
 
+				"vec4 mapColor = vec4( 1.0, 1.0, 1.0, 1.0 );",
+				
 				// Blinn-Phong
 				// based on o3d example
 
-				"if ( material == 3 ) { ", 
+				"if ( enableMap ) {",
+				
+					"mapColor = texture2D( tMap, vUv );",
+					
+				"}",
+				
+				"if ( material == 2 ) { ", 
 
 					"vec3 normal = normalize( vNormal );",
 					"vec3 viewPosition = normalize( vViewPosition );",
@@ -694,7 +721,7 @@ THREE.WebGLRenderer = function ( scene ) {
 					maxPointLights ? 	"if ( pointDotNormalHalf >= 0.0 )" : "",
 					maxPointLights ? 		"pointSpecularWeight = pow( pointDotNormalHalf, mShininess );" : "",
 						
-					maxPointLights ? 	"pointDiffuse  += mDiffuse  * pointDiffuseWeight;" : "",
+					maxPointLights ? 	"pointDiffuse  += mColor * pointDiffuseWeight;" : "",
 					maxPointLights ? 	"pointSpecular += mSpecular * pointSpecularWeight;" : "",
 						
 					maxPointLights ? "}" : "",
@@ -719,7 +746,7 @@ THREE.WebGLRenderer = function ( scene ) {
 					maxDirLights ? 		"if ( dirDotNormalHalf >= 0.0 )" : "",
 					maxDirLights ? 			"dirSpecularWeight = pow( dirDotNormalHalf, mShininess );" : "",
 
-					maxDirLights ? 		"dirDiffuse  += mDiffuse  * dirDiffuseWeight;" : "",
+					maxDirLights ? 		"dirDiffuse  += mColor * dirDiffuseWeight;" : "",
 					maxDirLights ? 		"dirSpecular += mSpecular * dirSpecularWeight;" : "",
 
 					maxDirLights ? "}" : "",
@@ -732,27 +759,19 @@ THREE.WebGLRenderer = function ( scene ) {
 
 					// looks nicer with weighting
 					
-					"gl_FragColor = vec4( totalLight.xyz * vLightWeighting, 1.0 );",                    
-					//"gl_FragColor = vec4( totalLight.xyz, 1.0 );", 
+					"gl_FragColor = vec4( mapColor.rgb * totalLight.xyz * vLightWeighting, mapColor.a );",
 
-				// Bitmap: texture
-				
-				"} else if ( material == 2 ) {", 
-
-					"vec4 texelColor = texture2D( tDiffuse, vUv );",
-					"gl_FragColor = vec4( texelColor.rgb * vLightWeighting, texelColor.a );",
-
-				// ColorStroke: wireframe using uniform color
+				// Lambert: diffuse lighting
 				
 				"} else if ( material == 1 ) {", 
 
-					"gl_FragColor = vec4( mColor.rgb * vLightWeighting, mColor.a );",
+					"gl_FragColor = vec4( mColor.rgb * mapColor.rgb * vLightWeighting, mColor.a * mapColor.a );",
 
-				// ColorFill: triangle using uniform color
+				// Basic: unlit color / texture
 				
 				"} else {", 
 
-					"gl_FragColor = vec4( mColor.rgb * vLightWeighting, mColor.a );",
+					"gl_FragColor = mColor * mapColor;",
 					
 				"}",
 
@@ -884,49 +903,51 @@ THREE.WebGLRenderer = function ( scene ) {
 		_program.normalMatrix = _gl.getUniformLocation( _program, "normalMatrix" );
 		_program.objMatrix = _gl.getUniformLocation( _program, "objMatrix" );
 
-		_program.cameraPosition = _gl.getUniformLocation(_program, 'cameraPosition');
+		_program.cameraPosition = _gl.getUniformLocation( _program, 'cameraPosition' );
 
 		// lights
 		
-		_program.enableLighting = _gl.getUniformLocation(_program, 'enableLighting');
+		_program.enableLighting = _gl.getUniformLocation( _program, 'enableLighting' );
 		
-		_program.ambientLightColor = _gl.getUniformLocation(_program, 'ambientLightColor');
+		_program.ambientLightColor = _gl.getUniformLocation( _program, 'ambientLightColor' );
 		
 		if ( maxDirLights ) {
 			
-			_program.directionalLightNumber = _gl.getUniformLocation(_program, 'directionalLightNumber');
-			_program.directionalLightColor = _gl.getUniformLocation(_program, 'directionalLightColor');
-			_program.directionalLightDirection = _gl.getUniformLocation(_program, 'directionalLightDirection');
+			_program.directionalLightNumber = _gl.getUniformLocation( _program, 'directionalLightNumber' );
+			_program.directionalLightColor = _gl.getUniformLocation( _program, 'directionalLightColor' );
+			_program.directionalLightDirection = _gl.getUniformLocation( _program, 'directionalLightDirection' );
 			
 		}
 
 		if ( maxPointLights ) {
 			
-			_program.pointLightNumber = _gl.getUniformLocation(_program, 'pointLightNumber');
-			_program.pointLightColor = _gl.getUniformLocation(_program, 'pointLightColor');
-			_program.pointLightPosition = _gl.getUniformLocation(_program, 'pointLightPosition');
+			_program.pointLightNumber = _gl.getUniformLocation( _program, 'pointLightNumber' );
+			_program.pointLightColor = _gl.getUniformLocation( _program, 'pointLightColor' );
+			_program.pointLightPosition = _gl.getUniformLocation( _program, 'pointLightPosition' );
 			
 		}
 
 		// material
 		
-		_program.material = _gl.getUniformLocation(_program, 'material');
+		_program.material = _gl.getUniformLocation( _program, 'material' );
 		
-		// material properties (ColorFill / ColorStroke shader)
+		// material properties (Basic / Lambert / Blinn-Phong shader)
 		
-		_program.mColor = _gl.getUniformLocation(_program, 'mColor');
+		_program.mColor = _gl.getUniformLocation( _program, 'mColor' );
 
 		// material properties (Blinn-Phong shader)
 		
-		_program.mAmbient = _gl.getUniformLocation(_program, 'mAmbient');
-		_program.mDiffuse = _gl.getUniformLocation(_program, 'mDiffuse');
-		_program.mSpecular = _gl.getUniformLocation(_program, 'mSpecular');
-		_program.mShininess = _gl.getUniformLocation(_program, 'mShininess');
+		_program.mAmbient = _gl.getUniformLocation( _program, 'mAmbient' );
+		_program.mSpecular = _gl.getUniformLocation( _program, 'mSpecular' );
+		_program.mShininess = _gl.getUniformLocation( _program, 'mShininess' );
 
-		// texture (Bitmap shader)
+		// texture (diffuse map)
 		
-		_program.tDiffuse = _gl.getUniformLocation( _program, "tDiffuse");
-		_gl.uniform1i( _program.tDiffuse,  0 );
+		_program.enableMap = _gl.getUniformLocation( _program, "enableMap" );
+		_gl.uniform1i( _program.enableMap,  0 );
+		
+		_program.tMap = _gl.getUniformLocation( _program, "tMap" );
+		_gl.uniform1i( _program.tMap,  0 );
 
 		// vertex arrays
 		

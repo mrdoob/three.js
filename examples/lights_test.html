@@ -39,11 +39,10 @@
 		
 		<pre id="log"></pre>
 
-		<script type="text/javascript" src="../build/Three.js"></script> 
 		<!--
+		<script type="text/javascript" src="../build/Three.js"></script> 
 		-->
 
-		<!--
 		<script type="text/javascript" src="../src/Three.js"></script>
 		<script type="text/javascript" src="../src/core/Color.js"></script>
 		<script type="text/javascript" src="../src/core/Vector2.js"></script>
@@ -67,14 +66,15 @@
 		<script type="text/javascript" src="../src/objects/Mesh.js"></script>
 		<script type="text/javascript" src="../src/objects/Particle.js"></script>
 		<script type="text/javascript" src="../src/objects/Line.js"></script>
-		<script type="text/javascript" src="../src/materials/LineColorMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/Material.js"></script>
+		<script type="text/javascript" src="../src/materials/LineBasicMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/MeshBasicMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/MeshLambertMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/MeshPhongMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/MeshBitmapMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/MeshColorFillMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/MeshColorStrokeMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/MeshFaceMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/ParticleCircleMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/ParticleBitmapMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/ParticleBasicMaterial.js"></script>
+        <script type="text/javascript" src="../src/materials/Texture.js"></script>
 		<script type="text/javascript" src="../src/scenes/Scene.js"></script>
 		<script type="text/javascript" src="../src/renderers/Projector.js"></script>
 		<script type="text/javascript" src="../src/renderers/CanvasRenderer.js"></script>
@@ -84,6 +84,7 @@
 		<script type="text/javascript" src="../src/renderers/renderables/RenderableFace4.js"></script>
 		<script type="text/javascript" src="../src/renderers/renderables/RenderableParticle.js"></script>
 		<script type="text/javascript" src="../src/renderers/renderables/RenderableLine.js"></script>
+		<!--
 		-->
 
 		<script type="text/javascript" src="../src/extras/primitives/Sphere.js"></script>
@@ -148,7 +149,7 @@
 				
 				sphere = new Sphere( 100, 16, 8, 0 );
 				for (var i=0; i<30; i++) {
-					mesh = new THREE.Mesh( sphere, new THREE.MeshColorFillMaterial( 0xffffff ) );
+					mesh = new THREE.Mesh( sphere, new THREE.MeshLambertMaterial( { color: 0xffffff } ) );
 					mesh.position.x = 500 * (Math.random() - 0.5);
 					mesh.position.y = 500 * (Math.random() - 0.5);
 					mesh.position.z = 500 * (Math.random() - 0.5);
@@ -178,7 +179,7 @@
 
 
 				sphere = new Sphere( 100, 16, 8, 1 );
-				lightMesh = new THREE.Mesh( sphere, new THREE.MeshColorFillMaterial( 0xffaa00 ) );
+				lightMesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) );
 				lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
 				lightMesh.position = pointLight.position;
 				lightMesh.overdraw = true;
@@ -214,7 +215,6 @@
 
 
 				var loader = new THREE.Loader();
-				//loader.loadAsciiOld( "obj/torus/Torus.js", function() { createScene( new Torus() ) } );
 				//loader.loadAscii( "obj/torus/Torus_slim.js", function( geometry ) { createScene( geometry ) } );
                 loader.loadBinary( "obj/torus/Torus_bin.js", function( geometry ) { createScene( geometry ) }, "obj/torus" );
 
@@ -222,7 +222,7 @@
 
 			function createScene( geometry ) {
 				
-				zmesh = new THREE.Mesh( geometry, new THREE.MeshColorFillMaterial( 0xffffff ) );
+				zmesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: 0xffffff } ) );
 				zmesh.position.x = 0;
 				zmesh.position.z = 0;
 				zmesh.position.y = 0;
