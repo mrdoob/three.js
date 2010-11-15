@@ -18,7 +18,7 @@ THREE.WebGLRenderer = function ( scene ) {
 	var _canvas = document.createElement( 'canvas' ), _gl, _program,
 	_modelViewMatrix = new THREE.Matrix4(), _normalMatrix,
 	
-	BASIC = 0, LAMBERT = 1, PHONG = 2, // material constants used in shader
+	BASIC = 0, LAMBERT = 1, PHONG = 2, DEPTH = 3, // material constants used in shader
 	
 	maxLightCount = allocateLights( scene, 5 );
 	
@@ -356,7 +356,20 @@ THREE.WebGLRenderer = function ( scene ) {
 		
 		}
 		
-		if ( material instanceof THREE.MeshPhongMaterial ) {
+		if ( material instanceof THREE.MeshDepthMaterial ) {
+			
+			mOpacity = material.opacity;
+			
+			mWireframe = material.wireframe;
+			mLineWidth = material.wireframe_linewidth;
+			
+			_gl.uniform1f( _program.m2Near, material.__2near );
+			_gl.uniform1f( _program.mFarPlusNear, material.__farPlusNear );
+			_gl.uniform1f( _program.mFarMinusNear, material.__farMinusNear );
+			
+			_gl.uniform1i( _program.material, DEPTH );
+			
+		} else if ( material instanceof THREE.MeshPhongMaterial ) {
 
 			mAmbient  = material.ambient;
 			mSpecular = material.specular;
@@ -649,7 +662,7 @@ THREE.WebGLRenderer = function ( scene ) {
 			maxDirLights   ? "#define MAX_DIR_LIGHTS " + maxDirLights     : "",
 			maxPointLights ? "#define MAX_POINT_LIGHTS " + maxPointLights : "",
 		
-			"uniform int material;", // 0 - Basic, 1 - Lambert, 2 - Phong
+			"uniform int material;", // 0 - Basic, 1 - Lambert, 2 - Phong, 3 - Depth
 
 			"uniform bool enableMap;",
 		
@@ -660,6 +673,10 @@ THREE.WebGLRenderer = function ( scene ) {
 			"uniform vec4 mSpecular;",
 			"uniform float mShininess;",
 
+			"uniform float m2Near;",
+			"uniform float mFarPlusNear;",
+			"uniform float mFarMinusNear;",
+			
 			"uniform int pointLightNumber;",
 			"uniform int directionalLightNumber;",
 			
@@ -674,7 +691,7 @@ THREE.WebGLRenderer = function ( scene ) {
 			maxPointLights ? "varying vec3 vPointLightVector[ MAX_POINT_LIGHTS ];"     : "",
 			
 			"varying vec3 vViewPosition;",
-
+			
 			"void main() {",
 
 				"vec4 mapColor = vec4( 1.0, 1.0, 1.0, 1.0 );",
@@ -687,8 +704,18 @@ THREE.WebGLRenderer = function ( scene ) {
 					"mapColor = texture2D( tMap, vUv );",
 					
 				"}",
+
+				"if ( material == 3 ) { ",
+					
+					// this breaks shader validation in Chrome 9.0.576.0 dev 
+					// and also latest continuous build Chromium 9.0.583.0 (66089)
+					// (curiously it works in Chrome 9.0.576.0 canary build and Firefox 4b7)
+					//"float w = 1.0 - ( m2Near / ( mFarPlusNear - gl_FragCoord.z * mFarMinusNear ) );",
+					"float w = 0.5;",
+					
+					"gl_FragColor = vec4( w, w, w, 1.0 );",
 				
-				"if ( material == 2 ) { ", 
+				"} else if ( material == 2 ) { ", 
 
 					"vec3 normal = normalize( vNormal );",
 					"vec3 viewPosition = normalize( vViewPosition );",
@@ -821,6 +848,8 @@ THREE.WebGLRenderer = function ( scene ) {
 			maxPointLights ? "varying vec3 vPointLightVector[ MAX_POINT_LIGHTS ];"     : "",
 			
 			"varying vec3 vViewPosition;",
+			
+			"varying vec3 vFragPosition;",
 
 			"void main(void) {",
 
@@ -828,7 +857,7 @@ THREE.WebGLRenderer = function ( scene ) {
 				
 				"vec4 mPosition = objMatrix * vec4( position, 1.0 );",
 				"vViewPosition = cameraPosition - mPosition.xyz;",
-
+				
 				// eye space
 				
 				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
@@ -846,7 +875,7 @@ THREE.WebGLRenderer = function ( scene ) {
 					
 					maxDirLights ? "for( int i = 0; i < directionalLightNumber; i++ ) {" : "",
 					maxDirLights ?		"vec4 lDirection = viewMatrix * vec4( directionalLightDirection[ i ], 0.0 );" : "",
-					maxDirLights ?		"float directionalLightWeighting = max( dot( transformedNormal, normalize(lDirection.xyz ) ), 0.0 );" : "",						
+					maxDirLights ?		"float directionalLightWeighting = max( dot( transformedNormal, normalize(lDirection.xyz ) ), 0.0 );" : "",
 					maxDirLights ?		"vLightWeighting += directionalLightColor[ i ] * directionalLightWeighting;" : "",
 					maxDirLights ? "}" : "",
 					
@@ -949,6 +978,12 @@ THREE.WebGLRenderer = function ( scene ) {
 		_program.tMap = _gl.getUniformLocation( _program, "tMap" );
 		_gl.uniform1i( _program.tMap,  0 );
 
+		// material properties (Depth)
+		
+		_program.m2Near = _gl.getUniformLocation( _program, 'm2Near' );
+		_program.mFarPlusNear = _gl.getUniformLocation( _program, 'mFarPlusNear' );
+		_program.mFarMinusNear = _gl.getUniformLocation( _program, 'mFarMinusNear' );
+		
 		// vertex arrays
 		
 		_program.position = _gl.getAttribLocation( _program, "position" );
