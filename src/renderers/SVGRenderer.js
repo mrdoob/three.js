@@ -476,7 +476,7 @@ THREE.SVGRenderer = function () {
 
 		// https://gist.github.com/665829
 
-		return normal < 0 ? Math.min( 1 + normal, 0.5 ) : 0.5 + Math.min( normal, 0.5 );
+		return normal < 0 ? Math.min( ( 1 + normal ) * 0.5, 0.5 ) : 0.5 + Math.min( normal * 0.5, 0.5 );
 
 	}
 
