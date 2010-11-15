@@ -89,7 +89,7 @@
 				// Spheres
 
 				geometry = new Sphere( 100, 16, 8 );
-				// material = new THREE.MeshLambertMaterial( { color: 0xffffff, opacity: 1 } );
+				//material = new THREE.MeshLambertMaterial( { color: 0xffffff } );
 				material = new THREE.MeshDepthMaterial( { near: 1, far: 2000 } );
 
 				for (var i = 0; i < 20; i ++ ) {
@@ -131,6 +131,7 @@
 				scene.addLight( pointLight );
 
 				renderer = new THREE.CanvasRenderer();
+				//renderer = new THREE.WebGLRenderer();
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
 				container.appendChild( renderer.domElement );
