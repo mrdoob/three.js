@@ -9,4 +9,4 @@ THREE.PhongShading = 2;
 
 THREE.NormalBlending = 0;
 THREE.AdditiveBlending = 1;
-THREE.SubstractiveBlending = 2;
+THREE.SubtractiveBlending = 2;

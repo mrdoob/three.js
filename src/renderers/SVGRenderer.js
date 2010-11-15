@@ -339,11 +339,6 @@ THREE.SVGRenderer = function () {
 
 			_color.__styleString = material.color.__styleString;
 
-		} else if ( material instanceof THREE.MeshDepthMaterial ) {
-
-			_w = 1 - ( material.__2near / (material.__farPlusNear - element.z * material.__farMinusNear) );
-			_color.setRGBA( _w, _w, _w, 1 );
-
 		} else if ( material instanceof THREE.MeshLambertMaterial ) {
 
 			if ( _enableLighting ) {
@@ -360,6 +355,15 @@ THREE.SVGRenderer = function () {
 				_color.__styleString = material.color.__styleString;
 
 			}
+
+		} else if ( material instanceof THREE.MeshDepthMaterial ) {
+
+			_w = 1 - ( material.__2near / (material.__farPlusNear - element.z * material.__farMinusNear) );
+			_color.setRGBA( _w, _w, _w, 1 );
+
+		} else if ( material instanceof THREE.MeshNormalMaterial ) {
+
+			_color.setRGBA( normalToComponent( element.normalWorld.x ), normalToComponent( element.normalWorld.y ), normalToComponent( element.normalWorld.z ), 1 );
 
 		}
 
@@ -402,6 +406,15 @@ THREE.SVGRenderer = function () {
 				_color.__styleString = material.color.__styleString;
 
 			}
+
+		} else if ( material instanceof THREE.MeshDepthMaterial ) {
+
+			_w = 1 - ( material.__2near / (material.__farPlusNear - element.z * material.__farMinusNear) );
+			_color.setRGBA( _w, _w, _w, 1 );
+
+		} else if ( material instanceof THREE.MeshNormalMaterial ) {
+
+			_color.setRGBA( normalToComponent( element.normalWorld.x ), normalToComponent( element.normalWorld.y ), normalToComponent( element.normalWorld.z ), 1 );
 
 		}
 
@@ -456,6 +469,14 @@ THREE.SVGRenderer = function () {
 		}
 
 		return _svgCirclePool[ id ];
+
+	}
+
+	function normalToComponent( normal ) {
+
+		// https://gist.github.com/665829
+
+		return normal < 0 ? Math.min( 1 + normal, 0.5 ) : 0.5 + Math.min( normal, 0.5 );
 
 	}
 
