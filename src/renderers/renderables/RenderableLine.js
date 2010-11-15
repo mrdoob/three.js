@@ -4,8 +4,8 @@
 
 THREE.RenderableLine = function () {
 
-	this.v1 = new THREE.Vector2();
-	this.v2 = new THREE.Vector2();
+	this.v1 = new THREE.Vertex();
+	this.v2 = new THREE.Vertex();
 
 	this.z = null;
 

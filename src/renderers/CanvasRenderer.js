@@ -16,6 +16,9 @@ THREE.CanvasRenderer = function () {
 	_contextFillStyle = '#000000',
 	_contextLineWidth = 1,
 
+	_v1, _v2, _v3, _v4,
+	_v5 = new THREE.Vertex(), _v6 = new THREE.Vertex(), // Needed for latter splitting tris to quads
+
 	_clipRect = new THREE.Rectangle(),
 	_clearRect = new THREE.Rectangle(),
 	_bboxRect = new THREE.Rectangle(),
@@ -25,12 +28,22 @@ THREE.CanvasRenderer = function () {
 	_light = new THREE.Color( 0xffffffff ),
 	_ambientLight = new THREE.Color( 0xff000000 ),
 
-	_pi2 = Math.PI * 2,
-	_w, // z-buffer to w-buffer
-	_vector2 = new THREE.Vector2(), // Needed for expand
+	_pi2 = Math.PI * 2, _w, // z-buffer to w-buffer
 	_vector3 = new THREE.Vector3(), // Needed for PointLight
 	_uv1 = new THREE.UV(), _uv2 = new THREE.UV(), _uv3 = new THREE.UV(), _uv4 = new THREE.UV(),
-	v5 = new THREE.Vector2(), v6 = new THREE.Vector2(); // Needed for latter splitting tris to quads
+
+	_depthMap = document.createElement( 'canvas' ),
+	_depthMapContext = _depthMap.getContext( '2d' ),
+	_depthMapGradient = _depthMapContext.createLinearGradient( 0, 0, 255, 0);
+
+	_depthMap.width = 255;
+	_depthMap.height = 4;
+
+	_depthMapGradient.addColorStop( 0, "white" );
+	_depthMapGradient.addColorStop( 1, "black" );
+
+	_depthMapContext.fillStyle = _depthMapGradient;
+	_depthMapContext.fillRect( 0, 0, 255, 4 );
 
 	this.domElement = _canvas;
 	this.autoClear = true;
@@ -69,8 +82,7 @@ THREE.CanvasRenderer = function () {
 
 	this.render = function ( scene, camera ) {
 
-		var e, el, element, m, ml, fm, fml, material,
-		v1x, v1y, v2x, v2y, v3x, v3y, v4x, v4y, v5x, v5y, v6x, v6y;
+		var e, el, element, m, ml, fm, fml, material;
 
 		if ( this.autoClear ) {
 
@@ -103,22 +115,25 @@ THREE.CanvasRenderer = function () {
 
 			if ( element instanceof THREE.RenderableParticle ) {
 
-				v1x = element.x * _canvasWidthHalf; v1y = element.y * _canvasHeightHalf;
+				_v1 = element;
+				_v1.x *= _canvasWidthHalf; _v1.y *= _canvasHeightHalf;
 
 				for ( m = 0, ml = element.material.length; m < ml; m++ ) {
 
 					material = element.material[ m ];
-					material && renderParticle( v1x, v1y, element, material, scene );
+					material && renderParticle( _v1, element, material, scene );
 
 				}
 
 			} else if ( element instanceof THREE.RenderableLine ) {
 
-				v1x = element.v1.x * _canvasWidthHalf; v1y = element.v1.y * _canvasHeightHalf;
-				v2x = element.v2.x * _canvasWidthHalf; v2y = element.v2.y * _canvasHeightHalf;
+				_v1 = element.v1; _v2 = element.v2;
 
-				_bboxRect.addPoint( v1x, v1y );
-				_bboxRect.addPoint( v2x, v2y );
+				_v1.positionScreen.x *= _canvasWidthHalf; _v1.positionScreen.y *= _canvasHeightHalf;
+				_v2.positionScreen.x *= _canvasWidthHalf; _v2.positionScreen.y *= _canvasHeightHalf;
+
+				_bboxRect.addPoint( _v1.positionScreen.x, _v1.positionScreen.y );
+				_bboxRect.addPoint( _v2.positionScreen.x, _v2.positionScreen.y );
 
 				if ( !_clipRect.instersects( _bboxRect ) ) {
 
@@ -131,31 +146,29 @@ THREE.CanvasRenderer = function () {
 				while ( m < ml ) {
 
 					material = element.material[ m ++ ];
-					material && renderLine( v1x, v1y, v2x, v2y, element, material, scene );
+					material && renderLine( _v1, _v2, element, material, scene );
 
 				}
 
 			} else if ( element instanceof THREE.RenderableFace3 ) {
 
-				element.v1.x *= _canvasWidthHalf; element.v1.y *= _canvasHeightHalf;
-				element.v2.x *= _canvasWidthHalf; element.v2.y *= _canvasHeightHalf;
-				element.v3.x *= _canvasWidthHalf; element.v3.y *= _canvasHeightHalf;
+				_v1 = element.v1; _v2 = element.v2; _v3 = element.v3;
+
+				_v1.positionScreen.x *= _canvasWidthHalf; _v1.positionScreen.y *= _canvasHeightHalf;
+				_v2.positionScreen.x *= _canvasWidthHalf; _v2.positionScreen.y *= _canvasHeightHalf;
+				_v3.positionScreen.x *= _canvasWidthHalf; _v3.positionScreen.y *= _canvasHeightHalf;
 
 				if ( element.overdraw ) {
 
-					expand( element.v1, element.v2 );
-					expand( element.v2, element.v3 );
-					expand( element.v3, element.v1 );
+					expand( _v1.positionScreen, _v2.positionScreen );
+					expand( _v2.positionScreen, _v3.positionScreen );
+					expand( _v3.positionScreen, _v1.positionScreen );
 
 				}
 
-				v1x = element.v1.x; v1y = element.v1.y;
-				v2x = element.v2.x; v2y = element.v2.y;
-				v3x = element.v3.x; v3y = element.v3.y;
-
-				_bboxRect.addPoint( v1x, v1y );
-				_bboxRect.addPoint( v2x, v2y );
-				_bboxRect.addPoint( v3x, v3y );
+				_bboxRect.addPoint( _v1.positionScreen.x, _v1.positionScreen.y );
+				_bboxRect.addPoint( _v2.positionScreen.x, _v2.positionScreen.y );
+				_bboxRect.addPoint( _v3.positionScreen.x, _v3.positionScreen.y );
 
 				if ( !_clipRect.instersects( _bboxRect ) ) {
 
@@ -176,7 +189,7 @@ THREE.CanvasRenderer = function () {
 						while ( fm < fml ) {
 
 							material = element.faceMaterial[ fm ++ ];
-							material && renderFace3( v1x, v1y, v2x, v2y, v3x, v3y, element, material, scene );
+							material && renderFace3( _v1, _v2, _v3, element, material, scene );
 
 						}
 
@@ -184,46 +197,41 @@ THREE.CanvasRenderer = function () {
 
 					}
 
-					renderFace3( v1x, v1y, v2x, v2y, v3x, v3y, element, material, scene );
+					material && renderFace3( _v1, _v2, _v3, element, material, scene );
 
 				}
 
 			} else if ( element instanceof THREE.RenderableFace4 ) {
 
-				element.v1.x *= _canvasWidthHalf; element.v1.y *= _canvasHeightHalf;
-				element.v2.x *= _canvasWidthHalf; element.v2.y *= _canvasHeightHalf;
-				element.v3.x *= _canvasWidthHalf; element.v3.y *= _canvasHeightHalf;
-				element.v4.x *= _canvasWidthHalf; element.v4.y *= _canvasHeightHalf;
+				_v1 = element.v1; _v2 = element.v2; _v3 = element.v3; _v4 = element.v4;
 
-				v5.copy( element.v2 ); v6.copy( element.v4 );
+				_v1.positionScreen.x *= _canvasWidthHalf; _v1.positionScreen.y *= _canvasHeightHalf;
+				_v2.positionScreen.x *= _canvasWidthHalf; _v2.positionScreen.y *= _canvasHeightHalf;
+				_v3.positionScreen.x *= _canvasWidthHalf; _v3.positionScreen.y *= _canvasHeightHalf;
+				_v4.positionScreen.x *= _canvasWidthHalf; _v4.positionScreen.y *= _canvasHeightHalf;
 
-				if ( element.overdraw ) {
-
-					expand( element.v1, element.v2 );
-					expand( element.v2, element.v4 );
-					expand( element.v4, element.v1 );
-
-				}
-
-				v1x = element.v1.x; v1y = element.v1.y;
-				v2x = element.v2.x; v2y = element.v2.y;
-				v4x = element.v4.x; v4y = element.v4.y;
+				_v5.positionScreen.copy( _v2.positionScreen );
+				_v6.positionScreen.copy( _v4.positionScreen );
 
 				if ( element.overdraw ) {
 
-					expand( element.v3, v5 );
-					expand( element.v3, v6 );
+					expand( _v1.positionScreen, _v2.positionScreen );
+					expand( _v2.positionScreen, _v4.positionScreen );
+					expand( _v4.positionScreen, _v1.positionScreen );
 
 				}
 
-				v3x = element.v3.x; v3y = element.v3.y;
-				v5x = v5.x; v5y = v5.y;
-				v6x = v6.x; v6y = v6.y;
+				if ( element.overdraw ) {
 
-				_bboxRect.addPoint( v1x, v1y );
-				_bboxRect.addPoint( v2x, v2y );
-				_bboxRect.addPoint( v3x, v3y );
-				_bboxRect.addPoint( v4x, v4y );
+					expand( _v3.positionScreen, _v5.positionScreen );
+					expand( _v3.positionScreen, _v6.positionScreen );
+
+				}
+
+				_bboxRect.addPoint( _v1.positionScreen.x, _v1.positionScreen.y );
+				_bboxRect.addPoint( _v2.positionScreen.x, _v2.positionScreen.y );
+				_bboxRect.addPoint( _v3.positionScreen.x, _v3.positionScreen.y );
+				_bboxRect.addPoint( _v4.positionScreen.x, _v4.positionScreen.y );
 
 				if ( !_clipRect.instersects( _bboxRect ) ) {
 
@@ -244,7 +252,7 @@ THREE.CanvasRenderer = function () {
 						while ( fm < fml ) {
 
 							material = element.faceMaterial[ fm ++ ];
-							material && renderFace4( v1x, v1y, v2x, v2y, v3x, v3y, v4x, v4y, v5x, v5y, v6x, v6y, element, material, scene );
+							material && renderFace4( _v1, _v2, _v3, _v4, _v5, _v6, element, material, scene );
 
 						}
 
@@ -252,7 +260,7 @@ THREE.CanvasRenderer = function () {
 
 					}
 
-					renderFace4( v1x, v1y, v2x, v2y, v3x, v3y, v4x, v4y, v5x, v5y, v6x, v6y, element, material, scene );
+					material && renderFace4( _v1, _v2, _v3, _v4, _v5, _v6, element, material, scene );
 
 				}
 
@@ -376,7 +384,7 @@ THREE.CanvasRenderer = function () {
 
 	}
 
-	function renderParticle ( v1x, v1y, element, material, scene ) {
+	function renderParticle ( v1, element, material, scene ) {
 
 		var width, height, scaleX, scaleY, offsetX, offsetY,
 		bitmap, bitmapWidth, bitmapHeight;
@@ -404,7 +412,7 @@ THREE.CanvasRenderer = function () {
 
 			// TODO: Rotations break this...
 
-			_bboxRect.set( v1x + offsetX - width, v1y + offsetY - height, v1x + offsetX + width, v1y + offsetY + height );
+			_bboxRect.set( v1.x + offsetX - width, v1.y + offsetY - height, v1.x + offsetX + width, v1.y + offsetY + height );
 
 			if ( !_clipRect.instersects( _bboxRect ) ) {
 
@@ -413,7 +421,7 @@ THREE.CanvasRenderer = function () {
 			}
 
 			_context.save();
-			_context.translate( v1x, v1y );
+			_context.translate( v1.x, v1.y );
 			_context.rotate( - element.rotation );
 			_context.scale( scaleX, - scaleY );
 			_context.translate( - bitmapWidth + material.offset.x, - bitmapHeight - material.offset.y );
@@ -453,7 +461,7 @@ THREE.CanvasRenderer = function () {
 			width = element.scale.x * _canvasWidthHalf;
 			height = element.scale.y * _canvasHeightHalf;
 
-			_bboxRect.set( v1x - width, v1y - height, v1x + width, v1y + height );
+			_bboxRect.set( v1.x - width, v1.y - height, v1.x + width, v1.y + height );
 
 			if ( !_clipRect.instersects( _bboxRect ) ) {
 
@@ -462,7 +470,7 @@ THREE.CanvasRenderer = function () {
 			}
 
 			_context.save();
-			_context.translate( v1x, v1y );
+			_context.translate( v1.x, v1.y );
 			_context.rotate( - element.rotation );
 			_context.scale( width, height );
 
@@ -479,7 +487,7 @@ THREE.CanvasRenderer = function () {
 
 	}
 
-	function renderLine( v1x, v1y, v2x, v2y, element, material, scene ) {
+	function renderLine( v1, v2, element, material, scene ) {
 
 		if ( _contextGlobalAlpha != material.opacity ) {
 
@@ -490,8 +498,8 @@ THREE.CanvasRenderer = function () {
 		if ( material instanceof THREE.LineBasicMaterial ) {
 
 			_context.beginPath();
-			_context.moveTo( v1x, v1y );
-			_context.lineTo( v2x, v2y );
+			_context.moveTo( v1.positionScreen.x, v1.positionScreen.y );
+			_context.lineTo( v2.positionScreen.x, v2.positionScreen.y );
 			_context.closePath();
 
 			_color.__styleString = material.color.__styleString;
@@ -516,7 +524,7 @@ THREE.CanvasRenderer = function () {
 
 	}
 
-	function renderFace3( v1x, v1y, v2x, v2y, v3x, v3y, element, material, scene ) {
+	function renderFace3( v1, v2, v3, element, material, scene ) {
 
 		var bitmap, bitmapWidth, bitmapHeight;
 
@@ -532,25 +540,42 @@ THREE.CanvasRenderer = function () {
 			bitmapWidth = bitmap.width - 1;
 			bitmapHeight = bitmap.height - 1;
 
-			_uv1.copy( element.uvs[ 0 ] );
-			_uv2.copy( element.uvs[ 1 ] );
-			_uv3.copy( element.uvs[ 2 ] );
+			_uv1.u = element.uvs[ 0 ].u * bitmapWidth; _uv1.v = element.uvs[ 0 ].v * bitmapHeight;
+			_uv2.u = element.uvs[ 1 ].u * bitmapWidth; _uv2.v = element.uvs[ 1 ].v * bitmapHeight;
+			_uv3.u = element.uvs[ 2 ].u * bitmapWidth; _uv3.v = element.uvs[ 2 ].v * bitmapHeight;
 
-			_uv1.u *= bitmapWidth; _uv1.v *= bitmapHeight;
-			_uv2.u *= bitmapWidth; _uv2.v *= bitmapHeight;
-			_uv3.u *= bitmapWidth; _uv3.v *= bitmapHeight;
+			drawTexturedTriangle( bitmap, v1.positionScreen.x, v1.positionScreen.y, v2.positionScreen.x, v2.positionScreen.y, v3.positionScreen.x, v3.positionScreen.y, _uv1.u, _uv1.v, _uv2.u, _uv2.v, _uv3.u, _uv3.v );
 
-			drawTexturedTriangle( bitmap, v1x, v1y, v2x, v2y, v3x, v3y, _uv1.u, _uv1.v, _uv2.u, _uv2.v, _uv3.u, _uv3.v );
+			return;
+
+		}
+
+		if ( material instanceof THREE.MeshDepthMaterial ) {
+
+			bitmap = _depthMap;
+			bitmapWidth = bitmap.width - 1;
+			bitmapHeight = bitmap.height - 1;
+
+			_w = material.__2near / (material.__farPlusNear - v1.positionScreen.z * material.__farMinusNear );
+			_uv1.u = _w * bitmapWidth; _uv1.v = 0;
+
+			_w = material.__2near / (material.__farPlusNear - v2.positionScreen.z * material.__farMinusNear );
+			_uv2.u = _w * bitmapWidth; _uv2.v = 1;
+
+			_w = material.__2near / (material.__farPlusNear - v3.positionScreen.z * material.__farMinusNear );
+			_uv3.u = _w * bitmapWidth; _uv3.v = 2;
+
+			drawTexturedTriangle( bitmap, v1.positionScreen.x, v1.positionScreen.y, v2.positionScreen.x, v2.positionScreen.y, v3.positionScreen.x, v3.positionScreen.y, _uv1.u, _uv1.v, _uv2.u, _uv2.v, _uv3.u, _uv3.v );
 
 			return;
 
 		}
 
 		_context.beginPath();
-		_context.moveTo( v1x, v1y );
-		_context.lineTo( v2x, v2y );
-		_context.lineTo( v3x, v3y );
-		_context.lineTo( v1x, v1y );
+		_context.moveTo( v1.positionScreen.x, v1.positionScreen.y );
+		_context.lineTo( v2.positionScreen.x, v2.positionScreen.y );
+		_context.lineTo( v3.positionScreen.x, v3.positionScreen.y );
+		_context.lineTo( v1.positionScreen.x, v1.positionScreen.y );
 		_context.closePath();
 
 		if ( material instanceof THREE.MeshBasicMaterial ) {
@@ -559,8 +584,10 @@ THREE.CanvasRenderer = function () {
 
 		} else if ( material instanceof THREE.MeshDepthMaterial ) {
 
+			/*
 			_w = 1 - ( material.__2near / (material.__farPlusNear - element.z * material.__farMinusNear ) );
 			_color.setRGBA( _w, _w, _w, 1 );
+			*/
 
 		} else if ( material instanceof THREE.MeshLambertMaterial ) {
 
@@ -613,7 +640,7 @@ THREE.CanvasRenderer = function () {
 
 	}
 
-	function renderFace4 ( v1x, v1y, v2x, v2y, v3x, v3y, v4x, v4y, v5x, v5y, v6x, v6y, element, material, scene ) {
+	function renderFace4( v1, v2, v3, v4, v5, v6, element, material, scene ) {
 
 		var bitmap, bitmapWidth, bitmapHeight;
 
@@ -639,19 +666,44 @@ THREE.CanvasRenderer = function () {
 			_uv3.u *= bitmapWidth; _uv3.v *= bitmapHeight;
 			_uv4.u *= bitmapWidth; _uv4.v *= bitmapHeight;
 
-			drawTexturedTriangle( bitmap, v1x, v1y, v2x, v2y, v4x, v4y, _uv1.u, _uv1.v, _uv2.u, _uv2.v, _uv4.u, _uv4.v );
-			drawTexturedTriangle( bitmap, v5x, v5y, v3x, v3y, v6x, v6y, _uv2.u, _uv2.v, _uv3.u, _uv3.v, _uv4.u, _uv4.v );
+			drawTexturedTriangle( bitmap, v1.positionScreen.x, v1.positionScreen.y, v2.positionScreen.x, v2.positionScreen.y, v4.positionScreen.x, v4.positionScreen.y, _uv1.u, _uv1.v, _uv2.u, _uv2.v, _uv4.u, _uv4.v );
+			drawTexturedTriangle( bitmap, v5.positionScreen.x, v5.positionScreen.y, v3.positionScreen.x, v3.positionScreen.y, v6.positionScreen.x, v6.positionScreen.y, _uv2.u, _uv2.v, _uv3.u, _uv3.v, _uv4.u, _uv4.v );
+
+			return;
+
+		}
+
+		if ( material instanceof THREE.MeshDepthMaterial ) {
+
+			bitmap = _depthMap;
+			bitmapWidth = bitmap.width - 1;
+			bitmapHeight = bitmap.height - 1;
+
+			_w = material.__2near / (material.__farPlusNear - v1.positionScreen.z * material.__farMinusNear );
+			_uv1.u = _w * bitmapWidth; _uv1.v = 0;
+
+			_w = material.__2near / (material.__farPlusNear - v2.positionScreen.z * material.__farMinusNear );
+			_uv2.u = _w * bitmapWidth; _uv2.v = 1;
+
+			_w = material.__2near / (material.__farPlusNear - v3.positionScreen.z * material.__farMinusNear );
+			_uv3.u = _w * bitmapWidth; _uv3.v = 2;
+
+			_w = material.__2near / (material.__farPlusNear - v4.positionScreen.z * material.__farMinusNear );
+			_uv4.u = _w * bitmapWidth; _uv4.v = 3;
+
+			drawTexturedTriangle( bitmap, v1.positionScreen.x, v1.positionScreen.y, v2.positionScreen.x, v2.positionScreen.y, v4.positionScreen.x, v4.positionScreen.y, _uv1.u, _uv1.v, _uv2.u, _uv2.v, _uv4.u, _uv4.v );
+			drawTexturedTriangle( bitmap, v5.positionScreen.x, v5.positionScreen.y, v3.positionScreen.x, v3.positionScreen.y, v6.positionScreen.x, v6.positionScreen.y, _uv2.u, _uv2.v, _uv3.u, _uv3.v, _uv4.u, _uv4.v );
 
 			return;
 
 		}
 
 		_context.beginPath();
-		_context.moveTo( v1x, v1y );
-		_context.lineTo( v2x, v2y );
-		_context.lineTo( v3x, v3y );
-		_context.lineTo( v4x, v4y );
-		_context.lineTo( v1x, v1y );
+		_context.moveTo( v1.positionScreen.x, v1.positionScreen.y );
+		_context.lineTo( v2.positionScreen.x, v2.positionScreen.y );
+		_context.lineTo( v3.positionScreen.x, v3.positionScreen.y );
+		_context.lineTo( v4.positionScreen.x, v4.positionScreen.y );
+		_context.lineTo( v1.positionScreen.x, v1.positionScreen.y );
 		_context.closePath();
 
 		if ( material instanceof THREE.MeshBasicMaterial ) {
@@ -724,15 +776,11 @@ THREE.CanvasRenderer = function () {
 		_context.lineTo( x2, y2 );
 		_context.closePath();
 
-		x1 -= x0;
-		y1 -= y0;
-		x2 -= x0;
-		y2 -= y0;
+		x1 -= x0; y1 -= y0;
+		x2 -= x0; y2 -= y0;
 
-		u1 -= u0;
-		v1 -= v0;
-		u2 -= u0;
-		v2 -= v0;
+		u1 -= u0; v1 -= v0;
+		u2 -= u0; v2 -= v0;
 
 		var det = 1 / ( u1 * v2 - u2 * v1 ),
 
@@ -753,14 +801,15 @@ THREE.CanvasRenderer = function () {
 
 	// Hide anti-alias gaps
 
-	function expand( a, b ) {
+	function expand( v1, v2 ) {
 
-		_vector2.sub( b, a );
-		_vector2.unit();
-		_vector2.multiplyScalar( 0.75 );
+		var x = v2.x - v1.x, y =  v2.y - v1.y,
+		unit = 1 / Math.sqrt( x * x + y * y );
 
-		b.addSelf( _vector2 );
-		a.subSelf( _vector2 );
+		x *= unit; y *= unit;
+
+		v2.x += x; v2.y += y;
+		v1.x -= x; v1.y -= y;
 
 	}
 

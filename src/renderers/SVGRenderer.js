@@ -8,6 +8,9 @@ THREE.SVGRenderer = function () {
 	_projector = new THREE.Projector(),
 	_svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'),
 	_svgWidth, _svgHeight, _svgWidthHalf, _svgHeightHalf,
+
+	_v1, _v2, _v3, _v4,
+
 	_clipRect = new THREE.Rectangle(),
 	_bboxRect = new THREE.Rectangle(),
 
@@ -37,7 +40,7 @@ THREE.SVGRenderer = function () {
 
 	};
 
-	this.setSize = function ( width, height ) {
+	this.setSize = function( width, height ) {
 
 		_svgWidth = width; _svgHeight = height;
 		_svgWidthHalf = _svgWidth / 2; _svgHeightHalf = _svgHeight / 2;
@@ -60,10 +63,9 @@ THREE.SVGRenderer = function () {
 
 	};
 
-	this.render = function ( scene, camera ) {
+	this.render = function( scene, camera ) {
 
-		var e, el, m, ml, fm, fml, element, material,
-		v1x, v1y, v2x, v2y, v3x, v3y, v4x, v4y;
+		var e, el, m, ml, fm, fml, element, material;
 
 		if ( this.autoClear ) {
 
@@ -91,28 +93,31 @@ THREE.SVGRenderer = function () {
 
 			if ( element instanceof THREE.RenderableParticle ) {
 
-				v1x = element.x * _svgWidthHalf; v1y = element.y * -_svgHeightHalf;
+				_v1 = element;
+				_v1.x *= _svgWidthHalf; _v1.y *= -_svgHeightHalf;
 
 				for ( m = 0, ml = element.material.length; m < ml; m++ ) {
 
 					material = element.material[ m ];
-					material && renderParticle( v1x, v1y, element, material, scene );
+					material && renderParticle( _v1, element, material, scene );
 
 				}
 
 			}/* else if ( element instanceof THREE.RenderableLine ) {
 
-
+				TODO: It's actually quite easy...
 
 			}*/ else if ( element instanceof THREE.RenderableFace3 ) {
 
-				v1x = element.v1.x * _svgWidthHalf; v1y = element.v1.y * -_svgHeightHalf;
-				v2x = element.v2.x * _svgWidthHalf; v2y = element.v2.y * -_svgHeightHalf;
-				v3x = element.v3.x * _svgWidthHalf; v3y = element.v3.y * -_svgHeightHalf;
+				_v1 = element.v1; _v2 = element.v2; _v3 = element.v3;
 
-				_bboxRect.addPoint( v1x, v1y );
-				_bboxRect.addPoint( v2x, v2y );
-				_bboxRect.addPoint( v3x, v3y );
+				_v1.positionScreen.x *= _svgWidthHalf; _v1.positionScreen.y *= - _svgHeightHalf;
+				_v2.positionScreen.x *= _svgWidthHalf; _v2.positionScreen.y *= - _svgHeightHalf;
+				_v3.positionScreen.x *= _svgWidthHalf; _v3.positionScreen.y *= - _svgHeightHalf;
+
+				_bboxRect.addPoint( _v1.positionScreen.x, _v1.positionScreen.y );
+				_bboxRect.addPoint( _v2.positionScreen.x, _v2.positionScreen.y );
+				_bboxRect.addPoint( _v3.positionScreen.x, _v3.positionScreen.y );
 
 				if ( !_clipRect.instersects( _bboxRect ) ) {
 
@@ -133,7 +138,7 @@ THREE.SVGRenderer = function () {
 						while ( fm < fml ) {
 
 							material = element.faceMaterial[ fm ++ ];
-							material && renderFace3( v1x, v1y, v2x, v2y, v3x, v3y, element, material, scene );
+							material && renderFace3( _v1, _v2, _v3, element, material, scene );
 
 						}
 
@@ -141,21 +146,23 @@ THREE.SVGRenderer = function () {
 
 					}
 
-					material && renderFace3( v1x, v1y, v2x, v2y, v3x, v3y, element, material, scene );
+					material && renderFace3( _v1, _v2, _v3, element, material, scene );
 
 				}
 
 			} else if ( element instanceof THREE.RenderableFace4 ) {
 
-				v1x = element.v1.x * _svgWidthHalf; v1y = element.v1.y * -_svgHeightHalf;
-				v2x = element.v2.x * _svgWidthHalf; v2y = element.v2.y * -_svgHeightHalf;
-				v3x = element.v3.x * _svgWidthHalf; v3y = element.v3.y * -_svgHeightHalf;
-				v4x = element.v4.x * _svgWidthHalf; v4y = element.v4.y * -_svgHeightHalf;
+				_v1 = element.v1; _v2 = element.v2; _v3 = element.v3; _v4 = element.v4;
 
-				_bboxRect.addPoint( v1x, v1y );
-				_bboxRect.addPoint( v2x, v2y );
-				_bboxRect.addPoint( v3x, v3y );
-				_bboxRect.addPoint( v4x, v4y );
+				_v1.positionScreen.x *= _svgWidthHalf; _v1.positionScreen.y *= -_svgHeightHalf;
+				_v2.positionScreen.x *= _svgWidthHalf; _v2.positionScreen.y *= -_svgHeightHalf;
+				_v3.positionScreen.x *= _svgWidthHalf; _v3.positionScreen.y *= -_svgHeightHalf;
+				_v4.positionScreen.x *= _svgWidthHalf; _v4.positionScreen.y *= -_svgHeightHalf;
+
+				_bboxRect.addPoint( _v1.positionScreen.x, _v1.positionScreen.y );
+				_bboxRect.addPoint( _v2.positionScreen.x, _v2.positionScreen.y );
+				_bboxRect.addPoint( _v3.positionScreen.x, _v3.positionScreen.y );
+				_bboxRect.addPoint( _v4.positionScreen.x, _v4.positionScreen.y );
 
 				if ( !_clipRect.instersects( _bboxRect) ) {
 
@@ -176,7 +183,7 @@ THREE.SVGRenderer = function () {
 						while ( fm < fml ) {
 
 							material = element.faceMaterial[ fm ++ ];
-							material && renderFace4( v1x, v1y, v2x, v2y, v3x, v3y, v4x, v4y, element, material, scene );
+							material && renderFace4( _v1, _v2, _v3, _v4, element, material, scene );
 
 						}
 
@@ -184,7 +191,7 @@ THREE.SVGRenderer = function () {
 
 					}
 
-					material && renderFace4( v1x, v1y, v2x, v2y, v3x, v3y, v4x, v4y, element, material, scene );
+					material && renderFace4( _v1, _v2, _v3, _v4, element, material, scene );
 
 				}
 
@@ -283,11 +290,11 @@ THREE.SVGRenderer = function () {
 
 	}
 
-	function renderParticle ( v1x, v1y, element, material, scene ) {
+	function renderParticle( v1, element, material, scene ) {
 
 		_svgNode = getCircleNode( _circleCount++ );
-		_svgNode.setAttribute( 'cx', v1x );
-		_svgNode.setAttribute( 'cy', v1y );
+		_svgNode.setAttribute( 'cx', v1.x );
+		_svgNode.setAttribute( 'cy', v1.y );
 		_svgNode.setAttribute( 'r', element.scale.x * _svgWidthHalf );
 
 		if ( material instanceof THREE.ParticleCircleMaterial ) {
@@ -323,10 +330,10 @@ THREE.SVGRenderer = function () {
 	}
 	*/
 
-	function renderFace3 ( v1x, v1y, v2x, v2y, v3x, v3y, element, material, scene ) {
+	function renderFace3( v1, v2, v3, element, material, scene ) {
 
 		_svgNode = getPathNode( _pathCount ++ );
-		_svgNode.setAttribute( 'd', 'M ' + v1x + ' ' + v1y + ' L ' + v2x + ' ' + v2y + ' L ' + v3x + ',' + v3y + 'z' );
+		_svgNode.setAttribute( 'd', 'M ' + v1.positionScreen.x + ' ' + v1.positionScreen.y + ' L ' + v2.positionScreen.x + ' ' + v2.positionScreen.y + ' L ' + v3.positionScreen.x + ',' + v3.positionScreen.y + 'z' );
 
 		if ( material instanceof THREE.MeshBasicMaterial ) {
 
@@ -370,10 +377,10 @@ THREE.SVGRenderer = function () {
 
 	}
 
-	function renderFace4 ( v1x, v1y, v2x, v2y, v3x, v3y, v4x, v4y, element, material, scene ) {
+	function renderFace4( v1, v2, v3, v4, element, material, scene ) {
 
 		_svgNode = getPathNode( _pathCount ++ );
-		_svgNode.setAttribute( 'd', 'M ' + v1x + ' ' + v1y + ' L ' + v2x + ' ' + v2y + ' L ' + v3x + ',' + v3y + ' L ' + v4x + ',' + v4y + 'z' );
+		_svgNode.setAttribute( 'd', 'M ' + v1.positionScreen.x + ' ' + v1.positionScreen.y + ' L ' + v2.positionScreen.x + ' ' + v2.positionScreen.y + ' L ' + v3.positionScreen.x + ',' + v3.positionScreen.y + ' L ' + v4.positionScreen.x + ',' + v4.positionScreen.y + 'z' );
 
 		if ( material instanceof THREE.MeshBasicMaterial ) {
 
@@ -412,7 +419,7 @@ THREE.SVGRenderer = function () {
 
 	}
 
-	function getPathNode ( id ) {
+	function getPathNode( id ) {
 
 		if ( _svgPathPool[ id ] == null ) {
 
@@ -432,7 +439,7 @@ THREE.SVGRenderer = function () {
 
 	}
 
-	function getCircleNode ( id ) {
+	function getCircleNode( id ) {
 
 		if ( _svgCirclePool[id] == null ) {
 

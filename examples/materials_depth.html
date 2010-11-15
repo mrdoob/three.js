@@ -23,15 +23,9 @@
 
 		<script type="text/javascript">
 
-			var SCREEN_WIDTH = window.innerWidth;
-			var SCREEN_HEIGHT = window.innerHeight;
+			var container, stats;
 
-			var container;
-			var stats;
-
-			var camera;
-			var scene;
-			var renderer;
+			var camera, scene, renderer;
 
 			var cube, plane;
 
@@ -69,7 +63,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 45, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 2000 );
+				camera = new THREE.Camera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.x = 1000;
 				camera.position.y = 1000;
 				camera.position.z = 1000;
@@ -79,7 +73,7 @@
 
 				// Plane
 
-				var material = new THREE.MeshDepthMaterial( { near: 1, far: 2000, wireframe: true } );
+				var material = new THREE.MeshDepthMaterial( { near: 1, far: 2000 } );
 
 				plane = new THREE.Mesh( new Plane( 1000, 1000, 10, 10 ), material );
 				plane.rotation.x = - 90 * ( Math.PI / 180 );
@@ -88,7 +82,7 @@
 
 				// Spheres
 
-				geometry = new Sphere( 100, 16, 8 );
+				geometry = new Sphere( 100, 8, 4 );
 				//material = new THREE.MeshLambertMaterial( { color: 0xffffff } );
 				material = new THREE.MeshDepthMaterial( { near: 1, far: 2000 } );
 
@@ -98,16 +92,19 @@
 					cube.overdraw = true;
 
 					cube.position.x = ( i % 5 ) * 200 - 400;
-					cube.position.z = Math.floor( i / 5 ) * 200 - 400;
+					cube.position.z = Math.floor( i / 5 ) * 200 - 350;
 
 					/*
 					cube.position.x = Math.random() * 1000 - 500;
 					cube.position.y = Math.random() * 1000 - 500;
 					cube.position.z = Math.random() * 1000 - 500;
+					*/
 
 					cube.rotation.x = Math.random() * 200 - 100;
 					cube.rotation.y = Math.random() * 200 - 100;
 					cube.rotation.z = Math.random() * 200 - 100;
+
+					/*
 					cube.scale.x = cube.scale.y = cube.scale.z = Math.random() + 0.5;
 					*/
 
@@ -132,7 +129,7 @@
 
 				renderer = new THREE.CanvasRenderer();
 				//renderer = new THREE.WebGLRenderer();
-				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.appendChild( renderer.domElement );
 
@@ -200,20 +197,20 @@
 
 			function loop() {
 
-				if ( moveForward ) camera.position.z -= 5; // camera.moveZ( 5 );
-				if ( moveBackwards ) camera.position.z += 5; // camera.moveZ( - 5 );
+				if ( moveForward ) camera.position.z -= 10; // camera.moveZ( 10 );
+				if ( moveBackwards ) camera.position.z += 10; // camera.moveZ( - 10 );
 
-				if ( moveUp ) camera.position.y += 5; // camera.moveZ( 5 );
-				if ( moveDown ) camera.position.y -= 5; // camera.moveZ( - 5 );
+				if ( moveUp ) camera.position.y += 10; // camera.moveZ( 10 );
+				if ( moveDown ) camera.position.y -= 10; // camera.moveZ( - 10 );
 
-				if ( moveLeft ) camera.position.x -= 5; // camera.moveX( - 5 );
-				if ( moveRight ) camera.position.x += 5; // camera.moveX( 5 );
+				if ( moveLeft ) camera.position.x -= 10; // camera.moveX( - 10 );
+				if ( moveRight ) camera.position.x += 10; // camera.moveX( 10 );
 
 				if ( pitchUp ) camera.rotation.x += 0.01; // camera.rotateX( 1 );
 				if ( pitchDown ) camera.rotation.x -= 0.01; // camera.rotateX( - 1 );
 
-				if ( yawLeft ) camera.target.position.x -= 5; // camera.rotation.y += 0.01; // camera.rotateY( 1 );
-				if ( yawRight ) camera.target.position.x += 5; // camera.rotation.y -= 0.01; // camera.rotateY( - 1 );
+				if ( yawLeft ) camera.target.position.x -= 10; // camera.rotation.y += 0.01; // camera.rotateY( 1 );
+				if ( yawRight ) camera.target.position.x += 10; // camera.rotation.y -= 0.01; // camera.rotateY( - 1 );
 
 				if ( rollLeft ) camera.rotation.z += 0.01; // camera.rotateZ( 1 );
 				if ( rollRight ) camera.rotation.z -= 0.01; // camera.rotateZ( - 1 );
@@ -240,11 +237,9 @@
 
 					var object = scene.objects[i];
 
-					/*
 					object.rotation.x += 0.01;
 					object.rotation.y += 0.005;
 					object.position.y = Math.sin( object.rotation.x ) * 200;
-					*/
 
 					debugContext.rect( object.position.x * 0.1 - 5, object.position.z * 0.1 - 5, 10, 10 );
 
