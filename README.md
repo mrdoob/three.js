@@ -67,7 +67,7 @@ This code creates a camera, then creates a scene object, adds a bunch of random 
 
 			for (var i = 0; i < 1000; i++) {
 
-				var particle = new THREE.Particle( new THREE.ParticleCircleMaterial( Math.random() * 0x808008 + 0x808080, 1 ) );
+				var particle = new THREE.Particle( new THREE.ParticleCircleMaterial( { corlor: Math.random() * 0x808008 + 0x808080, opacity: 1 } ) );
 				particle.position.x = Math.random() * 2000 - 1000;
 				particle.position.y = Math.random() * 2000 - 1000;
 				particle.position.z = Math.random() * 2000 - 1000;
@@ -117,14 +117,16 @@ For creating a customised version of the library, including the source files in 
 	<script type="text/javascript" src="js/three/objects/Particle.js"></script>
 	<script type="text/javascript" src="js/three/objects/Line.js"></script>
 	<script type="text/javascript" src="js/three/objects/Mesh.js"></script>
-	<script type="text/javascript" src="js/three/materials/LineColorMaterial.js"></script>
+	<script type="text/javascript" src="js/three/materials/Material.js"></script>
+	<script type="text/javascript" src="js/three/materials/LineBasicMaterial.js"></script>
+	<script type="text/javascript" src="js/three/materials/MeshBasicMaterial.js"></script>
+	<script type="text/javascript" src="js/three/materials/MeshLambertMaterial.js"></script>
 	<script type="text/javascript" src="js/three/materials/MeshPhongMaterial.js"></script>
-	<script type="text/javascript" src="js/three/materials/MeshBitmapMaterial.js"></script>
-	<script type="text/javascript" src="js/three/materials/MeshColorFillMaterial.js"></script>
-	<script type="text/javascript" src="js/three/materials/MeshColorStrokeMaterial.js"></script>
+	<script type="text/javascript" src="js/three/materials/MeshDepthMaterial.js"></script>
 	<script type="text/javascript" src="js/three/materials/MeshFaceMaterial.js"></script>
-	<script type="text/javascript" src="js/three/materials/ParticleBitmapMaterial.js"></script>
+	<script type="text/javascript" src="js/three/materials/ParticleBasicMaterial.js"></script>
 	<script type="text/javascript" src="js/three/materials/ParticleCircleMaterial.js"></script>
+	<script type="text/javascript" src="js/three/materials/textures/Texture.js"></script>
 	<script type="text/javascript" src="js/three/scenes/Scene.js"></script>
 	<script type="text/javascript" src="js/three/renderers/Projector.js"></script>
 	<script type="text/javascript" src="js/three/renderers/DOMRenderer.js"></script>
