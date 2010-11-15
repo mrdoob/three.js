@@ -951,7 +951,7 @@ THREE.Loader.prototype = {
 		if ( m.map_diffuse && urlbase ) {
 
 			texture = document.createElement( 'canvas' );
-			material = new THREE.MeshBitmapMaterial( texture );
+			material = new THREE.MeshLambertMaterial( { map: new THREE.Texture( texture ) } );
 
 			image = new Image();
 			image.onload = function () {
@@ -961,17 +961,17 @@ THREE.Loader.prototype = {
 					var w = nearest_pow2( this.width ),
 						h = nearest_pow2( this.height );
 
-					material.bitmap.width = w;
-					material.bitmap.height = h;
-					material.bitmap.getContext("2d").drawImage( this, 0, 0, w, h );
+					material.map.image.width = w;
+					material.map.image.height = h;
+					material.map.image.getContext("2d").drawImage( this, 0, 0, w, h );
 
 				} else {
 
-					material.bitmap = this;
+					material.map.image = this;
 
 				}
 
-				material.loaded = 1;
+				material.map.loaded = 1;
 
 			};
 
@@ -980,15 +980,15 @@ THREE.Loader.prototype = {
 		} else if ( m.col_diffuse ) {
 
 			color = (m.col_diffuse[0]*255 << 16) + (m.col_diffuse[1]*255 << 8) + m.col_diffuse[2]*255;
-			material = new THREE.MeshColorFillMaterial( color, m.transparency );
+			material = new THREE.MeshLambertMaterial( { color: color, opacity: m.transparency } );
 
 		} else if ( m.a_dbg_color ) {
 
-			material = new THREE.MeshColorFillMaterial( m.a_dbg_color );
+			material = new THREE.MeshLambertMaterial( { color: m.a_dbg_color } );
 
 		} else {
 
-			material = new THREE.MeshColorFillMaterial( 0xeeeeee );
+			material = new THREE.MeshLambertMaterial( { color: 0xeeeeee } );
 
 		}
 

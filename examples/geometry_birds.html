@@ -354,7 +354,7 @@
 					boid.setAvoidWalls( true );
 					boid.setWorldSize( 500, 500, 400 );
 
-					bird = birds[ i ] = new THREE.Mesh( new Bird(), new THREE.MeshColorFillMaterial( Math.random() * 0xffffff ) );
+					bird = birds[ i ] = new THREE.Mesh( new Bird(), new THREE.MeshBasicMaterial( { color:Math.random() * 0xffffff } ) );
 					bird.phase = Math.floor( Math.random() * 62.83 );
 					bird.position = boids[ i ].position;
 					bird.doubleSided = true;

@@ -137,7 +137,7 @@
 
 				// light representation
 				sphere = new Sphere( 100, 16, 8, 1 );
-				lightMesh = new THREE.Mesh( sphere, new THREE.MeshColorFillMaterial( 0xffaa00 ) );
+				lightMesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) );
 				lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
 				lightMesh.position = pointLight.position;
 				lightMesh.overdraw = true;
@@ -176,7 +176,6 @@
 				var s = (new Date).getTime();
 				
 				var loader = new THREE.Loader();
-				//loader.loadAsciiOld( "obj/lucy/Lucy100k.js", function() { createScene( new Lucy100k(), s ) } );
 				//loader.loadAscii( 'obj/lucy/Lucy100k_slim.js', function( geometry ) { createScene( geometry, s ) } );
 				loader.loadBinary( 'obj/lucy/Lucy100k_bin.js', function( geometry ) { createScene( geometry, s ) }, "obj/lucy" );
 
@@ -184,10 +183,10 @@
 			
 			function createScene( geometry, start ) {
 				
-				addMesh( geometry, 0.75, 900, 0, 0, 0,0,0, new THREE.MeshPhongMaterial( 0x030303, 0x030303, 0x990000, 30, 1.0 ) );
+				addMesh( geometry, 0.75, 900, 0, 0, 0,0,0, new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0x030303, specular: 0x990000, shininess: 30 } ) );
 				addMesh( geometry, 0.75, 300, 0, 0, 0,0,0, new THREE.MeshFaceMaterial( ) );
-				addMesh( geometry, 0.75, -300, 0, 0, 0,0,0, new THREE.MeshPhongMaterial( 0x030303, 0x111111, 0xffaa00, 10, 1.0 )  );
-				addMesh( geometry, 0.75, -900, 0, 0, 0,0,0, new THREE.MeshPhongMaterial( 0x030303, 0x555555, 0x666666, 10, 1.0 )  );
+				addMesh( geometry, 0.75, -300, 0, 0, 0,0,0, new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0x111111, specular: 0xffaa00, shininess: 10 } ) );
+				addMesh( geometry, 0.75, -900, 0, 0, 0,0,0, new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0x555555, specular: 0x666666, shininess: 10 } ) );
 				
 				log( "geometry.vertices: " + geometry.vertices.length );
 				log( "geometry.faces: " + geometry.faces.length );

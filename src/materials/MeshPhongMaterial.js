@@ -21,7 +21,7 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 
 	this.id = THREE.MeshPhongMaterialCounter.value ++;
 
-	this.color = new THREE.Color( 0xff0000 );
+	this.color = new THREE.Color( 0xeeeeee );
 	this.map = null;
 	this.ambient = new THREE.Color( 0x050505 );
 	this.specular = new THREE.Color( 0x111111 );
@@ -38,7 +38,7 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 		if ( parameters.color !== undefined ) this.color = new THREE.Color( parameters.color );
 		if ( parameters.map !== undefined ) this.map = parameters.map;
 		if ( parameters.ambient !== undefined ) this.ambient = new THREE.Color( parameters.ambient );
-		if ( parameters.specular !== undefined ) this.specular_color = new THREE.Color( parameters.specular );
+		if ( parameters.specular !== undefined ) this.specular = new THREE.Color( parameters.specular );
 		if ( parameters.specular_map !== undefined ) this.specular_map = parameters.specular_map;
 		if ( parameters.shininess !== undefined ) this.shininess = parameters.shininess;
 		if ( parameters.opacity !== undefined ) this.opacity = parameters.opacity;
