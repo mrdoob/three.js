@@ -722,7 +722,6 @@ THREE.CanvasRenderer = function () {
 		_context.moveTo( x0, y0 );
 		_context.lineTo( x1, y1 );
 		_context.lineTo( x2, y2 );
-		_context.lineTo( x0, y0 );
 		_context.closePath();
 
 		x1 -= x0;
