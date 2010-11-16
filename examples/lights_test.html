@@ -85,15 +85,15 @@
 		<script type="text/javascript" src="../src/renderers/renderables/RenderableParticle.js"></script>
 		<script type="text/javascript" src="../src/renderers/renderables/RenderableLine.js"></script>
 		-->
-		
-		<script type="text/javascript" src="geometry/primitives/Sphere.js"></script>
-		<script type="text/javascript" src="geometry/primitives/Plane.js"></script>
+
+		<script type="text/javascript" src="../src/extras/primitives/Sphere.js"></script>
+		<script type="text/javascript" src="../src/extras/primitives/Plane.js"></script>
 
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
 
-			var SCREEN_WIDTH = window.innerWidth/2;
+			var SCREEN_WIDTH = window.innerWidth / 2;
 			var SCREEN_HEIGHT = window.innerHeight;
 			var FLOOR = -250;
 
@@ -105,9 +105,9 @@
 			var canvasRenderer, webglRenderer;
 
 			var mesh, zmesh, lightMesh, geometry;
-			
+
 			var directionalLight, pointLight;
-			
+
 			var mouseX = 0;
 			var mouseY = 0;
 

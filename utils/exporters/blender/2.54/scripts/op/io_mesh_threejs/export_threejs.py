@@ -100,7 +100,7 @@ def save(operator, context, filepath="", use_modifiers=True, use_normals=True, u
     # incase
     color = uvcoord = uvcoord_key = normal = normal_key = None
 
-    file.write('// Generated with Blender 2.54 exporter\n')
+    file.write('// Generated with Blender exporter (compatible with Blender 2.54 / 2.55)\n')
     file.write('// http://github.com/mrdoob/three.js/tree/master/utils/exporters/blender\n\n')
 
     file.write('var %s = function () {\n\n' % classname)
