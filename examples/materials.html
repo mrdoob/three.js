@@ -1,0 +1,202 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>three.js - geometry - materials</title>
+		<meta charset="utf-8">
+		<style type="text/css">
+			body {
+				font-family: Monospace;
+				background-color: #202020;
+				margin: 0px;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+	<body>
+
+		<script type="text/javascript" src="../build/Three.js"></script>
+
+		<script type="text/javascript" src="../src/extras/primitives/Sphere.js"></script>
+		<script type="text/javascript" src="../src/extras/primitives/Plane.js"></script>
+
+		<script type="text/javascript" src="js/Stats.js"></script>
+
+		<script type="text/javascript">
+
+			var container, stats;
+
+			var camera, scene, renderer, objects;
+			var particleLight, pointLight;
+
+			init();
+			setInterval( loop, 1000 / 60 );
+
+			function init() {
+
+				container = document.createElement('div');
+				document.body.appendChild(container);
+
+				camera = new THREE.Camera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.y = 200;
+				camera.position.z = 800;
+
+				scene = new THREE.Scene();
+
+				// Grid
+
+				var geometry = new THREE.Geometry();
+				geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( - 500, 0, 0 ) ) );
+				geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( 500, 0, 0 ) ) );
+
+				for ( var i = 0; i <= 10; i ++ ) {
+
+					var line = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 0.2 } ) );
+					line.position.y = - 120;
+					line.position.z = ( i * 100 ) - 500;
+					scene.addObject( line );
+
+					var line = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 0.2 } ) );
+					line.position.x = ( i * 100 ) - 500;
+					line.position.y = - 120;
+					line.rotation.y = 90 * Math.PI / 180;
+					scene.addObject( line );
+
+				}
+
+				// Spheres
+
+				var geometry = new Sphere( 100, 16, 8 );
+
+				var materials = [];
+				materials.push( new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, blending: THREE.AdditiveBlending } ) );
+				materials.push( new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, wireframe: true } ) );  
+				materials.push( new THREE.MeshLambertMaterial( { color: 0xffffff } ) );
+				materials.push( new THREE.MeshDepthMaterial( { near: 1, far: 2000 } ) );
+				materials.push( new THREE.MeshNormalMaterial( ) );
+				materials.push( new THREE.MeshBasicMaterial( { map: new THREE.Texture( generateTexture() ) } ) );
+
+				objects = [];
+
+				for ( var i = 0, l = materials.length; i < l; i ++ ) {
+
+					var sphere = new THREE.Mesh( geometry, materials[ i ] );
+					sphere.overdraw = true;
+
+					sphere.position.x = ( i % 5 ) * 200 - 400;
+					sphere.position.z = Math.floor( i / 5 ) * 200 - 200;
+
+					sphere.rotation.x = Math.random() * 200 - 100;
+					sphere.rotation.y = Math.random() * 200 - 100;
+					sphere.rotation.z = Math.random() * 200 - 100;
+
+					objects.push( sphere );
+
+					scene.addObject( sphere );
+
+				}
+
+				particleLight = new THREE.Particle( new THREE.ParticleCircleMaterial( { color: 0xff0000 } ) );
+				particleLight.scale.x = particleLight.scale.y = particleLight.scale.z = 5;
+				scene.addObject( particleLight );
+
+				// Lights
+
+				scene.addLight( new THREE.AmbientLight( Math.random() * 0x202020 ) );
+
+				var directionalLight = new THREE.DirectionalLight( Math.random() * 0xffffff );
+				directionalLight.position.x = Math.random() - 0.5;
+				directionalLight.position.y = Math.random() - 0.5;
+				directionalLight.position.z = Math.random() - 0.5;
+				directionalLight.position.normalize();
+				scene.addLight( directionalLight );
+
+				pointLight = new THREE.PointLight( 0xff0000, 1 );
+				scene.addLight( pointLight );
+
+				renderer = new THREE.CanvasRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				container.appendChild( renderer.domElement );
+
+				var debugCanvas = document.createElement( 'canvas' );
+				debugCanvas.width = 512;
+				debugCanvas.height = 512;
+				debugCanvas.style.position = 'absolute';
+				debugCanvas.style.top = '0px';
+				debugCanvas.style.left = '0px';
+
+				container.appendChild( debugCanvas );
+
+				debugContext = debugCanvas.getContext( '2d' );
+				debugContext.setTransform( 1, 0, 0, 1, 256, 256 );
+				debugContext.strokeStyle = '#000000';
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild(stats.domElement);
+
+			}
+
+			function generateTexture() {
+
+				var canvas = document.createElement( 'canvas' );
+				canvas.width = 256;
+				canvas.height = 256;
+
+				var context = canvas.getContext( '2d' );
+				var image = context.getImageData( 0, 0, 256, 256 );
+
+				var x = 0, y = 0;
+
+				for ( var i = 0, j = 0, l = image.data.length; i < l; i += 4, j ++ ) {
+
+					x = j % 256;
+					y = x == 0 ? y + 1 : y;
+
+					image.data[ i + 2 ] = Math.floor( x ^ y );
+					image.data[ i + 3 ] = 255;
+
+				}
+
+				context.putImageData( image, 0, 0 );
+
+				return canvas;
+
+			}
+
+			//
+
+			function loop() {
+
+				var timer = new Date().getTime() * 0.0001;
+
+				camera.position.x = Math.cos( timer ) * 1000;
+				camera.position.z = Math.sin( timer ) * 1000;
+
+				for ( var i = 0, l = objects.length; i < l; i++ ) {
+
+					var object = objects[ i ];
+
+					object.rotation.x += 0.01;
+					object.rotation.y += 0.005;
+
+				}
+
+				particleLight.position.x = Math.sin( timer * 7 ) * 300;
+				particleLight.position.y = Math.cos( timer * 5 ) * 400;
+				particleLight.position.z = Math.cos( timer * 3 ) * 300;
+
+				pointLight.position.x = particleLight.position.x;
+				pointLight.position.y = particleLight.position.y;
+				pointLight.position.z = particleLight.position.z;
+
+				renderer.render( scene, camera );
+
+				stats.update();
+			}
+
+		</script>
+
+	</body>
+</html>

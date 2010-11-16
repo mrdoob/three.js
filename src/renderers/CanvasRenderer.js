@@ -873,16 +873,24 @@ THREE.CanvasRenderer = function () {
 
 	function setBlending( blending ) {
 
-		switch( blending ) {
+		switch ( blending ) {
 
-			case 0: // THREE.NormalBlending
-				_context.globalCompositeOperation = "source-over";
+			case THREE.NormalBlending:
+
+				_context.globalCompositeOperation = 'source-over';
+
 				break;
-			case 1: // THREE.AdditiveBlending
-				_context.globalCompositeOperation = "lighter";
+
+			case THREE.AdditiveBlending:
+
+				_context.globalCompositeOperation = 'lighter';
+
 				break;
-			case 2: // THREE.SubtractiveBlending
-				_context.globalCompositeOperation = "darker";
+
+			case THREE.SubtractiveBlending:
+
+				_context.globalCompositeOperation = 'darker';
+
 				break;
 
 		}

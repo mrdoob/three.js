@@ -17,7 +17,7 @@ THREE.ParticleCircleMaterial = function ( parameters ) {
 	if ( parameters ) {
 
 		if ( parameters.color !== undefined ) this.color.setHex( parameters.color );
-		if ( parameters.opacity !== undefined ) this.opacity  = parameters.opacity;
+		if ( parameters.opacity !== undefined ) this.opacity = parameters.opacity;
 		if ( parameters.blending !== undefined ) this.blending = parameters.blending;
 
 	}
