@@ -29,7 +29,7 @@ THREE.Color.prototype = {
 
 	setHex: function ( hex ) {
 
-		this.hex = ( ~~hex ).toString( 16 ).length < 8 ? 0xff << 24 ^ hex : hex;
+		this.hex = ( ( hex = ~~ hex ) & 0xffffff ) == hex ? 0xff << 24 ^ hex : hex;
 
 		if ( this.autoUpdate ) {
 
@@ -37,31 +37,6 @@ THREE.Color.prototype = {
 			this.updateStyleString();
 
 		}
-
-	},
-
-	copyRGB: function ( color ) {
-
-		this.r = color.r;
-		this.g = color.g;
-		this.b = color.b;
-
-	},
-
-	copyRGBA: function ( color ) {
-
-		this.r = color.r;
-		this.g = color.g;
-		this.b = color.b;
-		this.a = color.a;
-
-	},
-
-	multiplySelfRGB: function ( color ) {
-
-		this.r *= color.r;
-		this.g *= color.g;
-		this.b *= color.b;
 
 	},
 
