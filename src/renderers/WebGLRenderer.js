@@ -18,7 +18,7 @@ THREE.WebGLRenderer = function ( scene ) {
 	var _canvas = document.createElement( 'canvas' ), _gl, _program,
 	_modelViewMatrix = new THREE.Matrix4(), _normalMatrix,
 	
-	BASIC = 0, LAMBERT = 1, PHONG = 2, DEPTH = 3, // material constants used in shader
+	BASIC = 0, LAMBERT = 1, PHONG = 2, DEPTH = 3, NORMAL = 4, // material constants used in shader
 	
 	maxLightCount = allocateLights( scene, 5 );
 	
@@ -356,12 +356,23 @@ THREE.WebGLRenderer = function ( scene ) {
 		
 		}
 		
-		if ( material instanceof THREE.MeshDepthMaterial ) {
+		if ( material instanceof THREE.MeshNormalMaterial ) {
+			
+			mOpacity = material.opacity;
+			mBlending = material.blending;
+			
+			_gl.uniform1f( _program.mOpacity, mOpacity );
+			
+			_gl.uniform1i( _program.material, NORMAL );
+			
+		} else if ( material instanceof THREE.MeshDepthMaterial ) {
 			
 			mOpacity = material.opacity;
 			
 			mWireframe = material.wireframe;
 			mLineWidth = material.wireframe_linewidth;
+			
+			_gl.uniform1f( _program.mOpacity, mOpacity );
 			
 			_gl.uniform1f( _program.m2Near, material.__2near );
 			_gl.uniform1f( _program.mFarPlusNear, material.__farPlusNear );
@@ -641,7 +652,7 @@ THREE.WebGLRenderer = function ( scene ) {
 
 		_gl.frontFace( _gl.CCW );
 		_gl.cullFace( _gl.BACK );
-		_gl.enable( _gl.CULL_FACE );		
+		_gl.enable( _gl.CULL_FACE );
 		
 		_gl.enable( _gl.BLEND );
 		//_gl.blendFunc( _gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA );
@@ -662,12 +673,13 @@ THREE.WebGLRenderer = function ( scene ) {
 			maxDirLights   ? "#define MAX_DIR_LIGHTS " + maxDirLights     : "",
 			maxPointLights ? "#define MAX_POINT_LIGHTS " + maxPointLights : "",
 		
-			"uniform int material;", // 0 - Basic, 1 - Lambert, 2 - Phong, 3 - Depth
+			"uniform int material;", // 0 - Basic, 1 - Lambert, 2 - Phong, 3 - Depth, 4 - Normal
 
 			"uniform bool enableMap;",
 		
 			"uniform sampler2D tMap;",
 			"uniform vec4 mColor;",
+			"uniform float mOpacity;",
 
 			"uniform vec4 mAmbient;",
 			"uniform vec4 mSpecular;",
@@ -695,9 +707,6 @@ THREE.WebGLRenderer = function ( scene ) {
 			"void main() {",
 
 				"vec4 mapColor = vec4( 1.0, 1.0, 1.0, 1.0 );",
-				
-				// Blinn-Phong
-				// based on o3d example
 
 				"if ( enableMap ) {",
 				
@@ -705,7 +714,15 @@ THREE.WebGLRenderer = function ( scene ) {
 					
 				"}",
 
-				"if ( material == 3 ) { ",
+				// Normals
+				
+				"if ( material == 4 ) { ",
+				
+					"gl_FragColor = vec4( 0.5*normalize( vNormal ) + vec3(0.5, 0.5, 0.5), mOpacity );",
+				
+				// Depth
+				
+				"} else if ( material == 3 ) { ",
 					
 					// this breaks shader validation in Chrome 9.0.576.0 dev 
 					// and also latest continuous build Chromium 9.0.583.0 (66089)
@@ -713,7 +730,10 @@ THREE.WebGLRenderer = function ( scene ) {
 					//"float w = 1.0 - ( m2Near / ( mFarPlusNear - gl_FragCoord.z * mFarMinusNear ) );",
 					"float w = 0.5;",
 					
-					"gl_FragColor = vec4( w, w, w, 1.0 );",
+					"gl_FragColor = vec4( w, w, w, mOpacity );",
+				
+				// Blinn-Phong
+				// based on o3d example
 				
 				"} else if ( material == 2 ) { ", 
 
@@ -963,6 +983,7 @@ THREE.WebGLRenderer = function ( scene ) {
 		// material properties (Basic / Lambert / Blinn-Phong shader)
 		
 		_program.mColor = _gl.getUniformLocation( _program, 'mColor' );
+		_program.mOpacity = _gl.getUniformLocation( _program, 'mOpacity' );
 
 		// material properties (Blinn-Phong shader)
 		
