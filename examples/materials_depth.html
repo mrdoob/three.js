@@ -16,7 +16,7 @@
 
 		<script type="text/javascript" src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="../src/extras/primitives/Sphere.js"></script>
+		<script type="text/javascript" src="../src/extras/primitives/Cube.js"></script>
 		<script type="text/javascript" src="../src/extras/primitives/Plane.js"></script>
 
 		<script type="text/javascript" src="js/Stats.js"></script>
@@ -77,12 +77,13 @@
 
 				plane = new THREE.Mesh( new Plane( 1000, 1000, 10, 10 ), material );
 				plane.rotation.x = - 90 * ( Math.PI / 180 );
+				plane.position.y = - 100;
 				plane.doubleSided = true;
 				scene.addObject( plane );
 
 				// Spheres
 
-				geometry = new Sphere( 100, 8, 4 );
+				geometry = new Cube( 100, 100, 100 );
 				//material = new THREE.MeshLambertMaterial( { color: 0xffffff } );
 				material = new THREE.MeshDepthMaterial( { near: 1, far: 2000 } );
 
@@ -128,7 +129,7 @@
 				scene.addLight( pointLight );
 
 				renderer = new THREE.CanvasRenderer();
-				//renderer = new THREE.WebGLRenderer();
+				// renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.appendChild( renderer.domElement );
@@ -239,7 +240,7 @@
 
 					object.rotation.x += 0.01;
 					object.rotation.y += 0.005;
-					object.position.y = Math.sin( object.rotation.x ) * 200;
+					object.position.y = Math.sin( object.rotation.x ) * 200 + 200;
 
 					debugContext.rect( object.position.x * 0.1 - 5, object.position.z * 0.1 - 5, 10, 10 );
 

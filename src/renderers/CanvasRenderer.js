@@ -23,6 +23,9 @@ THREE.CanvasRenderer = function () {
 	_v1x, _v1y, _v2x, _v2y, _v3x, _v3y,
 	_v4x, _v4y, _v5x, _v5y, _v6x, _v6y,
 
+	_color1, _color2, _color3, _color4,
+	_2near, _farPlusNear, _farMinusNear,
+
 	_bitmap, _bitmapWidth, _bitmapHeight,
 
 	_clipRect = new THREE.Rectangle(),
@@ -38,18 +41,27 @@ THREE.CanvasRenderer = function () {
 	_vector3 = new THREE.Vector3(), // Needed for PointLight
 	_uv1 = new THREE.UV(), _uv2 = new THREE.UV(), _uv3 = new THREE.UV(), _uv4 = new THREE.UV(),
 
-	_depthMap = document.createElement( 'canvas' ),
-	_depthMapContext = _depthMap.getContext( '2d' ),
-	_depthMapGradient = _depthMapContext.createLinearGradient( 0, 0, 255, 0);
+	_pixelMap, _pixelMapContext, _pixelMapImage, _pixelMapData,
+	_gradientMap, _gradientMapContext, _gradientMapQuality = 32;
 
-	_depthMap.width = 255;
-	_depthMap.height = 4;
+	_pixelMap = document.createElement( 'canvas' );
+	_pixelMap.width = _pixelMap.height = 2;
 
-	_depthMapGradient.addColorStop( 0, "white" );
-	_depthMapGradient.addColorStop( 1, "black" );
+	_pixelMapContext = _pixelMap.getContext( '2d' );
+	_pixelMapContext.fillStyle = 'rgba(0,0,0,1)';
+	_pixelMapContext.fillRect( 0, 0, 2, 2 );
 
-	_depthMapContext.fillStyle = _depthMapGradient;
-	_depthMapContext.fillRect( 0, 0, 255, 4 );
+	_pixelMapImage = _pixelMapContext.getImageData( 0, 0, 2, 2 );
+	_pixelMapData = _pixelMapImage.data;
+
+	_gradientMap = document.createElement( 'canvas' );
+	_gradientMap.width = _gradientMap.height = _gradientMapQuality;
+
+	_gradientMapContext = _gradientMap.getContext( '2d' );
+	_gradientMapContext.translate( - _gradientMapQuality / 2, - _gradientMapQuality / 2 );
+	_gradientMapContext.scale( _gradientMapQuality, _gradientMapQuality );
+
+	_gradientMapQuality --; // Fix UVs
 
 	this.domElement = _canvas;
 	this.autoClear = true;
@@ -292,26 +304,6 @@ THREE.CanvasRenderer = function () {
 		_context.setTransform( 1, 0, 0, 1, 0, 0 );
 
 	};
-
-	function setBlending( blending ) {
-
-		switch( blending ) {
-
-			case 0: // THREE.NormalBlending
-				_context.globalCompositeOperation = "source-over";
-				break;
-			case 1: // THREE.AdditiveBlending
-				_context.globalCompositeOperation = "lighter";
-				break;
-			case 2: // THREE.SubtractiveBlending
-				_context.globalCompositeOperation = "darker";
-				break;
-
-		}
-
-		_contextGlobalCompositeOperation = blending;
-
-	}
 
 	function calculateAmbientLight( scene, color ) {
 
@@ -627,13 +619,20 @@ THREE.CanvasRenderer = function () {
 			_color.setRGBA( _w, _w, _w, 1 );
 			*/
 
-			_bitmap = _depthMap;
+			_2near = material.__2near;
+			_farPlusNear = material.__farPlusNear;
+			_farMinusNear = material.__farMinusNear;
 
-			_uv1.u = ( material.__2near / (material.__farPlusNear - v1.positionScreen.z * material.__farMinusNear ) ) * 255;
-			_uv2.u = ( material.__2near / (material.__farPlusNear - v2.positionScreen.z * material.__farMinusNear ) ) * 255;
-			_uv3.u = ( material.__2near / (material.__farPlusNear - v3.positionScreen.z * material.__farMinusNear ) ) * 255;
+			_color1 = ~~ ( ( 1 - ( _2near / ( _farPlusNear - v1.positionScreen.z * _farMinusNear ) ) ) * 255 );
+			_color2 = ~~ ( ( 1 - ( _2near / ( _farPlusNear - v2.positionScreen.z * _farMinusNear ) ) ) * 255 );
+			_color3 = ~~ ( ( 1 - ( _2near / ( _farPlusNear - v3.positionScreen.z * _farMinusNear ) ) ) * 255 );
+			// _color4 = ~~ ( ( _color2 + _color3 ) * 0.5 );
 
-			_uv1.v = 0; _uv2.v = 1; _uv3.v = 2;
+			_bitmap = getGradientTexture( [ _color1, _color1, _color1 ], [ _color2, _color2, _color2 ], [ _color3, _color3, _color3 ], [ _color3, _color3, _color3 ] );
+
+			_uv1.u = 0; _uv1.v = 0; 
+			_uv2.u = _gradientMapQuality; _uv2.v = 0;
+			_uv3.u = 0; _uv3.v = _gradientMapQuality;
 
 			drawTexturedTriangle( _bitmap, _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _uv1.u, _uv1.v, _uv2.u, _uv2.v, _uv3.u, _uv3.v );
 
@@ -723,14 +722,21 @@ THREE.CanvasRenderer = function () {
 			_color.setRGBA( _w, _w, _w, 1 );
 			*/
 
-			_bitmap = _depthMap;
+			_2near = material.__2near;
+			_farPlusNear = material.__farPlusNear;
+			_farMinusNear = material.__farMinusNear;
 
-			_uv1.u = ( material.__2near / (material.__farPlusNear - v1.positionScreen.z * material.__farMinusNear ) ) * 255;
-			_uv2.u = ( material.__2near / (material.__farPlusNear - v2.positionScreen.z * material.__farMinusNear ) ) * 255;
-			_uv3.u = ( material.__2near / (material.__farPlusNear - v3.positionScreen.z * material.__farMinusNear ) ) * 255;
-			_uv4.u = ( material.__2near / (material.__farPlusNear - v4.positionScreen.z * material.__farMinusNear ) ) * 255;
+			_color1 = ~~ ( ( 1 - ( _2near / ( _farPlusNear - v1.positionScreen.z * _farMinusNear ) ) ) * 255 );
+			_color2 = ~~ ( ( 1 - ( _2near / ( _farPlusNear - v2.positionScreen.z * _farMinusNear ) ) ) * 255 );
+			_color3 = ~~ ( ( 1 - ( _2near / ( _farPlusNear - v3.positionScreen.z * _farMinusNear ) ) ) * 255 );
+			_color4 = ~~ ( ( 1 - ( _2near / ( _farPlusNear - v4.positionScreen.z * _farMinusNear ) ) ) * 255 );
 
-			_uv1.v = 0; _uv2.v = 1; _uv3.v = 2; _uv4.v = 3;
+			_bitmap = getGradientTexture( [ _color1, _color1, _color1 ], [ _color2, _color2, _color2 ], [ _color4, _color4, _color4 ], [ _color3, _color3, _color3 ] );
+
+			_uv1.u = 0; _uv1.v = 0; 
+			_uv2.u = _gradientMapQuality; _uv2.v = 0;
+			_uv3.u = _gradientMapQuality; _uv3.v = _gradientMapQuality;
+			_uv4.u = 0; _uv4.v = _gradientMapQuality;
 
 			drawTexturedTriangle( _bitmap, _v1x, _v1y, _v2x, _v2y, _v4x, _v4y, _uv1.u, _uv1.v, _uv2.u, _uv2.v, _uv4.u, _uv4.v );
 			drawTexturedTriangle( _bitmap, _v5x, _v5y, _v3x, _v3y, _v6x, _v6y, _uv2.u, _uv2.v, _uv3.u, _uv3.v, _uv4.u, _uv4.v );
@@ -857,6 +863,51 @@ THREE.CanvasRenderer = function () {
 		_context.clip();
 		_context.drawImage( bitmap, 0, 0 );
 		_context.restore();
+
+	}
+
+	function setBlending( blending ) {
+
+		switch( blending ) {
+
+			case 0: // THREE.NormalBlending
+				_context.globalCompositeOperation = "source-over";
+				break;
+			case 1: // THREE.AdditiveBlending
+				_context.globalCompositeOperation = "lighter";
+				break;
+			case 2: // THREE.SubtractiveBlending
+				_context.globalCompositeOperation = "darker";
+				break;
+
+		}
+
+		_contextGlobalCompositeOperation = blending;
+
+	}
+
+	function getGradientTexture( c1, c2, c3, c4 ) {
+
+		_pixelMapData[ 0 ] = c1[ 0 ];
+		_pixelMapData[ 1 ] = c1[ 1 ];
+		_pixelMapData[ 2 ] = c1[ 2 ];
+
+		_pixelMapData[ 4 ] = c2[ 0 ];
+		_pixelMapData[ 5 ] = c2[ 1 ];
+		_pixelMapData[ 6 ] = c2[ 2 ];
+
+		_pixelMapData[ 8 ] = c3[ 0 ];
+		_pixelMapData[ 9 ] = c3[ 1 ];
+		_pixelMapData[ 10 ] = c3[ 2 ];
+
+		_pixelMapData[ 12 ] = c4[ 0 ];
+		_pixelMapData[ 13 ] = c4[ 1 ];
+		_pixelMapData[ 14 ] = c4[ 2 ];
+
+		_pixelMapContext.putImageData( _pixelMapImage, 0, 0 );
+		_gradientMapContext.drawImage( _pixelMap, 0, 0 );
+
+		return _gradientMap;
 
 	}
 
