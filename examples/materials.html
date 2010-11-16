@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - geometry - materials</title>
+		<title>three.js - materials</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -65,22 +65,24 @@
 
 				// Spheres
 
-				var geometry = new Sphere( 100, 16, 8 );
+				var geometry = new Sphere( 100, 14, 8 );
 
 				var materials = [];
-				materials.push( new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, blending: THREE.AdditiveBlending } ) );
-				materials.push( new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, wireframe: true } ) );  
-				materials.push( new THREE.MeshLambertMaterial( { color: 0xffffff } ) );
-				materials.push( new THREE.MeshDepthMaterial( { near: 1, far: 2000 } ) );
-				materials.push( new THREE.MeshNormalMaterial( ) );
-				materials.push( new THREE.MeshBasicMaterial( { map: new THREE.Texture( generateTexture() ) } ) );
+				materials.push( { material: new THREE.MeshBasicMaterial( { color: 0x00ffff, wireframe: true } ), overdraw: false, doubleSided: true } );
+				materials.push( { material: new THREE.MeshBasicMaterial( { color: 0xff0000, blending: THREE.AdditiveBlending } ), overdraw: false, doubleSided: true } );
+				materials.push( { material: new THREE.MeshLambertMaterial( { color: 0xffffff } ), overdraw: true, doubleSided: false } );
+				materials.push( { material: new THREE.MeshPhongMaterial( { ambient: 0x030383, color: 0xf55555, specular: 0x66f6f6, shininess: 10 } ), overdraw: true, doubleSided: false } );
+				materials.push( { material: new THREE.MeshDepthMaterial( { near: 1, far: 2000 } ), overdraw: true, doubleSided: false } );
+				materials.push( { material: new THREE.MeshNormalMaterial(), overdraw: true, doubleSided: false } );
+				materials.push( { material: new THREE.MeshBasicMaterial( { map: new THREE.Texture( generateTexture() ) } ), overdraw: true, doubleSided: false } );
 
 				objects = [];
 
 				for ( var i = 0, l = materials.length; i < l; i ++ ) {
 
-					var sphere = new THREE.Mesh( geometry, materials[ i ] );
-					sphere.overdraw = true;
+					var sphere = new THREE.Mesh( geometry, materials[ i ].material );
+					sphere.overdraw = materials[ i ].overdraw;
+					sphere.doubleSided = materials[ i ].doubleSided;
 
 					sphere.position.x = ( i % 5 ) * 200 - 400;
 					sphere.position.z = Math.floor( i / 5 ) * 200 - 200;
@@ -95,8 +97,8 @@
 
 				}
 
-				particleLight = new THREE.Particle( new THREE.ParticleCircleMaterial( { color: 0xff0000 } ) );
-				particleLight.scale.x = particleLight.scale.y = particleLight.scale.z = 5;
+				particleLight = new THREE.Particle( new THREE.ParticleCircleMaterial( { color: 0xffffff } ) );
+				particleLight.scale.x = particleLight.scale.y = particleLight.scale.z = 4;
 				scene.addObject( particleLight );
 
 				// Lights
@@ -110,7 +112,7 @@
 				directionalLight.position.normalize();
 				scene.addLight( directionalLight );
 
-				pointLight = new THREE.PointLight( 0xff0000, 1 );
+				pointLight = new THREE.PointLight( 0xffffff, 1 );
 				scene.addLight( pointLight );
 
 				renderer = new THREE.CanvasRenderer();
