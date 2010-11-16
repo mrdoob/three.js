@@ -185,7 +185,7 @@ THREE.WebGLRenderer = function ( scene ) {
 
 	this.createBuffers = function ( object, mf ) {
 
-		var f, fl, fi, face, vertexNormals, normal, uv, v1, v2, v3, v4,
+		var f, fl, fi, face, vertexNormals, normal, uv, v1, v2, v3, v4, m, ml, i, l,
 
 		materialFaceGroup = object.materialFaceGroup[ mf ],
 
@@ -196,8 +196,52 @@ THREE.WebGLRenderer = function ( scene ) {
 		normalArray = [],
 		uvArray = [],
 
-		vertexIndex = 0;
+		vertexIndex = 0,
 
+		useSmoothNormals = false;
+		
+		// need to find out if there is any material in the object
+		// (among all mesh materials and also face materials)
+		// which would need smooth normals
+		
+		function needsSmoothNormals( material ) {
+			
+			return material.shading != undefined && ( material.shading == THREE.GouraudShading || material.shading == THREE.PhongShading );
+			
+		}
+		
+		for ( m = 0, ml = object.material.length; m < ml; m++ ) {
+
+			meshMaterial = object.material[ m ];
+
+			if ( meshMaterial instanceof THREE.MeshFaceMaterial ) {
+
+				for ( i = 0, l = materialFaceGroup.material.length; i < l; i++ ) {
+					
+					if ( needsSmoothNormals( materialFaceGroup.material[ i ] ) ) {
+						
+						useSmoothNormals = true;
+						break;
+						
+					}
+
+				}
+
+			} else {
+
+				if ( needsSmoothNormals( meshMaterial ) ) {
+					
+					useSmoothNormals = true;
+					break;
+					
+				}
+
+			}
+			
+			if ( useSmoothNormals ) break;
+
+		}
+		
 		for ( f = 0, fl = materialFaceGroup.faces.length; f < fl; f++ ) {
 
 			fi = materialFaceGroup.faces[f];
@@ -217,7 +261,7 @@ THREE.WebGLRenderer = function ( scene ) {
 				vertexArray.push( v2.x, v2.y, v2.z );
 				vertexArray.push( v3.x, v3.y, v3.z );
 
-				if ( vertexNormals.length == 3 ) {
+				if ( vertexNormals.length == 3 && useSmoothNormals ) {
 
 					normalArray.push( vertexNormals[0].x, vertexNormals[0].y, vertexNormals[0].z );
 					normalArray.push( vertexNormals[1].x, vertexNormals[1].y, vertexNormals[1].z );
@@ -261,7 +305,7 @@ THREE.WebGLRenderer = function ( scene ) {
 				vertexArray.push( v3.x, v3.y, v3.z );
 				vertexArray.push( v4.x, v4.y, v4.z );
 
-				if ( vertexNormals.length == 4 ) {
+				if ( vertexNormals.length == 4 && useSmoothNormals ) {
 
 					normalArray.push( vertexNormals[0].x, vertexNormals[0].y, vertexNormals[0].z );
 					normalArray.push( vertexNormals[1].x, vertexNormals[1].y, vertexNormals[1].z );
@@ -298,6 +342,7 @@ THREE.WebGLRenderer = function ( scene ) {
 				lineArray.push( vertexIndex + 2, vertexIndex + 3 );
 
 				vertexIndex += 4;
+				
 			}
 		}
 

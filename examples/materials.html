@@ -65,16 +65,19 @@
 
 				// Spheres
 
-				var geometry = new Sphere( 100, 14, 8 );
+				var geometry = new Sphere( 100, 14, 8, true );
 
+				var generatedTexture = new THREE.Texture( generateTexture() );
+				generatedTexture.loaded = 1;
+				
 				var materials = [];
 				materials.push( { material: new THREE.MeshBasicMaterial( { color: 0x00ffff, wireframe: true } ), overdraw: false, doubleSided: true } );
 				materials.push( { material: new THREE.MeshBasicMaterial( { color: 0xff0000, blending: THREE.AdditiveBlending } ), overdraw: false, doubleSided: true } );
 				materials.push( { material: new THREE.MeshLambertMaterial( { color: 0xffffff } ), overdraw: true, doubleSided: false } );
 				materials.push( { material: new THREE.MeshPhongMaterial( { ambient: 0x030383, color: 0xf55555, specular: 0x66f6f6, shininess: 10 } ), overdraw: true, doubleSided: false } );
 				materials.push( { material: new THREE.MeshDepthMaterial( { near: 1, far: 2000 } ), overdraw: true, doubleSided: false } );
-				materials.push( { material: new THREE.MeshNormalMaterial(), overdraw: true, doubleSided: false } );
-				materials.push( { material: new THREE.MeshBasicMaterial( { map: new THREE.Texture( generateTexture() ) } ), overdraw: true, doubleSided: false } );
+				materials.push( { material: new THREE.MeshNormalMaterial( ), overdraw: true, doubleSided: false } );
+				materials.push( { material: new THREE.MeshBasicMaterial( { map: generatedTexture } ), overdraw: true, doubleSided: false } );
 
 				objects = [];
 
@@ -97,8 +100,9 @@
 
 				}
 
-				particleLight = new THREE.Particle( new THREE.ParticleCircleMaterial( { color: 0xffffff } ) );
-				particleLight.scale.x = particleLight.scale.y = particleLight.scale.z = 4;
+				//particleLight = new THREE.Particle( new THREE.ParticleCircleMaterial( { color: 0xffffff } ) );
+				//particleLight.scale.x = particleLight.scale.y = particleLight.scale.z = 4;
+				particleLight = new THREE.Mesh( new Sphere( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
 				scene.addObject( particleLight );
 
 				// Lights
@@ -116,6 +120,7 @@
 				scene.addLight( pointLight );
 
 				renderer = new THREE.CanvasRenderer();
+				//renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.appendChild( renderer.domElement );
