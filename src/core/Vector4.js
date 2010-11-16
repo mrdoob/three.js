@@ -79,6 +79,28 @@ THREE.Vector4.prototype = {
 		return this;
 
 	},
+	
+	multiplyScalar: function ( s ) {
+
+		this.x *= s;
+		this.y *= s;
+		this.z *= s;
+		this.w *= s;
+
+		return this;
+
+	},
+
+	divideScalar: function ( s ) {
+
+		this.x /= s;
+		this.y /= s;
+		this.z /= s;
+		this.w /= s;
+
+		return this;
+
+	},
 
 	clone: function () {
 
