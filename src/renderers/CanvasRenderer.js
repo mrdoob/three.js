@@ -20,6 +20,11 @@ THREE.CanvasRenderer = function () {
 	_v1, _v2, _v3, _v4,
 	_v5 = new THREE.Vertex(), _v6 = new THREE.Vertex(), // Needed for latter splitting tris to quads
 
+	_v1x, _v1y, _v2x, _v2y, _v3x, _v3y,
+	_v4x, _v4y, _v5x, _v5y, _v6x, _v6y,
+
+	_bitmap, _bitmapWidth, _bitmapHeight,
+
 	_clipRect = new THREE.Rectangle(),
 	_clearRect = new THREE.Rectangle(),
 	_bboxRect = new THREE.Rectangle(),
@@ -528,12 +533,12 @@ THREE.CanvasRenderer = function () {
 
 		}
 
-		if ( material instanceof THREE.LineBasicMaterial ) {
+		_context.beginPath();
+		_context.moveTo( v1.positionScreen.x, v1.positionScreen.y );
+		_context.lineTo( v2.positionScreen.x, v2.positionScreen.y );
+		_context.closePath();
 
-			_context.beginPath();
-			_context.moveTo( v1.positionScreen.x, v1.positionScreen.y );
-			_context.lineTo( v2.positionScreen.x, v2.positionScreen.y );
-			_context.closePath();
+		if ( material instanceof THREE.LineBasicMaterial ) {
 
 			_color.__styleString = material.color.__styleString;
 
@@ -550,7 +555,6 @@ THREE.CanvasRenderer = function () {
 			}
 
 			_context.stroke();
-
 			_bboxRect.inflate( material.linewidth * 2 );
 
 		}
@@ -559,7 +563,9 @@ THREE.CanvasRenderer = function () {
 
 	function renderFace3( v1, v2, v3, element, material, scene ) {
 
-		var bitmap, bitmapWidth, bitmapHeight;
+		_v1x = v1.positionScreen.x; _v1y = v1.positionScreen.y;
+		_v2x = v2.positionScreen.x; _v2y = v2.positionScreen.y;
+		_v3x = v3.positionScreen.x; _v3y = v3.positionScreen.y;
 
 		if ( material.opacity != _contextGlobalAlpha ) {
 
@@ -575,46 +581,25 @@ THREE.CanvasRenderer = function () {
 
 		if ( material.map ) {
 
-			bitmap = material.map.image;
-			bitmapWidth = bitmap.width - 1;
-			bitmapHeight = bitmap.height - 1;
+			_bitmap = material.map.image;
+			_bitmapWidth = _bitmap.width - 1;
+			_bitmapHeight = _bitmap.height - 1;
 
-			_uv1.u = element.uvs[ 0 ].u * bitmapWidth; _uv1.v = element.uvs[ 0 ].v * bitmapHeight;
-			_uv2.u = element.uvs[ 1 ].u * bitmapWidth; _uv2.v = element.uvs[ 1 ].v * bitmapHeight;
-			_uv3.u = element.uvs[ 2 ].u * bitmapWidth; _uv3.v = element.uvs[ 2 ].v * bitmapHeight;
+			_uv1.u = element.uvs[ 0 ].u * _bitmapWidth; _uv1.v = element.uvs[ 0 ].v * _bitmapHeight;
+			_uv2.u = element.uvs[ 1 ].u * _bitmapWidth; _uv2.v = element.uvs[ 1 ].v * _bitmapHeight;
+			_uv3.u = element.uvs[ 2 ].u * _bitmapWidth; _uv3.v = element.uvs[ 2 ].v * _bitmapHeight;
 
-			drawTexturedTriangle( bitmap, v1.positionScreen.x, v1.positionScreen.y, v2.positionScreen.x, v2.positionScreen.y, v3.positionScreen.x, v3.positionScreen.y, _uv1.u, _uv1.v, _uv2.u, _uv2.v, _uv3.u, _uv3.v );
-
-			return;
-
-		}
-
-		if ( material instanceof THREE.MeshDepthMaterial ) {
-
-			bitmap = _depthMap;
-
-			_uv1.u = ( material.__2near / (material.__farPlusNear - v1.positionScreen.z * material.__farMinusNear ) ) * 255;
-			_uv2.u = ( material.__2near / (material.__farPlusNear - v2.positionScreen.z * material.__farMinusNear ) ) * 255;
-			_uv3.u = ( material.__2near / (material.__farPlusNear - v3.positionScreen.z * material.__farMinusNear ) ) * 255;
-
-			_uv1.v = 0; _uv2.v = 1; _uv3.v = 2;
-
-			drawTexturedTriangle( bitmap, v1.positionScreen.x, v1.positionScreen.y, v2.positionScreen.x, v2.positionScreen.y, v3.positionScreen.x, v3.positionScreen.y, _uv1.u, _uv1.v, _uv2.u, _uv2.v, _uv3.u, _uv3.v );
+			drawTexturedTriangle( _bitmap, _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _uv1.u, _uv1.v, _uv2.u, _uv2.v, _uv3.u, _uv3.v );
 
 			return;
 
 		}
-
-		_context.beginPath();
-		_context.moveTo( v1.positionScreen.x, v1.positionScreen.y );
-		_context.lineTo( v2.positionScreen.x, v2.positionScreen.y );
-		_context.lineTo( v3.positionScreen.x, v3.positionScreen.y );
-		_context.lineTo( v1.positionScreen.x, v1.positionScreen.y );
-		_context.closePath();
 
 		if ( material instanceof THREE.MeshBasicMaterial ) {
 
 			_color.__styleString = material.color.__styleString;
+
+			drawTriangle( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _color, material.wireframe, material.wireframe_linewidth );
 
 		} else if ( material instanceof THREE.MeshLambertMaterial ) {
 
@@ -633,41 +618,164 @@ THREE.CanvasRenderer = function () {
 
 			}
 
-		}/* else if ( material instanceof THREE.MeshDepthMaterial ) {
+			drawTriangle( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _color, material.wireframe, material.wireframe_linewidth );
 
+		} else if ( material instanceof THREE.MeshDepthMaterial ) {
+
+			/*
 			_w = 1 - ( material.__2near / (material.__farPlusNear - element.z * material.__farMinusNear ) );
 			_color.setRGBA( _w, _w, _w, 1 );
+			*/
 
+			_bitmap = _depthMap;
 
-		}*/ else if ( material instanceof THREE.MeshNormalMaterial ) {
+			_uv1.u = ( material.__2near / (material.__farPlusNear - v1.positionScreen.z * material.__farMinusNear ) ) * 255;
+			_uv2.u = ( material.__2near / (material.__farPlusNear - v2.positionScreen.z * material.__farMinusNear ) ) * 255;
+			_uv3.u = ( material.__2near / (material.__farPlusNear - v3.positionScreen.z * material.__farMinusNear ) ) * 255;
+
+			_uv1.v = 0; _uv2.v = 1; _uv3.v = 2;
+
+			drawTexturedTriangle( _bitmap, _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _uv1.u, _uv1.v, _uv2.u, _uv2.v, _uv3.u, _uv3.v );
+
+		} else if ( material instanceof THREE.MeshNormalMaterial ) {
 
 			_color.setRGBA( normalToComponent( element.normalWorld.x ), normalToComponent( element.normalWorld.y ), normalToComponent( element.normalWorld.z ), 1 );
 
+			drawTriangle( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _color, material.wireframe, material.wireframe_linewidth );
+
 		}
 
-		if ( material.wireframe ) {
+	}
 
-			if ( _contextLineWidth != material.wireframe_linewidth ) {
+	function renderFace4( v1, v2, v3, v4, v5, v6, element, material, scene ) {
 
-				_context.lineWidth = _contextLineWidth = material.wireframe_linewidth;
+		_v1x = v1.positionScreen.x; _v1y = v1.positionScreen.y;
+		_v2x = v2.positionScreen.x; _v2y = v2.positionScreen.y;
+		_v3x = v3.positionScreen.x; _v3y = v3.positionScreen.y;
+		_v4x = v4.positionScreen.x; _v4y = v4.positionScreen.y;
+		_v5x = v5.positionScreen.x; _v5y = v5.positionScreen.y;
+		_v6x = v6.positionScreen.x; _v6y = v6.positionScreen.y;
+
+		if ( material.opacity != _contextGlobalAlpha ) {
+
+			_context.globalAlpha = _contextGlobalAlpha = material.opacity;
+
+		}
+
+		if ( material.blending != _contextGlobalCompositeOperation ) {
+
+			setBlending( material.blending );
+
+		}
+
+		if ( material.map ) {
+
+			_bitmap = material.map.image;
+			_bitmapWidth = _bitmap.width - 1;
+			_bitmapHeight = _bitmap.height - 1;
+
+			_uv1.copy( element.uvs[ 0 ] );
+			_uv2.copy( element.uvs[ 1 ] );
+			_uv3.copy( element.uvs[ 2 ] );
+			_uv4.copy( element.uvs[ 3 ] );
+
+			_uv1.u *= _bitmapWidth; _uv1.v *= _bitmapHeight;
+			_uv2.u *= _bitmapWidth; _uv2.v *= _bitmapHeight;
+			_uv3.u *= _bitmapWidth; _uv3.v *= _bitmapHeight;
+			_uv4.u *= _bitmapWidth; _uv4.v *= _bitmapHeight;
+
+			drawTexturedTriangle( _bitmap, _v1x, _v1y, _v2x, _v2y, _v4x, _v4y, _uv1.u, _uv1.v, _uv2.u, _uv2.v, _uv4.u, _uv4.v );
+			drawTexturedTriangle( _bitmap, _v5x, _v5y, _v3x, _v3y, _v6x, _v6y, _uv2.u, _uv2.v, _uv3.u, _uv3.v, _uv4.u, _uv4.v );
+
+			return;
+
+		}
+
+		if ( material instanceof THREE.MeshBasicMaterial ) {
+
+			_color.__styleString = material.color.__styleString;
+
+			drawQuad( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _v4x, _v4y, _color, material.wireframe, material.wireframe_linewidth );
+
+		} else if ( material instanceof THREE.MeshLambertMaterial ) {
+
+			if ( _enableLighting ) {
+
+				_light.copyRGB( _ambientLight );
+				calculateFaceLight( scene, element, _light );
+
+				_color.copyRGBA( material.color );
+				_color.multiplySelfRGB( _light );
+				_color.updateStyleString();
+
+			} else {
+
+				_color.__styleString = material.color.__styleString;
 
 			}
 
-			if ( _contextStrokeStyle != _color.__styleString ) {
+			drawQuad( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _v4x, _v4y, _color, material.wireframe, material.wireframe_linewidth );
 
-				_context.strokeStyle = _contextStrokeStyle  = _color.__styleString;
+		} else if ( material instanceof THREE.MeshDepthMaterial ) {
+
+			/*
+			_w = 1 - ( material.__2near / (material.__farPlusNear - element.z * material.__farMinusNear ) );
+			_color.setRGBA( _w, _w, _w, 1 );
+			*/
+
+			_bitmap = _depthMap;
+
+			_uv1.u = ( material.__2near / (material.__farPlusNear - v1.positionScreen.z * material.__farMinusNear ) ) * 255;
+			_uv2.u = ( material.__2near / (material.__farPlusNear - v2.positionScreen.z * material.__farMinusNear ) ) * 255;
+			_uv3.u = ( material.__2near / (material.__farPlusNear - v3.positionScreen.z * material.__farMinusNear ) ) * 255;
+			_uv4.u = ( material.__2near / (material.__farPlusNear - v4.positionScreen.z * material.__farMinusNear ) ) * 255;
+
+			_uv1.v = 0; _uv2.v = 1; _uv3.v = 2; _uv4.v = 3;
+
+			drawTexturedTriangle( _bitmap, _v1x, _v1y, _v2x, _v2y, _v4x, _v4y, _uv1.u, _uv1.v, _uv2.u, _uv2.v, _uv4.u, _uv4.v );
+			drawTexturedTriangle( _bitmap, _v5x, _v5y, _v3x, _v3y, _v6x, _v6y, _uv2.u, _uv2.v, _uv3.u, _uv3.v, _uv4.u, _uv4.v );
+
+		} else if ( material instanceof THREE.MeshNormalMaterial ) {
+
+			_color.setRGBA( normalToComponent( element.normalWorld.x ), normalToComponent( element.normalWorld.y ), normalToComponent( element.normalWorld.z ), 1 );
+
+			drawQuad( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _v4x, _v4y, _color, material.wireframe, material.wireframe_linewidth );
+
+		}
+
+	}
+
+	function drawTriangle( x0, y0, x1, y1, x2, y2, color, wireframe, wireframe_linewidth ) {
+
+		_context.beginPath();
+		_context.moveTo( x0, y0 );
+		_context.lineTo( x1, y1 );
+		_context.lineTo( x2, y2 );
+		_context.lineTo( x0, y0 );
+		_context.closePath();
+
+		if ( wireframe ) {
+
+			if ( _contextLineWidth != wireframe_linewidth ) {
+
+				_context.lineWidth = _contextLineWidth = wireframe_linewidth;
+
+			}
+
+			if ( _contextStrokeStyle != color.__styleString ) {
+
+				_context.strokeStyle = _contextStrokeStyle  = color.__styleString;
 
 			}
 
 			_context.stroke();
-
-			_bboxRect.inflate( material.wireframe_linewidth * 2 );
+			_bboxRect.inflate( wireframe_linewidth * 2 );
 
 		} else {
 
-			if ( _contextFillStyle != _color.__styleString ) {
+			if ( _contextFillStyle != color.__styleString ) {
 
-				_context.fillStyle = _contextFillStyle = _color.__styleString;
+				_context.fillStyle = _contextFillStyle = color.__styleString;
 
 			}
 
@@ -677,127 +785,38 @@ THREE.CanvasRenderer = function () {
 
 	}
 
-	function renderFace4( v1, v2, v3, v4, v5, v6, element, material, scene ) {
-
-		var bitmap, bitmapWidth, bitmapHeight;
-
-		if ( material.opacity != _contextGlobalAlpha ) {
-
-			_context.globalAlpha = _contextGlobalAlpha = material.opacity;
-
-		}
-
-		if ( material.blending != _contextGlobalCompositeOperation ) {
-
-			setBlending( material.blending );
-
-		}
-
-		if ( material.map ) {
-
-			bitmap = material.map.image;
-			bitmapWidth = bitmap.width - 1;
-			bitmapHeight = bitmap.height - 1;
-
-			_uv1.copy( element.uvs[ 0 ] );
-			_uv2.copy( element.uvs[ 1 ] );
-			_uv3.copy( element.uvs[ 2 ] );
-			_uv4.copy( element.uvs[ 3 ] );
-
-			_uv1.u *= bitmapWidth; _uv1.v *= bitmapHeight;
-			_uv2.u *= bitmapWidth; _uv2.v *= bitmapHeight;
-			_uv3.u *= bitmapWidth; _uv3.v *= bitmapHeight;
-			_uv4.u *= bitmapWidth; _uv4.v *= bitmapHeight;
-
-			drawTexturedTriangle( bitmap, v1.positionScreen.x, v1.positionScreen.y, v2.positionScreen.x, v2.positionScreen.y, v4.positionScreen.x, v4.positionScreen.y, _uv1.u, _uv1.v, _uv2.u, _uv2.v, _uv4.u, _uv4.v );
-			drawTexturedTriangle( bitmap, v5.positionScreen.x, v5.positionScreen.y, v3.positionScreen.x, v3.positionScreen.y, v6.positionScreen.x, v6.positionScreen.y, _uv2.u, _uv2.v, _uv3.u, _uv3.v, _uv4.u, _uv4.v );
-
-			return;
-
-		}
-
-		if ( material instanceof THREE.MeshDepthMaterial ) {
-
-			bitmap = _depthMap;
-
-			_uv1.u = ( material.__2near / (material.__farPlusNear - v1.positionScreen.z * material.__farMinusNear ) ) * 255;
-			_uv2.u = ( material.__2near / (material.__farPlusNear - v2.positionScreen.z * material.__farMinusNear ) ) * 255;
-			_uv3.u = ( material.__2near / (material.__farPlusNear - v3.positionScreen.z * material.__farMinusNear ) ) * 255;
-			_uv4.u = ( material.__2near / (material.__farPlusNear - v4.positionScreen.z * material.__farMinusNear ) ) * 255;
-
-			_uv1.v = 0; _uv2.v = 1; _uv3.v = 2; _uv4.v = 3;
-
-			drawTexturedTriangle( bitmap, v1.positionScreen.x, v1.positionScreen.y, v2.positionScreen.x, v2.positionScreen.y, v4.positionScreen.x, v4.positionScreen.y, _uv1.u, _uv1.v, _uv2.u, _uv2.v, _uv4.u, _uv4.v );
-			drawTexturedTriangle( bitmap, v5.positionScreen.x, v5.positionScreen.y, v3.positionScreen.x, v3.positionScreen.y, v6.positionScreen.x, v6.positionScreen.y, _uv2.u, _uv2.v, _uv3.u, _uv3.v, _uv4.u, _uv4.v );
-
-			return;
-
-		}
+	function drawQuad( x0, y0, x1, y1, x2, y2, x3, y3, color, wireframe, wireframe_linewidth ) {
 
 		_context.beginPath();
-		_context.moveTo( v1.positionScreen.x, v1.positionScreen.y );
-		_context.lineTo( v2.positionScreen.x, v2.positionScreen.y );
-		_context.lineTo( v3.positionScreen.x, v3.positionScreen.y );
-		_context.lineTo( v4.positionScreen.x, v4.positionScreen.y );
-		_context.lineTo( v1.positionScreen.x, v1.positionScreen.y );
+		_context.moveTo( x0, y0 );
+		_context.lineTo( x1, y1 );
+		_context.lineTo( x2, y2 );
+		_context.lineTo( x3, y3 );
+		_context.lineTo( x0, y0 );
 		_context.closePath();
 
-		if ( material instanceof THREE.MeshBasicMaterial ) {
+		if ( wireframe ) {
 
-			_color.__styleString = material.color.__styleString;
+			if ( _contextLineWidth != wireframe_linewidth ) {
 
-		} else if ( material instanceof THREE.MeshLambertMaterial ) {
-
-			if ( _enableLighting ) {
-
-				_light.copyRGB( _ambientLight );
-				calculateFaceLight( scene, element, _light );
-
-				_color.copyRGBA( material.color );
-				_color.multiplySelfRGB( _light );
-				_color.updateStyleString();
-
-			} else {
-
-				_color.__styleString = material.color.__styleString;
+				_context.lineWidth = _contextLineWidth = wireframe_linewidth;
 
 			}
 
-		}/* else if ( material instanceof THREE.MeshDepthMaterial ) {
+			if ( _contextStrokeStyle != color.__styleString ) {
 
-			_w = 1 - ( material.__2near / (material.__farPlusNear - element.z * material.__farMinusNear ) );
-			_color.setRGBA( _w, _w, _w, 1 );
-
-
-		}*/ else if ( material instanceof THREE.MeshNormalMaterial ) {
-
-			_color.setRGBA( normalToComponent( element.normalWorld.x ), normalToComponent( element.normalWorld.y ), normalToComponent( element.normalWorld.z ), 1 );
-
-		}
-
-		if ( material.wireframe ) {
-
-			if ( _contextLineWidth != material.wireframe_linewidth ) {
-
-				_context.lineWidth = _contextLineWidth = material.wireframe_linewidth;
-
-			}
-
-			if ( _contextStrokeStyle != _color.__styleString ) {
-
-				_context.strokeStyle = _contextStrokeStyle  = _color.__styleString;
+				_context.strokeStyle = _contextStrokeStyle  = color.__styleString;
 
 			}
 
 			_context.stroke();
-
-			_bboxRect.inflate( material.wireframe_linewidth * 2 );
+			_bboxRect.inflate( wireframe_linewidth * 2 );
 
 		} else {
 
-			if ( _contextFillStyle != _color.__styleString ) {
+			if ( _contextFillStyle != color.__styleString ) {
 
-				_context.fillStyle = _contextFillStyle = _color.__styleString;
+				_context.fillStyle = _contextFillStyle = color.__styleString;
 
 			}
 
@@ -838,6 +857,7 @@ THREE.CanvasRenderer = function () {
 		_context.clip();
 		_context.drawImage( bitmap, 0, 0 );
 		_context.restore();
+
 	}
 
 	function normalToComponent( normal ) {
