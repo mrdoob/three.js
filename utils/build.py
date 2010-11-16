@@ -35,7 +35,8 @@ def compress(text):
 		handle.write(text)
 
 	out_tuple = tempfile.mkstemp()
-	os.system("java -jar yuicompressor-2.4.2.jar %s --type js -o %s --charset utf-8 -v" % (in_tuple[1], out_tuple[1]))
+	# os.system("java -jar yuicompressor-2.4.2.jar %s --type js -o %s --charset utf-8 -v" % (in_tuple[1], out_tuple[1]))
+	os.system("java -jar compiler.jar --js %s --js_output_file %s" % (in_tuple[1], out_tuple[1]))
 
 	with os.fdopen(out_tuple[0], 'r') as handle:
 		compressed = handle.read()
