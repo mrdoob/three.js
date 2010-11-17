@@ -30,7 +30,7 @@ THREE.Vector4.prototype = {
 		this.x = v.x;
 		this.y = v.y;
 		this.z = v.z;
-		this.w = v.w;
+		this.w = v.w || 1.0;
 
 		return this;
 
@@ -79,6 +79,36 @@ THREE.Vector4.prototype = {
 		return this;
 
 	},
+	
+	multiplyScalar: function ( s ) {
+
+		this.x *= s;
+		this.y *= s;
+		this.z *= s;
+		this.w *= s;
+
+		return this;
+
+	},
+
+	divideScalar: function ( s ) {
+
+		this.x /= s;
+		this.y /= s;
+		this.z /= s;
+		this.w /= s;
+
+		return this;
+
+	},
+	
+	lerpSelf: function ( v, alpha ) {
+		
+		this.x = this.x + (v.x - this.x) * alpha;
+		this.y = this.y + (v.y - this.y) * alpha;
+		this.z = this.z + (v.z - this.z) * alpha;
+		this.w = this.w + (v.w - this.w) * alpha;
+	}
 
 	clone: function () {
 
