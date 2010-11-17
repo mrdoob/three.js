@@ -206,7 +206,7 @@ THREE.WebGLRenderer = function ( scene ) {
 
 		function needsSmoothNormals( material ) {
 
-			return material.shading != undefined && material.shading == THREE.SmoothShading;
+			return material && material.shading != undefined && material.shading == THREE.SmoothShading;
 
 		}
 
@@ -530,7 +530,7 @@ THREE.WebGLRenderer = function ( scene ) {
 				for ( i = 0, l = materialFaceGroup.material.length; i < l; i++ ) {
 
 					material = materialFaceGroup.material[ i ];
-					if ( material.blending == blending ) {
+					if ( material && material.blending == blending ) {
 						
 						this.setBlending( material.blending );
 						this.renderBuffer( material, materialFaceGroup );
@@ -542,7 +542,7 @@ THREE.WebGLRenderer = function ( scene ) {
 			} else {
 
 				material = meshMaterial;
-				if ( material.blending == blending ) {
+				if ( material && material.blending == blending ) {
 					
 					this.setBlending( material.blending );
 					this.renderBuffer( material, materialFaceGroup );
