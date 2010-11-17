@@ -14,15 +14,74 @@ THREE.Projector = function() {
 	_vector4 = new THREE.Vector4(),
 	_projScreenMatrix = new THREE.Matrix4(),
 	_projScreenObjectMatrix = new THREE.Matrix4();
+	
+	function clipLineSegmentAgainstNearAndFarPlanes ( s0, s1 ) {
+		
+		var visible,
+			alpha0 = 0, alpha1 = 1,
+			
+			// Calculate the boundary coordinate of each vertex for the near and far clip planes,
+			// Z = -1 and Z = +1, respectively.			
+			bc0near =  s0.z + s0.w,
+			bc1near =  s1.z + s1.w,
+			bc0far =  -s0.z + s0.w,
+			bc1far =  -s1.z + s1.w;
+
+		if (bc0near >= 0 && bc1near >= 0 && bc0far >= 0 && bc1far >= 0) {
+			// Both vertices lie entirely within all clip planes.
+			visible = true;
+		} else if ((bc0near < 0 && bc1near < 0) || (bc0far < 0 && bc1far < 0)) {
+			// Both vertices lie entirely outside one of the clip planes.
+			visible = false;
+		} else {
+			
+			// The line segment spans at least one clip plane.
+			
+			if (bc0near < 0) {
+				// vertex0 lies outside the near plane, vertex1 inside
+				alpha0 = Math.max(alpha0, bc0near / (bc0near - bc1near));
+			} else if (bc1near < 0) {
+				// vertex1 lies outside the near plane, vertex0 inside
+				alpha1 = Math.min(alpha1, bc0near / (bc0near - bc1near));
+			}
+			
+			if (bc0far < 0) {
+				// vertex0 lies outside the far plane, vertex1 inside
+				alpha0 = Math.max(alpha0, bc0far / (bc0far - bc1far));
+			} else if (bc1far < 0) {
+				// vertex1 lies outside the far plane, vertex1 inside
+				alpha1 = Math.min(alpha1, bc0far / (bc0far - bc1far));
+			}
+			
+			if (alpha1 < alpha0) {
+				// The line segment spans two boundaries, but is outside both of them.
+				// (This can't happen when we're only clipping against just near/far but good
+				//  to leave the check here for future usage if other clip planes are added.)
+				visible = false;
+			} else {
+			
+				// Update the s0 and s1 vertices to match the clipped line segment.
+				s0.lerpSelf(s1, alpha0);
+				s1.lerpSelf(s0, 1 - alpha1);
+
+				visible = true;
+			}
+		}
+		
+		return visible;
+	}
 
 	this.projectScene = function ( scene, camera ) {
 
 		var o, ol, v, vl, f, fl, objects, object, objectMatrix,
-		vertices, vertex, vertexPositionScreen, vertex2,
+		vertices, vertex, vertex0, vertex1, vertexPositionScreen,
 		faces, face, v1, v2, v3, v4;
 
 		_renderList = [];
-		_face3Count = 0, _face4Count = 0, _lineCount = 0, _particleCount = 0;
+		_face3Count = 0;
+		_face4Count = 0;
+		_lineCount = 0;
+		_particleCount = 0;
 
 		if( camera.autoUpdateMatrix ) {
 
@@ -60,6 +119,11 @@ THREE.Projector = function() {
 					vertexPositionScreen = vertex.positionScreen;
 					vertexPositionScreen.copy( vertex.position );
 					_projScreenObjectMatrix.transform( vertexPositionScreen );
+					
+					// Perform the perspective divide. TODO: This should be be performend 
+					// post clipping (imagine if the vertex lies at the same location as 
+				    // the camera, causing a divide by w = 0).
+					vertexPositionScreen.multiplyScalar( 1.0 / vertexPositionScreen.w );
 
 					vertex.__visible = vertexPositionScreen.z > 0 && vertexPositionScreen.z < 1;
 
@@ -170,32 +234,33 @@ THREE.Projector = function() {
 
 					vertex = vertices[ v ];
 
-					vertexPositionScreen = vertex.positionScreen;
-					vertexPositionScreen.copy( vertex.position );
-					_projScreenObjectMatrix.transform( vertexPositionScreen );
+					vertex.positionScreen.copy( vertex.position );
+					_projScreenObjectMatrix.transform( vertex.positionScreen );
+				}
 
-					vertex.__visible = vertexPositionScreen.z > 0 && vertexPositionScreen.z < 1;
+				for ( v = 1, vl = vertices.length; v < vl; v++ ) {
 
-					if ( v > 0 ) {
+					vertex0 = vertices[ v ];
+					vertex1 = vertices[ v - 1 ];
+					
+					if (clipLineSegmentAgainstNearAndFarPlanes(vertex0.positionScreen, vertex1.positionScreen)) {
+						
+						// Perform the perspective divide
+						vertex0.positionScreen.multiplyScalar( 1.0 / vertex0.positionScreen.w );
+						vertex1.positionScreen.multiplyScalar( 1.0 / vertex1.positionScreen.w );
 
-						vertex2 = object.geometry.vertices[ v - 1 ];
+						_line = _linePool[ _lineCount ] = _linePool[ _lineCount ] || new THREE.RenderableLine();
+						_line.v1.copy( vertex0.positionScreen );
+						_line.v2.copy( vertex1.positionScreen );
 
-						if ( vertex.__visible && vertex2.__visible ) {
+						// TODO: Use centriums here too.
+						_line.z = Math.max( vertex0.positionScreen.z, vertex1.positionScreen.z );
 
-							_line = _linePool[ _lineCount ] = _linePool[ _lineCount ] || new THREE.RenderableLine();
-							_line.v1.copy( vertex.positionScreen );
-							_line.v2.copy( vertex2.positionScreen );
+						_line.material = object.material;
 
-							// TODO: Use centriums here too.
-							_line.z = Math.max( vertex.positionScreen.z, vertex2.positionScreen.z );
+						_renderList.push( _line );
 
-							_line.material = object.material;
-
-							_renderList.push( _line );
-
-							_lineCount ++;
-
-						}
+						_lineCount ++;
 					}
 				}
 
@@ -248,5 +313,4 @@ THREE.Projector = function() {
 		return vector;
 
 	};
-
 };
