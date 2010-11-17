@@ -1,6 +1,7 @@
 /**
  * @author mr.doob / http://mrdoob.com/
  * @author supereggbert / http://www.paulbrunt.co.uk/
+ * @author julianwa / https://github.com/julianwa
  */
 
 THREE.Projector = function() {
@@ -14,62 +15,6 @@ THREE.Projector = function() {
 	_vector4 = new THREE.Vector4(),
 	_projScreenMatrix = new THREE.Matrix4(),
 	_projScreenObjectMatrix = new THREE.Matrix4();
-	
-	function clipLineSegmentAgainstNearAndFarPlanes ( s0, s1 ) {
-		
-		var visible,
-			alpha0 = 0, alpha1 = 1,
-			
-			// Calculate the boundary coordinate of each vertex for the near and far clip planes,
-			// Z = -1 and Z = +1, respectively.			
-			bc0near =  s0.z + s0.w,
-			bc1near =  s1.z + s1.w,
-			bc0far =  -s0.z + s0.w,
-			bc1far =  -s1.z + s1.w;
-
-		if (bc0near >= 0 && bc1near >= 0 && bc0far >= 0 && bc1far >= 0) {
-			// Both vertices lie entirely within all clip planes.
-			visible = true;
-		} else if ((bc0near < 0 && bc1near < 0) || (bc0far < 0 && bc1far < 0)) {
-			// Both vertices lie entirely outside one of the clip planes.
-			visible = false;
-		} else {
-			
-			// The line segment spans at least one clip plane.
-			
-			if (bc0near < 0) {
-				// vertex0 lies outside the near plane, vertex1 inside
-				alpha0 = Math.max(alpha0, bc0near / (bc0near - bc1near));
-			} else if (bc1near < 0) {
-				// vertex1 lies outside the near plane, vertex0 inside
-				alpha1 = Math.min(alpha1, bc0near / (bc0near - bc1near));
-			}
-			
-			if (bc0far < 0) {
-				// vertex0 lies outside the far plane, vertex1 inside
-				alpha0 = Math.max(alpha0, bc0far / (bc0far - bc1far));
-			} else if (bc1far < 0) {
-				// vertex1 lies outside the far plane, vertex1 inside
-				alpha1 = Math.min(alpha1, bc0far / (bc0far - bc1far));
-			}
-			
-			if (alpha1 < alpha0) {
-				// The line segment spans two boundaries, but is outside both of them.
-				// (This can't happen when we're only clipping against just near/far but good
-				//  to leave the check here for future usage if other clip planes are added.)
-				visible = false;
-			} else {
-			
-				// Update the s0 and s1 vertices to match the clipped line segment.
-				s0.lerpSelf(s1, alpha0);
-				s1.lerpSelf(s0, 1 - alpha1);
-
-				visible = true;
-			}
-		}
-		
-		return visible;
-	}
 
 	this.projectScene = function ( scene, camera ) {
 
@@ -312,4 +257,74 @@ THREE.Projector = function() {
 		return vector;
 
 	};
+
+	function clipLineSegmentAgainstNearAndFarPlanes( s0, s1 ) {
+
+		var visible, alpha0 = 0, alpha1 = 1,
+
+		// Calculate the boundary coordinate of each vertex for the near and far clip planes,
+		// Z = -1 and Z = +1, respectively.
+		bc0near =  s0.z + s0.w,
+		bc1near =  s1.z + s1.w,
+		bc0far =  -s0.z + s0.w,
+		bc1far =  -s1.z + s1.w;
+
+		if ( bc0near >= 0 && bc1near >= 0 && bc0far >= 0 && bc1far >= 0 ) {
+
+			// Both vertices lie entirely within all clip planes.
+			visible = true;
+
+		} else if ( ( bc0near < 0 && bc1near < 0) || (bc0far < 0 && bc1far < 0 ) ) {
+
+			// Both vertices lie entirely outside one of the clip planes.
+			visible = false;
+
+		} else {
+
+			// The line segment spans at least one clip plane.
+
+			if ( bc0near < 0 ) {
+
+				// vertex0 lies outside the near plane, vertex1 inside
+				alpha0 = Math.max( alpha0, bc0near / ( bc0near - bc1near ) );
+
+			} else if ( bc1near < 0 ) {
+
+				// vertex1 lies outside the near plane, vertex0 inside
+				alpha1 = Math.min( alpha1, bc0near / ( bc0near - bc1near ) );
+
+			}
+
+			if ( bc0far < 0 ) {
+
+				// vertex0 lies outside the far plane, vertex1 inside
+				alpha0 = Math.max( alpha0, bc0far / ( bc0far - bc1far ) );
+
+			} else if ( bc1far < 0 ) {
+
+				// vertex1 lies outside the far plane, vertex1 inside
+				alpha1 = Math.min( alpha1, bc0far / ( bc0far - bc1far ) );
+
+			}
+
+			if ( alpha1 < alpha0 ) {
+
+				// The line segment spans two boundaries, but is outside both of them.
+				// (This can't happen when we're only clipping against just near/far but good
+				//  to leave the check here for future usage if other clip planes are added.)
+				visible = false;
+
+			} else {
+
+				// Update the s0 and s1 vertices to match the clipped line segment.
+				s0.lerpSelf( s1, alpha0 );
+				s1.lerpSelf( s0, 1 - alpha1 );
+
+				visible = true;
+			}
+		}
+
+		return visible;
+	}
+
 };
