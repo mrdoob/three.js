@@ -11,7 +11,8 @@ The engine can render using &lt;canvas&gt;, &lt;svg&gt; and WebGL.
 
 [More info...](http://mrdoob.com/blog/post/693)
 
-Other similar projects: [pre3d](http://deanm.github.com/pre3d/), [pvjs](http://code.google.com/p/pvjswebgl/), [jsgl](http://tulrich.com/geekstuff/canvas/perspective.html), [k3d](http://www.kevs3d.co.uk/dev/canvask3d/k3d_test.html), ...
+Other &lt;canvas&gt; based engines: [pre3d](http://deanm.github.com/pre3d/), [pvjs](http://code.google.com/p/pvjswebgl/), [jsgl](http://tulrich.com/geekstuff/canvas/perspective.html), [k3d](http://www.kevs3d.co.uk/dev/canvask3d/k3d_test.html), ...
+WebGL based: [WebGLU](https://github.com/OneGeek/WebGLU), [GLGE](http://www.glge.org/), [C3DL](http://www.c3dl.org/), [Copperlicht](http://www.ambiera.com/copperlicht/), [SpiderGL](http://spidergl.org/), [SceneJS](http://scenejs.org/), ...
 
 ### Examples ###
 
@@ -67,7 +68,7 @@ This code creates a camera, then creates a scene object, adds a bunch of random 
 
 			for (var i = 0; i < 1000; i++) {
 
-				var particle = new THREE.Particle( new THREE.ParticleCircleMaterial( { corlor: Math.random() * 0x808008 + 0x808080, opacity: 1 } ) );
+				var particle = new THREE.Particle( new THREE.ParticleCircleMaterial( { color: Math.random() * 0x808008 + 0x808080 } ) );
 				particle.position.x = Math.random() * 2000 - 1000;
 				particle.position.y = Math.random() * 2000 - 1000;
 				particle.position.z = Math.random() * 2000 - 1000;
@@ -93,53 +94,60 @@ This code creates a camera, then creates a scene object, adds a bunch of random 
 
 For creating a customised version of the library, including the source files in this order would be a good way to start:
 
-	<script type="text/javascript" src="js/three/Three.js"></script>
-	<script type="text/javascript" src="js/three/core/Color.js"></script>
-	<script type="text/javascript" src="js/three/core/Vector2.js"></script>
-	<script type="text/javascript" src="js/three/core/Vector3.js"></script>
-	<script type="text/javascript" src="js/three/core/Vector4.js"></script>
-	<script type="text/javascript" src="js/three/core/Ray.js"></script>
-	<script type="text/javascript" src="js/three/core/Rectangle.js"></script>
-	<script type="text/javascript" src="js/three/core/Matrix3.js"></script>
-	<script type="text/javascript" src="js/three/core/Matrix4.js"></script>
-	<script type="text/javascript" src="js/three/core/Vertex.js"></script>
-	<script type="text/javascript" src="js/three/core/Face3.js"></script>
-	<script type="text/javascript" src="js/three/core/Face4.js"></script>
-	<script type="text/javascript" src="js/three/core/UV.js"></script>
-	<script type="text/javascript" src="js/three/core/Geometry.js"></script>
-	<script type="text/javascript" src="js/three/cameras/Camera.js"></script>
-	<script type="text/javascript" src="js/three/io/Loader.js"></script>
-	<script type="text/javascript" src="js/three/lights/Light.js"></script>
-	<script type="text/javascript" src="js/three/lights/AmbientLight.js"></script>
-	<script type="text/javascript" src="js/three/lights/DirectionalLight.js"></script>
-	<script type="text/javascript" src="js/three/lights/PointLight.js"></script>
-	<script type="text/javascript" src="js/three/objects/Object3D.js"></script>
-	<script type="text/javascript" src="js/three/objects/Particle.js"></script>
-	<script type="text/javascript" src="js/three/objects/Line.js"></script>
-	<script type="text/javascript" src="js/three/objects/Mesh.js"></script>
-	<script type="text/javascript" src="js/three/materials/Material.js"></script>
-	<script type="text/javascript" src="js/three/materials/LineBasicMaterial.js"></script>
-	<script type="text/javascript" src="js/three/materials/MeshBasicMaterial.js"></script>
-	<script type="text/javascript" src="js/three/materials/MeshLambertMaterial.js"></script>
-	<script type="text/javascript" src="js/three/materials/MeshPhongMaterial.js"></script>
-	<script type="text/javascript" src="js/three/materials/MeshDepthMaterial.js"></script>
-	<script type="text/javascript" src="js/three/materials/MeshFaceMaterial.js"></script>
-	<script type="text/javascript" src="js/three/materials/ParticleBasicMaterial.js"></script>
-	<script type="text/javascript" src="js/three/materials/ParticleCircleMaterial.js"></script>
-	<script type="text/javascript" src="js/three/materials/textures/Texture.js"></script>
-	<script type="text/javascript" src="js/three/scenes/Scene.js"></script>
-	<script type="text/javascript" src="js/three/renderers/Projector.js"></script>
-	<script type="text/javascript" src="js/three/renderers/DOMRenderer.js"></script>
-	<script type="text/javascript" src="js/three/renderers/CanvasRenderer.js"></script>
-	<script type="text/javascript" src="js/three/renderers/SVGRenderer.js"></script>
-	<script type="text/javascript" src="js/three/renderers/WebGLRenderer.js"></script>
-	<script type="text/javascript" src="js/three/renderers/renderables/RenderableFace3.js"></script>
-	<script type="text/javascript" src="js/three/renderers/renderables/RenderableFace4.js"></script>
-	<script type="text/javascript" src="js/three/renderers/renderables/RenderableParticle.js"></script>
-	<script type="text/javascript" src="js/three/renderers/renderables/RenderableLine.js"></script>
+	<script type="text/javascript" src="../src/Three.js"></script>
+	<script type="text/javascript" src="../src/core/Color.js"></script>
+	<script type="text/javascript" src="../src/core/Vector2.js"></script>
+	<script type="text/javascript" src="../src/core/Vector3.js"></script>
+	<script type="text/javascript" src="../src/core/Vector4.js"></script>
+	<script type="text/javascript" src="../src/core/Ray.js"></script>
+	<script type="text/javascript" src="../src/core/Rectangle.js"></script>
+	<script type="text/javascript" src="../src/core/Matrix3.js"></script>
+	<script type="text/javascript" src="../src/core/Matrix4.js"></script>
+	<script type="text/javascript" src="../src/core/Vertex.js"></script>
+	<script type="text/javascript" src="../src/core/Face3.js"></script>
+	<script type="text/javascript" src="../src/core/Face4.js"></script>
+	<script type="text/javascript" src="../src/core/UV.js"></script>
+	<script type="text/javascript" src="../src/core/Geometry.js"></script>
+	<script type="text/javascript" src="../src/cameras/Camera.js"></script>
+	<script type="text/javascript" src="../src/lights/Light.js"></script>
+	<script type="text/javascript" src="../src/lights/AmbientLight.js"></script>
+	<script type="text/javascript" src="../src/lights/DirectionalLight.js"></script>
+	<script type="text/javascript" src="../src/lights/PointLight.js"></script>
+	<script type="text/javascript" src="../src/objects/Object3D.js"></script>
+	<script type="text/javascript" src="../src/objects/Mesh.js"></script>
+	<script type="text/javascript" src="../src/objects/Particle.js"></script>
+	<script type="text/javascript" src="../src/objects/Line.js"></script>
+	<script type="text/javascript" src="../src/materials/Material.js"></script>
+	<script type="text/javascript" src="../src/materials/LineBasicMaterial.js"></script>
+	<script type="text/javascript" src="../src/materials/MeshBasicMaterial.js"></script>
+	<script type="text/javascript" src="../src/materials/MeshLambertMaterial.js"></script>
+	<script type="text/javascript" src="../src/materials/MeshPhongMaterial.js"></script>
+	<script type="text/javascript" src="../src/materials/MeshDepthMaterial.js"></script>
+	<script type="text/javascript" src="../src/materials/MeshNormalMaterial.js"></script>
+	<script type="text/javascript" src="../src/materials/MeshFaceMaterial.js"></script>
+	<script type="text/javascript" src="../src/materials/ParticleBasicMaterial.js"></script>
+	<script type="text/javascript" src="../src/materials/ParticleCircleMaterial.js"></script>
+	<script type="text/javascript" src="../src/materials/textures/Texture.js"></script>
+	<script type="text/javascript" src="../src/scenes/Scene.js"></script>
+	<script type="text/javascript" src="../src/renderers/Projector.js"></script>
+	<script type="text/javascript" src="../src/renderers/CanvasRenderer.js"></script>
+	<script type="text/javascript" src="../src/renderers/SVGRenderer.js"></script>
+	<script type="text/javascript" src="../src/renderers/WebGLRenderer.js"></script>
+	<script type="text/javascript" src="../src/renderers/renderables/RenderableFace3.js"></script>
+	<script type="text/javascript" src="../src/renderers/renderables/RenderableFace4.js"></script>
+	<script type="text/javascript" src="../src/renderers/renderables/RenderableParticle.js"></script>
+	<script type="text/javascript" src="../src/renderers/renderables/RenderableLine.js"></script>
 
 
 ### Change Log ###
+
+2010 11 17 - **r29** (69.563 kb)
+
+* **New materials API** Still work in progress, but mostly there. ([alteredq](http://github.com/alteredq) & [mrdoob](http://github.com/mrdoob))
+* Line clipping in `CanvasRenderer` (([julianwa](http://github.com/julianwa))
+* Refactored `CanvasRenderer` and `SVGRenderer`. ([mrdoob](http://github.com/mrdoob))
+* Switched to Closure compiler.
+
 
 2010 11 04 - **r28** (62.802 kb)
 
