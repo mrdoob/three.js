@@ -79,7 +79,7 @@ THREE.Vector4.prototype = {
 		return this;
 
 	},
-	
+
 	multiplyScalar: function ( s ) {
 
 		this.x *= s;
@@ -101,14 +101,14 @@ THREE.Vector4.prototype = {
 		return this;
 
 	},
-	
+
 	lerpSelf: function ( v, alpha ) {
-		
+
 		this.x = this.x + (v.x - this.x) * alpha;
 		this.y = this.y + (v.y - this.y) * alpha;
 		this.z = this.z + (v.z - this.z) * alpha;
 		this.w = this.w + (v.w - this.w) * alpha;
-	}
+	},
 
 	clone: function () {
 

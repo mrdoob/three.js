@@ -119,10 +119,10 @@ THREE.Projector = function() {
 					vertexPositionScreen = vertex.positionScreen;
 					vertexPositionScreen.copy( vertex.position );
 					_projScreenObjectMatrix.transform( vertexPositionScreen );
-					
+
 					// Perform the perspective divide. TODO: This should be be performend 
 					// post clipping (imagine if the vertex lies at the same location as 
-				    // the camera, causing a divide by w = 0).
+					// the camera, causing a divide by w = 0).
 					vertexPositionScreen.multiplyScalar( 1.0 / vertexPositionScreen.w );
 
 					vertex.__visible = vertexPositionScreen.z > 0 && vertexPositionScreen.z < 1;
@@ -148,9 +148,9 @@ THREE.Projector = function() {
 							   ( v3.positionScreen.y - v1.positionScreen.y ) * ( v2.positionScreen.x - v1.positionScreen.x ) < 0 ) ) ) {
 
 								_face3 = _face3Pool[ _face3Count ] = _face3Pool[ _face3Count ] || new THREE.RenderableFace3();
-								_face3.v1.copy( v1.positionScreen );
-								_face3.v2.copy( v2.positionScreen );
-								_face3.v3.copy( v3.positionScreen );
+								_face3.v1.positionScreen.copy( v1.positionScreen );
+								_face3.v2.positionScreen.copy( v2.positionScreen );
+								_face3.v3.positionScreen.copy( v3.positionScreen );
 
 								_face3.normalWorld.copy( face.normal );
 								object.matrixRotation.transform( _face3.normalWorld );
@@ -190,10 +190,10 @@ THREE.Projector = function() {
 							   ( v2.positionScreen.y - v3.positionScreen.y ) * ( v4.positionScreen.x - v3.positionScreen.x ) < 0 ) ) ) ) {
 
 								_face4 = _face4Pool[ _face4Count ] = _face4Pool[ _face4Count ] || new THREE.RenderableFace4();
-								_face4.v1.copy( v1.positionScreen );
-								_face4.v2.copy( v2.positionScreen );
-								_face4.v3.copy( v3.positionScreen );
-								_face4.v4.copy( v4.positionScreen );
+								_face4.v1.positionScreen.copy( v1.positionScreen );
+								_face4.v2.positionScreen.copy( v2.positionScreen );
+								_face4.v3.positionScreen.copy( v3.positionScreen );
+								_face4.v4.positionScreen.copy( v4.positionScreen );
 
 								_face4.normalWorld.copy( face.normal );
 								object.matrixRotation.transform( _face4.normalWorld );
@@ -242,16 +242,16 @@ THREE.Projector = function() {
 
 					vertex0 = vertices[ v ];
 					vertex1 = vertices[ v - 1 ];
-					
+
 					if (clipLineSegmentAgainstNearAndFarPlanes(vertex0.positionScreen, vertex1.positionScreen)) {
-						
+
 						// Perform the perspective divide
 						vertex0.positionScreen.multiplyScalar( 1.0 / vertex0.positionScreen.w );
 						vertex1.positionScreen.multiplyScalar( 1.0 / vertex1.positionScreen.w );
 
 						_line = _linePool[ _lineCount ] = _linePool[ _lineCount ] || new THREE.RenderableLine();
-						_line.v1.copy( vertex0.positionScreen );
-						_line.v2.copy( vertex1.positionScreen );
+						_line.v1.positionScreen.copy( vertex0.positionScreen );
+						_line.v2.positionScreen.copy( vertex1.positionScreen );
 
 						// TODO: Use centriums here too.
 						_line.z = Math.max( vertex0.positionScreen.z, vertex1.positionScreen.z );
