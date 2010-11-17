@@ -3,7 +3,7 @@
  *
  * parameters = {
  *  color: <hex>,
- *  map: new THREE.UVMap( <Image> ),
+ *  map: new THREE.Texture( <Image> ),
  *  opacity: <float>,
  *  blending: THREE.NormalBlending
  * }

@@ -10,7 +10,7 @@
  *  specular_map: new THREE.UVMap( <Image> ),
  *  shininess: <float>,
  *  opacity: <float>,
- *  shading: THREE.PhongShading,
+ *  shading: THREE.SmoothShading,
  *  blending: THREE.AdditiveBlending,
  *  wireframe: <boolean>,
  *  wireframe_linewidth: <float>
@@ -28,7 +28,7 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 	this.specular_map = null;
 	this.shininess = 30;
 	this.opacity = 1;
-	this.shading = THREE.PhongShading;
+	this.shading = THREE.SmoothShading;
 	this.blending = THREE.NormalBlending;
 	this.wireframe = false;
 	this.wireframe_linewidth = 1;

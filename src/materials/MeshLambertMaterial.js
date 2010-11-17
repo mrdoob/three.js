@@ -6,7 +6,7 @@
  *  color: <hex>,
  *  map: new THREE.UVMap( <Image> ),
  *  opacity: <float>,
- *  shading: THREE.GouraudShading,
+ *  shading: THREE.SmoothShading,
  *  blending: THREE.NormalBlending,
  *  wireframe: <boolean>,
  *  wireframe_linewidth: <float>
@@ -20,7 +20,7 @@ THREE.MeshLambertMaterial = function ( parameters ) {
 	this.color = new THREE.Color( 0xeeeeee );
 	this.map = null;
 	this.opacity = 1;
-	this.shading = THREE.GouraudShading;
+	this.shading = THREE.SmoothShading;
 	this.blending = THREE.NormalBlending;
 	this.wireframe = false;
 	this.wireframe_linewidth = 1;

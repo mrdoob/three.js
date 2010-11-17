@@ -10,7 +10,7 @@
 				overflow: hidden;
 			}
 
-			#info {			
+			#info {
 				position: absolute;
 				top: 0px; width: 100%;
 				color: #ffffff;
@@ -69,7 +69,7 @@
 				loader.loadAscii( "obj/walt/WaltHead_slim.js", function( geometry ) {
 				
 					//object = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( { ambient: 0x555555, color: 0x555555, specular: 0xffffff, shininess: 50, shading: THREE.FlatShading } )  );
-					object = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( { ambient: 0x555555, color: 0x555555, specular: 0xffffff, shininess: 50, shading: THREE.PhongShading } )  );
+					object = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( { ambient: 0x555555, color: 0x555555, specular: 0xffffff, shininess: 50, shading: THREE.SmoothShading } )  );
 					object.scale.x = object.scale.y = object.scale.z = 0.80;
 					object.overdraw = true;
 					scene.addObject( object );

@@ -199,17 +199,17 @@ THREE.WebGLRenderer = function ( scene ) {
 		vertexIndex = 0,
 
 		useSmoothNormals = false;
-		
+
 		// need to find out if there is any material in the object
 		// (among all mesh materials and also face materials)
 		// which would need smooth normals
-		
+
 		function needsSmoothNormals( material ) {
-			
-			return material.shading != undefined && ( material.shading == THREE.GouraudShading || material.shading == THREE.PhongShading );
-			
+
+			return material.shading != undefined && material.shading == THREE.SmoothShading;
+
 		}
-		
+
 		for ( m = 0, ml = object.material.length; m < ml; m++ ) {
 
 			meshMaterial = object.material[ m ];

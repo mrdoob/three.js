@@ -208,9 +208,9 @@ THREE.SVGRenderer = function () {
 		var l, ll, light, lightColor,
 		lights = scene.lights;
 
-		_ambientLight.setRGBA( 0, 0, 0, 1 );
-		_directionalLights.setRGBA( 0, 0, 0, 1 );
-		_pointLights.setRGBA( 0, 0, 0, 1 );
+		_ambientLight.setRGB( 0, 0, 0 );
+		_directionalLights.setRGB( 0, 0, 0 );
+		_pointLights.setRGB( 0, 0, 0 );
 
 		for ( l = 0, ll = lights.length; l < ll; l++ ) {
 
@@ -359,11 +359,11 @@ THREE.SVGRenderer = function () {
 		} else if ( material instanceof THREE.MeshDepthMaterial ) {
 
 			_w = 1 - ( material.__2near / (material.__farPlusNear - element.z * material.__farMinusNear) );
-			_color.setRGBA( _w, _w, _w, 1 );
+			_color.setRGB( _w, _w, _w );
 
 		} else if ( material instanceof THREE.MeshNormalMaterial ) {
 
-			_color.setRGBA( normalToComponent( element.normalWorld.x ), normalToComponent( element.normalWorld.y ), normalToComponent( element.normalWorld.z ), 1 );
+			_color.setRGB( normalToComponent( element.normalWorld.x ), normalToComponent( element.normalWorld.y ), normalToComponent( element.normalWorld.z ) );
 
 		}
 
@@ -415,11 +415,11 @@ THREE.SVGRenderer = function () {
 		} else if ( material instanceof THREE.MeshDepthMaterial ) {
 
 			_w = 1 - ( material.__2near / (material.__farPlusNear - element.z * material.__farMinusNear) );
-			_color.setRGBA( _w, _w, _w, 1 );
+			_color.setRGB( _w, _w, _w );
 
 		} else if ( material instanceof THREE.MeshNormalMaterial ) {
 
-			_color.setRGBA( normalToComponent( element.normalWorld.x ), normalToComponent( element.normalWorld.y ), normalToComponent( element.normalWorld.z ), 1 );
+			_color.setRGB( normalToComponent( element.normalWorld.x ), normalToComponent( element.normalWorld.y ), normalToComponent( element.normalWorld.z ) );
 
 		}
 

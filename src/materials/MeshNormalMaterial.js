@@ -5,13 +5,13 @@
  *  opacity: <float>,
  *  shading: THREE.FlatShading,
  *  blending: THREE.NormalBlending
- * } 
+ * }
  */
 
 THREE.MeshNormalMaterial = function ( parameters ) {
 
 	this.opacity = 1;
-    this.shading = THREE.FlatShading;
+	this.shading = THREE.FlatShading;
 	this.blending = THREE.NormalBlending;
 
 

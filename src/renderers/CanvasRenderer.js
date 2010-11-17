@@ -312,9 +312,9 @@ THREE.CanvasRenderer = function () {
 		var l, ll, light, lightColor,
 		lights = scene.lights;
 
-		_ambientLight.setRGBA( 0, 0, 0, 1 );
-		_directionalLights.setRGBA( 0, 0, 0, 1 );
-		_pointLights.setRGBA( 0, 0, 0, 1 );
+		_ambientLight.setRGB( 0, 0, 0 );
+		_directionalLights.setRGB( 0, 0, 0 );
+		_pointLights.setRGB( 0, 0, 0 );
 
 		for ( l = 0, ll = lights.length; l < ll; l++ ) {
 
@@ -612,7 +612,7 @@ THREE.CanvasRenderer = function () {
 
 			/*
 			_w = 1 - ( material.__2near / (material.__farPlusNear - element.z * material.__farMinusNear ) );
-			_color.setRGBA( _w, _w, _w, 1 );
+			_color.setRGB( _w, _w, _w );
 			*/
 
 			_2near = material.__2near;
@@ -721,7 +721,7 @@ THREE.CanvasRenderer = function () {
 
 			/*
 			_w = 1 - ( material.__2near / (material.__farPlusNear - element.z * material.__farMinusNear ) );
-			_color.setRGBA( _w, _w, _w, 1 );
+			_color.setRGB( _w, _w, _w );
 			*/
 
 			_2near = material.__2near;

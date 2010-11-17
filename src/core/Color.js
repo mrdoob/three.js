@@ -11,12 +11,11 @@ THREE.Color = function ( hex ) {
 
 THREE.Color.prototype = {
 
-	setRGBA: function ( r, g, b, a ) {
+	setRGB: function ( r, g, b ) {
 
 		this.r = r;
 		this.g = g;
 		this.b = b;
-		this.a = a;
 
 		if ( this.autoUpdate ) {
 
@@ -29,7 +28,7 @@ THREE.Color.prototype = {
 
 	setHex: function ( hex ) {
 
-		this.hex = ( ( hex = ~~ hex ) & 0xffffff ) == hex ? 0xff << 24 ^ hex : hex;
+		this.hex = ( ~~ hex ) & 0xffffff;
 
 		if ( this.autoUpdate ) {
 
@@ -42,13 +41,12 @@ THREE.Color.prototype = {
 
 	updateHex: function () {
 
-		this.hex = ~~( this.a * 255 ) << 24 ^ ~~( this.r * 255 ) << 16 ^ ~~( this.g * 255 ) << 8 ^ ~~( this.b * 255 );
+		this.hex = ~~( this.r * 255 ) << 16 ^ ~~( this.g * 255 ) << 8 ^ ~~( this.b * 255 );
 
 	},
 
 	updateRGBA: function () {
 
-		this.a = ( this.hex >> 24 & 255 ) / 255;
 		this.r = ( this.hex >> 16 & 255 ) / 255;
 		this.g = ( this.hex >> 8 & 255 ) / 255;
 		this.b = ( this.hex & 255 ) / 255;
@@ -57,13 +55,13 @@ THREE.Color.prototype = {
 
 	updateStyleString: function () {
 
-		this.__styleString = 'rgba(' + ~~( this.r * 255 ) + ',' + ~~( this.g * 255 ) + ',' + ~~( this.b * 255 ) + ',' + this.a + ')';
+		this.__styleString = 'rgb(' + ~~( this.r * 255 ) + ',' + ~~( this.g * 255 ) + ',' + ~~( this.b * 255 ) + ')';
 
 	},
 
 	toString: function () {
 
-		return 'THREE.Color ( r: ' + this.r + ', g: ' + this.g + ', b: ' + this.b + ', a: ' + this.a + ', hex: ' + this.hex + ' )';
+		return 'THREE.Color ( r: ' + this.r + ', g: ' + this.g + ', b: ' + this.b + ', hex: ' + this.hex + ' )';
 
 	}
 
