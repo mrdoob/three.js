@@ -253,7 +253,7 @@ THREE.Projector = function() {
 						_line.v1.positionScreen.copy( vertex0.positionScreen );
 						_line.v2.positionScreen.copy( vertex1.positionScreen );
 
-						// TODO: Use centriums here too.
+						// TODO: Use centroids here too.
 						_line.z = Math.max( vertex0.positionScreen.z, vertex1.positionScreen.z );
 
 						_line.material = object.material;
@@ -268,24 +268,23 @@ THREE.Projector = function() {
 
 				_vector4.set( object.position.x, object.position.y, object.position.z, 1 );
 
-				camera.matrix.transform( _vector4 );
-				camera.projectionMatrix.transform( _vector4 );
+				_projScreenMatrix.transform( _vector4 );
 
-				object.screen.set( _vector4.x / _vector4.w, _vector4.y / _vector4.w, _vector4.z / _vector4.w );
+				_vector4.z /= _vector4.w;
 
-				if ( object.screen.z > 0 && object.screen.z < 1 ) {
+				if ( _vector4.z > 0 && _vector4.z < 1 ) {
 
 					_particle = _particlePool[ _particleCount ] = _particlePool[ _particleCount ] || new THREE.RenderableParticle();
-					_particle.x = object.screen.x;
-					_particle.y = object.screen.y;
-					_particle.z = object.screen.z;
+					_particle.x = _vector4.x / _vector4.w;
+					_particle.y = _vector4.y / _vector4.w;
+					_particle.z = _vector4.z;
 
 					_particle.rotation = object.rotation.z;
 
-					_particle.scale.x = object.scale.x * Math.abs( _vector4.x / _vector4.w - ( _vector4.x + camera.projectionMatrix.n11 ) / ( _vector4.w + camera.projectionMatrix.n14 ) );
-					_particle.scale.y = object.scale.y * Math.abs( _vector4.y / _vector4.w - ( _vector4.y + camera.projectionMatrix.n22 ) / ( _vector4.w + camera.projectionMatrix.n24 ) );
+					_particle.scale.x = object.scale.x * Math.abs( _particle.x - ( _vector4.x + camera.projectionMatrix.n11 ) / ( _vector4.w + camera.projectionMatrix.n14 ) );
+					_particle.scale.y = object.scale.y * Math.abs( _particle.y - ( _vector4.y + camera.projectionMatrix.n22 ) / ( _vector4.w + camera.projectionMatrix.n24 ) );
+
 					_particle.material = object.material;
-					_particle.color = object.color;
 
 					_renderList.push( _particle );
 

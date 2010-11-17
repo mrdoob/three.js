@@ -144,7 +144,7 @@ For creating a customised version of the library, including the source files in 
 2010 11 17 - **r29** (69.563 kb)
 
 * **New materials API** Still work in progress, but mostly there. ([alteredq](http://github.com/alteredq) & [mrdoob](http://github.com/mrdoob))
-* Line clipping in `CanvasRenderer` (([julianwa](http://github.com/julianwa))
+* Line clipping in `CanvasRenderer` ([julianwa](http://github.com/julianwa))
 * Refactored `CanvasRenderer` and `SVGRenderer`. ([mrdoob](http://github.com/mrdoob))
 * Switched to Closure compiler.
 
@@ -155,7 +155,7 @@ For creating a customised version of the library, including the source files in 
 * `MeshPhongMaterial` working with `WebGLRenderer`. ([alteredq](http://github.com/alteredq))
 * Support for *huge* objects. Max 500k polys and counting. ([alteredq](http://github.com/alteredq))
 * `Projector.unprojectVector` and `Ray` class to check intersections with faces (based on [mindlapse](https://github.com/mindlapse) work)
-* Fixed `CanvasRenderer` and `SVGRenderer` z-sorting (not as jumpy anymore).
+* Fixed `Projector` z-sorting (not as jumpy anymore).
 * Fixed Orthographic projection (was y-inverted).
 * Hmmm.. lib file size starting to get too big...
 
