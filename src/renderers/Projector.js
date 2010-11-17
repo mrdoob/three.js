@@ -20,6 +20,8 @@ THREE.Projector = function() {
 
 		var o, ol, v, vl, f, fl, objects, object, objectMatrix,
 		vertices, vertex, vertex0, vertex1, vertexPositionScreen,
+		clippedVertexPositionScreen0 = new THREE.Vector4(), 
+		clippedVertexPositionScreen1 = new THREE.Vector4(),
 		faces, face, v1, v2, v3, v4;
 
 		_renderList = [];
@@ -187,19 +189,22 @@ THREE.Projector = function() {
 
 					vertex0 = vertices[ v ];
 					vertex1 = vertices[ v - 1 ];
+					
+					clippedVertexPositionScreen0.copy( vertex0.positionScreen );
+					clippedVertexPositionScreen1.copy( vertex1.positionScreen );
 
-					if (clipLineSegmentAgainstNearAndFarPlanes(vertex0.positionScreen, vertex1.positionScreen)) {
+					if (clipLineSegmentAgainstNearAndFarPlanes(clippedVertexPositionScreen0, clippedVertexPositionScreen1)) {
 
 						// Perform the perspective divide
-						vertex0.positionScreen.multiplyScalar( 1.0 / vertex0.positionScreen.w );
-						vertex1.positionScreen.multiplyScalar( 1.0 / vertex1.positionScreen.w );
+						clippedVertexPositionScreen0.multiplyScalar( 1.0 / clippedVertexPositionScreen0.w );
+						clippedVertexPositionScreen1.multiplyScalar( 1.0 / clippedVertexPositionScreen1.w );
 
 						_line = _linePool[ _lineCount ] = _linePool[ _lineCount ] || new THREE.RenderableLine();
-						_line.v1.positionScreen.copy( vertex0.positionScreen );
-						_line.v2.positionScreen.copy( vertex1.positionScreen );
+						_line.v1.positionScreen.copy( clippedVertexPositionScreen0 );
+						_line.v2.positionScreen.copy( clippedVertexPositionScreen1 );
 
 						// TODO: Use centroids here too.
-						_line.z = Math.max( vertex0.positionScreen.z, vertex1.positionScreen.z );
+						_line.z = Math.max( clippedVertexPositionScreen0.z, clippedVertexPositionScreen1.z );
 
 						_line.material = object.material;
 
