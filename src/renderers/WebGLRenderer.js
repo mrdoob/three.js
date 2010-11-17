@@ -473,7 +473,6 @@ THREE.WebGLRenderer = function ( scene ) {
 			
 		}
 		
-
 		// vertices
 		
 		_gl.bindBuffer( _gl.ARRAY_BUFFER, materialFaceGroup.__webGLVertexBuffer );
@@ -518,50 +517,130 @@ THREE.WebGLRenderer = function ( scene ) {
 
 	};
 
-	this.renderMesh = function ( object, camera ) {
-
-		var i, l, m, ml, mf, material, meshMaterial, materialFaceGroup;
-
-		// create separate VBOs per material
+	this.renderPass = function ( object, materialFaceGroup, blending ) {
 		
-		for ( mf in object.materialFaceGroup ) {
+		var i, l, m, ml, material, meshMaterial;
+		
+		for ( m = 0, ml = object.material.length; m < ml; m++ ) {
 
-			materialFaceGroup = object.materialFaceGroup[ mf ];
+			meshMaterial = object.material[ m ];
 
-			// initialise buffers on the first access
-			
-			if( ! materialFaceGroup.__webGLVertexBuffer ) {
+			if ( meshMaterial instanceof THREE.MeshFaceMaterial ) {
 
-				this.createBuffers( object, mf );
+				for ( i = 0, l = materialFaceGroup.material.length; i < l; i++ ) {
 
-			}
-
-			for ( m = 0, ml = object.material.length; m < ml; m++ ) {
-
-				meshMaterial = object.material[ m ];
-
-				if ( meshMaterial instanceof THREE.MeshFaceMaterial ) {
-
-					for ( i = 0, l = materialFaceGroup.material.length; i < l; i++ ) {
-
-						material = materialFaceGroup.material[ i ];
+					material = materialFaceGroup.material[ i ];
+					if ( material.blending == blending ) {
+						
+						this.setBlending( material.blending );
 						this.renderBuffer( material, materialFaceGroup );
-
+						
 					}
 
-				} else {
+				}
 
-					material = meshMaterial;
+			} else {
+
+				material = meshMaterial;
+				if ( material.blending == blending ) {
+					
+					this.setBlending( material.blending );
 					this.renderBuffer( material, materialFaceGroup );
-
 				}
 
 			}
 
 		}
-
+		
 	};
 
+	this.render = function( scene, camera ) {
+		
+		var o, ol;
+		
+		this.initWebGLObjects( scene );
+		
+		if ( this.autoClear ) {
+
+			this.clear();
+
+		}
+
+		camera.autoUpdateMatrix && camera.updateMatrix();
+		_gl.uniform3f( _program.cameraPosition, camera.position.x, camera.position.y, camera.position.z );
+
+		this.setupLights( scene );
+
+		// opaque pass
+		
+		for ( o = 0, ol = scene.__webGLObjects.length; o < ol; o++ ) {
+			
+			webGLObject = scene.__webGLObjects[ o ];
+			
+			this.setupMatrices( webGLObject.__object, camera );
+			this.renderPass( webGLObject.__object, webGLObject, THREE.NormalBlending );
+			
+		}
+		
+		// transparent pass
+		
+		for ( o = 0, ol = scene.__webGLObjects.length; o < ol; o++ ) {
+			
+			webGLObject = scene.__webGLObjects[ o ];
+			
+			this.setupMatrices( webGLObject.__object, camera );
+			this.renderPass( webGLObject.__object, webGLObject, THREE.AdditiveBlending );
+			this.renderPass( webGLObject.__object, webGLObject, THREE.SubtractiveBlending );
+			
+		}
+		
+	};
+	
+	this.initWebGLObjects = function( scene ) {
+		
+		var o, ol, object, mf, materialFaceGroup;
+		
+		if ( !scene.__webGLObjects ) {
+				
+			scene.__webGLObjects = [];
+			
+		}
+		
+		for ( o = 0, ol = scene.objects.length; o < ol; o++ ) {
+
+			object = scene.objects[ o ];
+
+			if ( object instanceof THREE.Mesh ) {
+
+				// create separate VBOs per material
+				
+				for ( mf in object.materialFaceGroup ) {
+
+					materialFaceGroup = object.materialFaceGroup[ mf ];
+
+					// initialise buffers on the first access
+					
+					if( ! materialFaceGroup.__webGLVertexBuffer ) {
+
+						this.createBuffers( object, mf );
+						materialFaceGroup.__object = object;
+						scene.__webGLObjects.push( materialFaceGroup );
+
+					}
+					
+				}
+
+			} else if ( object instanceof THREE.Line ) {
+				
+			} else if ( object instanceof THREE.Particle ) {
+			
+			}
+			
+		}
+		
+	};
+	
+	
 	this.setupMatrices = function ( object, camera ) {
 
 		object.autoUpdateMatrix && object.updateMatrix();
@@ -583,60 +662,33 @@ THREE.WebGLRenderer = function ( scene ) {
 
 	};
 
-	this.render = function ( scene, camera ) {
+	
+	this.setBlending = function( blending ) {
+		
+		switch ( blending ) {
 
-		var o, ol, object;
+			case THREE.AdditiveBlending:
 
-		if ( this.autoClear ) {
+				_gl.blendEquation( _gl.FUNC_ADD );
+				_gl.blendFunc( _gl.ONE, _gl.ONE );
+			
+				break;
 
-			this.clear();
+			case THREE.SubtractiveBlending:
 
+				//_gl.blendEquation( _gl.FUNC_SUBTRACT );
+				_gl.blendFunc( _gl.DST_COLOR, _gl.ZERO );
+			
+				break;
+				
+			default:
+			
+				_gl.blendEquation( _gl.FUNC_ADD );
+				_gl.blendFunc( _gl.ONE, _gl.ONE_MINUS_SRC_ALPHA );
+				
+				break;
 		}
-
-		camera.autoUpdateMatrix && camera.updateMatrix();
-		_gl.uniform3f( _program.cameraPosition, camera.position.x, camera.position.y, camera.position.z );
-
-		this.setupLights( scene );
-
-		for ( o = 0, ol = scene.objects.length; o < ol; o++ ) {
-
-			object = scene.objects[ o ];
-
-			this.setupMatrices( object, camera );
-
-			if ( object instanceof THREE.Mesh ) {
-
-				this.renderMesh( object, camera );
-
-			} else if ( object instanceof THREE.Line ) {
-
-				// TODO
-
-				// It would be very inefficient to do lines one-by-one.
-
-				// This will need a complete redesign from how CanvasRenderer does it.
-
-				// Though it could be brute forced, if only used for lightweight
-				// stuff (as CanvasRenderer can only handle small number of elements 
-				// anyways). 
-
-				// Heavy-duty wireframe lines are handled efficiently in mesh renderer.
-
-			} else if ( object instanceof THREE.Particle ) {
-
-				// TODO
-
-				// The same as with lines, particles shouldn't be handled one-by-one.
-
-				// Again, heavy duty particle system would require different approach,
-				// like one VBO per particle system and then update attribute arrays, 
-				// though the best would be to move also behavior computation
-				// into the shader (ala http://spidergl.org/example.php?id=11)
-
-			}
-
-		}
-
+		
 	};
 	
 	this.setFaceCulling = function( cullFace, frontFace ) {
@@ -701,7 +753,7 @@ THREE.WebGLRenderer = function ( scene ) {
 		
 		_gl.enable( _gl.BLEND );
 		//_gl.blendFunc( _gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA );
-		// _gl.blendFunc( _gl.SRC_ALPHA, _gl.ONE ); // cool!
+		//_gl.blendFunc( _gl.SRC_ALPHA, _gl.ONE ); // cool!
 		_gl.blendFunc( _gl.ONE, _gl.ONE_MINUS_SRC_ALPHA );
 		_gl.clearColor( 0, 0, 0, 0 );
 
