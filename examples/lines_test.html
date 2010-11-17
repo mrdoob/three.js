@@ -36,7 +36,7 @@
 			stats;
 
 			init();
-			setInterval(loop, 1000 / 60);
+			setInterval( loop, 1000 / 60 );
 
 			function init() {
 
@@ -47,7 +47,7 @@
 				document.body.appendChild(container);
 
 				camera = new THREE.Camera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.z = 1000;
+				camera.position.z = 100;
 
 				scene = new THREE.Scene();
 
@@ -57,7 +57,7 @@
 
 				// particles
 
-				material = new THREE.ParticleCircleMaterial( { color: 0xffffff, opacity: 1 } );
+				material = new THREE.ParticleCircleMaterial( { color: 0xffffff } );
 				var geometry = new THREE.Geometry();
 
 				for (var i = 0; i < 100; i++) {
@@ -67,7 +67,7 @@
 					particle.position.y = Math.random() * 2 - 1;
 					particle.position.z = Math.random() * 2 - 1;
 					particle.position.normalize();
-					particle.position.multiplyScalar(Math.random() * 10 + 450);
+					particle.position.multiplyScalar( Math.random() * 10 + 450 );
 					particle.scale.x = particle.scale.y = 5;
 					scene.addObject( particle );
 
@@ -77,7 +77,7 @@
 
 				// lines
 
-				var line = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0xffffff, opacity: Math.random() } ) );
+				var line = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 0.5 } ) );
 				scene.addObject(line);
 
 				/*
