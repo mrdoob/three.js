@@ -68,7 +68,7 @@
 				var geometry1 = new Sphere( 70, 32, 16, true );
 
 				var generatedTexture = new THREE.Texture( generateTexture() );
-				generatedTexture.loaded = 1;
+				generatedTexture.image.loaded = 1;
 
 				var materials = [];
 				materials.push( { material: new THREE.MeshLambertMaterial( { color: 0xdddddd, shading: THREE.FlatShading } ), overdraw: true, doubleSided: false } );

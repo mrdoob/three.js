@@ -5,6 +5,8 @@
  * parameters = {
  *  color: <hex>,
  *  map: new THREE.Texture( <Image> ),
+ *  env_map: new THREE.TextureCube( [posx, negx, posy, negy, posz, negz] ),
+ *  reflectivity: <float>,
  *  opacity: <float>,
  *  blending: THREE.NormalBlending,
  *  wireframe: <boolean>,
@@ -18,6 +20,8 @@ THREE.MeshBasicMaterial = function ( parameters ) {
 
 	this.color = new THREE.Color( 0xeeeeee );
 	this.map = null;
+	this.env_map = null;
+	this.reflectivity = 1;
 	this.opacity = 1;
 	this.blending = THREE.NormalBlending;
 	this.wireframe = false;
@@ -27,6 +31,8 @@ THREE.MeshBasicMaterial = function ( parameters ) {
 
 		if ( parameters.color !== undefined ) this.color.setHex( parameters.color );
 		if ( parameters.map !== undefined ) this.map = parameters.map;
+		if ( parameters.env_map !== undefined ) this.env_map = parameters.env_map;
+		if ( parameters.reflectivity !== undefined ) this.reflectivity  = parameters.reflectivity;
 		if ( parameters.opacity !== undefined ) this.opacity  = parameters.opacity;
 		if ( parameters.blending !== undefined ) this.blending = parameters.blending;
 		if ( parameters.wireframe !== undefined ) this.wireframe = parameters.wireframe;
@@ -40,6 +46,8 @@ THREE.MeshBasicMaterial = function ( parameters ) {
 			'id: ' + this.id + '<br/>' +
 			'color: ' + this.color + '<br/>' +
 			'map: ' + this.map + '<br/>' +
+			'env_map: ' + this.env_map + '<br/>' +
+			'reflectivity: ' + this.reflectivity + '<br/>' +
 			'opacity: ' + this.opacity + '<br/>' +
 			'blending: ' + this.blending + '<br/>' +
 			'wireframe: ' + this.wireframe + '<br/>' +

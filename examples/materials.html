@@ -68,7 +68,7 @@
 				var geometry = new Sphere( 100, 14, 8, false );
 
 				var generatedTexture = new THREE.Texture( generateTexture() );
-				generatedTexture.loaded = 1;
+				generatedTexture.image.loaded = 1;
 
 				var materials = [];
 				materials.push( { material: new THREE.MeshBasicMaterial( { color: 0x00ffff, wireframe: true } ), overdraw: false, doubleSided: true } );

@@ -971,7 +971,7 @@ THREE.Loader.prototype = {
 
 				}
 
-				material.map.loaded = 1;
+				material.map.image.loaded = 1;
 
 			};
 

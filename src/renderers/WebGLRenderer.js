@@ -379,9 +379,10 @@ THREE.WebGLRenderer = function ( scene ) {
 
 	this.renderBuffer = function ( material, materialFaceGroup ) {
 
-		var mColor, mOpacity, mWireframe, mLineWidth, mBlending,
+		var mColor, mOpacity, mReflectivity,
+			mWireframe, mLineWidth, mBlending,
 			mAmbient, mSpecular, mShininess,
-			mMap;
+			mMap, envMap;
 		
 		if ( material instanceof THREE.MeshPhongMaterial ||
 			 material instanceof THREE.MeshLambertMaterial ||
@@ -389,6 +390,7 @@ THREE.WebGLRenderer = function ( scene ) {
 		
 			mColor = material.color;
 			mOpacity = material.opacity;
+			mReflectivity = material.reflectivity;
 			
 			mWireframe = material.wireframe;
 			mLineWidth = material.wireframe_linewidth;
@@ -396,9 +398,10 @@ THREE.WebGLRenderer = function ( scene ) {
 			mBlending = material.blending;
 		
 			mMap = material.map;
+			envMap = material.env_map;
 			
 			_gl.uniform4f( _program.mColor,  mColor.r * mOpacity, mColor.g * mOpacity, mColor.b * mOpacity, mOpacity );
-		
+			_gl.uniform1f( _program.mReflectivity, mReflectivity );
 		}
 		
 		if ( material instanceof THREE.MeshNormalMaterial ) {
@@ -449,7 +452,7 @@ THREE.WebGLRenderer = function ( scene ) {
 		
 		if ( mMap ) {
 
-			if ( !material.__webGLTexture && material.map.loaded ) {
+			if ( !material.__webGLTexture && material.map.image.loaded ) {
 
 				material.__webGLTexture = _gl.createTexture();
 				_gl.bindTexture( _gl.TEXTURE_2D, material.__webGLTexture );
@@ -470,6 +473,53 @@ THREE.WebGLRenderer = function ( scene ) {
 		} else {
 			
 			_gl.uniform1i( _program.enableMap, 0 );
+			
+		}
+		
+		if ( envMap ) {
+			
+			if ( material.env_map && 
+				 material.env_map instanceof THREE.TextureCube && 
+				 material.env_map.image.length == 6 ) {
+				
+				if ( !material.__webGLTextureCube && !material.__cubeMapInitialized && material.env_map.image.loadCount == 6 ) {
+					
+					material.__webGLTextureCube = _gl.createTexture();
+					
+					_gl.bindTexture( _gl.TEXTURE_CUBE_MAP, material.__webGLTextureCube );
+					
+					_gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_WRAP_S, _gl.CLAMP_TO_EDGE );
+					_gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_WRAP_T, _gl.CLAMP_TO_EDGE );
+			
+					_gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MAG_FILTER, _gl.LINEAR );
+					_gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MIN_FILTER, _gl.LINEAR_MIPMAP_LINEAR );
+					
+					_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, material.env_map.image[0] );
+					_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_NEGATIVE_X, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, material.env_map.image[1] );
+					_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_Y, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, material.env_map.image[2] );
+					_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, material.env_map.image[3] );
+					_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_Z, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, material.env_map.image[4] );
+					_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, material.env_map.image[5] );
+					
+					_gl.generateMipmap( _gl.TEXTURE_CUBE_MAP );
+					
+					_gl.bindTexture( _gl.TEXTURE_CUBE_MAP, null );
+					
+					material.__cubeMapInitialized = true;
+					
+				}
+				
+				_gl.activeTexture( _gl.TEXTURE1 );
+				_gl.bindTexture( _gl.TEXTURE_CUBE_MAP, material.__webGLTextureCube );
+				_gl.uniform1i( _program.tCube,  1 );
+				
+			}
+			
+			_gl.uniform1i( _program.enableCubeMap, 1 );
+			
+		} else {
+			
+			_gl.uniform1i( _program.enableCubeMap, 0 );
 			
 		}
 		
@@ -773,7 +823,11 @@ THREE.WebGLRenderer = function ( scene ) {
 			"uniform int material;", // 0 - Basic, 1 - Lambert, 2 - Phong, 3 - Depth, 4 - Normal
 
 			"uniform bool enableMap;",
+			"uniform bool enableCubeMap;",
 		
+			"uniform samplerCube tCube;",
+			"uniform float mReflectivity;",
+
 			"uniform sampler2D tMap;",
 			"uniform vec4 mColor;",
 			"uniform float mOpacity;",
@@ -801,13 +855,26 @@ THREE.WebGLRenderer = function ( scene ) {
 			
 			"varying vec3 vViewPosition;",
 			
+			"varying vec3 vReflect;",
+			
 			"void main() {",
 
 				"vec4 mapColor = vec4( 1.0, 1.0, 1.0, 1.0 );",
+				"vec4 cubeColor = vec4( 1.0, 1.0, 1.0, 1.0 );",
 
+				// diffuse map
+				
 				"if ( enableMap ) {",
 				
 					"mapColor = texture2D( tMap, vUv );",
+					
+				"}",
+
+				// cube map
+				
+				"if ( enableCubeMap ) {",
+					
+					"cubeColor = mReflectivity * textureCube( tCube, vReflect );",
 					
 				"}",
 
@@ -903,19 +970,19 @@ THREE.WebGLRenderer = function ( scene ) {
 
 					// looks nicer with weighting
 					
-					"gl_FragColor = vec4( mapColor.rgb * totalLight.xyz * vLightWeighting, mapColor.a );",
+					"gl_FragColor = vec4( mapColor.rgb * cubeColor.rgb * totalLight.xyz * vLightWeighting, mapColor.a );",
 
 				// Lambert: diffuse lighting
 				
 				"} else if ( material == 1 ) {", 
 
-					"gl_FragColor = vec4( mColor.rgb * mapColor.rgb * vLightWeighting, mColor.a * mapColor.a );",
+					"gl_FragColor = vec4( mColor.rgb * mapColor.rgb * cubeColor.rgb * vLightWeighting, mColor.a * mapColor.a );",
 
 				// Basic: unlit color / texture
 				
 				"} else {", 
 
-					"gl_FragColor = mColor * mapColor;",
+					"gl_FragColor = mColor * mapColor * cubeColor;",
 					
 				"}",
 
@@ -966,7 +1033,7 @@ THREE.WebGLRenderer = function ( scene ) {
 			
 			"varying vec3 vViewPosition;",
 			
-			"varying vec3 vFragPosition;",
+			"varying vec3 vReflect;",
 
 			"void main(void) {",
 
@@ -974,6 +1041,8 @@ THREE.WebGLRenderer = function ( scene ) {
 				
 				"vec4 mPosition = objMatrix * vec4( position, 1.0 );",
 				"vViewPosition = cameraPosition - mPosition.xyz;",
+				
+				"vec3 nWorld = mat3(objMatrix) * normal;",
 				
 				// eye space
 				
@@ -1009,6 +1078,8 @@ THREE.WebGLRenderer = function ( scene ) {
 
 				"vNormal = transformedNormal;",
 				"vUv = uv;",
+
+				"vReflect = reflect( normalize(mPosition.xyz - cameraPosition), normalize(nWorld.xyz) );",
 
 				"gl_Position = projectionMatrix * mvPosition;",
 
@@ -1081,6 +1152,7 @@ THREE.WebGLRenderer = function ( scene ) {
 		
 		_program.mColor = _gl.getUniformLocation( _program, 'mColor' );
 		_program.mOpacity = _gl.getUniformLocation( _program, 'mOpacity' );
+		_program.mReflectivity = _gl.getUniformLocation( _program, 'mReflectivity' );
 
 		// material properties (Blinn-Phong shader)
 		
@@ -1095,6 +1167,14 @@ THREE.WebGLRenderer = function ( scene ) {
 		
 		_program.tMap = _gl.getUniformLocation( _program, "tMap" );
 		_gl.uniform1i( _program.tMap,  0 );
+
+		// cube texture
+		
+		_program.enableCubeMap = _gl.getUniformLocation( _program, "enableCubeMap" );
+		_gl.uniform1i( _program.enableCubeMap,  0 );
+		
+		_program.tCube = _gl.getUniformLocation( _program, "tCube" );
+		_gl.uniform1i( _program.tCube,  1 ); // it's important to use non-zero texture unit, otherwise it doesn't work
 
 		// material properties (Depth)
 		

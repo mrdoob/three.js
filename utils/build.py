@@ -120,6 +120,7 @@ def buildFull(debug):
 		'materials/ParticleCircleMaterial.js',
 		'materials/ParticleDOMMaterial.js',
 		'materials/textures/Texture.js',
+		'materials/textures/TextureCube.js',
 		'scenes/Scene.js',
 		'renderers/Projector.js',
 		'renderers/DOMRenderer.js',
@@ -221,6 +222,7 @@ def buildWebGL(debug):
 		'materials/ParticleBasicMaterial.js',
 		'materials/ParticleCircleMaterial.js',
 		'materials/textures/Texture.js',
+		'materials/textures/TextureCube.js',
 		'scenes/Scene.js',
 		'renderers/WebGLRenderer.js',
 	]

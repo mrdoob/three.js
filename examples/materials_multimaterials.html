@@ -209,10 +209,10 @@
 				}
 
 				var xm1 = new THREE.MeshLambertMaterial( { map: new THREE.Texture( x1 ) } );
-				xm1.map.loaded = 1; // this is procedurally generated texture
+				xm1.map.image.loaded = 1; // this is procedurally generated texture
 
 				var xm2 = new THREE.MeshLambertMaterial( { map: new THREE.Texture( x2 ) } );
-				xm2.map.loaded = 1; // this is procedurally generated texture
+				xm2.map.image.loaded = 1; // this is procedurally generated texture
 				
 				geometry.materials[0].push ( xm1 ); // goes to faces with material 0
 				geometry.materials[1].push ( xm2 ); // goes to faces with material 1
@@ -267,7 +267,7 @@
 					xc.fillText(i, 10, 64);
 					
 					var xm = new THREE.MeshBasicMaterial( { map: new THREE.Texture( x ) } );
-					xm.map.loaded = 1;
+					xm.map.image.loaded = 1;
 					
 					mesh = new THREE.Mesh( new Plane( size, size ), xm );
 					mesh.position.x = i * (size + 5) - ( ( materials.length - 1 )* ( size + 5 )/2);
