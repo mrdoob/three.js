@@ -1,11 +1,11 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - cube map WebGL</title>
+		<title>three.js - Escher cube map WebGL</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
-				background:#000;
+				background:#fff;
 				color:#fff;
 				padding:0;
 				margin:0;
@@ -16,29 +16,25 @@
 			a {	color: #ff0080;	text-decoration: none; }
 			a:hover { color: #0080ff; }
 			
-			canvas { pointer-events:none; z-index:10; position:relative; }
 			#log { position:absolute; top:50px; text-align:left; display:block; z-index:100 }
-			#d { text-align:center; margin:1em 0 -7.5em 0; z-index:1000; position:relative; display:block }
-			.button { background:orange; color:#fff; padding:0.2em 0.5em; cursor:pointer }
-			.inactive { background:#999; color:#eee }
+			#d { text-align:center; margin:1em auto -9.0em; z-index:1000; position:relative; display:block; 
+				 background:rgba(0,0,0,0.75); padding:0.25em; width:300px; border-radius:10px; -webkit-box-shadow: 0px 0px 10px rgba(0,0,0,0.5) }
 		</style>
 	</head>
 	
 	<body>
 		<div id="d">
 			<p><a href="http://github.com/mrdoob/three.js">Three.js</a> cube mapping demo
-
-			<p>Walt Disney head by <a href="http://www.davidoreilly.com/2009/01/walt-disneys-head-on-a-plate" target="_blank">David OReilly</a>
-			<p>Texture by <a href="http://www.humus.name/index.php?page=Textures" target="_blank">Humus</a>
+			<p>Original artwork by <a href="http://en.wikipedia.org/wiki/Hand_with_Reflecting_Sphere" target="_blank">M. C. Escher</a>
+			<p>Texture by <a href="http://brainwagon.org/2002/12/05/fun-with-environment-maps/" target="_blank">Mark VandeWettering</a>
 		</div>
 		
 		<pre id="log"></pre>
 
-		<script type="text/javascript" src="../build/Three.js"></script> 
+		<script type="text/javascript" src="../build/ThreeEscher.js"></script> 
 		
 		<script type="text/javascript" src="../src/extras/primitives/Sphere.js"></script>
 		<script type="text/javascript" src="../src/extras/primitives/Plane.js"></script>
-		<script type="text/javascript" src="../src/extras/io/Loader.js"></script>
 
 		<script type="text/javascript" src="js/Stats.js"></script>
 
@@ -46,8 +42,9 @@
 
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
-			var FLOOR = -250;
 
+			var statsEnabled = false;
+			
 			var container;
 			var stats;
 
@@ -94,8 +91,8 @@
 				container = document.createElement('div');
 				document.body.appendChild(container);
 
-				camera = new THREE.Camera( 50, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
-				camera.position.z = 2000;
+				camera = new THREE.Camera( 90, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
+				camera.position.z = 3200;
 				camera.updateMatrix();
 
 				scene = new THREE.Scene();
@@ -105,7 +102,7 @@
 				var ambient = new THREE.AmbientLight( 0x101010 );
 				scene.addLight( ambient );
 
-				directionalLight = new THREE.DirectionalLight( 0xffffff, 1.0 );
+				directionalLight = new THREE.DirectionalLight( 0xffffff );
 				directionalLight.position.x = 1;
 				directionalLight.position.y = 1;
 				directionalLight.position.z = 2;
@@ -128,7 +125,7 @@
 				scene.addObject(lightMesh);
 
 				// material samples
-				var r = "textures/cube/SwedishRoyalCastle/";
+				var r = "textures/cube/Escher/";
 				
 				var urls = [ r + "px.jpg", r + "nx.jpg", 
 							 r + "py.jpg", r + "ny.jpg", 
@@ -136,25 +133,27 @@
 				
 				var images = loadImageArray( urls );
 				
-				var cubeMaterial3 = new THREE.MeshLambertMaterial( { color: 0xffaa00, env_map: new THREE.TextureCube( images ) } );
-				var cubeMaterial2 = new THREE.MeshLambertMaterial( { color: 0xffee00, env_map: new THREE.TextureCube( images ) } );
-				var cubeMaterial1 = new THREE.MeshLambertMaterial( { color: 0xffffff, env_map: new THREE.TextureCube( images ) } )
+				var cubeMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff, env_map: new THREE.TextureCube( images ) } )
+				var sphere = new Sphere( 100, 64, 32, true );
 				
-				createCube( 4000, images );
+				createCube( 6000, images );
+				createScene( sphere, cubeMaterial, 16 );
 				
 				webglRenderer = new THREE.WebGLRenderer( scene );
 				webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				container.appendChild( webglRenderer.domElement );
 
-				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				stats.domElement.style.zIndex = 100;
-				container.appendChild( stats.domElement );
+				if ( statsEnabled ) {
 				
-				var loader = new THREE.Loader();
-				loader.loadBinary( "obj/walt/WaltHead_bin.js", function( geometry ) { createScene( geometry, cubeMaterial1, cubeMaterial2, cubeMaterial3 ) }, "obj/walt" );
-
+					stats = new Stats();
+					stats.domElement.style.position = 'absolute';
+					stats.domElement.style.top = '0px';
+					stats.domElement.style.zIndex = 100;
+					container.appendChild( stats.domElement );
+					
+				}
+			
+				
 			}
 
 			function createCube( size, images ) {
@@ -168,14 +167,13 @@
 				addMesh( plane, 1,     0, -hsize,       0, -pi2,    0, pi, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[3] ) } ) );
 				
 			}
-
-			function createScene( geometry, m1, m2, m3 ) {
+			
+			function createScene( geometry, m, scale ) {
 				
-				var s = 15;
-				
-				addMesh( geometry, s,      0, 0, -100, 0,0,0, m1 );
-				addMesh( geometry, s,   -900, 0, -100, 0,0,0, m2 );
-				addMesh( geometry, s,    900, 0, -100, 0,0,0, m3 );
+				var mesh = new THREE.Mesh( geometry, m );
+				mesh.scale.x = mesh.scale.y = mesh.scale.z = scale;
+				mesh.updateMatrix();
+				scene.addObject(mesh);
 
 			}
 
@@ -221,7 +219,7 @@
 				
 				webglRenderer.render( scene, camera );
 
-				stats.update();
+				if ( statsEnabled ) stats.update();
 
 			}
 
