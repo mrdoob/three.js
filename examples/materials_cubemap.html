@@ -142,11 +142,11 @@
 				
 				var plane = new Plane( 100, 100 );
 				
-				addMesh( plane, 40,     0, 0,  -2000, 0,    0,0, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[5] ) } )  );
-				addMesh( plane, 40, -2000, 0,      0, 0, 1.57,0, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[0] ) } )  );
-				addMesh( plane, 40,  2000, 0,      0, 0,-1.57,0, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[1] ) } )  );
-				addMesh( plane, 40,     0, 2000,   0, 1.57, 0,0, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[2] ) } )  );
-				addMesh( plane, 40,     0, -2000,  0, -1.57,0,0, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[3] ) } )  );
+				addMesh( plane, 40,     0, 0,  -2000,  0,    0,    0,    new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[5] ) } )  );
+				addMesh( plane, 40, -2000, 0,      0,  0,    1.57, 0,    new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[0] ) } )  );
+				addMesh( plane, 40,  2000, 0,      0,  0,   -1.57, 0,    new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[1] ) } )  );
+				addMesh( plane, 40,     0, 2000,   0,  1.57, 0,    3.14, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[2] ) } )  );
+				addMesh( plane, 40,     0, -2000,  0, -1.57, 0,    3.14, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[3] ) } )  );
 				
 				webglRenderer = new THREE.WebGLRenderer( scene );
 				webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
