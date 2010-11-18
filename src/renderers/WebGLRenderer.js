@@ -1042,7 +1042,9 @@ THREE.WebGLRenderer = function ( scene ) {
 				"vec4 mPosition = objMatrix * vec4( position, 1.0 );",
 				"vViewPosition = cameraPosition - mPosition.xyz;",
 				
-				"vec3 nWorld = mat3(objMatrix) * normal;",
+				// this doesn't work on Mac
+				//"vec3 nWorld = mat3(objMatrix) * normal;",
+				"vec3 nWorld = mat3( objMatrix[0].xyz, objMatrix[1].xyz, objMatrix[2].xyz ) * normal;",
 				
 				// eye space
 				
