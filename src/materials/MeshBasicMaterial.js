@@ -8,6 +8,7 @@
  *  env_map: new THREE.TextureCube( [posx, negx, posy, negy, posz, negz] ),
  *  reflectivity: <float>,
  *  opacity: <float>,
+ *  shading: THREE.SmoothShading,
  *  blending: THREE.NormalBlending,
  *  wireframe: <boolean>,
  *  wireframe_linewidth: <float>
@@ -23,6 +24,7 @@ THREE.MeshBasicMaterial = function ( parameters ) {
 	this.env_map = null;
 	this.reflectivity = 1;
 	this.opacity = 1;
+	this.shading = THREE.SmoothShading;
 	this.blending = THREE.NormalBlending;
 	this.wireframe = false;
 	this.wireframe_linewidth = 1;
@@ -34,6 +36,7 @@ THREE.MeshBasicMaterial = function ( parameters ) {
 		if ( parameters.env_map !== undefined ) this.env_map = parameters.env_map;
 		if ( parameters.reflectivity !== undefined ) this.reflectivity  = parameters.reflectivity;
 		if ( parameters.opacity !== undefined ) this.opacity  = parameters.opacity;
+		if ( parameters.shading !== undefined ) this.shading = parameters.shading;
 		if ( parameters.blending !== undefined ) this.blending = parameters.blending;
 		if ( parameters.wireframe !== undefined ) this.wireframe = parameters.wireframe;
 		if ( parameters.wireframe_linewidth !== undefined ) this.wireframe_linewidth = parameters.wireframe_linewidth;
