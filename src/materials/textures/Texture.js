@@ -22,3 +22,6 @@ THREE.Texture = function ( image, mapping ) {
 THREE.UVMapping = 0;
 THREE.ReflectionMap = 1;
 THREE.RefractionMap = 2;
+
+THREE.Multiply = 0;
+THREE.Mix = 1;

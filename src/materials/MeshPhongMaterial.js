@@ -3,14 +3,19 @@
  * @author alteredq / http://alteredqualia.com/
  *
  * parameters = {
- *  ambient: <hex>,
  *  color: <hex>,
+ *  ambient: <hex>,
  *  specular: <hex>,
+ *  shininess: <float>,
+
  *  map: new THREE.Texture( <Image> ),
  *  specular_map: new THREE.Texture( <Image> ),
+
  *  env_map: new THREE.TextureCube( [posx, negx, posy, negy, posz, negz] ),
- *  shininess: <float>,
+ *  combine: THREE.Multiply,
  *  reflectivity: <float>,
+ *  refraction_ratio: <float>,
+
  *  opacity: <float>,
  *  shading: THREE.SmoothShading,
  *  blending: THREE.NormalBlending,
@@ -24,13 +29,18 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 	this.id = THREE.MeshPhongMaterialCounter.value ++;
 
 	this.color = new THREE.Color( 0xeeeeee );
-	this.map = null;
 	this.ambient = new THREE.Color( 0x050505 );
 	this.specular = new THREE.Color( 0x111111 );
-	this.specular_map = null;
-	this.env_map = null;
 	this.shininess = 30;
+	
+	this.map = null;
+	this.specular_map = null;
+	
+	this.env_map = null;
+	this.combine = THREE.Multiply;
 	this.reflectivity = 1;
+	this.refraction_ratio = 0.98;
+	
 	this.opacity = 1;
 	this.shading = THREE.SmoothShading;
 	this.blending = THREE.NormalBlending;
@@ -40,13 +50,18 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 	if ( parameters ) {
 
 		if ( parameters.color !== undefined ) this.color = new THREE.Color( parameters.color );
-		if ( parameters.map !== undefined ) this.map = parameters.map;
 		if ( parameters.ambient !== undefined ) this.ambient = new THREE.Color( parameters.ambient );
 		if ( parameters.specular !== undefined ) this.specular = new THREE.Color( parameters.specular );
-		if ( parameters.specular_map !== undefined ) this.specular_map = parameters.specular_map;
-		if ( parameters.env_map !== undefined ) this.env_map = parameters.env_map;
 		if ( parameters.shininess !== undefined ) this.shininess = parameters.shininess;
+		
+		if ( parameters.map !== undefined ) this.map = parameters.map;
+		if ( parameters.specular_map !== undefined ) this.specular_map = parameters.specular_map;
+		
+		if ( parameters.env_map !== undefined ) this.env_map = parameters.env_map;
+		if ( parameters.combine !== undefined ) this.combine = parameters.combine;
 		if ( parameters.reflectivity !== undefined ) this.reflectivity  = parameters.reflectivity;
+		if ( parameters.refraction_ratio !== undefined ) this.refraction_ratio  = parameters.refraction_ratio;
+		
 		if ( parameters.opacity !== undefined ) this.opacity = parameters.opacity;
 		if ( parameters.shading !== undefined ) this.shading = parameters.shading;
 		if ( parameters.blending !== undefined ) this.blending = parameters.blending;
@@ -60,13 +75,18 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 		return 'THREE.MeshPhongMaterial (<br/>' +
 			'id: ' + this.id + '<br/>' +
 			'color: ' + this.color + '<br/>' +
-			'map: ' + this.map + '<br/>' +
-			'env_map: ' + this.env_map + '<br/>' +
 			'ambient: ' + this.ambient + '<br/>' +
 			'specular: ' + this.specular + '<br/>' +
-			'specular_map: ' + this.specular_map + '<br/>' +
 			'shininess: ' + this.shininess + '<br/>' +
+		
+			'map: ' + this.map + '<br/>' +
+			'specular_map: ' + this.specular_map + '<br/>' +
+		
+			'env_map: ' + this.env_map + '<br/>' +
+			'combine: ' + this.combine + '<br/>' +
 			'reflectivity: ' + this.reflectivity + '<br/>' +
+			'refraction_ratio: ' + this.refraction_ratio + '<br/>' +
+		
 			'opacity: ' + this.opacity + '<br/>' +
 			'shading: ' + this.shading + '<br/>' +
 			'wireframe: ' + this.wireframe + '<br/>' +

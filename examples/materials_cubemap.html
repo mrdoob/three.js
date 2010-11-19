@@ -17,7 +17,7 @@
 			a:hover { color: #0080ff; }
 
 			canvas { pointer-events:none; z-index:10; position:relative; }
-			#log { position:absolute; top:50px; text-align:left; display:block; z-index:100 }
+			#log { position:absolute; top:50px; text-align:left; display:block; z-index:100; pointer-events:none; }
 			#d { text-align:center; margin:1em 0 -7.5em 0; z-index:1000; position:relative; display:block }
 			.button { background:orange; color:#fff; padding:0.2em 0.5em; cursor:pointer }
 			.inactive { background:#999; color:#eee }
@@ -103,7 +103,8 @@
 
 				var images = loadImageArray( urls );
 
-				var cubeMaterial3 = new THREE.MeshLambertMaterial( { color: 0xffaa00, env_map: new THREE.TextureCube( images ) } );
+				//var cubeMaterial3 = new THREE.MeshPhongMaterial( { color: 0x000000, specular:0xaa0000, env_map: new THREE.TextureCube( images ), combine: THREE.Mix, reflectivity: 0.25 } );
+				var cubeMaterial3 = new THREE.MeshLambertMaterial( { color: 0xff6600, env_map: new THREE.TextureCube( images ), combine: THREE.Mix, reflectivity: 0.3 } );
 				var cubeMaterial2 = new THREE.MeshLambertMaterial( { color: 0xffee00, env_map: new THREE.TextureCube( images ) } );
 				var cubeMaterial1 = new THREE.MeshLambertMaterial( { color: 0xffffff, env_map: new THREE.TextureCube( images ) } )
 

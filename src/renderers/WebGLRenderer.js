@@ -20,7 +20,7 @@ THREE.WebGLRenderer = function ( scene ) {
 	
 	BASIC = 0, LAMBERT = 1, PHONG = 2, DEPTH = 3, NORMAL = 4, // material constants used in shader
 	
-	maxLightCount = allocateLights( scene, 5 );
+	maxLightCount = allocateLights( scene, 4 );
 	
 	this.domElement = _canvas;
 	this.autoClear = true;
@@ -382,7 +382,8 @@ THREE.WebGLRenderer = function ( scene ) {
 		var mColor, mOpacity, mReflectivity,
 			mWireframe, mLineWidth, mBlending,
 			mAmbient, mSpecular, mShininess,
-			mMap, envMap;
+			mMap, envMap, mixEnvMap,
+			mRefractionRatio, useRefract;
 		
 		if ( material instanceof THREE.MeshPhongMaterial ||
 			 material instanceof THREE.MeshLambertMaterial ||
@@ -390,7 +391,6 @@ THREE.WebGLRenderer = function ( scene ) {
 		
 			mColor = material.color;
 			mOpacity = material.opacity;
-			mReflectivity = material.reflectivity;
 			
 			mWireframe = material.wireframe;
 			mLineWidth = material.wireframe_linewidth;
@@ -399,9 +399,21 @@ THREE.WebGLRenderer = function ( scene ) {
 		
 			mMap = material.map;
 			envMap = material.env_map;
+
+			mixEnvMap = material.combine == THREE.Mix;
+			mReflectivity = material.reflectivity;
+			
+			useRefract = material.env_map && material.env_map.mapping == THREE.RefractionMap;
+			mRefractionRatio = material.refraction_ratio;
 			
 			_gl.uniform4f( _program.mColor,  mColor.r * mOpacity, mColor.g * mOpacity, mColor.b * mOpacity, mOpacity );
+			
+			_gl.uniform1i( _program.mixEnvMap, mixEnvMap );
 			_gl.uniform1f( _program.mReflectivity, mReflectivity );
+			
+			_gl.uniform1i( _program.useRefract, useRefract );
+			_gl.uniform1f( _program.mRefractionRatio, mRefractionRatio );
+			
 		}
 		
 		if ( material instanceof THREE.MeshNormalMaterial ) {
@@ -824,6 +836,7 @@ THREE.WebGLRenderer = function ( scene ) {
 
 			"uniform bool enableMap;",
 			"uniform bool enableCubeMap;",
+			"uniform bool mixEnvMap;",
 		
 			"uniform samplerCube tCube;",
 			"uniform float mReflectivity;",
@@ -874,7 +887,7 @@ THREE.WebGLRenderer = function ( scene ) {
 				
 				"if ( enableCubeMap ) {",
 					
-					"cubeColor = mReflectivity * textureCube( tCube, vReflect );",
+					"cubeColor = textureCube( tCube, vReflect );",
 					
 				"}",
 
@@ -909,7 +922,7 @@ THREE.WebGLRenderer = function ( scene ) {
 					maxPointLights ? "vec4 pointDiffuse  = vec4( 0.0, 0.0, 0.0, 0.0 );" : "",
 					maxPointLights ? "vec4 pointSpecular = vec4( 0.0, 0.0, 0.0, 0.0 );" : "",
 
-					maxPointLights ? "for( int i = 0; i < pointLightNumber; i++ ) {" : "",
+					maxPointLights ? "for( int i = 0; i < MAX_POINT_LIGHTS; i++ ) {" : "",
 					
 					maxPointLights ? 	"vec3 pointVector = normalize( vPointLightVector[ i ] );" : "",
 					maxPointLights ? 	"vec3 pointHalfVector = normalize( vPointLightVector[ i ] + vViewPosition );" : "",
@@ -942,7 +955,7 @@ THREE.WebGLRenderer = function ( scene ) {
 					maxDirLights ? "vec4 dirDiffuse  = vec4( 0.0, 0.0, 0.0, 0.0 );" : "",
 					maxDirLights ? "vec4 dirSpecular = vec4( 0.0, 0.0, 0.0, 0.0 );" : "",
 					
-					maxDirLights ? "for( int i = 0; i < directionalLightNumber; i++ ) {" : "",
+					maxDirLights ? "for( int i = 0; i < MAX_DIR_LIGHTS; i++ ) {" : "",
 
 					maxDirLights ?		"vec4 lDirection = viewMatrix * vec4( directionalLightDirection[ i ], 0.0 );" : "",
 
@@ -970,19 +983,43 @@ THREE.WebGLRenderer = function ( scene ) {
 
 					// looks nicer with weighting
 					
-					"gl_FragColor = vec4( mapColor.rgb * cubeColor.rgb * totalLight.xyz * vLightWeighting, mapColor.a );",
-
+					"if ( mixEnvMap ) {",
+						
+						"gl_FragColor = vec4( mix( mapColor.rgb * totalLight.xyz * vLightWeighting, cubeColor.rgb, mReflectivity ), mapColor.a );",
+					
+					"} else {",
+				
+						"gl_FragColor = vec4( mapColor.rgb * cubeColor.rgb * totalLight.xyz * vLightWeighting, mapColor.a );",
+						
+					"}",
+					
 				// Lambert: diffuse lighting
 				
 				"} else if ( material == 1 ) {", 
 
-					"gl_FragColor = vec4( mColor.rgb * mapColor.rgb * cubeColor.rgb * vLightWeighting, mColor.a * mapColor.a );",
-
+				"if ( mixEnvMap ) {",
+					
+						"gl_FragColor = vec4( mix( mColor.rgb * mapColor.rgb * vLightWeighting, cubeColor.rgb, mReflectivity ), mColor.a * mapColor.a );",
+					
+					"} else {",
+					
+						"gl_FragColor = vec4( mColor.rgb * mapColor.rgb * cubeColor.rgb * vLightWeighting, mColor.a * mapColor.a );",
+					
+					"}",
+	
 				// Basic: unlit color / texture
 				
 				"} else {", 
 
-					"gl_FragColor = mColor * mapColor * cubeColor;",
+					"if ( mixEnvMap ) {",
+
+						"gl_FragColor = mix( mColor * mapColor, cubeColor, mReflectivity );",
+						
+					"} else {",
+
+						"gl_FragColor = mColor * mapColor * cubeColor;",
+						
+					"}",
 					
 				"}",
 
@@ -1006,6 +1043,7 @@ THREE.WebGLRenderer = function ( scene ) {
 			"uniform vec3 cameraPosition;",
 
 			"uniform bool enableLighting;",
+			"uniform bool useRefract;",
 			
 			"uniform int pointLightNumber;",
 			"uniform int directionalLightNumber;",
@@ -1034,6 +1072,7 @@ THREE.WebGLRenderer = function ( scene ) {
 			"varying vec3 vViewPosition;",
 			
 			"varying vec3 vReflect;",
+			"uniform float mRefractionRatio;",
 
 			"void main(void) {",
 
@@ -1061,7 +1100,7 @@ THREE.WebGLRenderer = function ( scene ) {
 					
 					// directional lights
 					
-					maxDirLights ? "for( int i = 0; i < directionalLightNumber; i++ ) {" : "",
+					maxDirLights ? "for( int i = 0; i < MAX_DIR_LIGHTS; i++ ) {" : "",
 					maxDirLights ?		"vec4 lDirection = viewMatrix * vec4( directionalLightDirection[ i ], 0.0 );" : "",
 					maxDirLights ?		"float directionalLightWeighting = max( dot( transformedNormal, normalize(lDirection.xyz ) ), 0.0 );" : "",
 					maxDirLights ?		"vLightWeighting += directionalLightColor[ i ] * directionalLightWeighting;" : "",
@@ -1069,7 +1108,7 @@ THREE.WebGLRenderer = function ( scene ) {
 					
 					// point lights
 					
-					maxPointLights ? "for( int i = 0; i < pointLightNumber; i++ ) {" : "",
+					maxPointLights ? "for( int i = 0; i < MAX_POINT_LIGHTS; i++ ) {" : "",
 					maxPointLights ? 	"vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );" : "",
 					maxPointLights ? 	"vPointLightVector[ i ] = normalize( lPosition.xyz - mvPosition.xyz );" : "",
 					maxPointLights ? 	"float pointLightWeighting = max( dot( transformedNormal, vPointLightVector[ i ] ), 0.0 );" : "",
@@ -1081,8 +1120,16 @@ THREE.WebGLRenderer = function ( scene ) {
 				"vNormal = transformedNormal;",
 				"vUv = uv;",
 
-				"vReflect = reflect( normalize(mPosition.xyz - cameraPosition), normalize(nWorld.xyz) );",
-
+				"if ( useRefract ) {",
+				
+					"vReflect = refract( normalize(mPosition.xyz - cameraPosition), normalize(nWorld.xyz), mRefractionRatio );",
+				
+				"} else {",
+				
+					"vReflect = reflect( normalize(mPosition.xyz - cameraPosition), normalize(nWorld.xyz) );",
+					
+				"}",
+				
 				"gl_Position = projectionMatrix * mvPosition;",
 
 			"}" ];
@@ -1107,8 +1154,8 @@ THREE.WebGLRenderer = function ( scene ) {
 
 			alert( "Could not initialise shaders" );
 
-			//alert( "VALIDATE_STATUS: " + _gl.getProgramParameter( _program, _gl.VALIDATE_STATUS ) );
-			//alert( _gl.getError() );
+			alert( "VALIDATE_STATUS: " + _gl.getProgramParameter( _program, _gl.VALIDATE_STATUS ) );
+			alert( _gl.getError() );
 		}
 		
 
@@ -1165,19 +1212,29 @@ THREE.WebGLRenderer = function ( scene ) {
 		// texture (diffuse map)
 		
 		_program.enableMap = _gl.getUniformLocation( _program, "enableMap" );
-		_gl.uniform1i( _program.enableMap,  0 );
+		_gl.uniform1i( _program.enableMap, 0 );
 		
 		_program.tMap = _gl.getUniformLocation( _program, "tMap" );
-		_gl.uniform1i( _program.tMap,  0 );
+		_gl.uniform1i( _program.tMap, 0 );
 
 		// cube texture
 		
 		_program.enableCubeMap = _gl.getUniformLocation( _program, "enableCubeMap" );
-		_gl.uniform1i( _program.enableCubeMap,  0 );
+		_gl.uniform1i( _program.enableCubeMap, 0 );
 		
 		_program.tCube = _gl.getUniformLocation( _program, "tCube" );
-		_gl.uniform1i( _program.tCube,  1 ); // it's important to use non-zero texture unit, otherwise it doesn't work
+		_gl.uniform1i( _program.tCube, 1 ); // it's important to use non-zero texture unit, otherwise it doesn't work
 
+		_program.mixEnvMap = _gl.getUniformLocation( _program, "mixEnvMap" );
+		_gl.uniform1i( _program.mixEnvMap, 0 );
+		
+		// refraction
+		
+		_program.mRefractionRatio = _gl.getUniformLocation( _program, 'mRefractionRatio' );
+		
+		_program.useRefract = _gl.getUniformLocation( _program, "useRefract" );
+		_gl.uniform1i( _program.useRefract, 0 );
+		
 		// material properties (Depth)
 		
 		_program.m2Near = _gl.getUniformLocation( _program, 'm2Near' );

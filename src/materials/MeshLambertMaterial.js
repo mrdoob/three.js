@@ -5,8 +5,12 @@
  * parameters = {
  *  color: <hex>,
  *  map: new THREE.Texture( <Image> ),
+ 
  *  env_map: new THREE.TextureCube( [posx, negx, posy, negy, posz, negz] ),
+ *  combine: THREE.Multiply,
  *  reflectivity: <float>,
+ *  refraction_ratio: <float>,
+ 
  *  opacity: <float>,
  *  shading: THREE.SmoothShading,
  *  blending: THREE.NormalBlending,
@@ -21,8 +25,12 @@ THREE.MeshLambertMaterial = function ( parameters ) {
 
 	this.color = new THREE.Color( 0xeeeeee );
 	this.map = null;
+	
 	this.env_map = null;
+	this.combine = THREE.Multiply;
 	this.reflectivity = 1;
+	this.refraction_ratio = 0.98;
+	
 	this.opacity = 1;
 	this.shading = THREE.SmoothShading;
 	this.blending = THREE.NormalBlending;
@@ -33,8 +41,12 @@ THREE.MeshLambertMaterial = function ( parameters ) {
 
 		if ( parameters.color !== undefined ) this.color.setHex( parameters.color );
 		if ( parameters.map !== undefined ) this.map = parameters.map;
+		
 		if ( parameters.env_map !== undefined ) this.env_map = parameters.env_map;
+		if ( parameters.combine !== undefined ) this.combine = parameters.combine;
 		if ( parameters.reflectivity !== undefined ) this.reflectivity  = parameters.reflectivity;
+		if ( parameters.refraction_ratio !== undefined ) this.refraction_ratio  = parameters.refraction_ratio;
+		
 		if ( parameters.opacity !== undefined ) this.opacity  = parameters.opacity;
 		if ( parameters.shading !== undefined ) this.shading = parameters.shading;
 		if ( parameters.blending !== undefined ) this.blending = parameters.blending;
@@ -49,8 +61,12 @@ THREE.MeshLambertMaterial = function ( parameters ) {
 			'id: ' + this.id + '<br/>' +
 			'color: ' + this.color + '<br/>' +
 			'map: ' + this.map + '<br/>' +
+		
 			'env_map: ' + this.env_map + '<br/>' +
+			'combine: ' + this.combine + '<br/>' +
 			'reflectivity: ' + this.reflectivity + '<br/>' +
+			'refraction_ratio: ' + this.refraction_ratio + '<br/>' +
+		
 			'opacity: ' + this.opacity + '<br/>' +
 			'shading: ' + this.shading + '<br/>' +
 			'blending: ' + this.blending + '<br/>' +
