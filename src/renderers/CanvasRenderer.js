@@ -18,7 +18,7 @@ THREE.CanvasRenderer = function () {
 	_contextLineWidth = 1,
 
 	_v1, _v2, _v3, _v4,
-	_v5 = new THREE.Vertex(), _v6 = new THREE.Vertex(), // Needed for latter splitting tris to quads
+	_v5 = new THREE.Vertex(), _v6 = new THREE.Vertex(), // Needed for latter splitting quads to tris
 
 	_v1x, _v1y, _v2x, _v2y, _v3x, _v3y,
 	_v4x, _v4y, _v5x, _v5y, _v6x, _v6y,
@@ -119,9 +119,7 @@ THREE.CanvasRenderer = function () {
 		_context.fillRect( _clipRect.getX(), _clipRect.getY(), _clipRect.getWidth(), _clipRect.getHeight() );
 		*/
 
-		_enableLighting = scene.lights.length > 0;
-
-		if ( _enableLighting ) {
+		if ( _enableLighting = scene.lights.length > 0 ) {
 
 			calculateLights( scene );
 
@@ -393,17 +391,8 @@ THREE.CanvasRenderer = function () {
 		var width, height, scaleX, scaleY, offsetX, offsetY,
 		bitmap, bitmapWidth, bitmapHeight;
 
-		if ( material.opacity != _contextGlobalAlpha ) {
-
-			_context.globalAlpha = _contextGlobalAlpha = material.opacity;
-
-		}
-
-		if ( material.blending != _contextGlobalCompositeOperation ) {
-
-			setBlending( material.blending );
-
-		}
+		setOpacity( material.opacity );
+		setBlending( material.blending );
 
 		if ( material instanceof THREE.ParticleBasicMaterial ) {
 
@@ -482,11 +471,7 @@ THREE.CanvasRenderer = function () {
 
 			}
 
-			if ( _contextFillStyle !== _color.__styleString ) {
-
-				_context.fillStyle = _contextFillStyle = _color.__styleString;
-
-			}
+			setFillStyle( _color.__styleString );
 
 			_context.save();
 			_context.translate( v1.x, v1.y );
@@ -506,17 +491,8 @@ THREE.CanvasRenderer = function () {
 
 	function renderLine( v1, v2, element, material, scene ) {
 
-		if ( material.opacity != _contextGlobalAlpha ) {
-
-			_context.globalAlpha = _contextGlobalAlpha = material.opacity;
-
-		}
-
-		if ( material.blending != _contextGlobalCompositeOperation ) {
-
-			setBlending( material.blending );
-
-		}
+		setOpacity( material.opacity );
+		setBlending( material.blending );
 
 		_context.beginPath();
 		_context.moveTo( v1.positionScreen.x, v1.positionScreen.y );
@@ -527,17 +503,8 @@ THREE.CanvasRenderer = function () {
 
 			_color.__styleString = material.color.__styleString;
 
-			if ( _contextLineWidth != material.linewidth ) {
-
-				_context.lineWidth = _contextLineWidth = material.linewidth;
-
-			}
-
-			if ( _contextStrokeStyle != _color.__styleString ) {
-
-				_context.strokeStyle = _contextStrokeStyle  = _color.__styleString;
-
-			}
+			setLineWidth( material.linewidth );
+			setStrokeStyle( _color.__styleString );
 
 			_context.stroke();
 			_bboxRect.inflate( material.linewidth * 2 );
@@ -552,17 +519,8 @@ THREE.CanvasRenderer = function () {
 		_v2x = v2.positionScreen.x; _v2y = v2.positionScreen.y;
 		_v3x = v3.positionScreen.x; _v3y = v3.positionScreen.y;
 
-		if ( material.opacity != _contextGlobalAlpha ) {
-
-			_context.globalAlpha = _contextGlobalAlpha = material.opacity;
-
-		}
-
-		if ( material.blending != _contextGlobalCompositeOperation ) {
-
-			setBlending( material.blending );
-
-		}
+		setOpacity( material.opacity );
+		setBlending( material.blending );
 
 		if ( material.map ) {
 
@@ -654,17 +612,8 @@ THREE.CanvasRenderer = function () {
 		_v5x = v5.positionScreen.x; _v5y = v5.positionScreen.y;
 		_v6x = v6.positionScreen.x; _v6y = v6.positionScreen.y;
 
-		if ( material.opacity != _contextGlobalAlpha ) {
-
-			_context.globalAlpha = _contextGlobalAlpha = material.opacity;
-
-		}
-
-		if ( material.blending != _contextGlobalCompositeOperation ) {
-
-			setBlending( material.blending );
-
-		}
+		setOpacity( material.opacity );
+		setBlending( material.blending );
 
 		if ( material.map ) {
 
@@ -767,28 +716,15 @@ THREE.CanvasRenderer = function () {
 
 		if ( wireframe ) {
 
-			if ( _contextLineWidth != wireframe_linewidth ) {
-
-				_context.lineWidth = _contextLineWidth = wireframe_linewidth;
-
-			}
-
-			if ( _contextStrokeStyle != color.__styleString ) {
-
-				_context.strokeStyle = _contextStrokeStyle  = color.__styleString;
-
-			}
+			setLineWidth( wireframe_linewidth );
+			setStrokeStyle( color.__styleString );
 
 			_context.stroke();
 			_bboxRect.inflate( wireframe_linewidth * 2 );
 
 		} else {
 
-			if ( _contextFillStyle != color.__styleString ) {
-
-				_context.fillStyle = _contextFillStyle = color.__styleString;
-
-			}
+			setFillStyle( color.__styleString );
 
 			_context.fill();
 
@@ -808,28 +744,15 @@ THREE.CanvasRenderer = function () {
 
 		if ( wireframe ) {
 
-			if ( _contextLineWidth != wireframe_linewidth ) {
-
-				_context.lineWidth = _contextLineWidth = wireframe_linewidth;
-
-			}
-
-			if ( _contextStrokeStyle != color.__styleString ) {
-
-				_context.strokeStyle = _contextStrokeStyle  = color.__styleString;
-
-			}
+			setLineWidth( wireframe_linewidth );
+			setStrokeStyle( color.__styleString );
 
 			_context.stroke();
 			_bboxRect.inflate( wireframe_linewidth * 2 );
 
 		} else {
 
-			if ( _contextFillStyle != color.__styleString ) {
-
-				_context.fillStyle = _contextFillStyle = color.__styleString;
-
-			}
+			setFillStyle( color.__styleString );
 
 			_context.fill();
 
@@ -871,35 +794,83 @@ THREE.CanvasRenderer = function () {
 
 	}
 
-	function setBlending( blending ) {
+	//
 
-		switch ( blending ) {
+	function setOpacity( value ) {
 
-			case THREE.NormalBlending:
+		if ( _contextGlobalAlpha != value ) {
 
-				_context.globalCompositeOperation = 'source-over';
-
-				break;
-
-			case THREE.AdditiveBlending:
-
-				_context.globalCompositeOperation = 'lighter';
-
-				break;
-
-			case THREE.SubtractiveBlending:
-
-				_context.globalCompositeOperation = 'darker';
-
-				break;
+			_context.globalAlpha = _contextGlobalAlpha = value;
 
 		}
 
-		_contextGlobalCompositeOperation = blending;
+	}
+
+	function setBlending( value ) {
+
+		if ( _contextGlobalCompositeOperation != value ) {
+
+			switch ( value ) {
+
+				case THREE.NormalBlending:
+
+					_context.globalCompositeOperation = 'source-over';
+
+					break;
+
+				case THREE.AdditiveBlending:
+
+					_context.globalCompositeOperation = 'lighter';
+
+					break;
+
+				case THREE.SubtractiveBlending:
+
+					_context.globalCompositeOperation = 'darker';
+
+					break;
+
+			}
+
+			_contextGlobalCompositeOperation = value;
+
+		}
+
+	}
+
+	function setLineWidth( value ) {
+
+		if ( _contextLineWidth != value ) {
+
+			_context.lineWidth = _contextLineWidth = value;
+
+		}
+
+	}
+
+	function setStrokeStyle( value ) {
+
+		if ( _contextStrokeStyle != value ) {
+
+			_context.strokeStyle = _contextStrokeStyle  = value;
+
+		}
+
+	}
+
+	function setFillStyle( value ) {
+
+		if ( _contextFillStyle != value ) {
+
+			_context.fillStyle = _contextFillStyle = value;
+
+		}
 
 	}
 
 	function getGradientTexture( c1, c2, c3, c4 ) {
+
+		// http://mrdoob.com/blog/post/710
 
 		_pixelMapData[ 0 ] = c1[ 0 ];
 		_pixelMapData[ 1 ] = c1[ 1 ];
