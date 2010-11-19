@@ -46,6 +46,7 @@
 			var container, stats;
 
 			var camera, scene, webglRenderer;
+			var cameraCube, sceneCube;
 
 			var mesh, zmesh, lightMesh, geometry;
 
@@ -70,8 +71,10 @@
 				camera = new THREE.Camera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
 				camera.position.z = 3200;
 
-				scene = new THREE.Scene();
+				cameraCube = new THREE.Camera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
 
+				scene = new THREE.Scene();
+				sceneCube = new THREE.Scene();
 
 				var r = "textures/skymap_";
 
@@ -99,6 +102,7 @@
 
 				webglRenderer = new THREE.WebGLRenderer( scene );
 				webglRenderer.setSize( window.innerWidth, window.innerHeight );
+				webglRenderer.autoClear = false;
 				container.appendChild( webglRenderer.domElement );
 
 				if ( statsEnabled ) {
@@ -123,9 +127,7 @@
 				mesh.rotation.x = rx;
 				mesh.rotation.y = ry;
 				mesh.rotation.z = rz;
-				mesh.overdraw = true;
-				mesh.updateMatrix();
-				scene.addObject(mesh);
+				sceneCube.addObject(mesh);
 
 			}
 
@@ -172,6 +174,12 @@
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 
+				cameraCube.target.position.x = - camera.position.x;
+				cameraCube.target.position.y = - camera.position.y;
+				cameraCube.target.position.z = - camera.position.z;
+
+				webglRenderer.clear();
+				webglRenderer.render( sceneCube, cameraCube );
 				webglRenderer.render( scene, camera );
 
 				if ( statsEnabled ) stats.update();
