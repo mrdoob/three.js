@@ -16,7 +16,7 @@ THREE.Mesh = function ( geometry, material, normUVs ) {
 
 	this.materialFaceGroup = {};
 	this.sortFacesByMaterial();
-	if( normUVs ) this.normalizeUVs();
+	if ( normUVs ) this.normalizeUVs();
 
 	this.geometry.computeBoundingBox();
 

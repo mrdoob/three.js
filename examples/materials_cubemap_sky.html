@@ -36,6 +36,7 @@
 
 		<script type="text/javascript" src="../src/extras/primitives/Sphere.js"></script>
 		<script type="text/javascript" src="../src/extras/primitives/Plane.js"></script>
+		<script type="text/javascript" src="../src/extras/GeometryUtils.js"></script>
 
 		<script type="text/javascript" src="js/Stats.js"></script>
 
@@ -76,27 +77,31 @@
 				scene = new THREE.Scene();
 				sceneCube = new THREE.Scene();
 
-				var r = "textures/skymap_";
+				var geometry = new THREE.Geometry();
+				var sphere = new THREE.Mesh( new Sphere( 100, 32, 16 ) );
 
+				for ( var i = 0; i < 200; i ++ ) {
+
+					sphere.position.x = Math.random() * 10000 - 5000;
+					sphere.position.y = Math.random() * 10000 - 5000;
+					sphere.position.z = Math.random() * 10000 - 5000;
+					sphere.scale.x = sphere.scale.y = sphere.scale.z = Math.random() * 4 + 1;
+
+					// Merging spheres in a single geometry
+					GeometryUtils.merge( geometry, sphere );
+				}
+
+				var r = "textures/skymap_";
 				var urls = [ r + "right1024.jpg", r + "left1024.jpg", 
 					 r + "top1024.jpg", r + "bottom1024.jpg", 
 					 r + "front1024.jpg", r + "back1024.jpg" ];
 
 				var images = loadImageArray( urls );
-
 				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, env_map: new THREE.TextureCube( images ) } );
-				var geometry = new Sphere( 100, 32, 16, true );
 
-				for ( var i = 0; i < 200; i ++ ) {
-
-					var mesh = new THREE.Mesh( geometry, material );
-					mesh.position.x = Math.random() * 10000 - 5000;
-					mesh.position.y = Math.random() * 10000 - 5000;
-					mesh.position.z = Math.random() * 10000 - 5000;
-					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 4 + 1;
-					scene.addObject( mesh );
-
-				}
+				var mesh = new THREE.Mesh( geometry, material );
+				mesh.position.x = 100;
+				scene.addObject( mesh );
 
 				createCube( 100000, images );
 
