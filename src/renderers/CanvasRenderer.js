@@ -901,6 +901,8 @@ THREE.CanvasRenderer = function () {
 
 	function getGradientTexture( c1, c2, c3, c4 ) {
 
+		// http://mrdoob.com/blog/post/710
+
 		_pixelMapData[ 0 ] = c1[ 0 ];
 		_pixelMapData[ 1 ] = c1[ 1 ];
 		_pixelMapData[ 2 ] = c1[ 2 ];
