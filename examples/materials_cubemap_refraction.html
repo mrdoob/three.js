@@ -1,0 +1,238 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>three.js - cube map WebGL</title>
+		<meta charset="utf-8">
+		<style type="text/css">
+			body {
+				background:#000;
+				color:#fff;
+				padding:0;
+				margin:0;
+				overflow:hidden;
+				font-family:georgia;
+				text-align:center;
+			}
+			a {	color: #ff0080;	text-decoration: none; }
+			a:hover { color: #0080ff; }
+
+			canvas { pointer-events:none; z-index:10; position:relative; }
+			#log { position:absolute; top:50px; text-align:left; display:block; z-index:100; pointer-events:none; }
+			#d { text-align:center; margin:1em auto -9.5em; z-index:1000; position:relative; display:block; 
+				background:rgba(0,0,0,0.5); padding:0.5em; width:400px; border-radius:15px; -webkit-box-shadow: 0px 0px 10px rgba(0,0,0,0.5) }
+		</style>
+	</head>
+
+	<body>
+		<div id="d">
+			<p><a href="http://github.com/mrdoob/three.js">Three.js</a> cube map refraction demo
+
+			<p>Lucy model from <a href="http://graphics.stanford.edu/data/3Dscanrep/">Stanford 3d scanning repository</a>
+			<p>Texture by <a href="http://www.humus.name/index.php?page=Textures" target="_blank">Humus</a>
+		</div>
+
+		<pre id="log"></pre>
+
+		<script type="text/javascript" src="../build/Three.js"></script> 
+
+		<script type="text/javascript" src="../src/extras/primitives/Sphere.js"></script>
+		<script type="text/javascript" src="../src/extras/primitives/Plane.js"></script>
+		<script type="text/javascript" src="../src/extras/io/Loader.js"></script>
+
+		<script type="text/javascript" src="js/Stats.js"></script>
+
+		<script type="text/javascript">
+
+			var FLOOR = -250;
+
+			var container, stats;
+
+			var camera, scene, webglRenderer;
+			var cameraCube, sceneCube;
+
+			var mesh, zmesh, lightMesh, geometry;
+
+			var directionalLight, pointLight;
+
+			var mouseX = 0;
+			var mouseY = 0;
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+			document.addEventListener('mousemove', onDocumentMouseMove, false);
+
+			init();
+			setInterval( loop, 1000 / 60 );
+
+			function init() {
+
+				container = document.createElement('div');
+				document.body.appendChild(container);
+
+				camera = new THREE.Camera( 50, window.innerWidth / window.innerHeight, 1, 100000 );
+				camera.position.z = 2000;
+
+				cameraCube = new THREE.Camera( 50, window.innerWidth / window.innerHeight, 1, 100000 );
+
+				scene = new THREE.Scene();
+				sceneCube = new THREE.Scene();
+
+				// LIGHTS
+
+				var ambient = new THREE.AmbientLight( 0xffffff );
+				scene.addLight( ambient );
+
+				pointLight = new THREE.PointLight( 0xffffff, 2 );
+				scene.addLight( pointLight );
+
+				// light representation
+				sphere = new Sphere( 100, 16, 8, 1 );
+				lightMesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color:0xffaa00 } ) );
+				lightMesh.position = pointLight.position;
+				lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
+				scene.addObject(lightMesh);
+
+				// material samples
+				
+				
+                var r = "textures/cube/Park3Med/";
+
+				var urls = [ r + "px.jpg", r + "nx.jpg", 
+							 r + "py.jpg", r + "ny.jpg", 
+							 r + "pz.jpg", r + "nz.jpg" ];
+				
+				var images = loadImageArray( urls );
+				var cubeMaterial3 = new THREE.MeshBasicMaterial( { color: 0xccddff, env_map: new THREE.TextureCube( images, THREE.RefractionMap ), refraction_ratio: 0.98, reflectivity:0.9 } );
+				var cubeMaterial2 = new THREE.MeshBasicMaterial( { color: 0xccfffd, env_map: new THREE.TextureCube( images, THREE.RefractionMap ), refraction_ratio: 0.985 } );
+				var cubeMaterial1 = new THREE.MeshBasicMaterial( { color: 0xffffff, env_map: new THREE.TextureCube( images, THREE.RefractionMap ), refraction_ratio: 0.98 } )
+
+				createCube( 10000, images );
+
+				webglRenderer = new THREE.WebGLRenderer( scene );
+				webglRenderer.setSize( window.innerWidth, window.innerHeight );
+				webglRenderer.autoClear = false;
+				container.appendChild( webglRenderer.domElement );
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				stats.domElement.style.zIndex = 100;
+				container.appendChild( stats.domElement );
+
+				var loader = new THREE.Loader();
+				loader.loadBinary( 'obj/lucy/Lucy100k_bin.js', function( geometry ) { createScene( geometry, cubeMaterial1, cubeMaterial2, cubeMaterial3 ) }, "obj/lucy" );
+
+			}
+
+			function addMesh( geometry, scale, x, y, z, rx, ry, rz, material ) {
+
+				mesh = new THREE.Mesh( geometry, material );
+				mesh.scale.x = mesh.scale.y = mesh.scale.z = scale;
+				mesh.position.x = x;
+				mesh.position.y = y;
+				mesh.position.z = z;
+				mesh.rotation.x = rx;
+				mesh.rotation.y = ry;
+				mesh.rotation.z = rz;
+				scene.addObject(mesh);
+
+			}
+
+			function addCubeMesh( geometry, scale, x, y, z, rx, ry, rz, material ) {
+
+				mesh = new THREE.Mesh( geometry, material );
+				mesh.position.x = x;
+				mesh.position.y = y;
+				mesh.position.z = z;
+				mesh.rotation.x = rx;
+				mesh.rotation.y = ry;
+				mesh.rotation.z = rz;
+				mesh.scale.x = mesh.scale.y = mesh.scale.z = scale;
+				sceneCube.addObject(mesh);
+
+			}
+
+			function createCube( size, images ) {
+
+				var hsize = size/2, plane = new Plane( size, size ), pi2 = Math.PI/2, pi = Math.PI;
+
+				addCubeMesh( plane, 1,      0,     0,  -hsize,  0,      0,  0, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[5] ) } ) );
+				addCubeMesh( plane, 1, -hsize,     0,       0,  0,    pi2,  0, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[0] ) } ) );
+				addCubeMesh( plane, 1,  hsize,     0,       0,  0,   -pi2,  0, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[1] ) } ) );
+				addCubeMesh( plane, 1,     0,  hsize,       0,  pi2,    0, pi, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[2] ) } ) );
+				addCubeMesh( plane, 1,     0, -hsize,       0, -pi2,    0, pi, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[3] ) } ) );
+
+			}
+
+			function createScene( geometry, m1, m2, m3 ) {
+
+				var s = 1.5, z = -1000;
+
+				addMesh( geometry, s,      0, 0, z, 0,0,0, m1 );
+				addMesh( geometry, s,   -900, 0, z, 0,0,0, m2 );
+				addMesh( geometry, s,    900, 0, z, 0,0,0, m3 );
+
+			}
+
+			function loadImageArray( urls ) {
+
+				var i, images = [];
+
+				images.loadCount = 0;
+
+				for ( i = 0; i < urls.length; ++i ) {
+
+					images[i] = new Image();
+					images[i].loaded = 0;
+					images[i].onload = function() { images.loadCount += 1; this.loaded = 1;/*log( images.loadCount );*/ }
+					images[i].src = urls[i];
+
+				}
+
+				return images;
+
+			}
+
+			function onDocumentMouseMove(event) {
+
+				mouseX = ( event.clientX - windowHalfX ) * 4;
+				mouseY = ( event.clientY - windowHalfY ) * 4;
+
+			}
+
+			var r = 0;
+
+			function loop() {
+
+				camera.position.x += ( mouseX - camera.position.x ) * .05;
+				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+
+				cameraCube.target.position.x = - camera.position.x;
+				cameraCube.target.position.y = - camera.position.y;
+				cameraCube.target.position.z = - camera.position.z;
+
+
+				lightMesh.position.x = 1500 * Math.cos( r );
+				lightMesh.position.z = 1500 * Math.sin( r );
+
+				r += 0.01;
+
+				webglRenderer.clear();
+				webglRenderer.render( sceneCube, cameraCube );
+				webglRenderer.render( scene, camera );
+
+				stats.update();
+
+			}
+
+			function log(text) {
+
+				var e = document.getElementById("log");
+				e.innerHTML = text + "<br/>" + e.innerHTML;
+
+			}
+		</script>
+
+	</body>
+</html>

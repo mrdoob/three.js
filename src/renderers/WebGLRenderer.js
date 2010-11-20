@@ -887,7 +887,7 @@ THREE.WebGLRenderer = function ( scene ) {
 				
 				"if ( enableCubeMap ) {",
 					
-					"cubeColor = textureCube( tCube, vReflect );",
+					"cubeColor = textureCube( tCube, vec3( -vReflect.x, vReflect.yz ) );",
 					
 				"}",
 
