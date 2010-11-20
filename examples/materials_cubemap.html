@@ -102,7 +102,7 @@
 							 r + "pz.jpg", r + "nz.jpg" ];
 
 				var images = loadImageArray( urls );
-
+				
 				//var cubeMaterial3 = new THREE.MeshPhongMaterial( { color: 0x000000, specular:0xaa0000, env_map: new THREE.TextureCube( images ), combine: THREE.Mix, reflectivity: 0.25 } );
 				var cubeMaterial3 = new THREE.MeshLambertMaterial( { color: 0xff6600, env_map: new THREE.TextureCube( images ), combine: THREE.Mix, reflectivity: 0.3 } );
 				var cubeMaterial2 = new THREE.MeshLambertMaterial( { color: 0xffee00, env_map: new THREE.TextureCube( images ) } );
