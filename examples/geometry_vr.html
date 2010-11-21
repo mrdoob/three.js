@@ -5,7 +5,7 @@
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
-				background-color: #ffffff;
+				background-color: #000000;
 				margin: 0px;
 				overflow: hidden;
 			}
@@ -17,6 +17,7 @@
 				padding: 5px;
 				font-family:Monospace;
 				font-size:13px;
+				font-weight: bold;
 				text-align:center;
 			}
 
@@ -28,16 +29,17 @@
 	<body>
 
 		<div id="container"></div> 
-		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - vr demo. skybox by <a href="http://www.zfight.com/" target="_blank">Jochum Skoglund</a></div>
+		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - vr demo. skybox by <a href="http://www.zfight.com/" target="_blank">Jochum Skoglund</a>. (mousewheel: change fov)</div>
 
 		<script type="text/javascript" src="../build/Three.js"></script>
-		<script type="text/javascript" src="../src/extras/primitives/Plane.js"></script>
+		<script type="text/javascript" src="../src/extras/primitives/Cube.js"></script>
 
 		<script type="text/javascript">
 
 			var camera, scene, renderer;
 
-			var texture_placeholder, wireframe,
+			var fov = 75,
+			texture_placeholder, wireframe,
 			isUserInteracting = false,
 			onMouseDownMouseX = 0, onMouseDownMouseY = 0,
 			lon = 90, onMouseDownLon = 0,
@@ -52,7 +54,7 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.Camera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.Camera( fov, window.innerWidth / window.innerHeight, 1, 1100 );
 
 				scene = new THREE.Scene();
 
@@ -66,41 +68,26 @@
 				context.fillStyle = 'rgba( 200, 200, 200, 1 )';
 				context.fillRect( 0, 0, texture_placeholder.width, texture_placeholder.height );
 
-				mesh = new THREE.Mesh( new Plane( 1000, 1000, 5, 5 ), loadTexture( 'textures/skymap_front1024.jpg' ) );
-				mesh.position.z = -500;
+				var materials = [];
+				materials.push( [ loadTexture( 'textures/skymap_right1024.jpg' ), wireframe ] );
+				materials.push( [ loadTexture( 'textures/skymap_left1024.jpg' ), wireframe ] );
+				materials.push( [ loadTexture( 'textures/skymap_back1024.jpg' ), wireframe ] );
+				materials.push( [ loadTexture( 'textures/skymap_front1024.jpg' ), wireframe ] );
+				materials.push( [ loadTexture( 'textures/skymap_top1024.jpg' ), wireframe ] );
+				materials.push( [ loadTexture( 'textures/skymap_bottom1024.jpg' ), wireframe ] );
+
+				mesh = new THREE.Mesh( new Cube( 100, 100, 100, 7, 7, materials, true ), new THREE.MeshFaceMaterial() );
 				mesh.overdraw = true;
 				scene.addObject( mesh );
 
-				mesh = new THREE.Mesh( new Plane( 1000, 1000, 5, 5 ), loadTexture( 'textures/skymap_back1024.jpg' ) );
-				mesh.position.z = 500;
-				mesh.rotation.y = 180 * Math.PI / 180;
-				mesh.overdraw = true;
-				scene.addObject( mesh );
+				for ( var i = 0, l = mesh.geometry.vertices.length; i < l; i ++ ) {
 
-				mesh = new THREE.Mesh( new Plane( 1000, 1000, 5, 5 ), loadTexture( 'textures/skymap_left1024.jpg' ) );
-				mesh.position.x = -500;
-				mesh.rotation.y = 90 * Math.PI / 180;
-				mesh.overdraw = true;
-				scene.addObject( mesh );
+					var vertex = mesh.geometry.vertices[ i ];
 
-				mesh = new THREE.Mesh( new Plane( 1000, 1000, 5, 5 ), loadTexture( 'textures/skymap_right1024.jpg' ) );
-				mesh.position.x = 500;
-				mesh.rotation.y = -90 * Math.PI / 180;
-				mesh.overdraw = true;
-				scene.addObject( mesh );
+					vertex.position.normalize();
+					vertex.position.multiplyScalar( 550 );
 
-				mesh = new THREE.Mesh( new Plane( 1000, 1000, 5, 5 ), loadTexture( 'textures/skymap_top1024.jpg' ) );
-				mesh.position.y = 500;
-				mesh.rotation.x = 90 * Math.PI / 180;
-				mesh.overdraw = true;
-				scene.addObject( mesh );
-
-				mesh = new THREE.Mesh( new Plane( 1000, 1000, 5, 5 ), loadTexture( 'textures/skymap_bottom1024.jpg' ) );
-				mesh.position.y = -500;
-				mesh.rotation.x = -90 * Math.PI / 180;
-				mesh.overdraw = true;
-				scene.addObject( mesh );
-
+				}
 
 				renderer = new THREE.CanvasRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -110,6 +97,7 @@
 				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.addEventListener( 'mouseup', onDocumentMouseUp, false );
+				document.addEventListener( 'mousewheel', onDocumentMouseWheel, false );
 
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
@@ -131,7 +119,7 @@
 
 				texture.src = path;
 
-				return [ material, wireframe ];
+				return material;
 			}
 
 			function onDocumentMouseDown( event ) {
@@ -156,7 +144,6 @@
 
 					lon = ( onPointerDownPointerX - event.clientX ) * 0.1 + onPointerDownLon;
 					lat = ( event.clientY - onPointerDownPointerY ) * 0.1 + onPointerDownLat;
-
 					render();
 
 				}
@@ -165,10 +152,17 @@
 			function onDocumentMouseUp( event ) {
 
 				isUserInteracting = false;
-
 				wireframe.opacity = 0;
-
 				render();
+
+			}
+
+			function onDocumentMouseWheel( event ) {
+
+				fov -= event.wheelDeltaY * 0.05;
+				camera.projectionMatrix = THREE.Matrix4.makePerspective( fov, window.innerWidth / window.innerHeight, 1, 1100 );
+				render();
+
 			}
 
 
@@ -209,6 +203,10 @@
 				camera.target.position.x = 500 * Math.sin( phi ) * Math.cos( theta );
 				camera.target.position.y = 500 * Math.cos( phi );
 				camera.target.position.z = 500 * Math.sin( phi ) * Math.sin( theta );
+
+				camera.position.x = - camera.target.position.x;
+				camera.position.y = - camera.target.position.y;
+				camera.position.z = - camera.target.position.z;
 
 				renderer.render( scene, camera );
 

@@ -63,14 +63,15 @@
 
 				// Cube
 
-				geometry = new Cube( 200, 200, 200 );
+				var materials = [];
 
-				for ( var i = 0; i < geometry.faces.length; i++ ) {
+				for ( var i = 0; i < 6; i ++ ) {
 
-					geometry.faces[ i ].material = [ new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, opacity: 1 } ) ];
+					materials.push( [ new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } ) ] );
+
 				}
 
-				cube = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial() );
+				cube = new THREE.Mesh( new Cube( 200, 200, 200, 1, 1, materials ), new THREE.MeshFaceMaterial() );
 				cube.position.y = 150;
 				scene.addObject( cube );
 

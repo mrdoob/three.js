@@ -388,11 +388,13 @@ THREE.CanvasRenderer = function () {
 
 	function renderParticle ( v1, element, material, scene ) {
 
-		var width, height, scaleX, scaleY, offsetX, offsetY,
-		bitmap, bitmapWidth, bitmapHeight;
+		if ( material.opacity == 0 ) return;
 
 		setOpacity( material.opacity );
 		setBlending( material.blending );
+
+		var width, height, scaleX, scaleY, offsetX, offsetY,
+		bitmap, bitmapWidth, bitmapHeight;
 
 		if ( material instanceof THREE.ParticleBasicMaterial ) {
 
@@ -491,6 +493,8 @@ THREE.CanvasRenderer = function () {
 
 	function renderLine( v1, v2, element, material, scene ) {
 
+		if ( material.opacity == 0 ) return;
+
 		setOpacity( material.opacity );
 		setBlending( material.blending );
 
@@ -515,12 +519,14 @@ THREE.CanvasRenderer = function () {
 
 	function renderFace3( v1, v2, v3, element, material, scene ) {
 
-		_v1x = v1.positionScreen.x; _v1y = v1.positionScreen.y;
-		_v2x = v2.positionScreen.x; _v2y = v2.positionScreen.y;
-		_v3x = v3.positionScreen.x; _v3y = v3.positionScreen.y;
+		if ( material.opacity == 0 ) return;
 
 		setOpacity( material.opacity );
 		setBlending( material.blending );
+
+		_v1x = v1.positionScreen.x; _v1y = v1.positionScreen.y;
+		_v2x = v2.positionScreen.x; _v2y = v2.positionScreen.y;
+		_v3x = v3.positionScreen.x; _v3y = v3.positionScreen.y;
 
 		if ( material.map ) {
 
@@ -605,15 +611,17 @@ THREE.CanvasRenderer = function () {
 
 	function renderFace4( v1, v2, v3, v4, v5, v6, element, material, scene ) {
 
+		if ( material.opacity == 0 ) return;
+
+		setOpacity( material.opacity );
+		setBlending( material.blending );
+
 		_v1x = v1.positionScreen.x; _v1y = v1.positionScreen.y;
 		_v2x = v2.positionScreen.x; _v2y = v2.positionScreen.y;
 		_v3x = v3.positionScreen.x; _v3y = v3.positionScreen.y;
 		_v4x = v4.positionScreen.x; _v4y = v4.positionScreen.y;
 		_v5x = v5.positionScreen.x; _v5y = v5.positionScreen.y;
 		_v6x = v6.positionScreen.x; _v6y = v6.positionScreen.y;
-
-		setOpacity( material.opacity );
-		setBlending( material.blending );
 
 		if ( material.map ) {
 
