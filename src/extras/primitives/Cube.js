@@ -11,7 +11,7 @@ var Cube = function ( width, height, depth, segments_width, segments_height, mat
 	width_half = width / 2,
 	height_half = height / 2,
 	depth_half = depth / 2,
-	flip = flipped !== undefined ? - 1 : 1;
+	flip = flipped ? - 1 : 1;
 
 	if ( materials !== undefined ) {
 
@@ -41,8 +41,8 @@ var Cube = function ( width, height, depth, segments_width, segments_height, mat
 	buildPlane( 'z', 'y',   1 * flip, - 1, depth, height, - width_half, this.materials[ 1 ] ); // left
 	buildPlane( 'x', 'z', - 1 * flip, - 1, width, depth, height_half, this.materials[ 2 ] ); // top
 	buildPlane( 'x', 'z', - 1 * flip,   1, width, depth, - height_half, this.materials[ 3 ] ); // bottom
-	buildPlane( 'x', 'y',   1 * flip, - 1, width, height, depth_half, this.materials[ 4 ] ); // front
-	buildPlane( 'x', 'y', - 1 * flip, - 1, width, height, - depth_half, this.materials[ 5 ] ); // back
+	buildPlane( 'x', 'y',   1 * flip, - 1, width, height, depth_half, this.materials[ 4 ] ); // back
+	buildPlane( 'x', 'y', - 1 * flip, - 1, width, height, - depth_half, this.materials[ 5 ] ); // front
 
 	function buildPlane( u, v, udir, vdir, width, height, depth, material ) {
 

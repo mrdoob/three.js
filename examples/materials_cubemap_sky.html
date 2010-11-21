@@ -92,9 +92,9 @@
 				}
 
 				var r = "textures/skymap_";
-				var urls = [ r + "right1024.jpg", r + "left1024.jpg", 
-					 r + "top1024.jpg", r + "bottom1024.jpg", 
-					 r + "front1024.jpg", r + "back1024.jpg" ];
+				var urls = [ r + "px.jpg", r + "nx.jpg", 
+					 r + "py.jpg", r + "ny.jpg", 
+					 r + "pz.jpg", r + "nz.jpg" ];
 
 				var images = loadImageArray( urls );
 				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, env_map: new THREE.TextureCube( images ) } );
