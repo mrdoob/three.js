@@ -5,7 +5,7 @@
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
-				background-color: #000000;
+				background-color: rgb(200,200,200);
 				margin: 0px;
 				overflow: hidden;
 			}
@@ -69,12 +69,12 @@
 				context.fillRect( 0, 0, texture_placeholder.width, texture_placeholder.height );
 
 				var materials = [];
-				materials.push( [ loadTexture( 'textures/skymap_right1024.jpg' ), wireframe ] );
-				materials.push( [ loadTexture( 'textures/skymap_left1024.jpg' ), wireframe ] );
-				materials.push( [ loadTexture( 'textures/skymap_back1024.jpg' ), wireframe ] );
-				materials.push( [ loadTexture( 'textures/skymap_front1024.jpg' ), wireframe ] );
-				materials.push( [ loadTexture( 'textures/skymap_top1024.jpg' ), wireframe ] );
-				materials.push( [ loadTexture( 'textures/skymap_bottom1024.jpg' ), wireframe ] );
+				materials.push( [ loadTexture( 'textures/skymap_px.jpg' ), wireframe ] );
+				materials.push( [ loadTexture( 'textures/skymap_nx.jpg' ), wireframe ] );
+				materials.push( [ loadTexture( 'textures/skymap_py.jpg' ), wireframe ] );
+				materials.push( [ loadTexture( 'textures/skymap_ny.jpg' ), wireframe ] );
+				materials.push( [ loadTexture( 'textures/skymap_pz.jpg' ), wireframe ] );
+				materials.push( [ loadTexture( 'textures/skymap_nz.jpg' ), wireframe ] );
 
 				mesh = new THREE.Mesh( new Cube( 100, 100, 100, 7, 7, materials, true ), new THREE.MeshFaceMaterial() );
 				mesh.overdraw = true;

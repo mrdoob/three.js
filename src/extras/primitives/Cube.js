@@ -39,10 +39,10 @@ var Cube = function ( width, height, depth, segments_width, segments_height, mat
 
 	buildPlane( 'z', 'y', - 1 * flip, - 1, depth, height, width_half, this.materials[ 0 ] ); // right
 	buildPlane( 'z', 'y',   1 * flip, - 1, depth, height, - width_half, this.materials[ 1 ] ); // left
-	buildPlane( 'x', 'y',   1 * flip, - 1, width, height, depth_half, this.materials[ 2 ] ); // front
-	buildPlane( 'x', 'y', - 1 * flip, - 1, width, height, - depth_half, this.materials[ 3 ] ); // back
-	buildPlane( 'x', 'z', - 1 * flip, - 1, width, depth, height_half, this.materials[ 4 ] ); // top
-	buildPlane( 'x', 'z', - 1 * flip,   1, width, depth, - height_half, this.materials[ 5 ] ); // bottom
+	buildPlane( 'x', 'z', - 1 * flip, - 1, width, depth, height_half, this.materials[ 2 ] ); // top
+	buildPlane( 'x', 'z', - 1 * flip,   1, width, depth, - height_half, this.materials[ 3 ] ); // bottom
+	buildPlane( 'x', 'y',   1 * flip, - 1, width, height, depth_half, this.materials[ 4 ] ); // front
+	buildPlane( 'x', 'y', - 1 * flip, - 1, width, height, - depth_half, this.materials[ 5 ] ); // back
 
 	function buildPlane( u, v, udir, vdir, width, height, depth, material ) {
 
