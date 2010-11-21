@@ -35,7 +35,7 @@
 		<script type="text/javascript" src="../build/Three.js"></script> 
 
 		<script type="text/javascript" src="../src/extras/primitives/Sphere.js"></script>
-		<script type="text/javascript" src="../src/extras/primitives/Plane.js"></script>
+		<script type="text/javascript" src="../src/extras/primitives/Cube.js"></script>
 		<script type="text/javascript" src="../src/extras/GeometryUtils.js"></script>
 
 		<script type="text/javascript" src="js/Stats.js"></script>
@@ -100,10 +100,18 @@
 				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, env_map: new THREE.TextureCube( images ) } );
 
 				var mesh = new THREE.Mesh( geometry, material );
-				mesh.position.x = 100;
 				scene.addObject( mesh );
 
-				createCube( 100000, images );
+				var materials = [];
+
+				for ( var i = 0; i < 6; i ++ ) {
+
+					materials.push( [ new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[ i ] ) } ) ] );
+
+				}
+
+				var mesh = new THREE.Mesh( new Cube( 100000, 100000, 100000, 2, 2, materials, true ), new THREE.MeshFaceMaterial() );
+				sceneCube.addObject( mesh );
 
 				webglRenderer = new THREE.WebGLRenderer( scene );
 				webglRenderer.setSize( window.innerWidth, window.innerHeight );
@@ -119,32 +127,6 @@
 					container.appendChild( stats.domElement );
 
 				}
-
-			}
-
-			function addMesh( geometry, scale, x, y, z, rx, ry, rz, material ) {
-
-				mesh = new THREE.Mesh( geometry, material );
-				mesh.scale.x = mesh.scale.y = mesh.scale.z = scale;
-				mesh.position.x = x;
-				mesh.position.y = y;
-				mesh.position.z = z;
-				mesh.rotation.x = rx;
-				mesh.rotation.y = ry;
-				mesh.rotation.z = rz;
-				sceneCube.addObject(mesh);
-
-			}
-
-			function createCube( size, images ) {
-
-				var hsize = size/2, plane = new Plane( size, size ), pi2 = Math.PI/2, pi = Math.PI;
-
-				addMesh( plane, 1,      0,     0,  -hsize,  0,      0,  0, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[5] ) } ) );
-				addMesh( plane, 1, -hsize,     0,       0,  0,    pi2,  0, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[0] ) } ) );
-				addMesh( plane, 1,  hsize,     0,       0,  0,   -pi2,  0, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[1] ) } ) );
-				addMesh( plane, 1,     0,  hsize,       0,  pi2,    0, pi, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[2] ) } ) );
-				addMesh( plane, 1,     0, -hsize,       0, -pi2,    0, pi, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[3] ) } ) );
 
 			}
 

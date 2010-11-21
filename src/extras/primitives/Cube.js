@@ -44,6 +44,8 @@ var Cube = function ( width, height, depth, segments_width, segments_height, mat
 	buildPlane( 'x', 'y',   1 * flip, - 1, width, height, depth_half, this.materials[ 4 ] ); // back
 	buildPlane( 'x', 'y', - 1 * flip, - 1, width, height, - depth_half, this.materials[ 5 ] ); // front
 
+	mergeVertices();
+
 	function buildPlane( u, v, udir, vdir, width, height, depth, material ) {
 
 		var gridX = segments_width || 1,
@@ -104,6 +106,53 @@ var Cube = function ( width, height, depth, segments_width, segments_height, mat
 			}
 
 		}
+
+	}
+
+	function mergeVertices() {
+
+		var unique = [], changes = [];
+
+		for ( var i = 0, il = scope.vertices.length; i < il; i ++ ) {
+
+			var v = scope.vertices[ i ],
+			duplicate = false;
+
+			for ( var j = 0, jl = unique.length; j < jl; j ++ ) {
+
+				var vu = unique[ j ];
+
+				if( v.position.x == vu.position.x && v.position.y == vu.position.y && v.position.z == vu.position.z ) {
+
+					changes[ i ] = j;
+					duplicate = true;
+					break;
+
+				}
+
+			}
+
+			if ( ! duplicate ) {
+
+				changes[ i ] = unique.length;
+				unique.push( new THREE.Vertex( v.position.clone() ) );
+
+			}
+
+		}
+
+		for ( var i = 0, l = scope.faces.length; i < l; i ++ ) {
+
+			var face = scope.faces[ i ];
+
+			face.a = changes[ face.a ];
+			face.b = changes[ face.b ];
+			face.c = changes[ face.c ];
+			face.d = changes[ face.d ];
+
+		}
+
+		scope.vertices = unique;
 
 	}
 
