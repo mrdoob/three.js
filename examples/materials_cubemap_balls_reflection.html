@@ -30,7 +30,7 @@
 	</head>
 
 	<body>
-		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl cube reflection demo. skybox by <a href="http://www.zfight.com/" target="_blank">Jochum Skoglund</a></div>
+		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl cube reflection demo. skybox by <a href="http://ict.debevec.org/~debevec/" target="_blank">Paul Debevec</a></div>
 
 		<script type="text/javascript" src="../build/Three.js"></script> 
 
@@ -91,15 +91,21 @@
 
 					// Merging spheres in a single geometry
 					GeometryUtils.merge( geometry, sphere );
+
 				}
 
-				var r = "textures/skymap_";
-				var urls = [ r + "px.jpg", r + "nx.jpg", 
-					 r + "py.jpg", r + "ny.jpg", 
-					 r + "nz.jpg", r + "pz.jpg" ];
+				var path = "textures/cube/pisa/";
+				var format = '.png';
+				var urls = [
+						path + 'px' + format, path + 'nx' + format,
+						path + 'py' + format, path + 'ny' + format,
+						path + 'pz' + format, path + 'nz' + format
+					];
 
 				var images = ImageUtils.loadArray( urls );
 				var textureCube = new THREE.TextureCube( images );
+				// var textureCube = new THREE.TextureCube( images, THREE.RefractionMap );
+
 				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, env_map: textureCube } );
 
 				var mesh = new THREE.Mesh( geometry, material );

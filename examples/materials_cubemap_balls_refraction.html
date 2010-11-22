@@ -93,10 +93,13 @@
 					GeometryUtils.merge( geometry, sphere );
 				}
 
-				var r = "textures/skymap_";
-				var urls = [ r + "px.jpg", r + "nx.jpg", 
-					 r + "py.jpg", r + "ny.jpg", 
-					 r + "nz.jpg", r + "pz.jpg" ];
+				var path = "textures/cube/skybox/";
+				var format = '.jpg';
+				var urls = [
+						path + 'px' + format, path + 'nx' + format,
+						path + 'py' + format, path + 'ny' + format,
+						path + 'pz' + format, path + 'nz' + format
+					];
 
 				var images = ImageUtils.loadArray( urls );
 				var textureCube = new THREE.TextureCube( images, THREE.RefractionMap );

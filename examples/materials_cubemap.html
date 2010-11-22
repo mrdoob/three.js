@@ -94,15 +94,16 @@
 				lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
 				scene.addObject(lightMesh);
 
-				// material samples
-				var r = "textures/cube/SwedishRoyalCastle/";
-
-				var urls = [ r + "px.jpg", r + "nx.jpg", 
-							 r + "py.jpg", r + "ny.jpg", 
-							 r + "pz.jpg", r + "nz.jpg" ];
+				var path = "textures/cube/SwedishRoyalCastle/";
+				var format = '.jpg';
+				var urls = [
+						path + 'px' + format, path + 'nx' + format,
+						path + 'py' + format, path + 'ny' + format,
+						path + 'pz' + format, path + 'nz' + format
+					];
 
 				var images = ImageUtils.loadArray( urls );
-				
+
 				var reflectionCube = new THREE.TextureCube( images );
 				var refractionCube = new THREE.TextureCube( images, THREE.RefractionMap );
 				
