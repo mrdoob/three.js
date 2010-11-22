@@ -638,7 +638,7 @@ def generate_color(i):
         return "0x%06x" % int(0xffffff * random.random())
         
 def value2string(v):
-    if type(v)==str and v[0] != "0":
+    if type(v)==str and v[0:2] != "0x":
         return '"%s"' % v
     return str(v)
     
