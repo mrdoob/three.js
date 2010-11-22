@@ -117,7 +117,7 @@
 				xc.fillStyle = "#555";
 				xc.fillRect(96, 96, 32, 32);
 				
-				var xm = new THREE.MeshBasicMaterial( { map: new THREE.Texture( x ) } );
+				var xm = new THREE.MeshBasicMaterial( { map: new THREE.Texture( x, THREE.UVMapping, THREE.Repeat, THREE.Repeat ) } );
 				xm.map.image.loaded = 1;
 				
 				geometry = new Plane( 100, 100, 15, 10 );

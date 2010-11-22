@@ -391,6 +391,7 @@ THREE.WebGLRenderer = function ( scene ) {
 			mAmbient, mSpecular, mShininess,
 			mMap, envMap, mixEnvMap,
 			mRefractionRatio, useRefract;
+		
 
 		if ( material instanceof THREE.MeshPhongMaterial ||
 			 material instanceof THREE.MeshLambertMaterial ||
@@ -474,16 +475,18 @@ THREE.WebGLRenderer = function ( scene ) {
 			envMap = material.env_map;
 
 		}
-
+		
 		if ( mMap ) {
 
 			if ( !material.__webGLTexture && material.map.image.loaded ) {
 
 				material.__webGLTexture = _gl.createTexture();
 				_gl.bindTexture( _gl.TEXTURE_2D, material.__webGLTexture );
-				_gl.texImage2D( _gl.TEXTURE_2D, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, material.map.image ) ;
-				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_S, _gl.CLAMP_TO_EDGE );
-				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_T, _gl.CLAMP_TO_EDGE );
+				_gl.texImage2D( _gl.TEXTURE_2D, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, material.map.image );
+				
+				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_S, paramThreeToGL( material.map.wrap_s ) );
+				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_T, paramThreeToGL( material.map.wrap_t ) );
+				
 				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MAG_FILTER, _gl.LINEAR );
 				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, _gl.LINEAR_MIPMAP_LINEAR );
 				_gl.generateMipmap( _gl.TEXTURE_2D );
@@ -521,22 +524,17 @@ THREE.WebGLRenderer = function ( scene ) {
 					_gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MAG_FILTER, _gl.LINEAR );
 					_gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MIN_FILTER, _gl.LINEAR_MIPMAP_LINEAR );
 
-					//_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, true );
-
 					 for ( var i = 0; i < 6; ++i ) {
 
 						_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, material.env_map.image[ i ] );
-					}
 
-					//_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, false );
+					}
 
 					_gl.generateMipmap( _gl.TEXTURE_CUBE_MAP );
 
 					_gl.bindTexture( _gl.TEXTURE_CUBE_MAP, null );
 
 					material.env_map.image.__cubeMapInitialized = true;
-
-					//log( "texture cube initialised " + material );
 
 				}
 
@@ -1313,6 +1311,19 @@ THREE.WebGLRenderer = function ( scene ) {
 
 		return shader;
 
+	};
+
+	function paramThreeToGL( p ) {
+	
+		switch ( p ) {
+		
+		case THREE.Repeat: 	  	   return _gl.REPEAT; break;
+		case THREE.ClampToEdge:    return _gl.CLAMP_TO_EDGE; break;
+		case THREE.MirroredRepeat: return _gl.MIRRORED_REPEAT; break;
+		
+		}
+		
+		return 0;
 	};
 
 	/* DEBUG
