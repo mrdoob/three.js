@@ -41,6 +41,7 @@
 		<script type="text/javascript" src="../src/extras/primitives/Cube.js"></script>
 		<script type="text/javascript" src="../src/extras/io/Loader.js"></script>
 		<script type="text/javascript" src="../src/extras/ImageUtils.js"></script>
+		<script type="text/javascript" src="../src/extras/SceneUtils.js"></script>
 
 		<script type="text/javascript" src="js/Stats.js"></script>
 
@@ -112,9 +113,9 @@
 				var cubeMaterial2 = new THREE.MeshLambertMaterial( { color: 0xffee00, env_map: refractionCube, refraction_ratio: 0.95 } );
 				var cubeMaterial1 = new THREE.MeshLambertMaterial( { color: 0xffffff, env_map: reflectionCube } )
 
-				//createCubePlanes( 10000, images );
-				//createCube( 10000, images );
-				createCubeWebGL( 10000, reflectionCube );
+				//SceneUtils.addPanoramaCubePlanes( sceneCube, 100000, images );
+				//SceneUtils.addPanoramaCube( sceneCube, 100000, images );
+				SceneUtils.addPanoramaCubeWebGL( sceneCube, 100000, reflectionCube );
 				
 				webglRenderer = new THREE.WebGLRenderer( scene );
 				webglRenderer.setSize( window.innerWidth, window.innerHeight );
@@ -133,77 +134,13 @@
 
 			}
 
-			function addMesh( geometry, scale, x, y, z, rx, ry, rz, material ) {
-
-				mesh = new THREE.Mesh( geometry, material );
-				mesh.scale.x = mesh.scale.y = mesh.scale.z = scale;
-				mesh.position.x = x;
-				mesh.position.y = y;
-				mesh.position.z = z;
-				mesh.rotation.x = rx;
-				mesh.rotation.y = ry;
-				mesh.rotation.z = rz;
-				scene.addObject(mesh);
-
-			}
-
-			function addCubeMesh( geometry, scale, x, y, z, rx, ry, rz, material ) {
-
-				mesh = new THREE.Mesh( geometry, material );
-				mesh.position.x = x;
-				mesh.position.y = y;
-				mesh.position.z = z;
-				mesh.rotation.x = rx;
-				mesh.rotation.y = ry;
-				mesh.rotation.z = rz;
-				mesh.scale.x = mesh.scale.y = mesh.scale.z = scale;
-				sceneCube.addObject(mesh);
-
-			}
-
-			function createCubeWebGL( size, textureCube ) {
-			
-				var material = new THREE.MeshCubeMaterial( { env_map: textureCube } );
-
-				mesh = new THREE.Mesh( new Cube( size, size, size, 1, 1, null, true ), material );
-				sceneCube.addObject( mesh );
-			
-			}
-
-			function createCube( size, images ) {
-
-				var materials = [];
-				materials.push( new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[0] ) } ) );
-				materials.push( new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[1] ) } ) );
-				materials.push( new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[2] ) } ) );
-				materials.push( new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[3] ) } ) );
-				materials.push( new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[4] ) } ) );
-				materials.push( new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[5] ) } ) );
-
-				mesh = new THREE.Mesh( new Cube( size, size, size, 1, 1, materials, true ), new THREE.MeshFaceMaterial() );
-				sceneCube.addObject( mesh );
-
-			}
-			
-			function createCubePlanes( size, images ) {
-
-				var hsize = size/2, plane = new Plane( size, size ), pi2 = Math.PI/2, pi = Math.PI;
-
-				addCubeMesh( plane, 1,      0,     0,  -hsize,  0,      0,  0, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[5] ) } ) );
-				addCubeMesh( plane, 1, -hsize,     0,       0,  0,    pi2,  0, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[0] ) } ) );
-				addCubeMesh( plane, 1,  hsize,     0,       0,  0,   -pi2,  0, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[1] ) } ) );
-				addCubeMesh( plane, 1,     0,  hsize,       0,  pi2,    0, pi, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[2] ) } ) );
-				addCubeMesh( plane, 1,     0, -hsize,       0, -pi2,    0, pi, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[3] ) } ) );
-			
-			}
-
 			function createScene( geometry, m1, m2, m3 ) {
 
 				var s = 15;
 
-				addMesh( geometry, s,      0, 0, -100, 0,0,0, m1 );
-				addMesh( geometry, s,   -900, 0, -100, 0,0,0, m2 );
-				addMesh( geometry, s,    900, 0, -100, 0,0,0, m3 );
+				SceneUtils.addMesh( scene, geometry, s,      0, 0, -100, 0,0,0, m1 );
+				SceneUtils.addMesh( scene, geometry, s,   -900, 0, -100, 0,0,0, m2 );
+				SceneUtils.addMesh( scene, geometry, s,    900, 0, -100, 0,0,0, m3 );
 
 			}
 
