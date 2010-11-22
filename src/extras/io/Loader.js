@@ -458,7 +458,7 @@ THREE.Loader.prototype = {
 				u3 = uvs[ uvc*2 ];
 				v3 = uvs[ uvc*2 + 1 ];
 
-				THREE.Loader.prototype.uv( scope, u1, v1, u2, v2, u3, v3 );
+				THREE.Loader.prototype.uv3( scope, u1, v1, u2, v2, u3, v3 );
 
 			}
 
@@ -483,7 +483,7 @@ THREE.Loader.prototype = {
 				u4 = uvs[ uvd*2 ];
 				v4 = uvs[ uvd*2 + 1 ];
 
-				THREE.Loader.prototype.uv( scope, u1, v1, u2, v2, u3, v3, u4, v4 );
+				THREE.Loader.prototype.uv4( scope, u1, v1, u2, v2, u3, v3, u4, v4 );
 
 			}
 
@@ -741,7 +741,7 @@ THREE.Loader.prototype = {
 					u3 = data.uvs[ uvc * 2 ];
 					v3 = data.uvs[ uvc * 2 + 1 ];
 
-					THREE.Loader.prototype.uv( scope, u1, v1, u2, v2, u3, v3 );
+					THREE.Loader.prototype.uv3( scope, u1, v1, u2, v2, u3, v3 );
 
 				}
 
@@ -766,7 +766,7 @@ THREE.Loader.prototype = {
 					u4 = data.uvs[ uvd * 2 ];
 					v4 = data.uvs[ uvd * 2 + 1 ];
 
-					THREE.Loader.prototype.uv( scope, u1, v1, u2, v2, u3, v3, u4, v4 );
+					THREE.Loader.prototype.uv4( scope, u1, v1, u2, v2, u3, v3, u4, v4 );
 
 				}
 
@@ -907,13 +907,23 @@ THREE.Loader.prototype = {
 
 	},
 
-	uv: function( scope, u1, v1, u2, v2, u3, v3, u4, v4 ) {
+	uv3: function( scope, u1, v1, u2, v2, u3, v3 ) {
 
 		var uv = [];
 		uv.push( new THREE.UV( u1, v1 ) );
 		uv.push( new THREE.UV( u2, v2 ) );
 		uv.push( new THREE.UV( u3, v3 ) );
-		if ( u4 && v4 ) uv.push( new THREE.UV( u4, v4 ) );
+		scope.uvs.push( uv );
+
+	},
+
+	uv4: function( scope, u1, v1, u2, v2, u3, v3, u4, v4 ) {
+
+		var uv = [];
+		uv.push( new THREE.UV( u1, v1 ) );
+		uv.push( new THREE.UV( u2, v2 ) );
+		uv.push( new THREE.UV( u3, v3 ) );
+		uv.push( new THREE.UV( u4, v4 ) );
 		scope.uvs.push( uv );
 
 	},
