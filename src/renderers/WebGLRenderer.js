@@ -6,8 +6,8 @@
 
 THREE.WebGLRenderer = function ( scene ) {
 	
-	// Currently you can use just up to 5 directional / point lights total.
-	// Chrome barfs on shader linking when there are more than 5 lights :(
+	// Currently you can use just up to 4 directional / point lights total.
+	// Chrome barfs on shader linking when there are more than 4 lights :(
 		
 	// It seems problem comes from having too many varying vectors.
 	
@@ -18,7 +18,7 @@ THREE.WebGLRenderer = function ( scene ) {
 	var _canvas = document.createElement( 'canvas' ), _gl, _program,
 	_modelViewMatrix = new THREE.Matrix4(), _normalMatrix,
 	
-	BASIC = 0, LAMBERT = 1, PHONG = 2, DEPTH = 3, NORMAL = 4, // material constants used in shader
+	BASIC = 0, LAMBERT = 1, PHONG = 2, DEPTH = 3, NORMAL = 4, CUBE = 5, // material constants used in shader
 	
 	maxLightCount = allocateLights( scene, 4 );
 	
@@ -460,6 +460,12 @@ THREE.WebGLRenderer = function ( scene ) {
 
 			_gl.uniform1i( _program.material, BASIC );
 
+		} else if ( material instanceof THREE.MeshCubeMaterial ) {
+
+			_gl.uniform1i( _program.material, CUBE );
+			
+			envMap = material.env_map;
+
 		} 
 		
 		if ( mMap ) {
@@ -494,17 +500,19 @@ THREE.WebGLRenderer = function ( scene ) {
 				 material.env_map instanceof THREE.TextureCube && 
 				 material.env_map.image.length == 6 ) {
 				
-				if ( !material.__webGLTextureCube && !material.__cubeMapInitialized && material.env_map.image.loadCount == 6 ) {
+				if ( !material.env_map.image.__webGLTextureCube && !material.env_map.image.__cubeMapInitialized && material.env_map.image.loadCount == 6 ) {
 					
-					material.__webGLTextureCube = _gl.createTexture();
+					material.env_map.image.__webGLTextureCube = _gl.createTexture();
 					
-					_gl.bindTexture( _gl.TEXTURE_CUBE_MAP, material.__webGLTextureCube );
+					_gl.bindTexture( _gl.TEXTURE_CUBE_MAP, material.env_map.image.__webGLTextureCube );
 					
 					_gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_WRAP_S, _gl.CLAMP_TO_EDGE );
 					_gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_WRAP_T, _gl.CLAMP_TO_EDGE );
 			
 					_gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MAG_FILTER, _gl.LINEAR );
 					_gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MIN_FILTER, _gl.LINEAR_MIPMAP_LINEAR );
+					
+					//_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, true );
 					
 					_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, material.env_map.image[0] );
 					_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_NEGATIVE_X, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, material.env_map.image[1] );
@@ -513,16 +521,20 @@ THREE.WebGLRenderer = function ( scene ) {
 					_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_Z, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, material.env_map.image[4] );
 					_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, material.env_map.image[5] );
 					
+					//_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, false );
+					
 					_gl.generateMipmap( _gl.TEXTURE_CUBE_MAP );
 					
 					_gl.bindTexture( _gl.TEXTURE_CUBE_MAP, null );
 					
-					material.__cubeMapInitialized = true;
+					material.env_map.image.__cubeMapInitialized = true;
+					
+					//log( "texture cube initialised " + material );
 					
 				}
 				
 				_gl.activeTexture( _gl.TEXTURE1 );
-				_gl.bindTexture( _gl.TEXTURE_CUBE_MAP, material.__webGLTextureCube );
+				_gl.bindTexture( _gl.TEXTURE_CUBE_MAP, material.env_map.image.__webGLTextureCube );
 				_gl.uniform1i( _program.tCube,  1 );
 				
 			}
@@ -832,7 +844,7 @@ THREE.WebGLRenderer = function ( scene ) {
 			maxDirLights   ? "#define MAX_DIR_LIGHTS " + maxDirLights     : "",
 			maxPointLights ? "#define MAX_POINT_LIGHTS " + maxPointLights : "",
 		
-			"uniform int material;", // 0 - Basic, 1 - Lambert, 2 - Phong, 3 - Depth, 4 - Normal
+			"uniform int material;", // 0 - Basic, 1 - Lambert, 2 - Phong, 3 - Depth, 4 - Normal, 5 - Cube
 
 			"uniform bool enableMap;",
 			"uniform bool enableCubeMap;",
@@ -869,7 +881,9 @@ THREE.WebGLRenderer = function ( scene ) {
 			"varying vec3 vViewPosition;",
 			
 			"varying vec3 vReflect;",
-			
+		
+			"uniform vec3 cameraPosition;",
+		
 			"void main() {",
 
 				"vec4 mapColor = vec4( 1.0, 1.0, 1.0, 1.0 );",
@@ -891,9 +905,16 @@ THREE.WebGLRenderer = function ( scene ) {
 					
 				"}",
 
+				// Cube
+				
+				"if ( material == 5 ) { ",
+
+					"vec3 wPos = cameraPosition - vViewPosition;",
+					"gl_FragColor = textureCube( tCube, vec3( -wPos.x, wPos.yz ) );",
+
 				// Normals
 				
-				"if ( material == 4 ) { ",
+				"} else if ( material == 4 ) { ",
 				
 					"gl_FragColor = vec4( 0.5*normalize( vNormal ) + vec3(0.5, 0.5, 0.5), mOpacity );",
 				

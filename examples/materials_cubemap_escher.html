@@ -34,6 +34,7 @@
 
 		<script type="text/javascript" src="../src/extras/primitives/Sphere.js"></script>
 		<script type="text/javascript" src="../src/extras/primitives/Plane.js"></script>
+		<script type="text/javascript" src="../src/extras/primitives/Cube.js"></script>
 
 		<script type="text/javascript" src="js/Stats.js"></script>
 
@@ -77,16 +78,19 @@
 							 r + "py.jpg", r + "ny.jpg", 
 							 r + "pz.jpg", r + "nz.jpg" ];
 
-				var images = loadImageArray( urls );
+				var images = THREE.loadImageArray( urls );
 
-				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, env_map: new THREE.TextureCube( images ) } )
+				var textureCube = new THREE.TextureCube( images );
+				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, env_map: textureCube } )
 				var geometry = new Sphere( 100, 96, 64, true );
 
 				var mesh = new THREE.Mesh( geometry, material );
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 16;
 				scene.addObject( mesh );
 
-				createCube( 6000, images );
+				//createCubePlanes( 6000, images );
+				//createCube( 6000, images );
+				createCubeWebGL( 6000, textureCube );
 
 				webglRenderer = new THREE.WebGLRenderer( scene );
 				webglRenderer.setSize( window.innerWidth, window.innerHeight );
@@ -104,7 +108,7 @@
 
 			}
 
-			function addMesh( geometry, scale, x, y, z, rx, ry, rz, material ) {
+			function addCubeMesh( geometry, scale, x, y, z, rx, ry, rz, material ) {
 
 				mesh = new THREE.Mesh( geometry, material );
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = scale;
@@ -121,34 +125,39 @@
 			}
 
 			function createCube( size, images ) {
+				
+				var materials = [];
+				materials.push( new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[1] ) } ) );
+				materials.push( new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[0] ) } ) );
+				materials.push( new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[4] ) } ) );
+				materials.push( new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[5] ) } ) );
+				materials.push( new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[2] ) } ) );
+				materials.push( new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[3] ) } ) );
 
-				var hsize = size/2, plane = new Plane( size, size ), pi2 = Math.PI/2, pi = Math.PI;
-
-				addMesh( plane, 1,      0,     0,  -hsize,  0,      0,  0, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[5] ) } ) );
-				addMesh( plane, 1, -hsize,     0,       0,  0,    pi2,  0, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[0] ) } ) );
-				addMesh( plane, 1,  hsize,     0,       0,  0,   -pi2,  0, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[1] ) } ) );
-				addMesh( plane, 1,     0,  hsize,       0,  pi2,    0, pi, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[2] ) } ) );
-				addMesh( plane, 1,     0, -hsize,       0, -pi2,    0, pi, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[3] ) } ) );
+				mesh = new THREE.Mesh( new Cube( size, size, size, 1, 1, materials, true ), new THREE.MeshFaceMaterial() );
+				scene.addObject( mesh );
 
 			}
 
-			function loadImageArray( urls ) {
+			function createCubePlanes( size, images ) {
 
-				var i, images = [];
+				var hsize = size/2, plane = new Plane( size, size ), pi2 = Math.PI/2, pi = Math.PI;
 
-				images.loadCount = 0;
+				addCubeMesh( plane, 1,      0,     0,  -hsize,  0,      0,  0, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[5] ) } ) );
+				addCubeMesh( plane, 1, -hsize,     0,       0,  0,    pi2,  0, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[0] ) } ) );
+				addCubeMesh( plane, 1,  hsize,     0,       0,  0,   -pi2,  0, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[1] ) } ) );
+				addCubeMesh( plane, 1,     0,  hsize,       0,  pi2,    0, pi, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[2] ) } ) );
+				addCubeMesh( plane, 1,     0, -hsize,       0, -pi2,    0, pi, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[3] ) } ) );
 
-				for ( i = 0; i < urls.length; ++i ) {
+			}
 
-					images[i] = new Image();
-					images[i].loaded = 0;
-					images[i].onload = function() { images.loadCount += 1; this.loaded = 1;/*log( images.loadCount );*/ }
-					images[i].src = urls[i];
-
-				}
-
-				return images;
-
+			function createCubeWebGL( size, textureCube ) {
+				
+				var material = new THREE.MeshCubeMaterial( { env_map: textureCube } );
+				
+				mesh = new THREE.Mesh( new Cube( size, size, size, 1, 1, null, true ), material );
+				scene.addObject( mesh );
+				
 			}
 
 			function onDocumentMouseMove(event) {

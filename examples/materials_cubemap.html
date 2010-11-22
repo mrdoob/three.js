@@ -38,13 +38,12 @@
 
 		<script type="text/javascript" src="../src/extras/primitives/Sphere.js"></script>
 		<script type="text/javascript" src="../src/extras/primitives/Plane.js"></script>
+		<script type="text/javascript" src="../src/extras/primitives/Cube.js"></script>
 		<script type="text/javascript" src="../src/extras/io/Loader.js"></script>
-
+		
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
-
-			var FLOOR = -250;
 
 			var container, stats;
 
@@ -101,19 +100,24 @@
 							 r + "py.jpg", r + "ny.jpg", 
 							 r + "pz.jpg", r + "nz.jpg" ];
 
-				var images = loadImageArray( urls );
+				var images = THREE.loadImageArray( urls );
+				
+				var reflectionCube = new THREE.TextureCube( images );
+				var refractionCube = new THREE.TextureCube( images, THREE.RefractionMap );
 				
 				//var cubeMaterial3 = new THREE.MeshPhongMaterial( { color: 0x000000, specular:0xaa0000, env_map: new THREE.TextureCube( images ), combine: THREE.Mix, reflectivity: 0.25 } );
-				var cubeMaterial3 = new THREE.MeshLambertMaterial( { color: 0xff6600, env_map: new THREE.TextureCube( images ), combine: THREE.Mix, reflectivity: 0.3 } );
-				var cubeMaterial2 = new THREE.MeshLambertMaterial( { color: 0xffee00, env_map: new THREE.TextureCube( images, THREE.RefractionMap ), refraction_ratio: 0.95 } );
-				var cubeMaterial1 = new THREE.MeshLambertMaterial( { color: 0xffffff, env_map: new THREE.TextureCube( images ) } )
+				var cubeMaterial3 = new THREE.MeshLambertMaterial( { color: 0xff6600, env_map: reflectionCube, combine: THREE.Mix, reflectivity: 0.3 } );
+				var cubeMaterial2 = new THREE.MeshLambertMaterial( { color: 0xffee00, env_map: refractionCube, refraction_ratio: 0.95 } );
+				var cubeMaterial1 = new THREE.MeshLambertMaterial( { color: 0xffffff, env_map: reflectionCube } )
 
-				createCube( 10000, images );
-
+				//createCubePlanes( 10000, images );
+				//createCube( 10000, images );
+				createCubeWebGL( 10000, reflectionCube );
+				
 				webglRenderer = new THREE.WebGLRenderer( scene );
 				webglRenderer.setSize( window.innerWidth, window.innerHeight );
 				webglRenderer.autoClear = false;
-				webglRenderer.setFaceCulling( 0 );
+				//webglRenderer.setFaceCulling( 0 );
 				container.appendChild( webglRenderer.domElement );
 
 				stats = new Stats();
@@ -155,7 +159,31 @@
 
 			}
 
+			function createCubeWebGL( size, textureCube ) {
+			
+				var material = new THREE.MeshCubeMaterial( { env_map: textureCube } );
+
+				mesh = new THREE.Mesh( new Cube( size, size, size, 1, 1, null, true ), material );
+				sceneCube.addObject( mesh );
+			
+			}
+
 			function createCube( size, images ) {
+
+				var materials = [];
+				materials.push( new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[1] ) } ) );
+				materials.push( new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[0] ) } ) );
+				materials.push( new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[4] ) } ) );
+				materials.push( new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[5] ) } ) );
+				materials.push( new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[2] ) } ) );
+				materials.push( new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[3] ) } ) );
+
+				mesh = new THREE.Mesh( new Cube( size, size, size, 1, 1, materials, true ), new THREE.MeshFaceMaterial() );
+				sceneCube.addObject( mesh );
+
+			}
+			
+			function createCubePlanes( size, images ) {
 
 				var hsize = size/2, plane = new Plane( size, size ), pi2 = Math.PI/2, pi = Math.PI;
 
@@ -164,7 +192,7 @@
 				addCubeMesh( plane, 1,  hsize,     0,       0,  0,   -pi2,  0, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[1] ) } ) );
 				addCubeMesh( plane, 1,     0,  hsize,       0,  pi2,    0, pi, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[2] ) } ) );
 				addCubeMesh( plane, 1,     0, -hsize,       0, -pi2,    0, pi, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[3] ) } ) );
-
+			
 			}
 
 			function createScene( geometry, m1, m2, m3 ) {
@@ -174,25 +202,6 @@
 				addMesh( geometry, s,      0, 0, -100, 0,0,0, m1 );
 				addMesh( geometry, s,   -900, 0, -100, 0,0,0, m2 );
 				addMesh( geometry, s,    900, 0, -100, 0,0,0, m3 );
-
-			}
-
-			function loadImageArray( urls ) {
-
-				var i, images = [];
-
-				images.loadCount = 0;
-
-				for ( i = 0; i < urls.length; ++i ) {
-
-					images[i] = new Image();
-					images[i].loaded = 0;
-					images[i].onload = function() { images.loadCount += 1; this.loaded = 1;/*log( images.loadCount );*/ }
-					images[i].src = urls[i];
-
-				}
-
-				return images;
 
 			}
 
