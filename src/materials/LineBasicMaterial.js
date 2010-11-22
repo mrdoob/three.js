@@ -17,9 +17,7 @@ THREE.LineBasicMaterial = function ( parameters ) {
 	this.linewidth = 1;
 	this.linecap = 'round';
 	this.linejoin = 'round';
-	this.wireframe = true;
-	this.wireframe_linewidth = 1;
-	
+
 	if ( parameters ) {
 
 		if ( parameters.color !== undefined ) this.color.setHex( parameters.color );
@@ -29,9 +27,7 @@ THREE.LineBasicMaterial = function ( parameters ) {
 		if ( parameters.linecap !== undefined ) this.linecap = parameters.linecap;
 		if ( parameters.linejoin !== undefined ) this.linejoin = parameters.linejoin;
 	}
-	
-	this.wireframe_linewidth = this.linewidth;
-		
+
 	this.toString = function () {
 
 		return 'THREE.LineBasicMaterial (<br/>' +

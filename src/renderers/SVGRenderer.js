@@ -15,11 +15,11 @@ THREE.SVGRenderer = function () {
 	_bboxRect = new THREE.Rectangle(),
 
 	_enableLighting = false,
-	_color = new THREE.Color( 0xffffffff ),
-	_light = new THREE.Color( 0xffffffff ),
-	_ambientLight = new THREE.Color( 0xff000000 ),
-	_directionalLights = new THREE.Color( 0xff000000 ),
-	_pointLights = new THREE.Color( 0xff000000 ),
+	_color = new THREE.Color( 0xffffff ),
+	_light = new THREE.Color( 0xffffff ),
+	_ambientLight = new THREE.Color( 0x000000 ),
+	_directionalLights = new THREE.Color( 0x000000 ),
+	_pointLights = new THREE.Color( 0x000000 ),
 
 	_w, // z-buffer to w-buffer
 	_vector3 = new THREE.Vector3(), // Needed for PointLight
@@ -67,7 +67,8 @@ THREE.SVGRenderer = function () {
 
 	this.render = function( scene, camera ) {
 
-		var e, el, m, ml, fm, fml, element, material;
+		var e, el, m, ml, fm, fml, element, material,
+		linecap, linejoin;
 
 		if ( this.autoClear ) {
 
@@ -87,7 +88,7 @@ THREE.SVGRenderer = function () {
 
 		}
 
-		for ( e = 0, el = _renderList.length; e < el; e++ ) {
+		for ( e = 0, el = _renderList.length; e < el; e ++ ) {
 
 			element = _renderList[ e ];
 
@@ -107,24 +108,29 @@ THREE.SVGRenderer = function () {
 
 			} else if ( element instanceof THREE.RenderableLine ) {
 
-				//TODO: It's actually quite easy...
 				_v1 = element.v1; _v2 = element.v2;
+
 				_v1.positionScreen.x *= _svgWidthHalf; _v1.positionScreen.y *= - _svgHeightHalf;
 				_v2.positionScreen.x *= _svgWidthHalf; _v2.positionScreen.y *= - _svgHeightHalf;
-				
+
 				_bboxRect.addPoint( _v1.positionScreen.x, _v1.positionScreen.y );
 				_bboxRect.addPoint( _v2.positionScreen.x, _v2.positionScreen.y );
 
 				if ( !_clipRect.instersects( _bboxRect ) ) {
+
 					continue;
+
 				}
-			
+
 				m = 0; ml = element.material.length;
 
-				while ( m < ml ) {						
+				while ( m < ml ) {
+
 					material = element.material[ m ++ ];
 					material && renderLine( _v1, _v2, element, material, scene );
+
 				}
+
 			} else if ( element instanceof THREE.RenderableFace3 ) {
 
 				_v1 = element.v1; _v2 = element.v2; _v3 = element.v3;
@@ -334,21 +340,26 @@ THREE.SVGRenderer = function () {
 	}
 
 	function renderLine ( v1, v2, element, material, scene ) {
+
 		_svgNode = getLineNode( _lineCount ++ );
 
-		_svgNode.setAttribute('x1', v1.positionScreen.x);
-		_svgNode.setAttribute('y1', v1.positionScreen.y);
-		_svgNode.setAttribute('x2', v2.positionScreen.x);
-		_svgNode.setAttribute('y2', v2.positionScreen.y);
-		
+		_svgNode.setAttribute( 'x1', v1.positionScreen.x );
+		_svgNode.setAttribute( 'y1', v1.positionScreen.y );
+		_svgNode.setAttribute( 'x2', v2.positionScreen.x );
+		_svgNode.setAttribute( 'y2', v2.positionScreen.y );
+
 		if ( material instanceof THREE.LineBasicMaterial ) {
+
 			_color.__styleString = material.color.__styleString;
+
 		} else {
+
 			_color.__styleString = 'rgb(0,0,0)';
+
 		}
-		
-		_svgNode.setAttribute( 'style', 'fill: none; stroke: ' + _color.__styleString + '; stroke-width: ' + material.linewidth);
-		
+
+		_svgNode.setAttribute( 'style', 'fill: none; stroke: ' + _color.__styleString + '; stroke-width: ' + material.linewidth );
+
 		_svg.appendChild( _svgNode );
 	}
 
@@ -396,7 +407,7 @@ THREE.SVGRenderer = function () {
 
 		if ( material.wireframe ) {
 
-			_svgNode.setAttribute( 'style', 'fill: none; stroke: ' + _color.__styleString + '; stroke-width: ' + material.wireframe_linewidth + '; stroke-opacity: ' + material.opacity + '; stroke-linecap: round; stroke-linejoin: round' );
+			_svgNode.setAttribute( 'style', 'fill: none; stroke: ' + _color.__styleString + '; stroke-width: ' + material.wireframe_linewidth + '; stroke-opacity: ' + material.opacity + '; stroke-linecap: ' + linecap + '; stroke-linejoin: ' + linejoin );
 
 		} else {
 
@@ -412,9 +423,9 @@ THREE.SVGRenderer = function () {
 
 		_svgNode = getPathNode( _pathCount ++ );
 		_svgNode.setAttribute( 'd', 'M ' + v1.positionScreen.x + ' ' + v1.positionScreen.y + ' L ' + v2.positionScreen.x + ' ' + v2.positionScreen.y + ' L ' + v3.positionScreen.x + ',' + v3.positionScreen.y + ' L ' + v4.positionScreen.x + ',' + v4.positionScreen.y + 'z' );
-		
+
 		linecap = linejoin = 'round';
-		
+
 		if ( material instanceof THREE.MeshBasicMaterial ) {
 
 			_color.__styleString = material.color.__styleString;
@@ -458,7 +469,7 @@ THREE.SVGRenderer = function () {
 
 		if ( material.wireframe ) {
 
-			_svgNode.setAttribute( 'style', 'fill: none; stroke: ' + _color.__styleString + '; stroke-width: ' + material.wireframe_linewidth + '; stroke-opacity: ' + material.opacity + '; stroke-linecap: '+linecap+'; stroke-linejoin: '+linejoin );
+			_svgNode.setAttribute( 'style', 'fill: none; stroke: ' + _color.__styleString + '; stroke-width: ' + material.wireframe_linewidth + '; stroke-opacity: ' + material.opacity + '; stroke-linecap: ' + linecap + '; stroke-linejoin: ' + linejoin );
 
 		} else {
 
@@ -489,7 +500,7 @@ THREE.SVGRenderer = function () {
 		return _svgLinePool[ id ];
 
 	}
-	
+
 	function getPathNode( id ) {
 
 		if ( _svgPathPool[ id ] == null ) {
