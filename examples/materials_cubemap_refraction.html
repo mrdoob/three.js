@@ -110,8 +110,8 @@
 				var cubeMaterial1 = new THREE.MeshBasicMaterial( { color: 0xffffff, env_map: textureCube, refraction_ratio: 0.98 } )
 
 				//createCubePlanes( 100000, images );
-				//createCube( 100000, images );
-				createCubeWebGL( 100000, textureCube );
+				createCube( 100000, images );
+				//createCubeWebGL( 100000, textureCube );
 
 				webglRenderer = new THREE.WebGLRenderer( scene );
 				webglRenderer.setSize( window.innerWidth, window.innerHeight );

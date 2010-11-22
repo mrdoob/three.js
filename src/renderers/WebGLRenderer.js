@@ -475,6 +475,8 @@ THREE.WebGLRenderer = function ( scene ) {
 				material.__webGLTexture = _gl.createTexture();
 				_gl.bindTexture( _gl.TEXTURE_2D, material.__webGLTexture );
 				_gl.texImage2D( _gl.TEXTURE_2D, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, material.map.image ) ;
+				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_S, _gl.CLAMP_TO_EDGE );
+				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_T, _gl.CLAMP_TO_EDGE );
 				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MAG_FILTER, _gl.LINEAR );
 				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, _gl.LINEAR_MIPMAP_LINEAR );
 				_gl.generateMipmap( _gl.TEXTURE_2D );
@@ -512,16 +514,18 @@ THREE.WebGLRenderer = function ( scene ) {
 					_gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MAG_FILTER, _gl.LINEAR );
 					_gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MIN_FILTER, _gl.LINEAR_MIPMAP_LINEAR );
 					
-					//_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, true );
 					
 					_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, material.env_map.image[0] );
 					_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_NEGATIVE_X, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, material.env_map.image[1] );
+					
+					//_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, true );
 					_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_Y, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, material.env_map.image[2] );
 					_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, material.env_map.image[3] );
+					//_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, false );
+					
 					_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_Z, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, material.env_map.image[4] );
 					_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, material.env_map.image[5] );
 					
-					//_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, false );
 					
 					_gl.generateMipmap( _gl.TEXTURE_CUBE_MAP );
 					

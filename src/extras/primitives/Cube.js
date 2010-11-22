@@ -11,7 +11,7 @@ var Cube = function ( width, height, depth, segments_width, segments_height, mat
 	width_half = width / 2,
 	height_half = height / 2,
 	depth_half = depth / 2,
-	flip = flipped !== undefined ? - 1 : 1;
+	flip = flipped ? - 1 : 1;
 
 	if ( materials !== undefined ) {
 
@@ -39,10 +39,14 @@ var Cube = function ( width, height, depth, segments_width, segments_height, mat
 
 	buildPlane( 'z', 'y', - 1 * flip, - 1, depth, height, width_half, this.materials[ 0 ] ); // right
 	buildPlane( 'z', 'y',   1 * flip, - 1, depth, height, - width_half, this.materials[ 1 ] ); // left
-	buildPlane( 'x', 'y',   1 * flip, - 1, width, height, depth_half, this.materials[ 2 ] ); // front
-	buildPlane( 'x', 'y', - 1 * flip, - 1, width, height, - depth_half, this.materials[ 3 ] ); // back
-	buildPlane( 'x', 'z', - 1 * flip, - 1, width, depth, height_half, this.materials[ 4 ] ); // top
-	buildPlane( 'x', 'z', - 1 * flip,   1, width, depth, - height_half, this.materials[ 5 ] ); // bottom
+    
+	buildPlane( 'x', 'z', - 1 * flip, - 1, width, depth, height_half, this.materials[ 2 ] ); // top
+	buildPlane( 'x', 'z', - 1 * flip, 1, width, depth, - height_half, this.materials[ 3 ] ); // bottom
+    
+	buildPlane( 'x', 'y',   1 * flip, - 1, width, height, depth_half, this.materials[ 4 ] ); // back
+	buildPlane( 'x', 'y', - 1 * flip, - 1, width, height, - depth_half, this.materials[ 5 ] ); // front
+
+	mergeVertices();
 
 	function buildPlane( u, v, udir, vdir, width, height, depth, material ) {
 
@@ -104,6 +108,53 @@ var Cube = function ( width, height, depth, segments_width, segments_height, mat
 			}
 
 		}
+
+	}
+
+	function mergeVertices() {
+
+		var unique = [], changes = [];
+
+		for ( var i = 0, il = scope.vertices.length; i < il; i ++ ) {
+
+			var v = scope.vertices[ i ],
+			duplicate = false;
+
+			for ( var j = 0, jl = unique.length; j < jl; j ++ ) {
+
+				var vu = unique[ j ];
+
+				if( v.position.x == vu.position.x && v.position.y == vu.position.y && v.position.z == vu.position.z ) {
+
+					changes[ i ] = j;
+					duplicate = true;
+					break;
+
+				}
+
+			}
+
+			if ( ! duplicate ) {
+
+				changes[ i ] = unique.length;
+				unique.push( new THREE.Vertex( v.position.clone() ) );
+
+			}
+
+		}
+
+		for ( var i = 0, l = scope.faces.length; i < l; i ++ ) {
+
+			var face = scope.faces[ i ];
+
+			face.a = changes[ face.a ];
+			face.b = changes[ face.b ];
+			face.c = changes[ face.c ];
+			face.d = changes[ face.d ];
+
+		}
+
+		scope.vertices = unique;
 
 	}
 
