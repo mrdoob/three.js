@@ -15,16 +15,23 @@ THREE.LineBasicMaterial = function ( parameters ) {
 	this.opacity = 1;
 	this.blending = THREE.NormalBlending;
 	this.linewidth = 1;
-
+	this.linecap = 'round';
+	this.linejoin = 'round';
+	this.wireframe = true;
+	this.wireframe_linewidth = 1;
+	
 	if ( parameters ) {
 
 		if ( parameters.color !== undefined ) this.color.setHex( parameters.color );
 		if ( parameters.opacity !== undefined ) this.opacity  = parameters.opacity;
 		if ( parameters.blending !== undefined ) this.blending = parameters.blending;
 		if ( parameters.linewidth !== undefined ) this.linewidth = parameters.linewidth;
-
+		if ( parameters.linecap !== undefined ) this.linecap = parameters.linecap;
+		if ( parameters.linejoin !== undefined ) this.linejoin = parameters.linejoin;
 	}
-
+	
+	this.wireframe_linewidth = this.linewidth;
+		
 	this.toString = function () {
 
 		return 'THREE.LineBasicMaterial (<br/>' +
@@ -32,6 +39,8 @@ THREE.LineBasicMaterial = function ( parameters ) {
 			'opacity: ' + this.opacity + '<br/>' +
 			'blending: ' + this.blending + '<br/>' +
 			'linewidth: ' + this.linewidth +'<br/>' +
+			'linecap: ' + this.linecap +'<br/>' +
+			'linejoin: ' + this.linejoin +'<br/>' +
 			')';
 
 	};
