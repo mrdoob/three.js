@@ -39,6 +39,7 @@
 		<script type="text/javascript" src="../src/extras/primitives/Plane.js"></script>
 		<script type="text/javascript" src="../src/extras/primitives/Cube.js"></script>
 		<script type="text/javascript" src="../src/extras/io/Loader.js"></script>
+		<script type="text/javascript" src="../src/extras/ImageUtils.js"></script>
 
 		<script type="text/javascript" src="js/Stats.js"></script>
 
@@ -102,7 +103,7 @@
 							 r + "py.jpg", r + "ny.jpg", 
 							 r + "pz.jpg", r + "nz.jpg" ];
 
-				var images = THREE.loadImageArray( urls );
+				var images = ImageUtils.loadArray( urls );
 				var textureCube = new THREE.TextureCube( images, THREE.RefractionMap );
 
 				var cubeMaterial3 = new THREE.MeshBasicMaterial( { color: 0xccddff, env_map: textureCube, refraction_ratio: 0.98, reflectivity:0.9 } );

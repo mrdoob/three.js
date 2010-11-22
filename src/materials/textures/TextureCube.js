@@ -19,23 +19,3 @@ THREE.TextureCube = function ( image, mapping ) {
 	};
 
 };
-
-THREE.loadImageArray = function ( urls ) {
-
-	var i, images = [];
-
-	images.loadCount = 0;
-
-	for ( i = 0; i < urls.length; ++i ) {
-
-		images[i] = new Image();
-		images[i].loaded = 0;
-		images[i].onload = function() { images.loadCount += 1; this.loaded = 1; }
-		images[i].src = urls[i];
-
-	}
-
-	return images;
-
-};
-

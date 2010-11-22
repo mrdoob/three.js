@@ -40,7 +40,8 @@
 		<script type="text/javascript" src="../src/extras/primitives/Plane.js"></script>
 		<script type="text/javascript" src="../src/extras/primitives/Cube.js"></script>
 		<script type="text/javascript" src="../src/extras/io/Loader.js"></script>
-		
+		<script type="text/javascript" src="../src/extras/ImageUtils.js"></script>
+
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
@@ -100,7 +101,7 @@
 							 r + "py.jpg", r + "ny.jpg", 
 							 r + "pz.jpg", r + "nz.jpg" ];
 
-				var images = THREE.loadImageArray( urls );
+				var images = ImageUtils.loadArray( urls );
 				
 				var reflectionCube = new THREE.TextureCube( images );
 				var refractionCube = new THREE.TextureCube( images, THREE.RefractionMap );
