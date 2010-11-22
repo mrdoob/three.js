@@ -15,11 +15,11 @@ THREE.SVGRenderer = function () {
 	_bboxRect = new THREE.Rectangle(),
 
 	_enableLighting = false,
-	_color = new THREE.Color( 0xffffffff ),
-	_light = new THREE.Color( 0xffffffff ),
-	_ambientLight = new THREE.Color( 0xff000000 ),
-	_directionalLights = new THREE.Color( 0xff000000 ),
-	_pointLights = new THREE.Color( 0xff000000 ),
+	_color = new THREE.Color( 0xffffff ),
+	_light = new THREE.Color( 0xffffff ),
+	_ambientLight = new THREE.Color( 0x000000 ),
+	_directionalLights = new THREE.Color( 0x000000 ),
+	_pointLights = new THREE.Color( 0x000000 ),
 
 	_w, // z-buffer to w-buffer
 	_vector3 = new THREE.Vector3(), // Needed for PointLight

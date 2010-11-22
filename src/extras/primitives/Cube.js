@@ -37,14 +37,12 @@ var Cube = function ( width, height, depth, segments_width, segments_height, mat
 
 	}
 
-	buildPlane( 'z', 'y', - 1 * flip, - 1, depth, height, width_half, this.materials[ 0 ] ); // right
-	buildPlane( 'z', 'y',   1 * flip, - 1, depth, height, - width_half, this.materials[ 1 ] ); // left
-    
-	buildPlane( 'x', 'z', - 1 * flip, - 1, width, depth, height_half, this.materials[ 2 ] ); // top
-	buildPlane( 'x', 'z', - 1 * flip, 1, width, depth, - height_half, this.materials[ 3 ] ); // bottom
-    
-	buildPlane( 'x', 'y',   1 * flip, - 1, width, height, depth_half, this.materials[ 4 ] ); // back
-	buildPlane( 'x', 'y', - 1 * flip, - 1, width, height, - depth_half, this.materials[ 5 ] ); // front
+	buildPlane( 'z', 'y',   1 * flip, - 1, depth, height, - width_half, this.materials[ 0 ] ); // px
+	buildPlane( 'z', 'y', - 1 * flip, - 1, depth, height, width_half, this.materials[ 1 ] ); // nx
+	buildPlane( 'x', 'z',   1 * flip,   1, width, depth, height_half, this.materials[ 2 ] ); // py
+	buildPlane( 'x', 'z',   1 * flip, - 1, width, depth, - height_half, this.materials[ 3 ] ); // ny
+	buildPlane( 'x', 'y',   1 * flip, - 1, width, height, depth_half, this.materials[ 4 ] ); // pz
+	buildPlane( 'x', 'y', - 1 * flip, - 1, width, height, - depth_half, this.materials[ 5 ] ); // nz
 
 	mergeVertices();
 

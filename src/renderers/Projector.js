@@ -14,14 +14,15 @@ THREE.Projector = function() {
 
 	_vector4 = new THREE.Vector4(),
 	_projScreenMatrix = new THREE.Matrix4(),
-	_projScreenObjectMatrix = new THREE.Matrix4();
+	_projScreenObjectMatrix = new THREE.Matrix4(),
+
+	_clippedVertex1PositionScreen = new THREE.Vector4(),
+	_clippedVertex2PositionScreen = new THREE.Vector4();
 
 	this.projectScene = function ( scene, camera ) {
 
 		var o, ol, v, vl, f, fl, objects, object, objectMatrix,
-		vertices, vertex, vertex0, vertex1, vertexPositionScreen,
-		clippedVertexPositionScreen0 = new THREE.Vector4(), 
-		clippedVertexPositionScreen1 = new THREE.Vector4(),
+		vertices, vertex, vertexPositionScreen,
 		faces, face, v1, v2, v3, v4;
 
 		_renderList = [];
@@ -70,7 +71,7 @@ THREE.Projector = function() {
 					// Perform the perspective divide. TODO: This should be be performend 
 					// post clipping (imagine if the vertex lies at the same location as 
 					// the camera, causing a divide by w = 0).
-					vertexPositionScreen.multiplyScalar( 1.0 / vertexPositionScreen.w );
+					vertexPositionScreen.multiplyScalar( 1 / vertexPositionScreen.w );
 
 					vertex.__visible = vertexPositionScreen.z > 0 && vertexPositionScreen.z < 1;
 
@@ -177,34 +178,33 @@ THREE.Projector = function() {
 
 				vertices = object.geometry.vertices;
 
-				for ( v = 0, vl = vertices.length; v < vl; v++ ) {
-
-					vertex = vertices[ v ];
-
-					vertex.positionScreen.copy( vertex.position );
-					_projScreenObjectMatrix.transform( vertex.positionScreen );
-				}
+				vertex = vertices[ 0 ];
+				vertex.positionScreen.copy( vertex.position );
+				_projScreenObjectMatrix.transform( vertex.positionScreen );
 
 				for ( v = 1, vl = vertices.length; v < vl; v++ ) {
 
-					vertex0 = vertices[ v ];
-					vertex1 = vertices[ v - 1 ];
-					
-					clippedVertexPositionScreen0.copy( vertex0.positionScreen );
-					clippedVertexPositionScreen1.copy( vertex1.positionScreen );
+					v1 = vertices[ v ];
 
-					if (clipLineSegmentAgainstNearAndFarPlanes(clippedVertexPositionScreen0, clippedVertexPositionScreen1)) {
+					v1.positionScreen.copy( v1.position );
+					_projScreenObjectMatrix.transform( v1.positionScreen );
+
+					v2 = vertices[ v - 1 ];
+
+					_clippedVertex1PositionScreen.copy( v1.positionScreen );
+					_clippedVertex2PositionScreen.copy( v2.positionScreen );
+
+					if ( clipLine( _clippedVertex1PositionScreen, _clippedVertex2PositionScreen ) ) {
 
 						// Perform the perspective divide
-						clippedVertexPositionScreen0.multiplyScalar( 1.0 / clippedVertexPositionScreen0.w );
-						clippedVertexPositionScreen1.multiplyScalar( 1.0 / clippedVertexPositionScreen1.w );
+						_clippedVertex1PositionScreen.multiplyScalar( 1 / _clippedVertex1PositionScreen.w );
+						_clippedVertex2PositionScreen.multiplyScalar( 1 / _clippedVertex2PositionScreen.w );
 
 						_line = _linePool[ _lineCount ] = _linePool[ _lineCount ] || new THREE.RenderableLine();
-						_line.v1.positionScreen.copy( clippedVertexPositionScreen0 );
-						_line.v2.positionScreen.copy( clippedVertexPositionScreen1 );
+						_line.v1.positionScreen.copy( _clippedVertex1PositionScreen );
+						_line.v2.positionScreen.copy( _clippedVertex2PositionScreen );
 
-						// TODO: Use centroids here too.
-						_line.z = Math.max( clippedVertexPositionScreen0.z, clippedVertexPositionScreen1.z );
+						_line.z = Math.max( _clippedVertex1PositionScreen.z, _clippedVertex2PositionScreen.z );
 
 						_line.material = object.material;
 
@@ -263,73 +263,74 @@ THREE.Projector = function() {
 
 	};
 
-	function clipLineSegmentAgainstNearAndFarPlanes( s0, s1 ) {
+	function clipLine( s1, s2 ) {
 
-		var visible, alpha0 = 0, alpha1 = 1,
+		var alpha1 = 0, alpha2 = 1,
 
 		// Calculate the boundary coordinate of each vertex for the near and far clip planes,
 		// Z = -1 and Z = +1, respectively.
-		bc0near =  s0.z + s0.w,
 		bc1near =  s1.z + s1.w,
-		bc0far =  -s0.z + s0.w,
-		bc1far =  -s1.z + s1.w;
+		bc2near =  s2.z + s2.w,
+		bc1far =  - s1.z + s1.w,
+		bc2far =  - s2.z + s2.w;
 
-		if ( bc0near >= 0 && bc1near >= 0 && bc0far >= 0 && bc1far >= 0 ) {
+		if ( bc1near >= 0 && bc2near >= 0 && bc1far >= 0 && bc2far >= 0 ) {
 
 			// Both vertices lie entirely within all clip planes.
-			visible = true;
+			return true;
 
-		} else if ( ( bc0near < 0 && bc1near < 0) || (bc0far < 0 && bc1far < 0 ) ) {
+		} else if ( ( bc1near < 0 && bc2near < 0) || (bc1far < 0 && bc2far < 0 ) ) {
 
 			// Both vertices lie entirely outside one of the clip planes.
-			visible = false;
+			return false;
 
 		} else {
 
 			// The line segment spans at least one clip plane.
 
-			if ( bc0near < 0 ) {
+			if ( bc1near < 0 ) {
 
-				// vertex0 lies outside the near plane, vertex1 inside
-				alpha0 = Math.max( alpha0, bc0near / ( bc0near - bc1near ) );
+				// v1 lies outside the near plane, v2 inside
+				alpha1 = Math.max( alpha1, bc1near / ( bc1near - bc2near ) );
 
-			} else if ( bc1near < 0 ) {
+			} else if ( bc2near < 0 ) {
 
-				// vertex1 lies outside the near plane, vertex0 inside
-				alpha1 = Math.min( alpha1, bc0near / ( bc0near - bc1near ) );
-
-			}
-
-			if ( bc0far < 0 ) {
-
-				// vertex0 lies outside the far plane, vertex1 inside
-				alpha0 = Math.max( alpha0, bc0far / ( bc0far - bc1far ) );
-
-			} else if ( bc1far < 0 ) {
-
-				// vertex1 lies outside the far plane, vertex1 inside
-				alpha1 = Math.min( alpha1, bc0far / ( bc0far - bc1far ) );
+				// v2 lies outside the near plane, v1 inside
+				alpha2 = Math.min( alpha2, bc1near / ( bc1near - bc2near ) );
 
 			}
 
-			if ( alpha1 < alpha0 ) {
+			if ( bc1far < 0 ) {
+
+				// v1 lies outside the far plane, v2 inside
+				alpha1 = Math.max( alpha1, bc1far / ( bc1far - bc2far ) );
+
+			} else if ( bc2far < 0 ) {
+
+				// v2 lies outside the far plane, v2 inside
+				alpha2 = Math.min( alpha2, bc1far / ( bc1far - bc2far ) );
+
+			}
+
+			if ( alpha2 < alpha1 ) {
 
 				// The line segment spans two boundaries, but is outside both of them.
 				// (This can't happen when we're only clipping against just near/far but good
 				//  to leave the check here for future usage if other clip planes are added.)
-				visible = false;
+				return false;
 
 			} else {
 
-				// Update the s0 and s1 vertices to match the clipped line segment.
-				s0.lerpSelf( s1, alpha0 );
-				s1.lerpSelf( s0, 1 - alpha1 );
+				// Update the s1 and s2 vertices to match the clipped line segment.
+				s1.lerpSelf( s2, alpha1 );
+				s2.lerpSelf( s1, 1 - alpha2 );
 
-				visible = true;
+				return true;
+
 			}
+
 		}
 
-		return visible;
 	}
 
 };
