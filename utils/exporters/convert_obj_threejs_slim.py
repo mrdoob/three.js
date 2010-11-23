@@ -4,13 +4,15 @@
 How to use this converter
 -------------------------
 
-python convert_obj_threejs_slim.py -i infile.obj -o outfile.js [-a center|top|bottom] [-s smooth|flat] [-t ascii|binary]
+python convert_obj_threejs_slim.py -i infile.obj -o outfile.js [-a center|top|bottom] [-s smooth|flat] [-t ascii|binary] [-d invert|normal]
 
 Notes: 
 
-    - by default, model is centered (middle of bounding box goes to 0,0,0),
-      uses smooth shading (if there were vertex normals in the original 
-      model) and is in ASCII format.
+    - by default:
+        converted model will be centered (middle of bounding box goes to 0,0,0)
+        use smooth shading (if there were vertex normals in the original model)
+        will be in ASCII format
+        original model is assumed to use non-inverted transparency / dissolve (0.0 fully transparent, 1.0 fully opaque)
  
     - binary conversion will create two files: 
         outfile.js  (materials)
@@ -128,9 +130,10 @@ import math
 # #####################################################
 # Configuration
 # #####################################################
-ALIGN = "center"    # center bottom top none
-SHADING = "smooth"  # smooth flat 
-TYPE = "ascii"      # ascii binary
+ALIGN = "center"        # center bottom top none
+SHADING = "smooth"      # smooth flat 
+TYPE = "ascii"          # ascii binary
+TRANSPARENCY = "normal" # normal invert
 
 # default colors for debugging (each material gets one distinct color): 
 # white, red, green, blue, yellow, cyan, magenta
@@ -367,16 +370,19 @@ def parse_mtl(fname):
             # Transparency
             # Tr 0.9 or d 0.9
             if (chunks[0] == "Tr" or chunks[0] == "d") and len(chunks) == 2:
-                materials[identifier]["transparency"] = float(chunks[1])
+                if TRANSPARENCY == "invert":
+                    materials[identifier]["transparency"] = 1.0 - float(chunks[1])
+                else:
+                    materials[identifier]["transparency"] = float(chunks[1])
 
             # Optical density
             # Ni 1.0
-            if chunks[0] == "Ni" and len(chunks) == 2:                
+            if chunks[0] == "Ni" and len(chunks) == 2:
                 materials[identifier]["optical_density"] = float(chunks[1])
 
             # Diffuse texture
             # map_Kd texture_diffuse.jpg
-            if chunks[0] == "map_Kd" and len(chunks) == 2:                
+            if chunks[0] == "map_Kd" and len(chunks) == 2:
                 materials[identifier]["map_diffuse"] = chunks[1]
 
             # Ambient texture
@@ -1142,7 +1148,7 @@ def convert_binary(infile, outfile):
 # Helpers
 # #############################################################################
 def usage():
-    print "Usage: %s -i filename.obj -o filename.js [-a center|top|bottom] [-s flat|smooth] [-t binary|ascii]" % os.path.basename(sys.argv[0])
+    print "Usage: %s -i filename.obj -o filename.js [-a center|top|bottom] [-s flat|smooth] [-t binary|ascii] [-d invert|normal]" % os.path.basename(sys.argv[0])
         
 # #####################################################
 # Main
@@ -1151,7 +1157,7 @@ if __name__ == "__main__":
     
     # get parameters from the command line
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hi:o:a:s:t:", ["help", "input=", "output=", "align=", "shading=", "type="])
+        opts, args = getopt.getopt(sys.argv[1:], "hi:o:a:s:t:d:", ["help", "input=", "output=", "align=", "shading=", "type=", "dissolve="])
     
     except getopt.GetoptError:
         usage()
@@ -1181,6 +1187,10 @@ if __name__ == "__main__":
         elif o in ("-t", "--type"):
             if a in ("binary", "ascii"):
                 TYPE = a
+
+        elif o in ("-d", "--dissolve"):
+            if a in ("normal", "invert"):
+                TRANSPARENCY = a
 
     if infile == "" or outfile == "":
         usage()
