@@ -22,8 +22,6 @@ THREE.Scene = function () {
 			this.objects.splice( i, 1 );
 
 		}
-
-		object.__removed = true;
 		
 	};
 
