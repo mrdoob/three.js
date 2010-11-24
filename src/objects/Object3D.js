@@ -15,6 +15,8 @@ THREE.Object3D = function ( material ) {
 
 	this.screen = new THREE.Vector3();
 
+	this.visible = true;
+	
 	this.autoUpdateMatrix = true;
 
 	this.updateMatrix = function () {

@@ -102,9 +102,9 @@
 				
 				// SPHERES
 				
-				sphere = new Sphere( 100, 16, 8, 0 );
+				sphere = new Sphere( 100, 16, 8 );
 				for (var i=0; i<30; i++) {
-					mesh = new THREE.Mesh( sphere, new THREE.MeshLambertMaterial( { color: 0xffffff } ) );
+					mesh = new THREE.Mesh( sphere, new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading } ) );
 					mesh.position.x = 500 * (Math.random() - 0.5);
 					mesh.position.y = 500 * (Math.random() - 0.5);
 					mesh.position.z = 500 * (Math.random() - 0.5);
@@ -133,7 +133,7 @@
 				scene.addLight( pointLight );
 
 
-				sphere = new Sphere( 100, 16, 8, 1 );
+				sphere = new Sphere( 100, 16, 8 );
 				lightMesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) );
 				lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
 				lightMesh.position = pointLight.position;

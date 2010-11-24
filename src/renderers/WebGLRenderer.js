@@ -655,9 +655,13 @@ THREE.WebGLRenderer = function ( scene ) {
 		for ( o = 0, ol = scene.__webGLObjects.length; o < ol; o++ ) {
 
 			webGLObject = scene.__webGLObjects[ o ];
+			
+			if ( webGLObject.__object.visible ) {
 
-			this.setupMatrices( webGLObject.__object, camera );
-			this.renderPass( webGLObject.__object, webGLObject, THREE.NormalBlending, false );
+				this.setupMatrices( webGLObject.__object, camera );
+				this.renderPass( webGLObject.__object, webGLObject, THREE.NormalBlending, false );
+				
+			}
 
 		}
 
@@ -667,18 +671,25 @@ THREE.WebGLRenderer = function ( scene ) {
 
 			webGLObject = scene.__webGLObjects[ o ];
 
-			this.setupMatrices( webGLObject.__object, camera );
+			if ( webGLObject.__object.visible ) {
+				
+				this.setupMatrices( webGLObject.__object, camera );
 
-			// opaque blended materials
-			this.renderPass( webGLObject.__object, webGLObject, THREE.AdditiveBlending, false );
-			this.renderPass( webGLObject.__object, webGLObject, THREE.SubtractiveBlending, false );
-			
-			// transparent blended materials
-			this.renderPass( webGLObject.__object, webGLObject, THREE.AdditiveBlending, true );
-			this.renderPass( webGLObject.__object, webGLObject, THREE.SubtractiveBlending, true );
+				// opaque blended materials
+				
+				this.renderPass( webGLObject.__object, webGLObject, THREE.AdditiveBlending, false );
+				this.renderPass( webGLObject.__object, webGLObject, THREE.SubtractiveBlending, false );
+				
+				// transparent blended materials
+				
+				this.renderPass( webGLObject.__object, webGLObject, THREE.AdditiveBlending, true );
+				this.renderPass( webGLObject.__object, webGLObject, THREE.SubtractiveBlending, true );
 
-			// transparent normal materials
-			this.renderPass( webGLObject.__object, webGLObject, THREE.NormalBlending, true );
+				// transparent normal materials
+				
+				this.renderPass( webGLObject.__object, webGLObject, THREE.NormalBlending, true );
+				
+			}
 
 		}
 
@@ -725,6 +736,20 @@ THREE.WebGLRenderer = function ( scene ) {
 			}*/
 
 		}
+		
+		// clean up orphaned objects
+		
+		for ( o = scene.__webGLObjects.length - 1; o >= 0; o-- ) {
+			
+			object = scene.__webGLObjects[ o ].__object;
+			if ( object.__removed ) {
+
+				scene.__webGLObjects.splice( o, 1 );
+
+			}
+			
+		}
+		
 
 	};
 
