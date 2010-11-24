@@ -736,13 +736,18 @@ THREE.WebGLRenderer = function ( scene ) {
 			}*/
 
 		}
-		
-		// clean up orphaned objects
+
+	};
+
+	this.removeObject = function ( scene, object ) {
+
+		var o, ol, zobject;
 		
 		for ( o = scene.__webGLObjects.length - 1; o >= 0; o-- ) {
 			
-			object = scene.__webGLObjects[ o ].__object;
-			if ( object.__removed ) {
+			zobject = scene.__webGLObjects[ o ].__object;
+			
+			if ( object == zobject ) {
 
 				scene.__webGLObjects.splice( o, 1 );
 
@@ -750,9 +755,7 @@ THREE.WebGLRenderer = function ( scene ) {
 			
 		}
 		
-
 	};
-
 
 	this.setupMatrices = function ( object, camera ) {
 
