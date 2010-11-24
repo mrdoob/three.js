@@ -596,7 +596,7 @@ THREE.WebGLRenderer = function ( scene ) {
 
 	};
 
-	this.renderPass = function ( object, materialFaceGroup, blending ) {
+	this.renderPass = function ( object, materialFaceGroup, blending, transparent ) {
 
 		var i, l, m, ml, material, meshMaterial;
 
@@ -609,7 +609,7 @@ THREE.WebGLRenderer = function ( scene ) {
 				for ( i = 0, l = materialFaceGroup.material.length; i < l; i++ ) {
 
 					material = materialFaceGroup.material[ i ];
-					if ( material && material.blending == blending ) {
+					if ( material && material.blending == blending && ( material.opacity < 1.0 == transparent ) ) {
 
 						this.setBlending( material.blending );
 						this.renderBuffer( material, materialFaceGroup );
@@ -621,7 +621,7 @@ THREE.WebGLRenderer = function ( scene ) {
 			} else {
 
 				material = meshMaterial;
-				if ( material && material.blending == blending ) {
+				if ( material && material.blending == blending && ( material.opacity < 1.0 == transparent ) ) {
 
 					this.setBlending( material.blending );
 					this.renderBuffer( material, materialFaceGroup );
@@ -655,9 +655,13 @@ THREE.WebGLRenderer = function ( scene ) {
 		for ( o = 0, ol = scene.__webGLObjects.length; o < ol; o++ ) {
 
 			webGLObject = scene.__webGLObjects[ o ];
+			
+			if ( webGLObject.__object.visible ) {
 
-			this.setupMatrices( webGLObject.__object, camera );
-			this.renderPass( webGLObject.__object, webGLObject, THREE.NormalBlending );
+				this.setupMatrices( webGLObject.__object, camera );
+				this.renderPass( webGLObject.__object, webGLObject, THREE.NormalBlending, false );
+				
+			}
 
 		}
 
@@ -667,9 +671,25 @@ THREE.WebGLRenderer = function ( scene ) {
 
 			webGLObject = scene.__webGLObjects[ o ];
 
-			this.setupMatrices( webGLObject.__object, camera );
-			this.renderPass( webGLObject.__object, webGLObject, THREE.AdditiveBlending );
-			this.renderPass( webGLObject.__object, webGLObject, THREE.SubtractiveBlending );
+			if ( webGLObject.__object.visible ) {
+				
+				this.setupMatrices( webGLObject.__object, camera );
+
+				// opaque blended materials
+				
+				this.renderPass( webGLObject.__object, webGLObject, THREE.AdditiveBlending, false );
+				this.renderPass( webGLObject.__object, webGLObject, THREE.SubtractiveBlending, false );
+				
+				// transparent blended materials
+				
+				this.renderPass( webGLObject.__object, webGLObject, THREE.AdditiveBlending, true );
+				this.renderPass( webGLObject.__object, webGLObject, THREE.SubtractiveBlending, true );
+
+				// transparent normal materials
+				
+				this.renderPass( webGLObject.__object, webGLObject, THREE.NormalBlending, true );
+				
+			}
 
 		}
 
@@ -716,6 +736,20 @@ THREE.WebGLRenderer = function ( scene ) {
 			}*/
 
 		}
+		
+		// clean up orphaned objects
+		
+		for ( o = scene.__webGLObjects.length - 1; o >= 0; o-- ) {
+			
+			object = scene.__webGLObjects[ o ].__object;
+			if ( object.__removed ) {
+
+				scene.__webGLObjects.splice( o, 1 );
+
+			}
+			
+		}
+		
 
 	};
 

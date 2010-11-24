@@ -12,6 +12,8 @@ var SceneUtils = {
 		mesh.rotation.z = rz;
 		scene.addObject( mesh );
 
+		return mesh;
+		
 	},
 	
 	addPanoramaCubeWebGL: function ( scene, size, textureCube ) {
@@ -20,6 +22,8 @@ var SceneUtils = {
 			mesh = new THREE.Mesh( new Cube( size, size, size, 1, 1, null, true ), material );
 		
 		scene.addObject( mesh );
+		
+		return mesh;
 		
 	},
 
@@ -35,6 +39,8 @@ var SceneUtils = {
 
 		mesh = new THREE.Mesh( new Cube( size, size, size, 1, 1, materials, true ), new THREE.MeshFaceMaterial() );
 		scene.addObject( mesh );
+		
+		return mesh;
 
 	},
 
@@ -49,6 +55,8 @@ var SceneUtils = {
 		SceneUtils.addMesh( scene, plane, 1,     0,  hsize,       0,  pi2,    0, pi, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[2] ) } ) );
 		SceneUtils.addMesh( scene, plane, 1,     0, -hsize,       0, -pi2,    0, pi, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[3] ) } ) );
 
+		return mesh;
+		
 	}
 	
 }

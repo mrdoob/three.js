@@ -23,6 +23,8 @@ THREE.Scene = function () {
 
 		}
 
+		object.__removed = true;
+		
 	};
 
 	this.addLight = function ( light ) {
