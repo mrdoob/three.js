@@ -41,7 +41,7 @@ THREE.Loader.prototype = {
 	//  - urlbase parameter is mandatory (it applies to all models, it tells where to find the file with binary buffers)
 	//  - binary models consist of two files: JS and BIN
 
-	loadBinary: function( url, callback, urlbase ) {
+	loadBinary: function( url, callback, urlbase, callback_progress ) {
 
 		// #1 load JS part via web worker
 
@@ -63,7 +63,7 @@ THREE.Loader.prototype = {
 			//  Also, worker loading huge data by Ajax still freezes browser. Go figure, 
 			//  worker with baked ascii JSON data keeps browser more responsive.
 
-			THREE.Loader.prototype.loadAjaxBuffers( buffers, materials, callback, urlbase );
+			THREE.Loader.prototype.loadAjaxBuffers( buffers, materials, callback, urlbase, callback_progress );
 
 		};
 
@@ -85,13 +85,15 @@ THREE.Loader.prototype = {
 	// See also other suggestions by Gregg Tavares
 	// https://groups.google.com/group/o3d-discuss/browse_thread/thread/a8967bc9ce1e0978
 
-	loadAjaxBuffers: function( buffers, materials, callback, urlbase ) {
+	loadAjaxBuffers: function( buffers, materials, callback, urlbase, callback_progress ) {
 
 		var xhr = new XMLHttpRequest(),
 			url = urlbase + "/" + buffers;
 
+		var length = 0;
+		
 		xhr.onreadystatechange = function() {
-
+			
 			if ( xhr.readyState == 4 ) {
 
 				if ( xhr.status == 200 || xhr.status == 0 ) {
@@ -103,7 +105,27 @@ THREE.Loader.prototype = {
 					alert( "Couldn't load [" + url + "] [" + xhr.status + "]" );
 
 				}
+						
+			} else if ( xhr.readyState == 3 ) {
+				
+				if ( callback_progress ) {
+				
+					if ( length == 0 ) {
+						
+						length = xhr.getResponseHeader( "Content-Length" );
+						
+					}
+					
+					callback_progress( { total: length, loaded: xhr.responseText.length } );
+					
+				}
+				
+			} else if ( xhr.readyState == 2 ) {
+				
+				length = xhr.getResponseHeader( "Content-Length" );
+				
 			}
+			
 		}
 
 		xhr.open("GET", url, true);
