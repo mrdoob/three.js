@@ -1,65 +1,62 @@
 var GeometryUtils = {
 
-	merge: function ( object1, object2 ) {
+	merge: function ( geometry1, object2 /* mesh | geometry */ ) {
 
-		var isMesh = object2 instanceof THREE.Mesh;
-
-		var geometry1 = object1,
+		var isMesh = object2 instanceof THREE.Mesh,
 		vertexPosition = geometry1.vertices.length,
 		facePosition = geometry1.faces.length,
 		uvPosition = geometry1.uvs.length,
-		geometry2 = isMesh ? object2.geometry : object2;
+		geometry2 = isMesh ? object2.geometry : object2,
+		vertices1 = geometry1.vertices,
+		vertices2 = geometry2.vertices,
+		faces1 = geometry1.faces,
+		faces2 = geometry2.faces,
+		uvs1 = geometry1.uvs,
+		uvs2 = geometry2.uvs;
 
-		if ( isMesh ) object2.updateMatrix();
+		isMesh && object2.updateMatrix();
 
-		for ( var i = 0, il = geometry2.vertices.length; i < il; i ++ ) {
+		for ( var i = 0, il = vertices2.length; i < il; i ++ ) {
 
-			var vertex = geometry2.vertices[ i ];
+			var vertex = vertices2[ i ];
 
 			var vertexCopy = new THREE.Vertex( vertex.position.clone() );
 
-			if ( isMesh ) object2.matrix.transform( vertexCopy.position );
+			isMesh && object2.matrix.transform( vertexCopy.position );
 
-			geometry1.vertices.push( vertexCopy );
+			vertices1.push( vertexCopy );
 
 		}
 
-		for ( var i = 0, il = geometry2.faces.length; i < il; i ++ ) {
+		for ( var i = 0, il = faces2.length; i < il; i ++ ) {
 
-			var face = geometry2.faces[ i ];
+			var face = faces2[ i ], faceCopy, normal,
+			faceVertexNormals = face.vertexNormals;
 
 			if ( face instanceof THREE.Face3 ) {
 
-				var faceCopy = new THREE.Face3();
-				faceCopy.a = face.a + vertexPosition;
-				faceCopy.b = face.b + vertexPosition;
-				faceCopy.c = face.c + vertexPosition;
+				faceCopy = new THREE.Face3( face.a + vertexPosition, face.b + vertexPosition, face.c + vertexPosition );
 
 			} else if ( face instanceof THREE.Face4 ) {
 
-				var faceCopy = new THREE.Face4();
-				faceCopy.a = face.a + vertexPosition;
-				faceCopy.b = face.b + vertexPosition;
-				faceCopy.c = face.c + vertexPosition;
-				faceCopy.d = face.d + vertexPosition;
+				faceCopy = new THREE.Face4( face.a + vertexPosition, face.b + vertexPosition, face.c + vertexPosition, face.d + vertexPosition );
 
 			}
 
-			for ( var j = 0, jl = face.vertexNormals.length; j < jl; j ++ ) {
+			for ( var j = 0, jl = faceVertexNormals.length; j < jl; j ++ ) {
 
-				var normal = face.vertexNormals[ j ];
+				normal = faceVertexNormals[ j ];
 				faceCopy.vertexNormals.push( normal.clone() );
+
 			}
 
-			geometry1.faces.push( faceCopy );
+			faces1.push( faceCopy );
 
 		}
 
-		for ( var i = 0, il = geometry2.uvs.length; i < il; i ++ ) {
+		for ( var i = 0, il = uvs2.length; i < il; i ++ ) {
 
-			var uv = geometry2.uvs[ i ];
-
-			var uvCopy = [];
+			var uv = uvs2[ i ], uvCopy = [];
 
 			for ( var j = 0, jl = uv.length; j < jl; j ++ ) {
 
@@ -67,7 +64,7 @@ var GeometryUtils = {
 
 			}
 
-			geometry1.uvs.push( uvCopy );
+			uvs1.push( uvCopy );
 
 		}
 
