@@ -393,43 +393,44 @@ THREE.CanvasRenderer = function () {
 		setOpacity( material.opacity );
 		setBlending( material.blending );
 
-		var width, height, scaleX, scaleY, offsetX, offsetY,
+		var width, height, scaleX, scaleY,
 		bitmap, bitmapWidth, bitmapHeight;
 
 		if ( material instanceof THREE.ParticleBasicMaterial ) {
 
-			bitmap = material.bitmap;
-			bitmapWidth = bitmap.width / 2;
-			bitmapHeight = bitmap.height / 2;
+			if ( material.map ) {
 
-			scaleX = element.scale.x * _canvasWidthHalf;
-			scaleY = element.scale.y * _canvasHeightHalf;
+				bitmap = material.map;
+				bitmapWidth = bitmap.width >> 1;
+				bitmapHeight = bitmap.height >> 1;
 
-			width = scaleX * bitmapWidth;
-			height = scaleY * bitmapHeight;
+				scaleX = element.scale.x * _canvasWidthHalf;
+				scaleY = element.scale.y * _canvasHeightHalf;
 
-			offsetX = material.offset.x * scaleX;
-			offsetY = material.offset.y * scaleY;
+				width = scaleX * bitmapWidth;
+				height = scaleY * bitmapHeight;
 
-			// TODO: Rotations break this...
+				// TODO: Rotations break this...
 
-			_bboxRect.set( v1.x + offsetX - width, v1.y + offsetY - height, v1.x + offsetX + width, v1.y + offsetY + height );
+				_bboxRect.set( v1.x - width, v1.y - height, v1.x  + width, v1.y + height );
 
-			if ( !_clipRect.instersects( _bboxRect ) ) {
+				if ( !_clipRect.instersects( _bboxRect ) ) {
 
-				return;
+					return;
+
+				}
+
+				_context.save();
+				_context.translate( v1.x, v1.y );
+				_context.rotate( - element.rotation );
+				_context.scale( scaleX, - scaleY );
+				_context.translate( - bitmapWidth, - bitmapHeight );
+
+				_context.drawImage( bitmap, 0, 0 );
+
+				_context.restore();
 
 			}
-
-			_context.save();
-			_context.translate( v1.x, v1.y );
-			_context.rotate( - element.rotation );
-			_context.scale( scaleX, - scaleY );
-			_context.translate( - bitmapWidth + material.offset.x, - bitmapHeight - material.offset.y );
-
-			_context.drawImage( bitmap, 0, 0 );
-
-			_context.restore();
 
 			/* DEBUG
 			_context.beginPath();
