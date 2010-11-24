@@ -67,8 +67,7 @@ THREE.SVGRenderer = function () {
 
 	this.render = function( scene, camera ) {
 
-		var e, el, m, ml, fm, fml, element, material,
-		linecap, linejoin;
+		var e, el, m, ml, fm, fml, element, material;
 
 		if ( this.autoClear ) {
 
@@ -352,15 +351,12 @@ THREE.SVGRenderer = function () {
 
 			_color.__styleString = material.color.__styleString;
 
-		} else {
+			_svgNode.setAttribute( 'style', 'fill: none; stroke: ' + _color.__styleString + '; stroke-width: ' + material.linewidth + '; stroke-opacity: ' + material.opacity + '; stroke-linecap: ' + material.linecap + '; stroke-linejoin: ' + material.linejoin );
 
-			_color.__styleString = 'rgb(0,0,0)';
+			_svg.appendChild( _svgNode );
 
 		}
 
-		_svgNode.setAttribute( 'style', 'fill: none; stroke: ' + _color.__styleString + '; stroke-width: ' + material.linewidth );
-
-		_svg.appendChild( _svgNode );
 	}
 
 	function renderFace3( v1, v2, v3, element, material, scene ) {
@@ -407,7 +403,7 @@ THREE.SVGRenderer = function () {
 
 		if ( material.wireframe ) {
 
-			_svgNode.setAttribute( 'style', 'fill: none; stroke: ' + _color.__styleString + '; stroke-width: ' + material.wireframe_linewidth + '; stroke-opacity: ' + material.opacity + '; stroke-linecap: ' + linecap + '; stroke-linejoin: ' + linejoin );
+			_svgNode.setAttribute( 'style', 'fill: none; stroke: ' + _color.__styleString + '; stroke-width: ' + material.wireframe_linewidth + '; stroke-opacity: ' + material.opacity + '; stroke-linecap: ' + material.wireframe_linecap + '; stroke-linejoin: ' + material.wireframe_linejoin );
 
 		} else {
 
@@ -423,8 +419,6 @@ THREE.SVGRenderer = function () {
 
 		_svgNode = getPathNode( _pathCount ++ );
 		_svgNode.setAttribute( 'd', 'M ' + v1.positionScreen.x + ' ' + v1.positionScreen.y + ' L ' + v2.positionScreen.x + ' ' + v2.positionScreen.y + ' L ' + v3.positionScreen.x + ',' + v3.positionScreen.y + ' L ' + v4.positionScreen.x + ',' + v4.positionScreen.y + 'z' );
-
-		linecap = linejoin = 'round';
 
 		if ( material instanceof THREE.MeshBasicMaterial ) {
 
@@ -461,15 +455,11 @@ THREE.SVGRenderer = function () {
 
 			_color.setRGB( normalToComponent( element.normalWorld.x ), normalToComponent( element.normalWorld.y ), normalToComponent( element.normalWorld.z ) );
 
-		} else if ( material instanceof THREE.LineBasicMaterial ) {
-			_color.__styleString = material.color.__styleString;
-			linecap = material.linecap;
-			linejoin = material.linejoin;
 		}
 
 		if ( material.wireframe ) {
 
-			_svgNode.setAttribute( 'style', 'fill: none; stroke: ' + _color.__styleString + '; stroke-width: ' + material.wireframe_linewidth + '; stroke-opacity: ' + material.opacity + '; stroke-linecap: ' + linecap + '; stroke-linejoin: ' + linejoin );
+			_svgNode.setAttribute( 'style', 'fill: none; stroke: ' + _color.__styleString + '; stroke-width: ' + material.wireframe_linewidth + '; stroke-opacity: ' + material.opacity + '; stroke-linecap: ' + material.wireframe_linecap + '; stroke-linejoin: ' + material.wireframe_linejoin );
 
 		} else {
 
