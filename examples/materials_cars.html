@@ -240,13 +240,13 @@
 
 				"Orange": 	new THREE.MeshLambertMaterial( { color: 0xff6600, env_map: textureCube, combine: THREE.Mix, reflectivity: 0.3 } ),
 				"Blue": 	new THREE.MeshLambertMaterial( { color: 0x001133, env_map: textureCube, combine: THREE.Mix, reflectivity: 0.3 } ),
-				"Red": 		new THREE.MeshLambertMaterial( { color: 0x660000, env_map: textureCube, combine: THREE.Mix, reflectivity: 0.5 } ),
-				"Black": 	new THREE.MeshLambertMaterial( { color: 0x000000, env_map: textureCube, combine: THREE.Mix, reflectivity: 0.5 } ),
-				"White":	new THREE.MeshLambertMaterial( { color: 0xffffff, env_map: textureCube, combine: THREE.Mix, reflectivity: 0.5 } ),
+				"Red": 		new THREE.MeshLambertMaterial( { color: 0x660000, env_map: textureCube, combine: THREE.Mix, reflectivity: 0.25 } ),
+				"Black": 	new THREE.MeshLambertMaterial( { color: 0x000000, env_map: textureCube, combine: THREE.Mix, reflectivity: 0.15 } ),
+				"White":	new THREE.MeshLambertMaterial( { color: 0xffffff, env_map: textureCube, combine: THREE.Mix, reflectivity: 0.25 } ),
 
 				"Carmine": 	new THREE.MeshPhongMaterial( { color: 0x770000, specular:0xffaaaa, env_map: textureCube, combine: THREE.Multiply } ),
 				"Gold": 	new THREE.MeshPhongMaterial( { color: 0xaa9944, specular:0xbbaa99, shininess:50, env_map: textureCube, combine: THREE.Multiply } ),
-				"Bronze":	new THREE.MeshPhongMaterial( { color: 0x150505, specular:0xee6600, shininess:10, env_map: textureCube, combine: THREE.Mix, reflectivity: 0.5 } ),
+				"Bronze":	new THREE.MeshPhongMaterial( { color: 0x150505, specular:0xee6600, shininess:10, env_map: textureCube, combine: THREE.Mix, reflectivity: 0.25 } ),
 				"Chrome": 	new THREE.MeshPhongMaterial( { color: 0xffffff, specular:0xffffff, env_map: textureCube, combine: THREE.Multiply } ),
 
 				"Orange metal": new THREE.MeshLambertMaterial( { color: 0xff6600, env_map: textureCube, combine: THREE.Multiply } ),
@@ -538,7 +538,7 @@
 
 				for( i = 0; i < materials.length; i++ ) {
 
-					src += '<button id="' + button_name( car, i ) + '">' + materials[ i ][ 0 ] + '</button>';
+					src += '<button id="' + button_name( car, i ) + '">' + materials[ i ][ 0 ] + '</button> ';
 
 				}
 
