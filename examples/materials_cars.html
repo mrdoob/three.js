@@ -510,13 +510,8 @@
 			function switchCar( car ) {
 
 				for ( var c in CARS ) {
-					if ( c != car && CARS[ c ].object ) {
 
-						/*
-						scene.removeObject( CARS[ c ].object );
-						webglRenderer.removeObject( scene, CARS[ c ].object );
-						CARS[ c ].object = null;
-						*/
+					if ( c != car && CARS[ c ].object ) {
 
 						CARS[ c ].object.visible = false;
 						CARS[ c ].buttons.style.display = "none";
@@ -601,7 +596,6 @@
 
 			function onDocumentMouseMove(event) {
 
-				mouseX = ( event.clientX - windowHalfX );
 				mouseY = ( event.clientY - window.innerHeight );
 
 			}
@@ -612,7 +606,6 @@
 
 				r -= 0.005;
 
-				// camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 
 				camera.position.x = 1000 * Math.cos( r );
@@ -626,13 +619,11 @@
 				webglRenderer.render( sceneCube, cameraCube );
 				webglRenderer.render( scene, camera );
 
-				// webglRenderer.render( scene, camera );
-
 				if ( STATS_ENABLED ) stats.update();
 
 			}
 
-			function log(text) {
+			function log( text ) {
 
 				var e = document.getElementById("log");
 				e.innerHTML = text + "<br/>" + e.innerHTML;
