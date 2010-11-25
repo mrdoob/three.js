@@ -40,6 +40,7 @@ Materials
 [![materials_normal](http://mrdoob.github.com/three.js/assets/examples/22_materials_normal.png)](http://mrdoob.github.com/three.js/examples/materials_normal.html)
 [![materials_shaders](http://mrdoob.github.com/three.js/assets/examples/23_materials_shaders.png)](http://mrdoob.github.com/three.js/examples/materials_shaders.html)
 [![materials_video](http://mrdoob.github.com/three.js/assets/examples/24_materials_video.png)](http://mrdoob.github.com/three.js/examples/materials_video.html)
+[![materials_cars](http://mrdoob.github.com/three.js/assets/examples/25_materials_cars.png)](http://mrdoob.github.com/three.js/examples/materials_cars.html)
 
 Particles
 
