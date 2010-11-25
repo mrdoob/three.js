@@ -478,10 +478,10 @@ THREE.WebGLRenderer = function ( scene ) {
 		
 		if ( mMap ) {
 
-			if ( !material.__webGLTexture && material.map.image.loaded ) {
+			if ( !material.map.__webGLTexture && material.map.image.loaded ) {
 
-				material.__webGLTexture = _gl.createTexture();
-				_gl.bindTexture( _gl.TEXTURE_2D, material.__webGLTexture );
+				material.map.__webGLTexture = _gl.createTexture();
+				_gl.bindTexture( _gl.TEXTURE_2D, material.map.__webGLTexture );
 				_gl.texImage2D( _gl.TEXTURE_2D, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, material.map.image );
 				
 				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_S, paramThreeToGL( material.map.wrap_s ) );
@@ -495,7 +495,7 @@ THREE.WebGLRenderer = function ( scene ) {
 			}
 
 			_gl.activeTexture( _gl.TEXTURE0 );
-			_gl.bindTexture( _gl.TEXTURE_2D, material.__webGLTexture );
+			_gl.bindTexture( _gl.TEXTURE_2D, material.map.__webGLTexture );
 			_gl.uniform1i( _program.tMap,  0 );
 
 			_gl.uniform1i( _program.enableMap, 1 );
