@@ -9,16 +9,25 @@ THREE.WebGLRenderer = function ( scene ) {
 	// Currently you can use just up to 4 directional / point lights total.
 	// Chrome barfs on shader linking when there are more than 4 lights :(
 
-	// It seems problem comes from having too many varying vectors.
+	// The problem comes from shader using too many varying vectors.
 
-	// Weirdly, this is not GPU limitation as the same shader works ok in Firefox.
-	// This difference could come from Chrome using ANGLE on Windows,
+	// This is not GPU limitation as the same shader works ok in Firefox
+	// or Chrome with "--use-gl=desktop" flag.
+	
+	// This difference comes from Chrome on Windows using by default ANGLE,
 	// thus going DirectX9 route (while FF uses OpenGL).
+	
+	// See http://code.google.com/p/chromium/issues/detail?id=63491
 
 	var _canvas = document.createElement( 'canvas' ), _gl, _program,
 	_modelViewMatrix = new THREE.Matrix4(), _normalMatrix,
 
-	BASIC = 0, LAMBERT = 1, PHONG = 2, DEPTH = 3, NORMAL = 4, CUBE = 5, // material constants used in shader
+	// material constants used in shader
+	
+	BASIC = 0, LAMBERT = 1, PHONG = 2, DEPTH = 3, NORMAL = 4, CUBE = 5, 
+
+	// heuristics to create shader parameters according to lights in the scene
+	// (not to blow over maxLights budget)
 
 	maxLightCount = allocateLights( scene, 4 );
 
@@ -28,51 +37,7 @@ THREE.WebGLRenderer = function ( scene ) {
 	initGL();
 	initProgram( maxLightCount.directional, maxLightCount.point );
 
-	// Querying via gl.getParameter() reports different values for CH and FF for many max parameters.
-	// On my GPU Chrome reports MAX_VARYING_VECTORS = 8, FF reports 0 yet compiles shaders with many
-	// more varying vectors (up to 29 lights are ok, more start to throw warnings to FF error console
-	// and then crash the browser).
-
 	//alert( dumpObject( getGLParams() ) );
-
-
-	function allocateLights( scene, maxLights ) {
-
-		// heuristics to create shader parameters according to lights in the scene
-		// (not to blow over maxLights budget)
-
-		if ( scene ) {
-
-			var l, ll, light, dirLights = pointLights = maxDirLights = maxPointLights = 0;
-
-			for ( l = 0, ll = scene.lights.length; l < ll; l++ ) {
-
-				light = scene.lights[ l ];
-
-				if ( light instanceof THREE.DirectionalLight ) dirLights++;
-				if ( light instanceof THREE.PointLight ) pointLights++;
-
-			}
-
-			if ( ( pointLights + dirLights ) <= maxLights ) {
-
-				maxDirLights = dirLights;
-				maxPointLights = pointLights;
-
-			} else {
-
-				maxDirLights = Math.ceil( maxLights * dirLights / ( pointLights + dirLights ) );
-				maxPointLights = maxLights - maxDirLights;
-
-			}
-
-			return { 'directional' : maxDirLights, 'point' : maxPointLights };
-
-		}
-
-		return { 'directional' : 1, 'point' : maxLights - 1 };
-
-	};
 
 	this.setSize = function ( width, height ) {
 
@@ -182,12 +147,10 @@ THREE.WebGLRenderer = function ( scene ) {
 		}
 
 	};
-
+	
 	this.createBuffers = function ( object, mf ) {
 
-		var f, fl, fi, face, vertexNormals, normal, uv, v1, v2, v3, v4, m, ml, i, l,
-
-		materialFaceGroup = object.materialFaceGroup[ mf ],
+		var f, fl, fi, face, vertexNormals, normal, uv, v1, v2, v3, v4, m, ml, i,
 
 		faceArray = [],
 		lineArray = [],
@@ -198,49 +161,9 @@ THREE.WebGLRenderer = function ( scene ) {
 
 		vertexIndex = 0,
 
-		useSmoothNormals = false;
+		materialFaceGroup = object.materialFaceGroup[ mf ],
 
-		// need to find out if there is any material in the object
-		// (among all mesh materials and also face materials)
-		// which would need smooth normals
-
-		function needsSmoothNormals( material ) {
-
-			return material && material.shading != undefined && material.shading == THREE.SmoothShading;
-
-		}
-
-		for ( m = 0, ml = object.material.length; m < ml; m++ ) {
-
-			meshMaterial = object.material[ m ];
-
-			if ( meshMaterial instanceof THREE.MeshFaceMaterial ) {
-
-				for ( i = 0, l = materialFaceGroup.material.length; i < l; i++ ) {
-
-					if ( needsSmoothNormals( materialFaceGroup.material[ i ] ) ) {
-
-						useSmoothNormals = true;
-						break;
-
-					}
-
-				}
-
-			} else {
-
-				if ( needsSmoothNormals( meshMaterial ) ) {
-
-					useSmoothNormals = true;
-					break;
-
-				}
-
-			}
-
-			if ( useSmoothNormals ) break;
-
-		}
+		needsSmoothNormals = bufferNeedsSmoothNormals ( materialFaceGroup, object );
 
 		for ( f = 0, fl = materialFaceGroup.faces.length; f < fl; f++ ) {
 
@@ -248,7 +171,7 @@ THREE.WebGLRenderer = function ( scene ) {
 
 			face = object.geometry.faces[ fi ];
 			vertexNormals = face.vertexNormals;
-			normal = face.normal;
+			faceNormal = face.normal;
 			uv = object.geometry.uvs[ fi ];
 
 			if ( face instanceof THREE.Face3 ) {
@@ -261,7 +184,7 @@ THREE.WebGLRenderer = function ( scene ) {
 				vertexArray.push( v2.x, v2.y, v2.z );
 				vertexArray.push( v3.x, v3.y, v3.z );
 
-				if ( vertexNormals.length == 3 && useSmoothNormals ) {
+				if ( vertexNormals.length == 3 && needsSmoothNormals ) {
 
 					for ( i = 0; i < 3; i ++ ) {
 
@@ -273,7 +196,7 @@ THREE.WebGLRenderer = function ( scene ) {
 
 					for ( i = 0; i < 3; i ++ ) {
 
-						normalArray.push( normal.x, normal.y, normal.z );
+						normalArray.push( faceNormal.x, faceNormal.y, faceNormal.z );
 
 					}
 
@@ -284,6 +207,7 @@ THREE.WebGLRenderer = function ( scene ) {
 					for ( i = 0; i < 3; i ++ ) {
 
 						uvArray.push( uv[ i ].u, uv[ i ].v );
+						
 					}
 
 				}
@@ -310,7 +234,7 @@ THREE.WebGLRenderer = function ( scene ) {
 				vertexArray.push( v3.x, v3.y, v3.z );
 				vertexArray.push( v4.x, v4.y, v4.z );
 
-				if ( vertexNormals.length == 4 && useSmoothNormals ) {
+				if ( vertexNormals.length == 4 && needsSmoothNormals ) {
 
 					for ( i = 0; i < 4; i ++ ) {
 
@@ -322,7 +246,7 @@ THREE.WebGLRenderer = function ( scene ) {
 
 					for ( i = 0; i < 4; i ++ ) {
 
-						normalArray.push( normal.x, normal.y, normal.z );
+						normalArray.push( faceNormal.x, faceNormal.y, faceNormal.z );
 
 					}
 
@@ -333,6 +257,7 @@ THREE.WebGLRenderer = function ( scene ) {
 					for ( i = 0; i < 4; i ++ ) {
 
 						uvArray.push( uv[ i ].u, uv[ i ].v );
+						
 					}
 
 				}
@@ -1219,6 +1144,7 @@ THREE.WebGLRenderer = function ( scene ) {
 
 			alert( "VALIDATE_STATUS: " + _gl.getProgramParameter( _program, _gl.VALIDATE_STATUS ) );
 			alert( _gl.getError() );
+			
 		}
 
 
@@ -1361,8 +1287,90 @@ THREE.WebGLRenderer = function ( scene ) {
 		}
 		
 		return 0;
+		
 	};
 
+	function materialNeedsSmoothNormals( material ) {
+
+		return material && material.shading != undefined && material.shading == THREE.SmoothShading;
+
+	};
+	
+	function bufferNeedsSmoothNormals ( materialFaceGroup, object ) {
+		
+		var m, ml, i, l, needsSmoothNormals = false;
+		
+		for ( m = 0, ml = object.material.length; m < ml; m++ ) {
+
+			meshMaterial = object.material[ m ];
+
+			if ( meshMaterial instanceof THREE.MeshFaceMaterial ) {
+
+				for ( i = 0, l = materialFaceGroup.material.length; i < l; i++ ) {
+
+					if ( materialNeedsSmoothNormals( materialFaceGroup.material[ i ] ) ) {
+
+						needsSmoothNormals = true;
+						break;
+
+					}
+
+				}
+
+			} else {
+
+				if ( materialNeedsSmoothNormals( meshMaterial ) ) {
+
+					needsSmoothNormals = true;
+					break;
+
+				}
+
+			}
+
+			if ( needsSmoothNormals ) break;
+
+		}
+		
+		return needsSmoothNormals;
+		
+	};
+	
+	function allocateLights( scene, maxLights ) {
+
+		if ( scene ) {
+
+			var l, ll, light, dirLights = pointLights = maxDirLights = maxPointLights = 0;
+
+			for ( l = 0, ll = scene.lights.length; l < ll; l++ ) {
+
+				light = scene.lights[ l ];
+
+				if ( light instanceof THREE.DirectionalLight ) dirLights++;
+				if ( light instanceof THREE.PointLight ) pointLights++;
+
+			}
+
+			if ( ( pointLights + dirLights ) <= maxLights ) {
+
+				maxDirLights = dirLights;
+				maxPointLights = pointLights;
+
+			} else {
+
+				maxDirLights = Math.ceil( maxLights * dirLights / ( pointLights + dirLights ) );
+				maxPointLights = maxLights - maxDirLights;
+
+			}
+
+			return { 'directional' : maxDirLights, 'point' : maxPointLights };
+
+		}
+
+		return { 'directional' : 1, 'point' : maxLights - 1 };
+
+	};
+	
 	/* DEBUG
 	function getGLParams() {
 
