@@ -98,7 +98,8 @@
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.addEventListener( 'mouseup', onDocumentMouseUp, false );
 				document.addEventListener( 'mousewheel', onDocumentMouseWheel, false );
-
+				document.addEventListener( 'DOMMouseScroll', onDocumentMouseWheel, false);
+				
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
 
@@ -158,8 +159,27 @@
 			}
 
 			function onDocumentMouseWheel( event ) {
-
-				fov -= event.wheelDeltaY * 0.05;
+				
+				// WebKit
+				
+				if ( event.wheelDeltaY ) {
+					
+					fov -= event.wheelDeltaY * 0.05;
+					
+				// Opera / Explorer 9
+				
+				} else if ( event.wheelDelta ) {
+					
+					fov -= event.wheelDelta * 0.05;
+					
+				// Firefox
+				
+				} else if ( event.detail ) {
+				
+					fov += event.detail * 1.0;
+				
+				}
+				
 				camera.projectionMatrix = THREE.Matrix4.makePerspective( fov, window.innerWidth / window.innerHeight, 1, 1100 );
 				render();
 
