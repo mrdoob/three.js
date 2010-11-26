@@ -139,7 +139,7 @@ THREE.CanvasRenderer = function () {
 				for ( m = 0, ml = element.material.length; m < ml; m++ ) {
 
 					material = element.material[ m ];
-					material && renderParticle( _v1, element, material, scene );
+					renderParticle( _v1, element, material, scene );
 
 				}
 
@@ -164,7 +164,7 @@ THREE.CanvasRenderer = function () {
 				while ( m < ml ) {
 
 					material = element.material[ m ++ ];
-					material && renderLine( _v1, _v2, element, material, scene );
+					renderLine( _v1, _v2, element, material, scene );
 
 				}
 
@@ -215,7 +215,7 @@ THREE.CanvasRenderer = function () {
 
 					}
 
-					material && renderFace3( _v1, _v2, _v3, element, material, scene );
+					renderFace3( _v1, _v2, _v3, element, material, scene );
 
 				}
 
@@ -278,7 +278,7 @@ THREE.CanvasRenderer = function () {
 
 					}
 
-					material && renderFace4( _v1, _v2, _v3, _v4, _v5, _v6, element, material, scene );
+					renderFace4( _v1, _v2, _v3, _v4, _v5, _v6, element, material, scene );
 
 				}
 
