@@ -47,6 +47,7 @@ Particles
 [![particles_random](http://mrdoob.github.com/three.js/assets/examples/02_random.png)](http://mrdoob.github.com/three.js/examples/particles_random.html)
 [![particles_wave](http://mrdoob.github.com/three.js/assets/examples/01_waves.png)](http://mrdoob.github.com/three.js/examples/particles_waves.html)
 [![particles_floor](http://mrdoob.github.com/three.js/assets/examples/00_floor.png)](http://mrdoob.github.com/three.js/examples/particles_floor.html)
+[![particles_sprites](http://mrdoob.github.com/three.js/assets/examples/26_particles_sprites.png)](http://mrdoob.github.com/three.js/examples/particles_sprites.html)
 
 ### Featured projects ###
 
