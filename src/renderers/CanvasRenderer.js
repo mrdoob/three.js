@@ -78,9 +78,6 @@ THREE.CanvasRenderer = function () {
 		_canvas.width = _canvasWidth;
 		_canvas.height = _canvasHeight;
 
-		_context.lineJoin = 'round';
-		_context.lineCap = 'round';
-
 		_clipRect.set( - _canvasWidthHalf, - _canvasHeightHalf, _canvasWidthHalf, _canvasHeightHalf );
 
 	};
@@ -92,7 +89,6 @@ THREE.CanvasRenderer = function () {
 			_clearRect.inflate( 1 );
 			_clearRect.minSelf( _clipRect );
 
-			_context.setTransform( 1, 0, 0, - 1, _canvasWidthHalf, _canvasHeightHalf );
 			_context.clearRect( _clearRect.getX(), _clearRect.getY(), _clearRect.getWidth(), _clearRect.getHeight() );
 
 			_clearRect.empty();
@@ -104,26 +100,18 @@ THREE.CanvasRenderer = function () {
 
 		var e, el, element, m, ml, fm, fml, material;
 
-		if ( this.autoClear ) {
+		_context.setTransform( 1, 0, 0, - 1, _canvasWidthHalf, _canvasHeightHalf );
 
-			this.clear();
-
-		}
+		this.autoClear && this.clear();
 
 		_renderList = _projector.projectScene( scene, camera );
-
-		_context.setTransform( 1, 0, 0, - 1, _canvasWidthHalf, _canvasHeightHalf );
 
 		/* DEBUG
 		_context.fillStyle = 'rgba(0, 255, 255, 0.5)';
 		_context.fillRect( _clipRect.getX(), _clipRect.getY(), _clipRect.getWidth(), _clipRect.getHeight() );
 		*/
 
-		if ( _enableLighting = scene.lights.length > 0 ) {
-
-			calculateLights( scene );
-
-		}
+		( _enableLighting = scene.lights.length > 0 ) && calculateLights( scene );
 
 		for ( e = 0, el = _renderList.length; e < el; e++ ) {
 
@@ -138,8 +126,7 @@ THREE.CanvasRenderer = function () {
 
 				for ( m = 0, ml = element.material.length; m < ml; m++ ) {
 
-					material = element.material[ m ];
-					renderParticle( _v1, element, material, scene );
+					renderParticle( _v1, element, element.material[ m ], scene );
 
 				}
 
@@ -153,20 +140,18 @@ THREE.CanvasRenderer = function () {
 				_bboxRect.addPoint( _v1.positionScreen.x, _v1.positionScreen.y );
 				_bboxRect.addPoint( _v2.positionScreen.x, _v2.positionScreen.y );
 
-				if ( !_clipRect.instersects( _bboxRect ) ) {
+				if ( _clipRect.instersects( _bboxRect ) ) {
 
-					continue;
+					m = 0; ml = element.material.length;
 
-				}
+					while ( m < ml ) {
 
-				m = 0; ml = element.material.length;
+						renderLine( _v1, _v2, element, element.material[ m ++ ], scene );
 
-				while ( m < ml ) {
-
-					material = element.material[ m ++ ];
-					renderLine( _v1, _v2, element, material, scene );
+					}
 
 				}
+
 
 			} else if ( element instanceof THREE.RenderableFace3 ) {
 
@@ -188,34 +173,32 @@ THREE.CanvasRenderer = function () {
 				_bboxRect.addPoint( _v2.positionScreen.x, _v2.positionScreen.y );
 				_bboxRect.addPoint( _v3.positionScreen.x, _v3.positionScreen.y );
 
-				if ( !_clipRect.instersects( _bboxRect ) ) {
+				if ( _clipRect.instersects( _bboxRect ) ) {
 
-					continue;
+					m = 0; ml = element.meshMaterial.length;
 
-				}
+					while ( m < ml ) {
 
-				m = 0; ml = element.meshMaterial.length;
+						material = element.meshMaterial[ m ++ ];
 
-				while ( m < ml ) {
+						if ( material instanceof THREE.MeshFaceMaterial ) {
 
-					material = element.meshMaterial[ m ++ ];
+							fm = 0; fml = element.faceMaterial.length;
 
-					if ( material instanceof THREE.MeshFaceMaterial ) {
+							while ( fm < fml ) {
 
-						fm = 0; fml = element.faceMaterial.length;
+								material = element.faceMaterial[ fm ++ ];
+								material && renderFace3( _v1, _v2, _v3, element, material, scene );
 
-						while ( fm < fml ) {
+							}
 
-							material = element.faceMaterial[ fm ++ ];
-							material && renderFace3( _v1, _v2, _v3, element, material, scene );
+							continue;
 
 						}
 
-						continue;
+						renderFace3( _v1, _v2, _v3, element, material, scene );
 
 					}
-
-					renderFace3( _v1, _v2, _v3, element, material, scene );
 
 				}
 
@@ -237,10 +220,6 @@ THREE.CanvasRenderer = function () {
 					expand( _v2.positionScreen, _v4.positionScreen );
 					expand( _v4.positionScreen, _v1.positionScreen );
 
-				}
-
-				if ( element.overdraw ) {
-
 					expand( _v3.positionScreen, _v5.positionScreen );
 					expand( _v3.positionScreen, _v6.positionScreen );
 
@@ -251,34 +230,32 @@ THREE.CanvasRenderer = function () {
 				_bboxRect.addPoint( _v3.positionScreen.x, _v3.positionScreen.y );
 				_bboxRect.addPoint( _v4.positionScreen.x, _v4.positionScreen.y );
 
-				if ( !_clipRect.instersects( _bboxRect ) ) {
+				if ( _clipRect.instersects( _bboxRect ) ) {
 
-					continue;
+					m = 0; ml = element.meshMaterial.length;
 
-				}
+					while ( m < ml ) {
 
-				m = 0; ml = element.meshMaterial.length;
+						material = element.meshMaterial[ m ++ ];
 
-				while ( m < ml ) {
+						if ( material instanceof THREE.MeshFaceMaterial ) {
 
-					material = element.meshMaterial[ m ++ ];
+							fm = 0; fml = element.faceMaterial.length;
 
-					if ( material instanceof THREE.MeshFaceMaterial ) {
+							while ( fm < fml ) {
 
-						fm = 0; fml = element.faceMaterial.length;
+								material = element.faceMaterial[ fm ++ ];
+								material && renderFace4( _v1, _v2, _v3, _v4, _v5, _v6, element, material, scene );
 
-						while ( fm < fml ) {
+							}
 
-							material = element.faceMaterial[ fm ++ ];
-							material && renderFace4( _v1, _v2, _v3, _v4, _v5, _v6, element, material, scene );
+							continue;
 
 						}
 
-						continue;
+						renderFace4( _v1, _v2, _v3, _v4, _v5, _v6, element, material, scene );
 
 					}
-
-					renderFace4( _v1, _v2, _v3, _v4, _v5, _v6, element, material, scene );
 
 				}
 
@@ -314,7 +291,7 @@ THREE.CanvasRenderer = function () {
 		_directionalLights.setRGB( 0, 0, 0 );
 		_pointLights.setRGB( 0, 0, 0 );
 
-		for ( l = 0, ll = lights.length; l < ll; l++ ) {
+		for ( l = 0, ll = lights.length; l < ll; l ++ ) {
 
 			light = lights[ l ];
 			lightColor = light.color;
@@ -348,17 +325,18 @@ THREE.CanvasRenderer = function () {
 		var l, ll, light, lightColor, amount
 		lights = scene.lights;
 
-		for ( l = 0, ll = lights.length; l < ll; l++ ) {
+		for ( l = 0, ll = lights.length; l < ll; l ++ ) {
 
 			light = lights[ l ];
 			lightColor = light.color;
 
 			if ( light instanceof THREE.DirectionalLight ) {
 
-				amount = element.normalWorld.dot( light.position ) * light.intensity;
+				amount = element.normalWorld.dot( light.position );
 
 				if ( amount > 0 ) {
 
+					amount *= light.intensity;
 					color.r += lightColor.r * amount;
 					color.g += lightColor.g * amount;
 					color.b += lightColor.b * amount;
@@ -370,10 +348,11 @@ THREE.CanvasRenderer = function () {
 				_vector3.sub( light.position, element.centroidWorld );
 				_vector3.normalize();
 
-				amount = element.normalWorld.dot( _vector3 ) * light.intensity;
+				amount = element.normalWorld.dot( _vector3 );
 
 				if ( amount > 0 ) {
 
+					amount *= light.intensity;
 					color.r += lightColor.r * amount;
 					color.g += lightColor.g * amount;
 					color.b += lightColor.b * amount;
@@ -553,25 +532,44 @@ THREE.CanvasRenderer = function () {
 
 			if ( _enableLighting ) {
 
-				_light.r = _ambientLight.r;
-				_light.g = _ambientLight.g;
-				_light.b = _ambientLight.b;
+				if ( material.shading == THREE.FlatShading ) {
 
-				calculateFaceLight( scene, element, _light );
+					_light.r = _ambientLight.r;
+					_light.g = _ambientLight.g;
+					_light.b = _ambientLight.b;
 
-				_color.r = material.color.r * _light.r;
-				_color.g = material.color.g * _light.g;
-				_color.b = material.color.b * _light.b;
+					calculateFaceLight( scene, element, _light );
 
-				_color.updateStyleString();
+					_color.r = material.color.r * _light.r;
+					_color.g = material.color.g * _light.g;
+					_color.b = material.color.b * _light.b;
+
+					_color.updateStyleString();
+
+					drawTriangle( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _color, material.wireframe, material.wireframe_linewidth );
+
+				} else if ( material.shading == THREE.SmoothShading ) {
+
+					_light.r = _ambientLight.r;
+					_light.g = _ambientLight.g;
+					_light.b = _ambientLight.b;
+
+					calculateFaceLight( scene, element, _light );
+
+					_color.r = material.color.r * _light.r;
+					_color.g = material.color.g * _light.g;
+					_color.b = material.color.b * _light.b;
+
+					_color.updateStyleString();
+
+				}
 
 			} else {
 
-				_color.__styleString = material.color.__styleString;
+				drawTriangle( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, material.color.__styleString, material.wireframe, material.wireframe_linewidth );
 
 			}
 
-			drawTriangle( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _color, material.wireframe, material.wireframe_linewidth );
 
 		} else if ( material instanceof THREE.MeshDepthMaterial ) {
 

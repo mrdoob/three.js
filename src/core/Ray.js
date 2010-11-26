@@ -57,7 +57,7 @@ THREE.Ray.prototype = {
 			c = object.matrix.transform( vertices[ face.c ].position.clone() );
 			d = face instanceof THREE.Face4 ? object.matrix.transform( vertices[ face.d ].position.clone() ) : null;
 
-			normal = object.matrixRotation.transform( face.normal.clone() );
+			normal = object.rotationMatrix.transform( face.normal.clone() );
 			dot = direction.dot( normal );
 
 			if ( dot < 0 ) { // Math.abs( dot ) > 0.0001

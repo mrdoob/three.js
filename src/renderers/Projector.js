@@ -21,21 +21,15 @@ THREE.Projector = function() {
 
 	this.projectScene = function ( scene, camera ) {
 
-		var o, ol, v, vl, f, fl, objects, object, objectMatrix,
+		var o, ol, v, vl, f, fl, objects, object,
+		objectMatrix, objectRotationMatrix, objectMaterial, objectOverdraw,
 		vertices, vertex, vertexPositionScreen,
 		faces, face, v1, v2, v3, v4;
 
 		_renderList = [];
-		_face3Count = 0;
-		_face4Count = 0;
-		_lineCount = 0;
-		_particleCount = 0;
+		_face3Count = _face4Count = _lineCount = _particleCount = 0;
 
-		if( camera.autoUpdateMatrix ) {
-
-			camera.updateMatrix();
-
-		}
+		camera.autoUpdateMatrix && camera.updateMatrix();
 
 		_projScreenMatrix.multiply( camera.projectionMatrix, camera.matrix );
 
@@ -45,12 +39,11 @@ THREE.Projector = function() {
 
 			object = objects[ o ];
 			objectMatrix = object.matrix;
+			objectRotationMatrix = object.rotationMatrix;
+			objectMaterial = object.material;
+			objectOverdraw = object.overdraw;
 
-			if( object.autoUpdateMatrix ) {
-
-				object.updateMatrix();
-
-			}
+			object.autoUpdateMatrix && object.updateMatrix();
 
 			if ( object instanceof THREE.Mesh ) {
 
@@ -96,12 +89,13 @@ THREE.Projector = function() {
 							   ( v3.positionScreen.y - v1.positionScreen.y ) * ( v2.positionScreen.x - v1.positionScreen.x ) < 0 ) ) ) {
 
 								_face3 = _face3Pool[ _face3Count ] = _face3Pool[ _face3Count ] || new THREE.RenderableFace3();
+
 								_face3.v1.positionScreen.copy( v1.positionScreen );
 								_face3.v2.positionScreen.copy( v2.positionScreen );
 								_face3.v3.positionScreen.copy( v3.positionScreen );
 
 								_face3.normalWorld.copy( face.normal );
-								object.matrixRotation.transform( _face3.normalWorld );
+								objectRotationMatrix.transform( _face3.normalWorld );
 
 								_face3.centroidWorld.copy( face.centroid );
 								objectMatrix.transform( _face3.centroidWorld );
@@ -111,11 +105,10 @@ THREE.Projector = function() {
 
 								_face3.z = _face3.centroidScreen.z;
 
-								_face3.meshMaterial = object.material;
+								_face3.meshMaterial = objectMaterial;
 								_face3.faceMaterial = face.material;
-								_face3.overdraw = object.overdraw;
+								_face3.overdraw = objectOverdraw;
 								_face3.uvs = object.geometry.uvs[ f ];
-								_face3.color = face.color;
 
 								_renderList.push( _face3 );
 
@@ -138,13 +131,14 @@ THREE.Projector = function() {
 							   ( v2.positionScreen.y - v3.positionScreen.y ) * ( v4.positionScreen.x - v3.positionScreen.x ) < 0 ) ) ) ) {
 
 								_face4 = _face4Pool[ _face4Count ] = _face4Pool[ _face4Count ] || new THREE.RenderableFace4();
+
 								_face4.v1.positionScreen.copy( v1.positionScreen );
 								_face4.v2.positionScreen.copy( v2.positionScreen );
 								_face4.v3.positionScreen.copy( v3.positionScreen );
 								_face4.v4.positionScreen.copy( v4.positionScreen );
 
 								_face4.normalWorld.copy( face.normal );
-								object.matrixRotation.transform( _face4.normalWorld );
+								objectRotationMatrix.transform( _face4.normalWorld );
 
 								_face4.centroidWorld.copy( face.centroid );
 								objectMatrix.transform( _face4.centroidWorld );
@@ -154,11 +148,10 @@ THREE.Projector = function() {
 
 								_face4.z = _face4.centroidScreen.z;
 
-								_face4.meshMaterial = object.material;
+								_face4.meshMaterial = objectMaterial;
 								_face4.faceMaterial = face.material;
-								_face4.overdraw = object.overdraw;
+								_face4.overdraw = objectOverdraw;
 								_face4.uvs = object.geometry.uvs[ f ];
-								_face4.color = face.color;
 
 								_renderList.push( _face4 );
 

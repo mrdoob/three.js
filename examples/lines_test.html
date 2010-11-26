@@ -60,7 +60,7 @@
 				material = new THREE.ParticleCircleMaterial( { color: 0xffffff } );
 				var geometry = new THREE.Geometry();
 
-				for (var i = 0; i < 100; i++) {
+				for ( var i = 0; i < 100; i ++ ) {
 
 					particle = new THREE.Particle( material );
 					particle.position.x = Math.random() * 2 - 1;
@@ -78,7 +78,7 @@
 				// lines
 
 				var line = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 0.5 } ) );
-				scene.addObject(line);
+				scene.addObject( line );
 
 				/*
 				stats = new Stats();
@@ -87,9 +87,9 @@
 				container.appendChild(stats.domElement);
 				*/
 
-				document.addEventListener('mousemove', onDocumentMouseMove, false);
-				document.addEventListener('touchstart', onDocumentTouchStart, false);
-				document.addEventListener('touchmove', onDocumentTouchMove, false);
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
+				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
 			}
 
 			//
@@ -102,23 +102,23 @@
 
 			function onDocumentTouchStart( event ) {
 
-				if(event.touches.length > 1) {
+				if ( event.touches.length > 1 ) {
 
 					event.preventDefault();
 
-					mouseX = event.touches[0].pageX - windowHalfX;
-					mouseY = event.touches[0].pageY - windowHalfY;
+					mouseX = event.touches[ 0 ].pageX - windowHalfX;
+					mouseY = event.touches[ 0 ].pageY - windowHalfY;
 				}
 			}
 
 			function onDocumentTouchMove( event ) {
 
-				if(event.touches.length == 1) {
+				if ( event.touches.length == 1 ) {
 
 					event.preventDefault();
 
-					mouseX = event.touches[0].pageX - windowHalfX;
-					mouseY = event.touches[0].pageY - windowHalfY;
+					mouseX = event.touches[ 0 ].pageX - windowHalfX;
+					mouseY = event.touches[ 0 ].pageY - windowHalfY;
 				}
 			}
 
@@ -126,8 +126,8 @@
 
 			function loop() {
 
-				camera.position.x += (mouseX - camera.position.x) * .05;
-				camera.position.y += (-mouseY + 200 - camera.position.y) * .05;
+				camera.position.x += ( mouseX - camera.position.x ) * .05;
+				camera.position.y += ( - mouseY + 200 - camera.position.y ) * .05;
 				camera.updateMatrix();
 
 				renderer.render(scene, camera);

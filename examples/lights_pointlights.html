@@ -60,7 +60,7 @@
 
 				scene = new THREE.Scene();
 
-				object = new THREE.Mesh( new WaltHead(), new THREE.MeshLambertMaterial( { color: 0xffffff } ) );
+				object = new THREE.Mesh( new WaltHead(), new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading } ) );
 				object.overdraw = true;
 				scene.addObject( object );
 

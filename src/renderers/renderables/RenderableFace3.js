@@ -4,6 +4,8 @@
 
 THREE.RenderableFace3 = function () {
 
+	this.z = null;
+
 	this.v1 = new THREE.Vertex();
 	this.v2 = new THREE.Vertex();
 	this.v3 = new THREE.Vertex();
@@ -12,10 +14,11 @@ THREE.RenderableFace3 = function () {
 	this.centroidScreen = new THREE.Vector3();
 
 	this.normalWorld = new THREE.Vector3();
+	this.vertexNormalsWorld = [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ];
 
-	this.z = null;
-
-	this.color = null;
-	this.material = null;
+	this.meshMaterial = null;
+	this.faceMaterial = null;
+	this.overdraw = false;
+	this.uv = null;
 
 };

@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - geometry - cube</title>
+		<title>three.js - geometry - sphere</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -60,23 +60,16 @@
 		<script type="text/javascript" src="../src/renderers/renderables/RenderableLine.js"></script>
 
 		<script type="text/javascript" src="../src/extras/primitives/Sphere.js"></script>
-		<script type="text/javascript" src="../src/extras/primitives/Plane.js"></script>
 
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
 
-			var SCREEN_WIDTH = window.innerWidth;
-			var SCREEN_HEIGHT = window.innerHeight;
+			var container, stats;
 
-			var container;
-			var stats;
+			var camera, scene, renderer, objects;
 
-			var camera;
-			var scene;
-			var renderer;
-
-			var cube, plane;
+			var sphere;
 
 			var targetRotation = 0;
 			var targetRotationOnMouseDown = 0;
@@ -111,43 +104,59 @@
 				container = document.createElement('div');
 				document.body.appendChild(container);
 
-				camera = new THREE.Camera( 45, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
+				camera = new THREE.Camera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.y = 150;
 				camera.position.z = 400;
 				camera.target.position.y = 150;
 
 				scene = new THREE.Scene();
 
-				// Plane
+				// Grid
 
-				var material = new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 0.5, wireframe: true, wireframe_size: 1 } );
+				var geometry = new THREE.Geometry();
+				geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( - 500, 0, 0 ) ) );
+				geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( 500, 0, 0 ) ) );
 
-				plane = new THREE.Mesh( new Plane( 1000, 1000, 10, 10 ), material );
-				plane.rotation.x = - 90 * ( Math.PI / 180 );
-				plane.doubleSided = true;
-				scene.addObject( plane );
+				var material = new THREE.LineBasicMaterial( { color: 0x000000, opacity: 0.5 } );
+
+				for ( var i = 0; i <= 10; i ++ ) {
+
+					var line = new THREE.Line( geometry, material );
+					line.position.z = ( i * 100 ) - 500;
+					scene.addObject( line );
+
+					var line = new THREE.Line( geometry, material );
+					line.position.x = ( i * 100 ) - 500;
+					line.rotation.y = 90 * Math.PI / 180;
+					scene.addObject( line );
+
+				}
 
 				// Spheres
+
+				objects = [];
 
 				geometry = new Sphere( 100, 16, 8 );
 				material = new THREE.MeshLambertMaterial( { color: 0xffffff, opacity: 1 } );
 
 				for ( var i = 0; i < 10; i ++ ) {
 
-					cube = new THREE.Mesh( geometry, material );
-					cube.overdraw = true;
+					sphere = new THREE.Mesh( geometry, material );
+					sphere.overdraw = true;
 
-					cube.position.x = Math.random() * 1000 - 500;
-					cube.position.y = Math.random() * 1000 - 500;
-					cube.position.z = Math.random() * 1000 - 500;
+					sphere.position.x = Math.random() * 1000 - 500;
+					sphere.position.y = Math.random() * 1000 - 500;
+					sphere.position.z = Math.random() * 1000 - 500;
 
-					cube.rotation.x = Math.random() * 200 - 100;
-					cube.rotation.y = Math.random() * 200 - 100;
-					cube.rotation.z = Math.random() * 200 - 100;
+					sphere.rotation.x = Math.random() * 200 - 100;
+					sphere.rotation.y = Math.random() * 200 - 100;
+					sphere.rotation.z = Math.random() * 200 - 100;
 
-					cube.scale.x = cube.scale.y = cube.scale.z = Math.random() + 0.5;
+					sphere.scale.x = sphere.scale.y = sphere.scale.z = Math.random() + 0.5;
 
-					scene.addObject(cube);
+					objects.push( sphere );
+
+					scene.addObject( sphere );
 
 				}
 
@@ -168,7 +177,7 @@
 
 
 				renderer = new THREE.CanvasRenderer();
-				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.appendChild( renderer.domElement );
 
@@ -272,9 +281,10 @@
 				debugContext.rect( camera.target.position.x * 0.1 - 5, camera.target.position.z * 0.1 - 5, 10, 10 );
 				debugContext.rect( - 50, - 50, 100, 100 );
 
-				for ( var i = 1; i < scene.objects.length; i++ ) {
+				for ( var i = 0, l = objects.length; i < l; i++ ) {
 
-					var object = scene.objects[i];
+					var object = objects[ i ];
+
 					object.rotation.x += 0.01;
 					object.rotation.y += 0.005;
 					object.position.y = Math.sin( object.rotation.x ) * 200;

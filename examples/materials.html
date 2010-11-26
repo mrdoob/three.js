@@ -17,7 +17,6 @@
 		<script type="text/javascript" src="../build/Three.js"></script>
 
 		<script type="text/javascript" src="../src/extras/primitives/Sphere.js"></script>
-		<script type="text/javascript" src="../src/extras/primitives/Plane.js"></script>
 
 		<script type="text/javascript" src="js/Stats.js"></script>
 
@@ -48,14 +47,16 @@
 				geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( - 500, 0, 0 ) ) );
 				geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( 500, 0, 0 ) ) );
 
+				var material = new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 0.2 } );
+
 				for ( var i = 0; i <= 10; i ++ ) {
 
-					var line = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 0.2 } ) );
+					var line = new THREE.Line( geometry, material );
 					line.position.y = - 120;
 					line.position.z = ( i * 100 ) - 500;
 					scene.addObject( line );
 
-					var line = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 0.2 } ) );
+					var line = new THREE.Line( geometry, material );
 					line.position.x = ( i * 100 ) - 500;
 					line.position.y = - 120;
 					line.rotation.y = 90 * Math.PI / 180;
@@ -74,8 +75,8 @@
 				materials.push( { material: new THREE.MeshBasicMaterial( { color: 0x00ffff, wireframe: true } ), overdraw: false, doubleSided: true } );
 				//materials.push( { material: new THREE.MeshBasicMaterial( { color: 0xff0000, blending: THREE.SubtractiveBlending } ), overdraw: false, doubleSided: true } );
 				materials.push( { material: new THREE.MeshBasicMaterial( { color: 0xff0000, blending: THREE.AdditiveBlending } ), overdraw: false, doubleSided: true } );
-				materials.push( { material: new THREE.MeshLambertMaterial( { color: 0xffffff } ), overdraw: true, doubleSided: false } );
-				materials.push( { material: new THREE.MeshPhongMaterial( { ambient: 0x030383, color: 0xf55555, specular: 0x66f6f6, shininess: 10 } ), overdraw: true, doubleSided: false } );
+				materials.push( { material: new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading } ), overdraw: true, doubleSided: false } );
+				materials.push( { material: new THREE.MeshPhongMaterial( { ambient: 0x030383, color: 0xf55555, specular: 0x66f6f6, shininess: 10, shading: THREE.FlatShading } ), overdraw: true, doubleSided: false } );
 				materials.push( { material: new THREE.MeshDepthMaterial( { near: 1, far: 2000 } ), overdraw: true, doubleSided: false } );
 				materials.push( { material: new THREE.MeshNormalMaterial( ), overdraw: true, doubleSided: false } );
 				materials.push( { material: new THREE.MeshBasicMaterial( { map: generatedTexture } ), overdraw: true, doubleSided: false } );
