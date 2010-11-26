@@ -92,7 +92,7 @@
 
 					// Merging spheres in a single geometry
 					GeometryUtils.merge( geometry, sphere );
-                    
+
 				}
 
 				var path = "textures/cube/skybox/";
@@ -105,7 +105,7 @@
 
 				var images = ImageUtils.loadArray( urls );
 				var textureCube = new THREE.TextureCube( images, THREE.RefractionMap );
-				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, env_map: textureCube, refraction_ratio: 0.75 } );
+				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, env_map: textureCube, refraction_ratio: 0.95 } );
 
 				var mesh = new THREE.Mesh( geometry, material );
 				mesh.position.x = 100;
