@@ -45,6 +45,7 @@
 		<script type="text/javascript" src="../src/materials/MeshLambertMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/MeshPhongMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/MeshDepthMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/MeshNormalMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/MeshFaceMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/ParticleBasicMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/ParticleCircleMaterial.js"></script>
@@ -55,7 +56,6 @@
 		<script type="text/javascript" src="../src/renderers/SVGRenderer.js"></script>
 		<script type="text/javascript" src="../src/renderers/WebGLRenderer.js"></script>
 		<script type="text/javascript" src="../src/renderers/renderables/RenderableFace3.js"></script>
-		<script type="text/javascript" src="../src/renderers/renderables/RenderableFace4.js"></script>
 		<script type="text/javascript" src="../src/renderers/renderables/RenderableParticle.js"></script>
 		<script type="text/javascript" src="../src/renderers/renderables/RenderableLine.js"></script>
 
@@ -68,6 +68,7 @@
 			var container, stats;
 
 			var camera, scene, renderer, objects;
+			var pointLight;
 
 			var sphere;
 
@@ -80,29 +81,23 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
-			var moveForward = false,
-			moveBackwards = false,
-			moveUp = false,
-			moveDown = false,
-			moveLeft = false,
-			moveRight = false,
+			var moveForward = false, moveBackwards = false,
+			moveUp = false, moveDown = false,
+			moveLeft = false, moveRight = false,
 
-			yawLeft = false,
-			yawRight = false,
-			pitchUp = false,
-			pitchDown = false,
-			rollLeft = false,
-			rollRight = false;
+			yawLeft = false, yawRight = false,
+			pitchUp = false, pitchDown = false,
+			rollLeft = false, rollRight = false;
 
 			var debugContext;
 
 			init();
-			setInterval(loop, 1000/60);
+			setInterval( loop, 1000 / 60 );
 
 			function init() {
 
-				container = document.createElement('div');
-				document.body.appendChild(container);
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
 
 				camera = new THREE.Camera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.y = 150;
@@ -137,7 +132,7 @@
 				objects = [];
 
 				geometry = new Sphere( 100, 16, 8 );
-				material = new THREE.MeshLambertMaterial( { color: 0xffffff, opacity: 1 } );
+				material = new THREE.MeshLambertMaterial( { color: 0xffffff, opacity: 1/*, shading: THREE.FlatShading*/ } );
 
 				for ( var i = 0; i < 10; i ++ ) {
 
@@ -172,9 +167,8 @@
 				directionalLight.position.normalize();
 				scene.addLight( directionalLight );
 
-				var pointLight = new THREE.PointLight( 0xff0000, 1 );
+				pointLight = new THREE.PointLight( 0xff0000, 1 );
 				scene.addLight( pointLight );
-
 
 				renderer = new THREE.CanvasRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );

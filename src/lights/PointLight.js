@@ -2,7 +2,7 @@ THREE.PointLight = function ( hex, intensity ) {
 
 	THREE.Light.call( this, hex );
 
-	this.position = new THREE.Vector3( 0, 0, 0 );
+	this.position = new THREE.Vector3();
 	this.intensity = intensity || 1;
 
 };

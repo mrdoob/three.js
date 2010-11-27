@@ -7,11 +7,13 @@
 THREE.Texture = function ( image, mapping, wrap_s, wrap_t ) {
 
 	this.image = image;
+	this.loaded = false;
+
 	this.mapping = mapping !== undefined ? mapping : THREE.UVMapping;
-	
+
 	this.wrap_s = wrap_s !== undefined ? wrap_s : THREE.ClampToEdge;
 	this.wrap_t = wrap_t !== undefined ? wrap_t : THREE.ClampToEdge;
-	
+
 	this.toString = function () {
 
 		return 'THREE.Texture (<br/>' +

@@ -129,7 +129,6 @@ def buildFull(debug):
 		'renderers/SVGRenderer.js',
 		'renderers/WebGLRenderer.js',
 		'renderers/renderables/RenderableFace3.js',
-		'renderers/renderables/RenderableFace4.js',
 		'renderers/renderables/RenderableParticle.js',
 		'renderers/renderables/RenderableLine.js'
 	]
@@ -178,7 +177,6 @@ def buildCanvas(debug):
 		'renderers/Projector.js',
 		'renderers/CanvasRenderer.js',
 		'renderers/renderables/RenderableFace3.js',
-		'renderers/renderables/RenderableFace4.js',
 		'renderers/renderables/RenderableParticle.js',
 		'renderers/renderables/RenderableLine.js'
 	]
@@ -272,7 +270,6 @@ def buildSVG(debug):
 		'renderers/Projector.js',
 		'renderers/SVGRenderer.js',
 		'renderers/renderables/RenderableFace3.js',
-		'renderers/renderables/RenderableFace4.js',
 		'renderers/renderables/RenderableParticle.js',
 		'renderers/renderables/RenderableLine.js'
 	]

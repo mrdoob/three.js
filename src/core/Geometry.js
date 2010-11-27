@@ -22,18 +22,16 @@ THREE.Geometry.prototype = {
 			face = this.faces[ f ];
 			face.centroid.set( 0, 0, 0 );
 
+			face.centroid.addSelf( this.vertices[ face.a ].position );
+			face.centroid.addSelf( this.vertices[ face.b ].position );
+			face.centroid.addSelf( this.vertices[ face.c ].position );
+
 			if ( face instanceof THREE.Face3 ) {
 
-				face.centroid.addSelf( this.vertices[ face.a ].position );
-				face.centroid.addSelf( this.vertices[ face.b ].position );
-				face.centroid.addSelf( this.vertices[ face.c ].position );
 				face.centroid.divideScalar( 3 );
 
 			} else if ( face instanceof THREE.Face4 ) {
 
-				face.centroid.addSelf( this.vertices[ face.a ].position );
-				face.centroid.addSelf( this.vertices[ face.b ].position );
-				face.centroid.addSelf( this.vertices[ face.c ].position );
 				face.centroid.addSelf( this.vertices[ face.d ].position );
 				face.centroid.divideScalar( 4 );
 

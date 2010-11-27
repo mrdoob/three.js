@@ -74,6 +74,7 @@
 				scene.addObject(mesh);
 
 				mesh = new THREE.Mesh( new Sphere( 200, 20, 20 ), loadImage( 'textures/land_ocean_ice_cloud_2048.jpg' ) );
+				mesh.overdraw = true;
 				scene.addObject(mesh);
 
 				renderer = new THREE.CanvasRenderer();
