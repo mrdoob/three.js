@@ -19,7 +19,7 @@
 # To support reload properly, try to access a package var, if it's there, reload everything
 if "bpy" in locals():
     import sys
-    reload(sys.modules.get("io_mesh_threejs_slim.export_threejs_slim", sys))
+    reload(sys.modules.get("io_mesh_threejs.export_threejs", sys))
 
 
 import bpy
@@ -27,17 +27,17 @@ from bpy.props import *
 from io_utils import ExportHelper
 
 
-class ExportTHREEJSSlim(bpy.types.Operator, ExportHelper):
+class ExportTHREEJS(bpy.types.Operator, ExportHelper):
     '''Export selected object for Three.js (ASCII JSON format).'''
-    bl_idname = "export.threejs_slim"
-    bl_label = "Export Three.js Slim"
-    
+    bl_idname = "export.threejs"
+    bl_label = "Export Three.js"
+
     filename_ext = ".js"
 
     use_modifiers = BoolProperty(name="Apply Modifiers", description="Apply modifiers to the exported mesh", default=True)
     use_normals = BoolProperty(name="Normals", description="Export normals", default=True)
     use_uv_coords = BoolProperty(name="UVs", description="Export texture coordinates", default=True)
-    
+
     align_types = [("None","None","None"), ("Center","Center","Center"), ("Bottom","Bottom","Bottom"), ("Top","Top","Top")]
     align_model = EnumProperty(name="Align model", description="Align model", items=align_types, default="Center")
 
@@ -52,8 +52,8 @@ class ExportTHREEJSSlim(bpy.types.Operator, ExportHelper):
             raise Exception("filename not set")
 
         filepath = self.filepath
-        import io_mesh_threejs_slim.export_threejs_slim
-        return io_mesh_threejs_slim.export_threejs_slim.save(self, context, **self.properties)
+        import io_mesh_threejs.export_threejs
+        return io_mesh_threejs.export_threejs.save(self, context, **self.properties)
 
     def draw(self, context):
         layout = self.layout
@@ -66,11 +66,11 @@ class ExportTHREEJSSlim(bpy.types.Operator, ExportHelper):
         row.prop(self.properties, "use_uv_coords")
         row = layout.row()
         row.prop(self.properties, "align_model")
-        
+
 
 def menu_func(self, context):
     default_path = bpy.data.filepath.replace(".blend", ".js")
-    self.layout.operator(ExportTHREEJSSlim.bl_idname, text="Three.js (.js) Slim").filepath = default_path
+    self.layout.operator(ExportTHREEJS.bl_idname, text="Three.js (.js)").filepath = default_path
 
 
 def register():

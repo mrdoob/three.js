@@ -239,23 +239,23 @@
 
 			function loop() {
 
-				if ( moveForward ) camera.position.z -= 5; // camera.moveZ( 5 );
-				if ( moveBackwards ) camera.position.z += 5; // camera.moveZ( - 5 );
+				if ( moveForward ) camera.position.z -= 5;
+				if ( moveBackwards ) camera.position.z += 5;
 
-				if ( moveUp ) camera.position.y += 5; // camera.moveZ( 5 );
-				if ( moveDown ) camera.position.y -= 5; // camera.moveZ( - 5 );
+				if ( moveUp ) camera.position.y += 5;
+				if ( moveDown ) camera.position.y -= 5;
 
-				if ( moveLeft ) camera.position.x -= 5; // camera.moveX( - 5 );
-				if ( moveRight ) camera.position.x += 5; // camera.moveX( 5 );
+				if ( moveLeft ) camera.position.x -= 5;
+				if ( moveRight ) camera.position.x += 5;
 
-				if ( pitchUp ) camera.rotation.x += 0.01; // camera.rotateX( 1 );
-				if ( pitchDown ) camera.rotation.x -= 0.01; // camera.rotateX( - 1 );
+				if ( pitchUp ) camera.rotation.x += 0.01;
+				if ( pitchDown ) camera.rotation.x -= 0.01;
 
-				if ( yawLeft ) camera.target.position.x -= 5; // camera.rotation.y += 0.01; // camera.rotateY( 1 );
-				if ( yawRight ) camera.target.position.x += 5; // camera.rotation.y -= 0.01; // camera.rotateY( - 1 );
+				if ( yawLeft ) camera.target.position.x -= 5;
+				if ( yawRight ) camera.target.position.x += 5;
 
-				if ( rollLeft ) camera.rotation.z += 0.01; // camera.rotateZ( 1 );
-				if ( rollRight ) camera.rotation.z -= 0.01; // camera.rotateZ( - 1 );
+				if ( rollLeft ) camera.rotation.z += 0.01;
+				if ( rollRight ) camera.rotation.z -= 0.01;
 
 				debugContext.clearRect( -256, -256, 512, 512 );
 

@@ -27,7 +27,7 @@ THREE.CanvasRenderer = function () {
 	_color4 = new THREE.Color(),
 	_2near, _farPlusNear, _farMinusNear,
 
-	_bitmap, _bitmapWidth, _bitmapHeight,
+	_bitmap,
 
 	_clipRect = new THREE.Rectangle(),
 	_clearRect = new THREE.Rectangle(),
@@ -41,7 +41,6 @@ THREE.CanvasRenderer = function () {
 
 	_pi2 = Math.PI * 2,
 	_vector3 = new THREE.Vector3(), // Needed for PointLight
-	_uv1 = new THREE.UV(), _uv2 = new THREE.UV(), _uv3 = new THREE.UV(), _uv4 = new THREE.UV(),
 
 	_pixelMap, _pixelMapContext, _pixelMapImage, _pixelMapData,
 	_gradientMap, _gradientMapContext, _gradientMapQuality = 16;
@@ -583,6 +582,7 @@ THREE.CanvasRenderer = function () {
 
 	}
 
+	/*
 	function drawQuad( x0, y0, x1, y1, x2, y2, x3, y3 ) {
 
 		_context.beginPath();
@@ -594,6 +594,7 @@ THREE.CanvasRenderer = function () {
 		_context.closePath();
 
 	}
+	*/
 
 	function strokePath( color, linewidth ) {
 
@@ -616,7 +617,8 @@ THREE.CanvasRenderer = function () {
 
 		// http://extremelysatisfactorytotalitarianism.com/blog/?p=2120
 
-		var width = bitmap.width - 1,
+		var a, b, c, d, e, f, det,
+		width = bitmap.width - 1,
 		height = bitmap.height - 1;
 
 		u0 *= width; v0 *= height;
@@ -629,7 +631,7 @@ THREE.CanvasRenderer = function () {
 		u1 -= u0; v1 -= v0;
 		u2 -= u0; v2 -= v0;
 
-		var det = 1 / ( u1 * v2 - u2 * v1 ),
+		det = 1 / ( u1 * v2 - u2 * v1 ),
 
 		a = ( v2 * x1 - v1 * x2 ) * det,
 		b = ( v2 * y1 - v1 * y2 ) * det,

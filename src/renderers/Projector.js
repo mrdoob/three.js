@@ -8,7 +8,6 @@ THREE.Projector = function() {
 
 	var _renderList = null,
 	_face3, _face32, _face3Count, _face3Pool = [],
-	//_face4, _face4Count, _face4Pool = [],
 	_line, _lineCount, _linePool = [],
 	_particle, _particleCount, _particlePool = [],
 
@@ -19,7 +18,7 @@ THREE.Projector = function() {
 	_clippedVertex1PositionScreen = new THREE.Vector4(),
 	_clippedVertex2PositionScreen = new THREE.Vector4(),
 
-	_face3VertexNormals, _face4VertexNormals;
+	_face3VertexNormals;
 
 	this.projectScene = function ( scene, camera ) {
 
@@ -29,7 +28,7 @@ THREE.Projector = function() {
 		faces, face, faceVertexNormals, normal, v1, v2, v3, v4;
 
 		_renderList = [];
-		_face3Count = _face4Count = _lineCount = _particleCount = 0;
+		_face3Count = _lineCount = _particleCount = 0;
 
 		camera.autoUpdateMatrix && camera.updateMatrix();
 
@@ -48,8 +47,6 @@ THREE.Projector = function() {
 			objectOverdraw = object.overdraw;
 
 			if ( object instanceof THREE.Mesh ) {
-
-				// _projScreenObjectMatrix.multiply( _projScreenMatrix, objectMatrix );
 
 				// vertices
 
