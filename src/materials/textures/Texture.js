@@ -27,8 +27,8 @@ THREE.Texture = function ( image, mapping, wrap_s, wrap_t ) {
 };
 
 THREE.UVMapping = 0;
-THREE.ReflectionMap = 1;
-THREE.RefractionMap = 2;
+THREE.ReflectionMapping = 1;
+THREE.RefractionMapping = 2;
 
 THREE.Multiply = 0;
 THREE.Mix = 1;

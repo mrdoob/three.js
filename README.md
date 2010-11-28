@@ -156,7 +156,7 @@ For creating a customised version of the library, including the source files in 
 
 ### Change Log ###
 
-2010 11 28 - **r30** (75.653 KB, gz: 17.812 KB)
+2010 11 28 - **r30** (75.653 KB, gzip: 17.812 KB)
 
 * `CanvasRenderer` SmoothShading support
 

@@ -17,6 +17,8 @@ THREE.CanvasRenderer = function () {
 	_contextFillStyle = null,
 	_contextLineWidth = 1,
 
+	_min = Math.min, _max = Math.max,
+
 	_v1, _v2, _v3,
 	_v1x, _v1y, _v2x, _v2y, _v3x, _v3y,
 
@@ -474,13 +476,20 @@ THREE.CanvasRenderer = function () {
 
 			}
 
-			/*
 			if ( material.env_map ) {
 
-				
+				if ( material.env_map.mapping == THREE.ReflectionMapping ) {
+
+					
+
+				} else if ( material.env_map.mapping == THREE.RefractionMapping ) {
+
+					
+
+				}
 
 			}
-			*/
+
 
 		} else if ( material instanceof THREE.MeshLambertMaterial ) {
 
@@ -727,21 +736,21 @@ THREE.CanvasRenderer = function () {
 
 		// http://mrdoob.com/blog/post/710
 
-		_pixelMapData[ 0 ] = ~~ ( color1.r * 255 );
-		_pixelMapData[ 1 ] = ~~ ( color1.g * 255 );
-		_pixelMapData[ 2 ] = ~~ ( color1.b * 255 );
+		_pixelMapData[ 0 ] = _max( 0, _min( 255, ~~ ( color1.r * 255 ) ) );
+		_pixelMapData[ 1 ] = _max( 0, _min( 255, ~~ ( color1.g * 255 ) ) );
+		_pixelMapData[ 2 ] = _max( 0, _min( 255, ~~ ( color1.b * 255 ) ) );
 
-		_pixelMapData[ 4 ] = ~~ ( color2.r * 255 );
-		_pixelMapData[ 5 ] = ~~ ( color2.g * 255 );
-		_pixelMapData[ 6 ] = ~~ ( color2.b * 255 );
+		_pixelMapData[ 4 ] = _max( 0, _min( 255, ~~ ( color2.r * 255 ) ) );
+		_pixelMapData[ 5 ] = _max( 0, _min( 255, ~~ ( color2.g * 255 ) ) );
+		_pixelMapData[ 6 ] = _max( 0, _min( 255, ~~ ( color2.b * 255 ) ) );
 
-		_pixelMapData[ 8 ] = ~~ ( color3.r * 255 );
-		_pixelMapData[ 9 ] = ~~ ( color3.g * 255 );
-		_pixelMapData[ 10 ] = ~~ ( color3.b * 255 );
+		_pixelMapData[ 8 ] = _max( 0, _min( 255, ~~ ( color3.r * 255 ) ) );
+		_pixelMapData[ 9 ] = _max( 0, _min( 255, ~~ ( color3.g * 255 ) ) );
+		_pixelMapData[ 10 ] = _max( 0, _min( 255, ~~ ( color3.b * 255 ) ) );
 
-		_pixelMapData[ 12 ] = ~~ ( color4.r * 255 );
-		_pixelMapData[ 13 ] = ~~ ( color4.g * 255 );
-		_pixelMapData[ 14 ] = ~~ ( color4.b * 255 );
+		_pixelMapData[ 12 ] = _max( 0, _min( 255, ~~ ( color4.r * 255 ) ) );
+		_pixelMapData[ 13 ] = _max( 0, _min( 255, ~~ ( color4.g * 255 ) ) );
+		_pixelMapData[ 14 ] = _max( 0, _min( 255, ~~ ( color4.b * 255 ) ) );
 
 		_pixelMapContext.putImageData( _pixelMapImage, 0, 0 );
 		_gradientMapContext.drawImage( _pixelMap, 0, 0 );
@@ -754,7 +763,7 @@ THREE.CanvasRenderer = function () {
 
 		// https://gist.github.com/665829
 
-		return normal < 0 ? Math.min( ( 1 + normal ) * 0.5, 0.5 ) : 0.5 + Math.min( normal * 0.5, 0.5 );
+		return normal < 0 ? _min( ( 1 + normal ) * 0.5, 0.5 ) : 0.5 + _min( normal * 0.5, 0.5 );
 
 	}
 

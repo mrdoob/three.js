@@ -336,7 +336,7 @@ THREE.WebGLRenderer = function ( scene ) {
 			mixEnvMap = material.combine == THREE.Mix;
 			mReflectivity = material.reflectivity;
 
-			useRefract = material.env_map && material.env_map.mapping == THREE.RefractionMap;
+			useRefract = material.env_map && material.env_map.mapping == THREE.RefractionMapping;
 			mRefractionRatio = material.refraction_ratio;
 
 			_gl.uniform4f( _program.mColor,  mColor.r * mOpacity, mColor.g * mOpacity, mColor.b * mOpacity, mOpacity );
