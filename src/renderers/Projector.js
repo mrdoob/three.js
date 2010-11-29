@@ -7,8 +7,8 @@
 THREE.Projector = function() {
 
 	var _renderList = null,
-	_face3, _face3Count, _face3Pool = [],
-	_face4, _face4Count, _face4Pool = [],
+	_face3, _face32, _face3Count, _face3Pool = [],
+	//_face4, _face4Count, _face4Pool = [],
 	_line, _lineCount, _linePool = [],
 	_particle, _particleCount, _particlePool = [],
 
@@ -17,14 +17,16 @@ THREE.Projector = function() {
 	_projScreenObjectMatrix = new THREE.Matrix4(),
 
 	_clippedVertex1PositionScreen = new THREE.Vector4(),
-	_clippedVertex2PositionScreen = new THREE.Vector4();
+	_clippedVertex2PositionScreen = new THREE.Vector4(),
+
+	_face3VertexNormals, _face4VertexNormals;
 
 	this.projectScene = function ( scene, camera ) {
 
-		var o, ol, v, vl, f, fl, objects, object,
+		var o, ol, v, vl, f, fl, n, nl, objects, object,
 		objectMatrix, objectRotationMatrix, objectMaterial, objectOverdraw,
 		vertices, vertex, vertexPositionScreen,
-		faces, face, v1, v2, v3, v4;
+		faces, face, faceVertexNormals, normal, v1, v2, v3, v4;
 
 		_renderList = [];
 		_face3Count = _face4Count = _lineCount = _particleCount = 0;
@@ -38,16 +40,16 @@ THREE.Projector = function() {
 		for ( o = 0, ol = objects.length; o < ol; o++ ) {
 
 			object = objects[ o ];
+			object.autoUpdateMatrix && object.updateMatrix();
+
 			objectMatrix = object.matrix;
 			objectRotationMatrix = object.rotationMatrix;
 			objectMaterial = object.material;
 			objectOverdraw = object.overdraw;
 
-			object.autoUpdateMatrix && object.updateMatrix();
-
 			if ( object instanceof THREE.Mesh ) {
 
-				_projScreenObjectMatrix.multiply( _projScreenMatrix, objectMatrix );
+				// _projScreenObjectMatrix.multiply( _projScreenMatrix, objectMatrix );
 
 				// vertices
 
@@ -57,9 +59,12 @@ THREE.Projector = function() {
 
 					vertex = vertices[ v ];
 
+					vertex.positionWorld.copy( vertex.position );
+					objectMatrix.transform( vertex.positionWorld );
+
 					vertexPositionScreen = vertex.positionScreen;
-					vertexPositionScreen.copy( vertex.position );
-					_projScreenObjectMatrix.transform( vertexPositionScreen );
+					vertexPositionScreen.copy( vertex.positionWorld );
+					_projScreenMatrix.transform( vertexPositionScreen );
 
 					// Perform the perspective divide. TODO: This should be be performend 
 					// post clipping (imagine if the vertex lies at the same location as 
@@ -74,7 +79,7 @@ THREE.Projector = function() {
 
 				faces = object.geometry.faces;
 
-				for ( f = 0, fl = faces.length; f < fl; f++ ) {
+				for ( f = 0, fl = faces.length; f < fl; f ++ ) {
 
 					face = faces[ f ];
 
@@ -90,6 +95,10 @@ THREE.Projector = function() {
 
 								_face3 = _face3Pool[ _face3Count ] = _face3Pool[ _face3Count ] || new THREE.RenderableFace3();
 
+								_face3.v1.positionWorld.copy( v1.positionWorld );
+								_face3.v2.positionWorld.copy( v2.positionWorld );
+								_face3.v3.positionWorld.copy( v3.positionWorld );
+
 								_face3.v1.positionScreen.copy( v1.positionScreen );
 								_face3.v2.positionScreen.copy( v2.positionScreen );
 								_face3.v3.positionScreen.copy( v3.positionScreen );
@@ -103,12 +112,29 @@ THREE.Projector = function() {
 								_face3.centroidScreen.copy( _face3.centroidWorld );
 								_projScreenMatrix.transform( _face3.centroidScreen );
 
+								faceVertexNormals = face.vertexNormals;
+								_face3VertexNormals = _face3.vertexNormalsWorld;
+
+								for ( n = 0, nl = faceVertexNormals.length; n < nl; n ++ ) {
+
+									normal = _face3VertexNormals[ n ].copy( faceVertexNormals[ n ] );
+									objectRotationMatrix.transform( normal );
+
+								}
+
 								_face3.z = _face3.centroidScreen.z;
 
 								_face3.meshMaterial = objectMaterial;
 								_face3.faceMaterial = face.material;
 								_face3.overdraw = objectOverdraw;
-								_face3.uvs = object.geometry.uvs[ f ];
+
+								if ( object.geometry.uvs[ f ] ) {
+
+									_face3.uvs[ 0 ] = object.geometry.uvs[ f ][ 0 ];
+									_face3.uvs[ 1 ] = object.geometry.uvs[ f ][ 1 ];
+									_face3.uvs[ 2 ] = object.geometry.uvs[ f ][ 2 ];
+
+								}
 
 								_renderList.push( _face3 );
 
@@ -130,32 +156,76 @@ THREE.Projector = function() {
 							   ( v2.positionScreen.x - v3.positionScreen.x ) * ( v4.positionScreen.y - v3.positionScreen.y ) -
 							   ( v2.positionScreen.y - v3.positionScreen.y ) * ( v4.positionScreen.x - v3.positionScreen.x ) < 0 ) ) ) ) {
 
-								_face4 = _face4Pool[ _face4Count ] = _face4Pool[ _face4Count ] || new THREE.RenderableFace4();
+								_face3 = _face3Pool[ _face3Count ] = _face3Pool[ _face3Count ] || new THREE.RenderableFace3();
 
-								_face4.v1.positionScreen.copy( v1.positionScreen );
-								_face4.v2.positionScreen.copy( v2.positionScreen );
-								_face4.v3.positionScreen.copy( v3.positionScreen );
-								_face4.v4.positionScreen.copy( v4.positionScreen );
+								_face3.v1.positionWorld.copy( v1.positionWorld );
+								_face3.v2.positionWorld.copy( v2.positionWorld );
+								_face3.v3.positionWorld.copy( v4.positionWorld );
 
-								_face4.normalWorld.copy( face.normal );
-								objectRotationMatrix.transform( _face4.normalWorld );
+								_face3.v1.positionScreen.copy( v1.positionScreen );
+								_face3.v2.positionScreen.copy( v2.positionScreen );
+								_face3.v3.positionScreen.copy( v4.positionScreen );
 
-								_face4.centroidWorld.copy( face.centroid );
-								objectMatrix.transform( _face4.centroidWorld );
+								_face3.normalWorld.copy( face.normal );
+								objectRotationMatrix.transform( _face3.normalWorld );
 
-								_face4.centroidScreen.copy( _face4.centroidWorld );
-								_projScreenMatrix.transform( _face4.centroidScreen );
+								_face3.centroidWorld.copy( face.centroid );
+								objectMatrix.transform( _face3.centroidWorld );
 
-								_face4.z = _face4.centroidScreen.z;
+								_face3.centroidScreen.copy( _face3.centroidWorld );
+								_projScreenMatrix.transform( _face3.centroidScreen );
 
-								_face4.meshMaterial = objectMaterial;
-								_face4.faceMaterial = face.material;
-								_face4.overdraw = objectOverdraw;
-								_face4.uvs = object.geometry.uvs[ f ];
+								_face3.z = _face3.centroidScreen.z;
 
-								_renderList.push( _face4 );
+								_face3.meshMaterial = objectMaterial;
+								_face3.faceMaterial = face.material;
+								_face3.overdraw = objectOverdraw;
 
-								_face4Count ++;
+								if ( object.geometry.uvs[ f ] ) {
+
+									_face3.uvs[ 0 ] = object.geometry.uvs[ f ][ 0 ];
+									_face3.uvs[ 1 ] = object.geometry.uvs[ f ][ 1 ];
+									_face3.uvs[ 2 ] = object.geometry.uvs[ f ][ 3 ];
+
+								}
+
+								_renderList.push( _face3 );
+
+								_face3Count ++;
+
+								// 
+
+								_face32 = _face3Pool[ _face3Count ] = _face3Pool[ _face3Count ] || new THREE.RenderableFace3();
+
+								_face32.v1.positionWorld.copy( v2.positionWorld );
+								_face32.v2.positionWorld.copy( v3.positionWorld );
+								_face32.v3.positionWorld.copy( v4.positionWorld );
+
+								_face32.v1.positionScreen.copy( v2.positionScreen );
+								_face32.v2.positionScreen.copy( v3.positionScreen );
+								_face32.v3.positionScreen.copy( v4.positionScreen );
+
+								_face32.normalWorld.copy( _face3.normalWorld );
+								_face32.centroidWorld.copy( _face3.centroidWorld );
+								_face32.centroidScreen.copy( _face3.centroidScreen );
+
+								_face32.z = _face32.centroidScreen.z;
+
+								_face32.meshMaterial = objectMaterial;
+								_face32.faceMaterial = face.material;
+								_face32.overdraw = objectOverdraw;
+
+								if ( object.geometry.uvs[ f ] ) {
+
+									_face32.uvs[ 0 ] = object.geometry.uvs[ f ][ 1 ];
+									_face32.uvs[ 1 ] = object.geometry.uvs[ f ][ 2 ];
+									_face32.uvs[ 2 ] = object.geometry.uvs[ f ][ 3 ];
+
+								}
+
+								_renderList.push( _face32 );
+
+								_face3Count ++;
 
 							}
 

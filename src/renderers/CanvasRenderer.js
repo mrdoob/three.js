@@ -17,13 +17,14 @@ THREE.CanvasRenderer = function () {
 	_contextFillStyle = null,
 	_contextLineWidth = 1,
 
-	_v1, _v2, _v3, _v4,
-	_v5 = new THREE.Vertex(), _v6 = new THREE.Vertex(), // Needed for latter splitting quads to tris
-
+	_v1, _v2, _v3,
 	_v1x, _v1y, _v2x, _v2y, _v3x, _v3y,
-	_v4x, _v4y, _v5x, _v5y, _v6x, _v6y,
 
-	_color1, _color2, _color3, _color4,
+	_color = new THREE.Color(),
+	_color1 = new THREE.Color(),
+	_color2 = new THREE.Color(),
+	_color3 = new THREE.Color(),
+	_color4 = new THREE.Color(),
 	_2near, _farPlusNear, _farMinusNear,
 
 	_bitmap, _bitmapWidth, _bitmapHeight,
@@ -33,11 +34,10 @@ THREE.CanvasRenderer = function () {
 	_bboxRect = new THREE.Rectangle(),
 
 	_enableLighting = false,
-	_color = new THREE.Color( 0xffffff ),
-	_light = new THREE.Color( 0xffffff ),
-	_ambientLight = new THREE.Color( 0x000000 ),
-	_directionalLights = new THREE.Color( 0x000000 ),
-	_pointLights = new THREE.Color( 0x000000 ),
+	_light = new THREE.Color(),
+	_ambientLight = new THREE.Color(),
+	_directionalLights = new THREE.Color(),
+	_pointLights = new THREE.Color(),
 
 	_pi2 = Math.PI * 2,
 	_vector3 = new THREE.Vector3(), // Needed for PointLight
@@ -111,7 +111,13 @@ THREE.CanvasRenderer = function () {
 		_context.fillRect( _clipRect.getX(), _clipRect.getY(), _clipRect.getWidth(), _clipRect.getHeight() );
 		*/
 
-		( _enableLighting = scene.lights.length > 0 ) && calculateLights( scene );
+		_enableLighting = scene.lights.length > 0;
+
+		if ( _enableLighting ) {
+
+			 calculateLights( scene );
+
+		}
 
 		for ( e = 0, el = _renderList.length; e < el; e++ ) {
 
@@ -202,63 +208,6 @@ THREE.CanvasRenderer = function () {
 
 				}
 
-			} else if ( element instanceof THREE.RenderableFace4 ) {
-
-				_v1 = element.v1; _v2 = element.v2; _v3 = element.v3; _v4 = element.v4;
-
-				_v1.positionScreen.x *= _canvasWidthHalf; _v1.positionScreen.y *= _canvasHeightHalf;
-				_v2.positionScreen.x *= _canvasWidthHalf; _v2.positionScreen.y *= _canvasHeightHalf;
-				_v3.positionScreen.x *= _canvasWidthHalf; _v3.positionScreen.y *= _canvasHeightHalf;
-				_v4.positionScreen.x *= _canvasWidthHalf; _v4.positionScreen.y *= _canvasHeightHalf;
-
-				_v5.positionScreen.copy( _v2.positionScreen );
-				_v6.positionScreen.copy( _v4.positionScreen );
-
-				if ( element.overdraw ) {
-
-					expand( _v1.positionScreen, _v2.positionScreen );
-					expand( _v2.positionScreen, _v4.positionScreen );
-					expand( _v4.positionScreen, _v1.positionScreen );
-
-					expand( _v3.positionScreen, _v5.positionScreen );
-					expand( _v3.positionScreen, _v6.positionScreen );
-
-				}
-
-				_bboxRect.addPoint( _v1.positionScreen.x, _v1.positionScreen.y );
-				_bboxRect.addPoint( _v2.positionScreen.x, _v2.positionScreen.y );
-				_bboxRect.addPoint( _v3.positionScreen.x, _v3.positionScreen.y );
-				_bboxRect.addPoint( _v4.positionScreen.x, _v4.positionScreen.y );
-
-				if ( _clipRect.instersects( _bboxRect ) ) {
-
-					m = 0; ml = element.meshMaterial.length;
-
-					while ( m < ml ) {
-
-						material = element.meshMaterial[ m ++ ];
-
-						if ( material instanceof THREE.MeshFaceMaterial ) {
-
-							fm = 0; fml = element.faceMaterial.length;
-
-							while ( fm < fml ) {
-
-								material = element.faceMaterial[ fm ++ ];
-								material && renderFace4( _v1, _v2, _v3, _v4, _v5, _v6, element, material, scene );
-
-							}
-
-							continue;
-
-						}
-
-						renderFace4( _v1, _v2, _v3, _v4, _v5, _v6, element, material, scene );
-
-					}
-
-				}
-
 			}
 
 			/*
@@ -320,23 +269,23 @@ THREE.CanvasRenderer = function () {
 
 	}
 
-	function calculateFaceLight( scene, element, color ) {
+	function calculateLight( scene, position, normal, color ) {
 
-		var l, ll, light, lightColor, amount
-		lights = scene.lights;
+		var l, ll, light, lightColor, lightIntensity,
+		amount, lights = scene.lights;
 
 		for ( l = 0, ll = lights.length; l < ll; l ++ ) {
 
 			light = lights[ l ];
 			lightColor = light.color;
+			lightIntensity = light.intensity;
 
 			if ( light instanceof THREE.DirectionalLight ) {
 
-				amount = element.normalWorld.dot( light.position );
+				amount = normal.dot( light.position ) * lightIntensity;
 
 				if ( amount > 0 ) {
 
-					amount *= light.intensity;
 					color.r += lightColor.r * amount;
 					color.g += lightColor.g * amount;
 					color.b += lightColor.b * amount;
@@ -345,14 +294,13 @@ THREE.CanvasRenderer = function () {
 
 			} else if ( light instanceof THREE.PointLight ) {
 
-				_vector3.sub( light.position, element.centroidWorld );
+				_vector3.sub( light.position, position );
 				_vector3.normalize();
 
-				amount = element.normalWorld.dot( _vector3 );
+				amount = normal.dot( _vector3 ) * lightIntensity;
 
 				if ( amount > 0 ) {
 
-					amount *= light.intensity;
 					color.r += lightColor.r * amount;
 					color.g += lightColor.g * amount;
 					color.b += lightColor.b * amount;
@@ -508,68 +456,85 @@ THREE.CanvasRenderer = function () {
 		_v2x = v2.positionScreen.x; _v2y = v2.positionScreen.y;
 		_v3x = v3.positionScreen.x; _v3y = v3.positionScreen.y;
 
-		if ( material.map ) {
-
-			_bitmap = material.map.image;
-			_bitmapWidth = _bitmap.width - 1;
-			_bitmapHeight = _bitmap.height - 1;
-
-			_uv1.u = element.uvs[ 0 ].u * _bitmapWidth; _uv1.v = element.uvs[ 0 ].v * _bitmapHeight;
-			_uv2.u = element.uvs[ 1 ].u * _bitmapWidth; _uv2.v = element.uvs[ 1 ].v * _bitmapHeight;
-			_uv3.u = element.uvs[ 2 ].u * _bitmapWidth; _uv3.v = element.uvs[ 2 ].v * _bitmapHeight;
-
-			drawTexturedTriangle( _bitmap, _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _uv1.u, _uv1.v, _uv2.u, _uv2.v, _uv3.u, _uv3.v );
-
-			return;
-
-		}
+		drawTriangle( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y );
 
 		if ( material instanceof THREE.MeshBasicMaterial ) {
 
-			drawTriangle( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, material.color, material.wireframe, material.wireframe_linewidth );
+			if ( material.map ) {
 
-		} else if ( material instanceof THREE.MeshLambertMaterial ) {
+				texturePath( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, material.map.image, element.uvs[ 0 ].u, element.uvs[ 0 ].v, element.uvs[ 1 ].u, element.uvs[ 1 ].v, element.uvs[ 2 ].u, element.uvs[ 2 ].v );
 
-			if ( _enableLighting ) {
-
-				if ( material.shading == THREE.FlatShading ) {
-
-					_light.r = _ambientLight.r;
-					_light.g = _ambientLight.g;
-					_light.b = _ambientLight.b;
-
-					calculateFaceLight( scene, element, _light );
-
-					_color.r = material.color.r * _light.r;
-					_color.g = material.color.g * _light.g;
-					_color.b = material.color.b * _light.b;
-
-					_color.updateStyleString();
-
-					drawTriangle( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _color, material.wireframe, material.wireframe_linewidth );
-
-				} else if ( material.shading == THREE.SmoothShading ) {
-
-					_light.r = _ambientLight.r;
-					_light.g = _ambientLight.g;
-					_light.b = _ambientLight.b;
-
-					calculateFaceLight( scene, element, _light );
-
-					_color.r = material.color.r * _light.r;
-					_color.g = material.color.g * _light.g;
-					_color.b = material.color.b * _light.b;
-
-					_color.updateStyleString();
-
-				}
+				/*
+				setBlending( THREE.SubtractiveBlending );
+				fillPath( material.color.__styleString );
+				*/
 
 			} else {
 
-				drawTriangle( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, material.color.__styleString, material.wireframe, material.wireframe_linewidth );
+				material.wireframe ? strokePath( material.color.__styleString, material.wireframe_linewidth ) : fillPath( material.color.__styleString );
 
 			}
 
+			/*
+			if ( material.env_map ) {
+
+				
+
+			}
+			*/
+
+		} else if ( material instanceof THREE.MeshLambertMaterial ) {
+
+			if ( material.map && !material.wireframe ) {
+
+				texturePath( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, material.map.image, element.uvs[ 0 ].u, element.uvs[ 0 ].v, element.uvs[ 1 ].u, element.uvs[ 1 ].v, element.uvs[ 2 ].u, element.uvs[ 2 ].v );
+
+				setBlending( THREE.SubtractiveBlending );
+
+			}
+
+			if ( _enableLighting ) {
+
+				if ( material.shading == THREE.SmoothShading && !material.wireframe ) {
+
+					_color1.r = _color2.r = _color3.r = _ambientLight.r;
+					_color1.g = _color2.g = _color3.g = _ambientLight.g;
+					_color1.b = _color2.b = _color3.b = _ambientLight.b;
+
+					calculateLight( scene, element.v1.positionWorld, element.vertexNormalsWorld[ 0 ], _color1 );
+					calculateLight( scene, element.v2.positionWorld, element.vertexNormalsWorld[ 1 ], _color2 );
+					calculateLight( scene, element.v3.positionWorld, element.vertexNormalsWorld[ 2 ], _color3 );
+
+					_color4.r = ( _color2.r + _color3.r ) * 0.5;
+					_color4.g = ( _color2.g + _color3.g ) * 0.5;
+					_color4.b = ( _color2.b + _color3.b ) * 0.5;
+
+					_bitmap = getGradientTexture( _color1, _color2, _color3, _color4 );
+
+					texturePath( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _bitmap, 0, 0, 1, 0, 0, 1 );
+
+				} else {
+
+					_light.r = _ambientLight.r;
+					_light.g = _ambientLight.g;
+					_light.b = _ambientLight.b;
+
+					calculateLight( scene, element.centroidWorld, element.normalWorld, _light );
+
+					_color.r = material.color.r * _light.r;
+					_color.g = material.color.g * _light.g;
+					_color.b = material.color.b * _light.b;
+
+					_color.updateStyleString();
+					material.wireframe ? strokePath( _color.__styleString, material.wireframe_linewidth ) : fillPath( _color.__styleString );
+
+				} 
+
+			} else {
+
+				material.wireframe ? strokePath( material.color.__styleString, material.wireframe_linewidth ) : fillPath( material.color.__styleString );
+
+			}
 
 		} else if ( material instanceof THREE.MeshDepthMaterial ) {
 
@@ -582,122 +547,17 @@ THREE.CanvasRenderer = function () {
 			_farPlusNear = material.__farPlusNear;
 			_farMinusNear = material.__farMinusNear;
 
-			_color1 = ~~ ( ( 1 - ( _2near / ( _farPlusNear - v1.positionScreen.z * _farMinusNear ) ) ) * 255 );
-			_color2 = ~~ ( ( 1 - ( _2near / ( _farPlusNear - v2.positionScreen.z * _farMinusNear ) ) ) * 255 );
-			_color3 = ~~ ( ( 1 - ( _2near / ( _farPlusNear - v3.positionScreen.z * _farMinusNear ) ) ) * 255 );
-			// _color4 = ~~ ( ( _color2 + _color3 ) * 0.5 );
+			_color1.r = _color1.g = _color1.b = 1 - ( _2near / ( _farPlusNear - v1.positionScreen.z * _farMinusNear ) );
+			_color2.r = _color2.g = _color2.b = 1 - ( _2near / ( _farPlusNear - v2.positionScreen.z * _farMinusNear ) );
+			_color3.r = _color3.g = _color3.b = 1 - ( _2near / ( _farPlusNear - v3.positionScreen.z * _farMinusNear ) );
 
-			_bitmap = getGradientTexture( [ _color1, _color1, _color1 ], [ _color2, _color2, _color2 ], [ _color3, _color3, _color3 ], [ _color3, _color3, _color3 ] );
+			_color4.r = ( _color2.r + _color3.r ) * 0.5;
+			_color4.g = ( _color2.g + _color3.g ) * 0.5;
+			_color4.b = ( _color2.b + _color3.b ) * 0.5;
 
-			_uv1.u = 0; _uv1.v = 0; 
-			_uv2.u = _gradientMapQuality; _uv2.v = 0;
-			_uv3.u = 0; _uv3.v = _gradientMapQuality;
+			_bitmap = getGradientTexture( _color1, _color2, _color3, _color4 );
 
-			drawTexturedTriangle( _bitmap, _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _uv1.u, _uv1.v, _uv2.u, _uv2.v, _uv3.u, _uv3.v );
-
-		} else if ( material instanceof THREE.MeshNormalMaterial ) {
-
-			_color.r = normalToComponent( element.normalWorld.x );
-			_color.g = normalToComponent( element.normalWorld.y );
-			_color.b = normalToComponent( element.normalWorld.z );
-			_color.updateStyleString();
-
-			drawTriangle( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _color, material.wireframe, material.wireframe_linewidth );
-
-		}
-
-	}
-
-	function renderFace4( v1, v2, v3, v4, v5, v6, element, material, scene ) {
-
-		if ( material.opacity == 0 ) return;
-
-		setOpacity( material.opacity );
-		setBlending( material.blending );
-
-		_v1x = v1.positionScreen.x; _v1y = v1.positionScreen.y;
-		_v2x = v2.positionScreen.x; _v2y = v2.positionScreen.y;
-		_v3x = v3.positionScreen.x; _v3y = v3.positionScreen.y;
-		_v4x = v4.positionScreen.x; _v4y = v4.positionScreen.y;
-		_v5x = v5.positionScreen.x; _v5y = v5.positionScreen.y;
-		_v6x = v6.positionScreen.x; _v6y = v6.positionScreen.y;
-
-		if ( material.map ) {
-
-			_bitmap = material.map.image;
-			_bitmapWidth = _bitmap.width - 1;
-			_bitmapHeight = _bitmap.height - 1;
-
-			_uv1.copy( element.uvs[ 0 ] );
-			_uv2.copy( element.uvs[ 1 ] );
-			_uv3.copy( element.uvs[ 2 ] );
-			_uv4.copy( element.uvs[ 3 ] );
-
-			_uv1.u *= _bitmapWidth; _uv1.v *= _bitmapHeight;
-			_uv2.u *= _bitmapWidth; _uv2.v *= _bitmapHeight;
-			_uv3.u *= _bitmapWidth; _uv3.v *= _bitmapHeight;
-			_uv4.u *= _bitmapWidth; _uv4.v *= _bitmapHeight;
-
-			drawTexturedTriangle( _bitmap, _v1x, _v1y, _v2x, _v2y, _v4x, _v4y, _uv1.u, _uv1.v, _uv2.u, _uv2.v, _uv4.u, _uv4.v );
-			drawTexturedTriangle( _bitmap, _v5x, _v5y, _v3x, _v3y, _v6x, _v6y, _uv2.u, _uv2.v, _uv3.u, _uv3.v, _uv4.u, _uv4.v );
-
-			return;
-
-		}
-
-		if ( material instanceof THREE.MeshBasicMaterial ) {
-
-			drawQuad( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _v4x, _v4y, material.color, material.wireframe, material.wireframe_linewidth );
-
-		} else if ( material instanceof THREE.MeshLambertMaterial ) {
-
-			if ( _enableLighting ) {
-
-				_light.r = _ambientLight.r;
-				_light.g = _ambientLight.g;
-				_light.b = _ambientLight.b;
-
-				calculateFaceLight( scene, element, _light );
-
-				_color.r = material.color.r * _light.r;
-				_color.g = material.color.g * _light.g;
-				_color.b = material.color.b * _light.b;
-
-				_color.updateStyleString();
-
-			} else {
-
-				_color.__styleString = material.color.__styleString;
-
-			}
-
-			drawQuad( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _v4x, _v4y, _color, material.wireframe, material.wireframe_linewidth );
-
-		} else if ( material instanceof THREE.MeshDepthMaterial ) {
-
-			/*
-			_w = 1 - ( material.__2near / (material.__farPlusNear - element.z * material.__farMinusNear ) );
-			_color.setRGB( _w, _w, _w );
-			*/
-
-			_2near = material.__2near;
-			_farPlusNear = material.__farPlusNear;
-			_farMinusNear = material.__farMinusNear;
-
-			_color1 = ~~ ( ( 1 - ( _2near / ( _farPlusNear - v1.positionScreen.z * _farMinusNear ) ) ) * 255 );
-			_color2 = ~~ ( ( 1 - ( _2near / ( _farPlusNear - v2.positionScreen.z * _farMinusNear ) ) ) * 255 );
-			_color3 = ~~ ( ( 1 - ( _2near / ( _farPlusNear - v3.positionScreen.z * _farMinusNear ) ) ) * 255 );
-			_color4 = ~~ ( ( 1 - ( _2near / ( _farPlusNear - v4.positionScreen.z * _farMinusNear ) ) ) * 255 );
-
-			_bitmap = getGradientTexture( [ _color1, _color1, _color1 ], [ _color2, _color2, _color2 ], [ _color4, _color4, _color4 ], [ _color3, _color3, _color3 ] );
-
-			_uv1.u = 0; _uv1.v = 0; 
-			_uv2.u = _gradientMapQuality; _uv2.v = 0;
-			_uv3.u = _gradientMapQuality; _uv3.v = _gradientMapQuality;
-			_uv4.u = 0; _uv4.v = _gradientMapQuality;
-
-			drawTexturedTriangle( _bitmap, _v1x, _v1y, _v2x, _v2y, _v4x, _v4y, _uv1.u, _uv1.v, _uv2.u, _uv2.v, _uv4.u, _uv4.v );
-			drawTexturedTriangle( _bitmap, _v5x, _v5y, _v3x, _v3y, _v6x, _v6y, _uv2.u, _uv2.v, _uv3.u, _uv3.v, _uv4.u, _uv4.v );
+			texturePath( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _bitmap, 0, 0, 1, 0, 0, 1 );
 
 		} else if ( material instanceof THREE.MeshNormalMaterial ) {
 
@@ -706,13 +566,13 @@ THREE.CanvasRenderer = function () {
 			_color.b = normalToComponent( element.normalWorld.z );
 			_color.updateStyleString();
 
-			drawQuad( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _v4x, _v4y, _color, material.wireframe, material.wireframe_linewidth );
+			material.wireframe ? strokePath( _color.__styleString, material.wireframe_linewidth ) : fillPath( _color.__styleString );
 
 		}
 
 	}
 
-	function drawTriangle( x0, y0, x1, y1, x2, y2, color, wireframe, wireframe_linewidth ) {
+	function drawTriangle( x0, y0, x1, y1, x2, y2 ) {
 
 		_context.beginPath();
 		_context.moveTo( x0, y0 );
@@ -721,25 +581,9 @@ THREE.CanvasRenderer = function () {
 		_context.lineTo( x0, y0 );
 		_context.closePath();
 
-		if ( wireframe ) {
-
-			setLineWidth( wireframe_linewidth );
-			setStrokeStyle( color.__styleString );
-
-			_context.stroke();
-			_bboxRect.inflate( wireframe_linewidth * 2 );
-
-		} else {
-
-			setFillStyle( color.__styleString );
-
-			_context.fill();
-
-		}
-
 	}
 
-	function drawQuad( x0, y0, x1, y1, x2, y2, x3, y3, color, wireframe, wireframe_linewidth ) {
+	function drawQuad( x0, y0, x1, y1, x2, y2, x3, y3 ) {
 
 		_context.beginPath();
 		_context.moveTo( x0, y0 );
@@ -749,33 +593,35 @@ THREE.CanvasRenderer = function () {
 		_context.lineTo( x0, y0 );
 		_context.closePath();
 
-		if ( wireframe ) {
+	}
 
-			setLineWidth( wireframe_linewidth );
-			setStrokeStyle( color.__styleString );
+	function strokePath( color, linewidth ) {
 
-			_context.stroke();
-			_bboxRect.inflate( wireframe_linewidth * 2 );
+		setStrokeStyle( color );
+		setLineWidth( linewidth );
 
-		} else {
-
-			setFillStyle( color.__styleString );
-
-			_context.fill();
-
-		}
+		_context.stroke();
+		// _bboxRect.inflate( linewidth * 2 );
 
 	}
 
-	function drawTexturedTriangle( bitmap, x0, y0, x1, y1, x2, y2, u0, v0, u1, v1, u2, v2 ) {
+	function fillPath( color ) {
+
+		setFillStyle( color );
+		_context.fill();
+
+	}
+
+	function texturePath( x0, y0, x1, y1, x2, y2, bitmap, u0, v0, u1, v1, u2, v2 ) {
 
 		// http://extremelysatisfactorytotalitarianism.com/blog/?p=2120
 
-		_context.beginPath();
-		_context.moveTo( x0, y0 );
-		_context.lineTo( x1, y1 );
-		_context.lineTo( x2, y2 );
-		_context.closePath();
+		var width = bitmap.width - 1,
+		height = bitmap.height - 1;
+
+		u0 *= width; v0 *= height;
+		u1 *= width; v1 *= height;
+		u2 *= width; v2 *= height;
 
 		x1 -= x0; y1 -= y0;
 		x2 -= x0; y2 -= y0;
@@ -875,25 +721,25 @@ THREE.CanvasRenderer = function () {
 
 	}
 
-	function getGradientTexture( c1, c2, c3, c4 ) {
+	function getGradientTexture( color1, color2, color3, color4 ) {
 
 		// http://mrdoob.com/blog/post/710
 
-		_pixelMapData[ 0 ] = c1[ 0 ];
-		_pixelMapData[ 1 ] = c1[ 1 ];
-		_pixelMapData[ 2 ] = c1[ 2 ];
+		_pixelMapData[ 0 ] = ~~ ( color1.r * 255 );
+		_pixelMapData[ 1 ] = ~~ ( color1.g * 255 );
+		_pixelMapData[ 2 ] = ~~ ( color1.b * 255 );
 
-		_pixelMapData[ 4 ] = c2[ 0 ];
-		_pixelMapData[ 5 ] = c2[ 1 ];
-		_pixelMapData[ 6 ] = c2[ 2 ];
+		_pixelMapData[ 4 ] = ~~ ( color2.r * 255 );
+		_pixelMapData[ 5 ] = ~~ ( color2.g * 255 );
+		_pixelMapData[ 6 ] = ~~ ( color2.b * 255 );
 
-		_pixelMapData[ 8 ] = c3[ 0 ];
-		_pixelMapData[ 9 ] = c3[ 1 ];
-		_pixelMapData[ 10 ] = c3[ 2 ];
+		_pixelMapData[ 8 ] = ~~ ( color3.r * 255 );
+		_pixelMapData[ 9 ] = ~~ ( color3.g * 255 );
+		_pixelMapData[ 10 ] = ~~ ( color3.b * 255 );
 
-		_pixelMapData[ 12 ] = c4[ 0 ];
-		_pixelMapData[ 13 ] = c4[ 1 ];
-		_pixelMapData[ 14 ] = c4[ 2 ];
+		_pixelMapData[ 12 ] = ~~ ( color4.r * 255 );
+		_pixelMapData[ 13 ] = ~~ ( color4.g * 255 );
+		_pixelMapData[ 14 ] = ~~ ( color4.b * 255 );
 
 		_pixelMapContext.putImageData( _pixelMapImage, 0, 0 );
 		_gradientMapContext.drawImage( _pixelMap, 0, 0 );

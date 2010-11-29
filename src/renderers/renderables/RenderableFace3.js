@@ -19,6 +19,6 @@ THREE.RenderableFace3 = function () {
 	this.meshMaterial = null;
 	this.faceMaterial = null;
 	this.overdraw = false;
-	this.uv = null;
+	this.uvs = [ null, null, null ];
 
 };

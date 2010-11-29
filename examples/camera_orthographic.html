@@ -71,10 +71,11 @@
 				// Cubes
 
 				var geometry = new Cube( 50, 50, 50 );
+				var material = new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading } );
 
 				for ( var i = 0; i < 100; i ++ ) {
 
-					var cube = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: 0xffffff, opacity: Math.random() * 0.5 + 0.5 } ) );
+					var cube = new THREE.Mesh( geometry, material );
 					cube.overdraw = true;
 
 					cube.scale.y = Math.floor( Math.random() * 2 + 1 );
