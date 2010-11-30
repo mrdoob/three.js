@@ -52,12 +52,12 @@ THREE.Ray.prototype = {
 			origin = this.origin.clone();
 			direction = this.direction.clone();
 
-			a = object.matrix.transform( vertices[ face.a ].position.clone() );
-			b = object.matrix.transform( vertices[ face.b ].position.clone() );
-			c = object.matrix.transform( vertices[ face.c ].position.clone() );
-			d = face instanceof THREE.Face4 ? object.matrix.transform( vertices[ face.d ].position.clone() ) : null;
+			a = object.matrix.transformVector3( vertices[ face.a ].position.clone() );
+			b = object.matrix.transformVector3( vertices[ face.b ].position.clone() );
+			c = object.matrix.transformVector3( vertices[ face.c ].position.clone() );
+			d = face instanceof THREE.Face4 ? object.matrix.transformVector3( vertices[ face.d ].position.clone() ) : null;
 
-			normal = object.rotationMatrix.transform( face.normal.clone() );
+			normal = object.rotationMatrix.transformVector3( face.normal.clone() );
 			dot = direction.dot( normal );
 
 			if ( dot < 0 ) { // Math.abs( dot ) > 0.0001

@@ -22,7 +22,7 @@ var GeometryUtils = {
 
 			var vertexCopy = new THREE.Vertex( vertex.position.clone() );
 
-			isMesh && object2.matrix.transform( vertexCopy.position );
+			isMesh && object2.matrix.transformVector3( vertexCopy.position );
 
 			vertices1.push( vertexCopy );
 

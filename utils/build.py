@@ -144,7 +144,7 @@ def buildExtras(debug):
 	]
 
 	build(files, debug, 'ThreeExtras')
-	
+
 def buildFull(debug):
 	files = [
 		'Three.js',

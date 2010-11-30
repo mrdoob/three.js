@@ -285,13 +285,13 @@ THREE.Projector = function() {
 
 				_projScreenMatrix.transformVector4( _vector4 );
 
-				_vector4.multiplyScalar( 1 / _vector4.w );
+				_vector4.z /= _vector4.w;
 
 				if ( _vector4.z > 0 && _vector4.z < 1 ) {
 
 					_particle = _particlePool[ _particleCount ] = _particlePool[ _particleCount ] || new THREE.RenderableParticle();
-					_particle.x = _vector4.x;
-					_particle.y = _vector4.y;
+					_particle.x = _vector4.x / _vector4.w;
+					_particle.y = _vector4.y / _vector4.w;
 					_particle.z = _vector4.z;
 
 					_particle.rotation = object.rotation.z;

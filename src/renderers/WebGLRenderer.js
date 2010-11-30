@@ -923,10 +923,10 @@ THREE.WebGLRenderer = function ( scene ) {
 
 				"if ( enableCubeMap ) {",
 
-					// "cubeColor = textureCube( tCube, vec3( -vReflect.x, vReflect.yz ) );",
-					"cubeColor.r = textureCube( tCube, vec3( -vReflect.x, vReflect.yz ) ).r;",
-					"cubeColor.g = textureCube( tCube, vec3( -vReflect.x + 0.005, vReflect.yz ) ).g;",
-					"cubeColor.b = textureCube( tCube, vec3( -vReflect.x + 0.01, vReflect.yz ) ).b;",
+					"cubeColor = textureCube( tCube, vec3( -vReflect.x, vReflect.yz ) );",
+					// "cubeColor.r = textureCube( tCube, vec3( -vReflect.x, vReflect.yz ) ).r;",
+					// "cubeColor.g = textureCube( tCube, vec3( -vReflect.x + 0.005, vReflect.yz ) ).g;",
+					// "cubeColor.b = textureCube( tCube, vec3( -vReflect.x + 0.01, vReflect.yz ) ).b;",
 
 				"}",
 
