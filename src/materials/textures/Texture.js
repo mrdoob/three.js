@@ -33,6 +33,6 @@ THREE.RefractionMapping = 2;
 THREE.Multiply = 0;
 THREE.Mix = 1;
 
-THREE.Repeat = 0;
+THREE.Repeat = 0; // TODO: Rename to *Wrapping
 THREE.ClampToEdge = 1;
 THREE.MirroredRepeat = 2;

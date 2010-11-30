@@ -503,7 +503,7 @@ THREE.CanvasRenderer = function () {
 
 			if ( _enableLighting ) {
 
-				if ( material.shading == THREE.SmoothShading && !material.wireframe ) {
+				if ( !material.wireframe && material.shading == THREE.SmoothShading && element.vertexNormalsWorld.length == 3 ) {
 
 					_color1.r = _color2.r = _color3.r = _ambientLight.r;
 					_color1.g = _color2.g = _color3.g = _ambientLight.g;
@@ -611,7 +611,8 @@ THREE.CanvasRenderer = function () {
 		setLineWidth( linewidth );
 
 		_context.stroke();
-		// _bboxRect.inflate( linewidth * 2 );
+
+		_bboxRect.inflate( linewidth * 2 );
 
 	}
 

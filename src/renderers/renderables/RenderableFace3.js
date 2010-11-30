@@ -14,7 +14,7 @@ THREE.RenderableFace3 = function () {
 	this.centroidScreen = new THREE.Vector3();
 
 	this.normalWorld = new THREE.Vector3();
-	this.vertexNormalsWorld = [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ];
+	this.vertexNormalsWorld = [];
 
 	this.meshMaterial = null;
 	this.faceMaterial = null;

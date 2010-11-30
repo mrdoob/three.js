@@ -114,7 +114,8 @@ THREE.Projector = function() {
 
 								for ( n = 0, nl = faceVertexNormals.length; n < nl; n ++ ) {
 
-									normal = _face3VertexNormals[ n ].copy( faceVertexNormals[ n ] );
+									normal = _face3VertexNormals[ n ] = _face3VertexNormals[ n ] || new THREE.Vector3();
+									normal.copy( faceVertexNormals[ n ] );
 									objectRotationMatrix.transform( normal );
 
 								}
@@ -172,6 +173,8 @@ THREE.Projector = function() {
 								_face3.centroidScreen.copy( _face3.centroidWorld );
 								_projScreenMatrix.transform( _face3.centroidScreen );
 
+								// TODO: Handle vertex normals
+
 								_face3.z = _face3.centroidScreen.z;
 
 								_face3.meshMaterial = objectMaterial;
@@ -205,6 +208,8 @@ THREE.Projector = function() {
 								_face32.normalWorld.copy( _face3.normalWorld );
 								_face32.centroidWorld.copy( _face3.centroidWorld );
 								_face32.centroidScreen.copy( _face3.centroidScreen );
+
+								// TODO: Handle vertex normals
 
 								_face32.z = _face32.centroidScreen.z;
 
