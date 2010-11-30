@@ -111,7 +111,7 @@ def Export():
                     code += '\tuv( %.6f, %.6f, %.6f, %.6f, %.6f, %.6f);\n' % (uv[0].x, uv[0].y, uv[1].x, uv[1].y, uv[2].x, uv[2].y)
                 ncount += 1
                 uvcount += 1
-            
+        code +='\n\tthis.computeCentroids();\n\tthis.computeNormals(true);\n'
         #selection color
         code +='\n\tscope.colors = {};\n'
         code +='\tscope.selections = {};\n'

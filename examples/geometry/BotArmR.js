@@ -130,6 +130,9 @@ var BotArmR = function () {
 	f4( 41, 38, 34, 37, 1.000000, 0.000000, 0.000000 );
 	uv( 0.140674, 0.140674, 0.140674, 0.859326, 0.140674, 0.859326, 0.140674, 0.140674);
 
+	this.computeCentroids();
+	this.computeNormals(true);
+
 	scope.colors = {};
 	scope.selections = {};
 	scope.selections["c1"] = [8, 29, 30, 31, 32];
