@@ -57,11 +57,11 @@ THREE.Projector = function() {
 					vertex = vertices[ v ];
 
 					vertex.positionWorld.copy( vertex.position );
-					objectMatrix.transform( vertex.positionWorld );
+					objectMatrix.transformVector3( vertex.positionWorld );
 
 					vertexPositionScreen = vertex.positionScreen;
 					vertexPositionScreen.copy( vertex.positionWorld );
-					_projScreenMatrix.transform( vertexPositionScreen );
+					_projScreenMatrix.transformVector4( vertexPositionScreen );
 
 					// Perform the perspective divide. TODO: This should be be performend 
 					// post clipping (imagine if the vertex lies at the same location as 
@@ -101,13 +101,13 @@ THREE.Projector = function() {
 								_face3.v3.positionScreen.copy( v3.positionScreen );
 
 								_face3.normalWorld.copy( face.normal );
-								objectRotationMatrix.transform( _face3.normalWorld );
+								objectRotationMatrix.transformVector3( _face3.normalWorld );
 
 								_face3.centroidWorld.copy( face.centroid );
-								objectMatrix.transform( _face3.centroidWorld );
+								objectMatrix.transformVector3( _face3.centroidWorld );
 
 								_face3.centroidScreen.copy( _face3.centroidWorld );
-								_projScreenMatrix.transform( _face3.centroidScreen );
+								_projScreenMatrix.transformVector3( _face3.centroidScreen );
 
 								faceVertexNormals = face.vertexNormals;
 								_face3VertexNormals = _face3.vertexNormalsWorld;
@@ -116,7 +116,7 @@ THREE.Projector = function() {
 
 									normal = _face3VertexNormals[ n ] = _face3VertexNormals[ n ] || new THREE.Vector3();
 									normal.copy( faceVertexNormals[ n ] );
-									objectRotationMatrix.transform( normal );
+									objectRotationMatrix.transformVector3( normal );
 
 								}
 
@@ -165,13 +165,13 @@ THREE.Projector = function() {
 								_face3.v3.positionScreen.copy( v4.positionScreen );
 
 								_face3.normalWorld.copy( face.normal );
-								objectRotationMatrix.transform( _face3.normalWorld );
+								objectRotationMatrix.transformVector3( _face3.normalWorld );
 
 								_face3.centroidWorld.copy( face.centroid );
-								objectMatrix.transform( _face3.centroidWorld );
+								objectMatrix.transformVector3( _face3.centroidWorld );
 
 								_face3.centroidScreen.copy( _face3.centroidWorld );
-								_projScreenMatrix.transform( _face3.centroidScreen );
+								_projScreenMatrix.transformVector3( _face3.centroidScreen );
 
 								// TODO: Handle vertex normals
 
@@ -245,14 +245,14 @@ THREE.Projector = function() {
 
 				vertex = vertices[ 0 ];
 				vertex.positionScreen.copy( vertex.position );
-				_projScreenObjectMatrix.transform( vertex.positionScreen );
+				_projScreenObjectMatrix.transformVector4( vertex.positionScreen );
 
 				for ( v = 1, vl = vertices.length; v < vl; v++ ) {
 
 					v1 = vertices[ v ];
 
 					v1.positionScreen.copy( v1.position );
-					_projScreenObjectMatrix.transform( v1.positionScreen );
+					_projScreenObjectMatrix.transformVector4( v1.positionScreen );
 
 					v2 = vertices[ v - 1 ];
 
@@ -283,15 +283,15 @@ THREE.Projector = function() {
 
 				_vector4.set( object.position.x, object.position.y, object.position.z, 1 );
 
-				_projScreenMatrix.transform( _vector4 );
+				_projScreenMatrix.transformVector4( _vector4 );
 
-				_vector4.z /= _vector4.w;
+				_vector4.multiplyScalar( 1 / _vector4.w );
 
 				if ( _vector4.z > 0 && _vector4.z < 1 ) {
 
 					_particle = _particlePool[ _particleCount ] = _particlePool[ _particleCount ] || new THREE.RenderableParticle();
-					_particle.x = _vector4.x / _vector4.w;
-					_particle.y = _vector4.y / _vector4.w;
+					_particle.x = _vector4.x;
+					_particle.y = _vector4.y;
 					_particle.z = _vector4.z;
 
 					_particle.rotation = object.rotation.z;
@@ -322,7 +322,7 @@ THREE.Projector = function() {
 		var matrix = new THREE.Matrix4();
 
 		matrix.multiply( THREE.Matrix4.makeInvert( camera.matrix ), THREE.Matrix4.makeInvert( camera.projectionMatrix ) );
-		matrix.transform( vector );
+		matrix.transformVector3( vector );
 
 		return vector;
 
