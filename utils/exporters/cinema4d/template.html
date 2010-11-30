@@ -1,0 +1,108 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>three.js - geometry - %s</title>
+		<meta charset="utf-8">
+		<style type="text/css">
+			body {
+				color: #808080;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+
+				background-color: #ffffff;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+			}
+
+			a {
+
+				color: #0080ff;
+			}
+
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div> 
+		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">Using three.js - %s</a></div>
+		<script type="text/javascript" src="Three.js"></script>
+		<script type="text/javascript" src="%s.js"></script>
+
+		<script type="text/javascript">
+
+			var SCREEN_WIDTH = window.innerWidth, SCREEN_HEIGHT = window.innerHeight;
+
+			var container, stats;
+
+			var camera, scene, renderer;
+
+			var mesh;
+
+			var mouseX = 0;
+			var mouseY = 0;
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+
+			init();
+			setInterval( loop, 1000 / 60 );
+
+
+			function init() {
+
+				container = document.getElementById( 'container' );
+
+				camera = new THREE.Camera( 60, SCREEN_WIDTH / SCREEN_HEIGHT, 0.0001, 10000 );
+				camera.position.z = 500;
+
+				scene = new THREE.Scene();
+				
+				var geom = new %s();
+				geom.autoColor();
+				mesh = new THREE.Mesh( geom, new THREE.MeshFaceMaterial() );
+				mesh.position = geom.getPosition();
+				mesh.rotation = geom.getRotation();
+				mesh.scale = geom.getScale();
+				scene.addObject(mesh);
+
+				renderer = new THREE.CanvasRenderer();
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+
+				container.appendChild(renderer.domElement);
+
+				document.addEventListener('mousemove', onDocumentMouseMove, false);
+
+			}
+
+			
+			function onDocumentMouseMove( event ) {
+
+				mouseX = ( event.clientX - windowHalfX );
+				mouseY = ( event.clientY - windowHalfY );
+
+			}
+
+			function loop() {
+
+				camera.position.x += (mouseX - camera.position.x) * 0.05;
+				camera.position.y += (-mouseY - camera.position.y) * 0.05;
+
+				mesh.rotation.y -= 0.005;
+
+				renderer.render(scene, camera);
+				
+			}
+
+
+		</script>
+
+	</body>
+</html>
