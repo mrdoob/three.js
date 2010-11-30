@@ -54,7 +54,7 @@
 			var camera, scene, renderer,
 			particle1, particle2, particle2,
 			light1, light2, light3,
-			object;
+			object,loader;
 
 			init();
 			setInterval( loop, 1000 / 60 );
@@ -68,8 +68,10 @@
 
 				scene = new THREE.Scene();
 
-				var loader = new THREE.Loader();
+				loader = new THREE.Loader( true );
+				document.body.appendChild( loader.statusDomElement );
 				
+				/*
 				loader.loadAscii( "obj/walt/WaltHead_slim.js", function( geometry ) {
 				
 					//object = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( { ambient: 0x555555, color: 0x555555, specular: 0xffffff, shininess: 50, shading: THREE.FlatShading } )  );
@@ -79,18 +81,19 @@
 					scene.addObject( object );
 					
 				});
+				*/
 				
 
-				/*
 				loader.loadBinary( "obj/walt/WaltHead_bin.js", function( geometry ) {
 				
-					object = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( 0x555555, 0x555555, 0xffffff, 50, 1.0  )  );
+					object = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( { ambient: 0x555555, color: 0x555555, specular: 0xffffff, shininess: 50, shading: THREE.SmoothShading }  )  );
 					object.scale.x = object.scale.y = object.scale.z = 0.80;
 					object.overdraw = true;
 					scene.addObject( object );
 					
+					loader.statusDomElement.style.display = "none";
+					
 				}, "obj/walt");
-				*/
 				
 				/*
 				var directionalLight = new THREE.DirectionalLight( 0x111111, 0.9 );

@@ -154,7 +154,7 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
-			var loader = new THREE.Loader();
+			var loader = new THREE.Loader( true );
 			document.body.appendChild( loader.statusDomElement );
 			
 			document.addEventListener('mousemove', onDocumentMouseMove, false);
@@ -542,7 +542,7 @@
 
 			function createScene( geometry, car ) {
 
-				$( "status" ).innerHTML = "Creating model ...";
+				loader.statusDomElement.innerHTML = "Creating model ...";
 
 				var m = new THREE.MeshFaceMaterial(),
 					s = CARS[ car ].scale * 1,
