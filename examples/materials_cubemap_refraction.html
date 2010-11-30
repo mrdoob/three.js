@@ -18,7 +18,7 @@
 
 			canvas { pointer-events:none; z-index:10; position:relative; }
 			#log { position:absolute; top:50px; text-align:left; display:block; z-index:100; pointer-events:none; }
-			#d { text-align:center; margin:1em auto -9.5em; z-index:1000; position:relative; display:block; 
+			#d { text-align:center; margin:1em auto -9.5em; z-index:200; position:relative; display:block; 
 				background:rgba(0,0,0,0.5); padding:0.5em; width:400px; border-radius:15px; -webkit-box-shadow: 0px 0px 10px rgba(0,0,0,0.5) }
 		</style>
 	</head>
@@ -55,6 +55,8 @@
 
 			var mesh, zmesh, lightMesh, geometry;
 
+			var loader;
+			
 			var directionalLight, pointLight;
 
 			var mouseX = 0;
@@ -126,7 +128,9 @@
 				stats.domElement.style.zIndex = 100;
 				container.appendChild( stats.domElement );
 
-				var loader = new THREE.Loader();
+				loader = new THREE.Loader( true );
+				document.body.appendChild( loader.statusDomElement );
+				
 				loader.loadBinary( 'obj/lucy/Lucy100k_bin.js', function( geometry ) { createScene( geometry, cubeMaterial1, cubeMaterial2, cubeMaterial3 ) }, "obj/lucy" );
 
 			}
@@ -138,6 +142,8 @@
 				SceneUtils.addMesh( scene, geometry, s,      0, 0, z, 0,0,0, m1 );
 				SceneUtils.addMesh( scene, geometry, s,   -900, 0, z, 0,0,0, m2 );
 				SceneUtils.addMesh( scene, geometry, s,    900, 0, z, 0,0,0, m3 );
+				
+				loader.statusDomElement.style.display = "none";
 
 			}
 

@@ -54,6 +54,8 @@
 
 			var mesh, zmesh, lightMesh, geometry;
 
+			var loader;
+			
 			var directionalLight, pointLight;
 
 			var mouseX = 0;
@@ -129,7 +131,9 @@
 				stats.domElement.style.zIndex = 100;
 				container.appendChild( stats.domElement );
 
-				var loader = new THREE.Loader();
+				loader = new THREE.Loader( true );
+				document.body.appendChild( loader.statusDomElement );
+				
 				loader.loadBinary( "obj/walt/WaltHead_bin.js", function( geometry ) { createScene( geometry, cubeMaterial1, cubeMaterial2, cubeMaterial3 ) }, "obj/walt" );
 
 			}
@@ -141,6 +145,8 @@
 				SceneUtils.addMesh( scene, geometry, s,      0, 0, -100, 0,0,0, m1 );
 				SceneUtils.addMesh( scene, geometry, s,   -900, 0, -100, 0,0,0, m2 );
 				SceneUtils.addMesh( scene, geometry, s,    900, 0, -100, 0,0,0, m3 );
+				
+				loader.statusDomElement.style.display = "none";
 
 			}
 

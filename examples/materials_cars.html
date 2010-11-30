@@ -27,8 +27,6 @@
 			#car_info { text-align:center; }
 			#car_name { font-size:1em }
 			#car_author { font-size:1em }
-
-			#status { font-size:0.8em; text-align:left; background:#b00; color:#fff; width:140px; padding:0.25em 0.25em 0.25em 0.5em; position:absolute; right:0px; top:0px; z-index:1000; }
 		</style>
 	</head>
 
@@ -53,8 +51,6 @@
 
 			<div id="buttons_materials" class="bwrap"></div>
 		</div>
-
-		<div id="status">Loading model ...</div>
 
 		<div id="log"></div>
 
@@ -159,7 +155,8 @@
 			var windowHalfY = window.innerHeight / 2;
 
 			var loader = new THREE.Loader();
-
+			document.body.appendChild( loader.statusDomElement );
+			
 			document.addEventListener('mousemove', onDocumentMouseMove, false);
 
 			init();
@@ -457,28 +454,9 @@
 
 				}
 
-				loader.loadBinary( CARS[ "veyron" ].url, function( geometry ) { createScene( geometry, "veyron" ) }, CARS[ "veyron" ].path, updateProgress );
+				loader.loadBinary( CARS[ "veyron" ].url, function( geometry ) { createScene( geometry, "veyron" ) }, CARS[ "veyron" ].path );
 
 				for(var c in CARS) initCarButton( c );
-
-			}
-
-			function updateProgress( progress ) {
-
-				var message = "Loaded ";
-
-				if ( progress.total ) {
-
-					message += ( 100 * progress.loaded / progress.total ).toFixed(0) + "%";
-
-
-				} else {
-
-					message += ( progress.loaded / 1000 ).toFixed(2) + " KB";
-
-				}
-
-				$( "status" ).innerHTML = message;
 
 			}
 
@@ -489,7 +467,7 @@
 					if ( ! CARS[ car ].object ) {
 
 						$( "status" ).style.display = "block";
-						loader.loadBinary( CARS[ car ].url, function( geometry ) { createScene( geometry, car ) }, CARS[ car ].path, updateProgress );
+						loader.loadBinary( CARS[ car ].url, function( geometry ) { createScene( geometry, car ) }, CARS[ car ].path );
 
 					} else {
 
@@ -586,8 +564,8 @@
 
 				switchCar( car );
 
-				$( "status" ).style.display = "none";
-				$( "status" ).innerHTML = "Loading model ...";
+				loader.statusDomElement.style.display = "none";
+				loader.statusDomElement.innerHTML = "Loading model ...";
 
 			}
 
