@@ -64,6 +64,8 @@
 			var scene;
 			var canvasRenderer, webglRenderer;
 
+			var loader;
+			
 			var mesh, zmesh, lightMesh;
 			
 			var directionalLight, pointLight;
@@ -177,11 +179,14 @@
 
 				var s = (new Date).getTime();
 				
-				var loader = new THREE.Loader();
+				loader = new THREE.Loader( true );
+				document.body.appendChild( loader.statusDomElement );
+				
 				//loader.loadAscii( 'obj/lucy/Lucy100k_slim.js', function( geometry ) { createScene( geometry, s ) } );
 				loader.loadBinary( 'obj/lucy/Lucy100k_bin.js', function( geometry ) { createScene( geometry, s ) }, "obj/lucy" );
 
 			}
+			
 			
 			function createScene( geometry, start ) {
 				
@@ -189,6 +194,8 @@
 				addMesh( geometry, 0.75, 300, 0, 0, 0,0,0, new THREE.MeshFaceMaterial( ) );
 				addMesh( geometry, 0.75, -300, 0, 0, 0,0,0, new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0x111111, specular: 0xffaa00, shininess: 10 } ) );
 				addMesh( geometry, 0.75, -900, 0, 0, 0,0,0, new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0x555555, specular: 0x666666, shininess: 10 } ) );
+				
+				loader.statusDomElement.style.display = "none";
 				
 				log( "geometry.vertices: " + geometry.vertices.length );
 				log( "geometry.faces: " + geometry.faces.length );
