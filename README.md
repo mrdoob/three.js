@@ -159,9 +159,9 @@ For creating a customised version of the library, including the source files in 
 
 2010 11 30 - **r30** (77.809 KB, gzip: 18.336 KB)
 
-* Reflection and Refraction materials support in `WebGLRenderer` ([alteredq](http://github.com/alteredq)
+* Reflection and Refraction materials support in `WebGLRenderer` ([alteredq](http://github.com/alteredq))
 * `SmoothShading` support on `CanvasRenderer`/`MeshLambertMaterial`
-* `MeshShaderMaterial` for `WebGLRenderer` ([alteredq](http://github.com/alteredq)
+* `MeshShaderMaterial` for `WebGLRenderer` ([alteredq](http://github.com/alteredq))
 * Removed `RenderableFace4` from `Projector`/`CanvasRenderer` (maybe just temporary).
 * Added extras folder with `GeometryUtils`, `ImageUtils`, `SceneUtils` and `ShaderUtils` ([alteredq](http://github.com/alteredq) & [mrdoob](http://github.com/mrdoob))
 * Blender 2.5x Slim now the default exporter (old exporter removed).
