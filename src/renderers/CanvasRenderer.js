@@ -476,6 +476,7 @@ THREE.CanvasRenderer = function () {
 
 			}
 
+			/*
 			if ( material.env_map ) {
 
 				if ( material.env_map.mapping == THREE.ReflectionMapping ) {
@@ -489,7 +490,7 @@ THREE.CanvasRenderer = function () {
 				}
 
 			}
-
+			*/
 
 		} else if ( material instanceof THREE.MeshLambertMaterial ) {
 
