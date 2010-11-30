@@ -37,13 +37,7 @@ var ShaderUtils = {
 			
 			"attribute vec3 position;",
 			"attribute vec3 normal;",
-			"attribute vec3 uv;",
-			
-			"uniform mat4 objMatrix;",
-			"uniform mat4 modelViewMatrix;",
-			"uniform mat4 projectionMatrix;",
-			
-			"uniform vec3 cameraPosition;",
+			"attribute vec3 uv;",			
 			
 			"uniform float mRefractionRatio;",
 			"uniform float mFresnelBias;",
@@ -56,9 +50,9 @@ var ShaderUtils = {
 
 			"void main(void) {",
 				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
-				"vec4 mPosition = objMatrix * vec4( position, 1.0 );",
+				"vec4 mPosition = objectMatrix * vec4( position, 1.0 );",
 				
-				"vec3 nWorld = normalize ( mat3( objMatrix[0].xyz, objMatrix[1].xyz, objMatrix[2].xyz ) * normal );",
+				"vec3 nWorld = normalize ( mat3( objectMatrix[0].xyz, objectMatrix[1].xyz, objectMatrix[2].xyz ) * normal );",
 				
 				"vec3 I = mPosition.xyz - cameraPosition;",
 				
