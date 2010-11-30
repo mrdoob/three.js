@@ -9,6 +9,7 @@ except ImportError:
 
 import os
 import tempfile
+import sys
 
 
 def merge(files):
@@ -397,6 +398,11 @@ def parse_args():
 		parser.add_option('--all', dest='all', help='Build all Three.js versions', action='store_true')
 
 		args, remainder = parser.parse_args()
+
+	# If no arguments have been passed, show the help message and exit
+	if len(sys.argv) == 1:
+		parser.print_help()
+		sys.exit(1)
 
 	return args
 
