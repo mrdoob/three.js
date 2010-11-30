@@ -14,16 +14,16 @@ The engine can render using &lt;canvas&gt;, &lt;svg&gt; and WebGL.
 Materials
 
 [![materials_cars](http://mrdoob.github.com/three.js/assets/examples/25_materials_cars.png)](http://mrdoob.github.com/three.js/examples/materials_cars.html)
-[![materials](http://mrdoob.github.com/three.js/assets/examples/13_materials.png)](http://mrdoob.github.com/three.js/examples/materials.html)
-[![materials_cubemap](http://mrdoob.github.com/three.js/assets/examples/14_materials_cubemap.png)](http://mrdoob.github.com/three.js/examples/materials_cubemap.html)
+[![materials_cubemap_refraction](http://mrdoob.github.com/three.js/assets/examples/18_materials_cubemap_refraction.png)](http://mrdoob.github.com/three.js/examples/materials_cubemap_refraction.html)
 [![materials_cubemap_balls_reflection](http://mrdoob.github.com/three.js/assets/examples/15_materials_cubemap_balls_reflection.png)](http://mrdoob.github.com/three.js/examples/materials_cubemap_balls_reflection.html)
 [![materials_cubemap_balls_refraction](http://mrdoob.github.com/three.js/assets/examples/16_materials_cubemap_balls_refraction.png)](http://mrdoob.github.com/three.js/examples/materials_cubemap_balls_refraction.html)
 [![materials_cubemap_escher](http://mrdoob.github.com/three.js/assets/examples/17_materials_cubemap_escher.png)](http://mrdoob.github.com/three.js/examples/materials_cubemap_escher.html)
-[![materials_cubemap_refraction](http://mrdoob.github.com/three.js/assets/examples/18_materials_cubemap_refraction.png)](http://mrdoob.github.com/three.js/examples/materials_cubemap_refraction.html)
-[![materials_depth](http://mrdoob.github.com/three.js/assets/examples/19_materials_depth.png)](http://mrdoob.github.com/three.js/examples/materials_depth.html)
+[![materials_cubemap](http://mrdoob.github.com/three.js/assets/examples/14_materials_cubemap.png)](http://mrdoob.github.com/three.js/examples/materials_cubemap.html)
 [![materials_gl](http://mrdoob.github.com/three.js/assets/examples/20_materials_gl.png)](http://mrdoob.github.com/three.js/examples/materials_gl.html)
-[![materials_multimaterials](http://mrdoob.github.com/three.js/assets/examples/21_materials_multimaterials.png)](http://mrdoob.github.com/three.js/examples/materials_multimaterials.html)
+[![materials](http://mrdoob.github.com/three.js/assets/examples/13_materials.png)](http://mrdoob.github.com/three.js/examples/materials.html)
+[![materials_depth](http://mrdoob.github.com/three.js/assets/examples/19_materials_depth.png)](http://mrdoob.github.com/three.js/examples/materials_depth.html)
 [![materials_normal](http://mrdoob.github.com/three.js/assets/examples/22_materials_normal.png)](http://mrdoob.github.com/three.js/examples/materials_normal.html)
+[![materials_multimaterials](http://mrdoob.github.com/three.js/assets/examples/21_materials_multimaterials.png)](http://mrdoob.github.com/three.js/examples/materials_multimaterials.html)
 [![materials_shaders](http://mrdoob.github.com/three.js/assets/examples/23_materials_shaders.png)](http://mrdoob.github.com/three.js/examples/materials_shaders.html)
 [![materials_video](http://mrdoob.github.com/three.js/assets/examples/24_materials_video.png)](http://mrdoob.github.com/three.js/examples/materials_video.html)
 
@@ -141,6 +141,7 @@ For creating a customised version of the library, including the source files in 
 	<script type="text/javascript" src="../src/materials/MeshDepthMaterial.js"></script>
 	<script type="text/javascript" src="../src/materials/MeshNormalMaterial.js"></script>
 	<script type="text/javascript" src="../src/materials/MeshFaceMaterial.js"></script>
+	<script type="text/javascript" src="../src/materials/MeshShaderMaterial.js"></script>
 	<script type="text/javascript" src="../src/materials/ParticleBasicMaterial.js"></script>
 	<script type="text/javascript" src="../src/materials/ParticleCircleMaterial.js"></script>
 	<script type="text/javascript" src="../src/materials/textures/Texture.js"></script>
@@ -156,9 +157,14 @@ For creating a customised version of the library, including the source files in 
 
 ### Change Log ###
 
-2010 11 28 - **r30** (75.653 KB, gzip: 17.812 KB)
+2010 11 30 - **r30** (77.809 KB, gzip: 18.336 KB)
 
-* `CanvasRenderer` SmoothShading support
+* Reflection and Refraction materials support in `WebGLRenderer` ([alteredq](http://github.com/alteredq)
+* `SmoothShading` support on `CanvasRenderer`/`MeshLambertMaterial`
+* `MeshShaderMaterial` for `WebGLRenderer` ([alteredq](http://github.com/alteredq)
+* Removed `RenderableFace4` from `Projector`/`CanvasRenderer` (maybe just temporary).
+* Added extras folder with `GeometryUtils`, `ImageUtils`, `SceneUtils` and `ShaderUtils` ([alteredq](http://github.com/alteredq) & [mrdoob](http://github.com/mrdoob))
+* Blender 2.5x Slim now the default exporter (old exporter removed).
 
 
 2010 11 17 - **r29** (69.563 KB)
