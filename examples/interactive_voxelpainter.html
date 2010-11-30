@@ -28,7 +28,7 @@
 			var projector, plane, cube;
 			var mouse2D, mouse3D, ray,
 			rollOveredFace, isShiftDown = false,
-			theta = 45, isCtrlDown = false;
+			theta = 45, isCtrlDown = false, isAltDown = false;
 
 			init();
 			setInterval( loop, 1000 / 60 );
@@ -43,7 +43,7 @@
 				info.style.top = '10px';
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - voxel painter<br /><strong>click</strong>: add voxel, <strong>control + click</strong>: remove voxel, <strong>shift + click</strong>: rotate, <a href="javascript:save();return false;">save .png</a>';
+				info.innerHTML = '<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - voxel painter<br /><strong>click</strong>: add voxel, <strong>alt + click</strong>: remove voxel, <strong>shift + click</strong>: rotate, <a href="javascript:save();return false;">save .png</a>';
 				container.appendChild( info );
 
 				camera = new THREE.Camera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
@@ -135,7 +135,7 @@
 
 				if ( intersects.length > 0 ) {
 
-					if ( isCtrlDown ) {
+					if ( isAltDown ) {
 
 						if ( intersects[ 0 ].object != plane ) {
 
@@ -165,6 +165,7 @@
 
 					case 16: isShiftDown = true; break;
 					case 17: isCtrlDown = true; break;
+					case 18: isAltDown = true; break;
 
 				}
 
@@ -176,6 +177,7 @@
 
 					case 16: isShiftDown = false; break;
 					case 17: isCtrlDown = false; break;
+					case 18: isAltDown = false; break;
 
 				}
 			}
