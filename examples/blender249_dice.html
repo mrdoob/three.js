@@ -17,7 +17,7 @@
 
 		<script type="text/javascript" src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="geometry/Dice249UV.js"></script>
+		<script type="text/javascript" src="geometry/c4d/Dice249UV.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
@@ -66,9 +66,9 @@
 				camera.target.position.y = 0;
 
 				scene = new THREE.Scene();
-				
+
 				//model
-				model = new THREE.Mesh( new Dice249UV(), new THREE.MeshBasicMaterial( { map: loadImage( 'geometry/dice.gif' ) } ) );
+				model = new THREE.Mesh( new Dice249UV(), new THREE.MeshBasicMaterial( { map: loadImage( 'textures/dice.gif' ) } ) );
 				model.rotation.x = Math.PI * .5;
 				model.rotation.z = Math.PI * .25;
 				model.scale = new THREE.Vector3(70,70,70);
