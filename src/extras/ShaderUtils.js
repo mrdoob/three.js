@@ -35,10 +35,6 @@ var ShaderUtils = {
 				
 			vertex_shader: [
 			
-			"attribute vec3 position;",
-			"attribute vec3 normal;",
-			"attribute vec3 uv;",			
-			
 			"uniform float mRefractionRatio;",
 			"uniform float mFresnelBias;",
 			"uniform float mFresnelScale;",

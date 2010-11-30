@@ -1079,12 +1079,10 @@ THREE.WebGLRenderer = function ( scene ) {
 
 		var chunks = [
 
+
+
 			maxDirLights   ? "#define MAX_DIR_LIGHTS " + maxDirLights     : "",
 			maxPointLights ? "#define MAX_POINT_LIGHTS " + maxPointLights : "",
-
-			"attribute vec3 position;",
-			"attribute vec3 normal;",
-			"attribute vec2 uv;",
 
 			"uniform bool enableLighting;",
 			"uniform bool useRefract;",
@@ -1195,6 +1193,9 @@ THREE.WebGLRenderer = function ( scene ) {
 			"uniform mat4 modelViewMatrix;",
 			"uniform mat4 projectionMatrix;",
 			"uniform vec3 cameraPosition;",
+			"attribute vec3 position;",
+			"attribute vec3 normal;",
+			"attribute vec2 uv;",
 			""
 		].join("\n");
 		
@@ -1205,10 +1206,8 @@ THREE.WebGLRenderer = function ( scene ) {
 
 		if ( !_gl.getProgramParameter( program, _gl.LINK_STATUS ) ) {
 
-			alert( "Could not initialise shaders" );
-
-			alert( "VALIDATE_STATUS: " + _gl.getProgramParameter( program, _gl.VALIDATE_STATUS ) );
-			alert( _gl.getError() );
+			alert( "Could not initialise shaders\n"+
+					"VALIDATE_STATUS: " + _gl.getProgramParameter( program, _gl.VALIDATE_STATUS ) + ", gl error [" + _gl.getError() + "]" );
 			
 		}
 		
