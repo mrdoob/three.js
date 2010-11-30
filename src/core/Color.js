@@ -4,12 +4,6 @@
 
 THREE.Color = function ( hex ) {
 
-	/*
-	this.r; this.g; this.b; this.a;
-	this.hex;
-	this.__styleString;
-	*/
-
 	this.autoUpdate = true;
 	this.setHex( hex );
 
@@ -17,12 +11,11 @@ THREE.Color = function ( hex ) {
 
 THREE.Color.prototype = {
 
-	setRGBA: function ( r, g, b, a ) {
+	setRGB: function ( r, g, b ) {
 
 		this.r = r;
 		this.g = g;
 		this.b = b;
-		this.a = a;
 
 		if ( this.autoUpdate ) {
 
@@ -35,7 +28,7 @@ THREE.Color.prototype = {
 
 	setHex: function ( hex ) {
 
-		this.hex = hex;
+		this.hex = ( ~~ hex ) & 0xffffff;
 
 		if ( this.autoUpdate ) {
 
@@ -46,40 +39,14 @@ THREE.Color.prototype = {
 
 	},
 
-	copyRGB: function ( color ) {
-
-		this.r = color.r;
-		this.g = color.g;
-		this.b = color.b;
-
-	},
-
-	copyRGBA: function ( color ) {
-
-		this.r = color.r;
-		this.g = color.g;
-		this.b = color.b;
-		this.a = color.a;
-
-	},
-
-	multiplySelfRGB: function ( color ) {
-
-		this.r *= color.r;
-		this.g *= color.g;
-		this.b *= color.b;
-
-	},
-
 	updateHex: function () {
 
-		this.hex = Math.floor( this.a * 255 ) << 24 | Math.floor( this.r * 255 ) << 16 | Math.floor( this.g * 255 ) << 8 | Math.floor( this.b * 255 );
+		this.hex = ~~( this.r * 255 ) << 16 ^ ~~( this.g * 255 ) << 8 ^ ~~( this.b * 255 );
 
 	},
 
 	updateRGBA: function () {
 
-		this.a = ( this.hex >> 24 & 255 ) / 255;
 		this.r = ( this.hex >> 16 & 255 ) / 255;
 		this.g = ( this.hex >> 8 & 255 ) / 255;
 		this.b = ( this.hex & 255 ) / 255;
@@ -88,13 +55,13 @@ THREE.Color.prototype = {
 
 	updateStyleString: function () {
 
-		this.__styleString = 'rgba(' + Math.floor( this.r * 255 ) + ',' + Math.floor( this.g * 255 ) + ',' + Math.floor( this.b * 255 ) + ',' + this.a + ')';
+		this.__styleString = 'rgb(' + ~~( this.r * 255 ) + ',' + ~~( this.g * 255 ) + ',' + ~~( this.b * 255 ) + ')';
 
 	},
 
 	toString: function () {
 
-		return 'THREE.Color ( r: ' + this.r + ', g: ' + this.g + ', b: ' + this.b + ', a: ' + this.a + ', hex: ' + this.hex + ' )';
+		return 'THREE.Color ( r: ' + this.r + ', g: ' + this.g + ', b: ' + this.b + ', hex: ' + this.hex + ' )';
 
 	}
 

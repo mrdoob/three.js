@@ -22,25 +22,14 @@
 
 		<script type="text/javascript">
 
-			var SCREEN_WIDTH = window.innerWidth;
-			var SCREEN_HEIGHT = window.innerHeight;
+			var SEPARATION = 100, AMOUNTX = 50, AMOUNTY = 50;
 
-			var SEPARATION = 100;
-			var AMOUNTX = 50;
-			var AMOUNTY = 50;
+			var container, stats;
+			var camera, scene, renderer;
 
-			var stats;
-			var container;
+			var particles, particle, count;
 
-			var particles, particle;
-			var count;
-
-			var camera;
-			var scene;
-			var renderer;
-
-			var mouseX = 0;
-			var mouseY = 0;
+			var mouseX = 0, mouseY = 0;
 
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
@@ -53,18 +42,18 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
+				camera = new THREE.Camera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 1000;
 
 				scene = new THREE.Scene();
 
 				renderer = new THREE.CanvasRenderer();
-				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				particles = new Array();
 
 				var i = 0;
-				var material = new THREE.ParticleCircleMaterial( 0xffffff, 1 );
+				var material = new THREE.ParticleCircleMaterial( { color: 0xffffff, opacity: 1 } );
 
 				for ( var ix = 0; ix < AMOUNTX; ix ++ ) {
 

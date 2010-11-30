@@ -8,10 +8,6 @@
 
 THREE.Matrix4 = function () {
 
-	this._x = new THREE.Vector3();
-	this._y = new THREE.Vector3();
-	this._z = new THREE.Vector3();
-
 };
 
 THREE.Matrix4.prototype = {
@@ -41,27 +37,22 @@ THREE.Matrix4.prototype = {
 
 	lookAt: function ( eye, center, up ) {
 
-		var x = this._x, y = this._y, z = this._z;
+		var x = new THREE.Vector3(), y = new THREE.Vector3(), z = new THREE.Vector3();
 
-		z.sub( eye, center );
-		z.normalize();
-
-		x.cross( up, z );
-		x.normalize();
-
-		y.cross( z, x );
-		y.normalize();
+		z.sub( eye, center ).normalize();
+		x.cross( up, z ).normalize();
+		y.cross( z, x ).normalize();
 
 		this.n11 = x.x; this.n12 = x.y; this.n13 = x.z; this.n14 = - x.dot( eye );
 		this.n21 = y.x; this.n22 = y.y; this.n23 = y.z; this.n24 = - y.dot( eye );
 		this.n31 = z.x; this.n32 = z.y; this.n33 = z.z; this.n34 = - z.dot( eye );
-		this.n41 = 0; this.n42 = 0; this.n43 = 0; this.
-n44 = 1;
+		this.n41 = 0; this.n42 = 0; this.n43 = 0; this.n44 = 1;
+
 	},
 
 	transform: function ( v ) {
 
-		var vx = v.x, vy = v.y, vz = v.z, vw = v.w ? v.w : 1.0;
+		var vx = v.x, vy = v.y, vz = v.z, vw = v.w || 1, vwi;
 
 		v.x = this.n11 * vx + this.n12 * vy + this.n13 * vz + this.n14 * vw;
 		v.y = this.n21 * vx + this.n22 * vy + this.n23 * vz + this.n24 * vw;
@@ -69,15 +60,16 @@ n44 = 1;
 
 		vw = this.n41 * vx + this.n42 * vy + this.n43 * vz + this.n44 * vw;
 
-		if( v.w ) {
+		if ( v.w ) {
 
 			v.w = vw;
 
 		} else {
 
-			v.x = v.x / vw;
-			v.y = v.y / vw;
-			v.z = v.z / vw;
+			vwi = 1 / vw;
+			v.x *= vwi;
+			v.y *= vwi;
+			v.z *= vwi;
 
 		}
 

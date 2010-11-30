@@ -1,34 +1,37 @@
 /**
  * @author mr.doob / http://mrdoob.com/
  * @author supereggbert / http://www.paulbrunt.co.uk/
+ * @author julianwa / https://github.com/julianwa
  */
 
 THREE.Projector = function() {
 
 	var _renderList = null,
-	_face3, _face3Count, _face3Pool = [],
-	_face4, _face4Count, _face4Pool = [],
+	_face3, _face32, _face3Count, _face3Pool = [],
+	//_face4, _face4Count, _face4Pool = [],
 	_line, _lineCount, _linePool = [],
 	_particle, _particleCount, _particlePool = [],
 
 	_vector4 = new THREE.Vector4(),
 	_projScreenMatrix = new THREE.Matrix4(),
-	_projScreenObjectMatrix = new THREE.Matrix4();
+	_projScreenObjectMatrix = new THREE.Matrix4(),
+
+	_clippedVertex1PositionScreen = new THREE.Vector4(),
+	_clippedVertex2PositionScreen = new THREE.Vector4(),
+
+	_face3VertexNormals, _face4VertexNormals;
 
 	this.projectScene = function ( scene, camera ) {
 
-		var o, ol, v, vl, f, fl, objects, object, objectMatrix,
-		vertices, vertex, vertexPositionScreen, vertex2,
-		faces, face, v1, v2, v3, v4;
+		var o, ol, v, vl, f, fl, n, nl, objects, object,
+		objectMatrix, objectRotationMatrix, objectMaterial, objectOverdraw,
+		vertices, vertex, vertexPositionScreen,
+		faces, face, faceVertexNormals, normal, v1, v2, v3, v4;
 
 		_renderList = [];
-		_face3Count = 0, _face4Count = 0, _lineCount = 0, _particleCount = 0;
+		_face3Count = _face4Count = _lineCount = _particleCount = 0;
 
-		if( camera.autoUpdateMatrix ) {
-
-			camera.updateMatrix();
-
-		}
+		camera.autoUpdateMatrix && camera.updateMatrix();
 
 		_projScreenMatrix.multiply( camera.projectionMatrix, camera.matrix );
 
@@ -37,17 +40,16 @@ THREE.Projector = function() {
 		for ( o = 0, ol = objects.length; o < ol; o++ ) {
 
 			object = objects[ o ];
+			object.autoUpdateMatrix && object.updateMatrix();
+
 			objectMatrix = object.matrix;
-
-			if( object.autoUpdateMatrix ) {
-
-				object.updateMatrix();
-
-			}
+			objectRotationMatrix = object.rotationMatrix;
+			objectMaterial = object.material;
+			objectOverdraw = object.overdraw;
 
 			if ( object instanceof THREE.Mesh ) {
 
-				_projScreenObjectMatrix.multiply( _projScreenMatrix, objectMatrix );
+				// _projScreenObjectMatrix.multiply( _projScreenMatrix, objectMatrix );
 
 				// vertices
 
@@ -57,9 +59,17 @@ THREE.Projector = function() {
 
 					vertex = vertices[ v ];
 
+					vertex.positionWorld.copy( vertex.position );
+					objectMatrix.transform( vertex.positionWorld );
+
 					vertexPositionScreen = vertex.positionScreen;
-					vertexPositionScreen.copy( vertex.position );
-					_projScreenObjectMatrix.transform( vertexPositionScreen );
+					vertexPositionScreen.copy( vertex.positionWorld );
+					_projScreenMatrix.transform( vertexPositionScreen );
+
+					// Perform the perspective divide. TODO: This should be be performend 
+					// post clipping (imagine if the vertex lies at the same location as 
+					// the camera, causing a divide by w = 0).
+					vertexPositionScreen.multiplyScalar( 1 / vertexPositionScreen.w );
 
 					vertex.__visible = vertexPositionScreen.z > 0 && vertexPositionScreen.z < 1;
 
@@ -69,7 +79,7 @@ THREE.Projector = function() {
 
 				faces = object.geometry.faces;
 
-				for ( f = 0, fl = faces.length; f < fl; f++ ) {
+				for ( f = 0, fl = faces.length; f < fl; f ++ ) {
 
 					face = faces[ f ];
 
@@ -84,12 +94,17 @@ THREE.Projector = function() {
 							   ( v3.positionScreen.y - v1.positionScreen.y ) * ( v2.positionScreen.x - v1.positionScreen.x ) < 0 ) ) ) {
 
 								_face3 = _face3Pool[ _face3Count ] = _face3Pool[ _face3Count ] || new THREE.RenderableFace3();
-								_face3.v1.copy( v1.positionScreen );
-								_face3.v2.copy( v2.positionScreen );
-								_face3.v3.copy( v3.positionScreen );
+
+								_face3.v1.positionWorld.copy( v1.positionWorld );
+								_face3.v2.positionWorld.copy( v2.positionWorld );
+								_face3.v3.positionWorld.copy( v3.positionWorld );
+
+								_face3.v1.positionScreen.copy( v1.positionScreen );
+								_face3.v2.positionScreen.copy( v2.positionScreen );
+								_face3.v3.positionScreen.copy( v3.positionScreen );
 
 								_face3.normalWorld.copy( face.normal );
-								object.matrixRotation.transform( _face3.normalWorld );
+								objectRotationMatrix.transform( _face3.normalWorld );
 
 								_face3.centroidWorld.copy( face.centroid );
 								objectMatrix.transform( _face3.centroidWorld );
@@ -97,13 +112,29 @@ THREE.Projector = function() {
 								_face3.centroidScreen.copy( _face3.centroidWorld );
 								_projScreenMatrix.transform( _face3.centroidScreen );
 
+								faceVertexNormals = face.vertexNormals;
+								_face3VertexNormals = _face3.vertexNormalsWorld;
+
+								for ( n = 0, nl = faceVertexNormals.length; n < nl; n ++ ) {
+
+									normal = _face3VertexNormals[ n ].copy( faceVertexNormals[ n ] );
+									objectRotationMatrix.transform( normal );
+
+								}
+
 								_face3.z = _face3.centroidScreen.z;
 
-								_face3.meshMaterial = object.material;
+								_face3.meshMaterial = objectMaterial;
 								_face3.faceMaterial = face.material;
-								_face3.overdraw = object.overdraw;
-								_face3.uvs = object.geometry.uvs[ f ];
-								_face3.color = face.color;
+								_face3.overdraw = objectOverdraw;
+
+								if ( object.geometry.uvs[ f ] ) {
+
+									_face3.uvs[ 0 ] = object.geometry.uvs[ f ][ 0 ];
+									_face3.uvs[ 1 ] = object.geometry.uvs[ f ][ 1 ];
+									_face3.uvs[ 2 ] = object.geometry.uvs[ f ][ 2 ];
+
+								}
 
 								_renderList.push( _face3 );
 
@@ -125,32 +156,76 @@ THREE.Projector = function() {
 							   ( v2.positionScreen.x - v3.positionScreen.x ) * ( v4.positionScreen.y - v3.positionScreen.y ) -
 							   ( v2.positionScreen.y - v3.positionScreen.y ) * ( v4.positionScreen.x - v3.positionScreen.x ) < 0 ) ) ) ) {
 
-								_face4 = _face4Pool[ _face4Count ] = _face4Pool[ _face4Count ] || new THREE.RenderableFace4();
-								_face4.v1.copy( v1.positionScreen );
-								_face4.v2.copy( v2.positionScreen );
-								_face4.v3.copy( v3.positionScreen );
-								_face4.v4.copy( v4.positionScreen );
+								_face3 = _face3Pool[ _face3Count ] = _face3Pool[ _face3Count ] || new THREE.RenderableFace3();
 
-								_face4.normalWorld.copy( face.normal );
-								object.matrixRotation.transform( _face4.normalWorld );
+								_face3.v1.positionWorld.copy( v1.positionWorld );
+								_face3.v2.positionWorld.copy( v2.positionWorld );
+								_face3.v3.positionWorld.copy( v4.positionWorld );
 
-								_face4.centroidWorld.copy( face.centroid );
-								objectMatrix.transform( _face4.centroidWorld );
+								_face3.v1.positionScreen.copy( v1.positionScreen );
+								_face3.v2.positionScreen.copy( v2.positionScreen );
+								_face3.v3.positionScreen.copy( v4.positionScreen );
 
-								_face4.centroidScreen.copy( _face4.centroidWorld );
-								_projScreenMatrix.transform( _face4.centroidScreen );
+								_face3.normalWorld.copy( face.normal );
+								objectRotationMatrix.transform( _face3.normalWorld );
 
-								_face4.z = _face4.centroidScreen.z;
+								_face3.centroidWorld.copy( face.centroid );
+								objectMatrix.transform( _face3.centroidWorld );
 
-								_face4.meshMaterial = object.material;
-								_face4.faceMaterial = face.material;
-								_face4.overdraw = object.overdraw;
-								_face4.uvs = object.geometry.uvs[ f ];
-								_face4.color = face.color;
+								_face3.centroidScreen.copy( _face3.centroidWorld );
+								_projScreenMatrix.transform( _face3.centroidScreen );
 
-								_renderList.push( _face4 );
+								_face3.z = _face3.centroidScreen.z;
 
-								_face4Count ++;
+								_face3.meshMaterial = objectMaterial;
+								_face3.faceMaterial = face.material;
+								_face3.overdraw = objectOverdraw;
+
+								if ( object.geometry.uvs[ f ] ) {
+
+									_face3.uvs[ 0 ] = object.geometry.uvs[ f ][ 0 ];
+									_face3.uvs[ 1 ] = object.geometry.uvs[ f ][ 1 ];
+									_face3.uvs[ 2 ] = object.geometry.uvs[ f ][ 3 ];
+
+								}
+
+								_renderList.push( _face3 );
+
+								_face3Count ++;
+
+								// 
+
+								_face32 = _face3Pool[ _face3Count ] = _face3Pool[ _face3Count ] || new THREE.RenderableFace3();
+
+								_face32.v1.positionWorld.copy( v2.positionWorld );
+								_face32.v2.positionWorld.copy( v3.positionWorld );
+								_face32.v3.positionWorld.copy( v4.positionWorld );
+
+								_face32.v1.positionScreen.copy( v2.positionScreen );
+								_face32.v2.positionScreen.copy( v3.positionScreen );
+								_face32.v3.positionScreen.copy( v4.positionScreen );
+
+								_face32.normalWorld.copy( _face3.normalWorld );
+								_face32.centroidWorld.copy( _face3.centroidWorld );
+								_face32.centroidScreen.copy( _face3.centroidScreen );
+
+								_face32.z = _face32.centroidScreen.z;
+
+								_face32.meshMaterial = objectMaterial;
+								_face32.faceMaterial = face.material;
+								_face32.overdraw = objectOverdraw;
+
+								if ( object.geometry.uvs[ f ] ) {
+
+									_face32.uvs[ 0 ] = object.geometry.uvs[ f ][ 1 ];
+									_face32.uvs[ 1 ] = object.geometry.uvs[ f ][ 2 ];
+									_face32.uvs[ 2 ] = object.geometry.uvs[ f ][ 3 ];
+
+								}
+
+								_renderList.push( _face32 );
+
+								_face3Count ++;
 
 							}
 
@@ -166,36 +241,39 @@ THREE.Projector = function() {
 
 				vertices = object.geometry.vertices;
 
-				for ( v = 0, vl = vertices.length; v < vl; v++ ) {
+				vertex = vertices[ 0 ];
+				vertex.positionScreen.copy( vertex.position );
+				_projScreenObjectMatrix.transform( vertex.positionScreen );
 
-					vertex = vertices[ v ];
+				for ( v = 1, vl = vertices.length; v < vl; v++ ) {
 
-					vertexPositionScreen = vertex.positionScreen;
-					vertexPositionScreen.copy( vertex.position );
-					_projScreenObjectMatrix.transform( vertexPositionScreen );
+					v1 = vertices[ v ];
 
-					vertex.__visible = vertexPositionScreen.z > 0 && vertexPositionScreen.z < 1;
+					v1.positionScreen.copy( v1.position );
+					_projScreenObjectMatrix.transform( v1.positionScreen );
 
-					if ( v > 0 ) {
+					v2 = vertices[ v - 1 ];
 
-						vertex2 = object.geometry.vertices[ v - 1 ];
+					_clippedVertex1PositionScreen.copy( v1.positionScreen );
+					_clippedVertex2PositionScreen.copy( v2.positionScreen );
 
-						if ( vertex.__visible && vertex2.__visible ) {
+					if ( clipLine( _clippedVertex1PositionScreen, _clippedVertex2PositionScreen ) ) {
 
-							_line = _linePool[ _lineCount ] = _linePool[ _lineCount ] || new THREE.RenderableLine();
-							_line.v1.copy( vertex.positionScreen );
-							_line.v2.copy( vertex2.positionScreen );
+						// Perform the perspective divide
+						_clippedVertex1PositionScreen.multiplyScalar( 1 / _clippedVertex1PositionScreen.w );
+						_clippedVertex2PositionScreen.multiplyScalar( 1 / _clippedVertex2PositionScreen.w );
 
-							// TODO: Use centriums here too.
-							_line.z = Math.max( vertex.positionScreen.z, vertex2.positionScreen.z );
+						_line = _linePool[ _lineCount ] = _linePool[ _lineCount ] || new THREE.RenderableLine();
+						_line.v1.positionScreen.copy( _clippedVertex1PositionScreen );
+						_line.v2.positionScreen.copy( _clippedVertex2PositionScreen );
 
-							_line.material = object.material;
+						_line.z = Math.max( _clippedVertex1PositionScreen.z, _clippedVertex2PositionScreen.z );
 
-							_renderList.push( _line );
+						_line.material = object.material;
 
-							_lineCount ++;
+						_renderList.push( _line );
 
-						}
+						_lineCount ++;
 					}
 				}
 
@@ -203,24 +281,23 @@ THREE.Projector = function() {
 
 				_vector4.set( object.position.x, object.position.y, object.position.z, 1 );
 
-				camera.matrix.transform( _vector4 );
-				camera.projectionMatrix.transform( _vector4 );
+				_projScreenMatrix.transform( _vector4 );
 
-				object.screen.set( _vector4.x / _vector4.w, _vector4.y / _vector4.w, _vector4.z / _vector4.w );
+				_vector4.z /= _vector4.w;
 
-				if ( object.screen.z > 0 && object.screen.z < 1 ) {
+				if ( _vector4.z > 0 && _vector4.z < 1 ) {
 
 					_particle = _particlePool[ _particleCount ] = _particlePool[ _particleCount ] || new THREE.RenderableParticle();
-					_particle.x = object.screen.x;
-					_particle.y = object.screen.y;
-					_particle.z = object.screen.z;
+					_particle.x = _vector4.x / _vector4.w;
+					_particle.y = _vector4.y / _vector4.w;
+					_particle.z = _vector4.z;
 
 					_particle.rotation = object.rotation.z;
 
-					_particle.scale.x = object.scale.x * Math.abs( _vector4.x / _vector4.w - ( _vector4.x + camera.projectionMatrix.n11 ) / ( _vector4.w + camera.projectionMatrix.n14 ) );
-					_particle.scale.y = object.scale.y * Math.abs( _vector4.y / _vector4.w - ( _vector4.y + camera.projectionMatrix.n22 ) / ( _vector4.w + camera.projectionMatrix.n24 ) );
+					_particle.scale.x = object.scale.x * Math.abs( _particle.x - ( _vector4.x + camera.projectionMatrix.n11 ) / ( _vector4.w + camera.projectionMatrix.n14 ) );
+					_particle.scale.y = object.scale.y * Math.abs( _particle.y - ( _vector4.y + camera.projectionMatrix.n22 ) / ( _vector4.w + camera.projectionMatrix.n24 ) );
+
 					_particle.material = object.material;
-					_particle.color = object.color;
 
 					_renderList.push( _particle );
 
@@ -237,5 +314,86 @@ THREE.Projector = function() {
 		return _renderList;
 
 	};
+
+	this.unprojectVector = function ( vector, camera ) {
+
+		var matrix = new THREE.Matrix4();
+
+		matrix.multiply( THREE.Matrix4.makeInvert( camera.matrix ), THREE.Matrix4.makeInvert( camera.projectionMatrix ) );
+		matrix.transform( vector );
+
+		return vector;
+
+	};
+
+	function clipLine( s1, s2 ) {
+
+		var alpha1 = 0, alpha2 = 1,
+
+		// Calculate the boundary coordinate of each vertex for the near and far clip planes,
+		// Z = -1 and Z = +1, respectively.
+		bc1near =  s1.z + s1.w,
+		bc2near =  s2.z + s2.w,
+		bc1far =  - s1.z + s1.w,
+		bc2far =  - s2.z + s2.w;
+
+		if ( bc1near >= 0 && bc2near >= 0 && bc1far >= 0 && bc2far >= 0 ) {
+
+			// Both vertices lie entirely within all clip planes.
+			return true;
+
+		} else if ( ( bc1near < 0 && bc2near < 0) || (bc1far < 0 && bc2far < 0 ) ) {
+
+			// Both vertices lie entirely outside one of the clip planes.
+			return false;
+
+		} else {
+
+			// The line segment spans at least one clip plane.
+
+			if ( bc1near < 0 ) {
+
+				// v1 lies outside the near plane, v2 inside
+				alpha1 = Math.max( alpha1, bc1near / ( bc1near - bc2near ) );
+
+			} else if ( bc2near < 0 ) {
+
+				// v2 lies outside the near plane, v1 inside
+				alpha2 = Math.min( alpha2, bc1near / ( bc1near - bc2near ) );
+
+			}
+
+			if ( bc1far < 0 ) {
+
+				// v1 lies outside the far plane, v2 inside
+				alpha1 = Math.max( alpha1, bc1far / ( bc1far - bc2far ) );
+
+			} else if ( bc2far < 0 ) {
+
+				// v2 lies outside the far plane, v2 inside
+				alpha2 = Math.min( alpha2, bc1far / ( bc1far - bc2far ) );
+
+			}
+
+			if ( alpha2 < alpha1 ) {
+
+				// The line segment spans two boundaries, but is outside both of them.
+				// (This can't happen when we're only clipping against just near/far but good
+				//  to leave the check here for future usage if other clip planes are added.)
+				return false;
+
+			} else {
+
+				// Update the s1 and s2 vertices to match the clipped line segment.
+				s1.lerpSelf( s2, alpha1 );
+				s2.lerpSelf( s1, 1 - alpha2 );
+
+				return true;
+
+			}
+
+		}
+
+	}
 
 };

@@ -16,23 +16,16 @@
 	<body>
 
 		<script type="text/javascript" src="../build/Three.js"></script>
-
-		<script type="text/javascript" src="geometry/primitives/Cube.js"></script>
-		<script type="text/javascript" src="geometry/primitives/Plane.js"></script>
+		<script type="text/javascript" src="../src/extras/primitives/Cube.js"></script>
+		<script type="text/javascript" src="../src/extras/primitives/Plane.js"></script>
 
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
 
-			var SCREEN_WIDTH = window.innerWidth;
-			var SCREEN_HEIGHT = window.innerHeight;
+			var container, stats;
 
-			var container;
-			var stats;
-
-			var camera;
-			var scene;
-			var renderer;
+			var camera, scene, renderer;
 
 			var cube, plane;
 
@@ -50,18 +43,18 @@
 
 			function init() {
 
-				container = document.createElement('div');
-				document.body.appendChild(container);
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
 
-				var info = document.createElement('div');
+				var info = document.createElement( 'div' );
 				info.style.position = 'absolute';
 				info.style.top = '10px';
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
 				info.innerHTML = 'Drag to spin the cube';
-				container.appendChild(info);
+				container.appendChild( info );
 
-				camera = new THREE.Camera( 70, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
+				camera = new THREE.Camera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.y = 150;
 				camera.position.z = 500;
 				camera.target.position.y = 150;
@@ -70,25 +63,28 @@
 
 				// Cube
 
-				geometry = new Cube( 200, 200, 200 );
+				var materials = [];
 
-				for (var i = 0; i < geometry.faces.length; i++) {
+				for ( var i = 0; i < 6; i ++ ) {
 
-					geometry.faces[i].material = [ new THREE.MeshColorFillMaterial( Math.random() * 0xffffff, 1 ) ];
+					materials.push( [ new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } ) ] );
+
 				}
 
-				cube = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial() );
+				cube = new THREE.Mesh( new Cube( 200, 200, 200, 1, 1, materials ), new THREE.MeshFaceMaterial() );
 				cube.position.y = 150;
+				cube.overdraw = true;
 				scene.addObject( cube );
 
 				// Plane
 
-				plane = new THREE.Mesh( new Plane( 200, 200 ), new THREE.MeshColorFillMaterial( 0xe0e0e0 ) );
+				plane = new THREE.Mesh( new Plane( 200, 200 ), new THREE.MeshBasicMaterial( { color: 0xe0e0e0 } ) );
 				plane.rotation.x = -90 * ( Math.PI / 180 );
+				plane.overdraw = true;
 				scene.addObject( plane );
 
 				renderer = new THREE.CanvasRenderer();
-				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				renderer.setSize(  window.innerWidth, window.innerHeight );
 
 				container.appendChild( renderer.domElement );
 

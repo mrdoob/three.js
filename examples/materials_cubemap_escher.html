@@ -1,0 +1,141 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>three.js - webgl reflection [Escher]</title>
+		<meta charset="utf-8">
+		<style type="text/css">
+			body {
+				background:#fff;
+				color:#fff;
+				padding:0;
+				margin:0;
+				overflow:hidden;
+				font-family:georgia;
+				text-align:center;
+			}
+			a {	color: #ff0080;	text-decoration: none; }
+			a:hover { color: #0080ff; }			
+			#log { position:absolute; top:50px; text-align:left; display:block; z-index:100; pointer-events:none; }
+			#d { text-align:center; margin:1em auto -9.0em; z-index:1000; position:relative; display:block; 
+				 background:rgba(0,0,0,0.75); padding:0.25em; width:300px; border-radius:10px; -webkit-box-shadow: 0px 0px 10px rgba(0,0,0,0.5) }
+		</style>
+	</head>
+
+	<body>
+		<div id="d">
+			<p><a href="http://github.com/mrdoob/three.js">Three.js</a> cube mapping demo
+			<p>Original artwork by <a href="http://en.wikipedia.org/wiki/Hand_with_Reflecting_Sphere" target="_blank">M. C. Escher</a>
+			<p>Texture by <a href="http://brainwagon.org/2002/12/05/fun-with-environment-maps/" target="_blank">Mark VandeWettering</a>
+		</div>
+
+		<pre id="log"></pre>
+
+		<script type="text/javascript" src="../build/Three.js"></script> 
+
+		<script type="text/javascript" src="../src/extras/primitives/Sphere.js"></script>
+		<script type="text/javascript" src="../src/extras/primitives/Plane.js"></script>
+		<script type="text/javascript" src="../src/extras/primitives/Cube.js"></script>
+		<script type="text/javascript" src="../src/extras/ImageUtils.js"></script>
+		<script type="text/javascript" src="../src/extras/SceneUtils.js"></script>
+
+		<script type="text/javascript" src="js/Stats.js"></script>
+
+		<script type="text/javascript">
+
+			var statsEnabled = false;
+
+			var container, stats;
+
+			var camera, scene, webglRenderer;
+
+			var mesh, zmesh, lightMesh, geometry;
+
+			var directionalLight, pointLight;
+
+			var mouseX = 0;
+			var mouseY = 0;
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+			init();
+			setInterval( loop, 1000 / 60 );
+
+			function init() {
+
+				container = document.createElement('div');
+				document.body.appendChild(container);
+
+				camera = new THREE.Camera( 75, window.innerWidth / window.innerHeight, 1, 100000 );
+				camera.position.z = 3200;
+
+				scene = new THREE.Scene();
+
+
+				var r = "textures/cube/Escher/";
+
+				var urls = [ r + "px.jpg", r + "nx.jpg", 
+							 r + "py.jpg", r + "ny.jpg", 
+							 r + "pz.jpg", r + "nz.jpg" ];
+
+				var images = ImageUtils.loadArray( urls );
+
+				var textureCube = new THREE.TextureCube( images );
+				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, env_map: textureCube } )
+				var geometry = new Sphere( 100, 96, 64, true );
+
+				var mesh = new THREE.Mesh( geometry, material );
+				mesh.scale.x = mesh.scale.y = mesh.scale.z = 16;
+				scene.addObject( mesh );
+
+				//SceneUtils.addPanoramaCubePlanes( scene, 6000, images );
+				//SceneUtils.addPanoramaCube( scene, 6000, images );
+				SceneUtils.addPanoramaCubeWebGL( scene, 6000, textureCube );
+
+				webglRenderer = new THREE.WebGLRenderer( scene );
+				webglRenderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( webglRenderer.domElement );
+
+				if ( statsEnabled ) {
+
+					stats = new Stats();
+					stats.domElement.style.position = 'absolute';
+					stats.domElement.style.top = '0px';
+					stats.domElement.style.zIndex = 100;
+					container.appendChild( stats.domElement );
+
+				}
+
+			}
+
+			function onDocumentMouseMove(event) {
+
+				mouseX = ( event.clientX - windowHalfX );
+				mouseY = ( event.clientY - windowHalfY );
+
+			}
+
+			function loop() {
+
+				camera.position.x += ( mouseX - camera.position.x ) * .05;
+				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+
+				webglRenderer.render( scene, camera );
+
+				if ( statsEnabled ) stats.update();
+
+			}
+
+			function log(text) {
+
+				var e = document.getElementById("log");
+				e.innerHTML = text + "<br/>" + e.innerHTML;
+
+			}
+
+		</script>
+
+	</body>
+</html>

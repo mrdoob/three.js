@@ -34,7 +34,7 @@ THREE.Vector3.prototype = {
 
 	},
 
-	add: function( v1, v2 ) {
+	add: function ( v1, v2 ) {
 
 		this.x = v1.x + v2.x;
 		this.y = v1.y + v2.y;
@@ -144,7 +144,8 @@ THREE.Vector3.prototype = {
 
 	distanceTo: function ( v ) {
 
-		return Math.sqrt( this.distanceToSquared( v ) );
+		var dx = this.x - v.x, dy = this.y - v.y, dz = this.z - v.z;
+		return Math.sqrt( dx * dx + dy * dy + dz * dz );
 
 	},
 
@@ -179,15 +180,9 @@ THREE.Vector3.prototype = {
 
 	normalize: function () {
 
-		if ( this.length() > 0 ) {
+		var length = Math.sqrt( this.x * this.x + this.y * this.y + this.z * this.z );
 
-			this.multiplyScalar( 1 / this.length() );
-
-		} else {
-
-			this.multiplyScalar( 0 );
-
-		}
+		length > 0 ? this.multiplyScalar( 1 / length ) : this.set( 0, 0, 0 );
 
 		return this;
 

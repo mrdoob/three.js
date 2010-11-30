@@ -11,26 +11,50 @@ The engine can render using &lt;canvas&gt;, &lt;svg&gt; and WebGL.
 
 [More info...](http://mrdoob.com/blog/post/693)
 
-Other similar projects: [pre3d](http://deanm.github.com/pre3d/), [pvjs](http://code.google.com/p/pvjswebgl/), [jsgl](http://tulrich.com/geekstuff/canvas/perspective.html), [k3d](http://www.kevs3d.co.uk/dev/canvask3d/k3d_test.html), ...
+Other &lt;canvas&gt; based engines: [pre3d](http://deanm.github.com/pre3d/), [pvjs](http://code.google.com/p/pvjswebgl/), [jsgl](http://tulrich.com/geekstuff/canvas/perspective.html), [k3d](http://www.kevs3d.co.uk/dev/canvask3d/k3d_test.html), ...
+WebGL based: [WebGLU](https://github.com/OneGeek/WebGLU), [GLGE](http://www.glge.org/), [C3DL](http://www.c3dl.org/), [Copperlicht](http://www.ambiera.com/copperlicht/), [SpiderGL](http://spidergl.org/), [SceneJS](http://scenejs.org/), ...
 
 ### Examples ###
 
+[![large_mesh](http://mrdoob.github.com/three.js/assets/examples/12_large_mesh.png)](http://mrdoob.github.com/three.js/examples/geometry_large_mesh.html)
+[![interactive_cubes](http://mrdoob.github.com/three.js/assets/examples/11_interactive.png)](http://mrdoob.github.com/three.js/examples/interactive_cubes.html)
+[![camera_ortographic](http://mrdoob.github.com/three.js/assets/examples/10_orthographic.png)](http://mrdoob.github.com/three.js/examples/camera_orthographic.html)
 [![lights_pointlights](http://mrdoob.github.com/three.js/assets/examples/09_walthead.png)](http://mrdoob.github.com/three.js/examples/lights_pointlights.html)
 [![geometry_birds](http://mrdoob.github.com/three.js/assets/examples/08_birds.png)](http://mrdoob.github.com/three.js/examples/geometry_birds.html)
 [![geometry_earth](http://mrdoob.github.com/three.js/assets/examples/07_earth.png)](http://mrdoob.github.com/three.js/examples/geometry_earth.html)
 [![geometry_terrain](http://mrdoob.github.com/three.js/assets/examples/06_terrain.png)](http://mrdoob.github.com/three.js/examples/geometry_terrain.html)
-[![materials_video](http://mrdoob.github.com/three.js/assets/examples/05_video.png)](http://mrdoob.github.com/three.js/examples/materials_video.html)
 [![geometry_vr](http://mrdoob.github.com/three.js/assets/examples/04_vr.png)](http://mrdoob.github.com/three.js/examples/geometry_vr.html)
 [![geometry_cube](http://mrdoob.github.com/three.js/assets/examples/03_cube.png)](http://mrdoob.github.com/three.js/examples/geometry_cube.html)
+
+Materials
+
+[![materials](http://mrdoob.github.com/three.js/assets/examples/13_materials.png)](http://mrdoob.github.com/three.js/examples/materials.html)
+[![materials_cubemap](http://mrdoob.github.com/three.js/assets/examples/14_materials_cubemap.png)](http://mrdoob.github.com/three.js/examples/materials_cubemap.html)
+[![materials_cubemap_balls_reflection](http://mrdoob.github.com/three.js/assets/examples/15_materials_cubemap_balls_reflection.png)](http://mrdoob.github.com/three.js/examples/materials_cubemap_balls_reflection.html)
+[![materials_cubemap_balls_refraction](http://mrdoob.github.com/three.js/assets/examples/16_materials_cubemap_balls_refraction.png)](http://mrdoob.github.com/three.js/examples/materials_cubemap_balls_refraction.html)
+[![materials_cubemap_escher](http://mrdoob.github.com/three.js/assets/examples/17_materials_cubemap_escher.png)](http://mrdoob.github.com/three.js/examples/materials_cubemap_escher.html)
+[![materials_cubemap_refraction](http://mrdoob.github.com/three.js/assets/examples/18_materials_cubemap_refraction.png)](http://mrdoob.github.com/three.js/examples/materials_cubemap_refraction.html)
+[![materials_depth](http://mrdoob.github.com/three.js/assets/examples/19_materials_depth.png)](http://mrdoob.github.com/three.js/examples/materials_depth.html)
+[![materials_gl](http://mrdoob.github.com/three.js/assets/examples/20_materials_gl.png)](http://mrdoob.github.com/three.js/examples/materials_gl.html)
+[![materials_multimaterials](http://mrdoob.github.com/three.js/assets/examples/21_materials_multimaterials.png)](http://mrdoob.github.com/three.js/examples/materials_multimaterials.html)
+[![materials_normal](http://mrdoob.github.com/three.js/assets/examples/22_materials_normal.png)](http://mrdoob.github.com/three.js/examples/materials_normal.html)
+[![materials_shaders](http://mrdoob.github.com/three.js/assets/examples/23_materials_shaders.png)](http://mrdoob.github.com/three.js/examples/materials_shaders.html)
+[![materials_video](http://mrdoob.github.com/three.js/assets/examples/24_materials_video.png)](http://mrdoob.github.com/three.js/examples/materials_video.html)
+[![materials_cars](http://mrdoob.github.com/three.js/assets/examples/25_materials_cars.png)](http://mrdoob.github.com/three.js/examples/materials_cars.html)
+
+Particles
+
 [![particles_random](http://mrdoob.github.com/three.js/assets/examples/02_random.png)](http://mrdoob.github.com/three.js/examples/particles_random.html)
 [![particles_wave](http://mrdoob.github.com/three.js/assets/examples/01_waves.png)](http://mrdoob.github.com/three.js/examples/particles_waves.html)
 [![particles_floor](http://mrdoob.github.com/three.js/assets/examples/00_floor.png)](http://mrdoob.github.com/three.js/examples/particles_floor.html)
+[![particles_sprites](http://mrdoob.github.com/three.js/assets/examples/26_particles_sprites.png)](http://mrdoob.github.com/three.js/examples/particles_sprites.html)
 
 ### Featured projects ###
 
+[![Voxels](http://mrdoob.github.com/three.js/assets/projects/10_voxels.png)](http://mrdoob.com/projects/voxels/)
 [![The Wilderness Downtown](http://mrdoob.github.com/three.js/assets/projects/09_arcadefire.png)](http://thewildernessdowntown.com/)
 [![CloudSCAD](http://mrdoob.github.com/three.js/assets/projects/08_cloudscad.png)](http://cloudscad.com/stl_viewer/)
-[![Or so they say...](http://mrdoob.github.com/three.js/assets/projects/07_orsotheysay.png)](http://xplsv.com/prods/demos/online/xplsv_orsotheysay/)
+[![Or so they say...](http://mrdoob.github.com/three.js/assets/projects/07_orsotheysay.png)](http://xplsv.com/prods/demos/xplsv_orsotheysay/)
 [![Rat](http://mrdoob.github.com/three.js/assets/projects/06_rat.png)](http://tech.lab212.org/2010/07/export-textured-models-from-blender2-5-to-three-js/)
 [![Failure](http://mrdoob.github.com/three.js/assets/projects/05_failure.png)](http://www.is-real.net/experiments/three/failure/)
 [![Space Cannon 3D](http://mrdoob.github.com/three.js/assets/projects/02_spacecannon.png)](http://labs.brian-stoner.com/spacecannon/)
@@ -63,7 +87,7 @@ This code creates a camera, then creates a scene object, adds a bunch of random 
 
 			for (var i = 0; i < 1000; i++) {
 
-				var particle = new THREE.Particle( new THREE.ParticleCircleMaterial( Math.random() * 0x808008 + 0x808080, 1 ) );
+				var particle = new THREE.Particle( new THREE.ParticleCircleMaterial( { color: Math.random() * 0x808008 + 0x808080 } ) );
 				particle.position.x = Math.random() * 2000 - 1000;
 				particle.position.y = Math.random() * 2000 - 1000;
 				particle.position.z = Math.random() * 2000 - 1000;
@@ -89,56 +113,71 @@ This code creates a camera, then creates a scene object, adds a bunch of random 
 
 For creating a customised version of the library, including the source files in this order would be a good way to start:
 
-	<script type="text/javascript" src="js/three/Three.js"></script>
-	<script type="text/javascript" src="js/three/core/Color.js"></script>
-	<script type="text/javascript" src="js/three/core/Vector2.js"></script>
-	<script type="text/javascript" src="js/three/core/Vector3.js"></script>
-	<script type="text/javascript" src="js/three/core/Vector4.js"></script>
-	<script type="text/javascript" src="js/three/core/Rectangle.js"></script>
-	<script type="text/javascript" src="js/three/core/Matrix3.js"></script>
-	<script type="text/javascript" src="js/three/core/Matrix4.js"></script>
-	<script type="text/javascript" src="js/three/core/Vertex.js"></script>
-	<script type="text/javascript" src="js/three/core/Face3.js"></script>
-	<script type="text/javascript" src="js/three/core/Face4.js"></script>
-	<script type="text/javascript" src="js/three/core/UV.js"></script>
-	<script type="text/javascript" src="js/three/core/Geometry.js"></script>
-	<script type="text/javascript" src="js/three/cameras/Camera.js"></script>
-	<script type="text/javascript" src="js/three/lights/Light.js"></script>
-	<script type="text/javascript" src="js/three/lights/AmbientLight.js"></script>
-	<script type="text/javascript" src="js/three/lights/DirectionalLight.js"></script>
-	<script type="text/javascript" src="js/three/lights/PointLight.js"></script>
-	<script type="text/javascript" src="js/three/objects/Object3D.js"></script>
-	<script type="text/javascript" src="js/three/objects/Particle.js"></script>
-	<script type="text/javascript" src="js/three/objects/Line.js"></script>
-	<script type="text/javascript" src="js/three/objects/Mesh.js"></script>
-	<script type="text/javascript" src="js/three/materials/LineColorMaterial.js"></script>
-	<script type="text/javascript" src="js/three/materials/MeshPhongMaterial.js"></script>
-	<script type="text/javascript" src="js/three/materials/MeshBitmapMaterial.js"></script>
-	<script type="text/javascript" src="js/three/materials/MeshColorFillMaterial.js"></script>
-	<script type="text/javascript" src="js/three/materials/MeshColorStrokeMaterial.js"></script>
-	<script type="text/javascript" src="js/three/materials/MeshFaceMaterial.js"></script>
-	<script type="text/javascript" src="js/three/materials/ParticleBitmapMaterial.js"></script>
-	<script type="text/javascript" src="js/three/materials/ParticleCircleMaterial.js"></script>
-	<script type="text/javascript" src="js/three/scenes/Scene.js"></script>
-	<script type="text/javascript" src="js/three/renderers/Projector.js"></script>
-	<script type="text/javascript" src="js/three/renderers/DOMRenderer.js"></script>
-	<script type="text/javascript" src="js/three/renderers/CanvasRenderer.js"></script>
-	<script type="text/javascript" src="js/three/renderers/SVGRenderer.js"></script>
-	<script type="text/javascript" src="js/three/renderers/WebGLRenderer.js"></script>
-	<script type="text/javascript" src="js/three/renderers/renderables/RenderableFace3.js"></script>
-	<script type="text/javascript" src="js/three/renderers/renderables/RenderableFace4.js"></script>
-	<script type="text/javascript" src="js/three/renderers/renderables/RenderableParticle.js"></script>
-	<script type="text/javascript" src="js/three/renderers/renderables/RenderableLine.js"></script>
-
-
-### Contributors ###
-
-Thanks to the power of the internets (and github <3) these people have kindly helped out with the project.
-
-[alteredq](http://github.com/alteredq), [philogb](http://github.com/philogb), [supereggbert](http://github.com/supereggbert), [kikko](http://github.com/kikko), [kile](http://kile.stravaganza.org/), ...
+	<script type="text/javascript" src="../src/Three.js"></script>
+	<script type="text/javascript" src="../src/core/Color.js"></script>
+	<script type="text/javascript" src="../src/core/Vector2.js"></script>
+	<script type="text/javascript" src="../src/core/Vector3.js"></script>
+	<script type="text/javascript" src="../src/core/Vector4.js"></script>
+	<script type="text/javascript" src="../src/core/Ray.js"></script>
+	<script type="text/javascript" src="../src/core/Rectangle.js"></script>
+	<script type="text/javascript" src="../src/core/Matrix3.js"></script>
+	<script type="text/javascript" src="../src/core/Matrix4.js"></script>
+	<script type="text/javascript" src="../src/core/Vertex.js"></script>
+	<script type="text/javascript" src="../src/core/Face3.js"></script>
+	<script type="text/javascript" src="../src/core/Face4.js"></script>
+	<script type="text/javascript" src="../src/core/UV.js"></script>
+	<script type="text/javascript" src="../src/core/Geometry.js"></script>
+	<script type="text/javascript" src="../src/cameras/Camera.js"></script>
+	<script type="text/javascript" src="../src/lights/Light.js"></script>
+	<script type="text/javascript" src="../src/lights/AmbientLight.js"></script>
+	<script type="text/javascript" src="../src/lights/DirectionalLight.js"></script>
+	<script type="text/javascript" src="../src/lights/PointLight.js"></script>
+	<script type="text/javascript" src="../src/objects/Object3D.js"></script>
+	<script type="text/javascript" src="../src/objects/Mesh.js"></script>
+	<script type="text/javascript" src="../src/objects/Particle.js"></script>
+	<script type="text/javascript" src="../src/objects/Line.js"></script>
+	<script type="text/javascript" src="../src/materials/Material.js"></script>
+	<script type="text/javascript" src="../src/materials/LineBasicMaterial.js"></script>
+	<script type="text/javascript" src="../src/materials/MeshBasicMaterial.js"></script>
+	<script type="text/javascript" src="../src/materials/MeshLambertMaterial.js"></script>
+	<script type="text/javascript" src="../src/materials/MeshPhongMaterial.js"></script>
+	<script type="text/javascript" src="../src/materials/MeshDepthMaterial.js"></script>
+	<script type="text/javascript" src="../src/materials/MeshNormalMaterial.js"></script>
+	<script type="text/javascript" src="../src/materials/MeshFaceMaterial.js"></script>
+	<script type="text/javascript" src="../src/materials/ParticleBasicMaterial.js"></script>
+	<script type="text/javascript" src="../src/materials/ParticleCircleMaterial.js"></script>
+	<script type="text/javascript" src="../src/materials/textures/Texture.js"></script>
+	<script type="text/javascript" src="../src/scenes/Scene.js"></script>
+	<script type="text/javascript" src="../src/renderers/Projector.js"></script>
+	<script type="text/javascript" src="../src/renderers/CanvasRenderer.js"></script>
+	<script type="text/javascript" src="../src/renderers/SVGRenderer.js"></script>
+	<script type="text/javascript" src="../src/renderers/WebGLRenderer.js"></script>
+	<script type="text/javascript" src="../src/renderers/renderables/RenderableFace3.js"></script>
+	<script type="text/javascript" src="../src/renderers/renderables/RenderableFace4.js"></script>
+	<script type="text/javascript" src="../src/renderers/renderables/RenderableParticle.js"></script>
+	<script type="text/javascript" src="../src/renderers/renderables/RenderableLine.js"></script>
 
 
 ### Change Log ###
+
+2010 11 17 - **r29** (69.563 kb)
+
+* **New materials API** Still work in progress, but mostly there. ([alteredq](http://github.com/alteredq) & [mrdoob](http://github.com/mrdoob))
+* Line clipping in `CanvasRenderer` ([julianwa](http://github.com/julianwa))
+* Refactored `CanvasRenderer` and `SVGRenderer`. ([mrdoob](http://github.com/mrdoob))
+* Switched to Closure compiler.
+
+
+2010 11 04 - **r28** (62.802 kb)
+
+* `Loader` class allows load geometry asynchronously at runtime. ([alteredq](http://github.com/alteredq))
+* `MeshPhongMaterial` working with `WebGLRenderer`. ([alteredq](http://github.com/alteredq))
+* Support for *huge* objects. Max 500k polys and counting. ([alteredq](http://github.com/alteredq))
+* `Projector.unprojectVector` and `Ray` class to check intersections with faces (based on [mindlapse](https://github.com/mindlapse) work)
+* Fixed `Projector` z-sorting (not as jumpy anymore).
+* Fixed Orthographic projection (was y-inverted).
+* Hmmm.. lib file size starting to get too big...
+
 
 2010 10 28 - **r25** (54.480 kb)
 
@@ -154,7 +193,6 @@ Thanks to the power of the internets (and github <3) these people have kindly he
 * Added `PointLight`
 * `CanvasRenderer` and `SVGRenderer` basic lighting support (ColorStroke/ColorFill only)
 * `Renderer` > `Projector`. `CanvasRenderer`, `SVGRenderer` and `DOMRenderer` do not extend anymore
-* Interactivity base code (hdi folder). To be refactored... ([mindlapse](http://github.com/mindlapse))
 * Added `computeCentroids` method to `Geometry`
 
 

@@ -11,7 +11,6 @@ THREE.RenderableParticle = function () {
 	this.rotation = null;
 	this.scale = new THREE.Vector2();
 
-	this.color = null;
 	this.material = null;
 
 };

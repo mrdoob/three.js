@@ -60,7 +60,7 @@
 
 				// particles
 
-				material = new THREE.ParticleCircleMaterial(0xffffff, 1);
+				material = new THREE.ParticleCircleMaterial( { color: 0xffffff, opacity: 1 } );
 
 				for (var i = 0; i < 1000; i++) {
 
@@ -69,7 +69,7 @@
 					particle.position.y = Math.random() * 2 - 1;
 					particle.position.z = Math.random() * 2 - 1;
 					particle.position.normalize();
-					particle.position.multiplyScalar(Math.random() * 10 + 450);
+					particle.position.multiplyScalar( Math.random() * 10 + 450 );
 					scene.addObject( particle );
 
 				}
@@ -82,16 +82,16 @@
 
 					var vector = new THREE.Vector3( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 );
 					vector.normalize();
-					vector.multiplyScalar(450);
+					vector.multiplyScalar( 450 );
 
-					geometry.vertices.push(new THREE.Vertex(vector));
+					geometry.vertices.push( new THREE.Vertex( vector ) );
 
 					var vector2 = vector.clone();
-					vector2.multiplyScalar(Math.random() * 0.3 + 1);
+					vector2.multiplyScalar( Math.random() * 0.3 + 1 );
 
-					geometry.vertices.push(new THREE.Vertex(vector2));
+					geometry.vertices.push( new THREE.Vertex( vector2 ) );
 
-					var line = new THREE.Line( geometry, new THREE.LineColorMaterial( 0xffffff, Math.random() ) );
+					var line = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0xffffff, opacity: Math.random() } ) );
 					scene.addObject(line);
 				}
 
@@ -102,9 +102,9 @@
 				container.appendChild(stats.domElement);
 				*/
 
-				document.addEventListener('mousemove', onDocumentMouseMove, false);
-				document.addEventListener('touchstart', onDocumentTouchStart, false);
-				document.addEventListener('touchmove', onDocumentTouchMove, false);
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
+				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
 			}
 
 			//
@@ -121,8 +121,8 @@
 
 					event.preventDefault();
 
-					mouseX = event.touches[0].pageX - windowHalfX;
-					mouseY = event.touches[0].pageY - windowHalfY;
+					mouseX = event.touches[ 0 ].pageX - windowHalfX;
+					mouseY = event.touches[ 0 ].pageY - windowHalfY;
 				}
 			}
 
@@ -132,8 +132,8 @@
 
 					event.preventDefault();
 
-					mouseX = event.touches[0].pageX - windowHalfX;
-					mouseY = event.touches[0].pageY - windowHalfY;
+					mouseX = event.touches[ 0 ].pageX - windowHalfX;
+					mouseY = event.touches[ 0 ].pageY - windowHalfY;
 				}
 			}
 
@@ -141,11 +141,11 @@
 
 			function loop() {
 
-				camera.position.x += (mouseX - camera.position.x) * .05;
-				camera.position.y += (-mouseY + 200 - camera.position.y) * .05;
+				camera.position.x += ( mouseX - camera.position.x ) * .05;
+				camera.position.y += ( - mouseY + 200 - camera.position.y ) * .05;
 				camera.updateMatrix();
 
-				renderer.render(scene, camera);
+				renderer.render( scene, camera );
 
 				// stats.update();
 			}

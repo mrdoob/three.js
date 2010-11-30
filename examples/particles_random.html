@@ -24,24 +24,12 @@
 
 		<script type="text/javascript">
 
-			var SCREEN_WIDTH = window.innerWidth;
-			var SCREEN_HEIGHT = window.innerHeight;
-
-			var stats;
-			var container;
-
-			var particle;
-
-			var camera;
-			var scene;
-			var renderer;
-
-			var mouseX = 0;
-			var mouseY = 0;
+			var container, stats;
+			var camera, scene, renderer, particle;
+			var mouseX = 0, mouseY = 0;
 
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
-
 
 			init();
 			setInterval( loop, 1000 / 60 );
@@ -51,17 +39,17 @@
 				container = document.createElement('div');
 				document.body.appendChild(container);
 
-				camera = new THREE.Camera( 75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
+				camera = new THREE.Camera( 75, window.innerWidth / window.innerHeight, 1, 3000 );
 				camera.position.z = 1000;
 
 				scene = new THREE.Scene();
 
 				renderer = new THREE.CanvasRenderer();
-				renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				for (var i = 0; i < 1000; i++) {
+				for ( var i = 0; i < 1000; i++ ) {
 
-					particle = new THREE.Particle( new THREE.ParticleCircleMaterial( Math.random() * 0x808008 + 0x808080, 1 ) );
+					particle = new THREE.Particle( new THREE.ParticleCircleMaterial( { color: Math.random() * 0x808008 + 0x808080, opacity: 1 } ) );
 					particle.position.x = Math.random() * 2000 - 1000;
 					particle.position.y = Math.random() * 2000 - 1000;
 					particle.position.z = Math.random() * 2000 - 1000;
