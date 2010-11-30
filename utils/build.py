@@ -9,6 +9,7 @@ except ImportError:
 
 import os
 import tempfile
+import sys
 
 
 def merge(files):
@@ -375,7 +376,7 @@ def parse_args():
 	if ap:
 		parser = argparse.ArgumentParser(description='Build and compress Three.js')
 		parser.add_argument('--extras', help='Build ThreeExtras.js', action='store_const', const=True)
-		parser.add_argument('--full', help='Build Three.js', action='store_const', const=True, default=True)
+		parser.add_argument('--full', help='Build Three.js', action='store_const', const=True)
 		parser.add_argument('--canvas', help='Build ThreeCanvas.js', action='store_true')
 		parser.add_argument('--webgl', help='Build ThreeWebGL.js', action='store_true')
 		parser.add_argument('--svg', help='Build ThreeSVG.js', action='store_true')
@@ -388,7 +389,7 @@ def parse_args():
 	else:
 		parser = optparse.OptionParser(description='Build and compress Three.js')
 		parser.add_option('--extras', dest='extras', help='Build ThreeExtras.js', action='store_const', const=True)
-		parser.add_option('--full', dest='full', help='Build Three.js', action='store_const', const=True, default=True)
+		parser.add_option('--full', dest='full', help='Build Three.js', action='store_const', const=True)
 		parser.add_option('--canvas', dest='canvas', help='Build ThreeCanvas.js', action='store_true')
 		parser.add_option('--webgl', dest='webgl', help='Build ThreeWebGL.js', action='store_true')
 		parser.add_option('--svg', dest='svg', help='Build ThreeSVG.js', action='store_true')
@@ -397,6 +398,11 @@ def parse_args():
 		parser.add_option('--all', dest='all', help='Build all Three.js versions', action='store_true')
 
 		args, remainder = parser.parse_args()
+
+	# If no arguments have been passed, show the help message and exit
+	if len(sys.argv) == 1:
+		parser.print_help()
+		sys.exit(1)
 
 	return args
 
@@ -407,11 +413,11 @@ def main(argv=None):
 
 	debug = args.debug
 
-	if args.extras:
-		buildExtras(debug)
-
 	if args.full or args.all:
 		buildFull(debug)
+
+	if args.extras:
+		buildExtras(debug)
 
 	if args.canvas or args.all:
 		buildCanvas(debug)

@@ -4,7 +4,7 @@
  * parameters = {
  *  fragment_shader: <string>,
  *  vertex_shader: <string>,
- *  uniforms: [ "parameter1": value1, "parameter2": value2 ],
+ *  uniforms: { "parameter1": { type: "f", value: 1.0 }, "parameter2": { type: "i" value2: 2 } },
  
  *  shading: THREE.SmoothShading,
  *  blending: THREE.NormalBlending,
