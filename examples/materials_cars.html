@@ -466,7 +466,7 @@
 
 					if ( ! CARS[ car ].object ) {
 
-						$( "status" ).style.display = "block";
+						loader.statusDomElement.style.display = "block";
 						loader.loadBinary( CARS[ car ].url, function( geometry ) { createScene( geometry, car ) }, CARS[ car ].path );
 
 					} else {

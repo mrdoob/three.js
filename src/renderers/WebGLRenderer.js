@@ -27,7 +27,7 @@ THREE.WebGLRenderer = function ( scene ) {
 	_modelViewMatrixArray = new Float32Array(16), 
 	_projectionMatrixArray = new Float32Array(16), 
 	_normalMatrixArray = new Float32Array(9),
-	_objMatrixArray = new Float32Array(16),
+	_objectMatrixArray = new Float32Array(16),
 
 	// ubershader material constants
 	
@@ -332,7 +332,7 @@ THREE.WebGLRenderer = function ( scene ) {
 				
 				material.program = buildProgram( material.fragment_shader, material.vertex_shader );
 				
-				identifiers = [ 'viewMatrix', 'modelViewMatrix', 'projectionMatrix', 'normalMatrix', 'objMatrix', 'cameraPosition' ];
+				identifiers = [ 'viewMatrix', 'modelViewMatrix', 'projectionMatrix', 'normalMatrix', 'objectMatrix', 'cameraPosition' ];
 				for( u in material.uniforms ) identifiers.push(u);
 				cacheUniformLocations( material.program, identifiers );
 				cacheAttributeLocations( material.program );
@@ -740,7 +740,7 @@ THREE.WebGLRenderer = function ( scene ) {
 		_normalMatrix = THREE.Matrix4.makeInvert3x3( _modelViewMatrix ).transpose();
 		_normalMatrixArray.set( _normalMatrix.m );
 
-		_objMatrixArray.set( object.matrix.flatten() );
+		_objectMatrixArray.set( object.matrix.flatten() );
 	
 	};
 	
@@ -750,7 +750,7 @@ THREE.WebGLRenderer = function ( scene ) {
 		_gl.uniformMatrix4fv( program.uniforms.modelViewMatrix, false, _modelViewMatrixArray );
 		_gl.uniformMatrix4fv( program.uniforms.projectionMatrix, false, _projectionMatrixArray );
 		_gl.uniformMatrix3fv( program.uniforms.normalMatrix, false, _normalMatrixArray );
-		_gl.uniformMatrix4fv( program.uniforms.objMatrix, false, _objMatrixArray );
+		_gl.uniformMatrix4fv( program.uniforms.objectMatrix, false, _objectMatrixArray );
 		
 	};
 
@@ -1086,8 +1086,6 @@ THREE.WebGLRenderer = function ( scene ) {
 			"attribute vec3 normal;",
 			"attribute vec2 uv;",
 
-			"uniform vec3 cameraPosition;",
-
 			"uniform bool enableLighting;",
 			"uniform bool useRefract;",
 
@@ -1102,10 +1100,7 @@ THREE.WebGLRenderer = function ( scene ) {
 			maxPointLights ? "uniform vec3 pointLightColor[ MAX_POINT_LIGHTS ];"    : "",
 			maxPointLights ? "uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];" : "",
 
-			"uniform mat4 objMatrix;",
 			"uniform mat4 viewMatrix;",
-			"uniform mat4 modelViewMatrix;",
-			"uniform mat4 projectionMatrix;",
 			"uniform mat3 normalMatrix;",
 
 			"varying vec3 vNormal;",
@@ -1124,12 +1119,12 @@ THREE.WebGLRenderer = function ( scene ) {
 
 				// world space
 
-				"vec4 mPosition = objMatrix * vec4( position, 1.0 );",
+				"vec4 mPosition = objectMatrix * vec4( position, 1.0 );",
 				"vViewPosition = cameraPosition - mPosition.xyz;",
 
 				// this doesn't work on Mac
-				//"vec3 nWorld = mat3(objMatrix) * normal;",
-				"vec3 nWorld = mat3( objMatrix[0].xyz, objMatrix[1].xyz, objMatrix[2].xyz ) * normal;",
+				//"vec3 nWorld = mat3(objectMatrix) * normal;",
+				"vec3 nWorld = mat3( objectMatrix[0].xyz, objectMatrix[1].xyz, objectMatrix[2].xyz ) * normal;",
 
 				// eye space
 
@@ -1188,14 +1183,23 @@ THREE.WebGLRenderer = function ( scene ) {
 		
 		var program = _gl.createProgram(),
 		
-		prefix = [ "#ifdef GL_ES",
-				   "precision highp float;",
-				   "#endif",
-				   ""
-			     ].join("\n");
+		prefix_fragment = [
+			"#ifdef GL_ES",
+			"precision highp float;",
+			"#endif",
+			""
+		].join("\n"),
 
-		_gl.attachShader( program, getShader( "fragment", prefix + fragment_shader ) );
-		_gl.attachShader( program, getShader( "vertex", vertex_shader ) );
+		prefix_vertex = [
+			"uniform mat4 objectMatrix;",
+			"uniform mat4 modelViewMatrix;",
+			"uniform mat4 projectionMatrix;",
+			"uniform vec3 cameraPosition;",
+			""
+		].join("\n");
+		
+		_gl.attachShader( program, getShader( "fragment", prefix_fragment + fragment_shader ) );
+		_gl.attachShader( program, getShader( "vertex", prefix_vertex + vertex_shader ) );
 		
 		_gl.linkProgram( program );
 
@@ -1322,7 +1326,7 @@ THREE.WebGLRenderer = function ( scene ) {
 		// material properties (Basic / Lambert / Blinn-Phong shader)
 		// material properties (Depth)
 
-		cacheUniformLocations( _program, [ 'viewMatrix', 'modelViewMatrix', 'projectionMatrix', 'normalMatrix', 'objMatrix', 'cameraPosition',
+		cacheUniformLocations( _program, [ 'viewMatrix', 'modelViewMatrix', 'projectionMatrix', 'normalMatrix', 'objectMatrix', 'cameraPosition',
 										   'enableLighting', 'ambientLightColor',
 										   'material', 'mColor', 'mAmbient', 'mSpecular', 'mShininess', 'mOpacity',
 										   'enableMap', 'tMap',
