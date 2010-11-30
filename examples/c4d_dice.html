@@ -67,10 +67,7 @@
 				scene = new THREE.Scene();
 
 				//model
-				initBitmapMaterial('geometry/dice.gif');
-				geom = new Dice();
-				//geom.autoColor();
-				model = new THREE.Mesh( geom, material );
+				model = new THREE.Mesh( new Dice(), new THREE.MeshBasicMaterial( { map: loadImage( 'geometry/dice.gif' ) } ) );
 				model.rotation.x = Math.PI * .5;
 				model.scale = new THREE.Vector3(.75,.75,.75);
 				scene.addObject(model);
@@ -158,20 +155,16 @@
 				renderer.render(scene, camera);
 				stats.update();
 			}
-			function initBitmapMaterial(url) {
+			function loadImage( path ) {
 
-				texture = document.createElement( 'canvas' );
-				texture.width = 128;
-				texture.height = 128;
+				var image = document.createElement( 'img' );
+				var texture = new THREE.Texture( image, THREE.UVMapping )
 
-				material = new THREE.MeshBitmapMaterial( texture );
+				image.onload = function () { texture.loaded = true; };
+				image.src = path;
 
-				var temp = new Image();
-				temp.onload = function () {
-					material.bitmap = this;
-					renderer.render(scene, camera);
-				};
-				temp.src = url;
+				return texture;
+
 			}
 
 		</script>

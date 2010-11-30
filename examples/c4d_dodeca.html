@@ -67,7 +67,7 @@
 
 				//model
 				var geometry = new DodecaEdges();
-				for (var i = 0; i < geometry.faces.length; i++) geometry.faces[i].material = [ new THREE.MeshColorFillMaterial( Math.random() * 0xffffff, 1 ) ];
+				for (var i = 0; i < geometry.faces.length; i++) geometry.faces[i].material = [ new THREE.MeshBasicMaterial( {color:Math.random() * 0xffffff} ) ];
 				model = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial());
 				var s = 3;
 				model.scale = new THREE.Vector3(s,s,s);
@@ -79,10 +79,12 @@
 				model3 = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial());
 				model3.scale = new THREE.Vector3(s*3.2216,s*3.2216,s*3.2216);
 				
+				
+				
 				scene.addObject(model3);
 				scene.addObject(model2);
 				scene.addObject(model);
-
+				
 				renderer = new THREE.CanvasRenderer();
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 

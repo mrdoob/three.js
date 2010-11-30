@@ -134,7 +134,7 @@ def Export():
                
         code += '\n\tscope.autoColor = function(){\n'
         code += '\t\tfor(var s in this.selections){\n'
-        code += '\t\t\tfor(var i = 0 ; i < this.selections[s].length; i++) this.faces[this.selections[s][i]].material = [ new THREE.MeshColorFillMaterial( this.colors[s],1) ];\n'
+        code += '\t\t\tfor(var i = 0 ; i < this.selections[s].length; i++) this.faces[this.selections[s][i]].material = [new THREE.MeshBasicMaterial({color:this.colors[s]})];\n'
         code += '\t\t}\n\t}\n'
         
         # model position, rotation, scale               rotation x,y,z = H,P,B => three.js x,y,z is P,H,B => y,x,z

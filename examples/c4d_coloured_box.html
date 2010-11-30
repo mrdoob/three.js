@@ -69,7 +69,6 @@
 				scene = new THREE.Scene();
 
 				//model
-				initBitmapMaterial('geometry/Dice.jpg');
 				var geometry = new Box6();
 				geometry.autoColor();
 				model = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial());
@@ -158,21 +157,6 @@
 
 				renderer.render(scene, camera);
 				stats.update();
-			}
-			function initBitmapMaterial(url) {
-
-				texture = document.createElement( 'canvas' );
-				texture.width = 128;
-				texture.height = 128;
-
-				material = new THREE.MeshBitmapMaterial( texture );
-
-				var temp = new Image();
-				temp.onload = function () {
-					material.bitmap = this;
-					renderer.render(scene, camera);
-				};
-				temp.src = url;
 			}
 
 		</script>

@@ -912,44 +912,41 @@ var Nano = function ( urlbase ) {
     
     function create_material( m ) {
         var material;
-        
+        /*
         if( m.map_diffuse && urlbase ) {
             var texture = document.createElement( 'canvas' );
             
-            material = new THREE.MeshBitmapMaterial( texture );
-            var image = new Image();
+            // material = new THREE.MeshBitmapMaterial( texture );
+            material = new THREE.MeshBasicMaterial( { map: loadImage( urlbase ) }
             
-            image.onload = function () {
-                
-                if ( !is_pow2(this.width) || !is_pow2(this.height) ) {
-                
-                    var w = nearest_pow2( this.width );
-                    var h = nearest_pow2( this.height );
-                    material.bitmap.width = w;
-                    material.bitmap.height = h;
-                    material.bitmap.getContext("2d").drawImage( this, 0, 0, w, h );
-                }
-                else {
-                    material.bitmap = this;
-                }
-                material.loaded = 1;
-                
-            };
-            image.src = urlbase + "/" + m.map_diffuse;
+            function loadImage( path ) {
+
+        		var image = document.createElement( 'img' );
+        		var texture = new THREE.Texture( image, THREE.UVMapping )
+
+        		image.onload = function () { texture.loaded = true; };
+        		image.src = path;
+
+        		return texture;
+
+        	}
+            
         }
-        else if( m.col_diffuse ) {
+        else */
+        if( m.col_diffuse ) {
             var color = (m.col_diffuse[0]*255 << 16) + (m.col_diffuse[1]*255 << 8) + m.col_diffuse[2]*255;
-            material = new THREE.MeshColorFillMaterial( color, m.transparency );
+            material = new THREE.MeshBasicMaterial( {color:color, opacity:m.transparency} );
         }
         else if( m.a_dbg_color ) {
-            material = new THREE.MeshColorFillMaterial( m.a_dbg_color );
+            material = new THREE.MeshBasicMaterial( {color:m.a_dbg_color} );
         }
         else {
-            material = new THREE.MeshColorFillMaterial( 0xffeeeeee );
+            material = new THREE.MeshBasicMaterial( {color:0xffeeeeee} );
         }
 
         return material;
     }
+    
 }
 
 Nano.prototype = new THREE.Geometry();

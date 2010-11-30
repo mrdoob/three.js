@@ -32,7 +32,7 @@
 			var scene;
 			var renderer;
 
-			var model,material;
+			var model;
 
 			var targetRotation = 0;
 			var targetRotationOnMouseDown = 0;
@@ -68,10 +68,7 @@
 				scene = new THREE.Scene();
 				
 				//model
-				initBitmapMaterial('geometry/dice.gif');
-				var geom = new Dice249UV()
-				model = new THREE.Mesh( new Dice249UV(), material );
-				
+				model = new THREE.Mesh( new Dice249UV(), new THREE.MeshBasicMaterial( { map: loadImage( 'geometry/dice.gif' ) } ) );
 				model.rotation.x = Math.PI * .5;
 				model.rotation.z = Math.PI * .25;
 				model.scale = new THREE.Vector3(70,70,70);
@@ -161,20 +158,16 @@
 				renderer.render(scene, camera);
 				stats.update();
 			}
-			function initBitmapMaterial(url) {
+			function loadImage( path ) {
 
-				texture = document.createElement( 'canvas' );
-				texture.width = 128;
-				texture.height = 128;
+				var image = document.createElement( 'img' );
+				var texture = new THREE.Texture( image, THREE.UVMapping )
 
-				material = new THREE.MeshBitmapMaterial( texture );
+				image.onload = function () { texture.loaded = true; };
+				image.src = path;
 
-				var temp = new Image();
-				temp.onload = function () {
-					material.bitmap = this;
-					renderer.render(scene, camera);
-				};
-				temp.src = url;
+				return texture;
+
 			}
 
 		</script>

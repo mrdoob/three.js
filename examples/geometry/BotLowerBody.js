@@ -516,7 +516,7 @@ var BotLowerBody = function () {
 
 	scope.autoColor = function(){
 		for(var s in this.selections){
-			for(var i = 0 ; i < this.selections[s].length; i++) this.faces[this.selections[s][i]].material = [ new THREE.MeshColorFillMaterial( this.colors[s],1) ];
+			for(var i = 0 ; i < this.selections[s].length; i++) this.faces[this.selections[s][i]].material = [new THREE.MeshBasicMaterial({color:this.colors[s]})];
 		}
 	}
 
