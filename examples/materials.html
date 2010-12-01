@@ -110,7 +110,7 @@
 
 				// Spheres
 
-				var geometry = new Sphere( 100, 14, 8, false );
+				var geometry = new Sphere( 100, 14, 7, false );
 
 				var materials = [];
 				materials.push( { material: new THREE.MeshBasicMaterial( { color: 0x00ffff, wireframe: true } ), overdraw: false, doubleSided: true } );
@@ -121,6 +121,7 @@
 				// materials.push( { material: new THREE.MeshPhongMaterial( { ambient: 0x030383, color: 0xf55555, specular: 0x66f6f6, shininess: 10, shading: THREE.FlatShading } ), overdraw: true, doubleSided: false } );
 				materials.push( { material: new THREE.MeshDepthMaterial( { near: 1, far: 2000 } ), overdraw: true, doubleSided: false } );
 				materials.push( { material: new THREE.MeshNormalMaterial(), overdraw: true, doubleSided: false } );
+				materials.push( { material: new THREE.MeshBasicMaterial( { map: ImageUtils.loadTexture( 'textures/land_ocean_ice_cloud_2048.jpg', THREE.UVMapping ) } ), overdraw: false, doubleSided: false } );
 				materials.push( { material: new THREE.MeshLambertMaterial( { map: ImageUtils.loadTexture( 'textures/land_ocean_ice_cloud_2048.jpg', THREE.UVMapping ) } ), overdraw: false, doubleSided: false } );
 				materials.push( { material: new THREE.MeshBasicMaterial( { env_map: ImageUtils.loadTexture( 'textures/envmap.png', THREE.ReflectionMapping ) } ), overdraw: false, doubleSided: false } );
 
