@@ -60,6 +60,7 @@
 		<script type="text/javascript" src="../src/renderers/renderables/RenderableLine.js"></script>
 
 		<script type="text/javascript" src="../src/extras/primitives/Sphere.js"></script>
+		<script type="text/javascript" src="../src/extras/ImageUtils.js"></script>
 
 		<script type="text/javascript" src="js/Stats.js"></script>
 
@@ -132,7 +133,7 @@
 				objects = [];
 
 				geometry = new Sphere( 100, 16, 8 );
-				material = new THREE.MeshLambertMaterial( { color: 0xffffff, opacity: 1/*, shading: THREE.FlatShading*/ } );
+				material = new THREE.MeshBasicMaterial( { env_map: ImageUtils.loadTexture( 'textures/land_ocean_ice_cloud_2048.jpg', THREE.ReflectionMapping ) } );
 
 				for ( var i = 0; i < 10; i ++ ) {
 

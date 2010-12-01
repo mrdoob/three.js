@@ -461,7 +461,7 @@ THREE.CanvasRenderer = function () {
 
 		if ( material instanceof THREE.MeshBasicMaterial ) {
 
-			if ( material.map ) {
+			if ( material.map && material.map.loaded ) {
 
 				texturePath( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, material.map.image, element.uvs[ 0 ].u, element.uvs[ 0 ].v, element.uvs[ 1 ].u, element.uvs[ 1 ].v, element.uvs[ 2 ].u, element.uvs[ 2 ].v );
 
@@ -476,12 +476,11 @@ THREE.CanvasRenderer = function () {
 
 			}
 
-			/*
-			if ( material.env_map ) {
+			if ( material.env_map && material.env_map.loaded ) {
 
 				if ( material.env_map.mapping == THREE.ReflectionMapping ) {
 
-					
+					texturePath( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, material.env_map.image, element.vertexNormalsWorld[ 0 ].x * 0.5 + 0.5, element.vertexNormalsWorld[ 0 ].y * 0.5 + 0.5, element.vertexNormalsWorld[ 1 ].x * 0.5 + 0.5, element.vertexNormalsWorld[ 1 ].y * 0.5 + 0.5, element.vertexNormalsWorld[ 2 ].x * 0.5 + 0.5, element.vertexNormalsWorld[ 2 ].y * 0.5 + 0.5 );
 
 				} else if ( material.env_map.mapping == THREE.RefractionMapping ) {
 
@@ -490,7 +489,6 @@ THREE.CanvasRenderer = function () {
 				}
 
 			}
-			*/
 
 		} else if ( material instanceof THREE.MeshLambertMaterial ) {
 
