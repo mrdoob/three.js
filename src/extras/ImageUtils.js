@@ -1,5 +1,24 @@
 var ImageUtils = {
 
+	loadTexture: function ( path, mapping ) {
+
+		var texture = new THREE.Texture( null, mapping );
+
+		var image = new Image();
+
+		image.onload = function () {
+
+			texture.image = this;
+			texture.loaded = true;
+
+		};
+
+		image.src = path;
+
+		return texture;
+
+	},
+
 	loadArray: function ( array ) {
 
 		var i, l, images = [];
