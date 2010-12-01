@@ -445,26 +445,9 @@ THREE.WebGLRenderer = function ( scene ) {
 		
 		if ( mMap ) {
 
-			if ( !material.map.__webGLTexture && material.map.image.loaded ) {
-
-				material.map.__webGLTexture = _gl.createTexture();
-				_gl.bindTexture( _gl.TEXTURE_2D, material.map.__webGLTexture );
-				_gl.texImage2D( _gl.TEXTURE_2D, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, material.map.image );
-				
-				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_S, paramThreeToGL( material.map.wrap_s ) );
-				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_T, paramThreeToGL( material.map.wrap_t ) );
-				
-				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MAG_FILTER, _gl.LINEAR );
-				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, _gl.LINEAR_MIPMAP_LINEAR );
-				_gl.generateMipmap( _gl.TEXTURE_2D );
-				_gl.bindTexture( _gl.TEXTURE_2D, null );
-
-			}
-
-			_gl.activeTexture( _gl.TEXTURE0 );
-			_gl.bindTexture( _gl.TEXTURE_2D, material.map.__webGLTexture );
+			setTexture( mMap, 0 );
+			
 			_gl.uniform1i( program.uniforms.tMap,  0 );
-
 			_gl.uniform1i( program.uniforms.enableMap, 1 );
 
 		} else {
@@ -475,42 +458,9 @@ THREE.WebGLRenderer = function ( scene ) {
 
 		if ( envMap ) {
 
-			if ( material.env_map && material.env_map instanceof THREE.TextureCube &&
-			material.env_map.image.length == 6 ) {
-
-				if ( !material.env_map.image.__webGLTextureCube &&
-				!material.env_map.image.__cubeMapInitialized && material.env_map.image.loadCount == 6 ) {
-
-					material.env_map.image.__webGLTextureCube = _gl.createTexture();
-
-					_gl.bindTexture( _gl.TEXTURE_CUBE_MAP, material.env_map.image.__webGLTextureCube );
-
-					_gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_WRAP_S, _gl.CLAMP_TO_EDGE );
-					_gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_WRAP_T, _gl.CLAMP_TO_EDGE );
-
-					_gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MAG_FILTER, _gl.LINEAR );
-					_gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MIN_FILTER, _gl.LINEAR_MIPMAP_LINEAR );
-
-					 for ( var i = 0; i < 6; ++i ) {
-
-						_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, material.env_map.image[ i ] );
-
-					}
-
-					_gl.generateMipmap( _gl.TEXTURE_CUBE_MAP );
-
-					_gl.bindTexture( _gl.TEXTURE_CUBE_MAP, null );
-
-					material.env_map.image.__cubeMapInitialized = true;
-
-				}
-
-				_gl.activeTexture( _gl.TEXTURE1 );
-				_gl.bindTexture( _gl.TEXTURE_CUBE_MAP, material.env_map.image.__webGLTextureCube );
-				_gl.uniform1i( program.uniforms.tCube,  1 );
-
-			}
-
+			setCubeTexture( envMap, 1 );
+			
+			_gl.uniform1i( program.uniforms.tCube, 1 );
 			_gl.uniform1i( program.uniforms.enableCubeMap, 1 );
 
 		} else {
@@ -1241,39 +1191,14 @@ THREE.WebGLRenderer = function ( scene ) {
 				
 				texture = uniforms[u].texture;
 				
-				if ( texture instanceof THREE.TextureCube &&
-					 texture.image.length == 6 ) {
-
-					if ( !texture.image.__webGLTextureCube &&
-						 !texture.image.__cubeMapInitialized && texture.image.loadCount == 6 ) {
-
-						texture.image.__webGLTextureCube = _gl.createTexture();
-
-						_gl.bindTexture( _gl.TEXTURE_CUBE_MAP, texture.image.__webGLTextureCube );
-
-						_gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_WRAP_S, _gl.CLAMP_TO_EDGE );
-						_gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_WRAP_T, _gl.CLAMP_TO_EDGE );
-
-						_gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MAG_FILTER, _gl.LINEAR );
-						_gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MIN_FILTER, _gl.LINEAR_MIPMAP_LINEAR );
-
-						for ( var i = 0; i < 6; ++i ) {
-
-							_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, texture.image[ i ] );
-
-						}
-
-						_gl.generateMipmap( _gl.TEXTURE_CUBE_MAP );
-
-						_gl.bindTexture( _gl.TEXTURE_CUBE_MAP, null );
-
-						texture.image.__cubeMapInitialized = true;
-
-					}
-
-					_gl.activeTexture( _gl.TEXTURE1 );
-					_gl.bindTexture( _gl.TEXTURE_CUBE_MAP, texture.image.__webGLTextureCube );
-				
+				if ( texture instanceof THREE.TextureCube ) {
+					
+					setCubeTexture( texture, value );
+					
+				} else if ( texture instanceof THREE.Texture ) {
+					
+					setTexture( texture, value );
+					
 				}
 			
 			}
@@ -1282,6 +1207,68 @@ THREE.WebGLRenderer = function ( scene ) {
 		
 	};
 
+	function setCubeTexture( texture, slot ) {
+		
+		if ( texture instanceof THREE.TextureCube &&
+			 texture.image.length == 6 ) {
+
+			if ( !texture.image.__webGLTextureCube &&
+				 !texture.image.__cubeMapInitialized && texture.image.loadCount == 6 ) {
+
+				texture.image.__webGLTextureCube = _gl.createTexture();
+
+				_gl.bindTexture( _gl.TEXTURE_CUBE_MAP, texture.image.__webGLTextureCube );
+
+				_gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_WRAP_S, _gl.CLAMP_TO_EDGE );
+				_gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_WRAP_T, _gl.CLAMP_TO_EDGE );
+
+				_gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MAG_FILTER, _gl.LINEAR );
+				_gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MIN_FILTER, _gl.LINEAR_MIPMAP_LINEAR );
+
+				for ( var i = 0; i < 6; ++i ) {
+
+					_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, texture.image[ i ] );
+
+				}
+
+				_gl.generateMipmap( _gl.TEXTURE_CUBE_MAP );
+
+				_gl.bindTexture( _gl.TEXTURE_CUBE_MAP, null );
+
+				texture.image.__cubeMapInitialized = true;
+
+			}
+
+			_gl.activeTexture( _gl.TEXTURE0 + slot );
+			_gl.bindTexture( _gl.TEXTURE_CUBE_MAP, texture.image.__webGLTextureCube );
+		
+		}
+		
+	};
+	
+	function setTexture( texture, slot ) {
+		
+		if ( !texture.__webGLTexture && texture.image.loaded ) {
+
+			texture.__webGLTexture = _gl.createTexture();
+			_gl.bindTexture( _gl.TEXTURE_2D, texture.__webGLTexture );
+			_gl.texImage2D( _gl.TEXTURE_2D, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, texture.image );
+			
+			_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_S, paramThreeToGL( texture.wrap_s ) );
+			_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_T, paramThreeToGL( texture.wrap_t ) );
+			
+			_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MAG_FILTER, _gl.LINEAR );
+			_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, _gl.LINEAR_MIPMAP_LINEAR );
+			_gl.generateMipmap( _gl.TEXTURE_2D );
+			_gl.bindTexture( _gl.TEXTURE_2D, null );
+
+		}
+
+		_gl.activeTexture( _gl.TEXTURE0 + slot );
+		_gl.bindTexture( _gl.TEXTURE_2D, texture.__webGLTexture );
+		
+	};
+	
 	function cacheUniformLocations( program, identifiers ) {
 		
 		var i, l, id;
