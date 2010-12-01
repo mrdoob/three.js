@@ -30,6 +30,7 @@ THREE.CanvasRenderer = function () {
 	_2near, _farPlusNear, _farMinusNear,
 
 	_bitmap,
+	_uv1x, _uv1y, _uv2x, _uv2y, _uv3x, _uv3y,
 
 	_clipRect = new THREE.Rectangle(),
 	_clearRect = new THREE.Rectangle(),
@@ -470,23 +471,33 @@ THREE.CanvasRenderer = function () {
 				fillPath( material.color.__styleString );
 				*/
 
-			} else {
-
-				material.wireframe ? strokePath( material.color.__styleString, material.wireframe_linewidth ) : fillPath( material.color.__styleString );
-
-			}
-
-			if ( material.env_map && material.env_map.loaded ) {
+			} else if ( material.env_map && material.env_map.loaded ) {
 
 				if ( material.env_map.mapping == THREE.ReflectionMapping ) {
 
-					texturePath( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, material.env_map.image, element.vertexNormalsWorld[ 0 ].x * 0.5 + 0.5, element.vertexNormalsWorld[ 0 ].y * 0.5 + 0.5, element.vertexNormalsWorld[ 1 ].x * 0.5 + 0.5, element.vertexNormalsWorld[ 1 ].y * 0.5 + 0.5, element.vertexNormalsWorld[ 2 ].x * 0.5 + 0.5, element.vertexNormalsWorld[ 2 ].y * 0.5 + 0.5 );
+					_vector3.copy( element.vertexNormalsWorld[ 0 ] );
+					_uv1x = ( _vector3.x * camera.matrix.n11 + _vector3.y * camera.matrix.n12 + _vector3.z * camera.matrix.n13 ) * 0.5 + 0.5;
+					_uv1y = - ( _vector3.x * camera.matrix.n21 + _vector3.y * camera.matrix.n22 + _vector3.z * camera.matrix.n23 ) * 0.5 + 0.5;
+
+					_vector3.copy( element.vertexNormalsWorld[ 1 ] );
+					_uv2x = ( _vector3.x * camera.matrix.n11 + _vector3.y * camera.matrix.n12 + _vector3.z * camera.matrix.n13 ) * 0.5 + 0.5;
+					_uv2y = - ( _vector3.x * camera.matrix.n21 + _vector3.y * camera.matrix.n22 + _vector3.z * camera.matrix.n23 ) * 0.5 + 0.5;
+
+					_vector3.copy( element.vertexNormalsWorld[ 2 ] );
+					_uv3x = ( _vector3.x * camera.matrix.n11 + _vector3.y * camera.matrix.n12 + _vector3.z * camera.matrix.n13 ) * 0.5 + 0.5;
+					_uv3y = - ( _vector3.x * camera.matrix.n21 + _vector3.y * camera.matrix.n22 + _vector3.z * camera.matrix.n23 ) * 0.5 + 0.5;
+
+					texturePath( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, material.env_map.image, _uv1x, _uv1y, _uv2x, _uv2y, _uv3x, _uv3y );
 
 				}/* else if ( material.env_map.mapping == THREE.RefractionMapping ) {
 
 					
 
 				}*/
+
+			} else {
+
+				material.wireframe ? strokePath( material.color.__styleString, material.wireframe_linewidth ) : fillPath( material.color.__styleString );
 
 			}
 

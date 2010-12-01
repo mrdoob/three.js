@@ -34,11 +34,11 @@ THREE.Vector3.prototype = {
 
 	},
 
-	add: function ( v1, v2 ) {
+	add: function ( a, b ) {
 
-		this.x = v1.x + v2.x;
-		this.y = v1.y + v2.y;
-		this.z = v1.z + v2.z;
+		this.x = a.x + b.x;
+		this.y = a.y + b.y;
+		this.z = a.z + b.z;
 
 		return this;
 
@@ -64,11 +64,11 @@ THREE.Vector3.prototype = {
 
 	},
 
-	sub: function( v1, v2 ) {
+	sub: function( a, b ) {
 
-		this.x = v1.x - v2.x;
-		this.y = v1.y - v2.y;
-		this.z = v1.z - v2.z;
+		this.x = a.x - b.x;
+		this.y = a.y - b.y;
+		this.z = a.z - b.z;
 
 		return this;
 
@@ -84,11 +84,11 @@ THREE.Vector3.prototype = {
 
 	},
 
-	cross: function ( v1, v2 ) {
+	cross: function ( a, b ) {
 
-		this.x = v1.y * v2.z - v1.z * v2.y;
-		this.y = v1.z * v2.x - v1.x * v2.z;
-		this.z = v1.x * v2.y - v1.y * v2.x;
+		this.x = a.y * b.z - a.z * b.y;
+		this.y = a.z * b.x - a.x * b.z;
+		this.z = a.x * b.y - a.y * b.x;
 
 		return this;
 
@@ -101,6 +101,16 @@ THREE.Vector3.prototype = {
 		this.x = ty * v.z - tz * v.y;
 		this.y = tz * v.x - tx * v.z;
 		this.z = tx * v.y - ty * v.x;
+
+		return this;
+
+	},
+
+	multiply: function ( a, b ) {
+
+		this.x = a.x * b.x;
+		this.y = a.y * b.y;
+		this.z = a.z * b.z;
 
 		return this;
 
