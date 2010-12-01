@@ -482,11 +482,11 @@ THREE.CanvasRenderer = function () {
 
 					texturePath( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, material.env_map.image, element.vertexNormalsWorld[ 0 ].x * 0.5 + 0.5, element.vertexNormalsWorld[ 0 ].y * 0.5 + 0.5, element.vertexNormalsWorld[ 1 ].x * 0.5 + 0.5, element.vertexNormalsWorld[ 1 ].y * 0.5 + 0.5, element.vertexNormalsWorld[ 2 ].x * 0.5 + 0.5, element.vertexNormalsWorld[ 2 ].y * 0.5 + 0.5 );
 
-				} else if ( material.env_map.mapping == THREE.RefractionMapping ) {
+				}/* else if ( material.env_map.mapping == THREE.RefractionMapping ) {
 
 					
 
-				}
+				}*/
 
 			}
 

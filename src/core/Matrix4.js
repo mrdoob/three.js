@@ -52,13 +52,12 @@ THREE.Matrix4.prototype = {
 
 	transformVector3: function ( v ) {
 
-		var vx = v.x, vy = v.y, vz = v.z;
+		var vx = v.x, vy = v.y, vz = v.z,
+		d = 1 / ( this.n41 * vx + this.n42 * vy + this.n43 * vz + this.n44 );
 
-		v.x = this.n11 * vx + this.n12 * vy + this.n13 * vz + this.n14;
-		v.y = this.n21 * vx + this.n22 * vy + this.n23 * vz + this.n24;
-		v.z = this.n31 * vx + this.n32 * vy + this.n33 * vz + this.n34;
-
-		v.multiplyScalar( 1 / ( this.n41 * vx + this.n42 * vy + this.n43 * vz + this.n44 ) );
+		v.x = ( this.n11 * vx + this.n12 * vy + this.n13 * vz + this.n14 ) * d;
+		v.y = ( this.n21 * vx + this.n22 * vy + this.n23 * vz + this.n24 ) * d;
+		v.z = ( this.n31 * vx + this.n32 * vy + this.n33 * vz + this.n34 ) * d;
 
 		return v;
 
