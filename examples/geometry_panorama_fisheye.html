@@ -28,7 +28,7 @@
 	</head>
 	<body>
 
-		<div id="container"></div> 
+		<div id="container"></div>
 		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - panorama fisheye demo. cubemap by <a href="http://www.zfight.com/" target="_blank">Jochum Skoglund</a>. (mousewheel: change fov)</div>
 
 		<script type="text/javascript" src="../build/Three.js"></script>
@@ -99,7 +99,7 @@
 				document.addEventListener( 'mouseup', onDocumentMouseUp, false );
 				document.addEventListener( 'mousewheel', onDocumentMouseWheel, false );
 				document.addEventListener( 'DOMMouseScroll', onDocumentMouseWheel, false);
-				
+
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
 
@@ -109,16 +109,17 @@
 
 				var material = new THREE.MeshBasicMaterial( { map: new THREE.Texture( texture_placeholder, THREE.UVMapping ) } );
 
-				var texture = new Image();
+				var image = new Image();
 
-				texture.onload = function () {
+				image.onload = function () {
 
 					material.map.image = this;
+					material.map.loaded = true;
 					render();
 
 				};
 
-				texture.src = path;
+				image.src = path;
 
 				return material;
 			}
@@ -159,27 +160,27 @@
 			}
 
 			function onDocumentMouseWheel( event ) {
-				
+
 				// WebKit
-				
+
 				if ( event.wheelDeltaY ) {
-					
+
 					fov -= event.wheelDeltaY * 0.05;
-					
+
 				// Opera / Explorer 9
-				
+
 				} else if ( event.wheelDelta ) {
-					
+
 					fov -= event.wheelDelta * 0.05;
-					
+
 				// Firefox
-				
+
 				} else if ( event.detail ) {
-				
+
 					fov += event.detail * 1.0;
-				
+
 				}
-				
+
 				camera.projectionMatrix = THREE.Matrix4.makePerspective( fov, window.innerWidth / window.innerHeight, 1, 1100 );
 				render();
 

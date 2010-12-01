@@ -100,16 +100,17 @@
 
 				var material = new THREE.MeshBasicMaterial( { map: new THREE.Texture( texture_placeholder, THREE.UVMapping ) } );
 
-				var texture = new Image();
+				var image = new Image();
 
-				texture.onload = function () {
+				image.onload = function () {
 
 					material.map.image = this;
+					material.map.loaded = true;
 					render();
 
 				};
 
-				texture.src = path;
+				image.src = path;
 
 				return material;
 			}

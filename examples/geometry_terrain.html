@@ -68,8 +68,11 @@
 				scene = new THREE.Scene();
 
 				var heightMap = height( 1024, 1024 );
-				var textureMap = shadow( heightMap );
-				var material = new THREE.MeshBasicMaterial( { map: new THREE.Texture( textureMap, THREE.UVMapping ) } );
+
+				var texture = new THREE.Texture( shadow( heightMap ), THREE.UVMapping );
+				texture.loaded = true;
+
+				var material = new THREE.MeshBasicMaterial( { map: texture } );
 
 				var quality = 20;
 				var quality1 = quality + 1;
