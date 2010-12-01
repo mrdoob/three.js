@@ -84,6 +84,59 @@ def build(files, debug, outputFilename):
 	output(addHeader(compress(text), outputFilename), outputFilename)
 
 
+def buildCommon(debug):
+	files = [
+		'Three.js',
+		'core/Color.js',
+		'core/Vector2.js',
+		'core/Vector3.js',
+		'core/Vector4.js',
+		'core/Ray.js',
+		'core/Rectangle.js',
+		'core/Matrix3.js',
+		'core/Matrix4.js',
+		'core/Vertex.js',
+		'core/Face3.js',
+		'core/Face4.js',
+		'core/UV.js',
+		'core/Geometry.js',
+		'cameras/Camera.js',
+		'lights/Light.js',
+		'lights/AmbientLight.js',
+		'lights/DirectionalLight.js',
+		'lights/PointLight.js',
+		'objects/Object3D.js',
+		'objects/Particle.js',
+		'objects/Line.js',
+		'objects/Mesh.js',
+		'materials/Material.js',
+		'materials/LineBasicMaterial.js',
+		'materials/MeshBasicMaterial.js',
+		'materials/MeshLambertMaterial.js',
+		'materials/MeshPhongMaterial.js',
+		'materials/MeshDepthMaterial.js',
+		'materials/MeshNormalMaterial.js',
+		'materials/MeshFaceMaterial.js',
+		'materials/MeshCubeMaterial.js',
+		'materials/MeshShaderMaterial.js',
+		'materials/ParticleBasicMaterial.js',
+		'materials/ParticleCircleMaterial.js',
+		'materials/ParticleDOMMaterial.js',
+		'materials/textures/Texture.js',
+		'materials/textures/TextureCube.js',
+		'scenes/Scene.js',
+		'renderers/Projector.js',
+		'renderers/DOMRenderer.js',
+		'renderers/CanvasRenderer.js',
+		'renderers/SVGRenderer.js',
+		'renderers/WebGLRenderer.js',
+		'renderers/renderables/RenderableFace3.js',
+		'renderers/renderables/RenderableParticle.js',
+		'renderers/renderables/RenderableLine.js'
+	]
+
+	build(files, debug, 'Three')
+
 def buildExtras(debug):
 	files = [
 		'Three.js',
@@ -145,60 +198,6 @@ def buildExtras(debug):
 	]
 
 	build(files, debug, 'ThreeExtras')
-
-def buildFull(debug):
-	files = [
-		'Three.js',
-		'core/Color.js',
-		'core/Vector2.js',
-		'core/Vector3.js',
-		'core/Vector4.js',
-		'core/Ray.js',
-		'core/Rectangle.js',
-		'core/Matrix3.js',
-		'core/Matrix4.js',
-		'core/Vertex.js',
-		'core/Face3.js',
-		'core/Face4.js',
-		'core/UV.js',
-		'core/Geometry.js',
-		'cameras/Camera.js',
-		'lights/Light.js',
-		'lights/AmbientLight.js',
-		'lights/DirectionalLight.js',
-		'lights/PointLight.js',
-		'objects/Object3D.js',
-		'objects/Particle.js',
-		'objects/Line.js',
-		'objects/Mesh.js',
-		'materials/Material.js',
-		'materials/LineBasicMaterial.js',
-		'materials/MeshBasicMaterial.js',
-		'materials/MeshLambertMaterial.js',
-		'materials/MeshPhongMaterial.js',
-		'materials/MeshDepthMaterial.js',
-		'materials/MeshNormalMaterial.js',
-		'materials/MeshFaceMaterial.js',
-		'materials/MeshCubeMaterial.js',
-		'materials/MeshShaderMaterial.js',
-		'materials/ParticleBasicMaterial.js',
-		'materials/ParticleCircleMaterial.js',
-		'materials/ParticleDOMMaterial.js',
-		'materials/textures/Texture.js',
-		'materials/textures/TextureCube.js',
-		'scenes/Scene.js',
-		'renderers/Projector.js',
-		'renderers/DOMRenderer.js',
-		'renderers/CanvasRenderer.js',
-		'renderers/SVGRenderer.js',
-		'renderers/WebGLRenderer.js',
-		'renderers/renderables/RenderableFace3.js',
-		'renderers/renderables/RenderableParticle.js',
-		'renderers/renderables/RenderableLine.js'
-	]
-
-	build(files, debug, 'Three')
-
 
 def buildCanvas(debug):
 
@@ -375,8 +374,8 @@ def parse_args():
 
 	if ap:
 		parser = argparse.ArgumentParser(description='Build and compress Three.js')
+		parser.add_argument('--common', help='Build Three.js', action='store_const', const=True)
 		parser.add_argument('--extras', help='Build ThreeExtras.js', action='store_const', const=True)
-		parser.add_argument('--full', help='Build Three.js', action='store_const', const=True)
 		parser.add_argument('--canvas', help='Build ThreeCanvas.js', action='store_true')
 		parser.add_argument('--webgl', help='Build ThreeWebGL.js', action='store_true')
 		parser.add_argument('--svg', help='Build ThreeSVG.js', action='store_true')
@@ -388,8 +387,8 @@ def parse_args():
 
 	else:
 		parser = optparse.OptionParser(description='Build and compress Three.js')
+		parser.add_option('--common', dest='common', help='Build Three.js', action='store_const', const=True)
 		parser.add_option('--extras', dest='extras', help='Build ThreeExtras.js', action='store_const', const=True)
-		parser.add_option('--full', dest='full', help='Build Three.js', action='store_const', const=True)
 		parser.add_option('--canvas', dest='canvas', help='Build ThreeCanvas.js', action='store_true')
 		parser.add_option('--webgl', dest='webgl', help='Build ThreeWebGL.js', action='store_true')
 		parser.add_option('--svg', dest='svg', help='Build ThreeSVG.js', action='store_true')
@@ -413,8 +412,8 @@ def main(argv=None):
 
 	debug = args.debug
 
-	if args.full or args.all:
-		buildFull(debug)
+	if args.common or args.all:
+		buildCommon(debug)
 
 	if args.extras:
 		buildExtras(debug)

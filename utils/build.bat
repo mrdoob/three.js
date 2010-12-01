@@ -1,3 +1,3 @@
-python build.py --full
+python build.py --common
+python build.py --common --debug
 python build.py --extras
-python build.py --full --debug
