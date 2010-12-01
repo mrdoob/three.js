@@ -445,26 +445,9 @@ THREE.WebGLRenderer = function ( scene ) {
 		
 		if ( mMap ) {
 
-			if ( !material.map.__webGLTexture && material.map.image.loaded ) {
-
-				material.map.__webGLTexture = _gl.createTexture();
-				_gl.bindTexture( _gl.TEXTURE_2D, material.map.__webGLTexture );
-				_gl.texImage2D( _gl.TEXTURE_2D, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, material.map.image );
-				
-				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_S, paramThreeToGL( material.map.wrap_s ) );
-				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_T, paramThreeToGL( material.map.wrap_t ) );
-				
-				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MAG_FILTER, _gl.LINEAR );
-				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, _gl.LINEAR_MIPMAP_LINEAR );
-				_gl.generateMipmap( _gl.TEXTURE_2D );
-				_gl.bindTexture( _gl.TEXTURE_2D, null );
-
-			}
-
-			_gl.activeTexture( _gl.TEXTURE0 );
-			_gl.bindTexture( _gl.TEXTURE_2D, material.map.__webGLTexture );
+			setTexture( mMap, 0 );
+			
 			_gl.uniform1i( program.uniforms.tMap,  0 );
-
 			_gl.uniform1i( program.uniforms.enableMap, 1 );
 
 		} else {
@@ -475,14 +458,9 @@ THREE.WebGLRenderer = function ( scene ) {
 
 		if ( envMap ) {
 
-			if ( material.env_map ) {
-
-				setCubeTexture( material.env_map, 1 );
-				
-				_gl.uniform1i( program.uniforms.tCube, 1 );
-
-			}
-
+			setCubeTexture( envMap, 1 );
+			
+			_gl.uniform1i( program.uniforms.tCube, 1 );
 			_gl.uniform1i( program.uniforms.enableCubeMap, 1 );
 
 		} else {
@@ -1212,7 +1190,16 @@ THREE.WebGLRenderer = function ( scene ) {
 				_gl.uniform1i( location, value );
 				
 				texture = uniforms[u].texture;
-				setCubeTexture( texture, value );
+				
+				if ( texture instanceof THREE.TextureCube ) {
+					
+					setCubeTexture( texture, value );
+					
+				} else if ( texture instanceof THREE.Texture ) {
+					
+					setTexture( texture, value );
+					
+				}
 			
 			}
 			
@@ -1256,6 +1243,29 @@ THREE.WebGLRenderer = function ( scene ) {
 			_gl.bindTexture( _gl.TEXTURE_CUBE_MAP, texture.image.__webGLTextureCube );
 		
 		}
+		
+	};
+	
+	function setTexture( texture, slot ) {
+		
+		if ( !texture.__webGLTexture && texture.image.loaded ) {
+
+			texture.__webGLTexture = _gl.createTexture();
+			_gl.bindTexture( _gl.TEXTURE_2D, texture.__webGLTexture );
+			_gl.texImage2D( _gl.TEXTURE_2D, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, texture.image );
+			
+			_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_S, paramThreeToGL( texture.wrap_s ) );
+			_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_T, paramThreeToGL( texture.wrap_t ) );
+			
+			_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MAG_FILTER, _gl.LINEAR );
+			_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, _gl.LINEAR_MIPMAP_LINEAR );
+			_gl.generateMipmap( _gl.TEXTURE_2D );
+			_gl.bindTexture( _gl.TEXTURE_2D, null );
+
+		}
+
+		_gl.activeTexture( _gl.TEXTURE0 + slot );
+		_gl.bindTexture( _gl.TEXTURE_2D, texture.__webGLTexture );
 		
 	};
 	
