@@ -993,7 +993,7 @@ THREE.WebGLRenderer = function ( scene ) {
 
 				"} else if ( material == 1 ) {",
 
-				"if ( mixEnvMap ) {",
+					"if ( mixEnvMap ) {",
 
 						"gl_FragColor = vec4( mix( mColor.rgb * mapColor.rgb * vLightWeighting, cubeColor.rgb, mReflectivity ), mColor.a * mapColor.a );",
 
@@ -1028,8 +1028,6 @@ THREE.WebGLRenderer = function ( scene ) {
 	function generateVertexShader( maxDirLights, maxPointLights ) {
 
 		var chunks = [
-
-
 
 			maxDirLights   ? "#define MAX_DIR_LIGHTS " + maxDirLights     : "",
 			maxPointLights ? "#define MAX_POINT_LIGHTS " + maxPointLights : "",
