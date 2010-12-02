@@ -245,6 +245,7 @@ THREE.Loader.prototype = {
 
 			this.computeCentroids();
 			this.computeNormals();
+			this.sortFacesByMaterial();
 
 			//var e = (new Date).getTime();
 
@@ -706,6 +707,7 @@ THREE.Loader.prototype = {
 
 			this.computeCentroids();
 			this.computeNormals();
+			this.sortFacesByMaterial();
 
 			function init_vertices() {
 

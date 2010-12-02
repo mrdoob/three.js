@@ -66,10 +66,6 @@
 
 				}
 
-				// Spheres
-
-				var geometry1 = new Sphere( 70, 32, 16, true );
-
 				var generatedTexture = new THREE.Texture( generateTexture() );
 				generatedTexture.image.loaded = 1;
 
@@ -89,13 +85,15 @@
 				materials.push( { material: new THREE.MeshBasicMaterial( { map: generatedTexture } ), overdraw: true, doubleSided: false } );
 				materials.push( { material: new THREE.MeshLambertMaterial( { map: generatedTexture } ), overdraw: true, doubleSided: false } );
 
-				// Extra mesh to be broken down for MeshFaceMaterial
-				
-				var geometry2 = new Sphere( 70, 32, 16, true );
-				
-				for ( var i = 0, l = geometry2.faces.length; i < l; i ++ ) {
+				// Spheres geometry
 
-					var face = geometry2.faces[ i ];
+				var geometry_smooth = new Sphere( 70, 32, 16, true );
+				var geometry_flat = new Sphere( 70, 32, 16, false );
+				var geometry_pieces = new Sphere( 70, 32, 16, true ); // Extra geometry to be broken down for MeshFaceMaterial
+				
+				for ( var i = 0, l = geometry_pieces.faces.length; i < l; i ++ ) {
+
+					var face = geometry_pieces.faces[ i ];
 					if ( Math.random() > 0.7 ) face.material = [ materials[ Math.floor( Math.random() * materials.length )  ].material ];
 
 				}
@@ -104,16 +102,19 @@
 
 				objects = [];
 
-				var sphere, geometry;
+				var sphere, geometry, material;
 				
 				for ( var i = 0, l = materials.length; i < l; i ++ ) {
 				
-					geometry = materials[ i ].material instanceof THREE.MeshFaceMaterial ? geometry2 : geometry1;
-						
-					sphere = new THREE.Mesh( geometry, materials[ i ].material );
+					material = materials[ i ].material;
 					
-					sphere.overdraw = materials[ i ].overdraw;
-					sphere.doubleSided = materials[ i ].doubleSided;
+					geometry = material instanceof THREE.MeshFaceMaterial ? geometry_pieces : 
+							   ( material.shading == THREE.FlatShading ? geometry_flat : geometry_smooth );
+					
+					sphere = new THREE.Mesh( geometry, material );
+					
+					sphere.overdraw = material.overdraw;
+					sphere.doubleSided = material.doubleSided;
 
 					sphere.position.x = ( i % 4 ) * 200 - 400;
 					sphere.position.z = Math.floor( i / 4 ) * 200 - 200;

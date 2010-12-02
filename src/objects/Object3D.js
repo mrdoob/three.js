@@ -4,6 +4,8 @@
 
 THREE.Object3D = function ( material ) {
 
+	this.id = THREE.Object3DCounter.value ++;
+
 	this.position = new THREE.Vector3();
 	this.rotation = new THREE.Vector3();
 	this.scale = new THREE.Vector3( 1, 1, 1 );
@@ -35,3 +37,5 @@ THREE.Object3D = function ( material ) {
 	};
 
 };
+
+THREE.Object3DCounter = { value: 0 };

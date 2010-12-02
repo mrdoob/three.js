@@ -158,6 +158,7 @@ var Cube = function ( width, height, depth, segments_width, segments_height, mat
 
 	this.computeCentroids();
 	this.computeNormals();
+	this.sortFacesByMaterial();
 
 }
 

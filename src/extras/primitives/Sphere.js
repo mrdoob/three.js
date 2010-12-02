@@ -105,6 +105,8 @@ var Sphere = function ( radius, segments_width, segments_height ) {
 
 	this.computeCentroids();
 	this.computeNormals();
+	this.sortFacesByMaterial();
+
 }
 
 Sphere.prototype = new THREE.Geometry();
