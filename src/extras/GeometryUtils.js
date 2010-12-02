@@ -43,12 +43,17 @@ var GeometryUtils = {
 
 			}
 
+			faceCopy.centroid.copy( face.centroid );
+			faceCopy.normal.copy( face.normal );
+
 			for ( var j = 0, jl = faceVertexNormals.length; j < jl; j ++ ) {
 
 				normal = faceVertexNormals[ j ];
 				faceCopy.vertexNormals.push( normal.clone() );
 
 			}
+
+			faceCopy.material = face.material.slice();
 
 			faces1.push( faceCopy );
 
