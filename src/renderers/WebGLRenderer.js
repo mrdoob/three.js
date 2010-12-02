@@ -155,7 +155,7 @@ THREE.WebGLRenderer = function ( scene ) {
 
 	};
 	
-	this.createBuffers = function ( object, mf ) {
+	this.createBuffers = function ( object, g ) {
 
 		var f, fl, fi, face, vertexNormals, normal, uv, v1, v2, v3, v4, m, ml, i,
 
@@ -168,13 +168,13 @@ THREE.WebGLRenderer = function ( scene ) {
 
 		vertexIndex = 0,
 
-		materialFaceGroup = object.materialFaceGroup[ mf ],
+		geometryChunk = object.geometry.geometryChunks[ g ],
 
-		needsSmoothNormals = bufferNeedsSmoothNormals ( materialFaceGroup, object );
+		needsSmoothNormals = bufferNeedsSmoothNormals ( geometryChunk, object );
 
-		for ( f = 0, fl = materialFaceGroup.faces.length; f < fl; f++ ) {
+		for ( f = 0, fl = geometryChunk.faces.length; f < fl; f++ ) {
 
-			fi = materialFaceGroup.faces[f];
+			fi = geometryChunk.faces[ f ];
 
 			face = object.geometry.faces[ fi ];
 			vertexNormals = face.vertexNormals;
@@ -283,6 +283,7 @@ THREE.WebGLRenderer = function ( scene ) {
 				vertexIndex += 4;
 
 			}
+			
 		}
 
 		if ( !vertexArray.length ) {
@@ -291,32 +292,32 @@ THREE.WebGLRenderer = function ( scene ) {
 
 		}
 
-		materialFaceGroup.__webGLVertexBuffer = _gl.createBuffer();
-		_gl.bindBuffer( _gl.ARRAY_BUFFER, materialFaceGroup.__webGLVertexBuffer );
+		geometryChunk.__webGLVertexBuffer = _gl.createBuffer();
+		_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLVertexBuffer );
 		_gl.bufferData( _gl.ARRAY_BUFFER, new Float32Array( vertexArray ), _gl.STATIC_DRAW );
 
-		materialFaceGroup.__webGLNormalBuffer = _gl.createBuffer();
-		_gl.bindBuffer( _gl.ARRAY_BUFFER, materialFaceGroup.__webGLNormalBuffer );
+		geometryChunk.__webGLNormalBuffer = _gl.createBuffer();
+		_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLNormalBuffer );
 		_gl.bufferData( _gl.ARRAY_BUFFER, new Float32Array( normalArray ), _gl.STATIC_DRAW );
 
-		materialFaceGroup.__webGLUVBuffer = _gl.createBuffer();
-		_gl.bindBuffer( _gl.ARRAY_BUFFER, materialFaceGroup.__webGLUVBuffer );
+		geometryChunk.__webGLUVBuffer = _gl.createBuffer();
+		_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLUVBuffer );
 		_gl.bufferData( _gl.ARRAY_BUFFER, new Float32Array( uvArray ), _gl.STATIC_DRAW );
 
-		materialFaceGroup.__webGLFaceBuffer = _gl.createBuffer();
-		_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, materialFaceGroup.__webGLFaceBuffer );
+		geometryChunk.__webGLFaceBuffer = _gl.createBuffer();
+		_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryChunk.__webGLFaceBuffer );
 		_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, new Uint16Array( faceArray ), _gl.STATIC_DRAW );
 
-		materialFaceGroup.__webGLLineBuffer = _gl.createBuffer();
-		_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, materialFaceGroup.__webGLLineBuffer );
+		geometryChunk.__webGLLineBuffer = _gl.createBuffer();
+		_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryChunk.__webGLLineBuffer );
 		_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, new Uint16Array( lineArray ), _gl.STATIC_DRAW );
 
-		materialFaceGroup.__webGLFaceCount = faceArray.length;
-		materialFaceGroup.__webGLLineCount = lineArray.length;
+		geometryChunk.__webGLFaceCount = faceArray.length;
+		geometryChunk.__webGLLineCount = lineArray.length;
 
 	};
 
-	this.renderBuffer = function ( camera, material, materialFaceGroup ) {
+	this.renderBuffer = function ( camera, material, geometryChunk ) {
 
 		var mColor, mOpacity, mReflectivity,
 			mWireframe, mLineWidth, mBlending,
@@ -355,6 +356,9 @@ THREE.WebGLRenderer = function ( scene ) {
 		}
 			
 		if ( material instanceof THREE.MeshShaderMaterial ) {
+			
+			mWireframe = material.wireframe;
+			mLineWidth = material.wireframe_linewidth;
 			
 			setUniforms( program, material.uniforms );
 			this.loadCamera( program, camera );
@@ -471,19 +475,19 @@ THREE.WebGLRenderer = function ( scene ) {
 
 		// vertices
 
-		_gl.bindBuffer( _gl.ARRAY_BUFFER, materialFaceGroup.__webGLVertexBuffer );
+		_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLVertexBuffer );
 		_gl.vertexAttribPointer( program.position, 3, _gl.FLOAT, false, 0, 0 );
 
 		// normals
 
-		_gl.bindBuffer( _gl.ARRAY_BUFFER, materialFaceGroup.__webGLNormalBuffer );
+		_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLNormalBuffer );
 		_gl.vertexAttribPointer( program.normal, 3, _gl.FLOAT, false, 0, 0 );
 
 		// uvs
 
 		if ( mMap ) {
 
-			_gl.bindBuffer( _gl.ARRAY_BUFFER, materialFaceGroup.__webGLUVBuffer );
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLUVBuffer );
 
 			_gl.enableVertexAttribArray( program.uv );
 			_gl.vertexAttribPointer( program.uv, 2, _gl.FLOAT, false, 0, 0 );
@@ -498,22 +502,22 @@ THREE.WebGLRenderer = function ( scene ) {
 
 		if ( ! mWireframe ) {
 
-			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, materialFaceGroup.__webGLFaceBuffer );
-			_gl.drawElements( _gl.TRIANGLES, materialFaceGroup.__webGLFaceCount, _gl.UNSIGNED_SHORT, 0 );
+			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryChunk.__webGLFaceBuffer );
+			_gl.drawElements( _gl.TRIANGLES, geometryChunk.__webGLFaceCount, _gl.UNSIGNED_SHORT, 0 );
 
 		// render lines
 
 		} else {
 
 			_gl.lineWidth( mLineWidth );
-			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, materialFaceGroup.__webGLLineBuffer );
-			_gl.drawElements( _gl.LINES, materialFaceGroup.__webGLLineCount, _gl.UNSIGNED_SHORT, 0 );
+			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryChunk.__webGLLineBuffer );
+			_gl.drawElements( _gl.LINES, geometryChunk.__webGLLineCount, _gl.UNSIGNED_SHORT, 0 );
 
 		}
 
 	};
 
-	this.renderPass = function ( camera, object, materialFaceGroup, blending, transparent ) {
+	this.renderPass = function ( camera, object, geometryChunk, blending, transparent ) {
 
 		var i, l, m, ml, material, meshMaterial;
 
@@ -523,13 +527,13 @@ THREE.WebGLRenderer = function ( scene ) {
 
 			if ( meshMaterial instanceof THREE.MeshFaceMaterial ) {
 
-				for ( i = 0, l = materialFaceGroup.material.length; i < l; i++ ) {
+				for ( i = 0, l = geometryChunk.material.length; i < l; i++ ) {
 
-					material = materialFaceGroup.material[ i ];
+					material = geometryChunk.material[ i ];
 					if ( material && material.blending == blending && ( material.opacity < 1.0 == transparent ) ) {
 
 						this.setBlending( material.blending );
-						this.renderBuffer( camera, material, materialFaceGroup );
+						this.renderBuffer( camera, material, geometryChunk );
 
 					}
 
@@ -541,7 +545,7 @@ THREE.WebGLRenderer = function ( scene ) {
 				if ( material && material.blending == blending && ( material.opacity < 1.0 == transparent ) ) {
 
 					this.setBlending( material.blending );
-					this.renderBuffer( camera, material, materialFaceGroup );
+					this.renderBuffer( camera, material, geometryChunk );
 					
 				}
 
@@ -553,7 +557,7 @@ THREE.WebGLRenderer = function ( scene ) {
 	
 	this.render = function( scene, camera ) {
 
-		var o, ol;
+		var o, ol, webGLObject, object, buffer;
 
 		this.initWebGLObjects( scene );
 
@@ -574,11 +578,14 @@ THREE.WebGLRenderer = function ( scene ) {
 
 			webGLObject = scene.__webGLObjects[ o ];
 			
-			if ( webGLObject.__object.visible ) {
+			object = webGLObject.object;
+			buffer = webGLObject.buffer;
+			
+			if ( object.visible ) {
 
-				this.setupMatrices( webGLObject.__object, camera );
+				this.setupMatrices( object, camera );
 				this.loadMatrices( _program );
-				this.renderPass( camera, webGLObject.__object, webGLObject, THREE.NormalBlending, false );
+				this.renderPass( camera, object, buffer, THREE.NormalBlending, false );
 				
 			}
 
@@ -590,24 +597,27 @@ THREE.WebGLRenderer = function ( scene ) {
 
 			webGLObject = scene.__webGLObjects[ o ];
 
-			if ( webGLObject.__object.visible ) {
+			object = webGLObject.object;
+			buffer = webGLObject.buffer;
+			
+			if ( object.visible ) {
 				
-				this.setupMatrices( webGLObject.__object, camera );
+				this.setupMatrices( object, camera );
 				this.loadMatrices( _program );
 
 				// opaque blended materials
 				
-				this.renderPass( camera, webGLObject.__object, webGLObject, THREE.AdditiveBlending, false );
-				this.renderPass( camera, webGLObject.__object, webGLObject, THREE.SubtractiveBlending, false );
+				this.renderPass( camera, object, buffer, THREE.AdditiveBlending, false );
+				this.renderPass( camera, object, buffer, THREE.SubtractiveBlending, false );
 				
 				// transparent blended materials
 				
-				this.renderPass( camera, webGLObject.__object, webGLObject, THREE.AdditiveBlending, true );
-				this.renderPass( camera, webGLObject.__object, webGLObject, THREE.SubtractiveBlending, true );
+				this.renderPass( camera, object, buffer, THREE.AdditiveBlending, true );
+				this.renderPass( camera, object, buffer, THREE.SubtractiveBlending, true );
 
 				// transparent normal materials
 				
-				this.renderPass( camera, webGLObject.__object, webGLObject, THREE.NormalBlending, true );
+				this.renderPass( camera, object, buffer, THREE.NormalBlending, true );
 				
 			}
 
@@ -617,11 +627,12 @@ THREE.WebGLRenderer = function ( scene ) {
 
 	this.initWebGLObjects = function( scene ) {
 
-		var o, ol, object, mf, materialFaceGroup;
+		var o, ol, object, globject, g, geometryChunk, objmap;
 
 		if ( !scene.__webGLObjects ) {
 
 			scene.__webGLObjects = [];
+			scene.__webGLObjectsMap = {};
 
 		}
 
@@ -629,22 +640,39 @@ THREE.WebGLRenderer = function ( scene ) {
 
 			object = scene.objects[ o ];
 
+			if ( scene.__webGLObjectsMap[ object.id ] == undefined ) {
+				
+				scene.__webGLObjectsMap[ object.id ] = {};
+				
+			}
+			
+			objmap = scene.__webGLObjectsMap[ object.id ];
+			
 			if ( object instanceof THREE.Mesh ) {
 
-				// create separate VBOs per material
+				// create separate VBOs per geometry chunk
 
-				for ( mf in object.materialFaceGroup ) {
+				for ( g in object.geometry.geometryChunks ) {
 
-					materialFaceGroup = object.materialFaceGroup[ mf ];
+					geometryChunk = object.geometry.geometryChunks[ g ];
 
-					// initialise buffers on the first access
+					// initialise VBO on the first access
 
-					if( ! materialFaceGroup.__webGLVertexBuffer ) {
+					if( ! geometryChunk.__webGLVertexBuffer ) {
 
-						this.createBuffers( object, mf );
-						materialFaceGroup.__object = object;
-						scene.__webGLObjects.push( materialFaceGroup );
+						this.createBuffers( object, g );
 
+					}
+					
+					// create separate wrapper per each use of VBO
+					
+					if ( objmap[ g ] == undefined ) {
+					
+						globject = { buffer: geometryChunk, object: object };
+						scene.__webGLObjects.push( globject );
+					
+						objmap[ g ] = 1;
+						
 					}
 
 				}
@@ -665,7 +693,7 @@ THREE.WebGLRenderer = function ( scene ) {
 		
 		for ( o = scene.__webGLObjects.length - 1; o >= 0; o-- ) {
 			
-			zobject = scene.__webGLObjects[ o ].__object;
+			zobject = scene.__webGLObjects[ o ].object;
 			
 			if ( object == zobject ) {
 
@@ -993,7 +1021,7 @@ THREE.WebGLRenderer = function ( scene ) {
 
 				"} else if ( material == 1 ) {",
 
-				"if ( mixEnvMap ) {",
+					"if ( mixEnvMap ) {",
 
 						"gl_FragColor = vec4( mix( mColor.rgb * mapColor.rgb * vLightWeighting, cubeColor.rgb, mReflectivity ), mColor.a * mapColor.a );",
 
@@ -1028,8 +1056,6 @@ THREE.WebGLRenderer = function ( scene ) {
 	function generateVertexShader( maxDirLights, maxPointLights ) {
 
 		var chunks = [
-
-
 
 			maxDirLights   ? "#define MAX_DIR_LIGHTS " + maxDirLights     : "",
 			maxPointLights ? "#define MAX_POINT_LIGHTS " + maxPointLights : "",
@@ -1298,7 +1324,7 @@ THREE.WebGLRenderer = function ( scene ) {
 	function initUbershader( maxDirLights, maxPointLights ) {
 
 		var vertex_shader = generateVertexShader( maxDirLights, maxPointLights ),
-		    fragment_shader = generateFragmentShader( maxDirLights, maxPointLights );
+			fragment_shader = generateFragmentShader( maxDirLights, maxPointLights );
 
 		//log ( vertex_shader );
 		//log ( fragment_shader );
@@ -1403,7 +1429,7 @@ THREE.WebGLRenderer = function ( scene ) {
 
 	};
 	
-	function bufferNeedsSmoothNormals( materialFaceGroup, object ) {
+	function bufferNeedsSmoothNormals( geometryChunk, object ) {
 		
 		var m, ml, i, l, needsSmoothNormals = false;
 		
@@ -1413,9 +1439,9 @@ THREE.WebGLRenderer = function ( scene ) {
 
 			if ( meshMaterial instanceof THREE.MeshFaceMaterial ) {
 
-				for ( i = 0, l = materialFaceGroup.material.length; i < l; i++ ) {
+				for ( i = 0, l = geometryChunk.material.length; i < l; i++ ) {
 
-					if ( materialNeedsSmoothNormals( materialFaceGroup.material[ i ] ) ) {
+					if ( materialNeedsSmoothNormals( geometryChunk.material[ i ] ) ) {
 
 						needsSmoothNormals = true;
 						break;

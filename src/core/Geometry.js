@@ -1,6 +1,7 @@
 /**
  * @author mr.doob / http://mrdoob.com/
  * @author kile / http://kile.stravaganza.org/
+ * @author alteredq / http://alteredqualia.com/
  */
 
 THREE.Geometry = function () {
@@ -9,6 +10,8 @@ THREE.Geometry = function () {
 	this.faces = [];
 	this.uvs = [];
 
+	this.geometryChunks = {};
+	
 };
 
 THREE.Geometry.prototype = {
@@ -89,7 +92,7 @@ THREE.Geometry.prototype = {
 
 				if ( !cb.isZero() ) {
 
-				    cb.normalize();
+					cb.normalize();
 
 				}
 
@@ -161,6 +164,80 @@ THREE.Geometry.prototype = {
 
 	},
 
+	sortFacesByMaterial: function () {
+
+		// TODO
+		// Should optimize by grouping faces with ColorFill / ColorStroke materials
+		// which could then use vertex color attributes instead of each being
+		// in its separate VBO
+
+		var i, l, f, fl, face, material, vertices, mhash, ghash, hash_map = {};
+
+		function materialHash( material ) {
+
+			var hash_array = [];
+
+			for ( i = 0, l = material.length; i < l; i++ ) {
+
+				if ( material[ i ] == undefined ) {
+
+					hash_array.push( "undefined" );
+
+				} else {
+
+					hash_array.push( material[ i ].toString() );
+
+				}
+
+			}
+
+			return hash_array.join( '_' );
+
+		}
+
+		for ( f = 0, fl = this.faces.length; f < fl; f++ ) {
+
+			face = this.faces[ f ];
+			material = face.material;
+
+			mhash = materialHash( material );
+
+			if ( hash_map[ mhash ] == undefined ) {
+
+				hash_map[ mhash ] = { 'hash': mhash, 'counter': 0 };
+
+			}
+
+			ghash = hash_map[ mhash ].hash + '_' + hash_map[ mhash ].counter;
+
+			if ( this.geometryChunks[ ghash ] == undefined ) {
+
+				this.geometryChunks[ ghash ] = { 'faces': [], 'material': material, 'vertices': 0 };
+
+			}
+
+			vertices = face instanceof THREE.Face3 ? 3 : 4;
+
+			if ( this.geometryChunks[ ghash ].vertices + vertices > 65535 ) {
+
+				hash_map[ mhash ].counter += 1;
+				ghash = hash_map[ mhash ].hash + '_' + hash_map[ mhash ].counter;
+
+				if ( this.geometryChunks[ ghash ] == undefined ) {
+
+					this.geometryChunks[ ghash ] = { 'faces': [], 'material': material, 'vertices': 0 };
+
+				}
+
+			}
+
+			this.geometryChunks[ ghash ].faces.push( f );
+			this.geometryChunks[ ghash ].vertices += vertices;
+
+		}
+
+	},
+	
 	toString: function () {
 
 		return 'THREE.Geometry ( vertices: ' + this.vertices + ', faces: ' + this.faces + ', uvs: ' + this.uvs + ' )';

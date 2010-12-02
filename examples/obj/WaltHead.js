@@ -4885,6 +4885,7 @@ var WaltHead = function () {
 
 	this.computeCentroids();
 	this.computeNormals();
+	this.sortFacesByMaterial();
 
 	function v( x, y, z ) {
 

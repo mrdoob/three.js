@@ -20,6 +20,10 @@ var Bird = function () {
 	f3( 4, 7, 6 );
 	f3( 5, 6, 7 );
 
+	this.computeCentroids();
+	this.computeNormals();
+	this.sortFacesByMaterial();
+
 	function v( x, y, z ) {
 
 		scope.vertices.push( new THREE.Vertex( new THREE.Vector3( x, y, z ) ) );
