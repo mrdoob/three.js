@@ -9,6 +9,8 @@ The aim of this project is to create a lightweight 3D engine with a very low lev
 
 The engine can render using &lt;canvas&gt;, &lt;svg&gt; and WebGL.
 
+More? irc.freenode.net #three.js
+
 ### Examples ###
 
 Materials

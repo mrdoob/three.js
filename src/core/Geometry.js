@@ -11,7 +11,7 @@ THREE.Geometry = function () {
 	this.uvs = [];
 
 	this.geometryChunks = {};
-	
+
 };
 
 THREE.Geometry.prototype = {
