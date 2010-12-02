@@ -145,7 +145,7 @@
 
 					} else {
 
-						var position = new THREE.Vector3().add( intersects[ 0 ].point, intersects[ 0 ].object.rotationMatrix.transformVector3( intersects[ 0 ].face.normal.clone() ) );
+						var position = new THREE.Vector3().add( intersects[ 0 ].point, intersects[ 0 ].object.rotationMatrix.multiplyVector3( intersects[ 0 ].face.normal.clone() ) );
 
 						var voxel = new THREE.Mesh( new Cube( 50, 50, 50 ), [ new THREE.MeshLambertMaterial( { color: 0x00ff80, opacity: 1, shading: THREE.FlatShading } ), new THREE.MeshFaceMaterial() ] );
 						voxel.position.x = Math.floor( position.x / 50 ) * 50 + 25;

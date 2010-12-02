@@ -101,7 +101,19 @@ THREE.Geometry.prototype = {
 
 	},
 
-	computeBoundingBox: function ( ) {
+	computeVertexNormals: function () {
+
+		var f, fl;
+
+		for ( f = 0, fl = this.faces.length; f < fl; f++ ) {
+
+			
+
+		}
+
+	},
+
+	computeBoundingBox: function () {
 
 		if ( this.vertices.length > 0 ) {
 
@@ -151,7 +163,7 @@ THREE.Geometry.prototype = {
 
 	toString: function () {
 
-		return 'THREE.Geometry ( vertices: ' + this.vertices + ', faces: ' + this.faces + ' )';
+		return 'THREE.Geometry ( vertices: ' + this.vertices + ', faces: ' + this.faces + ', uvs: ' + this.uvs + ' )';
 
 	}
 
