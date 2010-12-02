@@ -155,9 +155,8 @@
 
 				}
 
-				//particleLight = new THREE.Particle( new THREE.ParticleCircleMaterial( { color: 0xffffff } ) );
-				//particleLight.scale.x = particleLight.scale.y = particleLight.scale.z = 4;
-				particleLight = new THREE.Mesh( new Sphere( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
+				particleLight = new THREE.Particle( new THREE.ParticleCircleMaterial( { color: 0xffffff } ) );
+				particleLight.scale.x = particleLight.scale.y = particleLight.scale.z = 4;
 				scene.addObject( particleLight );
 
 				// Lights
