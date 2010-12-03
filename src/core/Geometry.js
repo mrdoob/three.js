@@ -20,21 +20,23 @@ THREE.Geometry.prototype = {
 
 		var f, fl, face;
 
-		for ( f = 0, fl = this.faces.length; f < fl; f++ ) {
+		for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
 
 			face = this.faces[ f ];
 			face.centroid.set( 0, 0, 0 );
 
-			face.centroid.addSelf( this.vertices[ face.a ].position );
-			face.centroid.addSelf( this.vertices[ face.b ].position );
-			face.centroid.addSelf( this.vertices[ face.c ].position );
-
 			if ( face instanceof THREE.Face3 ) {
 
+				face.centroid.addSelf( this.vertices[ face.a ].position );
+				face.centroid.addSelf( this.vertices[ face.b ].position );
+				face.centroid.addSelf( this.vertices[ face.c ].position );
 				face.centroid.divideScalar( 3 );
 
 			} else if ( face instanceof THREE.Face4 ) {
 
+				face.centroid.addSelf( this.vertices[ face.a ].position );
+				face.centroid.addSelf( this.vertices[ face.b ].position );
+				face.centroid.addSelf( this.vertices[ face.c ].position );
 				face.centroid.addSelf( this.vertices[ face.d ].position );
 				face.centroid.divideScalar( 4 );
 
@@ -49,14 +51,14 @@ THREE.Geometry.prototype = {
 		var n, nl, v, vl, vertex, f, fl, face, vA, vB, vC,
 		cb = new THREE.Vector3(), ab = new THREE.Vector3();
 
-		for ( v = 0, vl = this.vertices.length; v < vl; v++ ) {
+		for ( v = 0, vl = this.vertices.length; v < vl; v ++ ) {
 
 			vertex = this.vertices[ v ];
 			vertex.normal.set( 0, 0, 0 );
 
 		}
 
-		for ( f = 0, fl = this.faces.length; f < fl; f++ ) {
+		for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
 
 			face = this.faces[ f ];
 
@@ -106,11 +108,60 @@ THREE.Geometry.prototype = {
 
 	computeVertexNormals: function () {
 
-		var f, fl;
+		var v, vertices = [],
+		f, fl, face;
 
-		for ( f = 0, fl = this.faces.length; f < fl; f++ ) {
+		for ( v = 0, vl = this.vertices.length; v < vl; v ++ ) {
 
-			
+			vertices[ v ] = new THREE.Vector3();
+
+		}
+
+		for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
+
+			face = this.faces[ f ];
+
+			if ( face instanceof THREE.Face3 ) {
+
+				vertices[ face.a ].addSelf( face.normal );
+				vertices[ face.b ].addSelf( face.normal );
+				vertices[ face.c ].addSelf( face.normal );
+
+			} else if ( face instanceof THREE.Face4 ) {
+
+				vertices[ face.a ].addSelf( face.normal );
+				vertices[ face.b ].addSelf( face.normal );
+				vertices[ face.c ].addSelf( face.normal );
+				vertices[ face.d ].addSelf( face.normal );
+
+			}
+
+		}
+
+		for ( v = 0, vl = this.vertices.length; v < vl; v ++ ) {
+
+			vertices[ v ].normalize();
+
+		}
+
+		for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
+
+			face = this.faces[ f ];
+
+			if ( face instanceof THREE.Face3 ) {
+
+				face.vertexNormals[ 0 ] = vertices[ face.a ].clone();
+				face.vertexNormals[ 1 ] = vertices[ face.b ].clone();
+				face.vertexNormals[ 2 ] = vertices[ face.c ].clone();
+
+			} else if ( face instanceof THREE.Face4 ) {
+
+				face.vertexNormals[ 0 ] = vertices[ face.a ].clone();
+				face.vertexNormals[ 1 ] = vertices[ face.b ].clone();
+				face.vertexNormals[ 2 ] = vertices[ face.c ].clone();
+				face.vertexNormals[ 3 ] = vertices[ face.d ].clone();
+
+			}
 
 		}
 
@@ -124,7 +175,7 @@ THREE.Geometry.prototype = {
 			'y': [ this.vertices[ 0 ].position.y, this.vertices[ 0 ].position.y ], 
 			'z': [ this.vertices[ 0 ].position.z, this.vertices[ 0 ].position.z ] };
 
-			for ( var v = 1, vl = this.vertices.length; v < vl; v++ ) {
+			for ( var v = 1, vl = this.vertices.length; v < vl; v ++ ) {
 
 				vertex = this.vertices[ v ];
 
@@ -237,7 +288,7 @@ THREE.Geometry.prototype = {
 		}
 
 	},
-	
+
 	toString: function () {
 
 		return 'THREE.Geometry ( vertices: ' + this.vertices + ', faces: ' + this.faces + ', uvs: ' + this.uvs + ' )';
