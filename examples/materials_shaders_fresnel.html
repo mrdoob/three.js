@@ -36,14 +36,14 @@
 		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl cube Fresnel shader demo. texture by <a href="http://www.humus.name/index.php?page=Textures" target="_blank">Humus</a> </div>
 
 		<script type="text/javascript" src="../build/ThreeExtras.js"></script> 
+		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<!--
-		<script type="text/javascript" src="js/Stats.js"></script>
 		-->
 		
 		<script type="text/javascript">
 
-			var statsEnabled = false;
+			var statsEnabled = true;
 
 			var container, stats;
 
@@ -79,7 +79,6 @@
 				sceneCube = new THREE.Scene();
 
 				var geometry = new Sphere( 100, 32, 16 );
-				geometry.sortFacesByMaterial();
 
 				var path = "textures/cube/Park2/";
 				var format = '.jpg';
