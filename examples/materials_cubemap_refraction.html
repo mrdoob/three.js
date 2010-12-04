@@ -107,7 +107,7 @@
 							 r + "pz.jpg", r + "nz.jpg" ];
 
 				var images = ImageUtils.loadArray( urls );
-				var textureCube = new THREE.TextureCube( images, THREE.RefractionMapping );
+				var textureCube = new THREE.Texture( images, new THREE.CubeRefractionMapping() );
 
 				var cubeMaterial3 = new THREE.MeshBasicMaterial( { color: 0xccddff, env_map: textureCube, refraction_ratio: 0.98, reflectivity:0.9 } );
 				var cubeMaterial2 = new THREE.MeshBasicMaterial( { color: 0xccfffd, env_map: textureCube, refraction_ratio: 0.985 } );

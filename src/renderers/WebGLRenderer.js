@@ -399,10 +399,10 @@ THREE.WebGLRenderer = function ( scene ) {
 			mMap = material.map;
 			envMap = material.env_map;
 
-			mixEnvMap = material.combine == THREE.Mix;
+			mixEnvMap = material.combine == THREE.MixOperation;
 			mReflectivity = material.reflectivity;
 
-			useRefract = material.env_map && material.env_map.mapping == THREE.RefractionMapping;
+			useRefract = material.env_map && material.env_map.mapping instanceof THREE.CubeRefractionMapping;
 			mRefractionRatio = material.refraction_ratio;
 
 			_gl.uniform4f( program.uniforms.mColor,  mColor.r * mOpacity, mColor.g * mOpacity, mColor.b * mOpacity, mOpacity );
@@ -1240,11 +1240,13 @@ THREE.WebGLRenderer = function ( scene ) {
 				
 				texture = uniforms[u].texture;
 				
-				if ( texture instanceof THREE.TextureCube ) {
+				if ( !texture ) continue;
+				
+				if ( texture.image instanceof Array && texture.image.length == 6 ) {
 					
 					setCubeTexture( texture, value );
 					
-				} else if ( texture instanceof THREE.Texture ) {
+				} else {
 					
 					setTexture( texture, value );
 					
@@ -1258,8 +1260,7 @@ THREE.WebGLRenderer = function ( scene ) {
 
 	function setCubeTexture( texture, slot ) {
 		
-		if ( texture instanceof THREE.TextureCube &&
-			 texture.image.length == 6 ) {
+		if ( texture.image.length == 6 ) {
 
 			if ( !texture.image.__webGLTextureCube &&
 				 !texture.image.__cubeMapInitialized && texture.image.loadCount == 6 ) {

@@ -37,7 +37,7 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 	this.specular_map = null;
 
 	this.env_map = null;
-	this.combine = THREE.Multiply;
+	this.combine = THREE.MultiplyOperation;
 	this.reflectivity = 1;
 	this.refraction_ratio = 0.98;
 

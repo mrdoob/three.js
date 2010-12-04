@@ -82,7 +82,7 @@
 
 				var images = ImageUtils.loadArray( urls );
 
-				var textureCube = new THREE.TextureCube( images );
+				var textureCube = new THREE.Texture( images );
 				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, env_map: textureCube } )
 				var geometry = new Sphere( 100, 96, 64, true );
 
