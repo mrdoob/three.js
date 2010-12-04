@@ -64,7 +64,7 @@
 				geometry = new WaltHead();
 				geometry.computeVertexNormals();
 
-				mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { env_map: ImageUtils.loadTexture( 'textures/metal.jpg', THREE.ReflectionMapping ) } ) );
+				mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { env_map: ImageUtils.loadTexture( 'textures/metal.jpg', new THREE.SphericalReflectionMapping() ) } ) );
 				mesh.overdraw = true;
 				scene.addObject( mesh );
 

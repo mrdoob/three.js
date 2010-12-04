@@ -19,7 +19,7 @@ THREE.MeshShaderMaterial = function ( parameters ) {
 
 	this.fragment_shader = "void main() {}";
 	this.vertex_shader = "void main() {}";
-    this.uniforms = {};
+	this.uniforms = {};
 
 	this.shading = THREE.SmoothShading;
 	this.blending = THREE.NormalBlending;
@@ -31,10 +31,10 @@ THREE.MeshShaderMaterial = function ( parameters ) {
 
 	if ( parameters ) {
 
-        if ( parameters.fragment_shader !== undefined ) this.fragment_shader = parameters.fragment_shader;
-        if ( parameters.vertex_shader !== undefined ) this.vertex_shader = parameters.vertex_shader;
+		if ( parameters.fragment_shader !== undefined ) this.fragment_shader = parameters.fragment_shader;
+		if ( parameters.vertex_shader !== undefined ) this.vertex_shader = parameters.vertex_shader;
 
-        if ( parameters.uniforms !== undefined ) this.uniforms = parameters.uniforms;
+		if ( parameters.uniforms !== undefined ) this.uniforms = parameters.uniforms;
 
 		if ( parameters.shading !== undefined ) this.shading = parameters.shading;
 		if ( parameters.blending !== undefined ) this.blending = parameters.blending;
@@ -50,7 +50,7 @@ THREE.MeshShaderMaterial = function ( parameters ) {
 
 		return 'THREE.MeshShaderMaterial (<br/>' +
 			'id: ' + this.id + '<br/>' +
-        
+
 			'blending: ' + this.blending + '<br/>' +
 			'wireframe: ' + this.wireframe + '<br/>' +
 			'wireframe_linewidth: ' + this.wireframe_linewidth +'<br/>' +

@@ -49,7 +49,14 @@
 		<script type="text/javascript" src="../src/materials/MeshFaceMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/ParticleBasicMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/ParticleCircleMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/textures/Texture.js"></script>
+		<script type="text/javascript" src="../src/materials/Texture.js"></script>
+		<script type="text/javascript" src="../src/materials/mappings/CubeReflectionMapping.js"></script>
+		<script type="text/javascript" src="../src/materials/mappings/CubeRefractionMapping.js"></script>
+		<script type="text/javascript" src="../src/materials/mappings/LatitudeReflectionMapping.js"></script>
+		<script type="text/javascript" src="../src/materials/mappings/LatitudeRefractionMapping.js"></script>
+		<script type="text/javascript" src="../src/materials/mappings/SphericalReflectionMapping.js"></script>
+		<script type="text/javascript" src="../src/materials/mappings/SphericalRefractionMapping.js"></script>
+		<script type="text/javascript" src="../src/materials/mappings/UVMapping.js"></script>
 		<script type="text/javascript" src="../src/scenes/Scene.js"></script>
 		<script type="text/javascript" src="../src/renderers/Projector.js"></script>
 		<script type="text/javascript" src="../src/renderers/CanvasRenderer.js"></script>
@@ -133,12 +140,12 @@
 				objects = [];
 
 				geometry = new Sphere( 100, 16, 8 );
-				material = new THREE.MeshBasicMaterial( { env_map: ImageUtils.loadTexture( 'textures/envmap.png', THREE.ReflectionMapping ) } );
+				material = new THREE.MeshBasicMaterial( { env_map: ImageUtils.loadTexture( 'textures/envmap.png', new THREE.SphericalReflectionMapping() ) } );
 
 				for ( var i = 0; i < 10; i ++ ) {
 
 					sphere = new THREE.Mesh( geometry, material );
-					// sphere.overdraw = true;
+					sphere.overdraw = true;
 
 					sphere.position.x = Math.random() * 1000 - 500;
 					sphere.position.y = Math.random() * 1000 - 500;

@@ -81,7 +81,7 @@
 				textureContext.fillStyle = '#000000';
 				textureContext.fillRect( 0, 0, 480, 204 );
 
-				var map = new THREE.Texture( texture, THREE.UVMapping );
+				var map = new THREE.Texture( texture );
 				map.loaded = true;
 
 				var material = new THREE.MeshBasicMaterial( { map: map } );
@@ -98,7 +98,7 @@
 				textureReflectionGradient.addColorStop( 0.2, 'rgba(240, 240, 240, 1)' );
 				textureReflectionGradient.addColorStop( 1, 'rgba(240, 240, 240, 0.8)' );
 
-				var materialReflection = new THREE.MeshBasicMaterial( { map: new THREE.Texture( textureReflection, THREE.UVMapping ) } );
+				var materialReflection = new THREE.MeshBasicMaterial( { map: new THREE.Texture( textureReflection ) } );
 
 				//
 
