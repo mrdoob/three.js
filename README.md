@@ -131,9 +131,9 @@ For creating a customised version of the library, including the source files in 
 	<script type="text/javascript" src="../src/lights/DirectionalLight.js"></script>
 	<script type="text/javascript" src="../src/lights/PointLight.js"></script>
 	<script type="text/javascript" src="../src/objects/Object3D.js"></script>
-	<script type="text/javascript" src="../src/objects/Mesh.js"></script>
 	<script type="text/javascript" src="../src/objects/Particle.js"></script>
 	<script type="text/javascript" src="../src/objects/Line.js"></script>
+	<script type="text/javascript" src="../src/objects/Mesh.js"></script>
 	<script type="text/javascript" src="../src/materials/Material.js"></script>
 	<script type="text/javascript" src="../src/materials/LineBasicMaterial.js"></script>
 	<script type="text/javascript" src="../src/materials/MeshBasicMaterial.js"></script>
@@ -142,12 +142,22 @@ For creating a customised version of the library, including the source files in 
 	<script type="text/javascript" src="../src/materials/MeshDepthMaterial.js"></script>
 	<script type="text/javascript" src="../src/materials/MeshNormalMaterial.js"></script>
 	<script type="text/javascript" src="../src/materials/MeshFaceMaterial.js"></script>
+	<script type="text/javascript" src="../src/materials/MeshCubeMaterial.js"></script>
 	<script type="text/javascript" src="../src/materials/MeshShaderMaterial.js"></script>
 	<script type="text/javascript" src="../src/materials/ParticleBasicMaterial.js"></script>
 	<script type="text/javascript" src="../src/materials/ParticleCircleMaterial.js"></script>
-	<script type="text/javascript" src="../src/materials/textures/Texture.js"></script>
+	<script type="text/javascript" src="../src/materials/ParticleDOMMaterial.js"></script>
+	<script type="text/javascript" src="../src/materials/Texture.js"></script>
+	<script type="text/javascript" src="../src/materials/mappings/CubeReflectionMapping.js"></script>
+	<script type="text/javascript" src="../src/materials/mappings/CubeRefractionMapping.js"></script>
+	<script type="text/javascript" src="../src/materials/mappings/LatitudeReflectionMapping.js"></script>
+	<script type="text/javascript" src="../src/materials/mappings/LatitudeRefractionMapping.js"></script>
+	<script type="text/javascript" src="../src/materials/mappings/SphericalReflectionMapping.js"></script>
+	<script type="text/javascript" src="../src/materials/mappings/SphericalRefractionMapping.js"></script>
+	<script type="text/javascript" src="../src/materials/mappings/UVMapping.js"></script>
 	<script type="text/javascript" src="../src/scenes/Scene.js"></script>
 	<script type="text/javascript" src="../src/renderers/Projector.js"></script>
+	<script type="text/javascript" src="../src/renderers/DOMRenderer.js"></script>
 	<script type="text/javascript" src="../src/renderers/CanvasRenderer.js"></script>
 	<script type="text/javascript" src="../src/renderers/SVGRenderer.js"></script>
 	<script type="text/javascript" src="../src/renderers/WebGLRenderer.js"></script>
@@ -157,6 +167,13 @@ For creating a customised version of the library, including the source files in 
 
 
 ### Change Log ###
+
+2010 12 05 - **r31** (79.479 KB, gzip: 18.788 KB)
+
+* Minor Materials API change (mappings). ([alteredq](http://github.com/alteredq) & [mrdoob](http://github.com/mrdoob))
+* Added Filters to `WebGLRenderer`
+* `python build.py --includes` generates includes string
+
 
 2010 11 30 - **r30** (77.809 KB, gzip: 18.336 KB)
 

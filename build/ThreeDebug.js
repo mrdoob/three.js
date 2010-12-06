@@ -1,4 +1,4 @@
-// ThreeDebug.js r30 - http://github.com/mrdoob/three.js
+// ThreeDebug.js r31 - http://github.com/mrdoob/three.js
 var THREE=THREE||{};THREE.Color=function(a){this.autoUpdate=true;this.setHex(a)};
 THREE.Color.prototype={setRGB:function(a,b,d){this.r=a;this.g=b;this.b=d;if(this.autoUpdate){this.updateHex();this.updateStyleString()}},setHex:function(a){this.hex=~~a&16777215;if(this.autoUpdate){this.updateRGBA();this.updateStyleString()}},updateHex:function(){this.hex=~~(this.r*255)<<16^~~(this.g*255)<<8^~~(this.b*255)},updateRGBA:function(){this.r=(this.hex>>16&255)/255;this.g=(this.hex>>8&255)/255;this.b=(this.hex&255)/255},updateStyleString:function(){this.__styleString="rgb("+~~(this.r*255)+
 ","+~~(this.g*255)+","+~~(this.b*255)+")"},toString:function(){return"THREE.Color ( r: "+this.r+", g: "+this.g+", b: "+this.b+", hex: "+this.hex+" )"}};THREE.Vector2=function(a,b){this.x=a||0;this.y=b||0};
