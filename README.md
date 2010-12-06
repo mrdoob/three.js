@@ -44,7 +44,7 @@ Particles
 
 Materials
 
-[![materials_shader_fresnel](http://mrdoob.github.com/three.js/assets/examples/28_materials_shader_fresnel.png)](http://mrdoob.github.com/three.js/examples/materials_shader_fresnel.html)
+[![materials_shader_fresnel](http://mrdoob.github.com/three.js/assets/examples/28_materials_shaders_fresnel.png)](http://mrdoob.github.com/three.js/examples/materials_shaders_fresnel.html)
 [![materials_cars](http://mrdoob.github.com/three.js/assets/examples/25_materials_cars.png)](http://mrdoob.github.com/three.js/examples/materials_cars.html)
 [![materials_cubemap_refraction](http://mrdoob.github.com/three.js/assets/examples/18_materials_cubemap_refraction.png)](http://mrdoob.github.com/three.js/examples/materials_cubemap_refraction.html)
 [![materials_cubemap_balls_reflection](http://mrdoob.github.com/three.js/assets/examples/15_materials_cubemap_balls_reflection.png)](http://mrdoob.github.com/three.js/examples/materials_cubemap_balls_reflection.html)
