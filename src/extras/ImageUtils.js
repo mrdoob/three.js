@@ -2,20 +2,11 @@ var ImageUtils = {
 
 	loadTexture: function ( path, mapping ) {
 
-		var texture = new THREE.Texture( null, mapping );
-
 		var image = new Image();
-
-		image.onload = function () {
-
-			texture.image = this;
-			texture.loaded = true;
-
-		};
-
+		image.onload = function () { this.loaded = true; };
 		image.src = path;
 
-		return texture;
+		return new THREE.Texture( image, mapping );
 
 	},
 
@@ -29,7 +20,7 @@ var ImageUtils = {
 
 			images[ i ] = new Image();
 			images[ i ].loaded = 0;
-			images[ i ].onload = function () { images.loadCount += 1; this.loaded = 1; }
+			images[ i ].onload = function () { images.loadCount += 1; this.loaded = true; }
 			images[ i ].src = array[ i ];
 
 		}

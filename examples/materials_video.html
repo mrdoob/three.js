@@ -74,6 +74,7 @@
 				// 
 
 				texture = document.createElement( 'canvas' );
+				texture.loaded = true;
 				texture.width = 480;
 				texture.height = 204;
 
@@ -82,11 +83,11 @@
 				textureContext.fillRect( 0, 0, 480, 204 );
 
 				var map = new THREE.Texture( texture );
-				map.loaded = true;
 
 				var material = new THREE.MeshBasicMaterial( { map: map } );
 
 				textureReflection = document.createElement( 'canvas' );
+				textureReflection.loaded = true;
 				textureReflection.width = 480;
 				textureReflection.height = 204;
 

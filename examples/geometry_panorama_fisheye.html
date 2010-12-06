@@ -39,7 +39,7 @@
 			var camera, scene, renderer;
 
 			var fov = 75,
-			texture_placeholder, wireframe,
+			texture_placeholder,
 			isUserInteracting = false,
 			onMouseDownMouseX = 0, onMouseDownMouseY = 0,
 			lon = 90, onMouseDownLon = 0,
@@ -62,19 +62,20 @@
 				texture_placeholder.width = 128;
 				texture_placeholder.height = 128;
 
-				wireframe = new THREE.MeshBasicMaterial( { color: 0xffffff, opacity: 0, wireframe: true } );
-
 				var context = texture_placeholder.getContext( '2d' );
 				context.fillStyle = 'rgb( 200, 200, 200 )';
 				context.fillRect( 0, 0, texture_placeholder.width, texture_placeholder.height );
 
-				var materials = [];
-				materials.push( [ loadTexture( 'textures/cube/skybox/px.jpg' ), wireframe ] ); // right
-				materials.push( [ loadTexture( 'textures/cube/skybox/nx.jpg' ), wireframe ] ); // left
-				materials.push( [ loadTexture( 'textures/cube/skybox/py.jpg' ), wireframe ] ); // top
-				materials.push( [ loadTexture( 'textures/cube/skybox/ny.jpg' ), wireframe ] ); // bottom
-				materials.push( [ loadTexture( 'textures/cube/skybox/pz.jpg' ), wireframe ] ); // back
-				materials.push( [ loadTexture( 'textures/cube/skybox/nz.jpg' ), wireframe ] ); // front
+				var materials = [
+
+					loadTexture( 'textures/cube/skybox/px.jpg' ), // right
+					loadTexture( 'textures/cube/skybox/nx.jpg' ), // left
+					loadTexture( 'textures/cube/skybox/py.jpg' ), // top
+					loadTexture( 'textures/cube/skybox/ny.jpg' ), // bottom
+					loadTexture( 'textures/cube/skybox/pz.jpg' ), // back
+					loadTexture( 'textures/cube/skybox/nz.jpg' ) // front
+
+				];
 
 				mesh = new THREE.Mesh( new Cube( 300, 300, 300, 7, 7, materials, true ), new THREE.MeshFaceMaterial() );
 				mesh.overdraw = true;
@@ -113,8 +114,8 @@
 
 				image.onload = function () {
 
+					this.loaded = true;
 					material.map.image = this;
-					material.map.loaded = true;
 					render();
 
 				};
@@ -129,8 +130,6 @@
 				event.preventDefault();
 
 				isUserInteracting = true;
-
-				wireframe.opacity = 0.2;
 
 				onPointerDownPointerX = event.clientX;
 				onPointerDownPointerY = event.clientY;
@@ -154,7 +153,6 @@
 			function onDocumentMouseUp( event ) {
 
 				isUserInteracting = false;
-				wireframe.opacity = 0;
 				render();
 
 			}
