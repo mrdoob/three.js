@@ -11,16 +11,247 @@ import os
 import tempfile
 import sys
 
+COMMON_FILES = [
+'Three.js',
+'core/Color.js',
+'core/Vector2.js',
+'core/Vector3.js',
+'core/Vector4.js',
+'core/Ray.js',
+'core/Rectangle.js',
+'core/Matrix3.js',
+'core/Matrix4.js',
+'core/Vertex.js',
+'core/Face3.js',
+'core/Face4.js',
+'core/UV.js',
+'core/Geometry.js',
+'cameras/Camera.js',
+'lights/Light.js',
+'lights/AmbientLight.js',
+'lights/DirectionalLight.js',
+'lights/PointLight.js',
+'objects/Object3D.js',
+'objects/Particle.js',
+'objects/Line.js',
+'objects/Mesh.js',
+'materials/Material.js',
+'materials/LineBasicMaterial.js',
+'materials/MeshBasicMaterial.js',
+'materials/MeshLambertMaterial.js',
+'materials/MeshPhongMaterial.js',
+'materials/MeshDepthMaterial.js',
+'materials/MeshNormalMaterial.js',
+'materials/MeshFaceMaterial.js',
+'materials/MeshCubeMaterial.js',
+'materials/MeshShaderMaterial.js',
+'materials/ParticleBasicMaterial.js',
+'materials/ParticleCircleMaterial.js',
+'materials/ParticleDOMMaterial.js',
+'materials/Texture.js',
+'materials/mappings/CubeReflectionMapping.js',
+'materials/mappings/CubeRefractionMapping.js',
+'materials/mappings/LatitudeReflectionMapping.js',
+'materials/mappings/LatitudeRefractionMapping.js',
+'materials/mappings/SphericalReflectionMapping.js',
+'materials/mappings/SphericalRefractionMapping.js',
+'materials/mappings/UVMapping.js',
+'scenes/Scene.js',
+'renderers/Projector.js',
+'renderers/DOMRenderer.js',
+'renderers/CanvasRenderer.js',
+'renderers/SVGRenderer.js',
+'renderers/WebGLRenderer.js',
+'renderers/renderables/RenderableFace3.js',
+'renderers/renderables/RenderableParticle.js',
+'renderers/renderables/RenderableLine.js'
+]
+
+EXTRAS_FILES = [		
+'extras/GeometryUtils.js',
+'extras/ImageUtils.js',
+'extras/SceneUtils.js',
+'extras/ShaderUtils.js',
+'extras/primitives/Cube.js',
+'extras/primitives/Cylinder.js',
+'extras/primitives/Plane.js',
+'extras/primitives/Sphere.js',
+'extras/io/Loader.js'
+]
+
+DOM_FILES = [
+'Three.js',
+'core/Color.js',
+'core/Vector2.js',
+'core/Vector3.js',
+'core/Vector4.js',
+'core/Ray.js',
+'core/Rectangle.js',
+'core/Matrix3.js',
+'core/Matrix4.js',
+'core/Vertex.js',
+'core/Face3.js',
+'core/Face4.js',
+'core/UV.js',
+'cameras/Camera.js',
+'objects/Object3D.js',
+'objects/Particle.js',
+'materials/ParticleDOMMaterial.js',
+'scenes/Scene.js',
+'renderers/Projector.js',
+'renderers/DOMRenderer.js',
+'renderers/renderables/RenderableParticle.js',
+]
+
+SVG_FILES = [
+'Three.js',
+'core/Color.js',
+'core/Vector2.js',
+'core/Vector3.js',
+'core/Vector4.js',
+'core/Ray.js',
+'core/Rectangle.js',
+'core/Matrix3.js',
+'core/Matrix4.js',
+'core/Vertex.js',
+'core/Face3.js',
+'core/Face4.js',
+'core/UV.js',
+'core/Geometry.js',
+'cameras/Camera.js',
+'lights/Light.js',
+'lights/AmbientLight.js',
+'lights/DirectionalLight.js',
+'lights/PointLight.js',
+'objects/Object3D.js',
+'objects/Particle.js',
+'objects/Line.js',
+'objects/Mesh.js',
+'materials/Material.js',
+'materials/LineBasicMaterial.js',
+'materials/MeshBasicMaterial.js',
+'materials/MeshLambertMaterial.js',
+'materials/MeshPhongMaterial.js',
+'materials/MeshDepthMaterial.js',
+'materials/MeshNormalMaterial.js',
+'materials/MeshFaceMaterial.js',
+'materials/ParticleBasicMaterial.js',
+'materials/ParticleCircleMaterial.js',
+'scenes/Scene.js',
+'renderers/Projector.js',
+'renderers/SVGRenderer.js',
+'renderers/renderables/RenderableFace3.js',
+'renderers/renderables/RenderableParticle.js',
+'renderers/renderables/RenderableLine.js'
+]
+
+CANVAS_FILES = [
+'Three.js',
+'core/Color.js',
+'core/Vector2.js',
+'core/Vector3.js',
+'core/Vector4.js',
+'core/Ray.js',
+'core/Rectangle.js',
+'core/Matrix3.js',
+'core/Matrix4.js',
+'core/Vertex.js',
+'core/Face3.js',
+'core/Face4.js',
+'core/UV.js',
+'core/Geometry.js',
+'cameras/Camera.js',
+'lights/Light.js',
+'lights/AmbientLight.js',
+'lights/DirectionalLight.js',
+'lights/PointLight.js',
+'objects/Object3D.js',
+'objects/Particle.js',
+'objects/Line.js',
+'objects/Mesh.js',
+'materials/Material.js',
+'materials/LineBasicMaterial.js',
+'materials/MeshBasicMaterial.js',
+'materials/MeshLambertMaterial.js',
+'materials/MeshPhongMaterial.js',
+'materials/MeshDepthMaterial.js',
+'materials/MeshNormalMaterial.js',
+'materials/MeshFaceMaterial.js',
+'materials/ParticleBasicMaterial.js',
+'materials/ParticleCircleMaterial.js',
+'materials/Texture.js',
+'materials/mappings/CubeReflectionMapping.js',
+'materials/mappings/CubeRefractionMapping.js',
+'materials/mappings/LatitudeReflectionMapping.js',
+'materials/mappings/LatitudeRefractionMapping.js',
+'materials/mappings/SphericalReflectionMapping.js',
+'materials/mappings/SphericalRefractionMapping.js',
+'materials/mappings/UVMapping.js',
+'scenes/Scene.js',
+'renderers/Projector.js',
+'renderers/CanvasRenderer.js',
+'renderers/renderables/RenderableFace3.js',
+'renderers/renderables/RenderableParticle.js',
+'renderers/renderables/RenderableLine.js'
+]
+
+WEBGL_FILES = [
+'Three.js',
+'core/Color.js',
+'core/Vector2.js',
+'core/Vector3.js',
+'core/Vector4.js',
+'core/Ray.js',
+'core/Rectangle.js',
+'core/Matrix3.js',
+'core/Matrix4.js',
+'core/Vertex.js',
+'core/Face3.js',
+'core/Face4.js',
+'core/UV.js',
+'core/Geometry.js',
+'cameras/Camera.js',
+'lights/Light.js',
+'lights/AmbientLight.js',
+'lights/DirectionalLight.js',
+'lights/PointLight.js',
+'objects/Object3D.js',
+'objects/Particle.js',
+'objects/Line.js',
+'objects/Mesh.js',
+'materials/Material.js',
+'materials/LineBasicMaterial.js',
+'materials/MeshBasicMaterial.js',
+'materials/MeshLambertMaterial.js',
+'materials/MeshPhongMaterial.js',
+'materials/MeshDepthMaterial.js',
+'materials/MeshNormalMaterial.js',
+'materials/MeshFaceMaterial.js',
+'materials/MeshCubeMaterial.js',
+'materials/MeshShaderMaterial.js',
+'materials/ParticleBasicMaterial.js',
+'materials/ParticleCircleMaterial.js',
+'materials/Texture.js',
+'materials/mappings/CubeReflectionMapping.js',
+'materials/mappings/CubeRefractionMapping.js',
+'materials/mappings/LatitudeReflectionMapping.js',
+'materials/mappings/LatitudeRefractionMapping.js',
+'materials/mappings/SphericalReflectionMapping.js',
+'materials/mappings/SphericalRefractionMapping.js',
+'materials/mappings/UVMapping.js',
+'scenes/Scene.js',
+'renderers/WebGLRenderer.js',
+]
 
 def merge(files):
 
-	text = ""
+	buffer = []
 
 	for filename in files:
 		with open(os.path.join('..', 'src', filename), 'r') as f:
-			text = text + f.read()
-
-	return text
+			buffer.append(f.read())
+	
+	return "".join(buffer)
 
 
 def output(text, filename):
@@ -67,7 +298,7 @@ def makeDebug(text):
 	return text
 
 
-def build(files, debug, outputFilename):
+def buildLib(files, debug, outputFilename):
 
 	text = merge(files)
 
@@ -84,381 +315,12 @@ def build(files, debug, outputFilename):
 	output(addHeader(compress(text), outputFilename), outputFilename)
 
 
-def buildCommon(debug):
+def buildIncludes(files, outputFilename):
 
-	files = [
-		'Three.js',
-		'core/Color.js',
-		'core/Vector2.js',
-		'core/Vector3.js',
-		'core/Vector4.js',
-		'core/Ray.js',
-		'core/Rectangle.js',
-		'core/Matrix3.js',
-		'core/Matrix4.js',
-		'core/Vertex.js',
-		'core/Face3.js',
-		'core/Face4.js',
-		'core/UV.js',
-		'core/Geometry.js',
-		'cameras/Camera.js',
-		'lights/Light.js',
-		'lights/AmbientLight.js',
-		'lights/DirectionalLight.js',
-		'lights/PointLight.js',
-		'objects/Object3D.js',
-		'objects/Particle.js',
-		'objects/Line.js',
-		'objects/Mesh.js',
-		'materials/Material.js',
-		'materials/LineBasicMaterial.js',
-		'materials/MeshBasicMaterial.js',
-		'materials/MeshLambertMaterial.js',
-		'materials/MeshPhongMaterial.js',
-		'materials/MeshDepthMaterial.js',
-		'materials/MeshNormalMaterial.js',
-		'materials/MeshFaceMaterial.js',
-		'materials/MeshCubeMaterial.js',
-		'materials/MeshShaderMaterial.js',
-		'materials/ParticleBasicMaterial.js',
-		'materials/ParticleCircleMaterial.js',
-		'materials/ParticleDOMMaterial.js',
-		'materials/Texture.js',
-		'materials/mappings/CubeReflectionMapping.js',
-		'materials/mappings/CubeRefractionMapping.js',
-		'materials/mappings/LatitudeReflectionMapping.js',
-		'materials/mappings/LatitudeRefractionMapping.js',
-		'materials/mappings/SphericalReflectionMapping.js',
-		'materials/mappings/SphericalRefractionMapping.js',
-		'materials/mappings/UVMapping.js',
-		'scenes/Scene.js',
-		'renderers/Projector.js',
-		'renderers/DOMRenderer.js',
-		'renderers/CanvasRenderer.js',
-		'renderers/SVGRenderer.js',
-		'renderers/WebGLRenderer.js',
-		'renderers/renderables/RenderableFace3.js',
-		'renderers/renderables/RenderableParticle.js',
-		'renderers/renderables/RenderableLine.js'
-	]
+	template = '\t\t<script type="text/javascript" src="../src/%s"></script>'
+	text = "\n".join(template % f for f in files)
 
-	build(files, debug, 'Three')
-
-def buildExtras(debug):
-	files = [
-		'Three.js',
-		'core/Color.js',
-		'core/Vector2.js',
-		'core/Vector3.js',
-		'core/Vector4.js',
-		'core/Ray.js',
-		'core/Rectangle.js',
-		'core/Matrix3.js',
-		'core/Matrix4.js',
-		'core/Vertex.js',
-		'core/Face3.js',
-		'core/Face4.js',
-		'core/UV.js',
-		'core/Geometry.js',
-		'cameras/Camera.js',
-		'lights/Light.js',
-		'lights/AmbientLight.js',
-		'lights/DirectionalLight.js',
-		'lights/PointLight.js',
-		'objects/Object3D.js',
-		'objects/Particle.js',
-		'objects/Line.js',
-		'objects/Mesh.js',
-		'materials/Material.js',
-		'materials/LineBasicMaterial.js',
-		'materials/MeshBasicMaterial.js',
-		'materials/MeshLambertMaterial.js',
-		'materials/MeshPhongMaterial.js',
-		'materials/MeshDepthMaterial.js',
-		'materials/MeshNormalMaterial.js',
-		'materials/MeshFaceMaterial.js',
-		'materials/MeshCubeMaterial.js',
-		'materials/MeshShaderMaterial.js',
-		'materials/ParticleBasicMaterial.js',
-		'materials/ParticleCircleMaterial.js',
-		'materials/ParticleDOMMaterial.js',
-		'materials/Texture.js',
-		'materials/mappings/CubeReflectionMapping.js',
-		'materials/mappings/CubeRefractionMapping.js',
-		'materials/mappings/LatitudeReflectionMapping.js',
-		'materials/mappings/LatitudeRefractionMapping.js',
-		'materials/mappings/SphericalReflectionMapping.js',
-		'materials/mappings/SphericalRefractionMapping.js',
-		'materials/mappings/UVMapping.js',
-		'scenes/Scene.js',
-		'renderers/Projector.js',
-		'renderers/DOMRenderer.js',
-		'renderers/CanvasRenderer.js',
-		'renderers/SVGRenderer.js',
-		'renderers/WebGLRenderer.js',
-		'renderers/renderables/RenderableFace3.js',
-		'renderers/renderables/RenderableParticle.js',
-		'renderers/renderables/RenderableLine.js',
-		'extras/GeometryUtils.js',
-		'extras/ImageUtils.js',
-		'extras/SceneUtils.js',
-		'extras/ShaderUtils.js',
-		'extras/primitives/Cube.js',
-		'extras/primitives/Cylinder.js',
-		'extras/primitives/Plane.js',
-		'extras/primitives/Sphere.js',
-		'extras/io/Loader.js'
-	]
-
-	build(files, debug, 'ThreeExtras')
-
-def buildCanvas(debug):
-
-	files = [
-		'Three.js',
-		'core/Color.js',
-		'core/Vector2.js',
-		'core/Vector3.js',
-		'core/Vector4.js',
-		'core/Ray.js',
-		'core/Rectangle.js',
-		'core/Matrix3.js',
-		'core/Matrix4.js',
-		'core/Vertex.js',
-		'core/Face3.js',
-		'core/Face4.js',
-		'core/UV.js',
-		'core/Geometry.js',
-		'cameras/Camera.js',
-		'lights/Light.js',
-		'lights/AmbientLight.js',
-		'lights/DirectionalLight.js',
-		'lights/PointLight.js',
-		'objects/Object3D.js',
-		'objects/Particle.js',
-		'objects/Line.js',
-		'objects/Mesh.js',
-		'materials/Material.js',
-		'materials/LineBasicMaterial.js',
-		'materials/MeshBasicMaterial.js',
-		'materials/MeshLambertMaterial.js',
-		'materials/MeshPhongMaterial.js',
-		'materials/MeshDepthMaterial.js',
-		'materials/MeshNormalMaterial.js',
-		'materials/MeshFaceMaterial.js',
-		'materials/ParticleBasicMaterial.js',
-		'materials/ParticleCircleMaterial.js',
-		'materials/Texture.js',
-		'materials/mappings/CubeReflectionMapping.js',
-		'materials/mappings/CubeRefractionMapping.js',
-		'materials/mappings/LatitudeReflectionMapping.js',
-		'materials/mappings/LatitudeRefractionMapping.js',
-		'materials/mappings/SphericalReflectionMapping.js',
-		'materials/mappings/SphericalRefractionMapping.js',
-		'materials/mappings/UVMapping.js',
-		'scenes/Scene.js',
-		'renderers/Projector.js',
-		'renderers/CanvasRenderer.js',
-		'renderers/renderables/RenderableFace3.js',
-		'renderers/renderables/RenderableParticle.js',
-		'renderers/renderables/RenderableLine.js'
-	]
-
-	build(files, debug, 'ThreeCanvas')
-
-
-def buildWebGL(debug):
-
-	files = [
-		'Three.js',
-		'core/Color.js',
-		'core/Vector2.js',
-		'core/Vector3.js',
-		'core/Vector4.js',
-		'core/Ray.js',
-		'core/Rectangle.js',
-		'core/Matrix3.js',
-		'core/Matrix4.js',
-		'core/Vertex.js',
-		'core/Face3.js',
-		'core/Face4.js',
-		'core/UV.js',
-		'core/Geometry.js',
-		'cameras/Camera.js',
-		'lights/Light.js',
-		'lights/AmbientLight.js',
-		'lights/DirectionalLight.js',
-		'lights/PointLight.js',
-		'objects/Object3D.js',
-		'objects/Particle.js',
-		'objects/Line.js',
-		'objects/Mesh.js',
-		'materials/Material.js',
-		'materials/LineBasicMaterial.js',
-		'materials/MeshBasicMaterial.js',
-		'materials/MeshLambertMaterial.js',
-		'materials/MeshPhongMaterial.js',
-		'materials/MeshDepthMaterial.js',
-		'materials/MeshNormalMaterial.js',
-		'materials/MeshFaceMaterial.js',
-		'materials/MeshCubeMaterial.js',
-		'materials/MeshShaderMaterial.js',
-		'materials/ParticleBasicMaterial.js',
-		'materials/ParticleCircleMaterial.js',
-		'materials/Texture.js',
-		'materials/mappings/CubeReflectionMapping.js',
-		'materials/mappings/CubeRefractionMapping.js',
-		'materials/mappings/LatitudeReflectionMapping.js',
-		'materials/mappings/LatitudeRefractionMapping.js',
-		'materials/mappings/SphericalReflectionMapping.js',
-		'materials/mappings/SphericalRefractionMapping.js',
-		'materials/mappings/UVMapping.js',
-		'scenes/Scene.js',
-		'renderers/WebGLRenderer.js',
-	]
-
-	build(files, debug, 'ThreeWebGL')
-
-
-def buildSVG(debug):
-
-	files = [
-		'Three.js',
-		'core/Color.js',
-		'core/Vector2.js',
-		'core/Vector3.js',
-		'core/Vector4.js',
-		'core/Ray.js',
-		'core/Rectangle.js',
-		'core/Matrix3.js',
-		'core/Matrix4.js',
-		'core/Vertex.js',
-		'core/Face3.js',
-		'core/Face4.js',
-		'core/UV.js',
-		'core/Geometry.js',
-		'cameras/Camera.js',
-		'lights/Light.js',
-		'lights/AmbientLight.js',
-		'lights/DirectionalLight.js',
-		'lights/PointLight.js',
-		'objects/Object3D.js',
-		'objects/Particle.js',
-		'objects/Line.js',
-		'objects/Mesh.js',
-		'materials/Material.js',
-		'materials/LineBasicMaterial.js',
-		'materials/MeshBasicMaterial.js',
-		'materials/MeshLambertMaterial.js',
-		'materials/MeshPhongMaterial.js',
-		'materials/MeshDepthMaterial.js',
-		'materials/MeshNormalMaterial.js',
-		'materials/MeshFaceMaterial.js',
-		'materials/ParticleBasicMaterial.js',
-		'materials/ParticleCircleMaterial.js',
-		'scenes/Scene.js',
-		'renderers/Projector.js',
-		'renderers/SVGRenderer.js',
-		'renderers/renderables/RenderableFace3.js',
-		'renderers/renderables/RenderableParticle.js',
-		'renderers/renderables/RenderableLine.js'
-	]
-
-	build(files, debug, 'ThreeSVG')
-
-
-def buildDOM(debug):
-
-	files = [
-		'Three.js',
-		'core/Color.js',
-		'core/Vector2.js',
-		'core/Vector3.js',
-		'core/Vector4.js',
-		'core/Ray.js',
-		'core/Rectangle.js',
-		'core/Matrix3.js',
-		'core/Matrix4.js',
-		'core/Vertex.js',
-		'core/Face3.js',
-		'core/Face4.js',
-		'core/UV.js',
-		'cameras/Camera.js',
-		'objects/Object3D.js',
-		'objects/Particle.js',
-		'materials/ParticleDOMMaterial.js',
-		'scenes/Scene.js',
-		'renderers/Projector.js',
-		'renderers/DOMRenderer.js',
-		'renderers/renderables/RenderableParticle.js',
-	]
-
-	build(files, debug, 'ThreeDOM')
-
-
-def buildIncludes():
-
-	text = ''
-	files = [
-		'Three.js',
-		'core/Color.js',
-		'core/Vector2.js',
-		'core/Vector3.js',
-		'core/Vector4.js',
-		'core/Ray.js',
-		'core/Rectangle.js',
-		'core/Matrix3.js',
-		'core/Matrix4.js',
-		'core/Vertex.js',
-		'core/Face3.js',
-		'core/Face4.js',
-		'core/UV.js',
-		'core/Geometry.js',
-		'cameras/Camera.js',
-		'lights/Light.js',
-		'lights/AmbientLight.js',
-		'lights/DirectionalLight.js',
-		'lights/PointLight.js',
-		'objects/Object3D.js',
-		'objects/Particle.js',
-		'objects/Line.js',
-		'objects/Mesh.js',
-		'materials/Material.js',
-		'materials/LineBasicMaterial.js',
-		'materials/MeshBasicMaterial.js',
-		'materials/MeshLambertMaterial.js',
-		'materials/MeshPhongMaterial.js',
-		'materials/MeshDepthMaterial.js',
-		'materials/MeshNormalMaterial.js',
-		'materials/MeshFaceMaterial.js',
-		'materials/MeshCubeMaterial.js',
-		'materials/MeshShaderMaterial.js',
-		'materials/ParticleBasicMaterial.js',
-		'materials/ParticleCircleMaterial.js',
-		'materials/ParticleDOMMaterial.js',
-		'materials/Texture.js',
-		'materials/mappings/CubeReflectionMapping.js',
-		'materials/mappings/CubeRefractionMapping.js',
-		'materials/mappings/LatitudeReflectionMapping.js',
-		'materials/mappings/LatitudeRefractionMapping.js',
-		'materials/mappings/SphericalReflectionMapping.js',
-		'materials/mappings/SphericalRefractionMapping.js',
-		'materials/mappings/UVMapping.js',
-		'scenes/Scene.js',
-		'renderers/Projector.js',
-		'renderers/DOMRenderer.js',
-		'renderers/CanvasRenderer.js',
-		'renderers/SVGRenderer.js',
-		'renderers/WebGLRenderer.js',
-		'renderers/renderables/RenderableFace3.js',
-		'renderers/renderables/RenderableParticle.js',
-		'renderers/renderables/RenderableLine.js'
-	]
-
-	for filename in files:
-		text = text + '\t\t<script type="text/javascript" src="../src/' + filename + '"></script>\n'
-
-	output(text, 'includes.js')
+	output(text, outputFilename + '.js')
 
 
 def parse_args():
@@ -502,29 +364,22 @@ def parse_args():
 def main(argv=None):
 
 	args = parse_args()
-
 	debug = args.debug
 
-	if args.includes or args.all:
-		buildIncludes()
-
-	if args.common or args.all:
-		buildCommon(debug)
-
-	if args.extras:
-		buildExtras(debug)
-
-	if args.canvas or args.all:
-		buildCanvas(debug)
-
-	if args.webgl or args.all:
-		buildWebGL(debug)
-
-	if args.svg or args.all:
-		buildSVG(debug)
-
-	if args.dom or args.all:
-		buildDOM(debug)
+	config = [
+	['Three', 	  	'includes_common', COMMON_FILES, args.common],
+	['ThreeCanvas', 'includes_canvas', CANVAS_FILES, args.canvas],
+	['ThreeWebGL',  'includes_webgl',  WEBGL_FILES,  args.webgl],
+	['ThreeSVG', 	'includes_svg',    SVG_FILES,    args.svg],
+	['ThreeDOM', 	'includes_dom',    DOM_FILES,    args.dom],
+	['ThreeExtras', 'includes_extras', COMMON_FILES + EXTRAS_FILES, args.extras]
+	]
+	
+	for fname_lib, fname_inc, files, enabled in config:
+		if enabled or args.all:
+			buildLib(files, debug, fname_lib)
+			if args.includes:
+				buildIncludes(files, fname_inc)
 
 if __name__ == "__main__":
 	main()
