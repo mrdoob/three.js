@@ -31,7 +31,7 @@
 	<body>
 
 		<div id="container"><br /><br /><br /><br /><br />Generating world...</div> 
-		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - <a href="http://www.minecraft.net/" target="_blank">minecraft</a> demo.<br />(camera move: WASD/↑←↓→)</div> 
+		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - <a href="http://www.minecraft.net/" target="_blank">minecraft</a> demo. featuring <a href="http://painterlypack.net/" target="_blank">painterly pack</a>.<br />(camera move: WASD/↑←↓→)</div> 
 
 		<script type="text/javascript" src="js/Stats.js"></script>
 		<script type="text/javascript" src="js/ImprovedNoise.js"></script>
@@ -115,7 +115,7 @@
 				var ambientLight = new THREE.AmbientLight( 0xcccccc );
 				scene.addLight( ambientLight );
 
-				var pointLight = new THREE.DirectionalLight( 0xffffff, 1 );
+				var pointLight = new THREE.DirectionalLight( 0xffffff, 1.5 );
 				pointLight.position.x = 1;
 				pointLight.position.y = 1;
 				pointLight.position.z = 0.5;
