@@ -3,7 +3,7 @@
  * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Cube.as
  */
 
-var Cube = function ( width, height, depth, segments_width, segments_height, materials, flipped ) {
+var Cube = function ( width, height, depth, segments_width, segments_height, materials, flipped, sides ) {
 
 	THREE.Geometry.call( this );
 
@@ -37,12 +37,28 @@ var Cube = function ( width, height, depth, segments_width, segments_height, mat
 
 	}
 
-	buildPlane( 'z', 'y',   1 * flip, - 1, depth, height, - width_half, this.materials[ 0 ] ); // px
-	buildPlane( 'z', 'y', - 1 * flip, - 1, depth, height, width_half, this.materials[ 1 ] ); // nx
-	buildPlane( 'x', 'z',   1 * flip,   1, width, depth, height_half, this.materials[ 2 ] ); // py
-	buildPlane( 'x', 'z',   1 * flip, - 1, width, depth, - height_half, this.materials[ 3 ] ); // ny
-	buildPlane( 'x', 'y',   1 * flip, - 1, width, height, depth_half, this.materials[ 4 ] ); // pz
-	buildPlane( 'x', 'y', - 1 * flip, - 1, width, height, - depth_half, this.materials[ 5 ] ); // nz
+	this.sides = { px: true, nx: true, py: true, ny: true, pz: true, nz: true };
+	
+	if( sides != undefined ) {
+		
+		for( var s in sides ) {
+			
+			if ( this.sides[ s ] != undefined ) {
+			
+				this.sides[ s ] = sides[ s ];
+				
+			}
+			
+		}
+		
+	}
+	
+	this.sides.px && buildPlane( 'z', 'y',   1 * flip, - 1, depth, height, - width_half, this.materials[ 0 ] ); // px
+	this.sides.nx && buildPlane( 'z', 'y', - 1 * flip, - 1, depth, height, width_half, this.materials[ 1 ] );   // nx
+	this.sides.py && buildPlane( 'x', 'z',   1 * flip,   1, width, depth, height_half, this.materials[ 2 ] );   // py
+	this.sides.ny && buildPlane( 'x', 'z',   1 * flip, - 1, width, depth, - height_half, this.materials[ 3 ] ); // ny
+	this.sides.pz && buildPlane( 'x', 'y',   1 * flip, - 1, width, height, depth_half, this.materials[ 4 ] );   // pz
+	this.sides.nz && buildPlane( 'x', 'y', - 1 * flip, - 1, width, height, - depth_half, this.materials[ 5 ] ); // nz
 
 	mergeVertices();
 
