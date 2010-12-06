@@ -19,12 +19,13 @@ More? irc.freenode.net #three.js
 [![materials](http://mrdoob.github.com/three.js/assets/examples/13_materials.png)](http://mrdoob.github.com/three.js/examples/materials.html)
 [![materials_depth](http://mrdoob.github.com/three.js/assets/examples/19_materials_depth.png)](http://mrdoob.github.com/three.js/examples/materials_depth.html)
 [![materials_normal](http://mrdoob.github.com/three.js/assets/examples/22_materials_normal.png)](http://mrdoob.github.com/three.js/examples/materials_normal.html)
-[![materials_video](http://mrdoob.github.com/three.js/assets/examples/24_materials_video.png)](http://mrdoob.github.com/three.js/examples/materials_video.html)
+[![lights_pointlights](http://mrdoob.github.com/three.js/assets/examples/09_walthead.png)](http://mrdoob.github.com/three.js/examples/lights_pointlights.html)
 [![interactive_cubes](http://mrdoob.github.com/three.js/assets/examples/11_interactive.png)](http://mrdoob.github.com/three.js/examples/interactive_cubes.html)
 [![camera_ortographic](http://mrdoob.github.com/three.js/assets/examples/10_orthographic.png)](http://mrdoob.github.com/three.js/examples/camera_orthographic.html)
 [![geometry_birds](http://mrdoob.github.com/three.js/assets/examples/08_birds.png)](http://mrdoob.github.com/three.js/examples/geometry_birds.html)
 [![geometry_earth](http://mrdoob.github.com/three.js/assets/examples/07_earth.png)](http://mrdoob.github.com/three.js/examples/geometry_earth.html)
 [![geometry_terrain](http://mrdoob.github.com/three.js/assets/examples/06_terrain.png)](http://mrdoob.github.com/three.js/examples/geometry_terrain.html)
+[![materials_video](http://mrdoob.github.com/three.js/assets/examples/24_materials_video.png)](http://mrdoob.github.com/three.js/examples/materials_video.html)
 [![geometry_panorama](http://mrdoob.github.com/three.js/assets/examples/04_vr.png)](http://mrdoob.github.com/three.js/examples/geometry_panorama.html)
 [![geometry_cube](http://mrdoob.github.com/three.js/assets/examples/03_cube.png)](http://mrdoob.github.com/three.js/examples/geometry_cube.html)
 [![particles_sprites](http://mrdoob.github.com/three.js/assets/examples/26_particles_sprites.png)](http://mrdoob.github.com/three.js/examples/particles_sprites.html)
@@ -44,7 +45,6 @@ More? irc.freenode.net #three.js
 [![materials_gl](http://mrdoob.github.com/three.js/assets/examples/20_materials_gl.png)](http://mrdoob.github.com/three.js/examples/materials_gl.html)
 [![materials_shaders](http://mrdoob.github.com/three.js/assets/examples/23_materials_shaders.png)](http://mrdoob.github.com/three.js/examples/materials_shaders.html)
 [![large_mesh](http://mrdoob.github.com/three.js/assets/examples/12_large_mesh.png)](http://mrdoob.github.com/three.js/examples/geometry_large_mesh.html)
-[![lights_pointlights](http://mrdoob.github.com/three.js/assets/examples/09_walthead.png)](http://mrdoob.github.com/three.js/examples/lights_pointlights.html)
 
 
 ### Featured projects ###
