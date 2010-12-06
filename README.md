@@ -35,6 +35,7 @@ More? irc.freenode.net #three.js
 
 #### WebGL ####
 
+[![geometry_minecraft](http://mrdoob.github.com/three.js/assets/examples/29_geometry_minecraft.png)](http://mrdoob.github.com/three.js/examples/geometry_minecraft.html)
 [![materials_shader_fresnel](http://mrdoob.github.com/three.js/assets/examples/28_materials_shaders_fresnel.png)](http://mrdoob.github.com/three.js/examples/materials_shaders_fresnel.html)
 [![materials_cars](http://mrdoob.github.com/three.js/assets/examples/25_materials_cars.png)](http://mrdoob.github.com/three.js/examples/materials_cars.html)
 [![materials_cubemap_refraction](http://mrdoob.github.com/three.js/assets/examples/18_materials_cubemap_refraction.png)](http://mrdoob.github.com/three.js/examples/materials_cubemap_refraction.html)
@@ -168,7 +169,7 @@ For creating a customised version of the library, including the source files in 
 
 ### Change Log ###
 
-2010 12 05 - **r31** (79.479 KB, gzip: 18.788 KB)
+2010 12 06 - **r31** (79.479 KB, gzip: 18.788 KB)
 
 * Minor Materials API change (mappings). ([alteredq](http://github.com/alteredq) & [mrdoob](http://github.com/mrdoob))
 * Added Filters to `WebGLRenderer`
