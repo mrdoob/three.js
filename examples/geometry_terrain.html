@@ -69,8 +69,8 @@
 
 				var heightMap = height( 1024, 1024 );
 
-				var texture = new THREE.Texture( shadow( heightMap ), THREE.UVMapping );
-				texture.loaded = true;
+				var texture = new THREE.Texture( shadow( heightMap ) );
+				texture.image.loaded = true;
 
 				var material = new THREE.MeshBasicMaterial( { map: texture } );
 

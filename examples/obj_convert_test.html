@@ -21,7 +21,7 @@
 			.inactive { background:#999; color:#eee }
 		</style>
 	</head>
-	
+
 	<body>
 		<div id="d">
 			<h1>OBJ to Three.js converter test</h1>
@@ -30,19 +30,19 @@
 			<span id="rwebgl" class="button">WebGL renderer</span>
 			<br/>
 
-			<p>Models by <a href="http://sketchup.google.com/3dwarehouse/details?mid=2c6fd128fca34052adc5f5b98d513da1">Reallusion<a> 
+			<p>Models by <a href="http://sketchup.google.com/3dwarehouse/details?mid=2c6fd128fca34052adc5f5b98d513da1">Reallusion<a>
 			<a href="http://sketchup.google.com/3dwarehouse/details?mid=f526cc4abf7cb68d76cab47c765b7255">iClone</a>.
-			
+
 			<p>Using a modified version of <a href="http://github.com/alteredq/three.js">Three.js</a> by mrdoob.
-			
+
 			<br/>
 			<p>Best viewed in Chrome 8/9 or Firefox 4 using WebGL renderer.
 			<p>Canvas renderer is very slow on anything other than Chrome.
 		</div>
-		
+
 		<pre id="log"></pre>
 
-		<script type="text/javascript" src="../build/Three.js"></script> 
+		<script type="text/javascript" src="../build/Three.js"></script>
 
 		<script type="text/javascript" src="../src/extras/io/Loader.js"></script>
 		<script type="text/javascript" src="../src/extras/primitives/Sphere.js"></script>
@@ -56,37 +56,34 @@
 			var SCREEN_HEIGHT = window.innerHeight;
 			var FLOOR = -250;
 
-			var container;
-			var stats;
+			var container,stats;
 
-			var camera;
-			var scene;
+			var camera, scene;
 			var canvasRenderer, webglRenderer;
 
 			var mesh, zmesh, geometry;
-			
-			var mouseX = 0;
-			var mouseY = 0;
 
-			var windowHalfX = window.innerWidth >> 1;
-			var windowHalfY = window.innerHeight >> 1;
+			var mouseX = 0, mouseY = 0;
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
 
 			var render_canvas = 1, render_gl = 1;
 			var has_gl = 0;
-			
+
 			var bcanvas = document.getElementById("rcanvas");
 			var bwebgl = document.getElementById("rwebgl");
-			
+
 			document.addEventListener('mousemove', onDocumentMouseMove, false);
 
 			init();
-			
+
 			loop();
-			
+
 			render_canvas = !has_gl;
 			bwebgl.style.display = has_gl ? "inline" : "none";
 			bcanvas.className = render_canvas ? "button" : "button inactive";
-			
+
 			setInterval(loop, 1000/60);
 
 
@@ -100,9 +97,9 @@
 				camera.updateMatrix();
 
 				scene = new THREE.Scene();
-				
+
 				// GROUND
-				
+
 				var x = document.createElement( "canvas" );
 				var xc = x.getContext("2d");
 				x.width = x.height = 128;
@@ -116,10 +113,10 @@
 				xc.fillRect(64, 64, 64, 64);
 				xc.fillStyle = "#555";
 				xc.fillRect(96, 96, 32, 32);
-				
-				var xm = new THREE.MeshBasicMaterial( { map: new THREE.Texture( x, THREE.UVMapping, THREE.Repeat, THREE.Repeat ) } );
+
+				var xm = new THREE.MeshBasicMaterial( { map: new THREE.Texture( x, THREE.UVMapping, THREE.RepeatWrapping, THREE.RepeatWrapping ) } );
 				xm.map.image.loaded = 1;
-				
+
 				geometry = new Plane( 100, 100, 15, 10 );
 				for(var i=0; i<geometry.uvs.length; i++) {
 					var uvs = geometry.uvs[i];
@@ -127,7 +124,7 @@
 						uvs[j].u *= 10;
 						uvs[j].v *= 10;
 					}
-					
+
 				}
 				mesh = new THREE.Mesh( geometry, xm );
 				mesh.position.x = 0;
@@ -137,9 +134,9 @@
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 10;
 				mesh.updateMatrix();
 				scene.addObject(mesh);
-				
+
 				// SPHERES
-				
+
 				sphere = new Sphere( 100, 16, 8, 1 );
 				for (var i=0; i<10; i++) {
 					mesh = new THREE.Mesh( sphere, new THREE.MeshLambertMaterial( { color: 0xdddddd } ) );
@@ -151,7 +148,7 @@
 					mesh.updateMatrix();
 					scene.addObject(mesh);
 				}
-				
+
 
 				// LIGHTS
 
@@ -191,10 +188,10 @@
 				stats.domElement.style.top = '0px';
 				stats.domElement.style.zIndex = 100;
 				container.appendChild( stats.domElement );
-				
+
 				bcanvas.addEventListener("click", toggleCanvas, false);
 				bwebgl.addEventListener("click", toggleWebGL, false);
-				
+
 				var loader = new THREE.Loader();
 				//loader.loadAscii( "obj/male02/Male02_slim.js",     function( geometry ) { createScene( geometry,  90, 50, FLOOR, 105 ) }, "obj/male02" );
 				//loader.loadAscii( "obj/female02/Female02_slim.js", function( geometry ) { createScene( geometry, -80, 50, FLOOR, 0 ) },   "obj/female02" );
@@ -205,7 +202,7 @@
 			}
 
 			function createScene( geometry, x, y, z, b ) {
-				
+
 				zmesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial(), 1 );
 				zmesh.position.x = x;
 				zmesh.position.z = y;
@@ -214,15 +211,15 @@
 				zmesh.overdraw = true;
 				zmesh.updateMatrix();
 				scene.addObject(zmesh);
-				
+
 				createMaterialsPalette( geometry.materials, 100, b );
-                
+
 			}
 
 			function createMaterialsPalette( materials, size, bottom ) {
-				
+
 				for ( var i=0; i<materials.length; ++i ) {
-					
+
 					// material
 					mesh = new THREE.Mesh( new Plane( size, size ), materials[i] );
 					mesh.position.x = i * (size + 5) - ( ( materials.length - 1 )* ( size + 5 )/2);
@@ -232,7 +229,7 @@
 					mesh.doubleSided = true;
 					mesh.updateMatrix();
 					scene.addObject(mesh);
-					
+
 					// number
 					var x = document.createElement( "canvas" );
 					var xc = x.getContext("2d");
@@ -242,10 +239,10 @@
 					xc.fillStyle = "orange";
 					xc.font = "50pt arial bold";
 					xc.fillText(i, 10, 64);
-					
+
 					var xm = new THREE.MeshBasicMaterial( { map: new THREE.Texture( x ) } );
 					xm.map.image.loaded = 1;
-					
+
 					mesh = new THREE.Mesh( new Plane( size, size ), xm );
 					mesh.position.x = i * (size + 5) - ( ( materials.length - 1 )* ( size + 5 )/2);
 					mesh.position.y = FLOOR + size/2 + bottom;
@@ -255,9 +252,9 @@
 					mesh.updateMatrix();
 					scene.addObject(mesh);
 				}
-				
+
 			}
-			
+
 			function onDocumentMouseMove(event) {
 
 				mouseX = ( event.clientX - windowHalfX );
@@ -284,40 +281,40 @@
 			}
 
 			function log( text ) {
-			
+
 				var e = document.getElementById("log");
 				e.innerHTML = text + "<br/>" + e.innerHTML;
-				
+
 			}
-			
+
 			function toggleCanvas() {
-			
+
 				render_canvas = !render_canvas;
 				bcanvas.className = render_canvas ? "button" : "button inactive";
-				
+
 				render_gl = !render_canvas;
 				bwebgl.className = render_gl ? "button" : "button inactive";
-				
+
 				if( has_gl )
 					webglRenderer.domElement.style.display = render_gl ? "block" : "none";
-				
+
 				canvasRenderer.domElement.style.display = render_canvas ? "block" : "none";
-				
+
 			}
-			
+
 			function toggleWebGL() {
-			
+
 				render_gl = !render_gl;
 				bwebgl.className = render_gl ? "button" : "button inactive";
-				
+
 				render_canvas = !render_gl;
 				bcanvas.className = render_canvas ? "button" : "button inactive";
-				
+
 				if( has_gl )
 					webglRenderer.domElement.style.display = render_gl ? "block" : "none";
-					
+
 				canvasRenderer.domElement.style.display = render_canvas ? "block" : "none";
-				
+
 			}
 		</script>
 

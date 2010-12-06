@@ -74,6 +74,7 @@
 				// 
 
 				texture = document.createElement( 'canvas' );
+				texture.loaded = true;
 				texture.width = 480;
 				texture.height = 204;
 
@@ -81,12 +82,12 @@
 				textureContext.fillStyle = '#000000';
 				textureContext.fillRect( 0, 0, 480, 204 );
 
-				var map = new THREE.Texture( texture, THREE.UVMapping );
-				map.loaded = true;
+				var map = new THREE.Texture( texture );
 
 				var material = new THREE.MeshBasicMaterial( { map: map } );
 
 				textureReflection = document.createElement( 'canvas' );
+				textureReflection.loaded = true;
 				textureReflection.width = 480;
 				textureReflection.height = 204;
 
@@ -98,7 +99,7 @@
 				textureReflectionGradient.addColorStop( 0.2, 'rgba(240, 240, 240, 1)' );
 				textureReflectionGradient.addColorStop( 1, 'rgba(240, 240, 240, 0.8)' );
 
-				var materialReflection = new THREE.MeshBasicMaterial( { map: new THREE.Texture( textureReflection, THREE.UVMapping ) } );
+				var materialReflection = new THREE.MeshBasicMaterial( { map: new THREE.Texture( textureReflection ) } );
 
 				//
 

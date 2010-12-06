@@ -107,11 +107,11 @@
 
 				var images = ImageUtils.loadArray( urls );
 
-				var reflectionCube = new THREE.TextureCube( images );
-				var refractionCube = new THREE.TextureCube( images, THREE.RefractionMapping );
+				var reflectionCube = new THREE.Texture( images );
+				var refractionCube = new THREE.Texture( images, new THREE.CubeRefractionMapping() );
 				
-				//var cubeMaterial3 = new THREE.MeshPhongMaterial( { color: 0x000000, specular:0xaa0000, env_map: new THREE.TextureCube( images ), combine: THREE.Mix, reflectivity: 0.25 } );
-				var cubeMaterial3 = new THREE.MeshLambertMaterial( { color: 0xff6600, env_map: reflectionCube, combine: THREE.Mix, reflectivity: 0.3 } );
+				//var cubeMaterial3 = new THREE.MeshPhongMaterial( { color: 0x000000, specular:0xaa0000, env_map: new THREE.TextureCube( images ), combine: THREE.MixOperation, reflectivity: 0.25 } );
+				var cubeMaterial3 = new THREE.MeshLambertMaterial( { color: 0xff6600, env_map: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3 } );
 				var cubeMaterial2 = new THREE.MeshLambertMaterial( { color: 0xffee00, env_map: refractionCube, refraction_ratio: 0.95 } );
 				var cubeMaterial1 = new THREE.MeshLambertMaterial( { color: 0xffffff, env_map: reflectionCube } )
 

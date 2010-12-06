@@ -92,8 +92,8 @@
 					];
 
 				var images = ImageUtils.loadArray( urls );
-				var textureCube = new THREE.TextureCube( images );
-				// var textureCube = new THREE.TextureCube( images, THREE.RefractionMap );
+				var textureCube = new THREE.Texture( images );
+				// var textureCube = new THREE.Texture( images, new THREE.CubeRefractionMapping );
 
 				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, env_map: textureCube } );
 

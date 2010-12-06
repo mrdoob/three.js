@@ -85,6 +85,7 @@ def build(files, debug, outputFilename):
 
 
 def buildCommon(debug):
+
 	files = [
 		'Three.js',
 		'core/Color.js',
@@ -122,8 +123,14 @@ def buildCommon(debug):
 		'materials/ParticleBasicMaterial.js',
 		'materials/ParticleCircleMaterial.js',
 		'materials/ParticleDOMMaterial.js',
-		'materials/textures/Texture.js',
-		'materials/textures/TextureCube.js',
+		'materials/Texture.js',
+		'materials/mappings/CubeReflectionMapping.js',
+		'materials/mappings/CubeRefractionMapping.js',
+		'materials/mappings/LatitudeReflectionMapping.js',
+		'materials/mappings/LatitudeRefractionMapping.js',
+		'materials/mappings/SphericalReflectionMapping.js',
+		'materials/mappings/SphericalRefractionMapping.js',
+		'materials/mappings/UVMapping.js',
 		'scenes/Scene.js',
 		'renderers/Projector.js',
 		'renderers/DOMRenderer.js',
@@ -175,8 +182,14 @@ def buildExtras(debug):
 		'materials/ParticleBasicMaterial.js',
 		'materials/ParticleCircleMaterial.js',
 		'materials/ParticleDOMMaterial.js',
-		'materials/textures/Texture.js',
-		'materials/textures/TextureCube.js',
+		'materials/Texture.js',
+		'materials/mappings/CubeReflectionMapping.js',
+		'materials/mappings/CubeRefractionMapping.js',
+		'materials/mappings/LatitudeReflectionMapping.js',
+		'materials/mappings/LatitudeRefractionMapping.js',
+		'materials/mappings/SphericalReflectionMapping.js',
+		'materials/mappings/SphericalRefractionMapping.js',
+		'materials/mappings/UVMapping.js',
 		'scenes/Scene.js',
 		'renderers/Projector.js',
 		'renderers/DOMRenderer.js',
@@ -235,7 +248,14 @@ def buildCanvas(debug):
 		'materials/MeshFaceMaterial.js',
 		'materials/ParticleBasicMaterial.js',
 		'materials/ParticleCircleMaterial.js',
-		'materials/textures/Texture.js',
+		'materials/Texture.js',
+		'materials/mappings/CubeReflectionMapping.js',
+		'materials/mappings/CubeRefractionMapping.js',
+		'materials/mappings/LatitudeReflectionMapping.js',
+		'materials/mappings/LatitudeRefractionMapping.js',
+		'materials/mappings/SphericalReflectionMapping.js',
+		'materials/mappings/SphericalRefractionMapping.js',
+		'materials/mappings/UVMapping.js',
 		'scenes/Scene.js',
 		'renderers/Projector.js',
 		'renderers/CanvasRenderer.js',
@@ -285,8 +305,14 @@ def buildWebGL(debug):
 		'materials/MeshShaderMaterial.js',
 		'materials/ParticleBasicMaterial.js',
 		'materials/ParticleCircleMaterial.js',
-		'materials/textures/Texture.js',
-		'materials/textures/TextureCube.js',
+		'materials/Texture.js',
+		'materials/mappings/CubeReflectionMapping.js',
+		'materials/mappings/CubeRefractionMapping.js',
+		'materials/mappings/LatitudeReflectionMapping.js',
+		'materials/mappings/LatitudeRefractionMapping.js',
+		'materials/mappings/SphericalReflectionMapping.js',
+		'materials/mappings/SphericalRefractionMapping.js',
+		'materials/mappings/UVMapping.js',
 		'scenes/Scene.js',
 		'renderers/WebGLRenderer.js',
 	]
@@ -370,10 +396,76 @@ def buildDOM(debug):
 	build(files, debug, 'ThreeDOM')
 
 
+def buildIncludes():
+
+	text = ''
+	files = [
+		'Three.js',
+		'core/Color.js',
+		'core/Vector2.js',
+		'core/Vector3.js',
+		'core/Vector4.js',
+		'core/Ray.js',
+		'core/Rectangle.js',
+		'core/Matrix3.js',
+		'core/Matrix4.js',
+		'core/Vertex.js',
+		'core/Face3.js',
+		'core/Face4.js',
+		'core/UV.js',
+		'core/Geometry.js',
+		'cameras/Camera.js',
+		'lights/Light.js',
+		'lights/AmbientLight.js',
+		'lights/DirectionalLight.js',
+		'lights/PointLight.js',
+		'objects/Object3D.js',
+		'objects/Particle.js',
+		'objects/Line.js',
+		'objects/Mesh.js',
+		'materials/Material.js',
+		'materials/LineBasicMaterial.js',
+		'materials/MeshBasicMaterial.js',
+		'materials/MeshLambertMaterial.js',
+		'materials/MeshPhongMaterial.js',
+		'materials/MeshDepthMaterial.js',
+		'materials/MeshNormalMaterial.js',
+		'materials/MeshFaceMaterial.js',
+		'materials/MeshCubeMaterial.js',
+		'materials/MeshShaderMaterial.js',
+		'materials/ParticleBasicMaterial.js',
+		'materials/ParticleCircleMaterial.js',
+		'materials/ParticleDOMMaterial.js',
+		'materials/Texture.js',
+		'materials/mappings/CubeReflectionMapping.js',
+		'materials/mappings/CubeRefractionMapping.js',
+		'materials/mappings/LatitudeReflectionMapping.js',
+		'materials/mappings/LatitudeRefractionMapping.js',
+		'materials/mappings/SphericalReflectionMapping.js',
+		'materials/mappings/SphericalRefractionMapping.js',
+		'materials/mappings/UVMapping.js',
+		'scenes/Scene.js',
+		'renderers/Projector.js',
+		'renderers/DOMRenderer.js',
+		'renderers/CanvasRenderer.js',
+		'renderers/SVGRenderer.js',
+		'renderers/WebGLRenderer.js',
+		'renderers/renderables/RenderableFace3.js',
+		'renderers/renderables/RenderableParticle.js',
+		'renderers/renderables/RenderableLine.js'
+	]
+
+	for filename in files:
+		text = text + '\t\t<script type="text/javascript" src="../src/' + filename + '"></script>\n'
+
+	output(text, 'includes.js')
+
+
 def parse_args():
 
 	if ap:
 		parser = argparse.ArgumentParser(description='Build and compress Three.js')
+		parser.add_argument('--includes', help='Build includes.js', action='store_true')
 		parser.add_argument('--common', help='Build Three.js', action='store_const', const=True)
 		parser.add_argument('--extras', help='Build ThreeExtras.js', action='store_const', const=True)
 		parser.add_argument('--canvas', help='Build ThreeCanvas.js', action='store_true')
@@ -387,6 +479,7 @@ def parse_args():
 
 	else:
 		parser = optparse.OptionParser(description='Build and compress Three.js')
+		parser.add_option('--includes', dest='includes', help='Build includes.js', action='store_true')
 		parser.add_option('--common', dest='common', help='Build Three.js', action='store_const', const=True)
 		parser.add_option('--extras', dest='extras', help='Build ThreeExtras.js', action='store_const', const=True)
 		parser.add_option('--canvas', dest='canvas', help='Build ThreeCanvas.js', action='store_true')
@@ -411,6 +504,9 @@ def main(argv=None):
 	args = parse_args()
 
 	debug = args.debug
+
+	if args.includes or args.all:
+		buildIncludes()
 
 	if args.common or args.all:
 		buildCommon(debug)

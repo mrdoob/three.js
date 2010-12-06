@@ -90,7 +90,7 @@
 
 
 				var images = ImageUtils.loadArray( urls );
-				var textureCube = new THREE.TextureCube( images );
+				var textureCube = new THREE.Texture( images );
 
 				var fragment_shader = ShaderUtils.lib["fresnel"].fragment_shader;
 				var vertex_shader = ShaderUtils.lib["fresnel"].vertex_shader;
