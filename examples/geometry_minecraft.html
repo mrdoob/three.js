@@ -1,0 +1,284 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>three.js - geometry - minecraft</title>
+		<meta charset="utf-8">
+		<style type="text/css">
+			body {
+				color: #61443e;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+
+				background-color: #bfd1e5;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+			}
+
+			a {
+
+				color: #a06851;
+			}
+
+		</style>
+	</head>
+	<body>
+
+		<div id="container"><br /><br /><br /><br /><br />Generating world...</div> 
+		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - <a href="http://www.minecraft.net/" target="_blank">minecraft</a> demo.<br />(camera move: WASD/↑←↓→)</div> 
+
+		<script type="text/javascript" src="js/Stats.js"></script>
+		<script type="text/javascript" src="js/ImprovedNoise.js"></script>
+
+		<script type="text/javascript" src="../build/Three.js"></script>
+		<script type="text/javascript" src="../src/extras/GeometryUtils.js"></script>
+		<script type="text/javascript" src="../src/extras/primitives/Cube.js"></script>
+
+		<script type="text/javascript">
+
+			var container, stats;
+
+			var camera, scene, renderer;
+
+			var mesh;
+
+			var worldWidth = 128, worldDepth = 128,
+			worldHalfWidth = worldWidth / 2, worldHalfDepth = worldDepth / 2,
+			data = generateHeight( worldWidth, worldDepth );
+
+			var mouseX = 0, mouseY = 0,
+			lat = 0, lon = 0, phy = 0, theta = 0;
+
+			var direction = new THREE.Vector3(),
+			moveForward = false, moveBackwards = false,
+			moveLeft = false, moveRight = false;
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+
+			init();
+			setInterval( loop, 1000 / 60 );
+
+
+			function init() {
+
+				container = document.getElementById( 'container' );
+
+				camera = new THREE.Camera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
+				camera.target.position.z = - 100;
+
+				scene = new THREE.Scene();
+
+				var materials = [
+
+					loadTexture( 'textures/minecraft/grass_dirt.png' ), // right
+					loadTexture( 'textures/minecraft/grass_dirt.png' ), // left
+					loadTexture( 'textures/minecraft/grass.png' ), // top
+					loadTexture( 'textures/minecraft/dirt.png' ), // bottom
+					loadTexture( 'textures/minecraft/grass_dirt.png' ), // back
+					loadTexture( 'textures/minecraft/grass_dirt.png' ) // front
+
+				];
+
+				var cube = new Cube( 100, 100, 100, 1, 1, materials );
+				var geometry = new THREE.Geometry();
+
+				camera.position.y = getY( worldHalfWidth, worldHalfDepth ) + 100;
+				camera.target.position.y = camera.position.y;
+
+				for ( var y = 0; y < worldDepth; y ++ ) {
+
+					for ( var x = 0; x < worldWidth; x ++ ) {
+
+						mesh = new THREE.Mesh( cube );
+						mesh.position.x = x * 100 - worldHalfWidth * 100;
+						mesh.position.y = Math.floor( data[ x + y * worldWidth ] * 0.2 ) * 100;
+						mesh.position.z = y * 100 - worldHalfDepth * 100;
+
+						GeometryUtils.merge( geometry, mesh );
+					}
+
+				}
+
+				geometry.sortFacesByMaterial();
+
+				mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial() );
+				scene.addObject( mesh );
+
+				var ambientLight = new THREE.AmbientLight( 0xcccccc );
+				scene.addLight( ambientLight );
+
+				var pointLight = new THREE.DirectionalLight( 0xffffff, 1 );
+				pointLight.position.x = 1;
+				pointLight.position.y = 1;
+				pointLight.position.z = 0.5;
+				pointLight.position.normalize;
+				scene.addLight( pointLight );
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				container.innerHTML = "";
+
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild( stats.domElement );
+
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.addEventListener( 'keydown', onDocumentKeyDown, false );
+				document.addEventListener( 'keyup', onDocumentKeyUp, false );
+
+			}
+
+			function loadTexture( path ) {
+
+				var image = new Image();
+				image.onload = function () { this.loaded = true; };
+				image.src = path;
+
+				return new THREE.MeshLambertMaterial( { map: new THREE.Texture( image, THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping, THREE.NearestFilter, THREE.NearestFilter ) } );
+
+			}
+
+			function generateHeight( width, height ) {
+
+				var data = [], perlin = new ImprovedNoise(),
+				size = width * height, quality = 2, z = Math.random() * 100;
+
+				for ( var j = 0; j < 4; j ++ ) {
+
+					if ( j == 0 ) for ( var i = 0; i < size; i ++ ) data[ i ] = 0;
+
+					for ( var i = 0; i < size; i ++ ) {
+
+						var x = i % width, y = ~~ ( i / width );
+						data[ i ] += perlin.noise( x / quality, y / quality, z ) * quality;
+
+
+					}
+
+					quality *= 4
+
+				}
+
+				return data;
+
+			}
+
+			function getY( x, z ) {
+
+				return ~~( data[ x + z * worldWidth ] * 0.2 ) * 100
+
+			}
+
+			function onDocumentMouseMove(event) {
+
+				mouseX = event.clientX - windowHalfX;
+				mouseY = event.clientY - windowHalfY;
+
+			}
+
+			function onDocumentKeyDown( event ) {
+
+				console.log( event.keyCode );
+
+				switch( event.keyCode ) {
+
+					case 38: /*↑*/ moveForward = true; break;
+					case 40: /*↓*/ moveBackwards = true; break;
+					case 37: /*←*/ moveLeft = true; break;
+					case 39: /*→*/ moveRight = true; break;
+
+					case 87: /*W*/ moveForward = true; break;
+					case 83: /*S*/ moveBackwards = true; break;
+					case 65: /*A*/ moveLeft = true; break;
+					case 68: /*D*/ moveRight = true; break;
+
+				}
+
+			}
+
+			function onDocumentKeyUp( event ) {
+
+				switch( event.keyCode ) {
+
+					case 38: /*↑*/ moveForward = false; break;
+					case 40: /*↓*/ moveBackwards = false; break;
+					case 37: /*←*/ moveLeft = false; break;
+					case 39: /*→*/ moveRight = false; break;
+
+					case 87: /*W*/ moveForward = false; break;
+					case 83: /*S*/ moveBackwards = false; break;
+					case 65: /*A*/ moveLeft = false; break;
+					case 68: /*D*/ moveRight = false; break;
+
+				}
+
+			}
+
+			function loop() {
+
+				if ( moveForward ) {
+
+					direction.copy( camera.target.position ).subSelf( camera.position ).normalize().multiplyScalar( 15 );
+					camera.position.addSelf( direction );
+					camera.target.position.addSelf( direction );
+
+				}
+
+				if ( moveBackwards ) {
+
+					direction.copy( camera.target.position ).subSelf( camera.position ).normalize().multiplyScalar( - 15 );
+					camera.position.addSelf( direction );
+					camera.target.position.addSelf( direction );
+
+				}
+
+				if ( moveLeft ) {
+
+					direction.copy( camera.target.position ).subSelf( camera.position ).normalize().multiplyScalar( - 15 );
+					direction.cross( direction.clone(), new THREE.Vector3( 0, 1, 0 ) );
+					camera.position.addSelf( direction );
+					camera.target.position.addSelf( direction );
+
+				}
+
+				if ( moveRight ) {
+
+					direction.copy( camera.target.position ).subSelf( camera.position ).normalize().multiplyScalar( 15 );
+					direction.cross( direction.clone(), new THREE.Vector3( 0, 1, 0 ) );
+					camera.position.addSelf( direction );
+					camera.target.position.addSelf( direction );
+
+				};
+
+				lon += mouseX * 0.005;
+				lat -= mouseY * 0.005;
+
+				lat = Math.max( - 85, Math.min( 85, lat ) );
+				phi = ( 90 - lat ) * Math.PI / 180;
+				theta = lon * Math.PI / 180;
+
+				camera.target.position.x = 100 * Math.sin( phi ) * Math.cos( theta ) + camera.position.x;
+				camera.target.position.y = 100 * Math.cos( phi ) + camera.position.y;
+				camera.target.position.z = 100 * Math.sin( phi ) * Math.sin( theta ) + camera.position.z;
+
+				renderer.render(scene, camera);
+				stats.update();
+
+			}
+
+		</script>
+
+	</body>
+</html>
