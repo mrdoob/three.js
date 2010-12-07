@@ -96,7 +96,7 @@
 				var vertex_shader = ShaderUtils.lib["fresnel"].vertex_shader;
 				var uniforms = ShaderUtils.lib["fresnel"].uniforms;
 
-				uniforms["tCube"][2] = textureCube;
+				uniforms["tCube"].texture = textureCube;
 
 				var material = new THREE.MeshShaderMaterial( { fragment_shader: fragment_shader, 
 															   vertex_shader: vertex_shader, 

@@ -118,8 +118,8 @@
 
 			function generateHeight( width, height ) {
 
-				var data = Float32Array ? new Float32Array() : [], perlin = new ImprovedNoise(),
-				size = width * height, quality = 1, z = Math.random() * 100;
+				var size = width * height, data = new Float32Array( size ), perlin = new ImprovedNoise(),
+					quality = 1, z = Math.random() * 100;
 
 				for ( var i = 0; i < size; i ++ ) {
 
