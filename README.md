@@ -35,6 +35,7 @@ More? irc.freenode.net #three.js
 
 #### WebGL ####
 
+[![geometry_terrain_gl](http://mrdoob.github.com/three.js/assets/examples/30_geometry_terrain_gl.png)](http://mrdoob.github.com/three.js/examples/geometry_terrain_gl.html)
 [![geometry_minecraft](http://mrdoob.github.com/three.js/assets/examples/29_geometry_minecraft.png)](http://mrdoob.github.com/three.js/examples/geometry_minecraft.html)
 [![materials_shader_fresnel](http://mrdoob.github.com/three.js/assets/examples/28_materials_shaders_fresnel.png)](http://mrdoob.github.com/three.js/examples/materials_shaders_fresnel.html)
 [![materials_cars](http://mrdoob.github.com/three.js/assets/examples/25_materials_cars.png)](http://mrdoob.github.com/three.js/examples/materials_cars.html)
@@ -50,6 +51,7 @@ More? irc.freenode.net #three.js
 
 ### Featured projects ###
 
+[![Sculpt](http://mrdoob.github.com/three.js/assets/projects/11_sculpt.png)](http://antimatter15.com/wp/2010/11/digital-sculpting-with-three-js/)
 [![Voxels](http://mrdoob.github.com/three.js/assets/projects/10_voxels.png)](http://mrdoob.com/projects/voxels/)
 [![The Wilderness Downtown](http://mrdoob.github.com/three.js/assets/projects/09_arcadefire.png)](http://thewildernessdowntown.com/)
 [![CloudSCAD](http://mrdoob.github.com/three.js/assets/projects/08_cloudscad.png)](http://cloudscad.com/stl_viewer/)

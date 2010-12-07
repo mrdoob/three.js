@@ -67,28 +67,16 @@
 
 				scene = new THREE.Scene();
 
-				var heightMap = height( 1024, 1024 );
+				var data = generateHeight( 1024, 1024 );
+				var material = new THREE.MeshBasicMaterial( { map: new THREE.Texture( generateTexture( data, 1024, 1024 ) ) } );
 
-				var texture = new THREE.Texture( shadow( heightMap ) );
-				texture.image.loaded = true;
+				var quality = 16, step = 1024 / quality;
+				var plane = new Plane( 2000, 2000, quality - 1, quality - 1 );
 
-				var material = new THREE.MeshBasicMaterial( { map: texture } );
+				for ( var i = 0, l = plane.vertices.length; i < l; i ++ ) {
 
-				var quality = 20;
-				var quality1 = quality + 1;
-
-				var plane = new Plane( 2000, 2000, quality, quality );
-
-				var data = heightMap.getContext( '2d' ).getImageData( 0, 0, heightMap.width, heightMap.height ).data;
-				var pixelsPerTriangle = Math.floor( heightMap.width / quality );
-
-				for ( var y = 0; y < quality1; y++ ) {
-
-					for (var x = 0; x < quality1; x++ ) {
-
-						plane.vertices[x + y * quality1].position.z = data[((x * pixelsPerTriangle) + (y * pixelsPerTriangle) * heightMap.width) * 4] * 2 - 128;
-
-					}
+					var x = i % quality, y = ~~ ( i / quality );
+					plane.vertices[ i ].position.z = data[ ( x * step ) + ( y * step ) * 1024 ] * 2 - 128;
 
 				}
 
@@ -98,7 +86,7 @@
 				mesh = new THREE.Mesh( plane, material );
 				mesh.rotation.x = -90 * Math.PI / 180;
 				mesh.overdraw = true;
-				scene.addObject(mesh);
+				scene.addObject( mesh );
 
 				renderer = new THREE.CanvasRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -133,60 +121,39 @@
 
 			}
 
-			function height( width, height ) {
+			function generateHeight( width, height ) {
 
-				var canvas, context, image, data;
+				var data = Float32Array ? new Float32Array() : [], perlin = new ImprovedNoise(),
+				size = width * height, quality = 2, z = Math.random() * 100;
 
-				canvas = document.createElement( 'canvas' );
-				canvas.width = width;
-				canvas.height = height;
+				for ( var i = 0; i < size; i ++ ) {
 
-				context = canvas.getContext( '2d' );
-				context.fillStyle = '#000';
-				context.fillRect( 0, 0, width, height );
+					data[ i ] = 0
 
-				image = context.getImageData( 0, 0, width, height );
-				data = image.data;
-
-				var perlin = new ImprovedNoise();
-
-				var size = width * height;
-				var quality = 2;
-				var zz = Math.random() * 100;
+				}
 
 				for ( var j = 0; j < 4; j ++ ) {
-
-					var x = 0, y = 0, yy = 0;
 
 					quality *= 4;
 
 					for ( var i = 0; i < size; i ++ ) {
 
-						data[ i * 4 ] += Math.floor( Math.abs( perlin.noise( x / quality, yy, zz ) * 0.5 ) * quality + 10 );
+						var x = i % width, y = ~~ ( i / width );
+						data[ i ] += Math.abs( perlin.noise( x / quality, y / quality, z ) * 0.5 * quality + 10 );
 
-						x++;
-
-						if (x == width)
-						{
-							x = 0;
-							y ++;
-							yy = y / quality;
-						}
 
 					}
+
 				}
 
-				context.putImageData( image, 0, 0 );
-
-				return canvas;
+				return data;
 
 			}
 
-			function shadow( texture ) {
+			function generateTexture( data, width, height ) {
 
-				var canvas, context, image, data, src_data,
-				index, level, diff, width = texture.width, height = texture.height,
-				vector3, sun, shade;
+				var canvas, context, image, imageData,
+				level, diff, vector3, sun, shade;
 
 				vector3 = new THREE.Vector3( 0, 0, 0 );
 
@@ -196,39 +163,34 @@
 				canvas = document.createElement( 'canvas' );
 				canvas.width = width;
 				canvas.height = height;
+				canvas.loaded = true;
 
 				context = canvas.getContext( '2d' );
 				context.fillStyle = '#000';
 				context.fillRect( 0, 0, width, height );
 
 				image = context.getImageData( 0, 0, width, height );
-				data = image.data;
+				imageData = image.data;
 
-				src_data = texture.getContext( '2d' ).getImageData( 0, 0, width, height ).data;
+				for ( var i = 0, j = 0, l = imageData.length; i < l; i += 4, j ++  ) {
 
-				for ( var y = 0; y < height; y++ ) {
+					vector3.x = data[ j - 1 ] - data[ j + 1 ];
+					vector3.y = 2;
+					vector3.z = data[ j - width ] - data[ j + width ];
+					vector3.normalize();
 
-					for ( var x = 0; x < width; x++ ) {
+					shade = vector3.dot( sun );
 
-						index = ( x + y * width ) * 4;
+					imageData[ i ] = ( 96 + shade * 128 ) * ( data[ j ] * 0.007 );
+					imageData[ i + 1 ] = ( 32 + shade * 96 ) * ( data[ j ] * 0.007 );
+					imageData[ i + 2 ] = ( shade * 96 ) * ( data[ j ] * 0.007 );
 
-						vector3.x = src_data[ index - 4 ] - src_data[ index + 4 ];
-						vector3.y = 2;
-						vector3.z = src_data[ index - ( width * 4 ) ] - src_data[ index + ( width * 4 ) ];
-						vector3.normalize();
-
-						shade = vector3.dot(sun);
-
-						data[ index ] = ( 96 + shade * 128 ) * ( src_data[ index ] * 0.007 );
-						data[ index + 1 ] = ( 32 + shade * 96 ) * ( src_data[ index ] * 0.007 );
-						data[ index + 2 ] = ( shade * 96 ) * ( src_data[ index ] * 0.007 );
-
-					}
 				}
 
 				context.putImageData( image, 0, 0 );
 
 				return canvas;
+
 			}
 
 

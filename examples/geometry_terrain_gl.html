@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - geometry - minecraft</title>
+		<title>three.js - geometry - webgl terrain</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -31,14 +31,14 @@
 	<body>
 
 		<div id="container"><br /><br /><br /><br /><br />Generating world...</div> 
-		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - <a href="http://www.minecraft.net/" target="_blank">minecraft</a> demo. featuring <a href="http://painterlypack.net/" target="_blank">painterly pack</a><br />(right click: forward, left click: backward)</div> 
+		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl terrain demo<br />(right click: forward, left click: backward)</div> 
 
 		<script type="text/javascript" src="js/Stats.js"></script>
 		<script type="text/javascript" src="js/ImprovedNoise.js"></script>
 
 		<script type="text/javascript" src="../build/Three.js"></script>
 		<script type="text/javascript" src="../src/extras/GeometryUtils.js"></script>
-		<script type="text/javascript" src="../src/extras/primitives/Cube.js"></script>
+		<script type="text/javascript" src="../src/extras/primitives/Plane.js"></script>
 
 		<script type="text/javascript">
 
@@ -46,11 +46,10 @@
 
 			var camera, scene, renderer;
 
-			var mesh;
+			var mesh, texture;
 
-			var worldWidth = 128, worldDepth = 128,
-			worldHalfWidth = worldWidth / 2, worldHalfDepth = worldDepth / 2,
-			data = generateHeight( worldWidth, worldDepth );
+			var worldWidth = 256, worldDepth = 256,
+			worldHalfWidth = worldWidth / 2, worldHalfDepth = worldDepth / 2;
 
 			var mouseX = 0, mouseY = 0,
 			lat = 0, lon = 0, phy = 0, theta = 0;
@@ -75,51 +74,28 @@
 
 				scene = new THREE.Scene();
 
-				var materials = [
+				data = generateHeight( worldWidth, worldDepth );
 
-					loadTexture( 'textures/minecraft/grass_dirt.png' ), // right
-					loadTexture( 'textures/minecraft/grass_dirt.png' ), // left
-					loadTexture( 'textures/minecraft/grass.png' ), // top
-					loadTexture( 'textures/minecraft/dirt.png' ), // bottom
-					loadTexture( 'textures/minecraft/grass_dirt.png' ), // back
-					loadTexture( 'textures/minecraft/grass_dirt.png' ) // front
-
-				];
-
-				var cube = new Cube( 100, 100, 100, 1, 1, materials, false, { ny: false } );
-				var geometry = new THREE.Geometry();
-
-				camera.position.y = getY( worldHalfWidth, worldHalfDepth ) + 100;
+				camera.position.y = data[ worldHalfWidth + worldHalfDepth * worldWidth ] + 500;
 				camera.target.position.y = camera.position.y;
 
-				for ( var y = 0; y < worldDepth; y ++ ) {
+				var geometry = new Plane( 7500, 7500, worldWidth - 1, worldDepth - 1 );
 
-					for ( var x = 0; x < worldWidth; x ++ ) {
+				for ( var i = 0, l = geometry.vertices.length; i < l; i ++ ) {
 
-						mesh = new THREE.Mesh( cube );
-						mesh.position.x = x * 100 - worldHalfWidth * 100;
-						mesh.position.y = Math.floor( data[ x + y * worldWidth ] * 0.2 ) * 100;
-						mesh.position.z = y * 100 - worldHalfDepth * 100;
-
-						GeometryUtils.merge( geometry, mesh );
-					}
+					geometry.vertices[ i ].position.z = data[ i ] * 10;
 
 				}
 
+				geometry.computeNormals();
+				geometry.computeVertexNormals();
 				geometry.sortFacesByMaterial();
 
-				mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial() );
+				texture = new THREE.Texture( generateTexture( data, worldWidth, worldDepth ), new THREE.UVMapping(), THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping );
+
+				mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { map: texture } ) );
+				mesh.rotation.x = - 90 * Math.PI / 180;
 				scene.addObject( mesh );
-
-				var ambientLight = new THREE.AmbientLight( 0xcccccc );
-				scene.addLight( ambientLight );
-
-				var directionalLight = new THREE.DirectionalLight( 0xffffff, 1.5 );
-				directionalLight.position.x = 1;
-				directionalLight.position.y = 1;
-				directionalLight.position.z = 0.5;
-				directionalLight.position.normalize();
-				scene.addLight( directionalLight );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -138,39 +114,30 @@
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.addEventListener( 'contextmenu', function ( event ) { event.preventDefault(); }, false );
 
-				document.addEventListener( 'keydown', onDocumentKeyDown, false );
-				document.addEventListener( 'keyup', onDocumentKeyUp, false );
-
-			}
-
-			function loadTexture( path ) {
-
-				var image = new Image();
-				image.onload = function () { this.loaded = true; };
-				image.src = path;
-
-				return new THREE.MeshLambertMaterial( { map: new THREE.Texture( image, new THREE.UVMapping(), THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping, THREE.NearestFilter, THREE.LinearMipMapLinearFilter ) } );
-
 			}
 
 			function generateHeight( width, height ) {
 
-				var data = [], perlin = new ImprovedNoise(),
-				size = width * height, quality = 2, z = Math.random() * 100;
+				var data = Float32Array ? new Float32Array() : [], perlin = new ImprovedNoise(),
+				size = width * height, quality = 1, z = Math.random() * 100;
+
+				for ( var i = 0; i < size; i ++ ) {
+
+					data[ i ] = 0
+
+				}
 
 				for ( var j = 0; j < 4; j ++ ) {
-
-					if ( j == 0 ) for ( var i = 0; i < size; i ++ ) data[ i ] = 0;
 
 					for ( var i = 0; i < size; i ++ ) {
 
 						var x = i % width, y = ~~ ( i / width );
-						data[ i ] += perlin.noise( x / quality, y / quality, z ) * quality;
+						data[ i ] += Math.abs( perlin.noise( x / quality, y / quality, z ) * quality * 1.75 );
 
 
 					}
 
-					quality *= 4
+					quality *= 5;
 
 				}
 
@@ -178,9 +145,45 @@
 
 			}
 
-			function getY( x, z ) {
+			function generateTexture( data, width, height ) {
 
-				return ~~( data[ x + z * worldWidth ] * 0.2 ) * 100
+				var canvas, context, image, imageData,
+				level, diff, vector3, sun, shade;
+
+				vector3 = new THREE.Vector3( 0, 0, 0 );
+
+				sun = new THREE.Vector3( 1, 1, 1 );
+				sun.normalize();
+
+				canvas = document.createElement( 'canvas' );
+				canvas.width = width;
+				canvas.height = height;
+				canvas.loaded = true;
+
+				context = canvas.getContext( '2d' );
+				context.fillStyle = '#000';
+				context.fillRect( 0, 0, width, height );
+
+				image = context.getImageData( 0, 0, width, height );
+				imageData = image.data;
+
+				for ( var i = 0, j = 0, l = imageData.length; i < l; i += 4, j ++  ) {
+
+					vector3.x = data[ j - 1 ] - data[ j + 1 ];
+					vector3.y = 2;
+					vector3.z = data[ j - width ] - data[ j + width ];
+					vector3.normalize();
+
+					shade = vector3.dot( sun );
+
+					imageData[ i ] = ( 96 + shade * 128 ) * ( 0.5 + data[ j ] * 0.007 );
+					imageData[ i + 1 ] = ( 32 + shade * 96 ) * ( 0.5 + data[ j ] * 0.007 );
+					imageData[ i + 2 ] = ( shade * 96 ) * ( 0.5 + data[ j ] * 0.007 );
+				}
+
+				context.putImageData( image, 0, 0 );
+
+				return canvas;
 
 			}
 
@@ -219,34 +222,6 @@
 
 			}
 
-			function onDocumentKeyDown( event ) {
-
-				switch( event.keyCode ) {
-
-					case 38: /*↑*/ moveForward = true; break;
-					case 40: /*↓*/ moveBackwards = true; break;
-
-					case 87: /*W*/ moveForward = true; break;
-					case 83: /*S*/ moveBackwards = true; break;
-
-				}
-
-			}
-
-			function onDocumentKeyUp( event ) {
-
-				switch( event.keyCode ) {
-
-					case 38: /*↑*/ moveForward = false; break;
-					case 40: /*↓*/ moveBackwards = false; break;
-
-					case 87: /*W*/ moveForward = false; break;
-					case 83: /*S*/ moveBackwards = false; break;
-
-				}
-
-			}
-
 			function loop() {
 
 				if ( moveForward ) {
@@ -265,8 +240,8 @@
 
 				}
 
-				lon += mouseX * 0.005;
-				lat -= mouseY * 0.005;
+				lon += mouseX * 0.004;
+				lat -= mouseY * 0.004;
 
 				lat = Math.max( - 85, Math.min( 85, lat ) );
 				phi = ( 90 - lat ) * Math.PI / 180;
