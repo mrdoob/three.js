@@ -244,7 +244,7 @@ THREE.Loader.prototype = {
 			currentOffset += init_quads_smooth_uv( currentOffset );
 
 			this.computeCentroids();
-			this.computeNormals();
+			this.computeFaceNormals();
 			this.sortFacesByMaterial();
 
 			//var e = (new Date).getTime();
@@ -706,7 +706,7 @@ THREE.Loader.prototype = {
 			init_faces();
 
 			this.computeCentroids();
-			this.computeNormals();
+			this.computeFaceNormals();
 			this.sortFacesByMaterial();
 
 			function init_vertices() {

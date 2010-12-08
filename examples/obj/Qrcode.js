@@ -1434,7 +1434,7 @@ var Qrcode = function () {
 	f4(19,20,362,361,m2);
 
 	this.computeCentroids();
-	this.computeNormals();
+	this.computeFaceNormals();
 	this.sortFacesByMaterial();
 
 	function v( x, y, z ) {

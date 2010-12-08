@@ -87,10 +87,6 @@
 
 				}
 
-				// geometry.computeNormals();
-				// geometry.computeVertexNormals();
-				// geometry.sortFacesByMaterial();
-
 				texture = new THREE.Texture( generateTexture( data, worldWidth, worldDepth ), new THREE.UVMapping(), THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping );
 
 				mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { map: texture } ) );

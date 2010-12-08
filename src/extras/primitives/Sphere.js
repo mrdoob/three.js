@@ -10,7 +10,7 @@ var Sphere = function ( radius, segments_width, segments_height ) {
 	var gridX = segments_width || 8,
 	gridY = segments_height || 6;
 
-	var i, j;
+	var i, j, pi = Math.PI;
 	var iHor = Math.max( 3, gridX );
 	var iVer = Math.max( 2, gridY );
 	var aVtc = [];
@@ -18,16 +18,16 @@ var Sphere = function ( radius, segments_width, segments_height ) {
 	for ( j = 0; j < ( iVer + 1 ) ; j++ ) {
 
 		var fRad1 = j / iVer;
-		var fZ = radius * Math.cos( fRad1 * Math.PI );
-		var fRds = radius * Math.sin( fRad1 * Math.PI );
+		var fZ = radius * Math.cos( fRad1 * pi );
+		var fRds = radius * Math.sin( fRad1 * pi );
 		var aRow = [];
 		var oVtx = 0;
 
 		for ( i = 0; i < iHor; i++ ) {
 
 			var fRad2 = 2 * i / iHor;
-			var fX = fRds * Math.sin( fRad2 * Math.PI );
-			var fY = fRds * Math.cos( fRad2 * Math.PI );
+			var fX = fRds * Math.sin( fRad2 * pi );
+			var fY = fRds * Math.cos( fRad2 * pi );
 
 			if ( !( ( j == 0 || j == iVer ) && i > 0 ) ) {
 
@@ -104,7 +104,8 @@ var Sphere = function ( radius, segments_width, segments_height ) {
 	}
 
 	this.computeCentroids();
-	this.computeNormals();
+	this.computeFaceNormals();
+	this.computeVertexNormals();
 	this.sortFacesByMaterial();
 
 }

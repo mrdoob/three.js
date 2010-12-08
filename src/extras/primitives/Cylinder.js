@@ -2,82 +2,80 @@
  * @author kile / http://kile.stravaganza.org/
  */
 
-var Cylinder = function (numSegs, topRad, botRad, height, topOffset, botOffset) {
+var Cylinder = function ( numSegs, topRad, botRad, height, topOffset, botOffset ) {
 
-	THREE.Geometry.call(this);
+	THREE.Geometry.call( this );
 
-	var scope = this, i;
+	var scope = this,
+	pi = Math.PI, i;
 
 	// VERTICES
 
 	// Top circle vertices
-	for (i = 0; i < numSegs; i++) {
+	for ( i = 0; i < numSegs; i ++ ) {
 
-		v( 
-			Math.sin(2 * 3.1415 * i / numSegs)*topRad,
-			Math.cos(2 * 3.1415 * i / numSegs)*topRad,
-			0);
+		v( Math.sin( 2 * pi * i / numSegs ) * topRad, Math.cos( 2 * pi * i / numSegs ) * topRad, 0 );
+
 	}
 
 	// Bottom circle vertices
-	for (i = 0; i < numSegs; i++) {
+	for ( i = 0; i < numSegs; i ++ ) {
 
-		v(  
-			Math.sin(2 * 3.1415 * i / numSegs)*botRad,
-			Math.cos(2 * 3.1415 * i / numSegs)*botRad,
-			height);
+		v( Math.sin( 2 * pi * i / numSegs ) * botRad, Math.cos( 2 * pi * i / numSegs ) * botRad, height );
+
 	}
 
 
 	// FACES
 
-	// Body	
-	for (i = 0; i < numSegs; i++) {
+	// Body
+	for ( i = 0; i < numSegs; i++ ) {
 
-		f4(i, i + numSegs, numSegs + (i + 1) % numSegs, (i + 1) % numSegs, '#ff0000');
+		f4( i, i + numSegs, numSegs + ( i + 1 ) % numSegs, ( i + 1 ) % numSegs, '#ff0000' );
 	}
 
 	// Bottom circle
-	if (botRad != 0) {
+	if ( botRad != 0 ) {
 
-		v(0, 0, -topOffset);
+		v( 0, 0, - topOffset );
 
-		for (i = numSegs; i < numSegs + (numSegs / 2); i++) {
+		for ( i = numSegs; i < numSegs + ( numSegs / 2 ); i++ ) {
 
-			f4(2 * numSegs,
-			(2 * i - 2 * numSegs) % numSegs,
-			(2 * i - 2 * numSegs + 1) % numSegs,
-			(2 * i - 2 * numSegs + 2) % numSegs);
+			f4( 2 * numSegs, ( 2 * i - 2 * numSegs ) % numSegs, ( 2 * i - 2 * numSegs + 1 ) % numSegs, ( 2 * i - 2 * numSegs + 2 ) % numSegs );
+
 		}
+
 	}
 
 	// Top circle
-	if (topRad != 0) {
+	if ( topRad != 0 ) {
 
-		v(0, 0, height + topOffset);
+		v( 0, 0, height + topOffset );
 
-		for (i = numSegs + (numSegs / 2); i < 2 * numSegs; i++) {
+		for ( i = numSegs + ( numSegs / 2 ); i < 2 * numSegs; i ++ ) {
 
-			f4(	(2 * i - 2 * numSegs + 2) % numSegs + numSegs,
-				(2 * i - 2 * numSegs + 1) % numSegs + numSegs,
-				(2 * i - 2 * numSegs) % numSegs+numSegs, 
-				2 * numSegs + 1);
+			f4( ( 2 * i - 2 * numSegs + 2 ) % numSegs + numSegs, ( 2 * i - 2 * numSegs + 1 ) % numSegs + numSegs, ( 2 * i - 2 * numSegs ) % numSegs+numSegs, 2 * numSegs + 1 );
+
 		}
+
 	}
 
 	this.computeCentroids();
-	this.computeNormals();
+	this.computeFaceNormals();
 	this.sortFacesByMaterial();
 
-	function v(x, y, z) {
+	function v( x, y, z ) {
 
 		scope.vertices.push( new THREE.Vertex( new THREE.Vector3( x, y, z ) ) );
+
 	}
 
-	function f4(a, b, c, d) {
+	function f4( a, b, c, d ) {
 
 		scope.faces.push( new THREE.Face4( a, b, c, d ) );
+
 	}
+
 }
 
 Cylinder.prototype = new THREE.Geometry();

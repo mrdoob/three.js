@@ -2,7 +2,7 @@ var Bird = function () {
 
 	var scope = this;
 
-	THREE.Geometry.call(this);
+	THREE.Geometry.call( this );
 
 	v(   5,   0,   0 );
 	v( - 5, - 2,   1 );
@@ -21,7 +21,7 @@ var Bird = function () {
 	f3( 5, 6, 7 );
 
 	this.computeCentroids();
-	this.computeNormals();
+	this.computeFaceNormals();
 	this.sortFacesByMaterial();
 
 	function v( x, y, z ) {

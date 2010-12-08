@@ -38,21 +38,21 @@ var Cube = function ( width, height, depth, segments_width, segments_height, mat
 	}
 
 	this.sides = { px: true, nx: true, py: true, ny: true, pz: true, nz: true };
-	
+
 	if( sides != undefined ) {
-		
+
 		for( var s in sides ) {
-			
+
 			if ( this.sides[ s ] != undefined ) {
-			
+
 				this.sides[ s ] = sides[ s ];
-				
+
 			}
-			
+
 		}
-		
+
 	}
-	
+
 	this.sides.px && buildPlane( 'z', 'y',   1 * flip, - 1, depth, height, - width_half, this.materials[ 0 ] ); // px
 	this.sides.nx && buildPlane( 'z', 'y', - 1 * flip, - 1, depth, height, width_half, this.materials[ 1 ] );   // nx
 	this.sides.py && buildPlane( 'x', 'z',   1 * flip,   1, width, depth, height_half, this.materials[ 2 ] );   // py
@@ -173,7 +173,7 @@ var Cube = function ( width, height, depth, segments_width, segments_height, mat
 	}
 
 	this.computeCentroids();
-	this.computeNormals();
+	this.computeFaceNormals();
 	this.sortFacesByMaterial();
 
 }
