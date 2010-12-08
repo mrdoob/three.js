@@ -379,7 +379,9 @@ THREE.WebGLRenderer = function ( scene ) {
 
 			mWireframe = material.wireframe;
 			mLineWidth = material.wireframe_linewidth;
-
+			
+			mBlending = material.blending;
+			
 			setUniforms( program, material.uniforms );
 
 		}
@@ -888,7 +890,6 @@ THREE.WebGLRenderer = function ( scene ) {
 			"uniform int pointLightNumber;",
 			"uniform int directionalLightNumber;",
 
-			maxDirLights ? "uniform mat4 viewMatrix;" : "",
 			maxDirLights ? "uniform vec3 directionalLightDirection[ MAX_DIR_LIGHTS ];" : "",
 
 			"varying vec3 vNormal;",
@@ -1094,9 +1095,6 @@ THREE.WebGLRenderer = function ( scene ) {
 			maxPointLights ? "uniform vec3 pointLightColor[ MAX_POINT_LIGHTS ];"    : "",
 			maxPointLights ? "uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];" : "",
 
-			"uniform mat4 viewMatrix;",
-			"uniform mat3 normalMatrix;",
-
 			"varying vec3 vNormal;",
 			"varying vec2 vUv;",
 
@@ -1137,7 +1135,7 @@ THREE.WebGLRenderer = function ( scene ) {
 
 					maxDirLights ? "for( int i = 0; i < MAX_DIR_LIGHTS; i++ ) {" : "",
 					maxDirLights ?		"vec4 lDirection = viewMatrix * vec4( directionalLightDirection[ i ], 0.0 );" : "",
-					maxDirLights ?		"float directionalLightWeighting = max( dot( transformedNormal, normalize(lDirection.xyz ) ), 0.0 );" : "",
+					maxDirLights ?		"float directionalLightWeighting = max( dot( transformedNormal, normalize( lDirection.xyz ) ), 0.0 );" : "",
 					maxDirLights ?		"vLightWeighting += directionalLightColor[ i ] * directionalLightWeighting;" : "",
 					maxDirLights ? "}" : "",
 
@@ -1181,6 +1179,7 @@ THREE.WebGLRenderer = function ( scene ) {
 			"#ifdef GL_ES",
 			"precision highp float;",
 			"#endif",
+			"uniform mat4 viewMatrix;",
 			""
 		].join("\n"),
 
@@ -1188,6 +1187,8 @@ THREE.WebGLRenderer = function ( scene ) {
 			"uniform mat4 objectMatrix;",
 			"uniform mat4 modelViewMatrix;",
 			"uniform mat4 projectionMatrix;",
+			"uniform mat4 viewMatrix;",
+			"uniform mat3 normalMatrix;",
 			"uniform vec3 cameraPosition;",
 			"attribute vec3 position;",
 			"attribute vec3 normal;",
@@ -1231,6 +1232,14 @@ THREE.WebGLRenderer = function ( scene ) {
 			} else if( type == "f" ) {
 
 				_gl.uniform1f( location, value );
+				
+			} else if( type == "v3" ) {
+
+				_gl.uniform3f( location, value.x, value.y, value.z );
+				
+			} else if( type == "c" ) {
+
+				_gl.uniform3f( location, value.r, value.g, value.b );
 
 			} else if( type == "t" ) {
 
