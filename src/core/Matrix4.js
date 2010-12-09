@@ -6,16 +6,16 @@
  * @author D1plo1d / http://github.com/D1plo1d
  */
 
-THREE.Matrix4 = function () {
+THREE.Matrix4 = function ( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43, n44 ) {
+
+	this.n11 = n11 || 1; this.n12 = n12 || 0; this.n13 = n13 || 0; this.n14 = n14 || 0;
+	this.n21 = n21 || 0; this.n22 = n22 || 1; this.n23 = n23 || 0; this.n24 = n24 || 0;
+	this.n31 = n31 || 0; this.n32 = n32 || 0; this.n33 = n33 || 1; this.n34 = n34 || 0;
+	this.n41 = n41 || 0; this.n42 = n42 || 0; this.n43 = n43 || 0; this.n44 = n44 || 1;
 
 };
 
 THREE.Matrix4.prototype = {
-
-	n11: 1, n12: 0, n13: 0, n14: 0,
-	n21: 0, n22: 1, n23: 0, n24: 0,
-	n31: 0, n32: 0, n33: 1, n34: 0,
-	n41: 0, n42: 0, n43: 0, n44: 1,
 
 	identity: function () {
 
@@ -23,6 +23,19 @@ THREE.Matrix4.prototype = {
 		this.n21 = 0; this.n22 = 1; this.n23 = 0; this.n24 = 0;
 		this.n31 = 0; this.n32 = 0; this.n33 = 1; this.n34 = 0;
 		this.n41 = 0; this.n42 = 0; this.n43 = 0; this.n44 = 1;
+
+		return this;
+
+	},
+
+	set: function ( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43, n44 ) {
+
+		this.n11 = n11; this.n12 = n12; this.n13 = n13; this.n14 = n14;
+		this.n21 = n21; this.n22 = n22; this.n23 = n23; this.n24 = n24;
+		this.n31 = n31; this.n32 = n32; this.n33 = n33; this.n34 = n34;
+		this.n41 = n41; this.n42 = n42; this.n43 = n43; this.n44 = n44;
+
+		return this;
 
 	},
 
@@ -32,6 +45,8 @@ THREE.Matrix4.prototype = {
 		this.n21 = m.n21; this.n22 = m.n22; this.n23 = m.n23; this.n24 = m.n24;
 		this.n31 = m.n31; this.n32 = m.n32; this.n33 = m.n33; this.n34 = m.n34;
 		this.n41 = m.n41; this.n42 = m.n42; this.n43 = m.n43; this.n44 = m.n44;
+
+		return this;
 
 	},
 
@@ -47,6 +62,8 @@ THREE.Matrix4.prototype = {
 		this.n21 = y.x; this.n22 = y.y; this.n23 = y.z; this.n24 = - y.dot( eye );
 		this.n31 = z.x; this.n32 = z.y; this.n33 = z.z; this.n34 = - z.dot( eye );
 		this.n41 = 0; this.n42 = 0; this.n43 = 0; this.n44 = 1;
+
+		return this;
 
 	},
 
@@ -122,6 +139,8 @@ THREE.Matrix4.prototype = {
 		this.n43 = a41 * b13 + a42 * b23 + a43 * b33 + a44 * b43;
 		this.n44 = a41 * b14 + a42 * b24 + a43 * b34 + a44 * b44;
 
+		return this;
+
 	},
 
 	multiplySelf: function ( m ) {
@@ -151,6 +170,8 @@ THREE.Matrix4.prototype = {
 		this.n43 = n41 * m.n13 + n42 * m.n23 + n43 * m.n33 + n44 * m.n43;
 		this.n44 = n41 * m.n14 + n42 * m.n24 + n43 * m.n34 + n44 * m.n44;
 
+		return this;
+
 	},
 
 	multiplyScalar: function ( s ) {
@@ -159,6 +180,8 @@ THREE.Matrix4.prototype = {
 		this.n21 *= s; this.n22 *= s; this.n23 *= s; this.n24 *= s;
 		this.n31 *= s; this.n32 *= s; this.n33 *= s; this.n34 *= s;
 		this.n41 *= s; this.n42 *= s; this.n43 *= s; this.n44 *= s;
+
+		return this;
 
 	},
 
@@ -223,10 +246,12 @@ THREE.Matrix4.prototype = {
 	clone: function () {
 
 		var m = new THREE.Matrix4();
+
 		m.n11 = this.n11; m.n12 = this.n12; m.n13 = this.n13; m.n14 = this.n14;
 		m.n21 = this.n21; m.n22 = this.n22; m.n23 = this.n23; m.n24 = this.n24;
 		m.n31 = this.n31; m.n32 = this.n32; m.n33 = this.n33; m.n34 = this.n34;
 		m.n41 = this.n41; m.n42 = this.n42; m.n43 = this.n43; m.n44 = this.n44;
+
 		return m;
 
 	},
