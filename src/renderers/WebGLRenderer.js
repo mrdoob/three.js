@@ -159,13 +159,14 @@ THREE.WebGLRenderer = function ( scene ) {
 
 	this.createBuffers = function ( object, g ) {
 
-		var f, fl, fi, face, vertexNormals, normal, uv, v1, v2, v3, v4, m, ml, i,
+		var f, fl, fi, face, vertexNormals, normal, uv, v1, v2, v3, v4, t1, t2, t3, t4, m, ml, i,
 
 		faceArray = [],
 		lineArray = [],
 
 		vertexArray = [],
 		normalArray = [],
+		tangentArray = [],
 		uvArray = [],
 
 		vertexIndex = 0,
@@ -193,8 +194,21 @@ THREE.WebGLRenderer = function ( scene ) {
 				vertexArray.push( v2.x, v2.y, v2.z );
 				vertexArray.push( v3.x, v3.y, v3.z );
 
+				if ( object.geometry.hasTangents ) {
+					
+					t1 = object.geometry.vertices[ face.a ].tangent;
+					t2 = object.geometry.vertices[ face.b ].tangent;
+					t3 = object.geometry.vertices[ face.c ].tangent;
+
+					tangentArray.push( t1.x, t1.y, t1.z, t1.w );
+					tangentArray.push( t2.x, t2.y, t2.z, t2.w );
+					tangentArray.push( t3.x, t3.y, t3.z, t3.w );
+					
+				}
+
 				if ( vertexNormals.length == 3 && needsSmoothNormals ) {
 
+					
 					for ( i = 0; i < 3; i ++ ) {
 
 						normalArray.push( vertexNormals[ i ].x, vertexNormals[ i ].y, vertexNormals[ i ].z );
@@ -242,15 +256,29 @@ THREE.WebGLRenderer = function ( scene ) {
 				vertexArray.push( v2.x, v2.y, v2.z );
 				vertexArray.push( v3.x, v3.y, v3.z );
 				vertexArray.push( v4.x, v4.y, v4.z );
+				
+				if ( object.geometry.hasTangents ) {
+					
+					t1 = object.geometry.vertices[ face.a ].tangent;
+					t2 = object.geometry.vertices[ face.b ].tangent;
+					t3 = object.geometry.vertices[ face.c ].tangent;
+					t4 = object.geometry.vertices[ face.d ].tangent;
+
+					tangentArray.push( t1.x, t1.y, t1.z, t1.w );
+					tangentArray.push( t2.x, t2.y, t2.z, t2.w );
+					tangentArray.push( t3.x, t3.y, t3.z, t3.w );
+					tangentArray.push( t4.x, t4.y, t4.z, t4.w );
+					
+				}
 
 				if ( vertexNormals.length == 4 && needsSmoothNormals ) {
-
+					
 					for ( i = 0; i < 4; i ++ ) {
 
 						normalArray.push( vertexNormals[ i ].x, vertexNormals[ i ].y, vertexNormals[ i ].z );
 
 					}
-
+					
 				} else {
 
 					for ( i = 0; i < 4; i ++ ) {
@@ -302,6 +330,14 @@ THREE.WebGLRenderer = function ( scene ) {
 		_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLNormalBuffer );
 		_gl.bufferData( _gl.ARRAY_BUFFER, new Float32Array( normalArray ), _gl.STATIC_DRAW );
 
+		if ( object.geometry.hasTangents ) {
+			
+			geometryChunk.__webGLTangentBuffer = _gl.createBuffer();
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLTangentBuffer );
+			_gl.bufferData( _gl.ARRAY_BUFFER, new Float32Array( tangentArray ), _gl.STATIC_DRAW );
+			
+		}
+		
 		if ( uvArray.length > 0 ) {
 
 			geometryChunk.__webGLUVBuffer = _gl.createBuffer();
@@ -346,7 +382,7 @@ THREE.WebGLRenderer = function ( scene ) {
 
 				}
 				cacheUniformLocations( material.program, identifiers );
-				cacheAttributeLocations( material.program, [ "position", "normal", "uv" ] );
+				cacheAttributeLocations( material.program, [ "position", "normal", "uv", "tangent" ] );
 
 			}
 
@@ -374,12 +410,13 @@ THREE.WebGLRenderer = function ( scene ) {
 		this.loadCamera( program, camera );
 		this.loadMatrices( program );
 
-
 		if ( material instanceof THREE.MeshShaderMaterial ) {
 
 			mWireframe = material.wireframe;
 			mLineWidth = material.wireframe_linewidth;
-
+			
+			mBlending = material.blending;
+			
 			setUniforms( program, material.uniforms );
 
 		}
@@ -505,6 +542,15 @@ THREE.WebGLRenderer = function ( scene ) {
 		_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLNormalBuffer );
 		_gl.vertexAttribPointer( attributes.normal, 3, _gl.FLOAT, false, 0, 0 );
 
+		// tangents
+
+		if ( attributes.tangent >= 0 ) {
+			
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLTangentBuffer );
+			_gl.vertexAttribPointer( attributes.tangent, 4, _gl.FLOAT, false, 0, 0 );
+			
+		}
+		
 		// uvs
 
 		if ( attributes.uv >= 0 ) {
@@ -826,6 +872,19 @@ THREE.WebGLRenderer = function ( scene ) {
 
 	};
 
+	this.supportsVertexTextures = function() {
+		
+		return maxVertexTextures() > 0;
+		
+	};
+	
+	function maxVertexTextures() {
+		
+		return _gl.getParameter( _gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS );
+
+	};
+	
+	
 	function initGL() {
 
 		try {
@@ -888,7 +947,6 @@ THREE.WebGLRenderer = function ( scene ) {
 			"uniform int pointLightNumber;",
 			"uniform int directionalLightNumber;",
 
-			maxDirLights ? "uniform mat4 viewMatrix;" : "",
 			maxDirLights ? "uniform vec3 directionalLightDirection[ MAX_DIR_LIGHTS ];" : "",
 
 			"varying vec3 vNormal;",
@@ -939,7 +997,7 @@ THREE.WebGLRenderer = function ( scene ) {
 
 				"} else if ( material == 4 ) { ",
 
-					"gl_FragColor = vec4( 0.5*normalize( vNormal ) + vec3(0.5, 0.5, 0.5), mOpacity );",
+					"gl_FragColor = vec4( 0.5 * normalize( vNormal ) + 0.5, mOpacity );",
 
 				// Depth
 
@@ -1094,9 +1152,6 @@ THREE.WebGLRenderer = function ( scene ) {
 			maxPointLights ? "uniform vec3 pointLightColor[ MAX_POINT_LIGHTS ];"    : "",
 			maxPointLights ? "uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];" : "",
 
-			"uniform mat4 viewMatrix;",
-			"uniform mat3 normalMatrix;",
-
 			"varying vec3 vNormal;",
 			"varying vec2 vUv;",
 
@@ -1137,7 +1192,7 @@ THREE.WebGLRenderer = function ( scene ) {
 
 					maxDirLights ? "for( int i = 0; i < MAX_DIR_LIGHTS; i++ ) {" : "",
 					maxDirLights ?		"vec4 lDirection = viewMatrix * vec4( directionalLightDirection[ i ], 0.0 );" : "",
-					maxDirLights ?		"float directionalLightWeighting = max( dot( transformedNormal, normalize(lDirection.xyz ) ), 0.0 );" : "",
+					maxDirLights ?		"float directionalLightWeighting = max( dot( transformedNormal, normalize( lDirection.xyz ) ), 0.0 );" : "",
 					maxDirLights ?		"vLightWeighting += directionalLightColor[ i ] * directionalLightWeighting;" : "",
 					maxDirLights ? "}" : "",
 
@@ -1181,13 +1236,18 @@ THREE.WebGLRenderer = function ( scene ) {
 			"#ifdef GL_ES",
 			"precision highp float;",
 			"#endif",
+			"uniform mat4 viewMatrix;",
 			""
 		].join("\n"),
 
 		prefix_vertex = [
+			maxVertexTextures() > 0 ? "#define VERTEX_TEXTURES" : "",
+		
 			"uniform mat4 objectMatrix;",
 			"uniform mat4 modelViewMatrix;",
 			"uniform mat4 projectionMatrix;",
+			"uniform mat4 viewMatrix;",
+			"uniform mat3 normalMatrix;",
 			"uniform vec3 cameraPosition;",
 			"attribute vec3 position;",
 			"attribute vec3 normal;",
@@ -1231,6 +1291,14 @@ THREE.WebGLRenderer = function ( scene ) {
 			} else if( type == "f" ) {
 
 				_gl.uniform1f( location, value );
+				
+			} else if( type == "v3" ) {
+
+				_gl.uniform3f( location, value.x, value.y, value.z );
+				
+			} else if( type == "c" ) {
+
+				_gl.uniform3f( location, value.r, value.g, value.b );
 
 			} else if( type == "t" ) {
 
