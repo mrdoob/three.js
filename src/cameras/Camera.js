@@ -15,7 +15,7 @@ THREE.Camera = function ( fov, aspect, near, far ) {
 
 	this.translateX = function ( amount ) {
 
-		var vector = camera.target.position.clone().subSelf( camera.position ).normalize().multiplyScalar( amount );
+		var vector = this.target.position.clone().subSelf( this.position ).normalize().multiplyScalar( amount );
 		vector.cross( vector.clone(), this.up );
 
 		this.position.addSelf( vector );
@@ -31,7 +31,7 @@ THREE.Camera = function ( fov, aspect, near, far ) {
 
 	this.translateZ = function ( amount ) {
 
-		var vector = camera.target.position.clone().subSelf( camera.position ).normalize().multiplyScalar( amount );
+		var vector = this.target.position.clone().subSelf( this.position ).normalize().multiplyScalar( amount );
 
 		this.position.subSelf( vector );
 		this.target.position.subSelf( vector );
