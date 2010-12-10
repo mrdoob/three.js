@@ -785,9 +785,8 @@ THREE.CanvasRenderer = function () {
 
 		function normalToComponent( normal ) {
 
-			// https://gist.github.com/665829
-
-			return normal < 0 ? _min( ( 1 + normal ) * 0.5, 0.5 ) : 0.5 + _min( normal * 0.5, 0.5 );
+			var component = ( normal + 1 ) * 0.5;
+			return component < 0 ? 0 : ( component > 1 ? 1 : component );
 
 		}
 
