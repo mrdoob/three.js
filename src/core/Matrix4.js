@@ -148,27 +148,31 @@ THREE.Matrix4.prototype = {
 		var n11 = this.n11, n12 = this.n12, n13 = this.n13, n14 = this.n14,
 		n21 = this.n21, n22 = this.n22, n23 = this.n23, n24 = this.n24,
 		n31 = this.n31, n32 = this.n32, n33 = this.n33, n34 = this.n34,
-		n41 = this.n41, n42 = this.n42, n43 = this.n43, n44 = this.n44;
+		n41 = this.n41, n42 = this.n42, n43 = this.n43, n44 = this.n44,
+		mn11 = m.n11, mn21 = m.n21, mn31 = m.n31, mn41 = m.n41,
+		mn12 = m.n12, mn22 = m.n22, mn32 = m.n32, mn42 = m.n42,
+		mn13 = m.n13, mn23 = m.n23, mn33 = m.n33, mn43 = m.n43,
+		mn14 = m.n14, mn24 = m.n24, mn34 = m.n34, mn44 = m.n44;
 
-		this.n11 = n11 * m.n11 + n12 * m.n21 + n13 * m.n31 + n14 * m.n41;
-		this.n12 = n11 * m.n12 + n12 * m.n22 + n13 * m.n32 + n14 * m.n42;
-		this.n13 = n11 * m.n13 + n12 * m.n23 + n13 * m.n33 + n14 * m.n43;
-		this.n14 = n11 * m.n14 + n12 * m.n24 + n13 * m.n34 + n14 * m.n44;
+		this.n11 = n11 * mn11 + n12 * mn21 + n13 * mn31 + n14 * mn41;
+		this.n12 = n11 * mn12 + n12 * mn22 + n13 * mn32 + n14 * mn42;
+		this.n13 = n11 * mn13 + n12 * mn23 + n13 * mn33 + n14 * mn43;
+		this.n14 = n11 * mn14 + n12 * mn24 + n13 * mn34 + n14 * mn44;
 
-		this.n21 = n21 * m.n11 + n22 * m.n21 + n23 * m.n31 + n24 * m.n41;
-		this.n22 = n21 * m.n12 + n22 * m.n22 + n23 * m.n32 + n24 * m.n42;
-		this.n23 = n21 * m.n13 + n22 * m.n23 + n23 * m.n33 + n24 * m.n43;
-		this.n24 = n21 * m.n14 + n22 * m.n24 + n23 * m.n34 + n24 * m.n44;
+		this.n21 = n21 * mn11 + n22 * mn21 + n23 * mn31 + n24 * mn41;
+		this.n22 = n21 * mn12 + n22 * mn22 + n23 * mn32 + n24 * mn42;
+		this.n23 = n21 * mn13 + n22 * mn23 + n23 * mn33 + n24 * mn43;
+		this.n24 = n21 * mn14 + n22 * mn24 + n23 * mn34 + n24 * mn44;
 
-		this.n31 = n31 * m.n11 + n32 * m.n21 + n33 * m.n31 + n34 * m.n41;
-		this.n32 = n31 * m.n12 + n32 * m.n22 + n33 * m.n32 + n34 * m.n42;
-		this.n33 = n31 * m.n13 + n32 * m.n23 + n33 * m.n33 + n34 * m.n43;
-		this.n34 = n31 * m.n14 + n32 * m.n24 + n33 * m.n34 + n34 * m.n44;
+		this.n31 = n31 * mn11 + n32 * mn21 + n33 * mn31 + n34 * mn41;
+		this.n32 = n31 * mn12 + n32 * mn22 + n33 * mn32 + n34 * mn42;
+		this.n33 = n31 * mn13 + n32 * mn23 + n33 * mn33 + n34 * mn43;
+		this.n34 = n31 * mn14 + n32 * mn24 + n33 * mn34 + n34 * mn44;
 
-		this.n41 = n41 * m.n11 + n42 * m.n21 + n43 * m.n31 + n44 * m.n41;
-		this.n42 = n41 * m.n12 + n42 * m.n22 + n43 * m.n32 + n44 * m.n42;
-		this.n43 = n41 * m.n13 + n42 * m.n23 + n43 * m.n33 + n44 * m.n43;
-		this.n44 = n41 * m.n14 + n42 * m.n24 + n43 * m.n34 + n44 * m.n44;
+		this.n41 = n41 * mn11 + n42 * mn21 + n43 * mn31 + n44 * mn41;
+		this.n42 = n41 * mn12 + n42 * mn22 + n43 * mn32 + n44 * mn42;
+		this.n43 = n41 * mn13 + n42 * mn23 + n43 * mn33 + n44 * mn43;
+		this.n44 = n41 * mn14 + n42 * mn24 + n43 * mn34 + n44 * mn44;
 
 		return this;
 
