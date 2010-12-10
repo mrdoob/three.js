@@ -81,16 +81,42 @@ THREE.Rectangle = function () {
 			_left = x; _top = y;
 			_right = x; _bottom = y;
 
+			resize();
+
 		} else {
 
-			_left = Math.min( _left, x );
-			_top = Math.min( _top, y );
-			_right = Math.max( _right, x );
-			_bottom = Math.max( _bottom, y );
+			_left = _left < x ? _left : x; // Math.min( _left, x );
+			_top = _top < y ? _top : y; // Math.min( _top, y );
+			_right = _right > x ? _right : x; // Math.max( _right, x );
+			_bottom = _bottom > y ? _bottom : y; // Math.max( _bottom, y );
 
+			resize();
 		}
 
-		resize();
+	};
+
+	this.add3Points = function ( x1, y1, x2, y2, x3, y3 ) {
+
+		if (_isEmpty) {
+
+			_isEmpty = false;
+			_left = x1 < x2 ? ( x1 < x3 ? x1 : x3 ) : ( x2 < x3 ? x2 : x3 );
+			_top = y1 < y2 ? ( y1 < y3 ? y1 : y3 ) : ( y2 < y3 ? y2 : y3 );
+			_right = x1 > x2 ? ( x1 > x3 ? x1 : x3 ) : ( x2 > x3 ? x2 : x3 );
+			_bottom = y1 > y2 ? ( y1 > y3 ? y1 : y3 ) : ( y2 > y3 ? y2 : y3 );
+
+			resize();
+
+		} else {
+
+			_left = x1 < x2 ? ( x1 < x3 ? ( x1 < _left ? x1 : _left ) : ( x3 < _left ? x3 : _left ) ) : ( x2 < x3 ? ( x2 < _left ? x2 : _left ) : ( x3 < _left ? x3 : _left ) );
+			_top = y1 < y2 ? ( y1 < y3 ? ( y1 < _top ? y1 : _top ) : ( y3 < _top ? y3 : _top ) ) : ( y2 < y3 ? ( y2 < _top ? y2 : _top ) : ( y3 < _top ? y3 : _top ) );
+			_right = x1 > x2 ? ( x1 > x3 ? ( x1 > _right ? x1 : _right ) : ( x3 > _right ? x3 : _right ) ) : ( x2 > x3 ? ( x2 > _right ? x2 : _right ) : ( x3 > _right ? x3 : _right ) );
+			_bottom = y1 > y2 ? ( y1 > y3 ? ( y1 > _bottom ? y1 : _bottom ) : ( y3 > _bottom ? y3 : _bottom ) ) : ( y2 > y3 ? ( y2 > _bottom ? y2 : _bottom ) : ( y3 > _bottom ? y3 : _bottom ) );
+
+			resize();
+
+		};
 
 	};
 
@@ -102,16 +128,18 @@ THREE.Rectangle = function () {
 			_left = r.getLeft(); _top = r.getTop();
 			_right = r.getRight(); _bottom = r.getBottom();
 
+			resize();
+
 		} else {
 
-			_left = Math.min(_left, r.getLeft());
-			_top = Math.min(_top, r.getTop());
-			_right = Math.max(_right, r.getRight());
-			_bottom = Math.max(_bottom, r.getBottom());
+			_left = _left < r.getLeft() ? _left : r.getLeft(); // Math.min(_left, r.getLeft() );
+			_top = _top < r.getTop() ? _top : r.getTop(); // Math.min(_top, r.getTop() );
+			_right = _right > r.getRight() ? _right : r.getRight(); // Math.max(_right, r.getRight() );
+			_bottom = _bottom > r.getBottom() ? _bottom : r.getBottom(); // Math.max(_bottom, r.getBottom() );
+
+			resize();
 
 		}
-
-		resize();
 
 	};
 
@@ -126,10 +154,10 @@ THREE.Rectangle = function () {
 
 	this.minSelf = function ( r ) {
 
-		_left = Math.max( _left, r.getLeft() );
-		_top = Math.max( _top, r.getTop() );
-		_right = Math.min( _right, r.getRight() );
-		_bottom = Math.min( _bottom, r.getBottom() );
+		_left = _left > r.getLeft() ? _left : r.getLeft(); // Math.max( _left, r.getLeft() );
+		_top = _top > r.getTop() ? _top : r.getTop(); // Math.max( _top, r.getTop() );
+		_right = _right < r.getRight() ? _right : r.getRight(); // Math.min( _right, r.getRight() );
+		_bottom = _bottom < r.getBottom() ? _bottom : r.getBottom(); // Math.min( _bottom, r.getBottom() );
 
 		resize();
 
@@ -147,7 +175,8 @@ THREE.Rectangle = function () {
 
 		// return this.contains( r.getLeft(), r.getTop() ) || this.contains( r.getRight(), r.getTop() ) || this.contains( r.getLeft(), r.getBottom() ) || this.contains( r.getRight(), r.getBottom() );
 
-		return Math.min( _right, r.getRight() ) - Math.max( _left, r.getLeft() ) >= 0 && Math.min( _bottom, r.getBottom() ) - Math.max( _top, r.getTop() ) >= 0;
+		return Math.min( _right, r.getRight() ) - Math.max( _left, r.getLeft() ) >= 0 &&
+		        Math.min( _bottom, r.getBottom() ) - Math.max( _top, r.getTop() ) >= 0;
 
 	};
 

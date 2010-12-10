@@ -177,9 +177,9 @@ THREE.CanvasRenderer = function () {
 
 				}
 
-				_bboxRect.addPoint( _v1.positionScreen.x, _v1.positionScreen.y );
-				_bboxRect.addPoint( _v2.positionScreen.x, _v2.positionScreen.y );
-				_bboxRect.addPoint( _v3.positionScreen.x, _v3.positionScreen.y );
+				_bboxRect.add3Points( _v1.positionScreen.x, _v1.positionScreen.y,
+						      _v2.positionScreen.x, _v2.positionScreen.y,
+						      _v3.positionScreen.x, _v3.positionScreen.y );
 
 				if ( _clipRect.instersects( _bboxRect ) ) {
 
