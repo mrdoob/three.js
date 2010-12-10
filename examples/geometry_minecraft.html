@@ -75,14 +75,18 @@
 
 				scene = new THREE.Scene();
 
+				var grass_dirt = loadTexture( 'textures/minecraft/grass_dirt.png' ),
+					grass 	   = loadTexture( 'textures/minecraft/grass.png' ),
+					dirt	   = loadTexture( 'textures/minecraft/dirt.png' );
+					
 				var materials = [
 
-					loadTexture( 'textures/minecraft/grass_dirt.png' ), // right
-					loadTexture( 'textures/minecraft/grass_dirt.png' ), // left
-					loadTexture( 'textures/minecraft/grass.png' ), 		// top
-					loadTexture( 'textures/minecraft/dirt.png' ), 		// bottom
-					loadTexture( 'textures/minecraft/grass_dirt.png' ), // back
-					loadTexture( 'textures/minecraft/grass_dirt.png' ) 	// front
+					grass_dirt, // right
+					grass_dirt, // left
+					grass, 		// top
+					dirt, 		// bottom
+					grass_dirt, // back
+					grass_dirt 	// front
 
 				];
 
@@ -166,6 +170,17 @@
 
 			}
 
+			function generateAO( image, sides ) {
+			
+				var c = document.createElement('canvas');
+				c.width = image.width;
+				c.height = image.height;
+				c.getContext( "2d" ).drawImage( image, 0, 0 );
+				
+				return c;
+				
+			}
+			
 			function loadTexture( path ) {
 
 				var image = new Image();
