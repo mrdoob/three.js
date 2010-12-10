@@ -17,8 +17,6 @@ THREE.CanvasRenderer = function () {
 	_contextFillStyle = null,
 	_contextLineWidth = 1,
 
-	_min = Math.min, _max = Math.max,
-
 	_v1, _v2, _v3,
 	_v1x, _v1y, _v2x, _v2y, _v3x, _v3y,
 
@@ -760,21 +758,26 @@ THREE.CanvasRenderer = function () {
 
 			// http://mrdoob.com/blog/post/710
 
-			_pixelMapData[ 0 ] = _max( 0, _min( 255, ~~ ( color1.r * 255 ) ) );
-			_pixelMapData[ 1 ] = _max( 0, _min( 255, ~~ ( color1.g * 255 ) ) );
-			_pixelMapData[ 2 ] = _max( 0, _min( 255, ~~ ( color1.b * 255 ) ) );
+			var c1r = ~~ ( color1.r * 255 ), c1g = ~~ ( color1.g * 255 ), c1b = ~~ ( color1.b * 255 ),
+			c2r = ~~ ( color2.r * 255 ), c2g = ~~ ( color2.g * 255 ), c2b = ~~ ( color2.b * 255 ),
+			c3r = ~~ ( color3.r * 255 ), c3g = ~~ ( color3.g * 255 ), c3b = ~~ ( color3.b * 255 ),
+			c4r = ~~ ( color4.r * 255 ), c4g = ~~ ( color4.g * 255 ), c4b = ~~ ( color4.b * 255 );
 
-			_pixelMapData[ 4 ] = _max( 0, _min( 255, ~~ ( color2.r * 255 ) ) );
-			_pixelMapData[ 5 ] = _max( 0, _min( 255, ~~ ( color2.g * 255 ) ) );
-			_pixelMapData[ 6 ] = _max( 0, _min( 255, ~~ ( color2.b * 255 ) ) );
+			_pixelMapData[ 0 ] = c1r < 0 ? 0 : c1r > 255 ? 255 : c1r;
+			_pixelMapData[ 1 ] = c1g < 0 ? 0 : c1g > 255 ? 255 : c1g;
+			_pixelMapData[ 2 ] = c1b < 0 ? 0 : c1b > 255 ? 255 : c1b;
 
-			_pixelMapData[ 8 ] = _max( 0, _min( 255, ~~ ( color3.r * 255 ) ) );
-			_pixelMapData[ 9 ] = _max( 0, _min( 255, ~~ ( color3.g * 255 ) ) );
-			_pixelMapData[ 10 ] = _max( 0, _min( 255, ~~ ( color3.b * 255 ) ) );
+			_pixelMapData[ 4 ] = c2r < 0 ? 0 : c2r > 255 ? 255 : c2r;
+			_pixelMapData[ 5 ] = c2g < 0 ? 0 : c2g > 255 ? 255 : c2g;
+			_pixelMapData[ 6 ] = c2b < 0 ? 0 : c2b > 255 ? 255 : c2b;
 
-			_pixelMapData[ 12 ] = _max( 0, _min( 255, ~~ ( color4.r * 255 ) ) );
-			_pixelMapData[ 13 ] = _max( 0, _min( 255, ~~ ( color4.g * 255 ) ) );
-			_pixelMapData[ 14 ] = _max( 0, _min( 255, ~~ ( color4.b * 255 ) ) );
+			_pixelMapData[ 8 ] = c3r < 0 ? 0 : c3r > 255 ? 255 : c3r;
+			_pixelMapData[ 9 ] = c3g < 0 ? 0 : c3g > 255 ? 255 : c3g;
+			_pixelMapData[ 10 ] = c3b < 0 ? 0 : c3b > 255 ? 255 : c3b;
+
+			_pixelMapData[ 12 ] = c4r < 0 ? 0 : c4r > 255 ? 255 : c4r;
+			_pixelMapData[ 13 ] = c4g < 0 ? 0 : c4g > 255 ? 255 : c4g;
+			_pixelMapData[ 14 ] = c4b < 0 ? 0 : c4b > 255 ? 255 : c4b;
 
 			_pixelMapContext.putImageData( _pixelMapImage, 0, 0 );
 			_gradientMapContext.drawImage( _pixelMap, 0, 0 );
