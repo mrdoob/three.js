@@ -79,29 +79,52 @@
 
 					loadTexture( 'textures/minecraft/grass_dirt.png' ), // right
 					loadTexture( 'textures/minecraft/grass_dirt.png' ), // left
-					loadTexture( 'textures/minecraft/grass.png' ), // top
-					loadTexture( 'textures/minecraft/dirt.png' ), // bottom
+					loadTexture( 'textures/minecraft/grass.png' ), 		// top
+					loadTexture( 'textures/minecraft/dirt.png' ), 		// bottom
 					loadTexture( 'textures/minecraft/grass_dirt.png' ), // back
-					loadTexture( 'textures/minecraft/grass_dirt.png' ) // front
+					loadTexture( 'textures/minecraft/grass_dirt.png' ) 	// front
 
 				];
 
-				var cube = new Cube( 100, 100, 100, 1, 1, materials, false, { ny: false } );
+				var h, px, nx, pz, nz, cubes = [];
+				
+				for ( var i = 0; i < 16; i++ ) {
+				
+					px = (i & 8) == 8;
+					nx = (i & 4) == 4;
+					pz = (i & 2) == 2;
+					nz = (i & 1) == 1;
+					cubes[ i ] = new Cube( 100, 100, 100, 1, 1, materials, false, { px: px, nx: nx, py: true, ny: false, pz: pz, nz: nz } );
+					
+				}
+				
 				var geometry = new THREE.Geometry();
 
 				camera.position.y = getY( worldHalfWidth, worldHalfDepth ) + 100;
 				camera.target.position.y = camera.position.y;
-
-				for ( var y = 0; y < worldDepth; y ++ ) {
+				
+				for ( var z = 0; z < worldDepth; z ++ ) {
 
 					for ( var x = 0; x < worldWidth; x ++ ) {
 
-						mesh = new THREE.Mesh( cube );
+						px = nx = pz = nz = 0;
+						
+						h = getY( x, z );
+						
+						px = (getY( x - 1, z ) != h) || x == 0 ? 1 : 0;
+						nx = (getY( x + 1, z ) != h) || x == worldWidth - 1 ? 1 : 0;
+						
+						pz = (getY( x, z + 1 ) != h) || z == worldDepth - 1 ? 1 : 0;
+						nz = (getY( x, z - 1 ) != h) || z == 0 ? 1 : 0;
+						
+						mesh = new THREE.Mesh( cubes[ px * 8 + nx * 4 + pz * 2 + nz ] );
+						
 						mesh.position.x = x * 100 - worldHalfWidth * 100;
-						mesh.position.y = Math.floor( data[ x + y * worldWidth ] * 0.2 ) * 100;
-						mesh.position.z = y * 100 - worldHalfDepth * 100;
+						mesh.position.y = h;
+						mesh.position.z = z * 100 - worldHalfDepth * 100;
 
 						GeometryUtils.merge( geometry, mesh );
+						
 					}
 
 				}
@@ -180,7 +203,7 @@
 
 			function getY( x, z ) {
 
-				return ~~( data[ x + z * worldWidth ] * 0.2 ) * 100
+				return ~~( data[ x + z * worldWidth ] * 0.2 ) * 100;
 
 			}
 
