@@ -195,7 +195,7 @@ THREE.WebGLRenderer = function ( scene ) {
 				vertexArray.push( v3.x, v3.y, v3.z );
 
 				if ( object.geometry.hasTangents ) {
-					
+
 					t1 = object.geometry.vertices[ face.a ].tangent;
 					t2 = object.geometry.vertices[ face.b ].tangent;
 					t3 = object.geometry.vertices[ face.c ].tangent;
@@ -203,12 +203,12 @@ THREE.WebGLRenderer = function ( scene ) {
 					tangentArray.push( t1.x, t1.y, t1.z, t1.w );
 					tangentArray.push( t2.x, t2.y, t2.z, t2.w );
 					tangentArray.push( t3.x, t3.y, t3.z, t3.w );
-					
+
 				}
 
 				if ( vertexNormals.length == 3 && needsSmoothNormals ) {
 
-					
+
 					for ( i = 0; i < 3; i ++ ) {
 
 						normalArray.push( vertexNormals[ i ].x, vertexNormals[ i ].y, vertexNormals[ i ].z );
@@ -256,9 +256,9 @@ THREE.WebGLRenderer = function ( scene ) {
 				vertexArray.push( v2.x, v2.y, v2.z );
 				vertexArray.push( v3.x, v3.y, v3.z );
 				vertexArray.push( v4.x, v4.y, v4.z );
-				
+
 				if ( object.geometry.hasTangents ) {
-					
+
 					t1 = object.geometry.vertices[ face.a ].tangent;
 					t2 = object.geometry.vertices[ face.b ].tangent;
 					t3 = object.geometry.vertices[ face.c ].tangent;
@@ -268,17 +268,17 @@ THREE.WebGLRenderer = function ( scene ) {
 					tangentArray.push( t2.x, t2.y, t2.z, t2.w );
 					tangentArray.push( t3.x, t3.y, t3.z, t3.w );
 					tangentArray.push( t4.x, t4.y, t4.z, t4.w );
-					
+
 				}
 
 				if ( vertexNormals.length == 4 && needsSmoothNormals ) {
-					
+
 					for ( i = 0; i < 4; i ++ ) {
 
 						normalArray.push( vertexNormals[ i ].x, vertexNormals[ i ].y, vertexNormals[ i ].z );
 
 					}
-					
+
 				} else {
 
 					for ( i = 0; i < 4; i ++ ) {
@@ -331,13 +331,13 @@ THREE.WebGLRenderer = function ( scene ) {
 		_gl.bufferData( _gl.ARRAY_BUFFER, new Float32Array( normalArray ), _gl.STATIC_DRAW );
 
 		if ( object.geometry.hasTangents ) {
-			
+
 			geometryChunk.__webGLTangentBuffer = _gl.createBuffer();
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLTangentBuffer );
 			_gl.bufferData( _gl.ARRAY_BUFFER, new Float32Array( tangentArray ), _gl.STATIC_DRAW );
-			
+
 		}
-		
+
 		if ( uvArray.length > 0 ) {
 
 			geometryChunk.__webGLUVBuffer = _gl.createBuffer();
@@ -412,11 +412,11 @@ THREE.WebGLRenderer = function ( scene ) {
 
 		if ( material instanceof THREE.MeshShaderMaterial ) {
 
-			mWireframe = material.wireframe;		_modelViewMatrixArray.set( _modelViewMatrix.flatten() );
+			mWireframe = material.wireframe;
 			mLineWidth = material.wireframe_linewidth;
-			
+
 			mBlending = material.blending;
-			
+
 			setUniforms( program, material.uniforms );
 
 		}
@@ -540,21 +540,21 @@ THREE.WebGLRenderer = function ( scene ) {
 		// normals
 
 		if ( attributes.normal >= 0 ) {
-			
+
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLNormalBuffer );
 			_gl.vertexAttribPointer( attributes.normal, 3, _gl.FLOAT, false, 0, 0 );
-			
+
 		}
 
 		// tangents
 
 		if ( attributes.tangent >= 0 ) {
-			
+
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLTangentBuffer );
 			_gl.vertexAttribPointer( attributes.tangent, 4, _gl.FLOAT, false, 0, 0 );
-			
+
 		}
-		
+
 		// uvs
 
 		if ( attributes.uv >= 0 ) {
@@ -877,18 +877,18 @@ THREE.WebGLRenderer = function ( scene ) {
 	};
 
 	this.supportsVertexTextures = function() {
-		
+
 		return maxVertexTextures() > 0;
-		
+
 	};
-	
+
 	function maxVertexTextures() {
-		
+
 		return _gl.getParameter( _gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS );
 
 	};
-	
-	
+
+
 	function initGL() {
 
 		try {
@@ -1246,7 +1246,7 @@ THREE.WebGLRenderer = function ( scene ) {
 
 		prefix_vertex = [
 			maxVertexTextures() > 0 ? "#define VERTEX_TEXTURES" : "",
-		
+
 			"uniform mat4 objectMatrix;",
 			"uniform mat4 modelViewMatrix;",
 			"uniform mat4 projectionMatrix;",
@@ -1295,11 +1295,11 @@ THREE.WebGLRenderer = function ( scene ) {
 			} else if( type == "f" ) {
 
 				_gl.uniform1f( location, value );
-				
+
 			} else if( type == "v3" ) {
 
 				_gl.uniform3f( location, value.x, value.y, value.z );
-				
+
 			} else if( type == "c" ) {
 
 				_gl.uniform3f( location, value.r, value.g, value.b );
