@@ -539,8 +539,12 @@ THREE.WebGLRenderer = function ( scene ) {
 
 		// normals
 
-		_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLNormalBuffer );
-		_gl.vertexAttribPointer( attributes.normal, 3, _gl.FLOAT, false, 0, 0 );
+		if ( attributes.normal >= 0 ) {
+			
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLNormalBuffer );
+			_gl.vertexAttribPointer( attributes.normal, 3, _gl.FLOAT, false, 0, 0 );
+			
+		}
 
 		// tangents
 
