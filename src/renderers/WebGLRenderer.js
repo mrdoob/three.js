@@ -412,7 +412,7 @@ THREE.WebGLRenderer = function ( scene ) {
 
 		if ( material instanceof THREE.MeshShaderMaterial ) {
 
-			mWireframe = material.wireframe;
+			mWireframe = material.wireframe;		_modelViewMatrixArray.set( _modelViewMatrix.flatten() );
 			mLineWidth = material.wireframe_linewidth;
 			
 			mBlending = material.blending;
@@ -646,6 +646,9 @@ THREE.WebGLRenderer = function ( scene ) {
 
 		camera.autoUpdateMatrix && camera.updateMatrix();
 
+		_viewMatrixArray.set( camera.matrix.flatten() );
+		_projectionMatrixArray.set( camera.projectionMatrix.flatten() );
+
 		// opaque pass
 
 		for ( o = 0, ol = scene.__webGLObjects.length; o < ol; o++ ) {
@@ -782,10 +785,7 @@ THREE.WebGLRenderer = function ( scene ) {
 		object.autoUpdateMatrix && object.updateMatrix();
 
 		_modelViewMatrix.multiply( camera.matrix, object.matrix );
-
-		_viewMatrixArray.set( camera.matrix.flatten() );
 		_modelViewMatrixArray.set( _modelViewMatrix.flatten() );
-		_projectionMatrixArray.set( camera.projectionMatrix.flatten() );
 
 		_normalMatrix = THREE.Matrix4.makeInvert3x3( _modelViewMatrix ).transpose();
 		_normalMatrixArray.set( _normalMatrix.m );

@@ -260,7 +260,7 @@ var ShaderUtils = {
 			].join("\n")
 
 		},
-
+		/*
 		'hatching' : {
 
 			uniforms: {
@@ -347,8 +347,8 @@ var ShaderUtils = {
 			].join("\n")
 
 		},
-
-		'new': {
+		*/
+		'basic': {
 
 			uniforms: {},
 
@@ -366,7 +366,7 @@ var ShaderUtils = {
 
 				"void main() {",
 
-					"gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);",
+					"gl_FragColor = vec4(1.0, 0.0, 0.0, 0.5);",
 
 				"}"
 

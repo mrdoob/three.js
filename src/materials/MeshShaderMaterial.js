@@ -24,7 +24,7 @@ THREE.MeshShaderMaterial = function ( parameters ) {
 	this.opacity = 1;
 	this.shading = THREE.SmoothShading;
 	this.blending = THREE.NormalBlending;
-		
+
 	this.wireframe = false;
 	this.wireframe_linewidth = 1;
 	this.wireframe_linecap = 'round';
