@@ -95,7 +95,7 @@
 			lat = 0, lon = 0, phy = 0, theta = 0;
 
 			var direction = new THREE.Vector3(),
-			moveForward = false, moveBackward = false;
+			moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
 
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
@@ -845,12 +845,17 @@
 
 				switch( event.keyCode ) {
 
-					case 38: /*↑*/ moveForward = true; break;
-					case 40: /*↓*/ moveBackward = true; break;
-
+					case 38: /*up*/ 
 					case 87: /*W*/ moveForward = true; break;
+
+					case 37: /*left*/ 
+					case 65: /*A*/ moveLeft = true; break;
+
+					case 40: /*down*/ 
 					case 83: /*S*/ moveBackward = true; break;
 
+					case 39: /*right*/ 
+					case 68: /*D*/ moveRight = true; break;
 				}
 
 			}
@@ -859,20 +864,27 @@
 
 				switch( event.keyCode ) {
 
-					case 38: /*↑*/ moveForward = false; break;
-					case 40: /*↓*/ moveBackward = false; break;
-
+					case 38: /*up*/ 
 					case 87: /*W*/ moveForward = false; break;
+
+					case 37: /*left*/ 
+					case 65: /*A*/ moveLeft = false; break;
+
+					case 40: /*down*/ 
 					case 83: /*S*/ moveBackward = false; break;
 
+					case 39: /*right*/ 
+					case 68: /*D*/ moveRight = false; break;
 				}
 
 			}
 
 			function loop() {
 
-				if ( moveForward ) camera.translateZ( - 15 );
+				if ( moveForward )  camera.translateZ( - 15 );
 				if ( moveBackward ) camera.translateZ( 15 );
+				if ( moveLeft )     camera.translateX( - 15 );
+				if ( moveRight )    camera.translateX( 15 );
 
 				lon += mouseX * 0.005;
 				lat -= mouseY * 0.005;
