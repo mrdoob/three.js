@@ -65,6 +65,8 @@ THREE.WebGLRenderer2 = function ( scene ) {
 
 		camera.autoUpdateMatrix && camera.updateMatrix();
 
+		// Setup camera matrices
+
 		_viewMatrixArray.set( camera.matrix.flatten() );
 		_projectionMatrixArray.set( camera.projectionMatrix.flatten() );
 
@@ -87,10 +89,15 @@ THREE.WebGLRenderer2 = function ( scene ) {
 
 			object.autoUpdateMatrix && object.updateMatrix();
 
+			// Setup object matrices
+
 			_objectMatrixArray.set( object.matrix.flatten() );
 
 			_modelViewMatrix.multiply( camera.matrix, object.matrix );
 			_modelViewMatrixArray.set( _modelViewMatrix.flatten() );
+
+			_normalMatrix = THREE.Matrix4.makeInvert3x3( _modelViewMatrix ).transpose();
+			_normalMatrixArray.set( _normalMatrix.m );
 
 			if ( object instanceof THREE.Mesh ) {
 
@@ -122,9 +129,16 @@ THREE.WebGLRenderer2 = function ( scene ) {
 
 					}
 
-					if ( material instanceof THREE.MeshBasicMaterial ) {
+					if ( material instanceof THREE.MeshPhongMaterial ||
+					material instanceof THREE.MeshLambertMaterial ||
+					material instanceof THREE.MeshBasicMaterial ) {
 
-						_gl.uniform4f( program.uniforms.mColor,  material.color.r * material.opacity, material.color.g * material.opacity, material.color.b * material.opacity, material.opacity );
+						_gl.uniform3f( program.uniforms.mColor, material.color.r, material.color.g, material.color.b );
+						_gl.uniform1f( program.uniforms.mOpacity, material.opacity );
+
+					} else if ( material instanceof THREE.MeshNormalMaterial ) {
+
+						_gl.uniform1f( program.uniforms.mOpacity, material.opacity );
 
 					}
 
@@ -135,9 +149,17 @@ THREE.WebGLRenderer2 = function ( scene ) {
 					_gl.uniformMatrix4fv( program.uniforms.projectionMatrix, false, _projectionMatrixArray );
 					_gl.uniformMatrix4fv( program.uniforms.objectMatrix, false, _objectMatrixArray );
 					_gl.uniformMatrix4fv( program.uniforms.modelViewMatrix, false, _modelViewMatrixArray );
+					_gl.uniformMatrix3fv( program.uniforms.normalMatrix, false, _normalMatrixArray );
 
 					_gl.bindBuffer( _gl.ARRAY_BUFFER, geometry.__webglBuffers.vertexBuffer );
 					_gl.vertexAttribPointer( attributes.position, 3, _gl.FLOAT, false, 0, 0 );
+
+					if ( attributes.normal >= 0 ) {
+
+						_gl.bindBuffer( _gl.ARRAY_BUFFER, geometry.__webglBuffers.normalBuffer );
+						_gl.vertexAttribPointer( attributes.normal, 3, _gl.FLOAT, false, 0, 0 );
+
+					}
 
 					if ( ! material.wireframe ) {
 
@@ -160,13 +182,16 @@ THREE.WebGLRenderer2 = function ( scene ) {
 
 		function buildBuffers( geometry ) {
 
-			var f, fl, face, v1, v2, v3, verticesIndex = 0,
-			verticesArray = [], facesArray = [], linesArray = [],
+			var f, fl, face, v1, v2, v3, vertexNormals, normal, uv,
+			vertexIndex = 0, verticesArray = [], facesArray = [], linesArray = [],
+			normalsArray = [], uvsArray = [],
 			buffers = {};
 
 			for ( f = 0, fl = geometry.faces.length; f < fl; f++ ) {
 
 				face = geometry.faces[ f ];
+				vertexNormals = face.vertexNormals;
+				faceNormal = face.normal;
 
 				if ( face instanceof THREE.Face3 ) {
 
@@ -178,15 +203,43 @@ THREE.WebGLRenderer2 = function ( scene ) {
 					verticesArray.push( v2.x, v2.y, v2.z );
 					verticesArray.push( v3.x, v3.y, v3.z );
 
-					facesArray.push( verticesIndex, verticesIndex + 1, verticesIndex + 2 );
+					if ( vertexNormals.length == 3 ) {
+
+						for ( i = 0; i < 3; i ++ ) {
+
+							normalsArray.push( vertexNormals[ i ].x, vertexNormals[ i ].y, vertexNormals[ i ].z );
+
+						}
+
+					} else {
+
+						for ( i = 0; i < 3; i ++ ) {
+
+							normalsArray.push( faceNormal.x, faceNormal.y, faceNormal.z );
+
+						}
+
+					}
+
+					if ( uv ) {
+
+						for ( i = 0; i < 3; i ++ ) {
+
+							uvsArray.push( uv[ i ].u, uv[ i ].v );
+
+						}
+
+					}
+
+					facesArray.push( vertexIndex, vertexIndex + 1, vertexIndex + 2 );
 
 					// TODO: don't add lines that already exist (faces sharing edge)
 
-					linesArray.push( verticesIndex, verticesIndex + 1 );
-					linesArray.push( verticesIndex, verticesIndex + 2 );
-					linesArray.push( verticesIndex + 1, verticesIndex + 2 );
+					linesArray.push( vertexIndex, vertexIndex + 1 );
+					linesArray.push( vertexIndex, vertexIndex + 2 );
+					linesArray.push( vertexIndex + 1, vertexIndex + 2 );
 
-					verticesIndex += 3;
+					vertexIndex += 3;
 
 				} else if ( face instanceof THREE.Face4 ) {
 
@@ -200,18 +253,46 @@ THREE.WebGLRenderer2 = function ( scene ) {
 					verticesArray.push( v3.x, v3.y, v3.z );
 					verticesArray.push( v4.x, v4.y, v4.z );
 
-					facesArray.push( verticesIndex, verticesIndex + 1, verticesIndex + 2 );
-					facesArray.push( verticesIndex, verticesIndex + 2, verticesIndex + 3 );
+					if ( vertexNormals.length == 4 && needsSmoothNormals ) {
+
+						for ( i = 0; i < 4; i ++ ) {
+
+							normalsArray.push( vertexNormals[ i ].x, vertexNormals[ i ].y, vertexNormals[ i ].z );
+
+						}
+
+					} else {
+
+						for ( i = 0; i < 4; i ++ ) {
+
+							normalsArray.push( faceNormal.x, faceNormal.y, faceNormal.z );
+
+						}
+
+					}
+
+					if ( uv ) {
+
+						for ( i = 0; i < 4; i ++ ) {
+
+							uvsArray.push( uv[ i ].u, uv[ i ].v );
+
+						}
+
+					}
+
+					facesArray.push( vertexIndex, vertexIndex + 1, vertexIndex + 2 );
+					facesArray.push( vertexIndex, vertexIndex + 2, vertexIndex + 3 );
 
 					// TODO: don't add lines that already exist (faces sharing edge)
 
-					linesArray.push( verticesIndex, verticesIndex + 1 );
-					linesArray.push( verticesIndex, verticesIndex + 2 );
-					linesArray.push( verticesIndex, verticesIndex + 3 );
-					linesArray.push( verticesIndex + 1, verticesIndex + 2 );
-					linesArray.push( verticesIndex + 2, verticesIndex + 3 );
+					linesArray.push( vertexIndex, vertexIndex + 1 );
+					linesArray.push( vertexIndex, vertexIndex + 2 );
+					linesArray.push( vertexIndex, vertexIndex + 3 );
+					linesArray.push( vertexIndex + 1, vertexIndex + 2 );
+					linesArray.push( vertexIndex + 2, vertexIndex + 3 );
 
-					verticesIndex += 4;
+					vertexIndex += 4;
 
 				}
 
@@ -222,6 +303,18 @@ THREE.WebGLRenderer2 = function ( scene ) {
 			buffers.vertexBuffer = _gl.createBuffer();
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, buffers.vertexBuffer );
 			_gl.bufferData( _gl.ARRAY_BUFFER, new Float32Array( verticesArray ), _gl.STATIC_DRAW );
+
+			buffers.normalBuffer = _gl.createBuffer();
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, buffers.normalBuffer );
+			_gl.bufferData( _gl.ARRAY_BUFFER, new Float32Array( normalsArray ), _gl.STATIC_DRAW );
+
+			if ( uvsArray.length > 0 ) {
+
+				buffers.uvBuffer = _gl.createBuffer();
+				_gl.bindBuffer( _gl.ARRAY_BUFFER, buffers.uvBuffer );
+				_gl.bufferData( _gl.ARRAY_BUFFER, new Float32Array( uvsArray ), _gl.STATIC_DRAW );
+
+			}
 
 			buffers.faceBuffer = _gl.createBuffer();
 			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, buffers.faceBuffer );
@@ -242,21 +335,47 @@ THREE.WebGLRenderer2 = function ( scene ) {
 
 		function createProgram( material ) {
 
-			var vs = '', fs = '',
+			var pvs = '', vs = '', pfs = '', fs = '',
 			identifiers = [ 'viewMatrix', 'modelViewMatrix', 'projectionMatrix', 'normalMatrix', 'objectMatrix', 'cameraPosition' ];
 
-			if ( material instanceof THREE.MeshBasicMaterial ) {
+			if ( material instanceof THREE.MeshPhongMaterial ||
+			material instanceof THREE.MeshLambertMaterial ||
+			material instanceof THREE.MeshBasicMaterial ) {
 
 				vs += 'void main() {\n';
-				vs += 'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n';
-				vs += '}'
-
-				fs += 'uniform vec4 mColor;\n';
 				fs += 'void main() {\n';
-				fs += 'gl_FragColor = mColor;\n';
-				fs += '}';
+
+				vs += 'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n';
+
+				pfs += 'uniform vec3 mColor;\n';
+				pfs += 'uniform float mOpacity;\n';
+				fs += 'gl_FragColor = vec4( mColor.xyz * mOpacity, mOpacity );\n';
 
 				identifiers.push( 'mColor' );
+				identifiers.push( 'mOpacity' );
+
+				vs += '}';
+				fs += '}';
+
+
+			} else if ( material instanceof THREE.MeshNormalMaterial ) {
+
+				vs += 'void main() {\n';
+				fs += 'void main() {\n';
+
+				pvs += "varying vec3 vNormal;\n";
+				vs += 'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n';
+				vs += "vNormal = normalize( normalMatrix * normal );\n";
+
+				pfs += 'uniform float mOpacity;\n';
+				pfs += "varying vec3 vNormal;\n";
+				fs += "gl_FragColor = vec4( 0.5 * normalize( vNormal ) + 0.5, mOpacity );\n";
+
+				identifiers.push( 'mOpacity' );
+
+				vs += '}';
+				fs += '}';
+
 
 			} else if ( material instanceof THREE.MeshShaderMaterial ) {
 
@@ -275,7 +394,7 @@ THREE.WebGLRenderer2 = function ( scene ) {
 
 			}
 
-			material.__webglProgram = compileProgram( vs, fs );
+			material.__webglProgram = compileProgram( pvs + vs, pfs + fs );
 
 			cacheUniformLocations( material.__webglProgram, identifiers );
 			cacheAttributeLocations( material.__webglProgram, [ "position", "normal", "uv", "tangent" ] );
@@ -298,8 +417,8 @@ THREE.WebGLRenderer2 = function ( scene ) {
 				"uniform mat3 normalMatrix;",
 				"uniform vec3 cameraPosition;",
 				"attribute vec3 position;",
-				//"attribute vec3 normal;",
-				//"attribute vec2 uv;",
+				"attribute vec3 normal;",
+				"attribute vec2 uv;",
 				""
 			].join("\n"),
 
@@ -343,7 +462,11 @@ THREE.WebGLRenderer2 = function ( scene ) {
 
 			if ( !_gl.getProgramParameter( program, _gl.LINK_STATUS ) ) {
 
-				alert( "Could not initialise shaders\n VALIDATE_STATUS: " + _gl.getProgramParameter( program, _gl.VALIDATE_STATUS ) + ", gl error [" + _gl.getError() + "]" );
+				alert( "Could not initialise shaders.\n" +
+				"VALIDATE_STATUS: " + _gl.getProgramParameter( program, _gl.VALIDATE_STATUS ) + "\n" +
+				"ERROR: " + _gl.getError() + "\n\n" +
+				"Vertex Shader: \n" + prefix_vertex + vertex_shader + "\n\n" +
+				"Fragment Shader: \n" + prefix_fragment + fragment_shader  );
 
 			}
 
