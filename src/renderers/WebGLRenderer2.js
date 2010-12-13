@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.WebGLRenderer2 = function ( scene ) {
+THREE.WebGLRenderer2 = function () {
 
 	var _canvas = document.createElement( 'canvas' ),
 	_gl, _currentProgram,
@@ -136,6 +136,13 @@ THREE.WebGLRenderer2 = function ( scene ) {
 						_gl.uniform3f( program.uniforms.mColor, material.color.r, material.color.g, material.color.b );
 						_gl.uniform1f( program.uniforms.mOpacity, material.opacity );
 
+						if ( material.map ) {
+
+							setTexture( material.map, 0 );
+							_gl.uniform1i( program.uniforms.tMap, 0 );
+
+						}
+
 					} else if ( material instanceof THREE.MeshNormalMaterial ) {
 
 						_gl.uniform1f( program.uniforms.mOpacity, material.opacity );
@@ -161,6 +168,23 @@ THREE.WebGLRenderer2 = function ( scene ) {
 
 					}
 
+					if ( attributes.uv >= 0 ) {
+
+						if ( geometry.__webglBuffers.uvBuffer ) {
+
+							_gl.bindBuffer( _gl.ARRAY_BUFFER, geometry.__webglBuffers.uvBuffer );
+
+							_gl.enableVertexAttribArray( attributes.uv );
+							_gl.vertexAttribPointer( attributes.uv, 2, _gl.FLOAT, false, 0, 0 );
+
+						} else {
+
+							_gl.disableVertexAttribArray( attributes.uv );
+
+						}
+
+					}
+
 					if ( ! material.wireframe ) {
 
 						_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometry.__webglBuffers.faceBuffer );
@@ -180,6 +204,8 @@ THREE.WebGLRenderer2 = function ( scene ) {
 
 		}
 
+		// Buffers
+
 		function buildBuffers( geometry ) {
 
 			var f, fl, face, v1, v2, v3, vertexNormals, normal, uv,
@@ -190,6 +216,7 @@ THREE.WebGLRenderer2 = function ( scene ) {
 			for ( f = 0, fl = geometry.faces.length; f < fl; f++ ) {
 
 				face = geometry.faces[ f ];
+				uv = geometry.uvs[ f ];
 				vertexNormals = face.vertexNormals;
 				faceNormal = face.normal;
 
@@ -253,7 +280,7 @@ THREE.WebGLRenderer2 = function ( scene ) {
 					verticesArray.push( v3.x, v3.y, v3.z );
 					verticesArray.push( v4.x, v4.y, v4.z );
 
-					if ( vertexNormals.length == 4 && needsSmoothNormals ) {
+					if ( vertexNormals.length == 4 ) {
 
 						for ( i = 0; i < 4; i ++ ) {
 
@@ -333,6 +360,8 @@ THREE.WebGLRenderer2 = function ( scene ) {
 
 		}
 
+		// Shaders
+
 		function createProgram( material ) {
 
 			var pvs = '', vs = '', pfs = '', fs = '',
@@ -349,7 +378,21 @@ THREE.WebGLRenderer2 = function ( scene ) {
 
 				pfs += 'uniform vec3 mColor;\n';
 				pfs += 'uniform float mOpacity;\n';
-				fs += 'gl_FragColor = vec4( mColor.xyz * mOpacity, mOpacity );\n';
+
+				fs += 'gl_FragColor = vec4( mColor.xyz, mOpacity );\n';
+
+				if ( material.map ) {
+
+					pvs += 'varying vec2 vUv;\n',
+					vs += 'vUv = uv;\n',
+
+					pfs += 'uniform sampler2D tMap;\n';
+					pfs += 'varying vec2 vUv;\n';
+					fs += 'gl_FragColor *= texture2D( tMap, vUv );\n';
+
+					identifiers.push( 'tMap' );
+
+				}
 
 				identifiers.push( 'mColor' );
 				identifiers.push( 'mOpacity' );
@@ -363,13 +406,13 @@ THREE.WebGLRenderer2 = function ( scene ) {
 				vs += 'void main() {\n';
 				fs += 'void main() {\n';
 
-				pvs += "varying vec3 vNormal;\n";
+				pvs += 'varying vec3 vNormal;\n';
 				vs += 'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n';
-				vs += "vNormal = normalize( normalMatrix * normal );\n";
+				vs += 'vNormal = normalize( normalMatrix * normal );\n';
 
 				pfs += 'uniform float mOpacity;\n';
-				pfs += "varying vec3 vNormal;\n";
-				fs += "gl_FragColor = vec4( ( normalize( vNormal ) + 1.0 ) * 0.5, mOpacity );\n";
+				pfs += 'varying vec3 vNormal;\n';
+				fs += 'gl_FragColor = vec4( ( normalize( vNormal ) + 1.0 ) * 0.5, mOpacity );\n';
 
 				identifiers.push( 'mOpacity' );
 
@@ -397,7 +440,7 @@ THREE.WebGLRenderer2 = function ( scene ) {
 			material.__webglProgram = compileProgram( pvs + vs, pfs + fs );
 
 			cacheUniformLocations( material.__webglProgram, identifiers );
-			cacheAttributeLocations( material.__webglProgram, [ "position", "normal", "uv", "tangent" ] );
+			cacheAttributeLocations( material.__webglProgram, [ "position", "normal", "uv"/*, "tangent"*/ ] );
 
 			return true;
 
@@ -408,7 +451,7 @@ THREE.WebGLRenderer2 = function ( scene ) {
 			var program = _gl.createProgram(), shader
 
 			prefix_vertex = [
-				//maxVertexTextures() > 0 ? "#define VERTEX_TEXTURES" : "",
+				maxVertexTextures() > 0 ? "#define VERTEX_TEXTURES" : "",
 
 				"uniform mat4 objectMatrix;",
 				"uniform mat4 modelViewMatrix;",
@@ -466,7 +509,7 @@ THREE.WebGLRenderer2 = function ( scene ) {
 				"VALIDATE_STATUS: " + _gl.getProgramParameter( program, _gl.VALIDATE_STATUS ) + "\n" +
 				"ERROR: " + _gl.getError() + "\n\n" +
 				"Vertex Shader: \n" + prefix_vertex + vertex_shader + "\n\n" +
-				"Fragment Shader: \n" + prefix_fragment + fragment_shader  );
+				"Fragment Shader: \n" + prefix_fragment + fragment_shader );
 
 			}
 
@@ -506,6 +549,59 @@ THREE.WebGLRenderer2 = function ( scene ) {
 				}
 
 			}
+
+		}
+
+		// Textures
+
+		function setTexture( texture, slot ) {
+
+			if ( !texture.__webglTexture && texture.image.loaded ) {
+
+				texture.__webglTexture = _gl.createTexture();
+				_gl.bindTexture( _gl.TEXTURE_2D, texture.__webglTexture );
+				_gl.texImage2D( _gl.TEXTURE_2D, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, texture.image );
+
+				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_S, paramThreeToGL( texture.wrap_s ) );
+				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_T, paramThreeToGL( texture.wrap_t ) );
+
+				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MAG_FILTER, paramThreeToGL( texture.mag_filter ) );
+				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, paramThreeToGL( texture.min_filter ) );
+				_gl.generateMipmap( _gl.TEXTURE_2D );
+				_gl.bindTexture( _gl.TEXTURE_2D, null );
+
+			}
+
+			_gl.activeTexture( _gl.TEXTURE0 + slot );
+			_gl.bindTexture( _gl.TEXTURE_2D, texture.__webglTexture );
+
+		}
+
+		function maxVertexTextures() {
+
+			return _gl.getParameter( _gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS );
+
+		};
+
+		function paramThreeToGL( p ) {
+
+			switch ( p ) {
+
+				case THREE.RepeatWrapping: return _gl.REPEAT; break;
+				case THREE.ClampToEdgeWrapping: return _gl.CLAMP_TO_EDGE; break;
+				case THREE.MirroredRepeatWrapping: return _gl.MIRRORED_REPEAT; break;
+
+				case THREE.NearestFilter: return _gl.NEAREST; break;
+				case THREE.NearestMipMapNearestFilter: return _gl.NEAREST_MIPMAP_NEAREST; break;
+				case THREE.NearestMipMapLinearFilter: return _gl.NEAREST_MIPMAP_LINEAR; break;
+
+				case THREE.LinearFilter: return _gl.LINEAR; break;
+				case THREE.LinearMipMapNearestFilter: return _gl.LINEAR_MIPMAP_NEAREST; break;
+				case THREE.LinearMipMapLinearFilter: return _gl.LINEAR_MIPMAP_LINEAR; break;
+
+			}
+
+			return 0;
 
 		}
 
