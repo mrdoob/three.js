@@ -129,9 +129,9 @@ THREE.WebGLRenderer2 = function ( scene ) {
 
 					}
 
-					if ( material instanceof THREE.MeshPhongMaterial ||
+					if ( material instanceof THREE.MeshBasicMaterial ||
 					material instanceof THREE.MeshLambertMaterial ||
-					material instanceof THREE.MeshBasicMaterial ) {
+					material instanceof THREE.MeshPhongMaterial ) {
 
 						_gl.uniform3f( program.uniforms.mColor, material.color.r, material.color.g, material.color.b );
 						_gl.uniform1f( program.uniforms.mOpacity, material.opacity );
@@ -338,9 +338,9 @@ THREE.WebGLRenderer2 = function ( scene ) {
 			var pvs = '', vs = '', pfs = '', fs = '',
 			identifiers = [ 'viewMatrix', 'modelViewMatrix', 'projectionMatrix', 'normalMatrix', 'objectMatrix', 'cameraPosition' ];
 
-			if ( material instanceof THREE.MeshPhongMaterial ||
+			if ( material instanceof THREE.MeshBasicMaterial ||
 			material instanceof THREE.MeshLambertMaterial ||
-			material instanceof THREE.MeshBasicMaterial ) {
+			material instanceof THREE.MeshPhongMaterial ) {
 
 				vs += 'void main() {\n';
 				fs += 'void main() {\n';
@@ -369,7 +369,7 @@ THREE.WebGLRenderer2 = function ( scene ) {
 
 				pfs += 'uniform float mOpacity;\n';
 				pfs += "varying vec3 vNormal;\n";
-				fs += "gl_FragColor = vec4( 0.5 * normalize( vNormal ) + 0.5, mOpacity );\n";
+				fs += "gl_FragColor = vec4( ( normalize( vNormal ) + 1.0 ) * 0.5, mOpacity );\n";
 
 				identifiers.push( 'mOpacity' );
 
