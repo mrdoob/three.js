@@ -645,6 +645,9 @@ THREE.WebGLRenderer = function ( scene ) {
 		}
 
 		camera.autoUpdateMatrix && camera.updateMatrix();
+		
+		_viewMatrixArray.set( camera.matrix.flatten() );
+		_projectionMatrixArray.set( camera.projectionMatrix.flatten() );
 
 		// opaque pass
 
@@ -783,9 +786,7 @@ THREE.WebGLRenderer = function ( scene ) {
 
 		_modelViewMatrix.multiply( camera.matrix, object.matrix );
 
-		_viewMatrixArray.set( camera.matrix.flatten() );
 		_modelViewMatrixArray.set( _modelViewMatrix.flatten() );
-		_projectionMatrixArray.set( camera.projectionMatrix.flatten() );
 
 		_normalMatrix = THREE.Matrix4.makeInvert3x3( _modelViewMatrix ).transpose();
 		_normalMatrixArray.set( _normalMatrix.m );
