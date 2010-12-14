@@ -24,7 +24,7 @@ THREE.Projector = function() {
 
 		var o, ol, v, vl, f, fl, n, nl, objects, object,
 		objectMatrix, objectRotationMatrix, objectMaterial, objectOverdraw,
-		vertices, vertex, vertexPositionScreen,
+		geometry, vertices, vertex, vertexPositionScreen,
 		faces, face, faceVertexNormals, normal, v1, v2, v3, v4;
 
 		_renderList = [];
@@ -48,9 +48,11 @@ THREE.Projector = function() {
 
 			if ( object instanceof THREE.Mesh ) {
 
+				geometry = object.geometry;
+
 				// vertices
 
-				vertices = object.geometry.vertices;
+				vertices = geometry.vertices;
 
 				for ( v = 0, vl = vertices.length; v < vl; v++ ) {
 
@@ -74,7 +76,7 @@ THREE.Projector = function() {
 
 				// faces
 
-				faces = object.geometry.faces;
+				faces = geometry.faces;
 
 				for ( f = 0, fl = faces.length; f < fl; f ++ ) {
 
