@@ -11,7 +11,7 @@
 
 THREE.ParticleBasicMaterial = function ( parameters ) {
 
-	this.color = new THREE.Color( 0xff0000 );
+	this.color = new THREE.Color( 0xffffff );
 	this.map = null;
 	this.opacity = 1;
 	this.blending = THREE.NormalBlending;

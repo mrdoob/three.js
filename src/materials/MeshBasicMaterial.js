@@ -23,7 +23,7 @@ THREE.MeshBasicMaterial = function ( parameters ) {
 
 	this.id = THREE.MeshBasicMaterialCounter.value ++;
 
-	this.color = new THREE.Color( 0xeeeeee );
+	this.color = new THREE.Color( 0xffffff );
 	this.map = null;
 
 	this.env_map = null;
