@@ -60,7 +60,7 @@ var Cube = function ( width, height, depth, segments_width, segments_height, mat
 	this.sides.pz && buildPlane( 'x', 'y',   1 * flip, - 1, width, height, depth_half, this.materials[ 4 ] );   // pz
 	this.sides.nz && buildPlane( 'x', 'y', - 1 * flip, - 1, width, height, - depth_half, this.materials[ 5 ] ); // nz
 
-	// mergeVertices();
+	mergeVertices();
 
 	function buildPlane( u, v, udir, vdir, width, height, depth, material ) {
 
