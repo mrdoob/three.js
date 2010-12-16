@@ -3,7 +3,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Mesh = function ( geometry, material, normUVs ) {
+THREE.Mesh = function ( geometry, material/*, normUVs*/ ) {
 
 	THREE.Object3D.call( this );
 
@@ -15,7 +15,7 @@ THREE.Mesh = function ( geometry, material, normUVs ) {
 
 	this.overdraw = false;
 
-	if ( normUVs ) this.normalizeUVs();
+	// if ( normUVs ) this.normalizeUVs();
 
 	this.geometry.computeBoundingBox();
 
@@ -23,6 +23,9 @@ THREE.Mesh = function ( geometry, material, normUVs ) {
 
 THREE.Mesh.prototype = new THREE.Object3D();
 THREE.Mesh.prototype.constructor = THREE.Mesh;
+
+/*
+TODO: This doesn't completely fix the issue. Needs to be handled directly in the CanvasRenderer
 
 THREE.Mesh.prototype.normalizeUVs = function () {
 
@@ -45,3 +48,4 @@ THREE.Mesh.prototype.normalizeUVs = function () {
 	}
 
 };
+*/

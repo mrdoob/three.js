@@ -99,6 +99,7 @@ THREE.WebGLRenderer2 = function () {
 			_normalMatrix = THREE.Matrix4.makeInvert3x3( _modelViewMatrix ).transpose();
 			_normalMatrixArray.set( _normalMatrix.m );
 
+
 			if ( object instanceof THREE.Mesh ) {
 
 				geometry = object.geometry;
@@ -158,43 +159,51 @@ THREE.WebGLRenderer2 = function () {
 					_gl.uniformMatrix4fv( program.uniforms.modelViewMatrix, false, _modelViewMatrixArray );
 					_gl.uniformMatrix3fv( program.uniforms.normalMatrix, false, _normalMatrixArray );
 
-					_gl.bindBuffer( _gl.ARRAY_BUFFER, geometry.__webglBuffers.vertexBuffer );
-					_gl.vertexAttribPointer( attributes.position, 3, _gl.FLOAT, false, 0, 0 );
+					var buffer, buffers = geometry.__webglBuffers;
 
-					if ( attributes.normal >= 0 ) {
+					for ( var i = 0, l = buffers.length; i < l; i ++ ) {
 
-						_gl.bindBuffer( _gl.ARRAY_BUFFER, geometry.__webglBuffers.normalBuffer );
-						_gl.vertexAttribPointer( attributes.normal, 3, _gl.FLOAT, false, 0, 0 );
+						buffer = buffers[ i ];
 
-					}
+						_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer.vertices );
+						_gl.vertexAttribPointer( attributes.position, 3, _gl.FLOAT, false, 0, 0 );
 
-					if ( attributes.uv >= 0 ) {
+						if ( attributes.normal >= 0 ) {
 
-						if ( geometry.__webglBuffers.uvBuffer ) {
-
-							_gl.bindBuffer( _gl.ARRAY_BUFFER, geometry.__webglBuffers.uvBuffer );
-
-							_gl.enableVertexAttribArray( attributes.uv );
-							_gl.vertexAttribPointer( attributes.uv, 2, _gl.FLOAT, false, 0, 0 );
-
-						} else {
-
-							_gl.disableVertexAttribArray( attributes.uv );
+							_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer.normals );
+							_gl.vertexAttribPointer( attributes.normal, 3, _gl.FLOAT, false, 0, 0 );
 
 						}
 
-					}
+						if ( attributes.uv >= 0 ) {
 
-					if ( ! material.wireframe ) {
+							if ( buffer.uvs ) {
 
-						_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometry.__webglBuffers.faceBuffer );
-						_gl.drawElements( _gl.TRIANGLES, geometry.__webglBuffers.faceCount, _gl.UNSIGNED_SHORT, 0 );
+								_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer.uvs );
 
-					} else {
+								_gl.enableVertexAttribArray( attributes.uv );
+								_gl.vertexAttribPointer( attributes.uv, 2, _gl.FLOAT, false, 0, 0 );
 
-						_gl.lineWidth( material.wireframe_linewidth );
-						_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometry.__webglBuffers.lineBuffer );
-						_gl.drawElements( _gl.LINES, geometry.__webglBuffers.lineCount, _gl.UNSIGNED_SHORT, 0 );
+							} else {
+
+								_gl.disableVertexAttribArray( attributes.uv );
+
+							}
+
+						}
+
+						if ( ! material.wireframe ) {
+
+							_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, buffer.faces );
+							_gl.drawElements( _gl.TRIANGLES, buffer.faceCount, _gl.UNSIGNED_SHORT, 0 );
+
+						} else {
+
+							_gl.lineWidth( material.wireframe_linewidth );
+							_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, buffer.lines );
+							_gl.drawElements( _gl.LINES, buffer.lineCount, _gl.UNSIGNED_SHORT, 0 );
+
+						}
 
 					}
 
@@ -208,9 +217,11 @@ THREE.WebGLRenderer2 = function () {
 
 		function buildBuffers( geometry ) {
 
-			var f, fl, face, v1, v2, v3, vertexNormals, normal, uv,
-			vertexIndex = 0, verticesArray = [], facesArray = [], linesArray = [],
-			normalsArray = [], uvsArray = [],
+			// TODO: Handle 65535
+
+			var vertexIndex = 0, group,
+			f, fl, face, v1, v2, v3, vertexNormals, normal, uv,
+			vertices = [], faces = [], lines = [], normals = [], uvs = [],
 			buffers = {};
 
 			for ( f = 0, fl = geometry.faces.length; f < fl; f++ ) {
@@ -226,15 +237,15 @@ THREE.WebGLRenderer2 = function () {
 					v2 = geometry.vertices[ face.b ].position;
 					v3 = geometry.vertices[ face.c ].position;
 
-					verticesArray.push( v1.x, v1.y, v1.z );
-					verticesArray.push( v2.x, v2.y, v2.z );
-					verticesArray.push( v3.x, v3.y, v3.z );
+					vertices.push( v1.x, v1.y, v1.z );
+					vertices.push( v2.x, v2.y, v2.z );
+					vertices.push( v3.x, v3.y, v3.z );
 
 					if ( vertexNormals.length == 3 ) {
 
 						for ( i = 0; i < 3; i ++ ) {
 
-							normalsArray.push( vertexNormals[ i ].x, vertexNormals[ i ].y, vertexNormals[ i ].z );
+							normals.push( vertexNormals[ i ].x, vertexNormals[ i ].y, vertexNormals[ i ].z );
 
 						}
 
@@ -242,7 +253,7 @@ THREE.WebGLRenderer2 = function () {
 
 						for ( i = 0; i < 3; i ++ ) {
 
-							normalsArray.push( faceNormal.x, faceNormal.y, faceNormal.z );
+							normals.push( faceNormal.x, faceNormal.y, faceNormal.z );
 
 						}
 
@@ -252,39 +263,51 @@ THREE.WebGLRenderer2 = function () {
 
 						for ( i = 0; i < 3; i ++ ) {
 
-							uvsArray.push( uv[ i ].u, uv[ i ].v );
+							uvs.push( uv[ i ].u, uv[ i ].v );
 
 						}
 
 					}
 
-					facesArray.push( vertexIndex, vertexIndex + 1, vertexIndex + 2 );
+					faces.push( vertexIndex, vertexIndex + 1, vertexIndex + 2 );
 
 					// TODO: don't add lines that already exist (faces sharing edge)
 
-					linesArray.push( vertexIndex, vertexIndex + 1 );
-					linesArray.push( vertexIndex, vertexIndex + 2 );
-					linesArray.push( vertexIndex + 1, vertexIndex + 2 );
+					lines.push( vertexIndex, vertexIndex + 1 );
+					lines.push( vertexIndex, vertexIndex + 2 );
+					lines.push( vertexIndex + 1, vertexIndex + 2 );
 
 					vertexIndex += 3;
 
 				} else if ( face instanceof THREE.Face4 ) {
+
+					group = Math.floor( vertexIndex / 65535 );
+
+					if ( !vertices ) {
+
+						vertices = [];
+						faces = [];
+						normals = [];
+						lines = [];
+						uvs = [];
+
+					}
 
 					v1 = geometry.vertices[ face.a ].position;
 					v2 = geometry.vertices[ face.b ].position;
 					v3 = geometry.vertices[ face.c ].position;
 					v4 = geometry.vertices[ face.d ].position;
 
-					verticesArray.push( v1.x, v1.y, v1.z );
-					verticesArray.push( v2.x, v2.y, v2.z );
-					verticesArray.push( v3.x, v3.y, v3.z );
-					verticesArray.push( v4.x, v4.y, v4.z );
+					vertices.push( v1.x, v1.y, v1.z );
+					vertices.push( v2.x, v2.y, v2.z );
+					vertices.push( v3.x, v3.y, v3.z );
+					vertices.push( v4.x, v4.y, v4.z );
 
 					if ( vertexNormals.length == 4 ) {
 
 						for ( i = 0; i < 4; i ++ ) {
 
-							normalsArray.push( vertexNormals[ i ].x, vertexNormals[ i ].y, vertexNormals[ i ].z );
+							normals.push( vertexNormals[ i ].x, vertexNormals[ i ].y, vertexNormals[ i ].z );
 
 						}
 
@@ -292,7 +315,7 @@ THREE.WebGLRenderer2 = function () {
 
 						for ( i = 0; i < 4; i ++ ) {
 
-							normalsArray.push( faceNormal.x, faceNormal.y, faceNormal.z );
+							normals.push( faceNormal.x, faceNormal.y, faceNormal.z );
 
 						}
 
@@ -302,22 +325,22 @@ THREE.WebGLRenderer2 = function () {
 
 						for ( i = 0; i < 4; i ++ ) {
 
-							uvsArray.push( uv[ i ].u, uv[ i ].v );
+							uvs.push( uv[ i ].u, uv[ i ].v );
 
 						}
 
 					}
 
-					facesArray.push( vertexIndex, vertexIndex + 1, vertexIndex + 2 );
-					facesArray.push( vertexIndex, vertexIndex + 2, vertexIndex + 3 );
+					faces.push( vertexIndex, vertexIndex + 1, vertexIndex + 2 );
+					faces.push( vertexIndex, vertexIndex + 2, vertexIndex + 3 );
 
 					// TODO: don't add lines that already exist (faces sharing edge)
 
-					linesArray.push( vertexIndex, vertexIndex + 1 );
-					linesArray.push( vertexIndex, vertexIndex + 2 );
-					linesArray.push( vertexIndex, vertexIndex + 3 );
-					linesArray.push( vertexIndex + 1, vertexIndex + 2 );
-					linesArray.push( vertexIndex + 2, vertexIndex + 3 );
+					lines.push( vertexIndex, vertexIndex + 1 );
+					lines.push( vertexIndex, vertexIndex + 2 );
+					lines.push( vertexIndex, vertexIndex + 3 );
+					lines.push( vertexIndex + 1, vertexIndex + 2 );
+					lines.push( vertexIndex + 2, vertexIndex + 3 );
 
 					vertexIndex += 4;
 
@@ -325,34 +348,49 @@ THREE.WebGLRenderer2 = function () {
 
 			}
 
-			if ( !verticesArray.length ) return false;
+			if ( !vertices.length ) return false;
 
-			buffers.vertexBuffer = _gl.createBuffer();
-			_gl.bindBuffer( _gl.ARRAY_BUFFER, buffers.vertexBuffer );
-			_gl.bufferData( _gl.ARRAY_BUFFER, new Float32Array( verticesArray ), _gl.STATIC_DRAW );
+			var buffer, buffers = [];
 
-			buffers.normalBuffer = _gl.createBuffer();
-			_gl.bindBuffer( _gl.ARRAY_BUFFER, buffers.normalBuffer );
-			_gl.bufferData( _gl.ARRAY_BUFFER, new Float32Array( normalsArray ), _gl.STATIC_DRAW );
+			// for ( var i = 0, l = group; i <= l; i ++ ) {
 
-			if ( uvsArray.length > 0 ) {
+				buffer = {
+					vertices: null,
+					faces: null,
+					faceCount: faces.length,
+					normals: null,
+					lines: null,
+					lineCount: lines.length,
+					uvs: null
+				};
 
-				buffers.uvBuffer = _gl.createBuffer();
-				_gl.bindBuffer( _gl.ARRAY_BUFFER, buffers.uvBuffer );
-				_gl.bufferData( _gl.ARRAY_BUFFER, new Float32Array( uvsArray ), _gl.STATIC_DRAW );
+				buffer.vertices = _gl.createBuffer();
+				_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer.vertices );
+				_gl.bufferData( _gl.ARRAY_BUFFER, new Float32Array( vertices ), _gl.STATIC_DRAW );
 
-			}
+				buffer.normals = _gl.createBuffer();
+				_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer.normals );
+				_gl.bufferData( _gl.ARRAY_BUFFER, new Float32Array( normals ), _gl.STATIC_DRAW );
 
-			buffers.faceBuffer = _gl.createBuffer();
-			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, buffers.faceBuffer );
-			_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, new Uint16Array( facesArray ), _gl.STATIC_DRAW );
+				if ( uvs.length > 0 ) {
 
-			buffers.lineBuffer = _gl.createBuffer();
-			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, buffers.lineBuffer );
-			_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, new Uint16Array( linesArray ), _gl.STATIC_DRAW );
+					buffer.uvs = _gl.createBuffer();
+					_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer.uvs );
+					_gl.bufferData( _gl.ARRAY_BUFFER, new Float32Array( uvs ), _gl.STATIC_DRAW );
 
-			buffers.faceCount = facesArray.length;
-			buffers.lineCount = linesArray.length;
+				}
+
+				buffer.faces = _gl.createBuffer();
+				_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, buffer.faces );
+				_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, new Uint16Array( faces ), _gl.STATIC_DRAW );
+
+				buffer.lines = _gl.createBuffer();
+				_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, buffer.lines );
+				_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, new Uint16Array( lines ), _gl.STATIC_DRAW );
+
+				buffers.push( buffer );
+
+			// }
 
 			geometry.__webglBuffers = buffers;
 

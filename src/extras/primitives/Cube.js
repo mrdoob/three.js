@@ -64,13 +64,16 @@ var Cube = function ( width, height, depth, segments_width, segments_height, mat
 
 	function buildPlane( u, v, udir, vdir, width, height, depth, material ) {
 
-		var gridX = segments_width || 1,
+		var w,
+		gridX = segments_width || 1,
 		gridY = segments_height || 1,
 		gridX1 = gridX + 1,
 		gridY1 = gridY + 1,
+		width_half = width / 2,
+		height_half = height / 2,
 		segment_width = width / gridX,
 		segment_height = height / gridY,
-		offset = scope.vertices.length, w;
+		offset = scope.vertices.length;
 
 		if ( ( u == 'x' && v == 'y' ) || ( u == 'y' && v == 'x' ) ) {
 

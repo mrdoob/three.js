@@ -13,7 +13,7 @@ THREE.Geometry = function () {
 	this.geometryChunks = {};
 
 	this.hasTangents = false;
-	
+
 };
 
 THREE.Geometry.prototype = {
@@ -170,35 +170,35 @@ THREE.Geometry.prototype = {
 	},
 
 	computeTangents: function() {
-		
+
 		// based on http://www.terathon.com/code/tangent.html
 		// tangents go to vertices
-		
+
 		var f, fl, v, vl, face, uv, vA, vB, vC, uvA, uvB, uvC,
 			x1, x2, y1, y2, z1, z2,
 			s1, s2, t1, t2, r, t, n,
 			tan1 = [], tan2 = [],
 			sdir = new THREE.Vector3(), tdir = new THREE.Vector3(),
-			tmp = new THREE.Vector3(), tmp2 = new THREE.Vector3(), 
+			tmp = new THREE.Vector3(), tmp2 = new THREE.Vector3(),
 			n = new THREE.Vector3(), w;
-		
+
 		for ( v = 0, vl = this.vertices.length; v < vl; v ++ ) {
 
 			tan1[ v ] = new THREE.Vector3();
 			tan2[ v ] = new THREE.Vector3();
 
 		}
-		
+
 		function handleTriangle( context, a, b, c ) {
-			
+
 			vA = context.vertices[ a ].position;
 			vB = context.vertices[ b ].position;
 			vC = context.vertices[ c ].position;
-			
+
 			uvA = uv[ 0 ];
 			uvB = uv[ 1 ];
 			uvC = uv[ 2 ];
-			
+
 			x1 = vB.x - vA.x;
 			x2 = vC.x - vA.x;
 			y1 = vB.y - vA.y;
@@ -212,41 +212,41 @@ THREE.Geometry.prototype = {
 			t2 = uvC.v - uvA.v;
 
 			r = 1.0 / ( s1 * t2 - s2 * t1 );
-			sdir.set( ( t2 * x1 - t1 * x2 ) * r, 
+			sdir.set( ( t2 * x1 - t1 * x2 ) * r,
 					  ( t2 * y1 - t1 * y2 ) * r,
 					  ( t2 * z1 - t1 * z2 ) * r );
-			tdir.set( ( s1 * x2 - s2 * x1 ) * r, 
+			tdir.set( ( s1 * x2 - s2 * x1 ) * r,
 					  ( s1 * y2 - s2 * y1 ) * r,
 					  ( s1 * z2 - s2 * z1 ) * r );
-			
+
 			tan1[ a ].addSelf( sdir );
 			tan1[ b ].addSelf( sdir );
 			tan1[ c ].addSelf( sdir );
-			
+
 			tan2[ a ].addSelf( tdir );
 			tan2[ b ].addSelf( tdir );
 			tan2[ c ].addSelf( tdir );
-			
+
 		}
-		
+
 		for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
-			
+
 			face = this.faces[ f ];
 			uv = this.uvs[ f ];
-			
+
 			if ( face instanceof THREE.Face3 ) {
-				
+
 				handleTriangle( this, face.a, face.b, face.c );
-				
+
 				this.vertices[ face.a ].normal.copy( face.vertexNormals[ 0 ] );
 				this.vertices[ face.b ].normal.copy( face.vertexNormals[ 1 ] );
 				this.vertices[ face.c ].normal.copy( face.vertexNormals[ 2 ] );
-				
-				
+
+
 			} else if ( face instanceof THREE.Face4 ) {
-				
+
 				handleTriangle( this, face.a, face.b, face.c );
-				
+
 				// this messes up everything
 				// quads need to be handled differently
 				//handleTriangle( this, face.a, face.c, face.d );
@@ -255,41 +255,41 @@ THREE.Geometry.prototype = {
 				this.vertices[ face.b ].normal.copy( face.vertexNormals[ 1 ] );
 				this.vertices[ face.c ].normal.copy( face.vertexNormals[ 2 ] );
 				this.vertices[ face.d ].normal.copy( face.vertexNormals[ 3 ] );
-				
+
 			}
-			
+
 		}
-		
+
 		for ( v = 0, vl = this.vertices.length; v < vl; v ++ ) {
-			
+
 			n.copy( this.vertices[ v ].normal );
 			t = tan1[ v ];
-			
+
 			// Gram-Schmidt orthogonalize
-			
+
 			tmp.copy( t );
 			tmp.subSelf( n.multiplyScalar( n.dot( t ) ) ).normalize();
-			
+
 			// Calculate handedness
-			
+
 			tmp2.cross( this.vertices[ v ].normal, t );
 			test = tmp2.dot( tan2[ v ] );
 			w = (test < 0.0) ? -1.0 : 1.0;
-			
+
 			this.vertices[ v ].tangent.set( tmp.x, tmp.y, tmp.z, w );
-			
+
 		}
-		
+
 		this.hasTangents = true;
-		
+
 	},
-	
+
 	computeBoundingBox: function () {
 
 		if ( this.vertices.length > 0 ) {
 
 			this.bbox = { 'x': [ this.vertices[ 0 ].position.x, this.vertices[ 0 ].position.x ],
-			'y': [ this.vertices[ 0 ].position.y, this.vertices[ 0 ].position.y ], 
+			'y': [ this.vertices[ 0 ].position.y, this.vertices[ 0 ].position.y ],
 			'z': [ this.vertices[ 0 ].position.z, this.vertices[ 0 ].position.z ] };
 
 			for ( var v = 1, vl = this.vertices.length; v < vl; v ++ ) {
