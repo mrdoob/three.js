@@ -7,10 +7,12 @@
 THREE.Projector = function() {
 
 	var _renderList = null,
+	_object, _objectCount, _objectPool = [],
 	_face3, _face32, _face3Count, _face3Pool = [],
 	_line, _lineCount, _linePool = [],
 	_particle, _particleCount, _particlePool = [],
 
+	_vector3 = new THREE.Vector3(),
 	_vector4 = new THREE.Vector4(),
 	_projScreenMatrix = new THREE.Matrix4(),
 	_projScreenObjectMatrix = new THREE.Matrix4(),
@@ -19,6 +21,44 @@ THREE.Projector = function() {
 	_clippedVertex2PositionScreen = new THREE.Vector4(),
 
 	_face3VertexNormals;
+
+	this.projectObjects = function ( scene, camera ) {
+
+		var o, ol, v, vl, f, fl, n, nl, objects, object;
+
+		_renderList = [];
+		_objectCount = 0;
+
+		objects = scene.objects;
+
+		for ( o = 0, ol = objects.length; o < ol; o++ ) {
+
+			object = objects[ o ];
+
+			if ( object.visible === false ) continue;
+
+			_object = _objectPool[ _objectCount ] = _objectPool[ _objectCount ] || new THREE.RenderableObject();
+
+			_vector4.copy( object.position );
+			_projScreenMatrix.multiplyVector4( _vector4 );
+			_vector4.multiplyScalar( 1 / _vector4.w );
+
+			_object.object = object;
+			_object.z = _vector3.z;
+
+			_renderList.push( _object );
+
+			_objectCount ++;
+
+		}
+
+		_renderList.sort( painterSort );
+
+		return _renderList;
+
+	};
+
+	// TODO: Rename to projectElements? Test also using it with projectObjects to speed up sorting?
 
 	this.projectScene = function ( scene, camera ) {
 
@@ -39,6 +79,9 @@ THREE.Projector = function() {
 		for ( o = 0, ol = objects.length; o < ol; o++ ) {
 
 			object = objects[ o ];
+
+			if ( object.visible === false ) continue;
+
 			object.autoUpdateMatrix && object.updateMatrix();
 
 			objectMatrix = object.matrix;
@@ -313,7 +356,7 @@ THREE.Projector = function() {
 
 		}
 
-		_renderList.sort( function ( a, b ) { return b.z - a.z; } );
+		_renderList.sort( painterSort );
 
 		return _renderList;
 
@@ -397,6 +440,12 @@ THREE.Projector = function() {
 			}
 
 		}
+
+	}
+
+	function painterSort( a, b ) {
+
+		return b.z - a.z;
 
 	}
 
