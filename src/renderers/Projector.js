@@ -6,12 +6,12 @@
 
 THREE.Projector = function() {
 
-	var _renderList = null,
-	_object, _objectCount, _objectPool = [],
+	var _object, _objectCount, _objectPool = [],
 	_face3, _face32, _face3Count, _face3Pool = [],
 	_line, _lineCount, _linePool = [],
 	_particle, _particleCount, _particlePool = [],
 
+	_vector3 = new THREE.Vector4(),
 	_vector4 = new THREE.Vector4(),
 	_projScreenMatrix = new THREE.Matrix4(),
 	_projScreenObjectMatrix = new THREE.Matrix4(),
@@ -21,13 +21,12 @@ THREE.Projector = function() {
 
 	_face3VertexNormals;
 
-	this.projectObjects = function ( scene, camera ) {
+	this.projectObjects = function ( scene, camera, sort ) {
 
-		var o, ol, objects, object;
+		var renderList = [],
+		o, ol, objects, object;
 
-		_renderList = [];
 		_objectCount = 0;
-
 		_projScreenMatrix.multiply( camera.projectionMatrix, camera.matrix );
 
 		objects = scene.objects;
@@ -40,35 +39,34 @@ THREE.Projector = function() {
 
 			_object = _objectPool[ _objectCount ] = _objectPool[ _objectCount ] || new THREE.RenderableObject();
 
-			_vector4.copy( object.position );
-			_projScreenMatrix.multiplyVector4( _vector4 );
-			// _vector4.multiplyScalar( 1 / _vector4.w );
+			_vector3.copy( object.position );
+			_projScreenMatrix.multiplyVector3( _vector3 );
 
 			_object.object = object;
-			_object.z = _vector4.z;
+			_object.z = _vector3.z;
 
-			_renderList.push( _object );
+			renderList.push( _object );
 
 			_objectCount ++;
 
 		}
 
-		_renderList.sort( painterSort );
+		( sort === undefined || sort === true ) && renderList.sort( painterSort );
 
-		return _renderList;
+		return renderList;
 
 	};
 
 	// TODO: Rename to projectElements? Test also using it with projectObjects to speed up sorting?
 
-	this.projectScene = function ( scene, camera ) {
+	this.projectScene = function ( scene, camera, sort ) {
 
-		var o, ol, v, vl, f, fl, n, nl, objects, object,
+		var renderList = [],
+		o, ol, v, vl, f, fl, n, nl, objects, object,
 		objectMatrix, objectRotationMatrix, objectMaterial, objectOverdraw,
 		geometry, vertices, vertex, vertexPositionScreen,
 		faces, face, faceVertexNormals, normal, v1, v2, v3, v4;
 
-		_renderList = [];
 		_face3Count = _lineCount = _particleCount = 0;
 
 		camera.autoUpdateMatrix && camera.updateMatrix();
@@ -180,7 +178,7 @@ THREE.Projector = function() {
 
 								}
 
-								_renderList.push( _face3 );
+								renderList.push( _face3 );
 
 								_face3Count ++;
 
@@ -235,7 +233,7 @@ THREE.Projector = function() {
 
 								}
 
-								_renderList.push( _face3 );
+								renderList.push( _face3 );
 
 								_face3Count ++;
 
@@ -271,7 +269,7 @@ THREE.Projector = function() {
 
 								}
 
-								_renderList.push( _face32 );
+								renderList.push( _face32 );
 
 								_face3Count ++;
 
@@ -319,7 +317,7 @@ THREE.Projector = function() {
 
 						_line.material = object.material;
 
-						_renderList.push( _line );
+						renderList.push( _line );
 
 						_lineCount ++;
 					}
@@ -347,7 +345,7 @@ THREE.Projector = function() {
 
 					_particle.material = object.material;
 
-					_renderList.push( _particle );
+					renderList.push( _particle );
 
 					_particleCount ++;
 
@@ -357,9 +355,9 @@ THREE.Projector = function() {
 
 		}
 
-		_renderList.sort( painterSort );
+		( sort === undefined || sort === true ) && renderList.sort( painterSort );
 
-		return _renderList;
+		return renderList;
 
 	};
 
