@@ -4,7 +4,10 @@
 
 THREE.WebGLRenderer2 = function () {
 
-	var _canvas = document.createElement( 'canvas' ),
+	var _renderList = null,
+	_projector = new THREE.Projector(),
+
+	_canvas = document.createElement( 'canvas' ),
 	_gl, _currentProgram,
 	_modelViewMatrix = new THREE.Matrix4(),
 	_viewMatrixArray = new Float32Array( 16 ),
@@ -70,17 +73,26 @@ THREE.WebGLRenderer2 = function () {
 		_viewMatrixArray.set( camera.matrix.flatten() );
 		_projectionMatrixArray.set( camera.projectionMatrix.flatten() );
 
+		/*
 		for ( o = 0, ol = scene.objects.length; o < ol; o++ ) {
 
 			object = scene.objects[ o ];
 
-			if ( object.visible ) {
-
-				renderObject( object );
-
-			}
+			renderObject( object );
 
 		}
+		*/
+
+		_renderList = _projector.projectObjects( scene, camera );
+
+		for ( o = 0, ol = _renderList.length; o < ol; o++ ) {
+
+			object = _renderList[ o ];
+
+			renderObject( object.object );
+
+		}
+
 
 		function renderObject( object ) {
 
@@ -280,18 +292,6 @@ THREE.WebGLRenderer2 = function () {
 					vertexIndex += 3;
 
 				} else if ( face instanceof THREE.Face4 ) {
-
-					group = Math.floor( vertexIndex / 65535 );
-
-					if ( !vertices ) {
-
-						vertices = [];
-						faces = [];
-						normals = [];
-						lines = [];
-						uvs = [];
-
-					}
 
 					v1 = geometry.vertices[ face.a ].position;
 					v2 = geometry.vertices[ face.b ].position;
