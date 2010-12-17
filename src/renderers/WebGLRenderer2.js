@@ -73,6 +73,16 @@ THREE.WebGLRenderer2 = function () {
 		_viewMatrixArray.set( camera.matrix.flatten() );
 		_projectionMatrixArray.set( camera.projectionMatrix.flatten() );
 
+		/*
+		for ( o = 0, ol = scene.objects.length; o < ol; o++ ) {
+
+			object = scene.objects[ o ];
+
+			renderObject( object );
+
+		}
+		*/
+
 		_renderList = _projector.projectObjects( scene, camera );
 
 		for ( o = 0, ol = _renderList.length; o < ol; o++ ) {
@@ -82,6 +92,7 @@ THREE.WebGLRenderer2 = function () {
 			renderObject( object.object );
 
 		}
+
 
 		function renderObject( object ) {
 

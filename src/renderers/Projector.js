@@ -12,7 +12,6 @@ THREE.Projector = function() {
 	_line, _lineCount, _linePool = [],
 	_particle, _particleCount, _particlePool = [],
 
-	_vector3 = new THREE.Vector3(),
 	_vector4 = new THREE.Vector4(),
 	_projScreenMatrix = new THREE.Matrix4(),
 	_projScreenObjectMatrix = new THREE.Matrix4(),
@@ -24,10 +23,12 @@ THREE.Projector = function() {
 
 	this.projectObjects = function ( scene, camera ) {
 
-		var o, ol, v, vl, f, fl, n, nl, objects, object;
+		var o, ol, objects, object;
 
 		_renderList = [];
 		_objectCount = 0;
+
+		_projScreenMatrix.multiply( camera.projectionMatrix, camera.matrix );
 
 		objects = scene.objects;
 
@@ -41,10 +42,10 @@ THREE.Projector = function() {
 
 			_vector4.copy( object.position );
 			_projScreenMatrix.multiplyVector4( _vector4 );
-			_vector4.multiplyScalar( 1 / _vector4.w );
+			// _vector4.multiplyScalar( 1 / _vector4.w );
 
 			_object.object = object;
-			_object.z = _vector3.z;
+			_object.z = _vector4.z;
 
 			_renderList.push( _object );
 
