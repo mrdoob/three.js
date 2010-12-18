@@ -62,12 +62,13 @@ COMMON_FILES = [
 'renderers/CanvasRenderer.js',
 'renderers/SVGRenderer.js',
 'renderers/WebGLRenderer.js',
+'renderers/renderables/RenderableObject.js',
 'renderers/renderables/RenderableFace3.js',
 'renderers/renderables/RenderableParticle.js',
 'renderers/renderables/RenderableLine.js'
 ]
 
-EXTRAS_FILES = [		
+EXTRAS_FILES = [
 'extras/GeometryUtils.js',
 'extras/ImageUtils.js',
 'extras/SceneUtils.js',
@@ -140,6 +141,7 @@ SVG_FILES = [
 'scenes/Scene.js',
 'renderers/Projector.js',
 'renderers/SVGRenderer.js',
+'renderers/renderables/RenderableObject.js',
 'renderers/renderables/RenderableFace3.js',
 'renderers/renderables/RenderableParticle.js',
 'renderers/renderables/RenderableLine.js'
@@ -190,6 +192,7 @@ CANVAS_FILES = [
 'scenes/Scene.js',
 'renderers/Projector.js',
 'renderers/CanvasRenderer.js',
+'renderers/renderables/RenderableObject.js',
 'renderers/renderables/RenderableFace3.js',
 'renderers/renderables/RenderableParticle.js',
 'renderers/renderables/RenderableLine.js'
@@ -250,7 +253,7 @@ def merge(files):
 	for filename in files:
 		with open(os.path.join('..', 'src', filename), 'r') as f:
 			buffer.append(f.read())
-	
+
 	return "".join(buffer)
 
 
@@ -374,7 +377,7 @@ def main(argv=None):
 	['ThreeDOM', 	'includes_dom',    DOM_FILES,    args.dom],
 	['ThreeExtras', 'includes_extras', COMMON_FILES + EXTRAS_FILES, args.extras]
 	]
-	
+
 	for fname_lib, fname_inc, files, enabled in config:
 		if enabled or args.all:
 			buildLib(files, debug, fname_lib)
