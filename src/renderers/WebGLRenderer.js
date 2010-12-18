@@ -536,6 +536,7 @@ THREE.WebGLRenderer = function ( scene ) {
 
 		_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLVertexBuffer );
 		_gl.vertexAttribPointer( attributes.position, 3, _gl.FLOAT, false, 0, 0 );
+		_gl.enableVertexAttribArray( attributes.position );
 
 		// normals
 
@@ -543,6 +544,7 @@ THREE.WebGLRenderer = function ( scene ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLNormalBuffer );
 			_gl.vertexAttribPointer( attributes.normal, 3, _gl.FLOAT, false, 0, 0 );
+			_gl.enableVertexAttribArray( attributes.normal );
 
 		}
 
@@ -552,7 +554,8 @@ THREE.WebGLRenderer = function ( scene ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLTangentBuffer );
 			_gl.vertexAttribPointer( attributes.tangent, 4, _gl.FLOAT, false, 0, 0 );
-
+			_gl.enableVertexAttribArray( attributes.tangent );
+			
 		}
 
 		// uvs
@@ -560,11 +563,11 @@ THREE.WebGLRenderer = function ( scene ) {
 		if ( attributes.uv >= 0 ) {
 
 			if ( geometryChunk.__webGLUVBuffer ) {
-
+				
 				_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLUVBuffer );
+				_gl.vertexAttribPointer( attributes.uv, 2, _gl.FLOAT, false, 0, 0 );
 
 				_gl.enableVertexAttribArray( attributes.uv );
-				_gl.vertexAttribPointer( attributes.uv, 2, _gl.FLOAT, false, 0, 0 );
 
 			} else {
 
@@ -1410,12 +1413,6 @@ THREE.WebGLRenderer = function ( scene ) {
 
 			id = identifiers[ i ];
 			program.attributes[ id ] = _gl.getAttribLocation( program, id );
-
-			if ( program.attributes[ id ] >= 0 ) {
-
-				_gl.enableVertexAttribArray( program.attributes[ id ] );
-
-			}
 
 		}
 
