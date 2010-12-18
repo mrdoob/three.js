@@ -31,7 +31,7 @@ THREE.WebGLRenderer = function ( scene ) {
 
 	// ubershader material constants
 
-	BASIC = 0, LAMBERT = 1, PHONG = 2, DEPTH = 3, NORMAL = 4, CUBE = 5,
+	BASIC = 0, LAMBERT = 1, PHONG = 2, DEPTH = 3, NORMAL = 4,
 
 	// heuristics to create shader parameters according to lights in the scene
 	// (not to blow over maxLights budget)
@@ -496,12 +496,6 @@ THREE.WebGLRenderer = function ( scene ) {
 
 			_gl.uniform1i( program.uniforms.material, BASIC );
 
-		} else if ( material instanceof THREE.MeshCubeMaterial ) {
-
-			_gl.uniform1i( program.uniforms.material, CUBE );
-
-			envMap = material.env_map;
-
 		}
 
 		if ( mMap ) {
@@ -930,7 +924,7 @@ THREE.WebGLRenderer = function ( scene ) {
 			maxDirLights   ? "#define MAX_DIR_LIGHTS " + maxDirLights     : "",
 			maxPointLights ? "#define MAX_POINT_LIGHTS " + maxPointLights : "",
 
-			"uniform int material;", // 0 - Basic, 1 - Lambert, 2 - Phong, 3 - Depth, 4 - Normal, 5 - Cube
+			"uniform int material;", // 0 - Basic, 1 - Lambert, 2 - Phong, 3 - Depth, 4 - Normal
 
 			"uniform bool enableMap;",
 			"uniform bool enableCubeMap;",
@@ -991,16 +985,9 @@ THREE.WebGLRenderer = function ( scene ) {
 
 				"}",
 
-				// Cube
-
-				"if ( material == 5 ) { ",
-
-					"vec3 wPos = cameraPosition - vViewPosition;",
-					"gl_FragColor = textureCube( tCube, vec3( -wPos.x, wPos.yz ) );",
-
 				// Normals
 
-				"} else if ( material == 4 ) { ",
+				"if ( material == 4 ) { ",
 
 					"gl_FragColor = vec4( 0.5 * normalize( vNormal ) + 0.5, mOpacity );",
 
