@@ -967,8 +967,6 @@ THREE.WebGLRenderer = function ( scene ) {
 
 			"varying vec3 vReflect;",
 
-			"uniform vec3 cameraPosition;",
-
 			"void main() {",
 
 				"vec4 mapColor = vec4( 1.0, 1.0, 1.0, 1.0 );",
@@ -1244,6 +1242,7 @@ THREE.WebGLRenderer = function ( scene ) {
 			"precision highp float;",
 			"#endif",
 			"uniform mat4 viewMatrix;",
+			"uniform vec3 cameraPosition;",
 			""
 		].join("\n"),
 

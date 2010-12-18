@@ -27,6 +27,24 @@ var SceneUtils = {
 		
 	},
 
+	addPanoramaCubeWebGL2: function ( scene, size, textureCube ) {
+		
+		var shader = ShaderUtils.lib["cube"];
+		shader.uniforms["tCube"].texture = textureCube;
+		
+		var material = new THREE.MeshShaderMaterial( { fragment_shader: shader.fragment_shader, 
+													   vertex_shader: shader.vertex_shader, 
+													   uniforms: shader.uniforms
+													} ),
+													
+			mesh = new THREE.Mesh( new Cube( size, size, size, 1, 1, null, true ), material );
+		
+		scene.addObject( mesh );
+		
+		return mesh;
+		
+	},
+
 	addPanoramaCube: function( scene, size, images ) {
 	
 		var materials = [];

@@ -372,6 +372,42 @@ var ShaderUtils = {
 
 			].join("\n")
 
+		},
+		
+		'cube': {
+
+			uniforms: { "tCube": { type: "t", value: 1, texture: null } },
+
+			vertex_shader: [
+
+				"varying vec3 vViewPosition;",
+
+				"void main() {",
+			
+					"vec4 mPosition = objectMatrix * vec4( position, 1.0 );",
+					"vViewPosition = cameraPosition - mPosition.xyz;",
+
+					"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+
+				"}"
+
+			].join("\n"),
+
+			fragment_shader: [
+
+				"uniform samplerCube tCube;",
+
+				"varying vec3 vViewPosition;",
+
+				"void main() {",
+
+					"vec3 wPos = cameraPosition - vViewPosition;",
+					"gl_FragColor = textureCube( tCube, vec3( -wPos.x, wPos.yz ) );",
+
+				"}"
+
+			].join("\n")
+
 		}
 
 	}
