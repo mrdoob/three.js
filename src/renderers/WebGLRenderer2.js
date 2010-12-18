@@ -83,7 +83,7 @@ THREE.WebGLRenderer2 = function () {
 		}
 		*/
 
-		_renderList = _projector.projectObjects( scene, camera );
+		_renderList = _projector.projectObjects( scene, camera, true );
 
 		for ( o = 0, ol = _renderList.length; o < ol; o++ ) {
 
@@ -177,24 +177,31 @@ THREE.WebGLRenderer2 = function () {
 
 						buffer = buffers[ i ];
 
+						// vertices
+
 						_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer.vertices );
 						_gl.vertexAttribPointer( attributes.position, 3, _gl.FLOAT, false, 0, 0 );
+						_gl.enableVertexAttribArray( attributes.position );
+
+						// normals
 
 						if ( attributes.normal >= 0 ) {
 
 							_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer.normals );
 							_gl.vertexAttribPointer( attributes.normal, 3, _gl.FLOAT, false, 0, 0 );
+							_gl.enableVertexAttribArray( attributes.normal );
 
 						}
+
+						// uvs
 
 						if ( attributes.uv >= 0 ) {
 
 							if ( buffer.uvs ) {
 
 								_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer.uvs );
-
-								_gl.enableVertexAttribArray( attributes.uv );
 								_gl.vertexAttribPointer( attributes.uv, 2, _gl.FLOAT, false, 0, 0 );
+								_gl.enableVertexAttribArray( attributes.uv );
 
 							} else {
 
@@ -204,10 +211,14 @@ THREE.WebGLRenderer2 = function () {
 
 						}
 
+						// render triangles
+
 						if ( ! material.wireframe ) {
 
 							_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, buffer.faces );
 							_gl.drawElements( _gl.TRIANGLES, buffer.faceCount, _gl.UNSIGNED_SHORT, 0 );
+
+						// render lines
 
 						} else {
 
@@ -231,9 +242,10 @@ THREE.WebGLRenderer2 = function () {
 
 			// TODO: Handle 65535
 
-			var vertexIndex = 0, group,
+			var itemCount = 0, vertexIndex, group,
 			f, fl, face, v1, v2, v3, vertexNormals, normal, uv,
-			vertices = [], faces = [], lines = [], normals = [], uvs = [],
+			vertexGroups = [], faceGroups = [], lineGroups = [], normalGroups = [], uvGroups = [],
+			vertices, faces, lines, normals, uvs,
 			buffers = {};
 
 			for ( f = 0, fl = geometry.faces.length; f < fl; f++ ) {
@@ -244,6 +256,20 @@ THREE.WebGLRenderer2 = function () {
 				faceNormal = face.normal;
 
 				if ( face instanceof THREE.Face3 ) {
+
+					itemCount += 3;
+					group = Math.floor( itemCount / 65535 );
+
+					if ( !vertexGroups[ group ] ) {
+
+						vertexIndex = 0;
+						vertices = vertexGroups[ group ] = [];
+						normals = normalGroups[ group ] = [];
+						uvs = uvGroups[ group ] = [];
+						faces = faceGroups[ group ] = [];
+						lines = lineGroups[ group ] = [];
+
+					}
 
 					v1 = geometry.vertices[ face.a ].position;
 					v2 = geometry.vertices[ face.b ].position;
@@ -292,6 +318,20 @@ THREE.WebGLRenderer2 = function () {
 					vertexIndex += 3;
 
 				} else if ( face instanceof THREE.Face4 ) {
+
+					itemCount += 4;
+					group = Math.floor( itemCount / 65535 );
+
+					if ( !vertexGroups[ group ] ) {
+
+						vertexIndex = 0;
+						vertices = vertexGroups[ group ] = [];
+						normals = normalGroups[ group ] = [];
+						uvs = uvGroups[ group ] = [];
+						faces = faceGroups[ group ] = [];
+						lines = lineGroups[ group ] = [];
+
+					}
 
 					v1 = geometry.vertices[ face.a ].position;
 					v2 = geometry.vertices[ face.b ].position;
@@ -352,45 +392,47 @@ THREE.WebGLRenderer2 = function () {
 
 			var buffer, buffers = [];
 
-			// for ( var i = 0, l = group; i <= l; i ++ ) {
+			for ( var i = 0, l = group; i <= l; i ++ ) {
 
 				buffer = {
+
 					vertices: null,
 					faces: null,
-					faceCount: faces.length,
+					faceCount: faceGroups[ i ].length,
 					normals: null,
 					lines: null,
-					lineCount: lines.length,
+					lineCount: lineGroups[ i ].length,
 					uvs: null
+
 				};
 
 				buffer.vertices = _gl.createBuffer();
 				_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer.vertices );
-				_gl.bufferData( _gl.ARRAY_BUFFER, new Float32Array( vertices ), _gl.STATIC_DRAW );
+				_gl.bufferData( _gl.ARRAY_BUFFER, new Float32Array( vertexGroups[ i ] ), _gl.STATIC_DRAW );
 
 				buffer.normals = _gl.createBuffer();
 				_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer.normals );
-				_gl.bufferData( _gl.ARRAY_BUFFER, new Float32Array( normals ), _gl.STATIC_DRAW );
+				_gl.bufferData( _gl.ARRAY_BUFFER, new Float32Array( normalGroups[ i ] ), _gl.STATIC_DRAW );
 
 				if ( uvs.length > 0 ) {
 
 					buffer.uvs = _gl.createBuffer();
 					_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer.uvs );
-					_gl.bufferData( _gl.ARRAY_BUFFER, new Float32Array( uvs ), _gl.STATIC_DRAW );
+					_gl.bufferData( _gl.ARRAY_BUFFER, new Float32Array( uvGroups[ i ] ), _gl.STATIC_DRAW );
 
 				}
 
 				buffer.faces = _gl.createBuffer();
 				_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, buffer.faces );
-				_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, new Uint16Array( faces ), _gl.STATIC_DRAW );
+				_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, new Uint16Array( faceGroups[ i ] ), _gl.STATIC_DRAW );
 
 				buffer.lines = _gl.createBuffer();
 				_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, buffer.lines );
-				_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, new Uint16Array( lines ), _gl.STATIC_DRAW );
+				_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, new Uint16Array( lineGroups[ i ] ), _gl.STATIC_DRAW );
 
 				buffers.push( buffer );
 
-			// }
+			}
 
 			geometry.__webglBuffers = buffers;
 

@@ -104,7 +104,7 @@ THREE.CanvasRenderer = function () {
 
 		this.autoClear && this.clear();
 
-		_renderList = _projector.projectScene( scene, camera );
+		_renderList = _projector.projectScene( scene, camera, true );
 
 		/* DEBUG
 		_context.fillStyle = 'rgba(0, 255, 255, 0.5)';

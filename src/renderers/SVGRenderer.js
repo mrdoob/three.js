@@ -75,7 +75,7 @@ THREE.SVGRenderer = function () {
 
 		}
 
-		_renderList = _projector.projectScene( scene, camera );
+		_renderList = _projector.projectScene( scene, camera, true );
 
 		_pathCount = 0; _circleCount = 0; _lineCount = 0;
 

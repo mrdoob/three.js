@@ -51,7 +51,7 @@ THREE.Projector = function() {
 
 		}
 
-		( sort === undefined || sort === true ) && renderList.sort( painterSort );
+		sort && renderList.sort( painterSort );
 
 		return renderList;
 
@@ -355,7 +355,7 @@ THREE.Projector = function() {
 
 		}
 
-		( sort === undefined || sort === true ) && renderList.sort( painterSort );
+		sort && renderList.sort( painterSort );
 
 		return renderList;
 
