@@ -66,7 +66,10 @@ THREE.CanvasRenderer = function () {
 	_gradientMapQuality --; // Fix UVs
 
 	this.domElement = _canvas;
+
 	this.autoClear = true;
+	this.sortObjects = true;
+	this.sortElements = true;
 
 	this.setSize = function ( width, height ) {
 
@@ -104,7 +107,7 @@ THREE.CanvasRenderer = function () {
 
 		this.autoClear && this.clear();
 
-		_renderList = _projector.projectScene( scene, camera, true );
+		_renderList = _projector.projectScene( scene, camera, this.sortElements );
 
 		/* DEBUG
 		_context.fillStyle = 'rgba(0, 255, 255, 0.5)';

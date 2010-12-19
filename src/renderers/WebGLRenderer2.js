@@ -44,7 +44,9 @@ THREE.WebGLRenderer2 = function () {
 	_gl.clearColor( 0, 0, 0, 0 );
 
 	this.domElement = _canvas;
+
 	this.autoClear = true;
+	this.sortObjects = true;
 
 	this.setSize = function ( width, height ) {
 
@@ -83,7 +85,7 @@ THREE.WebGLRenderer2 = function () {
 		}
 		*/
 
-		_renderList = _projector.projectObjects( scene, camera, true );
+		_renderList = _projector.projectObjects( scene, camera, this.sortObjects );
 
 		for ( o = 0, ol = _renderList.length; o < ol; o++ ) {
 
@@ -468,6 +470,8 @@ THREE.WebGLRenderer2 = function () {
 
 					pfs += 'uniform sampler2D tMap;\n';
 					pfs += 'varying vec2 vUv;\n';
+					// fs += 'vec4 mapColor = texture2D( tMap, vUv );\n';
+					// fs += 'mapColor.xyz *= mapColor.w;\n';
 					fs += 'gl_FragColor *= texture2D( tMap, vUv );\n';
 
 					identifiers.push( 'tMap' );

@@ -29,7 +29,10 @@ THREE.SVGRenderer = function () {
 	_quality = 1;
 
 	this.domElement = _svg;
+
 	this.autoClear = true;
+	this.sortObjects = true;
+	this.sortElements = true;
 
 	this.setQuality = function( quality ) {
 
@@ -75,7 +78,7 @@ THREE.SVGRenderer = function () {
 
 		}
 
-		_renderList = _projector.projectScene( scene, camera, true );
+		_renderList = _projector.projectScene( scene, camera, this.sortElements );
 
 		_pathCount = 0; _circleCount = 0; _lineCount = 0;
 
