@@ -34,11 +34,11 @@ THREE.Projector = function() {
 
 		objects = scene.objects;
 
-		for ( o = 0, ol = objects.length; o < ol; o++ ) {
+		for ( o = 0, ol = objects.length; o < ol; o ++ ) {
 
 			object = objects[ o ];
 
-			if ( object.visible === false || isInFrustum( object ) === false ) continue;
+			if ( !object.visible || !isInFrustum( object ) ) continue;
 
 			_object = _objectPool[ _objectCount ] = _objectPool[ _objectCount ] || new THREE.RenderableObject();
 
@@ -82,7 +82,7 @@ THREE.Projector = function() {
 
 			object = objects[ o ];
 
-			if ( object.visible === false ) continue;
+			if ( !object.visible ) continue;
 
 			object.autoUpdateMatrix && object.updateMatrix();
 

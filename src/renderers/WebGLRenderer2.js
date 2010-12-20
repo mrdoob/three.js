@@ -157,8 +157,14 @@ THREE.WebGLRenderer2 = function () {
 
 						_gl.uniform1f( program.uniforms.mOpacity, material.opacity );
 
-					}
+					} else if ( material instanceof THREE.MeshDepthMaterial ) {
 
+						_gl.uniform1f( program.uniforms.m2Near, material.__2near );
+						_gl.uniform1f( program.uniforms.mFarPlusNear, material.__farPlusNear );
+						_gl.uniform1f( program.uniforms.mFarMinusNear, material.__farMinusNear );
+						_gl.uniform1f( program.uniforms.mOpacity, material.opacity );
+
+					}
 
 					_gl.uniform3f( program.uniforms.cameraPosition, camera.position.x, camera.position.y, camera.position.z );
 
@@ -499,6 +505,26 @@ THREE.WebGLRenderer2 = function () {
 
 				vs += '}';
 				fs += '}';
+
+			} else if ( material instanceof THREE.MeshDepthMaterial ) {
+
+				vs += 'void main() {\n';
+				fs += 'void main() {\n';
+
+				vs += 'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n';
+
+				pfs += 'uniform float m2Near;\n';
+				pfs += 'uniform float mFarPlusNear;\n';
+				pfs += 'uniform float mFarMinusNear;\n';
+				pfs += 'uniform float mOpacity;\n';
+				fs += 'float w = 1.0 - ( m2Near / ( mFarPlusNear - gl_FragCoord.z * mFarMinusNear ) );\n';
+				fs += 'gl_FragColor = vec4( w, w, w, mOpacity );\n';
+
+				identifiers.push( 'm2Near', 'mFarPlusNear', 'mFarMinusNear', 'mOpacity' );
+
+				vs += '}';
+				fs += '}';
+
 
 
 			} else if ( material instanceof THREE.MeshShaderMaterial ) {
