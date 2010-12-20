@@ -481,8 +481,7 @@ THREE.WebGLRenderer2 = function () {
 
 				}
 
-				identifiers.push( 'mColor' );
-				identifiers.push( 'mOpacity' );
+				identifiers.push( 'mColor', 'mOpacity' );
 
 				vs += '}';
 				fs += '}';
@@ -513,10 +512,10 @@ THREE.WebGLRenderer2 = function () {
 
 				vs += 'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n';
 
+				pfs += 'uniform float mOpacity;\n';
 				pfs += 'uniform float m2Near;\n';
 				pfs += 'uniform float mFarPlusNear;\n';
 				pfs += 'uniform float mFarMinusNear;\n';
-				pfs += 'uniform float mOpacity;\n';
 				fs += 'float w = 1.0 - ( m2Near / ( mFarPlusNear - gl_FragCoord.z * mFarMinusNear ) );\n';
 				fs += 'gl_FragColor = vec4( w, w, w, mOpacity );\n';
 
@@ -524,8 +523,6 @@ THREE.WebGLRenderer2 = function () {
 
 				vs += '}';
 				fs += '}';
-
-
 
 			} else if ( material instanceof THREE.MeshShaderMaterial ) {
 

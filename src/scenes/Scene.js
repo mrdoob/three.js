@@ -6,6 +6,7 @@ THREE.Scene = function () {
 
 	this.objects = [];
 	this.lights = [];
+	this.fog = null;
 
 	this.addObject = function ( object ) {
 
