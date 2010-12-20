@@ -13,8 +13,15 @@ THREE.MeshDepthMaterial = function ( parameters ) {
 
 	this.near = 1;
 	this.far = 1000;
+	
 	this.opacity = 1;
+	this.shading = THREE.SmoothShading;
 	this.blending = THREE.NormalBlending;
+
+	this.wireframe = false;
+	this.wireframe_linewidth = 1;
+	this.wireframe_linecap = 'round';
+	this.wireframe_linejoin = 'round';
 
 	if ( parameters ) {
 
