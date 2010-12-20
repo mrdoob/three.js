@@ -78,9 +78,7 @@ THREE.WebGLRenderer2 = function () {
 		/*
 		for ( o = 0, ol = scene.objects.length; o < ol; o++ ) {
 
-			object = scene.objects[ o ];
-
-			renderObject( object );
+			renderObject( scene.objects[ o ] );
 
 		}
 		*/
@@ -89,12 +87,9 @@ THREE.WebGLRenderer2 = function () {
 
 		for ( o = 0, ol = _renderList.length; o < ol; o++ ) {
 
-			object = _renderList[ o ];
-
-			renderObject( object.object );
+			renderObject( _renderList[ o ].object );
 
 		}
-
 
 		function renderObject( object ) {
 
@@ -241,8 +236,6 @@ THREE.WebGLRenderer2 = function () {
 		// Buffers
 
 		function buildBuffers( geometry ) {
-
-			// TODO: Handle 65535
 
 			var itemCount = 0, vertexIndex, group,
 			f, fl, face, v1, v2, v3, vertexNormals, normal, uv,
@@ -470,8 +463,12 @@ THREE.WebGLRenderer2 = function () {
 
 					pfs += 'uniform sampler2D tMap;\n';
 					pfs += 'varying vec2 vUv;\n';
-					// fs += 'vec4 mapColor = texture2D( tMap, vUv );\n';
-					// fs += 'mapColor.xyz *= mapColor.w;\n';
+
+					/* Premultiply alpha
+					fs += 'vec4 mapColor = texture2D( tMap, vUv );\n';
+					fs += 'mapColor.xyz *= mapColor.w;\n';
+					*/
+
 					fs += 'gl_FragColor *= texture2D( tMap, vUv );\n';
 
 					identifiers.push( 'tMap' );

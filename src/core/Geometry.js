@@ -10,6 +10,9 @@ THREE.Geometry = function () {
 	this.faces = [];
 	this.uvs = [];
 
+	this.boundingBox = null;
+	this.boundingSphere = null;
+
 	this.geometryChunks = {};
 
 	this.hasTangents = false;
@@ -286,6 +289,8 @@ THREE.Geometry.prototype = {
 
 	computeBoundingBox: function () {
 
+		var vertex;
+
 		if ( this.vertices.length > 0 ) {
 
 			this.bbox = { 'x': [ this.vertices[ 0 ].position.x, this.vertices[ 0 ].position.x ],
@@ -329,6 +334,20 @@ THREE.Geometry.prototype = {
 			}
 
 		}
+
+	},
+
+	computeBoundingSphere: function () {
+
+		var radius = this.boundingSphere === null ? 0 : this.boundingSphere.radius;
+
+		for ( var v = 0, vl = this.vertices.length; v < vl; v ++ ) {
+
+			radius = Math.max( radius, this.vertices[ v ].position.length() );
+
+		}
+
+		this.boundingSphere = { radius: radius };
 
 	},
 

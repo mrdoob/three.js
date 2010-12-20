@@ -15,6 +15,7 @@ THREE.Projector = function() {
 	_vector4 = new THREE.Vector4(),
 	_projScreenMatrix = new THREE.Matrix4(),
 	_projScreenObjectMatrix = new THREE.Matrix4(),
+	_frustum = [],
 
 	_clippedVertex1PositionScreen = new THREE.Vector4(),
 	_clippedVertex2PositionScreen = new THREE.Vector4(),
@@ -29,13 +30,15 @@ THREE.Projector = function() {
 		_objectCount = 0;
 		_projScreenMatrix.multiply( camera.projectionMatrix, camera.matrix );
 
+		computeFrustum( _projScreenMatrix );
+
 		objects = scene.objects;
 
 		for ( o = 0, ol = objects.length; o < ol; o++ ) {
 
 			object = objects[ o ];
 
-			if ( object.visible === false ) continue;
+			if ( object.visible === false || isInFrustum( object ) === false ) continue;
 
 			_object = _objectPool[ _objectCount ] = _objectPool[ _objectCount ] || new THREE.RenderableObject();
 
@@ -372,6 +375,46 @@ THREE.Projector = function() {
 
 	};
 
+	function painterSort( a, b ) {
+
+		return b.z - a.z;
+
+	}
+
+	function computeFrustum( m ) {
+
+		_frustum[ 0 ] = new THREE.Vector4( m.n41 - m.n11, m.n42 - m.n12, m.n43 - m.n13, m.n44 - m.n14 );
+		_frustum[ 1 ] = new THREE.Vector4( m.n41 + m.n11, m.n42 + m.n12, m.n43 + m.n13, m.n44 + m.n14 );
+		_frustum[ 2 ] = new THREE.Vector4( m.n41 + m.n21, m.n42 + m.n22, m.n43 + m.n23, m.n44 + m.n24 );
+		_frustum[ 3 ] = new THREE.Vector4( m.n41 - m.n21, m.n42 - m.n22, m.n43 - m.n23, m.n44 - m.n24 );
+		_frustum[ 4 ] = new THREE.Vector4( m.n41 - m.n31, m.n42 - m.n32, m.n43 - m.n33, m.n44 - m.n34 );
+		_frustum[ 5 ] = new THREE.Vector4( m.n41 + m.n31, m.n42 + m.n32, m.n43 + m.n33, m.n44 + m.n34 );
+
+		for ( var i = 0, l = _frustum.length; i < l; i ++ ) {
+
+			var plane = _frustum[ i ];
+			plane.divideScalar( Math.sqrt( plane.x * plane.x + plane.y * plane.y + plane.z * plane.z ) );
+
+		}
+
+	}
+
+	function isInFrustum( object ) {
+
+		var d, position = object.position,
+		radius = - object.geometry.boundingSphere.radius * Math.max( object.scale.x, Math.max( object.scale.y, object.scale.z ) );
+
+		for ( var i = 0; i < 6; i ++ ) {
+
+			d = _frustum[ i ].x * position.x + _frustum[ i ].y * position.y + _frustum[ i ].z * position.z + _frustum[ i ].w;
+			if ( d <= radius ) return false;
+
+		}
+
+		return true;
+
+	}
+
 	function clipLine( s1, s2 ) {
 
 		var alpha1 = 0, alpha2 = 1,
@@ -439,12 +482,6 @@ THREE.Projector = function() {
 			}
 
 		}
-
-	}
-
-	function painterSort( a, b ) {
-
-		return b.z - a.z;
 
 	}
 

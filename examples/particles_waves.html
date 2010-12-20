@@ -27,7 +27,7 @@
 			var container, stats;
 			var camera, scene, renderer;
 
-			var particles, particle, count;
+			var particles, particle, count = 0;
 
 			var mouseX = 0, mouseY = 0;
 
@@ -47,9 +47,6 @@
 
 				scene = new THREE.Scene();
 
-				renderer = new THREE.CanvasRenderer();
-				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				particles = new Array();
 
 				var i = 0;
@@ -63,11 +60,13 @@
 						particle.position.x = ix * SEPARATION - ( ( AMOUNTX * SEPARATION ) / 2 );
 						particle.position.z = iy * SEPARATION - ( ( AMOUNTY * SEPARATION ) / 2 );
 						scene.addObject( particle );
+
 					}
+
 				}
 
-				count = 0;
-
+				renderer = new THREE.CanvasRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -99,6 +98,7 @@
 					mouseY = event.touches[ 0 ].pageY - windowHalfY;
 
 				}
+
 			}
 
 			function onDocumentTouchMove( event ) {
@@ -111,6 +111,7 @@
 					mouseY = event.touches[ 0 ].pageY - windowHalfY;
 
 				}
+
 			}
 
 			//
@@ -138,6 +139,7 @@
 				stats.update();
 
 				count += 0.1;
+
 			}
 
 		</script>

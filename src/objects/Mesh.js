@@ -17,7 +17,8 @@ THREE.Mesh = function ( geometry, material/*, normUVs*/ ) {
 
 	// if ( normUVs ) this.normalizeUVs();
 
-	this.geometry.computeBoundingBox();
+	// this.geometry.boundingBox ||this.geometry.computeBoundingBox();
+	this.geometry.boundingSphere || this.geometry.computeBoundingSphere();
 
 };
 

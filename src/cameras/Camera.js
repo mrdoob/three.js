@@ -8,6 +8,7 @@ THREE.Camera = function ( fov, aspect, near, far ) {
 	this.target = { position: new THREE.Vector3() };
 
 	this.up = new THREE.Vector3( 0, 1, 0 );
+
 	this.matrix = new THREE.Matrix4();
 	this.projectionMatrix = THREE.Matrix4.makePerspective( fov, aspect, near, far );
 
@@ -23,7 +24,7 @@ THREE.Camera = function ( fov, aspect, near, far ) {
 
 	};
 
-	/*
+	/* TODO
 	this.translateY = function ( amount ) {
 
 	};
