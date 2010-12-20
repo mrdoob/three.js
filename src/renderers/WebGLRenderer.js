@@ -31,7 +31,7 @@ THREE.WebGLRenderer = function ( scene ) {
 
 	// ubershader material constants
 
-	BASIC = 0, LAMBERT = 1, PHONG = 2, DEPTH = 3, NORMAL = 4,
+	BASIC = 0, LAMBERT = 1, PHONG = 2,
 
 	// heuristics to create shader parameters according to lights in the scene
 	// (not to blow over maxLights budget)
@@ -359,6 +359,14 @@ THREE.WebGLRenderer = function ( scene ) {
 
 	};
 
+	function setMaterialShaders( material, shaders ) {
+		
+		material.fragment_shader = shaders.fragment_shader;
+		material.vertex_shader = shaders.vertex_shader;
+		material.uniforms = shaders.uniforms;
+		
+	};
+	
 	this.renderBuffer = function ( camera, lights, material, geometryChunk ) {
 
 		var mColor, mOpacity, mReflectivity,
@@ -369,10 +377,25 @@ THREE.WebGLRenderer = function ( scene ) {
 			program, u, identifiers, attributes;
 
 
-		if ( material instanceof THREE.MeshShaderMaterial ) {
+		if ( material instanceof THREE.MeshShaderMaterial ||
+			 material instanceof THREE.MeshDepthMaterial ||
+			 material instanceof THREE.MeshNormalMaterial ) {
 
 			if ( !material.program ) {
 
+				if ( material instanceof THREE.MeshDepthMaterial ) {
+					
+					setMaterialShaders( material, ShaderLib[ 'depth' ] );
+					
+					material.uniforms.mNear.value = material.near;
+					material.uniforms.mFar.value = material.far;
+					
+				} else if ( material instanceof THREE.MeshNormalMaterial ) {
+					
+					setMaterialShaders( material, ShaderLib[ 'normal' ] );
+					
+				}					
+				
 				material.program = buildProgram( material.fragment_shader, material.vertex_shader );
 
 				identifiers = [ 'viewMatrix', 'modelViewMatrix', 'projectionMatrix', 'normalMatrix', 'objectMatrix', 'cameraPosition' ];
@@ -381,6 +404,7 @@ THREE.WebGLRenderer = function ( scene ) {
 					identifiers.push(u);
 
 				}
+				
 				cacheUniformLocations( material.program, identifiers );
 				cacheAttributeLocations( material.program, [ "position", "normal", "uv", "tangent" ] );
 
@@ -410,7 +434,9 @@ THREE.WebGLRenderer = function ( scene ) {
 		this.loadCamera( program, camera );
 		this.loadMatrices( program );
 
-		if ( material instanceof THREE.MeshShaderMaterial ) {
+		if ( material instanceof THREE.MeshShaderMaterial || 
+		     material instanceof THREE.MeshDepthMaterial ||
+			 material instanceof THREE.MeshNormalMaterial ) {
 
 			mWireframe = material.wireframe;
 			mLineWidth = material.wireframe_linewidth;
@@ -452,31 +478,7 @@ THREE.WebGLRenderer = function ( scene ) {
 
 		}
 
-		if ( material instanceof THREE.MeshNormalMaterial ) {
-
-			mOpacity = material.opacity;
-			mBlending = material.blending;
-
-			_gl.uniform1f( program.uniforms.mOpacity, mOpacity );
-
-			_gl.uniform1i( program.uniforms.material, NORMAL );
-
-		} else if ( material instanceof THREE.MeshDepthMaterial ) {
-
-			mOpacity = material.opacity;
-
-			mWireframe = material.wireframe;
-			mLineWidth = material.wireframe_linewidth;
-
-			_gl.uniform1f( program.uniforms.mOpacity, mOpacity );
-
-			_gl.uniform1f( program.uniforms.m2Near, material.__2near );
-			_gl.uniform1f( program.uniforms.mFarPlusNear, material.__farPlusNear );
-			_gl.uniform1f( program.uniforms.mFarMinusNear, material.__farMinusNear );
-
-			_gl.uniform1i( program.uniforms.material, DEPTH );
-
-		} else if ( material instanceof THREE.MeshPhongMaterial ) {
+		if ( material instanceof THREE.MeshPhongMaterial ) {
 
 			mAmbient  = material.ambient;
 			mSpecular = material.specular;
@@ -924,7 +926,7 @@ THREE.WebGLRenderer = function ( scene ) {
 			maxDirLights   ? "#define MAX_DIR_LIGHTS " + maxDirLights     : "",
 			maxPointLights ? "#define MAX_POINT_LIGHTS " + maxPointLights : "",
 
-			"uniform int material;", // 0 - Basic, 1 - Lambert, 2 - Phong, 3 - Depth, 4 - Normal
+			"uniform int material;", // 0 - Basic, 1 - Lambert, 2 - Phong
 
 			"uniform bool enableMap;",
 			"uniform bool enableCubeMap;",
@@ -940,10 +942,6 @@ THREE.WebGLRenderer = function ( scene ) {
 			"uniform vec4 mAmbient;",
 			"uniform vec4 mSpecular;",
 			"uniform float mShininess;",
-
-			"uniform float m2Near;",
-			"uniform float mFarPlusNear;",
-			"uniform float mFarMinusNear;",
 
 			"uniform int pointLightNumber;",
 			"uniform int directionalLightNumber;",
@@ -985,28 +983,10 @@ THREE.WebGLRenderer = function ( scene ) {
 
 				"}",
 
-				// Normals
-
-				"if ( material == 4 ) { ",
-
-					"gl_FragColor = vec4( 0.5 * normalize( vNormal ) + 0.5, mOpacity );",
-
-				// Depth
-
-				"} else if ( material == 3 ) { ",
-
-					// this breaks shader validation in Chrome 9.0.576.0 dev
-					// and also latest continuous build Chromium 9.0.583.0 (66089)
-					// (curiously it works in Chrome 9.0.576.0 canary build and Firefox 4b7)
-					//"float w = 1.0 - ( m2Near / ( mFarPlusNear - gl_FragCoord.z * mFarMinusNear ) );",
-					"float w = 0.5;",
-
-					"gl_FragColor = vec4( w, w, w, mOpacity );",
-
 				// Blinn-Phong
 				// based on o3d example
 
-				"} else if ( material == 2 ) { ",
+				"if ( material == 2 ) { ",
 
 					"vec3 normal = normalize( vNormal );",
 					"vec3 viewPosition = normalize( vViewPosition );",
@@ -1420,15 +1400,13 @@ THREE.WebGLRenderer = function ( scene ) {
 		// matrices
 		// lights
 		// material properties (Basic / Lambert / Blinn-Phong shader)
-		// material properties (Depth)
 
 		cacheUniformLocations( program, [ 'viewMatrix', 'modelViewMatrix', 'projectionMatrix', 'normalMatrix', 'objectMatrix', 'cameraPosition',
 										   'enableLighting', 'ambientLightColor',
 										   'material', 'mColor', 'mAmbient', 'mSpecular', 'mShininess', 'mOpacity',
 										   'enableMap', 'tMap',
 										   'enableCubeMap', 'tCube', 'mixEnvMap', 'mReflectivity',
-										   'mRefractionRatio', 'useRefract',
-										   'm2Near', 'mFarPlusNear', 'mFarMinusNear'
+										   'mRefractionRatio', 'useRefract'
 		] );
 
 
@@ -1629,5 +1607,74 @@ THREE.WebGLRenderer = function ( scene ) {
 		return str;
 	}
 	*/
+	
+	var ShaderLib = {
+		
+		'depth': {
+
+			uniforms: { "mNear": { type: "f", value: 1.0 }, 
+						"mFar" : { type: "f", value: 2000.0 } },
+
+			fragment_shader: [
+				
+				"uniform float mNear;",
+				"uniform float mFar;",
+
+				"void main() {",
+						
+					"float depth = gl_FragCoord.z / gl_FragCoord.w;",
+					"float color = 1.0 - smoothstep( mNear, mFar, depth );",
+					"gl_FragColor = vec4( vec3( color ), 1.0 );",
+					
+				"}"
+
+			].join("\n"),
+						
+			vertex_shader: [
+
+				"void main() {",
+
+					"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+
+				"}"
+
+			].join("\n")
+
+		},
+		
+		'normal': {
+			
+			uniforms: { },
+			
+			fragment_shader: [
+				
+				"varying vec3 vNormal;",
+			
+				"void main() {",
+						
+					"gl_FragColor = vec4( 0.5 * normalize( vNormal ) + 0.5, 1.0 );",
+					
+				"}"
+
+			].join("\n"),
+			
+			vertex_shader: [
+			
+				"varying vec3 vNormal;",
+
+				"void main() {",
+			
+					"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
+					"vNormal = normalize( normalMatrix * normal );",
+
+					"gl_Position = projectionMatrix * mvPosition;",
+
+				"}"
+
+			].join("\n")
+			
+		}
+		
+	};
 
 };
