@@ -38,7 +38,7 @@ THREE.Projector = function() {
 
 			object = objects[ o ];
 
-			if ( !object.visible || !isInFrustum( object ) ) continue;
+			if ( !object.visible || ( object instanceof THREE.Mesh && !isInFrustum( object ) ) ) continue;
 
 			_object = _objectPool[ _objectCount ] = _objectPool[ _objectCount ] || new THREE.RenderableObject();
 
@@ -76,11 +76,11 @@ THREE.Projector = function() {
 
 		_projScreenMatrix.multiply( camera.projectionMatrix, camera.matrix );
 
-		objects = scene.objects;
+		objects = this.projectObjects( scene, camera, true ); // scene.objects;
 
 		for ( o = 0, ol = objects.length; o < ol; o++ ) {
 
-			object = objects[ o ];
+			object = objects[ o ].object;
 
 			if ( !object.visible ) continue;
 
