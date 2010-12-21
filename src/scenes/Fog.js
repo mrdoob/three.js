@@ -1,5 +1,6 @@
 /**
  * @author mr.doob / http://mrdoob.com/
+ * @author alteredq / http://alteredqualia.com/
  */
 
 THREE.Fog = function ( hex, density ) {
