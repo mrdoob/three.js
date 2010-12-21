@@ -11,6 +11,7 @@
 				text-align:center;
 
 				background-color: #bfd1e5;
+				background-color:#fff;
 				margin: 0px;
 				overflow: hidden;
 			}
@@ -116,7 +117,8 @@
 				camera.target.position.y = camera.position.y;
 
 				scene = new THREE.Scene();
-
+				scene.fog = new THREE.Fog( 0xffffff, 0.00025 );
+				
 				var debug_texture = false,
 					debug_numbers = false,
 					debug_corner_colors = false,

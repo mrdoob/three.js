@@ -37,13 +37,14 @@ THREE.WebGLRenderer = function ( scene ) {
 	// (not to blow over maxLights budget)
 
 	maxLightCount = allocateLights( scene, 4 );
-
+	fog = scene ? scene.fog : null,
+	
 	this.domElement = _canvas;
 	this.autoClear = true;
 
 	initGL();
 
-	_uberProgram = initUbershader( maxLightCount.directional, maxLightCount.point );
+	_uberProgram = initUbershader( maxLightCount.directional, maxLightCount.point, fog );
 	_oldProgram = _uberProgram;
 
 	//alert( dumpObject( getGLParams() ) );
@@ -367,7 +368,7 @@ THREE.WebGLRenderer = function ( scene ) {
 		
 	};
 	
-	this.renderBuffer = function ( camera, lights, material, geometryChunk ) {
+	this.renderBuffer = function ( camera, lights, fog, material, geometryChunk ) {
 
 		var mColor, mOpacity, mReflectivity,
 			mWireframe, mLineWidth, mBlending,
@@ -396,7 +397,7 @@ THREE.WebGLRenderer = function ( scene ) {
 					
 				}					
 				
-				material.program = buildProgram( material.fragment_shader, material.vertex_shader );
+				material.program = buildProgram( material.fragment_shader, material.vertex_shader, null );
 
 				identifiers = [ 'viewMatrix', 'modelViewMatrix', 'projectionMatrix', 'normalMatrix', 'objectMatrix', 'cameraPosition' ];
 				for( u in material.uniforms ) {
@@ -475,6 +476,13 @@ THREE.WebGLRenderer = function ( scene ) {
 
 			_gl.uniform1i( program.uniforms.useRefract, useRefract );
 			_gl.uniform1f( program.uniforms.mRefractionRatio, mRefractionRatio );
+			
+			if ( fog ) {
+				
+				_gl.uniform1f( program.uniforms.fogDensity, fog.density );
+				_gl.uniform3f( program.uniforms.fogColor, fog.color.r, fog.color.g, fog.color.b );
+				
+			}
 
 		}
 
@@ -525,7 +533,7 @@ THREE.WebGLRenderer = function ( scene ) {
 			_gl.uniform1i( program.uniforms.enableCubeMap, 0 );
 
 		}
-
+		
 		attributes = program.attributes;
 
 		// vertices
@@ -592,7 +600,7 @@ THREE.WebGLRenderer = function ( scene ) {
 
 	};
 
-	this.renderPass = function ( camera, lights, object, geometryChunk, blending, transparent ) {
+	this.renderPass = function ( camera, lights, fog, object, geometryChunk, blending, transparent ) {
 
 		var i, l, m, ml, material, meshMaterial;
 
@@ -608,7 +616,7 @@ THREE.WebGLRenderer = function ( scene ) {
 					if ( material && material.blending == blending && ( material.opacity < 1.0 == transparent ) ) {
 
 						this.setBlending( material.blending );
-						this.renderBuffer( camera, lights, material, geometryChunk );
+						this.renderBuffer( camera, lights, fog, material, geometryChunk );
 
 					}
 
@@ -620,7 +628,7 @@ THREE.WebGLRenderer = function ( scene ) {
 				if ( material && material.blending == blending && ( material.opacity < 1.0 == transparent ) ) {
 
 					this.setBlending( material.blending );
-					this.renderBuffer( camera, lights, material, geometryChunk );
+					this.renderBuffer( camera, lights, fog, material, geometryChunk );
 
 				}
 
@@ -633,7 +641,8 @@ THREE.WebGLRenderer = function ( scene ) {
 	this.render = function( scene, camera ) {
 
 		var o, ol, webGLObject, object, buffer,
-			lights = scene.lights;
+			lights = scene.lights,
+			fog = scene.fog;
 
 		this.initWebGLObjects( scene );
 
@@ -660,7 +669,7 @@ THREE.WebGLRenderer = function ( scene ) {
 			if ( object.visible ) {
 
 				this.setupMatrices( object, camera );
-				this.renderPass( camera, lights, object, buffer, THREE.NormalBlending, false );
+				this.renderPass( camera, lights, fog, object, buffer, THREE.NormalBlending, false );
 
 			}
 
@@ -681,17 +690,17 @@ THREE.WebGLRenderer = function ( scene ) {
 
 				// opaque blended materials
 
-				this.renderPass( camera, lights, object, buffer, THREE.AdditiveBlending, false );
-				this.renderPass( camera, lights, object, buffer, THREE.SubtractiveBlending, false );
+				this.renderPass( camera, lights, fog, object, buffer, THREE.AdditiveBlending, false );
+				this.renderPass( camera, lights, fog, object, buffer, THREE.SubtractiveBlending, false );
 
 				// transparent blended materials
 
-				this.renderPass( camera, lights, object, buffer, THREE.AdditiveBlending, true );
-				this.renderPass( camera, lights, object, buffer, THREE.SubtractiveBlending, true );
+				this.renderPass( camera, lights, fog, object, buffer, THREE.AdditiveBlending, true );
+				this.renderPass( camera, lights, fog, object, buffer, THREE.SubtractiveBlending, true );
 
 				// transparent normal materials
 
-				this.renderPass( camera, lights, object, buffer, THREE.NormalBlending, true );
+				this.renderPass( camera, lights, fog, object, buffer, THREE.NormalBlending, true );
 
 			}
 
@@ -943,6 +952,11 @@ THREE.WebGLRenderer = function ( scene ) {
 			"uniform vec4 mSpecular;",
 			"uniform float mShininess;",
 
+			"#ifdef USE_FOG",
+				"uniform vec3 fogColor;",
+				"uniform float fogDensity;",
+			"#endif",
+			
 			"uniform int pointLightNumber;",
 			"uniform int directionalLightNumber;",
 
@@ -1096,7 +1110,18 @@ THREE.WebGLRenderer = function ( scene ) {
 					"}",
 
 				"}",
-
+				
+				"#ifdef USE_FOG",
+		
+					"const float LOG2 = 1.442695;",
+					"float z = gl_FragCoord.z / gl_FragCoord.w;",
+					"float fogFactor = exp2( - fogDensity * fogDensity * z * z * LOG2 );",
+					"fogFactor = clamp( fogFactor, 0.0, 1.0 );",
+					//"gl_FragColor = mix( vec4( fogColor, 1.0 ), gl_FragColor, fogFactor );",
+					"gl_FragColor = mix( vec4( 1.0, 1.0, 1.0, 1.0 ), gl_FragColor, fogFactor );",
+			
+				"#endif",
+				
 			"}" ];
 
 		return chunks.join("\n");
@@ -1200,7 +1225,7 @@ THREE.WebGLRenderer = function ( scene ) {
 
 	};
 
-	function buildProgram( fragment_shader, vertex_shader ) {
+	function buildProgram( fragment_shader, vertex_shader, fog ) {
 
 		var program = _gl.createProgram(),
 
@@ -1208,11 +1233,14 @@ THREE.WebGLRenderer = function ( scene ) {
 			"#ifdef GL_ES",
 			"precision highp float;",
 			"#endif",
+
+			fog ? "#define USE_FOG" : "",
+		
 			"uniform mat4 viewMatrix;",
 			"uniform vec3 cameraPosition;",
 			""
 		].join("\n"),
-
+		
 		prefix_vertex = [
 			maxVertexTextures() > 0 ? "#define VERTEX_TEXTURES" : "",
 
@@ -1227,7 +1255,7 @@ THREE.WebGLRenderer = function ( scene ) {
 			"attribute vec2 uv;",
 			""
 		].join("\n");
-
+		
 		_gl.attachShader( program, getShader( "fragment", prefix_fragment + fragment_shader ) );
 		_gl.attachShader( program, getShader( "vertex", prefix_vertex + vertex_shader ) );
 
@@ -1384,7 +1412,7 @@ THREE.WebGLRenderer = function ( scene ) {
 
 	};
 
-	function initUbershader( maxDirLights, maxPointLights ) {
+	function initUbershader( maxDirLights, maxPointLights, fog ) {
 
 		var vertex_shader = generateVertexShader( maxDirLights, maxPointLights ),
 			fragment_shader = generateFragmentShader( maxDirLights, maxPointLights ),
@@ -1393,7 +1421,7 @@ THREE.WebGLRenderer = function ( scene ) {
 		//log ( vertex_shader );
 		//log ( fragment_shader );
 
-		program = buildProgram( fragment_shader, vertex_shader );
+		program = buildProgram( fragment_shader, vertex_shader, fog );
 
 		_gl.useProgram( program );
 
@@ -1409,6 +1437,11 @@ THREE.WebGLRenderer = function ( scene ) {
 										   'mRefractionRatio', 'useRefract'
 		] );
 
+		if ( fog ) {
+			
+			cacheUniformLocations( program, [ 'fogColor', 'fogDensity' ] );
+			
+		}
 
 		if ( maxDirLights ) {
 

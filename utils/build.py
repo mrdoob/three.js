@@ -56,6 +56,7 @@ COMMON_FILES = [
 'materials/mappings/SphericalRefractionMapping.js',
 'materials/mappings/UVMapping.js',
 'scenes/Scene.js',
+'scenes/Fog.js',
 'renderers/Projector.js',
 'renderers/DOMRenderer.js',
 'renderers/CanvasRenderer.js',
@@ -241,6 +242,7 @@ WEBGL_FILES = [
 'materials/mappings/SphericalRefractionMapping.js',
 'materials/mappings/UVMapping.js',
 'scenes/Scene.js',
+'scenes/Fog.js',
 'renderers/WebGLRenderer.js',
 ]
 
