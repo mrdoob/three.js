@@ -1117,8 +1117,7 @@ THREE.WebGLRenderer = function ( scene ) {
 					"float z = gl_FragCoord.z / gl_FragCoord.w;",
 					"float fogFactor = exp2( - fogDensity * fogDensity * z * z * LOG2 );",
 					"fogFactor = clamp( fogFactor, 0.0, 1.0 );",
-					//"gl_FragColor = mix( vec4( fogColor, 1.0 ), gl_FragColor, fogFactor );",
-					"gl_FragColor = mix( vec4( 1.0, 1.0, 1.0, 1.0 ), gl_FragColor, fogFactor );",
+					"gl_FragColor = mix( vec4( fogColor, 1.0 ), gl_FragColor, fogFactor );",
 			
 				"#endif",
 				
