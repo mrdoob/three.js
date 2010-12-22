@@ -87,6 +87,7 @@ THREE.WebGLRenderer2 = function () {
 		}
 		*/
 
+		_currentProgram = null;
 		_renderList = _projector.projectObjects( scene, camera, this.sortObjects );
 
 		for ( o = 0, ol = _renderList.length; o < ol; o++ ) {
@@ -111,7 +112,6 @@ THREE.WebGLRenderer2 = function () {
 
 			_normalMatrix = THREE.Matrix4.makeInvert3x3( _modelViewMatrix ).transpose();
 			_normalMatrixArray.set( _normalMatrix.m );
-
 
 			if ( object instanceof THREE.Mesh ) {
 

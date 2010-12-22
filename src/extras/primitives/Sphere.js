@@ -103,12 +103,12 @@ var Sphere = function ( radius, segments_width, segments_height ) {
 		}
 	}
 
-	this.boundingSphere = { radius: radius };
-
 	this.computeCentroids();
 	this.computeFaceNormals();
 	this.computeVertexNormals();
 	this.sortFacesByMaterial();
+
+	this.boundingSphere = { radius: radius };
 
 }
 
