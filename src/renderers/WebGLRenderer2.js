@@ -468,99 +468,98 @@ THREE.WebGLRenderer2 = function ( antialias ) {
 
 		function createProgram( material ) {
 
-			var pvs = '', vs = '', pfs = '', fs = '',
-			identifiers = [ 'viewMatrix', 'modelViewMatrix', 'projectionMatrix', 'normalMatrix', 'objectMatrix', 'cameraPosition' ];
+			var vs, fs, identifiers = [ 'viewMatrix', 'modelViewMatrix', 'projectionMatrix', 'normalMatrix', 'objectMatrix', 'cameraPosition' ];
 
 			if ( material instanceof THREE.MeshBasicMaterial ||
 			material instanceof THREE.MeshLambertMaterial ||
 			material instanceof THREE.MeshPhongMaterial ) {
 
-				vs += 'void main() {\n';
-				fs += 'void main() {\n';
+				vs = [
+					material.map ? 'varying vec2 vUv;' : null,
 
-				vs += 'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n';
+					'void main() {',
+						material.map ? 'vUv = uv;' : null,
+						'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+					'}'
+				].filter( removeNull ).join( '\n' );
 
-				pfs += 'uniform vec3 mColor;\n';
-				pfs += 'uniform float mOpacity;\n';
+				fs = [
+					'uniform vec3 mColor;',
+					'uniform float mOpacity;',
 
-				fs += 'gl_FragColor = vec4( mColor.xyz, mOpacity );\n';
+					material.map ? 'uniform sampler2D tMap;' : null,
+					material.map ? 'varying vec2 vUv;' : null,
+
+					material.fog ? 'uniform float fog;' : null,
+					material.fog ? 'uniform vec3 fogColor;' : null,
+					material.fog ? 'uniform float fogDensity;' : null,
+
+					'void main() {',
+						'gl_FragColor = vec4( mColor.xyz, mOpacity );',
+
+						/* Premultiply alpha
+						material.map ? 'vec4 mapColor = texture2D( tMap, vUv );' : null,
+						material.map ? 'mapColor.xyz *= mapColor.w;' : null,
+						*/
+
+						material.map ? 'gl_FragColor *= texture2D( tMap, vUv );' : null,
+
+						material.fog ? 'const float LOG2 = 1.442695;' : null,
+						material.fog ? 'float z = fog * ( gl_FragCoord.z / gl_FragCoord.w );' : null,
+						material.fog ? 'float fogFactor = exp2( - fogDensity * fogDensity * z * z * LOG2 );' : null,
+						material.fog ? 'gl_FragColor = mix( gl_FragColor, vec4( fogColor, 1.0 ), 1.0 - clamp( fogFactor, 0.0, 1.0 ) );' : null,
+					'}'
+				].filter( removeNull ).join( '\n' );
 
 				identifiers.push( 'mColor', 'mOpacity' );
-
-				// uvmap
-
-				if ( material.map ) {
-
-					pvs += 'varying vec2 vUv;\n',
-					vs += 'vUv = uv;\n',
-
-					pfs += 'uniform sampler2D tMap;\n';
-					pfs += 'varying vec2 vUv;\n';
-
-					/* Premultiply alpha
-					fs += 'vec4 mapColor = texture2D( tMap, vUv );\n';
-					fs += 'mapColor.xyz *= mapColor.w;\n';
-					*/
-
-					fs += 'gl_FragColor *= texture2D( tMap, vUv );\n';
-
-					identifiers.push( 'tMap' );
-
-				}
-
-				// fog
-
-				pfs += 'uniform float fog;\n';
-				pfs += 'uniform vec3 fogColor;\n';
-				pfs += 'uniform float fogDensity;\n';
-
-				fs += 'const float LOG2 = 1.442695;\n';
-				fs += 'float z = fog * ( gl_FragCoord.z / gl_FragCoord.w );\n';
-				fs += 'float fogFactor = exp2( - fogDensity * fogDensity * z * z * LOG2 );\n';
-				fs += 'gl_FragColor = mix( gl_FragColor, vec4( fogColor, 1.0 ), 1.0 - clamp( fogFactor, 0.0, 1.0 ) );\n',
-
-				identifiers.push( 'fog', 'fogColor', 'fogDensity' );
-
-				vs += '}';
-				fs += '}';
+				material.map ? identifiers.push( 'tMap' ) : null;
+				material.fog ? identifiers.push( 'fog', 'fogColor', 'fogDensity' ) : null;
 
 
 			} else if ( material instanceof THREE.MeshNormalMaterial ) {
 
-				vs += 'void main() {\n';
-				fs += 'void main() {\n';
+				vs = [
+					'varying vec3 vNormal;',
 
-				pvs += 'varying vec3 vNormal;\n';
-				vs += 'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n';
-				vs += 'vNormal = normalize( normalMatrix * normal );\n';
+					'void main() {',
+						'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+						'vNormal = normalize( normalMatrix * normal );',
+					'}'
+				].join( '\n' );
 
-				pfs += 'uniform float mOpacity;\n';
-				pfs += 'varying vec3 vNormal;\n';
-				fs += 'gl_FragColor = vec4( ( normalize( vNormal ) + 1.0 ) * 0.5, mOpacity );\n';
+				fs = [
+					'uniform float mOpacity;',
+					'varying vec3 vNormal;',
+
+					'void main() {',
+						'gl_FragColor = vec4( ( normalize( vNormal ) + 1.0 ) * 0.5, mOpacity );',
+					'}'
+				].join( '\n' );
 
 				identifiers.push( 'mOpacity' );
 
-				vs += '}';
-				fs += '}';
-
 			} else if ( material instanceof THREE.MeshDepthMaterial ) {
 
-				vs += 'void main() {\n';
-				fs += 'void main() {\n';
+				vs = [
+					'void main() {',
+						'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+					'}'
 
-				vs += 'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n';
+				].join( '\n' );
 
-				pfs += 'uniform float mOpacity;\n';
-				pfs += 'uniform float m2Near;\n';
-				pfs += 'uniform float mFarPlusNear;\n';
-				pfs += 'uniform float mFarMinusNear;\n';
-				fs += 'float w = 1.0 - ( m2Near / ( mFarPlusNear - gl_FragCoord.z * mFarMinusNear ) );\n';
-				fs += 'gl_FragColor = vec4( w, w, w, mOpacity );\n';
+				fs = [
+					'uniform float m2Near;',
+					'uniform float mFarPlusNear;',
+					'uniform float mFarMinusNear;',
+					'uniform float mOpacity;',
+
+					'void main() {',
+						'float w = 1.0 - ( m2Near / ( mFarPlusNear - gl_FragCoord.z * mFarMinusNear ) );',
+						'gl_FragColor = vec4( w, w, w, mOpacity );',
+					'}'
+				].join( '\n' );
 
 				identifiers.push( 'm2Near', 'mFarPlusNear', 'mFarMinusNear', 'mOpacity' );
-
-				vs += '}';
-				fs += '}';
 
 			} else if ( material instanceof THREE.MeshShaderMaterial ) {
 
@@ -579,7 +578,7 @@ THREE.WebGLRenderer2 = function ( antialias ) {
 
 			}
 
-			material.__webglProgram = compileProgram( pvs + vs, pfs + fs );
+			material.__webglProgram = compileProgram( vs, fs );
 
 			cacheUniformLocations( material.__webglProgram, identifiers );
 			cacheAttributeLocations( material.__webglProgram, [ "position", "normal", "uv"/*, "tangent"*/ ] );
@@ -650,8 +649,8 @@ THREE.WebGLRenderer2 = function ( antialias ) {
 				alert( "Could not initialise shaders.\n" +
 				"VALIDATE_STATUS: " + _gl.getProgramParameter( program, _gl.VALIDATE_STATUS ) + "\n" +
 				"ERROR: " + _gl.getError() + "\n\n" +
-				"Vertex Shader: \n" + prefix_vertex + vertex_shader + "\n\n" +
-				"Fragment Shader: \n" + prefix_fragment + fragment_shader );
+				"- Vertex Shader -\n" + prefix_vertex + vertex_shader + "\n\n" +
+				"- Fragment Shader -\n" + prefix_fragment + fragment_shader );
 
 			}
 
@@ -744,6 +743,12 @@ THREE.WebGLRenderer2 = function ( antialias ) {
 			}
 
 			return 0;
+
+		}
+
+		function removeNull( element ) {
+
+			return element !== null;
 
 		}
 

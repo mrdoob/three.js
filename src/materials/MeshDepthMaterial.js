@@ -13,7 +13,7 @@ THREE.MeshDepthMaterial = function ( parameters ) {
 
 	this.near = 1;
 	this.far = 1000;
-	
+
 	this.opacity = 1;
 	this.shading = THREE.SmoothShading;
 	this.blending = THREE.NormalBlending;

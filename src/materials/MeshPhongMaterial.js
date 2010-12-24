@@ -41,6 +41,8 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 	this.reflectivity = 1;
 	this.refraction_ratio = 0.98;
 
+	this.fog = true;
+
 	this.opacity = 1;
 	this.shading = THREE.SmoothShading;
 	this.blending = THREE.NormalBlending;
@@ -64,6 +66,8 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 		if ( parameters.combine !== undefined ) this.combine = parameters.combine;
 		if ( parameters.reflectivity !== undefined ) this.reflectivity  = parameters.reflectivity;
 		if ( parameters.refraction_ratio !== undefined ) this.refraction_ratio  = parameters.refraction_ratio;
+
+		if ( parameters.fog !== undefined ) this.fog  = parameters.fog;
 
 		if ( parameters.opacity !== undefined ) this.opacity = parameters.opacity;
 		if ( parameters.shading !== undefined ) this.shading = parameters.shading;
