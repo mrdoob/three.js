@@ -4,7 +4,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.WebGLRenderer = function ( scene ) {
+THREE.WebGLRenderer = function ( scene, antialias ) {
 
 	// Currently you can use just up to 4 directional / point lights total.
 	// Chrome barfs on shader linking when there are more than 4 lights :(
@@ -39,10 +39,12 @@ THREE.WebGLRenderer = function ( scene ) {
 	maxLightCount = allocateLights( scene, 4 );
 	fog = scene ? scene.fog : null,
 	
+	aa = antialias != undefined ? antialias : true;
+	
 	this.domElement = _canvas;
 	this.autoClear = true;
 
-	initGL();
+	initGL( aa );
 
 	_uberProgram = initUbershader( maxLightCount.directional, maxLightCount.point, fog );
 	_oldProgram = _uberProgram;
@@ -897,11 +899,11 @@ THREE.WebGLRenderer = function ( scene ) {
 	};
 
 
-	function initGL() {
+	function initGL( antialias ) {
 
 		try {
 
-			_gl = _canvas.getContext( 'experimental-webgl', { antialias: true} );
+			_gl = _canvas.getContext( 'experimental-webgl', { antialias: antialias } );
 
 		} catch(e) { }
 
