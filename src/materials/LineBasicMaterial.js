@@ -28,7 +28,11 @@ THREE.LineBasicMaterial = function ( parameters ) {
 		if ( parameters.linejoin !== undefined ) this.linejoin = parameters.linejoin;
 	}
 
-	this.toString = function () {
+};
+
+THREE.LineBasicMaterial.prototype = {
+
+	toString: function () {
 
 		return 'THREE.LineBasicMaterial (<br/>' +
 			'color: ' + this.color + '<br/>' +
@@ -39,6 +43,6 @@ THREE.LineBasicMaterial = function ( parameters ) {
 			'linejoin: ' + this.linejoin +'<br/>' +
 			')';
 
-	};
+	}
 
-};
+}

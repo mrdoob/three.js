@@ -36,10 +36,14 @@ THREE.MeshDepthMaterial = function ( parameters ) {
 	this.__farPlusNear = this.far + this.near;
 	this.__farMinusNear = this.far - this.near;
 
-	this.toString = function () {
+};
+
+THREE.MeshDepthMaterial.prototype = {
+
+	toString: function () {
 
 		return 'THREE.MeshDepthMaterial';
 
-	};
+	}
 
-}
+};

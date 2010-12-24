@@ -65,7 +65,11 @@ THREE.MeshBasicMaterial = function ( parameters ) {
 
 	}
 
-	this.toString = function () {
+};
+
+THREE.MeshBasicMaterial.prototype = {
+
+	toString: function () {
 
 		return 'THREE.MeshBasicMaterial (<br/>' +
 			'id: ' + this.id + '<br/>' +
@@ -86,8 +90,8 @@ THREE.MeshBasicMaterial = function ( parameters ) {
 			'wireframe_linejoin: ' + this.wireframe_linejoin +'<br/>' +
 			')';
 
-	};
+	}
 
-}
+};
 
 THREE.MeshBasicMaterialCounter = { value: 0 };

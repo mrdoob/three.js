@@ -158,6 +158,16 @@
 
 				];
 
+				for ( var i = 0, l = geometry.faces.length; i < l; i ++ ) {
+
+					var face = geometry.faces[ i ];
+					if ( Math.random() > 0.5 ) face.material = [ materials[ Math.floor( Math.random() * materials.length ) ] ];
+
+				}
+
+				materials.push( new THREE.MeshFaceMaterial() );
+
+
 				for ( var i = 0; i < 5000; i ++ ) {
 
 					var mesh = new THREE.Mesh( geometry, materials[ Math.floor( Math.random() * materials.length ) ] );

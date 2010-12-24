@@ -407,7 +407,7 @@
 
 					bird = birds[ i ];
 
-					color = bird.material[0].color;
+					color = bird.materials[ 0 ].color;
 					color.r = color.g = color.b = ( 500 - bird.position.z ) / 1000;
 					color.updateStyleString();
 

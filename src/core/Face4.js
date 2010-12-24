@@ -2,7 +2,7 @@
  * @author mr.doob / http://mrdoob.com/
  */
 
-THREE.Face4 = function ( a, b, c, d, normal, material ) {
+THREE.Face4 = function ( a, b, c, d, normal, materials ) {
 
 	this.a = a;
 	this.b = b;
@@ -13,7 +13,7 @@ THREE.Face4 = function ( a, b, c, d, normal, material ) {
 	this.normal = normal instanceof THREE.Vector3 ? normal : new THREE.Vector3();
 	this.vertexNormals = normal instanceof Array ? normal : [];
 
-	this.material = material instanceof Array ? material : [ material ];
+	this.materials = materials instanceof Array ? materials : [ materials ];
 
 };
 
@@ -26,4 +26,4 @@ THREE.Face4.prototype = {
 
 	}
 
-}
+};

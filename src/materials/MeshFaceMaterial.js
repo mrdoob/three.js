@@ -4,10 +4,14 @@
 
 THREE.MeshFaceMaterial = function () {
 
-	this.toString = function () {
+};
+
+THREE.MeshFaceMaterial.prototype = {
+
+	toString: function () {
 
 		return 'THREE.MeshFaceMaterial';
 
-	};
+	}
 
 };

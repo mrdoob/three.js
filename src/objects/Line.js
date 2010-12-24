@@ -2,12 +2,12 @@
  * @author mr.doob / http://mrdoob.com/
  */
 
-THREE.Line = function ( geometry, material ) {
+THREE.Line = function ( geometry, materials ) {
 
 	THREE.Object3D.call( this );
 
 	this.geometry = geometry;
-	this.material = material instanceof Array ? material : [ material ];
+	this.materials = materials instanceof Array ? materials : [ materials ];
 
 };
 

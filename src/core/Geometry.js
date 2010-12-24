@@ -293,7 +293,7 @@ THREE.Geometry.prototype = {
 
 		if ( this.vertices.length > 0 ) {
 
-			this.bbox = { 'x': [ this.vertices[ 0 ].position.x, this.vertices[ 0 ].position.x ],
+			this.boundingBox = { 'x': [ this.vertices[ 0 ].position.x, this.vertices[ 0 ].position.x ],
 			'y': [ this.vertices[ 0 ].position.y, this.vertices[ 0 ].position.y ],
 			'z': [ this.vertices[ 0 ].position.z, this.vertices[ 0 ].position.z ] };
 
@@ -301,33 +301,33 @@ THREE.Geometry.prototype = {
 
 				vertex = this.vertices[ v ];
 
-				if ( vertex.position.x < this.bbox.x[ 0 ] ) {
+				if ( vertex.position.x < this.boundingBox.x[ 0 ] ) {
 
-					this.bbox.x[ 0 ] = vertex.position.x;
+					this.boundingBox.x[ 0 ] = vertex.position.x;
 
-				} else if ( vertex.position.x > this.bbox.x[ 1 ] ) {
+				} else if ( vertex.position.x > this.boundingBox.x[ 1 ] ) {
 
-					this.bbox.x[ 1 ] = vertex.position.x;
-
-				}
-
-				if ( vertex.position.y < this.bbox.y[ 0 ] ) {
-
-					this.bbox.y[ 0 ] = vertex.position.y;
-
-				} else if ( vertex.position.y > this.bbox.y[ 1 ] ) {
-
-					this.bbox.y[ 1 ] = vertex.position.y;
+					this.boundingBox.x[ 1 ] = vertex.position.x;
 
 				}
 
-				if ( vertex.position.z < this.bbox.z[ 0 ] ) {
+				if ( vertex.position.y < this.boundingBox.y[ 0 ] ) {
 
-					this.bbox.z[ 0 ] = vertex.position.z;
+					this.boundingBox.y[ 0 ] = vertex.position.y;
 
-				} else if ( vertex.position.z > this.bbox.z[ 1 ] ) {
+				} else if ( vertex.position.y > this.boundingBox.y[ 1 ] ) {
 
-					this.bbox.z[ 1 ] = vertex.position.z;
+					this.boundingBox.y[ 1 ] = vertex.position.y;
+
+				}
+
+				if ( vertex.position.z < this.boundingBox.z[ 0 ] ) {
+
+					this.boundingBox.z[ 0 ] = vertex.position.z;
+
+				} else if ( vertex.position.z > this.boundingBox.z[ 1 ] ) {
+
+					this.boundingBox.z[ 1 ] = vertex.position.z;
 
 				}
 
@@ -385,9 +385,9 @@ THREE.Geometry.prototype = {
 		for ( f = 0, fl = this.faces.length; f < fl; f++ ) {
 
 			face = this.faces[ f ];
-			material = face.material;
+			materials = face.materials;
 
-			mhash = materialHash( material );
+			mhash = materialHash( materials );
 
 			if ( hash_map[ mhash ] == undefined ) {
 
@@ -399,7 +399,7 @@ THREE.Geometry.prototype = {
 
 			if ( this.geometryChunks[ ghash ] == undefined ) {
 
-				this.geometryChunks[ ghash ] = { 'faces': [], 'material': material, 'vertices': 0 };
+				this.geometryChunks[ ghash ] = { 'faces': [], 'materials': materials, 'vertices': 0 };
 
 			}
 
@@ -412,7 +412,7 @@ THREE.Geometry.prototype = {
 
 				if ( this.geometryChunks[ ghash ] == undefined ) {
 
-					this.geometryChunks[ ghash ] = { 'faces': [], 'material': material, 'vertices': 0 };
+					this.geometryChunks[ ghash ] = { 'faces': [], 'materials': materials, 'vertices': 0 };
 
 				}
 

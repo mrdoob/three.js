@@ -27,7 +27,11 @@ THREE.ParticleBasicMaterial = function ( parameters ) {
 
 	}
 
-	this.toString = function () {
+};
+
+THREE.ParticleBasicMaterial.prototype = {
+
+	toString: function () {
 
 		return 'THREE.ParticleBasicMaterial (<br/>' +
 			'color: ' + this.color + '<br/>' +
@@ -36,6 +40,6 @@ THREE.ParticleBasicMaterial = function ( parameters ) {
 			'blending: ' + this.blending + '<br/>' +
 			')';
 
-	};
+	}
 
 };

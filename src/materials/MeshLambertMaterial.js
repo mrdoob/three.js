@@ -65,7 +65,11 @@ THREE.MeshLambertMaterial = function ( parameters ) {
 
 	}
 
-	this.toString = function () {
+};
+
+THREE.MeshLambertMaterial.prototype = {
+
+	toString: function () {
 
 		return 'THREE.MeshLambertMaterial (<br/>' +
 			'id: ' + this.id + '<br/>' +
@@ -87,7 +91,7 @@ THREE.MeshLambertMaterial = function ( parameters ) {
 			'wireframe_linejoin: ' + this.wireframe_linejoin +'<br/>' +
 			' )';
 
-	};
+	}
 
 };
 

@@ -101,7 +101,7 @@ THREE.WebGLRenderer2 = function ( antialias ) {
 		function renderObject( object ) {
 
 			var geometry, material, m, nl,
-			program, attributes;
+			program, uniforms, attributes;
 
 			object.autoUpdateMatrix && object.updateMatrix();
 
@@ -125,9 +125,9 @@ THREE.WebGLRenderer2 = function ( antialias ) {
 
 				}
 
-				for ( m = 0, ml = object.material.length; m < ml; m ++ ) {
+				for ( m = 0, ml = object.materials.length; m < ml; m ++ ) {
 
-					material = object.material[ m ];
+					material = object.materials[ m ];
 
 					if ( material.__webglProgram == undefined ) {
 
@@ -136,6 +136,7 @@ THREE.WebGLRenderer2 = function ( antialias ) {
 					}
 
 					program = material.__webglProgram;
+					uniforms = program.uniforms;
 					attributes = program.attributes;
 
 					if( program != _currentProgram ) {
@@ -148,54 +149,54 @@ THREE.WebGLRenderer2 = function ( antialias ) {
 
 						if ( scene.fog ) {
 
-							_gl.uniform1f( program.uniforms.fog, 1 );
-							_gl.uniform1f( program.uniforms.fogDensity, scene.fog.density );
-							_gl.uniform3f( program.uniforms.fogColor, scene.fog.color.r, scene.fog.color.g, scene.fog.color.b );
+							_gl.uniform1f( uniforms.fog, 1 );
+							_gl.uniform1f( uniforms.fogDensity, scene.fog.density );
+							_gl.uniform3f( uniforms.fogColor, scene.fog.color.r, scene.fog.color.g, scene.fog.color.b );
 
 						} else {
 
-							_gl.uniform1f( program.uniforms.fog, 0 );
+							_gl.uniform1f( uniforms.fog, 0 );
 
 						}
 
-					}
+						// material
 
-					// materials
+						if ( material instanceof THREE.MeshBasicMaterial ||
+						material instanceof THREE.MeshLambertMaterial ||
+						material instanceof THREE.MeshPhongMaterial ) {
 
-					if ( material instanceof THREE.MeshBasicMaterial ||
-					material instanceof THREE.MeshLambertMaterial ||
-					material instanceof THREE.MeshPhongMaterial ) {
+							_gl.uniform3f( uniforms.mColor, material.color.r, material.color.g, material.color.b );
+							_gl.uniform1f( uniforms.mOpacity, material.opacity );
 
-						_gl.uniform3f( program.uniforms.mColor, material.color.r, material.color.g, material.color.b );
-						_gl.uniform1f( program.uniforms.mOpacity, material.opacity );
+							if ( material.map ) {
 
-						if ( material.map ) {
+								setTexture( material.map, 0 );
+								_gl.uniform1i( uniforms.tMap, 0 );
 
-							setTexture( material.map, 0 );
-							_gl.uniform1i( program.uniforms.tMap, 0 );
+							}
+
+						} else if ( material instanceof THREE.MeshNormalMaterial ) {
+
+							_gl.uniform1f( uniforms.mOpacity, material.opacity );
+
+						} else if ( material instanceof THREE.MeshDepthMaterial ) {
+
+							_gl.uniform1f( uniforms.m2Near, material.__2near );
+							_gl.uniform1f( uniforms.mFarPlusNear, material.__farPlusNear );
+							_gl.uniform1f( uniforms.mFarMinusNear, material.__farMinusNear );
+							_gl.uniform1f( uniforms.mOpacity, material.opacity );
 
 						}
 
-					} else if ( material instanceof THREE.MeshNormalMaterial ) {
-
-						_gl.uniform1f( program.uniforms.mOpacity, material.opacity );
-
-					} else if ( material instanceof THREE.MeshDepthMaterial ) {
-
-						_gl.uniform1f( program.uniforms.m2Near, material.__2near );
-						_gl.uniform1f( program.uniforms.mFarPlusNear, material.__farPlusNear );
-						_gl.uniform1f( program.uniforms.mFarMinusNear, material.__farMinusNear );
-						_gl.uniform1f( program.uniforms.mOpacity, material.opacity );
+						_gl.uniform3f( uniforms.cameraPosition, camera.position.x, camera.position.y, camera.position.z );
+						_gl.uniformMatrix4fv( uniforms.viewMatrix, false, _viewMatrixArray );
+						_gl.uniformMatrix4fv( uniforms.projectionMatrix, false, _projectionMatrixArray );
 
 					}
 
-					_gl.uniform3f( program.uniforms.cameraPosition, camera.position.x, camera.position.y, camera.position.z );
-
-					_gl.uniformMatrix4fv( program.uniforms.viewMatrix, false, _viewMatrixArray );
-					_gl.uniformMatrix4fv( program.uniforms.projectionMatrix, false, _projectionMatrixArray );
-					_gl.uniformMatrix4fv( program.uniforms.objectMatrix, false, _objectMatrixArray );
-					_gl.uniformMatrix4fv( program.uniforms.modelViewMatrix, false, _modelViewMatrixArray );
-					_gl.uniformMatrix3fv( program.uniforms.normalMatrix, false, _normalMatrixArray );
+					_gl.uniformMatrix4fv( uniforms.objectMatrix, false, _objectMatrixArray );
+					_gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, _modelViewMatrixArray );
+					_gl.uniformMatrix3fv( uniforms.normalMatrix, false, _normalMatrixArray );
 
 					var buffer, buffers = geometry.__webglBuffers;
 

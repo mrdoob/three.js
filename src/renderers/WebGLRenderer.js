@@ -606,15 +606,16 @@ THREE.WebGLRenderer = function ( scene, antialias ) {
 
 		var i, l, m, ml, material, meshMaterial;
 
-		for ( m = 0, ml = object.material.length; m < ml; m++ ) {
+		for ( m = 0, ml = object.materials.length; m < ml; m++ ) {
 
-			meshMaterial = object.material[ m ];
+			meshMaterial = object.materials[ m ];
 
 			if ( meshMaterial instanceof THREE.MeshFaceMaterial ) {
 
-				for ( i = 0, l = geometryChunk.material.length; i < l; i++ ) {
+				for ( i = 0, l = geometryChunk.materials.length; i < l; i++ ) {
 
-					material = geometryChunk.material[ i ];
+					material = geometryChunk.materials[ i ];
+
 					if ( material && material.blending == blending && ( material.opacity < 1.0 == transparent ) ) {
 
 						this.setBlending( material.blending );
@@ -655,7 +656,7 @@ THREE.WebGLRenderer = function ( scene, antialias ) {
 		}
 
 		camera.autoUpdateMatrix && camera.updateMatrix();
-		
+
 		_viewMatrixArray.set( camera.matrix.flatten() );
 		_projectionMatrixArray.set( camera.projectionMatrix.flatten() );
 
@@ -958,7 +959,7 @@ THREE.WebGLRenderer = function ( scene, antialias ) {
 				"uniform vec3 fogColor;",
 				"uniform float fogDensity;",
 			"#endif",
-			
+
 			"uniform int pointLightNumber;",
 			"uniform int directionalLightNumber;",
 
@@ -1539,15 +1540,15 @@ THREE.WebGLRenderer = function ( scene, antialias ) {
 
 		var m, ml, i, l, needsSmoothNormals = false;
 
-		for ( m = 0, ml = object.material.length; m < ml; m++ ) {
+		for ( m = 0, ml = object.materials.length; m < ml; m++ ) {
 
-			meshMaterial = object.material[ m ];
+			meshMaterial = object.materials[ m ];
 
 			if ( meshMaterial instanceof THREE.MeshFaceMaterial ) {
 
-				for ( i = 0, l = geometryChunk.material.length; i < l; i++ ) {
+				for ( i = 0, l = geometryChunk.materials.length; i < l; i++ ) {
 
-					if ( materialNeedsSmoothNormals( geometryChunk.material[ i ] ) ) {
+					if ( materialNeedsSmoothNormals( geometryChunk.materials[ i ] ) ) {
 
 						needsSmoothNormals = true;
 						break;

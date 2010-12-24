@@ -110,7 +110,7 @@ THREE.CanvasRenderer = function () {
 		_renderList = _projector.projectScene( scene, camera, this.sortElements );
 
 		/* DEBUG
-		_context.fillStyle = 'rgba(0, 255, 255, 0.5)';
+		_context.fillStyle = 'rgba( 0, 255, 255, 0.5 )';
 		_context.fillRect( _clipRect.getX(), _clipRect.getY(), _clipRect.getWidth(), _clipRect.getHeight() );
 		*/
 
@@ -133,9 +133,9 @@ THREE.CanvasRenderer = function () {
 				_v1 = element;
 				_v1.x *= _canvasWidthHalf; _v1.y *= _canvasHeightHalf;
 
-				for ( m = 0, ml = element.material.length; m < ml; m++ ) {
+				for ( m = 0, ml = element.materials.length; m < ml; m++ ) {
 
-					renderParticle( _v1, element, element.material[ m ], scene );
+					renderParticle( _v1, element, element.materials[ m ], scene );
 
 				}
 
@@ -151,11 +151,11 @@ THREE.CanvasRenderer = function () {
 
 				if ( _clipRect.instersects( _bboxRect ) ) {
 
-					m = 0; ml = element.material.length;
+					m = 0; ml = element.materials.length;
 
 					while ( m < ml ) {
 
-						renderLine( _v1, _v2, element, element.material[ m ++ ], scene );
+						renderLine( _v1, _v2, element, element.materials[ m ++ ], scene );
 
 					}
 
@@ -184,19 +184,19 @@ THREE.CanvasRenderer = function () {
 
 				if ( _clipRect.instersects( _bboxRect ) ) {
 
-					m = 0; ml = element.meshMaterial.length;
+					m = 0; ml = element.meshMaterials.length;
 
 					while ( m < ml ) {
 
-						material = element.meshMaterial[ m ++ ];
+						material = element.meshMaterials[ m ++ ];
 
 						if ( material instanceof THREE.MeshFaceMaterial ) {
 
-							fm = 0; fml = element.faceMaterial.length;
+							fm = 0; fml = element.faceMaterials.length;
 
 							while ( fm < fml ) {
 
-								material = element.faceMaterial[ fm ++ ];
+								material = element.faceMaterials[ fm ++ ];
 								material && renderFace3( _v1, _v2, _v3, element, material, scene );
 
 							}

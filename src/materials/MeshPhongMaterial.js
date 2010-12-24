@@ -80,7 +80,11 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 
 	}
 
-	this.toString = function () {
+};
+
+THREE.MeshPhongMaterial.prototype = {
+
+	toString: function () {
 
 		return 'THREE.MeshPhongMaterial (<br/>' +
 			'id: ' + this.id + '<br/>' +
@@ -104,9 +108,9 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 			'wireframe_linewidth: ' + this.wireframe_linewidth + '<br/>' +
 			'wireframe_linecap: ' + this.wireframe_linecap +'<br/>' +
 			'wireframe_linejoin: ' + this.wireframe_linejoin +'<br/>' +
-			+ ')';
+			')';
 
-	};
+	}
 
 };
 

@@ -205,14 +205,14 @@
 
 					if ( intersects[ 0 ].face != rollOveredFace ) {
 
-						if ( rollOveredFace ) rollOveredFace.material = [];
+						if ( rollOveredFace ) rollOveredFace.materials = [];
 						rollOveredFace = intersects[ 0 ].face;
-						rollOveredFace.material = [ new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5 } ) ];
+						rollOveredFace.materials = [ new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5 } ) ];
 					}
 
 				} else if ( rollOveredFace ) {
 
-					 rollOveredFace.material = [];
+					 rollOveredFace.materials = [];
 					 rollOveredFace = null;
 
 				}
