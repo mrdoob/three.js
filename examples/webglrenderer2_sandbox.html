@@ -133,13 +133,13 @@
 				scene = new THREE.Scene();
 				scene.fog = new THREE.Fog( 0xffffff, 0.00025 );
 
-				var geometry = new Sphere( 100, 32, 16 );
+				var geometry = new Sphere( 50, 32, 16 );
 
 				var uniforms = ShaderUtils.lib[ 'basic' ].uniforms;
 				var vertex_shader = ShaderUtils.lib[ 'basic' ].vertex_shader;
 				var fragment_shader = ShaderUtils.lib[ 'basic' ].fragment_shader;
 
-				var generatedTexture = new THREE.Texture( generateTexture() );
+				var generatedTexture = new THREE.Texture( generateTexture(), new THREE.UVMapping(), THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping );
 
 				var materials = [
 
@@ -158,18 +158,22 @@
 
 				];
 
-				for ( var i = 0; i < 1000; i ++ ) {
+				for ( var i = 0; i < 5000; i ++ ) {
 
 					var mesh = new THREE.Mesh( geometry, materials[ Math.floor( Math.random() * materials.length ) ] );
 					mesh.position.x = Math.random() * 10000 - 5000;
 					mesh.position.y = Math.random() * 10000 - 5000;
 					mesh.position.z = Math.random() * 10000 - 5000;
+					mesh.rotation.x = Math.random() * 360 * ( Math.PI / 180 );
+					mesh.rotation.y = Math.random() * 360 * ( Math.PI / 180 );
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 4 + 1;
+					mesh.updateMatrix();
+					mesh.autoUpdateMatrix = false;
 					scene.addObject( mesh );
 
 				}
 
-				renderer = new THREE.WebGLRenderer2();
+				renderer = new THREE.WebGLRenderer2( false );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				// renderer.sortObjects = false;
 				container.appendChild( renderer.domElement );

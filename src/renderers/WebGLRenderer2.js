@@ -6,7 +6,7 @@
  * @author supereggbert / http://www.paulbrunt.co.uk/
  */
 
-THREE.WebGLRenderer2 = function () {
+THREE.WebGLRenderer2 = function ( antialias ) {
 
 	var _renderList = null,
 	_projector = new THREE.Projector(),
@@ -22,7 +22,8 @@ THREE.WebGLRenderer2 = function () {
 
 	try {
 
-		_gl = _canvas.getContext( 'experimental-webgl', { antialias: true } );
+		antialias = antialias !== undefined ? antialias : true;
+		_gl = _canvas.getContext( 'experimental-webgl', { antialias: antialias } );
 
 	} catch(e) { }
 
@@ -79,6 +80,8 @@ THREE.WebGLRenderer2 = function () {
 		_viewMatrixArray.set( camera.matrix.flatten() );
 		_projectionMatrixArray.set( camera.projectionMatrix.flatten() );
 
+		_currentProgram = null;
+
 		/*
 		for ( o = 0, ol = scene.objects.length; o < ol; o++ ) {
 
@@ -87,7 +90,6 @@ THREE.WebGLRenderer2 = function () {
 		}
 		*/
 
-		_currentProgram = null;
 		_renderList = _projector.projectObjects( scene, camera, this.sortObjects );
 
 		for ( o = 0, ol = _renderList.length; o < ol; o++ ) {
@@ -146,13 +148,13 @@ THREE.WebGLRenderer2 = function () {
 
 						if ( scene.fog ) {
 
-							_gl.uniform1i( program.uniforms.fog, 1 );
+							_gl.uniform1f( program.uniforms.fog, 1 );
 							_gl.uniform1f( program.uniforms.fogDensity, scene.fog.density );
 							_gl.uniform3f( program.uniforms.fogColor, scene.fog.color.r, scene.fog.color.g, scene.fog.color.b );
 
 						} else {
 
-							_gl.uniform1i( program.uniforms.fog, 0 );
+							_gl.uniform1f( program.uniforms.fog, 0 );
 
 						}
 
@@ -508,17 +510,14 @@ THREE.WebGLRenderer2 = function () {
 
 				// fog
 
-				pfs += 'uniform bool fog;\n';
+				pfs += 'uniform float fog;\n';
 				pfs += 'uniform vec3 fogColor;\n';
 				pfs += 'uniform float fogDensity;\n';
 
-				fs += 'if ( fog ) {\n';
 				fs += 'const float LOG2 = 1.442695;\n';
-				fs += 'float z = gl_FragCoord.z / gl_FragCoord.w;\n';
+				fs += 'float z = fog * ( gl_FragCoord.z / gl_FragCoord.w );\n';
 				fs += 'float fogFactor = exp2( - fogDensity * fogDensity * z * z * LOG2 );\n';
-				fs += 'fogFactor = clamp( fogFactor, 0.0, 1.0 );\n';
-				fs += 'gl_FragColor = mix( vec4( fogColor, 1.0 ), gl_FragColor, fogFactor );\n',
-				fs += '}\n';
+				fs += 'gl_FragColor = mix( gl_FragColor, vec4( fogColor, 1.0 ), 1.0 - clamp( fogFactor, 0.0, 1.0 ) );\n',
 
 				identifiers.push( 'fog', 'fogColor', 'fogDensity' );
 
