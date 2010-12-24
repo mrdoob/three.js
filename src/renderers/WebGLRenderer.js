@@ -38,9 +38,9 @@ THREE.WebGLRenderer = function ( scene, antialias ) {
 
 	maxLightCount = allocateLights( scene, 4 );
 	fog = scene ? scene.fog : null,
-	
+
 	aa = antialias != undefined ? antialias : true;
-	
+
 	this.domElement = _canvas;
 	this.autoClear = true;
 
@@ -363,13 +363,13 @@ THREE.WebGLRenderer = function ( scene, antialias ) {
 	};
 
 	function setMaterialShaders( material, shaders ) {
-		
+
 		material.fragment_shader = shaders.fragment_shader;
 		material.vertex_shader = shaders.vertex_shader;
 		material.uniforms = shaders.uniforms;
-		
+
 	};
-	
+
 	this.renderBuffer = function ( camera, lights, fog, material, geometryChunk ) {
 
 		var mColor, mOpacity, mReflectivity,
@@ -387,18 +387,18 @@ THREE.WebGLRenderer = function ( scene, antialias ) {
 			if ( !material.program ) {
 
 				if ( material instanceof THREE.MeshDepthMaterial ) {
-					
+
 					setMaterialShaders( material, ShaderLib[ 'depth' ] );
-					
+
 					material.uniforms.mNear.value = material.near;
 					material.uniforms.mFar.value = material.far;
-					
+
 				} else if ( material instanceof THREE.MeshNormalMaterial ) {
-					
+
 					setMaterialShaders( material, ShaderLib[ 'normal' ] );
-					
-				}					
-				
+
+				}
+
 				material.program = buildProgram( material.fragment_shader, material.vertex_shader, null );
 
 				identifiers = [ 'viewMatrix', 'modelViewMatrix', 'projectionMatrix', 'normalMatrix', 'objectMatrix', 'cameraPosition' ];
@@ -407,7 +407,7 @@ THREE.WebGLRenderer = function ( scene, antialias ) {
 					identifiers.push(u);
 
 				}
-				
+
 				cacheUniformLocations( material.program, identifiers );
 				cacheAttributeLocations( material.program, [ "position", "normal", "uv", "tangent" ] );
 
@@ -437,7 +437,7 @@ THREE.WebGLRenderer = function ( scene, antialias ) {
 		this.loadCamera( program, camera );
 		this.loadMatrices( program );
 
-		if ( material instanceof THREE.MeshShaderMaterial || 
+		if ( material instanceof THREE.MeshShaderMaterial ||
 		     material instanceof THREE.MeshDepthMaterial ||
 			 material instanceof THREE.MeshNormalMaterial ) {
 
@@ -478,12 +478,13 @@ THREE.WebGLRenderer = function ( scene, antialias ) {
 
 			_gl.uniform1i( program.uniforms.useRefract, useRefract );
 			_gl.uniform1f( program.uniforms.mRefractionRatio, mRefractionRatio );
-			
+
 			if ( fog ) {
-				
-				_gl.uniform1f( program.uniforms.fogDensity, fog.density );
+
+				_gl.uniform1f( program.uniforms.fogNear, fog.near );
+				_gl.uniform1f( program.uniforms.fogFar, fog.far );
 				_gl.uniform3f( program.uniforms.fogColor, fog.color.r, fog.color.g, fog.color.b );
-				
+
 			}
 
 		}
@@ -535,7 +536,7 @@ THREE.WebGLRenderer = function ( scene, antialias ) {
 			_gl.uniform1i( program.uniforms.enableCubeMap, 0 );
 
 		}
-		
+
 		attributes = program.attributes;
 
 		// vertices
@@ -561,7 +562,7 @@ THREE.WebGLRenderer = function ( scene, antialias ) {
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLTangentBuffer );
 			_gl.vertexAttribPointer( attributes.tangent, 4, _gl.FLOAT, false, 0, 0 );
 			_gl.enableVertexAttribArray( attributes.tangent );
-			
+
 		}
 
 		// uvs
@@ -569,7 +570,7 @@ THREE.WebGLRenderer = function ( scene, antialias ) {
 		if ( attributes.uv >= 0 ) {
 
 			if ( geometryChunk.__webGLUVBuffer ) {
-				
+
 				_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLUVBuffer );
 				_gl.vertexAttribPointer( attributes.uv, 2, _gl.FLOAT, false, 0, 0 );
 
@@ -957,7 +958,8 @@ THREE.WebGLRenderer = function ( scene, antialias ) {
 
 			"#ifdef USE_FOG",
 				"uniform vec3 fogColor;",
-				"uniform float fogDensity;",
+				"uniform float fogNear;",
+				"uniform float fogFar;",
 			"#endif",
 
 			"uniform int pointLightNumber;",
@@ -1113,17 +1115,23 @@ THREE.WebGLRenderer = function ( scene, antialias ) {
 					"}",
 
 				"}",
-				
+
 				"#ifdef USE_FOG",
-		
+
+					"float depth = gl_FragCoord.z / gl_FragCoord.w;",
+					"float fogFactor = smoothstep( fogNear, fogFar, depth );",
+					"gl_FragColor = mix( gl_FragColor, vec4( fogColor, 1.0 ), fogFactor );",
+
+					/*
 					"const float LOG2 = 1.442695;",
 					"float z = gl_FragCoord.z / gl_FragCoord.w;",
 					"float fogFactor = exp2( - fogDensity * fogDensity * z * z * LOG2 );",
 					"fogFactor = clamp( fogFactor, 0.0, 1.0 );",
 					"gl_FragColor = mix( vec4( fogColor, 1.0 ), gl_FragColor, fogFactor );",
-			
+					*/
+
 				"#endif",
-				
+
 			"}" ];
 
 		return chunks.join("\n");
@@ -1237,12 +1245,12 @@ THREE.WebGLRenderer = function ( scene, antialias ) {
 			"#endif",
 
 			fog ? "#define USE_FOG" : "",
-		
+
 			"uniform mat4 viewMatrix;",
 			"uniform vec3 cameraPosition;",
 			""
 		].join("\n"),
-		
+
 		prefix_vertex = [
 			maxVertexTextures() > 0 ? "#define VERTEX_TEXTURES" : "",
 
@@ -1257,7 +1265,7 @@ THREE.WebGLRenderer = function ( scene, antialias ) {
 			"attribute vec2 uv;",
 			""
 		].join("\n");
-		
+
 		_gl.attachShader( program, getShader( "fragment", prefix_fragment + fragment_shader ) );
 		_gl.attachShader( program, getShader( "vertex", prefix_vertex + vertex_shader ) );
 
@@ -1440,9 +1448,9 @@ THREE.WebGLRenderer = function ( scene, antialias ) {
 		] );
 
 		if ( fog ) {
-			
-			cacheUniformLocations( program, [ 'fogColor', 'fogDensity' ] );
-			
+
+			cacheUniformLocations( program, [ 'fogColor', 'fogNear', 'fogFar' ] );
+
 		}
 
 		if ( maxDirLights ) {
@@ -1642,29 +1650,29 @@ THREE.WebGLRenderer = function ( scene, antialias ) {
 		return str;
 	}
 	*/
-	
+
 	var ShaderLib = {
-		
+
 		'depth': {
 
-			uniforms: { "mNear": { type: "f", value: 1.0 }, 
+			uniforms: { "mNear": { type: "f", value: 1.0 },
 						"mFar" : { type: "f", value: 2000.0 } },
 
 			fragment_shader: [
-				
+
 				"uniform float mNear;",
 				"uniform float mFar;",
 
 				"void main() {",
-						
+
 					"float depth = gl_FragCoord.z / gl_FragCoord.w;",
 					"float color = 1.0 - smoothstep( mNear, mFar, depth );",
 					"gl_FragColor = vec4( vec3( color ), 1.0 );",
-					
+
 				"}"
 
 			].join("\n"),
-						
+
 			vertex_shader: [
 
 				"void main() {",
@@ -1676,29 +1684,29 @@ THREE.WebGLRenderer = function ( scene, antialias ) {
 			].join("\n")
 
 		},
-		
+
 		'normal': {
-			
+
 			uniforms: { },
-			
+
 			fragment_shader: [
-				
+
 				"varying vec3 vNormal;",
-			
+
 				"void main() {",
-						
+
 					"gl_FragColor = vec4( 0.5 * normalize( vNormal ) + 0.5, 1.0 );",
-					
+
 				"}"
 
 			].join("\n"),
-			
+
 			vertex_shader: [
-			
+
 				"varying vec3 vNormal;",
 
 				"void main() {",
-			
+
 					"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
 					"vNormal = normalize( normalMatrix * normal );",
 
@@ -1707,9 +1715,9 @@ THREE.WebGLRenderer = function ( scene, antialias ) {
 				"}"
 
 			].join("\n")
-			
+
 		}
-		
+
 	};
 
 };

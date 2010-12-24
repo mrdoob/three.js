@@ -150,7 +150,8 @@ THREE.WebGLRenderer2 = function ( antialias ) {
 						if ( scene.fog ) {
 
 							_gl.uniform1f( uniforms.fog, 1 );
-							_gl.uniform1f( uniforms.fogDensity, scene.fog.density );
+							_gl.uniform1f( uniforms.fogNear, scene.fog.near );
+							_gl.uniform1f( uniforms.fogFar, scene.fog.far );
 							_gl.uniform3f( uniforms.fogColor, scene.fog.color.r, scene.fog.color.g, scene.fog.color.b );
 
 						} else {
@@ -181,9 +182,8 @@ THREE.WebGLRenderer2 = function ( antialias ) {
 
 						} else if ( material instanceof THREE.MeshDepthMaterial ) {
 
-							_gl.uniform1f( uniforms.m2Near, material.__2near );
-							_gl.uniform1f( uniforms.mFarPlusNear, material.__farPlusNear );
-							_gl.uniform1f( uniforms.mFarMinusNear, material.__farMinusNear );
+							_gl.uniform1f( uniforms.mNear, material.near );
+							_gl.uniform1f( uniforms.mFar, material.far );
 							_gl.uniform1f( uniforms.mOpacity, material.opacity );
 
 						}
@@ -492,8 +492,9 @@ THREE.WebGLRenderer2 = function ( antialias ) {
 					material.map ? 'varying vec2 vUv;' : null,
 
 					material.fog ? 'uniform float fog;' : null,
+					material.fog ? 'uniform float fogNear;' : null,
+					material.fog ? 'uniform float fogFar;' : null,
 					material.fog ? 'uniform vec3 fogColor;' : null,
-					material.fog ? 'uniform float fogDensity;' : null,
 
 					'void main() {',
 						'gl_FragColor = vec4( mColor.xyz, mOpacity );',
@@ -505,16 +506,15 @@ THREE.WebGLRenderer2 = function ( antialias ) {
 
 						material.map ? 'gl_FragColor *= texture2D( tMap, vUv );' : null,
 
-						material.fog ? 'const float LOG2 = 1.442695;' : null,
-						material.fog ? 'float z = fog * ( gl_FragCoord.z / gl_FragCoord.w );' : null,
-						material.fog ? 'float fogFactor = exp2( - fogDensity * fogDensity * z * z * LOG2 );' : null,
-						material.fog ? 'gl_FragColor = mix( gl_FragColor, vec4( fogColor, 1.0 ), 1.0 - clamp( fogFactor, 0.0, 1.0 ) );' : null,
+						material.fog ? 'float depth = gl_FragCoord.z / gl_FragCoord.w;' : null,
+						material.fog ? 'float fogFactor = fog * smoothstep( fogNear, fogFar, depth );' : null,
+						material.fog ? 'gl_FragColor = mix( gl_FragColor, vec4( fogColor, 1.0 ), fogFactor );' : null,
 					'}'
 				].filter( removeNull ).join( '\n' );
 
 				identifiers.push( 'mColor', 'mOpacity' );
 				material.map ? identifiers.push( 'tMap' ) : null;
-				material.fog ? identifiers.push( 'fog', 'fogColor', 'fogDensity' ) : null;
+				material.fog ? identifiers.push( 'fog', 'fogColor', 'fogNear', 'fogFar' ) : null;
 
 
 			} else if ( material instanceof THREE.MeshNormalMaterial ) {
@@ -549,18 +549,18 @@ THREE.WebGLRenderer2 = function ( antialias ) {
 				].join( '\n' );
 
 				fs = [
-					'uniform float m2Near;',
-					'uniform float mFarPlusNear;',
-					'uniform float mFarMinusNear;',
+					'uniform float mNear;',
+					'uniform float mFar;',
 					'uniform float mOpacity;',
 
 					'void main() {',
-						'float w = 1.0 - ( m2Near / ( mFarPlusNear - gl_FragCoord.z * mFarMinusNear ) );',
-						'gl_FragColor = vec4( w, w, w, mOpacity );',
+						'float depth = gl_FragCoord.z / gl_FragCoord.w;',
+						'float color = 1.0 - smoothstep( mNear, mFar, depth );',
+						'gl_FragColor = vec4( vec3( color ), 1.0 );',
 					'}'
 				].join( '\n' );
 
-				identifiers.push( 'm2Near', 'mFarPlusNear', 'mFarMinusNear', 'mOpacity' );
+				identifiers.push( 'mNear', 'mFar', 'mOpacity' );
 
 			} else if ( material instanceof THREE.MeshShaderMaterial ) {
 

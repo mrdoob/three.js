@@ -127,11 +127,11 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
+				camera = new THREE.Camera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 3200;
 
 				scene = new THREE.Scene();
-				scene.fog = new THREE.Fog( 0xffffff, 0.00025 );
+				scene.fog = new THREE.Fog( 0xffffff, 1, 10000 );
 
 				var geometry = new Sphere( 50, 32, 16 );
 
@@ -151,7 +151,7 @@
 					new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.SmoothShading } ),
 					new THREE.MeshNormalMaterial( { shading: THREE.SmoothShading } ),
 					new THREE.MeshBasicMaterial( { color: 0xffaa00, wireframe: true } ),
-					new THREE.MeshDepthMaterial( { near: 1, far: 2000 } ),
+					new THREE.MeshDepthMaterial( { near: 1, far: 10000 } ),
 					new THREE.MeshBasicMaterial( { map: generatedTexture, fog: false } ),
 					new THREE.MeshLambertMaterial( { map: generatedTexture } ),
 					new THREE.MeshShaderMaterial( { uniforms: uniforms, vertex_shader: vertex_shader, fragment_shader: fragment_shader } )
@@ -166,7 +166,6 @@
 				}
 
 				materials.push( new THREE.MeshFaceMaterial() );
-
 
 				for ( var i = 0; i < 5000; i ++ ) {
 
