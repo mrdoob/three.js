@@ -145,20 +145,27 @@
 
 				var materials = [
 
+					new THREE.MeshNormalMaterial(),
+					new THREE.MeshDepthMaterial(),
+					new THREE.MeshBasicMaterial( { color: 0x0066ff, blending: THREE.AdditiveBlending } ),
+					new THREE.MeshBasicMaterial( { map: texture, fog: false } ),
+					new THREE.MeshBasicMaterial( { map: ImageUtils.loadTexture( 'textures/land_ocean_ice_cloud_2048.jpg' ) } ),
+					new THREE.MeshBasicMaterial( { map: texture2, env_map: ImageUtils.loadTexture( 'textures/envmap.png', new THREE.SphericalReflectionMapping() ) } ),
+					new THREE.MeshShaderMaterial( { uniforms: uniforms, vertex_shader: vertex_shader, fragment_shader: fragment_shader } )
+
+					/*
 					new THREE.MeshLambertMaterial( { color: 0xdddddd, shading: THREE.FlatShading } ),
 					new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.FlatShading } ),
-					new THREE.MeshNormalMaterial(),
-					new THREE.MeshBasicMaterial( { color: 0x665500, blending: THREE.AdditiveBlending } ),
 					new THREE.MeshLambertMaterial( { color: 0xdddddd, shading: THREE.SmoothShading } ),
 					new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.SmoothShading } ),
 					new THREE.MeshNormalMaterial( { shading: THREE.SmoothShading } ),
 					new THREE.MeshBasicMaterial( { color: 0xffaa00, wireframe: true } ),
-					new THREE.MeshDepthMaterial( { near: 1, far: 10000 } ),
 					new THREE.MeshBasicMaterial( { map: texture, fog: false } ),
 					new THREE.MeshBasicMaterial( { env_map: texture2, fog: false } ),
 					new THREE.MeshLambertMaterial( { map: ImageUtils.loadTexture( 'textures/land_ocean_ice_cloud_2048.jpg' ) } ),
 					new THREE.MeshLambertMaterial( { map: texture2, env_map: ImageUtils.loadTexture( 'textures/envmap.png', new THREE.SphericalReflectionMapping() ) } ),
 					new THREE.MeshShaderMaterial( { uniforms: uniforms, vertex_shader: vertex_shader, fragment_shader: fragment_shader } )
+					*/
 
 				];
 
