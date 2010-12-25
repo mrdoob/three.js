@@ -115,7 +115,7 @@
 
 				SceneUtils.addPanoramaCubeWebGL( sceneCube, 100000, textureCube );
 
-				webglRenderer = new THREE.WebGLRenderer( scene );
+				webglRenderer = new THREE.WebGLRenderer( { scene: scene } );
 				webglRenderer.setSize( window.innerWidth, window.innerHeight );
 				webglRenderer.autoClear = false;
 				container.appendChild( webglRenderer.domElement );

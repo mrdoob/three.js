@@ -190,7 +190,7 @@
 				
 				loader.loadBinary( "obj/ninja/NinjaLo_bin.js", function( geometry ) { createScene( geometry, scale, material1, material2 ) }, "obj/ninja" );
 
-				webglRenderer = new THREE.WebGLRenderer( scene );
+				webglRenderer = new THREE.WebGLRenderer( { scene: scene } );
 				webglRenderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( webglRenderer.domElement );
 

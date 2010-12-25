@@ -4,7 +4,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.WebGLRenderer = function ( scene, antialias ) {
+THREE.WebGLRenderer = function ( parameters ) {
 
 	// Currently you can use just up to 4 directional / point lights total.
 	// Chrome barfs on shader linking when there are more than 4 lights :(
@@ -36,15 +36,18 @@ THREE.WebGLRenderer = function ( scene, antialias ) {
 	// heuristics to create shader parameters according to lights in the scene
 	// (not to blow over maxLights budget)
 
-	maxLightCount = allocateLights( scene, 4 );
-	fog = scene ? scene.fog : null,
+	maxLightCount = allocateLights( parameters.scene, 4 );
+	fog = parameters.scene ? parameters.scene.fog : null,
 	
-	aa = antialias != undefined ? antialias : true;
+	antialias = parameters.antialias != undefined ? parameters.antialias : true,
+	
+	clearColor = parameters.clearColor ? new THREE.Color( parameters.clearColor ) : new THREE.Color( 0x000000 ),
+	clearAlpha = parameters.clearAlpha ? parameters.clearAlpha : 0;
 	
 	this.domElement = _canvas;
 	this.autoClear = true;
 
-	initGL( aa );
+	initGL( antialias, clearColor, clearAlpha );
 
 	_uberProgram = initUbershader( maxLightCount.directional, maxLightCount.point, fog );
 	_oldProgram = _uberProgram;
@@ -59,6 +62,13 @@ THREE.WebGLRenderer = function ( scene, antialias ) {
 
 	};
 
+	this.setClearColor = function( hex, alpha ) {
+		
+		var color = new THREE.Color( hex );
+		_gl.clearColor( color.r, color.g, color.b, alpha );
+		
+	};
+	
 	this.clear = function () {
 
 		_gl.clear( _gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT );
@@ -899,7 +909,7 @@ THREE.WebGLRenderer = function ( scene, antialias ) {
 	};
 
 
-	function initGL( antialias ) {
+	function initGL( antialias, clearColor, clearAlpha ) {
 
 		try {
 
@@ -926,7 +936,7 @@ THREE.WebGLRenderer = function ( scene, antialias ) {
 
 		_gl.enable( _gl.BLEND );
 		_gl.blendFunc( _gl.ONE, _gl.ONE_MINUS_SRC_ALPHA );
-		_gl.clearColor( 0, 0, 0, 0 );
+		_gl.clearColor( clearColor.r, clearColor.g, clearColor.b, clearAlpha );
 
 	};
 

@@ -148,7 +148,7 @@
 
 					try {
 
-						webglRenderer = new THREE.WebGLRenderer( scene );
+						webglRenderer = new THREE.WebGLRenderer( { scene: scene } );
 						webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 						container.appendChild( webglRenderer.domElement );
 
