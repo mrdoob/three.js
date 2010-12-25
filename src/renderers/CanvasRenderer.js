@@ -25,7 +25,8 @@ THREE.CanvasRenderer = function () {
 	_color2 = new THREE.Color(),
 	_color3 = new THREE.Color(),
 	_color4 = new THREE.Color(),
-	_2near, _farPlusNear, _farMinusNear,
+
+	_near, _far,
 
 	_bitmap,
 	_uv1x, _uv1y, _uv2x, _uv2y, _uv3x, _uv3y,
@@ -110,7 +111,7 @@ THREE.CanvasRenderer = function () {
 		_renderList = _projector.projectScene( scene, camera, this.sortElements );
 
 		/* DEBUG
-		_context.fillStyle = 'rgba(0, 255, 255, 0.5)';
+		_context.fillStyle = 'rgba( 0, 255, 255, 0.5 )';
 		_context.fillRect( _clipRect.getX(), _clipRect.getY(), _clipRect.getWidth(), _clipRect.getHeight() );
 		*/
 
@@ -133,9 +134,9 @@ THREE.CanvasRenderer = function () {
 				_v1 = element;
 				_v1.x *= _canvasWidthHalf; _v1.y *= _canvasHeightHalf;
 
-				for ( m = 0, ml = element.material.length; m < ml; m++ ) {
+				for ( m = 0, ml = element.materials.length; m < ml; m++ ) {
 
-					renderParticle( _v1, element, element.material[ m ], scene );
+					renderParticle( _v1, element, element.materials[ m ], scene );
 
 				}
 
@@ -151,11 +152,11 @@ THREE.CanvasRenderer = function () {
 
 				if ( _clipRect.instersects( _bboxRect ) ) {
 
-					m = 0; ml = element.material.length;
+					m = 0; ml = element.materials.length;
 
 					while ( m < ml ) {
 
-						renderLine( _v1, _v2, element, element.material[ m ++ ], scene );
+						renderLine( _v1, _v2, element, element.materials[ m ++ ], scene );
 
 					}
 
@@ -184,19 +185,19 @@ THREE.CanvasRenderer = function () {
 
 				if ( _clipRect.instersects( _bboxRect ) ) {
 
-					m = 0; ml = element.meshMaterial.length;
+					m = 0; ml = element.meshMaterials.length;
 
 					while ( m < ml ) {
 
-						material = element.meshMaterial[ m ++ ];
+						material = element.meshMaterials[ m ++ ];
 
 						if ( material instanceof THREE.MeshFaceMaterial ) {
 
-							fm = 0; fml = element.faceMaterial.length;
+							fm = 0; fml = element.faceMaterials.length;
 
 							while ( fm < fml ) {
 
-								material = element.faceMaterial[ fm ++ ];
+								material = element.faceMaterials[ fm ++ ];
 								material && renderFace3( _v1, _v2, _v3, element, material, scene );
 
 							}
@@ -575,13 +576,12 @@ THREE.CanvasRenderer = function () {
 				_color.setRGB( _w, _w, _w );
 				*/
 
-				_2near = material.__2near;
-				_farPlusNear = material.__farPlusNear;
-				_farMinusNear = material.__farMinusNear;
+				_near = camera.near;
+				_far = camera.far;
 
-				_color1.r = _color1.g = _color1.b = 1 - ( _2near / ( _farPlusNear - v1.positionScreen.z * _farMinusNear ) );
-				_color2.r = _color2.g = _color2.b = 1 - ( _2near / ( _farPlusNear - v2.positionScreen.z * _farMinusNear ) );
-				_color3.r = _color3.g = _color3.b = 1 - ( _2near / ( _farPlusNear - v3.positionScreen.z * _farMinusNear ) );
+				_color1.r = _color1.g = _color1.b = 1 - smoothstep( v1.positionScreen.z, _near, _far );
+				_color2.r = _color2.g = _color2.b = 1 - smoothstep( v2.positionScreen.z, _near, _far );
+				_color3.r = _color3.g = _color3.b = 1 - smoothstep( v3.positionScreen.z, _near, _far );
 
 				_color4.r = ( _color2.r + _color3.r ) * 0.5;
 				_color4.g = ( _color2.g + _color3.g ) * 0.5;
@@ -786,6 +786,18 @@ THREE.CanvasRenderer = function () {
 			_gradientMapContext.drawImage( _pixelMap, 0, 0 );
 
 			return _gradientMap;
+
+		}
+
+		function smoothstep( value, min, max ) {
+
+			/*
+			if ( value <= min ) return 0;
+			if ( value >= max ) return 1;
+			*/
+
+			var x = ( value - min ) / ( max - min );
+			return x * x * ( 3 - 2 * x );
 
 		}
 

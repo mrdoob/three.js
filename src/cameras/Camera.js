@@ -4,13 +4,18 @@
 
 THREE.Camera = function ( fov, aspect, near, far ) {
 
+	this.fov = fov;
+	this.aspect = aspect;
+	this.near = near;
+	this.far = far;
+
 	this.position = new THREE.Vector3();
 	this.target = { position: new THREE.Vector3() };
 
 	this.up = new THREE.Vector3( 0, 1, 0 );
 
 	this.matrix = new THREE.Matrix4();
-	this.projectionMatrix = THREE.Matrix4.makePerspective( fov, aspect, near, far );
+	this.projectionMatrix = null;
 
 	this.autoUpdateMatrix = true;
 
@@ -44,6 +49,14 @@ THREE.Camera = function ( fov, aspect, near, far ) {
 		this.matrix.lookAt( this.position, this.target.position, this.up );
 
 	};
+
+	this.updateProjectionMatrix = function () {
+
+		this.projectionMatrix = THREE.Matrix4.makePerspective( this.fov, this.aspect, this.near, this.far );
+
+	};
+
+	this.updateProjectionMatrix();
 
 	this.toString = function () {
 

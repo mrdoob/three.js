@@ -13,7 +13,7 @@ THREE.Vertex = function ( position, normal ) {
 	this.normalScreen = new THREE.Vector3();
 
 	this.tangent = new THREE.Vector4();
-	
+
 	this.__visible = true;
 
 }

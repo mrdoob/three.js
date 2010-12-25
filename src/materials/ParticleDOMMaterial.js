@@ -6,10 +6,15 @@ THREE.ParticleDOMMaterial = function ( domElement ) {
 
 	this.domElement = domElement;
 
-	this.toString = function () {
+};
+
+
+THREE.ParticleDOMMaterial.prototype = {
+
+	toString: function () {
 
 		return 'THREE.ParticleDOMMaterial ( domElement: ' + this.domElement + ' )';
 
-	};
+	}
 
 };

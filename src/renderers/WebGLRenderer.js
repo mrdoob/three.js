@@ -373,13 +373,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 	};
 
 	function setMaterialShaders( material, shaders ) {
-		
+
 		material.fragment_shader = shaders.fragment_shader;
 		material.vertex_shader = shaders.vertex_shader;
 		material.uniforms = shaders.uniforms;
-		
+
 	};
-	
+
 	this.renderBuffer = function ( camera, lights, fog, material, geometryChunk ) {
 
 		var mColor, mOpacity, mReflectivity,
@@ -397,18 +397,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 			if ( !material.program ) {
 
 				if ( material instanceof THREE.MeshDepthMaterial ) {
-					
+
 					setMaterialShaders( material, ShaderLib[ 'depth' ] );
-					
-					material.uniforms.mNear.value = material.near;
-					material.uniforms.mFar.value = material.far;
-					
+
+					material.uniforms.mNear.value = camera.near;
+					material.uniforms.mFar.value = camera.far;
+
 				} else if ( material instanceof THREE.MeshNormalMaterial ) {
-					
+
 					setMaterialShaders( material, ShaderLib[ 'normal' ] );
-					
-				}					
-				
+
+				}
+
 				material.program = buildProgram( material.fragment_shader, material.vertex_shader, null );
 
 				identifiers = [ 'viewMatrix', 'modelViewMatrix', 'projectionMatrix', 'normalMatrix', 'objectMatrix', 'cameraPosition' ];
@@ -417,7 +417,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					identifiers.push(u);
 
 				}
-				
+
 				cacheUniformLocations( material.program, identifiers );
 				cacheAttributeLocations( material.program, [ "position", "normal", "uv", "tangent" ] );
 
@@ -447,7 +447,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		this.loadCamera( program, camera );
 		this.loadMatrices( program );
 
-		if ( material instanceof THREE.MeshShaderMaterial || 
+		if ( material instanceof THREE.MeshShaderMaterial ||
 		     material instanceof THREE.MeshDepthMaterial ||
 			 material instanceof THREE.MeshNormalMaterial ) {
 
@@ -488,12 +488,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl.uniform1i( program.uniforms.useRefract, useRefract );
 			_gl.uniform1f( program.uniforms.mRefractionRatio, mRefractionRatio );
-			
+
 			if ( fog ) {
-				
-				_gl.uniform1f( program.uniforms.fogDensity, fog.density );
+
+				_gl.uniform1f( program.uniforms.fogNear, fog.near );
+				_gl.uniform1f( program.uniforms.fogFar, fog.far );
 				_gl.uniform3f( program.uniforms.fogColor, fog.color.r, fog.color.g, fog.color.b );
-				
+
 			}
 
 		}
@@ -545,7 +546,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.uniform1i( program.uniforms.enableCubeMap, 0 );
 
 		}
-		
+
 		attributes = program.attributes;
 
 		// vertices
@@ -571,7 +572,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLTangentBuffer );
 			_gl.vertexAttribPointer( attributes.tangent, 4, _gl.FLOAT, false, 0, 0 );
 			_gl.enableVertexAttribArray( attributes.tangent );
-			
+
 		}
 
 		// uvs
@@ -579,7 +580,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( attributes.uv >= 0 ) {
 
 			if ( geometryChunk.__webGLUVBuffer ) {
-				
+
 				_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLUVBuffer );
 				_gl.vertexAttribPointer( attributes.uv, 2, _gl.FLOAT, false, 0, 0 );
 
@@ -616,15 +617,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var i, l, m, ml, material, meshMaterial;
 
-		for ( m = 0, ml = object.material.length; m < ml; m++ ) {
+		for ( m = 0, ml = object.materials.length; m < ml; m++ ) {
 
-			meshMaterial = object.material[ m ];
+			meshMaterial = object.materials[ m ];
 
 			if ( meshMaterial instanceof THREE.MeshFaceMaterial ) {
 
-				for ( i = 0, l = geometryChunk.material.length; i < l; i++ ) {
+				for ( i = 0, l = geometryChunk.materials.length; i < l; i++ ) {
 
-					material = geometryChunk.material[ i ];
+					material = geometryChunk.materials[ i ];
+
 					if ( material && material.blending == blending && ( material.opacity < 1.0 == transparent ) ) {
 
 						this.setBlending( material.blending );
@@ -665,7 +667,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		camera.autoUpdateMatrix && camera.updateMatrix();
-		
+
 		_viewMatrixArray.set( camera.matrix.flatten() );
 		_projectionMatrixArray.set( camera.projectionMatrix.flatten() );
 
@@ -966,9 +968,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			"#ifdef USE_FOG",
 				"uniform vec3 fogColor;",
-				"uniform float fogDensity;",
+				"uniform float fogNear;",
+				"uniform float fogFar;",
 			"#endif",
-			
+
 			"uniform int pointLightNumber;",
 			"uniform int directionalLightNumber;",
 
@@ -1122,17 +1125,23 @@ THREE.WebGLRenderer = function ( parameters ) {
 					"}",
 
 				"}",
-				
+
 				"#ifdef USE_FOG",
-		
+
+					"float depth = gl_FragCoord.z / gl_FragCoord.w;",
+					"float fogFactor = smoothstep( fogNear, fogFar, depth );",
+					"gl_FragColor = mix( gl_FragColor, vec4( fogColor, 1.0 ), fogFactor );",
+
+					/*
 					"const float LOG2 = 1.442695;",
 					"float z = gl_FragCoord.z / gl_FragCoord.w;",
 					"float fogFactor = exp2( - fogDensity * fogDensity * z * z * LOG2 );",
 					"fogFactor = clamp( fogFactor, 0.0, 1.0 );",
 					"gl_FragColor = mix( vec4( fogColor, 1.0 ), gl_FragColor, fogFactor );",
-			
+					*/
+
 				"#endif",
-				
+
 			"}" ];
 
 		return chunks.join("\n");
@@ -1246,12 +1255,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 			"#endif",
 
 			fog ? "#define USE_FOG" : "",
-		
+
 			"uniform mat4 viewMatrix;",
 			"uniform vec3 cameraPosition;",
 			""
 		].join("\n"),
-		
+
 		prefix_vertex = [
 			maxVertexTextures() > 0 ? "#define VERTEX_TEXTURES" : "",
 
@@ -1266,7 +1275,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			"attribute vec2 uv;",
 			""
 		].join("\n");
-		
+
 		_gl.attachShader( program, getShader( "fragment", prefix_fragment + fragment_shader ) );
 		_gl.attachShader( program, getShader( "vertex", prefix_vertex + vertex_shader ) );
 
@@ -1449,9 +1458,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 		] );
 
 		if ( fog ) {
-			
-			cacheUniformLocations( program, [ 'fogColor', 'fogDensity' ] );
-			
+
+			cacheUniformLocations( program, [ 'fogColor', 'fogNear', 'fogFar' ] );
+
 		}
 
 		if ( maxDirLights ) {
@@ -1549,15 +1558,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var m, ml, i, l, needsSmoothNormals = false;
 
-		for ( m = 0, ml = object.material.length; m < ml; m++ ) {
+		for ( m = 0, ml = object.materials.length; m < ml; m++ ) {
 
-			meshMaterial = object.material[ m ];
+			meshMaterial = object.materials[ m ];
 
 			if ( meshMaterial instanceof THREE.MeshFaceMaterial ) {
 
-				for ( i = 0, l = geometryChunk.material.length; i < l; i++ ) {
+				for ( i = 0, l = geometryChunk.materials.length; i < l; i++ ) {
 
-					if ( materialNeedsSmoothNormals( geometryChunk.material[ i ] ) ) {
+					if ( materialNeedsSmoothNormals( geometryChunk.materials[ i ] ) ) {
 
 						needsSmoothNormals = true;
 						break;
@@ -1651,29 +1660,29 @@ THREE.WebGLRenderer = function ( parameters ) {
 		return str;
 	}
 	*/
-	
+
 	var ShaderLib = {
-		
+
 		'depth': {
 
-			uniforms: { "mNear": { type: "f", value: 1.0 }, 
+			uniforms: { "mNear": { type: "f", value: 1.0 },
 						"mFar" : { type: "f", value: 2000.0 } },
 
 			fragment_shader: [
-				
+
 				"uniform float mNear;",
 				"uniform float mFar;",
 
 				"void main() {",
-						
+
 					"float depth = gl_FragCoord.z / gl_FragCoord.w;",
 					"float color = 1.0 - smoothstep( mNear, mFar, depth );",
 					"gl_FragColor = vec4( vec3( color ), 1.0 );",
-					
+
 				"}"
 
 			].join("\n"),
-						
+
 			vertex_shader: [
 
 				"void main() {",
@@ -1685,29 +1694,29 @@ THREE.WebGLRenderer = function ( parameters ) {
 			].join("\n")
 
 		},
-		
+
 		'normal': {
-			
+
 			uniforms: { },
-			
+
 			fragment_shader: [
-				
+
 				"varying vec3 vNormal;",
-			
+
 				"void main() {",
-						
+
 					"gl_FragColor = vec4( 0.5 * normalize( vNormal ) + 0.5, 1.0 );",
-					
+
 				"}"
 
 			].join("\n"),
-			
+
 			vertex_shader: [
-			
+
 				"varying vec3 vNormal;",
 
 				"void main() {",
-			
+
 					"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
 					"vNormal = normalize( normalMatrix * normal );",
 
@@ -1716,9 +1725,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 				"}"
 
 			].join("\n")
-			
+
 		}
-		
+
 	};
 
 };

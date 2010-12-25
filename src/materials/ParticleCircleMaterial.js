@@ -22,7 +22,11 @@ THREE.ParticleCircleMaterial = function ( parameters ) {
 
 	}
 
-	this.toString = function () {
+};
+
+THREE.ParticleCircleMaterial.prototype = {
+
+	toString: function () {
 
 		return 'THREE.ParticleCircleMaterial (<br/>' +
 			'color: ' + this.color + '<br/>' +
@@ -30,6 +34,6 @@ THREE.ParticleCircleMaterial = function ( parameters ) {
 			'blending: ' + this.blending + '<br/>' +
 			')';
 
-	};
+	}
 
 };

@@ -96,6 +96,7 @@
 		<script type="text/javascript" src="../src/renderers/renderables/RenderableLine.js"></script>
 
 		<script type="text/javascript" src="../src/extras/primitives/Sphere.js"></script>
+		<script type="text/javascript" src="../src/extras/ImageUtils.js"></script>
 		<script type="text/javascript" src="../src/extras/ShaderUtils.js"></script>
 
 		<script type="text/javascript" src="js/Stats.js"></script>
@@ -127,49 +128,74 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
+				camera = new THREE.Camera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 3200;
 
 				scene = new THREE.Scene();
-				scene.fog = new THREE.Fog( 0xffffff, 0.00025 );
+				scene.fog = new THREE.Fog( 0xffffff, 1, 10000 );
 
-				var geometry = new Sphere( 100, 32, 16 );
+				var geometry = new Sphere( 50, 32, 16 );
 
 				var uniforms = ShaderUtils.lib[ 'basic' ].uniforms;
 				var vertex_shader = ShaderUtils.lib[ 'basic' ].vertex_shader;
 				var fragment_shader = ShaderUtils.lib[ 'basic' ].fragment_shader;
 
-				var generatedTexture = new THREE.Texture( generateTexture() );
+				var texture = new THREE.Texture( generateTexture( 0, 0.5, 1 ), new THREE.UVMapping() );
+				var texture2 = new THREE.Texture( generateTexture( 0, 1, 0 ), new THREE.SphericalReflectionMapping() );
 
 				var materials = [
 
+					new THREE.MeshNormalMaterial(),
+					new THREE.MeshDepthMaterial(),
+					new THREE.MeshBasicMaterial( { color: 0x0066ff, blending: THREE.AdditiveBlending } ),
+					new THREE.MeshBasicMaterial( { map: texture, fog: false } ),
+					new THREE.MeshBasicMaterial( { map: ImageUtils.loadTexture( 'textures/land_ocean_ice_cloud_2048.jpg' ) } ),
+					new THREE.MeshBasicMaterial( { map: texture2, env_map: ImageUtils.loadTexture( 'textures/envmap.png', new THREE.SphericalReflectionMapping() ) } ),
+					new THREE.MeshShaderMaterial( { uniforms: uniforms, vertex_shader: vertex_shader, fragment_shader: fragment_shader } )
+
+					/*
 					new THREE.MeshLambertMaterial( { color: 0xdddddd, shading: THREE.FlatShading } ),
 					new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.FlatShading } ),
-					new THREE.MeshNormalMaterial(),
-					new THREE.MeshBasicMaterial( { color: 0x665500, blending: THREE.AdditiveBlending } ),
 					new THREE.MeshLambertMaterial( { color: 0xdddddd, shading: THREE.SmoothShading } ),
 					new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.SmoothShading } ),
 					new THREE.MeshNormalMaterial( { shading: THREE.SmoothShading } ),
 					new THREE.MeshBasicMaterial( { color: 0xffaa00, wireframe: true } ),
-					new THREE.MeshDepthMaterial( { near: 1, far: 2000 } ),
-					new THREE.MeshBasicMaterial( { map: generatedTexture } ),
-					new THREE.MeshLambertMaterial( { map: generatedTexture } ),
+					new THREE.MeshBasicMaterial( { map: texture, fog: false } ),
+					new THREE.MeshBasicMaterial( { env_map: texture2, fog: false } ),
+					new THREE.MeshLambertMaterial( { map: ImageUtils.loadTexture( 'textures/land_ocean_ice_cloud_2048.jpg' ) } ),
+					new THREE.MeshLambertMaterial( { map: texture2, env_map: ImageUtils.loadTexture( 'textures/envmap.png', new THREE.SphericalReflectionMapping() ) } ),
 					new THREE.MeshShaderMaterial( { uniforms: uniforms, vertex_shader: vertex_shader, fragment_shader: fragment_shader } )
+					*/
 
 				];
 
-				for ( var i = 0; i < 1000; i ++ ) {
+				for ( var i = 0, l = geometry.faces.length; i < l; i ++ ) {
+
+					var face = geometry.faces[ i ];
+					if ( Math.random() > 0.5 ) face.material = [ materials[ Math.floor( Math.random() * materials.length ) ] ];
+
+				}
+
+				materials.push( new THREE.MeshFaceMaterial() );
+
+				// materials = [ new THREE.MeshBasicMaterial( { map: texture, env_map: texture2 } ) ];
+
+				for ( var i = 0; i < 5000; i ++ ) {
 
 					var mesh = new THREE.Mesh( geometry, materials[ Math.floor( Math.random() * materials.length ) ] );
 					mesh.position.x = Math.random() * 10000 - 5000;
 					mesh.position.y = Math.random() * 10000 - 5000;
 					mesh.position.z = Math.random() * 10000 - 5000;
+					mesh.rotation.x = Math.random() * 360 * ( Math.PI / 180 );
+					mesh.rotation.y = Math.random() * 360 * ( Math.PI / 180 );
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 4 + 1;
+					mesh.updateMatrix();
+					mesh.autoUpdateMatrix = false;
 					scene.addObject( mesh );
 
 				}
 
-				renderer = new THREE.WebGLRenderer2();
+				renderer = new THREE.WebGLRenderer2( false );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				// renderer.sortObjects = false;
 				container.appendChild( renderer.domElement );
@@ -186,7 +212,7 @@
 
 			}
 
-			function generateTexture() {
+			function generateTexture( r, g, b ) {
 
 				var canvas = document.createElement( 'canvas' );
 				canvas.loaded = true;
@@ -196,14 +222,17 @@
 				var context = canvas.getContext( '2d' );
 				var image = context.getImageData( 0, 0, 256, 256 );
 
-				var x = 0, y = 0;
+				var x = 0, y = 0, p;
 
 				for ( var i = 0, j = 0, l = image.data.length; i < l; i += 4, j ++ ) {
 
 					x = j % 256;
 					y = x == 0 ? y + 1 : y;
+					p = Math.floor( x ^ y );
 
-					image.data[ i + 2 ] = Math.floor( x ^ y );
+					image.data[ i ] = ~~ p * r;
+					image.data[ i + 1 ] = ~~ p * g;
+					image.data[ i + 2 ] = ~~ p * b;
 					image.data[ i + 3 ] = 255;
 
 				}

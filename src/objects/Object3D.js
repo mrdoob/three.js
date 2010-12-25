@@ -2,7 +2,7 @@
  * @author mr.doob / http://mrdoob.com/
  */
 
-THREE.Object3D = function ( material ) {
+THREE.Object3D = function () {
 
 	this.id = THREE.Object3DCounter.value ++;
 
@@ -17,10 +17,14 @@ THREE.Object3D = function ( material ) {
 
 	this.screen = new THREE.Vector3();
 
-	this.visible = true;
 	this.autoUpdateMatrix = true;
+	this.visible = true;
 
-	this.updateMatrix = function () {
+};
+
+THREE.Object3D.prototype = {
+
+	updateMatrix: function () {
 
 		this.matrixPosition = THREE.Matrix4.translationMatrix( this.position.x, this.position.y, this.position.z );
 
@@ -34,7 +38,7 @@ THREE.Object3D = function ( material ) {
 		this.matrix.multiplySelf( this.rotationMatrix );
 		this.matrix.multiplySelf( this.scaleMatrix );
 
-	};
+	}
 
 };
 

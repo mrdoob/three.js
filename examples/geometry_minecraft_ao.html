@@ -110,15 +110,15 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.Camera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
+				camera = new THREE.Camera( 60, window.innerWidth / window.innerHeight, 1, 7500 );
 				camera.target.position.z = - 100;
 
 				camera.position.y = getY( worldHalfWidth, worldHalfDepth ) * 100 + 100;
 				camera.target.position.y = camera.position.y;
 
 				scene = new THREE.Scene();
-				scene.fog = new THREE.Fog( 0xffffff, 0.00025 );
-				
+				scene.fog = new THREE.Fog( 0xffffff, 1, 7500 );
+
 				var debug_texture = false,
 					debug_numbers = false,
 					debug_corner_colors = false,

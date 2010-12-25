@@ -3,50 +3,21 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Mesh = function ( geometry, material/*, normUVs*/ ) {
+THREE.Mesh = function ( geometry, materials ) {
 
 	THREE.Object3D.call( this );
 
 	this.geometry = geometry;
-	this.material = material instanceof Array ? material : [ material ];
+	this.materials = materials instanceof Array ? materials : [ materials ];
 
 	this.flipSided = false;
 	this.doubleSided = false;
 
-	this.overdraw = false;
+	this.overdraw = false; // TODO: Move to material?
 
-	// if ( normUVs ) this.normalizeUVs();
-
-	// this.geometry.boundingBox ||this.geometry.computeBoundingBox();
 	this.geometry.boundingSphere || this.geometry.computeBoundingSphere();
 
 };
 
 THREE.Mesh.prototype = new THREE.Object3D();
 THREE.Mesh.prototype.constructor = THREE.Mesh;
-
-/*
-TODO: This doesn't completely fix the issue. Needs to be handled directly in the CanvasRenderer
-
-THREE.Mesh.prototype.normalizeUVs = function () {
-
-	var i, il, j, jl, uvs;
-
-	for ( i = 0, il = this.geometry.uvs.length; i < il; i++ ) {
-
-		uvs = this.geometry.uvs[ i ];
-
-		for ( j = 0, jl = uvs.length; j < jl; j++ ) {
-
-			// texture repeat
-			// (WebGL does this by default but canvas renderer needs to do it explicitly)
-
-			if( uvs[ j ].u != 1.0 ) uvs[ j ].u = uvs[ j ].u - Math.floor( uvs[ j ].u );
-			if( uvs[ j ].v != 1.0 ) uvs[ j ].v = uvs[ j ].v - Math.floor( uvs[ j ].v );
-
-		}
-
-	}
-
-};
-*/

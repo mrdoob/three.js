@@ -53,7 +53,7 @@ var GeometryUtils = {
 
 			}
 
-			faceCopy.material = face.material.slice();
+			faceCopy.materials = face.materials.slice();
 
 			faces1.push( faceCopy );
 

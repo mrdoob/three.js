@@ -64,9 +64,9 @@ THREE.Projector = function() {
 
 	this.projectScene = function ( scene, camera, sort ) {
 
-		var renderList = [],
+		var renderList = [], near = camera.near, far = camera.far,
 		o, ol, v, vl, f, fl, n, nl, objects, object,
-		objectMatrix, objectRotationMatrix, objectMaterial, objectOverdraw,
+		objectMatrix, objectRotationMatrix, objectMaterials, objectOverdraw,
 		geometry, vertices, vertex, vertexPositionScreen,
 		faces, face, faceVertexNormals, normal, v1, v2, v3, v4;
 
@@ -88,7 +88,7 @@ THREE.Projector = function() {
 
 			objectMatrix = object.matrix;
 			objectRotationMatrix = object.rotationMatrix;
-			objectMaterial = object.material;
+			objectMaterials = object.materials;
 			objectOverdraw = object.overdraw;
 
 			if ( object instanceof THREE.Mesh ) {
@@ -99,7 +99,7 @@ THREE.Projector = function() {
 
 				vertices = geometry.vertices;
 
-				for ( v = 0, vl = vertices.length; v < vl; v++ ) {
+				for ( v = 0, vl = vertices.length; v < vl; v ++ ) {
 
 					vertex = vertices[ v ];
 
@@ -110,12 +110,10 @@ THREE.Projector = function() {
 					vertexPositionScreen.copy( vertex.positionWorld );
 					_projScreenMatrix.multiplyVector4( vertexPositionScreen );
 
-					// Perform the perspective divide. TODO: This should be be performend 
-					// post clipping (imagine if the vertex lies at the same location as 
-					// the camera, causing a divide by w = 0).
-					vertexPositionScreen.multiplyScalar( 1 / vertexPositionScreen.w );
+					vertexPositionScreen.x /= vertexPositionScreen.w;
+					vertexPositionScreen.y /= vertexPositionScreen.w;
 
-					vertex.__visible = vertexPositionScreen.z > 0 && vertexPositionScreen.z < 1;
+					vertex.__visible = vertexPositionScreen.z > near && vertexPositionScreen.z < far;
 
 				}
 
@@ -169,8 +167,8 @@ THREE.Projector = function() {
 
 								_face3.z = _face3.centroidScreen.z;
 
-								_face3.meshMaterial = objectMaterial;
-								_face3.faceMaterial = face.material;
+								_face3.meshMaterials = objectMaterials;
+								_face3.faceMaterials = face.materials;
 								_face3.overdraw = objectOverdraw;
 
 								if ( object.geometry.uvs[ f ] ) {
@@ -224,8 +222,8 @@ THREE.Projector = function() {
 
 								_face3.z = _face3.centroidScreen.z;
 
-								_face3.meshMaterial = objectMaterial;
-								_face3.faceMaterial = face.material;
+								_face3.meshMaterials = objectMaterials;
+								_face3.faceMaterials = face.materials;
 								_face3.overdraw = objectOverdraw;
 
 								if ( object.geometry.uvs[ f ] ) {
@@ -260,8 +258,8 @@ THREE.Projector = function() {
 
 								_face32.z = _face32.centroidScreen.z;
 
-								_face32.meshMaterial = objectMaterial;
-								_face32.faceMaterial = face.material;
+								_face32.meshMaterials = objectMaterials;
+								_face32.faceMaterials = face.materials;
 								_face32.overdraw = objectOverdraw;
 
 								if ( object.geometry.uvs[ f ] ) {
@@ -318,7 +316,7 @@ THREE.Projector = function() {
 
 						_line.z = Math.max( _clippedVertex1PositionScreen.z, _clippedVertex2PositionScreen.z );
 
-						_line.material = object.material;
+						_line.materials = object.materials;
 
 						renderList.push( _line );
 
@@ -346,7 +344,7 @@ THREE.Projector = function() {
 					_particle.scale.x = object.scale.x * Math.abs( _particle.x - ( _vector4.x + camera.projectionMatrix.n11 ) / ( _vector4.w + camera.projectionMatrix.n14 ) );
 					_particle.scale.y = object.scale.y * Math.abs( _particle.y - ( _vector4.y + camera.projectionMatrix.n22 ) / ( _vector4.w + camera.projectionMatrix.n24 ) );
 
-					_particle.material = object.material;
+					_particle.materials = object.materials;
 
 					renderList.push( _particle );
 

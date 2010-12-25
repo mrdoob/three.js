@@ -6,7 +6,7 @@
  * @author supereggbert / http://www.paulbrunt.co.uk/
  */
 
-THREE.WebGLRenderer2 = function () {
+THREE.WebGLRenderer2 = function ( antialias ) {
 
 	var _renderList = null,
 	_projector = new THREE.Projector(),
@@ -22,7 +22,8 @@ THREE.WebGLRenderer2 = function () {
 
 	try {
 
-		_gl = _canvas.getContext( 'experimental-webgl', { antialias: true } );
+		antialias = antialias !== undefined ? antialias : true;
+		_gl = _canvas.getContext( 'experimental-webgl', { antialias: antialias } );
 
 	} catch(e) { }
 
@@ -79,6 +80,8 @@ THREE.WebGLRenderer2 = function () {
 		_viewMatrixArray.set( camera.matrix.flatten() );
 		_projectionMatrixArray.set( camera.projectionMatrix.flatten() );
 
+		_currentProgram = null;
+
 		/*
 		for ( o = 0, ol = scene.objects.length; o < ol; o++ ) {
 
@@ -87,7 +90,6 @@ THREE.WebGLRenderer2 = function () {
 		}
 		*/
 
-		_currentProgram = null;
 		_renderList = _projector.projectObjects( scene, camera, this.sortObjects );
 
 		for ( o = 0, ol = _renderList.length; o < ol; o++ ) {
@@ -99,7 +101,7 @@ THREE.WebGLRenderer2 = function () {
 		function renderObject( object ) {
 
 			var geometry, material, m, nl,
-			program, attributes;
+			program, uniforms, attributes;
 
 			object.autoUpdateMatrix && object.updateMatrix();
 
@@ -123,9 +125,9 @@ THREE.WebGLRenderer2 = function () {
 
 				}
 
-				for ( m = 0, ml = object.material.length; m < ml; m ++ ) {
+				for ( m = 0, ml = object.materials.length; m < ml; m ++ ) {
 
-					material = object.material[ m ];
+					material = object.materials[ m ];
 
 					if ( material.__webglProgram == undefined ) {
 
@@ -134,6 +136,7 @@ THREE.WebGLRenderer2 = function () {
 					}
 
 					program = material.__webglProgram;
+					uniforms = program.uniforms;
 					attributes = program.attributes;
 
 					if( program != _currentProgram ) {
@@ -146,54 +149,61 @@ THREE.WebGLRenderer2 = function () {
 
 						if ( scene.fog ) {
 
-							_gl.uniform1i( program.uniforms.fog, 1 );
-							_gl.uniform1f( program.uniforms.fogDensity, scene.fog.density );
-							_gl.uniform3f( program.uniforms.fogColor, scene.fog.color.r, scene.fog.color.g, scene.fog.color.b );
+							_gl.uniform1f( uniforms.fog, 1 );
+							_gl.uniform1f( uniforms.fogNear, scene.fog.near );
+							_gl.uniform1f( uniforms.fogFar, scene.fog.far );
+							_gl.uniform3f( uniforms.fogColor, scene.fog.color.r, scene.fog.color.g, scene.fog.color.b );
 
 						} else {
 
-							_gl.uniform1i( program.uniforms.fog, 0 );
+							_gl.uniform1f( uniforms.fog, 0 );
 
 						}
 
-					}
+						// material
 
-					// materials
+						if ( material instanceof THREE.MeshBasicMaterial ||
+						material instanceof THREE.MeshLambertMaterial ||
+						material instanceof THREE.MeshPhongMaterial ) {
 
-					if ( material instanceof THREE.MeshBasicMaterial ||
-					material instanceof THREE.MeshLambertMaterial ||
-					material instanceof THREE.MeshPhongMaterial ) {
+							_gl.uniform3f( uniforms.mColor, material.color.r, material.color.g, material.color.b );
+							_gl.uniform1f( uniforms.mOpacity, material.opacity );
 
-						_gl.uniform3f( program.uniforms.mColor, material.color.r, material.color.g, material.color.b );
-						_gl.uniform1f( program.uniforms.mOpacity, material.opacity );
+							if ( material.map ) {
 
-						if ( material.map ) {
+								setTexture( material.map, 0 );
+								_gl.uniform1i( uniforms.tMap, 0 );
 
-							setTexture( material.map, 0 );
-							_gl.uniform1i( program.uniforms.tMap, 0 );
+							}
+
+							if ( material.env_map ) {
+
+								setTexture( material.env_map, 1 );
+								_gl.uniform1i( uniforms.tSpherical, 1 );
+
+							}
+
+						} else if ( material instanceof THREE.MeshNormalMaterial ) {
+
+							_gl.uniform1f( uniforms.mOpacity, material.opacity );
+
+						} else if ( material instanceof THREE.MeshDepthMaterial ) {
+
+							_gl.uniform1f( uniforms.mNear, camera.near );
+							_gl.uniform1f( uniforms.mFar, camera.far );
+							_gl.uniform1f( uniforms.mOpacity, material.opacity );
 
 						}
 
-					} else if ( material instanceof THREE.MeshNormalMaterial ) {
-
-						_gl.uniform1f( program.uniforms.mOpacity, material.opacity );
-
-					} else if ( material instanceof THREE.MeshDepthMaterial ) {
-
-						_gl.uniform1f( program.uniforms.m2Near, material.__2near );
-						_gl.uniform1f( program.uniforms.mFarPlusNear, material.__farPlusNear );
-						_gl.uniform1f( program.uniforms.mFarMinusNear, material.__farMinusNear );
-						_gl.uniform1f( program.uniforms.mOpacity, material.opacity );
+						_gl.uniform3f( uniforms.cameraPosition, camera.position.x, camera.position.y, camera.position.z );
+						_gl.uniformMatrix4fv( uniforms.viewMatrix, false, _viewMatrixArray );
+						_gl.uniformMatrix4fv( uniforms.projectionMatrix, false, _projectionMatrixArray );
 
 					}
 
-					_gl.uniform3f( program.uniforms.cameraPosition, camera.position.x, camera.position.y, camera.position.z );
-
-					_gl.uniformMatrix4fv( program.uniforms.viewMatrix, false, _viewMatrixArray );
-					_gl.uniformMatrix4fv( program.uniforms.projectionMatrix, false, _projectionMatrixArray );
-					_gl.uniformMatrix4fv( program.uniforms.objectMatrix, false, _objectMatrixArray );
-					_gl.uniformMatrix4fv( program.uniforms.modelViewMatrix, false, _modelViewMatrixArray );
-					_gl.uniformMatrix3fv( program.uniforms.normalMatrix, false, _normalMatrixArray );
+					_gl.uniformMatrix4fv( uniforms.objectMatrix, false, _objectMatrixArray );
+					_gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, _modelViewMatrixArray );
+					_gl.uniformMatrix3fv( uniforms.normalMatrix, false, _normalMatrixArray );
 
 					var buffer, buffers = geometry.__webglBuffers;
 
@@ -255,6 +265,14 @@ THREE.WebGLRenderer2 = function () {
 					}
 
 				}
+
+			} else if ( object instanceof THREE.Line ) {
+
+				
+
+			} else if ( object instanceof THREE.Particle ) {
+
+				
 
 			}
 
@@ -466,102 +484,115 @@ THREE.WebGLRenderer2 = function () {
 
 		function createProgram( material ) {
 
-			var pvs = '', vs = '', pfs = '', fs = '',
-			identifiers = [ 'viewMatrix', 'modelViewMatrix', 'projectionMatrix', 'normalMatrix', 'objectMatrix', 'cameraPosition' ];
+			var vs, fs, identifiers = [ 'viewMatrix', 'modelViewMatrix', 'projectionMatrix', 'normalMatrix', 'objectMatrix', 'cameraPosition' ];
 
 			if ( material instanceof THREE.MeshBasicMaterial ||
 			material instanceof THREE.MeshLambertMaterial ||
 			material instanceof THREE.MeshPhongMaterial ) {
 
-				vs += 'void main() {\n';
-				fs += 'void main() {\n';
+				vs = [
+					material.map ? 'varying vec2 vUv;' : null,
+					material.env_map ? 'varying vec2 vSpherical;' : null,
 
-				vs += 'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n';
+					'void main() {',
+						'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
 
-				pfs += 'uniform vec3 mColor;\n';
-				pfs += 'uniform float mOpacity;\n';
+						material.map ? 'vUv = uv;' : null,
 
-				fs += 'gl_FragColor = vec4( mColor.xyz, mOpacity );\n';
+						material.env_map ? 'vec3 u = normalize( modelViewMatrix * vec4( position, 1.0 ) ).xyz;' : null,
+						material.env_map ? 'vec3 n = normalize( normalMatrix * normal );' : null,
+						material.env_map ? 'vec3 r = reflect( u, n );' : null,
+						material.env_map ? 'float m = 2.0 * sqrt( r.x * r.x + r.y * r.y + ( r.z + 1.0 ) * ( r.z + 1.0 ) );' : null,
+						material.env_map ? 'vSpherical.x = r.x / m + 0.5;' : null,
+						material.env_map ? 'vSpherical.y = - r.y / m + 0.5;' : null,
+
+					'}'
+				].filter( removeNull ).join( '\n' );
+
+				fs = [
+					'uniform vec3 mColor;',
+					'uniform float mOpacity;',
+
+					material.map ? 'uniform sampler2D tMap;' : null,
+					material.map ? 'varying vec2 vUv;' : null,
+
+					material.env_map ? 'uniform sampler2D tSpherical;' : null,
+					material.env_map ? 'varying vec2 vSpherical;' : null,
+
+					material.fog ? 'uniform float fog;' : null,
+					material.fog ? 'uniform float fogNear;' : null,
+					material.fog ? 'uniform float fogFar;' : null,
+					material.fog ? 'uniform vec3 fogColor;' : null,
+
+					'void main() {',
+						'gl_FragColor = vec4( mColor.xyz, mOpacity );',
+
+						/* Premultiply alpha
+						material.map ? 'vec4 mapColor = texture2D( tMap, vUv );' : null,
+						material.map ? 'mapColor.xyz *= mapColor.w;' : null,
+						*/
+
+						material.map ? 'gl_FragColor *= texture2D( tMap, vUv );' : null,
+
+						material.env_map ? 'gl_FragColor += texture2D( tSpherical, vSpherical );' : null,
+
+						material.fog ? 'float depth = gl_FragCoord.z / gl_FragCoord.w;' : null,
+						material.fog ? 'float fogFactor = fog * smoothstep( fogNear, fogFar, depth );' : null,
+						material.fog ? 'gl_FragColor = mix( gl_FragColor, vec4( fogColor, 1.0 ), fogFactor );' : null,
+					'}'
+				].filter( removeNull ).join( '\n' );
 
 				identifiers.push( 'mColor', 'mOpacity' );
 
-				// uvmap
-
-				if ( material.map ) {
-
-					pvs += 'varying vec2 vUv;\n',
-					vs += 'vUv = uv;\n',
-
-					pfs += 'uniform sampler2D tMap;\n';
-					pfs += 'varying vec2 vUv;\n';
-
-					/* Premultiply alpha
-					fs += 'vec4 mapColor = texture2D( tMap, vUv );\n';
-					fs += 'mapColor.xyz *= mapColor.w;\n';
-					*/
-
-					fs += 'gl_FragColor *= texture2D( tMap, vUv );\n';
-
-					identifiers.push( 'tMap' );
-
-				}
-
-				// fog
-
-				pfs += 'uniform bool fog;\n';
-				pfs += 'uniform vec3 fogColor;\n';
-				pfs += 'uniform float fogDensity;\n';
-
-				fs += 'if ( fog ) {\n';
-				fs += 'const float LOG2 = 1.442695;\n';
-				fs += 'float z = gl_FragCoord.z / gl_FragCoord.w;\n';
-				fs += 'float fogFactor = exp2( - fogDensity * fogDensity * z * z * LOG2 );\n';
-				fs += 'fogFactor = clamp( fogFactor, 0.0, 1.0 );\n';
-				fs += 'gl_FragColor = mix( vec4( fogColor, 1.0 ), gl_FragColor, fogFactor );\n',
-				fs += '}\n';
-
-				identifiers.push( 'fog', 'fogColor', 'fogDensity' );
-
-				vs += '}';
-				fs += '}';
+				material.map ? identifiers.push( 'tMap' ) : null;
+				material.env_map ? identifiers.push( 'tSpherical' ) : null;
+				material.fog ? identifiers.push( 'fog', 'fogColor', 'fogNear', 'fogFar' ) : null;
 
 
 			} else if ( material instanceof THREE.MeshNormalMaterial ) {
 
-				vs += 'void main() {\n';
-				fs += 'void main() {\n';
+				vs = [
+					'varying vec3 vNormal;',
 
-				pvs += 'varying vec3 vNormal;\n';
-				vs += 'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n';
-				vs += 'vNormal = normalize( normalMatrix * normal );\n';
+					'void main() {',
+						'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+						'vNormal = normalize( normalMatrix * normal );',
+					'}'
+				].join( '\n' );
 
-				pfs += 'uniform float mOpacity;\n';
-				pfs += 'varying vec3 vNormal;\n';
-				fs += 'gl_FragColor = vec4( ( normalize( vNormal ) + 1.0 ) * 0.5, mOpacity );\n';
+				fs = [
+					'uniform float mOpacity;',
+					'varying vec3 vNormal;',
+
+					'void main() {',
+						'gl_FragColor = vec4( ( normalize( vNormal ) + 1.0 ) * 0.5, mOpacity );',
+					'}'
+				].join( '\n' );
 
 				identifiers.push( 'mOpacity' );
 
-				vs += '}';
-				fs += '}';
-
 			} else if ( material instanceof THREE.MeshDepthMaterial ) {
 
-				vs += 'void main() {\n';
-				fs += 'void main() {\n';
+				vs = [
+					'void main() {',
+						'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+					'}'
 
-				vs += 'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n';
+				].join( '\n' );
 
-				pfs += 'uniform float mOpacity;\n';
-				pfs += 'uniform float m2Near;\n';
-				pfs += 'uniform float mFarPlusNear;\n';
-				pfs += 'uniform float mFarMinusNear;\n';
-				fs += 'float w = 1.0 - ( m2Near / ( mFarPlusNear - gl_FragCoord.z * mFarMinusNear ) );\n';
-				fs += 'gl_FragColor = vec4( w, w, w, mOpacity );\n';
+				fs = [
+					'uniform float mNear;',
+					'uniform float mFar;',
+					'uniform float mOpacity;',
 
-				identifiers.push( 'm2Near', 'mFarPlusNear', 'mFarMinusNear', 'mOpacity' );
+					'void main() {',
+						'float depth = gl_FragCoord.z / gl_FragCoord.w;',
+						'float color = 1.0 - smoothstep( mNear, mFar, depth );',
+						'gl_FragColor = vec4( vec3( color ), 1.0 );',
+					'}'
+				].join( '\n' );
 
-				vs += '}';
-				fs += '}';
+				identifiers.push( 'mNear', 'mFar', 'mOpacity' );
 
 			} else if ( material instanceof THREE.MeshShaderMaterial ) {
 
@@ -580,7 +611,7 @@ THREE.WebGLRenderer2 = function () {
 
 			}
 
-			material.__webglProgram = compileProgram( pvs + vs, pfs + fs );
+			material.__webglProgram = compileProgram( vs, fs );
 
 			cacheUniformLocations( material.__webglProgram, identifiers );
 			cacheAttributeLocations( material.__webglProgram, [ "position", "normal", "uv"/*, "tangent"*/ ] );
@@ -651,8 +682,8 @@ THREE.WebGLRenderer2 = function () {
 				alert( "Could not initialise shaders.\n" +
 				"VALIDATE_STATUS: " + _gl.getProgramParameter( program, _gl.VALIDATE_STATUS ) + "\n" +
 				"ERROR: " + _gl.getError() + "\n\n" +
-				"Vertex Shader: \n" + prefix_vertex + vertex_shader + "\n\n" +
-				"Fragment Shader: \n" + prefix_fragment + fragment_shader );
+				"- Vertex Shader -\n" + prefix_vertex + vertex_shader + "\n\n" +
+				"- Fragment Shader -\n" + prefix_fragment + fragment_shader );
 
 			}
 
@@ -745,6 +776,12 @@ THREE.WebGLRenderer2 = function () {
 			}
 
 			return 0;
+
+		}
+
+		function removeNull( element ) {
+
+			return element !== null;
 
 		}
 
