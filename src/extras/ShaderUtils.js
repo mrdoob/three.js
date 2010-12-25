@@ -373,7 +373,7 @@ var ShaderUtils = {
 			].join("\n")
 
 		},
-		
+
 		'cube': {
 
 			uniforms: { "tCube": { type: "t", value: 1, texture: null } },
@@ -383,7 +383,7 @@ var ShaderUtils = {
 				"varying vec3 vViewPosition;",
 
 				"void main() {",
-			
+
 					"vec4 mPosition = objectMatrix * vec4( position, 1.0 );",
 					"vViewPosition = cameraPosition - mPosition.xyz;",
 
@@ -402,7 +402,7 @@ var ShaderUtils = {
 				"void main() {",
 
 					"vec3 wPos = cameraPosition - vViewPosition;",
-					"gl_FragColor = textureCube( tCube, vec3( -wPos.x, wPos.yz ) );",
+					"gl_FragColor = textureCube( tCube, vec3( - wPos.x, wPos.yz ) );",
 
 				"}"
 

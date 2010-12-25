@@ -176,6 +176,13 @@ THREE.WebGLRenderer2 = function ( antialias ) {
 
 							}
 
+							if ( material.env_map ) {
+
+								setTexture( material.env_map, 1 );
+								_gl.uniform1i( uniforms.tSpherical, 1 );
+
+							}
+
 						} else if ( material instanceof THREE.MeshNormalMaterial ) {
 
 							_gl.uniform1f( uniforms.mOpacity, material.opacity );
@@ -258,6 +265,14 @@ THREE.WebGLRenderer2 = function ( antialias ) {
 					}
 
 				}
+
+			} else if ( object instanceof THREE.Line ) {
+
+				
+
+			} else if ( object instanceof THREE.Particle ) {
+
+				
 
 			}
 
@@ -477,10 +492,20 @@ THREE.WebGLRenderer2 = function ( antialias ) {
 
 				vs = [
 					material.map ? 'varying vec2 vUv;' : null,
+					material.env_map ? 'varying vec2 vSpherical;' : null,
 
 					'void main() {',
-						material.map ? 'vUv = uv;' : null,
 						'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+
+						material.map ? 'vUv = uv;' : null,
+
+						material.env_map ? 'vec3 u = normalize( modelViewMatrix * vec4( position, 1.0 ) ).xyz;' : null,
+						material.env_map ? 'vec3 n = normalize( normalMatrix * normal );' : null,
+						material.env_map ? 'vec3 r = reflect( u, n );' : null,
+						material.env_map ? 'float m = 2.0 * sqrt( r.x * r.x + r.y * r.y + ( r.z + 1.0 ) * ( r.z + 1.0 ) );' : null,
+						material.env_map ? 'vSpherical.x = r.x / m + 0.5;' : null,
+						material.env_map ? 'vSpherical.y = - r.y / m + 0.5;' : null,
+
 					'}'
 				].filter( removeNull ).join( '\n' );
 
@@ -490,6 +515,9 @@ THREE.WebGLRenderer2 = function ( antialias ) {
 
 					material.map ? 'uniform sampler2D tMap;' : null,
 					material.map ? 'varying vec2 vUv;' : null,
+
+					material.env_map ? 'uniform sampler2D tSpherical;' : null,
+					material.env_map ? 'varying vec2 vSpherical;' : null,
 
 					material.fog ? 'uniform float fog;' : null,
 					material.fog ? 'uniform float fogNear;' : null,
@@ -506,6 +534,8 @@ THREE.WebGLRenderer2 = function ( antialias ) {
 
 						material.map ? 'gl_FragColor *= texture2D( tMap, vUv );' : null,
 
+						material.env_map ? 'gl_FragColor += texture2D( tSpherical, vSpherical );' : null,
+
 						material.fog ? 'float depth = gl_FragCoord.z / gl_FragCoord.w;' : null,
 						material.fog ? 'float fogFactor = fog * smoothstep( fogNear, fogFar, depth );' : null,
 						material.fog ? 'gl_FragColor = mix( gl_FragColor, vec4( fogColor, 1.0 ), fogFactor );' : null,
@@ -513,7 +543,9 @@ THREE.WebGLRenderer2 = function ( antialias ) {
 				].filter( removeNull ).join( '\n' );
 
 				identifiers.push( 'mColor', 'mOpacity' );
+
 				material.map ? identifiers.push( 'tMap' ) : null;
+				material.env_map ? identifiers.push( 'tSpherical' ) : null;
 				material.fog ? identifiers.push( 'fog', 'fogColor', 'fogNear', 'fogFar' ) : null;
 
 
