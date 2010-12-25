@@ -16,7 +16,7 @@
 	<body>
 
 		<pre id="log"></pre>
-		
+
 		<script type="text/javascript" src="../build/ThreeExtras.js"></script>
 
 		<script type="text/javascript" src="js/Stats.js"></script>
@@ -78,7 +78,7 @@
 				materials.push( { material: new THREE.MeshNormalMaterial( { shading: THREE.SmoothShading } ), overdraw: true, doubleSided: false } );
 				materials.push( { material: new THREE.MeshBasicMaterial( { color: 0xffaa00, wireframe: true } ), overdraw: false, doubleSided: true } );
 
-				materials.push( { material: new THREE.MeshDepthMaterial( { near: 1, far: 2000 } ), overdraw: true, doubleSided: false } );
+				materials.push( { material: new THREE.MeshDepthMaterial(), overdraw: true, doubleSided: false } );
 				materials.push( { material: new THREE.MeshBasicMaterial( { map: generatedTexture } ), overdraw: true, doubleSided: false } );
 				materials.push( { material: new THREE.MeshLambertMaterial( { map: generatedTexture } ), overdraw: true, doubleSided: false } );
 

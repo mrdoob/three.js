@@ -64,7 +64,7 @@ THREE.Projector = function() {
 
 	this.projectScene = function ( scene, camera, sort ) {
 
-		var renderList = [],
+		var renderList = [], near = camera.near, far = camera.far,
 		o, ol, v, vl, f, fl, n, nl, objects, object,
 		objectMatrix, objectRotationMatrix, objectMaterials, objectOverdraw,
 		geometry, vertices, vertex, vertexPositionScreen,
@@ -99,7 +99,7 @@ THREE.Projector = function() {
 
 				vertices = geometry.vertices;
 
-				for ( v = 0, vl = vertices.length; v < vl; v++ ) {
+				for ( v = 0, vl = vertices.length; v < vl; v ++ ) {
 
 					vertex = vertices[ v ];
 
@@ -110,12 +110,10 @@ THREE.Projector = function() {
 					vertexPositionScreen.copy( vertex.positionWorld );
 					_projScreenMatrix.multiplyVector4( vertexPositionScreen );
 
-					// Perform the perspective divide. TODO: This should be be performend 
-					// post clipping (imagine if the vertex lies at the same location as 
-					// the camera, causing a divide by w = 0).
-					vertexPositionScreen.multiplyScalar( 1 / vertexPositionScreen.w );
+					vertexPositionScreen.x /= vertexPositionScreen.w;
+					vertexPositionScreen.y /= vertexPositionScreen.w;
 
-					vertex.__visible = vertexPositionScreen.z > 0 && vertexPositionScreen.z < 1;
+					vertex.__visible = vertexPositionScreen.z > near && vertexPositionScreen.z < far;
 
 				}
 

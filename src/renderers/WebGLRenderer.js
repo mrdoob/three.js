@@ -390,8 +390,8 @@ THREE.WebGLRenderer = function ( scene, antialias ) {
 
 					setMaterialShaders( material, ShaderLib[ 'depth' ] );
 
-					material.uniforms.mNear.value = material.near;
-					material.uniforms.mFar.value = material.far;
+					material.uniforms.mNear.value = camera.near;
+					material.uniforms.mFar.value = camera.far;
 
 				} else if ( material instanceof THREE.MeshNormalMaterial ) {
 

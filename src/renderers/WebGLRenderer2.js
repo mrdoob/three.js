@@ -189,8 +189,8 @@ THREE.WebGLRenderer2 = function ( antialias ) {
 
 						} else if ( material instanceof THREE.MeshDepthMaterial ) {
 
-							_gl.uniform1f( uniforms.mNear, material.near );
-							_gl.uniform1f( uniforms.mFar, material.far );
+							_gl.uniform1f( uniforms.mNear, camera.near );
+							_gl.uniform1f( uniforms.mFar, camera.far );
 							_gl.uniform1f( uniforms.mOpacity, material.opacity );
 
 						}

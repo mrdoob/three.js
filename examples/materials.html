@@ -29,6 +29,7 @@
 			var particleLight, pointLight;
 
 			init();
+			// loop();
 			setInterval( loop, 1000 / 60 );
 
 			function init() {
@@ -69,18 +70,19 @@
 
 				var geometry = new Sphere( 100, 14, 7, false );
 
-				var materials = [];
-				materials.push( { material: new THREE.MeshBasicMaterial( { color: 0x00ffff, wireframe: true } ), overdraw: false, doubleSided: true } );
-				//materials.push( { material: new THREE.MeshBasicMaterial( { color: 0xff0000, blending: THREE.SubtractiveBlending } ), overdraw: false, doubleSided: true } );
-				materials.push( { material: new THREE.MeshBasicMaterial( { color: 0xff0000, blending: THREE.AdditiveBlending } ), overdraw: false, doubleSided: true } );
-				materials.push( { material: new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading } ), overdraw: true, doubleSided: false } );
-				materials.push( { material: new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.SmoothShading } ), overdraw: true, doubleSided: false } );
-				// materials.push( { material: new THREE.MeshPhongMaterial( { ambient: 0x030383, color: 0xf55555, specular: 0x66f6f6, shininess: 10, shading: THREE.FlatShading } ), overdraw: true, doubleSided: false } );
-				materials.push( { material: new THREE.MeshDepthMaterial( { near: 1, far: 2000 } ), overdraw: true, doubleSided: false } );
-				materials.push( { material: new THREE.MeshNormalMaterial(), overdraw: true, doubleSided: false } );
-				materials.push( { material: new THREE.MeshBasicMaterial( { map: ImageUtils.loadTexture( 'textures/land_ocean_ice_cloud_2048.jpg' ) } ), overdraw: false, doubleSided: false } );
-				materials.push( { material: new THREE.MeshLambertMaterial( { map: ImageUtils.loadTexture( 'textures/land_ocean_ice_cloud_2048.jpg' ) } ), overdraw: false, doubleSided: false } );
-				materials.push( { material: new THREE.MeshBasicMaterial( { env_map: ImageUtils.loadTexture( 'textures/envmap.png', new THREE.SphericalReflectionMapping() ) } ), overdraw: false, doubleSided: false } );
+				var materials = [
+
+					{ material: new THREE.MeshBasicMaterial( { color: 0x00ffff, wireframe: true } ), overdraw: false, doubleSided: true },
+					{ material: new THREE.MeshBasicMaterial( { color: 0xff0000, blending: THREE.AdditiveBlending } ), overdraw: false, doubleSided: true },
+					{ material: new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading } ), overdraw: true, doubleSided: false },
+					{ material: new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.SmoothShading } ), overdraw: true, doubleSided: false },
+					{ material: new THREE.MeshDepthMaterial(), overdraw: true, doubleSided: false },
+					{ material: new THREE.MeshNormalMaterial(), overdraw: true, doubleSided: false },
+					{ material: new THREE.MeshBasicMaterial( { map: ImageUtils.loadTexture( 'textures/land_ocean_ice_cloud_2048.jpg' ) } ), overdraw: false, doubleSided: false },
+					{ material: new THREE.MeshLambertMaterial( { map: ImageUtils.loadTexture( 'textures/land_ocean_ice_cloud_2048.jpg' ) } ), overdraw: false, doubleSided: false },
+					{ material: new THREE.MeshBasicMaterial( { env_map: ImageUtils.loadTexture( 'textures/envmap.png', new THREE.SphericalReflectionMapping() ) } ), overdraw: false, doubleSided: false }
+
+				];
 
 				for ( var i = 0, l = geometry.faces.length; i < l; i ++ ) {
 

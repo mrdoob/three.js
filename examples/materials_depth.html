@@ -73,7 +73,7 @@
 
 				// Plane
 
-				var material = new THREE.MeshDepthMaterial( { near: 1, far: 2000 } );
+				var material = new THREE.MeshDepthMaterial();
 
 				plane = new THREE.Mesh( new Plane( 1000, 1000, 10, 10 ), material );
 				plane.rotation.x = - 90 * ( Math.PI / 180 );
