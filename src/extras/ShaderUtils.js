@@ -72,10 +72,12 @@ var ShaderUtils = {
 
 			"enableAO": { type: "i", value: 0 },
 			"enableDiffuse": { type: "i", value: 0 },
-			
+
 			"tDiffuse": { type: "t", value: 0, texture: null },
 			"tNormal": { type: "t", value: 2, texture: null },
 			"tAO": { type: "t", value: 3, texture: null },
+
+			"uNormalScale": { type: "f", value: 1.0 },
 
 			"tDisplacement": { type: "t", value: 4, texture: null },
 			"uDisplacementBias": { type: "f", value: -0.5 },
@@ -111,10 +113,12 @@ var ShaderUtils = {
 
 			"uniform bool enableDiffuse;",
 			"uniform bool enableAO;",
-			
+
 			"uniform sampler2D tDiffuse;",
 			"uniform sampler2D tNormal;",
 			"uniform sampler2D tAO;",
+
+			"uniform float uNormalScale;",
 
 			"varying vec3 vTangent;",
 			"varying vec3 vBinormal;",
@@ -129,12 +133,14 @@ var ShaderUtils = {
 
 				"vec3 diffuseTex = vec3( 1.0, 1.0, 1.0 );",
 				"vec3 aoTex = vec3( 1.0, 1.0, 1.0 );",
-				
-				"vec3 normalTex = normalize( texture2D( tNormal, vUv ).xyz * 2.0 - 1.0 );",
-				
+
+				"vec3 normalTex = texture2D( tNormal, vUv ).xyz * 2.0 - 1.0;",
+				"normalTex.xy *= uNormalScale;",
+				"normalTex = normalize( normalTex );",
+
 				"if( enableDiffuse )",
 					"diffuseTex = texture2D( tDiffuse, vUv ).xyz;",
-					
+
 				"if( enableAO )",
 					"aoTex = texture2D( tAO, vUv ).xyz;",
 
