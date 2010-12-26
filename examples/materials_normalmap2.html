@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - webgl normal map</title>
+		<title>three.js - webgl normal map - lee perry-smith</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -127,11 +127,11 @@
 				ambientLight = new THREE.AmbientLight( 0x222233 );
 				scene.addLight( ambientLight );
 
-				pointLight = new THREE.PointLight( 0xffffAA, 0.5 );
+				pointLight = new THREE.PointLight( 0x888877 );
 				pointLight.position.z = 10000;
 				scene.addLight( pointLight );
 
-				directionalLight = new THREE.DirectionalLight( 0xffff88 );
+				directionalLight = new THREE.DirectionalLight( 0x999955 );
 				directionalLight.position.x = 1;
 				directionalLight.position.y = 1;
 				directionalLight.position.z = 0.5;
@@ -140,20 +140,53 @@
 
 				// light representation
 
-				var sphere = new Sphere( 100, 16, 8, 1 );
+				var sphere = new Sphere( 100, 16, 8 );
 				lightMesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color:0xffaa00 } ) );
 				lightMesh.position = pointLight.position;
 				lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
 				scene.addObject(lightMesh);
 
-				var material = new THREE.MeshLambertMaterial( { map: ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" ) } );
+				// material parameters
+				
+				var ambient = 0x020202, diffuse = 0x666666, specular = 0x666666, shininess = 4;
+
+				var fragment_shader = ShaderUtils.lib[ "normal" ].fragment_shader;
+				var vertex_shader = ShaderUtils.lib[ "normal" ].vertex_shader;
+				var uniforms = ShaderUtils.lib[ "normal" ].uniforms;
+
+				uniforms[ "tNormal" ].texture = ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
+				uniforms[ "tDiffuse" ].texture = ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" );
+				
+				uniforms[ "enableAO" ].value = false;
+				uniforms[ "enableDiffuse" ].value = true;
+				
+				uniforms[ "uPointLightPos" ].value = pointLight.position;
+				uniforms[ "uPointLightColor" ].value = pointLight.color;
+
+				uniforms[ "uDirLightPos" ].value = directionalLight.position;
+				uniforms[ "uDirLightColor" ].value = directionalLight.color;
+				
+				uniforms[ "uAmbientLightColor" ].value = ambientLight.color;
+				
+				uniforms[ "uDiffuseColor" ].value.setHex( diffuse );
+				uniforms[ "uSpecularColor" ].value.setHex( specular );
+				uniforms[ "uAmbientColor" ].value.setHex( ambient );
+				
+				uniforms[ "uShininess" ].value = shininess;
+
+				var material = new THREE.MeshShaderMaterial( { fragment_shader: fragment_shader, 
+															    vertex_shader: vertex_shader, 
+															    uniforms: uniforms
+															  } );
+
+				//var material = new THREE.MeshLambertMaterial( { map: ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" ) } );
 
 				loader = new THREE.Loader( true );
 				document.body.appendChild( loader.statusDomElement );
 
 				loader.loadAscii( "obj/leeperrysmith/LeePerrySmith.js", function( geometry ) { createScene( geometry, 100, material ) }, "obj/leeperrysmith" );
 
-				webglRenderer = new THREE.WebGLRenderer( scene );
+				webglRenderer = new THREE.WebGLRenderer( { scene: scene } );
 				webglRenderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( webglRenderer.domElement );
 

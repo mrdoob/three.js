@@ -157,6 +157,9 @@
 				var vertex_shader = ShaderUtils.lib[ "normal" ].vertex_shader;
 				var uniforms = ShaderUtils.lib[ "normal" ].uniforms;
 
+				uniforms[ "enableAO" ].value = true;
+				uniforms[ "enableDiffuse" ].value = false;
+				
 				uniforms[ "tNormal" ].texture = ImageUtils.loadTexture( "textures/normal/ninja/normal.jpg" );
 				uniforms[ "tAO" ].texture = ImageUtils.loadTexture( "textures/normal/ninja/ao.jpg" );
 				
