@@ -82,6 +82,8 @@
 
 			}
 
+			var fogExp2 = true;
+			
 			var container, stats;
 
 			var camera, scene, renderer;
@@ -110,14 +112,22 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.Camera( 60, window.innerWidth / window.innerHeight, 1, 7500 );
+				if( fogExp2 )
+					camera = new THREE.Camera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
+				else
+					camera = new THREE.Camera( 60, window.innerWidth / window.innerHeight, 1, 7500 );
+					
 				camera.target.position.z = - 100;
 
 				camera.position.y = getY( worldHalfWidth, worldHalfDepth ) * 100 + 100;
 				camera.target.position.y = camera.position.y;
 
 				scene = new THREE.Scene();
-				scene.fog = new THREE.Fog( 0xffffff, - 1000, 7500 );
+				
+				if( fogExp2 )
+					scene.fog = new THREE.FogExp2( 0xffffff, 0.00025 );
+				else
+					scene.fog = new THREE.Fog( 0xffffff, - 1000, 7500 );
 
 				var debug_texture = false,
 					debug_numbers = false,

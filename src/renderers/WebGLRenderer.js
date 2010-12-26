@@ -491,9 +491,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( fog ) {
 
-				_gl.uniform1f( program.uniforms.fogNear, fog.near );
-				_gl.uniform1f( program.uniforms.fogFar, fog.far );
 				_gl.uniform3f( program.uniforms.fogColor, fog.color.r, fog.color.g, fog.color.b );
+				
+				if ( fog instanceof THREE.Fog ) {
+				
+					_gl.uniform1f( program.uniforms.fogNear, fog.near );
+					_gl.uniform1f( program.uniforms.fogFar, fog.far );
+					
+				} else if ( fog instanceof THREE.FogExp2 ) {
+					
+					_gl.uniform1f( program.uniforms.fogDensity, fog.density );
+					
+				}
 
 			}
 
@@ -968,8 +977,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			"#ifdef USE_FOG",
 				"uniform vec3 fogColor;",
-				"uniform float fogNear;",
-				"uniform float fogFar;",
+				
+				"#ifdef FOG_EXP2",
+					"uniform float fogDensity;",
+				"#else",
+					"uniform float fogNear;",
+					"uniform float fogFar;",
+				"#endif",
+				
 			"#endif",
 
 			"uniform int pointLightNumber;",
@@ -1127,18 +1142,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 				"}",
 
 				"#ifdef USE_FOG",
-
+				
 					"float depth = gl_FragCoord.z / gl_FragCoord.w;",
-					"float fogFactor = smoothstep( fogNear, fogFar, depth );",
-					"gl_FragColor = mix( gl_FragColor, vec4( fogColor, 1.0 ), fogFactor );",
 
-					/*
-					"const float LOG2 = 1.442695;",
-					"float z = gl_FragCoord.z / gl_FragCoord.w;",
-					"float fogFactor = exp2( - fogDensity * fogDensity * z * z * LOG2 );",
-					"fogFactor = clamp( fogFactor, 0.0, 1.0 );",
-					"gl_FragColor = mix( vec4( fogColor, 1.0 ), gl_FragColor, fogFactor );",
-					*/
+					"#ifdef FOG_EXP2",
+						"const float LOG2 = 1.442695;",
+						"float fogFactor = exp2( - fogDensity * fogDensity * depth * depth * LOG2 );",
+						"fogFactor = 1.0 - clamp( fogFactor, 0.0, 1.0 );",
+					"#else",
+						"float fogFactor = smoothstep( fogNear, fogFar, depth );",
+					"#endif",
+					
+					"gl_FragColor = mix( gl_FragColor, vec4( fogColor, 1.0 ), fogFactor );",
 
 				"#endif",
 
@@ -1255,6 +1270,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			"#endif",
 
 			fog ? "#define USE_FOG" : "",
+			fog instanceof THREE.FogExp2 ? "#define FOG_EXP2" : "",
 
 			"uniform mat4 viewMatrix;",
 			"uniform vec3 cameraPosition;",
@@ -1459,7 +1475,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( fog ) {
 
-			cacheUniformLocations( program, [ 'fogColor', 'fogNear', 'fogFar' ] );
+			cacheUniformLocations( program, [ 'fogColor', 'fogNear', 'fogFar', 'fogDensity' ] );
 
 		}
 

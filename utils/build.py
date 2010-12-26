@@ -57,6 +57,7 @@ COMMON_FILES = [
 'materials/mappings/UVMapping.js',
 'scenes/Scene.js',
 'scenes/Fog.js',
+'scenes/FogExp2.js',
 'renderers/Projector.js',
 'renderers/DOMRenderer.js',
 'renderers/CanvasRenderer.js',
@@ -243,6 +244,7 @@ WEBGL_FILES = [
 'materials/mappings/UVMapping.js',
 'scenes/Scene.js',
 'scenes/Fog.js',
+'scenes/FogExp2.js',
 'renderers/WebGLRenderer.js',
 ]
 
