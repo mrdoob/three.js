@@ -117,24 +117,24 @@
 				container = document.createElement('div');
 				document.body.appendChild(container);
 
-				camera = new THREE.Camera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.z = 800;
+				camera = new THREE.Camera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.z = 900;
 
 				scene = new THREE.Scene();
 
 				// LIGHTS
 
-				ambientLight = new THREE.AmbientLight( 0x222233 );
+				ambientLight = new THREE.AmbientLight( 0x050505 );
 				scene.addLight( ambientLight );
 
-				pointLight = new THREE.PointLight( 0x888877 );
+				pointLight = new THREE.PointLight( 0x999999 );
 				pointLight.position.z = 10000;
 				scene.addLight( pointLight );
 
-				directionalLight = new THREE.DirectionalLight( 0x999955 );
-				directionalLight.position.x = 1;
-				directionalLight.position.y = 1;
-				directionalLight.position.z = 0.5;
+				directionalLight = new THREE.DirectionalLight( 0xbbbbbb );
+				directionalLight.position.x = 0;
+				directionalLight.position.y = 0;
+				directionalLight.position.z = 1;
 				directionalLight.position.normalize();
 				scene.addLight( directionalLight );
 
@@ -148,12 +148,12 @@
 
 				// material parameters
 				
-				var ambient = 0x020202, diffuse = 0x666666, specular = 0x666666, shininess = 4;
+				var ambient = 0x020202, diffuse = 0x666666, specular = 0x444444, shininess = 2;
 
 				var fragment_shader = ShaderUtils.lib[ "normal" ].fragment_shader;
 				var vertex_shader = ShaderUtils.lib[ "normal" ].vertex_shader;
 				var uniforms = ShaderUtils.lib[ "normal" ].uniforms;
-
+ 
 				uniforms[ "tNormal" ].texture = ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
 				uniforms[ "tDiffuse" ].texture = ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" );
 				
@@ -174,12 +174,15 @@
 				
 				uniforms[ "uShininess" ].value = shininess;
 
+				
 				var material = new THREE.MeshShaderMaterial( { fragment_shader: fragment_shader, 
 															    vertex_shader: vertex_shader, 
 															    uniforms: uniforms
 															  } );
-
+				
 				//var material = new THREE.MeshLambertMaterial( { map: ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" ) } );
+				
+				//var material = new THREE.MeshPhongMaterial( { color: diffuse, specular: specular, ambient: ambient, shininess: shininess, map: ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" ) } );
 
 				loader = new THREE.Loader( true );
 				document.body.appendChild( loader.statusDomElement );
@@ -230,8 +233,8 @@
 
 				}
 
-				lightMesh.position.x = 2500 * Math.cos( r );
-				lightMesh.position.z = 2500 * Math.sin( r );
+				lightMesh.position.x = 500 * Math.cos( r );
+				lightMesh.position.z = 500 * Math.sin( r );
 
 				r += 0.01;
 
