@@ -372,11 +372,44 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	function cloneUniforms( uniforms_src ) {
+		
+		var u, p, parameter, uniforms_dst = {};
+		
+		for ( u in uniforms_src ) {
+			
+			uniforms_dst[ u ] = {};
+			
+			for ( p in uniforms[ u ] ) {
+				
+				parameter_src = uniforms_src[ u ][ p ];
+				parameter_dst = uniforms_dst[ u ][ p ];
+				
+				if ( parameter_src instanceof THREE.Color ||
+					 parameter_src instanceof THREE.Vector3 ||
+					 parameter_src instanceof THREE.Texture ) {
+				
+					parameter_dst = parameter_src.clone();
+					
+				} else {
+					
+					parameter_dst = parameter_src;
+					
+				}				
+				
+			}
+			
+		}
+		
+		return uniforms_dst;
+		
+	};
+	
 	function setMaterialShaders( material, shaders ) {
 
 		material.fragment_shader = shaders.fragment_shader;
 		material.vertex_shader = shaders.vertex_shader;
-		material.uniforms = shaders.uniforms;
+		material.uniforms = cloneUniforms( shaders.uniforms );
 
 	};
 
