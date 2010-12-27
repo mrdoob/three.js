@@ -105,8 +105,6 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
-			var r = 0.0;
-
 			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
 			init();
@@ -117,45 +115,38 @@
 				container = document.createElement('div');
 				document.body.appendChild(container);
 
-				camera = new THREE.Camera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.z = 800;
+				camera = new THREE.Camera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.z = 900;
 
 				scene = new THREE.Scene();
 
 				// LIGHTS
 
-				ambientLight = new THREE.AmbientLight( 0x555566 );
+				ambientLight = new THREE.AmbientLight( 0x444444 );
 				scene.addLight( ambientLight );
 
-				pointLight = new THREE.PointLight( 0x888877 );
-				pointLight.position.z = 400;
+				pointLight = new THREE.PointLight( 0xffffff );
+				pointLight.position.z = 600;
+
 				scene.addLight( pointLight );
 
-				directionalLight = new THREE.DirectionalLight( 0x999955 );
+				directionalLight = new THREE.DirectionalLight( 0xffffff );
 				directionalLight.position.x = 1;
 				directionalLight.position.y = 1;
-				directionalLight.position.z = 0.5;
+				directionalLight.position.z = - 1;
 				directionalLight.position.normalize();
 				scene.addLight( directionalLight );
 
-				// light representation
-
-				var sphere = new Sphere( 50, 16, 8 );
-				lightMesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color:0xffffff, opacity: 0.5 } ) );
-				lightMesh.position = pointLight.position;
-				lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
-				scene.addObject(lightMesh);
-
 				// material parameters
 
-				var ambient = 0x666677, diffuse = 0x666666, specular = 0x111111, shininess = 2;
+				var ambient = 0x444444, diffuse = 0x555555, specular = 0x181820, shininess = 2;
 
 				var fragment_shader = ShaderUtils.lib[ "normal" ].fragment_shader;
 				var vertex_shader = ShaderUtils.lib[ "normal" ].vertex_shader;
 				var uniforms = ShaderUtils.lib[ "normal" ].uniforms;
-
+ 
 				uniforms[ "tNormal" ].texture = ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
-				uniforms[ "uNormalScale" ].value = - 1.5;
+				uniforms[ "uNormalScale" ].value = - 0.75;
 
 				uniforms[ "tDiffuse" ].texture = ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" );
 
@@ -176,12 +167,10 @@
 
 				uniforms[ "uShininess" ].value = shininess;
 
-				var material = new THREE.MeshShaderMaterial( { fragment_shader: fragment_shader,
-															    vertex_shader: vertex_shader,
-															    uniforms: uniforms
-															  } );
-
-				//var material = new THREE.MeshLambertMaterial( { map: ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" ) } );
+				var material = new THREE.MeshShaderMaterial( { fragment_shader: fragment_shader, 
+									    vertex_shader: vertex_shader, 
+									    uniforms: uniforms
+									  } );
 
 				loader = new THREE.Loader( true );
 				document.body.appendChild( loader.statusDomElement );
@@ -231,13 +220,6 @@
 					mesh1.rotation.x = rx;
 
 				}
-
-				/*
-				lightMesh.position.x = 2500 * Math.cos( r );
-				lightMesh.position.z = 2500 * Math.sin( r );
-
-				r += 0.01;
-				*/
 
 				webglRenderer.render( scene, camera );
 

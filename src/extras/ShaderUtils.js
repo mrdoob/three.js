@@ -101,9 +101,9 @@ var ShaderUtils = {
 			fragment_shader: [
 
 			"uniform vec3 uDirLightPos;",
+			
+			"uniform vec3 uAmbientLightColor;",
 			"uniform vec3 uDirLightColor;",
-
-			"uniform vec3 uPointLightPos;",
 			"uniform vec3 uPointLightColor;",
 
 			"uniform vec3 uAmbientColor;",
@@ -125,7 +125,6 @@ var ShaderUtils = {
 			"varying vec3 vNormal;",
 			"varying vec2 vUv;",
 
-			"varying vec3 vLightWeighting;",
 			"varying vec3 vPointLightVector;",
 			"varying vec3 vViewPosition;",
 
@@ -190,11 +189,11 @@ var ShaderUtils = {
 
 				// all lights contribution summation
 
-				"vec4 totalLight = vec4( uAmbientColor, 1.0 );",
-				"totalLight += dirDiffuse + dirSpecular;",
-				"totalLight += pointDiffuse + pointSpecular;",
+				"vec4 totalLight = vec4( uAmbientLightColor * uAmbientColor, 1.0 );",
+				"totalLight += vec4( uDirLightColor, 1.0 ) * ( dirDiffuse + dirSpecular );",
+				"totalLight += vec4( uPointLightColor, 1.0 ) * ( pointDiffuse + pointSpecular );",
 
-				"gl_FragColor = vec4( totalLight.xyz * vLightWeighting * aoTex * diffuseTex, 1.0 );",
+				"gl_FragColor = vec4( totalLight.xyz * aoTex * diffuseTex, 1.0 );",
 
 			"}"
 			].join("\n"),
@@ -203,13 +202,7 @@ var ShaderUtils = {
 
 			"attribute vec4 tangent;",
 
-			"uniform vec3 uDirLightPos;",
-			"uniform vec3 uDirLightColor;",
-
 			"uniform vec3 uPointLightPos;",
-			"uniform vec3 uPointLightColor;",
-
-			"uniform vec3 uAmbientLightColor;",
 
 			"#ifdef VERTEX_TEXTURES",
 
@@ -224,7 +217,6 @@ var ShaderUtils = {
 			"varying vec3 vNormal;",
 			"varying vec2 vUv;",
 
-			"varying vec3 vLightWeighting;",
 			"varying vec3 vPointLightVector;",
 			"varying vec3 vViewPosition;",
 
@@ -245,22 +237,10 @@ var ShaderUtils = {
 
 				"vUv = uv;",
 
-				// ambient light
-
-				"vLightWeighting = uAmbientLightColor;",
-
 				// point light
 
 				"vec4 lPosition = viewMatrix * vec4( uPointLightPos, 1.0 );",
 				"vPointLightVector = normalize( lPosition.xyz - mvPosition.xyz );",
-				"float pointLightWeighting = max( dot( vNormal, vPointLightVector ), 0.0 );",
-				"vLightWeighting += uPointLightColor * pointLightWeighting;",
-
-				// directional light
-
-				"vec4 lDirection = viewMatrix * vec4( uDirLightPos, 0.0 );",
-				"float directionalLightWeighting = max( dot( vNormal, normalize( lDirection.xyz ) ), 0.0 );",
-				"vLightWeighting += uDirLightColor * directionalLightWeighting;",
 
 				// displacement mapping
 
