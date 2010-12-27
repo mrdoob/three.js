@@ -192,15 +192,15 @@ THREE.Geometry.prototype = {
 
 		}
 
-		function handleTriangle( context, a, b, c ) {
+		function handleTriangle( context, a, b, c, ua, ub, uc ) {
 
 			vA = context.vertices[ a ].position;
 			vB = context.vertices[ b ].position;
 			vC = context.vertices[ c ].position;
 
-			uvA = uv[ 0 ];
-			uvB = uv[ 1 ];
-			uvC = uv[ 2 ];
+			uvA = uv[ ua ];
+			uvB = uv[ ub ];
+			uvC = uv[ uc ];
 
 			x1 = vB.x - vA.x;
 			x2 = vC.x - vA.x;
@@ -239,7 +239,7 @@ THREE.Geometry.prototype = {
 
 			if ( face instanceof THREE.Face3 ) {
 
-				handleTriangle( this, face.a, face.b, face.c );
+				handleTriangle( this, face.a, face.b, face.c, 0, 1, 2 );
 
 				this.vertices[ face.a ].normal.copy( face.vertexNormals[ 0 ] );
 				this.vertices[ face.b ].normal.copy( face.vertexNormals[ 1 ] );
@@ -248,11 +248,8 @@ THREE.Geometry.prototype = {
 
 			} else if ( face instanceof THREE.Face4 ) {
 
-				handleTriangle( this, face.a, face.b, face.c );
-
-				// this messes up everything
-				// quads need to be handled differently
-				//handleTriangle( this, face.a, face.c, face.d );
+				handleTriangle( this, face.a, face.b, face.c, 0, 1, 2 );
+				handleTriangle( this, face.a, face.b, face.d, 0, 1, 3 );
 
 				this.vertices[ face.a ].normal.copy( face.vertexNormals[ 0 ] );
 				this.vertices[ face.b ].normal.copy( face.vertexNormals[ 1 ] );
