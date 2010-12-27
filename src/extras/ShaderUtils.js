@@ -101,7 +101,7 @@ var ShaderUtils = {
 			fragment_shader: [
 
 			"uniform vec3 uDirLightPos;",
-			
+
 			"uniform vec3 uAmbientLightColor;",
 			"uniform vec3 uDirLightColor;",
 			"uniform vec3 uPointLightColor;",
