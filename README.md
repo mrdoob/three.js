@@ -35,6 +35,9 @@ More? irc.freenode.net #three.js
 
 #### WebGL ####
 
+[![materials_normalmap2](http://mrdoob.github.com/three.js/assets/examples/33_materials_normalmap2.png)](http://mrdoob.github.com/three.js/examples/materials_normalmap2.html)
+[![materials_grass](http://mrdoob.github.com/three.js/assets/examples/32_materials_grass.png)](http://mrdoob.github.com/three.js/examples/materials_grass.html)
+[![materials_normalmap](http://mrdoob.github.com/three.js/assets/examples/31_materials_normalmap.png)](http://mrdoob.github.com/three.js/examples/materials_normalmap.html)
 [![geometry_terrain_gl](http://mrdoob.github.com/three.js/assets/examples/30_geometry_terrain_gl.png)](http://mrdoob.github.com/three.js/examples/geometry_terrain_gl.html)
 [![geometry_minecraft](http://mrdoob.github.com/three.js/assets/examples/29_geometry_minecraft.png)](http://mrdoob.github.com/three.js/examples/geometry_minecraft.html)
 [![materials_shader_fresnel](http://mrdoob.github.com/three.js/assets/examples/28_materials_shaders_fresnel.png)](http://mrdoob.github.com/three.js/examples/materials_shaders_fresnel.html)
