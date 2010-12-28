@@ -92,16 +92,13 @@
 				var images = ImageUtils.loadArray( urls );
 				var textureCube = new THREE.Texture( images );
 
-				var fragment_shader = ShaderUtils.lib["fresnel"].fragment_shader;
-				var vertex_shader = ShaderUtils.lib["fresnel"].vertex_shader;
-				var uniforms = ShaderUtils.lib["fresnel"].uniforms;
+				var shader = ShaderUtils.lib["fresnel"];
+				var uniforms = Uniforms.clone( shader.uniforms );
 
 				uniforms["tCube"].texture = textureCube;
 
-				var material = new THREE.MeshShaderMaterial( { fragment_shader: fragment_shader, 
-															   vertex_shader: vertex_shader, 
-															   uniforms: uniforms
-															} );
+				var parameters = { fragment_shader: shader.fragment_shader, vertex_shader: shader.vertex_shader, uniforms: uniforms };
+				var material = new THREE.MeshShaderMaterial( parameters );
 
 				for ( var i = 0; i < 200; i ++ ) {
 
@@ -111,6 +108,7 @@
 					mesh.position.z = Math.random() * 10000 - 5000;
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 4 + 1;
 					scene.addObject( mesh );
+					
 				}
 
 				SceneUtils.addPanoramaCubeWebGL( sceneCube, 100000, textureCube );

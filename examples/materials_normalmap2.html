@@ -141,9 +141,8 @@
 
 				var ambient = 0x444444, diffuse = 0x888888, specular = 0x080810, shininess = 2;
 
-				var fragment_shader = ShaderUtils.lib[ "normal" ].fragment_shader;
-				var vertex_shader = ShaderUtils.lib[ "normal" ].vertex_shader;
-				var uniforms = ShaderUtils.lib[ "normal" ].uniforms;
+				var shader = ShaderUtils.lib[ "normal" ];
+				var uniforms = Uniforms.clone( shader.uniforms );
  
 				uniforms[ "tNormal" ].texture = ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
 				uniforms[ "uNormalScale" ].value = - 0.75;
@@ -167,10 +166,8 @@
 
 				uniforms[ "uShininess" ].value = shininess;
 
-				var material = new THREE.MeshShaderMaterial( { fragment_shader: fragment_shader, 
-									    vertex_shader: vertex_shader, 
-									    uniforms: uniforms
-									  } );
+				var parameters = { fragment_shader: shader.fragment_shader, vertex_shader: shader.vertex_shader, uniforms: uniforms };
+				var material = new THREE.MeshShaderMaterial( parameters );
 
 				loader = new THREE.Loader( true );
 				document.body.appendChild( loader.statusDomElement );

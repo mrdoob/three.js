@@ -153,9 +153,8 @@
 
 				// normal map shader
 				
-				var fragment_shader = ShaderUtils.lib[ "normal" ].fragment_shader;
-				var vertex_shader = ShaderUtils.lib[ "normal" ].vertex_shader;
-				var uniforms = ShaderUtils.lib[ "normal" ].uniforms;
+				var shader = ShaderUtils.lib[ "normal" ];
+				var uniforms = Uniforms.clone( shader.uniforms );
 
 				uniforms[ "enableAO" ].value = true;
 				uniforms[ "enableDiffuse" ].value = false;
@@ -181,10 +180,8 @@
 				
 				uniforms[ "uShininess" ].value = shininess;
 
-				var material1 = new THREE.MeshShaderMaterial( { fragment_shader: fragment_shader, 
-															    vertex_shader: vertex_shader, 
-															    uniforms: uniforms
-															  } );
+				var parameters = { fragment_shader: shader.fragment_shader, vertex_shader: shader.vertex_shader, uniforms: uniforms };
+				var material1 = new THREE.MeshShaderMaterial( parameters );
 
 				var material2 = new THREE.MeshPhongMaterial( { color: diffuse, specular: specular, ambient: ambient, shininess: shininess } );
 
