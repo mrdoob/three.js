@@ -380,22 +380,21 @@ THREE.WebGLRenderer = function ( parameters ) {
 			
 			uniforms_dst[ u ] = {};
 			
-			for ( p in uniforms[ u ] ) {
+			for ( p in uniforms_src[ u ] ) {
 				
 				parameter_src = uniforms_src[ u ][ p ];
-				parameter_dst = uniforms_dst[ u ][ p ];
 				
 				if ( parameter_src instanceof THREE.Color ||
 					 parameter_src instanceof THREE.Vector3 ||
 					 parameter_src instanceof THREE.Texture ) {
 				
-					parameter_dst = parameter_src.clone();
+					uniforms_dst[ u ][ p ] = parameter_src.clone();
 					
 				} else {
 					
-					parameter_dst = parameter_src;
+					uniforms_dst[ u ][ p ] = parameter_src;
 					
-				}				
+				}
 				
 			}
 			
