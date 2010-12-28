@@ -11,6 +11,9 @@ THREE.CanvasRenderer = function () {
 	_canvasWidth, _canvasHeight, _canvasWidthHalf, _canvasHeightHalf,
 	_context = _canvas.getContext( '2d' ),
 
+	_clearColor = null,
+	_clearOpacity = null,
+
 	_contextGlobalAlpha = 1,
 	_contextGlobalCompositeOperation = 0,
 	_contextStrokeStyle = null,
@@ -86,6 +89,16 @@ THREE.CanvasRenderer = function () {
 
 	};
 
+	this.setClearColor = function( hex, opacity ) {
+
+		_clearColor = hex !== null ? new THREE.Color( hex ) : null;
+		_clearOpacity = opacity;
+
+		_clearRect.set( - _canvasWidthHalf, - _canvasHeightHalf, _canvasWidthHalf, _canvasHeightHalf );
+		_context.setTransform( 1, 0, 0, - 1, _canvasWidthHalf, _canvasHeightHalf );
+		this.clear();
+	};
+
 	this.clear = function () {
 
 		if ( !_clearRect.isEmpty() ) {
@@ -93,7 +106,19 @@ THREE.CanvasRenderer = function () {
 			_clearRect.inflate( 1 );
 			_clearRect.minSelf( _clipRect );
 
-			_context.clearRect( _clearRect.getX(), _clearRect.getY(), _clearRect.getWidth(), _clearRect.getHeight() );
+			if ( _clearColor !== null ) {
+
+				setBlending( THREE.NormalBlending );
+				setOpacity( 1 );
+
+				_context.fillStyle = 'rgba(' + Math.floor( _clearColor.r * 255 ) + ',' + Math.floor( _clearColor.g * 255 ) + ',' + Math.floor( _clearColor.b * 255 ) + ',' + _clearOpacity + ')';
+				_context.fillRect( _clearRect.getX(), _clearRect.getY(), _clearRect.getWidth(), _clearRect.getHeight() );
+
+			} else {
+
+				_context.clearRect( _clearRect.getX(), _clearRect.getY(), _clearRect.getWidth(), _clearRect.getHeight() );
+
+			}
 
 			_clearRect.empty();
 
@@ -683,80 +708,6 @@ THREE.CanvasRenderer = function () {
 
 		}
 
-		//
-
-		function setOpacity( value ) {
-
-			if ( _contextGlobalAlpha != value ) {
-
-				_context.globalAlpha = _contextGlobalAlpha = value;
-
-			}
-
-		}
-
-		function setBlending( value ) {
-
-			if ( _contextGlobalCompositeOperation != value ) {
-
-				switch ( value ) {
-
-					case THREE.NormalBlending:
-
-						_context.globalCompositeOperation = 'source-over';
-
-						break;
-
-					case THREE.AdditiveBlending:
-
-						_context.globalCompositeOperation = 'lighter';
-
-						break;
-
-					case THREE.SubtractiveBlending:
-
-						_context.globalCompositeOperation = 'darker';
-
-						break;
-
-				}
-
-				_contextGlobalCompositeOperation = value;
-
-			}
-
-		}
-
-		function setLineWidth( value ) {
-
-			if ( _contextLineWidth != value ) {
-
-				_context.lineWidth = _contextLineWidth = value;
-
-			}
-
-		}
-
-		function setStrokeStyle( value ) {
-
-			if ( _contextStrokeStyle != value ) {
-
-				_context.strokeStyle = _contextStrokeStyle  = value;
-
-			}
-
-		}
-
-		function setFillStyle( value ) {
-
-			if ( _contextFillStyle != value ) {
-
-				_context.fillStyle = _contextFillStyle = value;
-
-			}
-
-		}
-
 		function getGradientTexture( color1, color2, color3, color4 ) {
 
 			// http://mrdoob.com/blog/post/710
@@ -823,5 +774,79 @@ THREE.CanvasRenderer = function () {
 		}
 
 	};
+
+	// Context cached methods.
+
+	function setOpacity( value ) {
+
+		if ( _contextGlobalAlpha != value ) {
+
+			_context.globalAlpha = _contextGlobalAlpha = value;
+
+		}
+
+	}
+
+	function setBlending( value ) {
+
+		if ( _contextGlobalCompositeOperation != value ) {
+
+			switch ( value ) {
+
+				case THREE.NormalBlending:
+
+					_context.globalCompositeOperation = 'source-over';
+
+					break;
+
+				case THREE.AdditiveBlending:
+
+					_context.globalCompositeOperation = 'lighter';
+
+					break;
+
+				case THREE.SubtractiveBlending:
+
+					_context.globalCompositeOperation = 'darker';
+
+					break;
+
+			}
+
+			_contextGlobalCompositeOperation = value;
+
+		}
+
+	}
+
+	function setLineWidth( value ) {
+
+		if ( _contextLineWidth != value ) {
+
+			_context.lineWidth = _contextLineWidth = value;
+
+		}
+
+	}
+
+	function setStrokeStyle( value ) {
+
+		if ( _contextStrokeStyle != value ) {
+
+			_context.strokeStyle = _contextStrokeStyle  = value;
+
+		}
+
+	}
+
+	function setFillStyle( value ) {
+
+		if ( _contextFillStyle != value ) {
+
+			_context.fillStyle = _contextFillStyle = value;
+
+		}
+
+	}
 
 };

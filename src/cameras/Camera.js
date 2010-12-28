@@ -12,12 +12,12 @@ THREE.Camera = function ( fov, aspect, near, far ) {
 	this.position = new THREE.Vector3();
 	this.target = { position: new THREE.Vector3() };
 
-	this.up = new THREE.Vector3( 0, 1, 0 );
-
-	this.matrix = new THREE.Matrix4();
-	this.projectionMatrix = null;
-
 	this.autoUpdateMatrix = true;
+
+	this.projectionMatrix = null;
+	this.matrix = new THREE.Matrix4();
+
+	this.up = new THREE.Vector3( 0, 1, 0 );
 
 	this.translateX = function ( amount ) {
 
@@ -58,10 +58,14 @@ THREE.Camera = function ( fov, aspect, near, far ) {
 
 	this.updateProjectionMatrix();
 
-	this.toString = function () {
+};
+
+THREE.Camera.prototype = {
+
+	toString: function () {
 
 		return 'THREE.Camera ( ' + this.position + ', ' + this.target.position + ' )';
 
-	};
+	}
 
 };
