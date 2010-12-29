@@ -34,7 +34,8 @@
 		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl terrain demo<br />(left click: forward, right click: backward)</div> 
 
 		<script type="text/javascript" src="js/Stats.js"></script>
-		<script type="text/javascript" src="js/ImprovedNoise.js"></script>
+		<script type="text/javascript" src="js/PRNG.js"></script>
+		<script type="text/javascript" src="js/SimplexNoise.js"></script>
 
 		<script type="text/javascript" src="../build/Three.js"></script>
 		<script type="text/javascript" src="../src/extras/primitives/Plane.js"></script>
@@ -75,10 +76,10 @@
 
 				data = generateHeight( worldWidth, worldDepth );
 
-				camera.position.y = data[ worldHalfWidth + worldHalfDepth * worldWidth ] + 500;
+				camera.position.y = ( data[ worldHalfWidth + ( worldHalfDepth * worldWidth ) ] * 10 ) + 200;
 				camera.target.position.y = camera.position.y;
 
-				var geometry = new Plane( 7500, 7500, worldWidth - 1, worldDepth - 1 );
+				var geometry = new Plane( 10000, 10000, worldWidth - 1, worldDepth - 1 );
 
 				for ( var i = 0, l = geometry.vertices.length; i < l; i ++ ) {
 
@@ -111,6 +112,7 @@
 
 			}
 
+			/*
 			function generateHeight( width, height ) {
 
 				var size = width * height, data = new Float32Array( size ),
@@ -139,11 +141,71 @@
 				return data;
 
 			}
+			*/
+
+			function generateHeight( width, height ) {
+
+				var x, y, h, quality = 100, size = width * height, octaves = 10, offsetX = 100, offsetY = 100, data = [],
+				prng = new PRNG(), simplex1 = new SimplexNoise( prng ), simplex2 = new SimplexNoise( prng ), simplex3 = new SimplexNoise( prng );
+
+				simplex1.setSeed( Math.random() * 100 );
+				simplex2.setSeed( Math.random() * 100 );
+				simplex3.setSeed( Math.random() * 100 );
+
+				// Base Terrain
+
+				for ( var i = 0; i < size; i ++ ) {
+
+					x = ( ( i % width ) + offsetX ) / quality;
+					y = ( ~~ ( i / width ) + offsetY ) / quality;
+					h = 32 - ( Math.abs( simplex1.noise( x, y, 0 ) + simplex2.noise( x, y, 0 ) ) - simplex3.noise( x, y, 0 ) ) * 64;
+
+					data[ i ] = h;
+
+				}
+
+				// Blur
+
+				for ( var i = 0; i < size; i ++ ) {
+
+					x = i % width;
+
+					if ( x == 0 ) continue;
+					if ( x = width - 1 ); continue;
+
+					data[ i ] += ( data[ i - 1 ] + data[ i + 1 ] ) * 0.5;
+					data[ i ] *= 0.5;
+
+				}
+
+				for ( var i = width; i < size - width; i ++ ) {
+
+					data[ i ] += ( data[ i - width ] + data[ i + width ] ) * 0.5;
+					data[ i ] *= 0.5;
+
+				}
+
+				for ( var j = 4; j < 100; j *= 2 ) {
+
+					for ( var i = 0; i < size; i ++ ) {
+
+						x = ( ( i % width ) + offsetX ) / j,
+						y = ( ~~ ( i / width ) + offsetY ) / j;
+
+						data[ i ] -= Math.abs( simplex1.noise( x, y, 0 ) * simplex2.noise( x, y, 0 ) * simplex3.noise( x, y, 0 ) ) * j;
+
+					}
+
+				}
+
+				return data;
+
+			}
 
 			function generateTexture( data, width, height ) {
 
 				var canvas, canvasScaled, context, image, imageData,
-				level, diff, vector3, sun, shade;
+				level, diff, texel, vector3, sun, shade;
 
 				vector3 = new THREE.Vector3( 0, 0, 0 );
 
@@ -163,16 +225,32 @@
 
 				for ( var i = 0, j = 0, l = imageData.length; i < l; i += 4, j ++ ) {
 
-					vector3.x = data[ j - 2 ] - data[ j + 2 ];
-					vector3.y = 2;
-					vector3.z = data[ j - width * 2 ] - data[ j + width * 2 ];
-					vector3.normalize();
+					texel = data[ j ];
 
-					shade = vector3.dot( sun );
+					/*
+					imageData[ i ] = texel;
+					imageData[ i + 1 ] = texel;
+					imageData[ i + 2 ] = texel;
+					continue;
+					*/
 
-					imageData[ i ] = ( 96 + shade * 128 ) * ( 0.5 + data[ j ] * 0.007 );
-					imageData[ i + 1 ] = ( 32 + shade * 96 ) * ( 0.5 + data[ j ] * 0.007 );
-					imageData[ i + 2 ] = ( shade * 96 ) * ( 0.5 + data[ j ] * 0.007 );
+					shade = 0;
+
+					for ( var k = 1; k < 16; k ++ ) {
+
+						vector3.x = data[ j - k ] - data[ j + k ];
+						vector3.y = 1;
+						vector3.z = data[ j - width * k ] - data[ j + width * k ];
+						vector3.normalize();
+
+						shade += vector3.dot( sun ) * ( 16 - k );
+
+					}
+
+					imageData[ i ] = ( 128 + shade ) + texel;
+					imageData[ i + 1 ] = ( 64 + shade ) + texel;
+					imageData[ i + 2 ] = ( 32 + shade ) + texel;
+
 				}
 
 				context.putImageData( image, 0, 0 );
@@ -244,8 +322,8 @@
 
 			function loop() {
 
-				if ( moveForward ) camera.translateZ( - 15 );
-				if ( moveBackward ) camera.translateZ( 15 );
+				if ( moveForward ) camera.translateZ( - 10 );
+				if ( moveBackward ) camera.translateZ( 10 );
 
 				lon += mouseX * 0.004;
 				lat -= mouseY * 0.004;

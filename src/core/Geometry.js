@@ -113,7 +113,7 @@ THREE.Geometry.prototype = {
 
 	computeVertexNormals: function () {
 
-		var v, vertices = [],
+		var v, vl, vertices = [],
 		f, fl, face;
 
 		for ( v = 0, vl = this.vertices.length; v < vl; v ++ ) {
@@ -179,7 +179,7 @@ THREE.Geometry.prototype = {
 
 		var f, fl, v, vl, face, uv, vA, vB, vC, uvA, uvB, uvC,
 			x1, x2, y1, y2, z1, z2,
-			s1, s2, t1, t2, r, t, n,
+			s1, s2, t1, t2, r, t, test,
 			tan1 = [], tan2 = [],
 			sdir = new THREE.Vector3(), tdir = new THREE.Vector3(),
 			tmp = new THREE.Vector3(), tmp2 = new THREE.Vector3(),
@@ -355,7 +355,7 @@ THREE.Geometry.prototype = {
 		// which could then use vertex color attributes instead of each being
 		// in its separate VBO
 
-		var i, l, f, fl, face, material, vertices, mhash, ghash, hash_map = {};
+		var i, l, f, fl, face, material, materials, vertices, mhash, ghash, hash_map = {};
 
 		function materialHash( material ) {
 

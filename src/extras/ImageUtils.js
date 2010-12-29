@@ -20,7 +20,7 @@ var ImageUtils = {
 
 			images[ i ] = new Image();
 			images[ i ].loaded = 0;
-			images[ i ].onload = function () { images.loadCount += 1; this.loaded = true; }
+			images[ i ].onload = function () { images.loadCount += 1; this.loaded = true; };
 			images[ i ].src = array[ i ];
 
 		}
@@ -29,4 +29,4 @@ var ImageUtils = {
 
 	}
 
-}
+};

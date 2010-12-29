@@ -38,12 +38,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	maxLightCount = allocateLights( parameters.scene, 4 ),
 	fog = parameters.scene ? parameters.scene.fog : null,
-	
+
 	antialias = parameters.antialias != undefined ? parameters.antialias : true,
-	
+
 	clearColor = parameters.clearColor ? new THREE.Color( parameters.clearColor ) : new THREE.Color( 0x000000 ),
 	clearAlpha = parameters.clearAlpha ? parameters.clearAlpha : 0;
-	
+
 	this.domElement = _canvas;
 	this.autoClear = true;
 
@@ -63,12 +63,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 	};
 
 	this.setClearColor = function( hex, alpha ) {
-		
+
 		var color = new THREE.Color( hex );
 		_gl.clearColor( color.r, color.g, color.b, alpha );
-		
+
 	};
-	
+
 	this.clear = function () {
 
 		_gl.clear( _gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT );
@@ -122,7 +122,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.createBuffers = function ( object, g ) {
 
-		var f, fl, fi, face, vertexNormals, normal, uv, v1, v2, v3, v4, t1, t2, t3, t4, m, ml, i,
+		var f, fl, fi, face, vertexNormals, faceNormal, normal, uv, v1, v2, v3, v4, t1, t2, t3, t4, m, ml, i,
 
 		faceArray = [],
 		lineArray = [],
@@ -321,7 +321,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		geometryChunk.__webGLLineCount = lineArray.length;
 
 	};
-	
+
 	function setMaterialShaders( material, shaders ) {
 
 		material.fragment_shader = shaders.fragment_shader;
@@ -340,30 +340,30 @@ THREE.WebGLRenderer = function ( parameters ) {
 		
 		material.uniforms.opacity.value = material.opacity;
 		material.uniforms.map.texture = material.map;
-		
+
 		material.uniforms.env_map.texture = material.env_map;
 		material.uniforms.reflectivity.value = material.reflectivity;
 		material.uniforms.refraction_ratio.value = material.refraction_ratio;
 		material.uniforms.combine.value = material.combine;
 		material.uniforms.useRefract.value = material.env_map && material.env_map.mapping instanceof THREE.CubeRefractionMapping;
-		
+
 		if ( fog ) {
 
 			material.uniforms.fogColor.value.setHex( fog.color.hex );
-			
+
 			if ( fog instanceof THREE.Fog ) {
-				
+
 				material.uniforms.fogNear.value = fog.near;
 				material.uniforms.fogFar.value = fog.far;
-				
+
 			} else if ( fog instanceof THREE.FogExp2 ) {
-				
+
 				material.uniforms.fogDensity.value = fog.density;
-				
+
 			}
 
 		}
-		
+
 	};
 	
 	function refreshLights( material, lights ) {
@@ -375,8 +375,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		material.uniforms.pointLightColor.value = lights.point.colors;
 		material.uniforms.pointLightPosition.value = lights.point.positions;
 		
-	}
-	
+	};
 	
 	this.renderBuffer = function ( camera, lights, fog, material, geometryChunk ) {
 
@@ -409,9 +408,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 					setMaterialShaders( material, THREE.ShaderLib[ 'normal' ] );
 
 				} else if ( material instanceof THREE.MeshBasicMaterial ) {
-					
+
 					setMaterialShaders( material, THREE.ShaderLib[ 'basic' ] );
-					
+
 					refreshUniforms( material, fog );
 					
 				} else if ( material instanceof THREE.MeshLambertMaterial ) {
@@ -492,9 +491,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 			 material instanceof THREE.MeshLambertMaterial ) {
 			
 			refreshUniforms( material, fog );
-		
+
 		}
-		
+
 		if ( material instanceof THREE.MeshShaderMaterial ||
 		     material instanceof THREE.MeshDepthMaterial ||
 			 material instanceof THREE.MeshNormalMaterial ||
@@ -540,16 +539,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 			if ( fog ) {
 
 				_gl.uniform3f( program.uniforms.fogColor, fog.color.r, fog.color.g, fog.color.b );
-				
+
 				if ( fog instanceof THREE.Fog ) {
-				
+
 					_gl.uniform1f( program.uniforms.fogNear, fog.near );
 					_gl.uniform1f( program.uniforms.fogFar, fog.far );
-					
+
 				} else if ( fog instanceof THREE.FogExp2 ) {
-					
+
 					_gl.uniform1f( program.uniforms.fogDensity, fog.density );
-					
+
 				}
 
 			}
@@ -1154,7 +1153,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				"}",
 
 				THREE.Snippets[ "fog_fragment" ],
-				
+
 			"}" ];
 
 		return chunks.join("\n");
@@ -1234,7 +1233,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			parameters.fog ? "#define USE_FOG" : "",
 			parameters.fog instanceof THREE.FogExp2 ? "#define FOG_EXP2" : "",
-		
+
 			parameters.map ? "#define USE_MAP" : "",
 			parameters.env_map ? "#define USE_ENVMAP" : "",
 
@@ -1548,7 +1547,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function bufferNeedsSmoothNormals( geometryChunk, object ) {
 
-		var m, ml, i, l, needsSmoothNormals = false;
+		var m, ml, i, l, meshMaterial, needsSmoothNormals = false;
 
 		for ( m = 0, ml = object.materials.length; m < ml; m++ ) {
 
@@ -1590,7 +1589,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( scene ) {
 
-			var l, ll, light, dirLights = pointLights = maxDirLights = maxPointLights = 0;
+			var l, ll, light, dirLights, pointLights, maxDirLights, maxPointLights;
+			dirLights = pointLights = maxDirLights = maxPointLights = 0;
 
 			for ( l = 0, ll = scene.lights.length; l < ll; l++ ) {
 
@@ -1660,24 +1660,24 @@ THREE.Snippets = {
 	fog_pars_fragment: [
 
 	"#ifdef USE_FOG",
-	
+
 		"uniform vec3 fogColor;",
-		
+
 		"#ifdef FOG_EXP2",
 			"uniform float fogDensity;",
 		"#else",
 			"uniform float fogNear;",
 			"uniform float fogFar;",
 		"#endif",
-		
+
 	"#endif"
-	
+
 	].join("\n"),
 
 	fog_fragment: [
 
 	"#ifdef USE_FOG",
-	
+
 		"float depth = gl_FragCoord.z / gl_FragCoord.w;",
 
 		"#ifdef FOG_EXP2",
@@ -1687,7 +1687,7 @@ THREE.Snippets = {
 		"#else",
 			"float fogFactor = smoothstep( fogNear, fogFar, depth );",
 		"#endif",
-		
+
 		"gl_FragColor = mix( gl_FragColor, vec4( fogColor, 1.0 ), fogFactor );",
 
 	"#endif"
@@ -1868,7 +1868,7 @@ THREE.Snippets = {
 	"}"
 
 	].join("\n")
-	
+
 };
 
 THREE.ShaderLib = {
@@ -1937,9 +1937,9 @@ THREE.ShaderLib = {
 		].join("\n")
 
 	},
-	
+
 	'basic': {
-		
+
 		uniforms: { "color"   : { type: "c", value: new THREE.Color( 0xeeeeee ) },
 					"opacity" : { type: "f", value: 1 },
 					"map"     : { type: "t", value: 0, texture: null },
@@ -1953,9 +1953,9 @@ THREE.ShaderLib = {
 					"fogFar"	: { type: "f", value: 2000 },
 					"fogColor"	: { type: "c", value: new THREE.Color( 0xffffff ) }
 				},
-		
+
 		fragment_shader: [
-			
+
 			"uniform vec3 color;",
 			"uniform float opacity;",
 			
@@ -1964,7 +1964,7 @@ THREE.ShaderLib = {
 			THREE.Snippets[ "fog_pars_fragment" ],
 				
 			"void main() {",
-					
+
 				"vec4 mColor = vec4( color, opacity );",
 				"vec4 mapColor = vec4( 1.0, 1.0, 1.0, 1.0 );",
 				"vec4 cubeColor = vec4( 1.0, 1.0, 1.0, 1.0 );",
@@ -2048,11 +2048,11 @@ THREE.ShaderLib = {
 				
 				THREE.Snippets[ "envmap_fragment" ],
 				THREE.Snippets[ "fog_fragment" ],
-				
+
 			"}"
 
 		].join("\n"),
-		
+
 		vertex_shader: [
 		
 			"varying vec3 vLightWeighting;",

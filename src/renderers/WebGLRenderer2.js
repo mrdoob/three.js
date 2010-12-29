@@ -14,6 +14,7 @@ THREE.WebGLRenderer2 = function ( antialias ) {
 	_canvas = document.createElement( 'canvas' ),
 	_gl, _currentProgram,
 	_modelViewMatrix = new THREE.Matrix4(),
+	_normalMatrix = new THREE.Matrix4(),
 	_viewMatrixArray = new Float32Array( 16 ),
 	_modelViewMatrixArray = new Float32Array( 16 ),
 	_projectionMatrixArray = new Float32Array( 16 ),
@@ -100,7 +101,7 @@ THREE.WebGLRenderer2 = function ( antialias ) {
 
 		function renderObject( object ) {
 
-			var geometry, material, m, nl,
+			var geometry, material, m, ml,
 			program, uniforms, attributes;
 
 			object.autoUpdateMatrix && object.updateMatrix();
@@ -268,11 +269,11 @@ THREE.WebGLRenderer2 = function ( antialias ) {
 
 			} else if ( object instanceof THREE.Line ) {
 
-				
+
 
 			} else if ( object instanceof THREE.Particle ) {
 
-				
+
 
 			}
 
@@ -283,10 +284,9 @@ THREE.WebGLRenderer2 = function ( antialias ) {
 		function buildBuffers( geometry ) {
 
 			var itemCount = 0, vertexIndex, group,
-			f, fl, face, v1, v2, v3, vertexNormals, normal, uv,
+			f, fl, face, v1, v2, v3, v4, vertexNormals, faceNormal, normal, uv,
 			vertexGroups = [], faceGroups = [], lineGroups = [], normalGroups = [], uvGroups = [],
-			vertices, faces, lines, normals, uvs,
-			buffers = {};
+			vertices, faces, lines, normals, uvs;
 
 			for ( f = 0, fl = geometry.faces.length; f < fl; f++ ) {
 
@@ -544,9 +544,9 @@ THREE.WebGLRenderer2 = function ( antialias ) {
 
 				identifiers.push( 'mColor', 'mOpacity' );
 
-				material.map ? identifiers.push( 'tMap' ) : null;
-				material.env_map ? identifiers.push( 'tSpherical' ) : null;
-				material.fog ? identifiers.push( 'fog', 'fogColor', 'fogNear', 'fogFar' ) : null;
+				if ( material.map ) identifiers.push( 'tMap' );
+				if ( material.env_map ) identifiers.push( 'tSpherical' );
+				if ( material.fog ) identifiers.push( 'fog', 'fogColor', 'fogNear', 'fogFar' );
 
 
 			} else if ( material instanceof THREE.MeshNormalMaterial ) {
@@ -622,7 +622,7 @@ THREE.WebGLRenderer2 = function ( antialias ) {
 
 		function compileProgram( vertex_shader, fragment_shader ) {
 
-			var program = _gl.createProgram(), shader
+			var program = _gl.createProgram(), shader, prefix_vertex, prefix_fragment;
 
 			prefix_vertex = [
 				maxVertexTextures() > 0 ? "#define VERTEX_TEXTURES" : "",

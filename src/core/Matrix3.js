@@ -18,4 +18,4 @@ THREE.Matrix3.prototype = {
 
 	}
 
-}
+};

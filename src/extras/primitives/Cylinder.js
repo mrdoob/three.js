@@ -76,7 +76,7 @@ var Cylinder = function ( numSegs, topRad, botRad, height, topOffset, botOffset 
 
 	}
 
-}
+};
 
 Cylinder.prototype = new THREE.Geometry();
 Cylinder.prototype.constructor = Cylinder;

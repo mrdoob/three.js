@@ -110,7 +110,7 @@ var Sphere = function ( radius, segments_width, segments_height ) {
 
 	this.boundingSphere = { radius: radius };
 
-}
+};
 
 Sphere.prototype = new THREE.Geometry();
 Sphere.prototype.constructor = Sphere;

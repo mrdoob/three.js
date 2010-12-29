@@ -64,7 +64,7 @@ var Cube = function ( width, height, depth, segments_width, segments_height, mat
 
 	function buildPlane( u, v, udir, vdir, width, height, depth, material ) {
 
-		var w,
+		var w, ix, iy,
 		gridX = segments_width || 1,
 		gridY = segments_height || 1,
 		gridX1 = gridX + 1,
@@ -160,7 +160,7 @@ var Cube = function ( width, height, depth, segments_width, segments_height, mat
 
 		}
 
-		for ( var i = 0, l = scope.faces.length; i < l; i ++ ) {
+		for ( i = 0, il = scope.faces.length; i < il; i ++ ) {
 
 			var face = scope.faces[ i ];
 
@@ -179,7 +179,7 @@ var Cube = function ( width, height, depth, segments_width, segments_height, mat
 	this.computeFaceNormals();
 	this.sortFacesByMaterial();
 
-}
+};
 
 Cube.prototype = new THREE.Geometry();
 Cube.prototype.constructor = Cube;
