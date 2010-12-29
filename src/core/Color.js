@@ -7,7 +7,7 @@ THREE.Color = function ( hex ) {
 	this.autoUpdate = true;
 	this.setHex( hex );
 
-}
+};
 
 THREE.Color.prototype = {
 
@@ -65,7 +65,7 @@ THREE.Color.prototype = {
 
 	},
 
-	
+
 	toString: function () {
 
 		return 'THREE.Color ( r: ' + this.r + ', g: ' + this.g + ', b: ' + this.b + ', hex: ' + this.hex + ' )';

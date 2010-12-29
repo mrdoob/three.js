@@ -24,4 +24,4 @@ THREE.UV.prototype = {
 
 	}
 
-}
+};

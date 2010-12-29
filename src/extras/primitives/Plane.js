@@ -56,7 +56,7 @@ var Plane = function ( width, height, segments_width, segments_height ) {
 	this.computeFaceNormals();
 	this.sortFacesByMaterial();
 
-}
+};
 
 Plane.prototype = new THREE.Geometry();
 Plane.prototype.constructor = Plane;

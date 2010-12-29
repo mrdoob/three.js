@@ -28,7 +28,7 @@ var GeometryUtils = {
 
 		}
 
-		for ( var i = 0, il = faces2.length; i < il; i ++ ) {
+		for ( i = 0, il = faces2.length; i < il; i ++ ) {
 
 			var face = faces2[ i ], faceCopy, normal,
 			faceVertexNormals = face.vertexNormals;
@@ -59,7 +59,7 @@ var GeometryUtils = {
 
 		}
 
-		for ( var i = 0, il = uvs2.length; i < il; i ++ ) {
+		for ( i = 0, il = uvs2.length; i < il; i ++ ) {
 
 			var uv = uvs2[ i ], uvCopy = [];
 
@@ -75,4 +75,4 @@ var GeometryUtils = {
 
 	}
 
-}
+};

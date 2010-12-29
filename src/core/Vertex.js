@@ -16,7 +16,7 @@ THREE.Vertex = function ( position, normal ) {
 
 	this.__visible = true;
 
-}
+};
 
 THREE.Vertex.prototype = {
 
