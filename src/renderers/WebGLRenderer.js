@@ -1304,6 +1304,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				_gl.uniform3fv( location, value );
 
+			} else if( type == "v2" ) {
+
+				_gl.uniform2f( location, value.x, value.y );
+
 			} else if( type == "v3" ) {
 
 				_gl.uniform3f( location, value.x, value.y, value.z );
