@@ -153,9 +153,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 				v2 = object.geometry.vertices[ face.b ].position;
 				v3 = object.geometry.vertices[ face.c ].position;
 
-				vertexArray.push( v1.x, v1.y, v1.z );
-				vertexArray.push( v2.x, v2.y, v2.z );
-				vertexArray.push( v3.x, v3.y, v3.z );
+				vertexArray.push( v1.x, v1.y, v1.z,
+								  v2.x, v2.y, v2.z,
+								  v3.x, v3.y, v3.z );
 
 				if ( object.geometry.hasTangents ) {
 
@@ -163,9 +163,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 					t2 = object.geometry.vertices[ face.b ].tangent;
 					t3 = object.geometry.vertices[ face.c ].tangent;
 
-					tangentArray.push( t1.x, t1.y, t1.z, t1.w );
-					tangentArray.push( t2.x, t2.y, t2.z, t2.w );
-					tangentArray.push( t3.x, t3.y, t3.z, t3.w );
+					tangentArray.push( t1.x, t1.y, t1.z, t1.w,
+									   t2.x, t2.y, t2.z, t2.w,
+									   t3.x, t3.y, t3.z, t3.w );
 
 				}
 
@@ -202,9 +202,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				// TODO: don't add lines that already exist (faces sharing edge)
 
-				lineArray.push( vertexIndex, vertexIndex + 1 );
-				lineArray.push( vertexIndex, vertexIndex + 2 );
-				lineArray.push( vertexIndex + 1, vertexIndex + 2 );
+				lineArray.push( vertexIndex, vertexIndex + 1,
+								vertexIndex, vertexIndex + 2,
+								vertexIndex + 1, vertexIndex + 2 );
 
 				vertexIndex += 3;
 
@@ -215,10 +215,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 				v3 = object.geometry.vertices[ face.c ].position;
 				v4 = object.geometry.vertices[ face.d ].position;
 
-				vertexArray.push( v1.x, v1.y, v1.z );
-				vertexArray.push( v2.x, v2.y, v2.z );
-				vertexArray.push( v3.x, v3.y, v3.z );
-				vertexArray.push( v4.x, v4.y, v4.z );
+				vertexArray.push( v1.x, v1.y, v1.z,
+								  v2.x, v2.y, v2.z,
+								  v3.x, v3.y, v3.z,
+								  v4.x, v4.y, v4.z );
 
 				if ( object.geometry.hasTangents ) {
 
@@ -227,10 +227,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 					t3 = object.geometry.vertices[ face.c ].tangent;
 					t4 = object.geometry.vertices[ face.d ].tangent;
 
-					tangentArray.push( t1.x, t1.y, t1.z, t1.w );
-					tangentArray.push( t2.x, t2.y, t2.z, t2.w );
-					tangentArray.push( t3.x, t3.y, t3.z, t3.w );
-					tangentArray.push( t4.x, t4.y, t4.z, t4.w );
+					tangentArray.push( t1.x, t1.y, t1.z, t1.w,
+									   t2.x, t2.y, t2.z, t2.w,
+									   t3.x, t3.y, t3.z, t3.w,
+									   t4.x, t4.y, t4.z, t4.w );
 
 				}
 
@@ -262,16 +262,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				faceArray.push( vertexIndex, vertexIndex + 1, vertexIndex + 2 );
-				faceArray.push( vertexIndex, vertexIndex + 2, vertexIndex + 3 );
+				faceArray.push( vertexIndex, vertexIndex + 1, vertexIndex + 2,
+								vertexIndex, vertexIndex + 2, vertexIndex + 3 );
 
 				// TODO: don't add lines that already exist (faces sharing edge)
 
-				lineArray.push( vertexIndex, vertexIndex + 1 );
-				lineArray.push( vertexIndex, vertexIndex + 2 );
-				lineArray.push( vertexIndex, vertexIndex + 3 );
-				lineArray.push( vertexIndex + 1, vertexIndex + 2 );
-				lineArray.push( vertexIndex + 2, vertexIndex + 3 );
+				lineArray.push( vertexIndex, vertexIndex + 1,
+								vertexIndex, vertexIndex + 2,
+								vertexIndex, vertexIndex + 3,
+								vertexIndex + 1, vertexIndex + 2,
+								vertexIndex + 2, vertexIndex + 3 );
 
 				vertexIndex += 4;
 
@@ -1032,8 +1032,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			"void main() {",
 
-				"vec4 mapColor = vec4( 1.0, 1.0, 1.0, 1.0 );",
-				"vec4 cubeColor = vec4( 1.0, 1.0, 1.0, 1.0 );",
+				"vec4 mapColor = vec4( 1.0 );",
+				"vec4 cubeColor = vec4( 1.0 );",
 
 				// diffuse map
 
@@ -1066,8 +1066,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					"#if MAX_POINT_LIGHTS > 0",
 						
-						"vec4 pointDiffuse  = vec4( 0.0, 0.0, 0.0, 0.0 );",
-						"vec4 pointSpecular = vec4( 0.0, 0.0, 0.0, 0.0 );",
+						"vec4 pointDiffuse  = vec4( 0.0 );",
+						"vec4 pointSpecular = vec4( 0.0 );",
 
 						"for( int i = 0; i < MAX_POINT_LIGHTS; i++ ) {",
 
@@ -1101,8 +1101,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 					
 					"#if MAX_DIR_LIGHTS > 0",
 					
-						"vec4 dirDiffuse  = vec4( 0.0, 0.0, 0.0, 0.0 );",
-						"vec4 dirSpecular = vec4( 0.0, 0.0, 0.0, 0.0 );" ,
+						"vec4 dirDiffuse  = vec4( 0.0 );",
+						"vec4 dirSpecular = vec4( 0.0 );" ,
 
 						"for( int i = 0; i < MAX_DIR_LIGHTS; i++ ) {",
 
@@ -1834,7 +1834,7 @@ THREE.Snippets = {
 	
 	"if ( !enableLighting ) {",
 
-		"vLightWeighting = vec3( 1.0, 1.0, 1.0 );",
+		"vLightWeighting = vec3( 1.0 );",
 
 	"} else {",
 
@@ -1970,8 +1970,8 @@ THREE.ShaderLib = {
 			"void main() {",
 
 				"vec4 mColor = vec4( color, opacity );",
-				"vec4 mapColor = vec4( 1.0, 1.0, 1.0, 1.0 );",
-				"vec4 cubeColor = vec4( 1.0, 1.0, 1.0, 1.0 );",
+				"vec4 mapColor = vec4( 1.0 );",
+				"vec4 cubeColor = vec4( 1.0 );",
 
 				THREE.Snippets[ "map_fragment" ],
 				
@@ -2043,8 +2043,8 @@ THREE.ShaderLib = {
 			"void main() {",
 					
 				"vec4 mColor = vec4( color, opacity );",
-				"vec4 mapColor = vec4( 1.0, 1.0, 1.0, 1.0 );",
-				"vec4 cubeColor = vec4( 1.0, 1.0, 1.0, 1.0 );",
+				"vec4 mapColor = vec4( 1.0 );",
+				"vec4 cubeColor = vec4( 1.0 );",
 
 				THREE.Snippets[ "map_fragment" ],
 
