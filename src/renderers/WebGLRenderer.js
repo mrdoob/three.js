@@ -31,12 +31,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// ubershader material constants
 
-	LAMBERT = 1, PHONG = 2,
+	PHONG = 2,
 
 	// heuristics to create shader parameters according to lights in the scene
 	// (not to blow over maxLights budget)
 
-	maxLightCount = allocateLights( parameters.scene, 4 );
+	maxLightCount = allocateLights( parameters.scene, 4 ),
 	fog = parameters.scene ? parameters.scene.fog : null,
 	
 	antialias = parameters.antialias != undefined ? parameters.antialias : true,
@@ -77,11 +77,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.setupLights = function ( program, lights ) {
 
-		var l, ll, light, r, g, b,
-			ambientLights = [], pointLights = [], directionalLights = [],
-			colors = [], positions = [];
+		var l, ll, light, r = g = b = 0,
+			dcolors = [], dpositions = [],
+			pcolors = [], ppositions = [];
 
-		_gl.uniform1i( program.uniforms.enableLighting, lights.length );
 
 		for ( l = 0, ll = lights.length; l < ll; l++ ) {
 
@@ -89,84 +88,35 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( light instanceof THREE.AmbientLight ) {
 
-				ambientLights.push( light );
-
+				r += light.color.r;
+				g += light.color.g;
+				b += light.color.b;
+				
 			} else if ( light instanceof THREE.DirectionalLight ) {
 
-				directionalLights.push( light );
+				dcolors.push( light.color.r * light.intensity,
+							  light.color.g * light.intensity,
+							  light.color.b * light.intensity );
+
+				dpositions.push( light.position.x,
+								 light.position.y,
+								 light.position.z );
 
 			} else if( light instanceof THREE.PointLight ) {
 
-				pointLights.push( light );
+				pcolors.push( light.color.r * light.intensity,
+							  light.color.g * light.intensity,
+							  light.color.b * light.intensity );
 
+				ppositions.push( light.position.x,
+								 light.position.y,
+								 light.position.z );
+				
 			}
 
 		}
-
-		// sum all ambient lights
-		r = g = b = 0.0;
-
-		for ( l = 0, ll = ambientLights.length; l < ll; l++ ) {
-
-			r += ambientLights[ l ].color.r;
-			g += ambientLights[ l ].color.g;
-			b += ambientLights[ l ].color.b;
-
-		}
-
-		_gl.uniform3f( program.uniforms.ambientLightColor, r, g, b );
-
-		// pass directional lights as float arrays
-
-		colors = []; positions = [];
-
-		for ( l = 0, ll = directionalLights.length; l < ll; l++ ) {
-
-			light = directionalLights[ l ];
-
-			colors.push( light.color.r * light.intensity );
-			colors.push( light.color.g * light.intensity );
-			colors.push( light.color.b * light.intensity );
-
-			positions.push( light.position.x );
-			positions.push( light.position.y );
-			positions.push( light.position.z );
-
-		}
-
-		if ( directionalLights.length ) {
-
-			_gl.uniform1i(  program.uniforms.directionalLightNumber, directionalLights.length );
-			_gl.uniform3fv( program.uniforms.directionalLightDirection, positions );
-			_gl.uniform3fv( program.uniforms.directionalLightColor, colors );
-
-		}
-
-		// pass point lights as float arrays
-
-		colors = []; positions = [];
-
-		for ( l = 0, ll = pointLights.length; l < ll; l++ ) {
-
-			light = pointLights[ l ];
-
-			colors.push( light.color.r * light.intensity );
-			colors.push( light.color.g * light.intensity );
-			colors.push( light.color.b * light.intensity );
-
-			positions.push( light.position.x );
-			positions.push( light.position.y );
-			positions.push( light.position.z );
-
-		}
-
-		if ( pointLights.length ) {
-
-			_gl.uniform1i(  program.uniforms.pointLightNumber, pointLights.length );
-			_gl.uniform3fv( program.uniforms.pointLightPosition, positions );
-			_gl.uniform3fv( program.uniforms.pointLightColor, colors );
-
-		}
+		
+		return { ambient: [ r, g, b ], directional: { colors: dcolors, positions: dpositions }, point: { colors: pcolors, positions: ppositions } };
 
 	};
 
@@ -382,7 +332,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function refreshUniforms( material, fog ) {
 		
-		material.uniforms.color.value.setHex( material.color.hex );
+		// premultiply alpha
+		material.uniforms.color.value.setRGB( material.color.r * material.opacity, material.color.g * material.opacity, material.color.b * material.opacity );
+		
+		// pure color
+		//material.uniforms.color.value.setHex( material.color.hex );
+		
 		material.uniforms.opacity.value = material.opacity;
 		material.uniforms.map.texture = material.map;
 		
@@ -411,6 +366,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 		
 	};
 	
+	function refreshLights( material, lights ) {
+		
+		material.uniforms.enableLighting.value = lights.directional.positions.length + lights.point.positions.length;
+		material.uniforms.ambientLightColor.value = lights.ambient;
+		material.uniforms.directionalLightColor.value = lights.directional.colors;
+		material.uniforms.directionalLightDirection.value = lights.directional.positions;
+		material.uniforms.pointLightColor.value = lights.point.colors;
+		material.uniforms.pointLightPosition.value = lights.point.positions;
+		
+	}
+	
+	
 	this.renderBuffer = function ( camera, lights, fog, material, geometryChunk ) {
 
 		var mColor, mOpacity, mReflectivity,
@@ -418,13 +385,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 			mAmbient, mSpecular, mShininess,
 			mMap, envMap, mixEnvMap,
 			mRefractionRatio, useRefract,
-			program, u, identifiers, attributes;
+			program, u, identifiers, attributes, parameters,
+			vector_lights;
 
 
 		if ( material instanceof THREE.MeshShaderMaterial ||
 			 material instanceof THREE.MeshDepthMaterial ||
 			 material instanceof THREE.MeshNormalMaterial || 
-			 material instanceof THREE.MeshBasicMaterial ) {
+			 material instanceof THREE.MeshBasicMaterial ||
+			 material instanceof THREE.MeshLambertMaterial ) {
 
 			if ( !material.program ) {
 
@@ -445,9 +414,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 					
 					refreshUniforms( material, fog );
 					
+				} else if ( material instanceof THREE.MeshLambertMaterial ) {
+					
+					setMaterialShaders( material, THREE.ShaderLib[ 'lambert' ] );
+					
+					refreshUniforms( material, fog );
+					
 				}
 
-				material.program = buildProgram( material.fragment_shader, material.vertex_shader, { fog: fog, map: material.map, env_map: material.env_map } );
+				parameters = { fog: fog, map: material.map, env_map: material.env_map, maxDirLights: maxLightCount.directional, maxPointLights: maxLightCount.point };
+				material.program = buildProgram( material.fragment_shader, material.vertex_shader, parameters );
 
 				identifiers = [ 'viewMatrix', 'modelViewMatrix', 'projectionMatrix', 'normalMatrix', 'objectMatrix', 'cameraPosition' ];
 				for( u in material.uniforms ) {
@@ -476,16 +452,44 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		if ( program == _uberProgram ) {
+		if ( program == _uberProgram || 
+			 material instanceof THREE.MeshLambertMaterial ) {
 
-			this.setupLights( program, lights );
+			vector_lights = this.setupLights( program, lights );
+			
+			if ( program == _uberProgram ) {
+			
+				_gl.uniform1i( program.uniforms.enableLighting, vector_lights.directional.positions.length + vector_lights.point.positions.length || 
+																vector_lights.ambient[0] || vector_lights.ambient[1] || vector_lights.ambient[2] );
+				_gl.uniform3fv( program.uniforms.ambientLightColor, vector_lights.ambient );
+				
+				if ( vector_lights.directional.positions.length ) {
+
+					_gl.uniform3fv( program.uniforms.directionalLightDirection, vector_lights.directional.positions );
+					_gl.uniform3fv( program.uniforms.directionalLightColor, vector_lights.directional.colors );
+
+				}
+				
+				if ( vector_lights.point.positions.length ) {
+
+					_gl.uniform3fv( program.uniforms.pointLightPosition, vector_lights.point.positions );
+					_gl.uniform3fv( program.uniforms.pointLightColor, vector_lights.point.colors );
+
+				}
+				
+			} else {
+				
+				refreshLights( material, vector_lights );
+				
+			}
 
 		}
 
 		this.loadCamera( program, camera );
 		this.loadMatrices( program );
 
-		if ( material instanceof THREE.MeshBasicMaterial ) {
+		if ( material instanceof THREE.MeshBasicMaterial ||
+			 material instanceof THREE.MeshLambertMaterial ) {
 			
 			refreshUniforms( material, fog );
 		
@@ -494,7 +498,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( material instanceof THREE.MeshShaderMaterial ||
 		     material instanceof THREE.MeshDepthMaterial ||
 			 material instanceof THREE.MeshNormalMaterial ||
-			 material instanceof THREE.MeshBasicMaterial ) {
+			 material instanceof THREE.MeshBasicMaterial ||
+			 material instanceof THREE.MeshLambertMaterial ) {
 
 			mWireframe = material.wireframe;
 			mLineWidth = material.wireframe_linewidth;
@@ -505,8 +510,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		if ( material instanceof THREE.MeshPhongMaterial ||
-			 material instanceof THREE.MeshLambertMaterial ) {
+		if ( material instanceof THREE.MeshPhongMaterial ) {
 
 			mColor = material.color;
 			mOpacity = material.opacity;
@@ -563,11 +567,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.uniform1f( program.uniforms.mShininess, mShininess );
 
 			_gl.uniform1i( program.uniforms.material, PHONG );
-
-		} else if ( material instanceof THREE.MeshLambertMaterial ) {
-
-			_gl.uniform1i( program.uniforms.material, LAMBERT );
-
+			
 		}
 
 		if ( mMap ) {
@@ -991,14 +991,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 		
-	function generateFragmentShader( maxDirLights, maxPointLights ) {
+	function generateFragmentShader() {
 
 		var chunks = [
 
-			maxDirLights   ? "#define MAX_DIR_LIGHTS " + maxDirLights     : "",
-			maxPointLights ? "#define MAX_POINT_LIGHTS " + maxPointLights : "",
-
-			"uniform int material;", // 1 - Lambert, 2 - Phong
+			"uniform int material;", // 2 - Phong
 
 			"uniform bool enableMap;",
 			"uniform bool enableCubeMap;",
@@ -1015,19 +1012,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 			"uniform vec4 mSpecular;",
 			"uniform float mShininess;",
 
-			THREE.Snippets[ "fog_uniforms" ],
+			THREE.Snippets[ "fog_pars_fragment" ],
 			
-			"uniform int pointLightNumber;",
-			"uniform int directionalLightNumber;",
-
-			maxDirLights ? "uniform vec3 directionalLightDirection[ MAX_DIR_LIGHTS ];" : "",
+			"#if MAX_DIR_LIGHTS > 0",
+				"uniform vec3 directionalLightDirection[ MAX_DIR_LIGHTS ];",
+			"#endif",
 
 			"varying vec3 vNormal;",
 			"varying vec2 vUv;",
 
 			"varying vec3 vLightWeighting;",
 
-			maxPointLights ? "varying vec3 vPointLightVector[ MAX_POINT_LIGHTS ];"     : "",
+			"#if MAX_POINT_LIGHTS > 0",
+				"varying vec3 vPointLightVector[ MAX_POINT_LIGHTS ];",
+			"#endif",
 
 			"varying vec3 vViewPosition;",
 
@@ -1067,67 +1065,79 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					// point lights
 
-					maxPointLights ? "vec4 pointDiffuse  = vec4( 0.0, 0.0, 0.0, 0.0 );" : "",
-					maxPointLights ? "vec4 pointSpecular = vec4( 0.0, 0.0, 0.0, 0.0 );" : "",
+					"#if MAX_POINT_LIGHTS > 0",
+						
+						"vec4 pointDiffuse  = vec4( 0.0, 0.0, 0.0, 0.0 );",
+						"vec4 pointSpecular = vec4( 0.0, 0.0, 0.0, 0.0 );",
 
-					maxPointLights ? "for( int i = 0; i < MAX_POINT_LIGHTS; i++ ) {" : "",
+						"for( int i = 0; i < MAX_POINT_LIGHTS; i++ ) {",
 
-					maxPointLights ? 	"vec3 pointVector = normalize( vPointLightVector[ i ] );" : "",
-					maxPointLights ? 	"vec3 pointHalfVector = normalize( vPointLightVector[ i ] + vViewPosition );" : "",
+							"vec3 pointVector = normalize( vPointLightVector[ i ] );",
+							"vec3 pointHalfVector = normalize( vPointLightVector[ i ] + vViewPosition );",
 
-					maxPointLights ? 	"float pointDotNormalHalf = dot( normal, pointHalfVector );" : "",
-					maxPointLights ? 	"float pointDiffuseWeight = max( dot( normal, pointVector ), 0.0 );" : "",
+							"float pointDotNormalHalf = dot( normal, pointHalfVector );",
+							"float pointDiffuseWeight = max( dot( normal, pointVector ), 0.0 );",
 
-					// Ternary conditional is from the original o3d shader. Here it produces abrupt dark cutoff artefacts.
-					// Using just pow works ok in Chrome, but makes different artefact in Firefox 4.
-					// Zeroing on negative pointDotNormalHalf seems to work in both.
+							// Ternary conditional is from the original o3d shader. Here it produces abrupt dark cutoff artefacts.
+							// Using just pow works ok in Chrome, but makes different artefact in Firefox 4.
+							// Zeroing on negative pointDotNormalHalf seems to work in both.
 
-					//"float specularCompPoint = dot( normal, pointVector ) < 0.0 || pointDotNormalHalf < 0.0 ? 0.0 : pow( pointDotNormalHalf, mShininess );",
-					//"float specularCompPoint = pow( pointDotNormalHalf, mShininess );",
-					//"float pointSpecularWeight = pointDotNormalHalf < 0.0 ? 0.0 : pow( pointDotNormalHalf, mShininess );",
+							//"float specularCompPoint = dot( normal, pointVector ) < 0.0 || pointDotNormalHalf < 0.0 ? 0.0 : pow( pointDotNormalHalf, mShininess );",
+							//"float specularCompPoint = pow( pointDotNormalHalf, mShininess );",
+							//"float pointSpecularWeight = pointDotNormalHalf < 0.0 ? 0.0 : pow( pointDotNormalHalf, mShininess );",
 
-					// Ternary conditional inside for loop breaks Chrome shader linking.
-					// Must do it with if.
+							// Ternary conditional inside for loop breaks Chrome shader linking.
+							// Must do it with if.
 
-					maxPointLights ? 	"float pointSpecularWeight = 0.0;" : "",
-					maxPointLights ? 	"if ( pointDotNormalHalf >= 0.0 )" : "",
-					maxPointLights ? 		"pointSpecularWeight = pow( pointDotNormalHalf, mShininess );" : "",
+							"float pointSpecularWeight = 0.0;",
+							"if ( pointDotNormalHalf >= 0.0 )",
+								"pointSpecularWeight = pow( pointDotNormalHalf, mShininess );",
 
-					maxPointLights ? 	"pointDiffuse  += mColor * pointDiffuseWeight;" : "",
-					maxPointLights ? 	"pointSpecular += mSpecular * pointSpecularWeight;" : "",
+							"pointDiffuse  += mColor * pointDiffuseWeight;",
+							"pointSpecular += mSpecular * pointSpecularWeight;",
 
-					maxPointLights ? "}" : "",
+							"}",
 
-					// directional lights
+					"#endif",
+					
+					"#if MAX_DIR_LIGHTS > 0",
+					
+						"vec4 dirDiffuse  = vec4( 0.0, 0.0, 0.0, 0.0 );",
+						"vec4 dirSpecular = vec4( 0.0, 0.0, 0.0, 0.0 );" ,
 
-					maxDirLights ? "vec4 dirDiffuse  = vec4( 0.0, 0.0, 0.0, 0.0 );" : "",
-					maxDirLights ? "vec4 dirSpecular = vec4( 0.0, 0.0, 0.0, 0.0 );" : "",
+						"for( int i = 0; i < MAX_DIR_LIGHTS; i++ ) {",
 
-					maxDirLights ? "for( int i = 0; i < MAX_DIR_LIGHTS; i++ ) {" : "",
+							"vec4 lDirection = viewMatrix * vec4( directionalLightDirection[ i ], 0.0 );",
 
-					maxDirLights ?		"vec4 lDirection = viewMatrix * vec4( directionalLightDirection[ i ], 0.0 );" : "",
+							"vec3 dirVector = normalize( lDirection.xyz );",
+							"vec3 dirHalfVector = normalize( lDirection.xyz + vViewPosition );",
 
-					maxDirLights ? 		"vec3 dirVector = normalize( lDirection.xyz );" : "",
-					maxDirLights ? 		"vec3 dirHalfVector = normalize( lDirection.xyz + vViewPosition );" : "",
+							"float dirDotNormalHalf = dot( normal, dirHalfVector );",
 
-					maxDirLights ? 		"float dirDotNormalHalf = dot( normal, dirHalfVector );" : "",
+							"float dirDiffuseWeight = max( dot( normal, dirVector ), 0.0 );",
 
-					maxDirLights ? 		"float dirDiffuseWeight = max( dot( normal, dirVector ), 0.0 );" : "",
+							"float dirSpecularWeight = 0.0;",
+							"if ( dirDotNormalHalf >= 0.0 )",
+								"dirSpecularWeight = pow( dirDotNormalHalf, mShininess );",
 
-					maxDirLights ? 		"float dirSpecularWeight = 0.0;" : "",
-					maxDirLights ? 		"if ( dirDotNormalHalf >= 0.0 )" : "",
-					maxDirLights ? 			"dirSpecularWeight = pow( dirDotNormalHalf, mShininess );" : "",
+								"dirDiffuse  += mColor * dirDiffuseWeight;",
+								"dirSpecular += mSpecular * dirSpecularWeight;",
 
-					maxDirLights ? 		"dirDiffuse  += mColor * dirDiffuseWeight;" : "",
-					maxDirLights ? 		"dirSpecular += mSpecular * dirSpecularWeight;" : "",
-
-					maxDirLights ? "}" : "",
+						"}",
+					
+					"#endif",
 
 					// all lights contribution summation
 
 					"vec4 totalLight = mAmbient;",
-					maxDirLights   ? "totalLight += dirDiffuse + dirSpecular;" : "",
-					maxPointLights ? "totalLight += pointDiffuse + pointSpecular;" : "",
+					
+					"#if MAX_DIR_LIGHTS > 0",
+						"totalLight += dirDiffuse + dirSpecular;",
+					"#endif",
+					
+					"#if MAX_POINT_LIGHTS > 0",
+						"totalLight += pointDiffuse + pointSpecular;",
+					"#endif",
 
 					// looks nicer with weighting
 
@@ -1141,20 +1151,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					"}",
 
-				// Lambert: diffuse lighting
-
-				"} else if ( material == 1 ) {",
-
-					"if ( mixEnvMap ) {",
-
-						"gl_FragColor = vec4( mix( mColor.rgb * mapColor.rgb * vLightWeighting, cubeColor.rgb, mReflectivity ), mColor.a * mapColor.a );",
-
-					"} else {",
-
-						"gl_FragColor = vec4( mColor.rgb * mapColor.rgb * cubeColor.rgb * vLightWeighting, mColor.a * mapColor.a );",
-
-					"}",
-
 				"}",
 
 				THREE.Snippets[ "fog_fragment" ],
@@ -1165,33 +1161,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function generateVertexShader( maxDirLights, maxPointLights ) {
+	function generateVertexShader( ) {
 
 		var chunks = [
 
-			maxDirLights   ? "#define MAX_DIR_LIGHTS " + maxDirLights     : "",
-			maxPointLights ? "#define MAX_POINT_LIGHTS " + maxPointLights : "",
-
-			"uniform bool enableLighting;",
+			"#define PHONG",
+		
 			"uniform bool useRefract;",
 
-			"uniform int pointLightNumber;",
-			"uniform int directionalLightNumber;",
-
-			"uniform vec3 ambientLightColor;",
-
-			maxDirLights ? "uniform vec3 directionalLightColor[ MAX_DIR_LIGHTS ];"     : "",
-			maxDirLights ? "uniform vec3 directionalLightDirection[ MAX_DIR_LIGHTS ];" : "",
-
-			maxPointLights ? "uniform vec3 pointLightColor[ MAX_POINT_LIGHTS ];"    : "",
-			maxPointLights ? "uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];" : "",
-
+			THREE.Snippets[ "lights_pars_vertex" ],
+		
 			"varying vec3 vNormal;",
 			"varying vec2 vUv;",
 
 			"varying vec3 vLightWeighting;",
-
-			maxPointLights ? "varying vec3 vPointLightVector[ MAX_POINT_LIGHTS ];"     : "",
 
 			"varying vec3 vViewPosition;",
 
@@ -1214,32 +1197,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
 				"vec3 transformedNormal = normalize( normalMatrix * normal );",
 
-				"if ( !enableLighting ) {",
-
-					"vLightWeighting = vec3( 1.0, 1.0, 1.0 );",
-
-				"} else {",
-
-					"vLightWeighting = ambientLightColor;",
-
-					// directional lights
-
-					maxDirLights ? "for( int i = 0; i < MAX_DIR_LIGHTS; i++ ) {" : "",
-					maxDirLights ?		"vec4 lDirection = viewMatrix * vec4( directionalLightDirection[ i ], 0.0 );" : "",
-					maxDirLights ?		"float directionalLightWeighting = max( dot( transformedNormal, normalize( lDirection.xyz ) ), 0.0 );" : "",
-					maxDirLights ?		"vLightWeighting += directionalLightColor[ i ] * directionalLightWeighting;" : "",
-					maxDirLights ? "}" : "",
-
-					// point lights
-
-					maxPointLights ? "for( int i = 0; i < MAX_POINT_LIGHTS; i++ ) {" : "",
-					maxPointLights ? 	"vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );" : "",
-					maxPointLights ? 	"vPointLightVector[ i ] = normalize( lPosition.xyz - mvPosition.xyz );" : "",
-					maxPointLights ? 	"float pointLightWeighting = max( dot( transformedNormal, vPointLightVector[ i ] ), 0.0 );" : "",
-					maxPointLights ? 	"vLightWeighting += pointLightColor[ i ] * pointLightWeighting;" : "",
-					maxPointLights ? "}" : "",
-
-				"}",
+				THREE.Snippets[ "lights_vertex" ],
 
 				"vNormal = transformedNormal;",
 				"vUv = uv;",
@@ -1270,6 +1228,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 			"#ifdef GL_ES",
 			"precision highp float;",
 			"#endif",
+		
+			"#define MAX_DIR_LIGHTS " + parameters.maxDirLights,
+			"#define MAX_POINT_LIGHTS " + parameters.maxPointLights,
 
 			parameters.fog ? "#define USE_FOG" : "",
 			parameters.fog instanceof THREE.FogExp2 ? "#define FOG_EXP2" : "",
@@ -1284,6 +1245,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		prefix_vertex = [
 			maxVertexTextures() > 0 ? "#define VERTEX_TEXTURES" : "",
+
+			"#define MAX_DIR_LIGHTS " + parameters.maxDirLights,
+			"#define MAX_POINT_LIGHTS " + parameters.maxPointLights,
 
 			parameters.map ? "#define USE_MAP" : "",
 			parameters.env_map ? "#define USE_ENVMAP" : "",
@@ -1336,6 +1300,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 			} else if( type == "f" ) {
 
 				_gl.uniform1f( location, value );
+
+			} else if( type == "fv" ) {
+
+				_gl.uniform3fv( location, value );
 
 			} else if( type == "v3" ) {
 
@@ -1458,14 +1426,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function initUbershader( maxDirLights, maxPointLights, fog ) {
 		
-		var vertex_shader = generateVertexShader( maxDirLights, maxPointLights ),
-			fragment_shader = generateFragmentShader( maxDirLights, maxPointLights ),
+		var vertex_shader = generateVertexShader(),
+			fragment_shader = generateFragmentShader(),
 			program;
 
 		//console.log ( vertex_shader );
 		//console.log ( fragment_shader );
 
-		program = buildProgram( fragment_shader, vertex_shader, { fog: fog } );
+		program = buildProgram( fragment_shader, vertex_shader, { fog: fog, maxDirLights: maxDirLights, maxPointLights: maxPointLights } );
 
 		_gl.useProgram( program );
 
@@ -1489,13 +1457,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( maxDirLights ) {
 
-			cacheUniformLocations( program, [ 'directionalLightNumber', 'directionalLightColor', 'directionalLightDirection' ] );
+			cacheUniformLocations( program, [ 'directionalLightColor', 'directionalLightDirection' ] );
 
 		}
 
 		if ( maxPointLights ) {
 
-			cacheUniformLocations( program, [ 'pointLightNumber', 'pointLightColor', 'pointLightPosition' ] );
+			cacheUniformLocations( program, [ 'pointLightColor', 'pointLightPosition' ] );
 
 		}
 
@@ -1689,7 +1657,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 THREE.Snippets = {
 	
-	fog_uniforms: [
+	fog_pars_fragment: [
 
 	"#ifdef USE_FOG",
 	
@@ -1724,6 +1692,181 @@ THREE.Snippets = {
 
 	"#endif"
 	
+	].join("\n"),
+	
+	envmap_pars_fragment: [
+	
+	"#ifdef USE_ENVMAP",
+	
+		"varying vec3 vReflect;",
+		"uniform float reflectivity;",
+		"uniform samplerCube env_map;",
+		"uniform int combine;",
+	
+	"#endif"
+	
+	].join("\n"),
+	
+	envmap_fragment: [
+	
+	"#ifdef USE_ENVMAP",
+
+		"cubeColor = textureCube( env_map, vec3( -vReflect.x, vReflect.yz ) );",
+		
+		"if ( combine == 1 ) {",
+
+			"gl_FragColor = mix( gl_FragColor, cubeColor, reflectivity );",
+
+		"} else {",
+
+			"gl_FragColor = gl_FragColor * cubeColor;",
+
+		"}",	
+
+	"#endif"
+	
+	].join("\n"),
+	
+	envmap_pars_vertex: [
+	
+	"#ifdef USE_ENVMAP",
+	
+		"varying vec3 vReflect;",
+		"uniform float refraction_ratio;",
+		"uniform bool useRefract;",
+		
+	"#endif"
+	
+	].join("\n"),
+
+	envmap_vertex : [
+	
+	"#ifdef USE_ENVMAP",
+	
+		"vec4 mPosition = objectMatrix * vec4( position, 1.0 );",
+		"vec3 nWorld = mat3( objectMatrix[0].xyz, objectMatrix[1].xyz, objectMatrix[2].xyz ) * normal;",
+	
+		"if ( useRefract ) {",
+
+			"vReflect = refract( normalize( mPosition.xyz - cameraPosition ), normalize( nWorld.xyz ), refraction_ratio );",
+
+		"} else {",
+
+			"vReflect = reflect( normalize( mPosition.xyz - cameraPosition ), normalize( nWorld.xyz ) );",
+
+		"}",
+
+	"#endif"
+	
+	].join("\n"),
+	
+	map_pars_fragment: [
+	
+	"#ifdef USE_MAP",
+		
+		"varying vec2 vUv;",
+		"uniform sampler2D map;",
+		  
+	"#endif"
+	
+	].join("\n"),
+	
+	map_pars_vertex: [
+	
+	"#ifdef USE_MAP",
+	
+		"varying vec2 vUv;",
+
+	"#endif"
+	
+	].join("\n"),
+	
+	map_fragment: [
+
+	"#ifdef USE_MAP",
+
+		"mapColor = texture2D( map, vUv );",
+
+	"#endif"
+	
+	].join("\n"),
+	
+	map_vertex: [
+	
+	"#ifdef USE_MAP",
+	
+		"vUv = uv;",
+		
+	"#endif"
+	
+	].join("\n"),
+	
+	lights_pars_vertex: [
+	
+	"uniform bool enableLighting;",
+	"uniform vec3 ambientLightColor;",
+	
+	"#if MAX_DIR_LIGHTS > 0",
+	
+		"uniform vec3 directionalLightColor[ MAX_DIR_LIGHTS ];",
+		"uniform vec3 directionalLightDirection[ MAX_DIR_LIGHTS ];",
+		
+	"#endif",
+
+	"#if MAX_POINT_LIGHTS > 0",
+	
+		"uniform vec3 pointLightColor[ MAX_POINT_LIGHTS ];",
+		"uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];",
+		
+		"#ifdef PHONG",
+			"varying vec3 vPointLightVector[ MAX_POINT_LIGHTS ];",
+		"#endif",
+		
+	"#endif"
+	
+	].join("\n"),
+	
+	lights_vertex: [
+	
+	"if ( !enableLighting ) {",
+
+		"vLightWeighting = vec3( 1.0, 1.0, 1.0 );",
+
+	"} else {",
+
+		"vLightWeighting = ambientLightColor;",
+
+		"#if MAX_DIR_LIGHTS > 0",
+		
+		"for( int i = 0; i < MAX_DIR_LIGHTS; i++ ) {",
+		
+			"vec4 lDirection = viewMatrix * vec4( directionalLightDirection[ i ], 0.0 );",
+			"float directionalLightWeighting = max( dot( transformedNormal, normalize( lDirection.xyz ) ), 0.0 );",
+			"vLightWeighting += directionalLightColor[ i ] * directionalLightWeighting;",
+			
+		"}",
+		
+		"#endif",
+
+		"#if MAX_POINT_LIGHTS > 0",
+		
+		"for( int i = 0; i < MAX_POINT_LIGHTS; i++ ) {",
+		
+			"vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );",
+			"vec3 pointLightVector = normalize( lPosition.xyz - mvPosition.xyz );",
+			"float pointLightWeighting = max( dot( transformedNormal, pointLightVector ), 0.0 );",
+			"vLightWeighting += pointLightColor[ i ] * pointLightWeighting;",
+			
+			"#ifdef PHONG",
+				"vPointLightVector[ i ] = pointLightVector;",
+			"#endif",
+			
+		"}",
+		
+		"#endif",
+		
+	"}"
+
 	].join("\n")
 	
 };
@@ -1816,23 +1959,9 @@ THREE.ShaderLib = {
 			"uniform vec3 color;",
 			"uniform float opacity;",
 			
-			"#ifdef USE_MAP",
-				
-				"varying vec2 vUv;",
-				"uniform sampler2D map;",
-				  
-			"#endif",
-			
-			"#ifdef USE_ENVMAP",
-			
-				"varying vec3 vReflect;",
-				"uniform float reflectivity;",
-				"uniform samplerCube env_map;",
-				"uniform int combine;",
-				
-			"#endif",
-
-			THREE.Snippets[ "fog_uniforms" ],
+			THREE.Snippets[ "map_pars_fragment" ],
+			THREE.Snippets[ "envmap_pars_fragment" ],
+			THREE.Snippets[ "fog_pars_fragment" ],
 				
 			"void main() {",
 					
@@ -1840,36 +1969,84 @@ THREE.ShaderLib = {
 				"vec4 mapColor = vec4( 1.0, 1.0, 1.0, 1.0 );",
 				"vec4 cubeColor = vec4( 1.0, 1.0, 1.0, 1.0 );",
 
-				// diffuse map
-
-				"#ifdef USE_MAP",
-
-					"mapColor = texture2D( map, vUv );",
-
-				"#endif",
-
-				// environment map
+				THREE.Snippets[ "map_fragment" ],
 				
-				"#ifdef USE_ENVMAP",
+				"gl_FragColor = mColor * mapColor;",
+				
+				THREE.Snippets[ "envmap_fragment" ],
+				THREE.Snippets[ "fog_fragment" ],
+				
+			"}"
 
-					"cubeColor = textureCube( env_map, vec3( -vReflect.x, vReflect.yz ) );",
+		].join("\n"),
+		
+		vertex_shader: [
+			
+			THREE.Snippets[ "map_pars_vertex" ],
+			THREE.Snippets[ "envmap_pars_vertex" ],
+			
+			"void main() {",
+		
+				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
+				
+				THREE.Snippets[ "map_vertex" ],
+				THREE.Snippets[ "envmap_vertex" ],
+				
+				"gl_Position = projectionMatrix * mvPosition;",
+
+			"}"
+
+		].join("\n")
+		
+	},
+
+	'lambert': {
+		
+		uniforms: { "color"   : { type: "c", value: new THREE.Color( 0xeeeeee ) },
+					"opacity" : { type: "f", value: 1 },
+					"map"     : { type: "t", value: 0, texture: null },
 					
-					"if ( combine == 1 ) {",
-
-						"gl_FragColor = mix( mColor * mapColor, cubeColor, reflectivity );",
-
-					"} else {",
-
-						"gl_FragColor = mColor * mapColor * cubeColor;",
-
-					"}",
+					"env_map" 		  : { type: "t", value: 1, texture: null },
+					"useRefract"	  : { type: "i", value: 0 },
+					"reflectivity"    : { type: "f", value: 1 },
+					"refraction_ratio": { type: "f", value: 0.98 },
+					"combine"		  : { type: "i", value: 0 },
+					
+					"fogDensity": { type: "f", value: 0.00025 },
+					"fogNear"	: { type: "f", value: 1 },
+					"fogFar"	: { type: "f", value: 2000 },
+					"fogColor"	: { type: "c", value: new THREE.Color( 0xffffff ) },
+					
+					"enableLighting" 			: { type: "i", value: 1 },
+					"ambientLightColor" 		: { type: "fv", value: [] },
+					"directionalLightDirection" : { type: "fv", value: [] },
+					"directionalLightColor" 	: { type: "fv", value: [] },
+					"pointLightPosition"		: { type: "fv", value: [] },
+					"pointLightColor"			: { type: "fv", value: [] }
+				},
+		
+		fragment_shader: [
+			
+			"uniform vec3 color;",
+			"uniform float opacity;",
+			
+			"varying vec3 vLightWeighting;",
 				
-				"#else",
+			THREE.Snippets[ "map_pars_fragment" ],
+			THREE.Snippets[ "envmap_pars_fragment" ],
+			THREE.Snippets[ "fog_pars_fragment" ],
 				
-					"gl_FragColor = mColor * mapColor;",
+			"void main() {",
+					
+				"vec4 mColor = vec4( color, opacity );",
+				"vec4 mapColor = vec4( 1.0, 1.0, 1.0, 1.0 );",
+				"vec4 cubeColor = vec4( 1.0, 1.0, 1.0, 1.0 );",
 
-				"#endif",
+				THREE.Snippets[ "map_fragment" ],
+
+				"gl_FragColor =  mColor * mapColor * vec4( vLightWeighting, 1.0 );",
 				
+				THREE.Snippets[ "envmap_fragment" ],
 				THREE.Snippets[ "fog_fragment" ],
 				
 			"}"
@@ -1878,51 +2055,29 @@ THREE.ShaderLib = {
 		
 		vertex_shader: [
 		
-			"#ifdef USE_MAP",
+			"varying vec3 vLightWeighting;",
 			
-				"varying vec2 vUv;",
-
-			"#endif",
-			
-			"#ifdef USE_ENVMAP",
-			
-				"varying vec3 vReflect;",
-				"uniform float refraction_ratio;",
-				"uniform bool useRefract;",
-				
-			"#endif",
+			THREE.Snippets[ "map_pars_vertex" ],
+			THREE.Snippets[ "envmap_pars_vertex" ],
+			THREE.Snippets[ "lights_pars_vertex" ],
 			
 			"void main() {",
 		
-				"#ifdef USE_MAP",
+				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
 				
-					"vUv = uv;",
-					
-				"#endif",
-
-				"#ifdef USE_ENVMAP",
+				THREE.Snippets[ "map_vertex" ],
+				THREE.Snippets[ "envmap_vertex" ],
 				
-					"vec4 mPosition = objectMatrix * vec4( position, 1.0 );",
-					"vec3 nWorld = mat3( objectMatrix[0].xyz, objectMatrix[1].xyz, objectMatrix[2].xyz ) * normal;",
+				"vec3 transformedNormal = normalize( normalMatrix * normal );",
+
+				THREE.Snippets[ "lights_vertex" ],
 				
-					"if ( useRefract ) {",
-
-						"vReflect = refract( normalize( mPosition.xyz - cameraPosition ), normalize( nWorld.xyz ), refraction_ratio );",
-
-					"} else {",
-
-						"vReflect = reflect( normalize( mPosition.xyz - cameraPosition ), normalize( nWorld.xyz ) );",
-
-					"}",
-
-				"#endif",
-				
-				"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+				"gl_Position = projectionMatrix * mvPosition;",
 
 			"}"
 
 		].join("\n")
 		
-	}		
+	}	
 
 };
