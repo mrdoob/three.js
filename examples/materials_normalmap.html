@@ -141,7 +141,7 @@
 
 				// light representation
 				
-				var sphere = new Sphere( 100, 16, 8, 1 );
+				var sphere = new Sphere( 100, 16, 8 );
 				lightMesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color:0xffaa00 } ) );
 				lightMesh.position = pointLight.position;
 				lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
@@ -190,7 +190,7 @@
 				
 				loader.loadBinary( "obj/ninja/NinjaLo_bin.js", function( geometry ) { createScene( geometry, scale, material1, material2 ) }, "obj/ninja" );
 
-				webglRenderer = new THREE.WebGLRenderer( { scene: scene } );
+				webglRenderer = new THREE.WebGLRenderer();
 				webglRenderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( webglRenderer.domElement );
 

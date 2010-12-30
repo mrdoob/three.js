@@ -223,7 +223,7 @@
 				svgRenderer.setQuality( 'low' );
 				container.appendChild( svgRenderer.domElement );
 
-				webglRenderer = new THREE.WebGLRenderer( { scene: scene } );
+				webglRenderer = new THREE.WebGLRenderer();
 				webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				// webglRenderer.setFaceCulling( 0 );
 				container.appendChild( webglRenderer.domElement );

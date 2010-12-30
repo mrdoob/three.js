@@ -154,7 +154,7 @@
 				directionalLight.position.normalize();
 				scene.addLight( directionalLight );
 
-				renderer = new THREE.WebGLRenderer( { scene: scene } );
+				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.innerHTML = "";

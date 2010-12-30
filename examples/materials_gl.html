@@ -84,9 +84,9 @@
 
 				// Spheres geometry
 
-				var geometry_smooth = new Sphere( 70, 32, 16, true );
-				var geometry_flat = new Sphere( 70, 32, 16, false );
-				var geometry_pieces = new Sphere( 70, 32, 16, true ); // Extra geometry to be broken down for MeshFaceMaterial
+				var geometry_smooth = new Sphere( 70, 32, 16 );
+				var geometry_flat = new Sphere( 70, 32, 16 );
+				var geometry_pieces = new Sphere( 70, 32, 16 ); // Extra geometry to be broken down for MeshFaceMaterial
 				
 				for ( var i = 0, l = geometry_pieces.faces.length; i < l; i ++ ) {
 
@@ -143,7 +143,7 @@
 				pointLight = new THREE.PointLight( 0xffffff, 1 );
 				scene.addLight( pointLight );
 
-				renderer = new THREE.WebGLRenderer( { scene: scene } );
+				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.appendChild( renderer.domElement );

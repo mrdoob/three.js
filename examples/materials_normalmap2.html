@@ -174,7 +174,7 @@
 
 				loader.loadAscii( "obj/leeperrysmith/LeePerrySmith.js", function( geometry ) { createScene( geometry, 100, material ) }, "obj/leeperrysmith" );
 
-				webglRenderer = new THREE.WebGLRenderer( { scene: scene } );
+				webglRenderer = new THREE.WebGLRenderer();
 				webglRenderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( webglRenderer.domElement );
 

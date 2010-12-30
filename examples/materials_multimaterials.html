@@ -102,7 +102,7 @@
 
 				// SPHERES
 
-				sphere = new Sphere( 100, 16, 8, 1 );
+				sphere = new Sphere( 100, 16, 8 );
 				for (var i=0; i<10; i++) {
 					//mesh = new THREE.Mesh( sphere, new THREE.MeshLambertMaterial( ) );
 					mesh = new THREE.Mesh( sphere, [ new THREE.MeshLambertMaterial( { color: 0xffffff } ), new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true,  wireframe_linewidth: 1.5 } ) ] );
@@ -146,7 +146,7 @@
 
 				if ( render_gl ) {
 					try {
-						webglRenderer = new THREE.WebGLRenderer( { scene: scene } );
+						webglRenderer = new THREE.WebGLRenderer();
 						webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 						container.appendChild( webglRenderer.domElement );
 						has_gl = 1;

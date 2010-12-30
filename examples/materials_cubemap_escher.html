@@ -78,7 +78,7 @@
 
 				var textureCube = new THREE.Texture( images );
 				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, env_map: textureCube } )
-				var geometry = new Sphere( 100, 96, 64, true );
+				var geometry = new Sphere( 100, 96, 64 );
 
 				var mesh = new THREE.Mesh( geometry, material );
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 16;
@@ -88,7 +88,7 @@
 				//SceneUtils.addPanoramaCube( scene, 6000, images );
 				SceneUtils.addPanoramaCubeWebGL( scene, 6000, textureCube );
 
-				webglRenderer = new THREE.WebGLRenderer( { scene: scene } );
+				webglRenderer = new THREE.WebGLRenderer();
 				webglRenderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( webglRenderer.domElement );
 

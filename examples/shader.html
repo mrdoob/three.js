@@ -124,7 +124,7 @@
 				mesh = new THREE.Mesh( new Plane( 2, 2 ), material );
 				scene.addObject( mesh );
 
-				renderer = new THREE.WebGLRenderer( { scene: scene } );
+				renderer = new THREE.WebGLRenderer();
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();

@@ -20,7 +20,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	// See http://code.google.com/p/chromium/issues/detail?id=63491
 
 	var _canvas = document.createElement( 'canvas' ), _gl,
-	_oldProgram, _uberProgram,
+	_oldProgram = null,
 	_modelViewMatrix = new THREE.Matrix4(), _normalMatrix,
 
 	_viewMatrixArray = new Float32Array(16),
@@ -29,28 +29,24 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_normalMatrixArray = new Float32Array(9),
 	_objectMatrixArray = new Float32Array(16),
 
-	// ubershader material constants
+	// parameters defaults
+	
+	antialias = true,
+	clearColor = new THREE.Color( 0x000000 ),
+	clearAlpha = 0;
 
-	PHONG = 2,
-
-	// heuristics to create shader parameters according to lights in the scene
-	// (not to blow over maxLights budget)
-
-	maxLightCount = allocateLights( parameters.scene, 4 ),
-	fog = parameters.scene ? parameters.scene.fog : null,
-
-	antialias = parameters.antialias != undefined ? parameters.antialias : true,
-
-	clearColor = parameters.clearColor ? new THREE.Color( parameters.clearColor ) : new THREE.Color( 0x000000 ),
-	clearAlpha = parameters.clearAlpha ? parameters.clearAlpha : 0;
-
+	if ( parameters ) {
+		
+		if ( parameters.antialias !== undefined ) antialias = parameters.antialias;
+		if ( parameters.clearColor !== undefined ) clearColor.setHex( parameters.clearColor );
+		if ( parameters.clearAlpha !== undefined ) clearAlpha = parameters.clearAlpha;
+		
+	}
+		
 	this.domElement = _canvas;
 	this.autoClear = true;
 
 	initGL( antialias, clearColor, clearAlpha );
-
-	_uberProgram = initUbershader( maxLightCount.directional, maxLightCount.point, fog );
-	_oldProgram = _uberProgram;
 
 	//alert( dumpObject( getGLParams() ) );
 
@@ -330,7 +326,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function refreshUniforms( material, fog ) {
+	function refreshUniformsCommon( material, fog ) {
 		
 		// premultiply alpha
 		material.uniforms.color.value.setRGB( material.color.r * material.opacity, material.color.g * material.opacity, material.color.b * material.opacity );
@@ -366,6 +362,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 	
+	function refreshUniformsPhong( material ) {
+		
+		//material.uniforms.ambient.value.setHex( material.ambient.hex );
+		//material.uniforms.specular.value.setHex( material.specular.hex );
+		material.uniforms.ambient.value.setRGB( material.ambient.r, material.ambient.g, material.ambient.b );
+		material.uniforms.specular.value.setRGB( material.specular.r, material.specular.g, material.specular.b );
+		material.uniforms.shininess.value = material.shininess;
+		
+	};
+	
+	
 	function refreshLights( material, lights ) {
 		
 		material.uniforms.enableLighting.value = lights.directional.positions.length + lights.point.positions.length;
@@ -379,70 +386,62 @@ THREE.WebGLRenderer = function ( parameters ) {
 	
 	this.renderBuffer = function ( camera, lights, fog, material, geometryChunk ) {
 
-		var mColor, mOpacity, mReflectivity,
-			mWireframe, mLineWidth, mBlending,
-			mAmbient, mSpecular, mShininess,
-			mMap, envMap, mixEnvMap,
-			mRefractionRatio, useRefract,
-			program, u, identifiers, attributes, parameters,
-			vector_lights;
+		var program, u, identifiers, attributes, parameters, vector_lights, maxLightCount;
 
+		if ( !material.program ) {
 
-		if ( material instanceof THREE.MeshShaderMaterial ||
-			 material instanceof THREE.MeshDepthMaterial ||
-			 material instanceof THREE.MeshNormalMaterial || 
-			 material instanceof THREE.MeshBasicMaterial ||
-			 material instanceof THREE.MeshLambertMaterial ) {
+			if ( material instanceof THREE.MeshDepthMaterial ) {
 
-			if ( !material.program ) {
+				setMaterialShaders( material, THREE.ShaderLib[ 'depth' ] );
 
-				if ( material instanceof THREE.MeshDepthMaterial ) {
+				material.uniforms.mNear.value = camera.near;
+				material.uniforms.mFar.value = camera.far;
 
-					setMaterialShaders( material, THREE.ShaderLib[ 'depth' ] );
+			} else if ( material instanceof THREE.MeshNormalMaterial ) {
 
-					material.uniforms.mNear.value = camera.near;
-					material.uniforms.mFar.value = camera.far;
+				setMaterialShaders( material, THREE.ShaderLib[ 'normal' ] );
 
-				} else if ( material instanceof THREE.MeshNormalMaterial ) {
+			} else if ( material instanceof THREE.MeshBasicMaterial ) {
 
-					setMaterialShaders( material, THREE.ShaderLib[ 'normal' ] );
+				setMaterialShaders( material, THREE.ShaderLib[ 'basic' ] );
 
-				} else if ( material instanceof THREE.MeshBasicMaterial ) {
+				refreshUniformsCommon( material, fog );
+				
+			} else if ( material instanceof THREE.MeshLambertMaterial ) {
+				
+				setMaterialShaders( material, THREE.ShaderLib[ 'lambert' ] );
+				
+				refreshUniformsCommon( material, fog );
+				
+			} else if ( material instanceof THREE.MeshPhongMaterial ) {
+				
+				setMaterialShaders( material, THREE.ShaderLib[ 'phong' ] );
+				
+				refreshUniformsCommon( material, fog );
+				
+			}
 
-					setMaterialShaders( material, THREE.ShaderLib[ 'basic' ] );
+			// heuristics to create shader parameters according to lights in the scene
+			// (not to blow over maxLights budget)
 
-					refreshUniforms( material, fog );
-					
-				} else if ( material instanceof THREE.MeshLambertMaterial ) {
-					
-					setMaterialShaders( material, THREE.ShaderLib[ 'lambert' ] );
-					
-					refreshUniforms( material, fog );
-					
-				}
+			maxLightCount = allocateLights( lights, 4 );
 
-				parameters = { fog: fog, map: material.map, env_map: material.env_map, maxDirLights: maxLightCount.directional, maxPointLights: maxLightCount.point };
-				material.program = buildProgram( material.fragment_shader, material.vertex_shader, parameters );
+			parameters = { fog: fog, map: material.map, env_map: material.env_map, maxDirLights: maxLightCount.directional, maxPointLights: maxLightCount.point };
+			material.program = buildProgram( material.fragment_shader, material.vertex_shader, parameters );
 
-				identifiers = [ 'viewMatrix', 'modelViewMatrix', 'projectionMatrix', 'normalMatrix', 'objectMatrix', 'cameraPosition' ];
-				for( u in material.uniforms ) {
+			identifiers = [ 'viewMatrix', 'modelViewMatrix', 'projectionMatrix', 'normalMatrix', 'objectMatrix', 'cameraPosition' ];
+			for( u in material.uniforms ) {
 
-					identifiers.push(u);
-
-				}
-
-				cacheUniformLocations( material.program, identifiers );
-				cacheAttributeLocations( material.program, [ "position", "normal", "uv", "tangent" ] );
+				identifiers.push(u);
 
 			}
 
-			program = material.program;
-
-		} else {
-
-			program = _uberProgram;
+			cacheUniformLocations( material.program, identifiers );
+			cacheAttributeLocations( material.program, [ "position", "normal", "uv", "tangent" ] );
 
 		}
+
+		program = material.program;
 
 		if( program != _oldProgram ) {
 
@@ -451,149 +450,32 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		if ( program == _uberProgram || 
-			 material instanceof THREE.MeshLambertMaterial ) {
-
-			vector_lights = this.setupLights( program, lights );
-			
-			if ( program == _uberProgram ) {
-			
-				_gl.uniform1i( program.uniforms.enableLighting, vector_lights.directional.positions.length + vector_lights.point.positions.length || 
-																vector_lights.ambient[0] || vector_lights.ambient[1] || vector_lights.ambient[2] );
-				_gl.uniform3fv( program.uniforms.ambientLightColor, vector_lights.ambient );
-				
-				if ( vector_lights.directional.positions.length ) {
-
-					_gl.uniform3fv( program.uniforms.directionalLightDirection, vector_lights.directional.positions );
-					_gl.uniform3fv( program.uniforms.directionalLightColor, vector_lights.directional.colors );
-
-				}
-				
-				if ( vector_lights.point.positions.length ) {
-
-					_gl.uniform3fv( program.uniforms.pointLightPosition, vector_lights.point.positions );
-					_gl.uniform3fv( program.uniforms.pointLightColor, vector_lights.point.colors );
-
-				}
-				
-			} else {
-				
-				refreshLights( material, vector_lights );
-				
-			}
-
-		}
-
 		this.loadCamera( program, camera );
 		this.loadMatrices( program );
 
+		if ( material instanceof THREE.MeshPhongMaterial || 
+			 material instanceof THREE.MeshLambertMaterial ) {
+
+			vector_lights = this.setupLights( program, lights );
+			refreshLights( material, vector_lights );
+
+		}
+
 		if ( material instanceof THREE.MeshBasicMaterial ||
-			 material instanceof THREE.MeshLambertMaterial ) {
+			 material instanceof THREE.MeshLambertMaterial ||
+			 material instanceof THREE.MeshPhongMaterial ) {
 			
-			refreshUniforms( material, fog );
+			refreshUniformsCommon( material, fog );
 
 		}
-
-		if ( material instanceof THREE.MeshShaderMaterial ||
-		     material instanceof THREE.MeshDepthMaterial ||
-			 material instanceof THREE.MeshNormalMaterial ||
-			 material instanceof THREE.MeshBasicMaterial ||
-			 material instanceof THREE.MeshLambertMaterial ) {
-
-			mWireframe = material.wireframe;
-			mLineWidth = material.wireframe_linewidth;
-
-			mBlending = material.blending;
-
-			setUniforms( program, material.uniforms );
-
-		}
-
+		
 		if ( material instanceof THREE.MeshPhongMaterial ) {
-
-			mColor = material.color;
-			mOpacity = material.opacity;
-
-			mWireframe = material.wireframe;
-			mLineWidth = material.wireframe_linewidth;
-
-			mBlending = material.blending;
-
-			mMap = material.map;
-			envMap = material.env_map;
-
-			mixEnvMap = material.combine == THREE.MixOperation;
-			mReflectivity = material.reflectivity;
-
-			useRefract = material.env_map && material.env_map.mapping instanceof THREE.CubeRefractionMapping;
-			mRefractionRatio = material.refraction_ratio;
-
-			_gl.uniform4f( program.uniforms.mColor,  mColor.r * mOpacity, mColor.g * mOpacity, mColor.b * mOpacity, mOpacity );
-
-			_gl.uniform1i( program.uniforms.mixEnvMap, mixEnvMap );
-			_gl.uniform1f( program.uniforms.mReflectivity, mReflectivity );
-
-			_gl.uniform1i( program.uniforms.useRefract, useRefract );
-			_gl.uniform1f( program.uniforms.mRefractionRatio, mRefractionRatio );
-
-			if ( fog ) {
-
-				_gl.uniform3f( program.uniforms.fogColor, fog.color.r, fog.color.g, fog.color.b );
-
-				if ( fog instanceof THREE.Fog ) {
-
-					_gl.uniform1f( program.uniforms.fogNear, fog.near );
-					_gl.uniform1f( program.uniforms.fogFar, fog.far );
-
-				} else if ( fog instanceof THREE.FogExp2 ) {
-
-					_gl.uniform1f( program.uniforms.fogDensity, fog.density );
-
-				}
-
-			}
-
-		}
-
-		if ( material instanceof THREE.MeshPhongMaterial ) {
-
-			mAmbient  = material.ambient;
-			mSpecular = material.specular;
-			mShininess = material.shininess;
-
-			_gl.uniform4f( program.uniforms.mAmbient,  mAmbient.r,  mAmbient.g,  mAmbient.b,  mOpacity );
-			_gl.uniform4f( program.uniforms.mSpecular, mSpecular.r, mSpecular.g, mSpecular.b, mOpacity );
-			_gl.uniform1f( program.uniforms.mShininess, mShininess );
-
-			_gl.uniform1i( program.uniforms.material, PHONG );
 			
-		}
-
-		if ( mMap ) {
-
-			setTexture( mMap, 0 );
-
-			_gl.uniform1i( program.uniforms.tMap,  0 );
-			_gl.uniform1i( program.uniforms.enableMap, 1 );
-
-		} else {
-
-			_gl.uniform1i( program.uniforms.enableMap, 0 );
+			refreshUniformsPhong( material );
 
 		}
 
-		if ( envMap ) {
-
-			setCubeTexture( envMap, 1 );
-
-			_gl.uniform1i( program.uniforms.tCube, 1 );
-			_gl.uniform1i( program.uniforms.enableCubeMap, 1 );
-
-		} else {
-
-			_gl.uniform1i( program.uniforms.enableCubeMap, 0 );
-
-		}
+		setUniforms( program, material.uniforms );
 
 		attributes = program.attributes;
 
@@ -644,7 +526,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// render triangles
 
-		if ( ! mWireframe ) {
+		if ( ! material.wireframe ) {
 
 			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryChunk.__webGLFaceBuffer );
 			_gl.drawElements( _gl.TRIANGLES, geometryChunk.__webGLFaceCount, _gl.UNSIGNED_SHORT, 0 );
@@ -653,7 +535,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else {
 
-			_gl.lineWidth( mLineWidth );
+			_gl.lineWidth( material.wireframe_linewidth );
 			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryChunk.__webGLLineBuffer );
 			_gl.drawElements( _gl.LINES, geometryChunk.__webGLLineCount, _gl.UNSIGNED_SHORT, 0 );
 
@@ -958,7 +840,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-
 	function initGL( antialias, clearColor, clearAlpha ) {
 
 		try {
@@ -989,236 +870,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_gl.clearColor( clearColor.r, clearColor.g, clearColor.b, clearAlpha );
 
 	};
-		
-	function generateFragmentShader() {
-
-		var chunks = [
-
-			"uniform int material;", // 2 - Phong
-
-			"uniform bool enableMap;",
-			"uniform bool enableCubeMap;",
-			"uniform bool mixEnvMap;",
-
-			"uniform samplerCube tCube;",
-			"uniform float mReflectivity;",
-
-			"uniform sampler2D tMap;",
-			"uniform vec4 mColor;",
-			"uniform float mOpacity;",
-
-			"uniform vec4 mAmbient;",
-			"uniform vec4 mSpecular;",
-			"uniform float mShininess;",
-
-			THREE.Snippets[ "fog_pars_fragment" ],
-			
-			"#if MAX_DIR_LIGHTS > 0",
-				"uniform vec3 directionalLightDirection[ MAX_DIR_LIGHTS ];",
-			"#endif",
-
-			"varying vec3 vNormal;",
-			"varying vec2 vUv;",
-
-			"varying vec3 vLightWeighting;",
-
-			"#if MAX_POINT_LIGHTS > 0",
-				"varying vec3 vPointLightVector[ MAX_POINT_LIGHTS ];",
-			"#endif",
-
-			"varying vec3 vViewPosition;",
-
-			"varying vec3 vReflect;",
-
-			"void main() {",
-
-				"vec4 mapColor = vec4( 1.0 );",
-				"vec4 cubeColor = vec4( 1.0 );",
-
-				// diffuse map
-
-				"if ( enableMap ) {",
-
-					"mapColor = texture2D( tMap, vUv );",
-
-				"}",
-
-				// cube map
-
-				"if ( enableCubeMap ) {",
-
-					"cubeColor = textureCube( tCube, vec3( -vReflect.x, vReflect.yz ) );",
-					// "cubeColor.r = textureCube( tCube, vec3( -vReflect.x, vReflect.yz ) ).r;",
-					// "cubeColor.g = textureCube( tCube, vec3( -vReflect.x + 0.005, vReflect.yz ) ).g;",
-					// "cubeColor.b = textureCube( tCube, vec3( -vReflect.x + 0.01, vReflect.yz ) ).b;",
-
-				"}",
-
-				// Blinn-Phong
-				// based on o3d example
-
-				"if ( material == 2 ) { ",
-
-					"vec3 normal = normalize( vNormal );",
-					"vec3 viewPosition = normalize( vViewPosition );",
-
-					// point lights
-
-					"#if MAX_POINT_LIGHTS > 0",
-						
-						"vec4 pointDiffuse  = vec4( 0.0 );",
-						"vec4 pointSpecular = vec4( 0.0 );",
-
-						"for( int i = 0; i < MAX_POINT_LIGHTS; i++ ) {",
-
-							"vec3 pointVector = normalize( vPointLightVector[ i ] );",
-							"vec3 pointHalfVector = normalize( vPointLightVector[ i ] + vViewPosition );",
-
-							"float pointDotNormalHalf = dot( normal, pointHalfVector );",
-							"float pointDiffuseWeight = max( dot( normal, pointVector ), 0.0 );",
-
-							// Ternary conditional is from the original o3d shader. Here it produces abrupt dark cutoff artefacts.
-							// Using just pow works ok in Chrome, but makes different artefact in Firefox 4.
-							// Zeroing on negative pointDotNormalHalf seems to work in both.
-
-							//"float specularCompPoint = dot( normal, pointVector ) < 0.0 || pointDotNormalHalf < 0.0 ? 0.0 : pow( pointDotNormalHalf, mShininess );",
-							//"float specularCompPoint = pow( pointDotNormalHalf, mShininess );",
-							//"float pointSpecularWeight = pointDotNormalHalf < 0.0 ? 0.0 : pow( pointDotNormalHalf, mShininess );",
-
-							// Ternary conditional inside for loop breaks Chrome shader linking.
-							// Must do it with if.
-
-							"float pointSpecularWeight = 0.0;",
-							"if ( pointDotNormalHalf >= 0.0 )",
-								"pointSpecularWeight = pow( pointDotNormalHalf, mShininess );",
-
-							"pointDiffuse  += mColor * pointDiffuseWeight;",
-							"pointSpecular += mSpecular * pointSpecularWeight;",
-
-							"}",
-
-					"#endif",
-					
-					"#if MAX_DIR_LIGHTS > 0",
-					
-						"vec4 dirDiffuse  = vec4( 0.0 );",
-						"vec4 dirSpecular = vec4( 0.0 );" ,
-
-						"for( int i = 0; i < MAX_DIR_LIGHTS; i++ ) {",
-
-							"vec4 lDirection = viewMatrix * vec4( directionalLightDirection[ i ], 0.0 );",
-
-							"vec3 dirVector = normalize( lDirection.xyz );",
-							"vec3 dirHalfVector = normalize( lDirection.xyz + vViewPosition );",
-
-							"float dirDotNormalHalf = dot( normal, dirHalfVector );",
-
-							"float dirDiffuseWeight = max( dot( normal, dirVector ), 0.0 );",
-
-							"float dirSpecularWeight = 0.0;",
-							"if ( dirDotNormalHalf >= 0.0 )",
-								"dirSpecularWeight = pow( dirDotNormalHalf, mShininess );",
-
-								"dirDiffuse  += mColor * dirDiffuseWeight;",
-								"dirSpecular += mSpecular * dirSpecularWeight;",
-
-						"}",
-					
-					"#endif",
-
-					// all lights contribution summation
-
-					"vec4 totalLight = mAmbient;",
-					
-					"#if MAX_DIR_LIGHTS > 0",
-						"totalLight += dirDiffuse + dirSpecular;",
-					"#endif",
-					
-					"#if MAX_POINT_LIGHTS > 0",
-						"totalLight += pointDiffuse + pointSpecular;",
-					"#endif",
-
-					// looks nicer with weighting
-
-					"if ( mixEnvMap ) {",
-
-						"gl_FragColor = vec4( mix( mapColor.rgb * totalLight.xyz * vLightWeighting, cubeColor.rgb, mReflectivity ), mapColor.a );",
-
-					"} else {",
-
-						"gl_FragColor = vec4( mapColor.rgb * cubeColor.rgb * totalLight.xyz * vLightWeighting, mapColor.a );",
-
-					"}",
-
-				"}",
-
-				THREE.Snippets[ "fog_fragment" ],
-
-			"}" ];
-
-		return chunks.join("\n");
-
-	};
-
-	function generateVertexShader( ) {
-
-		var chunks = [
-
-			"#define PHONG",
-		
-			"uniform bool useRefract;",
-
-			THREE.Snippets[ "lights_pars_vertex" ],
-		
-			"varying vec3 vNormal;",
-			"varying vec2 vUv;",
-
-			"varying vec3 vLightWeighting;",
-
-			"varying vec3 vViewPosition;",
-
-			"varying vec3 vReflect;",
-			"uniform float mRefractionRatio;",
-
-			"void main(void) {",
-
-				// world space
-
-				"vec4 mPosition = objectMatrix * vec4( position, 1.0 );",
-				"vViewPosition = cameraPosition - mPosition.xyz;",
-
-				// this doesn't work on Mac
-				//"vec3 nWorld = mat3(objectMatrix) * normal;",
-				"vec3 nWorld = mat3( objectMatrix[0].xyz, objectMatrix[1].xyz, objectMatrix[2].xyz ) * normal;",
-
-				// eye space
-
-				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
-				"vec3 transformedNormal = normalize( normalMatrix * normal );",
-
-				THREE.Snippets[ "lights_vertex" ],
-
-				"vNormal = transformedNormal;",
-				"vUv = uv;",
-
-				"if ( useRefract ) {",
-
-					"vReflect = refract( normalize(mPosition.xyz - cameraPosition), normalize(nWorld.xyz), mRefractionRatio );",
-
-				"} else {",
-
-					"vReflect = reflect( normalize(mPosition.xyz - cameraPosition), normalize(nWorld.xyz) );",
-
-				"}",
-
-				"gl_Position = projectionMatrix * mvPosition;",
-
-			"}" ];
-
-		return chunks.join("\n");
-
-	};
-
+	
 	function buildProgram( fragment_shader, vertex_shader, parameters ) {
 
 		var program = _gl.createProgram(),
@@ -1272,6 +924,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			alert( "Could not initialise shaders\n"+
 					"VALIDATE_STATUS: " + _gl.getProgramParameter( program, _gl.VALIDATE_STATUS ) + ", gl error [" + _gl.getError() + "]" );
+			
+			//console.log( prefix_fragment + fragment_shader );
+			//console.log( prefix_vertex + vertex_shader );
 
 		}
 
@@ -1427,72 +1082,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function initUbershader( maxDirLights, maxPointLights, fog ) {
-		
-		var vertex_shader = generateVertexShader(),
-			fragment_shader = generateFragmentShader(),
-			program;
-
-		//console.log ( vertex_shader );
-		//console.log ( fragment_shader );
-
-		program = buildProgram( fragment_shader, vertex_shader, { fog: fog, maxDirLights: maxDirLights, maxPointLights: maxPointLights } );
-
-		_gl.useProgram( program );
-
-		// matrices
-		// lights
-		// material properties (Basic / Lambert / Blinn-Phong shader)
-
-		cacheUniformLocations( program, [ 'viewMatrix', 'modelViewMatrix', 'projectionMatrix', 'normalMatrix', 'objectMatrix', 'cameraPosition',
-										   'enableLighting', 'ambientLightColor',
-										   'material', 'mColor', 'mAmbient', 'mSpecular', 'mShininess', 'mOpacity',
-										   'enableMap', 'tMap',
-										   'enableCubeMap', 'tCube', 'mixEnvMap', 'mReflectivity',
-										   'mRefractionRatio', 'useRefract'
-		] );
-
-		if ( fog ) {
-
-			cacheUniformLocations( program, [ 'fogColor', 'fogNear', 'fogFar', 'fogDensity' ] );
-
-		}
-
-		if ( maxDirLights ) {
-
-			cacheUniformLocations( program, [ 'directionalLightColor', 'directionalLightDirection' ] );
-
-		}
-
-		if ( maxPointLights ) {
-
-			cacheUniformLocations( program, [ 'pointLightColor', 'pointLightPosition' ] );
-
-		}
-
-		// texture (diffuse map)
-
-		_gl.uniform1i( program.uniforms.enableMap, 0 );
-		_gl.uniform1i( program.uniforms.tMap, 0 );
-
-		// cube texture
-
-		_gl.uniform1i( program.uniforms.enableCubeMap, 0 );
-		_gl.uniform1i( program.uniforms.tCube, 1 ); // it's important to use non-zero texture unit, otherwise it doesn't work
-		_gl.uniform1i( program.uniforms.mixEnvMap, 0 );
-
-		// refraction
-
-		_gl.uniform1i( program.uniforms.useRefract, 0 );
-
-		// attribute arrays
-
-		cacheAttributeLocations( program, [ "position", "normal", "uv" ] );
-
-		return program;
-
-	};
-
 	function getShader( type, string ) {
 
 		var shader;
@@ -1589,16 +1178,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function allocateLights( scene, maxLights ) {
+	function allocateLights( lights, maxLights ) {
 
 		if ( scene ) {
 
 			var l, ll, light, dirLights, pointLights, maxDirLights, maxPointLights;
 			dirLights = pointLights = maxDirLights = maxPointLights = 0;
 
-			for ( l = 0, ll = scene.lights.length; l < ll; l++ ) {
+			for ( l = 0, ll = lights.length; l < ll; l++ ) {
 
-				light = scene.lights[ l ];
+				light = lights[ l ];
 
 				if ( light instanceof THREE.DirectionalLight ) dirLights++;
 				if ( light instanceof THREE.PointLight ) pointLights++;
@@ -1870,6 +1459,91 @@ THREE.Snippets = {
 		"#endif",
 		
 	"}"
+	
+	].join("\n"),
+	
+	lights_pars_fragment: [
+	
+	"#if MAX_DIR_LIGHTS > 0",
+		"uniform vec3 directionalLightDirection[ MAX_DIR_LIGHTS ];",
+	"#endif",
+	
+	"#if MAX_POINT_LIGHTS > 0",
+		"varying vec3 vPointLightVector[ MAX_POINT_LIGHTS ];",
+	"#endif",
+	
+	"varying vec3 vViewPosition;",
+	"varying vec3 vNormal;"
+	
+	].join("\n"),
+	
+	lights_fragment: [
+	
+	"vec3 normal = normalize( vNormal );",
+	"vec3 viewPosition = normalize( vViewPosition );",
+	
+	"vec4 mSpecular = vec4( specular, opacity );",
+
+	"#if MAX_POINT_LIGHTS > 0",
+		
+		"vec4 pointDiffuse  = vec4( 0.0 );",
+		"vec4 pointSpecular = vec4( 0.0 );",
+
+		"for( int i = 0; i < MAX_POINT_LIGHTS; i++ ) {",
+
+			"vec3 pointVector = normalize( vPointLightVector[ i ] );",
+			"vec3 pointHalfVector = normalize( vPointLightVector[ i ] + vViewPosition );",
+
+			"float pointDotNormalHalf = dot( normal, pointHalfVector );",
+			"float pointDiffuseWeight = max( dot( normal, pointVector ), 0.0 );",
+
+			"float pointSpecularWeight = 0.0;",
+			"if ( pointDotNormalHalf >= 0.0 )",
+				"pointSpecularWeight = pow( pointDotNormalHalf, shininess );",
+
+			"pointDiffuse  += mColor * pointDiffuseWeight;",
+			"pointSpecular += mSpecular * pointSpecularWeight;",
+
+			"}",
+
+	"#endif",
+	
+	"#if MAX_DIR_LIGHTS > 0",
+	
+		"vec4 dirDiffuse  = vec4( 0.0 );",
+		"vec4 dirSpecular = vec4( 0.0 );" ,
+
+		"for( int i = 0; i < MAX_DIR_LIGHTS; i++ ) {",
+
+			"vec4 lDirection = viewMatrix * vec4( directionalLightDirection[ i ], 0.0 );",
+
+			"vec3 dirVector = normalize( lDirection.xyz );",
+			"vec3 dirHalfVector = normalize( lDirection.xyz + vViewPosition );",
+
+			"float dirDotNormalHalf = dot( normal, dirHalfVector );",
+
+			"float dirDiffuseWeight = max( dot( normal, dirVector ), 0.0 );",
+
+			"float dirSpecularWeight = 0.0;",
+			"if ( dirDotNormalHalf >= 0.0 )",
+				"dirSpecularWeight = pow( dirDotNormalHalf, shininess );",
+
+			"dirDiffuse  += mColor * dirDiffuseWeight;",
+			"dirSpecular += mSpecular * dirSpecularWeight;",
+
+		"}",
+	
+	"#endif",
+
+	"vec4 totalLight = vec4( ambient, opacity );",
+
+	"#if MAX_DIR_LIGHTS > 0",
+		"totalLight += dirDiffuse + dirSpecular;",
+	"#endif",
+	
+	"#if MAX_POINT_LIGHTS > 0",
+		"totalLight += pointDiffuse + pointSpecular;",
+	"#endif"
 
 	].join("\n")
 
@@ -1947,11 +1621,13 @@ THREE.ShaderLib = {
 		uniforms: { "color"   : { type: "c", value: new THREE.Color( 0xeeeeee ) },
 					"opacity" : { type: "f", value: 1 },
 					"map"     : { type: "t", value: 0, texture: null },
+					
 					"env_map" 		  : { type: "t", value: 1, texture: null },
 					"useRefract"	  : { type: "i", value: 0 },
 					"reflectivity"    : { type: "f", value: 1 },
 					"refraction_ratio": { type: "f", value: 0.98 },
 					"combine"		  : { type: "i", value: 0 },
+					
 					"fogDensity": { type: "f", value: 0.00025 },
 					"fogNear"	: { type: "f", value: 1 },
 					"fogFar"	: { type: "f", value: 2000 },
@@ -2073,6 +1749,107 @@ THREE.ShaderLib = {
 				THREE.Snippets[ "envmap_vertex" ],
 				
 				"vec3 transformedNormal = normalize( normalMatrix * normal );",
+				
+				THREE.Snippets[ "lights_vertex" ],
+				
+				"gl_Position = projectionMatrix * mvPosition;",
+
+			"}"
+
+		].join("\n")
+		
+	},
+	
+	'phong': {
+		
+		uniforms: { "color"   : { type: "c", value: new THREE.Color( 0xeeeeee ) },
+					"opacity" : { type: "f", value: 1 },
+					"map"     : { type: "t", value: 0, texture: null },
+					
+					"ambient" : { type: "c", value: new THREE.Color( 0x050505 ) },
+					"specular": { type: "c", value: new THREE.Color( 0x111111 ) },
+					"shininess": { type: "f", value: 30 },
+					
+					"env_map" 		  : { type: "t", value: 1, texture: null },
+					"useRefract"	  : { type: "i", value: 0 },
+					"reflectivity"    : { type: "f", value: 1 },
+					"refraction_ratio": { type: "f", value: 0.98 },
+					"combine"		  : { type: "i", value: 0 },
+					
+					"fogDensity": { type: "f", value: 0.00025 },
+					"fogNear"	: { type: "f", value: 1 },
+					"fogFar"	: { type: "f", value: 2000 },
+					"fogColor"	: { type: "c", value: new THREE.Color( 0xffffff ) },
+					
+					"enableLighting" 			: { type: "i", value: 1 },
+					"ambientLightColor" 		: { type: "fv", value: [] },
+					"directionalLightDirection" : { type: "fv", value: [] },
+					"directionalLightColor" 	: { type: "fv", value: [] },
+					"pointLightPosition"		: { type: "fv", value: [] },
+					"pointLightColor"			: { type: "fv", value: [] }
+				},
+		
+		fragment_shader: [
+			
+			"uniform vec3 color;",
+			"uniform float opacity;",
+			
+			"uniform vec3 ambient;",
+			"uniform vec3 specular;",
+			"uniform float shininess;",
+				
+			"varying vec3 vLightWeighting;",
+				
+			THREE.Snippets[ "map_pars_fragment" ],
+			THREE.Snippets[ "envmap_pars_fragment" ],
+			THREE.Snippets[ "fog_pars_fragment" ],
+			THREE.Snippets[ "lights_pars_fragment" ],
+				
+			"void main() {",
+					
+				"vec4 mColor = vec4( color, opacity );",
+				"vec4 mapColor = vec4( 1.0 );",
+				"vec4 cubeColor = vec4( 1.0 );",
+
+				THREE.Snippets[ "map_fragment" ],
+				THREE.Snippets[ "lights_fragment" ],
+
+				"gl_FragColor =  mapColor * totalLight * vec4( vLightWeighting, 1.0 );",
+				
+				THREE.Snippets[ "envmap_fragment" ],
+				THREE.Snippets[ "fog_fragment" ],
+
+			"}"
+
+		].join("\n"),
+
+		vertex_shader: [
+		
+			"#define PHONG",
+			
+			"varying vec3 vLightWeighting;",
+			"varying vec3 vViewPosition;",
+			"varying vec3 vNormal;",
+			
+			THREE.Snippets[ "map_pars_vertex" ],
+			THREE.Snippets[ "envmap_pars_vertex" ],
+			THREE.Snippets[ "lights_pars_vertex" ],
+			
+			"void main() {",
+		
+				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
+				
+				THREE.Snippets[ "map_vertex" ],
+				THREE.Snippets[ "envmap_vertex" ],
+				
+				"#ifndef USE_ENVMAP",
+					"vec4 mPosition = objectMatrix * vec4( position, 1.0 );",
+				"#endif",
+				
+				"vViewPosition = cameraPosition - mPosition.xyz;",
+				
+				"vec3 transformedNormal = normalize( normalMatrix * normal );",
+				"vNormal = transformedNormal;",
 
 				THREE.Snippets[ "lights_vertex" ],
 				
