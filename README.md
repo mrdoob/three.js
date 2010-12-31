@@ -35,11 +35,12 @@ More? irc.freenode.net #three.js
 
 #### WebGL ####
 
+[![shader](http://mrdoob.github.com/three.js/assets/examples/34_shader.png)](http://mrdoob.github.com/three.js/examples/shader.html)
 [![materials_normalmap2](http://mrdoob.github.com/three.js/assets/examples/33_materials_normalmap2.png)](http://mrdoob.github.com/three.js/examples/materials_normalmap2.html)
 [![materials_grass](http://mrdoob.github.com/three.js/assets/examples/32_materials_grass.png)](http://mrdoob.github.com/three.js/examples/materials_grass.html)
 [![materials_normalmap](http://mrdoob.github.com/three.js/assets/examples/31_materials_normalmap.png)](http://mrdoob.github.com/three.js/examples/materials_normalmap.html)
 [![geometry_terrain_gl](http://mrdoob.github.com/three.js/assets/examples/30_geometry_terrain_gl.png)](http://mrdoob.github.com/three.js/examples/geometry_terrain_gl.html)
-[![geometry_minecraft](http://mrdoob.github.com/three.js/assets/examples/29_geometry_minecraft.png)](http://mrdoob.github.com/three.js/examples/geometry_minecraft.html)
+[![geometry_minecraft](http://mrdoob.github.com/three.js/assets/examples/29_geometry_minecraft.png)](http://mrdoob.github.com/three.js/examples/geometry_minecraft_ao.html)
 [![materials_shader_fresnel](http://mrdoob.github.com/three.js/assets/examples/28_materials_shaders_fresnel.png)](http://mrdoob.github.com/three.js/examples/materials_shaders_fresnel.html)
 [![materials_cars](http://mrdoob.github.com/three.js/assets/examples/25_materials_cars.png)](http://mrdoob.github.com/three.js/examples/materials_cars.html)
 [![materials_cubemap_refraction](http://mrdoob.github.com/three.js/assets/examples/18_materials_cubemap_refraction.png)](http://mrdoob.github.com/three.js/examples/materials_cubemap_refraction.html)
@@ -54,6 +55,7 @@ More? irc.freenode.net #three.js
 
 ### Featured projects ###
 
+[![FastKat](http://mrdoob.github.com/three.js/assets/projects/12_fastkat.png)](http://www.omiod.com/games/fastkat.php)
 [![Sculpt](http://mrdoob.github.com/three.js/assets/projects/11_sculpt.png)](http://antimatter15.com/wp/2010/11/digital-sculpting-with-three-js/)
 [![Voxels](http://mrdoob.github.com/three.js/assets/projects/10_voxels.png)](http://mrdoob.com/projects/voxels/)
 [![The Wilderness Downtown](http://mrdoob.github.com/three.js/assets/projects/09_arcadefire.png)](http://thewildernessdowntown.com/)
@@ -115,64 +117,76 @@ This code creates a camera, then creates a scene object, adds a bunch of random 
 
 	</script>
 
-For creating a customised version of the library, including the source files in this order would be a good way to start:
+For creating a customised version of the library, including the source files in this order is a good way to start:
 
-	<script type="text/javascript" src="../src/Three.js"></script>
-	<script type="text/javascript" src="../src/core/Color.js"></script>
-	<script type="text/javascript" src="../src/core/Vector2.js"></script>
-	<script type="text/javascript" src="../src/core/Vector3.js"></script>
-	<script type="text/javascript" src="../src/core/Vector4.js"></script>
-	<script type="text/javascript" src="../src/core/Ray.js"></script>
-	<script type="text/javascript" src="../src/core/Rectangle.js"></script>
-	<script type="text/javascript" src="../src/core/Matrix3.js"></script>
-	<script type="text/javascript" src="../src/core/Matrix4.js"></script>
-	<script type="text/javascript" src="../src/core/Vertex.js"></script>
-	<script type="text/javascript" src="../src/core/Face3.js"></script>
-	<script type="text/javascript" src="../src/core/Face4.js"></script>
-	<script type="text/javascript" src="../src/core/UV.js"></script>
-	<script type="text/javascript" src="../src/core/Geometry.js"></script>
-	<script type="text/javascript" src="../src/cameras/Camera.js"></script>
-	<script type="text/javascript" src="../src/lights/Light.js"></script>
-	<script type="text/javascript" src="../src/lights/AmbientLight.js"></script>
-	<script type="text/javascript" src="../src/lights/DirectionalLight.js"></script>
-	<script type="text/javascript" src="../src/lights/PointLight.js"></script>
-	<script type="text/javascript" src="../src/objects/Object3D.js"></script>
-	<script type="text/javascript" src="../src/objects/Particle.js"></script>
-	<script type="text/javascript" src="../src/objects/Line.js"></script>
-	<script type="text/javascript" src="../src/objects/Mesh.js"></script>
-	<script type="text/javascript" src="../src/materials/Material.js"></script>
-	<script type="text/javascript" src="../src/materials/LineBasicMaterial.js"></script>
-	<script type="text/javascript" src="../src/materials/MeshBasicMaterial.js"></script>
-	<script type="text/javascript" src="../src/materials/MeshLambertMaterial.js"></script>
-	<script type="text/javascript" src="../src/materials/MeshPhongMaterial.js"></script>
-	<script type="text/javascript" src="../src/materials/MeshDepthMaterial.js"></script>
-	<script type="text/javascript" src="../src/materials/MeshNormalMaterial.js"></script>
-	<script type="text/javascript" src="../src/materials/MeshFaceMaterial.js"></script>
-	<script type="text/javascript" src="../src/materials/MeshCubeMaterial.js"></script>
-	<script type="text/javascript" src="../src/materials/MeshShaderMaterial.js"></script>
-	<script type="text/javascript" src="../src/materials/ParticleBasicMaterial.js"></script>
-	<script type="text/javascript" src="../src/materials/ParticleCircleMaterial.js"></script>
-	<script type="text/javascript" src="../src/materials/ParticleDOMMaterial.js"></script>
-	<script type="text/javascript" src="../src/materials/Texture.js"></script>
-	<script type="text/javascript" src="../src/materials/mappings/CubeReflectionMapping.js"></script>
-	<script type="text/javascript" src="../src/materials/mappings/CubeRefractionMapping.js"></script>
-	<script type="text/javascript" src="../src/materials/mappings/LatitudeReflectionMapping.js"></script>
-	<script type="text/javascript" src="../src/materials/mappings/LatitudeRefractionMapping.js"></script>
-	<script type="text/javascript" src="../src/materials/mappings/SphericalReflectionMapping.js"></script>
-	<script type="text/javascript" src="../src/materials/mappings/SphericalRefractionMapping.js"></script>
-	<script type="text/javascript" src="../src/materials/mappings/UVMapping.js"></script>
-	<script type="text/javascript" src="../src/scenes/Scene.js"></script>
-	<script type="text/javascript" src="../src/renderers/Projector.js"></script>
-	<script type="text/javascript" src="../src/renderers/DOMRenderer.js"></script>
-	<script type="text/javascript" src="../src/renderers/CanvasRenderer.js"></script>
-	<script type="text/javascript" src="../src/renderers/SVGRenderer.js"></script>
-	<script type="text/javascript" src="../src/renderers/WebGLRenderer.js"></script>
-	<script type="text/javascript" src="../src/renderers/renderables/RenderableFace3.js"></script>
-	<script type="text/javascript" src="../src/renderers/renderables/RenderableParticle.js"></script>
-	<script type="text/javascript" src="../src/renderers/renderables/RenderableLine.js"></script>
+		<script type="text/javascript" src="../src/Three.js"></script>
+		<script type="text/javascript" src="../src/core/Color.js"></script>
+		<script type="text/javascript" src="../src/core/Vector2.js"></script>
+		<script type="text/javascript" src="../src/core/Vector3.js"></script>
+		<script type="text/javascript" src="../src/core/Vector4.js"></script>
+		<script type="text/javascript" src="../src/core/Ray.js"></script>
+		<script type="text/javascript" src="../src/core/Rectangle.js"></script>
+		<script type="text/javascript" src="../src/core/Matrix3.js"></script>
+		<script type="text/javascript" src="../src/core/Matrix4.js"></script>
+		<script type="text/javascript" src="../src/core/Vertex.js"></script>
+		<script type="text/javascript" src="../src/core/Face3.js"></script>
+		<script type="text/javascript" src="../src/core/Face4.js"></script>
+		<script type="text/javascript" src="../src/core/UV.js"></script>
+		<script type="text/javascript" src="../src/core/Geometry.js"></script>
+		<script type="text/javascript" src="../src/cameras/Camera.js"></script>
+		<script type="text/javascript" src="../src/lights/Light.js"></script>
+		<script type="text/javascript" src="../src/lights/AmbientLight.js"></script>
+		<script type="text/javascript" src="../src/lights/DirectionalLight.js"></script>
+		<script type="text/javascript" src="../src/lights/PointLight.js"></script>
+		<script type="text/javascript" src="../src/objects/Object3D.js"></script>
+		<script type="text/javascript" src="../src/objects/Particle.js"></script>
+		<script type="text/javascript" src="../src/objects/Line.js"></script>
+		<script type="text/javascript" src="../src/objects/Mesh.js"></script>
+		<script type="text/javascript" src="../src/materials/Material.js"></script>
+		<script type="text/javascript" src="../src/materials/LineBasicMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/MeshBasicMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/MeshLambertMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/MeshPhongMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/MeshDepthMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/MeshNormalMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/MeshFaceMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/MeshShaderMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/ParticleBasicMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/ParticleCircleMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/ParticleDOMMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/Texture.js"></script>
+		<script type="text/javascript" src="../src/materials/Uniforms.js"></script>
+		<script type="text/javascript" src="../src/materials/mappings/CubeReflectionMapping.js"></script>
+		<script type="text/javascript" src="../src/materials/mappings/CubeRefractionMapping.js"></script>
+		<script type="text/javascript" src="../src/materials/mappings/LatitudeReflectionMapping.js"></script>
+		<script type="text/javascript" src="../src/materials/mappings/LatitudeRefractionMapping.js"></script>
+		<script type="text/javascript" src="../src/materials/mappings/SphericalReflectionMapping.js"></script>
+		<script type="text/javascript" src="../src/materials/mappings/SphericalRefractionMapping.js"></script>
+		<script type="text/javascript" src="../src/materials/mappings/UVMapping.js"></script>
+		<script type="text/javascript" src="../src/scenes/Scene.js"></script>
+		<script type="text/javascript" src="../src/scenes/Fog.js"></script>
+		<script type="text/javascript" src="../src/scenes/FogExp2.js"></script>
+		<script type="text/javascript" src="../src/renderers/Projector.js"></script>
+		<script type="text/javascript" src="../src/renderers/DOMRenderer.js"></script>
+		<script type="text/javascript" src="../src/renderers/CanvasRenderer.js"></script>
+		<script type="text/javascript" src="../src/renderers/SVGRenderer.js"></script>
+		<script type="text/javascript" src="../src/renderers/WebGLRenderer.js"></script>
+		<script type="text/javascript" src="../src/renderers/renderables/RenderableObject.js"></script>
+		<script type="text/javascript" src="../src/renderers/renderables/RenderableFace3.js"></script>
+		<script type="text/javascript" src="../src/renderers/renderables/RenderableParticle.js"></script>
+		<script type="text/javascript" src="../src/renderers/renderables/RenderableLine.js"></script>
 
 
 ### Change Log ###
+
+2010 12 31 - **r32** (89.301 KB, gzip: 21.351 KB)
+
+* `Scene` now supports `Fog` and `FogExp2`. `WebGLRenderer` only right now. ([alteredq](http://github.com/alteredq))
+* Added `setClearColor( hex, opacity )` to `WebGLRenderer` and `CanvasRenderer` ([alteredq](http://github.com/alteredq) & [mrdoob](http://github.com/mrdoob))
+* `WebGLRenderer` shader system refactored improving performance. ([alteredq](http://github.com/alteredq))
+* `Projector` now does frustum culling of all the objects using their sphereBoundingBox. (thx [errynp](https://github.com/errynp))
+* `material` property changed to `materials` globaly.
+
 
 2010 12 06 - **r31** (79.479 KB, gzip: 18.788 KB)
 

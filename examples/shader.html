@@ -115,9 +115,9 @@
 
 				material = new THREE.MeshShaderMaterial( {
 
+					uniforms: uniforms,
 					vertex_shader: document.getElementById( 'vertex_shader' ).textContent,
-					fragment_shader: document.getElementById( 'fragment_shader' ).textContent,
-					uniforms: uniforms
+					fragment_shader: document.getElementById( 'fragment_shader' ).textContent
 
 					} );
 
