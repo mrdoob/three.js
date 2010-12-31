@@ -1549,6 +1549,40 @@ THREE.Snippets = {
 
 };
 
+THREE.UniformsLib = {
+	
+	common: {
+		
+	"color"   : { type: "c", value: new THREE.Color( 0xeeeeee ) },
+	"opacity" : { type: "f", value: 1 },
+	"map"     : { type: "t", value: 0, texture: null },
+	
+	"env_map" 		  : { type: "t", value: 1, texture: null },
+	"useRefract"	  : { type: "i", value: 0 },
+	"reflectivity"    : { type: "f", value: 1 },
+	"refraction_ratio": { type: "f", value: 0.98 },
+	"combine"		  : { type: "i", value: 0 },
+	
+	"fogDensity": { type: "f", value: 0.00025 },
+	"fogNear"	: { type: "f", value: 1 },
+	"fogFar"	: { type: "f", value: 2000 },
+	"fogColor"	: { type: "c", value: new THREE.Color( 0xffffff ) }
+	
+	},
+	
+	lights: {
+		
+	"enableLighting" 			: { type: "i", value: 1 },
+	"ambientLightColor" 		: { type: "fv", value: [] },
+	"directionalLightDirection" : { type: "fv", value: [] },
+	"directionalLightColor" 	: { type: "fv", value: [] },
+	"pointLightPosition"		: { type: "fv", value: [] },
+	"pointLightColor"			: { type: "fv", value: [] }
+	
+	}
+	
+};
+
 THREE.ShaderLib = {
 
 	'depth': {
@@ -1617,23 +1651,9 @@ THREE.ShaderLib = {
 	},
 
 	'basic': {
-
-		uniforms: { "color"   : { type: "c", value: new THREE.Color( 0xeeeeee ) },
-					"opacity" : { type: "f", value: 1 },
-					"map"     : { type: "t", value: 0, texture: null },
-					
-					"env_map" 		  : { type: "t", value: 1, texture: null },
-					"useRefract"	  : { type: "i", value: 0 },
-					"reflectivity"    : { type: "f", value: 1 },
-					"refraction_ratio": { type: "f", value: 0.98 },
-					"combine"		  : { type: "i", value: 0 },
-					
-					"fogDensity": { type: "f", value: 0.00025 },
-					"fogNear"	: { type: "f", value: 1 },
-					"fogFar"	: { type: "f", value: 2000 },
-					"fogColor"	: { type: "c", value: new THREE.Color( 0xffffff ) }
-				},
-
+		
+		uniforms: THREE.UniformsLib[ "common" ],
+		
 		fragment_shader: [
 
 			"uniform vec3 color;",
@@ -1682,28 +1702,8 @@ THREE.ShaderLib = {
 
 	'lambert': {
 		
-		uniforms: { "color"   : { type: "c", value: new THREE.Color( 0xeeeeee ) },
-					"opacity" : { type: "f", value: 1 },
-					"map"     : { type: "t", value: 0, texture: null },
-					
-					"env_map" 		  : { type: "t", value: 1, texture: null },
-					"useRefract"	  : { type: "i", value: 0 },
-					"reflectivity"    : { type: "f", value: 1 },
-					"refraction_ratio": { type: "f", value: 0.98 },
-					"combine"		  : { type: "i", value: 0 },
-					
-					"fogDensity": { type: "f", value: 0.00025 },
-					"fogNear"	: { type: "f", value: 1 },
-					"fogFar"	: { type: "f", value: 2000 },
-					"fogColor"	: { type: "c", value: new THREE.Color( 0xffffff ) },
-					
-					"enableLighting" 			: { type: "i", value: 1 },
-					"ambientLightColor" 		: { type: "fv", value: [] },
-					"directionalLightDirection" : { type: "fv", value: [] },
-					"directionalLightColor" 	: { type: "fv", value: [] },
-					"pointLightPosition"		: { type: "fv", value: [] },
-					"pointLightColor"			: { type: "fv", value: [] }
-				},
+		uniforms: Uniforms.merge( [ THREE.UniformsLib[ "common" ], 
+									THREE.UniformsLib[ "lights" ] ] ),
 		
 		fragment_shader: [
 			
@@ -1762,32 +1762,15 @@ THREE.ShaderLib = {
 	
 	'phong': {
 		
-		uniforms: { "color"   : { type: "c", value: new THREE.Color( 0xeeeeee ) },
-					"opacity" : { type: "f", value: 1 },
-					"map"     : { type: "t", value: 0, texture: null },
-					
-					"ambient" : { type: "c", value: new THREE.Color( 0x050505 ) },
-					"specular": { type: "c", value: new THREE.Color( 0x111111 ) },
-					"shininess": { type: "f", value: 30 },
-					
-					"env_map" 		  : { type: "t", value: 1, texture: null },
-					"useRefract"	  : { type: "i", value: 0 },
-					"reflectivity"    : { type: "f", value: 1 },
-					"refraction_ratio": { type: "f", value: 0.98 },
-					"combine"		  : { type: "i", value: 0 },
-					
-					"fogDensity": { type: "f", value: 0.00025 },
-					"fogNear"	: { type: "f", value: 1 },
-					"fogFar"	: { type: "f", value: 2000 },
-					"fogColor"	: { type: "c", value: new THREE.Color( 0xffffff ) },
-					
-					"enableLighting" 			: { type: "i", value: 1 },
-					"ambientLightColor" 		: { type: "fv", value: [] },
-					"directionalLightDirection" : { type: "fv", value: [] },
-					"directionalLightColor" 	: { type: "fv", value: [] },
-					"pointLightPosition"		: { type: "fv", value: [] },
-					"pointLightColor"			: { type: "fv", value: [] }
-				},
+		uniforms: Uniforms.merge( [ THREE.UniformsLib[ "common" ], 
+									THREE.UniformsLib[ "lights" ],
+									
+								    { "ambient"  : { type: "c", value: new THREE.Color( 0x050505 ) },
+									  "specular" : { type: "c", value: new THREE.Color( 0x111111 ) },
+									  "shininess": { type: "f", value: 30 }
+									}
+									
+								] ),
 		
 		fragment_shader: [
 			

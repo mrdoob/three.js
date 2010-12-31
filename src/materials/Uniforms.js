@@ -30,6 +30,26 @@ var Uniforms = {
 
 		return uniforms_dst;
 
+	},
+	
+	merge: function( uniforms ) {
+		
+		var u, p, tmp, merged = {};
+		
+		for( u = 0; u < uniforms.length; u++ ) {
+			
+			tmp = this.clone( uniforms[ u ] );
+			
+			for ( p in tmp ) {
+				
+				merged[ p ] = tmp[ p ];
+			
+			}
+			
+		}
+		
+		return merged;
+		
 	}
 
 };
