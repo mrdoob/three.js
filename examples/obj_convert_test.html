@@ -192,12 +192,15 @@
 				bcanvas.addEventListener("click", toggleCanvas, false);
 				bwebgl.addEventListener("click", toggleWebGL, false);
 
-				var loader = new THREE.Loader();
-				//loader.loadAscii( "obj/male02/Male02_slim.js",     function( geometry ) { createScene( geometry,  90, 50, FLOOR, 105 ) }, "obj/male02" );
-				//loader.loadAscii( "obj/female02/Female02_slim.js", function( geometry ) { createScene( geometry, -80, 50, FLOOR, 0 ) },   "obj/female02" );
-
-				loader.loadBinary( "obj/male02/Male02_bin.js",     function( geometry ) { createScene( geometry,  90, 50, FLOOR, 105 ) }, "obj/male02" );
-				loader.loadBinary( "obj/female02/Female02_bin.js", function( geometry ) { createScene( geometry, -80, 50, FLOOR, 0 ) },   "obj/female02" );
+				var loader = new THREE.Loader(),
+					callbackMale   = function( geometry ) { createScene( geometry,  90, 50, FLOOR, 105 ) },
+					callbackFemale = function( geometry ) { createScene( geometry, -80, 50, FLOOR, 0 ) };
+					
+				//loader.loadAscii( { model: "obj/male02/Male02_slim.js", callback: callbackMale } );
+				//loader.loadAscii( { model: "obj/female02/Female02_slim.js", callback: callbackFemale } );
+				
+				loader.loadBinary( { model: "obj/male02/Male02_bin.js", callback: callbackMale } );
+				loader.loadBinary( { model: "obj/female02/Female02_bin.js", callback: callbackFemale } );
 
 			}
 

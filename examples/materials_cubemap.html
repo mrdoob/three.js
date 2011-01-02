@@ -127,7 +127,7 @@
 				loader = new THREE.Loader( true );
 				document.body.appendChild( loader.statusDomElement );
 				
-				loader.loadBinary( "obj/walt/WaltHead_bin.js", function( geometry ) { createScene( geometry, cubeMaterial1, cubeMaterial2, cubeMaterial3 ) }, "obj/walt" );
+				loader.loadBinary( { model: "obj/walt/WaltHead_bin.js", callback: function( geometry ) { createScene( geometry, cubeMaterial1, cubeMaterial2, cubeMaterial3 ) } } );
 
 			}
 

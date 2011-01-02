@@ -124,7 +124,7 @@
 				loader = new THREE.Loader( true );
 				document.body.appendChild( loader.statusDomElement );
 				
-				loader.loadBinary( 'obj/lucy/Lucy100k_bin.js', function( geometry ) { createScene( geometry, cubeMaterial1, cubeMaterial2, cubeMaterial3 ) }, "obj/lucy" );
+				loader.loadBinary( { model: 'obj/lucy/Lucy100k_bin.js', callback: function( geometry ) { createScene( geometry, cubeMaterial1, cubeMaterial2, cubeMaterial3 ) } } );
 
 			}
 

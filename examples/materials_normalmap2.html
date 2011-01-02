@@ -172,7 +172,7 @@
 				loader = new THREE.Loader( true );
 				document.body.appendChild( loader.statusDomElement );
 
-				loader.loadAscii( "obj/leeperrysmith/LeePerrySmith.js", function( geometry ) { createScene( geometry, 100, material ) }, "obj/leeperrysmith" );
+				loader.loadAscii( { model: "obj/leeperrysmith/LeePerrySmith.js", callback: function( geometry ) { createScene( geometry, 100, material ) } } );
 
 				webglRenderer = new THREE.WebGLRenderer();
 				webglRenderer.setSize( window.innerWidth, window.innerHeight );

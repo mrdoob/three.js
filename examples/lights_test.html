@@ -171,8 +171,8 @@
 
 
 				var loader = new THREE.Loader();
-				//loader.loadAscii( "obj/torus/Torus_slim.js", function( geometry ) { createMesh( geometry ) } );
-				loader.loadBinary( "obj/torus/Torus_bin.js", function( geometry ) { createMesh( geometry ) }, "obj/torus" );
+				//loader.loadAscii( { model: "obj/torus/Torus_slim.js", callback: function( geometry ) { createMesh( geometry ) } } );
+				loader.loadBinary( { model: "obj/torus/Torus_bin.js", callback: function( geometry ) { createMesh( geometry ) } } );
 
 			}
 

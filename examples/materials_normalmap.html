@@ -60,7 +60,8 @@
 			ninja head from <a href="http://developer.amd.com/archive/gpu/MeshMapper/pages/default.aspx" target="_blank">AMD GPU MeshMapper</a>
 			
 			<div id="vt">displacement mapping needs vertex textures (GPU with Shader Model 3.0)<br/>
-			on Windows use <span class="code">Chrome --use-gl=desktop</span> or Firefox 4<br/>
+			on Windows use <span class="code">Chrome --use-gl=desktop</span> <br/>
+			or Firefox 4 (about:config => webgl.mochitest_native_gl=true)<br/>
 			please star this <a href="http://code.google.com/p/chromium/issues/detail?id=52497">Chrome issue</a> to get ANGLE support
 			</div>
 		</div>
@@ -188,7 +189,7 @@
 				loader = new THREE.Loader( true );
 				document.body.appendChild( loader.statusDomElement );
 				
-				loader.loadBinary( "obj/ninja/NinjaLo_bin.js", function( geometry ) { createScene( geometry, scale, material1, material2 ) }, "obj/ninja" );
+				loader.loadBinary( { model: "obj/ninja/NinjaLo_bin.js", callback: function( geometry ) { createScene( geometry, scale, material1, material2 ) } } );
 
 				webglRenderer = new THREE.WebGLRenderer();
 				webglRenderer.setSize( window.innerWidth, window.innerHeight );
