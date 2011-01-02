@@ -73,7 +73,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.setupLights = function ( program, lights ) {
 
-		var l, ll, light, r = g = b = 0,
+		var l, ll, light, r = 0, g = 0, b = 0,
 			dcolors = [], dpositions = [],
 			pcolors = [], ppositions = [];
 
