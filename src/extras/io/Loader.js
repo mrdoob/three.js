@@ -210,7 +210,12 @@ THREE.Loader.prototype = {
 				uvs = [],
 				tri_b, tri_c, tri_m, tri_na, tri_nb, tri_nc,
 				quad_b, quad_c, quad_d, quad_m, quad_na, quad_nb, quad_nc, quad_nd,
-				tri_uvb, tri_uvc, quad_uvb, quad_uvc, quad_uvd;
+				tri_uvb, tri_uvc, quad_uvb, quad_uvc, quad_uvd,
+				start_tri_flat, start_tri_smooth, start_tri_flat_uv, start_tri_smooth_uv,
+				start_quad_flat, start_quad_smooth, start_quad_flat_uv, start_quad_smooth_uv,
+				tri_size, quad_size,
+				len_tri_flat, len_tri_smooth, len_tri_flat_uv, len_tri_smooth_uv,
+				len_quad_flat, len_quad_smooth, len_quad_flat_uv, len_quad_smooth_uv;
 
 
 			THREE.Geometry.call(this);
@@ -245,19 +250,53 @@ THREE.Loader.prototype = {
 			quad_uvc = md.uv_index_bytes * 2,
 			quad_uvd = md.uv_index_bytes * 3;
 			
+			// buffers sizes
+			
+			tri_size =  md.vertex_index_bytes * 3 + md.material_index_bytes;
+			quad_size = md.vertex_index_bytes * 4 + md.material_index_bytes;
+
+			len_tri_flat      = md.ntri_flat      * ( tri_size );
+			len_tri_smooth    = md.ntri_smooth    * ( tri_size + md.normal_index_bytes * 3 );
+			len_tri_flat_uv   = md.ntri_flat_uv   * ( tri_size + md.uv_index_bytes * 3 );
+			len_tri_smooth_uv = md.ntri_smooth_uv * ( tri_size + md.normal_index_bytes * 3 + md.uv_index_bytes * 3 );
+
+			len_quad_flat      = md.nquad_flat      * ( quad_size );
+			len_quad_smooth    = md.nquad_smooth    * ( quad_size + md.normal_index_bytes * 4 );
+			len_quad_flat_uv   = md.nquad_flat_uv   * ( quad_size + md.uv_index_bytes * 4 );
+			len_quad_smooth_uv = md.nquad_smooth_uv * ( quad_size + md.normal_index_bytes * 4 + md.uv_index_bytes * 4 );
+			
+			// read buffers
+			
 			currentOffset += init_vertices( currentOffset );
 			currentOffset += init_normals( currentOffset );
 			currentOffset += init_uvs( currentOffset );
 
-			currentOffset += init_triangles_flat( currentOffset );
-			currentOffset += init_triangles_smooth( currentOffset );
-			currentOffset += init_triangles_flat_uv( currentOffset );
-			currentOffset += init_triangles_smooth_uv( currentOffset );
+			start_tri_flat 		= currentOffset; 
+			start_tri_smooth    = start_tri_flat    + len_tri_flat;
+			start_tri_flat_uv   = start_tri_smooth  + len_tri_smooth;
+			start_tri_smooth_uv = start_tri_flat_uv + len_tri_flat_uv;
+			
+			start_quad_flat     = start_tri_smooth_uv + len_tri_smooth_uv;
+			start_quad_smooth   = start_quad_flat     + len_quad_flat;
+			start_quad_flat_uv  = start_quad_smooth   + len_quad_smooth;
+			start_quad_smooth_uv= start_quad_flat_uv  +len_quad_flat_uv;
 
-			currentOffset += init_quads_flat( currentOffset );
-			currentOffset += init_quads_smooth( currentOffset );
-			currentOffset += init_quads_flat_uv( currentOffset );
-			currentOffset += init_quads_smooth_uv( currentOffset );
+			// have to first process faces with uvs
+			// so that face and uv indices match
+			
+			init_triangles_flat_uv( start_tri_flat_uv );
+			init_triangles_smooth_uv( start_tri_smooth_uv );
+
+			init_quads_flat_uv( start_quad_flat_uv );
+			init_quads_smooth_uv( start_quad_smooth_uv );
+
+			// now we can process untextured faces
+			
+			init_triangles_flat( start_tri_flat );
+			init_triangles_smooth( start_tri_smooth );
+
+			init_quads_flat( start_quad_flat );
+			init_quads_smooth( start_quad_smooth );
 
 			this.computeCentroids();
 			this.computeFaceNormals();
@@ -857,23 +896,14 @@ THREE.Loader.prototype = {
 				}
 
 				var i, l;
-
-				for ( i = 0, l = data.triangles.length; i < l; i += 4 ) {
-
-					add_tri( data.triangles, i );
-
-				}
-
+				
+				// need to process first faces with uvs
+				// as uvs are indexed by face indices
+				
 				for ( i = 0, l = data.triangles_uv.length; i < l; i+= 7 ) {
 
 					add_tri( data.triangles_uv, i );
 					add_uv3( data.triangles_uv, i + 4 );
-
-				}
-
-				for ( i = 0, l = data.triangles_n.length; i < l; i += 7 ) {
-
-					add_tri_n( data.triangles_n, i );
 
 				}
 
@@ -883,7 +913,34 @@ THREE.Loader.prototype = {
 					add_uv3( data.triangles_n_uv, i + 7 );
 
 				}
+				
+				for ( i = 0, l = data.quads_uv.length; i < l; i += 9 ) {
 
+					add_quad( data.quads_uv, i );
+					add_uv4( data.quads_uv, i + 5 );
+
+				}
+				
+				for ( i = 0, l = data.quads_n_uv.length; i < l; i += 13 ) {
+
+					add_quad_n( data.quads_n_uv, i );
+					add_uv4( data.quads_n_uv, i + 9 );
+
+				}
+				
+				// now can process untextured faces
+				
+				for ( i = 0, l = data.triangles.length; i < l; i += 4 ) {
+
+					add_tri( data.triangles, i );
+
+				}
+
+				for ( i = 0, l = data.triangles_n.length; i < l; i += 7 ) {
+
+					add_tri_n( data.triangles_n, i );
+
+				}
 
 				for ( i = 0, l = data.quads.length; i < l; i += 5 ) {
 
@@ -891,23 +948,9 @@ THREE.Loader.prototype = {
 
 				}
 
-				for ( i = 0, l = data.quads_uv.length; i < l; i += 9 ) {
-
-					add_quad( data.quads_uv, i );
-					add_uv4( data.quads_uv, i + 5 );
-
-				}
-
 				for ( i = 0, l = data.quads_n.length; i < l; i += 9 ) {
 
 					add_quad_n( data.quads_n, i );
-
-				}
-
-				for ( i = 0, l = data.quads_n_uv.length; i < l; i += 13 ) {
-
-					add_quad_n( data.quads_n_uv, i );
-					add_uv4( data.quads_n_uv, i + 9 );
 
 				}
 
