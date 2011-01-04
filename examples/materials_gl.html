@@ -44,24 +44,22 @@
 
 				// Grid
 
-				var geometry = new THREE.Geometry();
-				geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( - 500, 0, 0 ) ) );
-				geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( 500, 0, 0 ) ) );
+				var line_material = new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 0.2 } ),
+					geometry = new THREE.Geometry(),
+					floor = -75, step = 25;
+				
+				for ( var i = 0; i <= 40; i ++ ) {
+				
+					geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( - 500, floor, i * step - 500 ) ) );
+					geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(   500, floor, i * step - 500 ) ) );
 
-				for ( var i = 0; i <= 10; i ++ ) {
-
-					var line = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 0.2 } ) );
-					line.position.y = - 120;
-					line.position.z = ( i * 100 ) - 500;
-					scene.addObject( line );
-
-					var line = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 0.2 } ) );
-					line.position.x = ( i * 100 ) - 500;
-					line.position.y = - 120;
-					line.rotation.y = 90 * Math.PI / 180;
-					scene.addObject( line );
+					geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( i * step - 500, floor, -500 ) ) );
+					geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( i * step - 500, floor,  500 ) ) );
 
 				}
+				
+				var line = new THREE.Line( geometry, line_material, THREE.LinePieces );
+				scene.addObject( line );
 
 				var generatedTexture = new THREE.Texture( generateTexture() );
 				generatedTexture.image.loaded = 1;
