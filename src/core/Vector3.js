@@ -136,6 +136,16 @@ THREE.Vector3.prototype = {
 
 	},
 
+	divideSelf: function ( v ) {
+
+		this.x /= v.x;
+		this.y /= v.y;
+		this.z /= v.z;
+
+		return this;
+
+	},
+
 	divideScalar: function ( s ) {
 
 		this.x /= s;
