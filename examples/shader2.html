@@ -206,6 +206,8 @@
 					resolution: { type: "v2", value: new THREE.Vector2() },
 					texture: { type: "t", value: 0, texture: ImageUtils.loadTexture( "textures/disturb.jpg" ) }
 				};
+				
+				uniforms2.texture.texture.wrap_s = uniforms2.texture.texture.wrap_t = THREE.Repeat;
 
 				var size = 0.75, mlib = [], 
 					params = [ [ 'fragment_shader1', uniforms1 ],  [ 'fragment_shader2', uniforms2 ], [ 'fragment_shader3', uniforms1 ], [ 'fragment_shader4', uniforms1 ] ];
