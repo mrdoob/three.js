@@ -116,6 +116,51 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	this.createLineBuffers = function( object ) {
+		
+		var v, vl, vertex, 
+			vertexArray = [], lineArray = [], 
+			vertices = object.geometry.vertices;
+		
+		for ( v = 0, vl = vertices.length; v < vl; v++ ) {
+			
+			vertex = vertices[ v ].position;
+			vertexArray.push( vertex.x, vertex.y, vertex.z );
+			
+			if ( object.type == THREE.LineContinuous ) {
+				
+				if ( v < ( vl - 1 ) ) {
+					
+					lineArray.push( v, v + 1 );
+					
+				}
+				
+			} else {
+				
+				lineArray.push( v );
+				
+			}
+			
+		}
+			
+		if ( !vertexArray.length ) {
+
+			return;
+
+		}
+
+		object.__webGLVertexBuffer = _gl.createBuffer();
+		_gl.bindBuffer( _gl.ARRAY_BUFFER, object.__webGLVertexBuffer );
+		_gl.bufferData( _gl.ARRAY_BUFFER, new Float32Array( vertexArray ), _gl.STATIC_DRAW );
+		
+		object.__webGLLineBuffer = _gl.createBuffer();
+		_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, object.__webGLLineBuffer );
+		_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, new Uint16Array( lineArray ), _gl.STATIC_DRAW );
+		
+		object.__webGLLineCount = lineArray.length;
+		
+	};
+	
 	this.createBuffers = function ( object, g ) {
 
 		var f, fl, fi, face, vertexNormals, faceNormal, normal, uv, v1, v2, v3, v4, t1, t2, t3, t4, m, ml, i,
@@ -361,6 +406,30 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 	};
+
+	function refreshUniformsLine( material, fog ) {
+		
+		material.uniforms.color.value.setRGB( material.color.r * material.opacity, material.color.g * material.opacity, material.color.b * material.opacity );		
+		material.uniforms.opacity.value = material.opacity;
+
+		if ( fog ) {
+
+			material.uniforms.fogColor.value.setHex( fog.color.hex );
+
+			if ( fog instanceof THREE.Fog ) {
+
+				material.uniforms.fogNear.value = fog.near;
+				material.uniforms.fogFar.value = fog.far;
+
+			} else if ( fog instanceof THREE.FogExp2 ) {
+
+				material.uniforms.fogDensity.value = fog.density;
+
+			}
+
+		}
+
+	};
 	
 	function refreshUniformsPhong( material ) {
 		
@@ -386,7 +455,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	
 	this.renderBuffer = function ( camera, lights, fog, material, geometryChunk ) {
 
-		var program, u, identifiers, attributes, parameters, vector_lights, maxLightCount;
+		var program, u, identifiers, attributes, parameters, vector_lights, maxLightCount, linewidth;
 
 		if ( !material.program ) {
 
@@ -418,6 +487,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 				setMaterialShaders( material, THREE.ShaderLib[ 'phong' ] );
 				
 				refreshUniformsCommon( material, fog );
+				
+			} else if ( material instanceof THREE.LineBasicMaterial ) {
+				
+				setMaterialShaders( material, THREE.ShaderLib[ 'basic' ] );
+
+				refreshUniformsLine( material, fog );
 				
 			}
 
@@ -467,6 +542,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 			
 			refreshUniformsCommon( material, fog );
 
+		}
+		
+		if ( material instanceof THREE.LineBasicMaterial ) {
+			
+			refreshUniformsLine( material, fog );
 		}
 		
 		if ( material instanceof THREE.MeshPhongMaterial ) {
@@ -524,20 +604,23 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		// render triangles
-
-		if ( ! material.wireframe ) {
-
-			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryChunk.__webGLFaceBuffer );
-			_gl.drawElements( _gl.TRIANGLES, geometryChunk.__webGLFaceCount, _gl.UNSIGNED_SHORT, 0 );
-
 		// render lines
+
+		if ( material.wireframe || material instanceof THREE.LineBasicMaterial ) {
+
+			linewidth = material.wireframe_linewidth !== undefined ? material.wireframe_linewidth : 
+					    material.linewidth !== undefined ? material.linewidth : 1;
+			
+			_gl.lineWidth( linewidth );
+			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryChunk.__webGLLineBuffer );
+			_gl.drawElements( _gl.LINES, geometryChunk.__webGLLineCount, _gl.UNSIGNED_SHORT, 0 );
+
+		// render triangles
 
 		} else {
 
-			_gl.lineWidth( material.wireframe_linewidth );
-			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryChunk.__webGLLineBuffer );
-			_gl.drawElements( _gl.LINES, geometryChunk.__webGLLineCount, _gl.UNSIGNED_SHORT, 0 );
+			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryChunk.__webGLFaceBuffer );
+			_gl.drawElements( _gl.TRIANGLES, geometryChunk.__webGLFaceCount, _gl.UNSIGNED_SHORT, 0 );
 
 		}
 
@@ -581,6 +664,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 	};
+	
+	this.renderPassLines = function( camera, lights, fog, object ) {
+		
+		var m, ml, material;
+		
+		for ( m = 0, ml = object.materials.length; m < ml; m++ ) {
+			
+			material = object.materials[ m ];
+			this.setBlending( material.blending );
+			this.renderBuffer( camera, lights, fog, material, object );
+			
+		}
+		
+	};
 
 	this.render = function( scene, camera ) {
 
@@ -601,6 +698,23 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_viewMatrixArray.set( camera.matrix.flatten() );
 		_projectionMatrixArray.set( camera.projectionMatrix.flatten() );
 
+		// lines
+		
+		for ( o = 0, ol = scene.__webGLLines.length; o < ol; o++ ) {
+			
+			webGLObject = scene.__webGLLines[ o ];
+
+			object = webGLObject.object;
+
+			if ( object.visible ) {
+
+				this.setupMatrices( object, camera );
+				this.renderPassLines( camera, lights, fog, object );
+
+			}
+			
+		}
+		
 		// opaque pass
 
 		for ( o = 0, ol = scene.__webGLObjects.length; o < ol; o++ ) {
@@ -662,21 +776,28 @@ THREE.WebGLRenderer = function ( parameters ) {
 			scene.__webGLObjectsMap = {};
 
 		}
+		
+		if ( !scene.__webGLLines ) {
+			
+			scene.__webGLLines = [];
+			scene.__webGLLinesMap = {};
+			
+		}
 
 		for ( o = 0, ol = scene.objects.length; o < ol; o++ ) {
 
 			object = scene.objects[ o ];
 
-			if ( scene.__webGLObjectsMap[ object.id ] == undefined ) {
-
-				scene.__webGLObjectsMap[ object.id ] = {};
-
-			}
-
-			objmap = scene.__webGLObjectsMap[ object.id ];
-
 			if ( object instanceof THREE.Mesh ) {
+				
+				if ( scene.__webGLObjectsMap[ object.id ] == undefined ) {
 
+					scene.__webGLObjectsMap[ object.id ] = {};
+
+				}
+
+				objmap = scene.__webGLObjectsMap[ object.id ];
+				
 				// create separate VBOs per geometry chunk
 
 				for ( g in object.geometry.geometryChunks ) {
@@ -704,9 +825,34 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-			}/* else if ( object instanceof THREE.Line ) {
+			} else if ( object instanceof THREE.Line ) {
+				
+				if ( scene.__webGLLinesMap[ object.id ] == undefined ) {
 
-			} else if ( object instanceof THREE.Particle ) {
+					scene.__webGLLinesMap[ object.id ] = {};
+
+				}
+
+				lmap = scene.__webGLLinesMap[ object.id ];
+				
+				if( ! object.__webGLVertexBuffer ) {
+				
+					this.createLineBuffers( object );
+					
+				}
+				
+				g = 0;
+				
+				if ( lmap[ g ] == undefined ) {
+
+					globject = { object: object };
+					scene.__webGLLines.push( globject );
+
+					lmap[ g ] = 1;
+
+				}
+
+			}/* else if ( object instanceof THREE.Particle ) {
 
 			}*/
 
