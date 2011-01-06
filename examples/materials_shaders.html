@@ -15,7 +15,7 @@
 			}
 			h1 { }
 			a { color:skyblue }
-			canvas { pointer-events:none; z-index:10; position:relative; }
+			canvas { pointer-events:none; z-index:10; }
 			#log { position:absolute; top:50px; text-align:left; display:block; z-index:100 }
 			#d { text-align:center; margin:1em 0 -19.7em 0; z-index:0; position:relative; display:block }
 			.button { background:orange; color:#fff; padding:0.2em 0.5em; cursor:pointer }
@@ -121,7 +121,7 @@
 				var ambient = new THREE.AmbientLight( 0x101010 );
 				scene.addLight( ambient );
 
-				directionalLight = new THREE.DirectionalLight( 0xffffff, 1.0 );
+				directionalLight = new THREE.DirectionalLight( 0xffffff );
 				directionalLight.position.x = 1;
 				directionalLight.position.y = 1;
 				directionalLight.position.z = 2;
@@ -135,7 +135,7 @@
 				scene.addLight( pointLight );
 
 				// light representation
-				sphere = new Sphere( 100, 16, 8, 1 );
+				sphere = new Sphere( 100, 16, 8 );
 				lightMesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) );
 				lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
 				lightMesh.position = pointLight.position;
@@ -144,7 +144,7 @@
 				scene.addObject(lightMesh);
 
 				// material samples
-				sphere = new Sphere( 100, 32, 32, 1 );
+				sphere = new Sphere( 100, 32, 32 );
 
 				var y1 = 0, y2 = -200;
 				
@@ -173,6 +173,7 @@
 					try {
 						webglRenderer = new THREE.WebGLRenderer();
 						webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+						webglRenderer.domElement.style.position = "relative";
 						container.appendChild( webglRenderer.domElement );
 						has_gl = 1;
 					}
