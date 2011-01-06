@@ -1089,10 +1089,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		for( u in uniforms ) {
 
+			location = program.uniforms[u];
+			if ( !location ) continue;
+			
 			type = uniforms[u].type;
 			value = uniforms[u].value;
-			location = program.uniforms[u];
-
+			
 			if( type == "i" ) {
 
 				_gl.uniform1i( location, value );
