@@ -127,19 +127,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			vertex = vertices[ v ].position;
 			vertexArray.push( vertex.x, vertex.y, vertex.z );
 			
-			if ( object.type == THREE.LineContinuous ) {
-				
-				if ( v < ( vl - 1 ) ) {
-					
-					lineArray.push( v, v + 1 );
-					
-				}
-				
-			} else {
-				
-				lineArray.push( v );
-				
-			}
+			lineArray.push( v );
 			
 		}
 			
@@ -455,7 +443,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	
 	this.renderBuffer = function ( camera, lights, fog, material, geometryChunk ) {
 
-		var program, u, identifiers, attributes, parameters, vector_lights, maxLightCount, linewidth;
+		var program, u, identifiers, attributes, parameters, vector_lights, maxLightCount, linewidth, primitives;
 
 		if ( !material.program ) {
 
@@ -611,9 +599,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 			linewidth = material.wireframe_linewidth !== undefined ? material.wireframe_linewidth : 
 					    material.linewidth !== undefined ? material.linewidth : 1;
 			
+			primitives = material instanceof THREE.LineBasicMaterial && geometryChunk.type == THREE.LineStrip ? _gl.LINE_STRIP : _gl.LINES;
+			
 			_gl.lineWidth( linewidth );
 			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryChunk.__webGLLineBuffer );
-			_gl.drawElements( _gl.LINES, geometryChunk.__webGLLineCount, _gl.UNSIGNED_SHORT, 0 );
+			_gl.drawElements( primitives, geometryChunk.__webGLLineCount, _gl.UNSIGNED_SHORT, 0 );
 
 		// render triangles
 
