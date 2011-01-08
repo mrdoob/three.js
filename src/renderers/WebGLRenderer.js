@@ -654,20 +654,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 	};
-	
-	this.renderPassLines = function( camera, lights, fog, object ) {
-		
-		var m, ml, material;
-		
-		for ( m = 0, ml = object.materials.length; m < ml; m++ ) {
-			
-			material = object.materials[ m ];
-			this.setBlending( material.blending );
-			this.renderBuffer( camera, lights, fog, material, object );
-			
-		}
-		
-	};
 
 	this.render = function( scene, camera ) {
 
@@ -687,23 +673,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_viewMatrixArray.set( camera.matrix.flatten() );
 		_projectionMatrixArray.set( camera.projectionMatrix.flatten() );
-
-		// lines
-		
-		for ( o = 0, ol = scene.__webGLLines.length; o < ol; o++ ) {
-			
-			webGLObject = scene.__webGLLines[ o ];
-
-			object = webGLObject.object;
-
-			if ( object.visible ) {
-
-				this.setupMatrices( object, camera );
-				this.renderPassLines( camera, lights, fog, object );
-
-			}
-			
-		}
 		
 		// opaque pass
 
@@ -767,26 +736,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 		
-		if ( !scene.__webGLLines ) {
-			
-			scene.__webGLLines = [];
-			scene.__webGLLinesMap = {};
-			
-		}
-
 		for ( o = 0, ol = scene.objects.length; o < ol; o++ ) {
 
 			object = scene.objects[ o ];
 
+			if ( scene.__webGLObjectsMap[ object.id ] == undefined ) {
+
+				scene.__webGLObjectsMap[ object.id ] = {};
+
+			}
+
+			objmap = scene.__webGLObjectsMap[ object.id ];
+			
 			if ( object instanceof THREE.Mesh ) {
-				
-				if ( scene.__webGLObjectsMap[ object.id ] == undefined ) {
-
-					scene.__webGLObjectsMap[ object.id ] = {};
-
-				}
-
-				objmap = scene.__webGLObjectsMap[ object.id ];
 				
 				// create separate VBOs per geometry chunk
 
@@ -817,13 +779,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else if ( object instanceof THREE.Line ) {
 				
-				if ( scene.__webGLLinesMap[ object.id ] == undefined ) {
-
-					scene.__webGLLinesMap[ object.id ] = {};
-
-				}
-
-				lmap = scene.__webGLLinesMap[ object.id ];
 				
 				if( ! object.__webGLVertexBuffer ) {
 				
@@ -833,16 +788,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 				
 				g = 0;
 				
-				if ( lmap[ g ] == undefined ) {
+				if ( objmap[ g ] == undefined ) {
 
-					globject = { object: object };
-					scene.__webGLLines.push( globject );
+					globject = { buffer: object, object: object };
+					scene.__webGLObjects.push( globject );
 
-					lmap[ g ] = 1;
+					objmap[ g ] = 1;
 
 				}
 
-			}/* else if ( object instanceof THREE.Particle ) {
+			}/*  else if ( object instanceof THREE.ParticleSystem ) {
+
+			}else if ( object instanceof THREE.Particle ) {
 
 			}*/
 
