@@ -116,6 +116,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	this.createParticleBuffers = function( object ) {
+	};
+	
 	this.createLineBuffers = function( object ) {
 		
 		var v, vl, vertex, 
@@ -127,19 +130,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			vertex = vertices[ v ].position;
 			vertexArray.push( vertex.x, vertex.y, vertex.z );
 			
-			if ( object.type == THREE.LineContinuous ) {
-				
-				if ( v < ( vl - 1 ) ) {
-					
-					lineArray.push( v, v + 1 );
-					
-				}
-				
-			} else {
-				
-				lineArray.push( v );
-				
-			}
+			lineArray.push( v );
 			
 		}
 			
@@ -455,7 +446,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	
 	this.renderBuffer = function ( camera, lights, fog, material, geometryChunk ) {
 
-		var program, u, identifiers, attributes, parameters, vector_lights, maxLightCount, linewidth;
+		var program, u, identifiers, attributes, parameters, vector_lights, maxLightCount, linewidth, primitives;
 
 		if ( !material.program ) {
 
@@ -611,9 +602,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 			linewidth = material.wireframe_linewidth !== undefined ? material.wireframe_linewidth : 
 					    material.linewidth !== undefined ? material.linewidth : 1;
 			
+			primitives = material instanceof THREE.LineBasicMaterial && geometryChunk.type == THREE.LineStrip ? _gl.LINE_STRIP : _gl.LINES;
+			
 			_gl.lineWidth( linewidth );
 			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryChunk.__webGLLineBuffer );
-			_gl.drawElements( _gl.LINES, geometryChunk.__webGLLineCount, _gl.UNSIGNED_SHORT, 0 );
+			_gl.drawElements( primitives, geometryChunk.__webGLLineCount, _gl.UNSIGNED_SHORT, 0 );
 
 		// render triangles
 
@@ -664,20 +657,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 	};
-	
-	this.renderPassLines = function( camera, lights, fog, object ) {
-		
-		var m, ml, material;
-		
-		for ( m = 0, ml = object.materials.length; m < ml; m++ ) {
-			
-			material = object.materials[ m ];
-			this.setBlending( material.blending );
-			this.renderBuffer( camera, lights, fog, material, object );
-			
-		}
-		
-	};
 
 	this.render = function( scene, camera ) {
 
@@ -697,23 +676,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_viewMatrixArray.set( camera.matrix.flatten() );
 		_projectionMatrixArray.set( camera.projectionMatrix.flatten() );
-
-		// lines
-		
-		for ( o = 0, ol = scene.__webGLLines.length; o < ol; o++ ) {
-			
-			webGLObject = scene.__webGLLines[ o ];
-
-			object = webGLObject.object;
-
-			if ( object.visible ) {
-
-				this.setupMatrices( object, camera );
-				this.renderPassLines( camera, lights, fog, object );
-
-			}
-			
-		}
 		
 		// opaque pass
 
@@ -768,7 +730,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.initWebGLObjects = function( scene ) {
 
-		var o, ol, object, globject, g, geometryChunk, objmap;
+		function add_buffer( objmap, id, buffer, object ) {
+			
+			if ( objmap[ id ] == undefined ) {
+
+				scene.__webGLObjects.push( { buffer: buffer, object: object } );
+				objmap[ id ] = 1;
+
+			}
+			
+		};
+		
+		var o, ol, object, g, geometryChunk, objmap;
 
 		if ( !scene.__webGLObjects ) {
 
@@ -777,26 +750,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 		
-		if ( !scene.__webGLLines ) {
-			
-			scene.__webGLLines = [];
-			scene.__webGLLinesMap = {};
-			
-		}
-
 		for ( o = 0, ol = scene.objects.length; o < ol; o++ ) {
 
 			object = scene.objects[ o ];
 
+			if ( scene.__webGLObjectsMap[ object.id ] == undefined ) {
+
+				scene.__webGLObjectsMap[ object.id ] = {};
+
+			}
+
+			objmap = scene.__webGLObjectsMap[ object.id ];
+			
 			if ( object instanceof THREE.Mesh ) {
-				
-				if ( scene.__webGLObjectsMap[ object.id ] == undefined ) {
-
-					scene.__webGLObjectsMap[ object.id ] = {};
-
-				}
-
-				objmap = scene.__webGLObjectsMap[ object.id ];
 				
 				// create separate VBOs per geometry chunk
 
@@ -814,26 +780,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					// create separate wrapper per each use of VBO
 
-					if ( objmap[ g ] == undefined ) {
-
-						globject = { buffer: geometryChunk, object: object };
-						scene.__webGLObjects.push( globject );
-
-						objmap[ g ] = 1;
-
-					}
+					add_buffer( objmap, g, geometryChunk, object );
 
 				}
 
 			} else if ( object instanceof THREE.Line ) {
 				
-				if ( scene.__webGLLinesMap[ object.id ] == undefined ) {
-
-					scene.__webGLLinesMap[ object.id ] = {};
-
-				}
-
-				lmap = scene.__webGLLinesMap[ object.id ];
 				
 				if( ! object.__webGLVertexBuffer ) {
 				
@@ -841,18 +793,21 @@ THREE.WebGLRenderer = function ( parameters ) {
 					
 				}
 				
-				g = 0;
+				add_buffer( objmap, 0, object, object );
 				
-				if ( lmap[ g ] == undefined ) {
 
-					globject = { object: object };
-					scene.__webGLLines.push( globject );
+			} else if ( object instanceof THREE.ParticleSystem ) {
 
-					lmap[ g ] = 1;
-
+				if( ! object.__webGLVertexBuffer ) {
+				
+					this.createParticleBuffers( object );
+					
 				}
-
-			}/* else if ( object instanceof THREE.Particle ) {
+				
+				add_buffer( objmap, 0, object, object );
+				
+				
+			}/*else if ( object instanceof THREE.Particle ) {
 
 			}*/
 
@@ -1089,10 +1044,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		for( u in uniforms ) {
 
+			location = program.uniforms[u];
+			if ( !location ) continue;
+			
 			type = uniforms[u].type;
 			value = uniforms[u].value;
-			location = program.uniforms[u];
-
+			
 			if( type == "i" ) {
 
 				_gl.uniform1i( location, value );
@@ -1326,37 +1283,31 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function allocateLights( lights, maxLights ) {
 
-		if ( scene ) {
+		var l, ll, light, dirLights, pointLights, maxDirLights, maxPointLights;
+		dirLights = pointLights = maxDirLights = maxPointLights = 0;
 
-			var l, ll, light, dirLights, pointLights, maxDirLights, maxPointLights;
-			dirLights = pointLights = maxDirLights = maxPointLights = 0;
+		for ( l = 0, ll = lights.length; l < ll; l++ ) {
 
-			for ( l = 0, ll = lights.length; l < ll; l++ ) {
+			light = lights[ l ];
 
-				light = lights[ l ];
-
-				if ( light instanceof THREE.DirectionalLight ) dirLights++;
-				if ( light instanceof THREE.PointLight ) pointLights++;
-
-			}
-
-			if ( ( pointLights + dirLights ) <= maxLights ) {
-
-				maxDirLights = dirLights;
-				maxPointLights = pointLights;
-
-			} else {
-
-				maxDirLights = Math.ceil( maxLights * dirLights / ( pointLights + dirLights ) );
-				maxPointLights = maxLights - maxDirLights;
-
-			}
-
-			return { 'directional' : maxDirLights, 'point' : maxPointLights };
+			if ( light instanceof THREE.DirectionalLight ) dirLights++;
+			if ( light instanceof THREE.PointLight ) pointLights++;
 
 		}
 
-		return { 'directional' : 1, 'point' : maxLights - 1 };
+		if ( ( pointLights + dirLights ) <= maxLights ) {
+
+			maxDirLights = dirLights;
+			maxPointLights = pointLights;
+
+		} else {
+
+			maxDirLights = Math.ceil( maxLights * dirLights / ( pointLights + dirLights ) );
+			maxPointLights = maxLights - maxDirLights;
+
+		}
+
+		return { 'directional' : maxDirLights, 'point' : maxPointLights };
 
 	};
 
