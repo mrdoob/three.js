@@ -48,6 +48,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	initGL( antialias, clearColor, clearAlpha );
 
+	this.context = _gl;
+
 	//alert( dumpObject( getGLParams() ) );
 
 	this.setSize = function ( width, height ) {
@@ -658,13 +660,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	this.render = function( scene, camera ) {
+	this.render = function( scene, camera, renderTarget ) {
 
 		var o, ol, webGLObject, object, buffer,
 			lights = scene.lights,
 			fog = scene.fog;
 
 		this.initWebGLObjects( scene );
+
+		setRenderTarget( renderTarget );
 
 		if ( this.autoClear ) {
 
@@ -725,6 +729,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 		}
+
+        // Generate mipmap if we're using any kind of mipmap filtering
+        if ( renderTarget && renderTarget.min_filter !== THREE.NearestFilter && renderTarget.min_filter !== THREE.LinearFilter ) {
+
+            _gl.bindTexture( _gl.TEXTURE_2D, renderTarget.__webGLTexture );
+            _gl.generateMipmap(_gl.TEXTURE_2D);
+            _gl.bindTexture( _gl.TEXTURE_2D, null );
+
+        }
 
 	};
 
@@ -1159,6 +1172,43 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	function setRenderTarget( renderTexture ) {
+
+		var framebuffer;
+
+		if ( renderTexture && !renderTexture.__webGLFramebuffer ) {
+			renderTexture.__webGLFramebuffer = _gl.createFramebuffer();
+			renderTexture.__webGLRenderbuffer = _gl.createRenderbuffer();
+			renderTexture.__webGLTexture = _gl.createTexture();
+
+			// Setup renderbuffer
+			_gl.bindRenderbuffer( _gl.RENDERBUFFER, renderTexture.__webGLRenderbuffer );
+			_gl.renderbufferStorage( _gl.RENDERBUFFER, _gl.DEPTH_COMPONENT16, renderTexture.width, renderTexture.height );
+
+			// Setup texture
+			_gl.bindTexture( _gl.TEXTURE_2D, renderTexture.__webGLTexture );
+			_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_S, paramThreeToGL( renderTexture.wrap_s ) );
+			_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_T, paramThreeToGL( renderTexture.wrap_t ) );
+			_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MAG_FILTER, paramThreeToGL( renderTexture.mag_filter ) );
+			_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, paramThreeToGL( renderTexture.min_filter ) );
+			_gl.texImage2D( _gl.TEXTURE_2D, 0, paramThreeToGL( renderTexture.format ), renderTexture.width, renderTexture.height, 0, paramThreeToGL( renderTexture.format ), paramThreeToGL( renderTexture.type ), null);
+
+			// Setup framebuffer
+			_gl.bindFramebuffer( _gl.FRAMEBUFFER, renderTexture.__webGLFramebuffer );
+			_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_2D, renderTexture.__webGLTexture, 0 );
+			_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.DEPTH_ATTACHMENT, _gl.RENDERBUFFER, renderTexture.__webGLRenderbuffer);
+
+			// Release everything
+			_gl.bindTexture( _gl.TEXTURE_2D, null );
+			_gl.bindRenderbuffer( _gl.RENDERBUFFER, null );
+			_gl.bindFramebuffer( _gl.FRAMEBUFFER, null);
+		}
+
+		framebuffer = renderTexture ? renderTexture.__webGLFramebuffer : null;
+		_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
+
+	}
+
 	function cacheUniformLocations( program, identifiers ) {
 
 		var i, l, id;
@@ -1228,6 +1278,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 			case THREE.LinearFilter: return _gl.LINEAR; break;
 			case THREE.LinearMipMapNearestFilter: return _gl.LINEAR_MIPMAP_NEAREST; break;
 			case THREE.LinearMipMapLinearFilter: return _gl.LINEAR_MIPMAP_LINEAR; break;
+
+			case THREE.ByteType: return _gl.BYTE; break;
+			case THREE.UnsignedByteType: return _gl.UNSIGNED_BYTE; break;
+			case THREE.ShortType: return _gl.SHORT; break;
+			case THREE.UnsignedShortType: return _gl.UNSIGNED_SHORT; break;
+			case THREE.IntType: return _gl.INT; break;
+			case THREE.UnsignedShortType: return _gl.UNSIGNED_INT; break;
+			case THREE.FloatType: return _gl.FLOAT; break;
+
+			case THREE.AlphaFormat: return _gl.ALPHA; break;
+			case THREE.RGBFormat: return _gl.RGB; break;
+			case THREE.RGBAFormat: return _gl.RGBA; break;
+			case THREE.LuminanceFormat: return _gl.LUMINANCE; break;
+			case THREE.LuminanceAlphaFormat: return _gl.LUMINANCE_ALPHA; break;
 
 		}
 
