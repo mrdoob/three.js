@@ -127,19 +127,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			vertex = vertices[ v ].position;
 			vertexArray.push( vertex.x, vertex.y, vertex.z );
 			
-			if ( object.type == THREE.LineContinuous ) {
-				
-				if ( v < ( vl - 1 ) ) {
-					
-					lineArray.push( v, v + 1 );
-					
-				}
-				
-			} else {
-				
-				lineArray.push( v );
-				
-			}
+			lineArray.push( v );
 			
 		}
 			
@@ -455,7 +443,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	
 	this.renderBuffer = function ( camera, lights, fog, material, geometryChunk ) {
 
-		var program, u, identifiers, attributes, parameters, vector_lights, maxLightCount, linewidth;
+		var program, u, identifiers, attributes, parameters, vector_lights, maxLightCount, linewidth, primitives;
 
 		if ( !material.program ) {
 
@@ -611,9 +599,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 			linewidth = material.wireframe_linewidth !== undefined ? material.wireframe_linewidth : 
 					    material.linewidth !== undefined ? material.linewidth : 1;
 			
+			primitives = material instanceof THREE.LineBasicMaterial && geometryChunk.type == THREE.LineStrip ? _gl.LINE_STRIP : _gl.LINES;
+			
 			_gl.lineWidth( linewidth );
 			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryChunk.__webGLLineBuffer );
-			_gl.drawElements( _gl.LINES, geometryChunk.__webGLLineCount, _gl.UNSIGNED_SHORT, 0 );
+			_gl.drawElements( primitives, geometryChunk.__webGLLineCount, _gl.UNSIGNED_SHORT, 0 );
 
 		// render triangles
 
@@ -664,20 +654,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 	};
-	
-	this.renderPassLines = function( camera, lights, fog, object ) {
-		
-		var m, ml, material;
-		
-		for ( m = 0, ml = object.materials.length; m < ml; m++ ) {
-			
-			material = object.materials[ m ];
-			this.setBlending( material.blending );
-			this.renderBuffer( camera, lights, fog, material, object );
-			
-		}
-		
-	};
 
 	this.render = function( scene, camera ) {
 
@@ -697,23 +673,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_viewMatrixArray.set( camera.matrix.flatten() );
 		_projectionMatrixArray.set( camera.projectionMatrix.flatten() );
-
-		// lines
-		
-		for ( o = 0, ol = scene.__webGLLines.length; o < ol; o++ ) {
-			
-			webGLObject = scene.__webGLLines[ o ];
-
-			object = webGLObject.object;
-
-			if ( object.visible ) {
-
-				this.setupMatrices( object, camera );
-				this.renderPassLines( camera, lights, fog, object );
-
-			}
-			
-		}
 		
 		// opaque pass
 
@@ -777,26 +736,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 		
-		if ( !scene.__webGLLines ) {
-			
-			scene.__webGLLines = [];
-			scene.__webGLLinesMap = {};
-			
-		}
-
 		for ( o = 0, ol = scene.objects.length; o < ol; o++ ) {
 
 			object = scene.objects[ o ];
 
+			if ( scene.__webGLObjectsMap[ object.id ] == undefined ) {
+
+				scene.__webGLObjectsMap[ object.id ] = {};
+
+			}
+
+			objmap = scene.__webGLObjectsMap[ object.id ];
+			
 			if ( object instanceof THREE.Mesh ) {
-				
-				if ( scene.__webGLObjectsMap[ object.id ] == undefined ) {
-
-					scene.__webGLObjectsMap[ object.id ] = {};
-
-				}
-
-				objmap = scene.__webGLObjectsMap[ object.id ];
 				
 				// create separate VBOs per geometry chunk
 
@@ -827,13 +779,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else if ( object instanceof THREE.Line ) {
 				
-				if ( scene.__webGLLinesMap[ object.id ] == undefined ) {
-
-					scene.__webGLLinesMap[ object.id ] = {};
-
-				}
-
-				lmap = scene.__webGLLinesMap[ object.id ];
 				
 				if( ! object.__webGLVertexBuffer ) {
 				
@@ -843,16 +788,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 				
 				g = 0;
 				
-				if ( lmap[ g ] == undefined ) {
+				if ( objmap[ g ] == undefined ) {
 
-					globject = { object: object };
-					scene.__webGLLines.push( globject );
+					globject = { buffer: object, object: object };
+					scene.__webGLObjects.push( globject );
 
-					lmap[ g ] = 1;
+					objmap[ g ] = 1;
 
 				}
 
-			}/* else if ( object instanceof THREE.Particle ) {
+			}/*  else if ( object instanceof THREE.ParticleSystem ) {
+
+			}else if ( object instanceof THREE.Particle ) {
 
 			}*/
 
@@ -1089,10 +1036,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		for( u in uniforms ) {
 
+			location = program.uniforms[u];
+			if ( !location ) continue;
+			
 			type = uniforms[u].type;
 			value = uniforms[u].value;
-			location = program.uniforms[u];
-
+			
 			if( type == "i" ) {
 
 				_gl.uniform1i( location, value );

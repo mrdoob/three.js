@@ -13,7 +13,7 @@ THREE.Line = function ( geometry, materials, type ) {
 
 };
 
-THREE.LineContinuous = 0;
+THREE.LineStrip = 0;
 THREE.LinePieces = 1;
 
 THREE.Line.prototype = new THREE.Object3D();
