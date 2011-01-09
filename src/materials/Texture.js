@@ -24,7 +24,7 @@ THREE.Texture.prototype = {
 		return new THREE.Texture( this.image, this.mapping, this.wrap_s, this.wrap_t, this.mag_filter, this.min_filter );
 
 	},
-	
+
 	toString: function () {
 
 		return 'THREE.Texture (<br/>' +
@@ -52,3 +52,7 @@ THREE.NearestMipMapLinearFilter = 5;
 THREE.LinearFilter = 6;
 THREE.LinearMipMapNearestFilter = 7;
 THREE.LinearMipMapLinearFilter = 8;
+
+THREE.RGBFormat = 9;
+
+THREE.UnsignedByteType = 10;
