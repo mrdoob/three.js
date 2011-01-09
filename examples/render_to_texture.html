@@ -1,0 +1,149 @@
+<!DOCTYPE HTML>
+<html lang="en">
+    <head>
+        <title>three.js - shader</title>
+        <meta charset="utf-8">
+        <style type="text/css">
+            body {
+                color: #ffffff;
+                font-family:Monospace;
+                font-size:13px;
+                text-align:center;
+                font-weight: bold;
+
+                background-color: #000000;
+                margin: 0px;
+                overflow: hidden;
+            }
+
+            #info {
+                position: absolute;
+                top: 0px; width: 100%;
+                padding: 5px;
+            }
+
+            a {
+
+                color: #ffffff;
+            }
+
+        </style>
+    </head>
+    <body>
+
+        <div id="container"></div>
+        <div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a></div>
+
+        <script type="text/javascript" src="js/Stats.js"></script>
+
+        <script type="text/javascript" src="../build/ThreeWebGL.js"></script>
+        <script type="text/javascript" src="../build/ThreeExtras.js"></script>
+
+        <script id="vertex_shader" type="x-shader/x-vertex">
+            varying vec2 vUv;
+
+            void main()
+            {
+               vUv = uv;
+               gl_Position = vec4( position, 1.0 );
+           }
+        </script>
+
+        <script id="fragment_shader_pass_1" type="x-shader/x-fragment">
+            void main(void)
+            {
+                gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+            }
+        </script>
+
+        <script id="fragment_shader_pass_2" type="x-shader/x-fragment">
+            uniform sampler2D texture;
+
+            varying vec2 vUv;
+
+            void main(void)
+            {
+                vec4 color = texture2D(texture, vUv);
+                gl_FragColor = color;
+            }
+        </script>
+
+        <script type="text/javascript">
+
+            var container, stats;
+
+            var camera, scene, renderer;
+
+            var uniforms, rtTexture, material_1, material_2, mesh;
+
+            init();
+            setInterval( loop, 1000 / 60 );
+
+            function init() {
+
+                container = document.getElementById( 'container' );
+
+                renderer = new THREE.WebGLRenderer();
+                container.appendChild( renderer.domElement );
+
+                camera = new THREE.Camera();
+                camera.position.z = 1;
+
+                scene = new THREE.Scene();
+
+                rtTexture = new THREE.RenderTexture( 512, 512 );
+
+                material_1 = new THREE.MeshShaderMaterial( {
+
+                    uniforms: {},
+                    vertex_shader: document.getElementById( 'vertex_shader' ).textContent,
+                    fragment_shader: document.getElementById( 'fragment_shader_pass_1' ).textContent
+
+                } );
+
+                material_2 = new THREE.MeshShaderMaterial( {
+
+                    uniforms: { texture: { type: "t", value: 0, texture: rtTexture } },
+                    vertex_shader: document.getElementById( 'vertex_shader' ).textContent,
+                    fragment_shader: document.getElementById( 'fragment_shader_pass_2' ).textContent
+
+                } );
+
+                mesh = new THREE.Mesh( new Plane( 2, 2 ) );
+                scene.addObject( mesh );
+
+                onWindowResize();
+
+                window.addEventListener( 'resize', onWindowResize, false );
+
+                stats = new Stats();
+                stats.domElement.style.position = 'absolute';
+                stats.domElement.style.top = '0px';
+                container.appendChild( stats.domElement );
+
+            }
+
+            function onWindowResize( event ) {
+
+              renderer.setSize( window.innerWidth, window.innerHeight );
+
+            }
+
+            function loop() {
+
+                // Render to rtTexture
+                mesh.materials = [material_1];
+                renderer.render( scene, camera, rtTexture );
+
+                // Render to screen
+                mesh.materials = [material_2];
+                renderer.render( scene, camera );
+
+                stats.update();
+
+            }
+
+        </script>
+
+    </body>
+</html>
