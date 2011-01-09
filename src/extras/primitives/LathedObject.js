@@ -2,6 +2,13 @@
  * @author astrodud / http://astrodud.isgreat.org/
  */
 
+function transformVector3( v, m ) { // Transform a Vector3 via a Matrix4
+   var x = m.n11 * v.x + m.n12 * v.y + m.n13 * v.z + m.n14;
+   var y = m.n21 * v.x + m.n22 * v.y + m.n23 * v.z + m.n24;
+   var z = m.n31 * v.x + m.n32 * v.y + m.n33 * v.z + m.n34;
+   return( new THREE.Vector3( x, y, z ) );
+};
+
 function LathedObject( verts, nsteps, latheAngle ) {
    THREE.Geometry.call( this );
    nsteps = nsteps || 12;
@@ -14,7 +21,7 @@ function LathedObject( verts, nsteps, latheAngle ) {
       newV[ j ] = new THREE.Vector3( verts[ j ].x, verts[ j ].y, verts[ j ].z );
    }
    var m = THREE.Matrix4.rotationZMatrix( stepSize );
-   for ( var r = 0; r <= latheAngle + 0.001; r += stepSize ) { // need the +0.001 to it go up to latheAngle
+   for ( var r = 0; r <= latheAngle + 0.001; r += stepSize ) { // need the +0.001 for it go up to latheAngle
       for ( var j = 0; j < newV.length; j ++ ) {
 	 if ( r < latheAngle ) {
 	    newV[ j ] = transformVector3( newV[ j ], m );
