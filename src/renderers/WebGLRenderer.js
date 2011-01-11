@@ -74,6 +74,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.setupLights = function ( program, lights ) {
 
 		var l, ll, light, r = 0, g = 0, b = 0,
+			color, position, intensity,
 			dcolors = [], dpositions = [],
 			pcolors = [], ppositions = [];
 
@@ -81,32 +82,35 @@ THREE.WebGLRenderer = function ( parameters ) {
 		for ( l = 0, ll = lights.length; l < ll; l++ ) {
 
 			light = lights[ l ];
+			color = light.color;
+			position = light.position;
+			intensity = light.intensity;
 
 			if ( light instanceof THREE.AmbientLight ) {
 
-				r += light.color.r;
-				g += light.color.g;
-				b += light.color.b;
+				r += color.r;
+				g += color.g;
+				b += color.b;
 				
 			} else if ( light instanceof THREE.DirectionalLight ) {
 
-				dcolors.push( light.color.r * light.intensity,
-							  light.color.g * light.intensity,
-							  light.color.b * light.intensity );
+				dcolors.push( color.r * intensity,
+							  color.g * intensity,
+							  color.b * intensity );
 
-				dpositions.push( light.position.x,
-								 light.position.y,
-								 light.position.z );
+				dpositions.push( position.x,
+								 position.y,
+								 position.z );
 
 			} else if( light instanceof THREE.PointLight ) {
 
-				pcolors.push( light.color.r * light.intensity,
-							  light.color.g * light.intensity,
-							  light.color.b * light.intensity );
+				pcolors.push( color.r * intensity,
+							  color.g * intensity,
+							  color.b * intensity );
 
-				ppositions.push( light.position.x,
-								 light.position.y,
-								 light.position.z );
+				ppositions.push( position.x,
+								 position.y,
+								 position.z );
 				
 			}
 
@@ -152,205 +156,399 @@ THREE.WebGLRenderer = function ( parameters ) {
 		
 	};
 	
-	this.createBuffers = function ( object, g ) {
+	this.createBuffers = function ( geometryChunk ) {
+		
+		geometryChunk.__webGLVertexBuffer = _gl.createBuffer();
+		geometryChunk.__webGLNormalBuffer = _gl.createBuffer();
+		geometryChunk.__webGLTangentBuffer = _gl.createBuffer();
+		geometryChunk.__webGLUVBuffer = _gl.createBuffer();
+		geometryChunk.__webGLFaceBuffer = _gl.createBuffer();
+		geometryChunk.__webGLLineBuffer = _gl.createBuffer();
+		
+	};
+	
+	this.initBuffers = function( geometryChunk, object ) {
+		
+		var f, fl, nvertices = 0, ntris = 0, nlines = 0,
+			obj_faces = object.geometry.faces, 
+			chunk_faces = geometryChunk.faces;
+		
+		for ( f = 0, fl = chunk_faces.length; f < fl; f++ ) {
+			
+			fi = chunk_faces[ f ];
+			face = obj_faces[ fi ];
+			
+			if ( face instanceof THREE.Face3 ) {
+				
+				nvertices += 3;
+				ntris += 1;
+				nlines += 3;
+				
+			} else if ( face instanceof THREE.Face4 ) {
+				
+				nvertices += 4;
+				ntris += 2;
+				nlines += 5;
+				
+			}
+		
+		}
+		
+		// TODO: only create arrays for attributes existing in the object
+		
+		geometryChunk.__vertexArray  = new Float32Array( nvertices * 3 );
+		geometryChunk.__normalArray  = new Float32Array( nvertices * 3 );
+		geometryChunk.__tangentArray = new Float32Array( nvertices * 4 );
+		geometryChunk.__uvArray = new Float32Array( nvertices * 2 );
+		
+		geometryChunk.__faceArray = new Uint16Array( ntris * 3 );
+		geometryChunk.__lineArray = new Uint16Array( nlines * 2 );
+		
+		geometryChunk.__needsSmoothNormals = bufferNeedsSmoothNormals ( geometryChunk, object );
+		
+		geometryChunk.__webGLFaceCount = ntris * 3;
+		geometryChunk.__webGLLineCount = nlines * 2;
+		
+	};
+	
+	this.setBuffers = function ( geometryChunk, object, hint, dirtyVertices, dirtyElements, dirtyUvs, dirtyNormals, dirtyTangents ) {
 
 		var f, fl, fi, face, vertexNormals, faceNormal, normal, uv, v1, v2, v3, v4, t1, t2, t3, t4, m, ml, i,
-
-		faceArray = [],
-		lineArray = [],
-
-		vertexArray = [],
-		normalArray = [],
-		tangentArray = [],
-		uvArray = [],
-
+			vertices, vn, uvi,
+		
 		vertexIndex = 0,
 
-		geometryChunk = object.geometry.geometryChunks[ g ],
-
-		needsSmoothNormals = bufferNeedsSmoothNormals ( geometryChunk, object );
-
+		offset = 0,
+		offset_uv = 0,
+		offset_face = 0,
+		offset_normal = 0,
+		offset_tangent = 0,
+		offset_line = 0,
+		
+		vertexArray = geometryChunk.__vertexArray,
+		uvArray = geometryChunk.__uvArray,
+		normalArray = geometryChunk.__normalArray,
+		tangentArray = geometryChunk.__tangentArray,
+		
+		faceArray = geometryChunk.__faceArray,
+		lineArray = geometryChunk.__lineArray,
+		
+		needsSmoothNormals = geometryChunk.__needsSmoothNormals,
+		
+		geometry = object.geometry;
+		
 		for ( f = 0, fl = geometryChunk.faces.length; f < fl; f++ ) {
-
+			
 			fi = geometryChunk.faces[ f ];
 
-			face = object.geometry.faces[ fi ];
+			face = geometry.faces[ fi ];
 			vertexNormals = face.vertexNormals;
 			faceNormal = face.normal;
-			uv = object.geometry.uvs[ fi ];
+			uv = geometry.uvs[ fi ];
+			vertices = geometry.vertices;
 
 			if ( face instanceof THREE.Face3 ) {
 
-				v1 = object.geometry.vertices[ face.a ].position;
-				v2 = object.geometry.vertices[ face.b ].position;
-				v3 = object.geometry.vertices[ face.c ].position;
+				if ( dirtyVertices ) {
+					
+					v1 = vertices[ face.a ].position;
+					v2 = vertices[ face.b ].position;
+					v3 = vertices[ face.c ].position;
+					
+					vertexArray[ offset ]     = v1.x;
+					vertexArray[ offset + 1 ] = v1.y;
+					vertexArray[ offset + 2 ] = v1.z;
+					
+					vertexArray[ offset + 3 ] = v2.x;
+					vertexArray[ offset + 4 ] = v2.y;
+					vertexArray[ offset + 5 ] = v2.z;
 
-				vertexArray.push( v1.x, v1.y, v1.z,
-								  v2.x, v2.y, v2.z,
-								  v3.x, v3.y, v3.z );
-
-				if ( object.geometry.hasTangents ) {
-
-					t1 = object.geometry.vertices[ face.a ].tangent;
-					t2 = object.geometry.vertices[ face.b ].tangent;
-					t3 = object.geometry.vertices[ face.c ].tangent;
-
-					tangentArray.push( t1.x, t1.y, t1.z, t1.w,
-									   t2.x, t2.y, t2.z, t2.w,
-									   t3.x, t3.y, t3.z, t3.w );
-
+					vertexArray[ offset + 6 ] = v3.x;
+					vertexArray[ offset + 7 ] = v3.y;
+					vertexArray[ offset + 8 ] = v3.z;
+					
+					offset += 9;
+					
 				}
 
-				if ( vertexNormals.length == 3 && needsSmoothNormals ) {
+				if ( dirtyTangents && geometry.hasTangents ) {
 
+					t1 = vertices[ face.a ].tangent;
+					t2 = vertices[ face.b ].tangent;
+					t3 = vertices[ face.c ].tangent;
+
+					tangentArray[ offset_tangent ]     = t1.x;
+					tangentArray[ offset_tangent + 1 ] = t1.y;
+					tangentArray[ offset_tangent + 2 ] = t1.z;
+					tangentArray[ offset_tangent + 3 ] = t1.w;
+					
+					tangentArray[ offset_tangent + 4 ] = t2.x;
+					tangentArray[ offset_tangent + 5 ] = t2.y;
+					tangentArray[ offset_tangent + 6 ] = t2.z;
+					tangentArray[ offset_tangent + 7 ] = t2.w;
+					
+					tangentArray[ offset_tangent + 8 ]  = t3.x;
+					tangentArray[ offset_tangent + 9 ]  = t3.y;
+					tangentArray[ offset_tangent + 10 ] = t3.z;
+					tangentArray[ offset_tangent + 11 ] = t3.w;
+					
+					offset_tangent += 12;
+					
+				}
+
+				if( dirtyNormals ) {
+				
+					if ( vertexNormals.length == 3 && needsSmoothNormals ) {
+
+
+						for ( i = 0; i < 3; i ++ ) {
+
+							vn = vertexNormals[ i ];
+							
+							normalArray[ offset_normal ]     = vn.x;
+							normalArray[ offset_normal + 1 ] = vn.y;
+							normalArray[ offset_normal + 2 ] = vn.z;
+							
+							offset_normal += 3;
+
+						}
+
+					} else {
+
+						for ( i = 0; i < 3; i ++ ) {
+
+							normalArray[ offset_normal ]     = faceNormal.x;
+							normalArray[ offset_normal + 1 ] = faceNormal.y;
+							normalArray[ offset_normal + 2 ] = faceNormal.z;
+							
+							offset_normal += 3;
+
+						}
+
+					}
+					
+				}
+
+				if ( dirtyUvs && uv ) {
 
 					for ( i = 0; i < 3; i ++ ) {
 
-						normalArray.push( vertexNormals[ i ].x, vertexNormals[ i ].y, vertexNormals[ i ].z );
-
-					}
-
-				} else {
-
-					for ( i = 0; i < 3; i ++ ) {
-
-						normalArray.push( faceNormal.x, faceNormal.y, faceNormal.z );
-
-					}
-
-				}
-
-				if ( uv ) {
-
-					for ( i = 0; i < 3; i ++ ) {
-
-						uvArray.push( uv[ i ].u, uv[ i ].v );
+						uvi = uv[ i ];
+						
+						uvArray[ offset_uv ]     = uvi.u;
+						uvArray[ offset_uv + 1 ] = uvi.v;
+						
+						offset_uv += 2;
 
 					}
 
 				}
 
-				faceArray.push( vertexIndex, vertexIndex + 1, vertexIndex + 2 );
+				if( dirtyElements ) {
+					
+					faceArray[ offset_face ] = vertexIndex;
+					faceArray[ offset_face + 1 ] = vertexIndex + 1;
+					faceArray[ offset_face + 2 ] = vertexIndex + 2;
+					
+					offset_face += 3;
+				
+					lineArray[ offset_line ]     = vertexIndex;
+					lineArray[ offset_line + 1 ] = vertexIndex + 1;
+					
+					lineArray[ offset_line + 2 ] = vertexIndex;
+					lineArray[ offset_line + 3 ] = vertexIndex + 2;
+					
+					lineArray[ offset_line + 4 ] = vertexIndex + 1;
+					lineArray[ offset_line + 5 ] = vertexIndex + 2;
+					
+					offset_line += 6;
 
-				// TODO: don't add lines that already exist (faces sharing edge)
-
-				lineArray.push( vertexIndex, vertexIndex + 1,
-								vertexIndex, vertexIndex + 2,
-								vertexIndex + 1, vertexIndex + 2 );
-
-				vertexIndex += 3;
+					vertexIndex += 3;
+					
+				}
+				
 
 			} else if ( face instanceof THREE.Face4 ) {
 
-				v1 = object.geometry.vertices[ face.a ].position;
-				v2 = object.geometry.vertices[ face.b ].position;
-				v3 = object.geometry.vertices[ face.c ].position;
-				v4 = object.geometry.vertices[ face.d ].position;
+				if ( dirtyVertices ) {
+					
+					v1 = vertices[ face.a ].position;
+					v2 = vertices[ face.b ].position;
+					v3 = vertices[ face.c ].position;
+					v4 = vertices[ face.d ].position;
+			
+					vertexArray[ offset ]     = v1.x;
+					vertexArray[ offset + 1 ] = v1.y;
+					vertexArray[ offset + 2 ] = v1.z;
+					
+					vertexArray[ offset + 3 ] = v2.x;
+					vertexArray[ offset + 4 ] = v2.y;
+					vertexArray[ offset + 5 ] = v2.z;
 
-				vertexArray.push( v1.x, v1.y, v1.z,
-								  v2.x, v2.y, v2.z,
-								  v3.x, v3.y, v3.z,
-								  v4.x, v4.y, v4.z );
+					vertexArray[ offset + 6 ] = v3.x;
+					vertexArray[ offset + 7 ] = v3.y;
+					vertexArray[ offset + 8 ] = v3.z;
 
-				if ( object.geometry.hasTangents ) {
-
-					t1 = object.geometry.vertices[ face.a ].tangent;
-					t2 = object.geometry.vertices[ face.b ].tangent;
-					t3 = object.geometry.vertices[ face.c ].tangent;
-					t4 = object.geometry.vertices[ face.d ].tangent;
-
-					tangentArray.push( t1.x, t1.y, t1.z, t1.w,
-									   t2.x, t2.y, t2.z, t2.w,
-									   t3.x, t3.y, t3.z, t3.w,
-									   t4.x, t4.y, t4.z, t4.w );
-
+					vertexArray[ offset + 9 ] = v4.x;
+					vertexArray[ offset + 10 ] = v4.y;
+					vertexArray[ offset + 11 ] = v4.z;
+				
+					offset += 12;
+					
 				}
 
-				if ( vertexNormals.length == 4 && needsSmoothNormals ) {
+				if ( dirtyTangents && geometry.hasTangents ) {
+
+					t1 = vertices[ face.a ].tangent;
+					t2 = vertices[ face.b ].tangent;
+					t3 = vertices[ face.c ].tangent;
+					t4 = vertices[ face.d ].tangent;
+
+					tangentArray[ offset_tangent ]     = t1.x;
+					tangentArray[ offset_tangent + 1 ] = t1.y;
+					tangentArray[ offset_tangent + 2 ] = t1.z;
+					tangentArray[ offset_tangent + 3 ] = t1.w;
+					
+					tangentArray[ offset_tangent + 4 ] = t2.x;
+					tangentArray[ offset_tangent + 5 ] = t2.y;
+					tangentArray[ offset_tangent + 6 ] = t2.z;
+					tangentArray[ offset_tangent + 7 ] = t2.w;
+					
+					tangentArray[ offset_tangent + 8 ] = t3.x;
+					tangentArray[ offset_tangent + 9 ] = t3.y;
+					tangentArray[ offset_tangent + 10 ] = t3.z;
+					tangentArray[ offset_tangent + 11 ] = t3.w;
+					
+					tangentArray[ offset_tangent + 12 ] = t4.x;
+					tangentArray[ offset_tangent + 13 ] = t4.y;
+					tangentArray[ offset_tangent + 14 ] = t4.z;
+					tangentArray[ offset_tangent + 15 ] = t4.w;
+					
+					offset_tangent += 16;
+					
+				}
+				
+				if( dirtyNormals ) {
+					
+					if ( vertexNormals.length == 4 && needsSmoothNormals ) {
+
+						for ( i = 0; i < 4; i ++ ) {
+
+							vn = vertexNormals[ i ];
+							
+							normalArray[ offset_normal ]     = vn.x;
+							normalArray[ offset_normal + 1 ] = vn.y;
+							normalArray[ offset_normal + 2 ] = vn.z;
+							
+							offset_normal += 3;
+
+						}
+
+					} else {
+
+						for ( i = 0; i < 4; i ++ ) {
+
+							normalArray[ offset_normal ]     = faceNormal.x;
+							normalArray[ offset_normal + 1 ] = faceNormal.y;
+							normalArray[ offset_normal + 2 ] = faceNormal.z;
+							
+							offset_normal += 3;
+
+						}
+
+					}
+					
+				}
+
+				if ( dirtyUvs && uv ) {
 
 					for ( i = 0; i < 4; i ++ ) {
 
-						normalArray.push( vertexNormals[ i ].x, vertexNormals[ i ].y, vertexNormals[ i ].z );
-
-					}
-
-				} else {
-
-					for ( i = 0; i < 4; i ++ ) {
-
-						normalArray.push( faceNormal.x, faceNormal.y, faceNormal.z );
-
-					}
-
-				}
-
-				if ( uv ) {
-
-					for ( i = 0; i < 4; i ++ ) {
-
-						uvArray.push( uv[ i ].u, uv[ i ].v );
+						uvi = uv[ i ];
+						
+						uvArray[ offset_uv ]     = uvi.u;
+						uvArray[ offset_uv + 1 ] = uvi.v;
+						
+						offset_uv += 2;
 
 					}
 
 				}
-
-				faceArray.push( vertexIndex, vertexIndex + 1, vertexIndex + 2,
-								vertexIndex, vertexIndex + 2, vertexIndex + 3 );
-
-				// TODO: don't add lines that already exist (faces sharing edge)
-
-				lineArray.push( vertexIndex, vertexIndex + 1,
-								vertexIndex, vertexIndex + 2,
-								vertexIndex, vertexIndex + 3,
-								vertexIndex + 1, vertexIndex + 2,
-								vertexIndex + 2, vertexIndex + 3 );
-
-				vertexIndex += 4;
+		
+				if( dirtyElements ) {
+					
+					faceArray[ offset_face ]     = vertexIndex;
+					faceArray[ offset_face + 1 ] = vertexIndex + 1;
+					faceArray[ offset_face + 2 ] = vertexIndex + 2;
+					
+					faceArray[ offset_face + 3 ] = vertexIndex;
+					faceArray[ offset_face + 4 ] = vertexIndex + 2;
+					faceArray[ offset_face + 5 ] = vertexIndex + 3;
+					
+					offset_face += 6;
+					
+					lineArray[ offset_line ]     = vertexIndex;
+					lineArray[ offset_line + 1 ] = vertexIndex + 1;
+					
+					lineArray[ offset_line + 2 ] = vertexIndex;
+					lineArray[ offset_line + 3 ] = vertexIndex + 2;
+					
+					lineArray[ offset_line + 4 ] = vertexIndex;
+					lineArray[ offset_line + 5 ] = vertexIndex + 3;
+					
+					lineArray[ offset_line + 6 ] = vertexIndex + 1;
+					lineArray[ offset_line + 7 ] = vertexIndex + 2;
+					
+					lineArray[ offset_line + 8 ] = vertexIndex + 2;
+					lineArray[ offset_line + 9 ] = vertexIndex + 3;
+					
+					offset_line += 10;
+					
+					vertexIndex += 4;
+					
+				}
 
 			}
 
 		}
 
-		if ( !vertexArray.length ) {
-
-			return;
-
+		if ( dirtyVertices ) {
+		
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLVertexBuffer );
+			_gl.bufferData( _gl.ARRAY_BUFFER, vertexArray, hint );
+			
+		}
+		
+		if ( dirtyNormals ) {
+		
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLNormalBuffer );
+			_gl.bufferData( _gl.ARRAY_BUFFER, normalArray, hint );
+			
 		}
 
-		geometryChunk.__webGLVertexBuffer = _gl.createBuffer();
-		_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLVertexBuffer );
-		_gl.bufferData( _gl.ARRAY_BUFFER, new Float32Array( vertexArray ), _gl.STATIC_DRAW );
+		if ( dirtyTangents && geometry.hasTangents ) {
 
-		geometryChunk.__webGLNormalBuffer = _gl.createBuffer();
-		_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLNormalBuffer );
-		_gl.bufferData( _gl.ARRAY_BUFFER, new Float32Array( normalArray ), _gl.STATIC_DRAW );
-
-		if ( object.geometry.hasTangents ) {
-
-			geometryChunk.__webGLTangentBuffer = _gl.createBuffer();
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLTangentBuffer );
-			_gl.bufferData( _gl.ARRAY_BUFFER, new Float32Array( tangentArray ), _gl.STATIC_DRAW );
-
+			_gl.bufferData( _gl.ARRAY_BUFFER, tangentArray, hint );
+		
 		}
 
-		if ( uvArray.length > 0 ) {
+		if ( dirtyUvs && offset_uv > 0 ) {
 
-			geometryChunk.__webGLUVBuffer = _gl.createBuffer();
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLUVBuffer );
-			_gl.bufferData( _gl.ARRAY_BUFFER, new Float32Array( uvArray ), _gl.STATIC_DRAW );
+			_gl.bufferData( _gl.ARRAY_BUFFER, uvArray, hint );
 
 		}
 
-		geometryChunk.__webGLFaceBuffer = _gl.createBuffer();
-		_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryChunk.__webGLFaceBuffer );
-		_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, new Uint16Array( faceArray ), _gl.STATIC_DRAW );
+		if( dirtyElements ) {
+			
+			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryChunk.__webGLFaceBuffer );
+			_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, faceArray, hint );
 
-		geometryChunk.__webGLLineBuffer = _gl.createBuffer();
-		_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryChunk.__webGLLineBuffer );
-		_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, new Uint16Array( lineArray ), _gl.STATIC_DRAW );
-
-		geometryChunk.__webGLFaceCount = faceArray.length;
-		geometryChunk.__webGLLineCount = lineArray.length;
+			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryChunk.__webGLLineBuffer );
+			_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, lineArray, hint );
+			
+		}
 
 	};
 
@@ -741,7 +939,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			
 		};
 		
-		var o, ol, object, g, geometryChunk, objmap;
+		var o, ol, object, g, geometry, geometryChunk, objmap;
 
 		if ( !scene.__webGLObjects ) {
 
@@ -753,7 +951,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		for ( o = 0, ol = scene.objects.length; o < ol; o++ ) {
 
 			object = scene.objects[ o ];
-
+			geometry = object.geometry;
+			
 			if ( scene.__webGLObjectsMap[ object.id ] == undefined ) {
 
 				scene.__webGLObjectsMap[ object.id ] = {};
@@ -766,15 +965,31 @@ THREE.WebGLRenderer = function ( parameters ) {
 				
 				// create separate VBOs per geometry chunk
 
-				for ( g in object.geometry.geometryChunks ) {
+				for ( g in geometry.geometryChunks ) {
 
-					geometryChunk = object.geometry.geometryChunks[ g ];
+					geometryChunk = geometry.geometryChunks[ g ];
 
 					// initialise VBO on the first access
 
 					if( ! geometryChunk.__webGLVertexBuffer ) {
 
-						this.createBuffers( object, g );
+						this.createBuffers( geometryChunk );
+						this.initBuffers( geometryChunk, object );
+						
+						geometry.__dirtyVertices = true;
+						geometry.__dirtyElements = true;
+						geometry.__dirtyUvs = true;
+						geometry.__dirtyNormals = true;
+						geometry.__dirtyTangents = true;
+
+					}
+
+					if( geometry.__dirtyVertices || geometry.__dirtyElements || geometry.__dirtyUvs ) {
+
+						this.setBuffers( geometryChunk, object, _gl.DYNAMIC_DRAW, 
+										 geometry.__dirtyVertices, geometry.__dirtyElements, geometry.__dirtyUvs,
+										 geometry.__dirtyNormals, geometry.__dirtyTangents );
+						
 
 					}
 
@@ -783,6 +998,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 					add_buffer( objmap, g, geometryChunk, object );
 
 				}
+
+				geometry.__dirtyVertices = false;
+				geometry.__dirtyElements = false;
+				geometry.__dirtyUvs = false;
+				geometry.__dirtyNormals = false;
+				geometry.__dirtyTangents = false;
 
 			} else if ( object instanceof THREE.Line ) {
 				
@@ -1040,15 +1261,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setUniforms( program, uniforms ) {
 
-		var u, value, type, location, texture;
+		var u, uniform, value, type, location, texture;
 
 		for( u in uniforms ) {
 
 			location = program.uniforms[u];
 			if ( !location ) continue;
 			
-			type = uniforms[u].type;
-			value = uniforms[u].value;
+			uniform = uniforms[u];
+			
+			type = uniform.type;
+			value = uniform.value;
 			
 			if( type == "i" ) {
 
@@ -1078,7 +1301,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				_gl.uniform1i( location, value );
 
-				texture = uniforms[u].texture;
+				texture = uniform.texture;
 
 				if ( !texture ) continue;
 

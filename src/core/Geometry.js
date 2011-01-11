@@ -113,14 +113,50 @@ THREE.Geometry.prototype = {
 
 	computeVertexNormals: function () {
 
-		var v, vl, vertices = [],
-		f, fl, face;
+		var v, vl, f, fl, face, vertices;
 
-		for ( v = 0, vl = this.vertices.length; v < vl; v ++ ) {
+		// create internal buffers for reuse when calling this method repeatedly
+		// (otherwise memory allocation / deallocation every frame is big resource hog)
+		
+		if ( this.__tmpVertices == undefined ) {
+			
+			this.__tmpVertices = new Array( this.vertices.length );
+			vertices = this.__tmpVertices;
+			
+			for ( v = 0, vl = this.vertices.length; v < vl; v ++ ) {
 
-			vertices[ v ] = new THREE.Vector3();
+				vertices[ v ] = new THREE.Vector3();
 
+			}
+			
+			for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
+
+				face = this.faces[ f ];
+
+				if ( face instanceof THREE.Face3 ) {
+
+					face.vertexNormals = [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ];
+
+				} else if ( face instanceof THREE.Face4 ) {
+
+					face.vertexNormals = [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ];
+
+				}
+
+			}
+			
+		} else {
+			
+			vertices = this.__tmpVertices;
+			
+			for ( v = 0, vl = this.vertices.length; v < vl; v ++ ) {
+
+				vertices[ v ].set( 0, 0, 0 );
+
+			}
+			
 		}
+		
 
 		for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
 
@@ -155,16 +191,16 @@ THREE.Geometry.prototype = {
 
 			if ( face instanceof THREE.Face3 ) {
 
-				face.vertexNormals[ 0 ] = vertices[ face.a ].clone();
-				face.vertexNormals[ 1 ] = vertices[ face.b ].clone();
-				face.vertexNormals[ 2 ] = vertices[ face.c ].clone();
+				face.vertexNormals[ 0 ].copy( vertices[ face.a ] );
+				face.vertexNormals[ 1 ].copy( vertices[ face.b ] );
+				face.vertexNormals[ 2 ].copy( vertices[ face.c ] );
 
 			} else if ( face instanceof THREE.Face4 ) {
 
-				face.vertexNormals[ 0 ] = vertices[ face.a ].clone();
-				face.vertexNormals[ 1 ] = vertices[ face.b ].clone();
-				face.vertexNormals[ 2 ] = vertices[ face.c ].clone();
-				face.vertexNormals[ 3 ] = vertices[ face.d ].clone();
+				face.vertexNormals[ 0 ].copy( vertices[ face.a ] );
+				face.vertexNormals[ 1 ].copy( vertices[ face.b ] );
+				face.vertexNormals[ 2 ].copy( vertices[ face.c ] );
+				face.vertexNormals[ 3 ].copy( vertices[ face.d ] );
 
 			}
 
