@@ -43,7 +43,8 @@
             void main()
             {
                vUv = uv;
-               gl_Position = vec4( position, 1.0 );
+               //gl_Position = vec4( position, 1.0 );
+			   gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
            }
         </script>
 
@@ -59,7 +60,7 @@
 				float g = vUv.y;
 				if( vUv.x < 0.5 ) g = 0.0;
 				
-				gl_FragColor = vec4( r, g, 0.25, 1.0 );
+				gl_FragColor = vec4( r, g, time, 1.0 );
             }
         </script>
 
@@ -84,6 +85,7 @@
                 container = document.getElementById( 'container' );
 
                 cameraRTT = new THREE.Camera();
+				cameraRTT.projectionMatrix = THREE.Matrix4.makeOrtho( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
                 cameraRTT.position.z = 100;
 
 				camera = new THREE.Camera( 30, window.innerWidth / window.innerHeight, 1, 10000 );
@@ -117,7 +119,8 @@
 
                 } );
 
-                quad = new THREE.Mesh( new Plane( 2, 2 ), material );
+                quad = new THREE.Mesh( new Plane( 2000, 1000 ), material );
+				quad.position.z = -1000;
                 sceneRTT.addObject( quad );
 				
 				var n = 5,
@@ -131,6 +134,8 @@
 						mesh = new THREE.Mesh( geometry, material2 );
 						mesh.position.x = ( i - (n-1)/2 ) * 20;
 						mesh.position.y = ( j - (n-1)/2 ) * 20;
+						mesh.position.z = 0;
+						mesh.rotation.y = 1.57;
 						scene.addObject( mesh );
 						
 					}
@@ -138,6 +143,7 @@
 
                 renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.autoClear = false;
                 container.appendChild( renderer.domElement );
 				
                 stats = new Stats();
@@ -172,13 +178,17 @@
 				}
 					
 				material.uniforms.time.value += delta;
-					
+				
+				renderer.clear();
+				
                 renderer.render( sceneRTT, cameraRTT, rtTexture );
-				//renderer.render( sceneRTT, cameraRTT );
-
+				renderer.context.depthMask(0);
+				renderer.render( sceneRTT, cameraRTT );
+				renderer.context.depthMask(1);
                 // Render to screen
 				
                 renderer.render( scene, camera );
+				
 
                 stats.update();
 
