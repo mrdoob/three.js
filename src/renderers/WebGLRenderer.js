@@ -908,11 +908,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		this.initWebGLObjects( scene );
 
-		if ( renderTarget ) {
-			
-			setRenderTarget( renderTarget );
-			
-		}
+		setRenderTarget( renderTarget );
 		
 		if ( this.autoClear ) {
 			
@@ -1454,8 +1450,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setRenderTarget( renderTexture ) {
 
-		var framebuffer;
-
 		if ( renderTexture && !renderTexture.__webGLFramebuffer ) {
 			
 			renderTexture.__webGLFramebuffer = _gl.createFramebuffer();
@@ -1490,7 +1484,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			
 		}
 
-		framebuffer = renderTexture ? renderTexture.__webGLFramebuffer : null;
+		var framebuffer = renderTexture ? renderTexture.__webGLFramebuffer : null;
 		_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 
 	};

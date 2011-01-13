@@ -1,0 +1,177 @@
+<!DOCTYPE HTML>
+<html lang="en">
+    <head>
+        <title>three.js - render-to-texture - webgl</title>
+        <meta charset="utf-8">
+        <style type="text/css">
+            body {
+                color: #ffffff;
+                font-family:Monospace;
+                font-size:13px;
+                text-align:center;
+                font-weight: bold;
+
+                background-color: #000000;
+                margin: 0px;
+                overflow: hidden;
+            }
+
+            #info {
+                position: absolute;
+                top: 0px; width: 100%;
+                padding: 5px;
+            }
+
+            a {
+
+                color: #ffffff;
+            }
+
+        </style>
+    </head>
+    <body>
+
+        <div id="container"></div>
+        <div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> render-to-texture webgl example</div>
+
+        <script type="text/javascript" src="js/Stats.js"></script>
+        <script type="text/javascript" src="../build/ThreeExtras.js"></script>
+
+        <script id="vertex_shader" type="x-shader/x-vertex">
+            varying vec2 vUv;
+
+            void main()
+            {
+               vUv = uv;
+               gl_Position = vec4( position, 1.0 );
+           }
+        </script>
+
+        <script id="fragment_shader_pass_1" type="x-shader/x-fragment">
+			varying vec2 vUv;
+			uniform float time;
+			
+            void main(void)
+            {
+                gl_FragColor = vec4( time, vUv.x, vUv.y, 1.0 );
+            }
+        </script>
+
+        <script type="text/javascript">
+
+            var container, stats;
+
+            var cameraRTT, camera, sceneRTT, scene, renderer;
+
+			var mouseX = 0, mouseY = 0;
+			
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+			
+            var rtTexture, material, quad;
+
+            init();
+            setInterval( loop, 1000 / 60 );
+
+            function init() {
+
+                container = document.getElementById( 'container' );
+
+                cameraRTT = new THREE.Camera();
+                cameraRTT.position.z = 100;
+
+				camera = new THREE.Camera( 30, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.z = 100;
+				camera.updateMatrix();
+
+                sceneRTT = new THREE.Scene();
+				scene = new THREE.Scene();
+
+				var light = new THREE.DirectionalLight( 0xffffff );
+				light.position.x = 0;
+				light.position.y = 0;
+				light.position.z = 1;
+				light.position.normalize();
+				scene.addLight( light );
+
+                rtTexture = new THREE.RenderTarget( 256, 256 );
+
+                material = new THREE.MeshShaderMaterial( {
+
+                    uniforms: { time: { type: "f", value: 0.0 } },
+                    vertex_shader: document.getElementById( 'vertex_shader' ).textContent,
+                    fragment_shader: document.getElementById( 'fragment_shader_pass_1' ).textContent
+
+                } );
+
+                quad = new THREE.Mesh( new Plane( 2, 2 ), material );
+                sceneRTT.addObject( quad );
+				
+				var n = 5,
+					geometry = new Sphere( 10, 64, 32 ),
+					material2 = new THREE.MeshLambertMaterial( { color:0xffffff, map: rtTexture } );
+					//material2 = new THREE.MeshBasicMaterial( { color:0xffffff, map: rtTexture } );
+				
+				for( var j = 0; j < n; j++ ) {
+					for( var i = 0; i < n; i++ ) {
+					
+						mesh = new THREE.Mesh( geometry, material2 );
+						mesh.position.x = ( i - (n-1)/2 ) * 20;
+						mesh.position.y = ( j - (n-1)/2 ) * 20;
+						scene.addObject( mesh );
+						
+					}
+				}
+
+                renderer = new THREE.WebGLRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+                container.appendChild( renderer.domElement );
+				
+                stats = new Stats();
+                stats.domElement.style.position = 'absolute';
+                stats.domElement.style.top = '0px';
+                container.appendChild( stats.domElement );
+				
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+            }
+
+			function onDocumentMouseMove( event ) {
+
+				mouseX = ( event.clientX - windowHalfX );
+				mouseY = ( event.clientY - windowHalfY );
+
+			}
+
+			var delta = 0.01;
+			
+            function loop() {
+
+				camera.position.x += ( mouseX - camera.position.x ) * .05;
+				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+
+                // Render to texture
+				
+				if ( material.uniforms.time.value > 1 || material.uniforms.time.value < 0 ) {
+				
+					delta *= -1;
+					
+				}
+					
+				material.uniforms.time.value += delta;
+					
+                renderer.render( sceneRTT, cameraRTT, rtTexture );
+				//renderer.render( sceneRTT, cameraRTT );
+
+                // Render to screen
+				
+                renderer.render( scene, camera );
+
+                stats.update();
+
+            }
+
+        </script>
+
+    </body>
+</html>
