@@ -22,6 +22,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	var _canvas = document.createElement( 'canvas' ), _gl,
 	_oldProgram = null,
+	_oldFramebuffer = null,
 	_modelViewMatrix = new THREE.Matrix4(), _normalMatrix,
 
 	_viewMatrixArray = new Float32Array(16),
@@ -1484,8 +1485,30 @@ THREE.WebGLRenderer = function ( parameters ) {
 			
 		}
 
-		var framebuffer = renderTexture ? renderTexture.__webGLFramebuffer : null;
-		_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
+		var framebuffer, width, height;
+		
+		if ( renderTexture ) {
+			
+			framebuffer = renderTexture.__webGLFramebuffer;
+			width = renderTexture.width;
+			height = renderTexture.height;
+			
+		} else {
+			
+			framebuffer = null;
+			width = _canvas.width;
+			height = _canvas.height;
+			
+		}
+		
+		if( framebuffer != _oldFramebuffer ) {
+			
+			_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
+			_gl.viewport( 0, 0, width, height );
+			
+			_oldFramebuffer = framebuffer;
+			
+		}
 
 	};
 	

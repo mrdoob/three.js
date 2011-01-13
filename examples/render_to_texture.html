@@ -53,7 +53,13 @@
 			
             void main(void)
             {
-                gl_FragColor = vec4( time, vUv.x, vUv.y, 1.0 );
+                //gl_FragColor = vec4( time, vUv.x, vUv.y, 1.0 );
+				float r = vUv.x;
+				if( vUv.y < 0.5 ) r = 0.0;
+				float g = vUv.y;
+				if( vUv.x < 0.5 ) g = 0.0;
+				
+				gl_FragColor = vec4( r, g, 0.25, 1.0 );
             }
         </script>
 
@@ -91,6 +97,13 @@
 				light.position.x = 0;
 				light.position.y = 0;
 				light.position.z = 1;
+				light.position.normalize();
+				scene.addLight( light );
+
+				light = new THREE.DirectionalLight( 0xffaaaa, 0.5 );
+				light.position.x = -1;
+				light.position.y = 0;
+				light.position.z = -1;
 				light.position.normalize();
 				scene.addLight( light );
 
