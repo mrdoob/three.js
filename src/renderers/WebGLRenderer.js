@@ -1505,6 +1505,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			
 			_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 			_gl.viewport( 0, 0, width, height );
+			_gl.clear( _gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT );
 			
 			_oldFramebuffer = framebuffer;
 			

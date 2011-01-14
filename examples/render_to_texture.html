@@ -43,6 +43,7 @@
 			
             void main(void)
             {
+				//gl_FragColor = texture2D( tDiffuse, vec2( vUv.x, 1.0 - vUv.y ) );
 				gl_FragColor = texture2D( tDiffuse, vUv );
             }
         </script>
@@ -79,7 +80,7 @@
 
             var container, stats;
 
-            var cameraRTT, camera, sceneRTT, sceneScreen, scene, renderer;
+            var cameraRTT, camera, sceneRTT, sceneScreen, scene, renderer, zmesh1, zmesh2;
 
 			var mouseX = 0, mouseY = 0;
 			
@@ -113,6 +114,8 @@
 				light.position.z = 1;
 				light.position.normalize();
 				scene.addLight( light );
+				sceneRTT.addLight( light );
+				sceneScreen.addLight( light );
 
 				light = new THREE.DirectionalLight( 0xffaaaa, 0.5 );
 				light.position.x = -1;
@@ -139,13 +142,16 @@
 
                 } );
 
-				var mt = new THREE.MeshBasicMaterial( { color:0xffffff, map: ImageUtils.loadTexture( "textures/land_ocean_ice_cloud_2048.jpg" ) } );
+				//var mt = new THREE.MeshBasicMaterial( { color:0xffffff, map: ImageUtils.loadTexture( "textures/land_ocean_ice_cloud_2048.jpg" ) } );
 				
-				var plane = new Plane( 2000, 1000 );
+				var plane = new Plane( window.innerWidth, window.innerHeight );
 				
                 quad = new THREE.Mesh( plane, material );
 				quad.position.z = -100;
                 sceneRTT.addObject( quad );
+
+				var loader = new THREE.Loader();
+				loader.loadBinary( { model: "obj/torus/Torus_bin.js", callback: function( geometry ) { createMesh( geometry, sceneRTT ) } } );
 
                 quad = new THREE.Mesh( plane, materialScreen );
 				quad.position.z = -100;
@@ -183,6 +189,31 @@
 
             }
 
+			function createMesh( geometry, xscene ) {
+
+				var mat1 = new THREE.MeshPhongMaterial( { color: 0x555555, specular:0xffaa00, shininess:5 } ),
+					mat2 = new THREE.MeshPhongMaterial( { color: 0x550000, specular:0xff2200, shininess:5 } );
+				
+				zmesh1 = new THREE.Mesh( geometry, mat1 );
+				zmesh1.position.x = 0;
+				zmesh1.position.y = 0;
+				zmesh1.position.z = 100;
+				zmesh1.scale.x = zmesh1.scale.y = zmesh1.scale.z = 150;
+				zmesh1.overdraw = true;
+				zmesh1.updateMatrix();
+				xscene.addObject( zmesh1 );
+
+				zmesh2 = new THREE.Mesh( geometry, mat2 );
+				zmesh2.position.x = 0;
+				zmesh2.position.y = 150;
+				zmesh2.position.z = 100;
+				zmesh2.scale.x = zmesh2.scale.y = zmesh2.scale.z = 75;
+				zmesh2.overdraw = true;
+				zmesh2.updateMatrix();
+				xscene.addObject( zmesh2 );
+
+			}
+
 			function onDocumentMouseMove( event ) {
 
 				mouseX = ( event.clientX - windowHalfX );
@@ -194,10 +225,20 @@
 			
             function loop() {
 
+				var time = new Date().getTime() * 0.0015;
+				
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 
-                
+				if ( zmesh1 && zmesh2 ) {
+				
+					zmesh1.rotation.x = 1.57;
+					zmesh1.rotation.z = time;
+
+					zmesh2.rotation.z = 1.57;
+					zmesh2.rotation.y = -time;
+
+				}
 				
 				if ( material.uniforms.time.value > 1 || material.uniforms.time.value < 0 ) {
 				
@@ -213,11 +254,13 @@
 				
                 renderer.render( sceneRTT, cameraRTT, rtTexture );
 				
+				
 				// Render full screen quad with generated texture
 				// (disable depth writing so that it stays in the background)
 				
 				renderer.context.depthMask( 0 );
 				renderer.render( sceneScreen, cameraRTT );
+				//renderer.render( sceneRTT, cameraRTT );
 				renderer.context.depthMask( 1 );
 				
                 // Render second scene to screen
