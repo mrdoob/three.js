@@ -124,7 +124,7 @@
 				light.position.normalize();
 				scene.addLight( light );
 
-                rtTexture = new THREE.RenderTarget( 512, 512 /*, { min_filter: THREE.NearestFilter, mag_filter: THREE.NearestFilter } */ );
+                rtTexture = new THREE.RenderTarget( window.innerWidth, window.innerHeight, { min_filter: THREE.LinearFilter, mag_filter: THREE.NearestFilter } );
 
                 material = new THREE.MeshShaderMaterial( {
 
