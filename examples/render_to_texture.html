@@ -37,15 +37,14 @@
         <script type="text/javascript" src="js/Stats.js"></script>
         <script type="text/javascript" src="../build/ThreeExtras.js"></script>
 
-        <script id="vertex_shader" type="x-shader/x-vertex">
-            varying vec2 vUv;
-
-            void main()
+        <script id="fragment_shader_screen" type="x-shader/x-fragment">
+			varying vec2 vUv;
+			uniform sampler2D tDiffuse;
+			
+            void main(void)
             {
-               vUv = uv;
-               //gl_Position = vec4( position, 1.0 );
-			   gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-           }
+				gl_FragColor = texture2D( tDiffuse, vUv );
+            }
         </script>
 
         <script id="fragment_shader_pass_1" type="x-shader/x-fragment">
@@ -64,11 +63,23 @@
             }
         </script>
 
+        <script id="vertex_shader" type="x-shader/x-vertex">
+            varying vec2 vUv;
+
+            void main()
+            {
+               vUv = uv;
+               //gl_Position = vec4( position, 1.0 );
+			   gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+           }
+        </script>
+
+
         <script type="text/javascript">
 
             var container, stats;
 
-            var cameraRTT, camera, sceneRTT, scene, renderer;
+            var cameraRTT, camera, sceneRTT, sceneScreen, scene, renderer;
 
 			var mouseX = 0, mouseY = 0;
 			
@@ -93,6 +104,7 @@
 				camera.updateMatrix();
 
                 sceneRTT = new THREE.Scene();
+				sceneScreen = new THREE.Scene();
 				scene = new THREE.Scene();
 
 				var light = new THREE.DirectionalLight( 0xffffff );
@@ -109,7 +121,7 @@
 				light.position.normalize();
 				scene.addLight( light );
 
-                rtTexture = new THREE.RenderTarget( 256, 256 );
+                rtTexture = new THREE.RenderTarget( 512, 512 /*, { min_filter: THREE.NearestFilter, mag_filter: THREE.NearestFilter } */ );
 
                 material = new THREE.MeshShaderMaterial( {
 
@@ -119,10 +131,26 @@
 
                 } );
 
-                quad = new THREE.Mesh( new Plane( 2000, 1000 ), material );
-				quad.position.z = -1000;
-                sceneRTT.addObject( quad );
+                var materialScreen = new THREE.MeshShaderMaterial( {
+
+                    uniforms: { tDiffuse: { type: "t", value: 0, texture: rtTexture } },
+                    vertex_shader: document.getElementById( 'vertex_shader' ).textContent,
+                    fragment_shader: document.getElementById( 'fragment_shader_screen' ).textContent
+
+                } );
+
+				var mt = new THREE.MeshBasicMaterial( { color:0xffffff, map: ImageUtils.loadTexture( "textures/land_ocean_ice_cloud_2048.jpg" ) } );
 				
+				var plane = new Plane( 2000, 1000 );
+				
+                quad = new THREE.Mesh( plane, material );
+				quad.position.z = -100;
+                sceneRTT.addObject( quad );
+
+                quad = new THREE.Mesh( plane, materialScreen );
+				quad.position.z = -100;
+                sceneScreen.addObject( quad );
+
 				var n = 5,
 					geometry = new Sphere( 10, 64, 32 ),
 					material2 = new THREE.MeshLambertMaterial( { color:0xffffff, map: rtTexture } );
@@ -169,7 +197,7 @@
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 
-                // Render to texture
+                
 				
 				if ( material.uniforms.time.value > 1 || material.uniforms.time.value < 0 ) {
 				
@@ -181,11 +209,19 @@
 				
 				renderer.clear();
 				
+				// Render first scene into texture
+				
                 renderer.render( sceneRTT, cameraRTT, rtTexture );
-				renderer.context.depthMask(0);
-				renderer.render( sceneRTT, cameraRTT );
-				renderer.context.depthMask(1);
-                // Render to screen
+				
+				// Render full screen quad with generated texture
+				// (disable depth writing so that it stays in the background)
+				
+				renderer.context.depthMask( 0 );
+				renderer.render( sceneScreen, cameraRTT );
+				renderer.context.depthMask( 1 );
+				
+                // Render second scene to screen
+				// (using first scene as regular texture)
 				
                 renderer.render( scene, camera );
 				
