@@ -87,6 +87,11 @@ THREE.CanvasRenderer = function () {
 
 		_clipRect.set( - _canvasWidthHalf, - _canvasHeightHalf, _canvasWidthHalf, _canvasHeightHalf );
 
+		_contextGlobalAlpha = 1;
+		_contextGlobalCompositeOperation = 0;
+		_contextStrokeStyle = null;
+		_contextFillStyle = null;
+		_contextLineWidth = 1;
 	};
 
 	this.setClearColor = function( hex, opacity ) {
