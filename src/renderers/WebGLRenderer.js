@@ -901,7 +901,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	this.render = function( scene, camera, renderTarget ) {
+	this.render = function( scene, camera, renderTarget, clear ) {
 
 		var o, ol, webGLObject, object, buffer,
 			lights = scene.lights,
@@ -909,7 +909,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		this.initWebGLObjects( scene );
 
-		setRenderTarget( renderTarget );
+		setRenderTarget( renderTarget, clear !==undefined ? clear : true );
 		
 		if ( this.autoClear ) {
 			
@@ -1348,6 +1348,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				_gl.uniform1f( location, value );
 
+			} else if( type == "fv1" ) {
+
+				_gl.uniform1fv( location, value );
+				
 			} else if( type == "fv" ) {
 
 				_gl.uniform3fv( location, value );
@@ -1449,7 +1453,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function setRenderTarget( renderTexture ) {
+	function setRenderTarget( renderTexture, clear ) {
 
 		if ( renderTexture && !renderTexture.__webGLFramebuffer ) {
 			
@@ -1505,7 +1509,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 			
 			_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 			_gl.viewport( 0, 0, width, height );
-			_gl.clear( _gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT );
+			
+			if ( clear ) {
+			
+				_gl.clear( _gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT );
+				
+			}
 			
 			_oldFramebuffer = framebuffer;
 			
