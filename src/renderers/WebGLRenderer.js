@@ -953,6 +953,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				this.setupMatrices( object, camera );
 
+				if( object.doubleSided ) {
+					
+					_gl.disable( _gl.CULL_FACE );
+					
+				} else {
+					
+					_gl.enable( _gl.CULL_FACE );
+					
+				}
+				
 				// opaque blended materials
 
 				this.renderPass( camera, lights, fog, object, buffer, THREE.AdditiveBlending, false );

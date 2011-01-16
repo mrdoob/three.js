@@ -132,6 +132,7 @@
 				mesh.position.z = 0;
 				mesh.rotation.x = 1.57;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 10;
+				mesh.doubleSided = true;
 				mesh.updateMatrix();
 				scene.addObject(mesh);
 
@@ -169,7 +170,6 @@
 				if ( render_gl ) {
 					try {
 						webglRenderer = new THREE.WebGLRenderer();
-						webglRenderer.setFaceCulling(0);
 						webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 						webglRenderer.domElement.style.position = "relative";
 						container.appendChild( webglRenderer.domElement );
