@@ -961,6 +961,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 					
 					_gl.enable( _gl.CULL_FACE );
 					
+					if( object.flipSided ) {
+						
+						_gl.frontFace( _gl.CW );
+						
+					}
+					else {
+						
+						_gl.frontFace( _gl.CCW );
+						
+					}
+					
 				}
 				
 				// opaque blended materials
