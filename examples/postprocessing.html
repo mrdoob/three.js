@@ -250,8 +250,8 @@
 				sceneRTT.addLight( directionalLight );
 
                 rtTexture1 = new THREE.RenderTarget( window.innerWidth, window.innerHeight, { min_filter: THREE.LinearFilter, mag_filter: THREE.NearestFilter } );
-                rtTexture2 = new THREE.RenderTarget( 512, 256, { min_filter: THREE.LinearFilter, mag_filter: THREE.NearestFilter } );
-                rtTexture3 = new THREE.RenderTarget( 512, 256, { min_filter: THREE.LinearFilter, mag_filter: THREE.NearestFilter } );
+                rtTexture2 = new THREE.RenderTarget( 256, 512, { min_filter: THREE.LinearFilter, mag_filter: THREE.LinearFilter } );
+                rtTexture3 = new THREE.RenderTarget( 512, 256, { min_filter: THREE.LinearFilter, mag_filter: THREE.LinearFilter } );
 
                 materialColor = new THREE.MeshShaderMaterial( {
 
@@ -459,6 +459,8 @@
 				materialScreen.uniforms.tDiffuse.texture = rtTexture3;
 				materialScreen.uniforms.opacity.value = 1.0;
 				renderer.render( sceneScreen, cameraOrtho, rtTexture1, false );
+
+				// Render final scene to the screen with film shader
 
 				materialFilm.uniforms.tDiffuse.texture = rtTexture1;
 				quadScreen.materials = [ materialFilm ];
