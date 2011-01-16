@@ -217,7 +217,7 @@
 
             var container, stats;
 
-            var cameraOrtho, cameraPerspective, sceneRTT, sceneScreen, sceneBG, renderer, mesh, directionalLight;
+            var cameraOrtho, cameraPerspective, sceneModel, sceneScreen, sceneBG, renderer, mesh, directionalLight;
 			
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
@@ -238,7 +238,7 @@
 				cameraPerspective = new THREE.Camera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
 				cameraPerspective.position.z = 900;
 
-                sceneRTT = new THREE.Scene();
+                sceneModel = new THREE.Scene();
 				sceneScreen = new THREE.Scene();
 				sceneBG = new THREE.Scene();
 
@@ -247,7 +247,7 @@
 				directionalLight.position.y = 0;
 				directionalLight.position.z = 1;
 				directionalLight.position.normalize();
-				sceneRTT.addLight( directionalLight );
+				sceneModel.addLight( directionalLight );
 
                 rtTexture1 = new THREE.RenderTarget( window.innerWidth, window.innerHeight, { min_filter: THREE.LinearFilter, mag_filter: THREE.NearestFilter } );
                 rtTexture2 = new THREE.RenderTarget( 256, 512, { min_filter: THREE.LinearFilter, mag_filter: THREE.LinearFilter } );
@@ -256,8 +256,8 @@
                 materialColor = new THREE.MeshShaderMaterial( {
 
                     uniforms: { time: { type: "f", value: 0.0 } },
-                    vertex_shader: document.getElementById( 'vs-generic' ).textContent,
-                    fragment_shader: document.getElementById( 'fs-colors' ).textContent
+                    vertex_shader: getText( 'vs-generic' ),
+                    fragment_shader: getText( 'fs-colors' )
 
                 } );
 
@@ -266,8 +266,8 @@
                     uniforms: { tDiffuse: { type: "t", value: 0, texture: rtTexture1 },
 								opacity: { type: "f", value: 0.4 } 
 							  },
-                    vertex_shader: document.getElementById( 'vs-generic' ).textContent,
-                    fragment_shader: document.getElementById( 'fs-screen' ).textContent,
+                    vertex_shader: getText( 'vs-generic' ),
+                    fragment_shader: getText( 'fs-screen' ),
 					blending: THREE.AdditiveBlending
 
                 } );
@@ -275,17 +275,17 @@
                 materialFilm = new THREE.MeshShaderMaterial( {
 
                     uniforms: { tDiffuse: { type: "t", value: 0, texture: rtTexture1 },
-								time: { type: "f", value: 0.0 }					
+								time: { type: "f", value: 0.0 }
 							  },
-                    vertex_shader: document.getElementById( 'vs-generic' ).textContent,
-                    fragment_shader: document.getElementById( 'fs-film' ).textContent
+                    vertex_shader: getText( 'vs-generic' ),
+                    fragment_shader: getText( 'fs-film' )
 
                 } );
 
-				var kernel = buildKernel( 4.0 );
+				var kernel = buildKernel( 4.0 ), increment = 0.001953125;
 				
-				blurx = new THREE.Vector2( 0.001953125, 0.0 ),
-				blury = new THREE.Vector2( 0.0, 0.001953125 );
+				blurx = new THREE.Vector2( increment, 0.0 ),
+				blury = new THREE.Vector2( 0.0, increment );
 				
                 materialConvolution = new THREE.MeshShaderMaterial( {
 
@@ -306,7 +306,7 @@
 
 				loader = new THREE.Loader( true );
 				document.body.appendChild( loader.statusDomElement );
-				loader.loadAscii( { model: "obj/leeperrysmith/LeePerrySmith.js", callback: function( geometry ) { createMesh( geometry, sceneRTT, 100 ) } } );
+				loader.loadAscii( { model: "obj/leeperrysmith/LeePerrySmith.js", callback: function( geometry ) { createMesh( geometry, sceneModel, 100 ) } } );
 				
                 quadScreen = new THREE.Mesh( plane, materialConvolution );
 				quadScreen.position.z = -100;
@@ -324,6 +324,11 @@
 
             }
 
+			function getText( id ) {
+				
+				return document.getElementById( id ).textContent;
+			}
+			
 			function createMesh( geometry, scene, scale ) {
 
 				geometry.computeTangents();
@@ -412,11 +417,11 @@
             function loop() {
 
 				if ( ! start ) start = new Date().getTime();
-				var time = ( new Date().getTime() - start ) * 0.0004;				
+				var time = ( new Date().getTime() - start ) * 0.0004;
 
 				if ( mesh  ) {
 				
-					mesh.rotation.y = -time;			
+					mesh.rotation.y = -time;
 
 				}
 				
@@ -433,11 +438,15 @@
 				
 				// Render scene into texture
 				
+				// background 
+				
 				renderer.context.disable( renderer.context.DEPTH_TEST );
 				renderer.render( sceneBG, cameraOrtho, rtTexture1 );
 				renderer.context.enable( renderer.context.DEPTH_TEST );
 				
-                renderer.render( sceneRTT, cameraPerspective, rtTexture1 );
+				// model
+				
+                renderer.render( sceneModel, cameraPerspective, rtTexture1 );
 
 				// Render quad with blured scene into texture (convolution pass 1)
 				
