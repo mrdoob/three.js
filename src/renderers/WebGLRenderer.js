@@ -54,6 +54,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	//alert( dumpObject( getGLParams() ) );
 
+	this.lights = {
+		
+		ambient: 	 [ 0, 0, 0 ], 
+		directional: { length: 0, colors: new Array(), positions: new Array() }, 
+		point: 		 { length: 0, colors: new Array(), positions: new Array() }
+		
+	};
+	
+
 	this.setSize = function ( width, height ) {
 
 		_canvas.width = width;
@@ -75,14 +84,23 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	
 	this.setupLights = function ( program, lights ) {
 
 		var l, ll, light, r = 0, g = 0, b = 0,
 			color, position, intensity,
-			dcolors = [], dpositions = [],
-			pcolors = [], ppositions = [];
+			
+			zlights = this.lights,
+		
+			dcolors    = zlights.directional.colors,
+			dpositions = zlights.directional.positions,
 
+			pcolors    = zlights.point.colors,
+			ppositions = zlights.point.positions,
 
+			dlength = 0,
+			plength = 0;
+		
 		for ( l = 0, ll = lights.length; l < ll; l++ ) {
 
 			light = lights[ l ];
@@ -98,29 +116,38 @@ THREE.WebGLRenderer = function ( parameters ) {
 				
 			} else if ( light instanceof THREE.DirectionalLight ) {
 
-				dcolors.push( color.r * intensity,
-							  color.g * intensity,
-							  color.b * intensity );
+				dcolors[ dlength*3 ]     = color.r * intensity;
+				dcolors[ dlength*3 + 1 ] = color.g * intensity;
+				dcolors[ dlength*3 + 2 ] = color.b * intensity;
 
-				dpositions.push( position.x,
-								 position.y,
-								 position.z );
+				dpositions[ dlength*3 ]     = position.x;
+				dpositions[ dlength*3 + 1 ] = position.y;
+				dpositions[ dlength*3 + 2 ] = position.z;
 
+				dlength += 1;
+				
 			} else if( light instanceof THREE.PointLight ) {
 
-				pcolors.push( color.r * intensity,
-							  color.g * intensity,
-							  color.b * intensity );
+				pcolors[ plength*3 ]     = color.r * intensity;
+				pcolors[ plength*3 + 1 ] = color.g * intensity;
+				pcolors[ plength*3 + 2 ] = color.b * intensity;
 
-				ppositions.push( position.x,
-								 position.y,
-								 position.z );
+				ppositions[ plength*3 ]     = position.x;
+				ppositions[ plength*3 + 1 ] = position.y;
+				ppositions[ plength*3 + 2 ] = position.z;
+
+				plength += 1;
 				
 			}
 
 		}
 		
-		return { ambient: [ r, g, b ], directional: { colors: dcolors, positions: dpositions }, point: { colors: pcolors, positions: ppositions } };
+		zlights.point.length = plength;
+		zlights.directional.length = dlength;
+		
+		zlights.ambient[ 0 ] = r;
+		zlights.ambient[ 1 ] = g;
+		zlights.ambient[ 2 ] = b;
 
 	};
 
@@ -675,7 +702,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	
 	function refreshLights( material, lights ) {
 		
-		material.uniforms.enableLighting.value = lights.directional.positions.length + lights.point.positions.length;
+		material.uniforms.enableLighting.value = lights.directional.length + lights.point.length;
 		material.uniforms.ambientLightColor.value = lights.ambient;
 		material.uniforms.directionalLightColor.value = lights.directional.colors;
 		material.uniforms.directionalLightDirection.value = lights.directional.positions;
@@ -686,7 +713,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	
 	this.renderBuffer = function ( camera, lights, fog, material, geometryChunk, object ) {
 
-		var program, u, identifiers, attributes, parameters, vector_lights, maxLightCount, linewidth, primitives;
+		var program, u, identifiers, attributes, parameters, maxLightCount, linewidth, primitives;
 
 		if ( !material.program ) {
 
@@ -762,8 +789,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( material instanceof THREE.MeshPhongMaterial || 
 			 material instanceof THREE.MeshLambertMaterial ) {
 
-			vector_lights = this.setupLights( program, lights );
-			refreshLights( material, vector_lights );
+			this.setupLights( program, lights );
+			refreshLights( material, this.lights );
 
 		}
 
