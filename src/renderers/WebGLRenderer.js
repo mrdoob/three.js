@@ -181,7 +181,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				
 				nvertices += 4;
 				ntris += 2;
-				nlines += 5;
+				nlines += 4;
 				
 			}
 		
@@ -487,18 +487,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 					lineArray[ offset_line + 1 ] = vertexIndex + 1;
 					
 					lineArray[ offset_line + 2 ] = vertexIndex;
-					lineArray[ offset_line + 3 ] = vertexIndex + 2;
+					lineArray[ offset_line + 3 ] = vertexIndex + 3;
 					
-					lineArray[ offset_line + 4 ] = vertexIndex;
-					lineArray[ offset_line + 5 ] = vertexIndex + 3;
+					lineArray[ offset_line + 4 ] = vertexIndex + 1;
+					lineArray[ offset_line + 5 ] = vertexIndex + 2;
 					
-					lineArray[ offset_line + 6 ] = vertexIndex + 1;
-					lineArray[ offset_line + 7 ] = vertexIndex + 2;
+					lineArray[ offset_line + 6 ] = vertexIndex + 2;
+					lineArray[ offset_line + 7 ] = vertexIndex + 3;
 					
-					lineArray[ offset_line + 8 ] = vertexIndex + 2;
-					lineArray[ offset_line + 9 ] = vertexIndex + 3;
-					
-					offset_line += 10;
+					offset_line += 8;
 					
 					vertexIndex += 4;
 					
