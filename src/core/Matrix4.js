@@ -12,6 +12,9 @@ THREE.Matrix4 = function ( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33
 	this.n21 = n21 || 0; this.n22 = n22 || 1; this.n23 = n23 || 0; this.n24 = n24 || 0;
 	this.n31 = n31 || 0; this.n32 = n32 || 0; this.n33 = n33 || 1; this.n34 = n34 || 0;
 	this.n41 = n41 || 0; this.n42 = n42 || 0; this.n43 = n43 || 0; this.n44 = n44 || 1;
+	
+	this.flat = new Array( 16 );
+	this.m33 = new THREE.Matrix3();
 
 };
 
@@ -52,7 +55,7 @@ THREE.Matrix4.prototype = {
 
 	lookAt: function ( eye, center, up ) {
 
-		var x = new THREE.Vector3(), y = new THREE.Vector3(), z = new THREE.Vector3();
+		var x = THREE.Matrix4.__tmpVec1, y = THREE.Matrix4.__tmpVec2, z = THREE.Matrix4.__tmpVec3;
 
 		z.sub( eye, center ).normalize();
 		x.cross( up, z ).normalize();
@@ -262,10 +265,27 @@ THREE.Matrix4.prototype = {
 
 	flatten: function() {
 
-		return [ this.n11, this.n21, this.n31, this.n41,
-			  this.n12, this.n22, this.n32, this.n42,
-			  this.n13, this.n23, this.n33, this.n43,
-			  this.n14, this.n24, this.n34, this.n44 ];
+		this.flat[ 0 ] = this.n11;
+		this.flat[ 1 ] = this.n21;
+		this.flat[ 2 ] = this.n31;
+		this.flat[ 3 ] = this.n41;
+
+		this.flat[ 4 ] = this.n12;
+		this.flat[ 5 ] = this.n22;
+		this.flat[ 6 ] = this.n32;
+		this.flat[ 7 ] = this.n42;
+
+		this.flat[ 8 ]  = this.n13;
+		this.flat[ 9 ]  = this.n23;
+		this.flat[ 10 ] = this.n33;
+		this.flat[ 11 ] = this.n43;
+
+		this.flat[ 12 ] = this.n14;
+		this.flat[ 13 ] = this.n24;
+		this.flat[ 14 ] = this.n34;
+		this.flat[ 15 ] = this.n44;
+		
+		return this.flat;
 
 	},
 
@@ -398,7 +418,7 @@ THREE.Matrix4.makeInvert3x3 = function ( m1 ) {
 	// ( based on http://code.google.com/p/webgl-mjs/ )
 
 	var m = m1.flatten(),
-	m2 = new THREE.Matrix3(),
+	m2 = m1.m33,
 
 	a11 = m[ 10 ] * m[ 5 ] - m[ 6 ] * m[ 9 ],
 	a21 = - m[ 10 ] * m[ 1 ] + m[ 2 ] * m[ 9 ],
@@ -479,3 +499,7 @@ THREE.Matrix4.makeOrtho = function( left, right, top, bottom, near, far ) {
 	return m;
 
 };
+
+THREE.Matrix4.__tmpVec1 = new THREE.Vector3();
+THREE.Matrix4.__tmpVec2 = new THREE.Vector3();
+THREE.Matrix4.__tmpVec3 = new THREE.Vector3();
