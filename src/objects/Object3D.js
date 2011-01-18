@@ -11,9 +11,7 @@ THREE.Object3D = function () {
 	this.scale = new THREE.Vector3( 1, 1, 1 );
 
 	this.matrix = new THREE.Matrix4();
-	this.translationMatrix = new THREE.Matrix4();
-	this.rotationMatrix = new THREE.Matrix4();
-	this.scaleMatrix = new THREE.Matrix4();
+	this.tmpMatrix = new THREE.Matrix4();
 
 	this.screen = new THREE.Vector3();
 
@@ -26,18 +24,30 @@ THREE.Object3D.prototype = {
 
 	updateMatrix: function () {
 
-		this.matrixPosition = THREE.Matrix4.translationMatrix( this.position.x, this.position.y, this.position.z );
+		var p = this.position, r = this.rotation, s = this.scale, m = this.tmpMatrix;
 
-		this.rotationMatrix = THREE.Matrix4.rotationXMatrix( this.rotation.x );
-		this.rotationMatrix.multiplySelf( THREE.Matrix4.rotationYMatrix( this.rotation.y ) );
-		this.rotationMatrix.multiplySelf( THREE.Matrix4.rotationZMatrix( this.rotation.z ) );
+		this.matrix.setTranslation( p.x, p.y, p.z );
 
-		this.scaleMatrix = THREE.Matrix4.scaleMatrix( this.scale.x, this.scale.y, this.scale.z );
+		if ( r.x != 0 ) {
+		       m.setRotX( r.x );
+		       this.matrix.multiplySelf( m );
+		}
 
-		this.matrix.copy( this.matrixPosition );
-		this.matrix.multiplySelf( this.rotationMatrix );
-		this.matrix.multiplySelf( this.scaleMatrix );
+		if ( r.y != 0 ) {
+		       m.setRotY( r.y );
+		       this.matrix.multiplySelf( m );
+		}
 
+		if ( r.z != 0 ) {
+		       m.setRotZ( r.z );
+		       this.matrix.multiplySelf( m );
+		}
+
+		if ( s.x != 0 || s.y != 0 || s.z != 0 ) {
+		       m.setScale( s.x, s.y, s.z );
+		       this.matrix.multiplySelf( m );
+		}
+		
 	}
 
 };
