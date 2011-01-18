@@ -373,16 +373,17 @@ THREE.Matrix4.rotationAxisAngleMatrix = function ( axis, angle ) {
 	c = Math.cos( angle ),
 	s = Math.sin( angle ),
 	t = 1 - c,
-	x = axis.x, y = axis.y, z = axis.z;
+	x = axis.x, y = axis.y, z = axis.z,
+	tx = t * x, ty = t * y;
 
-	rot.n11 = t * x * x + c;
-	rot.n12 = t * x * y - s * z;
-	rot.n13 = t * x * z + s * y;
-	rot.n21 = t * x * y + s * z;
-	rot.n22 = t * y * y + c;
-	rot.n23 = t * y * z - s * x;
-	rot.n31 = t * x * z - s * y;
-	rot.n32 = t * y * z + s * x;
+	rot.n11 = tx * x + c;
+	rot.n12 = tx * y - s * z;
+	rot.n13 = tx * z + s * y;
+	rot.n21 = tx * y + s * z;
+	rot.n22 = ty * y + c;
+	rot.n23 = ty * z - s * x;
+	rot.n31 = tx * z - s * y;
+	rot.n32 = ty * z + s * x;
 	rot.n33 = t * z * z + c;
 
 	return rot;
