@@ -417,7 +417,6 @@ THREE.WebGLRenderer2 = function ( antialias ) {
 					// TODO: don't add lines that already exist (faces sharing edge)
 
 					lines.push( vertexIndex, vertexIndex + 1 );
-					lines.push( vertexIndex, vertexIndex + 2 );
 					lines.push( vertexIndex, vertexIndex + 3 );
 					lines.push( vertexIndex + 1, vertexIndex + 2 );
 					lines.push( vertexIndex + 2, vertexIndex + 3 );
