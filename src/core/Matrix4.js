@@ -294,6 +294,51 @@ THREE.Matrix4.prototype = {
 
 	},
 
+	setTranslation: function( x, y, z ) {
+	         this.set( 1, 0, 0, x, 0, 1, 0, y, 0, 0, 1, z, 0, 0, 0, 1 );
+		 return this;
+        },
+
+	setScale: function( x, y, z ) {
+	         this.set( x, 0, 0, 0, 0, y, 0, 0, 0, 0, z, 0, 0, 0, 0, 1 );
+		 return this;
+        },
+
+	setRotX: function( theta ) {
+                 var c = Math.cos( theta ), s = Math.sin( theta );
+		 this.set( 1, 0, 0, 0, 0, c, -s, 0, 0, c, s, 0, 0, 0, 0, 1 );
+		 return this;
+        },
+
+	setRotY: function( theta ) {
+                 var c = Math.cos( theta ), s = Math.sin( theta );
+		 this.set( c, 0, s, 0, 0, 1, 0, 0, -s, 0, c, 0, 0, 0, 0, 1 );
+		 return this;
+        },
+
+	setRotZ: function( theta ) {
+                 var c = Math.cos( theta ), s = Math.sin( theta );
+		 this.set( c, -s, 0, 0, s, c, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 );
+		 return this;
+        },
+
+	setRotAxis: function( axis, angle ) {
+                 //Based on http://www.gamedev.net/reference/articles/article1199.asp
+
+                 c = Math.cos( angle ),
+		 s = Math.sin( angle ),
+		 t = 1 - c,
+		 x = axis.x, y = axis.y, z = axis.z,
+		 tx = t * x, ty = t * y;
+
+		 this.set( tx * x + c, tx * y - s * z, tx * z + s * y, 0,
+			   tx * y + s * z, ty * y + c, ty * z - s * x, 0,
+			   tx * z - s * y, ty * z + s * x, t * z * z + c, 0,
+			   0, 0, 0, 1 );
+		 return this;
+
+        },
+
 	toString: function() {
 
 		return  "| " + this.n11 + " " + this.n12 + " " + this.n13 + " " + this.n14 + " |\n" +
