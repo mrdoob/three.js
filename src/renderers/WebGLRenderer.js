@@ -32,19 +32,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_objectMatrixArray = new Float32Array(16),
 
 	// parameters defaults
-	
+
 	antialias = true,
 	clearColor = new THREE.Color( 0x000000 ),
 	clearAlpha = 0;
 
 	if ( parameters ) {
-		
+
 		if ( parameters.antialias !== undefined ) antialias = parameters.antialias;
 		if ( parameters.clearColor !== undefined ) clearColor.setHex( parameters.clearColor );
 		if ( parameters.clearAlpha !== undefined ) clearAlpha = parameters.clearAlpha;
-		
+
 	}
-		
+
 	this.domElement = _canvas;
 	this.autoClear = true;
 
@@ -55,13 +55,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 	//alert( dumpObject( getGLParams() ) );
 
 	this.lights = {
-		
-		ambient: 	 [ 0, 0, 0 ], 
-		directional: { length: 0, colors: new Array(), positions: new Array() }, 
+
+		ambient: 	 [ 0, 0, 0 ],
+		directional: { length: 0, colors: new Array(), positions: new Array() },
 		point: 		 { length: 0, colors: new Array(), positions: new Array() }
-		
+
 	};
-	
+
 
 	this.setSize = function ( width, height ) {
 
@@ -84,14 +84,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	
+
 	this.setupLights = function ( program, lights ) {
 
 		var l, ll, light, r = 0, g = 0, b = 0,
 			color, position, intensity,
-			
+
 			zlights = this.lights,
-		
+
 			dcolors    = zlights.directional.colors,
 			dpositions = zlights.directional.positions,
 
@@ -100,7 +100,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			dlength = 0,
 			plength = 0;
-		
+
 		for ( l = 0, ll = lights.length; l < ll; l++ ) {
 
 			light = lights[ l ];
@@ -113,7 +113,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				r += color.r;
 				g += color.g;
 				b += color.b;
-				
+
 			} else if ( light instanceof THREE.DirectionalLight ) {
 
 				dcolors[ dlength*3 ]     = color.r * intensity;
@@ -125,7 +125,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				dpositions[ dlength*3 + 2 ] = position.z;
 
 				dlength += 1;
-				
+
 			} else if( light instanceof THREE.PointLight ) {
 
 				pcolors[ plength*3 ]     = color.r * intensity;
@@ -137,14 +137,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 				ppositions[ plength*3 + 2 ] = position.z;
 
 				plength += 1;
-				
+
 			}
 
 		}
-		
+
 		zlights.point.length = plength;
 		zlights.directional.length = dlength;
-		
+
 		zlights.ambient[ 0 ] = r;
 		zlights.ambient[ 1 ] = g;
 		zlights.ambient[ 2 ] = b;
@@ -152,90 +152,90 @@ THREE.WebGLRenderer = function ( parameters ) {
 	};
 
 	this.createParticleBuffers = function( geometry ) {
-		
+
 		geometry.__webGLVertexBuffer = _gl.createBuffer();
 		geometry.__webGLFaceBuffer = _gl.createBuffer();
-	
+
 	};
-	
+
 	this.createLineBuffers = function( geometry ) {
-		
+
 		geometry.__webGLVertexBuffer = _gl.createBuffer();
 		geometry.__webGLLineBuffer = _gl.createBuffer();
-		
+
 	};
 
 	this.createMeshBuffers = function( geometryChunk ) {
-		
+
 		geometryChunk.__webGLVertexBuffer = _gl.createBuffer();
 		geometryChunk.__webGLNormalBuffer = _gl.createBuffer();
 		geometryChunk.__webGLTangentBuffer = _gl.createBuffer();
 		geometryChunk.__webGLUVBuffer = _gl.createBuffer();
 		geometryChunk.__webGLFaceBuffer = _gl.createBuffer();
 		geometryChunk.__webGLLineBuffer = _gl.createBuffer();
-		
+
 	};
 
 	this.initLineBuffers = function( geometry ) {
-		
+
 		var nvertices = geometry.vertices.length;
 
 		geometry.__vertexArray = new Float32Array( nvertices * 3 );
 		geometry.__lineArray = new Uint16Array( nvertices );
-		
+
 		geometry.__webGLLineCount = nvertices;
-	
+
 	};
-	
+
 	this.initMeshBuffers = function( geometryChunk, object ) {
-		
+
 		var f, fl, nvertices = 0, ntris = 0, nlines = 0,
-			obj_faces = object.geometry.faces, 
+			obj_faces = object.geometry.faces,
 			chunk_faces = geometryChunk.faces;
-		
+
 		for ( f = 0, fl = chunk_faces.length; f < fl; f++ ) {
-			
+
 			fi = chunk_faces[ f ];
 			face = obj_faces[ fi ];
-			
+
 			if ( face instanceof THREE.Face3 ) {
-				
+
 				nvertices += 3;
 				ntris += 1;
 				nlines += 3;
-				
+
 			} else if ( face instanceof THREE.Face4 ) {
-				
+
 				nvertices += 4;
 				ntris += 2;
 				nlines += 4;
-				
+
 			}
-		
+
 		}
-		
+
 		// TODO: only create arrays for attributes existing in the object
-		
+
 		geometryChunk.__vertexArray  = new Float32Array( nvertices * 3 );
 		geometryChunk.__normalArray  = new Float32Array( nvertices * 3 );
 		geometryChunk.__tangentArray = new Float32Array( nvertices * 4 );
 		geometryChunk.__uvArray = new Float32Array( nvertices * 2 );
-		
+
 		geometryChunk.__faceArray = new Uint16Array( ntris * 3 );
 		geometryChunk.__lineArray = new Uint16Array( nlines * 2 );
-		
+
 		geometryChunk.__needsSmoothNormals = bufferNeedsSmoothNormals ( geometryChunk, object );
-		
+
 		geometryChunk.__webGLFaceCount = ntris * 3;
 		geometryChunk.__webGLLineCount = nlines * 2;
-	
+
 	};
-	
+
 	this.setMeshBuffers = function ( geometryChunk, object, hint, dirtyVertices, dirtyElements, dirtyUvs, dirtyNormals, dirtyTangents ) {
 
 		var f, fl, fi, face, vertexNormals, faceNormal, normal, uv, v1, v2, v3, v4, t1, t2, t3, t4, m, ml, i,
 			vn, uvi,
-		
+
 		vertexIndex = 0,
 
 		offset = 0,
@@ -244,44 +244,44 @@ THREE.WebGLRenderer = function ( parameters ) {
 		offset_normal = 0,
 		offset_tangent = 0,
 		offset_line = 0,
-		
+
 		vertexArray = geometryChunk.__vertexArray,
 		uvArray = geometryChunk.__uvArray,
 		normalArray = geometryChunk.__normalArray,
 		tangentArray = geometryChunk.__tangentArray,
-		
+
 		faceArray = geometryChunk.__faceArray,
 		lineArray = geometryChunk.__lineArray,
-		
+
 		needsSmoothNormals = geometryChunk.__needsSmoothNormals,
-		
+
 		geometry = object.geometry,
 		vertices = geometry.vertices,
 		chunk_faces = geometryChunk.faces,
 		obj_faces = geometry.faces,
 		obj_uvs = geometry.uvs;
-		
+
 		for ( f = 0, fl = chunk_faces.length; f < fl; f++ ) {
-			
+
 			fi = chunk_faces[ f ];
 			face = obj_faces[ fi ];
 			uv = obj_uvs[ fi ];
-			
+
 			vertexNormals = face.vertexNormals;
 			faceNormal = face.normal;
 
 			if ( face instanceof THREE.Face3 ) {
 
 				if ( dirtyVertices ) {
-					
+
 					v1 = vertices[ face.a ].position;
 					v2 = vertices[ face.b ].position;
 					v3 = vertices[ face.c ].position;
-					
+
 					vertexArray[ offset ]     = v1.x;
 					vertexArray[ offset + 1 ] = v1.y;
 					vertexArray[ offset + 2 ] = v1.z;
-					
+
 					vertexArray[ offset + 3 ] = v2.x;
 					vertexArray[ offset + 4 ] = v2.y;
 					vertexArray[ offset + 5 ] = v2.z;
@@ -289,9 +289,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 					vertexArray[ offset + 6 ] = v3.x;
 					vertexArray[ offset + 7 ] = v3.y;
 					vertexArray[ offset + 8 ] = v3.z;
-					
+
 					offset += 9;
-					
+
 				}
 
 				if ( dirtyTangents && geometry.hasTangents ) {
@@ -304,34 +304,34 @@ THREE.WebGLRenderer = function ( parameters ) {
 					tangentArray[ offset_tangent + 1 ] = t1.y;
 					tangentArray[ offset_tangent + 2 ] = t1.z;
 					tangentArray[ offset_tangent + 3 ] = t1.w;
-					
+
 					tangentArray[ offset_tangent + 4 ] = t2.x;
 					tangentArray[ offset_tangent + 5 ] = t2.y;
 					tangentArray[ offset_tangent + 6 ] = t2.z;
 					tangentArray[ offset_tangent + 7 ] = t2.w;
-					
+
 					tangentArray[ offset_tangent + 8 ]  = t3.x;
 					tangentArray[ offset_tangent + 9 ]  = t3.y;
 					tangentArray[ offset_tangent + 10 ] = t3.z;
 					tangentArray[ offset_tangent + 11 ] = t3.w;
-					
+
 					offset_tangent += 12;
-					
+
 				}
 
 				if( dirtyNormals ) {
-				
+
 					if ( vertexNormals.length == 3 && needsSmoothNormals ) {
 
 
 						for ( i = 0; i < 3; i ++ ) {
 
 							vn = vertexNormals[ i ];
-							
+
 							normalArray[ offset_normal ]     = vn.x;
 							normalArray[ offset_normal + 1 ] = vn.y;
 							normalArray[ offset_normal + 2 ] = vn.z;
-							
+
 							offset_normal += 3;
 
 						}
@@ -343,13 +343,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 							normalArray[ offset_normal ]     = faceNormal.x;
 							normalArray[ offset_normal + 1 ] = faceNormal.y;
 							normalArray[ offset_normal + 2 ] = faceNormal.z;
-							
+
 							offset_normal += 3;
 
 						}
 
 					}
-					
+
 				}
 
 				if ( dirtyUvs && uv ) {
@@ -357,10 +357,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 					for ( i = 0; i < 3; i ++ ) {
 
 						uvi = uv[ i ];
-						
+
 						uvArray[ offset_uv ]     = uvi.u;
 						uvArray[ offset_uv + 1 ] = uvi.v;
-						
+
 						offset_uv += 2;
 
 					}
@@ -368,42 +368,42 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 				if( dirtyElements ) {
-					
+
 					faceArray[ offset_face ] = vertexIndex;
 					faceArray[ offset_face + 1 ] = vertexIndex + 1;
 					faceArray[ offset_face + 2 ] = vertexIndex + 2;
-					
+
 					offset_face += 3;
-				
+
 					lineArray[ offset_line ]     = vertexIndex;
 					lineArray[ offset_line + 1 ] = vertexIndex + 1;
-					
+
 					lineArray[ offset_line + 2 ] = vertexIndex;
 					lineArray[ offset_line + 3 ] = vertexIndex + 2;
-					
+
 					lineArray[ offset_line + 4 ] = vertexIndex + 1;
 					lineArray[ offset_line + 5 ] = vertexIndex + 2;
-					
+
 					offset_line += 6;
 
 					vertexIndex += 3;
-					
+
 				}
-				
+
 
 			} else if ( face instanceof THREE.Face4 ) {
 
 				if ( dirtyVertices ) {
-					
+
 					v1 = vertices[ face.a ].position;
 					v2 = vertices[ face.b ].position;
 					v3 = vertices[ face.c ].position;
 					v4 = vertices[ face.d ].position;
-			
+
 					vertexArray[ offset ]     = v1.x;
 					vertexArray[ offset + 1 ] = v1.y;
 					vertexArray[ offset + 2 ] = v1.z;
-					
+
 					vertexArray[ offset + 3 ] = v2.x;
 					vertexArray[ offset + 4 ] = v2.y;
 					vertexArray[ offset + 5 ] = v2.z;
@@ -415,9 +415,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 					vertexArray[ offset + 9 ] = v4.x;
 					vertexArray[ offset + 10 ] = v4.y;
 					vertexArray[ offset + 11 ] = v4.z;
-				
+
 					offset += 12;
-					
+
 				}
 
 				if ( dirtyTangents && geometry.hasTangents ) {
@@ -431,38 +431,38 @@ THREE.WebGLRenderer = function ( parameters ) {
 					tangentArray[ offset_tangent + 1 ] = t1.y;
 					tangentArray[ offset_tangent + 2 ] = t1.z;
 					tangentArray[ offset_tangent + 3 ] = t1.w;
-					
+
 					tangentArray[ offset_tangent + 4 ] = t2.x;
 					tangentArray[ offset_tangent + 5 ] = t2.y;
 					tangentArray[ offset_tangent + 6 ] = t2.z;
 					tangentArray[ offset_tangent + 7 ] = t2.w;
-					
+
 					tangentArray[ offset_tangent + 8 ] = t3.x;
 					tangentArray[ offset_tangent + 9 ] = t3.y;
 					tangentArray[ offset_tangent + 10 ] = t3.z;
 					tangentArray[ offset_tangent + 11 ] = t3.w;
-					
+
 					tangentArray[ offset_tangent + 12 ] = t4.x;
 					tangentArray[ offset_tangent + 13 ] = t4.y;
 					tangentArray[ offset_tangent + 14 ] = t4.z;
 					tangentArray[ offset_tangent + 15 ] = t4.w;
-					
+
 					offset_tangent += 16;
-					
+
 				}
-				
+
 				if( dirtyNormals ) {
-					
+
 					if ( vertexNormals.length == 4 && needsSmoothNormals ) {
 
 						for ( i = 0; i < 4; i ++ ) {
 
 							vn = vertexNormals[ i ];
-							
+
 							normalArray[ offset_normal ]     = vn.x;
 							normalArray[ offset_normal + 1 ] = vn.y;
 							normalArray[ offset_normal + 2 ] = vn.z;
-							
+
 							offset_normal += 3;
 
 						}
@@ -474,13 +474,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 							normalArray[ offset_normal ]     = faceNormal.x;
 							normalArray[ offset_normal + 1 ] = faceNormal.y;
 							normalArray[ offset_normal + 2 ] = faceNormal.z;
-							
+
 							offset_normal += 3;
 
 						}
 
 					}
-					
+
 				}
 
 				if ( dirtyUvs && uv ) {
@@ -488,44 +488,44 @@ THREE.WebGLRenderer = function ( parameters ) {
 					for ( i = 0; i < 4; i ++ ) {
 
 						uvi = uv[ i ];
-						
+
 						uvArray[ offset_uv ]     = uvi.u;
 						uvArray[ offset_uv + 1 ] = uvi.v;
-						
+
 						offset_uv += 2;
 
 					}
 
 				}
-		
+
 				if( dirtyElements ) {
-					
+
 					faceArray[ offset_face ]     = vertexIndex;
 					faceArray[ offset_face + 1 ] = vertexIndex + 1;
 					faceArray[ offset_face + 2 ] = vertexIndex + 2;
-					
+
 					faceArray[ offset_face + 3 ] = vertexIndex;
 					faceArray[ offset_face + 4 ] = vertexIndex + 2;
 					faceArray[ offset_face + 5 ] = vertexIndex + 3;
-					
+
 					offset_face += 6;
-					
+
 					lineArray[ offset_line ]     = vertexIndex;
 					lineArray[ offset_line + 1 ] = vertexIndex + 1;
-					
+
 					lineArray[ offset_line + 2 ] = vertexIndex;
 					lineArray[ offset_line + 3 ] = vertexIndex + 3;
-					
+
 					lineArray[ offset_line + 4 ] = vertexIndex + 1;
 					lineArray[ offset_line + 5 ] = vertexIndex + 2;
-					
+
 					lineArray[ offset_line + 6 ] = vertexIndex + 2;
 					lineArray[ offset_line + 7 ] = vertexIndex + 3;
-					
+
 					offset_line += 8;
-					
+
 					vertexIndex += 4;
-					
+
 				}
 
 			}
@@ -533,24 +533,24 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		if ( dirtyVertices ) {
-		
+
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLVertexBuffer );
 			_gl.bufferData( _gl.ARRAY_BUFFER, vertexArray, hint );
-			
+
 		}
-		
+
 		if ( dirtyNormals ) {
-		
+
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLNormalBuffer );
 			_gl.bufferData( _gl.ARRAY_BUFFER, normalArray, hint );
-			
+
 		}
 
 		if ( dirtyTangents && geometry.hasTangents ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLTangentBuffer );
 			_gl.bufferData( _gl.ARRAY_BUFFER, tangentArray, hint );
-		
+
 		}
 
 		if ( dirtyUvs && offset_uv > 0 ) {
@@ -561,66 +561,66 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		if( dirtyElements ) {
-			
+
 			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryChunk.__webGLFaceBuffer );
 			_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, faceArray, hint );
 
 			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryChunk.__webGLLineBuffer );
 			_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, lineArray, hint );
-			
+
 		}
 
 	};
 
 	this.setLineBuffers = function( geometry, hint, dirtyVertices, dirtyElements ) {
-		
+
 		var v, vertex, offset,
 			vertices = geometry.vertices,
 			vl = vertices.length,
-		
-			vertexArray = geometry.__vertexArray, 
+
+			vertexArray = geometry.__vertexArray,
 			lineArray = geometry.__lineArray;
-		
+
 		if ( dirtyVertices ) {
-			
+
 			for ( v = 0; v < vl; v++ ) {
-				
+
 				vertex = vertices[ v ].position;
-				
+
 				offset = v * 3;
-				
+
 				vertexArray[ offset ]     = vertex.x;
 				vertexArray[ offset + 1 ] = vertex.y;
 				vertexArray[ offset + 2 ] = vertex.z;
-				
+
 			}
 
 		}
-		
+
 		// yeah, this is silly as order of element indices is currently fixed
 		// though this could change if some use case arises
-		
+
 		if ( dirtyElements ) {
-			
+
 			for ( v = 0; v < vl; v++ ) {
-				
+
 				lineArray[ v ] = v;
-				
+
 			}
-			
+
 		}
 
 		_gl.bindBuffer( _gl.ARRAY_BUFFER, geometry.__webGLVertexBuffer );
 		_gl.bufferData( _gl.ARRAY_BUFFER, vertexArray, hint );
-		
+
 		_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometry.__webGLLineBuffer );
 		_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, lineArray, hint );
-		
+
 	};
-	
+
 	this.setParticleBuffers = function( geometry, hint, dirtyVertices, dirtyElements ) {
 	};
-	
+
 	function setMaterialShaders( material, shaders ) {
 
 		material.fragment_shader = shaders.fragment_shader;
@@ -630,13 +630,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 	};
 
 	function refreshUniformsCommon( material, fog ) {
-		
+
 		// premultiply alpha
 		material.uniforms.color.value.setRGB( material.color.r * material.opacity, material.color.g * material.opacity, material.color.b * material.opacity );
-		
+
 		// pure color
 		//material.uniforms.color.value.setHex( material.color.hex );
-		
+
 		material.uniforms.opacity.value = material.opacity;
 		material.uniforms.map.texture = material.map;
 
@@ -666,8 +666,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 	};
 
 	function refreshUniformsLine( material, fog ) {
-		
-		material.uniforms.color.value.setRGB( material.color.r * material.opacity, material.color.g * material.opacity, material.color.b * material.opacity );		
+
+		material.uniforms.color.value.setRGB( material.color.r * material.opacity, material.color.g * material.opacity, material.color.b * material.opacity );
 		material.uniforms.opacity.value = material.opacity;
 
 		if ( fog ) {
@@ -688,29 +688,29 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 	};
-	
+
 	function refreshUniformsPhong( material ) {
-		
+
 		//material.uniforms.ambient.value.setHex( material.ambient.hex );
 		//material.uniforms.specular.value.setHex( material.specular.hex );
 		material.uniforms.ambient.value.setRGB( material.ambient.r, material.ambient.g, material.ambient.b );
 		material.uniforms.specular.value.setRGB( material.specular.r, material.specular.g, material.specular.b );
 		material.uniforms.shininess.value = material.shininess;
-		
+
 	};
-	
-	
+
+
 	function refreshLights( material, lights ) {
-		
+
 		material.uniforms.enableLighting.value = lights.directional.length + lights.point.length;
 		material.uniforms.ambientLightColor.value = lights.ambient;
 		material.uniforms.directionalLightColor.value = lights.directional.colors;
 		material.uniforms.directionalLightDirection.value = lights.directional.positions;
 		material.uniforms.pointLightColor.value = lights.point.colors;
 		material.uniforms.pointLightPosition.value = lights.point.positions;
-		
+
 	};
-	
+
 	this.renderBuffer = function ( camera, lights, fog, material, geometryChunk, object ) {
 
 		var program, u, identifiers, attributes, parameters, maxLightCount, linewidth, primitives;
@@ -733,25 +733,25 @@ THREE.WebGLRenderer = function ( parameters ) {
 				setMaterialShaders( material, THREE.ShaderLib[ 'basic' ] );
 
 				refreshUniformsCommon( material, fog );
-				
+
 			} else if ( material instanceof THREE.MeshLambertMaterial ) {
-				
+
 				setMaterialShaders( material, THREE.ShaderLib[ 'lambert' ] );
-				
+
 				refreshUniformsCommon( material, fog );
-				
+
 			} else if ( material instanceof THREE.MeshPhongMaterial ) {
-				
+
 				setMaterialShaders( material, THREE.ShaderLib[ 'phong' ] );
-				
+
 				refreshUniformsCommon( material, fog );
-				
+
 			} else if ( material instanceof THREE.LineBasicMaterial ) {
-				
+
 				setMaterialShaders( material, THREE.ShaderLib[ 'basic' ] );
 
 				refreshUniformsLine( material, fog );
-				
+
 			}
 
 			// heuristics to create shader parameters according to lights in the scene
@@ -786,7 +786,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		this.loadCamera( program, camera );
 		this.loadMatrices( program );
 
-		if ( material instanceof THREE.MeshPhongMaterial || 
+		if ( material instanceof THREE.MeshPhongMaterial ||
 			 material instanceof THREE.MeshLambertMaterial ) {
 
 			this.setupLights( program, lights );
@@ -797,18 +797,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( material instanceof THREE.MeshBasicMaterial ||
 			 material instanceof THREE.MeshLambertMaterial ||
 			 material instanceof THREE.MeshPhongMaterial ) {
-			
+
 			refreshUniformsCommon( material, fog );
 
 		}
-		
+
 		if ( material instanceof THREE.LineBasicMaterial ) {
-			
+
 			refreshUniformsLine( material, fog );
 		}
-		
+
 		if ( material instanceof THREE.MeshPhongMaterial ) {
-			
+
 			refreshUniformsPhong( material );
 
 		}
@@ -866,11 +866,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material.wireframe || material instanceof THREE.LineBasicMaterial ) {
 
-			linewidth = material.wireframe_linewidth !== undefined ? material.wireframe_linewidth : 
+			linewidth = material.wireframe_linewidth !== undefined ? material.wireframe_linewidth :
 						material.linewidth !== undefined ? material.linewidth : 1;
-			
+
 			primitives = material instanceof THREE.LineBasicMaterial && object.type == THREE.LineStrip ? _gl.LINE_STRIP : _gl.LINES;
-			
+
 			_gl.lineWidth( linewidth );
 			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryChunk.__webGLLineBuffer );
 			_gl.drawElements( primitives, geometryChunk.__webGLLineCount, _gl.UNSIGNED_SHORT, 0 );
@@ -933,19 +933,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		this.initWebGLObjects( scene );
 
-		setRenderTarget( renderTarget, clear !==undefined ? clear : true );
-		
+		setRenderTarget( renderTarget, clear !== undefined ? clear : true );
+
 		if ( this.autoClear ) {
-			
+
 			this.clear();
-			
+
 		}
 
 		camera.autoUpdateMatrix && camera.updateMatrix();
 
 		_viewMatrixArray.set( camera.matrix.flatten() );
 		_projectionMatrixArray.set( camera.projectionMatrix.flatten() );
-		
+
 		// opaque pass
 
 		for ( o = 0, ol = scene.__webGLObjects.length; o < ol; o++ ) {
@@ -978,26 +978,26 @@ THREE.WebGLRenderer = function ( parameters ) {
 				this.setupMatrices( object, camera );
 
 				if( object.doubleSided ) {
-					
+
 					_gl.disable( _gl.CULL_FACE );
-					
+
 				} else {
-					
+
 					_gl.enable( _gl.CULL_FACE );
-					
+
 					if( object.flipSided ) {
-						
+
 						_gl.frontFace( _gl.CW );
-						
+
 					}
 					else {
-						
+
 						_gl.frontFace( _gl.CCW );
-						
+
 					}
-					
+
 				}
-				
+
 				// opaque blended materials
 
 				this.renderPass( camera, lights, fog, object, buffer, THREE.AdditiveBlending, false );
@@ -1017,28 +1017,28 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		// Generate mipmap if we're using any kind of mipmap filtering
-		
+
 		if ( renderTarget && renderTarget.min_filter !== THREE.NearestFilter && renderTarget.min_filter !== THREE.LinearFilter ) {
 
 			updateRenderTargetMipmap( renderTarget );
-			
+
 		}
 
 	};
-	
+
 	this.initWebGLObjects = function( scene ) {
 
 		function add_buffer( objmap, id, buffer, object ) {
-			
+
 			if ( objmap[ id ] == undefined ) {
 
 				scene.__webGLObjects.push( { buffer: buffer, object: object } );
 				objmap[ id ] = 1;
 
 			}
-			
+
 		};
-		
+
 		var o, ol, object, g, geometry, geometryChunk, objmap;
 
 		if ( !scene.__webGLObjects ) {
@@ -1047,12 +1047,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 			scene.__webGLObjectsMap = {};
 
 		}
-		
+
 		for ( o = 0, ol = scene.objects.length; o < ol; o++ ) {
 
 			object = scene.objects[ o ];
 			geometry = object.geometry;
-			
+
 			if ( scene.__webGLObjectsMap[ object.id ] == undefined ) {
 
 				scene.__webGLObjectsMap[ object.id ] = {};
@@ -1060,9 +1060,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 			objmap = scene.__webGLObjectsMap[ object.id ];
-			
+
 			if ( object instanceof THREE.Mesh ) {
-				
+
 				// create separate VBOs per geometry chunk
 
 				for ( g in geometry.geometryChunks ) {
@@ -1075,7 +1075,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						this.createMeshBuffers( geometryChunk );
 						this.initMeshBuffers( geometryChunk, object );
-						
+
 						geometry.__dirtyVertices = true;
 						geometry.__dirtyElements = true;
 						geometry.__dirtyUvs = true;
@@ -1089,7 +1089,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 						this.setMeshBuffers( geometryChunk, object, _gl.DYNAMIC_DRAW,
 										 geometry.__dirtyVertices, geometry.__dirtyElements, geometry.__dirtyUvs,
 										 geometry.__dirtyNormals, geometry.__dirtyTangents );
-						
+
 
 					}
 
@@ -1106,40 +1106,40 @@ THREE.WebGLRenderer = function ( parameters ) {
 				geometry.__dirtyTangents = false;
 
 			} else if ( object instanceof THREE.Line ) {
-				
-				
+
+
 				if( ! geometry.__webGLVertexBuffer ) {
-				
+
 					this.createLineBuffers( geometry );
 					this.initLineBuffers( geometry );
-					
+
 					geometry.__dirtyVertices = true;
 					geometry.__dirtyElements = true;
-					
+
 				}
-				
+
 				if( geometry.__dirtyVertices ) {
-					
+
 					this.setLineBuffers( geometry, _gl.DYNAMIC_DRAW, geometry.__dirtyVertices, geometry.__dirtyElements );
-					
+
 				}
-				
+
 				add_buffer( objmap, 0, geometry, object );
-				
+
 				geometry.__dirtyVertices = false;
 				geometry.__dirtyElements = false;
 
 			} else if ( object instanceof THREE.ParticleSystem ) {
 
 				if( ! geometry.__webGLVertexBuffer ) {
-				
+
 					this.createParticleBuffers( geometry );
-					
+
 				}
-				
+
 				add_buffer( objmap, 0, geometry, object );
-				
-				
+
+
 			}/*else if ( object instanceof THREE.Particle ) {
 
 			}*/
@@ -1304,7 +1304,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_gl.clearColor( clearColor.r, clearColor.g, clearColor.b, clearAlpha );
 
 	};
-	
+
 	function buildProgram( fragment_shader, vertex_shader, parameters ) {
 
 		var program = _gl.createProgram(),
@@ -1313,7 +1313,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			"#ifdef GL_ES",
 			"precision highp float;",
 			"#endif",
-		
+
 			"#define MAX_DIR_LIGHTS " + parameters.maxDirLights,
 			"#define MAX_POINT_LIGHTS " + parameters.maxPointLights,
 
@@ -1358,7 +1358,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			alert( "Could not initialise shaders\n"+
 					"VALIDATE_STATUS: " + _gl.getProgramParameter( program, _gl.VALIDATE_STATUS ) + ", gl error [" + _gl.getError() + "]" );
-			
+
 			//console.log( prefix_fragment + fragment_shader );
 			//console.log( prefix_vertex + vertex_shader );
 
@@ -1379,12 +1379,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			location = program.uniforms[u];
 			if ( !location ) continue;
-			
+
 			uniform = uniforms[u];
-			
+
 			type = uniform.type;
 			value = uniform.value;
-			
+
 			if( type == "i" ) {
 
 				_gl.uniform1i( location, value );
@@ -1396,7 +1396,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			} else if( type == "fv1" ) {
 
 				_gl.uniform1fv( location, value );
-				
+
 			} else if( type == "fv" ) {
 
 				_gl.uniform3fv( location, value );
@@ -1501,18 +1501,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 	function setRenderTarget( renderTexture, clear ) {
 
 		if ( renderTexture && !renderTexture.__webGLFramebuffer ) {
-			
+
 			renderTexture.__webGLFramebuffer = _gl.createFramebuffer();
 			renderTexture.__webGLRenderbuffer = _gl.createRenderbuffer();
 			renderTexture.__webGLTexture = _gl.createTexture();
 
 			// Setup renderbuffer
-			
+
 			_gl.bindRenderbuffer( _gl.RENDERBUFFER, renderTexture.__webGLRenderbuffer );
 			_gl.renderbufferStorage( _gl.RENDERBUFFER, _gl.DEPTH_COMPONENT16, renderTexture.width, renderTexture.height );
 
 			// Setup texture
-			
+
 			_gl.bindTexture( _gl.TEXTURE_2D, renderTexture.__webGLTexture );
 			_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_S, paramThreeToGL( renderTexture.wrap_s ) );
 			_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_T, paramThreeToGL( renderTexture.wrap_t ) );
@@ -1521,59 +1521,59 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.texImage2D( _gl.TEXTURE_2D, 0, paramThreeToGL( renderTexture.format ), renderTexture.width, renderTexture.height, 0, paramThreeToGL( renderTexture.format ), paramThreeToGL( renderTexture.type ), null );
 
 			// Setup framebuffer
-			
+
 			_gl.bindFramebuffer( _gl.FRAMEBUFFER, renderTexture.__webGLFramebuffer );
 			_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_2D, renderTexture.__webGLTexture, 0 );
 			_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.DEPTH_ATTACHMENT, _gl.RENDERBUFFER, renderTexture.__webGLRenderbuffer );
 
 			// Release everything
-			
+
 			_gl.bindTexture( _gl.TEXTURE_2D, null );
 			_gl.bindRenderbuffer( _gl.RENDERBUFFER, null );
 			_gl.bindFramebuffer( _gl.FRAMEBUFFER, null);
-			
+
 		}
 
 		var framebuffer, width, height;
-		
+
 		if ( renderTexture ) {
-			
+
 			framebuffer = renderTexture.__webGLFramebuffer;
 			width = renderTexture.width;
 			height = renderTexture.height;
-			
+
 		} else {
-			
+
 			framebuffer = null;
 			width = _canvas.width;
 			height = _canvas.height;
-			
+
 		}
-		
+
 		if( framebuffer != _oldFramebuffer ) {
-			
+
 			_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 			_gl.viewport( 0, 0, width, height );
-			
+
 			if ( clear ) {
-			
+
 				_gl.clear( _gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT );
-				
+
 			}
-			
+
 			_oldFramebuffer = framebuffer;
-			
+
 		}
 
 	};
-	
+
 	function updateRenderTargetMipmap( renderTarget ) {
-		
+
 		_gl.bindTexture( _gl.TEXTURE_2D, renderTarget.__webGLTexture );
 		_gl.generateMipmap( _gl.TEXTURE_2D );
 		_gl.bindTexture( _gl.TEXTURE_2D, null );
-		
-	};	
+
+	};
 
 	function cacheUniformLocations( program, identifiers ) {
 
@@ -1776,7 +1776,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 };
 
 THREE.Snippets = {
-	
+
 	fog_pars_fragment: [
 
 	"#ifdef USE_FOG",
@@ -1811,28 +1811,28 @@ THREE.Snippets = {
 		"gl_FragColor = mix( gl_FragColor, vec4( fogColor, 1.0 ), fogFactor );",
 
 	"#endif"
-	
+
 	].join("\n"),
-	
+
 	envmap_pars_fragment: [
-	
+
 	"#ifdef USE_ENVMAP",
-	
+
 		"varying vec3 vReflect;",
 		"uniform float reflectivity;",
 		"uniform samplerCube env_map;",
 		"uniform int combine;",
-	
+
 	"#endif"
-	
+
 	].join("\n"),
-	
+
 	envmap_fragment: [
-	
+
 	"#ifdef USE_ENVMAP",
 
 		"cubeColor = textureCube( env_map, vec3( -vReflect.x, vReflect.yz ) );",
-		
+
 		"if ( combine == 1 ) {",
 
 			"gl_FragColor = mix( gl_FragColor, cubeColor, reflectivity );",
@@ -1841,31 +1841,31 @@ THREE.Snippets = {
 
 			"gl_FragColor = gl_FragColor * cubeColor;",
 
-		"}",	
+		"}",
 
 	"#endif"
-	
+
 	].join("\n"),
-	
+
 	envmap_pars_vertex: [
-	
+
 	"#ifdef USE_ENVMAP",
-	
+
 		"varying vec3 vReflect;",
 		"uniform float refraction_ratio;",
 		"uniform bool useRefract;",
-		
+
 	"#endif"
-	
+
 	].join("\n"),
 
 	envmap_vertex : [
-	
+
 	"#ifdef USE_ENVMAP",
-	
+
 		"vec4 mPosition = objectMatrix * vec4( position, 1.0 );",
 		"vec3 nWorld = mat3( objectMatrix[0].xyz, objectMatrix[1].xyz, objectMatrix[2].xyz ) * normal;",
-	
+
 		"if ( useRefract ) {",
 
 			"vReflect = refract( normalize( mPosition.xyz - cameraPosition ), normalize( nWorld.xyz ), refraction_ratio );",
@@ -1877,30 +1877,30 @@ THREE.Snippets = {
 		"}",
 
 	"#endif"
-	
+
 	].join("\n"),
-	
+
 	map_pars_fragment: [
-	
+
 	"#ifdef USE_MAP",
-		
+
 		"varying vec2 vUv;",
 		"uniform sampler2D map;",
-		  
+
 	"#endif"
-	
+
 	].join("\n"),
-	
+
 	map_pars_vertex: [
-	
+
 	"#ifdef USE_MAP",
-	
+
 		"varying vec2 vUv;",
 
 	"#endif"
-	
+
 	].join("\n"),
-	
+
 	map_fragment: [
 
 	"#ifdef USE_MAP",
@@ -1908,46 +1908,46 @@ THREE.Snippets = {
 		"mapColor = texture2D( map, vUv );",
 
 	"#endif"
-	
+
 	].join("\n"),
-	
+
 	map_vertex: [
-	
+
 	"#ifdef USE_MAP",
-	
+
 		"vUv = uv;",
-		
+
 	"#endif"
-	
+
 	].join("\n"),
-	
+
 	lights_pars_vertex: [
-	
+
 	"uniform bool enableLighting;",
 	"uniform vec3 ambientLightColor;",
-	
+
 	"#if MAX_DIR_LIGHTS > 0",
-	
+
 		"uniform vec3 directionalLightColor[ MAX_DIR_LIGHTS ];",
 		"uniform vec3 directionalLightDirection[ MAX_DIR_LIGHTS ];",
-		
+
 	"#endif",
 
 	"#if MAX_POINT_LIGHTS > 0",
-	
+
 		"uniform vec3 pointLightColor[ MAX_POINT_LIGHTS ];",
 		"uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];",
-		
+
 		"#ifdef PHONG",
 			"varying vec3 vPointLightVector[ MAX_POINT_LIGHTS ];",
 		"#endif",
-		
+
 	"#endif"
-	
+
 	].join("\n"),
-	
+
 	lights_vertex: [
-	
+
 	"if ( !enableLighting ) {",
 
 		"vLightWeighting = vec3( 1.0 );",
@@ -1957,62 +1957,62 @@ THREE.Snippets = {
 		"vLightWeighting = ambientLightColor;",
 
 		"#if MAX_DIR_LIGHTS > 0",
-		
+
 		"for( int i = 0; i < MAX_DIR_LIGHTS; i++ ) {",
-		
+
 			"vec4 lDirection = viewMatrix * vec4( directionalLightDirection[ i ], 0.0 );",
 			"float directionalLightWeighting = max( dot( transformedNormal, normalize( lDirection.xyz ) ), 0.0 );",
 			"vLightWeighting += directionalLightColor[ i ] * directionalLightWeighting;",
-			
+
 		"}",
-		
+
 		"#endif",
 
 		"#if MAX_POINT_LIGHTS > 0",
-		
+
 		"for( int i = 0; i < MAX_POINT_LIGHTS; i++ ) {",
-		
+
 			"vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );",
 			"vec3 pointLightVector = normalize( lPosition.xyz - mvPosition.xyz );",
 			"float pointLightWeighting = max( dot( transformedNormal, pointLightVector ), 0.0 );",
 			"vLightWeighting += pointLightColor[ i ] * pointLightWeighting;",
-			
+
 			"#ifdef PHONG",
 				"vPointLightVector[ i ] = pointLightVector;",
 			"#endif",
-			
+
 		"}",
-		
+
 		"#endif",
-		
+
 	"}"
-	
+
 	].join("\n"),
-	
+
 	lights_pars_fragment: [
-	
+
 	"#if MAX_DIR_LIGHTS > 0",
 		"uniform vec3 directionalLightDirection[ MAX_DIR_LIGHTS ];",
 	"#endif",
-	
+
 	"#if MAX_POINT_LIGHTS > 0",
 		"varying vec3 vPointLightVector[ MAX_POINT_LIGHTS ];",
 	"#endif",
-	
+
 	"varying vec3 vViewPosition;",
 	"varying vec3 vNormal;"
-	
+
 	].join("\n"),
-	
+
 	lights_fragment: [
-	
+
 	"vec3 normal = normalize( vNormal );",
 	"vec3 viewPosition = normalize( vViewPosition );",
-	
+
 	"vec4 mSpecular = vec4( specular, opacity );",
 
 	"#if MAX_POINT_LIGHTS > 0",
-		
+
 		"vec4 pointDiffuse  = vec4( 0.0 );",
 		"vec4 pointSpecular = vec4( 0.0 );",
 
@@ -2034,9 +2034,9 @@ THREE.Snippets = {
 			"}",
 
 	"#endif",
-	
+
 	"#if MAX_DIR_LIGHTS > 0",
-	
+
 		"vec4 dirDiffuse  = vec4( 0.0 );",
 		"vec4 dirSpecular = vec4( 0.0 );" ,
 
@@ -2059,7 +2059,7 @@ THREE.Snippets = {
 			"dirSpecular += mSpecular * dirSpecularWeight;",
 
 		"}",
-	
+
 	"#endif",
 
 	"vec4 totalLight = vec4( ambient, opacity );",
@@ -2067,7 +2067,7 @@ THREE.Snippets = {
 	"#if MAX_DIR_LIGHTS > 0",
 		"totalLight += dirDiffuse + dirSpecular;",
 	"#endif",
-	
+
 	"#if MAX_POINT_LIGHTS > 0",
 		"totalLight += pointDiffuse + pointSpecular;",
 	"#endif"
@@ -2077,37 +2077,37 @@ THREE.Snippets = {
 };
 
 THREE.UniformsLib = {
-	
+
 	common: {
-		
+
 	"color"   : { type: "c", value: new THREE.Color( 0xeeeeee ) },
 	"opacity" : { type: "f", value: 1 },
 	"map"     : { type: "t", value: 0, texture: null },
-	
+
 	"env_map" 		  : { type: "t", value: 1, texture: null },
 	"useRefract"	  : { type: "i", value: 0 },
 	"reflectivity"    : { type: "f", value: 1 },
 	"refraction_ratio": { type: "f", value: 0.98 },
 	"combine"		  : { type: "i", value: 0 },
-	
+
 	"fogDensity": { type: "f", value: 0.00025 },
 	"fogNear"	: { type: "f", value: 1 },
 	"fogFar"	: { type: "f", value: 2000 },
 	"fogColor"	: { type: "c", value: new THREE.Color( 0xffffff ) }
-	
+
 	},
-	
+
 	lights: {
-		
+
 	"enableLighting" 			: { type: "i", value: 1 },
 	"ambientLightColor" 		: { type: "fv", value: [] },
 	"directionalLightDirection" : { type: "fv", value: [] },
 	"directionalLightColor" 	: { type: "fv", value: [] },
 	"pointLightPosition"		: { type: "fv", value: [] },
 	"pointLightColor"			: { type: "fv", value: [] }
-	
+
 	}
-	
+
 };
 
 THREE.ShaderLib = {
@@ -2178,18 +2178,18 @@ THREE.ShaderLib = {
 	},
 
 	'basic': {
-		
+
 		uniforms: THREE.UniformsLib[ "common" ],
-		
+
 		fragment_shader: [
 
 			"uniform vec3 color;",
 			"uniform float opacity;",
-			
+
 			THREE.Snippets[ "map_pars_fragment" ],
 			THREE.Snippets[ "envmap_pars_fragment" ],
 			THREE.Snippets[ "fog_pars_fragment" ],
-				
+
 			"void main() {",
 
 				"vec4 mColor = vec4( color, opacity );",
@@ -2197,54 +2197,54 @@ THREE.ShaderLib = {
 				"vec4 cubeColor = vec4( 1.0 );",
 
 				THREE.Snippets[ "map_fragment" ],
-				
+
 				"gl_FragColor = mColor * mapColor;",
-				
+
 				THREE.Snippets[ "envmap_fragment" ],
 				THREE.Snippets[ "fog_fragment" ],
-				
+
 			"}"
 
 		].join("\n"),
-		
+
 		vertex_shader: [
-			
+
 			THREE.Snippets[ "map_pars_vertex" ],
 			THREE.Snippets[ "envmap_pars_vertex" ],
-			
+
 			"void main() {",
-		
+
 				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
-				
+
 				THREE.Snippets[ "map_vertex" ],
 				THREE.Snippets[ "envmap_vertex" ],
-				
+
 				"gl_Position = projectionMatrix * mvPosition;",
 
 			"}"
 
 		].join("\n")
-		
+
 	},
 
 	'lambert': {
-		
-		uniforms: Uniforms.merge( [ THREE.UniformsLib[ "common" ], 
+
+		uniforms: Uniforms.merge( [ THREE.UniformsLib[ "common" ],
 									THREE.UniformsLib[ "lights" ] ] ),
-		
+
 		fragment_shader: [
-			
+
 			"uniform vec3 color;",
 			"uniform float opacity;",
-			
+
 			"varying vec3 vLightWeighting;",
-				
+
 			THREE.Snippets[ "map_pars_fragment" ],
 			THREE.Snippets[ "envmap_pars_fragment" ],
 			THREE.Snippets[ "fog_pars_fragment" ],
-				
+
 			"void main() {",
-					
+
 				"vec4 mColor = vec4( color, opacity );",
 				"vec4 mapColor = vec4( 1.0 );",
 				"vec4 cubeColor = vec4( 1.0 );",
@@ -2252,7 +2252,7 @@ THREE.ShaderLib = {
 				THREE.Snippets[ "map_fragment" ],
 
 				"gl_FragColor =  mColor * mapColor * vec4( vLightWeighting, 1.0 );",
-				
+
 				THREE.Snippets[ "envmap_fragment" ],
 				THREE.Snippets[ "fog_fragment" ],
 
@@ -2261,62 +2261,62 @@ THREE.ShaderLib = {
 		].join("\n"),
 
 		vertex_shader: [
-		
+
 			"varying vec3 vLightWeighting;",
-			
+
 			THREE.Snippets[ "map_pars_vertex" ],
 			THREE.Snippets[ "envmap_pars_vertex" ],
 			THREE.Snippets[ "lights_pars_vertex" ],
-			
+
 			"void main() {",
-		
+
 				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
-				
+
 				THREE.Snippets[ "map_vertex" ],
 				THREE.Snippets[ "envmap_vertex" ],
-				
+
 				"vec3 transformedNormal = normalize( normalMatrix * normal );",
-				
+
 				THREE.Snippets[ "lights_vertex" ],
-				
+
 				"gl_Position = projectionMatrix * mvPosition;",
 
 			"}"
 
 		].join("\n")
-		
+
 	},
-	
+
 	'phong': {
-		
-		uniforms: Uniforms.merge( [ THREE.UniformsLib[ "common" ], 
+
+		uniforms: Uniforms.merge( [ THREE.UniformsLib[ "common" ],
 									THREE.UniformsLib[ "lights" ],
-									
+
 									{ "ambient"  : { type: "c", value: new THREE.Color( 0x050505 ) },
 									  "specular" : { type: "c", value: new THREE.Color( 0x111111 ) },
 									  "shininess": { type: "f", value: 30 }
 									}
-									
+
 								] ),
-		
+
 		fragment_shader: [
-			
+
 			"uniform vec3 color;",
 			"uniform float opacity;",
-			
+
 			"uniform vec3 ambient;",
 			"uniform vec3 specular;",
 			"uniform float shininess;",
-				
+
 			"varying vec3 vLightWeighting;",
-				
+
 			THREE.Snippets[ "map_pars_fragment" ],
 			THREE.Snippets[ "envmap_pars_fragment" ],
 			THREE.Snippets[ "fog_pars_fragment" ],
 			THREE.Snippets[ "lights_pars_fragment" ],
-				
+
 			"void main() {",
-					
+
 				"vec4 mColor = vec4( color, opacity );",
 				"vec4 mapColor = vec4( 1.0 );",
 				"vec4 cubeColor = vec4( 1.0 );",
@@ -2325,7 +2325,7 @@ THREE.ShaderLib = {
 				THREE.Snippets[ "lights_fragment" ],
 
 				"gl_FragColor =  mapColor * totalLight * vec4( vLightWeighting, 1.0 );",
-				
+
 				THREE.Snippets[ "envmap_fragment" ],
 				THREE.Snippets[ "fog_fragment" ],
 
@@ -2334,41 +2334,41 @@ THREE.ShaderLib = {
 		].join("\n"),
 
 		vertex_shader: [
-		
+
 			"#define PHONG",
-			
+
 			"varying vec3 vLightWeighting;",
 			"varying vec3 vViewPosition;",
 			"varying vec3 vNormal;",
-			
+
 			THREE.Snippets[ "map_pars_vertex" ],
 			THREE.Snippets[ "envmap_pars_vertex" ],
 			THREE.Snippets[ "lights_pars_vertex" ],
-			
+
 			"void main() {",
-		
+
 				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
-				
+
 				THREE.Snippets[ "map_vertex" ],
 				THREE.Snippets[ "envmap_vertex" ],
-				
+
 				"#ifndef USE_ENVMAP",
 					"vec4 mPosition = objectMatrix * vec4( position, 1.0 );",
 				"#endif",
-				
+
 				"vViewPosition = cameraPosition - mPosition.xyz;",
-				
+
 				"vec3 transformedNormal = normalize( normalMatrix * normal );",
 				"vNormal = transformedNormal;",
 
 				THREE.Snippets[ "lights_vertex" ],
-				
+
 				"gl_Position = projectionMatrix * mvPosition;",
 
 			"}"
 
 		].join("\n")
-		
-	}	
+
+	}
 
 };
