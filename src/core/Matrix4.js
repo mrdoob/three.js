@@ -306,7 +306,7 @@ THREE.Matrix4.prototype = {
 
 	setRotX: function( theta ) {
                  var c = Math.cos( theta ), s = Math.sin( theta );
-		 this.set( 1, 0, 0, 0, 0, c, -s, 0, 0, c, s, 0, 0, 0, 0, 1 );
+		 this.set( 1, 0, 0, 0, 0, c, -s, 0, 0, s, c, 0, 0, 0, 0, 1 );
 		 return this;
         },
 
