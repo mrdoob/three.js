@@ -295,38 +295,38 @@ THREE.Matrix4.prototype = {
 	},
 
 	setTranslation: function( x, y, z ) {
-	         
+
 		this.set( 1, 0, 0, x,
 				  0, 1, 0, y,
 				  0, 0, 1, z,
 				  0, 0, 0, 1 );
 		 
 		return this;
-		
+
 	},
 
 	setScale: function( x, y, z ) {
-		
+
 		this.set( x, 0, 0, 0,
 				  0, y, 0, 0,
 				  0, 0, z, 0,
 				  0, 0, 0, 1 );
 		
 		return this;
-		
+
 	},
 
 	setRotX: function( theta ) {
 
 		var c = Math.cos( theta ), s = Math.sin( theta );
-		
+
 		this.set( 1, 0,  0, 0,
 				  0, c, -s, 0,
 				  0, s,  c, 0,
 				  0, 0,  0, 1 );
-		
+
 		return this;
-		
+
 	},
 
 	setRotY: function( theta ) {
@@ -337,22 +337,22 @@ THREE.Matrix4.prototype = {
 				  0, 1, 0, 0,
 				 -s, 0, c, 0,
 				  0, 0, 0, 1 );
-		
+
 		return this;
-		
+
 	},
 
 	setRotZ: function( theta ) {
 
 		var c = Math.cos( theta ), s = Math.sin( theta );
-		
+
 		this.set( c, -s, 0, 0,
 				  s,  c, 0, 0,
 				  0,  0, 1, 0,
 				  0,  0, 0, 1 );
 		
 		return this;
-		
+
 	},
 
 	setRotAxis: function( axis, angle ) {
@@ -369,7 +369,7 @@ THREE.Matrix4.prototype = {
 				  tx * y + s * z, ty * y + c, ty * z - s * x, 0,
 				  tx * z - s * y, ty * z + s * x, t * z * z + c, 0,
 				  0, 0, 0, 1 );
-		
+
 		 return this;
 
 	},
@@ -389,9 +389,7 @@ THREE.Matrix4.translationMatrix = function ( x, y, z ) {
 
 	var m = new THREE.Matrix4();
 
-	m.n14 = x;
-	m.n24 = y;
-	m.n34 = z;
+	m.setTranslation( x, y, z );
 
 	return m;
 
@@ -401,9 +399,7 @@ THREE.Matrix4.scaleMatrix = function ( x, y, z ) {
 
 	var m = new THREE.Matrix4();
 
-	m.n11 = x;
-	m.n22 = y;
-	m.n33 = z;
+	m.setScale( x, y, z );
 
 	return m;
 
@@ -411,71 +407,50 @@ THREE.Matrix4.scaleMatrix = function ( x, y, z ) {
 
 THREE.Matrix4.rotationXMatrix = function ( theta ) {
 
-	var rot = new THREE.Matrix4();
+	var m = new THREE.Matrix4();
 
-	rot.n22 = rot.n33 = Math.cos( theta );
-	rot.n32 = Math.sin( theta );
-	rot.n23 = - rot.n32;
+	m.setRotX( theta );
 
-	return rot;
+	return m;
 
 };
 
 THREE.Matrix4.rotationYMatrix = function ( theta ) {
 
-	var rot = new THREE.Matrix4();
+	var m = new THREE.Matrix4();
 
-	rot.n11 = rot.n33 = Math.cos( theta );
-	rot.n13 = Math.sin( theta );
-	rot.n31 = - rot.n13;
+	m.setRotY( theta );
 
-	return rot;
+	return m;
 
 };
 
 THREE.Matrix4.rotationZMatrix = function ( theta ) {
 
-	var rot = new THREE.Matrix4();
+	var m = new THREE.Matrix4();
 
-	rot.n11 = rot.n22 = Math.cos( theta );
-	rot.n21 = Math.sin( theta );
-	rot.n12 = - rot.n21;
+	m.setRotZ( theta );
 
-	return rot;
+	return m;
 
 };
 
 THREE.Matrix4.rotationAxisAngleMatrix = function ( axis, angle ) {
 
-	//Based on http://www.gamedev.net/reference/articles/article1199.asp
+	var m = new THREE.Matrix4();
 
-	var rot = new THREE.Matrix4(),
-	c = Math.cos( angle ),
-	s = Math.sin( angle ),
-	t = 1 - c,
-	x = axis.x, y = axis.y, z = axis.z,
-	tx = t * x, ty = t * y;
+	setRotAxis( axis, angle );
 
-	rot.n11 = tx * x + c;
-	rot.n12 = tx * y - s * z;
-	rot.n13 = tx * z + s * y;
-	rot.n21 = tx * y + s * z;
-	rot.n22 = ty * y + c;
-	rot.n23 = ty * z - s * x;
-	rot.n31 = tx * z - s * y;
-	rot.n32 = ty * z + s * x;
-	rot.n33 = t * z * z + c;
-
-	return rot;
+	return m;
 
 };
 
 THREE.Matrix4.makeInvert = function ( m1 ) {
 
-        var n11 = m1.n11, n12 = m1.n12, n13 = m1.n13, n14 = m1.n14,
-	n21 = m1.n21, n22 = m1.n22, n23 = m1.n23, n24 = m1.n24,
-	n31 = m1.n31, n32 = m1.n32, n33 = m1.n33, n34 = m1.n34,
-	n41 = m1.n41, n42 = m1.n42, n43 = m1.n43, n44 = m1.n44;
+	var n11 = m1.n11, n12 = m1.n12, n13 = m1.n13, n14 = m1.n14,
+		n21 = m1.n21, n22 = m1.n22, n23 = m1.n23, n24 = m1.n24,
+		n31 = m1.n31, n32 = m1.n32, n33 = m1.n33, n34 = m1.n34,
+		n41 = m1.n41, n42 = m1.n42, n43 = m1.n43, n44 = m1.n44;
 
 	//TODO: make this more efficient
 	//( based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm )
