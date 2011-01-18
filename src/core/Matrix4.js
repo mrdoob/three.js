@@ -194,38 +194,43 @@ THREE.Matrix4.prototype = {
 
 	determinant: function () {
 
+		var n11 = this.n11, n12 = this.n12, n13 = this.n13, n14 = this.n14,
+		n21 = this.n21, n22 = this.n22, n23 = this.n23, n24 = this.n24,
+		n31 = this.n31, n32 = this.n32, n33 = this.n33, n34 = this.n34,
+		n41 = this.n41, n42 = this.n42, n43 = this.n43, n44 = this.n44;
+
 		//TODO: make this more efficient
 		//( based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm )
 		return (
-			this.n14 * this.n23 * this.n32 * this.n41-
-			this.n13 * this.n24 * this.n32 * this.n41-
-			this.n14 * this.n22 * this.n33 * this.n41+
-			this.n12 * this.n24 * this.n33 * this.n41+
+			n14 * n23 * n32 * n41-
+			n13 * n24 * n32 * n41-
+			n14 * n22 * n33 * n41+
+			n12 * n24 * n33 * n41+
 
-			this.n13 * this.n22 * this.n34 * this.n41-
-			this.n12 * this.n23 * this.n34 * this.n41-
-			this.n14 * this.n23 * this.n31 * this.n42+
-			this.n13 * this.n24 * this.n31 * this.n42+
+			n13 * n22 * n34 * n41-
+			n12 * n23 * n34 * n41-
+			n14 * n23 * n31 * n42+
+			n13 * n24 * n31 * n42+
 
-			this.n14 * this.n21 * this.n33 * this.n42-
-			this.n11 * this.n24 * this.n33 * this.n42-
-			this.n13 * this.n21 * this.n34 * this.n42+
-			this.n11 * this.n23 * this.n34 * this.n42+
+			n14 * n21 * n33 * n42-
+			n11 * n24 * n33 * n42-
+			n13 * n21 * n34 * n42+
+			n11 * n23 * n34 * n42+
 
-			this.n14 * this.n22 * this.n31 * this.n43-
-			this.n12 * this.n24 * this.n31 * this.n43-
-			this.n14 * this.n21 * this.n32 * this.n43+
-			this.n11 * this.n24 * this.n32 * this.n43+
+			n14 * n22 * n31 * n43-
+			n12 * n24 * n31 * n43-
+			n14 * n21 * n32 * n43+
+			n11 * n24 * n32 * n43+
 
-			this.n12 * this.n21 * this.n34 * this.n43-
-			this.n11 * this.n22 * this.n34 * this.n43-
-			this.n13 * this.n22 * this.n31 * this.n44+
-			this.n12 * this.n23 * this.n31 * this.n44+
+			n12 * n21 * n34 * n43-
+			n11 * n22 * n34 * n43-
+			n13 * n22 * n31 * n44+
+			n12 * n23 * n31 * n44+
 
-			this.n13 * this.n21 * this.n32 * this.n44-
-			this.n11 * this.n23 * this.n32 * this.n44-
-			this.n12 * this.n21 * this.n33 * this.n44+
-			this.n11 * this.n22 * this.n33 * this.n44 );
+			n13 * n21 * n32 * n44-
+			n11 * n23 * n32 * n44-
+			n12 * n21 * n33 * n44+
+			n11 * n22 * n33 * n44 );
 
 	},
 
