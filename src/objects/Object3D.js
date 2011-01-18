@@ -28,31 +28,26 @@ THREE.Object3D.prototype = {
 		var p = this.position, r = this.rotation, s = this.scale, m = this.tmpMatrix;
 
 		this.matrix.setTranslation( p.x, p.y, p.z );
-		this.rotationMatrix.identity();
 
-		if ( r.x != 0 ) {
-		       m.setRotX( r.x );
-		       this.matrix.multiplySelf( m );
-		       this.rotationMatrix.multiplySelf( m );
-		}
+		this.rotationMatrix.setRotX( r.x );
 
 		if ( r.y != 0 ) {
 		       m.setRotY( r.y );
-		       this.matrix.multiplySelf( m );
 		       this.rotationMatrix.multiplySelf( m );
 		}
 
 		if ( r.z != 0 ) {
 		       m.setRotZ( r.z );
-		       this.matrix.multiplySelf( m );
 		       this.rotationMatrix.multiplySelf( m );
 		}
+
+		this.matrix.multiplySelf( this.rotationMatrix );
 
 		if ( s.x != 0 || s.y != 0 || s.z != 0 ) {
 		       m.setScale( s.x, s.y, s.z );
 		       this.matrix.multiplySelf( m );
 		}
-
+		
 	}
 
 };
