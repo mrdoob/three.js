@@ -11,6 +11,7 @@ THREE.Object3D = function () {
 	this.scale = new THREE.Vector3( 1, 1, 1 );
 
 	this.matrix = new THREE.Matrix4();
+	this.rotationMatrix = new THREE.Matrix4();
 	this.tmpMatrix = new THREE.Matrix4();
 
 	this.screen = new THREE.Vector3();
@@ -27,27 +28,31 @@ THREE.Object3D.prototype = {
 		var p = this.position, r = this.rotation, s = this.scale, m = this.tmpMatrix;
 
 		this.matrix.setTranslation( p.x, p.y, p.z );
+		this.rotationMatrix.identity();
 
 		if ( r.x != 0 ) {
 		       m.setRotX( r.x );
 		       this.matrix.multiplySelf( m );
+		       this.rotationMatrix.multiplySelf( m );
 		}
 
 		if ( r.y != 0 ) {
 		       m.setRotY( r.y );
 		       this.matrix.multiplySelf( m );
+		       this.rotationMatrix.multiplySelf( m );
 		}
 
 		if ( r.z != 0 ) {
 		       m.setRotZ( r.z );
 		       this.matrix.multiplySelf( m );
+		       this.rotationMatrix.multiplySelf( m );
 		}
 
 		if ( s.x != 0 || s.y != 0 || s.z != 0 ) {
 		       m.setScale( s.x, s.y, s.z );
 		       this.matrix.multiplySelf( m );
 		}
-		
+
 	}
 
 };

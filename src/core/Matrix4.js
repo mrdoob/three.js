@@ -12,7 +12,7 @@ THREE.Matrix4 = function ( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33
 	this.n21 = n21 || 0; this.n22 = n22 || 1; this.n23 = n23 || 0; this.n24 = n24 || 0;
 	this.n31 = n31 || 0; this.n32 = n32 || 0; this.n33 = n33 || 1; this.n34 = n34 || 0;
 	this.n41 = n41 || 0; this.n42 = n42 || 0; this.n43 = n43 || 0; this.n44 = n44 || 1;
-	
+
 	this.flat = new Array( 16 );
 	this.m33 = new THREE.Matrix3();
 
@@ -289,7 +289,7 @@ THREE.Matrix4.prototype = {
 		this.flat[ 13 ] = this.n24;
 		this.flat[ 14 ] = this.n34;
 		this.flat[ 15 ] = this.n44;
-		
+
 		return this.flat;
 
 	},
@@ -323,6 +323,7 @@ THREE.Matrix4.prototype = {
         },
 
 	setRotAxis: function( axis, angle ) {
+
                  //Based on http://www.gamedev.net/reference/articles/article1199.asp
 
                  c = Math.cos( angle ),
@@ -501,7 +502,7 @@ THREE.Matrix4.makeInvert3x3 = function ( m1 ) {
 
 }
 
-THREE.Matrix4.makeFrustum = function( left, right, bottom, top, near, far ) {
+THREE.Matrix4.makeFrustum = function ( left, right, bottom, top, near, far ) {
 
 	var m, x, y, a, b, c, d;
 
@@ -522,7 +523,7 @@ THREE.Matrix4.makeFrustum = function( left, right, bottom, top, near, far ) {
 
 };
 
-THREE.Matrix4.makePerspective = function( fov, aspect, near, far ) {
+THREE.Matrix4.makePerspective = function ( fov, aspect, near, far ) {
 
 	var ymax, ymin, xmin, xmax;
 
@@ -535,7 +536,7 @@ THREE.Matrix4.makePerspective = function( fov, aspect, near, far ) {
 
 };
 
-THREE.Matrix4.makeOrtho = function( left, right, top, bottom, near, far ) {
+THREE.Matrix4.makeOrtho = function ( left, right, top, bottom, near, far ) {
 
 	var m, x, y, z, w, h, p;
 

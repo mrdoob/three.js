@@ -54,6 +54,7 @@
 		<script type="text/javascript" src="../src/materials/ParticleCircleMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/ParticleDOMMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/Texture.js"></script>
+		<script type="text/javascript" src="../src/materials/RenderTarget.js"></script>
 		<script type="text/javascript" src="../src/materials/Uniforms.js"></script>
 		<script type="text/javascript" src="../src/materials/mappings/CubeReflectionMapping.js"></script>
 		<script type="text/javascript" src="../src/materials/mappings/CubeRefractionMapping.js"></script>
@@ -70,7 +71,6 @@
 		<script type="text/javascript" src="../src/renderers/CanvasRenderer.js"></script>
 		<script type="text/javascript" src="../src/renderers/SVGRenderer.js"></script>
 		<script type="text/javascript" src="../src/renderers/WebGLRenderer.js"></script>
-		<script type="text/javascript" src="../src/renderers/WebGLRenderer2.js"></script>
 		<script type="text/javascript" src="../src/renderers/renderables/RenderableObject.js"></script>
 		<script type="text/javascript" src="../src/renderers/renderables/RenderableFace3.js"></script>
 		<script type="text/javascript" src="../src/renderers/renderables/RenderableParticle.js"></script>
@@ -89,21 +89,17 @@
 			var SCREEN_HEIGHT = window.innerHeight;
 			var AMOUNT = 100;
 
-			var container;
-			var stats;
+			var container, stats;
 
-			var camera;
-			var scene;
+			var camera, scene;
 			var canvasRenderer, svgRenderer, webglRenderer;
 
 			var mesh, qrcode;
 
-			var mouseX = 0;
-			var mouseY = 0;
+			var mouseX = 0, mouseY = 0;
 
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
-
 
 			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
