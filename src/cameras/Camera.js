@@ -18,14 +18,14 @@ THREE.Camera = function ( fov, aspect, near, far ) {
 	this.matrix = new THREE.Matrix4();
 
 	this.up = new THREE.Vector3( 0, 1, 0 );
-	
+
 	this.tmpVec = new THREE.Vector3();
 
 	this.translateX = function ( amount ) {
 
 		this.tmpVec.sub( this.target.position, this.position ).normalize().multiplyScalar( amount );
 		this.tmpVec.crossSelf( this.up );
-		
+
 		this.position.addSelf( this.tmpVec );
 		this.target.position.addSelf( this.tmpVec );
 
@@ -40,7 +40,7 @@ THREE.Camera = function ( fov, aspect, near, far ) {
 	this.translateZ = function ( amount ) {
 
 		this.tmpVec.sub( this.target.position, this.position ).normalize().multiplyScalar( amount );
-		
+
 		this.position.subSelf( this.tmpVec );
 		this.target.position.subSelf( this.tmpVec );
 
