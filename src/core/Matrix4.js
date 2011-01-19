@@ -439,7 +439,7 @@ THREE.Matrix4.rotationAxisAngleMatrix = function ( axis, angle ) {
 
 	var m = new THREE.Matrix4();
 
-	setRotAxis( axis, angle );
+	m.setRotAxis( axis, angle );
 
 	return m;
 
