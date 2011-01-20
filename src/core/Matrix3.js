@@ -8,11 +8,11 @@ THREE.Matrix3.prototype = {
 
 	transpose: function () {
 
-		var tmp;
+                var tmp, m = this.m;
 
-		tmp = this.m[1]; this.m[1] = this.m[3]; this.m[3] = tmp;
-		tmp = this.m[2]; this.m[2] = this.m[6]; this.m[6] = tmp;
-		tmp = this.m[5]; this.m[5] = this.m[7]; this.m[7] = tmp;
+		tmp = m[1]; m[1] = m[3]; m[3] = tmp;
+		tmp = m[2]; m[2] = m[6]; m[6] = tmp;
+		tmp = m[5]; m[5] = m[7]; m[7] = tmp;
 
 		return this;
 
