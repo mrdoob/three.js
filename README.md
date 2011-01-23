@@ -12,7 +12,7 @@ More? [#three.js on irc.freenode.net](http://webchat.freenode.net/?channels=thre
 ### Examples ###
 
 
-#### WebGL #### (Context 3D)
+#### WebGL (Context 3D) #### 
 
 [![shader](http://mrdoob.github.com/three.js/assets/examples/34_shader.png)](http://mrdoob.github.com/three.js/examples/shader.html)
 [![materials_normalmap2](http://mrdoob.github.com/three.js/assets/examples/33_materials_normalmap2.png)](http://mrdoob.github.com/three.js/examples/materials_normalmap2.html)
@@ -32,7 +32,7 @@ More? [#three.js on irc.freenode.net](http://webchat.freenode.net/?channels=thre
 [![large_mesh](http://mrdoob.github.com/three.js/assets/examples/12_large_mesh.png)](http://mrdoob.github.com/three.js/examples/geometry_large_mesh.html)
 
 
-#### Canvas #### (Context 2D)
+#### Canvas (Context 2D) #### 
 
 [![materials_reflection](http://mrdoob.github.com/three.js/assets/examples/27_materials_reflection.png)](http://mrdoob.github.com/three.js/examples/materials_reflection.html)
 [![materials](http://mrdoob.github.com/three.js/assets/examples/13_materials.png)](http://mrdoob.github.com/three.js/examples/materials.html)
