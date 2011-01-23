@@ -364,7 +364,7 @@ THREE.Projector = function() {
 
 	this.unprojectVector = function ( vector, camera ) {
 
-	        var matrix = THREE.Matrix4.makeInvert( camera.matrix );
+		var matrix = THREE.Matrix4.makeInvert( camera.matrix );
 
 		matrix.multiplySelf( THREE.Matrix4.makeInvert( camera.projectionMatrix ) );
 

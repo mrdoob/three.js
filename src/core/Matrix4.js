@@ -13,6 +13,9 @@ THREE.Matrix4 = function ( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33
 	this.n31 = n31 || 0; this.n32 = n32 || 0; this.n33 = n33 || 1; this.n34 = n34 || 0;
 	this.n41 = n41 || 0; this.n42 = n42 || 0; this.n43 = n43 || 0; this.n44 = n44 || 1;
 
+	this.flat = new Array( 16 );
+	this.m33 = new THREE.Matrix3();
+
 };
 
 THREE.Matrix4.prototype = {
@@ -267,8 +270,8 @@ THREE.Matrix4.prototype = {
 
 	flatten: function() {
 
-                var flat = THREE.Matrix4.__flat;
-
+		var flat = this.flat;
+		
 		flat[ 0 ] = this.n11;
 		flat[ 1 ] = this.n21;
 		flat[ 2 ] = this.n31;
@@ -477,24 +480,27 @@ THREE.Matrix4.makeInvert = function ( m1 ) {
 
 };
 
-THREE.Matrix4.makeInvert3x3 = function ( m1, m2 ) {
+THREE.Matrix4.makeInvert3x3 = function ( m1 ) {
 
-	// input:  m1: THREE.Matrix4, m2: THREE.Matrix3; output: THREE.Matrix3 (m2)
+	// input:  THREE.Matrix4, output: THREE.Matrix3
 	// ( based on http://code.google.com/p/webgl-mjs/ )
 
-        var m = m1.flatten(),
-	m2m = m2.m,
+	var m = m1.flatten(),
+		m33 = m1.m33,
+		m33m = m33.m,
 
-	a11 = m[ 10 ] * m[ 5 ] - m[ 6 ] * m[ 9 ],
+	a11 =   m[ 10 ] * m[ 5 ] - m[ 6 ] * m[ 9 ],
 	a21 = - m[ 10 ] * m[ 1 ] + m[ 2 ] * m[ 9 ],
-	a31 = m[ 6 ] * m[ 1 ] - m[ 2 ] * m[ 5 ],
+	a31 =   m[ 6 ]  * m[ 1 ] - m[ 2 ] * m[ 5 ],
 	a12 = - m[ 10 ] * m[ 4 ] + m[ 6 ] * m[ 8 ],
-	a22 = m[ 10 ] * m[ 0 ] - m[ 2 ] * m[ 8 ],
-	a32 = - m[ 6 ] * m[ 0 ] + m[ 2 ] * m[ 4 ],
-	a13 = m[ 9 ] * m[ 4 ] - m[ 5 ] * m[ 8 ],
-	a23 = - m[ 9 ] * m[ 0 ] + m[ 1 ] * m[ 8 ],
-	a33 = m[ 5 ] * m[ 0 ] - m[ 1 ] * m[ 4 ],
-	det = m[ 0 ] * ( a11 ) + m[ 1 ] * ( a12 ) + m[ 2 ] * ( a13 ),
+	a22 =   m[ 10 ] * m[ 0 ] - m[ 2 ] * m[ 8 ],
+	a32 = - m[ 6 ]  * m[ 0 ] + m[ 2 ] * m[ 4 ],
+	a13 =   m[ 9 ]  * m[ 4 ] - m[ 5 ] * m[ 8 ],
+	a23 = - m[ 9 ]  * m[ 0 ] + m[ 1 ] * m[ 8 ],
+	a33 =   m[ 5 ]  * m[ 0 ] - m[ 1 ] * m[ 4 ],
+	
+	det = m[ 0 ]  * a11 + m[ 1 ] * a12 + m[ 2 ] * a13,
+	
 	idet;
 
 	// no inverse
@@ -502,11 +508,11 @@ THREE.Matrix4.makeInvert3x3 = function ( m1, m2 ) {
 
 	idet = 1.0 / det;
 
-	m2m[ 0 ] = idet * a11; m2m[ 1 ] = idet * a21; m2m[ 2 ] = idet * a31;
-	m2m[ 3 ] = idet * a12; m2m[ 4 ] = idet * a22; m2m[ 5 ] = idet * a32;
-	m2m[ 6 ] = idet * a13; m2m[ 7 ] = idet * a23; m2m[ 8 ] = idet * a33;
+	m33m[ 0 ] = idet * a11; m33m[ 1 ] = idet * a21; m33m[ 2 ] = idet * a31;
+	m33m[ 3 ] = idet * a12; m33m[ 4 ] = idet * a22; m33m[ 5 ] = idet * a32;
+	m33m[ 6 ] = idet * a13; m33m[ 7 ] = idet * a23; m33m[ 8 ] = idet * a33;
 
-	return m2;
+	return m33;
 
 }
 
@@ -568,4 +574,3 @@ THREE.Matrix4.makeOrtho = function ( left, right, top, bottom, near, far ) {
 THREE.Matrix4.__tmpVec1 = new THREE.Vector3();
 THREE.Matrix4.__tmpVec2 = new THREE.Vector3();
 THREE.Matrix4.__tmpVec3 = new THREE.Vector3();
-THREE.Matrix4.__flat = new Array( 16 );

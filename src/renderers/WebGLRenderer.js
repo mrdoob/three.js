@@ -1166,8 +1166,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	this._m33 = new THREE.Matrix3();
-
 	this.setupMatrices = function ( object, camera ) {
 
 		object.autoUpdateMatrix && object.updateMatrix();
@@ -1175,7 +1173,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_modelViewMatrix.multiply( camera.matrix, object.matrix );
 		_modelViewMatrixArray.set( _modelViewMatrix.flatten() );
 
-		_normalMatrix = THREE.Matrix4.makeInvert3x3( _modelViewMatrix, this._m33 ).transpose();
+		_normalMatrix = THREE.Matrix4.makeInvert3x3( _modelViewMatrix ).transpose();
 		_normalMatrixArray.set( _normalMatrix.m );
 
 		_objectMatrixArray.set( object.matrix.flatten() );

@@ -68,8 +68,6 @@ THREE.WebGLRenderer2 = function ( antialias ) {
 
 	};
 
-	this._m33 = new THREE.Matrix3();
-
 	this.render = function( scene, camera ) {
 
 		var o, ol;
@@ -115,7 +113,7 @@ THREE.WebGLRenderer2 = function ( antialias ) {
 			_modelViewMatrix.multiply( camera.matrix, object.matrix );
 			_modelViewMatrixArray.set( _modelViewMatrix.flatten() );
 
-			_normalMatrix = THREE.Matrix4.makeInvert3x3( _modelViewMatrix, this._m33 ).transpose();
+			_normalMatrix = THREE.Matrix4.makeInvert3x3( _modelViewMatrix ).transpose();
 			_normalMatrixArray.set( _normalMatrix.m );
 
 			if ( object instanceof THREE.Mesh ) {
