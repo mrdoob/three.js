@@ -8,9 +8,7 @@ Examples/Geometry/Primitives
 * Create more primitives. http://code.google.com/p/ogre-procedural/source/browse/#hg/library/src
 
 Materials
-* MeshBitmapSphereMappingMaterial. http://en.wikipedia.org/wiki/Sphere_mapping
-* MeshBitmapCubeMappingMaterial. http://en.wikipedia.org/wiki/Cube_mapping
-* MeshShaderMaterial for WebGLRenderer
+* Layer based material system
 
 Renderers
-* FrustrumClipping near to Renderer (CanvasRenderer and SVGRenderer)
+* FrustrumClipping near to Projector (CanvasRenderer and SVGRenderer)
