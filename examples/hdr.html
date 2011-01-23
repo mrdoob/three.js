@@ -71,6 +71,7 @@
 		<script id="fs-hdr" type="x-shader/x-fragment">
 		uniform sampler2D   tDiffuse;
 		uniform float       exposure;
+		uniform float       brightMax;
 		
 		varying vec2  vUv;
 		 
@@ -94,7 +95,14 @@
 			color.xyz  = decode_pnghdr( color );
 			
 			// apply gamma correction and exposure
-			gl_FragData[0] = vec4( pow( exposure * color.xyz, vec3( 0.474 ) ), 1.0 );
+			//gl_FragColor = vec4( pow( exposure * color.xyz, vec3( 0.474 ) ), 1.0 );
+			
+			// Perform tone-mapping
+			float Y = dot(vec4(0.30, 0.59, 0.11, 0.0), color);
+			float YD = exposure * (exposure/brightMax + 1.0) / (exposure + 1.0);
+			color *= YD;
+			
+			gl_FragColor = vec4( color.xyz, 1.0 );
 		}
 		</script>
 		
@@ -152,8 +160,9 @@
 				
                 materialHDR = new THREE.MeshShaderMaterial( {
 
-                    uniforms: { tDiffuse: { type: "t", value: 0, texture: texture },
-								exposure: { type: "f", value: 0.125 } 
+                    uniforms: { tDiffuse:  { type: "t", value: 0, texture: texture },
+								exposure:  { type: "f", value: 0.125 },
+								brightMax: { type: "f", value: 0.5 }
 							  },
                     vertex_shader: getText( 'vs-hdr' ),
                     fragment_shader: getText( 'fs-hdr' )
