@@ -3,8 +3,6 @@ three.js
 
 #### Javascript 3D Engine ####
 
-[![Flattr this](http://api.flattr.com/button/button-compact-static-100x17.png)](http://flattr.com/thing/287/three-js)
-
 The aim of this project is to create a lightweight 3D engine with a very low level of abstraction (aka for dummies). Currently the examples are the documentation. Be aware that the API may change from revision to revision breaking backwards compatibility.
 
 The engine can render using &lt;canvas&gt;, &lt;svg&gt; and WebGL.
