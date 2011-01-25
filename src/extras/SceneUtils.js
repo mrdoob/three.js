@@ -1,4 +1,243 @@
 var SceneUtils = {
+	
+	loadScene : function( url, callback ) {
+
+		var dg, dm, dd, dl, dc, df, f,
+			g, o, m, l, p, c, t,
+			geometry, material, camera, fog, materials,
+			loader, callback_model,
+			worker = new Worker( url );
+
+		worker.onmessage = function( event ) {
+
+			function handle_objects() {
+				
+				for( dd in data.objects ) {
+					
+					if ( !result.objects[ dd ] ) {
+						
+						o = data.objects[ dd ];
+						
+						geometry = result.geometries[ o.geometry ];
+						
+						if ( geometry ) {
+							
+							materials = [];
+							for( i = 0; i < o.materials.length; i++ ) {
+								
+								materials[ i ] = result.materials[ o.materials[i] ];
+								
+							}
+							
+							p = o.position;
+							r = o.rotation;
+							s = o.scale;
+							
+							object = new THREE.Mesh( geometry, materials );
+							object.position.set( p[0], p[1], p[2] );
+							object.rotation.set( r[0], r[1], r[2] );
+							object.scale.set( s[0], s[1], s[2] );
+							object.visible = o.visible;
+							
+							result.scene.addObject( object );
+							
+							result.objects[ dd ] = object;
+							
+						}
+						
+					}
+					
+				}
+			};
+			
+			function handle_mesh( geo, id ) {
+				
+				result.geometries[ id ] = geo; 
+				handle_objects();
+				
+			};
+			
+			function create_callback( id ) {
+				
+				return function( geo ) { handle_mesh( geo, id ); }
+				
+			}
+			
+			var data = event.data;
+			
+			var result = {
+				
+				scene: new THREE.Scene(),
+				geometries: {},
+				materials: {},
+				objects: {},
+				cameras: {},
+				lights: {},
+				fogs: {}
+			
+			};
+			
+			loader = new THREE.Loader();
+			
+			// geometries	
+			
+			for( dg in data.geometries ) {
+				
+				g = data.geometries[ dg ];
+				
+				if ( g.type == "cube" ) {
+					
+					geometry = new Cube( g.width, g.height, g.depth, g.segments_width, g.segments_height, null, g.flipped, g.sides );
+					result.geometries[ dg ] = geometry;
+					
+				} else if ( g.type == "plane" ) {
+					
+					geometry = new Plane( g.width, g.height, g.segments_width, g.segments_height );
+					result.geometries[ dg ] = geometry;
+					
+				} else if ( g.type == "sphere" ) {
+					
+					geometry = new Sphere( g.radius, g.segments_width, g.segments_height );
+					result.geometries[ dg ] = geometry;
+					
+				} else if ( g.type == "cylinder" ) {
+					
+					geometry = new Cylinder( g.numSegs, g.topRad, g.botRad, g.height, g.topOffset, g.botOffset );
+					result.geometries[ dg ] = geometry;
+
+				} else if ( g.type == "torus" ) {
+					
+					geometry = new Torus( g.radius, g.tube, g.segmentsR, g.segmentsT );
+					result.geometries[ dg ] = geometry;
+					
+				} else if ( g.type == "bin_mesh" ) {
+					
+					loader.loadBinary( { model: g.url, 
+										 callback: create_callback( dg )
+										} );
+					
+				} else if ( g.type == "ascii_mesh" ) {
+					
+					loader.loadAscii( { model: g.url, 
+										callback: create_callback( dg )
+										} );
+					
+				}
+				
+			}
+
+			// materials
+			
+			for( dm in data.materials ) {
+				
+				m = data.materials[ dm ];
+				
+				material = new THREE[ m.type ]( m.parameters );
+				result.materials[ dm ] = material;
+				
+			}
+			
+			// objects
+			
+			handle_objects();
+			
+			
+			// lights
+			
+			for( dl in data.lights ) {
+				
+				l = data.lights[ dl ];
+				
+				if ( l.type == "directional" ) {
+				
+					p = l.direction;
+					
+					light = new THREE.DirectionalLight();
+					light.position.set( p[0], p[1], p[2] );
+					light.position.normalize();
+					
+				} else if ( l.type == "point" ) {
+				
+					p = l.position;
+					
+					light = new THREE.PointLight();
+					light.position.set( p[0], p[1], p[2] );
+					
+				}
+				
+				c = l.color;
+				light.color.setRGB( c[0], c[1], c[2] );
+				
+				result.scene.addLight( light );
+				
+				result.lights[ dl ] = light;
+				
+			}
+			
+			// cameras
+			
+			for( dc in data.cameras ) {
+				
+				c = data.cameras[ dc ];
+				
+				if ( c.type == "perspective" ) {
+					
+					camera = new THREE.Camera( c.fov, c.aspect, c.near, c.far );
+					
+				} else if ( c.type == "ortho" ) {
+					
+					camera = new THREE.Camera();
+					camera.projectionMatrix = THREE.Matrix4.makeOrtho( c.left, c.right, c.top, c.bottom, c.near, c.far );
+					
+				}
+				
+				p = c.position;
+				t = c.target;
+				camera.position.set( p[0], p[1], p[2] );
+				camera.target.position.set( t[0], t[1], t[2] );
+				
+				result.cameras[ dc ] = camera;
+				
+			}
+
+			// fogs
+			
+			for( df in data.fogs ) {
+				
+				f = data.fogs[ df ];
+				
+				if ( f.type == "linear" ) {
+					
+					fog = new THREE.Fog( 0x000000, f.near, f.far );
+				
+				} else if ( f.type == "exp2" ) {
+					
+					fog = new THREE.FogExp2( 0x000000, f.density );
+					
+				}
+				
+				c = f.color;
+				fog.color.setRGB( c[0], c[1], c[2] );
+				
+				result.fogs[ df ] = fog;
+				
+			}
+			
+			result.currentCamera = result.cameras[ data.defaults.camera ];
+			
+			if ( result.fogs && data.defaults.fog ) {
+			
+				result.scene.fog = result.fogs[ data.defaults.fog ];
+				
+			}
+			
+			callback( result );
+
+		};
+
+		worker.postMessage( 0 );
+		
+	},
 
 	addMesh: function ( scene, geometry, scale, x, y, z, rx, ry, rz, material ) {
 
