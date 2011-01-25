@@ -12,6 +12,7 @@ var Cylinder = function ( numSegs, topRad, botRad, height, topOffset, botOffset 
 	// VERTICES
 
 	// Top circle vertices
+
 	for ( i = 0; i < numSegs; i ++ ) {
 
 		v( Math.sin( 2 * pi * i / numSegs ) * topRad, Math.cos( 2 * pi * i / numSegs ) * topRad, 0 );
@@ -19,6 +20,7 @@ var Cylinder = function ( numSegs, topRad, botRad, height, topOffset, botOffset 
 	}
 
 	// Bottom circle vertices
+
 	for ( i = 0; i < numSegs; i ++ ) {
 
 		v( Math.sin( 2 * pi * i / numSegs ) * botRad, Math.cos( 2 * pi * i / numSegs ) * botRad, height );
@@ -29,12 +31,15 @@ var Cylinder = function ( numSegs, topRad, botRad, height, topOffset, botOffset 
 	// FACES
 
 	// Body
+
 	for ( i = 0; i < numSegs; i++ ) {
 
-		f4( i, i + numSegs, numSegs + ( i + 1 ) % numSegs, ( i + 1 ) % numSegs, '#ff0000' );
+		f4( i, i + numSegs, numSegs + ( i + 1 ) % numSegs, ( i + 1 ) % numSegs );
+
 	}
 
 	// Bottom circle
+
 	if ( botRad != 0 ) {
 
 		v( 0, 0, - topOffset );
@@ -48,6 +53,7 @@ var Cylinder = function ( numSegs, topRad, botRad, height, topOffset, botOffset 
 	}
 
 	// Top circle
+
 	if ( topRad != 0 ) {
 
 		v( 0, 0, height + topOffset );
