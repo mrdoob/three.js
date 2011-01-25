@@ -75,6 +75,8 @@
 		<script type="text/javascript" src="../src/materials/ParticleCircleMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/ParticleDOMMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/Texture.js"></script>
+		<script type="text/javascript" src="../src/materials/RenderTarget.js"></script>
+		<script type="text/javascript" src="../src/materials/Uniforms.js"></script>
 		<script type="text/javascript" src="../src/materials/mappings/CubeReflectionMapping.js"></script>
 		<script type="text/javascript" src="../src/materials/mappings/CubeRefractionMapping.js"></script>
 		<script type="text/javascript" src="../src/materials/mappings/LatitudeReflectionMapping.js"></script>
@@ -195,7 +197,7 @@
 
 				}
 
-				renderer = new THREE.WebGLRenderer2( false );
+				renderer = new THREE.WebGLRenderer2();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				// renderer.sortObjects = false;
 				container.appendChild( renderer.domElement );

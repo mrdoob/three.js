@@ -47,7 +47,7 @@ THREE.Object3D.prototype = {
 		       m.setScale( s.x, s.y, s.z );
 		       this.matrix.multiplySelf( m );
 		}
-		
+
 	}
 
 };
