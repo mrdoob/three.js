@@ -137,6 +137,11 @@ var SceneUtils = {
 					
 					geometry = new Torus( g.radius, g.tube, g.segmentsR, g.segmentsT );
 					result.geometries[ dg ] = geometry;
+
+				} else if ( g.type == "icosahedron" ) {
+					
+					geometry = new Icosahedron( g.subdivisions );
+					result.geometries[ dg ] = geometry;
 					
 				} else if ( g.type == "bin_mesh" ) {
 					
@@ -187,6 +192,10 @@ var SceneUtils = {
 					if ( pp == "env_map" || pp == "map" ) {
 						
 						m.parameters[ pp ] = result.textures[ m.parameters[ pp ] ];
+						
+					} else if ( pp == "shading" ) {
+						
+						m.parameters[ pp ] = ( m.parameters[ pp ] == "flat" ) ? THREE.FlatShading : THREE.SmoothShading;
 						
 					}
 					

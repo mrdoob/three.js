@@ -29,10 +29,20 @@ var scene = {
 		"visible"  : true
 	},
 
+	"icosahedron" : {
+		"geometry" : "icosahedron",
+		"materials": [ "faceted_white" ],
+		"position" : [ 20, 10, -60 ],
+		"rotation" : [ 0, 0, 0 ],
+		"scale"	   : [ 20, 20, 20 ],
+		"visible"  : true
+	},
+
+
 	"torus" : {
 		"geometry" : "torus",
 		"materials": [ "phong_orange" ],
-		"position" : [ 0, 5, -50 ],
+		"position" : [ -20, 5, -50 ],
 		"rotation" : [ 0, 0, 0 ],
 		"scale"	   : [ 2, 2, 2 ],
 		"visible"  : true
@@ -112,7 +122,12 @@ var scene = {
 		"segments_width"  : 32, 
 		"segments_height" : 16
 	},
- 
+
+	"icosahedron": {
+		"type"    : "icosahedron",
+		"subdivisions"  : 2
+	},
+	
 	"torus": {
 		"type"    : "torus",
 		"radius"  : 5,
@@ -179,6 +194,11 @@ var scene = {
 	"basic_white": {
 		"type": "MeshBasicMaterial",
 		"parameters": { color: 0xffffff, wireframe: true } 
+	},
+
+	"faceted_white": {
+		"type": "MeshLambertMaterial",
+		"parameters": { color: 0xffffff, shading: "flat" } 
 	},
 	
 	"basic_blue": {
