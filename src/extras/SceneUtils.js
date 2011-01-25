@@ -1,12 +1,16 @@
 var SceneUtils = {
 	
-	loadScene : function( url, callback ) {
+	loadScene : function( url, callback, callback_final ) {
 
-		var dg, dm, dd, dl, dc, df, f,
-			g, o, m, l, p, c, t,
-			geometry, material, camera, fog, materials,
-			loader, callback_model,
-			worker = new Worker( url );
+		var dg, dm, dd, dl, dc, df, dt,
+			g, o, m, l, p, c, t, f, tt, pp,
+			geometry, material, camera, fog, 
+			texture, images,
+			materials,
+			loader, worker;
+			
+		worker = new Worker( url );
+		loader = new THREE.Loader();
 
 		worker.onmessage = function( event ) {
 
@@ -59,7 +63,17 @@ var SceneUtils = {
 			
 			function create_callback( id ) {
 				
-				return function( geo ) { handle_mesh( geo, id ); }
+				return function( geo ) {
+					
+					handle_mesh( geo, id );
+					async_counter -= 1;
+					if( async_counter == 0 ) {
+						
+						callback_final( result );
+						
+					}
+					
+				}
 				
 			}
 			
@@ -70,6 +84,7 @@ var SceneUtils = {
 				scene: new THREE.Scene(),
 				geometries: {},
 				materials: {},
+				textures: {},
 				objects: {},
 				cameras: {},
 				lights: {},
@@ -77,9 +92,22 @@ var SceneUtils = {
 			
 			};
 			
-			loader = new THREE.Loader();
 			
 			// geometries	
+			
+			var async_counter = 0;
+			
+			for( dg in data.geometries ) {
+				
+				g = data.geometries[ dg ];
+				
+				if ( g.type == "bin_mesh" || g.type == "ascii_mesh" ) {
+					
+					async_counter += 1;
+					
+				}
+				
+			}
 			
 			for( dg in data.geometries ) {
 				
@@ -126,11 +154,43 @@ var SceneUtils = {
 				
 			}
 
+			// textures
+			
+			for( dt in data.textures ) {
+				
+				tt = data.textures[ dt ];
+				
+				if( tt.url instanceof Array ) {
+					
+					images = ImageUtils.loadArray( tt.url );
+					texture = new THREE.Texture( images );
+					
+				}
+				else {
+					
+					texture = ImageUtils.loadTexture( tt.url );
+					
+				}
+				
+				result.textures[ dt ] = texture;
+				
+			}
+			
 			// materials
 			
 			for( dm in data.materials ) {
 				
 				m = data.materials[ dm ];
+				
+				for( pp in m.parameters ) {
+					
+					if ( pp == "env_map" || pp == "map" ) {
+						
+						m.parameters[ pp ] = result.textures[ m.parameters[ pp ] ];
+						
+					}
+					
+				}
 				
 				material = new THREE[ m.type ]( m.parameters );
 				result.materials[ dm ] = material;
@@ -230,6 +290,12 @@ var SceneUtils = {
 				result.scene.fog = result.fogs[ data.defaults.fog ];
 				
 			}
+			
+			c = data.defaults.bgcolor;
+			result.bgColor = new THREE.Color();
+			result.bgColor.setRGB( c[0], c[1], c[2] );
+			
+			result.bgColorAlpha = data.defaults.bgalpha;
 			
 			callback( result );
 

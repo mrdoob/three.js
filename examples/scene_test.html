@@ -56,15 +56,19 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
-			document.addEventListener('mousemove', onDocumentMouseMove, false);
+			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
 			init();
 
-
 			function init() {
 
-				container = document.createElement('div');
-				document.body.appendChild(container);
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				renderer.domElement.style.position = "relative";
+				container.appendChild( renderer.domElement );
 
 				var callback = function( result ) {
 				
@@ -73,17 +77,28 @@
 					
 					camera.aspect = window.innerWidth / window.innerHeight;
 					camera.updateProjectionMatrix();
-
-					setInterval(loop, 1000/60);
+					
+					renderer.setClearColor( result.bgColor.hex, result.bgAlpha );
+					
+					setInterval( loop, 1000/60 );
 
 				}
 				
-				SceneUtils.loadScene( "scenes/test_scene.js", callback );
+				var callback_async = function( result ) {
 				
-				renderer = new THREE.WebGLRenderer();
-				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				renderer.domElement.style.position = "relative";
-				container.appendChild( renderer.domElement );
+					var mat_veyron = result.geometries[ "veyron" ].materials;
+					
+					mat_veyron[ 0 ][ 0 ] = result.materials[ "interior" ];
+					mat_veyron[ 1 ][ 0 ] = result.materials[ "chrome" ];
+					mat_veyron[ 2 ][ 0 ] = result.materials[ "darkerchrome" ];
+					mat_veyron[ 3 ][ 0 ] = result.materials[ "glass" ];
+					mat_veyron[ 4 ][ 0 ] = result.materials[ "chrome" ];
+					mat_veyron[ 5 ][ 0 ] = result.materials[ "chrome" ];
+					
+				}
+				
+				SceneUtils.loadScene( "scenes/test_scene.js", callback, callback_async );
+				
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';

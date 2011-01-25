@@ -13,7 +13,7 @@ var scene = {
 
 	"cube2" : {
 		"geometry" : "cube",
-		"materials": [ "basic_black" ],
+		"materials": [ "basic_white" ],
 		"position" : [ 0, 0, 0 ],
 		"rotation" : [ 0, -0.3, 0 ],
 		"scale"	   : [ 2, 2, 2 ],
@@ -149,12 +149,7 @@ var scene = {
 	"veyron": {
 		"type": "bin_mesh",
 		"url" : "obj/veyron/VeyronNoUv_bin.js"
-	},
-
-	"TextureCube": {
-		"type": "ascii_mesh",
-		"url" : "obj/textureTest/textureTest_baked.js"
-	},
+	}
 	
 	
 },
@@ -179,6 +174,11 @@ var scene = {
 	"basic_black": {
 		"type": "MeshBasicMaterial",
 		"parameters": { color: 0x000000, wireframe: true } 
+	},
+
+	"basic_white": {
+		"type": "MeshBasicMaterial",
+		"parameters": { color: 0xffffff, wireframe: true } 
 	},
 	
 	"basic_blue": {
@@ -211,9 +211,44 @@ var scene = {
 		"parameters": { color:0x000000, specular: 0xaa5500 } 
 	},
 	
+	"chrome": {
+		"type": "MeshLambertMaterial",
+		"parameters": { color: 0xffffff, env_map: "textureCube" }
+	},
+
+	"darkerchrome": {
+		"type": "MeshLambertMaterial",
+		"parameters": { color: 0x222222, env_map: "textureCube" }
+	},
+	
+	"glass": {
+		"type": "MeshLambertMaterial",
+		"parameters": { color: 0x101046, env_map: "textureCube", opacity: 0.25 }
+	},
+
+	"interior": {
+		"type": "MeshLambertMaterial",
+		"parameters": { color: 0x050505 }
+	},
+	
 	"face": {
 		"type": "MeshFaceMaterial",
 		"parameters": {}
+	}
+	
+},
+
+"textures": 
+{
+	
+	"textureCube": {
+		"url": [ "textures/cube/SwedishRoyalCastle/px.jpg",
+				 "textures/cube/SwedishRoyalCastle/nx.jpg",		
+				 "textures/cube/SwedishRoyalCastle/py.jpg",
+				 "textures/cube/SwedishRoyalCastle/ny.jpg",
+				 "textures/cube/SwedishRoyalCastle/pz.jpg",
+				 "textures/cube/SwedishRoyalCastle/nz.jpg"
+				]
 	}
 	
 },
@@ -273,13 +308,21 @@ var scene = {
 		"type"    : "exp2",
 		"color"   : [1,1,1],
 		"density" : 0.005,
+	},
+	
+	"black": {
+		"type"    : "exp2",
+		"color"   : [0,0,0],
+		"density" : 0.005,
 	}
 },
 	
 "defaults" : 
 {
-	"camera": "cam1",
-	"fog"	: "exponential"
+	"bgcolor" : [0,0,0],
+	"bgalpha" : 1,
+	"camera"  : "cam1",
+	"fog"	  : "black"
 }
 
 };
