@@ -11,8 +11,8 @@ THREE.CanvasRenderer = function () {
 	_canvasWidth, _canvasHeight, _canvasWidthHalf, _canvasHeightHalf,
 	_context = _canvas.getContext( '2d' ),
 
-	_clearColor = null,
-	_clearOpacity = null,
+	_clearColor = new THREE.Color( 0x000000 ),
+	_clearOpacity = 0,
 
 	_contextGlobalAlpha = 1,
 	_contextGlobalCompositeOperation = 0,
@@ -96,7 +96,7 @@ THREE.CanvasRenderer = function () {
 
 	this.setClearColor = function( hex, opacity ) {
 
-		_clearColor = hex !== null ? new THREE.Color( hex ) : null;
+		_clearColor.setHex( hex );
 		_clearOpacity = opacity;
 
 		_clearRect.set( - _canvasWidthHalf, - _canvasHeightHalf, _canvasWidthHalf, _canvasHeightHalf );
@@ -111,17 +111,17 @@ THREE.CanvasRenderer = function () {
 			_clearRect.inflate( 1 );
 			_clearRect.minSelf( _clipRect );
 
-			if ( _clearColor !== null ) {
+			if ( _clearColor.hex == 0x000000 && _clearOpacity == 0 ) {
+
+				_context.clearRect( _clearRect.getX(), _clearRect.getY(), _clearRect.getWidth(), _clearRect.getHeight() );
+
+			} else {
 
 				setBlending( THREE.NormalBlending );
 				setOpacity( 1 );
 
 				_context.fillStyle = 'rgba(' + Math.floor( _clearColor.r * 255 ) + ',' + Math.floor( _clearColor.g * 255 ) + ',' + Math.floor( _clearColor.b * 255 ) + ',' + _clearOpacity + ')';
 				_context.fillRect( _clearRect.getX(), _clearRect.getY(), _clearRect.getWidth(), _clearRect.getHeight() );
-
-			} else {
-
-				_context.clearRect( _clearRect.getX(), _clearRect.getY(), _clearRect.getWidth(), _clearRect.getHeight() );
 
 			}
 
