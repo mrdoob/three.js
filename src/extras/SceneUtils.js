@@ -1,6 +1,6 @@
 var SceneUtils = {
 	
-	loadScene : function( url, callback_sync, callback_async ) {
+	loadScene : function( url, callback_sync, callback_async, callback_progress ) {
 
 		var worker = new Worker( url );
 		worker.postMessage( 0 );
@@ -14,6 +14,7 @@ var SceneUtils = {
 				materials,
 				data, loader, 
 				counter_models, counter_textures,
+				total_models, total_textures,
 				result;
 
 			data = event.data;
@@ -100,6 +101,17 @@ var SceneUtils = {
 			
 			function async_callback_gate() {
 				
+				var progress = {
+					
+					total_models: total_models,
+					total_textures: total_textures,
+					loaded_models: total_models - counter_models,
+					loaded_textures: total_textures - counter_textures
+					
+				};
+				
+				callback_progress( progress );
+				
 				if( counter_models == 0 && counter_textures == 0 ) {
 					
 					callback_async( result );
@@ -123,6 +135,8 @@ var SceneUtils = {
 				}
 				
 			}
+			
+			total_models = counter_models;
 			
 			for( dg in data.geometries ) {
 				
@@ -193,6 +207,8 @@ var SceneUtils = {
 				}
 				
 			}
+			
+			total_textures = counter_textures;
 			
 			var callback_texture = function( images ) {
 				

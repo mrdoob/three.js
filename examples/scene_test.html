@@ -44,13 +44,26 @@
 				padding:0.1em 0.3em;
 				width:3em;
 				text-align: center;
-				/*
-				font-size:0.8em;
+				display:none;
+			}
+			
+			.shadow {
 				-moz-box-shadow: 0px 0px 5px #000;
 				-webkit-box-shadow: 0px 0px 5px #000;
 				box-shadow: 0px 0px 5px #000;
-				*/
-				display:none;
+			}
+			
+			#progressbar {
+				text-align: center;
+				background: white;
+				width: 250px;
+				height: 10px;
+			}
+			
+			#bar {
+				background:#d00;
+				width:50px;
+				height:10px;
 			}
 			
 			.enabled {
@@ -80,7 +93,11 @@
 
 		<div id="progress">
 			<span id="message">Loading ...</span>
-			<center><div id="start" class="disabled">Start</div></center>
+			
+			<center>
+				<div id="progressbar" class="shadow"><div id="bar" class="shadow"></div></div>
+				<div id="start" class="disabled">Start</div>
+			</center>
 		</div>
 		
 		<pre id="log"></pre>
@@ -133,6 +150,16 @@
 
 				setInterval( loop, 1000/60 );
 
+				var callback_progress = function( progress ) {
+				
+					var bar = 250;
+					if ( progress.total_models + progress.total_textures ) 
+						bar = Math.floor( 250 * ( progress.loaded_models + progress.loaded_textures ) / ( progress.total_models + progress.total_textures ) );
+					
+					$( "bar" ).style.width = bar + "px";
+					
+				}
+				
 				var callback_sync = function( result ) {
 				
 					/*
@@ -162,13 +189,14 @@
 					mat_veyron[ 5 ][ 0 ] = result.materials[ "chrome" ];
 					
 					$( "message" ).style.display = "none";
+					$( "progressbar" ).style.display = "none";
 					$( "start" ).style.display = "block";
 					$( "start" ).className = "enabled";
 					
 				}
 				
 				$( "progress" ).style.display = "block";
-				SceneUtils.loadScene( "scenes/test_scene.js", callback_sync, callback_async );
+				SceneUtils.loadScene( "scenes/test_scene.js", callback_sync, callback_async, callback_progress );
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
