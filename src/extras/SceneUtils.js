@@ -1,15 +1,40 @@
 var SceneUtils = {
 	
-	loadScene : function( url, callback ) {
+	loadScene : function( url, callback_sync, callback_async ) {
 
-		var dg, dm, dd, dl, dc, df, f,
-			g, o, m, l, p, c, t,
-			geometry, material, camera, fog, materials,
-			loader, callback_model,
-			worker = new Worker( url );
+		var worker = new Worker( url );
+		worker.postMessage( 0 );
 
 		worker.onmessage = function( event ) {
 
+			var dg, dm, dd, dl, dc, df, dt,
+				g, o, m, l, p, c, t, f, tt, pp,
+				geometry, material, camera, fog, 
+				texture, images,
+				materials,
+				data, loader, 
+				counter_models, counter_textures,
+				result;
+
+			data = event.data;
+			loader = new THREE.Loader();
+			
+			counter_models = 0;
+			counter_textures = 0;
+			
+			result = {
+				
+				scene: new THREE.Scene(),
+				geometries: {},
+				materials: {},
+				textures: {},
+				objects: {},
+				cameras: {},
+				lights: {},
+				fogs: {}
+			
+			};
+			
 			function handle_objects() {
 				
 				for( dd in data.objects ) {
@@ -48,6 +73,7 @@ var SceneUtils = {
 					}
 					
 				}
+				
 			};
 			
 			function handle_mesh( geo, id ) {
@@ -59,27 +85,44 @@ var SceneUtils = {
 			
 			function create_callback( id ) {
 				
-				return function( geo ) { handle_mesh( geo, id ); }
+				return function( geo ) {
+					
+					handle_mesh( geo, id );
+					
+					counter_models -= 1;
+					//console.log( "models to load:", counter_models );
+					
+					async_callback_gate();
+					
+				}
 				
-			}
-			
-			var data = event.data;
-			
-			var result = {
-				
-				scene: new THREE.Scene(),
-				geometries: {},
-				materials: {},
-				objects: {},
-				cameras: {},
-				lights: {},
-				fogs: {}
-			
 			};
 			
-			loader = new THREE.Loader();
+			function async_callback_gate() {
+				
+				if( counter_models == 0 && counter_textures == 0 ) {
+					
+					callback_async( result );
+					
+				}
+				
+			};
 			
-			// geometries	
+			// geometries
+			
+			// count how many models will be loaded asynchronously
+			
+			for( dg in data.geometries ) {
+				
+				g = data.geometries[ dg ];
+				
+				if ( g.type == "bin_mesh" || g.type == "ascii_mesh" ) {
+					
+					counter_models += 1;
+					
+				}
+				
+			}
 			
 			for( dg in data.geometries ) {
 				
@@ -109,6 +152,11 @@ var SceneUtils = {
 					
 					geometry = new Torus( g.radius, g.tube, g.segmentsR, g.segmentsT );
 					result.geometries[ dg ] = geometry;
+
+				} else if ( g.type == "icosahedron" ) {
+					
+					geometry = new Icosahedron( g.subdivisions );
+					result.geometries[ dg ] = geometry;
 					
 				} else if ( g.type == "bin_mesh" ) {
 					
@@ -126,21 +174,97 @@ var SceneUtils = {
 				
 			}
 
+			// textures
+			
+			// count how many textures will be loaded asynchronously
+			
+			for( dt in data.textures ) {
+				
+				tt = data.textures[ dt ];
+				
+				if( tt.url instanceof Array ) {
+					
+					counter_textures += tt.url.length;
+					
+				} else {
+					
+					counter_textures += 1;
+					
+				}
+				
+			}
+			
+			var callback_texture = function( images ) {
+				
+				counter_textures -= 1; 
+				//console.log( "textures to load:", counter_textures ); 
+				async_callback_gate();  
+				
+			};
+			
+			for( dt in data.textures ) {
+				
+				tt = data.textures[ dt ];
+				
+				if ( tt.mapping != undefined && THREE[ tt.mapping ] != undefined  ) {
+					
+					tt.mapping = new THREE[ tt.mapping ]();
+				
+				}
+				
+				if( tt.url instanceof Array ) {
+					
+					images = ImageUtils.loadArray( tt.url, callback_texture );
+					texture = new THREE.Texture( images, tt.mapping );
+					
+				} else {
+					
+					texture = ImageUtils.loadTexture( tt.url, tt.mapping, callback_texture );
+					
+					if ( THREE[ tt.min_filter ] != undefined )
+						texture.min_filter = THREE[ tt.min_filter ];
+					
+					if ( THREE[ tt.mag_filter ] != undefined )
+						texture.mag_filter = THREE[ tt.mag_filter ];
+					
+				}
+				
+				result.textures[ dt ] = texture;
+				
+			}
+			
 			// materials
 			
 			for( dm in data.materials ) {
 				
 				m = data.materials[ dm ];
 				
+				for( pp in m.parameters ) {
+					
+					if ( pp == "env_map" || pp == "map" ) {
+						
+						m.parameters[ pp ] = result.textures[ m.parameters[ pp ] ];
+						
+					} else if ( pp == "shading" ) {
+						
+						m.parameters[ pp ] = ( m.parameters[ pp ] == "flat" ) ? THREE.FlatShading : THREE.SmoothShading;
+						
+					} else if ( pp == "combine" ) {
+						
+						m.parameters[ pp ] = ( m.parameters[ pp ] == "MixOperation" ) ? THREE.MixOperation : THREE.MultiplyOperation;
+						
+					}
+					
+				}
+				
 				material = new THREE[ m.type ]( m.parameters );
 				result.materials[ dm ] = material;
 				
 			}
 			
-			// objects
+			// objects ( synchronous init of procedural primitives )
 			
 			handle_objects();
-			
 			
 			// lights
 			
@@ -166,7 +290,8 @@ var SceneUtils = {
 				}
 				
 				c = l.color;
-				light.color.setRGB( c[0], c[1], c[2] );
+				i = l.intensity || 1;
+				light.color.setRGB( c[0] * i, c[1] * i, c[2] * i );
 				
 				result.scene.addLight( light );
 				
@@ -223,7 +348,13 @@ var SceneUtils = {
 				
 			}
 			
-			result.currentCamera = result.cameras[ data.defaults.camera ];
+			// defaults
+			
+			if ( result.cameras && data.defaults.camera ) {
+				
+				result.currentCamera = result.cameras[ data.defaults.camera ];
+				
+			}
 			
 			if ( result.fogs && data.defaults.fog ) {
 			
@@ -231,11 +362,17 @@ var SceneUtils = {
 				
 			}
 			
-			callback( result );
+			c = data.defaults.bgcolor;
+			result.bgColor = new THREE.Color();
+			result.bgColor.setRGB( c[0], c[1], c[2] );
+			
+			result.bgColorAlpha = data.defaults.bgalpha;
+			
+			// synchronous callback
+			
+			callback_sync( result );
 
 		};
-
-		worker.postMessage( 0 );
 		
 	},
 

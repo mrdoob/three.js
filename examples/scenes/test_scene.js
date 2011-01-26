@@ -13,14 +13,23 @@ var scene = {
 
 	"cube2" : {
 		"geometry" : "cube",
-		"materials": [ "basic_black" ],
+		"materials": [ "basic_white" ],
 		"position" : [ 0, 0, 0 ],
 		"rotation" : [ 0, -0.3, 0 ],
 		"scale"	   : [ 2, 2, 2 ],
 		"visible"  : true
 	},
 
-	"sphere" : {
+	"cube3" : {
+		"geometry" : "cube",
+		"materials": [ "minecraft" ],
+		"position" : [ -30, -5, 25 ],
+		"rotation" : [ 0, 0.8, 0 ],
+		"scale"	   : [ 1, 1, 1 ],
+		"visible"  : true
+	},
+
+	"sphere_lambert" : {
 		"geometry" : "sphere",
 		"materials": [ "lambert_green" ],
 		"position" : [ -20, -5, 15 ],
@@ -29,10 +38,29 @@ var scene = {
 		"visible"  : true
 	},
 
+	"sphere_refraction" : {
+		"geometry" : "sphere",
+		"materials": [ "basic_refraction" ],
+		"position" : [ 50, 45, -50 ],
+		"rotation" : [ 0, 0, 0 ],
+		"scale"	   : [ 1, 1, 1 ],
+		"visible"  : true
+	},
+
+	"icosahedron" : {
+		"geometry" : "icosahedron",
+		"materials": [ "faceted_white" ],
+		"position" : [ 20, 10, -60 ],
+		"rotation" : [ 0, 0, 0 ],
+		"scale"	   : [ 20, 20, 20 ],
+		"visible"  : true
+	},
+
+
 	"torus" : {
 		"geometry" : "torus",
 		"materials": [ "phong_orange" ],
-		"position" : [ 0, 5, -50 ],
+		"position" : [ -20, 5, -50 ],
 		"rotation" : [ 0, 0, 0 ],
 		"scale"	   : [ 2, 2, 2 ],
 		"visible"  : true
@@ -67,10 +95,19 @@ var scene = {
 
 	"walt" : {
 		"geometry" : "WaltHead",
-		"materials": [ "phong_white" ],
+		"materials": [ "lambert_cube" ],
 		"position" : [ -45, 10, 0 ],
 		"rotation" : [ 0, 0, 0 ],
 		"scale"	   : [ 0.5, 0.5, 0.5 ],
+		"visible"  : true
+	},
+
+	"quad_bg" : {
+		"geometry" : "quad",
+		"materials": [ "textured_bg" ],
+		"position" : [ 0, 15, -90 ],
+		"rotation" : [ 0, 0, 0 ],
+		"scale"	   : [ 20, 20, 20 ],
 		"visible"  : true
 	},
 	
@@ -106,13 +143,26 @@ var scene = {
 		"segments_height" : 50
 	},	
 
+	"quad": {
+		"type"   : "plane",
+		"width"  : 10, 
+		"height" : 10,
+		"segments_width"  : 1, 
+		"segments_height" : 1
+	},	
+
 	"sphere": {
 		"type"    : "sphere",
 		"radius"  : 5, 
 		"segments_width"  : 32, 
 		"segments_height" : 16
 	},
- 
+
+	"icosahedron": {
+		"type"    : "icosahedron",
+		"subdivisions"  : 2
+	},
+	
 	"torus": {
 		"type"    : "torus",
 		"radius"  : 5,
@@ -149,12 +199,7 @@ var scene = {
 	"veyron": {
 		"type": "bin_mesh",
 		"url" : "obj/veyron/VeyronNoUv_bin.js"
-	},
-
-	"TextureCube": {
-		"type": "ascii_mesh",
-		"url" : "obj/textureTest/textureTest_baked.js"
-	},
+	}
 	
 	
 },
@@ -179,6 +224,16 @@ var scene = {
 	"basic_black": {
 		"type": "MeshBasicMaterial",
 		"parameters": { color: 0x000000, wireframe: true } 
+	},
+
+	"basic_white": {
+		"type": "MeshBasicMaterial",
+		"parameters": { color: 0xffffff, wireframe: true } 
+	},
+
+	"faceted_white": {
+		"type": "MeshLambertMaterial",
+		"parameters": { color: 0xffffff, shading: "flat" } 
 	},
 	
 	"basic_blue": {
@@ -211,9 +266,85 @@ var scene = {
 		"parameters": { color:0x000000, specular: 0xaa5500 } 
 	},
 	
+	"basic_refraction": {
+		"type": "MeshBasicMaterial",
+		"parameters": { color: 0xffffff, env_map: "cube_refraction", refraction_ratio: 0.95 } 
+	},
+	
+	"lambert_cube": {
+		"type": "MeshLambertMaterial",
+		"parameters": { color: 0xff6600, env_map: "cube_reflection", combine: "MixOperation", reflectivity: 0.3 }
+	},
+	
+	"chrome": {
+		"type": "MeshLambertMaterial",
+		"parameters": { color: 0xffffff, env_map: "cube_reflection" }
+	},
+
+	"darkerchrome": {
+		"type": "MeshLambertMaterial",
+		"parameters": { color: 0x222222, env_map: "cube_reflection" }
+	},
+	
+	"glass": {
+		"type": "MeshLambertMaterial",
+		"parameters": { color: 0x101046, env_map: "cube_reflection", opacity: 0.25 }
+	},
+
+	"interior": {
+		"type": "MeshLambertMaterial",
+		"parameters": { color: 0x050505 }
+	},
+	
+	"textured_bg": {
+		"type": "MeshBasicMaterial",
+		"parameters": { color: 0xffffff, map: "texture_bg" } 
+	},
+
+	"minecraft": {
+		"type": "MeshBasicMaterial",
+		"parameters": { color: 0xffffff, map: "texture_minecraft" } 
+	},
+	
 	"face": {
 		"type": "MeshFaceMaterial",
 		"parameters": {}
+	}
+	
+},
+
+"textures": 
+{
+	
+	"cube_reflection": {
+		"url": [ "textures/cube/SwedishRoyalCastle/px.jpg",
+				 "textures/cube/SwedishRoyalCastle/nx.jpg",
+				 "textures/cube/SwedishRoyalCastle/py.jpg",
+				 "textures/cube/SwedishRoyalCastle/ny.jpg",
+				 "textures/cube/SwedishRoyalCastle/pz.jpg",
+				 "textures/cube/SwedishRoyalCastle/nz.jpg"
+				]
+	},
+
+	"cube_refraction": {
+		"url": [ "textures/cube/SwedishRoyalCastle/px.jpg",
+				 "textures/cube/SwedishRoyalCastle/nx.jpg",
+				 "textures/cube/SwedishRoyalCastle/py.jpg",
+				 "textures/cube/SwedishRoyalCastle/ny.jpg",
+				 "textures/cube/SwedishRoyalCastle/nz.jpg",
+				 "textures/cube/SwedishRoyalCastle/pz.jpg"
+				],
+		"mapping": "CubeRefractionMapping"
+	},
+
+	"texture_bg": {
+		"url": "textures/cube/SwedishRoyalCastle/pz.jpg"
+	},
+
+	"texture_minecraft": {
+		"url": "textures/minecraft/grass.png",
+		"mag_filter": "NearestFilter",
+		"min_filter": "LinearMipMapLinearFilter"
 	}
 	
 },
@@ -249,7 +380,8 @@ var scene = {
 	"light1": {
 		"type"		 : "directional",
 		"direction"	 : [0,1,1],
-		"color" 	 : [1,1,1]
+		"color" 	 : [1,1,1],
+		"intensity"	 : 0.8
 	},
 
 	"light2": {
@@ -273,13 +405,21 @@ var scene = {
 		"type"    : "exp2",
 		"color"   : [1,1,1],
 		"density" : 0.005,
+	},
+	
+	"black": {
+		"type"    : "exp2",
+		"color"   : [0,0,0],
+		"density" : 0.005,
 	}
 },
 	
 "defaults" : 
 {
-	"camera": "cam1",
-	"fog"	: "exponential"
+	"bgcolor" : [0,0,0],
+	"bgalpha" : 1,
+	"camera"  : "cam1",
+	"fog"	  : "black"
 }
 
 };
