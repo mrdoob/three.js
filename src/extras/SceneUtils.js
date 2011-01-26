@@ -1,19 +1,37 @@
 var SceneUtils = {
 	
-	loadScene : function( url, callback, callback_final ) {
+	loadScene : function( url, callback_sync, callback_async ) {
 
-		var dg, dm, dd, dl, dc, df, dt,
-			g, o, m, l, p, c, t, f, tt, pp,
-			geometry, material, camera, fog, 
-			texture, images,
-			materials,
-			loader, worker;
-			
-		worker = new Worker( url );
-		loader = new THREE.Loader();
+		var worker = new Worker( url );
+		worker.postMessage( 0 );
 
 		worker.onmessage = function( event ) {
 
+			var dg, dm, dd, dl, dc, df, dt,
+				g, o, m, l, p, c, t, f, tt, pp,
+				geometry, material, camera, fog, 
+				texture, images,
+				materials,
+				data, loader, async_counter,
+				result;
+
+			data = event.data;
+			loader = new THREE.Loader();
+			async_counter = 0;
+			
+			result = {
+				
+				scene: new THREE.Scene(),
+				geometries: {},
+				materials: {},
+				textures: {},
+				objects: {},
+				cameras: {},
+				lights: {},
+				fogs: {}
+			
+			};
+			
 			function handle_objects() {
 				
 				for( dd in data.objects ) {
@@ -52,6 +70,7 @@ var SceneUtils = {
 					}
 					
 				}
+				
 			};
 			
 			function handle_mesh( geo, id ) {
@@ -66,36 +85,20 @@ var SceneUtils = {
 				return function( geo ) {
 					
 					handle_mesh( geo, id );
+					
 					async_counter -= 1;
 					if( async_counter == 0 ) {
 						
-						callback_final( result );
+						callback_async( result );
 						
 					}
 					
 				}
 				
-			}
-			
-			var data = event.data;
-			
-			var result = {
-				
-				scene: new THREE.Scene(),
-				geometries: {},
-				materials: {},
-				textures: {},
-				objects: {},
-				cameras: {},
-				lights: {},
-				fogs: {}
-			
 			};
 			
 			
-			// geometries	
-			
-			var async_counter = 0;
+			// geometries			
 			
 			for( dg in data.geometries ) {
 				
@@ -170,8 +173,7 @@ var SceneUtils = {
 					images = ImageUtils.loadArray( tt.url );
 					texture = new THREE.Texture( images );
 					
-				}
-				else {
+				} else {
 					
 					texture = ImageUtils.loadTexture( tt.url );
 					
@@ -212,10 +214,9 @@ var SceneUtils = {
 				
 			}
 			
-			// objects
+			// objects ( synchronous init of procedural primitives )
 			
 			handle_objects();
-			
 			
 			// lights
 			
@@ -298,7 +299,13 @@ var SceneUtils = {
 				
 			}
 			
-			result.currentCamera = result.cameras[ data.defaults.camera ];
+			// defaults
+			
+			if ( result.cameras && data.defaults.camera ) {
+				
+				result.currentCamera = result.cameras[ data.defaults.camera ];
+				
+			}
 			
 			if ( result.fogs && data.defaults.fog ) {
 			
@@ -312,11 +319,11 @@ var SceneUtils = {
 			
 			result.bgColorAlpha = data.defaults.bgalpha;
 			
-			callback( result );
+			// synchronous callback
+			
+			callback_sync( result );
 
 		};
-
-		worker.postMessage( 0 );
 		
 	},
 

@@ -70,7 +70,7 @@
 				renderer.domElement.style.position = "relative";
 				container.appendChild( renderer.domElement );
 
-				var callback = function( result ) {
+				var callback_sync = function( result ) {
 				
 					scene = result.scene;
 					camera = result.currentCamera;
@@ -97,7 +97,7 @@
 					
 				}
 				
-				SceneUtils.loadScene( "scenes/test_scene.js", callback, callback_async );
+				SceneUtils.loadScene( "scenes/test_scene.js", callback_sync, callback_async );
 				
 
 				stats = new Stats();
