@@ -1,6 +1,6 @@
 var ImageUtils = {
 
-	loadTexture: function ( path, mapping ) {
+	loadTexture: function ( path, mapping, callback ) {
 
 		var image = new Image();
 		image.onload = function () { this.loaded = true; };
@@ -10,7 +10,7 @@ var ImageUtils = {
 
 	},
 
-	loadArray: function ( array ) {
+	loadArray: function ( array, callback ) {
 
 		var i, l, images = [];
 

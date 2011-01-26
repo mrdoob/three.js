@@ -29,10 +29,19 @@ var scene = {
 		"visible"  : true
 	},
 
-	"sphere" : {
+	"sphere_lambert" : {
 		"geometry" : "sphere",
 		"materials": [ "lambert_green" ],
 		"position" : [ -20, -5, 15 ],
+		"rotation" : [ 0, 0, 0 ],
+		"scale"	   : [ 1, 1, 1 ],
+		"visible"  : true
+	},
+
+	"sphere_refraction" : {
+		"geometry" : "sphere",
+		"materials": [ "basic_refraction" ],
+		"position" : [ 50, 45, -50 ],
 		"rotation" : [ 0, 0, 0 ],
 		"scale"	   : [ 1, 1, 1 ],
 		"visible"  : true
@@ -86,7 +95,7 @@ var scene = {
 
 	"walt" : {
 		"geometry" : "WaltHead",
-		"materials": [ "phong_white" ],
+		"materials": [ "lambert_cube" ],
 		"position" : [ -45, 10, 0 ],
 		"rotation" : [ 0, 0, 0 ],
 		"scale"	   : [ 0.5, 0.5, 0.5 ],
@@ -257,19 +266,29 @@ var scene = {
 		"parameters": { color:0x000000, specular: 0xaa5500 } 
 	},
 	
+	"basic_refraction": {
+		"type": "MeshBasicMaterial",
+		"parameters": { color: 0xffffff, env_map: "cube_refraction", refraction_ratio: 0.95 } 
+	},
+	
+	"lambert_cube": {
+		"type": "MeshLambertMaterial",
+		"parameters": { color: 0xff6600, env_map: "cube_reflection", combine: "MixOperation", reflectivity: 0.3 }
+	},
+	
 	"chrome": {
 		"type": "MeshLambertMaterial",
-		"parameters": { color: 0xffffff, env_map: "texture_cube" }
+		"parameters": { color: 0xffffff, env_map: "cube_reflection" }
 	},
 
 	"darkerchrome": {
 		"type": "MeshLambertMaterial",
-		"parameters": { color: 0x222222, env_map: "texture_cube" }
+		"parameters": { color: 0x222222, env_map: "cube_reflection" }
 	},
 	
 	"glass": {
 		"type": "MeshLambertMaterial",
-		"parameters": { color: 0x101046, env_map: "texture_cube", opacity: 0.25 }
+		"parameters": { color: 0x101046, env_map: "cube_reflection", opacity: 0.25 }
 	},
 
 	"interior": {
@@ -297,7 +316,7 @@ var scene = {
 "textures": 
 {
 	
-	"texture_cube": {
+	"cube_reflection": {
 		"url": [ "textures/cube/SwedishRoyalCastle/px.jpg",
 				 "textures/cube/SwedishRoyalCastle/nx.jpg",
 				 "textures/cube/SwedishRoyalCastle/py.jpg",
@@ -305,6 +324,17 @@ var scene = {
 				 "textures/cube/SwedishRoyalCastle/pz.jpg",
 				 "textures/cube/SwedishRoyalCastle/nz.jpg"
 				]
+	},
+
+	"cube_refraction": {
+		"url": [ "textures/cube/SwedishRoyalCastle/px.jpg",
+				 "textures/cube/SwedishRoyalCastle/nx.jpg",
+				 "textures/cube/SwedishRoyalCastle/py.jpg",
+				 "textures/cube/SwedishRoyalCastle/ny.jpg",
+				 "textures/cube/SwedishRoyalCastle/nz.jpg",
+				 "textures/cube/SwedishRoyalCastle/pz.jpg"
+				],
+		"mapping": "CubeRefractionMapping"
 	},
 
 	"texture_bg": {
@@ -350,7 +380,8 @@ var scene = {
 	"light1": {
 		"type"		 : "directional",
 		"direction"	 : [0,1,1],
-		"color" 	 : [1,1,1]
+		"color" 	 : [1,1,1],
+		"intensity"	 : 0.8
 	},
 
 	"light2": {

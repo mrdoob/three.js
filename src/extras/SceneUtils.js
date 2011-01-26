@@ -12,12 +12,15 @@ var SceneUtils = {
 				geometry, material, camera, fog, 
 				texture, images,
 				materials,
-				data, loader, async_counter,
+				data, loader, 
+				counter_models, counter_textures,
 				result;
 
 			data = event.data;
 			loader = new THREE.Loader();
-			async_counter = 0;
+			
+			counter_models = 0;
+			counter_textures = 0;
 			
 			result = {
 				
@@ -86,8 +89,8 @@ var SceneUtils = {
 					
 					handle_mesh( geo, id );
 					
-					async_counter -= 1;
-					if( async_counter == 0 ) {
+					counter_models -= 1;
+					if( counter_models == 0 ) {
 						
 						callback_async( result );
 						
@@ -98,7 +101,9 @@ var SceneUtils = {
 			};
 			
 			
-			// geometries			
+			// geometries
+			
+			// count how many models will be loaded asynchronously
 			
 			for( dg in data.geometries ) {
 				
@@ -106,7 +111,7 @@ var SceneUtils = {
 				
 				if ( g.type == "bin_mesh" || g.type == "ascii_mesh" ) {
 					
-					async_counter += 1;
+					counter_models += 1;
 					
 				}
 				
@@ -164,18 +169,28 @@ var SceneUtils = {
 
 			// textures
 			
+			// TODO: keep track of async loading of textures
+			
+			var callback_texture = function() { };
+			
 			for( dt in data.textures ) {
 				
 				tt = data.textures[ dt ];
 				
+				if ( tt.mapping != undefined && THREE[ tt.mapping ] != undefined  ) {
+					
+					tt.mapping = new THREE[ tt.mapping ]();
+				
+				}
+				
 				if( tt.url instanceof Array ) {
 					
-					images = ImageUtils.loadArray( tt.url );
-					texture = new THREE.Texture( images );
+					images = ImageUtils.loadArray( tt.url, callback_texture );
+					texture = new THREE.Texture( images, tt.mapping );
 					
 				} else {
 					
-					texture = ImageUtils.loadTexture( tt.url );
+					texture = ImageUtils.loadTexture( tt.url, tt.mapping, callback_texture );
 					
 					if ( THREE[ tt.min_filter ] != undefined )
 						texture.min_filter = THREE[ tt.min_filter ];
@@ -204,6 +219,10 @@ var SceneUtils = {
 					} else if ( pp == "shading" ) {
 						
 						m.parameters[ pp ] = ( m.parameters[ pp ] == "flat" ) ? THREE.FlatShading : THREE.SmoothShading;
+						
+					} else if ( pp == "combine" ) {
+						
+						m.parameters[ pp ] = ( m.parameters[ pp ] == "MixOperation" ) ? THREE.MixOperation : THREE.MultiplyOperation;
 						
 					}
 					
@@ -242,7 +261,8 @@ var SceneUtils = {
 				}
 				
 				c = l.color;
-				light.color.setRGB( c[0], c[1], c[2] );
+				i = l.intensity || 1;
+				light.color.setRGB( c[0] * i, c[1] * i, c[2] * i );
 				
 				result.scene.addLight( light );
 				
