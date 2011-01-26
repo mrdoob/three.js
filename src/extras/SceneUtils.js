@@ -90,16 +90,23 @@ var SceneUtils = {
 					handle_mesh( geo, id );
 					
 					counter_models -= 1;
-					if( counter_models == 0 ) {
-						
-						callback_async( result );
-						
-					}
+					//console.log( "models to load:", counter_models );
+					
+					async_callback_gate();
 					
 				}
 				
 			};
 			
+			function async_callback_gate() {
+				
+				if( counter_models == 0 && counter_textures == 0 ) {
+					
+					callback_async( result );
+					
+				}
+				
+			};
 			
 			// geometries
 			
@@ -169,9 +176,31 @@ var SceneUtils = {
 
 			// textures
 			
-			// TODO: keep track of async loading of textures
+			// count how many textures will be loaded asynchronously
 			
-			var callback_texture = function() { };
+			for( dt in data.textures ) {
+				
+				tt = data.textures[ dt ];
+				
+				if( tt.url instanceof Array ) {
+					
+					counter_textures += tt.url.length;
+					
+				} else {
+					
+					counter_textures += 1;
+					
+				}
+				
+			}
+			
+			var callback_texture = function( images ) {
+				
+				counter_textures -= 1; 
+				//console.log( "textures to load:", counter_textures ); 
+				async_callback_gate();  
+				
+			};
 			
 			for( dt in data.textures ) {
 				
