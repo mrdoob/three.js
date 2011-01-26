@@ -175,6 +175,12 @@ var SceneUtils = {
 					
 					texture = ImageUtils.loadTexture( tt.url );
 					
+					if ( THREE[ tt.min_filter ] != undefined )
+						texture.min_filter = THREE[ tt.min_filter ];
+					
+					if ( THREE[ tt.mag_filter ] != undefined )
+						texture.mag_filter = THREE[ tt.mag_filter ];
+					
 				}
 				
 				result.textures[ dt ] = texture;

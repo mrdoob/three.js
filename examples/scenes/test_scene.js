@@ -20,6 +20,15 @@ var scene = {
 		"visible"  : true
 	},
 
+	"cube3" : {
+		"geometry" : "cube",
+		"materials": [ "minecraft" ],
+		"position" : [ -30, -5, 25 ],
+		"rotation" : [ 0, 0.8, 0 ],
+		"scale"	   : [ 1, 1, 1 ],
+		"visible"  : true
+	},
+
 	"sphere" : {
 		"geometry" : "sphere",
 		"materials": [ "lambert_green" ],
@@ -83,6 +92,15 @@ var scene = {
 		"scale"	   : [ 0.5, 0.5, 0.5 ],
 		"visible"  : true
 	},
+
+	"quad_bg" : {
+		"geometry" : "quad",
+		"materials": [ "textured_bg" ],
+		"position" : [ 0, 15, -90 ],
+		"rotation" : [ 0, 0, 0 ],
+		"scale"	   : [ 20, 20, 20 ],
+		"visible"  : true
+	},
 	
 	"ground" : {
 		"geometry" : "plane",
@@ -114,6 +132,14 @@ var scene = {
 		"height" : 10,
 		"segments_width"  : 50, 
 		"segments_height" : 50
+	},	
+
+	"quad": {
+		"type"   : "plane",
+		"width"  : 10, 
+		"height" : 10,
+		"segments_width"  : 1, 
+		"segments_height" : 1
 	},	
 
 	"sphere": {
@@ -233,22 +259,32 @@ var scene = {
 	
 	"chrome": {
 		"type": "MeshLambertMaterial",
-		"parameters": { color: 0xffffff, env_map: "textureCube" }
+		"parameters": { color: 0xffffff, env_map: "texture_cube" }
 	},
 
 	"darkerchrome": {
 		"type": "MeshLambertMaterial",
-		"parameters": { color: 0x222222, env_map: "textureCube" }
+		"parameters": { color: 0x222222, env_map: "texture_cube" }
 	},
 	
 	"glass": {
 		"type": "MeshLambertMaterial",
-		"parameters": { color: 0x101046, env_map: "textureCube", opacity: 0.25 }
+		"parameters": { color: 0x101046, env_map: "texture_cube", opacity: 0.25 }
 	},
 
 	"interior": {
 		"type": "MeshLambertMaterial",
 		"parameters": { color: 0x050505 }
+	},
+	
+	"textured_bg": {
+		"type": "MeshBasicMaterial",
+		"parameters": { color: 0xffffff, map: "texture_bg" } 
+	},
+
+	"minecraft": {
+		"type": "MeshBasicMaterial",
+		"parameters": { color: 0xffffff, map: "texture_minecraft" } 
 	},
 	
 	"face": {
@@ -261,14 +297,24 @@ var scene = {
 "textures": 
 {
 	
-	"textureCube": {
+	"texture_cube": {
 		"url": [ "textures/cube/SwedishRoyalCastle/px.jpg",
-				 "textures/cube/SwedishRoyalCastle/nx.jpg",		
+				 "textures/cube/SwedishRoyalCastle/nx.jpg",
 				 "textures/cube/SwedishRoyalCastle/py.jpg",
 				 "textures/cube/SwedishRoyalCastle/ny.jpg",
 				 "textures/cube/SwedishRoyalCastle/pz.jpg",
 				 "textures/cube/SwedishRoyalCastle/nz.jpg"
 				]
+	},
+
+	"texture_bg": {
+		"url": "textures/cube/SwedishRoyalCastle/pz.jpg"
+	},
+
+	"texture_minecraft": {
+		"url": "textures/minecraft/grass.png",
+		"mag_filter": "NearestFilter",
+		"min_filter": "LinearMipMapLinearFilter"
 	}
 	
 },
