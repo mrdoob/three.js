@@ -711,18 +711,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	this.renderBuffer = function ( camera, lights, fog, material, geometryChunk, object ) {
-
-		var program, u, identifiers, attributes, parameters, maxLightCount, linewidth, primitives;
-
+	this.initMaterial = function( material, lights, fog ) {
+		
 		if ( !material.program ) {
 
+			var u, identifiers, parameters, maxLightCount;
+			
 			if ( material instanceof THREE.MeshDepthMaterial ) {
 
 				setMaterialShaders( material, THREE.ShaderLib[ 'depth' ] );
-
-				material.uniforms.mNear.value = camera.near;
-				material.uniforms.mFar.value = camera.far;
 
 			} else if ( material instanceof THREE.MeshNormalMaterial ) {
 
@@ -732,25 +729,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				setMaterialShaders( material, THREE.ShaderLib[ 'basic' ] );
 
-				refreshUniformsCommon( material, fog );
-
 			} else if ( material instanceof THREE.MeshLambertMaterial ) {
 
 				setMaterialShaders( material, THREE.ShaderLib[ 'lambert' ] );
-
-				refreshUniformsCommon( material, fog );
 
 			} else if ( material instanceof THREE.MeshPhongMaterial ) {
 
 				setMaterialShaders( material, THREE.ShaderLib[ 'phong' ] );
 
-				refreshUniformsCommon( material, fog );
-
 			} else if ( material instanceof THREE.LineBasicMaterial ) {
 
 				setMaterialShaders( material, THREE.ShaderLib[ 'basic' ] );
-
-				refreshUniformsLine( material, fog );
 
 			}
 
@@ -773,6 +762,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 			cacheAttributeLocations( material.program, [ "position", "normal", "uv", "tangent" ] );
 
 		}
+		
+	};
+	
+	this.renderBuffer = function ( camera, lights, fog, material, geometryChunk, object ) {
+
+		var program, u, identifiers, attributes, parameters, maxLightCount, linewidth, primitives;
+
+		this.initMaterial( material, lights, fog );
 
 		program = material.program;
 
@@ -813,6 +810,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		if ( material instanceof THREE.MeshDepthMaterial ) {
+
+			material.uniforms.mNear.value = camera.near;
+			material.uniforms.mFar.value = camera.far;
+		}
+		
 		setUniforms( program, material.uniforms );
 
 		attributes = program.attributes;

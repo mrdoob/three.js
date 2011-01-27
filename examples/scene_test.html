@@ -179,10 +179,36 @@
 				
 			}
 			
-			function handle_update( result ) {
+			function handle_update( result, pieces ) {
 				
 				refreshSceneView( result );
 				renderer.initWebGLObjects( result.scene );
+				
+				var m, material, count = 0;
+				
+				for ( m in result.materials ) {
+				
+					material = result.materials[ m ];
+					if ( ! ( material instanceof THREE.MeshFaceMaterial ) ) {
+						
+						if( !material.program ) {
+						
+							console.log(m);
+							renderer.initMaterial( material, result.scene.lights, result.scene.fog );
+							
+							count += 1;
+							if( count > pieces ) {
+								
+								//console.log("xxxxxxxxx");
+								break;
+							
+							}
+							
+						}
+						
+					}
+					
+				}
 				
 			}
 			
@@ -206,13 +232,19 @@
 
 				var callback_progress = function( progress, result ) {
 				
-					var bar = 250;
-					if ( progress.total_models + progress.total_textures ) 
-						bar = Math.floor( 250 * ( progress.loaded_models + progress.loaded_textures ) / ( progress.total_models + progress.total_textures ) );
+					var bar = 250, 
+						total = progress.total_models + progress.total_textures,
+						loaded = progress.loaded_models + progress.loaded_textures;
+					
+					if ( total )
+						bar = Math.floor( bar * loaded / total );
 					
 					$( "bar" ).style.width = bar + "px";
 					
-					handle_update( result );
+					count = 0;
+					for ( var m in result.materials ) count++;
+
+					handle_update( result, Math.floor( count/total ) );
 					
 				}
 				
@@ -232,7 +264,7 @@
 					
 					*/
 
-					handle_update( result );
+					//handle_update( result, 1 );
 					
 				}
 				
@@ -248,13 +280,15 @@
 					mat_veyron[ 3 ][ 0 ] = result.materials[ "glass" ];
 					mat_veyron[ 4 ][ 0 ] = result.materials[ "chrome" ];
 					mat_veyron[ 5 ][ 0 ] = result.materials[ "chrome" ];
+					mat_veyron[ 6 ][ 0 ] = result.materials[ "backlights" ];
+					mat_veyron[ 7 ][ 0 ] = result.materials[ "backsignals" ];
 					
 					$( "message" ).style.display = "none";
 					$( "progressbar" ).style.display = "none";
 					$( "start" ).style.display = "block";
 					$( "start" ).className = "enabled";
 					
-					handle_update( result );
+					handle_update( result, 1 );
 					
 				}
 				
