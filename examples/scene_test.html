@@ -179,6 +179,13 @@
 				
 			}
 			
+			function handle_update( result ) {
+				
+				refreshSceneView( result );
+				renderer.initWebGLObjects( result.scene );
+				
+			}
+			
 			function init() {
 
 				container = document.createElement( 'div' );
@@ -197,7 +204,7 @@
 
 				setInterval( loop, 1000/60 );
 
-				var callback_progress = function( progress ) {
+				var callback_progress = function( progress, result ) {
 				
 					var bar = 250;
 					if ( progress.total_models + progress.total_textures ) 
@@ -205,11 +212,16 @@
 					
 					$( "bar" ).style.width = bar + "px";
 					
+					handle_update( result );
+					
 				}
 				
 				var callback_sync = function( result ) {
 				
 					/*
+					
+					// uncomment to see progressive scene loading
+					
 					scene = result.scene;
 					camera = result.currentCamera;
 					
@@ -220,7 +232,7 @@
 					
 					*/
 
-					refreshSceneView( result );
+					handle_update( result );
 					
 				}
 				
@@ -242,7 +254,7 @@
 					$( "start" ).style.display = "block";
 					$( "start" ).className = "enabled";
 					
-					refreshSceneView( result );
+					handle_update( result );
 					
 				}
 				
