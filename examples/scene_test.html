@@ -44,13 +44,26 @@
 				padding:0.1em 0.3em;
 				width:3em;
 				text-align: center;
-				/*
-				font-size:0.8em;
+				display:none;
+			}
+			
+			.shadow {
 				-moz-box-shadow: 0px 0px 5px #000;
 				-webkit-box-shadow: 0px 0px 5px #000;
 				box-shadow: 0px 0px 5px #000;
-				*/
-				display:none;
+			}
+			
+			#progressbar {
+				text-align: center;
+				background: white;
+				width: 250px;
+				height: 10px;
+			}
+			
+			#bar {
+				background:#d00;
+				width:50px;
+				height:10px;
 			}
 			
 			.enabled {
@@ -70,6 +83,48 @@
 			a { color:red }
 			canvas { pointer-events:none; z-index:10; }
 			#log { position:absolute; top:0; display:block; text-align:left; z-index:1000; pointer-events:none; }
+			
+			#scene_explorer {
+				background:transparent;
+				color:#fff;
+				width:200px;
+				position:absolute;
+				text-align:left;
+				top:0px;
+				z-index:200;
+				overflow:auto;
+			}
+			
+			#section_exp {
+				background:rgba(0,0,50,0.5);
+				padding:0.5em 0;
+				display:none;
+			}
+			
+			#scene_explorer h3 { 
+				font-size:1em;
+				padding:0;
+				margin:0;
+				color:orange;
+			}
+			
+			#scene_explorer a {
+				color:#555;
+				font-weight:bold;
+				text-decoration:none;
+				font-size:1.2em;
+				font-family:Monospace;
+			}
+			#scene_explorer a:hover {
+				background:#555;
+				color:rgba(0,0,50,1);
+			}
+			
+			.part {
+				display:none;
+				padding:0 0 0.5em 2em;
+			}
+			
 		</style>
 	</head>
 
@@ -77,10 +132,19 @@
 		<div id="info">
 			<a href="http://github.com/mrdoob/three.js">three.js</a> - scene loader test
 		</div>
+		
+		<div id="scene_explorer">
+			<a id="plus_exp" href="#">[+]</a>
+			<div id="section_exp"></div>
+		</div>
 
 		<div id="progress">
 			<span id="message">Loading ...</span>
-			<center><div id="start" class="disabled">Start</div></center>
+			
+			<center>
+				<div id="progressbar" class="shadow"><div id="bar" class="shadow"></div></div>
+				<div id="start" class="disabled">Start</div>
+			</center>
 		</div>
 		
 		<pre id="log"></pre>
@@ -115,6 +179,39 @@
 				
 			}
 			
+			function handle_update( result, pieces ) {
+				
+				refreshSceneView( result );
+				renderer.initWebGLObjects( result.scene );
+				
+				var m, material, count = 0;
+				
+				for ( m in result.materials ) {
+				
+					material = result.materials[ m ];
+					if ( ! ( material instanceof THREE.MeshFaceMaterial ) ) {
+						
+						if( !material.program ) {
+						
+							console.log(m);
+							renderer.initMaterial( material, result.scene.lights, result.scene.fog );
+							
+							count += 1;
+							if( count > pieces ) {
+								
+								//console.log("xxxxxxxxx");
+								break;
+							
+							}
+							
+						}
+						
+					}
+					
+				}
+				
+			}
+			
 			function init() {
 
 				container = document.createElement( 'div' );
@@ -133,9 +230,30 @@
 
 				setInterval( loop, 1000/60 );
 
+				var callback_progress = function( progress, result ) {
+				
+					var bar = 250, 
+						total = progress.total_models + progress.total_textures,
+						loaded = progress.loaded_models + progress.loaded_textures;
+					
+					if ( total )
+						bar = Math.floor( bar * loaded / total );
+					
+					$( "bar" ).style.width = bar + "px";
+					
+					count = 0;
+					for ( var m in result.materials ) count++;
+
+					handle_update( result, Math.floor( count/total ) );
+					
+				}
+				
 				var callback_sync = function( result ) {
 				
 					/*
+					
+					// uncomment to see progressive scene loading
+					
 					scene = result.scene;
 					camera = result.currentCamera;
 					
@@ -146,6 +264,8 @@
 					
 					*/
 
+					//handle_update( result, 1 );
+					
 				}
 				
 				var callback_async = function( result ) {
@@ -160,21 +280,29 @@
 					mat_veyron[ 3 ][ 0 ] = result.materials[ "glass" ];
 					mat_veyron[ 4 ][ 0 ] = result.materials[ "chrome" ];
 					mat_veyron[ 5 ][ 0 ] = result.materials[ "chrome" ];
+					mat_veyron[ 6 ][ 0 ] = result.materials[ "backlights" ];
+					mat_veyron[ 7 ][ 0 ] = result.materials[ "backsignals" ];
 					
 					$( "message" ).style.display = "none";
+					$( "progressbar" ).style.display = "none";
 					$( "start" ).style.display = "block";
 					$( "start" ).className = "enabled";
+					
+					handle_update( result, 1 );
 					
 				}
 				
 				$( "progress" ).style.display = "block";
-				SceneUtils.loadScene( "scenes/test_scene.js", callback_sync, callback_async );
+				SceneUtils.loadScene( "scenes/test_scene.js", callback_sync, callback_async, callback_progress );
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
+				stats.domElement.style.right = '0px';
 				stats.domElement.style.zIndex = 100;
 				container.appendChild( stats.domElement );
+				
+				$( "plus_exp" ).addEventListener( 'click', createToggle( "exp" ), false );
 
 			}
 
@@ -261,6 +389,79 @@
 				var e = $("log");
 				e.innerHTML = text + "<br/>" + e.innerHTML;
 
+			}
+
+			// Scene explorer user interface
+			
+			function toggle( id ) {
+				
+				var scn = $( "section_" + id ).style,
+					btn = $( "plus_" + id );
+				
+				if ( scn.display == "block" ) {
+				
+					scn.display = "none";
+					btn.innerHTML = "[+]";
+					
+				}
+				else {
+					
+					scn.display = "block";
+					btn.innerHTML = "[-]";
+					
+				}
+					
+			}
+			
+			function createToggle( label ) { return function() { toggle( label ) } };
+			
+			function refreshSceneView( result ) {
+				
+				$( "section_exp" ).innerHTML = generateSceneView( result );
+
+				var config = [ "obj", "geo", "mat", "tex", "lit", "cam" ];
+				
+				for ( var i = 0; i < config.length; i++ )
+					$( "plus_" + config[i] ).addEventListener( 'click', createToggle( config[i] ), false );
+
+			}
+			
+			function generateSection( label, id, objects ) {
+				
+				var html = "";
+				
+				html += "<h3><a id='plus_" + id + "' href='#'>[+]</a> " + label + "</h3>";
+				html += "<div id='section_" + id + "' class='part'>";
+				
+				for( var o in objects ) {
+				
+					html += o + "<br/>";
+					
+				}
+				html += "</div>";
+				
+				return html;
+			
+			}
+			
+			function generateSceneView( result ) {
+				
+				var config = [
+				[ "Objects",    "obj", result.objects ],
+				[ "Geometries", "geo", result.geometries ],
+				[ "Materials",  "mat", result.materials ],
+				[ "Textures",   "tex", result.textures ],
+				[ "Lights",     "lit", result.lights ],
+				[ "Cameras",    "cam", result.cameras ]
+				];
+				
+				var html = "";
+				
+				for ( var i = 0; i < config.length; i++ )
+					html += generateSection( config[i][0], config[i][1], config[i][2] );
+
+				return html;
+				
 			}
 
 		</script>

@@ -206,6 +206,7 @@ var scene = {
 	
 "materials":
 {
+	/*
 	"basic_red": {
 		"type": "MeshBasicMaterial",
 		"parameters": { color: 0xff0000, wireframe: true } 
@@ -215,15 +216,26 @@ var scene = {
 		"type": "MeshBasicMaterial",
 		"parameters": { color: 0x007711, wireframe: true } 
 	},
-
-	"basic_gray": {
+	
+	"basic_blue": {
 		"type": "MeshBasicMaterial",
-		"parameters": { color: 0x666666, wireframe: true } 
+		"parameters": { color: 0x0000ff, wireframe: true } 
 	},
-
+		
 	"basic_black": {
 		"type": "MeshBasicMaterial",
 		"parameters": { color: 0x000000, wireframe: true } 
+	},
+	
+	"phong_white": {
+		"type": "MeshPhongMaterial",
+		"parameters": { color: 0xaaaaaa } 
+	},
+	*/
+	
+	"basic_gray": {
+		"type": "MeshBasicMaterial",
+		"parameters": { color: 0x666666, wireframe: true } 
 	},
 
 	"basic_white": {
@@ -234,11 +246,6 @@ var scene = {
 	"faceted_white": {
 		"type": "MeshLambertMaterial",
 		"parameters": { color: 0xffffff, shading: "flat" } 
-	},
-	
-	"basic_blue": {
-		"type": "MeshBasicMaterial",
-		"parameters": { color: 0x0000ff, wireframe: true } 
 	},
 	
 	"lambert_red": {
@@ -256,11 +263,6 @@ var scene = {
 		"parameters": { color: 0x0055aa } 
 	},
 	
-	"phong_white": {
-		"type": "MeshPhongMaterial",
-		"parameters": { color: 0xaaaaaa } 
-	},
-
 	"phong_orange": {
 		"type": "MeshPhongMaterial",
 		"parameters": { color:0x000000, specular: 0xaa5500 } 
@@ -294,6 +296,16 @@ var scene = {
 	"interior": {
 		"type": "MeshLambertMaterial",
 		"parameters": { color: 0x050505 }
+	},
+	
+	"backlights": {	
+		"type": "MeshLambertMaterial",
+		"parameters": { color: 0xff0000, opacity: 0.5 }
+	},
+	
+	"backsignals": {
+		"type": "MeshLambertMaterial",
+		"parameters": { color: 0xffbb00, opacity: 0.5 }
 	},
 	
 	"textured_bg": {

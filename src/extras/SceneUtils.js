@@ -1,6 +1,6 @@
 var SceneUtils = {
 	
-	loadScene : function( url, callback_sync, callback_async ) {
+	loadScene : function( url, callback_sync, callback_async, callback_progress ) {
 
 		var worker = new Worker( url );
 		worker.postMessage( 0 );
@@ -14,6 +14,7 @@ var SceneUtils = {
 				materials,
 				data, loader, 
 				counter_models, counter_textures,
+				total_models, total_textures,
 				result;
 
 			data = event.data;
@@ -90,7 +91,6 @@ var SceneUtils = {
 					handle_mesh( geo, id );
 					
 					counter_models -= 1;
-					//console.log( "models to load:", counter_models );
 					
 					async_callback_gate();
 					
@@ -100,6 +100,17 @@ var SceneUtils = {
 			
 			function async_callback_gate() {
 				
+				var progress = {
+					
+					total_models: total_models,
+					total_textures: total_textures,
+					loaded_models: total_models - counter_models,
+					loaded_textures: total_textures - counter_textures
+					
+				};
+				
+				callback_progress( progress, result );
+				
 				if( counter_models == 0 && counter_textures == 0 ) {
 					
 					callback_async( result );
@@ -107,6 +118,119 @@ var SceneUtils = {
 				}
 				
 			};
+			
+			var callback_texture = function( images ) {
+				
+				counter_textures -= 1;
+				async_callback_gate();  
+				
+			};
+			
+			// first go synchronous elements
+			
+			// cameras
+			
+			for( dc in data.cameras ) {
+				
+				c = data.cameras[ dc ];
+				
+				if ( c.type == "perspective" ) {
+					
+					camera = new THREE.Camera( c.fov, c.aspect, c.near, c.far );
+					
+				} else if ( c.type == "ortho" ) {
+					
+					camera = new THREE.Camera();
+					camera.projectionMatrix = THREE.Matrix4.makeOrtho( c.left, c.right, c.top, c.bottom, c.near, c.far );
+					
+				}
+				
+				p = c.position;
+				t = c.target;
+				camera.position.set( p[0], p[1], p[2] );
+				camera.target.position.set( t[0], t[1], t[2] );
+				
+				result.cameras[ dc ] = camera;
+				
+			}
+			
+			// lights
+			
+			for( dl in data.lights ) {
+				
+				l = data.lights[ dl ];
+				
+				if ( l.type == "directional" ) {
+				
+					p = l.direction;
+					
+					light = new THREE.DirectionalLight();
+					light.position.set( p[0], p[1], p[2] );
+					light.position.normalize();
+					
+				} else if ( l.type == "point" ) {
+				
+					p = l.position;
+					
+					light = new THREE.PointLight();
+					light.position.set( p[0], p[1], p[2] );
+					
+				}
+				
+				c = l.color;
+				i = l.intensity || 1;
+				light.color.setRGB( c[0] * i, c[1] * i, c[2] * i );
+				
+				result.scene.addLight( light );
+				
+				result.lights[ dl ] = light;
+				
+			}
+			
+			// fogs
+			
+			for( df in data.fogs ) {
+				
+				f = data.fogs[ df ];
+				
+				if ( f.type == "linear" ) {
+					
+					fog = new THREE.Fog( 0x000000, f.near, f.far );
+				
+				} else if ( f.type == "exp2" ) {
+					
+					fog = new THREE.FogExp2( 0x000000, f.density );
+					
+				}
+				
+				c = f.color;
+				fog.color.setRGB( c[0], c[1], c[2] );
+				
+				result.fogs[ df ] = fog;
+				
+			}
+			
+			// defaults
+			
+			if ( result.cameras && data.defaults.camera ) {
+				
+				result.currentCamera = result.cameras[ data.defaults.camera ];
+				
+			}
+			
+			if ( result.fogs && data.defaults.fog ) {
+			
+				result.scene.fog = result.fogs[ data.defaults.fog ];
+				
+			}
+			
+			c = data.defaults.bgcolor;
+			result.bgColor = new THREE.Color();
+			result.bgColor.setRGB( c[0], c[1], c[2] );
+			
+			result.bgColorAlpha = data.defaults.bgalpha;
+
+			// now come potentially asynchronous elements
 			
 			// geometries
 			
@@ -123,6 +247,8 @@ var SceneUtils = {
 				}
 				
 			}
+			
+			total_models = counter_models;
 			
 			for( dg in data.geometries ) {
 				
@@ -194,13 +320,7 @@ var SceneUtils = {
 				
 			}
 			
-			var callback_texture = function( images ) {
-				
-				counter_textures -= 1; 
-				//console.log( "textures to load:", counter_textures ); 
-				async_callback_gate();  
-				
-			};
+			total_textures = counter_textures;
 			
 			for( dt in data.textures ) {
 				
@@ -265,108 +385,6 @@ var SceneUtils = {
 			// objects ( synchronous init of procedural primitives )
 			
 			handle_objects();
-			
-			// lights
-			
-			for( dl in data.lights ) {
-				
-				l = data.lights[ dl ];
-				
-				if ( l.type == "directional" ) {
-				
-					p = l.direction;
-					
-					light = new THREE.DirectionalLight();
-					light.position.set( p[0], p[1], p[2] );
-					light.position.normalize();
-					
-				} else if ( l.type == "point" ) {
-				
-					p = l.position;
-					
-					light = new THREE.PointLight();
-					light.position.set( p[0], p[1], p[2] );
-					
-				}
-				
-				c = l.color;
-				i = l.intensity || 1;
-				light.color.setRGB( c[0] * i, c[1] * i, c[2] * i );
-				
-				result.scene.addLight( light );
-				
-				result.lights[ dl ] = light;
-				
-			}
-			
-			// cameras
-			
-			for( dc in data.cameras ) {
-				
-				c = data.cameras[ dc ];
-				
-				if ( c.type == "perspective" ) {
-					
-					camera = new THREE.Camera( c.fov, c.aspect, c.near, c.far );
-					
-				} else if ( c.type == "ortho" ) {
-					
-					camera = new THREE.Camera();
-					camera.projectionMatrix = THREE.Matrix4.makeOrtho( c.left, c.right, c.top, c.bottom, c.near, c.far );
-					
-				}
-				
-				p = c.position;
-				t = c.target;
-				camera.position.set( p[0], p[1], p[2] );
-				camera.target.position.set( t[0], t[1], t[2] );
-				
-				result.cameras[ dc ] = camera;
-				
-			}
-
-			// fogs
-			
-			for( df in data.fogs ) {
-				
-				f = data.fogs[ df ];
-				
-				if ( f.type == "linear" ) {
-					
-					fog = new THREE.Fog( 0x000000, f.near, f.far );
-				
-				} else if ( f.type == "exp2" ) {
-					
-					fog = new THREE.FogExp2( 0x000000, f.density );
-					
-				}
-				
-				c = f.color;
-				fog.color.setRGB( c[0], c[1], c[2] );
-				
-				result.fogs[ df ] = fog;
-				
-			}
-			
-			// defaults
-			
-			if ( result.cameras && data.defaults.camera ) {
-				
-				result.currentCamera = result.cameras[ data.defaults.camera ];
-				
-			}
-			
-			if ( result.fogs && data.defaults.fog ) {
-			
-				result.scene.fog = result.fogs[ data.defaults.fog ];
-				
-			}
-			
-			c = data.defaults.bgcolor;
-			result.bgColor = new THREE.Color();
-			result.bgColor.setRGB( c[0], c[1], c[2] );
-			
-			result.bgColorAlpha = data.defaults.bgalpha;
 			
 			// synchronous callback
 			
