@@ -92,6 +92,7 @@ THREE.CanvasRenderer = function () {
 		_contextStrokeStyle = null;
 		_contextFillStyle = null;
 		_contextLineWidth = 1;
+
 	};
 
 	this.setClearColor = function( hex, opacity ) {
@@ -101,12 +102,16 @@ THREE.CanvasRenderer = function () {
 
 		_clearRect.set( - _canvasWidthHalf, - _canvasHeightHalf, _canvasWidthHalf, _canvasHeightHalf );
 		_context.setTransform( 1, 0, 0, - 1, _canvasWidthHalf, _canvasHeightHalf );
+
 		this.clear();
+
 	};
 
 	this.clear = function () {
 
 		if ( !_clearRect.isEmpty() ) {
+
+			_context.setTransform( 1, 0, 0, - 1, _canvasWidthHalf, _canvasHeightHalf );
 
 			_clearRect.inflate( 1 );
 			_clearRect.minSelf( _clipRect );
@@ -128,15 +133,14 @@ THREE.CanvasRenderer = function () {
 			_clearRect.empty();
 
 		}
+
 	};
 
 	this.render = function ( scene, camera ) {
 
 		var e, el, element, m, ml, fm, fml, material;
 
-		_context.setTransform( 1, 0, 0, - 1, _canvasWidthHalf, _canvasHeightHalf );
-
-		this.autoClear && this.clear();
+		this.autoClear ? this.clear() : _context.setTransform( 1, 0, 0, - 1, _canvasWidthHalf, _canvasHeightHalf );
 
 		_renderList = _projector.projectScene( scene, camera, this.sortElements );
 
@@ -359,9 +363,9 @@ THREE.CanvasRenderer = function () {
 
 			if ( material instanceof THREE.ParticleBasicMaterial ) {
 
-				if ( material.map ) {
+				if ( material.map && material.map.image.loaded ) {
 
-					bitmap = material.map;
+					bitmap = material.map.image;
 					bitmapWidth = bitmap.width >> 1;
 					bitmapHeight = bitmap.height >> 1;
 

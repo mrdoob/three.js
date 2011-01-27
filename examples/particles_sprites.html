@@ -44,7 +44,7 @@
 
 				scene = new THREE.Scene();
 
-				var material = new THREE.ParticleBasicMaterial( { map: createSprite(), blending: THREE.AdditiveBlending } );
+				var material = new THREE.ParticleBasicMaterial( { map: new THREE.Texture( generateSprite() ), blending: THREE.AdditiveBlending } );
 
 				for ( var i = 0; i < 1000; i++ ) {
 
@@ -71,11 +71,12 @@
 			}
 
 
-			function createSprite() {
+			function generateSprite() {
 
 				var canvas = document.createElement( 'canvas' );
 				canvas.width = 16;
 				canvas.height = 16;
+				canvas.loaded = true;
 
 				var context = canvas.getContext( '2d' );
 				var gradient = context.createRadialGradient( canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2 );
