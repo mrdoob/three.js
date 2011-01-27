@@ -109,9 +109,9 @@ THREE.CanvasRenderer = function () {
 
 	this.clear = function () {
 
-		if ( !_clearRect.isEmpty() ) {
+		_context.setTransform( 1, 0, 0, - 1, _canvasWidthHalf, _canvasHeightHalf );
 
-			_context.setTransform( 1, 0, 0, - 1, _canvasWidthHalf, _canvasHeightHalf );
+		if ( !_clearRect.isEmpty() ) {
 
 			_clearRect.inflate( 1 );
 			_clearRect.minSelf( _clipRect );
