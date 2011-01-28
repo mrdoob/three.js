@@ -361,7 +361,7 @@ var SceneUtils = {
 				
 				for( pp in m.parameters ) {
 					
-					if ( pp == "env_map" || pp == "map" ) {
+					if ( pp == "env_map" || pp == "map" || pp == "light_map" ) {
 						
 						m.parameters[ pp ] = result.textures[ m.parameters[ pp ] ];
 						

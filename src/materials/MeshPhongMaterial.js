@@ -11,6 +11,8 @@
  *  map: new THREE.Texture( <Image> ),
  *  specular_map: new THREE.Texture( <Image> ),
 
+ *  light_map: new THREE.Texture( <Image> ),
+
  *  env_map: new THREE.TextureCube( [posx, negx, posy, negy, posz, negz] ),
  *  combine: THREE.Multiply,
  *  reflectivity: <float>,
@@ -36,6 +38,8 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 	this.map = null;
 	this.specular_map = null;
 
+	this.light_map = null;
+	
 	this.env_map = null;
 	this.combine = THREE.MultiplyOperation;
 	this.reflectivity = 1;
@@ -59,6 +63,8 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 		if ( parameters.specular !== undefined ) this.specular = new THREE.Color( parameters.specular );
 		if ( parameters.shininess !== undefined ) this.shininess = parameters.shininess;
 
+		if ( parameters.light_map !== undefined ) this.light_map = parameters.light_map;
+		
 		if ( parameters.map !== undefined ) this.map = parameters.map;
 		if ( parameters.specular_map !== undefined ) this.specular_map = parameters.specular_map;
 

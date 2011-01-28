@@ -78,9 +78,9 @@ THREE.Loader.prototype = {
 		
 			s = (new Date).getTime(),
 			worker = new Worker( url );
-
+		
 		worker.onmessage = function( event ) {
-
+			
 			THREE.Loader.prototype.createModel( event.data, callback, texture_path );
 
 		};
@@ -582,7 +582,7 @@ THREE.Loader.prototype = {
 				u3 = uvs[ uvc*2 ];
 				v3 = uvs[ uvc*2 + 1 ];
 
-				THREE.Loader.prototype.uv3( scope, u1, v1, u2, v2, u3, v3 );
+				THREE.Loader.prototype.uv3( scope.uvs, u1, v1, u2, v2, u3, v3 );
 
 			}
 
@@ -607,7 +607,7 @@ THREE.Loader.prototype = {
 				u4 = uvs[ uvd*2 ];
 				v4 = uvs[ uvd*2 + 1 ];
 
-				THREE.Loader.prototype.uv4( scope, u1, v1, u2, v2, u3, v3, u4, v4 );
+				THREE.Loader.prototype.uv4( scope.uvs, u1, v1, u2, v2, u3, v3, u4, v4 );
 
 			}
 
@@ -866,7 +866,22 @@ THREE.Loader.prototype = {
 					u3 = data.uvs[ uvc * 2 ];
 					v3 = data.uvs[ uvc * 2 + 1 ];
 
-					THREE.Loader.prototype.uv3( scope, u1, v1, u2, v2, u3, v3 );
+					THREE.Loader.prototype.uv3( scope.uvs, u1, v1, u2, v2, u3, v3 );
+					
+					if( data.uvs2 ) {
+						
+						u1 = data.uvs2[ uva * 2 ];
+						v1 = data.uvs2[ uva * 2 + 1 ];
+
+						u2 = data.uvs2[ uvb * 2 ];
+						v2 = data.uvs2[ uvb * 2 + 1 ];
+
+						u3 = data.uvs2[ uvc * 2 ];
+						v3 = data.uvs2[ uvc * 2 + 1 ];
+
+						THREE.Loader.prototype.uv3( scope.uvs2, u1, 1-v1, u2, 1-v2, u3, 1-v3 );
+						
+					}
 
 				}
 
@@ -891,7 +906,25 @@ THREE.Loader.prototype = {
 					u4 = data.uvs[ uvd * 2 ];
 					v4 = data.uvs[ uvd * 2 + 1 ];
 
-					THREE.Loader.prototype.uv4( scope, u1, v1, u2, v2, u3, v3, u4, v4 );
+					THREE.Loader.prototype.uv4( scope.uvs, u1, v1, u2, v2, u3, v3, u4, v4 );
+					
+					if( data.uvs2 ) {
+						
+						u1 = data.uvs2[ uva * 2 ];
+						v1 = data.uvs2[ uva * 2 + 1 ];
+
+						u2 = data.uvs2[ uvb * 2 ];
+						v2 = data.uvs2[ uvb * 2 + 1 ];
+
+						u3 = data.uvs2[ uvc * 2 ];
+						v3 = data.uvs2[ uvc * 2 + 1 ];
+
+						u4 = data.uvs2[ uvd * 2 ];
+						v4 = data.uvs2[ uvd * 2 + 1 ];
+
+						THREE.Loader.prototype.uv4( scope.uvs2, u1, 1-v1, u2, 1-v2, u3, 1-v3, u4, 1-v4 );
+						
+					}
 
 				}
 
@@ -1036,24 +1069,24 @@ THREE.Loader.prototype = {
 
 	},
 
-	uv3: function( scope, u1, v1, u2, v2, u3, v3 ) {
+	uv3: function( where, u1, v1, u2, v2, u3, v3 ) {
 
 		var uv = [];
 		uv.push( new THREE.UV( u1, v1 ) );
 		uv.push( new THREE.UV( u2, v2 ) );
 		uv.push( new THREE.UV( u3, v3 ) );
-		scope.uvs.push( uv );
+		where.push( uv );
 
 	},
 
-	uv4: function( scope, u1, v1, u2, v2, u3, v3, u4, v4 ) {
+	uv4: function( where, u1, v1, u2, v2, u3, v3, u4, v4 ) {
 
 		var uv = [];
 		uv.push( new THREE.UV( u1, v1 ) );
 		uv.push( new THREE.UV( u2, v2 ) );
 		uv.push( new THREE.UV( u3, v3 ) );
 		uv.push( new THREE.UV( u4, v4 ) );
-		scope.uvs.push( uv );
+		where.push( uv );
 
 	},
 
@@ -1085,14 +1118,10 @@ THREE.Loader.prototype = {
 
 		}
 
-		var material, texture, image, color;
-
-		if ( m.map_diffuse && texture_path ) {
-
-			texture = document.createElement( 'canvas' );
-			material = new THREE.MeshLambertMaterial( { map: new THREE.Texture( texture ) } );
-
-			image = new Image();
+		function load_image( where, url ) {
+			
+			var image = new Image();
+			
 			image.onload = function () {
 
 				if ( !is_pow2( this.width ) || !is_pow2( this.height ) ) {
@@ -1100,21 +1129,33 @@ THREE.Loader.prototype = {
 					var w = nearest_pow2( this.width ),
 						h = nearest_pow2( this.height );
 
-					material.map.image.width = w;
-					material.map.image.height = h;
-					material.map.image.getContext("2d").drawImage( this, 0, 0, w, h );
+					where.image.width = w;
+					where.image.height = h;
+					where.image.getContext("2d").drawImage( this, 0, 0, w, h );
 
 				} else {
 
-					material.map.image = this;
+					where.image = this;
 
 				}
 
-				material.map.image.loaded = 1;
+				where.image.loaded = 1;
 
 			};
 
-			image.src = texture_path + "/" + m.map_diffuse;
+			image.src = url;
+			
+		}
+		
+		var material, texture, color;
+
+		if ( m.map_diffuse && texture_path ) {
+
+			texture = document.createElement( 'canvas' );
+			material = new THREE.MeshLambertMaterial( { map: new THREE.Texture( texture ) } );
+
+			load_image( material.map, texture_path + "/" + m.map_diffuse );			
+
 
 		} else if ( m.col_diffuse ) {
 
@@ -1128,6 +1169,15 @@ THREE.Loader.prototype = {
 		} else {
 
 			material = new THREE.MeshLambertMaterial( { color: 0xeeeeee } );
+
+		}
+		
+		if ( m.map_lightmap && texture_path ) {
+
+			texture = document.createElement( 'canvas' );
+			material.light_map = new THREE.Texture( texture );
+			
+			load_image( material.light_map, texture_path + "/" + m.map_lightmap );			
 
 		}
 

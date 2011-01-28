@@ -6,6 +6,8 @@
  *  color: <hex>,
  *  map: new THREE.Texture( <Image> ),
  
+ *  light_map: new THREE.Texture( <Image> ),
+ 
  *  env_map: new THREE.TextureCube( [posx, negx, posy, negy, posz, negz] ),
  *  combine: THREE.Multiply,
  *  reflectivity: <float>,
@@ -26,6 +28,8 @@ THREE.MeshLambertMaterial = function ( parameters ) {
 	this.color = new THREE.Color( 0xffffff );
 	this.map = null;
 
+	this.light_map = null;
+	
 	this.env_map = null;
 	this.combine = THREE.MultiplyOperation;
 	this.reflectivity = 1;
@@ -47,6 +51,8 @@ THREE.MeshLambertMaterial = function ( parameters ) {
 		if ( parameters.color !== undefined ) this.color.setHex( parameters.color );
 		if ( parameters.map !== undefined ) this.map = parameters.map;
 
+		if ( parameters.light_map !== undefined ) this.light_map = parameters.light_map;
+		
 		if ( parameters.env_map !== undefined ) this.env_map = parameters.env_map;
 		if ( parameters.combine !== undefined ) this.combine = parameters.combine;
 		if ( parameters.reflectivity !== undefined ) this.reflectivity  = parameters.reflectivity;

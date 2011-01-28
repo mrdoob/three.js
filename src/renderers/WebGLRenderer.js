@@ -171,6 +171,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		geometryChunk.__webGLNormalBuffer = _gl.createBuffer();
 		geometryChunk.__webGLTangentBuffer = _gl.createBuffer();
 		geometryChunk.__webGLUVBuffer = _gl.createBuffer();
+		geometryChunk.__webGLUV2Buffer = _gl.createBuffer();
 		geometryChunk.__webGLFaceBuffer = _gl.createBuffer();
 		geometryChunk.__webGLLineBuffer = _gl.createBuffer();
 
@@ -220,6 +221,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		geometryChunk.__normalArray  = new Float32Array( nvertices * 3 );
 		geometryChunk.__tangentArray = new Float32Array( nvertices * 4 );
 		geometryChunk.__uvArray = new Float32Array( nvertices * 2 );
+		geometryChunk.__uv2Array = new Float32Array( nvertices * 2 );
 
 		geometryChunk.__faceArray = new Uint16Array( ntris * 3 );
 		geometryChunk.__lineArray = new Uint16Array( nlines * 2 );
@@ -233,13 +235,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.setMeshBuffers = function ( geometryChunk, object, hint, dirtyVertices, dirtyElements, dirtyUvs, dirtyNormals, dirtyTangents ) {
 
-		var f, fl, fi, face, vertexNormals, faceNormal, normal, uv, v1, v2, v3, v4, t1, t2, t3, t4, m, ml, i,
-			vn, uvi,
+		var f, fl, fi, face, vertexNormals, faceNormal, normal, uv, uv2, v1, v2, v3, v4, t1, t2, t3, t4, m, ml, i,
+			vn, uvi, uv2i,
 
 		vertexIndex = 0,
 
 		offset = 0,
 		offset_uv = 0,
+		offset_uv2 = 0,
 		offset_face = 0,
 		offset_normal = 0,
 		offset_tangent = 0,
@@ -247,6 +250,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		vertexArray = geometryChunk.__vertexArray,
 		uvArray = geometryChunk.__uvArray,
+		uv2Array = geometryChunk.__uv2Array,
 		normalArray = geometryChunk.__normalArray,
 		tangentArray = geometryChunk.__tangentArray,
 
@@ -259,13 +263,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 		vertices = geometry.vertices,
 		chunk_faces = geometryChunk.faces,
 		obj_faces = geometry.faces,
-		obj_uvs = geometry.uvs;
+		obj_uvs = geometry.uvs,
+		obj_uvs2 = geometry.uvs2;
 
 		for ( f = 0, fl = chunk_faces.length; f < fl; f++ ) {
 
 			fi = chunk_faces[ f ];
 			face = obj_faces[ fi ];
 			uv = obj_uvs[ fi ];
+			uv2 = obj_uvs2[ fi ];
 
 			vertexNormals = face.vertexNormals;
 			faceNormal = face.normal;
@@ -362,6 +368,21 @@ THREE.WebGLRenderer = function ( parameters ) {
 						uvArray[ offset_uv + 1 ] = uvi.v;
 
 						offset_uv += 2;
+
+					}
+
+				}
+
+				if ( dirtyUvs && uv2 ) {
+
+					for ( i = 0; i < 3; i ++ ) {
+
+						uv2i = uv2[ i ];
+
+						uv2Array[ offset_uv2 ]     = uv2i.u;
+						uv2Array[ offset_uv2 + 1 ] = uv2i.v;
+
+						offset_uv2 += 2;
 
 					}
 
@@ -497,6 +518,21 @@ THREE.WebGLRenderer = function ( parameters ) {
 					}
 
 				}
+				
+				if ( dirtyUvs && uv2 ) {
+
+					for ( i = 0; i < 4; i ++ ) {
+
+						uv2i = uv2[ i ];
+
+						uv2Array[ offset_uv2 ]     = uv2i.u;
+						uv2Array[ offset_uv2 + 1 ] = uv2i.v;
+
+						offset_uv2 += 2;
+
+					}
+
+				}
 
 				if( dirtyElements ) {
 
@@ -557,6 +593,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLUVBuffer );
 			_gl.bufferData( _gl.ARRAY_BUFFER, uvArray, hint );
+
+		}
+
+		if ( dirtyUvs && offset_uv2 > 0 ) {
+
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLUV2Buffer );
+			_gl.bufferData( _gl.ARRAY_BUFFER, uv2Array, hint );
 
 		}
 
@@ -639,6 +682,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		material.uniforms.opacity.value = material.opacity;
 		material.uniforms.map.texture = material.map;
+		
+		material.uniforms.light_map.texture = material.light_map;
 
 		material.uniforms.env_map.texture = material.env_map;
 		material.uniforms.reflectivity.value = material.reflectivity;
@@ -748,7 +793,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			maxLightCount = allocateLights( lights, 4 );
 
-			parameters = { fog: fog, map: material.map, env_map: material.env_map, maxDirLights: maxLightCount.directional, maxPointLights: maxLightCount.point };
+			parameters = { fog: fog, map: material.map, env_map: material.env_map, light_map: material.light_map, maxDirLights: maxLightCount.directional, maxPointLights: maxLightCount.point };
 			material.program = buildProgram( material.fragment_shader, material.vertex_shader, parameters );
 
 			identifiers = [ 'viewMatrix', 'modelViewMatrix', 'projectionMatrix', 'normalMatrix', 'objectMatrix', 'cameraPosition' ];
@@ -759,7 +804,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 			cacheUniformLocations( material.program, identifiers );
-			cacheAttributeLocations( material.program, [ "position", "normal", "uv", "tangent" ] );
+			cacheAttributeLocations( material.program, [ "position", "normal", "uv", "uv2", "tangent" ] );
 
 		}
 		
@@ -860,6 +905,23 @@ THREE.WebGLRenderer = function ( parameters ) {
 			} else {
 
 				_gl.disableVertexAttribArray( attributes.uv );
+
+			}
+
+		}
+
+		if ( attributes.uv2 >= 0 ) {
+
+			if ( geometryChunk.__webGLUV2Buffer ) {
+
+				_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLUV2Buffer );
+				_gl.vertexAttribPointer( attributes.uv2, 2, _gl.FLOAT, false, 0, 0 );
+
+				_gl.enableVertexAttribArray( attributes.uv2 );
+
+			} else {
+
+				_gl.disableVertexAttribArray( attributes.uv2 );
 
 			}
 
@@ -1325,6 +1387,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			parameters.map ? "#define USE_MAP" : "",
 			parameters.env_map ? "#define USE_ENVMAP" : "",
+			parameters.light_map ? "#define USE_LIGHTMAP" : "",
 
 			"uniform mat4 viewMatrix;",
 			"uniform vec3 cameraPosition;",
@@ -1339,6 +1402,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			parameters.map ? "#define USE_MAP" : "",
 			parameters.env_map ? "#define USE_ENVMAP" : "",
+			parameters.light_map ? "#define USE_LIGHTMAP" : "",
 
 			"uniform mat4 objectMatrix;",
 			"uniform mat4 modelViewMatrix;",
@@ -1349,6 +1413,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			"attribute vec3 position;",
 			"attribute vec3 normal;",
 			"attribute vec2 uv;",
+			"attribute vec2 uv2;",
 			""
 		].join("\n");
 
@@ -1366,6 +1431,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 			//console.log( prefix_vertex + vertex_shader );
 
 		}
+		
+		//console.log( prefix_fragment + fragment_shader );
+		//console.log( prefix_vertex + vertex_shader );
 
 		program.uniforms = {};
 		program.attributes = {};
@@ -1780,6 +1848,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 THREE.Snippets = {
 
+	// FOG
+	
 	fog_pars_fragment: [
 
 	"#ifdef USE_FOG",
@@ -1817,6 +1887,8 @@ THREE.Snippets = {
 
 	].join("\n"),
 
+	// ENVIRONMENT MAP
+	
 	envmap_pars_fragment: [
 
 	"#ifdef USE_ENVMAP",
@@ -1882,6 +1954,8 @@ THREE.Snippets = {
 	"#endif"
 
 	].join("\n"),
+	
+	// COLOR MAP
 
 	map_pars_fragment: [
 
@@ -1924,6 +1998,49 @@ THREE.Snippets = {
 
 	].join("\n"),
 
+	// LIGHT MAP
+	
+	lightmap_pars_fragment: [
+
+	"#ifdef USE_LIGHTMAP",
+
+		"varying vec2 vUv2;",
+		"uniform sampler2D light_map;",
+
+	"#endif"
+
+	].join("\n"),
+	
+	lightmap_pars_vertex: [
+
+	"#ifdef USE_LIGHTMAP",
+
+		"varying vec2 vUv2;",
+
+	"#endif"
+
+	].join("\n"),
+	
+	lightmap_fragment: [
+
+	"#ifdef USE_LIGHTMAP",
+
+		"lightmapColor = texture2D( light_map, vUv2 );",
+
+	"#endif"
+
+	].join("\n"),
+	
+	lightmap_vertex: [
+
+	"#ifdef USE_LIGHTMAP",
+
+		"vUv2 = uv2;",
+
+	"#endif"
+
+	].join("\n"),
+
 	lights_pars_vertex: [
 
 	"uniform bool enableLighting;",
@@ -1949,6 +2066,8 @@ THREE.Snippets = {
 
 	].join("\n"),
 
+	// LIGHTS
+	
 	lights_vertex: [
 
 	"if ( !enableLighting ) {",
@@ -2087,6 +2206,8 @@ THREE.UniformsLib = {
 	"opacity" : { type: "f", value: 1 },
 	"map"     : { type: "t", value: 0, texture: null },
 
+	"light_map"       : { type: "t", value: 2, texture: null },
+
 	"env_map" 		  : { type: "t", value: 1, texture: null },
 	"useRefract"	  : { type: "i", value: 0 },
 	"reflectivity"    : { type: "f", value: 1 },
@@ -2190,6 +2311,7 @@ THREE.ShaderLib = {
 			"uniform float opacity;",
 
 			THREE.Snippets[ "map_pars_fragment" ],
+			THREE.Snippets[ "lightmap_pars_fragment" ],
 			THREE.Snippets[ "envmap_pars_fragment" ],
 			THREE.Snippets[ "fog_pars_fragment" ],
 
@@ -2197,11 +2319,13 @@ THREE.ShaderLib = {
 
 				"vec4 mColor = vec4( color, opacity );",
 				"vec4 mapColor = vec4( 1.0 );",
+				"vec4 lightmapColor = vec4( 1.0 );",
 				"vec4 cubeColor = vec4( 1.0 );",
 
 				THREE.Snippets[ "map_fragment" ],
+				THREE.Snippets[ "lightmap_fragment" ],
 
-				"gl_FragColor = mColor * mapColor;",
+				"gl_FragColor = mColor * mapColor * lightmapColor;",
 
 				THREE.Snippets[ "envmap_fragment" ],
 				THREE.Snippets[ "fog_fragment" ],
@@ -2213,6 +2337,7 @@ THREE.ShaderLib = {
 		vertex_shader: [
 
 			THREE.Snippets[ "map_pars_vertex" ],
+			THREE.Snippets[ "lightmap_pars_vertex" ],
 			THREE.Snippets[ "envmap_pars_vertex" ],
 
 			"void main() {",
@@ -2220,6 +2345,7 @@ THREE.ShaderLib = {
 				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
 
 				THREE.Snippets[ "map_vertex" ],
+				THREE.Snippets[ "lightmap_vertex" ],
 				THREE.Snippets[ "envmap_vertex" ],
 
 				"gl_Position = projectionMatrix * mvPosition;",
@@ -2243,6 +2369,7 @@ THREE.ShaderLib = {
 			"varying vec3 vLightWeighting;",
 
 			THREE.Snippets[ "map_pars_fragment" ],
+			THREE.Snippets[ "lightmap_pars_fragment" ],
 			THREE.Snippets[ "envmap_pars_fragment" ],
 			THREE.Snippets[ "fog_pars_fragment" ],
 
@@ -2250,11 +2377,13 @@ THREE.ShaderLib = {
 
 				"vec4 mColor = vec4( color, opacity );",
 				"vec4 mapColor = vec4( 1.0 );",
+				"vec4 lightmapColor = vec4( 1.0 );",
 				"vec4 cubeColor = vec4( 1.0 );",
 
 				THREE.Snippets[ "map_fragment" ],
+				THREE.Snippets[ "lightmap_fragment" ],
 
-				"gl_FragColor =  mColor * mapColor * vec4( vLightWeighting, 1.0 );",
+				"gl_FragColor =  mColor * mapColor * lightmapColor * vec4( vLightWeighting, 1.0 );",
 
 				THREE.Snippets[ "envmap_fragment" ],
 				THREE.Snippets[ "fog_fragment" ],
@@ -2268,6 +2397,7 @@ THREE.ShaderLib = {
 			"varying vec3 vLightWeighting;",
 
 			THREE.Snippets[ "map_pars_vertex" ],
+			THREE.Snippets[ "lightmap_pars_vertex" ],
 			THREE.Snippets[ "envmap_pars_vertex" ],
 			THREE.Snippets[ "lights_pars_vertex" ],
 
@@ -2276,6 +2406,7 @@ THREE.ShaderLib = {
 				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
 
 				THREE.Snippets[ "map_vertex" ],
+				THREE.Snippets[ "lightmap_vertex" ],
 				THREE.Snippets[ "envmap_vertex" ],
 
 				"vec3 transformedNormal = normalize( normalMatrix * normal );",
@@ -2314,6 +2445,7 @@ THREE.ShaderLib = {
 			"varying vec3 vLightWeighting;",
 
 			THREE.Snippets[ "map_pars_fragment" ],
+			THREE.Snippets[ "lightmap_pars_fragment" ],
 			THREE.Snippets[ "envmap_pars_fragment" ],
 			THREE.Snippets[ "fog_pars_fragment" ],
 			THREE.Snippets[ "lights_pars_fragment" ],
@@ -2322,12 +2454,14 @@ THREE.ShaderLib = {
 
 				"vec4 mColor = vec4( color, opacity );",
 				"vec4 mapColor = vec4( 1.0 );",
+				"vec4 lightmapColor = vec4( 1.0 );",
 				"vec4 cubeColor = vec4( 1.0 );",
 
 				THREE.Snippets[ "map_fragment" ],
 				THREE.Snippets[ "lights_fragment" ],
+				THREE.Snippets[ "lightmap_fragment" ],
 
-				"gl_FragColor =  mapColor * totalLight * vec4( vLightWeighting, 1.0 );",
+				"gl_FragColor =  mapColor * lightmapColor * totalLight * vec4( vLightWeighting, 1.0 );",
 
 				THREE.Snippets[ "envmap_fragment" ],
 				THREE.Snippets[ "fog_fragment" ],
@@ -2345,6 +2479,7 @@ THREE.ShaderLib = {
 			"varying vec3 vNormal;",
 
 			THREE.Snippets[ "map_pars_vertex" ],
+			THREE.Snippets[ "lightmap_pars_vertex" ],
 			THREE.Snippets[ "envmap_pars_vertex" ],
 			THREE.Snippets[ "lights_pars_vertex" ],
 
@@ -2353,6 +2488,7 @@ THREE.ShaderLib = {
 				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
 
 				THREE.Snippets[ "map_vertex" ],
+				THREE.Snippets[ "lightmap_vertex" ],
 				THREE.Snippets[ "envmap_vertex" ],
 
 				"#ifndef USE_ENVMAP",
