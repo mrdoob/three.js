@@ -1121,27 +1121,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			buffer = webGLObject.buffer;
 
 			if ( object.visible ) {
-
-				this.setupMatrices( object, camera );
-				this.renderPass( camera, lights, fog, object, buffer, THREE.NormalBlending, false );
-
-			}
-
-		}
-
-		// transparent pass
-
-		for ( o = 0, ol = scene.__webGLObjects.length; o < ol; o++ ) {
-
-			webGLObject = scene.__webGLObjects[ o ];
-
-			object = webGLObject.object;
-			buffer = webGLObject.buffer;
-
-			if ( object.visible ) {
-
-				this.setupMatrices( object, camera );
-
+				
 				if( object.doubleSided ) {
 
 					_gl.disable( _gl.CULL_FACE );
@@ -1162,6 +1142,26 @@ THREE.WebGLRenderer = function ( parameters ) {
 					}
 
 				}
+
+				this.setupMatrices( object, camera );
+				this.renderPass( camera, lights, fog, object, buffer, THREE.NormalBlending, false );
+
+			}
+
+		}
+
+		// transparent pass
+
+		for ( o = 0, ol = scene.__webGLObjects.length; o < ol; o++ ) {
+
+			webGLObject = scene.__webGLObjects[ o ];
+
+			object = webGLObject.object;
+			buffer = webGLObject.buffer;
+
+			if ( object.visible ) {
+
+				this.setupMatrices( object, camera );
 
 				// opaque blended materials
 
