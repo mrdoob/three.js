@@ -26,6 +26,52 @@ THREE.Color.prototype = {
 
 	},
 
+	// based on MochiKit implementation by Bob Ippolito
+	// h,s,v ranges are < 0.0 - 1.0 >
+	
+	setHSV: function ( h, s, v ) {
+
+		var red, green, blue, i, f, p, q, t;
+		
+		if ( v == 0.0 ) {
+			
+			red = green = blue = 0;
+			
+		} else {
+			
+			i = Math.floor( h * 6 );
+			f = ( h * 6 ) - i;
+			p = v * ( 1 - s );
+			q = v * ( 1 - ( s * f ) );
+			t = v * ( 1 - ( s * ( 1 - f ) ) );
+			
+			switch ( i ) {
+				
+				case 1: red = q; green = v; blue = p; break;
+				case 2: red = p; green = v; blue = t; break;
+				case 3: red = p; green = q; blue = v; break;
+				case 4: red = t; green = p; blue = v; break;
+				case 5: red = v; green = p; blue = q; break;
+				case 6: // fall through
+				case 0: red = v; green = t; blue = p; break;
+				
+			}
+		
+		}
+		
+		this.r = red;
+		this.g = green;
+		this.b = blue;
+
+		if ( this.autoUpdate ) {
+
+			this.updateHex();
+			this.updateStyleString();
+
+		}
+		
+	},
+	
 	setHex: function ( hex ) {
 
 		this.hex = ( ~~ hex ) & 0xffffff;

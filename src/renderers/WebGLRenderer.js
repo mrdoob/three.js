@@ -154,7 +154,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.createParticleBuffers = function( geometry ) {
 
 		geometry.__webGLVertexBuffer = _gl.createBuffer();
-		geometry.__webGLFaceBuffer = _gl.createBuffer();
+		geometry.__webGLParticleBuffer = _gl.createBuffer();
 
 	};
 
@@ -185,6 +185,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 		geometry.__lineArray = new Uint16Array( nvertices );
 
 		geometry.__webGLLineCount = nvertices;
+
+	};
+
+	this.initParticleBuffers = function( geometry ) {
+
+		var nvertices = geometry.vertices.length;
+
+		geometry.__vertexArray = new Float32Array( nvertices * 3 );
+		geometry.__particleArray = new Uint16Array( nvertices );
+
+		geometry.__webGLParticleCount = nvertices;
 
 	};
 
@@ -662,6 +673,50 @@ THREE.WebGLRenderer = function ( parameters ) {
 	};
 
 	this.setParticleBuffers = function( geometry, hint, dirtyVertices, dirtyElements ) {
+
+		var v, vertex, offset,
+			vertices = geometry.vertices,
+			vl = vertices.length,
+
+			vertexArray = geometry.__vertexArray,
+			particleArray = geometry.__particleArray;
+
+		if ( dirtyVertices ) {
+
+			for ( v = 0; v < vl; v++ ) {
+
+				vertex = vertices[ v ].position;
+
+				offset = v * 3;
+
+				vertexArray[ offset ]     = vertex.x;
+				vertexArray[ offset + 1 ] = vertex.y;
+				vertexArray[ offset + 2 ] = vertex.z;
+
+			}
+
+		}
+
+		// yeah, this is silly as order of element indices is currently fixed
+		// though this could change if some use case arises
+		// (like depth-sorting of semi-opaque particles)
+
+		if ( dirtyElements ) {
+
+			for ( v = 0; v < vl; v++ ) {
+
+				particleArray[ v ] = v;
+
+			}
+
+		}
+		
+		_gl.bindBuffer( _gl.ARRAY_BUFFER, geometry.__webGLVertexBuffer );
+		_gl.bufferData( _gl.ARRAY_BUFFER, vertexArray, hint );
+
+		_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometry.__webGLParticleBuffer );
+		_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, particleArray, hint );
+		
 	};
 
 	function setMaterialShaders( material, shaders ) {
@@ -734,6 +789,32 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	function refreshUniformsParticle( material, fog ) {
+
+		material.uniforms.color.value.setRGB( material.color.r * material.opacity, material.color.g * material.opacity, material.color.b * material.opacity );
+		material.uniforms.opacity.value = material.opacity;
+		material.uniforms.size.value = material.size;
+		material.uniforms.map.texture = material.map;
+
+		if ( fog ) {
+
+			material.uniforms.fogColor.value.setHex( fog.color.hex );
+
+			if ( fog instanceof THREE.Fog ) {
+
+				material.uniforms.fogNear.value = fog.near;
+				material.uniforms.fogFar.value = fog.far;
+
+			} else if ( fog instanceof THREE.FogExp2 ) {
+
+				material.uniforms.fogDensity.value = fog.density;
+
+			}
+
+		}
+
+	};
+
 	function refreshUniformsPhong( material ) {
 
 		//material.uniforms.ambient.value.setHex( material.ambient.hex );
@@ -786,6 +867,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				setMaterialShaders( material, THREE.ShaderLib[ 'basic' ] );
 
+			} else if ( material instanceof THREE.ParticleBasicMaterial ) {
+				
+				setMaterialShaders( material, THREE.ShaderLib[ 'particle_basic' ] );
+				
 			}
 
 			// heuristics to create shader parameters according to lights in the scene
@@ -847,6 +932,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( material instanceof THREE.LineBasicMaterial ) {
 
 			refreshUniformsLine( material, fog );
+			
+		}
+
+		if ( material instanceof THREE.ParticleBasicMaterial ) {
+
+			refreshUniformsParticle( material, fog );
+			
 		}
 
 		if ( material instanceof THREE.MeshPhongMaterial ) {
@@ -859,6 +951,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			material.uniforms.mNear.value = camera.near;
 			material.uniforms.mFar.value = camera.far;
+			
 		}
 		
 		setUniforms( program, material.uniforms );
@@ -940,13 +1033,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryChunk.__webGLLineBuffer );
 			_gl.drawElements( primitives, geometryChunk.__webGLLineCount, _gl.UNSIGNED_SHORT, 0 );
 
+		// render particles
+
+		} else if ( material instanceof THREE.ParticleBasicMaterial ) {
+
+			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryChunk.__webGLParticleBuffer );
+			_gl.drawElements( _gl.POINTS, geometryChunk.__webGLParticleCount, _gl.UNSIGNED_SHORT, 0 );			
+
 		// render triangles
-
+			
 		} else {
-
+			
 			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryChunk.__webGLFaceBuffer );
 			_gl.drawElements( _gl.TRIANGLES, geometryChunk.__webGLFaceCount, _gl.UNSIGNED_SHORT, 0 );
-
+			
 		}
 
 	};
@@ -1199,10 +1299,23 @@ THREE.WebGLRenderer = function ( parameters ) {
 				if( ! geometry.__webGLVertexBuffer ) {
 
 					this.createParticleBuffers( geometry );
+					this.initParticleBuffers( geometry );
+
+					geometry.__dirtyVertices = true;
+					geometry.__dirtyElements = true;
+					
+				}
+
+				if( geometry.__dirtyVertices ) {
+
+					this.setParticleBuffers( geometry, _gl.DYNAMIC_DRAW, geometry.__dirtyVertices, geometry.__dirtyElements );
 
 				}
 
 				add_buffer( objmap, 0, geometry, object );
+
+				geometry.__dirtyVertices = false;
+				geometry.__dirtyElements = false;
 
 
 			}/*else if ( object instanceof THREE.Particle ) {
@@ -1955,7 +2068,30 @@ THREE.Snippets = {
 
 	].join("\n"),
 	
-	// COLOR MAP
+	// COLOR MAP (particles)
+
+	map_particle_pars_fragment: [
+
+	"#ifdef USE_MAP",
+
+		"uniform sampler2D map;",
+
+	"#endif"
+
+	].join("\n"),
+
+
+	map_particle_fragment: [
+
+	"#ifdef USE_MAP",
+
+		"mapColor = texture2D( map, gl_PointCoord );",
+
+	"#endif"
+
+	].join("\n"),
+
+	// COLOR MAP (triangles)
 
 	map_pars_fragment: [
 
@@ -2230,8 +2366,22 @@ THREE.UniformsLib = {
 	"pointLightPosition"		: { type: "fv", value: [] },
 	"pointLightColor"			: { type: "fv", value: [] }
 
-	}
+	},
 
+	particle: {
+
+	"color"   : { type: "c", value: new THREE.Color( 0xeeeeee ) },
+	"opacity" : { type: "f", value: 1 },
+	"size" 	  : { type: "f", value: 1 },
+	"map"     : { type: "t", value: 0, texture: null },
+
+	"fogDensity": { type: "f", value: 0.00025 },
+	"fogNear"	: { type: "f", value: 1 },
+	"fogFar"	: { type: "f", value: 2000 },
+	"fogColor"	: { type: "c", value: new THREE.Color( 0xffffff ) }
+	
+	}
+	
 };
 
 THREE.ShaderLib = {
@@ -2508,6 +2658,52 @@ THREE.ShaderLib = {
 
 		].join("\n")
 
+	},
+	
+	'particle_basic': {
+
+		uniforms: THREE.UniformsLib[ "particle" ],
+
+		fragment_shader: [
+
+			"uniform vec3 color;",
+			"uniform float opacity;",
+
+			THREE.Snippets[ "map_particle_pars_fragment" ],
+			THREE.Snippets[ "fog_pars_fragment" ],
+
+			"void main() {",
+
+				"vec4 mColor = vec4( color, opacity );",
+				"vec4 mapColor = vec4( 1.0 );",
+
+				THREE.Snippets[ "map_particle_fragment" ],
+		
+				"gl_FragColor = mColor * mapColor;",
+
+				THREE.Snippets[ "fog_fragment" ],
+
+			"}"
+
+		].join("\n"),
+
+		vertex_shader: [
+
+			"uniform float size;",
+			
+			"void main() {",
+
+				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
+
+				"gl_Position = projectionMatrix * mvPosition;",
+				"gl_PointSize = size;",
+				//"gl_PointSize = 10.0 + 6.0 * mvPosition.z;";
+
+			"}"
+
+		].join("\n")
+
 	}
+	
 
 };
