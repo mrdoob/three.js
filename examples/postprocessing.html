@@ -65,48 +65,6 @@
 
         <script type="text/javascript" src="js/Stats.js"></script>
         <script type="text/javascript" src="../build/ThreeExtras.js"></script>
-
-
-		<!-- -----------------------------------------------------------------
-			Convolution shader 
-			  - ported from o3d sample to WebGL / GLSL
-					http://o3d.googlecode.com/svn/trunk/samples/convolution.html
-		----------------------------------------------------------------- ->
-		
-		<!-- Convolution fragment shader -->
-		<script id="fs-convolution" type="x-shader/x-fragment">
-		varying vec2 vUv;
-		
-		uniform sampler2D tDiffuse; 
-		uniform vec2 uImageIncrement;
-		
-		#define KERNEL_SIZE 25
-		uniform float cKernel[KERNEL_SIZE];
-		
-		void main(void) {
-			vec2 imageCoord = vUv;
-			vec4 sum = vec4( 0.0, 0.0, 0.0, 0.0 );
-			for( int i=0; i<KERNEL_SIZE; ++i ) {
-				sum += texture2D( tDiffuse, imageCoord ) * cKernel[i];
-				imageCoord += uImageIncrement;
-			}
-			gl_FragColor = sum;
-		}
-		</script>
-		
-		<!-- Convolution vertex shader -->
-		<script id="vs-convolution" type="x-shader/x-vertex">
-		varying vec2 vUv;
-		
-		uniform vec2 uImageIncrement;
-		#define KERNEL_SIZE 25.0
-		
-		void main(void) {
-			//vUv = vec2( uv.x, 1.0 - uv.y ) - ((KERNEL_SIZE - 1.0) / 2.0) * uImageIncrement;
-			vUv = uv - ((KERNEL_SIZE - 1.0) / 2.0) * uImageIncrement;
-			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-		}
-		</script>
 		
 		<!-- -----------------------------------------------------------------
 			Film grain & scanlines shader
@@ -282,22 +240,26 @@
 
                 } );
 
-				var kernel = buildKernel( 4.0 ), increment = 0.001953125;
+				var increment = 0.001953125;
 				
 				blurx = new THREE.Vector2( increment, 0.0 ),
 				blury = new THREE.Vector2( 0.0, increment );
 				
+				var shader = ShaderUtils.lib["convolution"];
+				var uniforms = Uniforms.clone( shader.uniforms );
+				
+				uniforms["tDiffuse"].texture = rtTexture1;
+				uniforms["uImageIncrement"].value = blurx;
+				uniforms["cKernel"].value = ShaderUtils.buildKernel( 4.0 );
+				
                 materialConvolution = new THREE.MeshShaderMaterial( {
 
-                    uniforms: { tDiffuse: { type: "t", value: 0, texture: rtTexture1 },
-								uImageIncrement: { type: "v2", value: blury },
-								cKernel: { type: "fv1", value: kernel }
-							  },
-                    vertex_shader: document.getElementById( 'vs-convolution' ).textContent,
-                    fragment_shader: document.getElementById( 'fs-convolution' ).textContent
+                    uniforms: uniforms,
+                    vertex_shader: shader.vertex_shader,
+                    fragment_shader: shader.fragment_shader
 
                 } );
-				
+
 				var plane = new Plane( window.innerWidth, window.innerHeight );
 				
                 quadBG = new THREE.Mesh( plane, materialColor );
@@ -373,42 +335,6 @@
 				
 				loader.statusDomElement.style.display = "none";
 
-			}
-
-			/*****************************************************************************************/
-			// Convolution  
-			//  - ported from o3d convolution shader sample 
-			//      http://o3d.googlecode.com/svn/trunk/samples/convolution.html
-			/*****************************************************************************************/
-
-			// We lop off the sqrt(2 * pi) * sigma term, since we're going to normalize anyway.
-			function gauss( x, sigma ) {
-			
-				return Math.exp( - (x * x) / (2.0 * sigma * sigma) );
-				
-			}
-
-			function buildKernel( sigma ) {
-			
-				var kMaxKernelSize = 25;
-				var kernelSize = 2 * Math.ceil( sigma * 3.0 ) + 1;
-				if ( kernelSize > kMaxKernelSize ) kernelSize = kMaxKernelSize;
-				var halfWidth = ( kernelSize - 1 ) * 0.5
-				
-				var values = new Array( kernelSize );
-				var sum = 0.0;
-				for( var i = 0; i < kernelSize; ++i ) {
-				
-					values[ i ] = gauss( i - halfWidth, sigma );
-					sum += values[ i ];
-					
-				}
-				
-				// normalize the kernel
-				for( var i = 0; i<kernelSize; ++i ) values[ i ] /= sum;
-				
-				return values;
-				
 			}
 
 			var delta = 0.01;
