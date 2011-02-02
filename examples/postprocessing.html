@@ -187,8 +187,8 @@
                 materialConvolution = new THREE.MeshShaderMaterial( {
 
                     uniforms: convolution_uniforms,
-                    vertex_shader: convolution_shader.vertex_shader,
-                    fragment_shader: convolution_shader.fragment_shader
+                    vertex_shader:   "#define KERNEL_SIZE 25.0\n" + convolution_shader.vertex_shader,
+                    fragment_shader: "#define KERNEL_SIZE 25\n"   + convolution_shader.fragment_shader
 
                 } );
 

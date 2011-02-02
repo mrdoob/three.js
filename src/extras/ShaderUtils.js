@@ -341,7 +341,7 @@ var ShaderUtils = {
 		"varying vec2 vUv;",
 		
 		"uniform vec2 uImageIncrement;",
-		"#define KERNEL_SIZE 25.0",
+		//"#define KERNEL_SIZE 25.0",
 		
 		"void main(void) {",
 		
@@ -359,7 +359,7 @@ var ShaderUtils = {
 		"uniform sampler2D tDiffuse;",
 		"uniform vec2 uImageIncrement;",
 		
-		"#define KERNEL_SIZE 25",
+		//"#define KERNEL_SIZE 25",
 		"uniform float cKernel[KERNEL_SIZE];",
 		
 		"void main(void) {",
