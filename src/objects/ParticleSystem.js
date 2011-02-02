@@ -9,8 +9,6 @@ THREE.ParticleSystem = function ( geometry, materials ) {
 	this.geometry = geometry;
 	this.materials = materials instanceof Array ? materials : [ materials ];
 
-	this.autoUpdateMatrix = false;
-
 };
 
 THREE.ParticleSystem.prototype = new THREE.Object3D();

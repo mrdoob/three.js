@@ -127,7 +127,6 @@
 					particles.rotation.x = Math.random() * 6;
 					particles.rotation.y = Math.random() * 6;
 					particles.rotation.z = Math.random() * 6;
-					particles.updateMatrix();
 					scene.addObject( particles );
 					
 				}
@@ -193,7 +192,6 @@
 				for( i = 0; i < scene.objects.length; i++ ) {
 				
 					scene.objects[i].rotation.y = time * ( i < 4 ? i+1 : - (i+1) );
-					scene.objects[i].updateMatrix();
 					
 				}
 
