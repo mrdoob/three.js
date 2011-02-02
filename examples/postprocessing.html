@@ -127,20 +127,6 @@
 			gl_FragColor =  vec4( cResult, cTextureScreen.a );
 		}
 		</script>
-        
-    
-		<!-- Render parameter modulated texture fragment shader -->
-        <script id="fs-screen" type="x-shader/x-fragment">
-			varying vec2 vUv;
-			uniform sampler2D tDiffuse;
-			uniform float opacity;
-			
-            void main(void)
-            {
-				vec4 texel = texture2D( tDiffuse, vUv );
-				gl_FragColor = opacity * texel;
-            }
-        </script>
 
 		<!-- Time modulated procedural color fragment shader -->
         <script id="fs-colors" type="x-shader/x-fragment">
@@ -219,13 +205,17 @@
 
                 } );
 
+				var screen_shader = ShaderUtils.lib["screen"];
+				var screen_uniforms = Uniforms.clone( screen_shader.uniforms );
+				
+				screen_uniforms["tDiffuse"].texture = rtTexture1;
+				screen_uniforms["opacity"].value = 0.4;
+				
                 materialScreen = new THREE.MeshShaderMaterial( {
 
-                    uniforms: { tDiffuse: { type: "t", value: 0, texture: rtTexture1 },
-								opacity: { type: "f", value: 0.4 } 
-							  },
-                    vertex_shader: getText( 'vs-generic' ),
-                    fragment_shader: getText( 'fs-screen' ),
+                    uniforms: screen_uniforms,
+                    vertex_shader: screen_shader.vertex_shader,
+                    fragment_shader: screen_shader.fragment_shader,
 					blending: THREE.AdditiveBlending
 
                 } );
@@ -245,18 +235,18 @@
 				blurx = new THREE.Vector2( increment, 0.0 ),
 				blury = new THREE.Vector2( 0.0, increment );
 				
-				var shader = ShaderUtils.lib["convolution"];
-				var uniforms = Uniforms.clone( shader.uniforms );
+				var convolution_shader = ShaderUtils.lib["convolution"];
+				var convolution_uniforms = Uniforms.clone( convolution_shader.uniforms );
 				
-				uniforms["tDiffuse"].texture = rtTexture1;
-				uniforms["uImageIncrement"].value = blurx;
-				uniforms["cKernel"].value = ShaderUtils.buildKernel( 4.0 );
+				convolution_uniforms["tDiffuse"].texture = rtTexture1;
+				convolution_uniforms["uImageIncrement"].value = blurx;
+				convolution_uniforms["cKernel"].value = ShaderUtils.buildKernel( 4.0 );
 				
                 materialConvolution = new THREE.MeshShaderMaterial( {
 
-                    uniforms: uniforms,
-                    vertex_shader: shader.vertex_shader,
-                    fragment_shader: shader.fragment_shader
+                    uniforms: convolution_uniforms,
+                    vertex_shader: convolution_shader.vertex_shader,
+                    fragment_shader: convolution_shader.fragment_shader
 
                 } );
 

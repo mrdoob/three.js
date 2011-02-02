@@ -7,69 +7,73 @@ var ShaderUtils = {
 			- based on Nvidia Cg tutorial
 		 ------------------------------------------------------------------------- */
 		
-			'fresnel': {
+		'fresnel': {
 
-			uniforms: {
+		uniforms: {
 
-			"mRefractionRatio": { type: "f", value: 1.02 },
-			"mFresnelBias": { type: "f", value: 0.1 },
-			"mFresnelPower": { type: "f", value: 2.0 },
-			"mFresnelScale": { type: "f", value: 1.0 },
-			"tCube": { type: "t", value: 1, texture: null }
+		"mRefractionRatio": { type: "f", value: 1.02 },
+		"mFresnelBias": { type: "f", value: 0.1 },
+		"mFresnelPower": { type: "f", value: 2.0 },
+		"mFresnelScale": { type: "f", value: 1.0 },
+		"tCube": { type: "t", value: 1, texture: null }
 
-			},
+		},
 
-			fragment_shader: [
+		fragment_shader: [
 
-			"uniform samplerCube tCube;",
+		"uniform samplerCube tCube;",
 
-			"varying vec3 vReflect;",
-			"varying vec3 vRefract[3];",
-			"varying float vReflectionFactor;",
+		"varying vec3 vReflect;",
+		"varying vec3 vRefract[3];",
+		"varying float vReflectionFactor;",
 
-			"void main() {",
-				"vec4 reflectedColor = textureCube( tCube, vec3( -vReflect.x, vReflect.yz ) );",
-				"vec4 refractedColor = vec4( 1.0, 1.0, 1.0, 1.0 );",
+		"void main() {",
+		
+			"vec4 reflectedColor = textureCube( tCube, vec3( -vReflect.x, vReflect.yz ) );",
+			"vec4 refractedColor = vec4( 1.0, 1.0, 1.0, 1.0 );",
 
-				"refractedColor.r = textureCube( tCube, vec3( -vRefract[0].x, vRefract[0].yz ) ).r;",
-				"refractedColor.g = textureCube( tCube, vec3( -vRefract[1].x, vRefract[1].yz ) ).g;",
-				"refractedColor.b = textureCube( tCube, vec3( -vRefract[2].x, vRefract[2].yz ) ).b;",
-				"refractedColor.a = 1.0;",
+			"refractedColor.r = textureCube( tCube, vec3( -vRefract[0].x, vRefract[0].yz ) ).r;",
+			"refractedColor.g = textureCube( tCube, vec3( -vRefract[1].x, vRefract[1].yz ) ).g;",
+			"refractedColor.b = textureCube( tCube, vec3( -vRefract[2].x, vRefract[2].yz ) ).b;",
+			"refractedColor.a = 1.0;",
 
-				"gl_FragColor = mix( refractedColor, reflectedColor, clamp( vReflectionFactor, 0.0, 1.0 ) );",
-			"}"
+			"gl_FragColor = mix( refractedColor, reflectedColor, clamp( vReflectionFactor, 0.0, 1.0 ) );",
+		
+		"}"
 
-			].join("\n"),
+		].join("\n"),
 
-			vertex_shader: [
+		vertex_shader: [
 
-			"uniform float mRefractionRatio;",
-			"uniform float mFresnelBias;",
-			"uniform float mFresnelScale;",
-			"uniform float mFresnelPower;",
+		"uniform float mRefractionRatio;",
+		"uniform float mFresnelBias;",
+		"uniform float mFresnelScale;",
+		"uniform float mFresnelPower;",
 
-			"varying vec3 vReflect;",
-			"varying vec3 vRefract[3];",
-			"varying float vReflectionFactor;",
+		"varying vec3 vReflect;",
+		"varying vec3 vRefract[3];",
+		"varying float vReflectionFactor;",
 
-			"void main(void) {",
-				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
-				"vec4 mPosition = objectMatrix * vec4( position, 1.0 );",
+		"void main() {",
+		
+			"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
+			"vec4 mPosition = objectMatrix * vec4( position, 1.0 );",
 
-				"vec3 nWorld = normalize ( mat3( objectMatrix[0].xyz, objectMatrix[1].xyz, objectMatrix[2].xyz ) * normal );",
+			"vec3 nWorld = normalize ( mat3( objectMatrix[0].xyz, objectMatrix[1].xyz, objectMatrix[2].xyz ) * normal );",
 
-				"vec3 I = mPosition.xyz - cameraPosition;",
+			"vec3 I = mPosition.xyz - cameraPosition;",
 
-				"vReflect = reflect( I, nWorld );",
-				"vRefract[0] = refract( normalize( I ), nWorld, mRefractionRatio );",
-				"vRefract[1] = refract( normalize( I ), nWorld, mRefractionRatio * 0.99 );",
-				"vRefract[2] = refract( normalize( I ), nWorld, mRefractionRatio * 0.98 );",
-				"vReflectionFactor = mFresnelBias + mFresnelScale * pow( 1.0 + dot( normalize( I ), nWorld ), mFresnelPower );",
+			"vReflect = reflect( I, nWorld );",
+			"vRefract[0] = refract( normalize( I ), nWorld, mRefractionRatio );",
+			"vRefract[1] = refract( normalize( I ), nWorld, mRefractionRatio * 0.99 );",
+			"vRefract[2] = refract( normalize( I ), nWorld, mRefractionRatio * 0.98 );",
+			"vReflectionFactor = mFresnelBias + mFresnelScale * pow( 1.0 + dot( normalize( I ), nWorld ), mFresnelPower );",
 
-				"gl_Position = projectionMatrix * mvPosition;",
-			"}"
+			"gl_Position = projectionMatrix * mvPosition;",
+			
+		"}"
 
-			].join("\n")
+		].join("\n")
 
 		},
 
@@ -340,8 +344,10 @@ var ShaderUtils = {
 		"#define KERNEL_SIZE 25.0",
 		
 		"void main(void) {",
+		
 			"vUv = uv - ((KERNEL_SIZE - 1.0) / 2.0) * uImageIncrement;",
 			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+		
 		"}"
 
 		].join("\n"),
@@ -357,6 +363,7 @@ var ShaderUtils = {
 		"uniform float cKernel[KERNEL_SIZE];",
 		
 		"void main(void) {",
+		
 			"vec2 imageCoord = vUv;",
 			"vec4 sum = vec4( 0.0, 0.0, 0.0, 0.0 );",
 			"for( int i=0; i<KERNEL_SIZE; ++i ) {",
@@ -364,6 +371,7 @@ var ShaderUtils = {
 				"imageCoord += uImageIncrement;",
 			"}",
 			"gl_FragColor = sum;",
+			
 		"}"
 			
 
@@ -371,6 +379,47 @@ var ShaderUtils = {
 
 		},
 
+		/* -------------------------------------------------------------------------
+			Full-screen textured quad shader
+		 ------------------------------------------------------------------------- */
+		
+		'screen': {
+
+		uniforms: { tDiffuse: { type: "t", value: 0, texture: null },
+					opacity: { type: "f", value: 1.0 } 
+				  },
+
+		vertex_shader: [
+
+		"varying vec2 vUv;",
+
+		"void main() {",
+			
+			"vUv = vec2( uv.x, 1.0 - uv.y );",
+			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+			
+		"}"
+
+		].join("\n"),
+
+		fragment_shader: [
+		
+		"varying vec2 vUv;",
+		"uniform sampler2D tDiffuse;",
+		"uniform float opacity;",
+		
+		"void main() {",
+		
+			"vec4 texel = texture2D( tDiffuse, vUv );",
+			"gl_FragColor = opacity * texel;",
+			
+		"}"
+
+		].join("\n")
+
+		},
+
+		
 		/* -------------------------------------------------------------------------
 			Simple test shader
 		 ------------------------------------------------------------------------- */
@@ -393,7 +442,7 @@ var ShaderUtils = {
 
 		"void main() {",
 
-			"gl_FragColor = vec4(1.0, 0.0, 0.0, 0.5);",
+			"gl_FragColor = vec4( 1.0, 0.0, 0.0, 0.5 );",
 
 		"}"
 
