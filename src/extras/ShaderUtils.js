@@ -3,8 +3,8 @@ var ShaderUtils = {
 	lib: { 
 		
 		/* -------------------------------------------------------------------------
-			Fresnel shader
-			- based on Nvidia Cg tutorial
+		//	Fresnel shader
+		//	- based on Nvidia Cg tutorial
 		 ------------------------------------------------------------------------- */
 		
 		'fresnel': {
@@ -78,10 +78,10 @@ var ShaderUtils = {
 		},
 
 		/* -------------------------------------------------------------------------
-			Normal map shader 
-				- Blinn-Phong 
-				- normal + diffuse + AO + displacement maps
-				- 1 point and 1 directional lights
+		//	Normal map shader 
+		//		- Blinn-Phong 
+		//		- normal + diffuse + AO + displacement maps
+		//		- 1 point and 1 directional lights
 		 ------------------------------------------------------------------------- */
 		
 		'normal' : {
@@ -282,7 +282,7 @@ var ShaderUtils = {
 		},
 
 		/* -------------------------------------------------------------------------
-			Cube map shader
+		//	Cube map shader
 		 ------------------------------------------------------------------------- */
 		
 		'cube': {
@@ -322,9 +322,9 @@ var ShaderUtils = {
 		},
 
 		/* ------------------------------------------------------------------------
-			Convolution shader 
-			  - ported from o3d sample to WebGL / GLSL
-					http://o3d.googlecode.com/svn/trunk/samples/convolution.html
+		//	Convolution shader 
+		//	  - ported from o3d sample to WebGL / GLSL
+		//			http://o3d.googlecode.com/svn/trunk/samples/convolution.html
 		------------------------------------------------------------------------ */
 		
 		'convolution': {
@@ -380,7 +380,97 @@ var ShaderUtils = {
 		},
 
 		/* -------------------------------------------------------------------------
-			Full-screen textured quad shader
+		
+		// Film grain & scanlines shader
+		
+		//	- ported from HLSL to WebGL / GLSL
+		//	  http://www.truevision3d.com/forums/showcase/staticnoise_colorblackwhite_scanline_shaders-t18698.0.html
+
+		// Screen Space Static Postprocessor
+		//
+		// Produces an analogue noise overlay similar to a film grain / TV static
+		//
+		// Original implementation and noise algorithm
+		// Pat 'Hawthorne' Shearon
+		//
+		// Optimized scanlines + noise version with intensity scaling
+		// Georg 'Leviathan' Steinrohder
+		
+		// This version is provided under a Creative Commons Attribution 3.0 License
+		// http://creativecommons.org/licenses/by/3.0/
+		 ------------------------------------------------------------------------- */
+
+		'film': {
+
+		uniforms: { tDiffuse: { type: "t", value: 0, texture: null },
+					time: { type: "f", value: 0.0 }
+				  },
+
+		vertex_shader: [
+            
+		"varying vec2 vUv;",
+
+		"void main() {",
+               
+			"vUv = vec2( uv.x, 1.0 - uv.y );",
+			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+		
+		"}"
+
+		].join("\n"),
+
+		fragment_shader: [
+		
+		"varying vec2 vUv;",
+		"uniform sampler2D tDiffuse;",
+		
+		// control parameter
+		"uniform float time;",
+
+		// noise effect intensity value (0 = no effect, 1 = full effect)
+		"const float fNintensity = 0.35;",
+		
+		// scanlines effect intensity value (0 = no effect, 1 = full effect)
+		"const float fSintensity = 0.35;",
+		
+		// scanlines effect count value (0 = no effect, 4096 = full effect)
+		"const float fScount = 4096.0;",
+		
+		"void main() {",
+			
+			// sample the source
+			"vec4 cTextureScreen = texture2D( tDiffuse, vUv );",
+
+			// make some noise
+			"float x = vUv.x * vUv.y * time *  1000.0;",
+			"x = mod( x, 13.0 ) * mod( x, 123.0 );",
+			"float dx = mod( x, 0.01 );",
+
+			// add noise
+			"vec3 cResult = cTextureScreen.rgb + cTextureScreen.rgb * clamp( 0.1 + dx * 100.0, 0.0, 1.0 );",
+
+			// get us a sine and cosine
+			"vec2 sc = vec2( sin(vUv.y * fScount), cos(vUv.y * fScount) );",
+
+			// add scanlines
+			"cResult += cTextureScreen.rgb * vec3( sc.x, sc.y, sc.x ) * fSintensity;",
+			
+			// interpolate between source and result by intensity
+			"cResult = cTextureScreen.rgb + clamp( fNintensity, 0.0,1.0 ) * ( cResult - cTextureScreen.rgb );",
+
+			// convert to grayscale if desired
+			"cResult = vec3( cResult.r * 0.3 + cResult.g * 0.59 + cResult.b * 0.11 );",
+
+			"gl_FragColor =  vec4( cResult, cTextureScreen.a );",
+		
+		"}"
+
+		].join("\n")
+
+		},
+
+		/* -------------------------------------------------------------------------
+		//	Full-screen textured quad shader
 		 ------------------------------------------------------------------------- */
 		
 		'screen': {
@@ -421,7 +511,7 @@ var ShaderUtils = {
 
 		
 		/* -------------------------------------------------------------------------
-			Simple test shader
+		//	Simple test shader
 		 ------------------------------------------------------------------------- */
 		
 		'basic': {
