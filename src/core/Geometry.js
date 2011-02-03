@@ -10,6 +10,7 @@ THREE.Geometry = function () {
 	this.faces = [];
 	this.uvs = [];
 	this.uvs2 = [];
+	this.colors = [];
 
 	this.boundingBox = null;
 	this.boundingSphere = null;

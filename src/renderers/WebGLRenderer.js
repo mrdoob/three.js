@@ -197,6 +197,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var nvertices = geometry.vertices.length;
 
 		geometry.__vertexArray = new Float32Array( nvertices * 3 );
+		geometry.__colorArray = new Float32Array( nvertices * 3 );
 		geometry.__particleArray = new Uint16Array( nvertices );
 		
 		geometry.__sortArray = [];
@@ -665,6 +666,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometry.__webGLVertexBuffer );
+			_gl.bufferData( _gl.ARRAY_BUFFER, vertexArray, hint );
+
 		}
 
 		// yeah, this is silly as order of element indices is currently fixed
@@ -678,24 +682,25 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
+			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometry.__webGLLineBuffer );
+			_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, lineArray, hint );
+
 		}
-
-		_gl.bindBuffer( _gl.ARRAY_BUFFER, geometry.__webGLVertexBuffer );
-		_gl.bufferData( _gl.ARRAY_BUFFER, vertexArray, hint );
-
-		_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometry.__webGLLineBuffer );
-		_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, lineArray, hint );
 
 	};
 
 	this.setParticleBuffers = function( geometry, hint, object, camera ) {
 
-		var v, vertex, offset,
+		var v, c, vertex, offset,
 			vertices = geometry.vertices,
 			vl = vertices.length,
 
+			colors = geometry.colors,
+			cl = colors.length,
+		
 			vertexArray = geometry.__vertexArray,
 			particleArray = geometry.__particleArray,
+			colorArray = geometry.__colorArray,
 		
 			sortArray = geometry.__sortArray,
 		
@@ -730,8 +735,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 				vertexArray[ offset ]     = vertex.x;
 				vertexArray[ offset + 1 ] = vertex.y;
 				vertexArray[ offset + 2 ] = vertex.z;
-				
 			}
+			
+			for ( c = 0; c < cl; c++ ) {
+				
+				offset = c * 3;
+				
+				color = colors[ sortArray[c][1] ];
+
+				colorArray[ offset ]     = color.r;
+				colorArray[ offset + 1 ] = color.g;
+				colorArray[ offset + 2 ] = color.b;
+				
+			}			
+			
 			
 		} else {
 		
@@ -750,8 +767,25 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 			}
+			
+			if ( dirtyColors ) {
+				
+				for ( c = 0; c < cl; c++ ) {
+
+					color = colors[ c ];
+
+					offset = c * 3;
+
+					colorArray[ offset ]     = color.r;
+					colorArray[ offset + 1 ] = color.g;
+					colorArray[ offset + 2 ] = color.b;
+
+				}					
+				
+			}
 
 		}
+		
 		
 		// yeah, this is silly as order of element indices is currently fixed
 		// though this could change if some use case arises
@@ -764,15 +798,25 @@ THREE.WebGLRenderer = function ( parameters ) {
 				particleArray[ v ] = v;
 
 			}
+			
+			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometry.__webGLParticleBuffer );
+			_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, particleArray, hint );
 
 		}
-			
 		
-		_gl.bindBuffer( _gl.ARRAY_BUFFER, geometry.__webGLVertexBuffer );
-		_gl.bufferData( _gl.ARRAY_BUFFER, vertexArray, hint );
-
-		_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometry.__webGLParticleBuffer );
-		_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, particleArray, hint );
+		if ( dirtyVertices || object.sortParticles ) {
+		
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometry.__webGLVertexBuffer );
+			_gl.bufferData( _gl.ARRAY_BUFFER, vertexArray, hint );
+			
+		}
+		
+		if ( dirtyColors || object.sortParticles ) {
+			
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometry.__webGLColorBuffer );
+			_gl.bufferData( _gl.ARRAY_BUFFER, colorArray, hint );
+		
+		}
 		
 	};
 
@@ -787,7 +831,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	function refreshUniformsCommon( material, fog ) {
 
 		// premultiply alpha
-		material.uniforms.color.value.setRGB( material.color.r * material.opacity, material.color.g * material.opacity, material.color.b * material.opacity );
+		material.uniforms.diffuse.value.setRGB( material.color.r * material.opacity, material.color.g * material.opacity, material.color.b * material.opacity );
 
 		// pure color
 		//material.uniforms.color.value.setHex( material.color.hex );
@@ -824,7 +868,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function refreshUniformsLine( material, fog ) {
 
-		material.uniforms.color.value.setRGB( material.color.r * material.opacity, material.color.g * material.opacity, material.color.b * material.opacity );
+		material.uniforms.diffuse.value.setRGB( material.color.r * material.opacity, material.color.g * material.opacity, material.color.b * material.opacity );
 		material.uniforms.opacity.value = material.opacity;
 
 		if ( fog ) {
@@ -848,7 +892,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function refreshUniformsParticle( material, fog ) {
 
-		material.uniforms.color.value.setRGB( material.color.r * material.opacity, material.color.g * material.opacity, material.color.b * material.opacity );
+		material.uniforms.psColor.value.setRGB( material.color.r * material.opacity, material.color.g * material.opacity, material.color.b * material.opacity );
 		material.uniforms.opacity.value = material.opacity;
 		material.uniforms.size.value = material.size;
 		material.uniforms.map.texture = material.map;
@@ -935,7 +979,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			maxLightCount = allocateLights( lights, 4 );
 
-			parameters = { fog: fog, map: material.map, env_map: material.env_map, light_map: material.light_map, maxDirLights: maxLightCount.directional, maxPointLights: maxLightCount.point };
+			parameters = { fog: fog, map: material.map, env_map: material.env_map, light_map: material.light_map, vertex_colors: material.vertex_colors,
+						   maxDirLights: maxLightCount.directional, maxPointLights: maxLightCount.point };
 			material.program = buildProgram( material.fragment_shader, material.vertex_shader, parameters );
 
 			identifiers = [ 'viewMatrix', 'modelViewMatrix', 'projectionMatrix', 'normalMatrix', 'objectMatrix', 'cameraPosition' ];
@@ -946,7 +991,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 			cacheUniformLocations( material.program, identifiers );
-			cacheAttributeLocations( material.program, [ "position", "normal", "uv", "uv2", "tangent" ] );
+			cacheAttributeLocations( material.program, [ "position", "normal", "uv", "uv2", "tangent", "color" ] );
 
 		}
 		
@@ -1020,6 +1065,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLVertexBuffer );
 		_gl.vertexAttribPointer( attributes.position, 3, _gl.FLOAT, false, 0, 0 );
 		_gl.enableVertexAttribArray( attributes.position );
+
+		// colors
+
+		if ( attributes.color >= 0 ) {
+
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLColorBuffer );
+			_gl.vertexAttribPointer( attributes.color, 3, _gl.FLOAT, false, 0, 0 );
+			_gl.enableVertexAttribArray( attributes.color );
+
+		}
 
 		// normals
 
@@ -1588,6 +1643,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			parameters.map ? "#define USE_MAP" : "",
 			parameters.env_map ? "#define USE_ENVMAP" : "",
 			parameters.light_map ? "#define USE_LIGHTMAP" : "",
+			parameters.vertex_colors ? "#define USE_COLOR" : "",
 
 			"uniform mat4 viewMatrix;",
 			"uniform vec3 cameraPosition;",
@@ -1603,6 +1659,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			parameters.map ? "#define USE_MAP" : "",
 			parameters.env_map ? "#define USE_ENVMAP" : "",
 			parameters.light_map ? "#define USE_LIGHTMAP" : "",
+			parameters.vertex_colors ? "#define USE_COLOR" : "",
 
 			"uniform mat4 objectMatrix;",
 			"uniform mat4 modelViewMatrix;",
@@ -1612,6 +1669,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			"uniform vec3 cameraPosition;",
 			"attribute vec3 position;",
 			"attribute vec3 normal;",
+			"attribute vec3 color;",
 			"attribute vec2 uv;",
 			"attribute vec2 uv2;",
 			""
@@ -2417,7 +2475,52 @@ THREE.Snippets = {
 		"totalLight += pointDiffuse + pointSpecular;",
 	"#endif"
 
+	].join("\n"),
+	
+	// VERTEX COLORS
+
+	color_pars_fragment: [
+
+	"#ifdef USE_COLOR",
+
+		"varying vec3 vColor;",
+
+	"#endif"
+
+	].join("\n"),
+
+
+	color_fragment: [
+
+	"#ifdef USE_COLOR",
+
+		"vertexColor = vec4( vColor, opacity );",
+
+	"#endif"
+
+	].join("\n"),
+	
+	color_pars_vertex: [
+
+	"#ifdef USE_COLOR",
+
+		"varying vec3 vColor;",
+
+	"#endif"
+
+	].join("\n"),
+
+
+	color_vertex: [
+
+	"#ifdef USE_COLOR",
+
+		"vColor = color;",
+
+	"#endif"
+
 	].join("\n")
+	
 
 };
 
@@ -2425,7 +2528,7 @@ THREE.UniformsLib = {
 
 	common: {
 
-	"color"   : { type: "c", value: new THREE.Color( 0xeeeeee ) },
+	"diffuse" : { type: "c", value: new THREE.Color( 0xeeeeee ) },
 	"opacity" : { type: "f", value: 1 },
 	"map"     : { type: "t", value: 0, texture: null },
 
@@ -2457,7 +2560,7 @@ THREE.UniformsLib = {
 
 	particle: {
 
-	"color"   : { type: "c", value: new THREE.Color( 0xeeeeee ) },
+	"psColor"   : { type: "c", value: new THREE.Color( 0xeeeeee ) },
 	"opacity" : { type: "f", value: 1 },
 	"size" 	  : { type: "f", value: 1 },
 	"map"     : { type: "t", value: 0, texture: null },
@@ -2544,7 +2647,7 @@ THREE.ShaderLib = {
 
 		fragment_shader: [
 
-			"uniform vec3 color;",
+			"uniform vec3 diffuse;",
 			"uniform float opacity;",
 
 			THREE.Snippets[ "map_pars_fragment" ],
@@ -2554,7 +2657,7 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-				"vec4 mColor = vec4( color, opacity );",
+				"vec4 mColor = vec4( diffuse, opacity );",
 				"vec4 mapColor = vec4( 1.0 );",
 				"vec4 lightmapColor = vec4( 1.0 );",
 				"vec4 cubeColor = vec4( 1.0 );",
@@ -2600,7 +2703,7 @@ THREE.ShaderLib = {
 
 		fragment_shader: [
 
-			"uniform vec3 color;",
+			"uniform vec3 diffuse;",
 			"uniform float opacity;",
 
 			"varying vec3 vLightWeighting;",
@@ -2612,7 +2715,7 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-				"vec4 mColor = vec4( color, opacity );",
+				"vec4 mColor = vec4( diffuse, opacity );",
 				"vec4 mapColor = vec4( 1.0 );",
 				"vec4 lightmapColor = vec4( 1.0 );",
 				"vec4 cubeColor = vec4( 1.0 );",
@@ -2672,7 +2775,7 @@ THREE.ShaderLib = {
 
 		fragment_shader: [
 
-			"uniform vec3 color;",
+			"uniform vec3 diffuse;",
 			"uniform float opacity;",
 
 			"uniform vec3 ambient;",
@@ -2689,7 +2792,7 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-				"vec4 mColor = vec4( color, opacity );",
+				"vec4 mColor = vec4( diffuse, opacity );",
 				"vec4 mapColor = vec4( 1.0 );",
 				"vec4 lightmapColor = vec4( 1.0 );",
 				"vec4 cubeColor = vec4( 1.0 );",
@@ -2753,20 +2856,23 @@ THREE.ShaderLib = {
 
 		fragment_shader: [
 
-			"uniform vec3 color;",
+			"uniform vec3 psColor;",
 			"uniform float opacity;",
 
+			THREE.Snippets[ "color_pars_fragment" ],
 			THREE.Snippets[ "map_particle_pars_fragment" ],
 			THREE.Snippets[ "fog_pars_fragment" ],
 
 			"void main() {",
 
-				"vec4 mColor = vec4( color, opacity );",
+				"vec4 mColor = vec4( psColor, opacity );",
 				"vec4 mapColor = vec4( 1.0 );",
+				"vec4 vertexColor = vec4( 1.0 );",
 
 				THREE.Snippets[ "map_particle_fragment" ],
+				THREE.Snippets[ "color_fragment" ],
 		
-				"gl_FragColor = mColor * mapColor;",
+				"gl_FragColor = mColor * mapColor * vertexColor;",
 
 				THREE.Snippets[ "fog_fragment" ],
 
@@ -2778,8 +2884,12 @@ THREE.ShaderLib = {
 
 			"uniform float size;",
 			
+			THREE.Snippets[ "color_pars_vertex" ],
+			
 			"void main() {",
 
+				THREE.Snippets[ "color_vertex" ],
+				
 				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
 
 				"gl_Position = projectionMatrix * mvPosition;",

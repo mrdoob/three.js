@@ -16,6 +16,8 @@ THREE.ParticleBasicMaterial = function ( parameters ) {
 	this.opacity = 1;
 	this.size = 1;
 	
+	this.vertex_colors = false;
+	
 	this.blending = THREE.NormalBlending;
 
 	this.offset = new THREE.Vector2(); // TODO: expose to parameters
@@ -27,6 +29,7 @@ THREE.ParticleBasicMaterial = function ( parameters ) {
 		if ( parameters.opacity !== undefined ) this.opacity  = parameters.opacity;
 		if ( parameters.size !== undefined ) this.size = parameters.size;
 		if ( parameters.blending !== undefined ) this.blending = parameters.blending;
+		if ( parameters.vertex_colors !== undefined ) this.vertex_colors = parameters.vertex_colors;
 
 	}
 
@@ -42,6 +45,7 @@ THREE.ParticleBasicMaterial.prototype = {
 			'opacity: ' + this.opacity + '<br/>' +
 			'size: ' + this.size + '<br/>' +
 			'blending: ' + this.blending + '<br/>' +
+			'vertex_colors: ' + this.vertex_colors + '<br/>' +
 			')';
 
 	}
