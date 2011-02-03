@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - particles - sprites - webgl</title>
+		<title>three.js - particles - billboards - webgl</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -48,8 +48,7 @@
 	<body>
 	
         <div id="info">
-			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl particle sprites example -
-			snowflakes by <a href="http://en.wikipedia.org/wiki/File:Sketch_of_snow_crystal_by_Ren%C3%A9_Descartes.jpg">Ren&eacute;  Descartes</a>
+			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl particle billboards example
 		</div>
 
 		<center>
@@ -76,7 +75,7 @@
 			}
 
 			var container, stats;
-			var camera, scene, renderer, particles, geometry, materials = [], parameters, i, h, color, sprite, size;
+			var camera, scene, renderer, particles, geometry, material, i, h, color, sprite, size, x, y, z;
 			var mouseX = 0, mouseY = 0;
 
 			var windowHalfX = window.innerWidth / 2;
@@ -84,58 +83,50 @@
 
 			init();
 			setInterval( loop, 1000 / 60 );
+			//loop();
 
 			function init() {
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 75, window.innerWidth / window.innerHeight, 1, 3000 );
+				camera = new THREE.Camera( 55, window.innerWidth / window.innerHeight, 1, 3000 );
 				camera.position.z = 1000;
 
 				scene = new THREE.Scene();
-				scene.fog = new THREE.FogExp2( 0x000000, 0.0008 );
+				scene.fog = new THREE.FogExp2( 0x000000, 0.001 );
 				
 				geometry = new THREE.Geometry();
 				
-				sprite1 = ImageUtils.loadTexture( "textures/sprites/snowflake1.png" );
-				sprite2 = ImageUtils.loadTexture( "textures/sprites/snowflake2.png" );
-				sprite3 = ImageUtils.loadTexture( "textures/sprites/snowflake3.png" );
-				sprite4 = ImageUtils.loadTexture( "textures/sprites/snowflake4.png" );
-				sprite5 = ImageUtils.loadTexture( "textures/sprites/snowflake5.png" );
+				sprite = ImageUtils.loadTexture( "textures/sprites/circle.png" );
 				
-				for ( i = 0; i < 2000; i++ ) {
+				for ( i = 0; i < 5000; i++ ) {
 
-					vector = new THREE.Vector3( Math.random() * 2000 - 1000, Math.random() * 2000 - 1000, Math.random() * 2000 - 1000 );
+					x = 2000 * Math.random() - 1000;
+					y = 2000 * Math.random() - 1000;
+					z = 2000 * Math.random() - 1000;
+					vector = new THREE.Vector3( x, y, z );
 					geometry.vertices.push( new THREE.Vertex( vector ) );					
 					
 				}
 
-				parameters = [ [ [1.0, 0.2, 1.0], sprite2, 20 ], [ [0.95, 0.1, 1], sprite3, 15 ], [ [0.90, 0.05, 1], sprite1, 10 ], [ [0.85, 0, 0.8], sprite5, 8 ], [ [0.80, 0, 0.7], sprite4, 5 ],			
-							   ];
+				material = new THREE.ParticleBasicMaterial( { size: 35, map: sprite, blending: THREE.BillboardBlending } );
+				material.color.setHSV( 1.0, 0.2, 0.8 );
+
+				particles = new THREE.ParticleSystem( geometry, material );
+				particles.sortParticles = true;
+				particles.updateMatrix();
+				scene.addObject( particles );
 				
-				for ( i = 0; i < parameters.length; i++ ) {
-
-					color  = parameters[i][0];
-					sprite = parameters[i][1];
-					size   = parameters[i][2];
-					
-					materials[i] = new THREE.ParticleBasicMaterial( { size: size, map: sprite, blending: THREE.AdditiveBlending } );
-					materials[i].color.setHSV( color[0], color[1], color[2] );
-
-					particles = new THREE.ParticleSystem( geometry, materials[i] );
-					particles.rotation.x = Math.random() * 6;
-					particles.rotation.y = Math.random() * 6;
-					particles.rotation.z = Math.random() * 6;
-					scene.addObject( particles );
-					
-				}
+				var light = new THREE.DirectionalLight( 0xffffff );
+				light.position.x = 0;
+				light.position.y = 0;
+				light.position.z = 1;
+				scene.addLight( light );
 
 				renderer = new THREE.WebGLRenderer( { clearAlpha: 1 });
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
-				
-				renderer.context.disable( renderer.context.DEPTH_TEST );
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
@@ -187,20 +178,17 @@
 				camera.position.x += ( mouseX - camera.position.x ) * 0.05;
 				camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
 
+				/*
 				for( i = 0; i < scene.objects.length; i++ ) {
 				
-					scene.objects[i].rotation.y = time * ( i < 4 ? i+1 : - (i+1) );
+					scene.objects[i].rotation.y = 5*time * ( i < 4 ? i+1 : - (i+1) );
 					
 				}
+				*/
 
-				for( i = 0; i < materials.length; i++ ) {
+				h = ( 360 * ( 1.0 + time ) % 360 ) / 360;
+				material.color.setHSV( h, 0.75, 0.8 );
 					
-					color = parameters[i][0];
-					
-					h = ( 360 * ( color[0] + time ) % 360 ) / 360;
-					materials[i].color.setHSV( h, color[1], color[2] );
-					
-				}
 				
 				renderer.render( scene, camera );
 

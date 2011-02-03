@@ -31,6 +31,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_normalMatrixArray = new Float32Array(9),
 	_objectMatrixArray = new Float32Array(16),
 
+	_projScreenMatrix = new THREE.Matrix4(),
+	_vector3 = new THREE.Vector4(),
+	
 	// parameters defaults
 
 	antialias = true,
@@ -194,6 +197,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		geometry.__vertexArray = new Float32Array( nvertices * 3 );
 		geometry.__particleArray = new Uint16Array( nvertices );
+		
+		geometry.__sortArray = [];
 
 		geometry.__webGLParticleCount = nvertices;
 
@@ -672,35 +677,71 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	this.setParticleBuffers = function( geometry, hint, dirtyVertices, dirtyElements ) {
+	this.setParticleBuffers = function( geometry, hint, dirtyVertices, dirtyElements, object, camera ) {
 
 		var v, vertex, offset,
 			vertices = geometry.vertices,
 			vl = vertices.length,
 
 			vertexArray = geometry.__vertexArray,
-			particleArray = geometry.__particleArray;
+			particleArray = geometry.__particleArray,
+		
+			sortArray = geometry.__sortArray;
 
-		if ( dirtyVertices ) {
-
+		if ( object.sortParticles ) {
+		
+			_projScreenMatrix.multiply( camera.projectionMatrix, camera.matrix );
+			_projScreenMatrix.multiplySelf( object.matrix );
+			
 			for ( v = 0; v < vl; v++ ) {
 
 				vertex = vertices[ v ].position;
-
+				
+				_vector3.copy( vertex );
+				_projScreenMatrix.multiplyVector3( _vector3 );
+				
+				sortArray[ v ] = [ _vector3.z, v ];
+				
+			}
+			
+			sortArray.sort( function(a,b) { return b[0] - a[0]; } );
+			
+			for ( v = 0; v < vl; v++ ) {
+				
+				vertex = vertices[ sortArray[v][1] ].position;
+				
 				offset = v * 3;
-
+				
 				vertexArray[ offset ]     = vertex.x;
 				vertexArray[ offset + 1 ] = vertex.y;
 				vertexArray[ offset + 2 ] = vertex.z;
+				
+			}
+			
+		} else {
+		
+			if ( dirtyVertices ) {
+
+				for ( v = 0; v < vl; v++ ) {
+
+					vertex = vertices[ v ].position;
+
+					offset = v * 3;
+
+					vertexArray[ offset ]     = vertex.x;
+					vertexArray[ offset + 1 ] = vertex.y;
+					vertexArray[ offset + 2 ] = vertex.z;
+
+				}
 
 			}
 
 		}
-
+		
 		// yeah, this is silly as order of element indices is currently fixed
 		// though this could change if some use case arises
 		// (like depth-sorting of semi-opaque particles)
-
+		
 		if ( dirtyElements ) {
 
 			for ( v = 0; v < vl; v++ ) {
@@ -710,6 +751,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 		}
+			
 		
 		_gl.bindBuffer( _gl.ARRAY_BUFFER, geometry.__webGLVertexBuffer );
 		_gl.bufferData( _gl.ARRAY_BUFFER, vertexArray, hint );
@@ -1094,9 +1136,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var o, ol, webGLObject, object, buffer,
 			lights = scene.lights,
-			fog = scene.fog;
+			fog = scene.fog,
+			ol;
 
-		this.initWebGLObjects( scene );
+		camera.autoUpdateMatrix && camera.updateMatrix();
+		
+		_viewMatrixArray.set( camera.matrix.flatten() );
+		_projectionMatrixArray.set( camera.projectionMatrix.flatten() );
+
+		this.initWebGLObjects( scene, camera );
 
 		setRenderTarget( renderTarget, clear !== undefined ? clear : true );
 
@@ -1106,14 +1154,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		camera.autoUpdateMatrix && camera.updateMatrix();
-
-		_viewMatrixArray.set( camera.matrix.flatten() );
-		_projectionMatrixArray.set( camera.projectionMatrix.flatten() );
-
-		// opaque pass
-
-		for ( o = 0, ol = scene.__webGLObjects.length; o < ol; o++ ) {
+		// set matrices and faces
+		
+		ol = scene.__webGLObjects.length;
+		
+		for ( o = 0; o < ol; o++ ) {
 
 			webGLObject = scene.__webGLObjects[ o ];
 
@@ -1121,6 +1166,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			buffer = webGLObject.buffer;
 
 			if ( object.visible ) {
+				
+				object.autoUpdateMatrix && object.updateMatrix();				
 				
 				if( object.doubleSided ) {
 
@@ -1142,7 +1189,22 @@ THREE.WebGLRenderer = function ( parameters ) {
 					}
 
 				}
+			
+			}
+			
+		}
 
+		// opaque pass
+
+		for ( o = 0; o < ol; o++ ) {
+
+			webGLObject = scene.__webGLObjects[ o ];
+
+			object = webGLObject.object;
+			buffer = webGLObject.buffer;
+
+			if ( object.visible ) {
+			
 				this.setupMatrices( object, camera );
 				this.renderPass( camera, lights, fog, object, buffer, THREE.NormalBlending, false );
 
@@ -1152,7 +1214,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// transparent pass
 
-		for ( o = 0, ol = scene.__webGLObjects.length; o < ol; o++ ) {
+		for ( o = 0; o < ol; o++ ) {
 
 			webGLObject = scene.__webGLObjects[ o ];
 
@@ -1162,7 +1224,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			if ( object.visible ) {
 
 				this.setupMatrices( object, camera );
-
+				
 				// opaque blended materials
 
 				this.renderPass( camera, lights, fog, object, buffer, THREE.AdditiveBlending, false );
@@ -1176,6 +1238,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 				// transparent normal materials
 
 				this.renderPass( camera, lights, fog, object, buffer, THREE.NormalBlending, true );
+
+				// billboard materials
+
+				this.renderPass( camera, lights, fog, object, buffer, THREE.BillboardBlending, false );
 
 			}
 
@@ -1191,7 +1257,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	this.initWebGLObjects = function( scene ) {
+	this.initWebGLObjects = function( scene, camera ) {
 
 		function add_buffer( objmap, id, buffer, object ) {
 
@@ -1306,9 +1372,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 					
 				}
 
-				if( geometry.__dirtyVertices ) {
+				if( geometry.__dirtyVertices || object.sortParticles ) {
 
-					this.setParticleBuffers( geometry, _gl.DYNAMIC_DRAW, geometry.__dirtyVertices, geometry.__dirtyElements );
+					this.setParticleBuffers( geometry, _gl.DYNAMIC_DRAW, geometry.__dirtyVertices, geometry.__dirtyElements, object, camera );
 
 				}
 
@@ -1345,8 +1411,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 	};
 
 	this.setupMatrices = function ( object, camera ) {
-
-		object.autoUpdateMatrix && object.updateMatrix();
 
 		_modelViewMatrix.multiply( camera.matrix, object.matrix );
 		_modelViewMatrixArray.set( _modelViewMatrix.flatten() );
@@ -1392,12 +1456,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				break;
 
+			case THREE.BillboardBlending:
+
+				_gl.blendEquation( _gl.FUNC_ADD );
+				_gl.blendFunc( _gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA);
+
+				break;
+
 			default:
 
 				_gl.blendEquation( _gl.FUNC_ADD );
 				_gl.blendFunc( _gl.ONE, _gl.ONE_MINUS_SRC_ALPHA );
 
 				break;
+		
 		}
 
 	};
@@ -1994,7 +2066,7 @@ THREE.Snippets = {
 			"float fogFactor = smoothstep( fogNear, fogFar, depth );",
 		"#endif",
 
-		"gl_FragColor = mix( gl_FragColor, vec4( fogColor, 1.0 ), fogFactor );",
+		"gl_FragColor = mix( gl_FragColor, vec4( fogColor, gl_FragColor.w ), fogFactor );",
 
 	"#endif"
 
