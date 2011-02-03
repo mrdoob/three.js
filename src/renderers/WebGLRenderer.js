@@ -158,6 +158,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		geometry.__webGLVertexBuffer = _gl.createBuffer();
 		geometry.__webGLParticleBuffer = _gl.createBuffer();
+		geometry.__webGLColorBuffer = _gl.createBuffer();
 
 	};
 
@@ -249,7 +250,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	this.setMeshBuffers = function ( geometryChunk, object, hint, dirtyVertices, dirtyElements, dirtyUvs, dirtyNormals, dirtyTangents ) {
+	this.setMeshBuffers = function ( geometryChunk, object, hint ) {
 
 		var f, fl, fi, face, vertexNormals, faceNormal, normal, uv, uv2, v1, v2, v3, v4, t1, t2, t3, t4, m, ml, i,
 			vn, uvi, uv2i,
@@ -274,8 +275,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 		lineArray = geometryChunk.__lineArray,
 
 		needsSmoothNormals = geometryChunk.__needsSmoothNormals,
+		
+		geometry = object.geometry, // this is shared for all chunks
+		
+		dirtyVertices = geometry.__dirtyVertices,
+		dirtyElements = geometry.__dirtyElements, 
+		dirtyUvs = geometry.__dirtyUvs, 
+		dirtyNormals = geometry.__dirtyNormals, 
+		dirtyTangents = geometry.__dirtyTangents,
 
-		geometry = object.geometry,
 		vertices = geometry.vertices,
 		chunk_faces = geometryChunk.faces,
 		obj_faces = geometry.faces,
@@ -631,14 +639,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	this.setLineBuffers = function( geometry, hint, dirtyVertices, dirtyElements ) {
+	this.setLineBuffers = function( geometry, hint ) {
 
 		var v, vertex, offset,
 			vertices = geometry.vertices,
 			vl = vertices.length,
 
 			vertexArray = geometry.__vertexArray,
-			lineArray = geometry.__lineArray;
+			lineArray = geometry.__lineArray,
+		
+			dirtyVertices = geometry.__dirtyVertices, 
+			dirtyElements = geometry.__dirtyElements;
 
 		if ( dirtyVertices ) {
 
@@ -677,7 +688,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	this.setParticleBuffers = function( geometry, hint, dirtyVertices, dirtyElements, object, camera ) {
+	this.setParticleBuffers = function( geometry, hint, object, camera ) {
 
 		var v, vertex, offset,
 			vertices = geometry.vertices,
@@ -686,7 +697,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 			vertexArray = geometry.__vertexArray,
 			particleArray = geometry.__particleArray,
 		
-			sortArray = geometry.__sortArray;
+			sortArray = geometry.__sortArray,
+		
+			dirtyVertices = geometry.__dirtyVertices,
+			dirtyElements = geometry.__dirtyElements,
+			dirtyColors = geometry.__dirtyColors;
 
 		if ( object.sortParticles ) {
 		
@@ -1317,9 +1332,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if( geometry.__dirtyVertices || geometry.__dirtyElements || geometry.__dirtyUvs ) {
 
-						this.setMeshBuffers( geometryChunk, object, _gl.DYNAMIC_DRAW,
-										 geometry.__dirtyVertices, geometry.__dirtyElements, geometry.__dirtyUvs,
-										 geometry.__dirtyNormals, geometry.__dirtyTangents );
+						this.setMeshBuffers( geometryChunk, object, _gl.DYNAMIC_DRAW );
 
 
 					}
@@ -1351,7 +1364,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if( geometry.__dirtyVertices ) {
 
-					this.setLineBuffers( geometry, _gl.DYNAMIC_DRAW, geometry.__dirtyVertices, geometry.__dirtyElements );
+					this.setLineBuffers( geometry, _gl.DYNAMIC_DRAW );
 
 				}
 
@@ -1368,19 +1381,21 @@ THREE.WebGLRenderer = function ( parameters ) {
 					this.initParticleBuffers( geometry );
 
 					geometry.__dirtyVertices = true;
+					geometry.__dirtyColors = true;
 					geometry.__dirtyElements = true;
 					
 				}
 
-				if( geometry.__dirtyVertices || object.sortParticles ) {
+				if( geometry.__dirtyVertices || geometry.__dirtyColors || object.sortParticles ) {
 
-					this.setParticleBuffers( geometry, _gl.DYNAMIC_DRAW, geometry.__dirtyVertices, geometry.__dirtyElements, object, camera );
+					this.setParticleBuffers( geometry, _gl.DYNAMIC_DRAW, object, camera );
 
 				}
 
 				add_buffer( objmap, 0, geometry, object );
 
 				geometry.__dirtyVertices = false;
+				geometry.__dirtyColors = false;
 				geometry.__dirtyElements = false;
 
 
