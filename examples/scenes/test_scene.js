@@ -255,7 +255,7 @@ var scene = {
 	
 	"lambert_green": {
 		"type": "MeshLambertMaterial",
-		"parameters": { color: 0x007711 } 
+		"parameters": { color: 0x007711, blending: "AdditiveBlending" } 
 	},
 
 	"lambert_blue": {

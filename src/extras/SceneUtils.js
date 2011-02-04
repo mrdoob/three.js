@@ -369,6 +369,10 @@ var SceneUtils = {
 						
 						m.parameters[ pp ] = ( m.parameters[ pp ] == "flat" ) ? THREE.FlatShading : THREE.SmoothShading;
 						
+					} else if ( pp == "blending" ) {
+						
+						m.parameters[ pp ] = THREE[ m.parameters[ pp ] ] ? THREE[ m.parameters[ pp ] ] : THREE.NormalBlending;
+						
 					} else if ( pp == "combine" ) {
 						
 						m.parameters[ pp ] = ( m.parameters[ pp ] == "MixOperation" ) ? THREE.MixOperation : THREE.MultiplyOperation;

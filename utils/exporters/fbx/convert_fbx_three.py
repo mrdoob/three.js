@@ -238,28 +238,28 @@ TEMPLATE_MATERIAL_SCENE = """\
     }"""
 
 TEMPLATE_CAMERA_PERSPECTIVE = """\
-	%(camera_id)s : {
-		"type"  : "perspective",
-		"fov"   : %(fov)f,
-		"aspect": %(aspect)f,
-		"near"  : %(near)f,
-		"far"   : %(far)f,
-		"position": %(position)s,
-		"target"  : %(target)s
-	}"""
+    %(camera_id)s : {
+        "type"  : "perspective",
+        "fov"   : %(fov)f,
+        "aspect": %(aspect)f,
+        "near"  : %(near)f,
+        "far"   : %(far)f,
+        "position": %(position)s,
+        "target"  : %(target)s
+    }"""
 
 TEMPLATE_CAMERA_ORTHO = """\
-	%(camera_id)s: {
-		"type"  : "ortho",
-		"left"  : %(left)f,
-		"right" : %(right)f,
-		"top"   : %(top)f,
-		"bottom": %(bottom)f,
-		"near"  : %(near)f,
-		"far"   : %(far)f,
-		"position": %(position)s,
-		"target"  : %(target)s
-	}"""
+    %(camera_id)s: {
+        "type"  : "ortho",
+        "left"  : %(left)f,
+        "right" : %(right)f,
+        "top"   : %(top)f,
+        "bottom": %(bottom)f,
+        "near"  : %(near)f,
+        "far"   : %(far)f,
+        "position": %(position)s,
+        "target"  : %(target)s
+    }"""
 
 TEMPLATE_VEC3 = '[ %f, %f, %f ]'  
 TEMPLATE_VEC2 = '[ %f, %f ]'  
@@ -1458,9 +1458,13 @@ def generate_ascii_model(data):
         
         vertex_index = indices_vertex[vi]
         
+        material_index = 0
+        if vi < len(data["faces"]["indices_material"][0]):
+            material_index = data["faces"]["indices_material"][0][vi]
+            
         face = {
         'vertex'   : vertex_index,
-        'material' : data["faces"]["indices_material"][0][vi]
+        'material' : material_index
         }
     
         if normals:
@@ -1534,15 +1538,15 @@ def generate_ascii_model(data):
 # Helpers
 # #####################################################
 def sanitize(text):
-	chunks = []
-	for ch in text:
-		if ch in (string.ascii_letters + string.digits + "_."):
-			chunks.append(ch)
-		else:
-			chunks.append("_")
-			
-	return "".join(chunks)
-	
+    chunks = []
+    for ch in text:
+        if ch in (string.ascii_letters + string.digits + "_."):
+            chunks.append(ch)
+        else:
+            chunks.append("_")
+            
+    return "".join(chunks)
+    
 def base_filename(path):
     return os.path.basename(path)
     
