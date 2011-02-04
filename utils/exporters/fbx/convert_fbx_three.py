@@ -108,6 +108,7 @@ import random
 import math
 import pprint
 import shutil
+import string
 import os.path
 
 # load platform specific binary modules
@@ -167,7 +168,7 @@ DEFAULTS = {
 }
 
 MATERIALS_IN_SCENE = True
-DEBUG_FBX_JSON = False
+DEBUG_FBX_JSON = True
 
 # default colors for debugging (each material gets one distinct color): 
 # white, red, green, blue, yellow, cyan, magenta
@@ -1168,7 +1169,7 @@ def generate_section(label, content):
     
 def get_mesh_filename(mesh):
     object_id = mesh["data"]["name"]
-    filename = "%s.js" % object_id
+    filename = "%s.js" % sanitize(object_id)
     return filename
     
 def generate_material_id_list(materials):
@@ -1532,6 +1533,16 @@ def generate_ascii_model(data):
 # #####################################################
 # Helpers
 # #####################################################
+def sanitize(text):
+	chunks = []
+	for ch in text:
+		if ch in (string.ascii_letters + string.digits + "_."):
+			chunks.append(ch)
+		else:
+			chunks.append("_")
+			
+	return "".join(chunks)
+	
 def base_filename(path):
     return os.path.basename(path)
     
