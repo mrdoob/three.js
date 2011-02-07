@@ -611,14 +611,18 @@ THREE.MarchingCubes = function ( resolution, materials ) {
 			
 			for( i = 0; i < object.count; i++ ) {
 				
-				x = object.positionArray[ i * 3 ];
-				y = object.positionArray[ i * 3 + 1 ];
-				z = object.positionArray[ i * 3 + 2 ];
+				a = i * 3;
+				b = a + 1;
+				c = a + 2;
+				
+				x = object.positionArray[ a ];
+				y = object.positionArray[ b ];
+				z = object.positionArray[ c ];
 				position = new THREE.Vector3( x, y, z );
 
-				x = object.normalArray[ i * 3 ];
-				y = object.normalArray[ i * 3 + 1 ];
-				z = object.normalArray[ i * 3 + 2 ];
+				x = object.normalArray[ a ];
+				y = object.normalArray[ b ];
+				z = object.normalArray[ c ];
 				normal = new THREE.Vector3( x, y, z );
 				normal.normalize();
 				
@@ -633,8 +637,8 @@ THREE.MarchingCubes = function ( resolution, materials ) {
 			for( i = 0; i < nfaces; i++ ) {
 				
 				a = ( start + i ) * 3;
-				b = ( start + i ) * 3 + 1;
-				c = ( start + i ) * 3 + 2;
+				b = a + 1;
+				c = a + 2;
 
 				na = geo.vertices[ a ].normal;
 				nb = geo.vertices[ b ].normal;
