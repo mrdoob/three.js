@@ -84,6 +84,7 @@ EXTRAS_FILES = [
 'extras/primitives/Torus.js',
 'extras/primitives/Icosahedron.js',
 'extras/primitives/LathedObject.js',
+'extras/objects/MarchingCubes.js',
 'extras/io/Loader.js'
 ]
 

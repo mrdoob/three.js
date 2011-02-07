@@ -403,7 +403,8 @@ var ShaderUtils = {
 		'film': {
 
 		uniforms: { tDiffuse: { type: "t", value: 0, texture: null },
-					time: { type: "f", value: 0.0 }
+					time: { type: "f", value: 0.0 },
+					grayscale: { type: "i", value: 1 }
 				  },
 
 		vertex_shader: [
@@ -426,6 +427,8 @@ var ShaderUtils = {
 		
 		// control parameter
 		"uniform float time;",
+		
+		"uniform bool grayscale;",
 
 		// noise effect intensity value (0 = no effect, 1 = full effect)
 		"const float fNintensity = 0.35;",
@@ -459,7 +462,9 @@ var ShaderUtils = {
 			"cResult = cTextureScreen.rgb + clamp( fNintensity, 0.0,1.0 ) * ( cResult - cTextureScreen.rgb );",
 
 			// convert to grayscale if desired
-			"cResult = vec3( cResult.r * 0.3 + cResult.g * 0.59 + cResult.b * 0.11 );",
+			"if( grayscale ) {",
+				"cResult = vec3( cResult.r * 0.3 + cResult.g * 0.59 + cResult.b * 0.11 );",
+			"}",
 
 			"gl_FragColor =  vec4( cResult, cTextureScreen.a );",
 		

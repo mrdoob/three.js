@@ -180,7 +180,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		geometryChunk.__webGLLineBuffer = _gl.createBuffer();
 
 	};
-
+	
 	this.initLineBuffers = function( geometry ) {
 
 		var nvertices = geometry.vertices.length;
@@ -997,13 +997,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 		
 	};
 	
-	this.renderBuffer = function ( camera, lights, fog, material, geometryChunk, object ) {
-
-		var program, u, identifiers, attributes, parameters, maxLightCount, linewidth, primitives;
-
+	this.setProgram = function( camera, lights, fog, material, object ) {
+		
 		this.initMaterial( material, lights, fog );
 
-		program = material.program;
+		var program = material.program;
 
 		if( program != _oldProgram ) {
 
@@ -1055,9 +1053,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 			material.uniforms.mFar.value = camera.far;
 			
 		}
-		
+	
 		setUniforms( program, material.uniforms );
 
+		return program;
+		
+	};
+	
+	this.renderBuffer = function ( camera, lights, fog, material, geometryChunk, object ) {
+
+		var program, attributes, linewidth, primitives;
+
+		program = this.setProgram( camera, lights, fog, material, object );
+		
 		attributes = program.attributes;
 
 		// vertices
@@ -1163,6 +1171,35 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	function renderBufferImmediate( object, program ) {
+		
+		if ( ! object.__webGLVertexBuffer ) object.__webGLVertexBuffer = _gl.createBuffer();
+		if ( ! object.__webGLNormalBuffer ) object.__webGLNormalBuffer = _gl.createBuffer();
+		
+		if ( object.hasPos ) {
+			
+		  _gl.bindBuffer( _gl.ARRAY_BUFFER, object.__webGLVertexBuffer );
+		  _gl.bufferData( _gl.ARRAY_BUFFER, object.positionArray, _gl.DYNAMIC_DRAW );
+		  _gl.enableVertexAttribArray( program.attributes.position );
+		  _gl.vertexAttribPointer( program.attributes.position, 3, _gl.FLOAT, false, 0, 0 );
+		
+		}
+		
+		if ( object.hasNormal ) {
+			
+		  _gl.bindBuffer( _gl.ARRAY_BUFFER, object.__webGLNormalBuffer );
+		  _gl.bufferData( _gl.ARRAY_BUFFER, object.normalArray, _gl.DYNAMIC_DRAW );
+		  _gl.enableVertexAttribArray( program.attributes.normal );
+		  _gl.vertexAttribPointer( program.attributes.normal, 3, _gl.FLOAT, false, 0, 0 );
+		
+		}
+		
+		_gl.drawArrays( _gl.TRIANGLES, 0, object.count );
+		
+		object.count = 0;
+		
+	};
+	
 	this.renderPass = function ( camera, lights, fog, object, geometryChunk, blending, transparent ) {
 
 		var i, l, m, ml, material, meshMaterial;
@@ -1202,6 +1239,27 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	this.renderPassImmediate = function ( camera, lights, fog, object, blending, transparent ) {
+
+		var i, l, m, ml, material, program;
+
+		for ( m = 0, ml = object.materials.length; m < ml; m++ ) {
+
+			material = object.materials[ m ];
+
+			if ( material && material.blending == blending && ( material.opacity < 1.0 == transparent ) ) {
+
+				this.setBlending( material.blending );
+				program = this.setProgram( camera, lights, fog, material, object );
+				
+				object.render( function( object ) { renderBufferImmediate( object, program ); } );
+
+			}
+
+		}
+
+	};
+	
 	this.render = function( scene, camera, renderTarget, clear ) {
 
 		var o, ol, webGLObject, object, buffer,
@@ -1227,7 +1285,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		// set matrices and faces
 		
 		ol = scene.__webGLObjects.length;
-		
+	
 		for ( o = 0; o < ol; o++ ) {
 
 			webGLObject = scene.__webGLObjects[ o ];
@@ -1261,8 +1319,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 			
 			}
-			
+		
 		}
+
 
 		// opaque pass
 
@@ -1275,11 +1334,29 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( object.visible ) {
 			
+				object.autoUpdateMatrix && object.updateMatrix();
+				
 				this.setupMatrices( object, camera );
 				this.renderPass( camera, lights, fog, object, buffer, THREE.NormalBlending, false );
 
 			}
 
+		}
+
+		// opaque pass (immediate simulator)
+		
+		for ( o = 0; o < scene.__webGLObjectsImmediate.length; o++ ) {
+			
+			webGLObject = scene.__webGLObjectsImmediate[ o ];
+			object = webGLObject.object;
+			
+			if ( object.visible ) {
+			
+				this.setupMatrices( object, camera );
+				this.renderPassImmediate( camera, lights, fog, object, THREE.NormalBlending, false );
+			
+			}
+			
 		}
 
 		// transparent pass
@@ -1340,12 +1417,25 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		};
 
+		function add_buffer_immediate( objmap, id, object ) {
+
+			if ( objmap[ id ] == undefined ) {
+
+				scene.__webGLObjectsImmediate.push( { object: object } );
+				objmap[ id ] = 1;
+
+			}
+
+		};
+
 		var o, ol, object, g, geometry, geometryChunk, objmap;
 
 		if ( !scene.__webGLObjects ) {
 
 			scene.__webGLObjects = [];
 			scene.__webGLObjectsMap = {};
+
+			scene.__webGLObjectsImmediate = [];
 
 		}
 
@@ -1454,6 +1544,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 				geometry.__dirtyElements = false;
 
 
+			} else if ( object instanceof THREE.MarchingCubes ) {
+				
+				add_buffer_immediate( objmap, 0, object );
+				
 			}/*else if ( object instanceof THREE.Particle ) {
 
 			}*/
@@ -1600,7 +1694,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl = _canvas.getContext( 'experimental-webgl', { antialias: antialias } );
 
-		} catch(e) { }
+		} catch(e) { console.log(e) }
 
 		if (!_gl) {
 
