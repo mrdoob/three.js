@@ -312,7 +312,7 @@ THREE.MarchingCubes = function ( resolution, materials ) {
 	// Immediate render mode simulator
 	/////////////////////////////////////
 	
-	this.posnormtriv = function( pos, norm, o1, o2, o3,render_callback ) {
+	this.posnormtriv = function( pos, norm, o1, o2, o3, render_callback ) {
 		
 		var c = this.count * 3;
 		
@@ -598,6 +598,67 @@ THREE.MarchingCubes = function ( resolution, materials ) {
 		
 		this.end( render_callback );
 	
+	};
+	
+	this.generateGeometry = function() {
+		
+		var start = 0, geo = new THREE.Geometry();
+		
+		var geo_callback = function( object ) {
+			
+			var i, x, y, z, vertex, position, normal, 
+				face, a, b, c, na, nb, nc;
+			
+			for( i = 0; i < object.count; i++ ) {
+				
+				x = object.positionArray[ i * 3 ];
+				y = object.positionArray[ i * 3 + 1 ];
+				z = object.positionArray[ i * 3 + 2 ];
+				position = new THREE.Vector3( x, y, z );
+
+				x = object.normalArray[ i * 3 ];
+				y = object.normalArray[ i * 3 + 1 ];
+				z = object.normalArray[ i * 3 + 2 ];
+				normal = new THREE.Vector3( x, y, z );
+				normal.normalize();
+				
+				vertex = new THREE.Vertex( position, normal );
+				
+				geo.vertices.push( vertex );
+				
+			}
+			
+			nfaces = object.count / 3;
+			
+			for( i = 0; i < nfaces; i++ ) {
+				
+				a = ( start + i ) * 3;
+				b = ( start + i ) * 3 + 1;
+				c = ( start + i ) * 3 + 2;
+
+				na = geo.vertices[ a ].normal;
+				nb = geo.vertices[ b ].normal;
+				nc = geo.vertices[ c ].normal;
+				
+				face = new THREE.Face3( a, b, c, [ na, nb, nc ] );
+				
+				geo.faces.push( face );
+				
+			}
+			
+			start += nfaces;
+			object.count = 0;
+			
+		};
+		
+		this.render( geo_callback );
+		
+		geo.sortFacesByMaterial();
+		
+		//console.log( "generated " + geo.faces.length + " triangles" );
+		
+		return geo;
+		
 	};
 	
 	this.init( resolution );
