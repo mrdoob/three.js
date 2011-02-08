@@ -95,7 +95,19 @@ THREE.CanvasRenderer = function () {
 
 	};
 
-	this.setClearColor = function( hex, opacity ) {
+	this.setClearColor = function( color, opacity ) {
+
+		_clearColor = color;
+		_clearOpacity = opacity;
+
+		_clearRect.set( - _canvasWidthHalf, - _canvasHeightHalf, _canvasWidthHalf, _canvasHeightHalf );
+		_context.setTransform( 1, 0, 0, - 1, _canvasWidthHalf, _canvasHeightHalf );
+
+		this.clear();
+
+	};
+
+	this.setClearColorHex = function( hex, opacity ) {
 
 		_clearColor.setHex( hex );
 		_clearOpacity = opacity;

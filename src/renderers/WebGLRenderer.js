@@ -74,9 +74,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	this.setClearColor = function( hex, alpha ) {
+	this.setClearColorHex = function( hex, alpha ) {
 
 		var color = new THREE.Color( hex );
+		_gl.clearColor( color.r, color.g, color.b, alpha );
+
+	};
+
+	this.setClearColor = function( color, alpha ) {
+
 		_gl.clearColor( color.r, color.g, color.b, alpha );
 
 	};
