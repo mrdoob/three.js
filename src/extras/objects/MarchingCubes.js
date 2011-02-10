@@ -409,7 +409,7 @@ THREE.MarchingCubes = function ( resolution, materials ) {
 		
 		for ( z = min_z; z < max_z; z++ ) {
 	  
-			z_offset = this.size * this.size * z,
+			z_offset = this.size2 * z,
 			fz = z / this.size - ballz,
 			fz2 = fz * fz;
 			

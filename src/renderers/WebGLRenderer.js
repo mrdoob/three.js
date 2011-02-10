@@ -1358,6 +1358,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			
 			if ( object.visible ) {
 			
+				object.autoUpdateMatrix && object.updateMatrix();
+				
 				this.setupMatrices( object, camera );
 				this.renderPassImmediate( camera, lights, fog, object, THREE.NormalBlending, false );
 			
@@ -1400,6 +1402,24 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		// transparent pass (immediate simulator)
+		
+		for ( o = 0; o < scene.__webGLObjectsImmediate.length; o++ ) {
+			
+			webGLObject = scene.__webGLObjectsImmediate[ o ];
+			object = webGLObject.object;
+			
+			if ( object.visible ) {
+			
+				object.autoUpdateMatrix && object.updateMatrix();
+				
+				this.setupMatrices( object, camera );
+				this.renderPassImmediate( camera, lights, fog, object, THREE.NormalBlending, true );
+			
+			}
+			
+		}
+		
 		// Generate mipmap if we're using any kind of mipmap filtering
 
 		if ( renderTarget && renderTarget.min_filter !== THREE.NearestFilter && renderTarget.min_filter !== THREE.LinearFilter ) {
