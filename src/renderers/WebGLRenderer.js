@@ -2288,7 +2288,8 @@ THREE.Snippets = {
 
 		"if ( combine == 1 ) {",
 
-			"gl_FragColor = mix( gl_FragColor, cubeColor, reflectivity );",
+			//"gl_FragColor = mix( gl_FragColor, cubeColor, reflectivity );",
+			"gl_FragColor = vec4( mix( gl_FragColor.xyz, cubeColor.xyz, reflectivity ), opacity );",
 
 		"} else {",
 
