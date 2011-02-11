@@ -2425,7 +2425,7 @@ THREE.Snippets = {
 
 	"#ifdef USE_ENVMAP",
 
-		"cubeColor = textureCube( env_map, vec3( -vReflect.x, vReflect.yz ) );",
+		"vec4 cubeColor = textureCube( env_map, vec3( -vReflect.x, vReflect.yz ) );",
 
 		"if ( combine == 1 ) {",
 
@@ -2492,7 +2492,7 @@ THREE.Snippets = {
 
 	"#ifdef USE_MAP",
 
-		"mapColor = texture2D( map, gl_PointCoord );",
+		"gl_FragColor = gl_FragColor * texture2D( map, gl_PointCoord );",
 
 	"#endif"
 
@@ -2525,7 +2525,7 @@ THREE.Snippets = {
 
 	"#ifdef USE_MAP",
 
-		"mapColor = texture2D( map, vUv );",
+		"gl_FragColor = gl_FragColor * texture2D( map, vUv );",
 
 	"#endif"
 
@@ -2568,7 +2568,7 @@ THREE.Snippets = {
 
 	"#ifdef USE_LIGHTMAP",
 
-		"lightmapColor = texture2D( light_map, vUv2 );",
+		"gl_FragColor = gl_FragColor * texture2D( light_map, vUv2 );",
 
 	"#endif"
 
@@ -2673,7 +2673,8 @@ THREE.Snippets = {
 
 	"vec3 normal = normalize( vNormal );",
 	"vec3 viewPosition = normalize( vViewPosition );",
-
+	
+	"vec4 mColor = vec4( diffuse, opacity );",
 	"vec4 mSpecular = vec4( specular, opacity );",
 
 	"#if MAX_POINT_LIGHTS > 0",
@@ -2735,7 +2736,9 @@ THREE.Snippets = {
 
 	"#if MAX_POINT_LIGHTS > 0",
 		"totalLight += pointDiffuse + pointSpecular;",
-	"#endif"
+	"#endif",
+	
+	"gl_FragColor = gl_FragColor * totalLight;"
 
 	].join("\n"),
 	
@@ -2756,7 +2759,7 @@ THREE.Snippets = {
 
 	"#ifdef USE_COLOR",
 
-		"vertexColor = vec4( vColor, opacity );",
+		"gl_FragColor = gl_FragColor * vec4( vColor, opacity );",
 
 	"#endif"
 
@@ -2842,7 +2845,7 @@ THREE.ShaderLib = {
 
 		uniforms: { "mNear": { type: "f", value: 1.0 },
 					"mFar" : { type: "f", value: 2000.0 },
-					"opacity" : { type: "f", value: 1.0 }					
+					"opacity" : { type: "f", value: 1.0 }
 				  },
 
 		fragment_shader: [
@@ -2924,18 +2927,11 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-				"vec4 mColor = vec4( diffuse, opacity );",
-				"vec4 mapColor = vec4( 1.0 );",
-				"vec4 lightmapColor = vec4( 1.0 );",
-				"vec4 cubeColor = vec4( 1.0 );",
-				"vec4 vertexColor = vec4( 1.0 );",
-
+				"gl_FragColor = vec4( diffuse, opacity );",
+		
 				THREE.Snippets[ "map_fragment" ],
 				THREE.Snippets[ "lightmap_fragment" ],
 				THREE.Snippets[ "color_fragment" ],
-
-				"gl_FragColor = mColor * mapColor * lightmapColor * vertexColor;",
-
 				THREE.Snippets[ "envmap_fragment" ],
 				THREE.Snippets[ "fog_fragment" ],
 
@@ -2979,6 +2975,7 @@ THREE.ShaderLib = {
 
 			"varying vec3 vLightWeighting;",
 
+			THREE.Snippets[ "color_pars_fragment" ],
 			THREE.Snippets[ "map_pars_fragment" ],
 			THREE.Snippets[ "lightmap_pars_fragment" ],
 			THREE.Snippets[ "envmap_pars_fragment" ],
@@ -2986,16 +2983,12 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-				"vec4 mColor = vec4( diffuse, opacity );",
-				"vec4 mapColor = vec4( 1.0 );",
-				"vec4 lightmapColor = vec4( 1.0 );",
-				"vec4 cubeColor = vec4( 1.0 );",
+				"gl_FragColor = vec4( diffuse, opacity );",
+				"gl_FragColor = gl_FragColor * vec4( vLightWeighting, 1.0 );",
 
 				THREE.Snippets[ "map_fragment" ],
 				THREE.Snippets[ "lightmap_fragment" ],
-
-				"gl_FragColor =  mColor * mapColor * lightmapColor * vec4( vLightWeighting, 1.0 );",
-
+				THREE.Snippets[ "color_fragment" ],
 				THREE.Snippets[ "envmap_fragment" ],
 				THREE.Snippets[ "fog_fragment" ],
 
@@ -3011,6 +3004,7 @@ THREE.ShaderLib = {
 			THREE.Snippets[ "lightmap_pars_vertex" ],
 			THREE.Snippets[ "envmap_pars_vertex" ],
 			THREE.Snippets[ "lights_pars_vertex" ],
+			THREE.Snippets[ "color_pars_vertex" ],
 
 			"void main() {",
 
@@ -3019,6 +3013,7 @@ THREE.ShaderLib = {
 				THREE.Snippets[ "map_vertex" ],
 				THREE.Snippets[ "lightmap_vertex" ],
 				THREE.Snippets[ "envmap_vertex" ],
+				THREE.Snippets[ "color_vertex" ],
 
 				"vec3 transformedNormal = normalize( normalMatrix * normal );",
 
@@ -3055,6 +3050,7 @@ THREE.ShaderLib = {
 
 			"varying vec3 vLightWeighting;",
 
+			THREE.Snippets[ "color_pars_fragment" ],
 			THREE.Snippets[ "map_pars_fragment" ],
 			THREE.Snippets[ "lightmap_pars_fragment" ],
 			THREE.Snippets[ "envmap_pars_fragment" ],
@@ -3063,17 +3059,12 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-				"vec4 mColor = vec4( diffuse, opacity );",
-				"vec4 mapColor = vec4( 1.0 );",
-				"vec4 lightmapColor = vec4( 1.0 );",
-				"vec4 cubeColor = vec4( 1.0 );",
+				"gl_FragColor = vec4( vLightWeighting, 1.0 );",
+				THREE.Snippets[ "lights_fragment" ],
 
 				THREE.Snippets[ "map_fragment" ],
-				THREE.Snippets[ "lights_fragment" ],
 				THREE.Snippets[ "lightmap_fragment" ],
-
-				"gl_FragColor =  mapColor * lightmapColor * totalLight * vec4( vLightWeighting, 1.0 );",
-
+				THREE.Snippets[ "color_fragment" ],
 				THREE.Snippets[ "envmap_fragment" ],
 				THREE.Snippets[ "fog_fragment" ],
 
@@ -3093,6 +3084,7 @@ THREE.ShaderLib = {
 			THREE.Snippets[ "lightmap_pars_vertex" ],
 			THREE.Snippets[ "envmap_pars_vertex" ],
 			THREE.Snippets[ "lights_pars_vertex" ],
+			THREE.Snippets[ "color_pars_vertex" ],
 
 			"void main() {",
 
@@ -3101,6 +3093,7 @@ THREE.ShaderLib = {
 				THREE.Snippets[ "map_vertex" ],
 				THREE.Snippets[ "lightmap_vertex" ],
 				THREE.Snippets[ "envmap_vertex" ],
+				THREE.Snippets[ "color_vertex" ],
 
 				"#ifndef USE_ENVMAP",
 					"vec4 mPosition = objectMatrix * vec4( position, 1.0 );",
@@ -3136,15 +3129,10 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-				"vec4 mColor = vec4( psColor, opacity );",
-				"vec4 mapColor = vec4( 1.0 );",
-				"vec4 vertexColor = vec4( 1.0 );",
+				"gl_FragColor = vec4( psColor, opacity );",
 
 				THREE.Snippets[ "map_particle_fragment" ],
 				THREE.Snippets[ "color_fragment" ],
-		
-				"gl_FragColor = mColor * mapColor * vertexColor;",
-
 				THREE.Snippets[ "fog_fragment" ],
 
 			"}"
