@@ -1147,9 +1147,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			material.uniforms.mNear.value = camera.near;
 			material.uniforms.mFar.value = camera.far;
+			material.uniforms.opacity.value = material.opacity;
 			
 		}
-	
+
+		if ( material instanceof THREE.MeshNormalMaterial ) {
+
+			material.uniforms.opacity.value = material.opacity;
+			
+		}
+		
 		setUniforms( program, material.uniforms );
 
 		return program;
@@ -1313,6 +1320,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 					if ( material && material.blending == blending && ( material.opacity < 1.0 == transparent ) ) {
 
 						this.setBlending( material.blending );
+						this.setDepthTest( material.depth_test );
+						
 						this.renderBuffer( camera, lights, fog, material, geometryChunk, object );
 
 					}
@@ -1325,6 +1334,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 				if ( material && material.blending == blending && ( material.opacity < 1.0 == transparent ) ) {
 
 					this.setBlending( material.blending );
+					this.setDepthTest( material.depth_test );
+					
 					this.renderBuffer( camera, lights, fog, material, geometryChunk, object );
 
 				}
@@ -1346,6 +1357,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			if ( material && material.blending == blending && ( material.opacity < 1.0 == transparent ) ) {
 
 				this.setBlending( material.blending );
+				this.setDepthTest( material.depth_test );
+				
 				program = this.setProgram( camera, lights, fog, material, object );
 				
 				object.render( function( object ) { renderBufferImmediate( object, program ); } );
@@ -1356,9 +1369,34 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 	
+	function setObjectFaces( object ) {
+		
+		if( object.doubleSided ) {
+
+			_gl.disable( _gl.CULL_FACE );
+
+		} else {
+
+			_gl.enable( _gl.CULL_FACE );
+
+			if( object.flipSided ) {
+
+				_gl.frontFace( _gl.CW );
+
+			}
+			else {
+
+				_gl.frontFace( _gl.CCW );
+
+			}
+
+		}
+		
+	};
+	
 	this.render = function( scene, camera, renderTarget, clear ) {
 
-		var o, ol, webGLObject, object, buffer,
+		var o, ol, oil, webGLObject, object, buffer,
 			lights = scene.lights,
 			fog = scene.fog,
 			ol;
@@ -1391,33 +1429,26 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( object.visible ) {
 				
-				object.autoUpdateMatrix && object.updateMatrix();				
-				
-				if( object.doubleSided ) {
-
-					_gl.disable( _gl.CULL_FACE );
-
-				} else {
-
-					_gl.enable( _gl.CULL_FACE );
-
-					if( object.flipSided ) {
-
-						_gl.frontFace( _gl.CW );
-
-					}
-					else {
-
-						_gl.frontFace( _gl.CCW );
-
-					}
-
-				}
+				object.autoUpdateMatrix && object.updateMatrix();
 			
 			}
 		
 		}
-
+		
+		oil = scene.__webGLObjectsImmediate.length;
+		
+		for ( o = 0; o < oil; o++ ) {
+			
+			webGLObject = scene.__webGLObjectsImmediate[ o ];
+			object = webGLObject.object;
+			
+			if ( object.visible ) {
+			
+				object.autoUpdateMatrix && object.updateMatrix();
+			
+			}
+		
+		}
 
 		// opaque pass
 
@@ -1429,8 +1460,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			buffer = webGLObject.buffer;
 
 			if ( object.visible ) {
-			
-				object.autoUpdateMatrix && object.updateMatrix();
+				
+				setObjectFaces( object );
 				
 				this.setupMatrices( object, camera );
 				this.renderPass( camera, lights, fog, object, buffer, THREE.NormalBlending, false );
@@ -1448,7 +1479,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			
 			if ( object.visible ) {
 			
-				object.autoUpdateMatrix && object.updateMatrix();
+				setObjectFaces( object );
 				
 				this.setupMatrices( object, camera );
 				this.renderPassImmediate( camera, lights, fog, object, THREE.NormalBlending, false );
@@ -1468,6 +1499,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( object.visible ) {
 
+				setObjectFaces( object );
+				
 				this.setupMatrices( object, camera );
 				
 				// opaque blended materials
@@ -1501,7 +1534,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			
 			if ( object.visible ) {
 			
-				object.autoUpdateMatrix && object.updateMatrix();
+				setObjectFaces( object );
 				
 				this.setupMatrices( object, camera );
 				this.renderPassImmediate( camera, lights, fog, object, THREE.NormalBlending, true );
@@ -1722,6 +1755,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	this.setDepthTest = function( test ) {
+		
+		if( test ) {
+			
+			_gl.enable( _gl.DEPTH_TEST );
+			
+		} else {
+			
+			_gl.disable( _gl.DEPTH_TEST );
+			
+		}
+		
+	};
+	
 	this.setBlending = function( blending ) {
 
 		switch ( blending ) {
@@ -2744,14 +2791,14 @@ THREE.UniformsLib = {
 	common: {
 
 	"diffuse" : { type: "c", value: new THREE.Color( 0xeeeeee ) },
-	"opacity" : { type: "f", value: 1 },
+	"opacity" : { type: "f", value: 1.0 },
 	"map"     : { type: "t", value: 0, texture: null },
 
 	"light_map"       : { type: "t", value: 2, texture: null },
 
 	"env_map" 		  : { type: "t", value: 1, texture: null },
 	"useRefract"	  : { type: "i", value: 0 },
-	"reflectivity"    : { type: "f", value: 1 },
+	"reflectivity"    : { type: "f", value: 1.0 },
 	"refraction_ratio": { type: "f", value: 0.98 },
 	"combine"		  : { type: "i", value: 0 },
 
@@ -2776,8 +2823,8 @@ THREE.UniformsLib = {
 	particle: {
 
 	"psColor"   : { type: "c", value: new THREE.Color( 0xeeeeee ) },
-	"opacity" : { type: "f", value: 1 },
-	"size" 	  : { type: "f", value: 1 },
+	"opacity" : { type: "f", value: 1.0 },
+	"size" 	  : { type: "f", value: 1.0 },
 	"map"     : { type: "t", value: 0, texture: null },
 
 	"fogDensity": { type: "f", value: 0.00025 },
@@ -2794,18 +2841,21 @@ THREE.ShaderLib = {
 	'depth': {
 
 		uniforms: { "mNear": { type: "f", value: 1.0 },
-					"mFar" : { type: "f", value: 2000.0 } },
+					"mFar" : { type: "f", value: 2000.0 },
+					"opacity" : { type: "f", value: 1.0 }					
+				  },
 
 		fragment_shader: [
 
 			"uniform float mNear;",
 			"uniform float mFar;",
+			"uniform float opacity;",
 
 			"void main() {",
 
 				"float depth = gl_FragCoord.z / gl_FragCoord.w;",
 				"float color = 1.0 - smoothstep( mNear, mFar, depth );",
-				"gl_FragColor = vec4( vec3( color ), 1.0 );",
+				"gl_FragColor = vec4( vec3( color ), opacity );",
 
 			"}"
 
@@ -2825,15 +2875,16 @@ THREE.ShaderLib = {
 
 	'normal': {
 
-		uniforms: { },
+		uniforms: { "opacity" : { type: "f", value: 1.0 } },
 
 		fragment_shader: [
 
+			"uniform float opacity;",
 			"varying vec3 vNormal;",
 
 			"void main() {",
 
-				"gl_FragColor = vec4( 0.5 * normalize( vNormal ) + 0.5, 1.0 );",
+				"gl_FragColor = vec4( 0.5 * normalize( vNormal ) + 0.5, opacity );",
 
 			"}"
 

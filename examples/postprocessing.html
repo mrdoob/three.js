@@ -139,8 +139,9 @@
 
                     uniforms: { time: { type: "f", value: 0.0 } },
                     vertex_shader: getText( 'vs-generic' ),
-                    fragment_shader: getText( 'fs-colors' )
-
+                    fragment_shader: getText( 'fs-colors' ),
+					depth_test: false
+					
                 } );
 
 				var screen_shader = ShaderUtils.lib["screen"];
@@ -298,9 +299,7 @@
 				
 				// background 
 				
-				renderer.context.disable( renderer.context.DEPTH_TEST );
 				renderer.render( sceneBG, cameraOrtho, rtTexture1 );
-				renderer.context.enable( renderer.context.DEPTH_TEST );
 				
 				// model
 				
