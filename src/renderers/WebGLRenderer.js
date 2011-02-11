@@ -65,7 +65,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-
 	this.setSize = function ( width, height ) {
 
 		_canvas.width = width;
@@ -163,14 +162,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.createParticleBuffers = function( geometry ) {
 
 		geometry.__webGLVertexBuffer = _gl.createBuffer();
-		geometry.__webGLParticleBuffer = _gl.createBuffer();
 		geometry.__webGLColorBuffer = _gl.createBuffer();
+		geometry.__webGLParticleBuffer = _gl.createBuffer();
 
 	};
 
 	this.createLineBuffers = function( geometry ) {
 
 		geometry.__webGLVertexBuffer = _gl.createBuffer();
+		geometry.__webGLColorBuffer = _gl.createBuffer();
 		geometry.__webGLLineBuffer = _gl.createBuffer();
 
 	};
@@ -180,8 +180,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 		geometryChunk.__webGLVertexBuffer = _gl.createBuffer();
 		geometryChunk.__webGLNormalBuffer = _gl.createBuffer();
 		geometryChunk.__webGLTangentBuffer = _gl.createBuffer();
+		geometryChunk.__webGLColorBuffer = _gl.createBuffer();
 		geometryChunk.__webGLUVBuffer = _gl.createBuffer();
 		geometryChunk.__webGLUV2Buffer = _gl.createBuffer();
+		
 		geometryChunk.__webGLFaceBuffer = _gl.createBuffer();
 		geometryChunk.__webGLLineBuffer = _gl.createBuffer();
 
@@ -192,6 +194,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var nvertices = geometry.vertices.length;
 
 		geometry.__vertexArray = new Float32Array( nvertices * 3 );
+		geometry.__colorArray = new Float32Array( nvertices * 3 );
 		geometry.__lineArray = new Uint16Array( nvertices );
 
 		geometry.__webGLLineCount = nvertices;
@@ -244,6 +247,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		geometryChunk.__vertexArray  = new Float32Array( nvertices * 3 );
 		geometryChunk.__normalArray  = new Float32Array( nvertices * 3 );
 		geometryChunk.__tangentArray = new Float32Array( nvertices * 4 );
+		geometryChunk.__colorArray = new Float32Array( nvertices * 3 );
 		geometryChunk.__uvArray = new Float32Array( nvertices * 2 );
 		geometryChunk.__uv2Array = new Float32Array( nvertices * 2 );
 
@@ -259,7 +263,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.setMeshBuffers = function ( geometryChunk, object, hint ) {
 
-		var f, fl, fi, face, vertexNormals, faceNormal, normal, uv, uv2, v1, v2, v3, v4, t1, t2, t3, t4, m, ml, i,
+		var f, fl, fi, face, vertexNormals, faceNormal, normal, 
+			uv, uv2, v1, v2, v3, v4, t1, t2, t3, t4, 
+			c1, c2, c3, c4,
+			m, ml, i,
 			vn, uvi, uv2i,
 
 		vertexIndex = 0,
@@ -271,12 +278,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 		offset_normal = 0,
 		offset_tangent = 0,
 		offset_line = 0,
+		offset_color = 0,
 
 		vertexArray = geometryChunk.__vertexArray,
 		uvArray = geometryChunk.__uvArray,
 		uv2Array = geometryChunk.__uv2Array,
 		normalArray = geometryChunk.__normalArray,
 		tangentArray = geometryChunk.__tangentArray,
+		colorArray = geometryChunk.__colorArray,
 
 		faceArray = geometryChunk.__faceArray,
 		lineArray = geometryChunk.__lineArray,
@@ -290,13 +299,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 		dirtyUvs = geometry.__dirtyUvs, 
 		dirtyNormals = geometry.__dirtyNormals, 
 		dirtyTangents = geometry.__dirtyTangents,
+		dirtyColors = geometry.__dirtyColors,
 
 		vertices = geometry.vertices,
 		chunk_faces = geometryChunk.faces,
 		obj_faces = geometry.faces,
 		obj_uvs = geometry.uvs,
-		obj_uvs2 = geometry.uvs2;
-
+		obj_uvs2 = geometry.uvs2,
+		obj_colors = geometry.colors;
+		
 		for ( f = 0, fl = chunk_faces.length; f < fl; f++ ) {
 
 			fi = chunk_faces[ f ];
@@ -331,6 +342,28 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
+				if ( dirtyColors && obj_colors.length ) {
+					
+					c1 = obj_colors[ face.a ];
+					c2 = obj_colors[ face.b ];
+					c3 = obj_colors[ face.c ];
+
+					colorArray[ offset_color ]     = c1.r;
+					colorArray[ offset_color + 1 ] = c1.g;
+					colorArray[ offset_color + 2 ] = c1.b;
+
+					colorArray[ offset_color + 3 ] = c2.r;
+					colorArray[ offset_color + 4 ] = c2.g;
+					colorArray[ offset_color + 5 ] = c2.b;
+
+					colorArray[ offset_color + 6 ] = c3.r;
+					colorArray[ offset_color + 7 ] = c3.g;
+					colorArray[ offset_color + 8 ] = c3.b;
+					
+					offset_color += 9;
+
+				}
+
 				if ( dirtyTangents && geometry.hasTangents ) {
 
 					t1 = vertices[ face.a ].tangent;
@@ -359,7 +392,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 				if( dirtyNormals ) {
 
 					if ( vertexNormals.length == 3 && needsSmoothNormals ) {
-
 
 						for ( i = 0; i < 3; i ++ ) {
 
@@ -471,7 +503,34 @@ THREE.WebGLRenderer = function ( parameters ) {
 					offset += 12;
 
 				}
+				
+				if ( dirtyColors && obj_colors.length ) {
 
+					c1 = obj_colors[ face.a ];
+					c2 = obj_colors[ face.b ];
+					c3 = obj_colors[ face.c ];
+					c3 = obj_colors[ face.d ];
+
+					colorArray[ offset_color ]     = c1.r;
+					colorArray[ offset_color + 1 ] = c1.g;
+					colorArray[ offset_color + 2 ] = c1.b;
+
+					colorArray[ offset_color + 3 ] = c2.r;
+					colorArray[ offset_color + 4 ] = c2.g;
+					colorArray[ offset_color + 5 ] = c2.b;
+
+					colorArray[ offset_color + 6 ] = c3.r;
+					colorArray[ offset_color + 7 ] = c3.g;
+					colorArray[ offset_color + 8 ] = c3.b;
+
+					colorArray[ offset_color + 9 ]  = c4.r;
+					colorArray[ offset_color + 10 ] = c4.g;
+					colorArray[ offset_color + 11 ] = c4.b;
+					
+					offset_color += 12;
+
+				}	
+				
 				if ( dirtyTangents && geometry.hasTangents ) {
 
 					t1 = vertices[ face.a ].tangent;
@@ -606,6 +665,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		if ( dirtyColors && obj_colors.length ) {
+
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLColorBuffer );
+			_gl.bufferData( _gl.ARRAY_BUFFER, colorArray, hint );
+
+		}
+		
 		if ( dirtyNormals ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLNormalBuffer );
@@ -648,14 +714,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.setLineBuffers = function( geometry, hint ) {
 
-		var v, vertex, offset,
+		var v, c, vertex, offset,
 			vertices = geometry.vertices,
+			colors = geometry.colors,
 			vl = vertices.length,
+			cl = colors.length,
 
 			vertexArray = geometry.__vertexArray,
+			colorArray = geometry.__colorArray,
 			lineArray = geometry.__lineArray,
 		
 			dirtyVertices = geometry.__dirtyVertices, 
+			dirtyColors = geometry.__dirtyColors,
 			dirtyElements = geometry.__dirtyElements;
 
 		if ( dirtyVertices ) {
@@ -674,6 +744,25 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometry.__webGLVertexBuffer );
 			_gl.bufferData( _gl.ARRAY_BUFFER, vertexArray, hint );
+
+		}
+
+		if ( dirtyColors ) {
+
+			for ( c = 0; c < cl; c++ ) {
+
+				color = colors[ c ];
+
+				offset = c * 3;
+
+				colorArray[ offset ]     = color.r;
+				colorArray[ offset + 1 ] = color.g;
+				colorArray[ offset + 2 ] = color.b;
+
+			}
+
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometry.__webGLColorBuffer );
+			_gl.bufferData( _gl.ARRAY_BUFFER, colorArray, hint );
 
 		}
 
@@ -741,6 +830,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				vertexArray[ offset ]     = vertex.x;
 				vertexArray[ offset + 1 ] = vertex.y;
 				vertexArray[ offset + 2 ] = vertex.z;
+				
 			}
 			
 			for ( c = 0; c < cl; c++ ) {
@@ -753,7 +843,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				colorArray[ offset + 1 ] = color.g;
 				colorArray[ offset + 2 ] = color.b;
 				
-			}			
+			}
 			
 			
 		} else {
@@ -786,7 +876,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					colorArray[ offset + 1 ] = color.g;
 					colorArray[ offset + 2 ] = color.b;
 
-				}					
+				}
 				
 			}
 
@@ -1498,13 +1588,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 						geometry.__dirtyUvs = true;
 						geometry.__dirtyNormals = true;
 						geometry.__dirtyTangents = true;
+						geometry.__dirtyColors = true;
 
 					}
 
-					if( geometry.__dirtyVertices || geometry.__dirtyElements || geometry.__dirtyUvs ) {
+					if( geometry.__dirtyVertices || geometry.__dirtyElements || 
+						geometry.__dirtyUvs || geometry.__dirtyNormals || 
+						geometry.__dirtyColors || geometry.__dirtyTangents ) {
 
 						this.setMeshBuffers( geometryChunk, object, _gl.DYNAMIC_DRAW );
-
 
 					}
 
@@ -1519,6 +1611,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				geometry.__dirtyUvs = false;
 				geometry.__dirtyNormals = false;
 				geometry.__dirtyTangents = false;
+				geometry.__dirtyColors = false;
 
 			} else if ( object instanceof THREE.Line ) {
 
@@ -1530,10 +1623,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					geometry.__dirtyVertices = true;
 					geometry.__dirtyElements = true;
+					geometry.__dirtyColors = true;
 
 				}
 
-				if( geometry.__dirtyVertices ) {
+				if( geometry.__dirtyVertices ||  geometry.__dirtyColors ) {
 
 					this.setLineBuffers( geometry, _gl.DYNAMIC_DRAW );
 
@@ -2771,6 +2865,7 @@ THREE.ShaderLib = {
 			"uniform vec3 diffuse;",
 			"uniform float opacity;",
 
+			THREE.Snippets[ "color_pars_fragment" ],
 			THREE.Snippets[ "map_pars_fragment" ],
 			THREE.Snippets[ "lightmap_pars_fragment" ],
 			THREE.Snippets[ "envmap_pars_fragment" ],
@@ -2782,11 +2877,13 @@ THREE.ShaderLib = {
 				"vec4 mapColor = vec4( 1.0 );",
 				"vec4 lightmapColor = vec4( 1.0 );",
 				"vec4 cubeColor = vec4( 1.0 );",
+				"vec4 vertexColor = vec4( 1.0 );",
 
 				THREE.Snippets[ "map_fragment" ],
 				THREE.Snippets[ "lightmap_fragment" ],
+				THREE.Snippets[ "color_fragment" ],
 
-				"gl_FragColor = mColor * mapColor * lightmapColor;",
+				"gl_FragColor = mColor * mapColor * lightmapColor * vertexColor;",
 
 				THREE.Snippets[ "envmap_fragment" ],
 				THREE.Snippets[ "fog_fragment" ],
@@ -2800,6 +2897,7 @@ THREE.ShaderLib = {
 			THREE.Snippets[ "map_pars_vertex" ],
 			THREE.Snippets[ "lightmap_pars_vertex" ],
 			THREE.Snippets[ "envmap_pars_vertex" ],
+			THREE.Snippets[ "color_pars_vertex" ],
 
 			"void main() {",
 
@@ -2808,6 +2906,7 @@ THREE.ShaderLib = {
 				THREE.Snippets[ "map_vertex" ],
 				THREE.Snippets[ "lightmap_vertex" ],
 				THREE.Snippets[ "envmap_vertex" ],
+				THREE.Snippets[ "color_vertex" ],
 
 				"gl_Position = projectionMatrix * mvPosition;",
 

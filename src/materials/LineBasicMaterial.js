@@ -18,6 +18,8 @@ THREE.LineBasicMaterial = function ( parameters ) {
 	this.linecap = 'round';
 	this.linejoin = 'round';
 
+	this.vertex_colors = false;
+	
 	if ( parameters ) {
 
 		if ( parameters.color !== undefined ) this.color.setHex( parameters.color );
@@ -26,6 +28,8 @@ THREE.LineBasicMaterial = function ( parameters ) {
 		if ( parameters.linewidth !== undefined ) this.linewidth = parameters.linewidth;
 		if ( parameters.linecap !== undefined ) this.linecap = parameters.linecap;
 		if ( parameters.linejoin !== undefined ) this.linejoin = parameters.linejoin;
+		if ( parameters.vertex_colors !== undefined ) this.vertex_colors = parameters.vertex_colors;
+		
 	}
 
 };
@@ -41,6 +45,7 @@ THREE.LineBasicMaterial.prototype = {
 			'linewidth: ' + this.linewidth +'<br/>' +
 			'linecap: ' + this.linecap +'<br/>' +
 			'linejoin: ' + this.linejoin +'<br/>' +
+			'vertex_colors: ' + this.vertex_colors + '<br/>' +
 			')';
 
 	}
