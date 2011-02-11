@@ -107,7 +107,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 			ppositions = zlights.point.positions,
 
 			dlength = 0,
-			plength = 0;
+			plength = 0,
+		
+			doffset = 0,
+			poffset = 0;
 
 		for ( l = 0, ll = lights.length; l < ll; l++ ) {
 
@@ -124,31 +127,41 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else if ( light instanceof THREE.DirectionalLight ) {
 
-				dcolors[ dlength*3 ]     = color.r * intensity;
-				dcolors[ dlength*3 + 1 ] = color.g * intensity;
-				dcolors[ dlength*3 + 2 ] = color.b * intensity;
+				doffset = dlength * 3;
+				
+				dcolors[ doffset ]     = color.r * intensity;
+				dcolors[ doffset + 1 ] = color.g * intensity;
+				dcolors[ doffset + 2 ] = color.b * intensity;
 
-				dpositions[ dlength*3 ]     = position.x;
-				dpositions[ dlength*3 + 1 ] = position.y;
-				dpositions[ dlength*3 + 2 ] = position.z;
+				dpositions[ doffset ]     = position.x;
+				dpositions[ doffset + 1 ] = position.y;
+				dpositions[ doffset + 2 ] = position.z;
 
 				dlength += 1;
 
 			} else if( light instanceof THREE.PointLight ) {
 
-				pcolors[ plength*3 ]     = color.r * intensity;
-				pcolors[ plength*3 + 1 ] = color.g * intensity;
-				pcolors[ plength*3 + 2 ] = color.b * intensity;
+				poffset = plength * 3;
+				
+				pcolors[ poffset ]     = color.r * intensity;
+				pcolors[ poffset + 1 ] = color.g * intensity;
+				pcolors[ poffset + 2 ] = color.b * intensity;
 
-				ppositions[ plength*3 ]     = position.x;
-				ppositions[ plength*3 + 1 ] = position.y;
-				ppositions[ plength*3 + 2 ] = position.z;
+				ppositions[ poffset ]     = position.x;
+				ppositions[ poffset + 1 ] = position.y;
+				ppositions[ poffset + 2 ] = position.z;
 
 				plength += 1;
 
 			}
 
 		}
+		
+		// null eventual remains from removed lights
+		// (this is to avoid if in shader)
+		
+		for( l = dlength * 3; l < dcolors.length; l++ ) dcolors[ l ] = 0.0;
+		for( l = plength * 3; l < pcolors.length; l++ ) pcolors[ l ] = 0.0;
 
 		zlights.point.length = plength;
 		zlights.directional.length = dlength;

@@ -196,10 +196,20 @@
 
 			}
 
-			var r = 0;
+			var r = 0, counter = 0;
 
 			function loop() {
 
+				if( counter == 30 ) {
+					
+					scene.removeLight( directionalLight );
+					
+				} else {
+				
+					counter++;
+					
+				}
+				
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 				camera.updateMatrix();
