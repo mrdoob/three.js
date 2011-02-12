@@ -26,6 +26,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// camera matrices caches
 	
+	_frustum = [ 
+		new THREE.Vector4(),
+		new THREE.Vector4(),
+		new THREE.Vector4(),
+		new THREE.Vector4(),
+		new THREE.Vector4(),
+		new THREE.Vector4()
+	 ],
+
 	_projScreenMatrix = new THREE.Matrix4(),
 	_projectionMatrixArray = new Float32Array( 16 ),
 	
@@ -817,7 +826,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( object.sortParticles ) {
 		
-			_projScreenMatrix.multiply( camera.projectionMatrix, camera.matrix );
 			_projScreenMatrix.multiplySelf( object.matrix );
 			
 			for ( v = 0; v < vl; v++ ) {
@@ -1406,6 +1414,42 @@ THREE.WebGLRenderer = function ( parameters ) {
 		
 	};
 	
+	function computeFrustum( m ) {
+
+		_frustum[ 0 ].set( m.n41 - m.n11, m.n42 - m.n12, m.n43 - m.n13, m.n44 - m.n14 );
+		_frustum[ 1 ].set( m.n41 + m.n11, m.n42 + m.n12, m.n43 + m.n13, m.n44 + m.n14 );
+		_frustum[ 2 ].set( m.n41 + m.n21, m.n42 + m.n22, m.n43 + m.n23, m.n44 + m.n24 );
+		_frustum[ 3 ].set( m.n41 - m.n21, m.n42 - m.n22, m.n43 - m.n23, m.n44 - m.n24 );
+		_frustum[ 4 ].set( m.n41 - m.n31, m.n42 - m.n32, m.n43 - m.n33, m.n44 - m.n34 );
+		_frustum[ 5 ].set( m.n41 + m.n31, m.n42 + m.n32, m.n43 + m.n33, m.n44 + m.n34 );
+
+		var i, plane;
+		
+		for ( i = 0; i < 5; i ++ ) {
+
+			plane = _frustum[ i ];
+			plane.divideScalar( Math.sqrt( plane.x * plane.x + plane.y * plane.y + plane.z * plane.z ) );
+
+		}
+
+	};
+	
+	function isInFrustum( object ) {
+
+		var distance, matrix = object.matrix,
+		radius = - object.geometry.boundingSphere.radius * Math.max( object.scale.x, Math.max( object.scale.y, object.scale.z ) );
+
+		for ( var i = 0; i < 6; i ++ ) {
+
+			distance = _frustum[ i ].x * matrix.n14 + _frustum[ i ].y * matrix.n24 + _frustum[ i ].z * matrix.n34 + _frustum[ i ].w;
+			if ( distance <= radius ) return false;
+
+		}
+
+		return true;
+
+	};
+	
 	this.render = function( scene, camera, renderTarget, clear ) {
 
 		var o, ol, oil, webGLObject, object, buffer,
@@ -1418,6 +1462,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_viewMatrixArray.set( camera.matrix.flatten() );
 		_projectionMatrixArray.set( camera.projectionMatrix.flatten() );
 
+		_projScreenMatrix.multiply( camera.projectionMatrix, camera.matrix );
+		computeFrustum( _projScreenMatrix );
+		
 		this.initWebGLObjects( scene, camera );
 
 		setRenderTarget( renderTarget, clear !== undefined ? clear : true );
@@ -1428,22 +1475,26 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		// set matrices and faces
+		// set matrices
 		
 		ol = scene.__webGLObjects.length;
 	
 		for ( o = 0; o < ol; o++ ) {
 
 			webGLObject = scene.__webGLObjects[ o ];
-
 			object = webGLObject.object;
-			buffer = webGLObject.buffer;
 
-			if ( object.visible ) {
+			if ( object.visible && ( ! ( object instanceof THREE.Mesh ) || isInFrustum( object ) ) ) {
 				
 				object.autoUpdateMatrix && object.updateMatrix();
 				this.setupMatrices( object, camera );
+				
+				webGLObject.render = true;
 			
+			} else {
+				
+				webGLObject.render = false;
+				
 			}
 		
 		}
@@ -1451,9 +1502,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		oil = scene.__webGLObjectsImmediate.length;
 		
 		for ( o = 0; o < oil; o++ ) {
-			
-			webGLObject = scene.__webGLObjectsImmediate[ o ];
-			object = webGLObject.object;
+		
+			object = scene.__webGLObjectsImmediate[ o ].object;
 			
 			if ( object.visible ) {
 			
@@ -1470,10 +1520,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			webGLObject = scene.__webGLObjects[ o ];
 
-			object = webGLObject.object;
-			buffer = webGLObject.buffer;
-
-			if ( object.visible ) {
+			if ( webGLObject.render ) {
+				
+				object = webGLObject.object;
+				buffer = webGLObject.buffer;
 				
 				setObjectFaces( object );
 				this.renderPass( camera, lights, fog, object, buffer, THREE.NormalBlending, false );
@@ -1484,10 +1534,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// opaque pass (immediate simulator)
 		
-		for ( o = 0; o < scene.__webGLObjectsImmediate.length; o++ ) {
+		for ( o = 0; o < oil; o++ ) {
 			
-			webGLObject = scene.__webGLObjectsImmediate[ o ];
-			object = webGLObject.object;
+			object = scene.__webGLObjectsImmediate[ o ].object;
 			
 			if ( object.visible ) {
 			
@@ -1504,10 +1553,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			webGLObject = scene.__webGLObjects[ o ];
 
-			object = webGLObject.object;
-			buffer = webGLObject.buffer;
-
-			if ( object.visible ) {
+			if ( webGLObject.render ) {
+				
+				object = webGLObject.object;
+				buffer = webGLObject.buffer;
 
 				setObjectFaces( object );
 				
@@ -1535,15 +1584,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// transparent pass (immediate simulator)
 		
-		for ( o = 0; o < scene.__webGLObjectsImmediate.length; o++ ) {
-			
-			webGLObject = scene.__webGLObjectsImmediate[ o ];
-			object = webGLObject.object;
+		for ( o = 0; o < oil; o++ ) {
+		
+			object = scene.__webGLObjectsImmediate[ o ].object;
 			
 			if ( object.visible ) {
 			
 				setObjectFaces( object );
-				
 				this.renderPassImmediate( camera, lights, fog, object, THREE.NormalBlending, true );
 			
 			}
