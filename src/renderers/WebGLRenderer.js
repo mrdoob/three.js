@@ -22,16 +22,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	var _canvas = document.createElement( 'canvas' ), _gl,
 	_oldProgram = null,
-	_oldFramebuffer = null,
-	_modelViewMatrix = new THREE.Matrix4(), _normalMatrix,
+	_oldFramebuffer = null,	
 
-	_viewMatrixArray = new Float32Array(16),
-	_modelViewMatrixArray = new Float32Array(16),
-	_projectionMatrixArray = new Float32Array(16),
-	_normalMatrixArray = new Float32Array(9),
-	_objectMatrixArray = new Float32Array(16),
-
+	// camera matrices caches
+	
 	_projScreenMatrix = new THREE.Matrix4(),
+	_projectionMatrixArray = new Float32Array( 16 ),
+	
+	_viewMatrixArray = new Float32Array( 16 ),	
+
 	_vector3 = new THREE.Vector4(),
 	
 	// parameters defaults
@@ -1120,7 +1119,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		this.loadCamera( program, camera );
-		this.loadMatrices( program );
+		this.loadMatrices( program, object );
 
 		if ( material instanceof THREE.MeshPhongMaterial ||
 			 material instanceof THREE.MeshLambertMaterial ) {
@@ -1443,6 +1442,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			if ( object.visible ) {
 				
 				object.autoUpdateMatrix && object.updateMatrix();
+				this.setupMatrices( object, camera );
 			
 			}
 		
@@ -1458,6 +1458,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			if ( object.visible ) {
 			
 				object.autoUpdateMatrix && object.updateMatrix();
+				this.setupMatrices( object, camera );
 			
 			}
 		
@@ -1475,8 +1476,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			if ( object.visible ) {
 				
 				setObjectFaces( object );
-				
-				this.setupMatrices( object, camera );
 				this.renderPass( camera, lights, fog, object, buffer, THREE.NormalBlending, false );
 
 			}
@@ -1493,8 +1492,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			if ( object.visible ) {
 			
 				setObjectFaces( object );
-				
-				this.setupMatrices( object, camera );
 				this.renderPassImmediate( camera, lights, fog, object, THREE.NormalBlending, false );
 			
 			}
@@ -1513,8 +1510,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			if ( object.visible ) {
 
 				setObjectFaces( object );
-				
-				this.setupMatrices( object, camera );
 				
 				// opaque blended materials
 
@@ -1549,7 +1544,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			
 				setObjectFaces( object );
 				
-				this.setupMatrices( object, camera );
 				this.renderPassImmediate( camera, lights, fog, object, THREE.NormalBlending, true );
 			
 			}
@@ -1609,6 +1603,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 			if ( scene.__webGLObjectsMap[ object.id ] == undefined ) {
 
 				scene.__webGLObjectsMap[ object.id ] = {};
+					
+				object._modelViewMatrix = new THREE.Matrix4();
+				
+				object._normalMatrixArray = new Float32Array( 9 );
+				object._modelViewMatrixArray = new Float32Array( 16 );	
+				object._objectMatrixArray = new Float32Array( 16 );
 
 			}
 
@@ -1683,6 +1683,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				geometry.__dirtyVertices = false;
 				geometry.__dirtyElements = false;
+				geometry.__dirtyColors = false;
 
 			} else if ( object instanceof THREE.ParticleSystem ) {
 
@@ -1742,23 +1743,24 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.setupMatrices = function ( object, camera ) {
 
-		_modelViewMatrix.multiply( camera.matrix, object.matrix );
-		_modelViewMatrixArray.set( _modelViewMatrix.flatten() );
+		object._modelViewMatrix.multiply( camera.matrix, object.matrix );
+		object._modelViewMatrixArray.set( object._modelViewMatrix.flatten() );
 
-		_normalMatrix = THREE.Matrix4.makeInvert3x3( _modelViewMatrix ).transpose();
-		_normalMatrixArray.set( _normalMatrix.m );
+		object._normalMatrix = THREE.Matrix4.makeInvert3x3( object._modelViewMatrix ).transpose();
+		object._normalMatrixArray.set( object._normalMatrix.m );
 
-		_objectMatrixArray.set( object.matrix.flatten() );
+		object._objectMatrixArray.set( object.matrix.flatten() );
 
 	};
 
-	this.loadMatrices = function ( program ) {
+	this.loadMatrices = function ( program, object ) {
 
 		_gl.uniformMatrix4fv( program.uniforms.viewMatrix, false, _viewMatrixArray );
-		_gl.uniformMatrix4fv( program.uniforms.modelViewMatrix, false, _modelViewMatrixArray );
 		_gl.uniformMatrix4fv( program.uniforms.projectionMatrix, false, _projectionMatrixArray );
-		_gl.uniformMatrix3fv( program.uniforms.normalMatrix, false, _normalMatrixArray );
-		_gl.uniformMatrix4fv( program.uniforms.objectMatrix, false, _objectMatrixArray );
+		
+		_gl.uniformMatrix4fv( program.uniforms.modelViewMatrix, false, object._modelViewMatrixArray );
+		_gl.uniformMatrix3fv( program.uniforms.normalMatrix, false, object._normalMatrixArray );
+		_gl.uniformMatrix4fv( program.uniforms.objectMatrix, false, object._objectMatrixArray );
 
 	};
 
