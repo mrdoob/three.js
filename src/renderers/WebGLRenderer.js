@@ -184,7 +184,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		geometry.__webGLVertexBuffer = _gl.createBuffer();
 		geometry.__webGLColorBuffer = _gl.createBuffer();
-		geometry.__webGLParticleBuffer = _gl.createBuffer();
 
 	};
 
@@ -228,7 +227,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		geometry.__vertexArray = new Float32Array( nvertices * 3 );
 		geometry.__colorArray = new Float32Array( nvertices * 3 );
-		geometry.__particleArray = new Uint16Array( nvertices );
 		
 		geometry.__sortArray = [];
 
@@ -815,7 +813,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			cl = colors.length,
 		
 			vertexArray = geometry.__vertexArray,
-			particleArray = geometry.__particleArray,
 			colorArray = geometry.__colorArray,
 		
 			sortArray = geometry.__sortArray,
@@ -899,24 +896,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 				
 			}
-
-		}
-		
-		
-		// yeah, this is silly as order of element indices is currently fixed
-		// though this could change if some use case arises
-		// (like depth-sorting of semi-opaque particles)
-		
-		if ( dirtyElements ) {
-
-			for ( v = 0; v < vl; v++ ) {
-
-				particleArray[ v ] = v;
-
-			}
-			
-			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometry.__webGLParticleBuffer );
-			_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, particleArray, hint );
 
 		}
 		
@@ -1279,9 +1258,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		// render particles
 
 		} else if ( material instanceof THREE.ParticleBasicMaterial ) {
-
-			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryChunk.__webGLParticleBuffer );
-			_gl.drawElements( _gl.POINTS, geometryChunk.__webGLParticleCount, _gl.UNSIGNED_SHORT, 0 );			
+			
+			_gl.drawArrays( _gl.POINTS, 0, geometryChunk.__webGLParticleCount );			
 
 		// render triangles
 			
@@ -1755,7 +1733,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					geometry.__dirtyVertices = true;
 					geometry.__dirtyColors = true;
-					geometry.__dirtyElements = true;
 					
 				}
 
@@ -1769,7 +1746,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				geometry.__dirtyVertices = false;
 				geometry.__dirtyColors = false;
-				geometry.__dirtyElements = false;
 
 
 			} else if ( object instanceof THREE.MarchingCubes ) {
