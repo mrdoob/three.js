@@ -70,7 +70,7 @@
 		</center>
 
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script type="text/javascript" src="../build/ThreeExtras.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
@@ -92,6 +92,8 @@
 
 			stats;
 
+			var cameraOrtho, sceneScreen, rtTexture1, rtTexture2, rtTexture3, materialScreen, materialConvolution, blurx, blury, quadScreen;
+			
 			init();
 			setInterval( loop, 1000 / 60 );
 
@@ -104,11 +106,12 @@
 
 				camera = new THREE.Camera( 33, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 700;
-
+				
 				scene = new THREE.Scene();
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.autoClear = false;
 				container.appendChild( renderer.domElement );
 
 				var geometry = new THREE.Geometry(), 
@@ -161,16 +164,70 @@
 					
 				}
 
-				/*
+				// postprocessing
+				
+                cameraOrtho = new THREE.Camera();
+				cameraOrtho.projectionMatrix = THREE.Matrix4.makeOrtho( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
+                cameraOrtho.position.z = 100;
+
+				sceneScreen = new THREE.Scene();
+				
+				var pars = { min_filter: THREE.LinearFilter, mag_filter: THREE.LinearFilter };
+                rtTexture1 = new THREE.RenderTarget( window.innerWidth, window.innerHeight, pars );
+                rtTexture2 = new THREE.RenderTarget( 512, 512, pars );
+                rtTexture3 = new THREE.RenderTarget( 512, 512, pars );
+
+				var screen_shader = ShaderUtils.lib["screen"];
+				var screen_uniforms = Uniforms.clone( screen_shader.uniforms );
+				
+				screen_uniforms["tDiffuse"].texture = rtTexture1;
+				screen_uniforms["opacity"].value = 1.0;
+				
+                materialScreen = new THREE.MeshShaderMaterial( {
+
+                    uniforms: screen_uniforms,
+                    vertex_shader: screen_shader.vertex_shader,
+                    fragment_shader: screen_shader.fragment_shader,
+					blending: THREE.AdditiveBlending
+
+                } );
+				
+				
+				var convolution_shader = ShaderUtils.lib["convolution"];
+				var convolution_uniforms = Uniforms.clone( convolution_shader.uniforms );
+
+				blurx = new THREE.Vector2( 0.001953125, 0.0 ),
+				blury = new THREE.Vector2( 0.0, 0.001953125 );
+
+				convolution_uniforms["tDiffuse"].texture = rtTexture1;
+				convolution_uniforms["uImageIncrement"].value = blurx;
+				convolution_uniforms["cKernel"].value = ShaderUtils.buildKernel( 4.0 );
+				
+                materialConvolution = new THREE.MeshShaderMaterial( {
+
+                    uniforms: convolution_uniforms,
+                    vertex_shader:   "#define KERNEL_SIZE 25.0\n" + convolution_shader.vertex_shader,
+                    fragment_shader: "#define KERNEL_SIZE 25\n"   + convolution_shader.fragment_shader
+
+                } );
+				
+				var plane = new Plane( window.innerWidth, window.innerHeight );				
+
+                quadScreen = new THREE.Mesh( plane, materialConvolution );
+				quadScreen.position.z = -100;
+                sceneScreen.addObject( quadScreen );
+
+				
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
-				container.appendChild(stats.domElement);
-				*/
+				//container.appendChild(stats.domElement);
+				
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+				
 			}
 
 			// port of Processing Java code by Thomas Diewald
@@ -261,9 +318,46 @@
 					
 				}
 				
-				renderer.render(scene, camera);
+				//renderer.render( scene, camera );
+
+				renderer.clear();
+				
+				// Render scene into texture
+				
+				renderer.render( scene, camera, rtTexture1 );
+
+				// Render quad with blured scene into texture (convolution pass 1)
+				
+				quadScreen.materials = [ materialConvolution ];
+				
+				materialConvolution.uniforms.tDiffuse.texture = rtTexture1;
+				materialConvolution.uniforms.uImageIncrement.value = blurx;
+				
+				renderer.render( sceneScreen, cameraOrtho, rtTexture2 );
+				
+				// Render quad with blured scene into texture (convolution pass 2)
+				
+				materialConvolution.uniforms.tDiffuse.texture = rtTexture2;
+				materialConvolution.uniforms.uImageIncrement.value = blury;
+				
+				renderer.render( sceneScreen, cameraOrtho, rtTexture3 );
+				
+				// Render original scene with superimposed blur to texture
+				
+				quadScreen.materials = [ materialScreen ];
+				
+				materialScreen.uniforms.tDiffuse.texture = rtTexture3;
+				materialScreen.uniforms.opacity.value = 1.3;
+				
+				renderer.render( sceneScreen, cameraOrtho, rtTexture1, false );
+
+				// Render to screen
+
+				materialScreen.uniforms.tDiffuse.texture = rtTexture1;
+				renderer.render( sceneScreen, cameraOrtho );
 
 				//stats.update();
+				
 			}
 
 			function is_browser_compatible() {
