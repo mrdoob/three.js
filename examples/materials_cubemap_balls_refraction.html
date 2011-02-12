@@ -5,7 +5,7 @@
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
-				background:#fff;
+				background:#777;
 				padding:0;
 				margin:0;
 				font-weight: bold;
@@ -26,6 +26,8 @@
 			a {
 				color: #ffffff;
 			}
+			
+			#oldie a { color:#da0 }
 		</style>
 	</head>
 
@@ -38,6 +40,8 @@
 
 		<script type="text/javascript">
 
+			if ( ! THREE.Supports.webgl ) THREE.Supports.addGetWebGLMessage();
+			
 			var statsEnabled = false;
 
 			var container, stats;

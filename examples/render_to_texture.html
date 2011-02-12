@@ -78,6 +78,8 @@
 
         <script type="text/javascript">
 
+			if ( ! THREE.Supports.webgl ) THREE.Supports.addGetWebGLMessage();
+			
             var container, stats;
 
             var cameraRTT, camera, sceneRTT, sceneScreen, scene, renderer, zmesh1, zmesh2;

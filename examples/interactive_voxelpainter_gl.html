@@ -10,6 +10,8 @@
 				margin: 0px;
 				overflow: hidden;
 			}
+			
+			#oldie { background-color: #ddd !important }
 		</style>
 	</head>
 	<body>
@@ -24,6 +26,8 @@
 
 		<script type="text/javascript">
 
+			if ( ! THREE.Supports.webgl ) THREE.Supports.addGetWebGLMessage();
+			
 			var container, stats;
 			var camera, scene, renderer;
 			var projector, plane, cube;

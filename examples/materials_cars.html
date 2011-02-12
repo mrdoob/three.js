@@ -27,6 +27,8 @@
 			#car_info { text-align:center; }
 			#car_name { font-size:1em }
 			#car_author { font-size:1em }
+			
+			#oldie { background:rgb(50,0,0) !important; color:#fff !important; margin-top:7em!important }
 		</style>
 	</head>
 
@@ -60,6 +62,8 @@
 
 		<script type="text/javascript">
 
+			if ( ! THREE.Supports.webgl ) THREE.Supports.addGetWebGLMessage();
+			
 			var STATS_ENABLED = false;
 
 			var CARS = {

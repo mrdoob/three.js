@@ -24,21 +24,6 @@
 				
             }
 
-			#oldie {
-				font-family:monospace;
-				font-size:13px;
-
-				text-align:center;
-				background:#eee;
-				color:#000;
-				padding:1em;
-
-				width:475px;
-				margin:5em auto 0;
-
-				display:none;
-			}
-
             a { color: red; }
 
         </style>
@@ -50,18 +35,6 @@
 			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl postprocessing example -
 			<a href="http://www.ir-ltd.net/infinite-3d-head-scan-released/" target="_blank">Lee Perry-Smith</a> head
 		</div>
-
-		<center>
-		<div id="oldie">
-			Sorry, your browser doesn't support <a href="http://khronos.org/webgl/wiki/Getting_a_WebGL_Implementation">WebGL</a>
-			and <a href="http://www.whatwg.org/specs/web-workers/current-work/">Web Workers</a>.<br/>
-			<br/>
-			Please try in
-			<a href="http://www.chromium.org/getting-involved/dev-channel">Chrome 9+</a> /
-			<a href="http://www.mozilla.com/en-US/firefox/all-beta.html">Firefox 4+</a> /
-			<a href="http://nightly.webkit.org/">Safari OSX 10.6+</a>
-		</div>
-		</center>
 
         <script type="text/javascript" src="js/Stats.js"></script>
         <script type="text/javascript" src="../build/ThreeExtras.js"></script>
@@ -91,11 +64,7 @@
 
         <script type="text/javascript">
 
-			if ( ! THREE.Supports.webgl ) {
-
-				document.getElementById( "oldie" ).style.display = "block";
-
-			}
+			if ( ! THREE.Supports.webgl ) THREE.Supports.addGetWebGLMessage();
 
             var container, stats;
 

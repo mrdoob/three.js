@@ -42,6 +42,13 @@
 
 		<script type="text/javascript">
 
+			if ( ! THREE.Supports.webgl ) {
+				
+				THREE.Supports.addGetWebGLMessage();
+				document.getElementById( 'container' ).innerHTML = "";
+				
+			}
+			
 			var fogExp2 = true;
 			
 			var container, stats;

@@ -27,6 +27,7 @@
 				color: #ffffff;
 			}
 
+			#oldie a { color:#da0 }
 		</style>
 	</head>
 	<body>
@@ -83,6 +84,8 @@
 		</script>
 
 		<script type="text/javascript">
+		
+			if ( ! THREE.Supports.webgl ) THREE.Supports.addGetWebGLMessage();
 
 			var container, stats;
 

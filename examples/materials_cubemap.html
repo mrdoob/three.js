@@ -21,6 +21,8 @@
 			#d { text-align:center; margin:1em 0 -7.5em 0; z-index:1000; position:relative; display:block }
 			.button { background:orange; color:#fff; padding:0.2em 0.5em; cursor:pointer }
 			.inactive { background:#999; color:#eee }
+			
+			#oldie { margin-top:11em !important }
 		</style>
 	</head>
 
@@ -40,6 +42,8 @@
 
 		<script type="text/javascript">
 
+			if ( ! THREE.Supports.webgl ) THREE.Supports.addGetWebGLMessage();
+			
 			var container, stats;
 
 			var camera, scene, webglRenderer;
