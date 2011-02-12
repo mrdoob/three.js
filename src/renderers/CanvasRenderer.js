@@ -697,7 +697,7 @@ THREE.CanvasRenderer = function () {
 
 			// http://extremelysatisfactorytotalitarianism.com/blog/?p=2120
 
-			var a, b, c, d, e, f, det,
+			var a, b, c, d, e, f, det, idet,
 			width = bitmap.width - 1,
 			height = bitmap.height - 1;
 
@@ -711,14 +711,18 @@ THREE.CanvasRenderer = function () {
 			u1 -= u0; v1 -= v0;
 			u2 -= u0; v2 -= v0;
 
-			det = 1 / ( u1 * v2 - u2 * v1 ),
+			det = u1 * v2 - u2 * v1;
 
-			a = ( v2 * x1 - v1 * x2 ) * det,
-			b = ( v2 * y1 - v1 * y2 ) * det,
-			c = ( u1 * x2 - u2 * x1 ) * det,
-			d = ( u1 * y2 - u2 * y1 ) * det,
+			if ( det == 0 ) return;
 
-			e = x0 - a * u0 - c * v0,
+			idet = 1 / det;
+
+			a = ( v2 * x1 - v1 * x2 ) * idet;
+			b = ( v2 * y1 - v1 * y2 ) * idet;
+			c = ( u1 * x2 - u2 * x1 ) * idet;
+			d = ( u1 * y2 - u2 * y1 ) * idet;
+
+			e = x0 - a * u0 - c * v0;
 			f = y0 - b * u0 - d * v0;
 
 			_context.save();
