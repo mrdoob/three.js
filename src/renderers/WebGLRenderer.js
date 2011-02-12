@@ -1486,7 +1486,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( object.visible && ( ! ( object instanceof THREE.Mesh ) || isInFrustum( object ) ) ) {
 				
-				object.autoUpdateMatrix && object.updateMatrix();
+				if( object.autoUpdateMatrix ) { 
+					
+					object.updateMatrix();
+					object._objectMatrixArray.set( object.matrix.flatten() );
+				
+				}
+				
 				this.setupMatrices( object, camera );
 				
 				webGLObject.render = true;
@@ -1507,7 +1513,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 			
 			if ( object.visible ) {
 			
-				object.autoUpdateMatrix && object.updateMatrix();
+				if( object.autoUpdateMatrix ) { 
+				
+					object.updateMatrix();
+					object._objectMatrixArray.set( object.matrix.flatten() );
+				
+				}
+				
 				this.setupMatrices( object, camera );
 			
 			}
@@ -1656,6 +1668,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 				object._normalMatrixArray = new Float32Array( 9 );
 				object._modelViewMatrixArray = new Float32Array( 16 );	
 				object._objectMatrixArray = new Float32Array( 16 );
+					
+				object._objectMatrixArray.set( object.matrix.flatten() );
 
 			}
 
@@ -1790,13 +1804,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.setupMatrices = function ( object, camera ) {
 
-		object._modelViewMatrix.multiply( camera.matrix, object.matrix );
-		object._modelViewMatrixArray.set( object._modelViewMatrix.flatten() );
-
-		object._normalMatrix = THREE.Matrix4.makeInvert3x3( object._modelViewMatrix ).transpose();
-		object._normalMatrixArray.set( object._normalMatrix.m );
-
-		object._objectMatrixArray.set( object.matrix.flatten() );
+		object._modelViewMatrix.multiplyToArray( camera.matrix, object.matrix, object._modelViewMatrixArray );
+		object._normalMatrix = THREE.Matrix4.makeInvert3x3( object._modelViewMatrix ).transposeIntoArray( object._normalMatrixArray );
 
 	};
 

@@ -146,6 +146,62 @@ THREE.Matrix4.prototype = {
 
 	},
 
+	multiplyToArray: function ( a, b, r ) {
+
+		var a11 = a.n11, a12 = a.n12, a13 = a.n13, a14 = a.n14,
+		a21 = a.n21, a22 = a.n22, a23 = a.n23, a24 = a.n24,
+		a31 = a.n31, a32 = a.n32, a33 = a.n33, a34 = a.n34,
+		a41 = a.n41, a42 = a.n42, a43 = a.n43, a44 = a.n44,
+
+		b11 = b.n11, b12 = b.n12, b13 = b.n13, b14 = b.n14,
+		b21 = b.n21, b22 = b.n22, b23 = b.n23, b24 = b.n24,
+		b31 = b.n31, b32 = b.n32, b33 = b.n33, b34 = b.n34,
+		b41 = b.n41, b42 = b.n42, b43 = b.n43, b44 = b.n44;
+
+		this.n11 = a11 * b11 + a12 * b21 + a13 * b31 + a14 * b41;
+		this.n12 = a11 * b12 + a12 * b22 + a13 * b32 + a14 * b42;
+		this.n13 = a11 * b13 + a12 * b23 + a13 * b33 + a14 * b43;
+		this.n14 = a11 * b14 + a12 * b24 + a13 * b34 + a14 * b44;
+
+		this.n21 = a21 * b11 + a22 * b21 + a23 * b31 + a24 * b41;
+		this.n22 = a21 * b12 + a22 * b22 + a23 * b32 + a24 * b42;
+		this.n23 = a21 * b13 + a22 * b23 + a23 * b33 + a24 * b43;
+		this.n24 = a21 * b14 + a22 * b24 + a23 * b34 + a24 * b44;
+
+		this.n31 = a31 * b11 + a32 * b21 + a33 * b31 + a34 * b41;
+		this.n32 = a31 * b12 + a32 * b22 + a33 * b32 + a34 * b42;
+		this.n33 = a31 * b13 + a32 * b23 + a33 * b33 + a34 * b43;
+		this.n34 = a31 * b14 + a32 * b24 + a33 * b34 + a34 * b44;
+
+		this.n41 = a41 * b11 + a42 * b21 + a43 * b31 + a44 * b41;
+		this.n42 = a41 * b12 + a42 * b22 + a43 * b32 + a44 * b42;
+		this.n43 = a41 * b13 + a42 * b23 + a43 * b33 + a44 * b43;
+		this.n44 = a41 * b14 + a42 * b24 + a43 * b34 + a44 * b44;
+
+		r[ 0 ] = this.n11;
+		r[ 1 ] = this.n21;
+		r[ 2 ] = this.n31;
+		r[ 3 ] = this.n41;
+
+		r[ 4 ] = this.n12;
+		r[ 5 ] = this.n22;
+		r[ 6 ] = this.n32;
+		r[ 7 ] = this.n42;
+
+		r[ 8 ]  = this.n13;
+		r[ 9 ]  = this.n23;
+		r[ 10 ] = this.n33;
+		r[ 11 ] = this.n43;
+
+		r[ 12 ] = this.n14;
+		r[ 13 ] = this.n24;
+		r[ 14 ] = this.n34;
+		r[ 15 ] = this.n44;
+		
+		return this;
+
+	},
+
 	multiplySelf: function ( m ) {
 
 		var n11 = this.n11, n12 = this.n12, n13 = this.n13, n14 = this.n14,
