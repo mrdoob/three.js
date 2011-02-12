@@ -75,7 +75,7 @@
 
 		<script type="text/javascript">
 		
-			if ( !is_browser_compatible() ) {
+			if ( ! THREE.Supports.webgl ) {
 
 				document.getElementById( "oldie" ).style.display = "block";
 
@@ -249,16 +249,6 @@
 				renderer.render(scene, camera);
 
 				//stats.update();
-			}
-
-			function is_browser_compatible() {
-
-				// WebGL support
-
-				try { var test = new Float32Array(1); } catch(e) { return false; }
-
-				return true;
-
 			}
 
 		</script>

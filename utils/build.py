@@ -26,6 +26,7 @@ COMMON_FILES = [
 'core/Face4.js',
 'core/UV.js',
 'core/Geometry.js',
+'core/Supports.js',
 'cameras/Camera.js',
 'lights/Light.js',
 'lights/AmbientLight.js',
