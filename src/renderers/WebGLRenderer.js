@@ -1242,31 +1242,42 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		// render mesh
+
+		if ( object instanceof THREE.Mesh ) {
+
+			// wireframe
+			
+			if ( material.wireframe ) {
+
+				_gl.lineWidth( material.wireframe_linewidth );
+				_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryChunk.__webGLLineBuffer );
+				_gl.drawElements( _gl.LINES, geometryChunk.__webGLLineCount, _gl.UNSIGNED_SHORT, 0 );
+			
+			// triangles
+			
+			} else {
+				
+				_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryChunk.__webGLFaceBuffer );
+				_gl.drawElements( _gl.TRIANGLES, geometryChunk.__webGLFaceCount, _gl.UNSIGNED_SHORT, 0 );
+				
+			}
+		
 		// render lines
+		
+		} else if ( object instanceof THREE.Line ) {
+			
+			primitives = object.type == THREE.LineStrip ? _gl.LINE_STRIP : _gl.LINES;
 
-		if ( material.wireframe || material instanceof THREE.LineBasicMaterial ) {
-
-			linewidth = material.wireframe_linewidth !== undefined ? material.wireframe_linewidth :
-						material.linewidth !== undefined ? material.linewidth : 1;
-
-			primitives = material instanceof THREE.LineBasicMaterial && object.type == THREE.LineStrip ? _gl.LINE_STRIP : _gl.LINES;
-
-			_gl.lineWidth( linewidth );
+			_gl.lineWidth( material.linewidth );
 			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryChunk.__webGLLineBuffer );
 			_gl.drawElements( primitives, geometryChunk.__webGLLineCount, _gl.UNSIGNED_SHORT, 0 );
-
+		
 		// render particles
-
-		} else if ( material instanceof THREE.ParticleBasicMaterial ) {
+		
+		} else if ( object instanceof THREE.ParticleSystem ) {
 			
-			_gl.drawArrays( _gl.POINTS, 0, geometryChunk.__webGLParticleCount );			
-
-		// render triangles
-			
-		} else {
-			
-			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryChunk.__webGLFaceBuffer );
-			_gl.drawElements( _gl.TRIANGLES, geometryChunk.__webGLFaceCount, _gl.UNSIGNED_SHORT, 0 );
+			_gl.drawArrays( _gl.POINTS, 0, geometryChunk.__webGLParticleCount );
 			
 		}
 
