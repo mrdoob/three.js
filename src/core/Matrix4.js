@@ -567,21 +567,20 @@ THREE.Matrix4.makeInvert3x3 = function ( m1 ) {
 	// input:  THREE.Matrix4, output: THREE.Matrix3
 	// ( based on http://code.google.com/p/webgl-mjs/ )
 
-	var m = m1.flatten(),
-		m33 = m1.m33,
+	var m33 = m1.m33,
 		m33m = m33.m,
 
-	a11 =   m[ 10 ] * m[ 5 ] - m[ 6 ] * m[ 9 ],
-	a21 = - m[ 10 ] * m[ 1 ] + m[ 2 ] * m[ 9 ],
-	a31 =   m[ 6 ]  * m[ 1 ] - m[ 2 ] * m[ 5 ],
-	a12 = - m[ 10 ] * m[ 4 ] + m[ 6 ] * m[ 8 ],
-	a22 =   m[ 10 ] * m[ 0 ] - m[ 2 ] * m[ 8 ],
-	a32 = - m[ 6 ]  * m[ 0 ] + m[ 2 ] * m[ 4 ],
-	a13 =   m[ 9 ]  * m[ 4 ] - m[ 5 ] * m[ 8 ],
-	a23 = - m[ 9 ]  * m[ 0 ] + m[ 1 ] * m[ 8 ],
-	a33 =   m[ 5 ]  * m[ 0 ] - m[ 1 ] * m[ 4 ],
+	a11 =   m1.n33 * m1.n22 - m1.n32 * m1.n23,
+	a21 = - m1.n33 * m1.n21 + m1.n31 * m1.n23,
+	a31 =   m1.n32 * m1.n21 - m1.n31 * m1.n22,
+	a12 = - m1.n33 * m1.n12 + m1.n32 * m1.n13,
+	a22 =   m1.n33 * m1.n11 - m1.n31 * m1.n13,
+	a32 = - m1.n32 * m1.n11 + m1.n31 * m1.n12,
+	a13 =   m1.n23 * m1.n12 - m1.n22 * m1.n13,
+	a23 = - m1.n23 * m1.n11 + m1.n21 * m1.n13,
+	a33 =   m1.n22 * m1.n11 - m1.n21 * m1.n12,
 	
-	det = m[ 0 ]  * a11 + m[ 1 ] * a12 + m[ 2 ] * a13,
+	det = m1.n11 * a11 + m1.n21 * a12 + m1.n31 * a13,
 	
 	idet;
 

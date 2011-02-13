@@ -1085,7 +1085,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		this.loadCamera( program, camera );
+		// only Phong and environment mapping use cameraPosition uniform
+		// shader material also gets it for the sake of genericity
+		
+		if ( material instanceof THREE.MeshShaderMaterial ||
+			 material instanceof THREE.MeshPhongMaterial ||
+			 material.env_map ) {
+			
+			this.loadCamera( program, camera );
+			
+		}
+		
 		this.loadMatrices( program, object );
 
 		if ( material instanceof THREE.MeshPhongMaterial ||
