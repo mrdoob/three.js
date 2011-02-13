@@ -352,6 +352,32 @@ THREE.Matrix4.prototype = {
 
 	},
 
+	flattenToArray: function( flat ) {
+		
+		flat[ 0 ] = this.n11;
+		flat[ 1 ] = this.n21;
+		flat[ 2 ] = this.n31;
+		flat[ 3 ] = this.n41;
+
+		flat[ 4 ] = this.n12;
+		flat[ 5 ] = this.n22;
+		flat[ 6 ] = this.n32;
+		flat[ 7 ] = this.n42;
+
+		flat[ 8 ]  = this.n13;
+		flat[ 9 ]  = this.n23;
+		flat[ 10 ] = this.n33;
+		flat[ 11 ] = this.n43;
+
+		flat[ 12 ] = this.n14;
+		flat[ 13 ] = this.n24;
+		flat[ 14 ] = this.n34;
+		flat[ 15 ] = this.n44;
+
+		return flat;
+
+	},
+
 	setTranslation: function( x, y, z ) {
 
 		this.set( 1, 0, 0, x,

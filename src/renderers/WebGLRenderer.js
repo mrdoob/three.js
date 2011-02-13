@@ -1427,8 +1427,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		camera.autoUpdateMatrix && camera.updateMatrix();
 		
-		_viewMatrixArray.set( camera.matrix.flatten() );
-		_projectionMatrixArray.set( camera.projectionMatrix.flatten() );
+		camera.matrix.flattenToArray( _viewMatrixArray );
+		camera.projectionMatrix.flattenToArray( _projectionMatrixArray );
 
 		_projScreenMatrix.multiply( camera.projectionMatrix, camera.matrix );
 		computeFrustum( _projScreenMatrix );
@@ -1457,7 +1457,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				if( object.autoUpdateMatrix ) { 
 					
 					object.updateMatrix();
-					object._objectMatrixArray.set( object.matrix.flatten() );
+					object.matrix.flattenToArray( object._objectMatrixArray );
 				
 				}
 				
@@ -1484,7 +1484,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				if( object.autoUpdateMatrix ) { 
 				
 					object.updateMatrix();
-					object._objectMatrixArray.set( object.matrix.flatten() );
+					object.matrix.flattenToArray( object._objectMatrixArray );
 				
 				}
 				
@@ -1634,10 +1634,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 				object._modelViewMatrix = new THREE.Matrix4();
 				
 				object._normalMatrixArray = new Float32Array( 9 );
-				object._modelViewMatrixArray = new Float32Array( 16 );	
+				object._modelViewMatrixArray = new Float32Array( 16 );
 				object._objectMatrixArray = new Float32Array( 16 );
-					
-				object._objectMatrixArray.set( object.matrix.flatten() );
+				
+				object.matrix.flattenToArray( object._objectMatrixArray );
 
 			}
 
