@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - geometry - webgl terrain + fog</title>
+		<title>three.js - geometry - terrain + fog - webgl</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -39,12 +39,13 @@
 		<script type="text/javascript" src="../build/Three.js"></script>
 		<script type="text/javascript" src="../src/extras/GeometryUtils.js"></script>
 		<script type="text/javascript" src="../src/extras/primitives/Plane.js"></script>
-
+		<script type="text/javascript" src="../src/extras/Detector.js"></script>
+		
 		<script type="text/javascript">
 
-			if ( ! THREE.Supports.webgl ) {
+			if ( ! THREE.Detector.webgl ) {
 				
-				THREE.Supports.addGetWebGLMessage();
+				THREE.Detector.addGetWebGLMessage();
 				document.getElementById( 'container' ).innerHTML = "";
 				
 			}

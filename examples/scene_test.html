@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - scene loader test</title>
+		<title>three.js - io - scene loader - webgl</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -154,7 +154,7 @@
 
 		<script type="text/javascript">
 
-			if ( ! THREE.Supports.webgl ) THREE.Supports.addGetWebGLMessage();
+			if ( ! THREE.Detector.webgl ) THREE.Detector.addGetWebGLMessage();
 			
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;

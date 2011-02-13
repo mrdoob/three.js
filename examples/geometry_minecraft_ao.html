@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - geometry - minecraft - ao</title>
+		<title>three.js - geometry - minecraft - ao - webgl</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -27,6 +27,7 @@
 			#oldie {
 				background:rgb(100,0,0) !important;
 				color:#fff !important;
+				margin-top:10em !important;
 			}
 			#oldie a { color:#fff }
 
@@ -52,10 +53,16 @@
 		<script type="text/javascript" src="../build/Three.js"></script>
 		<script type="text/javascript" src="../src/extras/GeometryUtils.js"></script>
 		<script type="text/javascript" src="../src/extras/primitives/Cube.js"></script>
+		<script type="text/javascript" src="../src/extras/Detector.js"></script>
 
 		<script type="text/javascript">
 
-			if ( ! THREE.Supports.webgl ) THREE.Supports.addGetWebGLMessage();
+			if ( ! THREE.Detector.webgl ) {
+				
+				THREE.Detector.addGetWebGLMessage();
+				document.getElementById( 'container' ).innerHTML = "";
+				
+			}
 
 			var fogExp2 = true;
 			

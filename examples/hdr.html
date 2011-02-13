@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
     <head>
-        <title>three.js - HDR texture - webgl</title>
+        <title>three.js - materials - HDR texture - webgl</title>
         <meta charset="utf-8">
         <style type="text/css">
             body {
@@ -36,8 +36,8 @@
 			based on <a href="http://spidergl.org/example.php?id=13" target="_blank">SpiderGL</a>
 		</div>
 
-        <script type="text/javascript" src="js/Stats.js"></script>
         <script type="text/javascript" src="../build/ThreeExtras.js"></script>
+        <script type="text/javascript" src="js/Stats.js"></script>
 
 		
 		<!-- HDR fragment shader -->
@@ -93,7 +93,7 @@
 
         <script type="text/javascript">
 
-			if ( ! THREE.Supports.webgl ) THREE.Supports.addGetWebGLMessage();
+			if ( ! THREE.Detector.webgl ) THREE.Detector.addGetWebGLMessage();
 
             var container, stats;
 

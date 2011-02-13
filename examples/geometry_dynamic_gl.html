@@ -44,9 +44,9 @@
 
 		<script type="text/javascript">
 
-			if ( ! THREE.Supports.webgl ) {
+			if ( ! THREE.Detector.webgl ) {
 			
-				THREE.Supports.addGetWebGLMessage();
+				THREE.Detector.addGetWebGLMessage();
 				document.getElementById( 'container' ).innerHTML = "";
 				
 			}

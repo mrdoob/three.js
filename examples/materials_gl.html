@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - materials WebGL</title>
+		<title>three.js - materials - webgl</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -18,11 +18,12 @@
 		<pre id="log"></pre>
 
 		<script type="text/javascript" src="../build/ThreeExtras.js"></script>
-
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
 
+			if ( ! THREE.Detector.webgl ) THREE.Detector.addGetWebGLMessage();
+			
 			var container, stats;
 
 			var camera, scene, renderer, objects;

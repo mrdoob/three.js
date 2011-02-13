@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - point light WebGL</title>
+		<title>three.js - lights - point lights - webgl</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -45,13 +45,14 @@
 		<script type="text/javascript" src="../build/Three.js"></script> 
 
 		<script type="text/javascript" src="../src/extras/io/Loader.js"></script>
-		<script type="text/javascript" src="../src/extras/primitives/Sphere.js"></script> 
+		<script type="text/javascript" src="../src/extras/primitives/Sphere.js"></script>
+		<script type="text/javascript" src="../src/extras/Detector.js"></script>
 
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
 
-			if ( ! THREE.Supports.webgl ) THREE.Supports.addGetWebGLMessage();
+			if ( ! THREE.Detector.webgl ) THREE.Detector.addGetWebGLMessage();
 			
 			var camera, scene, renderer,
 			particle1, particle2, particle2,

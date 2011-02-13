@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - grass</title>
+		<title>three.js - materials - grass - webgl</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -19,10 +19,12 @@
 	<body>
 		<script type="text/javascript" src="../build/Three.js"></script>
 		<script type="text/javascript" src="../src/extras/primitives/Plane.js"></script>
-
+		<script type="text/javascript" src="../src/extras/Detector.js"></script>
 
 		<script type="text/javascript">
 
+			if ( ! THREE.Detector.webgl ) THREE.Detector.addGetWebGLMessage();
+			
 			var camera, scene, renderer,
 			mesh, levels = [];
 

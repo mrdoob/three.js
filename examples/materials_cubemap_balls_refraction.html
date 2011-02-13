@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - webgl cube refraction [balls]</title>
+		<title>three.js - materials - cube refraction [balls] - webgl</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -34,13 +34,12 @@
 	<body>
 		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl cube refraction demo. skybox by <a href="http://www.zfight.com/" target="_blank">Jochum Skoglund</a></div>
 
-		<script type="text/javascript" src="../build/ThreeExtras.js"></script> 
-
+		<script type="text/javascript" src="../build/ThreeExtras.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
 
-			if ( ! THREE.Supports.webgl ) THREE.Supports.addGetWebGLMessage();
+			if ( ! THREE.Detector.webgl ) THREE.Detector.addGetWebGLMessage();
 			
 			var statsEnabled = false;
 

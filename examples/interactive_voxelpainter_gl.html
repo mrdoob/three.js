@@ -21,12 +21,13 @@
 		<script type="text/javascript" src="../src/extras/primitives/Cube.js"></script>
 		<script type="text/javascript" src="../src/extras/primitives/Plane.js"></script>
 		<script type="text/javascript" src="../src/extras/ImageUtils.js"></script>
+		<script type="text/javascript" src="../src/extras/Detector.js"></script>
 
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
 
-			if ( ! THREE.Supports.webgl ) THREE.Supports.addGetWebGLMessage();
+			if ( ! THREE.Detector.webgl ) THREE.Detector.addGetWebGLMessage();
 			
 			var container, stats;
 			var camera, scene, renderer;

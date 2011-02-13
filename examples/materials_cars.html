@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - webgl reflection [cars]</title>
+		<title>three.js - materials - cube reflection [cars] - webgl</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -57,12 +57,11 @@
 		<div id="log"></div>
 
 		<script type="text/javascript" src="../build/ThreeExtras.js"></script>
-
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
 
-			if ( ! THREE.Supports.webgl ) THREE.Supports.addGetWebGLMessage();
+			if ( ! THREE.Detector.webgl ) THREE.Detector.addGetWebGLMessage();
 			
 			var STATS_ENABLED = false;
 

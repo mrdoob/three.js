@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - webgl cube reflection / refraction [Walt]</title>
+		<title>three.js - materials - cube reflection / refraction [Walt] - webgl</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -36,13 +36,12 @@
 
 		<pre id="log"></pre>
 
-		<script type="text/javascript" src="../build/ThreeExtras.js"></script> 
-
+		<script type="text/javascript" src="../build/ThreeExtras.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
 
-			if ( ! THREE.Supports.webgl ) THREE.Supports.addGetWebGLMessage();
+			if ( ! THREE.Detector.webgl ) THREE.Detector.addGetWebGLMessage();
 			
 			var container, stats;
 
