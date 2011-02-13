@@ -191,7 +191,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		geometry.__webGLVertexBuffer = _gl.createBuffer();
 		geometry.__webGLColorBuffer = _gl.createBuffer();
-		geometry.__webGLLineBuffer = _gl.createBuffer();
 
 	};
 
@@ -215,7 +214,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		geometry.__vertexArray = new Float32Array( nvertices * 3 );
 		geometry.__colorArray = new Float32Array( nvertices * 3 );
-		geometry.__lineArray = new Uint16Array( nvertices );
 
 		geometry.__webGLLineCount = nvertices;
 
@@ -741,11 +739,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			vertexArray = geometry.__vertexArray,
 			colorArray = geometry.__colorArray,
-			lineArray = geometry.__lineArray,
 		
 			dirtyVertices = geometry.__dirtyVertices, 
-			dirtyColors = geometry.__dirtyColors,
-			dirtyElements = geometry.__dirtyElements;
+			dirtyColors = geometry.__dirtyColors;
 
 		if ( dirtyVertices ) {
 
@@ -782,22 +778,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometry.__webGLColorBuffer );
 			_gl.bufferData( _gl.ARRAY_BUFFER, colorArray, hint );
-
-		}
-
-		// yeah, this is silly as order of element indices is currently fixed
-		// though this could change if some use case arises
-
-		if ( dirtyElements ) {
-
-			for ( v = 0; v < vl; v++ ) {
-
-				lineArray[ v ] = v;
-
-			}
-
-			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometry.__webGLLineBuffer );
-			_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, lineArray, hint );
 
 		}
 
@@ -1267,11 +1247,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 		
 		} else if ( object instanceof THREE.Line ) {
 			
-			primitives = object.type == THREE.LineStrip ? _gl.LINE_STRIP : _gl.LINES;
+			primitives = ( object.type == THREE.LineStrip ) ? _gl.LINE_STRIP : _gl.LINES;
 
 			_gl.lineWidth( material.linewidth );
-			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryChunk.__webGLLineBuffer );
-			_gl.drawElements( primitives, geometryChunk.__webGLLineCount, _gl.UNSIGNED_SHORT, 0 );
+			_gl.drawArrays( primitives, 0, geometryChunk.__webGLLineCount );
 		
 		// render particles
 		
@@ -1718,7 +1697,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 					this.initLineBuffers( geometry );
 
 					geometry.__dirtyVertices = true;
-					geometry.__dirtyElements = true;
 					geometry.__dirtyColors = true;
 
 				}
@@ -1732,7 +1710,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 				add_buffer( objmap, 0, geometry, object );
 
 				geometry.__dirtyVertices = false;
-				geometry.__dirtyElements = false;
 				geometry.__dirtyColors = false;
 
 			} else if ( object instanceof THREE.ParticleSystem ) {
@@ -1757,7 +1734,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				geometry.__dirtyVertices = false;
 				geometry.__dirtyColors = false;
-
 
 			} else if ( object instanceof THREE.MarchingCubes ) {
 				
