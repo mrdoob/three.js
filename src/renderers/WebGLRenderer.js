@@ -24,6 +24,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_oldProgram = null,
 	_oldFramebuffer = null,	
 
+	// gl state cache
+	
+	_cullEnabled,
+	_oldBlending = null,
+	
 	// camera matrices caches
 	
 	_frustum = [ 
@@ -903,206 +908,173 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function refreshUniformsCommon( material, fog ) {
+	function refreshUniformsCommon( uniforms, material ) {
 
 		// premultiply alpha
-		material.uniforms.diffuse.value.setRGB( material.color.r * material.opacity, material.color.g * material.opacity, material.color.b * material.opacity );
+		uniforms.diffuse.value.setRGB( material.color.r * material.opacity, material.color.g * material.opacity, material.color.b * material.opacity );
 
 		// pure color
-		//material.uniforms.color.value.setHex( material.color.hex );
+		//uniforms.color.value.setHex( material.color.hex );
 
-		material.uniforms.opacity.value = material.opacity;
-		material.uniforms.map.texture = material.map;
+		uniforms.opacity.value = material.opacity;
+		uniforms.map.texture = material.map;
 		
-		material.uniforms.light_map.texture = material.light_map;
+		uniforms.light_map.texture = material.light_map;
 
-		material.uniforms.env_map.texture = material.env_map;
-		material.uniforms.reflectivity.value = material.reflectivity;
-		material.uniforms.refraction_ratio.value = material.refraction_ratio;
-		material.uniforms.combine.value = material.combine;
-		material.uniforms.useRefract.value = material.env_map && material.env_map.mapping instanceof THREE.CubeRefractionMapping;
+		uniforms.env_map.texture = material.env_map;
+		uniforms.reflectivity.value = material.reflectivity;
+		uniforms.refraction_ratio.value = material.refraction_ratio;
+		uniforms.combine.value = material.combine;
+		uniforms.useRefract.value = material.env_map && material.env_map.mapping instanceof THREE.CubeRefractionMapping;
 
-		if ( fog ) {
+	};
 
-			material.uniforms.fogColor.value.setHex( fog.color.hex );
+	function refreshUniformsLine( uniforms, material ) {
 
-			if ( fog instanceof THREE.Fog ) {
+		uniforms.diffuse.value.setRGB( material.color.r * material.opacity, material.color.g * material.opacity, material.color.b * material.opacity );
+		uniforms.opacity.value = material.opacity;
 
-				material.uniforms.fogNear.value = fog.near;
-				material.uniforms.fogFar.value = fog.far;
+	};
 
-			} else if ( fog instanceof THREE.FogExp2 ) {
+	function refreshUniformsParticle( uniforms, material ) {
 
-				material.uniforms.fogDensity.value = fog.density;
+		uniforms.psColor.value.setRGB( material.color.r * material.opacity, material.color.g * material.opacity, material.color.b * material.opacity );
+		uniforms.opacity.value = material.opacity;
+		uniforms.size.value = material.size;
+		uniforms.map.texture = material.map;
 
-			}
+	};
+	
+	function refreshUniformsFog( uniforms, fog ) {
+	
+		uniforms.fogColor.value.setHex( fog.color.hex );
+
+		if ( fog instanceof THREE.Fog ) {
+
+			uniforms.fogNear.value = fog.near;
+			uniforms.fogFar.value = fog.far;
+
+		} else if ( fog instanceof THREE.FogExp2 ) {
+
+			uniforms.fogDensity.value = fog.density;
 
 		}
-
+	
 	};
 
-	function refreshUniformsLine( material, fog ) {
+	function refreshUniformsPhong( uniforms, material ) {
 
-		material.uniforms.diffuse.value.setRGB( material.color.r * material.opacity, material.color.g * material.opacity, material.color.b * material.opacity );
-		material.uniforms.opacity.value = material.opacity;
-
-		if ( fog ) {
-
-			material.uniforms.fogColor.value.setHex( fog.color.hex );
-
-			if ( fog instanceof THREE.Fog ) {
-
-				material.uniforms.fogNear.value = fog.near;
-				material.uniforms.fogFar.value = fog.far;
-
-			} else if ( fog instanceof THREE.FogExp2 ) {
-
-				material.uniforms.fogDensity.value = fog.density;
-
-			}
-
-		}
-
-	};
-
-	function refreshUniformsParticle( material, fog ) {
-
-		material.uniforms.psColor.value.setRGB( material.color.r * material.opacity, material.color.g * material.opacity, material.color.b * material.opacity );
-		material.uniforms.opacity.value = material.opacity;
-		material.uniforms.size.value = material.size;
-		material.uniforms.map.texture = material.map;
-
-		if ( fog ) {
-
-			material.uniforms.fogColor.value.setHex( fog.color.hex );
-
-			if ( fog instanceof THREE.Fog ) {
-
-				material.uniforms.fogNear.value = fog.near;
-				material.uniforms.fogFar.value = fog.far;
-
-			} else if ( fog instanceof THREE.FogExp2 ) {
-
-				material.uniforms.fogDensity.value = fog.density;
-
-			}
-
-		}
-
-	};
-
-	function refreshUniformsPhong( material ) {
-
-		//material.uniforms.ambient.value.setHex( material.ambient.hex );
-		//material.uniforms.specular.value.setHex( material.specular.hex );
-		material.uniforms.ambient.value.setRGB( material.ambient.r, material.ambient.g, material.ambient.b );
-		material.uniforms.specular.value.setRGB( material.specular.r, material.specular.g, material.specular.b );
-		material.uniforms.shininess.value = material.shininess;
+		//uniforms.ambient.value.setHex( material.ambient.hex );
+		//uniforms.specular.value.setHex( material.specular.hex );
+		uniforms.ambient.value.setRGB( material.ambient.r, material.ambient.g, material.ambient.b );
+		uniforms.specular.value.setRGB( material.specular.r, material.specular.g, material.specular.b );
+		uniforms.shininess.value = material.shininess;
 
 	};
 
 
-	function refreshLights( material, lights ) {
+	function refreshUniformsLights( uniforms, lights ) {
 
-		material.uniforms.enableLighting.value = lights.directional.length + lights.point.length;
-		material.uniforms.ambientLightColor.value = lights.ambient;
-		material.uniforms.directionalLightColor.value = lights.directional.colors;
-		material.uniforms.directionalLightDirection.value = lights.directional.positions;
-		material.uniforms.pointLightColor.value = lights.point.colors;
-		material.uniforms.pointLightPosition.value = lights.point.positions;
+		uniforms.enableLighting.value = lights.directional.length + lights.point.length;
+		uniforms.ambientLightColor.value = lights.ambient;
+		uniforms.directionalLightColor.value = lights.directional.colors;
+		uniforms.directionalLightDirection.value = lights.directional.positions;
+		uniforms.pointLightColor.value = lights.point.colors;
+		uniforms.pointLightPosition.value = lights.point.positions;
 
 	};
 
 	this.initMaterial = function( material, lights, fog ) {
+
+		var u, identifiers, parameters, maxLightCount;
 		
-		if ( !material.program ) {
+		if ( material instanceof THREE.MeshDepthMaterial ) {
 
-			var u, identifiers, parameters, maxLightCount;
+			setMaterialShaders( material, THREE.ShaderLib[ 'depth' ] );
+
+		} else if ( material instanceof THREE.MeshNormalMaterial ) {
+
+			setMaterialShaders( material, THREE.ShaderLib[ 'normal' ] );
+
+		} else if ( material instanceof THREE.MeshBasicMaterial ) {
+
+			setMaterialShaders( material, THREE.ShaderLib[ 'basic' ] );
+
+		} else if ( material instanceof THREE.MeshLambertMaterial ) {
+
+			setMaterialShaders( material, THREE.ShaderLib[ 'lambert' ] );
+
+		} else if ( material instanceof THREE.MeshPhongMaterial ) {
+
+			setMaterialShaders( material, THREE.ShaderLib[ 'phong' ] );
+
+		} else if ( material instanceof THREE.LineBasicMaterial ) {
+
+			setMaterialShaders( material, THREE.ShaderLib[ 'basic' ] );
+
+		} else if ( material instanceof THREE.ParticleBasicMaterial ) {
 			
-			if ( material instanceof THREE.MeshDepthMaterial ) {
+			setMaterialShaders( material, THREE.ShaderLib[ 'particle_basic' ] );
+			
+		}
 
-				setMaterialShaders( material, THREE.ShaderLib[ 'depth' ] );
+		// heuristics to create shader parameters according to lights in the scene
+		// (not to blow over maxLights budget)
 
-			} else if ( material instanceof THREE.MeshNormalMaterial ) {
+		maxLightCount = allocateLights( lights, 4 );
 
-				setMaterialShaders( material, THREE.ShaderLib[ 'normal' ] );
+		parameters = { fog: fog, map: material.map, env_map: material.env_map, light_map: material.light_map, vertex_colors: material.vertex_colors,
+					   maxDirLights: maxLightCount.directional, maxPointLights: maxLightCount.point };
+		material.program = buildProgram( material.fragment_shader, material.vertex_shader, parameters );
 
-			} else if ( material instanceof THREE.MeshBasicMaterial ) {
+		identifiers = [ 'viewMatrix', 'modelViewMatrix', 'projectionMatrix', 'normalMatrix', 'objectMatrix', 'cameraPosition' ];
+		for( u in material.uniforms ) {
 
-				setMaterialShaders( material, THREE.ShaderLib[ 'basic' ] );
-
-			} else if ( material instanceof THREE.MeshLambertMaterial ) {
-
-				setMaterialShaders( material, THREE.ShaderLib[ 'lambert' ] );
-
-			} else if ( material instanceof THREE.MeshPhongMaterial ) {
-
-				setMaterialShaders( material, THREE.ShaderLib[ 'phong' ] );
-
-			} else if ( material instanceof THREE.LineBasicMaterial ) {
-
-				setMaterialShaders( material, THREE.ShaderLib[ 'basic' ] );
-
-			} else if ( material instanceof THREE.ParticleBasicMaterial ) {
-				
-				setMaterialShaders( material, THREE.ShaderLib[ 'particle_basic' ] );
-				
-			}
-
-			// heuristics to create shader parameters according to lights in the scene
-			// (not to blow over maxLights budget)
-
-			maxLightCount = allocateLights( lights, 4 );
-
-			parameters = { fog: fog, map: material.map, env_map: material.env_map, light_map: material.light_map, vertex_colors: material.vertex_colors,
-						   maxDirLights: maxLightCount.directional, maxPointLights: maxLightCount.point };
-			material.program = buildProgram( material.fragment_shader, material.vertex_shader, parameters );
-
-			identifiers = [ 'viewMatrix', 'modelViewMatrix', 'projectionMatrix', 'normalMatrix', 'objectMatrix', 'cameraPosition' ];
-			for( u in material.uniforms ) {
-
-				identifiers.push(u);
-
-			}
-
-			cacheUniformLocations( material.program, identifiers );
-			cacheAttributeLocations( material.program, [ "position", "normal", "uv", "uv2", "tangent", "color" ] );
+			identifiers.push(u);
 
 		}
-		
+
+		cacheUniformLocations( material.program, identifiers );
+		cacheAttributeLocations( material.program, [ "position", "normal", "uv", "uv2", "tangent", "color" ] );
+
 	};
 	
 	this.setProgram = function( camera, lights, fog, material, object ) {
 		
-		this.initMaterial( material, lights, fog );
+		if ( !material.program ) this.initMaterial( material, lights, fog );
 
-		var program = material.program;
+		var program = material.program, 
+			p_uniforms = program.uniforms,
+			m_uniforms = material.uniforms;
 
 		if( program != _oldProgram ) {
 
 			_gl.useProgram( program );
 			_oldProgram = program;
+			
+			_gl.uniformMatrix4fv( p_uniforms.projectionMatrix, false, _projectionMatrixArray );
 
 		}
-
-		// only Phong and environment mapping use cameraPosition uniform
-		// shader material also gets it for the sake of genericity
 		
-		if ( material instanceof THREE.MeshShaderMaterial ||
+		// refresh uniforms common to several materials
+		
+		if ( fog && ( 
+			 material instanceof THREE.MeshBasicMaterial ||
+			 material instanceof THREE.MeshLambertMaterial ||
 			 material instanceof THREE.MeshPhongMaterial ||
-			 material.env_map ) {
+			 material instanceof THREE.LineBasicMaterial ||
+			 material instanceof THREE.ParticleBasicMaterial )
+			) {
 			
-			this.loadCamera( program, camera );
+			refreshUniformsFog( m_uniforms, fog );
 			
-		}
-		
-		this.loadMatrices( program, object );
+		}		
 
 		if ( material instanceof THREE.MeshPhongMaterial ||
 			 material instanceof THREE.MeshLambertMaterial ) {
 
 			this.setupLights( program, lights );
-			refreshLights( material, this.lights );
+			refreshUniformsLights( m_uniforms, this.lights );
 
 		}
 
@@ -1110,44 +1082,67 @@ THREE.WebGLRenderer = function ( parameters ) {
 			 material instanceof THREE.MeshLambertMaterial ||
 			 material instanceof THREE.MeshPhongMaterial ) {
 
-			refreshUniformsCommon( material, fog );
+			refreshUniformsCommon( m_uniforms, material );
 
 		}
 
+		// refresh single material specific uniforms
+		
 		if ( material instanceof THREE.LineBasicMaterial ) {
 
-			refreshUniformsLine( material, fog );
+			refreshUniformsLine( m_uniforms, material );
 			
-		}
+		} else if ( material instanceof THREE.ParticleBasicMaterial ) {
 
-		if ( material instanceof THREE.ParticleBasicMaterial ) {
-
-			refreshUniformsParticle( material, fog );
+			refreshUniformsParticle( m_uniforms, material );
 			
-		}
+		} else if ( material instanceof THREE.MeshPhongMaterial ) {
 
-		if ( material instanceof THREE.MeshPhongMaterial ) {
+			refreshUniformsPhong( m_uniforms, material );
 
-			refreshUniformsPhong( material );
+		} else if ( material instanceof THREE.MeshDepthMaterial ) {
 
-		}
-
-		if ( material instanceof THREE.MeshDepthMaterial ) {
-
-			material.uniforms.mNear.value = camera.near;
-			material.uniforms.mFar.value = camera.far;
-			material.uniforms.opacity.value = material.opacity;
+			m_uniforms.mNear.value = camera.near;
+			m_uniforms.mFar.value = camera.far;
+			m_uniforms.opacity.value = material.opacity;
 			
-		}
+		} else if ( material instanceof THREE.MeshNormalMaterial ) {
 
-		if ( material instanceof THREE.MeshNormalMaterial ) {
-
-			material.uniforms.opacity.value = material.opacity;
+			m_uniforms.opacity.value = material.opacity;
 			
 		}
 		
-		setUniforms( program, material.uniforms );
+		// load common uniforms
+		
+		loadUniformsGeneric( program, m_uniforms );
+		loadUniformsMatrices( p_uniforms, object );
 
+		// load material specific uniforms
+		// (shader material also gets them for the sake of genericity)
+		
+		if ( material instanceof THREE.MeshShaderMaterial ||
+			 material instanceof THREE.MeshPhongMaterial ||
+			 material.env_map ) {
+			
+			_gl.uniform3f( p_uniforms.cameraPosition, camera.position.x, camera.position.y, camera.position.z );
+			
+		}
+		
+		if ( material instanceof THREE.MeshShaderMaterial ||
+			 material.env_map) {
+				 
+			_gl.uniformMatrix4fv( p_uniforms.objectMatrix, false, object._objectMatrixArray );
+		
+		}
+
+		if ( material instanceof THREE.MeshPhongMaterial ||
+			 material instanceof THREE.MeshLambertMaterial ||
+			 material instanceof THREE.MeshShaderMaterial ) {
+			 
+			_gl.uniformMatrix4fv( p_uniforms.viewMatrix, false, _viewMatrixArray );
+			
+		}
+		
 		return program;
 		
 	};
@@ -1317,7 +1312,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( material && material.blending == blending && ( material.opacity < 1.0 == transparent ) ) {
 
-						this.setBlending( material.blending );
+						setBlending( material.blending );
 						this.setDepthTest( material.depth_test );
 						
 						this.renderBuffer( camera, lights, fog, material, geometryChunk, object );
@@ -1331,7 +1326,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				material = meshMaterial;
 				if ( material && material.blending == blending && ( material.opacity < 1.0 == transparent ) ) {
 
-					this.setBlending( material.blending );
+					setBlending( material.blending );
 					this.setDepthTest( material.depth_test );
 					
 					this.renderBuffer( camera, lights, fog, material, geometryChunk, object );
@@ -1354,7 +1349,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( material && material.blending == blending && ( material.opacity < 1.0 == transparent ) ) {
 
-				this.setBlending( material.blending );
+				setBlending( material.blending );
 				this.setDepthTest( material.depth_test );
 				
 				program = this.setProgram( camera, lights, fog, material, object );
@@ -1371,11 +1366,21 @@ THREE.WebGLRenderer = function ( parameters ) {
 		
 		if( object.doubleSided ) {
 
-			_gl.disable( _gl.CULL_FACE );
+			if ( _cullEnabled ) {
+			
+				_gl.disable( _gl.CULL_FACE );
+				_cullEnabled = false;
+				
+			}
 
 		} else {
 
-			_gl.enable( _gl.CULL_FACE );
+			if ( ! _cullEnabled ) {
+			
+				_gl.enable( _gl.CULL_FACE );
+				_cullEnabled = true;
+			
+			}
 
 			if( object.flipSided ) {
 
@@ -1782,23 +1787,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	this.loadMatrices = function ( program, object ) {
-
-		_gl.uniformMatrix4fv( program.uniforms.viewMatrix, false, _viewMatrixArray );
-		_gl.uniformMatrix4fv( program.uniforms.projectionMatrix, false, _projectionMatrixArray );
-		
-		_gl.uniformMatrix4fv( program.uniforms.modelViewMatrix, false, object._modelViewMatrixArray );
-		_gl.uniformMatrix3fv( program.uniforms.normalMatrix, false, object._normalMatrixArray );
-		_gl.uniformMatrix4fv( program.uniforms.objectMatrix, false, object._objectMatrixArray );
-
-	};
-
-	this.loadCamera = function( program, camera ) {
-
-		_gl.uniform3f( program.uniforms.cameraPosition, camera.position.x, camera.position.y, camera.position.z );
-
-	};
-
 	this.setDepthTest = function( test ) {
 		
 		if( test ) {
@@ -1811,42 +1799,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			
 		}
 		
-	};
-	
-	this.setBlending = function( blending ) {
-
-		switch ( blending ) {
-
-			case THREE.AdditiveBlending:
-
-				_gl.blendEquation( _gl.FUNC_ADD );
-				_gl.blendFunc( _gl.ONE, _gl.ONE );
-
-				break;
-
-			case THREE.SubtractiveBlending:
-
-				//_gl.blendEquation( _gl.FUNC_SUBTRACT );
-				_gl.blendFunc( _gl.DST_COLOR, _gl.ZERO );
-
-				break;
-
-			case THREE.BillboardBlending:
-
-				_gl.blendEquation( _gl.FUNC_ADD );
-				_gl.blendFunc( _gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA);
-
-				break;
-
-			default:
-
-				_gl.blendEquation( _gl.FUNC_ADD );
-				_gl.blendFunc( _gl.ONE, _gl.ONE_MINUS_SRC_ALPHA );
-
-				break;
-		
-		}
-
 	};
 
 	this.setFaceCulling = function ( cullFace, frontFace ) {
@@ -1927,6 +1879,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_gl.enable( _gl.BLEND );
 		_gl.blendFunc( _gl.ONE, _gl.ONE_MINUS_SRC_ALPHA );
 		_gl.clearColor( clearColor.r, clearColor.g, clearColor.b, clearAlpha );
+		
+		_cullEnabled = true;
 
 	};
 
@@ -2005,7 +1959,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function setUniforms( program, uniforms ) {
+	function loadUniformsMatrices( uniforms, object ) {
+		
+		_gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, object._modelViewMatrixArray );
+		_gl.uniformMatrix3fv( uniforms.normalMatrix, false, object._normalMatrixArray );
+
+	};
+	
+	function loadUniformsGeneric( program, uniforms ) {
 
 		var u, uniform, value, type, location, texture;
 
@@ -2071,6 +2032,48 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	function setBlending( blending ) {
+
+		if ( blending != _oldBlending ) {
+		
+			switch ( blending ) {
+
+				case THREE.AdditiveBlending:
+
+					_gl.blendEquation( _gl.FUNC_ADD );
+					_gl.blendFunc( _gl.ONE, _gl.ONE );
+
+					break;
+
+				case THREE.SubtractiveBlending:
+
+					//_gl.blendEquation( _gl.FUNC_SUBTRACT );
+					_gl.blendFunc( _gl.DST_COLOR, _gl.ZERO );
+
+					break;
+
+				case THREE.BillboardBlending:
+
+					_gl.blendEquation( _gl.FUNC_ADD );
+					_gl.blendFunc( _gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA);
+
+					break;
+
+				default:
+
+					_gl.blendEquation( _gl.FUNC_ADD );
+					_gl.blendFunc( _gl.ONE, _gl.ONE_MINUS_SRC_ALPHA );
+
+					break;
+			
+			}
+			
+			_oldBlending = blending;
+		
+		}
+
+	};
+	
 	function setCubeTexture( texture, slot ) {
 
 		if ( texture.image.length == 6 ) {
