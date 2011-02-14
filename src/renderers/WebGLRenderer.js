@@ -26,7 +26,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// gl state cache
 	
-	_cullEnabled,
+	_oldDoubleSided = null,
+	_oldFlipSided = null,
 	_oldBlending = null,
 	
 	// camera matrices caches
@@ -531,7 +532,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					c1 = obj_colors[ face.a ];
 					c2 = obj_colors[ face.b ];
 					c3 = obj_colors[ face.c ];
-					c3 = obj_colors[ face.d ];
+					c4 = obj_colors[ face.d ];
 
 					colorArray[ offset_color ]     = c1.r;
 					colorArray[ offset_color + 1 ] = c1.g;
@@ -1364,34 +1365,35 @@ THREE.WebGLRenderer = function ( parameters ) {
 	
 	function setObjectFaces( object ) {
 		
-		if( object.doubleSided ) {
-
-			if ( _cullEnabled ) {
+		if ( _oldDoubleSided != object.doubleSided ) {
 			
-				_gl.disable( _gl.CULL_FACE );
-				_cullEnabled = false;
+			if( object.doubleSided ) {
 				
-			}
+				_gl.disable( _gl.CULL_FACE );
 
-		} else {
+			} else {
 
-			if ( ! _cullEnabled ) {
-			
 				_gl.enable( _gl.CULL_FACE );
-				_cullEnabled = true;
 			
 			}
-
+			
+			_oldDoubleSided = object.doubleSided;
+		
+		}
+		
+		if ( _oldFlipSided != object.flipSided ) {
+		
 			if( object.flipSided ) {
 
 				_gl.frontFace( _gl.CW );
 
-			}
-			else {
+			} else {
 
 				_gl.frontFace( _gl.CCW );
 
 			}
+			
+			_oldFlipSided = object.flipSided;
 
 		}
 		

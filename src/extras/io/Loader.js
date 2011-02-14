@@ -766,7 +766,7 @@ THREE.Loader.prototype = {
 
 			function init_vertices() {
 
-				var i, l, x, y, z;
+				var i, l, x, y, z, r, g, b;
 
 				for( i = 0, l = data.vertices.length; i < l; i += 3 ) {
 
@@ -776,6 +776,20 @@ THREE.Loader.prototype = {
 
 					THREE.Loader.prototype.v( scope, x, y, z );
 
+				}
+				
+				if ( data.colors ) {
+					
+					for( i = 0, l = data.colors.length; i < l; i += 3 ) {
+						
+						r = data.colors[ i     ];
+						g = data.colors[ i + 1 ];
+						b = data.colors[ i + 2 ];
+
+						THREE.Loader.prototype.vc( scope, r, g, b );
+					
+					}
+					
 				}
 
 			}
@@ -1004,6 +1018,14 @@ THREE.Loader.prototype = {
 
 	},
 
+	vc: function( scope, r, g, b ) {
+
+		var color = new THREE.Color( 0xffffff );
+		color.setRGB( r, g, b );
+		scope.colors.push( color );
+
+	},
+
 	f3: function( scope, a, b, c, mi ) {
 
 		var material = scope.materials[ mi ];
@@ -1147,39 +1169,49 @@ THREE.Loader.prototype = {
 			
 		}
 		
-		var material, texture, color;
+		var material, mtype, mpars, texture, color;
 
+		// defaults
+		
+		mtype = "MeshLambertMaterial";
+		mpars = { color: 0xeeeeee, opacity: 1.0, map: null, light_map: null, vertex_colors: m.vertex_colors };
+		
+		// parameters from model file
+		
+		if ( m.shading ) {
+			
+			if ( m.shading == "Phong" ) mtype = "MeshPhongMaterial";
+			
+		}
+		
 		if ( m.map_diffuse && texture_path ) {
 
 			texture = document.createElement( 'canvas' );
-			material = new THREE.MeshLambertMaterial( { map: new THREE.Texture( texture ) } );
-
-			load_image( material.map, texture_path + "/" + m.map_diffuse );			
-
+			mpars.map = new THREE.Texture( texture );
+			load_image( mpars.map, texture_path + "/" + m.map_diffuse );
 
 		} else if ( m.col_diffuse ) {
 
-			color = (m.col_diffuse[0]*255 << 16) + (m.col_diffuse[1]*255 << 8) + m.col_diffuse[2]*255;
-			material = new THREE.MeshLambertMaterial( { color: color, opacity: m.transparency } );
+			color = ( m.col_diffuse[0] * 255 << 16 ) + ( m.col_diffuse[1] * 255 << 8 ) + m.col_diffuse[2] * 255;
+			mpars.color = color;
+			mpars.opacity =  m.transparency;
 
 		} else if ( m.a_dbg_color ) {
 
-			material = new THREE.MeshLambertMaterial( { color: m.a_dbg_color } );
-
-		} else {
-
-			material = new THREE.MeshLambertMaterial( { color: 0xeeeeee } );
+			mpars.color = m.a_dbg_color;
 
 		}
-		
+
 		if ( m.map_lightmap && texture_path ) {
 
 			texture = document.createElement( 'canvas' );
-			material.light_map = new THREE.Texture( texture );
+			mpars.light_map = new THREE.Texture( texture );
 			
-			load_image( material.light_map, texture_path + "/" + m.map_lightmap );			
+			load_image( mpars.light_map, texture_path + "/" + m.map_lightmap );			
 
 		}
+		
+		material = new THREE[ mtype ]( mpars );
 
 		return material;
 

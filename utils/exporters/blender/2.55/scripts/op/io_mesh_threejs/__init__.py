@@ -36,6 +36,7 @@ class ExportTHREEJS(bpy.types.Operator, ExportHelper):
 
     use_modifiers = BoolProperty(name="Apply Modifiers", description="Apply modifiers to the exported mesh", default=True)
     use_normals = BoolProperty(name="Normals", description="Export normals", default=True)
+    use_colors = BoolProperty(name="Colors", description="Export vertex colors", default=True)
     use_uv_coords = BoolProperty(name="UVs", description="Export texture coordinates", default=True)
 
     align_types = [("None","None","None"), ("Center","Center","Center"), ("Bottom","Bottom","Bottom"), ("Top","Top","Top")]
@@ -62,6 +63,8 @@ class ExportTHREEJS(bpy.types.Operator, ExportHelper):
         row.prop(self.properties, "use_modifiers")
         row = layout.row()
         row.prop(self.properties, "use_normals")
+        row = layout.row()
+        row.prop(self.properties, "use_colors")
         row = layout.row()
         row.prop(self.properties, "use_uv_coords")
         row = layout.row()

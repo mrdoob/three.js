@@ -63,25 +63,27 @@ TEMPLATE_FILE_ASCII = """\
 
 var model = {
 
-	'materials': [%(materials)s],
+    'materials': [%(materials)s],
 
-	'normals': [%(normals)s],
+    'normals': [%(normals)s],
 
-	'vertices': [%(vertices)s],
+    'vertices': [%(vertices)s],
 
-	'uvs': [%(uvs)s],
+    'colors': [%(colors)s],
 
-	'triangles': [%(triangles)s],
-	'triangles_n': [%(triangles_n)s],
-	'triangles_uv': [%(triangles_uv)s],
-	'triangles_n_uv': [%(triangles_n_uv)s],
+    'uvs': [%(uvs)s],
 
-	'quads': [%(quads)s],
-	'quads_n': [%(quads_n)s],
-	'quads_uv': [%(quads_uv)s],
-	'quads_n_uv': [%(quads_n_uv)s],
+    'triangles': [%(triangles)s],
+    'triangles_n': [%(triangles_n)s],
+    'triangles_uv': [%(triangles_uv)s],
+    'triangles_n_uv': [%(triangles_n_uv)s],
 
-	'end': (new Date).getTime()
+    'quads': [%(quads)s],
+    'quads_n': [%(quads_n)s],
+    'quads_uv': [%(quads_uv)s],
+    'quads_n_uv': [%(quads_n_uv)s],
+
+    'end': (new Date).getTime()
 
 }
 
@@ -106,6 +108,7 @@ TEMPLATE_TRI_N_UV = "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d"
 TEMPLATE_QUAD_N_UV = "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d"
 
 TEMPLATE_N = "%f,%f,%f"
+TEMPLATE_C = "%f,%f,%f"
 TEMPLATE_UV = "%f,%f"
 
 # #####################################################
@@ -219,6 +222,9 @@ def generate_vertex(v):
 def generate_normal(n):
     return TEMPLATE_N % (n[0], n[1], n[2])
 
+def generate_vertex_color(c):
+    return TEMPLATE_C % (c[0], c[1], c[2])
+    
 def generate_uv(uv):
     return TEMPLATE_UV % (uv[0], 1.0 - uv[1])
 
@@ -364,6 +370,45 @@ def generate_normals(normals, use_normals):
     return ",".join(generate_normal(n) for n in chunks)
 
 # #####################################################
+# Vertex colors
+# #####################################################
+def extract_vertex_colors(mesh, use_colors):
+    if not use_colors:
+        return {}
+
+    colors = {}
+
+    color_layer = mesh.vertex_colors.active.data
+
+    for face_index, face in enumerate(mesh.faces):
+        
+        face_colors = color_layer[face_index]
+        face_colors = face_colors.color1, face_colors.color2, face_colors.color3, face_colors.color4
+        
+        for i, vertex_index in enumerate(face.vertices):
+
+            if vertex_index not in colors:
+                fc = face_colors[i]
+                colors[vertex_index] = fc[0], fc[1], fc[2]
+
+    # make sure all vertices have some color
+    for i in range(len(mesh.vertices)):
+        if i not in colors:
+            colors[i] = (0,0,0)
+            
+    return colors
+
+def generate_vertex_colors(colors, use_colors):
+    if not use_colors:
+        return ""
+
+    chunks = []
+    for vertex_index, color in sorted(colors.items(), key=operator.itemgetter(0)):
+        chunks.append(color)
+
+    return ",".join(generate_vertex_color(c) for c in chunks)
+
+# #####################################################
 # UVs
 # #####################################################
 def extract_uvs(mesh, use_uv_coords):
@@ -421,16 +466,19 @@ def generate_mtl(materials):
         mtl[m] = {
             'a_dbg_name': m,
             'a_dbg_index': index,
-            'a_dbg_color': generate_color(index)
+            'a_dbg_color': generate_color(index),
+            'vertex_colors' : False
         }
     return mtl
 
 def value2string(v):
-    if type(v)==str and v[0] != "0":
+    if type(v) == str and v[0] != "0":
         return '"%s"' % v
+    elif type(v) == bool:
+        return str(v).lower()
     return str(v)
 
-def generate_materials(mtl, materials):
+def generate_materials(mtl, materials, use_colors):
     """Generate JS array of materials objects
     """
 
@@ -445,6 +493,7 @@ def generate_materials(mtl, materials):
         mtl[m]['a_dbg_name'] = m
         mtl[m]['a_dbg_index'] = index
         mtl[m]['a_dbg_color'] = generate_color(index)
+        mtl[m]['vertex_colors'] = use_colors
 
         mtl_raw = ",\n".join(['\t"%s" : %s' % (n, value2string(v)) for n,v in sorted(mtl[m].items())])
         mtl_string = "\t{\n%s\n\t}" % mtl_raw
@@ -459,34 +508,41 @@ def extract_materials(mesh, scene):
     for m in mesh.materials:
         if m:
             materials[m.name] = {}
-            materials[m.name]['col_diffuse'] = [m.diffuse_intensity * m.diffuse_color[0],
-                                                m.diffuse_intensity * m.diffuse_color[1],
-                                                m.diffuse_intensity * m.diffuse_color[2]]
+            material = materials[m.name]
+            
+            material['col_diffuse'] = [m.diffuse_intensity * m.diffuse_color[0],
+                                       m.diffuse_intensity * m.diffuse_color[1],
+                                       m.diffuse_intensity * m.diffuse_color[2]]
 
-            materials[m.name]['col_specular'] = [m.specular_intensity * m.specular_color[0],
-                                                 m.specular_intensity * m.specular_color[1],
-                                                 m.specular_intensity * m.specular_color[2]]
+            material['col_specular'] = [m.specular_intensity * m.specular_color[0],
+                                        m.specular_intensity * m.specular_color[1],
+                                        m.specular_intensity * m.specular_color[2]]
 
-            materials[m.name]['col_ambient'] = [m.ambient * world.ambient_color[0],
-                                                m.ambient * world.ambient_color[1],
-                                                m.ambient * world.ambient_color[2]]
+            material['col_ambient'] = [m.ambient * world.ambient_color[0],
+                                       m.ambient * world.ambient_color[1],
+                                       m.ambient * world.ambient_color[2]]
 
-            materials[m.name]['transparency'] = m.alpha
+            material['transparency'] = m.alpha
 
             # not sure about mapping values to Blinn-Phong shader
             # Blender uses INT from [1,511] with default 0
             # http://www.blender.org/documentation/blender_python_api_2_54_0/bpy.types.Material.html#bpy.types.Material.specular_hardness
-            materials[m.name]["specular_coef"] = m.specular_hardness
+            material["specular_coef"] = m.specular_hardness
 
             if m.active_texture and m.active_texture.type == 'IMAGE':
                 fn = bpy.path.abspath(m.active_texture.image.filepath)
                 fn = os.path.normpath(fn)
                 fn_strip = os.path.basename(fn)
-                materials[m.name]['map_diffuse'] = fn_strip
+                material['map_diffuse'] = fn_strip
+                
+            if m.specular_intensity > 0.0 and (m.specular_color[0] > 0 or m.specular_color[1] > 0 or m.specular_color[2] > 0):
+                material['shading'] = "Phong"
+            else:
+                material['shading'] = "Lambert"
 
     return materials
 
-def generate_materials_string(mesh, scene):
+def generate_materials_string(mesh, scene, use_colors):
 
     random.seed(42) # to get well defined color order for debug materials
 
@@ -508,12 +564,12 @@ def generate_materials_string(mesh, scene):
     # extract real materials from the mesh
     mtl.update(extract_materials(mesh, scene))
 
-    return generate_materials(mtl, materials)
+    return generate_materials(mtl, materials, use_colors)
 
 # #####################################################
 # ASCII exporter
 # #####################################################
-def generate_ascii_model(mesh, scene, use_normals, use_uv_coords, align_model):
+def generate_ascii_model(mesh, scene, use_normals, use_colors, use_uv_coords, align_model):
 
     vertices = mesh.vertices[:]
 
@@ -527,6 +583,7 @@ def generate_ascii_model(mesh, scene, use_normals, use_uv_coords, align_model):
     sfaces = sort_faces(mesh.faces, use_normals, use_uv_coords)
 
     normals = extract_vertex_normals(mesh, use_normals)
+    colors = extract_vertex_colors(mesh, use_colors)
     uvs = extract_uvs(mesh, use_uv_coords)
 
     text = TEMPLATE_FILE_ASCII % {
@@ -544,8 +601,9 @@ def generate_ascii_model(mesh, scene, use_normals, use_uv_coords, align_model):
 
     "uvs"           : generate_uvs(uvs, use_uv_coords),
     "normals"       : generate_normals(normals, use_normals),
+    "colors"        : generate_vertex_colors(colors, use_colors),
 
-    "materials" : generate_materials_string(mesh, scene),
+    "materials" : generate_materials_string(mesh, scene, use_colors),
 
     "nvertex"   : len(mesh.vertices),
     "nface"     : len(mesh.faces),
@@ -557,7 +615,7 @@ def generate_ascii_model(mesh, scene, use_normals, use_uv_coords, align_model):
 # #####################################################
 # Main
 # #####################################################
-def save(operator, context, filepath="", use_modifiers=True, use_normals=True, use_uv_coords=True, align_model=1):
+def save(operator, context, filepath="", use_modifiers=True, use_normals=True, use_colors=True, use_uv_coords=True, align_model=1):
 
     def rvec3d(v):
         return round(v[0], 6), round(v[1], 6), round(v[2], 6)
@@ -594,6 +652,10 @@ def save(operator, context, filepath="", use_modifiers=True, use_normals=True, u
 
     faceUV = (len(mesh.uv_textures) > 0)
     vertexUV = (len(mesh.sticky) > 0)
+    vertexColors = len(mesh.vertex_colors) > 0
+
+    if not vertexColors:
+        use_colors = False
 
     if (not faceUV) and (not vertexUV):
         use_uv_coords = False
@@ -603,7 +665,12 @@ def save(operator, context, filepath="", use_modifiers=True, use_normals=True, u
         if not active_uv_layer:
             use_uv_coords = False
 
-    text = generate_ascii_model(mesh, scene, use_normals, use_uv_coords, align_model)
+    if vertexColors:
+        active_col_layer = mesh.vertex_colors.active
+        if not active_col_layer:
+            use_colors = False
+
+    text = generate_ascii_model(mesh, scene, use_normals, use_colors, use_uv_coords, align_model)
     file = open(filepath, 'w')
     file.write(text)
     file.close()
