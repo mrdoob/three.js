@@ -1297,72 +1297,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		
 	};
 	
-	this.renderPass = function ( camera, lights, fog, object, geometryChunk, blending, transparent ) {
-
-		var i, l, m, ml, material, meshMaterial;
-
-		for ( m = 0, ml = object.materials.length; m < ml; m++ ) {
-
-			meshMaterial = object.materials[ m ];
-
-			if ( meshMaterial instanceof THREE.MeshFaceMaterial ) {
-
-				for ( i = 0, l = geometryChunk.materials.length; i < l; i++ ) {
-
-					material = geometryChunk.materials[ i ];
-
-					if ( material && material.blending == blending && ( material.opacity < 1.0 == transparent ) ) {
-
-						setBlending( material.blending );
-						this.setDepthTest( material.depth_test );
-						
-						this.renderBuffer( camera, lights, fog, material, geometryChunk, object );
-
-					}
-
-				}
-
-			} else {
-
-				material = meshMaterial;
-				if ( material && material.blending == blending && ( material.opacity < 1.0 == transparent ) ) {
-
-					setBlending( material.blending );
-					this.setDepthTest( material.depth_test );
-					
-					this.renderBuffer( camera, lights, fog, material, geometryChunk, object );
-
-				}
-
-			}
-
-		}
-
-	};
-
-	this.renderPassImmediate = function ( camera, lights, fog, object, blending, transparent ) {
-
-		var i, l, m, ml, material, program;
-
-		for ( m = 0, ml = object.materials.length; m < ml; m++ ) {
-
-			material = object.materials[ m ];
-
-			if ( material && material.blending == blending && ( material.opacity < 1.0 == transparent ) ) {
-
-				setBlending( material.blending );
-				this.setDepthTest( material.depth_test );
-				
-				program = this.setProgram( camera, lights, fog, material, object );
-				
-				object.render( function( object ) { renderBufferImmediate( object, program ); } );
-
-			}
-
-		}
-
-	};
-	
 	function setObjectFaces( object ) {
 		
 		if ( _oldDoubleSided != object.doubleSided ) {
@@ -1434,10 +1368,88 @@ THREE.WebGLRenderer = function ( parameters ) {
 		return true;
 
 	};
+
+	function addToFixedArray( where, what ) {
+		
+		where.list[ where.count ] = what;
+		where.count += 1;
+	
+	};
+	
+	function unrollImmediateBufferMaterials( globject ) {
+		
+		var i, l, m, ml, material,
+			object = globject.object,
+			opaque = globject.opaque,
+			transparent = globject.transparent;
+
+		transparent.count = 0;
+		opaque.count = 0;
+		
+		for ( m = 0, ml = object.materials.length; m < ml; m++ ) {
+
+			material = object.materials[ m ];
+			
+			if ( ( material.opacity && material.opacity < 1.0 ) || material.blending != THREE.NormalBlending )
+				addToFixedArray( transparent, material );
+			else
+				addToFixedArray( opaque, material );
+			
+		}
+		
+	};
+	
+	function unrollBufferMaterials( globject ) {
+		
+		var i, l, m, ml, material, meshMaterial,
+			object = globject.object,
+			buffer = globject.buffer,
+			opaque = globject.opaque,
+			transparent = globject.transparent;
+
+		transparent.count = 0;
+		opaque.count = 0;
+		
+		for ( m = 0, ml = object.materials.length; m < ml; m++ ) {
+
+			meshMaterial = object.materials[ m ];
+
+			if ( meshMaterial instanceof THREE.MeshFaceMaterial ) {
+
+				for ( i = 0, l = buffer.materials.length; i < l; i++ ) {
+
+					material = buffer.materials[ i ];
+					
+					if ( material ) {
+						
+						if ( ( material.opacity && material.opacity < 1.0 ) || material.blending != THREE.NormalBlending )
+							addToFixedArray( transparent, material );
+						else
+							addToFixedArray( opaque, material );
+						
+					}
+
+				}
+
+			} else {
+
+				material = meshMaterial;
+				
+				if ( ( material.opacity && material.opacity < 1.0 ) || material.blending != THREE.NormalBlending )
+					addToFixedArray( transparent, material );
+				else
+					addToFixedArray( opaque, material );
+
+			}
+
+		}
+		
+	};
 	
 	this.render = function( scene, camera, renderTarget, clear ) {
 
-		var o, ol, oil, webGLObject, object, buffer,
+		var i, program, opaque, transparent,
+			o, ol, oil, webGLObject, object, buffer,
 			lights = scene.lights,
 			fog = scene.fog,
 			ol;
@@ -1480,7 +1492,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 				
 				this.setupMatrices( object, camera );
 				
+				unrollBufferMaterials( webGLObject );
+				
 				webGLObject.render = true;
+				
 			
 			} else {
 				
@@ -1494,7 +1509,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		
 		for ( o = 0; o < oil; o++ ) {
 		
-			object = scene.__webGLObjectsImmediate[ o ].object;
+			webGLObject = scene.__webGLObjectsImmediate[ o ];
+			object = webGLObject.object;
 			
 			if ( object.visible ) {
 			
@@ -1506,6 +1522,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 				
 				this.setupMatrices( object, camera );
+				
+				unrollImmediateBufferMaterials( webGLObject );
 			
 			}
 		
@@ -1513,6 +1531,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// opaque pass
 
+		setBlending( THREE.NormalBlending );
+		
 		for ( o = 0; o < ol; o++ ) {
 
 			webGLObject = scene.__webGLObjects[ o ];
@@ -1521,9 +1541,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 				
 				object = webGLObject.object;
 				buffer = webGLObject.buffer;
+				opaque = webGLObject.opaque;
 				
 				setObjectFaces( object );
-				this.renderPass( camera, lights, fog, object, buffer, THREE.NormalBlending, false );
+				
+				for( i = 0; i < opaque.count; i++ ) {
+					
+					material = opaque.list[ i ];
+					
+					this.setDepthTest( material.depth_test );
+					this.renderBuffer( camera, lights, fog, material, buffer, object );
+				
+				}
 
 			}
 
@@ -1533,12 +1562,24 @@ THREE.WebGLRenderer = function ( parameters ) {
 		
 		for ( o = 0; o < oil; o++ ) {
 			
-			object = scene.__webGLObjectsImmediate[ o ].object;
+			webGLObject = scene.__webGLObjectsImmediate[ o ];
+			object = webGLObject.object;
 			
 			if ( object.visible ) {
 			
+				opaque = webGLObject.opaque;
+				
 				setObjectFaces( object );
-				this.renderPassImmediate( camera, lights, fog, object, THREE.NormalBlending, false );
+				
+				for( i = 0; i < opaque.count; i++ ) {
+				
+					material = opaque.list[ i ];
+				
+					this.setDepthTest( material.depth_test );
+					program = this.setProgram( camera, lights, fog, material, object );
+					object.render( function( object ) { renderBufferImmediate( object, program ); } );
+				
+				}
 			
 			}
 			
@@ -1554,26 +1595,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 				
 				object = webGLObject.object;
 				buffer = webGLObject.buffer;
-
+				transparent = webGLObject.transparent;
+				
 				setObjectFaces( object );
 				
-				// opaque blended materials
-
-				this.renderPass( camera, lights, fog, object, buffer, THREE.AdditiveBlending, false );
-				this.renderPass( camera, lights, fog, object, buffer, THREE.SubtractiveBlending, false );
-
-				// transparent blended materials
-
-				this.renderPass( camera, lights, fog, object, buffer, THREE.AdditiveBlending, true );
-				this.renderPass( camera, lights, fog, object, buffer, THREE.SubtractiveBlending, true );
-
-				// transparent normal materials
-
-				this.renderPass( camera, lights, fog, object, buffer, THREE.NormalBlending, true );
-
-				// billboard materials
-
-				this.renderPass( camera, lights, fog, object, buffer, THREE.BillboardBlending, false );
+				for( i = 0; i < transparent.count; i++ ) {
+					
+					material = transparent.list[ i ];
+					
+					setBlending( material.blending );
+					this.setDepthTest( material.depth_test );
+					this.renderBuffer( camera, lights, fog, material, buffer, object );
+				
+				}
 
 			}
 
@@ -1583,12 +1617,25 @@ THREE.WebGLRenderer = function ( parameters ) {
 		
 		for ( o = 0; o < oil; o++ ) {
 		
-			object = scene.__webGLObjectsImmediate[ o ].object;
+			webGLObject = scene.__webGLObjectsImmediate[ o ];
+			object = webGLObject.object;
 			
 			if ( object.visible ) {
 			
+				transparent = webGLObject.transparent;
+				
 				setObjectFaces( object );
-				this.renderPassImmediate( camera, lights, fog, object, THREE.NormalBlending, true );
+				
+				for( i = 0; i < transparent.count; i++ ) {
+				
+					material = transparent.list[ i ];
+				
+					setBlending( material.blending );
+					this.setDepthTest( material.depth_test );
+					program = this.setProgram( camera, lights, fog, material, object );
+					object.render( function( object ) { renderBufferImmediate( object, program ); } );
+				
+				}
 			
 			}
 			
@@ -1610,7 +1657,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( objmap[ id ] == undefined ) {
 
-				scene.__webGLObjects.push( { buffer: buffer, object: object } );
+				scene.__webGLObjects.push( { buffer: buffer, object: object, 
+											 opaque: { list: [], count: 0 }, 
+											 transparent: { list: [], count: 0 } 
+											} );
 				objmap[ id ] = 1;
 
 			}
@@ -1621,7 +1671,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( objmap[ id ] == undefined ) {
 
-				scene.__webGLObjectsImmediate.push( { object: object } );
+				scene.__webGLObjectsImmediate.push( { object: object, 
+													  opaque: { list: [], count: 0 }, 
+													  transparent: { list: [], count: 0 } 
+												    } );
 				objmap[ id ] = 1;
 
 			}
