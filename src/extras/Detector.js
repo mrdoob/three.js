@@ -6,8 +6,8 @@ THREE.Detector = {
 	
 	// supported features
 	
-	canvas	: !!document.createElement( 'canvas' ).getContext,
-	webgl	: window.Uint8Array != undefined,
+	canvas	: !!window.CanvasRenderingContext2D, // !!document.createElement( 'canvas' ).getContext,
+	webgl	: !!window.WebGLRenderingContext, // window.Uint8Array != undefined,
 	workers : !!window.Worker,
 	
 	// helper methods
