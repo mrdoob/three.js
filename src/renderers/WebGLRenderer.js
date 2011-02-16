@@ -43,6 +43,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	_projScreenMatrix = new THREE.Matrix4(),
 	_projectionMatrixArray = new Float32Array( 16 ),
+	_cameraInverseMatrixArray = new Float32Array( 16 ),
 	
 	_viewMatrixArray = new Float32Array( 16 ),	
 
@@ -64,7 +65,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.domElement = _canvas;
 	this.autoClear = true;
-	this.sortObjects = false;
+	this.sortObjects = true;
 
 	initGL( antialias, clearColor, clearAlpha );
 
@@ -210,6 +211,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 		geometryChunk.__webGLUVBuffer = _gl.createBuffer();
 		geometryChunk.__webGLUV2Buffer = _gl.createBuffer();
 		
+		geometryChunk.__webGLSkinVertexABuffer = _gl.createBuffer();
+		geometryChunk.__webGLSkinVertexBBuffer = _gl.createBuffer();
+		geometryChunk.__webGLSkinIndicesBuffer = _gl.createBuffer();
+		geometryChunk.__webGLSkinWeightsBuffer = _gl.createBuffer();
+		
 		geometryChunk.__webGLFaceBuffer = _gl.createBuffer();
 		geometryChunk.__webGLLineBuffer = _gl.createBuffer();
 
@@ -275,6 +281,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 		geometryChunk.__uvArray = new Float32Array( nvertices * 2 );
 		geometryChunk.__uv2Array = new Float32Array( nvertices * 2 );
 
+		geometryChunk.__skinVertexAArray = new Float32Array( nvertices * 4 );
+		geometryChunk.__skinVertexBArray = new Float32Array( nvertices * 4 );
+		geometryChunk.__skinIndexArray = new Float32Array( nvertices * 4 );
+		geometryChunk.__skinWeightArray = new Float32Array( nvertices * 4 );
+		
 		geometryChunk.__faceArray = new Uint16Array( ntris * 3 );
 		geometryChunk.__lineArray = new Uint16Array( nlines * 2 );
 
@@ -290,6 +301,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var f, fl, fi, face, vertexNormals, faceNormal, normal, 
 			uv, uv2, v1, v2, v3, v4, t1, t2, t3, t4, 
 			c1, c2, c3, c4,
+			sw1, sw2, sw3, sw4,
+			si1, si2, si3, si4,
+			sa1, sa2, sa3, sa4,
+			sb1, sb2, sb3, sb4,
 			m, ml, i,
 			vn, uvi, uv2i,
 
@@ -303,6 +318,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		offset_tangent = 0,
 		offset_line = 0,
 		offset_color = 0,
+		offset_skin = 0,
 
 		vertexArray = geometryChunk.__vertexArray,
 		uvArray = geometryChunk.__uvArray,
@@ -310,6 +326,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 		normalArray = geometryChunk.__normalArray,
 		tangentArray = geometryChunk.__tangentArray,
 		colorArray = geometryChunk.__colorArray,
+		
+		skinVertexAArray = geometryChunk.__skinVertexAArray,
+		skinVertexBArray = geometryChunk.__skinVertexBArray,
+		skinIndexArray = geometryChunk.__skinIndexArray,
+		skinWeightArray = geometryChunk.__skinWeightArray,
 
 		faceArray = geometryChunk.__faceArray,
 		lineArray = geometryChunk.__lineArray,
@@ -330,7 +351,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		obj_faces = geometry.faces,
 		obj_uvs = geometry.uvs,
 		obj_uvs2 = geometry.uvs2,
-		obj_colors = geometry.colors;
+		obj_colors = geometry.colors,
+		
+		obj_skinVerticesA = geometry.skinVerticesA,
+		obj_skinVerticesB = geometry.skinVerticesB,
+		obj_skinIndices = geometry.skinIndices,
+		obj_skinWeights = geometry.skinWeights;
 		
 		for ( f = 0, fl = chunk_faces.length; f < fl; f++ ) {
 
@@ -364,6 +390,96 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					offset += 9;
 
+				}
+				
+				if ( obj_skinWeights.length ) {
+
+					// weights
+					
+					sw1 = obj_skinWeights[ face.a ];
+					sw2 = obj_skinWeights[ face.b ];
+					sw3 = obj_skinWeights[ face.c ];
+					
+					skinWeightArray[ offset_skin ]     = sw1.x;
+					skinWeightArray[ offset_skin + 1 ] = sw1.y;
+					skinWeightArray[ offset_skin + 2 ] = sw1.z;
+					skinWeightArray[ offset_skin + 3 ] = sw1.w;
+
+					skinWeightArray[ offset_skin + 4 ] = sw2.x;
+					skinWeightArray[ offset_skin + 5 ] = sw2.y;
+					skinWeightArray[ offset_skin + 6 ] = sw2.z;
+					skinWeightArray[ offset_skin + 7 ] = sw2.w;
+
+					skinWeightArray[ offset_skin + 8 ]  = sw3.x;
+					skinWeightArray[ offset_skin + 9 ]  = sw3.y;
+					skinWeightArray[ offset_skin + 10 ] = sw3.z;
+					skinWeightArray[ offset_skin + 11 ] = sw3.w;
+
+					// indices
+					
+					si1 = obj_skinIndices[ face.a ];
+					si2 = obj_skinIndices[ face.b ];
+					si3 = obj_skinIndices[ face.c ];
+
+					skinIndexArray[ offset_skin ]     = si1.x;
+					skinIndexArray[ offset_skin + 1 ] = si1.y;
+					skinIndexArray[ offset_skin + 2 ] = si1.z;
+					skinIndexArray[ offset_skin + 3 ] = si1.w;
+
+					skinIndexArray[ offset_skin + 4 ] = si2.x;
+					skinIndexArray[ offset_skin + 5 ] = si2.y;
+					skinIndexArray[ offset_skin + 6 ] = si2.z;
+					skinIndexArray[ offset_skin + 7 ] = si2.w;
+
+					skinIndexArray[ offset_skin + 8 ]  = si3.x;
+					skinIndexArray[ offset_skin + 9 ]  = si3.y;
+					skinIndexArray[ offset_skin + 10 ] = si3.z;
+					skinIndexArray[ offset_skin + 11 ] = si3.w;
+
+					// vertices A
+					
+					sa1 = obj_skinVerticesA[ face.a ];
+					sa2 = obj_skinVerticesA[ face.b ];
+					sa3 = obj_skinVerticesA[ face.c ];
+
+					skinVertexAArray[ offset_skin ]     = sa1.x;
+					skinVertexAArray[ offset_skin + 1 ] = sa1.y;
+					skinVertexAArray[ offset_skin + 2 ] = sa1.z;
+					skinVertexAArray[ offset_skin + 3 ] = 1; // pad for faster vertex shader
+
+					skinVertexAArray[ offset_skin + 4 ] = sa2.x;
+					skinVertexAArray[ offset_skin + 5 ] = sa2.y;
+					skinVertexAArray[ offset_skin + 6 ] = sa2.z;
+					skinVertexAArray[ offset_skin + 7 ] = 1;
+
+					skinVertexAArray[ offset_skin + 8 ]  = sa3.x;
+					skinVertexAArray[ offset_skin + 9 ]  = sa3.y;
+					skinVertexAArray[ offset_skin + 10 ] = sa3.z;
+					skinVertexAArray[ offset_skin + 11 ] = 1;
+
+					// vertices B
+					
+					sb1 = obj_skinVerticesB[ face.a ];
+					sb2 = obj_skinVerticesB[ face.b ];
+					sb3 = obj_skinVerticesB[ face.c ];
+
+					skinVertexBArray[ offset_skin ]     = sb1.x;
+					skinVertexBArray[ offset_skin + 1 ] = sb1.y;
+					skinVertexBArray[ offset_skin + 2 ] = sb1.z;
+					skinVertexBArray[ offset_skin + 3 ] = 1; // pad for faster vertex shader
+
+					skinVertexBArray[ offset_skin + 4 ] = sb2.x;
+					skinVertexBArray[ offset_skin + 5 ] = sb2.y;
+					skinVertexBArray[ offset_skin + 6 ] = sb2.z;
+					skinVertexBArray[ offset_skin + 7 ] = 1;
+
+					skinVertexBArray[ offset_skin + 8 ]  = sb3.x;
+					skinVertexBArray[ offset_skin + 9 ]  = sb3.y;
+					skinVertexBArray[ offset_skin + 10 ] = sb3.z;
+					skinVertexBArray[ offset_skin + 11 ] = 1;
+
+					offset_skin += 12;
+					
 				}
 
 				if ( dirtyColors && obj_colors.length ) {
@@ -526,6 +642,120 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					offset += 12;
 
+				}
+				
+				if ( obj_skinWeights.length ) {
+
+					// weights
+					
+					sw1 = obj_skinWeights[ face.a ];
+					sw2 = obj_skinWeights[ face.b ];
+					sw3 = obj_skinWeights[ face.c ];
+					sw4 = obj_skinWeights[ face.d ];
+					
+					skinWeightArray[ offset_skin ]     = sw1.x;
+					skinWeightArray[ offset_skin + 1 ] = sw1.y;
+					skinWeightArray[ offset_skin + 2 ] = sw1.z;
+					skinWeightArray[ offset_skin + 3 ] = sw1.w;
+
+					skinWeightArray[ offset_skin + 4 ] = sw2.x;
+					skinWeightArray[ offset_skin + 5 ] = sw2.y;
+					skinWeightArray[ offset_skin + 6 ] = sw2.z;
+					skinWeightArray[ offset_skin + 7 ] = sw2.w;
+
+					skinWeightArray[ offset_skin + 8 ]  = sw3.x;
+					skinWeightArray[ offset_skin + 9 ]  = sw3.y;
+					skinWeightArray[ offset_skin + 10 ] = sw3.z;
+					skinWeightArray[ offset_skin + 11 ] = sw3.w;
+
+					skinWeightArray[ offset_skin + 12 ] = sw4.x;
+					skinWeightArray[ offset_skin + 13 ] = sw4.y;
+					skinWeightArray[ offset_skin + 14 ] = sw4.z;
+					skinWeightArray[ offset_skin + 15 ] = sw4.w;
+
+					// indices
+					
+					si1 = obj_skinIndices[ face.a ];
+					si2 = obj_skinIndices[ face.b ];
+					si3 = obj_skinIndices[ face.c ];
+					si4 = obj_skinIndices[ face.d ];
+
+					skinIndexArray[ offset_skin ]     = si1.x;
+					skinIndexArray[ offset_skin + 1 ] = si1.y;
+					skinIndexArray[ offset_skin + 2 ] = si1.z;
+					skinIndexArray[ offset_skin + 3 ] = si1.w;
+
+					skinIndexArray[ offset_skin + 4 ] = si2.x;
+					skinIndexArray[ offset_skin + 5 ] = si2.y;
+					skinIndexArray[ offset_skin + 6 ] = si2.z;
+					skinIndexArray[ offset_skin + 7 ] = si2.w;
+
+					skinIndexArray[ offset_skin + 8 ]  = si3.x;
+					skinIndexArray[ offset_skin + 9 ]  = si3.y;
+					skinIndexArray[ offset_skin + 10 ] = si3.z;
+					skinIndexArray[ offset_skin + 11 ] = si3.w;
+
+					skinIndexArray[ offset_skin + 12 ] = si4.x;
+					skinIndexArray[ offset_skin + 13 ] = si4.y;
+					skinIndexArray[ offset_skin + 14 ] = si4.z;
+					skinIndexArray[ offset_skin + 15 ] = si4.w;
+
+					// vertices A
+					
+					sa1 = obj_skinVerticesA[ face.a ];
+					sa2 = obj_skinVerticesA[ face.b ];
+					sa3 = obj_skinVerticesA[ face.c ];
+					sa4 = obj_skinVerticesA[ face.d ];
+
+					skinVertexAArray[ offset_skin ]     = sa1.x;
+					skinVertexAArray[ offset_skin + 1 ] = sa1.y;
+					skinVertexAArray[ offset_skin + 2 ] = sa1.z;
+					skinVertexAArray[ offset_skin + 3 ] = 1; // pad for faster vertex shader
+
+					skinVertexAArray[ offset_skin + 4 ] = sa2.x;
+					skinVertexAArray[ offset_skin + 5 ] = sa2.y;
+					skinVertexAArray[ offset_skin + 6 ] = sa2.z;
+					skinVertexAArray[ offset_skin + 7 ] = 1;
+
+					skinVertexAArray[ offset_skin + 8 ]  = sa3.x;
+					skinVertexAArray[ offset_skin + 9 ]  = sa3.y;
+					skinVertexAArray[ offset_skin + 10 ] = sa3.z;
+					skinVertexAArray[ offset_skin + 11 ] = 1;
+
+					skinVertexAArray[ offset_skin + 12 ] = sa4.x;
+					skinVertexAArray[ offset_skin + 13 ] = sa4.y;
+					skinVertexAArray[ offset_skin + 14 ] = sa4.z;
+					skinVertexAArray[ offset_skin + 15 ] = 1;
+
+					// vertices B
+					
+					sb1 = obj_skinVerticesB[ face.a ];
+					sb2 = obj_skinVerticesB[ face.b ];
+					sb3 = obj_skinVerticesB[ face.c ];
+					sb4 = obj_skinVerticesB[ face.d ];
+
+					skinVertexBArray[ offset_skin ]     = sb1.x;
+					skinVertexBArray[ offset_skin + 1 ] = sb1.y;
+					skinVertexBArray[ offset_skin + 2 ] = sb1.z;
+					skinVertexBArray[ offset_skin + 3 ] = 1; // pad for faster vertex shader
+
+					skinVertexBArray[ offset_skin + 4 ] = sb2.x;
+					skinVertexBArray[ offset_skin + 5 ] = sb2.y;
+					skinVertexBArray[ offset_skin + 6 ] = sb2.z;
+					skinVertexBArray[ offset_skin + 7 ] = 1;
+
+					skinVertexBArray[ offset_skin + 8 ]  = sb3.x;
+					skinVertexBArray[ offset_skin + 9 ]  = sb3.y;
+					skinVertexBArray[ offset_skin + 10 ] = sb3.z;
+					skinVertexBArray[ offset_skin + 11 ] = 1;
+
+					skinVertexBArray[ offset_skin + 12 ]  = sb4.x;
+					skinVertexBArray[ offset_skin + 13 ]  = sb4.y;
+					skinVertexBArray[ offset_skin + 14 ] = sb4.z;
+					skinVertexBArray[ offset_skin + 15 ] = 1;
+
+					offset_skin += 16;					
+					
 				}
 				
 				if ( dirtyColors && obj_colors.length ) {
@@ -732,6 +962,22 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryChunk.__webGLLineBuffer );
 			_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, lineArray, hint );
 
+		}
+		
+		if( offset_skin > 0 ) {
+			
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLSkinVertexABuffer );
+			_gl.bufferData( _gl.ARRAY_BUFFER, skinVertexAArray, hint );
+
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLSkinVertexBBuffer );
+			_gl.bufferData( _gl.ARRAY_BUFFER, skinVertexBArray, hint );
+
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLSkinIndicesBuffer );
+			_gl.bufferData( _gl.ARRAY_BUFFER, skinIndexArray, hint );
+
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLSkinWeightsBuffer );
+			_gl.bufferData( _gl.ARRAY_BUFFER, skinWeightArray, hint );
+			
 		}
 
 	};
@@ -1029,7 +1275,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 					   maxDirLights: maxLightCount.directional, maxPointLights: maxLightCount.point };
 		material.program = buildProgram( material.fragment_shader, material.vertex_shader, parameters );
 
-		identifiers = [ 'viewMatrix', 'modelViewMatrix', 'projectionMatrix', 'normalMatrix', 'objectMatrix', 'cameraPosition' ];
+		identifiers = [ 'viewMatrix', 'modelViewMatrix', 'projectionMatrix', 'normalMatrix', 'objectMatrix', 'cameraPosition', 
+						'cameraInverseMatrix', 
+						'uBoneGlobalMatrices[0]', 'uBoneGlobalMatrices[1]', 'uBoneGlobalMatrices[2]', 'uBoneGlobalMatrices[3]', 'uBoneGlobalMatrices[4]',
+					    'uBoneGlobalMatrices[5]', 'uBoneGlobalMatrices[6]', 'uBoneGlobalMatrices[7]', 'uBoneGlobalMatrices[8]', 'uBoneGlobalMatrices[9]',
+					    'uBoneGlobalMatrices[10]', 'uBoneGlobalMatrices[11]', 'uBoneGlobalMatrices[12]', 'uBoneGlobalMatrices[13]', 'uBoneGlobalMatrices[14]'
+						];
 		for( u in material.uniforms ) {
 
 			identifiers.push(u);
@@ -1037,11 +1288,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		cacheUniformLocations( material.program, identifiers );
-		cacheAttributeLocations( material.program, [ "position", "normal", "uv", "uv2", "tangent", "color" ] );
+		cacheAttributeLocations( material.program, [ "position", "normal", "uv", "uv2", "tangent", "color", 
+													 "skinVertexA", "skinVertexB", "skinIndex", "skinWeight" ] );
 
 	};
 	
 	this.setProgram = function( camera, lights, fog, material, object ) {
+		
+		var skinning = true; // hack for testing
 		
 		if ( !material.program ) this.initMaterial( material, lights, fog );
 
@@ -1131,7 +1385,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 		
 		if ( material instanceof THREE.MeshShaderMaterial ||
-			 material.env_map) {
+			 material.env_map ||
+			 skinning ) {
 				 
 			_gl.uniformMatrix4fv( p_uniforms.objectMatrix, false, object._objectMatrixArray );
 		
@@ -1139,9 +1394,33 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material instanceof THREE.MeshPhongMaterial ||
 			 material instanceof THREE.MeshLambertMaterial ||
-			 material instanceof THREE.MeshShaderMaterial ) {
+			 material instanceof THREE.MeshShaderMaterial ||
+			 skinning ) {
 			 
 			_gl.uniformMatrix4fv( p_uniforms.viewMatrix, false, _viewMatrixArray );
+			
+		}
+		
+		if ( skinning ) {
+			
+			_gl.uniformMatrix4fv( p_uniforms.cameraInverseMatrix, false, _cameraInverseMatrixArray );
+			_gl.uniformMatrix4fv( p_uniforms["uBoneGlobalMatrices[0]"], false, object.boneMatrices[0]() );
+			_gl.uniformMatrix4fv( p_uniforms["uBoneGlobalMatrices[1]"], false, object.boneMatrices[1]() );
+			_gl.uniformMatrix4fv( p_uniforms["uBoneGlobalMatrices[2]"], false, object.boneMatrices[2]() );
+			_gl.uniformMatrix4fv( p_uniforms["uBoneGlobalMatrices[3]"], false, object.boneMatrices[3]() );
+			_gl.uniformMatrix4fv( p_uniforms["uBoneGlobalMatrices[4]"], false, object.boneMatrices[4]() );
+			
+			_gl.uniformMatrix4fv( p_uniforms["uBoneGlobalMatrices[5]"], false, object.boneMatrices[5]() );
+			_gl.uniformMatrix4fv( p_uniforms["uBoneGlobalMatrices[6]"], false, object.boneMatrices[6]() );
+			_gl.uniformMatrix4fv( p_uniforms["uBoneGlobalMatrices[7]"], false, object.boneMatrices[7]() );
+			_gl.uniformMatrix4fv( p_uniforms["uBoneGlobalMatrices[8]"], false, object.boneMatrices[8]() );
+			_gl.uniformMatrix4fv( p_uniforms["uBoneGlobalMatrices[9]"], false, object.boneMatrices[9]() );
+			_gl.uniformMatrix4fv( p_uniforms["uBoneGlobalMatrices[10]"], false, object.boneMatrices[10]() );
+			
+			_gl.uniformMatrix4fv( p_uniforms["uBoneGlobalMatrices[11]"], false, object.boneMatrices[11]() );
+			_gl.uniformMatrix4fv( p_uniforms["uBoneGlobalMatrices[12]"], false, object.boneMatrices[12]() );
+			_gl.uniformMatrix4fv( p_uniforms["uBoneGlobalMatrices[13]"], false, object.boneMatrices[13]() );
+			_gl.uniformMatrix4fv( p_uniforms["uBoneGlobalMatrices[14]"], false, object.boneMatrices[14]() );
 			
 		}
 		
@@ -1229,6 +1508,26 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		if ( object instanceof THREE.SkinnedMesh ) {
+			
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLSkinVertexABuffer );
+			_gl.vertexAttribPointer( attributes.skinVertexA, 4, _gl.FLOAT, false, 0, 0 );
+			_gl.enableVertexAttribArray( attributes.skinVertexA );
+
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLSkinVertexBBuffer );
+			_gl.vertexAttribPointer( attributes.skinVertexB, 4, _gl.FLOAT, false, 0, 0 );
+			_gl.enableVertexAttribArray( attributes.skinVertexB );
+
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLSkinIndicesBuffer );
+			_gl.vertexAttribPointer( attributes.skinIndex, 4, _gl.FLOAT, false, 0, 0 );
+			_gl.enableVertexAttribArray( attributes.skinIndex );
+
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLSkinWeightsBuffer );
+			_gl.vertexAttribPointer( attributes.skinWeight, 4, _gl.FLOAT, false, 0, 0 );
+			_gl.enableVertexAttribArray( attributes.skinWeight );
+			
+		}
+		
 		// render mesh
 
 		if ( object instanceof THREE.Mesh ) {
@@ -1466,9 +1765,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 		
 		camera.globalMatrix.flattenToArray( _viewMatrixArray );
 		camera.projectionMatrix.flattenToArray( _projectionMatrixArray );
+		camera.inverseMatrix.flattenToArray( _cameraInverseMatrixArray );
 
 		_projScreenMatrix.multiply( camera.projectionMatrix, camera.globalMatrix );
 		computeFrustum( _projScreenMatrix );
+		
+		if( THREE.AnimationHandler )
+			THREE.AnimationHandler.update();
 		
 		scene.update( undefined, false, camera, this );
 		
@@ -2030,11 +2333,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 			"uniform mat4 viewMatrix;",
 			"uniform mat3 normalMatrix;",
 			"uniform vec3 cameraPosition;",
+
+			"uniform mat4 cameraInverseMatrix;",
+
 			"attribute vec3 position;",
 			"attribute vec3 normal;",
 			"attribute vec3 color;",
 			"attribute vec2 uv;",
 			"attribute vec2 uv2;",
+			
+			"attribute vec4 skinVertexA;",
+			"attribute vec4 skinVertexB;",
+			"attribute vec4 skinIndex;",
+			"attribute vec4 skinWeight;",
 			""
 		].join("\n");
 
@@ -3124,7 +3435,7 @@ THREE.ShaderLib = {
 			"uniform vec3 diffuse;",
 			"uniform float opacity;",
 
-			"varying vec3 vLightWeighting;",
+			"varying vec3 vLightWeighting;",		
 
 			THREE.Snippets[ "color_pars_fragment" ],
 			THREE.Snippets[ "map_pars_fragment" ],
@@ -3157,6 +3468,8 @@ THREE.ShaderLib = {
 			THREE.Snippets[ "lights_pars_vertex" ],
 			THREE.Snippets[ "color_pars_vertex" ],
 
+			"uniform mat4 uBoneGlobalMatrices[20];",
+
 			"void main() {",
 
 				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
@@ -3170,7 +3483,17 @@ THREE.ShaderLib = {
 
 				THREE.Snippets[ "lights_vertex" ],
 
-				"gl_Position = projectionMatrix * mvPosition;",
+				//"gl_Position = projectionMatrix * mvPosition;",
+				
+				// skinning
+
+				"gl_Position  = ( uBoneGlobalMatrices[ int( skinIndex.x ) ] * skinVertexA ) * skinWeight.x;",
+				"gl_Position += ( uBoneGlobalMatrices[ int( skinIndex.y ) ] * skinVertexB ) * skinWeight.y;",
+				
+				// this doesn't work, no idea why
+				//"gl_Position  = projectionMatrix * cameraInverseMatrix * objectMatrix * gl_Position;",
+				
+				"gl_Position  = projectionMatrix * viewMatrix * objectMatrix * gl_Position;",
 
 			"}"
 

@@ -156,7 +156,12 @@ THREE.Animation.prototype.update = function( time ) {
 			object.skinMatrix           = JIThierarchy[ h ][ frame ];
 			object.autoUpdateMatrix     = false;
 			object.matrixNeedsToUpdate  = false;
+			
 			this.root.boneMatrices[ h ] = object.skinMatrix.flatten32;
+			
+			//object.skinMatrix.flattenToArray( this.root.boneMatrices[ h ] );
+			//object.skinMatrix.flattenToArrayOffset( this.root.boneMatrices, h * 16 );
+			
 		}
 		else {
 		

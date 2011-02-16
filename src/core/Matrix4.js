@@ -18,6 +18,38 @@ THREE.Matrix4 = function ( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33
 	this.flat = new Array( 16 );
 	this.m33 = new THREE.Matrix3();
 
+	// WebGL additions - NEEDS TO BE DISCUSSED!
+
+	if( typeof Float32Array !== 'undefined' ) {
+
+		var that = this;		
+		this.float32Array    = new Float32Array( 16 );
+		this.float32Array3x3 = new Float32Array( 9 );
+		
+		this.flatten32 = function() {
+			
+			var flat = that.float32Array;
+			
+			flat[ 0  ] = that.n11; flat[ 1  ] = that.n21; flat[ 2  ] = that.n31; flat[ 3  ] = that.n41;
+			flat[ 4  ] = that.n12; flat[ 5  ] = that.n22; flat[ 6  ] = that.n32; flat[ 7  ] = that.n42;
+			flat[ 8  ] = that.n13; flat[ 9  ] = that.n23; flat[ 10 ] = that.n33; flat[ 11 ] = that.n43;
+			flat[ 12 ] = that.n14; flat[ 13 ] = that.n24; flat[ 14 ] = that.n34; flat[ 15 ] = that.n44;
+	
+			return flat;
+		}
+		
+		this.flatten323x3 = function() {
+			
+			var flat = that.float32Array3x3;
+
+			flat[ 0 ] = that.n11; flat[ 1 ] = that.n21; flat[ 2 ] = that.n31;
+			flat[ 3 ] = that.n12; flat[ 4 ] = that.n22; flat[ 5 ] = that.n32;
+			flat[ 6 ] = that.n13; flat[ 7 ] = that.n23; flat[ 8 ] = that.n33;
+			
+			return flat;
+		}
+	}
+	
 };
 
 THREE.Matrix4.prototype = {
@@ -389,6 +421,32 @@ THREE.Matrix4.prototype = {
 
 	},
 
+	flattenToArrayOffset: function( flat, offset ) {
+		
+		flat[ offset ] 	   = this.n11;
+		flat[ offset + 1 ] = this.n21;
+		flat[ offset + 2 ] = this.n31;
+		flat[ offset + 3 ] = this.n41;
+
+		flat[ offset + 4 ] = this.n12;
+		flat[ offset + 5 ] = this.n22;
+		flat[ offset + 6 ] = this.n32;
+		flat[ offset + 7 ] = this.n42;
+
+		flat[ offset + 8 ]  = this.n13;
+		flat[ offset + 9 ]  = this.n23;
+		flat[ offset + 10 ] = this.n33;
+		flat[ offset + 11 ] = this.n43;
+
+		flat[ offset + 12 ] = this.n14;
+		flat[ offset + 13 ] = this.n24;
+		flat[ offset + 14 ] = this.n34;
+		flat[ offset + 15 ] = this.n44;
+
+		return flat;
+
+	},
+
 	setTranslation: function( x, y, z ) {
 
 		this.set( 1, 0, 0, x,
@@ -626,16 +684,16 @@ THREE.Matrix4.rotationAxisAngleMatrix = function ( axis, angle ) {
 
 };
 
-THREE.Matrix4.makeInvert = function ( m1 ) {
+THREE.Matrix4.makeInvert = function ( m1, m2 ) {
+
+	// based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
 
 	var n11 = m1.n11, n12 = m1.n12, n13 = m1.n13, n14 = m1.n14,
 		n21 = m1.n21, n22 = m1.n22, n23 = m1.n23, n24 = m1.n24,
 		n31 = m1.n31, n32 = m1.n32, n33 = m1.n33, n34 = m1.n34,
 		n41 = m1.n41, n42 = m1.n42, n43 = m1.n43, n44 = m1.n44;
 
-	//TODO: make this more efficient
-	//( based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm )
-	var m2 = new THREE.Matrix4();
+	if( m2 === undefined ) m2 = new THREE.Matrix4();
 
 	m2.n11 = n23*n34*n42 - n24*n33*n42 + n24*n32*n43 - n22*n34*n43 - n23*n32*n44 + n22*n33*n44;
 	m2.n12 = n14*n33*n42 - n13*n34*n42 - n14*n32*n43 + n12*n34*n43 + n13*n32*n44 - n12*n33*n44;
@@ -659,6 +717,47 @@ THREE.Matrix4.makeInvert = function ( m1 ) {
 
 };
 
+/*
+THREE.Matrix4.makeInvert = function ( m1 ) {
+
+	var m2 = new THREE.Matrix4();
+	
+	return THREE.Matrix4.makeInvertTo( m1, m2 );
+
+};
+
+THREE.Matrix4.makeInvertTo = function ( m1, m2 ) {
+
+	var n11 = m1.n11, n12 = m1.n12, n13 = m1.n13, n14 = m1.n14,
+		n21 = m1.n21, n22 = m1.n22, n23 = m1.n23, n24 = m1.n24,
+		n31 = m1.n31, n32 = m1.n32, n33 = m1.n33, n34 = m1.n34,
+		n41 = m1.n41, n42 = m1.n42, n43 = m1.n43, n44 = m1.n44;
+
+	//TODO: make this more efficient
+	//( based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm )
+
+	m2.n11 = n23*n34*n42 - n24*n33*n42 + n24*n32*n43 - n22*n34*n43 - n23*n32*n44 + n22*n33*n44;
+	m2.n12 = n14*n33*n42 - n13*n34*n42 - n14*n32*n43 + n12*n34*n43 + n13*n32*n44 - n12*n33*n44;
+	m2.n13 = n13*n24*n42 - n14*n23*n42 + n14*n22*n43 - n12*n24*n43 - n13*n22*n44 + n12*n23*n44;
+	m2.n14 = n14*n23*n32 - n13*n24*n32 - n14*n22*n33 + n12*n24*n33 + n13*n22*n34 - n12*n23*n34;
+	m2.n21 = n24*n33*n41 - n23*n34*n41 - n24*n31*n43 + n21*n34*n43 + n23*n31*n44 - n21*n33*n44;
+	m2.n22 = n13*n34*n41 - n14*n33*n41 + n14*n31*n43 - n11*n34*n43 - n13*n31*n44 + n11*n33*n44;
+	m2.n23 = n14*n23*n41 - n13*n24*n41 - n14*n21*n43 + n11*n24*n43 + n13*n21*n44 - n11*n23*n44;
+	m2.n24 = n13*n24*n31 - n14*n23*n31 + n14*n21*n33 - n11*n24*n33 - n13*n21*n34 + n11*n23*n34;
+	m2.n31 = n22*n34*n41 - n24*n32*n41 + n24*n31*n42 - n21*n34*n42 - n22*n31*n44 + n21*n32*n44;
+	m2.n32 = n14*n32*n41 - n12*n34*n41 - n14*n31*n42 + n11*n34*n42 + n12*n31*n44 - n11*n32*n44;
+	m2.n33 = n13*n24*n41 - n14*n22*n41 + n14*n21*n42 - n11*n24*n42 - n12*n21*n44 + n11*n22*n44;
+	m2.n34 = n14*n22*n31 - n12*n24*n31 - n14*n21*n32 + n11*n24*n32 + n12*n21*n34 - n11*n22*n34;
+	m2.n41 = n23*n32*n41 - n22*n33*n41 - n23*n31*n42 + n21*n33*n42 + n22*n31*n43 - n21*n32*n43;
+	m2.n42 = n12*n33*n41 - n13*n32*n41 + n13*n31*n42 - n11*n33*n42 - n12*n31*n43 + n11*n32*n43;
+	m2.n43 = n13*n22*n41 - n12*n23*n41 - n13*n21*n42 + n11*n23*n42 + n12*n21*n43 - n11*n22*n43;
+	m2.n44 = n12*n23*n31 - n13*n22*n31 + n13*n21*n32 - n11*n23*n32 - n12*n21*n33 + n11*n22*n33;
+	m2.multiplyScalar( 1 / m1.determinant() );
+
+	return m2;
+
+};
+*/
 THREE.Matrix4.makeInvert3x3 = function ( m1 ) {
 
 	// input:  THREE.Matrix4, output: THREE.Matrix3

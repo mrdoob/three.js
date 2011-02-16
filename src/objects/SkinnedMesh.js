@@ -2,6 +2,14 @@
  * @author mikael emtinger / http://gomo.se/
  */
 
+// do not crash if somebody includes the file in oldie browser
+
+if ( !window.Float32Array ) {
+
+	window.Float32Array = Array;
+
+}
+
 THREE.SkinnedMesh = function( geometry, materials ) {
 	
 	THREE.Mesh.call( this, geometry, materials );
@@ -41,6 +49,8 @@ THREE.SkinnedMesh = function( geometry, materials ) {
 			else
 				this.bones[ this.geometry.bones[ b ].parent ].addChild( this.bones[ b ] );
 		}
+
+		//this.boneMatrices = new Float32Array( 16 * this.bones.length );
 		
 		this.pose();
 
@@ -141,13 +151,25 @@ THREE.SkinnedMesh.prototype.pose = function() {
 
 	this.update( undefined, true );
 
-	var boneInverses = [];
+	var bim, bone,
+		boneInverses = [];
 	
 	for( var b = 0; b < this.bones.length; b++ ) {
 		
-		boneInverses.push( THREE.Matrix4.makeInvert( this.bones[ b ].skinMatrix, new THREE.Matrix4()));
+		boneInverses.push( THREE.Matrix4.makeInvert( this.bones[ b ].skinMatrix, new THREE.Matrix4() ) );
 		this.boneMatrices.push( this.bones[ b ].skinMatrix.flatten32 );
+		
+/*		
+		bone = this.bones[ b ];
+		
+		boneInverses.push( THREE.Matrix4.makeInvert( bone.skinMatrix ) );
+		
+		bim = new Float32Array( 16 );
+		bone.skinMatrix.flattenToArray( bim );
+		this.boneMatrices.push( bim );
 
+		//bone.skinMatrix.flattenToArrayOffset( this.boneMatrices, b * 16 );
+*/
 	}
 	
 
@@ -168,10 +190,10 @@ THREE.SkinnedMesh.prototype.pose = function() {
 			var indexB = this.geometry.skinIndices[ i ].y;
 	
 			vertex = new THREE.Vector3( orgVertex.x, orgVertex.y, orgVertex.z );
-			this.geometry.skinVerticesA.push( boneInverses[ indexA ].multiplyVector3( vertex ));
+			this.geometry.skinVerticesA.push( boneInverses[ indexA ].multiplyVector3( vertex ) );
 	
 			vertex = new THREE.Vector3( orgVertex.x, orgVertex.y, orgVertex.z );
-			this.geometry.skinVerticesB.push( boneInverses[ indexB ].multiplyVector3( vertex ));
+			this.geometry.skinVerticesB.push( boneInverses[ indexB ].multiplyVector3( vertex ) );
 			
 			// todo: add more influences
 	

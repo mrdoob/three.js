@@ -69,8 +69,12 @@ THREE.Camera.prototype.update = function( parentGlobalMatrix, forceUpdate, scene
 		else
 			this.globalMatrix.copy( this.localMatrix );
 
-		THREE.Matrix4.makeInvert( this.globalMatrix, this.inverseMatrix );	
+		THREE.Matrix4.makeInvert( this.globalMatrix, this.inverseMatrix );
+		
+		//THREE.Matrix4.makeInvertTo( this.globalMatrix, this.inverseMatrix );	
 			
+		//console.log(this.inverseMatrix);
+		
 		forceUpdate = true;
 	
 	} else {
@@ -89,6 +93,8 @@ THREE.Camera.prototype.update = function( parentGlobalMatrix, forceUpdate, scene
 			forceUpdate              = true;
 
 			THREE.Matrix4.makeInvert( this.globalMatrix, this.inverseMatrix );
+			
+			//THREE.Matrix4.makeInvertTo( this.globalMatrix, this.inverseMatrix );
 
 		}
 
