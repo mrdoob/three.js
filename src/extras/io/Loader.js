@@ -759,11 +759,51 @@ THREE.Loader.prototype = {
 
 			init_vertices();
 			init_faces();
+			init_skin();
 
 			this.computeCentroids();
 			this.computeFaceNormals();
 			this.sortFacesByMaterial();
 
+			function init_skin() {
+				
+				var i, l, x, y, z, w, a, b, c, d;
+
+				if ( data.skinWeights ) {
+					
+					for( i = 0, l = data.skinWeights.length; i < l; i += 2 ) {
+
+						x = data.skinWeights[ i     ];
+						y = data.skinWeights[ i + 1 ];
+						z = 0;
+						w = 0;
+
+						THREE.Loader.prototype.sw( scope, x, y, z, w );
+
+					}
+					
+				}
+				
+				if ( data.skinIndices ) {
+					
+					for( i = 0, l = data.skinIndices.length; i < l; i += 2 ) {
+
+						a = data.skinIndices[ i     ];
+						b = data.skinIndices[ i + 1 ];
+						c = 0;
+						d = 0;
+
+						THREE.Loader.prototype.si( scope, a, b, c, d );
+
+					}
+				
+				}
+				
+				THREE.Loader.prototype.bones( scope, data.bones );
+				THREE.Loader.prototype.animation( scope, data.animation );
+				
+			}
+			
 			function init_vertices() {
 
 				var i, l, x, y, z, r, g, b;
@@ -882,7 +922,7 @@ THREE.Loader.prototype = {
 
 					THREE.Loader.prototype.uv3( scope.uvs, u1, v1, u2, v2, u3, v3 );
 					
-					if( data.uvs2 ) {
+					if( data.uvs2 && data.uvs2.length ) {
 						
 						u1 = data.uvs2[ uva * 2 ];
 						v1 = data.uvs2[ uva * 2 + 1 ];
@@ -1012,6 +1052,30 @@ THREE.Loader.prototype = {
 
 	},
 
+	bones: function( scope, bones ) {
+
+		scope.bones = bones;
+
+	},
+	
+	animation: function( scope, animation ) {
+		
+		scope.animation = animation;
+
+	},
+	
+	si: function( scope, a, b, c, d ) {
+
+		scope.skinIndices.push( new THREE.Vector4( a, b, c, d ) );
+
+	},
+
+	sw: function( scope, x, y, z, w ) {
+
+		scope.skinWeights.push( new THREE.Vector4( x, y, z, w ) );
+
+	},
+	
 	v: function( scope, x, y, z ) {
 
 		scope.vertices.push( new THREE.Vertex( new THREE.Vector3( x, y, z ) ) );

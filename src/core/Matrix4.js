@@ -4,6 +4,8 @@
  * @author philogb / http://blog.thejit.org/
  * @author jordi_ros / http://plattsoft.com
  * @author D1plo1d / http://github.com/D1plo1d
+ * @author alteredq / http://alteredqualia.com/
+ * @author mikael emtinger / http://gomo.se/
  */
 
 THREE.Matrix4 = function ( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43, n44 ) {
@@ -83,6 +85,15 @@ THREE.Matrix4.prototype = {
 
 	},
 
+	multiplyVector3OnlyZ: function( v ) {
+		
+		var vx = v.x, vy = v.y, vz = v.z,
+		d = 1 / ( this.n41 * vx + this.n42 * vy + this.n43 * vz + this.n44 );
+
+		return ( this.n31 * vx + this.n32 * vy + this.n33 * vz + this.n34 ) * d;
+
+	},
+	
 	multiplyVector4: function ( v ) {
 
 		var vx = v.x, vy = v.y, vz = v.z, vw = v.w;
@@ -458,6 +469,92 @@ THREE.Matrix4.prototype = {
 
 	},
 
+	setPosition: function( vec3 ) {
+
+		this.n14 = vec3.x;
+		this.n24 = vec3.y;
+		this.n34 = vec3.z;
+		
+		return this;
+	
+	},
+	
+	setRotationFromEuler: function( vec3 ) {
+		
+		//var c = Math.PI / 180;
+		var x = vec3.x,// * c;
+			y = vec3.y,// * c;
+			z = vec3.z,// * c;
+		
+			ch = Math.cos( y  ),
+			sh = Math.sin( y  ),
+			ca = Math.cos( -z ),
+			sa = Math.sin( -z ),
+			cb = Math.cos( x  ),
+			sb = Math.sin( x  ),
+		
+			chsa = ch * sa,
+			shsa = sh * sa;
+	
+	    this.n11 = ch * ca;
+	    this.n12 = sh * sb - chsa * cb;
+	    this.n13 = chsa * sb + sh * cb;
+	    this.n21 = sa;
+	    this.n22 = ca * cb;
+	    this.n23 = - ca * sb;
+	    this.n31 = - sh * ca;
+	    this.n32 = shsa * cb + ch * sb;
+	    this.n33 = - shsa * sb + ch * cb;
+		
+	},
+
+	setRotationFromQuaternion: function( quat ) {
+
+		var x = quat.x, y = quat.y, z = quat.z, w = quat.w,
+	
+			x2 = x + x,
+			y2 = y + y,
+			z2 = z + z,
+	
+			xx = x * x2,
+			xy = x * y2,
+			xz = x * z2,
+	
+			yy = y * y2,
+			yz = y * z2,
+			zz = z * z2,
+	
+			wx = w * x2,
+			wy = w * y2,
+			wz = w * z2;
+	
+		this.n11 = 1 - ( yy + zz );
+		this.n12 = xy - wz;
+		this.n13 = xz + wy;
+	
+		this.n21 = xy + wz;
+		this.n22 = 1 - ( xx + zz );
+		this.n23 = yz - wx;
+	
+		this.n31 = xz - wy;
+		this.n32 = yz + wx;
+		this.n33 = 1 - ( xx + yy );
+		
+	},
+	
+	scale: function( vec3 ) {
+		
+		var x = vec3.x;
+		var y = vec3.y;
+		var z = vec3.z;
+		
+		this.n11 *= x; this.n12 *= x; this.n13 *= x;
+		this.n21 *= y; this.n22 *= y; this.n23 *= y;
+		this.n31 *= z; this.n32 *= z; this.n33 *= z;
+
+		return this;
+	},
+	
 	toString: function() {
 
 		return  "| " + this.n11 + " " + this.n12 + " " + this.n13 + " " + this.n14 + " |\n" +

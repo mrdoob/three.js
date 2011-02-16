@@ -1,6 +1,7 @@
 /**
  * @author supereggbert / http://www.paulbrunt.co.uk/
  * @author philogb / http://blog.thejit.org/
+ * @author mikael emtinger / http://gomo.se/
  */
 
 THREE.Vector4 = function ( x, y, z, w ) {
@@ -8,7 +9,7 @@ THREE.Vector4 = function ( x, y, z, w ) {
 	this.x = x || 0;
 	this.y = y || 0;
 	this.z = z || 0;
-	this.w = w || 1;
+	this.w = w !== undefined ? w : 1;
 
 };
 
@@ -108,6 +109,7 @@ THREE.Vector4.prototype = {
 		this.y = this.y + (v.y - this.y) * alpha;
 		this.z = this.z + (v.z - this.z) * alpha;
 		this.w = this.w + (v.w - this.w) * alpha;
+
 	},
 
 	clone: function () {

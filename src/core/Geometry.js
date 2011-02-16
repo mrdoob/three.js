@@ -2,15 +2,21 @@
  * @author mr.doob / http://mrdoob.com/
  * @author kile / http://kile.stravaganza.org/
  * @author alteredq / http://alteredqualia.com/
+ * @author mikael emtinger / http://gomo.se/
  */
 
 THREE.Geometry = function () {
 
+	this.id = "Geometry" + THREE.GeometryIdCounter++;
+	
 	this.vertices = [];
 	this.faces = [];
 	this.uvs = [];
 	this.uvs2 = [];
 	this.colors = [];
+	
+	this.skinWeights = [];
+	this.skinIndices = [];
 
 	this.boundingBox = null;
 	this.boundingSphere = null;
@@ -467,3 +473,5 @@ THREE.Geometry.prototype = {
 	}
 
 };
+
+THREE.GeometryIdCounter = 0;

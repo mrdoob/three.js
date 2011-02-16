@@ -64,6 +64,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.domElement = _canvas;
 	this.autoClear = true;
+	this.sortObjects = false;
 
 	initGL( antialias, clearColor, clearAlpha );
 
@@ -809,7 +810,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( object.sortParticles ) {
 		
-			_projScreenMatrix.multiplySelf( object.matrixWorld );
+			_projScreenMatrix.multiplySelf( object.globalMatrix );
 			
 			for ( v = 0; v < vl; v++ ) {
 
@@ -1355,7 +1356,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	
 	function isInFrustum( object ) {
 
-		var distance, matrix = object.matrix,
+		var distance, matrix = object.globalMatrix,
 		radius = - object.geometry.boundingSphere.radius * Math.max( object.scale.x, Math.max( object.scale.y, object.scale.z ) );
 
 		for ( var i = 0; i < 6; i ++ ) {
@@ -1446,38 +1447,30 @@ THREE.WebGLRenderer = function ( parameters ) {
 		
 	};
 	
-	function updateChildren( object ) {
-		
-		var i, l, child, children = object.children;
-		
-		for ( i = 0, l = children.length; i < l; i ++ ) {
-
-			child = children[ i ];
-
-			child.autoUpdateMatrix && child.updateMatrix();
-			child.matrixWorld.multiply( object.matrixWorld, child.matrix );
-			
-			updateChildren( child );
-		
-		}
 	
+	function painterSort( a, b ) {
+
+		return b.z - a.z;
+
 	};
 	
 	this.render = function( scene, camera, renderTarget, clear ) {
-
+		
 		var i, program, opaque, transparent,
 			o, ol, oil, webGLObject, object, buffer,
 			lights = scene.lights,
 			fog = scene.fog,
 			ol;
 		
-		camera.autoUpdateMatrix && camera.updateMatrix();
+		camera.autoUpdateMatrix && camera.update();
 		
-		camera.matrix.flattenToArray( _viewMatrixArray );
+		camera.globalMatrix.flattenToArray( _viewMatrixArray );
 		camera.projectionMatrix.flattenToArray( _projectionMatrixArray );
 
-		_projScreenMatrix.multiply( camera.projectionMatrix, camera.matrix );
+		_projScreenMatrix.multiply( camera.projectionMatrix, camera.globalMatrix );
 		computeFrustum( _projScreenMatrix );
+		
+		scene.update( undefined, false, camera, this );
 		
 		this.initWebGLObjects( scene, camera );
 
@@ -1498,20 +1491,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 			webGLObject = scene.__webGLObjects[ o ];
 			object = webGLObject.object;
 
-			if ( object.visible ) {
-				
-				if ( webGLObject.root ) {
-			
-					object.autoUpdateMatrix && object.updateMatrix();
-					object.matrixWorld.copy( object.matrix );
-				
-					updateChildren( object );
-					
-				}
+			if ( object.visible ) {				
 
 				if ( ! ( object instanceof THREE.Mesh ) || isInFrustum( object ) ) {
 					
-					object.matrixWorld.flattenToArray( object._objectMatrixArray );
+					object.globalMatrix.flattenToArray( object._objectMatrixArray );
 					
 					setupMatrices( object, camera );
 					
@@ -1519,6 +1503,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 					
 					webGLObject.render = true;
 					
+					if ( this.sortObjects ) {
+					
+						_vector3.copy( object.position );
+						_projScreenMatrix.multiplyVector3( _vector3 );
+
+						webGLObject.z = _vector3.z;
+					
+					}
 				
 				} else {
 					
@@ -1534,6 +1526,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		
 		}
 		
+		if ( this.sortObjects ) {
+			
+			scene.__webGLObjects.sort( painterSort );
+			
+		}
+		
 		oil = scene.__webGLObjectsImmediate.length;
 		
 		for ( o = 0; o < oil; o++ ) {
@@ -1545,9 +1543,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			
 				if( object.autoUpdateMatrix ) { 
 				
-					object.updateMatrix();
-					object.matrixWorld.copy( object.matrix );
-					object.matrixWorld.flattenToArray( object._objectMatrixArray );
+					object.globalMatrix.flattenToArray( object._objectMatrixArray );
 				
 				}
 				
@@ -1681,22 +1677,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function addChildren( scene, object ) {
-	
-		var i, l, children = object.children;
-		
-		for ( i = 0, l = children.length; i < l; i ++ ) {
-
-			child = children[ i ];
-
-			addObject( scene, child, false );
-			addChildren( scene, child );
-		
-		}
-
-	};
-
-	function addObject( scene, object, root ) {
+	function addObject( scene, object ) {
 		
 		var g, geometry, geometryChunk, objmap;
 		
@@ -1712,7 +1693,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			object._modelViewMatrixArray = new Float32Array( 16 );
 			object._objectMatrixArray = new Float32Array( 16 );
 			
-			object.matrix.flattenToArray( object._objectMatrixArray );
+			object.globalMatrix.flattenToArray( object._objectMatrixArray );
 
 		}
 
@@ -1753,7 +1734,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				// create separate wrapper per each use of VBO
 
-				add_buffer( objlist, objmap, g, geometryChunk, object, root );
+				add_buffer( objlist, objmap, g, geometryChunk, object );
 
 			}
 
@@ -1782,7 +1763,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			add_buffer( objlist, objmap, 0, geometry, object, root );
+			add_buffer( objlist, objmap, 0, geometry, object );
 
 			geometry.__dirtyVertices = false;
 			geometry.__dirtyColors = false;
@@ -1805,14 +1786,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			add_buffer( objlist, objmap, 0, geometry, object, root );
+			add_buffer( objlist, objmap, 0, geometry, object );
 
 			geometry.__dirtyVertices = false;
 			geometry.__dirtyColors = false;
 
 		} else if ( object instanceof THREE.MarchingCubes ) {
 			
-			add_buffer_immediate( scene.__webGLObjectsImmediate, objmap, 0, object, root );
+			add_buffer_immediate( scene.__webGLObjectsImmediate, objmap, 0, object );
 			
 		}/*else if ( object instanceof THREE.Particle ) {
 
@@ -1820,14 +1801,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 		
 	};
 
-	function add_buffer( objlist, objmap, id, buffer, object, root ) {
+	function add_buffer( objlist, objmap, id, buffer, object ) {
 
 		if ( objmap[ id ] == undefined ) {
 
 			objlist.push( { buffer: buffer, object: object, 
 							opaque: { list: [], count: 0 }, 
-							transparent: { list: [], count: 0 },
-							root: root
+							transparent: { list: [], count: 0 }
 						} );
 			
 			objmap[ id ] = 1;
@@ -1836,14 +1816,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function add_buffer_immediate( objlist, objmap, id, object, root ) {
+	function add_buffer_immediate( objlist, objmap, id, object ) {
 
 		if ( objmap[ id ] == undefined ) {
 
 			objlist.push( { object: object, 
 							opaque: { list: [], count: 0 }, 
-							transparent: { list: [], count: 0 },
-							root: root
+							transparent: { list: [], count: 0 }
 						} );
 			
 			objmap[ id ] = 1;
@@ -1869,8 +1848,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			object = scene.objects[ o ];
 
-			addObject( scene, object, true );
-			addChildren( scene, object );
+			addObject( scene, object );
 		
 		}
 
@@ -1894,9 +1872,21 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	this.addToRenderList = function( object ) {
+		
+		// TODO: implement this
+		
+	};
+
+	this.removeFromRenderList = function( object ) {
+		
+		// TODO: implement this
+		
+	};
+	
 	function setupMatrices ( object, camera ) {
 
-		object._modelViewMatrix.multiplyToArray( camera.matrix, object.matrixWorld, object._modelViewMatrixArray );
+		object._modelViewMatrix.multiplyToArray( camera.globalMatrix, object.globalMatrix, object._modelViewMatrixArray );
 		object._normalMatrix = THREE.Matrix4.makeInvert3x3( object._modelViewMatrix ).transposeIntoArray( object._normalMatrixArray );
 
 	};
