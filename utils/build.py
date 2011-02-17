@@ -21,21 +21,26 @@ COMMON_FILES = [
 'core/Rectangle.js',
 'core/Matrix3.js',
 'core/Matrix4.js',
+'core/Quaternion.js',
 'core/Vertex.js',
 'core/Face3.js',
 'core/Face4.js',
 'core/UV.js',
 'core/Geometry.js',
-'cameras/Camera.js',
-'lights/Light.js',
-'lights/AmbientLight.js',
-'lights/DirectionalLight.js',
-'lights/PointLight.js',
 'objects/Object3D.js',
 'objects/Particle.js',
 'objects/ParticleSystem.js',
 'objects/Line.js',
 'objects/Mesh.js',
+'objects/Bone.js',
+'objects/SkinnedMesh.js',
+'animation/AnimationHandler.js',
+'animation/Animation.js',
+'cameras/Camera.js',
+'lights/Light.js',
+'lights/AmbientLight.js',
+'lights/DirectionalLight.js',
+'lights/PointLight.js',
 'materials/Material.js',
 'materials/LineBasicMaterial.js',
 'materials/MeshBasicMaterial.js',
@@ -282,9 +287,15 @@ def compress(text):
 	with os.fdopen(in_tuple[0], 'w') as handle:
 		handle.write(text)
 
+	# uncomment to get concatenated JS if you can't figure out Closure compiler errors :|
+	
+	#f = open( "debug.js" , "w" )
+	#f.write(text)
+	#f.close()
+	
 	out_tuple = tempfile.mkstemp()
 	# os.system("java -jar yuicompressor-2.4.2.jar %s --type js -o %s --charset utf-8 -v" % (in_tuple[1], out_tuple[1]))
-	os.system("java -jar compiler.jar --js %s --js_output_file %s" % (in_tuple[1], out_tuple[1]))
+	os.system("java -jar compiler.jar --language_in=ECMASCRIPT5 --js %s --js_output_file %s" % (in_tuple[1], out_tuple[1]))
 
 	with os.fdopen(out_tuple[0], 'r') as handle:
 		compressed = handle.read()

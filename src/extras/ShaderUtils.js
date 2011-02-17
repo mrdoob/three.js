@@ -431,10 +431,10 @@ var ShaderUtils = {
 		"uniform bool grayscale;",
 
 		// noise effect intensity value (0 = no effect, 1 = full effect)
-		"const float fNintensity = 0.35;",
+		"const float fNintensity = 0.5;",
 		
 		// scanlines effect intensity value (0 = no effect, 1 = full effect)
-		"const float fSintensity = 0.35;",
+		"const float fSintensity = 0.05;",
 		
 		// scanlines effect count value (0 = no effect, 4096 = full effect)
 		"const float fScount = 4096.0;",

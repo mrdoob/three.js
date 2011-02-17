@@ -50,7 +50,7 @@ THREE.SkinnedMesh = function( geometry, materials ) {
 				this.bones[ this.geometry.bones[ b ].parent ].addChild( this.bones[ b ] );
 		}
 
-		//this.boneMatrices = new Float32Array( 16 * this.bones.length );
+		this.boneMatrices = new Float32Array( 16 * this.bones.length );
 		
 		this.pose();
 
@@ -154,22 +154,18 @@ THREE.SkinnedMesh.prototype.pose = function() {
 	var bim, bone,
 		boneInverses = [];
 	
-	for( var b = 0; b < this.bones.length; b++ ) {
-		
-		boneInverses.push( THREE.Matrix4.makeInvert( this.bones[ b ].skinMatrix, new THREE.Matrix4() ) );
-		this.boneMatrices.push( this.bones[ b ].skinMatrix.flatten32 );
-		
-/*		
+	for( var b = 0; b < this.bones.length; b++ ) {		
+
 		bone = this.bones[ b ];
 		
 		boneInverses.push( THREE.Matrix4.makeInvert( bone.skinMatrix ) );
 		
-		bim = new Float32Array( 16 );
-		bone.skinMatrix.flattenToArray( bim );
-		this.boneMatrices.push( bim );
+		//bim = new Float32Array( 16 );
+		//bone.skinMatrix.flattenToArray( bim );
+		//this.boneMatrices.push( bim );
 
-		//bone.skinMatrix.flattenToArrayOffset( this.boneMatrices, b * 16 );
-*/
+		bone.skinMatrix.flattenToArrayOffset( this.boneMatrices, b * 16 );
+
 	}
 	
 

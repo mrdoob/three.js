@@ -22,7 +22,8 @@ THREE.Quaternion = function( _x, _y, _z, _w ) {
 		set x( value ) { this.that.x = value; this.isDirty = true; },
 		set y( value ) { this.that.y = value; this.isDirty = true; },
 		set z( value ) { this.that.z = value; this.isDirty = true; },
-		set w( value ) { this.that.w = value; this.isDirty = true; },
+		set w( value ) { this.that.w = value; this.isDirty = true; }
+
 	};
 
 	this.api.__proto__ = THREE.Quaternion.prototype;

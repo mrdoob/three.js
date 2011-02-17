@@ -11,6 +11,8 @@ THREE.Animation = function( root, data ) {
 	this.startTime = 0;
 	this.isPlaying = false;
 	this.loop      = true;
+	
+	this.offset    = 0;
 
 
 	// need to initialize data?
@@ -25,6 +27,7 @@ THREE.Animation = function( root, data ) {
 		
 		for( var b = 0; b < this.root.bones.length; b++ )
 			this.hierarchy.push( this.root.bones[ b ] );
+
 	}
 	else {
 		
@@ -57,6 +60,7 @@ THREE.Animation.prototype.play = function( loop ) {
 				
 				this.hierarchy[ h ].prevKey = { pos: 0, rot: 0, scl: 0 };
 				this.hierarchy[ h ].nextKey = { pos: 0, rot: 0, scl: 0 };
+
 			}
 			
 			this.hierarchy[ h ].prevKey.pos = this.data.hierarchy[ h ].keys[ 0 ];
@@ -127,7 +131,7 @@ THREE.Animation.prototype.update = function( time ) {
 	
 	// update
 	
-	var currentTime         = new Date().getTime() * 0.001 - this.startTime;
+	var currentTime         = new Date().getTime() * 0.001 - this.startTime + this.offset;
 	var unloopedCurrentTime = currentTime;
 
 
@@ -140,6 +144,7 @@ THREE.Animation.prototype.update = function( time ) {
 		
 		this.startTime = new Date().getTime() * 0.001 - currentTime;
 		currentTime    = new Date().getTime() * 0.001 - this.startTime;
+
 	}
 	
 	frame = Math.min( parseInt( currentTime * this.data.fps ), parseInt( this.data.length * this.data.fps ));
@@ -157,10 +162,8 @@ THREE.Animation.prototype.update = function( time ) {
 			object.autoUpdateMatrix     = false;
 			object.matrixNeedsToUpdate  = false;
 			
-			this.root.boneMatrices[ h ] = object.skinMatrix.flatten32;
-			
 			//object.skinMatrix.flattenToArray( this.root.boneMatrices[ h ] );
-			//object.skinMatrix.flattenToArrayOffset( this.root.boneMatrices, h * 16 );
+			object.skinMatrix.flattenToArrayOffset( this.root.boneMatrices, h * 16 );
 			
 		}
 		else {
@@ -185,14 +188,15 @@ THREE.Animation.prototype.update = function( time ) {
 							
 							prevKey = this.data.hierarchy[ h ].keys[ 0 ];
 							nextKey = this.getNextKeyWith( type, h, 1 );
-						}
-						else {
+
+						} else {
 							
 							this.stop();
 							return;
+
 						}
-					}
-					else {
+
+					} else {
 						
 						do {
 							
@@ -204,6 +208,7 @@ THREE.Animation.prototype.update = function( time ) {
 		
 					object.prevKey[ type ] = prevKey;
 					object.nextKey[ type ] = nextKey;
+
 				}
 				
 				
@@ -239,7 +244,7 @@ THREE.Animation.prototype.update = function( time ) {
 					vector.z = prevXYZ[ 2 ] + ( nextXYZ[ 2 ] - prevXYZ[ 2 ] ) * scale;
 
 				}
-			}		
+			}	
 		}
 	}
 	

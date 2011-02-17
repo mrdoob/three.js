@@ -1278,10 +1278,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		material.program = buildProgram( material.fragment_shader, material.vertex_shader, parameters );
 
 		identifiers = [ 'viewMatrix', 'modelViewMatrix', 'projectionMatrix', 'normalMatrix', 'objectMatrix', 'cameraPosition', 
-						'cameraInverseMatrix', 
-						'uBoneGlobalMatrices[0]', 'uBoneGlobalMatrices[1]', 'uBoneGlobalMatrices[2]', 'uBoneGlobalMatrices[3]', 'uBoneGlobalMatrices[4]',
-					    'uBoneGlobalMatrices[5]', 'uBoneGlobalMatrices[6]', 'uBoneGlobalMatrices[7]', 'uBoneGlobalMatrices[8]', 'uBoneGlobalMatrices[9]',
-					    'uBoneGlobalMatrices[10]', 'uBoneGlobalMatrices[11]', 'uBoneGlobalMatrices[12]', 'uBoneGlobalMatrices[13]', 'uBoneGlobalMatrices[14]'
+						'cameraInverseMatrix', 'uBoneGlobalMatrices'
 						];
 		for( u in material.uniforms ) {
 
@@ -1403,32 +1400,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 		
 		if ( material.skinning ) {
 			
-			_gl.uniformMatrix4fv( p_uniforms.cameraInverseMatrix, false, _cameraInverseMatrixArray );
-			
-			_gl.uniformMatrix4fv( p_uniforms["uBoneGlobalMatrices[0]"], false, object.boneMatrices[0]() );
-			_gl.uniformMatrix4fv( p_uniforms["uBoneGlobalMatrices[1]"], false, object.boneMatrices[1]() );
-			_gl.uniformMatrix4fv( p_uniforms["uBoneGlobalMatrices[2]"], false, object.boneMatrices[2]() );
-			_gl.uniformMatrix4fv( p_uniforms["uBoneGlobalMatrices[3]"], false, object.boneMatrices[3]() );
-			_gl.uniformMatrix4fv( p_uniforms["uBoneGlobalMatrices[4]"], false, object.boneMatrices[4]() );
-			
-			_gl.uniformMatrix4fv( p_uniforms["uBoneGlobalMatrices[5]"], false, object.boneMatrices[5]() );
-			_gl.uniformMatrix4fv( p_uniforms["uBoneGlobalMatrices[6]"], false, object.boneMatrices[6]() );
-			_gl.uniformMatrix4fv( p_uniforms["uBoneGlobalMatrices[7]"], false, object.boneMatrices[7]() );
-			_gl.uniformMatrix4fv( p_uniforms["uBoneGlobalMatrices[8]"], false, object.boneMatrices[8]() );
-			_gl.uniformMatrix4fv( p_uniforms["uBoneGlobalMatrices[9]"], false, object.boneMatrices[9]() );
-			_gl.uniformMatrix4fv( p_uniforms["uBoneGlobalMatrices[10]"], false, object.boneMatrices[10]() );
-			
-			_gl.uniformMatrix4fv( p_uniforms["uBoneGlobalMatrices[11]"], false, object.boneMatrices[11]() );
-			_gl.uniformMatrix4fv( p_uniforms["uBoneGlobalMatrices[12]"], false, object.boneMatrices[12]() );
-			_gl.uniformMatrix4fv( p_uniforms["uBoneGlobalMatrices[13]"], false, object.boneMatrices[13]() );
-			_gl.uniformMatrix4fv( p_uniforms["uBoneGlobalMatrices[14]"], false, object.boneMatrices[14]() );
+			loadUniformsSkinning( p_uniforms, object );
 			
 		}
 		
 		return program;
 		
 	};
-	
+		
 	this.renderBuffer = function ( camera, lights, fog, material, geometryChunk, object ) {
 
 		var program, attributes, linewidth, primitives;
@@ -2376,6 +2355,24 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	function loadUniformsSkinning( uniforms, object ) {
+		
+		_gl.uniformMatrix4fv( uniforms.cameraInverseMatrix, false, _cameraInverseMatrixArray );
+		
+		/*
+		var i, l = object.boneMatrices.length;
+		
+		for( i = 0; i < l; i++ ) {
+			
+			//_gl.uniformMatrix4fv( uniforms[ "uBoneGlobalMatrices[" + i + "]" ], false, object.boneMatrices[ i ]() );
+			_gl.uniformMatrix4fv( uniforms[ "uBoneGlobalMatrices[" + i + "]" ], false, object.boneMatrices[ i ] );
+			
+		}
+		*/
+		_gl.uniformMatrix4fv( uniforms[ "uBoneGlobalMatrices" ], false, object.boneMatrices );
+	
+	};
+	
 	function loadUniformsMatrices( uniforms, object ) {
 		
 		_gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, object._modelViewMatrixArray );
