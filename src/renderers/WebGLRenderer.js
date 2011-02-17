@@ -65,7 +65,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.domElement = _canvas;
 	this.autoClear = true;
-	this.sortObjects = true;
+	this.sortObjects = false;
 
 	initGL( antialias, clearColor, clearAlpha );
 
@@ -1272,7 +1272,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 		maxLightCount = allocateLights( lights, 4 );
 
 		parameters = { fog: fog, map: material.map, env_map: material.env_map, light_map: material.light_map, vertex_colors: material.vertex_colors,
+					   skinning: material.skinning,
 					   maxDirLights: maxLightCount.directional, maxPointLights: maxLightCount.point };
+		
 		material.program = buildProgram( material.fragment_shader, material.vertex_shader, parameters );
 
 		identifiers = [ 'viewMatrix', 'modelViewMatrix', 'projectionMatrix', 'normalMatrix', 'objectMatrix', 'cameraPosition', 
@@ -1294,8 +1296,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 	};
 	
 	this.setProgram = function( camera, lights, fog, material, object ) {
-		
-		var skinning = true; // hack for testing
 		
 		if ( !material.program ) this.initMaterial( material, lights, fog );
 
@@ -1386,7 +1386,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		
 		if ( material instanceof THREE.MeshShaderMaterial ||
 			 material.env_map ||
-			 skinning ) {
+			 material.skinning ) {
 				 
 			_gl.uniformMatrix4fv( p_uniforms.objectMatrix, false, object._objectMatrixArray );
 		
@@ -1395,15 +1395,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( material instanceof THREE.MeshPhongMaterial ||
 			 material instanceof THREE.MeshLambertMaterial ||
 			 material instanceof THREE.MeshShaderMaterial ||
-			 skinning ) {
-			 
+			 material.skinning ) {
+
 			_gl.uniformMatrix4fv( p_uniforms.viewMatrix, false, _viewMatrixArray );
 			
 		}
 		
-		if ( skinning ) {
+		if ( material.skinning ) {
 			
 			_gl.uniformMatrix4fv( p_uniforms.cameraInverseMatrix, false, _cameraInverseMatrixArray );
+			
 			_gl.uniformMatrix4fv( p_uniforms["uBoneGlobalMatrices[0]"], false, object.boneMatrices[0]() );
 			_gl.uniformMatrix4fv( p_uniforms["uBoneGlobalMatrices[1]"], false, object.boneMatrices[1]() );
 			_gl.uniformMatrix4fv( p_uniforms["uBoneGlobalMatrices[2]"], false, object.boneMatrices[2]() );
@@ -2326,6 +2327,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			parameters.env_map ? "#define USE_ENVMAP" : "",
 			parameters.light_map ? "#define USE_LIGHTMAP" : "",
 			parameters.vertex_colors ? "#define USE_COLOR" : "",
+			parameters.skinning ? "#define USE_SKINNING" : "",
 
 			"uniform mat4 objectMatrix;",
 			"uniform mat4 modelViewMatrix;",
@@ -3246,8 +3248,39 @@ THREE.Snippets = {
 
 	"#endif"
 
-	].join("\n")
+	].join("\n"),
 	
+	// skinning
+	
+	skinning_pars_vertex: [
+	
+	"#ifdef USE_SKINNING",
+		
+		"uniform mat4 uBoneGlobalMatrices[20];",
+		
+	"#endif"
+		
+	].join("\n"),
+		
+	skinning_vertex: [
+	
+	"#ifdef USE_SKINNING",
+
+		"gl_Position  = ( uBoneGlobalMatrices[ int( skinIndex.x ) ] * skinVertexA ) * skinWeight.x;",
+		"gl_Position += ( uBoneGlobalMatrices[ int( skinIndex.y ) ] * skinVertexB ) * skinWeight.y;",
+		
+		// this doesn't work, no idea why
+		//"gl_Position  = projectionMatrix * cameraInverseMatrix * objectMatrix * gl_Position;",
+		
+		"gl_Position  = projectionMatrix * viewMatrix * objectMatrix * gl_Position;",
+	
+	"#else",
+		
+		"gl_Position = projectionMatrix * mvPosition;",
+		
+	"#endif"
+	
+	].join("\n")
 
 };
 
@@ -3407,6 +3440,7 @@ THREE.ShaderLib = {
 			THREE.Snippets[ "lightmap_pars_vertex" ],
 			THREE.Snippets[ "envmap_pars_vertex" ],
 			THREE.Snippets[ "color_pars_vertex" ],
+			THREE.Snippets[ "skinning_pars_vertex" ],
 
 			"void main() {",
 
@@ -3416,8 +3450,7 @@ THREE.ShaderLib = {
 				THREE.Snippets[ "lightmap_vertex" ],
 				THREE.Snippets[ "envmap_vertex" ],
 				THREE.Snippets[ "color_vertex" ],
-
-				"gl_Position = projectionMatrix * mvPosition;",
+				THREE.Snippets[ "skinning_vertex" ],
 
 			"}"
 
@@ -3467,8 +3500,7 @@ THREE.ShaderLib = {
 			THREE.Snippets[ "envmap_pars_vertex" ],
 			THREE.Snippets[ "lights_pars_vertex" ],
 			THREE.Snippets[ "color_pars_vertex" ],
-
-			"uniform mat4 uBoneGlobalMatrices[20];",
+			THREE.Snippets[ "skinning_pars_vertex" ],
 
 			"void main() {",
 
@@ -3482,18 +3514,7 @@ THREE.ShaderLib = {
 				"vec3 transformedNormal = normalize( normalMatrix * normal );",
 
 				THREE.Snippets[ "lights_vertex" ],
-
-				//"gl_Position = projectionMatrix * mvPosition;",
-				
-				// skinning
-
-				"gl_Position  = ( uBoneGlobalMatrices[ int( skinIndex.x ) ] * skinVertexA ) * skinWeight.x;",
-				"gl_Position += ( uBoneGlobalMatrices[ int( skinIndex.y ) ] * skinVertexB ) * skinWeight.y;",
-				
-				// this doesn't work, no idea why
-				//"gl_Position  = projectionMatrix * cameraInverseMatrix * objectMatrix * gl_Position;",
-				
-				"gl_Position  = projectionMatrix * viewMatrix * objectMatrix * gl_Position;",
+				THREE.Snippets[ "skinning_vertex" ],
 
 			"}"
 
@@ -3559,6 +3580,7 @@ THREE.ShaderLib = {
 			THREE.Snippets[ "envmap_pars_vertex" ],
 			THREE.Snippets[ "lights_pars_vertex" ],
 			THREE.Snippets[ "color_pars_vertex" ],
+			THREE.Snippets[ "skinning_pars_vertex" ],
 
 			"void main() {",
 
@@ -3579,8 +3601,7 @@ THREE.ShaderLib = {
 				"vNormal = transformedNormal;",
 
 				THREE.Snippets[ "lights_vertex" ],
-
-				"gl_Position = projectionMatrix * mvPosition;",
+				THREE.Snippets[ "skinning_vertex" ],
 
 			"}"
 

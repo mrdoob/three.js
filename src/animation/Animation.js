@@ -218,20 +218,26 @@ THREE.Animation.prototype.update = function( time ) {
 		
 				if( type === "rot" ) {
 		
-					if( scale < 0 || scale > 1 )
+					if( scale < 0 || scale > 1 ) {
+						
 						console.log( "Scale out of bounds:" + scale ); 
+						scale = scale < 0 ? 0 : 1;
+					
+					}
 		
 					THREE.Quaternion.slerp( prevXYZ, nextXYZ, object.quaternion, scale );
+
 				}
 				
 				// lerp pos/scl 
-							
+
 				else {
 					
 					vector   = type === "pos" ? object.position : object.scale; 
 					vector.x = prevXYZ[ 0 ] + ( nextXYZ[ 0 ] - prevXYZ[ 0 ] ) * scale;
 					vector.y = prevXYZ[ 1 ] + ( nextXYZ[ 1 ] - prevXYZ[ 1 ] ) * scale;
 					vector.z = prevXYZ[ 2 ] + ( nextXYZ[ 2 ] - prevXYZ[ 2 ] ) * scale;
+
 				}
 			}		
 		}
@@ -241,13 +247,12 @@ THREE.Animation.prototype.update = function( time ) {
 	// update JIT?
 	
 	if( JIThierarchy[ 0 ][ frame ] === undefined ) {
-
-		console.log(this.hierarchy);
 		
 		this.hierarchy[ 0 ].update( undefined, true );
 	
 		for( var h = 0; h < this.hierarchy.length; h++ ) 
 			JIThierarchy[ h ][ frame ] = this.hierarchy[ h ].skinMatrix.clone();
+
 	}
 
 };
@@ -274,9 +279,11 @@ THREE.Animation.prototype.getNextKeyWith = function( type, h, key ) {
 		
 		if( keys[ key ][ type ] !== undefined )
 			return keys[ key ];
+
 	}
 
 	return this.data.hierarchy[ h ].keys[ 0 ];
+
 }
 
 

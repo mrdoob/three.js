@@ -14,7 +14,8 @@
  *  wireframe: <boolean>,
  *  wireframe_linewidth: <float>,
  
- *  vertex_colors: <bool>
+ *  vertex_colors: <bool>,
+ *  skinning: <bool>
  * }
  */
 
@@ -38,6 +39,7 @@ THREE.MeshShaderMaterial = function ( parameters ) {
 	this.wireframe_linejoin = 'round';  // not implemented in WebGLRenderer (and this material doesn't make sense in CanvasRenderer)
 
 	this.vertex_colors = false; // must set this if shader wants to use "color" attribute stream
+	this.skinning = false;	// must set this is shader wants to use skinning attribute streams
 
 	if ( parameters ) {
 
@@ -58,6 +60,7 @@ THREE.MeshShaderMaterial = function ( parameters ) {
 		if ( parameters.wireframe_linejoin !== undefined ) this.wireframe_linejoin = parameters.wireframe_linejoin;
 		
 		if ( parameters.vertex_colors !== undefined ) this.vertex_colors = parameters.vertex_colors;
+		if ( parameters.skinning !== undefined ) this.skinning = parameters.skinning;
 
 	}
 
@@ -79,6 +82,7 @@ THREE.MeshShaderMaterial.prototype = {
 			'wireframe_linejoin: ' + this.wireframe_linejoin +'<br/>' +
 		
 			'vertex_colors: ' + this.vertex_colors + '<br/>' +
+			'skinning: ' + this.skinning + '<br/>' +
 			')';
 
 	}

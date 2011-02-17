@@ -21,7 +21,8 @@
  *  wireframe: <boolean>,
  *  wireframe_linewidth: <float>,
  
- *  vertex_colors: <bool>
+ *  vertex_colors: <bool>,
+ *  skinning: <bool>
  * }
  */
 
@@ -52,6 +53,7 @@ THREE.MeshBasicMaterial = function ( parameters ) {
 	this.wireframe_linejoin = 'round';	// implemented just in CanvasRenderer
 
 	this.vertex_colors = false;
+	this.skinning = false;
 	
 	if ( parameters ) {
 
@@ -78,6 +80,7 @@ THREE.MeshBasicMaterial = function ( parameters ) {
 		if ( parameters.wireframe_linejoin !== undefined ) this.wireframe_linejoin = parameters.wireframe_linejoin;
 		
 		if ( parameters.vertex_colors !== undefined ) this.vertex_colors = parameters.vertex_colors;
+		if ( parameters.skinning !== undefined ) this.skinning = parameters.skinning;
 
 	}
 
@@ -110,6 +113,7 @@ THREE.MeshBasicMaterial.prototype = {
 			'wireframe_linejoin: ' + this.wireframe_linejoin +'<br/>' +
 			
 			'vertex_colors: ' + this.vertex_colors + '<br/>' +
+			'skinning: ' + this.skinning + '<br/>' +
 			')';
 
 	}
