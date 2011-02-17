@@ -32,7 +32,7 @@
 
 THREE.MeshPhongMaterial = function ( parameters ) {
 
-	this.id = THREE.MeshPhongMaterialCounter.value ++;
+	this.id = THREE.MaterialCounter.value ++;
 
 	this.color = new THREE.Color( 0xffffff );
 	this.ambient = new THREE.Color( 0x050505 );
@@ -135,4 +135,3 @@ THREE.MeshPhongMaterial.prototype = {
 
 };
 
-THREE.MeshPhongMaterialCounter = { value: 0 };

@@ -21,7 +21,7 @@ THREE.Bone.prototype.supr        = THREE.Object3D.prototype;
  * Update
  */
 
-THREE.Bone.prototype.update = function( parentSkinMatrix, forceUpdate, camera, renderer ) {
+THREE.Bone.prototype.update = function( parentSkinMatrix, forceUpdate, camera ) {
 	
 	// update local
 	
@@ -45,21 +45,28 @@ THREE.Bone.prototype.update = function( parentSkinMatrix, forceUpdate, camera, r
 
 
 	// update children
+
+	var child, i, l = this.children.length;
 	
 	if( this.hasNoneBoneChildren ) {
 		
 		this.globalMatrix.multiply( this.skin.globalMatrix, this.skinMatrix );
 
-		for( var i = 0; i < this.children.length; i++ )
-			if( !( this.children[ i ] instanceof THREE.Bone ))
-				this.children[ i ].update( this.globalMatrix, true, camera, renderer );
-			else
-				this.children[ i ].update( this.skinMatrix, forceUpdate, camera, renderer );
 		
+		for( i = 0; i < l; i++ ) {
+			
+			child = this.children[ i ];
+			
+			if( ! ( child instanceof THREE.Bone ) )
+				child.update( this.globalMatrix, true, camera );
+			else
+				child.update( this.skinMatrix, forceUpdate, camera );
+		}
+	
 	} else {
 		
-		for( var i = 0; i < this.children.length; i++ )
-			this.children[ i ].update( this.skinMatrix, forceUpdate, camera, renderer );
+		for( i = 0; i < l; i++ )
+			this.children[ i ].update( this.skinMatrix, forceUpdate, camera );
 
 	}
 
@@ -80,8 +87,9 @@ THREE.Bone.prototype.addChild = function( child ) {
 		child.parent = this;		
 		this.children.push( child );
 
-		if( !( child instanceof THREE.Bone ))
-			this.hasNoneBoneChildren = true;	
+		if( ! ( child instanceof THREE.Bone ) )
+			this.hasNoneBoneChildren = true;
+
 	}
 
 };

@@ -32,23 +32,23 @@ THREE.Scene.prototype.addChild = function( child ) {
 
 }
 
-THREE.Scene.prototype.addChildRecurse = function( object ) {
+THREE.Scene.prototype.addChildRecurse = function( child ) {
 	
 	
-	if( object instanceof THREE.Light ) {
+	if( child instanceof THREE.Light ) {
 			
-		if( this.lights.indexOf( object ) === -1 )
-			this.lights.push( object );	
+		if( this.lights.indexOf( child ) === -1 )
+			this.lights.push( child );	
 
-	} else if( !( object instanceof THREE.Camera ) ) {
+	} else if( !( child instanceof THREE.Camera ) ) {
 		
-		if( this.objects.indexOf( object ) === -1 )
-			this.objects.push( object );
+		if( this.objects.indexOf( child ) === -1 )
+			this.objects.push( child );
 
 	}
 	
-	for( var c = 0; c < object.children.length; c++ )
-		this.addChildRecurse( object.children[ c ] );
+	for( var c = 0; c < child.children.length; c++ )
+		this.addChildRecurse( child.children[ c ] );
 
 }
 
@@ -66,24 +66,24 @@ THREE.Scene.prototype.removeChild = function( child ) {
 
 THREE.Scene.prototype.removeChildRecurse = function( child ) {
 	
-	if( object instanceof THREE.Light ) {
+	if( child instanceof THREE.Light ) {
 		
-		var i = this.lights.indexOf( object );
+		var i = this.lights.indexOf( child );
 		
-		if( i === -1 )
+		if( i !== -1 )
 			this.lights.splice( i, 1 );
 
-	} else if( !( object instanceof THREE.Camera ) ) {
+	} else if( !( child instanceof THREE.Camera ) ) {
 		
-		var i = this.objects.indexOf( object );
+		var i = this.objects.indexOf( child );
 		
-		if( i === -1 )
+		if( i !== -1 )
 			this.objects.splice( i, 1 );
 
 	}
 	
-	for( var c = 0; c < object.children.length; c++ )
-		this.removeChildRecurse( object.children[ c ] );
+	for( var c = 0; c < child.children.length; c++ )
+		this.removeChildRecurse( child.children[ c ] );
 
 }
 

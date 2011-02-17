@@ -26,6 +26,8 @@ THREE.Object3D = function() {
 	
 	this.boundRadius         = 0.0;
 	this.boundRadiusScale    = 1.0;
+	
+	this.rotationMatrix 	 = new THREE.Matrix4(); // this is just to cache it when somewhere it's computed somewhere else (stripped down globalMatrix)
 
 };
 
@@ -34,7 +36,7 @@ THREE.Object3D = function() {
  * Update
  */
 
-THREE.Object3D.prototype.update = function( parentGlobalMatrix, forceUpdate, camera, renderer ) {
+THREE.Object3D.prototype.update = function( parentGlobalMatrix, forceUpdate, camera ) {
 
 	// visible and auto update?
 	
@@ -43,7 +45,7 @@ THREE.Object3D.prototype.update = function( parentGlobalMatrix, forceUpdate, cam
 		// update local
 		
 		if( this.autoUpdateMatrix )
-			forceUpdate |= this.updateMatrix();			
+			forceUpdate |= this.updateMatrix();
 
 	
 		// update global
@@ -63,9 +65,11 @@ THREE.Object3D.prototype.update = function( parentGlobalMatrix, forceUpdate, cam
 
 		// update children
 	
-		for( var i = 0; i < this.children.length; i++ ) {
+		var i, l = this.children.length;
+		
+		for( i = 0; i < l; i++ ) {
 			
-			this.children[ i ].update( this.globalMatrix, forceUpdate, camera, renderer );
+			this.children[ i ].update( this.globalMatrix, forceUpdate, camera );
 			
 		}
 
@@ -81,84 +85,38 @@ THREE.Object3D.prototype.update = function( parentGlobalMatrix, forceUpdate, cam
 THREE.Object3D.prototype.updateMatrix = function() {
 	
 	// update position
-	
-	var isDirty = false;
-	
-	if( this.position.isDirty ) {
 		
-		this.localMatrix.setPosition( this.position );
-		this.position.isDirty = false;
-		isDirty = true;
-
-	}
-
-
+	this.localMatrix.setPosition( this.position );	
+	
 	// update quaternion
 	
-	if( this.useQuaternion ) {
+	if( this.useQuaternion )  {
 		
 		if( this.quaternion.isDirty ) {
 			
 			this.localMatrix.setRotationFromQuaternion( this.quaternion );
 			this.quaternion.isDirty = false;
-			this.rotation  .isDirty = false;
-			
-			if( this.scale.isDirty || this.scale.x !== 1 || this.scale.y !== 1 || this.scale.z !== 1 ) {
-				
-				this.localMatrix.scale( this.scale );
-				this.scale.isDirty = false;
-	
-				this.boundRadiusScale = Math.max( this.scale.x, Math.max( this.scale.y, this.scale.z ) );
-
-			}
-			
-			isDirty = true;
 
 		}
-
-	}
-
+		
 	// update rotation
-
-	else if( this.rotation.isDirty ) {
 	
+	} else {
+		
 		this.localMatrix.setRotationFromEuler( this.rotation );
-		this.rotation.isDirty = false;
-
-		if( this.scale.isDirty || this.scale.x !== 1 || this.scale.y !== 1 || this.scale.z !== 1 ) {
-			
-			this.localMatrix.scale( this.scale );
-			this.scale.isDirty = false;
-			
-			this.boundRadiusScale = Math.max( this.scale.x, Math.max( this.scale.y, this.scale.z ) );
-
-		}
-
-		isDirty = true;
-
+	
 	}
-
 
 	// update scale
 	
-	if( this.scale.isDirty ) {
+	if( this.scale.x !== 1 || this.scale.y !== 1 || this.scale.z !== 1 ) {
 		
-		if( this.useQuaternion ) 
-			this.localMatrix.setRotationFromQuaternion( this.quaternion );
-		else
-			this.localMatrix.setRotationFromEuler( this.rotation );
-
 		this.localMatrix.scale( this.scale );
-		this.scale.isDirty = false;
-
-		this.boundRadiusScale = Math.max( this.scale.x, Math.max( this.scale.y, this.scale.z ));
-
-		isDirty = true;
-
-	}
-
+		this.boundRadiusScale = Math.max( this.scale.x, Math.max( this.scale.y, this.scale.z ) );
 	
-	return isDirty;
+	}
+	
+	return true;
 
 };
 
@@ -186,7 +144,7 @@ THREE.Object3D.prototype.addChild = function( child ) {
  * RemoveChild
  */
 
-THREE.Object3D.prototype.removeChild = function() {
+THREE.Object3D.prototype.removeChild = function( child ) {
 	
 	var childIndex = this.children.indexOf( child ); 
 	

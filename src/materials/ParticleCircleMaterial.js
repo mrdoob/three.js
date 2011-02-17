@@ -10,6 +10,8 @@
 
 THREE.ParticleCircleMaterial = function ( parameters ) {
 
+	this.id = THREE.MaterialCounter.value ++;
+	
 	this.color = new THREE.Color( 0xffffff );
 	this.opacity = 1;
 	this.blending = THREE.NormalBlending;

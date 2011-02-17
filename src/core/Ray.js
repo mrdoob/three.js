@@ -42,6 +42,7 @@ THREE.Ray.prototype = {
 		origin, direction,
 		geometry = object.geometry,
 		vertices = geometry.vertices,
+		objMatrix,
 		intersect, intersects = [],
 		intersectPoint;
 
@@ -52,10 +53,13 @@ THREE.Ray.prototype = {
 			origin = this.origin.clone();
 			direction = this.direction.clone();
 
-			a = object.matrix.multiplyVector3( vertices[ face.a ].position.clone() );
-			b = object.matrix.multiplyVector3( vertices[ face.b ].position.clone() );
-			c = object.matrix.multiplyVector3( vertices[ face.c ].position.clone() );
-			d = face instanceof THREE.Face4 ? object.matrix.multiplyVector3( vertices[ face.d ].position.clone() ) : null;
+			objMatrix = object.globalMatrix;
+			objMatrix.extractRotationMatrix( object.rotationMatrix );
+			
+			a = objMatrix.multiplyVector3( vertices[ face.a ].position.clone() );
+			b = objMatrix.multiplyVector3( vertices[ face.b ].position.clone() );
+			c = objMatrix.multiplyVector3( vertices[ face.c ].position.clone() );
+			d = face instanceof THREE.Face4 ? objMatrix.multiplyVector3( vertices[ face.d ].position.clone() ) : null;
 
 			normal = object.rotationMatrix.multiplyVector3( face.normal.clone() );
 			dot = direction.dot( normal );

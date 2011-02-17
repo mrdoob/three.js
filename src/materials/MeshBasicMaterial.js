@@ -28,7 +28,7 @@
 
 THREE.MeshBasicMaterial = function ( parameters ) {
 
-	this.id = THREE.MeshBasicMaterialCounter.value ++;
+	this.id = THREE.MaterialCounter.value ++;
 
 	this.color = new THREE.Color( 0xffffff );
 	this.opacity = 1.0;
@@ -119,5 +119,3 @@ THREE.MeshBasicMaterial.prototype = {
 	}
 
 };
-
-THREE.MeshBasicMaterialCounter = { value: 0 };

@@ -1735,7 +1735,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	
 	this.render = function( scene, camera, renderTarget, clear ) {
 		
-		var i, program, opaque, transparent,
+		var i, program, opaque, transparent, material,
 			o, ol, oil, webGLObject, object, buffer,
 			lights = scene.lights,
 			fog = scene.fog,
@@ -1753,7 +1753,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if( THREE.AnimationHandler )
 			THREE.AnimationHandler.update();
 		
-		scene.update( undefined, false, camera, this );
+		scene.update( undefined, false, camera );
 		
 		this.initWebGLObjects( scene, camera );
 

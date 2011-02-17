@@ -415,7 +415,7 @@ THREE.Geometry.prototype = {
 
 				} else {
 
-					hash_array.push( material[ i ].toString() );
+					hash_array.push( material[ i ].id );
 
 				}
 

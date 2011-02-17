@@ -17,38 +17,6 @@ THREE.Matrix4 = function ( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33
 
 	this.flat = new Array( 16 );
 	this.m33 = new THREE.Matrix3();
-
-	// WebGL additions - NEEDS TO BE DISCUSSED!
-
-	if( typeof Float32Array !== 'undefined' ) {
-
-		var that = this;		
-		this.float32Array    = new Float32Array( 16 );
-		this.float32Array3x3 = new Float32Array( 9 );
-		
-		this.flatten32 = function() {
-			
-			var flat = that.float32Array;
-			
-			flat[ 0  ] = that.n11; flat[ 1  ] = that.n21; flat[ 2  ] = that.n31; flat[ 3  ] = that.n41;
-			flat[ 4  ] = that.n12; flat[ 5  ] = that.n22; flat[ 6  ] = that.n32; flat[ 7  ] = that.n42;
-			flat[ 8  ] = that.n13; flat[ 9  ] = that.n23; flat[ 10 ] = that.n33; flat[ 11 ] = that.n43;
-			flat[ 12 ] = that.n14; flat[ 13 ] = that.n24; flat[ 14 ] = that.n34; flat[ 15 ] = that.n44;
-	
-			return flat;
-		}
-		
-		this.flatten323x3 = function() {
-			
-			var flat = that.float32Array3x3;
-
-			flat[ 0 ] = that.n11; flat[ 1 ] = that.n21; flat[ 2 ] = that.n31;
-			flat[ 3 ] = that.n12; flat[ 4 ] = that.n22; flat[ 5 ] = that.n32;
-			flat[ 6 ] = that.n13; flat[ 7 ] = that.n23; flat[ 8 ] = that.n33;
-			
-			return flat;
-		}
-	}
 	
 };
 
@@ -611,6 +579,15 @@ THREE.Matrix4.prototype = {
 		this.n31 *= z; this.n32 *= z; this.n33 *= z;
 
 		return this;
+	},
+	
+	extractRotationMatrix: function( m ) {
+		
+		m.n11 = this.n11; m.n12 = this.n12; m.n13 = this.n13; m.n14 = 0;
+		m.n21 = this.n21; m.n22 = this.n22; m.n23 = this.n23; m.n24 = 0;
+		m.n31 = this.n31; m.n32 = this.n32; m.n33 = this.n33; m.n34 = 0;
+		m.n41 = 0; 		  m.n42 = 0; 		m.n43 = 0; 		  m.n44 = 1;
+
 	},
 	
 	toString: function() {

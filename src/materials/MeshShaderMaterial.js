@@ -21,7 +21,7 @@
 
 THREE.MeshShaderMaterial = function ( parameters ) {
 
-	this.id = THREE.MeshShaderMaterialCounter.value ++;
+	this.id = THREE.MaterialCounter.value ++;
 
 	this.fragment_shader = "void main() {}";
 	this.vertex_shader = "void main() {}";
@@ -89,4 +89,3 @@ THREE.MeshShaderMaterial.prototype = {
 
 };
 
-THREE.MeshShaderMaterialCounter = { value: 0 };

@@ -39,7 +39,7 @@ THREE.LOD.prototype.add = function( object3D, visibleAtDistance ) {
  * Update
  */
 
-THREE.LOD.prototype.update = function( parentGlobalMatrix, forceUpdate, camera, renderer ) {
+THREE.LOD.prototype.update = function( parentGlobalMatrix, forceUpdate, camera ) {
 	
 	// update local
 	
@@ -91,7 +91,8 @@ THREE.LOD.prototype.update = function( parentGlobalMatrix, forceUpdate, camera, 
 	// update children
 
 	for( var c = 0; c < this.children.length; c++ )
-		this.children[ c ].update( this.globalMatrix, forceUpdate, camera, renderer );
+		this.children[ c ].update( this.globalMatrix, forceUpdate, camera );
+
 
 };
 

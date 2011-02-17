@@ -153,7 +153,7 @@ THREE.CanvasRenderer = function () {
 		var e, el, element, m, ml, fm, fml, material;
 
 		this.autoClear ? this.clear() : _context.setTransform( 1, 0, 0, - 1, _canvasWidthHalf, _canvasHeightHalf );
-
+		
 		_renderList = _projector.projectScene( scene, camera, this.sortElements );
 
 		/* DEBUG
@@ -528,7 +528,7 @@ THREE.CanvasRenderer = function () {
 
 						if ( material.env_map.mapping instanceof THREE.SphericalReflectionMapping ) {
 
-							var cameraMatrix = camera.matrix;
+							var cameraMatrix = camera.globalMatrix;
 
 							_vector3.copy( element.vertexNormalsWorld[ 0 ] );
 							_uv1x = ( _vector3.x * cameraMatrix.n11 + _vector3.y * cameraMatrix.n12 + _vector3.z * cameraMatrix.n13 ) * 0.5 + 0.5;

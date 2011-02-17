@@ -228,6 +228,13 @@
 				renderer.domElement.style.position = "relative";
 				container.appendChild( renderer.domElement );
 
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				stats.domElement.style.right = '0px';
+				stats.domElement.style.zIndex = 100;
+				container.appendChild( stats.domElement );
+
 				$( "start" ).addEventListener( 'click', onStartClick, false );
 
 				setInterval( loop, 1000/60 );
@@ -296,13 +303,6 @@
 				
 				$( "progress" ).style.display = "block";
 				SceneUtils.loadScene( "scenes/test_scene.js", callback_sync, callback_async, callback_progress );
-
-				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				stats.domElement.style.right = '0px';
-				stats.domElement.style.zIndex = 100;
-				container.appendChild( stats.domElement );
 				
 				$( "plus_exp" ).addEventListener( 'click', createToggle( "exp" ), false );
 

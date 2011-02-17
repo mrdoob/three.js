@@ -38,7 +38,7 @@ THREE.Mesh.prototype.supr        = THREE.Object3D.prototype;
  * Update
  */
 
-THREE.Mesh.prototype.update = function( parentGlobalMatrix, forceUpdate, camera, renderer ) {
+THREE.Mesh.prototype.update = function( parentGlobalMatrix, forceUpdate, camera ) {
 	
 	// visible?
 	
@@ -73,23 +73,7 @@ THREE.Mesh.prototype.update = function( parentGlobalMatrix, forceUpdate, camera,
 		// update children
 	
 		for( var i = 0; i < this.children.length; i++ )
-			this.children[ i ].update( this.globalMatrix, forceUpdate, camera, renderer );
-
-
-		// check camera frustum and add to render list
-		
-		if( renderer && camera ) {
-			
-			if( camera.frustumContains( this ))
-				renderer.addToRenderList( this );
-			else
-				renderer.removeFromRenderList( this );
-		
-		}
-	
-	} else {
-		
-		renderer.removeFromRenderList( this );
+			this.children[ i ].update( this.globalMatrix, forceUpdate, camera );
 
 	}
 

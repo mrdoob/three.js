@@ -22,32 +22,41 @@ THREE.SkinnedMesh = function( geometry, materials ) {
 	this.bones        = [];
 	this.boneMatrices = [];
 	
+	var b, bone, gbone, p, q, s;
+	
 	if( this.geometry.bones !== undefined ) {
 		
-		for( var b = 0; b < this.geometry.bones.length; b++ ) {
+		for( b = 0; b < this.geometry.bones.length; b++ ) {
 			
-			var bone = this.addBone();
+			gbone = this.geometry.bones[ b ];
 			
-			bone.name         = this.geometry.bones[ b ].name;
-			bone.position.x   = this.geometry.bones[ b ].pos [ 0 ];
-			bone.position.y   = this.geometry.bones[ b ].pos [ 1 ];
-			bone.position.z   = this.geometry.bones[ b ].pos [ 2 ];
-			bone.quaternion.x = this.geometry.bones[ b ].rotq[ 0 ];
-			bone.quaternion.y = this.geometry.bones[ b ].rotq[ 1 ];
-			bone.quaternion.z = this.geometry.bones[ b ].rotq[ 2 ];
-			bone.quaternion.w = this.geometry.bones[ b ].rotq[ 3 ];
-			bone.scale.x      = this.geometry.bones[ b ].scl !== undefined ? this.geometry.bones[ b ].scl[ 0 ] : 1;
-			bone.scale.y      = this.geometry.bones[ b ].scl !== undefined ? this.geometry.bones[ b ].scl[ 1 ] : 1;
-			bone.scale.z      = this.geometry.bones[ b ].scl !== undefined ? this.geometry.bones[ b ].scl[ 2 ] : 1;
+			p = gbone.pos;
+			q = gbone.rotq;
+			s = gbone.scl;
+			
+			bone = this.addBone();
+			
+			bone.name = gbone.name;
+			bone.position.set( p[0], p[1], p[2] ); 
+			bone.quaternion.set( q[0], q[1], q[2], q[3] );
+			
+			if ( s !== undefined )
+				bone.scale.set( s[0], s[1], s[2] );
+			else
+				bone.scale.set( 1, 1, 1 );
 
 		}
 		
-		for( var b = 0; b < this.bones.length; b++ ) {
+		for( b = 0; b < this.bones.length; b++ ) {
 			
-			if( this.geometry.bones[ b ].parent === -1 ) 
-				this.addChild( this.bones[ b ] );
+			gbone = this.geometry.bones[ b ];
+			bone = this.bones[ b ];
+			
+			if( gbone.parent === -1 ) 
+				this.addChild( bone );
 			else
-				this.bones[ this.geometry.bones[ b ].parent ].addChild( this.bones[ b ] );
+				this.bones[ gbone.parent ].addChild( bone );
+
 		}
 
 		this.boneMatrices = new Float32Array( 16 * this.bones.length );
@@ -66,7 +75,7 @@ THREE.SkinnedMesh.prototype.constructor = THREE.SkinnedMesh;
  * Update
  */
 
-THREE.SkinnedMesh.prototype.update = function( parentGlobalMatrix, forceUpdate, camera, renderer ) {
+THREE.SkinnedMesh.prototype.update = function( parentGlobalMatrix, forceUpdate, camera ) {
 	
 	// visible?
 	
@@ -100,28 +109,18 @@ THREE.SkinnedMesh.prototype.update = function( parentGlobalMatrix, forceUpdate, 
 
 		// update children
 	
-		for( var i = 0; i < this.children.length; i++ )
-			if( this.children[ i ] instanceof THREE.Bone )
-				this.children[ i ].update( this.identityMatrix, false, camera, renderer );
-			else
-				this.children[ i ].update( this.globalMatrix, forceUpdate, camera, renderer );
-			
-
-
-		// check camera frustum and add to render list
+		var child, i, l = this.children.length;
 		
-		if( renderer && camera ) {
+		for( i = 0; i < l; i++ ) {
 			
-			if( camera.frustumContains( this ) )
-				renderer.addToRenderList( this );
+			child = this.children[ i ];
+			
+			if( child instanceof THREE.Bone )
+				child.update( this.identityMatrix, false, camera );
 			else
-				renderer.removeFromRenderList( this );
-
+				child.update( this.globalMatrix, forceUpdate, camera );
+			
 		}
-
-	} else {
-		
-		renderer.removeFromRenderList( this );
 
 	}
 
@@ -154,15 +153,11 @@ THREE.SkinnedMesh.prototype.pose = function() {
 	var bim, bone,
 		boneInverses = [];
 	
-	for( var b = 0; b < this.bones.length; b++ ) {		
+	for( var b = 0; b < this.bones.length; b++ ) {
 
 		bone = this.bones[ b ];
 		
 		boneInverses.push( THREE.Matrix4.makeInvert( bone.skinMatrix ) );
-		
-		//bim = new Float32Array( 16 );
-		//bone.skinMatrix.flattenToArray( bim );
-		//this.boneMatrices.push( bim );
 
 		bone.skinMatrix.flattenToArrayOffset( this.boneMatrices, b * 16 );
 

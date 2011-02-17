@@ -15,7 +15,7 @@
 
 THREE.MeshDepthMaterial = function ( parameters ) {
 
-	this.id = THREE.MeshDepthMaterialCounter.value ++;
+	this.id = THREE.MaterialCounter.value ++;
 	
 	this.opacity = 1.0;
 	
@@ -59,5 +59,3 @@ THREE.MeshDepthMaterial.prototype = {
 	}
 
 };
-
-THREE.MeshDepthMaterialCounter = { value: 0 };

@@ -34,8 +34,8 @@
         <div id="container"></div>
         <div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> render-to-texture webgl example</div>
 
-        <script type="text/javascript" src="js/Stats.js"></script>
         <script type="text/javascript" src="../build/ThreeExtras.js"></script>
+        <script type="text/javascript" src="js/Stats.js"></script>
 
         <script id="fragment_shader_screen" type="x-shader/x-fragment">
 			varying vec2 vUv;
@@ -201,8 +201,6 @@
 				zmesh1.position.y = 0;
 				zmesh1.position.z = 100;
 				zmesh1.scale.x = zmesh1.scale.y = zmesh1.scale.z = 150;
-				zmesh1.overdraw = true;
-				zmesh1.updateMatrix();
 				xscene.addObject( zmesh1 );
 
 				zmesh2 = new THREE.Mesh( geometry, mat2 );
@@ -210,8 +208,6 @@
 				zmesh2.position.y = 150;
 				zmesh2.position.z = 100;
 				zmesh2.scale.x = zmesh2.scale.y = zmesh2.scale.z = 75;
-				zmesh2.overdraw = true;
-				zmesh2.updateMatrix();
 				xscene.addObject( zmesh2 );
 
 			}
