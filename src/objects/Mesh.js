@@ -10,7 +10,6 @@ THREE.Mesh = function( geometry, materials ) {
 	
 	this.geometry     = geometry;
 	this.materials    = materials && materials.length ? materials : [ materials ];
-	this.normalMatrix = THREE.Matrix4.makeInvert3x3( this.globalMatrix ).transpose();
 	
 	this.flipSided = false;
 	this.doubleSided = false;
@@ -60,12 +59,7 @@ THREE.Mesh.prototype.update = function( parentGlobalMatrix, forceUpdate, camera 
 				this.globalMatrix.copy( this.localMatrix );
 			
 			this.matrixNeedsToUpdate = false;
-			forceUpdate               = true;
-			
-			
-			// update normal
-
-			this.normalMatrix = THREE.Matrix4.makeInvert3x3( this.globalMatrix ).transpose();
+			forceUpdate               = true;			
 
 		}
 

@@ -24,11 +24,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_oldProgram = null,
 	_oldFramebuffer = null,	
 
+	_this = this,
+	
 	// gl state cache
 	
 	_oldDoubleSided = null,
 	_oldFlipSided = null,
 	_oldBlending = null,
+	_oldDepth = null,
 	
 	// camera matrices caches
 	
@@ -109,12 +112,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 	};
 
 
-	this.setupLights = function ( program, lights ) {
+	function setupLights ( program, lights ) {
 
 		var l, ll, light, r = 0, g = 0, b = 0,
 			color, position, intensity,
 
-			zlights = this.lights,
+			zlights = _this.lights,
 
 			dcolors    = zlights.directional.colors,
 			dpositions = zlights.directional.positions,
@@ -1289,12 +1292,31 @@ THREE.WebGLRenderer = function ( parameters ) {
 		cacheUniformLocations( material.program, identifiers );
 		cacheAttributeLocations( material.program, [ "position", "normal", "uv", "uv2", "tangent", "color", 
 													 "skinVertexA", "skinVertexB", "skinIndex", "skinWeight" ] );
+		
+		var attributes = material.program.attributes;
+		
+		_gl.enableVertexAttribArray( attributes.position );
+		
+		if ( attributes.color >= 0 ) 	_gl.enableVertexAttribArray( attributes.color );
+		if ( attributes.normal >= 0 ) 	_gl.enableVertexAttribArray( attributes.normal );	
+		if ( attributes.tangent >= 0 ) 	_gl.enableVertexAttribArray( attributes.tangent );
+		
+		if ( material.skinning && 
+			 attributes.skinVertexA >=0 && attributes.skinVertexB >= 0 && 
+			 attributes.skinIndex >= 0 && attributes.skinWeight >= 0 ) {
+			
+			_gl.enableVertexAttribArray( attributes.skinVertexA );
+			_gl.enableVertexAttribArray( attributes.skinVertexB );
+			_gl.enableVertexAttribArray( attributes.skinIndex );
+			_gl.enableVertexAttribArray( attributes.skinWeight );
+			
+		}
 
 	};
 	
-	this.setProgram = function( camera, lights, fog, material, object ) {
+	function setProgram ( camera, lights, fog, material, object ) {
 		
-		if ( !material.program ) this.initMaterial( material, lights, fog );
+		if ( !material.program ) _this.initMaterial( material, lights, fog );
 
 		var program = material.program, 
 			p_uniforms = program.uniforms,
@@ -1326,8 +1348,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( material instanceof THREE.MeshPhongMaterial ||
 			 material instanceof THREE.MeshLambertMaterial ) {
 
-			this.setupLights( program, lights );
-			refreshUniformsLights( m_uniforms, this.lights );
+			setupLights( program, lights );
+			refreshUniformsLights( m_uniforms, _this.lights );
 
 		}
 
@@ -1408,11 +1430,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 		
 	};
 		
-	this.renderBuffer = function ( camera, lights, fog, material, geometryChunk, object ) {
+	function renderBuffer( camera, lights, fog, material, geometryChunk, object ) {
 
 		var program, attributes, linewidth, primitives;
 
-		program = this.setProgram( camera, lights, fog, material, object );
+		program = setProgram( camera, lights, fog, material, object );
 		
 		attributes = program.attributes;
 
@@ -1420,15 +1442,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLVertexBuffer );
 		_gl.vertexAttribPointer( attributes.position, 3, _gl.FLOAT, false, 0, 0 );
-		_gl.enableVertexAttribArray( attributes.position );
 
 		// colors
 
 		if ( attributes.color >= 0 ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLColorBuffer );
-			_gl.vertexAttribPointer( attributes.color, 3, _gl.FLOAT, false, 0, 0 );
-			_gl.enableVertexAttribArray( attributes.color );
+			_gl.vertexAttribPointer( attributes.color, 3, _gl.FLOAT, false, 0, 0 );			
 
 		}
 
@@ -1437,8 +1457,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( attributes.normal >= 0 ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLNormalBuffer );
-			_gl.vertexAttribPointer( attributes.normal, 3, _gl.FLOAT, false, 0, 0 );
-			_gl.enableVertexAttribArray( attributes.normal );
+			_gl.vertexAttribPointer( attributes.normal, 3, _gl.FLOAT, false, 0, 0 );			
 
 		}
 
@@ -1448,7 +1467,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLTangentBuffer );
 			_gl.vertexAttribPointer( attributes.tangent, 4, _gl.FLOAT, false, 0, 0 );
-			_gl.enableVertexAttribArray( attributes.tangent );
 
 		}
 
@@ -1488,23 +1506,21 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		if ( object instanceof THREE.SkinnedMesh ) {
+		if ( material.skinning && 
+			 attributes.skinVertexA >=0 && attributes.skinVertexB >= 0 && 
+			 attributes.skinIndex >= 0 && attributes.skinWeight >= 0 ) {
 			
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLSkinVertexABuffer );
 			_gl.vertexAttribPointer( attributes.skinVertexA, 4, _gl.FLOAT, false, 0, 0 );
-			_gl.enableVertexAttribArray( attributes.skinVertexA );
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLSkinVertexBBuffer );
 			_gl.vertexAttribPointer( attributes.skinVertexB, 4, _gl.FLOAT, false, 0, 0 );
-			_gl.enableVertexAttribArray( attributes.skinVertexB );
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLSkinIndicesBuffer );
 			_gl.vertexAttribPointer( attributes.skinIndex, 4, _gl.FLOAT, false, 0, 0 );
-			_gl.enableVertexAttribArray( attributes.skinIndex );
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryChunk.__webGLSkinWeightsBuffer );
 			_gl.vertexAttribPointer( attributes.skinWeight, 4, _gl.FLOAT, false, 0, 0 );
-			_gl.enableVertexAttribArray( attributes.skinWeight );
 			
 		}
 		
@@ -1608,6 +1624,26 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 			
 			_oldFlipSided = object.flipSided;
+
+		}
+		
+	};
+	
+	function setDepthTest( test ) {
+		
+		if ( _oldDepth != test ) {
+
+			if( test ) {
+				
+				_gl.enable( _gl.DEPTH_TEST );
+				
+			} else {
+				
+				_gl.disable( _gl.DEPTH_TEST );
+				
+			}
+			
+			_oldDepth = test;
 
 		}
 		
@@ -1750,8 +1786,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_projScreenMatrix.multiply( camera.projectionMatrix, camera.globalMatrix );
 		computeFrustum( _projScreenMatrix );
 		
-		if( THREE.AnimationHandler )
-			THREE.AnimationHandler.update();
+		if( THREE.AnimationHandler ) THREE.AnimationHandler.update();
 		
 		scene.update( undefined, false, camera );
 		
@@ -1858,8 +1893,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 					
 					material = opaque.list[ i ];
 					
-					this.setDepthTest( material.depth_test );
-					this.renderBuffer( camera, lights, fog, material, buffer, object );
+					setDepthTest( material.depth_test );
+					renderBuffer( camera, lights, fog, material, buffer, object );
 				
 				}
 
@@ -1884,8 +1919,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 				
 					material = opaque.list[ i ];
 				
-					this.setDepthTest( material.depth_test );
-					program = this.setProgram( camera, lights, fog, material, object );
+					setDepthTest( material.depth_test );
+					
+					program = setProgram( camera, lights, fog, material, object );
 					object.render( function( object ) { renderBufferImmediate( object, program ); } );
 				
 				}
@@ -1913,8 +1949,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 					material = transparent.list[ i ];
 					
 					setBlending( material.blending );
-					this.setDepthTest( material.depth_test );
-					this.renderBuffer( camera, lights, fog, material, buffer, object );
+					setDepthTest( material.depth_test );
+					
+					renderBuffer( camera, lights, fog, material, buffer, object );
 				
 				}
 
@@ -1940,8 +1977,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 					material = transparent.list[ i ];
 				
 					setBlending( material.blending );
-					this.setDepthTest( material.depth_test );
-					program = this.setProgram( camera, lights, fog, material, object );
+					setDepthTest( material.depth_test );
+					
+					program = setProgram( camera, lights, fog, material, object );
 					object.render( function( object ) { renderBufferImmediate( object, program ); } );
 				
 				}
@@ -2154,38 +2192,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 	};
-
-	this.addToRenderList = function( object ) {
-		
-		// TODO: implement this
-		
-	};
-
-	this.removeFromRenderList = function( object ) {
-		
-		// TODO: implement this
-		
-	};
 	
 	function setupMatrices ( object, camera ) {
 
 		object._modelViewMatrix.multiplyToArray( camera.globalMatrix, object.globalMatrix, object._modelViewMatrixArray );
-		object._normalMatrix = THREE.Matrix4.makeInvert3x3( object._modelViewMatrix ).transposeIntoArray( object._normalMatrixArray );
+		THREE.Matrix4.makeInvert3x3( object._modelViewMatrix ).transposeIntoArray( object._normalMatrixArray );
 
-	};
-
-	this.setDepthTest = function( test ) {
-		
-		if( test ) {
-			
-			_gl.enable( _gl.DEPTH_TEST );
-			
-		} else {
-			
-			_gl.disable( _gl.DEPTH_TEST );
-			
-		}
-		
 	};
 
 	this.setFaceCulling = function ( cullFace, frontFace ) {

@@ -98,11 +98,6 @@ THREE.SkinnedMesh.prototype.update = function( parentGlobalMatrix, forceUpdate, 
 			
 			this.matrixNeedsToUpdate = false;
 			forceUpdate              = true;
-			
-			
-			// update normal
-
-			this.normalMatrix = THREE.Matrix4.makeInvert3x3( this.globalMatrix ).transpose();
 
 		}
 

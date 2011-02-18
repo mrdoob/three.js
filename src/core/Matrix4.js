@@ -525,9 +525,11 @@ THREE.Matrix4.prototype = {
 	    this.n11 = ch * ca;
 	    this.n12 = sh * sb - chsa * cb;
 	    this.n13 = chsa * sb + sh * cb;
+		
 	    this.n21 = sa;
 	    this.n22 = ca * cb;
 	    this.n23 = - ca * sb;
+		
 	    this.n31 = - sh * ca;
 	    this.n32 = shsa * cb + ch * sb;
 	    this.n33 = - shsa * sb + ch * cb;
@@ -570,15 +572,16 @@ THREE.Matrix4.prototype = {
 	
 	scale: function( vec3 ) {
 		
-		var x = vec3.x;
-		var y = vec3.y;
-		var z = vec3.z;
+		var x = vec3.x,
+			y = vec3.y,
+			z = vec3.z;
 		
 		this.n11 *= x; this.n12 *= x; this.n13 *= x;
 		this.n21 *= y; this.n22 *= y; this.n23 *= y;
 		this.n31 *= z; this.n32 *= z; this.n33 *= z;
 
 		return this;
+
 	},
 	
 	extractRotationMatrix: function( m ) {

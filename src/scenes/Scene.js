@@ -40,7 +40,7 @@ THREE.Scene.prototype.addChildRecurse = function( child ) {
 		if( this.lights.indexOf( child ) === -1 )
 			this.lights.push( child );	
 
-	} else if( !( child instanceof THREE.Camera ) ) {
+	} else if( !( child instanceof THREE.Camera || child instanceof THREE.Bone ) ) {
 		
 		if( this.objects.indexOf( child ) === -1 )
 			this.objects.push( child );

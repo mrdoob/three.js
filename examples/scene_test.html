@@ -346,7 +346,7 @@
 				
 				result.camera.position.z = 100;
 				
-				var object, geometry, material, light, count = 100, range = 150;
+				var object, geometry, material, light, count = 500, range = 200;
 				
 				material = new THREE.MeshLambertMaterial( { color:0xffffff } );
 				geometry = new Cube( 5, 5, 5 );
@@ -360,9 +360,13 @@
 					object.rotation.x = Math.random() * 6;
 					object.rotation.y = Math.random() * 6;
 					object.rotation.z = Math.random() * 6;
+					object.autoUpdateMatrix = false;
+					object.updateMatrix();
 					result.scene.addObject( object );
 					
 				}
+				
+				result.scene.autoUpdateMatrix = false;
 				
 				light = new THREE.PointLight( 0xffffff );
 				result.scene.addLight( light );
