@@ -37,11 +37,11 @@
 			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl ribbons example
 		</div>
 		
-		<script type="text/javascript" src="../build/ThreeExtrasRibbon.js"></script>		
+		<script type="text/javascript" src="../build/ThreeExtras.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
-		
+
 			if ( ! THREE.Detector.webgl ) THREE.Detector.addGetWebGLMessage();
 
 			var container, stats;
@@ -53,15 +53,15 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
-			var postprocessing = {			
+			var postprocessing = {
 				
 				enabled  : true
 				
 			};
 
 			init();
-			setInterval( loop, 1000 / 60 );
-
+			loop();
+			
 			function init() {
 
 				container = document.createElement( 'div' );
@@ -257,7 +257,9 @@
 			}			
 
 			function loop() {
-
+				
+				THREE.requestAnimationFrame( renderer.domElement, loop );
+				
 				var time = new Date().getTime() * 0.00005;
 				
 				camera.position.x += ( mouseX - camera.position.x ) * 0.036;
@@ -285,8 +287,6 @@
 					materials[i].color.setHSV( h, 0.5+0.5*(i%20/20), 1 );					
 					
 				}
-
-				//renderer.render( scene, camera );
 
 				if ( postprocessing.enabled ) {
 				
@@ -334,6 +334,7 @@
 				}
 
 				stats.update();
+				
 			}
 
 

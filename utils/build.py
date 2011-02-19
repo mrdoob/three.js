@@ -82,6 +82,7 @@ EXTRAS_FILES = [
 'extras/Detector.js',
 'extras/GeometryUtils.js',
 'extras/ImageUtils.js',
+'extras/MiscUtils.js',
 'extras/SceneUtils.js',
 'extras/ShaderUtils.js',
 'extras/primitives/Cube.js',
