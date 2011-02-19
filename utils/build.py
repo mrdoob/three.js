@@ -34,6 +34,7 @@ COMMON_FILES = [
 'objects/Mesh.js',
 'objects/Bone.js',
 'objects/SkinnedMesh.js',
+'objects/Ribbon.js',
 'animation/AnimationHandler.js',
 'animation/Animation.js',
 'cameras/Camera.js',

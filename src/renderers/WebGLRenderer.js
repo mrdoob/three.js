@@ -205,6 +205,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	function createRibbonBuffers ( geometry ) {
+
+		geometry.__webGLVertexBuffer = _gl.createBuffer();
+		geometry.__webGLColorBuffer = _gl.createBuffer();
+
+	};
+
 	function createMeshBuffers ( geometryChunk ) {
 
 		geometryChunk.__webGLVertexBuffer = _gl.createBuffer();
@@ -235,6 +242,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	function initRibbonBuffers ( geometry ) {
+
+		var nvertices = geometry.vertices.length;
+
+		geometry.__vertexArray = new Float32Array( nvertices * 3 );
+		geometry.__colorArray = new Float32Array( nvertices * 3 );
+
+		geometry.__webGLVertexCount = nvertices;
+
+	};
+	
 	function initParticleBuffers ( geometry ) {
 
 		var nvertices = geometry.vertices.length;
@@ -1039,6 +1057,60 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	function setRibbonBuffers ( geometry, hint ) {
+
+		var v, c, vertex, offset,
+			vertices = geometry.vertices,
+			colors = geometry.colors,
+			vl = vertices.length,
+			cl = colors.length,
+
+			vertexArray = geometry.__vertexArray,
+			colorArray = geometry.__colorArray,
+		
+			dirtyVertices = geometry.__dirtyVertices, 
+			dirtyColors = geometry.__dirtyColors;
+
+		if ( dirtyVertices ) {
+
+			for ( v = 0; v < vl; v++ ) {
+
+				vertex = vertices[ v ].position;
+
+				offset = v * 3;
+
+				vertexArray[ offset ]     = vertex.x;
+				vertexArray[ offset + 1 ] = vertex.y;
+				vertexArray[ offset + 2 ] = vertex.z;
+
+			}
+
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometry.__webGLVertexBuffer );
+			_gl.bufferData( _gl.ARRAY_BUFFER, vertexArray, hint );
+
+		}
+
+		if ( dirtyColors ) {
+
+			for ( c = 0; c < cl; c++ ) {
+
+				color = colors[ c ];
+
+				offset = c * 3;
+
+				colorArray[ offset ]     = color.r;
+				colorArray[ offset + 1 ] = color.g;
+				colorArray[ offset + 2 ] = color.b;
+
+			}
+
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometry.__webGLColorBuffer );
+			_gl.bufferData( _gl.ARRAY_BUFFER, colorArray, hint );
+
+		}
+
+	};
+	
 	function setParticleBuffers ( geometry, hint, object, camera ) {
 
 		var v, c, vertex, offset,
@@ -1377,8 +1449,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else if ( material instanceof THREE.MeshDepthMaterial ) {
 
-			m_uniforms.mNear.value = camera.near;
-			m_uniforms.mFar.value = camera.far;
+			m_uniforms.mNear.value = camera.zNear;
+			m_uniforms.mFar.value = camera.zFar;
 			m_uniforms.opacity.value = material.opacity;
 			
 		} else if ( material instanceof THREE.MeshNormalMaterial ) {
@@ -1559,6 +1631,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		} else if ( object instanceof THREE.ParticleSystem ) {
 			
 			_gl.drawArrays( _gl.POINTS, 0, geometryChunk.__webGLParticleCount );
+			
+		// render ribbon
+		
+		} else if ( object instanceof THREE.Ribbon ) {
+			
+			_gl.drawArrays( _gl.TRIANGLE_STRIP, 0, geometryChunk.__webGLVertexCount );
 			
 		}
 
@@ -2066,6 +2144,29 @@ THREE.WebGLRenderer = function ( parameters ) {
 			geometry.__dirtyTangents = false;
 			geometry.__dirtyColors = false;
 
+		} else if ( object instanceof THREE.Ribbon ) {
+
+			if( ! geometry.__webGLVertexBuffer ) {
+
+				createRibbonBuffers( geometry );
+				initRibbonBuffers( geometry );
+
+				geometry.__dirtyVertices = true;
+				geometry.__dirtyColors = true;
+
+			}
+
+			if( geometry.__dirtyVertices || geometry.__dirtyColors ) {
+
+				setRibbonBuffers( geometry, _gl.DYNAMIC_DRAW );
+
+			}
+
+			add_buffer( objlist, objmap, 0, geometry, object );
+
+			geometry.__dirtyVertices = false;
+			geometry.__dirtyColors = false;
+			
 		} else if ( object instanceof THREE.Line ) {
 
 			if( ! geometry.__webGLVertexBuffer ) {

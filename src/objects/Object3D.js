@@ -132,7 +132,7 @@ THREE.Object3D.prototype.addChild = function( child ) {
 		if( child.parent !== undefined )
 			child.parent.removeChild( child );
 		
-		child.parent = this;		
+		child.parent = this;
 		this.children.push( child );
 
 	}
