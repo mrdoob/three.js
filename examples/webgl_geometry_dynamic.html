@@ -51,6 +51,8 @@
 				
 			}
 
+			window.onload = init;
+			
 			var container, stats;
 
 			var camera, scene, renderer;
@@ -68,10 +70,6 @@
 
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
-
-
-			init();
-			setInterval( loop, 1000 / 60 );
 
 
 			function init() {
@@ -146,6 +144,8 @@
 				
 				document.addEventListener( 'keydown', onDocumentKeyDown, false );
 				document.addEventListener( 'keyup', onDocumentKeyUp, false );
+				
+				loop();
 
 			}
 
@@ -224,6 +224,8 @@
 			}
 			
 			function loop() {
+			
+				requestAnimationFrame( loop, renderer.domElement );
 
 				var time = new Date().getTime() * 0.01;
 				

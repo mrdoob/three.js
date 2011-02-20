@@ -12,6 +12,7 @@
 
 				background-color: #000;
 				margin: 0px;
+				padding: 0px;
 				overflow: hidden;
 			}
 
@@ -22,7 +23,6 @@
 			}
 
 			a {
-
 				color: #0080ff;
 			}
 
@@ -39,6 +39,8 @@
 		<script type="text/javascript">
 
 			if ( ! THREE.Detector.webgl ) THREE.Detector.addGetWebGLMessage();
+			
+			window.onload = init;
 
 			var container, stats;
 
@@ -50,10 +52,6 @@
 
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
-
-
-			init();
-			setInterval( loop, 1000 / 60 );
 
 
 			function init() {
@@ -86,6 +84,8 @@
 				container.appendChild( stats.domElement );
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				
+				loop();
 
 			}
 
@@ -109,6 +109,8 @@
 
 			function loop() {
 
+				requestAnimationFrame( loop, renderer.domElement );
+				
 				camera.position.x += ( mouseX - camera.position.x ) * 0.05;
 				camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
 

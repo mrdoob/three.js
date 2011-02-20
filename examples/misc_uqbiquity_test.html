@@ -87,11 +87,14 @@
 		<script type="text/javascript" src="../src/extras/primitives/Plane.js"></script>
 		<script type="text/javascript" src="../src/extras/primitives/Cylinder.js"></script>
 		<script type="text/javascript" src="../src/extras/objects/MarchingCubes.js"></script>
+		<script type="text/javascript" src="../src/extras/MiscUtils.js"></script>
 
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
 
+			window.onload = init;
+			
 			var SCREEN_WIDTH = window.innerWidth / 3;
 			var SCREEN_HEIGHT = window.innerHeight;
 			var AMOUNT = 100;
@@ -109,11 +112,6 @@
 			var windowHalfY = window.innerHeight / 2;
 
 			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-
-			init();
-			// loop();
-			setInterval( loop, 1000 / 60 );
-
 
 			function init() {
 
@@ -236,6 +234,8 @@
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
 				container.appendChild( stats.domElement );
+				
+				loop();
 
 			}
 
@@ -247,6 +247,8 @@
 			}
 
 			function loop() {
+				
+				requestAnimationFrame( loop, container );
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
