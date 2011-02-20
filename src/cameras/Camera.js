@@ -4,14 +4,9 @@
  */
 
 THREE.Camera = function( FOV, aspect, zNear, zFar, renderer, target ) {
-	
-	// call super
-	
-	THREE.Object3D.call( this );
-	
 
-	// set arguments
-	
+	THREE.Object3D.call( this );
+
 	this.FOV              = FOV      || 50;
 	this.aspect           = aspect   || 1.0;
 	this.zNear            = zNear    || 0.1;
@@ -22,14 +17,11 @@ THREE.Camera = function( FOV, aspect, zNear, zFar, renderer, target ) {
 	this.useTarget        = true;
 	this.up               = new THREE.Vector3( 0, 1, 0 );
 
-
-	// init
-	
 	this.inverseMatrix     = new THREE.Matrix4();
 	this.projectionMatrix = null;
 
 	// movement
-	
+
 	this.tmpVec = new THREE.Vector3();
 
 	this.translateX = function ( amount ) {
@@ -58,7 +50,7 @@ THREE.Camera = function( FOV, aspect, zNear, zFar, renderer, target ) {
 	};
 
 	this.updateProjectionMatrix();
-	
+
 }
 
 THREE.Camera.prototype             = new THREE.Object3D();
@@ -73,10 +65,10 @@ THREE.Camera.prototype.supr        = THREE.Object3D.prototype;
 */
 
 THREE.Camera.prototype.updateProjectionMatrix = function() {
-	
+
 	this.projectionMatrix = THREE.Matrix4.makePerspective( this.FOV, this.aspect, this.zNear, this.zFar );
 
-} 
+}
 
 
 /*
@@ -84,38 +76,38 @@ THREE.Camera.prototype.updateProjectionMatrix = function() {
  */
 
 THREE.Camera.prototype.update = function( parentGlobalMatrix, forceUpdate, camera ) {
-	
+
 	if( this.useTarget ) {
-		
+
 		// local
-		
+
 		this.localMatrix.lookAt( this.position, this.target.position, this.up );
-		
-		
+
+
 		// global
-		
+
 		if( parentGlobalMatrix )
 			this.globalMatrix.multiply( parentGlobalMatrix, this.localMatrix );
 		else
 			this.globalMatrix.copy( this.localMatrix );
 
 		THREE.Matrix4.makeInvert( this.globalMatrix, this.inverseMatrix );
-		//THREE.Matrix4.makeInvertTo( this.globalMatrix, this.inverseMatrix );	
-		
+		//THREE.Matrix4.makeInvertTo( this.globalMatrix, this.inverseMatrix );
+
 		forceUpdate = true;
-	
+
 	} else {
-		
+
 		if( this.autoUpdateMatrix )
-			forceUpdate |= this.updateMatrix();			
-			
+			forceUpdate |= this.updateMatrix();
+
 		if( forceUpdate || this.matrixNeedsToUpdate ) {
-			
+
 			if( parentGlobalMatrix )
 				this.globalMatrix.multiply( parentGlobalMatrix, this.localMatrix );
 			else
 				this.globalMatrix.copy( this.localMatrix );
-			
+
 			this.matrixNeedsToUpdate = false;
 			forceUpdate              = true;
 
@@ -125,7 +117,7 @@ THREE.Camera.prototype.update = function( parentGlobalMatrix, forceUpdate, camer
 		}
 
 	}
-	
+
 	// update children
 
 	for( var i = 0; i < this.children.length; i++ )
@@ -145,11 +137,11 @@ THREE.Camera.prototype.frustumContains = function( object3D ) {
 
 	// object pos
 
-	var vx0 = object3D.globalMatrix.n14, 
+	var vx0 = object3D.globalMatrix.n14,
 	    vy0 = object3D.globalMatrix.n24,
 		vz0 = object3D.globalMatrix.n34;
-		
-		
+
+
 	// check z
 
 	var inverse = this.inverseMatrix;
@@ -158,10 +150,10 @@ THREE.Camera.prototype.frustumContains = function( object3D ) {
 
 	if( vz1 - radius > -this.zNear )
 		return false;
-		
+
 	if( vz1 + radius < -this.zFar )
 		return false;
-	
+
 
 	// check x
 
@@ -183,18 +175,18 @@ THREE.Camera.prototype.frustumContains = function( object3D ) {
 	// check y
 
 	var vy1 = ( inverse.n21 * vx0 + inverse.n22 * vy0 + inverse.n23 * vz0 + inverse.n24 ) * perspective.n22 * ooZ * this.screenCenterY;
-		
+
 	if( vy1 + radius < -this.screenCenterY )
 		return false;
-		
+
 	if( vy1 - radius > this.screenCenterY )
-		return false;		
+		return false;
 
 
 	// inside
 
 	object3D.screenPosition.set( vx1, vy1, vz1, radius );
-	
+
 	return true;
 
 };

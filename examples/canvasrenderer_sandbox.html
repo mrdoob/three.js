@@ -114,7 +114,7 @@
 			var debugContext;
 
 			init();
-			setInterval( loop, 1000 / 60 );
+			setInterval( render, 1000 / 60 );
 
 			function init() {
 
@@ -259,7 +259,7 @@
 
 			//
 
-			function loop() {
+			function render() {
 
 				if ( moveForward ) camera.position.z -= 5;
 				if ( moveBackwards ) camera.position.z += 5;
@@ -316,6 +316,7 @@
 				renderer.render(scene, camera);
 
 				stats.update();
+
 			}
 
 		</script>

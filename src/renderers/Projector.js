@@ -52,7 +52,7 @@ THREE.Projector = function() {
 			_objectCount ++;
 
 		}
-		
+
 		sort && renderList.sort( painterSort );
 
 		return renderList;
@@ -63,7 +63,7 @@ THREE.Projector = function() {
 
 	this.projectScene = function ( scene, camera, sort ) {
 
-		var renderList = [], near = camera.near, far = camera.far,
+		var renderList = [], near = camera.zNear, far = camera.zFar,
 		o, ol, v, vl, f, fl, n, nl, objects, object,
 		objectMatrix, objectMaterials, objectOverdraw,
 		objectRotationMatrix,
@@ -73,10 +73,10 @@ THREE.Projector = function() {
 		_face3Count = _lineCount = _particleCount = 0;
 
 		camera.autoUpdateMatrix && camera.update();
-		
+
 		_projScreenMatrix.multiply( camera.projectionMatrix, camera.globalMatrix );
 		computeFrustum( _projScreenMatrix );
-		
+
 		scene.update( undefined, false, camera );
 
 		objects = this.projectObjects( scene, camera, true ); // scene.objects;
@@ -92,7 +92,7 @@ THREE.Projector = function() {
 			objectMatrix = object.globalMatrix;
 			objectMatrix.extractRotationMatrix( object.rotationMatrix );
 			objectRotationMatrix = object.rotationMatrix;
-			
+
 			objectMaterials = object.materials;
 			objectOverdraw = object.overdraw;
 
@@ -419,7 +419,7 @@ THREE.Projector = function() {
 		return true;
 
 	};
-	
+
 	function clipLine( s1, s2 ) {
 
 		var alpha1 = 0, alpha2 = 1,
