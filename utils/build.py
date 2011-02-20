@@ -290,11 +290,11 @@ def compress(text):
 		handle.write(text)
 
 	# uncomment to get concatenated JS if you can't figure out Closure compiler errors :|
-	
+
 	#f = open( "debug.js" , "w" )
 	#f.write(text)
 	#f.close()
-	
+
 	out_tuple = tempfile.mkstemp()
 	# os.system("java -jar yuicompressor-2.4.2.jar %s --type js -o %s --charset utf-8 -v" % (in_tuple[1], out_tuple[1]))
 	os.system("java -jar compiler.jar --language_in=ECMASCRIPT5 --js %s --js_output_file %s" % (in_tuple[1], out_tuple[1]))

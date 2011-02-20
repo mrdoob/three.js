@@ -108,14 +108,14 @@
 					mesh.position.y = Math.random() * 10000 - 5000;
 					mesh.position.z = Math.random() * 10000 - 5000;
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 4 + 1;
-					mesh.autoUpdateMatrix = false;
+					mesh.matrixAutoUpdate = false;
 					mesh.updateMatrix();
 					scene.addObject( mesh );
-					
+
 				}
 
-				scene.autoUpdateMatrix = false;
-				
+				scene.matrixAutoUpdate = false;
+
 				SceneUtils.addPanoramaCubeWebGL( sceneCube, 100000, textureCube );
 
 				webglRenderer = new THREE.WebGLRenderer();

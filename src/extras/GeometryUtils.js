@@ -14,7 +14,7 @@ var GeometryUtils = {
 		uvs1 = geometry1.uvs,
 		uvs2 = geometry2.uvs;
 
-		isMesh && object2.autoUpdateMatrix && object2.updateMatrix();
+		isMesh && object2.matrixAutoUpdate && object2.updateMatrix();
 
 		for ( var i = 0, il = vertices2.length; i < il; i ++ ) {
 

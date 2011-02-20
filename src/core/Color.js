@@ -4,12 +4,13 @@
 
 THREE.Color = function ( hex ) {
 
-	this.autoUpdate = true;
 	this.setHex( hex );
 
 };
 
 THREE.Color.prototype = {
+
+	autoUpdate: true,
 
 	setRGB: function ( r, g, b ) {
 
@@ -26,27 +27,27 @@ THREE.Color.prototype = {
 
 	},
 
-	// based on MochiKit implementation by Bob Ippolito
-	// h,s,v ranges are < 0.0 - 1.0 >
-	
 	setHSV: function ( h, s, v ) {
 
+		// based on MochiKit implementation by Bob Ippolito
+		// h,s,v ranges are < 0.0 - 1.0 >
+
 		var red, green, blue, i, f, p, q, t;
-		
+
 		if ( v == 0.0 ) {
-			
+
 			red = green = blue = 0;
-			
+
 		} else {
-			
+
 			i = Math.floor( h * 6 );
 			f = ( h * 6 ) - i;
 			p = v * ( 1 - s );
 			q = v * ( 1 - ( s * f ) );
 			t = v * ( 1 - ( s * ( 1 - f ) ) );
-			
+
 			switch ( i ) {
-				
+
 				case 1: red = q; green = v; blue = p; break;
 				case 2: red = p; green = v; blue = t; break;
 				case 3: red = p; green = q; blue = v; break;
@@ -54,11 +55,11 @@ THREE.Color.prototype = {
 				case 5: red = v; green = p; blue = q; break;
 				case 6: // fall through
 				case 0: red = v; green = t; blue = p; break;
-				
+
 			}
-		
+
 		}
-		
+
 		this.r = red;
 		this.g = green;
 		this.b = blue;
@@ -69,9 +70,9 @@ THREE.Color.prototype = {
 			this.updateStyleString();
 
 		}
-		
+
 	},
-	
+
 	setHex: function ( hex ) {
 
 		this.hex = ( ~~ hex ) & 0xffffff;
@@ -110,7 +111,6 @@ THREE.Color.prototype = {
 		return new THREE.Color( this.hex );
 
 	},
-
 
 	toString: function () {
 

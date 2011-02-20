@@ -191,8 +191,8 @@
 					mesh.rotation.x = Math.random() * 360 * ( Math.PI / 180 );
 					mesh.rotation.y = Math.random() * 360 * ( Math.PI / 180 );
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 4 + 1;
+					mesh.matrixAutoUpdate = false;
 					mesh.updateMatrix();
-					mesh.autoUpdateMatrix = false;
 					scene.addObject( mesh );
 
 				}

@@ -153,7 +153,7 @@ THREE.CanvasRenderer = function () {
 		var e, el, element, m, ml, fm, fml, material;
 
 		this.autoClear ? this.clear() : _context.setTransform( 1, 0, 0, - 1, _canvasWidthHalf, _canvasHeightHalf );
-		
+
 		_renderList = _projector.projectScene( scene, camera, this.sortElements );
 
 		/* DEBUG
@@ -546,7 +546,7 @@ THREE.CanvasRenderer = function () {
 
 						}/* else if ( material.env_map.mapping == THREE.RefractionMapping ) {
 
-						
+							
 
 						}*/
 

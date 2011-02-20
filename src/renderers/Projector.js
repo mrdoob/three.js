@@ -52,7 +52,7 @@ THREE.Projector = function() {
 			_objectCount ++;
 
 		}
-		
+
 		sort && renderList.sort( painterSort );
 
 		return renderList;
@@ -63,20 +63,20 @@ THREE.Projector = function() {
 
 	this.projectScene = function ( scene, camera, sort ) {
 
-		var renderList = [], near = camera.near, far = camera.far,
+		var renderList = [], near = camera.zNear, far = camera.zFar,
 		o, ol, v, vl, f, fl, n, nl, objects, object,
 		objectMatrix, objectMaterials, objectOverdraw,
-		objectRotationMatrix,
+		objectMatrixRotation,
 		geometry, vertices, vertex, vertexPositionScreen,
 		faces, face, faceVertexNormals, normal, v1, v2, v3, v4;
 
 		_face3Count = _lineCount = _particleCount = 0;
 
-		camera.autoUpdateMatrix && camera.update();
-		
+		camera.matrixAutoUpdate && camera.update();
+
 		_projScreenMatrix.multiply( camera.projectionMatrix, camera.globalMatrix );
 		computeFrustum( _projScreenMatrix );
-		
+
 		scene.update( undefined, false, camera );
 
 		objects = this.projectObjects( scene, camera, true ); // scene.objects;
@@ -87,12 +87,12 @@ THREE.Projector = function() {
 
 			if ( !object.visible ) continue;
 
-			object.autoUpdateMatrix && object.updateMatrix();
+			object.matrixAutoUpdate && object.updateMatrix();
 
 			objectMatrix = object.globalMatrix;
-			objectMatrix.extractRotationMatrix( object.rotationMatrix );
-			objectRotationMatrix = object.rotationMatrix;
-			
+			objectMatrix.extractRotationMatrix( object.matrixRotation );
+			objectMatrixRotation = object.matrixRotation;
+
 			objectMaterials = object.materials;
 			objectOverdraw = object.overdraw;
 
@@ -151,7 +151,7 @@ THREE.Projector = function() {
 								_face3.v3.positionScreen.copy( v3.positionScreen );
 
 								_face3.normalWorld.copy( face.normal );
-								objectRotationMatrix.multiplyVector3( _face3.normalWorld );
+								objectMatrixRotation.multiplyVector3( _face3.normalWorld );
 
 								_face3.centroidWorld.copy( face.centroid );
 								objectMatrix.multiplyVector3( _face3.centroidWorld );
@@ -166,7 +166,7 @@ THREE.Projector = function() {
 
 									normal = _face3VertexNormals[ n ] = _face3VertexNormals[ n ] || new THREE.Vector3();
 									normal.copy( faceVertexNormals[ n ] );
-									objectRotationMatrix.multiplyVector3( normal );
+									objectMatrixRotation.multiplyVector3( normal );
 
 								}
 
@@ -215,7 +215,7 @@ THREE.Projector = function() {
 								_face3.v3.positionScreen.copy( v4.positionScreen );
 
 								_face3.normalWorld.copy( face.normal );
-								objectRotationMatrix.multiplyVector3( _face3.normalWorld );
+								objectMatrixRotation.multiplyVector3( _face3.normalWorld );
 
 								_face3.centroidWorld.copy( face.centroid );
 								objectMatrix.multiplyVector3( _face3.centroidWorld );
@@ -419,7 +419,7 @@ THREE.Projector = function() {
 		return true;
 
 	};
-	
+
 	function clipLine( s1, s2 ) {
 
 		var alpha1 = 0, alpha2 = 1,

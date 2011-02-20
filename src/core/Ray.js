@@ -54,14 +54,14 @@ THREE.Ray.prototype = {
 			direction = this.direction.clone();
 
 			objMatrix = object.globalMatrix;
-			objMatrix.extractRotationMatrix( object.rotationMatrix );
-			
+			objMatrix.extractRotationMatrix( object.matrixRotation );
+
 			a = objMatrix.multiplyVector3( vertices[ face.a ].position.clone() );
 			b = objMatrix.multiplyVector3( vertices[ face.b ].position.clone() );
 			c = objMatrix.multiplyVector3( vertices[ face.c ].position.clone() );
 			d = face instanceof THREE.Face4 ? objMatrix.multiplyVector3( vertices[ face.d ].position.clone() ) : null;
 
-			normal = object.rotationMatrix.multiplyVector3( face.normal.clone() );
+			normal = object.matrixRotation.multiplyVector3( face.normal.clone() );
 			dot = direction.dot( normal );
 
 			if ( dot < 0 ) { // Math.abs( dot ) > 0.0001
