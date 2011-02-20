@@ -2586,6 +2586,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					break;
 
+				case THREE.ReverseSubtractiveBlending:
+
+					_gl.blendEquation( _gl.FUNC_REVERSE_SUBTRACT );
+					_gl.blendFunc( _gl.ONE, _gl.ONE );
+
+    				break;
 				default:
 
 					_gl.blendEquation( _gl.FUNC_ADD );
