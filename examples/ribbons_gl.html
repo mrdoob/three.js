@@ -27,22 +27,24 @@
 				z-index:100;
 				
             }			
-			
-			
-		</style>
+		</style>		
 	</head>
-	<body>
 	
-        <div id="info">
-			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl ribbons example
-		</div>
+	<body>
 		
 		<script type="text/javascript" src="../build/ThreeExtras.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
+        <div id="info">
+			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl ribbons example
+		</div>
+		
+
 		<script type="text/javascript">
 
 			if ( ! THREE.Detector.webgl ) THREE.Detector.addGetWebGLMessage();
+			
+			window.onload = init;
 
 			var container, stats;
 			var camera, scene, renderer, ribbon, geometry, geometry2, materials = [], ribbons = [],
@@ -58,9 +60,6 @@
 				enabled  : true
 				
 			};
-
-			init();
-			loop();
 			
 			function init() {
 
@@ -168,6 +167,8 @@
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
 				
+				loop();
+				
 			}
 
 			function onDocumentMouseMove( event ) {
@@ -257,9 +258,9 @@
 			}			
 
 			function loop() {
-				
-				THREE.requestAnimationFrame( renderer.domElement, loop );
-				
+
+				requestAnimationFrame( loop, renderer.domElement );
+
 				var time = new Date().getTime() * 0.00005;
 				
 				camera.position.x += ( mouseX - camera.position.x ) * 0.036;
@@ -335,6 +336,8 @@
 
 				stats.update();
 				
+				
+
 			}
 
 
