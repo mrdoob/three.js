@@ -8,18 +8,20 @@ THREE.Object3D = function() {
 
 	this.id = THREE.Object3DCounter.value ++;
 
-	this.visible = true;
-	this.matrixAutoUpdate = true;
-	this.matrixNeedsUpdate = true;
-
 	this.parent = undefined;
 	this.children = [];
 
 	this.position = new THREE.Vector3();
 	this.rotation = new THREE.Vector3();
 	this.scale = new THREE.Vector3( 1.0, 1.0, 1.0 );
+
+	this.matrixRotation = new THREE.Matrix4(); // this is just to cache it when somewhere it's computed somewhere else (stripped down globalMatrix)
+
 	this.localMatrix = new THREE.Matrix4();
 	this.globalMatrix = new THREE.Matrix4();
+	this.matrixAutoUpdate = true;
+	this.matrixNeedsUpdate = true;
+
 	this.quaternion = new THREE.Quaternion();
 	this.useQuaternion = false;
 	this.screenPosition = new THREE.Vector4(); // xyzr
@@ -27,7 +29,7 @@ THREE.Object3D = function() {
 	this.boundRadius = 0.0;
 	this.boundRadiusScale = 1.0;
 
-	this.rotationMatrix = new THREE.Matrix4(); // this is just to cache it when somewhere it's computed somewhere else (stripped down globalMatrix)
+	this.visible = true;
 
 };
 
@@ -158,5 +160,3 @@ THREE.Object3D.prototype.removeChild = function( child ) {
 };
 
 THREE.Object3DCounter = { value: 0 };
-
-

@@ -66,7 +66,7 @@ THREE.Projector = function() {
 		var renderList = [], near = camera.zNear, far = camera.zFar,
 		o, ol, v, vl, f, fl, n, nl, objects, object,
 		objectMatrix, objectMaterials, objectOverdraw,
-		objectRotationMatrix,
+		objectMatrixRotation,
 		geometry, vertices, vertex, vertexPositionScreen,
 		faces, face, faceVertexNormals, normal, v1, v2, v3, v4;
 
@@ -90,8 +90,8 @@ THREE.Projector = function() {
 			object.matrixAutoUpdate && object.updateMatrix();
 
 			objectMatrix = object.globalMatrix;
-			objectMatrix.extractRotationMatrix( object.rotationMatrix );
-			objectRotationMatrix = object.rotationMatrix;
+			objectMatrix.extractRotationMatrix( object.matrixRotation );
+			objectMatrixRotation = object.matrixRotation;
 
 			objectMaterials = object.materials;
 			objectOverdraw = object.overdraw;
@@ -151,7 +151,7 @@ THREE.Projector = function() {
 								_face3.v3.positionScreen.copy( v3.positionScreen );
 
 								_face3.normalWorld.copy( face.normal );
-								objectRotationMatrix.multiplyVector3( _face3.normalWorld );
+								objectMatrixRotation.multiplyVector3( _face3.normalWorld );
 
 								_face3.centroidWorld.copy( face.centroid );
 								objectMatrix.multiplyVector3( _face3.centroidWorld );
@@ -166,7 +166,7 @@ THREE.Projector = function() {
 
 									normal = _face3VertexNormals[ n ] = _face3VertexNormals[ n ] || new THREE.Vector3();
 									normal.copy( faceVertexNormals[ n ] );
-									objectRotationMatrix.multiplyVector3( normal );
+									objectMatrixRotation.multiplyVector3( normal );
 
 								}
 
@@ -215,7 +215,7 @@ THREE.Projector = function() {
 								_face3.v3.positionScreen.copy( v4.positionScreen );
 
 								_face3.normalWorld.copy( face.normal );
-								objectRotationMatrix.multiplyVector3( _face3.normalWorld );
+								objectMatrixRotation.multiplyVector3( _face3.normalWorld );
 
 								_face3.centroidWorld.copy( face.centroid );
 								objectMatrix.multiplyVector3( _face3.centroidWorld );
