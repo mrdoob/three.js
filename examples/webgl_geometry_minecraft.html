@@ -45,6 +45,7 @@
 
 		<script type="text/javascript" src="../build/Three.js"></script>
 		<script type="text/javascript" src="../src/extras/GeometryUtils.js"></script>
+		<script type="text/javascript" src="../src/extras/MiscUtils.js"></script>
 		<script type="text/javascript" src="../src/extras/primitives/Cube.js"></script>
 		<script type="text/javascript" src="../src/extras/Detector.js"></script>
 
@@ -56,6 +57,8 @@
 				document.getElementById( 'container' ).innerHTML = "";
 				
 			}
+			
+			window.onload = init;
 
 			var container, stats;
 
@@ -75,10 +78,6 @@
 
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
-
-
-			init();
-			setInterval( loop, 1000 / 60 );
 
 
 			function init() {
@@ -188,19 +187,11 @@
 
 				document.addEventListener( 'keydown', onDocumentKeyDown, false );
 				document.addEventListener( 'keyup', onDocumentKeyUp, false );
+				
+				loop();
 
 			}
 
-			function generateAO( image, sides ) {
-
-				var c = document.createElement('canvas');
-				c.width = image.width;
-				c.height = image.height;
-				c.getContext( "2d" ).drawImage( image, 0, 0 );
-
-				return c;
-
-			}
 
 			function loadTexture( path ) {
 
@@ -308,6 +299,8 @@
 
 			function loop() {
 
+				requestAnimationFrame( loop, renderer.domElement );
+				
 				if ( moveForward ) camera.translateZ( - 15 );
 				if ( moveBackward ) camera.translateZ( 15 );
 

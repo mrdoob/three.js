@@ -52,6 +52,7 @@
 
 		<script type="text/javascript" src="../build/Three.js"></script>
 		<script type="text/javascript" src="../src/extras/GeometryUtils.js"></script>
+		<script type="text/javascript" src="../src/extras/MiscUtils.js"></script>
 		<script type="text/javascript" src="../src/extras/primitives/Cube.js"></script>
 		<script type="text/javascript" src="../src/extras/Detector.js"></script>
 
@@ -64,6 +65,8 @@
 				
 			}
 
+			window.onload = init;
+			
 			var fogExp2 = true;
 			
 			var container, stats;
@@ -84,10 +87,6 @@
 
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
-
-
-			init();
-			setInterval( loop, 1000 / 60 );
 
 
 			function init() {
@@ -487,6 +486,8 @@
 				document.getElementById( "bao" ).addEventListener( "click",  function() { mat.map = m_ao.map; }, false );
 				document.getElementById( "baot" ).addEventListener( "click", function() { mat.map = m_aot.map; }, false );
 				document.getElementById( "bt" ).addEventListener( "click",   function() { mat.map = m_t.map; }, false );
+				
+				loop();
 
 			}
 
@@ -880,6 +881,8 @@
 			}
 
 			function loop() {
+			
+				requestAnimationFrame( loop, renderer.domElement );
 
 				if ( moveForward )  camera.translateZ( - 15 );
 				if ( moveBackward ) camera.translateZ( 15 );

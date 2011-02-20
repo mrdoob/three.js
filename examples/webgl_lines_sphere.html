@@ -49,6 +49,8 @@
 		
 			if ( ! THREE.Detector.webgl ) THREE.Detector.addGetWebGLMessage();
 
+			window.onload = init;
+			
 			var SCREEN_WIDTH = window.innerWidth,
 				SCREEN_HEIGHT = window.innerHeight,
 
@@ -62,9 +64,6 @@
 			camera, scene, renderer,
 
 			stats;
-
-			init();
-			setInterval( loop, 1000 / 60 );
 
 			function init() {
 
@@ -129,6 +128,8 @@
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
 				
+				loop();
+				
 			}
 
 			function onDocumentMouseMove(event) {
@@ -166,6 +167,8 @@
 
 			function loop() {
 
+				requestAnimationFrame( loop, renderer.domElement );
+				
 				//camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY + 200 - camera.position.y ) * .05;
 				camera.updateMatrix();

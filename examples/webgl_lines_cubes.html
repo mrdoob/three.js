@@ -50,6 +50,8 @@
 		
 			if ( ! THREE.Detector.webgl ) THREE.Detector.addGetWebGLMessage();
 
+			window.onload = init;
+			
 			var mouseX = 0, mouseY = 0,
 
 			windowHalfX = window.innerWidth / 2,
@@ -58,9 +60,6 @@
 			camera, scene, renderer,
 
 			stats;
-
-			init();
-			setInterval( loop, 1000 / 60 );
 
 			function init() {
 
@@ -125,6 +124,9 @@
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+				
+				loop();
+				
 			}
 
 			// port of Processing Java code by Thomas Diewald
@@ -203,6 +205,8 @@
 
 			function loop() {
 
+				requestAnimationFrame( loop, renderer.domElement );
+				
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY + 200 - camera.position.y ) * .05;
 				camera.updateMatrix();
