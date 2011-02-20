@@ -43,20 +43,20 @@ THREE.LOD.prototype.update = function( parentGlobalMatrix, forceUpdate, camera )
 	
 	// update local
 	
-	if( this.autoUpdateMatrix )
+	if( this.matrixAutoUpdate )
 		forceUpdate |= this.updateMatrix();
 
 
 	// update global
 
-	if( forceUpdate || this.matrixNeedsToUpdate ) {
+	if( forceUpdate || this.matrixNeedsUpdate ) {
 		
 		if( parentGlobalMatrix )
 			this.globalMatrix.multiply( parentGlobalMatrix, this.localMatrix );
 		else
 			this.globalMatrix.copy( this.localMatrix );
 		
-		this.matrixNeedsToUpdate = false;
+		this.matrixNeedsUpdate = false;
 		forceUpdate              = true;
 
 	}

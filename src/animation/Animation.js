@@ -54,7 +54,7 @@ THREE.Animation.prototype.play = function( loop ) {
 		for( var h = 0; h < this.hierarchy.length; h++ ) {
 			
 			this.hierarchy[ h ].useQuaternion    = true;
-			this.hierarchy[ h ].autoUpdateMatrix = true;
+			this.hierarchy[ h ].matrixAutoUpdate = true;
 			
 			if( this.hierarchy[ h ].prevKey === undefined ) {
 				
@@ -159,8 +159,8 @@ THREE.Animation.prototype.update = function( time ) {
 		if( JIThierarchy[ h ][ frame ] !== undefined ) {
 
 			object.skinMatrix           = JIThierarchy[ h ][ frame ];
-			object.autoUpdateMatrix     = false;
-			object.matrixNeedsToUpdate  = false;
+			object.matrixAutoUpdate     = false;
+			object.matrixNeedsUpdate  = false;
 			
 			//object.skinMatrix.flattenToArray( this.root.boneMatrices[ h ] );
 			object.skinMatrix.flattenToArrayOffset( this.root.boneMatrices, h * 16 );
@@ -214,8 +214,8 @@ THREE.Animation.prototype.update = function( time ) {
 				
 				// interpolate rot (quaternion slerp)
 				
-				object.autoUpdateMatrix    = true;
-				object.matrixNeedsToUpdate = true;
+				object.matrixAutoUpdate = true;
+				object.matrixNeedsUpdate = true;
 				
 				scale   = ( currentTime - prevKey.time ) / ( nextKey.time - prevKey.time );
 				prevXYZ = prevKey[ type ];

@@ -97,7 +97,7 @@ THREE.WebGLRenderer2 = function ( antialias ) {
 
 		this.autoClear && this.clear();
 
-		camera.autoUpdateMatrix && camera.updateMatrix();
+		camera.matrixAutoUpdate && camera.updateMatrix();
 
 		// Setup camera matrices
 
@@ -127,7 +127,7 @@ THREE.WebGLRenderer2 = function ( antialias ) {
 			var geometry, material, m, ml,
 			program, uniforms, attributes;
 
-			object.autoUpdateMatrix && object.updateMatrix();
+			object.matrixAutoUpdate && object.updateMatrix();
 
 			// Setup object matrices
 

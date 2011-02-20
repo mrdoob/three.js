@@ -72,7 +72,7 @@ THREE.Projector = function() {
 
 		_face3Count = _lineCount = _particleCount = 0;
 
-		camera.autoUpdateMatrix && camera.update();
+		camera.matrixAutoUpdate && camera.update();
 
 		_projScreenMatrix.multiply( camera.projectionMatrix, camera.globalMatrix );
 		computeFrustum( _projScreenMatrix );
@@ -87,7 +87,7 @@ THREE.Projector = function() {
 
 			if ( !object.visible ) continue;
 
-			object.autoUpdateMatrix && object.updateMatrix();
+			object.matrixAutoUpdate && object.updateMatrix();
 
 			objectMatrix = object.globalMatrix;
 			objectMatrix.extractRotationMatrix( object.rotationMatrix );

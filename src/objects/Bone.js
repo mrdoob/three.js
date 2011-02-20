@@ -25,21 +25,21 @@ THREE.Bone.prototype.update = function( parentSkinMatrix, forceUpdate, camera ) 
 	
 	// update local
 	
-	if( this.autoUpdateMatrix )
+	if( this.matrixAutoUpdate )
 		forceUpdate |= this.updateMatrix();			
 
 	
 	// update skin matrix
 
-	if( forceUpdate || this.matrixNeedsToUpdate ) {
+	if( forceUpdate || this.matrixNeedsUpdate ) {
 		
 		if( parentSkinMatrix )
 			this.skinMatrix.multiply( parentSkinMatrix, this.localMatrix );
 		else
 			this.skinMatrix.copy( this.localMatrix );
 		
-		this.matrixNeedsToUpdate = false;
-		forceUpdate              = true;
+		this.matrixNeedsUpdate = false;
+		forceUpdate = true;
 
 	}
 

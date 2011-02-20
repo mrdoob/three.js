@@ -9,8 +9,8 @@ THREE.Object3D = function() {
 	this.id = THREE.Object3DCounter.value ++;
 
 	this.visible = true;
-	this.autoUpdateMatrix = true;
-	this.matrixNeedsToUpdate = true;
+	this.matrixAutoUpdate = true;
+	this.matrixNeedsUpdate = true;
 
 	this.parent = undefined;
 	this.children = [];
@@ -44,20 +44,20 @@ THREE.Object3D.prototype.update = function( parentGlobalMatrix, forceUpdate, cam
 
 		// update local
 
-		if( this.autoUpdateMatrix )
+		if( this.matrixAutoUpdate )
 			forceUpdate |= this.updateMatrix();
 
 
 		// update global
 
-		if( forceUpdate || this.matrixNeedsToUpdate ) {
+		if( forceUpdate || this.matrixNeedsUpdate ) {
 
 			if( parentGlobalMatrix )
 				this.globalMatrix.multiply( parentGlobalMatrix, this.localMatrix );
 			else
 				this.globalMatrix.copy( this.localMatrix );
 
-			this.matrixNeedsToUpdate = false;
+			this.matrixNeedsUpdate = false;
 			forceUpdate              = true;
 
 		}

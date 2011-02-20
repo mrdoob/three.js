@@ -98,17 +98,17 @@ THREE.Camera.prototype.update = function( parentGlobalMatrix, forceUpdate, camer
 
 	} else {
 
-		if( this.autoUpdateMatrix )
+		if( this.matrixAutoUpdate )
 			forceUpdate |= this.updateMatrix();
 
-		if( forceUpdate || this.matrixNeedsToUpdate ) {
+		if( forceUpdate || this.matrixNeedsUpdate ) {
 
 			if( parentGlobalMatrix )
 				this.globalMatrix.multiply( parentGlobalMatrix, this.localMatrix );
 			else
 				this.globalMatrix.copy( this.localMatrix );
 
-			this.matrixNeedsToUpdate = false;
+			this.matrixNeedsUpdate = false;
 			forceUpdate              = true;
 
 			THREE.Matrix4.makeInvert( this.globalMatrix, this.inverseMatrix );
