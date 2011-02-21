@@ -19,6 +19,7 @@
 		<script type="text/javascript" src="../src/extras/primitives/Cube.js"></script>
 		<script type="text/javascript" src="../src/extras/primitives/Plane.js"></script>
 
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
@@ -39,7 +40,7 @@
 			var windowHalfY = window.innerHeight / 2;
 
 			init();
-			setInterval(loop, 1000/60);
+			animate();
 
 			function init() {
 
@@ -159,12 +160,20 @@
 
 			//
 
-			function loop() {
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
 
 				plane.rotation.z = cube.rotation.y += ( targetRotation - cube.rotation.y ) * 0.05;
-
 				renderer.render(scene, camera);
-				stats.update();
+
 			}
 
 		</script>
