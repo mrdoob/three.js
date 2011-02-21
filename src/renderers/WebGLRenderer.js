@@ -1739,7 +1739,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var i, plane;
 
-		for ( i = 0; i < 5; i ++ ) {
+		for ( i = 0; i < 6; i ++ ) {
 
 			plane = _frustum[ i ];
 			plane.divideScalar( Math.sqrt( plane.x * plane.x + plane.y * plane.y + plane.z * plane.z ) );
