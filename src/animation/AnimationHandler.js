@@ -67,10 +67,11 @@ THREE.AnimationHandler = (function() {
 				// create quaternions
 			
 				if( data.hierarchy[ h ].keys[ k ].rot !== undefined &&
-				  !(data.hierarchy[ h ].keys[ k ].rot instanceof THREE.Quaternion )) {
+				  !( data.hierarchy[ h ].keys[ k ].rot instanceof THREE.Quaternion ) ) {
 					
 					var quat = data.hierarchy[ h ].keys[ k ].rot;
 					data.hierarchy[ h ].keys[ k ].rot = new THREE.Quaternion( quat[0], quat[1], quat[2], quat[3] ); 
+
 				}	
 			}
 		}

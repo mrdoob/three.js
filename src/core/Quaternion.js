@@ -2,46 +2,23 @@
  * @author mikael emtinger / http://gomo.se/
  */
 
-THREE.Quaternion = function( _x, _y, _z, _w ) {
+THREE.Quaternion = function( x, y, z, w ) {
 
-	this.x = _x || 0;
-	this.y = _y || 0;
-	this.z = _z || 0;
-	this.w = _w !== undefined ? _w : 1;
-
-	this.api = {
-	
-		isDirty:	false,
-		that: 		this,
-
-		get x() { return this.that.x; },
-		get y() { return this.that.y; },
-		get z() { return this.that.z; },
-		get w() { return this.that.w; },
-		
-		set x( value ) { this.that.x = value; this.isDirty = true; },
-		set y( value ) { this.that.y = value; this.isDirty = true; },
-		set z( value ) { this.that.z = value; this.isDirty = true; },
-		set w( value ) { this.that.w = value; this.isDirty = true; }
-
-	};
-
-	this.api.__proto__ = THREE.Quaternion.prototype;
-	
-	return this.api;
+	this.x = x || 0;
+	this.y = y || 0;
+	this.z = z || 0;
+	this.w = w !== undefined ? w : 1;
 	
 };
 
 
 THREE.Quaternion.prototype.set = function( x, y, z, w ) {
 	
-	var quat = this.that; 
-	quat.x = x;
-	quat.y = y;
-	quat.z = z;
-	quat.w = w;
+	this.x = x;
+	this.y = y;
+	this.z = z;
+	this.w = w;
 
-	this.isDirty = true;
 	return this;
 
 };
@@ -61,88 +38,67 @@ THREE.Quaternion.prototype.setFromEuler = function( vec3 ) {
 		c3 = Math.cos( x  ),
 		s3 = Math.sin( x  ),
 		c1c2 = c1 * c2,
-		s1s2 = s1 * s2,
-    
-		quat = this.that;
+		s1s2 = s1 * s2;
 	
-	quat.w = c1c2 * c3  - s1s2 * s3;
-  	quat.x = c1c2 * s3  + s1s2 * c3;
-	quat.y = s1 * c2 * c3 + c1 * s2 * s3;
-	quat.z = c1 * s2 * c3 - s1 * c2 * s3;
+	this.w = c1c2 * c3  - s1s2 * s3;
+  	this.x = c1c2 * s3  + s1s2 * c3;
+	this.y = s1 * c2 * c3 + c1 * s2 * s3;
+	this.z = c1 * s2 * c3 - s1 * c2 * s3;
 
-	this.isDirty = true;
 	return this;
 
 };
 
 
-THREE.Quaternion.prototype.calculateW = function() {
-	
-	var quat = this.that,
-		x    = quat.x,
-		y    = quat.y,
-		z    = quat.z;
+THREE.Quaternion.prototype.calculateW = function() {	
 
-	quat.w = -Math.sqrt( Math.abs( 1.0 - x*x - y*y - z*z ));
+	this.w = -Math.sqrt( Math.abs( 1.0 - this.x * this.x - this.y * this.y - this.z * this.z ) );
 
-	this.isDirty = true;
 	return this;
 
 };
 
 
 THREE.Quaternion.prototype.inverse = function() {
-	
-	var quat = this.that; 
-	quat.x *= -1;
-	quat.y *= -1;
-	quat.z *= -1;
 
-	this.isDirty = true;
+	this.x *= -1;
+	this.y *= -1;
+	this.z *= -1;
+
 	return this;
 
 };
 
 
 THREE.Quaternion.prototype.length = function() {
-	
-	var quat = this.that; 
 
-	return Math.sqrt( quat.x * quat.x + quat.y * quat.y + quat.z * quat.z + quat.w * quat.w );
+	return Math.sqrt( this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w );
 
 };
 
 
 THREE.Quaternion.prototype.normalize = function() {
 	
-	var quat = this.that,
-		x = quat.x,
-		y = quat.y,
-		z = quat.z,
-		w = quat.w;
-	
-	var len = Math.sqrt( x*x + y*y + z*z + w*w );
+	var len = Math.sqrt( this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w );
 	
 	if ( len == 0 ) {
 		
-		quat.x = 0;
-		quat.y = 0;
-		quat.z = 0;
-		quat.w = 0;
+		this.x = 0;
+		this.y = 0;
+		this.z = 0;
+		this.w = 0;
 	
-		this.isDirty = true;
-		return this;
+	} else {
 	
+		len = 1 / len;
+		
+		this.x = this.x * len;
+		this.y = this.y * len;
+		this.z = this.z * len;
+		this.w = this.w * len;
+		
 	}
 	
-	len = 1 / len;
-	
-	quat.x = x * len;
-	quat.y = y * len;
-	quat.z = z * len;
-	quat.w = w * len;
-	
-	this.isDirty = true;
 	return this;
 
 };
@@ -150,17 +106,14 @@ THREE.Quaternion.prototype.normalize = function() {
 
 THREE.Quaternion.prototype.multiplySelf = function( quat2 ) {
 	
-	var quat = this.that;
-
-		qax = quat.x,  qay = quat.y,  qaz = quat.z,  qaw = quat.w,
+	var qax = this.x,  qay = this.y,  qaz = this.z,  qaw = this.w,
 		qbx = quat2.x, qby = quat2.y, qbz = quat2.z, qbw = quat2.w;
 	
-	quat.x = qax * qbw + qaw * qbx + qay * qbz - qaz * qby;
-	quat.y = qay * qbw + qaw * qby + qaz * qbx - qax * qbz;
-	quat.z = qaz * qbw + qaw * qbz + qax * qby - qay * qbx;
-	quat.w = qaw * qbw - qax * qbx - qay * qby - qaz * qbz;
+	this.x = qax * qbw + qaw * qbx + qay * qbz - qaz * qby;
+	this.y = qay * qbw + qaw * qby + qaz * qbx - qax * qbz;
+	this.z = qaz * qbw + qaw * qbz + qax * qby - qay * qbx;
+	this.w = qaw * qbw - qax * qbx - qay * qby - qaz * qbz;
 
-	this.isDirty = true;
 	return this;
 
 };
@@ -170,9 +123,8 @@ THREE.Quaternion.prototype.multiplyVector3 = function( vec, dest ) {
 	
 	if( !dest ) { dest = vec; }
 	
-	var quat = this.that,
-		x    = vec.x,  y  = vec.y,  z  = vec.z,
-		qx   = quat.x, qy = quat.y, qz = quat.z, qw = quat.w;
+	var x    = vec.x,  y  = vec.y,  z  = vec.z,
+		qx   = this.x, qy = this.y, qz = this.z, qw = this.w;
 
 	// calculate quat * vec
 	

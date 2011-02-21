@@ -54,10 +54,15 @@ THREE.Object3D.prototype.update = function( parentGlobalMatrix, forceUpdate, cam
 
 		if( forceUpdate || this.matrixNeedsUpdate ) {
 
-			if( parentGlobalMatrix )
+			if( parentGlobalMatrix ) {
+				
 				this.globalMatrix.multiply( parentGlobalMatrix, this.localMatrix );
-			else
+
+			} else {
+
 				this.globalMatrix.copy( this.localMatrix );
+
+			}
 
 			this.matrixNeedsUpdate = false;
 			forceUpdate              = true;
@@ -94,12 +99,7 @@ THREE.Object3D.prototype.updateMatrix = function() {
 
 	if( this.useQuaternion )  {
 
-		if( this.quaternion.isDirty ) {
-
-			this.localMatrix.setRotationFromQuaternion( this.quaternion );
-			this.quaternion.isDirty = false;
-
-		}
+		this.localMatrix.setRotationFromQuaternion( this.quaternion );
 
 	// update rotation
 

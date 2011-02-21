@@ -1353,8 +1353,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 		material.program = buildProgram( material.fragment_shader, material.vertex_shader, parameters );
 
 		identifiers = [ 'viewMatrix', 'modelViewMatrix', 'projectionMatrix', 'normalMatrix', 'objectMatrix', 'cameraPosition',
-						'cameraInverseMatrix', 'uBoneGlobalMatrices'
+						'cameraInverseMatrix', 'boneGlobalMatrices'
 						];
+
 		for( u in material.uniforms ) {
 
 			identifiers.push(u);
@@ -2471,18 +2472,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	function loadUniformsSkinning( uniforms, object ) {
 
 		_gl.uniformMatrix4fv( uniforms.cameraInverseMatrix, false, _cameraInverseMatrixArray );
-
-		/*
-		var i, l = object.boneMatrices.length;
-
-		for( i = 0; i < l; i++ ) {
-
-			//_gl.uniformMatrix4fv( uniforms[ "uBoneGlobalMatrices[" + i + "]" ], false, object.boneMatrices[ i ]() );
-			_gl.uniformMatrix4fv( uniforms[ "uBoneGlobalMatrices[" + i + "]" ], false, object.boneMatrices[ i ] );
-
-		}
-		*/
-		_gl.uniformMatrix4fv( uniforms[ "uBoneGlobalMatrices" ], false, object.boneMatrices );
+		_gl.uniformMatrix4fv( uniforms.boneGlobalMatrices, false, object.boneMatrices );
 
 	};
 
@@ -3372,7 +3362,7 @@ THREE.Snippets = {
 
 	"#ifdef USE_SKINNING",
 
-		"uniform mat4 uBoneGlobalMatrices[20];",
+		"uniform mat4 boneGlobalMatrices[20];",
 
 	"#endif"
 
@@ -3382,8 +3372,8 @@ THREE.Snippets = {
 
 	"#ifdef USE_SKINNING",
 
-		"gl_Position  = ( uBoneGlobalMatrices[ int( skinIndex.x ) ] * skinVertexA ) * skinWeight.x;",
-		"gl_Position += ( uBoneGlobalMatrices[ int( skinIndex.y ) ] * skinVertexB ) * skinWeight.y;",
+		"gl_Position  = ( boneGlobalMatrices[ int( skinIndex.x ) ] * skinVertexA ) * skinWeight.x;",
+		"gl_Position += ( boneGlobalMatrices[ int( skinIndex.y ) ] * skinVertexB ) * skinWeight.y;",
 
 		// this doesn't work, no idea why
 		//"gl_Position  = projectionMatrix * cameraInverseMatrix * objectMatrix * gl_Position;",

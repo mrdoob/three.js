@@ -28,10 +28,10 @@ THREE.Animation = function( root, data ) {
 		for( var b = 0; b < this.root.bones.length; b++ )
 			this.hierarchy.push( this.root.bones[ b ] );
 
-	}
-	else {
+	} else {
 		
 		// parse hierarchy and match against animation (somehow)
+
 	}
 
 }
@@ -147,22 +147,21 @@ THREE.Animation.prototype.update = function( time ) {
 
 	}
 	
-	frame = Math.min( parseInt( currentTime * this.data.fps ), parseInt( this.data.length * this.data.fps ));
+	frame = Math.min( parseInt( currentTime * this.data.fps ), parseInt( this.data.length * this.data.fps ) );
 	
 	
 	// update
 	
-	for( var h = 0, hl = this.hierarchy.length; h < hl; h++ )
-	{
+	for( var h = 0, hl = this.hierarchy.length; h < hl; h++ ) {
+
 		object = this.hierarchy[ h ];
 	
 		if( JIThierarchy[ h ][ frame ] !== undefined ) {
 
-			object.skinMatrix           = JIThierarchy[ h ][ frame ];
-			object.matrixAutoUpdate     = false;
+			object.skinMatrix         = JIThierarchy[ h ][ frame ];
+			object.matrixAutoUpdate   = false;
 			object.matrixNeedsUpdate  = false;
-			
-			//object.skinMatrix.flattenToArray( this.root.boneMatrices[ h ] );
+
 			object.skinMatrix.flattenToArrayOffset( this.root.boneMatrices, h * 16 );
 			
 		}
@@ -177,7 +176,7 @@ THREE.Animation.prototype.update = function( time ) {
 				var nextKey = object.nextKey[ type ];
 				
 				// switch keys?
-							
+
 				if( nextKey.time < unloopedCurrentTime ) {
 		
 					// did we loop?
@@ -202,6 +201,7 @@ THREE.Animation.prototype.update = function( time ) {
 							
 							prevKey = nextKey;
 							nextKey = this.getNextKeyWith( type, h, nextKey.index + 1 );
+
 						}
 						while( nextKey.time < currentTime )
 					}
@@ -244,8 +244,11 @@ THREE.Animation.prototype.update = function( time ) {
 					vector.z = prevXYZ[ 2 ] + ( nextXYZ[ 2 ] - prevXYZ[ 2 ] ) * scale;
 
 				}
-			}	
+
+			}
+
 		}
+
 	}
 	
 	
@@ -272,8 +275,7 @@ THREE.Animation.prototype.updateObject = function( h, currentTime, unloopedCurre
 	
 
 }
-		
-		
+
 
 
 THREE.Animation.prototype.getNextKeyWith = function( type, h, key ) {
