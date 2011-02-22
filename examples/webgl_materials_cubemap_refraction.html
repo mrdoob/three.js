@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - materials - cube refraction [Lucy] - webgl</title>
+		<title>three.js webgl - materials - cube refraction [Lucy]</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -20,7 +20,7 @@
 			#log { position:absolute; top:50px; text-align:left; display:block; z-index:100; pointer-events:none; }
 			#d { text-align:center; margin:1em auto -9.5em; z-index:200; position:relative; display:block; 
 				background:rgba(0,0,0,0.5); padding:0.5em; width:400px; border-radius:15px; -webkit-box-shadow: 0px 0px 10px rgba(0,0,0,0.5) }
-				
+
 			#oldie { margin-top:15em !important }
 		</style>
 	</head>
@@ -35,13 +35,15 @@
 
 		<pre id="log"></pre>
 
-		<script type="text/javascript" src="../build/ThreeExtras.js"></script> 
+		<script type="text/javascript" src="../build/ThreeExtras.js"></script>
+
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
 
 			if ( ! THREE.Detector.webgl ) THREE.Detector.addGetWebGLMessage();
-			
+
 			var FLOOR = -250;
 
 			var container, stats;
@@ -52,19 +54,16 @@
 			var mesh, zmesh, lightMesh, geometry;
 
 			var loader;
-			
+
 			var directionalLight, pointLight;
 
-			var mouseX = 0;
-			var mouseY = 0;
+			var mouseX = 0, mouseY = 0;
 
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
-			document.addEventListener('mousemove', onDocumentMouseMove, false);
-
 			init();
-			setInterval( loop, 1000 / 60 );
+			animate();
 
 			function init() {
 
@@ -126,8 +125,10 @@
 
 				loader = new THREE.Loader( true );
 				document.body.appendChild( loader.statusDomElement );
-				
+
 				loader.loadBinary( { model: 'obj/lucy/Lucy100k_bin.js', callback: function( geometry ) { createScene( geometry, cubeMaterial1, cubeMaterial2, cubeMaterial3 ) } } );
+
+				document.addEventListener('mousemove', onDocumentMouseMove, false);
 
 			}
 
@@ -138,7 +139,7 @@
 				SceneUtils.addMesh( scene, geometry, s,      0, 0, z, 0,0,0, m1 );
 				SceneUtils.addMesh( scene, geometry, s,   -900, 0, z, 0,0,0, m2 );
 				SceneUtils.addMesh( scene, geometry, s,    900, 0, z, 0,0,0, m3 );
-				
+
 				loader.statusDomElement.style.display = "none";
 
 			}
@@ -150,9 +151,20 @@
 
 			}
 
-			var r = 0;
+			//
 
-			function loop() {
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				var timer = - new Date().getTime() * 0.0002;
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
@@ -162,16 +174,12 @@
 				cameraCube.target.position.z = - camera.position.z;
 
 
-				lightMesh.position.x = 1500 * Math.cos( r );
-				lightMesh.position.z = 1500 * Math.sin( r );
-
-				r += 0.01;
+				lightMesh.position.x = 1500 * Math.cos( timer );
+				lightMesh.position.z = 1500 * Math.sin( timer );
 
 				webglRenderer.clear();
 				webglRenderer.render( sceneCube, cameraCube );
 				webglRenderer.render( scene, camera );
-
-				stats.update();
 
 			}
 

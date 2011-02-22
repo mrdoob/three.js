@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - lights - point + directional - webgl</title>
+		<title>three.js misc - lights - point + directional</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 
@@ -116,7 +116,7 @@
 		<script type="text/javascript" src="../src/extras/objects/MarchingCubes.js"></script>
 		<script type="text/javascript" src="../src/extras/io/Loader.js"></script>
 
-
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
@@ -144,17 +144,14 @@
 			var bcanvas = document.getElementById( 'rcanvas' );
 			var bwebgl = document.getElementById( 'rwebgl' );
 
-			document.addEventListener('mousemove', onDocumentMouseMove, false);
+			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
 			init();
-
-			loop();
+			animate();
 
 			//render_canvas = !has_gl;
 			bwebgl.style.display = has_gl ? 'inline' : 'none';
 			bcanvas.className = render_canvas ? 'button' : 'button inactive';
-
-			setInterval(loop, 1000/60);
 
 			function init() {
 
@@ -180,8 +177,7 @@
 					mesh.position.z = 500 * ( Math.random() - 0.5 );
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = 0.25 * ( Math.random() + 0.5 );
 					mesh.overdraw = true;
-					mesh.updateMatrix();
-					scene.addObject(mesh);
+					scene.addObject( mesh );
 
 				}
 
@@ -206,7 +202,6 @@
 				lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
 				lightMesh.position = pointLight.position;
 				lightMesh.overdraw = true;
-				lightMesh.updateMatrix();
 				scene.addObject(lightMesh);
 
 
@@ -270,24 +265,25 @@
 
 			}
 
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
 			var r = 0, counter = 0;
 
-			function loop() {
+			function render() {
 
-				if( counter == 30 ) {
-					
-					scene.removeLight( directionalLight );
-					
-				} else {
-				
-					counter++;
-					
-				}
-				
+				counter == 30 ? scene.removeLight( directionalLight ) : counter ++;
+
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
-				camera.updateMatrix();
-
 
 				for ( var i = 0, l = scene.objects.length; i < l; i ++ ) {
 
@@ -303,20 +299,16 @@
 
 						scene.objects[i].rotation.z += 0.05;
 
-					scene.objects[i].updateMatrix();
 				}
 
 
-				lightMesh.position.x = 200*Math.cos(r);
-				lightMesh.position.z = 200*Math.sin(r);
-				lightMesh.updateMatrix();
+				lightMesh.position.x = 200 * Math.cos( r );
+				lightMesh.position.z = 200 * Math.sin( r );
 
 				r += 0.1;
 
 				if ( render_canvas ) canvasRenderer.render( scene, camera );
 				if ( render_gl && has_gl ) webglRenderer.render( scene, camera );
-
-				stats.update();
 
 			}
 

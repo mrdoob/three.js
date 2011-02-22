@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - interactive - voxel painter - webgl</title>
+		<title>three.js webgl - interactive - voxel painter</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -10,7 +10,7 @@
 				margin: 0px;
 				overflow: hidden;
 			}
-			
+
 			#oldie { background-color: #ddd !important }
 		</style>
 	</head>
@@ -23,12 +23,13 @@
 		<script type="text/javascript" src="../src/extras/ImageUtils.js"></script>
 		<script type="text/javascript" src="../src/extras/Detector.js"></script>
 
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
 
 			if ( ! THREE.Detector.webgl ) THREE.Detector.addGetWebGLMessage();
-			
+
 			var container, stats;
 			var camera, scene, renderer;
 			var projector, plane, cube;
@@ -36,12 +37,12 @@
 			rollOveredFace, isShiftDown = false,
 			theta = 45, isCtrlDown = false;
 
-			var rollOverMesh, rollOverMaterial, voxelPosition = new THREE.Vector3(), tmpVec = new THREE.Vector3();			
+			var rollOverMesh, rollOverMaterial, voxelPosition = new THREE.Vector3(), tmpVec = new THREE.Vector3();
 			var cubeGeo, cubeMaterial;
 			var i, intersector;
-			
+
 			init();
-			setInterval( loop, 1000 / 60 );
+			animate();
 
 			function init() {
 
@@ -63,20 +64,20 @@
 				scene = new THREE.Scene();
 
 				// roll-over helpers
-				
+
 				rollOverGeo = new Cube( 50, 50, 50 );
 				rollOverMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5 } );
 				rollOverMesh = new THREE.Mesh( rollOverGeo, rollOverMaterial );
 				scene.addObject( rollOverMesh );
-				
+
 
 				// cubes
-				
+
 				cubeGeo = new Cube( 50, 50, 50 );
 				cubeMaterial = new THREE.MeshLambertMaterial( { color: 0x00ff80, opacity: 1, shading: THREE.FlatShading, map: ImageUtils.loadTexture( "textures/square-outline-textured.png" ) } );
 				cubeMaterial.color.setHSV( 0.1, 0.7, 1.0 );
 				// picking
-				
+
 				projector = new THREE.Projector();
 
 				// grid
@@ -125,35 +126,35 @@
 			}
 
 			function getRealIntersector( intersects ) {
-				
+
 				for( i = 0; i < intersects.length; i++ ) {
-				
+
 					intersector = intersects[ i ];
-					
+
 					if ( intersector.object != rollOverMesh ) {
-						
+
 						return intersector;
-						
+
 					}
-				
+
 				}
-				
+
 				return null;
-				
+
 			}
-			
+
 			function setVoxelPosition( intersector ) {
-				
+
 				tmpVec.copy( intersector.face.normal );
-				
-				voxelPosition.add( intersector.point, intersector.object.rotationMatrix.multiplyVector3( tmpVec ) );
-					
+
+				voxelPosition.add( intersector.point, intersector.object.matrixRotation.multiplyVector3( tmpVec ) );
+
 				voxelPosition.x = Math.floor( voxelPosition.x / 50 ) * 50 + 25;
 				voxelPosition.y = Math.floor( voxelPosition.y / 50 ) * 50 + 25;
 				voxelPosition.z = Math.floor( voxelPosition.z / 50 ) * 50 + 25;
 
 			}
-			
+
 			function onDocumentMouseMove( event ) {
 
 				event.preventDefault();
@@ -172,11 +173,11 @@
 				if ( intersects.length > 0 ) {
 
 					intersector = getRealIntersector( intersects );
-					
+
 					// delete cube
-					
+
 					if ( isCtrlDown ) {
-						
+
 						if ( intersector.object != plane ) {
 
 							scene.removeObject( intersector.object );
@@ -185,15 +186,15 @@
 						}
 
 					// create cube
-					
+
 					} else {
 
-						intersector = getRealIntersector( intersects );						
+						intersector = getRealIntersector( intersects );
 						setVoxelPosition( intersector );
 
 						var voxel = new THREE.Mesh( cubeGeo, cubeMaterial );
 						voxel.position.copy( voxelPosition );
-						
+
 						scene.addObject( voxel );
 
 					}
@@ -227,8 +228,19 @@
 				window.open( renderer.domElement.toDataURL('image/png'), 'mywindow' );
 
 			}
-			
-			function loop() {
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
 
 				if ( isShiftDown ) {
 
@@ -245,19 +257,19 @@
 
 					intersector = getRealIntersector( intersects );
 					if ( intersector ) {
-					
-						setVoxelPosition( intersector );					
+
+						setVoxelPosition( intersector );
 						rollOverMesh.position = voxelPosition;
-						
+
 					}
-					
+
 				}
-				
+
 				camera.position.x = 1400 * Math.sin( theta * Math.PI / 360 );
 				camera.position.z = 1400 * Math.cos( theta * Math.PI / 360 );
 
 				renderer.render( scene, camera );
-				stats.update();
+
 			}
 
 		</script>

@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - materials - webgl</title>
+		<title>three.js webgl - materials</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -18,19 +18,21 @@
 		<pre id="log"></pre>
 
 		<script type="text/javascript" src="../build/ThreeExtras.js"></script>
+
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
 
 			if ( ! THREE.Detector.webgl ) THREE.Detector.addGetWebGLMessage();
-			
+
 			var container, stats;
 
 			var camera, scene, renderer, objects;
 			var particleLight, pointLight;
 
 			init();
-			setInterval( loop, 1000 / 60 );
+			animate();
 
 			function init() {
 
@@ -48,9 +50,9 @@
 				var line_material = new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 0.2 } ),
 					geometry = new THREE.Geometry(),
 					floor = -75, step = 25;
-				
+
 				for ( var i = 0; i <= 40; i ++ ) {
-				
+
 					geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( - 500, floor, i * step - 500 ) ) );
 					geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(   500, floor, i * step - 500 ) ) );
 
@@ -58,7 +60,7 @@
 					geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( i * step - 500, floor,  500 ) ) );
 
 				}
-				
+
 				var line = new THREE.Line( geometry, line_material, THREE.LinePieces );
 				scene.addObject( line );
 
@@ -86,7 +88,7 @@
 				var geometry_smooth = new Sphere( 70, 32, 16 );
 				var geometry_flat = new Sphere( 70, 32, 16 );
 				var geometry_pieces = new Sphere( 70, 32, 16 ); // Extra geometry to be broken down for MeshFaceMaterial
-				
+
 				for ( var i = 0, l = geometry_pieces.faces.length; i < l; i ++ ) {
 
 					var face = geometry_pieces.faces[ i ];
@@ -95,20 +97,20 @@
 				}
 
 				geometry_pieces.sortFacesByMaterial();
-				
+
 				materials.push( new THREE.MeshFaceMaterial() );
 
 				objects = [];
 
 				var sphere, geometry, material;
-				
+
 				for ( var i = 0, l = materials.length; i < l; i ++ ) {
-				
+
 					material = materials[ i ];
-					
-					geometry = material instanceof THREE.MeshFaceMaterial ? geometry_pieces : 
+
+					geometry = material instanceof THREE.MeshFaceMaterial ? geometry_pieces :
 							   ( material.shading == THREE.FlatShading ? geometry_flat : geometry_smooth );
-					
+
 					sphere = new THREE.Mesh( geometry, material );
 
 					sphere.position.x = ( i % 4 ) * 200 - 400;
@@ -195,7 +197,16 @@
 
 			//
 
-			function loop() {
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
 
 				var timer = new Date().getTime() * 0.0001;
 
@@ -221,14 +232,13 @@
 
 				renderer.render( scene, camera );
 
-				stats.update();
 			}
-			
+
 			function log( text ) {
-			
+
 				var e = document.getElementById("log");
 				e.innerHTML = text + "<br/>" + e.innerHTML;
-				
+
 			}
 
 		</script>

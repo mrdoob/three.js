@@ -101,6 +101,7 @@
 		<script type="text/javascript" src="../src/extras/ImageUtils.js"></script>
 		<script type="text/javascript" src="../src/extras/ShaderUtils.js"></script>
 
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
@@ -118,12 +119,8 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
-			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-
 			init();
-			// loop();
-			setInterval( loop, 1000 / 60 );
-
+			animate();
 
 			function init() {
 
@@ -212,6 +209,8 @@
 
 				}
 
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
 			}
 
 			function generateTexture( r, g, b ) {
@@ -252,14 +251,23 @@
 
 			}
 
-			function loop() {
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				if ( statsEnabled ) stats.update();
+
+			}
+
+			function render() {
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 
 				renderer.render( scene, camera );
-
-				if ( statsEnabled ) stats.update();
 
 			}
 

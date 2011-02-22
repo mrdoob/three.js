@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - geometry - dynamic - webgl</title>
+		<title>three.js webgl - geometry - dynamic</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -36,27 +36,27 @@
 	</head>
 	<body>
 
-		<div id="container"><br /><br /><br /><br /><br />Generating world...</div> 
-		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - dynamic geometry demo - webgl<br />(left click: forward, right click: backward)</div> 
+		<div id="container"></div>
+		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - dynamic geometry demo - webgl<br />(left click: forward, right click: backward)</div>
 
 		<script type="text/javascript" src="../build/ThreeExtras.js"></script>
+
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
 
 			if ( ! THREE.Detector.webgl ) {
-			
+
 				THREE.Detector.addGetWebGLMessage();
 				document.getElementById( 'container' ).innerHTML = "";
-				
+
 			}
 
-			window.onload = init;
-			
 			var container, stats;
 
 			var camera, scene, renderer;
-			
+
 			var mesh, texture,geometry, material;
 
 			var worldWidth = 128, worldDepth = 128,
@@ -71,6 +71,8 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
+			init();
+			animate();
 
 			function init() {
 
@@ -81,7 +83,7 @@
 
 				scene = new THREE.Scene();
 				scene.fog = new THREE.FogExp2( 0xaaccff, 0.0007 );
-				
+
 				//var light = new THREE.PointLight( 0xffffff, 2 );
 				//light.position.y = 500;
 				//scene.addLight( light );
@@ -92,42 +94,42 @@
 				geometry = new Plane( 20000, 20000, worldWidth - 1, worldDepth - 1 );
 
 				var i, j, il, jl;
-				
+
 				for ( i = 0, il = geometry.vertices.length; i < il; i ++ ) {
 
 					geometry.vertices[ i ].position.z = 35 * Math.sin( i/2 );
 
 				}
-				
+
 				for( i = 0; i < geometry.uvs.length; i++ ) {
-				
+
 					var uvs = geometry.uvs[ i ];
 					for ( j = 0, jl = uvs.length; j < jl; j++ ) {
-					
+
 						uvs[ j ].u *= 5;
 						uvs[ j ].v *= 5;
-						
+
 					}
 
 				}
-				
+
 
 				//console.log( "triangles: " + geometry.faces.length * 2 + " faces: " + geometry.faces.length + " vertices: " + geometry.vertices.length );
-				
+
 				geometry.computeFaceNormals();
 				geometry.computeVertexNormals();
-				
+
 				var texture = ImageUtils.loadTexture( "textures/water.jpg" );
 				texture.wrap_s = texture.wrap_t = THREE.RepeatWrapping;
 				material = new THREE.MeshBasicMaterial( { color:0x0044ff, opacity:1, map: texture } );
-				
+
 				mesh = new THREE.Mesh( geometry, material );
 				mesh.rotation.x = - 90 * Math.PI / 180;
 				scene.addObject( mesh );
 
 				renderer = new THREE.WebGLRenderer( { clearColor:0xaaccff, clearAlpha: 1 } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				
+
 				container.innerHTML = "";
 
 				container.appendChild( renderer.domElement );
@@ -141,11 +143,9 @@
 				document.addEventListener( 'mouseup', onDocumentMouseUp, false );
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.addEventListener( 'contextmenu', function ( event ) { event.preventDefault(); }, false );
-				
+
 				document.addEventListener( 'keydown', onDocumentKeyDown, false );
 				document.addEventListener( 'keyup', onDocumentKeyUp, false );
-				
-				loop();
 
 			}
 
@@ -184,7 +184,7 @@
 				mouseY = event.clientY - windowHalfY;
 
 			}
-			
+
 			function onDocumentKeyDown( event ) {
 
 				switch( event.keyCode ) {
@@ -222,13 +222,22 @@
 				}
 
 			}
-			
-			function loop() {
-			
-				requestAnimationFrame( loop, renderer.domElement );
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
 
 				var time = new Date().getTime() * 0.01;
-				
+
 				if ( moveForward ) camera.translateZ( - 10 );
 				if ( moveBackward ) camera.translateZ( 10 );
 				if ( moveLeft )     camera.translateX( - 10 );
@@ -257,12 +266,10 @@
 
 				mesh.geometry.__dirtyVertices = true;
 				//mesh.geometry.__dirtyNormals = true;
-				
-				renderer.render(scene, camera);
-				
-				stats.update();
 
-			}			
+				renderer.render(scene, camera);
+
+			}
 
 		</script>
 

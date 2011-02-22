@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - lines - cubes - webgl</title>
+		<title>three.js webgl - lines - cubes</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -13,7 +13,7 @@
 			a {
 				color:#0078ff;
 			}
-			
+
 			#info {
 				position: absolute;
 				top: 10px; width: 100%;
@@ -24,7 +24,7 @@
 				text-align: center;
 				z-index:100;
 			}
-			
+
 			a {
 				color: orange;
 				text-decoration: none;
@@ -33,33 +33,34 @@
 			a:hover {
 				color: #0080ff;
 			}
-			
+
 		</style>
 	</head>
 	<body>
-	
+
 		<div id="info">
-			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - lines WebGL demo 
+			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - lines WebGL demo
 			[<a href="http://en.wikipedia.org/wiki/Hilbert_curve">Hilbert curve</a> thanks to <a href="http://www.openprocessing.org/visuals/?visualID=15599">Thomas Diewald</a>]
 		</div>
 
 		<script type="text/javascript" src="../build/ThreeExtras.js"></script>
+
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
-		
+
 			if ( ! THREE.Detector.webgl ) THREE.Detector.addGetWebGLMessage();
 
-			window.onload = init;
-			
 			var mouseX = 0, mouseY = 0,
 
 			windowHalfX = window.innerWidth / 2,
 			windowHalfY = window.innerHeight / 2,
 
-			camera, scene, renderer,
+			camera, scene, renderer;
 
-			stats;
+			init();
+			animate();
 
 			function init() {
 
@@ -81,11 +82,11 @@
 					points = hilbert3D( new THREE.Vector3( 0,0,0 ), 200.0, 4, 0, 1, 2, 3, 4, 5, 6, 7 );
 
 				for ( i = 0; i < points.length; i ++ ) {
-				
+
 					geometry.vertices.push( new THREE.Vertex( points[i] ) );
-				
+
 				}
-				
+
 
 				// lines
 
@@ -96,14 +97,14 @@
 					parameters = [ [ m3, scale*0.5, [0,0,0],  g1 ], [ m2, scale*0.5, [d, 0, 0],  g1 ], [ m2, scale*0.5, [-d, 0, 0],  g1 ],
 								   [ m2, scale*0.5, [0,d,0],  g1 ], [ m2, scale*0.5, [d, d, 0],  g1 ], [ m2, scale*0.5, [-d, d, 0],  g1 ],
 								   [ m2, scale*0.5, [0,-d,0], g1 ], [ m2, scale*0.5, [d, -d, 0], g1 ], [ m2, scale*0.5, [-d, -d, 0], g1 ],
-								   
+
 								   [ m1, scale*0.5, [2*d, 0, 0],  g1 ], [ m1, scale*0.5, [-2*d, 0, 0],  g1 ],
 								   [ m1, scale*0.5, [2*d, d, 0],  g1 ], [ m1, scale*0.5, [-2*d, d, 0],  g1 ],
 								   [ m1, scale*0.5, [2*d, -d, 0], g1 ], [ m1, scale*0.5, [-2*d, -d, 0], g1 ],
 								   ];
-				
+
 				for ( i = 0; i < parameters.length; ++i ) {
-				
+
 					p = parameters[ i ];
 					line = new THREE.Line( p[ 3 ],  p[ 0 ] );
 					line.scale.x = line.scale.y = line.scale.z =  p[ 1 ];
@@ -111,33 +112,24 @@
 					line.position.y = p[ 2 ][ 1 ];
 					line.position.z = p[ 2 ][ 2 ];
 					scene.addObject( line );
-					
-				}
 
-				/*
-				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild(stats.domElement);
-				*/
+				}
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
-				
-				loop();
-				
+
 			}
 
 			// port of Processing Java code by Thomas Diewald
 			// http://www.openprocessing.org/visuals/?visualID=15599
-			
+
 			function hilbert3D( center, side, iterations, v0, v1, v2, v3, v4, v5, v6, v7 ) {
-			
+
 				var half = side/2,
-					
+
 					vec_s = [
-			  
+
 					new THREE.Vector3( center.x - half, center.y + half, center.z - half ),
 					new THREE.Vector3( center.x - half, center.y + half, center.z + half ),
 					new THREE.Vector3( center.x - half, center.y - half, center.z + half ),
@@ -146,31 +138,31 @@
 					new THREE.Vector3( center.x + half, center.y - half, center.z + half ),
 					new THREE.Vector3( center.x + half, center.y + half, center.z + half ),
 					new THREE.Vector3( center.x + half, center.y + half, center.z - half )
-				
+
 					],
-  
+
 					vec = [ vec_s[ v0 ], vec_s[ v1 ], vec_s[ v2 ], vec_s[ v3 ], vec_s[ v4 ], vec_s[ v5 ], vec_s[ v6 ], vec_s[ v7 ] ];
 
 				if( --iterations >= 0 ) {
-			
+
 					var tmp = [];
-					
+
 					tmp = tmp.concat( hilbert3D ( vec[ 0 ], half, iterations, v0, v3, v4, v7, v6, v5, v2, v1 ) );
 					tmp = tmp.concat( hilbert3D ( vec[ 1 ], half, iterations, v0, v7, v6, v1, v2, v5, v4, v3 ) );
-					tmp = tmp.concat( hilbert3D ( vec[ 2 ], half, iterations, v0, v7, v6, v1, v2, v5, v4, v3 ) ); 
+					tmp = tmp.concat( hilbert3D ( vec[ 2 ], half, iterations, v0, v7, v6, v1, v2, v5, v4, v3 ) );
 					tmp = tmp.concat( hilbert3D ( vec[ 3 ], half, iterations, v2, v3, v0, v1, v6, v7, v4, v5 ) );
-					tmp = tmp.concat( hilbert3D ( vec[ 4 ], half, iterations, v2, v3, v0, v1, v6, v7, v4, v5 ) ); 
+					tmp = tmp.concat( hilbert3D ( vec[ 4 ], half, iterations, v2, v3, v0, v1, v6, v7, v4, v5 ) );
 					tmp = tmp.concat( hilbert3D ( vec[ 5 ], half, iterations, v4, v3, v2, v5, v6, v1, v0, v7 ) );
 					tmp = tmp.concat( hilbert3D ( vec[ 6 ], half, iterations, v4, v3, v2, v5, v6, v1, v0, v7 ) );
 					tmp = tmp.concat( hilbert3D ( vec[ 7 ], half, iterations, v6, v5, v2, v1, v0, v3, v4, v7 ) );
-					
+
 					return tmp;
-					
+
 				}
-			
+
 				return vec;
 			}
-			
+
 			//
 
 			function onDocumentMouseMove(event) {
@@ -203,25 +195,30 @@
 
 			//
 
-			function loop() {
+			function animate() {
 
-				requestAnimationFrame( loop, renderer.domElement );
-				
+				requestAnimationFrame( animate );
+
+				render();
+
+			}
+
+			function render() {
+
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY + 200 - camera.position.y ) * .05;
 				camera.updateMatrix();
 
 				var time = new Date().getTime() * 0.0015;
-				
-				for( var i = 0; i<scene.objects.length; i++ ) {
-				
-					scene.objects[i].rotation.y = time * ( i % 2 ? 1 : -1);
-					
+
+				for( var i = 0; i < scene.objects.length; i++ ) {
+
+					scene.objects[ i ].rotation.y = time * ( i % 2 ? 1 : -1);
+
 				}
 
-				renderer.render(scene, camera);
+				renderer.render( scene, camera );
 
-				//stats.update();
 			}
 
 		</script>

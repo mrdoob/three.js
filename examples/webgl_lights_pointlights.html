@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - lights - point lights - webgl</title>
+		<title>three.js webl - lights - point lights</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -28,39 +28,40 @@
 			a:hover {
 				color: #0080ff;
 			}
-			
+
 			#log { color:#fff; position:absolute; top:50px; text-align:left; display:block; z-index:100; pointer-events:none; }
 		</style>
 	</head>
 	<body>
 
 		<pre id="log"></pre>
-		
+
 		<div id="container"></div>
 		<div id="info">
 			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - point lights WebGL demo.<br />
 			Walt Disney head by <a href="http://www.davidoreilly.com/2009/01/walt-disneys-head-on-a-plate" target="_blank">David OReilly</a>
 		</div>
 
-		<script type="text/javascript" src="../build/Three.js"></script> 
+		<script type="text/javascript" src="../build/Three.js"></script>
 
 		<script type="text/javascript" src="../src/extras/io/Loader.js"></script>
 		<script type="text/javascript" src="../src/extras/primitives/Sphere.js"></script>
 		<script type="text/javascript" src="../src/extras/Detector.js"></script>
 
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
 
 			if ( ! THREE.Detector.webgl ) THREE.Detector.addGetWebGLMessage();
-			
+
 			var camera, scene, renderer,
 			particle1, particle2, particle2,
 			light1, light2, light3,
 			object,loader;
 
 			init();
-			setInterval( loop, 1000 / 60 );
+			animate();
 
 			function init() {
 
@@ -73,21 +74,21 @@
 
 				loader = new THREE.Loader( true );
 				document.body.appendChild( loader.statusDomElement );
-				
+
 				var callback = function( geometry ) {
-				
+
 					object = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( { ambient: 0x555555, color: 0x555555, specular: 0xffffff, shininess: 50, shading: THREE.SmoothShading }  )  );
 					object.scale.x = object.scale.y = object.scale.z = 0.80;
 					object.overdraw = true;
 					scene.addObject( object );
-					
+
 					loader.statusDomElement.style.display = "none";
-					
+
 				};
-				
+
 				//loader.loadAscii( { model: "obj/walt/WaltHead_slim.js", callback: callback } );
 				loader.loadBinary( { model: "obj/walt/WaltHead_bin.js", callback: callback } );
-				
+
 				/*
 				var directionalLight = new THREE.DirectionalLight( 0x111111, 0.9 );
 				directionalLight.position.x = 1;
@@ -96,7 +97,7 @@
 				directionalLight.position.normalize();
 				scene.addLight( directionalLight );
 				*/
-				
+
 				scene.addLight( new THREE.AmbientLight( 0x00000 ) );
 
 				light1 = new THREE.PointLight( 0xff0040 );
@@ -109,23 +110,23 @@
 				scene.addLight( light3 );
 
 				var sphere = new Sphere( 0.5, 16, 8 );
-				
+
 				var l1 = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xff0040 } ) );
 				l1.position = light1.position;
 				scene.addObject( l1 );
-				
+
 				var l2 = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0x0040ff } ) );
 				l2.position = light2.position;
 				scene.addObject( l2 );
-	 
+
 				var l3 = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0x80ff80 } ) );
 				l3.position = light3.position;
 				scene.addObject( l3 );
- 
+
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
-				
+
 				/*
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
@@ -136,7 +137,17 @@
 
 			}
 
-			function loop() {
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+
+			}
+
+			function render() {
 
 				var time = new Date().getTime() * 0.0005;
 
@@ -154,17 +165,15 @@
 				light3.position.y = Math.cos( time * 0.3 ) * 40;
 				light3.position.z = Math.sin( time * 0.5 ) * 30;
 
-				renderer.render(scene, camera);
-				
-				//stats.update();
+				renderer.render( scene, camera );
 
 			}
-			
+
 			function log( text ) {
-			
+
 				var e = document.getElementById("log");
 				e.innerHTML = text + "<br/>" + e.innerHTML;
-				
+
 			}
 
 		</script>

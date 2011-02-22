@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - materials - grass - webgl</title>
+		<title>three.js webgl - materials - grass</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -21,15 +21,17 @@
 		<script type="text/javascript" src="../src/extras/primitives/Plane.js"></script>
 		<script type="text/javascript" src="../src/extras/Detector.js"></script>
 
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
+
 		<script type="text/javascript">
 
 			if ( ! THREE.Detector.webgl ) THREE.Detector.addGetWebGLMessage();
-			
+
 			var camera, scene, renderer,
 			mesh, levels = [];
 
 			init();
-			setInterval( loop, 1000 / 60 );
+			animate();
 
 			function init() {
 
@@ -99,7 +101,17 @@
 
 			}
 
-			function loop() {
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+
+			}
+
+			function render() {
 
 				var time = new Date().getTime() / 6000;
 

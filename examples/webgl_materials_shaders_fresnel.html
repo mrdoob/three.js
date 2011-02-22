@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - materials - shaders [Fresnel] - webgl</title>
+		<title>three.js webgl - materials - shaders [Fresnel]</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -27,19 +27,21 @@
 				color: #ffffff;
 			}
 			#log { position:absolute; top:50px; text-align:left; display:block; z-index:100 }
-			
+
 			#oldie a { color:#0b0 }
 		</style>
 	</head>
 
 	<body>
 		<pre id="log"></pre>
-		
+
 		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl cube Fresnel shader demo. texture by <a href="http://www.humus.name/index.php?page=Textures" target="_blank">Humus</a> </div>
 
-		<script type="text/javascript" src="../build/ThreeExtras.js"></script> 
+		<script type="text/javascript" src="../build/ThreeExtras.js"></script>
+
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
-		
+
 		<script type="text/javascript">
 
 			if ( ! THREE.Detector.webgl ) THREE.Detector.addGetWebGLMessage();
@@ -55,8 +57,7 @@
 
 			var directionalLight, pointLight;
 
-			var mouseX = 0;
-			var mouseY = 0;
+			var mouseX = 0, mouseY = 0;
 
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
@@ -64,7 +65,7 @@
 			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
 			init();
-			setInterval( loop, 1000 / 60 );
+			animate();
 
 			function init() {
 
@@ -142,7 +143,18 @@
 
 			}
 
-			function loop() {
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				if ( statsEnabled ) stats.update();
+
+			}
+
+			function render() {
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
@@ -154,8 +166,6 @@
 				webglRenderer.clear();
 				webglRenderer.render( sceneCube, cameraCube );
 				webglRenderer.render( scene, camera );
-
-				if ( statsEnabled ) stats.update();
 
 			}
 

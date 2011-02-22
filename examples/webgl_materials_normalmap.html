@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - materials - normal map - webgl</title>
+		<title>three.js webgl - materials - normal map</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -23,29 +23,29 @@
 				font-family:Monospace;
 				font-size:13px;
 				text-align:center;
-				z-index:1000; 
+				z-index:1000;
 			}
-			
+
 			#oldie {
 				background:rgb(200,100,0) !important;
-				color:#fff;				
+				color:#fff;
 			}
-			
-			#vt { display:none } 
+
+			#vt { display:none }
 			#vt, #vt a { color:orange; }
 			.code { }
-			
+
 			#log { position:absolute; top:50px; text-align:left; display:block; z-index:100 }
 		</style>
 	</head>
 
 	<body>
 		<pre id="log"></pre>
-		
+
 		<div id="info">
-			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl (<span id="description">normal + ao + displacement</span>) map demo. 
+			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl (<span id="description">normal + ao + displacement</span>) map demo.
 			ninja head from <a href="http://developer.amd.com/archive/gpu/MeshMapper/pages/default.aspx" target="_blank">AMD GPU MeshMapper</a>
-			
+
 			<div id="vt">displacement mapping needs vertex textures (GPU with Shader Model 3.0)<br/>
 			on Windows use <span class="code">Chrome --use-gl=desktop</span> <br/>
 			or Firefox 4 (about:config => webgl.mochitest_native_gl=true)<br/>
@@ -53,13 +53,15 @@
 			</div>
 		</div>
 
-		<script type="text/javascript" src="../build/ThreeExtras.js"></script> 
+		<script type="text/javascript" src="../build/ThreeExtras.js"></script>
+
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
-		
+
 		<script type="text/javascript">
 
 			if ( ! THREE.Detector.webgl ) THREE.Detector.addGetWebGLMessage();
-			
+
 			var statsEnabled = true;
 
 			var container, stats, loader;
@@ -68,7 +70,7 @@
 
 			var mesh, zmesh, lightMesh, geometry;
 			var mesh1, mesh2;
-	
+
 			var directionalLight, pointLight, ambientLight;
 
 			var mouseX = 0;
@@ -82,7 +84,7 @@
 			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
 			init();
-			setInterval( loop, 1000 / 60 );
+			animate();
 
 			function init() {
 
@@ -112,7 +114,7 @@
 				scene.addLight( directionalLight );
 
 				// light representation
-				
+
 				var sphere = new Sphere( 100, 16, 8 );
 				lightMesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color:0xffaa00 } ) );
 				lightMesh.position = pointLight.position;
@@ -120,36 +122,36 @@
 				scene.addObject(lightMesh);
 
 				// common material parameters
-				
+
 				var ambient = 0x050505, diffuse = 0x555555, specular = 0xaa6600, shininess = 10, scale = 23;
 
 				// normal map shader
-				
+
 				var shader = ShaderUtils.lib[ "normal" ];
 				var uniforms = Uniforms.clone( shader.uniforms );
 
 				uniforms[ "enableAO" ].value = true;
 				uniforms[ "enableDiffuse" ].value = false;
-				
+
 				uniforms[ "tNormal" ].texture = ImageUtils.loadTexture( "textures/normal/ninja/normal.jpg" );
 				uniforms[ "tAO" ].texture = ImageUtils.loadTexture( "textures/normal/ninja/ao.jpg" );
-				
+
 				uniforms[ "tDisplacement" ].texture = ImageUtils.loadTexture( "textures/normal/ninja/displacement.jpg" );
 				uniforms[ "uDisplacementBias" ].value = -0.428408 * scale;
 				uniforms[ "uDisplacementScale" ].value = 2.436143 * scale;
-				
+
 				uniforms[ "uPointLightPos" ].value = pointLight.position;
 				uniforms[ "uPointLightColor" ].value = pointLight.color;
 
 				uniforms[ "uDirLightPos" ].value = directionalLight.position;
 				uniforms[ "uDirLightColor" ].value = directionalLight.color;
-				
+
 				uniforms[ "uAmbientLightColor" ].value = ambientLight.color;
-				
+
 				uniforms[ "uDiffuseColor" ].value.setHex( diffuse );
 				uniforms[ "uSpecularColor" ].value.setHex( specular );
 				uniforms[ "uAmbientColor" ].value.setHex( ambient );
-				
+
 				uniforms[ "uShininess" ].value = shininess;
 
 				var parameters = { fragment_shader: shader.fragment_shader, vertex_shader: shader.vertex_shader, uniforms: uniforms };
@@ -159,7 +161,7 @@
 
 				loader = new THREE.Loader( true );
 				document.body.appendChild( loader.statusDomElement );
-				
+
 				loader.loadBinary( { model: "obj/ninja/NinjaLo_bin.js", callback: function( geometry ) { createScene( geometry, scale, material1, material2 ) } } );
 
 				webglRenderer = new THREE.WebGLRenderer();
@@ -169,7 +171,7 @@
 				var description = "normal + ao" + ( webglRenderer.supportsVertexTextures() ? " + displacement" : " + <strike>displacement</strike>" );
 				document.getElementById( "description" ).innerHTML = description;
 				document.getElementById( "vt" ).style.display = webglRenderer.supportsVertexTextures() ? "none" : "block";
-				
+
 				if ( statsEnabled ) {
 
 					stats = new Stats();
@@ -183,49 +185,58 @@
 			}
 
 			function createScene( geometry, scale, material1, material2 ) {
-				
+
 				geometry.computeTangents();
-				
+
 				mesh1 = SceneUtils.addMesh( scene, geometry, scale, -scale * 12, 0, 0, 0,0,0, material1 );
 				mesh2 = SceneUtils.addMesh( scene, geometry, scale,  scale * 12, 0, 0, 0,0,0, material2 );
-				
+
 				loader.statusDomElement.style.display = "none";
-				
+
 			}
-			
+
 			function onDocumentMouseMove(event) {
 
 				mouseX = ( event.clientX - windowHalfX ) * 10;
 				mouseY = ( event.clientY - windowHalfY ) * 10;
 
 			}
-			
-			function loop() {
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				if ( statsEnabled ) stats.update();
+
+			}
+
+			function render() {
 
 				var ry = mouseX * 0.0003, rx = mouseY * 0.0003;
-				
+
 				if( mesh1 ) {
-				
+
 					mesh1.rotation.y = ry;
 					mesh1.rotation.x = rx;
-					
+
 				}
-				
+
 				if( mesh2 ) {
-					
+
 					mesh2.rotation.y = ry;
 					mesh2.rotation.x = rx;
-					
+
 				}
-				
+
 				lightMesh.position.x = 2500 * Math.cos( r );
 				lightMesh.position.z = 2500 * Math.sin( r );
 
 				r += 0.01;
 
 				webglRenderer.render( scene, camera );
-
-				if ( statsEnabled ) stats.update();
 
 			}
 
@@ -235,7 +246,7 @@
 				e.innerHTML = text + "<br/>" + e.innerHTML;
 
 			}
-			
+
 
 		</script>
 

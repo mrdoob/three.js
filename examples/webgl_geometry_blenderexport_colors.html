@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - io - blender - vertex colors - webgl</title>
+		<title>three.js webgl - io blender - vertex colors</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -30,17 +30,17 @@
 	</head>
 	<body>
 
-		<div id="container"></div> 
-		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - vertex colors - blender export - webgl</div>
+		<div id="container"></div>
+		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> webgl - io blender - vertex colors</div>
 
 		<script type="text/javascript" src="../build/ThreeExtras.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>		
-		
+
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
+		<script type="text/javascript" src="js/Stats.js"></script>
+
 		<script type="text/javascript">
 
 			if ( ! THREE.Detector.webgl ) THREE.Detector.addGetWebGLMessage();
-			
-			window.onload = init;
 
 			var container, stats;
 
@@ -53,6 +53,8 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
+			init();
+			animate();
 
 			function init() {
 
@@ -62,9 +64,9 @@
 				camera.position.z = 1800;
 
 				scene = new THREE.Scene();
-				
+
 				//scene.addLight( new THREE.AmbientLight( 0x333333 )  );
-				
+
 				light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0, 0, 1 );
 				light.position.normalize();
@@ -72,7 +74,7 @@
 
 				var loader = new THREE.Loader();
 				loader.loadAscii( { model: "obj/cubecolors/cubecolors.js", callback: createScene } );
-				
+
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -84,22 +86,19 @@
 				container.appendChild( stats.domElement );
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-				
-				loop();
 
 			}
 
 			function createScene( geometry ) {
-			
+
 				geometry.materials[0][0].shading = THREE.FlatShading;
-				
-				var material = [ new THREE.MeshFaceMaterial(), 
-								 new THREE.MeshLambertMaterial( { color: 0xffffff, opacity:0.9, shading:THREE.FlatShading, wireframe: true, wireframe_linewidth: 2 } )  
-								];
+
+				var material = [ new THREE.MeshFaceMaterial(), new THREE.MeshLambertMaterial( { color: 0xffffff, opacity:0.9, shading:THREE.FlatShading, wireframe: true, wireframe_linewidth: 2 } ) ];
+
 				mesh = SceneUtils.addMesh( scene, geometry, 250, 0, 0, 0, 0, 0, 0, material );
-				
+
 			}
-			
+
 			function onDocumentMouseMove( event ) {
 
 				mouseX = ( event.clientX - windowHalfX );
@@ -107,22 +106,30 @@
 
 			}
 
-			function loop() {
+			//
 
-				requestAnimationFrame( loop, renderer.domElement );
-				
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
 				camera.position.x += ( mouseX - camera.position.x ) * 0.05;
 				camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
 
 				if ( mesh ) {
-				
+
 					mesh.rotation.x += 0.01;
 					mesh.rotation.y += 0.01;
-					
+
 				}
-				
+
 				renderer.render( scene, camera );
-				stats.update();
 
 			}
 
