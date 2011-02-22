@@ -6,6 +6,8 @@
 
 THREE.Texture = function ( image, mapping, wrap_s, wrap_t, mag_filter, min_filter ) {
 
+	if ( image.getContext ) image.loaded = true;
+
 	this.image = image;
 
 	this.mapping = mapping !== undefined ? mapping : new THREE.UVMapping();
