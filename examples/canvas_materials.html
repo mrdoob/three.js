@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - materials</title>
+		<title>three.js canvas - materials</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -15,10 +15,10 @@
 	<body>
 
 		<script type="text/javascript" src="../build/Three.js"></script>
-
 		<script type="text/javascript" src="../src/extras/primitives/Sphere.js"></script>
 		<script type="text/javascript" src="../src/extras/ImageUtils.js"></script>
 
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
@@ -29,8 +29,7 @@
 			var particleLight, pointLight;
 
 			init();
-			// loop();
-			setInterval( loop, 1000 / 60 );
+			animate();
 
 			function init() {
 
@@ -172,7 +171,16 @@
 
 			//
 
-			function loop() {
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
 
 				var timer = new Date().getTime() * 0.0001;
 
@@ -198,7 +206,6 @@
 
 				renderer.render( scene, camera );
 
-				stats.update();
 			}
 
 		</script>

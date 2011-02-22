@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - geometry - cube</title>
+		<title>three.js canvas - geometry - cube</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
 		<style type="text/css">
@@ -171,8 +171,8 @@
 
 			function render() {
 
-				plane.rotation.y = cube.rotation.y += ( targetRotation - cube.rotation.y ) * 0.05;
-				renderer.render(scene, camera);
+				plane.rotation.z = cube.rotation.y += ( targetRotation - cube.rotation.y ) * 0.05;
+				renderer.render( scene, camera );
 
 			}
 

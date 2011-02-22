@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - materials - cube refraction [balls] - webgl</title>
+		<title>three.js webgl - materials - cube refraction [balls]</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -26,7 +26,7 @@
 			a {
 				color: #ffffff;
 			}
-			
+
 			#oldie a { color:#da0 }
 		</style>
 	</head>
@@ -35,12 +35,14 @@
 		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl cube refraction demo. skybox by <a href="http://www.zfight.com/" target="_blank">Jochum Skoglund</a></div>
 
 		<script type="text/javascript" src="../build/ThreeExtras.js"></script>
+
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
 
 			if ( ! THREE.Detector.webgl ) THREE.Detector.addGetWebGLMessage();
-			
+
 			var statsEnabled = false;
 
 			var container, stats;
@@ -61,7 +63,7 @@
 			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
 			init();
-			setInterval( loop, 1000 / 60 );
+			animate();
 
 			function init() {
 
@@ -129,7 +131,18 @@
 
 			}
 
-			function loop() {
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				if ( statsEnabled ) stats.update();
+
+			}
+
+			function render() {
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
@@ -141,8 +154,6 @@
 				webglRenderer.clear();
 				webglRenderer.render( sceneCube, cameraCube );
 				webglRenderer.render( scene, camera );
-
-				if ( statsEnabled ) stats.update();
 
 			}
 

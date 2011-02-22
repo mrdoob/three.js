@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - materials - cube reflection [Escher] - webgl</title>
+		<title>three.js webgl - materials - cube reflection [Escher]</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -14,11 +14,10 @@
 				text-align:center;
 			}
 			a {	color: #ff0080;	text-decoration: none; }
-			a:hover { color: #0080ff; }			
+			a:hover { color: #0080ff; }
 			#log { position:absolute; top:50px; text-align:left; display:block; z-index:100; pointer-events:none; }
 			#d { text-align:center; margin:1em auto -9.0em; z-index:1000; position:relative; display:block; 
 				 background:rgba(0,0,0,0.75); padding:0.25em; width:300px; border-radius:10px; -webkit-box-shadow: 0px 0px 10px rgba(0,0,0,0.5) }
-				 
 			#oldie { margin-top:15em !important }
 		</style>
 	</head>
@@ -33,12 +32,14 @@
 		<pre id="log"></pre>
 
 		<script type="text/javascript" src="../build/ThreeExtras.js"></script>
+
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
 
 			if ( ! THREE.Detector.webgl ) THREE.Detector.addGetWebGLMessage();
-			
+
 			var statsEnabled = false;
 
 			var container, stats;
@@ -58,7 +59,7 @@
 			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
 			init();
-			setInterval( loop, 1000 / 60 );
+			animate();
 
 			function init() {
 
@@ -114,14 +115,23 @@
 
 			}
 
-			function loop() {
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				if ( statsEnabled ) stats.update();
+
+			}
+
+			function render() {
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 
 				webglRenderer.render( scene, camera );
-
-				if ( statsEnabled ) stats.update();
 
 			}
 

@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - materials - cube reflection [cars] - webgl</title>
+		<title>three.js webgl - materials - cube reflection [cars]</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -27,7 +27,7 @@
 			#car_info { text-align:center; }
 			#car_name { font-size:1em }
 			#car_author { font-size:1em }
-			
+
 			#oldie { background:rgb(50,0,0) !important; color:#fff !important; margin-top:7em!important }
 		</style>
 	</head>
@@ -57,12 +57,14 @@
 		<div id="log"></div>
 
 		<script type="text/javascript" src="../build/ThreeExtras.js"></script>
+
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
 
 			if ( ! THREE.Detector.webgl ) THREE.Detector.addGetWebGLMessage();
-			
+
 			var STATS_ENABLED = false;
 
 			var CARS = {
@@ -150,12 +152,9 @@
 
 			var loader = new THREE.Loader( true );
 			document.body.appendChild( loader.statusDomElement );
-			
-			document.addEventListener('mousemove', onDocumentMouseMove, false);
 
 			init();
-
-			setInterval(loop, 1000/60);
+			animate();
 
 			function init() {
 
@@ -213,6 +212,8 @@
 					container.appendChild( stats.domElement );
 
 				}
+
+				document.addEventListener('mousemove', onDocumentMouseMove, false);
 
 				var r = "textures/cube/Bridge2/";
 				var urls = [ r + "posx.jpg", r + "negx.jpg",
@@ -569,16 +570,24 @@
 
 			}
 
-			var r = 0;
+			//
 
-			function loop() {
+			function animate() {
 
-				r -= 0.005;
+				requestAnimationFrame( animate );
+
+				render();
+
+			}
+
+			function render() {
+
+				var timer = - new Date().getTime() * 0.0002;
 
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 
-				camera.position.x = 1000 * Math.cos( r );
-				camera.position.z = 1000 * Math.sin( r );
+				camera.position.x = 1000 * Math.cos( timer );
+				camera.position.z = 1000 * Math.sin( timer );
 
 				cameraCube.target.position.x = - camera.position.x;
 				cameraCube.target.position.y = - camera.position.y;

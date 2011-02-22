@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - materials - cube reflection / refraction [Walt] - webgl</title>
+		<title>three.js webgl - materials - cube reflection / refraction [Walt]</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -21,7 +21,7 @@
 			#d { text-align:center; margin:1em 0 -7.5em 0; z-index:1000; position:relative; display:block }
 			.button { background:orange; color:#fff; padding:0.2em 0.5em; cursor:pointer }
 			.inactive { background:#999; color:#eee }
-			
+
 			#oldie { margin-top:11em !important }
 		</style>
 	</head>
@@ -37,12 +37,14 @@
 		<pre id="log"></pre>
 
 		<script type="text/javascript" src="../build/ThreeExtras.js"></script>
+
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
 
 			if ( ! THREE.Detector.webgl ) THREE.Detector.addGetWebGLMessage();
-			
+
 			var container, stats;
 
 			var camera, scene, webglRenderer;
@@ -51,7 +53,7 @@
 			var mesh, zmesh, lightMesh, geometry;
 
 			var loader;
-			
+
 			var directionalLight, pointLight;
 
 			var mouseX = 0;
@@ -63,7 +65,7 @@
 			document.addEventListener('mousemove', onDocumentMouseMove, false);
 
 			init();
-			setInterval( loop, 1000 / 60 );
+			animate();
 
 			function init() {
 
@@ -105,7 +107,7 @@
 
 				var reflectionCube = new THREE.Texture( images );
 				var refractionCube = new THREE.Texture( images, new THREE.CubeRefractionMapping() );
-				
+
 				//var cubeMaterial3 = new THREE.MeshPhongMaterial( { color: 0x000000, specular:0xaa0000, env_map: new THREE.TextureCube( images ), combine: THREE.MixOperation, reflectivity: 0.25 } );
 				var cubeMaterial3 = new THREE.MeshLambertMaterial( { color: 0xff6600, env_map: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3 } );
 				var cubeMaterial2 = new THREE.MeshLambertMaterial( { color: 0xffee00, env_map: refractionCube, refraction_ratio: 0.95 } );
@@ -114,7 +116,7 @@
 				//SceneUtils.addPanoramaCubePlanes( sceneCube, 100000, images );
 				//SceneUtils.addPanoramaCube( sceneCube, 100000, images );
 				SceneUtils.addPanoramaCubeWebGL( sceneCube, 100000, reflectionCube );
-				
+
 				webglRenderer = new THREE.WebGLRenderer();
 				webglRenderer.setSize( window.innerWidth, window.innerHeight );
 				webglRenderer.autoClear = false;
@@ -129,7 +131,7 @@
 
 				loader = new THREE.Loader( true );
 				document.body.appendChild( loader.statusDomElement );
-				
+
 				loader.loadBinary( { model: "obj/walt/WaltHead_bin.js", callback: function( geometry ) { createScene( geometry, cubeMaterial1, cubeMaterial2, cubeMaterial3 ) } } );
 
 			}
@@ -141,7 +143,7 @@
 				SceneUtils.addMesh( scene, geometry, s,      0, 0, -100, 0,0,0, m1 );
 				SceneUtils.addMesh( scene, geometry, s,   -900, 0, -100, 0,0,0, m2 );
 				SceneUtils.addMesh( scene, geometry, s,    900, 0, -100, 0,0,0, m3 );
-				
+
 				loader.statusDomElement.style.display = "none";
 
 			}
@@ -153,9 +155,20 @@
 
 			}
 
-			var r = 0;
+			//
 
-			function loop() {
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				var timer = - new Date().getTime() * 0.0002;
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
@@ -165,10 +178,8 @@
 				cameraCube.target.position.z = - camera.position.z;
 
 
-				lightMesh.position.x = 1500 * Math.cos( r );
-				lightMesh.position.z = 1500 * Math.sin( r );
-
-				r += 0.01;
+				lightMesh.position.x = 1500 * Math.cos( timer );
+				lightMesh.position.z = 1500 * Math.sin( timer );
 
 				webglRenderer.clear();
 				webglRenderer.render( sceneCube, cameraCube );

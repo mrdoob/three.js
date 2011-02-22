@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - geometry - terrain 2 - webgl</title>
+		<title>three.js webgl - geometry - terrain 2</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -30,24 +30,26 @@
 	</head>
 	<body>
 
-		<div id="container"><br /><br /><br /><br /><br />Generating world...</div> 
-		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl terrain demo<br />(left click: forward, right click: backward)</div> 
-
-		<script type="text/javascript" src="js/Stats.js"></script>
-		<script type="text/javascript" src="js/PRNG.js"></script>
-		<script type="text/javascript" src="js/SimplexNoise.js"></script>
+		<div id="container"><br /><br /><br /><br /><br />Generating world...</div>
+		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl terrain demo<br />(left click: forward, right click: backward)</div>
 
 		<script type="text/javascript" src="../build/Three.js"></script>
 		<script type="text/javascript" src="../src/extras/primitives/Plane.js"></script>
 		<script type="text/javascript" src="../src/extras/Detector.js"></script>
 
+		<script type="text/javascript" src="js/PRNG.js"></script>
+		<script type="text/javascript" src="js/SimplexNoise.js"></script>
+
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
+		<script type="text/javascript" src="js/Stats.js"></script>
+
 		<script type="text/javascript">
 
 			if ( ! THREE.Detector.webgl ) {
-				
+
 				THREE.Detector.addGetWebGLMessage();
 				document.getElementById( 'container' ).innerHTML = "";
-				
+
 			}
 
 			var container, stats;
@@ -68,10 +70,8 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
-
 			init();
-			setInterval( loop, 1000 / 60 );
-
+			animate();
 
 			function init() {
 
@@ -328,7 +328,18 @@
 
 			}
 
-			function loop() {
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
 
 				if ( moveForward ) camera.translateZ( - 10 );
 				if ( moveBackward ) camera.translateZ( 10 );
@@ -344,8 +355,7 @@
 				camera.target.position.y = 100 * Math.cos( phi ) + camera.position.y;
 				camera.target.position.z = 100 * Math.sin( phi ) * Math.sin( theta ) + camera.position.z;
 
-				renderer.render(scene, camera);
-				stats.update();
+				renderer.render( scene, camera );
 
 			}
 

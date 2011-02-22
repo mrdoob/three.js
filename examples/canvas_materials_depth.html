@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - depth material</title>
+		<title>three.js canvas - depth material</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -15,10 +15,10 @@
 	<body>
 
 		<script type="text/javascript" src="../build/Three.js"></script>
-
 		<script type="text/javascript" src="../src/extras/primitives/Cube.js"></script>
 		<script type="text/javascript" src="../src/extras/primitives/Plane.js"></script>
 
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
@@ -55,8 +55,7 @@
 			var debugContext;
 
 			init();
-			setInterval( loop, 1000 / 60 );
-			// loop();
+			animate();
 
 			function init() {
 
@@ -129,7 +128,6 @@
 				scene.addLight( pointLight );
 
 				renderer = new THREE.CanvasRenderer();
-				// renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.appendChild( renderer.domElement );
@@ -196,7 +194,16 @@
 
 			//
 
-			function loop() {
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
 
 				if ( moveForward ) camera.position.z -= 10; // camera.moveZ( 10 );
 				if ( moveBackwards ) camera.position.z += 10; // camera.moveZ( - 10 );
@@ -216,14 +223,14 @@
 				if ( rollLeft ) camera.rotation.z += 0.01; // camera.rotateZ( 1 );
 				if ( rollRight ) camera.rotation.z -= 0.01; // camera.rotateZ( - 1 );
 
-				debugContext.clearRect( -256, -256, 512, 512 );
+				debugContext.clearRect( - 256, - 256, 512, 512 );
 
 				debugContext.beginPath();
 
 				// center
-				debugContext.moveTo( -10, 0 );
+				debugContext.moveTo( - 10, 0 );
 				debugContext.lineTo( 10, 0 );
-				debugContext.moveTo( 0, -10 );
+				debugContext.moveTo( 0, - 10 );
 				debugContext.lineTo( 0, 10 );
 
 				// camera
@@ -249,9 +256,8 @@
 				debugContext.closePath();
 				debugContext.stroke();
 
-				renderer.render(scene, camera);
+				renderer.render( scene, camera );
 
-				stats.update();
 			}
 
 		</script>

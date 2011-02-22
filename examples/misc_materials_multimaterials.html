@@ -46,6 +46,7 @@
 		<script type="text/javascript" src="../src/extras/primitives/Sphere.js"></script>
 		<script type="text/javascript" src="../src/extras/primitives/Plane.js"></script>
 
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
@@ -80,14 +81,11 @@
 			document.addEventListener('mousemove', onDocumentMouseMove, false);
 
 			init();
-
-			loop();
+			animate();
 
 			//render_canvas = !has_gl;
 			bwebgl.style.display = has_gl ? "inline" : "none";
 			bcanvas.className = render_canvas ? "button" : "button inactive";
-
-			setInterval(loop, 1000/60);
 
 			function init() {
 
@@ -167,7 +165,7 @@
 
 				var loader = new THREE.Loader(),
 					callback = function( geometry ) { createScene( geometry) };
-				
+
 				loader.loadAscii( { model: "obj/female02/Female02_slim.js", callback: callback } );
 				//loader.loadBinary( { model: "obj/female02/Female02_bin.js", callback: callback } );
 
@@ -284,7 +282,18 @@
 
 			}
 
-			function loop() {
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
@@ -292,8 +301,6 @@
 
 				if ( render_canvas ) canvasRenderer.render( scene, camera );
 				if ( render_gl && has_gl ) webglRenderer.render( scene, camera );
-
-				stats.update();
 
 			}
 

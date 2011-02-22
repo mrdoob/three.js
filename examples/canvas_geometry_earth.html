@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - geometry - earth</title>
+		<title>three.js canvas - geometry - earth</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -33,13 +33,13 @@
 		<div id="container"></div> 
 		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - earth demo</div>
 
-		<script type="text/javascript" src="js/Stats.js"></script>
-
 		<script type="text/javascript" src="../build/Three.js"></script>
 		<script type="text/javascript" src="../src/extras/ImageUtils.js"></script>
-
 		<script type="text/javascript" src="../src/extras/primitives/Plane.js"></script>
 		<script type="text/javascript" src="../src/extras/primitives/Sphere.js"></script>
+
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
+		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
 
@@ -54,10 +54,8 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
-
 			init();
-			setInterval( loop, 1000 / 60 );
-
+			animate();
 
 			function init() {
 
@@ -98,7 +96,18 @@
 
 			}
 
-			function loop() {
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
 
 				camera.position.x += ( mouseX - camera.position.x ) * 0.05;
 				camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
@@ -106,7 +115,6 @@
 				mesh.rotation.y -= 0.005;
 
 				renderer.render( scene, camera );
-				stats.update();
 
 			}
 

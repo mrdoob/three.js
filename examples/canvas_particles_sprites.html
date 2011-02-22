@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - particles - sprites</title>
+		<title>three.js canvas - particles - sprites</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
 		<style type="text/css">
@@ -19,8 +19,10 @@
 	<body>
 
 		<script type="text/javascript" src="../build/Three.js"></script>
-		<script type="text/javascript" src="js/Tween.js"></script>
+
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
+		<script type="text/javascript" src="js/Tween.js"></script>
 
 		<script type="text/javascript">
 
@@ -32,12 +34,12 @@
 			var windowHalfY = window.innerHeight / 2;
 
 			init();
-			setInterval( loop, 1000 / 60 );
+			animate();
 
 			function init() {
 
-				container = document.createElement('div');
-				document.body.appendChild(container);
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
 
 				camera = new THREE.Camera( 75, window.innerWidth / window.innerHeight, 1, 5000 );
 				camera.position.z = 1000;
@@ -76,7 +78,6 @@
 				var canvas = document.createElement( 'canvas' );
 				canvas.width = 16;
 				canvas.height = 16;
-				canvas.loaded = true;
 
 				var context = canvas.getContext( '2d' );
 				var gradient = context.createRadialGradient( canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2 );
@@ -136,7 +137,9 @@
 
 					mouseX = event.touches[ 0 ].pageX - windowHalfX;
 					mouseY = event.touches[ 0 ].pageY - windowHalfY;
+
 				}
+
 			}
 
 			function onDocumentTouchMove( event ) {
@@ -147,12 +150,23 @@
 
 					mouseX = event.touches[ 0 ].pageX - windowHalfX;
 					mouseY = event.touches[ 0 ].pageY - windowHalfY;
+
 				}
+
 			}
 
 			//
 
-			function loop() {
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
 
 				TWEEN.update();
 
@@ -161,7 +175,6 @@
 
 				renderer.render( scene, camera );
 
-				stats.update();
 			}
 
 		</script>

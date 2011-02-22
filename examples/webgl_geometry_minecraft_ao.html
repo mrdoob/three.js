@@ -47,28 +47,27 @@
 			<button id="baot">texture + ao</button>
 		</div>
 
-		<script type="text/javascript" src="js/Stats.js"></script>
-		<script type="text/javascript" src="js/ImprovedNoise.js"></script>
-
 		<script type="text/javascript" src="../build/Three.js"></script>
 		<script type="text/javascript" src="../src/extras/GeometryUtils.js"></script>
-		<script type="text/javascript" src="../src/extras/MiscUtils.js"></script>
 		<script type="text/javascript" src="../src/extras/primitives/Cube.js"></script>
 		<script type="text/javascript" src="../src/extras/Detector.js"></script>
+
+		<script type="text/javascript" src="js/ImprovedNoise.js"></script>
+
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
+		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
 
 			if ( ! THREE.Detector.webgl ) {
-				
+
 				THREE.Detector.addGetWebGLMessage();
 				document.getElementById( 'container' ).innerHTML = "";
-				
+
 			}
 
-			window.onload = init;
-			
 			var fogExp2 = true;
-			
+
 			var container, stats;
 
 			var camera, scene, renderer;
@@ -88,6 +87,8 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
+			init();
+			animate();
 
 			function init() {
 
@@ -97,14 +98,14 @@
 					camera = new THREE.Camera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
 				else
 					camera = new THREE.Camera( 60, window.innerWidth / window.innerHeight, 1, 7500 );
-					
+
 				camera.target.position.z = - 100;
 
 				camera.position.y = getY( worldHalfWidth, worldHalfDepth ) * 100 + 100;
 				camera.target.position.y = camera.position.y;
 
 				scene = new THREE.Scene();
-				
+
 				if( fogExp2 )
 					scene.fog = new THREE.FogExp2( 0xffffff, 0.00025 );
 				else
@@ -486,8 +487,6 @@
 				document.getElementById( "bao" ).addEventListener( "click",  function() { mat.map = m_ao.map; }, false );
 				document.getElementById( "baot" ).addEventListener( "click", function() { mat.map = m_aot.map; }, false );
 				document.getElementById( "bt" ).addEventListener( "click",   function() { mat.map = m_t.map; }, false );
-				
-				loop();
 
 			}
 
@@ -880,9 +879,18 @@
 
 			}
 
-			function loop() {
-			
-				requestAnimationFrame( loop, renderer.domElement );
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
 
 				if ( moveForward )  camera.translateZ( - 15 );
 				if ( moveBackward ) camera.translateZ( 15 );
@@ -901,7 +909,6 @@
 				camera.target.position.z = 100 * Math.sin( phi ) * Math.sin( theta ) + camera.position.z;
 
 				renderer.render(scene, camera);
-				stats.update();
 
 			}
 

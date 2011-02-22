@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - interactive - voxel painter</title>
+		<title>three.js canvas - interactive - voxel painter</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -15,10 +15,10 @@
 	<body>
 
 		<script type="text/javascript" src="../build/Three.js"></script>
-
 		<script type="text/javascript" src="../src/extras/primitives/Cube.js"></script>
 		<script type="text/javascript" src="../src/extras/primitives/Plane.js"></script>
 
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
@@ -31,7 +31,7 @@
 			theta = 45, isCtrlDown = false;
 
 			init();
-			setInterval( loop, 1000 / 60 );
+			animate();
 
 			function init() {
 
@@ -145,7 +145,7 @@
 
 					} else {
 
-						var position = new THREE.Vector3().add( intersects[ 0 ].point, intersects[ 0 ].object.rotationMatrix.multiplyVector3( intersects[ 0 ].face.normal.clone() ) );
+						var position = new THREE.Vector3().add( intersects[ 0 ].point, intersects[ 0 ].object.matrixRotation.multiplyVector3( intersects[ 0 ].face.normal.clone() ) );
 
 						var voxel = new THREE.Mesh( new Cube( 50, 50, 50 ), [ new THREE.MeshLambertMaterial( { color: 0x00ff80, opacity: 1, shading: THREE.FlatShading } ), new THREE.MeshFaceMaterial() ] );
 						voxel.position.x = Math.floor( position.x / 50 ) * 50 + 25;
@@ -186,7 +186,18 @@
 
 			}
 
-			function loop() {
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
 
 				if ( isShiftDown ) {
 
@@ -221,7 +232,7 @@
 				camera.position.z = 1400 * Math.cos( theta * Math.PI / 360 );
 
 				renderer.render( scene, camera );
-				stats.update();
+
 			}
 
 		</script>

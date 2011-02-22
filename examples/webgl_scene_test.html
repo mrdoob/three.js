@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - io - scene loader - webgl</title>
+		<title>three.js webgl - io - scene loader</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -150,6 +150,8 @@
 		<pre id="log"></pre>
 
 		<script type="text/javascript" src="../build/ThreeExtras.js"></script>
+
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
@@ -174,6 +176,7 @@
 			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
 			init();
+			animate();
 
 			function $( id ) {
 
@@ -236,8 +239,6 @@
 				container.appendChild( stats.domElement );
 
 				$( "start" ).addEventListener( 'click', onStartClick, false );
-
-				setInterval( loop, 1000/60 );
 
 				var callback_progress = function( progress, result ) {
 
@@ -379,14 +380,23 @@
 
 			}
 
-			function loop() {
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
 
 				camera.position.x += ( mouseX - camera.position.x ) * .001;
 				camera.position.y += ( - mouseY - camera.position.y ) * .001;
 
 				renderer.render( scene, camera );
-
-				stats.update();
 
 			}
 

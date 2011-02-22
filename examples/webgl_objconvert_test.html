@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - io - OBJ converter - webgl</title>
+		<title>three.js webgl - io - OBJ converter</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -48,6 +48,7 @@
 		<script type="text/javascript" src="../src/extras/primitives/Sphere.js"></script>
 		<script type="text/javascript" src="../src/extras/primitives/Plane.js"></script>
 
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
@@ -77,15 +78,11 @@
 			document.addEventListener('mousemove', onDocumentMouseMove, false);
 
 			init();
-
-			loop();
+			animate();
 
 			render_canvas = !has_gl;
 			bwebgl.style.display = has_gl ? "inline" : "none";
 			bcanvas.className = render_canvas ? "button" : "button inactive";
-
-			setInterval(loop, 1000/60);
-
 
 			function init() {
 
@@ -197,10 +194,10 @@
 				var loader = new THREE.Loader(),
 					callbackMale   = function( geometry ) { createScene( geometry,  90, 50, FLOOR, 105 ) },
 					callbackFemale = function( geometry ) { createScene( geometry, -80, 50, FLOOR, 0 ) };
-					
+
 				//loader.loadAscii( { model: "obj/male02/Male02_slim.js", callback: callbackMale } );
 				//loader.loadAscii( { model: "obj/female02/Female02_slim.js", callback: callbackFemale } );
-				
+
 				loader.loadBinary( { model: "obj/male02/Male02_bin.js", callback: callbackMale } );
 				loader.loadBinary( { model: "obj/female02/Female02_bin.js", callback: callbackFemale } );
 
@@ -267,7 +264,18 @@
 
 			}
 
-			function loop() {
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
@@ -280,8 +288,6 @@
 
 				if ( render_canvas ) canvasRenderer.render( scene, camera );
 				if ( render_gl && has_gl ) webglRenderer.render( scene, camera );
-
-				stats.update();
 
 			}
 

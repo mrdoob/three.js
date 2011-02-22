@@ -1,17 +1,17 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - ribbons - webgl</title>
+		<title>three.js webgl - ribbons</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
 				background-color: #000000;
 				margin: 0px;
 				overflow: hidden;
-                font-family:Monospace;
-                font-size:13px;
-                text-align:center;
-                font-weight: bold;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				font-weight: bold;
 				text-align:center;
 			}
 
@@ -19,23 +19,24 @@
 				color:#0078ff;
 			}
 
-            #info {
+			#info {
 				color:#fff;
-                position: absolute;
-                top: 0px; width: 100%;
-                padding: 5px;
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
 				z-index:100;
-
-            }
+			}
 		</style>
 	</head>
 
 	<body>
 
 		<script type="text/javascript" src="../build/ThreeExtras.js"></script>
+
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
-        <div id="info">
+		<div id="info">
 			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl ribbons example
 		</div>
 
@@ -43,8 +44,6 @@
 		<script type="text/javascript">
 
 			if ( ! THREE.Detector.webgl ) THREE.Detector.addGetWebGLMessage();
-
-			window.onload = init;
 
 			var container, stats;
 			var camera, scene, renderer, ribbon, geometry, geometry2, materials = [], ribbons = [],
@@ -55,11 +54,10 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
-			var postprocessing = {
+			var postprocessing = { enabled  : true };
 
-				enabled  : true
-
-			};
+			init();
+			animate();
 
 			function init() {
 
@@ -167,8 +165,6 @@
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
 
-				loop();
-
 			}
 
 			function onDocumentMouseMove( event ) {
@@ -212,9 +208,9 @@
 				postprocessing.camera.position.z = 100;
 
 				var pars = { min_filter: THREE.LinearFilter, mag_filter: THREE.LinearFilter };
-                postprocessing.rtTexture1 = new THREE.RenderTarget( window.innerWidth, window.innerHeight, pars );
-                postprocessing.rtTexture2 = new THREE.RenderTarget( 512, 512, pars );
-                postprocessing.rtTexture3 = new THREE.RenderTarget( 512, 512, pars );
+				postprocessing.rtTexture1 = new THREE.RenderTarget( window.innerWidth, window.innerHeight, pars );
+				postprocessing.rtTexture2 = new THREE.RenderTarget( 512, 512, pars );
+				postprocessing.rtTexture3 = new THREE.RenderTarget( 512, 512, pars );
 
 				var screen_shader = ShaderUtils.lib["screen"];
 				var screen_uniforms = Uniforms.clone( screen_shader.uniforms );
@@ -222,15 +218,14 @@
 				screen_uniforms["tDiffuse"].texture = postprocessing.rtTexture1;
 				screen_uniforms["opacity"].value = 1.0;
 
-                postprocessing.materialScreen = new THREE.MeshShaderMaterial( {
+				postprocessing.materialScreen = new THREE.MeshShaderMaterial( {
 
-                    uniforms: screen_uniforms,
-                    vertex_shader: screen_shader.vertex_shader,
-                    fragment_shader: screen_shader.fragment_shader,
-					blending: THREE.AdditiveBlending
+					uniforms: screen_uniforms,
+					vertex_shader: screen_shader.vertex_shader,
+					fragment_shader: screen_shader.fragment_shader,
+						blending: THREE.AdditiveBlending
 
-                } );
-
+				} );
 
 				var convolution_shader = ShaderUtils.lib["convolution"];
 				var convolution_uniforms = Uniforms.clone( convolution_shader.uniforms );
@@ -242,14 +237,13 @@
 				convolution_uniforms["uImageIncrement"].value = postprocessing.blurx;
 				convolution_uniforms["cKernel"].value = ShaderUtils.buildKernel( 4.0 );
 
-                postprocessing.materialConvolution = new THREE.MeshShaderMaterial( {
+				postprocessing.materialConvolution = new THREE.MeshShaderMaterial( {
 
-                    uniforms: convolution_uniforms,
-                    vertex_shader:   "#define KERNEL_SIZE 25.0\n" + convolution_shader.vertex_shader,
-                    fragment_shader: "#define KERNEL_SIZE 25\n"   + convolution_shader.fragment_shader
+					uniforms: convolution_uniforms,
+					vertex_shader:   "#define KERNEL_SIZE 25.0\n" + convolution_shader.vertex_shader,
+					fragment_shader: "#define KERNEL_SIZE 25\n"   + convolution_shader.fragment_shader
 
-                } );
-
+				} );
 
 				postprocessing.quad = new THREE.Mesh( new Plane( window.innerWidth, window.innerHeight ), postprocessing.materialConvolution );
 				postprocessing.quad.position.z = -500;
@@ -257,9 +251,18 @@
 
 			}
 
-			function loop() {
+			//
 
-				requestAnimationFrame( loop, renderer.domElement );
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
 
 				var time = new Date().getTime() * 0.00005;
 
@@ -334,12 +337,7 @@
 
 				}
 
-				stats.update();
-
-
-
 			}
-
 
 		</script>
 	</body>

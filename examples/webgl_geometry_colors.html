@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - geometry - vertex colors - webgl</title>
+		<title>three.js webgl - geometry - vertex colors</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -30,11 +30,13 @@
 	</head>
 	<body>
 
-		<div id="container"></div> 
+		<div id="container"></div>
 		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - vertex colors - webgl</div>
 
-		<script type="text/javascript" src="js/Stats.js"></script>
 		<script type="text/javascript" src="../build/ThreeExtras.js"></script>
+
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
+		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
 
@@ -51,10 +53,8 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
-
 			init();
-			setInterval( loop, 1000 / 60 );
-
+			animate();
 
 			function init() {
 
@@ -64,7 +64,7 @@
 				camera.position.z = 1800;
 
 				scene = new THREE.Scene();
-				
+
 				light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0, 0, 1 );
 				light.position.normalize();
@@ -72,7 +72,7 @@
 
 				var shadowMaterial = new THREE.MeshBasicMaterial( { map: ImageUtils.loadTexture( 'textures/shadow.png' ) } );
 				var shadowGeo = new Plane( 300, 300, 1, 1 );
-				
+
 				mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
 				mesh.position.y = - 250;
 				mesh.rotation.x = - 90 * Math.PI / 180;
@@ -91,15 +91,15 @@
 				scene.addObject( mesh );
 
 				var color, p, colors = [], colors2 = [], colors3 = [],
-					
+
 					geometry = new Icosahedron( 1 ),
 					geometry2 = new THREE.Geometry(),
 					geometry3 = new THREE.Geometry();
-					
+
 				for( var i = 0; i < geometry.vertices.length; i++ ) {
-				
+
 					p = geometry.vertices[ i ].position;
-					
+
 					color = new THREE.Color( 0xffffff );
 					color.setHSV( ( p.y + 1 ) / 2, 1.0, 1.0 );
 					colors[ i ] = color;
@@ -116,21 +116,21 @@
 
 				geometry3.vertices = geometry2.vertices = geometry.vertices;
 				geometry3.faces = geometry2.faces = geometry.faces;
-				
+
 				geometry2.sortFacesByMaterial();
 				geometry3.sortFacesByMaterial();
-				
+
 				geometry.colors = colors;
 				geometry2.colors = colors2;
 				geometry3.colors = colors3;
-				
+
 				var materials = [
-					
+
 					new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, vertex_colors: true } ),
 					new THREE.MeshBasicMaterial( { color: 0x000000, shading: THREE.FlatShading, wireframe: true } )
-					
+
 				];
-				
+
 				mesh = new THREE.Mesh( geometry, materials  );
 				mesh.position.x = -400;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 200;
@@ -170,13 +170,23 @@
 
 			}
 
-			function loop() {
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
 
 				camera.position.x += ( mouseX - camera.position.x ) * 0.05;
 				camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
 
 				renderer.render( scene, camera );
-				stats.update();
 
 			}
 

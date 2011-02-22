@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - materials - normal map [Lee Perry-Smith] - webgl</title>
+		<title>three.js webgl - materials - normal map [Lee Perry-Smith]</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -53,6 +53,8 @@
 		</div>
 
 		<script type="text/javascript" src="../build/ThreeExtras.js"></script>
+
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
@@ -76,10 +78,8 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
-			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-
 			init();
-			setInterval( loop, 1000 / 60 );
+			animate();
 
 			function init() {
 
@@ -159,6 +159,8 @@
 
 				}
 
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
 			}
 
 			function createScene( geometry, scale, material ) {
@@ -178,7 +180,18 @@
 
 			}
 
-			function loop() {
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				if ( statsEnabled ) stats.update();
+
+			}
+
+			function render() {
 
 				var ry = mouseX * 0.0003, rx = mouseY * 0.0003;
 
@@ -190,8 +203,6 @@
 				}
 
 				webglRenderer.render( scene, camera );
-
-				if ( statsEnabled ) stats.update();
 
 			}
 
