@@ -1,7 +1,7 @@
 <html>
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=utf-8"/> 
-		<title>three.js - geometry - birds</title>
+		<title>three.js canvas - geometry - birds</title>
 		<style type="text/css"> 
 			body {
 				color: #808080;
@@ -26,10 +26,11 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - birds demo</div>
 
-		<script type="text/javascript" src="js/Stats.js"></script>
-
 		<script type="text/javascript" src="../build/Three.js"></script>
 		<script type="text/javascript" src="obj/Bird.js"></script>
+
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
+		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
 
@@ -331,6 +332,7 @@
 			var stats;
 
 			init();
+			animate();
 
 			function init() {
 
@@ -378,8 +380,6 @@
 
 				document.getElementById( 'container' ).appendChild(stats.domElement);
 
-				setInterval( loop, 1000 / 200 );
-
 			}
 
 			function onDocumentMouseMove( event ) {
@@ -398,7 +398,18 @@
 
 			}
 
-			function loop() {
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
 
 				for ( var i = 0, il = birds.length; i < il; i++ ) {
 
@@ -420,8 +431,6 @@
 				}
 
 				renderer.render( scene, camera );
-
-				stats.update();
 
 			}
 

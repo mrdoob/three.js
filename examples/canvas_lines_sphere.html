@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - particles - floor</title>
+		<title>three.js canvas - lines - sphere</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
 		<style type="text/css">
@@ -18,7 +18,9 @@
 	</head>
 	<body>
 
-		<script type="text/javascript" src="../build/Three.js"></script> 
+		<script type="text/javascript" src="../build/Three.js"></script>
+
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 
 		<script type="text/javascript">
 
@@ -34,12 +36,10 @@
 			AMOUNTX = 10,
 			AMOUNTY = 10,
 
-			camera, scene, renderer,
-
-			stats;
+			camera, scene, renderer;
 
 			init();
-			setInterval(loop, 1000 / 60);
+			animate();
 
 			function init() {
 
@@ -92,15 +92,8 @@
 					geometry.vertices.push( new THREE.Vertex( vector2 ) );
 
 					var line = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0xffffff, opacity: Math.random() } ) );
-					scene.addObject(line);
+					scene.addObject( line );
 				}
-
-				/*
-				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild(stats.domElement);
-				*/
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
@@ -117,37 +110,47 @@
 
 			function onDocumentTouchStart( event ) {
 
-				if(event.touches.length > 1) {
+				if ( event.touches.length > 1 ) {
 
 					event.preventDefault();
 
 					mouseX = event.touches[ 0 ].pageX - windowHalfX;
 					mouseY = event.touches[ 0 ].pageY - windowHalfY;
+
 				}
+
 			}
 
 			function onDocumentTouchMove( event ) {
 
-				if(event.touches.length == 1) {
+				if ( event.touches.length == 1 ) {
 
 					event.preventDefault();
 
 					mouseX = event.touches[ 0 ].pageX - windowHalfX;
 					mouseY = event.touches[ 0 ].pageY - windowHalfY;
+
 				}
+
 			}
 
 			//
 
-			function loop() {
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+
+			}
+
+			function render() {
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY + 200 - camera.position.y ) * .05;
-				camera.updateMatrix();
 
 				renderer.render( scene, camera );
 
-				// stats.update();
 			}
 
 		</script>

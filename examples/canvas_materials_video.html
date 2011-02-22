@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - materials - video</title>
+		<title>three.js canvas - materials - video</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
 		<style type="text/css">
@@ -15,10 +15,11 @@
 	</head>
 	<body>
 
-		<script type="text/javascript" src="js/Stats.js"></script>
-
 		<script type="text/javascript" src="../build/Three.js"></script>
 		<script type="text/javascript" src="../src/extras/primitives/Plane.js"></script>
+
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
+		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<video id="video" autoplay style="display:none">
 			<source src="textures/sintel.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
@@ -44,12 +45,8 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
-
-			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-
 			init();
-			setInterval( loop, 1000 / 60 );
-
+			animate();
 
 			function init() {
 
@@ -148,6 +145,8 @@
 				stats.domElement.style.top = '0px';
 				container.appendChild( stats.domElement );
 
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
 			}
 
 			function onDocumentMouseMove(event) {
@@ -157,7 +156,18 @@
 
 			}
 
-			function loop() {
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
 
 				camera.position.x += ( mouseX - camera.position.x ) * 0.05;
 				camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
@@ -172,7 +182,6 @@
 				textureReflectionContext.fillRect( 0, 0, 480, 204 );
 
 				renderer.render( scene, camera );
-				stats.update();
 
 			}
 

@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - spherical reflection</title>
+		<title>three.js canvas - spherical reflection</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -42,6 +42,8 @@
 
 		<script type="text/javascript" src="obj/WaltHead.js"></script>
 
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
+
 		<script type="text/javascript">
 
 			var camera, scene, renderer,
@@ -50,7 +52,7 @@
 			geometry, mesh;
 
 			init();
-			setInterval( loop, 1000 / 60 );
+			animate();
 
 			function init() {
 
@@ -74,13 +76,23 @@
 
 			}
 
-			function loop() {
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+
+			}
+
+			function render() {
 
 				var time = new Date().getTime() * 0.0005;
 
 				mesh.rotation.y -= 0.01;
 
-				renderer.render(scene, camera);
+				renderer.render( scene, camera );
 
 			}
 

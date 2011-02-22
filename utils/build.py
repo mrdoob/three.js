@@ -82,7 +82,6 @@ EXTRAS_FILES = [
 'extras/Detector.js',
 'extras/GeometryUtils.js',
 'extras/ImageUtils.js',
-'extras/MiscUtils.js',
 'extras/SceneUtils.js',
 'extras/ShaderUtils.js',
 'extras/primitives/Cube.js',
@@ -396,7 +395,7 @@ def main(argv=None):
 	debug = args.debug
 
 	config = [
-	['Three', 	  	'includes_common', COMMON_FILES, args.common],
+	['Three', 	'includes_common', COMMON_FILES, args.common],
 	['ThreeCanvas', 'includes_canvas', CANVAS_FILES, args.canvas],
 	['ThreeWebGL',  'includes_webgl',  WEBGL_FILES,  args.webgl],
 	['ThreeSVG', 	'includes_svg',    SVG_FILES,    args.svg],

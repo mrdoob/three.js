@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - geometry - sphere</title>
+		<title>three.js canvas - performance</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -16,7 +16,7 @@
 
 		<!-- <script type="text/javascript" src="../build/Three.js"></script> -->
 
-			<script type="text/javascript" src="../src/Three.js"></script>
+		<script type="text/javascript" src="../src/Three.js"></script>
 		<script type="text/javascript" src="../src/core/Color.js"></script>
 		<script type="text/javascript" src="../src/core/Vector2.js"></script>
 		<script type="text/javascript" src="../src/core/Vector3.js"></script>
@@ -83,6 +83,7 @@
 
 		<script type="text/javascript" src="../src/extras/primitives/Sphere.js"></script>
 
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
@@ -103,27 +104,7 @@
 			var windowHalfY = window.innerHeight / 2;
 
 			init();
-
-			/*
-			var accum = 0, result = 0, results = [], amount = 100;
-
-			for ( var i = 0; i < amount; i ++ ) {
-
-				var timer = new Date().getTime();
-
-				loop();
-
-				accum += result = new Date().getTime() - timer;
-				results.push( result );
-			}
-
-			console.log( results );
-			console.log( accum / amount );
-			*/
-
-			// loop();
-
-			setInterval( loop, 1000 / 60 );
+			animate();
 
 			function init() {
 
@@ -203,11 +184,19 @@
 
 			//
 
-			function loop() {
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
 
 				renderer.render( scene, camera );
 
-				stats.update();
 			}
 
 		</script>

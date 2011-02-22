@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - geometry - sphere</title>
+		<title>three.js canvas - sandbox</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -83,6 +83,7 @@
 		<script type="text/javascript" src="../src/extras/primitives/Sphere.js"></script>
 		<script type="text/javascript" src="../src/extras/ImageUtils.js"></script>
 
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
@@ -114,7 +115,7 @@
 			var debugContext;
 
 			init();
-			setInterval( render, 1000 / 60 );
+			animate();
 
 			function init() {
 
@@ -259,6 +260,15 @@
 
 			//
 
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
 			function render() {
 
 				if ( moveForward ) camera.position.z -= 5;
@@ -313,9 +323,7 @@
 				debugContext.closePath();
 				debugContext.stroke();
 
-				renderer.render(scene, camera);
-
-				stats.update();
+				renderer.render( scene, camera );
 
 			}
 
