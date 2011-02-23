@@ -162,7 +162,7 @@
 				var image = document.createElement( 'img' );
 				var texture = new THREE.Texture( image, THREE.UVMapping )
 
-				image.onload = function () { texture.loaded = true; };
+				image.onload = function () { texture.needsUpdate = true; };
 				image.src = path;
 
 				return texture;

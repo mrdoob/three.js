@@ -2214,7 +2214,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			geometry.__dirtyVertices = false;
 			geometry.__dirtyColors = false;
 
-		} else if ( object instanceof THREE.MarchingCubes ) {
+		} else if ( THREE.MarchingCubes !== undefined && object instanceof THREE.MarchingCubes ) {
 
 			add_buffer_immediate( scene.__webGLObjectsImmediate, objmap, 0, object );
 
@@ -2600,12 +2600,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 	function setCubeTexture( texture, slot ) {
 
 		if ( texture.image.length == 6 ) {
+						
+			if ( texture.needsUpdate ) {
 
-			if ( !texture.image.__webGLTextureCube &&
-				 !texture.image.__cubeMapInitialized && texture.image.loadCount == 6 ) {
-
-				texture.image.__webGLTextureCube = _gl.createTexture();
-
+				if ( !texture.image.__webGLTextureCube ) {
+					
+					texture.image.__webGLTextureCube = _gl.createTexture();
+					
+				}
+				
 				_gl.bindTexture( _gl.TEXTURE_CUBE_MAP, texture.image.__webGLTextureCube );
 
 				_gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_WRAP_S, _gl.CLAMP_TO_EDGE );
@@ -2623,38 +2626,60 @@ THREE.WebGLRenderer = function ( parameters ) {
 				_gl.generateMipmap( _gl.TEXTURE_CUBE_MAP );
 
 				_gl.bindTexture( _gl.TEXTURE_CUBE_MAP, null );
-
-				texture.image.__cubeMapInitialized = true;
-
+				
+				texture.needsUpdate = false;
+				
 			}
 
 			_gl.activeTexture( _gl.TEXTURE0 + slot );
 			_gl.bindTexture( _gl.TEXTURE_CUBE_MAP, texture.image.__webGLTextureCube );
-
+			
 		}
 
 	};
 
 	function setTexture( texture, slot ) {
+		
+		if ( texture.needsUpdate ) {
 
-		if ( !texture.__webGLTexture && texture.image.loaded ) {
+			if ( !texture.__wasSetOnce ) {
 
-			texture.__webGLTexture = _gl.createTexture();
-			_gl.bindTexture( _gl.TEXTURE_2D, texture.__webGLTexture );
-			_gl.texImage2D( _gl.TEXTURE_2D, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, texture.image );
+				texture.__webGLTexture = _gl.createTexture();
+				
+				_gl.bindTexture( _gl.TEXTURE_2D, texture.__webGLTexture );
+				_gl.texImage2D( _gl.TEXTURE_2D, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, texture.image );
 
-			_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_S, paramThreeToGL( texture.wrap_s ) );
-			_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_T, paramThreeToGL( texture.wrap_t ) );
+				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_S, paramThreeToGL( texture.wrap_s ) );
+				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_T, paramThreeToGL( texture.wrap_t ) );
 
-			_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MAG_FILTER, paramThreeToGL( texture.mag_filter ) );
-			_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, paramThreeToGL( texture.min_filter ) );
-			_gl.generateMipmap( _gl.TEXTURE_2D );
-			_gl.bindTexture( _gl.TEXTURE_2D, null );
+				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MAG_FILTER, paramThreeToGL( texture.mag_filter ) );
+				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, paramThreeToGL( texture.min_filter ) );
+				_gl.generateMipmap( _gl.TEXTURE_2D );
+				_gl.bindTexture( _gl.TEXTURE_2D, null );
+				
+				texture.__wasSetOnce = true;
+				
+			} else {
+				
+				_gl.bindTexture( _gl.TEXTURE_2D, texture.__webGLTexture );
+				_gl.texSubImage2D( _gl.TEXTURE_2D, 0, 0, 0, _gl.RGBA, _gl.UNSIGNED_BYTE, texture.image );
+				
+				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_S, paramThreeToGL( texture.wrap_s ) );
+				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_T, paramThreeToGL( texture.wrap_t ) );
+
+				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MAG_FILTER, paramThreeToGL( texture.mag_filter ) );
+				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, paramThreeToGL( texture.min_filter ) );
+				_gl.generateMipmap( _gl.TEXTURE_2D );
+				_gl.bindTexture( _gl.TEXTURE_2D, null );
+				
+			}			
+			
+			texture.needsUpdate = false;
 
 		}
 
 		_gl.activeTexture( _gl.TEXTURE0 + slot );
-		_gl.bindTexture( _gl.TEXTURE_2D, texture.__webGLTexture );
+		_gl.bindTexture( _gl.TEXTURE_2D, texture.__webGLTexture );		
 
 	};
 

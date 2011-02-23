@@ -44,10 +44,12 @@
 				var geometry = new Plane( 100, 100 );
 
 				var texture = generateTextureBase();
+				texture.needsUpdate = true;
 
 				for ( var i = 0; i < 10; i ++ ) {
 
 					mesh = levels[ i ] = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { map: new THREE.Texture( generateTextureLevel( texture ), new THREE.UVMapping(), THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping ) } ) );
+					mesh.materials[0].map.needsUpdate = true;
 					mesh.rotation.x = - 90 * ( Math.PI / 180 );
 					mesh.position.y = i * 0.5;
 					scene.addObject( mesh );
@@ -64,7 +66,6 @@
 			function generateTextureBase() {
 
 				var canvas = document.createElement( 'canvas' );
-				canvas.loaded = true;
 				canvas.width = 1024;
 				canvas.height = 1024;
 
@@ -91,7 +92,6 @@
 				texture.getContext( '2d' ).drawImage( texture, 0, 0 );
 
 				var canvas = document.createElement( 'canvas' );
-				canvas.loaded = true;
 				canvas.width = texture.width;
 				canvas.height = texture.height;
 

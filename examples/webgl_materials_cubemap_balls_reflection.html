@@ -89,10 +89,7 @@
 						path + 'pz' + format, path + 'nz' + format
 					];
 
-				var images = ImageUtils.loadArray( urls );
-				var textureCube = new THREE.Texture( images );
-				// var textureCube = new THREE.Texture( images, new THREE.CubeRefractionMapping );
-
+				var textureCube = ImageUtils.loadTextureCube( urls );
 				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, env_map: textureCube } );
 
 				for ( var i = 0; i < 200; i ++ ) {
@@ -105,8 +102,6 @@
 					scene.addObject( mesh );
 				}
 
-				//SceneUtils.addPanoramaCubePlanes( sceneCube, 100000, images );
-				//SceneUtils.addPanoramaCube( sceneCube, 100000, images );
 				SceneUtils.addPanoramaCubeWebGL( sceneCube, 100000, textureCube );
 
 				webglRenderer = new THREE.WebGLRenderer();

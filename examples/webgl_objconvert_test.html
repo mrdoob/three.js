@@ -112,8 +112,8 @@
 				xc.fillRect(96, 96, 32, 32);
 
 				var xm = new THREE.MeshBasicMaterial( { map: new THREE.Texture( x, THREE.UVMapping, THREE.RepeatWrapping, THREE.RepeatWrapping ) } );
-				xm.map.image.loaded = 1;
-
+				xm.map.needsUpdate = true;
+				
 				geometry = new Plane( 100, 100, 15, 10 );
 				for(var i=0; i<geometry.uvs.length; i++) {
 					var uvs = geometry.uvs[i];
@@ -243,7 +243,7 @@
 					xc.fillText(i, 10, 64);
 
 					var xm = new THREE.MeshBasicMaterial( { map: new THREE.Texture( x ) } );
-					xm.map.image.loaded = 1;
+					xm.map.needsUpdate = true;
 
 					mesh = new THREE.Mesh( new Plane( size, size ), xm );
 					mesh.position.x = i * (size + 5) - ( ( materials.length - 1 )* ( size + 5 )/2);

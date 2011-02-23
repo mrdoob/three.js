@@ -103,11 +103,9 @@
 						path + 'pz' + format, path + 'nz' + format
 					];
 
-				var images = ImageUtils.loadArray( urls );
+				var textureCube = ImageUtils.loadTextureCube( urls );
 
-				var reflectionCube = new THREE.Texture( images );
-
-				parameters = { color: 0xff1100, env_map: reflectionCube, combine: THREE.MixOperationa, reflectivity: 0.3, shading: THREE.FlatShading };
+				parameters = { color: 0xff1100, env_map: textureCube, shading: THREE.FlatShading };
 				//parameters = { color: 0xff1100, shading: THREE.FlatShading };
 				cubeMaterial = new THREE.MeshBasicMaterial( parameters );
 				

@@ -402,9 +402,12 @@ var ShaderUtils = {
 
 		'film': {
 
-		uniforms: { tDiffuse: { type: "t", value: 0, texture: null },
-					time: { type: "f", value: 0.0 },
-					grayscale: { type: "i", value: 1 }
+		uniforms: { tDiffuse:   { type: "t", value: 0, texture: null },
+					time: 	    { type: "f", value: 0.0 },
+					nIntensity: { type: "f", value: 0.5 },
+					sIntensity: { type: "f", value: 0.05 },
+					sCount: 	{ type: "f", value: 4096 },
+					grayscale:  { type: "i", value: 1 }
 				  },
 
 		vertex_shader: [
@@ -431,13 +434,13 @@ var ShaderUtils = {
 		"uniform bool grayscale;",
 
 		// noise effect intensity value (0 = no effect, 1 = full effect)
-		"const float fNintensity = 0.5;",
+		"uniform float nIntensity;",
 		
 		// scanlines effect intensity value (0 = no effect, 1 = full effect)
-		"const float fSintensity = 0.05;",
+		"uniform float sIntensity;",
 		
 		// scanlines effect count value (0 = no effect, 4096 = full effect)
-		"const float fScount = 4096.0;",
+		"uniform float sCount;",
 		
 		"void main() {",
 			
@@ -453,13 +456,13 @@ var ShaderUtils = {
 			"vec3 cResult = cTextureScreen.rgb + cTextureScreen.rgb * clamp( 0.1 + dx * 100.0, 0.0, 1.0 );",
 
 			// get us a sine and cosine
-			"vec2 sc = vec2( sin(vUv.y * fScount), cos(vUv.y * fScount) );",
+			"vec2 sc = vec2( sin( vUv.y * sCount ), cos( vUv.y * sCount ) );",
 
 			// add scanlines
-			"cResult += cTextureScreen.rgb * vec3( sc.x, sc.y, sc.x ) * fSintensity;",
+			"cResult += cTextureScreen.rgb * vec3( sc.x, sc.y, sc.x ) * sIntensity;",
 			
 			// interpolate between source and result by intensity
-			"cResult = cTextureScreen.rgb + clamp( fNintensity, 0.0,1.0 ) * ( cResult - cTextureScreen.rgb );",
+			"cResult = cTextureScreen.rgb + clamp( nIntensity, 0.0,1.0 ) * ( cResult - cTextureScreen.rgb );",
 
 			// convert to grayscale if desired
 			"if( grayscale ) {",

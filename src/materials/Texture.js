@@ -6,8 +6,6 @@
 
 THREE.Texture = function ( image, mapping, wrap_s, wrap_t, mag_filter, min_filter ) {
 
-	if ( image.getContext ) image.loaded = true;
-
 	this.image = image;
 
 	this.mapping = mapping !== undefined ? mapping : new THREE.UVMapping();
@@ -17,6 +15,8 @@ THREE.Texture = function ( image, mapping, wrap_s, wrap_t, mag_filter, min_filte
 
 	this.mag_filter = mag_filter !== undefined ? mag_filter : THREE.LinearFilter;
 	this.min_filter = min_filter !== undefined ? min_filter : THREE.LinearMipMapLinearFilter;
+	
+	this.needsUpdate = false;
 
 };
 

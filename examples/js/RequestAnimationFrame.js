@@ -1,6 +1,6 @@
 /**
  * Provides requestAnimationFrame in a cross browser way.
- * @author greggman / http://greggman.com/
+ * @author paulirish / http://paulirish.com/
  */
 
 if ( !window.requestAnimationFrame ) {
@@ -9,7 +9,7 @@ if ( !window.requestAnimationFrame ) {
 
 		return window.requestAnimationFrame ||
 		window.webkitRequestAnimationFrame ||
-		window.mozRequestAnimationFrame ||
+		//window.mozRequestAnimationFrame || // commented out for the moment, FF4 caps framerate at ~30fps: https://bugzilla.mozilla.org/show_bug.cgi?id=630127
 		window.oRequestAnimationFrame ||
 		window.msRequestAnimationFrame ||
 		function( /* function FrameRequestCallback */ callback, /* DOMElement Element */ element ) {

@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - geometry - minecraft - ao - webgl</title>
+		<title>three.js webgl - geometry - minecraft - ao</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -73,6 +73,8 @@
 			var camera, scene, renderer;
 
 			var mesh;
+			
+			var mat;
 
 			var worldWidth = 128, worldDepth = 128,
 			worldHalfWidth = worldWidth / 2, worldHalfDepth = worldDepth / 2,
@@ -503,6 +505,8 @@
 
 				canvas.width = canvas.height = size;
 
+				var texture = new THREE.Texture( canvas, new THREE.UVMapping(), THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping, THREE.NearestFilter, THREE.LinearMipMapLinearFilter );
+
 				function generateTexture() {
 
 					if( count == 3 ) {
@@ -517,13 +521,13 @@
 
 						}
 
-						canvas.loaded = true;
+						texture.needsUpdate = true;
 
 					}
 
 				}
 
-				return new THREE.MeshLambertMaterial( { map: new THREE.Texture( canvas, new THREE.UVMapping(), THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping, THREE.NearestFilter, THREE.LinearMipMapLinearFilter ) } );
+				return new THREE.MeshLambertMaterial( { map: texture } );
 
 			}
 
@@ -540,6 +544,8 @@
 
 				canvas.width = canvas.height = size;
 
+				var texture = new THREE.Texture( canvas, new THREE.UVMapping(), THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping, THREE.NearestFilter, THREE.LinearMipMapLinearFilter );
+				
 				function generateTexture() {
 
 					if( count == 3 ) {
@@ -558,13 +564,13 @@
 
 						}
 
-						canvas.loaded = true;
+						texture.needsUpdate = true;
 
 					}
 
 				}
 
-				return new THREE.MeshLambertMaterial( { map: new THREE.Texture( canvas, new THREE.UVMapping(), THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping, THREE.NearestFilter, THREE.LinearMipMapLinearFilter ) } );
+				return new THREE.MeshLambertMaterial( { map: texture } );
 
 			}
 			function generateMegamaterialDebug() {
@@ -594,9 +600,10 @@
 
 				}
 
-				canvas.loaded = true;
-
-				return new THREE.MeshLambertMaterial( { map: new THREE.Texture( canvas, new THREE.UVMapping(), THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping, THREE.NearestFilter, THREE.LinearMipMapLinearFilter ) } );
+				var texture = new THREE.Texture( canvas, new THREE.UVMapping(), THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping, THREE.NearestFilter, THREE.LinearMipMapLinearFilter );
+				texture.needsUpdate = true;
+				
+				return new THREE.MeshLambertMaterial( { map: texture } );
 
 			}
 
@@ -769,7 +776,7 @@
 
 				var image = new Image();
 
-				image.onload = function () { this.loaded = true; callback(); };
+				image.onload = function () { callback(); };
 				image.src = path;
 
 				return image;
