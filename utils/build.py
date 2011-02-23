@@ -79,7 +79,6 @@ COMMON_FILES = [
 ]
 
 EXTRAS_FILES = [
-'extras/Detector.js',
 'extras/GeometryUtils.js',
 'extras/ImageUtils.js',
 'extras/SceneUtils.js',
@@ -326,29 +325,34 @@ def makeDebug(text):
 	return text
 
 
-def buildLib(files, debug, outputFilename):
+def buildLib(files, debug, filename):
 
 	text = merge(files)
 
 	if debug:
 		text = makeDebug(text)
-		outputFilename = outputFilename + 'Debug'
+		filename = filename + 'Debug'
 
-	outputFilename = outputFilename + '.js'
+	if filename == "Three":
+		folder = ''
+	else:
+		folder = 'custom/'
+
+	filename = filename + '.js'
 
 	print "=" * 40
-	print "Compiling", outputFilename
+	print "Compiling", filename
 	print "=" * 40
 
-	output(addHeader(compress(text), outputFilename), outputFilename)
+	output(addHeader(compress(text), filename), folder + filename)
 
 
-def buildIncludes(files, outputFilename):
+def buildIncludes(files, filename):
 
 	template = '\t\t<script type="text/javascript" src="../src/%s"></script>'
 	text = "\n".join(template % f for f in files)
 
-	output(text, outputFilename + '.js')
+	output(text, filename + '.js')
 
 
 def parse_args():
@@ -395,12 +399,12 @@ def main(argv=None):
 	debug = args.debug
 
 	config = [
-	['Three', 	'includes_common', COMMON_FILES, args.common],
+	['Three', 'includes_common', COMMON_FILES + EXTRAS_FILES, args.common],
 	['ThreeCanvas', 'includes_canvas', CANVAS_FILES, args.canvas],
-	['ThreeWebGL',  'includes_webgl',  WEBGL_FILES,  args.webgl],
-	['ThreeSVG', 	'includes_svg',    SVG_FILES,    args.svg],
-	['ThreeDOM', 	'includes_dom',    DOM_FILES,    args.dom],
-	['ThreeExtras', 'includes_extras', COMMON_FILES + EXTRAS_FILES, args.extras]
+	['ThreeDOM', 'includes_dom', DOM_FILES, args.dom],
+	['ThreeSVG', 'includes_svg', SVG_FILES, args.svg],
+	['ThreeWebGL', 'includes_webgl', WEBGL_FILES, args.webgl],
+	['ThreeExtras', 'includes_extras', EXTRAS_FILES, args.extras]
 	]
 
 	for fname_lib, fname_inc, files, enabled in config:

@@ -41,20 +41,18 @@
 		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - <a href="http://www.minecraft.net/" target="_blank">minecraft</a> demo. featuring <a href="http://painterlypack.net/" target="_blank">painterly pack</a><br />(left click: forward, right click: backward)</div>
 
 		<script type="text/javascript" src="../build/Three.js"></script>
-		<script type="text/javascript" src="../src/extras/GeometryUtils.js"></script>
-		<script type="text/javascript" src="../src/extras/primitives/Cube.js"></script>
-		<script type="text/javascript" src="../src/extras/Detector.js"></script>
 
 		<script type="text/javascript" src="js/ImprovedNoise.js"></script>
 
+		<script type="text/javascript" src="js/Detector.js"></script>
 		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
 
-			if ( ! THREE.Detector.webgl ) {
+			if ( ! Detector.webgl ) {
 
-				THREE.Detector.addGetWebGLMessage();
+				Detector.addGetWebGLMessage();
 				document.getElementById( 'container' ).innerHTML = "";
 
 			}
@@ -323,7 +321,7 @@
 				camera.target.position.y = 100 * Math.cos( phi ) + camera.position.y;
 				camera.target.position.z = 100 * Math.sin( phi ) * Math.sin( theta ) + camera.position.z;
 
-				renderer.render(scene, camera);
+				renderer.render( scene, camera );
 
 			}
 

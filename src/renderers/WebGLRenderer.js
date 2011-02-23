@@ -2362,7 +2362,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if (!_gl) {
 
-			alert("WebGL not supported");
+			// alert("WebGL not supported");
 			throw "cannot create webgl context";
 
 		}

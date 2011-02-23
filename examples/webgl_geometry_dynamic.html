@@ -39,16 +39,17 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - dynamic geometry demo - webgl<br />(left click: forward, right click: backward)</div>
 
-		<script type="text/javascript" src="../build/ThreeExtras.js"></script>
+		<script type="text/javascript" src="../build/Three.js"></script>
 
+		<script type="text/javascript" src="js/Detector.js"></script>
 		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
 
-			if ( ! THREE.Detector.webgl ) {
+			if ( ! Detector.webgl ) {
 
-				THREE.Detector.addGetWebGLMessage();
+				Detector.addGetWebGLMessage();
 				document.getElementById( 'container' ).innerHTML = "";
 
 			}

@@ -48,20 +48,18 @@
 		</div>
 
 		<script type="text/javascript" src="../build/Three.js"></script>
-		<script type="text/javascript" src="../src/extras/GeometryUtils.js"></script>
-		<script type="text/javascript" src="../src/extras/primitives/Cube.js"></script>
-		<script type="text/javascript" src="../src/extras/Detector.js"></script>
 
 		<script type="text/javascript" src="js/ImprovedNoise.js"></script>
 
+		<script type="text/javascript" src="js/Detector.js"></script>
 		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
 
-			if ( ! THREE.Detector.webgl ) {
+			if ( ! Detector.webgl ) {
 
-				THREE.Detector.addGetWebGLMessage();
+				Detector.addGetWebGLMessage();
 				document.getElementById( 'container' ).innerHTML = "";
 
 			}
@@ -908,7 +906,7 @@
 				camera.target.position.y = 100 * Math.cos( phi ) + camera.position.y;
 				camera.target.position.z = 100 * Math.sin( phi ) * Math.sin( theta ) + camera.position.z;
 
-				renderer.render(scene, camera);
+				renderer.render( scene, camera );
 
 			}
 

@@ -35,8 +35,9 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - shader material demo. featuring <a href="http://www.pouet.net/prod.php?which=52761" target="_blank">Monjori by Mic</a></div>
 
-		<script type="text/javascript" src="../build/ThreeExtras.js"></script>
+		<script type="text/javascript" src="../build/Three.js"></script>
 
+		<script type="text/javascript" src="js/Detector.js"></script>
 		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
@@ -169,7 +170,7 @@
 
 		<script type="text/javascript">
 
-			if ( ! THREE.Detector.webgl ) THREE.Detector.addGetWebGLMessage();
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var container, stats;
 

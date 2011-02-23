@@ -42,14 +42,15 @@
 			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - lines WebGL demo
 		</div>
 
-		<script type="text/javascript" src="../build/ThreeExtras.js"></script>
+		<script type="text/javascript" src="../build/Three.js"></script>
 
+		<script type="text/javascript" src="js/Detector.js"></script>
 		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
 
-			if ( ! THREE.Detector.webgl ) THREE.Detector.addGetWebGLMessage();
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var SCREEN_WIDTH = window.innerWidth,
 				SCREEN_HEIGHT = window.innerHeight,
