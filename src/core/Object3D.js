@@ -34,129 +34,105 @@ THREE.Object3D = function() {
 };
 
 
-/*
- * Update
- */
+THREE.Object3D.prototype = {
 
-THREE.Object3D.prototype.update = function( parentGlobalMatrix, forceUpdate, camera ) {
+	update: function ( parentGlobalMatrix, forceUpdate, camera ) {
 
-	// visible and auto update?
+		if ( this.visible ) {
 
-	if( this.visible ) {
+			if ( this.matrixAutoUpdate ) {
 
-		// update local
-
-		if( this.matrixAutoUpdate )
-			forceUpdate |= this.updateMatrix();
-
-
-		// update global
-
-		if( forceUpdate || this.matrixNeedsUpdate ) {
-
-			if( parentGlobalMatrix ) {
-				
-				this.globalMatrix.multiply( parentGlobalMatrix, this.localMatrix );
-
-			} else {
-
-				this.globalMatrix.copy( this.localMatrix );
+				forceUpdate |= this.updateMatrix();
 
 			}
 
-			this.matrixNeedsUpdate = false;
-			forceUpdate              = true;
+			// update global
+
+			if ( forceUpdate || this.matrixNeedsUpdate ) {
+
+				if ( parentGlobalMatrix ) {
+
+					this.globalMatrix.multiply( parentGlobalMatrix, this.localMatrix );
+
+				} else {
+
+					this.globalMatrix.copy( this.localMatrix );
+
+				}
+
+				this.matrixNeedsUpdate = false;
+				forceUpdate              = true;
+
+			}
+
+
+			// update children
+
+			var i, l = this.children.length;
+
+			for ( i = 0; i < l; i++ ) {
+
+				this.children[ i ].update( this.globalMatrix, forceUpdate, camera );
+
+			}
 
 		}
 
+	},
 
-		// update children
 
-		var i, l = this.children.length;
+	updateMatrix: function () {
 
-		for( i = 0; i < l; i++ ) {
+		this.localMatrix.setPosition( this.position );
 
-			this.children[ i ].update( this.globalMatrix, forceUpdate, camera );
+		if ( this.useQuaternion )  {
+
+			this.localMatrix.setRotationFromQuaternion( this.quaternion );
+
+		} else {
+
+			this.localMatrix.setRotationFromEuler( this.rotation );
+
+		}
+
+		if ( this.scale.x !== 1 || this.scale.y !== 1 || this.scale.z !== 1 ) {
+
+			this.localMatrix.scale( this.scale );
+			this.boundRadiusScale = Math.max( this.scale.x, Math.max( this.scale.y, this.scale.z ) );
+
+		}
+
+		return true;
+
+	},
+
+	addChild: function ( child ) {
+
+		if ( this.children.indexOf( child ) === -1 ) {
+
+			if( child.parent !== undefined )
+				child.parent.removeChild( child );
+
+			child.parent = this;
+			this.children.push( child );
+
+		}
+
+	},
+
+	removeChild: function ( child ) {
+
+		var childIndex = this.children.indexOf( child );
+
+		if ( childIndex !== -1 )	{
+
+			this.children.splice( childIndex, 1 );
+			child.parent = undefined;
 
 		}
 
 	}
 
-};
-
-
-/*
- * Update Matrix
- */
-
-THREE.Object3D.prototype.updateMatrix = function() {
-
-	// update position
-
-	this.localMatrix.setPosition( this.position );
-
-	// update quaternion
-
-	if( this.useQuaternion )  {
-
-		this.localMatrix.setRotationFromQuaternion( this.quaternion );
-
-	// update rotation
-
-	} else {
-
-		this.localMatrix.setRotationFromEuler( this.rotation );
-
-	}
-
-	// update scale
-
-	if( this.scale.x !== 1 || this.scale.y !== 1 || this.scale.z !== 1 ) {
-
-		this.localMatrix.scale( this.scale );
-		this.boundRadiusScale = Math.max( this.scale.x, Math.max( this.scale.y, this.scale.z ) );
-
-	}
-
-	return true;
-
-};
-
-
-/*
- * AddChild
- */
-
-THREE.Object3D.prototype.addChild = function( child ) {
-
-	if( this.children.indexOf( child ) === -1 ) {
-
-		if( child.parent !== undefined )
-			child.parent.removeChild( child );
-
-		child.parent = this;
-		this.children.push( child );
-
-	}
-
-};
-
-
-/*
- * RemoveChild
- */
-
-THREE.Object3D.prototype.removeChild = function( child ) {
-
-	var childIndex = this.children.indexOf( child );
-
-	if( childIndex !== -1 )	{
-
-		this.children.splice( childIndex, 1 );
-		child.parent = undefined;
-
-	}
-
-};
+}
 
 THREE.Object3DCounter = { value: 0 };
