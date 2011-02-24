@@ -36,14 +36,15 @@
 
 		<pre id="log"></pre>
 
-		<script type="text/javascript" src="../build/ThreeExtras.js"></script>
+		<script type="text/javascript" src="../build/Three.js"></script>
 
+		<script type="text/javascript" src="js/Detector.js"></script>
 		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
 
-			if ( ! THREE.Detector.webgl ) THREE.Detector.addGetWebGLMessage();
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var container, stats;
 
@@ -180,8 +181,6 @@
 				webglRenderer.clear();
 				webglRenderer.render( sceneCube, cameraCube );
 				webglRenderer.render( scene, camera );
-
-				stats.update();
 
 			}
 

@@ -2077,7 +2077,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function addObject( scene, object ) {
+	function addObject( scene, object, camera ) {
 
 		var g, geometry, geometryChunk, objmap;
 
@@ -2271,7 +2271,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			object = scene.objects[ o ];
 
-			addObject( scene, object );
+			addObject( scene, object, camera );
 
 		}
 
@@ -2362,7 +2362,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if (!_gl) {
 
-			alert("WebGL not supported");
+			// alert("WebGL not supported");
 			throw "cannot create webgl context";
 
 		}

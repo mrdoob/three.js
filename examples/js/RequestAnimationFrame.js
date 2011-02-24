@@ -7,9 +7,8 @@ if ( !window.requestAnimationFrame ) {
 
 	window.requestAnimationFrame = ( function() {
 
-		return window.requestAnimationFrame ||
-		window.webkitRequestAnimationFrame ||
-		//window.mozRequestAnimationFrame || // commented out for the moment, FF4 caps framerate at ~30fps: https://bugzilla.mozilla.org/show_bug.cgi?id=630127
+		return window.webkitRequestAnimationFrame ||
+		window.mozRequestAnimationFrame || // comment out if FF4 is slow (it caps framerate at ~30fps: https://bugzilla.mozilla.org/show_bug.cgi?id=630127)
 		window.oRequestAnimationFrame ||
 		window.msRequestAnimationFrame ||
 		function( /* function FrameRequestCallback */ callback, /* DOMElement Element */ element ) {

@@ -36,8 +36,9 @@
 			<a href="http://www.ir-ltd.net/infinite-3d-head-scan-released/" target="_blank">Lee Perry-Smith</a> head
 		</div>
 
-		<script type="text/javascript" src="../build/ThreeExtras.js"></script>
+		<script type="text/javascript" src="../build/Three.js"></script>
 
+		<script type="text/javascript" src="js/Detector.js"></script>
 		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
@@ -68,7 +69,7 @@
 
 		<script type="text/javascript">
 
-			if ( ! THREE.Detector.webgl ) THREE.Detector.addGetWebGLMessage();
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var container, stats;
 

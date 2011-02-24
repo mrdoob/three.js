@@ -44,16 +44,13 @@
 
 		<script type="text/javascript" src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="../src/extras/io/Loader.js"></script>
-		<script type="text/javascript" src="../src/extras/primitives/Sphere.js"></script>
-		<script type="text/javascript" src="../src/extras/Detector.js"></script>
-
+		<script type="text/javascript" src="js/Detector.js"></script>
 		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
 
-			if ( ! THREE.Detector.webgl ) THREE.Detector.addGetWebGLMessage();
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var camera, scene, renderer,
 			particle1, particle2, particle2,

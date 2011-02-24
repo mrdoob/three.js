@@ -46,9 +46,6 @@
 
 		<script type="text/javascript" src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="../src/extras/io/Loader.js"></script>
-		<script type="text/javascript" src="../src/extras/primitives/Sphere.js"></script>
-
 		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
@@ -238,8 +235,6 @@
 
 				if ( render_canvas ) canvasRenderer.render( scene, camera );
 				if ( render_gl && has_gl ) webglRenderer.render( scene, camera );
-
-				stats.update();
 
 			}
 
