@@ -221,8 +221,7 @@
 							 r + "posy.jpg", r + "negy.jpg",
 							 r + "posz.jpg", r + "negz.jpg" ];
 
-				var images = ImageUtils.loadArray( urls );
-				var textureCube = new THREE.Texture( images );
+				var textureCube = ImageUtils.loadTextureCube( urls );
 
 				// common materials
 

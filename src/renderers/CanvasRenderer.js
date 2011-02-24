@@ -375,7 +375,7 @@ THREE.CanvasRenderer = function () {
 
 			if ( material instanceof THREE.ParticleBasicMaterial ) {
 
-				if ( material.map && material.map.image.loaded ) {
+				if ( material.map ) {
 
 					bitmap = material.map.image;
 					bitmapWidth = bitmap.width >> 1;
@@ -510,47 +510,42 @@ THREE.CanvasRenderer = function () {
 
 			if ( material instanceof THREE.MeshBasicMaterial ) {
 
-				if ( material.map/* && !material.wireframe*/ ) {
+				if ( material.map/* && !material.wireframe*/ ) {					
 
-					if ( material.map.image.loaded ) {
+					if ( material.map.mapping instanceof THREE.UVMapping ) {
 
-						if ( material.map.mapping instanceof THREE.UVMapping ) {
-
-							texturePath( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, material.map.image, element.uvs[ 0 ].u, element.uvs[ 0 ].v, element.uvs[ 1 ].u, element.uvs[ 1 ].v, element.uvs[ 2 ].u, element.uvs[ 2 ].v );
-
-						}
+						texturePath( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, material.map.image, element.uvs[ 0 ].u, element.uvs[ 0 ].v, element.uvs[ 1 ].u, element.uvs[ 1 ].v, element.uvs[ 2 ].u, element.uvs[ 2 ].v );
 
 					}
+
 
 				} else if ( material.env_map ) {
 
-					if ( material.env_map.image.loaded ) {
 
-						if ( material.env_map.mapping instanceof THREE.SphericalReflectionMapping ) {
+					if ( material.env_map.mapping instanceof THREE.SphericalReflectionMapping ) {
 
-							var cameraMatrix = camera.globalMatrix;
+						var cameraMatrix = camera.globalMatrix;
 
-							_vector3.copy( element.vertexNormalsWorld[ 0 ] );
-							_uv1x = ( _vector3.x * cameraMatrix.n11 + _vector3.y * cameraMatrix.n12 + _vector3.z * cameraMatrix.n13 ) * 0.5 + 0.5;
-							_uv1y = - ( _vector3.x * cameraMatrix.n21 + _vector3.y * cameraMatrix.n22 + _vector3.z * cameraMatrix.n23 ) * 0.5 + 0.5;
+						_vector3.copy( element.vertexNormalsWorld[ 0 ] );
+						_uv1x = ( _vector3.x * cameraMatrix.n11 + _vector3.y * cameraMatrix.n12 + _vector3.z * cameraMatrix.n13 ) * 0.5 + 0.5;
+						_uv1y = - ( _vector3.x * cameraMatrix.n21 + _vector3.y * cameraMatrix.n22 + _vector3.z * cameraMatrix.n23 ) * 0.5 + 0.5;
 
-							_vector3.copy( element.vertexNormalsWorld[ 1 ] );
-							_uv2x = ( _vector3.x * cameraMatrix.n11 + _vector3.y * cameraMatrix.n12 + _vector3.z * cameraMatrix.n13 ) * 0.5 + 0.5;
-							_uv2y = - ( _vector3.x * cameraMatrix.n21 + _vector3.y * cameraMatrix.n22 + _vector3.z * cameraMatrix.n23 ) * 0.5 + 0.5;
+						_vector3.copy( element.vertexNormalsWorld[ 1 ] );
+						_uv2x = ( _vector3.x * cameraMatrix.n11 + _vector3.y * cameraMatrix.n12 + _vector3.z * cameraMatrix.n13 ) * 0.5 + 0.5;
+						_uv2y = - ( _vector3.x * cameraMatrix.n21 + _vector3.y * cameraMatrix.n22 + _vector3.z * cameraMatrix.n23 ) * 0.5 + 0.5;
 
-							_vector3.copy( element.vertexNormalsWorld[ 2 ] );
-							_uv3x = ( _vector3.x * cameraMatrix.n11 + _vector3.y * cameraMatrix.n12 + _vector3.z * cameraMatrix.n13 ) * 0.5 + 0.5;
-							_uv3y = - ( _vector3.x * cameraMatrix.n21 + _vector3.y * cameraMatrix.n22 + _vector3.z * cameraMatrix.n23 ) * 0.5 + 0.5;
+						_vector3.copy( element.vertexNormalsWorld[ 2 ] );
+						_uv3x = ( _vector3.x * cameraMatrix.n11 + _vector3.y * cameraMatrix.n12 + _vector3.z * cameraMatrix.n13 ) * 0.5 + 0.5;
+						_uv3y = - ( _vector3.x * cameraMatrix.n21 + _vector3.y * cameraMatrix.n22 + _vector3.z * cameraMatrix.n23 ) * 0.5 + 0.5;
 
-							texturePath( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, material.env_map.image, _uv1x, _uv1y, _uv2x, _uv2y, _uv3x, _uv3y );
+						texturePath( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, material.env_map.image, _uv1x, _uv1y, _uv2x, _uv2y, _uv3x, _uv3y );
 
-						}/* else if ( material.env_map.mapping == THREE.RefractionMapping ) {
+					}/* else if ( material.env_map.mapping == THREE.RefractionMapping ) {
 
-							
+						
 
-						}*/
+					}*/
 
-					}
 
 				} else {
 

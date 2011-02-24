@@ -104,7 +104,8 @@
 				}
 
 				texture = new THREE.Texture( generateTexture( data, worldWidth, worldDepth ), new THREE.UVMapping(), THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping );
-
+				texture.needsUpdate = true;
+				
 				mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { map: texture } ) );
 				mesh.rotation.x = - 90 * Math.PI / 180;
 				scene.addObject( mesh );
@@ -199,7 +200,6 @@
 				canvasScaled = document.createElement( 'canvas' );
 				canvasScaled.width = width * 4;
 				canvasScaled.height = height * 4;
-				canvasScaled.loaded = true;
 
 				context = canvasScaled.getContext( '2d' );
 				context.scale( 4, 4 );

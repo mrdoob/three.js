@@ -66,7 +66,7 @@
 				scene.addObject( line );
 
 				var generatedTexture = new THREE.Texture( generateTexture() );
-				generatedTexture.image.loaded = 1;
+				generatedTexture.needsUpdate = true;
 
 				var materials = [];
 				materials.push( new THREE.MeshLambertMaterial( { color: 0xdddddd, shading: THREE.FlatShading } ) );

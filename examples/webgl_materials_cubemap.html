@@ -104,18 +104,14 @@
 						path + 'pz' + format, path + 'nz' + format
 					];
 
-				var images = ImageUtils.loadArray( urls );
-
-				var reflectionCube = new THREE.Texture( images );
-				var refractionCube = new THREE.Texture( images, new THREE.CubeRefractionMapping() );
-
-				//var cubeMaterial3 = new THREE.MeshPhongMaterial( { color: 0x000000, specular:0xaa0000, env_map: new THREE.TextureCube( images ), combine: THREE.MixOperation, reflectivity: 0.25 } );
+				var reflectionCube = ImageUtils.loadTextureCube( urls );
+				var refractionCube = new THREE.Texture( reflectionCube.image, new THREE.CubeRefractionMapping() );
+				
+				//var cubeMaterial3 = new THREE.MeshPhongMaterial( { color: 0x000000, specular:0xaa0000, env_map: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.25 } );
 				var cubeMaterial3 = new THREE.MeshLambertMaterial( { color: 0xff6600, env_map: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3 } );
 				var cubeMaterial2 = new THREE.MeshLambertMaterial( { color: 0xffee00, env_map: refractionCube, refraction_ratio: 0.95 } );
 				var cubeMaterial1 = new THREE.MeshLambertMaterial( { color: 0xffffff, env_map: reflectionCube } )
 
-				//SceneUtils.addPanoramaCubePlanes( sceneCube, 100000, images );
-				//SceneUtils.addPanoramaCube( sceneCube, 100000, images );
 				SceneUtils.addPanoramaCubeWebGL( sceneCube, 100000, reflectionCube );
 
 				webglRenderer = new THREE.WebGLRenderer();

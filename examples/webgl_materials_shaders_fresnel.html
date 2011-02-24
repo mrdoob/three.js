@@ -92,8 +92,7 @@
 					];
 
 
-				var images = ImageUtils.loadArray( urls );
-				var textureCube = new THREE.Texture( images );
+				var textureCube = ImageUtils.loadTextureCube( urls );
 
 				var shader = ShaderUtils.lib["fresnel"];
 				var uniforms = Uniforms.clone( shader.uniforms );

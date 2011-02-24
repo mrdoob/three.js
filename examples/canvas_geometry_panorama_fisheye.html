@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - panorama fisheye demo</title>
+		<title>three.js canvas - panorama fisheye demo</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -108,14 +108,16 @@
 
 			function loadTexture( path ) {
 
-				var material = new THREE.MeshBasicMaterial( { map: new THREE.Texture( texture_placeholder ) } );
+				var texture = new THREE.Texture( texture_placeholder ),
+					material = new THREE.MeshBasicMaterial( { map: texture } );
 
 				var image = new Image();
 
 				image.onload = function () {
 
-					this.loaded = true;
+					texture.needsUpdate = true;
 					material.map.image = this;
+					
 					render();
 
 				};
@@ -123,6 +125,7 @@
 				image.src = path;
 
 				return material;
+
 			}
 
 			function onDocumentMouseDown( event ) {

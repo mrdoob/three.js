@@ -139,6 +139,8 @@
 				var film_uniforms = Uniforms.clone( film_shader.uniforms );
 
 				film_uniforms["tDiffuse"].texture = rtTexture1;
+				film_uniforms["nIntensity"].value = 0.25;
+				film_uniforms["sIntensity"].value = 0.5;
 
 				materialFilm = new THREE.MeshShaderMaterial( {
 

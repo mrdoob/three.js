@@ -193,10 +193,12 @@
 			function loadTexture( path ) {
 
 				var image = new Image();
-				image.onload = function () { this.loaded = true; };
+				image.onload = function () { texture.needsUpdate = true; };
 				image.src = path;
 
-				return new THREE.MeshLambertMaterial( { map: new THREE.Texture( image, new THREE.UVMapping(), THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping, THREE.NearestFilter, THREE.LinearMipMapLinearFilter ) } );
+				var texture  = new THREE.Texture( image, new THREE.UVMapping(), THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping, THREE.NearestFilter, THREE.LinearMipMapLinearFilter );
+				
+				return new THREE.MeshLambertMaterial( { map: texture } );
 
 			}
 

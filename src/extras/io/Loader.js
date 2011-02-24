@@ -1225,7 +1225,7 @@ THREE.Loader.prototype = {
 
 				}
 
-				where.image.loaded = 1;
+				where.needsUpdate = true;
 
 			};
 
