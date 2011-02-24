@@ -112,25 +112,23 @@
 				camera.position.z = 100;
 				camera.updateMatrix();
 
+				scene = new THREE.Scene();
 				sceneRTT = new THREE.Scene();
 				sceneScreen = new THREE.Scene();
-				scene = new THREE.Scene();
 
 				var light = new THREE.DirectionalLight( 0xffffff );
 				light.position.x = 0;
 				light.position.y = 0;
 				light.position.z = 1;
 				light.position.normalize();
-				scene.addLight( light );
 				sceneRTT.addLight( light );
-				sceneScreen.addLight( light );
-
-				light = new THREE.DirectionalLight( 0xffaaaa, 0.5 );
-				light.position.x = -1;
+				
+				light = new THREE.DirectionalLight( 0xffaaaa, 1.5 );
+				light.position.x = 0;
 				light.position.y = 0;
 				light.position.z = -1;
 				light.position.normalize();
-				scene.addLight( light );
+				sceneRTT.addLight( light );
 
 				rtTexture = new THREE.RenderTarget( window.innerWidth, window.innerHeight, { min_filter: THREE.LinearFilter, mag_filter: THREE.NearestFilter } );
 
@@ -280,8 +278,6 @@
 				// (using first scene as regular texture)
 
 				renderer.render( scene, camera );
-
-				stats.update();
 
 			}
 
