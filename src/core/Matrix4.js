@@ -507,32 +507,23 @@ THREE.Matrix4.prototype = {
 
 	setRotationFromEuler: function( vec3 ) {
 
-		//var c = Math.PI / 180;
-		var x = vec3.x,// * c;
-			y = vec3.y,// * c;
-			z = vec3.z,// * c;
+		var x = vec3.x, y = vec3.y, z = vec3.z,
+		a = Math.cos( x ), b = Math.sin( x ),
+		c = Math.cos( y ), d = Math.sin( y ),
+		e = Math.cos( z ), f = Math.sin( z ),
+		ad = a * d, bd = b * d;
 
-			ch = Math.cos( y  ),
-			sh = Math.sin( y  ),
-			ca = Math.cos( -z ),
-			sa = Math.sin( -z ),
-			cb = Math.cos( x  ),
-			sb = Math.sin( x  ),
+		this.n11 = c * e;
+		this.n12 = - c * f;
+		this.n13 = d;
 
-			chsa = ch * sa,
-			shsa = sh * sa;
+		this.n21 = bd * e + a * f;
+		this.n22 = - bd * f + a * e;
+		this.n23 = - b * c;
 
-	    this.n11 = ch * ca;
-	    this.n12 = sh * sb - chsa * cb;
-	    this.n13 = chsa * sb + sh * cb;
-
-	    this.n21 = sa;
-	    this.n22 = ca * cb;
-	    this.n23 = - ca * sb;
-
-	    this.n31 = - sh * ca;
-	    this.n32 = shsa * cb + ch * sb;
-	    this.n33 = - shsa * sb + ch * cb;
+		this.n31 = - ad * e + b * f;
+		this.n32 = ad * f + b * e;
+		this.n33 = a * c;
 
 	},
 
@@ -592,7 +583,7 @@ THREE.Matrix4.prototype = {
 	},
 
 	extractPositionVector: function( v ) {
-		
+
 		v.x = this.n14;
 		v.y = this.n24;
 		v.z = this.n34;
@@ -761,9 +752,9 @@ THREE.Matrix4.makeInvert3x3 = function ( m1 ) {
 	a13 =   m1.n23 * m1.n12 - m1.n22 * m1.n13,
 	a23 = - m1.n23 * m1.n11 + m1.n21 * m1.n13,
 	a33 =   m1.n22 * m1.n11 - m1.n21 * m1.n12,
-	
+
 	det = m1.n11 * a11 + m1.n21 * a12 + m1.n31 * a13,
-	
+
 	idet;
 
 	// no inverse
