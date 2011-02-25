@@ -87,13 +87,25 @@ THREE.Object3D.prototype = {
 
 		if ( this.useQuaternion )  {
 
-			this.localMatrix.setRotationFromQuaternion( this.quaternion );
+			this.matrixRotation.setRotationFromQuaternion( this.quaternion );
 
 		} else {
 
-			this.localMatrix.setRotationFromEuler( this.rotation );
+			this.matrixRotation.setRotationFromEuler( this.rotation );
 
 		}
+
+		this.localMatrix.n11 = this.matrixRotation.n11;
+		this.localMatrix.n12 = this.matrixRotation.n12;
+		this.localMatrix.n13 = this.matrixRotation.n13;
+
+		this.localMatrix.n21 = this.matrixRotation.n21;
+		this.localMatrix.n22 = this.matrixRotation.n22;
+		this.localMatrix.n23 = this.matrixRotation.n23;
+
+		this.localMatrix.n31 = this.matrixRotation.n31;
+		this.localMatrix.n32 = this.matrixRotation.n32;
+		this.localMatrix.n33 = this.matrixRotation.n33;
 
 		if ( this.scale.x !== 1 || this.scale.y !== 1 || this.scale.z !== 1 ) {
 

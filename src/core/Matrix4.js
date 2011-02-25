@@ -565,9 +565,10 @@ THREE.Matrix4.prototype = {
 
 		var x = vec3.x, y = vec3.y, z = vec3.z;
 
-		this.n11 *= x; this.n12 *= x; this.n13 *= x;
-		this.n21 *= y; this.n22 *= y; this.n23 *= y;
-		this.n31 *= z; this.n32 *= z; this.n33 *= z;
+		this.n11 *= x; this.n12 *= y; this.n13 *= z;
+		this.n21 *= x; this.n22 *= y; this.n23 *= z;
+		this.n31 *= x; this.n32 *= y; this.n33 *= z;
+		this.n41 *= x; this.n42 *= y; this.n43 *= z;
 
 		return this;
 

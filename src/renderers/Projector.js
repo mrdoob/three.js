@@ -15,7 +15,7 @@ THREE.Projector = function() {
 	_vector4 = new THREE.Vector4(),
 	_projScreenMatrix = new THREE.Matrix4(),
 	_projScreenObjectMatrix = new THREE.Matrix4(),
-	
+
 	_frustum = [
 		new THREE.Vector4(),
 		new THREE.Vector4(),
@@ -98,7 +98,6 @@ THREE.Projector = function() {
 			object.matrixAutoUpdate && object.updateMatrix();
 
 			objectMatrix = object.globalMatrix;
-			objectMatrix.extractRotationMatrix( object.matrixRotation );
 			objectMatrixRotation = object.matrixRotation;
 
 			objectMaterials = object.materials;
