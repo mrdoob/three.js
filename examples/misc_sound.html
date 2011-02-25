@@ -43,7 +43,6 @@
 		
 		<script type="text/javascript" src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/CameraControl.js"></script>
 		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Detector.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
@@ -72,7 +71,9 @@
 				scene  = new THREE.Scene();
 				scene.fog = new THREE.FogExp2( 0x000000, 0.0035 );
 
-				camera = new THREE.Camera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.QuakeCamera( { fov: 50, aspect: window.innerWidth / window.innerHeight, near: 1, far: 10000,
+												  movement_speed: 1, look_speed: 0.002, nofly: true, look_vertical: false } );
+												  
 				camera.position.set( 0, 25, 0 );
 
 				light = new THREE.DirectionalLight( 0xffffff );
@@ -149,9 +150,7 @@
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
-				//container.appendChild( stats.domElement );
-				
-				cameraControl = new CameraControlWASD( camera, 1, 0.002, true, false );
+				//container.appendChild( stats.domElement );				
 				
 				initPostprocessing();
 				renderer.autoClear = false;
@@ -226,9 +225,7 @@
 				var time = new Date().getTime() * 0.005;
 				
 				material_sphere1.color.setHSV( 0.0, 0.3 + 0.7 * ( 1 + Math.cos(time) ) / 2, 1 );
-				material_sphere2.color.setHSV( 0.1, 0.3 + 0.7 * ( 1 + Math.sin(time) ) / 2, 1 );
-				
-				cameraControl.update();				
+				material_sphere2.color.setHSV( 0.1, 0.3 + 0.7 * ( 1 + Math.sin(time) ) / 2, 1 );	
 				
 				if ( postprocessing.enabled ) {
 

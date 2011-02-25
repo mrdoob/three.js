@@ -3,7 +3,7 @@
  * @author mikael emtinger / http://gomo.se/
  */
 
-THREE.Camera = function( FOV, aspect, zNear, zFar, renderer, target ) {
+THREE.Camera = function( FOV, aspect, zNear, zFar, target ) {
 
 	THREE.Object3D.call( this );
 

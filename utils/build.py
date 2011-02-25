@@ -31,6 +31,7 @@ COMMON_FILES = [
 'animation/AnimationHandler.js',
 'animation/Animation.js',
 'cameras/Camera.js',
+'cameras/QuakeCamera.js',
 'lights/Light.js',
 'lights/AmbientLight.js',
 'lights/DirectionalLight.js',
