@@ -591,6 +591,14 @@ THREE.Matrix4.prototype = {
 
 	},
 
+	extractPositionVector: function( v ) {
+		
+		v.x = this.n14;
+		v.y = this.n24;
+		v.z = this.n34;
+
+	},
+
 	toString: function() {
 
 		return  "| " + this.n11 + " " + this.n12 + " " + this.n13 + " " + this.n14 + " |\n" +

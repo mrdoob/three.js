@@ -13,6 +13,7 @@ THREE.Scene = function() {
 
 	this.objects = [];
 	this.lights  = [];
+	this.sounds  = [];
 	this.fog     = null;
 
 };
@@ -34,11 +35,15 @@ THREE.Scene.prototype.addChild = function( child ) {
 
 THREE.Scene.prototype.addChildRecurse = function( child ) {
 	
-	
 	if( child instanceof THREE.Light ) {
 			
 		if( this.lights.indexOf( child ) === -1 )
 			this.lights.push( child );	
+
+	} else if( child instanceof THREE.Sound3D ) {
+		
+		if( this.sounds.indexOf( child ) === -1 )
+			this.sounds.push( child );
 
 	} else if( !( child instanceof THREE.Camera || child instanceof THREE.Bone ) ) {
 		
@@ -72,6 +77,13 @@ THREE.Scene.prototype.removeChildRecurse = function( child ) {
 		
 		if( i !== -1 )
 			this.lights.splice( i, 1 );
+
+	} else if( child instanceof THREE.Sound3D ) {
+		
+		var i = this.sounds.indexOf( child );
+		
+		if( i !== -1 )
+			this.sounds.splice( i, 1 );
 
 	} else if( !( child instanceof THREE.Camera ) ) {
 		
