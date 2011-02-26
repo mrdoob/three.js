@@ -3,7 +3,7 @@
  * @author mikael emtinger / http://gomo.se/
  */
 
-THREE.Scene = function() {
+THREE.Scene = function () {
 
 	THREE.Object3D.call( this );
 
@@ -12,6 +12,8 @@ THREE.Scene = function() {
 	this.sounds = [];
 
 	this.fog = null;
+
+	this.matrixAutoUpdate = false;
 
 };
 

@@ -380,7 +380,7 @@ THREE.Matrix4.prototype = {
 	flatten: function () {
 
 		this.flattenToArray( this.flat );
-		return flat;
+		return this.flat;
 
 	},
 

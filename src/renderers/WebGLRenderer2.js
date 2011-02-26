@@ -114,6 +114,8 @@ THREE.WebGLRenderer2 = function ( antialias ) {
 		}
 		*/
 
+		scene.update( undefined, false, camera );
+
 		_renderList = _projector.projectObjects( scene, camera, this.sortObjects );
 
 		for ( o = 0, ol = _renderList.length; o < ol; o++ ) {

@@ -59,8 +59,8 @@ THREE.Object3D.prototype = {
 
 		if ( childIndex !== - 1 ) {
 
-			this.children.splice( childIndex, 1 );
 			child.parent = undefined;
+			this.children.splice( childIndex, 1 );
 
 		}
 
@@ -134,9 +134,7 @@ THREE.Object3D.prototype = {
 
 			// update children
 
-			var i, l = this.children.length;
-
-			for ( i = 0; i < l; i++ ) {
+			for ( var i = 0, l = this.children.length; i < l; i ++ ) {
 
 				this.children[ i ].update( this.matrixWorld, forceUpdate, camera );
 
