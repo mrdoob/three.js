@@ -139,43 +139,43 @@ THREE.Quaternion.prototype = {
 
 		return dest;
 
-	},
+	}
 
-	slerp : function ( qa, qb, qm, t ) {
+}
 
-		var cosHalfTheta = qa.w * qb.w + qa.x * qb.x + qa.y * qb.y + qa.z * qb.z;
+THREE.Quaternion.slerp = function ( qa, qb, qm, t ) {
 
-		if ( Math.abs( cosHalfTheta ) >= 1.0 ) {
+	var cosHalfTheta = qa.w * qb.w + qa.x * qb.x + qa.y * qb.y + qa.z * qb.z;
 
-			qm.w = qa.w; qm.x = qa.x; qm.y = qa.y; qm.z = qa.z;
-			return qm;
+	if ( Math.abs( cosHalfTheta ) >= 1.0 ) {
 
-		}
+		qm.w = qa.w; qm.x = qa.x; qm.y = qa.y; qm.z = qa.z;
+		return qm;
 
-		var halfTheta = Math.acos( cosHalfTheta ),
-		sinHalfTheta = Math.sqrt( 1.0 - cosHalfTheta * cosHalfTheta );
+	}
 
-		if ( Math.abs( sinHalfTheta ) < 0.001 ) { 
+	var halfTheta = Math.acos( cosHalfTheta ),
+	sinHalfTheta = Math.sqrt( 1.0 - cosHalfTheta * cosHalfTheta );
 
-			qm.w = 0.5 * ( qa.w + qb.w );
-			qm.x = 0.5 * ( qa.x + qb.x );
-			qm.y = 0.5 * ( qa.y + qb.y );
-			qm.z = 0.5 * ( qa.z + qb.z );
+	if ( Math.abs( sinHalfTheta ) < 0.001 ) { 
 
-			return qm;
-
-		}
-
-		var ratioA = Math.sin( ( 1 - t ) * halfTheta ) / sinHalfTheta,
-		ratioB = Math.sin( t * halfTheta ) / sinHalfTheta; 
-
-		qm.w = ( qa.w * ratioA + qb.w * ratioB );
-		qm.x = ( qa.x * ratioA + qb.x * ratioB );
-		qm.y = ( qa.y * ratioA + qb.y * ratioB );
-		qm.z = ( qa.z * ratioA + qb.z * ratioB );
+		qm.w = 0.5 * ( qa.w + qb.w );
+		qm.x = 0.5 * ( qa.x + qb.x );
+		qm.y = 0.5 * ( qa.y + qb.y );
+		qm.z = 0.5 * ( qa.z + qb.z );
 
 		return qm;
 
 	}
+
+	var ratioA = Math.sin( ( 1 - t ) * halfTheta ) / sinHalfTheta,
+	ratioB = Math.sin( t * halfTheta ) / sinHalfTheta; 
+
+	qm.w = ( qa.w * ratioA + qb.w * ratioB );
+	qm.x = ( qa.x * ratioA + qb.x * ratioB );
+	qm.y = ( qa.y * ratioA + qb.y * ratioB );
+	qm.z = ( qa.z * ratioA + qb.z * ratioB );
+
+	return qm;
 
 }
