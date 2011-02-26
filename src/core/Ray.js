@@ -11,7 +11,7 @@ THREE.Ray = function ( origin, direction ) {
 
 THREE.Ray.prototype = {
 
-	intersectScene: function ( scene ) {
+	intersectScene : function ( scene ) {
 
 		var i, l, object,
 		objects = scene.objects,
@@ -35,7 +35,7 @@ THREE.Ray.prototype = {
 
 	},
 
-	intersectObject: function ( object ) {
+	intersectObject : function ( object ) {
 
 		var f, fl, face, a, b, c, d, normal,
 		dot, scalar,

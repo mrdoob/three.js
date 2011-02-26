@@ -20,8 +20,9 @@ THREE.Vertex = function ( position, normal ) {
 
 THREE.Vertex.prototype = {
 
-	toString: function () {
+	toString : function () {
 
 		return 'THREE.Vertex ( position: ' + this.position + ', normal: ' + this.normal + ' )';
 	}
+
 };

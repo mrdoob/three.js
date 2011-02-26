@@ -18,7 +18,7 @@ THREE.Face3 = function ( a, b, c, normal, materials ) {
 
 THREE.Face3.prototype = {
 
-	toString: function () {
+	toString : function () {
 
 		return 'THREE.Face3 ( ' + this.a + ', ' + this.b + ', ' + this.c + ' )';
 

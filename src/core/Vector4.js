@@ -6,17 +6,20 @@
 
 THREE.Vector4 = function ( x, y, z, w ) {
 
-	this.x = x || 0;
-	this.y = y || 0;
-	this.z = z || 0;
-	//this.w = w !== undefined ? w : 1;
-	this.w = w || 1;
+	this.set(
+
+		x || 0,
+		y || 0,
+		z || 0,
+		w || 1
+
+	);
 
 };
 
 THREE.Vector4.prototype = {
 
-	set: function ( x, y, z, w ) {
+	set : function ( x, y, z, w ) {
 
 		this.x = x;
 		this.y = y;
@@ -27,99 +30,131 @@ THREE.Vector4.prototype = {
 
 	},
 
-	copy: function ( v ) {
+	copy : function ( v ) {
 
-		this.x = v.x;
-		this.y = v.y;
-		this.z = v.z;
-		this.w = v.w || 1.0;
+		this.set(
 
-		return this;
+			v.x,
+			v.y,
+			v.z,
+			v.w || 1.0
 
-	},
-
-	add: function ( v1, v2 ) {
-
-		this.x = v1.x + v2.x;
-		this.y = v1.y + v2.y;
-		this.z = v1.z + v2.z;
-		this.w = v1.w + v2.w;
+		);
 
 		return this;
 
 	},
 
-	addSelf: function ( v ) {
+	add : function ( v1, v2 ) {
 
-		this.x += v.x;
-		this.y += v.y;
-		this.z += v.z;
-		this.w += v.w;
+		this.set(
 
-		return this;
+			v1.x + v2.x,
+			v1.y + v2.y,
+			v1.z + v2.z,
+			v1.w + v2.w
 
-	},
-
-	sub: function ( v1, v2 ) {
-
-		this.x = v1.x - v2.x;
-		this.y = v1.y - v2.y;
-		this.z = v1.z - v2.z;
-		this.w = v1.w - v2.w;
+		);
 
 		return this;
 
 	},
 
-	subSelf: function ( v ) {
+	addSelf : function ( v ) {
 
-		this.x -= v.x;
-		this.y -= v.y;
-		this.z -= v.z;
-		this.w -= v.w;
+		this.set(
 
-		return this;
+			this.x + v.x,
+			this.y + v.y,
+			this.z + v.z,
+			this.w + v.w
 
-	},
-
-	multiplyScalar: function ( s ) {
-
-		this.x *= s;
-		this.y *= s;
-		this.z *= s;
-		this.w *= s;
+		);
 
 		return this;
 
 	},
 
-	divideScalar: function ( s ) {
+	sub : function ( v1, v2 ) {
 
-		this.x /= s;
-		this.y /= s;
-		this.z /= s;
-		this.w /= s;
+		this.set(
+
+			v1.x - v2.x,
+			v1.y - v2.y,
+			v1.z - v2.z,
+			v1.w - v2.w
+
+		);
 
 		return this;
 
 	},
 
-	lerpSelf: function ( v, alpha ) {
+	subSelf : function ( v ) {
 
-		this.x = this.x + (v.x - this.x) * alpha;
-		this.y = this.y + (v.y - this.y) * alpha;
-		this.z = this.z + (v.z - this.z) * alpha;
-		this.w = this.w + (v.w - this.w) * alpha;
+		this.set(
+
+			this.x - v.x,
+			this.y - v.y,
+			this.z - v.z,
+			this.w - v.w
+
+		);
+
+		return this;
 
 	},
 
-	clone: function () {
+	multiplyScalar : function ( s ) {
+
+		this.set(
+
+			this.x * s,
+			this.y * s,
+			this.z * s,
+			this.w * s
+
+		);
+
+		return this;
+
+	},
+
+	divideScalar : function ( s ) {
+
+		this.set(
+
+			this.x / s,
+			this.y / s,
+			this.z / s,
+			this.w / s
+
+		);
+
+		return this;
+
+	},
+
+	lerpSelf : function ( v, alpha ) {
+
+		this.set(
+
+			this.x + (v.x - this.x) * alpha,
+			this.y + (v.y - this.y) * alpha,
+			this.z + (v.z - this.z) * alpha,
+			this.w + (v.w - this.w) * alpha
+
+		);
+
+	},
+
+	clone : function () {
 
 		return new THREE.Vector4( this.x, this.y, this.z, this.w );
 
 	},
 
-	toString: function () {
+	toString : function () {
 
 		return 'THREE.Vector4 (' + this.x + ', ' + this.y + ', ' + this.z + ', ' + this.w + ')';
 

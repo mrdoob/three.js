@@ -10,9 +10,9 @@ THREE.Color = function ( hex ) {
 
 THREE.Color.prototype = {
 
-	autoUpdate: true,
+	autoUpdate : true,
 
-	setRGB: function ( r, g, b ) {
+	setRGB : function ( r, g, b ) {
 
 		this.r = r;
 		this.g = g;
@@ -27,7 +27,7 @@ THREE.Color.prototype = {
 
 	},
 
-	setHSV: function ( h, s, v ) {
+	setHSV : function ( h, s, v ) {
 
 		// based on MochiKit implementation by Bob Ippolito
 		// h,s,v ranges are < 0.0 - 1.0 >
@@ -73,7 +73,7 @@ THREE.Color.prototype = {
 
 	},
 
-	setHex: function ( hex ) {
+	setHex : function ( hex ) {
 
 		this.hex = ( ~~ hex ) & 0xffffff;
 
@@ -86,13 +86,13 @@ THREE.Color.prototype = {
 
 	},
 
-	updateHex: function () {
+	updateHex : function () {
 
-		this.hex = ~~( this.r * 255 ) << 16 ^ ~~( this.g * 255 ) << 8 ^ ~~( this.b * 255 );
+		this.hex = ~~ ( this.r * 255 ) << 16 ^ ~~ ( this.g * 255 ) << 8 ^ ~~ ( this.b * 255 );
 
 	},
 
-	updateRGBA: function () {
+	updateRGBA : function () {
 
 		this.r = ( this.hex >> 16 & 255 ) / 255;
 		this.g = ( this.hex >> 8 & 255 ) / 255;
@@ -100,19 +100,19 @@ THREE.Color.prototype = {
 
 	},
 
-	updateStyleString: function () {
+	updateStyleString : function () {
 
-		this.__styleString = 'rgb(' + ~~( this.r * 255 ) + ',' + ~~( this.g * 255 ) + ',' + ~~( this.b * 255 ) + ')';
+		this.__styleString = 'rgb(' + ~~ ( this.r * 255 ) + ',' + ~~ ( this.g * 255 ) + ',' + ~~ ( this.b * 255 ) + ')';
 
 	},
 
-	clone: function () {
+	clone : function () {
 
 		return new THREE.Color( this.hex );
 
 	},
 
-	toString: function () {
+	toString : function () {
 
 		return 'THREE.Color ( r: ' + this.r + ', g: ' + this.g + ', b: ' + this.b + ', hex: ' + this.hex + ' )';
 

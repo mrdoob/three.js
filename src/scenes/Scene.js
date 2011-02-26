@@ -112,7 +112,7 @@ THREE.Scene.prototype.removeChildRecurse = function( child ) {
 
 }
 
-THREE.Scene.prototype.addObject    = THREE.Scene.prototype.addChild;
+THREE.Scene.prototype.addObject = THREE.Scene.prototype.addChild;
 THREE.Scene.prototype.removeObject = THREE.Scene.prototype.removeChild;
-THREE.Scene.prototype.addLight     = THREE.Scene.prototype.addChild;
-THREE.Scene.prototype.removeLight  = THREE.Scene.prototype.removeChild;
+THREE.Scene.prototype.addLight = THREE.Scene.prototype.addChild;
+THREE.Scene.prototype.removeLight = THREE.Scene.prototype.removeChild;

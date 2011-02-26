@@ -4,21 +4,40 @@
 
 THREE.UV = function ( u, v ) {
 
-	this.u = u || 0;
-	this.v = v || 0;
+	this.set(
+
+		u || 0,
+		v || 0
+
+	);
 
 };
 
 THREE.UV.prototype = {
 
-	copy: function ( uv ) {
+	set : function ( u, v ) {
 
-		this.u = uv.u;
-		this.v = uv.v;
+		this.u = u;
+		this.v = v;
+
+		return this;
 
 	},
 
-	toString: function () {
+	copy : function ( uv ) {
+
+		this.set(
+
+			uv.u,
+			uv.v
+
+		);
+
+		return this;
+
+	},
+
+	toString : function () {
 
 		return 'THREE.UV (' + this.u + ', ' + this.v + ')';
 

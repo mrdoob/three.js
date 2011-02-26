@@ -1,3 +1,7 @@
+/**
+ * @author mr.doob / http://mrdoob.com/
+ */
+
 THREE.PointLight = function ( hex, intensity ) {
 
 	THREE.Light.call( this, hex );
