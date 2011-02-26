@@ -8,13 +8,13 @@
 THREE.Geometry = function () {
 
 	this.id = "Geometry" + THREE.GeometryIdCounter++;
-	
+
 	this.vertices = [];
 	this.faces = [];
 	this.uvs = [];
 	this.uvs2 = [];
 	this.colors = [];
-	
+
 	this.skinWeights = [];
 	this.skinIndices = [];
 	//this.skinVerticesA = [];
@@ -127,18 +127,18 @@ THREE.Geometry.prototype = {
 
 		// create internal buffers for reuse when calling this method repeatedly
 		// (otherwise memory allocation / deallocation every frame is big resource hog)
-		
+
 		if ( this.__tmpVertices == undefined ) {
-			
+
 			this.__tmpVertices = new Array( this.vertices.length );
 			vertices = this.__tmpVertices;
-			
+
 			for ( v = 0, vl = this.vertices.length; v < vl; v ++ ) {
 
 				vertices[ v ] = new THREE.Vector3();
 
 			}
-			
+
 			for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
 
 				face = this.faces[ f ];
@@ -154,19 +154,18 @@ THREE.Geometry.prototype = {
 				}
 
 			}
-			
+
 		} else {
-			
+
 			vertices = this.__tmpVertices;
-			
+
 			for ( v = 0, vl = this.vertices.length; v < vl; v ++ ) {
 
 				vertices[ v ].set( 0, 0, 0 );
 
 			}
-			
+
 		}
-		
 
 		for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
 

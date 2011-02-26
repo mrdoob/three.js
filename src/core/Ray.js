@@ -54,7 +54,6 @@ THREE.Ray.prototype = {
 			direction = this.direction.clone();
 
 			objMatrix = object.globalMatrix;
-			objMatrix.extractRotationMatrix( object.matrixRotation );
 
 			a = objMatrix.multiplyVector3( vertices[ face.a ].position.clone() );
 			b = objMatrix.multiplyVector3( vertices[ face.b ].position.clone() );
