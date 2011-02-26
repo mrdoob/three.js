@@ -14,43 +14,49 @@ More? [#three.js on irc.freenode.net](http://webchat.freenode.net/?channels=thre
 
 #### WebGL (Context 3D) ####
 
-[![shader](http://mrdoob.github.com/three.js/assets/examples/34_shader.png)](http://mrdoob.github.com/three.js/examples/shader.html)
-[![materials_normalmap2](http://mrdoob.github.com/three.js/assets/examples/33_materials_normalmap2.png)](http://mrdoob.github.com/three.js/examples/materials_normalmap2.html)
-[![materials_grass](http://mrdoob.github.com/three.js/assets/examples/32_materials_grass.png)](http://mrdoob.github.com/three.js/examples/materials_grass.html)
-[![materials_normalmap](http://mrdoob.github.com/three.js/assets/examples/31_materials_normalmap.png)](http://mrdoob.github.com/three.js/examples/materials_normalmap.html)
-[![geometry_terrain_gl](http://mrdoob.github.com/three.js/assets/examples/30_geometry_terrain_gl.png)](http://mrdoob.github.com/three.js/examples/geometry_terrain_gl.html)
-[![geometry_minecraft](http://mrdoob.github.com/three.js/assets/examples/29_geometry_minecraft.png)](http://mrdoob.github.com/three.js/examples/geometry_minecraft_ao.html)
-[![materials_shader_fresnel](http://mrdoob.github.com/three.js/assets/examples/28_materials_shaders_fresnel.png)](http://mrdoob.github.com/three.js/examples/materials_shaders_fresnel.html)
-[![materials_cars](http://mrdoob.github.com/three.js/assets/examples/25_materials_cars.png)](http://mrdoob.github.com/three.js/examples/materials_cars.html)
-[![materials_cubemap_refraction](http://mrdoob.github.com/three.js/assets/examples/18_materials_cubemap_refraction.png)](http://mrdoob.github.com/three.js/examples/materials_cubemap_refraction.html)
-[![materials_cubemap_balls_reflection](http://mrdoob.github.com/three.js/assets/examples/15_materials_cubemap_balls_reflection.png)](http://mrdoob.github.com/three.js/examples/materials_cubemap_balls_reflection.html)
-[![materials_cubemap_balls_refraction](http://mrdoob.github.com/three.js/assets/examples/16_materials_cubemap_balls_refraction.png)](http://mrdoob.github.com/three.js/examples/materials_cubemap_balls_refraction.html)
-[![materials_cubemap_escher](http://mrdoob.github.com/three.js/assets/examples/17_materials_cubemap_escher.png)](http://mrdoob.github.com/three.js/examples/materials_cubemap_escher.html)
-[![materials_cubemap](http://mrdoob.github.com/three.js/assets/examples/14_materials_cubemap.png)](http://mrdoob.github.com/three.js/examples/materials_cubemap.html)
-[![materials_gl](http://mrdoob.github.com/three.js/assets/examples/20_materials_gl.png)](http://mrdoob.github.com/three.js/examples/materials_gl.html)
-[![materials_shaders](http://mrdoob.github.com/three.js/assets/examples/23_materials_shaders.png)](http://mrdoob.github.com/three.js/examples/materials_shaders.html)
-[![large_mesh](http://mrdoob.github.com/three.js/assets/examples/12_large_mesh.png)](http://mrdoob.github.com/three.js/examples/geometry_large_mesh.html)
+[![video](http://mrdoob.github.com/three.js/assets/examples/40_video.png)](http://mrdoob.github.com/three.js/examples/webgl_materials_video.html)
+[![dof](http://mrdoob.github.com/three.js/assets/examples/39_dof.png)](http://mrdoob.github.com/three.js/examples/webgl_postprocessing_dof.html)
+[![ribbon](http://mrdoob.github.com/three.js/assets/examples/38_ribbon.png)](http://mrdoob.github.com/three.js/examples/webgl_ribbons.html)
+[![vertexcolors](http://mrdoob.github.com/three.js/assets/examples/37_vertexcolors.png)](http://mrdoob.github.com/three.js/examples/webgl_geometry_colors.html)
+[![particles](http://mrdoob.github.com/three.js/assets/examples/36_particles.png)](http://mrdoob.github.com/three.js/examples/webgl_particles_billboards_colors.html)
+[![lines](http://mrdoob.github.com/three.js/assets/examples/35_lines.png)](http://mrdoob.github.com/three.js/examples/webgl_lines_colors.html)
+[![shader](http://mrdoob.github.com/three.js/assets/examples/34_shader.png)](http://mrdoob.github.com/three.js/examples/webgl_shader.html)
+[![materials_normalmap2](http://mrdoob.github.com/three.js/assets/examples/33_materials_normalmap2.png)](http://mrdoob.github.com/three.js/examples/webgl_materials_normalmap2.html)
+[![materials_grass](http://mrdoob.github.com/three.js/assets/examples/32_materials_grass.png)](http://mrdoob.github.com/three.js/examples/webgl_materials_grass.html)
+[![materials_normalmap](http://mrdoob.github.com/three.js/assets/examples/31_materials_normalmap.png)](http://mrdoob.github.com/three.js/examples/webgl_materials_normalmap.html)
+[![geometry_terrain_gl](http://mrdoob.github.com/three.js/assets/examples/30_geometry_terrain_gl.png)](http://mrdoob.github.com/three.js/examples/webgl_geometry_terrain.html)
+[![geometry_minecraft](http://mrdoob.github.com/three.js/assets/examples/29_geometry_minecraft.png)](http://mrdoob.github.com/three.js/examples/webgl_geometry_minecraft_ao.html)
+[![materials_shader_fresnel](http://mrdoob.github.com/three.js/assets/examples/28_materials_shaders_fresnel.png)](http://mrdoob.github.com/three.js/examples/webgl_materials_shaders_fresnel.html)
+[![materials_cars](http://mrdoob.github.com/three.js/assets/examples/25_materials_cars.png)](http://mrdoob.github.com/three.js/examples/webgl_materials_cars.html)
+[![materials_cubemap_refraction](http://mrdoob.github.com/three.js/assets/examples/18_materials_cubemap_refraction.png)](http://mrdoob.github.com/three.js/examples/webgl_materials_cubemap_refraction.html)
+[![materials_cubemap_balls_reflection](http://mrdoob.github.com/three.js/assets/examples/15_materials_cubemap_balls_reflection.png)](http://mrdoob.github.com/three.js/examples/webgl_materials_cubemap_balls_reflection.html)
+[![materials_cubemap_balls_refraction](http://mrdoob.github.com/three.js/assets/examples/16_materials_cubemap_balls_refraction.png)](http://mrdoob.github.com/three.js/examples/webgl_materials_cubemap_balls_refraction.html)
+[![materials_cubemap_escher](http://mrdoob.github.com/three.js/assets/examples/17_materials_cubemap_escher.png)](http://mrdoob.github.com/three.js/examples/webgl_materials_cubemap_escher.html)
+[![materials_cubemap](http://mrdoob.github.com/three.js/assets/examples/14_materials_cubemap.png)](http://mrdoob.github.com/three.js/examples/webgl_materials_cubemap.html)
+[![materials_gl](http://mrdoob.github.com/three.js/assets/examples/20_materials_gl.png)](http://mrdoob.github.com/three.js/examples/webgl_materials.html)
+[![materials_shaders](http://mrdoob.github.com/three.js/assets/examples/23_materials_shaders.png)](http://mrdoob.github.com/three.js/examples/webgl_materials_shaders.html)
+[![large_mesh](http://mrdoob.github.com/three.js/assets/examples/12_large_mesh.png)](http://mrdoob.github.com/three.js/examples/webgl_geometry_large_mesh.html)
 
 
 #### Canvas (Context 2D) ####
 
-[![materials_reflection](http://mrdoob.github.com/three.js/assets/examples/27_materials_reflection.png)](http://mrdoob.github.com/three.js/examples/materials_reflection.html)
-[![materials](http://mrdoob.github.com/three.js/assets/examples/13_materials.png)](http://mrdoob.github.com/three.js/examples/materials.html)
-[![materials_depth](http://mrdoob.github.com/three.js/assets/examples/19_materials_depth.png)](http://mrdoob.github.com/three.js/examples/materials_depth.html)
-[![materials_normal](http://mrdoob.github.com/three.js/assets/examples/22_materials_normal.png)](http://mrdoob.github.com/three.js/examples/materials_normal.html)
-[![lights_pointlights](http://mrdoob.github.com/three.js/assets/examples/09_walthead.png)](http://mrdoob.github.com/three.js/examples/lights_pointlights.html)
-[![interactive_cubes](http://mrdoob.github.com/three.js/assets/examples/11_interactive.png)](http://mrdoob.github.com/three.js/examples/interactive_cubes.html)
-[![camera_ortographic](http://mrdoob.github.com/three.js/assets/examples/10_orthographic.png)](http://mrdoob.github.com/three.js/examples/camera_orthographic.html)
-[![geometry_birds](http://mrdoob.github.com/three.js/assets/examples/08_birds.png)](http://mrdoob.github.com/three.js/examples/geometry_birds.html)
-[![geometry_earth](http://mrdoob.github.com/three.js/assets/examples/07_earth.png)](http://mrdoob.github.com/three.js/examples/geometry_earth.html)
-[![geometry_terrain](http://mrdoob.github.com/three.js/assets/examples/06_terrain.png)](http://mrdoob.github.com/three.js/examples/geometry_terrain.html)
-[![materials_video](http://mrdoob.github.com/three.js/assets/examples/24_materials_video.png)](http://mrdoob.github.com/three.js/examples/materials_video.html)
-[![geometry_panorama](http://mrdoob.github.com/three.js/assets/examples/04_vr.png)](http://mrdoob.github.com/three.js/examples/geometry_panorama.html)
-[![geometry_cube](http://mrdoob.github.com/three.js/assets/examples/03_cube.png)](http://mrdoob.github.com/three.js/examples/geometry_cube.html)
-[![particles_sprites](http://mrdoob.github.com/three.js/assets/examples/26_particles_sprites.png)](http://mrdoob.github.com/three.js/examples/particles_sprites.html)
-[![particles_random](http://mrdoob.github.com/three.js/assets/examples/02_random.png)](http://mrdoob.github.com/three.js/examples/particles_random.html)
-[![particles_wave](http://mrdoob.github.com/three.js/assets/examples/01_waves.png)](http://mrdoob.github.com/three.js/examples/particles_waves.html)
-[![particles_floor](http://mrdoob.github.com/three.js/assets/examples/00_floor.png)](http://mrdoob.github.com/three.js/examples/particles_floor.html)
+[![materials_reflection](http://mrdoob.github.com/three.js/assets/examples/27_materials_reflection.png)](http://mrdoob.github.com/three.js/examples/canvas_materials_reflection.html)
+[![materials](http://mrdoob.github.com/three.js/assets/examples/13_materials.png)](http://mrdoob.github.com/three.js/examples/canvas_materials.html)
+[![materials_depth](http://mrdoob.github.com/three.js/assets/examples/19_materials_depth.png)](http://mrdoob.github.com/three.js/examples/canvas_materials_depth.html)
+[![materials_normal](http://mrdoob.github.com/three.js/assets/examples/22_materials_normal.png)](http://mrdoob.github.com/three.js/examples/canvas_materials_normal.html)
+[![lights_pointlights](http://mrdoob.github.com/three.js/assets/examples/09_walthead.png)](http://mrdoob.github.com/three.js/examples/canvas_lights_pointlights.html)
+[![interactive_cubes](http://mrdoob.github.com/three.js/assets/examples/11_interactive.png)](http://mrdoob.github.com/three.js/examples/canvas_interactive_cubes.html)
+[![camera_ortographic](http://mrdoob.github.com/three.js/assets/examples/10_orthographic.png)](http://mrdoob.github.com/three.js/examples/canvas_camera_orthographic.html)
+[![geometry_birds](http://mrdoob.github.com/three.js/assets/examples/08_birds.png)](http://mrdoob.github.com/three.js/examples/canvas_geometry_birds.html)
+[![geometry_earth](http://mrdoob.github.com/three.js/assets/examples/07_earth.png)](http://mrdoob.github.com/three.js/examples/canvas_geometry_earth.html)
+[![geometry_terrain](http://mrdoob.github.com/three.js/assets/examples/06_terrain.png)](http://mrdoob.github.com/three.js/examples/canvas_geometry_terrain.html)
+[![materials_video](http://mrdoob.github.com/three.js/assets/examples/24_materials_video.png)](http://mrdoob.github.com/three.js/examples/canvas_materials_video.html)
+[![geometry_panorama](http://mrdoob.github.com/three.js/assets/examples/04_vr.png)](http://mrdoob.github.com/three.js/examples/canvas_geometry_panorama.html)
+[![geometry_cube](http://mrdoob.github.com/three.js/assets/examples/03_cube.png)](http://mrdoob.github.com/three.js/examples/canvas_geometry_cube.html)
+[![particles_sprites](http://mrdoob.github.com/three.js/assets/examples/26_particles_sprites.png)](http://mrdoob.github.com/three.js/examples/canvas_particles_sprites.html)
+[![particles_random](http://mrdoob.github.com/three.js/assets/examples/02_random.png)](http://mrdoob.github.com/three.js/examples/canvas_particles_random.html)
+[![particles_wave](http://mrdoob.github.com/three.js/assets/examples/01_waves.png)](http://mrdoob.github.com/three.js/examples/canvas_particles_waves.html)
+[![particles_floor](http://mrdoob.github.com/three.js/assets/examples/00_floor.png)](http://mrdoob.github.com/three.js/examples/canvas_particles_floor.html)
 
 
 ### Featured projects ###
@@ -73,16 +79,16 @@ More? [#three.js on irc.freenode.net](http://webchat.freenode.net/?channels=thre
 
 Download the [minified library](http://mrdoob.github.com/three.js/build/Three.js) and include it in your html.
 
-	<script type="text/javascript" src="js/Three.js"></script>
+	<script src="js/Three.js"></script>
 
 This code creates a camera, then creates a scene object, adds a bunch of random particles in it, creates a &lt;canvas&gt; renderer and adds its viewport in the document.body element.
 
-	<script type="text/javascript">
+	<script>
 
 		var camera, scene, renderer;
 
 		init();
-		setInterval( loop, 1000 / 60 );
+		animate();
 
 		function init() {
 
@@ -91,7 +97,7 @@ This code creates a camera, then creates a scene object, adds a bunch of random 
 
 			scene = new THREE.Scene();
 
-			for (var i = 0; i < 1000; i++) {
+			for ( var i = 0; i < 1000; i ++ ) {
 
 				var particle = new THREE.Particle( new THREE.ParticleCircleMaterial( { color: Math.random() * 0xffffff } ) );
 				particle.position.x = Math.random() * 2000 - 1000;
@@ -109,7 +115,14 @@ This code creates a camera, then creates a scene object, adds a bunch of random 
 
 		}
 
-		function loop() {
+		function animate() {
+
+			requestAnimationFrame( animate );
+			render();
+
+		}
+
+		function render() {
 
 			renderer.render( scene, camera );
 
@@ -119,6 +132,19 @@ This code creates a camera, then creates a scene object, adds a bunch of random 
 
 
 ### Change Log ###
+
+2011 02 26 - **r33** (190.451 KB, gzip: 46.278 KB)
+
+* Added `ParticleSystem` object to `WebGLRenderer` ([alteredq](http://github.com/alteredq))
+* Added `Line` support to `WebGLRenderer` ([alteredq](http://github.com/alteredq))
+* Added vertex colors support to `WebGLRenderer` ([alteredq](http://github.com/alteredq))
+* Added `Ribbon` object. ([alteredq](http://github.com/alteredq))
+* Added updateable textures support to `WebGLRenderer` ([alteredq](http://github.com/alteredq))
+* Added `Sound` object and `SoundRenderer`. ([empaempa](http://github.com/empaempa))
+* `LOD`, `Bone`, `SkinnedMesh` objects and hierarchy being developed. ([empaempa](http://github.com/empaempa))
+* Changed build setup (`Three.js` now includes everything. `Three*.js` inside `build/custom` folder) ([mrdoob](http://github.com/mrdoob))
+* Many internal changes.
+
 
 2010 12 31 - **r32** (89.301 KB, gzip: 21.351 KB)
 

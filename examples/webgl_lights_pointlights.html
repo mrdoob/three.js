@@ -1,0 +1,178 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>three.js webl - lights - point lights</title>
+		<meta charset="utf-8">
+		<style type="text/css">
+			body {
+				background-color: #000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				color: #ffffff;
+				padding: 5px;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: center;
+			}
+
+			a {
+				color: #ff0080;
+				text-decoration: none;
+			}
+
+			a:hover {
+				color: #0080ff;
+			}
+
+			#log { color:#fff; position:absolute; top:50px; text-align:left; display:block; z-index:100; pointer-events:none; }
+		</style>
+	</head>
+	<body>
+
+		<pre id="log"></pre>
+
+		<div id="container"></div>
+		<div id="info">
+			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - point lights WebGL demo.<br />
+			Walt Disney head by <a href="http://www.davidoreilly.com/2009/01/walt-disneys-head-on-a-plate" target="_blank">David OReilly</a>
+		</div>
+
+		<script type="text/javascript" src="../build/Three.js"></script>
+
+		<script type="text/javascript" src="js/Detector.js"></script>
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
+		<script type="text/javascript" src="js/Stats.js"></script>
+
+		<script type="text/javascript">
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var camera, scene, renderer,
+			particle1, particle2, particle2,
+			light1, light2, light3,
+			object,loader;
+
+			init();
+			animate();
+
+			function init() {
+
+				var container = document.getElementById( 'container' );
+
+				camera = new THREE.Camera( 65, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.z = 100;
+
+				scene = new THREE.Scene();
+
+				loader = new THREE.Loader( true );
+				document.body.appendChild( loader.statusDomElement );
+
+				var callback = function( geometry ) {
+
+					object = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( { ambient: 0x555555, color: 0x555555, specular: 0xffffff, shininess: 50, shading: THREE.SmoothShading }  )  );
+					object.scale.x = object.scale.y = object.scale.z = 0.80;
+					object.overdraw = true;
+					scene.addObject( object );
+
+					loader.statusDomElement.style.display = "none";
+
+				};
+
+				//loader.loadAscii( { model: "obj/walt/WaltHead_slim.js", callback: callback } );
+				loader.loadBinary( { model: "obj/walt/WaltHead_bin.js", callback: callback } );
+
+				/*
+				var directionalLight = new THREE.DirectionalLight( 0x111111, 0.9 );
+				directionalLight.position.x = 1;
+				directionalLight.position.y = 1;
+				directionalLight.position.z = 2;
+				directionalLight.position.normalize();
+				scene.addLight( directionalLight );
+				*/
+
+				scene.addLight( new THREE.AmbientLight( 0x00000 ) );
+
+				light1 = new THREE.PointLight( 0xff0040 );
+				scene.addLight( light1 );
+
+				light2 = new THREE.PointLight( 0x0040ff );
+				scene.addLight( light2 );
+
+				light3 = new THREE.PointLight( 0x80ff80 );
+				scene.addLight( light3 );
+
+				var sphere = new Sphere( 0.5, 16, 8 );
+
+				var l1 = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xff0040 } ) );
+				l1.position = light1.position;
+				scene.addObject( l1 );
+
+				var l2 = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0x0040ff } ) );
+				l2.position = light2.position;
+				scene.addObject( l2 );
+
+				var l3 = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0x80ff80 } ) );
+				l3.position = light3.position;
+				scene.addObject( l3 );
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				/*
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				stats.domElement.style.zIndex = 100;
+				container.appendChild( stats.domElement );
+				*/
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+
+			}
+
+			function render() {
+
+				var time = new Date().getTime() * 0.0005;
+
+				if( object ) object.rotation.y -= 0.01;
+
+				light1.position.x = Math.sin( time * 0.7 ) * 30;
+				light1.position.y = Math.cos( time * 0.5 ) * 40;
+				light1.position.z = Math.cos( time * 0.3 ) * 30;
+
+				light2.position.x = Math.cos( time * 0.3 ) * 30;
+				light2.position.y = Math.sin( time * 0.5 ) * 40;
+				light2.position.z = Math.sin( time * 0.7 ) * 30;
+
+				light3.position.x = Math.sin( time * 0.7 ) * 30;
+				light3.position.y = Math.cos( time * 0.3 ) * 40;
+				light3.position.z = Math.sin( time * 0.5 ) * 30;
+
+				renderer.render( scene, camera );
+
+			}
+
+			function log( text ) {
+
+				var e = document.getElementById("log");
+				e.innerHTML = text + "<br/>" + e.innerHTML;
+
+			}
+
+		</script>
+	</body>
+</html>

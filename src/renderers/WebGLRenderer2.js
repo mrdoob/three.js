@@ -97,11 +97,11 @@ THREE.WebGLRenderer2 = function ( antialias ) {
 
 		this.autoClear && this.clear();
 
-		camera.autoUpdateMatrix && camera.updateMatrix();
+		camera.matrixAutoUpdate && camera.update();
 
 		// Setup camera matrices
 
-		_viewMatrixArray.set( camera.matrix.flatten() );
+		_viewMatrixArray.set( camera.matrixWorld.flatten() );
 		_projectionMatrixArray.set( camera.projectionMatrix.flatten() );
 
 		_currentProgram = null;
@@ -113,6 +113,8 @@ THREE.WebGLRenderer2 = function ( antialias ) {
 
 		}
 		*/
+
+		scene.update( undefined, false, camera );
 
 		_renderList = _projector.projectObjects( scene, camera, this.sortObjects );
 
@@ -127,14 +129,14 @@ THREE.WebGLRenderer2 = function ( antialias ) {
 			var geometry, material, m, ml,
 			program, uniforms, attributes;
 
-			object.autoUpdateMatrix && object.updateMatrix();
+			object.matrixAutoUpdate && object.updateMatrix();
 
 			// Setup object matrices
 
-			_objectMatrixArray.set( object.matrix.flatten() );
+			object.matrixWorld.flattenToArray( _objectMatrixArray )
 
-			_modelViewMatrix.multiply( camera.matrix, object.matrix );
-			_modelViewMatrixArray.set( _modelViewMatrix.flatten() );
+			_modelViewMatrix.multiply( camera.matrixWorld, object.matrixWorld );
+			_modelViewMatrix.flattenToArray( _modelViewMatrixArray );
 
 			_normalMatrix = THREE.Matrix4.makeInvert3x3( _modelViewMatrix ).transpose();
 			_normalMatrixArray.set( _normalMatrix.m );
@@ -752,9 +754,14 @@ THREE.WebGLRenderer2 = function ( antialias ) {
 
 		function setTexture( texture, slot ) {
 
-			if ( !texture.__webglTexture && texture.image.loaded ) {
-
+			if ( !texture.__webglTexture ) {
+				
 				texture.__webglTexture = _gl.createTexture();
+				
+			}
+			
+			if ( texture.needsUpdate ) {
+
 				_gl.bindTexture( _gl.TEXTURE_2D, texture.__webglTexture );
 				_gl.texImage2D( _gl.TEXTURE_2D, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, texture.image );
 
@@ -765,14 +772,16 @@ THREE.WebGLRenderer2 = function ( antialias ) {
 				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, paramThreeToGL( texture.min_filter ) );
 				_gl.generateMipmap( _gl.TEXTURE_2D );
 				_gl.bindTexture( _gl.TEXTURE_2D, null );
+				
+				texture.needsUpdate = false;
 
 			}
 
 			_gl.activeTexture( _gl.TEXTURE0 + slot );
 			_gl.bindTexture( _gl.TEXTURE_2D, texture.__webglTexture );
 
-		}
-
+		};
+		
 		function maxVertexTextures() {
 
 			return _gl.getParameter( _gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS );

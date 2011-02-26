@@ -1,0 +1,220 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>three.js webgl - materials - normal map [Lee Perry-Smith]</title>
+		<meta charset="utf-8">
+		<style type="text/css">
+			body {
+				background:#000;
+				color:#fff;
+				padding:0;
+				margin:0;
+				font-weight: bold;
+				overflow:hidden;
+			}
+
+			a {	color: #ffffff;	}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				color: #ffffff;
+				padding: 5px;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				z-index:1000;
+			}
+
+			#oldie {
+				background:rgb(200,100,0) !important;
+				color:#fff;				
+			}
+
+			#vt { display:none }
+			#vt, #vt a { color:orange; }
+			.code { }
+
+			#log { position:absolute; top:50px; text-align:left; display:block; z-index:100 }
+		</style>
+	</head>
+
+	<body>
+		<pre id="log"></pre>
+
+		<div id="info">
+			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl normalmap demo.
+			<a href="http://www.ir-ltd.net/infinite-3d-head-scan-released/" target="_blank">Lee Perry-Smith</a> head.
+
+			<div id="vt">displacement mapping needs vertex textures (GPU with Shader Model 3.0)<br/>
+			on Windows use <span class="code">Chrome --use-gl=desktop</span> or Firefox 4<br/>
+			please star this <a href="http://code.google.com/p/chromium/issues/detail?id=52497">Chrome issue</a> to get ANGLE support
+			</div>
+		</div>
+
+		<script type="text/javascript" src="../build/Three.js"></script>
+
+		<script type="text/javascript" src="js/Detector.js"></script>
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
+		<script type="text/javascript" src="js/Stats.js"></script>
+
+		<script type="text/javascript">
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var statsEnabled = true;
+
+			var container, stats, loader;
+
+			var camera, scene, webglRenderer;
+
+			var mesh, zmesh, lightMesh, geometry;
+			var mesh1;
+
+			var directionalLight, pointLight, ambientLight;
+
+			var mouseX = 0;
+			var mouseY = 0;
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement('div');
+				document.body.appendChild(container);
+
+				camera = new THREE.Camera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.z = 900;
+
+				scene = new THREE.Scene();
+
+				// LIGHTS
+
+				ambientLight = new THREE.AmbientLight( 0x444444 );
+				scene.addLight( ambientLight );
+
+				pointLight = new THREE.PointLight( 0xffffff );
+				pointLight.position.z = 600;
+
+				scene.addLight( pointLight );
+
+				directionalLight = new THREE.DirectionalLight( 0xffffff );
+				directionalLight.position.x = 1;
+				directionalLight.position.y = 1;
+				directionalLight.position.z = - 1;
+				directionalLight.position.normalize();
+				scene.addLight( directionalLight );
+
+				// material parameters
+
+				var ambient = 0x444444, diffuse = 0x888888, specular = 0x080810, shininess = 2;
+
+				var shader = ShaderUtils.lib[ "normal" ];
+				var uniforms = Uniforms.clone( shader.uniforms );
+ 
+				uniforms[ "tNormal" ].texture = ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
+				uniforms[ "uNormalScale" ].value = - 0.75;
+
+				uniforms[ "tDiffuse" ].texture = ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" );
+
+				uniforms[ "enableAO" ].value = false;
+				uniforms[ "enableDiffuse" ].value = true;
+
+				uniforms[ "uPointLightPos" ].value = pointLight.position;
+				uniforms[ "uPointLightColor" ].value = pointLight.color;
+
+				uniforms[ "uDirLightPos" ].value = directionalLight.position;
+				uniforms[ "uDirLightColor" ].value = directionalLight.color;
+
+				uniforms[ "uAmbientLightColor" ].value = ambientLight.color;
+
+				uniforms[ "uDiffuseColor" ].value.setHex( diffuse );
+				uniforms[ "uSpecularColor" ].value.setHex( specular );
+				uniforms[ "uAmbientColor" ].value.setHex( ambient );
+
+				uniforms[ "uShininess" ].value = shininess;
+
+				var parameters = { fragment_shader: shader.fragment_shader, vertex_shader: shader.vertex_shader, uniforms: uniforms };
+				var material = new THREE.MeshShaderMaterial( parameters );
+
+				loader = new THREE.Loader( true );
+				document.body.appendChild( loader.statusDomElement );
+
+				loader.loadAscii( { model: "obj/leeperrysmith/LeePerrySmith.js", callback: function( geometry ) { createScene( geometry, 100, material ) } } );
+
+				webglRenderer = new THREE.WebGLRenderer();
+				webglRenderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( webglRenderer.domElement );
+
+				if ( statsEnabled ) {
+
+					stats = new Stats();
+					stats.domElement.style.position = 'absolute';
+					stats.domElement.style.top = '0px';
+					stats.domElement.style.zIndex = 100;
+					container.appendChild( stats.domElement );
+
+				}
+
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+			}
+
+			function createScene( geometry, scale, material ) {
+
+				geometry.computeTangents();
+
+				mesh1 = SceneUtils.addMesh( scene, geometry, scale, 0, - 50, 0, 0, 0, 0, material );
+
+				loader.statusDomElement.style.display = "none";
+
+			}
+
+			function onDocumentMouseMove(event) {
+
+				mouseX = ( event.clientX - windowHalfX ) * 10;
+				mouseY = ( event.clientY - windowHalfY ) * 10;
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				if ( statsEnabled ) stats.update();
+
+			}
+
+			function render() {
+
+				var ry = mouseX * 0.0003, rx = mouseY * 0.0003;
+
+				if( mesh1 ) {
+
+					mesh1.rotation.y = ry;
+					mesh1.rotation.x = rx;
+
+				}
+
+				webglRenderer.render( scene, camera );
+
+			}
+
+			function log( text ) {
+
+				var e = document.getElementById("log");
+				e.innerHTML = text + "<br/>" + e.innerHTML;
+
+			}
+
+		</script>
+
+	</body>
+</html>

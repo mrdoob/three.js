@@ -1,0 +1,288 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>three.js - geometry - canvas polyfield</title>
+		<meta charset="utf-8">
+		<style type="text/css">
+			body {
+				background-color: #ffffff;
+				margin: 0px;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+	<body>
+
+		<!-- 
+		<script type="text/javascript" src="../build/Three.js"></script>
+		-->
+
+		<script type="text/javascript" src="../src/Three.js"></script>
+		<script type="text/javascript" src="../src/core/Color.js"></script>
+		<script type="text/javascript" src="../src/core/Vector2.js"></script>
+		<script type="text/javascript" src="../src/core/Vector3.js"></script>
+		<script type="text/javascript" src="../src/core/Vector4.js"></script>
+		<script type="text/javascript" src="../src/core/Ray.js"></script>
+		<script type="text/javascript" src="../src/core/Rectangle.js"></script>
+		<script type="text/javascript" src="../src/core/Matrix3.js"></script>
+		<script type="text/javascript" src="../src/core/Matrix4.js"></script>
+		<script type="text/javascript" src="../src/core/Object3D.js"></script>
+		<script type="text/javascript" src="../src/core/Quaternion.js"></script>
+		<script type="text/javascript" src="../src/core/Vertex.js"></script>
+		<script type="text/javascript" src="../src/core/Face3.js"></script>
+		<script type="text/javascript" src="../src/core/Face4.js"></script>
+		<script type="text/javascript" src="../src/core/UV.js"></script>
+		<script type="text/javascript" src="../src/core/Geometry.js"></script>
+		<script type="text/javascript" src="../src/animation/AnimationHandler.js"></script>
+		<script type="text/javascript" src="../src/animation/Animation.js"></script>
+		<script type="text/javascript" src="../src/cameras/Camera.js"></script>
+		<script type="text/javascript" src="../src/cameras/QuakeCamera.js"></script>
+		<script type="text/javascript" src="../src/lights/Light.js"></script>
+		<script type="text/javascript" src="../src/lights/AmbientLight.js"></script>
+		<script type="text/javascript" src="../src/lights/DirectionalLight.js"></script>
+		<script type="text/javascript" src="../src/lights/PointLight.js"></script>
+		<script type="text/javascript" src="../src/materials/Material.js"></script>
+		<script type="text/javascript" src="../src/materials/Mappings.js"></script>
+		<script type="text/javascript" src="../src/materials/LineBasicMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/MeshBasicMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/MeshLambertMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/MeshPhongMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/MeshDepthMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/MeshNormalMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/MeshFaceMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/MeshShaderMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/ParticleBasicMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/ParticleCircleMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/ParticleDOMMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/Texture.js"></script>
+		<script type="text/javascript" src="../src/materials/RenderTarget.js"></script>
+		<script type="text/javascript" src="../src/materials/Uniforms.js"></script>
+		<script type="text/javascript" src="../src/objects/Particle.js"></script>
+		<script type="text/javascript" src="../src/objects/ParticleSystem.js"></script>
+		<script type="text/javascript" src="../src/objects/Line.js"></script>
+		<script type="text/javascript" src="../src/objects/Mesh.js"></script>
+		<script type="text/javascript" src="../src/objects/Bone.js"></script>
+		<script type="text/javascript" src="../src/objects/SkinnedMesh.js"></script>
+		<script type="text/javascript" src="../src/objects/Ribbon.js"></script>
+		<script type="text/javascript" src="../src/objects/Sound.js"></script>
+		<script type="text/javascript" src="../src/scenes/Scene.js"></script>
+		<script type="text/javascript" src="../src/scenes/Fog.js"></script>
+		<script type="text/javascript" src="../src/scenes/FogExp2.js"></script>
+		<script type="text/javascript" src="../src/renderers/Projector.js"></script>
+		<script type="text/javascript" src="../src/renderers/DOMRenderer.js"></script>
+		<script type="text/javascript" src="../src/renderers/CanvasRenderer.js"></script>
+		<script type="text/javascript" src="../src/renderers/SVGRenderer.js"></script>
+		<script type="text/javascript" src="../src/renderers/WebGLRenderer.js"></script>
+		<script type="text/javascript" src="../src/renderers/SoundRenderer.js"></script>
+		<script type="text/javascript" src="../src/renderers/renderables/RenderableObject.js"></script>
+		<script type="text/javascript" src="../src/renderers/renderables/RenderableFace3.js"></script>
+		<script type="text/javascript" src="../src/renderers/renderables/RenderableParticle.js"></script>
+		<script type="text/javascript" src="../src/renderers/renderables/RenderableLine.js"></script>
+		<script type="text/javascript" src="../src/extras/GeometryUtils.js"></script>
+		<script type="text/javascript" src="../src/extras/ImageUtils.js"></script>
+		<script type="text/javascript" src="../src/extras/SceneUtils.js"></script>
+		<script type="text/javascript" src="../src/extras/ShaderUtils.js"></script>
+		<script type="text/javascript" src="../src/extras/primitives/Cube.js"></script>
+		<script type="text/javascript" src="../src/extras/primitives/Cylinder.js"></script>
+		<script type="text/javascript" src="../src/extras/primitives/Plane.js"></script>
+		<script type="text/javascript" src="../src/extras/primitives/Sphere.js"></script>
+		<script type="text/javascript" src="../src/extras/primitives/Torus.js"></script>
+		<script type="text/javascript" src="../src/extras/primitives/Icosahedron.js"></script>
+		<script type="text/javascript" src="../src/extras/primitives/LathedObject.js"></script>
+		<script type="text/javascript" src="../src/extras/objects/MarchingCubes.js"></script>
+		<script type="text/javascript" src="../src/extras/io/Loader.js"></script>
+
+		<script type="text/javascript" src="obj/Qrcode.js"></script>
+
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
+		<script type="text/javascript" src="js/Stats.js"></script>
+
+		<script type="text/javascript">
+
+			var SCREEN_WIDTH = window.innerWidth / 3;
+			var SCREEN_HEIGHT = window.innerHeight;
+			var AMOUNT = 100;
+
+			var container, stats;
+
+			var camera, scene;
+			var canvasRenderer, svgRenderer, webglRenderer;
+
+			var mesh, qrcode;
+
+			var mouseX = 0, mouseY = 0;
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement('div');
+				document.body.appendChild(container);
+
+				camera = new THREE.Camera( 75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
+				// camera.position.x = - 5000;
+				// camera.position.y = 50000;
+				camera.position.z = 500
+
+				scene = new THREE.Scene();
+
+				// QRCODE
+
+				qrcode = mesh = new THREE.Mesh( new Qrcode(), new THREE.MeshFaceMaterial() );
+				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
+				scene.addObject( mesh );
+
+				// CUBES
+
+				var cube = new Cube( 100, 100, 100 );
+
+				mesh = new THREE.Mesh( cube, new THREE.MeshBasicMaterial( { color: 0x0000ff, opacity: 0.5 } ) );
+				mesh.position.x = 500;
+				mesh.rotation.x = Math.random();
+				mesh.rotation.y = Math.random();
+				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
+				scene.addObject( mesh );
+
+				mesh = new THREE.Mesh( cube, new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } ) );
+				mesh.position.x = 500;
+				mesh.position.y = 500;
+				mesh.rotation.x = Math.random();
+				mesh.rotation.y = Math.random();
+				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
+				scene.addObject( mesh );
+
+				// PLANE
+
+				mesh = new THREE.Mesh( new Plane( 100, 100 ), new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } ) );
+				mesh.position.y = -500;
+				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
+				mesh.doubleSided = true;
+				scene.addObject( mesh );
+
+				// CYLINDER
+
+				mesh = new THREE.Mesh( new Cylinder( 10, 20, 100, 200, - 50, - 20 ), new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } ) );
+				mesh.position.x = -500;
+				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
+				scene.addObject( mesh );
+
+				// POLYFIELD
+
+				var geometry = new THREE.Geometry();
+
+				for (var i = 0; i < 100; i ++) {
+
+					var v = new THREE.Vector3( Math.random() * 1000 - 500, Math.random() * 1000 - 500, Math.random() * 1000 - 500 );
+
+					var v0 = new THREE.Vertex( new THREE.Vector3( Math.random() * 100 - 50, Math.random() * 100 - 50, Math.random() * 100 - 50 ) );
+					var v1 = new THREE.Vertex( new THREE.Vector3( Math.random() * 100 - 50, Math.random() * 100 - 50, Math.random() * 100 - 50 ) );
+					var v2 = new THREE.Vertex( new THREE.Vector3( Math.random() * 100 - 50, Math.random() * 100 - 50, Math.random() * 100 - 50 ) );
+
+					v0.position.addSelf( v );
+					v1.position.addSelf( v );
+					v2.position.addSelf( v );
+
+					var face = new THREE.Face3( geometry.vertices.push( v0 ) - 1, geometry.vertices.push( v1 ) - 1, geometry.vertices.push( v2 ) - 1, null, new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } ) );
+
+					geometry.faces.push( face );
+				}
+
+				geometry.computeFaceNormals();
+				geometry.computeCentroids();
+				geometry.sortFacesByMaterial();
+
+				mesh = new THREE.Mesh( geometry, [ new THREE.MeshFaceMaterial(), new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, wireframe: true, wireframe_linewidth: 10 } ) ] );
+				mesh.doubleSided = true;
+				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
+				scene.addObject( mesh );
+
+				// PARTICLES
+
+				for ( var i = 0; i < 100; i ++ ) {
+
+					particle = new THREE.Particle( new THREE.ParticleCircleMaterial( { color: Math.random() * 0xffffff } ) );
+					particle.position.x = Math.random() * 1000 - 500;
+					particle.position.y = Math.random() * 1000 - 500;
+					particle.position.z = Math.random() * 1000 - 500;
+					particle.scale.x = particle.scale.y = 10;
+					scene.addObject( particle );
+
+				}
+
+				// LIGHTS
+
+				var ambient = new THREE.AmbientLight( 0x80ffff );
+				scene.addLight( ambient );
+
+				var directional = new THREE.DirectionalLight( 0xffff00 );
+				scene.addLight( directional );
+
+				canvasRenderer = new THREE.CanvasRenderer();
+				canvasRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				container.appendChild( canvasRenderer.domElement );
+
+				svgRenderer = new THREE.SVGRenderer();
+				svgRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				svgRenderer.setQuality( 'low' );
+				container.appendChild( svgRenderer.domElement );
+
+				webglRenderer = new THREE.WebGLRenderer();
+				webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				// webglRenderer.setFaceCulling( 0 );
+				container.appendChild( webglRenderer.domElement );
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild( stats.domElement );
+
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+			}
+
+			function onDocumentMouseMove(event) {
+
+				mouseX = ( event.clientX - windowHalfX );
+				mouseY = ( event.clientY - windowHalfY );
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				camera.position.x += ( mouseX - camera.position.x ) * .05;
+				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+				camera.updateMatrix();
+
+				mesh.rotation.y += 0.01;
+				mesh.updateMatrix();
+
+				/*
+				qrcode.rotation.x += 0.01;
+				qrcode.rotation.z += 0.02;
+				*/
+
+				canvasRenderer.render( scene, camera );
+				svgRenderer.render( scene, camera );
+				webglRenderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

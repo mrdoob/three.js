@@ -5,14 +5,18 @@
 
 THREE.Vector2 = function ( x, y ) {
 
-	this.x = x || 0;
-	this.y = y || 0;
+	this.set(
+
+		x || 0,
+		y || 0
+
+	);
 
 };
 
 THREE.Vector2.prototype = {
 
-	set: function ( x, y ) {
+	set : function ( x, y ) {
 
 		this.x = x;
 		this.y = y;
@@ -21,61 +25,98 @@ THREE.Vector2.prototype = {
 
 	},
 
-	copy: function ( v ) {
+	copy : function ( v ) {
 
-		this.x = v.x;
-		this.y = v.y;
+		this.set(
 
-		return this;
+			v.x,
+			v.y
 
-	},
-
-	addSelf: function ( v ) {
-
-		this.x += v.x;
-		this.y += v.y;
+		);
 
 		return this;
 
 	},
 
-	add: function ( v1, v2 ) {
+	addSelf : function ( v ) {
 
-		this.x = v1.x + v2.x;
-		this.y = v1.y + v2.y;
+		this.set(
 
-		return this;
+			this.x + v.x,
+			this.y + v.y
 
-	},
-
-	subSelf: function ( v ) {
-
-		this.x -= v.x;
-		this.y -= v.y;
+		);
 
 		return this;
 
 	},
 
-	sub: function ( v1, v2 ) {
+	add : function ( v1, v2 ) {
 
-		this.x = v1.x - v2.x;
-		this.y = v1.y - v2.y;
+		this.set(
 
-		return this;
+			v1.x + v2.x,
+			v1.y + v2.y
 
-	},
-
-	multiplyScalar: function ( s ) {
-
-		this.x *= s;
-		this.y *= s;
+		);
 
 		return this;
 
 	},
 
-	unit: function () {
+	subSelf : function ( v ) {
+
+		this.set(
+
+			this.x - v.x,
+			this.y - v.y
+
+		);
+
+		return this;
+
+	},
+
+	sub : function ( v1, v2 ) {
+
+		this.set(
+
+			v1.x - v2.x,
+			v1.y - v2.y
+
+		);
+
+		return this;
+
+	},
+
+	multiplyScalar : function ( s ) {
+
+		this.set(
+
+			this.x * s,
+			this.y * s
+
+		);
+
+		return this;
+
+	},
+
+	negate : function() {
+
+		this.set(
+
+			- this.x,
+			- this.y
+
+		);
+
+		return this;
+
+	},
+
+	unit : function () {
 
 		this.multiplyScalar( 1 / this.length() );
 
@@ -83,34 +124,25 @@ THREE.Vector2.prototype = {
 
 	},
 
-	length: function () {
+	length : function () {
 
-		return Math.sqrt( this.x * this.x + this.y * this.y );
+		return Math.sqrt( this.lengthSq() );
 
 	},
 
-	lengthSq: function () {
+	lengthSq : function () {
 
 		return this.x * this.x + this.y * this.y;
 
 	},
 
-	negate: function() {
-
-		this.x = - this.x;
-		this.y = - this.y;
-
-		return this;
-
-	},
-
-	clone: function () {
+	clone : function () {
 
 		return new THREE.Vector2( this.x, this.y );
 
 	},
 
-	toString: function () {
+	toString : function () {
 
 		return 'THREE.Vector2 (' + this.x + ', ' + this.y + ')';
 

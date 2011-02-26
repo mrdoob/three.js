@@ -15,7 +15,7 @@
 
 THREE.MeshNormalMaterial = function ( parameters ) {
 
-	this.id = THREE.MeshNormalMaterialCounter.value ++;
+	this.id = THREE.MaterialCounter.value ++;
 	
 	this.opacity = 1.0;
 	
@@ -60,4 +60,3 @@ THREE.MeshNormalMaterial.prototype = {
 
 };
 
-THREE.MeshNormalMaterialCounter = { value: 0 };

@@ -11,7 +11,7 @@ THREE.Ray = function ( origin, direction ) {
 
 THREE.Ray.prototype = {
 
-	intersectScene: function ( scene ) {
+	intersectScene : function ( scene ) {
 
 		var i, l, object,
 		objects = scene.objects,
@@ -35,13 +35,14 @@ THREE.Ray.prototype = {
 
 	},
 
-	intersectObject: function ( object ) {
+	intersectObject : function ( object ) {
 
 		var f, fl, face, a, b, c, d, normal,
 		dot, scalar,
 		origin, direction,
 		geometry = object.geometry,
 		vertices = geometry.vertices,
+		objMatrix,
 		intersect, intersects = [],
 		intersectPoint;
 
@@ -52,12 +53,14 @@ THREE.Ray.prototype = {
 			origin = this.origin.clone();
 			direction = this.direction.clone();
 
-			a = object.matrix.multiplyVector3( vertices[ face.a ].position.clone() );
-			b = object.matrix.multiplyVector3( vertices[ face.b ].position.clone() );
-			c = object.matrix.multiplyVector3( vertices[ face.c ].position.clone() );
-			d = face instanceof THREE.Face4 ? object.matrix.multiplyVector3( vertices[ face.d ].position.clone() ) : null;
+			objMatrix = object.matrixWorld;
 
-			normal = object.rotationMatrix.multiplyVector3( face.normal.clone() );
+			a = objMatrix.multiplyVector3( vertices[ face.a ].position.clone() );
+			b = objMatrix.multiplyVector3( vertices[ face.b ].position.clone() );
+			c = objMatrix.multiplyVector3( vertices[ face.c ].position.clone() );
+			d = face instanceof THREE.Face4 ? objMatrix.multiplyVector3( vertices[ face.d ].position.clone() ) : null;
+
+			normal = object.matrixRotation.multiplyVector3( face.normal.clone() );
 			dot = direction.dot( normal );
 
 			if ( dot < 0 ) { // Math.abs( dot ) > 0.0001

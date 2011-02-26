@@ -1,0 +1,195 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>three.js webgl - materials - cube refraction [Lucy]</title>
+		<meta charset="utf-8">
+		<style type="text/css">
+			body {
+				background:#000;
+				color:#fff;
+				padding:0;
+				margin:0;
+				overflow:hidden;
+				font-family:georgia;
+				text-align:center;
+			}
+			a {	color: #ff0080;	text-decoration: none; }
+			a:hover { color: #0080ff; }
+
+			canvas { pointer-events:none; z-index:10; }
+			#log { position:absolute; top:50px; text-align:left; display:block; z-index:100; pointer-events:none; }
+			#d { text-align:center; margin:1em auto -9.5em; z-index:200; position:relative; display:block; 
+				background:rgba(0,0,0,0.5); padding:0.5em; width:400px; border-radius:15px; -webkit-box-shadow: 0px 0px 10px rgba(0,0,0,0.5) }
+
+			#oldie { margin-top:15em !important }
+		</style>
+	</head>
+
+	<body>
+		<div id="d">
+			<p><a href="http://github.com/mrdoob/three.js">Three.js</a> cube map refraction demo
+
+			<p>Lucy model from <a href="http://graphics.stanford.edu/data/3Dscanrep/">Stanford 3d scanning repository</a>
+			<p>Texture by <a href="http://www.humus.name/index.php?page=Textures" target="_blank">Humus</a>
+		</div>
+
+		<pre id="log"></pre>
+
+		<script type="text/javascript" src="../build/Three.js"></script>
+
+		<script type="text/javascript" src="js/Detector.js"></script>
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
+		<script type="text/javascript" src="js/Stats.js"></script>
+
+		<script type="text/javascript">
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var FLOOR = -250;
+
+			var container, stats;
+
+			var camera, scene, webglRenderer;
+			var cameraCube, sceneCube;
+
+			var mesh, zmesh, lightMesh, geometry;
+
+			var loader;
+
+			var directionalLight, pointLight;
+
+			var mouseX = 0, mouseY = 0;
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement('div');
+				document.body.appendChild(container);
+
+				camera = new THREE.Camera( 50, window.innerWidth / window.innerHeight, 1, 100000 );
+				camera.position.z = 2000;
+
+				cameraCube = new THREE.Camera( 50, window.innerWidth / window.innerHeight, 1, 100000 );
+
+				scene = new THREE.Scene();
+				sceneCube = new THREE.Scene();
+
+				// LIGHTS
+
+				var ambient = new THREE.AmbientLight( 0xffffff );
+				scene.addLight( ambient );
+
+				pointLight = new THREE.PointLight( 0xffffff, 2 );
+				scene.addLight( pointLight );
+
+				// light representation
+				sphere = new Sphere( 100, 16, 8 );
+				lightMesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color:0xffaa00 } ) );
+				lightMesh.position = pointLight.position;
+				lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
+				scene.addObject(lightMesh);
+
+				// material samples
+
+				var r = "textures/cube/Park3Med/";
+
+				var urls = [ r + "px.jpg", r + "nx.jpg", 
+							 r + "py.jpg", r + "ny.jpg", 
+							 r + "pz.jpg", r + "nz.jpg" ];
+
+				var textureCube = ImageUtils.loadTextureCube( urls, new THREE.CubeRefractionMapping() );
+
+				var cubeMaterial3 = new THREE.MeshBasicMaterial( { color: 0xccddff, env_map: textureCube, refraction_ratio: 0.98, reflectivity:0.9 } );
+				var cubeMaterial2 = new THREE.MeshBasicMaterial( { color: 0xccfffd, env_map: textureCube, refraction_ratio: 0.985 } );
+				var cubeMaterial1 = new THREE.MeshBasicMaterial( { color: 0xffffff, env_map: textureCube, refraction_ratio: 0.98 } )
+
+				//SceneUtils.addPanoramaCubePlanes( sceneCube, 100000, images );
+				//SceneUtils.addPanoramaCube( sceneCube, 100000, images );
+				SceneUtils.addPanoramaCubeWebGL( sceneCube, 100000, textureCube );
+
+				webglRenderer = new THREE.WebGLRenderer();
+				webglRenderer.setSize( window.innerWidth, window.innerHeight );
+				webglRenderer.autoClear = false;
+				container.appendChild( webglRenderer.domElement );
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				stats.domElement.style.zIndex = 100;
+				container.appendChild( stats.domElement );
+
+				loader = new THREE.Loader( true );
+				document.body.appendChild( loader.statusDomElement );
+
+				loader.loadBinary( { model: 'obj/lucy/Lucy100k_bin.js', callback: function( geometry ) { createScene( geometry, cubeMaterial1, cubeMaterial2, cubeMaterial3 ) } } );
+
+				document.addEventListener('mousemove', onDocumentMouseMove, false);
+
+			}
+
+			function createScene( geometry, m1, m2, m3 ) {
+
+				var s = 1.5, z = -1000;
+
+				SceneUtils.addMesh( scene, geometry, s,      0, 0, z, 0,0,0, m1 );
+				SceneUtils.addMesh( scene, geometry, s,   -900, 0, z, 0,0,0, m2 );
+				SceneUtils.addMesh( scene, geometry, s,    900, 0, z, 0,0,0, m3 );
+
+				loader.statusDomElement.style.display = "none";
+
+			}
+
+			function onDocumentMouseMove(event) {
+
+				mouseX = ( event.clientX - windowHalfX ) * 4;
+				mouseY = ( event.clientY - windowHalfY ) * 4;
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				var timer = - new Date().getTime() * 0.0002;
+
+				camera.position.x += ( mouseX - camera.position.x ) * .05;
+				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+
+				cameraCube.target.position.x = - camera.position.x;
+				cameraCube.target.position.y = - camera.position.y;
+				cameraCube.target.position.z = - camera.position.z;
+
+
+				lightMesh.position.x = 1500 * Math.cos( timer );
+				lightMesh.position.z = 1500 * Math.sin( timer );
+
+				webglRenderer.clear();
+				webglRenderer.render( sceneCube, cameraCube );
+				webglRenderer.render( scene, camera );
+
+			}
+
+			function log(text) {
+
+				var e = document.getElementById("log");
+				e.innerHTML = text + "<br/>" + e.innerHTML;
+
+			}
+		</script>
+
+	</body>
+</html>
