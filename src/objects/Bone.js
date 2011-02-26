@@ -3,18 +3,18 @@
  */
 
 THREE.Bone = function( belongsToSkin ) {
-	
+
 	THREE.Object3D.call( this );
-	
-	this.skin                = belongsToSkin;
-	this.skinMatrix          = new THREE.Matrix4();
-	this.hasNoneBoneChildren = false;	
+
+	this.skin = belongsToSkin;
+	this.skinMatrix = new THREE.Matrix4();
+	this.hasNoneBoneChildren = false;
 
 };
 
-THREE.Bone.prototype             = new THREE.Object3D();
+THREE.Bone.prototype = new THREE.Object3D();
 THREE.Bone.prototype.constructor = THREE.Bone;
-THREE.Bone.prototype.supr        = THREE.Object3D.prototype;
+THREE.Bone.prototype.supr = THREE.Object3D.prototype;
 
 
 /*
@@ -30,7 +30,6 @@ THREE.Bone.prototype.update = function( parentSkinMatrix, forceUpdate, camera ) 
 		forceUpdate |= this.updateMatrix();
 
 	}
-
 
 	// update skin matrix
 
@@ -50,7 +49,6 @@ THREE.Bone.prototype.update = function( parentSkinMatrix, forceUpdate, camera ) 
 		forceUpdate = true;
 
 	}
-
 
 	// update children
 
@@ -79,8 +77,11 @@ THREE.Bone.prototype.update = function( parentSkinMatrix, forceUpdate, camera ) 
 
 	} else {
 
-		for( i = 0; i < l; i++ )
+		for ( i = 0; i < l; i++ ) {
+
 			this.children[ i ].update( this.skinMatrix, forceUpdate, camera );
+
+		}
 
 	}
 
@@ -93,21 +94,27 @@ THREE.Bone.prototype.update = function( parentSkinMatrix, forceUpdate, camera ) 
 
 THREE.Bone.prototype.addChild = function( child ) {
 
-	if( this.children.indexOf( child ) === -1 ) {
+	if ( this.children.indexOf( child ) === - 1 ) {
 
-		if( child.parent !== undefined )
+		if ( child.parent !== undefined ) {
+
 			child.parent.removeChild( child );
-		
-		child.parent = this;		
+
+		}
+
+		child.parent = this;
 		this.children.push( child );
 
-		if( ! ( child instanceof THREE.Bone ) )
+		if ( ! ( child instanceof THREE.Bone ) ) {
+
 			this.hasNoneBoneChildren = true;
+
+		}
 
 	}
 
 };
 
 /*
- * Todo: Remove Children: see if any remaining are none-Bone
+ * TODO: Remove Children: see if any remaining are none-Bone
  */

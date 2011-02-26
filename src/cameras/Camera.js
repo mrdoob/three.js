@@ -209,7 +209,7 @@ THREE.Camera.prototype.frustumContains = function( object3D ) {
 
 	// inside
 
-	object3D.screenPosition.set( vx1, vy1, vz1, radius );
+	object3D.positionScreen.set( vx1, vy1, vz1, radius );
 
 	return true;
 

@@ -12,21 +12,19 @@ THREE.Object3D = function() {
 	this.children = [];
 
 	this.position = new THREE.Vector3();
+	this.positionScreen = new THREE.Vector4();
 	this.rotation = new THREE.Vector3();
 	this.scale = new THREE.Vector3( 1.0, 1.0, 1.0 );
 
 	this.matrix = new THREE.Matrix4();
 	this.matrixWorld = new THREE.Matrix4();
-
 	this.matrixRotation = new THREE.Matrix4();
-	// this.matrixRotationWorld = new THREE.Matrix4();
-
-	this.matrixAutoUpdate = true;
+	this.matrixRotationWorld = new THREE.Matrix4();
 	this.matrixNeedsUpdate = true;
+	this.matrixAutoUpdate = true;
 
 	this.quaternion = new THREE.Quaternion();
 	this.useQuaternion = false;
-	this.screenPosition = new THREE.Vector4(); // TODO: Rename to positionScreen
 
 	this.boundRadius = 0.0;
 	this.boundRadiusScale = 1.0;

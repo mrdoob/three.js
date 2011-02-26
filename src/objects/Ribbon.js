@@ -11,7 +11,7 @@ THREE.Ribbon = function ( geometry, materials ) {
 
 	this.flipSided = false;
 	this.doubleSided = false;
-	
+
 };
 
 THREE.Ribbon.prototype = new THREE.Object3D();

@@ -8,7 +8,7 @@ THREE.ParticleSystem = function ( geometry, materials ) {
 
 	this.geometry = geometry;
 	this.materials = materials instanceof Array ? materials : [ materials ];
-	
+
 	this.sortParticles = false;
 
 };

@@ -10,23 +10,32 @@ THREE.LOD = function() {
 
 };
 
-THREE.LOD.prototype             = new THREE.Object3D();
+THREE.LOD.prototype = new THREE.Object3D();
 THREE.LOD.prototype.constructor = THREE.LOD;
-THREE.LOD.prototype.supr        = THREE.Object3D.prototype;
+THREE.LOD.prototype.supr = THREE.Object3D.prototype;
 
 /*
  * Add
  */
 
-THREE.LOD.prototype.add = function( object3D, visibleAtDistance ) {
+THREE.LOD.prototype.add = function ( object3D, visibleAtDistance ) {
 
-	if( visibleAtDistance === undefined ) visibleAtDistance = 0;
+	if ( visibleAtDistance === undefined ) {
+
+		visibleAtDistance = 0;
+
+	}
+
 	visibleAtDistance = Math.abs( visibleAtDistance );
 
-	for( var l = 0; l < this.LODs.length; l++ ) {
+	for ( var l = 0; l < this.LODs.length; l++ ) {
 
-		if( visibleAtDistance < this.LODs[ l ].visibleAtDistance )
+		if ( visibleAtDistance < this.LODs[ l ].visibleAtDistance ) {
+
 			break;
+
+		}
+
 	}
 
 	this.LODs.splice( l, 0, { visibleAtDistance: visibleAtDistance, object3D: object3D } );
@@ -39,7 +48,7 @@ THREE.LOD.prototype.add = function( object3D, visibleAtDistance ) {
  * Update
  */
 
-THREE.LOD.prototype.update = function( parentMatrixWorld, forceUpdate, camera ) {
+THREE.LOD.prototype.update = function ( parentMatrixWorld, forceUpdate, camera ) {
 
 	// update local
 
@@ -48,7 +57,6 @@ THREE.LOD.prototype.update = function( parentMatrixWorld, forceUpdate, camera ) 
 		forceUpdate |= this.updateMatrix();
 
 	}
-
 
 	// update global
 
@@ -69,10 +77,9 @@ THREE.LOD.prototype.update = function( parentMatrixWorld, forceUpdate, camera ) 
 
 	}
 
+	// update LODs
 
-	// update lods
-
-	if( this.LODs.length > 1 ) {
+	if ( this.LODs.length > 1 ) {
 
 		var distance = -camera.inverseMatrix.mulitplyVector3OnlyZ( this.position );
 
@@ -101,12 +108,13 @@ THREE.LOD.prototype.update = function( parentMatrixWorld, forceUpdate, camera ) 
 
 	}
 
-
 	// update children
 
-	for( var c = 0; c < this.children.length; c++ )
+	for ( var c = 0; c < this.children.length; c++ ) {
+
 		this.children[ c ].update( this.matrixWorld, forceUpdate, camera );
+
+	}
 
 
 };
-

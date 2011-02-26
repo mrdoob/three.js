@@ -4,7 +4,7 @@
  * @author mikael emtinger / http://gomo.se/
  */
 
-THREE.Mesh = function( geometry, materials ) {
+THREE.Mesh = function ( geometry, materials ) {
 
 	THREE.Object3D.call( this );
 

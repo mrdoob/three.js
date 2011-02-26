@@ -8,7 +8,7 @@ THREE.Line = function ( geometry, materials, type ) {
 
 	this.geometry = geometry;
 	this.materials = materials instanceof Array ? materials : [ materials ];
-	
+
 	this.type = ( type != undefined ) ? type : THREE.LineStrip;
 
 };
