@@ -48,8 +48,6 @@ THREE.Projector = function() {
 			_object = _objectPool[ _objectCount ] = _objectPool[ _objectCount ] || new THREE.RenderableObject();
 
 			_vector3.copy( object.position );
-			//matrix = object.globalMatrix;
-			//_vector3.set( matrix.n14, matrix.n24,  matrix.n34 );
 			_projScreenMatrix.multiplyVector3( _vector3 );
 
 			_object.object = object;
@@ -82,7 +80,7 @@ THREE.Projector = function() {
 
 		camera.matrixAutoUpdate && camera.update();
 
-		_projScreenMatrix.multiply( camera.projectionMatrix, camera.globalMatrix );
+		_projScreenMatrix.multiply( camera.projectionMatrix, camera.matrixWorld );
 		computeFrustum( _projScreenMatrix );
 
 		scene.update( undefined, false, camera );
@@ -97,7 +95,7 @@ THREE.Projector = function() {
 
 			object.matrixAutoUpdate && object.updateMatrix();
 
-			objectMatrix = object.globalMatrix;
+			objectMatrix = object.matrixWorld;
 			objectMatrixRotation = object.matrixRotation;
 
 			objectMaterials = object.materials;
@@ -377,7 +375,7 @@ THREE.Projector = function() {
 
 	this.unprojectVector = function ( vector, camera ) {
 
-		var matrix = THREE.Matrix4.makeInvert( camera.globalMatrix );
+		var matrix = THREE.Matrix4.makeInvert( camera.matrixWorld );
 
 		matrix.multiplySelf( THREE.Matrix4.makeInvert( camera.projectionMatrix ) );
 
@@ -413,7 +411,7 @@ THREE.Projector = function() {
 
 	function isInFrustum( object ) {
 
-		var distance, matrix = object.globalMatrix,
+		var distance, matrix = object.matrixWorld,
 		radius = - object.geometry.boundingSphere.radius * Math.max( object.scale.x, Math.max( object.scale.y, object.scale.z ) );
 
 		for ( var i = 0; i < 6; i ++ ) {

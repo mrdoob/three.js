@@ -148,25 +148,25 @@
 					ribbon.matrixAutoUpdate = false;
 
 					// manually create local matrix
-					
-					ribbon.localMatrix.setPosition( ribbon.position );
+
+					ribbon.matrix.setPosition( ribbon.position );
 					ribbon.matrixRotation.setRotationFromEuler( ribbon.rotation );
 
-					ribbon.localMatrix.n11 = ribbon.matrixRotation.n11;
-					ribbon.localMatrix.n12 = ribbon.matrixRotation.n12;
-					ribbon.localMatrix.n13 = ribbon.matrixRotation.n13;
+					ribbon.matrix.n11 = ribbon.matrixRotation.n11;
+					ribbon.matrix.n12 = ribbon.matrixRotation.n12;
+					ribbon.matrix.n13 = ribbon.matrixRotation.n13;
 
-					ribbon.localMatrix.n21 = ribbon.matrixRotation.n21;
-					ribbon.localMatrix.n22 = ribbon.matrixRotation.n22;
-					ribbon.localMatrix.n23 = ribbon.matrixRotation.n23;
+					ribbon.matrix.n21 = ribbon.matrixRotation.n21;
+					ribbon.matrix.n22 = ribbon.matrixRotation.n22;
+					ribbon.matrix.n23 = ribbon.matrixRotation.n23;
 
-					ribbon.localMatrix.n31 = ribbon.matrixRotation.n31;
-					ribbon.localMatrix.n32 = ribbon.matrixRotation.n32;
-					ribbon.localMatrix.n33 = ribbon.matrixRotation.n33;
-					
-					ribbon.localMatrix.multiplySelf( tmpRot );
+					ribbon.matrix.n31 = ribbon.matrixRotation.n31;
+					ribbon.matrix.n32 = ribbon.matrixRotation.n32;
+					ribbon.matrix.n33 = ribbon.matrixRotation.n33;
 
-					ribbon.localMatrix.scale( ribbon.scale );
+					ribbon.matrix.multiplySelf( tmpRot );
+
+					ribbon.matrix.scale( ribbon.scale );
 					ribbon.boundRadiusScale = Math.max( ribbon.scale.x, Math.max( ribbon.scale.y, ribbon.scale.z ) );
 
 					ribbons.push( ribbon );

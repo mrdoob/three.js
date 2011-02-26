@@ -46,21 +46,26 @@ THREE.SkinnedMesh = function( geometry, materials ) {
 				bone.scale.set( 1, 1, 1 );
 
 		}
-		
+
 		for( b = 0; b < this.bones.length; b++ ) {
-			
+
 			gbone = this.geometry.bones[ b ];
 			bone = this.bones[ b ];
-			
-			if( gbone.parent === -1 ) 
+
+			if ( gbone.parent === -1 ) {
+
 				this.addChild( bone );
-			else
+
+			} else {
+
 				this.bones[ gbone.parent ].addChild( bone );
+
+			}
 
 		}
 
 		this.boneMatrices = new Float32Array( 16 * this.bones.length );
-		
+
 		this.pose();
 
 	}
@@ -75,46 +80,59 @@ THREE.SkinnedMesh.prototype.constructor = THREE.SkinnedMesh;
  * Update
  */
 
-THREE.SkinnedMesh.prototype.update = function( parentGlobalMatrix, forceUpdate, camera ) {
-	
+THREE.SkinnedMesh.prototype.update = function( parentMatrixWorld, forceUpdate, camera ) {
+
 	// visible?
-	
-	if( this.visible ) {
+
+	if ( this.visible ) {
 
 		// update local
-		
-		if( this.matrixAutoUpdate )
+
+		if ( this.matrixAutoUpdate ) {
+
 			forceUpdate |= this.updateMatrix();
+
+		}
 
 
 		// update global
 
-		if( forceUpdate || this.matrixNeedsUpdate ) {
-			
-			if( parentGlobalMatrix )
-				this.globalMatrix.multiply( parentGlobalMatrix, this.localMatrix );
-			else
-				this.globalMatrix.copy( this.localMatrix );
-			
+		if ( forceUpdate || this.matrixNeedsUpdate ) {
+
+			if ( parentMatrixWorld ) {
+
+				this.matrixWorld.multiply( parentMatrixWorld, this.matrix );
+
+			} else {
+
+				this.matrixWorld.copy( this.matrix );
+
+			}
+
 			this.matrixNeedsUpdate = false;
-			forceUpdate              = true;
+			forceUpdate = true;
 
 		}
 
 
 		// update children
-	
+
 		var child, i, l = this.children.length;
-		
-		for( i = 0; i < l; i++ ) {
-			
+
+		for ( i = 0; i < l; i++ ) {
+
 			child = this.children[ i ];
-			
-			if( child instanceof THREE.Bone )
+
+			if ( child instanceof THREE.Bone ) {
+
 				child.update( this.identityMatrix, false, camera );
-			else
-				child.update( this.globalMatrix, forceUpdate, camera );
-			
+
+			} else {
+
+				child.update( this.matrixWorld, forceUpdate, camera );
+
+			}
+
 		}
 
 	}

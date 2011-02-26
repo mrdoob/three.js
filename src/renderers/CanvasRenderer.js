@@ -524,7 +524,7 @@ THREE.CanvasRenderer = function () {
 
 					if ( material.env_map.mapping instanceof THREE.SphericalReflectionMapping ) {
 
-						var cameraMatrix = camera.globalMatrix;
+						var cameraMatrix = camera.matrixWorld;
 
 						_vector3.copy( element.vertexNormalsWorld[ 0 ] );
 						_uv1x = ( _vector3.x * cameraMatrix.n11 + _vector3.y * cameraMatrix.n12 + _vector3.z * cameraMatrix.n13 ) * 0.5 + 0.5;

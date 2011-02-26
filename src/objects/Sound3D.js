@@ -146,13 +146,13 @@ THREE.Sound3D.prototype.calculateVolumeAndPan = function ( cameraRelativePositio
 
 };
 
-THREE.Sound3D.prototype.update = function ( parentGlobalMatrix, forceUpdate, camera ) {
+THREE.Sound3D.prototype.update = function ( parentMatrixWorld, forceUpdate, camera ) {
 
 	// update local (rotation/scale is not used)
 
 	if ( this.matrixAutoUpdate ) {
 
-		this.localMatrix.setPosition( this.position );
+		this.matrix.setPosition( this.position );
 		forceUpdate = true;
 
 	}
@@ -162,13 +162,13 @@ THREE.Sound3D.prototype.update = function ( parentGlobalMatrix, forceUpdate, cam
 
 	if ( forceUpdate || this.matrixNeedsUpdate ) {
 
-		if ( parentGlobalMatrix ) {
+		if ( parentMatrixWorld ) {
 
-			this.globalMatrix.multiply( parentGlobalMatrix, this.localMatrix );
+			this.matrixWorld.multiply( parentMatrixWorld, this.matrix );
 
 		} else {
 
-			this.globalMatrix.copy( this.localMatrix );
+			this.matrixWorld.copy( this.matrix );
 
 		}
 
@@ -184,7 +184,7 @@ THREE.Sound3D.prototype.update = function ( parentGlobalMatrix, forceUpdate, cam
 
 	for ( i = 0; i < l; i++ ) {
 
-		this.children[ i ].update( this.globalMatrix, forceUpdate, camera );
+		this.children[ i ].update( this.matrixWorld, forceUpdate, camera );
 
 	}
 

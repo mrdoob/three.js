@@ -101,7 +101,7 @@ THREE.WebGLRenderer2 = function ( antialias ) {
 
 		// Setup camera matrices
 
-		_viewMatrixArray.set( camera.globalMatrix.flatten() );
+		_viewMatrixArray.set( camera.matrixWorld.flatten() );
 		_projectionMatrixArray.set( camera.projectionMatrix.flatten() );
 
 		_currentProgram = null;
@@ -131,9 +131,9 @@ THREE.WebGLRenderer2 = function ( antialias ) {
 
 			// Setup object matrices
 
-			object.globalMatrix.flattenToArray( _objectMatrixArray )
-			
-			_modelViewMatrix.multiply( camera.globalMatrix, object.globalMatrix );
+			object.matrixWorld.flattenToArray( _objectMatrixArray )
+
+			_modelViewMatrix.multiply( camera.matrixWorld, object.matrixWorld );
 			_modelViewMatrix.flattenToArray( _modelViewMatrixArray );
 
 			_normalMatrix = THREE.Matrix4.makeInvert3x3( _modelViewMatrix ).transpose();

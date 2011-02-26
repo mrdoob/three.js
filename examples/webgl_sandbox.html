@@ -1,18 +1,39 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js canvas - sandbox</title>
+		<title>three.js - webgl</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
-				font-family: Monospace;
-				background-color: #f0f0f0;
-				margin: 0px;
-				overflow: hidden;
+				background:#fff;
+				padding:0;
+				margin:0;
+				font-weight: bold;
+				overflow:hidden;
 			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				color: #ffffff;
+				padding: 5px;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				z-index:1000; 
+			}
+
+			a {
+				color: #ffffff;
+			}
+			#log { position:absolute; top:50px; text-align:left; display:block; z-index:100 }
 		</style>
 	</head>
+
 	<body>
+		<pre id="log"></pre>
+
+		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl cube Fresnel shader demo.</div>
 
 		<!-- <script type="text/javascript" src="../build/Three.js"></script> -->
 
@@ -91,39 +112,23 @@
 		<script type="text/javascript" src="../src/extras/objects/MarchingCubes.js"></script>
 		<script type="text/javascript" src="../src/extras/io/Loader.js"></script>
 
-		<script type="text/javascript" src="../src/extras/primitives/Sphere.js"></script>
-		<script type="text/javascript" src="../src/extras/ImageUtils.js"></script>
-
 		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
 
+			var statsEnabled = true;
+
 			var container, stats;
 
-			var camera, scene, renderer, objects;
-			var pointLight;
+			var camera, scene, renderer;
 
-			var sphere;
+			var mesh, zmesh, lightMesh, geometry;
 
-			var targetRotation = 0;
-			var targetRotationOnMouseDown = 0;
-
-			var mouseX = 0;
-			var mouseXOnMouseDown = 0;
+			var mouseX = 0, mouseY = 0;
 
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
-
-			var moveForward = false, moveBackwards = false,
-			moveUp = false, moveDown = false,
-			moveLeft = false, moveRight = false,
-
-			yawLeft = false, yawRight = false,
-			pitchUp = false, pitchDown = false,
-			rollLeft = false, rollRight = false;
-
-			var debugContext;
 
 			init();
 			animate();
@@ -133,139 +138,126 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.y = 150;
-				camera.position.z = 400;
-				camera.target.position.y = 150;
+				camera = new THREE.Camera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.z = 3200;
 
 				scene = new THREE.Scene();
+				scene.fog = new THREE.Fog( 0xffffff, 1, 10000 );
 
-				// Grid
+				var geometry = new Sphere( 50, 32, 16 );
 
-				var geometry = new THREE.Geometry();
-				geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( - 500, 0, 0 ) ) );
-				geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( 500, 0, 0 ) ) );
+				var uniforms = ShaderUtils.lib[ 'basic' ].uniforms;
+				var vertex_shader = ShaderUtils.lib[ 'basic' ].vertex_shader;
+				var fragment_shader = ShaderUtils.lib[ 'basic' ].fragment_shader;
 
-				var material = new THREE.LineBasicMaterial( { color: 0x000000, opacity: 0.5 } );
+				var texture = new THREE.Texture( generateTexture( 0, 0.5, 1 ), new THREE.UVMapping() );
+				var texture2 = new THREE.Texture( generateTexture( 0, 1, 0 ), new THREE.SphericalReflectionMapping() );
 
-				for ( var i = 0; i <= 10; i ++ ) {
+				var materials = [
 
-					var line = new THREE.Line( geometry, material );
-					line.position.z = ( i * 100 ) - 500;
-					scene.addObject( line );
+					new THREE.MeshNormalMaterial(),
+					new THREE.MeshDepthMaterial(),
+					new THREE.MeshBasicMaterial( { color: 0x0066ff, blending: THREE.AdditiveBlending } ),
+					new THREE.MeshBasicMaterial( { map: texture, fog: false } ),
+					new THREE.MeshBasicMaterial( { map: ImageUtils.loadTexture( 'textures/land_ocean_ice_cloud_2048.jpg' ) } ),
+					new THREE.MeshBasicMaterial( { map: texture2, env_map: ImageUtils.loadTexture( 'textures/envmap.png', new THREE.SphericalReflectionMapping() ) } ),
+					new THREE.MeshShaderMaterial( { uniforms: uniforms, vertex_shader: vertex_shader, fragment_shader: fragment_shader } )
 
-					var line = new THREE.Line( geometry, material );
-					line.position.x = ( i * 100 ) - 500;
-					line.rotation.y = 90 * Math.PI / 180;
-					scene.addObject( line );
+					/*
+					new THREE.MeshLambertMaterial( { color: 0xdddddd, shading: THREE.FlatShading } ),
+					new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.FlatShading } ),
+					new THREE.MeshLambertMaterial( { color: 0xdddddd, shading: THREE.SmoothShading } ),
+					new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.SmoothShading } ),
+					new THREE.MeshNormalMaterial( { shading: THREE.SmoothShading } ),
+					new THREE.MeshBasicMaterial( { color: 0xffaa00, wireframe: true } ),
+					new THREE.MeshBasicMaterial( { map: texture, fog: false } ),
+					new THREE.MeshBasicMaterial( { env_map: texture2, fog: false } ),
+					new THREE.MeshLambertMaterial( { map: ImageUtils.loadTexture( 'textures/land_ocean_ice_cloud_2048.jpg' ) } ),
+					new THREE.MeshLambertMaterial( { map: texture2, env_map: ImageUtils.loadTexture( 'textures/envmap.png', new THREE.SphericalReflectionMapping() ) } ),
+					new THREE.MeshShaderMaterial( { uniforms: uniforms, vertex_shader: vertex_shader, fragment_shader: fragment_shader } )
+					*/
 
-				}
+				];
 
-				// Spheres
+				for ( var i = 0, l = geometry.faces.length; i < l; i ++ ) {
 
-				objects = [];
-
-				geometry = new Sphere( 100, 16, 8 );
-				material = new THREE.MeshBasicMaterial( { env_map: ImageUtils.loadTexture( 'textures/metal.jpg', new THREE.SphericalReflectionMapping() ) } );
-
-				for ( var i = 0; i < 10; i ++ ) {
-
-					sphere = new THREE.Mesh( geometry, material );
-					sphere.overdraw = true;
-
-					sphere.position.x = Math.random() * 1000 - 500;
-					sphere.position.y = Math.random() * 1000 - 500;
-					sphere.position.z = Math.random() * 1000 - 500;
-
-					sphere.rotation.x = Math.random() * 200 - 100;
-					sphere.rotation.y = Math.random() * 200 - 100;
-					sphere.rotation.z = Math.random() * 200 - 100;
-
-					sphere.scale.x = sphere.scale.y = sphere.scale.z = Math.random() + 0.5;
-
-					objects.push( sphere );
-
-					scene.addObject( sphere );
+					var face = geometry.faces[ i ];
+					if ( Math.random() > 0.5 ) face.material = [ materials[ Math.floor( Math.random() * materials.length ) ] ];
 
 				}
 
-				// Lights
+				materials.push( new THREE.MeshFaceMaterial() );
 
-				var ambientLight = new THREE.AmbientLight( Math.random() * 0x202020 );
-				scene.addLight( ambientLight );
+				// materials = [ new THREE.MeshBasicMaterial( { map: texture, env_map: texture2 } ) ];
 
-				var directionalLight = new THREE.DirectionalLight( Math.random() * 0xffffff );
-				directionalLight.position.x = Math.random() - 0.5;
-				directionalLight.position.y = Math.random() - 0.5;
-				directionalLight.position.z = Math.random() - 0.5;
-				directionalLight.position.normalize();
-				scene.addLight( directionalLight );
+				for ( var i = 0; i < 5000; i ++ ) {
 
-				pointLight = new THREE.PointLight( 0xff0000, 1 );
-				scene.addLight( pointLight );
+					var mesh = new THREE.Mesh( geometry, materials[ Math.floor( Math.random() * materials.length ) ] );
+					mesh.position.x = Math.random() * 10000 - 5000;
+					mesh.position.y = Math.random() * 10000 - 5000;
+					mesh.position.z = Math.random() * 10000 - 5000;
+					mesh.rotation.x = Math.random() * 360 * ( Math.PI / 180 );
+					mesh.rotation.y = Math.random() * 360 * ( Math.PI / 180 );
+					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 4 + 1;
+					mesh.matrixAutoUpdate = false;
+					mesh.updateMatrix();
+					scene.addObject( mesh );
 
-				renderer = new THREE.CanvasRenderer();
+				}
+
+				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
+				// renderer.sortObjects = false;
 				container.appendChild( renderer.domElement );
 
-				var debugCanvas = document.createElement( 'canvas' );
-				debugCanvas.width = 512;
-				debugCanvas.height = 512;
-				debugCanvas.style.position = 'absolute';
-				debugCanvas.style.top = '0px';
-				debugCanvas.style.left = '0px';
+				if ( statsEnabled ) {
 
-				container.appendChild( debugCanvas );
-
-				debugContext = debugCanvas.getContext( '2d' );
-				debugContext.setTransform( 1, 0, 0, 1, 256, 256 );
-				debugContext.strokeStyle = '#000000';
-
-				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild(stats.domElement);
-
-				document.addEventListener( 'keydown', onDocumentKeyDown, false );
-				document.addEventListener( 'keyup', onDocumentKeyUp, false );
-			}
-
-			function onDocumentKeyDown( event ) {
-
-				switch( event.keyCode ) {
-
-					case 38: moveForward = true; break; // up
-					case 40: moveBackwards = true; break; // down
-					case 37: moveLeft = true; break; // left
-					case 39: moveRight = true; break; // right
-					case 65: yawLeft = true; break; // a
-					case 68: yawRight = true; break; // d
-					case 87: moveUp/*pitchUp*/ = true; break; // w
-					case 83: moveDown/*pitchDown*/ = true; break; // s
-					case 90: rollLeft = true; break; // z
-					case 67: rollRight = true; break; // c
+					stats = new Stats();
+					stats.domElement.style.position = 'absolute';
+					stats.domElement.style.top = '0px';
+					stats.domElement.style.zIndex = 100;
+					container.appendChild( stats.domElement );
 
 				}
 
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
 			}
 
-			function onDocumentKeyUp( event ) {
+			function generateTexture( r, g, b ) {
 
-				switch( event.keyCode ) {
+				var canvas = document.createElement( 'canvas' );
+				canvas.width = 256;
+				canvas.height = 256;
 
-					case 38: moveForward = false; break; // up
-					case 40: moveBackwards = false; break; // down
-					case 37: moveLeft = false; break; // left
-					case 39: moveRight = false; break; // right
-					case 65: yawLeft = false; break; // a
-					case 68: yawRight = false; break; // d
-					case 87: moveUp/*pitchUp*/ = false; break; // w
-					case 83: moveDown/*pitchDown*/ = false; break; // s
-					case 90: rollLeft = false; break; // z
-					case 67: rollRight = false; break; // c
+				var context = canvas.getContext( '2d' );
+				var image = context.getImageData( 0, 0, 256, 256 );
+
+				var x = 0, y = 0, p;
+
+				for ( var i = 0, j = 0, l = image.data.length; i < l; i += 4, j ++ ) {
+
+					x = j % 256;
+					y = x == 0 ? y + 1 : y;
+					p = Math.floor( x ^ y );
+
+					image.data[ i ] = ~~ p * r;
+					image.data[ i + 1 ] = ~~ p * g;
+					image.data[ i + 2 ] = ~~ p * b;
+					image.data[ i + 3 ] = 255;
 
 				}
+
+				context.putImageData( image, 0, 0 );
+
+				return canvas;
+
+			}
+
+			function onDocumentMouseMove(event) {
+
+				mouseX = ( event.clientX - windowHalfX ) * 10;
+				mouseY = ( event.clientY - windowHalfY ) * 10;
 
 			}
 
@@ -276,65 +268,23 @@
 				requestAnimationFrame( animate );
 
 				render();
-				stats.update();
+				if ( statsEnabled ) stats.update();
 
 			}
 
 			function render() {
 
-				if ( moveForward ) camera.position.z -= 5;
-				if ( moveBackwards ) camera.position.z += 5;
-
-				if ( moveUp ) camera.position.y += 5;
-				if ( moveDown ) camera.position.y -= 5;
-
-				if ( moveLeft ) camera.position.x -= 5;
-				if ( moveRight ) camera.position.x += 5;
-
-				if ( pitchUp ) camera.rotation.x += 0.01;
-				if ( pitchDown ) camera.rotation.x -= 0.01;
-
-				if ( yawLeft ) camera.target.position.x -= 5;
-				if ( yawRight ) camera.target.position.x += 5;
-
-				if ( rollLeft ) camera.rotation.z += 0.01;
-				if ( rollRight ) camera.rotation.z -= 0.01;
-
-				debugContext.clearRect( -256, -256, 512, 512 );
-
-				debugContext.beginPath();
-
-				// center
-				debugContext.moveTo( -10, 0 );
-				debugContext.lineTo( 10, 0 );
-				debugContext.moveTo( 0, -10 );
-				debugContext.lineTo( 0, 10 );
-
-				// camera
-
-				debugContext.moveTo( camera.position.x * 0.1, camera.position.z * 0.1 );
-				debugContext.lineTo( camera.target.position.x * 0.1, camera.target.position.z * 0.1 );
-				debugContext.rect( camera.position.x * 0.1 - 5, camera.position.z * 0.1 - 5, 10, 10 );
-				debugContext.rect( camera.target.position.x * 0.1 - 5, camera.target.position.z * 0.1 - 5, 10, 10 );
-				debugContext.rect( - 50, - 50, 100, 100 );
-
-				for ( var i = 0, l = objects.length; i < l; i++ ) {
-
-					var object = objects[ i ];
-
-					object.rotation.x += 0.01;
-					object.rotation.y += 0.005;
-					object.position.y = Math.sin( object.rotation.x ) * 200;
-
-					debugContext.rect( object.position.x * 0.1 - 5, object.position.z * 0.1 - 5, 10, 10 );
-
-				}
-
-
-				debugContext.closePath();
-				debugContext.stroke();
+				camera.position.x += ( mouseX - camera.position.x ) * .05;
+				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 
 				renderer.render( scene, camera );
+
+			}
+
+			function log( text ) {
+
+				var e = document.getElementById("log");
+				e.innerHTML = text + "<br/>" + e.innerHTML;
 
 			}
 

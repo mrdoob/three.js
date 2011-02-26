@@ -19,16 +19,16 @@ THREE.LOD.prototype.supr        = THREE.Object3D.prototype;
  */
 
 THREE.LOD.prototype.add = function( object3D, visibleAtDistance ) {
-	
+
 	if( visibleAtDistance === undefined ) visibleAtDistance = 0;
 	visibleAtDistance = Math.abs( visibleAtDistance );
-	
+
 	for( var l = 0; l < this.LODs.length; l++ ) {
-		
+
 		if( visibleAtDistance < this.LODs[ l ].visibleAtDistance )
 			break;
 	}
-	
+
 	this.LODs.splice( l, 0, { visibleAtDistance: visibleAtDistance, object3D: object3D } );
 	this.addChild( object3D );
 
@@ -39,51 +39,65 @@ THREE.LOD.prototype.add = function( object3D, visibleAtDistance ) {
  * Update
  */
 
-THREE.LOD.prototype.update = function( parentGlobalMatrix, forceUpdate, camera ) {
-	
+THREE.LOD.prototype.update = function( parentMatrixWorld, forceUpdate, camera ) {
+
 	// update local
-	
-	if( this.matrixAutoUpdate )
+
+	if ( this.matrixAutoUpdate ) {
+
 		forceUpdate |= this.updateMatrix();
+
+	}
 
 
 	// update global
 
-	if( forceUpdate || this.matrixNeedsUpdate ) {
-		
-		if( parentGlobalMatrix )
-			this.globalMatrix.multiply( parentGlobalMatrix, this.localMatrix );
-		else
-			this.globalMatrix.copy( this.localMatrix );
-		
+	if ( forceUpdate || this.matrixNeedsUpdate ) {
+
+		if ( parentMatrixWorld ) {
+
+			this.matrixWorld.multiply( parentMatrixWorld, this.matrix );
+
+		} else {
+
+			this.matrixWorld.copy( this.matrix );
+
+		}
+
 		this.matrixNeedsUpdate = false;
-		forceUpdate              = true;
+		forceUpdate = true;
 
 	}
 
 
 	// update lods
-		
+
 	if( this.LODs.length > 1 ) {
-		
+
 		var distance = -camera.inverseMatrix.mulitplyVector3OnlyZ( this.position );
 
 		this.LODs[ 0 ].object3D.visible = true;
-		
-		for( var l = 1; l < this.LODs.length; l++ ) {
-			
+
+		for ( var l = 1; l < this.LODs.length; l++ ) {
+
 			if( distance >= this.LODs[ l ].visibleAtDistance ) {
-				
+
 				this.LODs[ l - 1 ].object3D.visible = false;
 				this.LODs[ l     ].object3D.visible = true;
-			}
-			else 
+
+			} else {
+
 				break;
 
+			}
+
 		}
-		
-		for( ; l < this.LODs.length; l++ ) 
+
+		for( ; l < this.LODs.length; l++ ) {
+
 			this.LODs[ l ].object3D.visible = false;
+
+		}
 
 	}
 
@@ -91,7 +105,7 @@ THREE.LOD.prototype.update = function( parentGlobalMatrix, forceUpdate, camera )
 	// update children
 
 	for( var c = 0; c < this.children.length; c++ )
-		this.children[ c ].update( this.globalMatrix, forceUpdate, camera );
+		this.children[ c ].update( this.matrixWorld, forceUpdate, camera );
 
 
 };

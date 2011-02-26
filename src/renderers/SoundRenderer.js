@@ -23,17 +23,15 @@ THREE.SoundRenderer = function() {
 		var sounds = scene.sounds;
 		var s, l = sounds.length;
 
-		//camera.globalMatrix.extractPositionVector( this.cameraPosition );
-
 		for ( s = 0; s < l; s++ ) {
 
 			sound = sounds[ s ];
 
 			this.soundPosition.set(
 
-				sound.globalMatrix.n14,
-				sound.globalMatrix.n24,
-				sound.globalMatrix.n34
+				sound.matrixWorld.n14,
+				sound.matrixWorld.n24,
+				sound.matrixWorld.n34
 
 			);
 

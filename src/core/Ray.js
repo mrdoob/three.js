@@ -53,7 +53,7 @@ THREE.Ray.prototype = {
 			origin = this.origin.clone();
 			direction = this.direction.clone();
 
-			objMatrix = object.globalMatrix;
+			objMatrix = object.matrixWorld;
 
 			a = objMatrix.multiplyVector3( vertices[ face.a ].position.clone() );
 			b = objMatrix.multiplyVector3( vertices[ face.b ].position.clone() );

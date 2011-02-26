@@ -22,22 +22,30 @@ THREE.Bone.prototype.supr        = THREE.Object3D.prototype;
  */
 
 THREE.Bone.prototype.update = function( parentSkinMatrix, forceUpdate, camera ) {
-	
-	// update local
-	
-	if( this.matrixAutoUpdate )
-		forceUpdate |= this.updateMatrix();			
 
-	
+	// update local
+
+	if ( this.matrixAutoUpdate ) {
+
+		forceUpdate |= this.updateMatrix();
+
+	}
+
+
 	// update skin matrix
 
-	if( forceUpdate || this.matrixNeedsUpdate ) {
-		
-		if( parentSkinMatrix )
-			this.skinMatrix.multiply( parentSkinMatrix, this.localMatrix );
-		else
-			this.skinMatrix.copy( this.localMatrix );
-		
+	if ( forceUpdate || this.matrixNeedsUpdate ) {
+
+		if( parentSkinMatrix ) {
+
+			this.skinMatrix.multiply( parentSkinMatrix, this.matrix );
+
+		} else {
+
+			this.skinMatrix.copy( this.matrix );
+
+		}
+
 		this.matrixNeedsUpdate = false;
 		forceUpdate = true;
 
@@ -47,24 +55,30 @@ THREE.Bone.prototype.update = function( parentSkinMatrix, forceUpdate, camera ) 
 	// update children
 
 	var child, i, l = this.children.length;
-	
-	if( this.hasNoneBoneChildren ) {
-		
-		this.globalMatrix.multiply( this.skin.globalMatrix, this.skinMatrix );
 
-		
-		for( i = 0; i < l; i++ ) {
-			
+	if ( this.hasNoneBoneChildren ) {
+
+		this.matrixWorld.multiply( this.skin.matrixWorld, this.skinMatrix );
+
+
+		for ( i = 0; i < l; i++ ) {
+
 			child = this.children[ i ];
-			
-			if( ! ( child instanceof THREE.Bone ) )
-				child.update( this.globalMatrix, true, camera );
-			else
+
+			if ( ! ( child instanceof THREE.Bone ) ) {
+
+				child.update( this.matrixWorld, true, camera );
+
+			} else {
+
 				child.update( this.skinMatrix, forceUpdate, camera );
+
+			}
+
 		}
-	
+
 	} else {
-		
+
 		for( i = 0; i < l; i++ )
 			this.children[ i ].update( this.skinMatrix, forceUpdate, camera );
 

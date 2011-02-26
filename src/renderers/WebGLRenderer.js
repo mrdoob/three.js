@@ -1131,7 +1131,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( object.sortParticles ) {
 
-			_projScreenMatrix.multiplySelf( object.globalMatrix );
+			_projScreenMatrix.multiplySelf( object.matrixWorld );
 
 			for ( v = 0; v < vl; v++ ) {
 
@@ -1750,7 +1750,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function isInFrustum( object ) {
 
-		var distance, matrix = object.globalMatrix,
+		var distance, matrix = object.matrixWorld,
 		radius = - object.geometry.boundingSphere.radius * Math.max( object.scale.x, Math.max( object.scale.y, object.scale.z ) );
 
 		for ( var i = 0; i < 6; i ++ ) {
@@ -1858,11 +1858,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		camera.matrixAutoUpdate && camera.update();
 
-		camera.globalMatrix.flattenToArray( _viewMatrixArray );
+		camera.matrixWorld.flattenToArray( _viewMatrixArray );
 		camera.projectionMatrix.flattenToArray( _projectionMatrixArray );
 		camera.inverseMatrix.flattenToArray( _cameraInverseMatrixArray );
 
-		_projScreenMatrix.multiply( camera.projectionMatrix, camera.globalMatrix );
+		_projScreenMatrix.multiply( camera.projectionMatrix, camera.matrixWorld );
 		computeFrustum( _projScreenMatrix );
 
 		if( THREE.AnimationHandler ) THREE.AnimationHandler.update();
@@ -1892,7 +1892,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( ! ( object instanceof THREE.Mesh ) || isInFrustum( object ) ) {
 
-					object.globalMatrix.flattenToArray( object._objectMatrixArray );
+					object.matrixWorld.flattenToArray( object._objectMatrixArray );
 
 					setupMatrices( object, camera );
 
@@ -1940,7 +1940,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if( object.matrixAutoUpdate ) {
 
-					object.globalMatrix.flattenToArray( object._objectMatrixArray );
+					object.matrixWorld.flattenToArray( object._objectMatrixArray );
 
 				}
 
@@ -2093,7 +2093,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			object._modelViewMatrixArray = new Float32Array( 16 );
 			object._objectMatrixArray = new Float32Array( 16 );
 
-			object.globalMatrix.flattenToArray( object._objectMatrixArray );
+			object.matrixWorld.flattenToArray( object._objectMatrixArray );
 
 		}
 
@@ -2297,7 +2297,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setupMatrices ( object, camera ) {
 
-		object._modelViewMatrix.multiplyToArray( camera.globalMatrix, object.globalMatrix, object._modelViewMatrixArray );
+		object._modelViewMatrix.multiplyToArray( camera.matrixWorld, object.matrixWorld, object._modelViewMatrixArray );
 		THREE.Matrix4.makeInvert3x3( object._modelViewMatrix ).transposeIntoArray( object._normalMatrixArray );
 
 	};
