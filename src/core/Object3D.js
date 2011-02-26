@@ -103,6 +103,8 @@ THREE.Object3D.prototype = {
 
 	},
 
+	// TODO: Add link to parent so rotationWorld can be updated too.
+
 	update: function ( parentMatrixWorld, forceUpdate, camera ) {
 
 		if ( this.visible ) {
