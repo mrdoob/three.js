@@ -71,7 +71,7 @@ THREE.Projector = function() {
 
 	this.projectScene = function ( scene, camera, sort ) {
 
-		var renderList = [], near = camera.zNear, far = camera.zFar,
+		var renderList = [], near = camera.near, far = camera.far,
 		o, ol, v, vl, f, fl, n, nl, objects, object,
 		objectMatrix, objectMaterials, objectOverdraw,
 		objectMatrixRotation,

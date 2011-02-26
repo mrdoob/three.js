@@ -3,19 +3,22 @@
  * @author mikael emtinger / http://gomo.se/
  */
 
-THREE.Camera = function( FOV, aspect, zNear, zFar, target ) {
+THREE.Camera = function( fov, aspect, near, far, target ) {
 
 	THREE.Object3D.call( this );
 
-	this.FOV              = FOV      || 50;
-	this.aspect           = aspect   || 1.0;
-	this.zNear            = zNear    || 0.1;
-	this.zFar             = zFar     || 2000;
-	this.screenCenterX    = 0;
-	this.screenCenterY    = 0;
-	this.target           = target   || new THREE.Object3D();
-	this.useTarget        = true;
-	this.up               = new THREE.Vector3( 0, 1, 0 );
+	this.fov = fov || 50;
+	this.aspect = aspect || 1.0;
+	this.near = near || 0.1;
+	this.far = far || 2000;
+
+	this.screenCenterX = 0;
+	this.screenCenterY = 0;
+
+	this.target = target || new THREE.Object3D();
+	this.useTarget = true;
+
+	this.up = new THREE.Vector3( 0, 1, 0 );
 
 	this.inverseMatrix     = new THREE.Matrix4();
 	this.projectionMatrix = null;
@@ -30,7 +33,7 @@ THREE.Camera = function( FOV, aspect, zNear, zFar, target ) {
 		this.tmpVec.crossSelf( this.up );
 
 		if ( nofly ) this.tmpVec.y = 0;
-		
+
 		this.position.addSelf( this.tmpVec );
 		this.target.position.addSelf( this.tmpVec );
 
@@ -47,7 +50,7 @@ THREE.Camera = function( FOV, aspect, zNear, zFar, target ) {
 		this.tmpVec.sub( this.target.position, this.position ).normalize().multiplyScalar( amount );
 
 		if ( nofly ) this.tmpVec.y = 0;
-		
+
 		this.position.subSelf( this.tmpVec );
 		this.target.position.subSelf( this.tmpVec );
 
@@ -57,9 +60,9 @@ THREE.Camera = function( FOV, aspect, zNear, zFar, target ) {
 
 }
 
-THREE.Camera.prototype             = new THREE.Object3D();
+THREE.Camera.prototype = new THREE.Object3D();
 THREE.Camera.prototype.constructor = THREE.Camera;
-THREE.Camera.prototype.supr        = THREE.Object3D.prototype;
+THREE.Camera.prototype.supr = THREE.Object3D.prototype;
 
 
 /*
@@ -70,7 +73,7 @@ THREE.Camera.prototype.supr        = THREE.Object3D.prototype;
 
 THREE.Camera.prototype.updateProjectionMatrix = function() {
 
-	this.projectionMatrix = THREE.Matrix4.makePerspective( this.FOV, this.aspect, this.zNear, this.zFar );
+	this.projectionMatrix = THREE.Matrix4.makePerspective( this.fov, this.aspect, this.near, this.far );
 
 }
 
@@ -152,12 +155,17 @@ THREE.Camera.prototype.frustumContains = function( object3D ) {
 	var radius  = object3D.boundRadius * object3D.boundRadiusScale;
 	var vz1     = ( inverse.n31 * vx0 + inverse.n32 * vy0 + inverse.n33 * vz0 + inverse.n34 );
 
-	if( vz1 - radius > -this.zNear )
+	if( vz1 - radius > - this.near ) {
+
 		return false;
 
-	if( vz1 + radius < -this.zFar )
+	}
+
+	if( vz1 + radius < - this.far ) {
+
 		return false;
 
+	}
 
 	// check x
 

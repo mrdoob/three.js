@@ -1450,8 +1450,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else if ( material instanceof THREE.MeshDepthMaterial ) {
 
-			m_uniforms.mNear.value = camera.zNear;
-			m_uniforms.mFar.value = camera.zFar;
+			m_uniforms.mNear.value = camera.near;
+			m_uniforms.mFar.value = camera.far;
 			m_uniforms.opacity.value = material.opacity;
 
 		} else if ( material instanceof THREE.MeshNormalMaterial ) {
