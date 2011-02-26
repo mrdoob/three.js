@@ -113,6 +113,9 @@
 
 				}
 
+				var tmpRot = new THREE.Matrix4();
+				tmpRot.setRotAxis( new THREE.Vector3( 1, 0, 0 ), 1.57 );
+				
 				var material_base = new THREE.MeshBasicMaterial( { color:0xffffff, vertex_colors:true } );
 
 				renderer.initMaterial( material_base, scene.lights, scene.fog );
@@ -130,9 +133,9 @@
 					materials[c].uniforms = Uniforms.clone( THREE.ShaderLib[ 'basic' ].uniforms );
 
 					ribbon = new THREE.Ribbon( i % 2 ? geometry : geometry2, materials[c] );
-					ribbon.rotation.x = 1.57;
+					ribbon.rotation.x = 0;
 					ribbon.rotation.y = 1.57;
-					ribbon.rotation.z = -3.14;
+					ribbon.rotation.z = 3.14;	
 
 					x = 40 * ( i - xgrid/2 );
 					y = 40 * ( j - ygrid/2 );
@@ -143,7 +146,28 @@
 
 					ribbon.doubleSided = true;
 					ribbon.matrixAutoUpdate = false;
-					ribbon.updateMatrix();
+
+					// manually create local matrix
+					
+					ribbon.localMatrix.setPosition( ribbon.position );
+					ribbon.matrixRotation.setRotationFromEuler( ribbon.rotation );
+
+					ribbon.localMatrix.n11 = ribbon.matrixRotation.n11;
+					ribbon.localMatrix.n12 = ribbon.matrixRotation.n12;
+					ribbon.localMatrix.n13 = ribbon.matrixRotation.n13;
+
+					ribbon.localMatrix.n21 = ribbon.matrixRotation.n21;
+					ribbon.localMatrix.n22 = ribbon.matrixRotation.n22;
+					ribbon.localMatrix.n23 = ribbon.matrixRotation.n23;
+
+					ribbon.localMatrix.n31 = ribbon.matrixRotation.n31;
+					ribbon.localMatrix.n32 = ribbon.matrixRotation.n32;
+					ribbon.localMatrix.n33 = ribbon.matrixRotation.n33;
+					
+					ribbon.localMatrix.multiplySelf( tmpRot );
+
+					ribbon.localMatrix.scale( ribbon.scale );
+					ribbon.boundRadiusScale = Math.max( ribbon.scale.x, Math.max( ribbon.scale.y, ribbon.scale.z ) );
 
 					ribbons.push( ribbon );
 					scene.addObject( ribbon );
@@ -224,7 +248,7 @@
 					uniforms: screen_uniforms,
 					vertex_shader: screen_shader.vertex_shader,
 					fragment_shader: screen_shader.fragment_shader,
-						blending: THREE.AdditiveBlending
+					blending: THREE.AdditiveBlending
 
 				} );
 
