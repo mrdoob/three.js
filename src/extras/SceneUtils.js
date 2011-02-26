@@ -334,8 +334,7 @@ var SceneUtils = {
 
 				if( tt.url instanceof Array ) {
 
-					images = ImageUtils.loadArray( tt.url, callback_texture );
-					texture = new THREE.Texture( images, tt.mapping );
+					texture = ImageUtils.loadTextureCube( tt.url, tt.mapping, callback_texture );
 
 				} else {
 
