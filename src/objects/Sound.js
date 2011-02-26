@@ -2,7 +2,7 @@
  * @author mikael emtinger / http://gomo.se/
  */
 
-THREE.Sound3D = function ( sources, radius, volume, loop ) {
+THREE.Sound = function ( sources, radius, volume, loop ) {
 
 	THREE.Object3D.call( this );
 
@@ -48,7 +48,7 @@ THREE.Sound3D = function ( sources, radius, volume, loop ) {
 			element = document.createElement( "source" );
 			element.src = this.sources[ s ];
 
-			this.domElement.THREESound3D = this;
+			this.domElement.THREESound = this;
 			this.domElement.appendChild( element );
 			this.domElement.addEventListener( "canplay", this.onLoad, true );
 			this.domElement.load();
@@ -62,16 +62,16 @@ THREE.Sound3D = function ( sources, radius, volume, loop ) {
 };
 
 
-THREE.Sound3D.prototype = new THREE.Object3D();
-THREE.Sound3D.prototype.constructor = THREE.Sound3D;
-THREE.Sound3D.prototype.supr = THREE.Object3D.prototype;
+THREE.Sound.prototype = new THREE.Object3D();
+THREE.Sound.prototype.constructor = THREE.Sound;
+THREE.Sound.prototype.supr = THREE.Object3D.prototype;
 
 
-THREE.Sound3D.prototype.onLoad = function () {
+THREE.Sound.prototype.onLoad = function () {
 
-	var sound3D = this.THREESound3D;
+	var sound = this.THREESound;
 
-	if ( sound3D.isLoaded ) {
+	if ( sound.isLoaded ) {
 
 		return;
 
@@ -79,25 +79,25 @@ THREE.Sound3D.prototype.onLoad = function () {
 
 	this.removeEventListener( "canplay", this.onLoad, true );
 
-	sound3D.isLoaded = true;
-	sound3D.duration = this.duration;
+	sound.isLoaded = true;
+	sound.duration = this.duration;
 
-	if ( sound3D.isPlaying ) {
+	if ( sound.isPlaying ) {
 
-		sound3D.play();
+		sound.play();
 
 	}
 
 };
 
-THREE.Sound3D.prototype.addToDOM = function ( parent ) {
+THREE.Sound.prototype.addToDOM = function ( parent ) {
 
 	this.isAddedToDOM = true;
 	parent.appendChild( this.domElement );
 
 };
 
-THREE.Sound3D.prototype.play = function ( startTime ) {
+THREE.Sound.prototype.play = function ( startTime ) {
 
 	this.isPlaying = true;
 
@@ -115,14 +115,14 @@ THREE.Sound3D.prototype.play = function ( startTime ) {
 
 };
 
-THREE.Sound3D.prototype.pause = function () {
+THREE.Sound.prototype.pause = function () {
 
 	this.isPlaying = false;
 	this.domElement.pause();
 
 };
 
-THREE.Sound3D.prototype.stop = function (){
+THREE.Sound.prototype.stop = function (){
 
 	this.isPlaying = false;
 	this.domElement.pause();
@@ -130,7 +130,7 @@ THREE.Sound3D.prototype.stop = function (){
 
 };
 
-THREE.Sound3D.prototype.calculateVolumeAndPan = function ( cameraRelativePosition ) {
+THREE.Sound.prototype.calculateVolumeAndPan = function ( cameraRelativePosition ) {
 
 	var distance = cameraRelativePosition.length();
 
@@ -146,7 +146,7 @@ THREE.Sound3D.prototype.calculateVolumeAndPan = function ( cameraRelativePositio
 
 };
 
-THREE.Sound3D.prototype.update = function ( parentMatrixWorld, forceUpdate, camera ) {
+THREE.Sound.prototype.update = function ( parentMatrixWorld, forceUpdate, camera ) {
 
 	// update local (rotation/scale is not used)
 

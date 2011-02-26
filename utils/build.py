@@ -59,7 +59,7 @@ COMMON_FILES = [
 'objects/Bone.js',
 'objects/SkinnedMesh.js',
 'objects/Ribbon.js',
-'objects/Sound3D.js',
+'objects/Sound.js',
 'scenes/Scene.js',
 'scenes/Fog.js',
 'scenes/FogExp2.js',

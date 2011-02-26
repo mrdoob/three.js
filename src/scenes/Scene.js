@@ -38,7 +38,7 @@ THREE.Scene.prototype.addChildRecurse = function( child ) {
 
 		}
 
-	} else if ( child instanceof THREE.Sound3D ) {
+	} else if ( child instanceof THREE.Sound ) {
 
 		if ( this.sounds.indexOf( child ) === -1 ) {
 
@@ -84,7 +84,7 @@ THREE.Scene.prototype.removeChildRecurse = function( child ) {
 
 		}
 
-	} else if ( child instanceof THREE.Sound3D ) {
+	} else if ( child instanceof THREE.Sound ) {
 
 		var i = this.sounds.indexOf( child );
 
