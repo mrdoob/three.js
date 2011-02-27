@@ -345,20 +345,15 @@ THREE.Matrix4.prototype = {
 
 	transpose: function () {
 
-		function swap( obj, p1, p2 ) {
-
-			var aux = obj[ p1 ];
-			obj[ p1 ] = obj[ p2 ];
-			obj[ p2 ] = aux;
-
-		}
-
-		swap( this, 'n21', 'n12' );
-		swap( this, 'n31', 'n13' );
-		swap( this, 'n32', 'n23' );
-		swap( this, 'n41', 'n14' );
-		swap( this, 'n42', 'n24' );
-		swap( this, 'n43', 'n34' );
+		var tmp;
+		
+		tmp = this.n21; this.n21 = this.n12; this.n12 = tmp;
+		tmp = this.n31; this.n31 = this.n13; this.n13 = tmp;
+		tmp = this.n32; this.n32 = this.n23; this.n23 = tmp;
+		
+		tmp = this.n41; this.n41 = this.n14; this.n14 = tmp;
+		tmp = this.n42; this.n42 = this.n24; this.n24 = tmp;
+		tmp = this.n43; this.n43 = this.n34; this.n43 = tmp;
 
 		return this;
 
