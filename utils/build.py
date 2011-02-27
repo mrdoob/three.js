@@ -400,7 +400,7 @@ def main(argv=None):
 	debug = args.debug
 
 	config = [
-	['Three', 'includes_common', COMMON_FILES + EXTRAS_FILES, args.common],
+	['Three', 'includes', COMMON_FILES + EXTRAS_FILES, args.common],
 	['ThreeCanvas', 'includes_canvas', CANVAS_FILES, args.canvas],
 	['ThreeDOM', 'includes_dom', DOM_FILES, args.dom],
 	['ThreeSVG', 'includes_svg', SVG_FILES, args.svg],
