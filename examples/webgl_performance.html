@@ -92,6 +92,7 @@
 		<script type="text/javascript" src="../src/extras/objects/MarchingCubes.js"></script>
 		<script type="text/javascript" src="../src/extras/io/Loader.js"></script>
 
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
@@ -110,8 +111,8 @@
 			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
 			init();
-			// loop();
-			setInterval( loop, 1000 / 60 );
+			// render();
+			animate();
 
 
 			function init() {
@@ -136,12 +137,13 @@
 					mesh.rotation.x = Math.random() * 360 * ( Math.PI / 180 );
 					mesh.rotation.y = Math.random() * 360 * ( Math.PI / 180 );
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 4 + 1;
-					mesh.updateMatrix();
 					mesh.matrixAutoUpdate = false;
+					mesh.updateMatrix();
+
 					scene.addObject( mesh );
 
 				}
-				
+
 				scene.matrixAutoUpdate = false;
 
 				renderer = new THREE.WebGLRenderer();
@@ -195,21 +197,23 @@
 
 			}
 
-			function loop() {
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 
 				renderer.render( scene, camera );
-
-				stats.update();
-
-			}
-
-			function log( text ) {
-
-				var e = document.getElementById("log");
-				e.innerHTML = text + "<br/>" + e.innerHTML;
 
 			}
 

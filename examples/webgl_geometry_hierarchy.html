@@ -92,11 +92,10 @@
 		<script type="text/javascript" src="../src/extras/objects/MarchingCubes.js"></script>
 		<script type="text/javascript" src="../src/extras/io/Loader.js"></script>
 
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
-
-			var statsEnabled = true;
 
 			var container, stats;
 
@@ -112,7 +111,7 @@
 			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
 			init();
-			setInterval( loop, 1000 / 60 );
+			animate();
 
 			function init() {
 
@@ -138,8 +137,8 @@
 					mesh.position.z = Math.random() * 2000 - 1000;
 					mesh.rotation.x = Math.random() * 360 * ( Math.PI / 180 );
 					mesh.rotation.y = Math.random() * 360 * ( Math.PI / 180 );
+					mesh.matrixAutoUpdate = false;
 					mesh.updateMatrix();
-					mesh.autoUpdateMatrix = false;
 
 					group.addChild( mesh );
 
@@ -152,15 +151,11 @@
 				renderer.sortObjects = false;
 				container.appendChild( renderer.domElement );
 
-				if ( statsEnabled ) {
-
-					stats = new Stats();
-					stats.domElement.style.position = 'absolute';
-					stats.domElement.style.top = '0px';
-					stats.domElement.style.zIndex = 100;
-					container.appendChild( stats.domElement );
-
-				}
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				stats.domElement.style.zIndex = 100;
+				container.appendChild( stats.domElement );
 
 			}
 
@@ -171,7 +166,18 @@
 
 			}
 
-			function loop() {
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
 
 				var rx = Math.sin( new Date().getTime() * 0.0007 ) * 0.5,
 				ry = Math.sin( new Date().getTime() * 0.0003 ) * 0.5,
@@ -185,15 +191,6 @@
 				group.rotation.z = rz;
 
 				renderer.render( scene, camera );
-
-				if ( statsEnabled ) stats.update();
-
-			}
-
-			function log( text ) {
-
-				var e = document.getElementById("log");
-				e.innerHTML = text + "<br/>" + e.innerHTML;
 
 			}
 
