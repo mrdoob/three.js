@@ -26,12 +26,12 @@ Detector = {
 
 		var html = [
 
-		'Sorry, your browser doesn\'t support <a href="http://khronos.org/webgl/wiki/Getting_a_WebGL_Implementation">WebGL</a><br/>',
-		'<br/>',
-		'Please try with',
-		'<a href="http://www.google.com/chrome">Chrome 9+</a> /',
-		'<a href="http://www.mozilla.com/en-US/firefox/all-beta.html">Firefox 4+</a> /',
-		'<a href="http://nightly.webkit.org/">Safari OSX 10.6+</a>'
+			'Sorry, your browser doesn\'t support <a href="http://khronos.org/webgl/wiki/Getting_a_WebGL_Implementation">WebGL</a><br/>',
+			'<br/>',
+			'Please try with',
+			'<a href="http://www.google.com/chrome">Chrome 9+</a> /',
+			'<a href="http://www.mozilla.com/en-US/firefox/all-beta.html">Firefox 4+</a> /',
+			'<a href="http://nightly.webkit.org/">Safari 10.6+</a>'
 
 		].join("\n");
 

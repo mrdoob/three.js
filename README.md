@@ -117,7 +117,8 @@ This code creates a camera, then creates a scene object, adds a bunch of random 
 
 		function animate() {
 
-			requestAnimationFrame( animate ); // Include examples/js/RequestAnimationFrame.js for cross-browser compatibility.
+			// Include examples/js/RequestAnimationFrame.js for cross-browser compatibility.
+			requestAnimationFrame( animate );
 			render();
 
 		}
