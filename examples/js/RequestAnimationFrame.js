@@ -1,6 +1,6 @@
 /**
  * Provides requestAnimationFrame in a cross browser way.
- * @author paulirish / http://paulirish.com/
+ * http://paulirish.com/2011/requestanimationframe-for-smart-animating/
  */
 
 if ( !window.requestAnimationFrame ) {
