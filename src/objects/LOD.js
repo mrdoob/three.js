@@ -77,11 +77,15 @@ THREE.LOD.prototype.update = function ( parentMatrixWorld, forceUpdate, camera )
 
 	}
 
+
 	// update LODs
 
 	if ( this.LODs.length > 1 ) {
 
-		var distance = -camera.inverseMatrix.mulitplyVector3OnlyZ( this.position );
+
+		var inverse  = camera.matrixWorldInverse;
+		var radius   = this.boundRadius * this.boundRadiusScale;
+		var distance = -( inverse.n31 * this.position.x + inverse.n32 * this.position.y + inverse.n33 * this.position.z + inverse.n34 );
 
 		this.LODs[ 0 ].object3D.visible = true;
 

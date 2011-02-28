@@ -36,6 +36,9 @@
 		<script type="text/javascript" src="src/objects/Mesh.js"></script>
 		<script type="text/javascript" src="src/objects/Sound.js"></script>
 		<script type="text/javascript" src="src/objects/Bone.js"></script>
+		<script type="text/javascript" src="src/objects/LOD.js"></script>
+		<script type="text/javascript" src="src/objects/Ribbon.js"></script>
+		<script type="text/javascript" src="src/objects/ParticleSystem.js"></script>
 		<script type="text/javascript" src="src/cameras/Camera.js"></script>
 		<script type="text/javascript" src="src/lights/Light.js"></script>
 		<script type="text/javascript" src="src/lights/AmbientLight.js"></script>
@@ -106,98 +109,18 @@
 
 				var geometry = new Cube( 100, 100, 100 );
 				var material = new THREE.MeshNormalMaterial();
+				var mesh     = new THREE.Mesh( geometry, material );
 
-				var mesh = new THREE.Mesh( geometry, material );
-				mesh.position.x = 1000;
-				scene.addObject( mesh );
+				var material2 = new THREE.MeshLambertMaterial( { color: 0xff00ff } );
+				var mesh2 = new THREE.Mesh( geometry, material2 );
 
-				objects = [];
+				var lod = new THREE.LOD();
+				lod.add( mesh );
+				lod.add( mesh2, 2000 );
 
-				objects.push( mesh );
+				scene.addObject( lod );
 
-				var amount = 200, child, object = mesh;
 
-				for ( var i = 0; i < amount; i ++ ) {
-
-					child = new THREE.Mesh( geometry, material );
-					child.position.x = 100;
-
-					object.addChild( child );
-					object = child;
-
-					objects.push( child );
-
-				}
-
-				object = mesh;
-
-				for ( var i = 0; i < amount; i ++ ) {
-
-					child = new THREE.Mesh( geometry, material );
-					child.position.x = - 100;
-
-					object.addChild( child );
-					object = child;
-
-					objects.push( child );
-
-				}
-
-				object = mesh;
-
-				for ( var i = 0; i < amount; i ++ ) {
-
-					child = new THREE.Mesh( geometry, material );
-					child.position.y = - 100;
-
-					object.addChild( child );
-					object = child;
-
-					objects.push( child );
-
-				}
-
-				object = mesh;
-
-				for ( var i = 0; i < amount; i ++ ) {
-
-					child = new THREE.Mesh( geometry, material );
-					child.position.y = 100;
-
-					object.addChild( child );
-					object = child;
-
-					objects.push( child );
-
-				}
-
-				object = mesh;
-
-				for ( var i = 0; i < amount; i ++ ) {
-
-					child = new THREE.Mesh( geometry, material );
-					child.position.z = - 100;
-
-					object.addChild( child );
-					object = child;
-
-					objects.push( child );
-
-				}
-
-				object = mesh;
-
-				for ( var i = 0; i < amount; i ++ ) {
-
-					child = new THREE.Mesh( geometry, material );
-					child.position.z = 100;
-
-					object.addChild( child );
-					object = child;
-
-					objects.push( child );
-
-				}
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -215,20 +138,8 @@
 
 			function loop() {
 
-				var rx = Math.sin( new Date().getTime() * 0.0007 ) * 0.2,
-				ry = Math.sin( new Date().getTime() * 0.0003 ) * 0.1,
-				rz = Math.sin( new Date().getTime() * 0.0002 ) * 0.1;
-
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
-
-				for ( var i = 0, l = objects.length; i < l; i ++ ) {
-
-					objects[ i ].rotation.x = rx;
-					objects[ i ].rotation.y = ry;
-					objects[ i ].rotation.z = rz;
-
-				}
 
 				renderer.render( scene, camera );
 

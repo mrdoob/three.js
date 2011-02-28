@@ -3422,14 +3422,14 @@ THREE.Snippets = {
 		"gl_Position += ( boneGlobalMatrices[ int( skinIndex.y ) ] * skinVertexB ) * skinWeight.y;",
 
 		// this doesn't work, no idea why
-		"gl_Position  = projectionMatrix * objectMatrix * gl_Position;",
+		"gl_Position  = projectionMatrix * cameraInverseMatrix * objectMatrix * gl_Position;",
 
 		// EMPA: Above should work now
 		//"gl_Position  = projectionMatrix * viewMatrix * objectMatrix * gl_Position;",
 
 	"#else",
 
-		"gl_Position = projectionMatrix * mvPosition;",
+		"gl_Position = projectionMatrix * cameraInverseMatrix * mvPosition;",
 
 	"#endif"
 
@@ -3516,7 +3516,7 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-				"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+				"gl_Position = projectionMatrix * cameraInverseMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
 			"}"
 
@@ -3547,10 +3547,10 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-				"//vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
+				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
 				"vNormal = normalize( normalMatrix * normal );",
 
-				"gl_Position = projectionMatrix * cameraInverseMatrix * modelViewMatrix * vec4( position, 1.0 );//mvPosition;",
+				"gl_Position = projectionMatrix * cameraInverseMatrix * mvPosition;",
 
 			"}"
 
@@ -3799,7 +3799,7 @@ THREE.ShaderLib = {
 
 				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
 
-				"gl_Position = projectionMatrix * mvPosition;",
+				"gl_Position = projectionMatrix * cameraInverseMatrix * mvPosition;",
 				"gl_PointSize = size;",
 				//"gl_PointSize = 10.0 + 6.0 * mvPosition.z;";
 
