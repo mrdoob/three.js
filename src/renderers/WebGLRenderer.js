@@ -46,7 +46,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	_projScreenMatrix = new THREE.Matrix4(),
 	_projectionMatrixArray = new Float32Array( 16 ),
-	_cameraInverseMatrixArray = new Float32Array( 16 ),
 
 	_viewMatrixArray = new Float32Array( 16 ),
 
@@ -1401,6 +1400,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_oldProgram = program;
 
 			_gl.uniformMatrix4fv( p_uniforms.projectionMatrix, false, _projectionMatrixArray );
+			_gl.uniformMatrix4fv( p_uniforms.cameraInverseMatrix, false, _viewMatrixArray );
 
 		}
 
@@ -1856,14 +1856,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 			fog = scene.fog,
 			ol;
 
+
+// EMPA: needs to be reset 
+		_oldProgram = null,
+
+
 		camera.matrixAutoUpdate && camera.update();
 
-		camera.matrixWorld.flattenToArray( _viewMatrixArray );
+		camera.matrixWorldInverse.flattenToArray( _viewMatrixArray );
 		camera.projectionMatrix.flattenToArray( _projectionMatrixArray );
-		camera.inverseMatrix.flattenToArray( _cameraInverseMatrixArray );
 
-		_projScreenMatrix.multiply( camera.projectionMatrix, camera.matrixWorld );
-		computeFrustum( _projScreenMatrix );
+		_projScreenMatrix.multiply( camera.projectionMatrix, camera.matrixWorldInverse );
+
+// EMPA: calling camera frustum check
+//		computeFrustum( _projScreenMatrix );
 
 		if( THREE.AnimationHandler ) THREE.AnimationHandler.update();
 
@@ -1890,7 +1896,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( object.visible ) {
 
-				if ( ! ( object instanceof THREE.Mesh ) || isInFrustum( object ) ) {
+// EMPA: calling camera frustum check (probably faster to have inside of WebGLRenderer)
+//				if ( ! ( object instanceof THREE.Mesh ) || isInFrustum( object ) ) {
+				if ( ! ( object instanceof THREE.Mesh ) || camera.frustumContains( object ) ) {
 
 					object.matrixWorld.flattenToArray( object._objectMatrixArray );
 
@@ -1902,10 +1910,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( this.sortObjects ) {
 
-						_vector3.copy( object.position );
-						_projScreenMatrix.multiplyVector3( _vector3 );
+// EMPA: positionScreen.z contains the z-depth in camera space after camera.frustumContains
+//						_vector3.copy( object.position );
+//						_projScreenMatrix.multiplyVector3( _vector3 );
 
-						webGLObject.z = _vector3.z;
+//						webGLObject.z = _vector3.z;
+
+						webGLObject.z = object.positionScreen.z;
 
 					}
 
@@ -2297,9 +2308,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setupMatrices ( object, camera ) {
 
-		object._modelViewMatrix.multiplyToArray( camera.matrixWorld, object.matrixWorld, object._modelViewMatrixArray );
-		THREE.Matrix4.makeInvert3x3( object._modelViewMatrix ).transposeIntoArray( object._normalMatrixArray );
+// EMPA: moved inverse * matrixWorld to vertex shader
+//		object._modelViewMatrix.multiplyToArray( camera.matrixWorldInverse, object.matrixWorld, object._modelViewMatrixArray );
+//		THREE.Matrix4.makeInvert3x3( object._modelViewMatrix ).transposeIntoArray( object._normalMatrixArray );
 
+
+// EMPA: the normal update part is only needed when object (or object's parents) have been rotated (could be done inside Mesh.update)
+		object.matrixWorld.flattenToArray( object._modelViewMatrixArray );
+		THREE.Matrix4.makeInvert3x3( object.matrixWorld ).transposeIntoArray( object._normalMatrixArray );
 	};
 
 	this.setFaceCulling = function ( cullFace, frontFace ) {
@@ -2377,8 +2393,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_gl.cullFace( _gl.BACK );
 		_gl.enable( _gl.CULL_FACE );
 
-		_gl.enable( _gl.BLEND );
-		_gl.blendFunc( _gl.ONE, _gl.ONE_MINUS_SRC_ALPHA );
+// EMPA: enable only when neccesary
+//		_gl.enable( _gl.BLEND );
+//		_gl.blendFunc( _gl.ONE, _gl.ONE_MINUS_SRC_ALPHA );
 		_gl.clearColor( clearColor.r, clearColor.g, clearColor.b, clearAlpha );
 
 		_cullEnabled = true;
@@ -2471,16 +2488,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function loadUniformsSkinning( uniforms, object ) {
 
-		_gl.uniformMatrix4fv( uniforms.cameraInverseMatrix, false, _cameraInverseMatrixArray );
+		_gl.uniformMatrix4fv( uniforms.cameraInverseMatrix, false, _viewMatrixArray );
 		_gl.uniformMatrix4fv( uniforms.boneGlobalMatrices, false, object.boneMatrices );
 
 	};
 
 	function loadUniformsMatrices( uniforms, object ) {
 
+// EMPA: added inverse * matrixWorld to vertex shader
+//		_gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, object._modelViewMatrixArray );
+//		_gl.uniformMatrix3fv( uniforms.normalMatrix, false, object._normalMatrixArray );
+
+//		_gl.uniformMatrix4fv( uniforms.cameraInverseMatrix, false, _viewMatrixArray );
 		_gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, object._modelViewMatrixArray );
 		_gl.uniformMatrix3fv( uniforms.normalMatrix, false, object._normalMatrixArray );
-
 	};
 
 	function loadUniformsGeneric( program, uniforms ) {
@@ -3401,9 +3422,10 @@ THREE.Snippets = {
 		"gl_Position += ( boneGlobalMatrices[ int( skinIndex.y ) ] * skinVertexB ) * skinWeight.y;",
 
 		// this doesn't work, no idea why
-		//"gl_Position  = projectionMatrix * cameraInverseMatrix * objectMatrix * gl_Position;",
+		"gl_Position  = projectionMatrix * objectMatrix * gl_Position;",
 
-		"gl_Position  = projectionMatrix * viewMatrix * objectMatrix * gl_Position;",
+		// EMPA: Above should work now
+		//"gl_Position  = projectionMatrix * viewMatrix * objectMatrix * gl_Position;",
 
 	"#else",
 
@@ -3525,10 +3547,10 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
+				"//vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
 				"vNormal = normalize( normalMatrix * normal );",
 
-				"gl_Position = projectionMatrix * mvPosition;",
+				"gl_Position = projectionMatrix * cameraInverseMatrix * modelViewMatrix * vec4( position, 1.0 );//mvPosition;",
 
 			"}"
 
