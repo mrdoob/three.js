@@ -49,12 +49,12 @@ THREE.MeshBasicMaterial = function ( parameters ) {
 
 	this.wireframe = false;
 	this.wireframe_linewidth = 1.0;
-	this.wireframe_linecap = 'round';	// implemented just in CanvasRenderer
-	this.wireframe_linejoin = 'round';	// implemented just in CanvasRenderer
+	this.wireframe_linecap = 'round'; // implemented just in CanvasRenderer
+	this.wireframe_linejoin = 'round'; // implemented just in CanvasRenderer
 
 	this.vertex_colors = false;
 	this.skinning = false;
-	
+
 	if ( parameters ) {
 
 		if ( parameters.color !== undefined ) this.color.setHex( parameters.color );
@@ -78,43 +78,9 @@ THREE.MeshBasicMaterial = function ( parameters ) {
 		if ( parameters.wireframe_linewidth !== undefined ) this.wireframe_linewidth = parameters.wireframe_linewidth;
 		if ( parameters.wireframe_linecap !== undefined ) this.wireframe_linecap = parameters.wireframe_linecap;
 		if ( parameters.wireframe_linejoin !== undefined ) this.wireframe_linejoin = parameters.wireframe_linejoin;
-		
+
 		if ( parameters.vertex_colors !== undefined ) this.vertex_colors = parameters.vertex_colors;
 		if ( parameters.skinning !== undefined ) this.skinning = parameters.skinning;
-
-	}
-
-};
-
-THREE.MeshBasicMaterial.prototype = {
-
-	toString: function () {
-
-		return 'THREE.MeshBasicMaterial (<br/>' +
-			'id: ' + this.id + '<br/>' +
-		
-			'color: ' + this.color + '<br/>' +
-			'opacity: ' + this.opacity + '<br/>' +
-			'map: ' + this.map + '<br/>' +
-
-			'light_map: ' + this.light_map + '<br/>' +
-
-			'env_map: ' + this.env_map + '<br/>' +
-			'combine: ' + this.combine + '<br/>' +
-			'reflectivity: ' + this.reflectivity + '<br/>' +
-			'refraction_ratio: ' + this.refraction_ratio + '<br/>' +
-
-			'blending: ' + this.blending + '<br/>' +
-			'depth_test: ' + this.depth_test + '<br/>' +
-
-			'wireframe: ' + this.wireframe + '<br/>' +
-			'wireframe_linewidth: ' + this.wireframe_linewidth +'<br/>' +
-			'wireframe_linecap: ' + this.wireframe_linecap +'<br/>' +
-			'wireframe_linejoin: ' + this.wireframe_linejoin +'<br/>' +
-			
-			'vertex_colors: ' + this.vertex_colors + '<br/>' +
-			'skinning: ' + this.skinning + '<br/>' +
-			')';
 
 	}
 

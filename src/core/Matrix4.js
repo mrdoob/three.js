@@ -346,11 +346,11 @@ THREE.Matrix4.prototype = {
 	transpose: function () {
 
 		var tmp;
-		
+
 		tmp = this.n21; this.n21 = this.n12; this.n12 = tmp;
 		tmp = this.n31; this.n31 = this.n13; this.n13 = tmp;
 		tmp = this.n32; this.n32 = this.n23; this.n23 = tmp;
-		
+
 		tmp = this.n41; this.n41 = this.n14; this.n14 = tmp;
 		tmp = this.n42; this.n42 = this.n24; this.n24 = tmp;
 		tmp = this.n43; this.n43 = this.n34; this.n43 = tmp;
@@ -584,15 +584,6 @@ THREE.Matrix4.prototype = {
 		this.n41 *= x; this.n42 *= y; this.n43 *= z;
 
 		return this;
-
-	},
-
-	toString : function() {
-
-		return  "| " + this.n11 + " " + this.n12 + " " + this.n13 + " " + this.n14 + " |\n" +
-			"| " + this.n21 + " " + this.n22 + " " + this.n23 + " " + this.n24 + " |\n" +
-			"| " + this.n31 + " " + this.n32 + " " + this.n33 + " " + this.n34 + " |\n" +
-			"| " + this.n41 + " " + this.n42 + " " + this.n43 + " " + this.n44 + " |";
 
 	}
 

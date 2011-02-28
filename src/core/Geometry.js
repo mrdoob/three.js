@@ -465,12 +465,6 @@ THREE.Geometry.prototype = {
 
 		}
 
-	},
-
-	toString: function () {
-
-		return 'THREE.Geometry ( vertices: ' + this.vertices + ', faces: ' + this.faces + ', uvs: ' + this.uvs + ' )';
-
 	}
 
 };

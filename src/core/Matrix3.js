@@ -17,7 +17,7 @@ THREE.Matrix3.prototype = {
 		return this;
 
 	},
-	
+
 	transposeIntoArray: function ( r ) {
 
 		var m = this.m;
@@ -31,7 +31,7 @@ THREE.Matrix3.prototype = {
 		r[ 6 ] = m[ 2 ];
 		r[ 7 ] = m[ 5 ];
 		r[ 8 ] = m[ 8 ];
-		
+
 		return this;
 
 	}

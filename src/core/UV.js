@@ -35,12 +35,6 @@ THREE.UV.prototype = {
 
 		return this;
 
-	},
-
-	toString : function () {
-
-		return 'THREE.UV (' + this.u + ', ' + this.v + ')';
-
 	}
 
 };

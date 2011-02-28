@@ -297,12 +297,6 @@ THREE.Vector3.prototype = {
 
 		return new THREE.Vector3( this.x, this.y, this.z );
 
-	},
-
-	toString : function () {
-
-		return 'THREE.Vector3 ( ' + this.x + ', ' + this.y + ', ' + this.z + ' )';
-
 	}
 
 };

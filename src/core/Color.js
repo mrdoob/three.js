@@ -79,7 +79,7 @@ THREE.Color.prototype = {
 
 		if ( this.autoUpdate ) {
 
-			this.updateRGBA();
+			this.updateRGB();
 			this.updateStyleString();
 
 		}
@@ -92,7 +92,7 @@ THREE.Color.prototype = {
 
 	},
 
-	updateRGBA : function () {
+	updateRGB : function () {
 
 		this.r = ( this.hex >> 16 & 255 ) / 255;
 		this.g = ( this.hex >> 8 & 255 ) / 255;
@@ -109,12 +109,6 @@ THREE.Color.prototype = {
 	clone : function () {
 
 		return new THREE.Color( this.hex );
-
-	},
-
-	toString : function () {
-
-		return 'THREE.Color ( r: ' + this.r + ', g: ' + this.g + ', b: ' + this.b + ', hex: ' + this.hex + ' )';
 
 	}
 

@@ -140,12 +140,6 @@ THREE.Vector2.prototype = {
 
 		return new THREE.Vector2( this.x, this.y );
 
-	},
-
-	toString : function () {
-
-		return 'THREE.Vector2 (' + this.x + ', ' + this.y + ')';
-
 	}
 
 };

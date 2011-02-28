@@ -28,7 +28,7 @@ THREE.MeshShaderMaterial = function ( parameters ) {
 	this.uniforms = {};
 
 	this.opacity = 1.0; // set to < 1.0 to renderer in transparent batch
-	
+
 	this.shading = THREE.SmoothShading;
 	this.blending = THREE.NormalBlending;
 	this.depth_test = true;
@@ -49,7 +49,7 @@ THREE.MeshShaderMaterial = function ( parameters ) {
 		if ( parameters.uniforms !== undefined ) this.uniforms = parameters.uniforms;
 
 		if ( parameters.opacity !== undefined ) this.opacity  = parameters.opacity;
-		
+
 		if ( parameters.shading !== undefined ) this.shading = parameters.shading;
 		if ( parameters.blending !== undefined ) this.blending = parameters.blending;
 		if ( parameters.depth_test !== undefined ) this.depth_test = parameters.depth_test;
@@ -58,34 +58,10 @@ THREE.MeshShaderMaterial = function ( parameters ) {
 		if ( parameters.wireframe_linewidth !== undefined ) this.wireframe_linewidth = parameters.wireframe_linewidth;
 		if ( parameters.wireframe_linecap !== undefined ) this.wireframe_linecap = parameters.wireframe_linecap;
 		if ( parameters.wireframe_linejoin !== undefined ) this.wireframe_linejoin = parameters.wireframe_linejoin;
-		
+
 		if ( parameters.vertex_colors !== undefined ) this.vertex_colors = parameters.vertex_colors;
 		if ( parameters.skinning !== undefined ) this.skinning = parameters.skinning;
 
 	}
 
 };
-
-THREE.MeshShaderMaterial.prototype = {
-
-	toString: function () {
-
-		return 'THREE.MeshShaderMaterial (<br/>' +
-			'id: ' + this.id + '<br/>' +
-
-			'blending: ' + this.blending + '<br/>' +
-			'depth_test: ' + this.depth_test + '<br/>' +
-		
-			'wireframe: ' + this.wireframe + '<br/>' +
-			'wireframe_linewidth: ' + this.wireframe_linewidth +'<br/>' +
-			'wireframe_linecap: ' + this.wireframe_linecap +'<br/>' +
-			'wireframe_linejoin: ' + this.wireframe_linejoin +'<br/>' +
-		
-			'vertex_colors: ' + this.vertex_colors + '<br/>' +
-			'skinning: ' + this.skinning + '<br/>' +
-			')';
-
-	}
-
-};
-

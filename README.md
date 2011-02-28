@@ -134,7 +134,7 @@ This code creates a camera, then creates a scene object, adds a bunch of random 
 
 ### Change Log ###
 
-2011 02 26 - **r33** (190.451 KB, gzip: 46.278 KB)
+2011 02 26 - **r33** (184.605 KB, gzip: 45.481 KB)
 
 * Added `ParticleSystem` object to `WebGLRenderer` ([alteredq](http://github.com/alteredq))
 * Added `Line` support to `WebGLRenderer` ([alteredq](http://github.com/alteredq))

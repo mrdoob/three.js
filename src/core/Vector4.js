@@ -152,12 +152,6 @@ THREE.Vector4.prototype = {
 
 		return new THREE.Vector4( this.x, this.y, this.z, this.w );
 
-	},
-
-	toString : function () {
-
-		return 'THREE.Vector4 (' + this.x + ', ' + this.y + ', ' + this.z + ', ' + this.w + ')';
-
 	}
 
 };

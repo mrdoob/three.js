@@ -197,10 +197,4 @@ THREE.Rectangle = function () {
 
 	};
 
-	this.toString = function () {
-
-		return "THREE.Rectangle ( left: " + _left + ", right: " + _right + ", top: " + _top + ", bottom: " + _bottom + ", width: " + _width + ", height: " + _height + " )";
-
-	};
-
 };

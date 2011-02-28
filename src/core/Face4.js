@@ -16,14 +16,3 @@ THREE.Face4 = function ( a, b, c, d, normal, materials ) {
 	this.materials = materials instanceof Array ? materials : [ materials ];
 
 };
-
-
-THREE.Face4.prototype = {
-
-	toString : function () {
-
-		return 'THREE.Face4 ( ' + this.a + ', ' + this.b + ', ' + this.c + ' ' + this.d + ' )';
-
-	}
-
-};

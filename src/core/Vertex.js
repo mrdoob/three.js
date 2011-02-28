@@ -17,12 +17,3 @@ THREE.Vertex = function ( position, normal ) {
 	this.__visible = true;
 
 };
-
-THREE.Vertex.prototype = {
-
-	toString : function () {
-
-		return 'THREE.Vertex ( position: ' + this.position + ', normal: ' + this.normal + ' )';
-	}
-
-};
