@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - materials - multi-materials - webgl</title>
+		<title>three.js misc - materials - multi-materials</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -99,9 +99,9 @@
 				sphere = new Sphere( 100, 16, 8 );
 				for (var i=0; i<10; i++) {
 					//mesh = new THREE.Mesh( sphere, new THREE.MeshLambertMaterial( ) );
-					mesh = new THREE.Mesh( sphere, [ new THREE.MeshLambertMaterial( { color: 0xffffff } ), new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true,  wireframe_linewidth: 1.5 } ) ] );
-					//mesh = new THREE.Mesh( sphere, new THREE.MeshLambertMaterial( { color: 0x00aa00, wireframe: true,  wireframe_linewidth: 1.5 } ) );
-					//mesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { wireframe: true,  wireframe_linewidth: 2.5 } ) );
+					mesh = new THREE.Mesh( sphere, [ new THREE.MeshLambertMaterial( { color: 0xffffff } ), new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true,  wireframeLinewidth: 1.5 } ) ] );
+					//mesh = new THREE.Mesh( sphere, new THREE.MeshLambertMaterial( { color: 0x00aa00, wireframe: true,  wireframeLinewidth: 1.5 } ) );
+					//mesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { wireframe: true,  wireframeLinewidth: 2.5 } ) );
 					mesh.position.x = 500 * ( Math.random() - 0.5 );
 					mesh.position.y = 500 * ( Math.random() - 0.5 );
 					mesh.position.z = 500 * ( Math.random() - 0.5 );
@@ -211,7 +211,7 @@
 				var materials = [ new THREE.MeshFaceMaterial() ];
 
 				// full-mesh wireframe overlay
-				//materials.push( new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true, wireframe_linewidth: 1.5 } ) );
+				//materials.push( new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true, wireframeLinewidth: 1.5 } ) );
 
 				// full-mesh color overlay
 				//materials.push( new THREE.MeshBasicMaterial { color: 0xff0000, opacity: 0.5 } ) );

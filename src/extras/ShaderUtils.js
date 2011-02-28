@@ -1,3 +1,8 @@
+/**
+ * @author alteredq / http://alteredqualia.com/
+ * @author mr.doob / http://mrdoob.com/
+ */
+ 
 var ShaderUtils = {
 
 	lib: { 
@@ -19,7 +24,7 @@ var ShaderUtils = {
 
 		},
 
-		fragment_shader: [
+		fragmentShader: [
 
 		"uniform samplerCube tCube;",
 
@@ -43,7 +48,7 @@ var ShaderUtils = {
 
 		].join("\n"),
 
-		vertex_shader: [
+		vertexShader: [
 
 		"uniform float mRefractionRatio;",
 		"uniform float mFresnelBias;",
@@ -116,7 +121,7 @@ var ShaderUtils = {
 
 		},
 
-		fragment_shader: [
+		fragmentShader: [
 
 		"uniform vec3 uDirLightPos;",
 
@@ -216,7 +221,7 @@ var ShaderUtils = {
 		"}"
 		].join("\n"),
 
-		vertex_shader: [
+		vertexShader: [
 
 		"attribute vec4 tangent;",
 
@@ -289,7 +294,7 @@ var ShaderUtils = {
 
 		uniforms: { "tCube": { type: "t", value: 1, texture: null } },
 
-		vertex_shader: [
+		vertexShader: [
 
 		"varying vec3 vViewPosition;",
 
@@ -304,7 +309,7 @@ var ShaderUtils = {
 
 		].join("\n"),
 
-		fragment_shader: [
+		fragmentShader: [
 
 		"uniform samplerCube tCube;",
 
@@ -336,7 +341,7 @@ var ShaderUtils = {
 		"cKernel" : { type: "fv1", value: [] }
 		},
 
-		vertex_shader: [
+		vertexShader: [
 
 		"varying vec2 vUv;",
 		
@@ -352,7 +357,7 @@ var ShaderUtils = {
 
 		].join("\n"),
 
-		fragment_shader: [
+		fragmentShader: [
 
 		"varying vec2 vUv;",
 		
@@ -410,7 +415,7 @@ var ShaderUtils = {
 					grayscale:  { type: "i", value: 1 }
 				  },
 
-		vertex_shader: [
+		vertexShader: [
             
 		"varying vec2 vUv;",
 
@@ -423,7 +428,7 @@ var ShaderUtils = {
 
 		].join("\n"),
 
-		fragment_shader: [
+		fragmentShader: [
 		
 		"varying vec2 vUv;",
 		"uniform sampler2D tDiffuse;",
@@ -487,7 +492,7 @@ var ShaderUtils = {
 					opacity: { type: "f", value: 1.0 } 
 				  },
 
-		vertex_shader: [
+		vertexShader: [
 
 		"varying vec2 vUv;",
 
@@ -500,7 +505,7 @@ var ShaderUtils = {
 
 		].join("\n"),
 
-		fragment_shader: [
+		fragmentShader: [
 		
 		"varying vec2 vUv;",
 		"uniform sampler2D tDiffuse;",
@@ -526,7 +531,7 @@ var ShaderUtils = {
 
 		uniforms: {},
 
-		vertex_shader: [
+		vertexShader: [
 
 		"void main() {",
 
@@ -536,7 +541,7 @@ var ShaderUtils = {
 
 		].join("\n"),
 
-		fragment_shader: [
+		fragmentShader: [
 
 		"void main() {",
 
@@ -579,7 +584,7 @@ var ShaderUtils = {
 		for( i = 0; i < kernelSize; ++i ) values[ i ] /= sum;
 		
 		return values;
-				
+
 	}
 
 };

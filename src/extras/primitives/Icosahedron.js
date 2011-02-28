@@ -1,5 +1,6 @@
 /**
  * @author oosmoxiecode
+ 
  * uvs are messed up in this one, and commented away for now. There is an ugly "seam" by the shared vertices
  * when it "wraps" around, that needs to be fixed. It´s because they share the first and the last vertices
  * so it draws the entire texture on the seam-faces, I think...

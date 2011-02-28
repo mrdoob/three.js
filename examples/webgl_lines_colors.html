@@ -118,7 +118,7 @@
 									[ material, scale*1.5, [0,0,0],  geometry2 ],
 									[ material, scale*1.5, [d,0,0],  geometry3 ] ];
 
-				material.vertex_colors = true;
+				material.vertexColors = true;
 
 				for ( i = 0; i < parameters.length; ++i ) {
 
@@ -140,7 +140,7 @@
 
 				sceneScreen = new THREE.Scene();
 
-				var pars = { min_filter: THREE.LinearFilter, mag_filter: THREE.LinearFilter };
+				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter };
 				rtTexture1 = new THREE.RenderTarget( window.innerWidth, window.innerHeight, pars );
 				rtTexture2 = new THREE.RenderTarget( 512, 512, pars );
 				rtTexture3 = new THREE.RenderTarget( 512, 512, pars );
@@ -154,8 +154,8 @@
 				materialScreen = new THREE.MeshShaderMaterial( {
 
 					uniforms: screen_uniforms,
-					vertex_shader: screen_shader.vertex_shader,
-					fragment_shader: screen_shader.fragment_shader,
+					vertexShader: screen_shader.vertexShader,
+					fragmentShader: screen_shader.fragmentShader,
 					blending: THREE.AdditiveBlending
 
 				} );
@@ -173,8 +173,8 @@
 				materialConvolution = new THREE.MeshShaderMaterial( {
 
 					uniforms: convolution_uniforms,
-					vertex_shader:   "#define KERNEL_SIZE 25.0\n" + convolution_shader.vertex_shader,
-					fragment_shader: "#define KERNEL_SIZE 25\n"   + convolution_shader.fragment_shader
+					vertexShader:   "#define KERNEL_SIZE 25.0\n" + convolution_shader.vertexShader,
+					fragmentShader: "#define KERNEL_SIZE 25\n"   + convolution_shader.fragmentShader
 
 				} );
 

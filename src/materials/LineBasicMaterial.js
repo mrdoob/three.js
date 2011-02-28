@@ -7,13 +7,13 @@
  *  opacity: <float>,
  
  *  blending: THREE.NormalBlending,
- *  depth_test: <bool>,
+ *  depthTest: <bool>,
  
  *  linewidth: <float>,
  *  linecap: "round",  
  *  linejoin: "round",
  
- *  vertex_colors: <bool>
+ *  vertexColors: <bool>
  * }
  */
 
@@ -25,13 +25,13 @@ THREE.LineBasicMaterial = function ( parameters ) {
 	this.opacity = 1.0;
 
 	this.blending = THREE.NormalBlending;
-	this.depth_test = true;
+	this.depthTest = true;
 
 	this.linewidth = 1.0;
 	this.linecap = 'round'; // implemented just in CanvasRenderer
 	this.linejoin = 'round'; // implemented just in CanvasRenderer
 
-	this.vertex_colors = false;
+	this.vertexColors = false;
 
 	if ( parameters ) {
 
@@ -39,13 +39,13 @@ THREE.LineBasicMaterial = function ( parameters ) {
 		if ( parameters.opacity !== undefined ) this.opacity  = parameters.opacity;
 
 		if ( parameters.blending !== undefined ) this.blending = parameters.blending;
-		if ( parameters.depth_test !== undefined ) this.depth_test = parameters.depth_test;
+		if ( parameters.depthTest !== undefined ) this.depthTest = parameters.depthTest;
 
 		if ( parameters.linewidth !== undefined ) this.linewidth = parameters.linewidth;
 		if ( parameters.linecap !== undefined ) this.linecap = parameters.linecap;
 		if ( parameters.linejoin !== undefined ) this.linejoin = parameters.linejoin;
 
-		if ( parameters.vertex_colors !== undefined ) this.vertex_colors = parameters.vertex_colors;
+		if ( parameters.vertexColors !== undefined ) this.vertexColors = parameters.vertexColors;
 
 	}
 

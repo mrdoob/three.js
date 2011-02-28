@@ -4,17 +4,17 @@
  * @author szimek / https://github.com/szimek/
  */
 
-THREE.Texture = function ( image, mapping, wrap_s, wrap_t, mag_filter, min_filter ) {
+THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter ) {
 
 	this.image = image;
 
 	this.mapping = mapping !== undefined ? mapping : new THREE.UVMapping();
 
-	this.wrap_s = wrap_s !== undefined ? wrap_s : THREE.ClampToEdgeWrapping;
-	this.wrap_t = wrap_t !== undefined ? wrap_t : THREE.ClampToEdgeWrapping;
+	this.wrapS = wrapS !== undefined ? wrapS : THREE.ClampToEdgeWrapping;
+	this.wrapT = wrapT !== undefined ? wrapT : THREE.ClampToEdgeWrapping;
 
-	this.mag_filter = mag_filter !== undefined ? mag_filter : THREE.LinearFilter;
-	this.min_filter = min_filter !== undefined ? min_filter : THREE.LinearMipMapLinearFilter;
+	this.magFilter = magFilter !== undefined ? magFilter : THREE.LinearFilter;
+	this.minFilter = minFilter !== undefined ? minFilter : THREE.LinearMipMapLinearFilter;
 
 	this.needsUpdate = false;
 
@@ -24,7 +24,7 @@ THREE.Texture.prototype = {
 
 	clone: function () {
 
-		return new THREE.Texture( this.image, this.mapping, this.wrap_s, this.wrap_t, this.mag_filter, this.min_filter );
+		return new THREE.Texture( this.image, this.mapping, this.wrapS, this.wrapT, this.magFilter, this.minFilter );
 
 	}
 

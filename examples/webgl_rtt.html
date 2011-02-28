@@ -67,7 +67,7 @@
 			}
 		</script>
 
-		<script id="vertex_shader" type="x-shader/x-vertex">
+		<script id="vertexShader" type="x-shader/x-vertex">
 			varying vec2 vUv;
 
 			void main() {
@@ -130,21 +130,21 @@
 				light.position.normalize();
 				sceneRTT.addLight( light );
 
-				rtTexture = new THREE.RenderTarget( window.innerWidth, window.innerHeight, { min_filter: THREE.LinearFilter, mag_filter: THREE.NearestFilter } );
+				rtTexture = new THREE.RenderTarget( window.innerWidth, window.innerHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter } );
 
 				material = new THREE.MeshShaderMaterial( {
 
 					uniforms: { time: { type: "f", value: 0.0 } },
-					vertex_shader: document.getElementById( 'vertex_shader' ).textContent,
-					fragment_shader: document.getElementById( 'fragment_shader_pass_1' ).textContent
+					vertexShader: document.getElementById( 'vertexShader' ).textContent,
+					fragmentShader: document.getElementById( 'fragment_shader_pass_1' ).textContent
 
 				} );
 
 				var materialScreen = new THREE.MeshShaderMaterial( {
 
 					uniforms: { tDiffuse: { type: "t", value: 0, texture: rtTexture } },
-					vertex_shader: document.getElementById( 'vertex_shader' ).textContent,
-					fragment_shader: document.getElementById( 'fragment_shader_screen' ).textContent
+					vertexShader: document.getElementById( 'vertexShader' ).textContent,
+					fragmentShader: document.getElementById( 'fragment_shader_screen' ).textContent
 
 				} );
 

@@ -3,12 +3,12 @@
  * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Sphere.as
  */
 
-var Sphere = function ( radius, segments_width, segments_height ) {
+var Sphere = function ( radius, segmentsWidth, segmentsHeight ) {
 
 	THREE.Geometry.call( this );
 
-	var gridX = segments_width || 8,
-	gridY = segments_height || 6;
+	var gridX = segmentsWidth || 8,
+	gridY = segmentsHeight || 6;
 
 	var i, j, pi = Math.PI;
 	var iHor = Math.max( 3, gridX );

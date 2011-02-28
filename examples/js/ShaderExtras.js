@@ -16,7 +16,7 @@ var ShaderExtras = {
 				maxblur:  { type: "f", value: 1.0 },
 			  },
 
-	vertex_shader: [
+	vertexShader: [
 
 	"varying vec2 vUv;",
 
@@ -29,7 +29,7 @@ var ShaderExtras = {
 
 	].join("\n"),
 
-	fragment_shader: [
+	fragmentShader: [
 
 	"varying vec2 vUv;",
 	

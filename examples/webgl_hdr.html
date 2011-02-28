@@ -128,8 +128,8 @@
 				scene.addLight( directionalLight );
 
 				var texture = ImageUtils.loadTexture( "textures/memorial.png" );
-				texture.min_filter = THREE.LinearFilter;
-				texture.mag_filter = THREE.NearestFilter;
+				texture.minFilter = THREE.LinearFilter;
+				texture.magFilter = THREE.NearestFilter;
 
 				materialHDR = new THREE.MeshShaderMaterial( {
 
@@ -138,8 +138,8 @@
 						exposure:  { type: "f", value: 0.125 },
 						brightMax: { type: "f", value: 0.5 }
 						},
-					vertex_shader: getText( 'vs-hdr' ),
-					fragment_shader: getText( 'fs-hdr' )
+					vertexShader: getText( 'vs-hdr' ),
+					fragmentShader: getText( 'fs-hdr' )
 
 				} );
 

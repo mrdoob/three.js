@@ -1,3 +1,7 @@
+/**
+ * @author alteredq / http://alteredqualia.com/
+ */
+ 
 var Uniforms = {
 
 	clone: function( uniforms_src ) {

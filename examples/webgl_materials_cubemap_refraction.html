@@ -104,9 +104,9 @@
 
 				var textureCube = ImageUtils.loadTextureCube( urls, new THREE.CubeRefractionMapping() );
 
-				var cubeMaterial3 = new THREE.MeshBasicMaterial( { color: 0xccddff, env_map: textureCube, refraction_ratio: 0.98, reflectivity:0.9 } );
-				var cubeMaterial2 = new THREE.MeshBasicMaterial( { color: 0xccfffd, env_map: textureCube, refraction_ratio: 0.985 } );
-				var cubeMaterial1 = new THREE.MeshBasicMaterial( { color: 0xffffff, env_map: textureCube, refraction_ratio: 0.98 } )
+				var cubeMaterial3 = new THREE.MeshBasicMaterial( { color: 0xccddff, envMap: textureCube, refractionRatio: 0.98, reflectivity:0.9 } );
+				var cubeMaterial2 = new THREE.MeshBasicMaterial( { color: 0xccfffd, envMap: textureCube, refractionRatio: 0.985 } );
+				var cubeMaterial1 = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube, refractionRatio: 0.98 } )
 
 				//SceneUtils.addPanoramaCubePlanes( sceneCube, 100000, images );
 				//SceneUtils.addPanoramaCube( sceneCube, 100000, images );

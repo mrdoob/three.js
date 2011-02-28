@@ -1238,7 +1238,7 @@ THREE.Loader.prototype = {
 		// defaults
 		
 		mtype = "MeshLambertMaterial";
-		mpars = { color: 0xeeeeee, opacity: 1.0, map: null, light_map: null, vertex_colors: m.vertex_colors };
+		mpars = { color: 0xeeeeee, opacity: 1.0, map: null, lightMap: null, vertexColors: m.vertex_colors };
 		
 		// parameters from model file
 		
@@ -1269,9 +1269,9 @@ THREE.Loader.prototype = {
 		if ( m.map_lightmap && texture_path ) {
 
 			texture = document.createElement( 'canvas' );
-			mpars.light_map = new THREE.Texture( texture );
+			mpars.lightMap = new THREE.Texture( texture );
 			
-			load_image( mpars.light_map, texture_path + "/" + m.map_lightmap );			
+			load_image( mpars.lightMap, texture_path + "/" + m.map_lightmap );			
 
 		}
 		

@@ -1,3 +1,7 @@
+/**
+ * @author alteredq / http://alteredqualia.com/
+ */
+
 var SceneUtils = {
 
 	loadScene : function( url, callback_sync, callback_async, callback_progress ) {
@@ -256,17 +260,17 @@ var SceneUtils = {
 
 				if ( g.type == "cube" ) {
 
-					geometry = new Cube( g.width, g.height, g.depth, g.segments_width, g.segments_height, null, g.flipped, g.sides );
+					geometry = new Cube( g.width, g.height, g.depth, g.segmentsWidth, g.segmentsHeight, null, g.flipped, g.sides );
 					result.geometries[ dg ] = geometry;
 
 				} else if ( g.type == "plane" ) {
 
-					geometry = new Plane( g.width, g.height, g.segments_width, g.segments_height );
+					geometry = new Plane( g.width, g.height, g.segmentsWidth, g.segmentsHeight );
 					result.geometries[ dg ] = geometry;
 
 				} else if ( g.type == "sphere" ) {
 
-					geometry = new Sphere( g.radius, g.segments_width, g.segments_height );
+					geometry = new Sphere( g.radius, g.segmentsWidth, g.segmentsHeight );
 					result.geometries[ dg ] = geometry;
 
 				} else if ( g.type == "cylinder" ) {
@@ -340,11 +344,11 @@ var SceneUtils = {
 
 					texture = ImageUtils.loadTexture( tt.url, tt.mapping, callback_texture );
 
-					if ( THREE[ tt.min_filter ] != undefined )
-						texture.min_filter = THREE[ tt.min_filter ];
+					if ( THREE[ tt.minFilter ] != undefined )
+						texture.minFilter = THREE[ tt.minFilter ];
 
-					if ( THREE[ tt.mag_filter ] != undefined )
-						texture.mag_filter = THREE[ tt.mag_filter ];
+					if ( THREE[ tt.magFilter ] != undefined )
+						texture.magFilter = THREE[ tt.magFilter ];
 
 				}
 
@@ -360,7 +364,7 @@ var SceneUtils = {
 
 				for( pp in m.parameters ) {
 
-					if ( pp == "env_map" || pp == "map" || pp == "light_map" ) {
+					if ( pp == "envMap" || pp == "map" || pp == "lightMap" ) {
 
 						m.parameters[ pp ] = result.textures[ m.parameters[ pp ] ];
 
@@ -418,8 +422,8 @@ var SceneUtils = {
 		var shader = ShaderUtils.lib["cube"];
 		shader.uniforms["tCube"].texture = textureCube;
 
-		var material = new THREE.MeshShaderMaterial( { fragment_shader: shader.fragment_shader,
-								   vertex_shader: shader.vertex_shader,
+		var material = new THREE.MeshShaderMaterial( { fragmentShader: shader.fragmentShader,
+								   vertexShader: shader.vertexShader,
 								   uniforms: shader.uniforms
 								} ),
 

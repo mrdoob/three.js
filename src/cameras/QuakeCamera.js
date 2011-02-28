@@ -2,6 +2,22 @@
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  * @author paulirish / http://paulirish.com/
+ *
+ * parameters = {
+ *  fov: <float>,
+ *  aspect: <float>,
+ *  near: <float>,
+ *  far: <float>,
+ *  target: <THREE.Object3D>,
+ 
+ *  movementSpeed: <float>,
+ *  lookSpeed: <float>,
+ 
+ *  noFly: <bool>, 
+ *  lookVertical: <bool>, 
+ 
+ *  domElement: <HTMLElement>, 
+ * }
  */
 
 function bind( scope, fn ) {
@@ -14,24 +30,25 @@ function bind( scope, fn ) {
 
 }
 
+
 THREE.QuakeCamera = function ( parameters ) {
 
 	THREE.Camera.call( this, parameters.fov, parameters.aspect, parameters.near, parameters.far, parameters.target );
 
-	this.movement_speed = 1.0;
-	this.look_speed = 0.005;
+	this.movementSpeed = 1.0;
+	this.lookSpeed = 0.005;
 
-	this.nofly = false;
-	this.look_vertical = true;
+	this.noFly = false;
+	this.lookVertical = true;
 
 	this.domElement = document;
 
 	if ( parameters ) {
 
-		if ( parameters.movement_speed !== undefined ) this.movement_speed = parameters.movement_speed;
-		if ( parameters.look_speed !== undefined ) this.look_speed  = parameters.look_speed;
-		if ( parameters.nofly !== undefined ) this.nofly = parameters.nofly;
-		if ( parameters.look_vertical !== undefined ) this.look_vertical = parameters.look_vertical;
+		if ( parameters.movementSpeed !== undefined ) this.movementSpeed = parameters.movementSpeed;
+		if ( parameters.lookSpeed !== undefined ) this.lookSpeed  = parameters.lookSpeed;
+		if ( parameters.noFly !== undefined ) this.noFly = parameters.noFly;
+		if ( parameters.lookVertical !== undefined ) this.lookVertical = parameters.lookVertical;
 
 		if ( parameters.domElement !== undefined ) this.domElement = parameters.domElement;
 
@@ -130,24 +147,24 @@ THREE.QuakeCamera = function ( parameters ) {
 
 	this.update = function() {
 
-		if ( this.moveForward ) this.translateZ( - this.movement_speed, this.nofly );
-		if ( this.moveBackward ) this.translateZ( this.movement_speed, this.nofly );
-		if ( this.moveLeft ) this.translateX( - this.movement_speed, this.nofly );
-		if ( this.moveRight ) this.translateX( this.movement_speed, this.nofly );
+		if ( this.moveForward ) this.translateZ( - this.movementSpeed, this.noFly );
+		if ( this.moveBackward ) this.translateZ( this.movementSpeed, this.noFly );
+		if ( this.moveLeft ) this.translateX( - this.movementSpeed, this.noFly );
+		if ( this.moveRight ) this.translateX( this.movementSpeed, this.noFly );
 
-		this.lon += this.mouseX * this.look_speed;
-		if( this.look_vertical ) this.lat -= this.mouseY * this.look_speed;
+		this.lon += this.mouseX * this.lookSpeed;
+		if( this.lookVertical ) this.lat -= this.mouseY * this.lookSpeed;
 
 		this.lat = Math.max( - 85, Math.min( 85, this.lat ) );
 		this.phi = ( 90 - this.lat ) * Math.PI / 180;
 		this.theta = this.lon * Math.PI / 180;
 
-		var target_position = this.target.position,
+		var targetPosition = this.target.position,
 			position = this.position;
 
-		target_position.x = position.x + 100 * Math.sin( this.phi ) * Math.cos( this.theta );
-		target_position.y = position.y + 100 * Math.cos( this.phi );
-		target_position.z = position.z + 100 * Math.sin( this.phi ) * Math.sin( this.theta );
+		targetPosition.x = position.x + 100 * Math.sin( this.phi ) * Math.cos( this.theta );
+		targetPosition.y = position.y + 100 * Math.cos( this.phi );
+		targetPosition.z = position.z + 100 * Math.sin( this.phi ) * Math.sin( this.theta );
 
 		this.supr.update.call( this );
 

@@ -155,7 +155,7 @@
 
 		</script>
 
-		<script id="vertex_shader" type="x-shader/x-vertex">
+		<script id="vertexShader" type="x-shader/x-vertex">
 
 			varying vec2 vUv;
 
@@ -211,7 +211,7 @@
 					texture: { type: "t", value: 0, texture: ImageUtils.loadTexture( "textures/disturb.jpg" ) }
 				};
 
-				uniforms2.texture.texture.wrap_s = uniforms2.texture.texture.wrap_t = THREE.Repeat;
+				uniforms2.texture.texture.wrapS = uniforms2.texture.texture.wrapT = THREE.Repeat;
 
 				var size = 0.75, mlib = [],
 					params = [ [ 'fragment_shader1', uniforms1 ],  [ 'fragment_shader2', uniforms2 ], [ 'fragment_shader3', uniforms1 ], [ 'fragment_shader4', uniforms1 ] ];
@@ -221,8 +221,8 @@
 					material = new THREE.MeshShaderMaterial( {
 
 						uniforms: params[ i ][ 1 ],
-						vertex_shader: document.getElementById( 'vertex_shader' ).textContent,
-						fragment_shader: document.getElementById( params[ i ][ 0 ] ).textContent
+						vertexShader: document.getElementById( 'vertexShader' ).textContent,
+						fragmentShader: document.getElementById( params[ i ][ 0 ] ).textContent
 
 						} );
 

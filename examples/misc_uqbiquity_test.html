@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - geometry - canvas polyfield</title>
+		<title>three.js misc - geometry - polyfield</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -195,7 +195,7 @@
 				geometry.computeCentroids();
 				geometry.sortFacesByMaterial();
 
-				mesh = new THREE.Mesh( geometry, [ new THREE.MeshFaceMaterial(), new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, wireframe: true, wireframe_linewidth: 10 } ) ] );
+				mesh = new THREE.Mesh( geometry, [ new THREE.MeshFaceMaterial(), new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, wireframe: true, wireframeLinewidth: 10 } ) ] );
 				mesh.doubleSided = true;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
 				scene.addObject( mesh );

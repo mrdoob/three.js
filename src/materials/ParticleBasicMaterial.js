@@ -10,9 +10,9 @@
  *  size: <float>,
  
  *  blending: THREE.NormalBlending,
- *  depth_test: <bool>,
+ *  depthTest: <bool>,
  
- *  vertex_colors: <bool>
+ *  vertexColors: <bool>
  * }
  */
 
@@ -27,11 +27,11 @@ THREE.ParticleBasicMaterial = function ( parameters ) {
 	this.size = 1.0;
 
 	this.blending = THREE.NormalBlending;
-	this.depth_test = true;
+	this.depthTest = true;
 
 	this.offset = new THREE.Vector2(); // TODO: expose to parameters (implemented just in CanvasRenderer)
 
-	this.vertex_colors = false;
+	this.vertexColors = false;
 
 	if ( parameters ) {
 
@@ -42,9 +42,9 @@ THREE.ParticleBasicMaterial = function ( parameters ) {
 		if ( parameters.size !== undefined ) this.size = parameters.size;
 
 		if ( parameters.blending !== undefined ) this.blending = parameters.blending;
-		if ( parameters.depth_test !== undefined ) this.depth_test = parameters.depth_test;
+		if ( parameters.depthTest !== undefined ) this.depthTest = parameters.depthTest;
 
-		if ( parameters.vertex_colors !== undefined ) this.vertex_colors = parameters.vertex_colors;
+		if ( parameters.vertexColors !== undefined ) this.vertexColors = parameters.vertexColors;
 
 	}
 

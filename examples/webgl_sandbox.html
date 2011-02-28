@@ -145,8 +145,8 @@
 				var geometry = new Sphere( 50, 32, 16 );
 
 				var uniforms = ShaderUtils.lib[ 'basic' ].uniforms;
-				var vertex_shader = ShaderUtils.lib[ 'basic' ].vertex_shader;
-				var fragment_shader = ShaderUtils.lib[ 'basic' ].fragment_shader;
+				var vertexShader = ShaderUtils.lib[ 'basic' ].vertexShader;
+				var fragmentShader = ShaderUtils.lib[ 'basic' ].fragmentShader;
 
 				var texture = new THREE.Texture( generateTexture( 0, 0.5, 1 ), new THREE.UVMapping() );
 				var texture2 = new THREE.Texture( generateTexture( 0, 1, 0 ), new THREE.SphericalReflectionMapping() );
@@ -158,8 +158,8 @@
 					new THREE.MeshBasicMaterial( { color: 0x0066ff, blending: THREE.AdditiveBlending } ),
 					new THREE.MeshBasicMaterial( { map: texture, fog: false } ),
 					new THREE.MeshBasicMaterial( { map: ImageUtils.loadTexture( 'textures/land_ocean_ice_cloud_2048.jpg' ) } ),
-					new THREE.MeshBasicMaterial( { map: texture2, env_map: ImageUtils.loadTexture( 'textures/envmap.png', new THREE.SphericalReflectionMapping() ) } ),
-					new THREE.MeshShaderMaterial( { uniforms: uniforms, vertex_shader: vertex_shader, fragment_shader: fragment_shader } )
+					new THREE.MeshBasicMaterial( { map: texture2, envMap: ImageUtils.loadTexture( 'textures/envmap.png', new THREE.SphericalReflectionMapping() ) } ),
+					new THREE.MeshShaderMaterial( { uniforms: uniforms, vertexShader: vertexShader, fragmentShader: fragmentShader } )
 
 					/*
 					new THREE.MeshLambertMaterial( { color: 0xdddddd, shading: THREE.FlatShading } ),
@@ -169,10 +169,10 @@
 					new THREE.MeshNormalMaterial( { shading: THREE.SmoothShading } ),
 					new THREE.MeshBasicMaterial( { color: 0xffaa00, wireframe: true } ),
 					new THREE.MeshBasicMaterial( { map: texture, fog: false } ),
-					new THREE.MeshBasicMaterial( { env_map: texture2, fog: false } ),
+					new THREE.MeshBasicMaterial( { envMap: texture2, fog: false } ),
 					new THREE.MeshLambertMaterial( { map: ImageUtils.loadTexture( 'textures/land_ocean_ice_cloud_2048.jpg' ) } ),
-					new THREE.MeshLambertMaterial( { map: texture2, env_map: ImageUtils.loadTexture( 'textures/envmap.png', new THREE.SphericalReflectionMapping() ) } ),
-					new THREE.MeshShaderMaterial( { uniforms: uniforms, vertex_shader: vertex_shader, fragment_shader: fragment_shader } )
+					new THREE.MeshLambertMaterial( { map: texture2, envMap: ImageUtils.loadTexture( 'textures/envmap.png', new THREE.SphericalReflectionMapping() ) } ),
+					new THREE.MeshShaderMaterial( { uniforms: uniforms, vertexShader: vertexShader, fragmentShader: fragmentShader } )
 					*/
 
 				];
@@ -186,7 +186,7 @@
 
 				materials.push( new THREE.MeshFaceMaterial() );
 
-				// materials = [ new THREE.MeshBasicMaterial( { map: texture, env_map: texture2 } ) ];
+				// materials = [ new THREE.MeshBasicMaterial( { map: texture, envMap: texture2 } ) ];
 
 				for ( var i = 0; i < 5000; i ++ ) {
 

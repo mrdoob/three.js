@@ -52,7 +52,7 @@ COLORS = [0xeeeeee, 0xee0000, 0x00ee00, 0x0000ee, 0xeeee00, 0x00eeee, 0xee00ee]
 # #####################################################
 TEMPLATE_FILE_ASCII = """\
 /*
- * File generated with Blender 2.55 Exporter
+ * File generated with Blender 2.56 Exporter
  * https://github.com/mrdoob/three.js/tree/master/utils/exporters/blender/
  *
  * vertices: %(nvertex)d

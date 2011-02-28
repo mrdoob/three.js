@@ -129,8 +129,8 @@ var scene = {
 		"width" : 10, 
 		"height": 10,
 		"depth" : 10, 
-		"segments_width"  : 1, 
-		"segments_height" : 1,
+		"segmentsWidth"  : 1, 
+		"segmentsHeight" : 1,
 		"flipped" : false, 
 		"sides"   : { "px": true, "nx": true, "py": true, "ny": true, "pz": true, "nz": true }
 	},
@@ -139,23 +139,23 @@ var scene = {
 		"type"   : "plane",
 		"width"  : 10, 
 		"height" : 10,
-		"segments_width"  : 50, 
-		"segments_height" : 50
+		"segmentsWidth"  : 50, 
+		"segmentsHeight" : 50
 	},	
 
 	"quad": {
 		"type"   : "plane",
 		"width"  : 10, 
 		"height" : 10,
-		"segments_width"  : 1, 
-		"segments_height" : 1
+		"segmentsWidth"  : 1, 
+		"segmentsHeight" : 1
 	},	
 
 	"sphere": {
 		"type"    : "sphere",
 		"radius"  : 5, 
-		"segments_width"  : 32, 
-		"segments_height" : 16
+		"segmentsWidth"  : 32, 
+		"segmentsHeight" : 16
 	},
 
 	"icosahedron": {
@@ -270,27 +270,27 @@ var scene = {
 	
 	"basic_refraction": {
 		"type": "MeshBasicMaterial",
-		"parameters": { color: 0xffffff, env_map: "cube_refraction", refraction_ratio: 0.95 } 
+		"parameters": { color: 0xffffff, envMap: "cube_refraction", refractionRatio: 0.95 } 
 	},
 	
 	"lambert_cube": {
 		"type": "MeshLambertMaterial",
-		"parameters": { color: 0xff6600, env_map: "cube_reflection", combine: "MixOperation", reflectivity: 0.3 }
+		"parameters": { color: 0xff6600, envMap: "cube_reflection", combine: "MixOperation", reflectivity: 0.3 }
 	},
 	
 	"chrome": {
 		"type": "MeshLambertMaterial",
-		"parameters": { color: 0xffffff, env_map: "cube_reflection" }
+		"parameters": { color: 0xffffff, envMap: "cube_reflection" }
 	},
 
 	"darkerchrome": {
 		"type": "MeshLambertMaterial",
-		"parameters": { color: 0x222222, env_map: "cube_reflection" }
+		"parameters": { color: 0x222222, envMap: "cube_reflection" }
 	},
 	
 	"glass": {
 		"type": "MeshLambertMaterial",
-		"parameters": { color: 0x101046, env_map: "cube_reflection", opacity: 0.25 }
+		"parameters": { color: 0x101046, envMap: "cube_reflection", opacity: 0.25 }
 	},
 
 	"interior": {
@@ -355,8 +355,8 @@ var scene = {
 
 	"texture_minecraft": {
 		"url": "textures/minecraft/grass.png",
-		"mag_filter": "NearestFilter",
-		"min_filter": "LinearMipMapLinearFilter"
+		"magFilter": "NearestFilter",
+		"minFilter": "LinearMipMapLinearFilter"
 	}
 	
 },

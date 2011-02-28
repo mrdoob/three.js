@@ -6,10 +6,10 @@
  *  opacity: <float>,
  
  *  blending: THREE.NormalBlending,
- *  depth_test: <bool>,
+ *  depthTest: <bool>,
  
  *  wireframe: <boolean>,
- *  wireframe_linewidth: <float>
+ *  wireframeLinewidth: <float>
  * } 
  */
 
@@ -21,10 +21,10 @@ THREE.MeshDepthMaterial = function ( parameters ) {
 
 	this.shading = THREE.SmoothShading; // doesn't really apply here, normals are not used
 	this.blending = THREE.NormalBlending;
-	this.depth_test = true;
+	this.depthTest = true;
 
 	this.wireframe = false;
-	this.wireframe_linewidth = 1.0;
+	this.wireframeLinewidth = 1.0;
 
 	if ( parameters ) {
 
@@ -32,10 +32,10 @@ THREE.MeshDepthMaterial = function ( parameters ) {
 
 		if ( parameters.shading !== undefined ) this.shading  = parameters.shading;
 		if ( parameters.blending !== undefined ) this.blending = parameters.blending;
-		if ( parameters.depth_test !== undefined ) this.depth_test = parameters.depth_test;
+		if ( parameters.depthTest !== undefined ) this.depthTest = parameters.depthTest;
 
 		if ( parameters.wireframe !== undefined ) this.wireframe = parameters.wireframe;
-		if ( parameters.wireframe_linewidth !== undefined ) this.wireframe_linewidth = parameters.wireframe_linewidth;
+		if ( parameters.wireframeLinewidth !== undefined ) this.wireframeLinewidth = parameters.wireframeLinewidth;
 
 	}
 

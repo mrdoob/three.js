@@ -124,25 +124,25 @@
 				var camaroMaterials = {
 
 					body: 		[],
-					chrome: 	new THREE.MeshLambertMaterial( { color: 0xffffff, env_map: textureCube } ),
-					darkchrome: new THREE.MeshLambertMaterial( { color: 0x444444, env_map: textureCube } ),
-					glass:		new THREE.MeshBasicMaterial( { color: 0x223344, env_map: textureCube, opacity: 0.25, combine: THREE.MixOperation, reflectivity: 0.25 } ),
+					chrome: 	new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: textureCube } ),
+					darkchrome: new THREE.MeshLambertMaterial( { color: 0x444444, envMap: textureCube } ),
+					glass:		new THREE.MeshBasicMaterial( { color: 0x223344, envMap: textureCube, opacity: 0.25, combine: THREE.MixOperation, reflectivity: 0.25 } ),
 					tire:       new THREE.MeshLambertMaterial( { color: 0x050505 } ),
 					interior:   new THREE.MeshPhongMaterial( { color: 0x050505, shininess: 20 } ),
 					black:      new THREE.MeshLambertMaterial( { color: 0x000000 } )
 
 				}
 
-				camaroMaterials.body.push( [ "Orange", new THREE.MeshLambertMaterial( { color: 0xff6600, env_map: textureCube, combine: THREE.MixOperation, reflectivity: 0.3 } ) ] );
-				camaroMaterials.body.push( [ "Blue", new THREE.MeshLambertMaterial( { color: 0x226699, env_map: textureCube, combine: THREE.MixOperation, reflectivity: 0.3 } ) ] );
-				camaroMaterials.body.push( [ "Red", new THREE.MeshLambertMaterial( { color: 0x660000, env_map: textureCube, combine: THREE.MixOperation, reflectivity: 0.5 } ) ] );
-				camaroMaterials.body.push( [ "Black", new THREE.MeshLambertMaterial( { color: 0x000000, env_map: textureCube, combine: THREE.MixOperation, reflectivity: 0.5 } ) ] );
-				camaroMaterials.body.push( [ "White", new THREE.MeshLambertMaterial( { color: 0xffffff, env_map: textureCube, combine: THREE.MixOperation, reflectivity: 0.5 } ) ] );
+				camaroMaterials.body.push( [ "Orange", new THREE.MeshLambertMaterial( { color: 0xff6600, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.3 } ) ] );
+				camaroMaterials.body.push( [ "Blue", new THREE.MeshLambertMaterial( { color: 0x226699, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.3 } ) ] );
+				camaroMaterials.body.push( [ "Red", new THREE.MeshLambertMaterial( { color: 0x660000, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.5 } ) ] );
+				camaroMaterials.body.push( [ "Black", new THREE.MeshLambertMaterial( { color: 0x000000, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.5 } ) ] );
+				camaroMaterials.body.push( [ "White", new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.5 } ) ] );
 
-				camaroMaterials.body.push( [ "Carmine", new THREE.MeshPhongMaterial( { color: 0x770000, specular:0xffaaaa, env_map: textureCube, combine: THREE.MultiplyOperation } ) ] );
-				camaroMaterials.body.push( [ "Gold", new THREE.MeshPhongMaterial( { color: 0xaa9944, specular:0xbbaa99, shininess:50, env_map: textureCube, combine: THREE.MultiplyOperation } ) ] );
-				camaroMaterials.body.push( [ "Bronze", new THREE.MeshPhongMaterial( { color: 0x150505, specular:0xee6600, shininess:10, env_map: textureCube, combine: THREE.MixOperation, reflectivity: 0.5 } ) ] );
-				camaroMaterials.body.push( [ "Chrome", new THREE.MeshPhongMaterial( { color: 0xffffff, specular:0xffffff, env_map: textureCube, combine: THREE.MultiplyOperation } ) ] );
+				camaroMaterials.body.push( [ "Carmine", new THREE.MeshPhongMaterial( { color: 0x770000, specular:0xffaaaa, envMap: textureCube, combine: THREE.MultiplyOperation } ) ] );
+				camaroMaterials.body.push( [ "Gold", new THREE.MeshPhongMaterial( { color: 0xaa9944, specular:0xbbaa99, shininess:50, envMap: textureCube, combine: THREE.MultiplyOperation } ) ] );
+				camaroMaterials.body.push( [ "Bronze", new THREE.MeshPhongMaterial( { color: 0x150505, specular:0xee6600, shininess:10, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.5 } ) ] );
+				camaroMaterials.body.push( [ "Chrome", new THREE.MeshPhongMaterial( { color: 0xffffff, specular:0xffffff, envMap: textureCube, combine: THREE.MultiplyOperation } ) ] );
 
 				var loader = new THREE.Loader();
 				loader.loadBinary( { model: "obj/camaro/CamaroNoUv_bin.js", callback: function( geometry ) { createScene( geometry, camaroMaterials ) } } );

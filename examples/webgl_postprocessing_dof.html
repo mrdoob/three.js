@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - postprocessing - depth-of-field - webgl</title>
+		<title>three.js webgl - postprocessing - depth-of-field</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -102,7 +102,7 @@
 
 				var textureCube = ImageUtils.loadTextureCube( urls );
 
-				parameters = { color: 0xff1100, env_map: textureCube, shading: THREE.FlatShading };
+				parameters = { color: 0xff1100, envMap: textureCube, shading: THREE.FlatShading };
 				//parameters = { color: 0xff1100, shading: THREE.FlatShading };
 				cubeMaterial = new THREE.MeshBasicMaterial( parameters );
 
@@ -241,7 +241,7 @@
 				postprocessing.camera.projectionMatrix = THREE.Matrix4.makeOrtho( window.innerWidth / - 2, window.innerWidth / 2,  window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
 				postprocessing.camera.position.z = 100;
 
-				var pars = { min_filter: THREE.LinearFilter, mag_filter: THREE.LinearFilter };
+				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter };
 				postprocessing.rtTextureDepth = new THREE.RenderTarget( window.innerWidth, height, pars );
 				postprocessing.rtTextureColor = new THREE.RenderTarget( window.innerWidth, height, pars );
 
@@ -257,8 +257,8 @@
 				postprocessing.materialBokeh = new THREE.MeshShaderMaterial( {
 
 					uniforms: postprocessing.bokeh_uniforms,
-					vertex_shader: bokeh_shader.vertex_shader,
-					fragment_shader: bokeh_shader.fragment_shader
+					vertexShader: bokeh_shader.vertexShader,
+					fragmentShader: bokeh_shader.fragmentShader
 
 				} );
 

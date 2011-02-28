@@ -1225,8 +1225,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setMaterialShaders( material, shaders ) {
 
-		material.fragment_shader = shaders.fragment_shader;
-		material.vertex_shader = shaders.vertex_shader;
+		material.fragmentShader = shaders.fragmentShader;
+		material.vertexShader = shaders.vertexShader;
 		material.uniforms = Uniforms.clone( shaders.uniforms );
 
 	};
@@ -1242,13 +1242,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 		uniforms.opacity.value = material.opacity;
 		uniforms.map.texture = material.map;
 
-		uniforms.light_map.texture = material.light_map;
+		uniforms.lightMap.texture = material.lightMap;
 
-		uniforms.env_map.texture = material.env_map;
+		uniforms.envMap.texture = material.envMap;
 		uniforms.reflectivity.value = material.reflectivity;
-		uniforms.refraction_ratio.value = material.refraction_ratio;
+		uniforms.refractionRatio.value = material.refractionRatio;
 		uniforms.combine.value = material.combine;
-		uniforms.useRefract.value = material.env_map && material.env_map.mapping instanceof THREE.CubeRefractionMapping;
+		uniforms.useRefract.value = material.envMap && material.envMap.mapping instanceof THREE.CubeRefractionMapping;
 
 	};
 
@@ -1346,11 +1346,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		maxLightCount = allocateLights( lights, 4 );
 
-		parameters = { fog: fog, map: material.map, env_map: material.env_map, light_map: material.light_map, vertex_colors: material.vertex_colors,
+		parameters = { fog: fog, map: material.map, envMap: material.envMap, lightMap: material.lightMap, vertexColors: material.vertexColors,
 					   skinning: material.skinning,
 					   maxDirLights: maxLightCount.directional, maxPointLights: maxLightCount.point };
 
-		material.program = buildProgram( material.fragment_shader, material.vertex_shader, parameters );
+		material.program = buildProgram( material.fragmentShader, material.vertexShader, parameters );
 
 		identifiers = [ 'viewMatrix', 'modelViewMatrix', 'projectionMatrix', 'normalMatrix', 'objectMatrix', 'cameraPosition',
 						'cameraInverseMatrix', 'boneGlobalMatrices'
@@ -1470,14 +1470,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material instanceof THREE.MeshShaderMaterial ||
 			 material instanceof THREE.MeshPhongMaterial ||
-			 material.env_map ) {
+			 material.envMap ) {
 
 			_gl.uniform3f( p_uniforms.cameraPosition, camera.position.x, camera.position.y, camera.position.z );
 
 		}
 
 		if ( material instanceof THREE.MeshShaderMaterial ||
-			 material.env_map ||
+			 material.envMap ||
 			 material.skinning ) {
 
 			_gl.uniformMatrix4fv( p_uniforms.objectMatrix, false, object._objectMatrixArray );
@@ -1605,7 +1605,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( material.wireframe ) {
 
-				_gl.lineWidth( material.wireframe_linewidth );
+				_gl.lineWidth( material.wireframeLinewidth );
 				_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryChunk.__webGLLineBuffer );
 				_gl.drawElements( _gl.LINES, geometryChunk.__webGLLineCount, _gl.UNSIGNED_SHORT, 0 );
 
@@ -1972,7 +1972,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					material = opaque.list[ i ];
 
-					setDepthTest( material.depth_test );
+					setDepthTest( material.depthTest );
 					renderBuffer( camera, lights, fog, material, buffer, object );
 
 				}
@@ -1998,7 +1998,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					material = opaque.list[ i ];
 
-					setDepthTest( material.depth_test );
+					setDepthTest( material.depthTest );
 
 					program = setProgram( camera, lights, fog, material, object );
 					object.render( function( object ) { renderBufferImmediate( object, program ); } );
@@ -2028,7 +2028,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					material = transparent.list[ i ];
 
 					setBlending( material.blending );
-					setDepthTest( material.depth_test );
+					setDepthTest( material.depthTest );
 
 					renderBuffer( camera, lights, fog, material, buffer, object );
 
@@ -2056,7 +2056,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					material = transparent.list[ i ];
 
 					setBlending( material.blending );
-					setDepthTest( material.depth_test );
+					setDepthTest( material.depthTest );
 
 					program = setProgram( camera, lights, fog, material, object );
 					object.render( function( object ) { renderBufferImmediate( object, program ); } );
@@ -2069,7 +2069,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// Generate mipmap if we're using any kind of mipmap filtering
 
-		if ( renderTarget && renderTarget.min_filter !== THREE.NearestFilter && renderTarget.min_filter !== THREE.LinearFilter ) {
+		if ( renderTarget && renderTarget.minFilter !== THREE.NearestFilter && renderTarget.minFilter !== THREE.LinearFilter ) {
 
 			updateRenderTargetMipmap( renderTarget );
 
@@ -2385,7 +2385,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function buildProgram( fragment_shader, vertex_shader, parameters ) {
+	function buildProgram( fragmentShader, vertexShader, parameters ) {
 
 		var program = _gl.createProgram(),
 
@@ -2401,9 +2401,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 			parameters.fog instanceof THREE.FogExp2 ? "#define FOG_EXP2" : "",
 
 			parameters.map ? "#define USE_MAP" : "",
-			parameters.env_map ? "#define USE_ENVMAP" : "",
-			parameters.light_map ? "#define USE_LIGHTMAP" : "",
-			parameters.vertex_colors ? "#define USE_COLOR" : "",
+			parameters.envMap ? "#define USE_ENVMAP" : "",
+			parameters.lightMap ? "#define USE_LIGHTMAP" : "",
+			parameters.vertexColors ? "#define USE_COLOR" : "",
 
 			"uniform mat4 viewMatrix;",
 			"uniform vec3 cameraPosition;",
@@ -2417,9 +2417,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 			"#define MAX_POINT_LIGHTS " + parameters.maxPointLights,
 
 			parameters.map ? "#define USE_MAP" : "",
-			parameters.env_map ? "#define USE_ENVMAP" : "",
-			parameters.light_map ? "#define USE_LIGHTMAP" : "",
-			parameters.vertex_colors ? "#define USE_COLOR" : "",
+			parameters.envMap ? "#define USE_ENVMAP" : "",
+			parameters.lightMap ? "#define USE_LIGHTMAP" : "",
+			parameters.vertexColors ? "#define USE_COLOR" : "",
 			parameters.skinning ? "#define USE_SKINNING" : "",
 
 			"uniform mat4 objectMatrix;",
@@ -2444,8 +2444,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			""
 		].join("\n");
 
-		_gl.attachShader( program, getShader( "fragment", prefix_fragment + fragment_shader ) );
-		_gl.attachShader( program, getShader( "vertex", prefix_vertex + vertex_shader ) );
+		_gl.attachShader( program, getShader( "fragment", prefix_fragment + fragmentShader ) );
+		_gl.attachShader( program, getShader( "vertex", prefix_vertex + vertexShader ) );
 
 		_gl.linkProgram( program );
 
@@ -2454,13 +2454,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 			alert( "Could not initialise shaders\n"+
 					"VALIDATE_STATUS: " + _gl.getProgramParameter( program, _gl.VALIDATE_STATUS ) + ", gl error [" + _gl.getError() + "]" );
 
-			//console.log( prefix_fragment + fragment_shader );
-			//console.log( prefix_vertex + vertex_shader );
+			//console.log( prefix_fragment + fragmentShader );
+			//console.log( prefix_vertex + vertexShader );
 
 		}
 
-		//console.log( prefix_fragment + fragment_shader );
-		//console.log( prefix_vertex + vertex_shader );
+		//console.log( prefix_fragment + fragmentShader );
+		//console.log( prefix_vertex + vertexShader );
 
 		program.uniforms = {};
 		program.attributes = {};
@@ -2649,11 +2649,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 				_gl.bindTexture( _gl.TEXTURE_2D, texture.__webGLTexture );
 				_gl.texImage2D( _gl.TEXTURE_2D, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, texture.image );
 
-				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_S, paramThreeToGL( texture.wrap_s ) );
-				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_T, paramThreeToGL( texture.wrap_t ) );
+				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_S, paramThreeToGL( texture.wrapS ) );
+				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_T, paramThreeToGL( texture.wrapT ) );
 
-				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MAG_FILTER, paramThreeToGL( texture.mag_filter ) );
-				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, paramThreeToGL( texture.min_filter ) );
+				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MAG_FILTER, paramThreeToGL( texture.magFilter ) );
+				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, paramThreeToGL( texture.minFilter ) );
 				_gl.generateMipmap( _gl.TEXTURE_2D );
 				_gl.bindTexture( _gl.TEXTURE_2D, null );
 
@@ -2664,11 +2664,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 				_gl.bindTexture( _gl.TEXTURE_2D, texture.__webGLTexture );
 				_gl.texSubImage2D( _gl.TEXTURE_2D, 0, 0, 0, _gl.RGBA, _gl.UNSIGNED_BYTE, texture.image );
 
-				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_S, paramThreeToGL( texture.wrap_s ) );
-				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_T, paramThreeToGL( texture.wrap_t ) );
+				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_S, paramThreeToGL( texture.wrapS ) );
+				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_T, paramThreeToGL( texture.wrapT ) );
 
-				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MAG_FILTER, paramThreeToGL( texture.mag_filter ) );
-				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, paramThreeToGL( texture.min_filter ) );
+				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MAG_FILTER, paramThreeToGL( texture.magFilter ) );
+				_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, paramThreeToGL( texture.minFilter ) );
 				_gl.generateMipmap( _gl.TEXTURE_2D );
 				_gl.bindTexture( _gl.TEXTURE_2D, null );
 
@@ -2699,10 +2699,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 			// Setup texture
 
 			_gl.bindTexture( _gl.TEXTURE_2D, renderTexture.__webGLTexture );
-			_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_S, paramThreeToGL( renderTexture.wrap_s ) );
-			_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_T, paramThreeToGL( renderTexture.wrap_t ) );
-			_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MAG_FILTER, paramThreeToGL( renderTexture.mag_filter ) );
-			_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, paramThreeToGL( renderTexture.min_filter ) );
+			_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_S, paramThreeToGL( renderTexture.wrapS ) );
+			_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_T, paramThreeToGL( renderTexture.wrapT ) );
+			_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MAG_FILTER, paramThreeToGL( renderTexture.magFilter ) );
+			_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, paramThreeToGL( renderTexture.minFilter ) );
 			_gl.texImage2D( _gl.TEXTURE_2D, 0, paramThreeToGL( renderTexture.format ), renderTexture.width, renderTexture.height, 0, paramThreeToGL( renderTexture.format ), paramThreeToGL( renderTexture.type ), null );
 
 			// Setup framebuffer
@@ -3009,7 +3009,7 @@ THREE.Snippets = {
 
 		"varying vec3 vReflect;",
 		"uniform float reflectivity;",
-		"uniform samplerCube env_map;",
+		"uniform samplerCube envMap;",
 		"uniform int combine;",
 
 	"#endif"
@@ -3020,7 +3020,7 @@ THREE.Snippets = {
 
 	"#ifdef USE_ENVMAP",
 
-		"vec4 cubeColor = textureCube( env_map, vec3( -vReflect.x, vReflect.yz ) );",
+		"vec4 cubeColor = textureCube( envMap, vec3( -vReflect.x, vReflect.yz ) );",
 
 		"if ( combine == 1 ) {",
 
@@ -3042,7 +3042,7 @@ THREE.Snippets = {
 	"#ifdef USE_ENVMAP",
 
 		"varying vec3 vReflect;",
-		"uniform float refraction_ratio;",
+		"uniform float refractionRatio;",
 		"uniform bool useRefract;",
 
 	"#endif"
@@ -3058,7 +3058,7 @@ THREE.Snippets = {
 
 		"if ( useRefract ) {",
 
-			"vReflect = refract( normalize( mPosition.xyz - cameraPosition ), normalize( nWorld.xyz ), refraction_ratio );",
+			"vReflect = refract( normalize( mPosition.xyz - cameraPosition ), normalize( nWorld.xyz ), refractionRatio );",
 
 		"} else {",
 
@@ -3143,7 +3143,7 @@ THREE.Snippets = {
 	"#ifdef USE_LIGHTMAP",
 
 		"varying vec2 vUv2;",
-		"uniform sampler2D light_map;",
+		"uniform sampler2D lightMap;",
 
 	"#endif"
 
@@ -3163,7 +3163,7 @@ THREE.Snippets = {
 
 	"#ifdef USE_LIGHTMAP",
 
-		"gl_FragColor = gl_FragColor * texture2D( light_map, vUv2 );",
+		"gl_FragColor = gl_FragColor * texture2D( lightMap, vUv2 );",
 
 	"#endif"
 
@@ -3423,12 +3423,12 @@ THREE.UniformsLib = {
 	"opacity" : { type: "f", value: 1.0 },
 	"map"     : { type: "t", value: 0, texture: null },
 
-	"light_map"       : { type: "t", value: 2, texture: null },
+	"lightMap"       : { type: "t", value: 2, texture: null },
 
-	"env_map" 		  : { type: "t", value: 1, texture: null },
+	"envMap" 		  : { type: "t", value: 1, texture: null },
 	"useRefract"	  : { type: "i", value: 0 },
 	"reflectivity"    : { type: "f", value: 1.0 },
-	"refraction_ratio": { type: "f", value: 0.98 },
+	"refractionRatio": { type: "f", value: 0.98 },
 	"combine"		  : { type: "i", value: 0 },
 
 	"fogDensity": { type: "f", value: 0.00025 },
@@ -3474,7 +3474,7 @@ THREE.ShaderLib = {
 					"opacity" : { type: "f", value: 1.0 }
 				  },
 
-		fragment_shader: [
+		fragmentShader: [
 
 			"uniform float mNear;",
 			"uniform float mFar;",
@@ -3490,7 +3490,7 @@ THREE.ShaderLib = {
 
 		].join("\n"),
 
-		vertex_shader: [
+		vertexShader: [
 
 			"void main() {",
 
@@ -3506,7 +3506,7 @@ THREE.ShaderLib = {
 
 		uniforms: { "opacity" : { type: "f", value: 1.0 } },
 
-		fragment_shader: [
+		fragmentShader: [
 
 			"uniform float opacity;",
 			"varying vec3 vNormal;",
@@ -3519,7 +3519,7 @@ THREE.ShaderLib = {
 
 		].join("\n"),
 
-		vertex_shader: [
+		vertexShader: [
 
 			"varying vec3 vNormal;",
 
@@ -3540,7 +3540,7 @@ THREE.ShaderLib = {
 
 		uniforms: THREE.UniformsLib[ "common" ],
 
-		fragment_shader: [
+		fragmentShader: [
 
 			"uniform vec3 diffuse;",
 			"uniform float opacity;",
@@ -3565,7 +3565,7 @@ THREE.ShaderLib = {
 
 		].join("\n"),
 
-		vertex_shader: [
+		vertexShader: [
 
 			THREE.Snippets[ "map_pars_vertex" ],
 			THREE.Snippets[ "lightmap_pars_vertex" ],
@@ -3594,7 +3594,7 @@ THREE.ShaderLib = {
 		uniforms: Uniforms.merge( [ THREE.UniformsLib[ "common" ],
 									THREE.UniformsLib[ "lights" ] ] ),
 
-		fragment_shader: [
+		fragmentShader: [
 
 			"uniform vec3 diffuse;",
 			"uniform float opacity;",
@@ -3622,7 +3622,7 @@ THREE.ShaderLib = {
 
 		].join("\n"),
 
-		vertex_shader: [
+		vertexShader: [
 
 			"varying vec3 vLightWeighting;",
 
@@ -3665,7 +3665,7 @@ THREE.ShaderLib = {
 
 								] ),
 
-		fragment_shader: [
+		fragmentShader: [
 
 			"uniform vec3 diffuse;",
 			"uniform float opacity;",
@@ -3698,7 +3698,7 @@ THREE.ShaderLib = {
 
 		].join("\n"),
 
-		vertex_shader: [
+		vertexShader: [
 
 			"#define PHONG",
 
@@ -3744,7 +3744,7 @@ THREE.ShaderLib = {
 
 		uniforms: THREE.UniformsLib[ "particle" ],
 
-		fragment_shader: [
+		fragmentShader: [
 
 			"uniform vec3 psColor;",
 			"uniform float opacity;",
@@ -3765,7 +3765,7 @@ THREE.ShaderLib = {
 
 		].join("\n"),
 
-		vertex_shader: [
+		vertexShader: [
 
 			"uniform float size;",
 

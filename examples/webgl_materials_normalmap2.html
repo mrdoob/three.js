@@ -138,7 +138,7 @@
 
 				uniforms[ "uShininess" ].value = shininess;
 
-				var parameters = { fragment_shader: shader.fragment_shader, vertex_shader: shader.vertex_shader, uniforms: uniforms };
+				var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms };
 				var material = new THREE.MeshShaderMaterial( parameters );
 
 				loader = new THREE.Loader( true );

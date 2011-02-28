@@ -519,10 +519,10 @@ THREE.CanvasRenderer = function () {
 					}
 
 
-				} else if ( material.env_map ) {
+				} else if ( material.envMap ) {
 
 
-					if ( material.env_map.mapping instanceof THREE.SphericalReflectionMapping ) {
+					if ( material.envMap.mapping instanceof THREE.SphericalReflectionMapping ) {
 
 						var cameraMatrix = camera.matrixWorld;
 
@@ -538,9 +538,9 @@ THREE.CanvasRenderer = function () {
 						_uv3x = ( _vector3.x * cameraMatrix.n11 + _vector3.y * cameraMatrix.n12 + _vector3.z * cameraMatrix.n13 ) * 0.5 + 0.5;
 						_uv3y = - ( _vector3.x * cameraMatrix.n21 + _vector3.y * cameraMatrix.n22 + _vector3.z * cameraMatrix.n23 ) * 0.5 + 0.5;
 
-						texturePath( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, material.env_map.image, _uv1x, _uv1y, _uv2x, _uv2y, _uv3x, _uv3y );
+						texturePath( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, material.envMap.image, _uv1x, _uv1y, _uv2x, _uv2y, _uv3x, _uv3y );
 
-					}/* else if ( material.env_map.mapping == THREE.RefractionMapping ) {
+					}/* else if ( material.envMap.mapping == THREE.RefractionMapping ) {
 
 						
 
@@ -549,7 +549,7 @@ THREE.CanvasRenderer = function () {
 
 				} else {
 
-					material.wireframe ? strokePath( material.color.__styleString, material.wireframe_linewidth ) : fillPath( material.color.__styleString );
+					material.wireframe ? strokePath( material.color.__styleString, material.wireframeLinewidth ) : fillPath( material.color.__styleString );
 
 				}
 
@@ -600,13 +600,13 @@ THREE.CanvasRenderer = function () {
 						_color.b = material.color.b * _light.b;
 
 						_color.updateStyleString();
-						material.wireframe ? strokePath( _color.__styleString, material.wireframe_linewidth ) : fillPath( _color.__styleString );
+						material.wireframe ? strokePath( _color.__styleString, material.wireframeLinewidth ) : fillPath( _color.__styleString );
 
 					} 
 
 				} else {
 
-					material.wireframe ? strokePath( material.color.__styleString, material.wireframe_linewidth ) : fillPath( material.color.__styleString );
+					material.wireframe ? strokePath( material.color.__styleString, material.wireframeLinewidth ) : fillPath( material.color.__styleString );
 
 				}
 
@@ -639,7 +639,7 @@ THREE.CanvasRenderer = function () {
 				_color.b = normalToComponent( element.normalWorld.z );
 				_color.updateStyleString();
 
-				material.wireframe ? strokePath( _color.__styleString, material.wireframe_linewidth ) : fillPath( _color.__styleString );
+				material.wireframe ? strokePath( _color.__styleString, material.wireframeLinewidth ) : fillPath( _color.__styleString );
 
 			}
 

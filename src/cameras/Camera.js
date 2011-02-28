@@ -27,12 +27,12 @@ THREE.Camera = function( fov, aspect, near, far, target ) {
 
 	this.tmpVec = new THREE.Vector3();
 
-	this.translateX = function ( amount, nofly ) {
+	this.translateX = function ( amount, noFly ) {
 
 		this.tmpVec.sub( this.target.position, this.position ).normalize().multiplyScalar( amount );
 		this.tmpVec.crossSelf( this.up );
 
-		if ( nofly ) this.tmpVec.y = 0;
+		if ( noFly ) this.tmpVec.y = 0;
 
 		this.position.addSelf( this.tmpVec );
 		this.target.position.addSelf( this.tmpVec );
@@ -45,11 +45,11 @@ THREE.Camera = function( fov, aspect, near, far, target ) {
 	};
 	*/
 
-	this.translateZ = function ( amount, nofly ) {
+	this.translateZ = function ( amount, noFly ) {
 
 		this.tmpVec.sub( this.target.position, this.position ).normalize().multiplyScalar( amount );
 
-		if ( nofly ) this.tmpVec.y = 0;
+		if ( noFly ) this.tmpVec.y = 0;
 
 		this.position.subSelf( this.tmpVec );
 		this.target.position.subSelf( this.tmpVec );

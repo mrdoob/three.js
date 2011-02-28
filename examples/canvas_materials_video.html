@@ -80,8 +80,8 @@
 				imageContext.fillRect( 0, 0, 480, 204 );
 
 				texture = new THREE.Texture( image );
-				texture.min_filter = THREE.LinearFilter;
-				texture.mag_filter = THREE.LinearFilter;
+				texture.minFilter = THREE.LinearFilter;
+				texture.magFilter = THREE.LinearFilter;
 
 				var material = new THREE.MeshBasicMaterial( { map: texture } );
 
@@ -98,8 +98,8 @@
 				imageReflectionGradient.addColorStop( 1, 'rgba(240, 240, 240, 0.8)' );
 
 				textureReflection = new THREE.Texture( imageReflection );
-				textureReflection.min_filter = THREE.LinearFilter;
-				textureReflection.mag_filter = THREE.LinearFilter;
+				textureReflection.minFilter = THREE.LinearFilter;
+				textureReflection.magFilter = THREE.LinearFilter;
 				
 				var materialReflection = new THREE.MeshBasicMaterial( { map: textureReflection } );
 

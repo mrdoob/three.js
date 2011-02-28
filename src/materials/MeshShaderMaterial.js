@@ -2,19 +2,19 @@
  * @author alteredq / http://alteredqualia.com/
  *
  * parameters = {
- *  fragment_shader: <string>,
- *  vertex_shader: <string>,
+ *  fragmentShader: <string>,
+ *  vertexShader: <string>,
  
  *  uniforms: { "parameter1": { type: "f", value: 1.0 }, "parameter2": { type: "i" value2: 2 } },
  
  *  shading: THREE.SmoothShading,
  *  blending: THREE.NormalBlending,
- *  depth_test: <bool>,
+ *  depthTest: <bool>,
  
  *  wireframe: <boolean>,
- *  wireframe_linewidth: <float>,
+ *  wireframeLinewidth: <float>,
  
- *  vertex_colors: <bool>,
+ *  vertexColors: <bool>,
  *  skinning: <bool>
  * }
  */
@@ -23,28 +23,28 @@ THREE.MeshShaderMaterial = function ( parameters ) {
 
 	this.id = THREE.MaterialCounter.value ++;
 
-	this.fragment_shader = "void main() {}";
-	this.vertex_shader = "void main() {}";
+	this.fragmentShader = "void main() {}";
+	this.vertexShader = "void main() {}";
 	this.uniforms = {};
 
 	this.opacity = 1.0; // set to < 1.0 to renderer in transparent batch
 
 	this.shading = THREE.SmoothShading;
 	this.blending = THREE.NormalBlending;
-	this.depth_test = true;
+	this.depthTest = true;
 
 	this.wireframe = false;
-	this.wireframe_linewidth = 1.0;
-	this.wireframe_linecap = 'round';	// doesn't make sense here
-	this.wireframe_linejoin = 'round';  // not implemented in WebGLRenderer (and this material doesn't make sense in CanvasRenderer)
+	this.wireframeLinewidth = 1.0;
+	this.wireframeLinecap = 'round';	// doesn't make sense here
+	this.wireframeLinejoin = 'round';  // not implemented in WebGLRenderer (and this material doesn't make sense in CanvasRenderer)
 
-	this.vertex_colors = false; // must set this if shader wants to use "color" attribute stream
+	this.vertexColors = false; // must set this if shader wants to use "color" attribute stream
 	this.skinning = false;	// must set this is shader wants to use skinning attribute streams
 
 	if ( parameters ) {
 
-		if ( parameters.fragment_shader !== undefined ) this.fragment_shader = parameters.fragment_shader;
-		if ( parameters.vertex_shader !== undefined ) this.vertex_shader = parameters.vertex_shader;
+		if ( parameters.fragmentShader !== undefined ) this.fragmentShader = parameters.fragmentShader;
+		if ( parameters.vertexShader !== undefined ) this.vertexShader = parameters.vertexShader;
 
 		if ( parameters.uniforms !== undefined ) this.uniforms = parameters.uniforms;
 
@@ -52,14 +52,14 @@ THREE.MeshShaderMaterial = function ( parameters ) {
 
 		if ( parameters.shading !== undefined ) this.shading = parameters.shading;
 		if ( parameters.blending !== undefined ) this.blending = parameters.blending;
-		if ( parameters.depth_test !== undefined ) this.depth_test = parameters.depth_test;
+		if ( parameters.depthTest !== undefined ) this.depthTest = parameters.depthTest;
 
 		if ( parameters.wireframe !== undefined ) this.wireframe = parameters.wireframe;
-		if ( parameters.wireframe_linewidth !== undefined ) this.wireframe_linewidth = parameters.wireframe_linewidth;
-		if ( parameters.wireframe_linecap !== undefined ) this.wireframe_linecap = parameters.wireframe_linecap;
-		if ( parameters.wireframe_linejoin !== undefined ) this.wireframe_linejoin = parameters.wireframe_linejoin;
+		if ( parameters.wireframeLinewidth !== undefined ) this.wireframeLinewidth = parameters.wireframeLinewidth;
+		if ( parameters.wireframeLinecap !== undefined ) this.wireframeLinecap = parameters.wireframeLinecap;
+		if ( parameters.wireframeLinejoin !== undefined ) this.wireframeLinejoin = parameters.wireframeLinejoin;
 
-		if ( parameters.vertex_colors !== undefined ) this.vertex_colors = parameters.vertex_colors;
+		if ( parameters.vertexColors !== undefined ) this.vertexColors = parameters.vertexColors;
 		if ( parameters.skinning !== undefined ) this.skinning = parameters.skinning;
 
 	}

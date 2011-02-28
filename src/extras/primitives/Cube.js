@@ -3,7 +3,7 @@
  * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Cube.as
  */
 
-var Cube = function ( width, height, depth, segments_width, segments_height, materials, flipped, sides ) {
+var Cube = function ( width, height, depth, segmentsWidth, segmentsHeight, materials, flipped, sides ) {
 
 	THREE.Geometry.call( this );
 
@@ -65,8 +65,8 @@ var Cube = function ( width, height, depth, segments_width, segments_height, mat
 	function buildPlane( u, v, udir, vdir, width, height, depth, material ) {
 
 		var w, ix, iy,
-		gridX = segments_width || 1,
-		gridY = segments_height || 1,
+		gridX = segmentsWidth || 1,
+		gridY = segmentsHeight || 1,
 		gridX1 = gridX + 1,
 		gridY1 = gridY + 1,
 		width_half = width / 2,

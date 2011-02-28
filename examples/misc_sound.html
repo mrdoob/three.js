@@ -71,7 +71,7 @@
 				scene.fog = new THREE.FogExp2( 0x000000, 0.0035 );
 
 				camera = new THREE.QuakeCamera( { fov: 50, aspect: window.innerWidth / window.innerHeight, near: 1, far: 10000,
-												  movement_speed: 1, look_speed: 0.002, nofly: true, look_vertical: false } );
+												  movementSpeed: 1, lookSpeed: 0.002, noFly: true, lookVertical: false } );
 
 				camera.position.set( 0, 25, 0 );
 
@@ -126,7 +126,7 @@
 
 				// ground
 
-				var material_wireframe = new THREE.MeshLambertMaterial( { color: 0xffaa00, wireframe: true, wireframe_linewidth: 1 } );
+				var material_wireframe = new THREE.MeshLambertMaterial( { color: 0xffaa00, wireframe: true, wireframeLinewidth: 1 } );
 				material_wireframe.color.setHSV( 0.1, 0.2, 0.25 );
 
 
@@ -160,7 +160,7 @@
 				postprocessing.camera.projectionMatrix = THREE.Matrix4.makeOrtho( window.innerWidth / - 2, window.innerWidth / 2,  window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
 				postprocessing.camera.position.z = 100;
 
-				var pars = { min_filter: THREE.LinearFilter, mag_filter: THREE.LinearFilter };
+				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter };
 				postprocessing.rtTexture1 = new THREE.RenderTarget( window.innerWidth, window.innerHeight, pars );
 				postprocessing.rtTexture2 = new THREE.RenderTarget( 512, 512, pars );
 				postprocessing.rtTexture3 = new THREE.RenderTarget( 512, 512, pars );
@@ -174,8 +174,8 @@
 				postprocessing.materialScreen = new THREE.MeshShaderMaterial( {
 
 					uniforms: screen_uniforms,
-					vertex_shader: screen_shader.vertex_shader,
-					fragment_shader: screen_shader.fragment_shader,
+					vertexShader: screen_shader.vertexShader,
+					fragmentShader: screen_shader.fragmentShader,
 					blending: THREE.AdditiveBlending
 
 				} );
@@ -193,8 +193,8 @@
 				postprocessing.materialConvolution = new THREE.MeshShaderMaterial( {
 
 					uniforms: convolution_uniforms,
-					vertex_shader:   "#define KERNEL_SIZE 25.0\n" + convolution_shader.vertex_shader,
-					fragment_shader: "#define KERNEL_SIZE 25\n"   + convolution_shader.fragment_shader
+					vertexShader:   "#define KERNEL_SIZE 25.0\n" + convolution_shader.vertexShader,
+					fragmentShader: "#define KERNEL_SIZE 25\n"   + convolution_shader.fragmentShader
 
 				} );
 

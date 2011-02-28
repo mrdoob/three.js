@@ -41,14 +41,14 @@
 		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
-		<script id="vertex_shader" type="x-shader/x-vertex">
+		<script id="vertexShader" type="x-shader/x-vertex">
 			void main()
 			{
 				gl_Position = vec4( position, 1.0 );
 			}
 		</script>
 
-		<script id="fragment_shader" type="x-shader/x-fragment">
+		<script id="fragmentShader" type="x-shader/x-fragment">
 			#ifdef GL_ES
 			precision highp float;
 			#endif
@@ -120,8 +120,8 @@
 				material = new THREE.MeshShaderMaterial( {
 
 					uniforms: uniforms,
-					vertex_shader: document.getElementById( 'vertex_shader' ).textContent,
-					fragment_shader: document.getElementById( 'fragment_shader' ).textContent
+					vertexShader: document.getElementById( 'vertexShader' ).textContent,
+					fragmentShader: document.getElementById( 'fragmentShader' ).textContent
 
 					} );
 
