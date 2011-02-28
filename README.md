@@ -5,8 +5,7 @@ three.js
 
 The aim of this project is to create a lightweight 3D engine with a very low level of abstraction (for dummies). The engine can render using &lt;canvas&gt;, &lt;svg&gt; and WebGL.
 
-Be aware that the API may change from revision to revision breaking backwards compatibility.
-[API Reference](https://github.com/mrdoob/three.js/wiki/r33-API-Reference)
+[API Reference](https://github.com/mrdoob/three.js/wiki/r33-API-Reference). Be aware that the API may change from revision to revision breaking backwards compatibility.
 
 More? [#three.js on irc.freenode.net](http://webchat.freenode.net/?channels=three.js)
 
