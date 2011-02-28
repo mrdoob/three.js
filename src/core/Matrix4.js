@@ -81,9 +81,9 @@ THREE.Matrix4.prototype = {
 		this.n41 = 0; this.n42 = 0; this.n43 = 0; this.n44 = 1;
 */
 
-		this.n11 = x.x; this.n12 = y.x; this.n13 = z.x; this.n14 = -eye.x;
-		this.n21 = x.y; this.n22 = y.y; this.n23 = z.y; this.n24 = -eye.y;
-		this.n31 = x.z; this.n32 = y.z; this.n33 = z.z; this.n34 = -eye.z;
+		this.n11 = x.x; this.n12 = y.x; this.n13 = z.x; this.n14 = eye.x;
+		this.n21 = x.y; this.n22 = y.y; this.n23 = z.y; this.n24 = eye.y;
+		this.n31 = x.z; this.n32 = y.z; this.n33 = z.z; this.n34 = eye.z;
 
 		return this;
 
