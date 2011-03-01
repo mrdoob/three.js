@@ -40,6 +40,7 @@ THREE.QuakeCamera = function ( parameters ) {
 
 	this.noFly = false;
 	this.lookVertical = true;
+	this.autoForward = false;
 
 	this.domElement = document;
 
@@ -49,6 +50,7 @@ THREE.QuakeCamera = function ( parameters ) {
 		if ( parameters.lookSpeed !== undefined ) this.lookSpeed  = parameters.lookSpeed;
 		if ( parameters.noFly !== undefined ) this.noFly = parameters.noFly;
 		if ( parameters.lookVertical !== undefined ) this.lookVertical = parameters.lookVertical;
+		if ( parameters.autoForward !== undefined ) this.autoForward = parameters.autoForward;
 
 		if ( parameters.domElement !== undefined ) this.domElement = parameters.domElement;
 
@@ -147,7 +149,7 @@ THREE.QuakeCamera = function ( parameters ) {
 
 	this.update = function() {
 
-		if ( this.moveForward ) this.translateZ( - this.movementSpeed, this.noFly );
+		if ( this.moveForward || this.autoForward ) this.translateZ( - this.movementSpeed, this.noFly );
 		if ( this.moveBackward ) this.translateZ( this.movementSpeed, this.noFly );
 		if ( this.moveLeft ) this.translateX( - this.movementSpeed, this.noFly );
 		if ( this.moveRight ) this.translateX( this.movementSpeed, this.noFly );
