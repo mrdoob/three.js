@@ -46,8 +46,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	_projScreenMatrix = new THREE.Matrix4(),
 	_projectionMatrixArray = new Float32Array( 16 ),
-	_cameraInverseMatrixArray = new Float32Array( 16 ),
-
 	_viewMatrixArray = new Float32Array( 16 ),
 
 	_vector3 = new THREE.Vector4(),
@@ -1858,11 +1856,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		camera.matrixAutoUpdate && camera.update();
 
-		camera.matrixWorld.flattenToArray( _viewMatrixArray );
+		camera.matrixWorldInverse.flattenToArray( _viewMatrixArray );
 		camera.projectionMatrix.flattenToArray( _projectionMatrixArray );
-		camera.inverseMatrix.flattenToArray( _cameraInverseMatrixArray );
 
-		_projScreenMatrix.multiply( camera.projectionMatrix, camera.matrixWorld );
+		_projScreenMatrix.multiply( camera.projectionMatrix, camera.matrixWorldInverse );
 		computeFrustum( _projScreenMatrix );
 
 		if( THREE.AnimationHandler ) THREE.AnimationHandler.update();
@@ -2297,7 +2294,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setupMatrices ( object, camera ) {
 
-		object._modelViewMatrix.multiplyToArray( camera.matrixWorld, object.matrixWorld, object._modelViewMatrixArray );
+		object._modelViewMatrix.multiplyToArray( camera.matrixWorldInverse, object.matrixWorld, object._modelViewMatrixArray );
 		THREE.Matrix4.makeInvert3x3( object._modelViewMatrix ).transposeIntoArray( object._normalMatrixArray );
 
 	};
@@ -2471,7 +2468,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function loadUniformsSkinning( uniforms, object ) {
 
-		_gl.uniformMatrix4fv( uniforms.cameraInverseMatrix, false, _cameraInverseMatrixArray );
+		_gl.uniformMatrix4fv( uniforms.cameraInverseMatrix, false, _viewMatrixArray );
 		_gl.uniformMatrix4fv( uniforms.boneGlobalMatrices, false, object.boneMatrices );
 
 	};

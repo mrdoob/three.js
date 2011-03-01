@@ -49,6 +49,17 @@ THREE.Object3D.prototype = {
 			child.parent = this;
 			this.children.push( child );
 
+			
+			// add to scene
+			
+			var scene = this;
+			
+			while( scene instanceof THREE.Scene === false && scene !== undefined )
+				scene = scene.parent;
+			
+			if( scene !== undefined ) 
+				scene.addChildRecurse( child );
+
 		}
 
 	},
@@ -149,3 +160,8 @@ THREE.Object3D.prototype = {
 }
 
 THREE.Object3DCounter = { value: 0 };
+
+
+
+
+
