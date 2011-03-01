@@ -61,6 +61,7 @@ COMMON_FILES = [
 'objects/SkinnedMesh.js',
 'objects/Ribbon.js',
 'objects/Sound.js',
+'objects/LOD.js',
 'scenes/Scene.js',
 'scenes/Fog.js',
 'scenes/FogExp2.js',
