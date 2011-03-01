@@ -18,7 +18,6 @@ THREE.Object3D = function() {
 
 	this.matrix = new THREE.Matrix4();
 	this.matrixWorld = new THREE.Matrix4();
-	this.matrixRotation = new THREE.Matrix4();
 	this.matrixRotationWorld = new THREE.Matrix4();
 	this.matrixNeedsUpdate = true;
 	this.matrixAutoUpdate = true;
@@ -49,14 +48,13 @@ THREE.Object3D.prototype = {
 			child.parent = this;
 			this.children.push( child );
 
-			
 			// add to scene
-			
+
 			var scene = this;
-			
+
 			while( scene instanceof THREE.Scene === false && scene !== undefined )
 				scene = scene.parent;
-			
+
 			if( scene !== undefined ) 
 				scene.addChildRecurse( child );
 
@@ -83,25 +81,13 @@ THREE.Object3D.prototype = {
 
 		if ( this.useQuaternion )  {
 
-			this.matrixRotation.setRotationFromQuaternion( this.quaternion );
+			this.matrix.setRotationFromQuaternion( this.quaternion );
 
 		} else {
 
-			this.matrixRotation.setRotationFromEuler( this.rotation );
+			this.matrix.setRotationFromEuler( this.rotation );
 
 		}
-
-		this.matrix.n11 = this.matrixRotation.n11;
-		this.matrix.n12 = this.matrixRotation.n12;
-		this.matrix.n13 = this.matrixRotation.n13;
-
-		this.matrix.n21 = this.matrixRotation.n21;
-		this.matrix.n22 = this.matrixRotation.n22;
-		this.matrix.n23 = this.matrixRotation.n23;
-
-		this.matrix.n31 = this.matrixRotation.n31;
-		this.matrix.n32 = this.matrixRotation.n32;
-		this.matrix.n33 = this.matrixRotation.n33;
 
 		if ( this.scale.x !== 1 || this.scale.y !== 1 || this.scale.z !== 1 ) {
 
@@ -113,8 +99,6 @@ THREE.Object3D.prototype = {
 		return true;
 
 	},
-
-	// TODO: Add link to parent so rotationWorld can be updated too.
 
 	update: function ( parentMatrixWorld, forceUpdate, camera ) {
 
@@ -140,6 +124,22 @@ THREE.Object3D.prototype = {
 
 				}
 
+				// extract rotation matrix
+
+				var invScaleX = 1 / this.scale.x, invScaleY = 1 / this.scale.y, invScaleZ = 1 / this.scale.z;
+
+				this.matrixRotationWorld.n11 = this.matrixWorld.n11 * invScaleX;
+				this.matrixRotationWorld.n21 = this.matrixWorld.n21 * invScaleX;
+				this.matrixRotationWorld.n31 = this.matrixWorld.n31 * invScaleX;
+
+				this.matrixRotationWorld.n12 = this.matrixWorld.n12 * invScaleY;
+				this.matrixRotationWorld.n22 = this.matrixWorld.n22 * invScaleY;
+				this.matrixRotationWorld.n32 = this.matrixWorld.n32 * invScaleY;
+
+				this.matrixRotationWorld.n13 = this.matrixWorld.n13 * invScaleZ;
+				this.matrixRotationWorld.n23 = this.matrixWorld.n23 * invScaleZ;
+				this.matrixRotationWorld.n33 = this.matrixWorld.n33 * invScaleZ;
+
 				this.matrixNeedsUpdate = false;
 				forceUpdate = true;
 
@@ -160,8 +160,3 @@ THREE.Object3D.prototype = {
 }
 
 THREE.Object3DCounter = { value: 0 };
-
-
-
-
-

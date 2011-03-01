@@ -60,7 +60,7 @@ THREE.Ray.prototype = {
 			c = objMatrix.multiplyVector3( vertices[ face.c ].position.clone() );
 			d = face instanceof THREE.Face4 ? objMatrix.multiplyVector3( vertices[ face.d ].position.clone() ) : null;
 
-			normal = object.matrixRotation.multiplyVector3( face.normal.clone() );
+			normal = object.matrixRotationWorld.multiplyVector3( face.normal.clone() );
 			dot = direction.dot( normal );
 
 			if ( dot < 0 ) { // Math.abs( dot ) > 0.0001

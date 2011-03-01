@@ -65,7 +65,7 @@ THREE.Projector = function() {
 
 	};
 
-	// TODO: Rename to projectElements? Test also using it with projectObjects to speed up sorting?
+	// TODO: Rename to projectElements?
 
 	this.projectScene = function ( scene, camera, sort ) {
 
@@ -80,7 +80,7 @@ THREE.Projector = function() {
 
 		camera.matrixAutoUpdate && camera.update();
 
-		_projScreenMatrix.multiply( camera.projectionMatrix, camera.matrixWorld );
+		_projScreenMatrix.multiply( camera.projectionMatrix, camera.matrixWorldInverse );
 		computeFrustum( _projScreenMatrix );
 
 		scene.update( undefined, false, camera );
@@ -93,10 +93,8 @@ THREE.Projector = function() {
 
 			if ( !object.visible ) continue;
 
-			object.matrixAutoUpdate && object.updateMatrix();
-
 			objectMatrix = object.matrixWorld;
-			objectMatrixRotation = object.matrixRotation;
+			objectMatrixRotation = object.matrixRotationWorld;
 
 			objectMaterials = object.materials;
 			objectOverdraw = object.overdraw;
@@ -375,10 +373,9 @@ THREE.Projector = function() {
 
 	this.unprojectVector = function ( vector, camera ) {
 
-		var matrix = THREE.Matrix4.makeInvert( camera.matrixWorld );
+		var matrix = camera.matrixWorld.clone();
 
 		matrix.multiplySelf( THREE.Matrix4.makeInvert( camera.projectionMatrix ) );
-
 		matrix.multiplyVector3( vector );
 
 		return vector;

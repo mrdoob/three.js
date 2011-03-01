@@ -143,7 +143,7 @@
 
 				tmpVec.copy( intersector.face.normal );
 
-				voxelPosition.add( intersector.point, intersector.object.matrixRotation.multiplyVector3( tmpVec ) );
+				voxelPosition.add( intersector.point, intersector.object.matrixRotationWorld.multiplyVector3( tmpVec ) );
 
 				voxelPosition.x = Math.floor( voxelPosition.x / 50 ) * 50 + 25;
 				voxelPosition.y = Math.floor( voxelPosition.y / 50 ) * 50 + 25;
