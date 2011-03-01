@@ -28,6 +28,7 @@ COMMON_FILES = [
 'core/Face4.js',
 'core/UV.js',
 'core/Geometry.js',
+'core/Spline.js',
 'animation/AnimationHandler.js',
 'animation/Animation.js',
 'cameras/Camera.js',
