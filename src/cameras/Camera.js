@@ -20,8 +20,8 @@ THREE.Camera = function( fov, aspect, near, far, target ) {
 
 	this.up = new THREE.Vector3( 0, 1, 0 );
 
-	this.inverseMatrix     = new THREE.Matrix4();
-	this.projectionMatrix = null;
+	this.matrixWorldInverse = new THREE.Matrix4();
+	this.projectionMatrix   = null;
 
 	// movement
 
@@ -103,8 +103,7 @@ THREE.Camera.prototype.update = function( parentMatrixWorld, forceUpdate, camera
 
 		}
 
-		THREE.Matrix4.makeInvert( this.matrixWorld, this.inverseMatrix );
-		//THREE.Matrix4.makeInvertTo( this.matrixWorld, this.inverseMatrix );
+		THREE.Matrix4.makeInvert( this.matrixWorld, this.matrixWorldInverse );
 
 		forceUpdate = true;
 
@@ -126,10 +125,9 @@ THREE.Camera.prototype.update = function( parentMatrixWorld, forceUpdate, camera
 			}
 
 			this.matrixNeedsUpdate = false;
-			forceUpdate              = true;
+			forceUpdate            = true;
 
-			THREE.Matrix4.makeInvert( this.matrixWorld, this.inverseMatrix );
-			//THREE.Matrix4.makeInvertTo( this.matrixWorld, this.inverseMatrix );
+			THREE.Matrix4.makeInvert( this.matrixWorld, this.matrixWorldInverse );
 
 		}
 
@@ -148,7 +146,7 @@ THREE.Camera.prototype.update = function( parentMatrixWorld, forceUpdate, camera
 
 /*
  * FrustumContains
- * Checks object against projected image (as opposed to ordinary frustum check)
+ * Checks object against projected image (as opposed to ordinary 3D frustum check)
  *
  * TODO: make it work also for ortho camera
  */
@@ -163,7 +161,7 @@ THREE.Camera.prototype.frustumContains = function( object3D ) {
 
 	// check z
 
-	var inverse = this.inverseMatrix;
+	var inverse = this.matrixWorldInverse;
 	var radius = object3D.boundRadius * object3D.boundRadiusScale;
 	var vz1 = ( inverse.n31 * vx0 + inverse.n32 * vy0 + inverse.n33 * vz0 + inverse.n34 );
 

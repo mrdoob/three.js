@@ -150,19 +150,19 @@
 					// manually create local matrix
 
 					ribbon.matrix.setPosition( ribbon.position );
-					ribbon.matrixRotation.setRotationFromEuler( ribbon.rotation );
+					ribbon.matrixRotationWorld.setRotationFromEuler( ribbon.rotation );
 
-					ribbon.matrix.n11 = ribbon.matrixRotation.n11;
-					ribbon.matrix.n12 = ribbon.matrixRotation.n12;
-					ribbon.matrix.n13 = ribbon.matrixRotation.n13;
+					ribbon.matrix.n11 = ribbon.matrixRotationWorld.n11;
+					ribbon.matrix.n12 = ribbon.matrixRotationWorld.n12;
+					ribbon.matrix.n13 = ribbon.matrixRotationWorld.n13;
 
-					ribbon.matrix.n21 = ribbon.matrixRotation.n21;
-					ribbon.matrix.n22 = ribbon.matrixRotation.n22;
-					ribbon.matrix.n23 = ribbon.matrixRotation.n23;
+					ribbon.matrix.n21 = ribbon.matrixRotationWorld.n21;
+					ribbon.matrix.n22 = ribbon.matrixRotationWorld.n22;
+					ribbon.matrix.n23 = ribbon.matrixRotationWorld.n23;
 
-					ribbon.matrix.n31 = ribbon.matrixRotation.n31;
-					ribbon.matrix.n32 = ribbon.matrixRotation.n32;
-					ribbon.matrix.n33 = ribbon.matrixRotation.n33;
+					ribbon.matrix.n31 = ribbon.matrixRotationWorld.n31;
+					ribbon.matrix.n32 = ribbon.matrixRotationWorld.n32;
+					ribbon.matrix.n33 = ribbon.matrixRotationWorld.n33;
 
 					ribbon.matrix.multiplySelf( tmpRot );
 
