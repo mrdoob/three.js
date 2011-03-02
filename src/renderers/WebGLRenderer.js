@@ -2095,14 +2095,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		/*
-		for ( var o = 0, ol = scene.__objectsAdded.length; o < ol; o ++ ) {
-
-			addObject( scene.__objectsAdded[ o ], scene );
-
-		}
-		*/
-
 		while ( scene.__objectsRemoved.length ) {
 
 			removeObject( scene.__objectsRemoved[ 0 ], scene );
@@ -2116,6 +2108,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 			scene.__objectsAdded.splice( 0, 1 );
 
 		}
+
+		// update must be called after objects adding / removal
+		
+		for ( var o = 0, ol = scene.__webglObjects.length; o < ol; o ++ ) {
+
+			updateObject( scene.__webglObjects[ o ], scene );
+
+		}
+		
 
 	};
 
@@ -2169,26 +2170,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				if ( geometry.__dirtyVertices || geometry.__dirtyElements ||
-					geometry.__dirtyUvs || geometry.__dirtyNormals ||
-					geometry.__dirtyColors || geometry.__dirtyTangents ) {
-
-					setMeshBuffers( geometryGroup, object, _gl.DYNAMIC_DRAW );
-
-				}
-
 				// create separate wrapper per each use of VBO
 
 				addBuffer( objlist, geometryGroup, object );
 
 			}
-
-			geometry.__dirtyVertices = false;
-			geometry.__dirtyElements = false;
-			geometry.__dirtyUvs = false;
-			geometry.__dirtyNormals = false;
-			geometry.__dirtyTangents = false;
-			geometry.__dirtyColors = false;
 
 		} else if ( object instanceof THREE.Ribbon ) {
 
@@ -2204,16 +2190,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			if( geometry.__dirtyVertices || geometry.__dirtyColors ) {
-
-				setRibbonBuffers( geometry, _gl.DYNAMIC_DRAW );
-
-			}
-
 			addBuffer( objlist, geometry, object );
-
-			geometry.__dirtyVertices = false;
-			geometry.__dirtyColors = false;
 
 		} else if ( object instanceof THREE.Line ) {
 
@@ -2229,16 +2206,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			if( geometry.__dirtyVertices ||  geometry.__dirtyColors ) {
-
-				setLineBuffers( geometry, _gl.DYNAMIC_DRAW );
-
-			}
-
 			addBuffer( objlist, geometry, object );
-
-			geometry.__dirtyVertices = false;
-			geometry.__dirtyColors = false;
 
 		} else if ( object instanceof THREE.ParticleSystem ) {
 
@@ -2254,16 +2222,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			if ( geometry.__dirtyVertices || geometry.__dirtyColors || object.sortParticles ) {
-
-				setParticleBuffers( geometry, _gl.DYNAMIC_DRAW, object );
-
-			}
-
 			addBuffer( objlist, geometry, object );
-
-			geometry.__dirtyVertices = false;
-			geometry.__dirtyColors = false;
 
 		} else if ( THREE.MarchingCubes !== undefined && object instanceof THREE.MarchingCubes ) {
 
@@ -2275,6 +2234,88 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	function updateObject( webGLObject, scene ) {
+
+		var g, geometry, geometryGroup, webGLObject, object;
+
+		object = webGLObject.object;
+
+		if ( object instanceof THREE.Mesh ) {
+
+			geometry = object.geometry;
+
+			// check all geometry groups
+
+			for ( g in geometry.geometryGroups ) {
+
+				geometryGroup = geometry.geometryGroups[ g ];
+
+				if ( geometry.__dirtyVertices || geometry.__dirtyElements ||
+					geometry.__dirtyUvs || geometry.__dirtyNormals ||
+					geometry.__dirtyColors || geometry.__dirtyTangents ) {
+
+					setMeshBuffers( geometryGroup, object, _gl.DYNAMIC_DRAW );
+
+				}
+
+			}
+
+			geometry.__dirtyVertices = false;
+			geometry.__dirtyElements = false;
+			geometry.__dirtyUvs = false;
+			geometry.__dirtyNormals = false;
+			geometry.__dirtyTangents = false;
+			geometry.__dirtyColors = false;
+
+		} else if ( object instanceof THREE.Ribbon ) {
+
+			geometry = object.geometry;
+
+			if( geometry.__dirtyVertices || geometry.__dirtyColors ) {
+
+				setRibbonBuffers( geometry, _gl.DYNAMIC_DRAW );
+
+			}
+
+			geometry.__dirtyVertices = false;
+			geometry.__dirtyColors = false;
+
+		} else if ( object instanceof THREE.Line ) {
+
+			geometry = object.geometry;
+
+			if( geometry.__dirtyVertices ||  geometry.__dirtyColors ) {
+
+				setLineBuffers( geometry, _gl.DYNAMIC_DRAW );
+
+			}
+
+			geometry.__dirtyVertices = false;
+			geometry.__dirtyColors = false;
+
+		} else if ( object instanceof THREE.ParticleSystem ) {
+
+			geometry = object.geometry;
+
+			if ( geometry.__dirtyVertices || geometry.__dirtyColors || object.sortParticles ) {
+
+				setParticleBuffers( geometry, _gl.DYNAMIC_DRAW, object );
+
+			}
+
+			geometry.__dirtyVertices = false;
+			geometry.__dirtyColors = false;
+
+		} else if ( THREE.MarchingCubes !== undefined && object instanceof THREE.MarchingCubes ) {
+
+			// it updates itself in render callback
+			
+		}/*else if ( object instanceof THREE.Particle ) {
+
+		}*/
+
+	};
+	
 	function sortFacesByMaterial( geometry ) {
 
 		// TODO
