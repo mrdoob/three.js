@@ -3,7 +3,7 @@
  * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Cube.as
  */
 
-var Cube = function ( width, height, depth, segmentsWidth, segmentsHeight, materials, flipped, sides ) {
+var Cube = function ( width, height, depth, segmentsWidth, segmentsHeight, segmentsDepth, materials, flipped, sides ) {
 
 	THREE.Geometry.call( this );
 
@@ -67,12 +67,8 @@ var Cube = function ( width, height, depth, segmentsWidth, segmentsHeight, mater
 		var w, ix, iy,
 		gridX = segmentsWidth || 1,
 		gridY = segmentsHeight || 1,
-		gridX1 = gridX + 1,
-		gridY1 = gridY + 1,
 		width_half = width / 2,
 		height_half = height / 2,
-		segment_width = width / gridX,
-		segment_height = height / gridY,
 		offset = scope.vertices.length;
 
 		if ( ( u == 'x' && v == 'y' ) || ( u == 'y' && v == 'x' ) ) {
@@ -82,13 +78,19 @@ var Cube = function ( width, height, depth, segmentsWidth, segmentsHeight, mater
 		} else if ( ( u == 'x' && v == 'z' ) || ( u == 'z' && v == 'x' ) ) {
 
 			w = 'y';
+			gridY = segmentsDepth || 1;
 
 		} else if ( ( u == 'z' && v == 'y' ) || ( u == 'y' && v == 'z' ) ) {
 
 			w = 'x';
+			gridX = segmentsDepth || 1;
 
 		}
 
+		var gridX1 = gridX + 1,
+		gridY1 = gridY + 1,
+		segment_width = width / gridX,
+		segment_height = height / gridY;
 
 		for( iy = 0; iy < gridY1; iy++ ) {
 
