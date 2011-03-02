@@ -14,7 +14,13 @@
  *  lookSpeed: <float>,
  
  *  noFly: <bool>, 
- *  lookVertical: <bool>, 
+ *  lookVertical: <bool>,
+ *  autoForward: <bool>,
+ 
+ *  heightSpeed: <bool>,
+ *  heightCoef: <float>,
+ *  heightMin: <float>,
+ *  heightMax: <float>,
  
  *  domElement: <HTMLElement>, 
  * }
@@ -36,6 +42,12 @@ function clamp_bottom( x, a ) {
 	
 };
 
+function clamp( x, a, b ) {
+	
+	return x < a ? a : ( x > b ? b : x );
+	
+};
+
 THREE.QuakeCamera = function ( parameters ) {
 
 	THREE.Camera.call( this, parameters.fov, parameters.aspect, parameters.near, parameters.far, parameters.target );
@@ -47,6 +59,7 @@ THREE.QuakeCamera = function ( parameters ) {
 	this.lookVertical = true;
 	this.autoForward = false;
 	
+	this.heightSpeed = false;
 	this.heightCoef = 1.0;
 	this.heightMin = 0.0;
 	
@@ -60,16 +73,17 @@ THREE.QuakeCamera = function ( parameters ) {
 		if ( parameters.lookVertical !== undefined ) this.lookVertical = parameters.lookVertical;
 		
 		if ( parameters.autoForward !== undefined ) this.autoForward = parameters.autoForward;
-		if ( parameters.autoSpeed !== undefined ) this.autoSpeed = parameters.autoSpeed;
 		
+		if ( parameters.heightSpeed !== undefined ) this.heightSpeed = parameters.heightSpeed;
 		if ( parameters.heightCoef !== undefined ) this.heightCoef = parameters.heightCoef;
 		if ( parameters.heightMin !== undefined ) this.heightMin = parameters.heightMin;
+		if ( parameters.heightMax !== undefined ) this.heightMax = parameters.heightMax;
 
 		if ( parameters.domElement !== undefined ) this.domElement = parameters.domElement;
 
 	}
 
-	this.autoSpeedFactor = 1.0;
+	this.autoSpeedFactor = 0.0;
 	
 	this.mouseX = 0;
 	this.mouseY = 0;
@@ -164,16 +178,20 @@ THREE.QuakeCamera = function ( parameters ) {
 
 	this.update = function() {
 
-		if ( this.autoSpeed ) {
-		
-			if ( this.position.y > this.heightMin )
-				this.autoSpeedFactor = clamp_bottom( ( this.position.y - this.heightMin ) * this.heightCoef, 1.0 );
-			else
-				this.autoSpeedFactor = 1.0;
+		if ( this.heightSpeed ) {
+
+			var y = clamp( this.position.y, this.heightMin, this.heightMax ),
+				delta = y - this.heightMin;
 			
+			this.autoSpeedFactor = delta * this.heightCoef;
+			
+		} else {
+				
+			this.autoSpeedFactor = 0.0;
+
 		}
-		
-		if ( this.moveForward || this.autoForward ) this.translateZ( - this.movementSpeed * this.autoSpeedFactor, this.noFly );
+
+		if ( this.moveForward || this.autoForward ) this.translateZ( - ( this.movementSpeed + this.autoSpeedFactor ), this.noFly );
 		if ( this.moveBackward ) this.translateZ( this.movementSpeed, this.noFly );
 		if ( this.moveLeft ) this.translateX( - this.movementSpeed, this.noFly );
 		if ( this.moveRight ) this.translateX( this.movementSpeed, this.noFly );
