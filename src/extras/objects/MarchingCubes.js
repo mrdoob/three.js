@@ -657,9 +657,7 @@ THREE.MarchingCubes = function ( resolution, materials ) {
 		
 		this.render( geo_callback );
 		
-		geo.sortFacesByMaterial();
-		
-		//console.log( "generated " + geo.faces.length + " triangles" );
+		// console.log( "generated " + geo.faces.length + " triangles" );
 		
 		return geo;
 		

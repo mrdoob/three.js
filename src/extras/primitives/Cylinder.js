@@ -68,7 +68,6 @@ var Cylinder = function ( numSegs, topRad, botRad, height, topOffset, botOffset 
 
 	this.computeCentroids();
 	this.computeFaceNormals();
-	this.sortFacesByMaterial();
 
 	function v( x, y, z ) {
 

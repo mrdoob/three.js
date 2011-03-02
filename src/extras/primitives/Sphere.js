@@ -106,7 +106,6 @@ var Sphere = function ( radius, segmentsWidth, segmentsHeight ) {
 	this.computeCentroids();
 	this.computeFaceNormals();
 	this.computeVertexNormals();
-	this.sortFacesByMaterial();
 
 	this.boundingSphere = { radius: radius };
 

@@ -300,7 +300,6 @@ THREE.Loader.prototype = {
 
 			this.computeCentroids();
 			this.computeFaceNormals();
-			this.sortFacesByMaterial();
 
 			//var e = (new Date).getTime();
 
@@ -763,7 +762,6 @@ THREE.Loader.prototype = {
 
 			this.computeCentroids();
 			this.computeFaceNormals();
-			this.sortFacesByMaterial();
 
 			function init_skin() {
 				

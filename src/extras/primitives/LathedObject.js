@@ -60,7 +60,6 @@ function LathedObject( verts, nsteps, latheAngle ) {
 	this.computeCentroids();
 	this.computeFaceNormals();
 	this.computeVertexNormals();
-	this.sortFacesByMaterial();
 
 };
 

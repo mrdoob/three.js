@@ -17,13 +17,9 @@ THREE.Geometry = function () {
 
 	this.skinWeights = [];
 	this.skinIndices = [];
-	//this.skinVerticesA = [];
-	//this.skinVerticesB = [];
 
 	this.boundingBox = null;
 	this.boundingSphere = null;
-
-	this.geometryChunks = {};
 
 	this.hasTangents = false;
 
@@ -390,80 +386,6 @@ THREE.Geometry.prototype = {
 		}
 
 		this.boundingSphere = { radius: radius };
-
-	},
-
-	sortFacesByMaterial: function () {
-
-		// TODO
-		// Should optimize by grouping faces with ColorFill / ColorStroke materials
-		// which could then use vertex color attributes instead of each being
-		// in its separate VBO
-
-		var i, l, f, fl, face, material, materials, vertices, mhash, ghash, hash_map = {};
-
-		function materialHash( material ) {
-
-			var hash_array = [];
-
-			for ( i = 0, l = material.length; i < l; i++ ) {
-
-				if ( material[ i ] == undefined ) {
-
-					hash_array.push( "undefined" );
-
-				} else {
-
-					hash_array.push( material[ i ].id );
-
-				}
-
-			}
-
-			return hash_array.join( '_' );
-
-		}
-
-		for ( f = 0, fl = this.faces.length; f < fl; f++ ) {
-
-			face = this.faces[ f ];
-			materials = face.materials;
-
-			mhash = materialHash( materials );
-
-			if ( hash_map[ mhash ] == undefined ) {
-
-				hash_map[ mhash ] = { 'hash': mhash, 'counter': 0 };
-
-			}
-
-			ghash = hash_map[ mhash ].hash + '_' + hash_map[ mhash ].counter;
-
-			if ( this.geometryChunks[ ghash ] == undefined ) {
-
-				this.geometryChunks[ ghash ] = { 'faces': [], 'materials': materials, 'vertices': 0 };
-
-			}
-
-			vertices = face instanceof THREE.Face3 ? 3 : 4;
-
-			if ( this.geometryChunks[ ghash ].vertices + vertices > 65535 ) {
-
-				hash_map[ mhash ].counter += 1;
-				ghash = hash_map[ mhash ].hash + '_' + hash_map[ mhash ].counter;
-
-				if ( this.geometryChunks[ ghash ] == undefined ) {
-
-					this.geometryChunks[ ghash ] = { 'faces': [], 'materials': materials, 'vertices': 0 };
-
-				}
-
-			}
-
-			this.geometryChunks[ ghash ].faces.push( f );
-			this.geometryChunks[ ghash ].vertices += vertices;
-
-		}
 
 	}
 

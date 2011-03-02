@@ -90,7 +90,6 @@ var Icosahedron = function ( subdivisions ) {
 	this.computeCentroids();
 	this.computeFaceNormals();
 	this.computeVertexNormals();
-	this.sortFacesByMaterial();
 
 	function v( x, y, z ) {
 		var length = Math.sqrt(x * x + y * y + z * z);
@@ -176,4 +175,3 @@ var Icosahedron = function ( subdivisions ) {
 
 Icosahedron.prototype = new THREE.Geometry();
 Icosahedron.prototype.constructor = Icosahedron;
-

@@ -193,7 +193,6 @@
 
 				geometry.computeFaceNormals();
 				geometry.computeCentroids();
-				geometry.sortFacesByMaterial();
 
 				mesh = new THREE.Mesh( geometry, [ new THREE.MeshFaceMaterial(), new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, wireframe: true, wireframeLinewidth: 10 } ) ] );
 				mesh.doubleSided = true;

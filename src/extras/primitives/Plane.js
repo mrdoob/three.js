@@ -54,7 +54,6 @@ var Plane = function ( width, height, segmentsWidth, segmentsHeight ) {
 
 	this.computeCentroids();
 	this.computeFaceNormals();
-	this.sortFacesByMaterial();
 
 };
 

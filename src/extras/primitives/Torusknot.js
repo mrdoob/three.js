@@ -69,7 +69,6 @@ var Torusknot = function (radius, tube, segmentsR, segmentsT, p, q, heightScale)
 	this.computeCentroids();
 	this.computeFaceNormals();
 	this.computeVertexNormals();
-	this.sortFacesByMaterial();
 
 	function vert( x, y, z ) {
 		var i = scope.vertices.push( new THREE.Vertex( new THREE.Vector3( x, y, z ) ) );

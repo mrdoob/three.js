@@ -52,7 +52,6 @@ var Torus = function ( radius, tube, segmentsR, segmentsT ) {
 	this.computeCentroids();
 	this.computeFaceNormals();
 	this.computeVertexNormals();
-	this.sortFacesByMaterial();
 
 	function vert( x, y, z ) {
 		scope.vertices.push( new THREE.Vertex( new THREE.Vector3( x, y, z ) ) );
