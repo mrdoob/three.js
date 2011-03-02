@@ -5,7 +5,7 @@ three.js
 
 The aim of this project is to create a lightweight 3D engine with a very low level of abstraction — in other words, for dummies. The engine can render using &lt;canvas&gt;, &lt;svg&gt; and WebGL.
 
-[API Reference](https://github.com/mrdoob/three.js/wiki/r33-API-Reference) — be aware that the API may change from revision to revision breaking backwards compatibility.
+[API Reference](https://github.com/mrdoob/three.js/wiki/r34-API-Reference) — be aware that the API may change from revision to revision breaking backwards compatibility.
 
 More? [#three.js on irc.freenode.net](http://webchat.freenode.net/?channels=three.js)
 
@@ -134,9 +134,17 @@ This code creates a camera, then creates a scene object, adds a bunch of random 
 
 ### Change Log ###
 
+2011 03 02 - **r34** (186.045 KB, gzip: 45.953 KB)
+
+* Now using camera.matrixWorldInverse instead of camera.matrixWorld for projecting. ([alteredq](http://github.com/alteredq) and [mrdoob](http://github.com/mrdoob))
+* Camel cased properties and object json format (**Re-exporting of models required**) ([alteredq](http://github.com/alteredq))
+* Added `QuakeCamera` for easy fly-bys ([alteredq](http://github.com/alteredq))
+* Added `LOD` example ([alteredq](http://github.com/alteredq))
+
 
 2011 02 26 - **r33** (184.483 KB, gzip: 45.580 KB)
 
+* Changed build setup (**build/Three.js now also include extras**) ([mrdoob](http://github.com/mrdoob))
 * Added `ParticleSystem` object to `WebGLRenderer` ([alteredq](http://github.com/alteredq))
 * Added `Line` support to `WebGLRenderer` ([alteredq](http://github.com/alteredq))
 * Added vertex colors support to `WebGLRenderer` ([alteredq](http://github.com/alteredq))
@@ -144,8 +152,7 @@ This code creates a camera, then creates a scene object, adds a bunch of random 
 * Added updateable textures support to `WebGLRenderer` ([alteredq](http://github.com/alteredq))
 * Added `Sound` object and `SoundRenderer`. ([empaempa](http://github.com/empaempa))
 * `LOD`, `Bone`, `SkinnedMesh` objects and hierarchy being developed. ([empaempa](http://github.com/empaempa))
-* Changed build setup (`Three.js` now includes everything. `Three*.js` inside `build/custom` folder) ([mrdoob](http://github.com/mrdoob))
-* Many internal changes.
+* Added hierarchies examples ([mrdoob](http://github.com/mrdoob))
 
 
 2010 12 31 - **r32** (89.301 KB, gzip: 21.351 KB)

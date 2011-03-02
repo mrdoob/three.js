@@ -12,8 +12,8 @@ THREE.Camera = function( fov, aspect, near, far, target ) {
 	this.near = near || 0.1;
 	this.far = far || 2000;
 
-	this.screenCenterX = 0;
-	this.screenCenterY = 0;
+	// this.screenCenterX = 0;
+	// this.screenCenterY = 0;
 
 	this.target = target || new THREE.Object3D();
 	this.useTarget = true;
@@ -143,7 +143,6 @@ THREE.Camera.prototype.update = function( parentMatrixWorld, forceUpdate, camera
 
 };
 
-
 /*
  * FrustumContains
  * Checks object against projected image (as opposed to ordinary 3D frustum check)
@@ -151,6 +150,7 @@ THREE.Camera.prototype.update = function( parentMatrixWorld, forceUpdate, camera
  * TODO: make it work also for ortho camera
  */
 
+/*
 THREE.Camera.prototype.frustumContains = function( object3D ) {
 
 	// object pos
@@ -212,3 +212,4 @@ THREE.Camera.prototype.frustumContains = function( object3D ) {
 	return true;
 
 };
+*/
