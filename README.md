@@ -136,7 +136,7 @@ This code creates a camera, then creates a scene object, adds a bunch of random 
 
 2011 03 02 - **r34** (186.045 KB, gzip: 45.953 KB)
 
-* Now using camera.matrixWorldInverse instead of camera.matrixWorld for projecting. ([alteredq](http://github.com/alteredq) and [mrdoob](http://github.com/mrdoob))
+* Now using camera.matrixWorldInverse instead of camera.matrixWorld for projecting. ([empaempa](http://github.com/empaempa) and [mrdoob](http://github.com/mrdoob))
 * Camel cased properties and object json format (**Re-exporting of models required**) ([alteredq](http://github.com/alteredq))
 * Added `QuakeCamera` for easy fly-bys ([alteredq](http://github.com/alteredq))
 * Added `LOD` example ([alteredq](http://github.com/alteredq))
