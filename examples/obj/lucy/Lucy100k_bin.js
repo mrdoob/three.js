@@ -9,9 +9,9 @@
 
 var model = {
     'materials': [	{
-	"a_dbg_color" : 0xeeeeee,
-	"a_dbg_index" : 0,
-	"a_dbg_name" : "default"
+	"DbgColor" : 0xeeeeee,
+	"DbgIndex" : 0,
+	"DbgName" : "default"
 	}],
 
     'buffers': 'Lucy100k_bin.bin',

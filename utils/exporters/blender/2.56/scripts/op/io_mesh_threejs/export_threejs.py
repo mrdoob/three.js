@@ -74,14 +74,14 @@ var model = {
     'uvs': [%(uvs)s],
 
     'triangles': [%(triangles)s],
-    'triangles_n': [%(triangles_n)s],
-    'triangles_uv': [%(triangles_uv)s],
-    'triangles_n_uv': [%(triangles_n_uv)s],
+    'trianglesUvs': [%(trianglesUvs)s],
+    'trianglesNormals': [%(trianglesNormals)s],
+    'trianglesNormalsUvs': [%(trianglesNormalsUvs)s],
 
     'quads': [%(quads)s],
-    'quads_n': [%(quads_n)s],
-    'quads_uv': [%(quads_uv)s],
-    'quads_n_uv': [%(quads_n_uv)s],
+    'quadsUvs': [%(quadsUvs)s],
+    'quadsNormals': [%(quadsNormals)s],
+    'quadsNormalsUvs': [%(quadsNormalsUvs)s],
 
     'end': (new Date).getTime()
 
@@ -464,10 +464,10 @@ def generate_mtl(materials):
     for m in materials:
         index = materials[m]
         mtl[m] = {
-            'a_dbg_name': m,
-            'a_dbg_index': index,
-            'a_dbg_color': generate_color(index),
-            'vertex_colors' : False
+            'DbgName': m,
+            'DbgIndex': index,
+            'DbgColor': generate_color(index),
+            'vertexColors' : False
         }
     return mtl
 
@@ -490,10 +490,10 @@ def generate_materials(mtl, materials, use_colors):
         #  materials should be sorted according to how
         #  they appeared in OBJ file (for the first time)
         #  this index is identifier used in face definitions
-        mtl[m]['a_dbg_name'] = m
-        mtl[m]['a_dbg_index'] = index
-        mtl[m]['a_dbg_color'] = generate_color(index)
-        mtl[m]['vertex_colors'] = use_colors
+        mtl[m]['DbgName'] = m
+        mtl[m]['DbgIndex'] = index
+        mtl[m]['DbgColor'] = generate_color(index)
+        mtl[m]['vertexColors'] = use_colors
 
         mtl_raw = ",\n".join(['\t"%s" : %s' % (n, value2string(v)) for n,v in sorted(mtl[m].items())])
         mtl_string = "\t{\n%s\n\t}" % mtl_raw
@@ -510,15 +510,15 @@ def extract_materials(mesh, scene):
             materials[m.name] = {}
             material = materials[m.name]
             
-            material['col_diffuse'] = [m.diffuse_intensity * m.diffuse_color[0],
+            material['colorDiffuse'] = [m.diffuse_intensity * m.diffuse_color[0],
                                        m.diffuse_intensity * m.diffuse_color[1],
                                        m.diffuse_intensity * m.diffuse_color[2]]
 
-            material['col_specular'] = [m.specular_intensity * m.specular_color[0],
+            material['colorSpecular'] = [m.specular_intensity * m.specular_color[0],
                                         m.specular_intensity * m.specular_color[1],
                                         m.specular_intensity * m.specular_color[2]]
 
-            material['col_ambient'] = [m.ambient * world.ambient_color[0],
+            material['colorAmbient'] = [m.ambient * world.ambient_color[0],
                                        m.ambient * world.ambient_color[1],
                                        m.ambient * world.ambient_color[2]]
 
@@ -527,13 +527,13 @@ def extract_materials(mesh, scene):
             # not sure about mapping values to Blinn-Phong shader
             # Blender uses INT from [1,511] with default 0
             # http://www.blender.org/documentation/blender_python_api_2_54_0/bpy.types.Material.html#bpy.types.Material.specular_hardness
-            material["specular_coef"] = m.specular_hardness
+            material["specularCoef"] = m.specular_hardness
 
             if m.active_texture and m.active_texture.type == 'IMAGE':
                 fn = bpy.path.abspath(m.active_texture.image.filepath)
                 fn = os.path.normpath(fn)
                 fn_strip = os.path.basename(fn)
-                material['map_diffuse'] = fn_strip
+                material['mapDiffuse'] = fn_strip
                 
             if m.specular_intensity > 0.0 and (m.specular_color[0] > 0 or m.specular_color[1] > 0 or m.specular_color[2] > 0):
                 material['shading'] = "Phong"
@@ -590,14 +590,14 @@ def generate_ascii_model(mesh, scene, use_normals, use_colors, use_uv_coords, al
     "vertices"      : ",".join(generate_vertex(v) for v in vertices),
 
     "triangles"     : ",".join(generate_triangle(f) for f in sfaces['triangles_flat']),
-    "triangles_n"   : ",".join(generate_triangle_n(f, normals, mesh) for f in sfaces['triangles_smooth']),
-    "triangles_uv"  : ",".join(generate_triangle_uv(f, uvs, mesh) for f in sfaces['triangles_flat_uv']),
-    "triangles_n_uv": ",".join(generate_triangle_n_uv(f, normals, uvs, mesh) for f in sfaces['triangles_smooth_uv']),
+    "trianglesUvs"  : ",".join(generate_triangle_uv(f, uvs, mesh) for f in sfaces['triangles_flat_uv']),
+    "trianglesNormals"   : ",".join(generate_triangle_n(f, normals, mesh) for f in sfaces['triangles_smooth']),
+    "trianglesNormalsUvs": ",".join(generate_triangle_n_uv(f, normals, uvs, mesh) for f in sfaces['triangles_smooth_uv']),
 
     "quads"         : ",".join(generate_quad(f) for f in sfaces['quads_flat']),
-    "quads_n"       : ",".join(generate_quad_n(f, normals, mesh) for f in sfaces['quads_smooth']),
-    "quads_uv"      : ",".join(generate_quad_uv(f, uvs, mesh) for f in sfaces['quads_flat_uv']),
-    "quads_n_uv"    : ",".join(generate_quad_n_uv(f, normals, uvs, mesh) for f in sfaces['quads_smooth_uv']),
+    "quadsUvs"      : ",".join(generate_quad_uv(f, uvs, mesh) for f in sfaces['quads_flat_uv']),
+    "quadsNormals"       : ",".join(generate_quad_n(f, normals, mesh) for f in sfaces['quads_smooth']),
+    "quadsNormalsUvs"    : ",".join(generate_quad_n_uv(f, normals, uvs, mesh) for f in sfaces['quads_smooth_uv']),
 
     "uvs"           : generate_uvs(uvs, use_uv_coords),
     "normals"       : generate_normals(normals, use_normals),

@@ -162,14 +162,14 @@ var model = {
     'uvs': [%(uvs)s],
 
     'triangles': [%(triangles)s],
-    'triangles_n': [%(triangles_n)s],
-    'triangles_uv': [%(triangles_uv)s],
-    'triangles_n_uv': [%(triangles_n_uv)s],
+    'trianglesUvs': [%(trianglesUvs)s],
+    'trianglesNormals': [%(trianglesNormals)s],
+    'trianglesNormalsUvs': [%(trianglesNormalsUvs)s],
 
     'quads': [%(quads)s],
-    'quads_n': [%(quads_n)s],
-    'quads_uv': [%(quads_uv)s],
-    'quads_n_uv': [%(quads_n_uv)s],
+    'quadsUvs': [%(quadsUvs)s],
+    'quadsNormals': [%(quadsNormals)s],
+    'quadsNormalsUvs': [%(quadsNormalsUvs)s],
 
     'end': (new Date).getTime()
     }
@@ -350,22 +350,22 @@ def parse_mtl(fname):
             # Diffuse color
             # Kd 1.000 1.000 1.000
             if chunks[0] == "Kd" and len(chunks) == 4:
-                materials[identifier]["col_diffuse"] = [float(chunks[1]), float(chunks[2]), float(chunks[3])]
+                materials[identifier]["colorDiffuse"] = [float(chunks[1]), float(chunks[2]), float(chunks[3])]
 
             # Ambient color
             # Ka 1.000 1.000 1.000
             if chunks[0] == "Ka" and len(chunks) == 4:
-                materials[identifier]["col_ambient"] = [float(chunks[1]), float(chunks[2]), float(chunks[3])]
+                materials[identifier]["colorAmbient"] = [float(chunks[1]), float(chunks[2]), float(chunks[3])]
 
             # Specular color
             # Ks 1.000 1.000 1.000
             if chunks[0] == "Ks" and len(chunks) == 4:
-                materials[identifier]["col_specular"] = [float(chunks[1]), float(chunks[2]), float(chunks[3])]
+                materials[identifier]["colorSpecular"] = [float(chunks[1]), float(chunks[2]), float(chunks[3])]
 
             # Specular coefficient
             # Ns 154.000
             if chunks[0] == "Ns" and len(chunks) == 2:
-                materials[identifier]["specular_coef"] = float(chunks[1])
+                materials[identifier]["specularCoef"] = float(chunks[1])
 
             # Transparency
             # Tr 0.9 or d 0.9
@@ -378,32 +378,32 @@ def parse_mtl(fname):
             # Optical density
             # Ni 1.0
             if chunks[0] == "Ni" and len(chunks) == 2:
-                materials[identifier]["optical_density"] = float(chunks[1])
+                materials[identifier]["opticalDensity"] = float(chunks[1])
 
             # Diffuse texture
             # map_Kd texture_diffuse.jpg
             if chunks[0] == "map_Kd" and len(chunks) == 2:
-                materials[identifier]["map_diffuse"] = chunks[1]
+                materials[identifier]["mapDiffuse"] = chunks[1]
 
             # Ambient texture
             # map_Ka texture_ambient.jpg
             if chunks[0] == "map_Ka" and len(chunks) == 2:
-                materials[identifier]["map_ambient"] = chunks[1]
+                materials[identifier]["mapAmbient"] = chunks[1]
 
             # Specular texture
             # map_Ks texture_specular.jpg
             if chunks[0] == "map_Ks" and len(chunks) == 2:
-                materials[identifier]["map_specular"] = chunks[1]
+                materials[identifier]["mapSpecular"] = chunks[1]
 
             # Alpha texture
             # map_d texture_alpha.png
             if chunks[0] == "map_d" and len(chunks) == 2:
-                materials[identifier]["map_alpha"] = chunks[1]
+                materials[identifier]["mapAlpha"] = chunks[1]
 
             # Bump texture
             # map_bump texture_bump.jpg or bump texture_bump.jpg
             if (chunks[0] == "map_bump" or chunks[0] == "bump") and len(chunks) == 2:
-                materials[identifier]["map_bump"] = chunks[1]
+                materials[identifier]["mapBump"] = chunks[1]
 
             # Illumination
             # illum 2
@@ -663,9 +663,9 @@ def generate_materials(mtl, materials):
         #  materials should be sorted according to how
         #  they appeared in OBJ file (for the first time)
         #  this index is identifier used in face definitions
-        mtl[m]['a_dbg_name'] = m
-        mtl[m]['a_dbg_index'] = index
-        mtl[m]['a_dbg_color'] = generate_color(index)
+        mtl[m]['DbgName'] = m
+        mtl[m]['DbgIndex'] = index
+        mtl[m]['DbgColor'] = generate_color(index)
         
         mtl_raw = ",\n".join(['\t"%s" : %s' % (n, value2string(v)) for n,v in sorted(mtl[m].items())])
         mtl_string = "\t{\n%s\n\t}" % mtl_raw
@@ -681,9 +681,9 @@ def generate_mtl(materials):
     for m in materials:
         index = materials[m]
         mtl[m] = {
-            'a_dbg_name': m,
-            'a_dbg_index': index,
-            'a_dbg_color': generate_color(index)
+            'DbgName': m,
+            'DbgIndex': index,
+            'DbgColor': generate_color(index)
         }
     return mtl
     
@@ -809,13 +809,13 @@ def convert_ascii(infile, outfile):
     "name"          : get_name(outfile),
     "vertices"      : ",".join(generate_vertex(v) for v in vertices),
     "triangles"     : ",".join(generate_triangle(f) for f in sfaces['triangles_flat']),
-    "triangles_n"   : ",".join(generate_triangle_n(f) for f in sfaces['triangles_smooth']),
-    "triangles_uv"  : ",".join(generate_triangle_uv(f) for f in sfaces['triangles_flat_uv']),
-    "triangles_n_uv": ",".join(generate_triangle_n_uv(f) for f in sfaces['triangles_smooth_uv']),
+    "trianglesUvs"  : ",".join(generate_triangle_uv(f) for f in sfaces['triangles_flat_uv']),
+    "trianglesNormals"   : ",".join(generate_triangle_n(f) for f in sfaces['triangles_smooth']),
+    "trianglesNormalsUvs": ",".join(generate_triangle_n_uv(f) for f in sfaces['triangles_smooth_uv']),
     "quads"         : ",".join(generate_quad(f) for f in sfaces['quads_flat']),
-    "quads_n"       : ",".join(generate_quad_n(f) for f in sfaces['quads_smooth']),
-    "quads_uv"      : ",".join(generate_quad_uv(f) for f in sfaces['quads_flat_uv']),
-    "quads_n_uv"    : ",".join(generate_quad_n_uv(f) for f in sfaces['quads_smooth_uv']),
+    "quadsUvs"      : ",".join(generate_quad_uv(f) for f in sfaces['quads_flat_uv']),
+    "quadsNormals"       : ",".join(generate_quad_n(f) for f in sfaces['quads_smooth']),
+    "quadsNormalsUvs"    : ",".join(generate_quad_n_uv(f) for f in sfaces['quads_smooth_uv']),
     "uvs"           : ",".join(generate_uv(uv) for uv in uvs),
     "normals"       : normals_string,
     

@@ -289,14 +289,14 @@ var model = {
     'uvs2': [%(uvs2)s],
 
     'triangles': [%(triangles)s],
-    'triangles_n': [%(triangles_n)s],
-    'triangles_uv': [%(triangles_uv)s],
-    'triangles_n_uv': [%(triangles_n_uv)s],
+    'trianglesUvs': [%(trianglesUvs)s],
+    'trianglesNormals': [%(trianglesNormals)s],
+    'trianglesNormalsUvs': [%(trianglesNormalsUvs)s],
 
     'quads': [%(quads)s],
-    'quads_n': [%(quads_n)s],
-    'quads_uv': [%(quads_uv)s],
-    'quads_n_uv': [%(quads_n_uv)s],
+    'quadsUvs': [%(quadsUvs)s],
+    'quadsNormals': [%(quadsNormals)s],
+    'quadsNormalsUvs': [%(quadsNormalsUvs)s],
 
     'end': (new Date).getTime()
     }
@@ -1274,16 +1274,16 @@ def generate_materials_scene(data):
                     parameters += ", shininess: %f" % material["shininess"]
 
                 # TODO: proper handling of textures
-                color_map = get_material_texture(material_index, mesh["data"]["textures"], "DiffuseColor")
-                light_map = get_material_texture(material_index, mesh["data"]["textures"], "AmbientColor")
-                bump_map  = get_material_texture(material_index, mesh["data"]["textures"], "Bump")
+                colorMap = get_material_texture(material_index, mesh["data"]["textures"], "DiffuseColor")
+                lightMap = get_material_texture(material_index, mesh["data"]["textures"], "AmbientColor")
+                bumpMap  = get_material_texture(material_index, mesh["data"]["textures"], "Bump")
                 
                 if map:
-                    parameters += ", map: %s" % generate_string(color_map[0]["info"]["name"])
-                if light_map:
-                    parameters += ", light_map: %s" % generate_string(light_map[0]["info"]["name"])
-                if bump_map:
-                    parameters += ", bump_map: %s" % generate_string(bump_map[0]["info"]["name"])
+                    parameters += ", map: %s" % generate_string(colorMap[0]["info"]["name"])
+                if lightMap:
+                    parameters += ", lightMap: %s" % generate_string(lightMap[0]["info"]["name"])
+                if bumpMap:
+                    parameters += ", bumpMap: %s" % generate_string(bumpMap[0]["info"]["name"])
                 
                 material_string = TEMPLATE_MATERIAL_SCENE % {
                 "material_id" : generate_string(material_id),
@@ -1396,25 +1396,25 @@ def value2string(v):
 
 def generate_material_model(material, index):
     m = {
-    'a_dbg_name'    :generate_string(material["name"]),
-    'a_dbg_index'   :index,
-    'a_dbg_color'   :generate_color(index),
+    'DbgName'    :generate_string(material["name"]),
+    'DbgIndex'   :index,
+    'DbgColor'   :generate_color(index),
     "shading"       :generate_string(material["shading_model"]),
     "opacity"       : material["opacity"]
     }
     
     if material["shading_model"] in ["Lambert", "Phong"]:
-        m["col_ambient"] = material["ambient"]
-        m["col_diffuse"] = material["diffuse"]
+        m["colorAmbient"] = material["ambient"]
+        m["colorDiffuse"] = material["diffuse"]
         m["col_emissive"] = material["emissive"]
         
     if material["shading_model"] in ["Phong"]:
-        m["col_specular"] = material["specular"]
+        m["colorSpecular"] = material["specular"]
         m["shininess"] = material["shininess"]
         
     if not MATERIALS_IN_SCENE:
-        conditional_set(m, "map_diffuse", material.get("map_diffuse", 0))
-        conditional_set(m, "map_lightmap", material.get("map_lightmap", 0))    
+        conditional_set(m, "mapDiffuse", material.get("mapDiffuse", 0))
+        conditional_set(m, "mapLightmap", material.get("mapLightmap", 0))    
         
     mtl_raw = ",\n".join(['\t"%s" : %s' % (n, value2string(v)) for n,v in sorted(m.items())])
     mtl_string = "\t{\n%s\n\t}" % mtl_raw
@@ -1444,14 +1444,14 @@ def generate_ascii_model(data):
         
 
     triangles = []
-    triangles_n = []
-    triangles_uv = []
-    triangles_n_uv = []
+    trianglesUvs = []
+    trianglesNormals = []
+    trianglesNormalsUvs = []
 
     quads = []
-    quads_n = []
-    quads_uv = []
-    quads_n_uv = []
+    quadsUvs = []
+    quadsNormals = []
+    quadsNormalsUvs = []
 
     indices_vertex = data["faces"]["indices_vertex"]
     for vi in range(len(indices_vertex)):
@@ -1480,24 +1480,24 @@ def generate_ascii_model(data):
         if len(vertex_index) == 3:
             if normals:
                 if uvs:
-                    where = triangles_n_uv
+                    where = trianglesNormalsUvs
                 else:
-                    where = triangles_n
+                    where = trianglesNormals
             else:
                 if uvs:
-                    where = triangles_uv
+                    where = trianglesUvs
                 else:
                     where = triangles
                     
         elif len(vertex_index) == 4:
             if normals:
                 if uvs:
-                    where = quads_n_uv
+                    where = quadsNormalsUvs
                 else:
-                    where = quads_n
+                    where = quadsNormals
             else:
                 if uvs:
-                    where = quads_uv
+                    where = quadsUvs
                 else:
                     where = quads
             
@@ -1522,14 +1522,14 @@ def generate_ascii_model(data):
     "uvs2"      : ",".join(generate_uv(u) for u in uvs2),
 
     "triangles"     : ",".join(generate_triangle(f) for f in triangles),
-    "triangles_n"   : ",".join(generate_triangle_n(f) for f in triangles_n),
-    "triangles_uv"  : ",".join(generate_triangle_uv(f) for f in triangles_uv),
-    "triangles_n_uv": ",".join(generate_triangle_n_uv(f) for f in triangles_n_uv),
+    "trianglesUvs"  : ",".join(generate_triangle_uv(f) for f in trianglesUvs),
+    "trianglesNormals"   : ",".join(generate_triangle_n(f) for f in trianglesNormals),
+    "trianglesNormalsUvs": ",".join(generate_triangle_n_uv(f) for f in trianglesNormalsUvs),
         
     "quads"         : ",".join(generate_quad(f) for f in quads),
-    "quads_n"       : ",".join(generate_quad_n(f) for f in quads_n),
-    "quads_uv"      : ",".join(generate_quad_uv(f) for f in quads_uv),
-    "quads_n_uv"    : ",".join(generate_quad_n_uv(f) for f in quads_n_uv)
+    "quadsUvs"      : ",".join(generate_quad_uv(f) for f in quadsUvs),
+    "quadsNormals"       : ",".join(generate_quad_n(f) for f in quadsNormals),
+    "quadsNormalsUvs"    : ",".join(generate_quad_n_uv(f) for f in quadsNormalsUvs)
     }
     
     return text

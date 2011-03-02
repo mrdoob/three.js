@@ -987,31 +987,31 @@ THREE.Loader.prototype = {
 				// need to process first faces with uvs
 				// as uvs are indexed by face indices
 				
-				for ( i = 0, l = data.triangles_uv.length; i < l; i+= 7 ) {
+				for ( i = 0, l = data.trianglesUvs.length; i < l; i+= 7 ) {
 
-					add_tri( data.triangles_uv, i );
-					add_uv3( data.triangles_uv, i + 4 );
-
-				}
-
-				for ( i = 0, l = data.triangles_n_uv.length; i < l; i += 10 ) {
-
-					add_tri_n( data.triangles_n_uv, i );
-					add_uv3( data.triangles_n_uv, i + 7 );
+					add_tri( data.trianglesUvs, i );
+					add_uv3( data.trianglesUvs, i + 4 );
 
 				}
-				
-				for ( i = 0, l = data.quads_uv.length; i < l; i += 9 ) {
 
-					add_quad( data.quads_uv, i );
-					add_uv4( data.quads_uv, i + 5 );
+				for ( i = 0, l = data.trianglesNormalsUvs.length; i < l; i += 10 ) {
+
+					add_tri_n( data.trianglesNormalsUvs, i );
+					add_uv3( data.trianglesNormalsUvs, i + 7 );
 
 				}
 				
-				for ( i = 0, l = data.quads_n_uv.length; i < l; i += 13 ) {
+				for ( i = 0, l = data.quadsUvs.length; i < l; i += 9 ) {
 
-					add_quad_n( data.quads_n_uv, i );
-					add_uv4( data.quads_n_uv, i + 9 );
+					add_quad( data.quadsUvs, i );
+					add_uv4( data.quadsUvs, i + 5 );
+
+				}
+				
+				for ( i = 0, l = data.quadsNormalsUvs.length; i < l; i += 13 ) {
+
+					add_quad_n( data.quadsNormalsUvs, i );
+					add_uv4( data.quadsNormalsUvs, i + 9 );
 
 				}
 				
@@ -1023,9 +1023,9 @@ THREE.Loader.prototype = {
 
 				}
 
-				for ( i = 0, l = data.triangles_n.length; i < l; i += 7 ) {
+				for ( i = 0, l = data.trianglesNormals.length; i < l; i += 7 ) {
 
-					add_tri_n( data.triangles_n, i );
+					add_tri_n( data.trianglesNormals, i );
 
 				}
 
@@ -1035,9 +1035,9 @@ THREE.Loader.prototype = {
 
 				}
 
-				for ( i = 0, l = data.quads_n.length; i < l; i += 9 ) {
+				for ( i = 0, l = data.quadsNormals.length; i < l; i += 9 ) {
 
-					add_quad_n( data.quads_n, i );
+					add_quad_n( data.quadsNormals, i );
 
 				}
 
@@ -1238,7 +1238,7 @@ THREE.Loader.prototype = {
 		// defaults
 		
 		mtype = "MeshLambertMaterial";
-		mpars = { color: 0xeeeeee, opacity: 1.0, map: null, lightMap: null, vertexColors: m.vertex_colors };
+		mpars = { color: 0xeeeeee, opacity: 1.0, map: null, lightMap: null, vertexColors: m.vertexColors };
 		
 		// parameters from model file
 		
@@ -1248,30 +1248,30 @@ THREE.Loader.prototype = {
 			
 		}
 		
-		if ( m.map_diffuse && texture_path ) {
+		if ( m.mapDiffuse && texture_path ) {
 
 			texture = document.createElement( 'canvas' );
 			mpars.map = new THREE.Texture( texture );
-			load_image( mpars.map, texture_path + "/" + m.map_diffuse );
+			load_image( mpars.map, texture_path + "/" + m.mapDiffuse );
 
-		} else if ( m.col_diffuse ) {
+		} else if ( m.colorDiffuse ) {
 
-			color = ( m.col_diffuse[0] * 255 << 16 ) + ( m.col_diffuse[1] * 255 << 8 ) + m.col_diffuse[2] * 255;
+			color = ( m.colorDiffuse[0] * 255 << 16 ) + ( m.colorDiffuse[1] * 255 << 8 ) + m.colorDiffuse[2] * 255;
 			mpars.color = color;
 			mpars.opacity =  m.transparency;
 
-		} else if ( m.a_dbg_color ) {
+		} else if ( m.DbgColor ) {
 
-			mpars.color = m.a_dbg_color;
+			mpars.color = m.DbgColor;
 
 		}
 
-		if ( m.map_lightmap && texture_path ) {
+		if ( m.mapLightmap && texture_path ) {
 
 			texture = document.createElement( 'canvas' );
 			mpars.lightMap = new THREE.Texture( texture );
 			
-			load_image( mpars.lightMap, texture_path + "/" + m.map_lightmap );			
+			load_image( mpars.lightMap, texture_path + "/" + m.mapLightmap );
 
 		}
 		

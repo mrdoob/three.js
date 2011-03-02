@@ -9,9 +9,9 @@
 
 var model = {
     'materials': [	{
-	"a_dbg_color" : 0xeeeeee,
-	"a_dbg_index" : 0,
-	"a_dbg_name" : "(null)"
+	"DbgColor" : 0xeeeeee,
+	"DbgIndex" : 0,
+	"DbgName" : "(null)"
 	}],
 
     'buffers': 'Torus_bin.bin',
