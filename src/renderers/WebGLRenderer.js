@@ -210,7 +210,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function createMeshBuffers ( geometryGroup ) {
+	function createMeshBuffers( geometryGroup ) {
 
 		geometryGroup.__webGLVertexBuffer = _gl.createBuffer();
 		geometryGroup.__webGLNormalBuffer = _gl.createBuffer();
@@ -229,7 +229,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function initLineBuffers ( geometry ) {
+	function initLineBuffers( geometry ) {
 
 		var nvertices = geometry.vertices.length;
 
@@ -240,7 +240,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function initRibbonBuffers ( geometry ) {
+	function initRibbonBuffers( geometry ) {
 
 		var nvertices = geometry.vertices.length;
 
@@ -251,7 +251,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function initParticleBuffers ( geometry ) {
+	function initParticleBuffers( geometry ) {
 
 		var nvertices = geometry.vertices.length;
 
@@ -264,7 +264,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function initMeshBuffers ( geometryGroup, object ) {
+	function initMeshBuffers( geometryGroup, object ) {
 
 		var f, fl, nvertices = 0, ntris = 0, nlines = 0,
 			obj_faces = object.geometry.faces,
@@ -315,7 +315,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function setMeshBuffers ( geometryGroup, object, hint ) {
+	function setMeshBuffers( geometryGroup, object, hint ) {
 
 		var f, fl, fi, face, vertexNormals, faceNormal, normal,
 			uv, uv2, v1, v2, v3, v4, t1, t2, t3, t4,
@@ -548,7 +548,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				if( dirtyNormals ) {
+				if ( dirtyNormals ) {
 
 					if ( vertexNormals.length == 3 && needsSmoothNormals ) {
 
@@ -973,7 +973,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		if( dirtyElements ) {
+		if ( dirtyElements ) {
 
 			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryGroup.__webGLFaceBuffer );
 			_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, faceArray, hint );
@@ -983,7 +983,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		if( offset_skin > 0 ) {
+		if ( offset_skin > 0 ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webGLSkinVertexABuffer );
 			_gl.bufferData( _gl.ARRAY_BUFFER, skinVertexAArray, hint );
@@ -1001,7 +1001,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function setLineBuffers ( geometry, hint ) {
+	function setLineBuffers( geometry, hint ) {
 
 		var v, c, vertex, offset,
 			vertices = geometry.vertices,
@@ -1055,7 +1055,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function setRibbonBuffers ( geometry, hint ) {
+	function setRibbonBuffers( geometry, hint ) {
 
 		var v, c, vertex, offset,
 			vertices = geometry.vertices,
@@ -1109,7 +1109,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function setParticleBuffers ( geometry, hint, object, camera ) {
+	function setParticleBuffers( geometry, hint, object ) {
 
 		var v, c, vertex, offset,
 			vertices = geometry.vertices,
@@ -1385,7 +1385,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function setProgram ( camera, lights, fog, material, object ) {
+	function setProgram( camera, lights, fog, material, object ) {
 
 		if ( !material.program ) _this.initMaterial( material, lights, fog );
 
@@ -1828,10 +1828,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				material = meshMaterial;
 
-				if ( ( material.opacity && material.opacity < 1.0 ) || material.blending != THREE.NormalBlending )
+				if ( ( material.opacity && material.opacity < 1.0 ) || material.blending != THREE.NormalBlending ) {
+
 					addToFixedArray( transparent, material );
-				else
+
+				} else {
+
 					addToFixedArray( opaque, material );
+
+				}
 
 			}
 
@@ -1849,7 +1854,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.render = function( scene, camera, renderTarget, clear ) {
 
 		var i, program, opaque, transparent, material,
-			o, ol, oil, webGLObject, object, buffer,
+			o, ol, oil, webglObject, object, buffer,
 			lights = scene.lights,
 			fog = scene.fog,
 			ol;
@@ -1878,12 +1883,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// set matrices
 
-		ol = scene.__webGLObjects.length;
+		ol = scene.__webglObjects.length;
 
 		for ( o = 0; o < ol; o++ ) {
 
-			webGLObject = scene.__webGLObjects[ o ];
-			object = webGLObject.object;
+			webglObject = scene.__webglObjects[ o ];
+			object = webglObject.object;
 
 			if ( object.visible ) {
 
@@ -1893,28 +1898,28 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					setupMatrices( object, camera );
 
-					unrollBufferMaterials( webGLObject );
+					unrollBufferMaterials( webglObject );
 
-					webGLObject.render = true;
+					webglObject.render = true;
 
 					if ( this.sortObjects ) {
 
 						_vector3.copy( object.position );
 						_projScreenMatrix.multiplyVector3( _vector3 );
 
-						webGLObject.z = _vector3.z;
+						webglObject.z = _vector3.z;
 
 					}
 
 				} else {
 
-					webGLObject.render = false;
+					webglObject.render = false;
 
 				}
 
 			} else {
 
-				webGLObject.render = false;
+				webglObject.render = false;
 
 			}
 
@@ -1922,16 +1927,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( this.sortObjects ) {
 
-			scene.__webGLObjects.sort( painterSort );
+			scene.__webglObjects.sort( painterSort );
 
 		}
 
-		oil = scene.__webGLObjectsImmediate.length;
+		oil = scene.__webglObjectsImmediate.length;
 
 		for ( o = 0; o < oil; o++ ) {
 
-			webGLObject = scene.__webGLObjectsImmediate[ o ];
-			object = webGLObject.object;
+			webglObject = scene.__webglObjectsImmediate[ o ];
+			object = webglObject.object;
 
 			if ( object.visible ) {
 
@@ -1943,7 +1948,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				setupMatrices( object, camera );
 
-				unrollImmediateBufferMaterials( webGLObject );
+				unrollImmediateBufferMaterials( webglObject );
 
 			}
 
@@ -1955,13 +1960,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		for ( o = 0; o < ol; o++ ) {
 
-			webGLObject = scene.__webGLObjects[ o ];
+			webglObject = scene.__webglObjects[ o ];
 
-			if ( webGLObject.render ) {
+			if ( webglObject.render ) {
 
-				object = webGLObject.object;
-				buffer = webGLObject.buffer;
-				opaque = webGLObject.opaque;
+				object = webglObject.object;
+				buffer = webglObject.buffer;
+				opaque = webglObject.opaque;
 
 				setObjectFaces( object );
 
@@ -1982,12 +1987,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		for ( o = 0; o < oil; o++ ) {
 
-			webGLObject = scene.__webGLObjectsImmediate[ o ];
-			object = webGLObject.object;
+			webglObject = scene.__webglObjectsImmediate[ o ];
+			object = webglObject.object;
 
 			if ( object.visible ) {
 
-				opaque = webGLObject.opaque;
+				opaque = webglObject.opaque;
 
 				setObjectFaces( object );
 
@@ -2010,13 +2015,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		for ( o = 0; o < ol; o++ ) {
 
-			webGLObject = scene.__webGLObjects[ o ];
+			webglObject = scene.__webglObjects[ o ];
 
-			if ( webGLObject.render ) {
+			if ( webglObject.render ) {
 
-				object = webGLObject.object;
-				buffer = webGLObject.buffer;
-				transparent = webGLObject.transparent;
+				object = webglObject.object;
+				buffer = webglObject.buffer;
+				transparent = webglObject.transparent;
 
 				setObjectFaces( object );
 
@@ -2039,12 +2044,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		for ( o = 0; o < oil; o++ ) {
 
-			webGLObject = scene.__webGLObjectsImmediate[ o ];
-			object = webGLObject.object;
+			webglObject = scene.__webglObjectsImmediate[ o ];
+			object = webglObject.object;
 
 			if ( object.visible ) {
 
-				transparent = webGLObject.transparent;
+				transparent = webglObject.transparent;
 
 				setObjectFaces( object );
 
@@ -2074,34 +2079,51 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	function setupMatrices( object, camera ) {
 
+		object._modelViewMatrix.multiplyToArray( camera.matrixWorldInverse, object.matrixWorld, object._modelViewMatrixArray );
+		THREE.Matrix4.makeInvert3x3( object._modelViewMatrix ).transposeIntoArray( object._normalMatrixArray );
 
-	this.initWebGLObjects = function( scene, camera ) {
+	};
 
-		if ( !scene.__webGLObjects ) {
+	this.initWebGLObjects = function ( scene, camera ) {
 
-			scene.__webGLObjects = [];
-			scene.__webGLObjectsMap = {};
+		if ( !scene.__webglObjects ) {
 
-			scene.__webGLObjectsImmediate = [];
+			scene.__webglObjects = [];
+			scene.__webglObjectsImmediate = [];
 
 		}
 
-		for ( var o = 0, ol = scene.objects.length; o < ol; o ++ ) {
+		/*
+		for ( var o = 0, ol = scene.__objectsAdded.length; o < ol; o ++ ) {
 
-			addObject( scene.objects[ o ], scene, camera );
+			addObject( scene.__objectsAdded[ o ], scene );
+
+		}
+		*/
+
+		while ( scene.__objectsRemoved.length ) {
+
+			removeObject( scene.__objectsRemoved[ 0 ], scene );
+			scene.__objectsRemoved.splice( 0, 1 );
+
+		}
+
+		while ( scene.__objectsAdded.length ) {
+
+			addObject( scene.__objectsAdded[ 0 ], scene );
+			scene.__objectsAdded.splice( 0, 1 );
 
 		}
 
 	};
 
-	function addObject( object, scene, camera ) {
+	function addObject( object, scene ) {
 
-		var g, geometry, geometryGroup, objmap;
+		var g, geometry, geometryGroup;
 
-		if ( scene.__webGLObjectsMap[ object.id ] == undefined ) {
-
-			scene.__webGLObjectsMap[ object.id ] = {};
+		if ( object._modelViewMatrix == undefined ) {
 
 			object._modelViewMatrix = new THREE.Matrix4();
 
@@ -2113,8 +2135,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		objmap = scene.__webGLObjectsMap[ object.id ];
-		objlist = scene.__webGLObjects;
+		objlist = scene.__webglObjects;
 
 		if ( object instanceof THREE.Mesh ) {
 
@@ -2134,7 +2155,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				// initialise VBO on the first access
 
-				if( ! geometryGroup.__webGLVertexBuffer ) {
+				if ( ! geometryGroup.__webGLVertexBuffer ) {
 
 					createMeshBuffers( geometryGroup );
 					initMeshBuffers( geometryGroup, object );
@@ -2148,7 +2169,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				if( geometry.__dirtyVertices || geometry.__dirtyElements ||
+				if ( geometry.__dirtyVertices || geometry.__dirtyElements ||
 					geometry.__dirtyUvs || geometry.__dirtyNormals ||
 					geometry.__dirtyColors || geometry.__dirtyTangents ) {
 
@@ -2158,7 +2179,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				// create separate wrapper per each use of VBO
 
-				add_buffer( objlist, objmap, g, geometryGroup, object );
+				addBuffer( objlist, geometryGroup, object );
 
 			}
 
@@ -2189,7 +2210,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			add_buffer( objlist, objmap, 0, geometry, object );
+			addBuffer( objlist, geometry, object );
 
 			geometry.__dirtyVertices = false;
 			geometry.__dirtyColors = false;
@@ -2214,7 +2235,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			add_buffer( objlist, objmap, 0, geometry, object );
+			addBuffer( objlist, geometry, object );
 
 			geometry.__dirtyVertices = false;
 			geometry.__dirtyColors = false;
@@ -2223,7 +2244,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			geometry = object.geometry;
 
-			if( ! geometry.__webGLVertexBuffer ) {
+			if ( ! geometry.__webGLVertexBuffer ) {
 
 				createParticleBuffers( geometry );
 				initParticleBuffers( geometry );
@@ -2233,20 +2254,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			if( geometry.__dirtyVertices || geometry.__dirtyColors || object.sortParticles ) {
+			if ( geometry.__dirtyVertices || geometry.__dirtyColors || object.sortParticles ) {
 
-				setParticleBuffers( geometry, _gl.DYNAMIC_DRAW, object, camera );
+				setParticleBuffers( geometry, _gl.DYNAMIC_DRAW, object );
 
 			}
 
-			add_buffer( objlist, objmap, 0, geometry, object );
+			addBuffer( objlist, geometry, object );
 
 			geometry.__dirtyVertices = false;
 			geometry.__dirtyColors = false;
 
 		} else if ( THREE.MarchingCubes !== undefined && object instanceof THREE.MarchingCubes ) {
 
-			add_buffer_immediate( scene.__webGLObjectsImmediate, objmap, 0, object );
+			addBufferImmediate( scene.__webglObjectsImmediate, object );
 
 		}/*else if ( object instanceof THREE.Particle ) {
 
@@ -2330,47 +2351,35 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function add_buffer( objlist, objmap, id, buffer, object ) {
+	function addBuffer( objlist, buffer, object ) {
 
-		if ( objmap[ id ] == undefined ) {
-
-			objlist.push( { buffer: buffer, object: object,
-							opaque: { list: [], count: 0 },
-							transparent: { list: [], count: 0 }
-						} );
-
-			objmap[ id ] = 1;
-
-		}
+		objlist.push( { buffer: buffer, object: object,
+				opaque: { list: [], count: 0 },
+				transparent: { list: [], count: 0 }
+			} );
 
 	};
 
-	function add_buffer_immediate( objlist, objmap, id, object ) {
+	function addBufferImmediate( objlist, object ) {
 
-		if ( objmap[ id ] == undefined ) {
-
-			objlist.push( { object: object,
-							opaque: { list: [], count: 0 },
-							transparent: { list: [], count: 0 }
-						} );
-
-			objmap[ id ] = 1;
-
-		}
+		objlist.push( { object: object,
+				opaque: { list: [], count: 0 },
+				transparent: { list: [], count: 0 }
+			} );
 
 	};
 
-	this.removeObject = function ( scene, object ) {
+	function removeObject( object, scene ) {
 
 		var o, ol, zobject;
 
-		for ( o = scene.__webGLObjects.length - 1; o >= 0; o-- ) {
+		for ( o = scene.__webglObjects.length - 1; o >= 0; o-- ) {
 
-			zobject = scene.__webGLObjects[ o ].object;
+			zobject = scene.__webglObjects[ o ].object;
 
 			if ( object == zobject ) {
 
-				scene.__webGLObjects.splice( o, 1 );
+				scene.__webglObjects.splice( o, 1 );
 
 			}
 
@@ -2378,14 +2387,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function setupMatrices ( object, camera ) {
-
-		object._modelViewMatrix.multiplyToArray( camera.matrixWorldInverse, object.matrixWorld, object._modelViewMatrixArray );
-		THREE.Matrix4.makeInvert3x3( object._modelViewMatrix ).transposeIntoArray( object._normalMatrixArray );
-
-	};
-
-	this.setFaceCulling = function ( cullFace, frontFace ) {
+	this.setFaceCulling = function( cullFace, frontFace ) {
 
 		if ( cullFace ) {
 

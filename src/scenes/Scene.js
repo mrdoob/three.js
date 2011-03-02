@@ -7,13 +7,16 @@ THREE.Scene = function () {
 
 	THREE.Object3D.call( this );
 
+	this.matrixAutoUpdate = false;
+
+	this.fog = null;
+
 	this.objects = [];
 	this.lights = [];
 	this.sounds = [];
 
-	this.fog = null;
-
-	this.matrixAutoUpdate = false;
+	this.__objectsAdded = [];
+	this.__objectsRemoved = [];
 
 };
 
@@ -51,6 +54,7 @@ THREE.Scene.prototype.addChildRecurse = function( child ) {
 		if ( this.objects.indexOf( child ) === -1 ) {
 
 			this.objects.push( child );
+			this.__objectsAdded.push( child );
 
 		}
 
@@ -101,6 +105,7 @@ THREE.Scene.prototype.removeChildRecurse = function( child ) {
 		if( i !== -1 ) {
 
 			this.objects.splice( i, 1 );
+			this.__objectsRemoved.push( child );
 
 		}
 
