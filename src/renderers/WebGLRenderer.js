@@ -1867,8 +1867,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_projScreenMatrix.multiply( camera.projectionMatrix, camera.matrixWorldInverse );
 		computeFrustum( _projScreenMatrix );
 
-		if( THREE.AnimationHandler ) THREE.AnimationHandler.update();
-
 		scene.update( undefined, false, camera );
 
 		this.initWebGLObjects( scene, camera );
