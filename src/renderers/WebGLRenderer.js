@@ -2093,13 +2093,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		while ( scene.__objectsRemoved.length ) {
-
-			removeObject( scene.__objectsRemoved[ 0 ], scene );
-			scene.__objectsRemoved.splice( 0, 1 );
-
-		}
-
 		while ( scene.__objectsAdded.length ) {
 
 			addObject( scene.__objectsAdded[ 0 ], scene );
@@ -2107,14 +2100,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		// update must be called after objects adding / removal
-		
-		for ( var o = 0, ol = scene.__webglObjects.length; o < ol; o ++ ) {
+		while ( scene.__objectsRemoved.length ) {
 
-			updateObject( scene.__webglObjects[ o ], scene );
+			removeObject( scene.__objectsRemoved[ 0 ], scene );
+			scene.__objectsRemoved.splice( 0, 1 );
 
 		}
-		
+
+		// update must be called after objects adding / removal
+
+		for ( var o = 0, ol = scene.__webglObjects.length; o < ol; o ++ ) {
+
+			updateObject( scene.__webglObjects[ o ].object, scene );
+
+		}
 
 	};
 
@@ -2133,8 +2132,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			object.matrixWorld.flattenToArray( object._objectMatrixArray );
 
 		}
-
-		objlist = scene.__webglObjects;
 
 		if ( object instanceof THREE.Mesh ) {
 
@@ -2170,7 +2167,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				// create separate wrapper per each use of VBO
 
-				addBuffer( objlist, geometryGroup, object );
+				addBuffer( scene.__webglObjects, geometryGroup, object );
 
 			}
 
@@ -2188,7 +2185,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			addBuffer( objlist, geometry, object );
+			addBuffer( scene.__webglObjects, geometry, object );
 
 		} else if ( object instanceof THREE.Line ) {
 
@@ -2204,7 +2201,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			addBuffer( objlist, geometry, object );
+			addBuffer( scene.__webglObjects, geometry, object );
 
 		} else if ( object instanceof THREE.ParticleSystem ) {
 
@@ -2220,7 +2217,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			addBuffer( objlist, geometry, object );
+			addBuffer( scene.__webglObjects, geometry, object );
 
 		} else if ( THREE.MarchingCubes !== undefined && object instanceof THREE.MarchingCubes ) {
 
@@ -2232,11 +2229,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function updateObject( webGLObject, scene ) {
+	function updateObject( object, scene ) {
 
-		var g, geometry, geometryGroup, webGLObject, object;
-
-		object = webGLObject.object;
+		var g, geometry, geometryGroup;
 
 		if ( object instanceof THREE.Mesh ) {
 
@@ -2311,6 +2306,24 @@ THREE.WebGLRenderer = function ( parameters ) {
 		} else if ( object instanceof THREE.Particle ) {
 
 		}*/
+
+	};
+
+	function removeObject( object, scene ) {
+
+		var o, ol, zobject;
+
+		for ( o = scene.__webglObjects.length - 1; o >= 0; o-- ) {
+
+			zobject = scene.__webglObjects[ o ].object;
+
+			if ( object == zobject ) {
+
+				scene.__webglObjects.splice( o, 1 );
+
+			}
+
+		}
 
 	};
 
@@ -2405,24 +2418,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 				opaque: { list: [], count: 0 },
 				transparent: { list: [], count: 0 }
 			} );
-
-	};
-
-	function removeObject( object, scene ) {
-
-		var o, ol, zobject;
-
-		for ( o = scene.__webglObjects.length - 1; o >= 0; o-- ) {
-
-			zobject = scene.__webglObjects[ o ].object;
-
-			if ( object == zobject ) {
-
-				scene.__webglObjects.splice( o, 1 );
-
-			}
-
-		}
 
 	};
 
