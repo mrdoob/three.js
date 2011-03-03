@@ -3,17 +3,19 @@
  * @author mikael emtinger / http://gomo.se/
  */
 
-THREE.Camera = function( fov, aspect, near, far, target ) {
+THREE.Camera = function ( fov, aspect, near, far, target ) {
 
 	THREE.Object3D.call( this );
 
 	this.fov = fov || 50;
-	this.aspect = aspect || 1.0;
+	this.aspect = aspect || 1;
 	this.near = near || 0.1;
 	this.far = far || 2000;
 
-	// this.screenCenterX = 0;
-	// this.screenCenterY = 0;
+	/*
+	this.screenCenterX = 0;
+	this.screenCenterY = 0;
+	*/
 
 	this.target = target || new THREE.Object3D();
 	this.useTarget = true;
@@ -25,17 +27,17 @@ THREE.Camera = function( fov, aspect, near, far, target ) {
 
 	// movement
 
-	this.tmpVec = new THREE.Vector3();
+	var vector = new THREE.Vector3();
 
 	this.translateX = function ( amount, noFly ) {
 
-		this.tmpVec.sub( this.target.position, this.position ).normalize().multiplyScalar( amount );
-		this.tmpVec.crossSelf( this.up );
+		vector.sub( this.target.position, this.position ).normalize().multiplyScalar( amount );
+		vector.crossSelf( this.up );
 
-		if ( noFly ) this.tmpVec.y = 0;
+		if ( noFly ) vector.y = 0;
 
-		this.position.addSelf( this.tmpVec );
-		this.target.position.addSelf( this.tmpVec );
+		this.position.addSelf( vector );
+		this.target.position.addSelf( vector );
 
 	};
 
@@ -47,12 +49,12 @@ THREE.Camera = function( fov, aspect, near, far, target ) {
 
 	this.translateZ = function ( amount, noFly ) {
 
-		this.tmpVec.sub( this.target.position, this.position ).normalize().multiplyScalar( amount );
+		vector.sub( this.target.position, this.position ).normalize().multiplyScalar( amount );
 
-		if ( noFly ) this.tmpVec.y = 0;
+		if ( noFly ) vector.y = 0;
 
-		this.position.subSelf( this.tmpVec );
-		this.target.position.subSelf( this.tmpVec );
+		this.position.subSelf( vector );
+		this.target.position.subSelf( vector );
 
 	};
 
@@ -71,7 +73,7 @@ THREE.Camera.prototype.supr = THREE.Object3D.prototype;
  * TODO: make it work also for ortho camera
 */
 
-THREE.Camera.prototype.updateProjectionMatrix = function() {
+THREE.Camera.prototype.updateProjectionMatrix = function () {
 
 	this.projectionMatrix = THREE.Matrix4.makePerspective( this.fov, this.aspect, this.near, this.far );
 
@@ -84,7 +86,7 @@ THREE.Camera.prototype.updateProjectionMatrix = function() {
 
 THREE.Camera.prototype.update = function( parentMatrixWorld, forceUpdate, camera ) {
 
-	if( this.useTarget ) {
+	if ( this.useTarget ) {
 
 		// local
 
@@ -109,12 +111,15 @@ THREE.Camera.prototype.update = function( parentMatrixWorld, forceUpdate, camera
 
 	} else {
 
-		if( this.matrixAutoUpdate )
+		if ( this.matrixAutoUpdate ) {
+
 			forceUpdate |= this.updateMatrix();
 
-		if( forceUpdate || this.matrixNeedsUpdate ) {
+		}
 
-			if( parentMatrixWorld ) {
+		if ( forceUpdate || this.matrixNeedsUpdate ) {
+
+			if ( parentMatrixWorld ) {
 
 				this.matrixWorld.multiply( parentMatrixWorld, this.matrix );
 
@@ -125,7 +130,7 @@ THREE.Camera.prototype.update = function( parentMatrixWorld, forceUpdate, camera
 			}
 
 			this.matrixNeedsUpdate = false;
-			forceUpdate            = true;
+			forceUpdate = true;
 
 			THREE.Matrix4.makeInvert( this.matrixWorld, this.matrixWorldInverse );
 
@@ -135,7 +140,7 @@ THREE.Camera.prototype.update = function( parentMatrixWorld, forceUpdate, camera
 
 	// update children
 
-	for ( var i = 0; i < this.children.length; i++ ) {
+	for ( var i = 0; i < this.children.length; i ++ ) {
 
 		this.children[ i ].update( this.matrixWorld, forceUpdate, camera );
 

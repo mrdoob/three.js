@@ -7,7 +7,7 @@
 
 THREE.Geometry = function () {
 
-	this.id = "Geometry" + THREE.GeometryIdCounter++;
+	this.id = "Geometry" + THREE.GeometryIdCounter ++;
 
 	this.vertices = [];
 	this.faces = [];

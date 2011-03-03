@@ -75,7 +75,8 @@ THREE.Matrix4.prototype = {
 		x.cross( up, z ).normalize();
 		y.cross( z, x ).normalize();
 
-/*		this.n11 = x.x; this.n12 = x.y; this.n13 = x.z; this.n14 = - x.dot( eye );
+/*
+		this.n11 = x.x; this.n12 = x.y; this.n13 = x.z; this.n14 = - x.dot( eye );
 		this.n21 = y.x; this.n22 = y.y; this.n23 = y.z; this.n24 = - y.dot( eye );
 		this.n31 = z.x; this.n32 = z.y; this.n33 = z.z; this.n34 = - z.dot( eye );
 		this.n41 = 0; this.n42 = 0; this.n43 = 0; this.n44 = 1;
@@ -525,19 +526,19 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	setPosition: function( vec3 ) {
+	setPosition: function( v ) {
 
-		this.n14 = vec3.x;
-		this.n24 = vec3.y;
-		this.n34 = vec3.z;
+		this.n14 = v.x;
+		this.n24 = v.y;
+		this.n34 = v.z;
 
 		return this;
 
 	},
 
-	setRotationFromEuler: function( vec3 ) {
+	setRotationFromEuler: function( v ) {
 
-		var x = vec3.x, y = vec3.y, z = vec3.z,
+		var x = v.x, y = v.y, z = v.z,
 		a = Math.cos( x ), b = Math.sin( x ),
 		c = Math.cos( y ), d = Math.sin( y ),
 		e = Math.cos( z ), f = Math.sin( z ),
@@ -557,9 +558,9 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	setRotationFromQuaternion: function( quat ) {
+	setRotationFromQuaternion: function( q ) {
 
-		var x = quat.x, y = quat.y, z = quat.z, w = quat.w,
+		var x = q.x, y = q.y, z = q.z, w = q.w,
 		x2 = x + x, y2 = y + y, z2 = z + z,
 		xx = x * x2, xy = x * y2, xz = x * z2,
 		yy = y * y2, yz = y * z2, zz = z * z2,
@@ -579,9 +580,9 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	scale : function ( vec3 ) {
+	scale : function ( v ) {
 
-		var x = vec3.x, y = vec3.y, z = vec3.z;
+		var x = v.x, y = v.y, z = v.z;
 
 		this.n11 *= x; this.n12 *= y; this.n13 *= z;
 		this.n21 *= x; this.n22 *= y; this.n23 *= z;
