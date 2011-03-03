@@ -2306,16 +2306,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 			geometry.__dirtyVertices = false;
 			geometry.__dirtyColors = false;
 
-		} else if ( THREE.MarchingCubes !== undefined && object instanceof THREE.MarchingCubes ) {
+		}/* else if ( THREE.MarchingCubes !== undefined && object instanceof THREE.MarchingCubes ) {
 
 			// it updates itself in render callback
-			
-		}/*else if ( object instanceof THREE.Particle ) {
+
+		} else if ( object instanceof THREE.Particle ) {
 
 		}*/
 
 	};
-	
+
 	function sortFacesByMaterial( geometry ) {
 
 		// TODO

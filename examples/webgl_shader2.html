@@ -228,7 +228,7 @@
 
 					mlib[ i ] = material;
 
-					mesh = new THREE.Mesh( new Cube( size, size, size, 1, 1, [ mlib[ i ], mlib[ i ], mlib[ i ], mlib[ i ], mlib[ i ], mlib[ i ] ], false ), new THREE.MeshFaceMaterial() );
+					mesh = new THREE.Mesh( new Cube( size, size, size, 1, 1, 1, [ mlib[ i ], mlib[ i ], mlib[ i ], mlib[ i ], mlib[ i ], mlib[ i ] ], false ), new THREE.MeshFaceMaterial() );
 					mesh.position.x = i - (params.length - 1)/2;
 					mesh.position.y = i % 2 - 0.5;
 					scene.addObject( mesh );

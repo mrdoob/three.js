@@ -70,7 +70,7 @@
 
 				}
 
-				cube = new THREE.Mesh( new Cube( 200, 200, 200, 1, 1, materials ), new THREE.MeshFaceMaterial() );
+				cube = new THREE.Mesh( new Cube( 200, 200, 200, 1, 1, 1, materials ), new THREE.MeshFaceMaterial() );
 				cube.position.y = 150;
 				cube.overdraw = true;
 				scene.addObject( cube );
@@ -78,7 +78,7 @@
 				// Plane
 
 				plane = new THREE.Mesh( new Plane( 200, 200 ), new THREE.MeshBasicMaterial( { color: 0xe0e0e0 } ) );
-				plane.rotation.x = -90 * ( Math.PI / 180 );
+				plane.rotation.x = - 90 * ( Math.PI / 180 );
 				plane.overdraw = true;
 				scene.addObject( plane );
 

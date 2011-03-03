@@ -427,7 +427,7 @@ var SceneUtils = {
 								   uniforms: shader.uniforms
 								} ),
 
-		mesh = new THREE.Mesh( new Cube( size, size, size, 1, 1, null, true ), material );
+		mesh = new THREE.Mesh( new Cube( size, size, size, 1, 1, 1, null, true ), material );
 		scene.addObject( mesh );
 
 		return mesh;
