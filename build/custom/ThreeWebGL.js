@@ -1,4 +1,4 @@
-// ThreeWebGL.js r33 - http://github.com/mrdoob/three.js
+// ThreeWebGL.js r34 - http://github.com/mrdoob/three.js
 var THREE=THREE||{};THREE.Color=function(a){this.setHex(a)};
 THREE.Color.prototype={autoUpdate:!0,setRGB:function(a,b,d){this.r=a;this.g=b;this.b=d;if(this.autoUpdate){this.updateHex();this.updateStyleString()}},setHSV:function(a,b,d){var e,h,m,k,o,n;if(d==0)e=h=m=0;else{k=Math.floor(a*6);o=a*6-k;a=d*(1-b);n=d*(1-b*o);b=d*(1-b*(1-o));switch(k){case 1:e=n;h=d;m=a;break;case 2:e=a;h=d;m=b;break;case 3:e=a;h=n;m=d;break;case 4:e=b;h=a;m=d;break;case 5:e=d;h=a;m=n;break;case 6:case 0:e=d;h=b;m=a}}this.r=e;this.g=h;this.b=m;if(this.autoUpdate){this.updateHex();
 this.updateStyleString()}},setHex:function(a){this.hex=~~a&16777215;if(this.autoUpdate){this.updateRGB();this.updateStyleString()}},updateHex:function(){this.hex=~~(this.r*255)<<16^~~(this.g*255)<<8^~~(this.b*255)},updateRGB:function(){this.r=(this.hex>>16&255)/255;this.g=(this.hex>>8&255)/255;this.b=(this.hex&255)/255},updateStyleString:function(){this.__styleString="rgb("+~~(this.r*255)+","+~~(this.g*255)+","+~~(this.b*255)+")"},clone:function(){return new THREE.Color(this.hex)}};
