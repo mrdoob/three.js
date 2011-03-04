@@ -137,10 +137,6 @@ THREE.AnimationHandler = (function() {
 				// THIS SHOULD BE REMOVED WHEN LENGTH IS UPDATED TO MS IN EXPORT FORMAT!
 				data.hierarchy[ h ].keys[ k ].time = parseInt( data.hierarchy[ h ].keys[ k ].time * 1000, 10 );
 
-				// set index
-
-				data.hierarchy[ h ].keys[ k ].index = k;
-
 
 				// create quaternions
 
@@ -151,6 +147,30 @@ THREE.AnimationHandler = (function() {
 					data.hierarchy[ h ].keys[ k ].rot = new THREE.Quaternion( quat[0], quat[1], quat[2], quat[3] );
 
 				}
+			
+			}
+			
+			
+			// remove all keys that are on the same time
+			
+			for( var k = 1; k < data.hierarchy[ h ].keys.length; k++ ) {
+				
+				if( data.hierarchy[ h ].keys[ k ].time === data.hierarchy[ h ].keys[ k - 1 ].time ) {
+					
+					data.hierarchy[ h ].keys.splice( k, 1 );
+					k--;
+				
+				}
+				
+			}
+
+
+			// set index
+			
+			for( var k = 1; k < data.hierarchy[ h ].keys.length; k++ ) {
+				
+				data.hierarchy[ h ].keys[ k ].index = k;
+				
 			}
 		}
 

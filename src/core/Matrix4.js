@@ -72,8 +72,25 @@ THREE.Matrix4.prototype = {
 		var x = THREE.Matrix4.__tmpVec1, y = THREE.Matrix4.__tmpVec2, z = THREE.Matrix4.__tmpVec3;
 
 		z.sub( eye, center ).normalize();
+		
+		if ( z.length() === 0 ) {
+			
+			z.z = 1;
+		}
+		
 		x.cross( up, z ).normalize();
+
+		if ( x.length() === 0 ) {
+			
+			z.x += 0.0001;
+			x.cross( up, z ).normalize();
+			
+		}
+
 		y.cross( z, x ).normalize();
+
+//		if ( x.length() === 0 ) x.set( 1, 0, 0 );
+//		if ( y.length() === 0 ) y.set( 0, 1, 0 );
 
 /*		this.n11 = x.x; this.n12 = x.y; this.n13 = x.z; this.n14 = - x.dot( eye );
 		this.n21 = y.x; this.n22 = y.y; this.n23 = y.z; this.n24 = - y.dot( eye );
@@ -751,8 +768,10 @@ THREE.Matrix4.makeInvert3x3 = function ( m1 ) {
 	idet;
 
 	// no inverse
-	if (det == 0) throw "matrix not invertible";
-
+	if (det == 0) {
+		throw "matrix not invertible";
+	}
+	
 	idet = 1.0 / det;
 
 	m33m[ 0 ] = idet * a11; m33m[ 1 ] = idet * a21; m33m[ 2 ] = idet * a31;
