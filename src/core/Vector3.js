@@ -20,7 +20,7 @@ THREE.Vector3 = function ( x, y, z ) {
 
 THREE.Vector3.prototype = {
 
-	set: function ( x, y, z ) {
+	set : function ( x, y, z ) {
 
 		this.x = x;
 		this.y = y;
@@ -280,9 +280,15 @@ THREE.Vector3.prototype = {
 
 	},
 
-	setLength : function( len ) {
+	setLength : function ( l ) {
 
-		return this.normalize().multiplyScalar( len );
+		return this.normalize().multiplyScalar( l );
+
+	},
+
+	setRotationFromMatrix : function ( m ) {
+
+		
 
 	},
 

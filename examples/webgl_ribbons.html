@@ -114,8 +114,8 @@
 				}
 
 				var tmpRot = new THREE.Matrix4();
-				tmpRot.setRotAxis( new THREE.Vector3( 1, 0, 0 ), 1.57 );
-				
+				tmpRot.setRotationAxis( new THREE.Vector3( 1, 0, 0 ), 1.57 );
+
 				var material_base = new THREE.MeshBasicMaterial( { color:0xffffff, vertexColors:true } );
 
 				renderer.initMaterial( material_base, scene.lights, scene.fog );

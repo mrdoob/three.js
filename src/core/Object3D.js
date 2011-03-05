@@ -35,6 +35,30 @@ THREE.Object3D = function() {
 
 THREE.Object3D.prototype = {
 
+	translateX : function () {
+
+		
+
+	},
+
+	translateY : function () {
+
+		
+
+	},
+
+	translateZ : function () {
+
+		
+
+	},
+
+	lookAt : function ( object ) {
+	
+		
+	
+	},
+
 	addChild: function ( child ) {
 
 		if ( this.children.indexOf( child ) === - 1 ) {
@@ -124,21 +148,7 @@ THREE.Object3D.prototype = {
 
 				}
 
-				// extract rotation matrix
-
-				var invScaleX = 1 / this.scale.x, invScaleY = 1 / this.scale.y, invScaleZ = 1 / this.scale.z;
-
-				this.matrixRotationWorld.n11 = this.matrixWorld.n11 * invScaleX;
-				this.matrixRotationWorld.n21 = this.matrixWorld.n21 * invScaleX;
-				this.matrixRotationWorld.n31 = this.matrixWorld.n31 * invScaleX;
-
-				this.matrixRotationWorld.n12 = this.matrixWorld.n12 * invScaleY;
-				this.matrixRotationWorld.n22 = this.matrixWorld.n22 * invScaleY;
-				this.matrixRotationWorld.n32 = this.matrixWorld.n32 * invScaleY;
-
-				this.matrixRotationWorld.n13 = this.matrixWorld.n13 * invScaleZ;
-				this.matrixRotationWorld.n23 = this.matrixWorld.n23 * invScaleZ;
-				this.matrixRotationWorld.n33 = this.matrixWorld.n33 * invScaleZ;
+				this.matrixRotationWorld.extractRotation( this.matrixWorld, this.scale );
 
 				this.matrixNeedsUpdate = false;
 				forceUpdate = true;
