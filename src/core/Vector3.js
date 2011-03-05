@@ -280,15 +280,25 @@ THREE.Vector3.prototype = {
 
 	},
 
-	setLength : function ( l ) {
+	setPositionFromMatrix : function ( m ) {
 
-		return this.normalize().multiplyScalar( l );
+		this.x = m.n14;
+		this.y = m.n24;
+		this.z = m.n34;
 
 	},
 
+	/*
 	setRotationFromMatrix : function ( m ) {
 
 		
+
+	},
+	*/
+
+	setLength : function ( l ) {
+
+		return this.normalize().multiplyScalar( l );
 
 	},
 
