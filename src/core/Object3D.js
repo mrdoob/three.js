@@ -6,21 +6,23 @@
 
 THREE.Object3D = function() {
 
-	this.id = THREE.Object3DCounter.value ++;
-
 	this.parent = undefined;
 	this.children = [];
 
+	this.up = new THREE.Vector3( 0.0, 1.0, 0.0 );
+
 	this.position = new THREE.Vector3();
-	this.positionScreen = new THREE.Vector4();
 	this.rotation = new THREE.Vector3();
 	this.scale = new THREE.Vector3( 1.0, 1.0, 1.0 );
+
+	this.rotationAutoUpdate = true;
 
 	this.matrix = new THREE.Matrix4();
 	this.matrixWorld = new THREE.Matrix4();
 	this.matrixRotationWorld = new THREE.Matrix4();
-	this.matrixNeedsUpdate = true;
+
 	this.matrixAutoUpdate = true;
+	this.matrixWorldNeedsUpdate = true;
 
 	this.quaternion = new THREE.Quaternion();
 	this.useQuaternion = false;
@@ -35,6 +37,7 @@ THREE.Object3D = function() {
 
 THREE.Object3D.prototype = {
 
+	/*
 	translateX : function () {
 
 		
@@ -52,11 +55,20 @@ THREE.Object3D.prototype = {
 		
 
 	},
+	*/
 
-	lookAt : function ( object ) {
-	
-		
-	
+	lookAt : function ( target ) {
+
+		// TODO: Add hierarchy support.
+
+		this.matrix.lookAt( this.position, target, this.up );
+
+		if ( this.rotationAutoUpdate ) {
+
+			this.rotation.setRotationFromMatrix( this.matrix );
+
+		}
+
 	},
 
 	addChild: function ( child ) {
@@ -76,11 +88,17 @@ THREE.Object3D.prototype = {
 
 			var scene = this;
 
-			while( scene instanceof THREE.Scene === false && scene !== undefined )
+			while ( scene instanceof THREE.Scene === false && scene !== undefined ) {
+
 				scene = scene.parent;
 
-			if( scene !== undefined ) 
+			}
+
+			if ( scene !== undefined )  {
+
 				scene.addChildRecurse( child );
+
+			}
 
 		}
 
@@ -136,7 +154,7 @@ THREE.Object3D.prototype = {
 
 			// update matrixWorld
 
-			if ( forceUpdate || this.matrixNeedsUpdate ) {
+			if ( forceUpdate || this.matrixWorldNeedsUpdate ) {
 
 				if ( parentMatrixWorld ) {
 
@@ -150,7 +168,7 @@ THREE.Object3D.prototype = {
 
 				this.matrixRotationWorld.extractRotation( this.matrixWorld, this.scale );
 
-				this.matrixNeedsUpdate = false;
+				this.matrixWorldNeedsUpdate = false;
 				forceUpdate = true;
 
 			}
@@ -168,5 +186,3 @@ THREE.Object3D.prototype = {
 	}
 
 }
-
-THREE.Object3DCounter = { value: 0 };

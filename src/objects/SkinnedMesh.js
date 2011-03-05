@@ -101,7 +101,7 @@ THREE.SkinnedMesh.prototype.update = function ( parentMatrixWorld, forceUpdate, 
 
 		// update global
 
-		if ( forceUpdate || this.matrixNeedsUpdate ) {
+		if ( forceUpdate || this.matrixWorldNeedsUpdate ) {
 
 			if ( parentMatrixWorld ) {
 
@@ -113,7 +113,7 @@ THREE.SkinnedMesh.prototype.update = function ( parentMatrixWorld, forceUpdate, 
 
 			}
 
-			this.matrixNeedsUpdate = false;
+			this.matrixWorldNeedsUpdate = false;
 			forceUpdate = true;
 
 		}

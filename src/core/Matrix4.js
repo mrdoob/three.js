@@ -69,17 +69,15 @@ THREE.Matrix4.prototype = {
 
 	lookAt : function ( eye, center, up ) {
 
-		var x = THREE.Matrix4.__tmpVec1,
-		y = THREE.Matrix4.__tmpVec2,
-		z = THREE.Matrix4.__tmpVec3;
+		var x = THREE.Matrix4.__v1, y = THREE.Matrix4.__v2, z = THREE.Matrix4.__v3;
 
 		z.sub( eye, center ).normalize();
 		x.cross( up, z ).normalize();
 		y.cross( z, x ).normalize();
 
-		this.n11 = x.x; this.n12 = y.x; this.n13 = z.x; this.n14 = eye.x;
-		this.n21 = x.y; this.n22 = y.y; this.n23 = z.y; this.n24 = eye.y;
-		this.n31 = x.z; this.n32 = y.z; this.n33 = z.z; this.n34 = eye.z;
+		this.n11 = x.x; this.n12 = y.x; this.n13 = z.x; // this.n14 = eye.x;
+		this.n21 = x.y; this.n22 = y.y; this.n23 = z.y; // this.n24 = eye.y;
+		this.n31 = x.z; this.n32 = y.z; this.n33 = z.z; // this.n34 = eye.z;
 
 		return this;
 
@@ -478,6 +476,8 @@ THREE.Matrix4.prototype = {
 		this.n32 = ad * f + b * e;
 		this.n33 = a * c;
 
+		return this;
+
 	},
 
 	setRotationFromQuaternion : function( q ) {
@@ -499,6 +499,8 @@ THREE.Matrix4.prototype = {
 		this.n31 = xz - wy;
 		this.n32 = yz + wx;
 		this.n33 = 1 - ( xx + yy );
+
+		return this;
 
 	},
 
@@ -666,6 +668,6 @@ THREE.Matrix4.makeOrtho = function ( left, right, top, bottom, near, far ) {
 
 };
 
-THREE.Matrix4.__tmpVec1 = new THREE.Vector3();
-THREE.Matrix4.__tmpVec2 = new THREE.Vector3();
-THREE.Matrix4.__tmpVec3 = new THREE.Vector3();
+THREE.Matrix4.__v1 = new THREE.Vector3();
+THREE.Matrix4.__v2 = new THREE.Vector3();
+THREE.Matrix4.__v3 = new THREE.Vector3();

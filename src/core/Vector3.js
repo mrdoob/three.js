@@ -288,13 +288,25 @@ THREE.Vector3.prototype = {
 
 	},
 
-	/*
 	setRotationFromMatrix : function ( m ) {
 
-		
+		this.y = Math.asin( m.n13 );
+
+		var yc = Math.cos( this.y );
+
+		if ( Math.abs( yc ) > 0.00001 ) {
+
+			this.x = Math.atan2( - m.n23 / yc, m.n33 / yc );
+			this.z = Math.atan2( - m.n13 / yc, m.n11 / yc );
+
+		} else {
+
+			this.x = 0;
+			this.z = Math.atan2( m.n21, m.n22 );
+
+		}
 
 	},
-	*/
 
 	setLength : function ( l ) {
 

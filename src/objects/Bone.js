@@ -33,7 +33,7 @@ THREE.Bone.prototype.update = function( parentSkinMatrix, forceUpdate, camera ) 
 
 	// update skin matrix
 
-	if ( forceUpdate || this.matrixNeedsUpdate ) {
+	if ( forceUpdate || this.matrixWorldNeedsUpdate ) {
 
 		if( parentSkinMatrix ) {
 
@@ -45,7 +45,7 @@ THREE.Bone.prototype.update = function( parentSkinMatrix, forceUpdate, camera ) 
 
 		}
 
-		this.matrixNeedsUpdate = false;
+		this.matrixWorldNeedsUpdate = false;
 		forceUpdate = true;
 
 	}
