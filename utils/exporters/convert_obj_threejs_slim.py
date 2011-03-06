@@ -323,17 +323,18 @@ def normalize(v):
     """Normalize 3d vector"""
     
     l = math.sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2])
-    v[0] /= l
-    v[1] /= l
-    v[2] /= l
+    if l:
+        v[0] /= l
+        v[1] /= l
+        v[2] /= l
 
 # #####################################################
 # MTL parser
 # #####################################################
 def texture_relative_path(fullpath):
-	texture_file = os.path.basename(fullpath)
-	return texture_file
-	
+    texture_file = os.path.basename(fullpath)
+    return texture_file
+    
 def parse_mtl(fname):
     """Parse MTL file.
     """
