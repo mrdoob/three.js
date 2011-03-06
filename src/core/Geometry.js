@@ -213,7 +213,7 @@ THREE.Geometry.prototype = {
 
 	},
 
-	computeTangents: function() {
+	computeTangents: function () {
 
 		// based on http://www.terathon.com/code/tangent.html
 		// tangents go to vertices

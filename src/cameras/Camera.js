@@ -16,7 +16,7 @@ THREE.Camera = function ( fov, aspect, near, far, target ) {
 	this.useTarget = true;
 
 	this.matrixWorldInverse = new THREE.Matrix4();
-	this.projectionMatrix   = null;
+	this.projectionMatrix = null;
 
 	this.updateProjectionMatrix();
 
@@ -26,8 +26,6 @@ THREE.Camera.prototype = new THREE.Object3D();
 THREE.Camera.prototype.constructor = THREE.Camera;
 THREE.Camera.prototype.supr = THREE.Object3D.prototype;
 
-
-// Overrides Object3D::translate()
 
 THREE.Camera.prototype.translate = function ( distance, axis ) {
 

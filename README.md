@@ -136,7 +136,7 @@ This code creates a camera, then creates a scene object, adds a bunch of random 
 
 ### Change Log ###
 
-2011 03 06 - **r35** (188.029 KB, gzip: 46.465 KB)
+2011 03 06 - **r35** (187.875 KB, gzip: 46.433 KB)
 
 * Added methods `translate`, `translateX`, `translateY`, `translateZ` and `lookAt` methods to `Object3D`. ([mrdoob](http://github.com/mrdoob))
 * Added methods `setViewport` and `setScissor` to `WebGLRenderer`. ([alteredq](http://github.com/alteredq))
