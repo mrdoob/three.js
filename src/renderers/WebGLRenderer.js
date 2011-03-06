@@ -55,6 +55,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	_vector3 = new THREE.Vector4(),
 
+	// light arrays cache
+	
+	_lights = {
+
+		ambient: 	 [ 0, 0, 0 ],
+		directional: { length: 0, colors: new Array(), positions: new Array() },
+		point: 		 { length: 0, colors: new Array(), positions: new Array() }
+
+	},
+
 	// parameters defaults
 
 	antialias = true,
@@ -78,14 +88,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.context = _gl;
 
 	//alert( dumpObject( getGLParams() ) );
-
-	this.lights = {
-
-		ambient: 	 [ 0, 0, 0 ],
-		directional: { length: 0, colors: new Array(), positions: new Array() },
-		point: 		 { length: 0, colors: new Array(), positions: new Array() }
-
-	};
 
 	this.setSize = function ( width, height ) {
 
@@ -148,7 +150,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var l, ll, light, r = 0, g = 0, b = 0,
 			color, position, intensity,
 
-			zlights = _this.lights,
+			zlights = _lights,
 
 			dcolors    = zlights.directional.colors,
 			dpositions = zlights.directional.positions,
@@ -1453,7 +1455,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			 material instanceof THREE.MeshLambertMaterial ) {
 
 			setupLights( program, lights );
-			refreshUniformsLights( m_uniforms, _this.lights );
+			refreshUniformsLights( m_uniforms, _lights );
 
 		}
 
@@ -1902,7 +1904,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		scene.update( undefined, false, camera );
 
-		this.initWebGLObjects( scene, camera );
+		this.initWebGLObjects( scene );
 
 		setRenderTarget( renderTarget );
 
@@ -2117,7 +2119,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	this.initWebGLObjects = function ( scene, camera ) {
+	this.initWebGLObjects = function ( scene ) {
 
 		if ( !scene.__webglObjects ) {
 
