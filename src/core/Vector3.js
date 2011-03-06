@@ -292,12 +292,12 @@ THREE.Vector3.prototype = {
 
 		this.y = Math.asin( m.n13 );
 
-		var yc = Math.cos( this.y );
+		var cosY = Math.cos( this.y );
 
-		if ( Math.abs( yc ) > 0.00001 ) {
+		if ( Math.abs( cosY ) > 0.00001 ) {
 
-			this.x = Math.atan2( - m.n23 / yc, m.n33 / yc );
-			this.z = Math.atan2( - m.n13 / yc, m.n11 / yc );
+			this.x = Math.atan2( - m.n23 / cosY, m.n33 / cosY );
+			this.z = Math.atan2( - m.n13 / cosY, m.n11 / cosY );
 
 		} else {
 

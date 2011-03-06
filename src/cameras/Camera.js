@@ -20,38 +20,22 @@ THREE.Camera = function ( fov, aspect, near, far, target ) {
 
 	this.updateProjectionMatrix();
 
-	// movement
-
-	var vector = new THREE.Vector3();
-
-	this.translateX = function ( amount, noFly ) {
-
-		vector.sub( this.target.position, this.position ).normalize().multiplyScalar( amount );
-		vector.crossSelf( this.up );
-
-		if ( noFly ) vector.y = 0;
-
-		this.position.addSelf( vector );
-		this.target.position.addSelf( vector );
-
-	};
-
-	this.translateZ = function ( amount, noFly ) {
-
-		vector.sub( this.target.position, this.position ).normalize().multiplyScalar( amount );
-
-		if ( noFly ) vector.y = 0;
-
-		this.position.subSelf( vector );
-		this.target.position.subSelf( vector );
-
-	};
-
 }
 
 THREE.Camera.prototype = new THREE.Object3D();
 THREE.Camera.prototype.constructor = THREE.Camera;
 THREE.Camera.prototype.supr = THREE.Object3D.prototype;
+
+
+// Overrides Object3D::translate()
+
+THREE.Camera.prototype.translate = function ( distance, axis ) {
+
+	this.matrix.rotateAxis( axis );
+	this.position.addSelf( axis.multiplyScalar( distance ) );
+	this.target.position.addSelf( axis.multiplyScalar( distance ) );
+
+}
 
 
 THREE.Camera.prototype.updateProjectionMatrix = function () {

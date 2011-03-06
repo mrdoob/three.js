@@ -75,9 +75,9 @@ THREE.Matrix4.prototype = {
 		x.cross( up, z ).normalize();
 		y.cross( z, x ).normalize();
 
-		this.n11 = x.x; this.n12 = y.x; this.n13 = z.x; // this.n14 = eye.x;
-		this.n21 = x.y; this.n22 = y.y; this.n23 = z.y; // this.n24 = eye.y;
-		this.n31 = x.z; this.n32 = y.z; this.n33 = z.z; // this.n34 = eye.z;
+		this.n11 = x.x; this.n12 = y.x; this.n13 = z.x;
+		this.n21 = x.y; this.n22 = y.y; this.n23 = z.y;
+		this.n31 = x.z; this.n32 = y.z; this.n33 = z.z;
 
 		return this;
 
@@ -113,6 +113,20 @@ THREE.Matrix4.prototype = {
 		v.y = this.n21 * vx + this.n22 * vy + this.n23 * vz + this.n24 * vw;
 		v.z = this.n31 * vx + this.n32 * vy + this.n33 * vz + this.n34 * vw;
 		v.w = this.n41 * vx + this.n42 * vy + this.n43 * vz + this.n44 * vw;
+
+		return v;
+
+	},
+
+	rotateAxis : function ( v ) {
+
+		var vx = v.x, vy = v.y, vz = v.z;
+
+		v.x = vx * this.n11 + vy * this.n12 + vz * this.n13;
+		v.y = vx * this.n21 + vy * this.n22 + vz * this.n23;
+		v.z = vx * this.n31 + vy * this.n32 + vz * this.n33;
+
+		v.normalize();
 
 		return v;
 
@@ -583,9 +597,7 @@ THREE.Matrix4.makeInvert3x3 = function ( m1 ) {
 	// input:  THREE.Matrix4, output: THREE.Matrix3
 	// ( based on http://code.google.com/p/webgl-mjs/ )
 
-	var m33 = m1.m33,
-		m33m = m33.m,
-
+	var m33 = m1.m33, m33m = m33.m,
 	a11 =   m1.n33 * m1.n22 - m1.n32 * m1.n23,
 	a21 = - m1.n33 * m1.n21 + m1.n31 * m1.n23,
 	a31 =   m1.n32 * m1.n21 - m1.n31 * m1.n22,

@@ -9,11 +9,11 @@ THREE.Object3D = function() {
 	this.parent = undefined;
 	this.children = [];
 
-	this.up = new THREE.Vector3( 0.0, 1.0, 0.0 );
+	this.up = new THREE.Vector3( 0, 1, 0 );
 
 	this.position = new THREE.Vector3();
 	this.rotation = new THREE.Vector3();
-	this.scale = new THREE.Vector3( 1.0, 1.0, 1.0 );
+	this.scale = new THREE.Vector3( 1, 1, 1 );
 
 	this.rotationAutoUpdate = true;
 
@@ -32,30 +32,37 @@ THREE.Object3D = function() {
 
 	this.visible = true;
 
+	this._vector = new THREE.Vector3();
+
 };
 
 
 THREE.Object3D.prototype = {
 
-	/*
-	translateX : function () {
+	translate : function ( distance, axis ) {
 
-		
-
-	},
-
-	translateY : function () {
-
-		
+		this.matrix.rotateAxis( axis );
+		this.position.addSelf( axis.multiplyScalar( distance ) );
 
 	},
 
-	translateZ : function () {
+	translateX : function ( distance ) {
 
-		
+		this.translate( distance, this._vector.set( 1, 0, 0 ) );
 
 	},
-	*/
+
+	translateY : function ( distance ) {
+
+		this.translate( distance, this._vector.set( 0, 1, 0 ) );
+
+	},
+
+	translateZ : function ( distance ) {
+
+		this.translate( distance, this._vector.set( 0, 0, 1 ) );
+
+	},
 
 	lookAt : function ( vector ) {
 
