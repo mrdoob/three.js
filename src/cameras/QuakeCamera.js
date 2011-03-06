@@ -169,10 +169,10 @@ THREE.QuakeCamera = function ( parameters ) {
 
 		}
 
-		if ( this.moveForward || this.autoForward ) this.translateZ( - ( this.movementSpeed + this.autoSpeedFactor ), this.noFly );
-		if ( this.moveBackward ) this.translateZ( this.movementSpeed, this.noFly );
-		if ( this.moveLeft ) this.translateX( - this.movementSpeed, this.noFly );
-		if ( this.moveRight ) this.translateX( this.movementSpeed, this.noFly );
+		if ( this.moveForward || this.autoForward ) this.translateZ( - ( this.movementSpeed + this.autoSpeedFactor ) );
+		if ( this.moveBackward ) this.translateZ( this.movementSpeed );
+		if ( this.moveLeft ) this.translateX( - this.movementSpeed );
+		if ( this.moveRight ) this.translateX( this.movementSpeed );
 
 		this.lon += this.mouseX * this.lookSpeed;
 		if( this.lookVertical ) this.lat -= this.mouseY * this.lookSpeed;
@@ -225,6 +225,23 @@ THREE.QuakeCamera = function ( parameters ) {
 
 };
 
+
 THREE.QuakeCamera.prototype = new THREE.Camera();
 THREE.QuakeCamera.prototype.constructor = THREE.QuakeCamera;
 THREE.QuakeCamera.prototype.supr = THREE.Camera.prototype;
+
+
+THREE.QuakeCamera.prototype.translate = function ( distance, axis ) {
+
+	this.matrix.rotateAxis( axis );
+	
+	if ( this.noFly ) {
+		
+		axis.y = 0;
+
+	}
+	
+	this.position.addSelf( axis.multiplyScalar( distance ) );
+	this.target.position.addSelf( axis.multiplyScalar( distance ) );
+
+};
