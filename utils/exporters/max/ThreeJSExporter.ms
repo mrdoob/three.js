@@ -7,13 +7,13 @@
 rollout ThreeJSExporter "ThreeJSExporter"
 (
 	-- Variables
-	
+
 	local ostream,
 
 	headerFormat = "// Converted from: %
 //  vertices: %
 //  normals: %
-//  uvs: %	
+//  uvs: %
 //  triangles: %
 //  materials: %
 //
@@ -24,26 +24,26 @@ rollout ThreeJSExporter "ThreeJSExporter"
 ",
 
 	vertexFormat = "%,%,%",
-	
+
 	vertexNormalFormat = "%,%,%",
 	UVFormat = "%,%",
-	
-	triFormat = "%,%,%, %",
-	triUVFormat = "%,%,%, %, %,%,%",
-	triNFormat = "%,%,%, %, %,%,%",
-	triUVNFormat = "%,%,%, %, %,%,%, %,%,%",
+
+	triFormat = "%,%,%,%",
+	triUVFormat = "%,%,%,%,%,%,%",
+	triNFormat = "%,%,%,%,%,%,%",
+	triUVNFormat = "%,%,%,%,%,%,%,%,%,%",
 
 	footerFormat = "}\n\npostMessage( model );"
 
 	-------------------------------------------------------------------------------------
 	-- User interface
-	
-	group "ThreeJSExporter  v0.1" 
+
+	group "ThreeJSExporter  v0.2" 
 	(
-		
+
 		label msg "Exports meshes in Three.js ascii JSON format" align:#left
-		hyperLink lab1 "Original source can be found here" address:"https://github.com/mrdoob/three.js" align:#left		
-		
+		hyperLink lab1 "Original source can be found here" address:"https://github.com/mrdoob/three.js" align:#left
+
 		checkbox flipYZ "Flip YZ" checked:true enabled:true
 		checkbox flipUV "Flip UV" checked:true enabled:true
 		checkbox flipFace "Flip faces" checked:false enabled:true
@@ -53,27 +53,27 @@ rollout ThreeJSExporter "ThreeJSExporter"
 		checkbox exportColor "Export vertex colors" checked:false enabled:false
 
 	)
-	
-	button btn_export "Export selected objects"	
+
+	button btn_export "Export selected objects"
 
 	-------------------------------------------------------------------------------------
 	-- Dump vertices
 
 	function DumpVertices src = 
 	(
-			
+
 		Format "'vertices': [" to:ostream
-		
+
 		num = src.count
-		
+
 		if num > 0 then
 		(
-			
+
 			for i = 1 to num do
 			(
-				
+
 				vert = src[i]
-				
+
 				if flipYZ.checked then
 				(
 					x = vert.x
@@ -85,44 +85,44 @@ rollout ThreeJSExporter "ThreeJSExporter"
 				)
 				else
 				(
-					
+
 					x = vert.x
 					y = vert.y
 					z = vert.z
-					
-				)					
+
+				)
 				
 				Format vertexFormat x y z to:ostream
 				
-				if i < num then Format ", " to:ostream
+				if i < num then Format "," to:ostream
 
 			)
 
 		)
-		
+
 		Format "],\n\n" to:ostream
 
 	)
-	
+
 	-------------------------------------------------------------------------------------
 	-- Dump normals
 
 	function DumpNormals src = 
 	(
-			
+
 		Format "'normals': [" to:ostream
-		
+
 		num = src.count
-		
+
 		if num > 0 and exportNormal.checked then
 		(
-			
+
 			for i = 1 to num do
 			(
-				
+
 				normal = src[i]
 				normal = normalize normal as point3
-				
+
 				if flipYZ.checked then
 				(
 
@@ -141,39 +141,39 @@ rollout ThreeJSExporter "ThreeJSExporter"
 					z = normal.z
 
 				)
-				
+
 				Format vertexNormalFormat x y z to:ostream
-				
-				if i < num then Format ", " to:ostream
+
+				if i < num then Format "," to:ostream
 
 			)
 
 		)
-		
+
 		Format "],\n\n" to:ostream
 
 	)
-	
+
 	-------------------------------------------------------------------------------------
 	-- Dump uvs
 
 	function DumpUvs src = 
 	(
-			
+
 		Format "'uvs': [" to:ostream
-		
+
 		num = src.count
-		
+
 		if num > 0 and exportUv.checked then
 		(
-			
+
 			for i = 1 to num do
 			(
-				
+
 				uvw = src[i]
-				
+
 				u = uvw.x
-				
+
 				if flipUV.checked then 
 				(
 					v = 1 - uvw.y
@@ -182,68 +182,68 @@ rollout ThreeJSExporter "ThreeJSExporter"
 				(
 					v = uvw.y
 				)
-				
+
 				Format UVFormat u v to:ostream
-				
-				if i < num then Format ", " to:ostream
+
+				if i < num then Format "," to:ostream
 
 			)
 
 		)
-		
+
 		Format "],\n\n" to:ostream
 
 	)
 
 	-------------------------------------------------------------------------------------
 	-- Dump face type
-	
+
 	function DumpFaceType label content = 
 	(
 		Format "'%': [" label to:ostream
-		
+
 		num = content.count
-		
+
 		if num > 0 then 
 		(
 
 			for i = 1 to num do
 			(
-				
+
 				zface = content[i]
-				
+
 				fv  = zface[1]
 				fuv = zface[2]
-				m   = zface[3] - 1 
-				
+				m   = zface[3] - 1
+
 				needsFlip = zface[4]
 
 				hasUVs = (classof fuv == Point3)
-				
+
 				va = (fv.x - 1) as Integer
 				vb = (fv.y - 1) as Integer
 				vc = (fv.z - 1) as Integer
 
 				if smoothNormal.checked then 
 				(
-				
+
 					-- normals have the same indices as vertices
-					
+
 					na = va
 					nb = vb
 					nc = vc
-					
+
 				)
 				else 
 				(
-					-- normals have the same indices as faces
-					
+					-- normals have the same indices as face
+
 					na = i - 1
 					nb = na
 					nc = na
-					
+
 				)
-				
+
 				if hasUVs then
 				(
 				
@@ -252,28 +252,28 @@ rollout ThreeJSExporter "ThreeJSExporter"
 					uc = (fuv.z - 1) as Integer
 
 				)
-				
+
 				if flipFace.checked or needsFlip then 
 				(
 					tmp = vb
 					vb = vc
 					vc = tmp
-					
+
 					tmp = nb
 					nb = nc
 					nc = tmp
-					
+
 					if hasUVs then
 					(
-					
+
 						tmp = ub
 						ub = uc
 						uc = tmp
 
 					)
-					
+
 				)
-				
+
 				if label == "triangles" then
 				(
 					Format triFormat va vb vc m to:ostream
@@ -289,18 +289,18 @@ rollout ThreeJSExporter "ThreeJSExporter"
 				else if label == "trianglesNormalsUvs" then
 				(
 					Format triUVNFormat va vb vc m na nb nc ua ub uc to:ostream
-				)				
-				
-				if i < num then Format ", " to:ostream
-				
+				)
+
+				if i < num then Format "," to:ostream
+
 			)
 
 		)
-			
+
 		Format "],\n\n" to:ostream
-		
+
 	)
-	
+
 	-------------------------------------------------------------------------------------
 	-- Dump faces
 
@@ -308,7 +308,7 @@ rollout ThreeJSExporter "ThreeJSExporter"
 	(
 
 		hasUVs = true
-		
+
 		triangles = #()
 		trianglesUvs = #()
 		trianglesNormals = #()
@@ -318,20 +318,20 @@ rollout ThreeJSExporter "ThreeJSExporter"
 		quadsUvs = #()
 		quadsNormals = #()
 		quadsNormalsUvs = #()
-		
+
 		num = src.count
-		
+
 		if num > 0 then
 		(
-			
+
 			for i = 1 to num do
 			(
 
 				zface = src[i]
 				fuv = zface[2]
-				
+
 				hasUVs = (classof fuv == Point3)
-				
+
 				if hasUVs and exportUv.checked and exportNormal.checked then
 				(
 					append trianglesNormalsUvs zface
@@ -348,11 +348,11 @@ rollout ThreeJSExporter "ThreeJSExporter"
 				(
 					append triangles zface
 				)
-				
+
 			)
 
 		)
-		
+
 		DumpFaceType "triangles" triangles
 		DumpFaceType "trianglesUvs" trianglesUvs
 		DumpFaceType "trianglesNormals" trianglesNormals
@@ -361,37 +361,37 @@ rollout ThreeJSExporter "ThreeJSExporter"
 		DumpFaceType "quads" quads
 		DumpFaceType "quadsUvs" quadsUvs
 		DumpFaceType "quadsNormals" quadsNormals
-		DumpFaceType "quadsNormalsUvs" quadsNormalsUvs		
-		
+		DumpFaceType "quadsNormalsUvs" quadsNormalsUvs
+
 	)
-	
+
 	-------------------------------------------------------------------------------------
 	-- Dump color
-	
+
 	function DumpColor pcolor label = 
 	(
 		r = pcolor.r / 255
 		g = pcolor.g / 255
 		b = pcolor.b / 255
-		
+
 		fr = formattedPrint r format:".4f"
 		fg = formattedPrint g format:".4f"
 		fb = formattedPrint b format:".4f"
-		
+
 		Format "'%'  : [%, %, %],\n" label fr fg fb to:ostream
-		
+
 	)
-	
+
 	-------------------------------------------------------------------------------------
 	-- Dump map
-	
+
 	function DumpMap pmap label = 
 	(
-		
-		if classof pmap == BitmapTexture then	
+
+		if classof pmap == BitmapTexture then
 		(
 			bm = pmap.bitmap
-			
+
 			if bm != undefined then 
 			(
 
@@ -399,21 +399,21 @@ rollout ThreeJSExporter "ThreeJSExporter"
 				Format "'%'    : '%',\n" label fname to:ostream
 
 			)
-			
+
 		)
-		
+
 	)
 
 	-------------------------------------------------------------------------------------
 	-- Export materials
-	
+
 	function ExportMaterials zmaterials = 
 	(
 
 		Format "'materials': [\n" to:ostream
-		
+
 		totalMaterials = zmaterials.count
-		
+
 		for i = 1 to totalMaterials do
 		(
 			mat = zmaterials[i]
@@ -421,16 +421,16 @@ rollout ThreeJSExporter "ThreeJSExporter"
 			Format "{\n" to:ostream
 
 			-- debug
-			
+
 			Format "'DbgIndex' : %,\n" (i-1) to:ostream
 			Format "'DbgName'  : '%',\n" mat.name to:ostream
-		
+
 			-- colors
-			
+
 			DumpColor mat.diffuse  "colorDiffuse"
 			DumpColor mat.ambient  "colorAmbient"
-			DumpColor mat.specular "colorSpecular"			
-			
+			DumpColor mat.specular "colorSpecular"
+
 			t = mat.opacity / 100
 			s = mat.glossiness
 			
@@ -438,7 +438,7 @@ rollout ThreeJSExporter "ThreeJSExporter"
 			Format "'specularCoef'  : %,\n" s to:ostream
 
 			-- maps
-			
+
 			DumpMap mat.diffuseMap  "mapDiffuse"
 			DumpMap mat.ambientMap  "mapAmbient"
 			DumpMap mat.specularMap "mapSpecular"
@@ -446,24 +446,24 @@ rollout ThreeJSExporter "ThreeJSExporter"
 			DumpMap mat.opacityMap 	"mapAlpha"
 
 			Format "}" to:ostream
-			
+
 			if i < totalMaterials then Format "," to:ostream
 			Format "\n\n" to:ostream
-			
+
 		)
-		
+
 		Format "],\n\n" to:ostream
 
 	)
-	
+
 	-------------------------------------------------------------------------------------
 	-- Extract vertices from mesh
-	
+
 	function ExtractVertices obj whereto =
 	(
 
 		n = obj.numVerts
-		
+
 		for i = 1 to n do 
 		(
 
@@ -473,10 +473,10 @@ rollout ThreeJSExporter "ThreeJSExporter"
 		)
 
 	)
-	
+
 	-------------------------------------------------------------------------------------
 	-- Extract normals from mesh
-	
+
 	function ExtractNormals obj whereto needsFlip =
 	(
 		if smoothNormal.checked then
@@ -488,14 +488,14 @@ rollout ThreeJSExporter "ThreeJSExporter"
 			(
 
 				n = GetNormal obj i
-				
+
 				if needsFlip then
 				(
 					n.x *= -1
 					n.y *= -1
 					n.z *= -1
 				)
-				
+
 				append whereto n
 
 			)
@@ -503,14 +503,14 @@ rollout ThreeJSExporter "ThreeJSExporter"
 		)
 		else
 		(
-			
+
 			num = obj.numFaces
-			
+
 			for i = 1 to num do 
 			(
 
 				n = GetFaceNormal obj i
-				
+
 				if needsFlip then
 				(
 					n.x *= -1
@@ -525,10 +525,10 @@ rollout ThreeJSExporter "ThreeJSExporter"
 		)
 
 	)
-	
+
 	-------------------------------------------------------------------------------------
 	-- Extract uvs from mesh
-	
+
 	function ExtractUvs obj whereto =
 	(
 		n = obj.numTVerts
@@ -542,18 +542,18 @@ rollout ThreeJSExporter "ThreeJSExporter"
 		)
 
 	)
-	
+
 	-------------------------------------------------------------------------------------
 	-- Extract faces from mesh
-	
+
 	function ExtractFaces objMesh objMaterial whereto allMaterials needsFlip offsetVert offsetUv =
 	(
 		n = objMesh.numFaces
 		hasUVs = objMesh.numTVerts > 0
-		
+
 		useMultiMaterial = false
 		materialIDList = #()
-		
+
 		if ( classof objMaterial ) == StandardMaterial then 
 		(
 			fm = findItem allMaterials objMaterial
@@ -561,7 +561,7 @@ rollout ThreeJSExporter "ThreeJSExporter"
 		else
 		(
 			useMultiMaterial = true
-			
+
 			for i = 1 to n do 
 			(
 				mID = GetFaceMatID objMesh i
@@ -575,7 +575,7 @@ rollout ThreeJSExporter "ThreeJSExporter"
 				)
 
 			)
-			
+
 		)
 		
 		for i = 1 to n do 
@@ -588,39 +588,39 @@ rollout ThreeJSExporter "ThreeJSExporter"
 			fv.x += offsetVert
 			fv.y += offsetVert
 			fv.z += offsetVert
-			
+
 			if useMultiMaterial then 
 			(
 				mID = GetFaceMatID objMesh i
 				fm = materialIDList[mID]
 			)
-			
+
 			if hasUVs then
 			(
-			
+
 				fuv = GetTVFace objMesh i
 				
 				fuv.x += offsetUv
 				fuv.y += offsetUv
 				fuv.z += offsetUv
-				
+
 			)
 			else
 			(
 				fuv = false
 			)
-			
+
 			append zface fv 
 			append zface fuv
 			append zface fm
 			append zface needsFlip
-			
+
 			append whereto zface
 
 		)
 
 	)
-	
+
 	-------------------------------------------------------------------------------------
 	-- Extract materials from eventual multimaterial
 	
@@ -639,7 +639,7 @@ rollout ThreeJSExporter "ThreeJSExporter"
 		)
 		else if materialClass == MultiMaterial then
 		(
-		
+
 			n = objMesh.numFaces
 			
 			for i = 1 to n do 
@@ -666,9 +666,9 @@ rollout ThreeJSExporter "ThreeJSExporter"
 	function NeedsFaceFlip node = 
 	(
 		needsFlip = false
-		
+
 		local tmp = Snapshot node
-		
+
 		face_normal = normalize ( getfacenormal tmp 1 )
 
 		face = getface tmp 1
@@ -677,21 +677,21 @@ rollout ThreeJSExporter "ThreeJSExporter"
 		vb = getvert tmp face[2]
 		vc = getvert tmp face[3]
 
-		computed_normal = normalize ( cross (vc - vb)  (va - vb) )		
-		
+		computed_normal = normalize ( cross (vc - vb)  (va - vb) )
+
 		if distance computed_normal face_normal > 0.1 then needsFlip = true
 
 		delete tmp
-		
+
 		return needsFlip
 	)
-	
+
 	-------------------------------------------------------------------------------------
 	-- Extract only things that either already are or can be converted to meshes
-	
+
 	function ExtractMesh node =
 	(
-		
+
 		if SuperClassOf node == GeometryClass then
 		(
 			return #( SnapshotAsMesh node, node.name, node.material, NeedsFaceFlip node )
@@ -703,104 +703,119 @@ rollout ThreeJSExporter "ThreeJSExporter"
 		return #( false, node.name, 0 )
 
 	)
-	
+
 	-------------------------------------------------------------------------------------
 	-- Export scene
-	
+
 	function ExportScene =
 	(
-		
+
 		-- Extract meshes
-		
+
 		meshObjects = #()
-		
+
 		mergedVertices = #()
 		mergedNormals = #()
 		mergedUvs = #()
 		mergedFaces = #()
 		mergedMaterials = #()
-		
+
 		for obj in selection do 
 		(
-			
+
 			result = ExtractMesh obj
-			
+
 			meshObj   	 = result[1]
 			meshName     = result[2]
 			meshMaterial = result[3]
 			needsFlip    = result[4]
-			
+
 			if ClassOf meshObj == TriMesh then 
 			(
-				
+
 				append meshObjects result
-				
+
+				vertexOffset = mergedVertices.count
+				uvOffset = mergedUvs.count
+
 				ExtractMaterials meshObj meshMaterial mergedMaterials
-				
+
 				ExtractVertices meshObj mergedVertices
 				ExtractNormals meshObj mergedNormals needsFlip
 				ExtractUvs meshObj mergedUvs
-				
-				--ExtractFaces meshObj zmaterial mergedFaces mergedVertices.count mergedUvs.count
-				ExtractFaces meshObj meshMaterial mergedFaces mergedMaterials needsFlip 0 0
+
+				ExtractFaces meshObj meshMaterial mergedFaces mergedMaterials needsFlip vertexOffset uvOffset
 
 			)
 
 		)
-		
+
 		totalVertices = mergedVertices.count
-		totalNormals = mergedNormals.count
-		totalUvs = mergedUvs.count
 		totalFaces = mergedFaces.count
-		totalMaterials = sceneMaterials.count
+		totalMaterials = mergedMaterials.count
+
+		totalNormals = 0
+		if exportNormal.checked then 
+		(
+			totalNormals = mergedNormals.count
+		)
+
+		totalUvs = 0
+		if exportUv.checked then
+		(
+			totalUvs = mergedUvs.count
+		)
+
 
 		-- Dump header
-		
+
 		Format headerFormat maxFileName totalVertices totalNormals totalUvs totalFaces totalMaterials to:ostream
 
-		
+		-- Dump objects (debug)
+
 		Format "// Source objects:\n\n" to:ostream
-		
+
 		i = 0
-		
+
 		for obj in meshObjects do 
 		(
 
 			meshName = obj[2]
 			Format "// %: %\n" i meshName to:ostream
 			i += 1
-			
+
 		)
-		
-		
+
+		-- Dump model
+
 		Format "\n\nvar model = {\n\n" to:ostream
-		
+
 		-- Dump all materials in the scene
-		
+
 		ExportMaterials mergedMaterials
-		
+
 		-- Dump merged data from all selected geometries
-		
+
 		DumpVertices mergedVertices
 		DumpNormals mergedNormals
 		DumpUvs mergedUvs
 		DumpFaces mergedFaces
-		
+
 		-- Dump footer
-		
-		Format footerFormat to:ostream		
-		
-	)	
-	
-	
+
+		Format footerFormat to:ostream
+
+	)
+
+
 	-------------------------------------------------------------------------------------
 	-- Open and prepare a file handle for writing
-	
+
 	function GetSaveFileStream =
 	(
 		zname = getFilenameFile maxFileName
 		zname += ".js"
-		
+
 		fname = GetSaveFileName filename:zname types:"JavaScript file (*.js)|*.js|All Files(*.*)|*.*|"
 		if fname == undefined then
 			return undefined
@@ -814,10 +829,10 @@ rollout ThreeJSExporter "ThreeJSExporter"
 
 		return ostream
 	)
-	
+
 	-------------------------------------------------------------------------------------
 	-- Export button click handler
-	
+
 	on btn_export pressed do
 	(
 		ostream = GetSaveFileStream()
