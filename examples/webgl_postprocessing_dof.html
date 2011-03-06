@@ -305,7 +305,7 @@
 						for( i = 0; i < nobjects; i++ ) objects[i].materials = [ materials[i] ];
 
 
-					renderer.render( scene, camera, postprocessing.rtTextureColor );
+					renderer.render( scene, camera, postprocessing.rtTextureColor, true );
 
 					// Render depth into texture
 
@@ -314,7 +314,7 @@
 					else
 						for( i = 0; i < nobjects; i++ ) objects[i].materials = [ material_depth ];
 
-					renderer.render( scene, camera, postprocessing.rtTextureDepth );
+					renderer.render( scene, camera, postprocessing.rtTextureDepth, true );
 
 					// Render bokeh composite
 

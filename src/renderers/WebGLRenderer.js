@@ -1884,7 +1884,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	this.render = function( scene, camera, renderTarget, clear ) {
+	this.render = function( scene, camera, renderTarget, forceClear ) {
 
 		var i, program, opaque, transparent, material,
 			o, ol, oil, webglObject, object, buffer,
@@ -1904,9 +1904,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		this.initWebGLObjects( scene, camera );
 
-		setRenderTarget( renderTarget, clear !== undefined ? clear : true );
+		setRenderTarget( renderTarget );
 
-		if ( this.autoClear ) {
+		if ( this.autoClear || forceClear ) {
 
 			this.clear();
 
@@ -2852,7 +2852,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function setRenderTarget( renderTexture, clear ) {
+	function setRenderTarget( renderTexture ) {
 
 		if ( renderTexture && !renderTexture.__webGLFramebuffer ) {
 
@@ -2908,12 +2908,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 			_gl.viewport( _viewportX, _viewportY, width, height );
-
-			if ( clear ) {
-
-				_gl.clear( _gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT );
-
-			}
 
 			_oldFramebuffer = framebuffer;
 
