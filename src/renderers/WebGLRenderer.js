@@ -98,7 +98,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	this.setViewport = function( x, y, width, height ) {
+	this.setViewport = function ( x, y, width, height ) {
 		
 		_viewportX = x;
 		_viewportY = y;
@@ -110,19 +110,25 @@ THREE.WebGLRenderer = function ( parameters ) {
 		
 	};
 	
-	this.setScissor = function( x, y, width, height ) {
+	this.setScissor = function ( x, y, width, height ) {
 
 		_gl.scissor( x, y, width, height );
 		
 	};
 	
-	this.enableScissorTest = function( enable ) {
+	this.enableScissorTest = function ( enable ) {
 		
 		if ( enable )
 			_gl.enable( _gl.SCISSOR_TEST );
 		else
 			_gl.disable( _gl.SCISSOR_TEST );
 		
+	};
+	
+	this.enableDepthBufferWrite = function ( enable ) {
+		
+		_gl.depthMask( enable );
+
 	};
 	
 	this.setClearColorHex = function ( hex, alpha ) {
