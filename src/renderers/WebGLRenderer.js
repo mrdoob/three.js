@@ -33,6 +33,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_oldBlending = null,
 	_oldDepth = null,
 
+	_viewportX = 0,
+	_viewportY = 0,
+	_viewportWidth = 0,
+	_viewportHeight = 0,
+
 	// camera matrices caches
 
 	_frustum = [
@@ -86,10 +91,38 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_canvas.width = width;
 		_canvas.height = height;
-		_gl.viewport( 0, 0, _canvas.width, _canvas.height );
+		
+		this.setViewport( 0, 0, _canvas.width, _canvas.height );
 
 	};
 
+	this.setViewport = function( x, y, width, height ) {
+		
+		_viewportX = x;
+		_viewportY = y;
+		
+		_viewportWidth = width;
+		_viewportHeight = height;
+		
+		_gl.viewport( _viewportX, _viewportY, _viewportWidth, _viewportHeight );
+		
+	};
+	
+	this.setScissor = function( x, y, width, height ) {
+
+		_gl.scissor( x, y, width, height );
+		
+	};
+	
+	this.enableScissorTest = function( enable ) {
+		
+		if ( enable )
+			_gl.enable( _gl.SCISSOR_TEST );
+		else
+			_gl.disable( _gl.SCISSOR_TEST );
+		
+	};
+	
 	this.setClearColorHex = function ( hex, alpha ) {
 
 		var color = new THREE.Color( hex );
@@ -2866,15 +2899,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 		} else {
 
 			framebuffer = null;
-			width = _canvas.width;
-			height = _canvas.height;
+			width = _viewportWidth;
+			height = _viewportHeight;
 
 		}
 
 		if( framebuffer != _oldFramebuffer ) {
 
 			_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
-			_gl.viewport( 0, 0, width, height );
+			_gl.viewport( _viewportX, _viewportY, width, height );
 
 			if ( clear ) {
 
