@@ -57,11 +57,11 @@ THREE.Object3D.prototype = {
 	},
 	*/
 
-	lookAt : function ( target ) {
+	lookAt : function ( vector ) {
 
 		// TODO: Add hierarchy support.
 
-		this.matrix.lookAt( this.position, target, this.up );
+		this.matrix.lookAt( this.position, vector, this.up );
 
 		if ( this.rotationAutoUpdate ) {
 
