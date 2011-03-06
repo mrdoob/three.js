@@ -309,8 +309,6 @@ rollout ThreeJSExporter "ThreeJSExporter"
 
 		hasUVs = true
 		
-		if exportNormal.checked and exportUv.checked and hasUVs then
-		
 		triangles = #()
 		trianglesUvs = #()
 		trianglesNormals = #()
@@ -479,7 +477,7 @@ rollout ThreeJSExporter "ThreeJSExporter"
 	-------------------------------------------------------------------------------------
 	-- Extract normals from mesh
 	
-	function ExtractNormals obj whereto =
+	function ExtractNormals obj whereto needsFlip =
 	(
 		if smoothNormal.checked then
 		(
@@ -490,6 +488,14 @@ rollout ThreeJSExporter "ThreeJSExporter"
 			(
 
 				n = GetNormal obj i
+				
+				if needsFlip then
+				(
+					n.x *= -1
+					n.y *= -1
+					n.z *= -1
+				)
+				
 				append whereto n
 
 			)
@@ -504,6 +510,14 @@ rollout ThreeJSExporter "ThreeJSExporter"
 			(
 
 				n = GetFaceNormal obj i
+				
+				if needsFlip then
+				(
+					n.x *= -1
+					n.y *= -1
+					n.z *= -1
+				)
+
 				append whereto n
 
 			)
@@ -724,7 +738,7 @@ rollout ThreeJSExporter "ThreeJSExporter"
 				ExtractMaterials meshObj meshMaterial mergedMaterials
 				
 				ExtractVertices meshObj mergedVertices
-				ExtractNormals meshObj mergedNormals
+				ExtractNormals meshObj mergedNormals needsFlip
 				ExtractUvs meshObj mergedUvs
 				
 				--ExtractFaces meshObj zmaterial mergedFaces mergedVertices.count mergedUvs.count
