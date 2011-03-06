@@ -260,7 +260,7 @@ var SceneUtils = {
 
 				if ( g.type == "cube" ) {
 
-					geometry = new Cube( g.width, g.height, g.depth, g.segmentsWidth, g.segmentsHeight, null, g.flipped, g.sides );
+					geometry = new Cube( g.width, g.height, g.depth, g.segmentsWidth, g.segmentsHeight, g.segmentsDepth, null, g.flipped, g.sides );
 					result.geometries[ dg ] = geometry;
 
 				} else if ( g.type == "plane" ) {

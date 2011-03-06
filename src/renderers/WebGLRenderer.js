@@ -2717,6 +2717,30 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	function setTextureParameters( textureType, texture, image ) {
+
+		if ( isPowerOfTwo( image.width ) && isPowerOfTwo( image.height ) ) {
+
+			_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_S, paramThreeToGL( texture.wrapS ) );
+			_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_T, paramThreeToGL( texture.wrapT ) );
+
+			_gl.texParameteri( textureType, _gl.TEXTURE_MAG_FILTER, paramThreeToGL( texture.magFilter ) );
+			_gl.texParameteri( textureType, _gl.TEXTURE_MIN_FILTER, paramThreeToGL( texture.minFilter ) );
+
+			_gl.generateMipmap( textureType );
+
+		} else {
+
+			_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_S, _gl.CLAMP_TO_EDGE );
+			_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_T, _gl.CLAMP_TO_EDGE );
+			
+			_gl.texParameteri( textureType, _gl.TEXTURE_MAG_FILTER, filterFallback( texture.magFilter ) );
+			_gl.texParameteri( textureType, _gl.TEXTURE_MIN_FILTER, filterFallback( texture.minFilter ) );
+
+		}
+
+	};
+	
 	function setTexture( texture, slot ) {
 
 		if ( texture.needsUpdate ) {
@@ -2728,26 +2752,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 				_gl.bindTexture( _gl.TEXTURE_2D, texture.__webGLTexture );
 				_gl.texImage2D( _gl.TEXTURE_2D, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, texture.image );
 
-				if ( isPowerOfTwo( texture.image.width ) && isPowerOfTwo( texture.image.height ) ) {
-
-					_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_S, paramThreeToGL( texture.wrapS ) );
-					_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_T, paramThreeToGL( texture.wrapT ) );
-
-					_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MAG_FILTER, paramThreeToGL( texture.magFilter ) );
-					_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, paramThreeToGL( texture.minFilter ) );
-
-					_gl.generateMipmap( _gl.TEXTURE_2D );
-
-				} else {
-
-					_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, _gl.LINEAR );
-					_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_S, _gl.CLAMP_TO_EDGE );
-					_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_T, _gl.CLAMP_TO_EDGE );
-
-				}
-
-				_gl.bindTexture( _gl.TEXTURE_2D, null );
-
 				texture.__wasSetOnce = true;
 
 			} else {
@@ -2755,28 +2759,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 				_gl.bindTexture( _gl.TEXTURE_2D, texture.__webGLTexture );
 				_gl.texSubImage2D( _gl.TEXTURE_2D, 0, 0, 0, _gl.RGBA, _gl.UNSIGNED_BYTE, texture.image );
 
-				if ( isPowerOfTwo( texture.image.width ) && isPowerOfTwo( texture.image.height ) ) {
-
-					_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_S, paramThreeToGL( texture.wrapS ) );
-					_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_T, paramThreeToGL( texture.wrapT ) );
-
-					_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MAG_FILTER, paramThreeToGL( texture.magFilter ) );
-					_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, paramThreeToGL( texture.minFilter ) );
-
-					_gl.generateMipmap( _gl.TEXTURE_2D );
-
-				} else {
-
-					_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, _gl.LINEAR );
-					_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_S, _gl.CLAMP_TO_EDGE );
-					_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_T, _gl.CLAMP_TO_EDGE );
-
-				}
-
-				_gl.bindTexture( _gl.TEXTURE_2D, null );
-
 			}
 
+			setTextureParameters( _gl.TEXTURE_2D, texture, texture.image );
+			_gl.bindTexture( _gl.TEXTURE_2D, null );
+			
 			texture.needsUpdate = false;
 
 		}
@@ -2791,42 +2778,38 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( texture.image.length == 6 ) {
 
 			if ( texture.needsUpdate ) {
-
-				if ( !texture.image.__webGLTextureCube ) {
+				
+				if ( !texture.__wasSetOnce ) {
 
 					texture.image.__webGLTextureCube = _gl.createTexture();
 
-				}
+					_gl.bindTexture( _gl.TEXTURE_CUBE_MAP, texture.image.__webGLTextureCube );
 
-				_gl.bindTexture( _gl.TEXTURE_CUBE_MAP, texture.image.__webGLTextureCube );
+					for ( var i = 0; i < 6; ++i ) {
 
-				_gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_WRAP_S, _gl.CLAMP_TO_EDGE );
-				_gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_WRAP_T, _gl.CLAMP_TO_EDGE );
+						_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, texture.image[ i ] );
 
-				_gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MAG_FILTER, _gl.LINEAR );
-
-				if ( isPowerOfTwo( texture.image.width ) && isPowerOfTwo( texture.image.height ) ) {
-
-					_gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MIN_FILTER, _gl.LINEAR_MIPMAP_LINEAR );
+					}
+				
+					texture.__wasSetOnce = true;
 
 				} else {
 
-					_gl.texParameteri( _gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MIN_FILTER, _gl.LINEAR );
+					_gl.bindTexture( _gl.TEXTURE_CUBE_MAP, texture.image.__webGLTextureCube );
+
+					for ( var i = 0; i < 6; ++i ) {
+
+						_gl.texSubImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, 0, 0, _gl.RGBA, _gl.UNSIGNED_BYTE, texture.image[ i ] );
+
+					}
 
 				}
 
-				for ( var i = 0; i < 6; ++i ) {
-
-					_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, texture.image[ i ] );
-
-				}
-
-				_gl.generateMipmap( _gl.TEXTURE_CUBE_MAP );
-
+				setTextureParameters( _gl.TEXTURE_CUBE_MAP, texture, texture.image[0] );
 				_gl.bindTexture( _gl.TEXTURE_CUBE_MAP, null );
 
 				texture.needsUpdate = false;
-
+				
 			}
 
 			_gl.activeTexture( _gl.TEXTURE0 + slot );
@@ -2967,6 +2950,24 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	// fallback filters for non-power-of-2 textures
+	
+	function filterFallback ( f ) {
+		
+		switch ( f ) {
+
+			case THREE.NearestFilter:
+			case THREE.NearestMipMapNearestFilter:
+			case THREE.NearestMipMapLinearFilter: return _gl.NEAREST; break;
+
+			case THREE.LinearFilter:
+			case THREE.LinearMipMapNearestFilter:
+			case THREE.LinearMipMapLinearFilter: return _gl.LINEAR; break;
+
+		}
+		
+	};
+	
 	function paramThreeToGL( p ) {
 
 		switch ( p ) {

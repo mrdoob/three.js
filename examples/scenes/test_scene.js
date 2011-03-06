@@ -131,6 +131,7 @@ var scene = {
 		"depth" : 10, 
 		"segmentsWidth"  : 1, 
 		"segmentsHeight" : 1,
+		"segmentsDepth"  : 1,
 		"flipped" : false, 
 		"sides"   : { "px": true, "nx": true, "py": true, "ny": true, "pz": true, "nz": true }
 	},
