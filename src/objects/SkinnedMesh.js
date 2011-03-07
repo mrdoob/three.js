@@ -17,7 +17,6 @@ THREE.SkinnedMesh = function( geometry, materials ) {
 	// init bones
 
 	this.identityMatrix = new THREE.Matrix4();
-
 	this.bones = [];
 	this.boneMatrices = [];
 
@@ -49,8 +48,6 @@ THREE.SkinnedMesh = function( geometry, materials ) {
 				bone.scale.set( 1, 1, 1 );
 
 			}
-
-			bone.scale.set( 1, 1, 1 );
 
 		}
 
@@ -104,7 +101,7 @@ THREE.SkinnedMesh.prototype.update = function ( parentMatrixWorld, forceUpdate, 
 
 		// update global
 
-		if ( forceUpdate || this.matrixNeedsUpdate ) {
+		if ( forceUpdate || this.matrixWorldNeedsUpdate ) {
 
 			if ( parentMatrixWorld ) {
 
@@ -116,7 +113,7 @@ THREE.SkinnedMesh.prototype.update = function ( parentMatrixWorld, forceUpdate, 
 
 			}
 
-			this.matrixNeedsUpdate = false;
+			this.matrixWorldNeedsUpdate = false;
 			forceUpdate = true;
 
 		}
@@ -211,11 +208,6 @@ THREE.SkinnedMesh.prototype.pose = function() {
 
 			orgVertex = this.geometry.vertices[ i ].position;
 
-		// 20, 23
-
-//			this.geometry.skinIndices[ i ].x = 23;
-	//		this.geometry.skinIndices[ i ].y = 23;
-			
 			var indexA = this.geometry.skinIndices[ i ].x;
 			var indexB = this.geometry.skinIndices[ i ].y;
 
@@ -236,8 +228,6 @@ THREE.SkinnedMesh.prototype.pose = function() {
 				this.geometry.skinWeights[ i ].y += len;
 
 			}
-		//		this.geometry.skinWeights[ i ].x = 1;
-			//	this.geometry.skinWeights[ i ].y = 0;
 
 		}
 

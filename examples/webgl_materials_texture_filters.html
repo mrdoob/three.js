@@ -1,0 +1,273 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>three.js webgl - materials - texture filtering</title>
+		<meta charset="utf-8">
+		<style type="text/css">
+			body {
+				color: #aaa;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+
+				background-color: #000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+				z-index:100;
+			}
+			
+			.lbl { color:#fff; font-size:16px; font-weight:bold; position: absolute; bottom:0px; z-index:100; text-shadow:#000 1px 1px 1px; background-color:rgba(0,0,0,0.85); padding:1em }
+			#lbl_left { text-align:left; left:0px }
+			#lbl_right { text-align:left; right:0px }
+			
+			.g { color:#aaa }
+			.c { color:#fa0 }
+			
+			a { color:red }						
+			
+		</style>
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - texture filtering example
+			- painting by <a href="http://en.wikipedia.org/wiki/Basket_of_Fruit_%28Caravaggio%29">Caravaggio</a>
+		</div>		
+		
+		<div id="lbl_left" class="lbl">
+		Floor <span class="g">(128x128)</span><br/>
+		mag: <span class="c">Linear</span><br/>
+		min: <span class="c">LinearMipMapLinear</span><br/>
+		<br/>
+		Painting <span class="g">(748x600)</span><br/>
+		mag: <span class="c">Linear</span><br/>
+		min: <span class="c">Linear</span>
+		</div>
+
+		<div id="lbl_right" class="lbl">
+		Floor <br/>
+		mag: <span class="c">Nearest</span><br/>
+		min: <span class="c">Nearest</span><br/>
+		<br/>
+		Painting <br/>
+		mag: <span class="c">Nearest</span><br/>
+		min: <span class="c">Nearest</span>
+		</div>
+
+		<script type="text/javascript" src="../build/Three.js"></script>
+
+		<script type="text/javascript" src="js/Detector.js"></script>
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
+		<script type="text/javascript" src="js/Stats.js"></script>
+
+		<script type="text/javascript">
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			
+			var SCREEN_WIDTH = window.innerWidth;
+			var SCREEN_HEIGHT = window.innerHeight;
+
+			var container,stats;
+
+			var camera, scene, scene2, renderer;
+
+			var mouseX = 0, mouseY = 0;
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+			init();
+			animate();
+
+
+			function init() {
+
+				container = document.createElement('div');
+				document.body.appendChild(container);
+
+				camera = new THREE.Camera( 35, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 5000 );
+				camera.position.z = 1500;
+
+				scene = new THREE.Scene();
+				scene2 = new THREE.Scene();
+				
+				scene.fog = new THREE.Fog( 0x000000, 1500, 4000 );
+				scene2.fog = scene.fog;
+				
+				// GROUND
+
+				var imageCanvas = document.createElement( "canvas" ),
+					context = imageCanvas.getContext( "2d" );
+
+				imageCanvas.width = imageCanvas.height = 128;
+
+				context.fillStyle = "#444";
+				context.fillRect( 0, 0, 128, 128 );
+				context.fillStyle = "#fff";
+				context.fillRect( 0, 0, 64, 64);
+				context.fillRect( 64, 64, 64, 64 );
+				
+				var textureCanvas = new THREE.Texture( imageCanvas, THREE.UVMapping, THREE.RepeatWrapping, THREE.RepeatWrapping );
+					materialCanvas = new THREE.MeshBasicMaterial( { map: textureCanvas } );
+
+				textureCanvas.needsUpdate = true;
+
+				var textureCanvas2 = new THREE.Texture( imageCanvas, THREE.UVMapping, THREE.RepeatWrapping, THREE.RepeatWrapping, THREE.NearestFilter, THREE.NearestFilter );
+					materialCanvas2 = new THREE.MeshBasicMaterial( { color:0xffccaa, map: textureCanvas2 } );
+
+				textureCanvas2.needsUpdate = true;
+
+				var i, j, uvs,
+					geometryRepeat = new Plane( 100, 100, 1, 1 );
+					
+				for( i = 0; i < geometryRepeat.uvs.length; i++ ) {
+					
+					uvs = geometryRepeat.uvs[i];
+					
+					for ( j = 0; j < uvs.length; j++ ) {
+					
+						uvs[j].u *= 1000;
+						uvs[j].v *= 1000;
+
+					}
+
+				}
+				
+				
+				var meshCanvas = new THREE.Mesh( geometryRepeat, materialCanvas );
+				meshCanvas.rotation.x = Math.PI / 2;
+				meshCanvas.scale.x = meshCanvas.scale.y = meshCanvas.scale.z = 1000;
+				meshCanvas.doubleSided = true;
+				
+				var meshCanvas2 = new THREE.Mesh( geometryRepeat, materialCanvas2 );
+				meshCanvas2.rotation.x = Math.PI / 2;
+				meshCanvas2.scale.x = meshCanvas2.scale.y = meshCanvas2.scale.z = 1000;
+				meshCanvas2.doubleSided = true;
+				
+
+				// PAINTING
+				
+				var callbackPainting = function( image ) {
+				
+					texturePainting2.image = image;
+					texturePainting2.needsUpdate = true;
+
+					scene.addObject( meshCanvas );
+					scene2.addObject( meshCanvas2 );
+
+					var geometry = new Plane( 100, 100, 1, 1 ),
+						mesh = new THREE.Mesh( geometry, materialPainting ),
+						mesh2 = new THREE.Mesh( geometry, materialPainting2 );
+
+					addPainting( scene, mesh );
+					addPainting( scene2, mesh2 );
+					
+					function addPainting( zscene, zmesh ) {
+						
+						zmesh.scale.x = image.width / 100;
+						zmesh.scale.y = image.height / 100;
+
+						zscene.addObject( zmesh );
+
+						var meshFrame = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x000000 } )  );
+
+						meshFrame.position.z = -0.5;
+						meshFrame.scale.x = 1.1 * image.width / 100;
+						meshFrame.scale.y = 1.1 * image.height / 100;
+						
+						zscene.addObject( meshFrame );
+
+						var meshShadow = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 0.9 } )  );
+
+						meshShadow.position.z = - 1.1 * image.height/2;
+						meshShadow.scale.x = 1.1 * image.width / 100;
+						meshShadow.scale.y = 1.1 * image.height / 100;
+						meshShadow.rotation.x = -Math.PI / 2;
+						zscene.addObject( meshShadow );
+
+						meshShadow.position.y = - 1.1 * image.height/2;
+						
+						var floorHeight = - 1.117 * image.height/2;
+						meshCanvas.position.y = meshCanvas2.position.y = floorHeight;
+
+					}
+
+					
+				};
+				
+				var texturePainting = ImageUtils.loadTexture( "textures/758px-Canestra_di_frutta_(Caravaggio).jpg", THREE.UVMapping, callbackPainting ),
+					texturePainting2 = new THREE.Texture(),
+					materialPainting = new THREE.MeshBasicMaterial( { color:0xffffff, map: texturePainting } ),
+					materialPainting2 = new THREE.MeshBasicMaterial( { color:0xffccaa, map: texturePainting2 } );
+					
+				texturePainting2.minFilter = texturePainting2.magFilter = THREE.NearestFilter;
+				texturePainting.minFilter = texturePainting.magFilter = THREE.LinearFilter;
+
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				renderer.domElement.style.position = "relative";
+				container.appendChild( renderer.domElement );
+				
+				renderer.setClearColor( scene.fog.color, 1 );
+				renderer.autoClear = false;
+				
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				stats.domElement.style.zIndex = 100;
+				//container.appendChild( stats.domElement );
+				
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+			}
+
+
+			function onDocumentMouseMove(event) {
+
+				mouseX = ( event.clientX - windowHalfX );
+				mouseY = ( event.clientY - windowHalfY );
+
+			}
+
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				camera.position.x += ( mouseX - camera.position.x ) * .05;
+				camera.position.y += ( - ( mouseY - 200) - camera.position.y ) * .05;
+
+				renderer.enableScissorTest( false );
+				renderer.clear();
+				renderer.enableScissorTest( true );
+				
+				//renderer.setViewport( 0, 0, SCREEN_WIDTH/2, SCREEN_HEIGHT );
+				renderer.setScissor( 0, 0, SCREEN_WIDTH/2 - 2, SCREEN_HEIGHT );
+				renderer.render( scene, camera );
+
+				
+				//renderer.setViewport( SCREEN_WIDTH/2, 0, SCREEN_WIDTH/2, SCREEN_HEIGHT );
+				renderer.setScissor( SCREEN_WIDTH/2, 0, SCREEN_WIDTH/2 - 2, SCREEN_HEIGHT  );
+				renderer.render( scene2, camera );
+				
+
+			}
+
+		</script>
+
+	</body>
+</html>

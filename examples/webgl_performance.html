@@ -144,8 +144,6 @@
 
 				}
 
-				scene.matrixAutoUpdate = false;
-
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.sortObjects = false;
@@ -156,37 +154,6 @@
 				stats.domElement.style.top = '0px';
 				stats.domElement.style.zIndex = 100;
 				container.appendChild( stats.domElement );
-
-			}
-
-			function generateTexture( r, g, b ) {
-
-				var canvas = document.createElement( 'canvas' );
-				canvas.loaded = true;
-				canvas.width = 256;
-				canvas.height = 256;
-
-				var context = canvas.getContext( '2d' );
-				var image = context.getImageData( 0, 0, 256, 256 );
-
-				var x = 0, y = 0, p;
-
-				for ( var i = 0, j = 0, l = image.data.length; i < l; i += 4, j ++ ) {
-
-					x = j % 256;
-					y = x == 0 ? y + 1 : y;
-					p = Math.floor( x ^ y );
-
-					image.data[ i ] = ~~ p * r;
-					image.data[ i + 1 ] = ~~ p * g;
-					image.data[ i + 2 ] = ~~ p * b;
-					image.data[ i + 3 ] = 255;
-
-				}
-
-				context.putImageData( image, 0, 0 );
-
-				return canvas;
 
 			}
 

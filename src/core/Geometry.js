@@ -7,7 +7,7 @@
 
 THREE.Geometry = function () {
 
-	this.id = "Geometry" + THREE.GeometryIdCounter++;
+	this.id = "Geometry" + THREE.GeometryIdCounter ++;
 
 	this.vertices = [];
 	this.faces = [];
@@ -213,7 +213,7 @@ THREE.Geometry.prototype = {
 
 	},
 
-	computeTangents: function() {
+	computeTangents: function () {
 
 		// based on http://www.terathon.com/code/tangent.html
 		// tangents go to vertices

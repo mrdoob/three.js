@@ -20,7 +20,7 @@ THREE.Vector3 = function ( x, y, z ) {
 
 THREE.Vector3.prototype = {
 
-	set: function ( x, y, z ) {
+	set : function ( x, y, z ) {
 
 		this.x = x;
 		this.y = y;
@@ -280,9 +280,37 @@ THREE.Vector3.prototype = {
 
 	},
 
-	setLength : function( len ) {
+	setPositionFromMatrix : function ( m ) {
 
-		return this.normalize().multiplyScalar( len );
+		this.x = m.n14;
+		this.y = m.n24;
+		this.z = m.n34;
+
+	},
+
+	setRotationFromMatrix : function ( m ) {
+
+		this.y = Math.asin( m.n13 );
+
+		var cosY = Math.cos( this.y );
+
+		if ( Math.abs( cosY ) > 0.00001 ) {
+
+			this.x = Math.atan2( - m.n23 / cosY, m.n33 / cosY );
+			this.z = Math.atan2( - m.n13 / cosY, m.n11 / cosY );
+
+		} else {
+
+			this.x = 0;
+			this.z = Math.atan2( m.n21, m.n22 );
+
+		}
+
+	},
+
+	setLength : function ( l ) {
+
+		return this.normalize().multiplyScalar( l );
 
 	},
 

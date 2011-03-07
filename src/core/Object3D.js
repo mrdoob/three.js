@@ -6,21 +6,23 @@
 
 THREE.Object3D = function() {
 
-	this.id = THREE.Object3DCounter.value ++;
-
 	this.parent = undefined;
 	this.children = [];
 
+	this.up = new THREE.Vector3( 0, 1, 0 );
+
 	this.position = new THREE.Vector3();
-	this.positionScreen = new THREE.Vector4();
 	this.rotation = new THREE.Vector3();
-	this.scale = new THREE.Vector3( 1.0, 1.0, 1.0 );
+	this.scale = new THREE.Vector3( 1, 1, 1 );
+
+	this.rotationAutoUpdate = true;
 
 	this.matrix = new THREE.Matrix4();
 	this.matrixWorld = new THREE.Matrix4();
 	this.matrixRotationWorld = new THREE.Matrix4();
-	this.matrixNeedsUpdate = true;
+
 	this.matrixAutoUpdate = true;
+	this.matrixWorldNeedsUpdate = true;
 
 	this.quaternion = new THREE.Quaternion();
 	this.useQuaternion = false;
@@ -30,10 +32,51 @@ THREE.Object3D = function() {
 
 	this.visible = true;
 
+	this._vector = new THREE.Vector3();
+
 };
 
 
 THREE.Object3D.prototype = {
+
+	translate : function ( distance, axis ) {
+
+		this.matrix.rotateAxis( axis );
+		this.position.addSelf( axis.multiplyScalar( distance ) );
+
+	},
+
+	translateX : function ( distance ) {
+
+		this.translate( distance, this._vector.set( 1, 0, 0 ) );
+
+	},
+
+	translateY : function ( distance ) {
+
+		this.translate( distance, this._vector.set( 0, 1, 0 ) );
+
+	},
+
+	translateZ : function ( distance ) {
+
+		this.translate( distance, this._vector.set( 0, 0, 1 ) );
+
+	},
+
+	lookAt : function ( vector ) {
+
+		// TODO: Add hierarchy support.
+
+		this.matrix.lookAt( this.position, vector, this.up );
+
+		if ( this.rotationAutoUpdate ) {
+
+			this.rotation.setRotationFromMatrix( this.matrix );
+
+		}
+
+	},
 
 	addChild: function ( child ) {
 
@@ -52,11 +95,17 @@ THREE.Object3D.prototype = {
 
 			var scene = this;
 
-			while( scene instanceof THREE.Scene === false && scene !== undefined )
+			while ( scene instanceof THREE.Scene === false && scene !== undefined ) {
+
 				scene = scene.parent;
 
-			if( scene !== undefined ) 
+			}
+
+			if ( scene !== undefined )  {
+
 				scene.addChildRecurse( child );
+
+			}
 
 		}
 
@@ -112,7 +161,7 @@ THREE.Object3D.prototype = {
 
 			// update matrixWorld
 
-			if ( forceUpdate || this.matrixNeedsUpdate ) {
+			if ( forceUpdate || this.matrixWorldNeedsUpdate ) {
 
 				if ( parentMatrixWorld ) {
 
@@ -124,23 +173,9 @@ THREE.Object3D.prototype = {
 
 				}
 
-				// extract rotation matrix
+				this.matrixRotationWorld.extractRotation( this.matrixWorld, this.scale );
 
-				var invScaleX = 1 / this.scale.x, invScaleY = 1 / this.scale.y, invScaleZ = 1 / this.scale.z;
-
-				this.matrixRotationWorld.n11 = this.matrixWorld.n11 * invScaleX;
-				this.matrixRotationWorld.n21 = this.matrixWorld.n21 * invScaleX;
-				this.matrixRotationWorld.n31 = this.matrixWorld.n31 * invScaleX;
-
-				this.matrixRotationWorld.n12 = this.matrixWorld.n12 * invScaleY;
-				this.matrixRotationWorld.n22 = this.matrixWorld.n22 * invScaleY;
-				this.matrixRotationWorld.n32 = this.matrixWorld.n32 * invScaleY;
-
-				this.matrixRotationWorld.n13 = this.matrixWorld.n13 * invScaleZ;
-				this.matrixRotationWorld.n23 = this.matrixWorld.n23 * invScaleZ;
-				this.matrixRotationWorld.n33 = this.matrixWorld.n33 * invScaleZ;
-
-				this.matrixNeedsUpdate = false;
+				this.matrixWorldNeedsUpdate = false;
 				forceUpdate = true;
 
 			}
@@ -158,5 +193,3 @@ THREE.Object3D.prototype = {
 	}
 
 }
-
-THREE.Object3DCounter = { value: 0 };

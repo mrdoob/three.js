@@ -264,15 +264,15 @@
 
 				// Render first scene into texture
 
-				renderer.render( sceneRTT, cameraRTT, rtTexture );
+				renderer.render( sceneRTT, cameraRTT, rtTexture, true );
 
 				// Render full screen quad with generated texture
 				// (disable depth writing so that it stays in the background)
 
-				renderer.context.depthMask( 0 );
+				renderer.enableDepthBufferWrite( false );
 				renderer.render( sceneScreen, cameraRTT );
 				//renderer.render( sceneRTT, cameraRTT );
-				renderer.context.depthMask( 1 );
+				renderer.enableDepthBufferWrite( true );
 
 				// Render second scene to screen
 				// (using first scene as regular texture)

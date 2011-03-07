@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js - misc - sound</title>
+		<title>three.js misc - sound</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
@@ -226,7 +226,7 @@
 
 					// Render scene into texture
 
-					renderer.render( scene, camera, postprocessing.rtTexture1 );
+					renderer.render( scene, camera, postprocessing.rtTexture1, true );
 
 					// Render quad with blured scene into texture (convolution pass 1)
 
@@ -251,7 +251,7 @@
 					postprocessing.materialScreen.uniforms.tDiffuse.texture = postprocessing.rtTexture3;
 					postprocessing.materialScreen.uniforms.opacity.value = 1.3;
 
-					renderer.render( postprocessing.scene, postprocessing.camera, postprocessing.rtTexture1, false );
+					renderer.render( postprocessing.scene, postprocessing.camera, postprocessing.rtTexture1 );
 
 					// Render to screen
 

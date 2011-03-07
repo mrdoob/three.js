@@ -9,44 +9,22 @@
  *  near: <float>,
  *  far: <float>,
  *  target: <THREE.Object3D>,
- 
+
  *  movementSpeed: <float>,
  *  lookSpeed: <float>,
- 
- *  noFly: <bool>, 
+
+ *  noFly: <bool>,
  *  lookVertical: <bool>,
  *  autoForward: <bool>,
- 
+
  *  heightSpeed: <bool>,
  *  heightCoef: <float>,
  *  heightMin: <float>,
  *  heightMax: <float>,
- 
- *  domElement: <HTMLElement>, 
+
+ *  domElement: <HTMLElement>,
  * }
  */
-
-function bind( scope, fn ) {
-
-	return function () {
-
-		fn.apply( scope, arguments );
-
-	};
-
-}
-
-function clamp_bottom( x, a ) {
-	
-	return x < a ? a : x;
-	
-};
-
-function clamp( x, a, b ) {
-	
-	return x < a ? a : ( x > b ? b : x );
-	
-};
 
 THREE.QuakeCamera = function ( parameters ) {
 
@@ -58,11 +36,11 @@ THREE.QuakeCamera = function ( parameters ) {
 	this.noFly = false;
 	this.lookVertical = true;
 	this.autoForward = false;
-	
+
 	this.heightSpeed = false;
 	this.heightCoef = 1.0;
 	this.heightMin = 0.0;
-	
+
 	this.domElement = document;
 
 	if ( parameters ) {
@@ -71,9 +49,9 @@ THREE.QuakeCamera = function ( parameters ) {
 		if ( parameters.lookSpeed !== undefined ) this.lookSpeed  = parameters.lookSpeed;
 		if ( parameters.noFly !== undefined ) this.noFly = parameters.noFly;
 		if ( parameters.lookVertical !== undefined ) this.lookVertical = parameters.lookVertical;
-		
+
 		if ( parameters.autoForward !== undefined ) this.autoForward = parameters.autoForward;
-		
+
 		if ( parameters.heightSpeed !== undefined ) this.heightSpeed = parameters.heightSpeed;
 		if ( parameters.heightCoef !== undefined ) this.heightCoef = parameters.heightCoef;
 		if ( parameters.heightMin !== undefined ) this.heightMin = parameters.heightMin;
@@ -84,7 +62,7 @@ THREE.QuakeCamera = function ( parameters ) {
 	}
 
 	this.autoSpeedFactor = 0.0;
-	
+
 	this.mouseX = 0;
 	this.mouseY = 0;
 
@@ -182,19 +160,19 @@ THREE.QuakeCamera = function ( parameters ) {
 
 			var y = clamp( this.position.y, this.heightMin, this.heightMax ),
 				delta = y - this.heightMin;
-			
+
 			this.autoSpeedFactor = delta * this.heightCoef;
-			
+
 		} else {
-				
+
 			this.autoSpeedFactor = 0.0;
 
 		}
 
-		if ( this.moveForward || this.autoForward ) this.translateZ( - ( this.movementSpeed + this.autoSpeedFactor ), this.noFly );
-		if ( this.moveBackward ) this.translateZ( this.movementSpeed, this.noFly );
-		if ( this.moveLeft ) this.translateX( - this.movementSpeed, this.noFly );
-		if ( this.moveRight ) this.translateX( this.movementSpeed, this.noFly );
+		if ( this.moveForward || this.autoForward ) this.translateZ( - ( this.movementSpeed + this.autoSpeedFactor ) );
+		if ( this.moveBackward ) this.translateZ( this.movementSpeed );
+		if ( this.moveLeft ) this.translateX( - this.movementSpeed );
+		if ( this.moveRight ) this.translateX( this.movementSpeed );
 
 		this.lon += this.mouseX * this.lookSpeed;
 		if( this.lookVertical ) this.lat -= this.mouseY * this.lookSpeed;
@@ -223,8 +201,47 @@ THREE.QuakeCamera = function ( parameters ) {
 	this.domElement.addEventListener( 'keydown', bind( this, this.onKeyDown ), false );
 	this.domElement.addEventListener( 'keyup', bind( this, this.onKeyUp ), false );
 
+	function bind( scope, fn ) {
+
+		return function () {
+
+			fn.apply( scope, arguments );
+
+		};
+
+	}
+
+	function clamp_bottom( x, a ) {
+
+		return x < a ? a : x;
+
+	};
+
+	function clamp( x, a, b ) {
+
+		return x < a ? a : ( x > b ? b : x );
+
+	};
+
 };
+
 
 THREE.QuakeCamera.prototype = new THREE.Camera();
 THREE.QuakeCamera.prototype.constructor = THREE.QuakeCamera;
 THREE.QuakeCamera.prototype.supr = THREE.Camera.prototype;
+
+
+THREE.QuakeCamera.prototype.translate = function ( distance, axis ) {
+
+	this.matrix.rotateAxis( axis );
+	
+	if ( this.noFly ) {
+		
+		axis.y = 0;
+
+	}
+	
+	this.position.addSelf( axis.multiplyScalar( distance ) );
+	this.target.position.addSelf( axis.multiplyScalar( distance ) );
+
+};

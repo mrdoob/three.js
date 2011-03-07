@@ -169,14 +169,14 @@ THREE.Animation.prototype.update = function( deltaTimeMS ) {
 				object.skinMatrix = JIThierarchy[ h ][ frame ];
 				
 				object.matrixAutoUpdate = false;
-				object.matrixNeedsUpdate = false;
+				object.matrixWorldNeedsUpdate = false;
 			}
 			else {
 			
 				object.matrix = JIThierarchy[ h ][ frame ];
 				
 				object.matrixAutoUpdate = false;
-				object.matrixNeedsUpdate = true;
+				object.matrixWorldNeedsUpdate = true;
 			}
 			
 		// use interpolation
@@ -255,13 +255,13 @@ THREE.Animation.prototype.update = function( deltaTimeMS ) {
 
 
 				object.matrixAutoUpdate = true;
-				object.matrixNeedsUpdate = true;
+				object.matrixWorldNeedsUpdate = true;
 
 				scale = ( currentTime - prevKey.time ) / ( nextKey.time - prevKey.time );
 				prevXYZ = prevKey[ type ];
 				nextXYZ = nextKey[ type ];
 
-				
+
 				// check scale error
 
 				if ( scale < 0 || scale > 1 ) {

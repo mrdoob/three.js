@@ -159,7 +159,7 @@ THREE.Sound.prototype.update = function ( parentMatrixWorld, forceUpdate, camera
 
 	// update global
 
-	if ( forceUpdate || this.matrixNeedsUpdate ) {
+	if ( forceUpdate || this.matrixWorldNeedsUpdate ) {
 
 		if ( parentMatrixWorld ) {
 
@@ -171,7 +171,7 @@ THREE.Sound.prototype.update = function ( parentMatrixWorld, forceUpdate, camera
 
 		}
 
-		this.matrixNeedsUpdate = false;
+		this.matrixWorldNeedsUpdate = false;
 		forceUpdate = true;
 
 	}

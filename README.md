@@ -5,7 +5,7 @@ three.js
 
 The aim of this project is to create a lightweight 3D engine with a very low level of abstraction — in other words, for dummies. The engine can render using &lt;canvas&gt;, &lt;svg&gt; and WebGL.
 
-[API Reference](https://github.com/mrdoob/three.js/wiki/r34-API-Reference) — be aware that the API may change from revision to revision breaking backwards compatibility.
+[API Reference](https://github.com/mrdoob/three.js/wiki/r35-API-Reference) — be aware that the API may change from revision to revision breaking backwards compatibility.
 
 More? [#three.js on irc.freenode.net](http://webchat.freenode.net/?channels=three.js)
 
@@ -14,6 +14,8 @@ More? [#three.js on irc.freenode.net](http://webchat.freenode.net/?channels=thre
 
 #### WebGL (Context 3D) ####
 
+[![scissors](http://mrdoob.github.com/three.js/assets/examples/42_scissors.png)](http://mrdoob.github.com/three.js/examples/webgl_materials_texture_filters.html)
+[![lookat](http://mrdoob.github.com/three.js/assets/examples/41_lookat.png)](http://mrdoob.github.com/three.js/examples/misc_lookat.html)
 [![video](http://mrdoob.github.com/three.js/assets/examples/40_video.png)](http://mrdoob.github.com/three.js/examples/webgl_materials_video.html)
 [![dof](http://mrdoob.github.com/three.js/assets/examples/39_dof.png)](http://mrdoob.github.com/three.js/examples/webgl_postprocessing_dof.html)
 [![ribbon](http://mrdoob.github.com/three.js/assets/examples/38_ribbon.png)](http://mrdoob.github.com/three.js/examples/webgl_ribbons.html)
@@ -133,6 +135,14 @@ This code creates a camera, then creates a scene object, adds a bunch of random 
 
 
 ### Change Log ###
+
+2011 03 06 - **r35** (187.875 KB, gzip: 46.433 KB)
+
+* Added methods `translate`, `translateX`, `translateY`, `translateZ` and `lookAt` methods to `Object3D`. ([mrdoob](http://github.com/mrdoob))
+* Added methods `setViewport` and `setScissor` to `WebGLRenderer`. ([alteredq](http://github.com/alteredq))
+* Added support for non-po2 textures. ([mrdoob](http://github.com/mrdoob) and [alteredq](http://github.com/alteredq))
+* Minor API clean up. ([mrdoob](http://github.com/mrdoob))
+
 
 2011 03 02 - **r34** (186.045 KB, gzip: 45.953 KB)
 

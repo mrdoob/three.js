@@ -280,7 +280,7 @@
 
 				// background
 
-				renderer.render( sceneBG, cameraOrtho, rtTexture1 );
+				renderer.render( sceneBG, cameraOrtho, rtTexture1, true );
 
 				// model
 
@@ -305,7 +305,7 @@
 
 				materialScreen.uniforms.tDiffuse.texture = rtTexture3;
 				materialScreen.uniforms.opacity.value = 1.0;
-				renderer.render( sceneScreen, cameraOrtho, rtTexture1, false );
+				renderer.render( sceneScreen, cameraOrtho, rtTexture1 );
 
 				// Render final scene to the screen with film shader
 
