@@ -41,16 +41,17 @@ rollout ThreeJSExporter "ThreeJSExporter"
 	group "ThreeJSExporter  v0.2" 
 	(
 
-		label msg "Exports meshes in Three.js ascii JSON format" align:#left
-		hyperLink lab1 "Original source can be found here" address:"https://github.com/mrdoob/three.js" align:#left
+		label msg "Exports selected meshes in Three.js ascii JSON format" align:#left
+		hyperLink lab1 "Original source at GitHub" address:"https://github.com/mrdoob/three.js" align:#left
 
+		checkbox exportUv "Export uvs" checked:true enabled:true
+		checkbox exportNormal "Export normals" checked:true enabled:true
+		checkbox smoothNormal "Use vertex normals" checked:false enabled:true
+		checkbox exportColor "Export vertex colors" checked:false enabled:false
 		checkbox flipYZ "Flip YZ" checked:true enabled:true
 		checkbox flipUV "Flip UV" checked:true enabled:true
-		checkbox flipFace "Flip faces" checked:false enabled:true
-		checkbox exportNormal "Export normals" checked:true enabled:true
-		checkbox smoothNormal "Use vertex normals" checked:true enabled:true
-		checkbox exportUv "Export uvs" checked:true enabled:true
-		checkbox exportColor "Export vertex colors" checked:false enabled:false
+		checkbox flipFace "Flip all faces" checked:false enabled:true
+		checkbox autoflipFace "Try fixing flipped faces" checked:false enabled:true
 
 	)
 
@@ -489,7 +490,7 @@ rollout ThreeJSExporter "ThreeJSExporter"
 
 				n = GetNormal obj i
 
-				if needsFlip then
+				if flipFace.checked or needsFlip then
 				(
 					n.x *= -1
 					n.y *= -1
@@ -511,7 +512,7 @@ rollout ThreeJSExporter "ThreeJSExporter"
 
 				n = GetFaceNormal obj i
 
-				if needsFlip then
+				if flipFace.checked or needsFlip then
 				(
 					n.x *= -1
 					n.y *= -1
@@ -694,7 +695,14 @@ rollout ThreeJSExporter "ThreeJSExporter"
 
 		if SuperClassOf node == GeometryClass then
 		(
-			return #( SnapshotAsMesh node, node.name, node.material, NeedsFaceFlip node )
+			needsFlip = false
+			
+			if autoflipFace.checked then
+			(
+				needsFlip = NeedsFaceFlip node
+			)
+			
+			return #( SnapshotAsMesh node, node.name, node.material, needsFlip )
 
 		)
 
