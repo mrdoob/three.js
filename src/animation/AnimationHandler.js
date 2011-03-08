@@ -118,8 +118,8 @@ THREE.AnimationHandler = (function() {
 			return;
 
 		// THIS SHOULD BE REMOVED WHEN LENGTH IS UPDATED TO MS IN EXPORT FORMAT!
-		data.length = parseInt( data.length * 1000, 10 );	
-		data.fps   *= 0.001;
+		//data.length = parseInt( data.length * 1000, 10 );	
+		//data.fps   *= 0.001;
 		
 
 		// loop through all keys
@@ -135,7 +135,7 @@ THREE.AnimationHandler = (function() {
 
 
 				// THIS SHOULD BE REMOVED WHEN LENGTH IS UPDATED TO MS IN EXPORT FORMAT!
-				data.hierarchy[ h ].keys[ k ].time = parseInt( data.hierarchy[ h ].keys[ k ].time * 1000, 10 );
+				//data.hierarchy[ h ].keys[ k ].time = parseInt( data.hierarchy[ h ].keys[ k ].time * 1000, 10 );
 
 
 				// create quaternions
@@ -177,7 +177,7 @@ THREE.AnimationHandler = (function() {
 
 		// JIT
 
-		var lengthInFrames = parseInt( data.length * data.fps * 0.001, 10 );
+		var lengthInFrames = parseInt( data.length * data.fps, 10 );
 
 		data.JIT = {};
 		data.JIT.hierarchy = [];
