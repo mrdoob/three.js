@@ -1387,11 +1387,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 		maxLightCount = allocateLights( lights, 4 );
 
 		maxBones = allocateBones( object );
-		
-		parameters = { fog: fog, map: material.map, envMap: material.envMap, lightMap: material.lightMap, vertexColors: material.vertexColors,
-					   skinning: material.skinning,
-					   maxDirLights: maxLightCount.directional, maxPointLights: maxLightCount.point,
-					   maxBones: maxBones };
+
+		parameters = {
+				fog: fog, map: material.map, envMap: material.envMap,
+				lightMap: material.lightMap, vertexColors: material.vertexColors,
+				sizeAttenuation: material.sizeAttenuation, skinning: material.skinning,
+				maxDirLights: maxLightCount.directional, maxPointLights: maxLightCount.point,
+				maxBones: maxBones
+		};
 
 		material.program = buildProgram( material.fragmentShader, material.vertexShader, parameters );
 
@@ -2588,6 +2591,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			parameters.lightMap ? "#define USE_LIGHTMAP" : "",
 			parameters.vertexColors ? "#define USE_COLOR" : "",
 			parameters.skinning ? "#define USE_SKINNING" : "",
+
+			parameters.sizeAttenuation ? "#define USE_SIZEATTENUATION" : "",
 
 			"uniform mat4 objectMatrix;",
 			"uniform mat4 modelViewMatrix;",
@@ -4002,9 +4007,12 @@ THREE.ShaderLib = {
 
 				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
 
-				"float length = sqrt( mvPosition.x * mvPosition.x + mvPosition.y * mvPosition.y + mvPosition.z * mvPosition.z );",
+				"#ifdef USE_SIZEATTENUATION",
+					"gl_PointSize = size * ( scale / length( mvPosition.xyz ) );",
+				"#else",
+					"gl_PointSize = size;",
+				"#endif",
 
-				"gl_PointSize = size * ( scale / length );",
 				"gl_Position = projectionMatrix * mvPosition;",
 
 			"}"
@@ -4012,6 +4020,5 @@ THREE.ShaderLib = {
 		].join("\n")
 
 	}
-
 
 };
