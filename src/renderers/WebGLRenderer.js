@@ -1303,6 +1303,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		uniforms.psColor.value.setRGB( material.color.r * material.opacity, material.color.g * material.opacity, material.color.b * material.opacity );
 		uniforms.opacity.value = material.opacity;
 		uniforms.size.value = material.size;
+		uniforms.scale.value = _canvas.height / 2.0; // TODO: Cache this.
 		uniforms.map.texture = material.map;
 
 	};
@@ -3676,6 +3677,7 @@ THREE.UniformsLib = {
 	"psColor"   : { type: "c", value: new THREE.Color( 0xeeeeee ) },
 	"opacity" : { type: "f", value: 1.0 },
 	"size" 	  : { type: "f", value: 1.0 },
+	"scale"   : { type: "f", value: 1.0 },
 	"map"     : { type: "t", value: 0, texture: null },
 
 	"fogDensity": { type: "f", value: 0.00025 },
@@ -3990,6 +3992,7 @@ THREE.ShaderLib = {
 		vertexShader: [
 
 			"uniform float size;",
+			"uniform float scale;",
 
 			THREE.Snippets[ "color_pars_vertex" ],
 
@@ -4000,8 +4003,7 @@ THREE.ShaderLib = {
 				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
 
 				"gl_Position = projectionMatrix * mvPosition;",
-				"gl_PointSize = size;",
-				//"gl_PointSize = 10.0 + 6.0 * mvPosition.z;";
+				"gl_PointSize = size * ( scale / length( mvPosition.xyz ) );",
 
 			"}"
 

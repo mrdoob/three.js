@@ -16,7 +16,8 @@ THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter ) 
 	this.magFilter = magFilter !== undefined ? magFilter : THREE.LinearFilter;
 	this.minFilter = minFilter !== undefined ? minFilter : THREE.LinearMipMapLinearFilter;
 
-	this.needsUpdate = false;
+	// this.needsUpdate = false;
+	this.needsUpdate = image.getContext ? true : false; // true by default for <canvas> element
 
 };
 
