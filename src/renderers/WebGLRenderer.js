@@ -4002,8 +4002,10 @@ THREE.ShaderLib = {
 
 				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
 
+				"float length = sqrt( mvPosition.x * mvPosition.x + mvPosition.y * mvPosition.y + mvPosition.z * mvPosition.z );",
+
+				"gl_PointSize = size * ( scale / length );",
 				"gl_Position = projectionMatrix * mvPosition;",
-				"gl_PointSize = size * ( scale / length( mvPosition.xyz ) );",
 
 			"}"
 
