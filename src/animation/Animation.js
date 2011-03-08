@@ -162,12 +162,11 @@ THREE.Animation.prototype.update = function( deltaTimeMS ) {
 	
 		// use JIT?
 	
-		if ( JIThierarchy[ h ][ frame ] !== undefined ) {
+		if ( this.JITCompile && JIThierarchy[ h ][ frame ] !== undefined ) {
 
 			if( object instanceof THREE.Bone ) {
 				
 				object.skinMatrix = JIThierarchy[ h ][ frame ];
-				object.skinMatrix.flattenToArrayOffset( this.root.boneMatrices, h * 16 );
 				
 				object.matrixAutoUpdate = false;
 				object.matrixWorldNeedsUpdate = false;
@@ -186,14 +185,18 @@ THREE.Animation.prototype.update = function( deltaTimeMS ) {
 
 			// make sure so original matrix and not JIT matrix is set
 
-			if( object instanceof THREE.Bone ) {
+			if ( this.JITCompile ) {
 				
-				object.skinMatrix = object.animationCache.originalMatrix;
-				
-			} else {
-				
-				object.matrix = object.animationCache.originalMatrix;
-				
+				if( object instanceof THREE.Bone ) {
+					
+					object.skinMatrix = object.animationCache.originalMatrix;
+					
+				} else {
+					
+					object.matrix = object.animationCache.originalMatrix;
+					
+				}
+
 			}
 
 
@@ -209,16 +212,23 @@ THREE.Animation.prototype.update = function( deltaTimeMS ) {
 
 				// switch keys?
 
-				if ( nextKey.time < unloopedCurrentTime ) {
+				if ( nextKey.time <= unloopedCurrentTime ) {
 
 					// did we loop?
 
-					if ( currentTime < unloopedCurrentTime ) {
+					if ( currentTime <= unloopedCurrentTime ) {
 
 						if ( this.loop ) {
 
 							prevKey = this.data.hierarchy[ h ].keys[ 0 ];
 							nextKey = this.getNextKeyWith( type, h, 1 );
+
+							while( nextKey.time < currentTime ) {
+	
+								prevKey = nextKey;
+								nextKey = this.getNextKeyWith( type, h, nextKey.index + 1 );
+	
+							}
 
 						} else {
 
@@ -256,7 +266,7 @@ THREE.Animation.prototype.update = function( deltaTimeMS ) {
 
 				if ( scale < 0 || scale > 1 ) {
 
-					console.log( "THREE.Animation.update: Warning! Scale out of bounds:" + scale ); 
+					console.log( "THREE.Animation.update: Warning! Scale out of bounds:" + scale + " on bone " + h ); 
 					scale = scale < 0 ? 0 : 1;
 
 				}

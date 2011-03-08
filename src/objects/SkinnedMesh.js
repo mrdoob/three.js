@@ -17,7 +17,6 @@ THREE.SkinnedMesh = function( geometry, materials ) {
 	// init bones
 
 	this.identityMatrix = new THREE.Matrix4();
-
 	this.bones = [];
 	this.boneMatrices = [];
 
@@ -38,6 +37,7 @@ THREE.SkinnedMesh = function( geometry, materials ) {
 			bone.name = gbone.name;
 			bone.position.set( p[0], p[1], p[2] ); 
 			bone.quaternion.set( q[0], q[1], q[2], q[3] );
+			bone.useQuaternion = true;
 
 			if ( s !== undefined ) {
 
@@ -137,6 +137,19 @@ THREE.SkinnedMesh.prototype.update = function ( parentMatrixWorld, forceUpdate, 
 
 			}
 
+		}
+
+
+		// flatten to array
+
+		var b, bl = this.bones.length;
+			ba = this.bones;
+			bm = this.boneMatrices;
+
+		for ( b = 0; b < bl; b++ ) {
+			
+			ba[ b ].skinMatrix.flattenToArrayOffset( bm, b * 16 );
+			
 		}
 
 	}
