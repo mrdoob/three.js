@@ -77,7 +77,7 @@ THREE.Geometry.prototype = {
 
 				cb.set( 0, 0, 0 );
 
-				for ( n = 0, nl = face.normal.length; n < nl; n++ ) {
+				for ( n = 0, nl = face.vertexNormals.length; n < nl; n++ ) {
 
 					cb.addSelf( face.vertexNormals[n] );
 
