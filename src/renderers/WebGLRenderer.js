@@ -1442,9 +1442,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.useProgram( program );
 			_oldProgram = program;
 
-			_gl.uniformMatrix4fv( p_uniforms.projectionMatrix, false, _projectionMatrixArray );
-
 		}
+
+		_gl.uniformMatrix4fv( p_uniforms.projectionMatrix, false, _projectionMatrixArray );
 
 		// refresh uniforms common to several materials
 
