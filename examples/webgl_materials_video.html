@@ -322,9 +322,9 @@
 
 				counter++;
 
-				if ( postprocessing.enabled ) {
+				renderer.clear();
 
-					renderer.clear();
+				if ( postprocessing.enabled ) {
 
 					// Render scene into texture
 
@@ -362,7 +362,6 @@
 
 				} else {
 
-					renderer.clear();
 					renderer.render( scene, camera );
 
 				}
