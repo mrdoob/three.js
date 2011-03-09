@@ -1249,7 +1249,10 @@ THREE.Loader.prototype = {
 		if ( m.mapDiffuse && texture_path ) {
 
 			texture = document.createElement( 'canvas' );
+			
 			mpars.map = new THREE.Texture( texture );
+			mpars.map.sourceFile = m.mapDiffuse;
+			
 			load_image( mpars.map, texture_path + "/" + m.mapDiffuse );
 
 		} else if ( m.colorDiffuse ) {
@@ -1267,7 +1270,9 @@ THREE.Loader.prototype = {
 		if ( m.mapLightmap && texture_path ) {
 
 			texture = document.createElement( 'canvas' );
+			
 			mpars.lightMap = new THREE.Texture( texture );
+			mpars.lightMap.sourceFile = m.mapLightmap;
 			
 			load_image( mpars.lightMap, texture_path + "/" + m.mapLightmap );
 
