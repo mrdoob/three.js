@@ -69,6 +69,7 @@ COMMON_FILES = [
 'renderers/DOMRenderer.js',
 'renderers/CanvasRenderer.js',
 'renderers/SVGRenderer.js',
+'renderers/WebGLShaders.js',
 'renderers/WebGLRenderer.js',
 'renderers/SoundRenderer.js',
 'renderers/renderables/RenderableObject.js',
@@ -267,6 +268,7 @@ WEBGL_FILES = [
 'scenes/Fog.js',
 'scenes/FogExp2.js',
 'renderers/SoundRenderer.js',
+'renderers/WebGLShaders.js',
 'renderers/WebGLRenderer.js',
 ]
 

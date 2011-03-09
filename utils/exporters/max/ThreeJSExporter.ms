@@ -408,7 +408,7 @@ rollout ThreeJSExporter "ThreeJSExporter"
 	-------------------------------------------------------------------------------------
 	-- Export materials
 
-	function ExportMaterials zmaterials = 
+	function ExportMaterials zmaterials hasDummyMaterial = 
 	(
 
 		Format "'materials': [\n" to:ostream
@@ -448,8 +448,20 @@ rollout ThreeJSExporter "ThreeJSExporter"
 
 			Format "}" to:ostream
 
-			if i < totalMaterials then Format "," to:ostream
+			if ( i < totalMaterials or hasDummyMaterial ) then Format "," to:ostream
 			Format "\n\n" to:ostream
+
+		)
+		
+		if hasDummyMaterial then
+		(
+
+			Format "{\n" to:ostream
+
+			Format "'DbgIndex' : %,\n" totalMaterials to:ostream
+			Format "'DbgName'  : '%',\n" "dummy" to:ostream
+			
+			Format "}" to:ostream
 
 		)
 
@@ -554,12 +566,16 @@ rollout ThreeJSExporter "ThreeJSExporter"
 
 		useMultiMaterial = false
 		materialIDList = #()
-
-		if ( classof objMaterial ) == StandardMaterial then 
+		
+		materialClass = classof objMaterial
+		
+		if materialClass == StandardMaterial then 
 		(
+
 			fm = findItem allMaterials objMaterial
+
 		)
-		else
+		else if materialClass == MultiMaterial then
 		(
 			useMultiMaterial = true
 
@@ -572,11 +588,21 @@ rollout ThreeJSExporter "ThreeJSExporter"
 				mMergedIndex = findItem allMaterials subMaterial
 				if mMergedIndex > 0 then 
 				(
+
 					materialIDList[mID] = mMergedIndex
+
 				)
 
 			)
 
+		)
+		else
+		(
+			
+			-- undefined material
+			
+			fm = 0
+			
 		)
 		
 		for i = 1 to n do 
@@ -592,8 +618,10 @@ rollout ThreeJSExporter "ThreeJSExporter"
 
 			if useMultiMaterial then 
 			(
+
 				mID = GetFaceMatID objMesh i
 				fm = materialIDList[mID]
+
 			)
 
 			if hasUVs then
@@ -608,7 +636,9 @@ rollout ThreeJSExporter "ThreeJSExporter"
 			)
 			else
 			(
+
 				fuv = false
+
 			)
 
 			append zface fv 
@@ -632,9 +662,12 @@ rollout ThreeJSExporter "ThreeJSExporter"
 
 		if materialClass == StandardMaterial then
 		(
+
 			if ( findItem whereto objMaterial ) == 0 then
 			(
+
 				append whereto objMaterial
+
 			)
 
 		)
@@ -652,7 +685,9 @@ rollout ThreeJSExporter "ThreeJSExporter"
 
 				if ( findItem whereto subMaterial ) == 0 then
 				(
+
 					append whereto subMaterial
+
 				)
 
 			)
@@ -728,6 +763,8 @@ rollout ThreeJSExporter "ThreeJSExporter"
 		mergedFaces = #()
 		mergedMaterials = #()
 
+		hasDummyMaterial = true
+		
 		for obj in selection do 
 		(
 
@@ -800,7 +837,7 @@ rollout ThreeJSExporter "ThreeJSExporter"
 
 		-- Dump all materials in the scene
 
-		ExportMaterials mergedMaterials
+		ExportMaterials mergedMaterials hasDummyMaterial
 
 		-- Dump merged data from all selected geometries
 
