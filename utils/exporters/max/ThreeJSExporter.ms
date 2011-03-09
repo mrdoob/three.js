@@ -408,7 +408,7 @@ rollout ThreeJSExporter "ThreeJSExporter"
 	-------------------------------------------------------------------------------------
 	-- Export materials
 
-	function ExportMaterials zmaterials hasDummyMaterial = 
+	function ExportMaterials zmaterials = 
 	(
 
 		Format "'materials': [\n" to:ostream
@@ -424,46 +424,48 @@ rollout ThreeJSExporter "ThreeJSExporter"
 			-- debug
 
 			Format "'DbgIndex' : %,\n" (i-1) to:ostream
-			Format "'DbgName'  : '%',\n" mat.name to:ostream
 
-			-- colors
+			if classof mat != BooleanClass then
+			(
 
-			DumpColor mat.diffuse  "colorDiffuse"
-			DumpColor mat.ambient  "colorAmbient"
-			DumpColor mat.specular "colorSpecular"
+				Format "'DbgName'  : '%',\n" mat.name to:ostream
+				
+				-- colors
 
-			t = mat.opacity / 100
-			s = mat.glossiness
-			
-			Format "'transparency'  : %,\n" t to:ostream
-			Format "'specularCoef'  : %,\n" s to:ostream
+				DumpColor mat.diffuse  "colorDiffuse"
+				DumpColor mat.ambient  "colorAmbient"
+				DumpColor mat.specular "colorSpecular"
 
-			-- maps
+				t = mat.opacity / 100
+				s = mat.glossiness
+				
+				Format "'transparency'  : %,\n" t to:ostream
+				Format "'specularCoef'  : %,\n" s to:ostream
 
-			DumpMap mat.diffuseMap  "mapDiffuse"
-			DumpMap mat.ambientMap  "mapAmbient"
-			DumpMap mat.specularMap "mapSpecular"
-			DumpMap mat.bumpMap 	"mapBump"
-			DumpMap mat.opacityMap 	"mapAlpha"
+				-- maps
+
+				DumpMap mat.diffuseMap  "mapDiffuse"
+				DumpMap mat.ambientMap  "mapAmbient"
+				DumpMap mat.specularMap "mapSpecular"
+				DumpMap mat.bumpMap 	"mapBump"
+				DumpMap mat.opacityMap 	"mapAlpha"
+
+			)
+			else 
+			(
+				
+				Format "'DbgName'  : '%',\n" "dummy" to:ostream
+				
+				DumpColor red "colorDiffuse"
+				
+			)
 
 			Format "}" to:ostream
 
-			if ( i < totalMaterials or hasDummyMaterial ) then Format "," to:ostream
+			if ( i < totalMaterials ) then Format "," to:ostream
 			Format "\n\n" to:ostream
 
-		)
-		
-		if hasDummyMaterial then
-		(
-
-			Format "{\n" to:ostream
-
-			Format "'DbgIndex' : %,\n" totalMaterials to:ostream
-			Format "'DbgName'  : '%',\n" "dummy" to:ostream
-			
-			Format "}" to:ostream
-
-		)
+		)		
 
 		Format "],\n\n" to:ostream
 
@@ -577,19 +579,40 @@ rollout ThreeJSExporter "ThreeJSExporter"
 		)
 		else if materialClass == MultiMaterial then
 		(
+
 			useMultiMaterial = true
 
 			for i = 1 to n do 
 			(
+
 				mID = GetFaceMatID objMesh i
 				materialIndex = findItem objMaterial.materialIDList mID
-				subMaterial = objMaterial.materialList[materialIndex]
-
-				mMergedIndex = findItem allMaterials subMaterial
-				if mMergedIndex > 0 then 
+				
+				if materialIndex > 0 then
 				(
 
-					materialIDList[mID] = mMergedIndex
+					subMaterial = objMaterial.materialList[materialIndex]
+
+					mMergedIndex = findItem allMaterials subMaterial
+
+					if mMergedIndex > 0 then 
+					(
+
+						materialIDList[mID] = mMergedIndex
+
+					)
+					else
+					(
+
+						materialIDList[mID] = findItem allMaterials false
+
+					)
+
+				)
+				else
+				(
+
+					materialIDList[mID] = findItem allMaterials false
 
 				)
 
@@ -601,7 +624,7 @@ rollout ThreeJSExporter "ThreeJSExporter"
 			
 			-- undefined material
 			
-			fm = 0
+			fm = findItem allMaterials false
 			
 		)
 		
@@ -620,7 +643,7 @@ rollout ThreeJSExporter "ThreeJSExporter"
 			(
 
 				mID = GetFaceMatID objMesh i
-				fm = materialIDList[mID]
+				fm = materialIDList[mID]				
 
 			)
 
@@ -653,9 +676,9 @@ rollout ThreeJSExporter "ThreeJSExporter"
 	)
 
 	-------------------------------------------------------------------------------------
-	-- Extract materials from eventual multimaterial
+	-- Extract materials from eventual multi-material
 	
-	function ExtractMaterials objMesh objMaterial whereto =
+	function ExtractMaterials objMesh objMaterial whereto zname =
 	(
 		
 		materialClass = classof objMaterial
@@ -681,16 +704,35 @@ rollout ThreeJSExporter "ThreeJSExporter"
 			
 				mID = getFaceMatId objMesh i
 				materialIndex = findItem objMaterial.materialIDList mID
-				subMaterial = objMaterial.materialList[materialIndex]
-
-				if ( findItem whereto subMaterial ) == 0 then
+				
+				if materialIndex > 0 then
 				(
 
-					append whereto subMaterial
+					subMaterial = objMaterial.materialList[materialIndex]
+
+					if ( findItem whereto subMaterial ) == 0 then
+					(
+
+						append whereto subMaterial
+
+					)
 
 				)
+				else
+				(
+					-- Format "Mess with % [%][%]\n\n" zname i mID to:ostream
+				)
+				
 
 			)
+
+		)
+		else
+		(
+			
+			-- unknown or undefined material
+			
+			append whereto false
 
 		)
 
@@ -762,8 +804,6 @@ rollout ThreeJSExporter "ThreeJSExporter"
 		mergedUvs = #()
 		mergedFaces = #()
 		mergedMaterials = #()
-
-		hasDummyMaterial = true
 		
 		for obj in selection do 
 		(
@@ -783,7 +823,7 @@ rollout ThreeJSExporter "ThreeJSExporter"
 				vertexOffset = mergedVertices.count
 				uvOffset = mergedUvs.count
 
-				ExtractMaterials meshObj meshMaterial mergedMaterials
+				ExtractMaterials meshObj meshMaterial mergedMaterials meshName
 
 				ExtractVertices meshObj mergedVertices
 				ExtractNormals meshObj mergedNormals needsFlip
@@ -837,7 +877,7 @@ rollout ThreeJSExporter "ThreeJSExporter"
 
 		-- Dump all materials in the scene
 
-		ExportMaterials mergedMaterials hasDummyMaterial
+		ExportMaterials mergedMaterials
 
 		-- Dump merged data from all selected geometries
 
