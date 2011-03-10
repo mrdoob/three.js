@@ -135,7 +135,7 @@ rollout ThreeJSExporter "ThreeJSExporter"
 
 		num = src.count
 
-		if num > 0 and exportColor.checked and useColors then
+		if num > 0 and useColors then
 		(
 
 			for i = 1 to num do
@@ -462,7 +462,7 @@ rollout ThreeJSExporter "ThreeJSExporter"
 	-------------------------------------------------------------------------------------
 	-- Export materials
 
-	function ExportMaterials zmaterials = 
+	function ExportMaterials zmaterials useVertexColors = 
 	(
 
 		Format "'materials': [\n" to:ostream
@@ -513,7 +513,8 @@ rollout ThreeJSExporter "ThreeJSExporter"
 				DumpColor red "colorDiffuse"
 				
 			)
-
+				
+			Format "'vertexColors' : %\n" useVertexColors to:ostream
 			Format "}" to:ostream
 
 			if ( i < totalMaterials ) then Format "," to:ostream
@@ -546,6 +547,28 @@ rollout ThreeJSExporter "ThreeJSExporter"
 	-------------------------------------------------------------------------------------
 	-- Extract vertex colors from mesh
 
+	function BlendValues x y =
+	(
+
+		return x + ( y - x )/2
+
+	)
+	
+	function HandleColor firstColor i whereto startOffset c = 
+	(
+
+		if firstColor[ i ] then 
+		(
+			whereto[ startOffset + i ] = c
+			firstColor[ i ] = false
+		)
+		else
+		(
+			whereto[ startOffset + i ] = BlendValues whereto[ startOffset + i ] c
+		)
+
+	)
+	
 	function ExtractColors obj whereto =
 	(
 
@@ -555,10 +578,13 @@ rollout ThreeJSExporter "ThreeJSExporter"
 		
 		startOffset = whereto.count
 		
+		firstColor = #()
+		
 		for i = 1 to nVertices do
 		(
 
 			append whereto (color 255 255 255)
+			append firstColor true
 
 		)
 
@@ -585,9 +611,9 @@ rollout ThreeJSExporter "ThreeJSExporter"
 				--   so this may mess up things, but in Three
 				--   there is 1-1 correspondence, so we need this )
 				
-				whereto[ startOffset + f.x ] = c1
-				whereto[ startOffset + f.y ] = c2
-				whereto[ startOffset + f.z ] = c3
+				HandleColor firstColor f.x whereto startOffset c1
+				HandleColor firstColor f.y whereto startOffset c2
+				HandleColor firstColor f.z whereto startOffset c3
 
 			)
 
@@ -824,12 +850,7 @@ rollout ThreeJSExporter "ThreeJSExporter"
 
 					)
 
-				)
-				else
-				(
-					-- Format "Mess with % [%][%]\n\n" zname i mID to:ostream
-				)
-				
+				)				
 
 			)
 
@@ -971,10 +992,13 @@ rollout ThreeJSExporter "ThreeJSExporter"
 		totalNormals = 0
 		totalUvs = 0
 		
-		if sceneHasVColors then
+		useColors = false
+		
+		if sceneHasVColors and exportColor.checked then
 		(
 
 			totalColors = totalVertices
+			useColors = true
 
 		)
 
@@ -1018,13 +1042,13 @@ rollout ThreeJSExporter "ThreeJSExporter"
 
 		-- Dump all materials in the scene
 
-		ExportMaterials mergedMaterials
+		ExportMaterials mergedMaterials useColors
 
 		-- Dump merged data from all selected geometries
 
 		DumpVertices mergedVertices
 		DumpNormals mergedNormals
-		DumpColors mergedColors sceneHasVColors
+		DumpColors mergedColors useColors
 		DumpUvs mergedUvs
 		DumpFaces mergedFaces
 
