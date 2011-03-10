@@ -267,6 +267,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		geometryGroup.__webGLFaceBuffer = _gl.createBuffer();
 		geometryGroup.__webGLLineBuffer = _gl.createBuffer();
+		
+		
+		if( geometryGroup.numberVertexKeys ) {
+			
+			var k, kl;
+			geometryGroup.__webGLVertexKeysBuffers = []; 
+			
+			for( k = 0, kl = geometryGroup.numberVertexKeys; k < kl; k++ ) {
+				
+				geometryGroup.__webGLVertexKeysBuffers.push( _gl.createBuffer());	
+			}
+
+		}
 
 	};
 
@@ -354,6 +367,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 		geometryGroup.__webGLFaceCount = ntris * 3;
 		geometryGroup.__webGLLineCount = nlines * 2;
 
+		if( geometryGroup.numberVertexKeys ) {
+			
+			var k, kl;
+			geometryGroup.__vertexKeysArrays = []; 
+			
+			for( k = 0, kl = geometryGroup.numberVertexKeys; k < kl; k++ ) {
+				
+				geometryGroup.__vertexKeysArrays.push( new Float32Array( nvertices * 3 ));	
+			}
+
+		}
+
+
 	};
 
 	function setMeshBuffers ( geometryGroup, object, hint ) {
@@ -367,10 +393,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 			sb1, sb2, sb3, sb4,
 			m, ml, i,
 			vn, uvi, uv2i,
+			vk, vkl, vka,
 
 		vertexIndex = 0,
 
 		offset = 0,
+		offsetVertexKey = 0,
 		offset_uv = 0,
 		offset_uv2 = 0,
 		offset_face = 0,
@@ -381,6 +409,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		offset_skin = 0,
 
 		vertexArray = geometryGroup.__vertexArray,
+		vertexKeysArrays = geometryGroup.__vertexKeysArrays,
 		uvArray = geometryGroup.__uvArray,
 		uv2Array = geometryGroup.__uv2Array,
 		normalArray = geometryGroup.__normalArray,
@@ -400,6 +429,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		geometry = object.geometry, // this is shared for all chunks
 
 		dirtyVertices = geometry.__dirtyVertices,
+		dirtyVertexKeys = geometry.__dirtyVertexKeys,
 		dirtyElements = geometry.__dirtyElements,
 		dirtyUvs = geometry.__dirtyUvs,
 		dirtyNormals = geometry.__dirtyNormals,
@@ -407,6 +437,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		dirtyColors = geometry.__dirtyColors,
 
 		vertices = geometry.vertices,
+		vertexKeys = geometry.vertexKeys,
 		chunk_faces = geometryGroup.faces,
 		obj_faces = geometry.faces,
 		obj_uvs = geometry.uvs,
@@ -450,6 +481,33 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					offset += 9;
 
+				}
+
+				if ( dirtyVertexKeys ) {
+					
+					for( vk = 0, vkl = vertexKeys.length; vk < vkl; vk++ ) {
+						
+						v1 = vertexKeys[ vk ].vertices[ face.a ].position;
+						v2 = vertexKeys[ vk ].vertices[ face.b ].position;
+						v3 = vertexKeys[ vk ].vertices[ face.c ].position;
+
+						vka = vertexKeysArrays[ vk ];
+	
+						vka[ offsetVertexKey + 0 ] = v1.x;
+						vka[ offsetVertexKey + 1 ] = v1.y;
+						vka[ offsetVertexKey + 2 ] = v1.z;
+	
+						vka[ offsetVertexKey + 3 ] = v2.x;
+						vka[ offsetVertexKey + 4 ] = v2.y;
+						vka[ offsetVertexKey + 5 ] = v2.z;
+	
+						vka[ offsetVertexKey + 6 ] = v3.x;
+						vka[ offsetVertexKey + 7 ] = v3.y;
+						vka[ offsetVertexKey + 8 ] = v3.z;
+					}
+
+					offsetVertexKey += 9;
+					
 				}
 
 				if ( obj_skinWeights.length ) {
@@ -702,6 +760,38 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					offset += 12;
 
+				}
+
+				if ( dirtyVertexKeys ) {
+					
+					for( vk = 0, vkl = vertexKeys.length; vk < vkl; vk++ ) {
+						
+						v1 = vertexKeys[ vk ].vertices[ face.a ].position;
+						v2 = vertexKeys[ vk ].vertices[ face.b ].position;
+						v3 = vertexKeys[ vk ].vertices[ face.c ].position;
+						v4 = vertexKeys[ vk ].vertices[ face.d ].position;
+	
+						vka = vertexKeysArrays[ vk ];
+	
+						vka[ offsetVertexKey + 0 ] = v1.x;
+						vka[ offsetVertexKey + 1 ] = v1.y;
+						vka[ offsetVertexKey + 2 ] = v1.z;
+	
+						vka[ offsetVertexKey + 3 ] = v2.x;
+						vka[ offsetVertexKey + 4 ] = v2.y;
+						vka[ offsetVertexKey + 5 ] = v2.z;
+	
+						vka[ offsetVertexKey + 6 ] = v3.x;
+						vka[ offsetVertexKey + 7 ] = v3.y;
+						vka[ offsetVertexKey + 8 ] = v3.z;
+	
+						vka[ offsetVertexKey + 9 ] = v4.x;
+						vka[ offsetVertexKey + 10 ] = v4.y;
+						vka[ offsetVertexKey + 11 ] = v4.z;
+					}
+
+					offsetVertexKey += 12;
+					
 				}
 
 				if ( obj_skinWeights.length ) {
@@ -977,6 +1067,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webGLVertexBuffer );
 			_gl.bufferData( _gl.ARRAY_BUFFER, vertexArray, hint );
 
+		}
+
+		if ( dirtyVertexKeys ) {
+			
+			for( vk = 0, vkl = vertexKeys.length; vk < vkl; vk++ ) {
+		
+				_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webGLVertexKeysBuffers[ vk ] );
+				_gl.bufferData( _gl.ARRAY_BUFFER, vertexKeysArrays[ vk ], hint );
+				
+			}
 		}
 
 		if ( dirtyColors && obj_colors.length ) {
@@ -1389,13 +1489,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 		
 		parameters = { fog: fog, map: material.map, envMap: material.envMap, lightMap: material.lightMap, vertexColors: material.vertexColors,
 					   skinning: material.skinning,
+					   vertexAnimated: material.vertexAnimated,
 					   maxDirLights: maxLightCount.directional, maxPointLights: maxLightCount.point,
 					   maxBones: maxBones };
 
 		material.program = buildProgram( material.fragmentShader, material.vertexShader, parameters );
 
 		identifiers = [ 'viewMatrix', 'modelViewMatrix', 'projectionMatrix', 'normalMatrix', 'objectMatrix', 'cameraPosition',
-						'cameraInverseMatrix', 'boneGlobalMatrices'
+						'cameraInverseMatrix', 'boneGlobalMatrices', 'positionInterpolation'
 						];
 
 		for( u in material.uniforms ) {
@@ -1405,7 +1506,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		cacheUniformLocations( material.program, identifiers );
-		cacheAttributeLocations( material.program, [ "position", "normal", "uv", "uv2", "tangent", "color",
+		cacheAttributeLocations( material.program, [ "position", "positionNextKey", "normal", "uv", "uv2", "tangent", "color",
 													 "skinVertexA", "skinVertexB", "skinIndex", "skinWeight" ] );
 
 		var attributes = material.program.attributes;
@@ -1425,6 +1526,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.enableVertexAttribArray( attributes.skinIndex );
 			_gl.enableVertexAttribArray( attributes.skinWeight );
 
+		}
+		
+		if ( material.vertexAnimated &&
+			 attributes.positionNextKey >= 0 ) {
+
+			_gl.enableVertexAttribArray( attributes.positionNextKey );
+			 	
 		}
 
 	};
@@ -1540,6 +1648,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 			loadUniformsSkinning( p_uniforms, object );
 
 		}
+		
+		if ( material.vertexAnimated ) {
+			
+			loadUniformsVertexAnimated( p_uniforms, object );
+		}
 
 		return program;
 
@@ -1555,8 +1668,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// vertices
 
-		_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webGLVertexBuffer );
-		_gl.vertexAttribPointer( attributes.position, 3, _gl.FLOAT, false, 0, 0 );
+		if ( !material.vertexAnimated ) {
+			
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webGLVertexBuffer );
+			_gl.vertexAttribPointer( attributes.position, 3, _gl.FLOAT, false, 0, 0 );
+			
+		} else {
+			
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webGLVertexKeysBuffers[ object.keyA ] );
+			_gl.vertexAttribPointer( attributes.position, 3, _gl.FLOAT, false, 0, 0 );
+			
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webGLVertexKeysBuffers[ object.keyB ] );
+			_gl.vertexAttribPointer( attributes.positionNextKey, 3, _gl.FLOAT, false, 0, 0 );
+		}
+
 
 		// colors
 
@@ -2201,6 +2326,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					initMeshBuffers( geometryGroup, object );
 
 					geometry.__dirtyVertices = true;
+					geometry.__dirtyVertexKeys = true;
 					geometry.__dirtyElements = true;
 					geometry.__dirtyUvs = true;
 					geometry.__dirtyNormals = true;
@@ -2287,7 +2413,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				geometryGroup = geometry.geometryGroups[ g ];
 
-				if ( geometry.__dirtyVertices || geometry.__dirtyElements ||
+				if ( geometry.__dirtyVertices || geometry.__dirtyVertexKeys || geometry.__dirtyElements ||
 					geometry.__dirtyUvs || geometry.__dirtyNormals ||
 					geometry.__dirtyColors || geometry.__dirtyTangents ) {
 
@@ -2298,6 +2424,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 			geometry.__dirtyVertices = false;
+			geometry.__dirtyVertexKeys = false;
 			geometry.__dirtyElements = false;
 			geometry.__dirtyUvs = false;
 			geometry.__dirtyNormals = false;
@@ -2379,6 +2506,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		// in its separate VBO
 
 		var i, l, f, fl, face, material, materials, vertices, mhash, ghash, hash_map = {};
+		var numberVertexKeys = geometry.vertexKeys !== undefined ? geometry.vertexKeys.length : 0;
 
 		geometry.geometryGroups = {};
 
@@ -2421,7 +2549,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( geometry.geometryGroups[ ghash ] == undefined ) {
 
-				geometry.geometryGroups[ ghash ] = { 'faces': [], 'materials': materials, 'vertices': 0 };
+				geometry.geometryGroups[ ghash ] = { 'faces': [], 'materials': materials, 'vertices': 0, 'numberVertexKeys': numberVertexKeys };
 
 			}
 
@@ -2434,7 +2562,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( geometry.geometryGroups[ ghash ] == undefined ) {
 
-					geometry.geometryGroups[ ghash ] = { 'faces': [], 'materials': materials, 'vertices': 0 };
+					geometry.geometryGroups[ ghash ] = { 'faces': [], 'materials': materials, 'vertices': 0, 'numberVertexKeys': numberVertexKeys };
 
 				}
 
@@ -2587,6 +2715,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			parameters.lightMap ? "#define USE_LIGHTMAP" : "",
 			parameters.vertexColors ? "#define USE_COLOR" : "",
 			parameters.skinning ? "#define USE_SKINNING" : "",
+			parameters.vertexAnimated ? "#define USE_VERTEXANIMATION" : "",
+
 
 			"uniform mat4 objectMatrix;",
 			"uniform mat4 modelViewMatrix;",
@@ -2598,6 +2728,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			"uniform mat4 cameraInverseMatrix;",
 
 			"attribute vec3 position;",
+			"attribute vec3 positionNextKey;",
 			"attribute vec3 normal;",
 			"attribute vec3 color;",
 			"attribute vec2 uv;",
@@ -2641,6 +2772,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_gl.uniformMatrix4fv( uniforms.boneGlobalMatrices, false, object.boneMatrices );
 
 	};
+	
+	function loadUniformsVertexAnimated ( uniforms, object ) {
+		
+		_gl.uniform1f( uniforms.positionInterpolation, object.keyInterpolation );
+	}
 
 	function loadUniformsMatrices ( uniforms, object ) {
 
@@ -3633,7 +3769,33 @@ THREE.Snippets = {
 
 	"#endif"
 
-	].join("\n")
+	].join("\n"),
+	
+	// vertex animation
+
+	vertexanimated_pars_vertex: [
+
+	"#ifdef USE_VERTEXANIMATION",
+
+		"uniform float positionInterpolation;",
+
+	"#endif"
+
+	].join("\n"),
+
+	vertexanimated_vertex: [
+
+	"#ifdef USE_VERTEXANIMATION",
+
+		"gl_Position  = projectionMatrix * modelViewMatrix * vec4( mix( position, positionNextKey, positionInterpolation ), 1.0 );",
+
+	"#else",
+
+		"gl_Position = projectionMatrix * mvPosition;",
+
+	"#endif"
+
+	].join("\n")	
 
 };
 
@@ -3656,7 +3818,9 @@ THREE.UniformsLib = {
 	"fogDensity": { type: "f", value: 0.00025 },
 	"fogNear"	: { type: "f", value: 1 },
 	"fogFar"	: { type: "f", value: 2000 },
-	"fogColor"	: { type: "c", value: new THREE.Color( 0xffffff ) }
+	"fogColor"	: { type: "c", value: new THREE.Color( 0xffffff ) },
+	
+	"positionInterpolation" : { type: "f", value: 0 }
 
 	},
 
@@ -3794,6 +3958,7 @@ THREE.ShaderLib = {
 			THREE.Snippets[ "envmap_pars_vertex" ],
 			THREE.Snippets[ "color_pars_vertex" ],
 			THREE.Snippets[ "skinning_pars_vertex" ],
+			THREE.Snippets[ "vertexanimated_pars_vertex" ],
 
 			"void main() {",
 
@@ -3804,6 +3969,7 @@ THREE.ShaderLib = {
 				THREE.Snippets[ "envmap_vertex" ],
 				THREE.Snippets[ "color_vertex" ],
 				THREE.Snippets[ "skinning_vertex" ],
+				THREE.Snippets[ "vertexanimated_vertex" ],
 
 			"}"
 
@@ -3854,9 +4020,10 @@ THREE.ShaderLib = {
 			THREE.Snippets[ "lights_pars_vertex" ],
 			THREE.Snippets[ "color_pars_vertex" ],
 			THREE.Snippets[ "skinning_pars_vertex" ],
+			THREE.Snippets[ "vertexanimated_pars_vertex" ],
 
 			"void main() {",
-
+				
 				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
 
 				THREE.Snippets[ "map_vertex" ],
@@ -3868,6 +4035,7 @@ THREE.ShaderLib = {
 
 				THREE.Snippets[ "lights_vertex" ],
 				THREE.Snippets[ "skinning_vertex" ],
+				THREE.Snippets[ "vertexanimated_vertex" ],
 
 			"}"
 
@@ -3934,6 +4102,7 @@ THREE.ShaderLib = {
 			THREE.Snippets[ "lights_pars_vertex" ],
 			THREE.Snippets[ "color_pars_vertex" ],
 			THREE.Snippets[ "skinning_pars_vertex" ],
+			THREE.Snippets[ "vertexanimated_pars_vertex" ],
 
 			"void main() {",
 
@@ -3955,6 +4124,7 @@ THREE.ShaderLib = {
 
 				THREE.Snippets[ "lights_vertex" ],
 				THREE.Snippets[ "skinning_vertex" ],
+				THREE.Snippets[ "vertexanimated_vertex" ],
 
 			"}"
 
