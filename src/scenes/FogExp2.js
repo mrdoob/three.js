@@ -6,6 +6,6 @@
 THREE.FogExp2 = function ( hex, density ) {
 
 	this.color = new THREE.Color( hex );
-	this.density = density || 0.00025;
+	this.density = ( density !== undefined ) ? density : 0.00025;
 
 };
