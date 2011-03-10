@@ -662,19 +662,20 @@ def generate_materials(mtl, materials):
     
     mtl_array = []
     for m in mtl:
-        index = materials[m]
-        
-        # add debug information
-        #  materials should be sorted according to how
-        #  they appeared in OBJ file (for the first time)
-        #  this index is identifier used in face definitions
-        mtl[m]['DbgName'] = m
-        mtl[m]['DbgIndex'] = index
-        mtl[m]['DbgColor'] = generate_color(index)
-        
-        mtl_raw = ",\n".join(['\t"%s" : %s' % (n, value2string(v)) for n,v in sorted(mtl[m].items())])
-        mtl_string = "\t{\n%s\n\t}" % mtl_raw
-        mtl_array.append([index, mtl_string])
+        if m in materials:
+            index = materials[m]
+            
+            # add debug information
+            #  materials should be sorted according to how
+            #  they appeared in OBJ file (for the first time)
+            #  this index is identifier used in face definitions
+            mtl[m]['DbgName'] = m
+            mtl[m]['DbgIndex'] = index
+            mtl[m]['DbgColor'] = generate_color(index)
+            
+            mtl_raw = ",\n".join(['\t"%s" : %s' % (n, value2string(v)) for n,v in sorted(mtl[m].items())])
+            mtl_string = "\t{\n%s\n\t}" % mtl_raw
+            mtl_array.append([index, mtl_string])
         
     return ",\n\n".join([m for i,m in sorted(mtl_array)])
 
