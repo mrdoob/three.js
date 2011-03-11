@@ -25,6 +25,7 @@ THREE.ParticleBasicMaterial = function ( parameters ) {
 	this.map = null;
 
 	this.size = 1.0;
+	this.sizeAttenuation = true;
 
 	this.blending = THREE.NormalBlending;
 	this.depthTest = true;
@@ -40,6 +41,7 @@ THREE.ParticleBasicMaterial = function ( parameters ) {
 		if ( parameters.map !== undefined ) this.map = parameters.map;
 
 		if ( parameters.size !== undefined ) this.size = parameters.size;
+		if ( parameters.sizeAttenuation !== undefined ) this.sizeAttenuation = parameters.sizeAttenuation;
 
 		if ( parameters.blending !== undefined ) this.blending = parameters.blending;
 		if ( parameters.depthTest !== undefined ) this.depthTest = parameters.depthTest;

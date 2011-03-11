@@ -85,7 +85,7 @@
 
 				geometry.colors = colors;
 
-				material = new THREE.ParticleBasicMaterial( { size: 35, map: sprite, blending: THREE.BillboardBlending, vertexColors: true } );
+				material = new THREE.ParticleBasicMaterial( { size: 85, map: sprite, blending: THREE.BillboardBlending, vertexColors: true } );
 				material.color.setHSV( 1.0, 0.2, 0.8 );
 
 				particles = new THREE.ParticleSystem( geometry, material );
@@ -111,6 +111,7 @@
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
 
@@ -143,6 +144,15 @@
 					mouseY = event.touches[ 0 ].pageY - windowHalfY;
 
 				}
+
+			}
+
+			function onWindowResize( event ) {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 

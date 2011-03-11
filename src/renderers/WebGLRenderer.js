@@ -1406,6 +1406,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		uniforms.psColor.value.setRGB( material.color.r * material.opacity, material.color.g * material.opacity, material.color.b * material.opacity );
 		uniforms.opacity.value = material.opacity;
 		uniforms.size.value = material.size;
+		uniforms.scale.value = _canvas.height / 2.0; // TODO: Cache this.
 		uniforms.map.texture = material.map;
 
 	};
@@ -1492,7 +1493,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		
 		parameters = { fog: fog, map: material.map, envMap: material.envMap, lightMap: material.lightMap, vertexColors: material.vertexColors,
 					   skinning: material.skinning,
-					   morphTargets: material.morphTargets, maxMorphTargets: 1,
+					   morphTargets: material.morphTargets,
 					   maxDirLights: maxLightCount.directional, maxPointLights: maxLightCount.point,
 					   maxBones: maxBones };
 
@@ -1566,7 +1567,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function setProgram ( camera, lights, fog, material, object ) {
+	function setProgram( camera, lights, fog, material, object ) {
 
 		if ( !material.program ) _this.initMaterial( material, lights, fog, object );
 
@@ -1579,9 +1580,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.useProgram( program );
 			_oldProgram = program;
 
-			_gl.uniformMatrix4fv( p_uniforms.projectionMatrix, false, _projectionMatrixArray );
-
 		}
+
+		_gl.uniformMatrix4fv( p_uniforms.projectionMatrix, false, _projectionMatrixArray );
 
 		// refresh uniforms common to several materials
 
@@ -1683,6 +1684,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 	};
 
 	function renderBuffer ( camera, lights, fog, material, geometryGroup, object ) {
+
+		if ( material.opacity == 0 ) return;
 
 		var program, attributes, linewidth, primitives;
 
@@ -1809,7 +1812,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		if ( material.skinning &&
-			 attributes.skinVertexA >=0 && attributes.skinVertexB >= 0 &&
+			 attributes.skinVertexA >= 0 && attributes.skinVertexB >= 0 &&
 			 attributes.skinIndex >= 0 && attributes.skinWeight >= 0 ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webGLSkinVertexABuffer );
@@ -2779,6 +2782,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			parameters.skinning ? "#define USE_SKINNING" : "",
 			parameters.morphTargets ? "#define USE_MORPHTARGETS" : "",
 
+
+			parameters.sizeAttenuation ? "#define USE_SIZEATTENUATION" : "",
 
 			"uniform mat4 objectMatrix;",
 			"uniform mat4 modelViewMatrix;",
