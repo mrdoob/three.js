@@ -241,8 +241,8 @@ def file_exists(filename):
 def get_name(fname):
     """Create model name based of filename ("path/fname.js" -> "fname").
     """
-    
-    return os.path.basename(fname).split(".")[0]
+
+    return os.path.splitext(os.path.basename(fname))
 
 def bbox(vertices):
     """Compute bounding box of vertex array.
@@ -323,13 +323,18 @@ def normalize(v):
     """Normalize 3d vector"""
     
     l = math.sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2])
-    v[0] /= l
-    v[1] /= l
-    v[2] /= l
+    if l:
+        v[0] /= l
+        v[1] /= l
+        v[2] /= l
 
 # #####################################################
 # MTL parser
 # #####################################################
+def texture_relative_path(fullpath):
+    texture_file = os.path.basename(fullpath)
+    return texture_file
+    
 def parse_mtl(fname):
     """Parse MTL file.
     """
@@ -383,27 +388,27 @@ def parse_mtl(fname):
             # Diffuse texture
             # map_Kd texture_diffuse.jpg
             if chunks[0] == "map_Kd" and len(chunks) == 2:
-                materials[identifier]["mapDiffuse"] = chunks[1]
+                materials[identifier]["mapDiffuse"] = texture_relative_path(chunks[1])
 
             # Ambient texture
             # map_Ka texture_ambient.jpg
             if chunks[0] == "map_Ka" and len(chunks) == 2:
-                materials[identifier]["mapAmbient"] = chunks[1]
+                materials[identifier]["mapAmbient"] = texture_relative_path(chunks[1])
 
             # Specular texture
             # map_Ks texture_specular.jpg
             if chunks[0] == "map_Ks" and len(chunks) == 2:
-                materials[identifier]["mapSpecular"] = chunks[1]
+                materials[identifier]["mapSpecular"] = texture_relative_path(chunks[1])
 
             # Alpha texture
             # map_d texture_alpha.png
             if chunks[0] == "map_d" and len(chunks) == 2:
-                materials[identifier]["mapAlpha"] = chunks[1]
+                materials[identifier]["mapAlpha"] = texture_relative_path(chunks[1])
 
             # Bump texture
             # map_bump texture_bump.jpg or bump texture_bump.jpg
             if (chunks[0] == "map_bump" or chunks[0] == "bump") and len(chunks) == 2:
-                materials[identifier]["mapBump"] = chunks[1]
+                materials[identifier]["mapBump"] = texture_relative_path(chunks[1])
 
             # Illumination
             # illum 2
@@ -657,19 +662,20 @@ def generate_materials(mtl, materials):
     
     mtl_array = []
     for m in mtl:
-        index = materials[m]
-        
-        # add debug information
-        #  materials should be sorted according to how
-        #  they appeared in OBJ file (for the first time)
-        #  this index is identifier used in face definitions
-        mtl[m]['DbgName'] = m
-        mtl[m]['DbgIndex'] = index
-        mtl[m]['DbgColor'] = generate_color(index)
-        
-        mtl_raw = ",\n".join(['\t"%s" : %s' % (n, value2string(v)) for n,v in sorted(mtl[m].items())])
-        mtl_string = "\t{\n%s\n\t}" % mtl_raw
-        mtl_array.append([index, mtl_string])
+        if m in materials:
+            index = materials[m]
+            
+            # add debug information
+            #  materials should be sorted according to how
+            #  they appeared in OBJ file (for the first time)
+            #  this index is identifier used in face definitions
+            mtl[m]['DbgName'] = m
+            mtl[m]['DbgIndex'] = index
+            mtl[m]['DbgColor'] = generate_color(index)
+            
+            mtl_raw = ",\n".join(['\t"%s" : %s' % (n, value2string(v)) for n,v in sorted(mtl[m].items())])
+            mtl_string = "\t{\n%s\n\t}" % mtl_raw
+            mtl_array.append([index, mtl_string])
         
     return ",\n\n".join([m for i,m in sorted(mtl_array)])
 

@@ -37,6 +37,8 @@ THREE.QuakeCamera = function ( parameters ) {
 	this.lookVertical = true;
 	this.autoForward = false;
 
+	this.dragToLook = false;
+	
 	this.heightSpeed = false;
 	this.heightCoef = 1.0;
 	this.heightMin = 0.0;
@@ -51,6 +53,8 @@ THREE.QuakeCamera = function ( parameters ) {
 		if ( parameters.lookVertical !== undefined ) this.lookVertical = parameters.lookVertical;
 
 		if ( parameters.autoForward !== undefined ) this.autoForward = parameters.autoForward;
+		
+		if ( parameters.dragToLook !== undefined ) this.dragToLook = parameters.dragToLook;
 
 		if ( parameters.heightSpeed !== undefined ) this.heightSpeed = parameters.heightSpeed;
 		if ( parameters.heightCoef !== undefined ) this.heightCoef = parameters.heightCoef;
@@ -76,6 +80,8 @@ THREE.QuakeCamera = function ( parameters ) {
 	this.moveLeft = false;
 	this.moveRight = false;
 
+	this.mouseDragOn = false;
+	
 	this.windowHalfX = window.innerWidth / 2;
 	this.windowHalfY = window.innerHeight / 2;
 
@@ -84,12 +90,18 @@ THREE.QuakeCamera = function ( parameters ) {
 		event.preventDefault();
 		event.stopPropagation();
 
-		switch ( event.button ) {
+		if ( !this.dragToLook ) {
 
-			case 0: this.moveForward = true; break;
-			case 2: this.moveBackward = true; break;
+			switch ( event.button ) {
+
+				case 0: this.moveForward = true; break;
+				case 2: this.moveBackward = true; break;
+
+			}
 
 		}
+		
+		this.mouseDragOn = true;
 
 	};
 
@@ -98,12 +110,18 @@ THREE.QuakeCamera = function ( parameters ) {
 		event.preventDefault();
 		event.stopPropagation();
 
-		switch ( event.button ) {
+		if ( !this.dragToLook ) {
 
-			case 0: this.moveForward = false; break;
-			case 2: this.moveBackward = false; break;
+			switch ( event.button ) {
+
+				case 0: this.moveForward = false; break;
+				case 2: this.moveBackward = false; break;
+
+			}
 
 		}
+		
+		this.mouseDragOn = false;
 
 	};
 
@@ -174,8 +192,16 @@ THREE.QuakeCamera = function ( parameters ) {
 		if ( this.moveLeft ) this.translateX( - this.movementSpeed );
 		if ( this.moveRight ) this.translateX( this.movementSpeed );
 
-		this.lon += this.mouseX * this.lookSpeed;
-		if( this.lookVertical ) this.lat -= this.mouseY * this.lookSpeed;
+		var actualLookSpeed = this.lookSpeed;
+		
+		if ( this.dragToLook && !this.mouseDragOn ) {
+
+			actualLookSpeed = 0;
+
+		}
+		
+		this.lon += this.mouseX * actualLookSpeed;
+		if( this.lookVertical ) this.lat -= this.mouseY * actualLookSpeed;
 
 		this.lat = Math.max( - 85, Math.min( 85, this.lat ) );
 		this.phi = ( 90 - this.lat ) * Math.PI / 180;

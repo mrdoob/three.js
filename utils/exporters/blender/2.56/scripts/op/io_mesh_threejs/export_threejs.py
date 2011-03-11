@@ -629,8 +629,6 @@ def save(operator, context, filepath="", use_modifiers=True, use_normals=True, u
     if not filepath.lower().endswith('.js'):
         filepath += '.js'
 
-    classname = os.path.basename(filepath).split(".")[0]
-
     if not obj:
         raise Exception("Error, Select 1 active object")
 
