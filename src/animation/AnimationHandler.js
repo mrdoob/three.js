@@ -116,10 +116,6 @@ THREE.AnimationHandler = (function() {
  
 		if( data.initialized === true )
 			return;
-
-		// THIS SHOULD BE REMOVED WHEN LENGTH IS UPDATED TO MS IN EXPORT FORMAT!
-		//data.length = parseInt( data.length * 1000, 10 );	
-		//data.fps   *= 0.001;
 		
 
 		// loop through all keys
@@ -134,10 +130,6 @@ THREE.AnimationHandler = (function() {
 					data.hierarchy[ h ].keys[ k ].time = 0;
 
 
-				// THIS SHOULD BE REMOVED WHEN LENGTH IS UPDATED TO MS IN EXPORT FORMAT!
-				//data.hierarchy[ h ].keys[ k ].time = parseInt( data.hierarchy[ h ].keys[ k ].time * 1000, 10 );
-
-
 				// create quaternions
 
 				if( data.hierarchy[ h ].keys[ k ].rot !== undefined &&
@@ -146,6 +138,57 @@ THREE.AnimationHandler = (function() {
 					var quat = data.hierarchy[ h ].keys[ k ].rot;
 					data.hierarchy[ h ].keys[ k ].rot = new THREE.Quaternion( quat[0], quat[1], quat[2], quat[3] );
 
+				}
+			}
+
+
+			// prepare morph target keys
+			
+			if( data.hierarchy[ h ].keys[ 0 ].morphTargets !== undefined ) {
+
+				// get all used
+
+				var usedMorphTargets = {};
+				
+				for( var k = 0; k < data.hierarchy[ h ].keys.length; k++ ) {
+	
+					for( var m = 0; m < data.hierarchy[ h ].keys[ k ].morphTargets.length; m++ ) {
+						
+						var morphTargetName = data.hierarchy[ h ].keys[ k ].morphTargets[ m ];
+						usedMorphTargets[ morphTargetName ] = -1;
+					}					
+				
+				}
+				
+				data.hierarchy[ h ].usedMorphTargets = usedMorphTargets;
+				
+				
+				// set all used on all frames
+				
+				for( var k = 0; k < data.hierarchy[ h ].keys.length; k++ ) {
+	
+					var influences = {};
+	
+					for( var morphTargetName in usedMorphTargets ) {
+			
+						for( var m = 0; m < data.hierarchy[ h ].keys[ k ].morphTargets.length; m++ ) {
+	
+							if( data.hierarchy[ h ].keys[ k ].morphTargets[ m ] === morphTargetName ) {
+								
+								influences[ morphTargetName ] = data.hierarchy[ h ].keys[ k ].morphTargetsInfluences[ m ];
+								break;	
+							}
+					
+						}
+						
+						if( m === data.hierarchy[ h ].keys[ k ].morphTargets.length ) {
+							
+							influences[ morphTargetName ] = 0;
+						}
+	
+					}
+				
+					data.hierarchy[ h ].keys[ k ].morphTargetsInfluences = influences;
 				}
 			
 			}

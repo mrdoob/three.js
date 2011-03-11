@@ -8,6 +8,7 @@ THREE.Animation = function( root, data, interpolationType, JITCompile ) {
 	this.data = THREE.AnimationHandler.get( data );
 	this.hierarchy = THREE.AnimationHandler.parse( root );
 	this.currentTime = 0;
+	this.timeScale = 1;
 	this.isPlaying = false;
 	this.isPaused = true;
 	this.loop = true;
@@ -92,6 +93,7 @@ THREE.Animation.prototype.pause = function() {
 THREE.Animation.prototype.stop = function() {
 
 	this.isPlaying = false;
+	this.isPaused  = false;
 	THREE.AnimationHandler.removeFromUpdate( this );
 	
 	
@@ -146,7 +148,7 @@ THREE.Animation.prototype.update = function( deltaTimeMS ) {
 
 	// update
 	
-	this.currentTime += deltaTimeMS;
+	this.currentTime += deltaTimeMS * this.timeScale;
 
 	unloopedCurrentTime = this.currentTime;
 	currentTime         = this.currentTime = this.currentTime % this.data.length;
@@ -216,7 +218,7 @@ THREE.Animation.prototype.update = function( deltaTimeMS ) {
 
 					// did we loop?
 
-					if ( currentTime <= unloopedCurrentTime ) {
+					if ( currentTime < unloopedCurrentTime ) {
 
 						if ( this.loop ) {
 

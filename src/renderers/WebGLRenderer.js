@@ -1452,7 +1452,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.initMaterial = function ( material, lights, fog, object ) {
 
-		var u, identifiers, i, parameters, maxLightCount, maxBones;
+		var u, a, identifiers, i, parameters, maxLightCount, maxBones;
 
 		if ( material instanceof THREE.MeshDepthMaterial ) {
 
@@ -1499,18 +1499,23 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		material.program = buildProgram( material.fragmentShader, material.vertexShader, parameters );
 
+
+		// load uniforms
+
 		identifiers = [ 'viewMatrix', 'modelViewMatrix', 'projectionMatrix', 'normalMatrix', 'objectMatrix', 'cameraPosition',
 						'cameraInverseMatrix', 'boneGlobalMatrices', 'morphTargetInfluences'
 						];
 
+
 		for( u in material.uniforms ) {
 
 			identifiers.push(u);
-
 		}
 
 		cacheUniformLocations( material.program, identifiers );
 		
+
+		// load attributes
 		
 		identifiers = [ "position", "normal", "uv", "uv2", "tangent", "color",
 					    "skinVertexA", "skinVertexB", "skinIndex", "skinWeight" ];
@@ -1518,6 +1523,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 		for( i = 0; i < this.maxMorphTargets; i++ ) {
 			
 			identifiers.push( "morphTarget" + i );
+		}
+		
+		for( a in material.attributes ) {
+			
+			identifiers.push( a );
 		}
 		
 		cacheAttributeLocations( material.program, identifiers );
@@ -1704,26 +1714,32 @@ THREE.WebGLRenderer = function ( parameters ) {
 			
 			// set base
 			
-			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webGLMorphTargetsBuffers[ object.morphTargetBase ] );
-			_gl.vertexAttribPointer( attributes.position, 3, _gl.FLOAT, false, 0, 0 );
+			if(  object.morphTargetBase !== -1 ) {
+				
+				_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webGLMorphTargetsBuffers[ object.morphTargetBase ] );
+				_gl.vertexAttribPointer( attributes.position, 3, _gl.FLOAT, false, 0, 0 );
+				
+			} else {
+				
+				_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webGLVertexBuffer );
+				_gl.vertexAttribPointer( attributes.position, 3, _gl.FLOAT, false, 0, 0 );
+				
+			}
 			
 			
 			// find most influencing
 			
-			var used = [];
 			var candidateInfluence = -1;
 			var candidate = 0;
 			var influences = object.morphTargetInfluences;
 			var i, il = influences.length;
 			var m = 0;
 
-			used[ object.morphTargetBase ] = 1;
-			
 			while( m < material.numSupportedMorphTargets ) {
 				
 				for( i = 0; i < il; i++ ) {
 					
-					if( !used[ i ] && candidateInfluence < influences[ i ] ) {
+					if( i != object.morphTargetBase && influences[ i ] > candidateInfluence ) {
 						
 						candidate = i;
 						candidateInfluence = influences[ candidate ];
@@ -1735,9 +1751,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				
 				object.__webGLMorphTargetInfluences[ m ] = candidateInfluence;
 
-				used[ candidate ] = 1;
 				candidateInfluence = -1;
-				
 				m++;
 			}
 			
@@ -3865,6 +3879,7 @@ THREE.Snippets = {
 		"morphed += ( morphTarget3 - position ) * morphTargetInfluences[ 3 ];",
 		"morphed *= 0.25;",
 		"morphed += position;",
+		
 		"gl_Position = projectionMatrix * modelViewMatrix * vec4( morphed, 1.0 );",
 
 	"#else",
@@ -3873,7 +3888,7 @@ THREE.Snippets = {
 
 	"#endif"
 
-	].join("\n")	
+	].join("\n")
 
 };
 
@@ -4256,6 +4271,5 @@ THREE.ShaderLib = {
 		].join("\n")
 
 	}
-
-
+	
 };
