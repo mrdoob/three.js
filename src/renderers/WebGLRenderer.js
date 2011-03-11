@@ -1729,17 +1729,24 @@ THREE.WebGLRenderer = function ( parameters ) {
 			
 			// find most influencing
 			
+			var used = [];
 			var candidateInfluence = -1;
 			var candidate = 0;
 			var influences = object.morphTargetInfluences;
 			var i, il = influences.length;
 			var m = 0;
 
+			if( object.morphTargetBase !== -1 ) {
+				
+				used[ object.morphTargetBase ] = true;
+				
+			}
+
 			while( m < material.numSupportedMorphTargets ) {
 				
 				for( i = 0; i < il; i++ ) {
 					
-					if( i != object.morphTargetBase && influences[ i ] > candidateInfluence ) {
+					if( !used[ i ] && influences[ i ] > candidateInfluence ) {
 						
 						candidate = i;
 						candidateInfluence = influences[ candidate ];
@@ -1751,6 +1758,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				
 				object.__webGLMorphTargetInfluences[ m ] = candidateInfluence;
 
+				used[ candidate ] = 1;
 				candidateInfluence = -1;
 				m++;
 			}
@@ -3877,7 +3885,10 @@ THREE.Snippets = {
 		"morphed += ( morphTarget1 - position ) * morphTargetInfluences[ 1 ];",
 		"morphed += ( morphTarget2 - position ) * morphTargetInfluences[ 2 ];",
 		"morphed += ( morphTarget3 - position ) * morphTargetInfluences[ 3 ];",
-		"morphed *= 0.25;",
+		"morphed += ( morphTarget4 - position ) * morphTargetInfluences[ 4 ];",
+		"morphed += ( morphTarget5 - position ) * morphTargetInfluences[ 5 ];",
+		"morphed += ( morphTarget6 - position ) * morphTargetInfluences[ 6 ];",
+		"morphed += ( morphTarget7 - position ) * morphTargetInfluences[ 7 ];",
 		"morphed += position;",
 		
 		"gl_Position = projectionMatrix * modelViewMatrix * vec4( morphed, 1.0 );",
