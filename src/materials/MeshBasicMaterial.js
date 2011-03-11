@@ -54,7 +54,7 @@ THREE.MeshBasicMaterial = function ( parameters ) {
 
 	this.vertexColors = false;
 	this.skinning = false;
-	this.vertexAnimated = false;
+	this.morphTargets = false;
 
 	if ( parameters ) {
 
@@ -82,7 +82,7 @@ THREE.MeshBasicMaterial = function ( parameters ) {
 
 		if ( parameters.vertexColors !== undefined ) this.vertexColors = parameters.vertexColors;
 		if ( parameters.skinning !== undefined ) this.skinning = parameters.skinning;
-		if ( parameters.vertexAnimated !== undefined ) this.vertexAnimated = parameters.vertexAnimated;
+		if ( parameters.morphTargets !== undefined ) this.morphTargets = parameters.morphTargets;
 
 	}
 

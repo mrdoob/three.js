@@ -14,7 +14,7 @@ THREE.Geometry = function () {
 	this.uvs = [];
 	this.uvs2 = [];
 	this.colors = [];
-	this.vertexKeys = [];
+	this.morphTargets = [];
 
 	this.skinWeights = [];
 	this.skinIndices = [];

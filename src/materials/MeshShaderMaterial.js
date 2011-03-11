@@ -40,7 +40,7 @@ THREE.MeshShaderMaterial = function ( parameters ) {
 
 	this.vertexColors = false; // must set this if shader wants to use "color" attribute stream
 	this.skinning = false;	// must set this is shader wants to use skinning attribute streams
-	this.vertexAnimated = false;
+	this.morphTargets = false;
 
 	if ( parameters ) {
 
@@ -62,7 +62,7 @@ THREE.MeshShaderMaterial = function ( parameters ) {
 
 		if ( parameters.vertexColors !== undefined ) this.vertexColors = parameters.vertexColors;
 		if ( parameters.skinning !== undefined ) this.skinning = parameters.skinning;
-		if ( parameters.vertexAnimated !== undefined ) this.vertexAnimated = parameters.vertexAnimated;
+		if ( parameters.morphTargets !== undefined ) this.morphTargets = parameters.morphTargets;
 
 	}
 

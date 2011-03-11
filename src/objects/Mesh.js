@@ -16,10 +16,11 @@ THREE.Mesh = function ( geometry, materials ) {
 
 	this.overdraw = false; // TODO: Move to material?
 
-	// calc bound radius
 
 	if ( this.geometry ) {
 
+		// calc bound radius
+	
 		if( !this.geometry.boundingSphere ) {
 
 			 this.geometry.computeBoundingSphere();
@@ -27,6 +28,21 @@ THREE.Mesh = function ( geometry, materials ) {
 		}
 
 		this.boundRadius = geometry.boundingSphere.radius;
+
+
+		// setup morph targets
+
+		if( this.geometry.morphTargets.length ) {
+			
+			this.morphTargetBase = 0;
+			this.morphTargetInfluences = [];
+			
+			for( var m = 0; m < this.geometry.morphTargets.length; m++ ) {
+				
+				this.morphTargetInfluences.push( 0 );	
+			}
+
+		}
 
 	}
 
