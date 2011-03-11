@@ -242,7 +242,7 @@ def get_name(fname):
     """Create model name based of filename ("path/fname.js" -> "fname").
     """
 
-    return os.path.splitext(os.path.basename(fname))
+    return os.path.splitext(os.path.basename(fname))[0]
 
 def bbox(vertices):
     """Compute bounding box of vertex array.

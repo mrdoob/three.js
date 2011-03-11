@@ -216,7 +216,7 @@ THREE.Animation.prototype.update = function( deltaTimeMS ) {
 
 					// did we loop?
 
-					if ( currentTime <= unloopedCurrentTime ) {
+					if ( currentTime < unloopedCurrentTime ) {
 
 						if ( this.loop ) {
 
