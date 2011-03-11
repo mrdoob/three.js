@@ -1433,7 +1433,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function setProgram ( camera, lights, fog, material, object ) {
+	function setProgram( camera, lights, fog, material, object ) {
 
 		if ( !material.program ) _this.initMaterial( material, lights, fog, object );
 
@@ -1551,6 +1551,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function renderBuffer ( camera, lights, fog, material, geometryGroup, object ) {
 
+		if ( material.opacity == 0 ) return;
+
 		var program, attributes, linewidth, primitives;
 
 		program = setProgram( camera, lights, fog, material, object );
@@ -1626,7 +1628,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		if ( material.skinning &&
-			 attributes.skinVertexA >=0 && attributes.skinVertexB >= 0 &&
+			 attributes.skinVertexA >= 0 && attributes.skinVertexB >= 0 &&
 			 attributes.skinIndex >= 0 && attributes.skinWeight >= 0 ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webGLSkinVertexABuffer );
