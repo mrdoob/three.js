@@ -1,6 +1,7 @@
 /**
  * @author mikael emtinger / http://gomo.se/
  * @author mrdoob / http://mrdoob.com/
+ * @author alteredq / http://alteredqualia.com/
  */
 
 THREE.Animation = function( root, data, interpolationType, JITCompile ) {
@@ -16,6 +17,7 @@ THREE.Animation = function( root, data, interpolationType, JITCompile ) {
 	this.JITCompile = JITCompile !== undefined ? JITCompile : true;
 
 	this.points = [];
+	this.target = new THREE.Vector3();
 
 };
 
@@ -39,7 +41,12 @@ THREE.Animation.prototype.play = function( loop, startTimeMS ) {
 
 			object = this.hierarchy[ h ];
 			
-			object.useQuaternion    = true;
+			if ( this.interpolationType !== THREE.AnimationHandler.CATMULLROM_FORWARD ) {
+
+				object.useQuaternion = true;
+
+			}
+			
 			object.matrixAutoUpdate = true;
 
 			if ( object.animationCache === undefined ) {
@@ -151,6 +158,7 @@ THREE.Animation.prototype.update = function( deltaTimeMS ) {
 	var frame;
 	var JIThierarchy = this.data.JIT.hierarchy;
 	var currentTime, unloopedCurrentTime;
+	var currentPoint, forwardPoint, angle;
 	
 
 	// update
@@ -285,7 +293,7 @@ THREE.Animation.prototype.update = function( deltaTimeMS ) {
 
 				if ( type === "pos" ) {
 
-					vector  = object.position; 
+					vector = object.position; 
 
 					if( this.interpolationType === THREE.AnimationHandler.LINEAR ) {
 						
@@ -293,7 +301,8 @@ THREE.Animation.prototype.update = function( deltaTimeMS ) {
 						vector.y = prevXYZ[ 1 ] + ( nextXYZ[ 1 ] - prevXYZ[ 1 ] ) * scale;
 						vector.z = prevXYZ[ 2 ] + ( nextXYZ[ 2 ] - prevXYZ[ 2 ] ) * scale;
 
-					} else {						
+					} else if ( this.interpolationType === THREE.AnimationHandler.CATMULLROM ||
+							    this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {						
 		
 						this.points[ 0 ] = this.getPrevKeyWith( "pos", h, prevKey.index - 1 )[ "pos" ];
 						this.points[ 1 ] = prevXYZ;
@@ -302,11 +311,25 @@ THREE.Animation.prototype.update = function( deltaTimeMS ) {
 
 						scale = scale * 0.33 + 0.33;
 
-						var result = this.interpolateCatmullRom( this.points, scale );
+						currentPoint = this.interpolateCatmullRom( this.points, scale );
 						
-						vector.x = result[ 0 ];
-						vector.y = result[ 1 ];
-						vector.z = result[ 2 ];
+						vector.x = currentPoint[ 0 ];
+						vector.y = currentPoint[ 1 ];
+						vector.z = currentPoint[ 2 ];
+						
+						if( this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {
+							
+							forwardPoint = this.interpolateCatmullRom( this.points, scale * 1.01 );							
+							
+							this.target.set( forwardPoint[ 0 ], forwardPoint[ 1 ], forwardPoint[ 2 ] );
+							this.target.subSelf( vector );
+							this.target.y = 0;
+							this.target.normalize();
+							
+							angle = Math.atan2( this.target.x, this.target.z );
+							object.rotation.set( 0, angle, 0 );
+							
+						}
 
 					}
 
@@ -316,7 +339,7 @@ THREE.Animation.prototype.update = function( deltaTimeMS ) {
 
 				} else if( type === "scl" ) {
 
-					vector   = object.scale;
+					vector = object.scale;
 					
 					vector.x = prevXYZ[ 0 ] + ( nextXYZ[ 0 ] - prevXYZ[ 0 ] ) * scale;
 					vector.y = prevXYZ[ 1 ] + ( nextXYZ[ 1 ] - prevXYZ[ 1 ] ) * scale;
@@ -390,7 +413,6 @@ THREE.Animation.prototype.interpolateCatmullRom = function ( points, scale ) {
 	return v3;
 
 };
-
 
 THREE.Animation.prototype.interpolate = function( p0, p1, p2, p3, t, t2, t3 ) {
 

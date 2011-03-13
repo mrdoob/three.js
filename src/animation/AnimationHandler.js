@@ -199,7 +199,7 @@ THREE.AnimationHandler = (function() {
 	};
 
 
-	// interpolation typess
+	// interpolation types
 
 	that.LINEAR = 0;
 	that.CATMULLROM = 1;
