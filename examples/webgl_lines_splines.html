@@ -99,7 +99,7 @@
 				for ( i = 0; i < points.length * n_sub; i ++ ) {
 				
 					index = i / ( points.length * n_sub );
-					position = spline.get2DPoint( points, index );
+					position = spline.getPoint( points, index );
 					
 					geometry.vertices[ i ] = new THREE.Vertex( new THREE.Vector3( position.x, position.y, position.z ) );
 

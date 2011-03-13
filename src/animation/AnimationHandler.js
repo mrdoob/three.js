@@ -50,6 +50,7 @@ THREE.AnimationHandler = (function() {
 
 		library[ data.name ] = data;
 		initData( data );
+
 	};
 
 
@@ -66,12 +67,14 @@ THREE.AnimationHandler = (function() {
 			} else {
 				
 				console.log( "THREE.AnimationHandler.get: Couldn't find animation " + name );
-				return null;	
+				return null;
+
 			}
-		}
-		else {
+
+		} else {
 			
 			// todo: add simple tween library
+
 		}
 		
 	};
@@ -99,6 +102,7 @@ THREE.AnimationHandler = (function() {
 		}
 		
 		return hierarchy;
+
 	};
 
 	var parseRecurseHierarchy = function( root, hierarchy ) {
@@ -107,6 +111,7 @@ THREE.AnimationHandler = (function() {
 		
 		for( var c = 0; c < root.children.length; c++ ) 
 			parseRecurseHierarchy( root.children[ c ], hierarchy );
+
 	}
 
 
@@ -172,6 +177,7 @@ THREE.AnimationHandler = (function() {
 				data.hierarchy[ h ].keys[ k ].index = k;
 				
 			}
+
 		}
 
 
