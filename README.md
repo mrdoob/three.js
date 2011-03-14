@@ -5,7 +5,7 @@ three.js
 
 The aim of this project is to create a lightweight 3D engine with a very low level of abstraction — in other words, for dummies. The engine can render using &lt;canvas&gt;, &lt;svg&gt; and WebGL.
 
-[API Reference](https://github.com/mrdoob/three.js/wiki/r36-API-Reference) — be aware that the API may change from revision to revision breaking backwards compatibility.
+[API Reference](https://github.com/mrdoob/three.js/wiki/API-Reference) — be aware that the API may change from revision to revision breaking backwards compatibility.
 
 More? [#three.js on irc.freenode.net](http://webchat.freenode.net/?channels=three.js)
 
@@ -140,7 +140,7 @@ This code creates a camera, then creates a scene object, adds a bunch of random 
 
 2011 03 14 - **r36** (194.524 KB, gzip: 48.597 KB)
 
-* Added 3D Studio MAX Mascript exporter. ([alteredq](http://github.com/alteredq))
+* Added 3DSMAX exporter. ([alteredq](http://github.com/alteredq))
 * Fixed `WebGLRenderer` aspect ratio bug when scene had only one material. ([mrdoob](http://github.com/mrdoob))
 * Added `sizeAttenuation` property to `ParticleBasicMaterial`. ([mrdoob](http://github.com/mrdoob))
 * Added `PathCamera`. ([alteredq](http://github.com/alteredq))
