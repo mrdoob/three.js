@@ -76,6 +76,7 @@ THREE.Matrix4.prototype = {
 		if ( z.length() === 0 ) {
 			
 			z.z = 1;
+
 		}
 		
 		x.cross( up, z ).normalize();

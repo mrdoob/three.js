@@ -72,7 +72,7 @@ THREE.QuakeCamera = function ( parameters ) {
 
 	this.lat = 0;
 	this.lon = 0;
-	this.phy = 0;
+	this.phi = 0;
 	this.theta = 0;
 
 	this.moveForward = false;
@@ -125,7 +125,7 @@ THREE.QuakeCamera = function ( parameters ) {
 
 	};
 
-	this.onMouseMove = function (event) {
+	this.onMouseMove = function ( event ) {
 
 		this.mouseX = event.clientX - this.windowHalfX;
 		this.mouseY = event.clientY - this.windowHalfY;
@@ -235,7 +235,7 @@ THREE.QuakeCamera = function ( parameters ) {
 
 		};
 
-	}
+	};
 
 	function clamp_bottom( x, a ) {
 

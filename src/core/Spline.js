@@ -11,7 +11,7 @@ THREE.Spline = function () {
 	point, intPoint, weight, w2, w3,
 	pa, pb, pc, pd;
 
-	this.get2DPoint = function ( points, k ) {
+	this.getPoint = function ( points, k ) {
 
 		point = ( points.length - 1 ) * k;
 		intPoint = Math.floor( point );
