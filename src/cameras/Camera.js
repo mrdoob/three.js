@@ -42,8 +42,14 @@ THREE.Camera.prototype.updateProjectionMatrix = function () {
 
 }
 
+THREE.Camera.prototype.updateMatrix = function () {
 
-THREE.Camera.prototype.update = function( parentMatrixWorld, forceUpdate, camera ) {
+	// this.parent === undefined && this.update( undefined, true );
+	this.update( undefined, true );
+
+}
+
+THREE.Camera.prototype.update = function ( parentMatrixWorld, forceUpdate, camera ) {
 
 	if ( this.useTarget ) {
 

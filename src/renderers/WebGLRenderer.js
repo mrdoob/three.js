@@ -1909,10 +1909,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 			fog = scene.fog,
 			ol;
 
-		if ( camera.matrixAutoUpdate && camera.parent === undefined) { camera.update( undefined, true ); }
+		camera.matrixAutoUpdate && camera.updateMatrix();
 
 		scene.update( undefined, false, camera );
-		
+
 		camera.matrixWorldInverse.flattenToArray( _viewMatrixArray );
 		camera.projectionMatrix.flattenToArray( _projectionMatrixArray );
 
