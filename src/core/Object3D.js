@@ -145,7 +145,7 @@ THREE.Object3D.prototype = {
 
 		}
 
-		return true;
+		this.matrixWorldNeedsUpdate = true;
 
 	},
 
@@ -153,15 +153,11 @@ THREE.Object3D.prototype = {
 
 		if ( this.visible ) {
 
-			if ( this.matrixAutoUpdate ) {
-
-				forceUpdate |= this.updateMatrix();
-
-			}
+			this.matrixAutoUpdate && this.updateMatrix();
 
 			// update matrixWorld
 
-			if ( forceUpdate || this.matrixWorldNeedsUpdate ) {
+			if ( this.matrixWorldNeedsUpdate || forceUpdate ) {
 
 				if ( parentMatrixWorld ) {
 

@@ -78,12 +78,12 @@ THREE.Projector = function() {
 
 		_face3Count = _lineCount = _particleCount = 0;
 
-		camera.matrixAutoUpdate && camera.update();
+		camera.matrixAutoUpdate && camera.updateMatrix();
+
+		scene.update( undefined, false, camera );
 
 		_projScreenMatrix.multiply( camera.projectionMatrix, camera.matrixWorldInverse );
 		computeFrustum( _projScreenMatrix );
-
-		scene.update( undefined, false, camera );
 
 		objects = this.projectObjects( scene, camera, true ); // scene.objects;
 

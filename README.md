@@ -138,14 +138,14 @@ This code creates a camera, then creates a scene object, adds a bunch of random 
 
 ### Change Log ###
 
-2011 03 14 - **r36** (194.524 KB, gzip: 48.597 KB)
+2011 03 14 - **r36** (194.547 KB, gzip: 48.608 KB)
 
 * Added 3DSMAX exporter. ([alteredq](http://github.com/alteredq))
 * Fixed `WebGLRenderer` aspect ratio bug when scene had only one material. ([mrdoob](http://github.com/mrdoob))
 * Added `sizeAttenuation` property to `ParticleBasicMaterial`. ([mrdoob](http://github.com/mrdoob))
 * Added `PathCamera`. ([alteredq](http://github.com/alteredq))
 * Fixed `WebGLRenderer` bug when Camera has a parent. Camera`Camera.updateMatrix` method. ([empaempa](http://github.com/empaempa))
-* Fixed `Camera.updateMatrix` method. ([mrdoob](http://github.com/mrdoob))
+* Fixed `Camera.updateMatrix` method and `Object3D.updateMatrix`. ([mrdoob](http://github.com/mrdoob))
 
 
 2011 03 06 - **r35** (187.875 KB, gzip: 46.433 KB)
