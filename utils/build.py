@@ -32,8 +32,6 @@ COMMON_FILES = [
 'animation/AnimationHandler.js',
 'animation/Animation.js',
 'cameras/Camera.js',
-'cameras/QuakeCamera.js',
-'cameras/PathCamera.js',
 'lights/Light.js',
 'lights/AmbientLight.js',
 'lights/DirectionalLight.js',
@@ -92,6 +90,8 @@ EXTRAS_FILES = [
 'extras/primitives/Icosahedron.js',
 'extras/primitives/LathedObject.js',
 'extras/objects/MarchingCubes.js',
+'extras/cameras/QuakeCamera.js',
+'extras/cameras/PathCamera.js',
 'extras/io/Loader.js'
 ]
 
@@ -237,8 +237,6 @@ WEBGL_FILES = [
 'core/UV.js',
 'core/Geometry.js',
 'cameras/Camera.js',
-'cameras/QuakeCamera.js',
-'cameras/PathCamera.js',
 'lights/Light.js',
 'lights/AmbientLight.js',
 'lights/DirectionalLight.js',
