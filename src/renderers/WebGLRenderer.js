@@ -1609,8 +1609,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		if ( material instanceof THREE.MeshPhongMaterial ||
-			 material instanceof THREE.MeshLambertMaterial ||
-			 material instanceof THREE.MeshShaderMaterial ) {
+			 material instanceof THREE.MeshLambertMaterial ) {
 
 			setupLights( program, lights );
 			refreshUniformsLights( m_uniforms, _lights );
