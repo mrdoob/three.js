@@ -7,7 +7,7 @@ Ks 0.165000 0.165000 0.165000
 Ni 1.000000
 d 1.000000
 illum 2
-map_Kd _01_-_Default1noCulling.JPG
+map_Kd 01_-_Default1noCulling.JPG
 
 
 newmtl FrontColorNoCullingID_male-02-1noCulling.JP
