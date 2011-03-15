@@ -1609,7 +1609,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		if ( material instanceof THREE.MeshPhongMaterial ||
-			 material instanceof THREE.MeshLambertMaterial ) {
+			 material instanceof THREE.MeshLambertMaterial ||
+			 material instanceof THREE.MeshShaderMaterial ) {
 
 			setupLights( program, lights );
 			refreshUniformsLights( m_uniforms, _lights );
@@ -1711,64 +1712,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.vertexAttribPointer( attributes.position, 3, _gl.FLOAT, false, 0, 0 );
 			
 		} else {
+		
+			setupMorphTargets( material, geometryGroup, object );
 			
-			// set base
-			
-			if(  object.morphTargetBase !== -1 ) {
-				
-				_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webGLMorphTargetsBuffers[ object.morphTargetBase ] );
-				_gl.vertexAttribPointer( attributes.position, 3, _gl.FLOAT, false, 0, 0 );
-				
-			} else {
-				
-				_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webGLVertexBuffer );
-				_gl.vertexAttribPointer( attributes.position, 3, _gl.FLOAT, false, 0, 0 );
-				
-			}
-			
-			
-			// find most influencing
-			
-			var used = [];
-			var candidateInfluence = -1;
-			var candidate = 0;
-			var influences = object.morphTargetInfluences;
-			var i, il = influences.length;
-			var m = 0;
-
-			if( object.morphTargetBase !== -1 ) {
-				
-				used[ object.morphTargetBase ] = true;
-				
-			}
-
-			while( m < material.numSupportedMorphTargets ) {
-				
-				for( i = 0; i < il; i++ ) {
-					
-					if( !used[ i ] && influences[ i ] > candidateInfluence ) {
-						
-						candidate = i;
-						candidateInfluence = influences[ candidate ];
-					}
-				}
-				
-				_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webGLMorphTargetsBuffers[ candidate ] );
-				_gl.vertexAttribPointer( attributes[ "morphTarget" + m ], 3, _gl.FLOAT, false, 0, 0 );
-				
-				object.__webGLMorphTargetInfluences[ m ] = candidateInfluence;
-
-				used[ candidate ] = 1;
-				candidateInfluence = -1;
-				m++;
-			}
-			
-			
-			// load updated influences uniform
-			
-			_gl.uniform1fv( material.program.uniforms.morphTargetInfluences, object.__webGLMorphTargetInfluences );
 		}
-
 
 		// colors
 
@@ -1896,6 +1843,89 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 	};
+
+	function setupMorphTargets( material, geometryGroup, object ) {
+		
+		// set base
+		
+		var attributes = material.program.attributes;
+		
+		if(  object.morphTargetBase !== -1 ) {
+			
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webGLMorphTargetsBuffers[ object.morphTargetBase ] );
+			_gl.vertexAttribPointer( attributes.position, 3, _gl.FLOAT, false, 0, 0 );
+			
+		} else {
+			
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webGLVertexBuffer );
+			_gl.vertexAttribPointer( attributes.position, 3, _gl.FLOAT, false, 0, 0 );
+			
+		}
+		
+		
+		if( object.morphTargetForcedOrder.length ) {
+
+			// set forced order
+			
+			var m = 0;
+			var order = object.morphTargetForcedOrder;
+			var influences = object.morphTargetInfluences;
+			
+			while( m < material.numSupportedMorphTargets && m < order.length ) {
+			
+				_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webGLMorphTargetsBuffers[ order[ m ] ] );
+				_gl.vertexAttribPointer( attributes[ "morphTarget" + m ], 3, _gl.FLOAT, false, 0, 0 );
+				
+				object.__webGLMorphTargetInfluences[ m ] = influences[ order[ m ]];
+
+				m++;
+			}			
+			
+		} else {
+			
+			// find most influencing
+			
+			var used = [];
+			var candidateInfluence = -1;
+			var candidate = 0;
+			var influences = object.morphTargetInfluences;
+			var i, il = influences.length;
+			var m = 0;
+	
+			if( object.morphTargetBase !== -1 ) {
+				
+				used[ object.morphTargetBase ] = true;
+				
+			}
+	
+			while( m < material.numSupportedMorphTargets ) {
+				
+				for( i = 0; i < il; i++ ) {
+					
+					if( !used[ i ] && influences[ i ] > candidateInfluence ) {
+						
+						candidate = i;
+						candidateInfluence = influences[ candidate ];
+					}
+				}
+				
+				_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webGLMorphTargetsBuffers[ candidate ] );
+				_gl.vertexAttribPointer( attributes[ "morphTarget" + m ], 3, _gl.FLOAT, false, 0, 0 );
+				
+				object.__webGLMorphTargetInfluences[ m ] = candidateInfluence;
+	
+				used[ candidate ] = 1;
+				candidateInfluence = -1;
+				m++;
+			}
+		}
+
+
+		// load updated influences uniform
+		
+		_gl.uniform1fv( material.program.uniforms.morphTargetInfluences, object.__webGLMorphTargetInfluences );
+	}
+
 
 	function renderBufferImmediate ( object, program ) {
 
