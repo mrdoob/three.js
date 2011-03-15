@@ -82,17 +82,17 @@ EXTRAS_FILES = [
 'extras/ImageUtils.js',
 'extras/SceneUtils.js',
 'extras/ShaderUtils.js',
+'extras/cameras/QuakeCamera.js',
+'extras/cameras/PathCamera.js',
+'extras/io/Loader.js',
+'extras/objects/MarchingCubes.js',
 'extras/primitives/Cube.js',
 'extras/primitives/Cylinder.js',
 'extras/primitives/Plane.js',
 'extras/primitives/Sphere.js',
 'extras/primitives/Torus.js',
 'extras/primitives/Icosahedron.js',
-'extras/primitives/LathedObject.js',
-'extras/objects/MarchingCubes.js',
-'extras/cameras/QuakeCamera.js',
-'extras/cameras/PathCamera.js',
-'extras/io/Loader.js'
+'extras/primitives/LathedObject.js'
 ]
 
 CANVAS_FILES = [
