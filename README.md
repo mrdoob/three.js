@@ -5,7 +5,7 @@ three.js
 
 The aim of this project is to create a lightweight 3D engine with a very low level of abstraction — in other words, for dummies. The engine can render using &lt;canvas&gt;, &lt;svg&gt; and WebGL.
 
-[API Reference](https://github.com/mrdoob/three.js/wiki/r35-API-Reference) — be aware that the API may change from revision to revision breaking backwards compatibility.
+[API Reference](https://github.com/mrdoob/three.js/wiki/API-Reference) — be aware that the API may change from revision to revision breaking backwards compatibility.
 
 More? [#three.js on irc.freenode.net](http://webchat.freenode.net/?channels=three.js)
 
@@ -63,6 +63,7 @@ More? [#three.js on irc.freenode.net](http://webchat.freenode.net/?channels=thre
 
 ### Featured projects ###
 
+[![HelloRacer](http://mrdoob.github.com/three.js/assets/projects/13_helloracer.png)](http://helloracer.com/webgl/)
 [![FastKat](http://mrdoob.github.com/three.js/assets/projects/12_fastkat.png)](http://www.omiod.com/games/fastkat.php)
 [![Sculpt](http://mrdoob.github.com/three.js/assets/projects/11_sculpt.png)](http://antimatter15.com/wp/2010/11/digital-sculpting-with-three-js/)
 [![Voxels](http://mrdoob.github.com/three.js/assets/projects/10_voxels.png)](http://mrdoob.com/projects/voxels/)
@@ -76,6 +77,7 @@ More? [#three.js on irc.freenode.net](http://webchat.freenode.net/?channels=thre
 [![DDD](http://mrdoob.github.com/three.js/assets/projects/01_ddd.png)](http://the389.com/works/three/)
 [![jsflowfield4d](http://mrdoob.github.com/three.js/assets/projects/00_jsflowfield4d.png)](http://test.sjeiti.com/jsflowfield4d/)
 [![spikeball](http://mrdoob.github.com/three.js/assets/projects/03_spikeball.png)](http://kile.stravaganza.org/lab/js/spikeball/)
+
 
 ### Usage ###
 
@@ -135,6 +137,16 @@ This code creates a camera, then creates a scene object, adds a bunch of random 
 
 
 ### Change Log ###
+
+2011 03 14 - **r36** (194.524 KB, gzip: 48.597 KB)
+
+* Added 3DSMAX exporter. ([alteredq](http://github.com/alteredq))
+* Fixed `WebGLRenderer` aspect ratio bug when scene had only one material. ([mrdoob](http://github.com/mrdoob))
+* Added `sizeAttenuation` property to `ParticleBasicMaterial`. ([mrdoob](http://github.com/mrdoob))
+* Added `PathCamera`. ([alteredq](http://github.com/alteredq))
+* Fixed `WebGLRenderer` bug when Camera has a parent. Camera`Camera.updateMatrix` method. ([empaempa](http://github.com/empaempa))
+* Fixed `Camera.updateMatrix` method. ([mrdoob](http://github.com/mrdoob))
+
 
 2011 03 06 - **r35** (187.875 KB, gzip: 46.433 KB)
 

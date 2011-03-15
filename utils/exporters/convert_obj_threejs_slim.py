@@ -4,7 +4,7 @@
 How to use this converter
 -------------------------
 
-python convert_obj_threejs_slim.py -i infile.obj -o outfile.js [-a center|top|bottom] [-s smooth|flat] [-t ascii|binary] [-d invert|normal]
+python convert_obj_threejs_slim.py -i infile.obj -o outfile.js [-m morphfiles*.obj] [-a center|top|bottom] [-s smooth|flat] [-t ascii|binary] [-d invert|normal]
 
 Notes: 
 
@@ -126,6 +126,7 @@ import getopt
 import sys
 import struct
 import math
+import glob
 
 # #####################################################
 # Configuration
@@ -159,6 +160,8 @@ var model = {
 
     'vertices': [%(vertices)s],
 
+    'morphTargets': [%(morphTargets)s],
+    
     'uvs': [%(uvs)s],
 
     'triangles': [%(triangles)s],
@@ -217,6 +220,8 @@ TEMPLATE_QUAD_N_UV = "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d"
 
 TEMPLATE_N = "%f,%f,%f"
 TEMPLATE_UV = "%f,%f"
+
+TEMPLATE_MORPH = "\t{ 'name': '%s', 'vertices': [%s] }"
 
 # #####################################################
 # Utils
@@ -632,6 +637,13 @@ def generate_uv(uv):
     return TEMPLATE_UV % (uv[0], 1.0 - uv[1])
 
 # #####################################################
+# Morphs
+# #####################################################
+def generate_morph(name, vertices):
+    vertex_string = ",".join(generate_vertex(v) for v in vertices)
+    return TEMPLATE_MORPH % (name, vertex_string)
+    
+# #####################################################
 # Materials
 # #####################################################
 def generate_color(i):
@@ -785,7 +797,7 @@ def sort_faces(faces):
 # #####################################################
 # API - ASCII converter
 # #####################################################
-def convert_ascii(infile, outfile):
+def convert_ascii(infile, morphfiles, outfile):
     """Convert infile.obj to outfile.js
     
     Here is where everything happens. If you need to automate conversions,
@@ -811,9 +823,47 @@ def convert_ascii(infile, outfile):
         
     sfaces = sort_faces(faces)
     
+    skipOriginalMorph = False
+    norminfile = os.path.normpath(infile)
+    
+    morphData = []
+    for mfilepattern in morphfiles.split():
+        for path in glob.glob(mfilepattern):
+            normpath = os.path.normpath(path)
+            if normpath != norminfile or not skipOriginalMorph:
+                name = os.path.basename(normpath)
+                
+                morphFaces, morphVertices, morphUvs, morphNormals, morphMaterials, morphMtllib = parse_obj(normpath)
+                
+                if ALIGN == "center":
+                    center(morphVertices)
+                elif ALIGN == "bottom":
+                    bottom(morphVertices)
+                elif ALIGN == "top":
+                    top(morphVertices)
+                    
+                morphData.append((get_name(name), morphVertices ))
+                print name, len(morphVertices)
+    
+    morphTargets = ""
+    if len(morphData):
+        morphTargets = "\n%s\n\t" % ",\n".join(generate_morph(name, vertices) for name, vertices in morphData)
+    
     text = TEMPLATE_FILE_ASCII % {
-    "name"          : get_name(outfile),
+    "name"      : get_name(outfile),
+    "fname"     : infile,
+    "nvertex"   : len(vertices),
+    "nface"     : len(faces),
+    "nmaterial" : len(materials),
+
+    "materials" : generate_materials_string(materials, mtllib),
+
+    "normals"       : normals_string,
+    "uvs"           : ",".join(generate_uv(uv) for uv in uvs),
     "vertices"      : ",".join(generate_vertex(v) for v in vertices),
+    
+    "morphTargets"  : morphTargets,
+    
     "triangles"     : ",".join(generate_triangle(f) for f in sfaces['triangles_flat']),
     "trianglesUvs"  : ",".join(generate_triangle_uv(f) for f in sfaces['triangles_flat_uv']),
     "trianglesNormals"   : ",".join(generate_triangle_n(f) for f in sfaces['triangles_smooth']),
@@ -821,16 +871,7 @@ def convert_ascii(infile, outfile):
     "quads"         : ",".join(generate_quad(f) for f in sfaces['quads_flat']),
     "quadsUvs"      : ",".join(generate_quad_uv(f) for f in sfaces['quads_flat_uv']),
     "quadsNormals"       : ",".join(generate_quad_n(f) for f in sfaces['quads_smooth']),
-    "quadsNormalsUvs"    : ",".join(generate_quad_n_uv(f) for f in sfaces['quads_smooth_uv']),
-    "uvs"           : ",".join(generate_uv(uv) for uv in uvs),
-    "normals"       : normals_string,
-    
-    "materials" : generate_materials_string(materials, mtllib),
-    
-    "fname"     : infile,
-    "nvertex"   : len(vertices),
-    "nface"     : len(faces),
-    "nmaterial" : len(materials)
+    "quadsNormalsUvs"    : ",".join(generate_quad_n_uv(f) for f in sfaces['quads_smooth_uv'])
     }
     
     out = open(outfile, "w")
@@ -1154,7 +1195,7 @@ def convert_binary(infile, outfile):
 # Helpers
 # #############################################################################
 def usage():
-    print "Usage: %s -i filename.obj -o filename.js [-a center|top|bottom] [-s flat|smooth] [-t binary|ascii] [-d invert|normal]" % os.path.basename(sys.argv[0])
+    print "Usage: %s -i filename.obj -o filename.js [-m morphfiles*.obj] [-a center|top|bottom] [-s flat|smooth] [-t binary|ascii] [-d invert|normal]" % os.path.basename(sys.argv[0])
         
 # #####################################################
 # Main
@@ -1163,13 +1204,14 @@ if __name__ == "__main__":
     
     # get parameters from the command line
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hi:o:a:s:t:d:", ["help", "input=", "output=", "align=", "shading=", "type=", "dissolve="])
+        opts, args = getopt.getopt(sys.argv[1:], "hi:m:o:a:s:t:d:", ["help", "input=", "morphs=", "output=", "align=", "shading=", "type=", "dissolve="])
     
     except getopt.GetoptError:
         usage()
         sys.exit(2)
         
     infile = outfile = ""
+    morphfiles = ""
     
     for o, a in opts:
         if o in ("-h", "--help"):
@@ -1178,6 +1220,9 @@ if __name__ == "__main__":
         
         elif o in ("-i", "--input"):
             infile = a
+
+        elif o in ("-m", "--morphs"):
+            morphfiles = a
 
         elif o in ("-o", "--output"):
             outfile = a
@@ -1203,9 +1248,11 @@ if __name__ == "__main__":
         sys.exit(2)
     
     print "Converting [%s] into [%s] ..." % (infile, outfile)
+    if morphfiles:
+        print "Morphs [%s]" % morphfiles    
     
     if TYPE == "ascii":
-        convert_ascii(infile, outfile)
+        convert_ascii(infile, morphfiles, outfile)
     elif TYPE == "binary":
         convert_binary(infile, outfile)
     

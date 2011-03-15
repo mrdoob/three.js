@@ -7,4 +7,3 @@ Materials
 Renderers
 * FrustrumClipping near to Projector (CanvasRenderer and SVGRenderer)
 * Implement VertexColors in CanvasRenderer
-* Move Geometry.sortFacesByMaterial to WebGLRenderer (always an issue when creating geometry by hand)

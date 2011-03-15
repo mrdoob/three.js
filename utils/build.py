@@ -318,7 +318,7 @@ def compress(text):
 
 
 def addHeader(text, endFilename):
-	with open(os.path.join('.', 'REVISION'), 'r') as handle:
+	with open(os.path.join('..', 'REVISION'), 'r') as handle:
 		revision = handle.read().rstrip()
 
 	return ("// %s r%s - http://github.com/mrdoob/three.js\n" % (endFilename, revision)) + text
