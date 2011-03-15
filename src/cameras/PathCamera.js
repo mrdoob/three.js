@@ -11,6 +11,9 @@
  *  waypoints: <Array>,	// [ [x,y,z], [x,y,z] ... ]
  *  duration: <float>, 	// seconds
  
+ *  useConstantSpeed: <bool>,
+ *  resamplingCoef: <float>,
+ 
  *  createDebugPath: <bool>,
  *  createDebugDummy: <bool>,
  
@@ -28,8 +31,13 @@ THREE.PathCamera = function ( parameters ) {
 
 	THREE.Camera.call( this, parameters.fov, parameters.aspect, parameters.near, parameters.far, parameters.target );
 
+	this.id = "PathCamera" + THREE.PathCameraIdCounter ++;
+	
 	this.duration = 10 * 1000; // milliseconds
 	this.waypoints = [];
+	
+	this.useConstantSpeed = true;
+	this.resamplingCoef = 50;
 	
 	this.debugPath = new THREE.Object3D();
 	this.debugDummy = new THREE.Object3D();
@@ -48,6 +56,9 @@ THREE.PathCamera = function ( parameters ) {
 
 		if ( parameters.duration !== undefined ) this.duration = parameters.duration * 1000;
 		if ( parameters.waypoints !== undefined ) this.waypoints = parameters.waypoints;
+		
+		if ( parameters.useConstantSpeed !== undefined ) this.useConstantSpeed = parameters.useConstantSpeed;
+		if ( parameters.resamplingCoef !== undefined ) this.resamplingCoef = parameters.resamplingCoef;
 
 		if ( parameters.createDebugPath !== undefined ) this.createDebugPath = parameters.createDebugPath;
 		if ( parameters.createDebugDummy !== undefined ) this.createDebugDummy = parameters.createDebugDummy;
@@ -112,11 +123,15 @@ THREE.PathCamera = function ( parameters ) {
 		
 		var targetPosition = this.target.position,
 			position = this.position;
-
+/*
 		targetPosition.x = position.x + 100 * Math.sin( this.phi ) * Math.cos( this.theta );
 		targetPosition.y = position.y + 100 * Math.cos( this.phi );
 		targetPosition.z = position.z + 100 * Math.sin( this.phi ) * Math.sin( this.theta );
-		
+*/
+		targetPosition.x = 100 * Math.sin( this.phi ) * Math.cos( this.theta );
+		targetPosition.y = 100 * Math.cos( this.phi );
+		targetPosition.z = 100 * Math.sin( this.phi ) * Math.sin( this.theta );
+
 		this.supr.update.call( this, parentMatrixWorld, forceUpdate, camera );
 
 	};
@@ -194,16 +209,21 @@ THREE.PathCamera = function ( parameters ) {
 		parentAnimation.keys[ first ] = { time: 0,        pos: path[ first ], rot: [ 0, 0, 0, 1 ], scl: [ 1, 1, 1 ] };
 		parentAnimation.keys[ last  ] = { time: duration, pos: path[ last ],  rot: [ 0, 0, 0, 1 ], scl: [ 1, 1, 1 ] };
 		
-		console.log( "path length total:", sl.total, "chunks:", sl.chunks );
-		
-		for ( i = 1; i < pl-1; i++ ) {
+		for ( i = 1; i < pl - 1; i++ ) {
 
+			// real distance (approximation via linear segments)
+			
 			t = duration * sl.chunks[ i ] / sl.total;
+			
+			// equal distance
+			
+			//t = duration * ( i / pl );			
+			
+			// linear distance
 			
 			//t += duration * distance( path[ i ], path[ i - 1 ] ) / sl.total;
 
 			parentAnimation.keys[ i ] = { time: t, pos: path[ i ] };
-			console.log( i, t/1000 );
 
 		}
 
@@ -212,27 +232,74 @@ THREE.PathCamera = function ( parameters ) {
 		THREE.AnimationHandler.add( animationData );
 		
 		return new THREE.Animation( parent, name, THREE.AnimationHandler.CATMULLROM_FORWARD, false );
-		//return new THREE.Animation( parent, name, THREE.AnimationHandler.CATMULLROM, false );
-		//return new THREE.Animation( parent, name, THREE.AnimationHandler.LINEAR, false );
 
 	};
 
+	function pointsToCoords( points ) {
+		
+		var i, p, l = points.length,
+			coords = [];
+		
+		for ( i = 0; i < l; i ++ ) {
+			
+			p = points[ i ];
+			coords[ i ] = { x: p[ 0 ], y: p[ 1 ], z: p[ 2 ] };
+
+		}
+		
+		return coords;
+		
+	};
+	
+	function reparametrizeSplineByArcLength( points, samplingCoef ) {
+		
+		var i, j, 
+			index, indexCurrent, indexNext,
+			sampling,
+			newpoints = [],
+			coords = pointsToCoords( points ),
+			spline = new THREE.Spline(),
+			sl = splineLength( points );
+		
+		newpoints.push( points[ 0 ] );
+		
+		for ( i = 1; i < points.length; i++ ) {
+			
+			linearDistance = distance( points[ i ], points[ i - 1 ] );
+			realDistance = sl.chunks[ i ] - sl.chunks[ i - 1 ];
+			
+			sampling = Math.ceil( samplingCoef * realDistance / sl.total );			
+			
+			indexCurrent = ( i - 1 ) / ( points.length - 1 );
+			indexNext = i / ( points.length - 1 );
+			
+			for ( j = 1; j < sampling - 1; j++ ) {
+
+				index = indexCurrent + j * ( 1 / sampling ) * ( indexNext - indexCurrent );
+
+				position = spline.getPoint( coords, index );
+				newpoints.push( [ position.x, position.y, position.z ] );
+				
+			}
+			
+			newpoints.push( points[ i ] );
+
+		}
+		
+		return newpoints;
+		
+	};
+	
 	function splineLength( points ) {
 
-		var i, index, p, coords = [], 
+		var i, index, p, 
+			coords = pointsToCoords( points ),
 			spline = new THREE.Spline(),
 			n_sub = 100, 
 			c = 0,
 			point = 0, intPoint = 0, oldIntPoint = 0,
 			chunkLengths = [ 0 ],
 			totalLength = 0;
-
-		for ( i = 0; i < points.length; i ++ ) {
-			
-			p = points[ i ];
-			coords[ i ] = { x: p[ 0 ], y: p[ 1 ], z: p[ 2 ] };
-
-		}
 
 		var oldPosition = [ points[ 0 ][ 0 ], points[ 0 ][ 1 ], points[ 0 ][ 2 ] ];
 
@@ -254,9 +321,9 @@ THREE.PathCamera = function ( parameters ) {
 
 			}
 
-			//console.log( intPoint, i, index, totalLength );
-
 		}
+		
+		chunkLengths[ chunkLengths.length ] = totalLength;
 
 		return { chunks: chunkLengths, total: totalLength };
 
@@ -267,15 +334,8 @@ THREE.PathCamera = function ( parameters ) {
 	
 		var i, index, position,
 			geometry = new THREE.Geometry(),
-			spline = new THREE.Spline(),
-			p, coords = [];
-		
-		for ( i = 0; i < points.length; i ++ ) {
-			
-			p = points[ i ];
-			coords[ i ] = { x: p[ 0 ], y: p[ 1 ], z: p[ 2 ] };
-
-		}
+			spline = new THREE.Spline(), 
+			coords = pointsToCoords( points );		
 		
 		for ( i = 0; i < coords.length * n_sub; i ++ ) {
 		
@@ -283,7 +343,7 @@ THREE.PathCamera = function ( parameters ) {
 			position = spline.getPoint( coords, index );
 			
 			geometry.vertices[ i ] = new THREE.Vertex( new THREE.Vector3( position.x, position.y, position.z ) );
-			
+
 		}
 		
 		return geometry;
@@ -335,6 +395,12 @@ THREE.PathCamera = function ( parameters ) {
 
 	};
 
+	if ( this.useConstantSpeed ) {
+		
+		this.waypoints = reparametrizeSplineByArcLength( this.waypoints, this.resamplingCoef );
+
+	}
+	
 	if ( this.createDebugDummy ) {
 
 		var dummyParentMaterial = new THREE.MeshLambertMaterial( { color: 0x0077ff } ),
@@ -347,27 +413,26 @@ THREE.PathCamera = function ( parameters ) {
 		var dummyChild = new THREE.Mesh( dummyChildGeo, dummyChildMaterial );
 		dummyChild.position.set( 0, 10, 0 );
 		
-		this.animation = initAnimationPath( this.animationParent, this.waypoints, "cameraPath01", this.duration );
+		this.animation = initAnimationPath( this.animationParent, this.waypoints, this.id, this.duration );
 
 		this.animationParent.addChild( this );
+		this.animationParent.addChild( this.target );
 		this.animationParent.addChild( dummyChild );
 		
 	} else {
 
-		this.animation = initAnimationPath( this.animationParent, this.waypoints, "cameraPath01", this.duration );
-		
+		this.animation = initAnimationPath( this.animationParent, this.waypoints, this.id, this.duration );
+		this.animationParent.addChild( this.target );
 		this.animationParent.addChild( this );
 
 	}
-
 
 	if ( this.createDebugPath ) {
 		
 		createPath( this.debugPath, this.waypoints );
 
 	}
-	
-	
+
 	this.domElement.addEventListener( 'mousemove', bind( this, this.onMouseMove ), false );	
 	
 };
@@ -375,3 +440,5 @@ THREE.PathCamera = function ( parameters ) {
 THREE.PathCamera.prototype = new THREE.Camera();
 THREE.PathCamera.prototype.constructor = THREE.PathCamera;
 THREE.PathCamera.prototype.supr = THREE.Camera.prototype;
+
+THREE.PathCameraIdCounter = 0;
