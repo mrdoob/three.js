@@ -113,6 +113,8 @@ CANVAS_FILES = [
 'core/Face4.js',
 'core/UV.js',
 'core/Geometry.js',
+'animation/AnimationHandler.js',
+'animation/Animation.js',
 'cameras/Camera.js',
 'lights/Light.js',
 'lights/AmbientLight.js',
@@ -161,6 +163,8 @@ DOM_FILES = [
 'core/Face3.js',
 'core/Face4.js',
 'core/UV.js',
+'animation/AnimationHandler.js',
+'animation/Animation.js',
 'cameras/Camera.js',
 'materials/ParticleDOMMaterial.js',
 'objects/Particle.js',
@@ -170,7 +174,7 @@ DOM_FILES = [
 'renderers/Projector.js',
 'renderers/DOMRenderer.js',
 'renderers/SoundRenderer.js',
-'renderers/renderables/RenderableParticle.js',
+'renderers/renderables/RenderableParticle.js'
 ]
 
 SVG_FILES = [
@@ -190,6 +194,8 @@ SVG_FILES = [
 'core/Face4.js',
 'core/UV.js',
 'core/Geometry.js',
+'animation/AnimationHandler.js',
+'animation/Animation.js',
 'cameras/Camera.js',
 'lights/Light.js',
 'lights/AmbientLight.js',
@@ -237,6 +243,8 @@ WEBGL_FILES = [
 'core/Face4.js',
 'core/UV.js',
 'core/Geometry.js',
+'animation/AnimationHandler.js',
+'animation/Animation.js',
 'cameras/Camera.js',
 'lights/Light.js',
 'lights/AmbientLight.js',
@@ -269,9 +277,10 @@ WEBGL_FILES = [
 'scenes/Scene.js',
 'scenes/Fog.js',
 'scenes/FogExp2.js',
+'renderers/Projector.js',
 'renderers/SoundRenderer.js',
 'renderers/WebGLShaders.js',
-'renderers/WebGLRenderer.js',
+'renderers/WebGLRenderer.js'
 ]
 
 def merge(files):
