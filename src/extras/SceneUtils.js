@@ -462,6 +462,28 @@ var SceneUtils = {
 		SceneUtils.addMesh( scene, plane, 1,     0,  hsize,       0,  pi2,    0, pi, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[2] ) } ) );
 		SceneUtils.addMesh( scene, plane, 1,     0, -hsize,       0, -pi2,    0, pi, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[3] ) } ) );
 
+	},
+	
+	showHierarchy : function ( root, visible ) {
+		
+		SceneUtils.traverseHierarchy( root, function( node ) { node.visible = visible; } );
+		
+	},
+	
+	traverseHierarchy : function ( root, callback ) {
+		
+		var n, i, l = root.children.length;
+		
+		for( i = 0; i < l; i++ ) {
+			
+			n = root.children[ i ];
+			
+			callback( n );
+			
+			SceneUtils.traverseHierarchy( n, callback );
+			
+		}
+		
 	}
 
 };
