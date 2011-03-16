@@ -1647,7 +1647,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		} else if ( material instanceof THREE.MeshNormalMaterial ) {
 
 			m_uniforms.opacity.value = material.opacity;
-
 		}
 
 		// load common uniforms
@@ -1815,7 +1814,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryGroup.__webGLFaceBuffer );
 				_gl.drawElements( _gl.TRIANGLES, geometryGroup.__webGLFaceCount, _gl.UNSIGNED_SHORT, 0 );
-
 			}
 
 		// render lines
@@ -1842,6 +1840,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 	};
+
 
 	function setupMorphTargets( material, geometryGroup, object ) {
 		
@@ -3921,10 +3920,6 @@ THREE.Snippets = {
 		"morphed += position;",
 		
 		"gl_Position = projectionMatrix * modelViewMatrix * vec4( morphed, 1.0 );",
-
-	"#else",
-
-		"gl_Position = projectionMatrix * mvPosition;",
 
 	"#endif"
 
