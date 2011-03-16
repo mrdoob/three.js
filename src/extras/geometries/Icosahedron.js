@@ -1,6 +1,6 @@
 /**
  * @author oosmoxiecode
- 
+
  * uvs are messed up in this one, and commented away for now. There is an ugly "seam" by the shared vertices
  * when it "wraps" around, that needs to be fixed. It´s because they share the first and the last vertices
  * so it draws the entire texture on the seam-faces, I think...
@@ -16,7 +16,7 @@ var Icosahedron = function ( subdivisions ) {
 	//var temp_uv = [];
 
 	THREE.Geometry.call(this);
-	
+
 	// create 12 vertices of a Icosahedron
 	var t = (1 + Math.sqrt(5)) / 2;
 
@@ -103,7 +103,7 @@ var Icosahedron = function ( subdivisions ) {
 
 	function f3( a, b, c, inscope ) {
 		inscope.faces.push( new THREE.Face3( a, b, c ) );
-		
+
 		/*inscope.uvs.push( [new THREE.UV( temp_uv[a].u, temp_uv[a].v ),
 						   new THREE.UV( temp_uv[b].u, temp_uv[b].v ),
 						   new THREE.UV( temp_uv[c].u, temp_uv[c].v )
@@ -118,18 +118,18 @@ var Icosahedron = function ( subdivisions ) {
 		var x = (pos1.x + pos2.x) / 2;
 		var y = (pos1.y + pos2.y) / 2;
 		var z = (pos1.z + pos2.z) / 2;
-		
+
 		var i = v(x, y, z);
 		return i;
 	}
 
 	/*function getUv(x,y,z) {
-		
+
 		var u,v;
 		var px,py,pz,d;
-			
+
 		d = Math.sqrt( x*x+y*y+z*z );
-			
+
 		px = x/d;
 		py = y/d;
 		pz = z/d;
