@@ -94,12 +94,12 @@
 
 				var position, index;
 				
-				var spline = new THREE.Spline();
+				var spline = new THREE.Spline( points );
 				
 				for ( i = 0; i < points.length * n_sub; i ++ ) {
 				
 					index = i / ( points.length * n_sub );
-					position = spline.getPoint( points, index );
+					position = spline.getPoint( index );
 					
 					geometry.vertices[ i ] = new THREE.Vertex( new THREE.Vector3( position.x, position.y, position.z ) );
 

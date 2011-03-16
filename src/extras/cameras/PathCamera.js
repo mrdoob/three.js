@@ -185,7 +185,7 @@ THREE.PathCamera = function ( parameters ) {
 
 	};
 
-	function initAnimationPath( parent, path, name, duration ) {
+	function initAnimationPath( parent, spline, name, duration ) {
 
 		var animationData = {
 
@@ -199,12 +199,13 @@ THREE.PathCamera = function ( parameters ) {
 
 		var i, 
 			parentAnimation, childAnimation,
+			path = spline.getControlPointsArray(),
+			sl = spline.getLength(),
 			pl = path.length,
-			sl = splineLength( path ),
 			t = 0,
 			first = 0,
 			last  = pl - 1;
-
+		
 		parentAnimation = { parent: -1, keys: [] };
 		parentAnimation.keys[ first ] = { time: 0,        pos: path[ first ], rot: [ 0, 0, 0, 1 ], scl: [ 1, 1, 1 ] };
 		parentAnimation.keys[ last  ] = { time: duration, pos: path[ last ],  rot: [ 0, 0, 0, 1 ], scl: [ 1, 1, 1 ] };
@@ -235,112 +236,16 @@ THREE.PathCamera = function ( parameters ) {
 
 	};
 
-	function pointsToCoords( points ) {
-		
-		var i, p, l = points.length,
-			coords = [];
-		
-		for ( i = 0; i < l; i ++ ) {
-			
-			p = points[ i ];
-			coords[ i ] = { x: p[ 0 ], y: p[ 1 ], z: p[ 2 ] };
 
-		}
-		
-		return coords;
-		
-	};
-	
-	function reparametrizeSplineByArcLength( points, samplingCoef ) {
-		
-		var i, j, 
-			index, indexCurrent, indexNext,
-			sampling,
-			newpoints = [],
-			coords = pointsToCoords( points ),
-			spline = new THREE.Spline(),
-			sl = splineLength( points );
-		
-		newpoints.push( points[ 0 ] );
-		
-		for ( i = 1; i < points.length; i++ ) {
-			
-			linearDistance = distance( points[ i ], points[ i - 1 ] );
-			realDistance = sl.chunks[ i ] - sl.chunks[ i - 1 ];
-			
-			sampling = Math.ceil( samplingCoef * realDistance / sl.total );			
-			
-			indexCurrent = ( i - 1 ) / ( points.length - 1 );
-			indexNext = i / ( points.length - 1 );
-			
-			for ( j = 1; j < sampling - 1; j++ ) {
-
-				index = indexCurrent + j * ( 1 / sampling ) * ( indexNext - indexCurrent );
-
-				position = spline.getPoint( coords, index );
-				newpoints.push( [ position.x, position.y, position.z ] );
-				
-			}
-			
-			newpoints.push( points[ i ] );
-
-		}
-		
-		return newpoints;
-		
-	};
-	
-	function splineLength( points ) {
-
-		var i, index, p, 
-			coords = pointsToCoords( points ),
-			spline = new THREE.Spline(),
-			n_sub = 100, 
-			c = 0,
-			point = 0, intPoint = 0, oldIntPoint = 0,
-			chunkLengths = [ 0 ],
-			totalLength = 0;
-
-		var oldPosition = [ points[ 0 ][ 0 ], points[ 0 ][ 1 ], points[ 0 ][ 2 ] ];
-
-		for ( i = 1; i < coords.length * n_sub; i ++ ) {
-
-			index = i / ( coords.length * n_sub );
-			position = spline.getPoint( coords, index );
-
-			totalLength += distance( [ position.x, position.y, position.z ], oldPosition );
-			oldPosition = [ position.x, position.y, position.z ];
-
-			point = ( coords.length - 1 ) * index;
-			intPoint = Math.floor( point );
-			
-			if ( intPoint != oldIntPoint ) {
-
-				chunkLengths[ intPoint ] = totalLength;
-				oldIntPoint = intPoint;
-
-			}
-
-		}
-		
-		chunkLengths[ chunkLengths.length ] = totalLength;
-
-		return { chunks: chunkLengths, total: totalLength };
-
-	};
-
-
-	function createSplineGeometryFromPoints( points, n_sub ) {
+	function createSplineGeometry( spline, n_sub ) {
 	
 		var i, index, position,
-			geometry = new THREE.Geometry(),
-			spline = new THREE.Spline(), 
-			coords = pointsToCoords( points );		
+			geometry = new THREE.Geometry();
 		
-		for ( i = 0; i < coords.length * n_sub; i ++ ) {
+		for ( i = 0; i < spline.points.length * n_sub; i ++ ) {
 		
-			index = i / ( coords.length * n_sub );
-			position = spline.getPoint( coords, index );
+			index = i / ( spline.points.length * n_sub );
+			position = spline.getPoint( index );
 			
 			geometry.vertices[ i ] = new THREE.Vertex( new THREE.Vector3( position.x, position.y, position.z ) );
 
@@ -350,26 +255,10 @@ THREE.PathCamera = function ( parameters ) {
 	
 	};
 
-	function createWaypointGeometryFromPoints( points ) {
-		
-		var i, position,
-			geometry = new THREE.Geometry();
-		
-		for ( i = 0; i < points.length; i ++ ) {
-		
-			position = points[ i ];
-			geometry.vertices[ i ] = new THREE.Vertex( new THREE.Vector3( position.x, position.y, position.z ) );
-			
-		}
-		
-		return geometry;
+	function createPath( parent, spline ) {
 
-	};
-			
-	function createPath( parent, path ) {
-
-		var lineGeo = createSplineGeometryFromPoints( path, 10 ),
-			particleGeo = createSplineGeometryFromPoints( path, 10 ),
+		var lineGeo = createSplineGeometry( spline, 10 ),
+			particleGeo = createSplineGeometry( spline, 10 ),
 			lineMat = new THREE.LineBasicMaterial( { color: 0xff0000, linewidth: 3 } );
 			lineObj = new THREE.Line( lineGeo, lineMat );
 			particleObj = new THREE.ParticleSystem( particleGeo, new THREE.ParticleBasicMaterial( { color: 0xffaa00, size: 3 } ) );
@@ -384,10 +273,10 @@ THREE.PathCamera = function ( parameters ) {
 			geo = new Sphere( 1, 16, 8 ),
 			mat = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 		
-		for( i = 0; i < path.length; i++ ) {
+		for( i = 0; i < spline.points.length; i++ ) {
 			
 			waypoint = new THREE.Mesh( geo, mat );
-			waypoint.position.set( path[ i ][ 0 ], path[ i ][ 1 ], path[ i ][ 2 ] );
+			waypoint.position.copy( spline.points[ i ] );
 			waypoint.updateMatrix();
 			parent.addChild( waypoint );
 			
@@ -395,9 +284,14 @@ THREE.PathCamera = function ( parameters ) {
 
 	};
 
+	// constructor
+	
+	this.spline = new THREE.Spline();
+	this.spline.initFromArray( this.waypoints );
+
 	if ( this.useConstantSpeed ) {
 		
-		this.waypoints = reparametrizeSplineByArcLength( this.waypoints, this.resamplingCoef );
+		this.spline.reparametrizeByArcLength( this.resamplingCoef );
 
 	}
 	
@@ -413,7 +307,7 @@ THREE.PathCamera = function ( parameters ) {
 		var dummyChild = new THREE.Mesh( dummyChildGeo, dummyChildMaterial );
 		dummyChild.position.set( 0, 10, 0 );
 		
-		this.animation = initAnimationPath( this.animationParent, this.waypoints, this.id, this.duration );
+		this.animation = initAnimationPath( this.animationParent, this.spline, this.id, this.duration );
 
 		this.animationParent.addChild( this );
 		this.animationParent.addChild( this.target );
@@ -421,7 +315,7 @@ THREE.PathCamera = function ( parameters ) {
 		
 	} else {
 
-		this.animation = initAnimationPath( this.animationParent, this.waypoints, this.id, this.duration );
+		this.animation = initAnimationPath( this.animationParent, this.spline, this.id, this.duration );
 		this.animationParent.addChild( this.target );
 		this.animationParent.addChild( this );
 
@@ -429,7 +323,7 @@ THREE.PathCamera = function ( parameters ) {
 
 	if ( this.createDebugPath ) {
 		
-		createPath( this.debugPath, this.waypoints );
+		createPath( this.debugPath, this.spline );
 
 	}
 
