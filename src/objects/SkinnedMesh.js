@@ -147,9 +147,9 @@ THREE.SkinnedMesh.prototype.update = function ( parentMatrixWorld, forceUpdate, 
 			bm = this.boneMatrices;
 
 		for ( b = 0; b < bl; b++ ) {
-			
+
 			ba[ b ].skinMatrix.flattenToArrayOffset( bm, b * 16 );
-			
+
 		}
 
 	}

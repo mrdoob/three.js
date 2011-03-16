@@ -151,38 +151,35 @@ THREE.Object3D.prototype = {
 
 	update: function ( parentMatrixWorld, forceUpdate, camera ) {
 
-		if ( this.visible ) {
+		this.matrixAutoUpdate && this.updateMatrix();
 
-			this.matrixAutoUpdate && this.updateMatrix();
+		// update matrixWorld
 
-			// update matrixWorld
+		if ( this.matrixWorldNeedsUpdate || forceUpdate ) {
 
-			if ( this.matrixWorldNeedsUpdate || forceUpdate ) {
+			if ( parentMatrixWorld ) {
 
-				if ( parentMatrixWorld ) {
+				this.matrixWorld.multiply( parentMatrixWorld, this.matrix );
 
-					this.matrixWorld.multiply( parentMatrixWorld, this.matrix );
+			} else {
 
-				} else {
-
-					this.matrixWorld.copy( this.matrix );
-
-				}
-
-				this.matrixRotationWorld.extractRotation( this.matrixWorld, this.scale );
-
-				this.matrixWorldNeedsUpdate = false;
-				forceUpdate = true;
+				this.matrixWorld.copy( this.matrix );
 
 			}
 
-			// update children
+			this.matrixRotationWorld.extractRotation( this.matrixWorld, this.scale );
 
-			for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+			this.matrixWorldNeedsUpdate = false;
 
-				this.children[ i ].update( this.matrixWorld, forceUpdate, camera );
+			forceUpdate = true;
 
-			}
+		}
+
+		// update children
+
+		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+
+			this.children[ i ].update( this.matrixWorld, forceUpdate, camera );
 
 		}
 
