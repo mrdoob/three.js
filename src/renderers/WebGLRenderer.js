@@ -3891,9 +3891,8 @@ THREE.Snippets = {
 
 	].join("\n"),
 	
-	// vertex animation
+	// morph targets
 
-//	vertexanimated_pars_vertex: [
 	morphtarget_pars_vertex: [
 
 	"#ifdef USE_MORPHTARGETS",
@@ -3921,6 +3920,10 @@ THREE.Snippets = {
 		
 		"gl_Position = projectionMatrix * modelViewMatrix * vec4( morphed, 1.0 );",
 
+	"#else",
+		"#ifndef USE_SKINNING",
+			"gl_Position = projectionMatrix * mvPosition;",
+		"#endif",
 	"#endif"
 
 	].join("\n")
