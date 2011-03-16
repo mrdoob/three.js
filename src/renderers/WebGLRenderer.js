@@ -79,6 +79,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
+	this.maxMorphTargets = 8;
 	this.domElement = _canvas;
 	this.autoClear = true;
 	this.sortObjects = true;
@@ -267,6 +268,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		geometryGroup.__webGLFaceBuffer = _gl.createBuffer();
 		geometryGroup.__webGLLineBuffer = _gl.createBuffer();
+		
+		
+		if( geometryGroup.numMorphTargets ) {
+			
+			var m, ml;
+			geometryGroup.__webGLMorphTargetsBuffers = []; 
+			
+			for( m = 0, ml = geometryGroup.numMorphTargets; m < ml; m++ ) {
+				
+				geometryGroup.__webGLMorphTargetsBuffers.push( _gl.createBuffer());	
+			}
+
+		}
 
 	};
 
@@ -354,6 +368,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 		geometryGroup.__webGLFaceCount = ntris * 3;
 		geometryGroup.__webGLLineCount = nlines * 2;
 
+		if( geometryGroup.numMorphTargets ) {
+			
+			var m, ml;
+			geometryGroup.__morphTargetsArrays = []; 
+			
+			for( m = 0, ml = geometryGroup.numMorphTargets; m < ml; m++ ) {
+				
+				geometryGroup.__morphTargetsArrays.push( new Float32Array( nvertices * 3 ));
+			}
+
+		}
+
 	};
 
 	function setMeshBuffers ( geometryGroup, object, hint ) {
@@ -367,6 +393,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			sb1, sb2, sb3, sb4,
 			m, ml, i,
 			vn, uvi, uv2i,
+			vk, vkl, vka,
 
 		vertexIndex = 0,
 
@@ -379,6 +406,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		offset_line = 0,
 		offset_color = 0,
 		offset_skin = 0,
+		offset_morphTarget = 0,
 
 		vertexArray = geometryGroup.__vertexArray,
 		uvArray = geometryGroup.__uvArray,
@@ -391,6 +419,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		skinVertexBArray = geometryGroup.__skinVertexBArray,
 		skinIndexArray = geometryGroup.__skinIndexArray,
 		skinWeightArray = geometryGroup.__skinWeightArray,
+
+		morphTargetsArrays = geometryGroup.__morphTargetsArrays,
 
 		faceArray = geometryGroup.__faceArray,
 		lineArray = geometryGroup.__lineArray,
@@ -405,6 +435,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		dirtyNormals = geometry.__dirtyNormals,
 		dirtyTangents = geometry.__dirtyTangents,
 		dirtyColors = geometry.__dirtyColors,
+		dirtyMorphTargets = geometry.__dirtyMorphTargets,
 
 		vertices = geometry.vertices,
 		chunk_faces = geometryGroup.faces,
@@ -416,7 +447,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 		obj_skinVerticesA = geometry.skinVerticesA,
 		obj_skinVerticesB = geometry.skinVerticesB,
 		obj_skinIndices = geometry.skinIndices,
-		obj_skinWeights = geometry.skinWeights;
+		obj_skinWeights = geometry.skinWeights,
+
+		morphTargets = geometry.morphTargets;
+		
 
 		for ( f = 0, fl = chunk_faces.length; f < fl; f++ ) {
 
@@ -450,6 +484,33 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					offset += 9;
 
+				}
+
+				if ( dirtyMorphTargets ) {
+					
+					for( vk = 0, vkl = morphTargets.length; vk < vkl; vk++ ) {
+						
+						v1 = morphTargets[ vk ].vertices[ face.a ].position;
+						v2 = morphTargets[ vk ].vertices[ face.b ].position;
+						v3 = morphTargets[ vk ].vertices[ face.c ].position;
+
+						vka = morphTargetsArrays[ vk ];
+	
+						vka[ offset_morphTarget + 0 ] = v1.x;
+						vka[ offset_morphTarget + 1 ] = v1.y;
+						vka[ offset_morphTarget + 2 ] = v1.z;
+	
+						vka[ offset_morphTarget + 3 ] = v2.x;
+						vka[ offset_morphTarget + 4 ] = v2.y;
+						vka[ offset_morphTarget + 5 ] = v2.z;
+	
+						vka[ offset_morphTarget + 6 ] = v3.x;
+						vka[ offset_morphTarget + 7 ] = v3.y;
+						vka[ offset_morphTarget + 8 ] = v3.z;
+					}
+
+					offset_morphTarget += 9;
+					
 				}
 
 				if ( obj_skinWeights.length ) {
@@ -702,6 +763,38 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					offset += 12;
 
+				}
+
+				if ( dirtyMorphTargets ) {
+					
+					for( vk = 0, vkl = morphTargets.length; vk < vkl; vk++ ) {
+						
+						v1 = morphTargets[ vk ].vertices[ face.a ].position;
+						v2 = morphTargets[ vk ].vertices[ face.b ].position;
+						v3 = morphTargets[ vk ].vertices[ face.c ].position;
+						v4 = morphTargets[ vk ].vertices[ face.d ].position;
+	
+						vka = morphTargetsArrays[ vk ];
+	
+						vka[ offset_morphTarget + 0 ] = v1.x;
+						vka[ offset_morphTarget + 1 ] = v1.y;
+						vka[ offset_morphTarget + 2 ] = v1.z;
+	
+						vka[ offset_morphTarget + 3 ] = v2.x;
+						vka[ offset_morphTarget + 4 ] = v2.y;
+						vka[ offset_morphTarget + 5 ] = v2.z;
+	
+						vka[ offset_morphTarget + 6 ] = v3.x;
+						vka[ offset_morphTarget + 7 ] = v3.y;
+						vka[ offset_morphTarget + 8 ] = v3.z;
+	
+						vka[ offset_morphTarget + 9 ] = v4.x;
+						vka[ offset_morphTarget + 10 ] = v4.y;
+						vka[ offset_morphTarget + 11 ] = v4.z;
+					}
+
+					offset_morphTarget += 12;
+					
 				}
 
 				if ( obj_skinWeights.length ) {
@@ -977,6 +1070,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webGLVertexBuffer );
 			_gl.bufferData( _gl.ARRAY_BUFFER, vertexArray, hint );
 
+		}
+
+		if ( dirtyMorphTargets ) {
+			
+			for( vk = 0, vkl = morphTargets.length; vk < vkl; vk++ ) {
+		
+				_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webGLMorphTargetsBuffers[ vk ] );
+				_gl.bufferData( _gl.ARRAY_BUFFER, morphTargetsArrays[ vk ], hint );
+				
+			}
 		}
 
 		if ( dirtyColors && obj_colors.length ) {
@@ -1349,7 +1452,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.initMaterial = function ( material, lights, fog, object ) {
 
-		var u, identifiers, parameters, maxLightCount, maxBones;
+		var u, a, identifiers, i, parameters, maxLightCount, maxBones;
 
 		if ( material instanceof THREE.MeshDepthMaterial ) {
 
@@ -1387,30 +1490,49 @@ THREE.WebGLRenderer = function ( parameters ) {
 		maxLightCount = allocateLights( lights, 4 );
 
 		maxBones = allocateBones( object );
-
-		parameters = {
-				fog: fog, map: material.map, envMap: material.envMap,
-				lightMap: material.lightMap, vertexColors: material.vertexColors,
-				sizeAttenuation: material.sizeAttenuation, skinning: material.skinning,
-				maxDirLights: maxLightCount.directional, maxPointLights: maxLightCount.point,
-				maxBones: maxBones
-		};
+		
+		parameters = { fog: fog, map: material.map, envMap: material.envMap, lightMap: material.lightMap, vertexColors: material.vertexColors,
+					   sizeAttenuation: material.sizeAttenuation,
+					   skinning: material.skinning,
+					   morphTargets: material.morphTargets,
+					   maxDirLights: maxLightCount.directional, maxPointLights: maxLightCount.point,
+					   maxBones: maxBones };
 
 		material.program = buildProgram( material.fragmentShader, material.vertexShader, parameters );
 
+
+		// load uniforms
+
 		identifiers = [ 'viewMatrix', 'modelViewMatrix', 'projectionMatrix', 'normalMatrix', 'objectMatrix', 'cameraPosition',
-						'cameraInverseMatrix', 'boneGlobalMatrices'
+						'cameraInverseMatrix', 'boneGlobalMatrices', 'morphTargetInfluences'
 						];
+
 
 		for( u in material.uniforms ) {
 
 			identifiers.push(u);
-
 		}
 
 		cacheUniformLocations( material.program, identifiers );
-		cacheAttributeLocations( material.program, [ "position", "normal", "uv", "uv2", "tangent", "color",
-													 "skinVertexA", "skinVertexB", "skinIndex", "skinWeight" ] );
+		
+
+		// load attributes
+		
+		identifiers = [ "position", "normal", "uv", "uv2", "tangent", "color",
+					    "skinVertexA", "skinVertexB", "skinIndex", "skinWeight" ];
+		
+		for( i = 0; i < this.maxMorphTargets; i++ ) {
+			
+			identifiers.push( "morphTarget" + i );
+		}
+		
+		for( a in material.attributes ) {
+			
+			identifiers.push( a );
+		}
+		
+		cacheAttributeLocations( material.program, identifiers );
+
 
 		var attributes = material.program.attributes;
 
@@ -1429,6 +1551,29 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.enableVertexAttribArray( attributes.skinIndex );
 			_gl.enableVertexAttribArray( attributes.skinWeight );
 
+		}
+		
+		if ( material.morphTargets ) {
+			
+			material.numSupportedMorphTargets = 0;
+			
+			if( attributes.morphTarget0 >= 0 ) { _gl.enableVertexAttribArray( attributes.morphTarget0 ); material.numSupportedMorphTargets++ }
+			if( attributes.morphTarget1 >= 0 ) { _gl.enableVertexAttribArray( attributes.morphTarget1 ); material.numSupportedMorphTargets++ }
+			if( attributes.morphTarget2 >= 0 ) { _gl.enableVertexAttribArray( attributes.morphTarget2 ); material.numSupportedMorphTargets++ }
+			if( attributes.morphTarget3 >= 0 ) { _gl.enableVertexAttribArray( attributes.morphTarget3 ); material.numSupportedMorphTargets++ }
+			if( attributes.morphTarget4 >= 0 ) { _gl.enableVertexAttribArray( attributes.morphTarget4 ); material.numSupportedMorphTargets++ }
+			if( attributes.morphTarget5 >= 0 ) { _gl.enableVertexAttribArray( attributes.morphTarget5 ); material.numSupportedMorphTargets++ }
+			if( attributes.morphTarget6 >= 0 ) { _gl.enableVertexAttribArray( attributes.morphTarget6 ); material.numSupportedMorphTargets++ }
+			if( attributes.morphTarget7 >= 0 ) { _gl.enableVertexAttribArray( attributes.morphTarget7 ); material.numSupportedMorphTargets++ }
+			 	
+			object.__webGLMorphTargetInfluences = new Float32Array( this.maxMorphTargets );
+			
+			for( var i = 0; i < this.maxMorphTargets; i++ ) {
+				
+				object.__webGLMorphTargetInfluences[ i ] = 0;
+				
+			}
+			
 		}
 
 	};
@@ -1544,7 +1689,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			loadUniformsSkinning( p_uniforms, object );
 
 		}
-
+		
 		return program;
 
 	};
@@ -1561,8 +1706,70 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// vertices
 
-		_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webGLVertexBuffer );
-		_gl.vertexAttribPointer( attributes.position, 3, _gl.FLOAT, false, 0, 0 );
+		if ( !material.morphTargets ) {
+			
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webGLVertexBuffer );
+			_gl.vertexAttribPointer( attributes.position, 3, _gl.FLOAT, false, 0, 0 );
+			
+		} else {
+			
+			// set base
+			
+			if(  object.morphTargetBase !== -1 ) {
+				
+				_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webGLMorphTargetsBuffers[ object.morphTargetBase ] );
+				_gl.vertexAttribPointer( attributes.position, 3, _gl.FLOAT, false, 0, 0 );
+				
+			} else {
+				
+				_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webGLVertexBuffer );
+				_gl.vertexAttribPointer( attributes.position, 3, _gl.FLOAT, false, 0, 0 );
+				
+			}
+			
+			
+			// find most influencing
+			
+			var used = [];
+			var candidateInfluence = -1;
+			var candidate = 0;
+			var influences = object.morphTargetInfluences;
+			var i, il = influences.length;
+			var m = 0;
+
+			if( object.morphTargetBase !== -1 ) {
+				
+				used[ object.morphTargetBase ] = true;
+				
+			}
+
+			while( m < material.numSupportedMorphTargets ) {
+				
+				for( i = 0; i < il; i++ ) {
+					
+					if( !used[ i ] && influences[ i ] > candidateInfluence ) {
+						
+						candidate = i;
+						candidateInfluence = influences[ candidate ];
+					}
+				}
+				
+				_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webGLMorphTargetsBuffers[ candidate ] );
+				_gl.vertexAttribPointer( attributes[ "morphTarget" + m ], 3, _gl.FLOAT, false, 0, 0 );
+				
+				object.__webGLMorphTargetInfluences[ m ] = candidateInfluence;
+
+				used[ candidate ] = 1;
+				candidateInfluence = -1;
+				m++;
+			}
+			
+			
+			// load updated influences uniform
+			
+			_gl.uniform1fv( material.program.uniforms.morphTargetInfluences, object.__webGLMorphTargetInfluences );
+		}
+
 
 		// colors
 
@@ -2207,6 +2414,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					initMeshBuffers( geometryGroup, object );
 
 					geometry.__dirtyVertices = true;
+					geometry.__dirtyMorphTargets = true;
 					geometry.__dirtyElements = true;
 					geometry.__dirtyUvs = true;
 					geometry.__dirtyNormals = true;
@@ -2293,7 +2501,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				geometryGroup = geometry.geometryGroups[ g ];
 
-				if ( geometry.__dirtyVertices || geometry.__dirtyElements ||
+				if ( geometry.__dirtyVertices || geometry.__dirtyMorphTargets || geometry.__dirtyElements ||
 					geometry.__dirtyUvs || geometry.__dirtyNormals ||
 					geometry.__dirtyColors || geometry.__dirtyTangents ) {
 
@@ -2304,6 +2512,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 			geometry.__dirtyVertices = false;
+			geometry.__dirtyMorphTargets = false;
 			geometry.__dirtyElements = false;
 			geometry.__dirtyUvs = false;
 			geometry.__dirtyNormals = false;
@@ -2385,6 +2594,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		// in its separate VBO
 
 		var i, l, f, fl, face, material, materials, vertices, mhash, ghash, hash_map = {};
+		var numMorphTargets = geometry.morphTargets !== undefined ? geometry.morphTargets.length : 0;
 
 		geometry.geometryGroups = {};
 
@@ -2427,7 +2637,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( geometry.geometryGroups[ ghash ] == undefined ) {
 
-				geometry.geometryGroups[ ghash ] = { 'faces': [], 'materials': materials, 'vertices': 0 };
+				geometry.geometryGroups[ ghash ] = { 'faces': [], 'materials': materials, 'vertices': 0, 'numMorphTargets': numMorphTargets };
 
 			}
 
@@ -2440,7 +2650,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( geometry.geometryGroups[ ghash ] == undefined ) {
 
-					geometry.geometryGroups[ ghash ] = { 'faces': [], 'materials': materials, 'vertices': 0 };
+					geometry.geometryGroups[ ghash ] = { 'faces': [], 'materials': materials, 'vertices': 0, 'numMorphTargets': numMorphTargets };
 
 				}
 
@@ -2593,6 +2803,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			parameters.lightMap ? "#define USE_LIGHTMAP" : "",
 			parameters.vertexColors ? "#define USE_COLOR" : "",
 			parameters.skinning ? "#define USE_SKINNING" : "",
+			parameters.morphTargets ? "#define USE_MORPHTARGETS" : "",
+
 
 			parameters.sizeAttenuation ? "#define USE_SIZEATTENUATION" : "",
 
@@ -2606,6 +2818,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 			"uniform mat4 cameraInverseMatrix;",
 
 			"attribute vec3 position;",
+			"attribute vec3 morphTarget0;",
+			"attribute vec3 morphTarget1;",
+			"attribute vec3 morphTarget2;",
+			"attribute vec3 morphTarget3;",
+			"attribute vec3 morphTarget4;",
+			"attribute vec3 morphTarget5;",
+			"attribute vec3 morphTarget6;",
+			"attribute vec3 morphTarget7;",
 			"attribute vec3 normal;",
 			"attribute vec3 color;",
 			"attribute vec2 uv;",
@@ -2649,6 +2869,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_gl.uniformMatrix4fv( uniforms.boneGlobalMatrices, false, object.boneMatrices );
 
 	};
+		
 
 	function loadUniformsMatrices ( uniforms, object ) {
 
