@@ -488,10 +488,12 @@ THREE.ShaderChunk = {
 	
 	default_vertex : [
 	
-	"#ifndef USE_MORPHTARGETS || USE_SKINNING",
+	"#ifndef USE_MORPHTARGETS",
+	"#ifndef USE_SKINNING",
 		
 		"gl_Position = projectionMatrix * mvPosition;",
 
+	"#endif",
 	"#endif"
 	
 	].join("\n")

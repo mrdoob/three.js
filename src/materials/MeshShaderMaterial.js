@@ -14,8 +14,10 @@
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>,
  
+ *  lights: <bool>,
  *  vertexColors: <bool>,
- *  skinning: <bool>
+ *  skinning: <bool>,
+ *  morphTargets: <bool>,
  * }
  */
 
@@ -36,11 +38,12 @@ THREE.MeshShaderMaterial = function ( parameters ) {
 	this.wireframe = false;
 	this.wireframeLinewidth = 1.0;
 	this.wireframeLinecap = 'round';	// doesn't make sense here
-	this.wireframeLinejoin = 'round';  // not implemented in WebGLRenderer (and this material doesn't make sense in CanvasRenderer)
+	this.wireframeLinejoin = 'round';  	// not implemented in WebGLRenderer (and this material doesn't make sense in CanvasRenderer)
 
-	this.vertexColors = false; // must set this if shader wants to use "color" attribute stream
-	this.skinning = false;	// must set this is shader wants to use skinning attribute streams
-	this.morphTargets = false;
+	this.lights = false; 		// set to use scene lights
+	this.vertexColors = false; 	// set to use "color" attribute stream
+	this.skinning = false;		// set to use skinning attribute streams
+	this.morphTargets = false; 	// set to use morph targets
 
 	if ( parameters ) {
 
@@ -60,6 +63,7 @@ THREE.MeshShaderMaterial = function ( parameters ) {
 		if ( parameters.wireframeLinecap !== undefined ) this.wireframeLinecap = parameters.wireframeLinecap;
 		if ( parameters.wireframeLinejoin !== undefined ) this.wireframeLinejoin = parameters.wireframeLinejoin;
 
+		if ( parameters.lights !== undefined ) this.lights = parameters.lights;
 		if ( parameters.vertexColors !== undefined ) this.vertexColors = parameters.vertexColors;
 		if ( parameters.skinning !== undefined ) this.skinning = parameters.skinning;
 		if ( parameters.morphTargets !== undefined ) this.morphTargets = parameters.morphTargets;

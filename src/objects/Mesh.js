@@ -35,6 +35,7 @@ THREE.Mesh = function ( geometry, materials ) {
 		if( this.geometry.morphTargets.length ) {
 			
 			this.morphTargetBase = -1;
+			this.morphTargetForcedOrder = [];
 			this.morphTargetInfluences = [];
 			this.morphTargetDictionary = {};
 			
@@ -42,6 +43,7 @@ THREE.Mesh = function ( geometry, materials ) {
 				
 				this.morphTargetInfluences.push( 0 );
 				this.morphTargetDictionary[ this.geometry.morphTargets[ m ].name ] = m;
+
 			}
 
 		}
