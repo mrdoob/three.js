@@ -3,7 +3,7 @@
  * @author mr.doob / http://mrdoob.com/ 
  */
 
-var Cylinder = function ( numSegs, topRad, botRad, height ) {
+var Cylinder = function ( numSegs, topRad, botRad, height, topOffset, botOffset ) {
 
 	THREE.Geometry.call( this );
 
@@ -35,26 +35,35 @@ var Cylinder = function ( numSegs, topRad, botRad, height ) {
 
 	// Bottom circle faces
 
-	v( 0, 0, - halfHeight );
+	if ( botRad > 0 ) {
 
-	for ( i = numSegs; i < numSegs + ( numSegs / 2 ); i++ ) {
+		v( 0, 0, - halfHeight - ( botOffset || 0 ) );
 
-		f4( 2 * numSegs, ( 2 * i - 2 * numSegs ) % numSegs, ( 2 * i - 2 * numSegs + 1 ) % numSegs, ( 2 * i - 2 * numSegs + 2 ) % numSegs );
+		for ( i = numSegs; i < numSegs + ( numSegs / 2 ); i++ ) {
+
+			f4( 2 * numSegs, ( 2 * i - 2 * numSegs ) % numSegs, ( 2 * i - 2 * numSegs + 1 ) % numSegs, ( 2 * i - 2 * numSegs + 2 ) % numSegs );
+
+		}
 
 	}
 
 	// Top circle faces
 
-	v( 0, 0, halfHeight );
+	if ( topRad > 0 ) {
 
-	for ( i = numSegs + ( numSegs / 2 ); i < 2 * numSegs; i ++ ) {
+		v( 0, 0, halfHeight + ( topOffset || 0 ) );
 
-		f4( ( 2 * i - 2 * numSegs + 2 ) % numSegs + numSegs, ( 2 * i - 2 * numSegs + 1 ) % numSegs + numSegs, ( 2 * i - 2 * numSegs ) % numSegs+numSegs, 2 * numSegs + 1 );
+		for ( i = numSegs + ( numSegs / 2 ); i < 2 * numSegs; i ++ ) {
+
+			f4( ( 2 * i - 2 * numSegs + 2 ) % numSegs + numSegs, ( 2 * i - 2 * numSegs + 1 ) % numSegs + numSegs, ( 2 * i - 2 * numSegs ) % numSegs+numSegs, 2 * numSegs + 1 );
+
+		}
 
 	}
 
 	this.computeCentroids();
 	this.computeFaceNormals();
+	// this.computeVertexNormals();
 
 	function v( x, y, z ) {
 
