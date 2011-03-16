@@ -23,21 +23,21 @@ var Torus = function ( radius, tube, segmentsR, segmentsT ) {
 			var x = (this.radius + this.tube*Math.cos(v))*Math.cos(u);
 			var y = (this.radius + this.tube*Math.cos(v))*Math.sin(u);
 			var z = this.tube*Math.sin(v);
-			
+
 			vert(x, y, z);
-			
+
 			temp_uv.push([i/this.segmentsT, 1 - j/this.segmentsR]);
 		}
 	}
 
-	
+
 	for (var j = 1; j <= this.segmentsR; ++j) {
 		for (var i = 1; i <= this.segmentsT; ++i) {
 			var a = (this.segmentsT + 1)*j + i;
 			var b = (this.segmentsT + 1)*j + i - 1;
 			var c = (this.segmentsT + 1)*(j - 1) + i - 1;
 			var d = (this.segmentsT + 1)*(j - 1) + i;
-			
+
 			f4(a,b,c,d);
 
 			this.uvs.push( [new THREE.UV( temp_uv[a][0], temp_uv[a][1] ),

@@ -65,6 +65,8 @@
 				var line = new THREE.Line( geometry, line_material, THREE.LinePieces );
 				scene.addObject( line );
 
+				// Materials
+
 				var generatedTexture = new THREE.Texture( generateTexture() );
 				generatedTexture.needsUpdate = true;
 
@@ -147,23 +149,10 @@
 
 				container.appendChild( renderer.domElement );
 
-				var debugCanvas = document.createElement( 'canvas' );
-				debugCanvas.width = 512;
-				debugCanvas.height = 512;
-				debugCanvas.style.position = 'absolute';
-				debugCanvas.style.top = '0px';
-				debugCanvas.style.left = '0px';
-
-				container.appendChild( debugCanvas );
-
-				debugContext = debugCanvas.getContext( '2d' );
-				debugContext.setTransform( 1, 0, 0, 1, 256, 256 );
-				debugContext.strokeStyle = '#000000';
-
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
-				container.appendChild(stats.domElement);
+				container.appendChild( stats.domElement );
 
 			}
 
@@ -230,13 +219,6 @@
 				pointLight.position.z = particleLight.position.z;
 
 				renderer.render( scene, camera );
-
-			}
-
-			function log( text ) {
-
-				var e = document.getElementById("log");
-				e.innerHTML = text + "<br/>" + e.innerHTML;
 
 			}
 
