@@ -55,7 +55,6 @@
 				light.position.z = - 1;
 				scene.addLight( light );
 
-
 				material = [
 						new THREE.MeshLambertMaterial( { color: 0xffffff } ),
 						new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true, opacity: 0.1 } )
@@ -66,7 +65,7 @@
 				object.position.z = 200;
 				scene.addObject( object );
 
-				object = new THREE.Mesh( new Cylinder( 50, 75, 75, 100 ), material );
+				object = new THREE.Mesh( new Cylinder( 50, 25, 75, 100 ), material );
 				object.position.z = 200;
 				scene.addObject( object );
 
@@ -83,8 +82,21 @@
 				object = new THREE.Mesh( new Sphere( 75, 20, 10 ), material );
 				scene.addObject( object );
 
-				object = new THREE.Mesh( new Torus( 50, 20, 20, 20 ), material );
+				var points = [];
+
+				for ( var i = 0; i < 50; i ++ ) {
+
+					points.push( new THREE.Vector3( Math.sin( i * 0.2 ) * 15 + 50, 0, ( i - 5 ) * 2 ) );
+
+				}
+
+				object = new THREE.Mesh( new Lathe( points, 20 ), material );
 				object.position.x = 200;
+				scene.addObject( object );
+
+				object = new THREE.Mesh( new Torus( 50, 20, 20, 20 ), material );
+				object.position.x = - 200;
+				object.position.z = - 200;
 				scene.addObject( object );
 
 				object = new THREE.Mesh( new TorusKnot( 50, 10, 50, 20 ), material );

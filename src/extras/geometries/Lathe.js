@@ -2,7 +2,7 @@
  * @author astrodud / http://astrodud.isgreat.org/
  */
 
-function Lathe( vertices, steps, angle ) {
+function Lathe( points, steps, angle ) {
 
 	THREE.Geometry.call( this );
 
@@ -13,21 +13,22 @@ function Lathe( vertices, steps, angle ) {
 
 	var newV = [], oldInds = [], newInds = [], startInds = [];
 
-	for ( var j = 0; j < vertices.length; j ++ ) {
+	for ( var j = 0; j < points.length; j ++ ) {
 
-		this.vertices.push( new THREE.Vertex( vertices[ j ] ) );
+		this.vertices.push( new THREE.Vertex( points[ j ] ) );
+
+		newV[ j ] = points[ j ].clone();
 		oldInds[ j ] = this.vertices.length - 1;
-		newV[ j ] = new THREE.Vector3( vertices[ j ].x, vertices[ j ].y, vertices[ j ].z );
 
 	}
 
-	var matrix = new THREE.Matrix4().setRotationZ( this.stepSize );
+	var matrix = new THREE.Matrix4().setRotationZ( stepSize );
 
-	for ( var r = 0; r <= this.angle + 0.001; r += this.stepSize ) { // need the +0.001 for it go up to angle
+	for ( var r = 0; r <= this.angle + 0.001; r += stepSize ) { // need the +0.001 for it go up to angle
 
 		for ( var j = 0; j < newV.length; j ++ ) {
 
-			if ( r < angle ) {
+			if ( r < this.angle ) {
 
 				newV[ j ] = matrix.multiplyVector3( newV[ j ].clone() );
 				this.vertices.push( new THREE.Vertex( newV[ j ] ) );
@@ -48,10 +49,10 @@ function Lathe( vertices, steps, angle ) {
 			this.faces.push( new THREE.Face4( newInds[ j ], newInds[ j + 1 ], oldInds[ j + 1 ], oldInds[ j ] ) );
 			this.uvs.push( [
 
-				new THREE.UV( r / angle, j / vertices.length ),
-				new THREE.UV( r / angle, ( j + 1 ) / vertices.length ),
-				new THREE.UV( ( r - stepSize ) / angle, ( j + 1 ) / vertices.length ),
-				new THREE.UV( ( r - stepSize ) / angle, j / vertices.length )
+				new THREE.UV( r / angle, j / points.length ),
+				new THREE.UV( r / angle, ( j + 1 ) / points.length ),
+				new THREE.UV( ( r - stepSize ) / angle, ( j + 1 ) / points.length ),
+				new THREE.UV( ( r - stepSize ) / angle, j / points.length )
 
 			] );
 
