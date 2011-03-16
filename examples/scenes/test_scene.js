@@ -69,7 +69,7 @@ var scene = {
 	"cone" : {
 		"geometry" : "cone",
 		"materials": [ "lambert_blue" ],
-		"position" : [ -50, 40, -50 ],
+		"position" : [ -50, 15, -50 ],
 		"rotation" : [ 1.57, 0, 0 ],
 		"scale"	   : [ 1, 1, 1 ],
 		"visible"  : true
@@ -78,7 +78,7 @@ var scene = {
 	"cylinder" : {
 		"geometry" : "cylinder",
 		"materials": [ "lambert_blue" ],
-		"position" : [ 50, 40, -50 ],
+		"position" : [ 50, 15, -50 ],
 		"rotation" : [ 1.57, 0, 0 ],
 		"scale"	   : [ 1, 1, 1 ],
 		"visible"  : true

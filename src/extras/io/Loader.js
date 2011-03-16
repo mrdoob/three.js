@@ -804,7 +804,9 @@ THREE.Loader.prototype = {
 			
 			function init_vertices() {
 
-				var i, l, x, y, z, r, g, b;
+				var i, l, v, vl, x, y, z, r, g, b, srcVertices, dstVertices;
+
+				// normal vertices
 
 				for( i = 0, l = data.vertices.length; i < l; i += 3 ) {
 
@@ -815,6 +817,30 @@ THREE.Loader.prototype = {
 					THREE.Loader.prototype.v( scope, x, y, z );
 
 				}
+
+				// vertex animation 
+
+				if( data.morphTargets !== undefined ) {
+					
+					for( i = 0, l = data.morphTargets.length; i < l; i++ ) {
+						
+						scope.morphTargets[ i ] = {};
+						scope.morphTargets[ i ].name = data.morphTargets[ i ].name;
+						scope.morphTargets[ i ].vertices = [];
+						
+						dstVertices = scope.morphTargets[ i ].vertices;
+						srcVertices = data.morphTargets [ i ].vertices;
+
+						for( v = 0, vl = srcVertices.length; v < vl; v += 3 ) {
+
+							dstVertices.push( new THREE.Vertex( new THREE.Vector3( srcVertices[ v ], srcVertices[ v + 1 ], srcVertices[ v + 2 ] )));
+
+						}
+						
+					} 
+					
+				}
+
 				
 				if ( data.colors ) {
 					
@@ -1079,6 +1105,8 @@ THREE.Loader.prototype = {
 		scope.vertices.push( new THREE.Vertex( new THREE.Vector3( x, y, z ) ) );
 
 	},
+
+
 
 	vc: function( scope, r, g, b ) {
 
