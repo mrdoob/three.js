@@ -817,6 +817,8 @@ def convert_ascii(infile, morphfiles, outfile):
     elif ALIGN == "top":
         top(vertices)
     
+    n_vertices = len(vertices)
+    
     normals_string = ""
     if SHADING == "smooth":
         normals_string = ",".join(generate_normal(n) for n in normals)
@@ -835,15 +837,19 @@ def convert_ascii(infile, morphfiles, outfile):
                 
                 morphFaces, morphVertices, morphUvs, morphNormals, morphMaterials, morphMtllib = parse_obj(normpath)
                 
-                if ALIGN == "center":
-                    center(morphVertices)
-                elif ALIGN == "bottom":
-                    bottom(morphVertices)
-                elif ALIGN == "top":
-                    top(morphVertices)
-                    
-                morphData.append((get_name(name), morphVertices ))
-                print name, len(morphVertices)
+                n_morph_vertices = len(morphVertices)
+                if n_vertices != n_morph_vertices:
+                    print "WARNING: skipping morph [%s] with different number of vertices [%d] than the original model [%d]" % (name, n_morph_vertices, n_vertices)
+                else:                    
+                    if ALIGN == "center":
+                        center(morphVertices)
+                    elif ALIGN == "bottom":
+                        bottom(morphVertices)
+                    elif ALIGN == "top":
+                        top(morphVertices)
+                        
+                    morphData.append((get_name(name), morphVertices ))
+                    print "adding [%s] with %d vertices" % (name, len(morphVertices))
     
     morphTargets = ""
     if len(morphData):
