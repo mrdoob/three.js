@@ -72,20 +72,20 @@ THREE.Matrix4.prototype = {
 		var x = THREE.Matrix4.__v1, y = THREE.Matrix4.__v2, z = THREE.Matrix4.__v3;
 
 		z.sub( eye, center ).normalize();
-		
+
 		if ( z.length() === 0 ) {
-			
+
 			z.z = 1;
 
 		}
-		
+
 		x.cross( up, z ).normalize();
 
 		if ( x.length() === 0 ) {
-			
+
 			z.x += 0.0001;
 			x.cross( up, z ).normalize();
-			
+
 		}
 
 		y.cross( z, x ).normalize();

@@ -151,6 +151,8 @@
 						voxel.position.x = Math.floor( position.x / 50 ) * 50 + 25;
 						voxel.position.y = Math.floor( position.y / 50 ) * 50 + 25;
 						voxel.position.z = Math.floor( position.z / 50 ) * 50 + 25;
+						voxel.matrixAutoUpdate = false;
+						voxel.updateMatrix();
 						voxel.overdraw = true;
 						scene.addObject( voxel );
 
