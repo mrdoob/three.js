@@ -5,77 +5,83 @@
 
 var Cylinder = function ( numSegs, topRad, botRad, height, topOffset, botOffset ) {
 
-	THREE.Geometry.call( this );
+  THREE.Geometry.call( this );
 
-	var scope = this, i, pi = Math.PI, halfHeight = height / 2;
+  var scope = this, i, pi = Math.PI, halfHeight = height / 2;
 
-	// Top circle vertices
+  // Top circle vertices
 
-	for ( i = 0; i < numSegs; i ++ ) {
+  for ( i = 0; i < numSegs; i ++ ) {
 
-		v( Math.sin( 2 * pi * i / numSegs ) * topRad, Math.cos( 2 * pi * i / numSegs ) * topRad, - halfHeight );
+    v( Math.sin( 2 * pi * i / numSegs ) * topRad, Math.cos( 2 * pi * i / numSegs ) * topRad, - halfHeight );
 
-	}
+  }
 
-	// Bottom circle vertices
+  // Bottom circle vertices
 
-	for ( i = 0; i < numSegs; i ++ ) {
+  for ( i = 0; i < numSegs; i ++ ) {
 
-		v( Math.sin( 2 * pi * i / numSegs ) * botRad, Math.cos( 2 * pi * i / numSegs ) * botRad, halfHeight );
+    v( Math.sin( 2 * pi * i / numSegs ) * botRad, Math.cos( 2 * pi * i / numSegs ) * botRad, halfHeight );
 
-	}
+  }
 
-	// Body faces
+  // Body faces
 
-	for ( i = 0; i < numSegs; i++ ) {
+  for ( i = 0; i < numSegs; i++ ) {
 
-		f4( i, i + numSegs, numSegs + ( i + 1 ) % numSegs, ( i + 1 ) % numSegs );
+    f4( i, i + numSegs, numSegs + ( i + 1 ) % numSegs, ( i + 1 ) % numSegs );
 
-	}
+  }
 
-	// Bottom circle faces
+  // Bottom circle faces
 
-	if ( botRad > 0 ) {
+  if ( botRad > 0 ) {
 
-		v( 0, 0, - halfHeight - ( botOffset || 0 ) );
+    v( 0, 0, - halfHeight - ( botOffset || 0 ) );
 
-		for ( i = numSegs; i < numSegs + ( numSegs / 2 ); i++ ) {
+    for ( i = numSegs; i < numSegs + ( numSegs / 2 ); i++ ) {
 
-			f4( 2 * numSegs, ( 2 * i - 2 * numSegs ) % numSegs, ( 2 * i - 2 * numSegs + 1 ) % numSegs, ( 2 * i - 2 * numSegs + 2 ) % numSegs );
+      f4(  2 * numSegs, 
+         ( 2 * i - 2 * numSegs     ) % numSegs, 
+         ( 2 * i - 2 * numSegs + 1 ) % numSegs, 
+         ( 2 * i - 2 * numSegs + 2 ) % numSegs );
 
-		}
+    }
 
-	}
+  }
 
-	// Top circle faces
+  // Top circle faces
 
-	if ( topRad > 0 ) {
+  if ( topRad > 0 ) {
 
-		v( 0, 0, halfHeight + ( topOffset || 0 ) );
+    v( 0, 0, halfHeight + ( topOffset || 0 ) );
 
-		for ( i = numSegs + ( numSegs / 2 ); i < 2 * numSegs; i ++ ) {
+    for ( i = numSegs + ( numSegs / 2 ); i < 2 * numSegs; i ++ ) {
 
-			f4( ( 2 * i - 2 * numSegs + 2 ) % numSegs + numSegs, ( 2 * i - 2 * numSegs + 1 ) % numSegs + numSegs, ( 2 * i - 2 * numSegs ) % numSegs+numSegs, 2 * numSegs + 1 );
+      f4(  2 * numSegs + 1,
+         ( 2 * i - 2 * numSegs + 2 ) % numSegs + numSegs, 
+         ( 2 * i - 2 * numSegs + 1 ) % numSegs + numSegs, 
+         ( 2 * i - 2 * numSegs     ) % numSegs + numSegs );
 
-		}
+    }
 
-	}
+  }
 
-	this.computeCentroids();
-	this.computeFaceNormals();
-	// this.computeVertexNormals();
+  this.computeCentroids();
+  this.computeFaceNormals();
+  //this.computeVertexNormals();
 
-	function v( x, y, z ) {
+  function v( x, y, z ) {
 
-		scope.vertices.push( new THREE.Vertex( new THREE.Vector3( x, y, z ) ) );
+    scope.vertices.push( new THREE.Vertex( new THREE.Vector3( x, y, z ) ) );
 
-	}
+  }
 
-	function f4( a, b, c, d ) {
+  function f4( a, b, c, d ) {
 
-		scope.faces.push( new THREE.Face4( a, b, c, d ) );
+    scope.faces.push( new THREE.Face4( a, b, c, d ) );
 
-	}
+  }
 
 };
 
