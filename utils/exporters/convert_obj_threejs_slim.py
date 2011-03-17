@@ -1228,7 +1228,7 @@ if __name__ == "__main__":
             outfile = a
 
         elif o in ("-a", "--align"):
-            if a in ("top", "bottom", "center"):
+            if a in ("top", "bottom", "center","none"):
                 ALIGN = a
 
         elif o in ("-s", "--shading"):
