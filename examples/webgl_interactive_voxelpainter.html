@@ -189,7 +189,8 @@
 
 						var voxel = new THREE.Mesh( cubeGeo, cubeMaterial );
 						voxel.position.copy( voxelPosition );
-
+						voxel.matrixAutoUpdate = false;
+						voxel.updateMatrix();
 						scene.addObject( voxel );
 
 					}
