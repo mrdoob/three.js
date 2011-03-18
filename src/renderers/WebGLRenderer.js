@@ -2142,8 +2142,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var i, program, opaque, transparent, material,
 			o, ol, oil, webglObject, object, buffer,
 			lights = scene.lights,
-			fog = scene.fog,
-			ol;
+			fog = scene.fog;
 
 		camera.matrixAutoUpdate && camera.updateMatrix();
 
