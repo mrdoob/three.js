@@ -88,50 +88,50 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.context = _gl;
 
-	//alert( dumpObject( getGLParams() ) );
+	// alert( dumpObject( getGLParams() ) );
 
 	this.setSize = function ( width, height ) {
 
 		_canvas.width = width;
 		_canvas.height = height;
-		
+
 		this.setViewport( 0, 0, _canvas.width, _canvas.height );
 
 	};
 
 	this.setViewport = function ( x, y, width, height ) {
-		
+
 		_viewportX = x;
 		_viewportY = y;
-		
+
 		_viewportWidth = width;
 		_viewportHeight = height;
-		
+
 		_gl.viewport( _viewportX, _viewportY, _viewportWidth, _viewportHeight );
-		
+
 	};
-	
+
 	this.setScissor = function ( x, y, width, height ) {
 
 		_gl.scissor( x, y, width, height );
-		
+
 	};
-	
+
 	this.enableScissorTest = function ( enable ) {
-		
+
 		if ( enable )
 			_gl.enable( _gl.SCISSOR_TEST );
 		else
 			_gl.disable( _gl.SCISSOR_TEST );
-		
+
 	};
-	
+
 	this.enableDepthBufferWrite = function ( enable ) {
-		
+
 		_gl.depthMask( enable );
 
 	};
-	
+
 	this.setClearColorHex = function ( hex, alpha ) {
 
 		var color = new THREE.Color( hex );
@@ -2873,11 +2873,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( !_gl.getProgramParameter( program, _gl.LINK_STATUS ) ) {
 
-			alert( "Could not initialise shaders\n"+
-					"VALIDATE_STATUS: " + _gl.getProgramParameter( program, _gl.VALIDATE_STATUS ) + ", gl error [" + _gl.getError() + "]" );
-
-			//console.log( prefix_fragment + fragmentShader );
-			//console.log( prefix_vertex + vertexShader );
+			console.error( "Could not initialise shader\n" + "VALIDATE_STATUS: " + _gl.getProgramParameter( program, _gl.VALIDATE_STATUS ) + ", gl error [" + _gl.getError() + "]" );
 
 		}
 
@@ -3238,7 +3234,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( !_gl.getShaderParameter( shader, _gl.COMPILE_STATUS ) ) {
 
-			alert( _gl.getShaderInfoLog( shader ) );
+			console.error( _gl.getShaderInfoLog( shader ) );
 			return null;
 
 		}
@@ -3248,9 +3244,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 	};
 
 	// fallback filters for non-power-of-2 textures
-	
+
 	function filterFallback ( f ) {
-		
+
 		switch ( f ) {
 
 			case THREE.NearestFilter:
