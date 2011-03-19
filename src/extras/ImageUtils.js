@@ -4,14 +4,14 @@ var ImageUtils = {
 
 		var image = new Image(),
 			texture = new THREE.Texture( image, mapping );
-		
+
 		image.onload = function () { texture.needsUpdate = true; if( callback ) callback( this ); };
 		image.src = path;
 
 		return texture;
 
 	},
-	
+
 	loadTextureCube: function ( array, mapping, callback ) {
 
 		var i, l, 
@@ -24,11 +24,11 @@ var ImageUtils = {
 
 			images[ i ] = new Image();
 			images[ i ].onload = function () {
-				
+
 					images.loadCount += 1; 
 					if( images.loadCount == 6 ) texture.needsUpdate = true; 
 					if( callback ) callback( this ); 
-				
+
 				};
 
 			images[ i ].src = array[ i ];
