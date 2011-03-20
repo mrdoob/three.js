@@ -10,10 +10,13 @@ THREE.Geometry = function () {
 	this.id = "Geometry" + THREE.GeometryIdCounter ++;
 
 	this.vertices = [];
+	this.colors = []; // one-to-one vertex colors, used in ParticleSystem, Line and Ribbon
+	
 	this.faces = [];
-	this.uvs = [];
-	this.uvs2 = [];
-	this.colors = [];
+	
+	this.faceUvs = [];
+	this.faceVertexUvs = [];
+	
 	this.morphTargets = [];
 
 	this.skinWeights = [];
@@ -277,7 +280,7 @@ THREE.Geometry.prototype = {
 		for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
 
 			face = this.faces[ f ];
-			uv = this.uvs[ f ];
+			uv = this.faceVertexUvs[ f ][ 0 ]; // use UV layer 0 for tangents
 
 			if ( face instanceof THREE.Face3 ) {
 

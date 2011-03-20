@@ -321,8 +321,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function initMeshBuffers ( geometryGroup, object ) {
 
-		var f, fl, nvertices = 0, ntris = 0, nlines = 0,
-			obj_faces = object.geometry.faces,
+		var f, fl, 
+		
+			nvertices = 0, ntris = 0, nlines = 0,
+			
+			uvType,
+			vertexColorType,
+			normalType,
+			materials,
+		
+			geometry = object.geometry,
+			obj_faces = geometry.faces,
 			chunk_faces = geometryGroup.faces;
 
 		for ( f = 0, fl = chunk_faces.length; f < fl; f++ ) {
@@ -345,28 +354,60 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 		}
+		
+		materials = unrollGroupMaterials( geometryGroup, object );
+		
+		uvType = bufferGuessUVType( materials, geometryGroup, object );
+		vertexColorType = bufferGuessVertexColorType( materials, geometryGroup, object );
+		normalType = bufferGuessNormalType( materials, geometryGroup, object );
 
-		// TODO: only create arrays for attributes existing in the object
+		geometryGroup.__vertexArray = new Float32Array( nvertices * 3 );
+		
+		if ( normalType ) {
 
-		geometryGroup.__vertexArray  = new Float32Array( nvertices * 3 );
-		geometryGroup.__normalArray  = new Float32Array( nvertices * 3 );
-		geometryGroup.__tangentArray = new Float32Array( nvertices * 4 );
-		geometryGroup.__colorArray = new Float32Array( nvertices * 3 );
-		geometryGroup.__uvArray = new Float32Array( nvertices * 2 );
-		geometryGroup.__uv2Array = new Float32Array( nvertices * 2 );
+			geometryGroup.__normalArray = new Float32Array( nvertices * 3 );
 
-		geometryGroup.__skinVertexAArray = new Float32Array( nvertices * 4 );
-		geometryGroup.__skinVertexBArray = new Float32Array( nvertices * 4 );
-		geometryGroup.__skinIndexArray = new Float32Array( nvertices * 4 );
-		geometryGroup.__skinWeightArray = new Float32Array( nvertices * 4 );
+		}
+		
+		if ( geometry.hasTangents ) {
+		
+			geometryGroup.__tangentArray = new Float32Array( nvertices * 4 );
+
+		}
+		
+		if ( vertexColorType ) {
+		
+			geometryGroup.__colorArray = new Float32Array( nvertices * 3 );
+
+		}
+
+		if ( uvType ) {
+		
+			if ( geometry.faceUvs.length > 0 || geometry.faceVertexUvs.length > 0 ) {
+			
+				geometryGroup.__uvArray = new Float32Array( nvertices * 2 );
+
+			}
+
+			if ( geometry.faceUvs.length > 1 || geometry.faceVertexUvs.length > 1 ) {
+			
+				geometryGroup.__uv2Array = new Float32Array( nvertices * 2 );
+
+			}
+
+		}
+
+		if ( object.geometry.skinWeights.length && object.geometry.skinIndices.length ) {
+
+			geometryGroup.__skinVertexAArray = new Float32Array( nvertices * 4 );
+			geometryGroup.__skinVertexBArray = new Float32Array( nvertices * 4 );
+			geometryGroup.__skinIndexArray = new Float32Array( nvertices * 4 );
+			geometryGroup.__skinWeightArray = new Float32Array( nvertices * 4 );
+
+		}
 
 		geometryGroup.__faceArray = new Uint16Array( ntris * 3 );
 		geometryGroup.__lineArray = new Uint16Array( nlines * 2 );
-
-		geometryGroup.__needsSmoothNormals = bufferNeedsSmoothNormals ( geometryGroup, object );
-
-		geometryGroup.__webGLFaceCount = ntris * 3;
-		geometryGroup.__webGLLineCount = nlines * 2;
 
 		if( geometryGroup.numMorphTargets ) {
 			
@@ -379,12 +420,23 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 		}
+		
+		geometryGroup.__needsSmoothNormals = ( normalType == THREE.SmoothShading );
+		
+		geometryGroup.__uvType = uvType;
+		geometryGroup.__vertexColorType = vertexColorType;
+		geometryGroup.__normalType = normalType;
+
+		geometryGroup.__webGLFaceCount = ntris * 3;
+		geometryGroup.__webGLLineCount = nlines * 2;		
 
 	};
 
 	function setMeshBuffers ( geometryGroup, object, hint ) {
 
-		var f, fl, fi, face, vertexNormals, faceNormal, normal,
+		var f, fl, fi, face, 
+			vertexNormals, faceNormal, normal,
+			vertexColors, faceColor,
 			uv, uv2, v1, v2, v3, v4, t1, t2, t3, t4,
 			c1, c2, c3, c4,
 			sw1, sw2, sw3, sw4,
@@ -426,6 +478,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		lineArray = geometryGroup.__lineArray,
 
 		needsSmoothNormals = geometryGroup.__needsSmoothNormals,
+		
+		vertexColorType = geometryGroup.__vertexColorType,
 
 		geometry = object.geometry, // this is shared for all chunks
 
@@ -440,8 +494,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 		vertices = geometry.vertices,
 		chunk_faces = geometryGroup.faces,
 		obj_faces = geometry.faces,
-		obj_uvs = geometry.uvs,
-		obj_uvs2 = geometry.uvs2,
+		
+		obj_uvs  = geometry.faceVertexUvs[ 0 ],
+		obj_uvs2 = geometry.faceVertexUvs[ 1 ],
+		
 		obj_colors = geometry.colors,
 
 		obj_skinVerticesA = geometry.skinVerticesA,
@@ -461,6 +517,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			vertexNormals = face.vertexNormals;
 			faceNormal = face.normal;
+			
+			vertexColors = face.vertexColors;
+			faceColor = face.color;
 
 			if ( face instanceof THREE.Face3 ) {
 
@@ -603,11 +662,21 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				if ( dirtyColors && obj_colors.length ) {
+				if ( dirtyColors && vertexColorType ) {
 
-					c1 = obj_colors[ face.a ];
-					c2 = obj_colors[ face.b ];
-					c3 = obj_colors[ face.c ];
+					if ( vertexColors.length == 3 && vertexColorType == THREE.VertexColors ) {
+
+						c1 = vertexColors[ 0 ];
+						c2 = vertexColors[ 1 ];
+						c3 = vertexColors[ 2 ];
+
+					} else {
+						
+						c1 = faceColor;
+						c2 = faceColor;
+						c3 = faceColor;
+
+					}
 
 					colorArray[ offset_color ]     = c1.r;
 					colorArray[ offset_color + 1 ] = c1.g;
@@ -911,12 +980,23 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				if ( dirtyColors && obj_colors.length ) {
+				if ( dirtyColors && vertexColorType ) {
 
-					c1 = obj_colors[ face.a ];
-					c2 = obj_colors[ face.b ];
-					c3 = obj_colors[ face.c ];
-					c4 = obj_colors[ face.d ];
+					if ( vertexColors.length == 4 && vertexColorType == THREE.VertexColors ) {
+
+						c1 = vertexColors[ 0 ];
+						c2 = vertexColors[ 1 ];
+						c3 = vertexColors[ 2 ];
+						c4 = vertexColors[ 3 ];
+
+					} else {
+						
+						c1 = faceColor;
+						c2 = faceColor;
+						c3 = faceColor;
+						c4 = faceColor;
+
+					}
 
 					colorArray[ offset_color ]     = c1.r;
 					colorArray[ offset_color + 1 ] = c1.g;
@@ -3349,6 +3429,120 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	function unrollGroupMaterials( geometryGroup, object ) {
+		
+		var m, ml, i, il,
+			material, meshMaterial,
+			materials = [];
+		
+		for ( m = 0, ml = object.materials.length; m < ml; m++ ) {
+
+			meshMaterial = object.materials[ m ];
+
+			if ( meshMaterial instanceof THREE.MeshFaceMaterial ) {
+
+				for ( i = 0, l = geometryGroup.materials.length; i < l; i++ ) {
+
+					material = geometryGroup.materials[ i ];
+
+					if ( material ) {
+						
+						materials.push( material );
+
+					}
+
+				}
+
+			} else {
+
+				material = meshMaterial;
+
+				if ( material ) {
+
+					materials.push( material );
+
+				}
+
+			}
+
+		}
+		
+		return materials;
+
+	};
+	
+	function bufferGuessVertexColorType ( materials, geometryGroup, object ) {
+		
+		var i, m, ml = materials.length;
+			
+		// use vertexColor type from the first material in unrolled materials
+		
+		for ( i = 0; i < ml; i++ ) {
+			
+			m = materials[ i ];
+			
+			if ( m.vertexColors ) {
+				
+				return m.vertexColors;
+
+			}
+			
+		}
+		
+		return false;
+		
+	};
+
+	function bufferGuessNormalType ( materials, geometryGroup, object ) {
+		
+		var i, m, ml = materials.length;
+			
+		// only MeshBasicMaterial and MeshDepthMaterial don't need normals
+		
+		for ( i = 0; i < ml; i++ ) {
+			
+			m = materials[ i ];
+			
+			if ( m instanceof THREE.MeshBasicMaterial || m instanceof MeshDepthMaterial ) continue;
+			
+			if ( materialNeedsSmoothNormals( m ) ) {
+				
+				return THREE.SmoothShading;
+
+			} else {
+
+				return THREE.FlatShading;
+
+			}
+
+		}
+		
+		return false;
+		
+	};
+
+	function bufferGuessUVType ( materials, geometryGroup, object ) {
+		
+		var i, m, ml = materials.length;
+			
+		// material must use some texture to require uvs
+		
+		for ( i = 0; i < ml; i++ ) {
+			
+			m = materials[ i ];
+			
+			if ( m.map || m.lightMap ) {
+				
+				return true;
+				
+			}
+			
+		}
+		
+		return false;
+		
+	};
+	
 	function allocateBones ( object ) {
 		
 		// default for when object is not specified
