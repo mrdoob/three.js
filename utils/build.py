@@ -93,6 +93,8 @@ EXTRAS_FILES = [
 'extras/geometries/Torus.js',
 'extras/geometries/TorusKnot.js',
 'extras/io/Loader.js',
+'extras/io/JSONLoader.js',
+'extras/io/BinaryLoader.js',
 'extras/objects/MarchingCubes.js'
 ]
 

@@ -2,7 +2,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Loader = function () {
+THREE.Loader = function ( showStatus ) {
 
 	this.showStatus = showStatus;	
 	this.statusDomElement = showStatus ? this.addStatusElement() : null;
