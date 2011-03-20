@@ -425,7 +425,7 @@ THREE.Projector = function() {
 
 		var particle = _particlePool[ _particleCount ] = _particlePool[ _particleCount ] || new THREE.RenderableParticle();
 		_particleCount ++;
-		return partile;
+		return particle;
 
 	}
 
