@@ -49,7 +49,21 @@
 
 				scene = new THREE.Scene();
 
-				var material = new THREE.ParticleCircleMaterial( { color: 0xffffff, opacity: 1 } );
+				var PI2 = Math.PI * 2;
+				var material = new THREE.ParticleCanvasMaterial( {
+
+							color: 0xffffff,
+							program: function ( context, color ) {
+
+								context.fillStyle = color.__styleString;
+								context.beginPath();
+								context.arc( 0, 0, 1, 0, PI2, true );
+								context.closePath();
+								context.fill();
+
+							}
+
+				} );
 
 				for ( var ix = 0; ix < AMOUNTX; ix++ ) {
 
