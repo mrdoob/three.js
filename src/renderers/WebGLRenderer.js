@@ -3503,7 +3503,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			
 			m = materials[ i ];
 			
-			if ( m instanceof THREE.MeshBasicMaterial || m instanceof MeshDepthMaterial ) continue;
+			if ( m instanceof THREE.MeshBasicMaterial || m instanceof THREE.MeshDepthMaterial ) continue;
 			
 			if ( materialNeedsSmoothNormals( m ) ) {
 				
