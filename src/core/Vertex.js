@@ -2,9 +2,11 @@
  * @author mr.doob / http://mrdoob.com/
  */
 
-THREE.Vertex = function ( position, normal ) {
+THREE.Vertex = function ( position /*, normal*/ ) {
 
 	this.position = position || new THREE.Vector3();
+
+	/*
 	this.positionWorld = new THREE.Vector3();
 	this.positionScreen = new THREE.Vector4();
 
@@ -15,5 +17,6 @@ THREE.Vertex = function ( position, normal ) {
 	this.tangent = new THREE.Vector4();
 
 	this.__visible = true;
+	*/
 
 };

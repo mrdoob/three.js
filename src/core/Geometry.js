@@ -11,12 +11,12 @@ THREE.Geometry = function () {
 
 	this.vertices = [];
 	this.colors = []; // one-to-one vertex colors, used in ParticleSystem, Line and Ribbon
-	
+
 	this.faces = [];
-	
+
 	this.faceUvs = [];
 	this.faceVertexUvs = [];
-	
+
 	this.morphTargets = [];
 
 	this.skinWeights = [];
@@ -66,12 +66,14 @@ THREE.Geometry.prototype = {
 		var n, nl, v, vl, vertex, f, fl, face, vA, vB, vC,
 		cb = new THREE.Vector3(), ab = new THREE.Vector3();
 
+		/*
 		for ( v = 0, vl = this.vertices.length; v < vl; v ++ ) {
 
 			vertex = this.vertices[ v ];
 			vertex.normal.set( 0, 0, 0 );
 
 		}
+		*/
 
 		for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
 

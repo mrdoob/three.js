@@ -1,0 +1,19 @@
+/**
+ * @author mr.doob / http://mrdoob.com/
+ */
+
+THREE.RenderableVertex = function () {
+
+	this.positionWorld = new THREE.Vector3();
+	this.positionScreen = new THREE.Vector4();
+
+	this.visible = true;
+
+};
+
+THREE.RenderableVertex.prototype.copy = function ( vertex ) {
+
+	this.positionWorld.copy( vertex.positionWorld );
+	this.positionScreen.copy( vertex.positionScreen );
+
+}
