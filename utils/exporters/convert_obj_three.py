@@ -1,10 +1,10 @@
-"""Convert Wavefront OBJ / MTL files into Three.js (slim models version, to be used with web worker based ascii / binary loader)
+"""Convert Wavefront OBJ / MTL files into Three.js (JSON model version, to be used with web worker based ascii / binary loader)
 
 -------------------------
 How to use this converter
 -------------------------
 
-python convert_obj_threejs_slim.py -i infile.obj -o outfile.js [-m morphfiles*.obj] [-a center|top|bottom] [-s smooth|flat] [-t ascii|binary] [-d invert|normal]
+python convert_obj_three.py -i infile.obj -o outfile.js [-m morphfiles*.obj] [-a center|top|bottom] [-s smooth|flat] [-t ascii|binary] [-d invert|normal]
 
 Notes: 
 
@@ -32,7 +32,7 @@ How to use generated JS file in your HTML document
         var loader = new THREE.Loader();
         
         // load ascii model
-        loader.loadAscii( "Model_slim.js", function( geometry ) { createScene( geometry) }, path_to_textures );
+        loader.loadAscii( "Model_ascii.js", function( geometry ) { createScene( geometry) }, path_to_textures );
 
         // load binary model
         loader.loadBinary( "Model_bin.js", function( geometry ) { createScene( geometry) }, path_to_textures );
@@ -147,32 +147,28 @@ TEMPLATE_FILE_ASCII = u"""\
 // Converted from: %(fname)s
 //  vertices: %(nvertex)d
 //  faces: %(nface)d 
+//  normals: %(nnormal)d 
+//  uvs: %(nuv)d 
 //  materials: %(nmaterial)d
 //
 //  Generated with OBJ -> Three.js converter
-//  http://github.com/alteredq/three.js/blob/master/utils/exporters/convert_obj_threejs_slim.py
+//  http://github.com/alteredq/three.js/blob/master/utils/exporters/convert_obj_three.py
 
 
 var model = {
+    'version' : 2,
+    
     'materials': [%(materials)s],
-
-    'normals': [%(normals)s],
 
     'vertices': [%(vertices)s],
 
     'morphTargets': [%(morphTargets)s],
-    
+
+    'normals': [%(normals)s],
+
     'uvs': [%(uvs)s],
 
-    'triangles': [%(triangles)s],
-    'trianglesUvs': [%(trianglesUvs)s],
-    'trianglesNormals': [%(trianglesNormals)s],
-    'trianglesNormalsUvs': [%(trianglesNormalsUvs)s],
-
-    'quads': [%(quads)s],
-    'quadsUvs': [%(quadsUvs)s],
-    'quadsNormals': [%(quadsNormals)s],
-    'quadsNormalsUvs': [%(quadsNormalsUvs)s],
+    'faces': [%(faces)s],
 
     'end': (new Date).getTime()
     }
@@ -187,10 +183,12 @@ TEMPLATE_FILE_BIN = u"""\
 //  materials: %(nmaterial)d
 //
 //  Generated with OBJ -> Three.js converter
-//  http://github.com/alteredq/three.js/blob/master/utils/exporters/convert_obj_threejs_slim.py
+//  http://github.com/alteredq/three.js/blob/master/utils/exporters/convert_obj_three.py
 
 
 var model = {
+    'version' : 1,
+
     'materials': [%(materials)s],
 
     'buffers': '%(buffers)s',
@@ -202,21 +200,6 @@ postMessage( model );
 """
 
 TEMPLATE_VERTEX = "%f,%f,%f"
-
-TEMPLATE_UV_TRI = "%f,%f,%f,%f,%f,%f"
-TEMPLATE_UV_QUAD = "%f,%f,%f,%f,%f,%f,%f,%f"
-
-TEMPLATE_TRI = "%d,%d,%d,%d"
-TEMPLATE_QUAD = "%d,%d,%d,%d,%d"
-
-TEMPLATE_TRI_UV = "%d,%d,%d,%d,%d,%d,%d"
-TEMPLATE_QUAD_UV = "%d,%d,%d,%d,%d,%d,%d,%d,%d"
-
-TEMPLATE_TRI_N = "%d,%d,%d,%d,%d,%d,%d"
-TEMPLATE_QUAD_N = "%d,%d,%d,%d,%d,%d,%d,%d,%d"
-
-TEMPLATE_TRI_N_UV = "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d"
-TEMPLATE_QUAD_N_UV = "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d"
 
 TEMPLATE_N = "%f,%f,%f"
 TEMPLATE_UV = "%f,%f"
@@ -571,64 +554,78 @@ def parse_obj(fname):
 # #####################################################
 # Generator
 # #####################################################
+def setBit(value, position, on):
+    if on:
+        mask = 1 << position
+        return (value | mask)
+    else:
+        mask = ~(1 << position)
+        return (value & mask)
+    
 def generate_vertex(v):
     return TEMPLATE_VERTEX % (v[0], v[1], v[2])
     
-def generate_triangle(f):
-    v = f['vertex']
-    return TEMPLATE_TRI % (v[0]-1, v[1]-1, v[2]-1, 
-                           f['material'])
+def generate_face(f):
+    isTriangle = ( len(f['vertex']) == 3 )
+    
+    if isTriangle:
+        nVertices = 3
+    else:
+        nVertices = 4
+        
+    hasMaterial = True # for the moment OBJs without materials get default material
+    
+    hasFaceUvs = False # not supported in OBJ
+    hasFaceVertexUvs = ( len(f['uv']) == nVertices )
 
-def generate_triangle_uv(f):
-    v = f['vertex']
-    uv = f['uv']
-    return TEMPLATE_TRI_UV % (v[0]-1, v[1]-1, v[2]-1, 
-                              f['material'], 
-                              uv[0]-1, uv[1]-1, uv[2]-1)
+    hasFaceNormals = False # don't export any face normals (as they are computed in engine)
+    hasFaceVertexNormals = ( len(f["normal"]) == nVertices and SHADING == "smooth" )
+    
+    hasFaceColors = False       # not supported in OBJ
+    hasFaceVertexColors = False # not supported in OBJ
 
-def generate_triangle_n(f):
-    v = f['vertex']
-    n = f['normal']
-    return TEMPLATE_TRI_N % (v[0]-1, v[1]-1, v[2]-1, 
-                             f['material'], 
-                             n[0]-1, n[1]-1, n[2]-1)
+    faceType = 0
+    faceType = setBit(faceType, 0, not isTriangle)
+    faceType = setBit(faceType, 1, hasMaterial)
+    faceType = setBit(faceType, 2, hasFaceUvs)
+    faceType = setBit(faceType, 3, hasFaceVertexUvs)
+    faceType = setBit(faceType, 4, hasFaceNormals)
+    faceType = setBit(faceType, 5, hasFaceVertexNormals)
+    faceType = setBit(faceType, 6, hasFaceColors)
+    faceType = setBit(faceType, 7, hasFaceVertexColors)    
+    
+    faceData = []
+    
+    # order is important, must match order in JSONLoader
+    
+    # face type
+    # vertex indices
+    # material index
+    # face uvs index
+    # face vertex uvs indices
+    # face color index
+    # face vertex colors indices
+    
+    faceData.append(faceType)    
+    
+    # must clamp in case on polygons bigger than quads
+    for i in xrange(nVertices):
+        index = f['vertex'][i] - 1
+        faceData.append(index)
+    
+    faceData.append( f['material'] )
 
-def generate_triangle_n_uv(f):
-    v = f['vertex']
-    n = f['normal']
-    uv = f['uv']
-    return TEMPLATE_TRI_N_UV % (v[0]-1, v[1]-1, v[2]-1, 
-                                f['material'], 
-                                n[0]-1, n[1]-1, n[2]-1, 
-                                uv[0]-1, uv[1]-1, uv[2]-1)
+    if hasFaceVertexUvs:
+        for i in xrange(nVertices):
+            index = f['uv'][i] - 1
+            faceData.append(index)
 
-def generate_quad(f):
-    vi = f['vertex']
-    return TEMPLATE_QUAD % (vi[0]-1, vi[1]-1, vi[2]-1, vi[3]-1, 
-                            f['material'])
+    if hasFaceVertexNormals:
+        for i in xrange(nVertices):
+            index = f['normal'][i] - 1
+            faceData.append(index)
 
-def generate_quad_uv(f):
-    v = f['vertex']
-    uv = f['uv']
-    return TEMPLATE_QUAD_UV % (v[0]-1, v[1]-1, v[2]-1, v[3]-1, 
-                               f['material'], 
-                               uv[0]-1, uv[1]-1, uv[2]-1, uv[3]-1)
-
-def generate_quad_n(f):
-    v = f['vertex']
-    n = f['normal']
-    return TEMPLATE_QUAD_N % (v[0]-1, v[1]-1, v[2]-1, v[3]-1, 
-                              f['material'],
-                              n[0]-1, n[1]-1, n[2]-1, n[3]-1)
-
-def generate_quad_n_uv(f):
-    v = f['vertex']
-    n = f['normal']
-    uv = f['uv']
-    return TEMPLATE_QUAD_N_UV % (v[0]-1, v[1]-1, v[2]-1, v[3]-1, 
-                                 f['material'],
-                                 n[0]-1, n[1]-1, n[2]-1, n[3]-1,
-                                 uv[0]-1, uv[1]-1, uv[2]-1, uv[3]-1)
+    return ",".join( map(str, faceData) )
 
 def generate_normal(n):
     return TEMPLATE_N % (n[0], n[1], n[2])
@@ -819,11 +816,11 @@ def convert_ascii(infile, morphfiles, outfile):
     
     n_vertices = len(vertices)
     
+    nnormal = 0
     normals_string = ""
     if SHADING == "smooth":
         normals_string = ",".join(generate_normal(n) for n in normals)
-        
-    sfaces = sort_faces(faces)
+        nnormal = len(normals)
     
     skipOriginalMorph = False
     norminfile = os.path.normpath(infile)
@@ -860,6 +857,8 @@ def convert_ascii(infile, morphfiles, outfile):
     "fname"     : infile,
     "nvertex"   : len(vertices),
     "nface"     : len(faces),
+    "nuv"       : len(uvs),
+    "nnormal"   : nnormal,
     "nmaterial" : len(materials),
 
     "materials" : generate_materials_string(materials, mtllib),
@@ -870,14 +869,7 @@ def convert_ascii(infile, morphfiles, outfile):
     
     "morphTargets"  : morphTargets,
     
-    "triangles"     : ",".join(generate_triangle(f) for f in sfaces['triangles_flat']),
-    "trianglesUvs"  : ",".join(generate_triangle_uv(f) for f in sfaces['triangles_flat_uv']),
-    "trianglesNormals"   : ",".join(generate_triangle_n(f) for f in sfaces['triangles_smooth']),
-    "trianglesNormalsUvs": ",".join(generate_triangle_n_uv(f) for f in sfaces['triangles_smooth_uv']),
-    "quads"         : ",".join(generate_quad(f) for f in sfaces['quads_flat']),
-    "quadsUvs"      : ",".join(generate_quad_uv(f) for f in sfaces['quads_flat_uv']),
-    "quadsNormals"       : ",".join(generate_quad_n(f) for f in sfaces['quads_smooth']),
-    "quadsNormalsUvs"    : ",".join(generate_quad_n_uv(f) for f in sfaces['quads_smooth_uv'])
+    "faces"     : ",".join(generate_face(f) for f in faces)
     }
     
     out = open(outfile, "w")
