@@ -6,8 +6,6 @@
 var Sphere = function ( radius, segmentsWidth, segmentsHeight ) {
 
 	THREE.Geometry.call( this );
-
-	this.faceVertexUvs[ 0 ] = [];
 	
 	var gridX = segmentsWidth || 8,
 	gridY = segmentsHeight || 6;
