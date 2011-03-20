@@ -23,8 +23,6 @@ THREE.JSONLoader.prototype = {
 	//		- texture_path (optional: if not specified, textures will be assumed to be in the same folder as JS model file)
 
 	load: function ( parameters ) {
-
-		console.log( parameters );
 		
 		var url = parameters.model,
 			callback = parameters.callback, 
@@ -34,8 +32,6 @@ THREE.JSONLoader.prototype = {
 			worker = new Worker( url );
 		
 		worker.onmessage = function( event ) {
-			
-			console.log( event.data );
 			
 			THREE.JSONLoader.prototype.createModel( event.data, callback, texture_path );
 
@@ -54,7 +50,7 @@ THREE.JSONLoader.prototype = {
 			THREE.Geometry.call( this );
 
 			THREE.Loader.prototype.init_materials( scope, json.materials, texture_path );
-
+			
 			parse();
 			init_skin();
 
@@ -78,9 +74,10 @@ THREE.JSONLoader.prototype = {
 				
 				var i, j, 
 				
-				type, offset,
+				offset, zLength,
 
-				isTriangle, 
+				type,
+				isQuad, 
 				hasMaterial, 
 				hasFaceUv, hasFaceVertexUv,
 				hasFaceNormal, hasFaceVertexNormal,
@@ -92,8 +89,16 @@ THREE.JSONLoader.prototype = {
 				vertices = json.vertices,
 				normals = json.normals,
 
-				nUvLayers = json.uvs.length;
+				nUvLayers = 0;
+				
+				// discard empty arrays
+				
+				for ( i = 0; i < json.uvs.length; i++ ) {
+					
+					if ( json.uvs[ i ].length ) nUvLayers ++;
 
+				}
+				
 				for ( i = 0; i < nUvLayers; i++ ) {
 
 					scope.faceUvs[ i ] = [];
@@ -102,8 +107,9 @@ THREE.JSONLoader.prototype = {
 				}
 
 				offset = 0;
-
-				while ( vertices[ offset ] ) {
+				zLength = vertices.length;
+				
+				while ( offset < zLength ) {
 
 					vertex = new THREE.Vertex();
 					
@@ -114,14 +120,15 @@ THREE.JSONLoader.prototype = {
 					scope.vertices.push( vertex );
 
 				}
-
+				
 				offset = 0;
+				zLength = faces.length;
 
-				while ( faces[ offset ] ) {
+				while ( offset < zLength ) {
 
-					type = faces[ offset ];
+					type = faces[ offset ++ ];
 
-					isTriangle          = isBitSet( type, 0 );
+					isQuad          	= isBitSet( type, 0 );
 					hasMaterial         = isBitSet( type, 1 );
 					hasFaceUv           = isBitSet( type, 2 );
 					hasFaceVertexUv     = isBitSet( type, 3 );
@@ -130,18 +137,9 @@ THREE.JSONLoader.prototype = {
 					hasFaceColor	    = isBitSet( type, 6 );
 					hasFaceVertexColor  = isBitSet( type, 7 );
 
+					//console.log("type", type, "bits", isQuad, hasMaterial, hasFaceUv, hasFaceVertexUv, hasFaceNormal, hasFaceVertexNormal, hasFaceColor, hasFaceVertexColor);
 
-					if ( isTriangle ) {
-
-						face = new THREE.Face3();
-					
-						face.a = faces[ offset ++ ];
-						face.b = faces[ offset ++ ];
-						face.c = faces[ offset ++ ];
-
-						nVertices = 3;
-
-					} else {
+					if ( isQuad ) {
 
 						face = new THREE.Face4();
 						
@@ -152,12 +150,22 @@ THREE.JSONLoader.prototype = {
 
 						nVertices = 4;
 
-					}
+					} else {
 
+						face = new THREE.Face3();
+					
+						face.a = faces[ offset ++ ];
+						face.b = faces[ offset ++ ];
+						face.c = faces[ offset ++ ];
+
+						nVertices = 3;
+
+					}
+					
 					if ( hasMaterial ) {
 
 						materialIndex = faces[ offset ++ ];
-						face.materials = [ scope.materials[ materialIndex ] ];
+						face.materials = scope.materials[ materialIndex ];
 
 					}
 

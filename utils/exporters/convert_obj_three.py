@@ -167,7 +167,7 @@ var model = {
 
     'normals': [%(normals)s],
 
-    'uvs': [%(uvs)s],
+    'uvs': [[%(uvs)s]],
 
     'faces': [%(faces)s],
 
