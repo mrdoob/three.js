@@ -512,8 +512,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			fi = chunk_faces[ f ];
 			face = obj_faces[ fi ];
-			uv = obj_uvs[ fi ];
-			uv2 = obj_uvs2[ fi ];
+			
+			if( obj_uvs ) {
+
+				uv = obj_uvs[ fi ];
+
+			}
+			
+			if( obj_uvs2 ) {
+				
+				uv2 = obj_uvs2[ fi ];
+
+			}
 
 			vertexNormals = face.vertexNormals;
 			faceNormal = face.normal;
@@ -751,7 +761,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				if ( dirtyUvs && uv ) {
+				if ( dirtyUvs && uv !== undefined ) {
 
 					for ( i = 0; i < 3; i ++ ) {
 
@@ -766,7 +776,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				if ( dirtyUvs && uv2 ) {
+				if ( dirtyUvs && uv2 !== undefined ) {
 
 					for ( i = 0; i < 3; i ++ ) {
 
@@ -1081,7 +1091,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				if ( dirtyUvs && uv ) {
+				if ( dirtyUvs && uv !== undefined ) {
 
 					for ( i = 0; i < 4; i ++ ) {
 
@@ -1096,7 +1106,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				if ( dirtyUvs && uv2 ) {
+				if ( dirtyUvs && uv2 !== undefined ) {
 
 					for ( i = 0; i < 4; i ++ ) {
 

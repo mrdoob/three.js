@@ -31,6 +31,8 @@ var Plane = function ( width, height, segmentsWidth, segmentsHeight ) {
 
 	}
 
+	this.faceVertexUvs[ 0 ] = [];
+	
 	for( iy = 0; iy < gridY; iy++ ) {
 
 		for( ix = 0; ix < gridX; ix++ ) {
@@ -41,7 +43,7 @@ var Plane = function ( width, height, segmentsWidth, segmentsHeight ) {
 			var d = ( ix + 1 ) + gridX1 * iy;
 
 			this.faces.push( new THREE.Face4( a, b, c, d ) );
-			this.faceVertexUvs.push( [
+			this.faceVertexUvs[ 0 ].push( [
 						new THREE.UV( ix / gridX, iy / gridY ),
 						new THREE.UV( ix / gridX, ( iy + 1 ) / gridY ),
 						new THREE.UV( ( ix + 1 ) / gridX, ( iy + 1 ) / gridY ),

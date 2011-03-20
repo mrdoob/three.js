@@ -112,11 +112,15 @@
 				xm.map.needsUpdate = true;
 				
 				geometry = new Plane( 100, 100, 15, 10 );
-				for(var i=0; i<geometry.faceVertexUvs.length; i++) {
-					var uvs = geometry.faceVertexUvs[i];
+				for( var i = 0; i < geometry.faceVertexUvs[ 0 ].length; i++ ) {
+					
+					var uvs = geometry.faceVertexUvs[ 0 ][ i ];
+					
 					for ( j = 0, jl = uvs.length; j < jl; j++ ) {
-						uvs[j].u *= 10;
-						uvs[j].v *= 10;
+					
+						uvs[ j ].u *= 10;
+						uvs[ j ].v *= 10;
+
 					}
 
 				}
