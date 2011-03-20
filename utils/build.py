@@ -71,8 +71,9 @@ COMMON_FILES = [
 'renderers/WebGLShaders.js',
 'renderers/WebGLRenderer.js',
 'renderers/SoundRenderer.js',
-'renderers/renderables/RenderableObject.js',
+'renderers/renderables/RenderableVertex.js',
 'renderers/renderables/RenderableFace3.js',
+'renderers/renderables/RenderableObject.js',
 'renderers/renderables/RenderableParticle.js',
 'renderers/renderables/RenderableLine.js'
 ]
