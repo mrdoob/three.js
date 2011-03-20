@@ -5,7 +5,7 @@
 THREE.Loader = function ( showStatus ) {
 
 	this.showStatus = showStatus;	
-	this.statusDomElement = showStatus ? this.addStatusElement() : null;
+	this.statusDomElement = showStatus ? THREE.Loader.prototype.addStatusElement() : null;
 
 };
 

@@ -24,6 +24,8 @@ THREE.JSONLoader.prototype = {
 
 	load: function ( parameters ) {
 
+		console.log( parameters );
+		
 		var url = parameters.model,
 			callback = parameters.callback, 
 		    texture_path = parameters.texture_path ? parameters.texture_path : THREE.Loader.prototype.extractUrlbase( url ),
@@ -32,6 +34,8 @@ THREE.JSONLoader.prototype = {
 			worker = new Worker( url );
 		
 		worker.onmessage = function( event ) {
+			
+			console.log( event.data );
 			
 			THREE.JSONLoader.prototype.createModel( event.data, callback, texture_path );
 
@@ -296,12 +300,12 @@ THREE.JSONLoader.prototype = {
 				
 			};
 			
-			Model.prototype = new THREE.Geometry();
-			Model.prototype.constructor = Model;
+		};
 
-			callback( new Model( texture_path ) );
+		Model.prototype = new THREE.Geometry();
+		Model.prototype.constructor = Model;
 
-		}
+		callback( new Model( texture_path ) );
 
 	}
 

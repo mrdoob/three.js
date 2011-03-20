@@ -8,6 +8,7 @@
 
 
 var model = {
+
     'version' : 1,
 
     'materials': [	{
@@ -83,6 +84,7 @@ var model = {
     'buffers': 'Male02_bin.bin',
 
     'end': (new Date).getTime()
-    }
+    
+};
     
 postMessage( model );

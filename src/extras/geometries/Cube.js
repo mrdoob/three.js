@@ -181,6 +181,7 @@ var Cube = function ( width, height, depth, segmentsWidth, segmentsHeight, segme
 
 	this.computeCentroids();
 	this.computeFaceNormals();
+	//this.computeVertexNormals();
 
 };
 

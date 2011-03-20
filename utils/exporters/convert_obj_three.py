@@ -156,6 +156,7 @@ TEMPLATE_FILE_ASCII = u"""\
 
 
 var model = {
+
     'version' : 2,
     
     'materials': [%(materials)s],
@@ -171,7 +172,8 @@ var model = {
     'faces': [%(faces)s],
 
     'end': (new Date).getTime()
-    }
+    
+};
     
 postMessage( model );
 """
@@ -187,6 +189,7 @@ TEMPLATE_FILE_BIN = u"""\
 
 
 var model = {
+
     'version' : 1,
 
     'materials': [%(materials)s],
@@ -194,7 +197,8 @@ var model = {
     'buffers': '%(buffers)s',
 
     'end': (new Date).getTime()
-    }
+    
+};
     
 postMessage( model );
 """
