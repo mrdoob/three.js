@@ -45,6 +45,8 @@ var Sphere = function ( radius, segmentsWidth, segmentsHeight ) {
 
 	var n1, n2, n3, iVerNum = aVtc.length;
 
+	this.faceVertexUvs[ 0 ] = [];
+
 	for ( j = 0; j < iVerNum; j++ ) {
 
 		var iHorNum = aVtc[ j ].length;
@@ -80,7 +82,7 @@ var Sphere = function ( radius, segmentsWidth, segmentsHeight ) {
 
 					this.faces.push( new THREE.Face3( aP1, aP2, aP3, [ new THREE.Vector3( n1.x, n1.y, n1.z ), new THREE.Vector3( n2.x, n2.y, n2.z ), new THREE.Vector3( n3.x, n3.y, n3.z ) ] ) );
 
-					this.faceVertexUvs.push( [ aP1uv, aP2uv, aP3uv ] );
+					this.faceVertexUvs[ 0 ].push( [ aP1uv, aP2uv, aP3uv ] );
 
 				}
 
@@ -95,7 +97,7 @@ var Sphere = function ( radius, segmentsWidth, segmentsHeight ) {
 
 					this.faces.push( new THREE.Face3( aP1, aP3, aP4, [ new THREE.Vector3( n1.x, n1.y, n1.z ), new THREE.Vector3( n2.x, n2.y, n2.z ), new THREE.Vector3( n3.x, n3.y, n3.z ) ] ) );
 
-					this.faceVertexUvs.push( [ aP1uv, aP3uv, aP4uv ] );
+					this.faceVertexUvs[ 0 ].push( [ aP1uv, aP3uv, aP4uv ] );
 
 				}
 

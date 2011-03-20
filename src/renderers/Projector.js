@@ -99,7 +99,7 @@ THREE.Projector = function() {
 		objectMatrix, objectMaterials,
 		objectMatrixRotation,
 		geometry, vertices, vertex, vertexPositionScreen,
-		faces, face, faceVertexNormals, normal, v1, v2, v3, v4;
+		faces, face, faceVertexNormals, faceVertexUvs, normal, v1, v2, v3, v4;
 
 		_face3Count = 0;
 		_lineCount = 0;
@@ -192,18 +192,20 @@ THREE.Projector = function() {
 
 								}
 
-								_face3.z = _face3.centroidScreen.z;
+								faceVertexUvs = geometry.faceVertexUvs[ 0 ][ f ];
+
+								if ( faceVertexUvs ) {
+
+									_face3.uvs[ 0 ] = faceVertexUvs[ 0 ];
+									_face3.uvs[ 1 ] = faceVertexUvs[ 1 ];
+									_face3.uvs[ 2 ] = faceVertexUvs[ 2 ];
+
+								}
 
 								_face3.meshMaterials = objectMaterials;
 								_face3.faceMaterials = face.materials;
 
-								if ( object.geometry.faceUvs[ f ] ) {
-
-									_face3.uvs[ 0 ] = object.geometry.faceUvs[ f ][ 0 ];
-									_face3.uvs[ 1 ] = object.geometry.faceUvs[ f ][ 1 ];
-									_face3.uvs[ 2 ] = object.geometry.faceUvs[ f ][ 2 ];
-
-								}
+								_face3.z = _face3.centroidScreen.z;
 
 								renderList.push( _face3 );
 
