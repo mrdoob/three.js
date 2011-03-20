@@ -8,6 +8,7 @@
 
 
 var model = {
+
     'version' : 1,
 
     'materials': [	{
@@ -26,6 +27,7 @@ var model = {
     'buffers': 'WaltHead_bin.bin',
 
     'end': (new Date).getTime()
-    }
+    
+};
     
 postMessage( model );

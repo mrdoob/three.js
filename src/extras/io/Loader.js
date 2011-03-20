@@ -4,17 +4,17 @@
 
 THREE.Loader = function ( showStatus ) {
 
-	this.showStatus = showStatus;
-	this.statusDomElement = showStatus ? this.addStatusElement() : null;
+	this.showStatus = showStatus;	
+	this.statusDomElement = showStatus ? THREE.Loader.prototype.addStatusElement() : null;
 
 };
 
 THREE.Loader.prototype = {
 
 	addStatusElement: function ( ) {
-
+		
 		var e = document.createElement( "div" );
-
+		
 		e.style.fontSize = "0.8em"; 
 		e.style.textAlign = "left";
 		e.style.background = "#b00"; 
@@ -25,13 +25,13 @@ THREE.Loader.prototype = {
 		e.style.right = "0px"; 
 		e.style.top = "0px"; 
 		e.style.zIndex = 1000;
-
+		
 		e.innerHTML = "Loading ...";
-
+		
 		return e;
-
+		
 	},
-
+	
 	updateProgress: function ( progress ) {
 
 		var message = "Loaded ";

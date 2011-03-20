@@ -6,7 +6,7 @@
 var Sphere = function ( radius, segmentsWidth, segmentsHeight ) {
 
 	THREE.Geometry.call( this );
-
+	
 	var gridX = segmentsWidth || 8,
 	gridY = segmentsHeight || 6;
 

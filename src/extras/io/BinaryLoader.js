@@ -37,7 +37,7 @@ THREE.BinaryLoader.prototype = {
 
 			s = (new Date).getTime(),
 			worker = new Worker( url ),
-			callback_progress = this.showProgress ? THREE.LoaderOld.prototype.updateProgress : null;
+			callback_progress = this.showProgress ? THREE.Loader.prototype.updateProgress : null;
 		
 		worker.onmessage = function( event ) {
 
@@ -764,6 +764,5 @@ THREE.BinaryLoader.prototype = {
 		where.push( uv );
 
 	}
-
 
 };	

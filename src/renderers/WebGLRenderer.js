@@ -355,11 +355,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 		
-		materials = unrollGroupMaterials( geometryGroup, object );
+		materials = unrollGroupMaterials( geometryGroup, object );		
 		
 		uvType = bufferGuessUVType( materials, geometryGroup, object );
-		vertexColorType = bufferGuessVertexColorType( materials, geometryGroup, object );
 		normalType = bufferGuessNormalType( materials, geometryGroup, object );
+		vertexColorType = bufferGuessVertexColorType( materials, geometryGroup, object );
+
+		console.log(uvType, normalType, vertexColorType, geometry, materials );
 
 		geometryGroup.__vertexArray = new Float32Array( nvertices * 3 );
 		
@@ -382,7 +384,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		if ( uvType ) {
-		
+			
 			if ( geometry.faceUvs.length > 0 || geometry.faceVertexUvs.length > 0 ) {
 			
 				geometryGroup.__uvArray = new Float32Array( nvertices * 2 );
@@ -437,6 +439,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var f, fl, fi, face, 
 			vertexNormals, faceNormal, normal,
 			vertexColors, faceColor,
+			uvType, vertexColorType, normalType,
 			uv, uv2, v1, v2, v3, v4, t1, t2, t3, t4,
 			c1, c2, c3, c4,
 			sw1, sw2, sw3, sw4,
@@ -480,6 +483,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		needsSmoothNormals = geometryGroup.__needsSmoothNormals,
 		
 		vertexColorType = geometryGroup.__vertexColorType,
+		uvType = geometryGroup.__uvType,
+		normalType = geometryGroup.__normalType,
 
 		geometry = object.geometry, // this is shared for all chunks
 
@@ -729,7 +734,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				if ( dirtyNormals ) {
+				if ( dirtyNormals && normalType ) {
 
 					if ( vertexNormals.length == 3 && needsSmoothNormals ) {
 
@@ -761,7 +766,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				if ( dirtyUvs && uv !== undefined ) {
+				if ( dirtyUvs && uv !== undefined && uvType ) {
 
 					for ( i = 0; i < 3; i ++ ) {
 
@@ -776,7 +781,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				if ( dirtyUvs && uv2 !== undefined ) {
+				if ( dirtyUvs && uv2 !== undefined && uvType ) {
 
 					for ( i = 0; i < 3; i ++ ) {
 
@@ -1059,7 +1064,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				if( dirtyNormals ) {
+				if( dirtyNormals && normalType ) {
 
 					if ( vertexNormals.length == 4 && needsSmoothNormals ) {
 
@@ -1091,7 +1096,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				if ( dirtyUvs && uv !== undefined ) {
+				if ( dirtyUvs && uv !== undefined && uvType ) {
 
 					for ( i = 0; i < 4; i ++ ) {
 
@@ -1106,7 +1111,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				if ( dirtyUvs && uv2 !== undefined ) {
+				if ( dirtyUvs && uv2 !== undefined && uvType ) {
 
 					for ( i = 0; i < 4; i ++ ) {
 
@@ -3444,6 +3449,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var m, ml, i, il,
 			material, meshMaterial,
 			materials = [];
+		
+		console.log( "unrollGroupMaterials", object.materials, geometryGroup );
 		
 		for ( m = 0, ml = object.materials.length; m < ml; m++ ) {
 

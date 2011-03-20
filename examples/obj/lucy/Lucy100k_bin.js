@@ -8,6 +8,7 @@
 
 
 var model = {
+
     'version' : 1,
 
     'materials': [	{
@@ -19,6 +20,7 @@ var model = {
     'buffers': 'Lucy100k_bin.bin',
 
     'end': (new Date).getTime()
-    }
+    
+};
     
 postMessage( model );
