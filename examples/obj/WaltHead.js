@@ -4892,15 +4892,9 @@ var WaltHead = function () {
 
 	}
 
-	function f3( a, b, c, nx, ny, nz ) {
+	function f3( a, b, c ) {
 
-		scope.faces.push( new THREE.Face3( a, b, c, (nx || ny || nz) ? new THREE.Vector3( nx, ny, nz ) : null ) );
-
-	}
-
-	function f4( a, b, c, d, nx, ny, nz ) {
-
-		scope.faces.push( new THREE.Face4( a, b, c, d, (nx || ny || nz) ? new THREE.Vector3( nx, ny, nz ) : null ) );
+		scope.faces.push( new THREE.Face3( a, b, c ) );
 
 	}
 

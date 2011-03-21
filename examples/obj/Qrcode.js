@@ -1444,13 +1444,13 @@ var Qrcode = function () {
 
 	function f3( a, b, c, material ) {
 
-		scope.faces.push( new THREE.Face3( a, b, c, null, material ) );
+		scope.faces.push( new THREE.Face3( a, b, c, null, null, material ) );
 
 	}
 
 	function f4( a, b, c, d, material ) {
 
-		scope.faces.push( new THREE.Face4( a, b, c, d, null, material ) );
+		scope.faces.push( new THREE.Face4( a, b, c, d, null, null, material ) );
 
 	}
 

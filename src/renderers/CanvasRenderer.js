@@ -554,7 +554,8 @@ THREE.CanvasRenderer = function () {
 
 					if ( material.map.mapping instanceof THREE.UVMapping ) {
 
-						texturePath( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, material.map.image, element.uvs[ 0 ].u, element.uvs[ 0 ].v, element.uvs[ 1 ].u, element.uvs[ 1 ].v, element.uvs[ 2 ].u, element.uvs[ 2 ].v );
+						_uvs = element.uvs[ 0 ];
+						texturePath( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, material.map.image, _uvs[ 0 ].u, _uvs[ 0 ].v, _uvs[ 1 ].u, _uvs[ 1 ].v, _uvs[ 2 ].u, _uvs[ 2 ].v );
 
 					}
 
