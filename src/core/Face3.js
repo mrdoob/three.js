@@ -15,6 +15,8 @@ THREE.Face3 = function ( a, b, c, normal, color, materials ) {
 	this.color = color instanceof THREE.Color ? color : new THREE.Color();
 	this.vertexColors = color instanceof Array ? color : [];
 
+	this.vertexTangents = [];
+	
 	this.materials = materials instanceof Array ? materials : [ materials ];
 
 	this.centroid = new THREE.Vector3();
