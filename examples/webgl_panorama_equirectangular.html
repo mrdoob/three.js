@@ -1,0 +1,146 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>three.js webgl - equirectangular panorama demo</title>
+		<meta charset="utf-8">
+		<style type="text/css">
+			body {
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				color: #ffffff;
+				padding: 5px;
+				font-family:Monospace;
+				font-size:13px;
+				font-weight: bold;
+				text-align:center;
+			}
+
+			a {
+				color: #ffffff;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div> 
+		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js webgl</a> - equirectangular panorama demo. photo by <a href="http://www.flickr.com/photos/jonragnarsson/2294472375/" target="_blank">Jón Ragnarsson</a>.</div>
+
+		<script type="text/javascript" src="../build/Three.js"></script>
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
+
+		<script type="text/javascript">
+
+			var camera, scene, renderer;
+
+			var fov = 70,
+			texture_placeholder,
+			isUserInteracting = false,
+			onMouseDownMouseX = 0, onMouseDownMouseY = 0,
+			lon = 0, onMouseDownLon = 0,
+			lat = 0, onMouseDownLat = 0,
+			phi = 0, theta = 0;
+
+			init();
+			animate();
+
+			function init() {
+
+				var container, mesh;
+
+				container = document.getElementById( 'container' );
+
+				camera = new THREE.Camera( fov, window.innerWidth / window.innerHeight, 1, 1100 );
+
+				scene = new THREE.Scene();
+
+				mesh = new THREE.Mesh( new Sphere( 500, 60, 40 ), new THREE.MeshBasicMaterial( { map: ImageUtils.loadTexture( 'textures/2294472375_24a3b8ef46_o.jpg' ) } ) );
+				mesh.scale.x = -1;
+				scene.addObject( mesh );
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				container.appendChild( renderer.domElement );
+
+				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.addEventListener( 'mouseup', onDocumentMouseUp, false );
+				document.addEventListener( 'mousewheel', onDocumentMouseWheel, false );
+
+			}
+
+			function onDocumentMouseDown( event ) {
+
+				event.preventDefault();
+
+				isUserInteracting = true;
+
+				onPointerDownPointerX = event.clientX;
+				onPointerDownPointerY = event.clientY;
+
+				onPointerDownLon = lon;
+				onPointerDownLat = lat;
+
+			}
+
+			function onDocumentMouseMove( event ) {
+
+				if ( isUserInteracting ) {
+
+					lon = ( onPointerDownPointerX - event.clientX ) * 0.1 + onPointerDownLon;
+					lat = ( event.clientY - onPointerDownPointerY ) * 0.1 + onPointerDownLat;
+
+				}
+			}
+
+			function onDocumentMouseUp( event ) {
+
+				isUserInteracting = false;
+
+			}
+
+			function onDocumentMouseWheel( event ) {
+
+				fov -= event.wheelDeltaY * 0.05;
+				camera.projectionMatrix = THREE.Matrix4.makePerspective( fov, window.innerWidth / window.innerHeight, 1, 1100 );
+				render();
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				render();
+
+			}
+
+			function render() {
+
+				lat = Math.max( - 85, Math.min( 85, lat ) );
+				phi = ( 90 - lat ) * Math.PI / 180;
+				theta = lon * Math.PI / 180;
+
+				camera.target.position.x = 500 * Math.sin( phi ) * Math.cos( theta );
+				camera.target.position.y = 500 * Math.cos( phi );
+				camera.target.position.z = 500 * Math.sin( phi ) * Math.sin( theta );
+
+				/*
+				// distortion
+				camera.position.x = - camera.target.position.x;
+				camera.position.y = - camera.target.position.y;
+				camera.position.z = - camera.target.position.z;
+				*/
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>
