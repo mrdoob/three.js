@@ -95,9 +95,9 @@
 
 				}
 
-				for( i = 0; i < geometry.uvs.length; i++ ) {
+				for( i = 0; i < geometry.faceVertexUvs[ 0 ].length; i++ ) {
 
-					var uvs = geometry.uvs[ i ];
+					var uvs = geometry.faceVertexUvs[ 0 ][ i ];
 					for ( j = 0, jl = uvs.length; j < jl; j++ ) {
 
 						uvs[ j ].u *= 5;

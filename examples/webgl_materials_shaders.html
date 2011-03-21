@@ -187,9 +187,11 @@
 				bcanvas.addEventListener("click", toggleCanvas, false);
 				bwebgl.addEventListener("click", toggleWebGL, false);
 
-				var loader = new THREE.Loader();
-				loader.loadAscii( { model: "obj/torus/Torus_slim.js", callback: function( geometry ) { createScene( geometry ) } } );
-				//loader.loadBinary( { model: "obj/torus/Torus_bin.js", callback: function( geometry ) { createScene( geometry ) } } );
+				var loader = new THREE.JSONLoader();
+				loader.load( { model: "obj/torus/Torus_slim.js", callback: function( geometry ) { createScene( geometry ) } } );
+				
+				//var loader = new THREE.BinaryLoader();
+				//loader.load( { model: "obj/torus/Torus_bin.js", callback: function( geometry ) { createScene( geometry ) } } );
 
 				document.addEventListener('mousemove', onDocumentMouseMove, false);
 

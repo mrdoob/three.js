@@ -53,6 +53,7 @@ THREE.JSONLoader.prototype = {
 			
 			parse();
 			init_skin();
+			init_morphing();
 
 			this.computeCentroids();
 			this.computeFaceNormals();
@@ -309,6 +310,33 @@ THREE.JSONLoader.prototype = {
 				scope.bones = json.bones;
 				scope.animation = json.animation;
 				
+			};
+			
+			function init_morphing() {
+
+				if( json.morphTargets !== undefined ) {
+					
+					var i, l, v, vl;
+					
+					for( i = 0, l = json.morphTargets.length; i < l; i++ ) {
+						
+						scope.morphTargets[ i ] = {};
+						scope.morphTargets[ i ].name = json.morphTargets[ i ].name;
+						scope.morphTargets[ i ].vertices = [];
+						
+						dstVertices = scope.morphTargets[ i ].vertices;
+						srcVertices = json.morphTargets [ i ].vertices;
+
+						for( v = 0, vl = srcVertices.length; v < vl; v += 3 ) {
+
+							dstVertices.push( new THREE.Vertex( new THREE.Vector3( srcVertices[ v ], srcVertices[ v + 1 ], srcVertices[ v + 2 ] ) ) );
+
+						}
+						
+					} 
+					
+				}
+
 			};
 			
 		};

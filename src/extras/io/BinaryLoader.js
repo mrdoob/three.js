@@ -711,7 +711,8 @@ THREE.BinaryLoader.prototype = {
 		scope.faces.push( new THREE.Face3( a, b, c, 
 						  [new THREE.Vector3( nax, nay, naz ), 
 						   new THREE.Vector3( nbx, nby, nbz ), 
-						   new THREE.Vector3( ncx, ncy, ncz )], 
+						   new THREE.Vector3( ncx, ncy, ncz )],
+						  null,
 						  material ) );
 
 	},
@@ -739,7 +740,8 @@ THREE.BinaryLoader.prototype = {
 						  [new THREE.Vector3( nax, nay, naz ), 
 						   new THREE.Vector3( nbx, nby, nbz ), 
 						   new THREE.Vector3( ncx, ncy, ncz ), 
-						   new THREE.Vector3( ndx, ndy, ndz )], 
+						   new THREE.Vector3( ndx, ndy, ndz )],
+						  null,
 						  material ) );
 
 	},

@@ -16,13 +16,14 @@ var SceneUtils = {
 				geometry, material, camera, fog,
 				texture, images,
 				materials,
-				data, loader,
+				data, binLoader, jsonLoader,
 				counter_models, counter_textures,
 				total_models, total_textures,
 				result;
 
 			data = event.data;
-			loader = new THREE.Loader();
+			binLoader = new THREE.BinaryLoader();
+			jsonLoader = new THREE.JSONLoader();
 
 			counter_models = 0;
 			counter_textures = 0;
@@ -290,15 +291,15 @@ var SceneUtils = {
 
 				} else if ( g.type == "bin_mesh" ) {
 
-					loader.loadBinary( { model: g.url,
-										 callback: create_callback( dg )
-										} );
+					binLoader.load( { model: g.url,
+									  callback: create_callback( dg )
+									} );
 
 				} else if ( g.type == "ascii_mesh" ) {
 
-					loader.loadAscii( { model: g.url,
-										callback: create_callback( dg )
-										} );
+					jsonLoader.load( { model: g.url,
+									   callback: create_callback( dg )
+									} );
 
 				}
 

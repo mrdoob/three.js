@@ -3519,7 +3519,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			
 			m = materials[ i ];
 			
-			if ( m instanceof THREE.MeshBasicMaterial || m instanceof THREE.MeshDepthMaterial ) continue;
+			if ( ( m instanceof THREE.MeshBasicMaterial && !m.envMap ) || m instanceof THREE.MeshDepthMaterial ) continue;
 			
 			if ( materialNeedsSmoothNormals( m ) ) {
 				
@@ -3547,7 +3547,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			
 			m = materials[ i ];
 			
-			if ( m.map || m.lightMap ) {
+			if ( m.map || m.lightMap || m instanceof THREE.MeshShaderMaterial ) {
 				
 				return true;
 				

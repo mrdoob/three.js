@@ -69,7 +69,8 @@
 
 				scene = new THREE.Scene();
 
-				loader = new THREE.Loader( true );
+				//loader = new THREE.JSONLoader( true );
+				loader = new THREE.BinaryLoader( true );
 				document.body.appendChild( loader.statusDomElement );
 
 				var callback = function( geometry ) {
@@ -83,8 +84,8 @@
 
 				};
 
-				//loader.loadAscii( { model: "obj/walt/WaltHead_slim.js", callback: callback } );
-				loader.loadBinary( { model: "obj/walt/WaltHead_bin.js", callback: callback } );
+				//loader.load( { model: "obj/walt/WaltHead_slim.js", callback: callback } );
+				loader.load( { model: "obj/walt/WaltHead_bin.js", callback: callback } );
 
 				/*
 				var directionalLight = new THREE.DirectionalLight( 0x111111, 0.9 );

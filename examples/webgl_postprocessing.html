@@ -176,9 +176,9 @@
 				quadBG.position.z = -500;
 				sceneBG.addObject( quadBG );
 
-				loader = new THREE.Loader( true );
+				loader = new THREE.JSONLoader( true );
 				document.body.appendChild( loader.statusDomElement );
-				loader.loadAscii( { model: "obj/leeperrysmith/LeePerrySmith.js", callback: function( geometry ) { createMesh( geometry, sceneModel, 100 ) } } );
+				loader.load( { model: "obj/leeperrysmith/LeePerrySmith.js", callback: function( geometry ) { createMesh( geometry, sceneModel, 100 ) } } );
 
 				quadScreen = new THREE.Mesh( plane, materialConvolution );
 				quadScreen.position.z = -100;
