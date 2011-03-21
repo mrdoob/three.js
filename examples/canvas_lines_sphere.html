@@ -44,7 +44,7 @@
 			function init() {
 
 				var container, separation = 100, amountX = 50, amountY = 50,
-				particles, particle, material;
+				particles, particle;
 
 				container = document.createElement('div');
 				document.body.appendChild(container);
@@ -60,9 +60,23 @@
 
 				// particles
 
-				material = new THREE.ParticleCircleMaterial( { color: 0xffffff, opacity: 1 } );
+				var PI2 = Math.PI * 2;
+				var material = new THREE.ParticleCanvasMaterial( {
 
-				for (var i = 0; i < 1000; i++) {
+							color: 0xffffff,
+							program: function ( context, color ) {
+
+								context.fillStyle = color.__styleString;
+								context.beginPath();
+								context.arc( 0, 0, 1, 0, PI2, true );
+								context.closePath();
+								context.fill();
+
+							}
+
+				} );
+
+				for ( var i = 0; i < 1000; i ++ ) {
 
 					particle = new THREE.Particle( material );
 					particle.position.x = Math.random() * 2 - 1;

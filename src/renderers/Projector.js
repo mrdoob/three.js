@@ -95,11 +95,12 @@ THREE.Projector = function() {
 	this.projectScene = function ( scene, camera, sort ) {
 
 		var renderList = [], near = camera.near, far = camera.far,
-		o, ol, v, vl, f, fl, n, nl, objects, object,
-		objectMatrix, objectMaterials,
+		o, ol, v, vl, f, fl, n, nl, u, ul, objects, object,
+		objectMatrix, objectMaterials, objectOverdraw,
 		objectMatrixRotation,
 		geometry, vertices, vertex, vertexPositionScreen,
-		faces, face, faceVertexNormals, faceVertexUvs, normal, v1, v2, v3, v4;
+		faces, face, faceVertexNormals, normal, faceVertexUvs, uvs,
+		v1, v2, v3, v4;
 
 		_face3Count = 0;
 		_lineCount = 0;
@@ -124,6 +125,7 @@ THREE.Projector = function() {
 			objectMatrixRotation = object.matrixRotationWorld;
 
 			objectMaterials = object.materials;
+			objectOverdraw = object.overdraw;
 
 			_vertexCount = 0;
 
@@ -184,7 +186,7 @@ THREE.Projector = function() {
 								faceVertexNormals = face.vertexNormals;
 								_face3VertexNormals = _face3.vertexNormalsWorld;
 
-								for ( n = 0; n < 3; n ++ ) {
+								for ( n = 0, nl = faceVertexNormals.length; n < nl; n ++ ) {
 
 									normal = _face3VertexNormals[ n ];
 									normal.copy( faceVertexNormals[ n ] );
@@ -192,18 +194,22 @@ THREE.Projector = function() {
 
 								}
 
-								faceVertexUvs = geometry.faceVertexUvs[ 0 ][ f ];
+								faceVertexUvs = geometry.faceVertexUvs;
 
-								if ( faceVertexUvs ) {
+								for ( u = 0, ul = faceVertexUvs.length; u < ul; u ++ ) {
 
-									_face3.uvs[ 0 ] = faceVertexUvs[ 0 ];
-									_face3.uvs[ 1 ] = faceVertexUvs[ 1 ];
-									_face3.uvs[ 2 ] = faceVertexUvs[ 2 ];
+									uvs = faceVertexUvs[ u ];
+
+									_face3.uvs[ u ] = [];
+									_face3.uvs[ u ][ 0 ] = uvs[ 0 ];
+									_face3.uvs[ u ][ 1 ] = uvs[ 1 ];
+									_face3.uvs[ u ][ 2 ] = uvs[ 2 ];
 
 								}
 
 								_face3.meshMaterials = objectMaterials;
 								_face3.faceMaterials = face.materials;
+								_face3.overdraw = objectOverdraw;
 
 								_face3.z = _face3.centroidScreen.z;
 
