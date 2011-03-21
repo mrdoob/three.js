@@ -507,7 +507,7 @@ THREE.BinaryLoader.prototype = {
 				u3 = uvs[ uvc*2 ];
 				v3 = uvs[ uvc*2 + 1 ];
 
-				THREE.BinaryLoader.prototype.uv3( scope.uvs, u1, v1, u2, v2, u3, v3 );
+				THREE.BinaryLoader.prototype.uv3( scope.faceVertexUvs[ 0 ], u1, v1, u2, v2, u3, v3 );
 
 			}
 
@@ -532,7 +532,7 @@ THREE.BinaryLoader.prototype = {
 				u4 = uvs[ uvd*2 ];
 				v4 = uvs[ uvd*2 + 1 ];
 
-				THREE.BinaryLoader.prototype.uv4( scope.uvs, u1, v1, u2, v2, u3, v3, u4, v4 );
+				THREE.BinaryLoader.prototype.uv4( scope.faceVertexUvs[ 0 ], u1, v1, u2, v2, u3, v3, u4, v4 );
 
 			}
 

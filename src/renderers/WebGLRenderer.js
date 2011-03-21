@@ -1177,7 +1177,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 		}
 
-		if ( dirtyColors && obj_colors.length ) {
+		if ( dirtyColors && offset_color > 0 ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webGLColorBuffer );
 			_gl.bufferData( _gl.ARRAY_BUFFER, colorArray, hint );

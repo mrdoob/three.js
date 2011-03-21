@@ -88,10 +88,11 @@ THREE.JSONLoader.prototype = {
 				faces = json.faces,
 				vertices = json.vertices,
 				normals = json.normals,
+				colors = json.colors,
 
 				nUvLayers = 0;
 				
-				// discard empty arrays
+				// disregard empty arrays
 				
 				for ( i = 0; i < json.uvs.length; i++ ) {
 					
@@ -256,9 +257,11 @@ THREE.JSONLoader.prototype = {
 
 						for ( i = 0; i < nVertices; i++ ) {
 
-							color = new THREE.Color( faces[ offset ++ ] );
+							colorIndex = faces[ offset ++ ];
+							
+							color = new THREE.Color( colors[ colorIndex ] );
 							face.vertexColors.push( color );
-
+							
 						}
 
 					}
