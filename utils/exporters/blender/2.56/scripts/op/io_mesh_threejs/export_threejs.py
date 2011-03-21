@@ -70,9 +70,11 @@ var model = {
     
     'materials': [%(materials)s],
 
-    'normals': [%(normals)s],
-
     'vertices': [%(vertices)s],
+
+    'morphTargets': [],
+
+    'normals': [%(normals)s],
 
     'colors': [%(colors)s],
 
@@ -226,7 +228,7 @@ def setBit(value, position, on):
         mask = ~(1 << position)
         return (value & mask)    
     
-def generate_face(f, i, normals, uvs, colors, mesh, use_normals, use_colors, use_uv_coords):
+def generate_face(f, faceIndex, normals, uvs, colors, mesh, use_normals, use_colors, use_uv_coords):
     isTriangle = ( len(f.vertices) == 3 )
     
     if isTriangle:
@@ -278,7 +280,7 @@ def generate_face(f, i, normals, uvs, colors, mesh, use_normals, use_colors, use
         faceData.append( f.material_index )
 
     if hasFaceVertexUvs:
-        uv = get_uv_indices(i, uvs, mesh)
+        uv = get_uv_indices(faceIndex, uvs, mesh)
         for i in range(nVertices):
             index = uv[i]
             faceData.append(index)

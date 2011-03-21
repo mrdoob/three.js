@@ -361,7 +361,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		normalType = bufferGuessNormalType( materials, geometryGroup, object );
 		vertexColorType = bufferGuessVertexColorType( materials, geometryGroup, object );
 
-		//console.log(uvType, normalType, vertexColorType, object, geometryGroup, materials );
+		//console.log("uvType",uvType, "normalType",normalType, "vertexColorType",vertexColorType, object, geometryGroup, materials );
 
 		geometryGroup.__vertexArray = new Float32Array( nvertices * 3 );
 		
@@ -439,6 +439,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var f, fl, fi, face, 
 			vertexNormals, faceNormal, normal,
 			vertexColors, faceColor,
+			vertexTangents,
 			uvType, vertexColorType, normalType,
 			uv, uv2, v1, v2, v3, v4, t1, t2, t3, t4,
 			c1, c2, c3, c4,
@@ -535,6 +536,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			
 			vertexColors = face.vertexColors;
 			faceColor = face.color;
+			
+			vertexTangents = face.vertexTangents;
 
 			if ( face instanceof THREE.Face3 ) {
 
@@ -711,9 +714,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( dirtyTangents && geometry.hasTangents ) {
 
-					t1 = vertices[ face.a ].tangent;
-					t2 = vertices[ face.b ].tangent;
-					t3 = vertices[ face.c ].tangent;
+					t1 = vertexTangents[ 0 ];
+					t2 = vertexTangents[ 1 ];
+					t3 = vertexTangents[ 2 ];
 
 					tangentArray[ offset_tangent ]     = t1.x;
 					tangentArray[ offset_tangent + 1 ] = t1.y;
@@ -1035,10 +1038,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( dirtyTangents && geometry.hasTangents ) {
 
-					t1 = vertices[ face.a ].tangent;
-					t2 = vertices[ face.b ].tangent;
-					t3 = vertices[ face.c ].tangent;
-					t4 = vertices[ face.d ].tangent;
+					t1 = vertexTangents[ 0 ];
+					t2 = vertexTangents[ 1 ];
+					t3 = vertexTangents[ 2 ];
+					t4 = vertexTangents[ 3 ];
 
 					tangentArray[ offset_tangent ]     = t1.x;
 					tangentArray[ offset_tangent + 1 ] = t1.y;

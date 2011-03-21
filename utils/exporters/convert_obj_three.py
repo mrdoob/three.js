@@ -4,7 +4,7 @@
 How to use this converter
 -------------------------
 
-python convert_obj_three.py -i infile.obj -o outfile.js [-m morphfiles*.obj] [-a center|top|bottom] [-s smooth|flat] [-t ascii|binary] [-d invert|normal]
+python convert_obj_three.py -i infile.obj -o outfile.js [-m morphfiles*.obj] [-a center|top|bottom|none] [-s smooth|flat] [-t ascii|binary] [-d invert|normal]
 
 Notes: 
 
@@ -29,18 +29,19 @@ How to use generated JS file in your HTML document
     <script type="text/javascript">
         ...
         
-        var loader = new THREE.Loader();
-        
         // load ascii model
-        loader.loadAscii( "Model_ascii.js", function( geometry ) { createScene( geometry) }, path_to_textures );
+        
+        var jsonLoader = new THREE.JSONLoader();
+        jsonLoader.load( { model: "Model_ascii.js", callback: function( geometry ) { createScene( geometry) } } );
 
         // load binary model
-        loader.loadBinary( "Model_bin.js", function( geometry ) { createScene( geometry) }, path_to_textures );
+        
+        var binLoader = new THREE.BinaryLoader();
+        binLoader.load( { model: "Model_bin.js", callback: function( geometry ) { createScene( geometry) } } );
 
         function createScene( geometry ) {
-            
-            var normalizeUVsFlag = 1; // set to 1 if canvas render has missing materials
-            var mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial(), normalizeUVsFlag );
+
+            var mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial() );
             
         }
         
