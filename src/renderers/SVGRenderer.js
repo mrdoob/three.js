@@ -101,9 +101,11 @@ THREE.SVGRenderer = function () {
 				_v1 = element;
 				_v1.x *= _svgWidthHalf; _v1.y *= -_svgHeightHalf;
 
-				for ( m = 0, ml = element.materials.length; m < ml; m++ ) {
+				m = 0; ml = element.materials.length;
 
-					material = element.materials[ m ];
+				while ( m < ml ) {
+
+					material = element.materials[ m ++ ];
 					material && renderParticle( _v1, element, material, scene );
 
 				}
@@ -129,7 +131,7 @@ THREE.SVGRenderer = function () {
 				while ( m < ml ) {
 
 					material = element.materials[ m ++ ];
-					material && renderLine( _v1, _v2, element, material, scene );
+					material && material.opacity != 0 && renderLine( _v1, _v2, element, material, scene );
 
 				}
 
@@ -164,7 +166,7 @@ THREE.SVGRenderer = function () {
 						while ( fm < fml ) {
 
 							material = element.faceMaterials[ fm ++ ];
-							material && renderFace3( _v1, _v2, _v3, element, material, scene );
+							material && material.opacity != 0 && renderFace3( _v1, _v2, _v3, element, material, scene );
 
 						}
 
@@ -172,7 +174,7 @@ THREE.SVGRenderer = function () {
 
 					}
 
-					material && renderFace3( _v1, _v2, _v3, element, material, scene );
+					material && material.opacity != 0 && renderFace3( _v1, _v2, _v3, element, material, scene );
 
 				}
 
@@ -209,7 +211,7 @@ THREE.SVGRenderer = function () {
 						while ( fm < fml ) {
 
 							material = element.faceMaterials[ fm ++ ];
-							material && renderFace4( _v1, _v2, _v3, _v4, element, material, scene );
+							material && material.opacity != 0 && renderFace4( _v1, _v2, _v3, _v4, element, material, scene );
 
 						}
 
@@ -217,7 +219,7 @@ THREE.SVGRenderer = function () {
 
 					}
 
-					material && renderFace4( _v1, _v2, _v3, _v4, element, material, scene );
+					material && material.opacity != 0 && renderFace4( _v1, _v2, _v3, _v4, element, material, scene );
 
 				}
 
@@ -308,6 +310,7 @@ THREE.SVGRenderer = function () {
 
 	function renderParticle( v1, element, material, scene ) {
 
+		/*
 		_svgNode = getCircleNode( _circleCount++ );
 		_svgNode.setAttribute( 'cx', v1.x );
 		_svgNode.setAttribute( 'cy', v1.y );
@@ -338,6 +341,7 @@ THREE.SVGRenderer = function () {
 		}
 
 		_svg.appendChild( _svgNode );
+		*/
 
 	}
 

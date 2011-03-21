@@ -73,6 +73,7 @@ COMMON_FILES = [
 'renderers/SoundRenderer.js',
 'renderers/renderables/RenderableVertex.js',
 'renderers/renderables/RenderableFace3.js',
+'renderers/renderables/RenderableFace4.js',
 'renderers/renderables/RenderableObject.js',
 'renderers/renderables/RenderableParticle.js',
 'renderers/renderables/RenderableLine.js'
@@ -146,6 +147,7 @@ CANVAS_FILES = [
 'renderers/SoundRenderer.js',
 'renderers/renderables/RenderableVertex.js',
 'renderers/renderables/RenderableFace3.js',
+'renderers/renderables/RenderableFace4.js',
 'renderers/renderables/RenderableObject.js',
 'renderers/renderables/RenderableParticle.js',
 'renderers/renderables/RenderableLine.js'
@@ -226,6 +228,7 @@ SVG_FILES = [
 'renderers/SoundRenderer.js',
 'renderers/renderables/RenderableVertex.js',
 'renderers/renderables/RenderableFace3.js',
+'renderers/renderables/RenderableFace4.js',
 'renderers/renderables/RenderableObject.js',
 'renderers/renderables/RenderableParticle.js',
 'renderers/renderables/RenderableLine.js'
