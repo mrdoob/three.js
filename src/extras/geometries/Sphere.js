@@ -45,8 +45,6 @@ var Sphere = function ( radius, segmentsWidth, segmentsHeight ) {
 
 	var n1, n2, n3, iVerNum = aVtc.length;
 
-	this.faceVertexUvs[ 0 ] = [];
-
 	for ( j = 0; j < iVerNum; j++ ) {
 
 		var iHorNum = aVtc[ j ].length;

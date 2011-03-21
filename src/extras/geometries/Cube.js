@@ -6,7 +6,7 @@
 var Cube = function ( width, height, depth, segmentsWidth, segmentsHeight, segmentsDepth, materials, flipped, sides ) {
 
 	THREE.Geometry.call( this );
-
+	
 	var scope = this,
 	width_half = width / 2,
 	height_half = height / 2,
@@ -106,8 +106,6 @@ var Cube = function ( width, height, depth, segmentsWidth, segmentsHeight, segme
 			}
 
 		}
-
-		scope.faceVertexUvs[ 0 ] = [];
 		
 		for( iy = 0; iy < gridY; iy++ ) {
 

@@ -30,8 +30,6 @@ var Plane = function ( width, height, segmentsWidth, segmentsHeight ) {
 		}
 
 	}
-
-	this.faceVertexUvs[ 0 ] = [];
 	
 	for( iy = 0; iy < gridY; iy++ ) {
 

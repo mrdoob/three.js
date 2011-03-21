@@ -14,8 +14,8 @@ THREE.Geometry = function () {
 
 	this.faces = [];
 
-	this.faceUvs = [];
-	this.faceVertexUvs = [];
+	this.faceUvs = [[]];
+	this.faceVertexUvs = [[]];
 
 	this.morphTargets = [];
 
