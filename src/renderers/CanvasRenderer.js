@@ -658,11 +658,6 @@ THREE.CanvasRenderer = function () {
 
 			} else if ( material instanceof THREE.MeshDepthMaterial ) {
 
-				/*
-				_w = 1 - ( material.__2near / (material.__farPlusNear - element.z * material.__farMinusNear ) );
-				_color.setRGB( _w, _w, _w );
-				*/
-
 				_near = camera.near;
 				_far = camera.far;
 
@@ -698,6 +693,8 @@ THREE.CanvasRenderer = function () {
 
 			if ( material.map || material.envMap ) {
 
+				// Let renderFace3() handle this
+
 				renderFace3( v1, v2, v4, 0, 1, 3, element, material, scene );
 				renderFace3( v5, v3, v6, 1, 2, 3, element, material, scene );
 
@@ -711,6 +708,28 @@ THREE.CanvasRenderer = function () {
 			_v4x = v4.positionScreen.x; _v4y = v4.positionScreen.y;
 			_v5x = v5.positionScreen.x; _v5y = v5.positionScreen.y;
 			_v6x = v6.positionScreen.x; _v6y = v6.positionScreen.y;
+
+			if ( material instanceof THREE.MeshDepthMaterial ) {
+
+				_near = camera.near;
+				_far = camera.far;
+
+				_color1.r = _color1.g = _color1.b = 1 - smoothstep( v1.positionScreen.z, _near, _far );
+				_color2.r = _color2.g = _color2.b = 1 - smoothstep( v2.positionScreen.z, _near, _far );
+				_color3.r = _color3.g = _color3.b = 1 - smoothstep( v4.positionScreen.z, _near, _far );
+				_color4.r = _color4.g = _color4.b = 1 - smoothstep( v3.positionScreen.z, _near, _far );
+
+				_bitmap = getGradientTexture( _color1, _color2, _color3, _color4 );
+
+				drawTriangle( _v1x, _v1y, _v2x, _v2y, _v4x, _v4y );
+				texturePath( _v1x, _v1y, _v2x, _v2y, _v4x, _v4y, _bitmap, 0, 0, 1, 0, 0, 1 );
+
+				drawTriangle( _v5x, _v5y, _v3x, _v3y, _v6x, _v6y );
+				texturePath( _v5x, _v5y, _v3x, _v3y, _v6x, _v6y, _bitmap, 1, 0, 1, 1, 0, 1 );
+
+				return;
+
+			}
 
 			drawQuad( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _v4x, _v4y );
 
@@ -740,32 +759,6 @@ THREE.CanvasRenderer = function () {
 					material.wireframe ? strokePath( material.color.__styleString, material.wireframeLinewidth ) : fillPath( material.color.__styleString );
 
 				}
-
-			} else if ( material instanceof THREE.MeshDepthMaterial ) {
-
-				/*
-				_w = 1 - ( material.__2near / (material.__farPlusNear - element.z * material.__farMinusNear ) );
-				_color.setRGB( _w, _w, _w );
-				*/
-
-				_2near = material.__2near;
-				_farPlusNear = material.__farPlusNear;
-				_farMinusNear = material.__farMinusNear;
-
-				_color1 = ~~ ( ( 1 - ( _2near / ( _farPlusNear - v1.positionScreen.z * _farMinusNear ) ) ) * 255 );
-				_color2 = ~~ ( ( 1 - ( _2near / ( _farPlusNear - v2.positionScreen.z * _farMinusNear ) ) ) * 255 );
-				_color3 = ~~ ( ( 1 - ( _2near / ( _farPlusNear - v3.positionScreen.z * _farMinusNear ) ) ) * 255 );
-				_color4 = ~~ ( ( 1 - ( _2near / ( _farPlusNear - v4.positionScreen.z * _farMinusNear ) ) ) * 255 );
-
-				_bitmap = getGradientTexture( [ _color1, _color1, _color1 ], [ _color2, _color2, _color2 ], [ _color4, _color4, _color4 ], [ _color3, _color3, _color3 ] );
-
-				_uv1.u = 0; _uv1.v = 0; 
-				_uv2.u = _gradientMapQuality; _uv2.v = 0;
-				_uv3.u = _gradientMapQuality; _uv3.v = _gradientMapQuality;
-				_uv4.u = 0; _uv4.v = _gradientMapQuality;
-
-				drawTexturedTriangle( _bitmap, _v1x, _v1y, _v2x, _v2y, _v4x, _v4y, _uv1.u, _uv1.v, _uv2.u, _uv2.v, _uv4.u, _uv4.v );
-				drawTexturedTriangle( _bitmap, _v5x, _v5y, _v3x, _v3y, _v6x, _v6y, _uv2.u, _uv2.v, _uv3.u, _uv3.v, _uv4.u, _uv4.v );
 
 			} else if ( material instanceof THREE.MeshNormalMaterial ) {
 
