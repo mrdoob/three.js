@@ -52,7 +52,7 @@
 		<script type="text/javascript" src="../src/materials/MeshFaceMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/MeshShaderMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/ParticleBasicMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/ParticleCircleMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/ParticleCanvasMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/ParticleDOMMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/Texture.js"></script>
 		<script type="text/javascript" src="../src/materials/RenderTarget.js"></script>
@@ -205,18 +205,6 @@
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
 				scene.addObject( mesh );
 
-				// PARTICLES
-
-				for ( var i = 0; i < 100; i ++ ) {
-
-					particle = new THREE.Particle( new THREE.ParticleCircleMaterial( { color: Math.random() * 0xffffff } ) );
-					particle.position.x = Math.random() * 1000 - 500;
-					particle.position.y = Math.random() * 1000 - 500;
-					particle.position.z = Math.random() * 1000 - 500;
-					particle.scale.x = particle.scale.y = 10;
-					scene.addObject( particle );
-
-				}
 
 				// LIGHTS
 

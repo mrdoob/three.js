@@ -198,12 +198,15 @@ THREE.Projector = function() {
 
 								for ( u = 0, ul = faceVertexUvs.length; u < ul; u ++ ) {
 
-									uvs = faceVertexUvs[ u ];
+									uvs = faceVertexUvs[ u ][ f ];
 
-									_face3.uvs[ u ] = [];
-									_face3.uvs[ u ][ 0 ] = uvs[ 0 ];
-									_face3.uvs[ u ][ 1 ] = uvs[ 1 ];
-									_face3.uvs[ u ][ 2 ] = uvs[ 2 ];
+									if ( uvs ) {
+
+										_face3.uvs[ u ][ 0 ] = uvs[ 0 ];
+										_face3.uvs[ u ][ 1 ] = uvs[ 1 ];
+										_face3.uvs[ u ][ 2 ] = uvs[ 2 ];
+
+									}
 
 								}
 
