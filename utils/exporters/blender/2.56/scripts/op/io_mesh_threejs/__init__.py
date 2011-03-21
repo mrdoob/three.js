@@ -17,10 +17,11 @@
 # ##### END GPL LICENSE BLOCK #####
 
 # To support reload properly, try to access a package var, if it's there, reload everything
-if "bpy" in locals():
-    import sys
-    reload(sys.modules.get("io_mesh_threejs.export_threejs", sys))
 
+if "bpy" in locals():
+    import imp
+    if "export_threejs" in locals():
+        imp.reload(export_threejs)
 
 import bpy
 from bpy.props import *

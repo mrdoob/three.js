@@ -160,10 +160,10 @@
 
 				var material2 = new THREE.MeshPhongMaterial( { color: diffuse, specular: specular, ambient: ambient, shininess: shininess } );
 
-				loader = new THREE.Loader( true );
+				loader = new THREE.BinaryLoader( true );
 				document.body.appendChild( loader.statusDomElement );
 
-				loader.loadBinary( { model: "obj/ninja/NinjaLo_bin.js", callback: function( geometry ) { createScene( geometry, scale, material1, material2 ) } } );
+				loader.load( { model: "obj/ninja/NinjaLo_bin.js", callback: function( geometry ) { createScene( geometry, scale, material1, material2 ) } } );
 
 				webglRenderer = new THREE.WebGLRenderer();
 				webglRenderer.setSize( window.innerWidth, window.innerHeight );
@@ -187,9 +187,9 @@
 
 			function createScene( geometry, scale, material1, material2 ) {
 
-				geometry.computeTangents();
+				//geometry.computeTangents();
 
-				mesh1 = SceneUtils.addMesh( scene, geometry, scale, -scale * 12, 0, 0, 0,0,0, material1 );
+				//mesh1 = SceneUtils.addMesh( scene, geometry, scale, -scale * 12, 0, 0, 0,0,0, material1 );
 				mesh2 = SceneUtils.addMesh( scene, geometry, scale,  scale * 12, 0, 0, 0,0,0, material2 );
 
 				loader.statusDomElement.style.display = "none";

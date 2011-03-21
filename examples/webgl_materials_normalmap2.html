@@ -141,10 +141,10 @@
 				var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms };
 				var material = new THREE.MeshShaderMaterial( parameters );
 
-				loader = new THREE.Loader( true );
+				loader = new THREE.JSONLoader( true );
 				document.body.appendChild( loader.statusDomElement );
 
-				loader.loadAscii( { model: "obj/leeperrysmith/LeePerrySmith.js", callback: function( geometry ) { createScene( geometry, 100, material ) } } );
+				loader.load( { model: "obj/leeperrysmith/LeePerrySmith.js", callback: function( geometry ) { createScene( geometry, 100, material ) } } );
 
 				webglRenderer = new THREE.WebGLRenderer();
 				webglRenderer.setSize( window.innerWidth, window.innerHeight );
@@ -166,8 +166,9 @@
 
 			function createScene( geometry, scale, material ) {
 
-				geometry.computeTangents();
+				//geometry.computeTangents();
 
+				material = new THREE.MeshFaceMaterial();
 				mesh1 = SceneUtils.addMesh( scene, geometry, scale, 0, - 50, 0, 0, 0, 0, material );
 
 				loader.statusDomElement.style.display = "none";
