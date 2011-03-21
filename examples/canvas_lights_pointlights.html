@@ -73,15 +73,26 @@
 				light3 = new THREE.PointLight( 0x80ff80 );
 				scene.addLight( light3 );
 
-				particle1 = new THREE.Particle( new THREE.ParticleCircleMaterial( { color: 0xff0040 } ) );
+				var PI2 = Math.PI * 2;
+				var program = function ( context, color ) {
+
+					context.fillStyle = color.__styleString;
+					context.beginPath();
+					context.arc( 0, 0, 1, 0, PI2, true );
+					context.closePath();
+					context.fill();
+
+				}
+
+				particle1 = new THREE.Particle( new THREE.ParticleCanvasMaterial( { color: 0xff0040, program: program } ) );
 				particle1.scale.x = particle1.scale.y = particle1.scale.z = 0.5;
 				scene.addObject( particle1 );
 
-				particle2 = new THREE.Particle( new THREE.ParticleCircleMaterial( { color: 0x0040ff } ) );
+				particle2 = new THREE.Particle( new THREE.ParticleCanvasMaterial( { color: 0x0040ff, program: program } ) );
 				particle2.scale.x = particle2.scale.y = particle2.scale.z = 0.5;
 				scene.addObject( particle2 );
 
-				particle3 = new THREE.Particle( new THREE.ParticleCircleMaterial( { color: 0x80ff80 } ) );
+				particle3 = new THREE.Particle( new THREE.ParticleCanvasMaterial( { color: 0x80ff80, program: program } ) );
 				particle3.scale.x = particle3.scale.y = particle3.scale.z = 0.5;
 				scene.addObject( particle3 );
 

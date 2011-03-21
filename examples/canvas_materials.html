@@ -111,7 +111,18 @@
 
 				}
 
-				particleLight = new THREE.Particle( new THREE.ParticleCircleMaterial( { color: 0xffffff } ) );
+				var PI2 = Math.PI * 2;
+				var program = function ( context, color ) {
+
+					context.fillStyle = color.__styleString;
+					context.beginPath();
+					context.arc( 0, 0, 1, 0, PI2, true );
+					context.closePath();
+					context.fill();
+
+				}
+
+				particleLight = new THREE.Particle( new THREE.ParticleCanvasMaterial( { color: 0xffffff, program: program } ) );
 				particleLight.scale.x = particleLight.scale.y = particleLight.scale.z = 4;
 				scene.addObject( particleLight );
 

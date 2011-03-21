@@ -20,7 +20,7 @@ THREE.CanvasRenderer = function () {
 	_contextFillStyle = null,
 	_contextLineWidth = 1,
 
-	_v1, _v2, _v3,
+	_v1, _v2, _v3, _v4,
 	_v1x, _v1y, _v2x, _v2y, _v3x, _v3y,
 
 	_color = new THREE.Color(),
@@ -31,7 +31,7 @@ THREE.CanvasRenderer = function () {
 
 	_near, _far,
 
-	_bitmap,
+	_bitmap, _uvs,
 	_uv1x, _uv1y, _uv2x, _uv2y, _uv3x, _uv3y,
 
 	_clipRect = new THREE.Rectangle(),
@@ -247,6 +247,15 @@ THREE.CanvasRenderer = function () {
 					}
 
 				}
+
+			} else if ( element instanceof THREE.RenderableFace4 ) {
+
+				_v1 = element.v1; _v2 = element.v2; _v3 = element.v3; _v4 = element.v4;
+
+				_v1.positionScreen.x *= _canvasWidthHalf; _v1.positionScreen.y *= _canvasHeightHalf;
+				_v2.positionScreen.x *= _canvasWidthHalf; _v2.positionScreen.y *= _canvasHeightHalf;
+				_v3.positionScreen.x *= _canvasWidthHalf; _v3.positionScreen.y *= _canvasHeightHalf;
+				_v4.positionScreen.x *= _canvasWidthHalf; _v4.positionScreen.y *= _canvasHeightHalf;
 
 			}
 
@@ -495,11 +504,12 @@ THREE.CanvasRenderer = function () {
 
 			if ( material instanceof THREE.MeshBasicMaterial ) {
 
-				if ( material.map/* && !material.wireframe*/ ) {					
+				if ( material.map/* && !material.wireframe*/ ) {
 
 					if ( material.map.mapping instanceof THREE.UVMapping ) {
 
-						texturePath( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, material.map.image, element.uvs[ 0 ].u, element.uvs[ 0 ].v, element.uvs[ 1 ].u, element.uvs[ 1 ].v, element.uvs[ 2 ].u, element.uvs[ 2 ].v );
+						_uvs = element.uvs[ 0 ];
+						texturePath( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, material.map.image, _uvs[ 0 ].u, _uvs[ 0 ].v, _uvs[ 1 ].u, _uvs[ 1 ].v, _uvs[ 2 ].u, _uvs[ 2 ].v );
 
 					}
 
@@ -544,7 +554,8 @@ THREE.CanvasRenderer = function () {
 
 					if ( material.map.mapping instanceof THREE.UVMapping ) {
 
-						texturePath( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, material.map.image, element.uvs[ 0 ].u, element.uvs[ 0 ].v, element.uvs[ 1 ].u, element.uvs[ 1 ].v, element.uvs[ 2 ].u, element.uvs[ 2 ].v );
+						_uvs = element.uvs[ 0 ];
+						texturePath( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, material.map.image, _uvs[ 0 ].u, _uvs[ 0 ].v, _uvs[ 1 ].u, _uvs[ 1 ].v, _uvs[ 2 ].u, _uvs[ 2 ].v );
 
 					}
 
@@ -674,6 +685,37 @@ THREE.CanvasRenderer = function () {
 		}
 
 		function texturePath( x0, y0, x1, y1, x2, y2, bitmap, u0, v0, u1, v1, u2, v2 ) {
+
+			/*
+			// http://tulrich.com/geekstuff/canvas/jsgl.js
+
+			var m11, m12, m21, m22, dx, dy, denom,
+			width = bitmap.width - 1,
+			height = bitmap.height - 1;
+
+			u0 *= width; v0 *= height;
+			u1 *= width; v1 *= height;
+			u2 *= width; v2 *= height;
+
+			_context.save();
+
+			denom = u0 * (v2 - v1) - u1 * v2 + u2 * v1 + (u1 - u2) * v0;
+
+			if ( denom == 0 ) return;
+
+			m11 = - (v0 * (x2 - x1) - v1 * x2 + v2 * x1 + (v1 - v2) * x0) / denom;
+			m12 = (v1 * y2 + v0 * (y1 - y2) - v2 * y1 + (v2 - v1) * y0) / denom;
+			m21 = (u0 * (x2 - x1) - u1 * x2 + u2 * x1 + (u1 - u2) * x0) / denom;
+			m22 = - (u1 * y2 + u0 * (y1 - y2) - u2 * y1 + (u2 - u1) * y0) / denom;
+			dx = (u0 * (v2 * x1 - v1 * x2) + v0 * (u1 * x2 - u2 * x1) + (u2 * v1 - u1 * v2) * x0) / denom;
+			dy = (u0 * (v2 * y1 - v1 * y2) + v0 * (u1 * y2 - u2 * y1) + (u2 * v1 - u1 * v2) * y0) / denom;
+
+			_context.transform( m11, m12, m21, m22, dx, dy );
+
+			_context.clip();
+			_context.drawImage( bitmap, 0, 0 );
+			_context.restore();
+			*/
 
 			// http://extremelysatisfactorytotalitarianism.com/blog/?p=2120
 
