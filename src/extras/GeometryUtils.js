@@ -5,14 +5,14 @@ var GeometryUtils = {
 		var isMesh = object2 instanceof THREE.Mesh,
 		vertexPosition = geometry1.vertices.length,
 		facePosition = geometry1.faces.length,
-		uvPosition = geometry1.uvs.length,
+		uvPosition = geometry1.faceVertexUvs[ 0 ].length,
 		geometry2 = isMesh ? object2.geometry : object2,
 		vertices1 = geometry1.vertices,
 		vertices2 = geometry2.vertices,
 		faces1 = geometry1.faces,
 		faces2 = geometry2.faces,
-		uvs1 = geometry1.uvs,
-		uvs2 = geometry2.uvs;
+		uvs1 = geometry1.faceVertexUvs[ 0 ],
+		uvs2 = geometry2.faceVertexUvs[ 0 ];
 
 		isMesh && object2.matrixAutoUpdate && object2.updateMatrix();
 

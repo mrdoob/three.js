@@ -291,7 +291,7 @@
 
 				function setUVTile( face, s, t ) {
 
-					var j, uv = cube.uvs[ face ];
+					var j, uv = cube.faceVertexUvs[ 0 ][ face ];
 					for ( j = 0; j < uv.length; j++ ) {
 
 						uv[ j ].u += s * (unit+2*padding);
@@ -372,9 +372,9 @@
 
 						// set UV tiles
 
-						for ( i = 0; i < cube.uvs.length; i++ ) {
+						for ( i = 0; i < cube.faceVertexUvs[ 0 ].length; i++ ) {
 
-							uv = cube.uvs[ i ];
+							uv = cube.faceVertexUvs[ 0 ][ i ];
 
 							for ( j = 0; j < uv.length; j++ ) {
 

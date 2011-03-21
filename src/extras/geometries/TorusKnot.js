@@ -7,7 +7,7 @@ var TorusKnot = function ( radius, tube, segmentsR, segmentsT, p, q, heightScale
 
 	var scope = this;
 	THREE.Geometry.call( this );
-
+	
 	this.radius = radius || 200;
 	this.tube = tube || 40;
 	this.segmentsR = segmentsR || 64;
@@ -26,6 +26,7 @@ var TorusKnot = function ( radius, tube, segmentsR, segmentsT, p, q, heightScale
 		this.grid[ i ] = new Array( this.segmentsT );
 
 		for ( var j = 0; j < this.segmentsT; ++ j ) {
+
 			var u = i / this.segmentsR * 2 * this.p * Math.PI;
 			var v = j / this.segmentsT * 2 * Math.PI;
 			var p = getPos( u, v, this.q, this.p, this.radius, this.heightScale );
@@ -66,10 +67,12 @@ var TorusKnot = function ( radius, tube, segmentsR, segmentsT, p, q, heightScale
 			var uvc = new THREE.UV( i / this.segmentsR, ( j + 1 ) / this.segmentsT );
 			var uvd = new THREE.UV( ( i + 1 ) / this.segmentsR, ( j + 1 ) / this.segmentsT );
 
-			f3(a, b, c);
-			this.uvs.push( [ uva,uvb,uvc ] );
-			f3(d, c, b);
-			this.uvs.push( [ uvd,uvc,uvb ] );
+			f3( a, b, c );
+			this.faceVertexUvs[ 0 ].push( [ uva,uvb,uvc ] );
+			
+			f3( d, c, b );
+			this.faceVertexUvs[ 0 ].push( [ uvd,uvc,uvb ] );
+
 		}
 	}
 
@@ -106,7 +109,7 @@ var TorusKnot = function ( radius, tube, segmentsR, segmentsT, p, q, heightScale
 
 	}
 
-}
+};
 
 TorusKnot.prototype = new THREE.Geometry();
 TorusKnot.prototype.constructor = TorusKnot;

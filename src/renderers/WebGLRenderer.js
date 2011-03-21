@@ -361,7 +361,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		normalType = bufferGuessNormalType( materials, geometryGroup, object );
 		vertexColorType = bufferGuessVertexColorType( materials, geometryGroup, object );
 
-		console.log(uvType, normalType, vertexColorType, geometry, materials );
+		//console.log(uvType, normalType, vertexColorType, object, geometryGroup, materials );
 
 		geometryGroup.__vertexArray = new Float32Array( nvertices * 3 );
 		
@@ -2889,7 +2889,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	};
 
 	function buildProgram ( fragmentShader, vertexShader, parameters ) {
-
+		
 		var program = _gl.createProgram(),
 
 		prefix_fragment = [
@@ -3330,6 +3330,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( !_gl.getShaderParameter( shader, _gl.COMPILE_STATUS ) ) {
 
 			console.error( _gl.getShaderInfoLog( shader ) );
+			console.error( string );
 			return null;
 
 		}
@@ -3449,8 +3450,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var m, ml, i, il,
 			material, meshMaterial,
 			materials = [];
-		
-		console.log( "unrollGroupMaterials", object.materials, geometryGroup );
 		
 		for ( m = 0, ml = object.materials.length; m < ml; m++ ) {
 

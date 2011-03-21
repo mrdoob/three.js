@@ -5,7 +5,7 @@
 function Lathe( points, steps, angle ) {
 
 	THREE.Geometry.call( this );
-
+	
 	this.steps = steps || 12;
 	this.angle = angle || 2 * Math.PI;
 
@@ -47,7 +47,7 @@ function Lathe( points, steps, angle ) {
 		for ( var j = 0; j < oldInds.length - 1; j ++ ) {
 
 			this.faces.push( new THREE.Face4( newInds[ j ], newInds[ j + 1 ], oldInds[ j + 1 ], oldInds[ j ] ) );
-			this.uvs.push( [
+			this.faceVertexUvs[ 0 ].push( [
 
 				new THREE.UV( r / angle, j / points.length ),
 				new THREE.UV( r / angle, ( j + 1 ) / points.length ),
