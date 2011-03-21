@@ -45,9 +45,20 @@
 
 				scene = new THREE.Scene();
 
+				var PI2 = Math.PI * 2;
+				var program = function ( context, color ) {
+
+					context.fillStyle = color.__styleString;
+					context.beginPath();
+					context.arc( 0, 0, 1, 0, PI2, true );
+					context.closePath();
+					context.fill();
+
+				}
+
 				for ( var i = 0; i < 1000; i++ ) {
 
-					particle = new THREE.Particle( new THREE.ParticleCircleMaterial( { color: Math.random() * 0x808008 + 0x808080, opacity: 1 } ) );
+					particle = new THREE.Particle( new THREE.ParticleCanvasMaterial( { color: Math.random() * 0x808008 + 0x808080, program: program } ) );
 					particle.position.x = Math.random() * 2000 - 1000;
 					particle.position.y = Math.random() * 2000 - 1000;
 					particle.position.z = Math.random() * 2000 - 1000;

@@ -391,8 +391,8 @@ THREE.CanvasRenderer = function () {
 					_context.translate( v1.x, v1.y );
 					_context.rotate( - element.rotation );
 					_context.scale( scaleX, - scaleY );
-					_context.translate( - bitmapWidth, - bitmapHeight );
 
+					_context.translate( - bitmapWidth, - bitmapHeight );
 					_context.drawImage( bitmap, 0, 0 );
 
 					_context.restore();
@@ -410,7 +410,7 @@ THREE.CanvasRenderer = function () {
 				_context.stroke();
 				*/
 
-			} else if ( material instanceof THREE.ParticleCircleMaterial ) {
+			} else if ( material instanceof THREE.ParticleCanvasMaterial ) {
 
 				if ( _enableLighting ) {
 
@@ -441,18 +441,13 @@ THREE.CanvasRenderer = function () {
 
 				}
 
-				setFillStyle( _color.__styleString );
-
 				_context.save();
 				_context.translate( v1.x, v1.y );
 				_context.rotate( - element.rotation );
 				_context.scale( width, height );
 
-				_context.beginPath();
-				_context.arc( 0, 0, 1, 0, _pi2, true );
-				_context.closePath();
+				material.program( _context, _color );
 
-				_context.fill();
 				_context.restore();
 
 			}
