@@ -187,7 +187,7 @@
 
 			function createScene( geometry, scale, material1, material2 ) {
 
-				//geometry.computeTangents();
+				geometry.computeTangents();
 
 				//mesh1 = SceneUtils.addMesh( scene, geometry, scale, -scale * 12, 0, 0, 0,0,0, material1 );
 				mesh2 = SceneUtils.addMesh( scene, geometry, scale,  scale * 12, 0, 0, 0,0,0, material2 );

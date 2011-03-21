@@ -159,11 +159,12 @@
 				bcanvas.addEventListener("click", toggleCanvas, false);
 				bwebgl.addEventListener("click", toggleWebGL, false);
 
-				var loader = new THREE.Loader(),
+				//var loader = new THREE.BinaryLoader(),
+				var loader = new THREE.JSONLoader(),
 					callback = function( geometry ) { createScene( geometry) };
 
-				loader.loadAscii( { model: "obj/female02/Female02_slim.js", callback: callback } );
-				//loader.loadBinary( { model: "obj/female02/Female02_bin.js", callback: callback } );
+				loader.load( { model: "obj/female02/Female02_slim.js", callback: callback } );
+				//loader.load( { model: "obj/female02/Female02_bin.js", callback: callback } );
 
 			}
 

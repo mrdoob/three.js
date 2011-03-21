@@ -123,10 +123,10 @@
 				stats.domElement.style.zIndex = 100;
 				container.appendChild( stats.domElement );
 
-				loader = new THREE.Loader( true );
+				loader = new THREE.BinaryLoader( true );
 				document.body.appendChild( loader.statusDomElement );
 
-				loader.loadBinary( { model: 'obj/lucy/Lucy100k_bin.js', callback: function( geometry ) { createScene( geometry, cubeMaterial1, cubeMaterial2, cubeMaterial3 ) } } );
+				loader.load( { model: 'obj/lucy/Lucy100k_bin.js', callback: function( geometry ) { createScene( geometry, cubeMaterial1, cubeMaterial2, cubeMaterial3 ) } } );
 
 				document.addEventListener('mousemove', onDocumentMouseMove, false);
 

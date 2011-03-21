@@ -144,8 +144,8 @@
 				camaroMaterials.body.push( [ "Bronze", new THREE.MeshPhongMaterial( { color: 0x150505, specular:0xee6600, shininess:10, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.5 } ) ] );
 				camaroMaterials.body.push( [ "Chrome", new THREE.MeshPhongMaterial( { color: 0xffffff, specular:0xffffff, envMap: textureCube, combine: THREE.MultiplyOperation } ) ] );
 
-				var loader = new THREE.Loader();
-				loader.loadBinary( { model: "obj/camaro/CamaroNoUv_bin.js", callback: function( geometry ) { createScene( geometry, camaroMaterials ) } } );
+				var loader = new THREE.BinaryLoader();
+				loader.load( { model: "obj/camaro/CamaroNoUv_bin.js", callback: function( geometry ) { createScene( geometry, camaroMaterials ) } } );
 
 			}
 

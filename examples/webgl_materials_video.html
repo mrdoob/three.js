@@ -180,9 +180,9 @@
 
 				var i, j, uv;
 
-				for ( i = 0; i < geometry.uvs.length; i++ ) {
+				for ( i = 0; i < geometry.faceVertexUvs[ 0 ].length; i++ ) {
 
-					uv = geometry.uvs[ i ];
+					uv = geometry.faceVertexUvs[ 0 ][ i ];
 
 					for ( j = 0; j < uv.length; j++ ) {
 

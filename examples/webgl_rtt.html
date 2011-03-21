@@ -156,8 +156,8 @@
 				quad.position.z = -100;
 				sceneRTT.addObject( quad );
 
-				var loader = new THREE.Loader();
-				loader.loadBinary( { model: "obj/torus/Torus_bin.js", callback: function( geometry ) { createMesh( geometry, sceneRTT ) } } );
+				var loader = new THREE.BinaryLoader();
+				loader.load( { model: "obj/torus/Torus_bin.js", callback: function( geometry ) { createMesh( geometry, sceneRTT ) } } );
 
 				quad = new THREE.Mesh( plane, materialScreen );
 				quad.position.z = -100;

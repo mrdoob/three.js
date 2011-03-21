@@ -126,14 +126,14 @@
 				var i, j, uvs,
 					geometryRepeat = new Plane( 100, 100, 1, 1 );
 					
-				for( i = 0; i < geometryRepeat.uvs.length; i++ ) {
+				for( i = 0; i < geometryRepeat.faceVertexUvs[ 0 ].length; i++ ) {
 					
-					uvs = geometryRepeat.uvs[i];
+					uvs = geometryRepeat.faceVertexUvs[ 0 ][ i ];
 					
 					for ( j = 0; j < uvs.length; j++ ) {
 					
-						uvs[j].u *= 1000;
-						uvs[j].v *= 1000;
+						uvs[ j ].u *= 1000;
+						uvs[ j ].v *= 1000;
 
 					}
 

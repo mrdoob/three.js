@@ -151,7 +151,7 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
-			var loader = new THREE.Loader( true );
+			var loader = new THREE.BinaryLoader( true );
 			document.body.appendChild( loader.statusDomElement );
 
 			init();
@@ -449,7 +449,7 @@
 
 				}
 
-				loader.loadBinary( { model: CARS[ "veyron" ].url, callback: function( geometry ) { createScene( geometry, "veyron" ) } } );
+				loader.load( { model: CARS[ "veyron" ].url, callback: function( geometry ) { createScene( geometry, "veyron" ) } } );
 
 				for( var c in CARS ) initCarButton( c );
 
@@ -462,7 +462,7 @@
 					if ( ! CARS[ car ].object ) {
 
 						loader.statusDomElement.style.display = "block";
-						loader.loadBinary( { model: CARS[ car ].url, callback: function( geometry ) { createScene( geometry, car ) } } );
+						loader.load( { model: CARS[ car ].url, callback: function( geometry ) { createScene( geometry, car ) } } );
 
 					} else {
 
