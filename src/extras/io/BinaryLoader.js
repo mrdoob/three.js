@@ -682,14 +682,14 @@ THREE.BinaryLoader.prototype = {
 	f3: function( scope, a, b, c, mi ) {
 
 		var material = scope.materials[ mi ];
-		scope.faces.push( new THREE.Face3( a, b, c, null, material ) );
+		scope.faces.push( new THREE.Face3( a, b, c, null, null, material ) );
 
 	},
 
 	f4: function( scope, a, b, c, d, mi ) {
 
 		var material = scope.materials[ mi ];
-		scope.faces.push( new THREE.Face4( a, b, c, d, null, material ) );
+		scope.faces.push( new THREE.Face4( a, b, c, d, null, null, material ) );
 
 	},
 
