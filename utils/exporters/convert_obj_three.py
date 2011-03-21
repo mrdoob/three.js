@@ -580,10 +580,10 @@ def generate_face(f):
     hasMaterial = True # for the moment OBJs without materials get default material
     
     hasFaceUvs = False # not supported in OBJ
-    hasFaceVertexUvs = ( len(f['uv']) == nVertices )
+    hasFaceVertexUvs = ( len(f['uv']) >= nVertices )
 
     hasFaceNormals = False # don't export any face normals (as they are computed in engine)
-    hasFaceVertexNormals = ( len(f["normal"]) == nVertices and SHADING == "smooth" )
+    hasFaceVertexNormals = ( len(f["normal"]) >= nVertices and SHADING == "smooth" )
     
     hasFaceColors = False       # not supported in OBJ
     hasFaceVertexColors = False # not supported in OBJ
