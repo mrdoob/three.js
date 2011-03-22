@@ -718,21 +718,6 @@ THREE.CanvasRenderer = function () {
 
 				if ( _enableLighting ) {
 
-					/*
-					_light.r = _ambientLight.r;
-					_light.g = _ambientLight.g;
-					_light.b = _ambientLight.b;
-
-					calculateLight( scene, element.centroidWorld, element.normalWorld, _light );
-
-					_color.r = material.color.r * _light.r;
-					_color.g = material.color.g * _light.g;
-					_color.b = material.color.b * _light.b;
-
-					_color.updateStyleString();
-					material.wireframe ? strokePath( _color.__styleString, material.wireframeLinewidth ) : fillPath( _color.__styleString );
-					*/
-
 					if ( !material.wireframe && material.shading == THREE.SmoothShading && element.vertexNormalsWorld.length == 4 ) {
 
 						_color1.r = _color2.r = _color3.r = _color4.r = _ambientLight.r;
