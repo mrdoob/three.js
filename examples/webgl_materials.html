@@ -71,6 +71,7 @@
 				generatedTexture.needsUpdate = true;
 
 				var materials = [];
+				materials.push( new THREE.MeshLambertMaterial( { map: generatedTexture } ) );
 				materials.push( new THREE.MeshLambertMaterial( { color: 0xdddddd, shading: THREE.FlatShading } ) );
 				materials.push( new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.FlatShading } ) );
 				materials.push( new THREE.MeshNormalMaterial( ) );
@@ -84,7 +85,6 @@
 
 				materials.push( new THREE.MeshDepthMaterial() );
 				materials.push( new THREE.MeshBasicMaterial( { map: generatedTexture } ) );
-				materials.push( new THREE.MeshLambertMaterial( { map: generatedTexture } ) );
 
 				// Spheres geometry
 
