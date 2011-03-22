@@ -74,7 +74,8 @@
 				scene.addLight( light );
 
 				var loader = new THREE.JSONLoader();
-				loader.load( { model: "obj/cubecolors/cubecolors.js", callback: createScene } );
+				loader.load( { model: "obj/cubecolors/cubecolors.js", callback: createScene1 } );
+				loader.load( { model: "obj/cubecolors/cube_fvc.js", callback: createScene2 } );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -90,13 +91,23 @@
 
 			}
 
-			function createScene( geometry ) {
+			function createScene1( geometry ) {
 
 				geometry.materials[0][0].shading = THREE.FlatShading;
 
 				var material = [ new THREE.MeshFaceMaterial(), new THREE.MeshLambertMaterial( { color: 0xffffff, opacity:0.9, shading:THREE.FlatShading, wireframe: true, wireframeLinewidth: 2 } ) ];
 
-				mesh = SceneUtils.addMesh( scene, geometry, 250, 0, 0, 0, 0, 0, 0, material );
+				mesh = SceneUtils.addMesh( scene, geometry, 250, 400, 0, 0, 0, 0, 0, material );
+
+			}
+
+			function createScene2( geometry ) {
+
+				geometry.materials[0][0].shading = THREE.FlatShading;
+
+				var material = new THREE.MeshFaceMaterial();
+
+				mesh2 = SceneUtils.addMesh( scene, geometry, 250, -400, 0, 0, 0, 0, 0, material );
 
 			}
 
@@ -127,6 +138,11 @@
 
 					mesh.rotation.x += 0.01;
 					mesh.rotation.y += 0.01;
+				}
+				
+				if ( mesh2 ) {
+					mesh2.rotation.x += 0.01;
+					mesh2.rotation.y += 0.01;
 
 				}
 
