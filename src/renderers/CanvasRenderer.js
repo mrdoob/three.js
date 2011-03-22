@@ -648,7 +648,7 @@ THREE.CanvasRenderer = function () {
 						_color.updateStyleString();
 						material.wireframe ? strokePath( _color.__styleString, material.wireframeLinewidth ) : fillPath( _color.__styleString );
 
-					} 
+					}
 
 				} else {
 
@@ -709,38 +709,16 @@ THREE.CanvasRenderer = function () {
 			_v5x = v5.positionScreen.x; _v5y = v5.positionScreen.y;
 			_v6x = v6.positionScreen.x; _v6y = v6.positionScreen.y;
 
-			if ( material instanceof THREE.MeshDepthMaterial ) {
-
-				_near = camera.near;
-				_far = camera.far;
-
-				_color1.r = _color1.g = _color1.b = 1 - smoothstep( v1.positionScreen.z, _near, _far );
-				_color2.r = _color2.g = _color2.b = 1 - smoothstep( v2.positionScreen.z, _near, _far );
-				_color3.r = _color3.g = _color3.b = 1 - smoothstep( v4.positionScreen.z, _near, _far );
-				_color4.r = _color4.g = _color4.b = 1 - smoothstep( v3.positionScreen.z, _near, _far );
-
-				_bitmap = getGradientTexture( _color1, _color2, _color3, _color4 );
-
-				drawTriangle( _v1x, _v1y, _v2x, _v2y, _v4x, _v4y );
-				texturePath( _v1x, _v1y, _v2x, _v2y, _v4x, _v4y, _bitmap, 0, 0, 1, 0, 0, 1 );
-
-				drawTriangle( _v5x, _v5y, _v3x, _v3y, _v6x, _v6y );
-				texturePath( _v5x, _v5y, _v3x, _v3y, _v6x, _v6y, _bitmap, 1, 0, 1, 1, 0, 1 );
-
-				return;
-
-			}
-
-			drawQuad( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _v4x, _v4y );
-
 			if ( material instanceof THREE.MeshBasicMaterial ) {
 
+				drawQuad( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _v4x, _v4y );
 				material.wireframe ? strokePath( material.color.__styleString, material.wireframeLinewidth ) : fillPath( material.color.__styleString );
 
 			} else if ( material instanceof THREE.MeshLambertMaterial ) {
 
 				if ( _enableLighting ) {
 
+					/*
 					_light.r = _ambientLight.r;
 					_light.g = _ambientLight.g;
 					_light.b = _ambientLight.b;
@@ -753,9 +731,51 @@ THREE.CanvasRenderer = function () {
 
 					_color.updateStyleString();
 					material.wireframe ? strokePath( _color.__styleString, material.wireframeLinewidth ) : fillPath( _color.__styleString );
+					*/
+
+					if ( !material.wireframe && material.shading == THREE.SmoothShading && element.vertexNormalsWorld.length == 4 ) {
+
+						_color1.r = _color2.r = _color3.r = _color4.r = _ambientLight.r;
+						_color1.g = _color2.g = _color3.g = _color4.g = _ambientLight.g;
+						_color1.b = _color2.b = _color3.b = _color4.b = _ambientLight.b;
+
+						calculateLight( scene, element.v1.positionWorld, element.vertexNormalsWorld[ 0 ], _color1 );
+						calculateLight( scene, element.v2.positionWorld, element.vertexNormalsWorld[ 1 ], _color2 );
+						calculateLight( scene, element.v4.positionWorld, element.vertexNormalsWorld[ 3 ], _color3 );
+						calculateLight( scene, element.v3.positionWorld, element.vertexNormalsWorld[ 2 ], _color4 );
+
+						_bitmap = getGradientTexture( _color1, _color2, _color3, _color4 );
+
+						// TODO: UVs are incorrect, v4->v3?
+
+						drawTriangle( _v1x, _v1y, _v2x, _v2y, _v4x, _v4y );
+						texturePath( _v1x, _v1y, _v2x, _v2y, _v4x, _v4y, _bitmap, 0, 0, 1, 0, 0, 1 );
+
+						drawTriangle( _v5x, _v5y, _v3x, _v3y, _v6x, _v6y );
+						texturePath( _v5x, _v5y, _v3x, _v3y, _v6x, _v6y, _bitmap, 1, 0, 1, 1, 0, 1 );
+
+					} else {
+
+						_light.r = _ambientLight.r;
+						_light.g = _ambientLight.g;
+						_light.b = _ambientLight.b;
+
+						calculateLight( scene, element.centroidWorld, element.normalWorld, _light );
+
+						_color.r = material.color.r * _light.r;
+						_color.g = material.color.g * _light.g;
+						_color.b = material.color.b * _light.b;
+
+						_color.updateStyleString();
+
+						drawQuad( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _v4x, _v4y );
+						material.wireframe ? strokePath( _color.__styleString, material.wireframeLinewidth ) : fillPath( _color.__styleString );
+
+					}
 
 				} else {
 
+					drawQuad( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _v4x, _v4y );
 					material.wireframe ? strokePath( material.color.__styleString, material.wireframeLinewidth ) : fillPath( material.color.__styleString );
 
 				}
@@ -767,7 +787,28 @@ THREE.CanvasRenderer = function () {
 				_color.b = normalToComponent( element.normalWorld.z );
 				_color.updateStyleString();
 
+				drawQuad( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _v4x, _v4y );
 				material.wireframe ? strokePath( _color.__styleString, material.wireframeLinewidth ) : fillPath( _color.__styleString );
+
+			} else if ( material instanceof THREE.MeshDepthMaterial ) {
+
+				_near = camera.near;
+				_far = camera.far;
+
+				_color1.r = _color1.g = _color1.b = 1 - smoothstep( v1.positionScreen.z, _near, _far );
+				_color2.r = _color2.g = _color2.b = 1 - smoothstep( v2.positionScreen.z, _near, _far );
+				_color3.r = _color3.g = _color3.b = 1 - smoothstep( v4.positionScreen.z, _near, _far );
+				_color4.r = _color4.g = _color4.b = 1 - smoothstep( v3.positionScreen.z, _near, _far );
+
+				_bitmap = getGradientTexture( _color1, _color2, _color3, _color4 );
+
+				// TODO: UVs are incorrect, v4->v3?
+
+				drawTriangle( _v1x, _v1y, _v2x, _v2y, _v4x, _v4y );
+				texturePath( _v1x, _v1y, _v2x, _v2y, _v4x, _v4y, _bitmap, 0, 0, 1, 0, 0, 1 );
+
+				drawTriangle( _v5x, _v5y, _v3x, _v3y, _v6x, _v6y );
+				texturePath( _v5x, _v5y, _v3x, _v3y, _v6x, _v6y, _bitmap, 1, 0, 1, 1, 0, 1 );
 
 			}
 
