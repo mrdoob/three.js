@@ -89,11 +89,11 @@ Download the [minified library](http://mrdoob.github.com/three.js/build/Three.js
 
 	<script src="js/Three.js"></script>
 
-This code creates a camera, then creates a scene object, adds a bunch of random particles in it, creates a &lt;canvas&gt; renderer and adds its viewport in the document.body element.
+This code creates a camera, then creates a scene, adds a cube on it, creates a &lt;canvas&gt; renderer and adds its viewport in the document.body element.
 
 	<script>
 
-		var camera, scene, renderer;
+		var camera, scene, mesh, renderer;
 
 		init();
 		animate();
@@ -105,16 +105,8 @@ This code creates a camera, then creates a scene object, adds a bunch of random 
 
 			scene = new THREE.Scene();
 
-			for ( var i = 0; i < 1000; i ++ ) {
-
-				var particle = new THREE.Particle( new THREE.ParticleCircleMaterial( { color: Math.random() * 0xffffff } ) );
-				particle.position.x = Math.random() * 2000 - 1000;
-				particle.position.y = Math.random() * 2000 - 1000;
-				particle.position.z = Math.random() * 2000 - 1000;
-				particle.scale.x = particle.scale.y = Math.random() * 10 + 5;
-				scene.addObject( particle );
-
-			}
+			mesh = new THREE.Mesh( new Cube( 200, 200, 200 ), new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } ) );
+			scene.addObject( mesh );
 
 			renderer = new THREE.CanvasRenderer();
 			renderer.setSize( window.innerWidth, window.innerHeight );
@@ -132,6 +124,9 @@ This code creates a camera, then creates a scene object, adds a bunch of random 
 		}
 
 		function render() {
+
+			mesh.rotation.x += 0.01;
+			mesh.rotation.y += 0.02;
 
 			renderer.render( scene, camera );
 
