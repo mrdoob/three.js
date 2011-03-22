@@ -216,7 +216,6 @@ SVG_FILES = [
 'materials/MeshNormalMaterial.js',
 'materials/MeshFaceMaterial.js',
 'materials/ParticleBasicMaterial.js',
-'materials/ParticleCanvasMaterial.js',
 'objects/Particle.js',
 'objects/Line.js',
 'objects/Mesh.js',
