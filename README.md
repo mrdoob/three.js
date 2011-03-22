@@ -93,7 +93,8 @@ This code creates a camera, then creates a scene, adds a cube on it, creates a &
 
 	<script>
 
-		var camera, scene, mesh, renderer;
+		var camera, scene, renderer,
+		geometry, material, mesh;
 
 		init();
 		animate();
@@ -105,7 +106,10 @@ This code creates a camera, then creates a scene, adds a cube on it, creates a &
 
 			scene = new THREE.Scene();
 
-			mesh = new THREE.Mesh( new Cube( 200, 200, 200 ), new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } ) );
+			geometry = new Cube( 200, 200, 200 );
+			material = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
+
+			mesh = new THREE.Mesh( geometry, material );
 			scene.addObject( mesh );
 
 			renderer = new THREE.CanvasRenderer();
