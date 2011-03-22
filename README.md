@@ -15,6 +15,7 @@ More? [#three.js on irc.freenode.net](http://webchat.freenode.net/?channels=thre
 
 #### WebGL (Context 3D) ####
 
+[![equirectangular](http://mrdoob.github.com/three.js/assets/examples/44_equirectangular.png)](http://mrdoob.github.com/three.js/examples/webgl_panorama_equirectangular.html)
 [![scissors](http://mrdoob.github.com/three.js/assets/examples/42_scissors.png)](http://mrdoob.github.com/three.js/examples/webgl_materials_texture_filters.html)
 [![lookat](http://mrdoob.github.com/three.js/assets/examples/41_lookat.png)](http://mrdoob.github.com/three.js/examples/misc_lookat.html)
 [![video](http://mrdoob.github.com/three.js/assets/examples/40_video.png)](http://mrdoob.github.com/three.js/examples/webgl_materials_video.html)
@@ -64,6 +65,8 @@ More? [#three.js on irc.freenode.net](http://webchat.freenode.net/?channels=thre
 
 ### Featured projects ###
 
+[![Photoparticles](http://mrdoob.github.com/three.js/assets/projects/15_photoparticles.png)](http://lab.aerotwist.com/webgl/photoparticles/)
+[![Plumegraph](http://mrdoob.github.com/three.js/assets/projects/14_plumegraph.png)](http://plumegraph.org/)
 [![HelloRacer](http://mrdoob.github.com/three.js/assets/projects/13_helloracer.png)](http://helloracer.com/webgl/)
 [![FastKat](http://mrdoob.github.com/three.js/assets/projects/12_fastkat.png)](http://www.omiod.com/games/fastkat.php)
 [![Sculpt](http://mrdoob.github.com/three.js/assets/projects/11_sculpt.png)](http://antimatter15.com/wp/2010/11/digital-sculpting-with-three-js/)
@@ -138,6 +141,16 @@ This code creates a camera, then creates a scene object, adds a bunch of random 
 
 
 ### Change Log ###
+
+2011 03 22 - **r37** (208.495 KB, gzip: 51.376 KB)
+
+* Changed JSON file format. (**Re-exporting of models required**) ([alteredq](http://github.com/alteredq) and [mrdoob](http://github.com/mrdoob))
+* Updated Blender and 3DSMAX exporters for new format. ([alteredq](http://github.com/alteredq))
+* Vertex colors are now per-face ([alteredq](http://github.com/alteredq))
+* `Geometry.uvs` is now a multidimensional array (allowing infinite uv sets) ([alteredq](http://github.com/alteredq))
+* `CanvasRenderer` renders `Face4` again (without spliting to 2 `Face3`) ([mrdoob](http://github.com/mrdoob))
+* `ParticleCircleMaterial` > `ParticleCanvasMaterial`. Allowing injecting any `canvas.context` code! ([mrdoob](http://github.com/mrdoob))
+
 
 2011 03 14 - **r36** (194.547 KB, gzip: 48.608 KB)
 
