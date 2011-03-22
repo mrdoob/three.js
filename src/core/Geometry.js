@@ -299,17 +299,17 @@ THREE.Geometry.prototype = {
 		}
 
 		var faceIndex = [ 'a', 'b', 'c', 'd' ];
-		
+
 		for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
-			
+
 			face = this.faces[ f ];
-			
+
 			for ( i = 0; i < face.vertexNormals.length; i++ ) {
-				
+
 				n.copy( face.vertexNormals[ i ] );
-				
+
 				vertexIndex = face[ faceIndex[ i ] ];
-				
+
 				t = tan1[ vertexIndex ];
 
 				// Gram-Schmidt orthogonalize
@@ -324,9 +324,9 @@ THREE.Geometry.prototype = {
 				w = (test < 0.0) ? -1.0 : 1.0;
 
 				face.vertexTangents[ i ] = new THREE.Vector4( tmp.x, tmp.y, tmp.z, w );
-				
+
 			}
-			
+
 		}
 
 		this.hasTangents = true;
