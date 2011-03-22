@@ -1132,12 +1132,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 				if ( dirtyElements ) {
 
 					faceArray[ offset_face ]     = vertexIndex;
-					faceArray[ offset_face + 1 ] = vertexIndex + 1;
-					faceArray[ offset_face + 2 ] = vertexIndex + 2;
+				   faceArray[ offset_face + 1 ] = vertexIndex + 1;
+				   faceArray[ offset_face + 2 ] = vertexIndex + 3;
 
-					faceArray[ offset_face + 3 ] = vertexIndex;
-					faceArray[ offset_face + 4 ] = vertexIndex + 2;
-					faceArray[ offset_face + 5 ] = vertexIndex + 3;
+				   faceArray[ offset_face + 3 ] = vertexIndex + 1;
+				   faceArray[ offset_face + 4 ] = vertexIndex + 2;
+				   faceArray[ offset_face + 5 ] = vertexIndex + 3;
 
 					offset_face += 6;
 

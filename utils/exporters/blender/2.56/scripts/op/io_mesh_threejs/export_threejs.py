@@ -103,7 +103,7 @@ def veckey3d(v):
 
 def veckey2d(v):
     return round(v[0], 6), round(v[1], 6)
-
+    
 def get_normal_indices(v, normals, mesh):
     n = []
     mv = mesh.vertices
@@ -118,13 +118,14 @@ def get_uv_indices(face_index, uvs, mesh):
         uv.append( uvs[veckey2d(i)] )
     return uv
 
-def get_color_indices(v, normals, mesh):
-    # TODO: make it proper
-    # this just reuses vertex indices as color indices
-    n = []
-    for i in range(len(v)):
-        n.append( v[i] )
-    return n
+def get_color_indices(face_index, colors, mesh):
+    c = []
+    color_layer = mesh.vertex_colors.active.data
+    face_colors = color_layer[face_index]
+    face_colors = face_colors.color1, face_colors.color2, face_colors.color3, face_colors.color4
+    for i in face_colors:
+        c.append( colors[hexcolor(i)] )
+    return c
 
 # #####################################################
 # Alignment
@@ -207,6 +208,9 @@ def bottom(vertices):
 # #####################################################
 # Elements
 # #####################################################
+def hexcolor(c):
+    return ( int(c[0] * 255) << 16  ) + ( int(c[1] * 255) << 8 ) + int(c[2] * 255)
+    
 def generate_vertex(v):
     return TEMPLATE_VERTEX % (v.co.x, v.co.y, v.co.z)
 
@@ -214,8 +218,7 @@ def generate_normal(n):
     return TEMPLATE_N % (n[0], n[1], n[2])
     
 def generate_vertex_color(c):
-    hexcolor = ( int(c[0] * 255) << 16  ) + ( int(c[1] * 255) << 8 ) + int(c[2] * 255)
-    return TEMPLATE_C % hexcolor
+    return TEMPLATE_C % c
     
 def generate_uv(uv):
     return TEMPLATE_UV % (uv[0], 1.0 - uv[1])
@@ -292,7 +295,7 @@ def generate_face(f, faceIndex, normals, uvs, colors, mesh, use_normals, use_col
             faceData.append(index)
             
     if hasFaceVertexColors:
-        c = get_color_indices(f.vertices, colors, mesh)
+        c = get_color_indices(faceIndex, colors, mesh)
         for i in range(nVertices):
             index = c[i]
             faceData.append(index)
@@ -334,11 +337,10 @@ def generate_normals(normals, use_normals):
 # #####################################################
 def extract_vertex_colors(mesh, use_colors):
     
-    # TODO: handle properly per face vertex colors
-    
     if not use_colors:
         return {}, 0
 
+    count = 0
     colors = {}
 
     color_layer = mesh.vertex_colors.active.data
@@ -347,19 +349,13 @@ def extract_vertex_colors(mesh, use_colors):
         
         face_colors = color_layer[face_index]
         face_colors = face_colors.color1, face_colors.color2, face_colors.color3, face_colors.color4
-        
-        for i, vertex_index in enumerate(face.vertices):
+    
+        for c in face_colors:
+            key = hexcolor(c)
+            if key not in colors:
+                colors[key] = count
+                count += 1
 
-            if vertex_index not in colors:
-                fc = face_colors[i]
-                colors[vertex_index] = fc[0], fc[1], fc[2]
-
-    # make sure all vertices have some color
-    count = len(mesh.vertices)
-    for i in range(count):
-        if i not in colors:
-            colors[i] = (0,0,0)
-            
     return colors, count
 
 def generate_vertex_colors(colors, use_colors):
@@ -367,8 +363,8 @@ def generate_vertex_colors(colors, use_colors):
         return ""
 
     chunks = []
-    for vertex_index, color in sorted(colors.items(), key=operator.itemgetter(0)):
-        chunks.append(color)
+    for key, index in sorted(colors.items(), key=operator.itemgetter(1)):
+        chunks.append(key)
 
     return ",".join(generate_vertex_color(c) for c in chunks)
 
@@ -376,6 +372,7 @@ def generate_vertex_colors(colors, use_colors):
 # UVs
 # #####################################################
 def extract_uvs(mesh, use_uv_coords):
+
     if not use_uv_coords:
         return {}, 0
 
@@ -385,7 +382,9 @@ def extract_uvs(mesh, use_uv_coords):
     uv_layer = mesh.uv_textures.active.data
 
     for face_index, face in enumerate(mesh.faces):
+
         for uv_index, uv in enumerate(uv_layer[face_index].uv):
+
             key = veckey2d(uv)
             if key not in uvs:
                 uvs[key] = count

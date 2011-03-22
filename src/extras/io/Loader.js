@@ -128,9 +128,10 @@ THREE.Loader.prototype = {
 		if ( m.shading ) {
 			
 			if ( m.shading == "Phong" ) mtype = "MeshPhongMaterial";
-			
+			else if ( m.shading == "Basic" ) mtype = "MeshBasicMaterial";
+
 		}
-		
+
 		if ( m.mapDiffuse && texture_path ) {
 
 			texture = document.createElement( 'canvas' );
