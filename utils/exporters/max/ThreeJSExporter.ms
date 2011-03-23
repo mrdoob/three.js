@@ -1,6 +1,6 @@
 -------------------------------------------------------------------------------------
 -- ThreeJSExporter.ms
--- Exports geometry from 3ds max to Three.js models in ASCII JSON format
+-- Exports geometry from 3ds max to Three.js models in ASCII JSON format v2
 -- By alteredq / http://alteredqualia.com
 -------------------------------------------------------------------------------------
 
@@ -40,7 +40,7 @@ rollout ThreeJSExporter "ThreeJSExporter"
 	-- User interface
 
 
-	group "ThreeJSExporter  v0.4"
+	group "ThreeJSExporter  v0.5"
 	(
 
 		label msg "Exports selected meshes in Three.js ascii JSON format" align:#left
@@ -819,7 +819,7 @@ rollout ThreeJSExporter "ThreeJSExporter"
 			-- unknown or undefined material
 			
 			append whereto false
-			append wheretoColors hasVColors
+			append wheretoColors false
 
 		)
 
@@ -884,7 +884,7 @@ rollout ThreeJSExporter "ThreeJSExporter"
 
 		-- Not geometry ... could be a camera, light, etc.
 		
-		return #( false, node.name, 0 )
+		return #( false, node.name, 0, false, false )
 
 	)
 

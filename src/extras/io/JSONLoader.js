@@ -73,7 +73,7 @@ THREE.JSONLoader.prototype = {
 
 				};
 				
-				var i, j, 
+				var i, j, fi,
 				
 				offset, zLength,
 
@@ -130,6 +130,7 @@ THREE.JSONLoader.prototype = {
 
 					type = faces[ offset ++ ];
 
+					
 					isQuad          	= isBitSet( type, 0 );
 					hasMaterial         = isBitSet( type, 1 );
 					hasFaceUv           = isBitSet( type, 2 );
@@ -207,7 +208,10 @@ THREE.JSONLoader.prototype = {
 
 							}
 
-							scope.faceVertexUvs[ i ].push( uvs );
+							// to get face <=> uv index correspondence
+							
+							fi = scope.faces.length;
+							scope.faceVertexUvs[ i ][ fi ] = uvs;
 
 						}
 
