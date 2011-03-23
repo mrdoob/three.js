@@ -4,7 +4,7 @@
 How to use this converter
 -------------------------
 
-python convert_obj_three.py -i infile.obj -o outfile.js [-m morphfiles*.obj] [-a center|top|bottom|none] [-s smooth|flat] [-t ascii|binary] [-d invert|normal]
+python convert_obj_three.py -i infile.obj -o outfile.js [-m morphfiles*.obj] [-a center|centerxz|top|bottom|none] [-s smooth|flat] [-t ascii|binary] [-d invert|normal]
 
 Notes: 
 
@@ -132,7 +132,7 @@ import glob
 # #####################################################
 # Configuration
 # #####################################################
-ALIGN = "center"        # center bottom top none
+ALIGN = "center"        # center centerxz bottom top none
 SHADING = "smooth"      # smooth flat 
 TYPE = "ascii"          # ascii binary
 TRANSPARENCY = "normal" # normal invert
@@ -308,6 +308,18 @@ def bottom(vertices):
     
     cx = bb['x'][0] + (bb['x'][1] - bb['x'][0])/2.0
     cy = bb['y'][0] 
+    cz = bb['z'][0] + (bb['z'][1] - bb['z'][0])/2.0
+    
+    translate(vertices, [-cx,-cy,-cz])
+
+def centerxz(vertices):
+    """Center model around X and Z.
+    """
+    
+    bb = bbox(vertices)
+    
+    cx = bb['x'][0] + (bb['x'][1] - bb['x'][0])/2.0
+    cy = 0 
     cz = bb['z'][0] + (bb['z'][1] - bb['z'][0])/2.0
     
     translate(vertices, [-cx,-cy,-cz])
@@ -814,6 +826,8 @@ def convert_ascii(infile, morphfiles, outfile):
     
     if ALIGN == "center":
         center(vertices)
+    elif ALIGN == "centerxz":
+        centerxz(vertices)
     elif ALIGN == "bottom":
         bottom(vertices)
     elif ALIGN == "top":
@@ -832,9 +846,7 @@ def convert_ascii(infile, morphfiles, outfile):
     
     morphData = []
     for mfilepattern in morphfiles.split():
-        matches = glob.glob(mfilepattern)
-        matches.sort()
-        for path in matches:
+        for path in glob.glob(mfilepattern):
             normpath = os.path.normpath(path)
             if normpath != norminfile or not skipOriginalMorph:
                 name = os.path.basename(normpath)
@@ -847,6 +859,8 @@ def convert_ascii(infile, morphfiles, outfile):
                 else:                    
                     if ALIGN == "center":
                         center(morphVertices)
+                    elif ALIGN == "centerxz":
+                        centerxz(morphVertices)
                     elif ALIGN == "bottom":
                         bottom(morphVertices)
                     elif ALIGN == "top":
@@ -903,6 +917,8 @@ def convert_binary(infile, outfile):
     
     if ALIGN == "center":
         center(vertices)
+    elif ALIGN == "centerxz":
+        centerxz(vertices)
     elif ALIGN == "bottom":
         bottom(vertices)
     elif ALIGN == "top":
@@ -1233,7 +1249,7 @@ if __name__ == "__main__":
             outfile = a
 
         elif o in ("-a", "--align"):
-            if a in ("top", "bottom", "center","none"):
+            if a in ("top", "bottom", "center", "centerxz", "none"):
                 ALIGN = a
 
         elif o in ("-s", "--shading"):
