@@ -51,24 +51,31 @@
 
 				scene = new THREE.Scene();
 
-				var geometry = new Cube( 50, 50, 50 );
-				var material = new THREE.MeshNormalMaterial();
+				var material = new THREE.MeshNormalMaterial( { shading: THREE.SmoothShading } );
 
-				for ( var i = 0; i < 5000; i ++ ) {
+				var loader = new THREE.JSONLoader();
+				loader.load( { model: 'obj/Suzanne.js', callback: function ( geometry ) {
 
-					var mesh = new THREE.Mesh( geometry, material );
-					mesh.position.x = Math.random() * 10000 - 5000;
-					mesh.position.y = Math.random() * 10000 - 5000;
-					mesh.position.z = Math.random() * 10000 - 5000;
-					mesh.rotation.x = Math.random() * 360 * ( Math.PI / 180 );
-					mesh.rotation.y = Math.random() * 360 * ( Math.PI / 180 );
-					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 4 + 1;
-					mesh.matrixAutoUpdate = false;
-					mesh.updateMatrix();
+					geometry.computeVertexNormals();
 
-					scene.addObject( mesh );
+					for ( var i = 0; i < 5000; i ++ ) {
 
-				}
+						var mesh = new THREE.Mesh( geometry, material );
+
+						mesh.position.x = Math.random() * 10000 - 5000;
+						mesh.position.y = Math.random() * 10000 - 5000;
+						mesh.position.z = Math.random() * 10000 - 5000;
+						mesh.rotation.x = Math.random() * 360 * ( Math.PI / 180 );
+						mesh.rotation.y = Math.random() * 360 * ( Math.PI / 180 );
+						mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 50 + 100;
+						mesh.matrixAutoUpdate = false;
+						mesh.updateMatrix();
+
+						scene.addObject( mesh );
+
+					}
+
+				} } );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
