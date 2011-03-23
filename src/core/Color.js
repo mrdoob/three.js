@@ -12,6 +12,16 @@ THREE.Color.prototype = {
 
 	autoUpdate : true,
 
+	copy : function ( color ) {
+
+		this.r = color.r;
+		this.g = color.g;
+		this.b = color.b;
+		this.hex = color.hex;
+		this.__styleString = color.__styleString;
+
+	},
+
 	setRGB : function ( r, g, b ) {
 
 		this.r = r;
