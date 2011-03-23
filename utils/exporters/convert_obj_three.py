@@ -832,7 +832,9 @@ def convert_ascii(infile, morphfiles, outfile):
     
     morphData = []
     for mfilepattern in morphfiles.split():
-        for path in glob.glob(mfilepattern):
+        matches = glob.glob(mfilepattern)
+        matches.sort()
+        for path in matches:
             normpath = os.path.normpath(path)
             if normpath != norminfile or not skipOriginalMorph:
                 name = os.path.basename(normpath)
