@@ -596,12 +596,10 @@ THREE.ShaderLib = {
 	
 			"void main() {",
 
-// todo: optimize
-
-				"vec3 pos    = ( objectMatrix * vec4( position, 1.0 )).xyz;",
-				"vec3 norm   = mat3( objectMatrix[0].xyz, objectMatrix[1].xyz, objectMatrix[2].xyz) * normal;// normalMatrix * normal;",
-				"vec4 final  = vec4( pos + directionalLightDirection * 5000.0 * step( 0.0, dot( directionalLightDirection, norm )), 1.0 );",
-				"gl_Position = projectionMatrix * viewMatrix * final;",
+				"vec4 pos      = objectMatrix * vec4( position, 1.0 );",
+				"vec3 norm     = mat3( objectMatrix[0].xyz, objectMatrix[1].xyz, objectMatrix[2].xyz ) * normal;",
+				"vec4 extruded = vec4( directionalLightDirection * 5000.0 * step( 0.0, dot( directionalLightDirection, norm )), 0.0 );",
+				"gl_Position   = projectionMatrix * viewMatrix * ( pos + extruded );",
 			"}"
 
 		].join( "\n" ),

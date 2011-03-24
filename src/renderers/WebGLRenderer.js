@@ -2553,7 +2553,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 			
 			var l, ll = scene.lights.length;
 			var p;
-			var light;
+			var light, geometryGroup;
+			var dirLight = [];			
+			var	program;
+			var p_uniforms;
+		    var m_uniforms;
+		    var attributes;
 	
 			ol = scene.__webglShadowVolumes.length;
 			
@@ -2562,38 +2567,61 @@ THREE.WebGLRenderer = function ( parameters ) {
 				light = scene.lights[ l ];
 				
 				if( light instanceof THREE.DirectionalLight ) {
+
+					dirLight[ 0 ] = -light.position.x;
+					dirLight[ 1 ] = -light.position.y;
+					dirLight[ 2 ] = -light.position.z;
+
 					
 					// render all volumes
 					
 					for ( o = 0; o < ol; o++ ) {
 			
-						webglObject = scene.__webglShadowVolumes[ o ];
-			
-						object = webglObject.object;
-						buffer = webglObject.buffer;
-						opaque = webglObject.opaque;
-			
-						object.matrixWorld.flattenToArray( object._objectMatrixArray );
-						setupMatrices( object, camera );
-						unrollBufferMaterials( webglObject );
+						object        = scene.__webglShadowVolumes[ o ].object;
+						geometryGroup = scene.__webglShadowVolumes[ o ].buffer;
+						material      = object.materials[ 0 ];
+
+
+						if ( !material.program ) _this.initMaterial( material, lights, fog, object );
 	
-	
-						// render first back, then front
-	
-						_gl.cullFace( _gl.FRONT );
-	
-						for( p = 0; p < 2; p++ ) {
-				
-							for( i = 0; i < opaque.count; i++ ) {
-				
-								material = opaque.list[ i ];
-								renderBuffer( camera, light, fog, material, buffer, object );
-				
-							}
-				
-							_gl.cullFace( _gl.BACK );
+						program = material.program,
+			  			p_uniforms = program.uniforms,
+		                m_uniforms = material.uniforms,
+		                attributes = program.attributes;
+
+
+						if( _oldProgram !== program ) {
+							
+							_gl.useProgram( program );
+							_oldProgram = program;
+
+							_gl.uniformMatrix4fv( p_uniforms.projectionMatrix, false, _projectionMatrixArray );
+							_gl.uniformMatrix4fv( p_uniforms.viewMatrix, false, _viewMatrixArray );
+							_gl.uniform3fv( p_uniforms.directionalLightDirection, dirLight );
 						}
+
+
+						object.matrixWorld.flattenToArray( object._objectMatrixArray );
+						//object._modelViewMatrix.multiplyToArray( camera.matrixWorldInverse, object.matrixWorld, object._modelViewMatrixArray );
+
+						_gl.uniformMatrix4fv( p_uniforms.objectMatrix, false, object._objectMatrixArray );
+						//_gl.uniformMatrix4fv( p_uniforms.modelViewMatrix, false, object._modelViewMatrixArray );
+
 	
+						_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webGLVertexBuffer );
+						_gl.vertexAttribPointer( attributes.position, 3, _gl.FLOAT, false, 0, 0 );
+
+						_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webGLNormalBuffer );
+						_gl.vertexAttribPointer( attributes.normal, 3, _gl.FLOAT, false, 0, 0 );
+
+						_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryGroup.__webGLFaceBuffer );
+
+						_gl.cullFace( _gl.FRONT );
+						_gl.drawElements( _gl.TRIANGLES, geometryGroup.__webGLFaceCount, _gl.UNSIGNED_SHORT, 0 );
+
+						_gl.cullFace( _gl.BACK );
+						_gl.drawElements( _gl.TRIANGLES, geometryGroup.__webGLFaceCount, _gl.UNSIGNED_SHORT, 0 );
+				
 					}
 	
 				}
