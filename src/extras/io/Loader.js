@@ -7,13 +7,13 @@ THREE.Loader = function ( showStatus ) {
 	this.showStatus = showStatus;
 	this.statusDomElement = showStatus ? THREE.Loader.prototype.addStatusElement() : null;
 
+	this.onLoadStart = function () {};
+	this.onLoadProgress = function() {};
+	this.onLoadComplete = function () {};
+
 };
 
 THREE.Loader.prototype = {
-
-	onLoadStart: function () {},
-	onLoadProgress: function() {},
-	onLoadComplete: function () {},
 
 	addStatusElement: function () {
 
