@@ -2608,9 +2608,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.stencilFunc( _gl.NOTEQUAL, 0, 0xFF );
 			_gl.stencilOp( _gl.KEEP, _gl.KEEP, _gl.KEEP );
 		    _gl.disable( _gl.DEPTH_TEST );
+			
 			_gl.enable( _gl.BLEND );
-			_gl.blendFunc( _gl.SRC_ALPHA, _gl.ONE );
-			_gl.blendEquation( _gl.FUNC_REVERSE_SUBTRACT );
+			_gl.blendFunc( _gl.ONE, _gl.ONE_MINUS_SRC_ALPHA );
+			_gl.blendEquation( _gl.FUNC_ADD );
 	
 	
 			_oldBlending = "";

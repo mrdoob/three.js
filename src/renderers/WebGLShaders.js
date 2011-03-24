@@ -578,7 +578,7 @@ THREE.ShaderLib = {
 	
 			"void main( void )",
 			"{",
-				"gl_FragColor = vec4( 1, 1, 1, 0.5 );",
+				"gl_FragColor = vec4( 0, 0, 0, 0.5 );",
 			"}"
 
 		].join( "\n" )

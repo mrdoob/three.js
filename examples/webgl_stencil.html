@@ -51,68 +51,60 @@
 				// world
 
 				var cube = new Cube( 300, 300, 10 );
-				var material = new THREE.MeshNormalMaterial();
+				var material0 = new THREE.MeshPhongMaterial( { color:0xff00ff } );
+				var material1 = new THREE.MeshLambertMaterial( { color:0x00ff00 } );
+				var material2 = new THREE.MeshLambertMaterial( { color:0x0000ff } );
 
-				var mesh1 = new THREE.Mesh( cube, material );
+				var mesh1 = new THREE.Mesh( cube, material0 );
 				mesh1.position.z = -150;
 				scene.addChild( mesh1 );
-				new THREE.ShadowVolume( mesh1 )
 
-
-				var mesh2 = new THREE.Mesh( cube, material );
+				var mesh2 = new THREE.Mesh( cube, material1 );
 				mesh2.position.x = -150;
 				mesh2.rotation.y = 90 * Math.PI / 180;
 				scene.addChild( mesh2 );
-				new THREE.ShadowVolume( mesh2 )
 
-
-				var mesh3 = new THREE.Mesh( cube, material );
+				var mesh3 = new THREE.Mesh( cube, material2 );
 				mesh3.position.y = -150;
 				mesh3.rotation.x = 90 * Math.PI / 180;
 				scene.addChild( mesh3 );
+
+				new THREE.ShadowVolume( mesh1 )
+				new THREE.ShadowVolume( mesh2 )
 				new THREE.ShadowVolume( mesh3 )
 	
 	
-				// shadow
+				// moving objects
 
 				var cube = new Cube( 40, 40, 40 );
 				var torus = new Torus( 40, 10 );
 				var sphere = new Sphere( 40 );
 				var cylinder = new Cylinder( 10, 10, 20, 40, 0, 0 );
-				mesh = new THREE.Mesh( torus, material );
+				mesh = new THREE.Mesh( torus, material1 );
 				scene.addChild( mesh );
 
-				new THREE.ShadowVolume( mesh );
-
-
-				boxMesh = new THREE.Mesh( cube, material );
+				boxMesh = new THREE.Mesh( cube, material2 );
 				scene.addChild( boxMesh );
 				
+				new THREE.ShadowVolume( mesh );
 				new THREE.ShadowVolume( boxMesh );
 
 
+				// lights
 
-				//shadowVolume.position.x = 40;
-
-				light = new THREE.DirectionalLight();
+				light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0, 1, 0 );
 				scene.addChild( light );
 
-				light2 = new THREE.DirectionalLight();
-				light2.position.set( 0, 1, 0 );
-				scene.addChild( light2 );
-				
-
-
-				var cube = new Cube( 10, 10, 10 );
-				lightCube = new THREE.Mesh( cube, material );
+				var cube = new Sphere( 5 );
+				lightCube = new THREE.Mesh( cube, material2 );
 				scene.addChild( lightCube );
 
-				lightCube2 = new THREE.Mesh( cube, material );
-				scene.addChild( lightCube2 );
-				
+
+				// renderer
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setClearColorHex( 0xaaaaaa, 1 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
@@ -155,16 +147,8 @@
 				light.position.y = 1;
 				light.position.z = Math.cos( t );
 
-				light2.position.x = Math.cos( t + 1 );
-				light2.position.y = 0.5;
-				light2.position.z = Math.sin( t + 1 );
-
-
 				lightCube.position.copy( light.position );
 				lightCube.position.multiplyScalar( 200 );
-
-				lightCube2.position.copy( light2.position );
-				lightCube2.position.multiplyScalar( 250 );
 
 
 				t += 0.02;
