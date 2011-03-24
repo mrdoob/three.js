@@ -1463,15 +1463,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function setMaterialShaders ( material, shaders ) {
+	function setMaterialShaders( material, shaders ) {
 
-		material.fragmentShader = shaders.fragmentShader;
-		material.vertexShader = shaders.vertexShader;
 		material.uniforms = Uniforms.clone( shaders.uniforms );
+		material.vertexShader = shaders.vertexShader;
+		material.fragmentShader = shaders.fragmentShader;
 
 	};
 
-	function refreshUniformsCommon ( uniforms, material ) {
+	function refreshUniformsCommon( uniforms, material ) {
 
 		// premultiply alpha
 		uniforms.diffuse.value.setRGB( material.color.r * material.opacity, material.color.g * material.opacity, material.color.b * material.opacity );
@@ -1582,103 +1582,112 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		// heuristics to create shader parameters according to lights in the scene
-		// (not to blow over maxLights budget)
+		if ( ! material.program ) {
 
-		maxLightCount = allocateLights( lights, 4 );
+			// heuristics to create shader parameters according to lights in the scene
+			// (not to blow over maxLights budget)
 
-		maxBones = allocateBones( object );
-		
-		parameters = { fog: fog, map: material.map, envMap: material.envMap, lightMap: material.lightMap, vertexColors: material.vertexColors,
-					   sizeAttenuation: material.sizeAttenuation,
-					   skinning: material.skinning,
-					   morphTargets: material.morphTargets,
-					   maxDirLights: maxLightCount.directional, maxPointLights: maxLightCount.point,
-					   maxBones: maxBones };
+			maxLightCount = allocateLights( lights, 4 );
 
-		material.program = buildProgram( material.fragmentShader, material.vertexShader, parameters );
+			maxBones = allocateBones( object );
 
+			parameters = { fog: fog, map: material.map, envMap: material.envMap, lightMap: material.lightMap, vertexColors: material.vertexColors,
+						   sizeAttenuation: material.sizeAttenuation,
+						   skinning: material.skinning,
+						   morphTargets: material.morphTargets,
+						   maxDirLights: maxLightCount.directional, maxPointLights: maxLightCount.point,
+						   maxBones: maxBones };
 
-		// load uniforms
+			material.program = buildProgram( material.fragmentShader, material.vertexShader, parameters );
 
-		identifiers = [ 'viewMatrix', 'modelViewMatrix', 'projectionMatrix', 'normalMatrix', 'objectMatrix', 'cameraPosition',
-						'cameraInverseMatrix', 'boneGlobalMatrices', 'morphTargetInfluences'
-						];
+			// load uniforms
 
-
-		for( u in material.uniforms ) {
-
-			identifiers.push(u);
-		}
-
-		cacheUniformLocations( material.program, identifiers );
-		
-
-		// load attributes
-		
-		identifiers = [ "position", "normal", "uv", "uv2", "tangent", "color",
-					    "skinVertexA", "skinVertexB", "skinIndex", "skinWeight" ];
-		
-		for( i = 0; i < this.maxMorphTargets; i++ ) {
-			
-			identifiers.push( "morphTarget" + i );
-		}
-		
-		for( a in material.attributes ) {
-			
-			identifiers.push( a );
-		}
-		
-		cacheAttributeLocations( material.program, identifiers );
+			identifiers = [ 'viewMatrix', 'modelViewMatrix', 'projectionMatrix', 'normalMatrix', 'objectMatrix', 'cameraPosition',
+							'cameraInverseMatrix', 'boneGlobalMatrices', 'morphTargetInfluences'
+							];
 
 
-		var attributes = material.program.attributes;
+			for( u in material.uniforms ) {
 
-		_gl.enableVertexAttribArray( attributes.position );
-
-		if ( attributes.color >= 0 ) 	_gl.enableVertexAttribArray( attributes.color );
-		if ( attributes.normal >= 0 ) 	_gl.enableVertexAttribArray( attributes.normal );
-		if ( attributes.tangent >= 0 ) 	_gl.enableVertexAttribArray( attributes.tangent );
-
-		if ( material.skinning &&
-			 attributes.skinVertexA >=0 && attributes.skinVertexB >= 0 &&
-			 attributes.skinIndex >= 0 && attributes.skinWeight >= 0 ) {
-
-			_gl.enableVertexAttribArray( attributes.skinVertexA );
-			_gl.enableVertexAttribArray( attributes.skinVertexB );
-			_gl.enableVertexAttribArray( attributes.skinIndex );
-			_gl.enableVertexAttribArray( attributes.skinWeight );
-
-		}
-		
-		if ( material.morphTargets ) {
-			
-			material.numSupportedMorphTargets = 0;
-			
-			if( attributes.morphTarget0 >= 0 ) { _gl.enableVertexAttribArray( attributes.morphTarget0 ); material.numSupportedMorphTargets++ }
-			if( attributes.morphTarget1 >= 0 ) { _gl.enableVertexAttribArray( attributes.morphTarget1 ); material.numSupportedMorphTargets++ }
-			if( attributes.morphTarget2 >= 0 ) { _gl.enableVertexAttribArray( attributes.morphTarget2 ); material.numSupportedMorphTargets++ }
-			if( attributes.morphTarget3 >= 0 ) { _gl.enableVertexAttribArray( attributes.morphTarget3 ); material.numSupportedMorphTargets++ }
-			if( attributes.morphTarget4 >= 0 ) { _gl.enableVertexAttribArray( attributes.morphTarget4 ); material.numSupportedMorphTargets++ }
-			if( attributes.morphTarget5 >= 0 ) { _gl.enableVertexAttribArray( attributes.morphTarget5 ); material.numSupportedMorphTargets++ }
-			if( attributes.morphTarget6 >= 0 ) { _gl.enableVertexAttribArray( attributes.morphTarget6 ); material.numSupportedMorphTargets++ }
-			if( attributes.morphTarget7 >= 0 ) { _gl.enableVertexAttribArray( attributes.morphTarget7 ); material.numSupportedMorphTargets++ }
-			 	
-			object.__webGLMorphTargetInfluences = new Float32Array( this.maxMorphTargets );
-			
-			for( var i = 0; i < this.maxMorphTargets; i++ ) {
-				
-				object.__webGLMorphTargetInfluences[ i ] = 0;
-				
+				identifiers.push(u);
 			}
-			
+
+			cacheUniformLocations( material.program, identifiers );
+
+
+			// load attributes
+
+			identifiers = [ "position", "normal", "uv", "uv2", "tangent", "color",
+						    "skinVertexA", "skinVertexB", "skinIndex", "skinWeight" ];
+
+			for ( i = 0; i < this.maxMorphTargets; i++ ) {
+
+				identifiers.push( "morphTarget" + i );
+			}
+
+			for ( a in material.attributes ) {
+
+				identifiers.push( a );
+			}
+
+			cacheAttributeLocations( material.program, identifiers );
+
+
+			var attributes = material.program.attributes;
+
+			_gl.enableVertexAttribArray( attributes.position );
+
+			if ( attributes.color >= 0 ) 	_gl.enableVertexAttribArray( attributes.color );
+			if ( attributes.normal >= 0 ) 	_gl.enableVertexAttribArray( attributes.normal );
+			if ( attributes.tangent >= 0 ) 	_gl.enableVertexAttribArray( attributes.tangent );
+
+			if ( material.skinning &&
+				 attributes.skinVertexA >=0 && attributes.skinVertexB >= 0 &&
+				 attributes.skinIndex >= 0 && attributes.skinWeight >= 0 ) {
+
+				_gl.enableVertexAttribArray( attributes.skinVertexA );
+				_gl.enableVertexAttribArray( attributes.skinVertexB );
+				_gl.enableVertexAttribArray( attributes.skinIndex );
+				_gl.enableVertexAttribArray( attributes.skinWeight );
+
+			}
+
+			if ( material.morphTargets ) {
+
+				material.numSupportedMorphTargets = 0;
+
+				if( attributes.morphTarget0 >= 0 ) { _gl.enableVertexAttribArray( attributes.morphTarget0 ); material.numSupportedMorphTargets++ }
+				if( attributes.morphTarget1 >= 0 ) { _gl.enableVertexAttribArray( attributes.morphTarget1 ); material.numSupportedMorphTargets++ }
+				if( attributes.morphTarget2 >= 0 ) { _gl.enableVertexAttribArray( attributes.morphTarget2 ); material.numSupportedMorphTargets++ }
+				if( attributes.morphTarget3 >= 0 ) { _gl.enableVertexAttribArray( attributes.morphTarget3 ); material.numSupportedMorphTargets++ }
+				if( attributes.morphTarget4 >= 0 ) { _gl.enableVertexAttribArray( attributes.morphTarget4 ); material.numSupportedMorphTargets++ }
+				if( attributes.morphTarget5 >= 0 ) { _gl.enableVertexAttribArray( attributes.morphTarget5 ); material.numSupportedMorphTargets++ }
+				if( attributes.morphTarget6 >= 0 ) { _gl.enableVertexAttribArray( attributes.morphTarget6 ); material.numSupportedMorphTargets++ }
+				if( attributes.morphTarget7 >= 0 ) { _gl.enableVertexAttribArray( attributes.morphTarget7 ); material.numSupportedMorphTargets++ }
+
+				object.__webGLMorphTargetInfluences = new Float32Array( this.maxMorphTargets );
+
+				for( var i = 0; i < this.maxMorphTargets; i++ ) {
+
+					object.__webGLMorphTargetInfluences[ i ] = 0;
+
+				}
+
+			}
+
 		}
+
+		material.__webglProgram = true;
 
 	};
 
 	function setProgram( camera, lights, fog, material, object ) {
 
-		if ( !material.program ) _this.initMaterial( material, lights, fog, object );
+		if ( ! material.__webglProgram ) {
+
+			_this.initMaterial( material, lights, fog, object );
+
+		}
 
 		var program = material.program,
 			p_uniforms = program.uniforms,
