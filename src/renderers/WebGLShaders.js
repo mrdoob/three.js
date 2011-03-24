@@ -6,6 +6,7 @@
 
 THREE.ShaderChunk = {
 
+
 	// FOG
 
 	fog_pars_fragment: [
@@ -554,6 +555,66 @@ THREE.UniformsLib = {
 };
 
 THREE.ShaderLib = {
+
+	'shadowPost': {
+		
+		vertexShader: [
+		
+			"uniform 	mat4 	projectionMatrix;",
+			"attribute 	vec3 	position;",
+	
+			"void main(void)",
+			"{",
+				"gl_Position = projectionMatrix * vec4( position, 1.0 );",
+			"}"
+
+		].join( "\n" ),
+		
+		fragmentShader: [
+		
+			"#ifdef GL_ES",
+				"precision highp float;",
+			"#endif",		
+	
+			"void main( void )",
+			"{",
+				"gl_FragColor = vec4( 0, 0, 0, 0.5 );",
+			"}"
+
+		].join( "\n" )
+		
+	},
+
+
+	'shadowVolumeDynamic': {
+		
+		uniforms: { "directionalLightDirection": { type: "fv", value: [] }},
+
+		vertexShader: [
+
+			"uniform 	vec3 	directionalLightDirection;",
+	
+			"void main() {",
+
+				"vec4 pos      = objectMatrix * vec4( position, 1.0 );",
+				"vec3 norm     = mat3( objectMatrix[0].xyz, objectMatrix[1].xyz, objectMatrix[2].xyz ) * normal;",
+				"vec4 extruded = vec4( directionalLightDirection * 5000.0 * step( 0.0, dot( directionalLightDirection, norm )), 0.0 );",
+				"gl_Position   = projectionMatrix * viewMatrix * ( pos + extruded );",
+			"}"
+
+		].join( "\n" ),
+
+		fragmentShader: [
+
+			"void main() {",
+
+				"gl_FragColor = vec4( 1, 1, 1, 1 );",
+
+			"}"
+
+		].join( "\n" )
+	},		
+
 
 	'depth': {
 
