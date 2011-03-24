@@ -4,34 +4,38 @@
 
 THREE.Loader = function ( showStatus ) {
 
-	this.showStatus = showStatus;	
+	this.showStatus = showStatus;
 	this.statusDomElement = showStatus ? THREE.Loader.prototype.addStatusElement() : null;
 
 };
 
 THREE.Loader.prototype = {
 
-	addStatusElement: function ( ) {
-		
+	onLoadStart: function () {},
+	onLoadProgress: function() {},
+	onLoadComplete: function () {},
+
+	addStatusElement: function () {
+
 		var e = document.createElement( "div" );
-		
-		e.style.fontSize = "0.8em"; 
-		e.style.textAlign = "left";
-		e.style.background = "#b00"; 
-		e.style.color = "#fff"; 
-		e.style.width = "140px"; 
-		e.style.padding = "0.25em 0.25em 0.25em 0.5em"; 
+
 		e.style.position = "absolute"; 
 		e.style.right = "0px"; 
 		e.style.top = "0px"; 
+		e.style.fontSize = "0.8em"; 
+		e.style.textAlign = "left";
+		e.style.background = "rgba(0,0,0,0.25)"; 
+		e.style.color = "#fff"; 
+		e.style.width = "120px"; 
+		e.style.padding = "0.5em 0.5em 0.5em 0.5em"; 
 		e.style.zIndex = 1000;
-		
+
 		e.innerHTML = "Loading ...";
-		
+
 		return e;
-		
+
 	},
-	
+
 	updateProgress: function ( progress ) {
 
 		var message = "Loaded ";
@@ -50,13 +54,13 @@ THREE.Loader.prototype = {
 		this.statusDomElement.innerHTML = message;
 
 	},
-	
+
 	extractUrlbase: function( url ) {
-		
+
 		var chunks = url.split( "/" );
 		chunks.pop();
 		return chunks.join( "/" );
-		
+
 	},
 
 	init_materials: function( scope, materials, texture_path ) {
@@ -88,9 +92,9 @@ THREE.Loader.prototype = {
 		}
 
 		function load_image( where, url ) {
-			
+
 			var image = new Image();
-			
+
 			image.onload = function () {
 
 				if ( !is_pow2( this.width ) || !is_pow2( this.height ) ) {
@@ -113,20 +117,20 @@ THREE.Loader.prototype = {
 			};
 
 			image.src = url;
-			
+
 		}
-		
+
 		var material, mtype, mpars, texture, color;
 
 		// defaults
-		
+
 		mtype = "MeshLambertMaterial";
 		mpars = { color: 0xeeeeee, opacity: 1.0, map: null, lightMap: null, vertexColors: m.vertexColors ? THREE.VertexColors : false };
-		
+
 		// parameters from model file
-		
+
 		if ( m.shading ) {
-			
+
 			if ( m.shading == "Phong" ) mtype = "MeshPhongMaterial";
 			else if ( m.shading == "Basic" ) mtype = "MeshBasicMaterial";
 
@@ -135,10 +139,10 @@ THREE.Loader.prototype = {
 		if ( m.mapDiffuse && texture_path ) {
 
 			texture = document.createElement( 'canvas' );
-			
+
 			mpars.map = new THREE.Texture( texture );
 			mpars.map.sourceFile = m.mapDiffuse;
-			
+
 			load_image( mpars.map, texture_path + "/" + m.mapDiffuse );
 
 		} else if ( m.colorDiffuse ) {
@@ -156,20 +160,18 @@ THREE.Loader.prototype = {
 		if ( m.mapLightmap && texture_path ) {
 
 			texture = document.createElement( 'canvas' );
-			
+
 			mpars.lightMap = new THREE.Texture( texture );
 			mpars.lightMap.sourceFile = m.mapLightmap;
-			
+
 			load_image( mpars.lightMap, texture_path + "/" + m.mapLightmap );
 
 		}
-		
+
 		material = new THREE[ mtype ]( mpars );
 
 		return material;
 
-	}	
-	
-};
-	
+	}
 
+};
