@@ -2524,148 +2524,22 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-
-
-		//////////////////////// stencil shadows begin //////////////////////
-		// method: we're rendering the world in light, then the shadow
-		//         volumes into the stencil and last a big darkening 
-		//         quad over the whole thing. This is NOT how you're
-		//         supposed to do stencil shadows but is much faster
-		//
-
-		if( scene.__webglShadowVolumes.length && scene.lights.length ) {
-			
-			// setup stencil
-	
-			_gl.enable( _gl.POLYGON_OFFSET_FILL );
-			_gl.polygonOffset( 0.1, 1.0 );
-			_gl.enable( _gl.STENCIL_TEST );
-			_gl.depthMask( false );
-			_gl.colorMask( false, false, false, false );
+		// render flares
 		
-			_gl.stencilFunc( _gl.ALWAYS, 1, 0xFF );
-			_gl.stencilOpSeparate( _gl.BACK,  _gl.KEEP, _gl.INCR, _gl.KEEP );
-			_gl.stencilOpSeparate( _gl.FRONT, _gl.KEEP, _gl.DECR, _gl.KEEP );
-	
-	
+		if( scene.__webglLensFlares.length ) {
 			
-			// loop through all directional lights
-			
-			var l, ll = scene.lights.length;
-			var p;
-			var light, geometryGroup;
-			var dirLight = [];			
-			var	program;
-			var p_uniforms;
-		    var m_uniforms;
-		    var attributes;
-	
-			ol = scene.__webglShadowVolumes.length;
-			
-			for( l = 0; l < ll; l++ ) {
-				
-				light = scene.lights[ l ];
-				
-				if( light instanceof THREE.DirectionalLight ) {
-
-					dirLight[ 0 ] = -light.position.x;
-					dirLight[ 1 ] = -light.position.y;
-					dirLight[ 2 ] = -light.position.z;
-
-					
-					// render all volumes
-					
-					for ( o = 0; o < ol; o++ ) {
-			
-						object        = scene.__webglShadowVolumes[ o ].object;
-						geometryGroup = scene.__webglShadowVolumes[ o ].buffer;
-						material      = object.materials[ 0 ];
-
-
-						if ( !material.program ) _this.initMaterial( material, lights, fog, object );
-	
-						program = material.program,
-			  			p_uniforms = program.uniforms,
-		                m_uniforms = material.uniforms,
-		                attributes = program.attributes;
-
-
-						if( _oldProgram !== program ) {
-							
-							_gl.useProgram( program );
-							_oldProgram = program;
-
-							_gl.uniformMatrix4fv( p_uniforms.projectionMatrix, false, _projectionMatrixArray );
-							_gl.uniformMatrix4fv( p_uniforms.viewMatrix, false, _viewMatrixArray );
-							_gl.uniform3fv( p_uniforms.directionalLightDirection, dirLight );
-						}
-
-
-						object.matrixWorld.flattenToArray( object._objectMatrixArray );
-						//object._modelViewMatrix.multiplyToArray( camera.matrixWorldInverse, object.matrixWorld, object._modelViewMatrixArray );
-
-						_gl.uniformMatrix4fv( p_uniforms.objectMatrix, false, object._objectMatrixArray );
-						//_gl.uniformMatrix4fv( p_uniforms.modelViewMatrix, false, object._modelViewMatrixArray );
-
-	
-						_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webGLVertexBuffer );
-						_gl.vertexAttribPointer( attributes.position, 3, _gl.FLOAT, false, 0, 0 );
-
-						_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webGLNormalBuffer );
-						_gl.vertexAttribPointer( attributes.normal, 3, _gl.FLOAT, false, 0, 0 );
-
-						_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryGroup.__webGLFaceBuffer );
-
-						_gl.cullFace( _gl.FRONT );
-						_gl.drawElements( _gl.TRIANGLES, geometryGroup.__webGLFaceCount, _gl.UNSIGNED_SHORT, 0 );
-
-						_gl.cullFace( _gl.BACK );
-						_gl.drawElements( _gl.TRIANGLES, geometryGroup.__webGLFaceCount, _gl.UNSIGNED_SHORT, 0 );
-				
-					}
-	
-				}
-	
-			}
-	
-	
-			// draw darkening polygon	
-	
-			_gl.disable( _gl.POLYGON_OFFSET_FILL );
-			_gl.colorMask( true, true, true, true );
-			_gl.stencilFunc( _gl.NOTEQUAL, 0, 0xFF );
-			_gl.stencilOp( _gl.KEEP, _gl.KEEP, _gl.KEEP );
-		    _gl.disable( _gl.DEPTH_TEST );
-			
-			_gl.enable( _gl.BLEND );
-			_gl.blendFunc( _gl.ONE, _gl.ONE_MINUS_SRC_ALPHA );
-			_gl.blendEquation( _gl.FUNC_ADD );
-	
-	
-			_oldBlending = "";
-			_oldProgram = _shadow.program;
-	
-			_gl.useProgram( _shadow.program );
-			_gl.uniformMatrix4fv( _shadow.projectionLocation, false, _projectionMatrixArray );
-			
-			_gl.bindBuffer( _gl.ARRAY_BUFFER, _shadow.vertexBuffer );
-			_gl.vertexAttribPointer( _shadow.vertexLocation, 3, _gl.FLOAT, false, 0, 0 );
-			_gl.enableVertexAttribArray( _shadow.vertexLocation );
-				
-			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, _shadow.elementBuffer );
-			_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
-	
-	
-			// disable stencil
-	
-		    _gl.disable	 ( _gl.STENCIL_TEST );
-		    _gl.enable	 ( _gl.DEPTH_TEST );
-			_gl.disable  ( _gl.BLEND );
-		    _gl.depthMask( true );
+			renderLensFlares( scene, renderTarget );
+		
 		}
 
 
-		//////////////////////// stencil shadows end //////////////////////
+		// render stencil shadows
+
+		if( scene.__webglShadowVolumes.length && scene.lights.length ) {
+
+			renderStencilShadows( scene );
+		
+		}
 
 
 		// Generate mipmap if we're using any kind of mipmap filtering
@@ -2677,6 +2551,159 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 	};
+
+
+	/*
+	 * Render lens flares
+	 * Method: renders 9 0xff00ff-colored points scattered over the light source area, 
+	 *         reads these back and calculates occlusion.  
+	 *         Then LensFlare.updateLensFlares() is called to re-position and 
+	 *         update transparency of flares. Then they are rendered.
+	 * 
+	 */
+
+	function renderLensFlares() {
+		
+		
+	}
+
+
+	/*
+	 * Stencil Shadows
+	 * method: we're rendering the world in light, then the shadow
+	 *         volumes into the stencil and last a big darkening 
+	 *         quad over the whole thing. This is not how "you're
+	 *	       supposed to" do stencil shadows but is much faster
+	 * 
+	 */
+
+	function renderStencilShadows( scene ) {
+			
+		// setup stencil
+
+		_gl.enable( _gl.POLYGON_OFFSET_FILL );
+		_gl.polygonOffset( 0.1, 1.0 );
+		_gl.enable( _gl.STENCIL_TEST );
+		_gl.depthMask( false );
+		_gl.colorMask( false, false, false, false );
+	
+		_gl.stencilFunc( _gl.ALWAYS, 1, 0xFF );
+		_gl.stencilOpSeparate( _gl.BACK,  _gl.KEEP, _gl.INCR, _gl.KEEP );
+		_gl.stencilOpSeparate( _gl.FRONT, _gl.KEEP, _gl.DECR, _gl.KEEP );
+
+		
+		// loop through all directional lights
+		
+		var l, ll = scene.lights.length;
+		var p;
+		var light, lights = scene.lights, geometryGroup;
+		var dirLight = [];			
+		var	program;
+		var p_uniforms;
+	    var m_uniforms;
+	    var attributes;
+		var o, ol = scene.__webglShadowVolumes.length;
+		
+		for( l = 0; l < ll; l++ ) {
+			
+			light = scene.lights[ l ];
+			
+			if( light instanceof THREE.DirectionalLight ) {
+
+				dirLight[ 0 ] = -light.position.x;
+				dirLight[ 1 ] = -light.position.y;
+				dirLight[ 2 ] = -light.position.z;
+
+				
+				// render all volumes
+				
+				for( o = 0; o < ol; o++ ) {
+		
+					object        = scene.__webglShadowVolumes[ o ].object;
+					geometryGroup = scene.__webglShadowVolumes[ o ].buffer;
+					material      = object.materials[ 0 ];
+
+
+					if ( !material.program ) _this.initMaterial( material, lights, undefined, object );
+
+					program = material.program,
+		  			p_uniforms = program.uniforms,
+	                m_uniforms = material.uniforms,
+	                attributes = program.attributes;
+
+
+					if( _oldProgram !== program ) {
+						
+						_gl.useProgram( program );
+						_oldProgram = program;
+
+						_gl.uniformMatrix4fv( p_uniforms.projectionMatrix, false, _projectionMatrixArray );
+						_gl.uniformMatrix4fv( p_uniforms.viewMatrix, false, _viewMatrixArray );
+						_gl.uniform3fv( p_uniforms.directionalLightDirection, dirLight );
+					}
+
+
+					object.matrixWorld.flattenToArray( object._objectMatrixArray );
+					_gl.uniformMatrix4fv( p_uniforms.objectMatrix, false, object._objectMatrixArray );
+
+
+					_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webGLVertexBuffer );
+					_gl.vertexAttribPointer( attributes.position, 3, _gl.FLOAT, false, 0, 0 );
+
+					_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webGLNormalBuffer );
+					_gl.vertexAttribPointer( attributes.normal, 3, _gl.FLOAT, false, 0, 0 );
+
+					_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryGroup.__webGLFaceBuffer );
+
+					_gl.cullFace( _gl.FRONT );
+					_gl.drawElements( _gl.TRIANGLES, geometryGroup.__webGLFaceCount, _gl.UNSIGNED_SHORT, 0 );
+
+					_gl.cullFace( _gl.BACK );
+					_gl.drawElements( _gl.TRIANGLES, geometryGroup.__webGLFaceCount, _gl.UNSIGNED_SHORT, 0 );
+			
+				}
+
+			}
+
+		}
+
+		// setup color+stencil
+
+		_gl.disable( _gl.POLYGON_OFFSET_FILL );
+		_gl.colorMask( true, true, true, true );
+		_gl.stencilFunc( _gl.NOTEQUAL, 0, 0xFF );
+		_gl.stencilOp( _gl.KEEP, _gl.KEEP, _gl.KEEP );
+	    _gl.disable( _gl.DEPTH_TEST );
+
+
+		// draw darkening polygon	
+
+		_oldBlending = "";
+		_oldProgram = _shadow.program;
+
+		_gl.useProgram( _shadow.program );
+		_gl.uniformMatrix4fv( _shadow.projectionLocation, false, _projectionMatrixArray );
+		
+		_gl.bindBuffer( _gl.ARRAY_BUFFER, _shadow.vertexBuffer );
+		_gl.vertexAttribPointer( _shadow.vertexLocation, 3, _gl.FLOAT, false, 0, 0 );
+		_gl.enableVertexAttribArray( _shadow.vertexLocation );
+
+		_gl.enable( _gl.BLEND );
+		_gl.blendFunc( _gl.ONE, _gl.ONE_MINUS_SRC_ALPHA );
+		_gl.blendEquation( _gl.FUNC_ADD );
+			
+		_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, _shadow.elementBuffer );
+		_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
+
+
+		// disable stencil
+
+	    _gl.disable	 ( _gl.STENCIL_TEST );
+	    _gl.enable	 ( _gl.DEPTH_TEST );
+		_gl.disable  ( _gl.BLEND );
+	    _gl.depthMask( true );
+	}
+
 
 	function setupMatrices ( object, camera ) {
 
@@ -2692,6 +2719,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			scene.__webglObjects = [];
 			scene.__webglObjectsImmediate = [];
 			scene.__webglShadowVolumes = [];
+			scene.__webglLensFlares = [];
 		}
 
 		while ( scene.__objectsAdded.length ) {
@@ -2722,6 +2750,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 		
+		for ( var o = 0, ol = scene.__webglLensFlares.length; o < ol; o ++ ) {
+
+			updateObject( scene.__webglLensFlares[ o ].object, scene );
+
+		}
 
 	};
 
