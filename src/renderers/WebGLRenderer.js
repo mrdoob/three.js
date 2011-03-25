@@ -3316,7 +3316,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				case THREE.AdditiveBlending:
 
 					_gl.blendEquation( _gl.FUNC_ADD );
-					_gl.blendFunc( _gl.ONE, _gl.ONE );
+					_gl.blendFunc( _gl.SRC_ALPHA, _gl.ONE );
 
 					break;
 
@@ -3327,12 +3327,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					break;
 
+				/*
 				case THREE.BillboardBlending:
 
 					_gl.blendEquation( _gl.FUNC_ADD );
 					_gl.blendFunc( _gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA);
 
 					break;
+				*/
 
 				case THREE.ReverseSubtractiveBlending:
 
@@ -3343,7 +3345,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				default:
 
 					_gl.blendEquation( _gl.FUNC_ADD );
-					_gl.blendFunc( _gl.ONE, _gl.ONE_MINUS_SRC_ALPHA );
+					_gl.blendFunc( _gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA );
 
 					break;
 
