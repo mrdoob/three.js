@@ -117,7 +117,9 @@ TEMPLATE_OBJECT = """\
         "rotation"  : %(rotation)s,
         "quaternion": %(quaternion)s,
         "scale"	    : %(scale)s,
-        "visible"   : true
+        "visible"       : true
+        "castsShadow"   : %(castsShadow)s,
+        "meshCollider"  : %(meshCollider)s
     }"""
 
 TEMPLATE_GEOMETRY = """\
@@ -856,6 +858,11 @@ def generate_group_id_list(obj):
         
     return chunks
     
+def generate_bool_property(property):
+    if property:
+        return "true"
+    return "false"
+    
 def generate_objects(data):
     chunks = []
     
@@ -891,6 +898,9 @@ def generate_objects(data):
             if len(group_ids) > 0:
                 group_string = generate_string_list(group_ids)
 
+            castsShadow = generate_bool_property(obj.THREE_castsShadow)
+            meshCollider = generate_bool_property(obj.THREE_meshCollider)            
+                
             object_string = TEMPLATE_OBJECT % {
             "object_id"   : generate_string(object_id),
             "geometry_id" : generate_string(geometry_id),
@@ -899,7 +909,9 @@ def generate_objects(data):
             "position"    : generate_vec3(position),
             "rotation"    : generate_vec3(rotation),
             "quaternion"  : generate_vec4(quaternion),
-            "scale"       : generate_vec3(scale)
+            "scale"       : generate_vec3(scale),
+            "castsShadow"  : castsShadow,
+            "meshCollider" : meshCollider
             }
             chunks.append(object_string)
         

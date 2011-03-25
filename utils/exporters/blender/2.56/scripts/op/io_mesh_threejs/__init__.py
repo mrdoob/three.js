@@ -27,6 +27,30 @@ import bpy
 from bpy.props import *
 from io_utils import ExportHelper
 
+bpy.types.Object.THREE_castsShadow = bpy.props.BoolProperty()
+bpy.types.Object.THREE_meshCollider = bpy.props.BoolProperty()
+
+ 
+class OBJECT_PT_hello( bpy.types.Panel ):
+    
+    bl_label = "THREE"
+    bl_space_type = "PROPERTIES"
+    bl_region_type = "WINDOW"
+    bl_context = "object"
+ 
+    def draw(self, context):
+        layout = self.layout
+        obj = context.object
+        
+        row = layout.row()
+        row.label(text="Selected object: " + obj.name )
+
+        row = layout.row()
+        row.prop( obj, "THREE_castsShadow", text="Casts shadow" )
+
+        row = layout.row()
+        row.prop( obj, "THREE_meshCollider", text="Mesh collider" )
+        
 
 class ExportTHREEJS(bpy.types.Operator, ExportHelper):
     '''Export selected object for Three.js (ASCII JSON format).'''
