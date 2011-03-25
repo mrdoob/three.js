@@ -111,6 +111,7 @@ TEMPLATE_SECTION = """
 TEMPLATE_OBJECT = """\
     %(object_id)s : {
         "geometry"  : %(geometry_id)s,
+        "groups"    : [ %(group_id)s ],
         "materials" : [ %(material_id)s ],
         "position"  : %(position)s,
         "rotation"  : %(rotation)s,
@@ -828,6 +829,9 @@ def generate_hex(number):
 def generate_string(s):
     return TEMPLATE_STRING % s
     
+def generate_string_list(src_list):
+    return ", ".join(generate_string(item) for item in src_list)
+    
 def generate_section(label, content):
     return TEMPLATE_SECTION % (label, content)
     
@@ -841,7 +845,16 @@ def generate_material_id_list(materials):
     for material in materials:
         chunks.append(material.name)
     
-    return ",".join(chunks)
+    return chunks
+    
+def generate_group_id_list(obj):
+    chunks = []
+    
+    for group in bpy.data.groups:
+        if obj.name in group.objects:
+            chunks.append(group.name)
+        
+    return chunks
     
 def generate_objects(data):
     chunks = []
@@ -857,7 +870,8 @@ def generate_objects(data):
 
             geometry_id = "geo_%s" % geo_name
             
-            material_id = generate_material_id_list(obj.material_slots)
+            material_ids = generate_material_id_list(obj.material_slots)
+            group_ids = generate_group_id_list(obj)
 
             #position = obj.location
             #rotation = obj.rotation_euler
@@ -870,12 +884,17 @@ def generate_objects(data):
             scale = [obj.scale.x, obj.scale.z, obj.scale.y]
             
             material_string = ""
-            if material_id:
-                material_string = generate_string(material_id)
-                
+            if len(material_ids) > 0:
+                material_string = generate_string_list(material_ids)
+
+            group_string = ""
+            if len(group_ids) > 0:
+                group_string = generate_string_list(group_ids)
+
             object_string = TEMPLATE_OBJECT % {
             "object_id"   : generate_string(object_id),
             "geometry_id" : generate_string(geometry_id),
+            "group_id"    : group_string,
             "material_id" : material_string,
             "position"    : generate_vec3(position),
             "rotation"    : generate_vec3(rotation),
