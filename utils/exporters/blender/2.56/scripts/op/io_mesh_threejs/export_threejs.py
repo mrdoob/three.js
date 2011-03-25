@@ -117,7 +117,7 @@ TEMPLATE_OBJECT = """\
         "rotation"  : %(rotation)s,
         "quaternion": %(quaternion)s,
         "scale"	    : %(scale)s,
-        "visible"       : true
+        "visible"       : true,
         "castsShadow"   : %(castsShadow)s,
         "meshCollider"  : %(meshCollider)s
     }"""
