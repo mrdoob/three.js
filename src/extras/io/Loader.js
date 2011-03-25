@@ -121,7 +121,7 @@ THREE.Loader.prototype = {
 		// defaults
 		
 		mtype = "MeshLambertMaterial";
-		mpars = { color: 0xeeeeee, opacity: 1.0, map: null, lightMap: null, vertexColors: m.vertexColors ? THREE.VertexColors : false };
+		mpars = { color: 0xeeeeee, opacity: 1.0, map: null, lightMap: null, vertexColors: m.vertexColors ? THREE.VertexColors : false, wireframe: m.wireframe };
 		
 		// parameters from model file
 		
