@@ -1,0 +1,174 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>three.js webgl - stencil shadow</title>
+		<meta charset="utf-8">
+		<style type="text/css">
+			body {
+				background:#fff;
+				padding:0;
+				margin:0;
+				font-weight: bold;
+				overflow:hidden;
+			}
+		</style>
+	</head>
+
+	<body>
+		<script type="text/javascript" src="../build/Three.js"></script>
+		<script type="text/javascript" src="js/Stats.js"></script>
+
+
+		<script type="text/javascript">
+			var statsEnabled = true;
+
+			var container, stats;
+
+			var camera, scene, renderer;
+
+			var mesh, boxMesh, light, lightCube, light2, lightCube2, zmesh, lightMesh, geometry;
+
+			var mouseX = 0, mouseY = 0;
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+			init();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.Camera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.z = 250;
+
+				scene = new THREE.Scene();
+	
+
+				// world
+
+				var cube = new Cube( 300, 300, 10 );
+				var material0 = new THREE.MeshPhongMaterial( { color:0xff00ff } );
+				var material1 = new THREE.MeshLambertMaterial( { color:0x00ff00 } );
+				var material2 = new THREE.MeshLambertMaterial( { color:0x0000ff } );
+
+				var mesh1 = new THREE.Mesh( cube, material0 );
+				mesh1.position.z = -150;
+				scene.addChild( mesh1 );
+
+				var mesh2 = new THREE.Mesh( cube, material1 );
+				mesh2.position.x = -150;
+				mesh2.rotation.y = 90 * Math.PI / 180;
+				scene.addChild( mesh2 );
+
+				var mesh3 = new THREE.Mesh( cube, material2 );
+				mesh3.position.y = -150;
+				mesh3.rotation.x = 90 * Math.PI / 180;
+				scene.addChild( mesh3 );
+
+				new THREE.ShadowVolume( mesh1 )
+				new THREE.ShadowVolume( mesh2 )
+				new THREE.ShadowVolume( mesh3 )
+	
+	
+				// moving objects
+
+				var cube = new Cube( 40, 40, 40 );
+				var torus = new Torus( 40, 10 );
+				var sphere = new Sphere( 40 );
+				var cylinder = new Cylinder( 10, 10, 20, 40, 0, 0 );
+				mesh = new THREE.Mesh( torus, material1 );
+				scene.addChild( mesh );
+
+				boxMesh = new THREE.Mesh( cube, material2 );
+				scene.addChild( boxMesh );
+				
+				new THREE.ShadowVolume( mesh );
+				new THREE.ShadowVolume( boxMesh );
+
+
+				// lights
+
+				light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( 0, 1, 0 );
+				scene.addChild( light );
+
+				var cube = new Sphere( 5 );
+				lightCube = new THREE.Mesh( cube, material2 );
+				scene.addChild( lightCube );
+
+
+				// renderer
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setClearColorHex( 0xaaaaaa, 1 );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				if ( statsEnabled ) {
+
+					stats = new Stats();
+					stats.domElement.style.position = 'absolute';
+					stats.domElement.style.top = '0px';
+					stats.domElement.style.zIndex = 100;
+					container.appendChild( stats.domElement );
+
+				}
+
+				setInterval( loop, 1000 / 60 );
+			}
+
+
+			function onDocumentMouseMove(event) {
+
+				mouseX = ( event.clientX - windowHalfX );
+				mouseY = ( event.clientY - windowHalfY );
+
+			}
+
+			var t = 0;
+
+			function loop() {
+
+				mesh.position.x = Math.sin( t ) * 100;
+				mesh.position.y = Math.cos( t ) * 100;
+
+				mesh.rotation.x += 0.5 * Math.PI / 180;
+				mesh.rotation.y += 1.0 * Math.PI / 180;
+				mesh.rotation.z += 1.5 * Math.PI / 180;
+
+				boxMesh.position.z = Math.sin( t ) * 100;
+				boxMesh.rotation.x = Math.sin( t ) * 180 * Math.PI / 180;
+
+				light.position.x = Math.sin( t );
+				light.position.y = 1.5;
+				light.position.z = Math.cos( t );
+
+				lightCube.position.copy( light.position );
+				lightCube.position.multiplyScalar( 200 );
+
+
+				t += 0.02;
+
+				camera.position.x += ( mouseX - camera.position.x ) * .05;
+				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+
+				renderer.render( scene, camera );
+
+				if ( statsEnabled ) stats.update();
+
+			}
+
+			function log( text ) {
+
+				var e = document.getElementById("log");
+				e.innerHTML = text + "<br/>" + e.innerHTML;
+
+			}
+		</script>
+
+	</body>
+</html>
