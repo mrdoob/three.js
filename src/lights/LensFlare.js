@@ -2,7 +2,7 @@
  * @author Mikael Emtinger
  */
  
-THREE.LensFlare = function ( material, size ) {
+THREE.LensFlare = function ( texture, size ) {
 
 	THREE.Object3D.call( this );
 
@@ -10,7 +10,7 @@ THREE.LensFlare = function ( material, size ) {
 	this.lensFlares = [];
 	this.customUpdateCallback = undefined;
 
-	this.addLensFlare( material, size, 0 );
+	this.add( texture, size, 0 );
 };
 
 THREE.LensFlare.prototype = new THREE.Object3D();
@@ -22,11 +22,11 @@ THREE.LensFlare.prototype.supr = THREE.Object3D.prototype;
  * Add: adds another flare 
  */
 
-THREE.LensFlare.prototype.add = function( material, size, distance ) {
+THREE.LensFlare.prototype.add = function( texture, size, distance ) {
 	
 	distance = Math.min( distance, Math.max( 0, distance ));
 
-	lensFlares.push( { material: material, size: size, distance: distance, position: new THREE.Vector3() } );
+	this.lensFlares.push( { texture: texture, size: size, distance: distance, position: new THREE.Vector3() } );
 }
 
 

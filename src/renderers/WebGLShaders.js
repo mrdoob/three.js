@@ -556,6 +556,52 @@ THREE.UniformsLib = {
 
 THREE.ShaderLib = {
 
+	'lensFlare': {
+		
+		vertexShader: [
+
+			"uniform 	vec3 	screenPosition;",
+			"uniform	vec2	scale;",
+			"uniform	float	rotation;",
+			"attribute 	vec2 	position;",
+			"attribute  vec2	UV;",
+			"varying	vec2	vUV;",
+	
+			"void main(void)",
+			"{",
+				"vUV = UV;",
+
+				"vec2 pos;",
+				"pos.x = cos( rotation ) * position.x - sin( rotation ) * position.y;",
+				"pos.y = sin( rotation ) * position.x + cos( rotation ) * position.y;",
+				"gl_Position = vec4(( pos * scale + screenPosition.xy ).xy, screenPosition.z, 1.0 );",
+			"}"
+
+		].join( "\n" ),
+		
+		fragmentShader: [
+		
+			"#ifdef GL_ES",
+				"precision highp float;",
+			"#endif",		
+
+			"uniform	sampler2D	map;",
+			"uniform    int         renderPink;",
+			"varying	vec2		vUV;",
+	
+			"void main( void )",
+			"{",
+				"if( renderPink == 1 ) {",
+					"gl_FragColor = vec4( 1.0, 0.0, 1.0, 1.0 );",
+				"} else {",
+					"gl_FragColor = texture2D( map, vUV );",
+				"}",
+			"}"
+		].join( "\n" )
+
+	},
+
+
 	'shadowPost': {
 		
 		vertexShader: [
@@ -575,10 +621,13 @@ THREE.ShaderLib = {
 			"#ifdef GL_ES",
 				"precision highp float;",
 			"#endif",		
+
+			"uniform 	float 	darkness;",
+
 	
 			"void main( void )",
 			"{",
-				"gl_FragColor = vec4( 0, 0, 0, 0.5 );",
+				"gl_FragColor = vec4( 0, 0, 0, darkness );",
 			"}"
 
 		].join( "\n" )

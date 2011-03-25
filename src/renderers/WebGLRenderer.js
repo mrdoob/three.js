@@ -68,12 +68,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// parameters defaults
 
+	stencil = true,
 	antialias = true,
 	clearColor = new THREE.Color( 0x000000 ),
 	clearAlpha = 0;
 
 	if ( parameters ) {
 
+		if ( parameters.stencil != undefined ) stencil = parameters.stencil;
 		if ( parameters.antialias !== undefined ) antialias = parameters.antialias;
 		if ( parameters.clearColor !== undefined ) clearColor.setHex( parameters.clearColor );
 		if ( parameters.clearAlpha !== undefined ) clearAlpha = parameters.clearAlpha;
@@ -85,45 +87,226 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.autoClear = true;
 	this.sortObjects = true;
 
-	initGL( antialias, clearColor, clearAlpha );
+	initGL( antialias, clearColor, clearAlpha, stencil );
 
 	this.context = _gl;
 
 
-	// create shadow polygons
+	// prepare stencil shadow polygon
 
-	var _shadow   = {};
-	var vertices = [];
-	var faces    = [];
+	if( stencil ) {
+		
+		var _stencilShadow      = {};
+		
+		_stencilShadow.vertices = new Float32Array( 12 );
+		_stencilShadow.faces    = new Uint16Array( 6 );
+		_stencilShadow.darkness = 0.5;
+		
+		_stencilShadow.vertices[ 0 * 3 + 0 ] = -2; _stencilShadow.vertices[ 0 * 3 + 1 ] = -1; _stencilShadow.vertices[ 0 * 3 + 2 ] = -1;
+		_stencilShadow.vertices[ 1 * 3 + 0 ] =  2; _stencilShadow.vertices[ 1 * 3 + 1 ] = -1; _stencilShadow.vertices[ 1 * 3 + 2 ] = -1;
+		_stencilShadow.vertices[ 2 * 3 + 0 ] =  2; _stencilShadow.vertices[ 2 * 3 + 1 ] =  1; _stencilShadow.vertices[ 2 * 3 + 2 ] = -1;
+		_stencilShadow.vertices[ 3 * 3 + 0 ] = -2; _stencilShadow.vertices[ 3 * 3 + 1 ] =  1; _stencilShadow.vertices[ 3 * 3 + 2 ] = -1;
+		
+		_stencilShadow.faces[ 0 ] = 0; _stencilShadow.faces[ 1 ] = 1; _stencilShadow.faces[ 2 ] = 2;
+		_stencilShadow.faces[ 3 ] = 0; _stencilShadow.faces[ 4 ] = 2; _stencilShadow.faces[ 5 ] = 3;
 	
-	vertices[ 0 * 3 + 0 ] = -2; vertices[ 0 * 3 + 1 ] = -1; vertices[ 0 * 3 + 2 ] = -1;
-	vertices[ 1 * 3 + 0 ] =  2; vertices[ 1 * 3 + 1 ] = -1; vertices[ 1 * 3 + 2 ] = -1;
-	vertices[ 2 * 3 + 0 ] =  2; vertices[ 2 * 3 + 1 ] =  1; vertices[ 2 * 3 + 2 ] = -1;
-	vertices[ 3 * 3 + 0 ] = -2; vertices[ 3 * 3 + 1 ] =  1; vertices[ 3 * 3 + 2 ] = -1;
 	
-	faces[ 0 ] = 0; faces[ 1 ] = 1; faces[ 2 ] = 2;
-	faces[ 3 ] = 0; faces[ 4 ] = 2; faces[ 5 ] = 3;
-
-
-	_shadow.vertexBuffer  = _gl.createBuffer();
-	_shadow.elementBuffer = _gl.createBuffer();
+		_stencilShadow.vertexBuffer  = _gl.createBuffer();
+		_stencilShadow.elementBuffer = _gl.createBuffer();
+		
+		_gl.bindBuffer( _gl.ARRAY_BUFFER, _stencilShadow.vertexBuffer );
+		_gl.bufferData( _gl.ARRAY_BUFFER,  _stencilShadow.vertices, _gl.STATIC_DRAW );
 	
-	_gl.bindBuffer( _gl.ARRAY_BUFFER, _shadow.vertexBuffer );
-	_gl.bufferData( _gl.ARRAY_BUFFER, new Float32Array( vertices ), _gl.STATIC_DRAW );
-
-	_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, _shadow.elementBuffer );
-	_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, new Uint16Array( faces ), _gl.STATIC_DRAW );
+		_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, _stencilShadow.elementBuffer );
+		_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, _stencilShadow.faces, _gl.STATIC_DRAW );
+		
 	
+		_stencilShadow.program = _gl.createProgram();
+	
+		_gl.attachShader( _stencilShadow.program, getShader( "fragment", THREE.ShaderLib.shadowPost.fragmentShader ));
+		_gl.attachShader( _stencilShadow.program, getShader( "vertex",   THREE.ShaderLib.shadowPost.vertexShader   ));
+	
+		_gl.linkProgram( _stencilShadow.program );
+	
+		_stencilShadow.vertexLocation     = _gl.getAttribLocation ( _stencilShadow.program, "position"         );
+		_stencilShadow.projectionLocation = _gl.getUniformLocation( _stencilShadow.program, "projectionMatrix" );
+		_stencilShadow.darknessLocation   = _gl.getUniformLocation( _stencilShadow.program, "darkness"         );
+	}
+	
+	
+	// prepare lens flare
+	
+	var _lensFlare = {};
+	var i;
+	
+	_lensFlare.vertices     = new Float32Array( 8 + 8 );
+	_lensFlare.faces        = new Uint16Array( 6 );
+	_lensFlare.transparency = 0.5;
+	
+	i = 0;
+	_lensFlare.vertices[ i++ ] = -1; _lensFlare.vertices[ i++ ] = -1;	// vertex
+	_lensFlare.vertices[ i++ ] = 0;  _lensFlare.vertices[ i++ ] = 0;	// uv... etc.
+	_lensFlare.vertices[ i++ ] = 1;  _lensFlare.vertices[ i++ ] = -1;
+	_lensFlare.vertices[ i++ ] = 1;  _lensFlare.vertices[ i++ ] = 0;
+	_lensFlare.vertices[ i++ ] = 1;  _lensFlare.vertices[ i++ ] = 1;
+	_lensFlare.vertices[ i++ ] = 1;  _lensFlare.vertices[ i++ ] = 1;
+	_lensFlare.vertices[ i++ ] = -1; _lensFlare.vertices[ i++ ] = 1;
+	_lensFlare.vertices[ i++ ] = 0;  _lensFlare.vertices[ i++ ] = 1;
 
-	_shadow.program = _gl.createProgram();
+	i = 0;
+	_lensFlare.faces[ i++ ] = 0; _lensFlare.faces[ i++ ] = 1; _lensFlare.faces[ i++ ] = 2;
+	_lensFlare.faces[ i++ ] = 0; _lensFlare.faces[ i++ ] = 2; _lensFlare.faces[ i++ ] = 3;
 
-	_gl.attachShader( _shadow.program, getShader( "fragment", THREE.ShaderLib.shadowPost.fragmentShader ));
-	_gl.attachShader( _shadow.program, getShader( "vertex",   THREE.ShaderLib.shadowPost.vertexShader   ));
+	_lensFlare.vertexBuffer  = _gl.createBuffer();
+	_lensFlare.elementBuffer = _gl.createBuffer();
+	_lensFlare.tempTexture   = _gl.createTexture();
+	
+	_gl.bindBuffer( _gl.ARRAY_BUFFER, _lensFlare.vertexBuffer );
+	_gl.bufferData( _gl.ARRAY_BUFFER,  _lensFlare.vertices, _gl.STATIC_DRAW );
 
-	_gl.linkProgram( _shadow.program );
+	_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, _lensFlare.elementBuffer );
+	_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, _lensFlare.faces, _gl.STATIC_DRAW );
 
-	_shadow.vertexLocation     = _gl.getAttribLocation ( _shadow.program, "position"         );
-	_shadow.projectionLocation = _gl.getUniformLocation( _shadow.program, "projectionMatrix" );
+	_gl.bindTexture( _gl.TEXTURE_2D, _lensFlare.tempTexture );
+	_gl.texImage2D( _gl.TEXTURE_2D, 0, _gl.RGB, 16, 16, 0, _gl.RGB, _gl.UNSIGNED_BYTE, null );
+	_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_S, _gl.CLAMP_TO_EDGE );
+	_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_T, _gl.CLAMP_TO_EDGE );
+	_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MAG_FILTER, _gl.NEAREST );
+	_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, _gl.NEAREST );
+
+
+	_lensFlare.program = _gl.createProgram();
+
+	_gl.attachShader( _lensFlare.program, getShader( "fragment", THREE.ShaderLib.lensFlare.fragmentShader ));
+	_gl.attachShader( _lensFlare.program, getShader( "vertex",   THREE.ShaderLib.lensFlare.vertexShader   ));
+
+	_gl.linkProgram( _lensFlare.program );
+
+	_lensFlare.attributes = {};
+	_lensFlare.uniforms = {};
+	_lensFlare.attributes.vertex       = _gl.getAttribLocation ( _lensFlare.program, "position" );
+	_lensFlare.attributes.uv           = _gl.getAttribLocation ( _lensFlare.program, "UV" );
+	_lensFlare.uniforms.map            = _gl.getUniformLocation( _lensFlare.program, "map" );
+	_lensFlare.uniforms.opacity        = _gl.getUniformLocation( _lensFlare.program, "opacity" );
+	_lensFlare.uniforms.scale          = _gl.getUniformLocation( _lensFlare.program, "scale" );
+	_lensFlare.uniforms.rotation       = _gl.getUniformLocation( _lensFlare.program, "rotation" );
+	_lensFlare.uniforms.screenPosition = _gl.getUniformLocation( _lensFlare.program, "screenPosition" );
+	_lensFlare.uniforms.renderPink     = _gl.getUniformLocation( _lensFlare.program, "renderPink" );
+
+	/*
+	 * Render lens flares
+	 * Method: renders 9 0xff00ff-colored points scattered over the light source area, 
+	 *         reads these back and calculates occlusion.  
+	 *         Then LensFlare.updateLensFlares() is called to re-position and 
+	 *         update transparency of flares. Then they are rendered.
+	 * 
+	 */
+
+	function renderLensFlares( scene, camera, renderTarget ) {
+		
+		var object, geometryGroup, material;
+		var o, ol = scene.__webglLensFlares.length;
+		var tempPosition = new THREE.Vector3();
+		var invAspect = _viewportHeight / _viewportWidth;
+		var halfViewportWidth = _viewportWidth * 0.5;
+		var halfViewportHeight = _viewportHeight * 0.5;
+		var size = 16 / _viewportHeight;
+		var restoreScale = [ size * invAspect, size ];
+		var screenPosition = [ 1, 1, 0 ];
+		var screenPositionPixels = [ 1, 1 ];
+
+		// set lensflare program
+
+		if( _oldProgram !== _lensFlare.program ) {
+			
+			_gl.useProgram( _lensFlare.program );
+			_oldProgram = _lensFlare.program;
+		}
+
+
+		// loop through all lens flares to update their occlusion and positions
+		// setup gl and common used attribs/unforms
+
+		_gl.uniform1i( _lensFlare.uniforms.map, 0 );
+		_gl.activeTexture( _gl.TEXTURE0 );
+		
+		_gl.uniform1f( _lensFlare.uniforms.opacity, 1 );
+		_gl.uniform1f( _lensFlare.uniforms.rotation, 0 );
+		_gl.uniform2fv( _lensFlare.uniforms.scale, restoreScale );
+
+		_gl.bindBuffer( _gl.ARRAY_BUFFER, _lensFlare.vertexBuffer );
+		_gl.vertexAttribPointer( _lensFlare.attributes.vertex, 2, _gl.FLOAT, false, 2 * 8, 0 );
+		_gl.vertexAttribPointer( _lensFlare.attributes.uv, 2, _gl.FLOAT, false, 2 * 8, 8 );
+
+		_gl.bindTexture( _gl.TEXTURE_2D, _lensFlare.tempTexture );
+
+		_gl.cullFace( _gl.BACK );
+		_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, _lensFlare.elementBuffer );
+
+
+		for( o = 0; o < ol; o++ ) {
+			
+			// calc object screen position
+			
+			object = scene.__webglLensFlares[ o ].object;
+			
+			tempPosition.set( object.matrixWorld.n14, object.matrixWorld.n24, object.matrixWorld.n34 );
+			
+			camera.matrixWorldInverse.multiplyVector3( tempPosition );
+			camera.projectionMatrix.multiplyVector3( tempPosition );
+			
+			
+			// setup arrays for gl programs
+			
+			screenPosition[ 0 ] = tempPosition.x;
+			screenPosition[ 1 ] = tempPosition.y;
+			screenPosition[ 2 ] = tempPosition.z;
+			
+			screenPositionPixels[ 0 ] = screenPosition[ 0 ] * halfViewportWidth + halfViewportWidth;
+			screenPositionPixels[ 1 ] = screenPosition[ 1 ] * halfViewportHeight + halfViewportHeight;
+
+			// todo: viewport culling
+			// save current RGB to temp texture
+			
+			_gl.copyTexSubImage2D( _gl.TEXTURE_2D, 0, 0, 0, screenPositionPixels[ 0 ] - 8, screenPositionPixels[ 1 ] - 8, 16, 16 );
+
+	
+			// render pink quad
+
+			_gl.uniform3fv( _lensFlare.uniforms.screenPosition, screenPosition );
+			_gl.uniform1i( _lensFlare.uniforms.renderPink, 1 );
+
+			_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
+
+
+			// restore graphics
+		
+			screenPosition[ 2 ] = 0;
+		
+			_gl.uniform1i( _lensFlare.uniforms.renderPink, 0 );
+			_gl.uniform3fv( _lensFlare.uniforms.screenPosition, screenPosition );
+
+			_gl.disable( _gl.DEPTH_TEST );
+			_gl.depthMask( false );
+
+			_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
+
+
+			
+			
+			// copy existing -> temp texture
+			// render pink quad
+			// read back pixles
+			// copy temp -> back
+			// call flare update
+			// render flares			
+			
+			
+
+		}
+		
+	}
+
 
 
 	this.setSize = function ( width, height ) {
@@ -185,6 +368,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_gl.clear( _gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT | _gl.STENCIL_BUFFER_BIT );
 
+	};
+
+	this.setStencilShadowDarkness = function( value ) {
+		
+		_stencilShadow.darkness = value;
 	};
 
 
@@ -2528,14 +2716,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 		
 		if( scene.__webglLensFlares.length ) {
 			
-			renderLensFlares( scene, renderTarget );
+			renderLensFlares( scene, camera, renderTarget );
 		
 		}
 
 
 		// render stencil shadows
 
-		if( scene.__webglShadowVolumes.length && scene.lights.length ) {
+		if( stencil && scene.__webglShadowVolumes.length && scene.lights.length ) {
 
 			renderStencilShadows( scene );
 		
@@ -2553,19 +2741,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	};
 
 
-	/*
-	 * Render lens flares
-	 * Method: renders 9 0xff00ff-colored points scattered over the light source area, 
-	 *         reads these back and calculates occlusion.  
-	 *         Then LensFlare.updateLensFlares() is called to re-position and 
-	 *         update transparency of flares. Then they are rendered.
-	 * 
-	 */
-
-	function renderLensFlares() {
-		
-		
-	}
+	
 
 
 	/*
@@ -2596,8 +2772,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 		
 		var l, ll = scene.lights.length;
 		var p;
-		var light, lights = scene.lights, geometryGroup;
+		var light, lights = scene.lights;
 		var dirLight = [];			
+		var object, geometryGroup, material;
 		var	program;
 		var p_uniforms;
 	    var m_uniforms;
@@ -2679,20 +2856,21 @@ THREE.WebGLRenderer = function ( parameters ) {
 		// draw darkening polygon	
 
 		_oldBlending = "";
-		_oldProgram = _shadow.program;
+		_oldProgram = _stencilShadow.program;
 
-		_gl.useProgram( _shadow.program );
-		_gl.uniformMatrix4fv( _shadow.projectionLocation, false, _projectionMatrixArray );
+		_gl.useProgram( _stencilShadow.program );
+		_gl.uniformMatrix4fv( _stencilShadow.projectionLocation, false, _projectionMatrixArray );
+		_gl.uniform1f( _stencilShadow.darknessLocation, _stencilShadow.darkness );
 		
-		_gl.bindBuffer( _gl.ARRAY_BUFFER, _shadow.vertexBuffer );
-		_gl.vertexAttribPointer( _shadow.vertexLocation, 3, _gl.FLOAT, false, 0, 0 );
-		_gl.enableVertexAttribArray( _shadow.vertexLocation );
+		_gl.bindBuffer( _gl.ARRAY_BUFFER, _stencilShadow.vertexBuffer );
+		_gl.vertexAttribPointer( _stencilShadow.vertexLocation, 3, _gl.FLOAT, false, 0, 0 );
+		_gl.enableVertexAttribArray( _stencilShadow.vertexLocation );
 
 		_gl.enable( _gl.BLEND );
 		_gl.blendFunc( _gl.ONE, _gl.ONE_MINUS_SRC_ALPHA );
 		_gl.blendEquation( _gl.FUNC_ADD );
 			
-		_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, _shadow.elementBuffer );
+		_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, _stencilShadow.elementBuffer );
 		_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
 
 
@@ -2820,6 +2998,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 			}
 
+		} else if ( object instanceof THREE.LensFlare ) {
+			
+			addBuffer( scene.__webglLensFlares, undefined, object );
+			
 		} else if ( object instanceof THREE.Ribbon ) {
 
 			geometry = object.geometry;
@@ -3122,11 +3304,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function initGL ( antialias, clearColor, clearAlpha ) {
+	function initGL ( antialias, clearColor, clearAlpha, stencil ) {
 
 		try {
 
-			if ( ! ( _gl = _canvas.getContext( 'experimental-webgl', { antialias: antialias, stencil:true } ) ) ) {
+			if ( ! ( _gl = _canvas.getContext( 'experimental-webgl', { antialias: antialias, stencil: stencil } ) ) ) {
 
 				throw 'Error creating WebGL context.';
 
