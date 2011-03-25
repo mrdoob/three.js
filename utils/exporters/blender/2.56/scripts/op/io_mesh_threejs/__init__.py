@@ -35,13 +35,14 @@ class ExportTHREEJS(bpy.types.Operator, ExportHelper):
 
     filename_ext = ".js"
 
-    use_modifiers = BoolProperty(name="Apply Modifiers", description="Apply modifiers to the exported mesh", default=True)
+    option_flip_yz = BoolProperty(name="Flip YZ", description="Flip YZ", default=True)
     use_normals = BoolProperty(name="Normals", description="Export normals", default=True)
     use_colors = BoolProperty(name="Colors", description="Export vertex colors", default=True)
     use_uv_coords = BoolProperty(name="UVs", description="Export texture coordinates", default=True)
+    option_export_scene = BoolProperty(name="Scene", description="Export scene", default=True)
 
     align_types = [("None","None","None"), ("Center","Center","Center"), ("Bottom","Bottom","Bottom"), ("Top","Top","Top")]
-    align_model = EnumProperty(name="Align model", description="Align model", items=align_types, default="Center")
+    align_model = EnumProperty(name="Align model", description="Align model", items=align_types, default="None")
 
     @classmethod
     def poll(cls, context):
@@ -61,15 +62,24 @@ class ExportTHREEJS(bpy.types.Operator, ExportHelper):
         layout = self.layout
 
         row = layout.row()
-        row.prop(self.properties, "use_modifiers")
+        row.prop(self.properties, "option_export_scene")
+        layout.separator()
+
+        row = layout.row()
+        row.prop(self.properties, "option_flip_yz")
+        layout.separator()
+
+        row = layout.row()
+        row.prop(self.properties, "align_model")
+        layout.separator()
+
         row = layout.row()
         row.prop(self.properties, "use_normals")
         row = layout.row()
         row.prop(self.properties, "use_colors")
         row = layout.row()
         row.prop(self.properties, "use_uv_coords")
-        row = layout.row()
-        row.prop(self.properties, "align_model")
+        
 
 
 def menu_func(self, context):

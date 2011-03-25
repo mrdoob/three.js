@@ -23,9 +23,8 @@
 Blender exporter for Three.js (ASCII JSON format).
 
 TODO
-    - model alignment
+    - export scene
     - copy used images to folder where exported file goes
-    - export all selected meshes
     - binary format
 """
 
@@ -42,13 +41,149 @@ import random
 # Configuration
 # #####################################################
 
-# default colors for debugging (each material gets one distinct color):
+DEFAULTS = {
+"bgcolor" : [0, 0, 0],
+"bgalpha" : 1.0,
+
+"camera"  : 
+    {
+        "name" : "default_camera",
+        "type" : "perspective",
+        "near" : 1,
+        "far"  : 10000,
+        "fov"  : 60,
+        "aspect": 1.333,
+        "position" : [0, 0, 10],
+        "target"   : [0, 0, 0]
+    },
+
+"light" :
+ {
+    "name"       : "default_light",
+    "type"       : "directional",
+    "direction"	 : [0,1,1],
+    "color" 	 : [1,1,1],
+    "intensity"	 : 0.8
+ }
+}
+
+# default colors for debugging (each material gets one distinct color): 
 # white, red, green, blue, yellow, cyan, magenta
 COLORS = [0xeeeeee, 0xee0000, 0x00ee00, 0x0000ee, 0xeeee00, 0x00eeee, 0xee00ee]
 
 
 # #####################################################
-# Templates
+# Templates - scene
+# #####################################################
+TEMPLATE_SCENE_ASCII = """\
+// Converted from: %(fname)s
+//  File generated with Blender 2.56 Exporter
+//  https://github.com/alteredq/three.js/tree/master/utils/exporters/blender/
+
+
+var scene = {
+
+"type" : "scene",
+"urlBaseType" : "relativeToScene",
+
+%(sections)s
+
+"defaults" : 
+{
+    "bgcolor" : %(bgcolor)s,
+    "bgalpha" : %(bgalpha)f,
+    "camera"  : %(defcamera)s
+}
+
+}
+
+postMessage( scene );
+
+"""
+
+TEMPLATE_SECTION = """
+"%s" : 
+{
+%s
+},
+"""
+
+TEMPLATE_OBJECT = """\
+    %(object_id)s : {
+        "geometry"  : %(geometry_id)s,
+        "materials" : [ %(material_id)s ],
+        "position"  : %(position)s,
+        "rotation"  : %(rotation)s,
+        "quaternion": %(quaternion)s,
+        "scale"	    : %(scale)s,
+        "visible"   : true
+    }"""
+
+TEMPLATE_GEOMETRY = """\
+    %(geometry_id)s : {
+        "type" : "ascii_mesh",
+        "url"  : %(model_file)s
+    }"""
+
+TEMPLATE_TEXTURE = """\
+    %(texture_id)s : {
+        "url": %(texture_file)s
+    }"""
+
+TEMPLATE_MATERIAL_SCENE = """\
+    %(material_id)s : {
+        "type": %(type)s,
+        "parameters": { %(parameters)s } 
+    }"""
+
+TEMPLATE_CAMERA_PERSPECTIVE = """\
+    %(camera_id)s : {
+        "type"  : "perspective",
+        "fov"   : %(fov)f,
+        "aspect": %(aspect)f,
+        "near"  : %(near)f,
+        "far"   : %(far)f,
+        "position": %(position)s,
+        "target"  : %(target)s
+    }"""
+
+TEMPLATE_CAMERA_ORTHO = """\
+    %(camera_id)s: {
+        "type"  : "ortho",
+        "left"  : %(left)f,
+        "right" : %(right)f,
+        "top"   : %(top)f,
+        "bottom": %(bottom)f,
+        "near"  : %(near)f,
+        "far"   : %(far)f,
+        "position": %(position)s,
+        "target"  : %(target)s
+    }"""
+
+TEMPLATE_LIGHT_DIRECTIONAL = """\
+	%(light_id)s: {
+		"type"		 : "directional",
+		"direction"	 : %(direction)s,
+		"color" 	 : %(color)s,
+		"intensity"	 : %(intensity).2f
+	}"""
+
+TEMPLATE_LIGHT_POINT = """\
+	%(light_id)s: {
+		"type"	     : "point",
+		"position"   : %(position)s,
+		"color"      : %(color)s
+		"intensity"	 : %(intensity).3f
+	}"""
+
+TEMPLATE_VEC4 = '[ %f, %f, %f, %f ]'
+TEMPLATE_VEC3 = '[ %f, %f, %f ]'
+TEMPLATE_VEC2 = '[ %f, %f ]'
+TEMPLATE_STRING = '"%s"'
+TEMPLATE_HEX = "0x%06x"
+
+# #####################################################
+# Templates - model
 # #####################################################
 TEMPLATE_FILE_ASCII = """\
 /*
@@ -98,8 +233,11 @@ TEMPLATE_C = "0x%06x"
 # #####################################################
 # Utils
 # #####################################################
+def veckey3(x,y,z):
+    return round(x, 6), round(y, 6), round(z, 6)
+
 def veckey3d(v):
-    return round(v.x, 6), round(v.y, 6), round(v.z, 6)
+    return veckey3(v.x, v.y, v.z)
 
 def veckey2d(v):
     return round(v[0], 6), round(v[1], 6)
@@ -107,8 +245,13 @@ def veckey2d(v):
 def get_normal_indices(v, normals, mesh):
     n = []
     mv = mesh.vertices
+
     for i in v:
-        n.append( normals[veckey3d(mv[i].normal)] )
+        normal = mv[i].normal        
+        key = veckey3d(normal)
+        
+        n.append( normals[key] )
+
     return n
 
 def get_uv_indices(face_index, uvs, mesh):
@@ -126,6 +269,24 @@ def get_color_indices(face_index, colors, mesh):
     for i in face_colors:
         c.append( colors[hexcolor(i)] )
     return c
+
+def rgb2int(rgb):
+    color = (int(rgb[0]*255) << 16) + (int(rgb[1]*255) << 8) + int(rgb[2]*255);
+    return color
+
+# #####################################################
+# Utils - files
+# #####################################################
+def write_file(fname, content):
+    out = open(fname, "w")
+    out.write(content)
+    out.close()
+
+def ensure_folder_exist(foldername):
+    """Create folder (with whole path) if it doesn't exist yet."""
+    
+    if not os.access(foldername, os.R_OK|os.W_OK|os.X_OK):
+        os.makedirs(foldername)
 
 # #####################################################
 # Alignment
@@ -231,7 +392,7 @@ def setBit(value, position, on):
         mask = ~(1 << position)
         return (value & mask)    
     
-def generate_face(f, faceIndex, normals, uvs, colors, mesh, use_normals, use_colors, use_uv_coords):
+def generate_face(f, faceIndex, normals, uvs, colors, mesh, use_normals, use_colors, use_uv_coords, flipyz):
     isTriangle = ( len(f.vertices) == 3 )
     
     if isTriangle:
@@ -315,7 +476,10 @@ def extract_vertex_normals(mesh, use_normals):
 
     for f in mesh.faces:
         for v in f.vertices:
-            key = veckey3d(mesh.vertices[v].normal)
+            
+            normal = mesh.vertices[v].normal            
+            key = veckey3d(normal)
+                
             if key not in normals:
                 normals[key] = count
                 count += 1
@@ -327,7 +491,7 @@ def generate_normals(normals, use_normals):
         return ""
 
     chunks = []
-    for key, index in sorted(normals.items(), key=operator.itemgetter(1)):
+    for key, index in sorted(normals.items(), key = operator.itemgetter(1)):
         chunks.append(key)
 
     return ",".join(generate_normal(n) for n in chunks)
@@ -441,7 +605,7 @@ def value2string(v):
         return str(v).lower()
     return str(v)
 
-def generate_materials(mtl, materials, use_colors):
+def generate_materials(mtl, materials, use_colors, draw_type):
     """Generate JS array of materials objects
     """
 
@@ -458,6 +622,10 @@ def generate_materials(mtl, materials, use_colors):
         mtl[m]['DbgColor'] = generate_color(index)
         mtl[m]['vertexColors'] = use_colors
 
+        if draw_type in [ "BOUNDS", "WIRE" ]:
+            mtl[m]['wireframe'] = True
+            mtl[m]['DbgColor'] = 0xff0000
+            
         mtl_raw = ",\n".join(['\t"%s" : %s' % (n, value2string(v)) for n,v in sorted(mtl[m].items())])
         mtl_string = "\t{\n%s\n\t}" % mtl_raw
         mtl_array.append([index, mtl_string])
@@ -505,7 +673,7 @@ def extract_materials(mesh, scene):
 
     return materials
 
-def generate_materials_string(mesh, scene, use_colors):
+def generate_materials_string(mesh, scene, use_colors, draw_type):
 
     random.seed(42) # to get well defined color order for debug materials
 
@@ -522,19 +690,21 @@ def generate_materials_string(mesh, scene, use_colors):
         materials = { 'default':0 }
 
     # default dummy materials
+    
     mtl = generate_mtl(materials)
 
     # extract real materials from the mesh
+    
     mtl.update(extract_materials(mesh, scene))
 
-    return generate_materials(mtl, materials, use_colors)
+    return generate_materials(mtl, materials, use_colors, draw_type)
 
 # #####################################################
 # ASCII exporter
 # #####################################################
-def generate_ascii_model(mesh, scene, use_normals, use_colors, use_uv_coords, align_model):
+def generate_ascii_model(mesh, scene, use_normals, use_colors, use_uv_coords, align_model, flipyz, draw_type):
 
-    vertices = mesh.vertices[:]
+    vertices = mesh.vertices[:]    
 
     if align_model == 1:
         center(vertices)
@@ -547,7 +717,7 @@ def generate_ascii_model(mesh, scene, use_normals, use_colors, use_uv_coords, al
     colors, ncolor = extract_vertex_colors(mesh, use_colors)
     uvs, nuv = extract_uvs(mesh, use_uv_coords)
 
-    mstring, nmaterial = generate_materials_string(mesh, scene, use_colors)
+    mstring, nmaterial = generate_materials_string(mesh, scene, use_colors, draw_type)
     
     text = TEMPLATE_FILE_ASCII % {
     "nvertex"   : len(mesh.vertices),
@@ -565,46 +735,49 @@ def generate_ascii_model(mesh, scene, use_normals, use_colors, use_uv_coords, al
 
     "vertices"      : ",".join(generate_vertex(v) for v in vertices),
 
-    "faces"     : ",".join(generate_face(f, i, normals, uvs, colors, mesh, use_normals, use_colors, use_uv_coords) for i, f in enumerate(mesh.faces))
+    "faces"     : ",".join(generate_face(f, i, normals, uvs, colors, mesh, use_normals, use_colors, use_uv_coords, flipyz) for i, f in enumerate(mesh.faces))
 
     }
 
     return text
 
 # #####################################################
-# Main
+# Utils
 # #####################################################
-def save(operator, context, filepath="", use_modifiers=True, use_normals=True, use_colors=True, use_uv_coords=True, align_model=1):
+def ensure_extension(filepath, extension):
+    if not filepath.lower().endswith(extension):
+        filepath += extension
+    return filepath
+    
+def generate_mesh_filename(meshname, filepath):
+    normpath = os.path.normpath(filepath)
+    path, ext = os.path.splitext(normpath)
+    return "%s.%s%s" % (path, meshname, ext)
+    
+# #####################################################
+# Export single mesh
+# #####################################################
+def export_mesh(obj, scene, filepath, use_normals, use_colors, use_uv_coords, align_model, flipyz, export_single_model):
+    """Export single mesh"""
 
-    def rvec3d(v):
-        return round(v[0], 6), round(v[1], 6), round(v[2], 6)
 
-    def rvec2d(v):
-        return round(v[0], 6), round(v[1], 6)
-
-    scene = context.scene
-    obj = context.object
-
-    if not filepath.lower().endswith('.js'):
-        filepath += '.js'
-
-    if not obj:
-        raise Exception("Error, Select 1 active object")
-
-    if scene.objects.active:
-        bpy.ops.object.mode_set(mode='OBJECT')
-
-    if use_modifiers:
-        mesh = obj.create_mesh(scene, True, 'PREVIEW')
-    else:
-        mesh = obj.data
+    # collapse modifiers into mesh
+    
+    mesh = obj.create_mesh(scene, True, 'RENDER')        
 
     if not mesh:
-        raise Exception("Error, could not get mesh data from active object")
+        raise Exception("Error, could not get mesh data from object [%s]" % obj.name)
 
     # that's what Blender's native export_obj.py does
-    x_rot = mathutils.Matrix.Rotation(-math.pi/2, 4, 'X')
-    mesh.transform(x_rot * obj.matrix_world)
+    # to flip YZ
+
+    X_ROT = mathutils.Matrix.Rotation(-math.pi/2, 4, 'X')
+
+    if export_single_model:
+        mesh.transform(X_ROT * obj.matrix_world)
+    else:
+        mesh.transform(X_ROT)
+
     mesh.calc_normals()
 
     faceUV = (len(mesh.uv_textures) > 0)
@@ -627,14 +800,412 @@ def save(operator, context, filepath="", use_modifiers=True, use_normals=True, u
         if not active_col_layer:
             use_colors = False
 
-    text = generate_ascii_model(mesh, scene, use_normals, use_colors, use_uv_coords, align_model)
-    file = open(filepath, 'w')
-    file.write(text)
-    file.close()
+    text = generate_ascii_model(mesh, scene, use_normals, use_colors, use_uv_coords, align_model, flipyz, obj.draw_type)    
+    write_file(filepath, text)
+
+    # remove temp mesh
+
+    bpy.data.meshes.remove(mesh)
 
     print("writing", filepath, "done")
+    
+    
+# #####################################################
+# Export scene
+# #####################################################
+def generate_vec4(vec):
+    return TEMPLATE_VEC4 % (vec[0], vec[1], vec[2], vec[3])
 
-    if use_modifiers:
-        bpy.data.meshes.remove(mesh)
+def generate_vec3(vec):
+    return TEMPLATE_VEC3 % (vec[0], vec[1], vec[2])
 
+def generate_vec2(vec):
+    return TEMPLATE_VEC2 % (vec[0], vec[1])
+
+def generate_hex(number):
+    return TEMPLATE_HEX % number
+    
+def generate_string(s):
+    return TEMPLATE_STRING % s
+    
+def generate_section(label, content):
+    return TEMPLATE_SECTION % (label, content)
+    
+def get_mesh_filename(mesh):
+    object_id = mesh["data"]["name"]
+    filename = "%s.js" % sanitize(object_id)
+    return filename
+    
+def generate_material_id_list(materials):
+    chunks = []
+    for material in materials:
+        chunks.append(material.name)
+    
+    return ",".join(chunks)
+    
+def generate_objects(data):
+    chunks = []
+    
+    for obj in data["objects"]:
+        if obj.type == "MESH":
+            object_id = obj.name
+            
+            if len(obj.modifiers) > 0:
+                geo_name = obj.name
+            else:
+                geo_name = obj.data.name
+
+            geometry_id = "geo_%s" % geo_name
+            
+            material_id = generate_material_id_list(obj.material_slots)
+
+            #position = obj.location
+            #rotation = obj.rotation_euler
+            scale = obj.scale
+            quaternion = obj.rotation_quaternion
+            
+            position = [obj.location.x, obj.location.z, -obj.location.y]
+            rotation = [obj.rotation_euler.x, -obj.rotation_euler.y, -obj.rotation_euler.z]
+            #quaternion = obj.rotation_euler.to_quat()
+            scale = [obj.scale.x, obj.scale.z, obj.scale.y]
+            
+            material_string = ""
+            if material_id:
+                material_string = generate_string(material_id)
+                
+            object_string = TEMPLATE_OBJECT % {
+            "object_id"   : generate_string(object_id),
+            "geometry_id" : generate_string(geometry_id),
+            "material_id" : material_string,
+            "position"    : generate_vec3(position),
+            "rotation"    : generate_vec3(rotation),
+            "quaternion"  : generate_vec4(quaternion),
+            "scale"       : generate_vec3(scale)
+            }
+            chunks.append(object_string)
+        
+    return ",\n\n".join(chunks)
+    
+def generate_geometries(data):
+    chunks = []
+    
+    geo_set = set()
+    
+    for obj in data["objects"]:
+        if obj.type == "MESH":
+            
+            if len(obj.modifiers) > 0:
+                name = obj.name
+            else:
+                name = obj.data.name
+            
+            if name not in geo_set:
+
+                geometry_id = "geo_%s" % name
+                model_filename = os.path.basename(generate_mesh_filename(name, data["filepath"]))
+                
+                geometry_string = TEMPLATE_GEOMETRY % {
+                "geometry_id" : generate_string(geometry_id),
+                "model_file"  : generate_string(model_filename)
+                }
+                chunks.append(geometry_string)
+                
+                geo_set.add(name)
+        
+    return ",\n\n".join(chunks)
+    
+def generate_textures_scene(data):
+    chunks = []
+    
+    # TODO: extract just textures actually used by some objects in the scene
+    
+    for img in bpy.data.images:
+        
+        texture_id = img.name
+        texture_file = extract_texture_filename(img)
+    
+        texture_string = TEMPLATE_TEXTURE % {
+        "texture_id"   : generate_string(texture_id),
+        "texture_file" : generate_string(texture_file)
+        }
+        chunks.append(texture_string)
+
+    return ",\n\n".join(chunks)
+
+def extract_texture_filename(image):
+    fn = bpy.path.abspath(image.filepath)
+    fn = os.path.normpath(fn)
+    fn_strip = os.path.basename(fn)
+    return fn_strip
+    
+def extract_material_data(m):
+    world = bpy.context.scene.world
+    
+    material = { 'name': m.name }
+    
+    material['colorDiffuse'] = [m.diffuse_intensity * m.diffuse_color[0],
+                                m.diffuse_intensity * m.diffuse_color[1],
+                                m.diffuse_intensity * m.diffuse_color[2]]
+
+    material['colorSpecular'] = [m.specular_intensity * m.specular_color[0],
+                                 m.specular_intensity * m.specular_color[1],
+                                 m.specular_intensity * m.specular_color[2]]
+
+    material['colorAmbient'] = [m.ambient * world.ambient_color[0],
+                                m.ambient * world.ambient_color[1],
+                                m.ambient * world.ambient_color[2]]
+
+    material['transparency'] = m.alpha
+
+    # not sure about mapping values to Blinn-Phong shader
+    # Blender uses INT from [1,511] with default 0
+    # http://www.blender.org/documentation/blender_python_api_2_54_0/bpy.types.Material.html#bpy.types.Material.specular_hardness
+
+    material["specularCoef"] = m.specular_hardness
+
+    material['mapDiffuse'] = ""
+    material['mapLight'] = ""
+    material['mapNormal'] = ""    
+        
+    # just take first textures of each, for the moment three.js materials can't handle more
+
+    for i in range(len(m.texture_slots)):
+        ts = m.texture_slots[i]
+        if ts:
+            t = ts.texture
+            if ts.use and t.type == 'IMAGE':
+                name = t.image.name
+
+                if t.use_normal_map:
+                    material['mapNormal'] = name
+                else:
+                    if not material['mapDiffuse']:
+                        material['mapDiffuse'] = name
+                    else:
+                        material['mapLight'] = name
+                
+                if material['mapDiffuse'] and material['mapNormal'] and material['mapLight']:
+                    break
+        
+    if m.specular_intensity > 0.0 and (m.specular_color[0] > 0 or m.specular_color[1] > 0 or m.specular_color[2] > 0):
+        material['shading'] = "Phong"
+    else:
+        material['shading'] = "Lambert"
+        
+    return material
+    
+def generate_material_string(material):
+    type_map = {
+    "Lambert"   : "MeshLambertMaterial",
+    "Phong"     : "MeshPhongMaterial"
+    }
+    
+    material_id = material["name"]
+    shading = material["shading"]
+    material_type = type_map.get(shading, "MeshBasicMaterial")
+
+    parameters = "color: %s" % generate_hex(rgb2int(material["colorDiffuse"]))
+    parameters += ", opacity: %.2f" % material["transparency"]
+
+    if shading == "Phong":
+        parameters += ", ambient: %s" % generate_hex(rgb2int(material["colorAmbient"]))
+        parameters += ", specular: %s" % generate_hex(rgb2int(material["colorSpecular"]))
+        parameters += ", shininess: %.1f" % material["specularCoef"]
+
+    colorMap = material['mapDiffuse']
+    lightMap = material['mapLight']
+    normalMap  = material['mapNormal']
+
+    if colorMap:
+        parameters += ", map: %s" % generate_string(colorMap)
+    if lightMap:
+        parameters += ", lightMap: %s" % generate_string(lightMap)
+    if normalMap:
+        parameters += ", normalMap: %s" % generate_string(normalMap)
+
+    material_string = TEMPLATE_MATERIAL_SCENE % {
+    "material_id" : generate_string(material_id),
+    "type"        : generate_string(material_type),
+    "parameters"  : parameters
+    }
+    
+    return material_string
+    
+def generate_materials_scene(data):
+    chunks = []
+
+    # TODO: extract just materials actually used by some objects in the scene
+    
+    for m in bpy.data.materials:
+        material = extract_material_data(m)
+        material_string = generate_material_string(material)
+        chunks.append(material_string)
+
+    return ",\n\n".join(chunks)
+
+def generate_cameras(data):
+    cameras = data.get("cameras", [])
+    if not cameras:
+        cameras.append(DEFAULTS["camera"])
+        
+    chunks = []
+    for camera in cameras:
+
+        if camera["type"] == "perspective":
+            camera_string = TEMPLATE_CAMERA_PERSPECTIVE % {
+            "camera_id" : generate_string(camera["name"]),
+            "fov"       : camera["fov"],
+            "aspect"    : camera["aspect"],
+            "near"      : camera["near"],
+            "far"       : camera["far"],
+            "position"  : generate_vec3(camera["position"]),
+            "target"    : generate_vec3(camera["target"])
+            }
+
+        elif camera["type"] == "ortho":
+            camera_string = TEMPLATE_CAMERA_ORTHO % {
+            "camera_id" : generate_string(camera["name"]),
+            "left"      : camera["left"],
+            "right"     : camera["right"],
+            "top"       : camera["top"],
+            "bottom"    : camera["bottom"],
+            "near"      : camera["near"],
+            "far"       : camera["far"],
+            "position"  : generate_vec3(camera["position"]),
+            "target"    : generate_vec3(camera["target"])
+            }
+            
+        chunks.append(camera_string)
+        
+    return ",\n\n".join(chunks)
+
+def generate_lights(data):
+    lights = data.get("lights", [])
+    if not lights:
+        lights.append(DEFAULTS["light"])
+        
+    chunks = []
+    for light in lights:
+
+        if light["type"] == "directional":
+            light_string = TEMPLATE_LIGHT_DIRECTIONAL % {
+            "light_id"      : generate_string(light["name"]),
+            "direction"     : generate_vec3(light["direction"]),
+            "color"         : generate_hex(rgb2int(light["color"])),
+            "intensity"     : light["intensity"]
+            }
+
+        elif light["type"] == "point":
+            light_string = TEMPLATE_LIGHT_POINT % {
+            "light_id"      : generate_string(light["name"]),
+            "position"      : generate_vec3(light["position"]),
+            "color"         : generate_hex(rgb2int(light["color"])),
+            "intensity"     : light["intensity"]
+            }
+            
+        chunks.append(light_string)
+            
+    return ",\n\n".join(chunks)
+
+def generate_ascii_scene(data):
+    objects = generate_objects(data)
+    geometries = generate_geometries(data)
+    textures = generate_textures_scene(data)
+    materials = generate_materials_scene(data)
+    cameras = generate_cameras(data)
+    lights = generate_lights(data)
+    
+    sections = [
+    ["objects",    objects],
+    ["geometries", geometries],
+    ["textures",   textures],
+    ["materials",  materials],
+    ["cameras",    cameras],
+    ["lights",     lights]
+    ]
+    
+    chunks = []
+    for label, content in sections:
+        if content:
+            chunks.append(generate_section(label, content))
+
+    sections_string = "\n".join(chunks)
+    
+    default_camera = "default_camera"
+    
+    parameters = {
+    "fname"     : data["source_file"],
+    "sections"  : sections_string,
+    "bgcolor"   : generate_vec3(DEFAULTS["bgcolor"]),
+    "bgalpha"   : DEFAULTS["bgalpha"],
+    "defcamera" : generate_string(default_camera)
+    }
+
+    text = TEMPLATE_SCENE_ASCII % parameters
+    
+    return text
+    
+def export_scene(scene, filepath, flipyz):
+
+    source_file = os.path.basename(bpy.data.filepath)
+
+    scene_text = ""
+    data = {
+    "scene"       : scene,
+    "objects"     : scene.objects,
+    "source_file" : source_file,
+    "filepath"    : filepath,
+    "flipyz"      : flipyz
+    }
+    scene_text += generate_ascii_scene(data)
+    
+    write_file(filepath, scene_text)
+
+# #####################################################
+# Main
+# #####################################################
+def save(operator, context, filepath = "", option_flip_yz = True, use_normals = True, use_colors = True, use_uv_coords = True, align_model = 0, option_export_scene = True):
+
+    filepath = ensure_extension(filepath, '.js')
+
+    scene = context.scene
+
+    if scene.objects.active:
+        bpy.ops.object.mode_set(mode='OBJECT')
+
+    if option_export_scene:
+
+        export_scene(scene, filepath, option_flip_yz)
+
+        geo_set = set()
+        
+        for obj in scene.objects:
+            if obj.type == "MESH":
+                
+                # create extra copy of geometry with applied modifiers
+                # (if they exist)
+                
+                if len(obj.modifiers) > 0:
+                    name = obj.name
+                    
+                # otherwise can share geometry
+
+                else:
+                    name = obj.data.name
+
+                if name not in geo_set:
+                    fname = generate_mesh_filename(name, filepath)
+                    export_mesh(obj, scene, fname, use_normals, use_colors, use_uv_coords, 0, option_flip_yz, False)
+                    
+                    geo_set.add(name)
+
+    else:
+
+        obj = context.object
+        if not obj:
+            raise Exception("Error, Select 1 active object or select 'export scene'")
+
+        export_mesh(obj, scene, filepath, use_normals, use_colors, use_uv_coords, align_model, option_flip_yz, True)
+
+    
     return {'FINISHED'}
