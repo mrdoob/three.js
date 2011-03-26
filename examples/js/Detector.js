@@ -7,10 +7,10 @@ Detector = {
 	// supported features
 
 	canvas	: !!window.CanvasRenderingContext2D,
-	webgl	: detectWebGL(),
+	webgl	: !!window.WebGLRenderingContext,
 	workers : !!window.Worker,
 	fileapi : window.File && window.FileReader && window.FileList && window.Blob,
-	
+
 	// helper methods
 
 	addGetWebGLMessage: function( parameters ) {
@@ -59,15 +59,5 @@ Detector = {
 		return message;
 
 	}
-	
 
 };
-
-function detectWebGL() {
-	
-	var c = document.createElement( "canvas" ),
-	webGLContext = c.getContext("experimental-webgl");
-	
-	return window.WebGLRenderingContext || webGLContext;
-	
-}
