@@ -1528,12 +1528,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function refreshUniformsCommon( uniforms, material ) {
 
-		// premultiply alpha
-		uniforms.diffuse.value.setRGB( material.color.r * material.opacity, material.color.g * material.opacity, material.color.b * material.opacity );
-
-		// pure color
-		//uniforms.color.value.setHex( material.color.hex );
-
+		uniforms.diffuse.value.setRGB( material.color.r, material.color.g, material.color.b );
 		uniforms.opacity.value = material.opacity;
 		uniforms.map.texture = material.map;
 
@@ -3343,7 +3338,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				default:
 
 					_gl.blendEquationSeparate( _gl.FUNC_ADD, _gl.FUNC_ADD );
-					_gl.blendFuncSeparate( _gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA, _gl.ONE, _gl.ONE );
+					_gl.blendFuncSeparate( _gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA, _gl.ONE, _gl.ONE_MINUS_SRC_ALPHA );
 
 					break;
 
