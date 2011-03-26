@@ -9,18 +9,16 @@
 
 var model = {
 
-    'version' : 1,
+    "version" : 1,
 
-    'materials': [	{
-	"DbgColor" : 0xeeeeee,
+    "materials": [	{
+	"DbgColor" : 15658734,
 	"DbgIndex" : 0,
 	"DbgName" : "(null)"
 	}],
 
-    'buffers': 'Torus_bin.bin',
+    "buffers": "Torus_bin.bin"
 
-    'end': (new Date).getTime()
-    
 };
     
 postMessage( model );

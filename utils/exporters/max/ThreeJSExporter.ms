@@ -40,7 +40,7 @@ rollout ThreeJSExporter "ThreeJSExporter"
 	-- User interface
 
 
-	group "ThreeJSExporter  v0.5"
+	group "ThreeJSExporter  v0.6"
 	(
 
 		label msg "Exports selected meshes in Three.js ascii JSON format" align:#left
@@ -73,7 +73,7 @@ rollout ThreeJSExporter "ThreeJSExporter"
 	function DumpVertices src = 
 	(
 
-		Format "'vertices': [" to:ostream
+		Format "\"vertices\": [" to:ostream
 
 		num = src.count
 
@@ -121,7 +121,7 @@ rollout ThreeJSExporter "ThreeJSExporter"
 	function DumpColors src useColors = 
 	(
 
-		Format "'colors': [" to:ostream
+		Format "\"colors\": [" to:ostream
 
 		num = src.count
 
@@ -139,9 +139,11 @@ rollout ThreeJSExporter "ThreeJSExporter"
 				
 				hexNum = ( bit.shift r 16 ) + ( bit.shift g 8 ) + b
 				
-				hexColor = formattedPrint hexNum format:"#x"
-				
-				Format "%" hexColor to:ostream
+				-- hexColor = formattedPrint hexNum format:"#x"
+				-- Format "%" hexColor to:ostream
+
+				decColor = formattedPrint hexNum format:"#d"
+				Format "%" decColor to:ostream
 				
 				if i < num then Format "," to:ostream
 
@@ -159,7 +161,7 @@ rollout ThreeJSExporter "ThreeJSExporter"
 	function DumpNormals src = 
 	(
 
-		Format "'normals': [" to:ostream
+		Format "\"normals\": [" to:ostream
 
 		num = src.count
 
@@ -209,7 +211,7 @@ rollout ThreeJSExporter "ThreeJSExporter"
 	function DumpUvs src = 
 	(
 
-		Format "'uvs': [[" to:ostream
+		Format "\"uvs\": [[" to:ostream
 
 		num = src.count
 
@@ -250,7 +252,7 @@ rollout ThreeJSExporter "ThreeJSExporter"
 	function DumpFaces src useColors = 
 	(
 
-		Format "'faces': [" to:ostream
+		Format "\"faces\": [" to:ostream
 		
 		num = src.count
 
@@ -422,7 +424,7 @@ rollout ThreeJSExporter "ThreeJSExporter"
 		fg = formattedPrint g format:".4f"
 		fb = formattedPrint b format:".4f"
 
-		Format "'%'  : [%, %, %],\n" label fr fg fb to:ostream
+		Format "\"%\"  : [%, %, %],\n" label fr fg fb to:ostream
 
 	)	
 
@@ -440,7 +442,7 @@ rollout ThreeJSExporter "ThreeJSExporter"
 			(
 
 				fname = filenameFromPath bm.filename
-				Format "'%'    : '%',\n" label fname to:ostream
+				Format "\"%\"    : \"%\",\n" label fname to:ostream
 
 			)
 
@@ -454,7 +456,7 @@ rollout ThreeJSExporter "ThreeJSExporter"
 	function ExportMaterials zmaterials zcolors = 
 	(
 
-		Format "'materials': [\n" to:ostream
+		Format "\"materials\": [\n" to:ostream
 
 		totalMaterials = zmaterials.count
 
@@ -466,14 +468,14 @@ rollout ThreeJSExporter "ThreeJSExporter"
 
 			-- debug
 
-			Format "'DbgIndex' : %,\n" (i-1) to:ostream
+			Format "\"DbgIndex\" : %,\n" (i-1) to:ostream
 
 			if classof mat != BooleanClass then
 			(
 
 				useVertexColors = zcolors[i]
 				
-				Format "'DbgName'  : '%',\n" mat.name to:ostream
+				Format "\"DbgName\"  : \"%\",\n" mat.name to:ostream
 				
 				-- colors
 
@@ -484,8 +486,8 @@ rollout ThreeJSExporter "ThreeJSExporter"
 				t = mat.opacity / 100
 				s = mat.glossiness
 				
-				Format "'transparency'  : %,\n" t to:ostream
-				Format "'specularCoef'  : %,\n" s to:ostream
+				Format "\"transparency\"  : %,\n" t to:ostream
+				Format "\"specularCoef\"  : %,\n" s to:ostream
 
 				-- maps
 
@@ -499,13 +501,13 @@ rollout ThreeJSExporter "ThreeJSExporter"
 			else 
 			(
 				
-				Format "'DbgName'  : '%',\n" "dummy" to:ostream
+				Format "\"DbgName\"  : \"%\",\n" "dummy" to:ostream
 				
 				DumpColor red "colorDiffuse"
 				
 			)
 				
-			Format "'vertexColors' : %\n" useVertexColors to:ostream
+			Format "\"vertexColors\" : %\n" useVertexColors to:ostream
 			Format "}" to:ostream
 
 			if ( i < totalMaterials ) then Format "," to:ostream
@@ -1001,7 +1003,7 @@ rollout ThreeJSExporter "ThreeJSExporter"
 		-- Dump model
 
 		Format "\n\nvar model = {\n\n" to:ostream
-		Format "'version' :2,\n\n" to:ostream
+		Format "\"version\" :2,\n\n" to:ostream
 
 		-- Dump all materials in the scene
 
