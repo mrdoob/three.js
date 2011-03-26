@@ -3125,7 +3125,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_gl.enable( _gl.CULL_FACE );
 
 		_gl.enable( _gl.BLEND );
-		_gl.blendFunc( _gl.ONE, _gl.ONE_MINUS_SRC_ALPHA );
+		_gl.blendEquation( _gl.FUNC_ADD );
+		_gl.blendFunc( _gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA );
+
 		_gl.clearColor( clearColor.r, clearColor.g, clearColor.b, clearAlpha );
 
 		_cullEnabled = true;
@@ -3133,7 +3135,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	};
 
 	function buildProgram ( fragmentShader, vertexShader, parameters ) {
-		
+
 		var program = _gl.createProgram(),
 
 		prefix_fragment = [
@@ -3322,30 +3324,26 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				case THREE.SubtractiveBlending:
 
-					//_gl.blendEquation( _gl.FUNC_SUBTRACT );
-					_gl.blendFunc( _gl.DST_COLOR, _gl.ZERO );
-
-					break;
-
-				/*
-				case THREE.BillboardBlending:
+					// TODO: Find blendFuncSeparate() combination
 
 					_gl.blendEquation( _gl.FUNC_ADD );
-					_gl.blendFunc( _gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA);
+					_gl.blendFunc( _gl.ZERO, _gl.ONE_MINUS_SRC_COLOR );
 
 					break;
-				*/
 
-				case THREE.ReverseSubtractiveBlending:
+				case THREE.MultiplyBlending:
 
-					_gl.blendEquation( _gl.FUNC_REVERSE_SUBTRACT );
-					_gl.blendFunc( _gl.ONE, _gl.ONE );
+					// TODO: Find blendFuncSeparate() combination
 
-    				break;
+					_gl.blendEquation( _gl.FUNC_ADD );
+					_gl.blendFunc( _gl.ZERO, _gl.SRC_COLOR );
+
+					break;
+
 				default:
 
-					_gl.blendEquation( _gl.FUNC_ADD );
-					_gl.blendFunc( _gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA );
+					_gl.blendEquationSeparate( _gl.FUNC_ADD, _gl.FUNC_ADD );
+					_gl.blendFuncSeparate( _gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA, _gl.ONE, _gl.ONE );
 
 					break;
 
