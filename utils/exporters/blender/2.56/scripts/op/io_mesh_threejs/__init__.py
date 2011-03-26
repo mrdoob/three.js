@@ -16,21 +16,32 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-# To support reload properly, try to access a package var, if it's there, reload everything
+# ################################################################
+# Init
+# ################################################################
+
+# To support reload properly, try to access a package var, 
+# if it's there, reload everything
 
 if "bpy" in locals():
     import imp
     if "export_threejs" in locals():
         imp.reload(export_threejs)
+    if "import_threejs" in locals():
+        imp.reload(import_threejs)
 
 import bpy
 from bpy.props import *
-from io_utils import ExportHelper
+from io_utils import ExportHelper, ImportHelper
+
+
+# ################################################################
+# Custom properties
+# ################################################################
 
 bpy.types.Object.THREE_castsShadow = bpy.props.BoolProperty()
 bpy.types.Object.THREE_meshCollider = bpy.props.BoolProperty()
 
- 
 class OBJECT_PT_hello( bpy.types.Panel ):
     
     bl_label = "THREE"
@@ -50,10 +61,33 @@ class OBJECT_PT_hello( bpy.types.Panel ):
 
         row = layout.row()
         row.prop( obj, "THREE_meshCollider", text="Mesh collider" )
+
         
+# ################################################################
+# Importer
+# ################################################################
+
+class ImportTHREEJS(bpy.types.Operator, ImportHelper):
+    '''Load a Three.js ASCII JSON model'''
+    bl_idname = "import.threejs"
+    bl_label = "Import Three.js"
+
+    filename_ext = ".js"
+    filter_glob = StringProperty(default="*.js", options={'HIDDEN'})
+
+    def execute(self, context):
+        # print("Selected: " + context.active_object.name)
+        from . import import_threejs
+        return import_threejs.load(self, context, **self.as_keywords(ignore=("filter_glob",)))
+
+
+
+# ################################################################
+# Exporter
+# ################################################################
 
 class ExportTHREEJS(bpy.types.Operator, ExportHelper):
-    '''Export selected object for Three.js (ASCII JSON format).'''
+    '''Export selected object / scene for Three.js (ASCII JSON format).'''
     bl_idname = "export.threejs"
     bl_label = "Export Three.js"
 
@@ -103,20 +137,26 @@ class ExportTHREEJS(bpy.types.Operator, ExportHelper):
         row.prop(self.properties, "use_colors")
         row = layout.row()
         row.prop(self.properties, "use_uv_coords")
-        
 
 
-def menu_func(self, context):
+# ################################################################
+# Common
+# ################################################################
+
+def menu_func_export(self, context):
     default_path = bpy.data.filepath.replace(".blend", ".js")
     self.layout.operator(ExportTHREEJS.bl_idname, text="Three.js (.js)").filepath = default_path
 
+def menu_func_import(self, context):
+    self.layout.operator(ImportTHREEJS.bl_idname, text="Three.js (.js)")
 
 def register():
-    bpy.types.INFO_MT_file_export.append(menu_func)
-
+    bpy.types.INFO_MT_file_export.append(menu_func_export)
+    bpy.types.INFO_MT_file_import.append(menu_func_import)
 
 def unregister():
-    bpy.types.INFO_MT_file_export.remove(menu_func)
+    bpy.types.INFO_MT_file_export.remove(menu_func_export)
+    bpy.types.INFO_MT_file_import.remove(menu_func_import)
 
 if __name__ == "__main__":
     register()

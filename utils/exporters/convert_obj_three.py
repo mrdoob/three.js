@@ -158,24 +158,22 @@ TEMPLATE_FILE_ASCII = u"""\
 
 var model = {
 
-    'version' : 2,
+    "version" : 2,
     
-    'materials': [%(materials)s],
+    "materials": [%(materials)s],
 
-    'vertices': [%(vertices)s],
+    "vertices": [%(vertices)s],
 
-    'morphTargets': [%(morphTargets)s],
+    "morphTargets": [%(morphTargets)s],
 
-    'normals': [%(normals)s],
+    "normals": [%(normals)s],
 
-    'uvs': [[%(uvs)s]],
+    "uvs": [[%(uvs)s]],
 
-    'faces': [%(faces)s],
+    "faces": [%(faces)s]
 
-    'end': (new Date).getTime()
-    
 };
-    
+
 postMessage( model );
 """
 
@@ -191,14 +189,12 @@ TEMPLATE_FILE_BIN = u"""\
 
 var model = {
 
-    'version' : 1,
+    "version" : 1,
 
-    'materials': [%(materials)s],
+    "materials": [%(materials)s],
 
-    'buffers': '%(buffers)s',
+    "buffers": "%(buffers)s"
 
-    'end': (new Date).getTime()
-    
 };
     
 postMessage( model );
@@ -209,7 +205,7 @@ TEMPLATE_VERTEX = "%f,%f,%f"
 TEMPLATE_N = "%f,%f,%f"
 TEMPLATE_UV = "%f,%f"
 
-TEMPLATE_MORPH = "\t{ 'name': '%s', 'vertices': [%s] }"
+TEMPLATE_MORPH = '\t{ "name": "%s", "vertices": [%s] }'
 
 # #####################################################
 # Utils
@@ -670,9 +666,11 @@ def generate_color(i):
     """
     
     if i < len(COLORS):
-        return "0x%06x" % COLORS[i]
+        #return "0x%06x" % COLORS[i]
+        return COLORS[i]
     else:
-        return "0x%06x" % int(0xffffff * random.random())
+        #return "0x%06x" % int(0xffffff * random.random())
+        return int(0xffffff * random.random())
         
 def value2string(v):
     if type(v)==str and v[0:2] != "0x":

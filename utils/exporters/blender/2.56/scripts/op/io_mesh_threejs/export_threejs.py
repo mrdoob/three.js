@@ -75,6 +75,7 @@ COLORS = [0xeeeeee, 0xee0000, 0x00ee00, 0x0000ee, 0xeeee00, 0x00eeee, 0xee00ee]
 # #####################################################
 # Templates - scene
 # #####################################################
+
 TEMPLATE_SCENE_ASCII = """\
 // Converted from: %(fname)s
 //  File generated with Blender 2.56 Exporter
@@ -167,7 +168,7 @@ TEMPLATE_LIGHT_DIRECTIONAL = """\
 	%(light_id)s: {
 		"type"		 : "directional",
 		"direction"	 : %(direction)s,
-		"color" 	 : %(color)s,
+		"color" 	 : %(color)d,
 		"intensity"	 : %(intensity).2f
 	}"""
 
@@ -175,7 +176,7 @@ TEMPLATE_LIGHT_POINT = """\
 	%(light_id)s: {
 		"type"	     : "point",
 		"position"   : %(position)s,
-		"color"      : %(color)s
+		"color"      : %(color)d,
 		"intensity"	 : %(intensity).3f
 	}"""
 
@@ -188,6 +189,7 @@ TEMPLATE_HEX = "0x%06x"
 # #####################################################
 # Templates - model
 # #####################################################
+
 TEMPLATE_FILE_ASCII = """\
 /*
  * File generated with Blender 2.56 Exporter
@@ -204,25 +206,23 @@ TEMPLATE_FILE_ASCII = """\
 
 var model = {
 
-    'version' : 2,
+    "version" : 2,
     
-    'materials': [%(materials)s],
+    "materials": [%(materials)s],
 
-    'vertices': [%(vertices)s],
+    "vertices": [%(vertices)s],
 
-    'morphTargets': [],
+    "morphTargets": [],
 
-    'normals': [%(normals)s],
+    "normals": [%(normals)s],
 
-    'colors': [%(colors)s],
+    "colors": [%(colors)s],
 
-    'uvs': [[%(uvs)s]],
+    "uvs": [[%(uvs)s]],
 
-    'faces': [%(faces)s],
+    "faces": [%(faces)s]
 
-    'end': (new Date).getTime()
-
-}
+};
 
 postMessage( model );
 """
@@ -231,11 +231,13 @@ TEMPLATE_VERTEX = "%f,%f,%f"
 
 TEMPLATE_N = "%f,%f,%f"
 TEMPLATE_UV = "%f,%f"
-TEMPLATE_C = "0x%06x"
+#TEMPLATE_C = "0x%06x"
+TEMPLATE_C = "%d"
 
 # #####################################################
 # Utils
 # #####################################################
+
 def veckey3(x,y,z):
     return round(x, 6), round(y, 6), round(z, 6)
 
@@ -280,6 +282,7 @@ def rgb2int(rgb):
 # #####################################################
 # Utils - files
 # #####################################################
+
 def write_file(fname, content):
     out = open(fname, "w")
     out.write(content)
@@ -291,9 +294,21 @@ def ensure_folder_exist(foldername):
     if not os.access(foldername, os.R_OK|os.W_OK|os.X_OK):
         os.makedirs(foldername)
 
+def ensure_extension(filepath, extension):
+    if not filepath.lower().endswith(extension):
+        filepath += extension
+    return filepath
+    
+def generate_mesh_filename(meshname, filepath):
+    normpath = os.path.normpath(filepath)
+    path, ext = os.path.splitext(normpath)
+    return "%s.%s%s" % (path, meshname, ext)
+    
+    
 # #####################################################
-# Alignment
+# Utils - alignment
 # #####################################################
+
 def bbox(vertices):
     """Compute bounding box of vertex array.
     """
@@ -370,8 +385,9 @@ def bottom(vertices):
     translate(vertices, [-cx,-cy,-cz])
 
 # #####################################################
-# Elements
+# Elements rendering 
 # #####################################################
+
 def hexcolor(c):
     return ( int(c[0] * 255) << 16  ) + ( int(c[1] * 255) << 8 ) + int(c[2] * 255)
     
@@ -386,6 +402,10 @@ def generate_vertex_color(c):
     
 def generate_uv(uv):
     return TEMPLATE_UV % (uv[0], 1.0 - uv[1])
+
+# #####################################################
+# Model exporter - faces
+# #####################################################
 
 def setBit(value, position, on):
     if on:
@@ -468,8 +488,9 @@ def generate_face(f, faceIndex, normals, uvs, colors, mesh, use_normals, use_col
 
 
 # #####################################################
-# Normals
+# Model exporter - normals
 # #####################################################
+
 def extract_vertex_normals(mesh, use_normals):
     if not use_normals:
         return {}, 0
@@ -500,8 +521,9 @@ def generate_normals(normals, use_normals):
     return ",".join(generate_normal(n) for n in chunks)
 
 # #####################################################
-# Vertex colors
+# Model exporter - vertex colors
 # #####################################################
+
 def extract_vertex_colors(mesh, use_colors):
     
     if not use_colors:
@@ -536,8 +558,9 @@ def generate_vertex_colors(colors, use_colors):
     return ",".join(generate_vertex_color(c) for c in chunks)
 
 # #####################################################
-# UVs
+# Model exporter - UVs
 # #####################################################
+
 def extract_uvs(mesh, use_uv_coords):
 
     if not use_uv_coords:
@@ -570,8 +593,9 @@ def generate_uvs(uvs, use_uv_coords):
     return ",".join(generate_uv(n) for n in chunks)
 
 # #####################################################
-# Materials
+# Model exporter - materials
 # #####################################################
+
 def generate_color(i):
     """Generate hex color corresponding to integer.
 
@@ -582,9 +606,11 @@ def generate_color(i):
     """
 
     if i < len(COLORS):
-        return "0x%06x" % COLORS[i]
+        #return "0x%06x" % COLORS[i]
+        return COLORS[i]
     else:
-        return "0x%06x" % int(0xffffff * random.random())
+        #return "0x%06x" % int(0xffffff * random.random())
+        return int(0xffffff * random.random())
 
 def generate_mtl(materials):
     """Generate dummy materials.
@@ -594,10 +620,10 @@ def generate_mtl(materials):
     for m in materials:
         index = materials[m]
         mtl[m] = {
-            'DbgName': m,
-            'DbgIndex': index,
-            'DbgColor': generate_color(index),
-            'vertexColors' : False
+            "DbgName": m,
+            "DbgIndex": index,
+            "DbgColor": generate_color(index),
+            "vertexColors" : False
         }
     return mtl
 
@@ -703,8 +729,9 @@ def generate_materials_string(mesh, scene, use_colors, draw_type):
     return generate_materials(mtl, materials, use_colors, draw_type)
 
 # #####################################################
-# ASCII exporter
+# ASCII model generator
 # #####################################################
+
 def generate_ascii_model(mesh, scene, use_normals, use_colors, use_uv_coords, align_model, flipyz, draw_type):
 
     vertices = mesh.vertices[:]    
@@ -744,22 +771,11 @@ def generate_ascii_model(mesh, scene, use_normals, use_colors, use_uv_coords, al
 
     return text
 
-# #####################################################
-# Utils
-# #####################################################
-def ensure_extension(filepath, extension):
-    if not filepath.lower().endswith(extension):
-        filepath += extension
-    return filepath
-    
-def generate_mesh_filename(meshname, filepath):
-    normpath = os.path.normpath(filepath)
-    path, ext = os.path.splitext(normpath)
-    return "%s.%s%s" % (path, meshname, ext)
     
 # #####################################################
-# Export single mesh
+# Model exporter - export single mesh
 # #####################################################
+
 def export_mesh(obj, scene, filepath, use_normals, use_colors, use_uv_coords, align_model, flipyz, export_single_model):
     """Export single mesh"""
 
@@ -814,8 +830,9 @@ def export_mesh(obj, scene, filepath, use_normals, use_colors, use_uv_coords, al
     
     
 # #####################################################
-# Export scene
+# Scene exporter - render elements
 # #####################################################
+
 def generate_vec4(vec):
     return TEMPLATE_VEC4 % (vec[0], vec[1], vec[2], vec[3])
 
@@ -863,6 +880,10 @@ def generate_bool_property(property):
         return "true"
     return "false"
     
+# #####################################################
+# Scene exporter - objects
+# #####################################################
+
 def generate_objects(data):
     chunks = []
     
@@ -917,6 +938,10 @@ def generate_objects(data):
         
     return ",\n\n".join(chunks)
     
+# #####################################################
+# Scene exporter - geometries
+# #####################################################
+
 def generate_geometries(data):
     chunks = []
     
@@ -945,6 +970,10 @@ def generate_geometries(data):
         
     return ",\n\n".join(chunks)
     
+# #####################################################
+# Scene exporter - textures
+# #####################################################
+
 def generate_textures_scene(data):
     chunks = []
     
@@ -969,6 +998,10 @@ def extract_texture_filename(image):
     fn_strip = os.path.basename(fn)
     return fn_strip
     
+# #####################################################
+# Scene exporter - materials
+# #####################################################
+
 def extract_material_data(m):
     world = bpy.context.scene.world
     
@@ -1035,12 +1068,15 @@ def generate_material_string(material):
     shading = material["shading"]
     material_type = type_map.get(shading, "MeshBasicMaterial")
 
-    parameters = "color: %s" % generate_hex(rgb2int(material["colorDiffuse"]))
+    #parameters = "color: %s" % generate_hex(rgb2int(material["colorDiffuse"]))
+    parameters = "color: %d" % rgb2int(material["colorDiffuse"])
     parameters += ", opacity: %.2f" % material["transparency"]
 
     if shading == "Phong":
-        parameters += ", ambient: %s" % generate_hex(rgb2int(material["colorAmbient"]))
-        parameters += ", specular: %s" % generate_hex(rgb2int(material["colorSpecular"]))
+        #parameters += ", ambient: %s" % generate_hex(rgb2int(material["colorAmbient"]))
+        #parameters += ", specular: %s" % generate_hex(rgb2int(material["colorSpecular"]))
+        parameters += ", ambient: %d" % rgb2int(material["colorAmbient"])
+        parameters += ", specular: %d" % rgb2int(material["colorSpecular"])
         parameters += ", shininess: %.1f" % material["specularCoef"]
 
     colorMap = material['mapDiffuse']
@@ -1073,6 +1109,10 @@ def generate_materials_scene(data):
         chunks.append(material_string)
 
     return ",\n\n".join(chunks)
+
+# #####################################################
+# Scene exporter - cameras
+# #####################################################
 
 def generate_cameras(data):
     cameras = data.get("cameras", [])
@@ -1110,6 +1150,10 @@ def generate_cameras(data):
         
     return ",\n\n".join(chunks)
 
+# #####################################################
+# Scene exporter - lights
+# #####################################################
+
 def generate_lights(data):
     lights = data.get("lights", [])
     if not lights:
@@ -1122,7 +1166,8 @@ def generate_lights(data):
             light_string = TEMPLATE_LIGHT_DIRECTIONAL % {
             "light_id"      : generate_string(light["name"]),
             "direction"     : generate_vec3(light["direction"]),
-            "color"         : generate_hex(rgb2int(light["color"])),
+            #"color"         : generate_hex(rgb2int(light["color"])),
+            "color"         : rgb2int(light["color"]),
             "intensity"     : light["intensity"]
             }
 
@@ -1130,13 +1175,18 @@ def generate_lights(data):
             light_string = TEMPLATE_LIGHT_POINT % {
             "light_id"      : generate_string(light["name"]),
             "position"      : generate_vec3(light["position"]),
-            "color"         : generate_hex(rgb2int(light["color"])),
+            #"color"         : generate_hex(rgb2int(light["color"])),
+            "color"         : rgb2int(light["color"]),
             "intensity"     : light["intensity"]
             }
             
         chunks.append(light_string)
             
     return ",\n\n".join(chunks)
+
+# #####################################################
+# Scene exporter - generate ASCII scene
+# #####################################################
 
 def generate_ascii_scene(data):
     objects = generate_objects(data)
@@ -1195,6 +1245,7 @@ def export_scene(scene, filepath, flipyz):
 # #####################################################
 # Main
 # #####################################################
+
 def save(operator, context, filepath = "", option_flip_yz = True, use_normals = True, use_colors = True, use_uv_coords = True, align_model = 0, option_export_scene = True):
 
     filepath = ensure_extension(filepath, '.js')
