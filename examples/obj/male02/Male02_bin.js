@@ -9,10 +9,10 @@
 
 var model = {
 
-    'version' : 1,
+    "version" : 1,
 
-    'materials': [	{
-	"DbgColor" : 0xeeeeee,
+    "materials": [	{
+	"DbgColor" : 15658734,
 	"DbgIndex" : 0,
 	"DbgName" : "male-02-1noCullingID_male-02-1noCulling.JP",
 	"colorAmbient" : [0.0, 0.0, 0.0],
@@ -26,7 +26,7 @@ var model = {
 	},
 
 	{
-	"DbgColor" : 0xee0000,
+	"DbgColor" : 15597568,
 	"DbgIndex" : 1,
 	"DbgName" : "orig_02_-_Defaul1noCu_orig_02_-_Defaul1noCu",
 	"colorAmbient" : [0.0, 0.0, 0.0],
@@ -40,7 +40,7 @@ var model = {
 	},
 
 	{
-	"DbgColor" : 0x00ee00,
+	"DbgColor" : 60928,
 	"DbgIndex" : 2,
 	"DbgName" : "FrontColorNoCullingID_orig_02_-_Defaul1noCu",
 	"colorAmbient" : [0.0, 0.0, 0.0],
@@ -54,7 +54,7 @@ var model = {
 	},
 
 	{
-	"DbgColor" : 0x0000ee,
+	"DbgColor" : 238,
 	"DbgIndex" : 3,
 	"DbgName" : "_01_-_Default1noCulli__01_-_Default1noCulli",
 	"colorAmbient" : [0.0, 0.0, 0.0],
@@ -68,7 +68,7 @@ var model = {
 	},
 
 	{
-	"DbgColor" : 0xeeee00,
+	"DbgColor" : 15658496,
 	"DbgIndex" : 4,
 	"DbgName" : "FrontColorNoCullingID_male-02-1noCulling.JP",
 	"colorAmbient" : [0.0, 0.0, 0.0],
@@ -81,10 +81,8 @@ var model = {
 	"transparency" : 1.0
 	}],
 
-    'buffers': 'Male02_bin.bin',
+    "buffers": "Male02_bin.bin"
 
-    'end': (new Date).getTime()
-    
 };
     
 postMessage( model );

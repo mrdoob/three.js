@@ -9,10 +9,10 @@
 
 var model = {
 
-    'version' : 1,
+    "version" : 1,
 
-    'materials': [	{
-	"DbgColor" : 0xeeeeee,
+    "materials": [	{
+	"DbgColor" : 15658734,
 	"DbgIndex" : 0,
 	"DbgName" : "lambert2SG.001",
 	"colorAmbient" : [0.0, 0.0, 0.0],
@@ -24,10 +24,8 @@ var model = {
 	"transparency" : 1.0
 	}],
 
-    'buffers': 'WaltHead_bin.bin',
+    "buffers": "WaltHead_bin.bin"
 
-    'end': (new Date).getTime()
-    
 };
     
 postMessage( model );
