@@ -501,6 +501,8 @@ rollout ThreeJSExporter "ThreeJSExporter"
 			else 
 			(
 				
+				useVertexColors = false
+				
 				Format "\"DbgName\"  : \"%\",\n" "dummy" to:ostream
 				
 				DumpColor red "colorDiffuse"
