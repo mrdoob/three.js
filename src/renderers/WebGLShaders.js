@@ -455,7 +455,7 @@ THREE.ShaderChunk = {
 	].join("\n"),
 
 	// morphing
-	
+
 	morphtarget_pars_vertex: [
 
 	"#ifdef USE_MORPHTARGETS",
@@ -480,23 +480,23 @@ THREE.ShaderChunk = {
 		"morphed += ( morphTarget6 - position ) * morphTargetInfluences[ 6 ];",
 		"morphed += ( morphTarget7 - position ) * morphTargetInfluences[ 7 ];",
 		"morphed += position;",
-		
+
 		"gl_Position = projectionMatrix * modelViewMatrix * vec4( morphed, 1.0 );",
 
 	"#endif"
 
 	].join("\n"),
-	
+
 	default_vertex : [
-	
+
 	"#ifndef USE_MORPHTARGETS",
 	"#ifndef USE_SKINNING",
-		
+
 		"gl_Position = projectionMatrix * mvPosition;",
 
 	"#endif",
 	"#endif"
-	
+
 	].join("\n")
 
 };
@@ -521,7 +521,7 @@ THREE.UniformsLib = {
 	"fogNear"	: { type: "f", value: 1 },
 	"fogFar"	: { type: "f", value: 2000 },
 	"fogColor"	: { type: "c", value: new THREE.Color( 0xffffff ) },
-	
+
 	"morphTargetInfluences" : { type: "f", value: 0 }
 
 	},
@@ -557,43 +557,43 @@ THREE.UniformsLib = {
 THREE.ShaderLib = {
 
 	'shadowPost': {
-		
+
 		vertexShader: [
-		
+
 			"uniform 	mat4 	projectionMatrix;",
 			"attribute 	vec3 	position;",
-	
+
 			"void main(void)",
 			"{",
 				"gl_Position = projectionMatrix * vec4( position, 1.0 );",
 			"}"
 
 		].join( "\n" ),
-		
+
 		fragmentShader: [
-		
+
 			"#ifdef GL_ES",
 				"precision highp float;",
 			"#endif",		
-	
+
 			"void main( void )",
 			"{",
 				"gl_FragColor = vec4( 0, 0, 0, 0.5 );",
 			"}"
 
 		].join( "\n" )
-		
+
 	},
 
 
 	'shadowVolumeDynamic': {
-		
+
 		uniforms: { "directionalLightDirection": { type: "fv", value: [] }},
 
 		vertexShader: [
 
 			"uniform 	vec3 	directionalLightDirection;",
-	
+
 			"void main() {",
 
 				"vec4 pos      = objectMatrix * vec4( position, 1.0 );",
@@ -613,7 +613,7 @@ THREE.ShaderLib = {
 			"}"
 
 		].join( "\n" )
-	},		
+	},
 
 
 	'depth': {
@@ -734,7 +734,7 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "skinning_vertex" ],
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
 				THREE.ShaderChunk[ "default_vertex" ],
-				
+
 			"}"
 
 		].join("\n")
