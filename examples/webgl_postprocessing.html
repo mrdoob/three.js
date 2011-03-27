@@ -184,7 +184,7 @@
 				quadScreen.position.z = -100;
 				sceneScreen.addObject( quadScreen );
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.autoClear = false;
 				container.appendChild( renderer.domElement );

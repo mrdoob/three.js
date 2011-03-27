@@ -86,7 +86,7 @@
 				scene.addLight( light );
 				*/
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.setSize( window.innerWidth, height );
 				container.appendChild( renderer.domElement );
 
