@@ -171,6 +171,10 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texture_path
 
 			}
 
+			// to get face <=> uv index correspondence
+
+			fi = geometry.faces.length;
+
 			if ( hasFaceUv ) {
 
 				for ( i = 0; i < nUvLayers; i++ ) {
@@ -182,7 +186,7 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texture_path
 					u = uvLayer[ uvIndex * 2 ];
 					v = uvLayer[ uvIndex * 2 + 1 ];
 
-					geometry.faceUvs[ i ].push( new THREE.UV( u, v ) );
+					geometry.faceUvs[ i ][ fi ] = new THREE.UV( u, v );
 
 				}
 
@@ -207,9 +211,6 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texture_path
 
 					}
 
-					// to get face <=> uv index correspondence
-
-					fi = geometry.faces.length;
 					geometry.faceVertexUvs[ i ][ fi ] = uvs;
 
 				}
