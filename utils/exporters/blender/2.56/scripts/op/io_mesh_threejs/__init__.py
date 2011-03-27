@@ -75,11 +75,22 @@ class ImportTHREEJS(bpy.types.Operator, ImportHelper):
     filename_ext = ".js"
     filter_glob = StringProperty(default="*.js", options={'HIDDEN'})
 
+    option_flip_yz = BoolProperty(name="Flip YZ", description="Flip YZ", default=True)
+    recalculate_normals = BoolProperty(name="Recalculate normals", description="Recalculate vertex normals", default=True)
+    
     def execute(self, context):
-        # print("Selected: " + context.active_object.name)
-        from . import import_threejs
-        return import_threejs.load(self, context, **self.as_keywords(ignore=("filter_glob",)))
+        import io_mesh_threejs.import_threejs
+        return io_mesh_threejs.import_threejs.load(self, context, **self.properties)
 
+
+    def draw(self, context):
+        layout = self.layout
+
+        row = layout.row()
+        row.prop(self.properties, "option_flip_yz")
+
+        row = layout.row()
+        row.prop(self.properties, "recalculate_normals")
 
 
 # ################################################################

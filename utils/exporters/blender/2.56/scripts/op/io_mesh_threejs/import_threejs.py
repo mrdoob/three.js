@@ -37,13 +37,69 @@ from io_utils import load_image, unpack_list, unpack_face_list
 # Generators
 # #####################################################
 
-def create_mesh_object(name, vertices, faces):
+def create_mesh_object(name, vertices, face_data, flipYZ, recalculate_normals):
 
+    faces   = face_data["faces"]
+    vertexNormals = face_data["vertexNormals"]
+    edges = []
+    
     # Create a new mesh
     
     me = bpy.data.meshes.new(name)
-    me.from_pydata(vertices, [], faces)
-    me.update()                                 # update the mesh with the new data
+    me.from_pydata(vertices, edges, faces)
+    
+    if not recalculate_normals:
+        me.update(calc_edges = True)
+    
+    if len(faces) == len(vertexNormals):
+        
+        print("setting vertex normals")
+        
+        for fi in range(len(faces)):
+
+            if vertexNormals[fi]:
+
+                #print("setting face %i with %i vertices" % (fi, len(normals[fi])))
+
+                # if me.update() is called after setting vertex normals
+                # setting face.use_smooth overrides these normals
+                #  - this fixes weird shading artefacts (seems to come from sharing 
+                #    of vertices between faces, didn't find a way how to set vertex normals
+                #    per face use of vertex as opposed to per vertex), 
+                #  - probably this just overrides all custom vertex normals
+                #  - to preserve vertex normals from the original data
+                #    call me.update() before setting them
+                
+                me.faces[fi].use_smooth = True
+                
+                if not recalculate_normals:
+                    for j in range(len(vertexNormals[fi])):
+                        
+                        vertexNormal = vertexNormals[fi][j]
+                    
+                        x = vertexNormal[0]
+                        y = vertexNormal[1]
+                        z = vertexNormal[2]
+                        
+                        if flipYZ:
+                            tmp = y
+                            y = z
+                            z = tmp
+
+                            # flip normals (this make them look consistent with the original before export)
+
+                            x = -x
+                            y = -y
+                            z = -z
+
+                        vi = me.faces[fi].vertices[j]
+                        
+                        me.vertices[vi].normal.x = x
+                        me.vertices[vi].normal.y = y
+                        me.vertices[vi].normal.z = z
+      
+    if recalculate_normals:
+        me.update(calc_edges = True)
 
     # Create a new object
     
@@ -309,18 +365,11 @@ def get_name(filepath):
 # Parser
 # #####################################################
 
-def load(operator, context, filepath):
+def load(operator, context, filepath, option_flip_yz = True, recalculate_normals = True):
     
     print('\nimporting %r' % filepath)
 
     time_main = time.time()
-
-    vertices = []
-    uvs = []
-    normals = []
-    colors = []
-    faces = [] 
-    materials = []
 
     print("\tparsing JSON file...")
     
@@ -342,12 +391,9 @@ def load(operator, context, filepath):
     # flip YZ
     
     vertices = splitArray(data["vertices"], 3)
-    vertices[:] = [(v[0], v[2], v[1]) for v in vertices]
-        
-    if data["normals"]:
-        normals = splitArray(data["normals"], 3)
-        normals[:] = [(v[0], v[2], v[1]) for v in normals]
-        
+    
+    if option_flip_yz:
+        vertices[:] = [(v[0], v[2], v[1]) for v in vertices]        
 
     # extract faces
     
@@ -357,13 +403,21 @@ def load(operator, context, filepath):
 
     bpy.ops.object.select_all(action='DESELECT')
 
-
-    print('\tbuilding geometry...\n\tfaces:%i, vertices:%i, normals: %i, uvs: %i, colors: %i, materials: %i ...' % ( len(faces), len(vertices), len(normals), len(uvs), len(colors), len(materials) ))
+    nfaces = len(face_data["faces"])
+    nvertices = len(vertices)
+    nnormals = len(data.get("normals", [])) / 3
+    ncolors = len(data.get("colors", [])) / 3
+    nuvs = len(data.get("uvs", [])) / 2
+    nmaterials = len(data.get("materials", []))
+    
+    print('\tbuilding geometry...\n\tfaces:%i, vertices:%i, vertex normals: %i, vertex uvs: %i, vertex colors: %i, materials: %i ...' % ( 
+        nfaces, nvertices, nnormals, nuvs, ncolors, nmaterials ))
 
     # Create new obj
     
-    create_mesh_object(get_name(filepath), vertices, face_data["faces"])
+    create_mesh_object(get_name(filepath), vertices, face_data, option_flip_yz, recalculate_normals)
 
+    scene = bpy.context.scene 
     scene.update()
 
     time_new = time.time()
