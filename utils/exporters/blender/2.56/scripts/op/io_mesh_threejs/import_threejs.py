@@ -34,9 +34,253 @@ from mathutils.geometry import tesselate_polygon
 from io_utils import load_image, unpack_list, unpack_face_list
 
 # #####################################################
+# Generators
+# #####################################################
+
+def create_mesh_object(name, vertices, faces):
+
+    # Create a new mesh
+    
+    me = bpy.data.meshes.new(name)
+    me.from_pydata(vertices, [], faces)
+    me.update()                                 # update the mesh with the new data
+
+    # Create a new object
+    
+    ob = bpy.data.objects.new(name, me) 
+    ob.data = me                                # link the mesh data to the object
+
+    scene = bpy.context.scene                   # get the current scene
+    scene.objects.link(ob)                      # link the object into the scene
+
+    ob.location = scene.cursor_location         # position object at 3d-cursor
+    
+    
+# #####################################################
+# Faces
+# #####################################################
+
+def extract_faces(data):
+    
+    result = {
+    "faces"         : [],
+    "materials"     : [],
+    "faceUvs"       : [],
+    "vertexUvs"     : [],
+    "faceNormals"   : [],
+    "vertexNormals" : [],
+    "faceColors"    : [],
+    "vertexColors"  : []
+    }
+    
+    faces = data.get("faces", [])
+    normals = data.get("normals", [])
+    colors = data.get("colors", [])
+
+    offset = 0
+    zLength = len(faces)
+
+    # disregard empty arrays
+
+    nUvLayers = 0
+
+    for layer in data["uvs"]:
+
+        if len(layer) > 0:
+            nUvLayers += 1
+            result["faceUvs"].append([])
+            result["vertexUvs"].append([])
+
+
+    while ( offset < zLength ):
+
+        type = faces[ offset ]
+        offset += 1
+
+        isQuad          	= isBitSet( type, 0 )
+        hasMaterial         = isBitSet( type, 1 )
+        hasFaceUv           = isBitSet( type, 2 )
+        hasFaceVertexUv     = isBitSet( type, 3 )
+        hasFaceNormal       = isBitSet( type, 4 )
+        hasFaceVertexNormal = isBitSet( type, 5 )
+        hasFaceColor	    = isBitSet( type, 6 )
+        hasFaceVertexColor  = isBitSet( type, 7 )
+
+        #print("type", type, "bits", isQuad, hasMaterial, hasFaceUv, hasFaceVertexUv, hasFaceNormal, hasFaceVertexNormal, hasFaceColor, hasFaceVertexColor)
+
+        # vertices
+        
+        if isQuad:
+
+            a = faces[ offset ]
+            offset += 1
+            
+            b = faces[ offset ]
+            offset += 1
+            
+            c = faces[ offset ]
+            offset += 1
+            
+            d = faces[ offset ]
+            offset += 1
+            
+            face = [a, b, c, d]
+
+            nVertices = 4
+
+        else:
+
+            a = faces[ offset ]
+            offset += 1
+            
+            b = faces[ offset ]
+            offset += 1
+            
+            c = faces[ offset ]
+            offset += 1
+
+            face = [a, b, c]
+            
+            nVertices = 3
+
+        result["faces"].append(face)
+
+        # material
+        
+        if hasMaterial:
+
+            materialIndex = faces[ offset ]
+            offset += 1
+        
+        else:
+
+            materialIndex = -1
+
+        result["materials"].append(materialIndex)
+
+        # uvs
+
+        for i in range(nUvLayers):
+
+            faceUv = None
+            
+            if hasFaceUv:
+                
+                uvLayer = data["uvs"][ i ]
+
+                uvIndex = faces[ offset ]
+                offset += 1
+
+                u = uvLayer[ uvIndex * 2 ]
+                v = uvLayer[ uvIndex * 2 + 1 ]
+
+                faceUv = [u, v]
+                
+            result["faceUvs"][i].append(faceUv)
+
+
+            if hasFaceVertexUv:
+
+                uvLayer = data["uvs"][ i ]
+
+                vertexUvs = []
+
+                for j in range(nVertices):
+
+                    uvIndex = faces[ offset ]
+                    offset += 1
+
+                    u = uvLayer[ uvIndex * 2 ]
+                    v = uvLayer[ uvIndex * 2 + 1 ]
+
+                    vertexUvs.append([u, v])
+
+            result["vertexUvs"][i].append(vertexUvs)
+
+
+        if hasFaceNormal:
+
+            normalIndex = faces[ offset ] * 3
+            offset += 1
+
+            x = normals[ normalIndex ]
+            y = normals[ normalIndex + 1 ]
+            z = normals[ normalIndex + 2 ]
+
+            faceNormal = [x, y, z]
+            
+        else:
+
+            faceNormal = None
+        
+        result["faceNormals"].append(faceNormal)
+
+
+        if hasFaceVertexNormal:
+
+            vertexNormals = []
+            
+            for j in range(nVertices):
+
+                normalIndex = faces[ offset ] * 3
+                offset += 1
+
+                x = normals[ normalIndex ]
+                y = normals[ normalIndex + 1 ]
+                z = normals[ normalIndex + 2 ]
+                
+                vertexNormals.append( [x, y, z] )
+
+
+        else:
+
+            vertexNormals = None
+        
+        result["vertexNormals"].append(vertexNormals)
+
+
+        if hasFaceColor:
+
+            colorIndex = faces[ offset ]
+            offset += 1
+            
+            faceColor = colors[ colorIndex ]
+
+        else:
+            
+            faceColor = None
+
+        result["faceColors"].append(faceColor)
+
+
+        if hasFaceVertexColor:
+
+            vertexColors = []
+
+            for j in range(nVertices):
+
+                colorIndex = faces[ offset ]
+                offset += 1
+
+                color = colors[ colorIndex ]
+                vertexColors.append( color )
+
+        else:
+            
+            vertexColors = None
+            
+        result["vertexColors"].append(vertexColors)
+
+
+    return result
+    
+# #####################################################
 # Utils
 # #####################################################
 
+def isBitSet(value, position):
+    return value & ( 1 << position )
+    
 def splitArray(data, chunkSize):
     result = []
     chunk = []
@@ -58,6 +302,9 @@ def extract_json_string(text):
     end = text.rfind("}", start, end)
     return text[start:end+1].strip()
 
+def get_name(filepath):
+    return os.path.splitext(os.path.basename(filepath))[0]
+    
 # #####################################################
 # Parser
 # #####################################################
@@ -68,8 +315,10 @@ def load(operator, context, filepath):
 
     time_main = time.time()
 
-    verts_loc = []
-    verts_tex = []
+    vertices = []
+    uvs = []
+    normals = []
+    colors = []
     faces = [] 
     materials = []
 
@@ -90,23 +339,30 @@ def load(operator, context, filepath):
     
     time_sub = time_new
 
-    verts_loc = splitArray(data["vertices"], 3)
-    verts_loc[:] = [(v[0], v[2], -v[1]) for v in verts_loc]
+    # flip YZ
+    
+    vertices = splitArray(data["vertices"], 3)
+    vertices[:] = [(v[0], v[2], v[1]) for v in vertices]
+        
+    if data["normals"]:
+        normals = splitArray(data["normals"], 3)
+        normals[:] = [(v[0], v[2], v[1]) for v in normals]
+        
 
+    # extract faces
+    
+    face_data = extract_faces(data)
+    
     # deselect all
 
     bpy.ops.object.select_all(action='DESELECT')
 
-    scene = context.scene
-    new_objects = []
 
-    print('\tbuilding geometry...\n\tverts:%i faces:%i materials: %i ...' % ( len(verts_loc), len(faces), len(materials) ))
+    print('\tbuilding geometry...\n\tfaces:%i, vertices:%i, normals: %i, uvs: %i, colors: %i, materials: %i ...' % ( len(faces), len(vertices), len(normals), len(uvs), len(colors), len(materials) ))
 
     # Create new obj
     
-    for obj in new_objects:
-        base = scene.objects.link(obj)
-        base.select = True
+    create_mesh_object(get_name(filepath), vertices, face_data["faces"])
 
     scene.update()
 
