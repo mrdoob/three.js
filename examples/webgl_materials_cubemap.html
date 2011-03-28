@@ -48,7 +48,7 @@
 
 			var container, stats;
 
-			var camera, scene, webglRenderer;
+			var camera, scene, renderer;
 			var cameraCube, sceneCube;
 
 			var mesh, zmesh, lightMesh, geometry;
@@ -73,10 +73,10 @@
 				container = document.createElement('div');
 				document.body.appendChild(container);
 
-				camera = new THREE.Camera( 50, window.innerWidth / window.innerHeight, 1, 100000 );
+				camera = new THREE.Camera( 50, window.innerWidth / window.innerHeight, 1, 5000 );
 				camera.position.z = 2000;
 
-				cameraCube = new THREE.Camera( 50, window.innerWidth / window.innerHeight, 1, 100000 );
+				cameraCube = new THREE.Camera( 50, window.innerWidth / window.innerHeight, 1, 100 );
 
 				scene = new THREE.Scene();
 				sceneCube = new THREE.Scene();
@@ -112,13 +112,13 @@
 				var cubeMaterial2 = new THREE.MeshLambertMaterial( { color: 0xffee00, envMap: refractionCube, refractionRatio: 0.95 } );
 				var cubeMaterial1 = new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: reflectionCube } )
 
-				SceneUtils.addPanoramaCubeWebGL( sceneCube, 100000, reflectionCube );
+				SceneUtils.addPanoramaCubeWebGL( sceneCube, 10, reflectionCube );
 
-				webglRenderer = new THREE.WebGLRenderer();
-				webglRenderer.setSize( window.innerWidth, window.innerHeight );
-				webglRenderer.autoClear = false;
-				//webglRenderer.setFaceCulling( 0 );
-				container.appendChild( webglRenderer.domElement );
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.autoClear = false;
+				//renderer.setFaceCulling( 0 );
+				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
@@ -178,9 +178,11 @@
 				lightMesh.position.x = 1500 * Math.cos( timer );
 				lightMesh.position.z = 1500 * Math.sin( timer );
 
-				webglRenderer.clear();
-				webglRenderer.render( sceneCube, cameraCube );
-				webglRenderer.render( scene, camera );
+				renderer.clear();
+				renderer.enableDepthBufferWrite( false );
+				renderer.render( sceneCube, cameraCube );
+				renderer.enableDepthBufferWrite( true );
+				renderer.render( scene, camera );
 
 			}
 
