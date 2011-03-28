@@ -42,6 +42,7 @@ def create_mesh_object(name, vertices, face_data, flipYZ, recalculate_normals):
     faces   = face_data["faces"]
     vertexNormals = face_data["vertexNormals"]
     vertexColors = face_data["vertexColors"]
+    vertexUVs = face_data["vertexUVs"]
     
     edges = []
     
@@ -131,6 +132,31 @@ def create_mesh_object(name, vertices, face_data, flipYZ, recalculate_normals):
                     face_colors[vi].b = b
 
 
+    # Handle uvs
+    
+    if face_data["hasVertexUVs"]:
+
+        print("setting vertex uvs")
+        
+        for li, layer in enumerate(vertexUVs):
+
+            me.uv_textures.new("uv_layer_%d" % li)
+
+            for fi in range(len(faces)):
+
+                if layer[fi]:
+                    
+                    face_uvs = me.uv_textures[li].data[fi]
+                    face_uvs = face_uvs.uv1, face_uvs.uv2, face_uvs.uv3, face_uvs.uv4
+                    
+                    for vi in range(len(layer[fi])):
+                        
+                        u = layer[fi][vi][0]
+                        v = layer[fi][vi][1]
+                    
+                        face_uvs[vi].x = u
+                        face_uvs[vi].y = 1.0 - v
+
 
     # Create a new object
     
@@ -152,8 +178,8 @@ def extract_faces(data):
     result = {
     "faces"         : [],
     "materials"     : [],
-    "faceUvs"       : [],
-    "vertexUvs"     : [],
+    "faceUVs"       : [],
+    "vertexUVs"     : [],
     "faceNormals"   : [],
     "vertexNormals" : [],
     "faceColors"    : [],
@@ -179,8 +205,8 @@ def extract_faces(data):
 
         if len(layer) > 0:
             nUvLayers += 1
-            result["faceUvs"].append([])
-            result["vertexUvs"].append([])
+            result["faceUVs"].append([])
+            result["vertexUVs"].append([])
 
 
     while ( offset < zLength ):
@@ -271,7 +297,7 @@ def extract_faces(data):
 
                 faceUv = [u, v]
                 
-            result["faceUvs"][i].append(faceUv)
+            result["faceUVs"][i].append(faceUv)
 
 
             if hasFaceVertexUv:
@@ -290,7 +316,7 @@ def extract_faces(data):
 
                     vertexUvs.append([u, v])
 
-            result["vertexUvs"][i].append(vertexUvs)
+            result["vertexUVs"][i].append(vertexUvs)
 
 
         if hasFaceNormal:
