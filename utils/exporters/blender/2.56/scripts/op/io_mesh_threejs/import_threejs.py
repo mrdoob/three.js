@@ -41,6 +41,8 @@ def create_mesh_object(name, vertices, face_data, flipYZ, recalculate_normals):
 
     faces   = face_data["faces"]
     vertexNormals = face_data["vertexNormals"]
+    vertexColors = face_data["vertexColors"]
+    
     edges = []
     
     # Create a new mesh
@@ -48,10 +50,12 @@ def create_mesh_object(name, vertices, face_data, flipYZ, recalculate_normals):
     me = bpy.data.meshes.new(name)
     me.from_pydata(vertices, edges, faces)
     
+    # Handle normals
+    
     if not recalculate_normals:
         me.update(calc_edges = True)
     
-    if len(faces) == len(vertexNormals):
+    if face_data["hasVertexNormals"]:
         
         print("setting vertex normals")
         
@@ -101,6 +105,33 @@ def create_mesh_object(name, vertices, face_data, flipYZ, recalculate_normals):
     if recalculate_normals:
         me.update(calc_edges = True)
 
+    # Handle colors
+    
+    if face_data["hasVertexColors"]:
+
+        print("setting vertex colors")
+
+        me.vertex_colors.new("vertex_color_layer_0")
+        
+        for fi in range(len(faces)):
+
+            if vertexColors[fi]:
+                
+                face_colors = me.vertex_colors[0].data[fi]
+                face_colors = face_colors.color1, face_colors.color2, face_colors.color3, face_colors.color4
+                
+                for vi in range(len(vertexColors[fi])):
+                    
+                    r = vertexColors[fi][vi][0]
+                    g = vertexColors[fi][vi][1]
+                    b = vertexColors[fi][vi][2]
+                
+                    face_colors[vi].r = r
+                    face_colors[vi].g = g
+                    face_colors[vi].b = b
+
+
+
     # Create a new object
     
     ob = bpy.data.objects.new(name, me) 
@@ -126,7 +157,11 @@ def extract_faces(data):
     "faceNormals"   : [],
     "vertexNormals" : [],
     "faceColors"    : [],
-    "vertexColors"  : []
+    "vertexColors"  : [],
+    
+    "hasVertexNormals"  : False,
+    "hasVertexUVs"      : False,
+    "hasVertexColors"   : False
     }
     
     faces = data.get("faces", [])
@@ -164,6 +199,10 @@ def extract_faces(data):
 
         #print("type", type, "bits", isQuad, hasMaterial, hasFaceUv, hasFaceVertexUv, hasFaceNormal, hasFaceVertexNormal, hasFaceColor, hasFaceVertexColor)
 
+        result["hasVertexUVs"] = result["hasVertexUVs"] or hasFaceVertexUv
+        result["hasVertexNormals"] = result["hasVertexNormals"] or hasFaceVertexNormal
+        result["hasVertexColors"] = result["hasVertexColors"] or hasFaceVertexColor
+        
         # vertices
         
         if isQuad:
@@ -300,7 +339,7 @@ def extract_faces(data):
             colorIndex = faces[ offset ]
             offset += 1
             
-            faceColor = colors[ colorIndex ]
+            faceColor = hexToTuple( colors[ colorIndex ] )
 
         else:
             
@@ -318,7 +357,7 @@ def extract_faces(data):
                 colorIndex = faces[ offset ]
                 offset += 1
 
-                color = colors[ colorIndex ]
+                color = hexToTuple( colors[ colorIndex ] )
                 vertexColors.append( color )
 
         else:
@@ -334,6 +373,12 @@ def extract_faces(data):
 # Utils
 # #####################################################
 
+def hexToTuple( hexColor ):
+    r = (( hexColor >> 16 ) & 0xff) / 255.0
+    g = (( hexColor >> 8 ) & 0xff) / 255.0
+    b = ( hexColor & 0xff) / 255.0
+    return (r, g, b)
+    
 def isBitSet(value, position):
     return value & ( 1 << position )
     
