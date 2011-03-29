@@ -160,6 +160,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_lensFlare.vertexBuffer  = _gl.createBuffer();
 	_lensFlare.elementBuffer = _gl.createBuffer();
 	_lensFlare.tempTexture   = _gl.createTexture();
+	_lensFlare.readBackPixels = new Uint8Array( 16*16*4 );
 	
 	_gl.bindBuffer( _gl.ARRAY_BUFFER, _lensFlare.vertexBuffer );
 	_gl.bufferData( _gl.ARRAY_BUFFER,  _lensFlare.vertices, _gl.STATIC_DRAW );
@@ -193,119 +194,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_lensFlare.uniforms.screenPosition = _gl.getUniformLocation( _lensFlare.program, "screenPosition" );
 	_lensFlare.uniforms.renderPink     = _gl.getUniformLocation( _lensFlare.program, "renderPink" );
 
-	/*
-	 * Render lens flares
-	 * Method: renders 9 0xff00ff-colored points scattered over the light source area, 
-	 *         reads these back and calculates occlusion.  
-	 *         Then LensFlare.updateLensFlares() is called to re-position and 
-	 *         update transparency of flares. Then they are rendered.
-	 * 
-	 */
-
-	function renderLensFlares( scene, camera, renderTarget ) {
-		
-		var object, geometryGroup, material;
-		var o, ol = scene.__webglLensFlares.length;
-		var tempPosition = new THREE.Vector3();
-		var invAspect = _viewportHeight / _viewportWidth;
-		var halfViewportWidth = _viewportWidth * 0.5;
-		var halfViewportHeight = _viewportHeight * 0.5;
-		var size = 16 / _viewportHeight;
-		var restoreScale = [ size * invAspect, size ];
-		var screenPosition = [ 1, 1, 0 ];
-		var screenPositionPixels = [ 1, 1 ];
-
-		// set lensflare program
-
-		if( _oldProgram !== _lensFlare.program ) {
-			
-			_gl.useProgram( _lensFlare.program );
-			_oldProgram = _lensFlare.program;
-		}
-
-
-		// loop through all lens flares to update their occlusion and positions
-		// setup gl and common used attribs/unforms
-
-		_gl.uniform1i( _lensFlare.uniforms.map, 0 );
-		_gl.activeTexture( _gl.TEXTURE0 );
-		
-		_gl.uniform1f( _lensFlare.uniforms.opacity, 1 );
-		_gl.uniform1f( _lensFlare.uniforms.rotation, 0 );
-		_gl.uniform2fv( _lensFlare.uniforms.scale, restoreScale );
-
-		_gl.bindBuffer( _gl.ARRAY_BUFFER, _lensFlare.vertexBuffer );
-		_gl.vertexAttribPointer( _lensFlare.attributes.vertex, 2, _gl.FLOAT, false, 2 * 8, 0 );
-		_gl.vertexAttribPointer( _lensFlare.attributes.uv, 2, _gl.FLOAT, false, 2 * 8, 8 );
-
-		_gl.bindTexture( _gl.TEXTURE_2D, _lensFlare.tempTexture );
-
-		_gl.cullFace( _gl.BACK );
-		_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, _lensFlare.elementBuffer );
-
-
-		for( o = 0; o < ol; o++ ) {
-			
-			// calc object screen position
-			
-			object = scene.__webglLensFlares[ o ].object;
-			
-			tempPosition.set( object.matrixWorld.n14, object.matrixWorld.n24, object.matrixWorld.n34 );
-			
-			camera.matrixWorldInverse.multiplyVector3( tempPosition );
-			camera.projectionMatrix.multiplyVector3( tempPosition );
-			
-			
-			// setup arrays for gl programs
-			
-			screenPosition[ 0 ] = tempPosition.x;
-			screenPosition[ 1 ] = tempPosition.y;
-			screenPosition[ 2 ] = tempPosition.z;
-			
-			screenPositionPixels[ 0 ] = screenPosition[ 0 ] * halfViewportWidth + halfViewportWidth;
-			screenPositionPixels[ 1 ] = screenPosition[ 1 ] * halfViewportHeight + halfViewportHeight;
-
-			// todo: viewport culling
-			// save current RGB to temp texture
-			
-			_gl.copyTexSubImage2D( _gl.TEXTURE_2D, 0, 0, 0, screenPositionPixels[ 0 ] - 8, screenPositionPixels[ 1 ] - 8, 16, 16 );
-
-	
-			// render pink quad
-
-			_gl.uniform3fv( _lensFlare.uniforms.screenPosition, screenPosition );
-			_gl.uniform1i( _lensFlare.uniforms.renderPink, 1 );
-
-			_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
-
-
-			// restore graphics
-		
-			screenPosition[ 2 ] = 0;
-		
-			_gl.uniform1i( _lensFlare.uniforms.renderPink, 0 );
-			_gl.uniform3fv( _lensFlare.uniforms.screenPosition, screenPosition );
-
-			_gl.disable( _gl.DEPTH_TEST );
-			_gl.depthMask( false );
-
-			_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
-
-
-			
-			
-			// copy existing -> temp texture
-			// render pink quad
-			// read back pixles
-			// copy temp -> back
-			// call flare update
-			// render flares			
-			
-			
-
-		}
-		
-	}
 
 
 
@@ -2712,20 +2600,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		// render flares
-		
-		if( scene.__webglLensFlares.length ) {
-			
-			renderLensFlares( scene, camera, renderTarget );
-		
-		}
-
-
 		// render stencil shadows
 
 		if( stencil && scene.__webglShadowVolumes.length && scene.lights.length ) {
 
 			renderStencilShadows( scene );
+		
+		}
+
+		// render lens flares
+		
+		if( scene.__webglLensFlares.length ) {
+			
+			renderLensFlares( scene, camera );
 		
 		}
 
@@ -2881,6 +2768,229 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_gl.disable  ( _gl.BLEND );
 	    _gl.depthMask( true );
 	}
+
+	/*
+	 * Render lens flares
+	 * Method: renders 16x16 0xff00ff-colored points scattered over the light source area, 
+	 *         reads these back and calculates occlusion.  
+	 *         Then LensFlare.updateLensFlares() is called to re-position and 
+	 *         update transparency of flares. Then they are rendered.
+	 * 
+	 */
+
+	function renderLensFlares( scene, camera ) {
+		
+		var object, objectZ, geometryGroup, material;
+		var o, ol = scene.__webglLensFlares.length;
+		var f, fl, flare;
+		var tempPosition = new THREE.Vector3();
+		var invAspect = _viewportHeight / _viewportWidth;
+		var halfViewportWidth = _viewportWidth * 0.5;
+		var halfViewportHeight = _viewportHeight * 0.5;
+		var size = 16 / _viewportHeight;
+		var scale = [ size * invAspect, size ];
+		var screenPosition = [ 1, 1, 0 ];
+		var screenPositionPixels = [ 1, 1 ];
+		var sampleX, sampleY, readBackPixels = _lensFlare.readBackPixels;
+		var sampleMidX = 7 * 4;
+		var sampleMidY = 7 * 16 * 4;
+		var sampleIndex, visibility;
+		var uniforms = _lensFlare.uniforms;
+		var attributes = _lensFlare.attributes;
+
+
+		// set lensflare program and reset blending
+
+		_gl.useProgram( _lensFlare.program );
+		_oldProgram = _lensFlare.program;
+		_oldBlending = "";
+
+
+		// loop through all lens flares to update their occlusion and positions
+		// setup gl and common used attribs/unforms
+
+		_gl.uniform1i( uniforms.map, 0 );
+		_gl.activeTexture( _gl.TEXTURE0 );
+		
+		_gl.uniform1f( uniforms.opacity, 1 );
+		_gl.uniform1f( uniforms.rotation, 0 );
+		_gl.uniform2fv( uniforms.scale, scale );
+
+		_gl.bindBuffer( _gl.ARRAY_BUFFER, _lensFlare.vertexBuffer );
+		_gl.vertexAttribPointer( attributes.vertex, 2, _gl.FLOAT, false, 2 * 8, 0 );
+		_gl.vertexAttribPointer( attributes.uv, 2, _gl.FLOAT, false, 2 * 8, 8 );
+
+		_gl.bindTexture( _gl.TEXTURE_2D, _lensFlare.tempTexture );
+
+		_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, _lensFlare.elementBuffer );
+
+		_gl.disable( _gl.CULL_FACE );
+		_gl.depthMask( false );
+
+
+		for( o = 0; o < ol; o++ ) {
+			
+			// calc object screen position
+			
+			object = scene.__webglLensFlares[ o ].object;
+			
+			tempPosition.set( object.matrixWorld.n14, object.matrixWorld.n24, object.matrixWorld.n34 );
+			
+			camera.matrixWorldInverse.multiplyVector3( tempPosition );
+			objectZ = tempPosition.z;
+			camera.projectionMatrix.multiplyVector3( tempPosition );
+			
+			
+			// setup arrays for gl programs
+			
+			screenPosition[ 0 ] = tempPosition.x;
+			screenPosition[ 1 ] = tempPosition.y;
+			screenPosition[ 2 ] = tempPosition.z;
+			
+			screenPositionPixels[ 0 ] = screenPosition[ 0 ] * halfViewportWidth + halfViewportWidth;
+			screenPositionPixels[ 1 ] = screenPosition[ 1 ] * halfViewportHeight + halfViewportHeight;
+	
+
+			// save current RGB to temp texture
+			
+			_gl.copyTexSubImage2D( _gl.TEXTURE_2D, 0, 0, 0, screenPositionPixels[ 0 ] - 8, screenPositionPixels[ 1 ] - 8, 16, 16 );
+
+	
+			// render pink quad
+
+			_gl.uniform3fv( uniforms.screenPosition, screenPosition );
+			_gl.uniform1i( uniforms.renderPink, 1 );
+
+			_gl.enable( _gl.DEPTH_TEST );
+
+			_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
+
+
+			// read back
+
+			try {
+				
+				_gl.readPixels( screenPositionPixels[ 0 ] - 8, screenPositionPixels[ 1 ] - 8, 16, 16, _gl.RGBA, _gl.UNSIGNED_BYTE, _lensFlare.readBackPixels );
+				
+			}
+			catch( error ) {
+				
+				console.log( "WebGLRenderer.renderLensFlare: readPixels failed!" );
+			}
+
+			if( _gl.getError()) {
+				
+				console.log( "WebGLRenderer.renderLensFlare: readPixels failed!" );
+			}
+
+
+			// sample read back pixels
+
+			sampleDistance = parseInt( 6 * ( 1 - Math.max( 0, Math.min( -objectZ, camera.far )) / camera.far ), 10 ) + 1;
+			sampleX = sampleDistance * 4;
+			sampleY = sampleDistance * 4 * 16;
+
+			visibility = 0;
+
+			sampleIndex = ( sampleMidX - sampleX ) + ( sampleMidY - sampleY );	// upper left
+			if( _lensFlare.readBackPixels[ sampleIndex + 0 ] === 255 && 
+				_lensFlare.readBackPixels[ sampleIndex + 1 ] === 0 &&
+				_lensFlare.readBackPixels[ sampleIndex + 2 ] === 255 ) visibility += 0.2;			
+
+			sampleIndex = ( sampleMidX + sampleX ) + ( sampleMidY - sampleY );	// upper right
+			if( readBackPixels[ sampleIndex + 0 ] === 255 && 
+				readBackPixels[ sampleIndex + 1 ] === 0 &&
+				readBackPixels[ sampleIndex + 2 ] === 255 ) visibility += 0.2;			
+
+			sampleIndex = ( sampleMidX + sampleX ) + ( sampleMidY + sampleY );	// lower right
+			if( readBackPixels[ sampleIndex + 0 ] === 255 && 
+				readBackPixels[ sampleIndex + 1 ] === 0 &&
+				readBackPixels[ sampleIndex + 2 ] === 255 ) visibility += 0.2;			
+
+			sampleIndex = ( sampleMidX - sampleX ) + ( sampleMidY + sampleY );	// lower left
+			if( readBackPixels[ sampleIndex + 0 ] === 255 && 
+				readBackPixels[ sampleIndex + 1 ] === 0 &&
+				readBackPixels[ sampleIndex + 2 ] === 255 ) visibility += 0.2;			
+
+			sampleIndex = sampleMidX + sampleMidY;								// center
+			if( readBackPixels[ sampleIndex + 0 ] === 255 && 
+				readBackPixels[ sampleIndex + 1 ] === 0 &&
+				readBackPixels[ sampleIndex + 2 ] === 255 ) visibility += 0.2;			
+
+
+			object.positionScreen.x = screenPosition[ 0 ];
+			object.positionScreen.y = screenPosition[ 1 ];
+			object.positionScreen.z = screenPosition[ 2 ];
+
+			if( object.customUpdateCallback ) {
+				
+				object.customUpdateCallback( visibility, object );
+				
+			} else {
+				
+				object.updateLensFlares( visibility );
+				
+			}
+
+
+			// restore graphics
+		
+			_gl.uniform1i( uniforms.renderPink, 0 );
+			_gl.disable( _gl.DEPTH_TEST );
+			_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
+		}
+		
+		
+		// loop through all lens flares and draw their flares
+		// setup gl
+		
+		_gl.enable( _gl.BLEND );
+		
+		for( o = 0; o < ol; o++ ) {
+		
+			object = scene.__webglLensFlares[ o ].object;
+
+			for( f = 0, fl = object.lensFlares.length; f < fl; f++ ) {
+				
+				flare = object.lensFlares[ f ];
+				
+				if( flare.opacity > 0.001 && flare.scale > 0.001 ) {
+
+					screenPosition[ 0 ] = flare.x;
+					screenPosition[ 1 ] = flare.y;
+					screenPosition[ 2 ] = flare.z;
+	
+					size = flare.size * flare.scale / _viewportHeight;
+					scale[ 0 ] = size * invAspect;
+					scale[ 1 ] = size;
+						
+	
+					_gl.uniform3fv( uniforms.screenPosition, screenPosition );
+					_gl.uniform1f( uniforms.rotation, flare.rotation );
+					_gl.uniform2fv( uniforms.scale, scale );
+					_gl.uniform1f( uniforms.opacity, flare.opacity );
+	
+					setBlending( flare.blending );
+					setTexture( flare.texture, 0 );
+	
+					// todo: only draw if loaded
+			
+					_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
+				}
+				
+			}
+			
+		}
+
+
+		// restore gl
+	
+		_gl.enable( _gl.CULL_FACE );
+		_gl.enable( _gl.DEPTH_TEST );
+		_gl.depthMask( true );
+		_gl.disable( _gl.BLEND );
+	}
+
 
 
 	function setupMatrices ( object, camera ) {
@@ -3518,6 +3628,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( blending != _oldBlending ) {
 
 			switch ( blending ) {
+
+				case THREE.AdditiveAlphaBlending:
+				
+					_gl.blendEquation( _gl.FUNC_ADD );
+					_gl.blendFunc( _gl.SRC_ALPHA, _gl.ONE );
+				
+					break;
 
 				case THREE.AdditiveBlending:
 

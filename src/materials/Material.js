@@ -15,5 +15,6 @@ THREE.AdditiveBlending = 1;
 THREE.SubtractiveBlending = 2;
 THREE.BillboardBlending = 3;
 THREE.ReverseSubtractiveBlending = 4;
+THREE.AdditiveAlphaBlending = 5;
 
 THREE.MaterialCounter = { value: 0 };

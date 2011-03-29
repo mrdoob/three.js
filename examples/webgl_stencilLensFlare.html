@@ -18,7 +18,6 @@
 		<script type="text/javascript" src="../build/Three.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
-
 		<script type="text/javascript">
 			var statsEnabled = true;
 
@@ -42,7 +41,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.Camera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.z = 250;
 
 				scene = new THREE.Scene();
@@ -91,20 +90,33 @@
 
 
 				// lights
+	
+				light = new THREE.PointLight( 0xffffff );
+				scene.addChild( light );
+
 
 				light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0, 1, 0 );
 				scene.addChild( light );
 
-				var cube = new Sphere( 5 );
+
+				var cube = new Sphere( 2 );
 				lightCube = new THREE.Mesh( cube, material2 );
+				lightCube.visible = false;
 				scene.addChild( lightCube );
+
+				var lensFlare = new THREE.LensFlare( ImageUtils.loadTexture( "textures/lensflare0.png" ), 128, 0.0, THREE.AdditiveAlphaBlending );
+				lensFlare.add( ImageUtils.loadTexture( "textures/lensflare1.png" ), 256, 0.33, THREE.AdditiveAlphaBlending );
+				lensFlare.add( lensFlare.lensFlares[ 1 ].texture, 300, 0.66, THREE.AdditiveAlphaBlending );
+				lensFlare.add( lensFlare.lensFlares[ 1 ].texture, 400, 1.0, THREE.AdditiveAlphaBlending );
+				
+				lightCube.addChild( lensFlare );
 
 
 				// renderer
 
-				renderer = new THREE.WebGLRenderer();
-				renderer.setClearColorHex( 0xaaaaaa, 1 );
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer.setClearColorHex( 0x222222, 1 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
@@ -144,13 +156,14 @@
 				boxMesh.rotation.x = Math.sin( t ) * 180 * Math.PI / 180;
 
 				light.position.x = Math.sin( t );
-				light.position.y = 1.5;
-				light.position.z = Math.cos( t );
+				light.position.y = 0.5;
+				light.position.normalize();
 
 				lightCube.position.copy( light.position );
 				lightCube.position.multiplyScalar( 200 );
 
-				t += 0.02;
+
+				t += 0.015;
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;

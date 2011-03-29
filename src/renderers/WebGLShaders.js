@@ -586,6 +586,8 @@ THREE.ShaderLib = {
 			"#endif",		
 
 			"uniform	sampler2D	map;",
+			"uniform	float		opacity;",
+			
 			"uniform    int         renderPink;",
 			"varying	vec2		vUV;",
 	
@@ -594,7 +596,9 @@ THREE.ShaderLib = {
 				"if( renderPink == 1 ) {",
 					"gl_FragColor = vec4( 1.0, 0.0, 1.0, 1.0 );",
 				"} else {",
-					"gl_FragColor = texture2D( map, vUV );",
+					"vec4 color = texture2D( map, vUV );",
+					"color.a *= opacity;",
+					"gl_FragColor = color;",
 				"}",
 			"}"
 		].join( "\n" )

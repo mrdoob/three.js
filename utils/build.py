@@ -36,6 +36,7 @@ COMMON_FILES = [
 'lights/AmbientLight.js',
 'lights/DirectionalLight.js',
 'lights/PointLight.js',
+'lights/LensFlare.js',
 'materials/Material.js',
 'materials/Mappings.js',
 'materials/LineBasicMaterial.js',
