@@ -1,5 +1,6 @@
 /**
  * @author mr.doob / http://mrdoob.com/
+ * @author jaycrossler / http://wecreategames.com
  */
 
 THREE.Ray = function ( origin, direction ) {
@@ -11,9 +12,9 @@ THREE.Ray = function ( origin, direction ) {
 
 THREE.Ray.prototype = {
 
-	intersectScene : function ( scene ) {
+	intersectScene : function ( scene, checkClickable ) {
 
-		var i, l, object,
+		var i, l, j, k, object,
 		objects = scene.objects,
 		intersects = [];
 
@@ -21,18 +22,99 @@ THREE.Ray.prototype = {
 
 			object = objects[i];
 
+			if (checkClickable && !object.isClickable) continue;
+
 			if ( object instanceof THREE.Mesh ) {
 
 				intersects = intersects.concat( this.intersectObject( object ) );
 
 			}
 
+			if ( object instanceof THREE.Particle ) {
+
+				intersects = intersects.concat( this.intersectParticle( object ) );
+
+			}
+
+			if ( object instanceof THREE.ParticleSystem ) {
+			
+				intersects = intersects.concat( this.intersectParticleSystemItem( object ) );				
+				
+			}
 		}
 
 		intersects.sort( function ( a, b ) { return a.distance - b.distance; } );
 
 		return intersects;
 
+	},
+
+	intersectParticleSystemItem : function ( object ) {
+		var intersects = [], target_point, starter_vector;
+		var dist_padding = 1;
+
+		var origin_point = this.origin.clone();
+		var direction_vector = this.direction.clone();
+
+		for ( var i = 0, l = object.geometry.vertices.length; i < l; i++) {
+			target_point = object.geometry.vertices[i].position; 
+			starter_vector = target_point.clone().subSelf(origin_point);
+		
+			var c1 = starter_vector.dot ( direction_vector );
+			var c2 = direction_vector.dot ( direction_vector );
+			var b = c1 / c2;
+			var intersect_point = origin_point.clone().addSelf(direction_vector.multiplyScalar(b));
+
+			var dist = target_point.distanceTo(intersect_point);
+			
+			//There are two ways people make particles - with one material, or many
+			var dist_cutoff = (object.materials[i]) ? (object.materials[i].size/2) : (object.materials[0].size/2);
+
+			if (dist < (dist_cutoff+dist_padding)) {
+				var intersect = {
+					distance: dist,
+					point: target_point,
+					particleNumber: i,
+					object: object.geometry.vertices[i],
+					particleSystem: object
+				};
+				intersects.push( intersect );
+			}
+		}
+		return intersects;
+
+	},
+
+	intersectParticle : function ( object ) {
+// Concept: If distance from point to the line is small, then consider it an intersect
+// Derived from: http://www.softsurfer.com/Archive/algorithm_0102/
+
+		var intersects = [];
+		var dist_padding = 1;
+
+		var origin_point = this.origin.clone();
+		var direction_vector = this.direction.clone();
+		var target_point = object.position;
+		var starter_vector = target_point.clone().subSelf(origin_point);
+
+		var c1 = starter_vector.dot ( direction_vector );
+		var c2 = direction_vector.dot ( direction_vector );
+		var b = c1 / c2;
+		var intersect_point = origin_point.clone().addSelf(direction_vector.multiplyScalar(b));
+
+		var dist = target_point.distanceTo(intersect_point);
+		var dist_cutoff = (object.scale && object.scale.x) ? (object.scale.x/2) : 1;  //Scale works on straight Particles
+
+		if (dist < (dist_cutoff+dist_padding)) {
+			var intersect = {
+				distance: dist,
+				point: target_point,
+				face: null,
+				object: object
+			};
+			intersects.push( intersect );
+		}
+		return intersects;
 	},
 
 	intersectObject : function ( object ) {
