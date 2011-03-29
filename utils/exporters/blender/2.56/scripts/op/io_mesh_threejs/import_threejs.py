@@ -36,13 +36,81 @@ from io_utils import load_image, unpack_list, unpack_face_list
 # #####################################################
 # Generators
 # #####################################################
+def setColor(c, t):
+    c.r = t[0]
+    c.g = t[1]
+    c.b = t[2]
 
-def create_mesh_object(name, vertices, face_data, flipYZ, recalculate_normals):
+def create_texture(filename, modelpath):
+    name = filename
+    texture = bpy.data.textures.new(name, type='IMAGE')
+    
+    image = load_image(filename, modelpath)
+    has_data = False
+
+    if image:
+        texture.image = image
+        has_data = image.has_data
+    
+    return texture
+    
+def create_materials(data, modelpath):
+    materials = []
+    materials_data = data.get("materials", [])
+    
+    for i, m in enumerate(materials_data):
+
+        name = m.get("DbgName", "material_%d" % i)
+        
+        colorAmbient = m.get("colorAmbient", None)
+        colorDiffuse = m.get("colorDiffuse", None)
+        colorSpecular = m.get("colorSpecular", None)
+        alpha = m.get("transparency", 1.0)
+        specular_hardness = m.get("specularCoef", 0)
+        
+        mapDiffuse = m.get("mapDiffuse", None)
+        mapLightmap = m.get("mapLightmap", None)
+        
+        useVertexColors = m.get("vertexColors", False)
+        
+        material = bpy.data.materials.new(name)
+        
+        material.THREE_useVertexColors = useVertexColors
+        
+        if colorDiffuse:
+            setColor(material.diffuse_color, colorDiffuse)
+            material.diffuse_intensity = 1.0
+
+        if colorSpecular:
+            setColor(material.specular_color, colorSpecular)
+            material.specular_intensity = 1.0
+            
+        if alpha < 1.0:
+            material.alpha = alpha
+            material.use_transparency = True
+            
+        if specular_hardness:
+            material.specular_hardness = specular_hardness
+            
+        if mapDiffuse:
+            texture = create_texture(mapDiffuse, modelpath)
+            mtex = material.texture_slots.add()
+            mtex.texture = texture
+            mtex.texture_coords = 'UV'
+            mtex.use = True
+            mtex.use_map_color_diffuse = True
+
+        materials.append(material)
+        
+    return materials
+    
+def create_mesh_object(name, vertices, materials, face_data, flipYZ, recalculate_normals):
 
     faces   = face_data["faces"]
     vertexNormals = face_data["vertexNormals"]
     vertexColors = face_data["vertexColors"]
     vertexUVs = face_data["vertexUVs"]
+    faceMaterials = face_data["materials"]
     
     edges = []
     
@@ -88,14 +156,14 @@ def create_mesh_object(name, vertices, face_data, flipYZ, recalculate_normals):
                         
                         if flipYZ:
                             tmp = y
-                            y = z
+                            y = -z
                             z = tmp
 
                             # flip normals (this make them look consistent with the original before export)
 
-                            x = -x
-                            y = -y
-                            z = -z
+                            #x = -x
+                            #y = -y
+                            #z = -z
 
                         vi = me.faces[fi].vertices[j]
                         
@@ -158,10 +226,30 @@ def create_mesh_object(name, vertices, face_data, flipYZ, recalculate_normals):
                         face_uvs[vi].y = 1.0 - v
 
 
+    # Handle materials # 1
+    
+    if face_data["hasMaterials"]:
+        
+
+        print("setting materials (mesh)")
+    
+        for m in materials:
+            
+            me.materials.append(m)
+
+        print("setting materials (faces)")    
+
+        for fi in range(len(faces)):
+            
+            if faceMaterials[fi] >= 0:
+                
+                me.faces[fi].material_index = faceMaterials[fi]
+
     # Create a new object
     
     ob = bpy.data.objects.new(name, me) 
     ob.data = me                                # link the mesh data to the object
+
 
     scene = bpy.context.scene                   # get the current scene
     scene.objects.link(ob)                      # link the object into the scene
@@ -187,7 +275,8 @@ def extract_faces(data):
     
     "hasVertexNormals"  : False,
     "hasVertexUVs"      : False,
-    "hasVertexColors"   : False
+    "hasVertexColors"   : False,
+    "hasMaterials"      : False
     }
     
     faces = data.get("faces", [])
@@ -228,6 +317,7 @@ def extract_faces(data):
         result["hasVertexUVs"] = result["hasVertexUVs"] or hasFaceVertexUv
         result["hasVertexNormals"] = result["hasVertexNormals"] or hasFaceVertexNormal
         result["hasVertexColors"] = result["hasVertexColors"] or hasFaceVertexColor
+        result["hasMaterials"] = result["hasMaterials"] or hasMaterial
         
         # vertices
         
@@ -431,7 +521,10 @@ def extract_json_string(text):
 
 def get_name(filepath):
     return os.path.splitext(os.path.basename(filepath))[0]
-    
+
+def get_path(filepath):
+    return os.path.dirname(filepath)
+
 # #####################################################
 # Parser
 # #####################################################
@@ -464,7 +557,7 @@ def load(operator, context, filepath, option_flip_yz = True, recalculate_normals
     vertices = splitArray(data["vertices"], 3)
     
     if option_flip_yz:
-        vertices[:] = [(v[0], v[2], v[1]) for v in vertices]        
+        vertices[:] = [(v[0], -v[2], v[1]) for v in vertices]        
 
     # extract faces
     
@@ -484,9 +577,13 @@ def load(operator, context, filepath, option_flip_yz = True, recalculate_normals
     print('\tbuilding geometry...\n\tfaces:%i, vertices:%i, vertex normals: %i, vertex uvs: %i, vertex colors: %i, materials: %i ...' % ( 
         nfaces, nvertices, nnormals, nuvs, ncolors, nmaterials ))
 
+    # Create materials
+    
+    materials = create_materials(data, get_path(filepath))
+    
     # Create new obj
     
-    create_mesh_object(get_name(filepath), vertices, face_data, option_flip_yz, recalculate_normals)
+    create_mesh_object(get_name(filepath), vertices, materials, face_data, option_flip_yz, recalculate_normals)
 
     scene = bpy.context.scene 
     scene.update()
