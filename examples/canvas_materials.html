@@ -112,9 +112,8 @@
 				}
 
 				var PI2 = Math.PI * 2;
-				var program = function ( context, color ) {
+				var program = function ( context ) {
 
-					context.fillStyle = color.__styleString;
 					context.beginPath();
 					context.arc( 0, 0, 1, 0, PI2, true );
 					context.closePath();

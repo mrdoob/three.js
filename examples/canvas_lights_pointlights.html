@@ -64,19 +64,18 @@
 
 				scene.addLight( new THREE.AmbientLight( 0x00020 ) );
 
-				light1 = new THREE.PointLight( 0xff0040 );
+				light1 = new THREE.PointLight( 0xff0040, 1, 50 );
 				scene.addLight( light1 );
 
-				light2 = new THREE.PointLight( 0x0040ff );
+				light2 = new THREE.PointLight( 0x0040ff, 1, 50 );
 				scene.addLight( light2 );
 
-				light3 = new THREE.PointLight( 0x80ff80 );
+				light3 = new THREE.PointLight( 0x80ff80, 1, 50 );
 				scene.addLight( light3 );
 
 				var PI2 = Math.PI * 2;
-				var program = function ( context, color ) {
+				var program = function ( context ) {
 
-					context.fillStyle = color.__styleString;
 					context.beginPath();
 					context.arc( 0, 0, 1, 0, PI2, true );
 					context.closePath();
