@@ -1,10 +1,11 @@
 /**
  * @author mr.doob / http://mrdoob.com/
+ * @author jaycrossler / http://wecreategames.com
  */
 
-THREE.Color = function ( hex ) {
+THREE.Color = function ( hex, transparency) {
 
-	this.setHex( hex );
+	this.setHex( hex, transparency );
 
 };
 
@@ -17,16 +18,19 @@ THREE.Color.prototype = {
 		this.r = color.r;
 		this.g = color.g;
 		this.b = color.b;
+		this.a = color.a
 		this.hex = color.hex;
 		this.__styleString = color.__styleString;
+		this.rgbaString = color.rgbaString;
 
 	},
 
-	setRGB : function ( r, g, b ) {
+	setRGB : function ( r, g, b, a ) {
 
 		this.r = r;
 		this.g = g;
 		this.b = b;
+		this.a = a;
 
 		if ( this.autoUpdate ) {
 
@@ -37,7 +41,7 @@ THREE.Color.prototype = {
 
 	},
 
-	setHSV : function ( h, s, v ) {
+	setHSV : function ( h, s, v, a ) {
 
 		// based on MochiKit implementation by Bob Ippolito
 		// h,s,v ranges are < 0.0 - 1.0 >
@@ -73,6 +77,7 @@ THREE.Color.prototype = {
 		this.r = red;
 		this.g = green;
 		this.b = blue;
+		this.a = (a) ? a : 1;
 
 		if ( this.autoUpdate ) {
 
@@ -83,9 +88,10 @@ THREE.Color.prototype = {
 
 	},
 
-	setHex : function ( hex ) {
+	setHex : function ( hex, transparency ) {
 
 		this.hex = ( ~~ hex ) & 0xffffff;
+		this.a = (transparency) ? transparency : 1;
 
 		if ( this.autoUpdate ) {
 
@@ -113,7 +119,7 @@ THREE.Color.prototype = {
 	updateStyleString : function () {
 
 		this.__styleString = 'rgb(' + ~~ ( this.r * 255 ) + ',' + ~~ ( this.g * 255 ) + ',' + ~~ ( this.b * 255 ) + ')';
-
+		this.rgbaString = 'rgba(' + ~~ ( this.r * 255 ) + ',' + ~~ ( this.g * 255 ) + ',' + ~~ ( this.b * 255 ) + ',' + (this.a) + ')';
 	},
 
 	clone : function () {
