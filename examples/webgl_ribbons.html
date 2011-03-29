@@ -71,7 +71,7 @@
 				scene = new THREE.Scene();
 				scene.fog = new THREE.FogExp2( 0x000000, 0.0016 );
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
@@ -130,12 +130,11 @@
 
 					materials[c] = new THREE.MeshBasicMaterial( { color:0xffffff, vertexColors:true } );
 					materials[c].program = material_base.program;
-					materials[c].uniforms = Uniforms.clone( THREE.ShaderLib[ 'basic' ].uniforms );
 
 					ribbon = new THREE.Ribbon( i % 2 ? geometry : geometry2, materials[c] );
 					ribbon.rotation.x = 0;
 					ribbon.rotation.y = 1.57;
-					ribbon.rotation.z = 3.14;	
+					ribbon.rotation.z = 3.14;
 
 					x = 40 * ( i - xgrid/2 );
 					y = 40 * ( j - ygrid/2 );

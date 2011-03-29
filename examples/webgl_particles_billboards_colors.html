@@ -85,7 +85,7 @@
 
 				geometry.colors = colors;
 
-				material = new THREE.ParticleBasicMaterial( { size: 85, map: sprite, blending: THREE.BillboardBlending, vertexColors: true } );
+				material = new THREE.ParticleBasicMaterial( { size: 85, map: sprite, vertexColors: true } );
 				material.color.setHSV( 1.0, 0.2, 0.8 );
 
 				particles = new THREE.ParticleSystem( geometry, material );

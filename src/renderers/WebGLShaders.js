@@ -240,9 +240,10 @@ THREE.ShaderChunk = {
 
 		"uniform vec3 pointLightColor[ MAX_POINT_LIGHTS ];",
 		"uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];",
+		"uniform float pointLightDistance[ MAX_POINT_LIGHTS ];",
 
 		"#ifdef PHONG",
-			"varying vec3 vPointLightVector[ MAX_POINT_LIGHTS ];",
+			"varying vec4 vPointLight[ MAX_POINT_LIGHTS ];",
 		"#endif",
 
 	"#endif"
@@ -275,18 +276,27 @@ THREE.ShaderChunk = {
 
 		"#if MAX_POINT_LIGHTS > 0",
 
-		"for( int i = 0; i < MAX_POINT_LIGHTS; i++ ) {",
+			"for( int i = 0; i < MAX_POINT_LIGHTS; i++ ) {",
 
-			"vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );",
-			"vec3 pointLightVector = normalize( lPosition.xyz - mvPosition.xyz );",
-			"float pointLightWeighting = max( dot( transformedNormal, pointLightVector ), 0.0 );",
-			"vLightWeighting += pointLightColor[ i ] * pointLightWeighting;",
+				"vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );",
 
-			"#ifdef PHONG",
-				"vPointLightVector[ i ] = pointLightVector;",
-			"#endif",
+				"vec3 lVector = lPosition.xyz - mvPosition.xyz;",
 
-		"}",
+				"float lDistance = 1.0;",
+
+				"if ( pointLightDistance[ i ] > 0.0 )",
+					"lDistance = 1.0 - min( ( length( lVector ) / pointLightDistance[ i ] ), 1.0 );",
+
+				"lVector = normalize( lVector );",
+
+				"float pointLightWeighting = max( dot( transformedNormal, lVector ), 0.0 );",
+				"vLightWeighting += pointLightColor[ i ] * pointLightWeighting * lDistance;",
+
+				"#ifdef PHONG",
+					"vPointLight[ i ] = vec4( lVector, lDistance );",
+				"#endif",
+
+			"}",
 
 		"#endif",
 
@@ -301,7 +311,7 @@ THREE.ShaderChunk = {
 	"#endif",
 
 	"#if MAX_POINT_LIGHTS > 0",
-		"varying vec3 vPointLightVector[ MAX_POINT_LIGHTS ];",
+		"varying vec4 vPointLight[ MAX_POINT_LIGHTS ];",
 	"#endif",
 
 	"varying vec3 vViewPosition;",
@@ -322,22 +332,24 @@ THREE.ShaderChunk = {
 		"vec4 pointDiffuse  = vec4( 0.0 );",
 		"vec4 pointSpecular = vec4( 0.0 );",
 
-		"for( int i = 0; i < MAX_POINT_LIGHTS; i++ ) {",
+		"for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {",
 
-			"vec3 pointVector = normalize( vPointLightVector[ i ] );",
-			"vec3 pointHalfVector = normalize( vPointLightVector[ i ] + vViewPosition );",
+			"vec3 pointVector = normalize( vPointLight[ i ].xyz );",
+			"vec3 pointHalfVector = normalize( vPointLight[ i ].xyz + vViewPosition );",
+			"float pointDistance = vPointLight[ i ].w;",
 
 			"float pointDotNormalHalf = dot( normal, pointHalfVector );",
 			"float pointDiffuseWeight = max( dot( normal, pointVector ), 0.0 );",
 
 			"float pointSpecularWeight = 0.0;",
+
 			"if ( pointDotNormalHalf >= 0.0 )",
 				"pointSpecularWeight = pow( pointDotNormalHalf, shininess );",
 
-			"pointDiffuse  += mColor * pointDiffuseWeight;",
-			"pointSpecular += mSpecular * pointSpecularWeight;",
+			"pointDiffuse  += mColor * pointDiffuseWeight * pointDistance;",
+			"pointSpecular += mSpecular * pointSpecularWeight * pointDistance;",
 
-			"}",
+		"}",
 
 	"#endif",
 
@@ -455,7 +467,7 @@ THREE.ShaderChunk = {
 	].join("\n"),
 
 	// morphing
-	
+
 	morphtarget_pars_vertex: [
 
 	"#ifdef USE_MORPHTARGETS",
@@ -480,23 +492,23 @@ THREE.ShaderChunk = {
 		"morphed += ( morphTarget6 - position ) * morphTargetInfluences[ 6 ];",
 		"morphed += ( morphTarget7 - position ) * morphTargetInfluences[ 7 ];",
 		"morphed += position;",
-		
+
 		"gl_Position = projectionMatrix * modelViewMatrix * vec4( morphed, 1.0 );",
 
 	"#endif"
 
 	].join("\n"),
-	
+
 	default_vertex : [
-	
+
 	"#ifndef USE_MORPHTARGETS",
 	"#ifndef USE_SKINNING",
-		
+
 		"gl_Position = projectionMatrix * mvPosition;",
 
 	"#endif",
 	"#endif"
-	
+
 	].join("\n")
 
 };
@@ -505,50 +517,51 @@ THREE.UniformsLib = {
 
 	common: {
 
-	"diffuse" : { type: "c", value: new THREE.Color( 0xeeeeee ) },
-	"opacity" : { type: "f", value: 1.0 },
-	"map"     : { type: "t", value: 0, texture: null },
+		"diffuse" : { type: "c", value: new THREE.Color( 0xeeeeee ) },
+		"opacity" : { type: "f", value: 1.0 },
+		"map" : { type: "t", value: 0, texture: null },
 
-	"lightMap"       : { type: "t", value: 2, texture: null },
+		"lightMap" : { type: "t", value: 2, texture: null },
 
-	"envMap" 		  : { type: "t", value: 1, texture: null },
-	"useRefract"	  : { type: "i", value: 0 },
-	"reflectivity"    : { type: "f", value: 1.0 },
-	"refractionRatio": { type: "f", value: 0.98 },
-	"combine"		  : { type: "i", value: 0 },
+		"envMap" : { type: "t", value: 1, texture: null },
+		"useRefract" : { type: "i", value: 0 },
+		"reflectivity" : { type: "f", value: 1.0 },
+		"refractionRatio" : { type: "f", value: 0.98 },
+		"combine" : { type: "i", value: 0 },
 
-	"fogDensity": { type: "f", value: 0.00025 },
-	"fogNear"	: { type: "f", value: 1 },
-	"fogFar"	: { type: "f", value: 2000 },
-	"fogColor"	: { type: "c", value: new THREE.Color( 0xffffff ) },
-	
-	"morphTargetInfluences" : { type: "f", value: 0 }
+		"fogDensity" : { type: "f", value: 0.00025 },
+		"fogNear" : { type: "f", value: 1 },
+		"fogFar" : { type: "f", value: 2000 },
+		"fogColor" : { type: "c", value: new THREE.Color( 0xffffff ) },
+
+		"morphTargetInfluences" : { type: "f", value: 0 }
 
 	},
 
 	lights: {
 
-	"enableLighting" 			: { type: "i", value: 1 },
-	"ambientLightColor" 		: { type: "fv", value: [] },
-	"directionalLightDirection" : { type: "fv", value: [] },
-	"directionalLightColor" 	: { type: "fv", value: [] },
-	"pointLightPosition"		: { type: "fv", value: [] },
-	"pointLightColor"			: { type: "fv", value: [] }
+		"enableLighting" : { type: "i", value: 1 },
+		"ambientLightColor" : { type: "fv", value: [] },
+		"directionalLightDirection" : { type: "fv", value: [] },
+		"directionalLightColor" : { type: "fv", value: [] },
+		"pointLightColor" : { type: "fv", value: [] },
+		"pointLightPosition" : { type: "fv", value: [] },
+		"pointLightDistance" : { type: "fv1", value: [] }
 
 	},
 
 	particle: {
 
-	"psColor"   : { type: "c", value: new THREE.Color( 0xeeeeee ) },
-	"opacity" : { type: "f", value: 1.0 },
-	"size" 	  : { type: "f", value: 1.0 },
-	"scale"   : { type: "f", value: 1.0 },
-	"map"     : { type: "t", value: 0, texture: null },
+		"psColor" : { type: "c", value: new THREE.Color( 0xeeeeee ) },
+		"opacity" : { type: "f", value: 1.0 },
+		"size" : { type: "f", value: 1.0 },
+		"scale" : { type: "f", value: 1.0 },
+		"map" : { type: "t", value: 0, texture: null },
 
-	"fogDensity": { type: "f", value: 0.00025 },
-	"fogNear"	: { type: "f", value: 1 },
-	"fogFar"	: { type: "f", value: 2000 },
-	"fogColor"	: { type: "c", value: new THREE.Color( 0xffffff ) }
+		"fogDensity" : { type: "f", value: 0.00025 },
+		"fogNear" : { type: "f", value: 1 },
+		"fogFar" : { type: "f", value: 2000 },
+		"fogColor" : { type: "c", value: new THREE.Color( 0xffffff ) }
 
 	}
 
@@ -607,46 +620,45 @@ THREE.ShaderLib = {
 
 
 	'shadowPost': {
-		
+
 		vertexShader: [
-		
+
 			"uniform 	mat4 	projectionMatrix;",
 			"attribute 	vec3 	position;",
-	
+
 			"void main(void)",
 			"{",
 				"gl_Position = projectionMatrix * vec4( position, 1.0 );",
 			"}"
 
 		].join( "\n" ),
-		
+
 		fragmentShader: [
-		
+
 			"#ifdef GL_ES",
 				"precision highp float;",
 			"#endif",		
 
 			"uniform 	float 	darkness;",
 
-	
 			"void main( void )",
 			"{",
 				"gl_FragColor = vec4( 0, 0, 0, darkness );",
 			"}"
 
 		].join( "\n" )
-		
+
 	},
 
 
 	'shadowVolumeDynamic': {
-		
+
 		uniforms: { "directionalLightDirection": { type: "fv", value: [] }},
 
 		vertexShader: [
 
 			"uniform 	vec3 	directionalLightDirection;",
-	
+
 			"void main() {",
 
 				"vec4 pos      = objectMatrix * vec4( position, 1.0 );",
@@ -666,7 +678,7 @@ THREE.ShaderLib = {
 			"}"
 
 		].join( "\n" )
-	},		
+	},
 
 
 	'depth': {
@@ -787,7 +799,7 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "skinning_vertex" ],
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
 				THREE.ShaderChunk[ "default_vertex" ],
-				
+
 			"}"
 
 		].join("\n")

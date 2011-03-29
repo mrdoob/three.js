@@ -39,92 +39,9 @@
 
 		<div id="container"><br /><br /><br /><br /><br />Generating world...</div>
 		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - <a href="http://www.minecraft.net/" target="_blank">minecraft</a> demo. featuring <a href="http://painterlypack.net/" target="_blank">painterly pack</a><br />(left click: forward, right click: backward)</div>
-<!--
+
 		<script type="text/javascript" src="../build/Three.js"></script>
--->
-		<script type="text/javascript" src="../src/Three.js"></script>
-		<script type="text/javascript" src="../src/core/Color.js"></script>
-		<script type="text/javascript" src="../src/core/Vector2.js"></script>
-		<script type="text/javascript" src="../src/core/Vector3.js"></script>
-		<script type="text/javascript" src="../src/core/Vector4.js"></script>
-		<script type="text/javascript" src="../src/core/Ray.js"></script>
-		<script type="text/javascript" src="../src/core/Rectangle.js"></script>
-		<script type="text/javascript" src="../src/core/Matrix3.js"></script>
-		<script type="text/javascript" src="../src/core/Matrix4.js"></script>
-		<script type="text/javascript" src="../src/core/Object3D.js"></script>
-		<script type="text/javascript" src="../src/core/Quaternion.js"></script>
-		<script type="text/javascript" src="../src/core/Vertex.js"></script>
-		<script type="text/javascript" src="../src/core/Face3.js"></script>
-		<script type="text/javascript" src="../src/core/Face4.js"></script>
-		<script type="text/javascript" src="../src/core/UV.js"></script>
-		<script type="text/javascript" src="../src/core/Geometry.js"></script>
-		<script type="text/javascript" src="../src/core/Spline.js"></script>
-		<script type="text/javascript" src="../src/animation/AnimationHandler.js"></script>
-		<script type="text/javascript" src="../src/animation/Animation.js"></script>
-		<script type="text/javascript" src="../src/cameras/Camera.js"></script>
-		<script type="text/javascript" src="../src/lights/Light.js"></script>
-		<script type="text/javascript" src="../src/lights/AmbientLight.js"></script>
-		<script type="text/javascript" src="../src/lights/DirectionalLight.js"></script>
-		<script type="text/javascript" src="../src/lights/PointLight.js"></script>
-		<script type="text/javascript" src="../src/materials/Material.js"></script>
-		<script type="text/javascript" src="../src/materials/Mappings.js"></script>
-		<script type="text/javascript" src="../src/materials/LineBasicMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/MeshBasicMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/MeshLambertMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/MeshPhongMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/MeshDepthMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/MeshNormalMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/MeshFaceMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/MeshShaderMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/ParticleBasicMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/ParticleCanvasMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/ParticleDOMMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/Texture.js"></script>
-		<script type="text/javascript" src="../src/materials/RenderTarget.js"></script>
-		<script type="text/javascript" src="../src/materials/Uniforms.js"></script>
-		<script type="text/javascript" src="../src/objects/Particle.js"></script>
-		<script type="text/javascript" src="../src/objects/ParticleSystem.js"></script>
-		<script type="text/javascript" src="../src/objects/Line.js"></script>
-		<script type="text/javascript" src="../src/objects/Mesh.js"></script>
-		<script type="text/javascript" src="../src/objects/Bone.js"></script>
-		<script type="text/javascript" src="../src/objects/SkinnedMesh.js"></script>
-		<script type="text/javascript" src="../src/objects/Ribbon.js"></script>
-		<script type="text/javascript" src="../src/objects/Sound.js"></script>
-		<script type="text/javascript" src="../src/objects/LOD.js"></script>
-		<script type="text/javascript" src="../src/scenes/Scene.js"></script>
-		<script type="text/javascript" src="../src/scenes/Fog.js"></script>
-		<script type="text/javascript" src="../src/scenes/FogExp2.js"></script>
-		<script type="text/javascript" src="../src/renderers/Projector.js"></script>
-		<script type="text/javascript" src="../src/renderers/DOMRenderer.js"></script>
-		<script type="text/javascript" src="../src/renderers/CanvasRenderer.js"></script>
-		<script type="text/javascript" src="../src/renderers/SVGRenderer.js"></script>
-		<script type="text/javascript" src="../src/renderers/WebGLShaders.js"></script>
-		<script type="text/javascript" src="../src/renderers/WebGLRenderer.js"></script>
-		<script type="text/javascript" src="../src/renderers/SoundRenderer.js"></script>
-		<script type="text/javascript" src="../src/renderers/renderables/RenderableVertex.js"></script>
-		<script type="text/javascript" src="../src/renderers/renderables/RenderableFace3.js"></script>
-		<script type="text/javascript" src="../src/renderers/renderables/RenderableObject.js"></script>
-		<script type="text/javascript" src="../src/renderers/renderables/RenderableParticle.js"></script>
-		<script type="text/javascript" src="../src/renderers/renderables/RenderableLine.js"></script>
-		<script type="text/javascript" src="../src/extras/GeometryUtils.js"></script>
-		<script type="text/javascript" src="../src/extras/ImageUtils.js"></script>
-		<script type="text/javascript" src="../src/extras/SceneUtils.js"></script>
-		<script type="text/javascript" src="../src/extras/ShaderUtils.js"></script>
-		<script type="text/javascript" src="../src/extras/cameras/QuakeCamera.js"></script>
-		<script type="text/javascript" src="../src/extras/cameras/PathCamera.js"></script>
-		<script type="text/javascript" src="../src/extras/geometries/Cube.js"></script>
-		<script type="text/javascript" src="../src/extras/geometries/Cylinder.js"></script>
-		<script type="text/javascript" src="../src/extras/geometries/Icosahedron.js"></script>
-		<script type="text/javascript" src="../src/extras/geometries/Lathe.js"></script>
-		<script type="text/javascript" src="../src/extras/geometries/Plane.js"></script>
-		<script type="text/javascript" src="../src/extras/geometries/Sphere.js"></script>
-		<script type="text/javascript" src="../src/extras/geometries/Torus.js"></script>
-		<script type="text/javascript" src="../src/extras/geometries/TorusKnot.js"></script>
-		<script type="text/javascript" src="../src/extras/io/Loader.js"></script>
-		<script type="text/javascript" src="../src/extras/io/JSONLoader.js"></script>
-		<script type="text/javascript" src="../src/extras/io/BinaryLoader.js"></script>
-		<script type="text/javascript" src="../src/extras/objects/MarchingCubes.js"></script>
-		
+
 		<script type="text/javascript" src="js/ImprovedNoise.js"></script>
 
 		<script type="text/javascript" src="js/Detector.js"></script>

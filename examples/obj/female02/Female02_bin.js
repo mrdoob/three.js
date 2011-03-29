@@ -9,10 +9,10 @@
 
 var model = {
 
-    'version' : 1,
+    "version" : 1,
 
-    'materials': [	{
-	"DbgColor" : 0xeeeeee,
+    "materials": [	{
+	"DbgColor" : 15658734,
 	"DbgIndex" : 0,
 	"DbgName" : "_03_-_Default1noCulli__03_-_Default1noCulli",
 	"colorAmbient" : [0.0, 0.0, 0.0],
@@ -26,7 +26,7 @@ var model = {
 	},
 
 	{
-	"DbgColor" : 0xee0000,
+	"DbgColor" : 15597568,
 	"DbgIndex" : 1,
 	"DbgName" : "_02_-_Default1noCulli__02_-_Default1noCulli",
 	"colorAmbient" : [0.0, 0.0, 0.0],
@@ -40,7 +40,7 @@ var model = {
 	},
 
 	{
-	"DbgColor" : 0x00ee00,
+	"DbgColor" : 60928,
 	"DbgIndex" : 2,
 	"DbgName" : "FrontColorNoCullingID__02_-_Default1noCulli",
 	"colorAmbient" : [0.0, 0.0, 0.0],
@@ -54,7 +54,7 @@ var model = {
 	},
 
 	{
-	"DbgColor" : 0x0000ee,
+	"DbgColor" : 238,
 	"DbgIndex" : 3,
 	"DbgName" : "FrontColorNoCullingID__03_-_Default1noCulli",
 	"colorAmbient" : [0.0, 0.0, 0.0],
@@ -68,7 +68,7 @@ var model = {
 	},
 
 	{
-	"DbgColor" : 0xeeee00,
+	"DbgColor" : 15658496,
 	"DbgIndex" : 4,
 	"DbgName" : "_01_-_Default1noCulli__01_-_Default1noCulli",
 	"colorAmbient" : [0.0, 0.0, 0.0],
@@ -82,7 +82,7 @@ var model = {
 	},
 
 	{
-	"DbgColor" : 0x00eeee,
+	"DbgColor" : 61166,
 	"DbgIndex" : 5,
 	"DbgName" : "FrontColorNoCullingID__01_-_Default1noCulli",
 	"colorAmbient" : [0.0, 0.0, 0.0],
@@ -95,10 +95,8 @@ var model = {
 	"transparency" : 1.0
 	}],
 
-    'buffers': 'Female02_bin.bin',
+    "buffers": "Female02_bin.bin"
 
-    'end': (new Date).getTime()
-    
 };
     
 postMessage( model );

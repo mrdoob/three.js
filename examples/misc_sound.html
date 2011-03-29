@@ -137,7 +137,7 @@
 				scene.addObject( mesh );
 
 
-				renderer = new THREE.WebGLRenderer( { clearColor: 0x000000, clearAlpha: 1 } );
+				renderer = new THREE.WebGLRenderer( { clearColor: 0x000000, clearAlpha: 1, antialias: false } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				soundRenderer = new THREE.SoundRenderer();

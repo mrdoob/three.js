@@ -9,6 +9,8 @@ var SceneUtils = {
 		var worker = new Worker( url );
 		worker.postMessage( 0 );
 
+		var urlBase = THREE.Loader.prototype.extractUrlbase( url );
+		
 		worker.onmessage = function( event ) {
 
 			var dg, dm, dd, dl, dc, df, dt,
@@ -41,6 +43,20 @@ var SceneUtils = {
 
 			};
 
+			function get_url( source_url, url_type ) {
+				
+				if ( url_type == "relativeToHTML" ) {
+					
+					return source_url;
+					
+				} else {
+					
+					return urlBase + "/" + source_url;
+
+				}
+
+			};
+			
 			function handle_objects() {
 
 				for( dd in data.objects ) {
@@ -62,11 +78,33 @@ var SceneUtils = {
 
 							p = o.position;
 							r = o.rotation;
+							q = o.quaternion;
 							s = o.scale;
+							
+							// turn off quaternions, for the moment
+							
+							q = 0;
 
+							if ( materials.length == 0 ) {
+								
+								materials[ 0 ] = new THREE.MeshFaceMaterial();
+								
+							}
+							
 							object = new THREE.Mesh( geometry, materials );
 							object.position.set( p[0], p[1], p[2] );
-							object.rotation.set( r[0], r[1], r[2] );
+							
+							if ( q ) {
+								
+								object.quaternion.set( q[0], q[1], q[2], q[3] );
+								object.useQuaternion = true;
+								
+							} else {
+
+								object.rotation.set( r[0], r[1], r[2] );
+								
+							}
+							
 							object.scale.set( s[0], s[1], s[2] );
 							object.visible = o.visible;
 
@@ -161,15 +199,20 @@ var SceneUtils = {
 
 			// lights
 
+			var hex, intensity;
+			
 			for( dl in data.lights ) {
 
 				l = data.lights[ dl ];
 
+				hex = ( l.color !== undefined ) ? l.color : 0xffffff;
+				intensity = ( l.intensity !== undefined ) ? l.intensity : 1;
+				
 				if ( l.type == "directional" ) {
 
 					p = l.direction;
 
-					light = new THREE.DirectionalLight();
+					light = new THREE.DirectionalLight( hex, intensity );
 					light.position.set( p[0], p[1], p[2] );
 					light.position.normalize();
 
@@ -177,14 +220,10 @@ var SceneUtils = {
 
 					p = l.position;
 
-					light = new THREE.PointLight();
+					light = new THREE.PointLight( hex, intensity );
 					light.position.set( p[0], p[1], p[2] );
 
 				}
-
-				c = l.color;
-				i = l.intensity || 1;
-				light.color.setRGB( c[0] * i, c[1] * i, c[2] * i );
 
 				result.scene.addLight( light );
 
@@ -254,7 +293,7 @@ var SceneUtils = {
 			}
 
 			total_models = counter_models;
-
+			
 			for( dg in data.geometries ) {
 
 				g = data.geometries[ dg ];
@@ -291,13 +330,13 @@ var SceneUtils = {
 
 				} else if ( g.type == "bin_mesh" ) {
 
-					binLoader.load( { model: g.url,
+					binLoader.load( { model: get_url( g.url, data.urlBaseType ),
 									  callback: create_callback( dg )
 									} );
 
 				} else if ( g.type == "ascii_mesh" ) {
 
-					jsonLoader.load( { model: g.url,
+					jsonLoader.load( { model: get_url( g.url, data.urlBaseType ),
 									   callback: create_callback( dg )
 									} );
 
@@ -336,14 +375,22 @@ var SceneUtils = {
 					tt.mapping = new THREE[ tt.mapping ]();
 
 				}
-
+				
 				if( tt.url instanceof Array ) {
-
-					texture = ImageUtils.loadTextureCube( tt.url, tt.mapping, callback_texture );
+				
+					var url_array = [];
+					
+					for( var i = 0; i < tt.url.length; i ++ ) {
+					
+						url_array[ i ] = get_url( tt.url[ i ], data.urlBaseType );
+						
+					}
+					
+					texture = ImageUtils.loadTextureCube( url_array, tt.mapping, callback_texture );
 
 				} else {
-
-					texture = ImageUtils.loadTexture( tt.url, tt.mapping, callback_texture );
+					
+					texture = ImageUtils.loadTexture( get_url( tt.url, data.urlBaseType ), tt.mapping, callback_texture );
 
 					if ( THREE[ tt.minFilter ] != undefined )
 						texture.minFilter = THREE[ tt.minFilter ];

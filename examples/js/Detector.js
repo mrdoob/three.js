@@ -10,7 +10,7 @@ Detector = {
 	webgl	: !!window.WebGLRenderingContext,
 	workers : !!window.Worker,
 	fileapi : window.File && window.FileReader && window.FileList && window.Blob,
-	
+
 	// helper methods
 
 	addGetWebGLMessage: function( parameters ) {

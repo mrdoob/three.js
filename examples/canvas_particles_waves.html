@@ -54,16 +54,15 @@
 				var PI2 = Math.PI * 2;
 				var material = new THREE.ParticleCanvasMaterial( {
 
-							color: 0xffffff,
-							program: function ( context, color ) {
+					color: 0xffffff,
+					program: function ( context ) {
 
-								context.strokeStyle = color.__styleString;
-								context.beginPath();
-								context.arc( 0, 0, 1, 0, PI2, true );
-								context.closePath();
-								context.stroke();
+						context.beginPath();
+						context.arc( 0, 0, 1, 0, PI2, true );
+						context.closePath();
+						context.stroke();
 
-							}
+					}
 
 				} );
 

@@ -86,7 +86,7 @@
 				scene.addLight( light );
 				*/
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.setSize( window.innerWidth, height );
 				container.appendChild( renderer.domElement );
 
@@ -135,7 +135,6 @@
 
 					materials[c] = new THREE.MeshBasicMaterial( parameters );
 					materials[c].program = material_base.program;
-					materials[c].uniforms = Uniforms.clone( THREE.ShaderLib[ 'basic' ].uniforms );
 
 					if ( singleMaterial )
 						mesh = new THREE.Mesh( geo, zmaterial );

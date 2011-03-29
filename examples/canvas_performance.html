@@ -100,7 +100,7 @@
 				directionalLight.position.z = 0;
 				scene.addLight( directionalLight );
 
-				var pointLight = new THREE.PointLight( 0xff0000, 1 );
+				var pointLight = new THREE.PointLight( 0xff0000, 1, 500 );
 				scene.addLight( pointLight );
 
 				renderer = new THREE.CanvasRenderer();

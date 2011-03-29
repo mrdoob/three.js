@@ -1,5 +1,8 @@
 var scene = {
 	
+"type"		  :	"scene",
+"urlBaseType" : "relativeToHTML",
+	
 "objects": 
 {	
 	"cube1" : {
@@ -393,14 +396,14 @@ var scene = {
 	"light1": {
 		"type"		 : "directional",
 		"direction"	 : [0,1,1],
-		"color" 	 : [1,1,1],
+		"color" 	 : 0xffffff,
 		"intensity"	 : 0.8
 	},
 
 	"light2": {
 		"type"	  : "point",
 		"position": [0,0,0],
-		"color"   : [1,1,1]
+		"color"   : 0xffffff
 	}
 	
 },
