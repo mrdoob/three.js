@@ -77,19 +77,30 @@ THREE.Camera.prototype.update = function ( parentMatrixWorld, forceUpdate, camer
 
 	} else {
 
-		if ( parentMatrixWorld ) {
+		if ( this.matrixAutoUpdate ) {
 
-			this.matrixWorld.multiply( parentMatrixWorld, this.matrix );
-
-		} else {
-
-			this.matrixWorld.copy( this.matrix );
+			forceUpdate |= this.updateMatrix();
 
 		}
 
-		THREE.Matrix4.makeInvert( this.matrixWorld, this.matrixWorldInverse );
+		if ( forceUpdate || this.matrixWorldNeedsUpdate ) {
 
-		forceUpdate = true;
+			if ( parentMatrixWorld ) {
+
+				this.matrixWorld.multiply( parentMatrixWorld, this.matrix );
+
+			} else {
+
+				this.matrixWorld.copy( this.matrix );
+
+			}
+
+			this.matrixWorldNeedsUpdate = false;
+			forceUpdate = true;
+
+			THREE.Matrix4.makeInvert( this.matrixWorld, this.matrixWorldInverse );
+
+		}
 
 	}
 
