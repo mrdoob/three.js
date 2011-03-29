@@ -63,7 +63,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		ambient: [ 0, 0, 0 ],
 		directional: { length: 0, colors: new Array(), positions: new Array() },
-		point: { length: 0, colors: new Array(), positions: new Array() }
+		point: { length: 0, colors: new Array(), positions: new Array(), distances: new Array() }
 
 	},
 
@@ -192,15 +192,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 	function setupLights ( program, lights ) {
 
 		var l, ll, light, r = 0, g = 0, b = 0,
-		color, position, intensity,
+		color, position, intensity, distance,
 
 		zlights = _lights,
 
-		dcolors    = zlights.directional.colors,
+		dcolors = zlights.directional.colors,
 		dpositions = zlights.directional.positions,
 
-		pcolors    = zlights.point.colors,
+		pcolors = zlights.point.colors,
 		ppositions = zlights.point.positions,
+		pdistances = zlights.point.distances,
 
 		dlength = 0,
 		plength = 0,
@@ -212,8 +213,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			light = lights[ l ];
 			color = light.color;
+
 			position = light.position;
 			intensity = light.intensity;
+			distance = light.distance;
 
 			if ( light instanceof THREE.AmbientLight ) {
 
@@ -225,11 +228,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				doffset = dlength * 3;
 
-				dcolors[ doffset ]     = color.r * intensity;
+				dcolors[ doffset ] = color.r * intensity;
 				dcolors[ doffset + 1 ] = color.g * intensity;
 				dcolors[ doffset + 2 ] = color.b * intensity;
 
-				dpositions[ doffset ]     = position.x;
+				dpositions[ doffset ] = position.x;
 				dpositions[ doffset + 1 ] = position.y;
 				dpositions[ doffset + 2 ] = position.z;
 
@@ -239,13 +242,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				poffset = plength * 3;
 
-				pcolors[ poffset ]     = color.r * intensity;
+				pcolors[ poffset ] = color.r * intensity;
 				pcolors[ poffset + 1 ] = color.g * intensity;
 				pcolors[ poffset + 2 ] = color.b * intensity;
 
-				ppositions[ poffset ]     = position.x;
+				ppositions[ poffset ] = position.x;
 				ppositions[ poffset + 1 ] = position.y;
 				ppositions[ poffset + 2 ] = position.z;
+
+				pdistances[ plength ] = distance;
 
 				plength += 1;
 
@@ -1594,6 +1599,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		uniforms.directionalLightDirection.value = lights.directional.positions;
 		uniforms.pointLightColor.value = lights.point.colors;
 		uniforms.pointLightPosition.value = lights.point.positions;
+		uniforms.pointLightDistance.value = lights.point.distances;
 
 	};
 
@@ -3867,19 +3873,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 		// 	- leave some extra space for other uniforms
 		//  - limit here is ANGLE's 254 max uniform vectors
 		//    (up to 54 should be safe)
-		
+
 		var maxBones = 50;
-		
+
 		if ( object !== undefined && object instanceof THREE.SkinnedMesh ) {
-			
+
 			maxBones = object.bones.length;
 
 		}
 
 		return maxBones;
-		
+
 	};
-	
+
 	function allocateLights ( lights, maxLights ) {
 
 		var l, ll, light, dirLights, pointLights, maxDirLights, maxPointLights;
