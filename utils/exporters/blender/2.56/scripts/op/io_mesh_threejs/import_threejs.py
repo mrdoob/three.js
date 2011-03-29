@@ -99,6 +99,8 @@ def create_materials(data, modelpath):
             mtex.texture_coords = 'UV'
             mtex.use = True
             mtex.use_map_color_diffuse = True
+            
+            material.active_texture = texture
 
         materials.append(material)
         
@@ -214,8 +216,8 @@ def create_mesh_object(name, vertices, materials, face_data, flipYZ, recalculate
 
                 if layer[fi]:
                     
-                    face_uvs = me.uv_textures[li].data[fi]
-                    face_uvs = face_uvs.uv1, face_uvs.uv2, face_uvs.uv3, face_uvs.uv4
+                    uv_face = me.uv_textures[li].data[fi]
+                    face_uvs = uv_face.uv1, uv_face.uv2, uv_face.uv3, uv_face.uv4
                     
                     for vi in range(len(layer[fi])):
                         
@@ -224,6 +226,12 @@ def create_mesh_object(name, vertices, materials, face_data, flipYZ, recalculate
                     
                         face_uvs[vi].x = u
                         face_uvs[vi].y = 1.0 - v
+                        
+                    active_texture = materials[faceMaterials[fi]].active_texture
+                    
+                    if active_texture:
+                        uv_face.use_image = True
+                        uv_face.image = active_texture.image
 
 
     # Handle materials # 1
