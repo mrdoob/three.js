@@ -165,20 +165,20 @@ TEMPLATE_CAMERA_ORTHO = """\
     }"""
 
 TEMPLATE_LIGHT_DIRECTIONAL = """\
-	%(light_id)s: {
-		"type"		 : "directional",
-		"direction"	 : %(direction)s,
-		"color" 	 : %(color)d,
-		"intensity"	 : %(intensity).2f
-	}"""
+    %(light_id)s: {
+        "type"		 : "directional",
+        "direction"	 : %(direction)s,
+        "color" 	 : %(color)d,
+        "intensity"	 : %(intensity).2f
+    }"""
 
 TEMPLATE_LIGHT_POINT = """\
-	%(light_id)s: {
-		"type"	     : "point",
-		"position"   : %(position)s,
-		"color"      : %(color)d,
-		"intensity"	 : %(intensity).3f
-	}"""
+    %(light_id)s: {
+        "type"	     : "point",
+        "position"   : %(position)s,
+        "color"      : %(color)d,
+        "intensity"	 : %(intensity).3f
+    }"""
 
 TEMPLATE_VEC4 = '[ %f, %f, %f, %f ]'
 TEMPLATE_VEC3 = '[ %f, %f, %f ]'
@@ -628,7 +628,7 @@ def generate_mtl(materials):
     return mtl
 
 def value2string(v):
-    if type(v) == str and v[0] != "0":
+    if type(v) == str and v[0:2] != "0x":
         return '"%s"' % v
     elif type(v) == bool:
         return str(v).lower()
@@ -649,7 +649,7 @@ def generate_materials(mtl, materials, use_colors, draw_type):
         mtl[m]['DbgName'] = m
         mtl[m]['DbgIndex'] = index
         mtl[m]['DbgColor'] = generate_color(index)
-        mtl[m]['vertexColors'] = use_colors
+        mtl[m]['vertexColors'] = use_colors and mtl[m]["useVertexColors"]
 
         if draw_type in [ "BOUNDS", "WIRE" ]:
             mtl[m]['wireframe'] = True
@@ -671,16 +671,16 @@ def extract_materials(mesh, scene):
             material = materials[m.name]
             
             material['colorDiffuse'] = [m.diffuse_intensity * m.diffuse_color[0],
-                                       m.diffuse_intensity * m.diffuse_color[1],
-                                       m.diffuse_intensity * m.diffuse_color[2]]
+                                        m.diffuse_intensity * m.diffuse_color[1],
+                                        m.diffuse_intensity * m.diffuse_color[2]]
 
             material['colorSpecular'] = [m.specular_intensity * m.specular_color[0],
-                                        m.specular_intensity * m.specular_color[1],
-                                        m.specular_intensity * m.specular_color[2]]
+                                         m.specular_intensity * m.specular_color[1],
+                                         m.specular_intensity * m.specular_color[2]]
 
             material['colorAmbient'] = [m.ambient * world.ambient_color[0],
-                                       m.ambient * world.ambient_color[1],
-                                       m.ambient * world.ambient_color[2]]
+                                        m.ambient * world.ambient_color[1],
+                                        m.ambient * world.ambient_color[2]]
 
             material['transparency'] = m.alpha
 
@@ -695,10 +695,14 @@ def extract_materials(mesh, scene):
                 fn_strip = os.path.basename(fn)
                 material['mapDiffuse'] = fn_strip
                 
-            if m.specular_intensity > 0.0 and (m.specular_color[0] > 0 or m.specular_color[1] > 0 or m.specular_color[2] > 0):
-                material['shading'] = "Phong"
-            else:
-                material['shading'] = "Lambert"
+            material["useVertexColors"] = m.THREE_useVertexColors
+            
+            # can't really use this reliably to tell apart Phong from Lambert
+            # as Blender defaults to non-zero specular color
+            #if m.specular_intensity > 0.0 and (m.specular_color[0] > 0 or m.specular_color[1] > 0 or m.specular_color[2] > 0):
+            #    material['shading'] = "Phong"
+            #else:
+            #    material['shading'] = "Lambert"
 
     return materials
 

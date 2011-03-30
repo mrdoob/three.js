@@ -24,6 +24,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_canvas = document.createElement( 'canvas' ),
 	_currentProgram = null,
 	_currentFramebuffer = null,
+	_currentDepthMask = true,
 
 	_this = this,
 
@@ -236,6 +237,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.enableDepthBufferWrite = function ( enable ) {
 
+		_currentDepthMask = enable;
 		_gl.depthMask( enable );
 
 	};
@@ -2811,7 +2813,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_gl.vertexAttribPointer( _stencilShadow.vertexLocation, 3, _gl.FLOAT, false, 0, 0 );
 		_gl.enableVertexAttribArray( _stencilShadow.vertexLocation );
 
-		_gl.enable( _gl.BLEND );
 		_gl.blendFunc( _gl.ONE, _gl.ONE_MINUS_SRC_ALPHA );
 		_gl.blendEquation( _gl.FUNC_ADD );
 			
@@ -2823,8 +2824,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	    _gl.disable	 ( _gl.STENCIL_TEST );
 	    _gl.enable	 ( _gl.DEPTH_TEST );
-		_gl.disable  ( _gl.BLEND );
-	    _gl.depthMask( true );
+	    _gl.depthMask( _currentDepthMask );
 	}
 
 	/*
@@ -2944,7 +2944,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			// sample read back pixels
 
-			sampleDistance = parseInt( 6 * ( 1 - Math.max( 0, Math.min( -objectZ, camera.far )) / camera.far ), 10 ) + 1;
+			sampleDistance = parseInt( 5 * ( 1 - Math.max( 0, Math.min( -objectZ, camera.far )) / camera.far ), 10 ) + 2;
 			sampleX = sampleDistance * 4;
 			sampleY = sampleDistance * 4 * 16;
 
@@ -3002,8 +3002,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		// loop through all lens flares and draw their flares
 		// setup gl
 		
-		_gl.enable( _gl.BLEND );
-		
 		for( o = 0; o < ol; o++ ) {
 		
 			object = scene.__webglLensFlares[ o ].object;
@@ -3045,8 +3043,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	
 		_gl.enable( _gl.CULL_FACE );
 		_gl.enable( _gl.DEPTH_TEST );
-		_gl.depthMask( true );
-		_gl.disable( _gl.BLEND );
+		_gl.depthMask( _currentDepthMask );
 	}
 
 

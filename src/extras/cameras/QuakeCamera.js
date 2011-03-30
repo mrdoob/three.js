@@ -37,7 +37,7 @@ THREE.QuakeCamera = function ( parameters ) {
 	this.lookVertical = true;
 	this.autoForward = false;
 
-	this.dragToLook = false;
+	this.activeLook = true;
 
 	this.heightSpeed = false;
 	this.heightCoef = 1.0;
@@ -54,7 +54,7 @@ THREE.QuakeCamera = function ( parameters ) {
 
 		if ( parameters.autoForward !== undefined ) this.autoForward = parameters.autoForward;
 
-		if ( parameters.dragToLook !== undefined ) this.dragToLook = parameters.dragToLook;
+		if ( parameters.activeLook !== undefined ) this.activeLook = parameters.activeLook;
 
 		if ( parameters.heightSpeed !== undefined ) this.heightSpeed = parameters.heightSpeed;
 		if ( parameters.heightCoef !== undefined ) this.heightCoef = parameters.heightCoef;
@@ -90,7 +90,7 @@ THREE.QuakeCamera = function ( parameters ) {
 		event.preventDefault();
 		event.stopPropagation();
 
-		if ( !this.dragToLook ) {
+		if ( this.activeLook ) {
 
 			switch ( event.button ) {
 
@@ -110,7 +110,7 @@ THREE.QuakeCamera = function ( parameters ) {
 		event.preventDefault();
 		event.stopPropagation();
 
-		if ( !this.dragToLook ) {
+		if ( this.activeLook ) {
 
 			switch ( event.button ) {
 
@@ -194,7 +194,7 @@ THREE.QuakeCamera = function ( parameters ) {
 
 		var actualLookSpeed = this.lookSpeed;
 
-		if ( this.dragToLook && !this.mouseDragOn ) {
+		if ( !this.activeLook ) {
 
 			actualLookSpeed = 0;
 

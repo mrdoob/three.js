@@ -42,6 +42,8 @@ from io_utils import ExportHelper, ImportHelper
 bpy.types.Object.THREE_castsShadow = bpy.props.BoolProperty()
 bpy.types.Object.THREE_meshCollider = bpy.props.BoolProperty()
 
+bpy.types.Material.THREE_useVertexColors = bpy.props.BoolProperty()
+
 class OBJECT_PT_hello( bpy.types.Panel ):
     
     bl_label = "THREE"
@@ -62,7 +64,24 @@ class OBJECT_PT_hello( bpy.types.Panel ):
         row = layout.row()
         row.prop( obj, "THREE_meshCollider", text="Mesh collider" )
 
+
+class MATERIAL_PT_hello( bpy.types.Panel ):
+    
+    bl_label = "THREE"
+    bl_space_type = "PROPERTIES"
+    bl_region_type = "WINDOW"
+    bl_context = "material"
+ 
+    def draw(self, context):
+        layout = self.layout
+        mat = context.material
         
+        row = layout.row()
+        row.label(text="Selected material: " + mat.name )
+
+        row = layout.row()
+        row.prop( mat, "THREE_useVertexColors", text="Use vertex colors" )
+
 # ################################################################
 # Importer
 # ################################################################
