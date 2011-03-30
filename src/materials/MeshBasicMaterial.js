@@ -53,7 +53,7 @@ THREE.MeshBasicMaterial = function ( parameters ) {
 	this.wireframeLinejoin = 'round'; // implemented just in CanvasRenderer
 
 	this.vertexColors = false;
-	
+
 	this.skinning = false;
 	this.morphTargets = false;
 
