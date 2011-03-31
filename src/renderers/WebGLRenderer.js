@@ -2376,11 +2376,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		for ( m = 0, ml = object.materials.length; m < ml; m++ ) {
 
 			material = object.materials[ m ];
-
-			if ( ( material.opacity && material.opacity < 1.0 ) || material.blending != THREE.NormalBlending )
-				addToFixedArray( transparent, material );
-			else
-				addToFixedArray( opaque, material );
+			material.transparent ? addToFixedArray( transparent, material ) : addToFixedArray( opaque, material );
 
 		}
 
@@ -2406,31 +2402,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 				for ( i = 0, l = buffer.materials.length; i < l; i++ ) {
 
 					material = buffer.materials[ i ];
-
-					if ( material ) {
-
-						if ( ( material.opacity && material.opacity < 1.0 ) || material.blending != THREE.NormalBlending )
-							addToFixedArray( transparent, material );
-						else
-							addToFixedArray( opaque, material );
-
-					}
+					if ( material ) material.transparent ? addToFixedArray( transparent, material ) : addToFixedArray( opaque, material );
 
 				}
 
 			} else {
 
 				material = meshMaterial;
-
-				if ( ( material.opacity && material.opacity < 1.0 ) || material.blending != THREE.NormalBlending ) {
-
-					addToFixedArray( transparent, material );
-
-				} else {
-
-					addToFixedArray( opaque, material );
-
-				}
+				if ( material ) material.transparent ? addToFixedArray( transparent, material ) : addToFixedArray( opaque, material );
 
 			}
 
@@ -2549,7 +2528,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		setBlending( THREE.NormalBlending );
 
-		for ( o = 0; o < ol; o++ ) {
+		for ( o = 0; o < ol; o ++ ) {
 
 			webglObject = scene.__webglObjects[ o ];
 
@@ -2561,7 +2540,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				setObjectFaces( object );
 
-				for( i = 0; i < opaque.count; i++ ) {
+				for ( i = 0; i < opaque.count; i ++ ) {
 
 					material = opaque.list[ i ];
 
@@ -2604,7 +2583,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// transparent pass
 
-		for ( o = 0; o < ol; o++ ) {
+		for ( o = 0; o < ol; o ++ ) {
 
 			webglObject = scene.__webglObjects[ o ];
 
@@ -2616,7 +2595,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				setObjectFaces( object );
 
-				for( i = 0; i < transparent.count; i++ ) {
+				for ( i = 0; i < transparent.count; i ++ ) {
 
 					material = transparent.list[ i ];
 
@@ -2644,7 +2623,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				setObjectFaces( object );
 
-				for( i = 0; i < transparent.count; i++ ) {
+				for ( i = 0; i < transparent.count; i ++ ) {
 
 					material = transparent.list[ i ];
 
@@ -2662,18 +2641,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// render stencil shadows
 
-		if( stencil && scene.__webglShadowVolumes.length && scene.lights.length ) {
+		if ( stencil && scene.__webglShadowVolumes.length && scene.lights.length ) {
 
 			renderStencilShadows( scene );
-		
+
 		}
 
 		// render lens flares
-		
-		if( scene.__webglLensFlares.length ) {
-			
+
+		if ( scene.__webglLensFlares.length ) {
+
 			renderLensFlares( scene, camera );
-		
+
 		}
 
 
@@ -2688,8 +2667,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 	};
 
 
-	
-
 
 	/*
 	 * Stencil Shadows
@@ -2701,7 +2678,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	 */
 
 	function renderStencilShadows( scene ) {
-			
+
 		// setup stencil
 
 		_gl.enable( _gl.POLYGON_OFFSET_FILL );
@@ -2709,40 +2686,39 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_gl.enable( _gl.STENCIL_TEST );
 		_gl.depthMask( false );
 		_gl.colorMask( false, false, false, false );
-	
+
 		_gl.stencilFunc( _gl.ALWAYS, 1, 0xFF );
 		_gl.stencilOpSeparate( _gl.BACK,  _gl.KEEP, _gl.INCR, _gl.KEEP );
 		_gl.stencilOpSeparate( _gl.FRONT, _gl.KEEP, _gl.DECR, _gl.KEEP );
 
-		
+
 		// loop through all directional lights
-		
+
 		var l, ll = scene.lights.length;
 		var p;
 		var light, lights = scene.lights;
-		var dirLight = [];			
+		var dirLight = [];
 		var object, geometryGroup, material;
-		var	program;
+		var program;
 		var p_uniforms;
-	    var m_uniforms;
-	    var attributes;
+		var m_uniforms;
+		var attributes;
 		var o, ol = scene.__webglShadowVolumes.length;
-		
-		for( l = 0; l < ll; l++ ) {
-			
+
+		for ( l = 0; l < ll; l++ ) {
+
 			light = scene.lights[ l ];
-			
-			if( light instanceof THREE.DirectionalLight ) {
+
+			if ( light instanceof THREE.DirectionalLight ) {
 
 				dirLight[ 0 ] = -light.position.x;
 				dirLight[ 1 ] = -light.position.y;
 				dirLight[ 2 ] = -light.position.z;
 
-				
 				// render all volumes
-				
-				for( o = 0; o < ol; o++ ) {
-		
+
+				for ( o = 0; o < ol; o++ ) {
+
 					object        = scene.__webglShadowVolumes[ o ].object;
 					geometryGroup = scene.__webglShadowVolumes[ o ].buffer;
 					material      = object.materials[ 0 ];
@@ -2751,12 +2727,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					program = material.program,
 		  			p_uniforms = program.uniforms,
-	                m_uniforms = material.uniforms,
-	                attributes = program.attributes;
+					m_uniforms = material.uniforms,
+					attributes = program.attributes;
 
+					if ( _currentProgram !== program ) {
 
-					if( _currentProgram !== program ) {
-						
 						_gl.useProgram( program );
 						_currentProgram = program;
 
@@ -2783,7 +2758,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					_gl.cullFace( _gl.BACK );
 					_gl.drawElements( _gl.TRIANGLES, geometryGroup.__webglFaceCount, _gl.UNSIGNED_SHORT, 0 );
-			
+
 				}
 
 			}
@@ -2797,10 +2772,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_gl.colorMask( true, true, true, true );
 		_gl.stencilFunc( _gl.NOTEQUAL, 0, 0xFF );
 		_gl.stencilOp( _gl.KEEP, _gl.KEEP, _gl.KEEP );
-	    _gl.disable( _gl.DEPTH_TEST );
+		_gl.disable( _gl.DEPTH_TEST );
 
 
-		// draw darkening polygon	
+		// draw darkening polygon
 
 		_oldBlending = "";
 		_currentProgram = _stencilShadow.program;
@@ -2808,23 +2783,24 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_gl.useProgram( _stencilShadow.program );
 		_gl.uniformMatrix4fv( _stencilShadow.projectionLocation, false, _projectionMatrixArray );
 		_gl.uniform1f( _stencilShadow.darknessLocation, _stencilShadow.darkness );
-		
+
 		_gl.bindBuffer( _gl.ARRAY_BUFFER, _stencilShadow.vertexBuffer );
 		_gl.vertexAttribPointer( _stencilShadow.vertexLocation, 3, _gl.FLOAT, false, 0, 0 );
 		_gl.enableVertexAttribArray( _stencilShadow.vertexLocation );
 
 		_gl.blendFunc( _gl.ONE, _gl.ONE_MINUS_SRC_ALPHA );
 		_gl.blendEquation( _gl.FUNC_ADD );
-			
+
 		_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, _stencilShadow.elementBuffer );
 		_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
 
 
 		// disable stencil
 
-	    _gl.disable	 ( _gl.STENCIL_TEST );
-	    _gl.enable	 ( _gl.DEPTH_TEST );
-	    _gl.depthMask( _currentDepthMask );
+		_gl.disable( _gl.STENCIL_TEST );
+		_gl.enable( _gl.DEPTH_TEST );
+		_gl.depthMask( _currentDepthMask );
+
 	}
 
 	/*
@@ -2837,7 +2813,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	 */
 
 	function renderLensFlares( scene, camera ) {
-		
+
 		var object, objectZ, geometryGroup, material;
 		var o, ol = scene.__webglLensFlares.length;
 		var f, fl, flare;
@@ -2869,7 +2845,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_gl.uniform1i( uniforms.map, 0 );
 		_gl.activeTexture( _gl.TEXTURE0 );
-		
+
 		_gl.uniform1f( uniforms.opacity, 1 );
 		_gl.uniform1f( uniforms.rotation, 0 );
 		_gl.uniform2fv( uniforms.scale, scale );
@@ -2886,34 +2862,34 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_gl.depthMask( false );
 
 
-		for( o = 0; o < ol; o++ ) {
-			
+		for ( o = 0; o < ol; o ++ ) {
+
 			// calc object screen position
-			
+
 			object = scene.__webglLensFlares[ o ].object;
-			
+
 			tempPosition.set( object.matrixWorld.n14, object.matrixWorld.n24, object.matrixWorld.n34 );
-			
+
 			camera.matrixWorldInverse.multiplyVector3( tempPosition );
 			objectZ = tempPosition.z;
 			camera.projectionMatrix.multiplyVector3( tempPosition );
-			
-			
+
+
 			// setup arrays for gl programs
-			
+
 			screenPosition[ 0 ] = tempPosition.x;
 			screenPosition[ 1 ] = tempPosition.y;
 			screenPosition[ 2 ] = tempPosition.z;
-			
+
 			screenPositionPixels[ 0 ] = screenPosition[ 0 ] * halfViewportWidth + halfViewportWidth;
 			screenPositionPixels[ 1 ] = screenPosition[ 1 ] * halfViewportHeight + halfViewportHeight;
-	
+
 
 			// save current RGB to temp texture
-			
+
 			_gl.copyTexSubImage2D( _gl.TEXTURE_2D, 0, 0, 0, screenPositionPixels[ 0 ] - 8, screenPositionPixels[ 1 ] - 8, 16, 16 );
 
-	
+
 			// render pink quad
 
 			_gl.uniform3fv( uniforms.screenPosition, screenPosition );
@@ -2927,17 +2903,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 			// read back
 
 			try {
-				
+
 				_gl.readPixels( screenPositionPixels[ 0 ] - 8, screenPositionPixels[ 1 ] - 8, 16, 16, _gl.RGBA, _gl.UNSIGNED_BYTE, _lensFlare.readBackPixels );
-				
-			}
-			catch( error ) {
-				
+
+			} catch( error ) {
+
 				console.log( "WebGLRenderer.renderLensFlare: readPixels failed!" );
 			}
 
-			if( _gl.getError()) {
-				
+			if ( _gl.getError() ) {
+
 				console.log( "WebGLRenderer.renderLensFlare: readPixels failed!" );
 			}
 
@@ -2953,99 +2928,98 @@ THREE.WebGLRenderer = function ( parameters ) {
 			sampleIndex = ( sampleMidX - sampleX ) + ( sampleMidY - sampleY );	// upper left
 			if( _lensFlare.readBackPixels[ sampleIndex + 0 ] === 255 && 
 				_lensFlare.readBackPixels[ sampleIndex + 1 ] === 0 &&
-				_lensFlare.readBackPixels[ sampleIndex + 2 ] === 255 ) visibility += 0.2;			
+				_lensFlare.readBackPixels[ sampleIndex + 2 ] === 255 ) visibility += 0.2;
 
 			sampleIndex = ( sampleMidX + sampleX ) + ( sampleMidY - sampleY );	// upper right
 			if( readBackPixels[ sampleIndex + 0 ] === 255 && 
 				readBackPixels[ sampleIndex + 1 ] === 0 &&
-				readBackPixels[ sampleIndex + 2 ] === 255 ) visibility += 0.2;			
+				readBackPixels[ sampleIndex + 2 ] === 255 ) visibility += 0.2;
 
 			sampleIndex = ( sampleMidX + sampleX ) + ( sampleMidY + sampleY );	// lower right
 			if( readBackPixels[ sampleIndex + 0 ] === 255 && 
 				readBackPixels[ sampleIndex + 1 ] === 0 &&
-				readBackPixels[ sampleIndex + 2 ] === 255 ) visibility += 0.2;			
+				readBackPixels[ sampleIndex + 2 ] === 255 ) visibility += 0.2;
 
 			sampleIndex = ( sampleMidX - sampleX ) + ( sampleMidY + sampleY );	// lower left
 			if( readBackPixels[ sampleIndex + 0 ] === 255 && 
 				readBackPixels[ sampleIndex + 1 ] === 0 &&
-				readBackPixels[ sampleIndex + 2 ] === 255 ) visibility += 0.2;			
+				readBackPixels[ sampleIndex + 2 ] === 255 ) visibility += 0.2;
 
 			sampleIndex = sampleMidX + sampleMidY;								// center
 			if( readBackPixels[ sampleIndex + 0 ] === 255 && 
 				readBackPixels[ sampleIndex + 1 ] === 0 &&
-				readBackPixels[ sampleIndex + 2 ] === 255 ) visibility += 0.2;			
+				readBackPixels[ sampleIndex + 2 ] === 255 ) visibility += 0.2;
 
 
 			object.positionScreen.x = screenPosition[ 0 ];
 			object.positionScreen.y = screenPosition[ 1 ];
 			object.positionScreen.z = screenPosition[ 2 ];
 
-			if( object.customUpdateCallback ) {
-				
+			if ( object.customUpdateCallback ) {
+
 				object.customUpdateCallback( visibility, object );
-				
+
 			} else {
-				
+
 				object.updateLensFlares( visibility );
-				
+
 			}
 
 
 			// restore graphics
-		
+
 			_gl.uniform1i( uniforms.renderPink, 0 );
 			_gl.disable( _gl.DEPTH_TEST );
 			_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
 		}
-		
-		
+
+
 		// loop through all lens flares and draw their flares
 		// setup gl
-		
-		for( o = 0; o < ol; o++ ) {
-		
+
+		for ( o = 0; o < ol; o ++ ) {
+
 			object = scene.__webglLensFlares[ o ].object;
 
-			for( f = 0, fl = object.lensFlares.length; f < fl; f++ ) {
-				
+			for ( f = 0, fl = object.lensFlares.length; f < fl; f ++ ) {
+
 				flare = object.lensFlares[ f ];
-				
-				if( flare.opacity > 0.001 && flare.scale > 0.001 ) {
+
+				if ( flare.opacity > 0.001 && flare.scale > 0.001 ) {
 
 					screenPosition[ 0 ] = flare.x;
 					screenPosition[ 1 ] = flare.y;
 					screenPosition[ 2 ] = flare.z;
-	
+
 					size = flare.size * flare.scale / _viewportHeight;
 					scale[ 0 ] = size * invAspect;
 					scale[ 1 ] = size;
-						
-	
+
 					_gl.uniform3fv( uniforms.screenPosition, screenPosition );
 					_gl.uniform1f( uniforms.rotation, flare.rotation );
 					_gl.uniform2fv( uniforms.scale, scale );
 					_gl.uniform1f( uniforms.opacity, flare.opacity );
-	
+
 					setBlending( flare.blending );
 					setTexture( flare.texture, 0 );
-	
+
 					// todo: only draw if loaded
-			
+
 					_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
+
 				}
-				
+
 			}
 
 		}
 
-
 		// restore gl
-	
+
 		_gl.enable( _gl.CULL_FACE );
 		_gl.enable( _gl.DEPTH_TEST );
 		_gl.depthMask( _currentDepthMask );
-	}
 
+	}
 
 
 	function setupMatrices ( object, camera ) {
@@ -3053,7 +3027,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		object._modelViewMatrix.multiplyToArray( camera.matrixWorldInverse, object.matrixWorld, object._modelViewMatrixArray );
 		THREE.Matrix4.makeInvert3x3( object._modelViewMatrix ).transposeIntoArray( object._normalMatrixArray );
 
-	};
+	}
 
 	this.initWebGLObjects = function ( scene ) {
 
@@ -3092,7 +3066,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			updateObject( scene.__webglShadowVolumes[ o ].object, scene );
 
 		}
-		
+
 		for ( var o = 0, ol = scene.__webglLensFlares.length; o < ol; o ++ ) {
 
 			updateObject( scene.__webglLensFlares[ o ].object, scene );
@@ -3165,9 +3139,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 		} else if ( object instanceof THREE.LensFlare ) {
-			
+
 			addBuffer( scene.__webglLensFlares, undefined, object );
-			
+
 		} else if ( object instanceof THREE.Ribbon ) {
 
 			geometry = object.geometry;
@@ -3404,19 +3378,21 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function addBuffer ( objlist, buffer, object ) {
 
-		objlist.push( { buffer: buffer, object: object,
-				opaque: { list: [], count: 0 },
-				transparent: { list: [], count: 0 }
-			} );
+		objlist.push( {
+			buffer: buffer, object: object,
+			opaque: { list: [], count: 0 },
+			transparent: { list: [], count: 0 }
+		} );
 
 	};
 
 	function addBufferImmediate ( objlist, object ) {
 
-		objlist.push( { object: object,
-				opaque: { list: [], count: 0 },
-				transparent: { list: [], count: 0 }
-			} );
+		objlist.push( {
+			object: object,
+			opaque: { list: [], count: 0 },
+			transparent: { list: [], count: 0 }
+		} );
 
 	};
 
@@ -3566,13 +3542,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 			"attribute vec2 uv2;",
 
 			"#ifdef USE_COLOR",
-			
+
 				"attribute vec3 color;",
-				
+
 			"#endif",
 
 			"#ifdef USE_MORPHTARGETS",
-			
+
 				"attribute vec3 morphTarget0;",
 				"attribute vec3 morphTarget1;",
 				"attribute vec3 morphTarget2;",
@@ -3581,18 +3557,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 				"attribute vec3 morphTarget5;",
 				"attribute vec3 morphTarget6;",
 				"attribute vec3 morphTarget7;",
-			
+
 			"#endif",
 
 			"#ifdef USE_SKINNING",
-			
+
 				"attribute vec4 skinVertexA;",
 				"attribute vec4 skinVertexB;",
 				"attribute vec4 skinIndex;",
 				"attribute vec4 skinWeight;",
 
 			"#endif",
-			
+
 			""
 		].join("\n");
 
@@ -3705,10 +3681,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 			switch ( blending ) {
 
 				case THREE.AdditiveAlphaBlending:
-				
+
 					_gl.blendEquation( _gl.FUNC_ADD );
 					_gl.blendFunc( _gl.SRC_ALPHA, _gl.ONE );
-				
+
 					break;
 
 				case THREE.AdditiveBlending:

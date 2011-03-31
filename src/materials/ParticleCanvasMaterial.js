@@ -11,20 +11,14 @@
 
 THREE.ParticleCanvasMaterial = function ( parameters ) {
 
-	this.id = THREE.MaterialCounter.value ++;
+	THREE.Material.call( this, parameters );
 
-	this.color = new THREE.Color( 0xffffff );
-	this.program = function ( context, color ) {};
-	this.opacity = 1;
-	this.blending = THREE.NormalBlending;
+	parameters = parameters || {};
 
-	if ( parameters ) {
-
-		if ( parameters.color !== undefined ) this.color.setHex( parameters.color );
-		if ( parameters.program !== undefined ) this.program = parameters.program;
-		if ( parameters.opacity !== undefined ) this.opacity = parameters.opacity;
-		if ( parameters.blending !== undefined ) this.blending = parameters.blending;
-
-	}
+	this.color = parameters.color !== undefined ? new THREE.Color( parameters.color ) : new THREE.Color( 0xffffff );
+	this.program = parameters.program !== undefined ? parameters.program : function ( context, color ) {};
 
 };
+
+THREE.ParticleCanvasMaterial.prototype = new THREE.Material();
+THREE.ParticleCanvasMaterial.prototype.constructor = THREE.ParticleCanvasMaterial;

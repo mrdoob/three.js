@@ -15,28 +15,16 @@
 
 THREE.MeshNormalMaterial = function ( parameters ) {
 
-	this.id = THREE.MaterialCounter.value ++;
+	THREE.Material.call( this, parameters );
 
-	this.opacity = 1.0;
+	parameters = parameters || {};
 
-	this.shading = THREE.FlatShading;
-	this.blending = THREE.NormalBlending;
-	this.depthTest = true;
+	this.shading = parameters.shading ? parameters.shading : THREE.FlatShading;
 
-	this.wireframe = false;
-	this.wireframeLinewidth = 1.0;
-
-	if ( parameters ) {
-
-		if ( parameters.opacity !== undefined ) this.opacity  = parameters.opacity;
-
-		if ( parameters.shading !== undefined ) this.shading  = parameters.shading;
-		if ( parameters.blending !== undefined ) this.blending = parameters.blending;
-		if ( parameters.depthTest !== undefined ) this.depthTest = parameters.depthTest;
-
-		if ( parameters.wireframe !== undefined ) this.wireframe = parameters.wireframe;
-		if ( parameters.wireframeLinewidth !== undefined ) this.wireframeLinewidth = parameters.wireframeLinewidth;
-
-	}
+	this.wireframe = parameters.wireframe ? parameters.wireframe : false;
+	this.wireframeLinewidth = parameters.wireframeLinewidth ? parameters.wireframeLinewidth : 1;
 
 };
+
+THREE.MeshNormalMaterial.prototype = new THREE.Material();
+THREE.MeshNormalMaterial.prototype.constructor = THREE.MeshNormalMaterial;

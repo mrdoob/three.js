@@ -126,7 +126,7 @@
 					body: 		[],
 					chrome: 	new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: textureCube } ),
 					darkchrome: new THREE.MeshLambertMaterial( { color: 0x444444, envMap: textureCube } ),
-					glass:		new THREE.MeshBasicMaterial( { color: 0x223344, envMap: textureCube, opacity: 0.25, combine: THREE.MixOperation, reflectivity: 0.25 } ),
+					glass:		new THREE.MeshBasicMaterial( { color: 0x223344, envMap: textureCube, opacity: 0.25, combine: THREE.MixOperation, reflectivity: 0.25, transparent: true } ),
 					tire:       new THREE.MeshLambertMaterial( { color: 0x050505 } ),
 					interior:   new THREE.MeshPhongMaterial( { color: 0x050505, shininess: 20 } ),
 					black:      new THREE.MeshLambertMaterial( { color: 0x000000 } )

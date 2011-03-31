@@ -52,7 +52,6 @@ COMMON_FILES = [
 'materials/ParticleCanvasMaterial.js',
 'materials/ParticleDOMMaterial.js',
 'materials/Texture.js',
-'materials/RenderTarget.js',
 'materials/Uniforms.js',
 'objects/Particle.js',
 'objects/ParticleSystem.js',
@@ -73,6 +72,7 @@ COMMON_FILES = [
 'renderers/SVGRenderer.js',
 'renderers/WebGLShaders.js',
 'renderers/WebGLRenderer.js',
+'renderers/WebGLRenderTarget.js',
 'renderers/SoundRenderer.js',
 'renderers/renderables/RenderableVertex.js',
 'renderers/renderables/RenderableFace3.js',
@@ -273,7 +273,6 @@ WEBGL_FILES = [
 'materials/ParticleBasicMaterial.js',
 'materials/ShadowVolumeDynamicMaterial.js',
 'materials/Texture.js',
-'materials/RenderTarget.js',
 'materials/Uniforms.js',
 'objects/Particle.js',
 'objects/ParticleSystem.js',
@@ -291,7 +290,8 @@ WEBGL_FILES = [
 'renderers/Projector.js',
 'renderers/SoundRenderer.js',
 'renderers/WebGLShaders.js',
-'renderers/WebGLRenderer.js'
+'renderers/WebGLRenderer.js',
+'renderers/WebGLRenderTarget.js'
 ]
 
 def merge(files):

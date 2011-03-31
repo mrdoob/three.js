@@ -154,9 +154,9 @@
 				sceneScreen = new THREE.Scene();
 
 				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter };
-				rtTexture1 = new THREE.RenderTarget( window.innerWidth, window.innerHeight, pars );
-				rtTexture2 = new THREE.RenderTarget( 512, 512, pars );
-				rtTexture3 = new THREE.RenderTarget( 512, 512, pars );
+				rtTexture1 = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
+				rtTexture2 = new THREE.WebGLRenderTarget( 512, 512, pars );
+				rtTexture3 = new THREE.WebGLRenderTarget( 512, 512, pars );
 
 				var screen_shader = ShaderUtils.lib["screen"];
 				var screen_uniforms = Uniforms.clone( screen_shader.uniforms );

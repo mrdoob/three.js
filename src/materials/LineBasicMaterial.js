@@ -19,34 +19,19 @@
 
 THREE.LineBasicMaterial = function ( parameters ) {
 
-	this.id = THREE.MaterialCounter.value ++;
+	THREE.Material.call( this, parameters );
 
-	this.color = new THREE.Color( 0xffffff );
-	this.opacity = 1.0;
+	parameters = parameters || {};
 
-	this.blending = THREE.NormalBlending;
-	this.depthTest = true;
+	this.color = parameters.color !== undefined ? new THREE.Color( parameters.color ) : new THREE.Color( 0xffffff );
 
-	this.linewidth = 1.0;
-	this.linecap = 'round'; // implemented just in CanvasRenderer
-	this.linejoin = 'round'; // implemented just in CanvasRenderer
+	this.linewidth = parameters.linewidth !== undefined ? parameters.linewidth : 1;
+	this.linecap = parameters.linecap !== undefined ? parameters.linecap : 'round';
+	this.linejoin = parameters.linejoin !== undefined ? parameters.linejoin : 'round';
 
-	this.vertexColors = false;
-
-	if ( parameters ) {
-
-		if ( parameters.color !== undefined ) this.color.setHex( parameters.color );
-		if ( parameters.opacity !== undefined ) this.opacity  = parameters.opacity;
-
-		if ( parameters.blending !== undefined ) this.blending = parameters.blending;
-		if ( parameters.depthTest !== undefined ) this.depthTest = parameters.depthTest;
-
-		if ( parameters.linewidth !== undefined ) this.linewidth = parameters.linewidth;
-		if ( parameters.linecap !== undefined ) this.linecap = parameters.linecap;
-		if ( parameters.linejoin !== undefined ) this.linejoin = parameters.linejoin;
-
-		if ( parameters.vertexColors !== undefined ) this.vertexColors = parameters.vertexColors;
-
-	}
+	this.vertexColors = parameters.vertexColors ? parameters.vertexColors : false;
 
 };
+
+THREE.LineBasicMaterial.prototype = new THREE.Material();
+THREE.LineBasicMaterial.prototype.constructor = THREE.LineBasicMaterial;

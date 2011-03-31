@@ -63,11 +63,10 @@ THREE.Mesh.prototype.supr = THREE.Object3D.prototype;
 
 THREE.Mesh.prototype.getMorphTargetIndexByName = function( name ) {
 
-	if( this.morphTargetDictionary[ name ] !== undefined ) {
-		
+	if ( this.morphTargetDictionary[ name ] !== undefined ) {
+
 		return this.morphTargetDictionary[ name ];
 	}
-	
 
 	console.log( "THREE.Mesh.getMorphTargetIndexByName: morph target " + name + " does not exist. Returning 0." );	
 	return 0;

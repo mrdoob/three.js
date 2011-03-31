@@ -4,7 +4,7 @@
 
 THREE.ParticleDOMMaterial = function ( domElement ) {
 
-	this.id = THREE.MaterialCounter.value ++;
+	THREE.Material.call( this );
 
 	this.domElement = domElement;
 

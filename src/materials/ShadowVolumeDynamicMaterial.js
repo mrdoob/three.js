@@ -28,32 +28,36 @@
 
 THREE.ShadowVolumeDynamicMaterial = function ( parameters ) {
 
-	this.id = THREE.MaterialCounter.value ++;
+	THREE.Material.call( this, parameters );
 
-	this.color = new THREE.Color( 0xffffff );
-	this.opacity = 1.0;
-	this.map = null;
+	parameters = parameters || {};
 
-	this.lightMap = null;
+	this.color = parameters.color !== undefined ? new THREE.Color( parameters.color ) : new THREE.Color( 0xffffff );
 
-	this.envMap = null;
-	this.combine = THREE.MultiplyOperation;
-	this.reflectivity = 1.0;
-	this.refractionRatio = 0.98;
+	this.map = parameters.map !== undefined ? parameters.map : null;
 
-	this.fog = true; // implemented just in WebGLRenderer2
+	this.lightMap = parameters.lightMap !== undefined ? parameters.lightMap : null;
 
-	this.shading = THREE.FlatShading;
-	this.blending = THREE.NormalBlending;
-	this.depthTest = true;
+	this.envMap = parameters.envMap !== undefined ? parameters.envMap : null;
+	this.combine = parameters.combine !== undefined ? parameters.combine : THREE.MultiplyOperation;
+	this.reflectivity = parameters.reflectivity !== undefined ? parameters.reflectivity : 1;
+	this.refractionRatio = parameters.refractionRatio !== undefined ? parameters.refractionRatio : 0.98;
 
-	this.wireframe = false;
-	this.wireframeLinewidth = 1.0;
-	this.wireframeLinecap = 'round'; // implemented just in CanvasRenderer
-	this.wireframeLinejoin = 'round'; // implemented just in CanvasRenderer
+	// this.enableFog = parameters.enableFog ? parameters.enableFog : true;
 
-	this.vertexColors = false;
-	this.skinning = false;
-	this.morphTargets = false;
+	this.shading = parameters.shading !== undefined ? parameters.shading : THREE.SmoothShading;
+
+	this.wireframe = parameters.wireframe !== undefined ? parameters.wireframe : false;
+	this.wireframeLinewidth = parameters.wireframeLinewidth !== undefined ? parameters.wireframeLinewidth : 1;
+	this.wireframeLinecap = parameters.wireframeLinecap !== undefined ? parameters.wireframeLinecap : 'round';
+	this.wireframeLinejoin = parameters.wireframeLinejoin !== undefined ? parameters.wireframeLinejoin : 'round';
+
+	this.vertexColors = parameters.vertexColors !== undefined ? parameters.vertexColors : false;
+
+	this.skinning = parameters.skinning !== undefined ? parameters.skinning : false;
+	this.morphTargets = parameters.morphTargets !== undefined ? parameters.morphTargets : false;
 
 };
+
+THREE.ShadowVolumeDynamicMaterial.prototype = new THREE.Material();
+THREE.ShadowVolumeDynamicMaterial.prototype.constructor = THREE.ShadowVolumeDynamicMaterial;
