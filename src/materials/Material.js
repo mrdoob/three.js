@@ -14,5 +14,7 @@ THREE.NormalBlending = 0;
 THREE.AdditiveBlending = 1;
 THREE.SubtractiveBlending = 2;
 THREE.MultiplyBlending = 3;
+THREE.AdditiveAlphaBlending = 4;
+
 
 THREE.MaterialCounter = { value: 0 };

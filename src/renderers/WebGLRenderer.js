@@ -24,6 +24,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_canvas = document.createElement( 'canvas' ),
 	_currentProgram = null,
 	_currentFramebuffer = null,
+	_currentDepthMask = true,
 
 	_this = this,
 
@@ -69,12 +70,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// parameters defaults
 
+	stencil = true,
 	antialias = true,
 	clearColor = new THREE.Color( 0x000000 ),
 	clearAlpha = 0;
 
 	if ( parameters ) {
 
+		if ( parameters.stencil != undefined ) stencil = parameters.stencil;
 		if ( parameters.antialias !== undefined ) antialias = parameters.antialias;
 		if ( parameters.clearColor !== undefined ) clearColor.setHex( parameters.clearColor );
 		if ( parameters.clearAlpha !== undefined ) clearAlpha = parameters.clearAlpha;
@@ -86,45 +89,114 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.autoClear = true;
 	this.sortObjects = true;
 
-	initGL( antialias, clearColor, clearAlpha );
+	initGL( antialias, clearColor, clearAlpha, stencil );
 
 	this.context = _gl;
 
 
-	// create shadow polygons
+	// prepare stencil shadow polygon
 
-	var _shadow   = {};
-	var vertices = [];
-	var faces    = [];
+	if( stencil ) {
+		
+		var _stencilShadow      = {};
+		
+		_stencilShadow.vertices = new Float32Array( 12 );
+		_stencilShadow.faces    = new Uint16Array( 6 );
+		_stencilShadow.darkness = 0.5;
+		
+		_stencilShadow.vertices[ 0 * 3 + 0 ] = -2; _stencilShadow.vertices[ 0 * 3 + 1 ] = -1; _stencilShadow.vertices[ 0 * 3 + 2 ] = -1;
+		_stencilShadow.vertices[ 1 * 3 + 0 ] =  2; _stencilShadow.vertices[ 1 * 3 + 1 ] = -1; _stencilShadow.vertices[ 1 * 3 + 2 ] = -1;
+		_stencilShadow.vertices[ 2 * 3 + 0 ] =  2; _stencilShadow.vertices[ 2 * 3 + 1 ] =  1; _stencilShadow.vertices[ 2 * 3 + 2 ] = -1;
+		_stencilShadow.vertices[ 3 * 3 + 0 ] = -2; _stencilShadow.vertices[ 3 * 3 + 1 ] =  1; _stencilShadow.vertices[ 3 * 3 + 2 ] = -1;
+		
+		_stencilShadow.faces[ 0 ] = 0; _stencilShadow.faces[ 1 ] = 1; _stencilShadow.faces[ 2 ] = 2;
+		_stencilShadow.faces[ 3 ] = 0; _stencilShadow.faces[ 4 ] = 2; _stencilShadow.faces[ 5 ] = 3;
+	
+	
+		_stencilShadow.vertexBuffer  = _gl.createBuffer();
+		_stencilShadow.elementBuffer = _gl.createBuffer();
+		
+		_gl.bindBuffer( _gl.ARRAY_BUFFER, _stencilShadow.vertexBuffer );
+		_gl.bufferData( _gl.ARRAY_BUFFER,  _stencilShadow.vertices, _gl.STATIC_DRAW );
+	
+		_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, _stencilShadow.elementBuffer );
+		_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, _stencilShadow.faces, _gl.STATIC_DRAW );
+		
+	
+		_stencilShadow.program = _gl.createProgram();
+	
+		_gl.attachShader( _stencilShadow.program, getShader( "fragment", THREE.ShaderLib.shadowPost.fragmentShader ));
+		_gl.attachShader( _stencilShadow.program, getShader( "vertex",   THREE.ShaderLib.shadowPost.vertexShader   ));
+	
+		_gl.linkProgram( _stencilShadow.program );
+	
+		_stencilShadow.vertexLocation     = _gl.getAttribLocation ( _stencilShadow.program, "position"         );
+		_stencilShadow.projectionLocation = _gl.getUniformLocation( _stencilShadow.program, "projectionMatrix" );
+		_stencilShadow.darknessLocation   = _gl.getUniformLocation( _stencilShadow.program, "darkness"         );
+	}
+	
+	
+	// prepare lens flare
+	
+	var _lensFlare = {};
+	var i;
+	
+	_lensFlare.vertices     = new Float32Array( 8 + 8 );
+	_lensFlare.faces        = new Uint16Array( 6 );
+	_lensFlare.transparency = 0.5;
+	
+	i = 0;
+	_lensFlare.vertices[ i++ ] = -1; _lensFlare.vertices[ i++ ] = -1;	// vertex
+	_lensFlare.vertices[ i++ ] = 0;  _lensFlare.vertices[ i++ ] = 0;	// uv... etc.
+	_lensFlare.vertices[ i++ ] = 1;  _lensFlare.vertices[ i++ ] = -1;
+	_lensFlare.vertices[ i++ ] = 1;  _lensFlare.vertices[ i++ ] = 0;
+	_lensFlare.vertices[ i++ ] = 1;  _lensFlare.vertices[ i++ ] = 1;
+	_lensFlare.vertices[ i++ ] = 1;  _lensFlare.vertices[ i++ ] = 1;
+	_lensFlare.vertices[ i++ ] = -1; _lensFlare.vertices[ i++ ] = 1;
+	_lensFlare.vertices[ i++ ] = 0;  _lensFlare.vertices[ i++ ] = 1;
 
-	vertices[ 0 * 3 + 0 ] = -2; vertices[ 0 * 3 + 1 ] = -1; vertices[ 0 * 3 + 2 ] = -1;
-	vertices[ 1 * 3 + 0 ] =  2; vertices[ 1 * 3 + 1 ] = -1; vertices[ 1 * 3 + 2 ] = -1;
-	vertices[ 2 * 3 + 0 ] =  2; vertices[ 2 * 3 + 1 ] =  1; vertices[ 2 * 3 + 2 ] = -1;
-	vertices[ 3 * 3 + 0 ] = -2; vertices[ 3 * 3 + 1 ] =  1; vertices[ 3 * 3 + 2 ] = -1;
+	i = 0;
+	_lensFlare.faces[ i++ ] = 0; _lensFlare.faces[ i++ ] = 1; _lensFlare.faces[ i++ ] = 2;
+	_lensFlare.faces[ i++ ] = 0; _lensFlare.faces[ i++ ] = 2; _lensFlare.faces[ i++ ] = 3;
 
-	faces[ 0 ] = 0; faces[ 1 ] = 1; faces[ 2 ] = 2;
-	faces[ 3 ] = 0; faces[ 4 ] = 2; faces[ 5 ] = 3;
+	_lensFlare.vertexBuffer  = _gl.createBuffer();
+	_lensFlare.elementBuffer = _gl.createBuffer();
+	_lensFlare.tempTexture   = _gl.createTexture();
+	_lensFlare.readBackPixels = new Uint8Array( 16*16*4 );
+	
+	_gl.bindBuffer( _gl.ARRAY_BUFFER, _lensFlare.vertexBuffer );
+	_gl.bufferData( _gl.ARRAY_BUFFER,  _lensFlare.vertices, _gl.STATIC_DRAW );
+
+	_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, _lensFlare.elementBuffer );
+	_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, _lensFlare.faces, _gl.STATIC_DRAW );
+
+	_gl.bindTexture( _gl.TEXTURE_2D, _lensFlare.tempTexture );
+	_gl.texImage2D( _gl.TEXTURE_2D, 0, _gl.RGB, 16, 16, 0, _gl.RGB, _gl.UNSIGNED_BYTE, null );
+	_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_S, _gl.CLAMP_TO_EDGE );
+	_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_T, _gl.CLAMP_TO_EDGE );
+	_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MAG_FILTER, _gl.NEAREST );
+	_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, _gl.NEAREST );
 
 
-	_shadow.vertexBuffer  = _gl.createBuffer();
-	_shadow.elementBuffer = _gl.createBuffer();
+	_lensFlare.program = _gl.createProgram();
 
-	_gl.bindBuffer( _gl.ARRAY_BUFFER, _shadow.vertexBuffer );
-	_gl.bufferData( _gl.ARRAY_BUFFER, new Float32Array( vertices ), _gl.STATIC_DRAW );
+	_gl.attachShader( _lensFlare.program, getShader( "fragment", THREE.ShaderLib.lensFlare.fragmentShader ));
+	_gl.attachShader( _lensFlare.program, getShader( "vertex",   THREE.ShaderLib.lensFlare.vertexShader   ));
 
-	_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, _shadow.elementBuffer );
-	_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, new Uint16Array( faces ), _gl.STATIC_DRAW );
+	_gl.linkProgram( _lensFlare.program );
+
+	_lensFlare.attributes = {};
+	_lensFlare.uniforms = {};
+	_lensFlare.attributes.vertex       = _gl.getAttribLocation ( _lensFlare.program, "position" );
+	_lensFlare.attributes.uv           = _gl.getAttribLocation ( _lensFlare.program, "UV" );
+	_lensFlare.uniforms.map            = _gl.getUniformLocation( _lensFlare.program, "map" );
+	_lensFlare.uniforms.opacity        = _gl.getUniformLocation( _lensFlare.program, "opacity" );
+	_lensFlare.uniforms.scale          = _gl.getUniformLocation( _lensFlare.program, "scale" );
+	_lensFlare.uniforms.rotation       = _gl.getUniformLocation( _lensFlare.program, "rotation" );
+	_lensFlare.uniforms.screenPosition = _gl.getUniformLocation( _lensFlare.program, "screenPosition" );
+	_lensFlare.uniforms.renderPink     = _gl.getUniformLocation( _lensFlare.program, "renderPink" );
 
 
-	_shadow.program = _gl.createProgram();
-
-	_gl.attachShader( _shadow.program, getShader( "fragment", THREE.ShaderLib.shadowPost.fragmentShader ));
-	_gl.attachShader( _shadow.program, getShader( "vertex",   THREE.ShaderLib.shadowPost.vertexShader   ));
-
-	_gl.linkProgram( _shadow.program );
-
-	_shadow.vertexLocation     = _gl.getAttribLocation ( _shadow.program, "position"         );
-	_shadow.projectionLocation = _gl.getUniformLocation( _shadow.program, "projectionMatrix" );
 
 
 	this.setSize = function ( width, height ) {
@@ -165,6 +237,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.enableDepthBufferWrite = function ( enable ) {
 
+		_currentDepthMask = enable;
 		_gl.depthMask( enable );
 
 	};
@@ -186,6 +259,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_gl.clear( _gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT | _gl.STENCIL_BUFFER_BIT );
 
+	};
+
+	this.setStencilShadowDarkness = function( value ) {
+		
+		_stencilShadow.darkness = value;
 	};
 
 
@@ -2582,139 +2660,21 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		// render stencil shadows
 
+		if( stencil && scene.__webglShadowVolumes.length && scene.lights.length ) {
 
-		//////////////////////// stencil shadows begin //////////////////////
-		// method: we're rendering the world in light, then the shadow
-		//         volumes into the stencil and last a big darkening 
-		//         quad over the whole thing. This is NOT how you're
-		//         supposed to do stencil shadows but is much faster
-		//
-
-		if ( scene.__webglShadowVolumes.length && scene.lights.length ) {
-
-			// setup stencil
-
-			_gl.enable( _gl.POLYGON_OFFSET_FILL );
-			_gl.polygonOffset( 0.1, 1.0 );
-			_gl.enable( _gl.STENCIL_TEST );
-			_gl.depthMask( false );
-			_gl.colorMask( false, false, false, false );
-
-			_gl.stencilFunc( _gl.ALWAYS, 1, 0xFF );
-			_gl.stencilOpSeparate( _gl.BACK,  _gl.KEEP, _gl.INCR, _gl.KEEP );
-			_gl.stencilOpSeparate( _gl.FRONT, _gl.KEEP, _gl.DECR, _gl.KEEP );
-
-
-			// loop through all directional lights
-
-			var l, ll = scene.lights.length,
-			p, light, geometryGroup, dirLight = [],
-			program, p_uniforms, m_uniforms,
-			attributes;
-
-			ol = scene.__webglShadowVolumes.length;
-
-			for ( l = 0; l < ll; l++ ) {
-
-				light = scene.lights[ l ];
-
-				if ( light instanceof THREE.DirectionalLight ) {
-
-					dirLight[ 0 ] = -light.position.x;
-					dirLight[ 1 ] = -light.position.y;
-					dirLight[ 2 ] = -light.position.z;
-
-					// render all volumes
-
-					for ( o = 0; o < ol; o++ ) {
-
-						object        = scene.__webglShadowVolumes[ o ].object;
-						geometryGroup = scene.__webglShadowVolumes[ o ].buffer;
-						material      = object.materials[ 0 ];
-
-
-						if ( !material.program ) _this.initMaterial( material, lights, fog, object );
-
-						program = material.program,
-			  			p_uniforms = program.uniforms,
-						m_uniforms = material.uniforms,
-						attributes = program.attributes;
-
-
-						if ( _currentProgram !== program ) {
-
-							_gl.useProgram( program );
-							_currentProgram = program;
-
-							_gl.uniformMatrix4fv( p_uniforms.projectionMatrix, false, _projectionMatrixArray );
-							_gl.uniformMatrix4fv( p_uniforms.viewMatrix, false, _viewMatrixArray );
-							_gl.uniform3fv( p_uniforms.directionalLightDirection, dirLight );
-						}
-
-
-						object.matrixWorld.flattenToArray( object._objectMatrixArray );
-						//object._modelViewMatrix.multiplyToArray( camera.matrixWorldInverse, object.matrixWorld, object._modelViewMatrixArray );
-
-						_gl.uniformMatrix4fv( p_uniforms.objectMatrix, false, object._objectMatrixArray );
-						//_gl.uniformMatrix4fv( p_uniforms.modelViewMatrix, false, object._modelViewMatrixArray );
-
-						_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglVertexBuffer );
-						_gl.vertexAttribPointer( attributes.position, 3, _gl.FLOAT, false, 0, 0 );
-
-						_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglNormalBuffer );
-						_gl.vertexAttribPointer( attributes.normal, 3, _gl.FLOAT, false, 0, 0 );
-
-						_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryGroup.__webglFaceBuffer );
-
-						_gl.cullFace( _gl.FRONT );
-						_gl.drawElements( _gl.TRIANGLES, geometryGroup.__webglFaceCount, _gl.UNSIGNED_SHORT, 0 );
-
-						_gl.cullFace( _gl.BACK );
-						_gl.drawElements( _gl.TRIANGLES, geometryGroup.__webglFaceCount, _gl.UNSIGNED_SHORT, 0 );
-
-					}
-
-				}
-
-			}
-
-			// draw darkening polygon
-
-			_gl.disable( _gl.POLYGON_OFFSET_FILL );
-			_gl.colorMask( true, true, true, true );
-			_gl.stencilFunc( _gl.NOTEQUAL, 0, 0xFF );
-			_gl.stencilOp( _gl.KEEP, _gl.KEEP, _gl.KEEP );
-			_gl.disable( _gl.DEPTH_TEST );
-
-			_gl.enable( _gl.BLEND );
-			_gl.blendFunc( _gl.ONE, _gl.ONE_MINUS_SRC_ALPHA );
-			_gl.blendEquation( _gl.FUNC_ADD );
-
-			_oldBlending = "";
-			_currentProgram = _shadow.program;
-
-			_gl.useProgram( _shadow.program );
-			_gl.uniformMatrix4fv( _shadow.projectionLocation, false, _projectionMatrixArray );
-
-			_gl.bindBuffer( _gl.ARRAY_BUFFER, _shadow.vertexBuffer );
-			_gl.vertexAttribPointer( _shadow.vertexLocation, 3, _gl.FLOAT, false, 0, 0 );
-			_gl.enableVertexAttribArray( _shadow.vertexLocation );
-
-			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, _shadow.elementBuffer );
-			_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
-
-			// disable stencil
-
-			_gl.disable( _gl.STENCIL_TEST );
-			_gl.enable( _gl.DEPTH_TEST );
-			_gl.disable( _gl.BLEND );
-			_gl.depthMask( true );
-
+			renderStencilShadows( scene );
+		
 		}
 
-
-		//////////////////////// stencil shadows end //////////////////////
+		// render lens flares
+		
+		if( scene.__webglLensFlares.length ) {
+			
+			renderLensFlares( scene, camera );
+		
+		}
 
 
 		// Generate mipmap if we're using any kind of mipmap filtering
@@ -2726,6 +2686,367 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 	};
+
+
+	
+
+
+	/*
+	 * Stencil Shadows
+	 * method: we're rendering the world in light, then the shadow
+	 *         volumes into the stencil and last a big darkening 
+	 *         quad over the whole thing. This is not how "you're
+	 *	       supposed to" do stencil shadows but is much faster
+	 * 
+	 */
+
+	function renderStencilShadows( scene ) {
+			
+		// setup stencil
+
+		_gl.enable( _gl.POLYGON_OFFSET_FILL );
+		_gl.polygonOffset( 0.1, 1.0 );
+		_gl.enable( _gl.STENCIL_TEST );
+		_gl.depthMask( false );
+		_gl.colorMask( false, false, false, false );
+	
+		_gl.stencilFunc( _gl.ALWAYS, 1, 0xFF );
+		_gl.stencilOpSeparate( _gl.BACK,  _gl.KEEP, _gl.INCR, _gl.KEEP );
+		_gl.stencilOpSeparate( _gl.FRONT, _gl.KEEP, _gl.DECR, _gl.KEEP );
+
+		
+		// loop through all directional lights
+		
+		var l, ll = scene.lights.length;
+		var p;
+		var light, lights = scene.lights;
+		var dirLight = [];			
+		var object, geometryGroup, material;
+		var	program;
+		var p_uniforms;
+	    var m_uniforms;
+	    var attributes;
+		var o, ol = scene.__webglShadowVolumes.length;
+		
+		for( l = 0; l < ll; l++ ) {
+			
+			light = scene.lights[ l ];
+			
+			if( light instanceof THREE.DirectionalLight ) {
+
+				dirLight[ 0 ] = -light.position.x;
+				dirLight[ 1 ] = -light.position.y;
+				dirLight[ 2 ] = -light.position.z;
+
+				
+				// render all volumes
+				
+				for( o = 0; o < ol; o++ ) {
+		
+					object        = scene.__webglShadowVolumes[ o ].object;
+					geometryGroup = scene.__webglShadowVolumes[ o ].buffer;
+					material      = object.materials[ 0 ];
+
+					if ( !material.program ) _this.initMaterial( material, lights, undefined, object );
+
+					program = material.program,
+		  			p_uniforms = program.uniforms,
+	                m_uniforms = material.uniforms,
+	                attributes = program.attributes;
+
+
+					if( _currentProgram !== program ) {
+						
+						_gl.useProgram( program );
+						_currentProgram = program;
+
+						_gl.uniformMatrix4fv( p_uniforms.projectionMatrix, false, _projectionMatrixArray );
+						_gl.uniformMatrix4fv( p_uniforms.viewMatrix, false, _viewMatrixArray );
+						_gl.uniform3fv( p_uniforms.directionalLightDirection, dirLight );
+					}
+
+
+					object.matrixWorld.flattenToArray( object._objectMatrixArray );
+					_gl.uniformMatrix4fv( p_uniforms.objectMatrix, false, object._objectMatrixArray );
+
+
+					_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglVertexBuffer );
+					_gl.vertexAttribPointer( attributes.position, 3, _gl.FLOAT, false, 0, 0 );
+
+					_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglNormalBuffer );
+					_gl.vertexAttribPointer( attributes.normal, 3, _gl.FLOAT, false, 0, 0 );
+
+					_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryGroup.__webglFaceBuffer );
+
+					_gl.cullFace( _gl.FRONT );
+					_gl.drawElements( _gl.TRIANGLES, geometryGroup.__webglFaceCount, _gl.UNSIGNED_SHORT, 0 );
+
+					_gl.cullFace( _gl.BACK );
+					_gl.drawElements( _gl.TRIANGLES, geometryGroup.__webglFaceCount, _gl.UNSIGNED_SHORT, 0 );
+			
+				}
+
+			}
+
+		}
+
+
+		// setup color+stencil
+
+		_gl.disable( _gl.POLYGON_OFFSET_FILL );
+		_gl.colorMask( true, true, true, true );
+		_gl.stencilFunc( _gl.NOTEQUAL, 0, 0xFF );
+		_gl.stencilOp( _gl.KEEP, _gl.KEEP, _gl.KEEP );
+	    _gl.disable( _gl.DEPTH_TEST );
+
+
+		// draw darkening polygon	
+
+		_oldBlending = "";
+		_currentProgram = _stencilShadow.program;
+
+		_gl.useProgram( _stencilShadow.program );
+		_gl.uniformMatrix4fv( _stencilShadow.projectionLocation, false, _projectionMatrixArray );
+		_gl.uniform1f( _stencilShadow.darknessLocation, _stencilShadow.darkness );
+		
+		_gl.bindBuffer( _gl.ARRAY_BUFFER, _stencilShadow.vertexBuffer );
+		_gl.vertexAttribPointer( _stencilShadow.vertexLocation, 3, _gl.FLOAT, false, 0, 0 );
+		_gl.enableVertexAttribArray( _stencilShadow.vertexLocation );
+
+		_gl.blendFunc( _gl.ONE, _gl.ONE_MINUS_SRC_ALPHA );
+		_gl.blendEquation( _gl.FUNC_ADD );
+			
+		_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, _stencilShadow.elementBuffer );
+		_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
+
+
+		// disable stencil
+
+	    _gl.disable	 ( _gl.STENCIL_TEST );
+	    _gl.enable	 ( _gl.DEPTH_TEST );
+	    _gl.depthMask( _currentDepthMask );
+	}
+
+	/*
+	 * Render lens flares
+	 * Method: renders 16x16 0xff00ff-colored points scattered over the light source area, 
+	 *         reads these back and calculates occlusion.  
+	 *         Then LensFlare.updateLensFlares() is called to re-position and 
+	 *         update transparency of flares. Then they are rendered.
+	 * 
+	 */
+
+	function renderLensFlares( scene, camera ) {
+		
+		var object, objectZ, geometryGroup, material;
+		var o, ol = scene.__webglLensFlares.length;
+		var f, fl, flare;
+		var tempPosition = new THREE.Vector3();
+		var invAspect = _viewportHeight / _viewportWidth;
+		var halfViewportWidth = _viewportWidth * 0.5;
+		var halfViewportHeight = _viewportHeight * 0.5;
+		var size = 16 / _viewportHeight;
+		var scale = [ size * invAspect, size ];
+		var screenPosition = [ 1, 1, 0 ];
+		var screenPositionPixels = [ 1, 1 ];
+		var sampleX, sampleY, readBackPixels = _lensFlare.readBackPixels;
+		var sampleMidX = 7 * 4;
+		var sampleMidY = 7 * 16 * 4;
+		var sampleIndex, visibility;
+		var uniforms = _lensFlare.uniforms;
+		var attributes = _lensFlare.attributes;
+
+
+		// set lensflare program and reset blending
+
+		_gl.useProgram( _lensFlare.program );
+		_currentProgram = _lensFlare.program;
+		_oldBlending = "";
+
+
+		// loop through all lens flares to update their occlusion and positions
+		// setup gl and common used attribs/unforms
+
+		_gl.uniform1i( uniforms.map, 0 );
+		_gl.activeTexture( _gl.TEXTURE0 );
+		
+		_gl.uniform1f( uniforms.opacity, 1 );
+		_gl.uniform1f( uniforms.rotation, 0 );
+		_gl.uniform2fv( uniforms.scale, scale );
+
+		_gl.bindBuffer( _gl.ARRAY_BUFFER, _lensFlare.vertexBuffer );
+		_gl.vertexAttribPointer( attributes.vertex, 2, _gl.FLOAT, false, 2 * 8, 0 );
+		_gl.vertexAttribPointer( attributes.uv, 2, _gl.FLOAT, false, 2 * 8, 8 );
+
+		_gl.bindTexture( _gl.TEXTURE_2D, _lensFlare.tempTexture );
+
+		_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, _lensFlare.elementBuffer );
+
+		_gl.disable( _gl.CULL_FACE );
+		_gl.depthMask( false );
+
+
+		for( o = 0; o < ol; o++ ) {
+			
+			// calc object screen position
+			
+			object = scene.__webglLensFlares[ o ].object;
+			
+			tempPosition.set( object.matrixWorld.n14, object.matrixWorld.n24, object.matrixWorld.n34 );
+			
+			camera.matrixWorldInverse.multiplyVector3( tempPosition );
+			objectZ = tempPosition.z;
+			camera.projectionMatrix.multiplyVector3( tempPosition );
+			
+			
+			// setup arrays for gl programs
+			
+			screenPosition[ 0 ] = tempPosition.x;
+			screenPosition[ 1 ] = tempPosition.y;
+			screenPosition[ 2 ] = tempPosition.z;
+			
+			screenPositionPixels[ 0 ] = screenPosition[ 0 ] * halfViewportWidth + halfViewportWidth;
+			screenPositionPixels[ 1 ] = screenPosition[ 1 ] * halfViewportHeight + halfViewportHeight;
+	
+
+			// save current RGB to temp texture
+			
+			_gl.copyTexSubImage2D( _gl.TEXTURE_2D, 0, 0, 0, screenPositionPixels[ 0 ] - 8, screenPositionPixels[ 1 ] - 8, 16, 16 );
+
+	
+			// render pink quad
+
+			_gl.uniform3fv( uniforms.screenPosition, screenPosition );
+			_gl.uniform1i( uniforms.renderPink, 1 );
+
+			_gl.enable( _gl.DEPTH_TEST );
+
+			_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
+
+
+			// read back
+
+			try {
+				
+				_gl.readPixels( screenPositionPixels[ 0 ] - 8, screenPositionPixels[ 1 ] - 8, 16, 16, _gl.RGBA, _gl.UNSIGNED_BYTE, _lensFlare.readBackPixels );
+				
+			}
+			catch( error ) {
+				
+				console.log( "WebGLRenderer.renderLensFlare: readPixels failed!" );
+			}
+
+			if( _gl.getError()) {
+				
+				console.log( "WebGLRenderer.renderLensFlare: readPixels failed!" );
+			}
+
+
+			// sample read back pixels
+
+			sampleDistance = parseInt( 5 * ( 1 - Math.max( 0, Math.min( -objectZ, camera.far )) / camera.far ), 10 ) + 2;
+			sampleX = sampleDistance * 4;
+			sampleY = sampleDistance * 4 * 16;
+
+			visibility = 0;
+
+			sampleIndex = ( sampleMidX - sampleX ) + ( sampleMidY - sampleY );	// upper left
+			if( _lensFlare.readBackPixels[ sampleIndex + 0 ] === 255 && 
+				_lensFlare.readBackPixels[ sampleIndex + 1 ] === 0 &&
+				_lensFlare.readBackPixels[ sampleIndex + 2 ] === 255 ) visibility += 0.2;			
+
+			sampleIndex = ( sampleMidX + sampleX ) + ( sampleMidY - sampleY );	// upper right
+			if( readBackPixels[ sampleIndex + 0 ] === 255 && 
+				readBackPixels[ sampleIndex + 1 ] === 0 &&
+				readBackPixels[ sampleIndex + 2 ] === 255 ) visibility += 0.2;			
+
+			sampleIndex = ( sampleMidX + sampleX ) + ( sampleMidY + sampleY );	// lower right
+			if( readBackPixels[ sampleIndex + 0 ] === 255 && 
+				readBackPixels[ sampleIndex + 1 ] === 0 &&
+				readBackPixels[ sampleIndex + 2 ] === 255 ) visibility += 0.2;			
+
+			sampleIndex = ( sampleMidX - sampleX ) + ( sampleMidY + sampleY );	// lower left
+			if( readBackPixels[ sampleIndex + 0 ] === 255 && 
+				readBackPixels[ sampleIndex + 1 ] === 0 &&
+				readBackPixels[ sampleIndex + 2 ] === 255 ) visibility += 0.2;			
+
+			sampleIndex = sampleMidX + sampleMidY;								// center
+			if( readBackPixels[ sampleIndex + 0 ] === 255 && 
+				readBackPixels[ sampleIndex + 1 ] === 0 &&
+				readBackPixels[ sampleIndex + 2 ] === 255 ) visibility += 0.2;			
+
+
+			object.positionScreen.x = screenPosition[ 0 ];
+			object.positionScreen.y = screenPosition[ 1 ];
+			object.positionScreen.z = screenPosition[ 2 ];
+
+			if( object.customUpdateCallback ) {
+				
+				object.customUpdateCallback( visibility, object );
+				
+			} else {
+				
+				object.updateLensFlares( visibility );
+				
+			}
+
+
+			// restore graphics
+		
+			_gl.uniform1i( uniforms.renderPink, 0 );
+			_gl.disable( _gl.DEPTH_TEST );
+			_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
+		}
+		
+		
+		// loop through all lens flares and draw their flares
+		// setup gl
+		
+		for( o = 0; o < ol; o++ ) {
+		
+			object = scene.__webglLensFlares[ o ].object;
+
+			for( f = 0, fl = object.lensFlares.length; f < fl; f++ ) {
+				
+				flare = object.lensFlares[ f ];
+				
+				if( flare.opacity > 0.001 && flare.scale > 0.001 ) {
+
+					screenPosition[ 0 ] = flare.x;
+					screenPosition[ 1 ] = flare.y;
+					screenPosition[ 2 ] = flare.z;
+	
+					size = flare.size * flare.scale / _viewportHeight;
+					scale[ 0 ] = size * invAspect;
+					scale[ 1 ] = size;
+						
+	
+					_gl.uniform3fv( uniforms.screenPosition, screenPosition );
+					_gl.uniform1f( uniforms.rotation, flare.rotation );
+					_gl.uniform2fv( uniforms.scale, scale );
+					_gl.uniform1f( uniforms.opacity, flare.opacity );
+	
+					setBlending( flare.blending );
+					setTexture( flare.texture, 0 );
+	
+					// todo: only draw if loaded
+			
+					_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
+				}
+				
+			}
+
+		}
+
+
+		// restore gl
+	
+		_gl.enable( _gl.CULL_FACE );
+		_gl.enable( _gl.DEPTH_TEST );
+		_gl.depthMask( _currentDepthMask );
+	}
+
+
 
 	function setupMatrices ( object, camera ) {
 
@@ -2741,6 +3062,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			scene.__webglObjects = [];
 			scene.__webglObjectsImmediate = [];
 			scene.__webglShadowVolumes = [];
+			scene.__webglLensFlares = [];
 		}
 
 		while ( scene.__objectsAdded.length ) {
@@ -2770,7 +3092,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 			updateObject( scene.__webglShadowVolumes[ o ].object, scene );
 
 		}
+		
+		for ( var o = 0, ol = scene.__webglLensFlares.length; o < ol; o ++ ) {
 
+			updateObject( scene.__webglLensFlares[ o ].object, scene );
+
+		}
 
 	};
 
@@ -2837,6 +3164,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
+		} else if ( object instanceof THREE.LensFlare ) {
+			
+			addBuffer( scene.__webglLensFlares, undefined, object );
+			
 		} else if ( object instanceof THREE.Ribbon ) {
 
 			geometry = object.geometry;
@@ -3139,11 +3470,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function initGL ( antialias, clearColor, clearAlpha ) {
+	function initGL ( antialias, clearColor, clearAlpha, stencil ) {
 
 		try {
 
-			if ( ! ( _gl = _canvas.getContext( 'experimental-webgl', { antialias: antialias, stencil:true } ) ) ) {
+			if ( ! ( _gl = _canvas.getContext( 'experimental-webgl', { antialias: antialias, stencil: stencil } ) ) ) {
 
 				throw 'Error creating WebGL context.';
 
@@ -3372,6 +3703,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( blending != _oldBlending ) {
 
 			switch ( blending ) {
+
+				case THREE.AdditiveAlphaBlending:
+				
+					_gl.blendEquation( _gl.FUNC_ADD );
+					_gl.blendFunc( _gl.SRC_ALPHA, _gl.ONE );
+				
+					break;
 
 				case THREE.AdditiveBlending:
 
