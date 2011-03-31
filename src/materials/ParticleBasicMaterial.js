@@ -18,36 +18,20 @@
 
 THREE.ParticleBasicMaterial = function ( parameters ) {
 
-	this.id = THREE.MaterialCounter.value ++;
+	THREE.Material.call( this, parameters );
 
-	this.color = new THREE.Color( 0xffffff );
-	this.opacity = 1.0;
-	this.map = null;
+	parameters = parameters || {};
 
-	this.size = 1.0;
-	this.sizeAttenuation = true;
+	this.color = parameters.color !== undefined ? new THREE.Color( parameters.color ) : new THREE.Color( 0xffffff );
 
-	this.blending = THREE.NormalBlending;
-	this.depthTest = true;
+	this.map = parameters.map !== undefined ? parameters.map : null;
 
-	this.offset = new THREE.Vector2(); // TODO: expose to parameters (implemented just in CanvasRenderer)
+	this.size = parameters.size !== undefined ? parameters.size : 1;
+	this.sizeAttenuation = parameters.sizeAttenuation !== undefined ? parameters.sizeAttenuation : true;
 
-	this.vertexColors = false;
-
-	if ( parameters ) {
-
-		if ( parameters.color !== undefined ) this.color.setHex( parameters.color );
-		if ( parameters.opacity !== undefined ) this.opacity  = parameters.opacity;
-		if ( parameters.map !== undefined ) this.map = parameters.map;
-
-		if ( parameters.size !== undefined ) this.size = parameters.size;
-		if ( parameters.sizeAttenuation !== undefined ) this.sizeAttenuation = parameters.sizeAttenuation;
-
-		if ( parameters.blending !== undefined ) this.blending = parameters.blending;
-		if ( parameters.depthTest !== undefined ) this.depthTest = parameters.depthTest;
-
-		if ( parameters.vertexColors !== undefined ) this.vertexColors = parameters.vertexColors;
-
-	}
+	this.vertexColors = parameters.vertexColors !== undefined ? parameters.vertexColors : false;
 
 };
+
+THREE.ParticleBasicMaterial.prototype = new THREE.Material();
+THREE.ParticleBasicMaterial.prototype.constructor = THREE.ParticleBasicMaterial;

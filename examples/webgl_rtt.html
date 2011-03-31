@@ -122,7 +122,7 @@
 				light.position.z = 1;
 				light.position.normalize();
 				sceneRTT.addLight( light );
-				
+
 				light = new THREE.DirectionalLight( 0xffaaaa, 1.5 );
 				light.position.x = 0;
 				light.position.y = 0;
@@ -130,7 +130,7 @@
 				light.position.normalize();
 				sceneRTT.addLight( light );
 
-				rtTexture = new THREE.RenderTarget( window.innerWidth, window.innerHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter } );
+				rtTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter } );
 
 				material = new THREE.MeshShaderMaterial( {
 

@@ -232,9 +232,9 @@
 				postprocessing.camera.position.z = 100;
 
 				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter };
-				postprocessing.rtTexture1 = new THREE.RenderTarget( window.innerWidth, window.innerHeight, pars );
-				postprocessing.rtTexture2 = new THREE.RenderTarget( 512, 512, pars );
-				postprocessing.rtTexture3 = new THREE.RenderTarget( 512, 512, pars );
+				postprocessing.rtTexture1 = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
+				postprocessing.rtTexture2 = new THREE.WebGLRenderTarget( 512, 512, pars );
+				postprocessing.rtTexture3 = new THREE.WebGLRenderTarget( 512, 512, pars );
 
 				var screen_shader = ShaderUtils.lib["screen"];
 				var screen_uniforms = Uniforms.clone( screen_shader.uniforms );
@@ -247,7 +247,8 @@
 					uniforms: screen_uniforms,
 					vertexShader: screen_shader.vertexShader,
 					fragmentShader: screen_shader.fragmentShader,
-					blending: THREE.AdditiveBlending
+					blending: THREE.AdditiveBlending,
+					transparent: true
 
 				} );
 

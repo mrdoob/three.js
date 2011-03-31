@@ -8,94 +8,63 @@
  *  specular: <hex>,
  *  shininess: <float>,
  *  opacity: <float>,
-
+ *
  *  map: new THREE.Texture( <Image> ),
-
+ *
  *  lightMap: new THREE.Texture( <Image> ),
-
+ *
  *  envMap: new THREE.TextureCube( [posx, negx, posy, negy, posz, negz] ),
  *  combine: THREE.Multiply,
  *  reflectivity: <float>,
  *  refractionRatio: <float>,
-
+ *
  *  shading: THREE.SmoothShading,
  *  blending: THREE.NormalBlending,
  *  depthTest: <bool>,
- 
+ *
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>,
- 
- *  vertexColors: <bool>,
+ *
+ *  vertexColors: false / THREE.VertexColors / THREE.FaceColors,
  *  skinning: <bool>
  * }
  */
 
 THREE.MeshPhongMaterial = function ( parameters ) {
 
-	this.id = THREE.MaterialCounter.value ++;
+	THREE.Material.call( this, parameters );
 
-	this.color = new THREE.Color( 0xffffff );
-	this.ambient = new THREE.Color( 0x050505 );
-	this.specular = new THREE.Color( 0x111111 );
-	this.shininess = 30.0;
-	this.opacity = 1.0;
+	parameters = parameters || {};
 
-	this.map = null;
+	this.color = parameters.color !== undefined ? new THREE.Color( parameters.color ) : new THREE.Color( 0xffffff );
+	this.ambient = parameters.ambient !== undefined ? new THREE.Color( parameters.ambient ) : new THREE.Color( 0x050505 );
+	this.specular = parameters.specular !== undefined ? new THREE.Color( parameters.specular ) : new THREE.Color( 0x111111 );
+	this.shininess = parameters.shininess !== undefined ? parameters.shininess : 30;
 
-	this.lightMap = null;
+	this.map = parameters.map !== undefined ? parameters.map : null;
 
-	this.envMap = null;
-	this.combine = THREE.MultiplyOperation;
-	this.reflectivity = 1.0;
-	this.refractionRatio = 0.98;
+	this.lightMap = parameters.lightMap !== undefined ? parameters.lightMap : null;
 
-	this.fog = true; // implemented just in WebGLRenderer2
+	this.envMap = parameters.envMap !== undefined ? parameters.envMap : null;
+	this.combine = parameters.combine !== undefined ? parameters.combine : THREE.MultiplyOperation;
+	this.reflectivity = parameters.reflectivity !== undefined ? parameters.reflectivity : 1;
+	this.refractionRatio = parameters.refractionRatio !== undefined ? parameters.refractionRatio : 0.98;
 
-	this.shading = THREE.SmoothShading;
-	this.blending = THREE.NormalBlending;
-	this.depthTest = true;
+	// this.enableFog = parameters.enableFog ? parameters.enableFog : true;
 
-	this.wireframe = false;
-	this.wireframeLinewidth = 1.0;
-	this.wireframeLinecap = 'round'; // implemented just in CanvasRenderer
-	this.wireframeLinejoin = 'round'; // implemented just in CanvasRenderer
+	this.shading = parameters.shading !== undefined ? parameters.shading : THREE.SmoothShading;
 
-	this.vertexColors = false;
-	this.skinning = false;
-	this.morphTargets = false;
+	this.wireframe = parameters.wireframe !== undefined ? parameters.wireframe : false;
+	this.wireframeLinewidth = parameters.wireframeLinewidth !== undefined ? parameters.wireframeLinewidth : 1;
+	this.wireframeLinecap = parameters.wireframeLinecap !== undefined ? parameters.wireframeLinecap : 'round';
+	this.wireframeLinejoin = parameters.wireframeLinejoin !== undefined ? parameters.wireframeLinejoin : 'round';
 
-	if ( parameters ) {
+	this.vertexColors = parameters.vertexColors !== undefined ? parameters.vertexColors : false;
 
-		if ( parameters.color !== undefined ) this.color = new THREE.Color( parameters.color );
-		if ( parameters.ambient !== undefined ) this.ambient = new THREE.Color( parameters.ambient );
-		if ( parameters.specular !== undefined ) this.specular = new THREE.Color( parameters.specular );
-		if ( parameters.shininess !== undefined ) this.shininess = parameters.shininess;
-		if ( parameters.opacity !== undefined ) this.opacity = parameters.opacity;
-
-		if ( parameters.lightMap !== undefined ) this.lightMap = parameters.lightMap;
-
-		if ( parameters.map !== undefined ) this.map = parameters.map;
-
-		if ( parameters.envMap !== undefined ) this.envMap = parameters.envMap;
-		if ( parameters.combine !== undefined ) this.combine = parameters.combine;
-		if ( parameters.reflectivity !== undefined ) this.reflectivity  = parameters.reflectivity;
-		if ( parameters.refractionRatio !== undefined ) this.refractionRatio  = parameters.refractionRatio;
-
-		if ( parameters.fog !== undefined ) this.fog  = parameters.fog;
-
-		if ( parameters.shading !== undefined ) this.shading = parameters.shading;
-		if ( parameters.blending !== undefined ) this.blending = parameters.blending;
-		if ( parameters.depthTest !== undefined ) this.depthTest = parameters.depthTest;
-
-		if ( parameters.wireframe !== undefined ) this.wireframe = parameters.wireframe;
-		if ( parameters.wireframeLinewidth !== undefined ) this.wireframeLinewidth = parameters.wireframeLinewidth;
-		if ( parameters.wireframeLinecap !== undefined ) this.wireframeLinecap = parameters.wireframeLinecap;
-		if ( parameters.wireframeLinejoin !== undefined ) this.wireframeLinejoin = parameters.wireframeLinejoin;
-
-		if ( parameters.vertexColors !== undefined ) this.vertexColors = parameters.vertexColors;
-		if ( parameters.skinning !== undefined ) this.skinning = parameters.skinning;
-		if ( parameters.morphTargets !== undefined ) this.morphTargets = parameters.morphTargets;
-
-	}
+	this.skinning = parameters.skinning !== undefined ? parameters.skinning : false;
+	this.morphTargets = parameters.morphTargets !== undefined ? parameters.morphTargets : false;
 
 };
+
+THREE.MeshPhongMaterial.prototype = new THREE.Material();
+THREE.MeshPhongMaterial.prototype.constructor = THREE.MeshPhongMaterial;

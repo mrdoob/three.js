@@ -62,7 +62,7 @@
 				// roll-over helpers
 
 				rollOverGeo = new Cube( 50, 50, 50 );
-				rollOverMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5 } );
+				rollOverMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, transparent: true } );
 				rollOverMesh = new THREE.Mesh( rollOverGeo, rollOverMaterial );
 				scene.addObject( rollOverMesh );
 
@@ -70,7 +70,7 @@
 				// cubes
 
 				cubeGeo = new Cube( 50, 50, 50 );
-				cubeMaterial = new THREE.MeshLambertMaterial( { color: 0x00ff80, opacity: 1, shading: THREE.FlatShading, map: ImageUtils.loadTexture( "textures/square-outline-textured.png" ) } );
+				cubeMaterial = new THREE.MeshLambertMaterial( { color: 0x00ff80, shading: THREE.FlatShading, map: ImageUtils.loadTexture( "textures/square-outline-textured.png" ) } );
 				cubeMaterial.color.setHSV( 0.1, 0.7, 1.0 );
 				// picking
 

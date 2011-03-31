@@ -2,7 +2,7 @@
  * @author szimek / https://github.com/szimek/
  */
 
-THREE.RenderTarget = function ( width, height, options ) {
+THREE.WebGLRenderTarget = function ( width, height, options ) {
 
 	this.width = width;
 	this.height = height;

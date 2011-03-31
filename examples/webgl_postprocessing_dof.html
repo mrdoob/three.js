@@ -241,8 +241,8 @@
 				postprocessing.camera.position.z = 100;
 
 				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter };
-				postprocessing.rtTextureDepth = new THREE.RenderTarget( window.innerWidth, height, pars );
-				postprocessing.rtTextureColor = new THREE.RenderTarget( window.innerWidth, height, pars );
+				postprocessing.rtTextureDepth = new THREE.WebGLRenderTarget( window.innerWidth, height, pars );
+				postprocessing.rtTextureColor = new THREE.WebGLRenderTarget( window.innerWidth, height, pars );
 
 				var bokeh_shader = ShaderExtras["bokeh"];
 
