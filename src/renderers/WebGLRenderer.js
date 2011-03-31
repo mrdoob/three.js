@@ -1530,6 +1530,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 					_gl.bindBuffer( _gl.ARRAY_BUFFER, customAttribute.buffer );
 					_gl.bufferData( _gl.ARRAY_BUFFER, customAttribute.array, hint );
 
+					customAttribute.dirty = false;
+
 				}
 
 			}
