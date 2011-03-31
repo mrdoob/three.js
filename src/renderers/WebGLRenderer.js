@@ -3675,13 +3675,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			switch ( blending ) {
 
-				case THREE.AdditiveAlphaBlending:
-
-					_gl.blendEquation( _gl.FUNC_ADD );
-					_gl.blendFunc( _gl.SRC_ALPHA, _gl.ONE );
-
-					break;
-
 				case THREE.AdditiveBlending:
 
 					_gl.blendEquation( _gl.FUNC_ADD );
