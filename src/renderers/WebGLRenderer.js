@@ -437,12 +437,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 	function initMeshBuffers ( geometryGroup, object ) {
 
 		var f, fl, fi, face,
+		m, ml, size,
 		nvertices = 0, ntris = 0, nlines = 0,
 
 		uvType,
 		vertexColorType,
 		normalType,
 		materials,
+		attribute,
 
 		geometry = object.geometry,
 		obj_faces = geometry.faces,
@@ -527,7 +529,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( geometryGroup.numMorphTargets ) {
 
-			var m, ml;
 			geometryGroup.__morphTargetsArrays = []; 
 
 			for ( m = 0, ml = geometryGroup.numMorphTargets; m < ml; m++ ) {
@@ -546,8 +547,42 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		geometryGroup.__webglFaceCount = ntris * 3 + ( object.geometry.edgeFaces ? object.geometry.edgeFaces.length * 2 * 3 : 0 );
 		geometryGroup.__webglLineCount = nlines * 2;
+		
+		
+		// custom attributes
+		
+		for( m = 0, ml = materials.length; m < ml; m++ ) {
+			
+			if( materials[ m ].attributes ) {
+				
+				geometryGroup.__webglCustomAttributes = {};
+
+				for( a in materials[ m ].attributes ) {
+					
+					attribute = materials[ m ].attributes[ a ];
+					
+					size = 1;		// "f" and "i"
+					
+					     if( attribute.type === "v2" ) size = 2;
+					else if( attribute.type === "v3" ) size = 3;
+					else if( attribute.type === "v4" ) size = 4;
+					else if( attribute.type === "c"  ) size = 3;
+					
+					attribute.size = size;
+					attribute.dirty = true;
+					attribute.array = new Float32Array( nvertices * size );
+					attribute.buffer = _gl.createBuffer();
+
+					geometryGroup.__webglCustomAttributes[ a ] = attribute;
+
+				}
+
+			}
+		
+		}
 
 	};
+
 
 	function setMeshBuffers ( geometryGroup, object, hint ) {
 
@@ -565,6 +600,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		m, ml, i,
 		vn, uvi, uv2i,
 		vk, vkl, vka,
+		a,
 
 		vertexIndex = 0,
 
@@ -578,6 +614,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		offset_color = 0,
 		offset_skin = 0,
 		offset_morphTarget = 0,
+		offset_custom = 0,
 
 		vertexArray = geometryGroup.__vertexArray,
 		uvArray = geometryGroup.__uvArray,
@@ -592,6 +629,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 		skinWeightArray = geometryGroup.__skinWeightArray,
 
 		morphTargetsArrays = geometryGroup.__morphTargetsArrays,
+		
+		customAttributes = geometryGroup.__webglCustomAttributes,
+		customAttribute,
 
 		faceArray = geometryGroup.__faceArray,
 		lineArray = geometryGroup.__lineArray,
@@ -628,6 +668,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 		obj_edgeFaces = geometry.edgeFaces,
 
 		morphTargets = geometry.morphTargets;
+
+		if ( customAttributes ) {
+			
+			for ( a in customAttributes ) {
+				
+				customAttributes[ a ].offset = 0;
+				
+			}
+			
+		}
+
+
 
 		for ( f = 0, fl = chunk_faces.length; f < fl; f ++ ) {
 
@@ -677,6 +729,83 @@ THREE.WebGLRenderer = function ( parameters ) {
 					offset += 9;
 
 				}
+
+				if ( customAttributes ) {
+					
+					for ( a in customAttributes ) {
+						
+						customAttribute = customAttributes[ a ];
+
+						if ( customAttribute.dirty ) {
+							
+							offset_custom = customAttribute.offset;
+							
+							if( customAttribute.size === 1 ) {
+								
+								customAttribute.array[ offset_custom + 0 ] = customAttribute.value[ face.a ];								
+								customAttribute.array[ offset_custom + 1 ] = customAttribute.value[ face.b ];								
+								customAttribute.array[ offset_custom + 2 ] = customAttribute.value[ face.c ];								
+								
+								customAttribute.offset += 3;
+								
+							} else {
+								
+								v1 = customAttribute.value[ face.a ];
+								v2 = customAttribute.value[ face.b ];
+								v3 = customAttribute.value[ face.c ];
+								
+								if( customAttribute.size === 2 ) {
+									
+									customAttribute.array[ offset_custom + 0 ] = v1.x;								
+									customAttribute.array[ offset_custom + 1 ] = v1.y;								
+									customAttribute.array[ offset_custom + 2 ] = v2.x;								
+									customAttribute.array[ offset_custom + 3 ] = v2.y;								
+									customAttribute.array[ offset_custom + 4 ] = v3.x;								
+									customAttribute.array[ offset_custom + 5 ] = v3.y;
+									
+									customAttribute.offset += 6;
+									
+								} else if( customAttribute.size === 3 ) {
+									
+									customAttribute.array[ offset_custom + 0 ] = v1.x;								
+									customAttribute.array[ offset_custom + 1 ] = v1.y;								
+									customAttribute.array[ offset_custom + 2 ] = v1.z;								
+									customAttribute.array[ offset_custom + 3 ] = v2.x;								
+									customAttribute.array[ offset_custom + 4 ] = v2.y;								
+									customAttribute.array[ offset_custom + 5 ] = v2.z;								
+									customAttribute.array[ offset_custom + 6 ] = v3.x;								
+									customAttribute.array[ offset_custom + 7 ] = v3.y;
+									customAttribute.array[ offset_custom + 8 ] = v3.z;
+									
+									customAttribute.offset += 9;
+									
+								} else {
+									
+									customAttribute.array[ offset_custom + 0  ] = v1.x;								
+									customAttribute.array[ offset_custom + 1  ] = v1.y;								
+									customAttribute.array[ offset_custom + 2  ] = v1.z;								
+									customAttribute.array[ offset_custom + 3  ] = v1.w;								
+									customAttribute.array[ offset_custom + 4  ] = v2.x;								
+									customAttribute.array[ offset_custom + 5  ] = v2.y;								
+									customAttribute.array[ offset_custom + 6  ] = v2.z;								
+									customAttribute.array[ offset_custom + 7  ] = v2.w;								
+									customAttribute.array[ offset_custom + 8  ] = v3.x;								
+									customAttribute.array[ offset_custom + 9  ] = v3.y;
+									customAttribute.array[ offset_custom + 10 ] = v3.z;
+									customAttribute.array[ offset_custom + 11 ] = v3.w;
+									
+									customAttribute.offset += 12;
+									
+								}
+								
+							}
+							
+						}
+						
+					}
+					
+				}
+
 
 				if ( dirtyMorphTargets ) {
 
@@ -966,6 +1095,94 @@ THREE.WebGLRenderer = function ( parameters ) {
 					offset += 12;
 
 				}
+
+				if ( customAttributes ) {
+					
+					for ( a in customAttributes ) {
+						
+						customAttribute = customAttributes[ a ];
+
+						if ( customAttribute.dirty ) {
+
+							offset_custom = customAttribute.offset;
+							
+							if( customAttribute.size === 1 ) {
+								
+								customAttribute.array[ offset_custom + 0 ] = customAttribute.value[ face.a ];								
+								customAttribute.array[ offset_custom + 1 ] = customAttribute.value[ face.b ];								
+								customAttribute.array[ offset_custom + 2 ] = customAttribute.value[ face.c ];								
+								customAttribute.array[ offset_custom + 2 ] = customAttribute.value[ face.d ];								
+								
+								customAttribute.offset += 4;
+								
+							} else {
+								
+								v1 = customAttribute.value[ face.a ];
+								v2 = customAttribute.value[ face.b ];
+								v3 = customAttribute.value[ face.c ];
+								v4 = customAttribute.value[ face.d ];
+								
+								if( customAttribute.size === 2 ) {
+									
+									customAttribute.array[ offset_custom + 0 ] = v1.x;								
+									customAttribute.array[ offset_custom + 1 ] = v1.y;								
+									customAttribute.array[ offset_custom + 2 ] = v2.x;								
+									customAttribute.array[ offset_custom + 3 ] = v2.y;								
+									customAttribute.array[ offset_custom + 4 ] = v3.x;								
+									customAttribute.array[ offset_custom + 5 ] = v3.y;
+									customAttribute.array[ offset_custom + 6 ] = v4.x;								
+									customAttribute.array[ offset_custom + 7 ] = v4.y;
+									
+									customAttribute.offset += 8;
+									
+								} else if( customAttribute.size === 3 ) {
+									
+									customAttribute.array[ offset_custom + 0  ] = v1.x;								
+									customAttribute.array[ offset_custom + 1  ] = v1.y;								
+									customAttribute.array[ offset_custom + 2  ] = v1.z;								
+									customAttribute.array[ offset_custom + 3  ] = v2.x;								
+									customAttribute.array[ offset_custom + 4  ] = v2.y;								
+									customAttribute.array[ offset_custom + 5  ] = v2.z;								
+									customAttribute.array[ offset_custom + 6  ] = v3.x;								
+									customAttribute.array[ offset_custom + 7  ] = v3.y;
+									customAttribute.array[ offset_custom + 8  ] = v3.z;
+									customAttribute.array[ offset_custom + 9  ] = v4.x;								
+									customAttribute.array[ offset_custom + 10 ] = v4.y;
+									customAttribute.array[ offset_custom + 11 ] = v4.z;
+									
+									customAttribute.offset += 12;
+									
+								} else {
+									
+									customAttribute.array[ offset_custom + 0  ] = v1.x;								
+									customAttribute.array[ offset_custom + 1  ] = v1.y;								
+									customAttribute.array[ offset_custom + 2  ] = v1.z;								
+									customAttribute.array[ offset_custom + 3  ] = v1.w;								
+									customAttribute.array[ offset_custom + 4  ] = v2.x;								
+									customAttribute.array[ offset_custom + 5  ] = v2.y;								
+									customAttribute.array[ offset_custom + 6  ] = v2.z;								
+									customAttribute.array[ offset_custom + 7  ] = v2.w;								
+									customAttribute.array[ offset_custom + 8  ] = v3.x;								
+									customAttribute.array[ offset_custom + 9  ] = v3.y;
+									customAttribute.array[ offset_custom + 10 ] = v3.z;
+									customAttribute.array[ offset_custom + 11 ] = v3.w;
+									customAttribute.array[ offset_custom + 12 ] = v4.x;								
+									customAttribute.array[ offset_custom + 13 ] = v4.y;
+									customAttribute.array[ offset_custom + 14 ] = v4.z;
+									customAttribute.array[ offset_custom + 15 ] = v4.w;
+									
+									customAttribute.offset += 16;
+									
+								}
+								
+							}
+							
+						}
+						
+					}
+					
+				}
+
 
 				if ( dirtyMorphTargets ) {
 
@@ -1299,6 +1516,23 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglVertexBuffer );
 			_gl.bufferData( _gl.ARRAY_BUFFER, vertexArray, hint );
+
+		}
+
+		if ( customAttributes ) {
+			
+			for ( a in customAttributes ) {
+				
+				customAttribute = customAttributes[ a ];
+
+				if ( customAttribute.dirty ) {
+
+					_gl.bindBuffer( _gl.ARRAY_BUFFER, customAttribute.buffer );
+					_gl.bufferData( _gl.ARRAY_BUFFER, customAttribute.array, hint );
+
+				}
+
+			}
 
 		}
 
@@ -1791,9 +2025,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
+			for ( a in material.attributes ) {
+
+				if( attributes[ a ] >= 0 ) _gl.enableVertexAttribArray( attributes[ a ] );
+
+			}
+
+
 			if ( material.morphTargets ) {
 
 				material.numSupportedMorphTargets = 0;
+
 
 				if ( attributes.morphTarget0 >= 0 ) {
 
@@ -1892,7 +2134,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			 material instanceof THREE.MeshLambertMaterial ||
 			 material instanceof THREE.MeshPhongMaterial ||
 			 material instanceof THREE.LineBasicMaterial ||
-			 material instanceof THREE.ParticleBasicMaterial )
+			 material instanceof THREE.ParticleBasicMaterial ||
+			 material.fog )
 			) {
 
 			refreshUniformsFog( m_uniforms, fog );
@@ -2002,7 +2245,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material.opacity == 0 ) return;
 
-		var program, attributes, linewidth, primitives;
+		var program, attributes, linewidth, primitives, a, attribute;
 
 		program = setProgram( camera, lights, fog, material, object );
 
@@ -2020,6 +2263,27 @@ THREE.WebGLRenderer = function ( parameters ) {
 			setupMorphTargets( material, geometryGroup, object );
 
 		}
+
+
+		// custom attributes
+
+		if ( geometryGroup.__webglCustomAttributes ) {
+			
+			for( a in geometryGroup.__webglCustomAttributes ) {
+				
+				if( attributes[ a ] >= 0 ) {
+					
+					attribute = geometryGroup.__webglCustomAttributes[ a ];
+					
+					_gl.bindBuffer( _gl.ARRAY_BUFFER, attribute.buffer );
+					_gl.vertexAttribPointer( attributes[ a ], attribute.size, _gl.FLOAT, false, 0, 0 );
+					
+				}
+				
+			}
+			
+		}
+
 
 		// colors
 
@@ -3117,6 +3381,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 					geometry.__dirtyTangents = true;
 					geometry.__dirtyColors = true;
 
+					
+
 				}
 
 				// create separate wrapper per each use of VBO
@@ -3197,7 +3463,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function updateObject ( object, scene ) {
 
-		var g, geometry, geometryGroup;
+		var g, geometry, geometryGroup, a, customAttributeDirty;
 
 		if ( object instanceof THREE.Mesh ) {
 
@@ -3209,9 +3475,21 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				geometryGroup = geometry.geometryGroups[ g ];
 
+				customAttributeDirty = false;
+
+				for( a in geometryGroup.__webglCustomAttributes ) {
+					
+					if( geometryGroup.__webglCustomAttributes[ a ].dirty ) {
+						
+						customAttributeDirty = true;
+						break;
+					}
+				
+				}
+
 				if ( geometry.__dirtyVertices || geometry.__dirtyMorphTargets || geometry.__dirtyElements ||
 					geometry.__dirtyUvs || geometry.__dirtyNormals ||
-					geometry.__dirtyColors || geometry.__dirtyTangents ) {
+					geometry.__dirtyColors || geometry.__dirtyTangents || customAttributeDirty ) {
 
 					setMeshBuffers( geometryGroup, object, _gl.DYNAMIC_DRAW );
 
@@ -3640,6 +3918,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 			} else if( type == "v3" ) {
 
 				_gl.uniform3f( location, value.x, value.y, value.z );
+
+			} else if( type == "v4" ) {
+
+				_gl.uniform4f( location, value.x, value.y, value.z, value.w );
 
 			} else if( type == "c" ) {
 
