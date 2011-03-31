@@ -294,7 +294,7 @@ var scene = {
 	
 	"glass": {
 		"type": "MeshLambertMaterial",
-		"parameters": { color: 0x101046, envMap: "cube_reflection", opacity: 0.25 }
+		"parameters": { color: 0x101046, envMap: "cube_reflection", opacity: 0.25, transparent: true }
 	},
 
 	"interior": {
