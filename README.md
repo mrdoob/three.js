@@ -141,6 +141,18 @@ This code creates a camera, then creates a scene, adds a cube on it, creates a &
 
 ### Change Log ###
 
+2011 03 31 - **r38** (225.720 KB, gzip: 55.881 KB)
+
+* Added `LensFlare` light. ([empaempa](http://github.com/empaempa))
+* Added `ShadowVolume` object (stencil shadows). ([empaempa](http://github.com/empaempa))
+* Improved Blender Exporter plus added Scene support. ([alteredq](http://github.com/alteredq))
+* Blender Importer for loading JSON files. ([alteredq](http://github.com/alteredq))
+* Added load/complete callbacks to `Loader` ([mrdoob](http://github.com/mrdoob))
+* Minor WebGL blend mode clean up. ([mrdoob](http://github.com/mrdoob))
+* *Materials now extend Material ([mrdoob](http://github.com/mrdoob))
+* `material.transparent` define whether material is transparent or not (before we were guessing). ([mrdoob](http://github.com/mrdoob))
+
+
 2011 03 22 - **r37** (208.495 KB, gzip: 51.376 KB)
 
 * Changed JSON file format. (**Re-exporting of models required**) ([alteredq](http://github.com/alteredq) and [mrdoob](http://github.com/mrdoob))

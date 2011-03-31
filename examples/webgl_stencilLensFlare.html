@@ -71,8 +71,8 @@
 				new THREE.ShadowVolume( mesh1 )
 				new THREE.ShadowVolume( mesh2 )
 				new THREE.ShadowVolume( mesh3 )
-	
-	
+
+
 				// moving objects
 
 				var cube = new Cube( 40, 40, 40 );
@@ -84,13 +84,13 @@
 
 				boxMesh = new THREE.Mesh( cube, material2 );
 				scene.addChild( boxMesh );
-				
+
 				new THREE.ShadowVolume( mesh );
 				new THREE.ShadowVolume( boxMesh );
 
 
 				// lights
-	
+
 				light = new THREE.PointLight( 0xffffff );
 				scene.addChild( light );
 
@@ -105,11 +105,11 @@
 				lightCube.visible = false;
 				scene.addChild( lightCube );
 
-				var lensFlare = new THREE.LensFlare( ImageUtils.loadTexture( "textures/lensflare0.png" ), 128, 0.0, THREE.AdditiveAlphaBlending );
-				lensFlare.add( ImageUtils.loadTexture( "textures/lensflare1.png" ), 256, 0.33, THREE.AdditiveAlphaBlending );
-				lensFlare.add( lensFlare.lensFlares[ 1 ].texture, 300, 0.66, THREE.AdditiveAlphaBlending );
-				lensFlare.add( lensFlare.lensFlares[ 1 ].texture, 400, 1.0, THREE.AdditiveAlphaBlending );
-				
+				var lensFlare = new THREE.LensFlare( ImageUtils.loadTexture( "textures/lensflare0.png" ), 128, 0.0, THREE.AdditiveBlending );
+				lensFlare.add( ImageUtils.loadTexture( "textures/lensflare1.png" ), 256, 0.33, THREE.AdditiveBlending );
+				lensFlare.add( lensFlare.lensFlares[ 1 ].texture, 300, 0.66, THREE.AdditiveBlending );
+				lensFlare.add( lensFlare.lensFlares[ 1 ].texture, 400, 1.0, THREE.AdditiveBlending );
+	
 				lightCube.addChild( lensFlare );
 
 

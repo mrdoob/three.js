@@ -30,6 +30,7 @@ THREE.MeshShaderMaterial = function ( parameters ) {
 	this.fragmentShader = parameters.fragmentShader !== undefined ? parameters.fragmentShader : "void main() {}";
 	this.vertexShader = parameters.vertexShader !== undefined ? parameters.vertexShader : "void main() {}";
 	this.uniforms = parameters.uniforms !== undefined ? parameters.uniforms : {};
+	this.attributes = parameters.attributes;
 
 	this.shading = parameters.shading !== undefined ? parameters.shading : THREE.SmoothShading;
 
