@@ -105,10 +105,10 @@
 				lightCube.visible = false;
 				scene.addChild( lightCube );
 
-				var lensFlare = new THREE.LensFlare( ImageUtils.loadTexture( "textures/lensflare0.png" ), 128, 0.0, THREE.AdditiveAlphaBlending );
-				lensFlare.add( ImageUtils.loadTexture( "textures/lensflare1.png" ), 256, 0.33, THREE.AdditiveAlphaBlending );
-				lensFlare.add( lensFlare.lensFlares[ 1 ].texture, 300, 0.66, THREE.AdditiveAlphaBlending );
-				lensFlare.add( lensFlare.lensFlares[ 1 ].texture, 400, 1.0, THREE.AdditiveAlphaBlending );
+				var lensFlare = new THREE.LensFlare( ImageUtils.loadTexture( "textures/lensflare0.png" ), 128, 0.0, THREE.AdditiveBlending );
+				lensFlare.add( ImageUtils.loadTexture( "textures/lensflare1.png" ), 256, 0.33, THREE.AdditiveBlending );
+				lensFlare.add( lensFlare.lensFlares[ 1 ].texture, 300, 0.66, THREE.AdditiveBlending );
+				lensFlare.add( lensFlare.lensFlares[ 1 ].texture, 400, 1.0, THREE.AdditiveBlending );
 				
 				lightCube.addChild( lensFlare );
 
