@@ -96,55 +96,53 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// prepare stencil shadow polygon
 
-	if( stencil ) {
-		
+	if ( stencil ) {
+
 		var _stencilShadow      = {};
-		
+
 		_stencilShadow.vertices = new Float32Array( 12 );
 		_stencilShadow.faces    = new Uint16Array( 6 );
 		_stencilShadow.darkness = 0.5;
-		
+
 		_stencilShadow.vertices[ 0 * 3 + 0 ] = -2; _stencilShadow.vertices[ 0 * 3 + 1 ] = -1; _stencilShadow.vertices[ 0 * 3 + 2 ] = -1;
 		_stencilShadow.vertices[ 1 * 3 + 0 ] =  2; _stencilShadow.vertices[ 1 * 3 + 1 ] = -1; _stencilShadow.vertices[ 1 * 3 + 2 ] = -1;
 		_stencilShadow.vertices[ 2 * 3 + 0 ] =  2; _stencilShadow.vertices[ 2 * 3 + 1 ] =  1; _stencilShadow.vertices[ 2 * 3 + 2 ] = -1;
 		_stencilShadow.vertices[ 3 * 3 + 0 ] = -2; _stencilShadow.vertices[ 3 * 3 + 1 ] =  1; _stencilShadow.vertices[ 3 * 3 + 2 ] = -1;
-		
+
 		_stencilShadow.faces[ 0 ] = 0; _stencilShadow.faces[ 1 ] = 1; _stencilShadow.faces[ 2 ] = 2;
 		_stencilShadow.faces[ 3 ] = 0; _stencilShadow.faces[ 4 ] = 2; _stencilShadow.faces[ 5 ] = 3;
-	
-	
+
 		_stencilShadow.vertexBuffer  = _gl.createBuffer();
 		_stencilShadow.elementBuffer = _gl.createBuffer();
-		
+
 		_gl.bindBuffer( _gl.ARRAY_BUFFER, _stencilShadow.vertexBuffer );
 		_gl.bufferData( _gl.ARRAY_BUFFER,  _stencilShadow.vertices, _gl.STATIC_DRAW );
-	
+
 		_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, _stencilShadow.elementBuffer );
 		_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, _stencilShadow.faces, _gl.STATIC_DRAW );
-		
-	
+
 		_stencilShadow.program = _gl.createProgram();
-	
+
 		_gl.attachShader( _stencilShadow.program, getShader( "fragment", THREE.ShaderLib.shadowPost.fragmentShader ));
 		_gl.attachShader( _stencilShadow.program, getShader( "vertex",   THREE.ShaderLib.shadowPost.vertexShader   ));
-	
+
 		_gl.linkProgram( _stencilShadow.program );
-	
+
 		_stencilShadow.vertexLocation     = _gl.getAttribLocation ( _stencilShadow.program, "position"         );
 		_stencilShadow.projectionLocation = _gl.getUniformLocation( _stencilShadow.program, "projectionMatrix" );
 		_stencilShadow.darknessLocation   = _gl.getUniformLocation( _stencilShadow.program, "darkness"         );
 	}
-	
-	
+
+
 	// prepare lens flare
-	
+
 	var _lensFlare = {};
 	var i;
-	
+
 	_lensFlare.vertices     = new Float32Array( 8 + 8 );
 	_lensFlare.faces        = new Uint16Array( 6 );
 	_lensFlare.transparency = 0.5;
-	
+
 	i = 0;
 	_lensFlare.vertices[ i++ ] = -1; _lensFlare.vertices[ i++ ] = -1;	// vertex
 	_lensFlare.vertices[ i++ ] = 0;  _lensFlare.vertices[ i++ ] = 0;	// uv... etc.
@@ -163,7 +161,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_lensFlare.elementBuffer = _gl.createBuffer();
 	_lensFlare.tempTexture   = _gl.createTexture();
 	_lensFlare.readBackPixels = new Uint8Array( 16*16*4 );
-	
+
 	_gl.bindBuffer( _gl.ARRAY_BUFFER, _lensFlare.vertexBuffer );
 	_gl.bufferData( _gl.ARRAY_BUFFER,  _lensFlare.vertices, _gl.STATIC_DRAW );
 
@@ -176,7 +174,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_T, _gl.CLAMP_TO_EDGE );
 	_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MAG_FILTER, _gl.NEAREST );
 	_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, _gl.NEAREST );
-
 
 	_lensFlare.program = _gl.createProgram();
 
@@ -195,8 +192,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_lensFlare.uniforms.rotation       = _gl.getUniformLocation( _lensFlare.program, "rotation" );
 	_lensFlare.uniforms.screenPosition = _gl.getUniformLocation( _lensFlare.program, "screenPosition" );
 	_lensFlare.uniforms.renderPink     = _gl.getUniformLocation( _lensFlare.program, "renderPink" );
-
-
 
 
 	this.setSize = function ( width, height ) {
