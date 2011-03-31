@@ -45,17 +45,17 @@
 				var texture = generateTextureBase();
 				texture.needsUpdate = true;
 
-				for ( var i = 0; i < 10; i ++ ) {
+				for ( var i = 0; i < 20; i ++ ) {
 
 					mesh = levels[ i ] = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { map: new THREE.Texture( generateTextureLevel( texture ), new THREE.UVMapping(), THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping ) } ) );
 					mesh.materials[0].map.needsUpdate = true;
 					mesh.rotation.x = - 90 * ( Math.PI / 180 );
-					mesh.position.y = i * 0.5;
+					mesh.position.y = i * 0.25;
 					scene.addObject( mesh );
 
 				}
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.sortObjects = false;
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
@@ -80,7 +80,7 @@
 
 				}
 
-				context.globalAlpha = 0.1;
+				context.globalAlpha = 0.05;
 				context.globalCompositeOperation = 'lighter';
 
 				return canvas;
@@ -114,16 +114,8 @@
 
 				var time = new Date().getTime() / 6000;
 
-				camera.position.x = 100 * Math.cos( time );
-				camera.position.z = 100 * Math.sin( time );
-
-				for ( var i = 0, l = levels.length; i < l; i ++ ) {
-
-					mesh = levels[ i ];
-					mesh.position.x = Math.sin( time * 4 ) * i * i * 0.02;
-					mesh.position.z = Math.cos( time * 6 ) * i * i * 0.02;
-
-				}
+				camera.position.x = 80 * Math.cos( time );
+				camera.position.z = 80 * Math.sin( time );
 
 				renderer.render( scene, camera );
 
