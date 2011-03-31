@@ -2887,7 +2887,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			// save current RGB to temp texture
 
-			_gl.copyTexSubImage2D( _gl.TEXTURE_2D, 0, 0, 0, screenPositionPixels[ 0 ] - 8, screenPositionPixels[ 1 ] - 8, 16, 16 );
+			_gl.copyTexSubImage2D( _gl.TEXTURE_2D, 0, 0, 0, screenPositionPixels[ 0 ] - 8, screenPositionPixels[ 1 ] - 8, 16, 16 );
 
 
 			// render pink quad
@@ -2904,16 +2904,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			try {
 
-				_gl.readPixels( screenPositionPixels[ 0 ] - 8, screenPositionPixels[ 1 ] - 8, 16, 16, _gl.RGBA, _gl.UNSIGNED_BYTE, _lensFlare.readBackPixels );
+				_gl.readPixels( screenPositionPixels[ 0 ] - 8, screenPositionPixels[ 1 ] - 8, 16, 16, _gl.RGBA, _gl.UNSIGNED_BYTE, _lensFlare.readBackPixels );
 
 			} catch( error ) {
 
 				console.log( "WebGLRenderer.renderLensFlare: readPixels failed!" );
+
 			}
 
 			if ( _gl.getError() ) {
 
 				console.log( "WebGLRenderer.renderLensFlare: readPixels failed!" );
+
 			}
 
 
@@ -2971,6 +2973,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.uniform1i( uniforms.renderPink, 0 );
 			_gl.disable( _gl.DEPTH_TEST );
 			_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
+
 		}
 
 
