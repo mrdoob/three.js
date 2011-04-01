@@ -74,7 +74,7 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texture_path
 
 		var i, j, fi,
 
-		offset, zLength,
+		offset, zLength, nVertices,
 		
 		colorIndex, normalIndex, uvIndex, materialIndex,
 		
@@ -87,7 +87,7 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texture_path
 
 		vertex, face, color, normal,
 		
-		uvLayer, uvs,
+		uvLayer, uvs, u, v,
 
 		faces = json.faces,
 		vertices = json.vertices,
