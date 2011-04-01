@@ -141,7 +141,7 @@ This code creates a camera, then creates a scene, adds a cube on it, creates a &
 
 ### Change Log ###
 
-2011 03 31 - **r38** (225.720 KB, gzip: 55.881 KB)
+2011 03 31 - **r38** (225.442 KB, gzip: 55.908 KB)
 
 * Added `LensFlare` light. ([empaempa](http://github.com/empaempa))
 * Added `ShadowVolume` object (stencil shadows). ([empaempa](http://github.com/empaempa))
@@ -151,6 +151,7 @@ This code creates a camera, then creates a scene, adds a cube on it, creates a &
 * Minor WebGL blend mode clean up. ([mrdoob](http://github.com/mrdoob))
 * *Materials now extend Material ([mrdoob](http://github.com/mrdoob))
 * `material.transparent` define whether material is transparent or not (before we were guessing). ([mrdoob](http://github.com/mrdoob))
+* Added internal program cache to WebGLRenderer (reuse already available programs). ([mrdoob](http://github.com/mrdoob))
 
 
 2011 03 22 - **r37** (208.495 KB, gzip: 51.376 KB)

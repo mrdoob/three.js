@@ -22,6 +22,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	var _gl,
 	_canvas = document.createElement( 'canvas' ),
+	_programs = [],
 	_currentProgram = null,
 	_currentFramebuffer = null,
 	_currentDepthMask = true,
@@ -3761,7 +3762,34 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function buildProgram ( fragmentShader, vertexShader, parameters ) {
 
-		var program = _gl.createProgram(),
+		var p, pl, program, code;
+
+		// Generate code
+
+		code = fragmentShader + "\n\n" + vertexShader + "\n\n";
+
+		for ( p in parameters ) {
+
+			code += p + ": " + parameters[ p ] + ",\n";
+
+		}
+
+		// Check if code has been already compiled
+
+		for ( p = 0, pl = _programs.length; p < pl; p ++ ) {
+
+			if ( _programs[ p ].code == code ) {
+
+				// console.log( "Code already compiled." /*: \n\n" + code*/ );
+				return _programs[ p ].program;
+
+			}
+
+		}
+
+		//
+
+		program = _gl.createProgram(),
 
 		prefix_fragment = [
 			"#ifdef GL_ES",
@@ -3863,6 +3891,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		program.uniforms = {};
 		program.attributes = {};
+
+		_programs.push( { program: program, code: code } );
 
 		return program;
 
