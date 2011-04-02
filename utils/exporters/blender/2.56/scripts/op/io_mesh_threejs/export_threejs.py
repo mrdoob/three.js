@@ -689,7 +689,7 @@ def extract_materials(mesh, scene):
             # http://www.blender.org/documentation/blender_python_api_2_54_0/bpy.types.Material.html#bpy.types.Material.specular_hardness
             material["specularCoef"] = m.specular_hardness
 
-            if m.active_texture and m.active_texture.type == 'IMAGE':
+            if m.active_texture and m.active_texture.type == 'IMAGE' and m.active_texture.image:
                 fn = bpy.path.abspath(m.active_texture.image.filepath)
                 fn = os.path.normpath(fn)
                 fn_strip = os.path.basename(fn)
