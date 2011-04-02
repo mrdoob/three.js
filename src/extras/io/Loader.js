@@ -136,7 +136,27 @@ THREE.Loader.prototype = {
 			else if ( m.shading == "Basic" ) mtype = "MeshBasicMaterial";
 
 		}
+		
+		if ( m.blending ) {
+			
+			if ( m.blending == "Additive" ) mpars.blending = THREE.AdditiveBlending;
+			else if ( m.blending == "Subtractive" ) mpars.blending = THREE.SubtractiveBlending;
+			else if ( m.blending == "Multiply" ) mpars.blending = THREE.MultiplyBlending;
 
+		}
+		
+		if ( m.transparent !== undefined ) {
+			
+			mpars.transparent = m.transparent;
+
+		}
+
+		if ( m.depthTest !== undefined ) {
+			
+			mpars.depthTest = m.depthTest;
+
+		}
+		
 		if ( m.mapDiffuse && texture_path ) {
 
 			texture = document.createElement( 'canvas' );
