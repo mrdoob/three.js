@@ -129,7 +129,7 @@
 				for ( j = 0; j < ygrid; j++ ) {
 
 					materials[c] = new THREE.MeshBasicMaterial( { color:0xffffff, vertexColors:true } );
-					materials[c].program = material_base.program;
+					//materials[c].program = material_base.program;
 
 					ribbon = new THREE.Ribbon( i % 2 ? geometry : geometry2, materials[c] );
 					ribbon.rotation.x = 0;
