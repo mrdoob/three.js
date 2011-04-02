@@ -1,0 +1,335 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>three.js webgl - materials - shaders [lava]</title>
+		<meta charset="utf-8">
+		<style type="text/css">
+			body {
+				color: #ffffff;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				font-weight: bold;
+
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+			}
+
+			a {
+
+				color: #ffffff;
+			}
+
+			#oldie a { color:#da0 }
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - shader material demo. featuring lava shader by <a href="http://irrlicht.sourceforge.net/phpBB2/viewtopic.php?t=21057" target="_blank">TheGameMaker</a></div>
+
+		<script type="text/javascript" src="../build/Three.js"></script>
+
+		<script type="text/javascript" src="js/Detector.js"></script>
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
+		<script type="text/javascript" src="js/Stats.js"></script>
+
+		<script id="fragmentShader" type="x-shader/x-fragment">
+
+			uniform float time;
+			uniform vec2 resolution;
+			
+			uniform float fogDensity;
+			uniform vec3 fogColor;
+
+			uniform sampler2D texture1;
+			uniform sampler2D texture2;
+
+			varying vec2 vUv;
+
+			void main( void ) {
+
+				vec2 position = -1.0 + 2.0 * vUv;
+
+				vec4 noise = texture2D( texture1, vUv );
+				vec2 T1 = vUv + vec2( 1.5, -1.5 ) * time  *0.02;
+				vec2 T2 = vUv + vec2( -0.5, 2.0 ) * time * 0.01;
+				
+				T1.x += noise.x * 2.0;
+				T1.y += noise.y * 2.0;
+				T2.x -= noise.y * 0.2;
+				T2.y += noise.z * 0.2;
+				
+				float p = texture2D( texture1, T1 * 2.0 ).a;
+				
+				vec4 color = texture2D( texture2, T2 * 2.0 );
+				vec4 temp = color * ( vec4( p, p, p, p ) * 2.0 ) + ( color * color - 0.1 );
+				
+				if( temp.r > 1.0 ){ temp.bg += clamp( temp.r - 2.0, 0.0, 100.0 ); }
+				if( temp.g > 1.0 ){ temp.rb += temp.g - 1.0; }
+				if( temp.b > 1.0 ){ temp.rg += temp.b - 1.0; }
+				
+				gl_FragColor = temp;
+
+				float depth = gl_FragCoord.z / gl_FragCoord.w;
+				const float LOG2 = 1.442695;
+				float fogFactor = exp2( - fogDensity * fogDensity * depth * depth * LOG2 );
+				fogFactor = 1.0 - clamp( fogFactor, 0.0, 1.0 );
+				
+				gl_FragColor = mix( gl_FragColor, vec4( fogColor, gl_FragColor.w ), fogFactor );
+
+			}
+		</script>
+
+		<script id="vertexShader" type="x-shader/x-vertex">
+
+			varying vec2 vUv;
+
+			void main()
+			{
+
+				vUv = vec2( 3.0, 1.0 ) * uv;
+				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+				gl_Position = projectionMatrix * mvPosition;
+
+			}
+
+		</script>
+
+		<script type="text/javascript">
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, stats;
+
+			var start_time;
+
+			var camera, scene, renderer;
+
+			var uniforms, material, mesh;
+
+			var mouseX = 0, mouseY = 0,
+			lat = 0, lon = 0, phy = 0, theta = 0;
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+			var postprocessing = { enabled : true };
+			
+			init();
+			animate();
+
+			function init() {
+
+				container = document.getElementById( 'container' );
+
+				camera = new THREE.Camera( 35, windowHalfX / windowHalfY, 1, 3000 );
+				camera.position.z = 4;
+
+				scene = new THREE.Scene();
+
+				start_time = new Date().getTime();
+
+				uniforms = {
+				
+					fogDensity: { type: "f", value: 0.45 },
+					fogColor: 	{ type: "v3", value: new THREE.Vector3( 0, 0, 0 ) },
+					time: 		{ type: "f", value: 1.0 },
+					resolution: { type: "v2", value: new THREE.Vector2() },
+					texture1: 	{ type: "t", value: 0, texture: ImageUtils.loadTexture( "textures/lava/cloud.png" ) },
+					texture2: 	{ type: "t", value: 1, texture: ImageUtils.loadTexture( "textures/lava/lavatile.jpg" ) }
+
+				};
+
+				uniforms.texture1.texture.wrapS = uniforms.texture1.texture.wrapT = THREE.Repeat;
+				uniforms.texture2.texture.wrapS = uniforms.texture2.texture.wrapT = THREE.Repeat;
+
+				var size = 0.65;
+
+				material = new THREE.MeshShaderMaterial( {
+
+					uniforms: uniforms,
+					vertexShader: document.getElementById( 'vertexShader' ).textContent,
+					fragmentShader: document.getElementById( 'fragmentShader' ).textContent
+
+				} );
+
+				mesh = new THREE.Mesh( new Torus( size, 0.3, 30, 30 ), [ material /*, new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, wireframeLinewidth: 2 } ) */ ] );
+				mesh.position.x = 0;
+				mesh.position.y = 0;
+				mesh.rotation.x = 0.3;
+				scene.addObject( mesh );
+
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				container.appendChild( renderer.domElement );
+
+				initPostprocessing();
+				renderer.autoClear = false;
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				//container.appendChild( stats.domElement );
+
+				onWindowResize();
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize( event ) {
+
+				uniforms.resolution.value.x = window.innerWidth;
+				uniforms.resolution.value.y = window.innerHeight;
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+			}
+
+			function initPostprocessing() {
+
+				postprocessing.scene = new THREE.Scene();
+
+				postprocessing.camera = new THREE.Camera();
+				postprocessing.camera.projectionMatrix = THREE.Matrix4.makeOrtho( window.innerWidth / - 2, window.innerWidth / 2,  window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
+				postprocessing.camera.position.z = 100;
+
+				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter };
+				postprocessing.rtTexture1 = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
+				postprocessing.rtTexture2 = new THREE.WebGLRenderTarget( 512, 512, pars );
+				postprocessing.rtTexture3 = new THREE.WebGLRenderTarget( 512, 512, pars );
+
+				var screen_shader = ShaderUtils.lib["screen"];
+				var screen_uniforms = Uniforms.clone( screen_shader.uniforms );
+
+				screen_uniforms["tDiffuse"].texture = postprocessing.rtTexture1;
+				screen_uniforms["opacity"].value = 1.0;
+
+				postprocessing.materialScreen = new THREE.MeshShaderMaterial( {
+
+					uniforms: screen_uniforms,
+					vertexShader: screen_shader.vertexShader,
+					fragmentShader: screen_shader.fragmentShader,
+					blending: THREE.AdditiveBlending,
+					transparent: true
+
+				} );
+
+				var convolution_shader = ShaderUtils.lib["convolution"];
+				var convolution_uniforms = Uniforms.clone( convolution_shader.uniforms );
+
+				postprocessing.blurx = new THREE.Vector2( 0.001953125, 0.0 ),
+				postprocessing.blury = new THREE.Vector2( 0.0, 0.001953125 );
+
+				convolution_uniforms["tDiffuse"].texture = postprocessing.rtTexture1;
+				convolution_uniforms["uImageIncrement"].value = postprocessing.blurx;
+				convolution_uniforms["cKernel"].value = ShaderUtils.buildKernel( 4.0 );
+
+				postprocessing.materialConvolution = new THREE.MeshShaderMaterial( {
+
+					uniforms: convolution_uniforms,
+					vertexShader:   "#define KERNEL_SIZE 25.0\n" + convolution_shader.vertexShader,
+					fragmentShader: "#define KERNEL_SIZE 25\n"   + convolution_shader.fragmentShader
+
+				} );
+
+				var film_shader = ShaderUtils.lib["film"];
+				var film_uniforms = Uniforms.clone( film_shader.uniforms );
+				
+				film_uniforms["tDiffuse"].texture = postprocessing.rtTexture1;
+				
+				postprocessing.materialFilm = new THREE.MeshShaderMaterial( { uniforms: film_uniforms, vertexShader: film_shader.vertexShader, fragmentShader: film_shader.fragmentShader } );
+				postprocessing.materialFilm.uniforms.grayscale.value = 0;
+				postprocessing.materialFilm.uniforms.nIntensity.value = 0.35;
+				postprocessing.materialFilm.uniforms.sIntensity.value = 0.95;
+				postprocessing.materialFilm.uniforms.sCount.value = 2048;
+
+				postprocessing.quad = new THREE.Mesh( new Plane( window.innerWidth, window.innerHeight ), postprocessing.materialConvolution );
+				postprocessing.quad.position.z = -500;
+				postprocessing.scene.addObject( postprocessing.quad );
+
+			}
+			
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				uniforms.time.value += 0.02;
+
+				mesh.rotation.y += 0.00125;
+				mesh.rotation.x += 0.005;
+
+				if ( postprocessing.enabled ) {
+
+					renderer.clear();
+
+					// Render scene into texture
+
+					renderer.render( scene, camera, postprocessing.rtTexture1, true );
+
+					// Render quad with blured scene into texture (convolution pass 1)
+
+					postprocessing.quad.materials = [ postprocessing.materialConvolution ];
+
+					postprocessing.materialConvolution.uniforms.tDiffuse.texture = postprocessing.rtTexture1;
+					postprocessing.materialConvolution.uniforms.uImageIncrement.value = postprocessing.blurx;
+
+					renderer.render( postprocessing.scene, postprocessing.camera, postprocessing.rtTexture2, true );
+
+					// Render quad with blured scene into texture (convolution pass 2)
+
+					postprocessing.materialConvolution.uniforms.tDiffuse.texture = postprocessing.rtTexture2;
+					postprocessing.materialConvolution.uniforms.uImageIncrement.value = postprocessing.blury;
+
+					renderer.render( postprocessing.scene, postprocessing.camera, postprocessing.rtTexture3, true );
+
+					// Render original scene with superimposed blur to texture
+
+					postprocessing.quad.materials = [ postprocessing.materialScreen ];
+
+					postprocessing.materialScreen.uniforms.tDiffuse.texture = postprocessing.rtTexture3;
+					postprocessing.materialScreen.uniforms.opacity.value = 1.25;
+
+					renderer.render( postprocessing.scene, postprocessing.camera, postprocessing.rtTexture1, false );
+
+					// Render to screen
+
+					postprocessing.materialFilm.uniforms.time.value += 0.01;
+					postprocessing.quad.materials = [ postprocessing.materialFilm ];
+
+					postprocessing.materialScreen.uniforms.tDiffuse.texture = postprocessing.rtTexture1;
+					renderer.render( postprocessing.scene, postprocessing.camera );
+
+				} else {
+
+					renderer.clear();
+					renderer.render( scene, camera );
+
+				}
+
+			}
+
+		</script>
+
+	</body>
+</html>
