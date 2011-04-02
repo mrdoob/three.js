@@ -124,6 +124,7 @@ class ExportTHREEJS(bpy.types.Operator, ExportHelper):
     filename_ext = ".js"
 
     option_flip_yz = BoolProperty(name="Flip YZ", description="Flip YZ", default=True)
+    use_materials = BoolProperty(name="Materials", description="Export materials", default=True)
     use_normals = BoolProperty(name="Normals", description="Export normals", default=True)
     use_colors = BoolProperty(name="Colors", description="Export vertex colors", default=True)
     use_uv_coords = BoolProperty(name="UVs", description="Export texture coordinates", default=True)
@@ -167,6 +168,8 @@ class ExportTHREEJS(bpy.types.Operator, ExportHelper):
         row.prop(self.properties, "use_colors")
         row = layout.row()
         row.prop(self.properties, "use_uv_coords")
+        row = layout.row()
+        row.prop(self.properties, "use_materials")
 
 
 # ################################################################

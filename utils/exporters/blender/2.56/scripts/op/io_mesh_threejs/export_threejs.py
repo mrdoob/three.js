@@ -415,7 +415,7 @@ def setBit(value, position, on):
         mask = ~(1 << position)
         return (value & mask)    
     
-def generate_face(f, faceIndex, normals, uvs, colors, mesh, use_normals, use_colors, use_uv_coords, flipyz):
+def generate_face(f, faceIndex, normals, uvs, colors, mesh, use_normals, use_colors, use_uv_coords, use_materials, flipyz):
     isTriangle = ( len(f.vertices) == 3 )
     
     if isTriangle:
@@ -423,7 +423,7 @@ def generate_face(f, faceIndex, normals, uvs, colors, mesh, use_normals, use_col
     else:
         nVertices = 4
         
-    hasMaterial = True # for the moment objects without materials get default material
+    hasMaterial = use_materials
     
     hasFaceUvs = False # not supported in Blender
     hasFaceVertexUvs = use_uv_coords
@@ -459,6 +459,7 @@ def generate_face(f, faceIndex, normals, uvs, colors, mesh, use_normals, use_col
     faceData.append(faceType)    
     
     # must clamp in case on polygons bigger than quads
+
     for i in range(nVertices):
         index = f.vertices[i]
         faceData.append(index)
@@ -736,7 +737,7 @@ def generate_materials_string(mesh, scene, use_colors, draw_type):
 # ASCII model generator
 # #####################################################
 
-def generate_ascii_model(mesh, scene, use_normals, use_colors, use_uv_coords, align_model, flipyz, draw_type):
+def generate_ascii_model(mesh, scene, use_normals, use_colors, use_uv_coords, use_materials, align_model, flipyz, draw_type):
 
     vertices = mesh.vertices[:]    
 
@@ -751,7 +752,11 @@ def generate_ascii_model(mesh, scene, use_normals, use_colors, use_uv_coords, al
     colors, ncolor = extract_vertex_colors(mesh, use_colors)
     uvs, nuv = extract_uvs(mesh, use_uv_coords)
 
-    mstring, nmaterial = generate_materials_string(mesh, scene, use_colors, draw_type)
+    mstring = ""
+    nmaterial = 0
+    
+    if use_materials:
+        mstring, nmaterial = generate_materials_string(mesh, scene, use_colors, draw_type)
     
     text = TEMPLATE_FILE_ASCII % {
     "nvertex"   : len(mesh.vertices),
@@ -769,7 +774,7 @@ def generate_ascii_model(mesh, scene, use_normals, use_colors, use_uv_coords, al
 
     "vertices"      : ",".join(generate_vertex(v) for v in vertices),
 
-    "faces"     : ",".join(generate_face(f, i, normals, uvs, colors, mesh, use_normals, use_colors, use_uv_coords, flipyz) for i, f in enumerate(mesh.faces))
+    "faces"     : ",".join(generate_face(f, i, normals, uvs, colors, mesh, use_normals, use_colors, use_uv_coords, use_materials, flipyz) for i, f in enumerate(mesh.faces))
 
     }
 
@@ -780,7 +785,7 @@ def generate_ascii_model(mesh, scene, use_normals, use_colors, use_uv_coords, al
 # Model exporter - export single mesh
 # #####################################################
 
-def export_mesh(obj, scene, filepath, use_normals, use_colors, use_uv_coords, align_model, flipyz, export_single_model):
+def export_mesh(obj, scene, filepath, use_normals, use_colors, use_uv_coords, use_materials, align_model, flipyz, export_single_model):
     """Export single mesh"""
 
 
@@ -823,7 +828,7 @@ def export_mesh(obj, scene, filepath, use_normals, use_colors, use_uv_coords, al
         if not active_col_layer:
             use_colors = False
 
-    text = generate_ascii_model(mesh, scene, use_normals, use_colors, use_uv_coords, align_model, flipyz, obj.draw_type)    
+    text = generate_ascii_model(mesh, scene, use_normals, use_colors, use_uv_coords, use_materials, align_model, flipyz, obj.draw_type)    
     write_file(filepath, text)
 
     # remove temp mesh
@@ -1250,7 +1255,7 @@ def export_scene(scene, filepath, flipyz):
 # Main
 # #####################################################
 
-def save(operator, context, filepath = "", option_flip_yz = True, use_normals = True, use_colors = True, use_uv_coords = True, align_model = 0, option_export_scene = True):
+def save(operator, context, filepath = "", option_flip_yz = True, use_normals = True, use_colors = True, use_uv_coords = True, use_materials = True, align_model = 0, option_export_scene = True):
 
     filepath = ensure_extension(filepath, '.js')
 
@@ -1281,7 +1286,7 @@ def save(operator, context, filepath = "", option_flip_yz = True, use_normals = 
 
                 if name not in geo_set:
                     fname = generate_mesh_filename(name, filepath)
-                    export_mesh(obj, scene, fname, use_normals, use_colors, use_uv_coords, 0, option_flip_yz, False)
+                    export_mesh(obj, scene, fname, use_normals, use_colors, use_uv_coords, use_materials, 0, option_flip_yz, False)
                     
                     geo_set.add(name)
 
@@ -1291,7 +1296,7 @@ def save(operator, context, filepath = "", option_flip_yz = True, use_normals = 
         if not obj:
             raise Exception("Error, Select 1 active object or select 'export scene'")
 
-        export_mesh(obj, scene, filepath, use_normals, use_colors, use_uv_coords, align_model, option_flip_yz, True)
+        export_mesh(obj, scene, filepath, use_normals, use_colors, use_uv_coords, use_materials, align_model, option_flip_yz, True)
 
     
     return {'FINISHED'}
