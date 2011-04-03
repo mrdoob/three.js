@@ -1,40 +1,39 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js webgl - materials - video</title>
+		<title>three.js webgl - materials - shaders [lava]</title>
 		<meta charset="utf-8">
 		<style type="text/css">
 			body {
-				background-color: #000;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
+				color: #ffffff;
 				font-family:Monospace;
 				font-size:13px;
 				text-align:center;
 				font-weight: bold;
-				text-align:center;
-			}
 
-			a {
-				color:#0078ff;
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
 			}
 
 			#info {
-				color:#fff;
 				position: absolute;
 				top: 0px; width: 100%;
 				padding: 5px;
-				z-index:100;
 			}
 
+			a {
+
+				color: #ffffff;
+			}
+
+			#oldie a { color:#da0 }
 		</style>
 	</head>
 	<body>
 
-		<div id="info">
-			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl video demo. playing <a href="http://durian.blender.org/" target="_blank">sintel</a> trailer
-		</div>
+		<div id="container"></div>
+		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - shader material demo. featuring lava shader by <a href="http://irrlicht.sourceforge.net/phpBB2/viewtopic.php?t=21057" target="_blank">TheGameMaker</a></div>
 
 		<script type="text/javascript" src="../build/Three.js"></script>
 
@@ -42,10 +41,67 @@
 		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
-		<video id="video" autoplay loop style="display:none">
-			<source src="textures/sintel.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
-			<source src="textures/sintel.ogv" type='video/ogg; codecs="theora, vorbis"'>
-		</video>
+		<script id="fragmentShader" type="x-shader/x-fragment">
+
+			uniform float time;
+			uniform vec2 resolution;
+			
+			uniform float fogDensity;
+			uniform vec3 fogColor;
+
+			uniform sampler2D texture1;
+			uniform sampler2D texture2;
+
+			varying vec2 vUv;
+
+			void main( void ) {
+
+				vec2 position = -1.0 + 2.0 * vUv;
+
+				vec4 noise = texture2D( texture1, vUv );
+				vec2 T1 = vUv + vec2( 1.5, -1.5 ) * time  *0.02;
+				vec2 T2 = vUv + vec2( -0.5, 2.0 ) * time * 0.01;
+				
+				T1.x += noise.x * 2.0;
+				T1.y += noise.y * 2.0;
+				T2.x -= noise.y * 0.2;
+				T2.y += noise.z * 0.2;
+				
+				float p = texture2D( texture1, T1 * 2.0 ).a;
+				
+				vec4 color = texture2D( texture2, T2 * 2.0 );
+				vec4 temp = color * ( vec4( p, p, p, p ) * 2.0 ) + ( color * color - 0.1 );
+				
+				if( temp.r > 1.0 ){ temp.bg += clamp( temp.r - 2.0, 0.0, 100.0 ); }
+				if( temp.g > 1.0 ){ temp.rb += temp.g - 1.0; }
+				if( temp.b > 1.0 ){ temp.rg += temp.b - 1.0; }
+				
+				gl_FragColor = temp;
+
+				float depth = gl_FragCoord.z / gl_FragCoord.w;
+				const float LOG2 = 1.442695;
+				float fogFactor = exp2( - fogDensity * fogDensity * depth * depth * LOG2 );
+				fogFactor = 1.0 - clamp( fogFactor, 0.0, 1.0 );
+				
+				gl_FragColor = mix( gl_FragColor, vec4( fogColor, gl_FragColor.w ), fogFactor );
+
+			}
+		</script>
+
+		<script id="vertexShader" type="x-shader/x-vertex">
+
+			varying vec2 vUv;
+
+			void main()
+			{
+
+				vUv = vec2( 3.0, 1.0 ) * uv;
+				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+				gl_Position = projectionMatrix * mvPosition;
+
+			}
+
+		</script>
 
 		<script type="text/javascript">
 
@@ -53,115 +109,67 @@
 
 			var container, stats;
 
+			var start_time;
+
 			var camera, scene, renderer;
 
-			var video, texture, material, mesh;
+			var uniforms, material, mesh;
 
-			var mouseX = 0;
-			var mouseY = 0;
+			var mouseX = 0, mouseY = 0,
+			lat = 0, lon = 0, phy = 0, theta = 0;
 
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
-			var postprocessing = { enabled: true };
-
-			var cube_count,
-
-				meshes = [],
-				materials = [],
-
-				xgrid = 20,
-				ygrid = 10;
-
+			var postprocessing = { enabled : true };
+			
 			init();
 			animate();
 
 			function init() {
 
-				container = document.createElement('div');
-				document.body.appendChild( container );
+				container = document.getElementById( 'container' );
 
-				camera = new THREE.Camera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.z = 500;
+				camera = new THREE.Camera( 35, windowHalfX / windowHalfY, 1, 3000 );
+				camera.position.z = 4;
 
 				scene = new THREE.Scene();
 
-				var light = new THREE.DirectionalLight( 0xffffff );
-				light.position.set( 0.5, 1, 1 );
-				light.position.normalize();
-				scene.addLight( light );
+				start_time = new Date().getTime();
 
-				renderer = new THREE.WebGLRenderer( { antialias: false } );
-				renderer.setSize( window.innerWidth, window.innerHeight );
+				uniforms = {
+				
+					fogDensity: { type: "f", value: 0.45 },
+					fogColor: 	{ type: "v3", value: new THREE.Vector3( 0, 0, 0 ) },
+					time: 		{ type: "f", value: 1.0 },
+					resolution: { type: "v2", value: new THREE.Vector2() },
+					texture1: 	{ type: "t", value: 0, texture: ImageUtils.loadTexture( "textures/lava/cloud.png" ) },
+					texture2: 	{ type: "t", value: 1, texture: ImageUtils.loadTexture( "textures/lava/lavatile.jpg" ) }
 
+				};
+
+				uniforms.texture1.texture.wrapS = uniforms.texture1.texture.wrapT = THREE.Repeat;
+				uniforms.texture2.texture.wrapS = uniforms.texture2.texture.wrapT = THREE.Repeat;
+
+				var size = 0.65;
+
+				material = new THREE.MeshShaderMaterial( {
+
+					uniforms: uniforms,
+					vertexShader: document.getElementById( 'vertexShader' ).textContent,
+					fragmentShader: document.getElementById( 'fragmentShader' ).textContent
+
+				} );
+
+				mesh = new THREE.Mesh( new Torus( size, 0.3, 30, 30 ), [ material /*, new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, wireframeLinewidth: 2 } ) */ ] );
+				mesh.position.x = 0;
+				mesh.position.y = 0;
+				mesh.rotation.x = 0.3;
+				scene.addObject( mesh );
+
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				container.appendChild( renderer.domElement );
-
-				video = document.getElementById( 'video' );
-
-				//video.volume = 0;
-				//video.muted = true;
-
-				texture = new THREE.Texture( video );
-				texture.minFilter = THREE.LinearFilter;
-				texture.magFilter = THREE.LinearFilter;
-
-				//
-
-				var i, j, ux, uy, ox, oy,
-					geometry,
-					xsize, ysize;
-
-				ux = 1 / xgrid;
-				uy = 1 / ygrid;
-
-				xsize = 480 / xgrid;
-				ysize = 204 / ygrid;
-
-				var parameters = { color: 0xffffff, map: texture },
-					material_base = new THREE.MeshLambertMaterial( parameters );
-
-				renderer.initMaterial( material_base, scene.lights, scene.fog );
-
-				cube_count = 0;
-
-				for( i = 0; i < xgrid; i++)
-				for( j = 0; j < ygrid; j++) {
-
-					ox = i;
-					oy = j;
-
-					geometry = new Cube( xsize, ysize, xsize );
-					change_uvs( geometry, ux, uy, ox, oy );
-
-					materials[ cube_count ] = new THREE.MeshLambertMaterial( parameters );
-
-					material = materials[ cube_count ];
-
-					//material.program = material_base.program;
-
-					material.hue = i/xgrid;
-					material.saturation = j/ygrid;
-
-					material.color.setHSV( material.hue, material.saturation, 1 );
-
-					mesh = new THREE.Mesh( geometry, material );
-
-					mesh.position.x =   ( i - xgrid/2 ) * xsize;
-					mesh.position.y = - ( j - ygrid/2 ) * ysize;
-					mesh.position.z = 0;
-
-					mesh.scale.x = mesh.scale.y = mesh.scale.z = 1;
-
-					scene.addObject(mesh);
-
-					mesh.dx = 0.001 * ( 0.5 - Math.random() );
-					mesh.dy = 0.001 * ( 0.5 - Math.random() );
-
-					meshes[ cube_count ] = mesh;
-
-					cube_count += 1;
-
-				}
 
 				initPostprocessing();
 				renderer.autoClear = false;
@@ -171,29 +179,23 @@
 				stats.domElement.style.top = '0px';
 				//container.appendChild( stats.domElement );
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				onWindowResize();
+
+				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
 
-			function change_uvs( geometry, unitx, unity, offsetx, offsety ) {
+			function onWindowResize( event ) {
 
-				var i, j, uv;
+				uniforms.resolution.value.x = window.innerWidth;
+				uniforms.resolution.value.y = window.innerHeight;
 
-				for ( i = 0; i < geometry.faceVertexUvs[ 0 ].length; i++ ) {
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
-					uv = geometry.faceVertexUvs[ 0 ][ i ];
-
-					for ( j = 0; j < uv.length; j++ ) {
-
-						uv[j].u = ( uv[j].u + offsetx ) * unitx;
-						uv[j].v = ( uv[j].v + offsety ) * unity;
-
-					}
-
-				}
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
 
 			}
-
 
 			function initPostprocessing() {
 
@@ -242,19 +244,23 @@
 
 				} );
 
+				var film_shader = ShaderUtils.lib["film"];
+				var film_uniforms = Uniforms.clone( film_shader.uniforms );
+				
+				film_uniforms["tDiffuse"].texture = postprocessing.rtTexture1;
+				
+				postprocessing.materialFilm = new THREE.MeshShaderMaterial( { uniforms: film_uniforms, vertexShader: film_shader.vertexShader, fragmentShader: film_shader.fragmentShader } );
+				postprocessing.materialFilm.uniforms.grayscale.value = 0;
+				postprocessing.materialFilm.uniforms.nIntensity.value = 0.35;
+				postprocessing.materialFilm.uniforms.sIntensity.value = 0.95;
+				postprocessing.materialFilm.uniforms.sCount.value = 2048;
+
 				postprocessing.quad = new THREE.Mesh( new Plane( window.innerWidth, window.innerHeight ), postprocessing.materialConvolution );
 				postprocessing.quad.position.z = -500;
 				postprocessing.scene.addObject( postprocessing.quad );
 
 			}
-
-			function onDocumentMouseMove(event) {
-
-				mouseX = ( event.clientX - windowHalfX );
-				mouseY = ( event.clientY - windowHalfY ) * 0.3;
-
-			}
-
+			
 			//
 
 			function animate() {
@@ -266,65 +272,16 @@
 
 			}
 
-			var h, counter = 1;
-
 			function render() {
 
-				var time = new Date().getTime() * 0.00005;
+				uniforms.time.value += 0.02;
 
-				camera.position.x += ( mouseX - camera.position.x ) * 0.05;
-				camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
-
-				if ( video.readyState === video.HAVE_ENOUGH_DATA ) {
-
-					if ( texture ) texture.needsUpdate = true;
-
-				}
-
-				for( i = 0; i < cube_count; i++ ) {
-
-					material = materials[i];
-
-					h = ( 360 * ( material.hue + time ) % 360 ) / 360;
-					material.color.setHSV( h, material.saturation, 1 );
-
-				}
-
-				if( counter % 1000  > 200 ) {
-
-					for( i = 0; i < cube_count; i++ ) {
-
-						mesh = meshes[i];
-
-						mesh.rotation.x += 10 * mesh.dx;
-						mesh.rotation.y += 10 * mesh.dy;
-
-						mesh.position.x += 200 * mesh.dx;
-						mesh.position.y += 200 * mesh.dy;
-						mesh.position.z += 400 * mesh.dx;
-
-					}
-
-				}
-
-				if( counter % 1000  == 0 ) {
-
-					for( i = 0; i < cube_count; i++ ) {
-
-						mesh = meshes[i];
-
-						mesh.dx *= -1;
-						mesh.dy *= -1;
-
-					}
-
-				}
-
-				counter++;
-
-				renderer.clear();
+				mesh.rotation.y += 0.00125;
+				mesh.rotation.x += 0.005;
 
 				if ( postprocessing.enabled ) {
+
+					renderer.clear();
 
 					// Render scene into texture
 
@@ -351,23 +308,26 @@
 					postprocessing.quad.materials = [ postprocessing.materialScreen ];
 
 					postprocessing.materialScreen.uniforms.tDiffuse.texture = postprocessing.rtTexture3;
-					postprocessing.materialScreen.uniforms.opacity.value = 1.3;
+					postprocessing.materialScreen.uniforms.opacity.value = 1.25;
 
 					renderer.render( postprocessing.scene, postprocessing.camera, postprocessing.rtTexture1, false );
 
 					// Render to screen
+
+					postprocessing.materialFilm.uniforms.time.value += 0.01;
+					postprocessing.quad.materials = [ postprocessing.materialFilm ];
 
 					postprocessing.materialScreen.uniforms.tDiffuse.texture = postprocessing.rtTexture1;
 					renderer.render( postprocessing.scene, postprocessing.camera );
 
 				} else {
 
+					renderer.clear();
 					renderer.render( scene, camera );
 
 				}
 
 			}
-
 
 		</script>
 

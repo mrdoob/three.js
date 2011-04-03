@@ -17,6 +17,10 @@
  *  lookVertical: <bool>,
  *  autoForward: <bool>,
 
+ *  constrainVertical: <bool>,
+ *  verticalMin: <float>,
+ *  verticalMax: <float>,
+ 
  *  heightSpeed: <bool>,
  *  heightCoef: <float>,
  *  heightMin: <float>,
@@ -43,6 +47,10 @@ THREE.QuakeCamera = function ( parameters ) {
 	this.heightCoef = 1.0;
 	this.heightMin = 0.0;
 
+	this.constrainVertical = false;
+	this.verticalMin = 0;
+	this.verticalMax = 3.14;
+	
 	this.domElement = document;
 
 	if ( parameters ) {
@@ -60,6 +68,10 @@ THREE.QuakeCamera = function ( parameters ) {
 		if ( parameters.heightCoef !== undefined ) this.heightCoef = parameters.heightCoef;
 		if ( parameters.heightMin !== undefined ) this.heightMin = parameters.heightMin;
 		if ( parameters.heightMax !== undefined ) this.heightMax = parameters.heightMax;
+		
+		if ( parameters.constrainVertical !== undefined ) this.constrainVertical = parameters.constrainVertical;
+		if ( parameters.verticalMin !== undefined ) this.verticalMin = parameters.verticalMin;
+		if ( parameters.verticalMax !== undefined ) this.verticalMax = parameters.verticalMax;
 
 		if ( parameters.domElement !== undefined ) this.domElement = parameters.domElement;
 
@@ -221,6 +233,26 @@ THREE.QuakeCamera = function ( parameters ) {
 			targetPosition.z = position.z + 100 * Math.sin( this.phi ) * Math.sin( this.theta );
 		}
 
+		this.lon += this.mouseX * actualLookSpeed;
+		if( this.lookVertical ) this.lat -= this.mouseY * actualLookSpeed;
+
+		this.lat = Math.max( - 85, Math.min( 85, this.lat ) );
+		this.phi = ( 90 - this.lat ) * Math.PI / 180;
+		this.theta = this.lon * Math.PI / 180;
+
+		if ( this.constrainVertical ) {
+
+			this.phi = map_linear( this.phi, 0, 3.14, this.verticalMin, this.verticalMax );
+			
+		}
+		
+		var targetPosition = this.target.position,
+			position = this.position;
+
+		targetPosition.x = position.x + 100 * Math.sin( this.phi ) * Math.cos( this.theta );
+		targetPosition.y = position.y + 100 * Math.cos( this.phi );
+		targetPosition.z = position.z + 100 * Math.sin( this.phi ) * Math.sin( this.theta );
+
 		this.supr.update.call( this );
 
 	};
@@ -244,6 +276,12 @@ THREE.QuakeCamera = function ( parameters ) {
 
 	};
 
+	function map_linear( x, sa, sb, ea, eb ) {
+		
+		return ( x  - sa ) * ( eb - ea ) / ( sb - sa ) + ea;
+		
+	};
+	
 	function clamp_bottom( x, a ) {
 
 		return x < a ? a : x;
