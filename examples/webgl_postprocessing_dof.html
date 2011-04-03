@@ -55,7 +55,7 @@
 				materials = [], objects = [],
 				singleMaterial, zmaterial = [],
 				parameters, i, j, k, h, color, x, y, z, s, n, nobjects,
-				material_depth, material_base, cubeMaterial;
+				material_depth, cubeMaterial;
 
 			var mouseX = 0, mouseY = 0;
 
@@ -79,13 +79,6 @@
 
 				scene = new THREE.Scene();
 
-				/*
-				var light = new THREE.DirectionalLight( 0xffffff );
-				light.position.set( 0, 0.5, 1 );
-				light.position.normalize();
-				scene.addLight( light );
-				*/
-
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.setSize( window.innerWidth, height );
 				container.appendChild( renderer.domElement );
@@ -103,7 +96,6 @@
 				var textureCube = ImageUtils.loadTextureCube( urls );
 
 				parameters = { color: 0xff1100, envMap: textureCube, shading: THREE.FlatShading };
-				//parameters = { color: 0xff1100, shading: THREE.FlatShading };
 				cubeMaterial = new THREE.MeshBasicMaterial( parameters );
 
 				singleMaterial = false;
@@ -111,12 +103,12 @@
 				if( singleMaterial ) zmaterial = [ cubeMaterial ];
 
 				//var geo = new Cube( 1, 1, 1 );
-				var geo = new Sphere( 1, 20, 10 );
 				//var geo = new Icosahedron( 2 );
+				var geo = new Sphere( 1, 20, 10 );
 
-				material_base = cubeMaterial;
-
-				renderer.initMaterial( material_base, scene.lights, scene.fog );
+				var start = new Date().getTime();
+				
+				renderer.initMaterial( cubeMaterial, scene.lights, scene.fog );
 
 				var xgrid = 14,
 					ygrid = 9,
@@ -133,13 +125,17 @@
 				for ( j = 0; j < ygrid; j++ )
 				for ( k = 0; k < zgrid; k++ ) {
 
-					materials[c] = new THREE.MeshBasicMaterial( parameters );
-					//materials[c].program = material_base.program;
+					if ( singleMaterial ) {
 
-					if ( singleMaterial )
 						mesh = new THREE.Mesh( geo, zmaterial );
-					else
-						mesh = new THREE.Mesh( geo, materials[c] );
+
+					} else {
+
+						materials[ c ] = new THREE.MeshBasicMaterial( parameters );
+						mesh = new THREE.Mesh( geo, materials[ c ] );
+						renderer.initMaterial( materials[ c ], scene.lights, scene.fog, mesh );
+
+					}
 
 					x = 200 * ( i - xgrid/2 );
 					y = 200 * ( j - ygrid/2 );
@@ -158,6 +154,8 @@
 
 				}
 
+				//console.log("init time: ", new Date().getTime() - start );
+				
 				scene.matrixAutoUpdate = false;
 
 				initPostprocessing();
@@ -283,14 +281,17 @@
 				camera.position.x += ( mouseX - camera.position.x ) * 0.036;
 				camera.position.y += ( - (mouseY) - camera.position.y ) * 0.036;
 
-				for( i = 0; i < nobjects; i++ ) {
+				if ( !singleMaterial ) {
 
-					h = ( 360 * ( i/nobjects + time ) % 360 ) / 360;
-					//materials[i].color.setHSV( h, 0.5 + 0.5 * ( i % 20 / 20 ), 1 );
-					materials[i].color.setHSV( h, 1, 1 );
+					for( i = 0; i < nobjects; i++ ) {
+
+						h = ( 360 * ( i/nobjects + time ) % 360 ) / 360;
+						//materials[ i ].color.setHSV( h, 0.5 + 0.5 * ( i % 20 / 20 ), 1 );
+						materials[ i ].color.setHSV( h, 1, 1 );
+
+					}
 
 				}
-
 
 				if ( postprocessing.enabled ) {
 
@@ -299,9 +300,9 @@
 					// Render scene into texture
 
 					if ( singleMaterial )
-						zmaterial[0] = cubeMaterial;
+						zmaterial[ 0 ] = cubeMaterial;
 					else
-						for( i = 0; i < nobjects; i++ ) objects[i].materials = [ materials[i] ];
+						for( i = 0; i < nobjects; i++ ) objects[ i ].materials[ 0 ] = materials[ i ];
 
 
 					renderer.render( scene, camera, postprocessing.rtTextureColor, true );
@@ -309,9 +310,9 @@
 					// Render depth into texture
 
 					if ( singleMaterial )
-						zmaterial[0] = material_depth;
+						zmaterial[ 0 ] = material_depth;
 					else
-						for( i = 0; i < nobjects; i++ ) objects[i].materials = [ material_depth ];
+						for( i = 0; i < nobjects; i++ ) objects[i].materials[ 0 ] = material_depth;
 
 					renderer.render( scene, camera, postprocessing.rtTextureDepth, true );
 

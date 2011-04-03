@@ -1914,39 +1914,45 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.initMaterial = function ( material, lights, fog, object ) {
 
-		var u, a, identifiers, i, parameters, maxLightCount, maxBones;
+		var u, a, identifiers, i, parameters, maxLightCount, maxBones, shaderID;
 
 		if ( material instanceof THREE.MeshDepthMaterial ) {
 
-			setMaterialShaders( material, THREE.ShaderLib[ 'depth' ] );
+			shaderID = 'depth';
 
 		} else if ( material instanceof THREE.ShadowVolumeDynamicMaterial ) {
 
-			setMaterialShaders( material, THREE.ShaderLib[ 'shadowVolumeDynamic' ] );
+			shaderID = 'shadowVolumeDynamic';
 
 		} else if ( material instanceof THREE.MeshNormalMaterial ) {
 
-			setMaterialShaders( material, THREE.ShaderLib[ 'normal' ] );
+			shaderID = 'normal';
 
 		} else if ( material instanceof THREE.MeshBasicMaterial ) {
 
-			setMaterialShaders( material, THREE.ShaderLib[ 'basic' ] );
+			shaderID = 'basic';
 
 		} else if ( material instanceof THREE.MeshLambertMaterial ) {
 
-			setMaterialShaders( material, THREE.ShaderLib[ 'lambert' ] );
+			shaderID = 'lambert';
 
 		} else if ( material instanceof THREE.MeshPhongMaterial ) {
 
-			setMaterialShaders( material, THREE.ShaderLib[ 'phong' ] );
+			shaderID = 'phong';
 
 		} else if ( material instanceof THREE.LineBasicMaterial ) {
 
-			setMaterialShaders( material, THREE.ShaderLib[ 'basic' ] );
+			shaderID = 'basic';
 
 		} else if ( material instanceof THREE.ParticleBasicMaterial ) {
 
-			setMaterialShaders( material, THREE.ShaderLib[ 'particle_basic' ] );
+			shaderID = 'particle_basic';
+
+		}
+
+		if ( shaderID ) {
+
+			setMaterialShaders( material, THREE.ShaderLib[ shaderID ] );
 
 		}
 
@@ -1958,53 +1964,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 		maxBones = allocateBones( object );
 
 		parameters = {
-			map: material.map, envMap: material.envMap, lightMap: material.lightMap, vertexColors: material.vertexColors,
+			map: !!material.map, envMap: !!material.envMap, lightMap: !!material.lightMap, 
+			vertexColors: material.vertexColors,
 			fog: fog, sizeAttenuation: material.sizeAttenuation,
 			skinning: material.skinning,
 			morphTargets: material.morphTargets,
+			maxMorphTargets: this.maxMorphTargets,
 			maxDirLights: maxLightCount.directional, maxPointLights: maxLightCount.point,
 			maxBones: maxBones
 		};
 
-		material.program = buildProgram( material.fragmentShader, material.vertexShader, parameters );
-
-		// load uniforms
-
-		identifiers = [
-			'viewMatrix', 'modelViewMatrix', 'projectionMatrix', 'normalMatrix', 'objectMatrix', 'cameraPosition',
-			'cameraInverseMatrix', 'boneGlobalMatrices', 'morphTargetInfluences'
-		];
-
-
-		for ( u in material.uniforms ) {
-
-			identifiers.push(u);
-
-		}
-
-		cacheUniformLocations( material.program, identifiers );
-
-
-		// load attributes
-
-		identifiers = [
-			"position", "normal", "uv", "uv2", "tangent", "color",
-			"skinVertexA", "skinVertexB", "skinIndex", "skinWeight"
-		];
-
-		for ( i = 0; i < this.maxMorphTargets; i++ ) {
-
-			identifiers.push( "morphTarget" + i );
-
-		}
-
-		for ( a in material.attributes ) {
-
-			identifiers.push( a );
-
-		}
-
-		cacheAttributeLocations( material.program, identifiers );
+		material.program = buildProgram( shaderID, material.fragmentShader, material.vertexShader, material.uniforms, material.attributes, parameters );
 
 		var attributes = material.program.attributes;
 
@@ -2055,12 +2025,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				_gl.enableVertexAttribArray( attributes.morphTarget2 );
 				material.numSupportedMorphTargets ++;
+
 			}
 
 			if ( attributes.morphTarget3 >= 0 ) {
 
 				_gl.enableVertexAttribArray( attributes.morphTarget3 );
 				material.numSupportedMorphTargets ++;
+
 			}
 
 			if ( attributes.morphTarget4 >= 0 ) {
@@ -2074,6 +2046,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				_gl.enableVertexAttribArray( attributes.morphTarget5 );
 				material.numSupportedMorphTargets ++;
+
 			}
 
 			if ( attributes.morphTarget6 >= 0 ) {
@@ -3755,19 +3728,32 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function buildProgram( fragmentShader, vertexShader, parameters ) {
+	function buildProgram( shaderID, fragmentShader, vertexShader, uniforms, attributes, parameters ) {
 
 		var p, pl, program, code;
+		var chunks = [];
 
 		// Generate code
 
-		code = fragmentShader + "\n\n" + vertexShader + "\n\n";
+		if ( shaderID ) {
+
+			chunks.push( shaderID );
+
+		} else {
+
+			chunks.push( fragmentShader );
+			chunks.push( vertexShader );
+
+		}
 
 		for ( p in parameters ) {
 
-			code += p + ": " + parameters[ p ] + ",\n";
+			chunks.push( p );
+			chunks.push( parameters[ p ] );
 
 		}
+
+		code = chunks.join();
 
 		// Check if code has been already compiled
 
@@ -3776,11 +3762,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 			if ( _programs[ p ].code == code ) {
 
 				// console.log( "Code already compiled." /*: \n\n" + code*/ );
+
 				return _programs[ p ].program;
 
 			}
 
 		}
+		
+		//console.log( "building new program " );
 
 		//
 
@@ -3886,6 +3875,48 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		program.uniforms = {};
 		program.attributes = {};
+
+		var identifiers, u, a, i;
+
+		// cache uniform locations
+
+		identifiers = [
+
+			'viewMatrix', 'modelViewMatrix', 'projectionMatrix', 'normalMatrix', 'objectMatrix', 'cameraPosition',
+			'cameraInverseMatrix', 'boneGlobalMatrices', 'morphTargetInfluences'
+
+		];
+
+		for ( u in uniforms ) {
+
+			identifiers.push( u );
+
+		}
+
+		cacheUniformLocations( program, identifiers );
+		
+		// cache attributes locations
+
+		identifiers = [
+
+			"position", "normal", "uv", "uv2", "tangent", "color",
+			"skinVertexA", "skinVertexB", "skinIndex", "skinWeight"
+
+		];
+
+		for ( i = 0; i < parameters.maxMorphTargets; i++ ) {
+
+			identifiers.push( "morphTarget" + i );
+
+		}
+
+		for ( a in attributes ) {
+
+			identifiers.push( a );
+
+		}
+
+		cacheAttributeLocations( program, identifiers );
 
 		_programs.push( { program: program, code: code } );
 
