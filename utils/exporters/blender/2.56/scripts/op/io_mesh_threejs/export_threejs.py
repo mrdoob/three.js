@@ -208,6 +208,8 @@ var model = {
 
     "version" : 2,
     
+    "scale" : %(scale)f,
+    
     "materials": [%(materials)s],
 
     "vertices": [%(vertices)s],
@@ -741,7 +743,7 @@ def generate_materials_string(mesh, scene, use_colors, draw_type):
 # ASCII model generator
 # #####################################################
 
-def generate_ascii_model(mesh, scene, use_normals, use_colors, use_uv_coords, use_materials, align_model, flipyz, option_truncate, draw_type):
+def generate_ascii_model(mesh, scene, use_normals, use_colors, use_uv_coords, use_materials, align_model, flipyz, option_truncate, option_scale, draw_type):
 
     vertices = mesh.vertices[:]    
 
@@ -769,6 +771,8 @@ def generate_ascii_model(mesh, scene, use_normals, use_colors, use_uv_coords, us
     "nnormal"   : nnormal,
     "ncolor"    : ncolor,
     "nmaterial" : nmaterial,
+    
+    "scale" : option_scale,
 
     "uvs"           : generate_uvs(uvs, use_uv_coords),
     "normals"       : generate_normals(normals, use_normals),
@@ -834,7 +838,7 @@ def export_mesh(obj, scene, filepath, use_normals, use_colors, use_uv_coords, us
         if not active_col_layer:
             use_colors = False
 
-    text = generate_ascii_model(mesh, scene, use_normals, use_colors, use_uv_coords, use_materials, align_model, flipyz, option_truncate, obj.draw_type)
+    text = generate_ascii_model(mesh, scene, use_normals, use_colors, use_uv_coords, use_materials, align_model, flipyz, option_truncate, option_scale, obj.draw_type)
     write_file(filepath, text)
 
     # remove temp mesh
