@@ -129,6 +129,8 @@ class ExportTHREEJS(bpy.types.Operator, ExportHelper):
     use_colors = BoolProperty(name="Colors", description="Export vertex colors", default=True)
     use_uv_coords = BoolProperty(name="UVs", description="Export texture coordinates", default=True)
     option_export_scene = BoolProperty(name="Scene", description="Export scene", default=False)
+    option_truncate = BoolProperty(name="Truncate", description="Truncate decimals", default=False)
+    option_scale = FloatProperty(name="Scale", description="Scale data", min=0.01, max=1000.0, soft_min=0.01, soft_max=1000.0, default=1.0)
 
     align_types = [("None","None","None"), ("Center","Center","Center"), ("Bottom","Bottom","Bottom"), ("Top","Top","Top")]
     align_model = EnumProperty(name="Align model", description="Align model", items=align_types, default="None")
@@ -164,12 +166,15 @@ class ExportTHREEJS(bpy.types.Operator, ExportHelper):
 
         row = layout.row()
         row.prop(self.properties, "use_normals")
-        row = layout.row()
         row.prop(self.properties, "use_colors")
         row = layout.row()
         row.prop(self.properties, "use_uv_coords")
-        row = layout.row()
         row.prop(self.properties, "use_materials")
+        layout.separator()
+
+        row = layout.row()
+        row.prop(self.properties, "option_truncate")
+        row.prop(self.properties, "option_scale")
 
 
 # ################################################################
