@@ -94,6 +94,8 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texture_path
 		normals = json.normals,
 		colors = json.colors,
 
+		scale = ( json.scale !== undefined ) ? json.scale : 1.0,
+		
 		nUvLayers = 0;
 
 		// disregard empty arrays
@@ -118,9 +120,9 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texture_path
 
 			vertex = new THREE.Vertex();
 
-			vertex.position.x = vertices[ offset ++ ];
-			vertex.position.y = vertices[ offset ++ ];
-			vertex.position.z = vertices[ offset ++ ];
+			vertex.position.x = vertices[ offset ++ ] / scale;
+			vertex.position.y = vertices[ offset ++ ] / scale;
+			vertex.position.z = vertices[ offset ++ ] / scale;
 
 			geometry.vertices.push( vertex );
 
