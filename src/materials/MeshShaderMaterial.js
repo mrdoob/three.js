@@ -37,6 +37,7 @@ THREE.MeshShaderMaterial = function ( parameters ) {
 	this.wireframe = parameters.wireframe !== undefined ? parameters.wireframe : false;
 	this.wireframeLinewidth = parameters.wireframeLinewidth !== undefined ? parameters.wireframeLinewidth : 1;
 
+	this.fog = parameters.fog !== undefined ? parameters.fog : false; // set to use scene fog
 	this.lights = parameters.lights !== undefined ? parameters.lights : false; // set to use scene lights
 	this.vertexColors = parameters.vertexColors !== undefined ? parameters.vertexColors : false; // set to use "color" attribute stream
 	this.skinning = parameters.skinning !== undefined ? parameters.skinning : false; // set to use skinning attribute streams
