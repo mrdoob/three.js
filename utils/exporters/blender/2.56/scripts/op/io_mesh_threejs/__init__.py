@@ -128,7 +128,7 @@ class ExportTHREEJS(bpy.types.Operator, ExportHelper):
     use_normals = BoolProperty(name="Normals", description="Export normals", default=True)
     use_colors = BoolProperty(name="Colors", description="Export vertex colors", default=True)
     use_uv_coords = BoolProperty(name="UVs", description="Export texture coordinates", default=True)
-    option_export_scene = BoolProperty(name="Scene", description="Export scene", default=True)
+    option_export_scene = BoolProperty(name="Scene", description="Export scene", default=False)
 
     align_types = [("None","None","None"), ("Center","Center","Center"), ("Bottom","Bottom","Bottom"), ("Top","Top","Top")]
     align_model = EnumProperty(name="Align model", description="Align model", items=align_types, default="None")
