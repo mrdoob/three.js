@@ -79,7 +79,9 @@ COMMON_FILES = [
 'renderers/renderables/RenderableFace4.js',
 'renderers/renderables/RenderableObject.js',
 'renderers/renderables/RenderableParticle.js',
-'renderers/renderables/RenderableLine.js'
+'renderers/renderables/RenderableLine.js',
+'physics/Collisions.js',
+'physics/CollisionUtils.js'
 ]
 
 EXTRAS_FILES = [

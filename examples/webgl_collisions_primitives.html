@@ -1,0 +1,216 @@
+<html>
+    <head>
+        <title>Intersection: ray with sphere/AABB/plane</title>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        <style type="text/css">
+            
+            body {
+                font-family: Monospace;
+                background-color: #f0f0f0;
+                margin: 0px;
+                overflow: hidden;
+            }
+            
+            #oldie {
+                background-color: #ddd !important
+            }
+            
+            #info {
+                position: absolute;
+                top: 30px;
+                left: 10px;
+                width: 800px;
+                color: #000000;
+                padding: 5px;
+                font-family: Monospace;
+                font-size: 13px;
+                text-align: left;
+                z-index: 100;
+            }
+            
+            #options {
+                position: absolute;
+                top: 10px;
+                left: 10px;
+                width: 800px;
+                color: #000000;
+                padding: 5px;
+                font-family: Monospace;
+                font-size: 13px;
+                text-align: left;
+                z-index: 100;
+            }
+            
+        </style>
+        <script type="text/javascript" src="../build/Three.js">
+        </script>
+        <script type="text/javascript" src="js/RequestAnimationFrame.js">
+        </script>
+        <script type="text/javascript">
+            
+            var scene, camera, renderer, info, mouse2d, sun;
+            
+            var theta = 0;
+            var camdist = 1500;
+            var geoms = [];
+            
+            function init(){
+                container = document.createElement('div');
+                document.body.appendChild(container);
+                
+                info = document.getElementById("info");
+                
+                camera = new THREE.Camera(40, window.innerWidth / window.innerHeight, 1, 10000);
+                mouse2d = new THREE.Vector3(0, 0, 1);
+                
+                scene = new THREE.Scene();
+                
+                renderer = new THREE.WebGLRenderer();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                container.appendChild(renderer.domElement);
+                
+                var ambientLight = new THREE.AmbientLight(0x606060);
+                scene.addLight(ambientLight);
+                
+                sun = new THREE.DirectionalLight(0xffffff);
+                scene.addLight(sun);
+                
+                //makeWall(480);
+                //makeWall(360);
+                makeWall(240);
+                makeWall(120);
+                makeWall(0);
+                makeWall(-120);
+                makeWall(-240);
+                //makeWall(-360);
+                //makeWall(-480);
+                
+                plane = new THREE.Mesh(new Plane(30000, 30000, 10, 10), new THREE.MeshLambertMaterial({
+                    color: 0x003300
+                }));
+                plane.position.y = -480;
+                plane.rotation.x = Math.PI / -2;
+                scene.addObject(plane);
+                geoms.push(plane);
+                
+                var cplane = new THREE.PlaneCollider(plane.position, new THREE.Vector3(0, 1, 0));
+                cplane.mesh = plane;
+                THREE.Collisions.colliders.push(cplane);
+                
+                container.onmousemove = onDocumentMouseMove;
+                animate();
+            }
+            
+            function makeWall(z){
+                var mx = 120 * 2;
+                for (var i = -mx; i <= mx; i += 120) {
+                    for (var j = -mx; j <= mx; j += 120) {
+                        if (Math.random() > 0.5) 
+                            createCube(100, new THREE.Vector3(j, i, z));
+                        else 
+                            createSphere(50, new THREE.Vector3(j, i, z));
+                    }
+                }
+            }
+            
+            function createCube(s, p){
+                var cube = new THREE.Mesh(new Cube(s, s, s, 1, 1, 1), new THREE.MeshLambertMaterial({
+                    color: 0x003300
+                }));
+                cube.position = p;
+                scene.addObject(cube);
+                geoms.push(cube);
+                THREE.Collisions.colliders.push(THREE.CollisionUtils.MeshAABB(cube, p));
+            }
+            
+            function createSphere(rad, p){
+                var sphere = new THREE.Mesh(new Sphere(rad, 10, 10), new THREE.MeshLambertMaterial({
+                    color: 0x003300
+                }));
+                sphere.position = p;
+                scene.addObject(sphere);
+                geoms.push(sphere);
+                
+                var sc = new THREE.SphereCollider(p, rad);
+                sc.mesh = sphere;
+                THREE.Collisions.colliders.push(sc);
+            }
+            
+            function onDocumentMouseMove(event){
+                event.preventDefault();
+                mouse2d.x = (event.clientX / window.innerWidth) * 2 - 1;
+                mouse2d.y = -(event.clientY / window.innerHeight) * 2 + 1;
+                mouse2d.z = 1;
+            }
+            
+            function animate(){
+                requestAnimationFrame(animate);
+                
+                var r = new THREE.Ray();
+                r.origin = mouse2d.clone();
+                var matrix = camera.matrixWorld.clone();
+                matrix.multiplySelf(THREE.Matrix4.makeInvert(camera.projectionMatrix));
+                matrix.multiplyVector3(r.origin);
+                r.direction = r.origin.clone().subSelf(camera.position);
+                
+                for (var i = 0; i < geoms.length; i++) {
+                    geoms[i].materials[0].color = new THREE.Color(0x007700);
+                }
+                
+                if (!document.getElementById("nearest").checked) {
+                    // Raycast all
+                    ts = new Date().getTime();
+                    var cs = THREE.Collisions.rayCastAll(r);
+                    tt = new Date().getTime() - ts;
+                    if (cs.length > 0) {
+                        info.innerHTML = cs.length + " colliders found in " + tt;
+                        for (var i = 0; i < cs.length; i++) {
+                            cs[i].mesh.materials[0].color = new THREE.Color(0xaa0000);
+                        }
+                    }
+                    else {
+                        info.innerHTML = "No intersection";
+                    }
+                }
+                else {
+                    // Raycast nearest
+                    ts = new Date().getTime();
+                    var c = THREE.Collisions.rayCastNearest(r);
+                    tt = new Date().getTime() - ts;
+                    if (c) {
+                        info.innerHTML = "Found in " + tt + " @ distance " + c.distance;
+                        c.mesh.materials[0].color = new THREE.Color(0xaa0000);
+                    }
+                    else {
+                        info.innerHTML = "No intersection";
+                    }
+                }
+                
+                camera.position.x = camdist * Math.cos(theta);
+                camera.position.z = camdist * Math.sin(theta);
+                camera.position.y = camdist / 2 * Math.sin(theta * 2);
+                sun.position = camera.position.clone();
+                sun.position.normalize();
+                theta += 0.005;
+                
+                renderer.render(scene, camera);
+            }
+            
+            function vts(v){
+                if (!v) 
+                    return "undefined<br>";
+                else 
+                    return v.x + " , " + v.y + " , " + v.z + "<br>";
+            }
+            
+        </script>
+    </head>
+    <body onload="init();">
+        <div id="info">
+        </div>
+        <div id="options">
+            <input type="checkbox" id="nearest" checked/> Nearest collider only
+            <br/>
+        </div>
+    </body>
+</html>

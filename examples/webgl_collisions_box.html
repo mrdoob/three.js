@@ -1,0 +1,144 @@
+
+<html> 
+ 
+<head> 
+<title>Intersection: ray with box</title> 
+<meta http-equiv="content-type" content="text/html; charset=utf-8"> 
+<style type="text/css"> 
+
+body {
+	font-family: Monospace;
+	background-color: #f0f0f0;
+	margin: 0px;
+	overflow: hidden;
+}
+ 
+#oldie { background-color: #ddd !important }
+
+#info {
+	position: absolute;
+	top: 30px; left: 10px; width: 800px;
+	color: #000000;
+	padding: 5px;
+	font-family: Monospace;
+	font-size: 13px;
+	text-align: left;
+	z-index:100;
+}
+
+#options {
+	position: absolute;
+	top: 10px; left: 10px; width: 800px;
+	color: #000000;
+	padding: 5px;
+	font-family: Monospace;
+	font-size: 13px;
+	text-align: left;
+	z-index:100;
+}
+
+</style>
+
+<script type="text/javascript" src="../build/Three.js"></script> 
+<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
+
+<script type="text/javascript"> 
+
+var scene, camera, renderer, info, mouse2d, sun, cube, ghostCube;
+
+var bounce = 0;
+
+function init() {
+
+	container = document.createElement( 'div' );
+	document.body.appendChild( container );
+	
+	info = document.getElementById("info");
+	
+	camera = new THREE.Camera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
+	camera.position.z = -500;
+	mouse2d = new THREE.Vector3( 0, 0, 1 );
+
+	scene = new THREE.Scene();
+
+	renderer = new THREE.WebGLRenderer();
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	container.appendChild(renderer.domElement);
+	
+	var ambientLight = new THREE.AmbientLight( 0x606060 );
+	scene.addLight( ambientLight );
+
+	sun = new THREE.DirectionalLight( 0xffffff );
+	sun.position = camera.position.clone();
+	scene.addLight( sun );
+	
+	createCube(200, new THREE.Vector3(0,0,0) );
+
+	container.onmousemove = onDocumentMouseMove;
+	animate();
+}
+
+function createCube(s, p) {
+	
+	cube = new THREE.Mesh ( 	
+		new Cube(s,s,s,1,1,1), 
+		new THREE.MeshLambertMaterial( { color: 0x003300 })
+	);
+
+	cube.position = p;
+	scene.addObject( cube );
+	THREE.Collisions.colliders.push( THREE.CollisionUtils.MeshOBB(cube) );
+}
+
+function onDocumentMouseMove( event ) {
+	event.preventDefault();	
+	mouse2d.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+	mouse2d.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+	mouse2d.z = 1;
+}
+
+function animate() {
+	requestAnimationFrame( animate );
+	
+	var r = new THREE.Ray();
+	r.origin = mouse2d.clone();
+	var matrix = camera.matrixWorld.clone();
+	matrix.multiplySelf( THREE.Matrix4.makeInvert( camera.projectionMatrix ) );
+	matrix.multiplyVector3( r.origin );
+	r.direction = r.origin.clone().subSelf(camera.position);
+
+	info.innerHTML = "";
+
+	var c = THREE.Collisions.rayCastNearest(r);
+	if(c) {
+		info.innerHTML += "Found @ distance " + c.distance;
+		c.mesh.materials[0].color = new THREE.Color(0xaa0000);
+	} else {
+		info.innerHTML += "No intersection";
+		cube.materials[0].color = new THREE.Color(0x003300);
+	}
+	
+	
+	cube.rotation.x += 0.01;
+	cube.rotation.y += 0.02;
+	cube.position.x = Math.sin(bounce) * 100;
+	bounce += 0.01;
+
+	renderer.render( scene, camera );
+}
+
+function vts(v) {
+	if(!v) return "undefined<br>";
+	else return v.x + " , " + v.y + " , " + v.z + "<br>";
+}
+
+</script>
+
+</head> 
+
+<body onload="init();"> 
+<div id="info"></div>
+<div id="options"></div>
+</body> 
+
+</html> 
