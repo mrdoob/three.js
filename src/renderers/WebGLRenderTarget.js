@@ -17,5 +17,8 @@ THREE.WebGLRenderTarget = function ( width, height, options ) {
 
 	this.format = options.format !== undefined ? options.format : THREE.RGBFormat;
 	this.type = options.type !== undefined ? options.type : THREE.UnsignedByteType;
+	
+	this.depthBuffer = options.depthBuffer !== undefined ? options.depthBuffer : true;
+	this.stencilBuffer = options.stencilBuffer !== undefined ? options.stencilBuffer : true;
 
 };
