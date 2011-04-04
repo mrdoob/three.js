@@ -18,6 +18,7 @@ THREE.Geometry = function () {
 	this.faceVertexUvs = [[]];
 
 	this.morphTargets = [];
+	this.morphColors = [];
 
 	this.skinWeights = [];
 	this.skinIndices = [];

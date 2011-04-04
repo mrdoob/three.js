@@ -4,7 +4,7 @@
 How to use this converter
 -------------------------
 
-python convert_obj_three.py -i infile.obj -o outfile.js [-m morphfiles*.obj] [-a center|centerxz|top|bottom|none] [-s smooth|flat] [-t ascii|binary] [-d invert|normal]
+python convert_obj_three.py -i infile.obj -o outfile.js [-m morphfiles*.obj] [-c morphcolors*.obj] [-a center|centerxz|top|bottom|none] [-s smooth|flat] [-t ascii|binary] [-d invert|normal] [-b]
 
 Notes: 
 
@@ -137,6 +137,8 @@ SHADING = "smooth"      # smooth flat
 TYPE = "ascii"          # ascii binary
 TRANSPARENCY = "normal" # normal invert
 
+BAKE_COLORS = False
+
 # default colors for debugging (each material gets one distinct color): 
 # white, red, green, blue, yellow, cyan, magenta
 COLORS = [0xeeeeee, 0xee0000, 0x00ee00, 0x0000ee, 0xeeee00, 0x00eeee, 0xee00ee]
@@ -148,7 +150,8 @@ TEMPLATE_FILE_ASCII = u"""\
 // Converted from: %(fname)s
 //  vertices: %(nvertex)d
 //  faces: %(nface)d 
-//  normals: %(nnormal)d 
+//  normals: %(nnormal)d
+//  colors: %(ncolor)d
 //  uvs: %(nuv)d 
 //  materials: %(nmaterial)d
 //
@@ -163,10 +166,14 @@ var model = {
     "materials": [%(materials)s],
 
     "vertices": [%(vertices)s],
-
+    
     "morphTargets": [%(morphTargets)s],
 
+    "morphColors": [%(morphColors)s],
+
     "normals": [%(normals)s],
+
+    "colors": [%(colors)s],
 
     "uvs": [[%(uvs)s]],
 
@@ -204,8 +211,11 @@ TEMPLATE_VERTEX = "%f,%f,%f"
 
 TEMPLATE_N = "%f,%f,%f"
 TEMPLATE_UV = "%f,%f"
+TEMPLATE_COLOR = "%.3f,%.3f,%.3f"
+TEMPLATE_COLOR_DEC = "%d"
 
-TEMPLATE_MORPH = '\t{ "name": "%s", "vertices": [%s] }'
+TEMPLATE_MORPH_VERTICES = '\t{ "name": "%s", "vertices": [%s] }'
+TEMPLATE_MORPH_COLORS   = '\t{ "name": "%s", "colors": [%s] }'
 
 # #####################################################
 # Utils
@@ -565,7 +575,7 @@ def parse_obj(fname):
     return faces, vertices, uvs, normals, materials, mtllib
     
 # #####################################################
-# Generator
+# Generator - faces
 # #####################################################
 def setBit(value, position, on):
     if on:
@@ -573,12 +583,9 @@ def setBit(value, position, on):
         return (value | mask)
     else:
         mask = ~(1 << position)
-        return (value & mask)
+        return (value & mask)    
     
-def generate_vertex(v):
-    return TEMPLATE_VERTEX % (v[0], v[1], v[2])
-    
-def generate_face(f):
+def generate_face(f, fc):
     isTriangle = ( len(f['vertex']) == 3 )
     
     if isTriangle:
@@ -594,7 +601,7 @@ def generate_face(f):
     hasFaceNormals = False # don't export any face normals (as they are computed in engine)
     hasFaceVertexNormals = ( len(f["normal"]) >= nVertices and SHADING == "smooth" )
     
-    hasFaceColors = False       # not supported in OBJ
+    hasFaceColors = BAKE_COLORS
     hasFaceVertexColors = False # not supported in OBJ
 
     faceType = 0
@@ -616,12 +623,15 @@ def generate_face(f):
     # material index
     # face uvs index
     # face vertex uvs indices
+    # face normal index
+    # face vertex normals indices
     # face color index
     # face vertex colors indices
     
     faceData.append(faceType)    
     
     # must clamp in case on polygons bigger than quads
+
     for i in xrange(nVertices):
         index = f['vertex'][i] - 1
         faceData.append(index)
@@ -637,8 +647,21 @@ def generate_face(f):
         for i in xrange(nVertices):
             index = f['normal'][i] - 1
             faceData.append(index)
+            
+    if hasFaceColors:
+        index = fc['material']
+        faceData.append(index)        
 
     return ",".join( map(str, faceData) )
+
+# #####################################################
+# Generator - chunks
+# #####################################################
+def hexcolor(c):
+    return ( int(c[0] * 255) << 16  ) + ( int(c[1] * 255) << 8 ) + int(c[2] * 255)
+
+def generate_vertex(v):
+    return TEMPLATE_VERTEX % (v[0], v[1], v[2])
 
 def generate_normal(n):
     return TEMPLATE_N % (n[0], n[1], n[2])
@@ -646,13 +669,149 @@ def generate_normal(n):
 def generate_uv(uv):
     return TEMPLATE_UV % (uv[0], 1.0 - uv[1])
 
+def generate_color_rgb(c):
+    return TEMPLATE_COLOR % (c[0], c[1], c[2])
+    
+def generate_color_decimal(c):
+    return TEMPLATE_COLOR_DEC % hexcolor(c)
+    
 # #####################################################
 # Morphs
 # #####################################################
-def generate_morph(name, vertices):
+def generate_morph_vertex(name, vertices):
     vertex_string = ",".join(generate_vertex(v) for v in vertices)
-    return TEMPLATE_MORPH % (name, vertex_string)
+    return TEMPLATE_MORPH_VERTICES % (name, vertex_string)
     
+def generate_morph_color(name, colors):
+    color_string = ",".join(generate_color_rgb(c) for c in colors)
+    return TEMPLATE_MORPH_COLORS % (name, color_string)
+
+def extract_material_colors(materials, mtlfilename, basename):
+    """Extract diffuse colors from MTL materials
+    """
+
+    if not materials:
+        materials = { 'default': 0 }
+
+    mtl = create_materials(materials, mtlfilename, basename)
+    
+    mtlColorArraySrt = []
+    for m in mtl:
+        if m in materials:
+            index = materials[m]
+            color = mtl[m].get("colorDiffuse", [1,0,0])
+            mtlColorArraySrt.append([index, color])
+       
+    mtlColorArraySrt.sort()
+    mtlColorArray = [x[1] for x in mtlColorArraySrt]
+
+    return mtlColorArray
+
+def extract_face_colors(faces, material_colors):
+    """Extract colors from materials and assign them to faces
+    """
+    
+    faceColors = []
+
+    for face in faces:
+        material_index = face['material']
+        faceColors.append(material_colors[material_index])
+
+    return faceColors
+
+def generate_morph_targets(morphfiles, n_vertices, infile):
+    skipOriginalMorph = False
+    norminfile = os.path.normpath(infile)
+    
+    morphVertexData = []
+
+    for mfilepattern in morphfiles.split():
+
+        matches = glob.glob(mfilepattern)
+        matches.sort()
+
+        for path in matches:
+
+            normpath = os.path.normpath(path)
+
+            if normpath != norminfile or not skipOriginalMorph:
+
+                name = os.path.basename(normpath)
+                
+                morphFaces, morphVertices, morphUvs, morphNormals, morphMaterials, morphMtllib = parse_obj(normpath)
+                
+                n_morph_vertices = len(morphVertices)
+
+                if n_vertices != n_morph_vertices:
+
+                    print "WARNING: skipping morph [%s] with different number of vertices [%d] than the original model [%d]" % (name, n_morph_vertices, n_vertices)
+
+                else:
+                    
+                    if ALIGN == "center":
+                        center(morphVertices)
+                    elif ALIGN == "centerxz":
+                        centerxz(morphVertices)
+                    elif ALIGN == "bottom":
+                        bottom(morphVertices)
+                    elif ALIGN == "top":
+                        top(morphVertices)
+                        
+                    morphVertexData.append((get_name(name), morphVertices))
+                    print "adding [%s] with %d vertices" % (name, n_morph_vertices)
+    
+    morphTargets = ""
+    if len(morphVertexData):
+        morphTargets = "\n%s\n\t" % ",\n".join(generate_morph_vertex(name, vertices) for name, vertices in morphVertexData)
+
+    return morphTargets
+    
+def generate_morph_colors(colorfiles, n_vertices, n_faces):
+    morphColorData = []
+    colorFaces = []
+    materialColors = []
+    
+    for mfilepattern in colorfiles.split():
+
+        matches = glob.glob(mfilepattern)
+        matches.sort()
+        for path in matches:
+            normpath = os.path.normpath(path)
+            name = os.path.basename(normpath)
+
+            morphFaces, morphVertices, morphUvs, morphNormals, morphMaterials, morphMtllib = parse_obj(normpath)
+
+            n_morph_vertices = len(morphVertices)
+            n_morph_faces = len(morphFaces)
+
+            if n_vertices != n_morph_vertices:
+
+                print "WARNING: skipping morph color map [%s] with different number of vertices [%d] than the original model [%d]" % (name, n_morph_vertices, n_vertices)
+
+            elif n_faces != n_morph_faces:
+
+                print "WARNING: skipping morph color map [%s] with different number of faces [%d] than the original model [%d]" % (name, n_morph_faces, n_faces)
+
+            else:
+
+                morphMaterialColors = extract_material_colors(morphMaterials, morphMtllib, normpath)  
+                morphFaceColors = extract_face_colors(morphFaces, morphMaterialColors)
+                morphColorData.append((get_name(name), morphFaceColors))
+
+                # take first color map for baking into face colors
+
+                if len(colorFaces) == 0:
+                    colorFaces = morphFaces
+                    materialColors = morphMaterialColors
+
+                print "adding [%s] with %d face colors" % (name, len(morphFaceColors))
+
+    morphColors = ""
+    if len(morphColorData):
+        morphColors = "\n%s\n\t" % ",\n".join(generate_morph_color(name, colors) for name, colors in morphColorData)
+    
+    return morphColors, colorFaces, materialColors
+
 # #####################################################
 # Materials
 # #####################################################
@@ -675,6 +834,8 @@ def generate_color(i):
 def value2string(v):
     if type(v)==str and v[0:2] != "0x":
         return '"%s"' % v
+    elif type(v) == bool:
+        return str(v).lower()
     return str(v)
     
 def generate_materials(mtl, materials):
@@ -697,6 +858,9 @@ def generate_materials(mtl, materials):
             mtl[m]['DbgIndex'] = index
             mtl[m]['DbgColor'] = generate_color(index)
             
+            if BAKE_COLORS:
+                mtl[m]['vertexColors'] = "face"
+            
             mtl_raw = ",\n".join(['\t"%s" : %s' % (n, value2string(v)) for n,v in sorted(mtl[m].items())])
             mtl_string = "\t{\n%s\n\t}" % mtl_raw
             mtl_array.append([index, mtl_string])
@@ -717,34 +881,49 @@ def generate_mtl(materials):
         }
     return mtl
     
-def generate_materials_string(materials, mtllib):
+def generate_materials_string(materials, mtlfilename, basename):
     """Generate final materials string.
     """
 
-    random.seed(42) # to get well defined color order for materials
+    if not materials:
+        materials = { 'default': 0 }
+
+    mtl = create_materials(materials, mtlfilename, basename)
+    return generate_materials(mtl, materials)
+    
+def create_materials(materials, mtlfilename, basename):
+    """Parse MTL file and create mapping between its materials and OBJ materials.
+       Eventual edge cases are handled here (missing materials, missing MTL file).
+    """
+
+    random.seed(42) # to get well defined color order for debug colors
     
     # default materials with debug colors for when
     # there is no specified MTL / MTL loading failed,
     # or if there were no materials / null materials
-    if not materials:
-        materials = { 'default':0 }
+
     mtl = generate_mtl(materials)
     
-    if mtllib:
+    if mtlfilename:
+
         # create full pathname for MTL (included from OBJ)
-        path = os.path.dirname(infile)
-        fname = os.path.join(path, mtllib)
+
+        path = os.path.dirname(basename)
+        fname = os.path.join(path, mtlfilename)
         
         if file_exists(fname):
+
             # override default materials with real ones from MTL
             # (where they exist, otherwise keep defaults)
+
             mtl.update(parse_mtl(fname))
         
         else:
+
             print "Couldn't find [%s]" % fname
-    
-    return generate_materials(mtl, materials)
-    
+            
+    return mtl
+
 # #####################################################
 # Faces
 # #####################################################
@@ -809,7 +988,7 @@ def sort_faces(faces):
 # #####################################################
 # API - ASCII converter
 # #####################################################
-def convert_ascii(infile, morphfiles, outfile):
+def convert_ascii(infile, morphfiles, colorfiles, outfile):
     """Convert infile.obj to outfile.js
     
     Here is where everything happens. If you need to automate conversions,
@@ -819,9 +998,16 @@ def convert_ascii(infile, morphfiles, outfile):
     if not file_exists(infile):
         print "Couldn't find [%s]" % infile
         return
-        
+       
+    # parse OBJ / MTL files
+
     faces, vertices, uvs, normals, materials, mtllib = parse_obj(infile)
-    
+
+    n_vertices = len(vertices)
+    n_faces = len(faces)
+
+    # align model
+
     if ALIGN == "center":
         center(vertices)
     elif ALIGN == "centerxz":
@@ -831,48 +1017,37 @@ def convert_ascii(infile, morphfiles, outfile):
     elif ALIGN == "top":
         top(vertices)
     
-    n_vertices = len(vertices)
-    
+    # generate normals string
+
     nnormal = 0
     normals_string = ""
     if SHADING == "smooth":
         normals_string = ",".join(generate_normal(n) for n in normals)
         nnormal = len(normals)
     
-    skipOriginalMorph = False
-    norminfile = os.path.normpath(infile)
+    # extract morph vertices
     
-    morphData = []
-    for mfilepattern in morphfiles.split():
-        matches = glob.glob(mfilepattern)
-        matches.sort()
-        for path in matches:
-            normpath = os.path.normpath(path)
-            if normpath != norminfile or not skipOriginalMorph:
-                name = os.path.basename(normpath)
-                
-                morphFaces, morphVertices, morphUvs, morphNormals, morphMaterials, morphMtllib = parse_obj(normpath)
-                
-                n_morph_vertices = len(morphVertices)
-                if n_vertices != n_morph_vertices:
-                    print "WARNING: skipping morph [%s] with different number of vertices [%d] than the original model [%d]" % (name, n_morph_vertices, n_vertices)
-                else:                    
-                    if ALIGN == "center":
-                        center(morphVertices)
-                    elif ALIGN == "centerxz":
-                        centerxz(morphVertices)
-                    elif ALIGN == "bottom":
-                        bottom(morphVertices)
-                    elif ALIGN == "top":
-                        top(morphVertices)
-                        
-                    morphData.append((get_name(name), morphVertices ))
-                    print "adding [%s] with %d vertices" % (name, len(morphVertices))
+    morphTargets = generate_morph_targets(morphfiles, n_vertices, infile)
     
-    morphTargets = ""
-    if len(morphData):
-        morphTargets = "\n%s\n\t" % ",\n".join(generate_morph(name, vertices) for name, vertices in morphData)
+    # extract morph colors
+
+    morphColors, colorFaces, materialColors = generate_morph_colors(colorfiles, n_vertices, n_faces)    
+
+    # generate colors string
     
+    ncolor = 0
+    colors_string = ""
+    
+    if len(colorFaces) < len(faces):
+        colorFaces = faces
+        materialColors = extract_material_colors(materials, mtllib, infile)
+    
+    if BAKE_COLORS:
+        colors_string = ",".join(generate_color_decimal(c) for c in materialColors)
+        ncolor = len(materialColors)
+        
+    # generate ascii model string
+
     text = TEMPLATE_FILE_ASCII % {
     "name"      : get_name(outfile),
     "fname"     : infile,
@@ -880,17 +1055,20 @@ def convert_ascii(infile, morphfiles, outfile):
     "nface"     : len(faces),
     "nuv"       : len(uvs),
     "nnormal"   : nnormal,
+    "ncolor"    : ncolor,
     "nmaterial" : len(materials),
 
-    "materials" : generate_materials_string(materials, mtllib),
+    "materials" : generate_materials_string(materials, mtllib, infile),
 
     "normals"       : normals_string,
+    "colors"        : colors_string,
     "uvs"           : ",".join(generate_uv(uv) for uv in uvs),
     "vertices"      : ",".join(generate_vertex(v) for v in vertices),
     
     "morphTargets"  : morphTargets,
+    "morphColors"   : morphColors,
     
-    "faces"     : ",".join(generate_face(f) for f in faces)
+    "faces"     : ",".join(generate_face(f, fc) for f, fc in zip(faces, colorFaces))
     }
     
     out = open(outfile, "w")
@@ -898,7 +1076,7 @@ def convert_ascii(infile, morphfiles, outfile):
     out.close()
     
     print "%d vertices, %d faces, %d materials" % (len(vertices), len(faces), len(materials))
-        
+
     
 # #############################################################################
 # API - Binary converter
@@ -933,7 +1111,7 @@ def convert_binary(infile, outfile):
     text = TEMPLATE_FILE_BIN % {
     "name"       : get_name(outfile),
     
-    "materials" : generate_materials_string(materials, mtllib),
+    "materials" : generate_materials_string(materials, mtllib, infile),
     "buffers"   : binfile,
     
     "fname"     : infile,
@@ -1216,7 +1394,7 @@ def convert_binary(infile, outfile):
 # Helpers
 # #############################################################################
 def usage():
-    print "Usage: %s -i filename.obj -o filename.js [-m morphfiles*.obj] [-a center|top|bottom] [-s flat|smooth] [-t binary|ascii] [-d invert|normal]" % os.path.basename(sys.argv[0])
+    print "Usage: %s -i filename.obj -o filename.js [-m morphfiles*.obj] [-c morphcolors*.obj] [-a center|top|bottom] [-s flat|smooth] [-t binary|ascii] [-d invert|normal]" % os.path.basename(sys.argv[0])
         
 # #####################################################
 # Main
@@ -1225,7 +1403,7 @@ if __name__ == "__main__":
     
     # get parameters from the command line
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hi:m:o:a:s:t:d:", ["help", "input=", "morphs=", "output=", "align=", "shading=", "type=", "dissolve="])
+        opts, args = getopt.getopt(sys.argv[1:], "hbi:m:c:b:o:a:s:t:d:", ["help", "bakecolors", "input=", "morphs=", "colors=", "output=", "align=", "shading=", "type=", "dissolve="])
     
     except getopt.GetoptError:
         usage()
@@ -1233,6 +1411,7 @@ if __name__ == "__main__":
         
     infile = outfile = ""
     morphfiles = ""
+    colorfiles = ""
     
     for o, a in opts:
         if o in ("-h", "--help"):
@@ -1244,6 +1423,9 @@ if __name__ == "__main__":
 
         elif o in ("-m", "--morphs"):
             morphfiles = a
+
+        elif o in ("-c", "--colors"):
+            colorfiles = a
 
         elif o in ("-o", "--output"):
             outfile = a
@@ -1264,16 +1446,23 @@ if __name__ == "__main__":
             if a in ("normal", "invert"):
                 TRANSPARENCY = a
 
+        elif o in ("-b", "--bakecolors"):
+            BAKE_COLORS = True
+
     if infile == "" or outfile == "":
         usage()
         sys.exit(2)
     
     print "Converting [%s] into [%s] ..." % (infile, outfile)
+
     if morphfiles:
-        print "Morphs [%s]" % morphfiles    
-    
+        print "Morphs [%s]" % morphfiles
+
+    if colorfiles:
+        print "Colors [%s]" % colorfiles
+
     if TYPE == "ascii":
-        convert_ascii(infile, morphfiles, outfile)
+        convert_ascii(infile, morphfiles, colorfiles, outfile)
     elif TYPE == "binary":
         convert_binary(infile, outfile)
     

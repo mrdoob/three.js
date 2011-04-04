@@ -258,7 +258,9 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texture_path
 
 			if ( hasFaceColor ) {
 
-				color = new THREE.Color( faces[ offset ++ ] );
+				colorIndex = faces[ offset ++ ];
+
+				color = new THREE.Color( colors[ colorIndex ] );
 				face.color = color;
 
 			}
@@ -326,7 +328,7 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texture_path
 
 		if( json.morphTargets !== undefined ) {
 
-			var i, l, v, vl;
+			var i, l, v, vl, dstVertices, srcVertices;
 
 			for( i = 0, l = json.morphTargets.length; i < l; i++ ) {
 
@@ -340,6 +342,31 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texture_path
 				for( v = 0, vl = srcVertices.length; v < vl; v += 3 ) {
 
 					dstVertices.push( new THREE.Vertex( new THREE.Vector3( srcVertices[ v ], srcVertices[ v + 1 ], srcVertices[ v + 2 ] ) ) );
+
+				}
+
+			} 
+
+		}
+		
+		if( json.morphColors !== undefined ) {
+
+			var i, l, c, cl, dstColors, srcColors, color;
+
+			for( i = 0, l = json.morphColors.length; i < l; i++ ) {
+
+				geometry.morphColors[ i ] = {};
+				geometry.morphColors[ i ].name = json.morphColors[ i ].name;
+				geometry.morphColors[ i ].colors = [];
+
+				dstColors = geometry.morphColors[ i ].colors;
+				srcColors = json.morphColors [ i ].colors;
+
+				for( c = 0, cl = srcColors.length; c < cl; c += 3 ) {
+
+					color = new THREE.Color( 0xffaa00 );
+					color.setRGB( srcColors[ v ], srcColors[ v + 1 ], srcColors[ v + 2 ] );
+					dstColors.push( color );
 
 				}
 

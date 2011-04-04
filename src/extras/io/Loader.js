@@ -120,13 +120,15 @@ THREE.Loader.prototype = {
 
 		}
 
-		var material, mtype, mpars, texture, color;
+		var material, mtype, mpars, texture, color, vertexColors;
 
 		// defaults
 
 		mtype = "MeshLambertMaterial";
 
-		mpars = { color: 0xeeeeee, opacity: 1.0, map: null, lightMap: null, vertexColors: m.vertexColors ? THREE.VertexColors : false, wireframe: m.wireframe };
+		vertexColors
+		
+		mpars = { color: 0xeeeeee, opacity: 1.0, map: null, lightMap: null, wireframe: m.wireframe };
 		
 		// parameters from model file
 
@@ -154,6 +156,20 @@ THREE.Loader.prototype = {
 		if ( m.depthTest !== undefined ) {
 			
 			mpars.depthTest = m.depthTest;
+
+		}
+		
+		if ( m.vertexColors !== undefined ) {
+			
+			if ( m.vertexColors == "face" ) {
+				
+				mpars.vertexColors = THREE.FaceColors;
+
+			} else if ( m.vertexColors ) {
+				
+				mpars.vertexColors = THREE.VertexColors;
+
+			}
 
 		}
 		

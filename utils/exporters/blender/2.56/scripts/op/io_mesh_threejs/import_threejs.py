@@ -108,11 +108,12 @@ def create_materials(data, modelpath):
     
 def create_mesh_object(name, vertices, materials, face_data, flipYZ, recalculate_normals):
 
-    faces   = face_data["faces"]
+    faces         = face_data["faces"]
     vertexNormals = face_data["vertexNormals"]
-    vertexColors = face_data["vertexColors"]
-    vertexUVs = face_data["vertexUVs"]
+    vertexColors  = face_data["vertexColors"]
+    vertexUVs     = face_data["vertexUVs"]
     faceMaterials = face_data["materials"]
+    faceColors    = face_data["faceColors"]
     
     edges = []
     
@@ -200,7 +201,29 @@ def create_mesh_object(name, vertices, materials, face_data, flipYZ, recalculate
                     face_colors[vi].r = r
                     face_colors[vi].g = g
                     face_colors[vi].b = b
+                    
+    elif face_data["hasFaceColors"]:
 
+        print("setting vertex colors from face colors")
+
+        me.vertex_colors.new("vertex_color_layer_0")
+        
+        for fi in range(len(faces)):
+
+            if faceColors[fi]:
+
+                r = faceColors[fi][0]
+                g = faceColors[fi][1]
+                b = faceColors[fi][2]
+
+                face_colors = me.vertex_colors[0].data[fi]
+                face_colors = face_colors.color1, face_colors.color2, face_colors.color3, face_colors.color4
+                
+                for vi in range(len(faces[fi])):
+                
+                    face_colors[vi].r = r
+                    face_colors[vi].g = g
+                    face_colors[vi].b = b
 
     # Handle uvs
     
@@ -284,6 +307,7 @@ def extract_faces(data):
     "hasVertexNormals"  : False,
     "hasVertexUVs"      : False,
     "hasVertexColors"   : False,
+    "hasFaceColors"     : False,
     "hasMaterials"      : False
     }
     
@@ -325,6 +349,7 @@ def extract_faces(data):
         result["hasVertexUVs"] = result["hasVertexUVs"] or hasFaceVertexUv
         result["hasVertexNormals"] = result["hasVertexNormals"] or hasFaceVertexNormal
         result["hasVertexColors"] = result["hasVertexColors"] or hasFaceVertexColor
+        result["hasFaceColors"] = result["hasFaceColors"] or hasFaceColor
         result["hasMaterials"] = result["hasMaterials"] or hasMaterial
         
         # vertices
