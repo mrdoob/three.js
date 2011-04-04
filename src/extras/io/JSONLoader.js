@@ -53,9 +53,11 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texture_path
 
 	init_skin();
 	init_morphing();
+	init_edges();
 
 	geometry.computeCentroids();
 	geometry.computeFaceNormals();
+	geometry.computeEdgeFaces();
 
 	function parse() {
 
@@ -371,6 +373,25 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texture_path
 				}
 
 			} 
+
+		}
+
+	};
+
+	function init_edges() {
+
+		if( json.edges !== undefined ) {
+
+			var i, il, v1, v2;
+
+			for ( i = 0; i < json.edges.length; i+= 2 ) {
+
+				v1 = json.edges[ i ];
+				v2 = json.edges[ i + 1 ];
+
+				geometry.edges.push( new THREE.Edge( geometry.vertices[ v1 ], geometry.vertices[ v2 ], v1, v2 ) );
+
+			}
 
 		}
 

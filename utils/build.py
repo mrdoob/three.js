@@ -29,6 +29,7 @@ COMMON_FILES = [
 'core/UV.js',
 'core/Geometry.js',
 'core/Spline.js',
+'core/Edge.js',
 'animation/AnimationHandler.js',
 'animation/Animation.js',
 'cameras/Camera.js',

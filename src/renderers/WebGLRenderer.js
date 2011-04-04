@@ -801,8 +801,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 									customAttribute.array[ offset_custom + 0 ] = v1.x;
 									customAttribute.array[ offset_custom + 1 ] = v1.y;
+
 									customAttribute.array[ offset_custom + 2 ] = v2.x;
 									customAttribute.array[ offset_custom + 3 ] = v2.y;
+
 									customAttribute.array[ offset_custom + 4 ] = v3.x;
 									customAttribute.array[ offset_custom + 5 ] = v3.y;
 
@@ -815,9 +817,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 										customAttribute.array[ offset_custom + 0 ] = v1.r;
 										customAttribute.array[ offset_custom + 1 ] = v1.g;
 										customAttribute.array[ offset_custom + 2 ] = v1.b;
+
 										customAttribute.array[ offset_custom + 3 ] = v2.r;
 										customAttribute.array[ offset_custom + 4 ] = v2.g;
 										customAttribute.array[ offset_custom + 5 ] = v2.b;
+
 										customAttribute.array[ offset_custom + 6 ] = v3.r;
 										customAttribute.array[ offset_custom + 7 ] = v3.g;
 										customAttribute.array[ offset_custom + 8 ] = v3.b;
@@ -827,9 +831,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 										customAttribute.array[ offset_custom + 0 ] = v1.x;
 										customAttribute.array[ offset_custom + 1 ] = v1.y;
 										customAttribute.array[ offset_custom + 2 ] = v1.z;
+
 										customAttribute.array[ offset_custom + 3 ] = v2.x;
 										customAttribute.array[ offset_custom + 4 ] = v2.y;
 										customAttribute.array[ offset_custom + 5 ] = v2.z;
+
 										customAttribute.array[ offset_custom + 6 ] = v3.x;
 										customAttribute.array[ offset_custom + 7 ] = v3.y;
 										customAttribute.array[ offset_custom + 8 ] = v3.z;
@@ -844,10 +850,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 									customAttribute.array[ offset_custom + 1  ] = v1.y;
 									customAttribute.array[ offset_custom + 2  ] = v1.z;
 									customAttribute.array[ offset_custom + 3  ] = v1.w;
+
 									customAttribute.array[ offset_custom + 4  ] = v2.x;
 									customAttribute.array[ offset_custom + 5  ] = v2.y;
 									customAttribute.array[ offset_custom + 6  ] = v2.z;
 									customAttribute.array[ offset_custom + 7  ] = v2.w;
+
 									customAttribute.array[ offset_custom + 8  ] = v3.x;
 									customAttribute.array[ offset_custom + 9  ] = v3.y;
 									customAttribute.array[ offset_custom + 10 ] = v3.z;
@@ -1147,7 +1155,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					vertexArray[ offset + 7 ] = v3.y;
 					vertexArray[ offset + 8 ] = v3.z;
 
-					vertexArray[ offset + 9 ] = v4.x;
+					vertexArray[ offset + 9 ]  = v4.x;
 					vertexArray[ offset + 10 ] = v4.y;
 					vertexArray[ offset + 11 ] = v4.z;
 
@@ -1229,10 +1237,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 									customAttribute.array[ offset_custom + 0 ] = v1.x;
 									customAttribute.array[ offset_custom + 1 ] = v1.y;
+
 									customAttribute.array[ offset_custom + 2 ] = v2.x;
 									customAttribute.array[ offset_custom + 3 ] = v2.y;
+
 									customAttribute.array[ offset_custom + 4 ] = v3.x;
 									customAttribute.array[ offset_custom + 5 ] = v3.y;
+
 									customAttribute.array[ offset_custom + 6 ] = v4.x;
 									customAttribute.array[ offset_custom + 7 ] = v4.y;
 
@@ -1245,12 +1256,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 										customAttribute.array[ offset_custom + 0  ] = v1.r;
 										customAttribute.array[ offset_custom + 1  ] = v1.g;
 										customAttribute.array[ offset_custom + 2  ] = v1.b;
+
 										customAttribute.array[ offset_custom + 3  ] = v2.r;
 										customAttribute.array[ offset_custom + 4  ] = v2.g;
 										customAttribute.array[ offset_custom + 5  ] = v2.b;
+
 										customAttribute.array[ offset_custom + 6  ] = v3.r;
 										customAttribute.array[ offset_custom + 7  ] = v3.g;
 										customAttribute.array[ offset_custom + 8  ] = v3.b;
+
 										customAttribute.array[ offset_custom + 9  ] = v4.r;
 										customAttribute.array[ offset_custom + 10 ] = v4.g;
 										customAttribute.array[ offset_custom + 11 ] = v4.b;
@@ -1260,12 +1274,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 										customAttribute.array[ offset_custom + 0  ] = v1.x;
 										customAttribute.array[ offset_custom + 1  ] = v1.y;
 										customAttribute.array[ offset_custom + 2  ] = v1.z;
+
 										customAttribute.array[ offset_custom + 3  ] = v2.x;
 										customAttribute.array[ offset_custom + 4  ] = v2.y;
 										customAttribute.array[ offset_custom + 5  ] = v2.z;
+
 										customAttribute.array[ offset_custom + 6  ] = v3.x;
 										customAttribute.array[ offset_custom + 7  ] = v3.y;
 										customAttribute.array[ offset_custom + 8  ] = v3.z;
+
 										customAttribute.array[ offset_custom + 9  ] = v4.x;
 										customAttribute.array[ offset_custom + 10 ] = v4.y;
 										customAttribute.array[ offset_custom + 11 ] = v4.z;
@@ -1280,14 +1297,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 									customAttribute.array[ offset_custom + 1  ] = v1.y;
 									customAttribute.array[ offset_custom + 2  ] = v1.z;
 									customAttribute.array[ offset_custom + 3  ] = v1.w;
+
 									customAttribute.array[ offset_custom + 4  ] = v2.x;
 									customAttribute.array[ offset_custom + 5  ] = v2.y;
 									customAttribute.array[ offset_custom + 6  ] = v2.z;
 									customAttribute.array[ offset_custom + 7  ] = v2.w;
+
 									customAttribute.array[ offset_custom + 8  ] = v3.x;
 									customAttribute.array[ offset_custom + 9  ] = v3.y;
 									customAttribute.array[ offset_custom + 10 ] = v3.z;
 									customAttribute.array[ offset_custom + 11 ] = v3.w;
+
 									customAttribute.array[ offset_custom + 12 ] = v4.x;
 									customAttribute.array[ offset_custom + 13 ] = v4.y;
 									customAttribute.array[ offset_custom + 14 ] = v4.z;
@@ -1443,8 +1463,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 					skinVertexBArray[ offset_skin + 10 ] = sb3.z;
 					skinVertexBArray[ offset_skin + 11 ] = 1;
 
-					skinVertexBArray[ offset_skin + 12 ]  = sb4.x;
-					skinVertexBArray[ offset_skin + 13 ]  = sb4.y;
+					skinVertexBArray[ offset_skin + 12 ] = sb4.x;
+					skinVertexBArray[ offset_skin + 13 ] = sb4.y;
 					skinVertexBArray[ offset_skin + 14 ] = sb4.z;
 					skinVertexBArray[ offset_skin + 15 ] = 1;
 
@@ -1507,8 +1527,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 					tangentArray[ offset_tangent + 6 ] = t2.z;
 					tangentArray[ offset_tangent + 7 ] = t2.w;
 
-					tangentArray[ offset_tangent + 8 ] = t3.x;
-					tangentArray[ offset_tangent + 9 ] = t3.y;
+					tangentArray[ offset_tangent + 8 ]  = t3.x;
+					tangentArray[ offset_tangent + 9 ]  = t3.y;
 					tangentArray[ offset_tangent + 10 ] = t3.z;
 					tangentArray[ offset_tangent + 11 ] = t3.w;
 

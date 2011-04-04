@@ -8,6 +8,7 @@ THREE.ShadowVolume = function( mesh, isStatic ) {
 	mesh.addChild( this );
 
 	this.calculateShadowVolumeGeometry( mesh.geometry );
+
 }
 
 THREE.ShadowVolume.prototype             = new THREE.Mesh();
@@ -39,7 +40,7 @@ THREE.ShadowVolume.prototype.calculateShadowVolumeGeometry = function( originalG
 	var	fl               = originalFaces.length;
 	
 	var	originalFace, face, i, f, n, vertex, numVertices;
-	var indices = [ "a", "b", "c", "d" ];
+	var indices = [ "a", "b", "c", "d" ];
 
 
 	for( f = 0; f < fl; f++ ) {
@@ -56,6 +57,7 @@ THREE.ShadowVolume.prototype.calculateShadowVolumeGeometry = function( originalG
 			
           	n = 3;
 			face = new THREE.Face3( numVertices, numVertices + 1, numVertices + 2 );
+
 		}
 
 		face.normal.copy( originalFace.normal );
