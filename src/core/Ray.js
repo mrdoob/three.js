@@ -63,7 +63,7 @@ THREE.Ray.prototype = {
 			normal = object.matrixRotationWorld.multiplyVector3( face.normal.clone() );
 			dot = direction.dot( normal );
 
-			if ( dot < 0 ) { // Math.abs( dot ) > 0.0001
+			if ( object.doubleSided || ( object.flipSided ? dot > 0 : dot < 0 ) ) { // Math.abs( dot ) > 0.0001
 
 				scalar = normal.dot( new THREE.Vector3().sub( a, origin ) ) / dot;
 				intersectPoint = origin.addSelf( direction.multiplyScalar( scalar ) );
