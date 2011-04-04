@@ -258,7 +258,9 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texture_path
 
 			if ( hasFaceColor ) {
 
-				color = new THREE.Color( faces[ offset ++ ] );
+				colorIndex = faces[ offset ++ ];
+
+				color = new THREE.Color( colors[ colorIndex ] );
 				face.color = color;
 
 			}

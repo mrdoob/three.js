@@ -2,6 +2,7 @@
 //  vertices: 50002
 //  faces: 100000 
 //  normals: 0
+//  colors: 0
 //  uvs: 0 
 //  materials: 0
 //
@@ -26,6 +27,8 @@ var model = {
     "morphColors": [],
 
     "normals": [],
+
+    "colors": [],
 
     "uvs": [[]],
 
