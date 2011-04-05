@@ -4,15 +4,28 @@
 How to use this converter
 -------------------------
 
-python convert_obj_three.py -i infile.obj -o outfile.js [-m morphfiles*.obj] [-c morphcolors*.obj] [-a center|centerxz|top|bottom|none] [-s smooth|flat] [-t ascii|binary] [-d invert|normal] [-b]
+python convert_obj_three.py -i infile.obj -o outfile.js [-m "morphfiles*.obj"] [-c "morphcolors*.obj"] [-a center|centerxz|top|bottom|none] [-s smooth|flat] [-t ascii|binary] [-d invert|normal] [-b] [-e]
 
 Notes: 
+    - flags
+        -i infile.obj			input OBJ file
+        -o outfile.js			output JS file
+        -m "morphfiles*.obj"	morph OBJ files (can use wildcards, enclosed in quotes multiple patterns separate by space)
+        -c "morphcolors*.obj"	morph colors OBJ files (can use wildcards, enclosed in quotes multiple patterns separate by space)
+        -a center|centerxz|top|bottom|none model alignment
+        -s smooth|flat			smooth = export vertex normals, flat = no normals (face normals computed in loader)
+        -t ascii|binary			export ascii or binary format (ascii has more features, binary just supports vertices, faces, normals, uvs and materials)
+        -d invert|normal		invert transparency
+        -b						bake material colors into face colors
+        -e						export edges
 
     - by default:
         converted model will be centered (middle of bounding box goes to 0,0,0)
         use smooth shading (if there were vertex normals in the original model)
         will be in ASCII format
         original model is assumed to use non-inverted transparency / dissolve (0.0 fully transparent, 1.0 fully opaque)
+        no face colors baking
+        no edges export
  
     - binary conversion will create two files: 
         outfile.js  (materials)
@@ -62,10 +75,7 @@ Current limitations
     - for the moment, only diffuse color and texture are used 
       (will need to extend shaders / renderers / materials in Three)
      
-    - models can have more than 65,536 vertices,
-      but in most cases it will not work well with browsers,
-      which currently seem to have troubles with handling
-      large JS files
+    - models can have more than 65,536 vertices
        
     - texture coordinates can be wrong in canvas renderer
       (there is crude normalization, but it doesn't
@@ -138,6 +148,7 @@ TYPE = "ascii"          # ascii binary
 TRANSPARENCY = "normal" # normal invert
 
 BAKE_COLORS = False
+EXPORT_EDGES = False
 
 # default colors for debugging (each material gets one distinct color): 
 # white, red, green, blue, yellow, cyan, magenta
@@ -149,11 +160,12 @@ COLORS = [0xeeeeee, 0xee0000, 0x00ee00, 0x0000ee, 0xeeee00, 0x00eeee, 0xee00ee]
 TEMPLATE_FILE_ASCII = u"""\
 // Converted from: %(fname)s
 //  vertices: %(nvertex)d
-//  faces: %(nface)d 
+//  faces: %(nface)d
 //  normals: %(nnormal)d
 //  colors: %(ncolor)d
-//  uvs: %(nuv)d 
+//  uvs: %(nuv)d
 //  materials: %(nmaterial)d
+//  edges: %(nedge)d
 //
 //  Generated with OBJ -> Three.js converter
 //  http://github.com/alteredq/three.js/blob/master/utils/exporters/convert_obj_three.py
@@ -177,7 +189,9 @@ var model = {
 
     "uvs": [[%(uvs)s]],
 
-    "faces": [%(faces)s]
+    "faces": [%(faces)s],
+
+    "edges" : [%(edges)s]
 
 };
 
@@ -187,7 +201,7 @@ postMessage( model );
 TEMPLATE_FILE_BIN = u"""\
 // Converted from: %(fname)s
 //  vertices: %(nvertex)d
-//  faces: %(nface)d 
+//  faces: %(nface)d
 //  materials: %(nmaterial)d
 //
 //  Generated with OBJ -> Three.js converter
@@ -213,6 +227,7 @@ TEMPLATE_N = "%f,%f,%f"
 TEMPLATE_UV = "%f,%f"
 TEMPLATE_COLOR = "%.3f,%.3f,%.3f"
 TEMPLATE_COLOR_DEC = "%d"
+TEMPLATE_EDGE = "%d,%d"
 
 TEMPLATE_MORPH_VERTICES = '\t{ "name": "%s", "vertices": [%s] }'
 TEMPLATE_MORPH_COLORS   = '\t{ "name": "%s", "colors": [%s] }'
@@ -338,6 +353,9 @@ def normalize(v):
         v[0] /= l
         v[1] /= l
         v[2] /= l
+
+def veckey3(v):
+    return round(v[0], 6), round(v[1], 6), round(v[2], 6)
 
 # #####################################################
 # MTL parser
@@ -675,6 +693,9 @@ def generate_color_rgb(c):
 def generate_color_decimal(c):
     return TEMPLATE_COLOR_DEC % hexcolor(c)
     
+def generate_edge(e):
+    return TEMPLATE_EDGE % (e[0], e[1])
+    
 # #####################################################
 # Morphs
 # #####################################################
@@ -811,6 +832,74 @@ def generate_morph_colors(colorfiles, n_vertices, n_faces):
         morphColors = "\n%s\n\t" % ",\n".join(generate_morph_color(name, colors) for name, colors in morphColorData)
     
     return morphColors, colorFaces, materialColors
+
+# #####################################################
+# Edges
+# #####################################################
+def edge_hash(a, b):
+    return "%d_%d" % (min(a, b), max(a, b))
+    
+def add_unique_edge(a, b, edge_set, edges):
+    h = edge_hash(a[0], b[0])
+    if h not in edge_set:
+        x = min(a[1], b[1])
+        y = max(a[1], b[1])
+        edges.append([x, y])
+        edge_set.add(h)
+    
+def compute_edges(faces, vertices):
+    edges = []
+    
+    # compute unique vertices
+
+    unique_vertices = {}
+    vertex_count = 0
+    
+    for i, v in enumerate(vertices):
+        key = veckey3(v)
+        if key not in unique_vertices:
+            unique_vertices[key] = [vertex_count, i]
+            vertex_count += 1
+
+    # find edges between unique vertices
+    
+    edge_set = set()    
+
+    for f in faces:
+        vertex_indices = f["vertex"]
+        unique_indices = []
+
+        for vi in vertex_indices:
+            v = vertices[vi - 1]
+            key = veckey3(v)
+            unique_indices.append(unique_vertices[key])
+        
+        if len(unique_indices) == 3:
+            a = unique_indices[0]
+            b = unique_indices[1]
+            c = unique_indices[2]
+            
+            add_unique_edge(a, b, edge_set, edges)
+            add_unique_edge(b, c, edge_set, edges)
+            add_unique_edge(a, c, edge_set, edges)
+
+        elif len(unique_indices) == 4:
+            a = unique_indices[0]
+            b = unique_indices[1]
+            c = unique_indices[2]
+            d = unique_indices[3]
+            
+            # this should be inside edge of quad, should it go in?
+            # add_unique_edge(b, d, edge_set, edges) 
+            
+            add_unique_edge(a, b, edge_set, edges)
+            add_unique_edge(a, d, edge_set, edges)
+            add_unique_edge(b, c, edge_set, edges)
+            add_unique_edge(c, d, edge_set, edges)
+
+    edges.sort()
+    
+    return edges
 
 # #####################################################
 # Materials
@@ -1034,10 +1123,10 @@ def convert_ascii(infile, morphfiles, colorfiles, outfile):
     morphColors, colorFaces, materialColors = generate_morph_colors(colorfiles, n_vertices, n_faces)    
 
     # generate colors string
-    
+
     ncolor = 0
     colors_string = ""
-    
+
     if len(colorFaces) < len(faces):
         colorFaces = faces
         materialColors = extract_material_colors(materials, mtllib, infile)
@@ -1045,6 +1134,16 @@ def convert_ascii(infile, morphfiles, colorfiles, outfile):
     if BAKE_COLORS:
         colors_string = ",".join(generate_color_decimal(c) for c in materialColors)
         ncolor = len(materialColors)
+        
+    # generate edges string
+    
+    nedge = 0
+    edges_string = ""
+    
+    if EXPORT_EDGES:
+        edges = compute_edges(faces, vertices)
+        nedge = len(edges) 
+        edges_string  = ",".join(generate_edge(e) for e in edges)
         
     # generate ascii model string
 
@@ -1057,6 +1156,7 @@ def convert_ascii(infile, morphfiles, colorfiles, outfile):
     "nnormal"   : nnormal,
     "ncolor"    : ncolor,
     "nmaterial" : len(materials),
+    "nedge"     : nedge,
 
     "materials" : generate_materials_string(materials, mtllib, infile),
 
@@ -1068,7 +1168,9 @@ def convert_ascii(infile, morphfiles, colorfiles, outfile):
     "morphTargets"  : morphTargets,
     "morphColors"   : morphColors,
     
-    "faces"     : ",".join(generate_face(f, fc) for f, fc in zip(faces, colorFaces))
+    "faces"     : ",".join(generate_face(f, fc) for f, fc in zip(faces, colorFaces)),
+        
+    "edges"    : edges_string
     }
     
     out = open(outfile, "w")
@@ -1403,7 +1505,7 @@ if __name__ == "__main__":
     
     # get parameters from the command line
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hbi:m:c:b:o:a:s:t:d:", ["help", "bakecolors", "input=", "morphs=", "colors=", "output=", "align=", "shading=", "type=", "dissolve="])
+        opts, args = getopt.getopt(sys.argv[1:], "hbei:m:c:b:o:a:s:t:d:", ["help", "bakecolors", "edges", "input=", "morphs=", "colors=", "output=", "align=", "shading=", "type=", "dissolve="])
     
     except getopt.GetoptError:
         usage()
@@ -1448,6 +1550,9 @@ if __name__ == "__main__":
 
         elif o in ("-b", "--bakecolors"):
             BAKE_COLORS = True
+
+        elif o in ("-e", "--edges"):
+            EXPORT_EDGES = True
 
     if infile == "" or outfile == "":
         usage()

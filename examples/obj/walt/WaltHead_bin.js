@@ -1,6 +1,6 @@
 // Converted from: ../../examples/obj/walt/WaltHead.obj
 //  vertices: 8146
-//  faces: 16160 
+//  faces: 16160
 //  materials: 1
 //
 //  Generated with OBJ -> Three.js converter

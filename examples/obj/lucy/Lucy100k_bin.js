@@ -1,6 +1,6 @@
 // Converted from: ../../examples/obj/lucy/lucy100k.obj
 //  vertices: 50002
-//  faces: 100000 
+//  faces: 100000
 //  materials: 0
 //
 //  Generated with OBJ -> Three.js converter

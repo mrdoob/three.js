@@ -404,7 +404,7 @@ THREE.Geometry.prototype = {
 
 		function edge_hash( a, b ) {
 
-			 return Math.min( a, b ) + "_" + Math.max( a, b );
+			return Math.min( a, b ) + "_" + Math.max( a, b );
 
 		};
 
