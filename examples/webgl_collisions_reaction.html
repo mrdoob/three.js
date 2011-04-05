@@ -42,13 +42,9 @@
             }
             
         </style>
-        <script type="text/javascript" src="lib/Three.js">
+        <script type="text/javascript" src="../build/Three.js">
         </script>
-        <script type="text/javascript" src="lib/RequestAnimationFrame.js">
-        </script>
-        <script type="text/javascript" src="src/Physics.js">
-        </script>
-        <script type="text/javascript" src="src/PhysicsUtils.js">
+        <script type="text/javascript" src="js/RequestAnimationFrame.js">
         </script>
         <script type="text/javascript">
             
@@ -118,7 +114,7 @@
                 cube.position = p;
 				cube.rotation.y = ry;
                 scene.addObject(cube);
-                Physics.colliders.push( PhysicsUtils.MeshOBB(cube) );	
+                THREE.Collisions.colliders.push( THREE.CollisionUtils.MeshOBB(cube) );	
 				cubes.push(cube);
 				return cube;
             }
@@ -137,13 +133,13 @@
 					cubes[i].materials[0].color = new THREE.Color(0x003300);
 				}
 				
-				var ray = new Ray( sphere.position, new THREE.Vector3(0,0,1) );
+				var ray = new THREE.Ray( sphere.position, new THREE.Vector3(0,0,1) );
 				
 				//debugNormal.position = sphere.position;
 				
 				
 				
-				var c = Physics.rayCastNearest(ray);
+				var c = THREE.Collisions.rayCastNearest(ray);
 				
 				if (!c || c.distance > speed) {
 					sphere.position.z += speed;

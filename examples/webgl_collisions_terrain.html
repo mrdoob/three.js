@@ -38,10 +38,8 @@ body {
 
 </style>
  
-<script type="text/javascript" src="lib/Three.js"></script>
-<script type="text/javascript" src="lib/RequestAnimationFrame.js"></script>
-<script type="text/javascript" src="src/Physics.js"></script> 
-<script type="text/javascript" src="src/PhysicsUtils.js"></script> 
+<script type="text/javascript" src="../build/Three.js"></script>
+<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 
 <script type="text/javascript"> 
 
@@ -67,7 +65,7 @@ function init() {
 
 	scene = new THREE.Scene();
 	
-	ray = new Ray();
+	ray = new THREE.Ray();
 	ray.origin.y = 10000;
 	ray.direction = new THREE.Vector3(0, -1, 0);
 	
@@ -98,10 +96,10 @@ function loadCube(p) {
 	var onGeometry = function( geometry ) {		
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: 0xf3e4b8 } ) );
 		scene.addObject( mesh );
-		Physics.colliders.push( PhysicsUtils.MeshColliderWBox(mesh) );
+		THREE.Collisions.colliders.push( THREE.CollisionUtils.MeshColliderWBox(mesh) );
 	};
 
-	loader.load( { model: "models/terrain.js", callback: onGeometry } );
+	loader.load( { model: "obj/terrain.js", callback: onGeometry } );
 }
 
 function onDocumentMouseMove( event ) {
@@ -117,7 +115,7 @@ function animate() {
 	ray.origin.x = radius * Math.cos(theta);
 	ray.origin.z = radius * Math.sin(theta);
 	
-	var c = Physics.rayCastNearest(ray);
+	var c = THREE.Collisions.rayCastNearest(ray);
 	if(c) {
 		//info.innerHTML = "Found @ distance " + c.distance;
 		sphere.position = ray.origin.clone().subSelf( new THREE.Vector3(0, c.distance - sphereSize/2, 0) );

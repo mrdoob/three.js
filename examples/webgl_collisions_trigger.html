@@ -109,7 +109,7 @@
                 }));
                 cube.position = p;
                 scene.addObject(cube);
-                THREE.Collisions.colliders.push(  THREE.CollisionUtils.MeshOBB(cube) );	
+                THREE.Collisions.colliders.push( THREE.CollisionUtils.MeshOBB(cube) );	
 				cubes.push(cube);
 				return cube;
             }
@@ -133,7 +133,7 @@
 				
 				var ray = new THREE.Ray( sphere.position, new THREE.Vector3(0,0,1) );
 				
-				var c =  THREE.Collisions.rayCastNearest(ray);
+				var c = THREE.Collisions.rayCastNearest(ray);
 				if (c && c.distance == -1) {
 					info.innerHTML = "Colliding!";
 					c.mesh.materials[0].color = new THREE.Color(0xff0000); 
