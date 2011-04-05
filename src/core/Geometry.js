@@ -14,10 +14,13 @@ THREE.Geometry = function () {
 
 	this.faces = [];
 
+	this.edges = [];
+
 	this.faceUvs = [[]];
 	this.faceVertexUvs = [[]];
 
 	this.morphTargets = [];
+	this.morphColors = [];
 
 	this.skinWeights = [];
 	this.skinIndices = [];
@@ -394,6 +397,108 @@ THREE.Geometry.prototype = {
 		}
 
 		this.boundingSphere = { radius: radius };
+
+	},
+
+	computeEdgeFaces: function () {
+
+		function edge_hash( a, b ) {
+
+			return Math.min( a, b ) + "_" + Math.max( a, b );
+
+		};
+
+		function addToMap( map, hash, i ) {
+
+			if ( map[ hash ] === undefined ) {
+
+				map[ hash ] = { "set": {}, "array": [] };
+				map[ hash ].set[ i ] = 1;
+				map[ hash ].array.push( i );
+
+			} else {
+
+				if( map[ hash ].set[ i ] === undefined ) {
+
+					map[ hash ].set[ i ] = 1;
+					map[ hash ].array.push( i );
+
+				}
+
+			}
+
+		};
+
+		var i, il, v1, v2, j, k,
+			face, faceIndices, faceIndex,
+			edge,
+			hash,
+			vfMap = {};
+
+		// construct vertex -> face map
+
+		for( i = 0, il = this.faces.length; i < il; i ++ ) {
+
+			face = this.faces[ i ];
+
+			if ( face instanceof THREE.Face3 ) {
+
+				hash = edge_hash( face.a, face.b );
+				addToMap( vfMap, hash, i );
+
+				hash = edge_hash( face.b, face.c );
+				addToMap( vfMap, hash, i );
+
+				hash = edge_hash( face.a, face.c );
+				addToMap( vfMap, hash, i );
+
+			} else if ( face instanceof THREE.Face4 ) {
+
+				// in WebGLRenderer quad is tesselated
+				// to triangles: a,b,d / b,c,d
+				// shared edge is: b,d
+
+				// should shared edge be included?
+				// comment out if not
+
+				hash = edge_hash( face.b, face.d ); 
+				addToMap( vfMap, hash, i );
+
+				hash = edge_hash( face.a, face.b );
+				addToMap( vfMap, hash, i );
+
+				hash = edge_hash( face.a, face.d );
+				addToMap( vfMap, hash, i );
+
+				hash = edge_hash( face.b, face.c );
+				addToMap( vfMap, hash, i );
+
+				hash = edge_hash( face.c, face.d );
+				addToMap( vfMap, hash, i );
+
+			}
+
+		}
+
+		// extract faces
+
+		for( i = 0, il = this.edges.length; i < il; i ++ ) {
+
+			edge = this.edges[ i ];
+
+			v1 = edge.vertexIndices[ 0 ];
+			v2 = edge.vertexIndices[ 1 ];
+
+			edge.faceIndices = vfMap[ edge_hash( v1, v2 ) ].array;
+
+			for( j = 0; j < edge.faceIndices.length; j ++ ) {
+
+				faceIndex = edge.faceIndices[ j ];
+				edge.faces.push( this.faces[ faceIndex ] );
+
+			}
+
+		}
 
 	}
 

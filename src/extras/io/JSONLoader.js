@@ -53,9 +53,11 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texture_path
 
 	init_skin();
 	init_morphing();
+	init_edges();
 
 	geometry.computeCentroids();
 	geometry.computeFaceNormals();
+	geometry.computeEdgeFaces();
 
 	function parse() {
 
@@ -94,6 +96,8 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texture_path
 		normals = json.normals,
 		colors = json.colors,
 
+		scale = ( json.scale !== undefined ) ? json.scale : 1.0,
+		
 		nUvLayers = 0;
 
 		// disregard empty arrays
@@ -118,9 +122,9 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texture_path
 
 			vertex = new THREE.Vertex();
 
-			vertex.position.x = vertices[ offset ++ ];
-			vertex.position.y = vertices[ offset ++ ];
-			vertex.position.z = vertices[ offset ++ ];
+			vertex.position.x = vertices[ offset ++ ] / scale;
+			vertex.position.y = vertices[ offset ++ ] / scale;
+			vertex.position.z = vertices[ offset ++ ] / scale;
 
 			geometry.vertices.push( vertex );
 
@@ -256,7 +260,9 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texture_path
 
 			if ( hasFaceColor ) {
 
-				color = new THREE.Color( faces[ offset ++ ] );
+				colorIndex = faces[ offset ++ ];
+
+				color = new THREE.Color( colors[ colorIndex ] );
 				face.color = color;
 
 			}
@@ -324,7 +330,7 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texture_path
 
 		if( json.morphTargets !== undefined ) {
 
-			var i, l, v, vl;
+			var i, l, v, vl, dstVertices, srcVertices;
 
 			for( i = 0, l = json.morphTargets.length; i < l; i++ ) {
 
@@ -342,6 +348,50 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texture_path
 				}
 
 			} 
+
+		}
+		
+		if( json.morphColors !== undefined ) {
+
+			var i, l, c, cl, dstColors, srcColors, color;
+
+			for( i = 0, l = json.morphColors.length; i < l; i++ ) {
+
+				geometry.morphColors[ i ] = {};
+				geometry.morphColors[ i ].name = json.morphColors[ i ].name;
+				geometry.morphColors[ i ].colors = [];
+
+				dstColors = geometry.morphColors[ i ].colors;
+				srcColors = json.morphColors [ i ].colors;
+
+				for( c = 0, cl = srcColors.length; c < cl; c += 3 ) {
+
+					color = new THREE.Color( 0xffaa00 );
+					color.setRGB( srcColors[ v ], srcColors[ v + 1 ], srcColors[ v + 2 ] );
+					dstColors.push( color );
+
+				}
+
+			} 
+
+		}
+
+	};
+
+	function init_edges() {
+
+		if( json.edges !== undefined ) {
+
+			var i, il, v1, v2;
+
+			for ( i = 0; i < json.edges.length; i+= 2 ) {
+
+				v1 = json.edges[ i ];
+				v2 = json.edges[ i + 1 ];
+
+				geometry.edges.push( new THREE.Edge( geometry.vertices[ v1 ], geometry.vertices[ v2 ], v1, v2 ) );
+
+			}
 
 		}
 

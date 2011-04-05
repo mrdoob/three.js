@@ -1,6 +1,6 @@
 // Converted from: ../../examples/obj/female02/female02.obj
 //  vertices: 3274
-//  faces: 6233 
+//  faces: 6233
 //  materials: 6
 //
 //  Generated with OBJ -> Three.js converter

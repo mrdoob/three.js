@@ -90,12 +90,13 @@
 
 		<script id="vertexShader" type="x-shader/x-vertex">
 
+			uniform vec2 uvScale;
 			varying vec2 vUv;
 
 			void main()
 			{
 
-				vUv = vec2( 3.0, 1.0 ) * uv;
+				vUv = uvScale * uv;
 				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
 				gl_Position = projectionMatrix * mvPosition;
 
@@ -143,6 +144,7 @@
 					fogColor: 	{ type: "v3", value: new THREE.Vector3( 0, 0, 0 ) },
 					time: 		{ type: "f", value: 1.0 },
 					resolution: { type: "v2", value: new THREE.Vector2() },
+					uvScale: 	{ type: "v2", value: new THREE.Vector2( 3.0, 1.0 ) },
 					texture1: 	{ type: "t", value: 0, texture: ImageUtils.loadTexture( "textures/lava/cloud.png" ) },
 					texture2: 	{ type: "t", value: 1, texture: ImageUtils.loadTexture( "textures/lava/lavatile.jpg" ) }
 

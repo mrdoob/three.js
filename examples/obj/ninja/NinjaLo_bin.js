@@ -1,6 +1,6 @@
 // Converted from: ../../examples/obj/ninja/ninjaHead_Low.obj
 //  vertices: 4485
-//  faces: 4810 
+//  faces: 4810
 //  materials: 0
 //
 //  Generated with OBJ -> Three.js converter

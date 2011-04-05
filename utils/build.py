@@ -29,6 +29,7 @@ COMMON_FILES = [
 'core/UV.js',
 'core/Geometry.js',
 'core/Spline.js',
+'core/Edge.js',
 'animation/AnimationHandler.js',
 'animation/Animation.js',
 'cameras/Camera.js',
@@ -102,6 +103,7 @@ EXTRAS_FILES = [
 'extras/io/Loader.js',
 'extras/io/JSONLoader.js',
 'extras/io/BinaryLoader.js',
+'extras/io/SceneLoader.js',
 'extras/objects/MarchingCubes.js'
 ]
 

@@ -201,12 +201,15 @@ TEMPLATE_FILE_ASCII = """\
  * uvs: %(nuv)d
  * colors: %(ncolor)d
  * materials: %(nmaterial)d
+ * edges: %(nedges)d
  *
  */
 
 var model = {
 
     "version" : 2,
+    
+    "scale" : %(scale)f,
     
     "materials": [%(materials)s],
 
@@ -220,7 +223,9 @@ var model = {
 
     "uvs": [[%(uvs)s]],
 
-    "faces": [%(faces)s]
+    "faces": [%(faces)s],
+
+    "edges" : [%(edges)s]
 
 };
 
@@ -228,11 +233,13 @@ postMessage( model );
 """
 
 TEMPLATE_VERTEX = "%f,%f,%f"
+TEMPLATE_VERTEX_TRUNCATE = "%d,%d,%d"
 
 TEMPLATE_N = "%f,%f,%f"
 TEMPLATE_UV = "%f,%f"
 #TEMPLATE_C = "0x%06x"
 TEMPLATE_C = "%d"
+TEMPLATE_EDGE = "%d,%d"
 
 # #####################################################
 # Utils
@@ -391,8 +398,11 @@ def bottom(vertices):
 def hexcolor(c):
     return ( int(c[0] * 255) << 16  ) + ( int(c[1] * 255) << 8 ) + int(c[2] * 255)
     
-def generate_vertex(v):
-    return TEMPLATE_VERTEX % (v.co.x, v.co.y, v.co.z)
+def generate_vertex(v, truncate):
+    if truncate:
+        return TEMPLATE_VERTEX_TRUNCATE % (v.co.x, v.co.y, v.co.z)
+    else:
+        return TEMPLATE_VERTEX % (v.co.x, v.co.y, v.co.z)
 
 def generate_normal(n):
     return TEMPLATE_N % (n[0], n[1], n[2])
@@ -403,6 +413,9 @@ def generate_vertex_color(c):
 def generate_uv(uv):
     return TEMPLATE_UV % (uv[0], 1.0 - uv[1])
 
+def generate_edge(e):
+    return TEMPLATE_EDGE % (e.vertices[0], e.vertices[1])
+    
 # #####################################################
 # Model exporter - faces
 # #####################################################
@@ -415,7 +428,7 @@ def setBit(value, position, on):
         mask = ~(1 << position)
         return (value & mask)    
     
-def generate_face(f, faceIndex, normals, uvs, colors, mesh, use_normals, use_colors, use_uv_coords, flipyz):
+def generate_face(f, faceIndex, normals, uvs, colors, mesh, use_normals, use_colors, use_uv_coords, use_materials, flipyz):
     isTriangle = ( len(f.vertices) == 3 )
     
     if isTriangle:
@@ -423,7 +436,7 @@ def generate_face(f, faceIndex, normals, uvs, colors, mesh, use_normals, use_col
     else:
         nVertices = 4
         
-    hasMaterial = True # for the moment objects without materials get default material
+    hasMaterial = use_materials
     
     hasFaceUvs = False # not supported in Blender
     hasFaceVertexUvs = use_uv_coords
@@ -459,6 +472,7 @@ def generate_face(f, faceIndex, normals, uvs, colors, mesh, use_normals, use_col
     faceData.append(faceType)    
     
     # must clamp in case on polygons bigger than quads
+
     for i in range(nVertices):
         index = f.vertices[i]
         faceData.append(index)
@@ -736,7 +750,17 @@ def generate_materials_string(mesh, scene, use_colors, draw_type):
 # ASCII model generator
 # #####################################################
 
-def generate_ascii_model(mesh, scene, use_normals, use_colors, use_uv_coords, align_model, flipyz, draw_type):
+def generate_ascii_model(mesh, scene, 
+                         use_normals, 
+                         use_colors, 
+                         use_uv_coords, 
+                         use_materials,
+                         use_edges,
+                         align_model, 
+                         flipyz, 
+                         option_truncate, 
+                         option_scale, 
+                         draw_type):
 
     vertices = mesh.vertices[:]    
 
@@ -751,8 +775,19 @@ def generate_ascii_model(mesh, scene, use_normals, use_colors, use_uv_coords, al
     colors, ncolor = extract_vertex_colors(mesh, use_colors)
     uvs, nuv = extract_uvs(mesh, use_uv_coords)
 
-    mstring, nmaterial = generate_materials_string(mesh, scene, use_colors, draw_type)
+    materials_string = ""
+    nmaterial = 0
     
+    edges_string = ""
+    nedges = 0
+    
+    if use_materials:
+        materials_string, nmaterial = generate_materials_string(mesh, scene, use_colors, draw_type)
+    
+    if use_edges:
+        nedges = len(mesh.edges) 
+        edges_string  = ",".join(generate_edge(e) for e in mesh.edges)
+        
     text = TEMPLATE_FILE_ASCII % {
     "nvertex"   : len(mesh.vertices),
     "nface"     : len(mesh.faces),
@@ -760,16 +795,21 @@ def generate_ascii_model(mesh, scene, use_normals, use_colors, use_uv_coords, al
     "nnormal"   : nnormal,
     "ncolor"    : ncolor,
     "nmaterial" : nmaterial,
+    "nedges"    : nedges,
+    
+    "scale" : option_scale,
 
     "uvs"           : generate_uvs(uvs, use_uv_coords),
     "normals"       : generate_normals(normals, use_normals),
     "colors"        : generate_vertex_colors(colors, use_colors),
 
-    "materials" : mstring,
+    "materials" : materials_string,
 
-    "vertices"      : ",".join(generate_vertex(v) for v in vertices),
+    "vertices" : ",".join(generate_vertex(v, option_truncate) for v in vertices),
 
-    "faces"     : ",".join(generate_face(f, i, normals, uvs, colors, mesh, use_normals, use_colors, use_uv_coords, flipyz) for i, f in enumerate(mesh.faces))
+    "faces"    : ",".join(generate_face(f, i, normals, uvs, colors, mesh, use_normals, use_colors, use_uv_coords, use_materials, flipyz) for i, f in enumerate(mesh.faces)),
+
+    "edges"    : edges_string
 
     }
 
@@ -780,13 +820,24 @@ def generate_ascii_model(mesh, scene, use_normals, use_colors, use_uv_coords, al
 # Model exporter - export single mesh
 # #####################################################
 
-def export_mesh(obj, scene, filepath, use_normals, use_colors, use_uv_coords, align_model, flipyz, export_single_model):
+def export_mesh(obj, scene, filepath, 
+                use_normals, 
+                use_colors, 
+                use_uv_coords, 
+                use_materials, 
+                use_edges, 
+                align_model, 
+                flipyz, 
+                option_truncate, 
+                option_scale, 
+                export_single_model):
+
     """Export single mesh"""
 
 
     # collapse modifiers into mesh
     
-    mesh = obj.create_mesh(scene, True, 'RENDER')        
+    mesh = obj.create_mesh(scene, True, 'RENDER')
 
     if not mesh:
         raise Exception("Error, could not get mesh data from object [%s]" % obj.name)
@@ -800,6 +851,8 @@ def export_mesh(obj, scene, filepath, use_normals, use_colors, use_uv_coords, al
         mesh.transform(X_ROT * obj.matrix_world)
     else:
         mesh.transform(X_ROT)
+
+    mesh.transform(mathutils.Matrix.Scale(option_scale, 4))
 
     mesh.calc_normals()
 
@@ -823,7 +876,18 @@ def export_mesh(obj, scene, filepath, use_normals, use_colors, use_uv_coords, al
         if not active_col_layer:
             use_colors = False
 
-    text = generate_ascii_model(mesh, scene, use_normals, use_colors, use_uv_coords, align_model, flipyz, obj.draw_type)    
+    text = generate_ascii_model(mesh, scene, 
+                                use_normals, 
+                                use_colors, 
+                                use_uv_coords, 
+                                use_materials,
+                                use_edges,
+                                align_model, 
+                                flipyz, 
+                                option_truncate, 
+                                option_scale, 
+                                obj.draw_type)
+
     write_file(filepath, text)
 
     # remove temp mesh
@@ -924,7 +988,7 @@ def generate_objects(data):
                 group_string = generate_string_list(group_ids)
 
             castsShadow = generate_bool_property(obj.THREE_castsShadow)
-            meshCollider = generate_bool_property(obj.THREE_meshCollider)            
+            meshCollider = generate_bool_property(obj.THREE_meshCollider)
                 
             object_string = TEMPLATE_OBJECT % {
             "object_id"   : generate_string(object_id),
@@ -1250,7 +1314,17 @@ def export_scene(scene, filepath, flipyz):
 # Main
 # #####################################################
 
-def save(operator, context, filepath = "", option_flip_yz = True, use_normals = True, use_colors = True, use_uv_coords = True, align_model = 0, option_export_scene = True):
+def save(operator, context, filepath = "", 
+         option_flip_yz = True, 
+         use_normals = True, 
+         use_colors = True, 
+         use_uv_coords = True, 
+         use_materials = True, 
+         use_edges = False, 
+         align_model = 0, 
+         option_export_scene = False, 
+         option_truncate = False, 
+         option_scale = 1.0):
 
     filepath = ensure_extension(filepath, '.js')
 
@@ -1281,7 +1355,17 @@ def save(operator, context, filepath = "", option_flip_yz = True, use_normals = 
 
                 if name not in geo_set:
                     fname = generate_mesh_filename(name, filepath)
-                    export_mesh(obj, scene, fname, use_normals, use_colors, use_uv_coords, 0, option_flip_yz, False)
+                    export_mesh(obj, scene, fname, 
+                                use_normals, 
+                                use_colors, 
+                                use_uv_coords, 
+                                use_materials, 
+                                use_edges, 
+                                False, 
+                                option_flip_yz, 
+                                option_truncate, 
+                                option_scale, 
+                                False)
                     
                     geo_set.add(name)
 
@@ -1291,7 +1375,17 @@ def save(operator, context, filepath = "", option_flip_yz = True, use_normals = 
         if not obj:
             raise Exception("Error, Select 1 active object or select 'export scene'")
 
-        export_mesh(obj, scene, filepath, use_normals, use_colors, use_uv_coords, align_model, option_flip_yz, True)
+        export_mesh(obj, scene, filepath, 
+                    use_normals, 
+                    use_colors, 
+                    use_uv_coords, 
+                    use_materials, 
+                    use_edges, 
+                    align_model, 
+                    option_flip_yz, 
+                    option_truncate, 
+                    option_scale, 
+                    True)
 
     
     return {'FINISHED'}
