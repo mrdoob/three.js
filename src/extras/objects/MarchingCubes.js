@@ -603,11 +603,13 @@ THREE.MarchingCubes = function ( resolution, materials ) {
 	this.generateGeometry = function() {
 		
 		var start = 0, geo = new THREE.Geometry();
+		var normals = [];
 		
 		var geo_callback = function( object ) {
 			
 			var i, x, y, z, vertex, position, normal, 
 				face, a, b, c, na, nb, nc;
+			
 			
 			for( i = 0; i < object.count; i++ ) {
 				
@@ -626,9 +628,10 @@ THREE.MarchingCubes = function ( resolution, materials ) {
 				normal = new THREE.Vector3( x, y, z );
 				normal.normalize();
 				
-				vertex = new THREE.Vertex( position, normal );
+				vertex = new THREE.Vertex( position );
 				
 				geo.vertices.push( vertex );
+				normals.push( normal );
 				
 			}
 			
@@ -640,9 +643,9 @@ THREE.MarchingCubes = function ( resolution, materials ) {
 				b = a + 1;
 				c = a + 2;
 
-				na = geo.vertices[ a ].normal;
-				nb = geo.vertices[ b ].normal;
-				nc = geo.vertices[ c ].normal;
+				na = normals[ a ];
+				nb = normals[ b ];
+				nc = normals[ c ];
 				
 				face = new THREE.Face3( a, b, c, [ na, nb, nc ] );
 				
