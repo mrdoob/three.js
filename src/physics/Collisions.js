@@ -1,28 +1,15 @@
-// Ray
-//function Ray(org, dir) {
-//    this.origin = org || new THREE.Vector3();
-//	// Make sure the direction is always normalized!
-//    this.direction = dir || new THREE.Vector3(1,0,0); 
-//}
-
-//Ray.prototype.intersectionPoint = function(t) {
-//	return this.origin.clone().addSelf(this.direction.multiplyScalar(t));
-//}
-
-// Parametric plane
 THREE.PlaneCollider = function(pt, nor){
 	this.point = pt;
 	this.normal = nor;
 }
 
-// Parametric sphere
+
 THREE.SphereCollider = function(cen, rad){
 	this.center = cen;
 	this.radius = rad;
 	this.radiusSq = rad * rad;
 }
 
-// Box (AABB or OOBB)
 THREE.BoxCollider = function(min, max){
 	this.min = min;
 	this.max = max;
@@ -34,7 +21,6 @@ THREE.MeshCollider = function(vertices, faces, normals, box) {
 	this.faces = faces;
 	this.normals = normals;
 	this.box = box;
-	
 	this.numFaces = this.faces.length;
 }
 
@@ -45,8 +31,6 @@ THREE.CollisionSystem = function(){
 
 THREE.Collisions = new THREE.CollisionSystem();
 
-// @params r Ray
-// @returns Array of colliders with a field "distance" set (@see Collisions.rayCast for details), empty if not intersection
 THREE.CollisionSystem.prototype.rayCastAll = function(r) {
 	r.direction.normalize();
 	var ld = 0;	
@@ -64,8 +48,6 @@ THREE.CollisionSystem.prototype.rayCastAll = function(r) {
 	return this.hits;
 }
 
-// @params r Ray
-// @returns nearest collider found, with "distance" field set, or null if no intersection
 THREE.CollisionSystem.prototype.rayCastNearest = function(r){
 	var cs = this.rayCastAll(r);
 	
@@ -86,8 +68,6 @@ THREE.CollisionSystem.prototype.rayCastNearest = function(r){
 	return cs[i];
 }
 
-// @params r Ray, c any supported collider type
-// @returns Number, distance to intersection, MAX_VALUE if no intersection and -1 if ray inside collider (where applicable)
 THREE.CollisionSystem.prototype.rayCast = function(r, c) {
 	if(c instanceof THREE.PlaneCollider)
 		return this.rayPlane(r, c);
@@ -99,8 +79,6 @@ THREE.CollisionSystem.prototype.rayCast = function(r, c) {
 		return this.rayBox(r, c.box);
 }
 
-// @params r Ray, me CMesh
-// @returns Number, distance to intersection or MAX_VALUE if no intersection
 THREE.CollisionSystem.prototype.rayMesh = function(r, me){
 	var rt = this.makeRayLocal(r, me.mesh);
 
@@ -198,7 +176,6 @@ THREE.CollisionSystem.prototype.rayTriangle = function(r, p0, p1, p2, n, mind){
 	return t;
 }
 
-// @params r Ray, m THREE.Mesh
 THREE.CollisionSystem.prototype.makeRayLocal = function(r, m){
 	var rt = new THREE.Ray(r.origin.clone(), r.direction.clone());
 	var mt = THREE.Matrix4.makeInvert( m.matrixWorld );
@@ -209,38 +186,21 @@ THREE.CollisionSystem.prototype.makeRayLocal = function(r, m){
 	return rt;
 }
 
-// @params r Ray, s CBox
-// @returns Number, distance to intersection, -1 if inside or MAX_VALUE if no intersection
 THREE.CollisionSystem.prototype.rayBox = function(r, ab){
-	
-	// If Collider.dynamic = true (default) it will act as an OOBB, getting the transformation from a mesh it is attached to
-	// In this case it needs to have a 'mesh' field, which has a 'matrixWorld' field in turn (like in THREE.Mesh)
 	var rt;
 	
 	if(ab.dynamic && ab.mesh && ab.mesh.matrixWorld) {
-		//if(ab.mesh.localRay) rt = ab.mesh.localRay;
-		//else 
 		rt = this.makeRayLocal(r, ab.mesh);
 	} else {
 		rt = new THREE.Ray(r.origin.clone(), r.direction.clone());
 	}
 
-	// If box is not marked as dynamic or mesh is not found, it works like a simple AABB
-	// and uses the originaly calculated bounding box (faster if object is static)
-	
 	var xt = 0, yt = 0, zt = 0;
 	var xn = 0, yn = 0, zn = 0;
 	var ins = true;
 	
 	if(rt.origin.x < ab.min.x) {
 		xt = ab.min.x - rt.origin.x;
-		/* If this and the similar lines below are uncommented, 
-		 * the function will return MAX_VALUE (i.e. no intersection) 
-		 * if the Ray.direction is too short to reach the AABB.
-		 *
-		 * Otherwise the Ray is considered infinite (but only forward) 
-		 * and returned is the distance from Ray.origin to intersection point.
-		 */ 
 		//if(xt > r.direction.x) return return Number.MAX_VALUE;
 		xt /= rt.direction.x;
 		ins = false;
@@ -322,9 +282,6 @@ THREE.CollisionSystem.prototype.rayBox = function(r, ab){
 	return t;
 }
 
-// @params r Ray, s CSphere
-// @returns Number, parametric distance or MAX_VALUE if no intersection
-// #TBT
 THREE.CollisionSystem.prototype.rayPlane = function(r, p){
 	var t = r.direction.dot(p.normal);
 	var d = p.point.dot(p.normal);
@@ -338,13 +295,11 @@ THREE.CollisionSystem.prototype.rayPlane = function(r, p){
 
 }
 
-// @params r Ray, s CSphere
-// @returns Number, parametric distance or MAX_VALUE if no intersection
 THREE.CollisionSystem.prototype.raySphere = function(r, s){
 	var e = s.center.clone().subSelf(r.origin);
 	if(e.lengthSq < s.radiusSq) return -1;
 	
-	var a = e.dot(r.direction.clone()); // Ray.direction must be unit vector!
+	var a = e.dot(r.direction.clone());
 	if(a <= 0) return Number.MAX_VALUE;
 	
 	var t = s.radiusSq - (e.lengthSq() - a * a);
