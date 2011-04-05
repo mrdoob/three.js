@@ -23,7 +23,7 @@ THREE.Mesh = function ( geometry, materials ) {
 
 		if( !this.geometry.boundingSphere ) {
 
-			 this.geometry.computeBoundingSphere();
+			this.geometry.computeBoundingSphere();
 
 		}
 

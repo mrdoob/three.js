@@ -16,7 +16,7 @@ body {
 
 #info {
 	position: absolute;
-	top: 30px; left: 10px; width: 800px;
+	top: 30px; left: 150px; width: 800px;
 	color: #000000;
 	padding: 5px;
 	font-family: Monospace;
@@ -40,10 +40,11 @@ body {
 
 <script type="text/javascript" src="../build/Three.js"></script> 
 <script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
+<script type="text/javascript" src="js/Stats.js"></script>
 
-<script type="text/javascript"> 
+<script type="text/javascript">
 
-var scene, camera, renderer, info, mouse2d, sun, cube, ghostCube;
+var scene, camera, renderer, info, mouse2d, sun, cube;
 
 var bounce = 0;
 
@@ -73,6 +74,11 @@ function init() {
 	
 	createCube( 200, new THREE.Vector3( 0,0,0 ) );
 
+	stats = new Stats();
+	stats.domElement.style.position = 'absolute';
+	stats.domElement.style.top = '0px';
+	container.appendChild( stats.domElement );
+
 	container.onmousemove = onDocumentMouseMove;
 	animate();
 
@@ -90,7 +96,7 @@ function createCube( s, p ) {
 
 	THREE.Collisions.colliders.push( THREE.CollisionUtils.MeshOBB( cube ) );
 
-}
+};
 
 function onDocumentMouseMove( event ) {
 
@@ -99,27 +105,34 @@ function onDocumentMouseMove( event ) {
 	mouse2d.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 	mouse2d.z = 1;
 
-}
+};
 
 function animate() {
+
 	requestAnimationFrame( animate );
 	
 	var r = new THREE.Ray();
-	r.origin = mouse2d.clone();
+	r.origin.copy( mouse2d );
+
 	var matrix = camera.matrixWorld.clone();
 	matrix.multiplySelf( THREE.Matrix4.makeInvert( camera.projectionMatrix ) );
 	matrix.multiplyVector3( r.origin );
-	r.direction = r.origin.clone().subSelf(camera.position);
+	r.direction = r.origin.clone().subSelf( camera.position );
 
 	info.innerHTML = "";
 
-	var c = THREE.Collisions.rayCastNearest(r);
-	if(c) {
-		info.innerHTML += "Found @ distance " + c.distance;
-		c.mesh.materials[0].color = new THREE.Color(0xaa0000);
+	var c = THREE.Collisions.rayCastNearest( r );
+
+	if( c ) {
+	
+		info.innerHTML += "Found @ distance " + c.distance.toFixed(2);
+		c.mesh.materials[ 0 ].color.setHex( 0xaa0000 );
+
 	} else {
+
 		info.innerHTML += "No intersection";
-		cube.materials[0].color = new THREE.Color(0x003300);
+		cube.materials[0].color.setHex( 0x003300 );
+
 	}
 	
 	
@@ -129,12 +142,17 @@ function animate() {
 	bounce += 0.01;
 
 	renderer.render( scene, camera );
-}
+	
+	stats.update();
+
+};
 
 function vts(v) {
+
 	if(!v) return "undefined<br>";
 	else return v.x + " , " + v.y + " , " + v.z + "<br>";
-}
+
+};
 
 </script>
 
