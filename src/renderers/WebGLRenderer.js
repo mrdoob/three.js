@@ -2606,7 +2606,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	}
 
 
-	function renderBufferImmediate( object, program ) {
+	function renderBufferImmediate( object, program, shading ) {
 
 		if ( ! object.__webglVertexBuffer ) object.__webglVertexBuffer = _gl.createBuffer();
 		if ( ! object.__webglNormalBuffer ) object.__webglNormalBuffer = _gl.createBuffer();
@@ -2623,6 +2623,50 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( object.hasNormal ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, object.__webglNormalBuffer );
+
+			if ( shading == THREE.FlatShading ) {
+
+				var nx, ny, nz,
+					nax, nbx, ncx, nay, nby, ncy, naz, nbz, ncz,
+					normalArray,
+					i, il = object.count * 3;
+
+				for( i = 0; i < il; i += 9 ) {
+
+					normalArray = object.normalArray;
+
+					nax  = normalArray[ i ];
+					nay  = normalArray[ i + 1 ];
+					naz  = normalArray[ i + 2 ];
+
+					nbx  = normalArray[ i + 3 ];
+					nby  = normalArray[ i + 4 ];
+					nbz  = normalArray[ i + 5 ];
+
+					ncx  = normalArray[ i + 6 ];
+					ncy  = normalArray[ i + 7 ];
+					ncz  = normalArray[ i + 8 ];
+
+					nx = ( nax + nbx + ncx ) / 3;
+					ny = ( nay + nby + ncy ) / 3;
+					nz = ( naz + nbz + ncz ) / 3;
+
+					normalArray[ i ] 	 = nx; 
+					normalArray[ i + 1 ] = ny;
+					normalArray[ i + 2 ] = nz;
+
+					normalArray[ i + 3 ] = nx; 
+					normalArray[ i + 4 ] = ny;
+					normalArray[ i + 5 ] = nz;
+
+					normalArray[ i + 6 ] = nx; 
+					normalArray[ i + 7 ] = ny;
+					normalArray[ i + 8 ] = nz;
+
+				}
+
+			}
+
 			_gl.bufferData( _gl.ARRAY_BUFFER, object.normalArray, _gl.DYNAMIC_DRAW );
 			_gl.enableVertexAttribArray( program.attributes.normal );
 			_gl.vertexAttribPointer( program.attributes.normal, 3, _gl.FLOAT, false, 0, 0 );
@@ -2944,7 +2988,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					setDepthTest( material.depthTest );
 
 					program = setProgram( camera, lights, fog, material, object );
-					object.render( function( object ) { renderBufferImmediate( object, program ); } );
+					object.render( function( object ) { renderBufferImmediate( object, program, material.shading ); } );
 
 				}
 
@@ -3002,7 +3046,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					setDepthTest( material.depthTest );
 
 					program = setProgram( camera, lights, fog, material, object );
-					object.render( function( object ) { renderBufferImmediate( object, program ); } );
+					object.render( function( object ) { renderBufferImmediate( object, program, material.shading ); } );
 
 				}
 

@@ -1,8 +1,7 @@
-
 <html> 
  
 <head> 
-<title>threej.s webgl - intersection: ray with box</title> 
+<title>three.js webgl - intersection: ray with box</title> 
 <meta http-equiv="content-type" content="text/html; charset=utf-8"> 
 <style type="text/css"> 
 
@@ -72,29 +71,34 @@ function init() {
 	sun.position = camera.position.clone();
 	scene.addLight( sun );
 	
-	createCube(200, new THREE.Vector3(0,0,0) );
+	createCube( 200, new THREE.Vector3( 0,0,0 ) );
 
 	container.onmousemove = onDocumentMouseMove;
 	animate();
+
 }
 
-function createCube(s, p) {
+function createCube( s, p ) {
 	
 	cube = new THREE.Mesh ( 	
-		new Cube(s,s,s,1,1,1), 
+		new Cube( s,s,s, 1,1,1 ), 
 		new THREE.MeshLambertMaterial( { color: 0x003300 })
 	);
 
 	cube.position = p;
 	scene.addObject( cube );
-	THREE.Collisions.colliders.push( THREE.CollisionUtils.MeshOBB(cube) );
+
+	THREE.Collisions.colliders.push( THREE.CollisionUtils.MeshOBB( cube ) );
+
 }
 
 function onDocumentMouseMove( event ) {
+
 	event.preventDefault();	
 	mouse2d.x = ( event.clientX / window.innerWidth ) * 2 - 1;
 	mouse2d.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 	mouse2d.z = 1;
+
 }
 
 function animate() {

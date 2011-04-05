@@ -2,19 +2,19 @@
  * @author drojdjou / http://everyday3d.com/
  */
 
-THREE.PlaneCollider = function( pt, nor ) {
+THREE.PlaneCollider = function( point, normal ) {
 
-	this.point = pt;
-	this.normal = nor;
+	this.point = point;
+	this.normal = normal;
 
 };
 
 
-THREE.SphereCollider = function( cen, rad ) {
+THREE.SphereCollider = function( center, radius ) {
 
-	this.center = cen;
-	this.radius = rad;
-	this.radiusSq = rad * rad;
+	this.center = center;
+	this.radius = radius;
+	this.radiusSq = radius * radius;
 
 };
 
