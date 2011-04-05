@@ -101,6 +101,7 @@ EXTRAS_FILES = [
 'extras/io/Loader.js',
 'extras/io/JSONLoader.js',
 'extras/io/BinaryLoader.js',
+'extras/io/SceneLoader.js',
 'extras/objects/MarchingCubes.js'
 ]
 

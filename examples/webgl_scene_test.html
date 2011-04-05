@@ -304,7 +304,9 @@
 				}
 
 				$( "progress" ).style.display = "block";
-				SceneUtils.loadScene( "scenes/test_scene.js", callback_sync, callback_async, callback_progress );
+
+				var loader = new THREE.SceneLoader();
+				loader.load( "scenes/test_scene.js", callback_sync, callback_async, callback_progress );
 
 				$( "plus_exp" ).addEventListener( 'click', createToggle( "exp" ), false );
 
