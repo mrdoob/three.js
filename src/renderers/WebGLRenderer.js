@@ -142,7 +142,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	_lensFlare.vertices     = new Float32Array( 8 + 8 );
 	_lensFlare.faces        = new Uint16Array( 6 );
-	_lensFlare.transparency = 0.5;
 
 	i = 0;
 	_lensFlare.vertices[ i++ ] = -1; _lensFlare.vertices[ i++ ] = -1;	// vertex
@@ -204,8 +203,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		
 	}
 
-
-
 	_lensFlare.attributes = {};
 	_lensFlare.uniforms = {};
 	_lensFlare.attributes.vertex       = _gl.getAttribLocation ( _lensFlare.program, "position" );
@@ -217,6 +214,57 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_lensFlare.uniforms.scale          = _gl.getUniformLocation( _lensFlare.program, "scale" );
 	_lensFlare.uniforms.rotation       = _gl.getUniformLocation( _lensFlare.program, "rotation" );
 	_lensFlare.uniforms.screenPosition = _gl.getUniformLocation( _lensFlare.program, "screenPosition" );
+
+
+	// prepare sprites
+	
+	_sprite = {};
+
+	_sprite.vertices = new Float32Array( 8 + 8 );
+	_sprite.faces    = new Uint16Array( 6 );
+
+	i = 0;
+	_sprite.vertices[ i++ ] = -1; _sprite.vertices[ i++ ] = -1;	// vertex
+	_sprite.vertices[ i++ ] = 0;  _sprite.vertices[ i++ ] = 0;	// uv... etc.
+	_sprite.vertices[ i++ ] = 1;  _sprite.vertices[ i++ ] = -1;
+	_sprite.vertices[ i++ ] = 1;  _sprite.vertices[ i++ ] = 0;
+	_sprite.vertices[ i++ ] = 1;  _sprite.vertices[ i++ ] = 1;
+	_sprite.vertices[ i++ ] = 1;  _sprite.vertices[ i++ ] = 1;
+	_sprite.vertices[ i++ ] = -1; _sprite.vertices[ i++ ] = 1;
+	_sprite.vertices[ i++ ] = 0;  _sprite.vertices[ i++ ] = 1;
+
+	i = 0;
+	_sprite.faces[ i++ ] = 0; _sprite.faces[ i++ ] = 1; _sprite.faces[ i++ ] = 2;
+	_sprite.faces[ i++ ] = 0; _sprite.faces[ i++ ] = 2; _sprite.faces[ i++ ] = 3;
+
+	_sprite.vertexBuffer  = _gl.createBuffer();
+	_sprite.elementBuffer = _gl.createBuffer();
+
+	_gl.bindBuffer( _gl.ARRAY_BUFFER, _sprite.vertexBuffer );
+	_gl.bufferData( _gl.ARRAY_BUFFER,  _sprite.vertices, _gl.STATIC_DRAW );
+
+	_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, _sprite.elementBuffer );
+	_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, _sprite.faces, _gl.STATIC_DRAW );
+
+
+	_sprite.program = _gl.createProgram();
+	_gl.attachShader( _sprite.program, getShader( "fragment", THREE.ShaderLib.sprite.fragmentShader ));
+	_gl.attachShader( _sprite.program, getShader( "vertex",   THREE.ShaderLib.sprite.vertexShader   ));
+	_gl.linkProgram( _sprite.program );
+
+	_sprite.attributes = {};
+	_sprite.uniforms = {};
+	_sprite.attributes.vertex       = _gl.getAttribLocation ( _sprite.program, "position" );
+	_sprite.attributes.uv           = _gl.getAttribLocation ( _sprite.program, "UV" );
+	_sprite.uniforms.map            = _gl.getUniformLocation( _sprite.program, "map" );
+	_sprite.uniforms.opacity        = _gl.getUniformLocation( _sprite.program, "opacity" );
+	_sprite.uniforms.scale          = _gl.getUniformLocation( _sprite.program, "scale" );
+	_sprite.uniforms.rotation       = _gl.getUniformLocation( _sprite.program, "rotation" );
+	_sprite.uniforms.screenPosition = _gl.getUniformLocation( _sprite.program, "screenPosition" );
+
+
+
+
 
 
 	this.setSize = function ( width, height ) {
@@ -3078,6 +3126,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		// render 2d
+		
+		if ( scene.__webglSprites.length ) {
+			
+			renderSprites( scene );
+			
+		}
+
 		// render stencil shadows
 
 		if ( stencil && scene.__webglShadowVolumes.length && scene.lights.length ) {
@@ -3301,7 +3357,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_gl.bindTexture( _gl.TEXTURE_2D, _lensFlare.occlusionTexture );
 
 		_gl.activeTexture( _gl.TEXTURE1 );
-		_gl.bindTexture( _gl.TEXTURE_2D, _lensFlare.tempTexture );
 
 		for ( o = 0; o < ol; o ++ ) {
 
@@ -3326,20 +3381,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 			screenPositionPixels[ 1 ] = screenPosition[ 1 ] * halfViewportHeight + halfViewportHeight;
 
 
-			// screen cull or go on if vertex texture
+			// screen cull 
 			
-			if( _lensFlare.hasVertexTexture ||  
-			  (	screenPositionPixels[ 0 ] > 0 &&
+			if(	screenPositionPixels[ 0 ] > 0 &&
 				screenPositionPixels[ 0 ] < _viewportWidth &&
 				screenPositionPixels[ 1 ] > 0 &&
-				screenPositionPixels[ 1 ] < _viewportHeight )) {
+				screenPositionPixels[ 1 ] < _viewportHeight ) {
 
 
 				// save current RGB to temp texture
 	
 				_gl.bindTexture( _gl.TEXTURE_2D, _lensFlare.tempTexture );
 				_gl.copyTexSubImage2D( _gl.TEXTURE_2D, 0, 0, 0, screenPositionPixels[ 0 ] - 8, screenPositionPixels[ 1 ] - 8, 16, 16 );
-	
+				_gl.finish();
+
 	
 				// render pink quad
 	
@@ -3351,12 +3406,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 				_gl.enable( _gl.DEPTH_TEST );
 	
 				_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
+				_gl.finish();
 	
 	
 				// copy result to occlusionMap
 	
 				_gl.bindTexture( _gl.TEXTURE_2D, _lensFlare.occlusionTexture );
 				_gl.copyTexSubImage2D( _gl.TEXTURE_2D, 0, 0, 0, screenPositionPixels[ 0 ] - 8, screenPositionPixels[ 1 ] - 8, 16, 16 );
+				_gl.finish();
 	
 	
 				// restore graphics
@@ -3447,6 +3504,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			scene.__webglObjectsImmediate = [];
 			scene.__webglShadowVolumes = [];
 			scene.__webglLensFlares = [];
+			scene.__webglSprites = [];
 		}
 
 		while ( scene.__objectsAdded.length ) {
@@ -3480,6 +3538,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		for ( var o = 0, ol = scene.__webglLensFlares.length; o < ol; o ++ ) {
 
 			updateObject( scene.__webglLensFlares[ o ].object, scene );
+
+		}
+
+		for ( var o = 0, ol = scene.__webglSprites.length; o < ol; o ++ ) {
+
+			updateObject( scene.__webglSprites[ o ].object, scene );
 
 		}
 

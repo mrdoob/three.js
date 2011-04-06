@@ -602,11 +602,13 @@ THREE.ShaderLib = {
 									  "texture2D( occlusionMap, vec2( 0.1, 0.9 )) +",
 									  "texture2D( occlusionMap, vec2( 0.1, 0.5 )) +",
 									  "texture2D( occlusionMap, vec2( 0.5, 0.5 ));",
-					
+/*
 					"vVisibility = (       visibility.r / 9.0 ) *",
 					              "( 1.0 - visibility.g / 9.0 ) *",
 					              "(       visibility.b / 9.0 ) *", 
 					              "( 1.0 - visibility.a / 9.0 );",
+*/
+					"vVisibility = ( 1.0 - visibility.a / 9.0 );",
 
 					"pos.x = cos( rotation ) * position.x - sin( rotation ) * position.y;",
 					"pos.y = sin( rotation ) * position.x + cos( rotation ) * position.y;",
@@ -636,7 +638,7 @@ THREE.ShaderLib = {
 			
 				"if( renderType == 0 ) {",
 							
-					"gl_FragColor = vec4( 1.0, 0.0, 1.0, 0.0 );",
+					"gl_FragColor = vec4( texture2D( map, vUV ).rgb, 0.0 );",
 				
 				// restore
 				
@@ -708,7 +710,7 @@ THREE.ShaderLib = {
 			
 				"if( renderType == 0 ) {",
 							
-					"gl_FragColor = vec4( 1.0, 0.0, 1.0, 0.0 );",
+					"gl_FragColor = vec4( texture2D( map, vUV ).rgb, 0.0 );",
 				
 				// restore
 				
@@ -735,6 +737,54 @@ THREE.ShaderLib = {
 		].join( "\n" )
 
 	},
+
+	'sprite': {
+		
+		vertexShader: [
+
+			"uniform 	vec3 	screenPosition;",
+			"uniform	vec2	scale;",
+			"uniform	float	rotation;",
+
+			"attribute 	vec2 	position;",
+			"attribute  vec2	UV;",
+
+			"varying	vec2	vUV;",
+	
+			"void main(void)",
+			"{",
+				"vUV = UV;",
+
+				"vec2 pos;",
+				"pos.x = cos( rotation ) * position.x - sin( rotation ) * position.y;",
+				"pos.y = sin( rotation ) * position.x + cos( rotation ) * position.y;",
+				
+				"gl_Position = vec4(( pos * scale + screenPosition.xy ).xy, screenPosition.z, 1.0 );",
+			"}"
+
+		].join( "\n" ),
+		
+		fragmentShader: [
+		
+			"#ifdef GL_ES",
+				"precision highp float;",
+			"#endif",		
+
+			"uniform	sampler2D	map;",
+			"uniform	float		opacity;",
+			
+			"varying	vec2		vUV;",
+	
+			"void main( void )",
+			"{",
+				"vec4 color = texture2D( map, vUV );",
+				"color.a *= opacity;",
+				"gl_FragColor = color;",
+			"}"
+		].join( "\n" )
+
+	},
+
 
 
 	'shadowPost': {
