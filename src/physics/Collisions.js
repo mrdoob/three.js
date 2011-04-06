@@ -2,19 +2,19 @@
  * @author drojdjou / http://everyday3d.com/
  */
 
-THREE.PlaneCollider = function( pt, nor ) {
+THREE.PlaneCollider = function( point, normal ) {
 
-	this.point = pt;
-	this.normal = nor;
+	this.point = point;
+	this.normal = normal;
 
 };
 
 
-THREE.SphereCollider = function( cen, rad ) {
+THREE.SphereCollider = function( center, radius ) {
 
-	this.center = cen;
-	this.radius = rad;
-	this.radiusSq = rad * rad;
+	this.center = center;
+	this.radius = radius;
+	this.radiusSq = radius * radius;
 
 };
 
@@ -45,25 +45,29 @@ THREE.CollisionSystem = function() {
 
 THREE.Collisions = new THREE.CollisionSystem();
 
-THREE.CollisionSystem.prototype.rayCastAll = function( r ) {
+THREE.CollisionSystem.prototype.rayCastAll = function( ray ) {
 
-	r.direction.normalize();
+	ray.direction.normalize();
 
-	var ld = 0;	
 	this.hits.length = 0;
-	
-	for ( var i = 0; i < this.colliders.length; i++ ) {
 
-		var d = this.rayCast( r, this.colliders[ i ] );	
+	var i, l, d, collider,
+		ld = 0;	
+	
+	for ( i = 0, l = this.colliders.length; i < l; i++ ) {
+
+		collider = this.colliders[ i ];
+		
+		d = this.rayCast( ray, collider );	
 		
 		if ( d < Number.MAX_VALUE ) {
 
-			this.colliders[ i ].distance = d;
+			collider.distance = d;
 
 			if ( d > ld ) 
-				this.hits.push( this.colliders[ i ] );
+				this.hits.push( collider );
 			else 
-				this.hits.unshift( this.colliders[ i ] );
+				this.hits.unshift( collider );
 
 			ld = d;
 
@@ -75,17 +79,17 @@ THREE.CollisionSystem.prototype.rayCastAll = function( r ) {
 
 };
 
-THREE.CollisionSystem.prototype.rayCastNearest = function( r ) {
+THREE.CollisionSystem.prototype.rayCastNearest = function( ray ) {
 
-	var cs = this.rayCastAll( r );
+	var cs = this.rayCastAll( ray );
 	
 	if( cs.length == 0 ) return null;
 	
 	var i = 0;
 
-	while( cs[i] instanceof THREE.MeshCollider ) {
+	while( cs[ i ] instanceof THREE.MeshCollider ) {
 
-		var d = this.rayMesh( r, cs[ i ] );
+		var d = this.rayMesh( ray, cs[ i ] );
 
 		if( d < Number.MAX_VALUE ) {
 
@@ -143,26 +147,32 @@ THREE.CollisionSystem.prototype.rayMesh = function( r, me ) {
 
 };
 
-THREE.CollisionSystem.prototype.rayTriangle = function( r, p0, p1, p2, n, mind ) {
-
-	//if (!n) {
-		var e1 = new THREE.Vector3().sub( p1, p0 );
-		var e2 = new THREE.Vector3().sub( p2, p1 );
-		n = new THREE.Vector3().cross( e1, e2 );
-	//}
+THREE.CollisionSystem.prototype.rayTriangle = function( ray, p0, p1, p2, n, mind ) {
 	
-	var dot = n.dot( r.direction );
+	var e1 = THREE.CollisionSystem.__v1, 
+		e2 = THREE.CollisionSystem.__v2;
+	
+	e1.sub( p1, p0 );
+	e2.sub( p2, p1 );
+	n.cross( e1, e2 )
+	
+	var dot = n.dot( ray.direction );
 	if ( !( dot < 0 ) ) return Number.MAX_VALUE;
 
 	var d = n.dot( p0 );
-	var t = d - n.dot( r.origin );
+	var t = d - n.dot( ray.origin );
 	
 	if ( !( t <= 0 ) ) return Number.MAX_VALUE;
 	if ( !( t >= dot * mind ) ) return Number.MAX_VALUE;
 	
 	t = t / dot;
 
-	var p = r.origin.clone().addSelf( r.direction.clone().multiplyScalar( t ) );
+	var p = THREE.CollisionSystem.__v3;
+
+	p.copy( ray.direction );
+	p.multiplyScalar( t );
+	p.addSelf( ray.origin );
+	
 	var u0, u1, u2, v0, v1, v2;
 
 	if ( Math.abs( n.x ) > Math.abs( n.y ) ) {
@@ -236,9 +246,9 @@ THREE.CollisionSystem.prototype.rayTriangle = function( r, p0, p1, p2, n, mind )
 
 };
 
-THREE.CollisionSystem.prototype.makeRayLocal = function( r, m ) {
+THREE.CollisionSystem.prototype.makeRayLocal = function( ray, m ) {
 
-	var rt = new THREE.Ray( r.origin.clone(), r.direction.clone() );
+	var rt = new THREE.Ray( ray.origin.clone(), ray.direction.clone() );
 	var mt = THREE.Matrix4.makeInvert( m.matrixWorld );
 
 	mt.multiplyVector3( rt.origin );
@@ -403,6 +413,11 @@ THREE.CollisionSystem.prototype.raySphere = function( r, s ) {
 	return Number.MAX_VALUE;
 
 };
+
+THREE.CollisionSystem.__v1 = new THREE.Vector3();
+THREE.CollisionSystem.__v2 = new THREE.Vector3();
+THREE.CollisionSystem.__v3 = new THREE.Vector3();
+
 
 
 

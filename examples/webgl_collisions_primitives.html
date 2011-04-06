@@ -18,7 +18,7 @@
             #info {
                 position: absolute;
                 top: 30px;
-                left: 10px;
+                left: 150px;
                 width: 800px;
                 color: #000000;
                 padding: 5px;
@@ -31,7 +31,7 @@
             #options {
                 position: absolute;
                 top: 10px;
-                left: 10px;
+                left: 150px;
                 width: 800px;
                 color: #000000;
                 padding: 5px;
@@ -42,10 +42,10 @@
             }
             
         </style>
-        <script type="text/javascript" src="../build/Three.js">
-        </script>
-        <script type="text/javascript" src="js/RequestAnimationFrame.js">
-        </script>
+        <script type="text/javascript" src="../build/Three.js"></script>
+        <script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
+		<script type="text/javascript" src="js/Stats.js"></script>
+		
         <script type="text/javascript">
             
             var scene, camera, renderer, info, mouse2d, sun;
@@ -97,8 +97,14 @@
                 cplane.mesh = plane;
                 THREE.Collisions.colliders.push(cplane);
                 
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild( stats.domElement );
+				
                 container.onmousemove = onDocumentMouseMove;
                 animate();
+
             }
             
             function makeWall(z){
@@ -157,33 +163,49 @@
                     geoms[i].materials[0].color = new THREE.Color(0x007700);
                 }
                 
-                if (!document.getElementById("nearest").checked) {
+                if ( !document.getElementById( "nearest" ).checked ) {
+
                     // Raycast all
+
                     ts = new Date().getTime();
-                    var cs = THREE.Collisions.rayCastAll(r);
+                    var cs = THREE.Collisions.rayCastAll( r );
                     tt = new Date().getTime() - ts;
-                    if (cs.length > 0) {
+
+                    if ( cs.length > 0 ) {
+
                         info.innerHTML = cs.length + " colliders found in " + tt;
-                        for (var i = 0; i < cs.length; i++) {
-                            cs[i].mesh.materials[0].color = new THREE.Color(0xaa0000);
+
+                        for ( var i = 0; i < cs.length; i++ ) {
+						
+                            cs[ i ].mesh.materials[ 0 ].color.setHex( 0xaa0000 );
+
                         }
-                    }
-                    else {
+
+                    } else {
+
                         info.innerHTML = "No intersection";
+
                     }
-                }
-                else {
+
+                } else {
+				
                     // Raycast nearest
+
                     ts = new Date().getTime();
-                    var c = THREE.Collisions.rayCastNearest(r);
+                    var c = THREE.Collisions.rayCastNearest( r );
                     tt = new Date().getTime() - ts;
-                    if (c) {
+
+                    if ( c ) {
+
                         info.innerHTML = "Found in " + tt + " @ distance " + c.distance;
-                        c.mesh.materials[0].color = new THREE.Color(0xaa0000);
-                    }
-                    else {
+                        c.mesh.materials[ 0 ].color.setHex( 0xaa0000 );
+
+                    } else {
+
                         info.innerHTML = "No intersection";
+
                     }
+
                 }
                 
                 camera.position.x = camdist * Math.cos(theta);
@@ -193,7 +215,9 @@
                 sun.position.normalize();
                 theta += 0.005;
                 
-                renderer.render(scene, camera);
+                renderer.render( scene, camera );
+				
+				stats.update();
             }
             
             function vts(v){
