@@ -3393,7 +3393,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 	
 				_gl.bindTexture( _gl.TEXTURE_2D, _lensFlare.tempTexture );
 				_gl.copyTexSubImage2D( _gl.TEXTURE_2D, 0, 0, 0, screenPositionPixels[ 0 ] - 8, screenPositionPixels[ 1 ] - 8, 16, 16 );
-				_gl.finish();
 
 	
 				// render pink quad
@@ -3406,14 +3405,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 				_gl.enable( _gl.DEPTH_TEST );
 	
 				_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
-				_gl.finish();
 	
 	
 				// copy result to occlusionMap
 	
 				_gl.bindTexture( _gl.TEXTURE_2D, _lensFlare.occlusionTexture );
 				_gl.copyTexSubImage2D( _gl.TEXTURE_2D, 0, 0, 0, screenPositionPixels[ 0 ] - 8, screenPositionPixels[ 1 ] - 8, 16, 16 );
-				_gl.finish();
 	
 	
 				// restore graphics
