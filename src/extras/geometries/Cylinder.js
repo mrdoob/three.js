@@ -8,13 +8,13 @@ var Cylinder = function ( numSegs, topRad, botRad, height, topOffset, botOffset 
 
 	THREE.Geometry.call( this );
 
-	var scope = this, i, pi = Math.PI, halfHeight = height / 2;
+	var scope = this, i, PI2 = Math.PI * 2, halfHeight = height / 2;
 
 	// Top circle vertices
 
 	for ( i = 0; i < numSegs; i ++ ) {
 
-		v( Math.sin( 2 * pi * i / numSegs ) * topRad, Math.cos( 2 * pi * i / numSegs ) * topRad, - halfHeight );
+		v( Math.sin( PI2 * i / numSegs ) * topRad, Math.cos( PI2 * i / numSegs ) * topRad, - halfHeight );
 
 	}
 
@@ -22,7 +22,7 @@ var Cylinder = function ( numSegs, topRad, botRad, height, topOffset, botOffset 
 
 	for ( i = 0; i < numSegs; i ++ ) {
 
-		v( Math.sin( 2 * pi * i / numSegs ) * botRad, Math.cos( 2 * pi * i / numSegs ) * botRad, halfHeight );
+		v( Math.sin( PI2 * i / numSegs ) * botRad, Math.cos( PI2 * i / numSegs ) * botRad, halfHeight );
 
 	}
 
@@ -74,6 +74,30 @@ var Cylinder = function ( numSegs, topRad, botRad, height, topOffset, botOffset 
 			);
 
 		}
+
+	}
+
+	// Cylindrical mapping
+
+	for ( var i = 0, il = this.faces.length; i < il; i ++ ) {
+
+		var uvs = [], face = this.faces[ i ],
+		a = this.vertices[ face.a ],
+		b = this.vertices[ face.b ],
+		c = this.vertices[ face.c ],
+		d = this.vertices[ face.d ];
+
+		uvs.push( new THREE.UV( 0.5 + Math.atan2( a.position.x, a.position.y ) / PI2, 0.5 + ( a.position.z / height ) ) );
+		uvs.push( new THREE.UV( 0.5 + Math.atan2( b.position.x, b.position.y ) / PI2, 0.5 + ( b.position.z / height ) ) );
+		uvs.push( new THREE.UV( 0.5 + Math.atan2( c.position.x, c.position.y ) / PI2, 0.5 + ( c.position.z / height ) ) );
+
+		if ( face instanceof THREE.Face4 ) {
+
+			uvs.push( new THREE.UV( 0.5 + ( Math.atan2( d.position.x, d.position.y ) / PI2 ), 0.5 + ( d.position.z / height ) ) );
+
+		}
+
+		this.faceVertexUvs[ 0 ].push( uvs );
 
 	}
 
