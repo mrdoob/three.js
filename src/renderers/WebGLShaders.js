@@ -569,24 +569,49 @@ THREE.UniformsLib = {
 
 THREE.ShaderLib = {
 
-	'lensFlare': {
+	'lensFlareVertexTexture': {
 		
 		vertexShader: [
 
 			"uniform 	vec3 	screenPosition;",
 			"uniform	vec2	scale;",
 			"uniform	float	rotation;",
+			"uniform    int     renderType;",
+
+			"uniform	sampler2D	occlusionMap;",
+
 			"attribute 	vec2 	position;",
 			"attribute  vec2	UV;",
 			"varying	vec2	vUV;",
+			"varying	float	vVisibility;",
 	
 			"void main(void)",
 			"{",
 				"vUV = UV;",
 
-				"vec2 pos;",
-				"pos.x = cos( rotation ) * position.x - sin( rotation ) * position.y;",
-				"pos.y = sin( rotation ) * position.x + cos( rotation ) * position.y;",
+				"vec2 pos = position;",
+				
+				"if( renderType == 2 ) {",
+
+					"vec4 visibility = texture2D( occlusionMap, vec2( 0.1, 0.1 )) +",
+									  "texture2D( occlusionMap, vec2( 0.5, 0.1 )) +",
+									  "texture2D( occlusionMap, vec2( 0.9, 0.1 )) +",
+									  "texture2D( occlusionMap, vec2( 0.9, 0.5 )) +",
+									  "texture2D( occlusionMap, vec2( 0.9, 0.9 )) +",
+									  "texture2D( occlusionMap, vec2( 0.5, 0.9 )) +",
+									  "texture2D( occlusionMap, vec2( 0.1, 0.9 )) +",
+									  "texture2D( occlusionMap, vec2( 0.1, 0.5 )) +",
+									  "texture2D( occlusionMap, vec2( 0.5, 0.5 ));",
+					
+					"vVisibility = (       visibility.r / 9.0 ) *",
+					              "( 1.0 - visibility.g / 9.0 ) *",
+					              "(       visibility.b / 9.0 ) *", 
+					              "( 1.0 - visibility.a / 9.0 );",
+
+					"pos.x = cos( rotation ) * position.x - sin( rotation ) * position.y;",
+					"pos.y = sin( rotation ) * position.x + cos( rotation ) * position.y;",
+				"}",
+				
 				"gl_Position = vec4(( pos * scale + screenPosition.xy ).xy, screenPosition.z, 1.0 );",
 			"}"
 
@@ -600,17 +625,110 @@ THREE.ShaderLib = {
 
 			"uniform	sampler2D	map;",
 			"uniform	float		opacity;",
+			"uniform    int         renderType;",
 			
-			"uniform    int         renderPink;",
+			"varying	vec2		vUV;",
+			"varying	float		vVisibility;",
+	
+			"void main( void )",
+			"{",
+				// pink square
+			
+				"if( renderType == 0 ) {",
+							
+					"gl_FragColor = vec4( 1.0, 0.0, 1.0, 0.0 );",
+				
+				// restore
+				
+				"} else if( renderType == 1 ) {",
+
+					"gl_FragColor = texture2D( map, vUV );",
+				
+				// flare
+				
+				"} else {",
+				
+					"vec4 color = texture2D( map, vUV );",
+					"color.a *= opacity * vVisibility;",
+					"gl_FragColor = color;",
+				"}",
+			"}"
+		].join( "\n" )
+
+	},
+
+
+	'lensFlare': {
+		
+		vertexShader: [
+
+			"uniform 	vec3 	screenPosition;",
+			"uniform	vec2	scale;",
+			"uniform	float	rotation;",
+			"uniform    int     renderType;",
+
+			"attribute 	vec2 	position;",
+			"attribute  vec2	UV;",
+
+			"varying	vec2	vUV;",
+	
+			"void main(void)",
+			"{",
+				"vUV = UV;",
+
+				"vec2 pos = position;",
+				
+				"if( renderType == 2 ) {",
+
+					"pos.x = cos( rotation ) * position.x - sin( rotation ) * position.y;",
+					"pos.y = sin( rotation ) * position.x + cos( rotation ) * position.y;",
+				"}",
+				
+				"gl_Position = vec4(( pos * scale + screenPosition.xy ).xy, screenPosition.z, 1.0 );",
+			"}"
+
+		].join( "\n" ),
+		
+		fragmentShader: [
+		
+			"#ifdef GL_ES",
+				"precision highp float;",
+			"#endif",		
+
+			"uniform	sampler2D	map;",
+			"uniform	sampler2D	occlusionMap;",
+			"uniform	float		opacity;",
+			"uniform    int         renderType;",
+			
 			"varying	vec2		vUV;",
 	
 			"void main( void )",
 			"{",
-				"if( renderPink == 1 ) {",
-					"gl_FragColor = vec4( 1.0, 0.0, 1.0, 1.0 );",
+				// pink square
+			
+				"if( renderType == 0 ) {",
+							
+					"gl_FragColor = vec4( 1.0, 0.0, 1.0, 0.0 );",
+				
+				// restore
+				
+				"} else if( renderType == 1 ) {",
+
+					"gl_FragColor = texture2D( map, vUV );",
+				
+				// flare
+				
 				"} else {",
+
+					"float visibility = texture2D( occlusionMap, vec2( 0.5, 0.1 )).a +",
+								  	   "texture2D( occlusionMap, vec2( 0.9, 0.5 )).a +",
+									   "texture2D( occlusionMap, vec2( 0.5, 0.9 )).a +",
+									   "texture2D( occlusionMap, vec2( 0.1, 0.5 )).a;",
+					
+	                "visibility = ( 1.0 - visibility / 4.0 );",
+
 					"vec4 color = texture2D( map, vUV );",
-					"color.a *= opacity;",
+					"color.a *= opacity * visibility;",
 					"gl_FragColor = color;",
 				"}",
 			"}"

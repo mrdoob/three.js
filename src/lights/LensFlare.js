@@ -51,7 +51,7 @@ THREE.LensFlare.prototype.add = function( texture, size, distance, blending ) {
  * Set myLensFlare.customUpdateCallback to alter the flares in your project specific way.
  */
 
-THREE.LensFlare.prototype.updateLensFlares = function( visibility ) {
+THREE.LensFlare.prototype.updateLensFlares = function() {
 	
 	var f, fl = this.lensFlares.length;
 	var flare;
@@ -66,13 +66,8 @@ THREE.LensFlare.prototype.updateLensFlares = function( visibility ) {
 		flare.x = this.positionScreen.x + vecX * flare.distance;
 		flare.y = this.positionScreen.y + vecY * flare.distance;
 
-		flare.wantedScale = ( visibility * 0.2 + 0.8 );
 		flare.wantedRotation = flare.x * Math.PI * 0.25;
-		flare.wantedOpacity = visibility;
-		
-		flare.scale += ( flare.wantedScale - flare.scale ) * 0.25;
 		flare.rotation += ( flare.wantedRotation - flare.rotation ) * 0.25;
-		flare.opacity += ( flare.wantedOpacity - flare.opacity ) * 0.5;
 
 	}
 

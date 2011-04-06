@@ -158,10 +158,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_lensFlare.faces[ i++ ] = 0; _lensFlare.faces[ i++ ] = 1; _lensFlare.faces[ i++ ] = 2;
 	_lensFlare.faces[ i++ ] = 0; _lensFlare.faces[ i++ ] = 2; _lensFlare.faces[ i++ ] = 3;
 
-	_lensFlare.vertexBuffer  = _gl.createBuffer();
-	_lensFlare.elementBuffer = _gl.createBuffer();
-	_lensFlare.tempTexture   = _gl.createTexture();
-	_lensFlare.readBackPixels = new Uint8Array( 16*16*4 );
+	_lensFlare.vertexBuffer     = _gl.createBuffer();
+	_lensFlare.elementBuffer    = _gl.createBuffer();
+	_lensFlare.tempTexture      = _gl.createTexture();
+	_lensFlare.occlusionTexture = _gl.createTexture();
 
 	_gl.bindBuffer( _gl.ARRAY_BUFFER, _lensFlare.vertexBuffer );
 	_gl.bufferData( _gl.ARRAY_BUFFER,  _lensFlare.vertices, _gl.STATIC_DRAW );
@@ -176,23 +176,47 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MAG_FILTER, _gl.NEAREST );
 	_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, _gl.NEAREST );
 
-	_lensFlare.program = _gl.createProgram();
+	_gl.bindTexture( _gl.TEXTURE_2D, _lensFlare.occlusionTexture );
+	_gl.texImage2D( _gl.TEXTURE_2D, 0, _gl.RGBA, 16, 16, 0, _gl.RGBA, _gl.UNSIGNED_BYTE, null );
+	_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_S, _gl.CLAMP_TO_EDGE );
+	_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_WRAP_T, _gl.CLAMP_TO_EDGE );
+	_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MAG_FILTER, _gl.NEAREST );
+	_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, _gl.NEAREST );
 
-	_gl.attachShader( _lensFlare.program, getShader( "fragment", THREE.ShaderLib.lensFlare.fragmentShader ));
-	_gl.attachShader( _lensFlare.program, getShader( "vertex",   THREE.ShaderLib.lensFlare.vertexShader   ));
+	if( _gl.getParameter( _gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS ) <= 0 ) {
+		
+		_lensFlare.hasVertexTexture = false;
 
-	_gl.linkProgram( _lensFlare.program );
+		_lensFlare.program = _gl.createProgram();
+		_gl.attachShader( _lensFlare.program, getShader( "fragment", THREE.ShaderLib.lensFlare.fragmentShader ));
+		_gl.attachShader( _lensFlare.program, getShader( "vertex",   THREE.ShaderLib.lensFlare.vertexShader   ));
+		_gl.linkProgram( _lensFlare.program );
+
+		
+	} else {
+
+		_lensFlare.hasVertexTexture = true;
+		
+		_lensFlare.program = _gl.createProgram();
+		_gl.attachShader( _lensFlare.program, getShader( "fragment", THREE.ShaderLib.lensFlareVertexTexture.fragmentShader ));
+		_gl.attachShader( _lensFlare.program, getShader( "vertex",   THREE.ShaderLib.lensFlareVertexTexture.vertexShader   ));
+		_gl.linkProgram( _lensFlare.program );
+		
+	}
+
+
 
 	_lensFlare.attributes = {};
 	_lensFlare.uniforms = {};
 	_lensFlare.attributes.vertex       = _gl.getAttribLocation ( _lensFlare.program, "position" );
 	_lensFlare.attributes.uv           = _gl.getAttribLocation ( _lensFlare.program, "UV" );
+	_lensFlare.uniforms.renderType     = _gl.getUniformLocation( _lensFlare.program, "renderType" );
 	_lensFlare.uniforms.map            = _gl.getUniformLocation( _lensFlare.program, "map" );
+	_lensFlare.uniforms.occlusionMap   = _gl.getUniformLocation( _lensFlare.program, "occlusionMap" );
 	_lensFlare.uniforms.opacity        = _gl.getUniformLocation( _lensFlare.program, "opacity" );
 	_lensFlare.uniforms.scale          = _gl.getUniformLocation( _lensFlare.program, "scale" );
 	_lensFlare.uniforms.rotation       = _gl.getUniformLocation( _lensFlare.program, "rotation" );
 	_lensFlare.uniforms.screenPosition = _gl.getUniformLocation( _lensFlare.program, "screenPosition" );
-	_lensFlare.uniforms.renderPink     = _gl.getUniformLocation( _lensFlare.program, "renderPink" );
 
 
 	this.setSize = function ( width, height ) {
@@ -3175,6 +3199,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
+
 	/*
 	 * Render lens flares
 	 * Method: renders 16x16 0xff00ff-colored points scattered over the light source area, 
@@ -3215,24 +3240,24 @@ THREE.WebGLRenderer = function ( parameters ) {
 		// loop through all lens flares to update their occlusion and positions
 		// setup gl and common used attribs/unforms
 
-		_gl.uniform1i( uniforms.map, 0 );
-		_gl.activeTexture( _gl.TEXTURE0 );
-
-		_gl.uniform1f( uniforms.opacity, 1 );
-		_gl.uniform1f( uniforms.rotation, 0 );
-		_gl.uniform2fv( uniforms.scale, scale );
+		_gl.uniform1i( uniforms.occlusionMap, 0 );
+		_gl.uniform1i( uniforms.map, 1 );
 
 		_gl.bindBuffer( _gl.ARRAY_BUFFER, _lensFlare.vertexBuffer );
 		_gl.vertexAttribPointer( attributes.vertex, 2, _gl.FLOAT, false, 2 * 8, 0 );
 		_gl.vertexAttribPointer( attributes.uv, 2, _gl.FLOAT, false, 2 * 8, 8 );
 
-		_gl.bindTexture( _gl.TEXTURE_2D, _lensFlare.tempTexture );
 
 		_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, _lensFlare.elementBuffer );
 
 		_gl.disable( _gl.CULL_FACE );
 		_gl.depthMask( false );
 
+		_gl.activeTexture( _gl.TEXTURE0 );
+		_gl.bindTexture( _gl.TEXTURE_2D, _lensFlare.occlusionTexture );
+
+		_gl.activeTexture( _gl.TEXTURE1 );
+		_gl.bindTexture( _gl.TEXTURE_2D, _lensFlare.tempTexture );
 
 		for ( o = 0; o < ol; o ++ ) {
 
@@ -3257,133 +3282,97 @@ THREE.WebGLRenderer = function ( parameters ) {
 			screenPositionPixels[ 1 ] = screenPosition[ 1 ] * halfViewportHeight + halfViewportHeight;
 
 
-			// save current RGB to temp texture
-
-			_gl.copyTexSubImage2D( _gl.TEXTURE_2D, 0, 0, 0, screenPositionPixels[ 0 ] - 8, screenPositionPixels[ 1 ] - 8, 16, 16 );
-
-
-			// render pink quad
-
-			_gl.uniform3fv( uniforms.screenPosition, screenPosition );
-			_gl.uniform1i( uniforms.renderPink, 1 );
-
-			_gl.enable( _gl.DEPTH_TEST );
-
-			_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
+			// screen cull or go on if vertex texture
+			
+			if( _lensFlare.hasVertexTexture ||  
+			  (	screenPositionPixels[ 0 ] > 0 &&
+				screenPositionPixels[ 0 ] < _viewportWidth &&
+				screenPositionPixels[ 1 ] > 0 &&
+				screenPositionPixels[ 1 ] < _viewportHeight )) {
 
 
-			// read back
-
-			try {
-
-				_gl.readPixels( screenPositionPixels[ 0 ] - 8, screenPositionPixels[ 1 ] - 8, 16, 16, _gl.RGBA, _gl.UNSIGNED_BYTE, _lensFlare.readBackPixels );
-
-			} catch( error ) {
-
-				console.log( "WebGLRenderer.renderLensFlare: readPixels failed!" );
-
-			}
-
-			if ( _gl.getError() ) {
-
-				console.log( "WebGLRenderer.renderLensFlare: readPixels failed!" );
-
-			}
-
-
-			// sample read back pixels
-
-			sampleDistance = parseInt( 5 * ( 1 - Math.max( 0, Math.min( -objectZ, camera.far )) / camera.far ), 10 ) + 2;
-			sampleX = sampleDistance * 4;
-			sampleY = sampleDistance * 4 * 16;
-
-			visibility = 0;
-
-			sampleIndex = ( sampleMidX - sampleX ) + ( sampleMidY - sampleY );	// upper left
-			if( _lensFlare.readBackPixels[ sampleIndex + 0 ] === 255 && 
-				_lensFlare.readBackPixels[ sampleIndex + 1 ] === 0 &&
-				_lensFlare.readBackPixels[ sampleIndex + 2 ] === 255 ) visibility += 0.2;
-
-			sampleIndex = ( sampleMidX + sampleX ) + ( sampleMidY - sampleY );	// upper right
-			if( readBackPixels[ sampleIndex + 0 ] === 255 && 
-				readBackPixels[ sampleIndex + 1 ] === 0 &&
-				readBackPixels[ sampleIndex + 2 ] === 255 ) visibility += 0.2;
-
-			sampleIndex = ( sampleMidX + sampleX ) + ( sampleMidY + sampleY );	// lower right
-			if( readBackPixels[ sampleIndex + 0 ] === 255 && 
-				readBackPixels[ sampleIndex + 1 ] === 0 &&
-				readBackPixels[ sampleIndex + 2 ] === 255 ) visibility += 0.2;
-
-			sampleIndex = ( sampleMidX - sampleX ) + ( sampleMidY + sampleY );	// lower left
-			if( readBackPixels[ sampleIndex + 0 ] === 255 && 
-				readBackPixels[ sampleIndex + 1 ] === 0 &&
-				readBackPixels[ sampleIndex + 2 ] === 255 ) visibility += 0.2;
-
-			sampleIndex = sampleMidX + sampleMidY;								// center
-			if( readBackPixels[ sampleIndex + 0 ] === 255 && 
-				readBackPixels[ sampleIndex + 1 ] === 0 &&
-				readBackPixels[ sampleIndex + 2 ] === 255 ) visibility += 0.2;
-
-
-			object.positionScreen.x = screenPosition[ 0 ];
-			object.positionScreen.y = screenPosition[ 1 ];
-			object.positionScreen.z = screenPosition[ 2 ];
-
-			if ( object.customUpdateCallback ) {
-
-				object.customUpdateCallback( visibility, object );
-
-			} else {
-
-				object.updateLensFlares( visibility );
-
-			}
-
-
-			// restore graphics
-
-			_gl.uniform1i( uniforms.renderPink, 0 );
-			_gl.disable( _gl.DEPTH_TEST );
-			_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
-
-		}
-
-
-		// loop through all lens flares and draw their flares
-		// setup gl
-
-		for ( o = 0; o < ol; o ++ ) {
-
-			object = scene.__webglLensFlares[ o ].object;
-
-			for ( f = 0, fl = object.lensFlares.length; f < fl; f ++ ) {
-
-				flare = object.lensFlares[ f ];
-
-				if ( flare.opacity > 0.001 && flare.scale > 0.001 ) {
-
-					screenPosition[ 0 ] = flare.x;
-					screenPosition[ 1 ] = flare.y;
-					screenPosition[ 2 ] = flare.z;
-
-					size = flare.size * flare.scale / _viewportHeight;
-					scale[ 0 ] = size * invAspect;
-					scale[ 1 ] = size;
-
-					_gl.uniform3fv( uniforms.screenPosition, screenPosition );
-					_gl.uniform1f( uniforms.rotation, flare.rotation );
-					_gl.uniform2fv( uniforms.scale, scale );
-					_gl.uniform1f( uniforms.opacity, flare.opacity );
-
-					setBlending( flare.blending );
-					setTexture( flare.texture, 0 );
-
-					// todo: only draw if loaded
-
-					_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
-
+				// save current RGB to temp texture
+	
+				_gl.bindTexture( _gl.TEXTURE_2D, _lensFlare.tempTexture );
+				_gl.copyTexSubImage2D( _gl.TEXTURE_2D, 0, 0, 0, screenPositionPixels[ 0 ] - 8, screenPositionPixels[ 1 ] - 8, 16, 16 );
+	
+	
+				// render pink quad
+	
+				_gl.uniform1i( uniforms.renderType, 0 );
+				_gl.uniform2fv( uniforms.scale, scale );
+				_gl.uniform3fv( uniforms.screenPosition, screenPosition );
+	
+				_gl.disable( _gl.BLEND );
+				_gl.enable( _gl.DEPTH_TEST );
+	
+				_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
+	
+	
+				// copy result to occlusionMap
+	
+				_gl.bindTexture( _gl.TEXTURE_2D, _lensFlare.occlusionTexture );
+				_gl.copyTexSubImage2D( _gl.TEXTURE_2D, 0, 0, 0, screenPositionPixels[ 0 ] - 8, screenPositionPixels[ 1 ] - 8, 16, 16 );
+	
+	
+				// restore graphics
+	
+				_gl.uniform1i( uniforms.renderType, 1 );
+				_gl.disable( _gl.DEPTH_TEST );
+				_gl.bindTexture( _gl.TEXTURE_2D, _lensFlare.tempTexture );
+				_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
+	
+	
+				// update object positions
+	
+				object.positionScreen.x = screenPosition[ 0 ];
+				object.positionScreen.y = screenPosition[ 1 ];
+				object.positionScreen.z = screenPosition[ 2 ];
+	
+				if ( object.customUpdateCallback ) {
+	
+					object.customUpdateCallback( object );
+	
+				} else {
+	
+					object.updateLensFlares();
+	
 				}
-
+	
+	
+				// render flares
+	
+				_gl.uniform1i( uniforms.renderType, 2 );
+				_gl.enable( _gl.BLEND );
+				
+				for ( f = 0, fl = object.lensFlares.length; f < fl; f ++ ) {
+	
+					flare = object.lensFlares[ f ];
+	
+					if ( flare.opacity > 0.001 && flare.scale > 0.001 ) {
+	
+						screenPosition[ 0 ] = flare.x;
+						screenPosition[ 1 ] = flare.y;
+						screenPosition[ 2 ] = flare.z;
+	
+						size = flare.size * flare.scale / _viewportHeight;
+						scale[ 0 ] = size * invAspect;
+						scale[ 1 ] = size;
+	
+						_gl.uniform3fv( uniforms.screenPosition, screenPosition );
+						_gl.uniform2fv( uniforms.scale, scale );
+						_gl.uniform1f( uniforms.rotation, flare.rotation );
+						_gl.uniform1f( uniforms.opacity, flare.opacity );
+	
+						setBlending( flare.blending );
+						setTexture( flare.texture, 1 );
+	
+						_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
+	
+					}
+	
+				}
+			
 			}
 
 		}
@@ -3395,6 +3384,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_gl.depthMask( _currentDepthMask );
 
 	}
+
+
 
 
 	function setupMatrices( object, camera ) {
