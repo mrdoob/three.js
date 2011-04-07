@@ -3536,11 +3536,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			// screen cull 
 			
-			//if(	_lensFlare.hasVertexTexture ||
-			if( screenPositionPixels[ 0 ] > 0 &&
+			if(	_lensFlare.hasVertexTexture ||
+			  ( screenPositionPixels[ 0 ] > 0 &&
 				screenPositionPixels[ 0 ] < _viewportWidth &&
 				screenPositionPixels[ 1 ] > 0 &&
-				screenPositionPixels[ 1 ] < _viewportHeight ) {
+				screenPositionPixels[ 1 ] < _viewportHeight )) {
 
 
 				// save current RGB to temp texture
