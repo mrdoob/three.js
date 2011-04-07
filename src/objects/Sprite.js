@@ -21,7 +21,7 @@ THREE.Sprite = function( parameters ) {
 	}
 	
 	this.useScreenCoordinates = parameters.useScreenCoordinates !== undefined ? parameters.useScreenCoordinates : true;
-	this.mergeWith3D = parameters.mergeWith3D !== undefined ? parameters.mergeWith3D : false;
+	this.mergeWith3D = parameters.mergeWith3D !== undefined ? parameters.mergeWith3D : !parameters.useScreenCoordinates;
 	this.affectedByDistance = parameters.affectedByDistance !== undefined ? parameters.affectedByDistance : !parameters.useScreenCoordinates;
 	this.alignment = parameters.alignment instanceof THREE.Vector2 ? parameters.alignment : THREE.SpriteAlignment.center;
 	
@@ -52,8 +52,7 @@ THREE.Sprite.prototype.updateMatrix = function () {
 
 	if ( this.scale.x !== 1 || this.scale.y !== 1 ) {
 
-		this.scale3d.set( this.scale.x, this.scale.y, 1 );
-		this.matrix.scale( this.scale3d );
+		this.matrix.scale( this.scale );
 		this.boundRadiusScale = Math.max( this.scale.x, this.scale.y );
 
 	}

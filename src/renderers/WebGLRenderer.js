@@ -3129,6 +3129,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 		}
+
 		// render 2d
 		
 		if ( scene.__webglSprites.length ) {
@@ -3330,6 +3331,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_oldBlending = "";
 
 		_gl.disable( _gl.CULL_FACE );
+		_gl.enable( _gl.BLEND );
 
 		_gl.bindBuffer( _gl.ARRAY_BUFFER, _sprite.vertexBuffer );
 		_gl.vertexAttribPointer( attributes.position, 2, _gl.FLOAT, false, 2 * 8, 0 );
@@ -3341,8 +3343,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_gl.activeTexture( _gl.TEXTURE0 );
 		_gl.uniform1i( uniforms.map, 0 );
-
-		_gl.depthMask( false );
 		
 
 		// render all non-custom shader sprites
@@ -3374,8 +3374,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 					}
 				
 					size = object.map.image.width / ( object.affectedByDistance ? 1 : _viewportHeight );
-					scale[ 0 ] = size * invAspect;
-					scale[ 1 ] = size;
+					scale[ 0 ] = size * invAspect * object.scale.x;
+					scale[ 1 ] = size * object.scale.y;
 				
 					_gl.uniform2f( uniforms.uvScale, object.uvScale.x, object.uvScale.y );
 					_gl.uniform2f( uniforms.uvOffset, object.uvOffset.x, object.uvOffset.y );
@@ -3387,11 +3387,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 					if( object.mergeWith3D && !mergeWith3D ) {
 						
 						_gl.enable( _gl.DEPTH_TEST );
+						_gl.depthMask( true );
+						
 						mergeWith3D = true;
 						
 					} else if( !object.mergeWith3D && mergeWith3D ) {
 						
 						_gl.disable( _gl.DEPTH_TEST );
+						_gl.depthMask( false );
+
 						mergeWith3D = false;
 						
 					}
@@ -3669,11 +3673,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		for ( var o = 0, ol = scene.__webglSprites.length; o < ol; o ++ ) {
+/*		for ( var o = 0, ol = scene.__webglSprites.length; o < ol; o ++ ) {
 
 			updateObject( scene.__webglSprites[ o ].object, scene );
 
-		}
+		}*/
 
 	};
 
