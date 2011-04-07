@@ -45,6 +45,10 @@ DEFAULTS = {
 "bgcolor" : [0, 0, 0],
 "bgalpha" : 1.0,
 
+"position" : [0, 0, 0],
+"rotation" : [-math.pi/2, 0, 0],
+"scale"    : [1, 1, 1],
+
 "camera"  : 
     {
         "name" : "default_camera",
@@ -61,9 +65,9 @@ DEFAULTS = {
  {
     "name"       : "default_light",
     "type"       : "directional",
-    "direction"	 : [0,1,1],
-    "color" 	 : [1,1,1],
-    "intensity"	 : 0.8
+    "direction"  : [0, 1, 1],
+    "color"      : [1, 1, 1],
+    "intensity"  : 0.8
  }
 }
 
@@ -77,10 +81,16 @@ COLORS = [0xeeeeee, 0xee0000, 0x00ee00, 0x0000ee, 0xeeee00, 0x00eeee, 0xee00ee]
 # #####################################################
 
 TEMPLATE_SCENE_ASCII = """\
-// Converted from: %(fname)s
-//  File generated with Blender 2.56 Exporter
-//  https://github.com/alteredq/three.js/tree/master/utils/exporters/blender/
-
+/* Converted from: %(fname)s
+ *
+ * File generated with Blender 2.56 Exporter
+ * https://github.com/alteredq/three.js/tree/master/utils/exporters/blender/
+ *
+ * objects:    %(nobjects)s
+ * geometries: %(ngeometries)s
+ * materials:  %(nmaterials)s
+ * textures:   %(ntextures)s
+ */  
 
 var scene = {
 
@@ -88,6 +98,13 @@ var scene = {
 "urlBaseType" : "relativeToScene",
 
 %(sections)s
+
+"transform" : 
+{
+    "position"  : %(position)s,
+    "rotation"  : %(rotation)s,
+    "scale"     : %(scale)s,
+},
 
 "defaults" : 
 {
@@ -99,7 +116,7 @@ var scene = {
 }
 
 postMessage( scene );
-
+close();
 """
 
 TEMPLATE_SECTION = """
@@ -117,7 +134,7 @@ TEMPLATE_OBJECT = """\
         "position"  : %(position)s,
         "rotation"  : %(rotation)s,
         "quaternion": %(quaternion)s,
-        "scale"	    : %(scale)s,
+        "scale"     : %(scale)s,
         "visible"       : true,
         "castsShadow"   : %(castsShadow)s,
         "meshCollider"  : %(meshCollider)s
@@ -230,6 +247,7 @@ var model = {
 };
 
 postMessage( model );
+close();
 """
 
 TEMPLATE_VERTEX = "%f,%f,%f"
@@ -648,7 +666,7 @@ def value2string(v):
         return str(v).lower()
     return str(v)
 
-def generate_materials(mtl, materials, use_colors, draw_type):
+def generate_materials(mtl, materials, draw_type):
     """Generate JS array of materials objects
     """
 
@@ -663,7 +681,6 @@ def generate_materials(mtl, materials, use_colors, draw_type):
         mtl[m]['DbgName'] = m
         mtl[m]['DbgIndex'] = index
         mtl[m]['DbgColor'] = generate_color(index)
-        mtl[m]['vertexColors'] = use_colors and mtl[m]["useVertexColors"]
 
         if draw_type in [ "BOUNDS", "WIRE" ]:
             mtl[m]['wireframe'] = True
@@ -675,7 +692,7 @@ def generate_materials(mtl, materials, use_colors, draw_type):
 
     return ",\n\n".join([m for i,m in sorted(mtl_array)]), len(mtl_array)
 
-def extract_materials(mesh, scene):
+def extract_materials(mesh, scene, use_colors):
     world = scene.world
 
     materials = {}
@@ -701,6 +718,7 @@ def extract_materials(mesh, scene):
             # not sure about mapping values to Blinn-Phong shader
             # Blender uses INT from [1,511] with default 0
             # http://www.blender.org/documentation/blender_python_api_2_54_0/bpy.types.Material.html#bpy.types.Material.specular_hardness
+
             material["specularCoef"] = m.specular_hardness
 
             if m.active_texture and m.active_texture.type == 'IMAGE' and m.active_texture.image:
@@ -708,8 +726,8 @@ def extract_materials(mesh, scene):
                 fn = os.path.normpath(fn)
                 fn_strip = os.path.basename(fn)
                 material['mapDiffuse'] = fn_strip
-                
-            material["useVertexColors"] = m.THREE_useVertexColors
+
+            material["vertexColors"] = m.THREE_useVertexColors and use_colors
             
             # can't really use this reliably to tell apart Phong from Lambert
             # as Blender defaults to non-zero specular color
@@ -742,9 +760,9 @@ def generate_materials_string(mesh, scene, use_colors, draw_type):
 
     # extract real materials from the mesh
     
-    mtl.update(extract_materials(mesh, scene))
+    mtl.update(extract_materials(mesh, scene, use_colors))
 
-    return generate_materials(mtl, materials, use_colors, draw_type)
+    return generate_materials(mtl, materials, draw_type)
 
 # #####################################################
 # ASCII model generator
@@ -834,7 +852,6 @@ def export_mesh(obj, scene, filepath,
 
     """Export single mesh"""
 
-
     # collapse modifiers into mesh
     
     mesh = obj.create_mesh(scene, True, 'RENDER')
@@ -845,16 +862,13 @@ def export_mesh(obj, scene, filepath,
     # that's what Blender's native export_obj.py does
     # to flip YZ
 
-    X_ROT = mathutils.Matrix.Rotation(-math.pi/2, 4, 'X')
-
     if export_single_model:
+        X_ROT = mathutils.Matrix.Rotation(-math.pi/2, 4, 'X')
         mesh.transform(X_ROT * obj.matrix_world)
-    else:
-        mesh.transform(X_ROT)
-
-    mesh.transform(mathutils.Matrix.Scale(option_scale, 4))
 
     mesh.calc_normals()
+
+    mesh.transform(mathutils.Matrix.Scale(option_scale, 4))
 
     faceUV = (len(mesh.uv_textures) > 0)
     vertexUV = (len(mesh.sticky) > 0)
@@ -958,27 +972,20 @@ def generate_objects(data):
     for obj in data["objects"]:
         if obj.type == "MESH":
             object_id = obj.name
-            
+
             if len(obj.modifiers) > 0:
                 geo_name = obj.name
             else:
                 geo_name = obj.data.name
 
             geometry_id = "geo_%s" % geo_name
-            
+
             material_ids = generate_material_id_list(obj.material_slots)
             group_ids = generate_group_id_list(obj)
 
-            #position = obj.location
-            #rotation = obj.rotation_euler
-            scale = obj.scale
-            quaternion = obj.rotation_quaternion
-            
-            position = [obj.location.x, obj.location.z, -obj.location.y]
-            rotation = [obj.rotation_euler.x, -obj.rotation_euler.y, -obj.rotation_euler.z]
-            #quaternion = obj.rotation_euler.to_quat()
-            scale = [obj.scale.x, obj.scale.z, obj.scale.y]
-            
+            position, quaternion, scale = obj.matrix_world.decompose()
+            rotation = quaternion.to_euler("XYZ")
+
             material_string = ""
             if len(material_ids) > 0:
                 material_string = generate_string_list(material_ids)
@@ -995,16 +1002,18 @@ def generate_objects(data):
             "geometry_id" : generate_string(geometry_id),
             "group_id"    : group_string,
             "material_id" : material_string,
+
             "position"    : generate_vec3(position),
             "rotation"    : generate_vec3(rotation),
             "quaternion"  : generate_vec4(quaternion),
             "scale"       : generate_vec3(scale),
+
             "castsShadow"  : castsShadow,
             "meshCollider" : meshCollider
             }
             chunks.append(object_string)
         
-    return ",\n\n".join(chunks)
+    return ",\n\n".join(chunks), len(chunks)
     
 # #####################################################
 # Scene exporter - geometries
@@ -1036,7 +1045,7 @@ def generate_geometries(data):
                 
                 geo_set.add(name)
         
-    return ",\n\n".join(chunks)
+    return ",\n\n".join(chunks), len(chunks)
     
 # #####################################################
 # Scene exporter - textures
@@ -1058,7 +1067,7 @@ def generate_textures_scene(data):
         }
         chunks.append(texture_string)
 
-    return ",\n\n".join(chunks)
+    return ",\n\n".join(chunks), len(chunks)
 
 def extract_texture_filename(image):
     fn = bpy.path.abspath(image.filepath)
@@ -1176,7 +1185,7 @@ def generate_materials_scene(data):
         material_string = generate_material_string(material)
         chunks.append(material_string)
 
-    return ",\n\n".join(chunks)
+    return ",\n\n".join(chunks), len(chunks)
 
 # #####################################################
 # Scene exporter - cameras
@@ -1257,10 +1266,12 @@ def generate_lights(data):
 # #####################################################
 
 def generate_ascii_scene(data):
-    objects = generate_objects(data)
-    geometries = generate_geometries(data)
-    textures = generate_textures_scene(data)
-    materials = generate_materials_scene(data)
+
+    objects, nobjects = generate_objects(data)
+    geometries, ngeometries = generate_geometries(data)
+    textures, ntextures = generate_textures_scene(data)
+    materials, nmaterials = generate_materials_scene(data)
+
     cameras = generate_cameras(data)
     lights = generate_lights(data)
     
@@ -1284,10 +1295,21 @@ def generate_ascii_scene(data):
     
     parameters = {
     "fname"     : data["source_file"],
+
     "sections"  : sections_string,
+
     "bgcolor"   : generate_vec3(DEFAULTS["bgcolor"]),
     "bgalpha"   : DEFAULTS["bgalpha"],
-    "defcamera" : generate_string(default_camera)
+    "defcamera" : generate_string(default_camera),
+
+    "nobjects"      : nobjects,
+    "ngeometries"   : ngeometries,
+    "ntextures"     : ntextures,
+    "nmaterials"    : nmaterials,
+    
+    "position"      : generate_vec3(DEFAULTS["position"]),
+    "rotation"      : generate_vec3(DEFAULTS["rotation"]),
+    "scale"         : generate_vec3(DEFAULTS["scale"])
     }
 
     text = TEMPLATE_SCENE_ASCII % parameters

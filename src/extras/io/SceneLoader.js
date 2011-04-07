@@ -27,6 +27,7 @@ THREE.SceneLoader.prototype = {
 				result;
 
 			data = event.data;
+
 			binLoader = new THREE.BinaryLoader();
 			jsonLoader = new THREE.JSONLoader();
 
@@ -46,6 +47,26 @@ THREE.SceneLoader.prototype = {
 
 			};
 
+			if ( data.transform ) {
+
+				var position = data.transform.position,
+					rotation = data.transform.rotation,
+					scale = data.transform.scale;
+
+				if ( position )
+					result.scene.position.set( position[ 0 ], position[ 1 ], position [ 2 ] );
+
+				if ( rotation )
+					result.scene.rotation.set( rotation[ 0 ], rotation[ 1 ], rotation [ 2 ] );
+
+				if ( scale )
+					result.scene.scale.set( scale[ 0 ], scale[ 1 ], scale [ 2 ] );
+
+				if ( position || rotation || scale )
+					result.scene.updateMatrix();
+
+			}
+			
 			function get_url( source_url, url_type ) {
 				
 				if ( url_type == "relativeToHTML" ) {
@@ -83,31 +104,31 @@ THREE.SceneLoader.prototype = {
 							r = o.rotation;
 							q = o.quaternion;
 							s = o.scale;
-							
+
 							// turn off quaternions, for the moment
-							
+
 							q = 0;
 
 							if ( materials.length == 0 ) {
-								
+
 								materials[ 0 ] = new THREE.MeshFaceMaterial();
-								
+
 							}
-							
+
 							object = new THREE.Mesh( geometry, materials );
 							object.position.set( p[0], p[1], p[2] );
-							
+
 							if ( q ) {
-								
+
 								object.quaternion.set( q[0], q[1], q[2], q[3] );
 								object.useQuaternion = true;
-								
+
 							} else {
 
 								object.rotation.set( r[0], r[1], r[2] );
-								
+
 							}
-							
+
 							object.scale.set( s[0], s[1], s[2] );
 							object.visible = o.visible;
 

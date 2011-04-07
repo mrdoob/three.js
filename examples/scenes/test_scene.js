@@ -441,3 +441,4 @@ var scene = {
 };
 
 postMessage( scene );
+close();

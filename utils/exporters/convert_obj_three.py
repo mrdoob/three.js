@@ -196,6 +196,7 @@ var model = {
 };
 
 postMessage( model );
+close();
 """
 
 TEMPLATE_FILE_BIN = u"""\
@@ -219,6 +220,7 @@ var model = {
 };
     
 postMessage( model );
+close();
 """
 
 TEMPLATE_VERTEX = "%f,%f,%f"
