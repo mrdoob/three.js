@@ -51,14 +51,14 @@
 
 				var amount = 200;
 				var radius = 500;
-				var mapA =  ImageUtils.loadTexture( "textures/sprite0.jpg" );
-				var mapB =  ImageUtils.loadTexture( "textures/sprite1.jpg" );
+				var mapA =  ImageUtils.loadTexture( "textures/sprite0.png" );
+				var mapB =  ImageUtils.loadTexture( "textures/sprite1.png" );
 				
 				nodeA = new THREE.Mesh( new Cube( 10, 10, 10 ), new THREE.MeshLambertMaterial( { color: 0xff0000 } ));
 				
 				for( var a = 0; a < amount; a++ ) {
 					
-					var sprite = new THREE.Sprite( { map: mapA, useScreenCoordinates: false, mergeWith3D: false, blending: THREE.AdditiveBlending } );
+					var sprite = new THREE.Sprite( { map: mapA, useScreenCoordinates: false } );
 					sprite.position.set( Math.random() - 0.5, 
 					                     Math.random() - 0.5,
 					                     Math.random() - 0.5 );

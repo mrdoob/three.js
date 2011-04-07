@@ -593,22 +593,17 @@ THREE.ShaderLib = {
 				
 				"if( renderType == 2 ) {",
 
-					"vec4 visibility = texture2D( occlusionMap, vec2( 0.1, 0.1 )) +",
-									  "texture2D( occlusionMap, vec2( 0.5, 0.1 )) +",
-									  "texture2D( occlusionMap, vec2( 0.9, 0.1 )) +",
-									  "texture2D( occlusionMap, vec2( 0.9, 0.5 )) +",
-									  "texture2D( occlusionMap, vec2( 0.9, 0.9 )) +",
-									  "texture2D( occlusionMap, vec2( 0.5, 0.9 )) +",
-									  "texture2D( occlusionMap, vec2( 0.1, 0.9 )) +",
-									  "texture2D( occlusionMap, vec2( 0.1, 0.5 )) +",
-									  "texture2D( occlusionMap, vec2( 0.5, 0.5 ));",
+					"float visibility = texture2D( occlusionMap, vec2( 0.1, 0.1 )).a +",
+									   "texture2D( occlusionMap, vec2( 0.5, 0.1 )).a +",
+									   "texture2D( occlusionMap, vec2( 0.9, 0.1 )).a +",
+									   "texture2D( occlusionMap, vec2( 0.9, 0.5 )).a +",
+									   "texture2D( occlusionMap, vec2( 0.9, 0.9 )).a +",
+									   "texture2D( occlusionMap, vec2( 0.5, 0.9 )).a +",
+									   "texture2D( occlusionMap, vec2( 0.1, 0.9 )).a +",
+									   "texture2D( occlusionMap, vec2( 0.1, 0.5 )).a +",
+									   "texture2D( occlusionMap, vec2( 0.5, 0.5 )).a;",
 
-					"vVisibility = (       visibility.r / 9.0 ) *",
-					              "( 1.0 - visibility.g / 9.0 ) *",
-					              "(       visibility.b / 9.0 ) *", 
-					              "( 1.0 - visibility.a / 9.0 );",
-
-//					"vVisibility = ( 1.0 - visibility.a / 9.0 );",
+					"vVisibility = ( 1.0 - visibility / 9.0 );",
 
 					"pos.x = cos( rotation ) * position.x - sin( rotation ) * position.y;",
 					"pos.y = sin( rotation ) * position.x + cos( rotation ) * position.y;",
@@ -638,8 +633,8 @@ THREE.ShaderLib = {
 			
 				"if( renderType == 0 ) {",
 							
-//					"gl_FragColor = vec4( texture2D( map, vUV ).rgb, 0.0 );",
-					"gl_FragColor = vec4( 1.0, 0.0, 1.0, 0.0 );",
+					"gl_FragColor = vec4( texture2D( map, vUV ).rgb, 0.0 );",
+//					"gl_FragColor = vec4( 1.0, 0.0, 1.0, 0.0 );",
 				
 				// restore
 				

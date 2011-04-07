@@ -3344,6 +3344,27 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_gl.activeTexture( _gl.TEXTURE0 );
 		_gl.uniform1i( uniforms.map, 0 );
 		
+		// update positions and sort
+		
+		for( o = 0, ol = scene.__webglSprites.length; o < ol; o++ ) {
+			
+			object = scene.__webglSprites[ o ];
+			
+			if( !object.useScreenCoordinates ) {
+			
+				object._modelViewMatrix.multiplyToArray( camera.matrixWorldInverse, object.matrixWorld, object._modelViewMatrixArray );
+				object.z = -object._modelViewMatrix.n34;
+			
+			} else {
+				
+				object.z = -object.position.z;
+				
+			}
+		
+		}
+
+		scene.__webglSprites.sort( painterSort );
+		
 
 		// render all non-custom shader sprites
 				
@@ -3365,7 +3386,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 					} else {
 
 						
-						object._modelViewMatrix.multiplyToArray( camera.matrixWorldInverse, object.matrixWorld, object._modelViewMatrixArray );
 
 						_gl.uniform1i( uniforms.useScreenCoordinates, 0 );
 						_gl.uniform1i( uniforms.affectedByDistance, object.affectedByDistance ? 1 : 0 );
@@ -3394,12 +3414,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 					} else if( !object.mergeWith3D && mergeWith3D ) {
 						
 						_gl.disable( _gl.DEPTH_TEST );
-						_gl.depthMask( false );
+						_gl.depthMask( object.blending === THREE.NormalBlending ? true : false );
 
 						mergeWith3D = false;
 						
 					}
 	
+						_gl.depthMask( true );
 					setBlending( object.blending );
 					setTexture( object.map, 0 );
 			
@@ -3515,17 +3536,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			// screen cull 
 			
-			if(	_lensFlare.hasVertexTexture ||
-			  ( screenPositionPixels[ 0 ] > 0 &&
+			//if(	_lensFlare.hasVertexTexture ||
+			if( screenPositionPixels[ 0 ] > 0 &&
 				screenPositionPixels[ 0 ] < _viewportWidth &&
 				screenPositionPixels[ 1 ] > 0 &&
-				screenPositionPixels[ 1 ] < _viewportHeight )) {
+				screenPositionPixels[ 1 ] < _viewportHeight ) {
 
 
 				// save current RGB to temp texture
 	
 				_gl.bindTexture( _gl.TEXTURE_2D, _lensFlare.tempTexture );
-				//_gl.copyTexSubImage2D( _gl.TEXTURE_2D, 0, 0, 0, screenPositionPixels[ 0 ] - 8, screenPositionPixels[ 1 ] - 8, 16, 16 );
 				_gl.copyTexImage2D( _gl.TEXTURE_2D, 0, _gl.RGB, screenPositionPixels[ 0 ] - 8, screenPositionPixels[ 1 ] - 8, 16, 16, 0 );
 
 	
@@ -3544,7 +3564,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 				// copy result to occlusionMap
 	
 				_gl.bindTexture( _gl.TEXTURE_2D, _lensFlare.occlusionTexture );
-				//_gl.copyTexSubImage2D( _gl.TEXTURE_2D, 0, 0, 0, screenPositionPixels[ 0 ] - 8, screenPositionPixels[ 1 ] - 8, 16, 16 );
 				_gl.copyTexImage2D( _gl.TEXTURE_2D, 0, _gl.RGBA, screenPositionPixels[ 0 ] - 8, screenPositionPixels[ 1 ] - 8, 16, 16, 0 );
 	
 	
