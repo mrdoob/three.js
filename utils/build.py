@@ -64,6 +64,7 @@ COMMON_FILES = [
 'objects/Sound.js',
 'objects/LOD.js',
 'objects/ShadowVolume.js',
+'objects/Sprite.js',
 'scenes/Scene.js',
 'scenes/Fog.js',
 'scenes/FogExp2.js',

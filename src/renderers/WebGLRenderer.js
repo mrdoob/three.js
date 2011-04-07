@@ -254,16 +254,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	_sprite.attributes = {};
 	_sprite.uniforms = {};
-	_sprite.attributes.vertex       = _gl.getAttribLocation ( _sprite.program, "position" );
-	_sprite.attributes.uv           = _gl.getAttribLocation ( _sprite.program, "UV" );
-	_sprite.uniforms.map            = _gl.getUniformLocation( _sprite.program, "map" );
-	_sprite.uniforms.opacity        = _gl.getUniformLocation( _sprite.program, "opacity" );
-	_sprite.uniforms.scale          = _gl.getUniformLocation( _sprite.program, "scale" );
-	_sprite.uniforms.rotation       = _gl.getUniformLocation( _sprite.program, "rotation" );
-	_sprite.uniforms.screenPosition = _gl.getUniformLocation( _sprite.program, "screenPosition" );
-
-
-
+	_sprite.attributes.position           = _gl.getAttribLocation ( _sprite.program, "position" );
+	_sprite.attributes.uv                 = _gl.getAttribLocation ( _sprite.program, "uv" );
+	_sprite.uniforms.uvOffset             = _gl.getUniformLocation( _sprite.program, "uvOffset" );
+	_sprite.uniforms.uvScale              = _gl.getUniformLocation( _sprite.program, "uvScale" );
+	_sprite.uniforms.rotation             = _gl.getUniformLocation( _sprite.program, "rotation" );
+	_sprite.uniforms.scale                = _gl.getUniformLocation( _sprite.program, "scale" );
+	_sprite.uniforms.alignment            = _gl.getUniformLocation( _sprite.program, "alignment" );
+	_sprite.uniforms.map                  = _gl.getUniformLocation( _sprite.program, "map" );
+	_sprite.uniforms.opacity              = _gl.getUniformLocation( _sprite.program, "opacity" );
+	_sprite.uniforms.useScreenCoordinates = _gl.getUniformLocation( _sprite.program, "useScreenCoordinates" );
+	_sprite.uniforms.affectedByDistance   = _gl.getUniformLocation( _sprite.program, "affectedByDistance" );
+	_sprite.uniforms.screenPosition    	  = _gl.getUniformLocation( _sprite.program, "screenPosition" );
+	_sprite.uniforms.modelViewMatrix      = _gl.getUniformLocation( _sprite.program, "modelViewMatrix" );
+	_sprite.uniforms.projectionMatrix     = _gl.getUniformLocation( _sprite.program, "projectionMatrix" );
 
 
 
@@ -3125,12 +3129,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 		}
-
 		// render 2d
 		
 		if ( scene.__webglSprites.length ) {
 			
-			renderSprites( scene );
+			renderSprites( scene, camera );
 			
 		}
 
@@ -3141,6 +3144,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			renderStencilShadows( scene );
 
 		}
+
 
 		// render lens flares
 
@@ -3301,6 +3305,130 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 
 	/*
+	 * Render sprites
+	 * 
+	 */
+
+	function renderSprites( scene, camera ) {
+
+		var o, ol, object;
+		var attributes = _sprite.attributes;
+		var uniforms = _sprite.uniforms;
+		var anyCustom = false;
+		var invAspect = _viewportHeight / _viewportWidth;
+		var size, scale = [];
+		var screenPosition;
+		var halfViewportWidth = _viewportWidth * 0.5;
+		var halfViewportHeight = _viewportHeight * 0.5;
+		var mergeWith3D = true;
+		
+
+		// setup gl
+		
+		_gl.useProgram( _sprite.program );
+		_currentProgram = _sprite.program;
+		_oldBlending = "";
+
+		_gl.disable( _gl.CULL_FACE );
+
+		_gl.bindBuffer( _gl.ARRAY_BUFFER, _sprite.vertexBuffer );
+		_gl.vertexAttribPointer( attributes.position, 2, _gl.FLOAT, false, 2 * 8, 0 );
+		_gl.vertexAttribPointer( attributes.uv, 2, _gl.FLOAT, false, 2 * 8, 8 );
+
+		_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, _sprite.elementBuffer );
+		
+		_gl.uniformMatrix4fv( uniforms.projectionMatrix, false, _projectionMatrixArray );
+
+		_gl.activeTexture( _gl.TEXTURE0 );
+		_gl.uniform1i( uniforms.map, 0 );
+
+		_gl.depthMask( false );
+		
+
+		// render all non-custom shader sprites
+				
+		for( o = 0, ol = scene.__webglSprites.length; o < ol; o++ ) {
+
+			object = scene.__webglSprites[ o ];
+
+			if( object.material === undefined ) {
+
+				if( object.map && object.map.image && object.map.image.width ) {
+	
+					if( object.useScreenCoordinates ) {
+						
+						_gl.uniform1i( uniforms.useScreenCoordinates, 1 );
+						_gl.uniform3f( uniforms.screenPosition, ( object.position.x - halfViewportWidth  ) / halfViewportWidth, 
+														        ( halfViewportHeight - object.position.y ) / halfViewportHeight,
+														          object.position.z );
+						
+					} else {
+
+						
+						object._modelViewMatrix.multiplyToArray( camera.matrixWorldInverse, object.matrixWorld, object._modelViewMatrixArray );
+
+						_gl.uniform1i( uniforms.useScreenCoordinates, 0 );
+						_gl.uniform1i( uniforms.affectedByDistance, object.affectedByDistance ? 1 : 0 );
+						_gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, object._modelViewMatrixArray );
+						
+					}
+				
+					size = object.map.image.width / ( object.affectedByDistance ? 1 : _viewportHeight );
+					scale[ 0 ] = size * invAspect;
+					scale[ 1 ] = size;
+				
+					_gl.uniform2f( uniforms.uvScale, object.uvScale.x, object.uvScale.y );
+					_gl.uniform2f( uniforms.uvOffset, object.uvOffset.x, object.uvOffset.y );
+					_gl.uniform2f( uniforms.alignment, object.alignment.x, object.alignment.y );
+					_gl.uniform1f( uniforms.opacity, object.opacity );
+					_gl.uniform1f( uniforms.rotation, object.rotation );
+					_gl.uniform2fv( uniforms.scale, scale );
+
+					if( object.mergeWith3D && !mergeWith3D ) {
+						
+						_gl.enable( _gl.DEPTH_TEST );
+						mergeWith3D = true;
+						
+					} else if( !object.mergeWith3D && mergeWith3D ) {
+						
+						_gl.disable( _gl.DEPTH_TEST );
+						mergeWith3D = false;
+						
+					}
+	
+					setBlending( object.blending );
+					setTexture( object.map, 0 );
+			
+					_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
+				}
+				
+			} else {
+				
+				anyCustom = true;
+				
+			}
+			
+		}
+
+
+		// loop through all custom
+
+/*		if( anyCustom ) {
+			
+		}
+*/
+
+		// restore gl
+
+		_gl.enable( _gl.CULL_FACE );
+		_gl.enable( _gl.DEPTH_TEST );
+		_gl.depthMask( _currentDepthMask );
+
+	}
+
+
+
+	/*
 	 * Render lens flares
 	 * Method: renders 16x16 0xff00ff-colored points scattered over the light source area, 
 	 *         reads these back and calculates occlusion.  
@@ -3383,16 +3511,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			// screen cull 
 			
-			if(	screenPositionPixels[ 0 ] > 0 &&
+			if(	_lensFlare.hasVertexTexture ||
+			  ( screenPositionPixels[ 0 ] > 0 &&
 				screenPositionPixels[ 0 ] < _viewportWidth &&
 				screenPositionPixels[ 1 ] > 0 &&
-				screenPositionPixels[ 1 ] < _viewportHeight ) {
+				screenPositionPixels[ 1 ] < _viewportHeight )) {
 
 
 				// save current RGB to temp texture
 	
 				_gl.bindTexture( _gl.TEXTURE_2D, _lensFlare.tempTexture );
-				_gl.copyTexSubImage2D( _gl.TEXTURE_2D, 0, 0, 0, screenPositionPixels[ 0 ] - 8, screenPositionPixels[ 1 ] - 8, 16, 16 );
+				//_gl.copyTexSubImage2D( _gl.TEXTURE_2D, 0, 0, 0, screenPositionPixels[ 0 ] - 8, screenPositionPixels[ 1 ] - 8, 16, 16 );
+				_gl.copyTexImage2D( _gl.TEXTURE_2D, 0, _gl.RGB, screenPositionPixels[ 0 ] - 8, screenPositionPixels[ 1 ] - 8, 16, 16, 0 );
 
 	
 				// render pink quad
@@ -3410,7 +3540,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 				// copy result to occlusionMap
 	
 				_gl.bindTexture( _gl.TEXTURE_2D, _lensFlare.occlusionTexture );
-				_gl.copyTexSubImage2D( _gl.TEXTURE_2D, 0, 0, 0, screenPositionPixels[ 0 ] - 8, screenPositionPixels[ 1 ] - 8, 16, 16 );
+				//_gl.copyTexSubImage2D( _gl.TEXTURE_2D, 0, 0, 0, screenPositionPixels[ 0 ] - 8, screenPositionPixels[ 1 ] - 8, 16, 16 );
+				_gl.copyTexImage2D( _gl.TEXTURE_2D, 0, _gl.RGBA, screenPositionPixels[ 0 ] - 8, screenPositionPixels[ 1 ] - 8, 16, 16, 0 );
 	
 	
 				// restore graphics
@@ -3665,7 +3796,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			addBufferImmediate( scene.__webglObjectsImmediate, object );
 
-		}/*else if ( object instanceof THREE.Particle ) {
+		} else if ( object instanceof THREE.Sprite ) {
+			
+			scene.__webglSprites.push( object );
+		}
+		
+		
+		/*else if ( object instanceof THREE.Particle ) {
 
 		}*/
 
@@ -3775,10 +3912,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 			if ( object == zobject ) {
 
 				scene.__webglObjects.splice( o, 1 );
+				return;
 
 			}
 
 		}
+		
+		// add shadwos/sprites etc.
 
 	};
 
