@@ -34,7 +34,6 @@ import bpy
 from bpy.props import *
 from io_utils import ExportHelper, ImportHelper
 
-
 # ################################################################
 # Custom properties
 # ################################################################
@@ -88,6 +87,7 @@ class MATERIAL_PT_hello( bpy.types.Panel ):
 
 class ImportTHREEJS(bpy.types.Operator, ImportHelper):
     '''Load a Three.js ASCII JSON model'''
+
     bl_idname = "import.threejs"
     bl_label = "Import Three.js"
 
@@ -113,29 +113,112 @@ class ImportTHREEJS(bpy.types.Operator, ImportHelper):
 
 
 # ################################################################
+# Exporter - settings
+# ################################################################
+
+SETTINGS_FILE_EXPORT = "threejs_settings_export.js"
+
+import os
+import json
+
+def file_exists(filename):
+    """Return true if file exists and accessible for reading.
+    
+    Should be safer than just testing for existence due to links and 
+    permissions magic on Unix filesystems.
+    
+    @rtype: boolean
+    """
+    
+    try:
+        f = open(filename, 'r')
+        f.close()
+        return True
+    except IOError:
+        return False
+    
+def get_settings_fullpath():
+    return os.path.join(bpy.app.tempdir, SETTINGS_FILE_EXPORT)
+
+def save_settings_export(properties):
+
+    settings = {
+    "option_export_scene" : properties.option_export_scene,
+
+    "option_flip_yz"      : properties.option_flip_yz,
+
+    "use_materials"       : properties.use_materials,
+    "use_normals"         : properties.use_normals,
+    "use_colors"          : properties.use_colors,
+    "use_uv_coords"       : properties.use_uv_coords,
+    "use_edges"           : properties.use_edges,
+
+    "option_truncate"     : properties.option_truncate,
+    "option_scale"        : properties.option_scale,
+
+    "align_model"         : properties.align_model
+    }
+    
+    fname = get_settings_fullpath()
+    f = open(fname, "w")
+    json.dump(settings, f)
+    
+def restore_settings_export(properties):
+    
+    settings = {}
+
+    fname = get_settings_fullpath()
+    if file_exists(fname):
+        f = open(fname, "r")
+        settings = json.load(f)
+    
+    properties.option_export_scene = settings.get("option_export_scene", False)
+
+    properties.option_flip_yz = settings.get("option_flip_yz", True)
+
+    properties.use_materials = settings.get("use_materials", True)
+    properties.use_normals = settings.get("use_normals", True)
+    properties.use_colors = settings.get("use_colors", True)
+    properties.use_uv_coords = settings.get("use_uv_coords", True)
+    properties.use_edges = settings.get("use_edges", False)
+    
+    properties.option_truncate = settings.get("option_truncate", False)
+    properties.option_scale = settings.get("option_scale", 1.0)
+    
+    properties.align_model = settings.get("align_model", "None")
+
+# ################################################################
 # Exporter
 # ################################################################
 
 class ExportTHREEJS(bpy.types.Operator, ExportHelper):
     '''Export selected object / scene for Three.js (ASCII JSON format).'''
+
     bl_idname = "export.threejs"
     bl_label = "Export Three.js"
 
     filename_ext = ".js"
 
-    option_flip_yz = BoolProperty(name="Flip YZ", description="Flip YZ", default=True)
-    use_materials = BoolProperty(name="Materials", description="Export materials", default=True)
-    use_normals = BoolProperty(name="Normals", description="Export normals", default=True)
-    use_colors = BoolProperty(name="Colors", description="Export vertex colors", default=True)
-    use_uv_coords = BoolProperty(name="UVs", description="Export texture coordinates", default=True)
-    use_edges = BoolProperty(name="Edges", description="Export edges", default=False)
-    option_export_scene = BoolProperty(name="Scene", description="Export scene", default=False)
-    option_truncate = BoolProperty(name="Truncate", description="Truncate decimals", default=False)
-    option_scale = FloatProperty(name="Scale", description="Scale data", min=0.01, max=1000.0, soft_min=0.01, soft_max=1000.0, default=1.0)
+    option_flip_yz = BoolProperty(name = "Flip YZ", description = "Flip YZ", default = True)
+
+    use_materials = BoolProperty(name = "Materials", description = "Export materials", default = True)
+    use_normals = BoolProperty(name = "Normals", description = "Export normals", default = True)
+    use_colors = BoolProperty(name = "Colors", description = "Export vertex colors", default = True)
+    use_uv_coords = BoolProperty(name = "UVs", description = "Export texture coordinates", default = True)
+    use_edges = BoolProperty(name = "Edges", description = "Export edges", default = False)
+    
+    option_export_scene = BoolProperty(name = "Scene", description = "Export scene", default = False)
+    
+    option_truncate = BoolProperty(name = "Truncate", description = "Truncate decimals", default = False)
+    option_scale = FloatProperty(name = "Scale", description = "Scale data", min = 0.01, max = 1000.0, soft_min = 0.01, soft_max = 1000.0, default = 1.0)
 
     align_types = [("None","None","None"), ("Center","Center","Center"), ("Bottom","Bottom","Bottom"), ("Top","Top","Top")]
-    align_model = EnumProperty(name="Align model", description="Align model", items=align_types, default="None")
-
+    align_model = EnumProperty(name = "Align model", description = "Align model", items = align_types, default = "None")
+    
+    def invoke(self, context, event):
+        restore_settings_export(self.properties)
+        return ExportHelper.invoke(self, context, event)
+        
     @classmethod
     def poll(cls, context):
         return context.active_object != None
@@ -146,6 +229,8 @@ class ExportTHREEJS(bpy.types.Operator, ExportHelper):
         if not self.properties.filepath:
             raise Exception("filename not set")
 
+        save_settings_export(self.properties)
+        
         filepath = self.filepath
         import io_mesh_threejs.export_threejs
         return io_mesh_threejs.export_threejs.save(self, context, **self.properties)
