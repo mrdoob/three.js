@@ -2066,7 +2066,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function refreshUniformsCommon( uniforms, material ) {
 
-		uniforms.diffuse.value.setRGB( material.color.r, material.color.g, material.color.b );
+		uniforms.diffuse.value = material.color;
 		uniforms.opacity.value = material.opacity;
 		uniforms.map.texture = material.map;
 
@@ -2082,14 +2082,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function refreshUniformsLine( uniforms, material ) {
 
-		uniforms.diffuse.value.setRGB( material.color.r, material.color.g, material.color.b );
+		uniforms.diffuse.value = material.color;
 		uniforms.opacity.value = material.opacity;
 
 	};
 
 	function refreshUniformsParticle( uniforms, material ) {
 
-		uniforms.psColor.value.setRGB( material.color.r, material.color.g, material.color.b );
+		uniforms.psColor.value = material.color;
 		uniforms.opacity.value = material.opacity;
 		uniforms.size.value = material.size;
 		uniforms.scale.value = _canvas.height / 2.0; // TODO: Cache this.
@@ -2099,7 +2099,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function refreshUniformsFog( uniforms, fog ) {
 
-		uniforms.fogColor.value.setHex( fog.color.hex );
+		uniforms.fogColor.value = fog.color;
 
 		if ( fog instanceof THREE.Fog ) {
 
@@ -2116,10 +2116,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function refreshUniformsPhong( uniforms, material ) {
 
-		//uniforms.ambient.value.setHex( material.ambient.hex );
-		//uniforms.specular.value.setHex( material.specular.hex );
-		uniforms.ambient.value.setRGB( material.ambient.r, material.ambient.g, material.ambient.b );
-		uniforms.specular.value.setRGB( material.specular.r, material.specular.g, material.specular.b );
+		uniforms.ambient.value = material.ambient;
+		uniforms.specular.value = material.specular;
 		uniforms.shininess.value = material.shininess;
 
 	};
