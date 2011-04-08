@@ -207,7 +207,7 @@
 				postprocessing.camera.projectionMatrix = THREE.Matrix4.makeOrtho( window.innerWidth / - 2, window.innerWidth / 2,  window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
 				postprocessing.camera.position.z = 100;
 
-				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter };
+				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
 				postprocessing.rtTexture1 = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
 				postprocessing.rtTexture2 = new THREE.WebGLRenderTarget( 512, 512, pars );
 				postprocessing.rtTexture3 = new THREE.WebGLRenderTarget( 512, 512, pars );
