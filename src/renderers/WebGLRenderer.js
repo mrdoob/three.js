@@ -748,7 +748,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		obj_skinVerticesB = geometry.skinVerticesB,
 		obj_skinIndices = geometry.skinIndices,
 		obj_skinWeights = geometry.skinWeights,
-		obj_edgeFaces = geometry.edgeFaces,
+		obj_edgeFaces = object instanceof THREE.ShadowVolume ? geometry.edgeFaces : undefined;
 
 		morphTargets = geometry.morphTargets;
 
@@ -2413,9 +2413,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var dirLight = m_uniforms.directionalLightDirection.value;
 
-			dirLight[ 0 ] = -lights.position.x;
-			dirLight[ 1 ] = -lights.position.y;
-			dirLight[ 2 ] = -lights.position.z;
+			dirLight[ 0 ] = -lights[ 1 ].position.x;
+			dirLight[ 1 ] = -lights[ 1 ].position.y;
+			dirLight[ 2 ] = -lights[ 1 ].position.z;
 
 			_gl.uniform3fv( p_uniforms.directionalLightDirection, dirLight );
 			_gl.uniformMatrix4fv( p_uniforms.objectMatrix, false, object._objectMatrixArray );
