@@ -135,7 +135,7 @@ TEMPLATE_OBJECT = """\
         "rotation"  : %(rotation)s,
         "quaternion": %(quaternion)s,
         "scale"     : %(scale)s,
-        "visible"       : true,
+        "visible"       : %(visible)s,
         "castsShadow"   : %(castsShadow)s,
         "meshCollider"  : %(meshCollider)s
     }"""
@@ -994,9 +994,13 @@ def generate_objects(data):
             if len(group_ids) > 0:
                 group_string = generate_string_list(group_ids)
 
-            castsShadow = generate_bool_property(obj.THREE_castsShadow)
-            meshCollider = generate_bool_property(obj.THREE_meshCollider)
+            castsShadow = obj.THREE_castsShadow
+            meshCollider = obj.THREE_meshCollider
                 
+            visible = True
+            if obj.draw_type in ["BOUNDS", "WIRE"] and meshCollider:
+                visible = False
+            
             object_string = TEMPLATE_OBJECT % {
             "object_id"   : generate_string(object_id),
             "geometry_id" : generate_string(geometry_id),
@@ -1008,8 +1012,9 @@ def generate_objects(data):
             "quaternion"  : generate_vec4(quaternion),
             "scale"       : generate_vec3(scale),
 
-            "castsShadow"  : castsShadow,
-            "meshCollider" : meshCollider
+            "castsShadow"  : generate_bool_property(castsShadow),
+            "meshCollider" : generate_bool_property(meshCollider),
+            "visible"      : generate_bool_property(visible)
             }
             chunks.append(object_string)
         

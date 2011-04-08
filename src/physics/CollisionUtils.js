@@ -51,14 +51,14 @@ THREE.CollisionUtils.MeshColliderWBox = function( m ) {
 	
 	for( var i = 0; i < mvl; i++ ) {
 
-		vertices.push( new THREE.Vector3( mv[i].position.x, mv[i].position.y, mv[i].position.z) );
+		vertices.push( new THREE.Vector3( mv[ i ].position.x, mv[ i ].position.y, mv[ i ].position.z ) );
 
 	}
 	
 	for( var i = 0; i < mfl; i++ ) {
 
-		faces.push( mf[i].a, mf[i].b, mf[i].c );
-		normals.push( new THREE.Vector3( mf[i].normal.x, mf[i].normal.y, mf[i].normal.z) );
+		faces.push( mf[ i ].a, mf[ i ].b, mf[ i ].c );
+		normals.push( new THREE.Vector3( mf[ i ].normal.x, mf[ i ].normal.y, mf[ i ].normal.z ) );
 
 	}
 	

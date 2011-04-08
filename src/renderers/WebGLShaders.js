@@ -602,13 +602,11 @@ THREE.ShaderLib = {
 									  "texture2D( occlusionMap, vec2( 0.1, 0.9 )) +",
 									  "texture2D( occlusionMap, vec2( 0.1, 0.5 )) +",
 									  "texture2D( occlusionMap, vec2( 0.5, 0.5 ));",
-/*
+
 					"vVisibility = (       visibility.r / 9.0 ) *",
 					              "( 1.0 - visibility.g / 9.0 ) *",
 					              "(       visibility.b / 9.0 ) *", 
 					              "( 1.0 - visibility.a / 9.0 );",
-*/
-					"vVisibility = ( 1.0 - visibility.a / 9.0 );",
 
 					"pos.x = cos( rotation ) * position.x - sin( rotation ) * position.y;",
 					"pos.y = sin( rotation ) * position.x + cos( rotation ) * position.y;",
@@ -638,7 +636,7 @@ THREE.ShaderLib = {
 			
 				"if( renderType == 0 ) {",
 							
-					"gl_FragColor = vec4( texture2D( map, vUV ).rgb, 0.0 );",
+					"gl_FragColor = vec4( 1.0, 0.0, 1.0, 0.0 );",
 				
 				// restore
 				
@@ -741,25 +739,46 @@ THREE.ShaderLib = {
 	'sprite': {
 		
 		vertexShader: [
-
-			"uniform 	vec3 	screenPosition;",
-			"uniform	vec2	scale;",
-			"uniform	float	rotation;",
+			"uniform	int		useScreenCoordinates;",
+			"uniform    int     affectedByDistance;",
+			"uniform	vec3	screenPosition;",
+			"uniform 	mat4 	modelViewMatrix;",
+			"uniform 	mat4 	projectionMatrix;",
+			"uniform    float   rotation;",
+			"uniform    vec2    scale;",
+			"uniform    vec2    alignment;",
+			"uniform    vec2    uvOffset;",
+			"uniform	vec2    uvScale;",
 
 			"attribute 	vec2 	position;",
-			"attribute  vec2	UV;",
+			"attribute  vec2	uv;",
 
 			"varying	vec2	vUV;",
 	
 			"void main(void)",
 			"{",
-				"vUV = UV;",
+				"vUV = uvOffset + uv * uvScale;",
 
-				"vec2 pos;",
-				"pos.x = cos( rotation ) * position.x - sin( rotation ) * position.y;",
-				"pos.y = sin( rotation ) * position.x + cos( rotation ) * position.y;",
+				"vec2 alignedPosition = position + alignment;",
+			
+				"vec2 rotatedPosition;",
+				"rotatedPosition.x = ( cos( rotation ) * alignedPosition.x - sin( rotation ) * alignedPosition.y ) * scale.x;",
+				"rotatedPosition.y = ( sin( rotation ) * alignedPosition.x + cos( rotation ) * alignedPosition.y ) * scale.y;",
+
+				"vec4 finalPosition;",
 				
-				"gl_Position = vec4(( pos * scale + screenPosition.xy ).xy, screenPosition.z, 1.0 );",
+				"if( useScreenCoordinates != 0 ) {",
+				
+					"finalPosition = vec4( screenPosition.xy + rotatedPosition, screenPosition.z, 1.0 );",
+				
+				"} else {",
+				
+					"finalPosition = projectionMatrix * modelViewMatrix * vec4( 0.0, 0.0, 0.0, 1.0 );",
+					"finalPosition.xy += rotatedPosition * ( affectedByDistance == 1 ? 1.0 : finalPosition.z );",
+
+				"}",
+
+				"gl_Position = finalPosition;",
 			"}"
 
 		].join( "\n" ),
@@ -780,6 +799,7 @@ THREE.ShaderLib = {
 				"vec4 color = texture2D( map, vUV );",
 				"color.a *= opacity;",
 				"gl_FragColor = color;",
+//				"gl_FragColor = vec4( 1.0, 0.0, 1.0, 1.0 );",
 			"}"
 		].join( "\n" )
 

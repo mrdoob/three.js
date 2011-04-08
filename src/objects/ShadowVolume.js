@@ -1,5 +1,5 @@
-/*
- * Shadow Volume
+/**
+ * @author mikael emtinger / http://gomo.se/
  */
 
 THREE.ShadowVolume = function( mesh, isStatic ) {
@@ -9,7 +9,7 @@ THREE.ShadowVolume = function( mesh, isStatic ) {
 
 	this.calculateShadowVolumeGeometry( mesh.geometry );
 
-}
+};
 
 THREE.ShadowVolume.prototype             = new THREE.Mesh();
 THREE.ShadowVolume.prototype.constructor = THREE.ShadowVolume;
@@ -100,7 +100,7 @@ THREE.ShadowVolume.prototype.calculateShadowVolumeGeometry = function( originalG
 
 	}
 
-}
+};
 
 
 
@@ -198,5 +198,5 @@ THREE.ShadowVolume.prototype.facesShareEdge = function( vertices, faceA, faceB )
 
 	return undefined;
 
-}
+};
 
