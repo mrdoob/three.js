@@ -215,6 +215,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_lensFlare.uniforms.rotation       = _gl.getUniformLocation( _lensFlare.program, "rotation" );
 	_lensFlare.uniforms.screenPosition = _gl.getUniformLocation( _lensFlare.program, "screenPosition" );
 
+	_gl.enableVertexAttribArray( _lensFlare.attributes.vertex );
+	_gl.enableVertexAttribArray( _lensFlare.attributes.uv );
+
 
 	// prepare sprites
 	
@@ -269,6 +272,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_sprite.uniforms.modelViewMatrix      = _gl.getUniformLocation( _sprite.program, "modelViewMatrix" );
 	_sprite.uniforms.projectionMatrix     = _gl.getUniformLocation( _sprite.program, "projectionMatrix" );
 
+	_gl.enableVertexAttribArray( _sprite.attributes.position );
+	_gl.enableVertexAttribArray( _sprite.attributes.uv );
 
 
 	this.setSize = function ( width, height ) {
@@ -3332,6 +3337,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_gl.disable( _gl.CULL_FACE );
 		_gl.enable( _gl.BLEND );
+		_gl.depthMask( true );
 
 		_gl.bindBuffer( _gl.ARRAY_BUFFER, _sprite.vertexBuffer );
 		_gl.vertexAttribPointer( attributes.position, 2, _gl.FLOAT, false, 2 * 8, 0 );
@@ -3381,7 +3387,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 						_gl.uniform1i( uniforms.useScreenCoordinates, 1 );
 						_gl.uniform3f( uniforms.screenPosition, ( object.position.x - halfViewportWidth  ) / halfViewportWidth, 
 														        ( halfViewportHeight - object.position.y ) / halfViewportHeight,
-														          object.position.z );
+														          Math.max( 0, Math.min( 1, object.position.z )));
 						
 					} else {
 
@@ -3407,20 +3413,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 					if( object.mergeWith3D && !mergeWith3D ) {
 						
 						_gl.enable( _gl.DEPTH_TEST );
-						_gl.depthMask( true );
-						
 						mergeWith3D = true;
 						
 					} else if( !object.mergeWith3D && mergeWith3D ) {
 						
 						_gl.disable( _gl.DEPTH_TEST );
-						_gl.depthMask( object.blending === THREE.NormalBlending ? true : false );
-
 						mergeWith3D = false;
 						
 					}
 	
-						_gl.depthMask( true );
 					setBlending( object.blending );
 					setTexture( object.map, 0 );
 			

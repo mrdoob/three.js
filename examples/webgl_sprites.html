@@ -54,7 +54,7 @@
 				var mapA =  ImageUtils.loadTexture( "textures/sprite0.png" );
 				var mapB =  ImageUtils.loadTexture( "textures/sprite1.png" );
 				
-				nodeA = new THREE.Mesh( new Cube( 10, 10, 10 ), new THREE.MeshLambertMaterial( { color: 0xff0000 } ));
+				nodeA = new THREE.Object3D();
 				
 				for( var a = 0; a < amount; a++ ) {
 					
@@ -76,7 +76,25 @@
 				}
 				
 				scene.addChild( nodeA );
+
+				// add 2d-sprites
+				
+				sprite = new THREE.Sprite( { map: mapA, alignment:THREE.SpriteAlignment.topLeft } );
+				sprite.position.set( 100, 100, 0 );
+				sprite.opacity = 0.25;
+				scene.addChild( sprite );
 						
+				sprite = new THREE.Sprite( { map: mapA, alignment:THREE.SpriteAlignment.topLeft } );
+				sprite.position.set( 150, 150, 2 );
+				sprite.opacity = 0.5;
+				scene.addChild( sprite );
+					
+				sprite = new THREE.Sprite( { map: mapA, alignment:THREE.SpriteAlignment.topLeft } );
+				sprite.position.set( 200, 200, 3 );
+				sprite.opacity = 1;
+				scene.addChild( sprite );
+				
+
 
 				// renderer
 
