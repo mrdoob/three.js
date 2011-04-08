@@ -16,6 +16,7 @@
 
 	<body>
 		<script type="text/javascript" src="../build/Three.js"></script>
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
@@ -32,9 +33,9 @@
 
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
-			
 
 			init();
+			animate();
 
 			function init() {
 
@@ -45,7 +46,7 @@
 				camera.position.z = 1500;
 
 				scene = new THREE.Scene();
-	
+
 
 				// create sprites
 
@@ -53,47 +54,47 @@
 				var radius = 500;
 				var mapA =  ImageUtils.loadTexture( "textures/sprite0.png" );
 				var mapB =  ImageUtils.loadTexture( "textures/sprite1.png" );
-				
+
 				nodeA = new THREE.Object3D();
-				
+
 				for( var a = 0; a < amount; a++ ) {
-					
+
 					var sprite = new THREE.Sprite( { map: mapA, useScreenCoordinates: false } );
-					sprite.position.set( Math.random() - 0.5, 
+					sprite.position.set( Math.random() - 0.5,
 					                     Math.random() - 0.5,
 					                     Math.random() - 0.5 );
-					
+
 					if( sprite.position.z < 0 ) {
-						
+
 						sprite.map = mapB;
-						
+
 					}
-					
+
 					sprite.position.normalize();
 					sprite.position.multiplyScalar( radius );
-					
+
 					nodeA.addChild( sprite );
 				}
-				
+
 				scene.addChild( nodeA );
 
 				// add 2d-sprites
-				
+
 				sprite = new THREE.Sprite( { map: mapA, alignment:THREE.SpriteAlignment.topLeft } );
 				sprite.position.set( 100, 100, 0 );
 				sprite.opacity = 0.25;
 				scene.addChild( sprite );
-						
+
 				sprite = new THREE.Sprite( { map: mapA, alignment:THREE.SpriteAlignment.topLeft } );
 				sprite.position.set( 150, 150, 2 );
 				sprite.opacity = 0.5;
 				scene.addChild( sprite );
-					
+
 				sprite = new THREE.Sprite( { map: mapA, alignment:THREE.SpriteAlignment.topLeft } );
 				sprite.position.set( 200, 200, 3 );
 				sprite.opacity = 1;
 				scene.addChild( sprite );
-				
+
 
 
 				// renderer
@@ -102,7 +103,7 @@
 				renderer.setClearColorHex( 0x000000, 1 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.sortObjects = true;
-				
+
 				container.appendChild( renderer.domElement );
 
 				if ( statsEnabled ) {
@@ -115,17 +116,25 @@
 
 				}
 
-				setInterval( loop, 1000 / 60 );
 			}
 
 
-			function loop() {
+			function animate() {
 
-				for( var c = 0; c < nodeA.children.length; c++ ) {
-					
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				for ( var c = 0; c < nodeA.children.length; c++ ) {
+
 					var sprite = nodeA.children[ c ];
 					var scale = Math.sin( time + sprite.position.x * 0.01 ) * 0.3 + 1.0;
-					
+
 					sprite.rotation += 0.1 * ( c / nodeA.children.length );
 					sprite.scale.set( scale, scale, 1.0 );
 					sprite.opacity = Math.sin( time + sprite.position.x * 0.01 ) * 0.4 + 0.6;
@@ -138,8 +147,6 @@
 				time += 0.02;
 
 				renderer.render( scene, camera );
-
-				if ( statsEnabled ) stats.update();
 
 			}
 

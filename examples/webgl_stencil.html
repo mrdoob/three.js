@@ -16,11 +16,11 @@
 
 	<body>
 		<script type="text/javascript" src="../build/Three.js"></script>
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 
 		<script type="text/javascript">
-			var statsEnabled = true;
 
 			var container, stats;
 
@@ -36,6 +36,7 @@
 			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
 			init();
+			animate();
 
 			function init() {
 
@@ -46,7 +47,7 @@
 				camera.position.z = 250;
 
 				scene = new THREE.Scene();
-	
+
 
 				// world
 
@@ -72,8 +73,8 @@
 				new THREE.ShadowVolume( mesh1 )
 				new THREE.ShadowVolume( mesh2 )
 				new THREE.ShadowVolume( mesh3 )
-	
-	
+
+
 				// moving objects
 
 				var cube = new Cube( 40, 40, 40 );
@@ -85,7 +86,7 @@
 
 				boxMesh = new THREE.Mesh( cube, material2 );
 				scene.addChild( boxMesh );
-				
+
 				new THREE.ShadowVolume( mesh );
 				new THREE.ShadowVolume( boxMesh );
 
@@ -108,17 +109,12 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				if ( statsEnabled ) {
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				stats.domElement.style.zIndex = 100;
+				container.appendChild( stats.domElement );
 
-					stats = new Stats();
-					stats.domElement.style.position = 'absolute';
-					stats.domElement.style.top = '0px';
-					stats.domElement.style.zIndex = 100;
-					container.appendChild( stats.domElement );
-
-				}
-
-				setInterval( loop, 1000 / 60 );
 			}
 
 
@@ -129,9 +125,18 @@
 
 			}
 
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
 			var t = 0;
 
-			function loop() {
+			function render() {
 
 				mesh.position.x = Math.sin( t ) * 100;
 				mesh.position.y = Math.cos( t ) * 100;
@@ -157,8 +162,6 @@
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 
 				renderer.render( scene, camera );
-
-				if ( statsEnabled ) stats.update();
 
 			}
 

@@ -4109,6 +4109,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		console.log(
+			navigator.userAgent + " | " +
+			_gl.getParameter( _gl.VERSION ) + " | " +
+			_gl.getParameter( _gl.VENDOR ) + " | " +
+			_gl.getParameter( _gl.RENDERER ) + " | " +
+			_gl.getParameter( _gl.SHADING_LANGUAGE_VERSION )
+		);
+
 		_gl.clearColor( 0, 0, 0, 1 );
 		_gl.clearDepth( 1 );
 
