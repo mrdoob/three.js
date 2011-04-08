@@ -152,6 +152,10 @@ THREE.CollisionSystem.prototype.rayTriangle = function( ray, p0, p1, p2, n, mind
 	var e1 = THREE.CollisionSystem.__v1, 
 		e2 = THREE.CollisionSystem.__v2;
 	
+	// do not crash on quads, fail instead
+
+	//if ( !n ) n = THREE.CollisionSystem.__v3;
+	
 	e1.sub( p1, p0 );
 	e2.sub( p2, p1 );
 	n.cross( e1, e2 )

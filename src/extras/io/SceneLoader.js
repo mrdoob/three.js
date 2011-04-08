@@ -136,7 +136,15 @@ THREE.SceneLoader.prototype = {
 
 							result.objects[ dd ] = object;
 
+							if ( o.meshCollider ) {
+
+								var meshCollider = THREE.CollisionUtils.MeshColliderWBox( object );
+								THREE.Collisions.colliders.push( meshCollider );
+
+							}
+
 						}
+						
 
 					}
 
