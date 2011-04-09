@@ -87,7 +87,7 @@ THREE.SceneUtils = {
 
 			callback( n );
 
-			SceneUtils.traverseHierarchy( n, callback );
+			THREE.SceneUtils.traverseHierarchy( n, callback );
 
 		}
 
