@@ -139,6 +139,15 @@ This code creates a camera, then creates a scene, adds a cube on it, creates a &
 
 ### Change Log ###
 
+2011 04 09 - **r39** (249.048 KB, gzip: 61.020 KB)
+
+* Improved WebGLRenderer program cache. ([alteredq](http://github.com/alteredq))
+* Added support for pre-computed edges in loaders and exporters. ([alteredq](http://github.com/alteredq))
+* Added `Sprite` object. ([empaempa](http://github.com/empaempa))
+* Added `Collisions` classes. ([drojdjou](http://github.com/drojdjou))
+* Added `THREE` namespace to all the classes that missed it. ([mrdoob](http://github.com/mrdoob))
+
+
 2011 03 31 - **r38** (225.442 KB, gzip: 55.908 KB)
 
 * Added `LensFlare` light. ([empaempa](http://github.com/empaempa))

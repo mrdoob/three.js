@@ -3,7 +3,7 @@
  */
 
 THREE.Sprite = function( parameters ) {
-	
+
 	THREE.Object3D.call( this );
 
 	if( parameters.material !== undefined ) {
@@ -11,27 +11,27 @@ THREE.Sprite = function( parameters ) {
 		this.material = parameters.material;
 		this.map      = undefined;
 		this.blending = material.blending;
-		
+
 	} else if( parameters.map !== undefined ) {
-		
+
 		this.map      = parameters.map instanceof THREE.Texture ? parameters.map : ImageUtils.loadTexture( parameters.map );
 		this.material = undefined;
 		this.blending = parameters.blending !== undefined ? parameters.blending : THREE.NormalBlending;
 
 	}
-	
+
 	this.useScreenCoordinates = parameters.useScreenCoordinates !== undefined ? parameters.useScreenCoordinates : true;
 	this.mergeWith3D = parameters.mergeWith3D !== undefined ? parameters.mergeWith3D : !this.useScreenCoordinates;
 	this.affectedByDistance = parameters.affectedByDistance !== undefined ? parameters.affectedByDistance : !this.useScreenCoordinates;
 	this.alignment = parameters.alignment instanceof THREE.Vector2 ? parameters.alignment : THREE.SpriteAlignment.center;
-	
+
 	this.rotation3d = this.rotation;
 	this.rotation = 0;
 	this.opacity = 1;
-	
+
 	this.uvOffset = new THREE.Vector2( 0, 0 );
 	this.uvScale  = new THREE.Vector2( 1, 1 );
-	
+
 };
 
 THREE.Sprite.prototype             = new THREE.Object3D();
@@ -75,5 +75,3 @@ THREE.SpriteAlignment.centerRight = new THREE.Vector2( -1, 0 );
 THREE.SpriteAlignment.bottomLeft = new THREE.Vector2( 1, 1 );
 THREE.SpriteAlignment.bottomCenter = new THREE.Vector2( 0, 1 );
 THREE.SpriteAlignment.bottomRight = new THREE.Vector2( -1, 1 );
-
-
