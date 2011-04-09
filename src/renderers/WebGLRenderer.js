@@ -215,9 +215,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_lensFlare.uniforms.rotation       = _gl.getUniformLocation( _lensFlare.program, "rotation" );
 	_lensFlare.uniforms.screenPosition = _gl.getUniformLocation( _lensFlare.program, "screenPosition" );
 
-	_gl.enableVertexAttribArray( _lensFlare.attributes.vertex );
-	_gl.enableVertexAttribArray( _lensFlare.attributes.uv );
+	//_gl.enableVertexAttribArray( _lensFlare.attributes.vertex );
+	//_gl.enableVertexAttribArray( _lensFlare.attributes.uv );
 
+	var _lensFlareAttributesEnabled = false;
 
 	// prepare sprites
 	
@@ -272,9 +273,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_sprite.uniforms.modelViewMatrix      = _gl.getUniformLocation( _sprite.program, "modelViewMatrix" );
 	_sprite.uniforms.projectionMatrix     = _gl.getUniformLocation( _sprite.program, "projectionMatrix" );
 
-	_gl.enableVertexAttribArray( _sprite.attributes.position );
-	_gl.enableVertexAttribArray( _sprite.attributes.uv );
+	//_gl.enableVertexAttribArray( _sprite.attributes.position );
+	//_gl.enableVertexAttribArray( _sprite.attributes.uv );
 
+	var _spriteAttributesEnabled = false;
 
 	this.setSize = function ( width, height ) {
 
@@ -2064,7 +2066,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function refreshUniformsCommon( uniforms, material ) {
 
-		uniforms.diffuse.value.setRGB( material.color.r, material.color.g, material.color.b );
+		uniforms.diffuse.value = material.color;
 		uniforms.opacity.value = material.opacity;
 		uniforms.map.texture = material.map;
 
@@ -2080,14 +2082,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function refreshUniformsLine( uniforms, material ) {
 
-		uniforms.diffuse.value.setRGB( material.color.r, material.color.g, material.color.b );
+		uniforms.diffuse.value = material.color;
 		uniforms.opacity.value = material.opacity;
 
 	};
 
 	function refreshUniformsParticle( uniforms, material ) {
 
-		uniforms.psColor.value.setRGB( material.color.r, material.color.g, material.color.b );
+		uniforms.psColor.value = material.color;
 		uniforms.opacity.value = material.opacity;
 		uniforms.size.value = material.size;
 		uniforms.scale.value = _canvas.height / 2.0; // TODO: Cache this.
@@ -2097,7 +2099,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function refreshUniformsFog( uniforms, fog ) {
 
-		uniforms.fogColor.value.setHex( fog.color.hex );
+		uniforms.fogColor.value = fog.color;
 
 		if ( fog instanceof THREE.Fog ) {
 
@@ -2114,10 +2116,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function refreshUniformsPhong( uniforms, material ) {
 
-		//uniforms.ambient.value.setHex( material.ambient.hex );
-		//uniforms.specular.value.setHex( material.specular.hex );
-		uniforms.ambient.value.setRGB( material.ambient.r, material.ambient.g, material.ambient.b );
-		uniforms.specular.value.setRGB( material.specular.r, material.specular.g, material.specular.b );
+		uniforms.ambient.value = material.ambient;
+		uniforms.specular.value = material.specular;
 		uniforms.shininess.value = material.shininess;
 
 	};
@@ -3335,6 +3335,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_currentProgram = _sprite.program;
 		_oldBlending = "";
 
+		if ( !_spriteAttributesEnabled ) {
+	
+			_gl.enableVertexAttribArray( _sprite.attributes.position );
+			_gl.enableVertexAttribArray( _sprite.attributes.uv );
+			
+			_spriteAttributesEnabled = true;
+
+		}
+		
 		_gl.disable( _gl.CULL_FACE );
 		_gl.enable( _gl.BLEND );
 		_gl.depthMask( true );
@@ -3490,6 +3499,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_currentProgram = _lensFlare.program;
 		_oldBlending = "";
 
+
+		if ( ! _lensFlareAttributesEnabled ) {
+		
+			_gl.enableVertexAttribArray( _lensFlare.attributes.vertex );
+			_gl.enableVertexAttribArray( _lensFlare.attributes.uv );
+			
+			_lensFlareAttributesEnabled = true;
+
+		}
 
 		// loop through all lens flares to update their occlusion and positions
 		// setup gl and common used attribs/unforms

@@ -107,9 +107,11 @@
 				directionalLight.position.normalize();
 				sceneModel.addLight( directionalLight );
 
-				rtTexture1 = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter } );
-				rtTexture2 = new THREE.WebGLRenderTarget( 256, 512, { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter } );
-				rtTexture3 = new THREE.WebGLRenderTarget( 512, 256, { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter } );
+				var pars1 = { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBFormat },
+					pars2 = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter,  format: THREE.RGBFormat };
+				rtTexture1 = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars1 );
+				rtTexture2 = new THREE.WebGLRenderTarget( 256, 512, pars2 );
+				rtTexture3 = new THREE.WebGLRenderTarget( 512, 256, pars2 );
 
 				materialColor = new THREE.MeshShaderMaterial( {
 
