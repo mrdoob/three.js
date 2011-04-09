@@ -6,7 +6,7 @@
  * so it draws the entire texture on the seam-faces, I think...
  */
 
-var Icosahedron = function ( subdivisions ) {
+THREE.Icosahedron = function ( subdivisions ) {
 
 	var scope = this;
 	var tempScope = new THREE.Geometry();
@@ -173,5 +173,5 @@ var Icosahedron = function ( subdivisions ) {
 
 }
 
-Icosahedron.prototype = new THREE.Geometry();
-Icosahedron.prototype.constructor = Icosahedron;
+THREE.Icosahedron.prototype = new THREE.Geometry();
+THREE.Icosahedron.prototype.constructor = THREE.Icosahedron;

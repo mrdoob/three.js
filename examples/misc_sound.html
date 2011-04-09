@@ -70,8 +70,10 @@
 				scene  = new THREE.Scene();
 				scene.fog = new THREE.FogExp2( 0x000000, 0.0035 );
 
-				camera = new THREE.QuakeCamera( { fov: 50, aspect: window.innerWidth / window.innerHeight, near: 1, far: 10000,
-												  movementSpeed: 1, lookSpeed: 0.002, noFly: true, lookVertical: false } );
+				camera = new THREE.QuakeCamera( {
+					fov: 50, aspect: window.innerWidth / window.innerHeight, near: 1, far: 10000,
+					movementSpeed: 1, lookSpeed: 0.002, noFly: true, lookVertical: false
+				} );
 
 				camera.position.set( 0, 25, 0 );
 
@@ -80,12 +82,12 @@
 				light.position.normalize();
 				scene.addLight( light );
 
-				var sphere = new Sphere( 20, 32, 16 );
+				var sphere = new THREE.Sphere( 20, 32, 16 );
 
 				material_sphere1 = new THREE.MeshLambertMaterial( { color: 0xffaa00, shading: THREE.FlatShading } );
 				material_sphere2 = new THREE.MeshLambertMaterial( { color: 0xff2200, shading: THREE.FlatShading } );
 
-				var cube = new Cube( 5, 40, 5 );
+				var cube = new THREE.Cube( 5, 40, 5 );
 				var material_cube = new THREE.MeshLambertMaterial( { color: 0xffff00, shading: THREE.FlatShading } );
 				material_cube.color.setHSV( 0.1, 0.7, 1 );
 
@@ -130,7 +132,7 @@
 				material_wireframe.color.setHSV( 0.1, 0.2, 0.25 );
 
 
-				var plane = new Plane( 1000, 1000, 100, 100 );
+				var plane = new THREE.Plane( 1000, 1000, 100, 100 );
 				mesh = new THREE.Mesh( plane, material_wireframe );
 				mesh.position.y = 0.1;
 				mesh.rotation.x = -1.57;
@@ -165,8 +167,8 @@
 				postprocessing.rtTexture2 = new THREE.WebGLRenderTarget( 512, 512, pars );
 				postprocessing.rtTexture3 = new THREE.WebGLRenderTarget( 512, 512, pars );
 
-				var screen_shader = ShaderUtils.lib["screen"];
-				var screen_uniforms = Uniforms.clone( screen_shader.uniforms );
+				var screen_shader = THREE.ShaderUtils.lib["screen"];
+				var screen_uniforms = THREE.UniformsUtils.clone( screen_shader.uniforms );
 
 				screen_uniforms["tDiffuse"].texture = postprocessing.rtTexture1;
 				screen_uniforms["opacity"].value = 1.0;
@@ -181,15 +183,15 @@
 
 				} );
 
-				var convolution_shader = ShaderUtils.lib["convolution"];
-				var convolution_uniforms = Uniforms.clone( convolution_shader.uniforms );
+				var convolution_shader = THREE.ShaderUtils.lib["convolution"];
+				var convolution_uniforms = THREE.UniformsUtils.clone( convolution_shader.uniforms );
 
 				postprocessing.blurx = new THREE.Vector2( 0.001953125, 0.0 ),
 				postprocessing.blury = new THREE.Vector2( 0.0, 0.001953125 );
 
 				convolution_uniforms["tDiffuse"].texture = postprocessing.rtTexture1;
 				convolution_uniforms["uImageIncrement"].value = postprocessing.blurx;
-				convolution_uniforms["cKernel"].value = ShaderUtils.buildKernel( 4.0 );
+				convolution_uniforms["cKernel"].value = THREE.ShaderUtils.buildKernel( 4.0 );
 
 				postprocessing.materialConvolution = new THREE.MeshShaderMaterial( {
 
@@ -199,8 +201,8 @@
 
 				} );
 
-				postprocessing.quad = new THREE.Mesh( new Plane( window.innerWidth, window.innerHeight ), postprocessing.materialConvolution );
-				postprocessing.quad.position.z = -500;
+				postprocessing.quad = new THREE.Mesh( new THREE.Plane( window.innerWidth, window.innerHeight ), postprocessing.materialConvolution );
+				postprocessing.quad.position.z = - 500;
 				postprocessing.scene.addObject( postprocessing.quad );
 
 			}

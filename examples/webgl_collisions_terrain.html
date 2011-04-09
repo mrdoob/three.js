@@ -1,9 +1,9 @@
-<html> 
- 
-<head> 
-<title>three.js webgl - intersection: ray with terrain mesh (through box)</title> 
-<meta http-equiv="content-type" content="text/html; charset=utf-8"> 
-<style type="text/css"> 
+<html>
+
+<head>
+<title>three.js webgl - intersection: ray with terrain mesh (through box)</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<style type="text/css">
 
 body {
 	font-family: Monospace;
@@ -11,7 +11,7 @@ body {
 	margin: 0px;
 	overflow: hidden;
 }
- 
+
 #oldie { background-color: #ddd !important }
 
 #info {
@@ -37,11 +37,11 @@ body {
 }
 
 </style>
- 
+
 <script type="text/javascript" src="../build/Three.js"></script>
 <script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 
-<script type="text/javascript"> 
+<script type="text/javascript">
 
 var scene, camera, renderer, info, mouse2d, sun, loader, sphere, ray;
 
@@ -54,46 +54,46 @@ var sphereSize = 4;
 function init() {
 	container = document.createElement( 'div' );
 	document.body.appendChild( container );
-	
+
 	info = document.getElementById("info");
-	
+
 	camera = new THREE.Camera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
 	camera.position.y = 120;
 	mouse2d = new THREE.Vector3( 0, 0, 1 );
-	
+
 	loader = new THREE.JSONLoader();
 
 	scene = new THREE.Scene();
-	
+
 	ray = new THREE.Ray();
 	ray.origin.y = 10000;
 	ray.direction = new THREE.Vector3(0, -1, 0);
-	
-	sphere = new THREE.Mesh( new Sphere( sphereSize, 10, 10 ), new THREE.MeshLambertMaterial( { color: 0xff0000 } ) );
+
+	sphere = new THREE.Mesh( new THREE.Sphere( sphereSize, 10, 10 ), new THREE.MeshLambertMaterial( { color: 0xff0000 } ) );
 	scene.addObject(sphere);
 	camera.target = sphere;
 
 	renderer = new THREE.WebGLRenderer();
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	container.appendChild(renderer.domElement);
-	
+
 	var ambientLight = new THREE.AmbientLight( 0x444444 );
 	scene.addLight( ambientLight );
 
 	sun = new THREE.DirectionalLight( 0xaaaaaa );
 	sun.position = new THREE.Vector3(-1,1, -1).normalize();
 	scene.addLight( sun );
-	
+
 	loadCube();
-	
-	
+
+
 
 	container.onmousemove = onDocumentMouseMove;
 	animate();
 }
 
 function loadCube(p) {
-	var onGeometry = function( geometry ) {		
+	var onGeometry = function( geometry ) {
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: 0xf3e4b8 } ) );
 		scene.addObject( mesh );
 		THREE.Collisions.colliders.push( THREE.CollisionUtils.MeshColliderWBox(mesh) );
@@ -103,7 +103,7 @@ function loadCube(p) {
 }
 
 function onDocumentMouseMove( event ) {
-	event.preventDefault();	
+	event.preventDefault();
 	mouse2d.x = ( event.clientX / window.innerWidth ) * 2 - 1;
 	mouse2d.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 	mouse2d.z = 1;
@@ -111,10 +111,10 @@ function onDocumentMouseMove( event ) {
 
 function animate() {
 	requestAnimationFrame( animate );
-		
+
 	ray.origin.x = radius * Math.cos(theta);
 	ray.origin.z = radius * Math.sin(theta);
-	
+
 	var c = THREE.Collisions.rayCastNearest(ray);
 	if(c) {
 		//info.innerHTML = "Found @ distance " + c.distance;
@@ -123,11 +123,11 @@ function animate() {
 		//info.innerHTML = "No intersection";
 	}
 
-	
-	
-	
+
+
+
 	theta += speed;
-	
+
 	renderer.render( scene, camera );
 }
 
@@ -138,11 +138,11 @@ function vts(v) {
 
 </script>
 
-</head> 
+</head>
 
-<body onload="init();"> 
+<body onload="init();">
 <div id="info"></div>
 <div id="options"></div>
-</body> 
+</body>
 
-</html> 
+</html>

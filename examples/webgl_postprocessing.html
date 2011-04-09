@@ -122,8 +122,8 @@
 
 				} );
 
-				var screen_shader = ShaderUtils.lib["screen"];
-				var screen_uniforms = Uniforms.clone( screen_shader.uniforms );
+				var screen_shader = THREE.ShaderUtils.lib["screen"];
+				var screen_uniforms = THREE.UniformsUtils.clone( screen_shader.uniforms );
 
 				screen_uniforms["tDiffuse"].texture = rtTexture1;
 				screen_uniforms["opacity"].value = 0.4;
@@ -138,8 +138,8 @@
 
 				} );
 
-				var film_shader = ShaderUtils.lib["film"];
-				var film_uniforms = Uniforms.clone( film_shader.uniforms );
+				var film_shader = THREE.ShaderUtils.lib["film"];
+				var film_uniforms = THREE.UniformsUtils.clone( film_shader.uniforms );
 
 				film_uniforms["tDiffuse"].texture = rtTexture1;
 				film_uniforms["nIntensity"].value = 0.25;
@@ -158,12 +158,12 @@
 				blurx = new THREE.Vector2( increment, 0.0 ),
 				blury = new THREE.Vector2( 0.0, increment );
 
-				var convolution_shader = ShaderUtils.lib["convolution"];
-				var convolution_uniforms = Uniforms.clone( convolution_shader.uniforms );
+				var convolution_shader = THREE.ShaderUtils.lib["convolution"];
+				var convolution_uniforms = THREE.UniformsUtils.clone( convolution_shader.uniforms );
 
 				convolution_uniforms["tDiffuse"].texture = rtTexture1;
 				convolution_uniforms["uImageIncrement"].value = blurx;
-				convolution_uniforms["cKernel"].value = ShaderUtils.buildKernel( 4.0 );
+				convolution_uniforms["cKernel"].value = THREE.ShaderUtils.buildKernel( 4.0 );
 
 				materialConvolution = new THREE.MeshShaderMaterial( {
 
@@ -173,7 +173,7 @@
 
 				} );
 
-				var plane = new Plane( window.innerWidth, window.innerHeight );
+				var plane = new THREE.Plane( window.innerWidth, window.innerHeight );
 
 				quadBG = new THREE.Mesh( plane, materialColor );
 				quadBG.position.z = -500;
@@ -211,13 +211,13 @@
 
 				var ambient = 0x444444, diffuse = 0x888888, specular = 0x080810, shininess = 2;
 
-				var shader = ShaderUtils.lib[ "normal" ];
-				var uniforms = Uniforms.clone( shader.uniforms );
+				var shader = THREE.ShaderUtils.lib[ "normal" ];
+				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
-				uniforms[ "tNormal" ].texture = ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
+				uniforms[ "tNormal" ].texture = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
 				uniforms[ "uNormalScale" ].value = - 0.75;
 
-				uniforms[ "tDiffuse" ].texture = ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" );
+				uniforms[ "tDiffuse" ].texture = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" );
 
 				uniforms[ "enableAO" ].value = false;
 				uniforms[ "enableDiffuse" ].value = true;

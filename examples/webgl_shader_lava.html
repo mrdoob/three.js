@@ -45,7 +45,7 @@
 
 			uniform float time;
 			uniform vec2 resolution;
-			
+
 			uniform float fogDensity;
 			uniform vec3 fogColor;
 
@@ -61,28 +61,28 @@
 				vec4 noise = texture2D( texture1, vUv );
 				vec2 T1 = vUv + vec2( 1.5, -1.5 ) * time  *0.02;
 				vec2 T2 = vUv + vec2( -0.5, 2.0 ) * time * 0.01;
-				
+
 				T1.x += noise.x * 2.0;
 				T1.y += noise.y * 2.0;
 				T2.x -= noise.y * 0.2;
 				T2.y += noise.z * 0.2;
-				
+
 				float p = texture2D( texture1, T1 * 2.0 ).a;
-				
+
 				vec4 color = texture2D( texture2, T2 * 2.0 );
 				vec4 temp = color * ( vec4( p, p, p, p ) * 2.0 ) + ( color * color - 0.1 );
-				
+
 				if( temp.r > 1.0 ){ temp.bg += clamp( temp.r - 2.0, 0.0, 100.0 ); }
 				if( temp.g > 1.0 ){ temp.rb += temp.g - 1.0; }
 				if( temp.b > 1.0 ){ temp.rg += temp.b - 1.0; }
-				
+
 				gl_FragColor = temp;
 
 				float depth = gl_FragCoord.z / gl_FragCoord.w;
 				const float LOG2 = 1.442695;
 				float fogFactor = exp2( - fogDensity * fogDensity * depth * depth * LOG2 );
 				fogFactor = 1.0 - clamp( fogFactor, 0.0, 1.0 );
-				
+
 				gl_FragColor = mix( gl_FragColor, vec4( fogColor, gl_FragColor.w ), fogFactor );
 
 			}
@@ -123,7 +123,7 @@
 			var windowHalfY = window.innerHeight / 2;
 
 			var postprocessing = { enabled : true };
-			
+
 			init();
 			animate();
 
@@ -139,14 +139,14 @@
 				start_time = new Date().getTime();
 
 				uniforms = {
-				
+
 					fogDensity: { type: "f", value: 0.45 },
-					fogColor: 	{ type: "v3", value: new THREE.Vector3( 0, 0, 0 ) },
-					time: 		{ type: "f", value: 1.0 },
+					fogColor: { type: "v3", value: new THREE.Vector3( 0, 0, 0 ) },
+					time: { type: "f", value: 1.0 },
 					resolution: { type: "v2", value: new THREE.Vector2() },
-					uvScale: 	{ type: "v2", value: new THREE.Vector2( 3.0, 1.0 ) },
-					texture1: 	{ type: "t", value: 0, texture: ImageUtils.loadTexture( "textures/lava/cloud.png" ) },
-					texture2: 	{ type: "t", value: 1, texture: ImageUtils.loadTexture( "textures/lava/lavatile.jpg" ) }
+					uvScale: { type: "v2", value: new THREE.Vector2( 3.0, 1.0 ) },
+					texture1: { type: "t", value: 0, texture: THREE.ImageUtils.loadTexture( "textures/lava/cloud.png" ) },
+					texture2: { type: "t", value: 1, texture: THREE.ImageUtils.loadTexture( "textures/lava/lavatile.jpg" ) }
 
 				};
 
@@ -163,7 +163,7 @@
 
 				} );
 
-				mesh = new THREE.Mesh( new Torus( size, 0.3, 30, 30 ), [ material /*, new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, wireframeLinewidth: 2 } ) */ ] );
+				mesh = new THREE.Mesh( new THREE.Torus( size, 0.3, 30, 30 ), [ material /*, new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, wireframeLinewidth: 2 } ) */ ] );
 				mesh.position.x = 0;
 				mesh.position.y = 0;
 				mesh.rotation.x = 0.3;
@@ -212,8 +212,8 @@
 				postprocessing.rtTexture2 = new THREE.WebGLRenderTarget( 512, 512, pars );
 				postprocessing.rtTexture3 = new THREE.WebGLRenderTarget( 512, 512, pars );
 
-				var screen_shader = ShaderUtils.lib["screen"];
-				var screen_uniforms = Uniforms.clone( screen_shader.uniforms );
+				var screen_shader = THREE.ShaderUtils.lib["screen"];
+				var screen_uniforms = THREE.UniformsUtils.clone( screen_shader.uniforms );
 
 				screen_uniforms["tDiffuse"].texture = postprocessing.rtTexture1;
 				screen_uniforms["opacity"].value = 1.0;
@@ -228,15 +228,15 @@
 
 				} );
 
-				var convolution_shader = ShaderUtils.lib["convolution"];
-				var convolution_uniforms = Uniforms.clone( convolution_shader.uniforms );
+				var convolution_shader = THREE.ShaderUtils.lib["convolution"];
+				var convolution_uniforms = THREE.UniformsUtils.clone( convolution_shader.uniforms );
 
 				postprocessing.blurx = new THREE.Vector2( 0.001953125, 0.0 ),
 				postprocessing.blury = new THREE.Vector2( 0.0, 0.001953125 );
 
 				convolution_uniforms["tDiffuse"].texture = postprocessing.rtTexture1;
 				convolution_uniforms["uImageIncrement"].value = postprocessing.blurx;
-				convolution_uniforms["cKernel"].value = ShaderUtils.buildKernel( 4.0 );
+				convolution_uniforms["cKernel"].value = THREE.ShaderUtils.buildKernel( 4.0 );
 
 				postprocessing.materialConvolution = new THREE.MeshShaderMaterial( {
 
@@ -246,23 +246,23 @@
 
 				} );
 
-				var film_shader = ShaderUtils.lib["film"];
-				var film_uniforms = Uniforms.clone( film_shader.uniforms );
-				
+				var film_shader = THREE.ShaderUtils.lib["film"];
+				var film_uniforms = THREE.UniformsUtils.clone( film_shader.uniforms );
+
 				film_uniforms["tDiffuse"].texture = postprocessing.rtTexture1;
-				
+
 				postprocessing.materialFilm = new THREE.MeshShaderMaterial( { uniforms: film_uniforms, vertexShader: film_shader.vertexShader, fragmentShader: film_shader.fragmentShader } );
 				postprocessing.materialFilm.uniforms.grayscale.value = 0;
 				postprocessing.materialFilm.uniforms.nIntensity.value = 0.35;
 				postprocessing.materialFilm.uniforms.sIntensity.value = 0.95;
 				postprocessing.materialFilm.uniforms.sCount.value = 2048;
 
-				postprocessing.quad = new THREE.Mesh( new Plane( window.innerWidth, window.innerHeight ), postprocessing.materialConvolution );
-				postprocessing.quad.position.z = -500;
+				postprocessing.quad = new THREE.Mesh( new THREE.Plane( window.innerWidth, window.innerHeight ), postprocessing.materialConvolution );
+				postprocessing.quad.position.z = - 500;
 				postprocessing.scene.addObject( postprocessing.quad );
 
 			}
-			
+
 			//
 
 			function animate() {

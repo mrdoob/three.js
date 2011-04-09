@@ -54,30 +54,30 @@
 				scene.addLight( light );
 
 				material = [
-					new THREE.MeshLambertMaterial( { map: ImageUtils.loadTexture( 'textures/UV.jpg' ) } ),
+					new THREE.MeshLambertMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/UV.jpg' ) } ),
 					new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true, opacity: 0.1 } )
 				];
 
-				object = new THREE.Mesh( new Cube( 100, 100, 100, 4, 4, 4 ), material );
+				object = new THREE.Mesh( new THREE.Cube( 100, 100, 100, 4, 4, 4 ), material );
 				object.position.x = - 200;
 				object.position.z = 200;
 				scene.addObject( object );
 
-				object = new THREE.Mesh( new Cylinder( 50, 25, 75, 100 ), material );
+				object = new THREE.Mesh( new THREE.Cylinder( 50, 25, 75, 100 ), material );
 				object.position.z = 200;
 				scene.addObject( object );
 
-				object = new THREE.Mesh( new Icosahedron( 2 ), material );
+				object = new THREE.Mesh( new THREE.Icosahedron( 2 ), material );
 				object.position.x = 200;
 				object.position.z = 200;
 				object.scale.x = object.scale.y = object.scale.z = 75;
 				scene.addObject( object );
 
-				object = new THREE.Mesh( new Plane( 100, 100, 4, 4 ), material );
+				object = new THREE.Mesh( new THREE.Plane( 100, 100, 4, 4 ), material );
 				object.position.x = - 200;
 				scene.addObject( object );
 
-				object = new THREE.Mesh( new Sphere( 75, 20, 10 ), material );
+				object = new THREE.Mesh( new THREE.Sphere( 75, 20, 10 ), material );
 				scene.addObject( object );
 
 				var points = [];
@@ -88,16 +88,16 @@
 
 				}
 
-				object = new THREE.Mesh( new Lathe( points, 20 ), material );
+				object = new THREE.Mesh( new THREE.Lathe( points, 20 ), material );
 				object.position.x = 200;
 				scene.addObject( object );
 
-				object = new THREE.Mesh( new Torus( 50, 20, 20, 20 ), material );
+				object = new THREE.Mesh( new THREE.Torus( 50, 20, 20, 20 ), material );
 				object.position.x = - 200;
 				object.position.z = - 200;
 				scene.addObject( object );
 
-				object = new THREE.Mesh( new TorusKnot( 50, 10, 50, 20 ), material );
+				object = new THREE.Mesh( new THREE.TorusKnot( 50, 10, 50, 20 ), material );
 				object.position.z = - 200;
 				scene.addObject( object );
 

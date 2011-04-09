@@ -69,21 +69,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	},
 
-	// parameters defaults
 
-	stencil = true,
-	antialias = true,
-	clearColor = new THREE.Color( 0x000000 ),
-	clearAlpha = 0;
+	// parameters
 
-	if ( parameters ) {
+	parameters = parameters || {};
 
-		if ( parameters.stencil != undefined ) stencil = parameters.stencil;
-		if ( parameters.antialias !== undefined ) antialias = parameters.antialias;
-		if ( parameters.clearColor !== undefined ) clearColor.setHex( parameters.clearColor );
-		if ( parameters.clearAlpha !== undefined ) clearAlpha = parameters.clearAlpha;
+	stencil = parameters.stencil !== undefined ? parameters.stencil : true;
+	antialias = parameters.antialias !== undefined ? parameters.antialias : false;
+	clearColor = parameters.clearColor !== undefined ? new THREE.Color( parameters.clearColor ) : new THREE.Color( 0x000000 );
+	clearAlpha = parameters.clearAlpha !== undefined ? parameters.clearAlpha : 0;
 
-	}
 
 	this.maxMorphTargets = 8;
 	this.domElement = _canvas;
@@ -183,7 +178,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_gl.texParameteri( _gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, _gl.NEAREST );
 
 	if( _gl.getParameter( _gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS ) <= 0 ) {
-		
+
 		_lensFlare.hasVertexTexture = false;
 
 		_lensFlare.program = _gl.createProgram();
@@ -191,16 +186,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_gl.attachShader( _lensFlare.program, getShader( "vertex",   THREE.ShaderLib.lensFlare.vertexShader   ));
 		_gl.linkProgram( _lensFlare.program );
 
-		
+
 	} else {
 
 		_lensFlare.hasVertexTexture = true;
-		
+
 		_lensFlare.program = _gl.createProgram();
 		_gl.attachShader( _lensFlare.program, getShader( "fragment", THREE.ShaderLib.lensFlareVertexTexture.fragmentShader ));
 		_gl.attachShader( _lensFlare.program, getShader( "vertex",   THREE.ShaderLib.lensFlareVertexTexture.vertexShader   ));
 		_gl.linkProgram( _lensFlare.program );
-		
+
 	}
 
 	_lensFlare.attributes = {};
@@ -2058,7 +2053,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setMaterialShaders( material, shaders ) {
 
-		material.uniforms = Uniforms.clone( shaders.uniforms );
+		material.uniforms = THREE.UniformsUtils.clone( shaders.uniforms );
 		material.vertexShader = shaders.vertexShader;
 		material.fragmentShader = shaders.fragmentShader;
 
@@ -4323,7 +4318,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		cacheUniformLocations( program, identifiers );
-		
+
 		// cache attributes locations
 
 		identifiers = [

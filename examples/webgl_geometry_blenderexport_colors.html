@@ -34,7 +34,7 @@
 		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> webgl - io blender - vertex colors</div>
 
 		<script type="text/javascript" src="../build/Three.js"></script>
-		
+
 		<script type="text/javascript" src="js/Detector.js"></script>
 		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
@@ -97,7 +97,7 @@
 
 				var material = [ new THREE.MeshFaceMaterial(), new THREE.MeshLambertMaterial( { color: 0xffffff, opacity:0.9, shading:THREE.FlatShading, wireframe: true, wireframeLinewidth: 2 } ) ];
 
-				mesh = SceneUtils.addMesh( scene, geometry, 250, 400, 0, 0, 0, 0, 0, material );
+				mesh = THREE.SceneUtils.addMesh( scene, geometry, 250, 400, 0, 0, 0, 0, 0, material );
 
 			}
 
@@ -107,7 +107,7 @@
 
 				var material = new THREE.MeshFaceMaterial();
 
-				mesh2 = SceneUtils.addMesh( scene, geometry, 250, -400, 0, 0, 0, 0, 0, material );
+				mesh2 = THREE.SceneUtils.addMesh( scene, geometry, 250, -400, 0, 0, 0, 0, 0, material );
 
 			}
 

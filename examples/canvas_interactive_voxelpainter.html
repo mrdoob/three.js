@@ -23,7 +23,7 @@
 
 			var container, stats;
 			var camera, scene, renderer;
-			var projector, plane, cube;
+			var projector, plane;
 			var mouse2D, mouse3D, ray,
 			rollOveredFace, isShiftDown = false,
 			theta = 45, isCtrlDown = false;
@@ -73,7 +73,7 @@
 
 				projector = new THREE.Projector();
 
-				plane = new THREE.Mesh( new Plane( 1000, 1000, 20, 20 ), new THREE.MeshFaceMaterial() );
+				plane = new THREE.Mesh( new THREE.Plane( 1000, 1000, 20, 20 ), new THREE.MeshFaceMaterial() );
 				plane.rotation.x = - 90 * Math.PI / 180;
 				scene.addObject( plane );
 
@@ -145,7 +145,7 @@
 
 						var position = new THREE.Vector3().add( intersects[ 0 ].point, intersects[ 0 ].object.matrixRotationWorld.multiplyVector3( intersects[ 0 ].face.normal.clone() ) );
 
-						var voxel = new THREE.Mesh( new Cube( 50, 50, 50 ), [ new THREE.MeshLambertMaterial( { color: 0x00ff80, opacity: 1, shading: THREE.FlatShading } ), new THREE.MeshFaceMaterial() ] );
+						var voxel = new THREE.Mesh( new THREE.Cube( 50, 50, 50 ), [ new THREE.MeshLambertMaterial( { color: 0x00ff80, opacity: 1, shading: THREE.FlatShading } ), new THREE.MeshFaceMaterial() ] );
 						voxel.position.x = Math.floor( position.x / 50 ) * 50 + 25;
 						voxel.position.y = Math.floor( position.y / 50 ) * 50 + 25;
 						voxel.position.z = Math.floor( position.z / 50 ) * 50 + 25;

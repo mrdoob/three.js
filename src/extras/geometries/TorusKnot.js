@@ -3,10 +3,11 @@
  * based on http://code.google.com/p/away3d/source/browse/trunk/fp10/Away3D/src/away3d/primitives/TorusKnot.as?spec=svn2473&r=2473
  */
 
-var TorusKnot = function ( radius, tube, segmentsR, segmentsT, p, q, heightScale ) {
+THREE.TorusKnot = function ( radius, tube, segmentsR, segmentsT, p, q, heightScale ) {
+
+	THREE.Geometry.call( this );
 
 	var scope = this;
-	THREE.Geometry.call( this );
 
 	this.radius = radius || 200;
 	this.tube = tube || 40;
@@ -103,5 +104,5 @@ var TorusKnot = function ( radius, tube, segmentsR, segmentsT, p, q, heightScale
 
 };
 
-TorusKnot.prototype = new THREE.Geometry();
-TorusKnot.prototype.constructor = TorusKnot;
+THREE.TorusKnot.prototype = new THREE.Geometry();
+THREE.TorusKnot.prototype.constructor = THREE.TorusKnot;

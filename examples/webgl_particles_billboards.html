@@ -68,7 +68,7 @@
 
 				geometry = new THREE.Geometry();
 
-				sprite = ImageUtils.loadTexture( "textures/sprites/circle.png" );
+				sprite = THREE.ImageUtils.loadTexture( "textures/sprites/circle.png" );
 
 				for ( i = 0; i < 10000; i++ ) {
 
@@ -95,7 +95,7 @@
 				light.position.z = 1;
 				scene.addLight( light );
 
-				renderer = new THREE.WebGLRenderer( { antialias: false, clearAlpha: 1 });
+				renderer = new THREE.WebGLRenderer( { clearAlpha: 1 });
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 

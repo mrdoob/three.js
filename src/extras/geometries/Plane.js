@@ -3,7 +3,7 @@
  * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Plane.as
  */
 
-var Plane = function ( width, height, segmentsWidth, segmentsHeight ) {
+THREE.Plane = function ( width, height, segmentsWidth, segmentsHeight ) {
 
 	THREE.Geometry.call( this );
 
@@ -30,7 +30,7 @@ var Plane = function ( width, height, segmentsWidth, segmentsHeight ) {
 		}
 
 	}
-	
+
 	for( iy = 0; iy < gridY; iy++ ) {
 
 		for( ix = 0; ix < gridX; ix++ ) {
@@ -57,5 +57,5 @@ var Plane = function ( width, height, segmentsWidth, segmentsHeight ) {
 
 };
 
-Plane.prototype = new THREE.Geometry();
-Plane.prototype.constructor = Plane;
+THREE.Plane.prototype = new THREE.Geometry();
+THREE.Plane.prototype.constructor = THREE.Plane;

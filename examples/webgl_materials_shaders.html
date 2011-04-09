@@ -125,18 +125,18 @@
 				scene.addLight( pointLight );
 
 				// light representation
-				sphere = new Sphere( 100, 16, 8 );
+				sphere = new THREE.Sphere( 100, 16, 8 );
 				lightMesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) );
 				lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
 				lightMesh.position = pointLight.position;
 				lightMesh.overdraw = true;
 				lightMesh.updateMatrix();
-				scene.addObject(lightMesh);
+				scene.addObject( lightMesh );
 
 				// material samples
-				sphere = new Sphere( 100, 32, 32 );
+				sphere = new THREE.Sphere( 100, 32, 32 );
 
-				var y1 = 0, y2 = -200;
+				var y1 = 0, y2 = - 200;
 
 				addMesh( sphere, 1, -600, y1, 0, 0,0,0, new THREE.MeshPhongMaterial( { ambient: 0x050505, color: 0x000000, specular: 0x555555, shininess: 30 } ) );
 				addMesh( sphere, 1, -600, y2, 0, 0,0,0, new THREE.MeshLambertMaterial( { color: 0x050505 } ) );
@@ -160,6 +160,7 @@
 				addMesh( sphere, 1,  600, y2, 0, 0,0,0, new THREE.MeshLambertMaterial( { color: 0x5500ff } ) );
 
 				if ( render_gl ) {
+
 					try {
 						webglRenderer = new THREE.WebGLRenderer();
 						webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
@@ -169,12 +170,15 @@
 					}
 					catch (e) {
 					}
+
 				}
 
-				if( render_canvas ) {
+				if ( render_canvas ) {
+
 					canvasRenderer = new THREE.CanvasRenderer();
 					canvasRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 					container.appendChild( canvasRenderer.domElement );
+
 				}
 
 

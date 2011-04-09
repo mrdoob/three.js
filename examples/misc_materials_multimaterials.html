@@ -49,7 +49,7 @@
 
 			var SCREEN_WIDTH = window.innerWidth/2;
 			var SCREEN_HEIGHT = window.innerHeight;
-			var FLOOR = -250;
+			var FLOOR = - 250;
 
 			var container;
 			var stats;
@@ -96,8 +96,10 @@
 
 				// SPHERES
 
-				sphere = new Sphere( 100, 16, 8 );
-				for (var i=0; i<10; i++) {
+				sphere = new THREE.Sphere( 100, 16, 8 );
+
+				for ( var i = 0; i < 10; i ++ ) {
+
 					//mesh = new THREE.Mesh( sphere, new THREE.MeshLambertMaterial( ) );
 					mesh = new THREE.Mesh( sphere, [ new THREE.MeshLambertMaterial( { color: 0xffffff } ), new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true,  wireframeLinewidth: 1.5 } ) ] );
 					//mesh = new THREE.Mesh( sphere, new THREE.MeshLambertMaterial( { color: 0x00aa00, wireframe: true,  wireframeLinewidth: 1.5 } ) );
@@ -107,6 +109,7 @@
 					mesh.position.z = 500 * ( Math.random() - 0.5 );
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = 0.25 * (Math.random() + 0.5);
 					scene.addObject(mesh);
+
 				}
 
 
@@ -132,10 +135,12 @@
 				mesh.position = pointLight.position;
 				scene.addObject(mesh);
 
-				if( render_canvas ) {
+				if ( render_canvas ) {
+
 					canvasRenderer = new THREE.CanvasRenderer();
 					canvasRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 					container.appendChild( canvasRenderer.domElement );
+
 				}
 
 				if ( render_gl ) {
@@ -234,12 +239,12 @@
 
 			function createMaterialsPalette( materials, size, bottom ) {
 
-				for ( var i=0; i<materials.length; ++i ) {
+				for ( var i = 0; i < materials.length; i ++ ) {
 
 					// material
-					mesh = new THREE.Mesh( new Plane( size, size ), materials[i] );
-					mesh.position.x = i * (size + 5) - ( ( materials.length - 1 )* ( size + 5 )/2);
-					mesh.position.y = FLOOR + size/2 + bottom;
+					mesh = new THREE.Mesh( new THREE.Plane( size, size ), materials[i] );
+					mesh.position.x = i * ( size + 5 ) - ( ( materials.length - 1 ) * ( size + 5 ) / 2 );
+					mesh.position.y = FLOOR + size / 2 + bottom;
 					mesh.position.z = -100;
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = 1;
 					mesh.doubleSided = true;
@@ -259,10 +264,10 @@
 					var xm = new THREE.MeshBasicMaterial( { map: new THREE.Texture( x ) } );
 					xm.map.needsUpdate = true;
 
-					mesh = new THREE.Mesh( new Plane( size, size ), xm );
-					mesh.position.x = i * (size + 5) - ( ( materials.length - 1 )* ( size + 5 )/2);
-					mesh.position.y = FLOOR + size/2 + bottom;
-					mesh.position.z = -99;
+					mesh = new THREE.Mesh( new THREE.Plane( size, size ), xm );
+					mesh.position.x = i * ( size + 5 ) - ( ( materials.length - 1 ) * ( size + 5 ) / 2 );
+					mesh.position.y = FLOOR + size / 2 + bottom;
+					mesh.position.z = - 99;
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = 1;
 					mesh.doubleSided = true;
 					mesh.updateMatrix();

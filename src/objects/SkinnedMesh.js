@@ -2,14 +2,6 @@
  * @author mikael emtinger / http://gomo.se/
  */
 
-// do not crash if somebody includes the file in oldie browser
-
-if ( !window.Float32Array ) {
-
-	window.Float32Array = Array;
-
-}
-
 THREE.SkinnedMesh = function( geometry, materials ) {
 
 	THREE.Mesh.call( this, geometry, materials );

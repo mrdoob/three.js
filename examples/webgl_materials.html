@@ -88,9 +88,9 @@
 
 				// Spheres geometry
 
-				var geometry_smooth = new Sphere( 70, 32, 16 );
-				var geometry_flat = new Sphere( 70, 32, 16 );
-				var geometry_pieces = new Sphere( 70, 32, 16 ); // Extra geometry to be broken down for MeshFaceMaterial
+				var geometry_smooth = new THREE.Sphere( 70, 32, 16 );
+				var geometry_flat = new THREE.Sphere( 70, 32, 16 );
+				var geometry_pieces = new THREE.Sphere( 70, 32, 16 ); // Extra geometry to be broken down for MeshFaceMaterial
 
 				for ( var i = 0, l = geometry_pieces.faces.length; i < l; i ++ ) {
 
@@ -127,7 +127,7 @@
 
 				}
 
-				particleLight = new THREE.Mesh( new Sphere( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
+				particleLight = new THREE.Mesh( new THREE.Sphere( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
 				scene.addObject( particleLight );
 
 				// Lights

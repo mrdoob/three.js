@@ -20,7 +20,7 @@
  *  constrainVertical: <bool>,
  *  verticalMin: <float>,
  *  verticalMax: <float>,
- 
+
  *  heightSpeed: <bool>,
  *  heightCoef: <float>,
  *  heightMin: <float>,
@@ -50,7 +50,7 @@ THREE.QuakeCamera = function ( parameters ) {
 	this.constrainVertical = false;
 	this.verticalMin = 0;
 	this.verticalMax = 3.14;
-	
+
 	this.domElement = document;
 
 	if ( parameters ) {
@@ -68,7 +68,7 @@ THREE.QuakeCamera = function ( parameters ) {
 		if ( parameters.heightCoef !== undefined ) this.heightCoef = parameters.heightCoef;
 		if ( parameters.heightMin !== undefined ) this.heightMin = parameters.heightMin;
 		if ( parameters.heightMax !== undefined ) this.heightMax = parameters.heightMax;
-		
+
 		if ( parameters.constrainVertical !== undefined ) this.constrainVertical = parameters.constrainVertical;
 		if ( parameters.verticalMin !== undefined ) this.verticalMin = parameters.verticalMin;
 		if ( parameters.verticalMax !== undefined ) this.verticalMax = parameters.verticalMax;
@@ -160,7 +160,7 @@ THREE.QuakeCamera = function ( parameters ) {
 
 			case 39: /*right*/
 			case 68: /*D*/ this.moveRight = true; break;
-			
+
 			case 81: this.freeze = !this.freeze; break;
 
 		}
@@ -190,44 +190,44 @@ THREE.QuakeCamera = function ( parameters ) {
 	this.update = function() {
 
 		if ( !this.freeze ) {
-			
+
 
 			if ( this.heightSpeed ) {
-	
+
 				var y = clamp( this.position.y, this.heightMin, this.heightMax ),
 					delta = y - this.heightMin;
-	
+
 				this.autoSpeedFactor = delta * this.heightCoef;
-	
+
 			} else {
-	
+
 				this.autoSpeedFactor = 0.0;
-	
+
 			}
-	
+
 			if ( this.moveForward || this.autoForward ) this.translateZ( - ( this.movementSpeed + this.autoSpeedFactor ) );
 			if ( this.moveBackward ) this.translateZ( this.movementSpeed );
 			if ( this.moveLeft ) this.translateX( - this.movementSpeed );
 			if ( this.moveRight ) this.translateX( this.movementSpeed );
-	
+
 			var actualLookSpeed = this.lookSpeed;
-	
+
 			if ( !this.activeLook ) {
-	
+
 				actualLookSpeed = 0;
-	
+
 			}
-	
+
 			this.lon += this.mouseX * actualLookSpeed;
 			if( this.lookVertical ) this.lat -= this.mouseY * actualLookSpeed;
-	
+
 			this.lat = Math.max( - 85, Math.min( 85, this.lat ) );
 			this.phi = ( 90 - this.lat ) * Math.PI / 180;
 			this.theta = this.lon * Math.PI / 180;
-	
+
 			var targetPosition = this.target.position,
 				position = this.position;
-	
+
 			targetPosition.x = position.x + 100 * Math.sin( this.phi ) * Math.cos( this.theta );
 			targetPosition.y = position.y + 100 * Math.cos( this.phi );
 			targetPosition.z = position.z + 100 * Math.sin( this.phi ) * Math.sin( this.theta );
@@ -243,9 +243,9 @@ THREE.QuakeCamera = function ( parameters ) {
 		if ( this.constrainVertical ) {
 
 			this.phi = map_linear( this.phi, 0, 3.14, this.verticalMin, this.verticalMax );
-			
+
 		}
-		
+
 		var targetPosition = this.target.position,
 			position = this.position;
 
@@ -277,11 +277,11 @@ THREE.QuakeCamera = function ( parameters ) {
 	};
 
 	function map_linear( x, sa, sb, ea, eb ) {
-		
+
 		return ( x  - sa ) * ( eb - ea ) / ( sb - sa ) + ea;
-		
+
 	};
-	
+
 	function clamp_bottom( x, a ) {
 
 		return x < a ? a : x;

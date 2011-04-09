@@ -88,7 +88,7 @@
 				scene.addLight( pointLight );
 
 				// light representation
-				sphere = new Sphere( 100, 16, 8 );
+				sphere = new THREE.Sphere( 100, 16, 8 );
 				lightMesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color:0xffaa00 } ) );
 				lightMesh.position = pointLight.position;
 				lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
@@ -102,15 +102,13 @@
 							 r + "py.jpg", r + "ny.jpg", 
 							 r + "pz.jpg", r + "nz.jpg" ];
 
-				var textureCube = ImageUtils.loadTextureCube( urls, new THREE.CubeRefractionMapping() );
+				var textureCube = THREE.ImageUtils.loadTextureCube( urls, new THREE.CubeRefractionMapping() );
 
 				var cubeMaterial3 = new THREE.MeshBasicMaterial( { color: 0xccddff, envMap: textureCube, refractionRatio: 0.98, reflectivity:0.9 } );
 				var cubeMaterial2 = new THREE.MeshBasicMaterial( { color: 0xccfffd, envMap: textureCube, refractionRatio: 0.985 } );
 				var cubeMaterial1 = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube, refractionRatio: 0.98 } )
 
-				//SceneUtils.addPanoramaCubePlanes( sceneCube, 100000, images );
-				//SceneUtils.addPanoramaCube( sceneCube, 100000, images );
-				SceneUtils.addPanoramaCubeWebGL( sceneCube, 100000, textureCube );
+				THREE.SceneUtils.addPanoramaCubeWebGL( sceneCube, 100000, textureCube );
 
 				webglRenderer = new THREE.WebGLRenderer();
 				webglRenderer.setSize( window.innerWidth, window.innerHeight );
@@ -136,9 +134,9 @@
 
 				var s = 1.5, z = -1000;
 
-				SceneUtils.addMesh( scene, geometry, s,      0, 0, z, 0,0,0, m1 );
-				SceneUtils.addMesh( scene, geometry, s,   -900, 0, z, 0,0,0, m2 );
-				SceneUtils.addMesh( scene, geometry, s,    900, 0, z, 0,0,0, m3 );
+				THREE.SceneUtils.addMesh( scene, geometry, s,      0, 0, z, 0,0,0, m1 );
+				THREE.SceneUtils.addMesh( scene, geometry, s,   -900, 0, z, 0,0,0, m2 );
+				THREE.SceneUtils.addMesh( scene, geometry, s,    900, 0, z, 0,0,0, m3 );
 
 				loader.statusDomElement.style.display = "none";
 

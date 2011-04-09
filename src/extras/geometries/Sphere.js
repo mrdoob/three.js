@@ -3,7 +3,7 @@
  * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Sphere.as
  */
 
-var Sphere = function ( radius, segmentsWidth, segmentsHeight ) {
+THREE.Sphere = function ( radius, segmentsWidth, segmentsHeight ) {
 
 	THREE.Geometry.call( this );
 
@@ -111,5 +111,5 @@ var Sphere = function ( radius, segmentsWidth, segmentsHeight ) {
 
 };
 
-Sphere.prototype = new THREE.Geometry();
-Sphere.prototype.constructor = Sphere;
+THREE.Sphere.prototype = new THREE.Geometry();
+THREE.Sphere.prototype.constructor = THREE.Sphere;

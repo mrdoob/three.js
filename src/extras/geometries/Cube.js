@@ -3,10 +3,10 @@
  * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Cube.as
  */
 
-var Cube = function ( width, height, depth, segmentsWidth, segmentsHeight, segmentsDepth, materials, flipped, sides ) {
+THREE.Cube = function ( width, height, depth, segmentsWidth, segmentsHeight, segmentsDepth, materials, flipped, sides ) {
 
 	THREE.Geometry.call( this );
-	
+
 	var scope = this,
 	width_half = width / 2,
 	height_half = height / 2,
@@ -106,7 +106,7 @@ var Cube = function ( width, height, depth, segmentsWidth, segmentsHeight, segme
 			}
 
 		}
-		
+
 		for( iy = 0; iy < gridY; iy++ ) {
 
 			for( ix = 0; ix < gridX; ix++ ) {
@@ -182,5 +182,5 @@ var Cube = function ( width, height, depth, segmentsWidth, segmentsHeight, segme
 
 };
 
-Cube.prototype = new THREE.Geometry();
-Cube.prototype.constructor = Cube;
+THREE.Cube.prototype = new THREE.Geometry();
+THREE.Cube.prototype.constructor = THREE.Cube;

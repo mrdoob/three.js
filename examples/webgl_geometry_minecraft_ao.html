@@ -70,9 +70,7 @@
 
 			var camera, scene, renderer;
 
-			var mesh;
-			
-			var mat;
+			var mesh, mat;
 
 			var worldWidth = 128, worldDepth = 128,
 			worldHalfWidth = worldWidth / 2, worldHalfDepth = worldDepth / 2,
@@ -85,9 +83,13 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.QuakeCamera( { fov: 60, aspect: window.innerWidth / window.innerHeight, near: 1, far: 20000,
-												  constrainVertical: true, verticalMin: 1.1, verticalMax: 2.2,
-												  movementSpeed: 15, lookSpeed: 0.005, noFly: false, lookVertical: true } );
+				camera = new THREE.QuakeCamera( {
+
+					fov: 60, aspect: window.innerWidth / window.innerHeight, near: 1, far: 20000,
+					constrainVertical: true, verticalMin: 1.1, verticalMax: 2.2,
+					movementSpeed: 15, lookSpeed: 0.005, noFly: false, lookVertical: true
+
+				} );
 
 				camera.target.position.z = - 100;
 
@@ -369,11 +371,11 @@
 
 						sides = { px: px, nx: nx, py: true, ny: false, pz: pz, nz: nz };
 
-						cube = new Cube( 100, 100, 100, 1, 1, 1, materials, false, sides );
+						cube = new THREE.Cube( 100, 100, 100, 1, 1, 1, materials, false, sides );
 
 						// set UV tiles
 
-						for ( i = 0; i < cube.faceVertexUvs[ 0 ].length; i++ ) {
+						for ( i = 0; i < cube.faceVertexUvs[ 0 ].length; i ++ ) {
 
 							uv = cube.faceVertexUvs[ 0 ][ i ];
 

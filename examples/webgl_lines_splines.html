@@ -158,8 +158,8 @@
 				rtTexture2 = new THREE.WebGLRenderTarget( 512, 512, pars );
 				rtTexture3 = new THREE.WebGLRenderTarget( 512, 512, pars );
 
-				var screen_shader = ShaderUtils.lib["screen"];
-				var screen_uniforms = Uniforms.clone( screen_shader.uniforms );
+				var screen_shader = THREE.ShaderUtils.lib["screen"];
+				var screen_uniforms = THREE.UniformsUtils.clone( screen_shader.uniforms );
 
 				screen_uniforms["tDiffuse"].texture = rtTexture1;
 				screen_uniforms["opacity"].value = 1.0;
@@ -173,15 +173,15 @@
 
 				} );
 
-				var convolution_shader = ShaderUtils.lib["convolution"];
-				var convolution_uniforms = Uniforms.clone( convolution_shader.uniforms );
+				var convolution_shader = THREE.ShaderUtils.lib["convolution"];
+				var convolution_uniforms = THREE.UniformsUtils.clone( convolution_shader.uniforms );
 
 				blurx = new THREE.Vector2( 0.001953125, 0.0 ),
 				blury = new THREE.Vector2( 0.0, 0.001953125 );
 
 				convolution_uniforms["tDiffuse"].texture = rtTexture1;
 				convolution_uniforms["uImageIncrement"].value = blurx;
-				convolution_uniforms["cKernel"].value = ShaderUtils.buildKernel( 4.0 );
+				convolution_uniforms["cKernel"].value = THREE.ShaderUtils.buildKernel( 4.0 );
 
 				materialConvolution = new THREE.MeshShaderMaterial( {
 
@@ -191,7 +191,7 @@
 
 				} );
 
-				var plane = new Plane( window.innerWidth, window.innerHeight );
+				var plane = new THREE.Plane( window.innerWidth, window.innerHeight );
 
 				quadScreen = new THREE.Mesh( plane, materialConvolution );
 				quadScreen.position.z = -100;

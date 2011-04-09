@@ -71,8 +71,8 @@
 				light.position.normalize();
 				scene.addLight( light );
 
-				var shadowMaterial = new THREE.MeshBasicMaterial( { map: ImageUtils.loadTexture( 'textures/shadow.png' ) } );
-				var shadowGeo = new Plane( 300, 300, 1, 1 );
+				var shadowMaterial = new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/shadow.png' ) } );
+				var shadowGeo = new THREE.Plane( 300, 300, 1, 1 );
 
 				mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
 				mesh.position.y = - 250;
@@ -92,44 +92,44 @@
 				scene.addObject( mesh );
 
 				var faceIndices = [ 'a', 'b', 'c', 'd' ];
-				
+
 				var color, f, f2, f3, p, n, vertexIndex,
 
-					geometry  = new Icosahedron( 1 ),
-					geometry2 = new Icosahedron( 1 ),
-					geometry3 = new Icosahedron( 1 );
+					geometry  = new THREE.Icosahedron( 1 ),
+					geometry2 = new THREE.Icosahedron( 1 ),
+					geometry3 = new THREE.Icosahedron( 1 );
 
-				for( var i = 0; i < geometry.faces.length; i++ ) {
-				
+				for ( var i = 0; i < geometry.faces.length; i++ ) {
+
 					f  = geometry.faces[ i ];
 					f2 = geometry2.faces[ i ];
 					f3 = geometry3.faces[ i ];
-					
+
 					n = ( f instanceof THREE.Face3 ) ? 3 : 4;
-					
+
 					for( var j = 0; j < n; j++ ) {
-					
+
 						vertexIndex = f[ faceIndices[ j ] ];
-						
+
 						p = geometry.vertices[ vertexIndex ].position;
 
 						color = new THREE.Color( 0xffffff );
 						color.setHSV( ( p.y + 1 ) / 2, 1.0, 1.0 );
-						
+
 						f.vertexColors[ j ] = color;
 
 						color = new THREE.Color( 0xffffff );
 						color.setHSV( 0.0, ( p.y + 1 ) / 2, 1.0 );
-						
+
 						f2.vertexColors[ j ] = color;
 
 						color = new THREE.Color( 0xffffff );
 						color.setHSV( 0.125 * vertexIndex/geometry.vertices.length, 1.0, 1.0 );
-						
+
 						f3.vertexColors[ j ] = color;
 
 					}
-					
+
 				}
 
 

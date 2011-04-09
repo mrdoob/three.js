@@ -74,7 +74,6 @@
 		<script type="text/javascript" src="../src/materials/ParticleCanvasMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/ParticleDOMMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/Texture.js"></script>
-		<script type="text/javascript" src="../src/materials/Uniforms.js"></script>
 		<script type="text/javascript" src="../src/objects/Particle.js"></script>
 		<script type="text/javascript" src="../src/objects/ParticleSystem.js"></script>
 		<script type="text/javascript" src="../src/objects/Line.js"></script>
@@ -153,11 +152,11 @@
 				scene = new THREE.Scene();
 				scene.fog = new THREE.Fog( 0xffffff, 1, 10000 );
 
-				var geometry = new Sphere( 50, 32, 16 );
+				var geometry = new THREE.Sphere( 50, 32, 16 );
 
-				var uniforms = ShaderUtils.lib[ 'basic' ].uniforms;
-				var vertexShader = ShaderUtils.lib[ 'basic' ].vertexShader;
-				var fragmentShader = ShaderUtils.lib[ 'basic' ].fragmentShader;
+				var uniforms = THREE.ShaderUtils.lib[ 'basic' ].uniforms;
+				var vertexShader = THREE.ShaderUtils.lib[ 'basic' ].vertexShader;
+				var fragmentShader = THREE.ShaderUtils.lib[ 'basic' ].fragmentShader;
 
 				var texture = new THREE.Texture( generateTexture( 0, 0.5, 1 ), new THREE.UVMapping() );
 				var texture2 = new THREE.Texture( generateTexture( 0, 1, 0 ), new THREE.SphericalReflectionMapping() );
@@ -168,8 +167,8 @@
 					new THREE.MeshDepthMaterial(),
 					new THREE.MeshBasicMaterial( { color: 0x0066ff, blending: THREE.AdditiveBlending } ),
 					new THREE.MeshBasicMaterial( { map: texture, fog: false } ),
-					new THREE.MeshBasicMaterial( { map: ImageUtils.loadTexture( 'textures/land_ocean_ice_cloud_2048.jpg' ) } ),
-					new THREE.MeshBasicMaterial( { map: texture2, envMap: ImageUtils.loadTexture( 'textures/envmap.png', new THREE.SphericalReflectionMapping() ) } ),
+					new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/land_ocean_ice_cloud_2048.jpg' ) } ),
+					new THREE.MeshBasicMaterial( { map: texture2, envMap: THREE.ImageUtils.loadTexture( 'textures/envmap.png', new THREE.SphericalReflectionMapping() ) } ),
 					new THREE.MeshShaderMaterial( { uniforms: uniforms, vertexShader: vertexShader, fragmentShader: fragmentShader } )
 
 					/*

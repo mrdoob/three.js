@@ -38,7 +38,6 @@
 
 		<script type="text/javascript" src="js/Detector.js"></script>
 		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
 
@@ -77,7 +76,7 @@
 				scene = new THREE.Scene();
 				sceneCube = new THREE.Scene();
 
-				var geometry = new Sphere( 100, 32, 16 );
+				var geometry = new THREE.Sphere( 100, 32, 16 );
 
 				var path = "textures/cube/skybox/";
 				var format = '.jpg';
@@ -87,7 +86,7 @@
 					path + 'pz' + format, path + 'nz' + format
 				];
 
-				var textureCube = ImageUtils.loadTextureCube( urls, new THREE.CubeRefractionMapping() );
+				var textureCube = THREE.ImageUtils.loadTextureCube( urls, new THREE.CubeRefractionMapping() );
 				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube, refractionRatio: 0.95 } );
 
 				for ( var i = 0; i < 500; i ++ ) {
@@ -96,16 +95,16 @@
 					mesh.position.x = Math.random() * 10000 - 5000;
 					mesh.position.y = Math.random() * 10000 - 5000;
 					mesh.position.z = Math.random() * 10000 - 5000;
-					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 2 + 1;
+					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 3 + 1;
 					scene.addObject( mesh );
 
 					spheres.push( mesh );
 
 				}
 
-				SceneUtils.addPanoramaCubeWebGL( sceneCube, 100000, textureCube );
+				THREE.SceneUtils.addPanoramaCubeWebGL( sceneCube, 100000, textureCube );
 
-				webglRenderer = new THREE.WebGLRenderer( { antialias: false } );
+				webglRenderer = new THREE.WebGLRenderer();
 				webglRenderer.setSize( window.innerWidth, window.innerHeight );
 				webglRenderer.autoClear = false;
 				container.appendChild( webglRenderer.domElement );

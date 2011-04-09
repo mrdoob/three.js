@@ -2,18 +2,18 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.SceneLoader = function ( ) {
+THREE.SceneLoader = function () {
 };
 
 THREE.SceneLoader.prototype = {
 
-	load : function( url, callback_sync, callback_async, callback_progress ) {
+	load : function ( url, callback_sync, callback_async, callback_progress ) {
 
 		var worker = new Worker( url );
 		worker.postMessage( 0 );
 
 		var urlBase = THREE.Loader.prototype.extractUrlbase( url );
-		
+
 		worker.onmessage = function( event ) {
 
 			var dg, dm, dd, dl, dc, df, dt,
@@ -66,21 +66,21 @@ THREE.SceneLoader.prototype = {
 					result.scene.updateMatrix();
 
 			}
-			
+
 			function get_url( source_url, url_type ) {
-				
+
 				if ( url_type == "relativeToHTML" ) {
-					
+
 					return source_url;
-					
+
 				} else {
-					
+
 					return urlBase + "/" + source_url;
 
 				}
 
 			};
-			
+
 			function handle_objects() {
 
 				for( dd in data.objects ) {
@@ -144,7 +144,7 @@ THREE.SceneLoader.prototype = {
 							}
 
 						}
-						
+
 
 					}
 
@@ -232,14 +232,14 @@ THREE.SceneLoader.prototype = {
 			// lights
 
 			var hex, intensity;
-			
-			for( dl in data.lights ) {
+
+			for ( dl in data.lights ) {
 
 				l = data.lights[ dl ];
 
 				hex = ( l.color !== undefined ) ? l.color : 0xffffff;
 				intensity = ( l.intensity !== undefined ) ? l.intensity : 1;
-				
+
 				if ( l.type == "directional" ) {
 
 					p = l.direction;
@@ -325,39 +325,39 @@ THREE.SceneLoader.prototype = {
 			}
 
 			total_models = counter_models;
-			
-			for( dg in data.geometries ) {
+
+			for ( dg in data.geometries ) {
 
 				g = data.geometries[ dg ];
 
 				if ( g.type == "cube" ) {
 
-					geometry = new Cube( g.width, g.height, g.depth, g.segmentsWidth, g.segmentsHeight, g.segmentsDepth, null, g.flipped, g.sides );
+					geometry = new THREE.Cube( g.width, g.height, g.depth, g.segmentsWidth, g.segmentsHeight, g.segmentsDepth, null, g.flipped, g.sides );
 					result.geometries[ dg ] = geometry;
 
 				} else if ( g.type == "plane" ) {
 
-					geometry = new Plane( g.width, g.height, g.segmentsWidth, g.segmentsHeight );
+					geometry = new THREE.Plane( g.width, g.height, g.segmentsWidth, g.segmentsHeight );
 					result.geometries[ dg ] = geometry;
 
 				} else if ( g.type == "sphere" ) {
 
-					geometry = new Sphere( g.radius, g.segmentsWidth, g.segmentsHeight );
+					geometry = new THREE.Sphere( g.radius, g.segmentsWidth, g.segmentsHeight );
 					result.geometries[ dg ] = geometry;
 
 				} else if ( g.type == "cylinder" ) {
 
-					geometry = new Cylinder( g.numSegs, g.topRad, g.botRad, g.height, g.topOffset, g.botOffset );
+					geometry = new THREE.Cylinder( g.numSegs, g.topRad, g.botRad, g.height, g.topOffset, g.botOffset );
 					result.geometries[ dg ] = geometry;
 
 				} else if ( g.type == "torus" ) {
 
-					geometry = new Torus( g.radius, g.tube, g.segmentsR, g.segmentsT );
+					geometry = new THREE.Torus( g.radius, g.tube, g.segmentsR, g.segmentsT );
 					result.geometries[ dg ] = geometry;
 
 				} else if ( g.type == "icosahedron" ) {
 
-					geometry = new Icosahedron( g.subdivisions );
+					geometry = new THREE.Icosahedron( g.subdivisions );
 					result.geometries[ dg ] = geometry;
 
 				} else if ( g.type == "bin_mesh" ) {
@@ -407,22 +407,22 @@ THREE.SceneLoader.prototype = {
 					tt.mapping = new THREE[ tt.mapping ]();
 
 				}
-				
+
 				if( tt.url instanceof Array ) {
-				
+
 					var url_array = [];
-					
+
 					for( var i = 0; i < tt.url.length; i ++ ) {
-					
+
 						url_array[ i ] = get_url( tt.url[ i ], data.urlBaseType );
-						
+
 					}
-					
-					texture = ImageUtils.loadTextureCube( url_array, tt.mapping, callback_texture );
+
+					texture = THREE.ImageUtils.loadTextureCube( url_array, tt.mapping, callback_texture );
 
 				} else {
-					
-					texture = ImageUtils.loadTexture( get_url( tt.url, data.urlBaseType ), tt.mapping, callback_texture );
+
+					texture = THREE.ImageUtils.loadTexture( get_url( tt.url, data.urlBaseType ), tt.mapping, callback_texture );
 
 					if ( THREE[ tt.minFilter ] != undefined )
 						texture.minFilter = THREE[ tt.minFilter ];
@@ -438,11 +438,11 @@ THREE.SceneLoader.prototype = {
 
 			// materials
 
-			for( dm in data.materials ) {
+			for ( dm in data.materials ) {
 
 				m = data.materials[ dm ];
 
-				for( pp in m.parameters ) {
+				for ( pp in m.parameters ) {
 
 					if ( pp == "envMap" || pp == "map" || pp == "lightMap" ) {
 

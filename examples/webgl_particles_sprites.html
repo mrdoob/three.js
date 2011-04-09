@@ -69,13 +69,13 @@
 
 				geometry = new THREE.Geometry();
 
-				sprite1 = ImageUtils.loadTexture( "textures/sprites/snowflake1.png" );
-				sprite2 = ImageUtils.loadTexture( "textures/sprites/snowflake2.png" );
-				sprite3 = ImageUtils.loadTexture( "textures/sprites/snowflake3.png" );
-				sprite4 = ImageUtils.loadTexture( "textures/sprites/snowflake4.png" );
-				sprite5 = ImageUtils.loadTexture( "textures/sprites/snowflake5.png" );
+				sprite1 = THREE.ImageUtils.loadTexture( "textures/sprites/snowflake1.png" );
+				sprite2 = THREE.ImageUtils.loadTexture( "textures/sprites/snowflake2.png" );
+				sprite3 = THREE.ImageUtils.loadTexture( "textures/sprites/snowflake3.png" );
+				sprite4 = THREE.ImageUtils.loadTexture( "textures/sprites/snowflake4.png" );
+				sprite5 = THREE.ImageUtils.loadTexture( "textures/sprites/snowflake5.png" );
 
-				for ( i = 0; i < 2000; i++ ) {
+				for ( i = 0; i < 2000; i ++ ) {
 
 					vector = new THREE.Vector3( Math.random() * 2000 - 1000, Math.random() * 2000 - 1000, Math.random() * 2000 - 1000 );
 					geometry.vertices.push( new THREE.Vertex( vector ) );
@@ -102,7 +102,7 @@
 
 				}
 
-				renderer = new THREE.WebGLRenderer( { antialias: false, clearAlpha: 1 });
+				renderer = new THREE.WebGLRenderer( { clearAlpha: 1 });
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 

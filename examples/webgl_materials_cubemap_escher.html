@@ -79,15 +79,15 @@
 							 r + "py.jpg", r + "ny.jpg", 
 							 r + "pz.jpg", r + "nz.jpg" ];
 
-				var textureCube = ImageUtils.loadTextureCube( urls );
+				var textureCube = THREE.ImageUtils.loadTextureCube( urls );
 				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube } )
-				var geometry = new Sphere( 100, 96, 64 );
+				var geometry = new THREE.Sphere( 100, 96, 64 );
 
 				var mesh = new THREE.Mesh( geometry, material );
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 16;
 				scene.addObject( mesh );
 
-				SceneUtils.addPanoramaCubeWebGL( scene, 6000, textureCube );
+				THREE.SceneUtils.addPanoramaCubeWebGL( scene, 6000, textureCube );
 
 				webglRenderer = new THREE.WebGLRenderer();
 				webglRenderer.setSize( window.innerWidth, window.innerHeight );

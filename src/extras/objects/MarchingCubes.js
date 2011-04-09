@@ -7,39 +7,31 @@
 
 // do not crash if somebody includes the file in oldie browser
 
-if ( !window.Int32Array ) {
-  
-	window.Int32Array = Array;
-	window.Float32Array = Array;
-
-}
-
-
 THREE.MarchingCubes = function ( resolution, materials ) {
 
 	THREE.Object3D.call( this );
 
-	this.materials = materials instanceof Array ? materials : [ materials ];	
+	this.materials = materials instanceof Array ? materials : [ materials ];
 
 	// functions have to be object properties
 	// prototype functions kill performance
 	// (tested and it was 4x slower !!!)
-	
+
 	this.init = function( resolution ) {
-	
+
 		// parameters
-		
+
 		this.isolation = 80.0;
-		
+
 		// size of field, 32 is pushing it in Javascript :)
-		
+
 		this.size = resolution;
 		this.size2 = this.size * this.size;
 		this.size3 = this.size2 * this.size;
 		this.halfsize = this.size / 2.0;
-		
+
 		// deltas
-		
+
 		this.delta = 2.0 / this.size;
 		this.yd = this.size;
 		this.zd = this.size2;
@@ -48,98 +40,98 @@ THREE.MarchingCubes = function ( resolution, materials ) {
 		this.normal_cache = new Float32Array( this.size3 * 3 );
 
 		// temp buffers used in polygonize
-		
+
 		this.vlist = new Float32Array( 12 * 3 );
 		this.nlist = new Float32Array( 12 * 3 );
-		
+
 		this.firstDraw = true;
-		
+
 		// immediate render mode simulator
-		
+
 		this.maxCount = 4096; // TODO: find the fastest size for this buffer
 		this.count = 0;
 		this.hasPos = false;
 		this.hasNormal = false;
-		
+
 		this.positionArray = new Float32Array( this.maxCount * 3 );
 		this.normalArray   = new Float32Array( this.maxCount * 3 );		
-		
+
 	};
 
 	///////////////////////
 	// Polygonization
 	///////////////////////
-	
+
 	this.lerp = function( a, b, t ) { return a + ( b - a ) * t; };
 
 	this.VIntX = function( q, pout, nout, offset, isol, x, y, z, valp1, valp2 ) {
 
 		var mu = ( isol - valp1 ) / ( valp2 - valp1 ),
 		nc = this.normal_cache;
-		
+
 		pout[ offset ] 	   = x + mu * this.delta;
 		pout[ offset + 1 ] = y;
 		pout[ offset + 2 ] = z;
-		
+
 		nout[ offset ] 	   = this.lerp( nc[ q ],     nc[ q + 3 ], mu );
 		nout[ offset + 1 ] = this.lerp( nc[ q + 1 ], nc[ q + 4 ], mu );
 		nout[ offset + 2 ] = this.lerp( nc[ q + 2 ], nc[ q + 5 ], mu );
-		
+
 	};
 
 	this.VIntY = function( q, pout, nout, offset, isol, x, y, z, valp1, valp2 ) {
-		
+
 		var mu = ( isol - valp1 ) / ( valp2 - valp1 ),
 		nc = this.normal_cache;
-		
+
 		pout[ offset ] 	   = x;
 		pout[ offset + 1 ] = y + mu * this.delta;
 		pout[ offset + 2 ] = z;
-		
+
 		var q2 = q + this.yd * 3;
 
 		nout[ offset ] 	   = this.lerp( nc[ q ],     nc[ q2 ],     mu );
 		nout[ offset + 1 ] = this.lerp( nc[ q + 1 ], nc[ q2 + 1 ], mu );
 		nout[ offset + 2 ] = this.lerp( nc[ q + 2 ], nc[ q2 + 2 ], mu );
-		
+
 	};
 
 	this.VIntZ = function( q, pout, nout, offset, isol, x, y, z, valp1, valp2 ) {
-		
+
 		var mu = ( isol - valp1 ) / ( valp2 - valp1 ),
 		nc = this.normal_cache;
-		
+
 		pout[ offset ] 	   = x;
 		pout[ offset + 1 ] = y;
 		pout[ offset + 2 ] = z + mu * this.delta;
-		
+
 		var q2 = q + this.zd * 3;
-		
+
 		nout[ offset ] 	   = this.lerp( nc[ q ],     nc[ q2 ],     mu );
 		nout[ offset + 1 ] = this.lerp( nc[ q + 1 ], nc[ q2 + 1 ], mu );
 		nout[ offset + 2 ] = this.lerp( nc[ q + 2 ], nc[ q2 + 2 ], mu );
-		
+
 	};
 
 	this.compNorm = function( q ) {
 
 		var q3 = q * 3;
-		
+
 		if ( this.normal_cache [ q3 ] == 0.0 ) {
-			
+
 			this.normal_cache[ q3     ] = this.field[ q - 1  ] 	    - this.field[ q + 1 ];
 			this.normal_cache[ q3 + 1 ] = this.field[ q - this.yd ] - this.field[ q + this.yd ];
 			this.normal_cache[ q3 + 2 ] = this.field[ q - this.zd ] - this.field[ q + this.zd ];
-			
+
 		}
-		
-	};	
-	
+
+	};
+
 	// Returns total number of triangles. Fills triangles.
 	// (this is where most of time is spent - it's inner work of O(n3) loop )
-	
+
 	this.polygonize = function( fx, fy, fz, q, isol, render_callback ) {
-		
+
 		// cache indices
 		var q1 = q + 1,
 			qy = q + this.yd,
@@ -158,7 +150,6 @@ THREE.MarchingCubes = function ( resolution, materials ) {
 			field5 = this.field[ q1z ],
 			field6 = this.field[ qyz ],
 			field7 = this.field[ q1yz ];
-		
 
 		if ( field0 < isol ) cubeindex |= 1;
 		if ( field1 < isol ) cubeindex |= 2;
@@ -170,7 +161,7 @@ THREE.MarchingCubes = function ( resolution, materials ) {
 		if ( field7 < isol ) cubeindex |= 64;
 
 		// if cube is entirely in/out of the surface - bail, nothing to draw
-		
+
 		var bits = THREE.edgeTable[ cubeindex ];
 		if ( bits == 0 ) return 0;
 
@@ -178,121 +169,121 @@ THREE.MarchingCubes = function ( resolution, materials ) {
 			fx2 = fx + d, 
 			fy2 = fy + d, 
 			fz2 = fz + d;
-		
+
 		// top of the cube
-		
+
 		if ( bits & 1 ) { 
-			
-			this.compNorm( q );      
-			this.compNorm( q1 );       
+
+			this.compNorm( q );
+			this.compNorm( q1 );
 			this.VIntX( q * 3, this.vlist, this.nlist, 0, isol, fx, fy, fz, field0, field1 );
-			
+
 		};
-		
+
 		if ( bits & 2 ) { 
-			
+
 			this.compNorm( q1 );  
 			this.compNorm( q1y );  
 			this.VIntY( q1 * 3, this.vlist, this.nlist, 3, isol, fx2, fy, fz, field1, field3 );
-			
+
 		};
-		
+
 		if ( bits & 4 ) { 
-			
+
 			this.compNorm( qy ); 
 			this.compNorm( q1y );  
 			this.VIntX( qy * 3, this.vlist, this.nlist, 6, isol, fx, fy2, fz, field2, field3 ); 
-			
+
 		};
-		
+
 		if ( bits & 8 ) { 
-			
-			this.compNorm( q );      
-			this.compNorm( qy );      
+
+			this.compNorm( q );
+			this.compNorm( qy );
 			this.VIntY( q * 3, this.vlist, this.nlist, 9, isol, fx, fy, fz, field0, field2 );
-			
+
 		};
 
 		// bottom of the cube
-			
+
 		if ( bits & 16 )  { 
-			
-			this.compNorm( qz );      
-			this.compNorm( q1z );      
+
+			this.compNorm( qz );
+			this.compNorm( q1z );
 			this.VIntX( qz * 3, this.vlist, this.nlist, 12, isol, fx, fy, fz2, field4, field5 ); 
-			
+
 		};
-		
+
 		if ( bits & 32 )  { 
-			
+
 			this.compNorm( q1z );  
 			this.compNorm( q1yz ); 
 			this.VIntY( q1z * 3,  this.vlist, this.nlist, 15, isol, fx2, fy, fz2, field5, field7 ); 
-			
+
 		};
-		
-		if ( bits & 64 )  { 
-			
-			this.compNorm( qyz ); 
-			this.compNorm( q1yz ); 
+
+		if ( bits & 64 ) {
+
+			this.compNorm( qyz );
+			this.compNorm( q1yz );
 			this.VIntX( qyz * 3, this.vlist, this.nlist, 18, isol, fx, fy2, fz2, field6, field7 ); 
-			
+
 		};
-		
-		if ( bits & 128 ) { 
-			
-			this.compNorm( qz );      
-			this.compNorm( qyz );     
+
+		if ( bits & 128 ) {
+
+			this.compNorm( qz );
+			this.compNorm( qyz );
 			this.VIntY( qz * 3,  this.vlist, this.nlist, 21, isol, fx, fy, fz2, field4, field6 ); 
-			
+
 		};
-			
+
 		// vertical lines of the cube
-			
-		if ( bits & 256 )  { 
-			
-			this.compNorm( q );          
-			this.compNorm( qz );          
+
+		if ( bits & 256 ) {
+
+			this.compNorm( q );
+			this.compNorm( qz );
 			this.VIntZ( q * 3, this.vlist, this.nlist, 24, isol, fx, fy, fz, field0, field4 );
-			
+
 		};
-		
-		if ( bits & 512 )  { 
-			
-			this.compNorm( q1 );      
-			this.compNorm( q1z );      
+
+		if ( bits & 512 ) {
+
+			this.compNorm( q1 );
+			this.compNorm( q1z );
 			this.VIntZ( q1 * 3,  this.vlist, this.nlist, 27, isol, fx2, fy,  fz, field1, field5 ); 
-			
+
 		};
-		
-		if ( bits & 1024 ) { 
-			
-			this.compNorm( q1y ); 
-			this.compNorm( q1yz ); 
+
+		if ( bits & 1024 ) {
+
+			this.compNorm( q1y );
+			this.compNorm( q1yz );
 			this.VIntZ( q1y * 3, this.vlist, this.nlist, 30, isol, fx2, fy2, fz, field3, field7 ); 
-			
+
 		};
-		
+
 		if ( bits & 2048 ) { 
-			
-			this.compNorm( qy );     
-			this.compNorm( qyz );     
+
+			this.compNorm( qy );
+			this.compNorm( qyz );
 			this.VIntZ( qy * 3, this.vlist, this.nlist, 33, isol, fx,  fy2, fz, field2, field6 ); 
-			
+
 		};
 
 		cubeindex <<= 4;  // re-purpose cubeindex into an offset into triTable
-		
+
 		var o1, o2, o3, numtris = 0, i = 0;
-			
+
 		// here is where triangles are created
 
 		while ( THREE.triTable[ cubeindex + i ] != -1 ) {
-	  
+
 			o1 = cubeindex + i;
 			o2 = o1 + 1;
 			o3 = o1 + 2;
-			
+
 			this.posnormtriv( this.vlist, this.nlist,
 							  3 * THREE.triTable[ o1 ],
 							  3 * THREE.triTable[ o2 ],
@@ -301,248 +292,251 @@ THREE.MarchingCubes = function ( resolution, materials ) {
 
 			i += 3;
 			numtris ++;
-		
+
 		}
 
 		return numtris;
-		
+
 	};
 
 	/////////////////////////////////////
 	// Immediate render mode simulator
 	/////////////////////////////////////
-	
+
 	this.posnormtriv = function( pos, norm, o1, o2, o3, render_callback ) {
-		
+
 		var c = this.count * 3;
-		
-		this.positionArray[ c ] 	= pos[ o1 ];
+
+		this.positionArray[ c ] = pos[ o1 ];
 		this.positionArray[ c + 1 ] = pos[ o1 + 1 ];
 		this.positionArray[ c + 2 ] = pos[ o1 + 2 ];
-		  
+
 		this.positionArray[ c + 3 ] = pos[ o2 ];
 		this.positionArray[ c + 4 ] = pos[ o2 + 1 ];
 		this.positionArray[ c + 5 ] = pos[ o2 + 2 ];
-		  
+
 		this.positionArray[ c + 6 ] = pos[ o3 ];
 		this.positionArray[ c + 7 ] = pos[ o3 + 1 ];
 		this.positionArray[ c + 8 ] = pos[ o3 + 2 ];
-		  
-		this.normalArray[ c ] 	  = norm[ o1 ]; 
+
+		this.normalArray[ c ] = norm[ o1 ]; 
 		this.normalArray[ c + 1 ] = norm[ o1 + 1 ];
 		this.normalArray[ c + 2 ] = norm[ o1 + 2 ];
-		  
+
 		this.normalArray[ c + 3 ] = norm[ o2 ]; 
 		this.normalArray[ c + 4 ] = norm[ o2 + 1 ];
 		this.normalArray[ c + 5 ] = norm[ o2 + 2 ];
-		  
+
 		this.normalArray[ c + 6 ] = norm[ o3 ]; 
 		this.normalArray[ c + 7 ] = norm[ o3 + 1 ];
 		this.normalArray[ c + 8 ] = norm[ o3 + 2 ];
-		
+
 		this.hasPos = true;
 		this.hasNormal = true;
-		
+
 		this.count += 3;
-		
+
 		if ( this.count >= this.maxCount - 3 ) {
-		
+
 			render_callback( this );
-		
+
 		}
-		
+
 	};
 
 	this.begin = function( ) {
-		
+
 		this.count = 0;
 		this.hasPos = false;
 		this.hasNormal = false;
-	  
+
 	};
 
 	this.end = function( render_callback ) {
-		
+
 		if ( this.count == 0 )
 			return;
-		
+
 		for ( var i = this.count * 3; i < this.positionArray.length; i++ )
 			this.positionArray[ i ] = 0.0;
-		
+
 		render_callback( this );
-		
+
 	};
 
 	/////////////////////////////////////
 	// Metaballs
 	/////////////////////////////////////
-	
+
 	// Adds a reciprocal ball (nice and blobby) that, to be fast, fades to zero after
 	// a fixed distance, determined by strength and subtract.
 
 	this.addBall = function( ballx, bally, ballz, strength, subtract ) {
-		
+
 		// Let's solve the equation to find the radius:
 		// 1.0 / (0.000001 + radius^2) * strength - subtract = 0
 		// strength / (radius^2) = subtract
 		// strength = subtract * radius^2
 		// radius^2 = strength / subtract
 		// radius = sqrt(strength / subtract)
-		
+
 		var radius = this.size * Math.sqrt( strength / subtract ),
 			zs = ballz * this.size,
 			ys = bally * this.size,
 			xs = ballx * this.size;
-		
+
 		var min_z = Math.floor( zs - radius ); if ( min_z < 1 ) min_z = 1;
 		var max_z = Math.floor( zs + radius ); if ( max_z > this.size - 1 ) max_z = this.size - 1;
 		var min_y = Math.floor( ys - radius ); if ( min_y < 1 ) min_y = 1;
 		var max_y = Math.floor( ys + radius ); if ( max_y > this.size - 1 ) max_y = this.size - 1;
 		var min_x = Math.floor( xs - radius ); if ( min_x < 1  ) min_x = 1;
 		var max_x = Math.floor( xs + radius ); if ( max_x > this.size - 1 ) max_x = this.size - 1;
-		
+
 
 		// Don't polygonize in the outer layer because normals aren't
 		// well-defined there.
 
 		var x, y, z, y_offset, z_offset, fx, fy, fz, fz2, fy2, val;
-		
+
 		for ( z = min_z; z < max_z; z++ ) {
-	  
+
 			z_offset = this.size2 * z,
 			fz = z / this.size - ballz,
 			fz2 = fz * fz;
-			
+
 			for ( y = min_y; y < max_y; y++ ) {
-			
+
 				y_offset = z_offset + this.size * y;
 				fy = y / this.size - bally;
 				fy2 = fy * fy;
-				
+
 				for ( x = min_x; x < max_x; x++ ) {
-					
+
 					fx = x / this.size - ballx;
 					val = strength / ( 0.000001 + fx*fx + fy2 + fz2 ) - subtract;
 					if ( val > 0.0 ) this.field[ y_offset + x ] += val;
-					
+
 				}
-				
+
 			}
-			
+
 		}
-		
+
 	};
 
 	this.addPlaneX = function( strength, subtract ) {
-		
+
 		var x, y, z, xx, val, xdiv, cxy,
-			
+
 			// cache attribute lookups
 			size = this.size,
 			yd = this.yd,
 			zd = this.zd,
 			field = this.field,
-			
+
 			dist = size * Math.sqrt( strength / subtract );
-		
+
 		if ( dist > size ) dist = size;
-		
+
 		for ( x = 0; x < dist; x++ ) {
-			
+
 			xdiv = x / size;
 			xx = xdiv * xdiv;
 			val = strength / ( 0.0001 + xx ) - subtract;
-			
+
 			if ( val > 0.0 ) {
-				
+
 				for ( y = 0; y < size; y++ ) {
-					
+
 					cxy = x + y * yd;
-					
-					for ( z = 0; z < size; z++ )
+
+					for ( z = 0; z < size; z++ ) {
+
 						field[ zd * z + cxy ] += val;
-					
+
+					}
+
 				}
-				
+
 			}
-			
+
 		}
 
 	};
 
 	this.addPlaneY = function( strength, subtract ) {
-		
+
 		var x, y, z, yy, val, ydiv, cy, cxy,
-			
+
 			// cache attribute lookups
 			size = this.size,
 			yd = this.yd,
 			zd = this.zd,
 			field = this.field,
-			
+
 			dist = size * Math.sqrt( strength / subtract );
-		
+
 		if ( dist > size ) dist = size;
-		
+
 		for ( y = 0; y < dist; y++ ) {
-			
+
 			ydiv = y / size;
 			yy = ydiv * ydiv;
 			val = strength / ( 0.0001 + yy ) - subtract;
-			
+
 			if ( val > 0.0 ) {
-				
+
 				cy = y * yd;
-				
+
 				for ( x = 0; x < size; x++ ) {
-					
+
 					cxy = cy + x;
-					
+
 					for ( z = 0; z < size; z++ )
 						field[ zd * z + cxy ] += val;
-					
+
 				}
-				
+
 			}
-			
+
 		}
 
 	};
 
 	this.addPlaneZ = function( strength, subtract ) {
-		
+
 		var x, y, z, zz, val, zdiv, cz, cyz;
-		
+
 			// cache attribute lookups
 			size = this.size,
 			yd = this.yd,
 			zd = this.zd,
 			field = this.field,
-		
+
 			dist = size * Math.sqrt( strength / subtract );
-		
+
 		if ( dist > size ) dist = size;
-		
+
 		for ( z = 0; z < dist; z++ ) {
-		
+
 			zdiv = z / size;
 			zz = zdiv * zdiv;
 			val = strength / ( 0.0001 + zz ) - subtract;
 			if ( val > 0.0 ) {
-		
+
 				cz = zd * z;
-				
+
 				for ( y = 0; y < size; y++ ) {
-						
+
 						cyz = cz + y * yd;
-					
-						for ( x = 0; x < size; x++ )					
+
+						for ( x = 0; x < size; x++ )
 							field[ cyz + x ] += val;
-					
+
 				}
-				
+
 			}
-			
+
 		}
 
 	};
@@ -552,71 +546,72 @@ THREE.MarchingCubes = function ( resolution, materials ) {
 	/////////////////////////////////////
 
 	this.reset = function() {
-		
+
 		var i;
-		
+
 		// wipe the normal cache
-		
+
 		for ( i = 0; i < this.size3; i++ ) {
-			
+
 			this.normal_cache[ i * 3 ] = 0.0;
 			this.field[ i ] = 0.0;
-			
-		}		
+
+		}
 
 	};
-	
-	this.render = function( render_callback ) {		
-		
+
+	this.render = function( render_callback ) {
+
 		this.begin();
-		
+
 		// Triangulate. Yeah, this is slow.
-		
+
 		var q, x, y, z, fx, fy, fz, y_offset, z_offset, smin2 = this.size - 2;
-		
+
 		for ( z = 1; z < smin2; z++ ) {
-			
+
 			z_offset = this.size2 * z;
 			fz = ( z - this.halfsize ) / this.halfsize; //+ 1
-			
+
 			for ( y = 1; y < smin2; y++ ) {
-			
+
 				y_offset = z_offset + this.size * y;
 				fy = ( y - this.halfsize ) / this.halfsize; //+ 1
-		
+
 				for ( x = 1; x < smin2; x++ ) {
-					
+
 					fx = ( x - this.halfsize ) / this.halfsize; //+ 1
 					q = y_offset + x;
-					
+
 					this.polygonize( fx, fy, fz, q, this.isolation, render_callback );
-				
+
 				}
-				
+
 			}
+
 		}
-		
+
 		this.end( render_callback );
-	
+
 	};
-	
+
 	this.generateGeometry = function() {
-		
+
 		var start = 0, geo = new THREE.Geometry();
 		var normals = [];
-		
+
 		var geo_callback = function( object ) {
-			
+
 			var i, x, y, z, vertex, position, normal, 
 				face, a, b, c, na, nb, nc;
-			
-			
-			for( i = 0; i < object.count; i++ ) {
-				
+
+
+			for ( i = 0; i < object.count; i++ ) {
+
 				a = i * 3;
 				b = a + 1;
 				c = a + 2;
-				
+
 				x = object.positionArray[ a ];
 				y = object.positionArray[ b ];
 				z = object.positionArray[ c ];
@@ -627,18 +622,18 @@ THREE.MarchingCubes = function ( resolution, materials ) {
 				z = object.normalArray[ c ];
 				normal = new THREE.Vector3( x, y, z );
 				normal.normalize();
-				
+
 				vertex = new THREE.Vertex( position );
-				
+
 				geo.vertices.push( vertex );
 				normals.push( normal );
-				
+
 			}
-			
+
 			nfaces = object.count / 3;
-			
-			for( i = 0; i < nfaces; i++ ) {
-				
+
+			for ( i = 0; i < nfaces; i++ ) {
+
 				a = ( start + i ) * 3;
 				b = a + 1;
 				c = a + 2;
@@ -646,26 +641,26 @@ THREE.MarchingCubes = function ( resolution, materials ) {
 				na = normals[ a ];
 				nb = normals[ b ];
 				nc = normals[ c ];
-				
+
 				face = new THREE.Face3( a, b, c, [ na, nb, nc ] );
-				
+
 				geo.faces.push( face );
-				
+
 			}
-			
+
 			start += nfaces;
 			object.count = 0;
-			
+
 		};
-		
+
 		this.render( geo_callback );
-		
+
 		// console.log( "generated " + geo.faces.length + " triangles" );
-		
+
 		return geo;
-		
+
 	};
-	
+
 	this.init( resolution );
 
 };

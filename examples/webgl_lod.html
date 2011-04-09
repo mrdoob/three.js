@@ -82,16 +82,20 @@
 				scene.addLight( light );
 
 				var material = [
-							new THREE.MeshLambertMaterial( { color: 0xffffff } ),
-							new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, wireframe: true } )
-						];
+
+					new THREE.MeshLambertMaterial( { color: 0xffffff } ),
+					new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, wireframe: true } )
+
+				];
 
 				var geometry = [
-							[ new Sphere( 100, 64, 32 ), 300 ],
-							[ new Sphere( 100, 32, 16 ), 1000 ],
-							[ new Sphere( 100, 16, 8 ), 2000 ],
-							[ new Sphere( 100, 8, 4 ), 10000 ]
-						  ];
+
+					[ new THREE.Sphere( 100, 64, 32 ), 300 ],
+					[ new THREE.Sphere( 100, 32, 16 ), 1000 ],
+					[ new THREE.Sphere( 100, 16, 8 ), 2000 ],
+					[ new THREE.Sphere( 100, 8, 4 ), 10000 ]
+
+				];
 
 				var i, j, mesh, lod;
 
@@ -117,7 +121,7 @@
 
 
 
-				renderer = new THREE.WebGLRenderer( { clearColor:0x000000, clearAlpha: 1 } );
+				renderer = new THREE.WebGLRenderer( { antialias: true, clearColor:0x000000, clearAlpha: 1 } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.sortObjects = false;
 				container.appendChild( renderer.domElement );

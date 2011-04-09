@@ -75,25 +75,29 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.QuakeCamera( { fov: 60, aspect: window.innerWidth / window.innerHeight, near: 1, far: 20000,
-												   movementSpeed: 15, lookSpeed: 0.005, noFly: false, lookVertical: true } );
+				camera = new THREE.QuakeCamera( {
+
+					fov: 60, aspect: window.innerWidth / window.innerHeight, near: 1, far: 20000,
+					movementSpeed: 15, lookSpeed: 0.005, noFly: false, lookVertical: true
+
+				} );
 
 				camera.target.position.z = - 100;
 
 				scene = new THREE.Scene();
 
 				var grass_dirt = loadTexture( 'textures/minecraft/grass_dirt.png' ),
-					grass 	   = loadTexture( 'textures/minecraft/grass.png' ),
-					dirt	   = loadTexture( 'textures/minecraft/dirt.png' );
+				grass = loadTexture( 'textures/minecraft/grass.png' ),
+				dirt = loadTexture( 'textures/minecraft/dirt.png' );
 
 				var materials = [
 
 					grass_dirt, // right
 					grass_dirt, // left
-					grass, 		// top
-					dirt, 		// bottom
+					grass, // top
+					dirt, // bottom
 					grass_dirt, // back
-					grass_dirt 	// front
+					grass_dirt  // front
 
 				];
 
@@ -101,11 +105,11 @@
 
 				for ( var i = 0; i < 16; i++ ) {
 
-					px = (i & 8) == 8;
-					nx = (i & 4) == 4;
-					pz = (i & 2) == 2;
-					nz = (i & 1) == 1;
-					cubes[ i ] = new Cube( 100, 100, 100, 1, 1, 1, materials, false, { px: px, nx: nx, py: true, ny: false, pz: pz, nz: nz } );
+					px = ( i & 8 ) == 8;
+					nx = ( i & 4 ) == 4;
+					pz = ( i & 2 ) == 2;
+					nz = ( i & 1 ) == 1;
+					cubes[ i ] = new THREE.Cube( 100, 100, 100, 1, 1, 1, materials, false, { px: px, nx: nx, py: true, ny: false, pz: pz, nz: nz } );
 
 				}
 

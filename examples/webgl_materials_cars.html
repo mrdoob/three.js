@@ -196,7 +196,7 @@
 				pointLight.position.z = 10000;
 				scene.addLight( pointLight );
 
-				SceneUtils.addPanoramaCubeWebGL( sceneCube, 100000, textureCube );
+				THREE.SceneUtils.addPanoramaCubeWebGL( sceneCube, 100000, textureCube );
 
 				webglRenderer = new THREE.WebGLRenderer();
 				webglRenderer.setSize( window.innerWidth, window.innerHeight );
@@ -221,7 +221,7 @@
 							 r + "posy.jpg", r + "negy.jpg",
 							 r + "posz.jpg", r + "negz.jpg" ];
 
-				var textureCube = ImageUtils.loadTextureCube( urls );
+				var textureCube = THREE.ImageUtils.loadTextureCube( urls );
 
 				// common materials
 
@@ -552,7 +552,7 @@
 
 				}
 
-				CARS[ car ].object = SceneUtils.addMesh( scene, geometry, s, 0, 0, 0, r[0], r[1], r[2], m );
+				CARS[ car ].object = THREE.SceneUtils.addMesh( scene, geometry, s, 0, 0, 0, r[0], r[1], r[2], m );
 
 				CARS[ car ].buttons = createButtons( materials.body, car );
 				attachButtonMaterials( materials.body, geometry, bm, car );

@@ -54,7 +54,7 @@
 		</div>
 
 		<script type="text/javascript" src="../build/Three.js"></script>
-		
+
 		<script type="text/javascript" src="js/Detector.js"></script>
 		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
@@ -116,7 +116,7 @@
 
 				// light representation
 
-				var sphere = new Sphere( 100, 16, 8 );
+				var sphere = new THREE.Sphere( 100, 16, 8 );
 				lightMesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color:0xffaa00 } ) );
 				lightMesh.position = pointLight.position;
 				lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
@@ -128,17 +128,17 @@
 
 				// normal map shader
 
-				var shader = ShaderUtils.lib[ "normal" ];
-				var uniforms = Uniforms.clone( shader.uniforms );
+				var shader = THREE.ShaderUtils.lib[ "normal" ];
+				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
 				uniforms[ "enableAO" ].value = true;
 				uniforms[ "enableDiffuse" ].value = false;
 
-				uniforms[ "tNormal" ].texture = ImageUtils.loadTexture( "textures/normal/ninja/normal.jpg" );
-				uniforms[ "tAO" ].texture = ImageUtils.loadTexture( "textures/normal/ninja/ao.jpg" );
+				uniforms[ "tNormal" ].texture = THREE.ImageUtils.loadTexture( "textures/normal/ninja/normal.jpg" );
+				uniforms[ "tAO" ].texture = THREE.ImageUtils.loadTexture( "textures/normal/ninja/ao.jpg" );
 
-				uniforms[ "tDisplacement" ].texture = ImageUtils.loadTexture( "textures/normal/ninja/displacement.jpg" );
-				uniforms[ "uDisplacementBias" ].value = -0.428408 * scale;
+				uniforms[ "tDisplacement" ].texture = THREE.ImageUtils.loadTexture( "textures/normal/ninja/displacement.jpg" );
+				uniforms[ "uDisplacementBias" ].value = - 0.428408 * scale;
 				uniforms[ "uDisplacementScale" ].value = 2.436143 * scale;
 
 				uniforms[ "uPointLightPos" ].value = pointLight.position;
@@ -188,9 +188,9 @@
 			function createScene( geometry, scale, material1, material2 ) {
 
 				geometry.computeTangents();
-				
-				mesh1 = SceneUtils.addMesh( scene, geometry, scale, -scale * 12, 0, 0, 0,0,0, material1 );
-				mesh2 = SceneUtils.addMesh( scene, geometry, scale,  scale * 12, 0, 0, 0,0,0, material2 );
+
+				mesh1 = THREE.SceneUtils.addMesh( scene, geometry, scale, -scale * 12, 0, 0, 0,0,0, material1 );
+				mesh2 = THREE.SceneUtils.addMesh( scene, geometry, scale,  scale * 12, 0, 0, 0,0,0, material2 );
 
 				loader.statusDomElement.style.display = "none";
 

@@ -5,7 +5,7 @@
 THREE.BinaryLoader = function ( showStatus ) {
 
 	THREE.Loader.call( this, showStatus );
-	
+
 };
 
 THREE.BinaryLoader.prototype = new THREE.Loader();
@@ -24,21 +24,21 @@ THREE.BinaryLoader.prototype = {
 	//		- texture_path (optional: if not specified, textures will be assumed to be in the same folder as JS model file)
 
 	load: function( parameters ) {
-	
+
 		// #1 load JS part via web worker
 
 		//  This isn't really necessary, JS part is tiny,
 		//  could be done by more ordinary means.
 
 		var url = parameters.model,
-			callback = parameters.callback, 
+			callback = parameters.callback,
 		    texture_path = parameters.texture_path ? parameters.texture_path : THREE.Loader.prototype.extractUrlbase( url ),
 			bin_path = parameters.bin_path ? parameters.bin_path : THREE.Loader.prototype.extractUrlbase( url ),
 
 			s = (new Date).getTime(),
 			worker = new Worker( url ),
 			callback_progress = this.showProgress ? THREE.Loader.prototype.updateProgress : null;
-		
+
 		worker.onmessage = function( event ) {
 
 			var materials = event.data.materials,
@@ -47,8 +47,8 @@ THREE.BinaryLoader.prototype = {
 			// #2 load BIN part via Ajax
 
 			//  For some reason it is faster doing loading from here than from within the worker.
-			//  Maybe passing of ginormous string as message between threads is costly? 
-			//  Also, worker loading huge data by Ajax still freezes browser. Go figure, 
+			//  Maybe passing of ginormous string as message between threads is costly?
+			//  Also, worker loading huge data by Ajax still freezes browser. Go figure,
 			//  worker with baked ascii JSON data keeps browser more responsive.
 
 			THREE.BinaryLoader.prototype.loadAjaxBuffers( buffers, materials, callback, bin_path, texture_path, callback_progress );
@@ -79,9 +79,9 @@ THREE.BinaryLoader.prototype = {
 			url = bin_path + "/" + buffers;
 
 		var length = 0;
-		
+
 		xhr.onreadystatechange = function() {
-			
+
 			if ( xhr.readyState == 4 ) {
 
 				if ( xhr.status == 200 || xhr.status == 0 ) {
@@ -93,27 +93,27 @@ THREE.BinaryLoader.prototype = {
 					alert( "Couldn't load [" + url + "] [" + xhr.status + "]" );
 
 				}
-						
+
 			} else if ( xhr.readyState == 3 ) {
-				
+
 				if ( callback_progress ) {
-				
+
 					if ( length == 0 ) {
-						
+
 						length = xhr.getResponseHeader( "Content-Length" );
-						
+
 					}
-					
+
 					callback_progress( { total: length, loaded: xhr.responseText.length } );
-					
+
 				}
-				
+
 			} else if ( xhr.readyState == 2 ) {
-				
+
 				length = xhr.getResponseHeader( "Content-Length" );
-				
+
 			}
-			
+
 		}
 
 		xhr.open("GET", url, true);
@@ -130,7 +130,7 @@ THREE.BinaryLoader.prototype = {
 			//var s = (new Date).getTime();
 
 			var scope = this,
-				currentOffset = 0, 
+				currentOffset = 0,
 				md,
 				normals = [],
 				uvs = [],
@@ -152,14 +152,14 @@ THREE.BinaryLoader.prototype = {
 			currentOffset += md.header_bytes;
 
 			// cache offsets
-			
-			tri_b   = md.vertex_index_bytes, 
-			tri_c   = md.vertex_index_bytes*2, 
+
+			tri_b   = md.vertex_index_bytes,
+			tri_c   = md.vertex_index_bytes*2,
 			tri_m   = md.vertex_index_bytes*3,
 			tri_na  = md.vertex_index_bytes*3 + md.material_index_bytes,
 			tri_nb  = md.vertex_index_bytes*3 + md.material_index_bytes + md.normal_index_bytes,
 			tri_nc  = md.vertex_index_bytes*3 + md.material_index_bytes + md.normal_index_bytes*2,
-		
+
 			quad_b  = md.vertex_index_bytes,
 			quad_c  = md.vertex_index_bytes*2,
 			quad_d  = md.vertex_index_bytes*3,
@@ -168,16 +168,16 @@ THREE.BinaryLoader.prototype = {
 			quad_nb = md.vertex_index_bytes*4 + md.material_index_bytes + md.normal_index_bytes,
 			quad_nc = md.vertex_index_bytes*4 + md.material_index_bytes + md.normal_index_bytes*2,
 			quad_nd = md.vertex_index_bytes*4 + md.material_index_bytes + md.normal_index_bytes*3,
-		
+
 			tri_uvb = md.uv_index_bytes,
 			tri_uvc = md.uv_index_bytes * 2,
-		
+
 			quad_uvb = md.uv_index_bytes,
 			quad_uvc = md.uv_index_bytes * 2,
 			quad_uvd = md.uv_index_bytes * 3;
-			
+
 			// buffers sizes
-			
+
 			tri_size =  md.vertex_index_bytes * 3 + md.material_index_bytes;
 			quad_size = md.vertex_index_bytes * 4 + md.material_index_bytes;
 
@@ -190,18 +190,18 @@ THREE.BinaryLoader.prototype = {
 			len_quad_smooth    = md.nquad_smooth    * ( quad_size + md.normal_index_bytes * 4 );
 			len_quad_flat_uv   = md.nquad_flat_uv   * ( quad_size + md.uv_index_bytes * 4 );
 			len_quad_smooth_uv = md.nquad_smooth_uv * ( quad_size + md.normal_index_bytes * 4 + md.uv_index_bytes * 4 );
-			
+
 			// read buffers
-			
+
 			currentOffset += init_vertices( currentOffset );
 			currentOffset += init_normals( currentOffset );
 			currentOffset += init_uvs( currentOffset );
 
-			start_tri_flat 		= currentOffset; 
+			start_tri_flat 		= currentOffset;
 			start_tri_smooth    = start_tri_flat    + len_tri_flat;
 			start_tri_flat_uv   = start_tri_smooth  + len_tri_smooth;
 			start_tri_smooth_uv = start_tri_flat_uv + len_tri_flat_uv;
-			
+
 			start_quad_flat     = start_tri_smooth_uv + len_tri_smooth_uv;
 			start_quad_smooth   = start_quad_flat     + len_quad_flat;
 			start_quad_flat_uv  = start_quad_smooth   + len_quad_smooth;
@@ -209,7 +209,7 @@ THREE.BinaryLoader.prototype = {
 
 			// have to first process faces with uvs
 			// so that face and uv indices match
-			
+
 			init_triangles_flat_uv( start_tri_flat_uv );
 			init_triangles_smooth_uv( start_tri_smooth_uv );
 
@@ -217,7 +217,7 @@ THREE.BinaryLoader.prototype = {
 			init_quads_smooth_uv( start_quad_smooth_uv );
 
 			// now we can process untextured faces
-			
+
 			init_triangles_flat( start_tri_flat );
 			init_triangles_smooth( start_tri_smooth );
 
@@ -366,7 +366,7 @@ THREE.BinaryLoader.prototype = {
 
 			function init_vertices( start ) {
 
-				var i, x, y, z, 
+				var i, x, y, z,
 					stride = md.vertex_coordinate_bytes * 3,
 					end = start + md.nvertices * stride;
 
@@ -386,7 +386,7 @@ THREE.BinaryLoader.prototype = {
 
 			function init_normals( start ) {
 
-				var i, x, y, z, 
+				var i, x, y, z,
 					stride = md.normal_coordinate_bytes * 3,
 					end = start + md.nnormals * stride;
 
@@ -406,7 +406,7 @@ THREE.BinaryLoader.prototype = {
 
 			function init_uvs( start ) {
 
-				var i, u, v, 
+				var i, u, v,
 					stride = md.uv_coordinate_bytes * 2,
 					end = start + md.nuvs * stride;
 
@@ -418,11 +418,11 @@ THREE.BinaryLoader.prototype = {
 					uvs.push( u, v );
 
 				}
-				
+
 				return md.nuvs * stride;
 
-			}			
-			
+			}
+
 			function add_tri( i ) {
 
 				var a, b, c, m;
@@ -648,7 +648,7 @@ THREE.BinaryLoader.prototype = {
 
 			function init_quads_smooth_uv( start ) {
 
-				var i, offset = md.vertex_index_bytes * 4 + md.material_index_bytes + md.normal_index_bytes * 4, 
+				var i, offset = md.vertex_index_bytes * 4 + md.material_index_bytes + md.normal_index_bytes * 4,
 					stride =  offset + md.uv_index_bytes * 4,
 					end = start + md.nquad_smooth_uv * stride;
 
@@ -678,7 +678,7 @@ THREE.BinaryLoader.prototype = {
 		scope.vertices.push( new THREE.Vertex( new THREE.Vector3( x, y, z ) ) );
 
 	},
-	
+
 	f3: function( scope, a, b, c, mi ) {
 
 		var material = scope.materials[ mi ];
@@ -708,9 +708,9 @@ THREE.BinaryLoader.prototype = {
 			ncy = normals[ nc*3 + 1 ],
 			ncz = normals[ nc*3 + 2 ];
 
-		scope.faces.push( new THREE.Face3( a, b, c, 
-						  [new THREE.Vector3( nax, nay, naz ), 
-						   new THREE.Vector3( nbx, nby, nbz ), 
+		scope.faces.push( new THREE.Face3( a, b, c,
+						  [new THREE.Vector3( nax, nay, naz ),
+						   new THREE.Vector3( nbx, nby, nbz ),
 						   new THREE.Vector3( ncx, ncy, ncz )],
 						  null,
 						  material ) );
@@ -737,9 +737,9 @@ THREE.BinaryLoader.prototype = {
 			ndz = normals[ nd*3 + 2 ];
 
 		scope.faces.push( new THREE.Face4( a, b, c, d,
-						  [new THREE.Vector3( nax, nay, naz ), 
-						   new THREE.Vector3( nbx, nby, nbz ), 
-						   new THREE.Vector3( ncx, ncy, ncz ), 
+						  [new THREE.Vector3( nax, nay, naz ),
+						   new THREE.Vector3( nbx, nby, nbz ),
+						   new THREE.Vector3( ncx, ncy, ncz ),
 						   new THREE.Vector3( ndx, ndy, ndz )],
 						  null,
 						  material ) );
@@ -767,4 +767,4 @@ THREE.BinaryLoader.prototype = {
 
 	}
 
-};	
+};

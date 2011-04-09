@@ -93,7 +93,7 @@
 						path + 'pz' + format, path + 'nz' + format
 					];
 
-				var textureCube = ImageUtils.loadTextureCube( urls );
+				var textureCube = THREE.ImageUtils.loadTextureCube( urls );
 
 				parameters = { color: 0xff1100, envMap: textureCube, shading: THREE.FlatShading };
 				cubeMaterial = new THREE.MeshBasicMaterial( parameters );
@@ -102,12 +102,12 @@
 
 				if( singleMaterial ) zmaterial = [ cubeMaterial ];
 
-				//var geo = new Cube( 1, 1, 1 );
-				//var geo = new Icosahedron( 2 );
-				var geo = new Sphere( 1, 20, 10 );
+				//var geo = new THREE.Cube( 1, 1, 1 );
+				//var geo = new THREE.Icosahedron( 2 );
+				var geo = new THREE.Sphere( 1, 20, 10 );
 
 				var start = new Date().getTime();
-				
+
 				renderer.initMaterial( cubeMaterial, scene.lights, scene.fog );
 
 				var xgrid = 14,
@@ -155,7 +155,7 @@
 				}
 
 				//console.log("init time: ", new Date().getTime() - start );
-				
+
 				scene.matrixAutoUpdate = false;
 
 				initPostprocessing();
@@ -244,7 +244,7 @@
 
 				var bokeh_shader = ShaderExtras["bokeh"];
 
-				postprocessing.bokeh_uniforms = Uniforms.clone( bokeh_shader.uniforms );
+				postprocessing.bokeh_uniforms = THREE.UniformsUtils.clone( bokeh_shader.uniforms );
 
 				postprocessing.bokeh_uniforms["tColor"].texture = postprocessing.rtTextureColor;
 				postprocessing.bokeh_uniforms["tDepth"].texture = postprocessing.rtTextureDepth;
@@ -259,8 +259,8 @@
 
 				} );
 
-				postprocessing.quad = new THREE.Mesh( new Plane( window.innerWidth, window.innerHeight ), postprocessing.materialBokeh );
-				postprocessing.quad.position.z = -500;
+				postprocessing.quad = new THREE.Mesh( new THREE.Plane( window.innerWidth, window.innerHeight ), postprocessing.materialBokeh );
+				postprocessing.quad.position.z = - 500;
 				postprocessing.scene.addObject( postprocessing.quad );
 
 			}

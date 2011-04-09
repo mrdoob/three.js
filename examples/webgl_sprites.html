@@ -51,8 +51,8 @@
 
 				var amount = 200;
 				var radius = 500;
-				var mapA =  ImageUtils.loadTexture( "textures/sprite0.png" );
-				var mapB =  ImageUtils.loadTexture( "textures/sprite1.png" );
+				var mapA = THREE.ImageUtils.loadTexture( "textures/sprite0.png" );
+				var mapB = THREE.ImageUtils.loadTexture( "textures/sprite1.png" );
 
 				group = new THREE.Object3D();
 
@@ -98,7 +98,7 @@
 
 				// renderer
 
-				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer = new THREE.WebGLRenderer();
 				renderer.setClearColorHex( 0x000000, 1 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.sortObjects = true;

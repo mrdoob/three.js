@@ -513,6 +513,62 @@ THREE.ShaderChunk = {
 
 };
 
+THREE.UniformsUtils = {
+
+	merge: function ( uniforms ) {
+
+		var u, p, tmp, merged = {};
+
+		for ( u = 0; u < uniforms.length; u++ ) {
+
+			tmp = this.clone( uniforms[ u ] );
+
+			for ( p in tmp ) {
+
+				merged[ p ] = tmp[ p ];
+
+			}
+
+		}
+
+		return merged;
+
+	},
+
+	clone: function ( uniforms_src ) {
+
+		var u, p, parameter, parameter_src, uniforms_dst = {};
+
+		for ( u in uniforms_src ) {
+
+			uniforms_dst[ u ] = {};
+
+			for ( p in uniforms_src[ u ] ) {
+
+				parameter_src = uniforms_src[ u ][ p ];
+
+				if ( parameter_src instanceof THREE.Color ||
+					 parameter_src instanceof THREE.Vector3 ||
+					 parameter_src instanceof THREE.Texture ) {
+
+					uniforms_dst[ u ][ p ] = parameter_src.clone();
+
+				} else {
+
+					uniforms_dst[ u ][ p ] = parameter_src;
+
+				}
+
+			}
+
+		}
+
+		return uniforms_dst;
+
+	}
+
+};
+
 THREE.UniformsLib = {
 
 	common: {
@@ -997,8 +1053,7 @@ THREE.ShaderLib = {
 
 	'lambert': {
 
-		uniforms: Uniforms.merge( [ THREE.UniformsLib[ "common" ],
-									THREE.UniformsLib[ "lights" ] ] ),
+		uniforms: THREE.UniformsUtils.merge( [ THREE.UniformsLib[ "common" ], THREE.UniformsLib[ "lights" ] ] ),
 
 		fragmentShader: [
 
@@ -1064,15 +1119,17 @@ THREE.ShaderLib = {
 
 	'phong': {
 
-		uniforms: Uniforms.merge( [ THREE.UniformsLib[ "common" ],
-									THREE.UniformsLib[ "lights" ],
+		uniforms: THREE.UniformsUtils.merge( [
 
-									{ "ambient"  : { type: "c", value: new THREE.Color( 0x050505 ) },
-									  "specular" : { type: "c", value: new THREE.Color( 0x111111 ) },
-									  "shininess": { type: "f", value: 30 }
-									}
+			THREE.UniformsLib[ "common" ],
+			THREE.UniformsLib[ "lights" ],
+			{
+				"ambient"  : { type: "c", value: new THREE.Color( 0x050505 ) },
+				"specular" : { type: "c", value: new THREE.Color( 0x111111 ) },
+				"shininess": { type: "f", value: 30 }
+			}
 
-								] ),
+		] ),
 
 		fragmentShader: [
 

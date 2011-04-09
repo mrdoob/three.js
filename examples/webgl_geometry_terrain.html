@@ -67,8 +67,12 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.QuakeCamera( { fov: 60, aspect: window.innerWidth / window.innerHeight, near: 1, far: 20000,
-												  movementSpeed: 15, lookSpeed: 0.004, noFly: false, lookVertical: true } );
+				camera = new THREE.QuakeCamera( {
+
+					fov: 60, aspect: window.innerWidth / window.innerHeight, near: 1, far: 20000,
+					movementSpeed: 15, lookSpeed: 0.004, noFly: false, lookVertical: true
+
+				} );
 
 				camera.target.position.z = - 100;
 
@@ -79,7 +83,7 @@
 				camera.position.y = data[ worldHalfWidth + worldHalfDepth * worldWidth ] + 500;
 				camera.target.position.y = camera.position.y;
 
-				var geometry = new Plane( 7500, 7500, worldWidth - 1, worldDepth - 1 );
+				var geometry = new THREE.Plane( 7500, 7500, worldWidth - 1, worldDepth - 1 );
 
 				for ( var i = 0, l = geometry.vertices.length; i < l; i ++ ) {
 
@@ -89,7 +93,7 @@
 
 				texture = new THREE.Texture( generateTexture( data, worldWidth, worldDepth ), new THREE.UVMapping(), THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping );
 				texture.needsUpdate = true;
-				
+
 				mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { map: texture } ) );
 				mesh.rotation.x = - 90 * Math.PI / 180;
 				scene.addObject( mesh );

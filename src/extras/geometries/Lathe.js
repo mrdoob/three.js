@@ -2,7 +2,7 @@
  * @author astrodud / http://astrodud.isgreat.org/
  */
 
-function Lathe( points, steps, angle ) {
+THREE.Lathe = function ( points, steps, angle ) {
 
 	THREE.Geometry.call( this );
 
@@ -67,5 +67,5 @@ function Lathe( points, steps, angle ) {
 
 };
 
-Lathe.prototype = new THREE.Geometry();
-Lathe.prototype.constructor = Lathe;
+THREE.Lathe.prototype = new THREE.Geometry();
+THREE.Lathe.prototype.constructor = THREE.Lathe;

@@ -28,7 +28,7 @@
 
 			#oldie {
 				background:rgb(200,100,0) !important;
-				color:#fff;				
+				color:#fff;
 			}
 
 			#vt { display:none }
@@ -113,13 +113,13 @@
 
 				var ambient = 0x444444, diffuse = 0x888888, specular = 0x080810, shininess = 2;
 
-				var shader = ShaderUtils.lib[ "normal" ];
-				var uniforms = Uniforms.clone( shader.uniforms );
+				var shader = THREE.ShaderUtils.lib[ "normal" ];
+				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
  
-				uniforms[ "tNormal" ].texture = ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
+				uniforms[ "tNormal" ].texture = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
 				uniforms[ "uNormalScale" ].value = - 0.75;
 
-				uniforms[ "tDiffuse" ].texture = ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" );
+				uniforms[ "tDiffuse" ].texture = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" );
 
 				uniforms[ "enableAO" ].value = false;
 				uniforms[ "enableDiffuse" ].value = true;
@@ -168,7 +168,7 @@
 
 				geometry.computeTangents();
 
-				mesh1 = SceneUtils.addMesh( scene, geometry, scale, 0, - 50, 0, 0, 0, 0, material );
+				mesh1 = THREE.SceneUtils.addMesh( scene, geometry, scale, 0, - 50, 0, 0, 0, 0, material );
 
 				loader.statusDomElement.style.display = "none";
 

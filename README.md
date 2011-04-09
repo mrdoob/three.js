@@ -3,7 +3,7 @@ three.js
 
 #### Javascript 3D Engine ####
 
-The aim of this project is to create a lightweight 3D engine with a very low level of abstraction — in other words, for dummies. The engine can render using &lt;canvas&gt;, &lt;svg&gt; and WebGL.
+The aim of the project is to create a lightweight 3D engine with a very low level of complexity — in other words, for dummies. The engine can render using &lt;canvas&gt;, &lt;svg&gt; and WebGL.
 
 [Contributors](https://github.com/mrdoob/three.js/contributors) — [API Reference](https://github.com/mrdoob/three.js/wiki/API-Reference)
 

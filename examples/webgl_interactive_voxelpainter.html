@@ -61,7 +61,7 @@
 
 				// roll-over helpers
 
-				rollOverGeo = new Cube( 50, 50, 50 );
+				rollOverGeo = new THREE.Cube( 50, 50, 50 );
 				rollOverMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, transparent: true } );
 				rollOverMesh = new THREE.Mesh( rollOverGeo, rollOverMaterial );
 				scene.addObject( rollOverMesh );
@@ -69,8 +69,8 @@
 
 				// cubes
 
-				cubeGeo = new Cube( 50, 50, 50 );
-				cubeMaterial = new THREE.MeshLambertMaterial( { color: 0x00ff80, shading: THREE.FlatShading, map: ImageUtils.loadTexture( "textures/square-outline-textured.png" ) } );
+				cubeGeo = new THREE.Cube( 50, 50, 50 );
+				cubeMaterial = new THREE.MeshLambertMaterial( { color: 0x00ff80, shading: THREE.FlatShading, map: THREE.ImageUtils.loadTexture( "textures/square-outline-textured.png" ) } );
 				cubeMaterial.color.setHSV( 0.1, 0.7, 1.0 );
 				// picking
 
@@ -78,7 +78,7 @@
 
 				// grid
 
-				plane = new THREE.Mesh( new Plane( 1000, 1000, 20, 20 ), new THREE.MeshBasicMaterial( { color: 0x555555, wireframe: true } ) );
+				plane = new THREE.Mesh( new THREE.Plane( 1000, 1000, 20, 20 ), new THREE.MeshBasicMaterial( { color: 0x555555, wireframe: true } ) );
 				plane.rotation.x = - 90 * Math.PI / 180;
 				scene.addObject( plane );
 
@@ -107,7 +107,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				container.appendChild(renderer.domElement);
+				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';

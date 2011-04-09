@@ -4,7 +4,7 @@
  * @author fuzzthink
  */
 
-var Cylinder = function ( numSegs, topRad, botRad, height, topOffset, botOffset ) {
+THREE.Cylinder = function ( numSegs, topRad, botRad, height, topOffset, botOffset ) {
 
 	THREE.Geometry.call( this );
 
@@ -119,5 +119,5 @@ var Cylinder = function ( numSegs, topRad, botRad, height, topOffset, botOffset 
 
 };
 
-Cylinder.prototype = new THREE.Geometry();
-Cylinder.prototype.constructor = Cylinder;
+THREE.Cylinder.prototype = new THREE.Geometry();
+THREE.Cylinder.prototype.constructor = THREE.Cylinder;

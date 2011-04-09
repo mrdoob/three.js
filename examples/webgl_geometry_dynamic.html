@@ -70,8 +70,12 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.QuakeCamera( { fov: 60, aspect: window.innerWidth / window.innerHeight, near: 1, far: 20000,
-												  movementSpeed: 10, lookSpeed: 0.004, noFly: false, lookVertical: true } );
+				camera = new THREE.QuakeCamera( {
+
+					fov: 60, aspect: window.innerWidth / window.innerHeight, near: 1, far: 20000,
+					movementSpeed: 10, lookSpeed: 0.004, noFly: false, lookVertical: true
+
+				} );
 
 				camera.target.position.z = - 100;
 
@@ -85,7 +89,7 @@
 				camera.position.y = 200;
 				camera.target.position.y = camera.position.y;
 
-				geometry = new Plane( 20000, 20000, worldWidth - 1, worldDepth - 1 );
+				geometry = new THREE.Plane( 20000, 20000, worldWidth - 1, worldDepth - 1 );
 
 				var i, j, il, jl;
 
@@ -113,7 +117,7 @@
 				geometry.computeFaceNormals();
 				geometry.computeVertexNormals();
 
-				var texture = ImageUtils.loadTexture( "textures/water.jpg" );
+				var texture = THREE.ImageUtils.loadTexture( "textures/water.jpg" );
 				texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 				material = new THREE.MeshBasicMaterial( { color:0x0044ff, opacity:1, map: texture } );
 

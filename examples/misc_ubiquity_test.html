@@ -57,7 +57,6 @@
 		<script type="text/javascript" src="../src/materials/ParticleCanvasMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/ParticleDOMMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/Texture.js"></script>
-		<script type="text/javascript" src="../src/materials/Uniforms.js"></script>
 		<script type="text/javascript" src="../src/objects/Particle.js"></script>
 		<script type="text/javascript" src="../src/objects/ParticleSystem.js"></script>
 		<script type="text/javascript" src="../src/objects/Line.js"></script>
@@ -103,7 +102,7 @@
 		<script type="text/javascript" src="../src/extras/io/JSONLoader.js"></script>
 		<script type="text/javascript" src="../src/extras/io/BinaryLoader.js"></script>
 		<script type="text/javascript" src="../src/extras/objects/MarchingCubes.js"></script>
-		
+
 		<script type="text/javascript" src="obj/Qrcode.js"></script>
 
 		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
@@ -150,7 +149,7 @@
 
 				// CUBES
 
-				var cube = new Cube( 100, 100, 100 );
+				var cube = new THREE.Cube( 100, 100, 100 );
 
 				mesh = new THREE.Mesh( cube, new THREE.MeshBasicMaterial( { color: 0x0000ff, opacity: 0.5 } ) );
 				mesh.position.x = 500;
@@ -169,7 +168,7 @@
 
 				// PLANE
 
-				mesh = new THREE.Mesh( new Plane( 100, 100 ), new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } ) );
+				mesh = new THREE.Mesh( new THREE.Plane( 100, 100 ), new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } ) );
 				mesh.position.y = -500;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
 				mesh.doubleSided = true;
@@ -177,7 +176,7 @@
 
 				// CYLINDER
 
-				mesh = new THREE.Mesh( new Cylinder( 10, 20, 100, 200, - 50, - 20 ), new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } ) );
+				mesh = new THREE.Mesh( new THREE.Cylinder( 10, 20, 100, 200, - 50, - 20 ), new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } ) );
 				mesh.position.x = -500;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
 				scene.addObject( mesh );

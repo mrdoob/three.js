@@ -70,8 +70,8 @@
 
 			function init() {
 
-				container = document.createElement('div');
-				document.body.appendChild(container);
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
 
 				camera = new THREE.Camera( 50, window.innerWidth / window.innerHeight, 1, 5000 );
 				camera.position.z = 2000;
@@ -90,7 +90,7 @@
 				scene.addLight( pointLight );
 
 				// light representation
-				sphere = new Sphere( 100, 16, 8 );
+				sphere = new THREE.Sphere( 100, 16, 8 );
 				lightMesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color:0xffaa00 } ) );
 				lightMesh.position = pointLight.position;
 				lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
@@ -104,15 +104,15 @@
 						path + 'pz' + format, path + 'nz' + format
 					];
 
-				var reflectionCube = ImageUtils.loadTextureCube( urls );
+				var reflectionCube = THREE.ImageUtils.loadTextureCube( urls );
 				var refractionCube = new THREE.Texture( reflectionCube.image, new THREE.CubeRefractionMapping() );
-				
+
 				//var cubeMaterial3 = new THREE.MeshPhongMaterial( { color: 0x000000, specular:0xaa0000, envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.25 } );
 				var cubeMaterial3 = new THREE.MeshLambertMaterial( { color: 0xff6600, envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3 } );
 				var cubeMaterial2 = new THREE.MeshLambertMaterial( { color: 0xffee00, envMap: refractionCube, refractionRatio: 0.95 } );
 				var cubeMaterial1 = new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: reflectionCube } )
 
-				SceneUtils.addPanoramaCubeWebGL( sceneCube, 10, reflectionCube );
+				THREE.SceneUtils.addPanoramaCubeWebGL( sceneCube, 10, reflectionCube );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -137,9 +137,9 @@
 
 				var s = 15;
 
-				SceneUtils.addMesh( scene, geometry, s,      0, 0, -100, 0,0,0, m1 );
-				SceneUtils.addMesh( scene, geometry, s,   -900, 0, -100, 0,0,0, m2 );
-				SceneUtils.addMesh( scene, geometry, s,    900, 0, -100, 0,0,0, m3 );
+				THREE.SceneUtils.addMesh( scene, geometry, s,      0, 0, -100, 0,0,0, m1 );
+				THREE.SceneUtils.addMesh( scene, geometry, s,   -900, 0, -100, 0,0,0, m2 );
+				THREE.SceneUtils.addMesh( scene, geometry, s,    900, 0, -100, 0,0,0, m3 );
 
 				loader.statusDomElement.style.display = "none";
 

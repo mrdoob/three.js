@@ -26,7 +26,7 @@
 
 			#ctrl {
 				position: absolute;
-				top: 0px; 
+				top: 0px;
 				left: 0px;
 				width: 200px;
 				color: #ffffff;
@@ -59,7 +59,7 @@
 			<input type="range" value="0" min="0" max="100" onchange="mesh.morphTargetInfluences[ 6 ] = this.value/100;" />
 			<input type="range" value="0" min="0" max="100" onchange="mesh.morphTargetInfluences[ 7 ] = this.value/100;" />
 		</div>
-		
+
 
 		<script type="text/javascript" src="../build/Three.js"></script>
 
@@ -109,31 +109,31 @@
 				scene.addLight( light );
 
 
+				var geometry = new THREE.Cube( 100, 100, 100 );
 				var material = new THREE.MeshLambertMaterial( { color: 0xffffff, morphTargets: true } );
-				var geometry = new Cube( 100, 100, 100 );
 
 				// construct 8 blend shapes
-				
-				for( var i = 0; i < geometry.vertices.length; i++ ) {
-					
+
+				for ( var i = 0; i < geometry.vertices.length; i ++ ) {
+
 					var vertices = [];
-					
-					for( var v = 0; v < geometry.vertices.length; v++ ) {
-						
+
+					for ( var v = 0; v < geometry.vertices.length; v ++ ) {
+
 						vertices.push( new THREE.Vertex( geometry.vertices[ v ].position.clone() ) )
-						
-						if( v === i ) {
-							
-							vertices[ vertices.length -1 ].position.x *= 2;
-							vertices[ vertices.length -1 ].position.y *= 2;
-							vertices[ vertices.length -1 ].position.z *= 2;
-							
+
+						if ( v === i ) {
+
+							vertices[ vertices.length - 1 ].position.x *= 2;
+							vertices[ vertices.length - 1 ].position.y *= 2;
+							vertices[ vertices.length - 1 ].position.z *= 2;
+
 						}
-						
+
 					}
-					
+
 					geometry.morphTargets.push( { name: "target" + i, vertices: vertices } );
-					
+
 				}
 
 				mesh = new THREE.Mesh( geometry, material );
@@ -174,7 +174,7 @@
 				renderer.render( scene, camera );
 
 			}
-			
+
 			function log( text ) {
 
 				var e = document.getElementById("log");

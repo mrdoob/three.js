@@ -2,7 +2,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-var SceneUtils = {
+THREE.SceneUtils = {
 
 	addMesh : function ( scene, geometry, scale, x, y, z, rx, ry, rz, material ) {
 
@@ -22,15 +22,18 @@ var SceneUtils = {
 
 	addPanoramaCubeWebGL : function ( scene, size, textureCube ) {
 
-		var shader = ShaderUtils.lib["cube"];
+		var shader = THREE.ShaderUtils.lib["cube"];
 		shader.uniforms["tCube"].texture = textureCube;
 
-		var material = new THREE.MeshShaderMaterial( { fragmentShader: shader.fragmentShader,
-								   vertexShader: shader.vertexShader,
-								   uniforms: shader.uniforms
-								} ),
+		var material = new THREE.MeshShaderMaterial( {
 
-		mesh = new THREE.Mesh( new Cube( size, size, size, 1, 1, 1, null, true ), material );
+			fragmentShader: shader.fragmentShader,
+			vertexShader: shader.vertexShader,
+			uniforms: shader.uniforms
+
+		} ),
+
+		mesh = new THREE.Mesh( new THREE.Cube( size, size, size, 1, 1, 1, null, true ), material );
 		scene.addObject( mesh );
 
 		return mesh;
@@ -40,6 +43,7 @@ var SceneUtils = {
 	addPanoramaCube : function( scene, size, images ) {
 
 		var materials = [], mesh;
+
 		materials.push( new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[ 0 ] ) } ) );
 		materials.push( new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[ 1 ] ) } ) );
 		materials.push( new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[ 2 ] ) } ) );
@@ -47,7 +51,7 @@ var SceneUtils = {
 		materials.push( new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[ 4 ] ) } ) );
 		materials.push( new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[ 5 ] ) } ) );
 
-		mesh = new THREE.Mesh( new Cube( size, size, size, 1, 1, materials, true ), new THREE.MeshFaceMaterial() );
+		mesh = new THREE.Mesh( new THREE.Cube( size, size, size, 1, 1, materials, true ), new THREE.MeshFaceMaterial() );
 		scene.addObject( mesh );
 
 		return mesh;
@@ -57,36 +61,36 @@ var SceneUtils = {
 	addPanoramaCubePlanes : function ( scene, size, images ) {
 
 
-		var hsize = size / 2, plane = new Plane( size, size ), pi = Math.PI, pi2 = Math.PI / 2;
+		var hsize = size / 2, plane = new THREE.Plane( size, size ), pi = Math.PI, pi2 = Math.PI / 2;
 
-		SceneUtils.addMesh( scene, plane, 1,      0,     0,  -hsize,  0,      0,  0, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[5] ) } ) );
-		SceneUtils.addMesh( scene, plane, 1, -hsize,     0,       0,  0,    pi2,  0, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[0] ) } ) );
-		SceneUtils.addMesh( scene, plane, 1,  hsize,     0,       0,  0,   -pi2,  0, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[1] ) } ) );
-		SceneUtils.addMesh( scene, plane, 1,     0,  hsize,       0,  pi2,    0, pi, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[2] ) } ) );
-		SceneUtils.addMesh( scene, plane, 1,     0, -hsize,       0, -pi2,    0, pi, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[3] ) } ) );
+		THREE.SceneUtils.addMesh( scene, plane, 1,      0,     0,  -hsize,  0,      0,  0, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[5] ) } ) );
+		THREE.SceneUtils.addMesh( scene, plane, 1, -hsize,     0,       0,  0,    pi2,  0, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[0] ) } ) );
+		THREE.SceneUtils.addMesh( scene, plane, 1,  hsize,     0,       0,  0,   -pi2,  0, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[1] ) } ) );
+		THREE.SceneUtils.addMesh( scene, plane, 1,     0,  hsize,       0,  pi2,    0, pi, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[2] ) } ) );
+		THREE.SceneUtils.addMesh( scene, plane, 1,     0, -hsize,       0, -pi2,    0, pi, new THREE.MeshBasicMaterial( { map: new THREE.Texture( images[3] ) } ) );
 
 	},
-	
+
 	showHierarchy : function ( root, visible ) {
-		
-		SceneUtils.traverseHierarchy( root, function( node ) { node.visible = visible; } );
-		
+
+		THREE.SceneUtils.traverseHierarchy( root, function( node ) { node.visible = visible; } );
+
 	},
-	
+
 	traverseHierarchy : function ( root, callback ) {
-		
+
 		var n, i, l = root.children.length;
-		
-		for( i = 0; i < l; i++ ) {
-			
+
+		for ( i = 0; i < l; i ++ ) {
+
 			n = root.children[ i ];
-			
+
 			callback( n );
-			
+
 			SceneUtils.traverseHierarchy( n, callback );
-			
+
 		}
-		
+
 	}
 
 };

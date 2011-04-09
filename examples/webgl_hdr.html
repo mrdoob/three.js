@@ -127,7 +127,7 @@
 				directionalLight.position.normalize();
 				scene.addLight( directionalLight );
 
-				var texture = ImageUtils.loadTexture( "textures/memorial.png" );
+				var texture = THREE.ImageUtils.loadTexture( "textures/memorial.png" );
 				texture.minFilter = THREE.LinearFilter;
 				texture.magFilter = THREE.NearestFilter;
 
@@ -143,7 +143,7 @@
 
 				} );
 
-				var plane = new Plane( 512, 768 );
+				var plane = new THREE.Plane( 512, 768 );
 
 				quad = new THREE.Mesh( plane, materialHDR );
 				quad.position.z = -100;

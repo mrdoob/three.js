@@ -45,7 +45,7 @@
 		<pre id="log"></pre>
 
 		<script type="text/javascript" src="../build/Three.js"></script>
-		
+
 		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
@@ -55,12 +55,9 @@
 			var SCREEN_HEIGHT = window.innerHeight;
 			var FLOOR = -250;
 
-			var container;
-			var stats;
+			var container, stats;
 
-			var camera;
-			var scene;
-			var canvasRenderer, webglRenderer;
+			var camera, scene, canvasRenderer, webglRenderer;
 
 			var loader;
 
@@ -68,8 +65,7 @@
 
 			var directionalLight, pointLight;
 
-			var mouseX = 0;
-			var mouseY = 0;
+			var mouseX = 0, mouseY = 0;
 
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
@@ -135,7 +131,7 @@
 				scene.addLight( pointLight );
 
 				// light representation
-				sphere = new Sphere( 100, 16, 8, 1 );
+				sphere = new THREE.Sphere( 100, 16, 8, 1 );
 				lightMesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) );
 				lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
 				lightMesh.position = pointLight.position;

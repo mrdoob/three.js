@@ -63,12 +63,12 @@
 
 				scene = new THREE.Scene();
 
-				mesh = new THREE.Mesh( new Plane( 300, 300, 3, 3 ), new THREE.MeshBasicMaterial( { map: ImageUtils.loadTexture( 'textures/shadow.png' ) } ) );
+				mesh = new THREE.Mesh( new THREE.Plane( 300, 300, 3, 3 ), new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/shadow.png' ) } ) );
 				mesh.position.y = - 250;
 				mesh.rotation.x = - 90 * Math.PI / 180;
 				scene.addObject(mesh);
 
-				mesh = new THREE.Mesh( new Sphere( 200, 20, 20 ), new THREE.MeshBasicMaterial( { map: ImageUtils.loadTexture( 'textures/land_ocean_ice_cloud_2048.jpg' ) } ) );
+				mesh = new THREE.Mesh( new THREE.Sphere( 200, 20, 20 ), new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/land_ocean_ice_cloud_2048.jpg' ) } ) );
 				mesh.overdraw = true;
 				scene.addObject(mesh);
 

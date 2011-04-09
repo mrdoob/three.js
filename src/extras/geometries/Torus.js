@@ -3,7 +3,9 @@
  * based on http://code.google.com/p/away3d/source/browse/trunk/fp10/Away3DLite/src/away3dlite/primitives/Torus.as?r=2888
  */
 
-var Torus = function ( radius, tube, segmentsR, segmentsT ) {
+THREE.Torus = function ( radius, tube, segmentsR, segmentsT ) {
+
+	THREE.Geometry.call( this );
 
 	var scope = this;
 
@@ -13,8 +15,6 @@ var Torus = function ( radius, tube, segmentsR, segmentsT ) {
 	this.segmentsT = segmentsT || 6;
 
 	var temp_uv = [];
-	
-	THREE.Geometry.call( this );
 
 	for ( var j = 0; j <= this.segmentsR; ++j ) {
 
@@ -74,5 +74,5 @@ var Torus = function ( radius, tube, segmentsR, segmentsT ) {
 
 };
 
-Torus.prototype = new THREE.Geometry();
-Torus.prototype.constructor = Torus;
+THREE.Torus.prototype = new THREE.Geometry();
+THREE.Torus.prototype.constructor = THREE.Torus;
