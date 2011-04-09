@@ -81,9 +81,7 @@ COMMON_FILES = [
 'renderers/renderables/RenderableFace4.js',
 'renderers/renderables/RenderableObject.js',
 'renderers/renderables/RenderableParticle.js',
-'renderers/renderables/RenderableLine.js',
-'physics/Collisions.js',
-'physics/CollisionUtils.js'
+'renderers/renderables/RenderableLine.js'
 ]
 
 EXTRAS_FILES = [
@@ -105,7 +103,9 @@ EXTRAS_FILES = [
 'extras/io/JSONLoader.js',
 'extras/io/BinaryLoader.js',
 'extras/io/SceneLoader.js',
-'extras/objects/MarchingCubes.js'
+'extras/objects/MarchingCubes.js',
+'extras/physics/Collisions.js',
+'extras/physics/CollisionUtils.js'
 ]
 
 CANVAS_FILES = [

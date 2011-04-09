@@ -27,7 +27,7 @@ THREE.BoxCollider = function( min, max ) {
 };
 
 THREE.MeshCollider = function( vertices, faces, normals, box ) {
-	
+
 	this.vertices = vertices;
 	this.faces = faces;
 	this.normals = normals;
@@ -52,21 +52,21 @@ THREE.CollisionSystem.prototype.rayCastAll = function( ray ) {
 	this.hits.length = 0;
 
 	var i, l, d, collider,
-		ld = 0;	
-	
+		ld = 0;
+
 	for ( i = 0, l = this.colliders.length; i < l; i++ ) {
 
 		collider = this.colliders[ i ];
-		
-		d = this.rayCast( ray, collider );	
-		
+
+		d = this.rayCast( ray, collider );
+
 		if ( d < Number.MAX_VALUE ) {
 
 			collider.distance = d;
 
-			if ( d > ld ) 
+			if ( d > ld )
 				this.hits.push( collider );
-			else 
+			else
 				this.hits.unshift( collider );
 
 			ld = d;
@@ -82,9 +82,9 @@ THREE.CollisionSystem.prototype.rayCastAll = function( ray ) {
 THREE.CollisionSystem.prototype.rayCastNearest = function( ray ) {
 
 	var cs = this.rayCastAll( ray );
-	
+
 	if( cs.length == 0 ) return null;
-	
+
 	var i = 0;
 
 	while( cs[ i ] instanceof THREE.MeshCollider ) {
@@ -101,9 +101,9 @@ THREE.CollisionSystem.prototype.rayCastNearest = function( ray ) {
 		i++;
 
 	}
-	
+
 	if ( i > cs.length ) return null;
-	
+
 	return cs[ i ];
 
 };
@@ -129,14 +129,14 @@ THREE.CollisionSystem.prototype.rayMesh = function( r, me ) {
 	var rt = this.makeRayLocal( r, me.mesh );
 
 	var d = Number.MAX_VALUE;
-	
+
 	for( var i = 0; i < me.numFaces/3; i++ ) {
 
 		var t = i * 3;
-		
+
 		var p0 = me.vertices[ me.faces[ t + 0 ] ];
 		var p1 = me.vertices[ me.faces[ t + 1 ] ];
-		var p2 = me.vertices[ me.faces[ t + 2 ] ];	
+		var p2 = me.vertices[ me.faces[ t + 2 ] ];
 		var n = me.normals[ me.faces[ i ] ];
 
 		d = Math.min(d, this.rayTriangle( rt, p0, p1, p2, n, d ) );
@@ -148,27 +148,27 @@ THREE.CollisionSystem.prototype.rayMesh = function( r, me ) {
 };
 
 THREE.CollisionSystem.prototype.rayTriangle = function( ray, p0, p1, p2, n, mind ) {
-	
-	var e1 = THREE.CollisionSystem.__v1, 
+
+	var e1 = THREE.CollisionSystem.__v1,
 		e2 = THREE.CollisionSystem.__v2;
-	
+
 	// do not crash on quads, fail instead
 
 	//if ( !n ) n = THREE.CollisionSystem.__v3;
-	
+
 	e1.sub( p1, p0 );
 	e2.sub( p2, p1 );
 	n.cross( e1, e2 )
-	
+
 	var dot = n.dot( ray.direction );
 	if ( !( dot < 0 ) ) return Number.MAX_VALUE;
 
 	var d = n.dot( p0 );
 	var t = d - n.dot( ray.origin );
-	
+
 	if ( !( t <= 0 ) ) return Number.MAX_VALUE;
 	if ( !( t >= dot * mind ) ) return Number.MAX_VALUE;
-	
+
 	t = t / dot;
 
 	var p = THREE.CollisionSystem.__v3;
@@ -176,7 +176,7 @@ THREE.CollisionSystem.prototype.rayTriangle = function( ray, p0, p1, p2, n, mind
 	p.copy( ray.direction );
 	p.multiplyScalar( t );
 	p.addSelf( ray.origin );
-	
+
 	var u0, u1, u2, v0, v1, v2;
 
 	if ( Math.abs( n.x ) > Math.abs( n.y ) ) {
@@ -186,7 +186,7 @@ THREE.CollisionSystem.prototype.rayTriangle = function( ray, p0, p1, p2, n, mind
 			u0 = p.y  - p0.y;
 			u1 = p1.y - p0.y;
 			u2 = p2.y - p0.y;
-			
+
 			v0 = p.z  - p0.z;
 			v1 = p1.z - p0.z;
 			v2 = p2.z - p0.z;
@@ -196,7 +196,7 @@ THREE.CollisionSystem.prototype.rayTriangle = function( ray, p0, p1, p2, n, mind
 			u0 = p.x  - p0.x;
 			u1 = p1.x - p0.x;
 			u2 = p2.x - p0.x;
-			
+
 			v0 = p.y  - p0.y;
 			v1 = p1.y - p0.y;
 			v2 = p2.y - p0.y;
@@ -210,7 +210,7 @@ THREE.CollisionSystem.prototype.rayTriangle = function( ray, p0, p1, p2, n, mind
 			u0 = p.x  - p0.x;
 			u1 = p1.x - p0.x;
 			u2 = p2.x - p0.x;
-			
+
 			v0 = p.z  - p0.z;
 			v1 = p1.z - p0.z;
 			v2 = p2.z - p0.z;
@@ -220,7 +220,7 @@ THREE.CollisionSystem.prototype.rayTriangle = function( ray, p0, p1, p2, n, mind
 			u0 = p.x  - p0.x;
 			u1 = p1.x - p0.x;
 			u2 = p2.x - p0.x;
-			
+
 			v0 = p.y  - p0.y;
 			v1 = p1.y - p0.y;
 			v2 = p2.y - p0.y;
@@ -228,24 +228,24 @@ THREE.CollisionSystem.prototype.rayTriangle = function( ray, p0, p1, p2, n, mind
 		}
 
 	}
-	
-	var temp = u1 * v2 - v1 * u2;	
+
+	var temp = u1 * v2 - v1 * u2;
 	if( !(temp != 0) ) return Number.MAX_VALUE;
 	//console.log("temp: " + temp);
 	temp = 1 / temp;
-	
+
 	var alpha = ( u0 * v2 - v0 * u2 ) * temp;
 	if( !(alpha >= 0) ) return Number.MAX_VALUE;
 	//console.log("alpha: " + alpha);
-	
+
 	var beta = ( u1 * v0 - v1 * u0 ) * temp;
 	if( !(beta >= 0) ) return Number.MAX_VALUE;
 	//console.log("beta: " + beta);
-	
+
 	var gamma = 1 - alpha - beta;
 	if( !(gamma >= 0) ) return Number.MAX_VALUE;
 	//console.log("gamma: " + gamma);
-	
+
 	return t;
 
 };
@@ -266,7 +266,7 @@ THREE.CollisionSystem.prototype.makeRayLocal = function( ray, m ) {
 THREE.CollisionSystem.prototype.rayBox = function( r, ab ) {
 
 	var rt;
-	
+
 	if ( ab.dynamic && ab.mesh && ab.mesh.matrixWorld ) {
 
 		rt = this.makeRayLocal( r, ab.mesh );
@@ -280,7 +280,7 @@ THREE.CollisionSystem.prototype.rayBox = function( r, ab ) {
 	var xt = 0, yt = 0, zt = 0;
 	var xn = 0, yn = 0, zn = 0;
 	var ins = true;
-	
+
 	if( rt.origin.x < ab.min.x ) {
 
 		xt = ab.min.x - rt.origin.x;
@@ -298,7 +298,7 @@ THREE.CollisionSystem.prototype.rayBox = function( r, ab ) {
 		xn = 1;
 
 	}
-	
+
 	if( rt.origin.y < ab.min.y ) {
 
 		yt = ab.min.y - rt.origin.y;
@@ -316,7 +316,7 @@ THREE.CollisionSystem.prototype.rayBox = function( r, ab ) {
 		yn = 1;
 
 	}
-	
+
 	if( rt.origin.z < ab.min.z ) {
 
 		zt = ab.min.z - rt.origin.z;
@@ -346,14 +346,14 @@ THREE.CollisionSystem.prototype.rayBox = function( r, ab ) {
 		t = yt;
 
 	}
-	
+
 	if ( zt > t ) {
 
 		which = 2;
 		t = zt;
 
 	}
-	
+
 	switch( which ) {
 
 		case 0:
@@ -384,7 +384,7 @@ THREE.CollisionSystem.prototype.rayBox = function( r, ab ) {
 			break;
 
 	}
-	
+
 	return t;
 
 };
@@ -394,10 +394,10 @@ THREE.CollisionSystem.prototype.rayPlane = function( r, p ) {
 	var t = r.direction.dot( p.normal );
 	var d = p.point.dot( p.normal );
 	var ds;
-	
+
 	if( t < 0 ) ds = ( d - r.origin.dot( p.normal ) ) / t;
 	else return Number.MAX_VALUE;
-	
+
 	if( ds > 0 ) return ds;
 	else return Number.MAX_VALUE;
 
@@ -407,13 +407,13 @@ THREE.CollisionSystem.prototype.raySphere = function( r, s ) {
 
 	var e = s.center.clone().subSelf( r.origin );
 	if ( e.lengthSq < s.radiusSq ) return -1;
-	
+
 	var a = e.dot( r.direction.clone() );
 	if ( a <= 0 ) return Number.MAX_VALUE;
-	
+
 	var t = s.radiusSq - ( e.lengthSq() - a * a );
 	if ( t >= 0 ) return Math.abs( a ) - Math.sqrt( t );
-	
+
 	return Number.MAX_VALUE;
 
 };
@@ -421,11 +421,3 @@ THREE.CollisionSystem.prototype.raySphere = function( r, s ) {
 THREE.CollisionSystem.__v1 = new THREE.Vector3();
 THREE.CollisionSystem.__v2 = new THREE.Vector3();
 THREE.CollisionSystem.__v3 = new THREE.Vector3();
-
-
-
-
-
-
-
-
