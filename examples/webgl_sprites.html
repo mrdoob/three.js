@@ -20,13 +20,12 @@
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="text/javascript">
-			var statsEnabled = true;
 
 			var container, stats;
 
 			var camera, scene, renderer;
 
-			var nodeA, nodeA;
+			var group;
 			var time = 0;
 
 			var mouseX = 0, mouseY = 0;
@@ -55,7 +54,7 @@
 				var mapA =  ImageUtils.loadTexture( "textures/sprite0.png" );
 				var mapB =  ImageUtils.loadTexture( "textures/sprite1.png" );
 
-				nodeA = new THREE.Object3D();
+				group = new THREE.Object3D();
 
 				for( var a = 0; a < amount; a++ ) {
 
@@ -73,10 +72,10 @@
 					sprite.position.normalize();
 					sprite.position.multiplyScalar( radius );
 
-					nodeA.addChild( sprite );
+					group.addChild( sprite );
 				}
 
-				scene.addChild( nodeA );
+				scene.addChild( group );
 
 				// add 2d-sprites
 
@@ -99,22 +98,18 @@
 
 				// renderer
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.setClearColorHex( 0x000000, 1 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.sortObjects = true;
 
 				container.appendChild( renderer.domElement );
 
-				if ( statsEnabled ) {
-
-					stats = new Stats();
-					stats.domElement.style.position = 'absolute';
-					stats.domElement.style.top = '0px';
-					stats.domElement.style.zIndex = 100;
-					container.appendChild( stats.domElement );
-
-				}
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				stats.domElement.style.zIndex = 100;
+				container.appendChild( stats.domElement );
 
 			}
 
@@ -130,19 +125,19 @@
 
 			function render() {
 
-				for ( var c = 0; c < nodeA.children.length; c++ ) {
+				for ( var c = 0; c < group.children.length; c++ ) {
 
-					var sprite = nodeA.children[ c ];
+					var sprite = group.children[ c ];
 					var scale = Math.sin( time + sprite.position.x * 0.01 ) * 0.3 + 1.0;
 
-					sprite.rotation += 0.1 * ( c / nodeA.children.length );
+					sprite.rotation += 0.1 * ( c / group.children.length );
 					sprite.scale.set( scale, scale, 1.0 );
 					sprite.opacity = Math.sin( time + sprite.position.x * 0.01 ) * 0.4 + 0.6;
 				}
 
-				nodeA.rotation.x = time * 0.5;
-				nodeA.rotation.y = time * 0.75;
-				nodeA.rotation.z = time * 1.0;
+				group.rotation.x = time * 0.5;
+				group.rotation.y = time * 0.75;
+				group.rotation.z = time * 1.0;
 
 				time += 0.02;
 
