@@ -47,14 +47,13 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var statsEnabled = true;
-
-			var container, stats;
+			var container, timer;
 
 			var camera, scene, webglRenderer;
 			var cameraCube, sceneCube;
 
 			var mesh, zmesh, lightMesh, geometry;
+			var spheres = [];
 
 			var directionalLight, pointLight;
 
@@ -102,16 +101,16 @@
 				var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms };
 				var material = new THREE.MeshShaderMaterial( parameters );
 
-				for ( var i = 0; i < 200; i ++ ) {
+				for ( var i = 0; i < 500; i ++ ) {
 
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.position.x = Math.random() * 10000 - 5000;
 					mesh.position.y = Math.random() * 10000 - 5000;
 					mesh.position.z = Math.random() * 10000 - 5000;
-					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 4 + 1;
-					mesh.matrixAutoUpdate = false;
-					mesh.updateMatrix();
+					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 2 + 1;
 					scene.addObject( mesh );
+
+					spheres.push( mesh );
 
 				}
 
@@ -119,20 +118,10 @@
 
 				SceneUtils.addPanoramaCubeWebGL( sceneCube, 100000, textureCube );
 
-				webglRenderer = new THREE.WebGLRenderer();
+				webglRenderer = new THREE.WebGLRenderer( { antialias: false } );
 				webglRenderer.setSize( window.innerWidth, window.innerHeight );
 				webglRenderer.autoClear = false;
 				container.appendChild( webglRenderer.domElement );
-
-				if ( statsEnabled ) {
-
-					stats = new Stats();
-					stats.domElement.style.position = 'absolute';
-					stats.domElement.style.top = '0px';
-					stats.domElement.style.zIndex = 100;
-					container.appendChild( stats.domElement );
-
-				}
 
 			}
 
@@ -150,11 +139,12 @@
 				requestAnimationFrame( animate );
 
 				render();
-				if ( statsEnabled ) stats.update();
 
 			}
 
 			function render() {
+
+				timer = new Date().getTime() * 0.0001;
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
@@ -162,6 +152,15 @@
 				cameraCube.target.position.x = - camera.position.x;
 				cameraCube.target.position.y = - camera.position.y;
 				cameraCube.target.position.z = - camera.position.z;
+
+				for ( var i = 0, il = spheres.length; i < il; i ++ ) {
+
+					var sphere = spheres[ i ];
+
+					sphere.position.x = 5000 * Math.cos( timer + i );
+					sphere.position.y = 5000 * Math.sin( timer + i * 1.1 );
+
+				}
 
 				webglRenderer.clear();
 				webglRenderer.render( sceneCube, cameraCube );

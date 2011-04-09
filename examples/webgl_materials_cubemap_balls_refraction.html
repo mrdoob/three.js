@@ -44,19 +44,17 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var statsEnabled = false;
-
-			var container, stats;
+			var container, timer;
 
 			var camera, scene, webglRenderer;
 			var cameraCube, sceneCube;
 
 			var mesh, zmesh, lightMesh, geometry;
+			var spheres = [];
 
 			var directionalLight, pointLight;
 
-			var mouseX = 0;
-			var mouseY = 0;
+			var mouseX = 0, mouseY = 0;
 
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
@@ -84,42 +82,33 @@
 				var path = "textures/cube/skybox/";
 				var format = '.jpg';
 				var urls = [
-						path + 'px' + format, path + 'nx' + format,
-						path + 'py' + format, path + 'ny' + format,
-						path + 'pz' + format, path + 'nz' + format
-					];
+					path + 'px' + format, path + 'nx' + format,
+					path + 'py' + format, path + 'ny' + format,
+					path + 'pz' + format, path + 'nz' + format
+				];
 
 				var textureCube = ImageUtils.loadTextureCube( urls, new THREE.CubeRefractionMapping() );
 				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube, refractionRatio: 0.95 } );
 
-				for ( var i = 0; i < 200; i ++ ) {
+				for ( var i = 0; i < 500; i ++ ) {
 
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.position.x = Math.random() * 10000 - 5000;
 					mesh.position.y = Math.random() * 10000 - 5000;
 					mesh.position.z = Math.random() * 10000 - 5000;
-					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 4 + 1;
+					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 2 + 1;
 					scene.addObject( mesh );
+
+					spheres.push( mesh );
+
 				}
 
-				//SceneUtils.addPanoramaCubePlanes( sceneCube, 100000, images );
-				//SceneUtils.addPanoramaCube( sceneCube, 100000, images );
 				SceneUtils.addPanoramaCubeWebGL( sceneCube, 100000, textureCube );
 
-				webglRenderer = new THREE.WebGLRenderer();
+				webglRenderer = new THREE.WebGLRenderer( { antialias: false } );
 				webglRenderer.setSize( window.innerWidth, window.innerHeight );
 				webglRenderer.autoClear = false;
 				container.appendChild( webglRenderer.domElement );
-
-				if ( statsEnabled ) {
-
-					stats = new Stats();
-					stats.domElement.style.position = 'absolute';
-					stats.domElement.style.top = '0px';
-					stats.domElement.style.zIndex = 100;
-					container.appendChild( stats.domElement );
-
-				}
 
 			}
 
@@ -137,11 +126,12 @@
 				requestAnimationFrame( animate );
 
 				render();
-				if ( statsEnabled ) stats.update();
 
 			}
 
 			function render() {
+
+				timer = new Date().getTime() * 0.0001;
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
@@ -149,6 +139,15 @@
 				cameraCube.target.position.x = - camera.position.x;
 				cameraCube.target.position.y = - camera.position.y;
 				cameraCube.target.position.z = - camera.position.z;
+
+				for ( var i = 0, il = spheres.length; i < il; i ++ ) {
+
+					var sphere = spheres[ i ];
+
+					sphere.position.x = 5000 * Math.cos( timer + i );
+					sphere.position.y = 5000 * Math.sin( timer + i * 1.1 );
+
+				}
 
 				webglRenderer.clear();
 				webglRenderer.render( sceneCube, cameraCube );
