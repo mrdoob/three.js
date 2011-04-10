@@ -1148,7 +1148,7 @@ def extract_material_data(m):
             if ts.use and t.type == 'IMAGE':
                 name = t.image.name
 
-                if t.option_normal_map:
+                if t.use_normal_map:
                     material['mapNormal'] = name
                 else:
                     if not material['mapDiffuse']:
