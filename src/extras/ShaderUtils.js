@@ -85,7 +85,7 @@ THREE.ShaderUtils = {
 		/* -------------------------------------------------------------------------
 		//	Normal map shader
 		//		- Blinn-Phong
-		//		- normal + diffuse + AO + displacement maps
+		//		- normal + diffuse + specular + AO + displacement maps
 		//		- 1 point and 1 directional lights
 		 ------------------------------------------------------------------------- */
 
@@ -93,16 +93,18 @@ THREE.ShaderUtils = {
 
 			uniforms: {
 
-				"enableAO": { type: "i", value: 0 },
-				"enableDiffuse": { type: "i", value: 0 },
+				"enableAO"		: { type: "i", value: 0 },
+				"enableDiffuse"	: { type: "i", value: 0 },
+				"enableSpecular": { type: "i", value: 0 },
 
-				"tDiffuse": { type: "t", value: 0, texture: null },
-				"tNormal": { type: "t", value: 2, texture: null },
-				"tAO": { type: "t", value: 3, texture: null },
+				"tDiffuse"	: { type: "t", value: 0, texture: null },
+				"tNormal"	: { type: "t", value: 2, texture: null },
+				"tSpecular"	: { type: "t", value: 3, texture: null },
+				"tAO"		: { type: "t", value: 4, texture: null },
 
 				"uNormalScale": { type: "f", value: 1.0 },
 
-				"tDisplacement": { type: "t", value: 4, texture: null },
+				"tDisplacement": { type: "t", value: 5, texture: null },
 				"uDisplacementBias": { type: "f", value: -0.5 },
 				"uDisplacementScale": { type: "f", value: 2.5 },
 
@@ -135,10 +137,12 @@ THREE.ShaderUtils = {
 				"uniform float uShininess;",
 
 				"uniform bool enableDiffuse;",
+				"uniform bool enableSpecular;",
 				"uniform bool enableAO;",
 
 				"uniform sampler2D tDiffuse;",
 				"uniform sampler2D tNormal;",
+				"uniform sampler2D tSpecular;",
 				"uniform sampler2D tAO;",
 
 				"uniform float uNormalScale;",
@@ -155,6 +159,7 @@ THREE.ShaderUtils = {
 
 					"vec3 diffuseTex = vec3( 1.0, 1.0, 1.0 );",
 					"vec3 aoTex = vec3( 1.0, 1.0, 1.0 );",
+					"vec3 specularTex = vec3( 1.0, 1.0, 1.0 );",
 
 					"vec3 normalTex = texture2D( tNormal, vUv ).xyz * 2.0 - 1.0;",
 					"normalTex.xy *= uNormalScale;",
@@ -165,6 +170,9 @@ THREE.ShaderUtils = {
 
 					"if( enableAO )",
 						"aoTex = texture2D( tAO, vUv ).xyz;",
+
+					"if( enableSpecular )",
+						"specularTex = texture2D( tSpecular, vUv ).xyz;",
 
 					"mat3 tsb = mat3( vTangent, vBinormal, vNormal );",
 					"vec3 finalNormal = tsb * normalTex;",
@@ -185,10 +193,10 @@ THREE.ShaderUtils = {
 
 					"float pointSpecularWeight = 0.0;",
 					"if ( pointDotNormalHalf >= 0.0 )",
-						"pointSpecularWeight = pow( pointDotNormalHalf, uShininess );",
+						"pointSpecularWeight = specularTex.r * pow( pointDotNormalHalf, uShininess );",
 
 					"pointDiffuse  += vec4( uDiffuseColor, 1.0 ) * pointDiffuseWeight;",
-					"pointSpecular += vec4( uSpecularColor, 1.0 ) * pointSpecularWeight;",
+					"pointSpecular += vec4( uSpecularColor, 1.0 ) * pointSpecularWeight * pointDiffuseWeight;",
 
 					// directional light
 
@@ -205,10 +213,10 @@ THREE.ShaderUtils = {
 
 					"float dirSpecularWeight = 0.0;",
 					"if ( dirDotNormalHalf >= 0.0 )",
-						"dirSpecularWeight = pow( dirDotNormalHalf, uShininess );",
+						"dirSpecularWeight = specularTex.r * pow( dirDotNormalHalf, uShininess );",
 
 					"dirDiffuse  += vec4( uDiffuseColor, 1.0 ) * dirDiffuseWeight;",
-					"dirSpecular += vec4( uSpecularColor, 1.0 ) * dirSpecularWeight;",
+					"dirSpecular += vec4( uSpecularColor, 1.0 ) * dirSpecularWeight * dirDiffuseWeight;",
 
 					// all lights contribution summation
 

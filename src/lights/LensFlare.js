@@ -15,6 +15,7 @@ THREE.LensFlare = function ( texture, size, distance, blending ) {
 		this.add( texture, size, distance, blending );
 		
 	}
+
 };
 
 THREE.LensFlare.prototype = new THREE.Object3D();
@@ -43,7 +44,7 @@ THREE.LensFlare.prototype.add = function( texture, size, distance, blending ) {
 		                    opacity: 1,					// opacity
 		                    blending: blending } );		// blending
 
-}
+};
 
 
 /*
@@ -71,7 +72,7 @@ THREE.LensFlare.prototype.updateLensFlares = function() {
 
 	}
 
-}
+};
 
 
 

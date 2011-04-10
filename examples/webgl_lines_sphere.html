@@ -115,7 +115,7 @@
 
 				}
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 				container.appendChild(renderer.domElement);
 

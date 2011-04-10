@@ -2122,8 +2122,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		uniforms.enableLighting.value = lights.directional.length + lights.point.length;
 		uniforms.ambientLightColor.value = lights.ambient;
+
 		uniforms.directionalLightColor.value = lights.directional.colors;
 		uniforms.directionalLightDirection.value = lights.directional.positions;
+
 		uniforms.pointLightColor.value = lights.point.colors;
 		uniforms.pointLightPosition.value = lights.point.positions;
 		uniforms.pointLightDistance.value = lights.point.distances;
@@ -3405,7 +3407,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				
 					size = object.map.image.width / ( object.affectedByDistance ? 1 : _viewportHeight );
 					scale[ 0 ] = size * invAspect * object.scale.x;
-					scale[ 1 ] = size * object.scale.y;
+					scale[ 1 ] = size * object.scale.y;
 				
 					_gl.uniform2f( uniforms.uvScale, object.uvScale.x, object.uvScale.y );
 					_gl.uniform2f( uniforms.uvOffset, object.uvOffset.x, object.uvOffset.y );
@@ -3649,9 +3651,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_gl.enable( _gl.DEPTH_TEST );
 		_gl.depthMask( _currentDepthMask );
 
-	}
-
-
+	};
 
 
 	function setupMatrices( object, camera ) {
@@ -3659,7 +3659,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		object._modelViewMatrix.multiplyToArray( camera.matrixWorldInverse, object.matrixWorld, object._modelViewMatrixArray );
 		THREE.Matrix4.makeInvert3x3( object._modelViewMatrix ).transposeIntoArray( object._normalMatrixArray );
 
-	}
+	};
 
 	this.initWebGLObjects = function ( scene ) {
 

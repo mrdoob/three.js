@@ -185,4 +185,4 @@ THREE.Object3D.prototype = {
 
 	}
 
-}
+};
