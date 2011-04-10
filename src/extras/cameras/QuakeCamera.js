@@ -205,7 +205,7 @@ THREE.QuakeCamera = function ( parameters ) {
 
 			}
 
-			if ( this.moveForward || this.autoForward ) this.translateZ( - ( this.movementSpeed + this.autoSpeedFactor ) );
+			if ( this.moveForward || ( this.autoForward && !this.moveBackward ) ) this.translateZ( - ( this.movementSpeed + this.autoSpeedFactor ) );
 			if ( this.moveBackward ) this.translateZ( this.movementSpeed );
 			if ( this.moveLeft ) this.translateX( - this.movementSpeed );
 			if ( this.moveRight ) this.translateX( this.movementSpeed );

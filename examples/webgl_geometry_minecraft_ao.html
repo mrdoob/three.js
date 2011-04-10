@@ -72,7 +72,7 @@
 
 			var mesh, mat;
 
-			var worldWidth = 128, worldDepth = 128,
+			var worldWidth = 200, worldDepth = 200,
 			worldHalfWidth = worldWidth / 2, worldHalfDepth = worldDepth / 2,
 			data = generateHeight( worldWidth, worldDepth );
 
@@ -85,9 +85,9 @@
 
 				camera = new THREE.QuakeCamera( {
 
-					fov: 60, aspect: window.innerWidth / window.innerHeight, near: 1, far: 20000,
+					fov: 50, aspect: window.innerWidth / window.innerHeight, near: 1, far: 20000,
 					constrainVertical: true, verticalMin: 1.1, verticalMax: 2.2,
-					movementSpeed: 15, lookSpeed: 0.00125, noFly: false, lookVertical: true
+					movementSpeed: 15, lookSpeed: 0.0025, noFly: false, lookVertical: true, autoForward: false
 
 				} );
 
@@ -97,7 +97,7 @@
 				camera.target.position.y = camera.position.y;
 
 				scene = new THREE.Scene();
-				scene.fog = new THREE.FogExp2( 0xffffff, 0.00025 );
+				scene.fog = new THREE.FogExp2( 0xffffff, 0.00015 );
 
 				var debug_texture = false,
 					debug_numbers = false,

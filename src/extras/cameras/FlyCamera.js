@@ -33,14 +33,20 @@ THREE.FlyCamera = function ( parameters ) {
 	
 	this.movementSpeed = 1.0;
 	this.rollSpeed = 0.005;
+
 	this.dragToLook = false;
+	this.autoForward = false;
+	
 	this.domElement = document;
 
 	if ( parameters ) {
 
 		if ( parameters.movementSpeed !== undefined ) this.movementSpeed = parameters.movementSpeed;
 		if ( parameters.rollSpeed !== undefined ) this.rollSpeed	= parameters.rollSpeed;
+
 		if ( parameters.dragToLook !== undefined ) this.dragToLook = parameters.dragToLook;
+		if ( parameters.autoForward !== undefined ) this.autoForward = parameters.autoForward;
+
 		if ( parameters.domElement !== undefined ) this.domElement = parameters.domElement;
 
 	}
@@ -226,9 +232,11 @@ THREE.FlyCamera = function ( parameters ) {
 
 	this.updateMovementVector = function() {
 
+		var forward = ( this.moveState.forward || ( this.autoForward && !this.moveState.back ) ) ? 1 : 0;
+		
 		this.moveVector.x = ( -this.moveState.left    + this.moveState.right );
 		this.moveVector.y = ( -this.moveState.down    + this.moveState.up );
-		this.moveVector.z = ( -this.moveState.forward + this.moveState.back );
+		this.moveVector.z = ( -forward + this.moveState.back );
 
 		//console.log( 'move:', [ this.moveVector.x, this.moveVector.y, this.moveVector.z ] );
 
@@ -280,6 +288,9 @@ THREE.FlyCamera = function ( parameters ) {
 
 	window.addEventListener( 'keydown', bind( this, this.keydown ), false );
 	window.addEventListener( 'keyup',   bind( this, this.keyup ), false );
+	
+	this.updateMovementVector();
+	this.updateRotationVector();	
 
 };
 
