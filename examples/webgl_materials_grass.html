@@ -45,9 +45,9 @@
 				var texture = generateTextureBase();
 				texture.needsUpdate = true;
 
-				for ( var i = 0; i < 20; i ++ ) {
+				for ( var i = 0; i < 15; i ++ ) {
 
-					mesh = levels[ i ] = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { map: new THREE.Texture( generateTextureLevel( texture ), new THREE.UVMapping(), THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping ) } ) );
+					mesh = levels[ i ] = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { map: new THREE.Texture( generateTextureLevel( texture ), new THREE.UVMapping(), THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping ), depthTest: false } ) );
 					mesh.materials[0].map.needsUpdate = true;
 					mesh.rotation.x = - 90 * ( Math.PI / 180 );
 					mesh.position.y = i * 0.25;
@@ -74,13 +74,13 @@
 
 					context.fillStyle = 'rgba(0,' + Math.floor( Math.random() * 64 + 32 ) + ',16,1)';
 					context.beginPath();
-					context.arc( Math.random() * canvas.width, Math.random() * canvas.height, Math.random() * 3 + 1, 0, Math.PI * 2, true );
+					context.arc( Math.random() * canvas.width, Math.random() * canvas.height, Math.random() * 2 + 1, 0, Math.PI * 2, true );
 					context.closePath();
 					context.fill();
 
 				}
 
-				context.globalAlpha = 0.05;
+				context.globalAlpha = 0.075;
 				context.globalCompositeOperation = 'lighter';
 
 				return canvas;
@@ -116,6 +116,14 @@
 
 				camera.position.x = 80 * Math.cos( time );
 				camera.position.z = 80 * Math.sin( time );
+
+				for ( var i = 0, l = levels.length; i < l; i ++ ) {
+
+					mesh = levels[ i ];
+					mesh.position.x = Math.sin( time * 4 ) * i * i * 0.005;
+					mesh.position.z = Math.cos( time * 6 ) * i * i * 0.005;
+
+				}
 
 				renderer.render( scene, camera );
 
