@@ -415,12 +415,18 @@ def bottom(vertices):
 
 def hexcolor(c):
     return ( int(c[0] * 255) << 16  ) + ( int(c[1] * 255) << 8 ) + int(c[2] * 255)
-    
-def generate_vertex(v, truncate):
-    if truncate:
-        return TEMPLATE_VERTEX_TRUNCATE % (v.co.x, v.co.y, v.co.z)
-    else:
+
+def generate_vertices(vertices, option_truncate, option_vertices):
+    if not option_vertices:
+        return ""
+
+    return ",".join(generate_vertex(v, option_truncate) for v in vertices)
+
+def generate_vertex(v, option_truncate):
+    if not option_truncate:
         return TEMPLATE_VERTEX % (v.co.x, v.co.y, v.co.z)
+    else:
+        return TEMPLATE_VERTEX_TRUNCATE % (v.co.x, v.co.y, v.co.z)
 
 def generate_normal(n):
     return TEMPLATE_N % (n[0], n[1], n[2])
@@ -444,9 +450,15 @@ def setBit(value, position, on):
         return (value | mask)
     else:
         mask = ~(1 << position)
-        return (value & mask)    
-    
-def generate_face(f, faceIndex, normals, uvs, colors, mesh, use_normals, use_colors, use_uv_coords, use_materials, flipyz):
+        return (value & mask)
+
+def generate_faces(normals, uvs, colors, mesh, option_normals, option_colors, option_uv_coords, option_materials, flipyz, option_faces):
+    if not option_faces:
+        return ""
+
+    return ",".join(generate_face(f, i, normals, uvs, colors, mesh, option_normals, option_colors, option_uv_coords, option_materials, flipyz) for i, f in enumerate(mesh.faces))
+
+def generate_face(f, faceIndex, normals, uvs, colors, mesh, option_normals, option_colors, option_uv_coords, option_materials, flipyz):
     isTriangle = ( len(f.vertices) == 3 )
     
     if isTriangle:
@@ -454,16 +466,16 @@ def generate_face(f, faceIndex, normals, uvs, colors, mesh, use_normals, use_col
     else:
         nVertices = 4
         
-    hasMaterial = use_materials
+    hasMaterial = option_materials
     
     hasFaceUvs = False # not supported in Blender
-    hasFaceVertexUvs = use_uv_coords
+    hasFaceVertexUvs = option_uv_coords
 
     hasFaceNormals = False # don't export any face normals (as they are computed in engine)
-    hasFaceVertexNormals = use_normals
+    hasFaceVertexNormals = option_normals
     
     hasFaceColors = False       # not supported in Blender
-    hasFaceVertexColors = use_colors
+    hasFaceVertexColors = option_colors
 
     faceType = 0
     faceType = setBit(faceType, 0, not isTriangle)
@@ -523,8 +535,8 @@ def generate_face(f, faceIndex, normals, uvs, colors, mesh, use_normals, use_col
 # Model exporter - normals
 # #####################################################
 
-def extract_vertex_normals(mesh, use_normals):
-    if not use_normals:
+def extract_vertex_normals(mesh, option_normals):
+    if not option_normals:
         return {}, 0
 
     count = 0
@@ -542,8 +554,8 @@ def extract_vertex_normals(mesh, use_normals):
 
     return normals, count
 
-def generate_normals(normals, use_normals):
-    if not use_normals:
+def generate_normals(normals, option_normals):
+    if not option_normals:
         return ""
 
     chunks = []
@@ -556,9 +568,9 @@ def generate_normals(normals, use_normals):
 # Model exporter - vertex colors
 # #####################################################
 
-def extract_vertex_colors(mesh, use_colors):
+def extract_vertex_colors(mesh, option_colors):
     
-    if not use_colors:
+    if not option_colors:
         return {}, 0
 
     count = 0
@@ -579,8 +591,8 @@ def extract_vertex_colors(mesh, use_colors):
 
     return colors, count
 
-def generate_vertex_colors(colors, use_colors):
-    if not use_colors:
+def generate_vertex_colors(colors, option_colors):
+    if not option_colors:
         return ""
 
     chunks = []
@@ -593,9 +605,9 @@ def generate_vertex_colors(colors, use_colors):
 # Model exporter - UVs
 # #####################################################
 
-def extract_uvs(mesh, use_uv_coords):
+def extract_uvs(mesh, option_uv_coords):
 
-    if not use_uv_coords:
+    if not option_uv_coords:
         return {}, 0
 
     count = 0
@@ -614,8 +626,8 @@ def extract_uvs(mesh, use_uv_coords):
 
     return uvs, count
 
-def generate_uvs(uvs, use_uv_coords):
-    if not use_uv_coords:
+def generate_uvs(uvs, option_uv_coords):
+    if not option_uv_coords:
         return ""
 
     chunks = []
@@ -692,7 +704,7 @@ def generate_materials(mtl, materials, draw_type):
 
     return ",\n\n".join([m for i,m in sorted(mtl_array)]), len(mtl_array)
 
-def extract_materials(mesh, scene, use_colors):
+def extract_materials(mesh, scene, option_colors):
     world = scene.world
 
     materials = {}
@@ -731,7 +743,7 @@ def extract_materials(mesh, scene, use_colors):
                 fn_strip = os.path.basename(fn)
                 material['mapDiffuse'] = fn_strip
 
-            material["vertexColors"] = m.THREE_useVertexColors and use_colors
+            material["vertexColors"] = m.THREE_useVertexColors and option_colors
             
             # can't really use this reliably to tell apart Phong from Lambert
             # as Blender defaults to non-zero specular color
@@ -742,7 +754,7 @@ def extract_materials(mesh, scene, use_colors):
 
     return materials
 
-def generate_materials_string(mesh, scene, use_colors, draw_type):
+def generate_materials_string(mesh, scene, option_colors, draw_type):
 
     random.seed(42) # to get well defined color order for debug materials
 
@@ -764,7 +776,7 @@ def generate_materials_string(mesh, scene, use_colors, draw_type):
 
     # extract real materials from the mesh
     
-    mtl.update(extract_materials(mesh, scene, use_colors))
+    mtl.update(extract_materials(mesh, scene, option_colors))
 
     return generate_materials(mtl, materials, draw_type)
 
@@ -773,18 +785,20 @@ def generate_materials_string(mesh, scene, use_colors, draw_type):
 # #####################################################
 
 def generate_ascii_model(mesh, scene, 
-                         use_normals, 
-                         use_colors, 
-                         use_uv_coords, 
-                         use_materials,
-                         use_edges,
+                         option_vertices, 
+                         option_faces, 
+                         option_normals, 
+                         option_edges, 
+                         option_uv_coords, 
+                         option_materials, 
+                         option_colors, 
                          align_model, 
                          flipyz, 
                          option_truncate, 
                          option_scale, 
                          draw_type):
 
-    vertices = mesh.vertices[:]    
+    vertices = mesh.vertices[:]
 
     if align_model == 1:
         center(vertices)
@@ -793,9 +807,9 @@ def generate_ascii_model(mesh, scene,
     elif align_model == 3:
         top(vertices)
 
-    normals, nnormal = extract_vertex_normals(mesh, use_normals)
-    colors, ncolor = extract_vertex_colors(mesh, use_colors)
-    uvs, nuv = extract_uvs(mesh, use_uv_coords)
+    normals, nnormal = extract_vertex_normals(mesh, option_normals)
+    colors, ncolor = extract_vertex_colors(mesh, option_colors)
+    uvs, nuv = extract_uvs(mesh, option_uv_coords)
 
     materials_string = ""
     nmaterial = 0
@@ -803,13 +817,13 @@ def generate_ascii_model(mesh, scene,
     edges_string = ""
     nedges = 0
     
-    if use_materials:
-        materials_string, nmaterial = generate_materials_string(mesh, scene, use_colors, draw_type)
-    
-    if use_edges:
+    if option_materials:
+        materials_string, nmaterial = generate_materials_string(mesh, scene, option_colors, draw_type)
+
+    if option_edges:
         nedges = len(mesh.edges) 
         edges_string  = ",".join(generate_edge(e) for e in mesh.edges)
-        
+
     text = TEMPLATE_FILE_ASCII % {
     "nvertex"   : len(mesh.vertices),
     "nface"     : len(mesh.faces),
@@ -818,18 +832,18 @@ def generate_ascii_model(mesh, scene,
     "ncolor"    : ncolor,
     "nmaterial" : nmaterial,
     "nedges"    : nedges,
-    
+
     "scale" : option_scale,
 
-    "uvs"           : generate_uvs(uvs, use_uv_coords),
-    "normals"       : generate_normals(normals, use_normals),
-    "colors"        : generate_vertex_colors(colors, use_colors),
+    "uvs"           : generate_uvs(uvs, option_uv_coords),
+    "normals"       : generate_normals(normals, option_normals),
+    "colors"        : generate_vertex_colors(colors, option_colors),
 
     "materials" : materials_string,
 
-    "vertices" : ",".join(generate_vertex(v, option_truncate) for v in vertices),
+    "vertices" : generate_vertices(vertices, option_truncate, option_vertices),
 
-    "faces"    : ",".join(generate_face(f, i, normals, uvs, colors, mesh, use_normals, use_colors, use_uv_coords, use_materials, flipyz) for i, f in enumerate(mesh.faces)),
+    "faces"    : generate_faces(normals, uvs, colors, mesh, option_normals, option_colors, option_uv_coords, option_materials, flipyz, option_faces),
 
     "edges"    : edges_string
 
@@ -843,11 +857,13 @@ def generate_ascii_model(mesh, scene,
 # #####################################################
 
 def export_mesh(obj, scene, filepath, 
-                use_normals, 
-                use_colors, 
-                use_uv_coords, 
-                use_materials, 
-                use_edges, 
+                option_vertices, 
+                option_faces, 
+                option_normals, 
+                option_edges, 
+                option_uv_coords, 
+                option_materials, 
+                option_colors, 
                 align_model, 
                 flipyz, 
                 option_truncate, 
@@ -879,27 +895,29 @@ def export_mesh(obj, scene, filepath,
     vertexColors = len(mesh.vertex_colors) > 0
 
     if not vertexColors:
-        use_colors = False
+        option_colors = False
 
     if (not faceUV) and (not vertexUV):
-        use_uv_coords = False
+        option_uv_coords = False
 
     if faceUV:
         active_uv_layer = mesh.uv_textures.active
         if not active_uv_layer:
-            use_uv_coords = False
+            option_uv_coords = False
 
     if vertexColors:
         active_col_layer = mesh.vertex_colors.active
         if not active_col_layer:
-            use_colors = False
+            option_colors = False
 
     text = generate_ascii_model(mesh, scene, 
-                                use_normals, 
-                                use_colors, 
-                                use_uv_coords, 
-                                use_materials,
-                                use_edges,
+                                option_vertices, 
+                                option_faces, 
+                                option_normals, 
+                                option_edges, 
+                                option_uv_coords, 
+                                option_materials, 
+                                option_colors, 
                                 align_model, 
                                 flipyz, 
                                 option_truncate, 
@@ -1351,11 +1369,13 @@ def export_scene(scene, filepath, flipyz):
 
 def save(operator, context, filepath = "", 
          option_flip_yz = True, 
-         use_normals = True, 
-         use_colors = True, 
-         use_uv_coords = True, 
-         use_materials = True, 
-         use_edges = False, 
+         option_vertices = True, 
+         option_faces = True, 
+         option_normals = True, 
+         option_edges = False, 
+         option_uv_coords = True, 
+         option_materials = True, 
+         option_colors = True, 
          align_model = 0, 
          option_export_scene = False, 
          option_truncate = False, 
@@ -1391,17 +1411,19 @@ def save(operator, context, filepath = "",
                 if name not in geo_set:
                     fname = generate_mesh_filename(name, filepath)
                     export_mesh(obj, scene, fname, 
-                                use_normals, 
-                                use_colors, 
-                                use_uv_coords, 
-                                use_materials, 
-                                use_edges, 
+                                option_vertices, 
+                                option_faces, 
+                                option_normals, 
+                                option_edges, 
+                                option_uv_coords, 
+                                option_materials, 
+                                option_colors, 
                                 False, 
                                 option_flip_yz, 
                                 option_truncate, 
                                 option_scale, 
                                 False)
-                    
+
                     geo_set.add(name)
 
     else:
@@ -1411,11 +1433,13 @@ def save(operator, context, filepath = "",
             raise Exception("Error, Select 1 active object or select 'export scene'")
 
         export_mesh(obj, scene, filepath, 
-                    use_normals, 
-                    use_colors, 
-                    use_uv_coords, 
-                    use_materials, 
-                    use_edges, 
+                    option_vertices, 
+                    option_faces, 
+                    option_normals, 
+                    option_edges, 
+                    option_uv_coords, 
+                    option_materials, 
+                    option_colors, 
                     align_model, 
                     option_flip_yz, 
                     option_truncate, 
