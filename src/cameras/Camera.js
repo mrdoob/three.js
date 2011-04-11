@@ -42,13 +42,6 @@ THREE.Camera.prototype.updateProjectionMatrix = function () {
 
 };
 
-THREE.Camera.prototype.updateMatrix = function () {
-
-	// this.parent === undefined && this.update( undefined, true );
-	this.update( undefined, true );
-
-};
-
 THREE.Camera.prototype.update = function ( parentMatrixWorld, forceUpdate, camera ) {
 
 	if ( this.useTarget ) {
@@ -77,15 +70,7 @@ THREE.Camera.prototype.update = function ( parentMatrixWorld, forceUpdate, camer
 
 	} else {
 
-		/*
-		if ( this.matrixAutoUpdate ) {
-
-			// this doesn't make sense, it is endless loop
-			// also updateMatrix() doesn't return anything
-			//forceUpdate |= this.updateMatrix();
-
-		}
-		*/
+		this.matrixAutoUpdate && this.updateMatrix();
 
 		if ( forceUpdate || this.matrixWorldNeedsUpdate ) {
 
