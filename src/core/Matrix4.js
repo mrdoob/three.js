@@ -69,21 +69,6 @@ THREE.Matrix4.prototype = {
 
 	lookAt : function ( eye, center, up ) {
 
-		/*
-		var x = THREE.Matrix4.__v1, y = THREE.Matrix4.__v2, z = THREE.Matrix4.__v3;
-
-		z.sub( center, eye ).normalize();
-		x.cross( up, z ).normalize();
-		y.cross( z, x ).normalize();
-
-		this.n11 = x.x; this.n12 = x.y; this.n13 = x.z; this.n14 = - x.dot( eye );
-		this.n21 = y.x; this.n22 = y.y; this.n23 = y.z; this.n24 = - y.dot( eye );
-		this.n31 = z.x; this.n32 = z.y; this.n33 = z.z; this.n34 = - z.dot( eye );
-		this.n41 = 0; this.n42 = 0; this.n43 = 0; this.n44 = 1;
-
-		return this;
-		*/
-
 		var x = THREE.Matrix4.__v1, y = THREE.Matrix4.__v2, z = THREE.Matrix4.__v3;
 
 		z.sub( eye, center ).normalize();

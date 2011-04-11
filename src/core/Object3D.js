@@ -68,7 +68,7 @@ THREE.Object3D.prototype = {
 
 		// TODO: Add hierarchy support.
 
-		this.matrix.lookAt( this.position, vector, this.up );
+		this.matrix.lookAt( vector, this.position, this.up );
 
 		if ( this.rotationAutoUpdate ) {
 
