@@ -42,12 +42,11 @@
 
 				var geometry = new THREE.Plane( 100, 100 );
 
-				var texture = generateTextureBase();
-				texture.needsUpdate = true;
+				var bitmap = generateTextureBase();
 
 				for ( var i = 0; i < 15; i ++ ) {
 
-					mesh = levels[ i ] = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { map: new THREE.Texture( generateTextureLevel( texture ), new THREE.UVMapping(), THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping ), depthTest: false } ) );
+					mesh = levels[ i ] = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { map: new THREE.Texture( generateTextureLevel( bitmap ) ), depthTest: false } ) );
 					mesh.materials[0].map.needsUpdate = true;
 					mesh.rotation.x = - 90 * ( Math.PI / 180 );
 					mesh.position.y = i * 0.25;
@@ -65,8 +64,8 @@
 			function generateTextureBase() {
 
 				var canvas = document.createElement( 'canvas' );
-				canvas.width = 1024;
-				canvas.height = 1024;
+				canvas.width = 512;
+				canvas.height = 512;
 
 				var context = canvas.getContext( '2d' );
 
@@ -74,7 +73,7 @@
 
 					context.fillStyle = 'rgba(0,' + Math.floor( Math.random() * 64 + 32 ) + ',16,1)';
 					context.beginPath();
-					context.arc( Math.random() * canvas.width, Math.random() * canvas.height, Math.random() * 2 + 1, 0, Math.PI * 2, true );
+					context.arc( Math.random() * canvas.width, Math.random() * canvas.height, Math.random() * 1 + 0.5, 0, Math.PI * 2, true );
 					context.closePath();
 					context.fill();
 
