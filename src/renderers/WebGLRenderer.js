@@ -2924,7 +2924,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			lights = scene.lights,
 			fog = scene.fog;
 
-		camera.matrixAutoUpdate && camera.updateMatrix();
+		camera.matrixAutoUpdate && camera.update( undefined, true );
 
 		scene.update( undefined, false, camera );
 
