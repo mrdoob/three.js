@@ -20,7 +20,7 @@
 # Init
 # ################################################################
 
-# To support reload properly, try to access a package var, 
+# To support reload properly, try to access a package var,
 # if it's there, reload everything
 
 if "bpy" in locals():
@@ -44,16 +44,16 @@ bpy.types.Object.THREE_meshCollider = bpy.props.BoolProperty()
 bpy.types.Material.THREE_useVertexColors = bpy.props.BoolProperty()
 
 class OBJECT_PT_hello( bpy.types.Panel ):
-    
+
     bl_label = "THREE"
     bl_space_type = "PROPERTIES"
     bl_region_type = "WINDOW"
     bl_context = "object"
- 
+
     def draw(self, context):
         layout = self.layout
         obj = context.object
-        
+
         row = layout.row()
         row.label(text="Selected object: " + obj.name )
 
@@ -65,16 +65,16 @@ class OBJECT_PT_hello( bpy.types.Panel ):
 
 
 class MATERIAL_PT_hello( bpy.types.Panel ):
-    
+
     bl_label = "THREE"
     bl_space_type = "PROPERTIES"
     bl_region_type = "WINDOW"
     bl_context = "material"
- 
+
     def draw(self, context):
         layout = self.layout
         mat = context.material
-        
+
         row = layout.row()
         row.label(text="Selected material: " + mat.name )
 
@@ -123,20 +123,20 @@ import json
 
 def file_exists(filename):
     """Return true if file exists and accessible for reading.
-    
-    Should be safer than just testing for existence due to links and 
+
+    Should be safer than just testing for existence due to links and
     permissions magic on Unix filesystems.
-    
+
     @rtype: boolean
     """
-    
+
     try:
         f = open(filename, 'r')
         f.close()
         return True
     except IOError:
         return False
-    
+
 def get_settings_fullpath():
     return os.path.join(bpy.app.tempdir, SETTINGS_FILE_EXPORT)
 
@@ -153,39 +153,41 @@ def save_settings_export(properties):
     "option_uv_coords"       : properties.option_uv_coords,
     "option_edges"           : properties.option_edges,
 
-    "option_truncate"     : properties.option_truncate,
+    "option_vertices_truncate"     : properties.option_vertices_truncate,
     "option_scale"        : properties.option_scale,
 
     "align_model"         : properties.align_model
     }
-    
+
     fname = get_settings_fullpath()
     f = open(fname, "w")
     json.dump(settings, f)
-    
+
 def restore_settings_export(properties):
-    
+
     settings = {}
 
     fname = get_settings_fullpath()
     if file_exists(fname):
         f = open(fname, "r")
         settings = json.load(f)
-    
-    properties.option_export_scene = settings.get("option_export_scene", False)
 
-    properties.option_flip_yz = settings.get("option_flip_yz", True)
-
-    properties.option_materials = settings.get("option_materials", True)
+    properties.option_vertices = settings.get("option_vertices", True)
+    properties.option_vertices_truncate = settings.get("option_vertices_truncate", False)
+    properties.option_faces = settings.get("option_faces", True)
     properties.option_normals = settings.get("option_normals", True)
+    properties.option_edges = settings.get("option_edges", False)
+
     properties.option_colors = settings.get("option_colors", True)
     properties.option_uv_coords = settings.get("option_uv_coords", True)
-    properties.option_edges = settings.get("option_edges", False)
-    
-    properties.option_truncate = settings.get("option_truncate", False)
-    properties.option_scale = settings.get("option_scale", 1.0)
-    
+    properties.option_materials = settings.get("option_materials", True)
+
     properties.align_model = settings.get("align_model", "None")
+
+    properties.option_scale = settings.get("option_scale", 1.0)
+    properties.option_flip_yz = settings.get("option_flip_yz", True)
+
+    properties.option_export_scene = settings.get("option_export_scene", False)
 
 # ################################################################
 # Exporter
@@ -199,10 +201,13 @@ class ExportTHREEJS(bpy.types.Operator, ExportHelper):
 
     filename_ext = ".js"
 
-    option_flip_yz = BoolProperty(name = "Flip YZ", description = "Flip YZ", default = True)
-
     option_vertices = BoolProperty(name = "Vertices", description = "Export vertices", default = True)
+    option_vertices_deltas = BoolProperty(name = "Deltas", description = "Delta vertices", default = False)
+    option_vertices_truncate = BoolProperty(name = "Truncate", description = "Truncate vertices", default = False)
+
     option_faces = BoolProperty(name = "Faces", description = "Export faces", default = True)
+    option_faces_deltas = BoolProperty(name = "Deltas", description = "Delta faces", default = False)
+
     option_normals = BoolProperty(name = "Normals", description = "Export normals", default = True)
     option_edges = BoolProperty(name = "Edges", description = "Export edges", default = False)
 
@@ -210,13 +215,13 @@ class ExportTHREEJS(bpy.types.Operator, ExportHelper):
     option_uv_coords = BoolProperty(name = "UVs", description = "Export texture coordinates", default = True)
     option_materials = BoolProperty(name = "Materials", description = "Export materials", default = True)
 
-    option_export_scene = BoolProperty(name = "Scene", description = "Export scene", default = False)
-
-    option_truncate = BoolProperty(name = "Truncate", description = "Truncate decimals", default = False)
-    option_scale = FloatProperty(name = "Scale", description = "Scale data", min = 0.01, max = 1000.0, soft_min = 0.01, soft_max = 1000.0, default = 1.0)
-
     align_types = [("None","None","None"), ("Center","Center","Center"), ("Bottom","Bottom","Bottom"), ("Top","Top","Top")]
     align_model = EnumProperty(name = "Align model", description = "Align model", items = align_types, default = "None")
+
+    option_scale = FloatProperty(name = "Scale", description = "Scale vertices", min = 0.01, max = 1000.0, soft_min = 0.01, soft_max = 1000.0, default = 1.0)
+    option_flip_yz = BoolProperty(name = "Flip YZ", description = "Flip YZ", default = True)
+
+    option_export_scene = BoolProperty(name = "Scene", description = "Export scene", default = False)
 
     def invoke(self, context, event):
         restore_settings_export(self.properties)
@@ -242,24 +247,33 @@ class ExportTHREEJS(bpy.types.Operator, ExportHelper):
         layout = self.layout
 
         row = layout.row()
-        row.prop(self.properties, "option_export_scene")
-        layout.separator()
-
-        row = layout.row()
-        row.prop(self.properties, "option_flip_yz")
-        layout.separator()
-
-        row = layout.row()
-        row.prop(self.properties, "align_model")
-        layout.separator()
+        row.label(text="Geometry:")
 
         row = layout.row()
         row.prop(self.properties, "option_vertices")
-        row.prop(self.properties, "option_normals")
+        row = layout.row()
+        row.enabled = self.properties.option_vertices
+        # row.prop(self.properties, "option_vertices_deltas")
+        row.prop(self.properties, "option_vertices_truncate")
+        layout.separator()
+
         row = layout.row()
         row.prop(self.properties, "option_faces")
+        row = layout.row()
+        row.enabled = self.properties.option_faces
+        # row.prop(self.properties, "option_faces_deltas")
+        layout.separator()
+
+        row = layout.row()
+        row.prop(self.properties, "option_normals")
+        layout.separator()
+
+        row = layout.row()
         row.prop(self.properties, "option_edges")
         layout.separator()
+
+        row = layout.row()
+        row.label(text="Materials:")
 
         row = layout.row()
         row.prop(self.properties, "option_uv_coords")
@@ -269,8 +283,21 @@ class ExportTHREEJS(bpy.types.Operator, ExportHelper):
         layout.separator()
 
         row = layout.row()
-        row.prop(self.properties, "option_truncate")
+        row.label(text="Settings:")
+
+        row = layout.row()
+        row.prop(self.properties, "align_model")
+        row = layout.row()
+        row.prop(self.properties, "option_flip_yz")
         row.prop(self.properties, "option_scale")
+        layout.separator()
+
+        row = layout.row()
+        row.label(text="Beta:")
+
+        row = layout.row()
+        row.prop(self.properties, "option_export_scene")
+        layout.separator()
 
 
 # ################################################################
