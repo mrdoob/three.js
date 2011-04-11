@@ -115,6 +115,15 @@ THREE.SceneLoader.prototype = {
 
 							}
 
+							// dirty hack to handle meshes with multiple materials
+							// just use face materials defined in model
+
+							if ( materials.length > 1 ) {
+
+								materials = [ new THREE.MeshFaceMaterial() ];
+
+							}
+
 							object = new THREE.Mesh( geometry, materials );
 							object.position.set( p[0], p[1], p[2] );
 
@@ -459,6 +468,20 @@ THREE.SceneLoader.prototype = {
 					} else if ( pp == "combine" ) {
 
 						m.parameters[ pp ] = ( m.parameters[ pp ] == "MixOperation" ) ? THREE.MixOperation : THREE.MultiplyOperation;
+
+					} else if ( pp == "vertexColors" ) {
+
+						if ( m.parameters[ pp ] == "face" ) {
+
+							m.parameters[ pp ] = THREE.FaceColors;
+
+						// default to vertex colors if "vertexColors" is anything else face colors or 0 / null / false
+
+						} else if ( m.parameters[ pp ] )   {
+
+							m.parameters[ pp ] = THREE.VertexColors;
+
+						}
 
 					}
 

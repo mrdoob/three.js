@@ -1020,7 +1020,8 @@ def generate_objects(data):
             meshCollider = obj.THREE_meshCollider
 
             visible = True
-            if obj.draw_type in ["BOUNDS", "WIRE"] and meshCollider:
+            #if obj.draw_type in ["BOUNDS", "WIRE"] and meshCollider:
+            if meshCollider:
                 visible = False
 
             object_string = TEMPLATE_OBJECT % {
@@ -1106,7 +1107,7 @@ def extract_texture_filename(image):
 # Scene exporter - materials
 # #####################################################
 
-def extract_material_data(m):
+def extract_material_data(m, option_colors):
     world = bpy.context.scene.world
 
     material = { 'name': m.name }
@@ -1139,6 +1140,8 @@ def extract_material_data(m):
     material['mapLight'] = ""
     material['mapNormal'] = ""
 
+    material["vertexColors"] = m.THREE_useVertexColors and option_colors
+    
     # just take first textures of each, for the moment three.js materials can't handle more
 
     for i in range(len(m.texture_slots)):
@@ -1159,10 +1162,10 @@ def extract_material_data(m):
                 if material['mapDiffuse'] and material['mapNormal'] and material['mapLight']:
                     break
 
-    if m.specular_intensity > 0.0 and (m.specular_color[0] > 0 or m.specular_color[1] > 0 or m.specular_color[2] > 0):
-        material['shading'] = "Phong"
-    else:
-        material['shading'] = "Lambert"
+    #if m.specular_intensity > 0.0 and (m.specular_color[0] > 0 or m.specular_color[1] > 0 or m.specular_color[2] > 0):
+    #    material['shading'] = "Phong"
+    #else:
+    #    material['shading'] = "Lambert"
 
     return material
 
@@ -1173,7 +1176,7 @@ def generate_material_string(material):
     }
 
     material_id = material["name"]
-    shading = material["shading"]
+    shading = material.get("shading", "Lambert")
     material_type = type_map.get(shading, "MeshBasicMaterial")
 
     #parameters = "color: %s" % generate_hex(rgb2int(material["colorDiffuse"]))
@@ -1198,6 +1201,9 @@ def generate_material_string(material):
     if normalMap:
         parameters += ", normalMap: %s" % generate_string(normalMap)
 
+    if material['vertexColors']:
+        parameters += ', vertexColors: "vertex"'
+        
     material_string = TEMPLATE_MATERIAL_SCENE % {
     "material_id" : generate_string(material_id),
     "type"        : generate_string(material_type),
@@ -1212,7 +1218,7 @@ def generate_materials_scene(data):
     # TODO: extract just materials actually used by some objects in the scene
 
     for m in bpy.data.materials:
-        material = extract_material_data(m)
+        material = extract_material_data(m, data["usecolors"])
         material_string = generate_material_string(material)
         chunks.append(material_string)
 
@@ -1347,7 +1353,7 @@ def generate_ascii_scene(data):
 
     return text
 
-def export_scene(scene, filepath, flipyz):
+def export_scene(scene, filepath, flipyz, option_colors):
 
     source_file = os.path.basename(bpy.data.filepath)
 
@@ -1357,7 +1363,8 @@ def export_scene(scene, filepath, flipyz):
     "objects"     : scene.objects,
     "source_file" : source_file,
     "filepath"    : filepath,
-    "flipyz"      : flipyz
+    "flipyz"      : flipyz,
+    "usecolors"   : option_colors
     }
     scene_text += generate_ascii_scene(data)
 
@@ -1390,7 +1397,7 @@ def save(operator, context, filepath = "",
 
     if option_export_scene:
 
-        export_scene(scene, filepath, option_flip_yz)
+        export_scene(scene, filepath, option_flip_yz, option_colors)
 
         geo_set = set()
 
