@@ -290,14 +290,14 @@ THREE.Vector3.prototype = {
 
 	setRotationFromMatrix : function ( m ) {
 
-		this.y = Math.asin( m.n13 );
-
 		var cosY = Math.cos( this.y );
+
+		this.y = Math.asin( m.n13 );
 
 		if ( Math.abs( cosY ) > 0.00001 ) {
 
 			this.x = Math.atan2( - m.n23 / cosY, m.n33 / cosY );
-			this.z = Math.atan2( - m.n13 / cosY, m.n11 / cosY );
+			this.z = Math.atan2( - m.n12 / cosY, m.n11 / cosY );
 
 		} else {
 
