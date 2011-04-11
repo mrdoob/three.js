@@ -43,6 +43,9 @@ bpy.types.Object.THREE_meshCollider = bpy.props.BoolProperty()
 
 bpy.types.Material.THREE_useVertexColors = bpy.props.BoolProperty()
 
+THREE_material_types = [("Basic", "Basic", "Basic"), ("Phong", "Phong", "Phong"), ("Lambert", "Lambert", "Lambert")]
+bpy.types.Material.THREE_materialType = EnumProperty(name = "Material type", description = "Material type", items = THREE_material_types, default = "Lambert")
+
 class OBJECT_PT_hello( bpy.types.Panel ):
 
     bl_label = "THREE"
@@ -79,7 +82,11 @@ class MATERIAL_PT_hello( bpy.types.Panel ):
         row.label(text="Selected material: " + mat.name )
 
         row = layout.row()
+        row.prop( mat, "THREE_materialType", text="Material type" )
+
+        row = layout.row()
         row.prop( mat, "THREE_useVertexColors", text="Use vertex colors" )
+
 
 # ################################################################
 # Importer
@@ -152,8 +159,10 @@ def save_settings_export(properties):
     "option_colors"          : properties.option_colors,
     "option_uv_coords"       : properties.option_uv_coords,
     "option_edges"           : properties.option_edges,
+    "option_faces"           : properties.option_faces,
+    "option_vertices"        : properties.option_vertices,
 
-    "option_vertices_truncate"     : properties.option_vertices_truncate,
+    "option_vertices_truncate" : properties.option_vertices_truncate,
     "option_scale"        : properties.option_scale,
 
     "align_model"         : properties.align_model

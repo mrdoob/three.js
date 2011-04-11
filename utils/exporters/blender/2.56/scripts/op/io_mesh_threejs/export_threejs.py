@@ -751,6 +751,8 @@ def extract_materials(mesh, scene, option_colors):
             #    material['shading'] = "Phong"
             #else:
             #    material['shading'] = "Lambert"
+            
+            material['shading'] = m.THREE_materialType
 
     return materials
 
@@ -1166,6 +1168,8 @@ def extract_material_data(m, option_colors):
     #    material['shading'] = "Phong"
     #else:
     #    material['shading'] = "Lambert"
+
+    material['shading'] = m.THREE_materialType
 
     return material
 
