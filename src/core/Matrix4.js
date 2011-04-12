@@ -476,6 +476,59 @@ THREE.Matrix4.prototype = {
 		return this;
 
 	},
+	
+	getPosition : function() {
+		
+		if( !this.position ) {
+			
+			this.position = new THREE.Vector3();
+			
+		}
+		
+		this.position.set( this.n14, this.n24, this.n34 );
+		
+		return this.position;
+		
+	},
+
+	getColumnX : function() {
+		
+		if( !this.columnX ) {
+			
+			this.columnX = new THREE.Vector3();
+			
+		}
+		
+		this.columnX.set( this.n11, this.n21, this.n31 );
+		
+		return this.columnX;
+	},
+
+	getColumnY : function() {
+		
+		if( !this.columnY ) {
+			
+			this.columnY = new THREE.Vector3();
+			
+		}
+		
+		this.columnY.set( this.n12, this.n22, this.n32 );
+		
+		return this.columnY;
+	},
+
+	getColumnZ : function() {
+		
+		if( !this.columnZ ) {
+			
+			this.columnZ = new THREE.Vector3();
+			
+		}
+		
+		this.columnZ.set( this.n13, this.n23, this.n33 );
+		
+		return this.columnZ;
+	},
 
 	setRotationFromEuler : function( v ) {
 
