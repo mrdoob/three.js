@@ -20,14 +20,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// See http://code.google.com/p/chromium/issues/detail?id=63491
 
-	var _gl,
-	_canvas = document.createElement( 'canvas' ),
+	var _this = this,
+	_gl, _canvas = document.createElement( 'canvas' ),
 	_programs = [],
 	_currentProgram = null,
 	_currentFramebuffer = null,
 	_currentDepthMask = true,
-
-	_this = this,
 
 	// gl state cache
 
@@ -79,6 +77,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 	clearColor = parameters.clearColor !== undefined ? new THREE.Color( parameters.clearColor ) : new THREE.Color( 0x000000 );
 	clearAlpha = parameters.clearAlpha !== undefined ? parameters.clearAlpha : 0;
 
+	this.data = {
+
+		vertices: 0,
+		faces: 0
+
+	}
 
 	this.maxMorphTargets = 8;
 	this.domElement = _canvas;
@@ -2576,6 +2580,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
+			_this.data.vertices += geometryGroup.__webglFaceCount;
+			_this.data.faces += geometryGroup.__webglFaceCount / 3;
+
 		// render lines
 
 		} else if ( object instanceof THREE.Line ) {
@@ -2923,6 +2930,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 			o, ol, oil, webglObject, object, buffer,
 			lights = scene.lights,
 			fog = scene.fog;
+
+		_this.data.vertices = 0;
+		_this.data.faces = 0;
 
 		camera.matrixAutoUpdate && camera.update( undefined, true );
 
@@ -3550,96 +3560,95 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 
 			// screen cull 
-			
-			if(	_lensFlare.hasVertexTexture ||
-			  ( screenPositionPixels[ 0 ] > 0 &&
+
+			if ( _lensFlare.hasVertexTexture || ( screenPositionPixels[ 0 ] > 0 &&
 				screenPositionPixels[ 0 ] < _viewportWidth &&
 				screenPositionPixels[ 1 ] > 0 &&
 				screenPositionPixels[ 1 ] < _viewportHeight )) {
 
 
 				// save current RGB to temp texture
-	
+
 				_gl.bindTexture( _gl.TEXTURE_2D, _lensFlare.tempTexture );
 				_gl.copyTexImage2D( _gl.TEXTURE_2D, 0, _gl.RGB, screenPositionPixels[ 0 ] - 8, screenPositionPixels[ 1 ] - 8, 16, 16, 0 );
 
-	
+
 				// render pink quad
-	
+
 				_gl.uniform1i( uniforms.renderType, 0 );
 				_gl.uniform2fv( uniforms.scale, scale );
 				_gl.uniform3fv( uniforms.screenPosition, screenPosition );
-	
+
 				_gl.disable( _gl.BLEND );
 				_gl.enable( _gl.DEPTH_TEST );
-	
+
 				_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
-	
-	
+
+
 				// copy result to occlusionMap
-	
+
 				_gl.bindTexture( _gl.TEXTURE_2D, _lensFlare.occlusionTexture );
 				_gl.copyTexImage2D( _gl.TEXTURE_2D, 0, _gl.RGBA, screenPositionPixels[ 0 ] - 8, screenPositionPixels[ 1 ] - 8, 16, 16, 0 );
-	
-	
+
+
 				// restore graphics
-	
+
 				_gl.uniform1i( uniforms.renderType, 1 );
 				_gl.disable( _gl.DEPTH_TEST );
 				_gl.bindTexture( _gl.TEXTURE_2D, _lensFlare.tempTexture );
 				_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
-	
-	
+
+
 				// update object positions
-	
+
 				object.positionScreen.x = screenPosition[ 0 ];
 				object.positionScreen.y = screenPosition[ 1 ];
 				object.positionScreen.z = screenPosition[ 2 ];
-	
+
 				if ( object.customUpdateCallback ) {
-	
+
 					object.customUpdateCallback( object );
-	
+
 				} else {
-	
+
 					object.updateLensFlares();
-	
+
 				}
-	
-	
+
+
 				// render flares
-	
+
 				_gl.uniform1i( uniforms.renderType, 2 );
 				_gl.enable( _gl.BLEND );
-				
+
 				for ( f = 0, fl = object.lensFlares.length; f < fl; f ++ ) {
-	
+
 					flare = object.lensFlares[ f ];
-	
+
 					if ( flare.opacity > 0.001 && flare.scale > 0.001 ) {
-	
+
 						screenPosition[ 0 ] = flare.x;
 						screenPosition[ 1 ] = flare.y;
 						screenPosition[ 2 ] = flare.z;
-	
+
 						size = flare.size * flare.scale / _viewportHeight;
 						scale[ 0 ] = size * invAspect;
 						scale[ 1 ] = size;
-	
+
 						_gl.uniform3fv( uniforms.screenPosition, screenPosition );
 						_gl.uniform2fv( uniforms.scale, scale );
 						_gl.uniform1f( uniforms.rotation, flare.rotation );
 						_gl.uniform1f( uniforms.opacity, flare.opacity );
-	
+
 						setBlending( flare.blending );
 						setTexture( flare.texture, 1 );
-	
+
 						_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
-	
+
 					}
-	
+
 				}
-			
+
 			}
 
 		}
@@ -4211,7 +4220,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 		}
-		
+
 		//console.log( "building new program " );
 
 		//
@@ -4629,29 +4638,29 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.bindFramebuffer( _gl.FRAMEBUFFER, renderTexture.__webglFramebuffer );
 
 			_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_2D, renderTexture.__webglTexture, 0 );
-			
-			if( renderTexture.depthBuffer && !renderTexture.stencilBuffer ) {
-				
+
+			if ( renderTexture.depthBuffer && !renderTexture.stencilBuffer ) {
+
 				_gl.renderbufferStorage( _gl.RENDERBUFFER, _gl.DEPTH_COMPONENT16, renderTexture.width, renderTexture.height );
 				_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.DEPTH_ATTACHMENT, _gl.RENDERBUFFER, renderTexture.__webglRenderbuffer );
-		
-		/* For some reason this is not working. Defaulting to RGBA4.	
+
+			/* For some reason this is not working. Defaulting to RGBA4.	
 			} else if( !renderTexture.depthBuffer && renderTexture.stencilBuffer ) {
-			
+
 				_gl.renderbufferStorage( _gl.RENDERBUFFER, _gl.STENCIL_INDEX8, renderTexture.width, renderTexture.height );
 				_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.STENCIL_ATTACHMENT, _gl.RENDERBUFFER, renderTexture.__webglRenderbuffer );
 			*/
 			} else if( renderTexture.depthBuffer && renderTexture.stencilBuffer ) {
-				
+
 				_gl.renderbufferStorage( _gl.RENDERBUFFER, _gl.DEPTH_STENCIL, renderTexture.width, renderTexture.height );
 				_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.DEPTH_STENCIL_ATTACHMENT, _gl.RENDERBUFFER, renderTexture.__webglRenderbuffer );
-				
+
 			} else {
-				
+
 				_gl.renderbufferStorage( _gl.RENDERBUFFER, _gl.RGBA4, renderTexture.width, renderTexture.height );
-				
+
 			}
-			
+
 
 			// Release everything
 

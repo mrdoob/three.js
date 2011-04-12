@@ -4,7 +4,8 @@
 
 THREE.SVGRenderer = function () {
 
-	var _renderList = null,
+	var _this = this,
+	_renderList = null,
 	_projector = new THREE.Projector(),
 	_svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'),
 	_svgWidth, _svgHeight, _svgWidthHalf, _svgHeightHalf,
@@ -33,6 +34,13 @@ THREE.SVGRenderer = function () {
 	this.autoClear = true;
 	this.sortObjects = true;
 	this.sortElements = true;
+
+	this.data = {
+
+		vertices: 0,
+		faces: 0
+
+	}
 
 	this.setQuality = function( quality ) {
 
@@ -72,11 +80,10 @@ THREE.SVGRenderer = function () {
 
 		var e, el, m, ml, fm, fml, element, material;
 
-		if ( this.autoClear ) {
+		this.autoClear && this.clear();
 
-			this.clear();
-
-		}
+		_this.data.vertices = 0;
+		_this.data.faces = 0;
 
 		_renderList = _projector.projectScene( scene, camera, this.sortElements );
 
@@ -368,6 +375,9 @@ THREE.SVGRenderer = function () {
 
 	function renderFace3( v1, v2, v3, element, material, scene ) {
 
+		_this.data.vertices += 3;
+		_this.data.faces ++;
+
 		_svgNode = getPathNode( _pathCount ++ );
 		_svgNode.setAttribute( 'd', 'M ' + v1.positionScreen.x + ' ' + v1.positionScreen.y + ' L ' + v2.positionScreen.x + ' ' + v2.positionScreen.y + ' L ' + v3.positionScreen.x + ',' + v3.positionScreen.y + 'z' );
 
@@ -423,6 +433,9 @@ THREE.SVGRenderer = function () {
 	}
 
 	function renderFace4( v1, v2, v3, v4, element, material, scene ) {
+
+		_this.data.vertices += 4;
+		_this.data.faces ++;
 
 		_svgNode = getPathNode( _pathCount ++ );
 		_svgNode.setAttribute( 'd', 'M ' + v1.positionScreen.x + ' ' + v1.positionScreen.y + ' L ' + v2.positionScreen.x + ' ' + v2.positionScreen.y + ' L ' + v3.positionScreen.x + ',' + v3.positionScreen.y + ' L ' + v4.positionScreen.x + ',' + v4.positionScreen.y + 'z' );
