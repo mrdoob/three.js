@@ -31,8 +31,7 @@ THREE.RollCamera = function ( fov, aspect, near, far ) {
 	var xTemp = new THREE.Vector3();
 	var yTemp = new THREE.Vector3();
 	var zTemp = new THREE.Vector3();
-	var rotationMatrix = new THREE.Matrix4();
-	var tempMatrix = new THREE.Matrix4();
+	var rollMatrix = new THREE.Matrix4();
 
 
 	// custom update
@@ -62,24 +61,21 @@ THREE.RollCamera = function ( fov, aspect, near, far ) {
 		xTemp.cross( yTemp, zTemp ).normalize();
 		yTemp.cross( zTemp, xTemp ).normalize();
 	
-		rotationMatrix.n11 = xTemp.x; rotationMatrix.n12 = yTemp.x; rotationMatrix.n13 = zTemp.x;
-		rotationMatrix.n21 = xTemp.y; rotationMatrix.n22 = yTemp.y; rotationMatrix.n23 = zTemp.y;
-		rotationMatrix.n31 = xTemp.z; rotationMatrix.n32 = yTemp.z; rotationMatrix.n33 = zTemp.z;
-		
+		this.matrix.n11 = xTemp.x; this.matrix.n12 = yTemp.x; this.matrix.n13 = zTemp.x;
+		this.matrix.n21 = xTemp.y; this.matrix.n22 = yTemp.y; this.matrix.n23 = zTemp.y;
+		this.matrix.n31 = xTemp.z; this.matrix.n32 = yTemp.z; this.matrix.n33 = zTemp.z;
 		
 		// save position and calculate camera matrix
 		
 	
-		this.matrix.identity();	
-		this.matrix.n11 = Math.cos( this.roll ); this.matrix.n12 = -Math.sin( this.roll );
-		this.matrix.n21 = Math.sin( this.roll ); this.matrix.n22 =  Math.cos( this.roll );
+		rollMatrix.identity();
+		rollMatrix.n11 = Math.cos( this.roll ); rollMatrix.n12 = -Math.sin( this.roll );
+		rollMatrix.n21 = Math.sin( this.roll ); rollMatrix.n22 =  Math.cos( this.roll );
 	
 	
 		// multiply camera with rotation and set 
 	
-		tempMatrix.multiply( rotationMatrix, this.matrix );
-	
-		this.matrix.copy( tempMatrix );
+		this.matrix.multiplySelf( rollMatrix );
 		this.matrixWorldNeedsUpdate = true;
 	
 		
