@@ -29,7 +29,6 @@ THREE.FlyCamera = function ( parameters ) {
 	THREE.Camera.call( this, parameters.fov, parameters.aspect, parameters.near, parameters.far, parameters.target );
 
 	this.tmpQuaternion = new THREE.Quaternion();
-	this.tdiff = 0;
 	
 	this.movementSpeed = 1.0;
 	this.rollSpeed = 0.005;
@@ -61,6 +60,7 @@ THREE.FlyCamera = function ( parameters ) {
 	this.rotationVector = new THREE.Vector3( 0, 0, 0 );
 
 	this.lastUpdate = new Date().getTime();
+	this.tdiff = 0;
 
 	this.handleEvent = function ( event ) {
 

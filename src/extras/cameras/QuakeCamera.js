@@ -53,6 +53,9 @@ THREE.QuakeCamera = function ( parameters ) {
 
 	this.domElement = document;
 
+	this.lastUpdate = new Date().getTime();
+	this.tdiff = 0;
+
 	if ( parameters ) {
 
 		if ( parameters.movementSpeed !== undefined ) this.movementSpeed = parameters.movementSpeed;
@@ -189,6 +192,10 @@ THREE.QuakeCamera = function ( parameters ) {
 
 	this.update = function() {
 
+		var now = new Date().getTime();
+		this.tdiff = ( now - this.lastUpdate ) / 1000;
+		this.lastUpdate = now;
+		
 		if ( !this.freeze ) {
 
 
@@ -197,7 +204,7 @@ THREE.QuakeCamera = function ( parameters ) {
 				var y = clamp( this.position.y, this.heightMin, this.heightMax ),
 					delta = y - this.heightMin;
 
-				this.autoSpeedFactor = delta * this.heightCoef;
+				this.autoSpeedFactor = this.tdiff * ( delta * this.heightCoef );
 
 			} else {
 
@@ -205,12 +212,14 @@ THREE.QuakeCamera = function ( parameters ) {
 
 			}
 
-			if ( this.moveForward || ( this.autoForward && !this.moveBackward ) ) this.translateZ( - ( this.movementSpeed + this.autoSpeedFactor ) );
-			if ( this.moveBackward ) this.translateZ( this.movementSpeed );
-			if ( this.moveLeft ) this.translateX( - this.movementSpeed );
-			if ( this.moveRight ) this.translateX( this.movementSpeed );
+			var actualMoveSpeed = this.tdiff * this.movementSpeed;
 
-			var actualLookSpeed = this.lookSpeed;
+			if ( this.moveForward || ( this.autoForward && !this.moveBackward ) ) this.translateZ( - ( actualMoveSpeed + this.autoSpeedFactor ) );
+			if ( this.moveBackward ) this.translateZ( actualMoveSpeed );
+			if ( this.moveLeft ) this.translateX( - actualMoveSpeed );
+			if ( this.moveRight ) this.translateX( actualMoveSpeed );
+
+			var actualLookSpeed = this.tdiff * this.lookSpeed;
 
 			if ( !this.activeLook ) {
 
