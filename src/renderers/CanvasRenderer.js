@@ -4,7 +4,8 @@
 
 THREE.CanvasRenderer = function () {
 
-	var _renderList = null,
+	var _this = this,
+	_renderList = null,
 	_projector = new THREE.Projector(),
 
 	_canvas = document.createElement( 'canvas' ),
@@ -81,6 +82,13 @@ THREE.CanvasRenderer = function () {
 	this.sortObjects = true;
 	this.sortElements = true;
 
+	this.data = {
+
+		vertices: 0,
+		faces: 0
+
+	}
+
 	this.setSize = function ( width, height ) {
 
 		_canvasWidth = width;
@@ -151,6 +159,9 @@ THREE.CanvasRenderer = function () {
 		var e, el, element, m, ml, fm, fml, material;
 
 		this.autoClear ? this.clear() : _context.setTransform( 1, 0, 0, - 1, _canvasWidthHalf, _canvasHeightHalf );
+
+		_this.data.vertices = 0;
+		_this.data.faces = 0;
 
 		_renderList = _projector.projectScene( scene, camera, this.sortElements );
 
@@ -538,6 +549,9 @@ THREE.CanvasRenderer = function () {
 
 		function renderFace3( v1, v2, v3, uv1, uv2, uv3, element, material, scene ) {
 
+			_this.data.vertices += 3;
+			_this.data.faces ++;
+
 			setOpacity( material.opacity );
 			setBlending( material.blending );
 
@@ -560,7 +574,6 @@ THREE.CanvasRenderer = function () {
 
 
 				} else if ( material.envMap ) {
-
 
 					if ( material.envMap.mapping instanceof THREE.SphericalReflectionMapping ) {
 
@@ -683,6 +696,9 @@ THREE.CanvasRenderer = function () {
 		}
 
 		function renderFace4( v1, v2, v3, v4, v5, v6, element, material, scene ) {
+
+			_this.data.vertices += 4;
+			_this.data.faces ++;
 
 			setOpacity( material.opacity );
 			setBlending( material.blending );

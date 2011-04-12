@@ -30,8 +30,7 @@
 	<body>
 		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - Object3D::lookAt() demo</div>
 
-		<script type="text/javascript" src="../build/custom/ThreeWebGL.js"></script>
-		<script type="text/javascript" src="../build/custom/ThreeExtras.js"></script>
+		<script type="text/javascript" src="../build/Three.js"></script>
 
 		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
@@ -65,7 +64,7 @@
 
 				scene = new THREE.Scene();
 
-				var geometry = new THREE.Cube( 10, 10, 100 );
+				var geometry = new THREE.Cylinder( 3, 10, 0.1, 100 );
 				var material = new THREE.MeshNormalMaterial( { shading: THREE.SmoothShading } );
 
 				target = new THREE.Mesh( new THREE.Sphere( 100, 20, 20 ), material );
@@ -78,7 +77,6 @@
 					mesh.position.y = Math.random() * 4000 - 2000;
 					mesh.position.z = Math.random() * 4000 - 2000;
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 4 + 2;
-
 					scene.addObject( mesh );
 
 				}

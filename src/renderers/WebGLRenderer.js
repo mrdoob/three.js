@@ -20,14 +20,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// See http://code.google.com/p/chromium/issues/detail?id=63491
 
-	var _gl,
-	_canvas = document.createElement( 'canvas' ),
+	var _this = this,
+	_gl, _canvas = document.createElement( 'canvas' ),
 	_programs = [],
 	_currentProgram = null,
 	_currentFramebuffer = null,
 	_currentDepthMask = true,
-
-	_this = this,
 
 	// gl state cache
 
@@ -79,6 +77,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 	clearColor = parameters.clearColor !== undefined ? new THREE.Color( parameters.clearColor ) : new THREE.Color( 0x000000 );
 	clearAlpha = parameters.clearAlpha !== undefined ? parameters.clearAlpha : 0;
 
+	this.data = {
+
+		vertices: 0,
+		faces: 0
+
+	}
 
 	this.maxMorphTargets = 8;
 	this.domElement = _canvas;
@@ -2576,6 +2580,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
+			_this.data.vertices += geometryGroup.__webglFaceCount;
+			_this.data.faces += geometryGroup.__webglFaceCount / 3;
+
 		// render lines
 
 		} else if ( object instanceof THREE.Line ) {
@@ -2924,7 +2931,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 			lights = scene.lights,
 			fog = scene.fog;
 
-		camera.matrixAutoUpdate && camera.updateMatrix();
+		_this.data.vertices = 0;
+		_this.data.faces = 0;
+
+		camera.matrixAutoUpdate && camera.update( undefined, true );
 
 		scene.update( undefined, false, camera );
 
@@ -3133,11 +3143,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		// render 2d
-		
+
 		if ( scene.__webglSprites.length ) {
-			
+
 			renderSprites( scene, camera );
-			
+
 		}
 
 		// render stencil shadows
@@ -3324,23 +3334,22 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var halfViewportWidth = _viewportWidth * 0.5;
 		var halfViewportHeight = _viewportHeight * 0.5;
 		var mergeWith3D = true;
-		
 
 		// setup gl
-		
+
 		_gl.useProgram( _sprite.program );
 		_currentProgram = _sprite.program;
 		_oldBlending = "";
 
 		if ( !_spriteAttributesEnabled ) {
-	
+
 			_gl.enableVertexAttribArray( _sprite.attributes.position );
 			_gl.enableVertexAttribArray( _sprite.attributes.uv );
-			
+
 			_spriteAttributesEnabled = true;
 
 		}
-		
+
 		_gl.disable( _gl.CULL_FACE );
 		_gl.enable( _gl.BLEND );
 		_gl.depthMask( true );
@@ -3350,65 +3359,64 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_gl.vertexAttribPointer( attributes.uv, 2, _gl.FLOAT, false, 2 * 8, 8 );
 
 		_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, _sprite.elementBuffer );
-		
+
 		_gl.uniformMatrix4fv( uniforms.projectionMatrix, false, _projectionMatrixArray );
 
 		_gl.activeTexture( _gl.TEXTURE0 );
 		_gl.uniform1i( uniforms.map, 0 );
-		
+
 		// update positions and sort
-		
+
 		for( o = 0, ol = scene.__webglSprites.length; o < ol; o++ ) {
-			
+
 			object = scene.__webglSprites[ o ];
-			
+
 			if( !object.useScreenCoordinates ) {
-			
+
 				object._modelViewMatrix.multiplyToArray( camera.matrixWorldInverse, object.matrixWorld, object._modelViewMatrixArray );
 				object.z = -object._modelViewMatrix.n34;
-			
+
 			} else {
-				
+
 				object.z = -object.position.z;
-				
+
 			}
-		
+
 		}
 
 		scene.__webglSprites.sort( painterSort );
-		
 
 		// render all non-custom shader sprites
-				
-		for( o = 0, ol = scene.__webglSprites.length; o < ol; o++ ) {
+
+		for ( o = 0, ol = scene.__webglSprites.length; o < ol; o++ ) {
 
 			object = scene.__webglSprites[ o ];
 
-			if( object.material === undefined ) {
+			if ( object.material === undefined ) {
 
-				if( object.map && object.map.image && object.map.image.width ) {
-	
-					if( object.useScreenCoordinates ) {
-						
+				if ( object.map && object.map.image && object.map.image.width ) {
+
+					if ( object.useScreenCoordinates ) {
+
 						_gl.uniform1i( uniforms.useScreenCoordinates, 1 );
 						_gl.uniform3f( uniforms.screenPosition, ( object.position.x - halfViewportWidth  ) / halfViewportWidth, 
 														        ( halfViewportHeight - object.position.y ) / halfViewportHeight,
 														          Math.max( 0, Math.min( 1, object.position.z )));
-						
+
 					} else {
 
-						
+
 
 						_gl.uniform1i( uniforms.useScreenCoordinates, 0 );
 						_gl.uniform1i( uniforms.affectedByDistance, object.affectedByDistance ? 1 : 0 );
 						_gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, object._modelViewMatrixArray );
-						
+
 					}
-				
+
 					size = object.map.image.width / ( object.affectedByDistance ? 1 : _viewportHeight );
 					scale[ 0 ] = size * invAspect * object.scale.x;
 					scale[ 1 ] = size * object.scale.y;
-				
+
 					_gl.uniform2f( uniforms.uvScale, object.uvScale.x, object.uvScale.y );
 					_gl.uniform2f( uniforms.uvOffset, object.uvOffset.x, object.uvOffset.y );
 					_gl.uniform2f( uniforms.alignment, object.alignment.x, object.alignment.y );
@@ -3416,39 +3424,40 @@ THREE.WebGLRenderer = function ( parameters ) {
 					_gl.uniform1f( uniforms.rotation, object.rotation );
 					_gl.uniform2fv( uniforms.scale, scale );
 
-					if( object.mergeWith3D && !mergeWith3D ) {
-						
+					if ( object.mergeWith3D && !mergeWith3D ) {
+
 						_gl.enable( _gl.DEPTH_TEST );
 						mergeWith3D = true;
-						
-					} else if( !object.mergeWith3D && mergeWith3D ) {
-						
+
+					} else if ( !object.mergeWith3D && mergeWith3D ) {
+
 						_gl.disable( _gl.DEPTH_TEST );
 						mergeWith3D = false;
-						
+
 					}
-	
+
 					setBlending( object.blending );
 					setTexture( object.map, 0 );
-			
+
 					_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
 				}
-				
+
 			} else {
-				
+
 				anyCustom = true;
-				
+
 			}
-			
+
 		}
 
 
 		// loop through all custom
 
-/*		if( anyCustom ) {
-			
+		/*
+		if( anyCustom ) {
+
 		}
-*/
+		*/
 
 		// restore gl
 
@@ -3551,96 +3560,95 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 
 			// screen cull 
-			
-			if(	_lensFlare.hasVertexTexture ||
-			  ( screenPositionPixels[ 0 ] > 0 &&
+
+			if ( _lensFlare.hasVertexTexture || ( screenPositionPixels[ 0 ] > 0 &&
 				screenPositionPixels[ 0 ] < _viewportWidth &&
 				screenPositionPixels[ 1 ] > 0 &&
 				screenPositionPixels[ 1 ] < _viewportHeight )) {
 
 
 				// save current RGB to temp texture
-	
+
 				_gl.bindTexture( _gl.TEXTURE_2D, _lensFlare.tempTexture );
 				_gl.copyTexImage2D( _gl.TEXTURE_2D, 0, _gl.RGB, screenPositionPixels[ 0 ] - 8, screenPositionPixels[ 1 ] - 8, 16, 16, 0 );
 
-	
+
 				// render pink quad
-	
+
 				_gl.uniform1i( uniforms.renderType, 0 );
 				_gl.uniform2fv( uniforms.scale, scale );
 				_gl.uniform3fv( uniforms.screenPosition, screenPosition );
-	
+
 				_gl.disable( _gl.BLEND );
 				_gl.enable( _gl.DEPTH_TEST );
-	
+
 				_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
-	
-	
+
+
 				// copy result to occlusionMap
-	
+
 				_gl.bindTexture( _gl.TEXTURE_2D, _lensFlare.occlusionTexture );
 				_gl.copyTexImage2D( _gl.TEXTURE_2D, 0, _gl.RGBA, screenPositionPixels[ 0 ] - 8, screenPositionPixels[ 1 ] - 8, 16, 16, 0 );
-	
-	
+
+
 				// restore graphics
-	
+
 				_gl.uniform1i( uniforms.renderType, 1 );
 				_gl.disable( _gl.DEPTH_TEST );
 				_gl.bindTexture( _gl.TEXTURE_2D, _lensFlare.tempTexture );
 				_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
-	
-	
+
+
 				// update object positions
-	
+
 				object.positionScreen.x = screenPosition[ 0 ];
 				object.positionScreen.y = screenPosition[ 1 ];
 				object.positionScreen.z = screenPosition[ 2 ];
-	
+
 				if ( object.customUpdateCallback ) {
-	
+
 					object.customUpdateCallback( object );
-	
+
 				} else {
-	
+
 					object.updateLensFlares();
-	
+
 				}
-	
-	
+
+
 				// render flares
-	
+
 				_gl.uniform1i( uniforms.renderType, 2 );
 				_gl.enable( _gl.BLEND );
-				
+
 				for ( f = 0, fl = object.lensFlares.length; f < fl; f ++ ) {
-	
+
 					flare = object.lensFlares[ f ];
-	
+
 					if ( flare.opacity > 0.001 && flare.scale > 0.001 ) {
-	
+
 						screenPosition[ 0 ] = flare.x;
 						screenPosition[ 1 ] = flare.y;
 						screenPosition[ 2 ] = flare.z;
-	
+
 						size = flare.size * flare.scale / _viewportHeight;
 						scale[ 0 ] = size * invAspect;
 						scale[ 1 ] = size;
-	
+
 						_gl.uniform3fv( uniforms.screenPosition, screenPosition );
 						_gl.uniform2fv( uniforms.scale, scale );
 						_gl.uniform1f( uniforms.rotation, flare.rotation );
 						_gl.uniform1f( uniforms.opacity, flare.opacity );
-	
+
 						setBlending( flare.blending );
 						setTexture( flare.texture, 1 );
-	
+
 						_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
-	
+
 					}
-	
+
 				}
-			
+
 			}
 
 		}
@@ -3706,11 +3714,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-/*		for ( var o = 0, ol = scene.__webglSprites.length; o < ol; o ++ ) {
+		/*
+		for ( var o = 0, ol = scene.__webglSprites.length; o < ol; o ++ ) {
 
 			updateObject( scene.__webglSprites[ o ].object, scene );
 
-		}*/
+		}
+		*/
 
 	};
 
@@ -3834,11 +3844,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 			addBufferImmediate( scene.__webglObjectsImmediate, object );
 
 		} else if ( object instanceof THREE.Sprite ) {
-			
+
 			scene.__webglSprites.push( object );
 		}
-		
-		
+
 		/*else if ( object instanceof THREE.Particle ) {
 
 		}*/
@@ -3942,20 +3951,39 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var o, ol, zobject;
 
-		for ( o = scene.__webglObjects.length - 1; o >= 0; o-- ) {
+		if ( object instanceof THREE.Mesh ) {
 
-			zobject = scene.__webglObjects[ o ].object;
+			for ( o = scene.__webglObjects.length - 1; o >= 0; o -- ) {
 
-			if ( object == zobject ) {
+				zobject = scene.__webglObjects[ o ].object;
 
-				scene.__webglObjects.splice( o, 1 );
-				return;
+				if ( object == zobject ) {
+
+					scene.__webglObjects.splice( o, 1 );
+					return;
+
+				}
+
+			}
+
+		} else if ( object instanceof THREE.Sprite ) {
+
+			for ( o = scene.__webglSprites.length - 1; o >= 0; o -- ) {
+
+				zobject = scene.__webglSprites[ o ];
+
+				if ( object == zobject ) {
+
+					scene.__webglSprites.splice( o, 1 );
+					return;
+
+				}
 
 			}
 
 		}
-		
-		// add shadwos/sprites etc.
+
+		// add shadows, etc
 
 	};
 
@@ -4192,7 +4220,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 		}
-		
+
 		//console.log( "building new program " );
 
 		//
@@ -4519,6 +4547,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			} else {
 
 				_gl.bindTexture( _gl.TEXTURE_2D, texture.__webglTexture );
+				// _gl.texImage2D( _gl.TEXTURE_2D, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, texture.image );
 				_gl.texSubImage2D( _gl.TEXTURE_2D, 0, 0, 0, _gl.RGBA, _gl.UNSIGNED_BYTE, texture.image );
 
 			}
@@ -4561,6 +4590,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					for ( var i = 0; i < 6; ++i ) {
 
+						// _gl.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, texture.image[ i ] );
 						_gl.texSubImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, 0, 0, _gl.RGBA, _gl.UNSIGNED_BYTE, texture.image[ i ] );
 
 					}
@@ -4608,29 +4638,29 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.bindFramebuffer( _gl.FRAMEBUFFER, renderTexture.__webglFramebuffer );
 
 			_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_2D, renderTexture.__webglTexture, 0 );
-			
-			if( renderTexture.depthBuffer && !renderTexture.stencilBuffer ) {
-				
+
+			if ( renderTexture.depthBuffer && !renderTexture.stencilBuffer ) {
+
 				_gl.renderbufferStorage( _gl.RENDERBUFFER, _gl.DEPTH_COMPONENT16, renderTexture.width, renderTexture.height );
 				_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.DEPTH_ATTACHMENT, _gl.RENDERBUFFER, renderTexture.__webglRenderbuffer );
-		
-		/* For some reason this is not working. Defaulting to RGBA4.	
+
+			/* For some reason this is not working. Defaulting to RGBA4.	
 			} else if( !renderTexture.depthBuffer && renderTexture.stencilBuffer ) {
-			
+
 				_gl.renderbufferStorage( _gl.RENDERBUFFER, _gl.STENCIL_INDEX8, renderTexture.width, renderTexture.height );
 				_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.STENCIL_ATTACHMENT, _gl.RENDERBUFFER, renderTexture.__webglRenderbuffer );
 			*/
 			} else if( renderTexture.depthBuffer && renderTexture.stencilBuffer ) {
-				
+
 				_gl.renderbufferStorage( _gl.RENDERBUFFER, _gl.DEPTH_STENCIL, renderTexture.width, renderTexture.height );
 				_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.DEPTH_STENCIL_ATTACHMENT, _gl.RENDERBUFFER, renderTexture.__webglRenderbuffer );
-				
+
 			} else {
-				
+
 				_gl.renderbufferStorage( _gl.RENDERBUFFER, _gl.RGBA4, renderTexture.width, renderTexture.height );
-				
+
 			}
-			
+
 
 			// Release everything
 

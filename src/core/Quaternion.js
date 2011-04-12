@@ -1,5 +1,6 @@
 /*
  * @author mikael emtinger / http://gomo.se/
+ * @author alteredq / http://alteredqualia.com/
  */
 
 THREE.Quaternion = function( x, y, z, w ) {
@@ -28,6 +29,17 @@ THREE.Quaternion.prototype = {
 
 	},
 
+	copy : function ( q ) {
+
+		this.x = q.x;
+		this.y = q.y;
+		this.z = q.z;
+		this.w = q.w;
+
+		return this;
+
+	},
+
 	setFromEuler : function ( vec3 ) {
 
 		var c = 0.5 * Math.PI / 360, // 0.5 is an optimization
@@ -41,6 +53,7 @@ THREE.Quaternion.prototype = {
 		s2 = Math.sin( -z ),
 		c3 = Math.cos( x  ),
 		s3 = Math.sin( x  ),
+
 		c1c2 = c1 * c2,
 		s1s2 = s1 * s2;
 
@@ -53,6 +66,23 @@ THREE.Quaternion.prototype = {
 
 	},
 
+	setFromAxisAngle: function ( axis, angle ) {
+
+		// from http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToQuaternion/index.htm
+		// axis have to be normalized
+
+		var halfAngle = angle / 2,
+			s = Math.sin( halfAngle );
+
+		this.x = axis.x * s;
+		this.y = axis.y * s;
+		this.z = axis.z * s;
+		this.w = Math.cos( halfAngle );
+
+		return this;
+
+	},
+	
 	calculateW  : function () {
 
 		this.w = - Math.sqrt( Math.abs( 1.0 - this.x * this.x - this.y * this.y - this.z * this.z ) );
@@ -113,6 +143,19 @@ THREE.Quaternion.prototype = {
 		this.z = qaz * qbw + qaw * qbz + qax * qby - qay * qbx;
 		this.w = qaw * qbw - qax * qbx - qay * qby - qaz * qbz;
 
+		return this;
+
+	},
+
+	multiply: function ( q1, q2 ) {
+
+		// from http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/code/index.htm
+
+		this.x =  q1.x * q2.w + q1.y * q2.z - q1.z * q2.y + q1.w * q2.x;
+		this.y = -q1.x * q2.z + q1.y * q2.w + q1.z * q2.x + q1.w * q2.y;
+		this.z =  q1.x * q2.y - q1.y * q2.x + q1.z * q2.w + q1.w * q2.z;
+		this.w = -q1.x * q2.x - q1.y * q2.y - q1.z * q2.z + q1.w * q2.w;
+		
 		return this;
 
 	},

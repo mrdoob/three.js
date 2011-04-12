@@ -315,12 +315,6 @@ def compress(text):
 	with os.fdopen(in_tuple[0], 'w') as handle:
 		handle.write(text)
 
-	# uncomment to get concatenated JS if you can't figure out Closure compiler errors :|
-
-	#f = open( "debug.js" , "w" )
-	#f.write(text)
-	#f.close()
-
 	out_tuple = tempfile.mkstemp()
 	# os.system("java -jar yuicompressor-2.4.2.jar %s --type js -o %s --charset utf-8 -v" % (in_tuple[1], out_tuple[1]))
 	os.system("java -jar compiler.jar --language_in=ECMASCRIPT5 --js %s --js_output_file %s" % (in_tuple[1], out_tuple[1]))
@@ -353,7 +347,7 @@ def makeDebug(text):
 	return text
 
 
-def buildLib(files, debug, filename):
+def buildLib(files, debug, unminified, filename):
 
 	text = merge(files)
 
@@ -372,7 +366,10 @@ def buildLib(files, debug, filename):
 	print "Compiling", filename
 	print "=" * 40
 
-	output(addHeader(compress(text), filename), folder + filename)
+	if not unminified:
+		text = compress(text)
+	
+	output(addHeader(text, filename), folder + filename)
 
 
 def buildIncludes(files, filename):
@@ -395,6 +392,7 @@ def parse_args():
 		parser.add_argument('--svg', help='Build ThreeSVG.js', action='store_true')
 		parser.add_argument('--dom', help='Build ThreeDOM.js', action='store_true')
 		parser.add_argument('--debug', help='Generate debug versions', action='store_const', const=True, default=False)
+		parser.add_argument('--unminified', help='Generate unminified versions', action='store_const', const=True, default=False)
 		parser.add_argument('--all', help='Build all Three.js versions', action='store_true')
 
 		args = parser.parse_args()
@@ -409,6 +407,7 @@ def parse_args():
 		parser.add_option('--svg', dest='svg', help='Build ThreeSVG.js', action='store_true')
 		parser.add_option('--dom', dest='dom', help='Build ThreeDOM.js', action='store_true')
 		parser.add_option('--debug', dest='debug', help='Generate debug versions', action='store_const', const=True, default=False)
+		parser.add_option('--unminified', help='Generate unminified versions', action='store_const', const=True, default=False)
 		parser.add_option('--all', dest='all', help='Build all Three.js versions', action='store_true')
 
 		args, remainder = parser.parse_args()
@@ -425,6 +424,7 @@ def main(argv=None):
 
 	args = parse_args()
 	debug = args.debug
+	unminified = args.unminified
 
 	config = [
 	['Three', 'includes', COMMON_FILES + EXTRAS_FILES, args.common],
@@ -437,7 +437,7 @@ def main(argv=None):
 
 	for fname_lib, fname_inc, files, enabled in config:
 		if enabled or args.all:
-			buildLib(files, debug, fname_lib)
+			buildLib(files, debug, unminified, fname_lib)
 			if args.includes:
 				buildIncludes(files, fname_inc)
 
