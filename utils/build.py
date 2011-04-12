@@ -91,6 +91,7 @@ EXTRAS_FILES = [
 'extras/cameras/QuakeCamera.js',
 'extras/cameras/PathCamera.js',
 'extras/cameras/FlyCamera.js',
+'extras/cameras/RollCamera.js',
 'extras/geometries/Cube.js',
 'extras/geometries/Cylinder.js',
 'extras/geometries/Icosahedron.js',

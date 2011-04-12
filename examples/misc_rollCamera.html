@@ -1,0 +1,238 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>three.js - webgl - roll camera example</title>
+		<meta charset="utf-8">
+		<style type="text/css">
+		    body {
+			color: #000;
+			font-family:Monospace;
+			font-size:13px;
+			text-align:center;
+			font-weight: bold;
+
+			background-color: #fff;
+			margin: 0px;
+			overflow: hidden;
+		    }
+
+		    #info {
+					color:#000;
+			position: absolute;
+			top: 0px; width: 100%;
+			padding: 5px;
+
+		    }
+
+		    a { color: red; }
+
+		</style>
+	</head>
+
+	<body>
+		<div id="container"></div>
+		<div id="info">
+			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - roll camera example -</br>W/S forward/backward</br>A/D to roll</br>Mouse to look around 
+		</div>
+
+		<script type="text/javascript" src="../build/Three.js"></script>
+		<script type="text/javascript" src="js/Stats.js"></script>
+
+		<script type="text/javascript">
+		
+			var statsEnabled = true;
+
+			var container, stats;
+
+			var camera, scene, renderer;
+
+			var cross;
+
+			var mouseX = 0, mouseY = 0;
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+			var doRoll = false, rollDirection = 1, forwardSpeed = 0;
+
+			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+			document.addEventListener( 'keydown', onKeyDown, false );
+			document.addEventListener( 'keyup', onKeyUp, false );
+
+			init();
+
+			function init() {
+
+				// scene and camera
+
+				scene = new THREE.Scene();
+				camera = new THREE.RollCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
+
+
+				// world
+
+				var cube = new THREE.Cube( 20, 60, 20 );
+				
+				cube.vertices[ 0 ].position.multiplyScalar( 0.1 );
+				cube.vertices[ 1 ].position.multiplyScalar( 0.1 );
+				cube.vertices[ 4 ].position.multiplyScalar( 0.1 );
+				cube.vertices[ 5 ].position.multiplyScalar( 0.1 );
+				
+				var material = new THREE.MeshPhongMaterial( { color:0xffffff } );
+
+				for( var i = 0; i < 200; i++ ) {
+					
+					var mesh = new THREE.Mesh( cube, material );
+					mesh.position.set(( Math.random() - 0.5 ) * 1000,
+									  ( Math.random() - 0.5 ) * 1000,
+									  ( Math.random() - 0.5 ) * 1000 );
+									  
+					scene.addChild( mesh );
+					
+				}
+
+
+				// create cross
+
+				cross = new THREE.Object3D();
+				cross.scale.set( 0.5, 0.5, 0.5 );
+				cross.matrixAutoUpdate = false;
+
+				var material = new THREE.MeshPhongMaterial( { color:0xff0000 } );
+				var mesh = new THREE.Mesh( new THREE.Cube( 40, 5, 5 ), material );
+				mesh.position.x = 20;
+				cross.addChild( mesh );
+
+				var material = new THREE.MeshPhongMaterial( { color:0x00ff00 } );
+				var mesh = new THREE.Mesh( new THREE.Cube( 5, 40, 5 ), material );
+				mesh.position.y = 20;
+				cross.addChild( mesh );
+
+				var material = new THREE.MeshPhongMaterial( { color:0x0000ff } );
+				var mesh = new THREE.Mesh( new THREE.Cube( 5, 5, 40 ), material );
+				mesh.position.z = 20;
+				cross.addChild( mesh );
+				
+				//camera.addChild( cross );
+				scene.addChild( camera );
+
+
+				// lights				
+
+				light = new THREE.DirectionalLight( 0xfffff );
+				light.position.set( 1, 1, 1 );
+				scene.addChild( light );
+
+				light = new THREE.DirectionalLight( 0xff0000 );
+				light.position.set( -1, -1, -1 );
+				scene.addChild( light );
+
+				light = new THREE.AmbientLight( 0x666666 );
+				scene.addChild( light );
+
+
+				// renderer
+
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer.setClearColorHex( 0xffffff, 1 );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				container = document.getElementById( 'container' );
+				container.appendChild( renderer.domElement );
+
+				if ( statsEnabled ) {
+
+					stats = new Stats();
+					stats.domElement.style.position = 'absolute';
+					stats.domElement.style.top = '0px';
+					stats.domElement.style.zIndex = 100;
+					container.appendChild( stats.domElement );
+
+				}
+
+				setInterval( loop, 1000 / 60 );
+			}
+
+
+			function loop() {
+
+				camera.rotateHorizontally( mouseX * 0.05 );
+				camera.rotateVertically( mouseY * 0.05 );
+				camera.translateZ( forwardSpeed )
+
+				if( doRoll ) {
+					
+					camera.roll += 0.01 * rollDirection;
+				}
+
+				cross.matrix.copy( camera.matrix );
+				cross.matrix.n14 = 0;
+				cross.matrix.n24 = 0;
+				cross.matrix.n34 = -200;
+				cross.matrixWorldNeedsUpdate = true;
+
+				renderer.render( scene, camera );
+
+				if ( statsEnabled ) stats.update();
+
+			}
+
+
+			function onKeyDown( event ) {
+		
+				switch( event.keyCode ) {
+		
+					case 38: /*up*/
+					case 87: /*W*/ forwardSpeed = 1; break;
+		
+					case 37: /*left*/
+					case 65: /*A*/ doRoll = true; rollDirection = 1; break;
+		
+					case 40: /*down*/
+					case 83: /*S*/ forwardSpeed = -1; break;
+		
+					case 39: /*right*/
+					case 68: /*D*/ doRoll = true; rollDirection = -1; break;
+		
+				}
+		
+			}
+		
+			function onKeyUp( event ) {
+		
+				switch( event.keyCode ) {
+		
+					case 38: /*up*/
+					case 87: /*W*/ forwardSpeed = 0; break;
+		
+					case 37: /*left*/
+					case 65: /*A*/ doRoll = false; break;
+		
+					case 40: /*down*/
+					case 83: /*S*/ forwardSpeed = 0; break;
+		
+					case 39: /*right*/
+					case 68: /*D*/ doRoll = false; break;
+		
+				}
+		
+			}
+
+			function onDocumentMouseMove(event) {
+
+				mouseX = ( event.clientX - windowHalfX ) / window.innerWidth;
+				mouseY = ( event.clientY - windowHalfY ) / window.innerHeight;
+
+			}
+
+
+			function log( text ) {
+
+				var e = document.getElementById("log");
+				e.innerHTML = text + "<br/>" + e.innerHTML;
+
+			}
+		</script>
+
+	</body>
+</html>
