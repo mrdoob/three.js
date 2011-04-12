@@ -38,7 +38,7 @@ THREE.RollCamera = function ( fov, aspect, near, far ) {
 
 	this.update = function() {
 	
-		// clamp forward up / down
+		// cap forward up / down
 		
 		if( this.forward.y > 0.9 ) {
 			
@@ -53,7 +53,7 @@ THREE.RollCamera = function ( fov, aspect, near, far ) {
 		}
 
 
-		// construct rotation matrix
+		// construct unrolled camera matrix
 	
 		zTemp.copy( this.forward );
 		yTemp.set( 0, 1, 0 );
@@ -65,15 +65,15 @@ THREE.RollCamera = function ( fov, aspect, near, far ) {
 		this.matrix.n21 = xTemp.y; this.matrix.n22 = yTemp.y; this.matrix.n23 = zTemp.y;
 		this.matrix.n31 = xTemp.z; this.matrix.n32 = yTemp.z; this.matrix.n33 = zTemp.z;
 		
-		// save position and calculate camera matrix
 		
+		// calculate roll matrix
 	
 		rollMatrix.identity();
 		rollMatrix.n11 = Math.cos( this.roll ); rollMatrix.n12 = -Math.sin( this.roll );
 		rollMatrix.n21 = Math.sin( this.roll ); rollMatrix.n22 =  Math.cos( this.roll );
 	
 	
-		// multiply camera with rotation and set 
+		// multiply camera with roll
 	
 		this.matrix.multiplySelf( rollMatrix );
 		this.matrixWorldNeedsUpdate = true;
@@ -84,7 +84,6 @@ THREE.RollCamera = function ( fov, aspect, near, far ) {
 		this.matrix.n14 = this.position.x;
 		this.matrix.n24 = this.position.y;
 		this.matrix.n34 = this.position.z;
-	
 		
 		
 		// call supr
