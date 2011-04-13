@@ -1,5 +1,5 @@
 /**
- * @author drojdjou / http://everyday3d.com/
+ * @author bartek drozdz / http://everyday3d.com/
  */
 
 THREE.PlaneCollider = function( point, normal ) {
@@ -38,6 +38,7 @@ THREE.MeshCollider = function( vertices, faces, normals, box ) {
 
 THREE.CollisionSystem = function() {
 
+	this.collisionNormal = null;
 	this.colliders = [];
 	this.hits = [];
 
@@ -139,8 +140,12 @@ THREE.CollisionSystem.prototype.rayMesh = function( r, me ) {
 		var p2 = me.vertices[ me.faces[ t + 2 ] ];
 		var n = me.normals[ me.faces[ i ] ];
 
-		d = Math.min(d, this.rayTriangle( rt, p0, p1, p2, n, d ) );
-
+		var nd = this.rayTriangle( rt, p0, p1, p2, n, d );
+		
+		if(nd < d) {
+			d = nd;
+			me.normal = this.collisionNormal;
+		}
 	}
 
 	return d;
@@ -245,7 +250,9 @@ THREE.CollisionSystem.prototype.rayTriangle = function( ray, p0, p1, p2, n, mind
 	var gamma = 1 - alpha - beta;
 	if( !(gamma >= 0) ) return Number.MAX_VALUE;
 	//console.log("gamma: " + gamma);
-
+	
+	this.collisionNormal = n;
+	
 	return t;
 
 };
