@@ -94,6 +94,7 @@
 				// lights
 
 				light = new THREE.DirectionalLight( 0xffffff );
+				light.castShadow = true;
 				light.position.set( 0, 1, 0 );
 				scene.addChild( light );
 
