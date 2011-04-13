@@ -38,7 +38,7 @@ THREE.MeshCollider = function( vertices, faces, normals, box ) {
 
 THREE.CollisionSystem = function() {
 
-	this.collisionNormal;
+	this.collisionNormal = null;
 	this.colliders = [];
 	this.hits = [];
 
