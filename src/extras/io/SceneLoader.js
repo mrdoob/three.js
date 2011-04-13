@@ -501,6 +501,12 @@ THREE.SceneLoader.prototype = {
 
 				}
 
+				if ( m.parameters.opacity !== undefined && m.parameters.opacity < 1.0 ) {
+					
+					m.parameters.transparent = true;
+
+				}
+				
 				material = new THREE[ m.type ]( m.parameters );
 				result.materials[ dm ] = material;
 
