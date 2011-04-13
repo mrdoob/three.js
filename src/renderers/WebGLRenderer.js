@@ -344,6 +344,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_stencilShadow.darkness = value;
 	};
 
+	this.getContext = function() {
+		
+		return _gl;
+		
+	}
+
 
 	function setupLights ( program, lights ) {
 
@@ -3222,7 +3228,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			light = scene.lights[ l ];
 
-			if ( light instanceof THREE.DirectionalLight ) {
+			if ( light instanceof THREE.DirectionalLight && light.castShadow ) {
 
 				dirLight[ 0 ] = -light.position.x;
 				dirLight[ 1 ] = -light.position.y;
