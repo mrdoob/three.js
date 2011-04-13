@@ -1,62 +1,66 @@
 /**
  * @author alteredq / http://alteredqualia.com/
+ * @author mr.doob / http://mrdoob.com/
  */
 
 Detector = {
 
-	// supported features
-
-	canvas	: !!window.CanvasRenderingContext2D,
-	webgl	: !!window.WebGLRenderingContext,
-	workers : !!window.Worker,
+	canvas : !! window.CanvasRenderingContext2D,
+	webgl : !! window.WebGLRenderingContext,
+	webglGfxCard : ( function () { try { return !! window.WebGLRenderingContext && !! document.createElement( 'canvas' ).getContext( 'experimental-webgl' ); } catch( e ) { return false; } } )(),
+	workers : !! window.Worker,
 	fileapi : window.File && window.FileReader && window.FileList && window.Blob,
 
-	// helper methods
+	getWebGLErrorMessage : function () {
 
-	addGetWebGLMessage: function( parameters ) {
+		var html;
 
-		var parent = document.body,
-			id = "oldie" ;
+		if ( ! this.webgl ) {
 
-		if ( parameters ) {
+			html = [
+				'Sorry, your browser doesn\'t support <a href="http://khronos.org/webgl/wiki/Getting_a_WebGL_Implementation">WebGL</a><br/>',
+				'Please try with',
+				'<a href="http://www.google.com/chrome">Chrome 10</a>, ',
+				'<a href="http://www.mozilla.com/en-US/firefox/all-beta.html">Firefox 4</a> or',
+				'<a href="http://nightly.webkit.org/">Safari 6</a>'
+			].join( '\n' );
 
-			if ( parameters.parent !== undefined ) parent  = parameters.parent;
-			if ( parameters.id !== undefined ) id  = parameters.id;
+		} else if ( ! this.webglGfxCard ) {
+
+			html = [
+				'Sorry, your browser supports <a href="http://khronos.org/webgl/wiki/Getting_a_WebGL_Implementation">WebGL</a><br/> but you may need to upgrade your graphics card.'
+			].join( '\n' );
 
 		}
 
-		var html = [
+		var msg = document.createElement( 'div' );
+		msg.style.fontFamily = 'monospace';
+		msg.style.fontSize = '13px';
+		msg.style.textAlign = 'center';
+		msg.style.background = '#eee';
+		msg.style.color = '#000';
+		msg.style.padding = '1em';
+		msg.style.width = '475px';
+		msg.style.margin = '5em auto 0';
+		msg.innerHTML = html;
 
-			'Sorry, your browser doesn\'t support <a href="http://khronos.org/webgl/wiki/Getting_a_WebGL_Implementation">WebGL</a><br/>',
-			'<br/>',
-			'Please try with',
-			'<a href="http://www.google.com/chrome">Chrome 9+</a> /',
-			'<a href="http://www.mozilla.com/en-US/firefox/all-beta.html">Firefox 4+</a> /',
-			'<a href="http://nightly.webkit.org/">Safari 10.6+</a>'
+		return msg;
 
-		].join("\n");
+	},
 
-		var wrap = document.createElement( "center" ),
-			message = document.createElement( "div" );
+	addGetWebGLMessage : function ( parameters ) {
 
-		message.innerHTML = html;
-		message.id = id;
+		var parent, id, domElement;
 
-		var style = message.style;
+		parameters = parameters || {};
 
-		style.fontFamily = "monospace";
-		style.fontSize = "13px";
-		style.textAlign = "center";
-		style.background = "#eee";
-		style.color = "#000";
-		style.padding = "1em";
-		style.width = "475px";
-		style.margin = "5em auto 0";
+		parent = parameters.parent !== undefined ? parameters.parent : document.body;
+		id = parameters.id !== undefined ? parameters.id : 'oldie';
 
-		wrap.appendChild( message )
-		parent.appendChild( wrap );
+		domElement = Detector.getWebGLErrorMessage();
+		domElement.id = id;
 
-		return message;
+		parent.appendChild( domElement );
 
 	}
 
