@@ -151,6 +151,9 @@ def save_settings_export(properties):
 
     settings = {
     "option_export_scene" : properties.option_export_scene,
+    
+    "option_lights" : properties.option_lights,
+    "option_cameras" : properties.option_cameras,
 
     "option_flip_yz"      : properties.option_flip_yz,
 
@@ -198,6 +201,9 @@ def restore_settings_export(properties):
 
     properties.option_export_scene = settings.get("option_export_scene", False)
 
+    properties.option_lights = settings.get("option_lights", False)
+    properties.option_cameras = settings.get("option_cameras", False)
+
 # ################################################################
 # Exporter
 # ################################################################
@@ -231,6 +237,8 @@ class ExportTHREEJS(bpy.types.Operator, ExportHelper):
     option_flip_yz = BoolProperty(name = "Flip YZ", description = "Flip YZ", default = True)
 
     option_export_scene = BoolProperty(name = "Scene", description = "Export scene", default = False)
+    option_lights = BoolProperty(name = "Lights", description = "Export default scene lights", default = False)
+    option_cameras = BoolProperty(name = "Cameras", description = "Export default scene cameras", default = False)
 
     def invoke(self, context, event):
         restore_settings_export(self.properties)
@@ -306,6 +314,8 @@ class ExportTHREEJS(bpy.types.Operator, ExportHelper):
 
         row = layout.row()
         row.prop(self.properties, "option_export_scene")
+        row.prop(self.properties, "option_lights")
+        row.prop(self.properties, "option_cameras")
         layout.separator()
 
 

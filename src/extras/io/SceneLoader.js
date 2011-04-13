@@ -152,6 +152,20 @@ THREE.SceneLoader.prototype = {
 
 							}
 
+							if ( o.castsShadow ) {
+								
+								//object.visible = true;
+								//object.materials = [ new THREE.MeshBasicMaterial( { color: 0xff0000 } ) ];
+
+								var shadow = new THREE.ShadowVolume( geometry )
+								result.scene.addChild( shadow );
+								
+								shadow.position = object.position;
+								shadow.rotation = object.rotation;
+								shadow.scale = object.scale;
+
+							}
+							
 						}
 
 
