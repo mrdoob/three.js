@@ -45,7 +45,7 @@ body {
 
 <script type="text/javascript"> 
 
-var scene, camera, renderer, info, mouse2d, sun, loader, stats;
+var scene, camera, renderer, info, mouse2d, sun, loader, stats, line;
 var meshes = [];
 
 var theta = 0;
@@ -85,6 +85,15 @@ function init() {
 	scene.addLight( sun );
 	
 	loadCube();
+	
+	var lineMat = new THREE.LineBasicMaterial( { color: 0xff0000, opacity: 1, linewidth: 3 } );
+	
+	var geom = new THREE.Geometry();
+	geom.vertices.push( new THREE.Vertex( new THREE.Vector3(-100, 0, 0) ) );
+	geom.vertices.push( new THREE.Vertex( new THREE.Vector3( 100, 0, 0) ) );
+	
+	line = new THREE.Line(geom, lineMat);
+	scene.addObject( line );
 
 	stats = new Stats();
 	stats.domElement.style.position = 'absolute';
@@ -109,7 +118,7 @@ function loadCube(p) {
 	};
 
 	
-	loader.load( { model: "obj/suzanne/suzanne.js", callback: onGeometry } );
+	loader.load( { model: "obj/suzanne/suzanneHi.js", callback: onGeometry } );
 }
 
 function addCube( p, g) {
@@ -150,6 +159,9 @@ function animate() {
 	ray.direction.copy( ray.origin );
 	ray.direction.subSelf( camera.position );
 	
+	//var ray2 = new THREE.Ray();
+	//ray2.origin = ray.origin.clone();
+	
 	if( meshes.length == 0 ) return;
 	
 	var i, l = meshes.length;
@@ -166,6 +178,13 @@ function animate() {
 	if( c ) {
 	
 		info.innerHTML += "Found @ normal " + vts(c.normal);
+		
+		var poi = ray.origin.clone().addSelf( ray.direction.clone().multiplyScalar(c.distance) );
+		line.geometry.vertices[0].position = poi;
+		line.geometry.vertices[1].position = poi.clone().addSelf(c.normal.multiplyScalar(100));
+		line.geometry.__dirtyVertices = true; 
+		line.geometry.__dirtyElements = true;
+		
 		c.mesh.materials[ 0 ].color.setHex( 0xbb0000 );
 
 	} else {
