@@ -3,11 +3,18 @@
  */
 
 THREE.SceneLoader = function () {
+
+	this.onLoadStart = function () {};
+	this.onLoadProgress = function() {};
+	this.onLoadComplete = function () {};
+
 };
 
 THREE.SceneLoader.prototype = {
 
 	load : function ( url, callback_sync, callback_async, callback_progress ) {
+
+		var scope = this;
 
 		var worker = new Worker( url );
 		worker.postMessage( 0 );
@@ -189,6 +196,8 @@ THREE.SceneLoader.prototype = {
 					handle_mesh( geo, id );
 
 					counter_models -= 1;
+					
+					scope.onLoadComplete();
 
 					async_callback_gate();
 
@@ -208,6 +217,8 @@ THREE.SceneLoader.prototype = {
 				};
 
 				callback_progress( progress, result );
+				
+				scope.onLoadProgress();
 
 				if( counter_models == 0 && counter_textures == 0 ) {
 
@@ -221,6 +232,8 @@ THREE.SceneLoader.prototype = {
 
 				counter_textures -= 1;
 				async_callback_gate();
+
+				scope.onLoadComplete();
 
 			};
 
@@ -342,6 +355,8 @@ THREE.SceneLoader.prototype = {
 				if ( g.type == "bin_mesh" || g.type == "ascii_mesh" ) {
 
 					counter_models += 1;
+					
+					scope.onLoadStart();
 
 				}
 
@@ -410,10 +425,18 @@ THREE.SceneLoader.prototype = {
 				if( tt.url instanceof Array ) {
 
 					counter_textures += tt.url.length;
+					
+					for( var n = 0; n < tt.url.length; n ++ ) {
+						
+						scope.onLoadStart();
+
+					}
 
 				} else {
 
 					counter_textures += 1;
+
+					scope.onLoadStart();
 
 				}
 
