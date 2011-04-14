@@ -32,6 +32,8 @@ THREE.RollCamera = function ( fov, aspect, near, far ) {
 	this.movementSpeed = 1;
 	this.rollSpeed = 1;
 
+	this.constrainVertical = [ -0.9, 0.9 ];
+
 	this.domElement = document;
 
 	// disable default camera behavior
@@ -91,14 +93,14 @@ THREE.RollCamera = function ( fov, aspect, near, far ) {
 		
 		// cap forward up / down
 		
-		if( this.forward.y > 0.9 ) {
+		if( this.forward.y > this.constrainVertical[ 1 ] ) {
 			
-			this.forward.y = 0.9;
+			this.forward.y = this.constrainVertical[ 1 ];
 			this.forward.normalize();
 			
-		} else if( this.forward.y < -0.9 ) {
+		} else if( this.forward.y < this.constrainVertical[ 0 ] ) {
 			
-			this.forward.y = -0.9;
+			this.forward.y = this.constrainVertical[ 0 ];
 			this.forward.normalize();
 			
 		}
