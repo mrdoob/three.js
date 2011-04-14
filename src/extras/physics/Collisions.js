@@ -38,9 +38,11 @@ THREE.MeshCollider = function( vertices, faces, normals, box ) {
 
 THREE.CollisionSystem = function() {
 
-	this.collisionNormal = null;
+	this.collisionNormal = new THREE.Vector3();
 	this.colliders = [];
 	this.hits = [];
+	
+	console.log("Collision system init / 004");
 
 };
 
@@ -138,13 +140,12 @@ THREE.CollisionSystem.prototype.rayMesh = function( r, me ) {
 		var p0 = me.vertices[ me.faces[ t + 0 ] ];
 		var p1 = me.vertices[ me.faces[ t + 1 ] ];
 		var p2 = me.vertices[ me.faces[ t + 2 ] ];
-		var n = me.normals[ me.faces[ i ] ];
 
-		var nd = this.rayTriangle( rt, p0, p1, p2, n, d );
+		var nd = this.rayTriangle( rt, p0, p1, p2, d );
 		
 		if(nd < d) {
 			d = nd;
-			me.normal = this.collisionNormal;
+			me.normal = this.collisionNormal.clone().normalize();
 		}
 	}
 
@@ -152,14 +153,15 @@ THREE.CollisionSystem.prototype.rayMesh = function( r, me ) {
 
 };
 
-THREE.CollisionSystem.prototype.rayTriangle = function( ray, p0, p1, p2, n, mind ) {
+THREE.CollisionSystem.prototype.rayTriangle = function( ray, p0, p1, p2, mind ) {
 
 	var e1 = THREE.CollisionSystem.__v1,
-		e2 = THREE.CollisionSystem.__v2;
+		e2 = THREE.CollisionSystem.__v2,
+		 n = new THREE.Vector3(); //THREE.CollisionSystem.__nr;
+
+	this.collisionNormal.set(0,0,0);
 
 	// do not crash on quads, fail instead
-
-	//if ( !n ) n = THREE.CollisionSystem.__v3;
 
 	e1.sub( p1, p0 );
 	e2.sub( p2, p1 );
@@ -428,3 +430,4 @@ THREE.CollisionSystem.prototype.raySphere = function( r, s ) {
 THREE.CollisionSystem.__v1 = new THREE.Vector3();
 THREE.CollisionSystem.__v2 = new THREE.Vector3();
 THREE.CollisionSystem.__v3 = new THREE.Vector3();
+THREE.CollisionSystem.__nr = new THREE.Vector3();
