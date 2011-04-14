@@ -62,6 +62,7 @@
 				camera = new THREE.RollCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.movementSpeed = 100;
 				camera.lookSpeed = 3;
+				camera.constrainVertical = [ -0.5, 0.5 ];
 				//camera.autoForward = true;
 
 				// world
