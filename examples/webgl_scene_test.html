@@ -279,7 +279,7 @@
 
 				}
 
-				var callbackFinised = function( result ) {
+				var callbackFinished = function( result ) {
 
 					loaded = result;
 
@@ -310,7 +310,7 @@
 				loader.callbackSync = callbackSync;
 				loader.callbackProgress = callbackProgress;
 				
-				loader.load( "scenes/test_scene.js", callbackFinised );
+				loader.load( "scenes/test_scene.js", callbackFinished );
 
 				$( "plus_exp" ).addEventListener( 'click', createToggle( "exp" ), false );
 
