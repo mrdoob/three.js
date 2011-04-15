@@ -241,7 +241,7 @@
 
 				$( "start" ).addEventListener( 'click', onStartClick, false );
 
-				var callback_progress = function( progress, result ) {
+				var callbackProgress = function( progress, result ) {
 
 					var bar = 250,
 						total = progress.total_models + progress.total_textures,
@@ -259,27 +259,7 @@
 
 				}
 
-				var callback_sync = function( result ) {
-
-					/*
-
-					// uncomment to see progressive scene loading
-
-					scene = result.scene;
-					camera = result.currentCamera;
-
-					camera.aspect = window.innerWidth / window.innerHeight;
-					camera.updateProjectionMatrix();
-
-					renderer.setClearColor( result.bgColor, result.bgAlpha );
-
-					*/
-
-					//handle_update( result, 1 );
-
-				}
-
-				var callback_async = function( result ) {
+				var callbackFinished = function( result ) {
 
 					loaded = result;
 
@@ -295,7 +275,9 @@
 				$( "progress" ).style.display = "block";
 
 				var loader = new THREE.SceneLoader();
-				loader.load( "obj/blenderscene/scene.js", callback_sync, callback_async, callback_progress );
+				loader.callbackProgress = callbackProgress;
+				
+				loader.load( "obj/blenderscene/scene.js", callbackFinished );
 
 				$( "plus_exp" ).addEventListener( 'click', createToggle( "exp" ), false );
 

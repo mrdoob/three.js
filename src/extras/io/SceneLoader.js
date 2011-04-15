@@ -7,12 +7,15 @@ THREE.SceneLoader = function () {
 	this.onLoadStart = function () {};
 	this.onLoadProgress = function() {};
 	this.onLoadComplete = function () {};
+		
+	this.callbackSync = function () {};
+	this.callbackProgress = function () {};
 
 };
 
 THREE.SceneLoader.prototype = {
 
-	load : function ( url, callback_sync, callback_async, callback_progress ) {
+	load : function ( url, callbackFinished ) {
 
 		var scope = this;
 
@@ -53,6 +56,29 @@ THREE.SceneLoader.prototype = {
 				fogs: {}
 
 			};
+
+			// find out if there are some colliders
+			
+			var hasColliders = false;
+			
+			for( dd in data.objects ) {
+				
+				o = data.objects[ dd ];
+
+				if ( o.meshCollider )  {
+					
+					hasColliders = true;
+					break;
+
+				}
+				
+			}
+			
+			if ( hasColliders ) {
+			
+				result.scene.collisions = new THREE.CollisionSystem();
+
+			}
 
 			if ( data.transform ) {
 
@@ -156,7 +182,7 @@ THREE.SceneLoader.prototype = {
 							if ( o.meshCollider ) {
 
 								var meshCollider = THREE.CollisionUtils.MeshColliderWBox( object );
-								THREE.Collisions.colliders.push( meshCollider );
+								result.scene.collisions.colliders.push( meshCollider );
 
 							}
 
@@ -210,26 +236,26 @@ THREE.SceneLoader.prototype = {
 
 				var progress = {
 
-					total_models: total_models,
-					total_textures: total_textures,
-					loaded_models: total_models - counter_models,
-					loaded_textures: total_textures - counter_textures
+					totalModels		: total_models,
+					totalTextures	: total_textures,
+					loadedModels	: total_models - counter_models,
+					loadedTextures	: total_textures - counter_textures
 
 				};
 
-				callback_progress( progress, result );
+				scope.callbackProgress( progress, result );
 				
 				scope.onLoadProgress();
 
 				if( counter_models == 0 && counter_textures == 0 ) {
 
-					callback_async( result );
+					callbackFinished( result );
 
 				}
 
 			};
 
-			var callback_texture = function( images ) {
+			var callbackTexture = function( images ) {
 
 				counter_textures -= 1;
 				async_callback_gate();
@@ -465,11 +491,11 @@ THREE.SceneLoader.prototype = {
 
 					}
 
-					texture = THREE.ImageUtils.loadTextureCube( url_array, tt.mapping, callback_texture );
+					texture = THREE.ImageUtils.loadTextureCube( url_array, tt.mapping, callbackTexture );
 
 				} else {
 
-					texture = THREE.ImageUtils.loadTexture( get_url( tt.url, data.urlBaseType ), tt.mapping, callback_texture );
+					texture = THREE.ImageUtils.loadTexture( get_url( tt.url, data.urlBaseType ), tt.mapping, callbackTexture );
 
 					if ( THREE[ tt.minFilter ] != undefined )
 						texture.minFilter = THREE[ tt.minFilter ];
@@ -542,7 +568,7 @@ THREE.SceneLoader.prototype = {
 
 			// synchronous callback
 
-			callback_sync( result );
+			scope.callbackSync( result );
 
 		};
 
