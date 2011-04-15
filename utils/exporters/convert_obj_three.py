@@ -20,7 +20,6 @@ Notes:
         -e						export edges
 
     - by default:
-        converted model will be centered (middle of bounding box goes to 0,0,0)
         use smooth shading (if there were vertex normals in the original model)
         will be in ASCII format
         original model is assumed to use non-inverted transparency / dissolve (0.0 fully transparent, 1.0 fully opaque)
@@ -142,7 +141,7 @@ import glob
 # #####################################################
 # Configuration
 # #####################################################
-ALIGN = "center"        # center centerxz bottom top none
+ALIGN = "none"        	# center centerxz bottom top none
 SHADING = "smooth"      # smooth flat 
 TYPE = "ascii"          # ascii binary
 TRANSPARENCY = "normal" # normal invert
