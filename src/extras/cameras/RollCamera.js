@@ -46,7 +46,7 @@ THREE.RollCamera = function ( fov, aspect, near, far ) {
 	this.forward = new THREE.Vector3( 0, 0, 1 );
 	this.roll = 0;
 
-	this.lastUpdate = new Date().getTime();
+	this.lastUpdate = -1;
 	this.delta = 0;
 	
 	var xTemp = new THREE.Vector3();
@@ -66,6 +66,9 @@ THREE.RollCamera = function ( fov, aspect, near, far ) {
 	this.update = function() {
 
 		var now = new Date().getTime();
+
+		if ( this.lastUpdate == -1 ) this.lastUpdate = now;
+		
 		this.delta = ( now - this.lastUpdate ) / 1000;
 		this.lastUpdate = now;
 
