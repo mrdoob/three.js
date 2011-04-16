@@ -30,9 +30,9 @@ Detector = {
 			].join( '\n' ) : [
 				'Sorry, your browser doesn\'t support <a href="http://khronos.org/webgl/wiki/Getting_a_WebGL_Implementation">WebGL</a><br/>',
 				'Please try with',
-				'<a href="http://www.google.com/chrome">Chrome 10</a>, ',
-				'<a href="http://www.mozilla.com/en-US/firefox/all-beta.html">Firefox 4</a> or',
-				'<a href="http://nightly.webkit.org/">Safari 6</a>'
+				'<a href="http://www.google.com/chrome">Chrome</a>, ',
+				'<a href="http://www.mozilla.com/en-US/firefox/new/">Firefox 4</a> or',
+				'<a href="http://nightly.webkit.org/">Webkit Nightly (Mac)</a>'
 			].join( '\n' );
 
 		}
