@@ -23,7 +23,7 @@ THREE.BoxCollider = function( min, max ) {
 	this.min = min;
 	this.max = max;
 	this.dynamic = true;
-	
+
 	this.normal = new THREE.Vector3();
 
 };
@@ -35,7 +35,7 @@ THREE.MeshCollider = function( vertices, faces, normals, box ) {
 	this.normals = normals;
 	this.box = box;
 	this.numFaces = this.faces.length;
-	
+
 	this.normal = new THREE.Vector3();
 
 };
@@ -45,18 +45,18 @@ THREE.CollisionSystem = function() {
 	this.collisionNormal = new THREE.Vector3();
 	this.colliders = [];
 	this.hits = [];
-	
-	console.log("Collision system init / 004");
+
+	// console.log("Collision system init / 004");
 
 };
 
 THREE.Collisions = new THREE.CollisionSystem();
 
 THREE.CollisionSystem.prototype.merge = function( collisionSystem ) {
-	
+
 	this.colliders = this.colliders.concat( collisionSystem.colliders );
 	this.hits = this.hits.concat( collisionSystem.hits );
-	
+
 };
 
 THREE.CollisionSystem.prototype.rayCastAll = function( ray ) {
@@ -153,7 +153,7 @@ THREE.CollisionSystem.prototype.rayMesh = function( r, me ) {
 		var p2 = me.vertices[ me.faces[ t + 2 ] ];
 
 		var nd = this.rayTriangle( rt, p0, p1, p2, d, this.collisionNormal );
-		
+
 		if( nd < d ) {
 
 			d = nd;
@@ -266,7 +266,7 @@ THREE.CollisionSystem.prototype.rayTriangle = function( ray, p0, p1, p2, mind, n
 	var gamma = 1 - alpha - beta;
 	if( !(gamma >= 0) ) return Number.MAX_VALUE;
 	//console.log("gamma: " + gamma);
-	
+
 	return t;
 
 };
