@@ -1,5 +1,5 @@
 /**
- * @author drojdjou / http://everyday3d.com/
+ * @author bartek drozdz / http://everyday3d.com/
  */
 
 THREE.CollisionUtils = {};

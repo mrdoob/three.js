@@ -59,7 +59,7 @@ THREE.FlyCamera = function ( parameters ) {
 	this.moveVector = new THREE.Vector3( 0, 0, 0 );
 	this.rotationVector = new THREE.Vector3( 0, 0, 0 );
 
-	this.lastUpdate = new Date().getTime();
+	this.lastUpdate = -1;
 	this.tdiff = 0;
 
 	this.handleEvent = function ( event ) {
@@ -208,6 +208,9 @@ THREE.FlyCamera = function ( parameters ) {
 	this.update = function( parentMatrixWorld, forceUpdate, camera ) {
 
 		var now = new Date().getTime();
+		
+		if ( this.lastUpdate == -1 ) this.lastUpdate = now;
+		
 		this.tdiff = ( now - this.lastUpdate ) / 1000;
 		this.lastUpdate = now;
 

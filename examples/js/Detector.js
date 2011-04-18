@@ -1,62 +1,59 @@
 /**
  * @author alteredq / http://alteredqualia.com/
+ * @author mr.doob / http://mrdoob.com/
  */
 
 Detector = {
 
-	// supported features
-
-	canvas	: !!window.CanvasRenderingContext2D,
-	webgl	: !!window.WebGLRenderingContext,
-	workers : !!window.Worker,
+	canvas : !! window.CanvasRenderingContext2D,
+	webgl : ( function () { try { return !! window.WebGLRenderingContext && !! document.createElement( 'canvas' ).getContext( 'experimental-webgl' ); } catch( e ) { return false; } } )(),
+	workers : !! window.Worker,
 	fileapi : window.File && window.FileReader && window.FileList && window.Blob,
 
-	// helper methods
+	getWebGLErrorMessage : function () {
 
-	addGetWebGLMessage: function( parameters ) {
+		var domElement = document.createElement( 'div' );
 
-		var parent = document.body,
-			id = "oldie" ;
+		domElement.style.fontFamily = 'monospace';
+		domElement.style.fontSize = '13px';
+		domElement.style.textAlign = 'center';
+		domElement.style.background = '#eee';
+		domElement.style.color = '#000';
+		domElement.style.padding = '1em';
+		domElement.style.width = '475px';
+		domElement.style.margin = '5em auto 0';
 
-		if ( parameters ) {
+		if ( ! this.webgl ) {
 
-			if ( parameters.parent !== undefined ) parent  = parameters.parent;
-			if ( parameters.id !== undefined ) id  = parameters.id;
+			domElement.innerHTML = window.WebGLRenderingContext ? [
+				'Sorry, your graphics card doesn\'t support <a href="http://khronos.org/webgl/wiki/Getting_a_WebGL_Implementation">WebGL</a>'
+			].join( '\n' ) : [
+				'Sorry, your browser doesn\'t support <a href="http://khronos.org/webgl/wiki/Getting_a_WebGL_Implementation">WebGL</a><br/>',
+				'Please try with',
+				'<a href="http://www.google.com/chrome">Chrome</a>, ',
+				'<a href="http://www.mozilla.com/en-US/firefox/new/">Firefox 4</a> or',
+				'<a href="http://nightly.webkit.org/">Webkit Nightly (Mac)</a>'
+			].join( '\n' );
 
 		}
 
-		var html = [
+		return domElement;
 
-			'Sorry, your browser doesn\'t support <a href="http://khronos.org/webgl/wiki/Getting_a_WebGL_Implementation">WebGL</a><br/>',
-			'<br/>',
-			'Please try with',
-			'<a href="http://www.google.com/chrome">Chrome 9+</a> /',
-			'<a href="http://www.mozilla.com/en-US/firefox/all-beta.html">Firefox 4+</a> /',
-			'<a href="http://nightly.webkit.org/">Safari 10.6+</a>'
+	},
 
-		].join("\n");
+	addGetWebGLMessage : function ( parameters ) {
 
-		var wrap = document.createElement( "center" ),
-			message = document.createElement( "div" );
+		var parent, id, domElement;
 
-		message.innerHTML = html;
-		message.id = id;
+		parameters = parameters || {};
 
-		var style = message.style;
+		parent = parameters.parent !== undefined ? parameters.parent : document.body;
+		id = parameters.id !== undefined ? parameters.id : 'oldie';
 
-		style.fontFamily = "monospace";
-		style.fontSize = "13px";
-		style.textAlign = "center";
-		style.background = "#eee";
-		style.color = "#000";
-		style.padding = "1em";
-		style.width = "475px";
-		style.margin = "5em auto 0";
+		domElement = Detector.getWebGLErrorMessage();
+		domElement.id = id;
 
-		wrap.appendChild( message )
-		parent.appendChild( wrap );
-
-		return message;
+		parent.appendChild( domElement );
 
 	}
 

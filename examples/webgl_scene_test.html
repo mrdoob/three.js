@@ -241,11 +241,11 @@
 
 				$( "start" ).addEventListener( 'click', onStartClick, false );
 
-				var callback_progress = function( progress, result ) {
+				var callbackProgress = function( progress, result ) {
 
 					var bar = 250,
-						total = progress.total_models + progress.total_textures,
-						loaded = progress.loaded_models + progress.loaded_textures;
+						total = progress.totalModels + progress.totalTextures,
+						loaded = progress.loadedModels + progress.loadedTextures;
 
 					if ( total )
 						bar = Math.floor( bar * loaded / total );
@@ -259,7 +259,7 @@
 
 				}
 
-				var callback_sync = function( result ) {
+				var callbackSync = function( result ) {
 
 					/*
 
@@ -279,7 +279,7 @@
 
 				}
 
-				var callback_async = function( result ) {
+				var callbackFinished = function( result ) {
 
 					loaded = result;
 
@@ -306,7 +306,11 @@
 				$( "progress" ).style.display = "block";
 
 				var loader = new THREE.SceneLoader();
-				loader.load( "scenes/test_scene.js", callback_sync, callback_async, callback_progress );
+				
+				loader.callbackSync = callbackSync;
+				loader.callbackProgress = callbackProgress;
+				
+				loader.load( "scenes/test_scene.js", callbackFinished );
 
 				$( "plus_exp" ).addEventListener( 'click', createToggle( "exp" ), false );
 

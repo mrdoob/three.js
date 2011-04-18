@@ -147,7 +147,7 @@ THREE.Loader.prototype = {
 
 		}
 
-		if ( m.transparent !== undefined ) {
+		if ( m.transparent !== undefined || m.opacity < 1.0 ) {
 
 			mpars.transparent = m.transparent;
 

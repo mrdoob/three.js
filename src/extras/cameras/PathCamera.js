@@ -270,7 +270,7 @@ THREE.PathCamera = function ( parameters ) {
 		parent.addChild( particleObj );
 
 		var waypoint,
-			geo = new Sphere( 1, 16, 8 ),
+			geo = new THREE.Sphere( 1, 16, 8 ),
 			mat = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 
 		for ( i = 0; i < spline.points.length; i++ ) {

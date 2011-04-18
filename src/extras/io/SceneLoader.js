@@ -3,11 +3,21 @@
  */
 
 THREE.SceneLoader = function () {
+
+	this.onLoadStart = function () {};
+	this.onLoadProgress = function() {};
+	this.onLoadComplete = function () {};
+		
+	this.callbackSync = function () {};
+	this.callbackProgress = function () {};
+
 };
 
 THREE.SceneLoader.prototype = {
 
-	load : function ( url, callback_sync, callback_async, callback_progress ) {
+	load : function ( url, callbackFinished ) {
+
+		var scope = this;
 
 		var worker = new Worker( url );
 		worker.postMessage( 0 );
@@ -46,6 +56,29 @@ THREE.SceneLoader.prototype = {
 				fogs: {}
 
 			};
+
+			// find out if there are some colliders
+			
+			var hasColliders = false;
+			
+			for( dd in data.objects ) {
+				
+				o = data.objects[ dd ];
+
+				if ( o.meshCollider )  {
+					
+					hasColliders = true;
+					break;
+
+				}
+				
+			}
+			
+			if ( hasColliders ) {
+			
+				result.scene.collisions = new THREE.CollisionSystem();
+
+			}
 
 			if ( data.transform ) {
 
@@ -149,10 +182,24 @@ THREE.SceneLoader.prototype = {
 							if ( o.meshCollider ) {
 
 								var meshCollider = THREE.CollisionUtils.MeshColliderWBox( object );
-								THREE.Collisions.colliders.push( meshCollider );
+								result.scene.collisions.colliders.push( meshCollider );
 
 							}
 
+							if ( o.castsShadow ) {
+								
+								//object.visible = true;
+								//object.materials = [ new THREE.MeshBasicMaterial( { color: 0xff0000 } ) ];
+
+								var shadow = new THREE.ShadowVolume( geometry )
+								result.scene.addChild( shadow );
+								
+								shadow.position = object.position;
+								shadow.rotation = object.rotation;
+								shadow.scale = object.scale;
+
+							}
+							
 						}
 
 
@@ -176,6 +223,8 @@ THREE.SceneLoader.prototype = {
 					handle_mesh( geo, id );
 
 					counter_models -= 1;
+					
+					scope.onLoadComplete();
 
 					async_callback_gate();
 
@@ -187,27 +236,31 @@ THREE.SceneLoader.prototype = {
 
 				var progress = {
 
-					total_models: total_models,
-					total_textures: total_textures,
-					loaded_models: total_models - counter_models,
-					loaded_textures: total_textures - counter_textures
+					totalModels		: total_models,
+					totalTextures	: total_textures,
+					loadedModels	: total_models - counter_models,
+					loadedTextures	: total_textures - counter_textures
 
 				};
 
-				callback_progress( progress, result );
+				scope.callbackProgress( progress, result );
+				
+				scope.onLoadProgress();
 
 				if( counter_models == 0 && counter_textures == 0 ) {
 
-					callback_async( result );
+					callbackFinished( result );
 
 				}
 
 			};
 
-			var callback_texture = function( images ) {
+			var callbackTexture = function( images ) {
 
 				counter_textures -= 1;
 				async_callback_gate();
+
+				scope.onLoadComplete();
 
 			};
 
@@ -329,6 +382,8 @@ THREE.SceneLoader.prototype = {
 				if ( g.type == "bin_mesh" || g.type == "ascii_mesh" ) {
 
 					counter_models += 1;
+					
+					scope.onLoadStart();
 
 				}
 
@@ -397,10 +452,18 @@ THREE.SceneLoader.prototype = {
 				if( tt.url instanceof Array ) {
 
 					counter_textures += tt.url.length;
+					
+					for( var n = 0; n < tt.url.length; n ++ ) {
+						
+						scope.onLoadStart();
+
+					}
 
 				} else {
 
 					counter_textures += 1;
+
+					scope.onLoadStart();
 
 				}
 
@@ -428,11 +491,11 @@ THREE.SceneLoader.prototype = {
 
 					}
 
-					texture = THREE.ImageUtils.loadTextureCube( url_array, tt.mapping, callback_texture );
+					texture = THREE.ImageUtils.loadTextureCube( url_array, tt.mapping, callbackTexture );
 
 				} else {
 
-					texture = THREE.ImageUtils.loadTexture( get_url( tt.url, data.urlBaseType ), tt.mapping, callback_texture );
+					texture = THREE.ImageUtils.loadTexture( get_url( tt.url, data.urlBaseType ), tt.mapping, callbackTexture );
 
 					if ( THREE[ tt.minFilter ] != undefined )
 						texture.minFilter = THREE[ tt.minFilter ];
@@ -488,6 +551,12 @@ THREE.SceneLoader.prototype = {
 
 				}
 
+				if ( m.parameters.opacity !== undefined && m.parameters.opacity < 1.0 ) {
+					
+					m.parameters.transparent = true;
+
+				}
+				
 				material = new THREE[ m.type ]( m.parameters );
 				result.materials[ dm ] = material;
 
@@ -499,7 +568,7 @@ THREE.SceneLoader.prototype = {
 
 			// synchronous callback
 
-			callback_sync( result );
+			scope.callbackSync( result );
 
 		};
 

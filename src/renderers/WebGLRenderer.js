@@ -72,9 +72,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	parameters = parameters || {};
 
-	stencil = parameters.stencil !== undefined ? parameters.stencil : true;
-	antialias = parameters.antialias !== undefined ? parameters.antialias : false;
-	clearColor = parameters.clearColor !== undefined ? new THREE.Color( parameters.clearColor ) : new THREE.Color( 0x000000 );
+	stencil = parameters.stencil !== undefined ? parameters.stencil : true,
+	antialias = parameters.antialias !== undefined ? parameters.antialias : false,
+	clearColor = parameters.clearColor !== undefined ? new THREE.Color( parameters.clearColor ) : new THREE.Color( 0x000000 ),
 	clearAlpha = parameters.clearAlpha !== undefined ? parameters.clearAlpha : 0;
 
 	this.data = {
@@ -82,7 +82,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		vertices: 0,
 		faces: 0
 
-	}
+	};
 
 	this.maxMorphTargets = 8;
 	this.domElement = _canvas;

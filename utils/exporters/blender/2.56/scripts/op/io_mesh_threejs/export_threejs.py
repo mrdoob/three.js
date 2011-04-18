@@ -1022,8 +1022,8 @@ def generate_objects(data):
             meshCollider = obj.THREE_meshCollider
 
             visible = True
-            #if obj.draw_type in ["BOUNDS", "WIRE"] and meshCollider:
-            if meshCollider:
+            #if obj.draw_type in ["BOUNDS", "WIRE"] and (meshCollider or castsShadow):
+            if meshCollider or castsShadow:
                 visible = False
 
             object_string = TEMPLATE_OBJECT % {
@@ -1222,7 +1222,7 @@ def generate_materials_scene(data):
     # TODO: extract just materials actually used by some objects in the scene
 
     for m in bpy.data.materials:
-        material = extract_material_data(m, data["usecolors"])
+        material = extract_material_data(m, data["use_colors"])
         material_string = generate_material_string(material)
         chunks.append(material_string)
 
@@ -1233,74 +1233,87 @@ def generate_materials_scene(data):
 # #####################################################
 
 def generate_cameras(data):
-    cameras = data.get("cameras", [])
-    if not cameras:
-        cameras.append(DEFAULTS["camera"])
+    if data["use_cameras"]:
 
-    chunks = []
-    for camera in cameras:
+        cameras = data.get("cameras", [])
+        
+        if not cameras:
+            cameras.append(DEFAULTS["camera"])
 
-        if camera["type"] == "perspective":
-            camera_string = TEMPLATE_CAMERA_PERSPECTIVE % {
-            "camera_id" : generate_string(camera["name"]),
-            "fov"       : camera["fov"],
-            "aspect"    : camera["aspect"],
-            "near"      : camera["near"],
-            "far"       : camera["far"],
-            "position"  : generate_vec3(camera["position"]),
-            "target"    : generate_vec3(camera["target"])
-            }
+        chunks = []
 
-        elif camera["type"] == "ortho":
-            camera_string = TEMPLATE_CAMERA_ORTHO % {
-            "camera_id" : generate_string(camera["name"]),
-            "left"      : camera["left"],
-            "right"     : camera["right"],
-            "top"       : camera["top"],
-            "bottom"    : camera["bottom"],
-            "near"      : camera["near"],
-            "far"       : camera["far"],
-            "position"  : generate_vec3(camera["position"]),
-            "target"    : generate_vec3(camera["target"])
-            }
+        for camera in cameras:
 
-        chunks.append(camera_string)
+            if camera["type"] == "perspective":
 
-    return ",\n\n".join(chunks)
+                camera_string = TEMPLATE_CAMERA_PERSPECTIVE % {
+                "camera_id" : generate_string(camera["name"]),
+                "fov"       : camera["fov"],
+                "aspect"    : camera["aspect"],
+                "near"      : camera["near"],
+                "far"       : camera["far"],
+                "position"  : generate_vec3(camera["position"]),
+                "target"    : generate_vec3(camera["target"])
+                }
+
+            elif camera["type"] == "ortho":
+
+                camera_string = TEMPLATE_CAMERA_ORTHO % {
+                "camera_id" : generate_string(camera["name"]),
+                "left"      : camera["left"],
+                "right"     : camera["right"],
+                "top"       : camera["top"],
+                "bottom"    : camera["bottom"],
+                "near"      : camera["near"],
+                "far"       : camera["far"],
+                "position"  : generate_vec3(camera["position"]),
+                "target"    : generate_vec3(camera["target"])
+                }
+
+            chunks.append(camera_string)
+
+        return ",\n\n".join(chunks)
+
+    return ""
 
 # #####################################################
 # Scene exporter - lights
 # #####################################################
 
 def generate_lights(data):
-    lights = data.get("lights", [])
-    if not lights:
-        lights.append(DEFAULTS["light"])
 
-    chunks = []
-    for light in lights:
+    if data["use_lights"]:
 
-        if light["type"] == "directional":
-            light_string = TEMPLATE_LIGHT_DIRECTIONAL % {
-            "light_id"      : generate_string(light["name"]),
-            "direction"     : generate_vec3(light["direction"]),
-            #"color"         : generate_hex(rgb2int(light["color"])),
-            "color"         : rgb2int(light["color"]),
-            "intensity"     : light["intensity"]
-            }
+        lights = data.get("lights", [])
+        if not lights:
+            lights.append(DEFAULTS["light"])
 
-        elif light["type"] == "point":
-            light_string = TEMPLATE_LIGHT_POINT % {
-            "light_id"      : generate_string(light["name"]),
-            "position"      : generate_vec3(light["position"]),
-            #"color"         : generate_hex(rgb2int(light["color"])),
-            "color"         : rgb2int(light["color"]),
-            "intensity"     : light["intensity"]
-            }
+        chunks = []
+        for light in lights:
 
-        chunks.append(light_string)
+            if light["type"] == "directional":
+                light_string = TEMPLATE_LIGHT_DIRECTIONAL % {
+                "light_id"      : generate_string(light["name"]),
+                "direction"     : generate_vec3(light["direction"]),
+                #"color"         : generate_hex(rgb2int(light["color"])),
+                "color"         : rgb2int(light["color"]),
+                "intensity"     : light["intensity"]
+                }
 
-    return ",\n\n".join(chunks)
+            elif light["type"] == "point":
+                light_string = TEMPLATE_LIGHT_POINT % {
+                "light_id"      : generate_string(light["name"]),
+                "position"      : generate_vec3(light["position"]),
+                #"color"         : generate_hex(rgb2int(light["color"])),
+                "color"         : rgb2int(light["color"]),
+                "intensity"     : light["intensity"]
+                }
+
+            chunks.append(light_string)
+
+        return ",\n\n".join(chunks)
+        
+    return ""
 
 # #####################################################
 # Scene exporter - generate ASCII scene
@@ -1332,7 +1345,9 @@ def generate_ascii_scene(data):
 
     sections_string = "\n".join(chunks)
 
-    default_camera = "default_camera"
+    default_camera = ""
+    if data["use_cameras"]:
+        default_camera = generate_string("default_camera")
 
     parameters = {
     "fname"     : data["source_file"],
@@ -1341,7 +1356,7 @@ def generate_ascii_scene(data):
 
     "bgcolor"   : generate_vec3(DEFAULTS["bgcolor"]),
     "bgalpha"   : DEFAULTS["bgalpha"],
-    "defcamera" : generate_string(default_camera),
+    "defcamera" :  generate_string(default_camera),
 
     "nobjects"      : nobjects,
     "ngeometries"   : ngeometries,
@@ -1357,7 +1372,7 @@ def generate_ascii_scene(data):
 
     return text
 
-def export_scene(scene, filepath, flipyz, option_colors):
+def export_scene(scene, filepath, flipyz, option_colors, option_lights, option_cameras):
 
     source_file = os.path.basename(bpy.data.filepath)
 
@@ -1368,7 +1383,9 @@ def export_scene(scene, filepath, flipyz, option_colors):
     "source_file" : source_file,
     "filepath"    : filepath,
     "flipyz"      : flipyz,
-    "usecolors"   : option_colors
+    "use_colors"  : option_colors,
+    "use_lights"  : option_lights, 
+    "use_cameras" : option_cameras
     }
     scene_text += generate_ascii_scene(data)
 
@@ -1390,6 +1407,8 @@ def save(operator, context, filepath = "",
          option_colors = True,
          align_model = 0,
          option_export_scene = False,
+         option_lights = False,
+         option_cameras = False,
          option_scale = 1.0):
 
     filepath = ensure_extension(filepath, '.js')
@@ -1401,7 +1420,7 @@ def save(operator, context, filepath = "",
 
     if option_export_scene:
 
-        export_scene(scene, filepath, option_flip_yz, option_colors)
+        export_scene(scene, filepath, option_flip_yz, option_colors, option_lights, option_cameras)
 
         geo_set = set()
 
