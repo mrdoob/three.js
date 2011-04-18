@@ -2401,7 +2401,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			 material instanceof THREE.MeshPhongMaterial ||
 			 material.envMap ) {
 
-			if( p_uniforms.cameraPosition >= 0 ) {
+			if( p_uniforms.cameraPosition !== null ) {
 				
 				_gl.uniform3f( p_uniforms.cameraPosition, camera.position.x, camera.position.y, camera.position.z );
 				
@@ -2413,7 +2413,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			 material.envMap ||
 			 material.skinning ) {
 
-			if ( p_uniforms.objectMatrix >= 0 ) {
+			if ( p_uniforms.objectMatrix !== null ) {
 				
 				_gl.uniformMatrix4fv( p_uniforms.objectMatrix, false, object._objectMatrixArray );
 				
@@ -2426,7 +2426,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			 material instanceof THREE.MeshShaderMaterial ||
 			 material.skinning ) {
 
-			if( p_uniforms.viewMatrix >= 0 ) {
+			if( p_uniforms.viewMatrix !== null ) {
 				
 				_gl.uniformMatrix4fv( p_uniforms.viewMatrix, false, _viewMatrixArray );
 				
