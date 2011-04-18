@@ -650,17 +650,23 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					attribute = materials[ m ].attributes[ a ];
 
-					size = 1;		// "f" and "i"
-
-					if( attribute.type === "v2" ) size = 2;
-					else if( attribute.type === "v3" ) size = 3;
-					else if( attribute.type === "v4" ) size = 4;
-					else if( attribute.type === "c"  ) size = 3;
-
-					attribute.size = size;
-					attribute.needsUpdate = true;
-					attribute.array = new Float32Array( nvertices * size );
-					attribute.buffer = _gl.createBuffer();
+					if( !attribute.__webglInitialized || attribute.createUniqueBuffers ) {
+						
+						attribute.__webglInitialized = true;
+						
+						size = 1;		// "f" and "i"
+	
+						if( attribute.type === "v2" ) size = 2;
+						else if( attribute.type === "v3" ) size = 3;
+						else if( attribute.type === "v4" ) size = 4;
+						else if( attribute.type === "c"  ) size = 3;
+	
+						attribute.size = size;
+						attribute.needsUpdate = true;
+						attribute.array = new Float32Array( nvertices * size );
+						attribute.buffer = _gl.createBuffer();
+						
+					}
 
 					geometryGroup.__webglCustomAttributes[ a ] = attribute;
 
@@ -2395,7 +2401,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 			 material instanceof THREE.MeshPhongMaterial ||
 			 material.envMap ) {
 
-			_gl.uniform3f( p_uniforms.cameraPosition, camera.position.x, camera.position.y, camera.position.z );
+			if( p_uniforms.cameraPosition >= 0 ) {
+				
+				_gl.uniform3f( p_uniforms.cameraPosition, camera.position.x, camera.position.y, camera.position.z );
+				
+			}
 
 		}
 
@@ -2403,7 +2413,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 			 material.envMap ||
 			 material.skinning ) {
 
-			_gl.uniformMatrix4fv( p_uniforms.objectMatrix, false, object._objectMatrixArray );
+			if ( p_uniforms.objectMatrix >= 0 ) {
+				
+				_gl.uniformMatrix4fv( p_uniforms.objectMatrix, false, object._objectMatrixArray );
+				
+			}
 
 		}
 
@@ -2412,7 +2426,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 			 material instanceof THREE.MeshShaderMaterial ||
 			 material.skinning ) {
 
-			_gl.uniformMatrix4fv( p_uniforms.viewMatrix, false, _viewMatrixArray );
+			if( p_uniforms.viewMatrix >= 0 ) {
+				
+				_gl.uniformMatrix4fv( p_uniforms.viewMatrix, false, _viewMatrixArray );
+				
+			} 
 
 		}
 
@@ -2452,7 +2470,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// vertices
 
-		if ( !material.morphTargets ) {
+		if ( !material.morphTargets && attributes.position >= 0 ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglVertexBuffer );
 			_gl.vertexAttribPointer( attributes.position, 3, _gl.FLOAT, false, 0, 0 );
@@ -2626,7 +2644,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglMorphTargetsBuffers[ object.morphTargetBase ] );
 			_gl.vertexAttribPointer( attributes.position, 3, _gl.FLOAT, false, 0, 0 );
 
-		} else {
+		} else if ( attributes.position >= 0 ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglVertexBuffer );
 			_gl.vertexAttribPointer( attributes.position, 3, _gl.FLOAT, false, 0, 0 );
@@ -2693,7 +2711,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// load updated influences uniform
 
-		_gl.uniform1fv( material.program.uniforms.morphTargetInfluences, object.__webglMorphTargetInfluences );
+		if( material.program.uniforms.morphTargetInfluences !== null ) {
+			
+			_gl.uniform1fv( material.program.uniforms.morphTargetInfluences, object.__webglMorphTargetInfluences );
+			
+		}
+
 	}
 
 
