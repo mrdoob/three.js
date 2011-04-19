@@ -137,7 +137,8 @@ TEMPLATE_OBJECT = """\
         "scale"     : %(scale)s,
         "visible"       : %(visible)s,
         "castsShadow"   : %(castsShadow)s,
-        "meshCollider"  : %(meshCollider)s
+        "meshCollider"  : %(meshCollider)s,
+        "trigger"       : %(trigger)s
     }"""
 
 TEMPLATE_GEOMETRY = """\
@@ -1020,6 +1021,7 @@ def generate_objects(data):
 
             castsShadow = obj.THREE_castsShadow
             meshCollider = obj.THREE_meshCollider
+            triggerType = obj.THREE_triggerType
 
             visible = True
             #if obj.draw_type in ["BOUNDS", "WIRE"] and (meshCollider or castsShadow):
@@ -1039,6 +1041,7 @@ def generate_objects(data):
 
             "castsShadow"  : generate_bool_property(castsShadow),
             "meshCollider" : generate_bool_property(meshCollider),
+            "trigger" 	   : generate_string(triggerType),
             "visible"      : generate_bool_property(visible)
             }
             chunks.append(object_string)

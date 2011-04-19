@@ -53,7 +53,8 @@ THREE.SceneLoader.prototype = {
 				objects: {},
 				cameras: {},
 				lights: {},
-				fogs: {}
+				fogs: {},
+				triggers: {}
 
 			};
 
@@ -197,6 +198,17 @@ THREE.SceneLoader.prototype = {
 								shadow.position = object.position;
 								shadow.rotation = object.rotation;
 								shadow.scale = object.scale;
+
+							}
+							
+							if ( o.trigger && o.trigger.toLowerCase() != "none" ) {
+								
+								var trigger = {
+								"type" 		: o.trigger,
+								"object"	: o
+								};
+								
+								result.triggers[ object.name ] = trigger;
 
 							}
 							
