@@ -244,6 +244,16 @@ THREE.SceneLoader.prototype = {
 
 			};
 
+			function create_callback_embed( id ) {
+
+				return function( geo ) {
+
+					result.geometries[ id ] = geo;
+
+				}
+
+			};
+
 			function async_callback_gate() {
 
 				var progress = {
@@ -448,6 +458,17 @@ THREE.SceneLoader.prototype = {
 					jsonLoader.load( { model: get_url( g.url, data.urlBaseType ),
 									   callback: create_callback( dg )
 									} );
+
+				} else if ( g.type == "embedded_mesh" ) {
+
+					var modelJson = data.embeds[ g.id ],
+						texture_path = "";
+
+					if ( modelJson ) {
+
+						jsonLoader.createModel( modelJson, create_callback_embed( dg ), texture_path );
+						
+					}
 
 				}
 
