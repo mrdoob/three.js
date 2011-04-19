@@ -665,6 +665,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 						attribute.needsUpdate = true;
 						attribute.array = new Float32Array( nvertices * size );
 						attribute.buffer = _gl.createBuffer();
+						attribute.buffer.belongsToAttribute = a;
 						
 					}
 
@@ -2484,7 +2485,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// custom attributes
 
-		if ( geometryGroup.__webglCustomAttributes ) {
+/*		if ( geometryGroup.__webglCustomAttributes ) {
 
 			for( a in geometryGroup.__webglCustomAttributes ) {
 
@@ -2499,7 +2500,26 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
+		}*/
+
+
+		if ( material.attributes ) {
+
+			for( a in material.attributes ) {
+
+				if( attributes[ a ] >= 0 ) {
+
+					attribute = material.attributes[ a ];
+
+					_gl.bindBuffer( _gl.ARRAY_BUFFER, attribute.buffer );
+					_gl.vertexAttribPointer( attributes[ a ], attribute.size, _gl.FLOAT, false, 0, 0 );
+
+				}
+
+			}
+
 		}
+
 
 
 		// colors

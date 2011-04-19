@@ -367,7 +367,7 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texture_path
 				for ( c = 0, cl = srcColors.length; c < cl; c += 3 ) {
 
 					color = new THREE.Color( 0xffaa00 );
-					color.setRGB( srcColors[ v ], srcColors[ v + 1 ], srcColors[ v + 2 ] );
+					color.setRGB( srcColors[ c ], srcColors[ c + 1 ], srcColors[ c + 2 ] );
 					dstColors.push( color );
 
 				}
