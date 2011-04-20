@@ -53,7 +53,8 @@ THREE.SceneLoader.prototype = {
 				objects: {},
 				cameras: {},
 				lights: {},
-				fogs: {}
+				fogs: {},
+				triggers: {}
 
 			};
 
@@ -200,6 +201,17 @@ THREE.SceneLoader.prototype = {
 
 							}
 							
+							if ( o.trigger && o.trigger.toLowerCase() != "none" ) {
+								
+								var trigger = {
+								"type" 		: o.trigger,
+								"object"	: o
+								};
+								
+								result.triggers[ object.name ] = trigger;
+
+							}
+							
 						}
 
 
@@ -227,6 +239,16 @@ THREE.SceneLoader.prototype = {
 					scope.onLoadComplete();
 
 					async_callback_gate();
+
+				}
+
+			};
+
+			function create_callback_embed( id ) {
+
+				return function( geo ) {
+
+					result.geometries[ id ] = geo;
 
 				}
 
@@ -436,6 +458,17 @@ THREE.SceneLoader.prototype = {
 					jsonLoader.load( { model: get_url( g.url, data.urlBaseType ),
 									   callback: create_callback( dg )
 									} );
+
+				} else if ( g.type == "embedded_mesh" ) {
+
+					var modelJson = data.embeds[ g.id ],
+						texture_path = "";
+
+					if ( modelJson ) {
+
+						jsonLoader.createModel( modelJson, create_callback_embed( dg ), texture_path );
+						
+					}
 
 				}
 
