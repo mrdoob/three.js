@@ -97,13 +97,13 @@ THREE.Object3D.prototype = {
 
 			var scene = this;
 
-			while ( scene instanceof THREE.Scene === false && scene !== undefined ) {
+			while ( scene.parent !== undefined ) {
 
 				scene = scene.parent;
 
 			}
 
-			if ( scene !== undefined )  {
+			if ( scene !== undefined && scene instanceof THREE.Scene )  {
 
 				scene.addChildRecurse( child );
 
