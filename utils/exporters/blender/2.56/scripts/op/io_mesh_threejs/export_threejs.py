@@ -141,10 +141,16 @@ TEMPLATE_OBJECT = """\
         "trigger"       : %(trigger)s
     }"""
 
-TEMPLATE_GEOMETRY = """\
+TEMPLATE_GEOMETRY_LINK = """\
     %(geometry_id)s : {
         "type" : "ascii_mesh",
         "url"  : %(model_file)s
+    }"""
+
+TEMPLATE_GEOMETRY_EMBED = """\
+    %(geometry_id)s : {
+        "type" : "embedded_mesh",
+        "id"  : %(embed_id)s
     }"""
 
 TEMPLATE_TEXTURE = """\
@@ -225,6 +231,15 @@ TEMPLATE_FILE_ASCII = """\
 
 var model = {
 
+%(model)s
+
+};
+
+postMessage( model );
+close();
+"""
+
+TEMPLATE_MODEL_ASCII = """\
     "version" : 2,
 
     "scale" : %(scale)f,
@@ -244,11 +259,6 @@ var model = {
     "faces": [%(faces)s],
 
     "edges" : [%(edges)s]
-
-};
-
-postMessage( model );
-close();
 """
 
 TEMPLATE_VERTEX = "%f,%f,%f"
@@ -827,20 +837,12 @@ def generate_ascii_model(mesh, scene,
         nedges = len(mesh.edges)
         edges_string  = ",".join(generate_edge(e) for e in mesh.edges)
 
-    text = TEMPLATE_FILE_ASCII % {
-    "nvertex"   : len(mesh.vertices),
-    "nface"     : len(mesh.faces),
-    "nuv"       : nuv,
-    "nnormal"   : nnormal,
-    "ncolor"    : ncolor,
-    "nmaterial" : nmaterial,
-    "nedges"    : nedges,
-
+    model_string = TEMPLATE_MODEL_ASCII % {
     "scale" : option_scale,
 
-    "uvs"           : generate_uvs(uvs, option_uv_coords),
-    "normals"       : generate_normals(normals, option_normals),
-    "colors"        : generate_vertex_colors(colors, option_colors),
+    "uvs"       : generate_uvs(uvs, option_uv_coords),
+    "normals"   : generate_normals(normals, option_normals),
+    "colors"    : generate_vertex_colors(colors, option_colors),
 
     "materials" : materials_string,
 
@@ -849,17 +851,29 @@ def generate_ascii_model(mesh, scene,
     "faces"    : generate_faces(normals, uvs, colors, mesh, option_normals, option_colors, option_uv_coords, option_materials, flipyz, option_faces),
 
     "edges"    : edges_string
-
     }
 
-    return text
+    text = TEMPLATE_FILE_ASCII % {
+    "nvertex"   : len(mesh.vertices),
+    "nface"     : len(mesh.faces),
+    "nuv"       : nuv,
+    "nnormal"   : nnormal,
+    "ncolor"    : ncolor,
+    "nmaterial" : nmaterial,
+    "nedges"    : nedges,
+    
+    "model"     : model_string
+    }
+
+
+    return text, model_string
 
 
 # #####################################################
 # Model exporter - export single mesh
 # #####################################################
 
-def export_mesh(obj, scene, filepath,
+def generate_mesh_string(obj, scene,
                 option_vertices,
                 option_vertices_truncate,
                 option_faces,
@@ -872,8 +886,6 @@ def export_mesh(obj, scene, filepath,
                 flipyz,
                 option_scale,
                 export_single_model):
-
-    """Export single mesh"""
 
     # collapse modifiers into mesh
 
@@ -913,7 +925,7 @@ def export_mesh(obj, scene, filepath,
         if not active_col_layer:
             option_colors = False
 
-    text = generate_ascii_model(mesh, scene,
+    text, model_string = generate_ascii_model(mesh, scene,
                                 option_vertices,
                                 option_vertices_truncate,
                                 option_faces,
@@ -926,12 +938,43 @@ def export_mesh(obj, scene, filepath,
                                 flipyz,
                                 option_scale,
                                 obj.draw_type)
-
-    write_file(filepath, text)
-
     # remove temp mesh
 
     bpy.data.meshes.remove(mesh)
+    
+    return text, model_string
+
+def export_mesh(obj, scene, filepath,
+                option_vertices,
+                option_vertices_truncate,
+                option_faces,
+                option_normals,
+                option_edges,
+                option_uv_coords,
+                option_materials,
+                option_colors,
+                align_model,
+                flipyz,
+                option_scale,
+                export_single_model):
+
+    """Export single mesh"""
+
+    text, model_string = generate_mesh_string(obj, scene,
+                option_vertices,
+                option_vertices_truncate,
+                option_faces,
+                option_normals,
+                option_edges,
+                option_uv_coords,
+                option_materials,
+                option_colors,
+                align_model,
+                flipyz,
+                option_scale,
+                export_single_model)
+
+    write_file(filepath, text)
 
     print("writing", filepath, "done")
 
@@ -1068,12 +1111,25 @@ def generate_geometries(data):
             if name not in geo_set:
 
                 geometry_id = "geo_%s" % name
-                model_filename = os.path.basename(generate_mesh_filename(name, data["filepath"]))
+                
+                if data["embed_meshes"]:
 
-                geometry_string = TEMPLATE_GEOMETRY % {
-                "geometry_id" : generate_string(geometry_id),
-                "model_file"  : generate_string(model_filename)
-                }
+                    embed_id = "emb_%s" % name
+
+                    geometry_string = TEMPLATE_GEOMETRY_EMBED % {
+                    "geometry_id" : generate_string(geometry_id),
+                    "embed_id"  : generate_string(embed_id)
+                    }
+
+                else:
+
+                    model_filename = os.path.basename(generate_mesh_filename(name, data["filepath"]))
+
+                    geometry_string = TEMPLATE_GEOMETRY_LINK % {
+                    "geometry_id" : generate_string(geometry_id),
+                    "model_file"  : generate_string(model_filename)
+                    }
+
                 chunks.append(geometry_string)
 
                 geo_set.add(name)
@@ -1319,6 +1375,25 @@ def generate_lights(data):
     return ""
 
 # #####################################################
+# Scene exporter - embedded meshes
+# #####################################################
+
+def generate_embeds(data):
+    
+    if data["embed_meshes"]:
+
+        chunks = []
+        
+        for e in data["embeds"]:
+            
+            embed = '"emb_%s": {%s}' % (e, data["embeds"][e])
+            chunks.append(embed)
+            
+        return ",\n\n".join(chunks)
+
+    return ""
+    
+# #####################################################
 # Scene exporter - generate ASCII scene
 # #####################################################
 
@@ -1332,13 +1407,16 @@ def generate_ascii_scene(data):
     cameras = generate_cameras(data)
     lights = generate_lights(data)
 
+    embeds = generate_embeds(data)
+
     sections = [
     ["objects",    objects],
     ["geometries", geometries],
     ["textures",   textures],
     ["materials",  materials],
     ["cameras",    cameras],
-    ["lights",     lights]
+    ["lights",     lights],
+    ["embeds",     embeds]
     ]
 
     chunks = []
@@ -1375,7 +1453,7 @@ def generate_ascii_scene(data):
 
     return text
 
-def export_scene(scene, filepath, flipyz, option_colors, option_lights, option_cameras):
+def export_scene(scene, filepath, flipyz, option_colors, option_lights, option_cameras, option_embed_meshes, embeds):
 
     source_file = os.path.basename(bpy.data.filepath)
 
@@ -1383,12 +1461,14 @@ def export_scene(scene, filepath, flipyz, option_colors, option_lights, option_c
     data = {
     "scene"       : scene,
     "objects"     : scene.objects,
+    "embeds"      : embeds,
     "source_file" : source_file,
     "filepath"    : filepath,
     "flipyz"      : flipyz,
     "use_colors"  : option_colors,
     "use_lights"  : option_lights, 
-    "use_cameras" : option_cameras
+    "use_cameras" : option_cameras,
+    "embed_meshes": option_embed_meshes
     }
     scene_text += generate_ascii_scene(data)
 
@@ -1412,7 +1492,8 @@ def save(operator, context, filepath = "",
          option_export_scene = False,
          option_lights = False,
          option_cameras = False,
-         option_scale = 1.0):
+         option_scale = 1.0,
+         option_embed_meshes = True):
 
     filepath = ensure_extension(filepath, '.js')
 
@@ -1423,9 +1504,8 @@ def save(operator, context, filepath = "",
 
     if option_export_scene:
 
-        export_scene(scene, filepath, option_flip_yz, option_colors, option_lights, option_cameras)
-
         geo_set = set()
+        embeds = {}
 
         for obj in scene.objects:
             if obj.type == "MESH":
@@ -1442,22 +1522,44 @@ def save(operator, context, filepath = "",
                     name = obj.data.name
 
                 if name not in geo_set:
-                    fname = generate_mesh_filename(name, filepath)
-                    export_mesh(obj, scene, fname,
-                                option_vertices,
-                                option_vertices_truncate,
-                                option_faces,
-                                option_normals,
-                                option_edges,
-                                option_uv_coords,
-                                option_materials,
-                                option_colors,
-                                False,
-                                option_flip_yz,
-                                option_scale,
-                                False)
+                    
+                    if option_embed_meshes:
+                        
+                        text, model_string = generate_mesh_string(obj, scene,
+                                                        option_vertices,
+                                                        option_vertices_truncate,
+                                                        option_faces,
+                                                        option_normals,
+                                                        option_edges,
+                                                        option_uv_coords,
+                                                        option_materials,
+                                                        option_colors,
+                                                        False,
+                                                        option_flip_yz,
+                                                        option_scale,
+                                                        False)
+                        
+                        embeds[name] = model_string
+
+                    else:
+                        fname = generate_mesh_filename(name, filepath)
+                        export_mesh(obj, scene, fname,
+                                    option_vertices,
+                                    option_vertices_truncate,
+                                    option_faces,
+                                    option_normals,
+                                    option_edges,
+                                    option_uv_coords,
+                                    option_materials,
+                                    option_colors,
+                                    False,
+                                    option_flip_yz,
+                                    option_scale,
+                                    False)
 
                     geo_set.add(name)
+
+        export_scene(scene, filepath, option_flip_yz, option_colors, option_lights, option_cameras, option_embed_meshes, embeds)
 
     else:
 
