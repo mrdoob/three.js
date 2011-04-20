@@ -60,7 +60,7 @@ THREE.Trident = function ( params /** Object */) {
 	function getSegment ( point, color ){
 		var geom = new THREE.Geometry();
 		geom.vertices = [new THREE.Vertex(), new THREE.Vertex(point)];
-		return new THREE.Line( geom, new THREE.MeshBasicMaterial( { color : color } ) );
+		return new THREE.Line( geom, new THREE.LineBasicMaterial( { color : color } ) );
 	}
 };
 
