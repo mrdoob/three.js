@@ -8,8 +8,6 @@ THREE.Particle = function ( materials ) {
 
 	this.materials = materials instanceof Array ? materials : [ materials ];
 
-	this.matrixAutoUpdate = false;
-
 };
 
 THREE.Particle.prototype = new THREE.Object3D();
