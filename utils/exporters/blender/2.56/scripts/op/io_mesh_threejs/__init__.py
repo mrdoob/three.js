@@ -40,6 +40,7 @@ from io_utils import ExportHelper, ImportHelper
 
 bpy.types.Object.THREE_castsShadow = bpy.props.BoolProperty()
 bpy.types.Object.THREE_meshCollider = bpy.props.BoolProperty()
+bpy.types.Object.THREE_exportGeometry = bpy.props.BoolProperty(default = True)
 
 THREE_trigger_types = [("None", "None", "None"), ("Small", "Small", "Small"), ("Large", "Large", "Large")]
 bpy.types.Object.THREE_triggerType = EnumProperty(name = "Trigger type", description = "Trigger type", items = THREE_trigger_types, default = "None")
@@ -64,6 +65,9 @@ class OBJECT_PT_hello( bpy.types.Panel ):
         row.label(text="Selected object: " + obj.name )
 
         row = layout.row()
+        row.prop( obj, "THREE_exportGeometry", text="Export geometry" )
+
+        row = layout.row()
         row.prop( obj, "THREE_castsShadow", text="Casts shadow" )
 
         row = layout.row()
@@ -71,6 +75,7 @@ class OBJECT_PT_hello( bpy.types.Panel ):
 
         row = layout.row()
         row.prop( obj, "THREE_triggerType", text="Trigger type" )
+
 
 class MATERIAL_PT_hello( bpy.types.Panel ):
 

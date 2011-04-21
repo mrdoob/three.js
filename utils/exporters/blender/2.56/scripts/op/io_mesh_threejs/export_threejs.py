@@ -141,6 +141,16 @@ TEMPLATE_OBJECT = """\
         "trigger"       : %(trigger)s
     }"""
 
+TEMPLATE_EMPTY = """\
+    %(object_id)s : {
+        "groups"    : [ %(group_id)s ],
+        "position"  : %(position)s,
+        "rotation"  : %(rotation)s,
+        "quaternion": %(quaternion)s,
+        "scale"     : %(scale)s,
+        "trigger"   : %(trigger)s
+    }"""
+
 TEMPLATE_GEOMETRY_LINK = """\
     %(geometry_id)s : {
         "type" : "ascii_mesh",
@@ -1038,7 +1048,8 @@ def generate_objects(data):
     chunks = []
 
     for obj in data["objects"]:
-        if obj.type == "MESH":
+
+        if obj.type == "MESH" and obj.THREE_exportGeometry:
             object_id = obj.name
 
             if len(obj.modifiers) > 0:
@@ -1071,9 +1082,11 @@ def generate_objects(data):
             if meshCollider or castsShadow:
                 visible = False
 
+            geometry_string = generate_string(geometry_id)
+                
             object_string = TEMPLATE_OBJECT % {
             "object_id"   : generate_string(object_id),
-            "geometry_id" : generate_string(geometry_id),
+            "geometry_id" : geometry_string,
             "group_id"    : group_string,
             "material_id" : material_string,
 
@@ -1086,6 +1099,33 @@ def generate_objects(data):
             "meshCollider" : generate_bool_property(meshCollider),
             "trigger" 	   : generate_string(triggerType),
             "visible"      : generate_bool_property(visible)
+            }
+            chunks.append(object_string)
+            
+        elif obj.type == "EMPTY" or (obj.type == "MESH" and not obj.THREE_exportGeometry):
+
+            object_id = obj.name
+            group_ids = generate_group_id_list(obj)
+
+            position, quaternion, scale = obj.matrix_world.decompose()
+            rotation = quaternion.to_euler("XYZ")
+
+            group_string = ""
+            if len(group_ids) > 0:
+                group_string = generate_string_list(group_ids)
+
+            triggerType = obj.THREE_triggerType
+                
+            object_string = TEMPLATE_EMPTY % {
+            "object_id"   : generate_string(object_id),
+            "group_id"    : group_string,
+
+            "position"    : generate_vec3(position),
+            "rotation"    : generate_vec3(rotation),
+            "quaternion"  : generate_vec4(quaternion),
+            "scale"       : generate_vec3(scale),
+
+            "trigger" 	   : generate_string(triggerType),
             }
             chunks.append(object_string)
 
@@ -1101,7 +1141,7 @@ def generate_geometries(data):
     geo_set = set()
 
     for obj in data["objects"]:
-        if obj.type == "MESH":
+        if obj.type == "MESH" and obj.THREE_exportGeometry:
 
             if len(obj.modifiers) > 0:
                 name = obj.name
@@ -1508,7 +1548,7 @@ def save(operator, context, filepath = "",
         embeds = {}
 
         for obj in scene.objects:
-            if obj.type == "MESH":
+            if obj.type == "MESH" and obj.THREE_exportGeometry:
 
                 # create extra copy of geometry with applied modifiers
                 # (if they exist)
@@ -1542,6 +1582,7 @@ def save(operator, context, filepath = "",
                         embeds[name] = model_string
 
                     else:
+
                         fname = generate_mesh_filename(name, filepath)
                         export_mesh(obj, scene, fname,
                                     option_vertices,
