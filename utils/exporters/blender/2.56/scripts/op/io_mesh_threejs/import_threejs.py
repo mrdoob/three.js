@@ -71,7 +71,11 @@ def create_materials(data, modelpath):
         mapDiffuse = m.get("mapDiffuse", None)
         mapLightmap = m.get("mapLightmap", None)
         
-        useVertexColors = m.get("vertexColors", False)
+        vertexColorsType = m.get("vertexColors", False)
+        
+        useVertexColors = False
+        if vertexColorsType:
+            useVertexColors = True
         
         material = bpy.data.materials.new(name)
         
