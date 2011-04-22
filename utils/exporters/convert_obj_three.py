@@ -18,6 +18,7 @@ Notes:
         -d invert|normal		invert transparency
         -b						bake material colors into face colors
         -e						export edges
+        -x 10.0                 scale and truncate
 
     - by default:
         use smooth shading (if there were vertex normals in the original model)
@@ -146,6 +147,9 @@ SHADING = "smooth"      # smooth flat
 TYPE = "ascii"          # ascii binary
 TRANSPARENCY = "normal" # normal invert
 
+TRUNCATE = False
+SCALE = 1.0
+
 BAKE_COLORS = False
 EXPORT_EDGES = False
 
@@ -174,6 +178,8 @@ var model = {
 
     "version" : 2,
     
+    "scale" : %(scale)f,
+
     "materials": [%(materials)s],
 
     "vertices": [%(vertices)s],
@@ -223,6 +229,7 @@ close();
 """
 
 TEMPLATE_VERTEX = "%f,%f,%f"
+TEMPLATE_VERTEX_TRUNCATE = "%d,%d,%d"
 
 TEMPLATE_N = "%f,%f,%f"
 TEMPLATE_UV = "%f,%f"
@@ -679,8 +686,11 @@ def generate_face(f, fc):
 def hexcolor(c):
     return ( int(c[0] * 255) << 16  ) + ( int(c[1] * 255) << 8 ) + int(c[2] * 255)
 
-def generate_vertex(v):
-    return TEMPLATE_VERTEX % (v[0], v[1], v[2])
+def generate_vertex(v, option_vertices_truncate, scale):
+    if not option_vertices_truncate:
+        return TEMPLATE_VERTEX % (v[0], v[1], v[2])
+    else:
+        return TEMPLATE_VERTEX_TRUNCATE % (scale * v[0], scale * v[1], scale * v[2])
 
 def generate_normal(n):
     return TEMPLATE_N % (n[0], n[1], n[2])
@@ -701,7 +711,7 @@ def generate_edge(e):
 # Morphs
 # #####################################################
 def generate_morph_vertex(name, vertices):
-    vertex_string = ",".join(generate_vertex(v) for v in vertices)
+    vertex_string = ",".join(generate_vertex(v, TRUNCATE, SCALE) for v in vertices)
     return TEMPLATE_MORPH_VERTICES % (name, vertex_string)
     
 def generate_morph_color(name, colors):
@@ -1164,14 +1174,16 @@ def convert_ascii(infile, morphfiles, colorfiles, outfile):
     "normals"       : normals_string,
     "colors"        : colors_string,
     "uvs"           : ",".join(generate_uv(uv) for uv in uvs),
-    "vertices"      : ",".join(generate_vertex(v) for v in vertices),
+    "vertices"      : ",".join(generate_vertex(v, TRUNCATE, SCALE) for v in vertices),
     
     "morphTargets"  : morphTargets,
     "morphColors"   : morphColors,
     
     "faces"     : ",".join(generate_face(f, fc) for f, fc in zip(faces, colorFaces)),
         
-    "edges"    : edges_string
+    "edges"    : edges_string,
+    
+    "scale"    : SCALE
     }
     
     out = open(outfile, "w")
@@ -1506,7 +1518,7 @@ if __name__ == "__main__":
     
     # get parameters from the command line
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hbei:m:c:b:o:a:s:t:d:", ["help", "bakecolors", "edges", "input=", "morphs=", "colors=", "output=", "align=", "shading=", "type=", "dissolve="])
+        opts, args = getopt.getopt(sys.argv[1:], "hbei:m:c:b:o:a:s:t:d:x:", ["help", "bakecolors", "edges", "input=", "morphs=", "colors=", "output=", "align=", "shading=", "type=", "dissolve=", "truncatescale="])
     
     except getopt.GetoptError:
         usage()
@@ -1554,6 +1566,10 @@ if __name__ == "__main__":
 
         elif o in ("-e", "--edges"):
             EXPORT_EDGES = True
+
+        elif o in ("-x", "--truncatescale"):
+            TRUNCATE = True
+            SCALE = float(a)
 
     if infile == "" or outfile == "":
         usage()

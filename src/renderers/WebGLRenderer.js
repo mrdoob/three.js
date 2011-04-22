@@ -80,7 +80,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.data = {
 
 		vertices: 0,
-		faces: 0
+		faces: 0,
+		drawCalls: 0
 
 	};
 
@@ -2626,6 +2627,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_this.data.vertices += geometryGroup.__webglFaceCount;
 			_this.data.faces += geometryGroup.__webglFaceCount / 3;
+			_this.data.drawCalls ++;
 
 		// render lines
 
@@ -2636,17 +2638,23 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.lineWidth( material.linewidth );
 			_gl.drawArrays( primitives, 0, geometryGroup.__webglLineCount );
 
+			_this.data.drawCalls ++;
+
 		// render particles
 
 		} else if ( object instanceof THREE.ParticleSystem ) {
 
 			_gl.drawArrays( _gl.POINTS, 0, geometryGroup.__webglParticleCount );
 
+			_this.data.drawCalls ++;
+
 		// render ribbon
 
 		} else if ( object instanceof THREE.Ribbon ) {
 
 			_gl.drawArrays( _gl.TRIANGLE_STRIP, 0, geometryGroup.__webglVertexCount );
+
+			_this.data.drawCalls ++;
 
 		}
 
@@ -2982,6 +2990,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_this.data.vertices = 0;
 		_this.data.faces = 0;
+		_this.data.drawCalls = 0;
 
 		camera.matrixAutoUpdate && camera.update( undefined, true );
 

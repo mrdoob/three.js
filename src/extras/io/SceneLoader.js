@@ -54,7 +54,8 @@ THREE.SceneLoader.prototype = {
 				cameras: {},
 				lights: {},
 				fogs: {},
-				triggers: {}
+				triggers: {},
+				empties: {}
 
 			};
 
@@ -123,16 +124,104 @@ THREE.SceneLoader.prototype = {
 
 						o = data.objects[ dd ];
 
-						geometry = result.geometries[ o.geometry ];
+						if ( o.geometry !== undefined ) {
 
-						if ( geometry ) {
+							geometry = result.geometries[ o.geometry ];
 
-							materials = [];
-							for( i = 0; i < o.materials.length; i++ ) {
+							// geometry already loaded
 
-								materials[ i ] = result.materials[ o.materials[i] ];
+							if ( geometry ) {
+
+								materials = [];
+								for( i = 0; i < o.materials.length; i++ ) {
+
+									materials[ i ] = result.materials[ o.materials[i] ];
+
+								}
+
+								p = o.position;
+								r = o.rotation;
+								q = o.quaternion;
+								s = o.scale;
+
+								// turn off quaternions, for the moment
+
+								q = 0;
+
+								if ( materials.length == 0 ) {
+
+									materials[ 0 ] = new THREE.MeshFaceMaterial();
+
+								}
+
+								// dirty hack to handle meshes with multiple materials
+								// just use face materials defined in model
+
+								if ( materials.length > 1 ) {
+
+									materials = [ new THREE.MeshFaceMaterial() ];
+
+								}
+
+								object = new THREE.Mesh( geometry, materials );
+								object.name = dd;
+								object.position.set( p[0], p[1], p[2] );
+
+								if ( q ) {
+
+									object.quaternion.set( q[0], q[1], q[2], q[3] );
+									object.useQuaternion = true;
+
+								} else {
+
+									object.rotation.set( r[0], r[1], r[2] );
+
+								}
+
+								object.scale.set( s[0], s[1], s[2] );
+								object.visible = o.visible;
+
+								result.scene.addObject( object );
+
+								result.objects[ dd ] = object;
+
+								if ( o.meshCollider ) {
+
+									var meshCollider = THREE.CollisionUtils.MeshColliderWBox( object );
+									result.scene.collisions.colliders.push( meshCollider );
+
+								}
+
+								if ( o.castsShadow ) {
+									
+									//object.visible = true;
+									//object.materials = [ new THREE.MeshBasicMaterial( { color: 0xff0000 } ) ];
+
+									var shadow = new THREE.ShadowVolume( geometry )
+									result.scene.addChild( shadow );
+									
+									shadow.position = object.position;
+									shadow.rotation = object.rotation;
+									shadow.scale = object.scale;
+
+								}
+								
+								if ( o.trigger && o.trigger.toLowerCase() != "none" ) {
+									
+									var trigger = {
+									"type" 		: o.trigger,
+									"object"	: o
+									};
+									
+									result.triggers[ object.name ] = trigger;
+
+								}
 
 							}
+
+						// pure Object3D
+
+						} else {
 
 							p = o.position;
 							r = o.rotation;
@@ -143,22 +232,7 @@ THREE.SceneLoader.prototype = {
 
 							q = 0;
 
-							if ( materials.length == 0 ) {
-
-								materials[ 0 ] = new THREE.MeshFaceMaterial();
-
-							}
-
-							// dirty hack to handle meshes with multiple materials
-							// just use face materials defined in model
-
-							if ( materials.length > 1 ) {
-
-								materials = [ new THREE.MeshFaceMaterial() ];
-
-							}
-
-							object = new THREE.Mesh( geometry, materials );
+							object = new THREE.Object3D();
 							object.name = dd;
 							object.position.set( p[0], p[1], p[2] );
 
@@ -174,46 +248,14 @@ THREE.SceneLoader.prototype = {
 							}
 
 							object.scale.set( s[0], s[1], s[2] );
-							object.visible = o.visible;
+							object.visible = ( o.visible !== undefined ) ? o.visible : false;
 
 							result.scene.addObject( object );
 
 							result.objects[ dd ] = object;
+							result.empties[ dd ] = object;
 
-							if ( o.meshCollider ) {
-
-								var meshCollider = THREE.CollisionUtils.MeshColliderWBox( object );
-								result.scene.collisions.colliders.push( meshCollider );
-
-							}
-
-							if ( o.castsShadow ) {
-								
-								//object.visible = true;
-								//object.materials = [ new THREE.MeshBasicMaterial( { color: 0xff0000 } ) ];
-
-								var shadow = new THREE.ShadowVolume( geometry )
-								result.scene.addChild( shadow );
-								
-								shadow.position = object.position;
-								shadow.rotation = object.rotation;
-								shadow.scale = object.scale;
-
-							}
-							
-							if ( o.trigger && o.trigger.toLowerCase() != "none" ) {
-								
-								var trigger = {
-								"type" 		: o.trigger,
-								"object"	: o
-								};
-								
-								result.triggers[ object.name ] = trigger;
-
-							}
-							
 						}
-
 
 					}
 
