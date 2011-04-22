@@ -1,0 +1,263 @@
+<!--
+Example of Blend Animation - try rolling the mouse ball back and forth
+strelz  -  strelz@live.com
+
+Model is 'Ludwig' by Jason Pierce - http://jasonpierce.animadillo.com/resource/ludwig/ludwig.html
+
+Procedure:
+1) In Blender produce one base pose and a number of secondary poses using a rigged model - export and convert each pose/mesh
+2) Load the base pose and save its geometry as the ParentGeometry - but don't add it as a mesh
+3) modify or overwrite the materials of the ParentGeometry to add 'MorphTargets:True' as a property
+3) Load the first secondary pose - add its vertices as an 'influence' on the ParentGeometry
+4) add a mesh to the scene for this first influence
+5) Load each of the other secondary meshes adding them as influence to the ParentGeoemtry but DONT ADD MESHES
+6) after the last secondary pose is loaded and added as an influence - start up your animation
+7) animation is achieved by setting all other influences to -1 and varying the desired influence from 7-9
+
+Known Problems:
+1) small movements from base to secondary produce nicer looking results - big movements produce wild distortion
+2) the varying range (7-9) for influences was found by experimention and may be different for other models (based on the number of materials??)
+3) only tested on Chrome (why exactly are you using anything else)
+4) This demo only shows animation from base->A base->B etc..  Chaining from base -> A -> B -> C is certainly possible with a bit more logic (and artistic ability) 
+
+-->
+
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>three.js webgl - Blend Animation</title>
+		<meta charset="utf-8">
+		<style type="text/css">
+			body {
+				background:#000;
+				color:#fff;
+				padding:0;
+				margin:0;
+				font-weight: bold;
+				overflow:hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				color: #ffffff;
+				padding: 5px;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: center;
+				z-index:100;
+			}
+
+			#ctrl {
+				position: absolute;
+				top: 0px;
+				left: 0px;
+				width: 200px;
+				color: #ffffff;
+				padding: 5px;
+				font-family: Monospace;
+				font-size: 13px;
+				z-index:100;
+			}
+
+
+			a { color:red }
+
+		</style>
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - WebGL Blend Animation Example (mouse wheel up/down to change)
+			<br/>
+			Model is <a href=http://jasonpierce.animadillo.com/resource/ludwig/ludwig.html>Ludwig</a> by Jason Pierce 
+			<br/><b id = "influence">influence : step</b>
+
+		 </div>
+
+
+		<script type="text/javascript" src="../build/Three.js"></script>
+
+		<script type="text/javascript" src="js/Detector.js"></script>
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
+		<script type="text/javascript" src="js/Stats.js"></script>
+
+		<script type="text/javascript">
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, stats;
+
+			var camera, scene, renderer;
+
+			var geometry, objects;
+
+			var parentGeometry;
+				var zmesh = [];				
+
+			var mouseX = 0, mouseY = 0;
+
+			var currentInfluence = 0;
+			var animReady = false;
+
+			var squish = 0;
+			var mesh;
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+			document.addEventListener( 'mousewheel', onDocumentMouseWheel, false );
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.Camera( 45, window.innerWidth / window.innerHeight, 1, 15000 );
+				camera.position.z = 500;
+
+
+				scene = new THREE.Scene();
+			//	scene.fog = new THREE.Fog( 0x000000, 1, 15000 );
+
+
+				var light = new THREE.PointLight( 0xff2200 );
+				light.position.set( 100, 100, 100 );
+				scene.addLight( light );
+
+				var directionalLight = new THREE.DirectionalLight( 0xffeedd );
+				directionalLight.position.y = -70;
+				directionalLight.position.z = 100;
+				directionalLight.position.normalize();
+				scene.addLight( directionalLight );
+
+				var light = new THREE.AmbientLight( 0x333333 );
+				scene.addLight( light );
+
+				var loader = new THREE.JSONLoader(),
+					parentCallback   = function( geometry ) { loadParent( geometry) };
+
+				loader.load( { model: "obj/ludwig/ludwig_stand.js", callback: parentCallback } );
+
+			}
+
+			function addInfluence( geometry, influenceName, last, first ) {
+			
+				parentGeometry.morphTargets.push( { name: influenceName, vertices: geometry.vertices } );
+                         
+
+				if(first){
+				   zmesh[influenceName] = new THREE.Mesh( parentGeometry, new THREE.MeshFaceMaterial() );
+				   
+				    zmesh[influenceName].position.x = 0;
+				    zmesh[influenceName].position.z = 0;
+				    zmesh[influenceName].position.y = 52;
+				    
+				    zmesh[influenceName].scale.x = zmesh[influenceName].scale.y = zmesh[influenceName].scale.z = 26;
+				    //zmesh.overdraw = true;
+				    zmesh[influenceName].updateMatrix();
+				    //THREE.SceneUtils.addMesh(scene, geometry,45,x+i*250-75*num,0,45,0,0,0,new THREE.MeshFaceMaterial());
+				    scene.addChild(zmesh[influenceName]);			
+				}
+				    //zmesh.morphTargetInfluences[0] =8;
+				if(last){
+				  renderer = new THREE.WebGLRenderer( { clearColor:0x222222, clearAlpha: 1 } );
+				  renderer.setSize( window.innerWidth, window.innerHeight );
+				  renderer.sortObjects = false;
+				  container.appendChild( renderer.domElement );
+				  animReady = true;
+				  document.getElementById('influence').innerHTML = "influence : "+parentGeometry.morphTargets[currentInfluence].name;
+				}				
+			}
+
+			function loadParent( geometry) {
+
+				parentGeometry = geometry;
+				    parentGeometry.materials[0][0] =  new THREE.MeshLambertMaterial( {  color: 0xffffff ,shading: THREE.SmoothShading,  morphTargets: true} );
+				    parentGeometry.materials[1][0] =  new THREE.MeshLambertMaterial( {  color: 0x000000 ,shading: THREE.SmoothShading,  morphTargets: true} );
+				    parentGeometry.materials[2][0] =  new THREE.MeshLambertMaterial( {  color: Math.random() * 0xffffff ,shading: THREE.SmoothShading,  morphTargets: true} );				    
+				    parentGeometry.materials[3][0] =  new THREE.MeshLambertMaterial( {  color: Math.random() * 0xffffff ,shading: THREE.SmoothShading,  morphTargets: true} );
+				    parentGeometry.materials[4][0] =  new THREE.MeshLambertMaterial( {  color: 0xffffff ,shading: THREE.SmoothShading,  morphTargets: true} );
+				    parentGeometry.materials[5][0] =  new THREE.MeshLambertMaterial( {  color: 0xa98c8c ,shading: THREE.SmoothShading,  morphTargets: true} );
+				    parentGeometry.materials[6][0] =  new THREE.MeshLambertMaterial( {  color: 0xa86363 ,shading: THREE.SmoothShading,  morphTargets: true} );			   
+
+			      
+
+				var loader = new THREE.JSONLoader(),
+					step = function( geometry ) { addInfluence( geometry, "step",false,true)},
+					dance = function( geometry ) { addInfluence( geometry, "dance",false,false)},
+					punch = function( geometry ) { addInfluence( geometry, "punch",false,false)},
+					jump = function( geometry ) { addInfluence( geometry, "jump",true,false)};
+
+				loader.load( { model: "obj/ludwig/ludwig_step.js", callback: step } );
+				loader.load( { model: "obj/ludwig/ludwig_punch.js", callback: punch } );
+				loader.load( { model: "obj/ludwig/ludwig_dance.js", callback: dance } );
+				loader.load( { model: "obj/ludwig/ludwig_jump.js", callback: jump } );
+				
+			}
+
+			function onDocumentMouseMove(event) {
+
+				mouseX = ( event.clientX - windowHalfX );
+				mouseY = ( event.clientY - windowHalfY ) * 2;
+
+			}
+			function onDocumentMouseWheel(event) {
+
+				var delta = event.wheelDelta;
+				if ((delta > 0) && (currentInfluence < zmesh["step"].morphTargetInfluences.length-1)){
+				    currentInfluence ++;
+				}
+				if ((delta < 0) && (currentInfluence > 0)){
+				    currentInfluence --;
+				}
+				document.getElementById('influence').innerHTML = "influence : "+parentGeometry.morphTargets[currentInfluence].name;
+
+			}
+
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				render();
+
+			}			
+
+			function render() {
+
+				if(animReady == true){
+					squish += .1;
+					zmesh["step"].morphTargetInfluences[1] =-1;
+					zmesh["step"].morphTargetInfluences[2] =-1;
+					zmesh["step"].morphTargetInfluences[3] =-1;
+					for (var v = 0; v < zmesh["step"].morphTargetInfluences.length;v++){
+					 if(v == currentInfluence){
+					      zmesh["step"].morphTargetInfluences[v] = Math.sin( squish )  + 8.0;
+					  }
+					  else{
+					      zmesh["step"].morphTargetInfluences[v] = -1;
+					   }
+					}
+				}
+
+				camera.position.x += ( mouseX - camera.position.x ) * .005;
+				camera.position.y += ( - mouseY - camera.position.y ) * .01;
+
+				renderer.render( scene, camera );
+
+			}
+
+			function log( text ) {
+
+				var e = document.getElementById("log");
+				e.innerHTML = text + "<br/>" + e.innerHTML;
+
+			}
+
+		</script>
+
+	</body>
+</html>
