@@ -42,6 +42,10 @@ THREE.Color.prototype = {
 		// based on MochiKit implementation by Bob Ippolito
 		// h,s,v ranges are < 0.0 - 1.0 >
 
+		this.h = h;
+		this.s = s;
+		this.v = v;
+		
 		var red, green, blue, i, f, p, q, t;
 
 		if ( v == 0.0 ) {
@@ -80,6 +84,66 @@ THREE.Color.prototype = {
 			this.updateStyleString();
 
 		}
+
+	},
+	
+	updateHSV : function () {
+		
+		// based on MochiKit implementation by Bob Ippolito
+
+		this.h = 0;
+		this.s = 0;
+		this.v = 0;
+		
+		var max = Math.max( Math.max( this.r, this.g ), this.b );
+		var min = Math.min( Math.min( this.r, this.g ), this.b );
+
+		var hue;
+		var saturation;
+		var value = max;
+
+		if ( min == max )	{
+
+			hue = 0;
+			saturation = 0;
+
+		} else {
+
+			var delta = ( max - min );
+			saturation = delta / max;
+
+			if ( this.r == max )	{
+
+				hue = ( this.g - this.b ) / delta;
+
+			} else if ( this.g == max ) {
+
+				hue = 2 + ( ( this.b - this.r ) / delta );
+
+			} else	{
+
+				hue = 4 + ( ( this.r - this.g ) / delta );
+			}
+
+			hue /= 6;
+
+			if ( hue < 0 ) {
+
+				hue += 1;
+
+			}
+			
+			if ( hue > 1 ) {
+
+				hue -= 1;
+
+			}
+
+		}
+		
+		this.h = hue;
+		this.s = saturation;
+		this.v = value;
 
 	},
 
