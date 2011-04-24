@@ -45,21 +45,22 @@ THREE.JSONLoader.prototype.load = function ( parameters ) {
 THREE.JSONLoader.prototype.createModel = function ( json, callback, texture_path ) {
 
 	var scope = this,
-	geometry = new THREE.Geometry();
+	geometry = new THREE.Geometry(),
+	scale = ( json.scale !== undefined ) ? json.scale : 1.0;
 
 	this.init_materials( geometry, json.materials, texture_path );
 
-	parse();
+	init_model( scale );
 
 	init_skin();
-	init_morphing();
+	init_morphing( scale );
 	init_edges();
 
 	geometry.computeCentroids();
 	geometry.computeFaceNormals();
 	geometry.computeEdgeFaces();
 
-	function parse() {
+	function init_model( scale ) {
 
 		if ( json.version === undefined || json.version != 2 ) {
 
@@ -95,8 +96,6 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texture_path
 		vertices = json.vertices,
 		normals = json.normals,
 		colors = json.colors,
-
-		scale = ( json.scale !== undefined ) ? json.scale : 1.0,
 
 		nUvLayers = 0;
 
@@ -326,11 +325,11 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texture_path
 
 	};
 
-	function init_morphing() {
+	function init_morphing( scale ) {
 
 		if ( json.morphTargets !== undefined ) {
 
-			var i, l, v, vl, dstVertices, srcVertices;
+			var i, l, v, vl, x, y, z, dstVertices, srcVertices;
 
 			for ( i = 0, l = json.morphTargets.length; i < l; i++ ) {
 
@@ -343,7 +342,11 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texture_path
 
 				for( v = 0, vl = srcVertices.length; v < vl; v += 3 ) {
 
-					dstVertices.push( new THREE.Vertex( new THREE.Vector3( srcVertices[ v ], srcVertices[ v + 1 ], srcVertices[ v + 2 ] ) ) );
+					x = srcVertices[ v ] / scale;
+					y = srcVertices[ v + 1 ] / scale;
+					z = srcVertices[ v + 2 ] / scale;
+
+					dstVertices.push( new THREE.Vertex( new THREE.Vector3( x, y, z ) ) );
 
 				}
 
