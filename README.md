@@ -139,6 +139,17 @@ This code creates a camera, then creates a scene, adds a cube on it, creates a &
 
 ### Change Log ###
 
+2011 04 24 - **r40** (263.774 KB, gzip: 64.320 KB)
+
+* Fixed `Object3D.lookAt`. ([mrdoob](http://github.com/mrdoob))
+* More and more Blender exporter goodness. ([alteredq](http://github.com/alteredq) and [mrdoob](http://github.com/mrdoob))
+* Improved `CollisionSystem`. ([drojdjou](https://github.com/drojdjou) and [alteredq](http://github.com/alteredq))
+* Fixes on WebGLRenderer. ([empaempa](http://github.com/empaempa))
+* Added `Trident` object. ([sroucheray](http://github.com/sroucheray))
+* Added `data` object to Renderers for getting number of vertices/faces/callDraws from last render. ([mrdoob](http://github.com/mrdoob))
+* Fixed `Projector` handling Particles with hierarchies. ([mrdoob](http://github.com/mrdoob))
+
+
 2011 04 09 - **r39** (249.048 KB, gzip: 61.020 KB)
 
 * Improved WebGLRenderer program cache. ([alteredq](http://github.com/alteredq))
