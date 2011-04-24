@@ -1277,14 +1277,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 									customAttribute.array[ offset_custom + 0 ] = customAttribute.value[ face.a ];
 									customAttribute.array[ offset_custom + 1 ] = customAttribute.value[ face.b ];
 									customAttribute.array[ offset_custom + 2 ] = customAttribute.value[ face.c ];
-									customAttribute.array[ offset_custom + 2 ] = customAttribute.value[ face.d ];
+									customAttribute.array[ offset_custom + 3 ] = customAttribute.value[ face.d ];
 									
 								} else if( customAttribute.boundTo === "faces" ) {
 									
 									customAttribute.array[ offset_custom + 0 ] = customAttribute.value[ offset_customSrc ];
 									customAttribute.array[ offset_custom + 1 ] = customAttribute.value[ offset_customSrc ];
 									customAttribute.array[ offset_custom + 2 ] = customAttribute.value[ offset_customSrc ];
-									customAttribute.array[ offset_custom + 2 ] = customAttribute.value[ offset_customSrc ];
+									customAttribute.array[ offset_custom + 3 ] = customAttribute.value[ offset_customSrc ];
 
 									customAttribute.offsetSrc++;
 									
@@ -1293,7 +1293,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 									customAttribute.array[ offset_custom + 0 ] = customAttribute.value[ offset_customSrc + 0 ];
 									customAttribute.array[ offset_custom + 1 ] = customAttribute.value[ offset_customSrc + 1 ];
 									customAttribute.array[ offset_custom + 2 ] = customAttribute.value[ offset_customSrc + 2 ];
-									customAttribute.array[ offset_custom + 2 ] = customAttribute.value[ offset_customSrc + 3 ];
+									customAttribute.array[ offset_custom + 3 ] = customAttribute.value[ offset_customSrc + 3 ];
 									
 									customAttribute.offsetSrc += 4;
 								}
@@ -3934,6 +3934,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						customAttributeDirty = true;
 						break;
+
 					}
 
 				}
