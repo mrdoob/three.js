@@ -84,6 +84,7 @@ COMMON_FILES = [
 EXTRAS_FILES = [
 'extras/animation/AnimationHandler.js',
 'extras/animation/Animation.js',
+'extras/ColorUtils.js',
 'extras/GeometryUtils.js',
 'extras/ImageUtils.js',
 'extras/SceneUtils.js',
