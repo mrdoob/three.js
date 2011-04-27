@@ -50,17 +50,17 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texture_path
 
 	this.init_materials( geometry, json.materials, texture_path );
 
-	init_model( scale );
+	parseModel( scale );
 
-	init_skin();
-	init_morphing( scale );
-	init_edges();
+	parseSkin();
+	parseMorphing( scale );
+	parseEdges();
 
-	geometry.computeCentroids();
 	geometry.computeFaceNormals();
-	geometry.computeEdgeFaces();
+	// geometry.computeCentroids();
+	// geometry.computeEdgeFaces();
 
-	function init_model( scale ) {
+	function parseModel( scale ) {
 
 		if ( json.version === undefined || json.version != 2 ) {
 
@@ -82,8 +82,8 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texture_path
 		colorIndex, normalIndex, uvIndex, materialIndex,
 
 		type,
-		isQuad, 
-		hasMaterial, 
+		isQuad,
+		hasMaterial,
 		hasFaceUv, hasFaceVertexUv,
 		hasFaceNormal, hasFaceVertexNormal,
 		hasFaceColor, hasFaceVertexColor,
@@ -286,7 +286,7 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texture_path
 
 	};
 
-	function init_skin() {
+	function parseSkin() {
 
 		var i, l, x, y, z, w, a, b, c, d;
 
@@ -325,7 +325,7 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texture_path
 
 	};
 
-	function init_morphing( scale ) {
+	function parseMorphing( scale ) {
 
 		if ( json.morphTargets !== undefined ) {
 
@@ -381,7 +381,7 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texture_path
 
 	};
 
-	function init_edges() {
+	function parseEdges() {
 
 		if( json.edges !== undefined ) {
 
