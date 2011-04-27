@@ -81,7 +81,7 @@ THREE.Color.prototype = {
 
 		}
 
-	},	
+	},
 
 	setHex : function ( hex ) {
 
