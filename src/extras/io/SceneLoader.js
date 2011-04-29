@@ -255,6 +255,18 @@ THREE.SceneLoader.prototype = {
 							result.objects[ dd ] = object;
 							result.empties[ dd ] = object;
 
+								
+							if ( o.trigger && o.trigger.toLowerCase() != "none" ) {
+								
+								var trigger = {
+								"type" 		: o.trigger,
+								"object"	: o
+								};
+								
+								result.triggers[ object.name ] = trigger;
+
+							}
+
 						}
 
 					}
