@@ -3348,7 +3348,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// draw darkening polygon
 
-		_oldBlending = "";
+		_oldBlending = -1;
 		_currentProgram = _stencilShadow.program;
 
 		_gl.useProgram( _stencilShadow.program );
@@ -3397,7 +3397,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_gl.useProgram( _sprite.program );
 		_currentProgram = _sprite.program;
-		_oldBlending = "";
+		_oldBlending = -1;
 
 		if ( !_spriteAttributesEnabled ) {
 
@@ -3561,7 +3561,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_gl.useProgram( _lensFlare.program );
 		_currentProgram = _lensFlare.program;
-		_oldBlending = "";
+		_oldBlending = -1;
 
 
 		if ( ! _lensFlareAttributesEnabled ) {
