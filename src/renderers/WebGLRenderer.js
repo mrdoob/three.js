@@ -21,7 +21,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	// See http://code.google.com/p/chromium/issues/detail?id=63491
 
 	var _this = this,
-	_gl, _canvas = document.createElement( 'canvas' ),
+	_gl, _canvas,
 	_programs = [],
 	_currentProgram = null,
 	_currentFramebuffer = null,
@@ -72,6 +72,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	parameters = parameters || {};
 
+	_canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElement( 'canvas' ),
 	stencil = parameters.stencil !== undefined ? parameters.stencil : true,
 	antialias = parameters.antialias !== undefined ? parameters.antialias : false,
 	clearColor = parameters.clearColor !== undefined ? new THREE.Color( parameters.clearColor ) : new THREE.Color( 0x000000 ),
