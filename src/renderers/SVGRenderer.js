@@ -363,9 +363,7 @@ THREE.SVGRenderer = function () {
 
 		if ( material instanceof THREE.LineBasicMaterial ) {
 
-			_color.__styleString = material.color.__styleString;
-
-			_svgNode.setAttribute( 'style', 'fill: none; stroke: ' + _color.__styleString + '; stroke-width: ' + material.linewidth + '; stroke-opacity: ' + material.opacity + '; stroke-linecap: ' + material.linecap + '; stroke-linejoin: ' + material.linejoin );
+			_svgNode.setAttribute( 'style', 'fill: none; stroke: #' + '#' + pad( material.color.hex.toString( 16 ) ) + '; stroke-width: ' + material.linewidth + '; stroke-opacity: ' + material.opacity + '; stroke-linecap: ' + material.linecap + '; stroke-linejoin: ' + material.linejoin );
 
 			_svg.appendChild( _svgNode );
 
@@ -383,7 +381,7 @@ THREE.SVGRenderer = function () {
 
 		if ( material instanceof THREE.MeshBasicMaterial ) {
 
-			_color.__styleString = material.color.__styleString;
+			_color.hex = material.color.hex;
 
 		} else if ( material instanceof THREE.MeshLambertMaterial ) {
 
@@ -395,15 +393,15 @@ THREE.SVGRenderer = function () {
 
 				calculateFaceLight( scene, element, _light );
 
-				_color.r = material.color.r * _light.r;
-				_color.g = material.color.g * _light.g;
-				_color.b = material.color.b * _light.b;
+				_color.r = Math.max( 0, Math.min( material.color.r * _light.r, 1 ) );
+				_color.g = Math.max( 0, Math.min( material.color.g * _light.g, 1 ) );
+				_color.b = Math.max( 0, Math.min( material.color.b * _light.b, 1 ) );
 
-				_color.updateStyleString();
+				_color.updateHex();
 
 			} else {
 
-				_color.__styleString = material.color.__styleString;
+				_color.hex = material.color.hex;
 
 			}
 
@@ -420,11 +418,11 @@ THREE.SVGRenderer = function () {
 
 		if ( material.wireframe ) {
 
-			_svgNode.setAttribute( 'style', 'fill: none; stroke: ' + _color.__styleString + '; stroke-width: ' + material.wireframeLinewidth + '; stroke-opacity: ' + material.opacity + '; stroke-linecap: ' + material.wireframeLinecap + '; stroke-linejoin: ' + material.wireframeLinejoin );
+			_svgNode.setAttribute( 'style', 'fill: none; stroke: #' + pad( _color.hex.toString( 16 ) ) + '; stroke-width: ' + material.wireframeLinewidth + '; stroke-opacity: ' + material.opacity + '; stroke-linecap: ' + material.wireframeLinecap + '; stroke-linejoin: ' + material.wireframeLinejoin );
 
 		} else {
 
-			_svgNode.setAttribute( 'style', 'fill: ' + _color.__styleString + '; fill-opacity: ' + material.opacity );
+			_svgNode.setAttribute( 'style', 'fill: #' + pad( _color.hex.toString( 16 ) ) + '; fill-opacity: ' + material.opacity );
 
 		}
 
@@ -442,7 +440,7 @@ THREE.SVGRenderer = function () {
 
 		if ( material instanceof THREE.MeshBasicMaterial ) {
 
-			_color.__styleString = material.color.__styleString;
+			_color.hex = material.color.hex;
 
 		} else if ( material instanceof THREE.MeshLambertMaterial ) {
 
@@ -454,15 +452,15 @@ THREE.SVGRenderer = function () {
 
 				calculateFaceLight( scene, element, _light );
 
-				_color.r = material.color.r * _light.r;
-				_color.g = material.color.g * _light.g;
-				_color.b = material.color.b * _light.b;
+				_color.r = Math.max( 0, Math.min( material.color.r * _light.r, 1 ) );
+				_color.g = Math.max( 0, Math.min( material.color.g * _light.g, 1 ) );
+				_color.b = Math.max( 0, Math.min( material.color.b * _light.b, 1 ) );
 
-				_color.updateStyleString();
+				_color.updateHex();
 
 			} else {
 
-				_color.__styleString = material.color.__styleString;
+				_color.hex = material.color.hex;
 
 			}
 
@@ -479,11 +477,11 @@ THREE.SVGRenderer = function () {
 
 		if ( material.wireframe ) {
 
-			_svgNode.setAttribute( 'style', 'fill: none; stroke: ' + _color.__styleString + '; stroke-width: ' + material.wireframeLinewidth + '; stroke-opacity: ' + material.opacity + '; stroke-linecap: ' + material.wireframeLinecap + '; stroke-linejoin: ' + material.wireframeLinejoin );
+			_svgNode.setAttribute( 'style', 'fill: none; stroke: #' + pad( _color.hex.toString( 16 ) ) + '; stroke-width: ' + material.wireframeLinewidth + '; stroke-opacity: ' + material.opacity + '; stroke-linecap: ' + material.wireframeLinecap + '; stroke-linejoin: ' + material.wireframeLinejoin );
 
 		} else {
 
-			_svgNode.setAttribute( 'style', 'fill: ' + _color.__styleString + '; fill-opacity: ' + material.opacity );
+			_svgNode.setAttribute( 'style', 'fill: #' + pad( _color.hex.toString( 16 ) ) + '; fill-opacity: ' + material.opacity );
 
 		}
 
@@ -553,9 +551,15 @@ THREE.SVGRenderer = function () {
 
 	function normalToComponent( normal ) {
 
-		// https://gist.github.com/665829
+		var component = ( normal + 1 ) * 0.5;
+		return component < 0 ? 0 : ( component > 1 ? 1 : component );
 
-		return normal < 0 ? Math.min( ( 1 + normal ) * 0.5, 0.5 ) : 0.5 + Math.min( normal * 0.5, 0.5 );
+	}
+
+	function pad( str ) {
+
+		while ( str.length < 6 ) str = '0' + str;
+		return str;
 
 	}
 

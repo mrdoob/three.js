@@ -94,6 +94,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.context = _gl;
 
+	var _supportsVertexTextures = ( maxVertexTextures() > 0 );
 
 	// prepare stencil shadow polygon
 
@@ -4183,7 +4184,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.supportsVertexTextures = function () {
 
-		return maxVertexTextures() > 0;
+		return _supportsVertexTextures;
 
 	};
 
@@ -4287,6 +4288,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		program = _gl.createProgram(),
 
 		prefix_fragment = [
+
 			"#ifdef GL_ES",
 			"precision highp float;",
 			"#endif",
@@ -4305,10 +4307,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 			"uniform mat4 viewMatrix;",
 			"uniform vec3 cameraPosition;",
 			""
+
 		].join("\n"),
 
 		prefix_vertex = [
-			maxVertexTextures() > 0 ? "#define VERTEX_TEXTURES" : "",
+			
+			_supportsVertexTextures ? "#define VERTEX_TEXTURES" : "",
 
 			"#define MAX_DIR_LIGHTS " + parameters.maxDirLights,
 			"#define MAX_POINT_LIGHTS " + parameters.maxPointLights,
@@ -4321,7 +4325,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			parameters.vertexColors ? "#define USE_COLOR" : "",
 			parameters.skinning ? "#define USE_SKINNING" : "",
 			parameters.morphTargets ? "#define USE_MORPHTARGETS" : "",
-
 
 			parameters.sizeAttenuation ? "#define USE_SIZEATTENUATION" : "",
 
@@ -4368,6 +4371,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			"#endif",
 
 			""
+
 		].join("\n");
 
 		_gl.attachShader( program, getShader( "fragment", prefix_fragment + fragmentShader ) );
