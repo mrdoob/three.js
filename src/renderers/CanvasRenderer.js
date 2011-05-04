@@ -30,11 +30,11 @@ THREE.CanvasRenderer = function () {
 	_v1x, _v1y, _v2x, _v2y, _v3x, _v3y,
 	_v4x, _v4y, _v5x, _v5y, _v6x, _v6y,
 
-	_color = new THREE.Color(),
-	_color1 = new THREE.Color(),
-	_color2 = new THREE.Color(),
-	_color3 = new THREE.Color(),
-	_color4 = new THREE.Color(),
+	_color = new THREE.Color( 0x000000 ),
+	_color1 = new THREE.Color( 0x000000 ),
+	_color2 = new THREE.Color( 0x000000 ),
+	_color3 = new THREE.Color( 0x000000 ),
+	_color4 = new THREE.Color( 0x000000 ),
 
 	_near, _far,
 
@@ -505,8 +505,8 @@ THREE.CanvasRenderer = function () {
 
 				}
 
-				setStrokeStyle( material.color.__styleString );
-				setFillStyle( material.color.__styleString );
+				setStrokeStyle( material.color );
+				setFillStyle( material.color );
 
 				_context.save();
 				_context.translate( v1.x, v1.y );
@@ -533,12 +533,10 @@ THREE.CanvasRenderer = function () {
 
 			if ( material instanceof THREE.LineBasicMaterial ) {
 
-				_color.__styleString = material.color.__styleString;
-
 				setLineWidth( material.linewidth );
 				setLineCap( material.linecap );
 				setLineJoin( material.linejoin );
-				setStrokeStyle( _color.__styleString );
+				setStrokeStyle( material.color );
 
 				_context.stroke();
 				_bboxRect.inflate( material.linewidth * 2 );
@@ -602,7 +600,7 @@ THREE.CanvasRenderer = function () {
 
 				} else {
 
-					material.wireframe ? strokePath( material.color.__styleString, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin ) : fillPath( material.color.__styleString );
+					material.wireframe ? strokePath( material.color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin ) : fillPath( material.color );
 
 				}
 
@@ -633,7 +631,7 @@ THREE.CanvasRenderer = function () {
 						calculateLight( scene, element.v2.positionWorld, element.vertexNormalsWorld[ 1 ], _color2 );
 						calculateLight( scene, element.v3.positionWorld, element.vertexNormalsWorld[ 2 ], _color3 );
 
-						_color4.r = ( _color2.r + _color3.r ) * 0.5;
+						_color4.r =  ( _color2.r + _color3.r ) * 0.5;
 						_color4.g = ( _color2.g + _color3.g ) * 0.5;
 						_color4.b = ( _color2.b + _color3.b ) * 0.5;
 
@@ -649,19 +647,18 @@ THREE.CanvasRenderer = function () {
 
 						calculateLight( scene, element.centroidWorld, element.normalWorld, _light );
 
-						_color.r = material.color.r * _light.r;
-						_color.g = material.color.g * _light.g;
-						_color.b = material.color.b * _light.b;
+						_color.r = Math.max( 0, Math.min( material.color.r * _light.r, 1 ) );
+						_color.g = Math.max( 0, Math.min( material.color.g * _light.g, 1 ) );
+						_color.b = Math.max( 0, Math.min( material.color.b * _light.b, 1 ) );
+						_color.updateHex();
 
-						_color.updateStyleString();
-
-						material.wireframe ? strokePath( _color.__styleString, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin ) : fillPath( _color.__styleString );
+						material.wireframe ? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin ) : fillPath( _color );
 
 					}
 
 				} else {
 
-					material.wireframe ? strokePath( material.color.__styleString, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin ) : fillPath( material.color.__styleString );
+					material.wireframe ? strokePath( material.color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin ) : fillPath( material.color );
 
 				}
 
@@ -687,9 +684,9 @@ THREE.CanvasRenderer = function () {
 				_color.r = normalToComponent( element.normalWorld.x );
 				_color.g = normalToComponent( element.normalWorld.y );
 				_color.b = normalToComponent( element.normalWorld.z );
-				_color.updateStyleString();
+				_color.updateHex();
 
-				material.wireframe ? strokePath( _color.__styleString, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin ) : fillPath( _color.__styleString );
+				material.wireframe ? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin ) : fillPath( _color );
 
 			}
 
@@ -725,7 +722,7 @@ THREE.CanvasRenderer = function () {
 
 				drawQuad( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _v4x, _v4y );
 
-				material.wireframe ? strokePath( material.color.__styleString, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin ) : fillPath( material.color.__styleString );
+				material.wireframe ? strokePath( material.color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin ) : fillPath( material.color );
 
 			} else if ( material instanceof THREE.MeshLambertMaterial ) {
 
@@ -760,15 +757,14 @@ THREE.CanvasRenderer = function () {
 
 						calculateLight( scene, element.centroidWorld, element.normalWorld, _light );
 
-						_color.r = material.color.r * _light.r;
-						_color.g = material.color.g * _light.g;
-						_color.b = material.color.b * _light.b;
-
-						_color.updateStyleString();
+						_color.r = Math.max( 0, Math.min( material.color.r * _light.r, 1 ) );
+						_color.g = Math.max( 0, Math.min( material.color.g * _light.g, 1 ) );
+						_color.b = Math.max( 0, Math.min( material.color.b * _light.b, 1 ) );
+						_color.updateHex();
 
 						drawQuad( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _v4x, _v4y );
 
-						material.wireframe ? strokePath( _color.__styleString, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin ) : fillPath( _color.__styleString );
+						material.wireframe ? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin ) : fillPath( _color );
 
 					}
 
@@ -776,7 +772,7 @@ THREE.CanvasRenderer = function () {
 
 					drawQuad( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _v4x, _v4y );
 
-					material.wireframe ? strokePath( material.color.__styleString, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin ) : fillPath( material.color.__styleString );
+					material.wireframe ? strokePath( material.color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin ) : fillPath( material.color );
 
 				}
 
@@ -785,11 +781,11 @@ THREE.CanvasRenderer = function () {
 				_color.r = normalToComponent( element.normalWorld.x );
 				_color.g = normalToComponent( element.normalWorld.y );
 				_color.b = normalToComponent( element.normalWorld.z );
-				_color.updateStyleString();
+				_color.updateHex();
 
 				drawQuad( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _v4x, _v4y );
 
-				material.wireframe ? strokePath( _color.__styleString, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin ) : fillPath( _color.__styleString );
+				material.wireframe ? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin ) : fillPath( _color );
 
 			} else if ( material instanceof THREE.MeshDepthMaterial ) {
 
@@ -1076,23 +1072,32 @@ THREE.CanvasRenderer = function () {
 
 	}
 
-	function setStrokeStyle( value ) {
+	function setStrokeStyle( color ) {
 
-		if ( _contextStrokeStyle != value ) {
+		if ( _contextStrokeStyle != color.hex ) {
 
-			_context.strokeStyle = _contextStrokeStyle  = value;
+			_contextStrokeStyle = color.hex;
+			_context.strokeStyle = '#' + pad( _contextStrokeStyle.toString( 16 ) );
 
 		}
 
 	}
 
-	function setFillStyle( value ) {
+	function setFillStyle( color ) {
 
-		if ( _contextFillStyle != value ) {
+		if ( _contextFillStyle != color.hex ) {
 
-			_context.fillStyle = _contextFillStyle = value;
+			_contextFillStyle = color.hex;
+			_context.fillStyle = '#' + pad( _contextFillStyle.toString( 16 ) );
 
 		}
+
+	}
+
+	function pad( str ) {
+
+		while ( str.length < 6 ) str = '0' + str;
+		return str;
 
 	}
 

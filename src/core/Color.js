@@ -10,15 +10,19 @@ THREE.Color = function ( hex ) {
 
 THREE.Color.prototype = {
 
-	autoUpdate : true,
-
 	copy : function ( color ) {
 
 		this.r = color.r;
 		this.g = color.g;
 		this.b = color.b;
 		this.hex = color.hex;
-		this.__styleString = color.__styleString;
+
+	},
+
+	setHex : function ( hex ) {
+
+		this.hex = ( ~~ hex ) & 0xffffff;
+		this.updateRGB();
 
 	},
 
@@ -28,12 +32,7 @@ THREE.Color.prototype = {
 		this.g = g;
 		this.b = b;
 
-		if ( this.autoUpdate ) {
-
-			this.updateHex();
-			this.updateStyleString();
-
-		}
+		this.updateHex();
 
 	},
 
@@ -42,11 +41,11 @@ THREE.Color.prototype = {
 		// based on MochiKit implementation by Bob Ippolito
 		// h,s,v ranges are < 0.0 - 1.0 >
 
-		var red, green, blue, i, f, p, q, t;
+		var r, g, b, i, f, p, q, t;
 
 		if ( v == 0.0 ) {
 
-			red = green = blue = 0;
+			r = g = b = 0;
 
 		} else {
 
@@ -58,41 +57,19 @@ THREE.Color.prototype = {
 
 			switch ( i ) {
 
-				case 1: red = q; green = v; blue = p; break;
-				case 2: red = p; green = v; blue = t; break;
-				case 3: red = p; green = q; blue = v; break;
-				case 4: red = t; green = p; blue = v; break;
-				case 5: red = v; green = p; blue = q; break;
+				case 1: r = q; g = v; b = p; break;
+				case 2: r = p; g = v; b = t; break;
+				case 3: r = p; g = q; b = v; break;
+				case 4: r = t; g = p; b = v; break;
+				case 5: r = v; g = p; b = q; break;
 				case 6: // fall through
-				case 0: red = v; green = t; blue = p; break;
+				case 0: r = v; g = t; b = p; break;
 
 			}
 
 		}
 
-		this.r = red;
-		this.g = green;
-		this.b = blue;
-
-		if ( this.autoUpdate ) {
-
-			this.updateHex();
-			this.updateStyleString();
-
-		}
-
-	},
-
-	setHex : function ( hex ) {
-
-		this.hex = ( ~~ hex ) & 0xffffff;
-
-		if ( this.autoUpdate ) {
-
-			this.updateRGB();
-			this.updateStyleString();
-
-		}
+		this.setRGB( r, g, b );
 
 	},
 
@@ -107,12 +84,6 @@ THREE.Color.prototype = {
 		this.r = ( this.hex >> 16 & 255 ) / 255;
 		this.g = ( this.hex >> 8 & 255 ) / 255;
 		this.b = ( this.hex & 255 ) / 255;
-
-	},
-
-	updateStyleString : function () {
-
-		this.__styleString = 'rgb(' + ~~ ( this.r * 255 ) + ',' + ~~ ( this.g * 255 ) + ',' + ~~ ( this.b * 255 ) + ')';
 
 	},
 
