@@ -65,6 +65,7 @@ More? [#three.js on irc.freenode.net](http://webchat.freenode.net/?channels=thre
 
 ### Featured projects ###
 
+[![Globe](http://mrdoob.github.com/three.js/assets/projects/16_globe.png)](http://data-arts.appspot.com/globe)
 [![Photoparticles](http://mrdoob.github.com/three.js/assets/projects/15_photoparticles.png)](http://lab.aerotwist.com/webgl/photoparticles/)
 [![Plumegraph](http://mrdoob.github.com/three.js/assets/projects/14_plumegraph.png)](http://plumegraph.org/)
 [![HelloRacer](http://mrdoob.github.com/three.js/assets/projects/13_helloracer.png)](http://helloracer.com/webgl/)
