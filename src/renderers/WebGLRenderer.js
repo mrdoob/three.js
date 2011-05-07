@@ -1848,6 +1848,21 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		/*
+		delete geometryGroup.__colorArray;
+		delete geometryGroup.__normalArray;
+		delete geometryGroup.__tangentArray;
+		delete geometryGroup.__uvArray;
+		delete geometryGroup.__uv2Array;
+		delete geometryGroup.__faceArray;
+		delete geometryGroup.__vertexArray;
+		delete geometryGroup.__lineArray;
+		delete geometryGroup.__skinVertexAArray;
+		delete geometryGroup.__skinVertexBArray;
+		delete geometryGroup.__skinIndexArray;
+		delete geometryGroup.__skinWeightArray;
+		*/
+
 	};
 
 	function setLineBuffers ( geometry, hint ) {
@@ -4004,6 +4019,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		} else if ( object instanceof THREE.Particle ) {
 
 		}*/
+
+		/*
+		delete geometry.vertices;
+		delete geometry.faces;
+		delete geometryGroup.faces;
+		*/
 
 	};
 
