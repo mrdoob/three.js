@@ -231,9 +231,9 @@ close();
 TEMPLATE_VERTEX = "%f,%f,%f"
 TEMPLATE_VERTEX_TRUNCATE = "%d,%d,%d"
 
-TEMPLATE_N = "%f,%f,%f"
-TEMPLATE_UV = "%f,%f"
-TEMPLATE_COLOR = "%.3f,%.3f,%.3f"
+TEMPLATE_N = "%.5g,%.5g,%.5g"
+TEMPLATE_UV = "%.5g,%.5g"
+TEMPLATE_COLOR = "%.3g,%.3g,%.3g"
 TEMPLATE_COLOR_DEC = "%d"
 TEMPLATE_EDGE = "%d,%d"
 
