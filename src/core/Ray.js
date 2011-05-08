@@ -13,13 +13,18 @@ THREE.Ray.prototype = {
 
 	intersectScene : function ( scene ) {
 
+		return this.intersectObjects( scene.objects );
+
+	},
+
+	intersectObjects : function ( objects ) {
+
 		var i, l, object,
-		objects = scene.objects,
 		intersects = [];
 
-		for ( i = 0, l = objects.length; i < l; i++ ) {
+		for ( i = 0, l = objects.length; i < l; i ++ ) {
 
-			object = objects[i];
+			object = objects[ i ];
 
 			if ( object instanceof THREE.Mesh ) {
 
