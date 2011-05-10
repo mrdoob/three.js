@@ -12,7 +12,7 @@ THREE.Scene = function () {
 	this.fog = null;
 
 	this.collisions = null;
-	
+
 	this.objects = [];
 	this.lights = [];
 	this.sounds = [];
