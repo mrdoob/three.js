@@ -2217,8 +2217,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var attributes = material.program.attributes;
 
-		_gl.enableVertexAttribArray( attributes.position );
-
+		if ( attributes.position >= 0 ) _gl.enableVertexAttribArray( attributes.position );
 		if ( attributes.color >= 0 ) _gl.enableVertexAttribArray( attributes.color );
 		if ( attributes.normal >= 0 ) _gl.enableVertexAttribArray( attributes.normal );
 		if ( attributes.tangent >= 0 ) _gl.enableVertexAttribArray( attributes.tangent );
@@ -2234,11 +2233,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		for ( a in material.attributes ) {
-
-			if( attributes[ a ] >= 0 ) _gl.enableVertexAttribArray( attributes[ a ] );
-
+		if ( material.attributes ) {
+			
+			for ( a in material.attributes ) {
+	
+				if( attributes[ a ] !== undefined && attributes[ a ] >= 0 ) _gl.enableVertexAttribArray( attributes[ a ] );
+	
+			}
+			
 		}
+
 
 
 		if ( material.morphTargets ) {
@@ -2509,12 +2513,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			for( a in material.attributes ) {
 
-				if( attributes[ a ] >= 0 ) {
+				if( attributes[ a ] !== undefined && attributes[ a ] >= 0 ) {
 
 					attribute = material.attributes[ a ];
 
-					_gl.bindBuffer( _gl.ARRAY_BUFFER, attribute.buffer );
-					_gl.vertexAttribPointer( attributes[ a ], attribute.size, _gl.FLOAT, false, 0, 0 );
+					if( attribute.buffer ) {
+						
+						_gl.bindBuffer( _gl.ARRAY_BUFFER, attribute.buffer );
+						_gl.vertexAttribPointer( attributes[ a ], attribute.size, _gl.FLOAT, false, 0, 0 );
+
+					}
 
 				}
 
