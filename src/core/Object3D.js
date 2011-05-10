@@ -15,6 +15,8 @@ THREE.Object3D = function() {
 	this.rotation = new THREE.Vector3();
 	this.scale = new THREE.Vector3( 1, 1, 1 );
 
+	this.dynamic = false; // when true it retains arrays so they can be updated with __dirty*
+
 	this.rotationAutoUpdate = true;
 
 	this.matrix = new THREE.Matrix4();
