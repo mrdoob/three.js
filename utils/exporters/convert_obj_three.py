@@ -75,8 +75,6 @@ Current limitations
     - for the moment, only diffuse color and texture are used 
       (will need to extend shaders / renderers / materials in Three)
      
-    - models can have more than 65,536 vertices
-       
     - texture coordinates can be wrong in canvas renderer
       (there is crude normalization, but it doesn't
        work for all cases)
