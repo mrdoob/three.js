@@ -103,7 +103,7 @@ var scene = {
 {
     "position"  : %(position)s,
     "rotation"  : %(rotation)s,
-    "scale"     : %(scale)s,
+    "scale"     : %(scale)s
 },
 
 "defaults" :
@@ -1282,30 +1282,27 @@ def generate_material_string(material):
     shading = material.get("shading", "Lambert")
     material_type = type_map.get(shading, "MeshBasicMaterial")
 
-    #parameters = "color: %s" % generate_hex(rgb2int(material["colorDiffuse"]))
-    parameters = "color: %d" % rgb2int(material["colorDiffuse"])
-    parameters += ", opacity: %.2f" % material["transparency"]
+    parameters = '"color": %d' % rgb2int(material["colorDiffuse"])
+    parameters += ', "opacity": %.2g' % material["transparency"]
 
     if shading == "Phong":
-        #parameters += ", ambient: %s" % generate_hex(rgb2int(material["colorAmbient"]))
-        #parameters += ", specular: %s" % generate_hex(rgb2int(material["colorSpecular"]))
-        parameters += ", ambient: %d" % rgb2int(material["colorAmbient"])
-        parameters += ", specular: %d" % rgb2int(material["colorSpecular"])
-        parameters += ", shininess: %.1f" % material["specularCoef"]
+        parameters += ', "ambient": %d' % rgb2int(material["colorAmbient"])
+        parameters += ', "specular": %d' % rgb2int(material["colorSpecular"])
+        parameters += ', "shininess": %.1g' % material["specularCoef"]
 
     colorMap = material['mapDiffuse']
     lightMap = material['mapLight']
-    normalMap  = material['mapNormal']
+    normalMap = material['mapNormal']
 
     if colorMap:
-        parameters += ", map: %s" % generate_string(colorMap)
+        parameters += ', "map": %s' % generate_string(colorMap)
     if lightMap:
-        parameters += ", lightMap: %s" % generate_string(lightMap)
+        parameters += ', "lightMap": %s' % generate_string(lightMap)
     if normalMap:
-        parameters += ", normalMap: %s" % generate_string(normalMap)
+        parameters += ', "normalMap": %s' % generate_string(normalMap)
 
     if material['vertexColors']:
-        parameters += ', vertexColors: "vertex"'
+        parameters += ', "vertexColors": "vertex"'
         
     material_string = TEMPLATE_MATERIAL_SCENE % {
     "material_id" : generate_string(material_id),
