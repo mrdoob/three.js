@@ -40,30 +40,7 @@ THREE.CollisionUtils.MeshAABB = function( m ) {
 
 THREE.CollisionUtils.MeshColliderWBox = function( m ) {
 
-	var mv = m.geometry.vertices;
-	var mvl = mv.length;
-	var mf = m.geometry.faces;
-	var mfl = mf.length;
-
-	var vertices = [];
-	var faces = [];
-	var normals = [];
-
-	for( var i = 0; i < mvl; i++ ) {
-
-		vertices.push( new THREE.Vector3( mv[ i ].position.x, mv[ i ].position.y, mv[ i ].position.z ) );
-
-	}
-
-	for( var i = 0; i < mfl; i++ ) {
-
-		faces.push( mf[ i ].a, mf[ i ].b, mf[ i ].c );
-		normals.push( new THREE.Vector3( mf[ i ].normal.x, mf[ i ].normal.y, mf[ i ].normal.z ) );
-
-	}
-
-	var mc = new THREE.MeshCollider( vertices, faces, normals, THREE.CollisionUtils.MeshOBB( m ) );
-	mc.mesh = m;
+	var mc = new THREE.MeshCollider( m, THREE.CollisionUtils.MeshOBB( m ) );
 
 	return mc;
 
