@@ -101,11 +101,12 @@ THREE.CollisionSystem.prototype.rayCastNearest = function( ray ) {
 
 	while( cs[ i ] instanceof THREE.MeshCollider ) {
 
-		var d = this.rayMesh( ray, cs[ i ] );
+        var dist_index = this.rayMesh ( ray, cs[ i ] );
 
-		if( d < Number.MAX_VALUE ) {
+		if( dist_index.dist < Number.MAX_VALUE ) {
 
-			cs[ i ].distance = d;
+			cs[ i ].distance = dist_index.dist;
+            cs[ i ].faceIndex = dist_index.faceIndex;
 			break;
 
 		}
@@ -141,12 +142,13 @@ THREE.CollisionSystem.prototype.rayMesh = function( r, me ) {
 	var rt = this.makeRayLocal( r, me.mesh );
 
 	var d = Number.MAX_VALUE;
+    var nearestface;
 
 	for( var i = 0; i < me.numFaces; i++ ) {
         var face = me.mesh.geometry.faces[i];
-		var p0 = me.mesh.geometry.vertices[ face.a ].position;
-		var p1 = me.mesh.geometry.vertices[ face.b ].position;
-		var p2 = me.mesh.geometry.vertices[ face.c ].position;
+        var p0 = me.mesh.geometry.vertices[ face.a ].position;
+        var p1 = me.mesh.geometry.vertices[ face.b ].position;
+        var p2 = me.mesh.geometry.vertices[ face.c ].position;
         var p3 = face instanceof THREE.Face4 ? me.mesh.geometry.vertices[ face.d ].position : null;
 
         if (face instanceof THREE.Face3) {
@@ -155,6 +157,7 @@ THREE.CollisionSystem.prototype.rayMesh = function( r, me ) {
             if( nd < d ) {
 
                 d = nd;
+                nearestface = i;
                 me.normal.copy( this.collisionNormal );
                 me.normal.normalize();
 
@@ -169,6 +172,7 @@ THREE.CollisionSystem.prototype.rayMesh = function( r, me ) {
             if( nd < d ) {
 
                 d = nd;
+                nearestface = i;
                 me.normal.copy( this.collisionNormal );
                 me.normal.normalize();
 
@@ -179,6 +183,7 @@ THREE.CollisionSystem.prototype.rayMesh = function( r, me ) {
             if( nd < d ) {
 
                 d = nd;
+                nearestface = i;
                 me.normal.copy( this.collisionNormal );
                 me.normal.normalize();
 
@@ -188,7 +193,7 @@ THREE.CollisionSystem.prototype.rayMesh = function( r, me ) {
 
 	}
 
-	return d;
+	return {dist: d, faceIndex: nearestface};
 
 };
 
