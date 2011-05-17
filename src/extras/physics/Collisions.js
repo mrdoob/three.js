@@ -28,13 +28,11 @@ THREE.BoxCollider = function( min, max ) {
 
 };
 
-THREE.MeshCollider = function( vertices, faces, normals, box ) {
+THREE.MeshCollider = function( mesh, box ) {
 
-	this.vertices = vertices;
-	this.faces = faces;
-	this.normals = normals;
+	this.mesh = mesh;
 	this.box = box;
-	this.numFaces = this.faces.length;
+	this.numFaces = this.mesh.geometry.faces.length;
 
 	this.normal = new THREE.Vector3();
 
@@ -103,11 +101,12 @@ THREE.CollisionSystem.prototype.rayCastNearest = function( ray ) {
 
 	while( cs[ i ] instanceof THREE.MeshCollider ) {
 
-		var d = this.rayMesh( ray, cs[ i ] );
+        var dist_index = this.rayMesh ( ray, cs[ i ] );
 
-		if( d < Number.MAX_VALUE ) {
+		if( dist_index.dist < Number.MAX_VALUE ) {
 
-			cs[ i ].distance = d;
+			cs[ i ].distance = dist_index.dist;
+            cs[ i ].faceIndex = dist_index.faceIndex;
 			break;
 
 		}
@@ -143,28 +142,58 @@ THREE.CollisionSystem.prototype.rayMesh = function( r, me ) {
 	var rt = this.makeRayLocal( r, me.mesh );
 
 	var d = Number.MAX_VALUE;
+    var nearestface;
 
-	for( var i = 0; i < me.numFaces/3; i++ ) {
+	for( var i = 0; i < me.numFaces; i++ ) {
+        var face = me.mesh.geometry.faces[i];
+        var p0 = me.mesh.geometry.vertices[ face.a ].position;
+        var p1 = me.mesh.geometry.vertices[ face.b ].position;
+        var p2 = me.mesh.geometry.vertices[ face.c ].position;
+        var p3 = face instanceof THREE.Face4 ? me.mesh.geometry.vertices[ face.d ].position : null;
 
-		var t = i * 3;
+        if (face instanceof THREE.Face3) {
+            var nd = this.rayTriangle( rt, p0, p1, p2, d, this.collisionNormal );
 
-		var p0 = me.vertices[ me.faces[ t + 0 ] ];
-		var p1 = me.vertices[ me.faces[ t + 1 ] ];
-		var p2 = me.vertices[ me.faces[ t + 2 ] ];
+            if( nd < d ) {
 
-		var nd = this.rayTriangle( rt, p0, p1, p2, d, this.collisionNormal );
+                d = nd;
+                nearestface = i;
+                me.normal.copy( this.collisionNormal );
+                me.normal.normalize();
 
-		if( nd < d ) {
+            }
+        
+        }
+        
+        else if (face instanceof THREE.Face4) {
+            
+            var nd = this.rayTriangle( rt, p0, p1, p3, d, this.collisionNormal );
+            
+            if( nd < d ) {
 
-			d = nd;
-			me.normal.copy( this.collisionNormal );
-			me.normal.normalize();
+                d = nd;
+                nearestface = i;
+                me.normal.copy( this.collisionNormal );
+                me.normal.normalize();
 
-		}
+            }
+            
+            nd = this.rayTriangle( rt, p1, p2, p3, d, this.collisionNormal );
+            
+            if( nd < d ) {
+
+                d = nd;
+                nearestface = i;
+                me.normal.copy( this.collisionNormal );
+                me.normal.normalize();
+
+            }
+
+        }
 
 	}
 
-	return d;
+	return {dist: d, faceIndex: nearestface};
 
 };
 
