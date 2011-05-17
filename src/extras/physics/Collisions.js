@@ -167,7 +167,7 @@ THREE.CollisionSystem.prototype.rayMesh = function( r, me ) {
         
         else if (face instanceof THREE.Face4) {
             
-            var nd = this.rayTriangle( rt, p0, p1, p2, d, this.collisionNormal );
+            var nd = this.rayTriangle( rt, p0, p1, p3, d, this.collisionNormal );
             
             if( nd < d ) {
 
