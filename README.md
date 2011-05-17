@@ -5,7 +5,7 @@ three.js
 
 The aim of the project is to create a lightweight 3D engine with a very low level of complexity — in other words, for dummies. The engine can render using &lt;canvas&gt;, &lt;svg&gt; and WebGL.
 
-[Contributors](https://github.com/mrdoob/three.js/contributors) — [Getting started](http://www.aerotwist.com/lab/getting-started-with-three-js/) — [API Reference](https://github.com/mrdoob/three.js/wiki/API-Reference)
+[Contributors](https://github.com/mrdoob/three.js/contributors) — [Getting Started](http://www.aerotwist.com/lab/getting-started-with-three-js/) — [API Reference](https://github.com/mrdoob/three.js/wiki/API-Reference)
 
 More? [#three.js on irc.freenode.net](http://webchat.freenode.net/?channels=three.js)
 
