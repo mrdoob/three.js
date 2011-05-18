@@ -3270,6 +3270,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		_gl.finish();
+
 	};
 
 
@@ -4651,8 +4653,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			} else {
 
 				_gl.bindTexture( _gl.TEXTURE_2D, texture.__webglTexture );
-				// _gl.texImage2D( _gl.TEXTURE_2D, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, texture.image );
-				_gl.texSubImage2D( _gl.TEXTURE_2D, 0, 0, 0, _gl.RGBA, _gl.UNSIGNED_BYTE, texture.image );
+				_gl.texImage2D( _gl.TEXTURE_2D, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, texture.image );
+				// _gl.texSubImage2D( _gl.TEXTURE_2D, 0, 0, 0, _gl.RGBA, _gl.UNSIGNED_BYTE, texture.image );
 
 			}
 

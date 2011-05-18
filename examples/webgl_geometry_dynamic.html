@@ -122,6 +122,7 @@
 				material = new THREE.MeshBasicMaterial( { color:0x0044ff, opacity:1, map: texture } );
 
 				mesh = new THREE.Mesh( geometry, material );
+				mesh.dynamic = true;
 				mesh.rotation.x = - 90 * Math.PI / 180;
 				scene.addObject( mesh );
 
