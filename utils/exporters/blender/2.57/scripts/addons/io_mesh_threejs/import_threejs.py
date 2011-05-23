@@ -16,10 +16,6 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-# Based on import_obj.py
-# Contributors: alteredq
-
-
 """
 Blender importer for Three.js (ASCII JSON format).
 

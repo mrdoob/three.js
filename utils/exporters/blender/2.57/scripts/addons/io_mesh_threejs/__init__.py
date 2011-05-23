@@ -25,15 +25,15 @@
 
 bl_info = {
     "name": "three.js format",
-    "author": "mrdoob",
-	"version": (1, 0),
+    "author": "mrdoob, kikko, alteredq, remoe",
+    "version": (1, 0),
     "blender": (2, 5, 7),
     "api": 35622,
-    "location": "File > Import-Export > three.js",
-    "description": "Import-Export THREEjs meshes",
+    "location": "File > Import-Export",
+    "description": "Import-Export three.js meshes",
     "warning": "",
-    "tracker_url": "",
-    "support": 'OFFICIAL',
+    "wiki_url": "https://github.com/mrdoob/three.js/tree/master/utils/exporters/blender",
+    "tracker_url": "https://github.com/mrdoob/three.js/issues",
     "category": "Import-Export"}
 
 if "bpy" in locals():
@@ -295,8 +295,8 @@ class ExportTHREEJS(bpy.types.Operator, ExportHelper):
 
         row = layout.row()
         row.prop(self.properties, "option_vertices")
-        row = layout.row()
-        row.enabled = self.properties.option_vertices
+        # row = layout.row()
+        # row.enabled = self.properties.option_vertices
         # row.prop(self.properties, "option_vertices_deltas")
         row.prop(self.properties, "option_vertices_truncate")
         layout.separator()

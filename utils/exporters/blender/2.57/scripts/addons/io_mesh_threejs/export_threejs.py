@@ -16,9 +16,6 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-# Based on export_obj.py and export_ply.py
-# Contributors: Mr.doob, Kikko, alteredq
-
 """
 Blender exporter for Three.js (ASCII JSON format).
 
@@ -226,7 +223,7 @@ TEMPLATE_HEX = "0x%06x"
 
 TEMPLATE_FILE_ASCII = """\
 /*
- * File generated with Blender 2.56 Exporter
+ * File generated with Blender 2.57 Exporter
  * https://github.com/mrdoob/three.js/tree/master/utils/exporters/blender/
  *
  * vertices: %(nvertex)d
