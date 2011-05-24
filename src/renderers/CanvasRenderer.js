@@ -2,13 +2,16 @@
  * @author mr.doob / http://mrdoob.com/
  */
 
-THREE.CanvasRenderer = function () {
+THREE.CanvasRenderer = function ( parameters ) {
 
 	var _this = this,
 	_renderList = null,
 	_projector = new THREE.Projector(),
 
-	_canvas = document.createElement( 'canvas' ),
+	parameters = parameters || {},
+
+	_canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElement( 'canvas' ),
+
 	_canvasWidth, _canvasHeight, _canvasWidthHalf, _canvasHeightHalf,
 	_context = _canvas.getContext( '2d' ),
 

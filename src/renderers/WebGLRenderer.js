@@ -21,8 +21,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	// See http://code.google.com/p/chromium/issues/detail?id=63491
 
 	var _this = this,
-	_gl, _canvas = document.createElement( 'canvas' ),
-	_programs = [],
+	_gl, _programs = [],
 	_currentProgram = null,
 	_currentFramebuffer = null,
 	_currentDepthMask = true,
@@ -67,15 +66,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	},
 
-
 	// parameters
 
-	parameters = parameters || {};
+	parameters = parameters || {},
 
-	stencil = parameters.stencil !== undefined ? parameters.stencil : true,
-	antialias = parameters.antialias !== undefined ? parameters.antialias : false,
-	clearColor = parameters.clearColor !== undefined ? new THREE.Color( parameters.clearColor ) : new THREE.Color( 0x000000 ),
-	clearAlpha = parameters.clearAlpha !== undefined ? parameters.clearAlpha : 0;
+	_canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElement( 'canvas' ),
+	_stencil = parameters.stencil !== undefined ? parameters.stencil : true,
+	_antialias = parameters.antialias !== undefined ? parameters.antialias : false,
+	_clearColor = parameters.clearColor !== undefined ? new THREE.Color( parameters.clearColor ) : new THREE.Color( 0x000000 ),
+	_clearAlpha = parameters.clearAlpha !== undefined ? parameters.clearAlpha : 0;
 
 	this.data = {
 
@@ -90,7 +89,51 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.autoClear = true;
 	this.sortObjects = true;
 
-	initGL( antialias, clearColor, clearAlpha, stencil );
+	// Init GL
+
+	try {
+
+		if ( ! ( _gl = _canvas.getContext( 'experimental-webgl', { antialias: _antialias, stencil: _stencil } ) ) ) {
+
+			throw 'Error creating WebGL context.';
+
+		}
+
+	} catch ( error ) {
+
+		console.error( error );
+
+	}
+
+	console.log(
+		navigator.userAgent + " | " +
+		_gl.getParameter( _gl.VERSION ) + " | " +
+		_gl.getParameter( _gl.VENDOR ) + " | " +
+		_gl.getParameter( _gl.RENDERER ) + " | " +
+		_gl.getParameter( _gl.SHADING_LANGUAGE_VERSION )
+	);
+
+	_gl.clearColor( 0, 0, 0, 1 );
+	_gl.clearDepth( 1 );
+
+	_gl.enable( _gl.DEPTH_TEST );
+	_gl.depthFunc( _gl.LEQUAL );
+
+	_gl.frontFace( _gl.CCW );
+	_gl.cullFace( _gl.BACK );
+	_gl.enable( _gl.CULL_FACE );
+
+	_gl.enable( _gl.BLEND );
+	_gl.blendEquation( _gl.FUNC_ADD );
+	_gl.blendFunc( _gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA );
+
+	_gl.clearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
+
+	// _gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, true );
+
+	_cullEnabled = true;
+
+	//
 
 	this.context = _gl;
 
@@ -98,7 +141,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// prepare stencil shadow polygon
 
-	if ( stencil ) {
+	if ( _stencil ) {
 
 		var _stencilShadow      = {};
 
@@ -324,14 +367,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.setClearColorHex = function ( hex, alpha ) {
 
-		var color = new THREE.Color( hex );
-		_gl.clearColor( color.r, color.g, color.b, alpha );
+		_clearColor.setHex( hex );
+		_clearAlpha = alpha;
+
+		_gl.clearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
 
 	};
 
 	this.setClearColor = function ( color, alpha ) {
 
-		_gl.clearColor( color.r, color.g, color.b, alpha );
+		_clearColor.copy( color );
+		_clearAlpha = alpha;
+
+		_gl.clearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
 
 	};
 
@@ -342,14 +390,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 	};
 
 	this.setStencilShadowDarkness = function( value ) {
-		
+
 		_stencilShadow.darkness = value;
 	};
 
 	this.getContext = function() {
-		
+
 		return _gl;
-		
+
 	}
 
 
@@ -3246,7 +3294,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// render stencil shadows
 
-		if ( stencil && scene.__webglShadowVolumes.length && scene.lights.length ) {
+		if ( _stencil && scene.__webglShadowVolumes.length && scene.lights.length ) {
 
 			renderStencilShadows( scene );
 
@@ -4234,52 +4282,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 	function maxVertexTextures() {
 
 		return _gl.getParameter( _gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS );
-
-	};
-
-	function initGL( antialias, clearColor, clearAlpha, stencil ) {
-
-		try {
-
-			if ( ! ( _gl = _canvas.getContext( 'experimental-webgl', { antialias: antialias, stencil: stencil } ) ) ) {
-
-				throw 'Error creating WebGL context.';
-
-			}
-
-		} catch ( e ) {
-
-			console.error( e );
-
-		}
-
-		console.log(
-			navigator.userAgent + " | " +
-			_gl.getParameter( _gl.VERSION ) + " | " +
-			_gl.getParameter( _gl.VENDOR ) + " | " +
-			_gl.getParameter( _gl.RENDERER ) + " | " +
-			_gl.getParameter( _gl.SHADING_LANGUAGE_VERSION )
-		);
-
-		_gl.clearColor( 0, 0, 0, 1 );
-		_gl.clearDepth( 1 );
-
-		_gl.enable( _gl.DEPTH_TEST );
-		_gl.depthFunc( _gl.LEQUAL );
-
-		_gl.frontFace( _gl.CCW );
-		_gl.cullFace( _gl.BACK );
-		_gl.enable( _gl.CULL_FACE );
-
-		_gl.enable( _gl.BLEND );
-		_gl.blendEquation( _gl.FUNC_ADD );
-		_gl.blendFunc( _gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA );
-
-		_gl.clearColor( clearColor.r, clearColor.g, clearColor.b, clearAlpha );
-
-		// _gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, true );
-
-		_cullEnabled = true;
 
 	};
 
