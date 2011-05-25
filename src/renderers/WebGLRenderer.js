@@ -4641,6 +4641,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setTexture( texture, slot ) {
 
+		/*
 		if ( texture.needsUpdate ) {
 
 			if ( !texture.__webglInit ) {
@@ -4661,6 +4662,31 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 			setTextureParameters( _gl.TEXTURE_2D, texture, texture.image );
+			_gl.bindTexture( _gl.TEXTURE_2D, null );
+
+			texture.needsUpdate = false;
+
+		}
+
+		_gl.activeTexture( _gl.TEXTURE0 + slot );
+		_gl.bindTexture( _gl.TEXTURE_2D, texture.__webglTexture );
+		*/
+
+		if ( texture.needsUpdate ) {
+
+			if ( texture.__webglTexture ) {
+
+				texture.__webglTexture = _gl.deleteTexture( texture.__webglTexture );
+
+			}
+
+			texture.__webglTexture = _gl.createTexture();
+
+			_gl.bindTexture( _gl.TEXTURE_2D, texture.__webglTexture );
+			_gl.texImage2D( _gl.TEXTURE_2D, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, texture.image );
+
+			setTextureParameters( _gl.TEXTURE_2D, texture, texture.image );
+
 			_gl.bindTexture( _gl.TEXTURE_2D, null );
 
 			texture.needsUpdate = false;
