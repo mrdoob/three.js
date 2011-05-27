@@ -101,6 +101,7 @@ EXTRAS_FILES = [
 'extras/geometries/Sphere.js',
 'extras/geometries/Torus.js',
 'extras/geometries/TorusKnot.js',
+'extras/geometries/Text.js',
 'extras/io/Loader.js',
 'extras/io/JSONLoader.js',
 'extras/io/BinaryLoader.js',

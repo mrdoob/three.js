@@ -1,6 +1,7 @@
 /**
  * @author mr.doob / http://mrdoob.com/
  * @author philogb / http://blog.thejit.org/
+ * @author zz85 / http://www.lab4games.net/zz85/blog
  */
 
 THREE.Vector2 = function ( x, y ) {
@@ -135,11 +136,29 @@ THREE.Vector2.prototype = {
 		return this.x * this.x + this.y * this.y;
 
 	},
+	
+	distanceTo : function ( v ) {
+
+		return Math.sqrt( this.distanceToSquared( v ) );
+
+	},
+
+	distanceToSquared : function ( v ) {
+
+		var dx = this.x - v.x, dy = this.y - v.y;
+		return dx * dx + dy * dy;
+
+	},
+
 
 	clone : function () {
 
 		return new THREE.Vector2( this.x, this.y );
 
+	},
+	
+	equals : function(v) {
+		return ( (v.x == this.x) && (v.y == this.y) );
 	}
 
 };
