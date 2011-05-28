@@ -476,61 +476,63 @@ THREE.Matrix4.prototype = {
 		return this;
 
 	},
-	
-	getPosition : function() {
-		
-		if( !this.position ) {
-			
+
+	getPosition: function() {
+
+		if ( ! this.position ) {
+
 			this.position = new THREE.Vector3();
-			
+
 		}
-		
+
 		this.position.set( this.n14, this.n24, this.n34 );
-		
+
 		return this.position;
-		
+
 	},
 
-	getColumnX : function() {
-		
-		if( !this.columnX ) {
-			
+	getColumnX: function() {
+
+		if ( ! this.columnX ) {
+
 			this.columnX = new THREE.Vector3();
-			
+
 		}
-		
+
 		this.columnX.set( this.n11, this.n21, this.n31 );
-		
+
 		return this.columnX;
 	},
 
-	getColumnY : function() {
-		
-		if( !this.columnY ) {
-			
+	getColumnY: function() {
+
+		if ( ! this.columnY ) {
+
 			this.columnY = new THREE.Vector3();
-			
+
 		}
-		
+
 		this.columnY.set( this.n12, this.n22, this.n32 );
-		
+
 		return this.columnY;
+
 	},
 
-	getColumnZ : function() {
-		
-		if( !this.columnZ ) {
-			
+	getColumnZ: function() {
+
+		if ( ! this.columnZ ) {
+
 			this.columnZ = new THREE.Vector3();
-			
+
 		}
-		
+
 		this.columnZ.set( this.n13, this.n23, this.n33 );
-		
+
 		return this.columnZ;
+
 	},
 
-	setRotationFromEuler : function( v ) {
+	setRotationFromEuler: function( v ) {
 
 		var x = v.x, y = v.y, z = v.z,
 		a = Math.cos( x ), b = Math.sin( x ),
@@ -554,7 +556,7 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	setRotationFromQuaternion : function( q ) {
+	setRotationFromQuaternion: function( q ) {
 
 		var x = q.x, y = q.y, z = q.z, w = q.w,
 		x2 = x + x, y2 = y + y, z2 = z + z,
@@ -578,7 +580,7 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	scale : function ( v ) {
+	scale: function ( v ) {
 
 		var x = v.x, y = v.y, z = v.z;
 
@@ -591,7 +593,7 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	extractPosition : function ( m ) {
+	extractPosition: function ( m ) {
 
 		this.n14 = m.n14;
 		this.n24 = m.n24;
@@ -599,7 +601,7 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	extractRotation : function ( m, s ) {
+	extractRotation: function ( m, s ) {
 
 		var invScaleX = 1 / s.x, invScaleY = 1 / s.y, invScaleZ = 1 / s.z;
 
@@ -628,7 +630,7 @@ THREE.Matrix4.makeInvert = function ( m1, m2 ) {
 	n31 = m1.n31, n32 = m1.n32, n33 = m1.n33, n34 = m1.n34,
 	n41 = m1.n41, n42 = m1.n42, n43 = m1.n43, n44 = m1.n44;
 
-	if( m2 === undefined ) m2 = new THREE.Matrix4();
+	if ( m2 === undefined ) m2 = new THREE.Matrix4();
 
 	m2.n11 = n23*n34*n42 - n24*n33*n42 + n24*n32*n43 - n22*n34*n43 - n23*n32*n44 + n22*n33*n44;
 	m2.n12 = n14*n33*n42 - n13*n34*n42 - n14*n32*n43 + n12*n34*n43 + n13*n32*n44 - n12*n33*n44;
@@ -673,10 +675,12 @@ THREE.Matrix4.makeInvert3x3 = function ( m1 ) {
 	idet;
 
 	// no inverse
-	if (det == 0) {
-		throw "matrix not invertible";
+	if ( det == 0 ) {
+
+		console.error( 'THREE.Matrix4.makeInvert3x3: Matrix not invertible.' );
+
 	}
-	
+
 	idet = 1.0 / det;
 
 	m33m[ 0 ] = idet * a11; m33m[ 1 ] = idet * a21; m33m[ 2 ] = idet * a31;

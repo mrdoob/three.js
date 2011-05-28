@@ -11,26 +11,20 @@ THREE.Ray = function ( origin, direction ) {
 
 THREE.Ray.prototype = {
 
-	intersectScene : function ( scene ) {
+	intersectScene: function ( scene ) {
 
 		return this.intersectObjects( scene.objects );
 
 	},
 
-	intersectObjects : function ( objects ) {
+	intersectObjects: function ( objects ) {
 
 		var i, l, object,
 		intersects = [];
 
 		for ( i = 0, l = objects.length; i < l; i ++ ) {
 
-			object = objects[ i ];
-
-			if ( object instanceof THREE.Mesh ) {
-
-				intersects = intersects.concat( this.intersectObject( object ) );
-
-			}
+			intersects = intersects.concat( this.intersectObject( objects[ i ] ) );
 
 		}
 
@@ -40,70 +34,93 @@ THREE.Ray.prototype = {
 
 	},
 
-	intersectObject : function ( object ) {
+	intersectObject: function ( object ) {
 
-		var f, fl, face, a, b, c, d, normal,
-		dot, scalar,
-		origin, direction,
-		geometry = object.geometry,
-		vertices = geometry.vertices,
-		objMatrix,
-		intersect, intersects = [],
-		intersectPoint;
+		if ( object instanceof THREE.Particle ) {
 
-		for ( f = 0, fl = geometry.faces.length; f < fl; f ++ ) {
+			var intersects = [],
+			distance = distanceFromIntersection( this.origin, this.direction, object );
 
-			face = geometry.faces[ f ];
+			if ( distance && distance < object.scale.x ) {
 
-			origin = this.origin.clone();
-			direction = this.direction.clone();
+				intersects.push( {
 
-			objMatrix = object.matrixWorld;
+					distance: distance,
+					point: object.position,
+					object: object
 
-			a = objMatrix.multiplyVector3( vertices[ face.a ].position.clone() );
-			b = objMatrix.multiplyVector3( vertices[ face.b ].position.clone() );
-			c = objMatrix.multiplyVector3( vertices[ face.c ].position.clone() );
-			d = face instanceof THREE.Face4 ? objMatrix.multiplyVector3( vertices[ face.d ].position.clone() ) : null;
+				} );
 
-			normal = object.matrixRotationWorld.multiplyVector3( face.normal.clone() );
-			dot = direction.dot( normal );
+			}
 
-			if ( object.doubleSided || ( object.flipSided ? dot > 0 : dot < 0 ) ) { // Math.abs( dot ) > 0.0001
+			return intersects;
 
-				scalar = normal.dot( new THREE.Vector3().sub( a, origin ) ) / dot;
-				intersectPoint = origin.addSelf( direction.multiplyScalar( scalar ) );
+		} else if ( object instanceof THREE.Mesh ) {
 
-				if ( face instanceof THREE.Face3 ) {
+			var f, fl, face, a, b, c, d, normal,
+			dot, scalar,
+			origin, direction,
+			geometry = object.geometry,
+			vertices = geometry.vertices,
+			objMatrix,
+			intersect, intersects = [],
+			intersectPoint;
 
-					if ( pointInFace3( intersectPoint, a, b, c ) ) {
+			for ( f = 0, fl = geometry.faces.length; f < fl; f ++ ) {
 
-						intersect = {
+				face = geometry.faces[ f ];
 
-							distance: this.origin.distanceTo( intersectPoint ),
-							point: intersectPoint,
-							face: face,
-							object: object
+				origin = this.origin.clone();
+				direction = this.direction.clone();
 
-						};
+				objMatrix = object.matrixWorld;
 
-						intersects.push( intersect );
+				a = objMatrix.multiplyVector3( vertices[ face.a ].position.clone() );
+				b = objMatrix.multiplyVector3( vertices[ face.b ].position.clone() );
+				c = objMatrix.multiplyVector3( vertices[ face.c ].position.clone() );
+				d = face instanceof THREE.Face4 ? objMatrix.multiplyVector3( vertices[ face.d ].position.clone() ) : null;
 
-					}
+				normal = object.matrixRotationWorld.multiplyVector3( face.normal.clone() );
+				dot = direction.dot( normal );
 
-				} else if ( face instanceof THREE.Face4 ) {
+				if ( object.doubleSided || ( object.flipSided ? dot > 0 : dot < 0 ) ) { // Math.abs( dot ) > 0.0001
 
-					if ( pointInFace3( intersectPoint, a, b, d ) || pointInFace3( intersectPoint, b, c, d ) ) {
+					scalar = normal.dot( new THREE.Vector3().sub( a, origin ) ) / dot;
+					intersectPoint = origin.addSelf( direction.multiplyScalar( scalar ) );
 
-						intersect = {
+					if ( face instanceof THREE.Face3 ) {
 
-							distance: this.origin.distanceTo( intersectPoint ),
-							point: intersectPoint,
-							face: face,
-							object: object
+						if ( pointInFace3( intersectPoint, a, b, c ) ) {
 
-						};
+							intersect = {
 
-						intersects.push( intersect );
+								distance: this.origin.distanceTo( intersectPoint ),
+								point: intersectPoint,
+								face: face,
+								object: object
+
+							};
+
+							intersects.push( intersect );
+
+						}
+
+					} else if ( face instanceof THREE.Face4 ) {
+
+						if ( pointInFace3( intersectPoint, a, b, d ) || pointInFace3( intersectPoint, b, c, d ) ) {
+
+							intersect = {
+
+								distance: this.origin.distanceTo( intersectPoint ),
+								point: intersectPoint,
+								face: face,
+								object: object
+
+							};
+
+							intersects.push( intersect );
+
+						}
 
 					}
 
@@ -111,9 +128,25 @@ THREE.Ray.prototype = {
 
 			}
 
+			return intersects;
+
 		}
 
-		return intersects;
+		function distanceFromIntersection( origin, direction, object ) {
+
+			var vector, dot, intersect, distance;
+
+			vector = object.position.clone().subSelf( origin );
+			dot = vector.dot( direction );
+
+			if ( dot < 0 ) return false; // Object is behind origin
+
+			intersect = origin.clone().addSelf( direction.clone().multiplyScalar( dot ) );
+			distance = object.position.distanceTo( intersect );
+
+			return distance;
+
+		}
 
 		// http://www.blackpawn.com/texts/pointinpoly/default.html
 
