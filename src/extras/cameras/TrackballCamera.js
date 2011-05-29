@@ -1,5 +1,5 @@
 /**
- * @author Eberhard Gräther / http://egraether.com/
+ * @author Eberhard Graether / http://egraether.com/
 
  * parameters = {
  *	fov: <float>,
@@ -11,6 +11,7 @@
  *	radius: <float>,
  *	screen: { width : <float>, height : <float>, offsetLeft : <float>, offsetTop : <float> },
 
+ *	rotateSpeed: <float>,
  *	zoomSpeed: <float>,
  *	panSpeed: <float>,
 
@@ -19,6 +20,9 @@
 
  *	staticMoving: <bool>,
  *	dynamicDampingFactor: <float>,
+
+ *	minDistance: <float>,
+ *	maxDistance: <float>,
 
  *	keys: <Array>, // [ rotateKey, zoomKey, panKey ],
 
@@ -39,6 +43,7 @@ THREE.TrackballCamera = function ( parameters ) {
 	this.screen = parameters.screen || { width : window.innerWidth, height : window.innerHeight, offsetLeft : 0, offsetTop : 0 };
 	this.radius = parameters.radius || ( this.screen.width + this.screen.height ) / 4;
 
+	this.rotateSpeed = parameters.rotateSpeed || 1.0;
 	this.zoomSpeed = parameters.zoomSpeed || 1.2;
 	this.panSpeed = parameters.panSpeed || 0.3;
 
@@ -48,7 +53,10 @@ THREE.TrackballCamera = function ( parameters ) {
 	this.staticMoving = parameters.staticMoving || false;
 	this.dynamicDampingFactor = parameters.dynamicDampingFactor || 0.2;
 
-	this.keys = parameters.keys || [ 65 /*A*/, 83 /*S*/, 68 /*D*/ ];
+	this.minDistance = parameters.minDistance || 0;
+	this.maxDistance = parameters.maxDistance || Infinity;
+
+	this.keys = parameters.keys || [ 16 /*SHIFT*/, 18 /*ALT*/, 17 /*CTRL*/ ];
 
 	this.useTarget = true;
 
@@ -126,14 +134,20 @@ THREE.TrackballCamera = function ( parameters ) {
 			var axis = (new THREE.Vector3()).cross( _rotateStart, _rotateEnd ).normalize(),
 			quaternion = new THREE.Quaternion();
 
+			angle *= this.rotateSpeed;
+
 			quaternion.setFromAxisAngle( axis, -angle );
 
 			quaternion.multiplyVector3( this.position );
 			quaternion.multiplyVector3( this.up );
 
-			if ( !this.staticMoving ) {
+			quaternion.multiplyVector3( _rotateEnd );
 
-				quaternion.multiplyVector3( _rotateEnd );
+			if ( this.staticMoving ) {
+
+				_rotateStart = _rotateEnd;
+
+			} else {
 
 				quaternion.setFromAxisAngle( axis, angle * ( this.dynamicDampingFactor - 1.0 ) );
 				quaternion.multiplyVector3( _rotateStart );
@@ -196,14 +210,32 @@ THREE.TrackballCamera = function ( parameters ) {
 		}
 
 	};
-	
-	this.update = function( parentMatrixWorld, forceUpdate, camera ) {
-	
-		if ( !this.staticMoving ) {
 
-			this.rotateCamera();
+	this.checkDistances = function() {
+
+		if ( !this.noZoom || !this.noPan ) {
+
+			if ( this.position.lengthSq() > this.maxDistance * this.maxDistance ) {
+
+				this.position.setLength( this.maxDistance );
+
+			}
+
+			var eye = this.position.clone().subSelf( this.target.position );
+
+			if ( eye.lengthSq() < this.minDistance * this.minDistance ) {
+
+				this.position.add( this.target.position, eye.setLength( this.minDistance ) );
+
+			}
 
 		}
+
+	};
+
+	this.update = function( parentMatrixWorld, forceUpdate, camera ) {
+
+		this.rotateCamera();
 
 		if ( !this.noZoom ) {
 
@@ -216,10 +248,13 @@ THREE.TrackballCamera = function ( parameters ) {
 			this.panCamera();
 
 		}
-	
+
+		this.checkDistances();
+
 		this.supr.update.call( this, parentMatrixWorld, forceUpdate, camera );
-	
+
 	};
+
 
 	// listeners
 
@@ -232,16 +267,19 @@ THREE.TrackballCamera = function ( parameters ) {
 		} else if ( event.keyCode === this.keys[ this.STATE.ROTATE ] ) {
 
 			_state = this.STATE.ROTATE;
-			_keyPressed = true;
 
-		} else if ( event.keyCode === this.keys[ this.STATE.ZOOM ] ) {
+		} else if ( event.keyCode === this.keys[ this.STATE.ZOOM ] && !this.noZoom ) {
 
 			_state = this.STATE.ZOOM;
-			_keyPressed = true;
 
-		} else if ( event.keyCode === this.keys[ this.STATE.PAN ] ) {
+		} else if ( event.keyCode === this.keys[ this.STATE.PAN ] && !this.noPan ) {
 
 			_state = this.STATE.PAN;
+
+		}
+
+		if ( _state !== this.STATE.NONE ) {
+
 			_keyPressed = true;
 
 		}
@@ -271,11 +309,11 @@ THREE.TrackballCamera = function ( parameters ) {
 
 				_rotateStart = _rotateEnd = this.getMouseProjectionOnBall( event.clientX, event.clientY );
 
-			} else if ( _state === this.STATE.ZOOM ) {
+			} else if ( _state === this.STATE.ZOOM && !this.noZoom ) {
 
 				_zoomStart = _zoomEnd = this.getMouseOnScreen( event.clientX, event.clientY );
 
-			} else {
+			} else if ( !this.noPan ) {
 
 				_panStart = _panEnd = this.getMouseOnScreen( event.clientX, event.clientY );
 
@@ -304,12 +342,6 @@ THREE.TrackballCamera = function ( parameters ) {
 		} else if ( _state === this.STATE.ROTATE ) {
 
 			_rotateEnd = this.getMouseProjectionOnBall( event.clientX, event.clientY );
-
-			if ( this.staticMoving ) {
-
-				this.rotateCamera();
-
-			}
 
 		} else if ( _state === this.STATE.ZOOM && !this.noZoom ) {
 
