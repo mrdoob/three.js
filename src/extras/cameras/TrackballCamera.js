@@ -16,6 +16,8 @@
  *	noZoom: <bool>,
  *	noPan: <bool>,
 
+ *	keys: <Array>, // [ rotateKey, zoomKey, panKey ]
+
  *	domElement: <HTMLElement>,
  * }
  */
@@ -33,7 +35,10 @@ THREE.TrackballCamera = function ( parameters ) {
 
 	this.noZoom = false;
 	this.noPan = false;
-	
+
+	this.keys = [ 65, 83, 68 ];
+	this.keyPressed = false;
+
 	this.domElement = document;
 
 	if ( parameters ) {
@@ -45,6 +50,8 @@ THREE.TrackballCamera = function ( parameters ) {
 
 		if ( parameters.noZoom !== undefined ) this.noZoom = parameters.noZoom;
 		if ( parameters.noPan !== undefined ) this.noPan = parameters.noPan;
+
+		if ( parameters.keys !== undefined ) this.keys = parameters.keys;
 
 		if ( parameters.domElement !== undefined ) this.domElement = parameters.domElement;
 
@@ -103,14 +110,37 @@ THREE.TrackballCamera.prototype.handleEvent = function ( event ) {
 };
 
 THREE.TrackballCamera.prototype.keydown = function( event ) {
+	
+	if ( this.state !== this.STATE.NONE ) {
 
+		return;
 
+	} else if ( event.keyCode === this.keys[ this.STATE.ROTATE ] ) {
+
+		this.state = this.STATE.ROTATE;
+		this.keyPressed = true;
+
+	} else if ( event.keyCode === this.keys[ this.STATE.ZOOM ] ) {
+
+		this.state = this.STATE.ZOOM;
+		this.keyPressed = true;
+
+	} else if ( event.keyCode === this.keys[ this.STATE.PAN ] ) {
+
+		this.state = this.STATE.PAN;
+		this.keyPressed = true;
+
+	}
 
 };
 
 THREE.TrackballCamera.prototype.keyup = function( event ) {
 
+	if ( this.state !== this.STATE.NONE ) {
 
+		this.state = this.STATE.NONE;
+
+	}
 
 };
 
@@ -138,6 +168,15 @@ THREE.TrackballCamera.prototype.mousedown = function(event) {
 };
 
 THREE.TrackballCamera.prototype.mousemove = function( event ) {
+	
+	if ( this.keyPressed ) {
+
+		this.start = this.getMouseProjectionOnBall( event.clientX, event.clientY );
+		this.mouse = this.getMouseOnScreen( event.clientX, event.clientY );
+
+		this.keyPressed = false;
+
+	}
 
 	if ( this.state === this.STATE.NONE ) {
 
@@ -171,7 +210,7 @@ THREE.TrackballCamera.prototype.mouseup = function( event ) {
 THREE.TrackballCamera.prototype.getScreenDimensions = function() {
 
 	if ( this.domElement != document ) {
-		
+
 		return {
 			width : this.domElement.offsetWidth, 
 			height : this.domElement.offsetHeight,
@@ -275,8 +314,8 @@ THREE.TrackballCamera.prototype.panCamera = function( clientX, clientY ) {
 	var pan = this.position.clone().crossSelf( this.up ).setLength( mouseChange.x );
 	pan.addSelf( this.up.clone().setLength( mouseChange.y ) );
 
-	this.position.addSelf(pan);
-	this.target.position.addSelf(pan);
+	this.position.addSelf( pan );
+	this.target.position.addSelf( pan );
 
 	this.mouse = newMouse;
 
