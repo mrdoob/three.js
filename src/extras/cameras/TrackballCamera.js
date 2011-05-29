@@ -56,7 +56,7 @@ THREE.TrackballCamera = function ( parameters ) {
 	this.minDistance = parameters.minDistance || 0;
 	this.maxDistance = parameters.maxDistance || Infinity;
 
-	this.keys = parameters.keys || [ 16 /*SHIFT*/, 18 /*ALT*/, 17 /*CTRL*/ ];
+	this.keys = parameters.keys || [ 65 /*A*/, 83 /*S*/, 68 /*D*/ ];
 
 	this.useTarget = true;
 

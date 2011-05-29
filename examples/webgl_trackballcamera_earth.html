@@ -5,7 +5,7 @@
 	<style type="text/css">
 
 		body {
-			background: #FFF;
+			background: #000;
 			color: #EEE;
 			padding: 0;
 			margin: 0;
@@ -42,16 +42,10 @@
 
 <div id="info">
 	<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - earth [trackball camera]<br/><br/>
-<b>MOVE</b> mouse & press <b>LEFT/SHIFT:</b> rotate, <b>MIDDLE/ALT:</b> zoom, <b>RIGHT/CTRL:</b> pan</div>
+	<b>MOVE</b> mouse & press <b>LEFT/A:</b> rotate, <b>MIDDLE/S:</b> zoom, <b>RIGHT/D:</b> pan
+</div>
 
 <script type="text/javascript">
-
-	if ( !Detector.webgl ) {
-
-		Detector.addGetWebGLMessage();
-		return;
-
-	}
 
 	var radius = 6371,
 	tilt = 0.41,
@@ -66,12 +60,19 @@
 	container, stats,
 
 	camera, scene, renderer,
-	geometry, meshPlanet, meshClouds, meshMoon, meshMoon2, meshMoon3,
+	geometry, meshPlanet, meshClouds, meshMoon,
 	dirLight, ambientLight,
 
 	time = new Date().getTime();
 
 	window.onload = function() {
+
+		if ( !Detector.webgl ) {
+
+			Detector.addGetWebGLMessage();
+			return;
+
+		}
 
 		init();
 		animate();
@@ -101,7 +102,7 @@
 			near: 50,
 			far: 1e7,
 
-			rotateSpeed: 0.6,
+			rotateSpeed: 1.0,
 			zoomSpeed: 1.2,
 			panSpeed: 0.2,
 
@@ -109,12 +110,12 @@
 			noPan: false,
 
 			staticMoving: false,
-			dynamicDampingFactor: 0.2,
+			dynamicDampingFactor: 0.3,
 
 			minDistance: radius * 1.1,
 			maxDistance: radius * 100,
 
-			keys: [ 16, 18, 17 ], // [ rotateKey, zoomKey, panKey ],
+			keys: [ 65, 83, 68 ], // [ rotateKey, zoomKey, panKey ],
 
 			domElement: renderer.domElement,
 
@@ -197,26 +198,6 @@
 		meshMoon.position.set( radius * 5, 0, 0 );
 		meshMoon.scale.set( moonScale, moonScale, moonScale );
 		scene.addObject( meshMoon );
-
-
-		// moon2
-
-		var materialMoon2 = new THREE.MeshPhongMaterial( { color: 0xffffff, map: moonTexture } );
-
-		meshMoon2 = new THREE.Mesh( geometry, materialMoon );
-		meshMoon2.position.set( -radius * 7, 0, radius * 3 );
-		meshMoon2.scale.set( moonScale, moonScale, moonScale );
-		scene.addObject( meshMoon2 );
-
-
-		// moon3
-
-		var materialMoon3 = new THREE.MeshPhongMaterial( { color: 0xffffff, map: moonTexture } );
-
-		meshMoon3 = new THREE.Mesh( geometry, materialMoon );
-		meshMoon3.position.set( radius, 0, -radius * 10 );
-		meshMoon3.scale.set( moonScale, moonScale, moonScale );
-		scene.addObject( meshMoon3 );
 
 
 		// stars
@@ -309,27 +290,15 @@
 
 		var angle = dt * rotationSpeed;
 
-		meshMoon.position = rotateY( meshMoon.position, angle * 2 );
-		meshMoon.rotation.y += angle;
-
-		meshMoon2.position = rotateY( meshMoon2.position, -angle * 1.5 );
-		meshMoon2.rotation.y += angle;
-
-		meshMoon3.position = rotateY( meshMoon3.position, angle );
-		meshMoon3.rotation.y += angle;
+		meshMoon.position = new THREE.Vector3(
+			Math.cos( angle ) * meshMoon.position.x - Math.sin( angle ) * meshMoon.position.z,
+			0,
+			Math.sin( angle ) * meshMoon.position.x + Math.cos( angle ) * meshMoon.position.z
+		);
+		meshMoon.rotation.y -= angle;
 
 		renderer.clear();
 		renderer.render( scene, camera );
-
-	};
-
-	function rotateY( vector, angle ) {
-
-		return new THREE.Vector3(
-			Math.cos( angle ) * vector.x - Math.sin( angle ) * vector.z,
-			0,
-			Math.sin( angle ) * vector.x + Math.cos( angle ) * vector.z
-		);
 
 	};
 
