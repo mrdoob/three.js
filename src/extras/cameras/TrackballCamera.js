@@ -66,6 +66,8 @@ THREE.TrackballCamera = function ( parameters ) {
 	var _keyPressed = false,
 	_state = this.STATE.NONE,
 
+	_eye = new THREE.Vector3(),
+
 	_rotateStart = new THREE.Vector3(),
 	_rotateEnd = new THREE.Vector3(),
 
@@ -117,9 +119,11 @@ THREE.TrackballCamera = function ( parameters ) {
 
 		}
 
+		_eye = this.position.clone().subSelf( this.target.position );
+
 		var projection = this.up.clone().setLength( mouseOnBall.y );
-		projection.addSelf( this.up.clone().crossSelf( this.position ).setLength( mouseOnBall.x ) );
-		projection.addSelf( this.position.clone().setLength( mouseOnBall.z ) );
+		projection.addSelf( this.up.clone().crossSelf( _eye ).setLength( mouseOnBall.x ) );
+		projection.addSelf( _eye.setLength( mouseOnBall.z ) );
 
 		return projection;
 
@@ -138,7 +142,7 @@ THREE.TrackballCamera = function ( parameters ) {
 
 			quaternion.setFromAxisAngle( axis, -angle );
 
-			quaternion.multiplyVector3( this.position );
+			quaternion.multiplyVector3( _eye );
 			quaternion.multiplyVector3( this.up );
 
 			quaternion.multiplyVector3( _rotateEnd );
@@ -164,8 +168,7 @@ THREE.TrackballCamera = function ( parameters ) {
 
 		if ( factor !== 1.0 && factor > 0.0 ) {
 
-			var eye = this.position.clone().subSelf( this.target.position );
-			this.position.add( this.target.position, eye.multiplyScalar( factor ) );
+			_eye.multiplyScalar( factor );
 
 			if ( this.staticMoving ) {
 
@@ -187,11 +190,9 @@ THREE.TrackballCamera = function ( parameters ) {
 
 		if ( mouseChange.lengthSq() ) {
 
-			var factor = this.position.distanceTo( this.target.position ) * this.panSpeed;
+			mouseChange.multiplyScalar( _eye.length() * this.panSpeed );
 
-			mouseChange.multiplyScalar( factor );
-
-			var pan = this.position.clone().crossSelf( this.up ).setLength( mouseChange.x );
+			var pan = _eye.clone().crossSelf( this.up ).setLength( mouseChange.x );
 			pan.addSelf( this.up.clone().setLength( mouseChange.y ) );
 
 			this.position.addSelf( pan );
@@ -221,11 +222,9 @@ THREE.TrackballCamera = function ( parameters ) {
 
 			}
 
-			var eye = this.position.clone().subSelf( this.target.position );
+			if ( _eye.lengthSq() < this.minDistance * this.minDistance ) {
 
-			if ( eye.lengthSq() < this.minDistance * this.minDistance ) {
-
-				this.position.add( this.target.position, eye.setLength( this.minDistance ) );
+				this.position.add( this.target.position, _eye.setLength( this.minDistance ) );
 
 			}
 
@@ -234,6 +233,8 @@ THREE.TrackballCamera = function ( parameters ) {
 	};
 
 	this.update = function( parentMatrixWorld, forceUpdate, camera ) {
+
+		_eye = this.position.clone().subSelf( this.target.position ),
 
 		this.rotateCamera();
 
@@ -248,6 +249,8 @@ THREE.TrackballCamera = function ( parameters ) {
 			this.panCamera();
 
 		}
+
+		this.position.add( this.target.position, _eye );
 
 		this.checkDistances();
 
