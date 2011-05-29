@@ -38,24 +38,36 @@ THREE.Ray.prototype = {
 
 		if ( object instanceof THREE.Particle ) {
 
-			var intersects = [],
-			distance = distanceFromIntersection( this.origin, this.direction, object );
+			var distance = distanceFromIntersection( this.origin, this.direction, object );
 
-			if ( distance && distance < object.scale.x ) {
+			if ( ! distance || distance > object.scale.x ) {
 
-				intersects.push( {
-
-					distance: distance,
-					point: object.position,
-					object: object
-
-				} );
+				return [];
 
 			}
 
-			return intersects;
+			return [ {
+
+				distance: distance,
+				point: object.position,
+				face: null,
+				object: object
+
+			} ];
 
 		} else if ( object instanceof THREE.Mesh ) {
+
+			// Checking boundingSphere
+
+			var distance = distanceFromIntersection( this.origin, this.direction, object );
+
+			if ( ! distance || distance > object.geometry.boundingSphere.radius * Math.max( object.scale.x, Math.max( object.scale.y, object.scale.z ) ) ) {
+
+				return [];
+
+			}
+
+			// Checking faces
 
 			var f, fl, face, a, b, c, d, normal,
 			dot, scalar,
@@ -129,6 +141,10 @@ THREE.Ray.prototype = {
 			}
 
 			return intersects;
+
+		} else {
+
+			return [];
 
 		}
 

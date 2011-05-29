@@ -68,12 +68,12 @@
 
 				scene = new THREE.Scene();
 
-				for ( var i = 0; i < 500; i ++ ) {
+				for ( var i = 0; i < 100; i ++ ) {
 
 					var particle = new THREE.Particle( new THREE.ParticleCanvasMaterial( { color: Math.random() * 0x808008 + 0x808080, program: programStroke } ) );
-					particle.position.x = Math.random() * 2000 - 1000;
-					particle.position.y = Math.random() * 2000 - 1000;
-					particle.position.z = Math.random() * 2000 - 1000;
+					particle.position.x = Math.random() * 800 - 400;
+					particle.position.y = Math.random() * 800 - 400;
+					particle.position.z = Math.random() * 800 - 400;
 					particle.scale.x = particle.scale.y = Math.random() * 10 + 10;
 					scene.addObject( particle );
 
