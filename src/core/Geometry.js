@@ -388,7 +388,9 @@ THREE.Geometry.prototype = {
 
 	computeBoundingSphere: function () {
 
-		var radius = this.boundingSphere === null ? 0 : this.boundingSphere.radius;
+		// var radius = this.boundingSphere === null ? 0 : this.boundingSphere.radius;
+
+		var radius = 0;
 
 		for ( var v = 0, vl = this.vertices.length; v < vl; v ++ ) {
 

@@ -98,7 +98,7 @@ THREE.Projector = function() {
 		_face4Count = 0;
 		_lineCount = 0;
 		_particleCount = 0;
-	
+
 		camera.matrixAutoUpdate && camera.update( undefined, true );
 
 		scene.update( undefined, false, camera );

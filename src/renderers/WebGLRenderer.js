@@ -698,7 +698,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				for ( a in materials[ m ].attributes ) {
 
-					attribute = materials[ m ].attributes[ a ];
+                    // Do a shallow copy of the attribute object so different geometryGroup chunks use different
+                    // attribute buffers which are correctly indexed in the setMeshBuffers function
+					attribute = {};
+					for (prop in materials[ m ].attributes[ a ] ) {
+						attribute [ prop ] = materials[ m ].attributes[ a ][ prop ];
+					}
 
 					if( !attribute.__webglInitialized || attribute.createUniqueBuffers ) {
 
@@ -2566,7 +2571,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// custom attributes
 
-/*		if ( geometryGroup.__webglCustomAttributes ) {
+        // Use the per-geometryGroup custom attribute arrays which are setup in initMeshBuffers
+		if ( geometryGroup.__webglCustomAttributes ) {
 
 			for( a in geometryGroup.__webglCustomAttributes ) {
 
@@ -2581,10 +2587,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-		}*/
+		}
 
 
-		if ( material.attributes ) {
+/*		if ( material.attributes ) {
 
 			for( a in material.attributes ) {
 
@@ -2603,7 +2609,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-		}
+		}*/
 
 
 
