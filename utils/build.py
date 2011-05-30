@@ -277,6 +277,7 @@ WEBGL_FILES = [
 'materials/ParticleBasicMaterial.js',
 'materials/ShadowVolumeDynamicMaterial.js',
 'materials/Texture.js',
+'objects/Particle.js',
 'objects/ParticleSystem.js',
 'objects/Line.js',
 'objects/Mesh.js',
