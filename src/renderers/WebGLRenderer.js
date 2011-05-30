@@ -3331,7 +3331,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		_gl.finish();
+		//_gl.finish();
 
 	};
 
