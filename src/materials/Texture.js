@@ -16,6 +16,9 @@ THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter ) 
 	this.magFilter = magFilter !== undefined ? magFilter : THREE.LinearFilter;
 	this.minFilter = minFilter !== undefined ? minFilter : THREE.LinearMipMapLinearFilter;
 
+	this.offset = new THREE.Vector2();
+	this.repeat = new THREE.Vector2( 1, 1 );
+
 	this.needsUpdate = false;
 
 };
