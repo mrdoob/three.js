@@ -37,6 +37,7 @@
 
 			var programStroke = function ( context ) {
 
+				context.lineWidth = 0.05;
 				context.beginPath();
 				context.arc( 0, 0, 1, 0, PI2, true );
 				context.closePath();
@@ -84,7 +85,7 @@
 				renderer = new THREE.CanvasRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				container.appendChild(renderer.domElement);
+				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
