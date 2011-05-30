@@ -99,18 +99,6 @@
 
 				}
 
-				for( i = 0; i < geometry.faceVertexUvs[ 0 ].length; i++ ) {
-
-					var uvs = geometry.faceVertexUvs[ 0 ][ i ];
-					for ( j = 0, jl = uvs.length; j < jl; j++ ) {
-
-						uvs[ j ].u *= 5;
-						uvs[ j ].v *= 5;
-
-					}
-
-				}
-
 
 				//console.log( "triangles: " + geometry.faces.length * 2 + " faces: " + geometry.faces.length + " vertices: " + geometry.vertices.length );
 
@@ -119,6 +107,7 @@
 
 				var texture = THREE.ImageUtils.loadTexture( "textures/water.jpg" );
 				texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+				texture.repeat.set( 5, 5 );
 				material = new THREE.MeshBasicMaterial( { color:0x0044ff, opacity:1, map: texture } );
 
 				mesh = new THREE.Mesh( geometry, material );

@@ -2162,7 +2162,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		uniforms.diffuse.value = material.color;
 		uniforms.opacity.value = material.opacity;
+		
 		uniforms.map.texture = material.map;
+		if ( material.map ) {
+			
+			uniforms.offsetRepeat.value.set( material.map.offset.x, material.map.offset.y, material.map.repeat.x, material.map.repeat.y );
+
+		}
 
 		uniforms.lightMap.texture = material.lightMap;
 
@@ -2187,6 +2193,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		uniforms.opacity.value = material.opacity;
 		uniforms.size.value = material.size;
 		uniforms.scale.value = _canvas.height / 2.0; // TODO: Cache this.
+
 		uniforms.map.texture = material.map;
 
 	};
