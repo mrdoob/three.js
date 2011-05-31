@@ -149,6 +149,7 @@ This code creates a camera, then creates a scene, adds a cube on it, creates a &
 * Fixes on WebGL attributes. ([alteredq](http://github.com/alteredq) and [empaempa](http://github.com/empaempa))
 * Reduced overall memory footprint. ([mrdoob](http://github.com/mrdoob))
 * Added `Face4` support to `CollisionSystem`. ([NINE78](http://github.com/NINE78))
+* Made Blender exporter work on 2.57. ([remoe](https://github.com/remoe))
 * Added `Particle` support to `Ray`. ([mrdoob](http://github.com/mrdoob) and [jaycrossler](https://github.com/jaycrossler))
 * Improved `Ray.intersectObject` performance by checking boundingSphere first. ([mrdoob](http://github.com/mrdoob))
 * Added `TrackballCamera. ([egraether](https://github.com/egraether))
