@@ -69,7 +69,7 @@
 				
 				camera = new THREE.PathCamera( {
 
-					fov: 40, aspect: window.viewportWidth / window.viewportHeight, near: 1, far: 1000,
+					fov: 40, aspect: window.innerWidth / window.innerHeight, near: 1, far: 1000,
 					waypoints: waypoints, duration: 28,
 					useConstantSpeed: true, resamplingCoef: 1,
 					createDebugPath: true, createDebugDummy: true,
