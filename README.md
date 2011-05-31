@@ -141,14 +141,18 @@ This code creates a camera, then creates a scene, adds a cube on it, creates a &
 
 ### Change Log ###
 
-2011 05 21 - **r41/ROME** (264.801 KB, gzip: 64.599 KB)
+2011 05 31 - **r41/ROME** (264.852 KB, gzip: 64.849 KB)
 
 (Up to this point, some [rome](http://ro.me) specific features have managed to get included in the lib. The aim is to clean this up in next revisions.)
 
 * Improved Blender Object and Scene exporters. ([alteredq](http://github.com/alteredq))
 * Fixes on WebGL attributes. ([alteredq](http://github.com/alteredq) and [empaempa](http://github.com/empaempa))
 * Reduced overall memory footprint. ([mrdoob](http://github.com/mrdoob))
-* Added Face4 support to CollisionSystem. ([NINE78](http://github.com/NINE78))
+* Added `Face4` support to `CollisionSystem`. ([NINE78](http://github.com/NINE78))
+* Added `Particle` support to `Ray`. ([mrdoob](http://github.com/mrdoob) and [jaycrossler](https://github.com/jaycrossler))
+* Improved `Ray.intersectObject` performance by checking boundingSphere first. ([mrdoob](http://github.com/mrdoob))
+* Added `TrackballCamera. ([egraether](https://github.com/egraether))
+* Added `repeat` and `offset` properties to `Texture`. ([mrdoob](http://github.com/mrdoob) and [alteredq](http://github.com/alteredq))
 
 
 2011 04 24 - **r40** (263.774 KB, gzip: 64.320 KB)
