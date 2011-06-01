@@ -109,7 +109,8 @@ EXTRAS_FILES = [
 'extras/objects/MarchingCubes.js',
 'extras/objects/Trident.js',
 'extras/physics/Collisions.js',
-'extras/physics/CollisionUtils.js'
+'extras/physics/CollisionUtils.js',
+'extras/renderers/AnaglyphWebGLRenderer.js'
 ]
 
 CANVAS_FILES = [
