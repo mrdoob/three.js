@@ -67,8 +67,8 @@
 
 			function init() {
 
-				container = document.createElement('div');
-				document.body.appendChild(container);
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
 
 				camera = new THREE.Camera( 70, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
 				camera.position.z = 1000;
@@ -104,7 +104,7 @@
 				scene.addObject(lightMesh);
 
 
-				webglRenderer = new THREE.CrosseyedWebGLRenderer( { separation: 20 } );
+				webglRenderer = new THREE.CrosseyedWebGLRenderer( { separation: 20, antialias: true } );
 				webglRenderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( webglRenderer.domElement );
 
