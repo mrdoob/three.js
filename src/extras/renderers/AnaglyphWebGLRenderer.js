@@ -6,7 +6,7 @@ THREE.AnaglyphWebGLRenderer = function ( parameters ) {
 
 	THREE.WebGLRenderer.call( this, parameters );
 
-	var that = this, setSize = this.setSize, render = this.render;
+	var _this = this, _setSize = this.setSize, _render = this.render;
 	var _cameraL = new THREE.Camera(), _cameraR = new THREE.Camera();
 
 	var params = { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat };
@@ -64,7 +64,7 @@ THREE.AnaglyphWebGLRenderer = function ( parameters ) {
 
 	this.setSize = function ( width, height ) {
 
-		setSize.call( that, width, height );
+		_setSize.call( _this, width, height );
 
 		_renderTargetL.width = width;
 		_renderTargetL.height = height;
@@ -86,9 +86,10 @@ THREE.AnaglyphWebGLRenderer = function ( parameters ) {
 		_cameraR.target.position.copy( camera.target.position );
 		_cameraR.translateX( 10 );
 
-		render.call( that, scene, _cameraL, _renderTargetL, true );
-		render.call( that, scene, _cameraR, _renderTargetR, true );
-		render.call( that, _scene, _camera );
+		_render.call( _this, scene, _cameraL, _renderTargetL, true );
+		_render.call( _this, scene, _cameraR, _renderTargetR, true );
+
+		_render.call( _this, _scene, _camera );
 
 	};
 
