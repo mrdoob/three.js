@@ -65,8 +65,9 @@ More? [#three.js on irc.freenode.net](http://webchat.freenode.net/?channels=thre
 
 ### Featured projects ###
 
-[![ROME](http://mrdoob.github.com/three.js/assets/projects/17_rome.png)](http://ro.me)
-[![Globe](http://mrdoob.github.com/three.js/assets/projects/16_globe.png)](http://data-arts.appspot.com/globe)
+[![Mission Control](http://mrdoob.github.com/three.js/assets/projects/18_missioncontrol.png)](http://superfad.com/missioncontrol/)
+[![ROME](http://mrdoob.github.com/three.js/assets/projects/17_rome.png)](http://ro.me/)
+[![Globe](http://mrdoob.github.com/three.js/assets/projects/16_globe.png)](http://data-arts.appspot.com/globe/)
 [![Photoparticles](http://mrdoob.github.com/three.js/assets/projects/15_photoparticles.png)](http://lab.aerotwist.com/webgl/photoparticles/)
 [![Plumegraph](http://mrdoob.github.com/three.js/assets/projects/14_plumegraph.png)](http://plumegraph.org/)
 [![HelloRacer](http://mrdoob.github.com/three.js/assets/projects/13_helloracer.png)](http://helloracer.com/webgl/)
@@ -141,9 +142,9 @@ This code creates a camera, then creates a scene, adds a cube on it, creates a &
 
 ### Change Log ###
 
-2011 05 31 - **r41/ROME** (264.852 KB, gzip: 64.849 KB)
+2011 05 31 - **r41/ROME** (265.317 KB, gzip: 64.849 KB)
 
-(Up to this point, some [rome](http://ro.me) specific features have managed to get included in the lib. The aim is to clean this up in next revisions.)
+(Up to this point, some [rome](http://ro.me) specific features managed to get in the lib. The aim is to clean this up in next revisions.)
 
 * Improved Blender Object and Scene exporters. ([alteredq](http://github.com/alteredq))
 * Fixes on WebGL attributes. ([alteredq](http://github.com/alteredq) and [empaempa](http://github.com/empaempa))
@@ -154,6 +155,7 @@ This code creates a camera, then creates a scene, adds a cube on it, creates a &
 * Improved `Ray.intersectObject` performance by checking boundingSphere first. ([mrdoob](http://github.com/mrdoob))
 * Added `TrackballCamera. ([egraether](https://github.com/egraether))
 * Added `repeat` and `offset` properties to `Texture`. ([mrdoob](http://github.com/mrdoob) and [alteredq](http://github.com/alteredq))
+* Cleaned up `Vector2`, `Vector3` and `Vector4`. ([egraether](https://github.com/egraether))
 
 
 2011 04 24 - **r40** (263.774 KB, gzip: 64.320 KB)
