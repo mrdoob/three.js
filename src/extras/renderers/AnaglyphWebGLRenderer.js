@@ -9,8 +9,8 @@ THREE.AnaglyphWebGLRenderer = function ( parameters ) {
 	var _this = this, _setSize = this.setSize, _render = this.render;
 	var _cameraL = new THREE.Camera(), _cameraR = new THREE.Camera();
 
-	var params = { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat };
-	var _renderTargetL = new THREE.WebGLRenderTarget( 512, 512, params ), _renderTargetR = new THREE.WebGLRenderTarget( 512, 512, params );
+	var _params = { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat };
+	var _renderTargetL = new THREE.WebGLRenderTarget( 512, 512, _params ), _renderTargetR = new THREE.WebGLRenderTarget( 512, 512, _params );
 
 	var _camera = new THREE.Camera( 53, 1, 1, 10000 );
 	_camera.position.z = 2;
