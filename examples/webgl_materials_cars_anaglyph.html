@@ -140,7 +140,6 @@
 			var container, stats;
 
 			var camera, scene, webglRenderer;
-			var cameraCube, sceneCube;
 
 			var m, mi;
 
@@ -166,10 +165,7 @@
 				// camera.position.z = 1000;
 				camera.updateMatrix();
 
-				cameraCube = new THREE.Camera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
-
 				scene = new THREE.Scene();
-				sceneCube = new THREE.Scene();
 
 				// LIGHTS
 
@@ -196,7 +192,7 @@
 				pointLight.position.z = 10000;
 				scene.addLight( pointLight );
 
-				THREE.SceneUtils.addPanoramaCubeWebGL( sceneCube, 100000, textureCube );
+				THREE.SceneUtils.addPanoramaCubeWebGL( scene, 100000, textureCube );
 
 				webglRenderer = new THREE.AnaglyphWebGLRenderer();
 				webglRenderer.setSize( window.innerWidth, window.innerHeight );
@@ -589,12 +585,6 @@
 				camera.position.x = 1000 * Math.cos( timer );
 				camera.position.z = 1000 * Math.sin( timer );
 
-				cameraCube.target.position.x = - camera.position.x;
-				cameraCube.target.position.y = - camera.position.y;
-				cameraCube.target.position.z = - camera.position.z;
-
-				webglRenderer.clear();
-				webglRenderer.render( sceneCube, cameraCube );
 				webglRenderer.render( scene, camera );
 
 				if ( STATS_ENABLED ) stats.update();
