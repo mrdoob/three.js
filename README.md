@@ -38,7 +38,6 @@ More? [#three.js on irc.freenode.net](http://webchat.freenode.net/?channels=thre
 [![materials_cubemap_escher](http://mrdoob.github.com/three.js/assets/examples/17_materials_cubemap_escher.png)](http://mrdoob.github.com/three.js/examples/webgl_materials_cubemap_escher.html)
 [![materials_cubemap](http://mrdoob.github.com/three.js/assets/examples/14_materials_cubemap.png)](http://mrdoob.github.com/three.js/examples/webgl_materials_cubemap.html)
 [![materials_gl](http://mrdoob.github.com/three.js/assets/examples/20_materials_gl.png)](http://mrdoob.github.com/three.js/examples/webgl_materials.html)
-[![materials_shaders](http://mrdoob.github.com/three.js/assets/examples/23_materials_shaders.png)](http://mrdoob.github.com/three.js/examples/webgl_materials_shaders.html)
 [![large_mesh](http://mrdoob.github.com/three.js/assets/examples/12_large_mesh.png)](http://mrdoob.github.com/three.js/examples/webgl_geometry_large_mesh.html)
 
 
@@ -60,7 +59,6 @@ More? [#three.js on irc.freenode.net](http://webchat.freenode.net/?channels=thre
 [![particles_sprites](http://mrdoob.github.com/three.js/assets/examples/26_particles_sprites.png)](http://mrdoob.github.com/three.js/examples/canvas_particles_sprites.html)
 [![particles_random](http://mrdoob.github.com/three.js/assets/examples/02_random.png)](http://mrdoob.github.com/three.js/examples/canvas_particles_random.html)
 [![particles_wave](http://mrdoob.github.com/three.js/assets/examples/01_waves.png)](http://mrdoob.github.com/three.js/examples/canvas_particles_waves.html)
-[![particles_floor](http://mrdoob.github.com/three.js/assets/examples/00_floor.png)](http://mrdoob.github.com/three.js/examples/canvas_particles_floor.html)
 
 
 ### Featured projects ###
@@ -76,12 +74,6 @@ More? [#three.js on irc.freenode.net](http://webchat.freenode.net/?channels=thre
 [![Voxels](http://mrdoob.github.com/three.js/assets/projects/10_voxels.png)](http://mrdoob.com/projects/voxels/)
 [![The Wilderness Downtown](http://mrdoob.github.com/three.js/assets/projects/09_arcadefire.png)](http://thewildernessdowntown.com/)
 [![Or so they say...](http://mrdoob.github.com/three.js/assets/projects/07_orsotheysay.png)](http://xplsv.com/prods/demos/xplsv_orsotheysay/)
-[![Failure](http://mrdoob.github.com/three.js/assets/projects/05_failure.png)](http://www.is-real.net/experiments/three/failure/)
-[![Space Cannon 3D](http://mrdoob.github.com/three.js/assets/projects/02_spacecannon.png)](http://labs.brian-stoner.com/spacecannon/)
-[![Alocasia](http://mrdoob.github.com/three.js/assets/projects/04_alocasia.png)](http://arithmetric.com/projects/alocasia/)
-[![DDD](http://mrdoob.github.com/three.js/assets/projects/01_ddd.png)](http://the389.com/works/three/)
-[![jsflowfield4d](http://mrdoob.github.com/three.js/assets/projects/00_jsflowfield4d.png)](http://test.sjeiti.com/jsflowfield4d/)
-[![spikeball](http://mrdoob.github.com/three.js/assets/projects/03_spikeball.png)](http://kile.stravaganza.org/lab/js/spikeball/)
 
 
 ### Usage ###
