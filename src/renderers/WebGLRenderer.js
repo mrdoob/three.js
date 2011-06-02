@@ -698,7 +698,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				for ( a in materials[ m ].attributes ) {
 
-					attribute = materials[ m ].attributes[ a ];
+                    // Do a shallow copy of the attribute object so different geometryGroup chunks use different
+                    // attribute buffers which are correctly indexed in the setMeshBuffers function
+					attribute = {};
+					for (prop in materials[ m ].attributes[ a ] ) {
+						attribute [ prop ] = materials[ m ].attributes[ a ][ prop ];
+					}
 
 					if( !attribute.__webglInitialized || attribute.createUniqueBuffers ) {
 
@@ -2157,7 +2162,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		uniforms.diffuse.value = material.color;
 		uniforms.opacity.value = material.opacity;
+		
 		uniforms.map.texture = material.map;
+		if ( material.map ) {
+			
+			uniforms.offsetRepeat.value.set( material.map.offset.x, material.map.offset.y, material.map.repeat.x, material.map.repeat.y );
+
+		}
 
 		uniforms.lightMap.texture = material.lightMap;
 
@@ -2182,6 +2193,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		uniforms.opacity.value = material.opacity;
 		uniforms.size.value = material.size;
 		uniforms.scale.value = _canvas.height / 2.0; // TODO: Cache this.
+
 		uniforms.map.texture = material.map;
 
 	};
@@ -2566,7 +2578,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// custom attributes
 
-/*		if ( geometryGroup.__webglCustomAttributes ) {
+        // Use the per-geometryGroup custom attribute arrays which are setup in initMeshBuffers
+		if ( geometryGroup.__webglCustomAttributes ) {
 
 			for( a in geometryGroup.__webglCustomAttributes ) {
 
@@ -2581,10 +2594,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-		}*/
+		}
 
 
-		if ( material.attributes ) {
+/*		if ( material.attributes ) {
 
 			for( a in material.attributes ) {
 
@@ -2603,7 +2616,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-		}
+		}*/
 
 
 
@@ -3318,7 +3331,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		_gl.finish();
+		//_gl.finish();
 
 	};
 

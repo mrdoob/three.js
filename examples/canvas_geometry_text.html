@@ -20,13 +20,9 @@
 
 		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
-       
-       
-       <!-- 
-        <script type="text/javascript" src="../src/extras/geometries/Text.js"></script>
-         <script type="text/javascript" src="helvetiker-normal-normal.js"></script>
-        -->
-       <script type="text/javascript" src="http://canvas-text.googlecode.com/svn-history/r41/trunk/faces/helvetiker-normal-normal.js"></script>
+		      
+		<!-- load the font file from canvas-text -->
+		<script type="text/javascript" src="js/helvetiker-normal-normal.js"></script>
         
 
 		<script type="text/javascript">
@@ -59,7 +55,7 @@
 				info.style.top = '10px';
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
-				info.innerHTML = 'Drag to spin the text';
+				info.innerHTML = 'Drag to spin the text<br/>Simple Dynamic 3D Text Example by <a href="http://www.lab4games.net/zz85/blog">zz85</a>';
 				container.appendChild( info );
 
 				camera = new THREE.Camera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
@@ -78,17 +74,21 @@
                    theText = hash;
                   }
                 
-                var text3d = new THREE.Text(theText, 80, 40, 4, "");
+                var text3d = new THREE.Text(theText, {
+					size: 80, 
+					height:40,
+					curveSegments:2,
+					font: "helvetiker"
+				});
              
-                //try MeshPhongMaterial MeshLambertMaterial MeshPhongMaterial MeshNormalMaterial
-                var textMaterial = new THREE.MeshBasicMaterial( { color: 0.5 * 0xffffff, wireframe:false });
+                var textMaterial = new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, wireframe:false });
                 text = new THREE.Mesh( text3d, textMaterial);
                 
                 text.doubleSided = false;
                 text.position.y = 0;
                 text.position.y = 0;
                 text.position.z = 0;
-                text.rotation.x = 0*Math.PI;
+                text.rotation.x = 0;
                 text.rotation.y = Math.PI*2;
 				text.overdraw = true;
 				
@@ -99,8 +99,6 @@
 				plane.rotation.x = - 90 * ( Math.PI / 180 );
                 plane.position.x = 0;
 				plane.overdraw = true;
-                
-                
                 
 				scene.addObject( plane );
 
@@ -197,12 +195,6 @@
 			}
 
 		</script>
-        <script>
-        var _gaq=[["_setAccount","UA-7549263-1"],["_trackPageview"]]; 
-        (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];g.async=1;
-        g.src=("https:"==location.protocol?"//ssl":"//www")+".google-analytics.com/ga.js";
-        s.parentNode.insertBefore(g,s)}(document,"script"));
-        </script>
 
 	</body>
 </html>

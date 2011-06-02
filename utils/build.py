@@ -93,6 +93,7 @@ EXTRAS_FILES = [
 'extras/cameras/PathCamera.js',
 'extras/cameras/FlyCamera.js',
 'extras/cameras/RollCamera.js',
+'extras/cameras/TrackballCamera.js',
 'extras/geometries/Cube.js',
 'extras/geometries/Cylinder.js',
 'extras/geometries/Icosahedron.js',
@@ -109,7 +110,8 @@ EXTRAS_FILES = [
 'extras/objects/MarchingCubes.js',
 'extras/objects/Trident.js',
 'extras/physics/Collisions.js',
-'extras/physics/CollisionUtils.js'
+'extras/physics/CollisionUtils.js',
+'extras/renderers/AnaglyphWebGLRenderer.js'
 ]
 
 CANVAS_FILES = [
@@ -277,6 +279,7 @@ WEBGL_FILES = [
 'materials/ParticleBasicMaterial.js',
 'materials/ShadowVolumeDynamicMaterial.js',
 'materials/Texture.js',
+'objects/Particle.js',
 'objects/ParticleSystem.js',
 'objects/Line.js',
 'objects/Mesh.js',
@@ -321,8 +324,8 @@ def compress(text):
 		handle.write(text)
 
 	out_tuple = tempfile.mkstemp()
-	# os.system("java -jar yuicompressor-2.4.2.jar %s --type js -o %s --charset utf-8 -v" % (in_tuple[1], out_tuple[1]))
-	os.system("java -jar compiler.jar --language_in=ECMASCRIPT5 --js %s --js_output_file %s" % (in_tuple[1], out_tuple[1]))
+
+	os.system("java -jar compiler/compiler.jar --language_in=ECMASCRIPT5_STRICT --js %s --js_output_file %s" % (in_tuple[1], out_tuple[1]))
 
 	with os.fdopen(out_tuple[0], 'r') as handle:
 		compressed = handle.read()
@@ -373,7 +376,7 @@ def buildLib(files, debug, unminified, filename):
 
 	if not unminified:
 		text = compress(text)
-	
+
 	output(addHeader(text, filename), folder + filename)
 
 

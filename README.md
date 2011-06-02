@@ -38,7 +38,6 @@ More? [#three.js on irc.freenode.net](http://webchat.freenode.net/?channels=thre
 [![materials_cubemap_escher](http://mrdoob.github.com/three.js/assets/examples/17_materials_cubemap_escher.png)](http://mrdoob.github.com/three.js/examples/webgl_materials_cubemap_escher.html)
 [![materials_cubemap](http://mrdoob.github.com/three.js/assets/examples/14_materials_cubemap.png)](http://mrdoob.github.com/three.js/examples/webgl_materials_cubemap.html)
 [![materials_gl](http://mrdoob.github.com/three.js/assets/examples/20_materials_gl.png)](http://mrdoob.github.com/three.js/examples/webgl_materials.html)
-[![materials_shaders](http://mrdoob.github.com/three.js/assets/examples/23_materials_shaders.png)](http://mrdoob.github.com/three.js/examples/webgl_materials_shaders.html)
 [![large_mesh](http://mrdoob.github.com/three.js/assets/examples/12_large_mesh.png)](http://mrdoob.github.com/three.js/examples/webgl_geometry_large_mesh.html)
 
 
@@ -60,13 +59,13 @@ More? [#three.js on irc.freenode.net](http://webchat.freenode.net/?channels=thre
 [![particles_sprites](http://mrdoob.github.com/three.js/assets/examples/26_particles_sprites.png)](http://mrdoob.github.com/three.js/examples/canvas_particles_sprites.html)
 [![particles_random](http://mrdoob.github.com/three.js/assets/examples/02_random.png)](http://mrdoob.github.com/three.js/examples/canvas_particles_random.html)
 [![particles_wave](http://mrdoob.github.com/three.js/assets/examples/01_waves.png)](http://mrdoob.github.com/three.js/examples/canvas_particles_waves.html)
-[![particles_floor](http://mrdoob.github.com/three.js/assets/examples/00_floor.png)](http://mrdoob.github.com/three.js/examples/canvas_particles_floor.html)
 
 
 ### Featured projects ###
 
-[![ROME](http://mrdoob.github.com/three.js/assets/projects/17_rome.png)](http://ro.me)
-[![Globe](http://mrdoob.github.com/three.js/assets/projects/16_globe.png)](http://data-arts.appspot.com/globe)
+[![Mission Control](http://mrdoob.github.com/three.js/assets/projects/18_missioncontrol.png)](http://superfad.com/missioncontrol/)
+[![ROME](http://mrdoob.github.com/three.js/assets/projects/17_rome.png)](http://ro.me/)
+[![Globe](http://mrdoob.github.com/three.js/assets/projects/16_globe.png)](http://data-arts.appspot.com/globe/)
 [![Photoparticles](http://mrdoob.github.com/three.js/assets/projects/15_photoparticles.png)](http://lab.aerotwist.com/webgl/photoparticles/)
 [![Plumegraph](http://mrdoob.github.com/three.js/assets/projects/14_plumegraph.png)](http://plumegraph.org/)
 [![HelloRacer](http://mrdoob.github.com/three.js/assets/projects/13_helloracer.png)](http://helloracer.com/webgl/)
@@ -75,12 +74,6 @@ More? [#three.js on irc.freenode.net](http://webchat.freenode.net/?channels=thre
 [![Voxels](http://mrdoob.github.com/three.js/assets/projects/10_voxels.png)](http://mrdoob.com/projects/voxels/)
 [![The Wilderness Downtown](http://mrdoob.github.com/three.js/assets/projects/09_arcadefire.png)](http://thewildernessdowntown.com/)
 [![Or so they say...](http://mrdoob.github.com/three.js/assets/projects/07_orsotheysay.png)](http://xplsv.com/prods/demos/xplsv_orsotheysay/)
-[![Failure](http://mrdoob.github.com/three.js/assets/projects/05_failure.png)](http://www.is-real.net/experiments/three/failure/)
-[![Space Cannon 3D](http://mrdoob.github.com/three.js/assets/projects/02_spacecannon.png)](http://labs.brian-stoner.com/spacecannon/)
-[![Alocasia](http://mrdoob.github.com/three.js/assets/projects/04_alocasia.png)](http://arithmetric.com/projects/alocasia/)
-[![DDD](http://mrdoob.github.com/three.js/assets/projects/01_ddd.png)](http://the389.com/works/three/)
-[![jsflowfield4d](http://mrdoob.github.com/three.js/assets/projects/00_jsflowfield4d.png)](http://test.sjeiti.com/jsflowfield4d/)
-[![spikeball](http://mrdoob.github.com/three.js/assets/projects/03_spikeball.png)](http://kile.stravaganza.org/lab/js/spikeball/)
 
 
 ### Usage ###
@@ -141,14 +134,20 @@ This code creates a camera, then creates a scene, adds a cube on it, creates a &
 
 ### Change Log ###
 
-2011 05 21 - **r41/ROME** (264.801 KB, gzip: 64.599 KB)
+2011 05 31 - **r41/ROME** (265.317 KB, gzip: 64.849 KB)
 
-(Up to this point, some [rome](http://ro.me) specific features have managed to get included in the lib. The aim is to clean this up in next revisions.)
+(Up to this point, some [rome](http://ro.me) specific features managed to get in the lib. The aim is to clean this up in next revisions.)
 
 * Improved Blender Object and Scene exporters. ([alteredq](http://github.com/alteredq))
 * Fixes on WebGL attributes. ([alteredq](http://github.com/alteredq) and [empaempa](http://github.com/empaempa))
 * Reduced overall memory footprint. ([mrdoob](http://github.com/mrdoob))
-* Added Face4 support to CollisionSystem. ([NINE78](http://github.com/NINE78))
+* Added `Face4` support to `CollisionSystem`. ([NINE78](http://github.com/NINE78))
+* Made Blender exporter work on 2.57. ([remoe](https://github.com/remoe))
+* Added `Particle` support to `Ray`. ([mrdoob](http://github.com/mrdoob) and [jaycrossler](https://github.com/jaycrossler))
+* Improved `Ray.intersectObject` performance by checking boundingSphere first. ([mrdoob](http://github.com/mrdoob))
+* Added `TrackballCamera. ([egraether](https://github.com/egraether))
+* Added `repeat` and `offset` properties to `Texture`. ([mrdoob](http://github.com/mrdoob) and [alteredq](http://github.com/alteredq))
+* Cleaned up `Vector2`, `Vector3` and `Vector4`. ([egraether](https://github.com/egraether))
 
 
 2011 04 24 - **r40** (263.774 KB, gzip: 64.320 KB)

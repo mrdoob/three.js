@@ -30,8 +30,11 @@ THREE.Camera.prototype.supr = THREE.Object3D.prototype;
 THREE.Camera.prototype.translate = function ( distance, axis ) {
 
 	this.matrix.rotateAxis( axis );
-	this.position.addSelf( axis.multiplyScalar( distance ) );
-	this.target.position.addSelf( axis.multiplyScalar( distance ) );
+
+	axis.multiplyScalar( distance )
+
+	this.position.addSelf( axis );
+	this.target.position.addSelf( axis );
 
 };
 

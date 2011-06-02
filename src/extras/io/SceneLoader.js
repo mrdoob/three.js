@@ -7,7 +7,7 @@ THREE.SceneLoader = function () {
 	this.onLoadStart = function () {};
 	this.onLoadProgress = function() {};
 	this.onLoadComplete = function () {};
-		
+
 	this.callbackSync = function () {};
 	this.callbackProgress = function () {};
 
@@ -60,24 +60,24 @@ THREE.SceneLoader.prototype = {
 			};
 
 			// find out if there are some colliders
-			
+
 			var hasColliders = false;
-			
+
 			for( dd in data.objects ) {
-				
+
 				o = data.objects[ dd ];
 
 				if ( o.meshCollider )  {
-					
+
 					hasColliders = true;
 					break;
 
 				}
-				
+
 			}
-			
+
 			if ( hasColliders ) {
-			
+
 				result.scene.collisions = new THREE.CollisionSystem();
 
 			}
