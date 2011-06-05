@@ -1,5 +1,6 @@
 /**
  * @author zz85 / http://www.lab4games.net/zz85/blog
+ * @author alteredq / http://alteredqualia.com/
  *
  * For creating 3D text geometry in three.js
  * 
@@ -28,19 +29,25 @@ THREE.Text = function ( text, parameters ) {
 	var size = parameters.size !== undefined ? parameters.size : 100;
 	var height = parameters.height !== undefined ? parameters.height : 50;
 	var curveSegments = parameters.curveSegments !== undefined ? parameters.curveSegments: 4;
+	
 	var font = parameters.font !== undefined ? parameters.font : "helvetiker";
+	var weight = parameters.weight !== undefined ? parameters.weight : "normal";
+	var style = parameters.style !== undefined ? parameters.style : "normal";
 
 	THREE.FontUtils.size = size;
 	THREE.FontUtils.divisions = curveSegments;
+	THREE.FontUtils.face = font;
+	THREE.FontUtils.weight = weight;
+	THREE.FontUtils.style = style;
 
 	// Get a Font data json object
 
 	var data = THREE.FontUtils.drawText( text );
 	//console.log( "data", data );
 
-	vertices = data.points;
-	faces = data.faces;
-	contour = data.contour;
+	var vertices = data.points;
+	var faces = data.faces;
+	var contour = data.contour;
 
 	var scope = this;
 
@@ -125,15 +132,15 @@ THREE.Text = function ( text, parameters ) {
 
 	}
 
-	function f3( a, b, c) {
+	function f3( a, b, c ) {
 
-		scope.faces.push( new THREE.Face3( a, b, c) );
+		scope.faces.push( new THREE.Face3( a, b, c ) );
 
 	}
 
-	function f4( a, b, c, d) {
+	function f4( a, b, c, d ) {
 
-		scope.faces.push( new THREE.Face4( a, b, c, d) );
+		scope.faces.push( new THREE.Face4( a, b, c, d ) );
 
 	}
 
@@ -215,7 +222,8 @@ THREE.FontUtils = {
 
 		}
 
-		holes = [];
+		var firstIndex,
+			holes = [];
 
 		while ( endPt < all.length ) {
 
@@ -258,15 +266,18 @@ THREE.FontUtils = {
 		// http://en.wikipedia.org/wiki/Closest_pair_of_points
 		// http://stackoverflow.com/questions/1602164/shortest-distance-between-points-algorithm
 
-		var verts = [];
+		var d, nextHoleVert, prevHoleVert,
+			nextShapeVert, prevShapeVert,
+			verts = [];
 
 		for ( var shapeId in isolatedShapes ) {
 
 			var shapeGroup = isolatedShapes[ shapeId ];
-			shape = shapeGroup.shape;
 			holes = shapeGroup.holes;
 
 			for ( var h in holes ) {
+
+				shape = shapeGroup.shape;
 
 				// we slice to each hole when neccessary
 
@@ -353,12 +364,13 @@ THREE.FontUtils = {
 		// Now we push the "cutted" vertices back to the triangulated indices.
 		//console.log("we have verts.length",verts.length);
 
-		var j;
-		for ( var v = 0; v < verts.length / 3; v++ ) {
+		var v, k, j;
+
+		for ( v = 0; v < verts.length / 3; v++ ) {
 
 			var face = [];
 
-			for ( var k = 0; k < 3; k++ ) {
+			for ( k = 0; k < 3; k++ ) {
 
 				for ( j = 0; j < points.length; j++ ) {
 
@@ -493,7 +505,9 @@ THREE.FontUtils = {
 
 	extractGlyphPoints : function( pts, c, face, scale, offset ) {
 
-		var i, cpx, cpy, outline, action, length,
+		var i, x, y,
+			cpx, cpy, cpx0, cpy0, cpx1, cpy1,
+			outline, action, length,
 			glyph = face.glyphs[ c ] || face.glyphs[ ctxt.options.fallbackCharacter ];
 	
 		if ( !glyph ) return;
