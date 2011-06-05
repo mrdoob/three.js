@@ -2,7 +2,16 @@
  * @author zz85 / http://www.lab4games.net/zz85/blog
  *
  * For creating 3D text geometry in three.js
- * 
+ *
+ * Text = 3D Text
+ *
+ * parameters = {
+ *  size: <float> size of the text
+ *  height: <float> thickness to extrude text,
+ *  curveSegments: <int> number of points on the curves,
+ *  font: <string> font name,
+ *  }
+ *  
  * It utilizes techniques used in
  * 
  * 	typeface.js and canvastext
@@ -18,22 +27,30 @@
  *
  */
  
-
-
-
 THREE.Text = function (text, parameters) {
 	THREE.Geometry.call( this );
 	
-	parameters = parameters || {};
+	this.parameters = parameters || {};
+	this.set(text);
 
+};
+
+THREE.Text.prototype = new THREE.Geometry();
+THREE.Text.prototype.constructor = THREE.Text;
+
+THREE.Text.prototype.set = function (text, parameters) {
+	this.text = text;
+	var parameters = parameters || this.parameters;
+	
 	var size = parameters.size !== undefined ? parameters.size : 100;
 	var height = parameters.height !== undefined ? parameters.height : 50;
 	var curveSegments = parameters.curveSegments !== undefined ? parameters.curveSegments: 4;
 	var font = parameters.font !== undefined ? parameters.font : "helvetiker";
-    
-
-    THREE.FontUtils.size = size;
+	
+	THREE.FontUtils.size = size;
     THREE.FontUtils.divisions = curveSegments;
+	THREE.FontUtils.face = font;
+	
     
     // Get a Font data json object
     var data = THREE.FontUtils.drawText(text);
@@ -45,7 +62,13 @@ THREE.Text = function (text, parameters) {
     contour = data.contour;
     
     var scope = this;
-    
+
+	scope.vertices = [];
+	scope.faces = [];
+	
+	
+	//console.log(this);
+	
     var vlen = 0;
     for (var i in vertices) {
         var vert = vertices[i];
@@ -57,8 +80,9 @@ THREE.Text = function (text, parameters) {
         var vert = vertices[i];
         v(vert.x, vert.y, height);
     }
-
-    // Bottom faces
+	
+	
+	// Bottom faces
     for (var i in faces) {
         var face = faces[i];
         f3(face[2], face[1], face[0]);
@@ -70,6 +94,7 @@ THREE.Text = function (text, parameters) {
         f3(face[0]+vlen, face[1]+vlen, face[2]+vlen);
     }
     
+	
     var i = contour.length;
     
     var lastV;
@@ -98,8 +123,6 @@ THREE.Text = function (text, parameters) {
         
     }
 
-
-	
     
     // UVs to be added
 
@@ -124,13 +147,9 @@ THREE.Text = function (text, parameters) {
 		scope.faces.push( new THREE.Face4( a, b, c, d) );
 
 	}
-
+	
+	
 };
-
-THREE.Text.prototype = new THREE.Geometry();
-THREE.Text.prototype.constructor = THREE.Text;
-
-
 
 THREE.FontUtils = {
 
@@ -165,8 +184,10 @@ THREE.FontUtils = {
 	extractPoints : function(points) {
 	    // Quick Exit
 	    if (points.length <3) {
-			console.log("not valid polygon");
-			return;
+			// throw new exception("")
+			// console.log("not valid polygon");
+			// return null;
+			throw "not valid polygon";
 		}
     
 		// Try to split shapes and holes.
@@ -279,9 +300,10 @@ THREE.FontUtils = {
 	            verts.push(hole[prevHoleVert]);
 	            verts.push(shape[shapeIndex]);
                             
-	            shapeGroup.shape = tmpShape1.concat(tmpHole1).concat(tmpHole2).concat(tmpShape2);
+	            shape = tmpShape1.concat(tmpHole1).concat(tmpHole2).concat(tmpShape2);
 
 	        }
+			shapeGroup.shape = shape;
 	    }
 	
 	    points = [];
@@ -305,24 +327,30 @@ THREE.FontUtils = {
    
    
 	   // Now we push the "cutted" vertics back to the triangulated indics.
-	   //console.log("we have verts.length",verts.length);
+	   //console.log("we have verts.length",verts.length,verts);
 	   var j;
 	   for (var v=0; v<verts.length/3; v++) {        
         
 	        var face = [];
         
-	        for (var k=0;k<3;k++) {            
-	            for (j=0; j<points.length; j++) {
+	        for (var k=0;k<3;k++) {
+				var found = false;
+	            for (j=0; j<points.length && !found; j++) {
                 
 	                var l =v*3+k;
 	                if (points[j].equals(verts[l])) {
 	                    face.push(j);
-	                    break;
+	                    found = true;
 	                }
                 
 	            }
+				// you would not wish to reach this point of code, because thing else is then wrong.
+				if (!found) {
+					points.push(verts[l]);
+					face.push(points.length-1);
+				}
 	        }
-        
+	
 	        triangulatedVertices.push(face);
 	   }
    
@@ -544,7 +572,7 @@ http://www.lab4games.net/zz85/blog
                 /* if we loop, it is probably a non-simple polygon */
                 if (0 >= (count--)){
                     //** Triangulate: ERROR - probable bad polygon!
-                    console.log("Warning, unable to triangulate polygon!");
+                    throw ("Warning, unable to triangulate polygon!");
                     return null;
                 }
             
