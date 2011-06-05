@@ -1,0 +1,488 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>three.js canvas/webgl - geometry - text</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
+		<style type="text/css">
+			body {
+				font-family: Monospace;
+				background-color: #000000;
+                /*f0f0f0*/
+				margin: 0px;
+				overflow: hidden;
+			}
+			
+			#info {
+				position: absolute;
+				top: 10px; 
+				width: 100%;
+				padding: 5px;
+				text-align: center;
+				color: white;
+			}
+			
+		</style>
+	</head>
+	<body>
+			<div id="info">
+				Drag to spin the text
+				<br/>Simple Dynamic 3D Text WebGL Example by <a href="http://www.lab4games.net/zz85/blog">zz85</a>
+			</div>
+			
+			
+<!--
+        <script type="text/javascript" src="http://mrdoob.github.com/three.js/build/Three.js"></script>
+
+-->
+		<script type="text/javascript" src="../build/Three.js"></script>
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
+		<script type="text/javascript" src="js/Stats.js"></script>
+       
+     
+		<link href="js/gui/gui.css" media="screen" rel="stylesheet" type="text/css" />
+		<script type="text/javascript" src="js/gui/gui.min.js"></script>
+		 <script type="text/javascript" src="../src/extras/geometries/Text.js"></script> 
+            <!--  
+        
+         <script type="text/javascript" src="helvetiker-normal-normal.js"></script>
+         http://canvas-text.googlecode.com/svn-history/r41/trunk/faces/dejavu_serif-normal-normal.js
+  optimer-normal-normal.js
+  gentilis-normal-normal
+  http://canvas-text.googlecode.com/svn-history/r41/trunk/faces/helvetiker-normal-normal.js
+	<script type="text/javascript" src="http://canvas-text.googlecode.com/svn-history/r41/trunk/faces/optimer-normal-normal.js"></script>
+
+	
+  -->
+        	<script type="text/javascript" src="js/helvetiker-normal-normal.js"></script>
+		<script type="text/javascript">
+
+			var container, stats;
+
+			var camera, scene, renderer;
+
+			var text, plane;
+
+			var targetRotation = 0;
+			var targetRotationOnMouseDown = 0;
+
+			var mouseX = 0;
+			var mouseXOnMouseDown = 0;
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+			var mouseY = 0;
+			var materials;
+			
+			init();
+			animate();
+
+			function init() {
+                //ThreeFont.face = 'optimer';
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.Camera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
+				
+				var originalCamPos = new THREE.Vector3(0,150,500);
+				camera.position = originalCamPos;
+				//camera.position.z = 500;
+				//camera.target.position.y = 150;
+
+				scene = new THREE.Scene();
+
+				// text
+
+			
+
+				
+                
+                
+				// Materials
+				
+				var materials = [];
+
+				for ( var i = 0; i < 6; i ++ ) {
+
+					materials.push( [ new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff , wireframe:false} ) ] );
+
+				}
+
+				var generatedTexture = new THREE.Texture( generateTexture() );
+				generatedTexture.needsUpdate = true;
+ 
+				//var 
+				materials = [];
+				materials.push( new THREE.MeshLambertMaterial( { map: generatedTexture } ) );
+				materials.push( new THREE.MeshLambertMaterial( { color: 0xdddddd, shading: THREE.FlatShading } ) );
+				materials.push( new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.FlatShading } ) );
+				materials.push( new THREE.MeshNormalMaterial( ) );
+				materials.push( new THREE.MeshBasicMaterial( { color: 0x665500, blending: THREE.AdditiveBlending } ) );
+				materials.push( new THREE.MeshBasicMaterial( { color: 0xff0000, blending: THREE.SubtractiveBlending } ) );
+ 
+				materials.push( new THREE.MeshLambertMaterial( { color: 0xdddddd, shading: THREE.SmoothShading } ) );
+				materials.push( new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.SmoothShading } ) );
+				materials.push( new THREE.MeshNormalMaterial( { shading: THREE.SmoothShading } ) );
+				materials.push( new THREE.MeshBasicMaterial( { color: 0xffaa00, wireframe: true } ) );
+ 
+				materials.push( new THREE.MeshDepthMaterial() );
+				materials.push( new THREE.MeshBasicMaterial( { map: generatedTexture } ) );
+                
+                
+			function generateTexture() {
+ 
+				var canvas = document.createElement( 'canvas' );
+				canvas.width = 256;
+				canvas.height = 256;
+ 
+				var context = canvas.getContext( '2d' );
+				var image = context.getImageData( 0, 0, 256, 256 );
+ 
+				var x = 0, y = 0;
+ 
+				for ( var i = 0, j = 0, l = image.data.length; i < l; i += 4, j ++ ) {
+ 
+					x = j % 256;
+					y = x == 0 ? y + 1 : y;
+ 
+					image.data[ i + 2 ] = Math.floor( x ^ y );
+					image.data[ i + 3 ] = 255;
+ 
+				}
+ 
+				context.putImageData( image, 0, 0 );
+ 
+				return canvas;
+ 
+			}
+ 
+                var theText = "B"; //Hello three.js :)
+                 var hash = document.location.hash.substr(1);
+                  if (hash.length === 0) {
+                    
+                  } else {
+                   theText = hash;
+                  }
+                
+				//var
+				   text3d = new THREE.Text(theText, {
+						size: 80, 
+						height:40,
+						curveSegments:2,
+						font: "helvetiker"
+					});
+					
+                //MEsh Normal MeshBasic
+                //MeshPhongMaterial MeshLambertMaterial MeshPhongMaterial
+                // new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff, wireframe:false} )
+				//text = new THREE.Mesh( text3d, materials[6] );  materials[3]
+                //new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff, wireframe:false } )
+                
+                // Math.random() *
+//0xf0f0f0
+	
+	/*
+	*  color: <hex>,
+	 *  ambient: <hex>,
+	 *  specular: <hex>,
+	 *  shininess: <float>,2
+	 *  opacity: <float>,
+	*/
+                var textMaterial = new THREE.MeshPhongMaterial( { color: 0xa0a0a0, wireframe:false, opacity:1,shininess:100,ambient:0xff0000 , specular:0x00ff00,reflectivity:100});
+				textMaterial = materials[9];
+
+                text = new THREE.Mesh( text3d, textMaterial);
+                
+                text.overdraw = true;
+                text.doubleSided = false;
+                text.position.y = 15;
+                
+                text.position.z = 0;
+                text.rotation.x = 0*Math.PI;
+                text.rotation.y = Math.PI*2;
+                
+				text.overdraw = false;
+				scene.addObject( text );
+                //scene.fog = new THREE.Fog( 0xffffff, 1, 10000 );
+                
+                
+				ambientLight = new THREE.AmbientLight( 0xffffff ) ;
+				scene.addLight(ambientLight );
+                
+                pointLight = new THREE.PointLight( 0xffffff, 1 );
+ 
+                pointLight.position.x = 0;
+                pointLight.position.y = 150;
+                pointLight.position.z = 450;
+				
+                
+				scene.addLight( pointLight );
+                //Math.random() *
+                
+                 directionalLight = new THREE.DirectionalLight(  0xffffff );
+				/*
+                directionalLight.position.x = Math.random() - 0.5;
+				directionalLight.position.y = Math.random() - 0.5;
+				directionalLight.position.z = Math.random() - 0.5;
+				*/
+                directionalLight.position.x = 50;
+                directionalLight.position.y = 50;
+                directionalLight.position.z = 50;
+                
+                directionalLight.position.normalize();
+                directionalLight.lookAt(text);
+				directionalLight.castShadow = true;
+				//intensity, distance, castShadow
+                
+				scene.addLight( directionalLight );
+                
+                //0x202020
+
+				// Plane
+                // ,reflectivity:1,refractionRatio:0
+                //, shading:THREE.FlatShading
+                //new THREE.MeshBasicMaterial( { color: 0xe0e0e0, wireframe:false} )
+//new THREE.MeshPhongMaterial( { color: 0xf0f0f0, wireframe:false,shininess:100})
+                
+				plane = new THREE.Mesh( new THREE.Plane( 800, 800 ), textMaterial );
+				plane.rotation.x = - 90 * ( Math.PI / 180 );
+                plane.position.x = 0;
+				plane.overdraw = true;
+                
+                
+                
+                
+				scene.addObject( plane );
+
+                renderer = new THREE.WebGLRenderer({antialias:true});
+    			renderer.setSize( window.innerWidth, window.innerHeight );
+
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild( stats.domElement );
+
+
+				//mousedown
+				document.addEventListener( 'mousemove', onDocumentMouseDown, false );
+				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
+				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+				
+				
+				var effectController  = {
+
+					focus: 		1.0,
+					aperture:	0.025,
+					maxblur:	1.0,
+					ambientLightColor: 0.5,
+					directionLightX: 1,
+					directionLightY: 1,
+					directionLightZ: 1,
+					pointLightX: 0,
+					pointLightY: 1,
+					pointLightZ: 1,
+					pointLightDistance: 0,
+					pointLightIntensity:-1,
+					text: "Hello World!",
+					wireframe: false
+
+				};
+				
+				var textChanger = function() {
+					console.log(effectController.text);
+	
+					/*
+					text3d.set(effectController.text);
+					
+					text3d.__dirtyVertices = true;
+					text3d.__dirtyNormals = true;
+					text3d.__dirtyColors = true;
+					text3d.__dirtyElements = true;
+					text3d.__dirtyMorphTargets = true;
+					text3d.__dirtyNormals = true;
+					text3d.__dirtyTangents = true;
+					text3d.__dirtyUvs = true;
+					text3d.__dirtyVertices = true;
+					renderer.clear();
+					*/
+					
+					scene.removeChild(text);
+					 text3d = new THREE.Text(effectController.text, {
+							size: 80, 
+							height:40,
+							curveSegments:2,
+							font: "helvetiker"
+						});
+					text = new THREE.Mesh( text3d, textMaterial)
+					scene.addChild(text);
+					
+				}
+
+				var matChanger = function( ) {
+
+					//postprocessing.bokeh_uniforms["focus"].value = effectController.focus;
+					//postprocessing.bokeh_uniforms["aperture"].value = effectController.aperture;
+					//postprocessing.bokeh_uniforms["maxblur"].value = effectController.maxblur;\
+					
+					
+					ambientLight.color.setHex(effectController.ambientLightColor*0xffffff);
+					directionalLight.position.x = 50 * effectController.directionLightX;
+	                directionalLight.position.y = 50 * effectController.directionLightY;
+	                directionalLight.position.z = 50 * effectController.directionLightZ;
+					pointLight.position.x = 500 * effectController.pointLightX;
+	                pointLight.position.y = 500 * effectController.pointLightY;
+	                pointLight.position.z = 500 * effectController.pointLightZ;
+					pointLight.distance = effectController.pointLightDistance ;
+					pointLight.intensity = effectController.pointLightIntensity ;
+				};
+
+				var gui = new GUI();
+				//gui.add( effectController, "focus", 0.0, 3.0, 0.025 ).onChange( matChanger );
+				//gui.add( effectController, "aperture", 0.001, 0.2, 0.001 ).onChange( matChanger );
+				//gui.add( effectController, "maxblur", 0.0, 3.0, 0.025 ).onChange( matChanger );
+				gui.add( effectController, "text").onChange( textChanger );
+				gui.add( effectController, "wireframe");
+				gui.add( effectController, "ambientLightColor", 0.0, 1.0, 0.025 ).onChange( matChanger );
+				gui.add( effectController, "directionLightX", -1, 1.0, 0.025 ).onChange( matChanger );
+				gui.add( effectController, "directionLightY", -1, 1.0, 0.025 ).onChange( matChanger );
+				gui.add( effectController, "directionLightZ", -1, 1.0, 0.025 ).onChange( matChanger );
+				gui.add( effectController, "pointLightX", -1, 1.0, 0.025 ).onChange( matChanger );
+				gui.add( effectController, "pointLightY", -1, 1.0, 0.025 ).onChange( matChanger );
+				gui.add( effectController, "pointLightZ", -1, 1.0, 0.025 ).onChange( matChanger );
+				gui.add( effectController, "pointLightDistance", -1, 1, 0.01 ).onChange( matChanger );
+				gui.add( effectController, "pointLightIntensity", -1, 1.0, 0.025 ).onChange( matChanger );
+				gui.show();
+				matChanger();
+			}
+
+			//
+
+			function onDocumentMouseDown( event ) {
+
+				event.preventDefault();
+
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.addEventListener( 'mouseup', onDocumentMouseUp, false );
+				document.addEventListener( 'mouseout', onDocumentMouseOut, false );
+
+				mouseXOnMouseDown = event.clientX - windowHalfX;
+				targetRotationOnMouseDown = targetRotation;
+			}
+
+			function onDocumentMouseMove( event ) {
+
+				mouseX = event.clientX - windowHalfX;
+				mouseY = event.clientY - windowHalfY;
+
+				targetRotation = targetRotationOnMouseDown + ( mouseX - mouseXOnMouseDown ) * 0.02;
+			}
+
+			function onDocumentMouseUp( event ) {
+
+				document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
+				document.removeEventListener( 'mouseout', onDocumentMouseOut, false );
+			}
+
+			function onDocumentMouseOut( event ) {
+
+				document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
+				document.removeEventListener( 'mouseout', onDocumentMouseOut, false );
+			}
+
+			function onDocumentTouchStart( event ) {
+
+				if ( event.touches.length == 1 ) {
+
+					event.preventDefault();
+
+					mouseXOnMouseDown = event.touches[ 0 ].pageX - windowHalfX;
+					targetRotationOnMouseDown = targetRotation;
+
+				}
+			}
+
+			function onDocumentTouchMove( event ) {
+
+				if ( event.touches.length == 1 ) {
+
+					event.preventDefault();
+
+					mouseX = event.touches[ 0 ].pageX - windowHalfX;
+					targetRotation = targetRotationOnMouseDown + ( mouseX - mouseXOnMouseDown ) * 0.05;
+
+				}
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+				
+				//console.log("targetRotation",targetRotation,text.rotation.y );
+
+				//plane.rotation.z = 
+				//text.rotation.y += ( targetRotation - text.rotation.y ) * 0.05;
+				
+				//camera.position.x += ( mouseX - camera.position.x ) * 0.05;
+				//camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
+				//camera.position.y += ( - mouseY + 200 - camera.position.y ) * .05;
+				//camera.position.z;
+				
+				//camera.useTarget = false;
+				//camera.rotation.z += ( targetRotation - camera.rotation.z ) * 0.05;
+				//camera.rotation.y += ( targetRotation - camera.rotation.y ) * 0.05;
+				//renderer.clear();
+				
+				camera.position.x = Math.cos(
+				(mouseX - windowHalfX)/windowHalfX * Math.PI + Math.PI/2
+				) * 500 + camera.target.position.x;
+				
+				camera.position.z = -Math.sin(
+				(mouseX - windowHalfX)/windowHalfX * Math.PI + Math.PI/2
+				) * 500;
+				
+				// + camera.target.position.z + Math.sin(
+				//(mouseY - windowHalfY)/windowHalfY * Math.PI + Math.PI/2
+				//) * 500
+				
+				/*
+				camera.position.y = Math.cos(
+				(mouseY - windowHalfY)/windowHalfY * Math.PI + Math.PI/2
+				) * 500 + camera.target.position.y;
+				*/
+				camera.position.y = (windowHalfY - mouseY)/windowHalfY *200 + camera.target.position.y;
+				//	
+				
+				renderer.render( scene, camera );
+				
+				// Camera movement
+				// Camera rotation
+				// Text angle
+				// Text rotation
+				// Keydowns
+				// Settings
+				// Materials
+			}
+
+		</script>
+        <script>
+        var _gaq=[["_setAccount","UA-7549263-1"],["_trackPageview"]]; 
+        (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];g.async=1;
+        g.src=("https:"==location.protocol?"//ssl":"//www")+".google-analytics.com/ga.js";
+        s.parentNode.insertBefore(g,s)}(document,"script"));
+        </script>
+
+	</body>
+</html>
