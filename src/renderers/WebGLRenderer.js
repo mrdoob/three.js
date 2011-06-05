@@ -826,7 +826,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		obj_skinVerticesB = geometry.skinVerticesB,
 		obj_skinIndices = geometry.skinIndices,
 		obj_skinWeights = geometry.skinWeights,
-		obj_edgeFaces = object instanceof THREE.ShadowVolume ? geometry.edgeFaces : undefined;
+		obj_edgeFaces = object instanceof THREE.ShadowVolume ? geometry.edgeFaces : undefined,
 
 		morphTargets = geometry.morphTargets;
 
@@ -4343,9 +4343,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		//
 
-		program = _gl.createProgram(),
+		program = _gl.createProgram();
 
-		prefix_fragment = [
+		var prefix_fragment = [
 
 			"#ifdef GL_ES",
 			"precision highp float;",
@@ -4366,9 +4366,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 			"uniform vec3 cameraPosition;",
 			""
 
-		].join("\n"),
+		].join("\n");
 
-		prefix_vertex = [
+		var prefix_vertex = [
 			
 			_supportsVertexTextures ? "#define VERTEX_TEXTURES" : "",
 
