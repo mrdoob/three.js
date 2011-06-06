@@ -344,10 +344,8 @@ THREE.FontUtils = {
 	                }
                 
 	            }
-				
+				// you would not wish to reach this point of code, because thing else is then wrong.
 				if (!found) {
-					// you would not wish to reach this point of code, because thing else is then wrong.
-					console.log("warning...");
 					points.push(verts[l]);
 					face.push(points.length-1);
 				}

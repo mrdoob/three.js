@@ -22,6 +22,7 @@
 		<script type="text/javascript" src="js/Stats.js"></script>
 		      
 		<!-- load the font file from canvas-text -->
+
 		<script type="text/javascript" src="js/helvetiker-normal-normal.js"></script>
         
 
@@ -55,10 +56,10 @@
 				info.style.top = '10px';
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
-				info.innerHTML = 'Drag to spin the text<br/>Simple Dynamic 3D Text Example by <a href="http://www.lab4games.net/zz85/blog">zz85</a>';
+				info.innerHTML = 'Simple Dynamic 3D Text Example by <a href="http://www.lab4games.net/zz85/blog">zz85</a><br/>Drag to spin the text';
 				container.appendChild( info );
 
-				camera = new THREE.Camera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new THREE.Camera( 50, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.y = 150;
 				camera.position.z = 500;
 				camera.target.position.y = 150;
@@ -66,41 +67,49 @@
 				scene = new THREE.Scene();
 
 				// Get text from hash
+
 				var theText = "Hello three.js! :)";
-                 var hash = document.location.hash.substr(1);
-                  if (hash.length === 0) {
-                    
-                  } else {
-                   theText = hash;
-                  }
+				
+				var hash = document.location.hash.substr( 1 );
+				
+				if ( hash.length !== 0 ) {
+                   
+					theText = hash;
+
+				}
                 
-                var text3d = new THREE.Text(theText, {
+                var text3d = new THREE.Text( theText, {
+
 					size: 80, 
-					height:40,
-					curveSegments:2,
+					height: 20,
+					curveSegments: 2,
 					font: "helvetiker"
+
 				});
-             
-                var textMaterial = new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, wireframe:false });
-                text = new THREE.Mesh( text3d, textMaterial);
-                
+
+                var textMaterial = new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, wireframe:false } );
+                text = new THREE.Mesh( text3d, textMaterial );
+
                 text.doubleSided = false;
+
                 text.position.y = 0;
-                text.position.y = 0;
+                text.position.y = 100;
                 text.position.z = 0;
+
                 text.rotation.x = 0;
                 text.rotation.y = Math.PI*2;
 				text.overdraw = true;
-				
+
                 scene.addObject( text );
-             
+
 				// Plane
-				plane = new THREE.Mesh( new THREE.Plane( 800, 800 ), new THREE.MeshBasicMaterial( { color: 0xe0e0e0, wireframe:true}) );
+
+				plane = new THREE.Mesh( new THREE.Plane( 800, 800 ), new THREE.MeshBasicMaterial( { color: 0xe0e0e0, wireframe:true }) );
 				plane.rotation.x = - 90 * ( Math.PI / 180 );
                 plane.position.x = 0;
 				plane.overdraw = true;
-                
-				scene.addObject( plane );
+
+				//scene.addObject( plane );
 
 				renderer = new THREE.CanvasRenderer();
                 renderer.setSize( window.innerWidth, window.innerHeight );
@@ -115,6 +124,7 @@
 				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+
 			}
 
 			//
@@ -129,6 +139,7 @@
 
 				mouseXOnMouseDown = event.clientX - windowHalfX;
 				targetRotationOnMouseDown = targetRotation;
+
 			}
 
 			function onDocumentMouseMove( event ) {
@@ -136,6 +147,7 @@
 				mouseX = event.clientX - windowHalfX;
 
 				targetRotation = targetRotationOnMouseDown + ( mouseX - mouseXOnMouseDown ) * 0.02;
+
 			}
 
 			function onDocumentMouseUp( event ) {
@@ -143,6 +155,7 @@
 				document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
 				document.removeEventListener( 'mouseout', onDocumentMouseOut, false );
+
 			}
 
 			function onDocumentMouseOut( event ) {
@@ -150,6 +163,7 @@
 				document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
 				document.removeEventListener( 'mouseout', onDocumentMouseOut, false );
+
 			}
 
 			function onDocumentTouchStart( event ) {
@@ -162,6 +176,7 @@
 					targetRotationOnMouseDown = targetRotation;
 
 				}
+
 			}
 
 			function onDocumentTouchMove( event ) {
@@ -174,6 +189,7 @@
 					targetRotation = targetRotationOnMouseDown + ( mouseX - mouseXOnMouseDown ) * 0.05;
 
 				}
+
 			}
 
 			//

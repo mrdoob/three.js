@@ -111,7 +111,8 @@ EXTRAS_FILES = [
 'extras/objects/Trident.js',
 'extras/physics/Collisions.js',
 'extras/physics/CollisionUtils.js',
-'extras/renderers/AnaglyphWebGLRenderer.js'
+'extras/renderers/AnaglyphWebGLRenderer.js',
+'extras/renderers/CrosseyedWebGLRenderer.js'
 ]
 
 CANVAS_FILES = [

@@ -11,9 +11,6 @@ THREE.Mesh = function ( geometry, materials ) {
 	this.geometry = geometry;
 	this.materials = materials && materials.length ? materials : [ materials ];
 
-	this.flipSided = false;
-	this.doubleSided = false;
-
 	this.overdraw = false; // TODO: Move to material?
 
 
