@@ -50,10 +50,13 @@
   optimer-normal-normal.js
   gentilis-normal-normal
   http://canvas-text.googlecode.com/svn-history/r41/trunk/faces/helvetiker-normal-normal.js
+http://canvas-text.googlecode.com/svn-history/r41/trunk/faces/dejavu_sans-normal-normal.js
+
+	http://canvas-text.googlecode.com/svn-history/r41/trunk/faces/optimer-normal-normal.js
+	http://canvas-text.googlecode.com/svn-history/r41/trunk/faces/gentilis-normal-normal.js
+  -->
 	<script type="text/javascript" src="http://canvas-text.googlecode.com/svn-history/r41/trunk/faces/optimer-normal-normal.js"></script>
 
-	
-  -->
         	<script type="text/javascript" src="js/helvetiker-normal-normal.js"></script>
 		<script type="text/javascript">
 
@@ -169,8 +172,8 @@
 						size: 80, 
 						height:40,
 						curveSegments:2,
-						font: "helvetiker"
-					});
+						font: "optimer"
+					});//dejavu sans
 					
                 //MEsh Normal MeshBasic
                 //MeshPhongMaterial MeshLambertMaterial MeshPhongMaterial
@@ -189,7 +192,7 @@
 	 *  opacity: <float>,
 	*/
                 var textMaterial = new THREE.MeshPhongMaterial( { color: 0xa0a0a0, wireframe:false, opacity:1,shininess:100,ambient:0xff0000 , specular:0x00ff00,reflectivity:100});
-				textMaterial = materials[9];
+				textMaterial = materials[2];
 
                 text = new THREE.Mesh( text3d, textMaterial);
                 
@@ -285,7 +288,7 @@
 					pointLightZ: 1,
 					pointLightDistance: 0,
 					pointLightIntensity:-1,
-					text: "Hello World!",
+					text: theText,
 					wireframe: false
 
 				};
@@ -306,6 +309,9 @@
 					text3d.__dirtyUvs = true;
 					text3d.__dirtyVertices = true;
 					renderer.clear();
+					
+					text.matrixAutoUpdate = true;
+					text.updateMatrix();
 					*/
 					
 					scene.removeChild(text);
@@ -313,7 +319,7 @@
 							size: 80, 
 							height:40,
 							curveSegments:2,
-							font: "helvetiker"
+							font: "helvetiker" //"helvetiker"
 						});
 					text = new THREE.Mesh( text3d, textMaterial)
 					scene.addChild(text);
@@ -351,7 +357,7 @@
 				gui.add( effectController, "pointLightX", -1, 1.0, 0.025 ).onChange( matChanger );
 				gui.add( effectController, "pointLightY", -1, 1.0, 0.025 ).onChange( matChanger );
 				gui.add( effectController, "pointLightZ", -1, 1.0, 0.025 ).onChange( matChanger );
-				gui.add( effectController, "pointLightDistance", -1, 1, 0.01 ).onChange( matChanger );
+				gui.add( effectController, "pointLightDistance", -1, 1000, 0.5).onChange( matChanger );
 				gui.add( effectController, "pointLightIntensity", -1, 1.0, 0.025 ).onChange( matChanger );
 				gui.show();
 				matChanger();
