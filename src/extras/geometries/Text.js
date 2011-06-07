@@ -181,7 +181,7 @@ THREE.FontUtils = {
 	},
 
 
-	extractPoints : function(points) {
+	extractPoints : function(points, characters) {
 	    // Quick Exit
 	    if (points.length <3) {
 			// throw new exception("")
@@ -191,53 +191,74 @@ THREE.FontUtils = {
 		}
     
 		// Try to split shapes and holes.
-		var all = [], point, shape;
+		var all, point, shape;
     
 	    var isolatedShapes = [];
-	
-	    // Use a quick hashmap for locating duplicates
-		for (var p in points) {
-			point = points[p];
-			all.push(point.x +","+ point.y);
-		}
-	
-	
-	
-		var firstPt = all[0];
-		var endPt = all.slice(1).indexOf(firstPt);
-	
-		if (endPt < all.length) {
-			endPt ++;
-			shape = points.slice(0, endPt);
-		}
-	
-		holes = [];
-    
-		while (endPt < all.length) {
-			firstIndex = endPt+1;
-			firstPt = all[firstIndex];
-			endPt = all.slice(firstIndex+1).indexOf(firstPt) + firstIndex;
-			if (endPt <= firstIndex ) break; 
 		
-			var contours = points.slice(firstIndex, endPt+1);
-		
-			if (this.Triangulate.area(contours)<0) {
-	            isolatedShapes.push({shape: shape, holes: holes});
-				// Save the old shapes, then work on new additional seperated shape
-            
-	            shape = contours;
-	            holes = [];
-            
-			} else {
-	            holes.push(contours);
+		for (var c in characters) {
+			points = characters[c];
+			
+			
+			all = [];
+		    // Use a quick hashmap for locating duplicates
+			for (var p in points) {
+				point = points[p];
+				all.push(point.x +","+ point.y);
 			}
-        
-			endPt++;		
+			
+			var firstPt, endPt, holes;
+			
+			// We check the first loop whether its CW or CCW direction to determine
+			// whether its shapes or holes first
+			endPt = all.slice(1).indexOf(all[0]);
+			var shapesFirst = this.Triangulate.area(points.slice(0, endPt+1))<0;
+			
+			//console.log(points.length, "shapesFirst",shapesFirst);
 		
-		}
+			holes = [];
+			endPt = -1;
     
-	    isolatedShapes.push({shape: shape, holes: holes});
-	
+			while (endPt < all.length) {
+				firstIndex = endPt+1;
+				firstPt = all[firstIndex];
+				endPt = all.slice(firstIndex+1).indexOf(firstPt) + firstIndex;
+				if (endPt <= firstIndex ) break; 
+		
+				var contours = points.slice(firstIndex, endPt+1);
+			
+				if (shapesFirst) {
+					if (this.Triangulate.area(contours)<0) {
+						// we got new isolated shape
+						if (firstIndex>0) {
+			            	isolatedShapes.push({shape: shape, holes: holes});
+						}
+						// Save the old shapes, then work on new additional seperated shape
+            
+			            shape = contours;
+			            holes = [];
+            
+					} else {
+			            holes.push(contours);
+					}
+				} else {
+					if (this.Triangulate.area(contours)<0) {		            
+			            
+						isolatedShapes.push({shape: contours, holes: holes});
+			            holes = [];
+            
+					} else {
+			            holes.push(contours);
+					}
+				}
+				endPt++;
+		
+			}
+    
+			if (shapesFirst) {
+		    	isolatedShapes.push({shape: shape, holes: holes});
+			}
+		}
+		
 		//console.log("isolatedShapes", isolatedShapes);
 	
     
@@ -365,7 +386,7 @@ THREE.FontUtils = {
 	},
 
 	drawText : function(text) {
-	    pts = [];
+	    var characterpts = [], pts = [];
 	
 	    // RenderText
 	    var face = this.getFace(),
@@ -374,17 +395,18 @@ THREE.FontUtils = {
 	        chars = String(text).split(''), 
 	        length = chars.length;
 	    for (i = 0; i < length; i++) {
-	      offset += this.extractGlyphPoints(chars[i], face, scale, offset); 
+	     	ret = this.extractGlyphPoints(chars[i], face, scale, offset); 
+			offset += ret.offset;
+			characterpts.push(ret.points);
+			pts = pts.concat(ret.points);
 	    }
-    
-	    // get the width 
+    	// get the width 
 	    width = offset/2;
 	    for (var p in pts) {
 	        pts[p].x -= width;
 	    }
 	
-	    var extract = this.extractPoints(pts);
-    
+	    var extract = this.extractPoints(pts, characterpts);
 	    extract.contour = pts;
 	    return extract;
     
@@ -439,6 +461,7 @@ THREE.FontUtils = {
 	extractGlyphPoints : function(c, face, scale, offset){
 	      var i, cpx, cpy, outline, action, length,
 	          glyph = face.glyphs[c] || face.glyphs[ctxt.options.fallbackCharacter];
+			var pts = [];
     
 	      if (!glyph) return;
   
@@ -514,7 +537,7 @@ THREE.FontUtils = {
 	          }
 	        }
 	      }
-	      return glyph.ha*scale;
+	      return { offset: glyph.ha*scale, points:pts };
 	    }
 
 

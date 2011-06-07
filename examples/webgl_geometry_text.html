@@ -45,17 +45,17 @@
 		 <script type="text/javascript" src="../src/extras/geometries/Text.js"></script> 
             <!--  
         
-         <script type="text/javascript" src="helvetiker-normal-normal.js"></script>
          http://canvas-text.googlecode.com/svn-history/r41/trunk/faces/dejavu_serif-normal-normal.js
   optimer-normal-normal.js
   gentilis-normal-normal
   http://canvas-text.googlecode.com/svn-history/r41/trunk/faces/helvetiker-normal-normal.js
-http://canvas-text.googlecode.com/svn-history/r41/trunk/faces/dejavu_sans-normal-normal.js
+	http://canvas-text.googlecode.com/svn-history/r41/trunk/faces/dejavu_sans-normal-normal.js
 
 	http://canvas-text.googlecode.com/svn-history/r41/trunk/faces/optimer-normal-normal.js
 	http://canvas-text.googlecode.com/svn-history/r41/trunk/faces/gentilis-normal-normal.js
+	optimer-bold-normal
   -->
-	<script type="text/javascript" src="http://canvas-text.googlecode.com/svn-history/r41/trunk/faces/optimer-normal-normal.js"></script>
+	<script type="text/javascript" src="http://canvas-text.googlecode.com/svn-history/r41/trunk/faces/gentilis-normal-normal.js"></script>
 
         	<script type="text/javascript" src="js/helvetiker-normal-normal.js"></script>
 		<script type="text/javascript">
@@ -94,12 +94,7 @@ http://canvas-text.googlecode.com/svn-history/r41/trunk/faces/dejavu_sans-normal
 
 				scene = new THREE.Scene();
 
-				// text
-
-			
-
-				
-                
+                //THREE.FontUtils.weight = "bold";
                 
 				// Materials
 				
@@ -167,13 +162,15 @@ http://canvas-text.googlecode.com/svn-history/r41/trunk/faces/dejavu_sans-normal
                    theText = hash;
                   }
                 
-				//var
-				   text3d = new THREE.Text(theText, {
+				textParams = {
 						size: 80, 
 						height:40,
 						curveSegments:2,
-						font: "optimer"
-					});//dejavu sans
+						font: "gentilis" //gentilis helvetiker
+					};
+				
+				//var
+				   text3d = new THREE.Text(theText, textParams);//dejavu sans
 					
                 //MEsh Normal MeshBasic
                 //MeshPhongMaterial MeshLambertMaterial MeshPhongMaterial
@@ -315,12 +312,7 @@ http://canvas-text.googlecode.com/svn-history/r41/trunk/faces/dejavu_sans-normal
 					*/
 					
 					scene.removeChild(text);
-					 text3d = new THREE.Text(effectController.text, {
-							size: 80, 
-							height:40,
-							curveSegments:2,
-							font: "helvetiker" //"helvetiker"
-						});
+					 text3d = new THREE.Text(effectController.text, textParams);
 					text = new THREE.Mesh( text3d, textMaterial)
 					scene.addChild(text);
 					
