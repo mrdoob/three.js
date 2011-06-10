@@ -28,7 +28,7 @@
  *
  */
  
-THREE.Text = function ( text, parameters ) {
+THREE.TextGeometry = function ( text, parameters ) {
 
 	THREE.Geometry.call( this );
 	
@@ -37,10 +37,10 @@ THREE.Text = function ( text, parameters ) {
 
 };
 
-THREE.Text.prototype = new THREE.Geometry();
-THREE.Text.prototype.constructor = THREE.Text;
+THREE.TextGeometry.prototype = new THREE.Geometry();
+THREE.TextGeometry.prototype.constructor = THREE.TextGeometry;
 
-THREE.Text.prototype.set = function ( text, parameters ) {
+THREE.TextGeometry.prototype.set = function ( text, parameters ) {
 
 	this.text = text;
 	var parameters = parameters || this.parameters;
@@ -144,13 +144,13 @@ THREE.Text.prototype.set = function ( text, parameters ) {
             if ( vertices[ k ].equals( contour[ i - 1 ] ) ) break;
 
         }
-        
-        f4( j, k, k+vlen, j+vlen );
-        
-    }
+
+		f4( j, k, k+vlen, j+vlen );
+
+	}
 
     
-    // UVs to be added
+	// UVs to be added
 
 	this.computeCentroids();
 	this.computeFaceNormals();
@@ -167,8 +167,8 @@ THREE.Text.prototype.set = function ( text, parameters ) {
 		scope.faces.push( new THREE.Face3( a, b, c) );
 
 	}
-    
-    function f4( a, b, c, d ) {
+
+	function f4( a, b, c, d ) {
 
 		scope.faces.push( new THREE.Face4( a, b, c, d) );
 

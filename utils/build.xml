@@ -27,11 +27,11 @@
     	  </exec>
     </target>
 	
-    <target name="unminified" description="Build debug THREE.js">
+    <target name="minified" description="Build minified THREE.js">
     	<exec executable="${python_dir}python">
     	    <arg value="${build_py}"/>
     	    <arg value="--all"/>
-    	    <arg value="--unminified"/>
+    	    <arg value="--minified"/>
     	  </exec>
     </target>
 </project>
