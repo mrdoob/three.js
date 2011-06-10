@@ -363,24 +363,94 @@ THREE.FontUtils = {
                 
 	            }
                 
+
+				
 	            prevShapeVert = ( shapeIndex - 1 ) >= 0 ? shapeIndex - 1 : shape.length - 1;
 	            nextShapeVert = ( shapeIndex + 1 ) < shape.length ? shapeIndex + 1 : 0;
             
-	            prevHoleVert = ( holeIndex - 1 ) >= 0 ? holeIndex - 1 : hole.length - 1;
-	            nextHoleVert = ( holeIndex + 1 ) < hole.length ? holeIndex + 1 : 0;
-            
+	            prevHoleVert = ( holeIndex - 1 ) >= 0 ? holeIndex - 1 : hole.length - 1; 
+	            nextHoleVert = ( holeIndex + 1 ) < hole.length ? holeIndex + 1 : 0 ;
+	
+	
+				var areaapts = [];
+				areaapts.push( hole[ holeIndex ] );
+	            areaapts.push( shape[ shapeIndex ] );
+	            areaapts.push( shape[ prevShapeVert ] );
+				
+				var areaa = this.Triangulate.area(areaapts);
+				
+            	var areabpts = [];
+	            areabpts.push( hole[ holeIndex ] );
+	            areabpts.push( hole[ prevHoleVert ] );
+	            areabpts.push( shape[ shapeIndex ] );
+				
+				var areab = this.Triangulate.area(areabpts);
+	
+				
+				var shapeOffset =1;
+				var holeOffset = -1;
+				
+				var oldShapeIndex = shapeIndex, oldHoleIndex = holeIndex;
+				shapeIndex += shapeOffset;
+				holeIndex += holeOffset;
+				
+				if (shapeIndex<0) { shapeIndex += shape.length;  }
+				shapeIndex %= shape.length;
+				if (holeIndex<0) { holeIndex += hole.length;  }
+				holeIndex %= shape.length;
+				
+				 prevShapeVert = ( shapeIndex - 1 ) >= 0 ? shapeIndex - 1 : shape.length - 1;
+		         nextShapeVert = ( shapeIndex + 1 ) < shape.length ? shapeIndex + 1 : 0;
+
+	            prevHoleVert = ( holeIndex - 1 ) >= 0 ? holeIndex - 1 : hole.length - 1; 
+	            nextHoleVert = ( holeIndex + 1 ) < hole.length ? holeIndex + 1 : 0 ;
+
+
+				areaapts = [];
+				areaapts.push( hole[ holeIndex ] );
+	            areaapts.push( shape[ shapeIndex ] );
+	            areaapts.push( shape[ prevShapeVert ] );
+
+				var areaa2 = this.Triangulate.area(areaapts);
+
+            	areabpts = [];
+	            areabpts.push( hole[ holeIndex ] );
+	            areabpts.push( hole[ prevHoleVert ] );
+	            areabpts.push( shape[ shapeIndex ] );
+
+				var areab2 = this.Triangulate.area(areabpts);
+				
+				if ( (areaa+areab) > (areaa2+areab2) ) {
+					shapeIndex = oldShapeIndex;
+					holeIndex = oldHoleIndex ;
+					
+					
+					if (shapeIndex<0) { shapeIndex += shape.length;  }
+					shapeIndex %= shape.length;
+					if (holeIndex<0) { holeIndex += hole.length;  }
+					holeIndex %= shape.length;
+					
+					
+					 prevShapeVert = ( shapeIndex - 1 ) >= 0 ? shapeIndex - 1 : shape.length - 1;
+			         nextShapeVert = ( shapeIndex + 1 ) < shape.length ? shapeIndex + 1 : 0;
+
+		            prevHoleVert = ( holeIndex - 1 ) >= 0 ? holeIndex - 1 : hole.length - 1; 
+		            nextHoleVert = ( holeIndex + 1 ) < hole.length ? holeIndex + 1 : 0 ;
+				}
+				
 	            tmpShape1 = shape.slice( 0, shapeIndex );
 	            tmpShape2 = shape.slice( shapeIndex );
 				tmpHole1 = hole.slice( holeIndex );
 				tmpHole2 = hole.slice( 0, holeIndex );
-        
+        		
 	            verts.push( hole[ holeIndex ] );
 	            verts.push( shape[ shapeIndex ] );
 	            verts.push( shape[ prevShapeVert ] );
-            
-	            verts.push( hole[ holeIndex ] );
+				
+			    verts.push( hole[ holeIndex ] );
 	            verts.push( hole[ prevHoleVert ] );
 	            verts.push( shape[ shapeIndex ] );
+			
 
 	            shape = tmpShape1.concat( tmpHole1 ).concat( tmpHole2 ).concat( tmpShape2 );
 
