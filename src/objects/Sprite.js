@@ -14,7 +14,7 @@ THREE.Sprite = function( parameters ) {
 
 	} else if( parameters.map !== undefined ) {
 
-		this.map      = parameters.map instanceof THREE.Texture ? parameters.map : ImageUtils.loadTexture( parameters.map );
+		this.map      = parameters.map instanceof THREE.Texture ? parameters.map : THREE.ImageUtils.loadTexture( parameters.map );
 		this.material = undefined;
 		this.blending = parameters.blending !== undefined ? parameters.blending : THREE.NormalBlending;
 
