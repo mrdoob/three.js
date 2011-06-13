@@ -67,6 +67,4 @@ if ( THREE.WebGLRenderer ) {
 
 	};
 	
-	THREE.CrosseyedWebGLRenderer.prototype.constructor = THREE.CrosseyedWebGLRenderer;
-	
 }
