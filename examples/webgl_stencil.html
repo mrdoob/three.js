@@ -51,7 +51,7 @@
 
 				// world
 
-				var cube = new THREE.Cube( 300, 300, 10 );
+				var cube = new THREE.CubeGeometry( 300, 300, 10 );
 				var material0 = new THREE.MeshPhongMaterial( { color:0xff00ff } );
 				var material1 = new THREE.MeshLambertMaterial( { color:0x00ff00 } );
 				var material2 = new THREE.MeshLambertMaterial( { color:0x0000ff } );
@@ -77,10 +77,10 @@
 
 				// moving objects
 
-				var cube = new THREE.Cube( 40, 40, 40 );
-				var torus = new THREE.Torus( 40, 10 );
-				var sphere = new THREE.Sphere( 40 );
-				var cylinder = new THREE.Cylinder( 10, 10, 20, 40, 0, 0 );
+				var cube = new THREE.CubeGeometry( 40, 40, 40 );
+				var torus = new THREE.TorusGeometry( 40, 10 );
+				var sphere = new THREE.SphereGeometry( 40 );
+				var cylinder = new THREE.CylinderGeometry( 10, 10, 20, 40, 0, 0 );
 				mesh = new THREE.Mesh( torus, material1 );
 				scene.addChild( mesh );
 
@@ -98,7 +98,7 @@
 				light.position.set( 0, 1, 0 );
 				scene.addChild( light );
 
-				var cube = new THREE.Sphere( 5 );
+				var cube = new THREE.SphereGeometry( 5 );
 				lightCube = new THREE.Mesh( cube, material2 );
 				scene.addChild( lightCube );
 

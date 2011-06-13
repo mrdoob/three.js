@@ -87,8 +87,8 @@ function init() {
 function createCube( s, p ) {
 
 	cube = new THREE.Mesh (
-		new THREE.Cube( s,s,s, 1,1,1 ),
-		new THREE.MeshLambertMaterial( { color: 0x003300 })
+		new THREE.CubeGeometry( s, s, s ),
+		new THREE.MeshLambertMaterial( { color: 0x003300 } )
 	);
 
 	cube.position = p;

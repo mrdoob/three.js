@@ -72,7 +72,7 @@
 
 				var material = new THREE.MeshDepthMaterial();
 
-				plane = new THREE.Mesh( new THREE.Plane( 1000, 1000, 10, 10 ), material );
+				plane = new THREE.Mesh( new THREE.PlaneGeometry( 1000, 1000, 10, 10 ), material );
 				plane.rotation.x = - 90 * ( Math.PI / 180 );
 				plane.position.y = - 100;
 				plane.doubleSided = true;
@@ -80,7 +80,7 @@
 
 				// Spheres
 
-				geometry = new THREE.Cube( 100, 100, 100 );
+				geometry = new THREE.CubeGeometry( 100, 100, 100 );
 				material = new THREE.MeshDepthMaterial( { near: 1, far: 2000 } );
 
 				for (var i = 0; i < 20; i ++ ) {

@@ -62,7 +62,7 @@ if ( THREE.WebGLRenderer ) {
 		} );
 
 		var _scene = new THREE.Scene();
-		_scene.addObject( new THREE.Mesh( new THREE.Plane( 2, 2 ), _material ) );
+		_scene.addObject( new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), _material ) );
 
 		this.setSize = function ( width, height ) {
 

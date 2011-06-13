@@ -473,32 +473,32 @@ THREE.SceneLoader.prototype = {
 
 				if ( g.type == "cube" ) {
 
-					geometry = new THREE.Cube( g.width, g.height, g.depth, g.segmentsWidth, g.segmentsHeight, g.segmentsDepth, null, g.flipped, g.sides );
+					geometry = new THREE.CubeGeometry( g.width, g.height, g.depth, g.segmentsWidth, g.segmentsHeight, g.segmentsDepth, null, g.flipped, g.sides );
 					result.geometries[ dg ] = geometry;
 
 				} else if ( g.type == "plane" ) {
 
-					geometry = new THREE.Plane( g.width, g.height, g.segmentsWidth, g.segmentsHeight );
+					geometry = new THREE.PlaneGeometry( g.width, g.height, g.segmentsWidth, g.segmentsHeight );
 					result.geometries[ dg ] = geometry;
 
 				} else if ( g.type == "sphere" ) {
 
-					geometry = new THREE.Sphere( g.radius, g.segmentsWidth, g.segmentsHeight );
+					geometry = new THREE.SphereGeometry( g.radius, g.segmentsWidth, g.segmentsHeight );
 					result.geometries[ dg ] = geometry;
 
 				} else if ( g.type == "cylinder" ) {
 
-					geometry = new THREE.Cylinder( g.numSegs, g.topRad, g.botRad, g.height, g.topOffset, g.botOffset );
+					geometry = new THREE.CylinderGeometry( g.numSegs, g.topRad, g.botRad, g.height, g.topOffset, g.botOffset );
 					result.geometries[ dg ] = geometry;
 
 				} else if ( g.type == "torus" ) {
 
-					geometry = new THREE.Torus( g.radius, g.tube, g.segmentsR, g.segmentsT );
+					geometry = new THREE.TorusGeometry( g.radius, g.tube, g.segmentsR, g.segmentsT );
 					result.geometries[ dg ] = geometry;
 
 				} else if ( g.type == "icosahedron" ) {
 
-					geometry = new THREE.Icosahedron( g.subdivisions );
+					geometry = new THREE.IcosahedronGeometry( g.subdivisions );
 					result.geometries[ dg ] = geometry;
 
 				} else if ( g.type == "bin_mesh" ) {

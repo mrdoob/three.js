@@ -78,7 +78,7 @@
 
 				}
                 
-                var text3d = new THREE.Text( theText, {
+		var text3d = new THREE.TextGeometry( theText, {
 
 					size: 80, 
 					height: 20,
@@ -104,7 +104,7 @@
 
 				// Plane
 
-				plane = new THREE.Mesh( new THREE.Plane( 800, 800 ), new THREE.MeshBasicMaterial( { color: 0xe0e0e0, wireframe:true }) );
+				plane = new THREE.Mesh( new THREE.PlaneGeometry( 800, 800 ), new THREE.MeshBasicMaterial( { color: 0xe0e0e0, wireframe:true }) );
 				plane.rotation.x = - 90 * ( Math.PI / 180 );
                 plane.position.x = 0;
 				plane.overdraw = true;

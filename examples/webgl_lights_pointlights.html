@@ -106,7 +106,7 @@
 				light3 = new THREE.PointLight( 0x80ff80, 2, 50 );
 				scene.addLight( light3 );
 
-				var sphere = new THREE.Sphere( 0.5, 16, 8 );
+				var sphere = new THREE.SphereGeometry( 0.5, 16, 8 );
 
 				var l1 = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xff0040 } ) );
 				l1.position = light1.position;

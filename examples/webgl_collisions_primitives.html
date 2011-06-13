@@ -85,22 +85,20 @@
                 //makeWall(-360);
                 //makeWall(-480);
 
-                plane = new THREE.Mesh(new THREE.Plane(30000, 30000, 10, 10), new THREE.MeshLambertMaterial({
-                    color: 0x003300
-                }));
-                plane.position.y = -480;
-                plane.rotation.x = Math.PI / -2;
-                scene.addObject(plane);
-                geoms.push(plane);
+                plane = new THREE.Mesh( new THREE.PlaneGeometry( 30000, 30000, 10, 10 ), new THREE.MeshLambertMaterial( { color: 0x003300 } ) );
+                plane.position.y = - 480;
+                plane.rotation.x = Math.PI / - 2;
+                scene.addObject( plane );
+                geoms.push( plane );
 
-                var cplane = new THREE.PlaneCollider(plane.position, new THREE.Vector3(0, 1, 0));
+                var cplane = new THREE.PlaneCollider( plane.position, new THREE.Vector3( 0, 1, 0 ) );
                 cplane.mesh = plane;
-                THREE.Collisions.colliders.push(cplane);
+                THREE.Collisions.colliders.push( cplane );
 
-				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+		stats = new Stats();
+		stats.domElement.style.position = 'absolute';
+		stats.domElement.style.top = '0px';
+		container.appendChild( stats.domElement );
 
                 container.onmousemove = onDocumentMouseMove;
                 animate();
@@ -120,9 +118,7 @@
             }
 
             function createCube(s, p){
-                var cube = new THREE.Mesh(new THREE.Cube(s, s, s, 1, 1, 1), new THREE.MeshLambertMaterial({
-                    color: 0x003300
-                }));
+                var cube = new THREE.Mesh(new THREE.CubeGeometry( s, s, s ), new THREE.MeshLambertMaterial( { color: 0x003300 } ) );
                 cube.position = p;
                 scene.addObject(cube);
                 geoms.push(cube);
@@ -130,9 +126,7 @@
             }
 
             function createSphere(rad, p){
-                var sphere = new THREE.Mesh(new THREE.Sphere(rad, 10, 10), new THREE.MeshLambertMaterial({
-                    color: 0x003300
-                }));
+                var sphere = new THREE.Mesh( new THREE.SphereGeometry( rad, 10, 10 ), new THREE.MeshLambertMaterial( { color: 0x003300 } ) );
                 sphere.position = p;
                 scene.addObject(sphere);
                 geoms.push(sphere);
