@@ -95,9 +95,9 @@ if ( THREE.WebGLRenderer ) {
 
 		};
 
-	};
+		THREE.AnaglyphWebGLRenderer.prototype = new THREE.WebGLRenderer();
+		THREE.AnaglyphWebGLRenderer.prototype.constructor = THREE.AnaglyphWebGLRenderer;
 
-	THREE.AnaglyphWebGLRenderer.prototype = new THREE.WebGLRenderer();
-	THREE.AnaglyphWebGLRenderer.prototype.constructor = THREE.AnaglyphWebGLRenderer;
+	};
 	
 }
