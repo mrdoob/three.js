@@ -52,6 +52,9 @@ THREE.Text.prototype.set = function ( text, parameters ) {
 	var font = parameters.font !== undefined ? parameters.font : "helvetiker";
 	var weight = parameters.weight !== undefined ? parameters.weight : "normal";
 	var style = parameters.style !== undefined ? parameters.style : "normal";
+	var bezelThickness = 10;
+	var bezelSize = 8;
+	var needsChezel = true;
 	
 	THREE.FontUtils.size = size;
     THREE.FontUtils.divisions = curveSegments;
@@ -59,6 +62,7 @@ THREE.Text.prototype.set = function ( text, parameters ) {
 	THREE.FontUtils.face = font;
 	THREE.FontUtils.weight = weight;
 	THREE.FontUtils.style = style;
+	THREE.FontUtils.bezelSize = bezelSize;
 
     // Get a Font data json object
 
@@ -69,6 +73,7 @@ THREE.Text.prototype.set = function ( text, parameters ) {
     var vertices = data.points;
     var faces = data.faces;
     var contour = data.contour;
+	var bezelPoints = data.bezel;
     
     var scope = this;
 
@@ -79,22 +84,43 @@ THREE.Text.prototype.set = function ( text, parameters ) {
 	
     var i, 
 		vert, vlen = vertices.length, 
-		face, flen = faces.length;
+		face, flen = faces.length,
+		bezelPt, blen = bezelPoints.length;
 
+	// Back facing Vertices	
     for ( i = 0; i < vlen; i++ ) {
 
         vert = vertices[ i ];
         v( vert.x, vert.y, 0 );
 
     }
-    
+
+    // Front faces Vertices
     for ( i = 0; i < vlen; i++ ) {
         
 		vert = vertices[ i ];
         v( vert.x, vert.y, height );
 
     }
+
+	if (needsChezel) {
+		
+		for ( i = 0; i < blen; i++ ) {
+
+	        bezelPt = bezelPoints[ i ];
+	        v( bezelPt.x, bezelPt.y, bezelThickness );
+
+	    }
 	
+		for ( i = 0; i < blen; i++ ) {
+
+	        bezelPt = bezelPoints[ i ];
+	        v( bezelPt.x, bezelPt.y, height - bezelThickness );
+
+	    }
+	
+	
+	}
 	
 	// Bottom faces
 
@@ -113,41 +139,90 @@ THREE.Text.prototype.set = function ( text, parameters ) {
         f3( face[ 0 ] + vlen, face[ 1 ] + vlen, face[ 2 ] + vlen );
 
     }
-    
-	
-    i = contour.length;
-    
+
     var lastV;
-    var j, k;
+    var j, k, l, m;
 
-    while ( --i > 0 ) {
+	if (needsChezel) {
+		
+		i = bezelPoints.length;
 
-        if ( !lastV ) {
+	    while ( --i > 0 ) {
 
-            lastV = contour[ i ];
+	        if ( !lastV ) {
 
-        } else if ( lastV.equals( contour[ i ] ) ) {
+	            lastV = contour[ i ];
 
-            lastV = null;
-            continue;
+	        } else if ( lastV.equals( contour[ i ] ) ) {
+			
+				// We reached the last point of a closed loop
+	            lastV = null;
+	            continue;
 
-        }
+	        }
         
-        for ( j = 0; j < vlen; j++ ) {
-
-            if ( vertices[ j ].equals( contour[ i ] ) ) break;
-
-        }
+			l = vlen*2 + i;
+			m = vlen*2 + i - 1;
         
-        for ( k = 0; k < vlen; k++ ) {
+			// Create faces for the z-sides of the text
+	        f4( l, m, m+blen, l+blen );
+	
+			for ( j = 0; j < vlen; j++ ) {
 
-            if ( vertices[ k ].equals( contour[ i - 1 ] ) ) break;
+	            if ( vertices[ j ].equals( contour[ i ] ) ) break;
 
-        }
+	        }
         
-        f4( j, k, k+vlen, j+vlen );
+	        for ( k = 0; k < vlen; k++ ) {
+
+	            if ( vertices[ k ].equals( contour[ i - 1 ] ) ) break;
+
+	        }
         
-    }
+			// Create faces for the z-sides of the text
+	        f4( j, k, m, l );
+			f4( l + blen, m + blen, k+vlen, j+vlen );
+			
+	
+        
+	    }
+		
+		
+	} else {
+
+		i = contour.length;
+
+	    while ( --i > 0 ) {
+
+	        if ( !lastV ) {
+
+	            lastV = contour[ i ];
+
+	        } else if ( lastV.equals( contour[ i ] ) ) {
+			
+				// We reached the last point of a closed loop
+	            lastV = null;
+	            continue;
+
+	        }
+        
+	        for ( j = 0; j < vlen; j++ ) {
+
+	            if ( vertices[ j ].equals( contour[ i ] ) ) break;
+
+	        }
+        
+	        for ( k = 0; k < vlen; k++ ) {
+
+	            if ( vertices[ k ].equals( contour[ i - 1 ] ) ) break;
+
+	        }
+        
+			// Create faces for the z-sides of the text
+	        f4( j, k, k+vlen, j+vlen );
+        
+	    }
+	}
 
     
     // UVs to be added
@@ -582,6 +657,91 @@ THREE.FontUtils = {
 	    var extract = this.extractPoints( pts, characterpts );
     
 	    extract.contour = pts;
+	
+		//this.bezelSize;
+		var bezelPoints = [];
+		
+		
+		
+		var centroids = [], forCentroids = [], expandOutwards = [], sum = new THREE.Vector2(), lastV;
+		
+		i = pts.length;
+
+	    while ( --i >= 0 ) {
+	        if ( !lastV ) {
+
+	            lastV = pts[ i ];
+
+	        } else if ( lastV.equals( pts[ i ] ) ) {
+			
+				// We reached the last point of a closed loop
+	            lastV = null;
+				var bool = this.Triangulate.area(forCentroids) > 0;
+				expandOutwards.push(bool);
+				centroids.push(sum.divideScalar(forCentroids.length));
+				forCentroids = [];
+				
+				sum = new THREE.Vector2();
+	            continue;
+
+	        }
+			
+			sum.addSelf(pts[i]);
+			forCentroids.push(pts[i]);
+			
+	    }
+	
+		
+		i = pts.length;
+		p = 0;
+		var pt, centroid ;
+		var dirV, adj;
+	    while ( --i >= 0 ) {
+			pt = pts[ i ];
+			centroid = centroids[p];
+			
+			
+			
+			dirV = pt.clone().subSelf(centroid);
+			adj = this.bezelSize / dirV.length();
+			
+			if (expandOutwards[p]) {
+				adj += 1;
+			}  else {
+				adj = 1 - adj;
+			}
+			
+			adj = dirV.multiplyScalar(adj).addSelf(centroid);
+			bezelPoints.unshift(adj);
+			
+			
+	        if ( !lastV ) {
+
+	            lastV = pts[ i ];
+
+	        } else if ( lastV.equals( pts[ i ] ) ) {
+			
+				// We reached the last point of a closed loop
+	            lastV = null;
+				p++;
+	            continue;
+
+	        }
+
+			
+	    }
+	
+	
+		/*
+		for ( p = 0; p < pts.length; p++ ) {
+			pt = pts[ p ];
+	        bezelPoints.push (new THREE.Vector2(pt.x + this.bezelSize, pt.y + this.bezelSize));
+
+	    }*/
+	
+	
+		extract.bezel = bezelPoints;
+	
 	    return extract;
     
 	},
