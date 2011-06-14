@@ -40,20 +40,6 @@
 		<script type="text/javascript" src="js/gui/gui.min.js"></script>
 		
 		<script type="text/javascript" src="../src/extras/geometries/Text.js"></script> 
-		
-	<!--  
-		<script type="text/javascript" src="http://canvas-text.googlecode.com/svn-history/r41/trunk/faces/optimer-normal-normal.js"></script>
-		
-		http://canvas-text.googlecode.com/svn-history/r41/trunk/faces/dejavu_serif-normal-normal.js
-		
-		http://canvas-text.googlecode.com/svn-history/r41/trunk/faces/helvetiker-normal-normal.js
-		http://canvas-text.googlecode.com/svn-history/r41/trunk/faces/dejavu_sans-normal-normal.js
-
-		http://canvas-text.googlecode.com/svn-history/r41/trunk/faces/optimer-normal-normal.js
-		http://canvas-text.googlecode.com/svn-history/r41/trunk/faces/gentilis-normal-normal.js
-		
-	-->
-
 		<script type="text/javascript" src="fonts/helvetiker_regular.typeface.js"></script>
 		<script type="text/javascript" src="fonts/optimer_regular.typeface.js"></script>
 
@@ -168,8 +154,8 @@
                 
 				//var
 				   text3d = new THREE.Text(theText, {
-						size: 80, 
-						height:40,
+						size: 180, 
+						height:140,
 						curveSegments:2,
 						font: "optimer"
 					});//dejavu sans
@@ -191,7 +177,7 @@
 	 *  opacity: <float>,
 	*/
                 var textMaterial = new THREE.MeshPhongMaterial( { color: 0xa0a0a0, wireframe:false, opacity:1,shininess:100,ambient:0xff0000 , specular:0x00ff00,reflectivity:100});
-				textMaterial = materials[2];
+				//textMaterial = materials[2];
 
                 text = new THREE.Mesh( text3d, textMaterial);
                 
@@ -199,7 +185,7 @@
                 text.doubleSided = false;
                 text.position.y = 15;
                 
-                text.position.z = 0;
+                text.position.z = 40;
                 text.rotation.x = 0*Math.PI;
                 text.rotation.y = Math.PI*2;
                 
