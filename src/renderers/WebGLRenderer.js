@@ -3835,6 +3835,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			scene.__webglShadowVolumes = [];
 			scene.__webglLensFlares = [];
 			scene.__webglSprites = [];
+
 		}
 
 		while ( scene.__objectsAdded.length ) {
@@ -4003,6 +4004,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		} else if ( object instanceof THREE.Sprite ) {
 
 			scene.__webglSprites.push( object );
+
 		}
 
 		/*else if ( object instanceof THREE.Particle ) {
@@ -4111,43 +4113,50 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function removeObject( object, scene ) {
+	function removeInstances( objlist, object ) {
 
-		var o, ol, zobject;
+		var o, ol;
 
-		if ( object instanceof THREE.Mesh ) {
+		for ( o = objlist.length - 1; o >= 0; o -- ) {
 
-			for ( o = scene.__webglObjects.length - 1; o >= 0; o -- ) {
+			if ( objlist[ o ].object == object ) {
 
-				zobject = scene.__webglObjects[ o ].object;
-
-				if ( object == zobject ) {
-
-					scene.__webglObjects.splice( o, 1 );
-					return;
-
-				}
-
-			}
-
-		} else if ( object instanceof THREE.Sprite ) {
-
-			for ( o = scene.__webglSprites.length - 1; o >= 0; o -- ) {
-
-				zobject = scene.__webglSprites[ o ];
-
-				if ( object == zobject ) {
-
-					scene.__webglSprites.splice( o, 1 );
-					return;
-
-				}
+				objlist.splice( o, 1 );
 
 			}
 
 		}
 
-		// add shadows, etc
+	};
+
+	function removeObject( object, scene ) {
+
+		// must check as shadow volume before mesh (as they are also meshes)
+
+		if ( object instanceof THREE.ShadowVolume ) {
+
+			removeInstances( scene.__webglShadowVolumes, object );
+
+		} else if ( object instanceof THREE.Mesh  ||
+			 object instanceof THREE.ParticleSystem ||
+			 object instanceof THREE.Ribbon ||
+		     object instanceof THREE.Line ) {
+
+			removeInstances( scene.__webglObjects, object );
+
+		} else if ( object instanceof THREE.Sprite ) {
+
+			removeInstances( scene.__webglSprites, object );
+
+		} else if ( object instanceof THREE.LensFlare ) {
+
+			removeInstances( scene.__webglLensFlares, object );
+
+		} else if ( object instanceof THREE.MarchingCubes ) {
+
+			removeInstances( scene.__webglObjectsImmediate, object );
+
+		}
 
 	};
 
