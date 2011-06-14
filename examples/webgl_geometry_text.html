@@ -31,7 +31,8 @@
 		<br/>type to enter new text, drag to spin the text
 		<br/><span class="button" id="color">change color</span>, 
 			<span class="button" id="font">change font</span>, 
-			<span class="button" id="weight">change weight</span>, 
+			<span class="button" id="weight">change weight</span>,
+			<span class="button" id="bezel">change bezel</span>,
 			<span class="button" id="postprocessing">change postprocessing</span>, 
 			<a id="permalink" href="#">permalink</a>
 		</div>
@@ -42,7 +43,7 @@
 		<script type="text/javascript" src="js/Detector.js"></script>
 		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
-		      
+			  
 		<!-- load the font file from canvas-text -->
 
 		<!--
@@ -72,27 +73,34 @@
 			var textMesh1, textMesh2, textGeo, textMaterial, parent;
 
 			var firstLetter = true;
-			
+
 			var text = "three.js",
+
 				height = 20,
-				size = 80,
+				size = 70,
 				hover = 30,
+
 				curveSegments = 6,
+
+				bezelThickness = 2,
+				bezelSize = 1.5,
+				bezelEnabled = true,
+
 				font = "optimer", 		// helvetiker, optimer, gentilis, droid sans, droid serif
 				weight = "bold",		// normal bold
 				style = "normal";		// normal italic
 
 			var mirror = true;
-			
+
 			var fontMap = {
 			"helvetiker"  : 0,
 			"optimer"  	  : 1,
 			"gentilis" 	  : 2,
 			"droid sans"  : 3,
 			"droid serif" : 4
-			
+
 			};
-			
+
 			var weightMap = {
 			"normal"	: 0,
 			"bold"		: 1
@@ -100,10 +108,10 @@
 
 			var reverseFontMap = {};
 			var reverseWeightMap = {};
-			
+
 			for ( var i in fontMap ) reverseFontMap[ fontMap[i] ] = i;
 			for ( var i in weightMap ) reverseWeightMap[ weightMap[i] ] = i;
-			
+
 			var targetRotation = 0;
 			var targetRotationOnMouseDown = 0;
 
@@ -120,11 +128,11 @@
 			animate();
 
 			function capitalize( txt ) {
-			
+
 				return txt.substring( 0, 1 ).toUpperCase() + txt.substring( 1 );
 
 			}
-			
+
 			function decimalToHex( d ) {
   
 				var hex = Number( d ).toString( 16 );
@@ -132,21 +140,21 @@
 				return hex.toUpperCase();
 
 			}
-			
+
 			function init() {
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				permalink = document.getElementById( "permalink" );
-				
+
 				camera = new THREE.Camera( 30, window.innerWidth / window.innerHeight, 1, 1500 );
 				camera.position.y = 400;
 				camera.position.z = 700;
 				camera.target.position.y = 100;
 
 				scene = new THREE.Scene();
-				
+
 				scene.fog = new THREE.Fog( 0x000000, 250, 1400 );
 
 				var dirLight = new THREE.DirectionalLight( 0xffffff, 0.125 );
@@ -156,7 +164,7 @@
 
 				var pointLight = new THREE.PointLight( 0xffffff, 1.5 );
 				pointLight.position.set( 0, 100, 50 );
-				scene.addLight( pointLight );				
+				scene.addLight( pointLight );
 
 				//text = capitalize( font ) + " " + capitalize( weight );
 				//text = "abcdefghijklmnopqrstuvwxyz0123456789";
@@ -165,60 +173,67 @@
 				// Get text from hash
 
 				var hash = document.location.hash.substr( 1 );
-				
+
 				if ( hash.length !== 0 ) {
-                   
+
 					var colorhash  = hash.substring( 0, 6 );
 					var fonthash   = hash.substring( 6, 7 );
 					var weighthash = hash.substring( 7, 8 );
 					var pphash 	   = hash.substring( 8, 9 );
-					var texthash   = hash.substring( 10 );					
+					var bezelhash  = hash.substring( 9, 10 );
+					var texthash   = hash.substring( 11 );
 
 					hex = colorhash;
 					pointLight.color.setHex( parseInt( colorhash, 16 ) );
-					
+
 					font = reverseFontMap[ parseInt( fonthash ) ];
 					weight = reverseWeightMap[ parseInt( weighthash ) ];
-					
+
 					postprocessing.enabled = parseInt( pphash );
-					
+					bezelEnabled = parseInt( bezelhash );
+
 					text = decodeURI( texthash );
 
 					updatePermalink();
 
 				} else {
 
-					pointLight.color.setHSV( Math.random(), 0.95, 0.85 );					
+					pointLight.color.setHSV( Math.random(), 0.95, 0.85 );
 					pointLight.color.updateHex();
 					hex = decimalToHex( pointLight.color.hex );
 
 				}
-				
-                textGeo = new THREE.TextGeometry( text, {
+
+				textGeo = new THREE.TextGeometry( text, {
 
 					size: size, 
 					height: height,
 					curveSegments: curveSegments,
+
 					font: font,
 					weight: weight,
-					style: style
+					style: style,
+
+					bezelThickness: bezelThickness,
+					bezelSize: bezelSize,
+					bezelEnabled: bezelEnabled
 
 				});
 				
-                textMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, wireframe: false } );
-				
+				textMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, wireframe: false } );
+
 				parent = new THREE.Object3D();
 				
 				textMesh1 = new THREE.Mesh( textGeo, textMaterial );
 
-                textMesh1.position.x = 0;
-                textMesh1.position.y = hover;
-                textMesh1.position.z = 0;
+				textMesh1.position.x = 0;
+				textMesh1.position.y = hover;
+				textMesh1.position.z = 0;
 
-                textMesh1.rotation.x = 0;
-                textMesh1.rotation.y = Math.PI * 2;
+				textMesh1.rotation.x = 0;
+				textMesh1.rotation.y = Math.PI * 2;
 
-                parent.addChild( textMesh1 );
+				parent.addChild( textMesh1 );
 
 				if ( mirror ) {
 
@@ -244,7 +259,7 @@
 				scene.addChild( plane );
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
-                renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 				
 				renderer.setClearColor( scene.fog.color, 1 );
 
@@ -267,7 +282,7 @@
 					pointLight.color.updateHex();
 					hex = decimalToHex( pointLight.color.hex );
 					
-					updatePermalink();					
+					updatePermalink();
 					
 				}, false );
 
@@ -315,6 +330,14 @@
 					
 				}, false );
 
+				document.getElementById( "bezel" ).addEventListener( 'click', function() {
+				
+					bezelEnabled = !bezelEnabled;
+					
+					refreshText();
+					
+				}, false );
+
 				document.getElementById( "postprocessing" ).addEventListener( 'click', function() {
 				
 					postprocessing.enabled = !postprocessing.enabled;
@@ -337,7 +360,7 @@
 			
 			function updatePermalink() {
 			
-				var link = hex + fontMap[ font ] + weightMap[ weight ] + boolToNum( postprocessing.enabled ) + "#" + encodeURI( text );
+				var link = hex + fontMap[ font ] + weightMap[ weight ] + boolToNum( postprocessing.enabled ) + boolToNum( bezelEnabled ) + "#" + encodeURI( text );
 				
 				permalink.href = "#" + link;
 				window.location.hash = link;
@@ -378,7 +401,7 @@
 
 				if ( keyCode == 8 ) {
 					
-					event.preventDefault();					
+					event.preventDefault();
 					
 				} else {
 				
@@ -397,25 +420,30 @@
 				
 				scene.removeChild( textMesh1 );
 
-                textGeo = new THREE.TextGeometry( text, {
+				textGeo = new THREE.TextGeometry( text, {
 
 					size: size, 
 					height: height,
 					curveSegments: curveSegments,
+
 					font: font,
 					weight: weight,
-					style: style
+					style: style,
+
+					bezelThickness: bezelThickness,
+					bezelSize: bezelSize,
+					bezelEnabled: bezelEnabled
 
 				});
 
 				textMesh1 = new THREE.Mesh( textGeo, textMaterial );
 
-                textMesh1.position.x = 0;
-                textMesh1.position.y = hover;
-                textMesh1.position.z = 0;
+				textMesh1.position.x = 0;
+				textMesh1.position.y = hover;
+				textMesh1.position.z = 0;
 
-                textMesh1.rotation.x = 0;
-                textMesh1.rotation.y = Math.PI * 2;
+				textMesh1.rotation.x = 0;
+				textMesh1.rotation.y = Math.PI * 2;
 
 				parent.addChild( textMesh1 );
 

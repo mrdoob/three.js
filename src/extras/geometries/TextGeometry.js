@@ -7,13 +7,20 @@
  * Text = 3D Text
  *
  * parameters = {
- *  size: <float> size of the text
- *  height: <float> thickness to extrude text,
- *  curveSegments: <int> number of points on the curves,
- *  font: <string> font name,
+ *  size: 			<float>, 	// size of the text
+ *  height: 		<float>, 	// thickness to extrude text
+ *  curveSegments: 	<int>,		// number of points on the curves
+ *
+ *  font: 			<string>,		// font name
+ *  weight: 		<string>,		// font weight (normal, bold)
+ *  style: 			<string>,		// font style  (normal, italics)
+ *
+ *  bezelEnabled:	<bool>,			// turn on bezel
+ *  bezelThickness: <float>, 		// how deep into text bezel goes
+ *  bezelSize:		<float>, 		// how far from text outline is bezel
  *  }
  *  
- * It utilizes techniques used in
+ * It uses techniques used in
  * 
  * 	typeface.js and canvastext
  * 		For converting fonts and rendering with javascript 
@@ -31,7 +38,7 @@
 THREE.TextGeometry = function ( text, parameters ) {
 
 	THREE.Geometry.call( this );
-	
+
 	this.parameters = parameters || {};
 	this.set( text );
 
@@ -44,112 +51,192 @@ THREE.TextGeometry.prototype.set = function ( text, parameters ) {
 
 	this.text = text;
 	var parameters = parameters || this.parameters;
-	
+
 	var size = parameters.size !== undefined ? parameters.size : 100;
 	var height = parameters.height !== undefined ? parameters.height : 50;
 	var curveSegments = parameters.curveSegments !== undefined ? parameters.curveSegments: 4;
-	
+
 	var font = parameters.font !== undefined ? parameters.font : "helvetiker";
 	var weight = parameters.weight !== undefined ? parameters.weight : "normal";
 	var style = parameters.style !== undefined ? parameters.style : "normal";
-	
+
+	var bezelThickness = parameters.bezelThickness !== undefined ? parameters.bezelThickness : 10;
+	var bezelSize = parameters.bezelSize !== undefined ? parameters.bezelSize : 8;
+	var bezelEnabled = parameters.bezelEnabled !== undefined ? parameters.bezelEnabled : false;
+
 	THREE.FontUtils.size = size;
-    THREE.FontUtils.divisions = curveSegments;
+	THREE.FontUtils.divisions = curveSegments;
 
 	THREE.FontUtils.face = font;
 	THREE.FontUtils.weight = weight;
 	THREE.FontUtils.style = style;
 
-    // Get a Font data json object
+	THREE.FontUtils.bezelSize = bezelSize;
 
-    var data = THREE.FontUtils.drawText( text );
+	// Get a Font data json object
 
-    //console.log("data", data);
-    
-    var vertices = data.points;
-    var faces = data.faces;
-    var contour = data.contour;
-    
-    var scope = this;
+	var data = THREE.FontUtils.drawText( text );
+
+	//console.log("data", data);
+
+	var vertices = data.points;
+	var faces = data.faces;
+	var contour = data.contour;
+	var bezelPoints = data.bezel;
+
+	var scope = this;
 
 	scope.vertices = [];
 	scope.faces = [];
 
 	//console.log(this);
-	
-    var i, 
+
+	var i, 
 		vert, vlen = vertices.length, 
-		face, flen = faces.length;
+		face, flen = faces.length,
+		bezelPt, blen = bezelPoints.length;
 
-    for ( i = 0; i < vlen; i++ ) {
+	// Back facing vertices
 
-        vert = vertices[ i ];
-        v( vert.x, vert.y, 0 );
+	for ( i = 0; i < vlen; i++ ) {
 
-    }
-    
-    for ( i = 0; i < vlen; i++ ) {
-        
 		vert = vertices[ i ];
-        v( vert.x, vert.y, height );
-
-    }
-	
-	
-	// Bottom faces
-
-    for ( i = 0; i < flen; i++ ) {
-
-        face = faces[ i ];
-        f3( face[ 2 ], face[ 1 ], face[ 0 ] );
-
-    }
-
-    // Top faces
-
-    for ( i = 0; i < flen; i++ ) {
-        
-		face = faces[ i ];
-        f3( face[ 0 ] + vlen, face[ 1 ] + vlen, face[ 2 ] + vlen );
-
-    }
-    
-	
-    i = contour.length;
-    
-    var lastV;
-    var j, k;
-
-    while ( --i > 0 ) {
-
-        if ( !lastV ) {
-
-            lastV = contour[ i ];
-
-        } else if ( lastV.equals( contour[ i ] ) ) {
-
-            lastV = null;
-            continue;
-
-        }
-        
-        for ( j = 0; j < vlen; j++ ) {
-
-            if ( vertices[ j ].equals( contour[ i ] ) ) break;
-
-        }
-        
-        for ( k = 0; k < vlen; k++ ) {
-
-            if ( vertices[ k ].equals( contour[ i - 1 ] ) ) break;
-
-        }
-
-		f4( j, k, k+vlen, j+vlen );
+		v( vert.x, vert.y, 0 );
 
 	}
 
-    
+	// Front facing vertices
+
+	for ( i = 0; i < vlen; i++ ) {
+	
+		vert = vertices[ i ];
+		v( vert.x, vert.y, height );
+
+	}
+
+	if ( bezelEnabled ) {
+
+		for ( i = 0; i < blen; i++ ) {
+
+			bezelPt = bezelPoints[ i ];
+			v( bezelPt.x, bezelPt.y, bezelThickness );
+
+		}
+
+		for ( i = 0; i < blen; i++ ) {
+
+			bezelPt = bezelPoints[ i ];
+			v( bezelPt.x, bezelPt.y, height - bezelThickness );
+
+		}
+
+	}
+
+	// Bottom faces
+
+	for ( i = 0; i < flen; i++ ) {
+
+		face = faces[ i ];
+		f3( face[ 2 ], face[ 1 ], face[ 0 ] );
+
+	}
+
+	// Top faces
+
+	for ( i = 0; i < flen; i++ ) {
+
+		face = faces[ i ];
+		f3( face[ 0 ] + vlen, face[ 1 ] + vlen, face[ 2 ] + vlen );
+
+	}
+
+	var lastV;
+	var j, k, l, m;
+
+	if ( bezelEnabled ) {
+
+		i = bezelPoints.length;
+
+		while ( --i > 0 ) {
+
+			if ( !lastV ) {
+
+				lastV = contour[ i ];
+
+			} else if ( lastV.equals( contour[ i ] ) ) {
+
+				// We reached the last point of a closed loop
+
+				lastV = null;
+				continue;
+
+			}
+
+			l = vlen * 2 + i;
+			m = l - 1;
+
+			// Create faces for the z-sides of the text
+
+			f4( l, m, m + blen, l + blen );
+
+			for ( j = 0; j < vlen; j++ ) {
+
+				if ( vertices[ j ].equals( contour[ i ] ) ) break;
+
+			}
+
+			for ( k = 0; k < vlen; k++ ) {
+
+				if ( vertices[ k ].equals( contour[ i - 1 ] ) ) break;
+
+			}
+
+			// Create faces for the z-sides of the text
+
+			f4( j, k, m, l );
+			f4( l + blen, m + blen, k + vlen, j + vlen );
+
+		}
+
+	} else {
+
+		i = contour.length;
+
+		while ( --i > 0 ) {
+
+			if ( !lastV ) {
+
+				lastV = contour[ i ];
+
+			} else if ( lastV.equals( contour[ i ] ) ) {
+
+				// We reached the last point of a closed loop
+
+				lastV = null;
+				continue;
+
+			}
+
+			for ( j = 0; j < vlen; j++ ) {
+
+				if ( vertices[ j ].equals( contour[ i ] ) ) break;
+
+			}
+
+			for ( k = 0; k < vlen; k++ ) {
+
+				if ( vertices[ k ].equals( contour[ i - 1 ] ) ) break;
+
+			}
+
+			// Create faces for the z-sides of the text
+
+			f4( j, k, k + vlen, j + vlen );
+
+		}
+	}
+
+
 	// UVs to be added
 
 	this.computeCentroids();
@@ -173,8 +260,8 @@ THREE.TextGeometry.prototype.set = function ( text, parameters ) {
 		scope.faces.push( new THREE.Face4( a, b, c, d) );
 
 	}
-	
-	
+
+
 };
 
 THREE.FontUtils = {
@@ -191,33 +278,33 @@ THREE.FontUtils = {
 
 	getFace : function() {
 
-	    return this.faces[ this.face ][ this.weight ][ this.style ];
+		return this.faces[ this.face ][ this.weight ][ this.style ];
 
 	},
 
 	loadFace : function( data ) {
 
-	    var family = data.familyName.toLowerCase();
+		var family = data.familyName.toLowerCase();
 
 		var ThreeFont = this;
 
-	    ThreeFont.faces[ family ] = ThreeFont.faces[ family ] || {};
-    
-	    ThreeFont.faces[ family ][ data.cssFontWeight ] = ThreeFont.faces[ family ][ data.cssFontWeight ] || {};
-	    ThreeFont.faces[ family ][ data.cssFontWeight ][ data.cssFontStyle ] = data;
-    
+		ThreeFont.faces[ family ] = ThreeFont.faces[ family ] || {};
+	
+		ThreeFont.faces[ family ][ data.cssFontWeight ] = ThreeFont.faces[ family ][ data.cssFontWeight ] || {};
+		ThreeFont.faces[ family ][ data.cssFontWeight ][ data.cssFontStyle ] = data;
+
 		var face = ThreeFont.faces[ family ][ data.cssFontWeight ][ data.cssFontStyle ] = data;
-		
-	    return data;
+
+		return data;
 
 	},
 
 
 	extractPoints : function( points, characters ) {
 
-	    // Quick exit
+		// Quick exit
 
-	    if ( points.length < 3 ) {
+		if ( points.length < 3 ) {
 
 			//throw "not valid polygon";
 
@@ -229,94 +316,117 @@ THREE.FontUtils = {
 				faces: []
 
 			};
-			
+
 		}
-    
+
 		// Try to split shapes and holes.
 
 		var p, point, shape,
 			all,
 			isolatedShapes = [];
-	
-	    // Use a quick hashmap for locating duplicates
 
-		for (var c in characters) {
-			points = characters[c];
+		// Use a quick hashmap for locating duplicates
+
+		for ( var c in characters ) {
+
+			points = characters[ c ];
 
 
 			all = [];
-		    // Use a quick hashmap for locating duplicates
-			for (var p in points) {
-				point = points[p];
-				all.push(point.x +","+ point.y);
+
+			// Use a quick hashmap for locating duplicates
+
+			for ( var p in points ) {
+
+				point = points[ p ];
+				all.push( point.x + "," + point.y );
+
 			}
 
 			var firstIndex, firstPt, endPt, holes;
 
 			// We check the first loop whether its CW or CCW direction to determine
 			// whether its shapes or holes first
-			endPt = all.slice(1).indexOf(all[0]);
-			var shapesFirst = this.Triangulate.area(points.slice(0, endPt+1))<0;
+
+			endPt = all.slice(1).indexOf( all[0] );
+			var shapesFirst = this.Triangulate.area( points.slice( 0, endPt + 1 ) ) < 0;
 
 			//console.log(points.length, "shapesFirst",shapesFirst);
 
 			holes = [];
 			endPt = -1;
 
-			while (endPt < all.length) {
-				firstIndex = endPt+1;
-				firstPt = all[firstIndex];
-				endPt = all.slice(firstIndex+1).indexOf(firstPt) + firstIndex;
-				if (endPt <= firstIndex ) break; 
+			while ( endPt < all.length ) {
 
-				var contours = points.slice(firstIndex, endPt+1);
+				firstIndex = endPt + 1;
+				firstPt = all[ firstIndex ];
+				endPt = all.slice( firstIndex + 1 ).indexOf( firstPt ) + firstIndex;
 
-				if (shapesFirst) {
-					if (this.Triangulate.area(contours)<0) {
+				if ( endPt <= firstIndex ) break; 
+
+				var contours = points.slice( firstIndex, endPt + 1 );
+
+				if ( shapesFirst ) {
+
+					if ( this.Triangulate.area( contours ) < 0 ) {
+
 						// we got new isolated shape
-						if (firstIndex>0) {
-			            	isolatedShapes.push({shape: shape, holes: holes});
+
+						if ( firstIndex > 0 ) {
+
+							isolatedShapes.push( { shape: shape, holes: holes } );
+
 						}
-						// Save the old shapes, then work on new additional seperated shape
 
-			            shape = contours;
-			            holes = [];
+						// Save the old shapes, then work on new additional separated shape
+
+						shape = contours;
+						holes = [];
 
 					} else {
-			            holes.push(contours);
+
+						holes.push( contours );
+
 					}
+
 				} else {
-					if (this.Triangulate.area(contours)<0) {		            
 
-						isolatedShapes.push({shape: contours, holes: holes});
-			            holes = [];
+					if ( this.Triangulate.area( contours ) < 0 ) {
+
+						isolatedShapes.push( {shape: contours, holes: holes } );
+						holes = [];
 
 					} else {
-			            holes.push(contours);
+
+						holes.push( contours );
+
 					}
+
 				}
+
 				endPt++;
 
 			}
 
-			if (shapesFirst) {
-		    	isolatedShapes.push({shape: shape, holes: holes});
+			if ( shapesFirst ) {
+
+				isolatedShapes.push( { shape: shape, holes: holes } );
+
 			}
+
 		}
 
-	
 		//console.log("isolatedShapes", isolatedShapes);
-	
-    
-	    /* For each isolated shape, find the closest points and break to the hole to allow triangulation*/
-    
+
+		/* For each isolated shape, find the closest points and break to the hole to allow triangulation*/
+
 		// Find closest points between holes
-	
-	    // we could optimize with
-	    // http://en.wikipedia.org/wiki/Proximity_problems
+
+		// we could optimize with
+		// http://en.wikipedia.org/wiki/Proximity_problems
 		// http://en.wikipedia.org/wiki/Closest_pair_of_points
 		// http://stackoverflow.com/questions/1602164/shortest-distance-between-points-algorithm
-	
+
 		var prevShapeVert, nextShapeVert,
 			prevHoleVert, nextHoleVert,
 			holeIndex, shapeIndex,
@@ -327,196 +437,194 @@ THREE.FontUtils = {
 			tmpShape1, tmpShape2,
 			tmpHole1, tmpHole2,
 			verts = [];
-    
-	    for ( shapeId = 0; shapeId < isolatedShapes.length; shapeId ++ ) {
+
+		for ( shapeId = 0; shapeId < isolatedShapes.length; shapeId ++ ) {
 
 			shapeGroup = isolatedShapes[ shapeId ];
 
-	        shape = shapeGroup.shape;
-	        holes = shapeGroup.holes;
-        
-	        for ( h = 0; h < holes.length; h++ ) {
+			shape = shapeGroup.shape;
+			holes = shapeGroup.holes;
 
-	            // we slice to each hole when neccessary
+			for ( h = 0; h < holes.length; h++ ) {
 
-	            hole = holes[ h ];
-	            shortest = Number.POSITIVE_INFINITY;
+				// we slice to each hole when neccessary
 
-	            for ( h2 = 0; h2 < hole.length; h2++ ) {
+				hole = holes[ h ];
+				shortest = Number.POSITIVE_INFINITY;
 
-	                pts1 = hole[ h2 ];
-                
-	                for ( p = 0; p < shape.length; p++ ) {
+				for ( h2 = 0; h2 < hole.length; h2++ ) {
 
-	                    pts2 = shape[ p ];
-	                    d = pts1.distanceTo( pts2 );
-                    
-	                    if ( d < shortest ) {
+					pts1 = hole[ h2 ];
 
-	                        shortest = d;
-	                        holeIndex = h2;
-	                        shapeIndex = p;
+					for ( p = 0; p < shape.length; p++ ) {
 
-	                    }
+						pts2 = shape[ p ];
+						d = pts1.distanceTo( pts2 );
 
-	                }
-                
-	            }
-                
+						if ( d < shortest ) {
 
-				
-	            prevShapeVert = ( shapeIndex - 1 ) >= 0 ? shapeIndex - 1 : shape.length - 1;
-	            nextShapeVert = ( shapeIndex + 1 ) < shape.length ? shapeIndex + 1 : 0;
-            
-	            prevHoleVert = ( holeIndex - 1 ) >= 0 ? holeIndex - 1 : hole.length - 1; 
-	            nextHoleVert = ( holeIndex + 1 ) < hole.length ? holeIndex + 1 : 0 ;
-	
-	
+							shortest = d;
+							holeIndex = h2;
+							shapeIndex = p;
+
+						}
+
+					}
+
+				}
+
+				prevShapeVert = ( shapeIndex - 1 ) >= 0 ? shapeIndex - 1 : shape.length - 1;
+				nextShapeVert = ( shapeIndex + 1 ) < shape.length ? shapeIndex + 1 : 0;
+
+				prevHoleVert = ( holeIndex - 1 ) >= 0 ? holeIndex - 1 : hole.length - 1; 
+				nextHoleVert = ( holeIndex + 1 ) < hole.length ? holeIndex + 1 : 0 ;
+
 				var areaapts = [];
 				areaapts.push( hole[ holeIndex ] );
-	            areaapts.push( shape[ shapeIndex ] );
-	            areaapts.push( shape[ prevShapeVert ] );
-				
-				var areaa = this.Triangulate.area(areaapts);
-				
-            	var areabpts = [];
-	            areabpts.push( hole[ holeIndex ] );
-	            areabpts.push( hole[ prevHoleVert ] );
-	            areabpts.push( shape[ shapeIndex ] );
-				
-				var areab = this.Triangulate.area(areabpts);
-	
-				
+				areaapts.push( shape[ shapeIndex ] );
+				areaapts.push( shape[ prevShapeVert ] );
+
+				var areaa = this.Triangulate.area( areaapts );
+
+				var areabpts = [];
+				areabpts.push( hole[ holeIndex ] );
+				areabpts.push( hole[ prevHoleVert ] );
+				areabpts.push( shape[ shapeIndex ] );
+
+				var areab = this.Triangulate.area( areabpts );
+
 				var shapeOffset =1;
 				var holeOffset = -1;
-				
+
 				var oldShapeIndex = shapeIndex, oldHoleIndex = holeIndex;
 				shapeIndex += shapeOffset;
 				holeIndex += holeOffset;
 				
-				if (shapeIndex<0) { shapeIndex += shape.length;  }
+				if ( shapeIndex < 0 ) { shapeIndex += shape.length;  }
 				shapeIndex %= shape.length;
-				if (holeIndex<0) { holeIndex += hole.length;  }
-				holeIndex %= shape.length;
-				
-				 prevShapeVert = ( shapeIndex - 1 ) >= 0 ? shapeIndex - 1 : shape.length - 1;
-		         nextShapeVert = ( shapeIndex + 1 ) < shape.length ? shapeIndex + 1 : 0;
 
-	            prevHoleVert = ( holeIndex - 1 ) >= 0 ? holeIndex - 1 : hole.length - 1; 
-	            nextHoleVert = ( holeIndex + 1 ) < hole.length ? holeIndex + 1 : 0 ;
+				if ( holeIndex < 0 ) { holeIndex += hole.length;  }
+				holeIndex %= shape.length;
+
+				prevShapeVert = ( shapeIndex - 1 ) >= 0 ? shapeIndex - 1 : shape.length - 1;
+				nextShapeVert = ( shapeIndex + 1 ) < shape.length ? shapeIndex + 1 : 0;
+
+				prevHoleVert = ( holeIndex - 1 ) >= 0 ? holeIndex - 1 : hole.length - 1; 
+				nextHoleVert = ( holeIndex + 1 ) < hole.length ? holeIndex + 1 : 0 ;
 
 
 				areaapts = [];
 				areaapts.push( hole[ holeIndex ] );
-	            areaapts.push( shape[ shapeIndex ] );
-	            areaapts.push( shape[ prevShapeVert ] );
+				areaapts.push( shape[ shapeIndex ] );
+				areaapts.push( shape[ prevShapeVert ] );
 
-				var areaa2 = this.Triangulate.area(areaapts);
+				var areaa2 = this.Triangulate.area( areaapts );
 
-            	areabpts = [];
-	            areabpts.push( hole[ holeIndex ] );
-	            areabpts.push( hole[ prevHoleVert ] );
-	            areabpts.push( shape[ shapeIndex ] );
+				areabpts = [];
+				areabpts.push( hole[ holeIndex ] );
+				areabpts.push( hole[ prevHoleVert ] );
+				areabpts.push( shape[ shapeIndex ] );
 
-				var areab2 = this.Triangulate.area(areabpts);
-				
-				if ( (areaa+areab) > (areaa2+areab2) ) {
+				var areab2 = this.Triangulate.area( areabpts );
+
+				if ( ( areaa + areab ) > ( areaa2 + areab2 ) ) {
+
 					shapeIndex = oldShapeIndex;
 					holeIndex = oldHoleIndex ;
-					
-					
-					if (shapeIndex<0) { shapeIndex += shape.length;  }
-					shapeIndex %= shape.length;
-					if (holeIndex<0) { holeIndex += hole.length;  }
-					holeIndex %= shape.length;
-					
-					
-					 prevShapeVert = ( shapeIndex - 1 ) >= 0 ? shapeIndex - 1 : shape.length - 1;
-			         nextShapeVert = ( shapeIndex + 1 ) < shape.length ? shapeIndex + 1 : 0;
 
-		            prevHoleVert = ( holeIndex - 1 ) >= 0 ? holeIndex - 1 : hole.length - 1; 
-		            nextHoleVert = ( holeIndex + 1 ) < hole.length ? holeIndex + 1 : 0 ;
+					if ( shapeIndex < 0 ) { shapeIndex += shape.length;  }
+					shapeIndex %= shape.length;
+
+					if ( holeIndex < 0 ) { holeIndex += hole.length;  }
+					holeIndex %= shape.length;
+
+
+					prevShapeVert = ( shapeIndex - 1 ) >= 0 ? shapeIndex - 1 : shape.length - 1;
+					nextShapeVert = ( shapeIndex + 1 ) < shape.length ? shapeIndex + 1 : 0;
+
+					prevHoleVert = ( holeIndex - 1 ) >= 0 ? holeIndex - 1 : hole.length - 1; 
+					nextHoleVert = ( holeIndex + 1 ) < hole.length ? holeIndex + 1 : 0 ;
+
 				}
-				
-	            tmpShape1 = shape.slice( 0, shapeIndex );
-	            tmpShape2 = shape.slice( shapeIndex );
+
+				tmpShape1 = shape.slice( 0, shapeIndex );
+				tmpShape2 = shape.slice( shapeIndex );
 				tmpHole1 = hole.slice( holeIndex );
 				tmpHole2 = hole.slice( 0, holeIndex );
-        		
-	            verts.push( hole[ holeIndex ] );
-	            verts.push( shape[ shapeIndex ] );
-	            verts.push( shape[ prevShapeVert ] );
-				
-			    verts.push( hole[ holeIndex ] );
-	            verts.push( hole[ prevHoleVert ] );
-	            verts.push( shape[ shapeIndex ] );
-			
 
-	            shape = tmpShape1.concat( tmpHole1 ).concat( tmpHole2 ).concat( tmpShape2 );
+				verts.push( hole[ holeIndex ] );
+				verts.push( shape[ shapeIndex ] );
+				verts.push( shape[ prevShapeVert ] );
 
-	        }
+				verts.push( hole[ holeIndex ] );
+				verts.push( hole[ prevHoleVert ] );
+				verts.push( shape[ shapeIndex ] );
+
+				shape = tmpShape1.concat( tmpHole1 ).concat( tmpHole2 ).concat( tmpShape2 );
+
+			}
 
 			shapeGroup.shape = shape;
 
-	    }
+		}
 	
-	    var points = [];
-	    var triangulatedVertices = [];
-	    var lastTriangles = 0;
+		var points = [];
+		var triangulatedVertices = [];
+		var lastTriangles = 0;
 
-	    for ( shapeId = 0; shapeId < isolatedShapes.length; shapeId ++ ) {
+		for ( shapeId = 0; shapeId < isolatedShapes.length; shapeId ++ ) {
 
-	        shapeGroup = isolatedShapes[ shapeId ];
+			shapeGroup = isolatedShapes[ shapeId ];
 
-	        shape = shapeGroup.shape;
-	        points = points.concat( shape );
+			shape = shapeGroup.shape;
+			points = points.concat( shape );
 
-	        var triangles = THREE.FontUtils.Triangulate( shape, true );
+			var triangles = THREE.FontUtils.Triangulate( shape, true );
 
-	        // We need to offset vertex indices for faces
+			// We need to offset vertex indices for faces
 
-	        for ( var v = 0; v < triangles.length; v++ ) {
+			for ( var v = 0; v < triangles.length; v++ ) {
 
-	            var face = triangles[ v ];
+				var face = triangles[ v ];
 
-	            face[ 0 ] += lastTriangles;
-	            face[ 1 ] += lastTriangles;
-	            face[ 2 ] += lastTriangles;
+				face[ 0 ] += lastTriangles;
+				face[ 1 ] += lastTriangles;
+				face[ 2 ] += lastTriangles;
 
-	        }
+			}
 
-	        triangulatedVertices = triangulatedVertices.concat( triangles );
-	        lastTriangles += shape.length;
+			triangulatedVertices = triangulatedVertices.concat( triangles );
+			lastTriangles += shape.length;
 
-	    }
-   
-   
-	   // Now we push the "cut" vertices back to the triangulated indices.
+		}
+  
 
-	   //console.log("we have verts.length",verts.length,verts);
+		// Now we push the "cut" vertices back to the triangulated indices.
 
-	   var v, j, k, l, found, face;
+		//console.log("we have verts.length",verts.length,verts);
 
-	   for ( v = 0; v < verts.length / 3; v++ ) {        
-        
-	        face = [];
-        
-	        for ( k = 0; k < 3; k++ ) {
+		var v, j, k, l, found, face;
+
+		for ( v = 0; v < verts.length / 3; v++ ) {
+
+			face = [];
+
+			for ( k = 0; k < 3; k++ ) {
 
 				found = false;
 
-	            for ( j=0; j < points.length && !found; j++ ) {
-                
-	                l = v * 3 + k;
+				for ( j=0; j < points.length && !found; j++ ) {
 
-	                if ( points[ j ].equals( verts[ l ] ) ) {
+					l = v * 3 + k;
 
-	                    face.push( j );
-	                    found = true;
+					if ( points[ j ].equals( verts[ l ] ) ) {
 
-	                }
-                
-	            }
+						face.push( j );
+						found = true;
+
+					}
+
+				}
 
 				// you would not wish to reach this point of code, something went wrong
 
@@ -524,66 +632,154 @@ THREE.FontUtils = {
 
 					points.push( verts[ l ] );
 					face.push( points.length - 1 );
-					
+
 					console.log( "not found" )
 
 				}
 
-	        }
-	
-	        triangulatedVertices.push( face );
+			}
 
-	   }
-   
-   
-	    //console.log("triangles", triangulatedVertices.length, "points", points);
+			triangulatedVertices.push( face );
 
-	    return {
+		}
 
-	        points: points,
-	        faces: triangulatedVertices
 
-	    };
+		//console.log("triangles", triangulatedVertices.length, "points", points);
+
+		return {
+
+			points: points,
+			faces: triangulatedVertices
+
+		};
 
 	},
 
 	drawText : function( text ) {
-	    
+
 		var characterpts = [], pts = [];
-	
-	    // RenderText
 
-	    var i, p,
+		// RenderText
+
+		var i, p,
 			face = this.getFace(),
-	        scale = this.size / face.resolution,
-	        offset = 0, 
-	        chars = String( text ).split( '' ), 
-	        length = chars.length;
+			scale = this.size / face.resolution,
+			offset = 0, 
+			chars = String( text ).split( '' ), 
+			length = chars.length;
 
-	    for ( i = 0; i < length; i++ ) {
+		for ( i = 0; i < length; i++ ) {
 
 			var ret = this.extractGlyphPoints( chars[ i ], face, scale, offset );
 			offset += ret.offset;
 			characterpts.push(ret.points);
 			pts = pts.concat(ret.points);
 
-	    }
-    
-	    // get the width 
+		}
 
-	    var width = offset / 2;
+		// get the width 
 
-	    for ( p = 0; p < pts.length; p++ ) {
+		var width = offset / 2;
 
-	        pts[ p ].x -= width;
+		for ( p = 0; p < pts.length; p++ ) {
 
-	    }
-	
-	    var extract = this.extractPoints( pts, characterpts );
-    
-	    extract.contour = pts;
-	    return extract;
-    
+			pts[ p ].x -= width;
+
+		}
+
+		var extract = this.extractPoints( pts, characterpts );
+
+		extract.contour = pts;
+
+		var bezelPoints = [];
+
+		var centroids = [], forCentroids = [], expandOutwards = [], sum = new THREE.Vector2(), lastV;
+
+		i = pts.length;
+
+		while ( --i >= 0 ) {
+
+			if ( !lastV ) {
+
+				lastV = pts[ i ];
+
+			} else if ( lastV.equals( pts[ i ] ) ) {
+
+				// We reached the last point of a closed loop
+
+				lastV = null;
+
+				var bool = this.Triangulate.area( forCentroids ) > 0;
+				expandOutwards.push( bool );
+				centroids.push( sum.divideScalar( forCentroids.length ) );
+				forCentroids = [];
+
+				sum = new THREE.Vector2();
+				continue;
+
+			}
+
+			sum.addSelf( pts[ i ] );
+			forCentroids.push( pts[ i ] );
+
+		}
+
+
+		i = pts.length;
+		p = 0;
+		var pt, centroid ;
+		var dirV, adj;
+
+		while ( --i >= 0 ) {
+
+			pt = pts[ i ];
+			centroid = centroids[p];
+
+			dirV = pt.clone().subSelf( centroid) ;
+			adj = this.bezelSize / dirV.length();
+
+			if ( expandOutwards[ p ] ) {
+
+				adj += 1;
+
+			}  else {
+
+				adj = 1 - adj;
+
+			}
+
+			adj = dirV.multiplyScalar( adj ).addSelf( centroid );
+			bezelPoints.unshift( adj );
+
+
+			if ( !lastV ) {
+
+				lastV = pts[ i ];
+
+			} else if ( lastV.equals( pts[ i ] ) ) {
+
+				// We reached the last point of a closed loop
+
+				lastV = null;
+				p++;
+				continue;
+
+			}
+
+		}
+
+
+		/*
+		for ( p = 0; p < pts.length; p++ ) {
+			pt = pts[ p ];
+			bezelPoints.push (new THREE.Vector2(pt.x + this.bezelSize, pt.y + this.bezelSize));
+
+		}*/
+
+		extract.bezel = bezelPoints;
+
+		return extract;
+
 	},
 
 
@@ -595,25 +791,25 @@ THREE.FontUtils = {
 	b2p0: function ( t, p ) {
 
 		var k = 1 - t;
-	    return k * k * p;
+		return k * k * p;
 
 	},
 
 	b2p1: function ( t, p ) {
 
-	    return 2 * ( 1 - t ) * t * p;
+		return 2 * ( 1 - t ) * t * p;
 
 	},
 
 	b2p2: function ( t, p ) {
 
-	    return t * t * p;
+		return t * t * p;
 
 	},
 
 	b2: function ( t, p0, p1, p2 ) {
 
-	    return this.b2p0( t, p0 ) + this.b2p1( t, p1 ) + this.b2p2( t, p2 );
+		return this.b2p0( t, p0 ) + this.b2p1( t, p1 ) + this.b2p2( t, p2 );
 
 	},
 
@@ -621,97 +817,99 @@ THREE.FontUtils = {
 
 	b3p0: function ( t, p ) {
 
-	    var k = 1 - t;
-	    return k * k * k * p;
+		var k = 1 - t;
+		return k * k * k * p;
 
 	},
 
 	b3p1: function ( t, p ) {
 
-	    var k = 1 - t;
-	    return 3 * k * k * t * p;
+		var k = 1 - t;
+		return 3 * k * k * t * p;
 
 	},
 
 	b3p2: function ( t, p ) {
 
-	    var k = 1 - t;
-	    return 3 * k * t * t * p;
+		var k = 1 - t;
+		return 3 * k * t * t * p;
 
 	},
 
 	b3p3: function ( t, p ) {
 
-	    return t * t * t * p;
+		return t * t * t * p;
 
 	},
 
 	b3: function ( t, p0, p1, p2, p3 ) {
 
-	    return this.b3p0( t, p0 ) + this.b3p1( t, p1 ) + this.b3p2( t, p2 ) +  this.b3p3( t, p3 );
+		return this.b3p0( t, p0 ) + this.b3p1( t, p1 ) + this.b3p2( t, p2 ) +  this.b3p3( t, p3 );
 
 	},
 
 
 	extractGlyphPoints : function( c, face, scale, offset ) {
+
 		var pts = [];
+
 		var i, i2,
 			outline, action, length,
 			scaleX, scaleY,
 			x, y, cpx, cpy, cpx0, cpy0, cpx1, cpy1, cpx2, cpy2,
 			laste,
 			glyph = face.glyphs[ c ] || face.glyphs[ ctxt.options.fallbackCharacter ];
-    
+	
 		if ( !glyph ) return;
   
 		if ( glyph.o ) {
-      
+	  
 			outline = glyph._cachedOutline || ( glyph._cachedOutline = glyph.o.split( ' ' ) );
-	        length = outline.length;
-        
+			length = outline.length;
+		
 			scaleX = scale;
 			scaleY = scale;
 		 
-	        for ( i = 0; i < length; ) {
+			for ( i = 0; i < length; ) {
 
 				action = outline[ i++ ];
   
 				switch( action ) {
 
-	            case 'm':
+				case 'm':
 
-	                // Move To
+					// Move To
 
-	                x = outline[ i++ ] * scaleX + offset;
+					x = outline[ i++ ] * scaleX + offset;
 					y = outline[ i++ ] * scaleY;
-	                pts.push( new THREE.Vector2( x, y ) );
+					pts.push( new THREE.Vector2( x, y ) );
 					break;
 
-	            case 'l':
+				case 'l':
 
-	                // Line To
+					// Line To
 
-	                x = outline[ i++ ] * scaleX + offset;
+					x = outline[ i++ ] * scaleX + offset;
 					y = outline[ i++ ] * scaleY;
-	                pts.push( new THREE.Vector2( x, y ) );
+					pts.push( new THREE.Vector2( x, y ) );
 					break;
 					
-	            case 'q':
+				case 'q':
 
-	                // QuadraticCurveTo
-	              
+					// QuadraticCurveTo
+				  
 					cpx  = outline[ i++ ] * scaleX + offset;
 					cpy  = outline[ i++ ] * scaleY;
 					cpx1 = outline[ i++ ] * scaleX + offset;
 					cpy1 = outline[ i++ ] * scaleY;
-              
+			  
 					laste = pts[ pts.length - 1 ];
-              
+			  
 					if ( laste ) {
 
 						cpx0 = laste.x;
 						cpy0 = laste.y;
-                
+				
 						for ( i2 = 1, divisions = this.divisions; i2 <= divisions; i2++ ) {
 
 							var t = i2 / divisions;
@@ -719,30 +917,30 @@ THREE.FontUtils = {
 							var ty = THREE.FontUtils.b2( t, cpy0, cpy1, cpy );
 							pts.push( new THREE.Vector2( tx, ty ) );
 
-	                  }
+					  }
 
-	              }              
-              
-	              break;
+				  }              
+			  
+				  break;
 
-	            case 'b':
+				case 'b':
 
 					// Cubic Bezier Curve
-	              
+				  
 					cpx  = outline[ i++ ] *  scaleX + offset;
 					cpy  = outline[ i++ ] *  scaleY;
 					cpx1 = outline[ i++ ] *  scaleX + offset;
 					cpy1 = outline[ i++ ] * -scaleY;
 					cpx2 = outline[ i++ ] *  scaleX + offset;
 					cpy2 = outline[ i++ ] * -scaleY;
-              
+			  
 					laste = pts[ pts.length - 1 ];
-              
+			  
 					if ( laste ) {
 
 						cpx0 = laste.x;
 						cpy0 = laste.y;
-                
+				
 						for ( i2 = 1, divisions = this.divisions; i2 <= divisions; i2++ ) {
 
 							var t = i2 / divisions;
@@ -784,72 +982,72 @@ THREE.FontUtils = {
 
 
 ( function( namespace ) {
-		
-    var EPSILON = 0.0000000001;
-    
-    // takes in an contour array and returns 
 
-    var process = function( contour, indices ) {
+	var EPSILON = 0.0000000001;
+
+	// takes in an contour array and returns 
+
+	var process = function( contour, indices ) {
 
 		var n = contour.length;
-        
+
 		if ( n < 3 ) return null;
 
-        var result = [],
+		var result = [],
 			verts = [], 
 			vertIndices = [];
 
 		/* we want a counter-clockwise polygon in verts */
-        
+
 		var u, v, w;
-        
-        if ( area( contour ) > 0.0 ) {
 
-            for ( v = 0; v < n; v++ ) verts[ v ] = v;
+		if ( area( contour ) > 0.0 ) {
 
-        } else {
+			for ( v = 0; v < n; v++ ) verts[ v ] = v;
 
-            for ( v = 0; v < n; v++ ) verts[ v ] = ( n - 1 ) - v;
+		} else {
 
-        }
-        
-        var nv = n;
-        
-        /*  remove nv - 2 vertices, creating 1 triangle every time */
+			for ( v = 0; v < n; v++ ) verts[ v ] = ( n - 1 ) - v;
 
-        var count = 2 * nv;   /* error detection */
+		}
+
+		var nv = n;
+
+		/*  remove nv - 2 vertices, creating 1 triangle every time */
+
+		var count = 2 * nv;   /* error detection */
 
 		for( v = nv - 1; nv > 2; ) {
-            
+
 			/* if we loop, it is probably a non-simple polygon */
-                
+
 			if ( ( count-- ) <= 0 ) {
 
 				//** Triangulate: ERROR - probable bad polygon!
-				
+
 				//throw ( "Warning, unable to triangulate polygon!" );
 				//return null;
-				
+
 				console.log( "Warning, unable to triangulate polygon!" );
-				
+
 				if ( indices ) return vertIndices;
 				return result;
 
 			}
-            
+
 			/* three consecutive vertices in current polygon, <u,v,w> */
 			
 			u = v; 	 	if ( nv <= u ) u = 0;     /* previous */
 			v = u + 1;  if ( nv <= v ) v = 0;     /* new v    */
 			w = v + 1;  if ( nv <= w ) w = 0;     /* next     */
-            
+			
 			if ( snip( contour, u, v, w, nv, verts ) ) {
 
 				var a, b, c, s, t;
-            
+			
 				/* true names of the vertices */
 
-                a = verts[ u ]; 
+				a = verts[ u ]; 
 				b = verts[ v ]; 
 				c = verts[ w ];
 
@@ -860,7 +1058,7 @@ THREE.FontUtils = {
 				result.push( contour[ c ] );
 
 				vertIndices.push( [ verts[ u ], verts[ v ], verts[ w ] ] );
-            
+			
 				/* remove v from the remaining polygon */
 
 				for( s = v, t = v + 1; t < nv; s++, t++ ) {
@@ -870,65 +1068,65 @@ THREE.FontUtils = {
 				}
 
 				nv--;
-            
+			
 				/* reset error detection counter */
 
 				count = 2 * nv;
 
-            }
+			}
 
 		}
-        
-        if ( indices ) return vertIndices;
+		
+		if ( indices ) return vertIndices;
 		return result;
 
-    };
-    
-    // calculate area of the contour polygon
+	};
+	
+	// calculate area of the contour polygon
 
-    var area = function ( contour ) {
+	var area = function ( contour ) {
 
-        var n = contour.length;
-        var a = 0.0;
-        
-        for( var p = n - 1, q = 0; q < n; p = q++ ) {
+		var n = contour.length;
+		var a = 0.0;
+		
+		for( var p = n - 1, q = 0; q < n; p = q++ ) {
 
-            a += contour[ p ].x * contour[ q ].y - contour[ q ].x * contour[ p ].y;
+			a += contour[ p ].x * contour[ q ].y - contour[ q ].x * contour[ p ].y;
 
-        }
+		}
 
-        return a * 0.5;
+		return a * 0.5;
 
-    };
-    
-    // see if p is inside triangle abc
+	};
+	
+	// see if p is inside triangle abc
 
-    var insideTriangle = function( ax, ay,
+	var insideTriangle = function( ax, ay,
 								   bx, by,
 								   cx, cy,
 								   px, py ) {
 
-          var aX, aY, bX, bY;
-          var cX, cY, apx, apy;
-          var bpx, bpy, cpx, cpy;
-          var cCROSSap, bCROSScp, aCROSSbp;
-        
-          aX = cx - bx;  aY = cy - by;
-          bX = ax - cx;  bY = ay - cy;
-          cX = bx - ax;  cY = by - ay;
-          apx= px  -ax;  apy= py - ay;
-          bpx= px - bx;  bpy= py - by;
-          cpx= px - cx;  cpy= py - cy;
-        
-          aCROSSbp = aX*bpy - aY*bpx;
-          cCROSSap = cX*apy - cY*apx;
-          bCROSScp = bX*cpy - bY*cpx;
-        
-          return ( (aCROSSbp >= 0.0) && (bCROSScp >= 0.0) && (cCROSSap >= 0.0) );
+		  var aX, aY, bX, bY;
+		  var cX, cY, apx, apy;
+		  var bpx, bpy, cpx, cpy;
+		  var cCROSSap, bCROSScp, aCROSSbp;
+		
+		  aX = cx - bx;  aY = cy - by;
+		  bX = ax - cx;  bY = ay - cy;
+		  cX = bx - ax;  cY = by - ay;
+		  apx= px  -ax;  apy= py - ay;
+		  bpx= px - bx;  bpy= py - by;
+		  cpx= px - cx;  cpy= py - cy;
+		
+		  aCROSSbp = aX*bpy - aY*bpx;
+		  cCROSSap = cX*apy - cY*apx;
+		  bCROSScp = bX*cpy - bY*cpx;
+		
+		  return ( (aCROSSbp >= 0.0) && (bCROSScp >= 0.0) && (cCROSSap >= 0.0) );
 
-    };
-    
-    
+	};
+	
+	
 	var snip = function ( contour, u, v, w, n, verts ) {
 
 		var p;
@@ -943,9 +1141,9 @@ THREE.FontUtils = {
 
 		cx = contour[ verts[ w ] ].x;
 		cy = contour[ verts[ w ] ].y;
-        
+		
 		if ( EPSILON > (((bx-ax)*(cy-ay)) - ((by-ay)*(cx-ax))) ) return false;
-        
+		
 			for ( p = 0; p < n; p++ ) {
 
 				if( (p == u) || (p == v) || (p == w) ) continue;
@@ -953,19 +1151,19 @@ THREE.FontUtils = {
 				px = contour[ verts[ p ] ].x
 				py = contour[ verts[ p ] ].y
 
-                if ( insideTriangle( ax, ay, bx, by, cx, cy, px, py ) ) return false;
+				if ( insideTriangle( ax, ay, bx, by, cx, cy, px, py ) ) return false;
 
-          }
+		  }
 
-          return true;
+		  return true;
 
-    };
-    
-    
-    namespace.Triangulate = process;
+	};
+	
+	
+	namespace.Triangulate = process;
 	namespace.Triangulate.area = area;
-    
-    return namespace;
+	
+	return namespace;
 
 })(THREE.FontUtils);
 
