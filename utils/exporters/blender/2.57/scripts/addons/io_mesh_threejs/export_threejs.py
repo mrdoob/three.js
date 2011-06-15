@@ -20,7 +20,6 @@
 Blender exporter for Three.js (ASCII JSON format).
 
 TODO
-    - export scene
     - copy used images to folder where exported file goes
     - binary format
 """
@@ -162,7 +161,7 @@ TEMPLATE_GEOMETRY_EMBED = """\
 
 TEMPLATE_TEXTURE = """\
     %(texture_id)s : {
-        "url": %(texture_file)s
+        "url": %(texture_file)s%(extras)s
     }"""
 
 TEMPLATE_MATERIAL_SCENE = """\
@@ -755,11 +754,17 @@ def extract_materials(mesh, scene, option_colors):
 
             material["specularCoef"] = m.specular_hardness
 
-            if m.active_texture and m.active_texture.type == 'IMAGE' and m.active_texture.image:
-                fn = bpy.path.abspath(m.active_texture.image.filepath)
+            texture = m.active_texture
+
+            if texture and texture.type == 'IMAGE' and texture.image:
+                fn = bpy.path.abspath(texture.image.filepath)
                 fn = os.path.normpath(fn)
                 fn_strip = os.path.basename(fn)
+
                 material['mapDiffuse'] = fn_strip
+                
+                if texture.repeat_x != 1 or texture.repeat_y != 1:
+                    material['mapDiffuseRepeat'] = [texture.repeat_x, texture.repeat_y]
 
             material["vertexColors"] = m.THREE_useVertexColors and option_colors
 
@@ -769,7 +774,7 @@ def extract_materials(mesh, scene, option_colors):
             #    material['shading'] = "Phong"
             #else:
             #    material['shading'] = "Lambert"
-            
+
             material['shading'] = m.THREE_materialType
 
     return materials
@@ -1182,16 +1187,25 @@ def generate_textures_scene(data):
 
     # TODO: extract just textures actually used by some objects in the scene
 
-    for img in bpy.data.images:
+    for texture in bpy.data.textures:
 
-        texture_id = img.name
-        texture_file = extract_texture_filename(img)
+        if texture.type == 'IMAGE' and texture.image:
 
-        texture_string = TEMPLATE_TEXTURE % {
-        "texture_id"   : generate_string(texture_id),
-        "texture_file" : generate_string(texture_file)
-        }
-        chunks.append(texture_string)
+            img = texture.image
+
+            texture_id = img.name
+            texture_file = extract_texture_filename(img)
+            
+            extras = ""
+            if texture.repeat_x != 1 or texture.repeat_y != 1:
+                extras = ',\n        "repeat": [%f, %f]' % (texture.repeat_x, texture.repeat_y)
+
+            texture_string = TEMPLATE_TEXTURE % {
+            "texture_id"   : generate_string(texture_id),
+            "texture_file" : generate_string(texture_file),
+            "extras"       : extras
+            }
+            chunks.append(texture_string)
 
     return ",\n\n".join(chunks), len(chunks)
 
@@ -1251,19 +1265,17 @@ def extract_material_data(m, option_colors):
 
                 if t.use_normal_map:
                     material['mapNormal'] = name
+
                 else:
+
                     if not material['mapDiffuse']:
                         material['mapDiffuse'] = name
+
                     else:
                         material['mapLight'] = name
 
                 if material['mapDiffuse'] and material['mapNormal'] and material['mapLight']:
                     break
-
-    #if m.specular_intensity > 0.0 and (m.specular_color[0] > 0 or m.specular_color[1] > 0 or m.specular_color[2] > 0):
-    #    material['shading'] = "Phong"
-    #else:
-    #    material['shading'] = "Lambert"
 
     material['shading'] = m.THREE_materialType
 
@@ -1462,7 +1474,7 @@ def generate_ascii_scene(data):
 
     default_camera = ""
     if data["use_cameras"]:
-        default_camera = generate_string("default_camera")
+        default_camera = "default_camera"
 
     parameters = {
     "fname"     : data["source_file"],

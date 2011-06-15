@@ -207,16 +207,16 @@ THREE.Loader.prototype = {
 
 		}
 
-		if ( m.mapLightmap && texture_path ) {
+		if ( m.mapLight && texture_path ) {
 
 			texture = document.createElement( 'canvas' );
 
 			mpars.lightMap = new THREE.Texture( texture );
-			mpars.lightMap.sourceFile = m.mapLightmap;
+			mpars.lightMap.sourceFile = m.mapLight;
 
 			if( m.mapLightmapRepeat ) {
 
-				mpars.lightMap.repeat.set( m.mapLightmapRepeat[ 0 ], m.mapLightmapRepeat[ 1 ] );
+				mpars.lightMap.repeat.set( m.mapLightRepeat[ 0 ], m.mapLightRepeat[ 1 ] );
 				mpars.lightMap.wrapS = mpars.lightMap.wrapT = THREE.RepeatWrapping;
 
 			}

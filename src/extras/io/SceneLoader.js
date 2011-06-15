@@ -589,6 +589,13 @@ THREE.SceneLoader.prototype = {
 
 					if ( THREE[ tt.magFilter ] != undefined )
 						texture.magFilter = THREE[ tt.magFilter ];
+					
+					if ( tt.repeat ) {
+
+						texture.repeat.set( tt.repeat[ 0 ], tt.repeat[ 1 ] );
+						texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+
+					}
 
 				}
 
