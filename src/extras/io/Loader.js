@@ -180,6 +180,19 @@ THREE.Loader.prototype = {
 			mpars.map = new THREE.Texture( texture );
 			mpars.map.sourceFile = m.mapDiffuse;
 
+			if( m.mapDiffuseRepeat ) {
+
+				mpars.map.repeat.set( m.mapDiffuseRepeat[ 0 ], m.mapDiffuseRepeat[ 1 ] );
+				mpars.map.wrapS = mpars.map.wrapT = THREE.RepeatWrapping;
+
+			}
+
+			if( m.mapDiffuseOffset ) {
+
+				mpars.map.offset.set( m.mapDiffuseOffset[ 0 ], m.mapDiffuseOffset[ 1 ] );
+
+			}
+
 			load_image( mpars.map, texture_path + "/" + m.mapDiffuse );
 
 		} else if ( m.colorDiffuse ) {
@@ -200,6 +213,19 @@ THREE.Loader.prototype = {
 
 			mpars.lightMap = new THREE.Texture( texture );
 			mpars.lightMap.sourceFile = m.mapLightmap;
+
+			if( m.mapLightmapRepeat ) {
+
+				mpars.lightMap.repeat.set( m.mapLightmapRepeat[ 0 ], m.mapLightmapRepeat[ 1 ] );
+				mpars.lightMap.wrapS = mpars.lightMap.wrapT = THREE.RepeatWrapping;
+
+			}
+
+			if( m.mapLightmapOffset ) {
+
+				mpars.lightMap.offset.set( m.mapLightmapOffset[ 0 ], m.mapLightmapOffset[ 1 ] );
+
+			}
 
 			load_image( mpars.lightMap, texture_path + "/" + m.mapLightmap );
 
