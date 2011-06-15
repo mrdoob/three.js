@@ -4663,7 +4663,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setTexture( texture, slot ) {
 
-		/*
 		if ( texture.needsUpdate ) {
 
 			if ( !texture.__webglInit ) {
@@ -4690,10 +4689,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		_gl.activeTexture( _gl.TEXTURE0 + slot );
-		_gl.bindTexture( _gl.TEXTURE_2D, texture.__webglTexture );
-		*/
-
+		/*
 		if ( texture.needsUpdate ) {
 
 			if ( texture.__webglTexture ) {
@@ -4714,9 +4710,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 			texture.needsUpdate = false;
 
 		}
-
+		*/
+		
 		_gl.activeTexture( _gl.TEXTURE0 + slot );
 		_gl.bindTexture( _gl.TEXTURE_2D, texture.__webglTexture );
+
 
 	};
 

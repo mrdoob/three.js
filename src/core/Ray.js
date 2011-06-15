@@ -155,7 +155,8 @@ THREE.Ray.prototype = {
 			vector = object.position.clone().subSelf( origin );
 			dot = vector.dot( direction );
 
-			if ( dot < 0 ) return false; // Object is behind origin
+			// TODO: Double check this
+			// if ( dot < 0 ) return false; // Object is behind origin
 
 			intersect = origin.clone().addSelf( direction.clone().multiplyScalar( dot ) );
 			distance = object.position.distanceTo( intersect );
