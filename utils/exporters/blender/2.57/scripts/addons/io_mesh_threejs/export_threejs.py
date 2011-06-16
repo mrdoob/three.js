@@ -1340,15 +1340,32 @@ def generate_materials_scene(data):
 def generate_cameras(data):
     if data["use_cameras"]:
 
-        cameras = data.get("cameras", [])
+        cams = bpy.data.objects
+        cams = [ob for ob in cams if ob.type == 'CAMERA']
         
-        if not cameras:
-            cameras.append(DEFAULTS["camera"])
+        if not cams:
+            cams.append(DEFAULTS["camera"])
 
         chunks = []
 
-        for camera in cameras:
+        for cameraobj in cams:
+            camera = bpy.data.cameras[cameraobj.name]
 
+            if camera.id_data.type == "PERSP":
+                
+                camera_string = TEMPLATE_CAMERA_PERSPECTIVE % {
+                "camera_id" : generate_string(camera.name),
+                "fov"       : (camera.angle / 3.14) * 180.0,
+                "aspect"    : 1.333,
+                "near"      : camera.clip_start,
+                "far"       : camera.clip_end,
+                "position"  : generate_vec3([cameraobj.location[0], cameraobj.location[2], cameraobj.location[1]]),
+                "target"    : generate_vec3([0, 0, 0])
+                }
+            else:
+                camera_string = str(camera.type)
+                
+            """
             if camera["type"] == "perspective":
 
                 camera_string = TEMPLATE_CAMERA_PERSPECTIVE % {
@@ -1374,6 +1391,7 @@ def generate_cameras(data):
                 "position"  : generate_vec3(camera["position"]),
                 "target"    : generate_vec3(camera["target"])
                 }
+            """
 
             chunks.append(camera_string)
 
