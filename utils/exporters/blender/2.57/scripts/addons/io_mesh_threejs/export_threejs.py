@@ -27,6 +27,7 @@ TODO
 import bpy
 import mathutils
 
+import shutil
 import os
 import os.path
 import math
@@ -1190,6 +1191,14 @@ def generate_textures_scene(data):
 
     # TODO: extract just textures actually used by some objects in the scene
 
+    rel_dest_dir = (os.path.basename(fpath).split(".")[0] + "\\").replace("\\","\\\\")
+    abs_dest_dir = fpath.split(".")[0] + "\\"
+
+    try:
+        os.makedirs(abs_dest_dir)
+    except OSError:
+        pass
+
     for texture in bpy.data.textures:
 
         if texture.type == 'IMAGE' and texture.image:
@@ -1199,6 +1208,8 @@ def generate_textures_scene(data):
             texture_id = img.name
             texture_file = extract_texture_filename(img)
             
+            shutil.copy(img.filepath,abs_dest_dir + texture_file)
+
             extras = ""
             if texture.repeat_x != 1 or texture.repeat_y != 1:
                 extras = ',\n        "repeat": [%f, %f]' % (texture.repeat_x, texture.repeat_y)
@@ -1208,7 +1219,7 @@ def generate_textures_scene(data):
 
             texture_string = TEMPLATE_TEXTURE % {
             "texture_id"   : generate_string(texture_id),
-            "texture_file" : generate_string(texture_file),
+            "texture_file" : generate_string(rel_dest_dir + texture_file),
             "extras"       : extras
             }
             chunks.append(texture_string)
@@ -1540,6 +1551,8 @@ def generate_ascii_scene(data):
     return text
 
 def export_scene(scene, filepath, flipyz, option_colors, option_lights, option_cameras, option_embed_meshes, embeds,option_url_base_type):
+    global fpath
+    fpath = filepath
 
     source_file = os.path.basename(bpy.data.filepath)
 
@@ -1671,6 +1684,5 @@ def save(operator, context, filepath = "",
                     option_flip_yz,
                     option_scale,
                     True)
-
 
     return {'FINISHED'}
