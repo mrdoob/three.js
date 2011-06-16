@@ -1347,31 +1347,13 @@ def generate_cameras(data):
     if data["use_cameras"]:
 
         cams = bpy.data.objects
-        cams = [ob for ob in cams if ob.type == 'CAMERA']
+        cams = [ob for ob in cams if (ob.type == 'CAMERA' and ob.select)]
+        
+        chunks = []
         
         if not cams:
-            cams.append(DEFAULTS["camera"])
+            camera = DEFAULTS["camera"]
 
-        chunks = []
-
-        for cameraobj in cams:
-            camera = bpy.data.cameras[cameraobj.name]
-
-            if camera.id_data.type == "PERSP":
-                
-                camera_string = TEMPLATE_CAMERA_PERSPECTIVE % {
-                "camera_id" : generate_string(camera.name),
-                "fov"       : (camera.angle / 3.14) * 180.0,
-                "aspect"    : 1.333,
-                "near"      : camera.clip_start,
-                "far"       : camera.clip_end,
-                "position"  : generate_vec3([cameraobj.location[0], cameraobj.location[2], cameraobj.location[1]]),
-                "target"    : generate_vec3([0, 0, 0])
-                }
-            else:
-                camera_string = str(camera.type)
-                
-            """
             if camera["type"] == "perspective":
 
                 camera_string = TEMPLATE_CAMERA_PERSPECTIVE % {
@@ -1397,9 +1379,31 @@ def generate_cameras(data):
                 "position"  : generate_vec3(camera["position"]),
                 "target"    : generate_vec3(camera["target"])
                 }
-            """
-
+            
             chunks.append(camera_string)
+
+        else:
+
+            for cameraobj in cams:
+                camera = bpy.data.cameras[cameraobj.name]
+
+                # TODO:
+                #   Support more than perspective camera
+                #   Calculate a target/lookat
+                #   Get correct aspect ratio
+                if camera.id_data.type == "PERSP":
+
+                    camera_string = TEMPLATE_CAMERA_PERSPECTIVE % {
+                    "camera_id" : generate_string(camera.name),
+                    "fov"       : (camera.angle / 3.14) * 180.0,
+                    "aspect"    : 1.333,
+                    "near"      : camera.clip_start,
+                    "far"       : camera.clip_end,
+                    "position"  : generate_vec3([cameraobj.location[0], cameraobj.location[2], cameraobj.location[1]]),
+                    "target"    : generate_vec3([0, 0, 0])
+                    }
+
+                chunks.append(camera_string)
 
         return ",\n\n".join(chunks)
 
@@ -1498,7 +1502,11 @@ def generate_ascii_scene(data):
 
     default_camera = ""
     if data["use_cameras"]:
-        default_camera = "default_camera"
+        cams = [ob for ob in bpy.data.objects if (ob.type == 'CAMERA' and ob.select)]
+        if not cams:
+            default_camera = "default_camera"
+        else:
+            default_camera = cams[0].name
 
     parameters = {
     "fname"     : data["source_file"],
