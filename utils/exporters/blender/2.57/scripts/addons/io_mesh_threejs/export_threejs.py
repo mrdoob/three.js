@@ -91,7 +91,7 @@ TEMPLATE_SCENE_ASCII = """\
 var scene = {
 
 "type" : "scene",
-"urlBaseType" : "relativeToScene",
+"urlBaseType" : %(basetype)s,
 
 %(sections)s
 
@@ -1473,6 +1473,13 @@ def generate_ascii_scene(data):
 
     embeds = generate_embeds(data)
 
+    basetype = "RelativeTo"
+
+    if data["base_type"]:
+        basetype += "HTML"
+    else:
+        basetype += "Scene"
+
     sections = [
     ["objects",    objects],
     ["geometries", geometries],
@@ -1506,6 +1513,7 @@ def generate_ascii_scene(data):
     "nobjects"      : nobjects,
     "ngeometries"   : ngeometries,
     "ntextures"     : ntextures,
+    "basetype"      : generate_string(basetype),
     "nmaterials"    : nmaterials,
 
     "position"      : generate_vec3(DEFAULTS["position"]),
@@ -1517,7 +1525,7 @@ def generate_ascii_scene(data):
 
     return text
 
-def export_scene(scene, filepath, flipyz, option_colors, option_lights, option_cameras, option_embed_meshes, embeds):
+def export_scene(scene, filepath, flipyz, option_colors, option_lights, option_cameras, option_embed_meshes, embeds,option_url_base_type):
 
     source_file = os.path.basename(bpy.data.filepath)
 
@@ -1532,7 +1540,8 @@ def export_scene(scene, filepath, flipyz, option_colors, option_lights, option_c
     "use_colors"  : option_colors,
     "use_lights"  : option_lights, 
     "use_cameras" : option_cameras,
-    "embed_meshes": option_embed_meshes
+    "embed_meshes": option_embed_meshes,
+    "base_type"   : option_url_base_type
     }
     scene_text += generate_ascii_scene(data)
 
@@ -1557,7 +1566,10 @@ def save(operator, context, filepath = "",
          option_lights = False,
          option_cameras = False,
          option_scale = 1.0,
-         option_embed_meshes = True):
+         option_embed_meshes = True,
+         option_url_base_type = True):
+
+    print("URL TYPE",option_url_base_type)
 
     filepath = ensure_extension(filepath, '.js')
 
@@ -1624,7 +1636,7 @@ def save(operator, context, filepath = "",
 
                     geo_set.add(name)
 
-        export_scene(scene, filepath, option_flip_yz, option_colors, option_lights, option_cameras, option_embed_meshes, embeds)
+        export_scene(scene, filepath, option_flip_yz, option_colors, option_lights, option_cameras, option_embed_meshes, embeds,option_url_base_type)
 
     else:
 
