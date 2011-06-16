@@ -3198,12 +3198,22 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				setObjectFaces( object );
 
-				for ( i = 0; i < opaque.count; i ++ ) {
+				if (scene.overrideMaterial)
+				{
+					
+					setDepthTest( scene.overrideMaterial.depthTest );
+					renderBuffer( camera, lights, fog, scene.overrideMaterial, buffer, object );
 
-					material = opaque.list[ i ];
+				} else {
+					
+					for ( i = 0; i < opaque.count; i ++ ) {
 
-					setDepthTest( material.depthTest );
-					renderBuffer( camera, lights, fog, material, buffer, object );
+						material = opaque.list[ i ];
+
+						setDepthTest( material.depthTest );
+						renderBuffer( camera, lights, fog, material, buffer, object );
+
+					}
 
 				}
 
@@ -3224,14 +3234,26 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				setObjectFaces( object );
 
-				for( i = 0; i < opaque.count; i++ ) {
+				if (scene.overrideMaterial)
+				{
+					
+					setDepthTest( scene.overrideMaterial.depthTest );
 
-					material = opaque.list[ i ];
+					program = setProgram( camera, lights, fog, scene.overrideMaterial, object );
+					object.render( function( object ) { renderBufferImmediate( object, program, scene.overrideMaterial.shading ); } );
 
-					setDepthTest( material.depthTest );
+				} else {
+					
+					for( i = 0; i < opaque.count; i++ ) {
 
-					program = setProgram( camera, lights, fog, material, object );
-					object.render( function( object ) { renderBufferImmediate( object, program, material.shading ); } );
+						material = opaque.list[ i ];
+
+						setDepthTest( material.depthTest );
+
+						program = setProgram( camera, lights, fog, material, object );
+						object.render( function( object ) { renderBufferImmediate( object, program, material.shading ); } );
+
+					}
 
 				}
 
@@ -3253,14 +3275,26 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				setObjectFaces( object );
 
-				for ( i = 0; i < transparent.count; i ++ ) {
+				if (scene.overrideMaterial)
+				{
+					
+					setBlending( scene.overrideMaterial.blending );
+					setDepthTest( scene.overrideMaterial.depthTest );
 
-					material = transparent.list[ i ];
+					renderBuffer( camera, lights, fog, scene.overrideMaterial, buffer, object );
 
-					setBlending( material.blending );
-					setDepthTest( material.depthTest );
+				} else {
+					
+					for ( i = 0; i < transparent.count; i ++ ) {
 
-					renderBuffer( camera, lights, fog, material, buffer, object );
+						material = transparent.list[ i ];
+
+						setBlending( material.blending );
+						setDepthTest( material.depthTest );
+
+						renderBuffer( camera, lights, fog, material, buffer, object );
+
+					}
 
 				}
 
@@ -3281,15 +3315,28 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				setObjectFaces( object );
 
-				for ( i = 0; i < transparent.count; i ++ ) {
+				if (scene.overrideMaterial)
+				{
 
-					material = transparent.list[ i ];
+					setBlending( scene.overrideMaterial.blending );
+					setDepthTest( scene.overrideMaterial.depthTest );
 
-					setBlending( material.blending );
-					setDepthTest( material.depthTest );
+					program = setProgram( camera, lights, fog, scene.overrideMaterial, object );
+					object.render( function( object ) { renderBufferImmediate( object, program, scene.overrideMaterial.shading ); } );
+					
+				} else {
+					
+					for ( i = 0; i < transparent.count; i ++ ) {
 
-					program = setProgram( camera, lights, fog, material, object );
-					object.render( function( object ) { renderBufferImmediate( object, program, material.shading ); } );
+						material = transparent.list[ i ];
+
+						setBlending( material.blending );
+						setDepthTest( material.depthTest );
+
+						program = setProgram( camera, lights, fog, material, object );
+						object.render( function( object ) { renderBufferImmediate( object, program, material.shading ); } );
+
+					}
 
 				}
 
