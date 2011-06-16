@@ -3125,10 +3125,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( this.sortObjects ) {
 
-						_vector3.copy( object.position );
-						_projScreenMatrix.multiplyVector3( _vector3 );
-
-						webglObject.z = _vector3.z;
+						if ( webglObject.object.renderDepth ) {
+							
+							webglObject.z = webglObject.object.renderDepth;
+						
+						} else {
+						
+							_vector3.copy( object.position );
+							_projScreenMatrix.multiplyVector3( _vector3 );
+	
+							webglObject.z = _vector3.z;
+							
+						}
 
 					}
 
