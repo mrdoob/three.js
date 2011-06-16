@@ -1479,7 +1479,7 @@ def generate_ascii_scene(data):
 
     embeds = generate_embeds(data)
 
-    basetype = "RelativeTo"
+    basetype = "relativeTo"
 
     if data["base_type"]:
         basetype += "HTML"
