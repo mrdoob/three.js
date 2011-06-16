@@ -265,7 +265,7 @@ class ExportTHREEJS(bpy.types.Operator, ExportHelper):
 
     option_export_scene = BoolProperty(name = "Scene", description = "Export scene", default = False)
     option_embed_meshes = BoolProperty(name = "Embed", description = "Embed meshes", default = True)
-    option_url_base_type = BoolProperty(name = "Url Base Type", description = "Url base type", default=True)
+    option_url_base_type = BoolProperty(name = "Use HTML as URL Base", description = "Url base type", default=True)
 
     option_lights = BoolProperty(name = "Lights", description = "Export default scene lights", default = False)
     option_cameras = BoolProperty(name = "Cameras", description = "Export default scene cameras", default = False)
@@ -348,10 +348,10 @@ class ExportTHREEJS(bpy.types.Operator, ExportHelper):
 
         row.prop(self.properties, "option_lights")
         row.prop(self.properties, "option_cameras")
-        row.prop(self.properties, "option_url_base_type")
 
         row = layout.row()
         row.prop(self.properties, "option_embed_meshes")
+        row.prop(self.properties, "option_url_base_type")
         layout.separator()
 
 

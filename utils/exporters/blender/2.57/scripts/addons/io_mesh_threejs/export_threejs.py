@@ -1583,7 +1583,7 @@ def save(operator, context, filepath = "",
          option_embed_meshes = True,
          option_url_base_type = True):
 
-    print("URL TYPE",option_url_base_type)
+    #print("URL TYPE",option_url_base_type)
 
     filepath = ensure_extension(filepath, '.js')
 
