@@ -390,8 +390,9 @@ THREE.SceneLoader.prototype = {
 				} else if ( l.type == "point" ) {
 
 					p = l.position;
+					d = l.distance;
 
-					light = new THREE.PointLight( hex, intensity );
+					light = new THREE.PointLight( hex, intensity,d);
 					light.position.set( p[0], p[1], p[2] );
 
 				}
