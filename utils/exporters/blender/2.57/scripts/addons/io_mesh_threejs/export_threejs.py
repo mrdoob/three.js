@@ -765,6 +765,9 @@ def extract_materials(mesh, scene, option_colors):
                 
                 if texture.repeat_x != 1 or texture.repeat_y != 1:
                     material['mapDiffuseRepeat'] = [texture.repeat_x, texture.repeat_y]
+                
+                if texture.extension == "REPEAT":
+                    material["mapDiffuseWrap"] = "repeat"
 
             material["vertexColors"] = m.THREE_useVertexColors and option_colors
 
@@ -1199,6 +1202,9 @@ def generate_textures_scene(data):
             extras = ""
             if texture.repeat_x != 1 or texture.repeat_y != 1:
                 extras = ',\n        "repeat": [%f, %f]' % (texture.repeat_x, texture.repeat_y)
+            
+            if texture.extension == "REPEAT":
+                extras = ',\n        "wrap": "repeat"'
 
             texture_string = TEMPLATE_TEXTURE % {
             "texture_id"   : generate_string(texture_id),
