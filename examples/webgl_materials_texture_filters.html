@@ -123,7 +123,7 @@
 
 				textureCanvas2.needsUpdate = true;
 
-				var i, j, uvs, geometryRepeat = new THREE.Plane( 100, 100, 1, 1 );
+				var i, j, uvs, geometryRepeat = new THREE.PlaneGeometry( 100, 100, 1, 1 );
 
 				for ( i = 0; i < geometryRepeat.faceVertexUvs[ 0 ].length; i ++ ) {
 
@@ -160,7 +160,7 @@
 					scene.addObject( meshCanvas );
 					scene2.addObject( meshCanvas2 );
 
-					var geometry = new THREE.Plane( 100, 100, 1, 1 ),
+					var geometry = new THREE.PlaneGeometry( 100, 100, 1, 1 ),
 						mesh = new THREE.Mesh( geometry, materialPainting ),
 						mesh2 = new THREE.Mesh( geometry, materialPainting2 );
 

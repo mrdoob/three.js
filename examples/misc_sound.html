@@ -82,12 +82,12 @@
 				light.position.normalize();
 				scene.addLight( light );
 
-				var sphere = new THREE.Sphere( 20, 32, 16 );
+				var sphere = new THREE.SphereGeometry( 20, 32, 16 );
 
 				material_sphere1 = new THREE.MeshLambertMaterial( { color: 0xffaa00, shading: THREE.FlatShading } );
 				material_sphere2 = new THREE.MeshLambertMaterial( { color: 0xff2200, shading: THREE.FlatShading } );
 
-				var cube = new THREE.Cube( 5, 40, 5 );
+				var cube = new THREE.CubeGeometry( 5, 40, 5 );
 				var material_cube = new THREE.MeshLambertMaterial( { color: 0xffff00, shading: THREE.FlatShading } );
 				material_cube.color.setHSV( 0.1, 0.7, 1 );
 
@@ -132,7 +132,7 @@
 				material_wireframe.color.setHSV( 0.1, 0.2, 0.25 );
 
 
-				var plane = new THREE.Plane( 1000, 1000, 100, 100 );
+				var plane = new THREE.PlaneGeometry( 1000, 1000, 100, 100 );
 				mesh = new THREE.Mesh( plane, material_wireframe );
 				mesh.position.y = 0.1;
 				mesh.rotation.x = -1.57;
@@ -201,7 +201,7 @@
 
 				} );
 
-				postprocessing.quad = new THREE.Mesh( new THREE.Plane( window.innerWidth, window.innerHeight ), postprocessing.materialConvolution );
+				postprocessing.quad = new THREE.Mesh( new THREE.PlaneGeometry( window.innerWidth, window.innerHeight ), postprocessing.materialConvolution );
 				postprocessing.quad.position.z = - 500;
 				postprocessing.scene.addObject( postprocessing.quad );
 

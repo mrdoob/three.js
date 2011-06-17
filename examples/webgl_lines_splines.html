@@ -191,7 +191,7 @@
 
 				} );
 
-				var plane = new THREE.Plane( window.innerWidth, window.innerHeight );
+				var plane = new THREE.PlaneGeometry( window.innerWidth, window.innerHeight );
 
 				quadScreen = new THREE.Mesh( plane, materialConvolution );
 				quadScreen.position.z = -100;

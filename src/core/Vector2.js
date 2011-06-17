@@ -1,6 +1,8 @@
 /**
  * @author mr.doob / http://mrdoob.com/
  * @author philogb / http://blog.thejit.org/
+ * @author egraether / http://egraether.com/
+ * @author zz85 / http://www.lab4games.net/zz85/blog
  */
 
 THREE.Vector2 = function ( x, y ) {
@@ -27,12 +29,24 @@ THREE.Vector2.prototype = {
 
 	copy : function ( v ) {
 
-		this.set(
+		this.x = v.x;
+		this.y = v.y;
 
-			v.x,
-			v.y
+		return this;
 
-		);
+	},
+
+	clone : function () {
+
+		return new THREE.Vector2( this.x, this.y );
+
+	},
+
+
+	add : function ( v1, v2 ) {
+
+		this.x = v1.x + v2.x;
+		this.y = v1.y + v2.y;
 
 		return this;
 
@@ -40,38 +54,8 @@ THREE.Vector2.prototype = {
 
 	addSelf : function ( v ) {
 
-		this.set(
-
-			this.x + v.x,
-			this.y + v.y
-
-		);
-
-		return this;
-
-	},
-
-	add : function ( v1, v2 ) {
-
-		this.set(
-
-			v1.x + v2.x,
-			v1.y + v2.y
-
-		);
-
-		return this;
-
-	},
-
-	subSelf : function ( v ) {
-
-		this.set(
-
-			this.x - v.x,
-			this.y - v.y
-
-		);
+		this.x += v.x;
+		this.y += v.y;
 
 		return this;
 
@@ -79,12 +63,17 @@ THREE.Vector2.prototype = {
 
 	sub : function ( v1, v2 ) {
 
-		this.set(
+		this.x = v1.x - v2.x;
+		this.y = v1.y - v2.y;
 
-			v1.x - v2.x,
-			v1.y - v2.y
+		return this;
 
-		);
+	},
+
+	subSelf : function ( v ) {
+
+		this.x -= v.x;
+		this.y -= v.y;
 
 		return this;
 
@@ -92,41 +81,40 @@ THREE.Vector2.prototype = {
 
 	multiplyScalar : function ( s ) {
 
-		this.set(
-
-			this.x * s,
-			this.y * s
-
-		);
+		this.x *= s;
+		this.y *= s;
 
 		return this;
 
 	},
+
+	divideScalar : function ( s ) {
+
+		if ( s ) {
+
+			this.x /= s;
+			this.y /= s;
+
+		} else {
+
+			this.set( 0, 0 );
+
+		}
+
+		return this;
+
+	},
+
 
 	negate : function() {
 
-		this.set(
-
-			- this.x,
-			- this.y
-
-		);
-
-		return this;
+		return this.multiplyScalar( -1 );
 
 	},
 
-	unit : function () {
+	dot : function ( v ) {
 
-		this.multiplyScalar( 1 / this.length() );
-
-		return this;
-
-	},
-
-	length : function () {
-
-		return Math.sqrt( this.lengthSq() );
+		return this.x * v.x + this.y * v.y;
 
 	},
 
@@ -136,9 +124,53 @@ THREE.Vector2.prototype = {
 
 	},
 
-	clone : function () {
+	length : function () {
 
-		return new THREE.Vector2( this.x, this.y );
+		return Math.sqrt( this.lengthSq() );
+
+	},
+
+	normalize : function () {
+
+		return this.divideScalar( this.length() );
+
+	},
+	
+	distanceTo : function ( v ) {
+
+		return Math.sqrt( this.distanceToSquared( v ) );
+
+	},
+
+	distanceToSquared : function ( v ) {
+
+		var dx = this.x - v.x, dy = this.y - v.y;
+		return dx * dx + dy * dy;
+
+	},
+
+
+	setLength : function ( l ) {
+
+		return this.normalize().multiplyScalar( l );
+
+	},
+
+	// deprecated: same as normalize
+
+	unit : function () {
+
+		return this.normalize();
+
+	},
+	
+	// danger, works only on numbers which are exactly the same
+	// (which may be not what is expected thanks to floating point precision)
+	// (should be probably using some tiny epsilon instead of equality)
+	
+	equals : function( v ) {
+
+		return ( ( v.x == this.x ) && ( v.y == this.y ) );
 
 	}
 

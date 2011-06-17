@@ -102,9 +102,9 @@
 
 				if( singleMaterial ) zmaterial = [ cubeMaterial ];
 
-				//var geo = new THREE.Cube( 1, 1, 1 );
-				//var geo = new THREE.Icosahedron( 2 );
-				var geo = new THREE.Sphere( 1, 20, 10 );
+				//var geo = new THREE.CubeGeometry( 1, 1, 1 );
+				//var geo = new THREE.IcosahedronGeometry( 2 );
+				var geo = new THREE.SphereGeometry( 1, 20, 10 );
 
 				var start = new Date().getTime();
 
@@ -259,7 +259,7 @@
 
 				} );
 
-				postprocessing.quad = new THREE.Mesh( new THREE.Plane( window.innerWidth, window.innerHeight ), postprocessing.materialBokeh );
+				postprocessing.quad = new THREE.Mesh( new THREE.PlaneGeometry( window.innerWidth, window.innerHeight ), postprocessing.materialBokeh );
 				postprocessing.quad.position.z = - 500;
 				postprocessing.scene.addObject( postprocessing.quad );
 

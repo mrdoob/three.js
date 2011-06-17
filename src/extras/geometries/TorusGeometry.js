@@ -3,7 +3,7 @@
  * based on http://code.google.com/p/away3d/source/browse/trunk/fp10/Away3DLite/src/away3dlite/primitives/Torus.as?r=2888
  */
 
-THREE.Torus = function ( radius, tube, segmentsR, segmentsT ) {
+THREE.TorusGeometry = function ( radius, tube, segmentsR, segmentsT ) {
 
 	THREE.Geometry.call( this );
 
@@ -74,5 +74,5 @@ THREE.Torus = function ( radius, tube, segmentsR, segmentsT ) {
 
 };
 
-THREE.Torus.prototype = new THREE.Geometry();
-THREE.Torus.prototype.constructor = THREE.Torus;
+THREE.TorusGeometry.prototype = new THREE.Geometry();
+THREE.TorusGeometry.prototype.constructor = THREE.TorusGeometry;

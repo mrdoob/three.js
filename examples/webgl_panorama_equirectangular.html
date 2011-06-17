@@ -59,7 +59,7 @@
 
 				scene = new THREE.Scene();
 
-				mesh = new THREE.Mesh( new THREE.Sphere( 500, 60, 40 ), new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/2294472375_24a3b8ef46_o.jpg' ) } ) );
+				mesh = new THREE.Mesh( new THREE.SphereGeometry( 500, 60, 40 ), new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/2294472375_24a3b8ef46_o.jpg' ) } ) );
 				mesh.scale.x = -1;
 				scene.addObject( mesh );
 

@@ -163,7 +163,7 @@
 
 				} );
 
-				mesh = new THREE.Mesh( new THREE.Torus( size, 0.3, 30, 30 ), [ material /*, new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, wireframeLinewidth: 2 } ) */ ] );
+				mesh = new THREE.Mesh( new THREE.TorusGeometry( size, 0.3, 30, 30 ), [ material /*, new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, wireframeLinewidth: 2 } ) */ ] );
 				mesh.position.x = 0;
 				mesh.position.y = 0;
 				mesh.rotation.x = 0.3;
@@ -257,7 +257,7 @@
 				postprocessing.materialFilm.uniforms.sIntensity.value = 0.95;
 				postprocessing.materialFilm.uniforms.sCount.value = 2048;
 
-				postprocessing.quad = new THREE.Mesh( new THREE.Plane( window.innerWidth, window.innerHeight ), postprocessing.materialConvolution );
+				postprocessing.quad = new THREE.Mesh( new THREE.PlaneGeometry( window.innerWidth, window.innerHeight ), postprocessing.materialConvolution );
 				postprocessing.quad.position.z = - 500;
 				postprocessing.scene.addObject( postprocessing.quad );
 

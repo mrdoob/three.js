@@ -826,7 +826,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		obj_skinVerticesB = geometry.skinVerticesB,
 		obj_skinIndices = geometry.skinIndices,
 		obj_skinWeights = geometry.skinWeights,
-		obj_edgeFaces = object instanceof THREE.ShadowVolume ? geometry.edgeFaces : undefined;
+		obj_edgeFaces = object instanceof THREE.ShadowVolume ? geometry.edgeFaces : undefined,
 
 		morphTargets = geometry.morphTargets;
 
@@ -2162,7 +2162,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		uniforms.diffuse.value = material.color;
 		uniforms.opacity.value = material.opacity;
+		
 		uniforms.map.texture = material.map;
+		if ( material.map ) {
+			
+			uniforms.offsetRepeat.value.set( material.map.offset.x, material.map.offset.y, material.map.repeat.x, material.map.repeat.y );
+
+		}
 
 		uniforms.lightMap.texture = material.lightMap;
 
@@ -2187,6 +2193,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		uniforms.opacity.value = material.opacity;
 		uniforms.size.value = material.size;
 		uniforms.scale.value = _canvas.height / 2.0; // TODO: Cache this.
+
 		uniforms.map.texture = material.map;
 
 	};
@@ -3332,7 +3339,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		_gl.finish();
+		//_gl.finish();
 
 	};
 
@@ -3836,6 +3843,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			scene.__webglShadowVolumes = [];
 			scene.__webglLensFlares = [];
 			scene.__webglSprites = [];
+
 		}
 
 		while ( scene.__objectsAdded.length ) {
@@ -4004,6 +4012,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		} else if ( object instanceof THREE.Sprite ) {
 
 			scene.__webglSprites.push( object );
+
 		}
 
 		/*else if ( object instanceof THREE.Particle ) {
@@ -4112,43 +4121,50 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function removeObject( object, scene ) {
+	function removeInstances( objlist, object ) {
 
-		var o, ol, zobject;
+		var o, ol;
 
-		if ( object instanceof THREE.Mesh ) {
+		for ( o = objlist.length - 1; o >= 0; o -- ) {
 
-			for ( o = scene.__webglObjects.length - 1; o >= 0; o -- ) {
+			if ( objlist[ o ].object == object ) {
 
-				zobject = scene.__webglObjects[ o ].object;
-
-				if ( object == zobject ) {
-
-					scene.__webglObjects.splice( o, 1 );
-					return;
-
-				}
-
-			}
-
-		} else if ( object instanceof THREE.Sprite ) {
-
-			for ( o = scene.__webglSprites.length - 1; o >= 0; o -- ) {
-
-				zobject = scene.__webglSprites[ o ];
-
-				if ( object == zobject ) {
-
-					scene.__webglSprites.splice( o, 1 );
-					return;
-
-				}
+				objlist.splice( o, 1 );
 
 			}
 
 		}
 
-		// add shadows, etc
+	};
+
+	function removeObject( object, scene ) {
+
+		// must check as shadow volume before mesh (as they are also meshes)
+
+		if ( object instanceof THREE.ShadowVolume ) {
+
+			removeInstances( scene.__webglShadowVolumes, object );
+
+		} else if ( object instanceof THREE.Mesh  ||
+			 object instanceof THREE.ParticleSystem ||
+			 object instanceof THREE.Ribbon ||
+		     object instanceof THREE.Line ) {
+
+			removeInstances( scene.__webglObjects, object );
+
+		} else if ( object instanceof THREE.Sprite ) {
+
+			removeInstances( scene.__webglSprites, object );
+
+		} else if ( object instanceof THREE.LensFlare ) {
+
+			removeInstances( scene.__webglLensFlares, object );
+
+		} else if ( object instanceof THREE.MarchingCubes ) {
+
+			removeInstances( scene.__webglObjectsImmediate, object );
+
+		}
 
 	};
 
@@ -4344,9 +4360,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		//
 
-		program = _gl.createProgram(),
+		program = _gl.createProgram();
 
-		prefix_fragment = [
+		var prefix_fragment = [
 
 			"#ifdef GL_ES",
 			"precision highp float;",
@@ -4367,9 +4383,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 			"uniform vec3 cameraPosition;",
 			""
 
-		].join("\n"),
+		].join("\n");
 
-		prefix_vertex = [
+		var prefix_vertex = [
 			
 			_supportsVertexTextures ? "#define VERTEX_TEXTURES" : "",
 
@@ -4655,7 +4671,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setTexture( texture, slot ) {
 
-		/*
 		if ( texture.needsUpdate ) {
 
 			if ( !texture.__webglInit ) {
@@ -4682,10 +4697,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		_gl.activeTexture( _gl.TEXTURE0 + slot );
-		_gl.bindTexture( _gl.TEXTURE_2D, texture.__webglTexture );
-		*/
-
+		/*
 		if ( texture.needsUpdate ) {
 
 			if ( texture.__webglTexture ) {
@@ -4706,9 +4718,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 			texture.needsUpdate = false;
 
 		}
-
+		*/
+		
 		_gl.activeTexture( _gl.TEXTURE0 + slot );
 		_gl.bindTexture( _gl.TEXTURE_2D, texture.__webglTexture );
+
 
 	};
 

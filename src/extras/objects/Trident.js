@@ -54,7 +54,7 @@ THREE.Trident = function ( params /** Object */) {
 
 	function getCone ( color ) {
 		//0.1 required to get a cone with a mapped bottom face
-		return new THREE.Mesh( new THREE.Cylinder( 30, 0.1, params.length / 20, params.length / 5 ), new THREE.MeshBasicMaterial( { color : color } ) );
+		return new THREE.Mesh( new THREE.CylinderGeometry( 30, 0.1, params.length / 20, params.length / 5 ), new THREE.MeshBasicMaterial( { color : color } ) );
 	}
 
 	function getSegment ( point, color ){

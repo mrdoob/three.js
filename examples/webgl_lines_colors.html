@@ -239,7 +239,7 @@
 
 				} );
 
-				postprocessing.quad = new THREE.Mesh( new THREE.Plane( window.innerWidth, window.innerHeight ), postprocessing.materialConvolution );
+				postprocessing.quad = new THREE.Mesh( new THREE.PlaneGeometry( window.innerWidth, window.innerHeight ), postprocessing.materialConvolution );
 				postprocessing.quad.position.z = - 500;
 				postprocessing.scene.addObject( postprocessing.quad );
 

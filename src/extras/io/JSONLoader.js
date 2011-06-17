@@ -56,8 +56,9 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texture_path
 	parseMorphing( scale );
 	parseEdges();
 
+	geometry.computeCentroids();
 	geometry.computeFaceNormals();
-	// geometry.computeCentroids();
+
 	// geometry.computeEdgeFaces();
 
 	function parseModel( scale ) {

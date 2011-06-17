@@ -69,7 +69,7 @@ function init() {
 	ray.origin.y = 10000;
 	ray.direction = new THREE.Vector3(0, -1, 0);
 
-	sphere = new THREE.Mesh( new THREE.Sphere( sphereSize, 10, 10 ), new THREE.MeshLambertMaterial( { color: 0xff0000 } ) );
+	sphere = new THREE.Mesh( new THREE.SphereGeometry( sphereSize, 10, 10 ), new THREE.MeshLambertMaterial( { color: 0xff0000 } ) );
 	scene.addObject(sphere);
 	camera.target = sphere;
 

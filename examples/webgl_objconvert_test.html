@@ -32,12 +32,6 @@
 
 			<p>Models by <a href="http://sketchup.google.com/3dwarehouse/details?mid=2c6fd128fca34052adc5f5b98d513da1">Reallusion</a>
 			<a href="http://sketchup.google.com/3dwarehouse/details?mid=f526cc4abf7cb68d76cab47c765b7255">iClone</a>.
-
-			<p>Using a modified version of <a href="http://github.com/alteredq/three.js">Three.js</a> by mrdoob.
-
-			<br/>
-			<p>Best viewed in Chrome 9 or Firefox 4 using WebGL renderer.
-			<p>Canvas renderer is very slow on anything other than Chrome.
 		</div>
 
 		<pre id="log"></pre>
@@ -110,20 +104,10 @@
 
 				var xm = new THREE.MeshBasicMaterial( { map: new THREE.Texture( x, THREE.UVMapping, THREE.RepeatWrapping, THREE.RepeatWrapping ) } );
 				xm.map.needsUpdate = true;
+				xm.map.repeat.set( 10, 10 );
 
-				geometry = new THREE.Plane( 100, 100, 15, 10 );
-				for( var i = 0; i < geometry.faceVertexUvs[ 0 ].length; i++ ) {
-
-					var uvs = geometry.faceVertexUvs[ 0 ][ i ];
-
-					for ( j = 0, jl = uvs.length; j < jl; j++ ) {
-
-						uvs[ j ].u *= 10;
-						uvs[ j ].v *= 10;
-
-					}
-
-				}
+				geometry = new THREE.PlaneGeometry( 100, 100, 15, 10 );
+	
 				mesh = new THREE.Mesh( geometry, xm );
 				mesh.position.x = 0;
 				mesh.position.y = FLOOR;
@@ -137,8 +121,9 @@
 				// SPHERES
 
 				var material_spheres = new THREE.MeshLambertMaterial( { color: 0xdddddd } ),
-					sphere = new THREE.Sphere( 100, 16, 8 );
-				for (var i=0; i<10; i++) {
+					sphere = new THREE.SphereGeometry( 100, 16, 8 );
+
+				for ( var i=0; i<10; i++ ) {
 					mesh = new THREE.Mesh( sphere, material_spheres );
 					mesh.position.x = 500 * (Math.random() - 0.5);
 					mesh.position.y = 300 * (Math.random() - 0) + FLOOR;
@@ -225,7 +210,7 @@
 				for ( var i = 0; i < materials.length; i ++ ) {
 
 					// material
-					mesh = new THREE.Mesh( new THREE.Plane( size, size ), materials[i] );
+					mesh = new THREE.Mesh( new THREE.PlaneGeometry( size, size ), materials[i] );
 					mesh.position.x = i * (size + 5) - ( ( materials.length - 1 )* ( size + 5 )/2);
 					mesh.position.y = FLOOR + size/2 + bottom;
 					mesh.position.z = -100;
@@ -247,7 +232,7 @@
 					var xm = new THREE.MeshBasicMaterial( { map: new THREE.Texture( x ) } );
 					xm.map.needsUpdate = true;
 
-					mesh = new THREE.Mesh( new THREE.Plane( size, size ), xm );
+					mesh = new THREE.Mesh( new THREE.PlaneGeometry( size, size ), xm );
 					mesh.position.x = i * (size + 5) - ( ( materials.length - 1 )* ( size + 5 )/2);
 					mesh.position.y = FLOOR + size/2 + bottom;
 					mesh.position.z = -99;

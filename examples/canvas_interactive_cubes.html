@@ -25,6 +25,8 @@
 			var camera, scene, projector, renderer;
 			var particleMaterial;
 
+			var objects = [];
+
 			init();
 			animate();
 
@@ -47,7 +49,7 @@
 
 				scene = new THREE.Scene();
 
-				var geometry = new THREE.Cube( 100, 100, 100 );
+				var geometry = new THREE.CubeGeometry( 100, 100, 100 );
 
 				for ( var i = 0; i < 10; i ++ ) {
 
@@ -62,6 +64,8 @@
 					object.rotation.y = ( Math.random() * 360 ) * Math.PI / 180;
 					object.rotation.z = ( Math.random() * 360 ) * Math.PI / 180;
 					scene.addObject( object );
+
+					objects.push( object );
 
 				}
 
@@ -105,7 +109,7 @@
 
 				var ray = new THREE.Ray( camera.position, vector.subSelf( camera.position ).normalize() );
 
-				var intersects = ray.intersectScene( scene );
+				var intersects = ray.intersectObjects( objects );
 
 				if ( intersects.length > 0 ) {
 

@@ -89,25 +89,13 @@
 				camera.position.y = 200;
 				camera.target.position.y = camera.position.y;
 
-				geometry = new THREE.Plane( 20000, 20000, worldWidth - 1, worldDepth - 1 );
+				geometry = new THREE.PlaneGeometry( 20000, 20000, worldWidth - 1, worldDepth - 1 );
 
 				var i, j, il, jl;
 
 				for ( i = 0, il = geometry.vertices.length; i < il; i ++ ) {
 
 					geometry.vertices[ i ].position.z = 35 * Math.sin( i/2 );
-
-				}
-
-				for( i = 0; i < geometry.faceVertexUvs[ 0 ].length; i++ ) {
-
-					var uvs = geometry.faceVertexUvs[ 0 ][ i ];
-					for ( j = 0, jl = uvs.length; j < jl; j++ ) {
-
-						uvs[ j ].u *= 5;
-						uvs[ j ].v *= 5;
-
-					}
 
 				}
 
@@ -119,6 +107,7 @@
 
 				var texture = THREE.ImageUtils.loadTexture( "textures/water.jpg" );
 				texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+				texture.repeat.set( 5, 5 );
 				material = new THREE.MeshBasicMaterial( { color:0x0044ff, opacity:1, map: texture } );
 
 				mesh = new THREE.Mesh( geometry, material );

@@ -96,7 +96,7 @@
 
 				// SPHERES
 
-				sphere = new THREE.Sphere( 100, 16, 8 );
+				sphere = new THREE.SphereGeometry( 100, 16, 8 );
 
 				for ( var i = 0; i < 10; i ++ ) {
 
@@ -242,7 +242,7 @@
 				for ( var i = 0; i < materials.length; i ++ ) {
 
 					// material
-					mesh = new THREE.Mesh( new THREE.Plane( size, size ), materials[i] );
+					mesh = new THREE.Mesh( new THREE.PlaneGeometry( size, size ), materials[i] );
 					mesh.position.x = i * ( size + 5 ) - ( ( materials.length - 1 ) * ( size + 5 ) / 2 );
 					mesh.position.y = FLOOR + size / 2 + bottom;
 					mesh.position.z = -100;
@@ -264,7 +264,7 @@
 					var xm = new THREE.MeshBasicMaterial( { map: new THREE.Texture( x ) } );
 					xm.map.needsUpdate = true;
 
-					mesh = new THREE.Mesh( new THREE.Plane( size, size ), xm );
+					mesh = new THREE.Mesh( new THREE.PlaneGeometry( size, size ), xm );
 					mesh.position.x = i * ( size + 5 ) - ( ( materials.length - 1 ) * ( size + 5 ) / 2 );
 					mesh.position.y = FLOOR + size / 2 + bottom;
 					mesh.position.z = - 99;
