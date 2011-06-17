@@ -3199,114 +3199,156 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		// opaque pass
+		if ( scene.overrideMaterial ) {
 
-		setBlending( THREE.NormalBlending );
+			setDepthTest( scene.overrideMaterial.depthTest );
+			setBlending( scene.overrideMaterial.blending );
 
-		for ( o = 0; o < ol; o ++ ) {
+			for ( o = 0; o < ol; o ++ ) {
 
-			webglObject = scene.__webglObjects[ o ];
+				webglObject = scene.__webglObjects[ o ];
 
-			if ( webglObject.render ) {
+				if ( webglObject.render ) {
 
+					object = webglObject.object;
+					buffer = webglObject.buffer;
+
+					setObjectFaces( object );
+
+					renderBuffer( camera, lights, fog, scene.overrideMaterial, buffer, object );
+
+				}
+
+			}
+
+			for ( o = 0; o < oil; o++ ) {
+
+				webglObject = scene.__webglObjectsImmediate[ o ];
 				object = webglObject.object;
-				buffer = webglObject.buffer;
-				opaque = webglObject.opaque;
 
-				setObjectFaces( object );
+				if ( object.visible ) {
 
-				for ( i = 0; i < opaque.count; i ++ ) {
+					setObjectFaces( object );
 
-					material = opaque.list[ i ];
-
-					setDepthTest( material.depthTest );
-					renderBuffer( camera, lights, fog, material, buffer, object );
+					program = setProgram( camera, lights, fog, scene.overrideMaterial, object );
+					object.render( function( object ) { renderBufferImmediate( object, program, scene.overrideMaterial.shading ); } );
 
 				}
 
 			}
 
-		}
+		} else {
 
-		// opaque pass (immediate simulator)
+			// opaque pass
 
-		for ( o = 0; o < oil; o++ ) {
+			setBlending( THREE.NormalBlending );
 
-			webglObject = scene.__webglObjectsImmediate[ o ];
-			object = webglObject.object;
+			for ( o = 0; o < ol; o ++ ) {
 
-			if ( object.visible ) {
+				webglObject = scene.__webglObjects[ o ];
 
-				opaque = webglObject.opaque;
+				if ( webglObject.render ) {
 
-				setObjectFaces( object );
+					object = webglObject.object;
+					buffer = webglObject.buffer;
+					opaque = webglObject.opaque;
 
-				for( i = 0; i < opaque.count; i++ ) {
+					setObjectFaces( object );
 
-					material = opaque.list[ i ];
+					for ( i = 0; i < opaque.count; i ++ ) {
 
-					setDepthTest( material.depthTest );
+						material = opaque.list[ i ];
 
-					program = setProgram( camera, lights, fog, material, object );
-					object.render( function( object ) { renderBufferImmediate( object, program, material.shading ); } );
+						setDepthTest( material.depthTest );
+						renderBuffer( camera, lights, fog, material, buffer, object );
+
+					}
 
 				}
 
 			}
 
-		}
+			// opaque pass (immediate simulator)
 
-		// transparent pass
+			for ( o = 0; o < oil; o++ ) {
 
-		for ( o = 0; o < ol; o ++ ) {
-
-			webglObject = scene.__webglObjects[ o ];
-
-			if ( webglObject.render ) {
-
+				webglObject = scene.__webglObjectsImmediate[ o ];
 				object = webglObject.object;
-				buffer = webglObject.buffer;
-				transparent = webglObject.transparent;
 
-				setObjectFaces( object );
+				if ( object.visible ) {
 
-				for ( i = 0; i < transparent.count; i ++ ) {
+					opaque = webglObject.opaque;
 
-					material = transparent.list[ i ];
+					setObjectFaces( object );
 
-					setBlending( material.blending );
-					setDepthTest( material.depthTest );
+					for( i = 0; i < opaque.count; i++ ) {
 
-					renderBuffer( camera, lights, fog, material, buffer, object );
+						material = opaque.list[ i ];
+
+						setDepthTest( material.depthTest );
+
+						program = setProgram( camera, lights, fog, material, object );
+						object.render( function( object ) { renderBufferImmediate( object, program, material.shading ); } );
+
+					}
 
 				}
 
 			}
 
-		}
+			// transparent pass
 
-		// transparent pass (immediate simulator)
+			for ( o = 0; o < ol; o ++ ) {
 
-		for ( o = 0; o < oil; o++ ) {
+				webglObject = scene.__webglObjects[ o ];
 
-			webglObject = scene.__webglObjectsImmediate[ o ];
-			object = webglObject.object;
+				if ( webglObject.render ) {
 
-			if ( object.visible ) {
+					object = webglObject.object;
+					buffer = webglObject.buffer;
+					transparent = webglObject.transparent;
 
-				transparent = webglObject.transparent;
+					setObjectFaces( object );
 
-				setObjectFaces( object );
+					for ( i = 0; i < transparent.count; i ++ ) {
 
-				for ( i = 0; i < transparent.count; i ++ ) {
+						material = transparent.list[ i ];
 
-					material = transparent.list[ i ];
+						setBlending( material.blending );
+						setDepthTest( material.depthTest );
 
-					setBlending( material.blending );
-					setDepthTest( material.depthTest );
+						renderBuffer( camera, lights, fog, material, buffer, object );
 
-					program = setProgram( camera, lights, fog, material, object );
-					object.render( function( object ) { renderBufferImmediate( object, program, material.shading ); } );
+					}
+
+				}
+
+			}
+
+			// transparent pass (immediate simulator)
+
+			for ( o = 0; o < oil; o++ ) {
+
+				webglObject = scene.__webglObjectsImmediate[ o ];
+				object = webglObject.object;
+
+				if ( object.visible ) {
+
+					transparent = webglObject.transparent;
+
+					setObjectFaces( object );
+
+					for ( i = 0; i < transparent.count; i ++ ) {
+
+						material = transparent.list[ i ];
+
+						setBlending( material.blending );
+						setDepthTest( material.depthTest );
+
+						program = setProgram( camera, lights, fog, material, object );
+						object.render( function( object ) { renderBufferImmediate( object, program, material.shading ); } );
+
+					}
 
 				}
 

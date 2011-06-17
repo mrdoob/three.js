@@ -320,7 +320,7 @@ THREE.SceneLoader.prototype = {
 				};
 
 				scope.callbackProgress( progress, result );
-				
+
 				scope.onLoadProgress();
 
 				if( counter_models == 0 && counter_textures == 0 ) {
@@ -390,8 +390,9 @@ THREE.SceneLoader.prototype = {
 				} else if ( l.type == "point" ) {
 
 					p = l.position;
+					d = l.distance;
 
-					light = new THREE.PointLight( hex, intensity );
+					light = new THREE.PointLight( hex, intensity, d );
 					light.position.set( p[0], p[1], p[2] );
 
 				}
@@ -589,11 +590,34 @@ THREE.SceneLoader.prototype = {
 
 					if ( THREE[ tt.magFilter ] != undefined )
 						texture.magFilter = THREE[ tt.magFilter ];
-					
+
+
 					if ( tt.repeat ) {
 
 						texture.repeat.set( tt.repeat[ 0 ], tt.repeat[ 1 ] );
-						texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+
+						if ( tt.repeat[ 0 ] != 1 ) texture.wrapS = THREE.RepeatWrapping;
+						if ( tt.repeat[ 1 ] != 1 ) texture.wrapT = THREE.RepeatWrapping;
+
+					}
+
+					if ( tt.offset ) {
+
+						texture.offset.set( tt.offset[ 0 ], tt.offset[ 1 ] );
+
+					}
+
+					// handle wrap after repeat so that default repeat can be overriden
+
+					if ( tt.wrap ) {
+
+						var wrapMap = {
+						"repeat" 	: THREE.RepeatWrapping,
+						"mirror"	: THREE.MirroredRepeatWrapping
+						}
+
+						if ( wrapMap[ tt.wrap[ 0 ] ] !== undefined ) texture.wrapS = wrapMap[ tt.wrap[ 0 ] ];
+						if ( wrapMap[ tt.wrap[ 1 ] ] !== undefined ) texture.wrapT = wrapMap[ tt.wrap[ 1 ] ];
 
 					}
 

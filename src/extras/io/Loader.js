@@ -183,7 +183,9 @@ THREE.Loader.prototype = {
 			if( m.mapDiffuseRepeat ) {
 
 				mpars.map.repeat.set( m.mapDiffuseRepeat[ 0 ], m.mapDiffuseRepeat[ 1 ] );
-				mpars.map.wrapS = mpars.map.wrapT = THREE.RepeatWrapping;
+
+				if ( m.mapDiffuseRepeat[ 0 ] != 1 ) mpars.map.wrapS = THREE.RepeatWrapping;
+				if ( m.mapDiffuseRepeat[ 1 ] != 1 ) mpars.map.wrapT = THREE.RepeatWrapping;
 
 			}
 
@@ -193,11 +195,23 @@ THREE.Loader.prototype = {
 
 			}
 
+			if( m.mapDiffuseWrap ) {
+
+				var wrapMap = {
+				"repeat" 	: THREE.RepeatWrapping,
+				"mirror"	: THREE.MirroredRepeatWrapping
+				}
+
+				if ( wrapMap[ m.mapDiffuseWrap[ 0 ] ] !== undefined ) mpars.map.wrapS = wrapMap[ m.mapDiffuseWrap[ 0 ] ];
+				if ( wrapMap[ m.mapDiffuseWrap[ 1 ] ] !== undefined ) mpars.map.wrapT = wrapMap[ m.mapDiffuseWrap[ 1 ] ];
+
+			}
+
 			load_image( mpars.map, texture_path + "/" + m.mapDiffuse );
 
 		} else if ( m.colorDiffuse ) {
 
-			color = ( m.colorDiffuse[0] * 255 << 16 ) + ( m.colorDiffuse[1] * 255 << 8 ) + m.colorDiffuse[2] * 255;
+			color = ( m.colorDiffuse[ 0 ] * 255 << 16 ) + ( m.colorDiffuse[ 1 ] * 255 << 8 ) + m.colorDiffuse[ 2 ] * 255;
 			mpars.color = color;
 			mpars.opacity =  m.transparency;
 
