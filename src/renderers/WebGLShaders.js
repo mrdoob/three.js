@@ -816,6 +816,7 @@ THREE.ShaderLib = {
 	
 			"void main(void)",
 			"{",
+				//"vUV = uvOffset + vec2( uv.x, 1.0 - uv.y ) * uvScale;",
 				"vUV = uvOffset + uv * uvScale;",
 
 				"vec2 alignedPosition = position + alignment;",
