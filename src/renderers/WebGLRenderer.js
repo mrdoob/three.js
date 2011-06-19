@@ -32,6 +32,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_oldFlipSided = null,
 	_oldBlending = null,
 	_oldDepth = null,
+    _oldPolygonOffset = null;
+    _oldPolygonOffsetFactor = null;
+    _oldPolygonOffsetUnits = null;
 	_cullEnabled = true,
 
 	_viewportX = 0,
@@ -2990,6 +2993,35 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 	};
+    
+    function setPolygonOffset ( polygonoffset, factor, units ) {
+        
+        if ( _oldPolygonOffset != polygonoffset ) {
+            
+            if ( polygonoffset ) {
+                
+                _gl.enable( _gl.POLYGON_OFFSET_FILL );
+                
+            } else {
+                
+                _gl.disable( _gl.POLYGON_OFFSET_FILL );
+                
+            }
+            
+            _oldPolygonOffset = polygonoffset;
+            
+        }
+        
+        if ( polygonoffset && ( _oldPolygonOffsetFactor != factor || _oldPolygonOffsetUnits != units ) ) {
+            
+            _gl.polygonOffset( factor, units );
+    
+            _oldPolygonOffsetFactor = factor;
+            _oldPolygonOffsetUnits = units;
+            
+        }
+    
+    };
 
 	function computeFrustum( m ) {
 
@@ -3149,10 +3181,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( this.sortObjects ) {
 
-						_vector3.copy( object.position );
-						_projScreenMatrix.multiplyVector3( _vector3 );
-
-						webglObject.z = _vector3.z;
+						if ( webglObject.object.renderDepth ) {
+							
+							webglObject.z = webglObject.object.renderDepth;
+						
+						} else {
+						
+							_vector3.copy( object.position );
+							_projScreenMatrix.multiplyVector3( _vector3 );
+	
+							webglObject.z = _vector3.z;
+							
+						}
 
 					}
 
@@ -3220,6 +3260,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					material = opaque.list[ i ];
 
 					setDepthTest( material.depthTest );
+                    setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
 					renderBuffer( camera, lights, fog, material, buffer, object );
 
 				}
@@ -3246,6 +3287,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					material = opaque.list[ i ];
 
 					setDepthTest( material.depthTest );
+                    setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
 
 					program = setProgram( camera, lights, fog, material, object );
 					object.render( function( object ) { renderBufferImmediate( object, program, material.shading ); } );
@@ -3276,6 +3318,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					setBlending( material.blending );
 					setDepthTest( material.depthTest );
+                    setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
 
 					renderBuffer( camera, lights, fog, material, buffer, object );
 
@@ -3304,6 +3347,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					setBlending( material.blending );
 					setDepthTest( material.depthTest );
+                    setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
 
 					program = setProgram( camera, lights, fog, material, object );
 					object.render( function( object ) { renderBufferImmediate( object, program, material.shading ); } );
