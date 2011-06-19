@@ -756,29 +756,11 @@ def extract_materials(mesh, scene, option_colors, option_copy_textures, filepath
 
             material["specularCoef"] = m.specular_hardness
 
-            texture = m.active_texture
+            textures = guess_material_textures(m)
 
-            if texture and texture.type == 'IMAGE' and texture.image:
-
-                texture_file = extract_texture_filename(texture.image)
-                material['mapDiffuse'] = texture_file
-
-                if option_copy_textures:
-                    save_image(texture.image, texture_file, filepath)
-
-                if texture.repeat_x != 1 or texture.repeat_y != 1:
-                    material['mapDiffuseRepeat'] = [texture.repeat_x, texture.repeat_y]
-
-                if texture.extension == "REPEAT":
-                    wrap_x = "repeat"
-                    wrap_y = "repeat"
-
-                    if texture.use_mirror_x:
-                        wrap_x = "mirror" 
-                    if texture.use_mirror_y:
-                        wrap_y = "mirror"
-
-                    material["mapDiffuseWrap"] = [wrap_x, wrap_y]
+            handle_texture('diffuse', textures, material, filepath, option_copy_textures)
+            handle_texture('light', textures, material, filepath, option_copy_textures)
+            handle_texture('normal', textures, material, filepath, option_copy_textures)
 
             material["vertexColors"] = m.THREE_useVertexColors and option_colors
 
@@ -818,6 +800,35 @@ def generate_materials_string(mesh, scene, option_colors, draw_type, option_copy
     mtl.update(extract_materials(mesh, scene, option_colors, option_copy_textures, filepath))
 
     return generate_materials(mtl, materials, draw_type)
+
+def handle_texture(id, textures, material, filepath, option_copy_textures):
+
+    if textures[id]:
+        texName     = 'map%s'       % id.capitalize()
+        repeatName  = 'map%sRepeat' % id.capitalize()
+        wrapName    = 'map%sWrap'   % id.capitalize()
+
+        texture = textures[id]
+        image = texture.image
+        fname = extract_texture_filename(image)
+        material[texName] = fname
+
+        if option_copy_textures:
+            save_image(image, fname, filepath)
+
+        if texture.repeat_x != 1 or texture.repeat_y != 1:
+            material[repeatName] = [texture.repeat_x, texture.repeat_y]
+
+        if texture.extension == "REPEAT":
+            wrap_x = "repeat"
+            wrap_y = "repeat"
+
+            if texture.use_mirror_x:
+                wrap_x = "mirror" 
+            if texture.use_mirror_y:
+                wrap_y = "mirror"
+
+            material[wrapName] = [wrap_x, wrap_y]
 
 # #####################################################
 # ASCII model generator
@@ -1303,38 +1314,57 @@ def extract_material_data(m, option_colors):
 
     material["specularCoef"] = m.specular_hardness
 
+    material["vertexColors"] = m.THREE_useVertexColors and option_colors
+
     material['mapDiffuse'] = ""
     material['mapLight'] = ""
     material['mapNormal'] = ""
 
-    material["vertexColors"] = m.THREE_useVertexColors and option_colors
-    
-    # just take first textures of each, for the moment three.js materials can't handle more
+    textures = guess_material_textures(m)
 
-    for i in range(len(m.texture_slots)):
-        ts = m.texture_slots[i]
-        if ts:
-            t = ts.texture
-            if ts.use and t.type == 'IMAGE':
-                name = t.image.name
+    if textures['diffuse']:
+        material['mapDiffuse'] = textures['diffuse'].image.name
 
-                if t.use_normal_map:
-                    material['mapNormal'] = name
+    if textures['light']:
+        material['mapLight'] = textures['light'].image.name
 
-                else:
-
-                    if not material['mapDiffuse']:
-                        material['mapDiffuse'] = name
-
-                    else:
-                        material['mapLight'] = name
-
-                if material['mapDiffuse'] and material['mapNormal'] and material['mapLight']:
-                    break
+    if textures['normal']:
+        material['mapNormal'] = textures['normal'].image.name
 
     material['shading'] = m.THREE_materialType
 
     return material
+
+def guess_material_textures(material):
+    textures = { 
+        'diffuse' : None,
+        'light'   : None,
+        'normal'  : None 
+    }
+
+    # just take first textures of each, for the moment three.js materials can't handle more
+    # assume diffuse comes before lightmap, normalmap has checked flag
+
+    for i in range(len(material.texture_slots)):
+        slot = material.texture_slots[i]
+        if slot:
+            texture = slot.texture
+            if slot.use and texture.type == 'IMAGE':
+
+                if texture.use_normal_map:
+                    textures['normal'] = texture
+
+                else:
+                    if not textures['diffuse']:
+                        textures['diffuse'] = texture
+
+                    else:
+                        textures['light'] = texture
+
+                if textures['diffuse'] and textures['normal'] and textures['light']:
+                    break
+
+    return textures
 
 def generate_material_string(material):
     type_map = {
