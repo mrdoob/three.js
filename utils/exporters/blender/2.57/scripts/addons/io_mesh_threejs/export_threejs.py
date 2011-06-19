@@ -759,11 +759,12 @@ def extract_materials(mesh, scene, option_colors, option_copy_textures, filepath
             texture = m.active_texture
 
             if texture and texture.type == 'IMAGE' and texture.image:
-                fn = bpy.path.abspath(texture.image.filepath)
-                fn = os.path.normpath(fn)
-                fn_strip = os.path.basename(fn)
 
-                material['mapDiffuse'] = fn_strip
+                texture_file = extract_texture_filename(texture.image)
+                material['mapDiffuse'] = texture_file
+
+                if option_copy_textures:
+                    save_image(texture.image, texture_file, filepath)
 
                 if texture.repeat_x != 1 or texture.repeat_y != 1:
                     material['mapDiffuseRepeat'] = [texture.repeat_x, texture.repeat_y]
@@ -778,11 +779,6 @@ def extract_materials(mesh, scene, option_colors, option_copy_textures, filepath
                         wrap_y = "mirror"
 
                     material["mapDiffuseWrap"] = [wrap_x, wrap_y]
-
-                if option_copy_textures:
-                    dst_dir = os.path.dirname(filepath)
-                    ensure_folder_exist(dst_dir)
-                    shutil.copy(texture.image.filepath, dst_dir)
 
             material["vertexColors"] = m.THREE_useVertexColors and option_colors
 
@@ -1228,10 +1224,7 @@ def generate_textures_scene(data):
             texture_file = extract_texture_filename(img)
 
             if data["copy_textures"]:
-                fpath = data["filepath"]
-                dst_dir = os.path.dirname(fpath)
-                ensure_folder_exist(dst_dir)
-                shutil.copy(img.filepath, dst_dir)
+                save_image(img, texture_file, data["filepath"])
 
             extras = ""
 
@@ -1263,6 +1256,19 @@ def extract_texture_filename(image):
     fn = os.path.normpath(fn)
     fn_strip = os.path.basename(fn)
     return fn_strip
+
+def save_image(img, name, fpath):
+    dst_dir = os.path.dirname(fpath)
+    dst_path = os.path.join(dst_dir, name)
+
+    ensure_folder_exist(dst_dir)
+
+    if img.packed_file:
+        img.save_render(dst_path)
+
+    else:
+        src_path = bpy.path.abspath(img.filepath)
+        shutil.copy(src_path, dst_dir)
 
 # #####################################################
 # Scene exporter - materials
