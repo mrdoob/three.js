@@ -20,6 +20,8 @@ THREE.Object3D = function() {
 	this.doubleSided = false;
 	this.flipSided = false;
 
+	this.renderDepth = null;
+
 	this.rotationAutoUpdate = true;
 
 	this.matrix = new THREE.Matrix4();
