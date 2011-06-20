@@ -3631,7 +3631,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					}
 
-					size = object.map.image.width / ( object.affectedByDistance ? 1 : _viewportHeight );
+					size = object.map.image.width / ( object.scaleByViewport ? _viewportHeight : 1 );
 					scale[ 0 ] = size * invAspect * object.scale.x;
 					scale[ 1 ] = size * object.scale.y;
 
