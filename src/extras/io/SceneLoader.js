@@ -30,7 +30,7 @@ THREE.SceneLoader.prototype = {
 				g, o, m, l, p, c, t, f, tt, pp,
 				geometry, material, camera, fog,
 				texture, images,
-				materials,
+				materials, light,
 				data, binLoader, jsonLoader,
 				counter_models, counter_textures,
 				total_models, total_textures,
@@ -132,10 +132,20 @@ THREE.SceneLoader.prototype = {
 
 							if ( geometry ) {
 
+								var hasNormals = false;
+
 								materials = [];
 								for( i = 0; i < o.materials.length; i++ ) {
 
 									materials[ i ] = result.materials[ o.materials[i] ];
+
+									hasNormals = materials[ i ] instanceof THREE.MeshShaderMaterial;
+
+								}
+
+								if ( hasNormals ) {
+
+									geometry.computeTangents();
 
 								}
 
@@ -193,26 +203,26 @@ THREE.SceneLoader.prototype = {
 								}
 
 								if ( o.castsShadow ) {
-									
+
 									//object.visible = true;
 									//object.materials = [ new THREE.MeshBasicMaterial( { color: 0xff0000 } ) ];
 
 									var shadow = new THREE.ShadowVolume( geometry )
 									result.scene.addChild( shadow );
-									
+
 									shadow.position = object.position;
 									shadow.rotation = object.rotation;
 									shadow.scale = object.scale;
 
 								}
-								
+
 								if ( o.trigger && o.trigger.toLowerCase() != "none" ) {
-									
+
 									var trigger = {
 									"type" 		: o.trigger,
 									"object"	: o
 									};
-									
+
 									result.triggers[ object.name ] = trigger;
 
 								}
@@ -255,14 +265,13 @@ THREE.SceneLoader.prototype = {
 							result.objects[ dd ] = object;
 							result.empties[ dd ] = object;
 
-								
 							if ( o.trigger && o.trigger.toLowerCase() != "none" ) {
-								
+
 								var trigger = {
 								"type" 		: o.trigger,
 								"object"	: o
 								};
-								
+
 								result.triggers[ object.name ] = trigger;
 
 							}
@@ -289,7 +298,7 @@ THREE.SceneLoader.prototype = {
 					handle_mesh( geo, id );
 
 					counter_models -= 1;
-					
+
 					scope.onLoadComplete();
 
 					async_callback_gate();
@@ -459,7 +468,7 @@ THREE.SceneLoader.prototype = {
 				if ( g.type == "bin_mesh" || g.type == "ascii_mesh" ) {
 
 					counter_models += 1;
-					
+
 					scope.onLoadStart();
 
 				}
@@ -540,9 +549,9 @@ THREE.SceneLoader.prototype = {
 				if( tt.url instanceof Array ) {
 
 					counter_textures += tt.url.length;
-					
+
 					for( var n = 0; n < tt.url.length; n ++ ) {
-						
+
 						scope.onLoadStart();
 
 					}
@@ -670,12 +679,101 @@ THREE.SceneLoader.prototype = {
 				}
 
 				if ( m.parameters.opacity !== undefined && m.parameters.opacity < 1.0 ) {
-					
+
 					m.parameters.transparent = true;
 
 				}
-				
-				material = new THREE[ m.type ]( m.parameters );
+
+				if ( m.parameters.normalMap ) {
+
+					var shader = THREE.ShaderUtils.lib[ "normal" ];
+					var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+
+					var diffuse = m.parameters.color;
+					var specular = m.parameters.specular;
+					var ambient = m.parameters.ambient;
+					var shininess = m.parameters.shininess;
+
+					var pointLight;
+					var directionalLight;
+					var ambientLight;
+
+					// take first of each light type (normal map shader supports just one light of each type)
+
+					for ( var i = 0; i < result.scene.lights.length; i ++ ) {
+
+						light = result.scene.lights[ i ];
+
+						if( ! ambientLight && ( light instanceof THREE.AmbientLight ) ) {
+
+							ambientLight = light;
+
+						} else if( ! pointLight && ( light instanceof THREE.PointLight ) ) {
+
+							pointLight = light;
+
+						} else if( ! directionalLight && ( light instanceof THREE.DirectionalLight ) ) {
+
+							directionalLight = light;
+
+						}
+
+					}
+
+					uniforms[ "tNormal" ].texture = result.textures[ m.parameters.normalMap ];
+
+					if ( m.parameters.normalMapFactor ) {
+
+						uniforms[ "uNormalScale" ].value = m.parameters.normalMapFactor;
+
+					}
+
+					if ( m.parameters.map ) {
+
+						uniforms[ "tDiffuse" ].texture = m.parameters.map;
+						uniforms[ "enableDiffuse" ].value = true;
+
+					}
+
+					uniforms[ "enableAO" ].value = false;
+					uniforms[ "enableSpecular" ].value = false;
+
+					if ( pointLight ) {
+
+						uniforms[ "uPointLightPos" ].value = pointLight.position;
+						uniforms[ "uPointLightColor" ].value = pointLight.color;
+
+					}
+
+					if ( directionalLight ) {
+
+						uniforms[ "uDirLightPos" ].value = directionalLight.position;
+						uniforms[ "uDirLightColor" ].value = directionalLight.color;
+
+					}
+
+					if ( ambientLight ) {
+
+						uniforms[ "uAmbientLightColor" ].value = ambientLight.color;
+
+					}
+
+					uniforms[ "uDiffuseColor" ].value.setHex( diffuse );
+					uniforms[ "uSpecularColor" ].value.setHex( specular );
+					uniforms[ "uAmbientColor" ].value.setHex( ambient );
+
+					uniforms[ "uShininess" ].value = shininess;
+
+					var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms };
+
+					material = new THREE.MeshShaderMaterial( parameters );
+
+				} else {
+
+					material = new THREE[ m.type ]( m.parameters );
+
+				}
+
 				result.materials[ dm ] = material;
 
 			}

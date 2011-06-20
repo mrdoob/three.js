@@ -808,7 +808,8 @@ def handle_texture(id, textures, material, filepath, option_copy_textures):
         repeatName  = 'map%sRepeat' % id.capitalize()
         wrapName    = 'map%sWrap'   % id.capitalize()
 
-        texture = textures[id]
+        slot = textures[id]['slot']
+        texture = textures[id]['texture']
         image = texture.image
         fname = extract_texture_filename(image)
         material[texName] = fname
@@ -829,6 +830,11 @@ def handle_texture(id, textures, material, filepath, option_copy_textures):
                 wrap_y = "mirror"
 
             material[wrapName] = [wrap_x, wrap_y]
+            
+        if slot.use_map_normal:
+            if slot.normal_factor != 1.0:
+                material['mapNormalFactor'] = slot.normal_factor
+
 
 # #####################################################
 # ASCII model generator
@@ -1319,17 +1325,20 @@ def extract_material_data(m, option_colors):
     material['mapDiffuse'] = ""
     material['mapLight'] = ""
     material['mapNormal'] = ""
+    material['mapNormalFactor'] = 1.0
 
     textures = guess_material_textures(m)
 
     if textures['diffuse']:
-        material['mapDiffuse'] = textures['diffuse'].image.name
+        material['mapDiffuse'] = textures['diffuse']['texture'].image.name
 
     if textures['light']:
-        material['mapLight'] = textures['light'].image.name
+        material['mapLight'] = textures['light']['texture'].image.name
 
     if textures['normal']:
-        material['mapNormal'] = textures['normal'].image.name
+        material['mapNormal'] = textures['normal']['texture'].image.name
+        if textures['normal']['slot'].use_map_normal:
+            material['mapNormalFactor'] = textures['normal']['slot'].normal_factor
 
     material['shading'] = m.THREE_materialType
 
@@ -1352,14 +1361,14 @@ def guess_material_textures(material):
             if slot.use and texture.type == 'IMAGE':
 
                 if texture.use_normal_map:
-                    textures['normal'] = texture
+                    textures['normal'] = { "texture": texture, "slot": slot }
 
                 else:
                     if not textures['diffuse']:
-                        textures['diffuse'] = texture
+                        textures['diffuse'] = { "texture": texture, "slot": slot }
 
                     else:
-                        textures['light'] = texture
+                        textures['light'] = { "texture": texture, "slot": slot }
 
                 if textures['diffuse'] and textures['normal'] and textures['light']:
                     break
@@ -1387,6 +1396,7 @@ def generate_material_string(material):
     colorMap = material['mapDiffuse']
     lightMap = material['mapLight']
     normalMap = material['mapNormal']
+    normalMapFactor = material['mapNormalFactor']
 
     if colorMap:
         parameters += ', "map": %s' % generate_string(colorMap)
@@ -1394,6 +1404,8 @@ def generate_material_string(material):
         parameters += ', "lightMap": %s' % generate_string(lightMap)
     if normalMap:
         parameters += ', "normalMap": %s' % generate_string(normalMap)
+    if normalMapFactor != 1.0:
+        parameters += ', "normalMapFactor": %f' % normalMapFactor
 
     if material['vertexColors']:
         parameters += ', "vertexColors": "vertex"'
