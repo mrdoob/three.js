@@ -45,7 +45,7 @@ if "bpy" in locals():
 
 import bpy
 from bpy.props import *
-from io_utils import ExportHelper, ImportHelper
+from bpy_extras.io_utils import ExportHelper, ImportHelper
 
 # ################################################################
 # Custom properties
