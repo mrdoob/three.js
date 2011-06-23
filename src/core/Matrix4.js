@@ -165,27 +165,6 @@ THREE.Matrix4.prototype = {
 		b31 = b.n31, b32 = b.n32, b33 = b.n33, b34 = b.n34,
 		b41 = b.n41, b42 = b.n42, b43 = b.n43, b44 = b.n44;
 
-		this.n11 = a11 * b11 + a12 * b21 + a13 * b31;
-		this.n12 = a11 * b12 + a12 * b22 + a13 * b32;
-		this.n13 = a11 * b13 + a12 * b23 + a13 * b33;
-		this.n14 = a11 * b14 + a12 * b24 + a13 * b34 + a14;
-
-		this.n21 = a21 * b11 + a22 * b21 + a23 * b31;
-		this.n22 = a21 * b12 + a22 * b22 + a23 * b32;
-		this.n23 = a21 * b13 + a22 * b23 + a23 * b33;
-		this.n24 = a21 * b14 + a22 * b24 + a23 * b34 + a24;
-
-		this.n31 = a31 * b11 + a32 * b21 + a33 * b31;
-		this.n32 = a31 * b12 + a32 * b22 + a33 * b32;
-		this.n33 = a31 * b13 + a32 * b23 + a33 * b33;
-		this.n34 = a31 * b14 + a32 * b24 + a33 * b34 + a34;
-
-		this.n41 = a41 * b11 + a42 * b21 + a43 * b31;
-		this.n42 = a41 * b12 + a42 * b22 + a43 * b32;
-		this.n43 = a41 * b13 + a42 * b23 + a43 * b33;
-		this.n44 = a41 * b14 + a42 * b24 + a43 * b34 + a44;
-
-		/*
 		this.n11 = a11 * b11 + a12 * b21 + a13 * b31 + a14 * b41;
 		this.n12 = a11 * b12 + a12 * b22 + a13 * b32 + a14 * b42;
 		this.n13 = a11 * b13 + a12 * b23 + a13 * b33 + a14 * b43;
@@ -205,7 +184,6 @@ THREE.Matrix4.prototype = {
 		this.n42 = a41 * b12 + a42 * b22 + a43 * b32 + a44 * b42;
 		this.n43 = a41 * b13 + a42 * b23 + a43 * b33 + a44 * b43;
 		this.n44 = a41 * b14 + a42 * b24 + a43 * b34 + a44 * b44;
-		*/
 
 		return this;
 
