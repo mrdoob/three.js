@@ -281,7 +281,7 @@ THREE.PathCamera = function ( parameters ) {
 		parent.addChild( particleObj );
 
 		var waypoint,
-			geo = new THREE.Sphere( 1, 16, 8 ),
+			geo = new THREE.SphereGeometry( 1, 16, 8 ),
 			mat = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 
 		for ( i = 0; i < spline.points.length; i++ ) {
@@ -310,8 +310,8 @@ THREE.PathCamera = function ( parameters ) {
 
 		var dummyParentMaterial = new THREE.MeshLambertMaterial( { color: 0x0077ff } ),
 		dummyChildMaterial  = new THREE.MeshLambertMaterial( { color: 0x00ff00 } ),
-		dummyParentGeo = new THREE.Cube( 10, 10, 20 ),
-		dummyChildGeo  = new THREE.Cube( 2, 2, 10 );
+		dummyParentGeo = new THREE.CubeGeometry( 10, 10, 20 ),
+		dummyChildGeo  = new THREE.CubeGeometry( 2, 2, 10 );
 
 		this.animationParent = new THREE.Mesh( dummyParentGeo, dummyParentMaterial );
 

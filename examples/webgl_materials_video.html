@@ -130,7 +130,7 @@
 					ox = i;
 					oy = j;
 
-					geometry = new THREE.Cube( xsize, ysize, xsize );
+					geometry = new THREE.CubeGeometry( xsize, ysize, xsize );
 					change_uvs( geometry, ux, uy, ox, oy );
 
 					materials[ cube_count ] = new THREE.MeshLambertMaterial( parameters );
@@ -242,7 +242,7 @@
 
 				} );
 
-				postprocessing.quad = new THREE.Mesh( new THREE.Plane( window.innerWidth, window.innerHeight ), postprocessing.materialConvolution );
+				postprocessing.quad = new THREE.Mesh( new THREE.PlaneGeometry( window.innerWidth, window.innerHeight ), postprocessing.materialConvolution );
 				postprocessing.quad.position.z = -500;
 				postprocessing.scene.addObject( postprocessing.quad );
 

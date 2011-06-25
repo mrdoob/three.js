@@ -150,7 +150,7 @@
 
 				// var mt = new THREE.MeshBasicMaterial( { color:0xffffff, map: ImageUtils.loadTexture( "textures/land_ocean_ice_cloud_2048.jpg" ) } );
 
-				var plane = new THREE.Plane( window.innerWidth, window.innerHeight );
+				var plane = new THREE.PlaneGeometry( window.innerWidth, window.innerHeight );
 
 				quad = new THREE.Mesh( plane, material );
 				quad.position.z = -100;
@@ -164,7 +164,7 @@
 				sceneScreen.addObject( quad );
 
 				var n = 5,
-					geometry = new THREE.Sphere( 10, 64, 32 ),
+					geometry = new THREE.SphereGeometry( 10, 64, 32 ),
 					material2 = new THREE.MeshLambertMaterial( { color:0xffffff, map: rtTexture } );
 					//material2 = new THREE.MeshBasicMaterial( { color:0xffffff, map: rtTexture } );
 

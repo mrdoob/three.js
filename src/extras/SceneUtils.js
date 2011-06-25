@@ -33,7 +33,7 @@ THREE.SceneUtils = {
 
 		} ),
 
-		mesh = new THREE.Mesh( new THREE.Cube( size, size, size, 1, 1, 1, null, true ), material );
+		mesh = new THREE.Mesh( new THREE.CubeGeometry( size, size, size, 1, 1, 1, null, true ), material );
 		scene.addObject( mesh );
 
 		return mesh;

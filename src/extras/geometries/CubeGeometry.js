@@ -3,7 +3,7 @@
  * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Cube.as
  */
 
-THREE.Cube = function ( width, height, depth, segmentsWidth, segmentsHeight, segmentsDepth, materials, flipped, sides ) {
+THREE.CubeGeometry = function ( width, height, depth, segmentsWidth, segmentsHeight, segmentsDepth, materials, flipped, sides ) {
 
 	THREE.Geometry.call( this );
 
@@ -182,5 +182,5 @@ THREE.Cube = function ( width, height, depth, segmentsWidth, segmentsHeight, seg
 
 };
 
-THREE.Cube.prototype = new THREE.Geometry();
-THREE.Cube.prototype.constructor = THREE.Cube;
+THREE.CubeGeometry.prototype = new THREE.Geometry();
+THREE.CubeGeometry.prototype.constructor = THREE.CubeGeometry;

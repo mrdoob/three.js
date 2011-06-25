@@ -1,1 +1,1 @@
-python build.py --all --includes
+python build.py --all --minified

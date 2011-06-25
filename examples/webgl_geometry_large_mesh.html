@@ -131,7 +131,7 @@
 				scene.addLight( pointLight );
 
 				// light representation
-				sphere = new THREE.Sphere( 100, 16, 8, 1 );
+				sphere = new THREE.SphereGeometry( 100, 16, 8, 1 );
 				lightMesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) );
 				lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
 				lightMesh.position = pointLight.position;

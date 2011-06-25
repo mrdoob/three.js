@@ -109,7 +109,7 @@
 					nx = ( i & 4 ) == 4;
 					pz = ( i & 2 ) == 2;
 					nz = ( i & 1 ) == 1;
-					cubes[ i ] = new THREE.Cube( 100, 100, 100, 1, 1, 1, materials, false, { px: px, nx: nx, py: true, ny: false, pz: pz, nz: nz } );
+					cubes[ i ] = new THREE.CubeGeometry( 100, 100, 100, 1, 1, 1, materials, false, { px: px, nx: nx, py: true, ny: false, pz: pz, nz: nz } );
 
 				}
 

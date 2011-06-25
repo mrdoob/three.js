@@ -151,7 +151,7 @@
 
 		// planet		
 		
-        geometry = new THREE.Sphere( radius, 100, 50 );
+        geometry = new THREE.SphereGeometry( radius, 100, 50 );
 		geometry.computeTangents();		
 
         meshPlanet = new THREE.Mesh( geometry, materialNormalMap );
@@ -344,7 +344,7 @@
 		postprocessing.materialFilm.uniforms.sIntensity.value = 0.75;
 		postprocessing.materialFilm.uniforms.sCount.value = 2048;
 
-		postprocessing.quad = new THREE.Mesh( new THREE.Plane( SCREEN_WIDTH, SCREEN_HEIGHT ), postprocessing.materialConvolution );
+		postprocessing.quad = new THREE.Mesh( new THREE.PlaneGeometry( SCREEN_WIDTH, SCREEN_HEIGHT ), postprocessing.materialConvolution );
 		postprocessing.quad.position.z = - 500;
 		postprocessing.scene.addObject( postprocessing.quad );
 
