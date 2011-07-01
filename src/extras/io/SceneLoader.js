@@ -690,7 +690,7 @@ THREE.SceneLoader.prototype = {
 
 				if ( m.parameters.normalMap ) {
 
-					var shader = THREE.ShaderUtils.lib[ "normal2" ];
+					var shader = THREE.ShaderUtils.lib[ "normal" ];
 					var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
 					var diffuse = m.parameters.color;
