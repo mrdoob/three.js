@@ -404,6 +404,10 @@ THREE.SceneLoader.prototype = {
 					light = new THREE.PointLight( hex, intensity, d );
 					light.position.set( p[0], p[1], p[2] );
 
+				} else if ( l.type == "ambient" ) {
+
+					light = new THREE.AmbientLight( hex );
+
 				}
 
 				result.scene.addLight( light );
@@ -686,39 +690,13 @@ THREE.SceneLoader.prototype = {
 
 				if ( m.parameters.normalMap ) {
 
-					var shader = THREE.ShaderUtils.lib[ "normal" ];
+					var shader = THREE.ShaderUtils.lib[ "normal2" ];
 					var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
 					var diffuse = m.parameters.color;
 					var specular = m.parameters.specular;
 					var ambient = m.parameters.ambient;
 					var shininess = m.parameters.shininess;
-
-					var pointLight;
-					var directionalLight;
-					var ambientLight;
-
-					// take first of each light type (normal map shader supports just one light of each type)
-
-					for ( var i = 0; i < result.scene.lights.length; i ++ ) {
-
-						light = result.scene.lights[ i ];
-
-						if( ! ambientLight && ( light instanceof THREE.AmbientLight ) ) {
-
-							ambientLight = light;
-
-						} else if( ! pointLight && ( light instanceof THREE.PointLight ) ) {
-
-							pointLight = light;
-
-						} else if( ! directionalLight && ( light instanceof THREE.DirectionalLight ) ) {
-
-							directionalLight = light;
-
-						}
-
-					}
 
 					uniforms[ "tNormal" ].texture = result.textures[ m.parameters.normalMap ];
 
@@ -738,33 +716,19 @@ THREE.SceneLoader.prototype = {
 					uniforms[ "enableAO" ].value = false;
 					uniforms[ "enableSpecular" ].value = false;
 
-					if ( pointLight ) {
-
-						uniforms[ "uPointLightPos" ].value = pointLight.position;
-						uniforms[ "uPointLightColor" ].value = pointLight.color;
-
-					}
-
-					if ( directionalLight ) {
-
-						uniforms[ "uDirLightPos" ].value = directionalLight.position;
-						uniforms[ "uDirLightColor" ].value = directionalLight.color;
-
-					}
-
-					if ( ambientLight ) {
-
-						uniforms[ "uAmbientLightColor" ].value = ambientLight.color;
-
-					}
-
 					uniforms[ "uDiffuseColor" ].value.setHex( diffuse );
 					uniforms[ "uSpecularColor" ].value.setHex( specular );
 					uniforms[ "uAmbientColor" ].value.setHex( ambient );
 
 					uniforms[ "uShininess" ].value = shininess;
 
-					var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms };
+					if ( m.parameters.opacity ) {
+
+						uniforms[ "uOpacity" ].value = m.parameters.opacity;
+
+					}
+
+					var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true };
 
 					material = new THREE.MeshShaderMaterial( parameters );
 
