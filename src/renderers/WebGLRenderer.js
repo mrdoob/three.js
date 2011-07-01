@@ -269,7 +269,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var _lensFlareAttributesEnabled = false;
 
 	// prepare sprites
-	
+
 	var _sprite = {};
 
 	_sprite.vertices = new Float32Array( 8 + 8 );
@@ -534,7 +534,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( geometryGroup.numMorphTargets ) {
 
 			var m, ml;
-			geometryGroup.__webglMorphTargetsBuffers = []; 
+			geometryGroup.__webglMorphTargetsBuffers = [];
 
 			for ( m = 0, ml = geometryGroup.numMorphTargets; m < ml; m++ ) {
 
@@ -619,7 +619,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		materials = unrollGroupMaterials( geometryGroup, object );
-		
+
 		// this will not work if materials would change in run-time
 		// it should be refreshed every frame
 		// but need to do unrollGroupMaterials
@@ -684,7 +684,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( geometryGroup.numMorphTargets ) {
 
-			geometryGroup.__morphTargetsArrays = []; 
+			geometryGroup.__morphTargetsArrays = [];
 
 			for ( m = 0, ml = geometryGroup.numMorphTargets; m < ml; m++ ) {
 
@@ -744,7 +744,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 						attribute.array = new Float32Array( nvertices * size );
 						attribute.buffer = _gl.createBuffer();
 						attribute.buffer.belongsToAttribute = a;
-						
+
 						originalAttribute.needsUpdate = true;
 						attribute.__original = originalAttribute;
 
@@ -922,7 +922,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					for ( a in customAttributes ) {
 
 						customAttribute = customAttributes[ a ];
-						
+
 						if ( customAttribute.__original.needsUpdate ) {
 
 							offset_custom = customAttribute.offset;
@@ -2186,10 +2186,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		uniforms.diffuse.value = material.color;
 		uniforms.opacity.value = material.opacity;
-		
+
 		uniforms.map.texture = material.map;
 		if ( material.map ) {
-			
+
 			uniforms.offsetRepeat.value.set( material.map.offset.x, material.map.offset.y, material.map.repeat.x, material.map.repeat.y );
 
 		}
@@ -2314,7 +2314,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		maxBones = allocateBones( object );
 
 		parameters = {
-			map: !!material.map, envMap: !!material.envMap, lightMap: !!material.lightMap, 
+			map: !!material.map, envMap: !!material.envMap, lightMap: !!material.lightMap,
 			vertexColors: material.vertexColors,
 			fog: fog, sizeAttenuation: material.sizeAttenuation,
 			skinning: material.skinning,
@@ -2345,13 +2345,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		if ( material.attributes ) {
-			
+
 			for ( a in material.attributes ) {
-	
+
 				if( attributes[ a ] !== undefined && attributes[ a ] >= 0 ) _gl.enableVertexAttribArray( attributes[ a ] );
-	
+
 			}
-			
+
 		}
 
 
@@ -2520,9 +2520,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 			 material.envMap ) {
 
 			if( p_uniforms.cameraPosition !== null ) {
-				
+
 				_gl.uniform3f( p_uniforms.cameraPosition, camera.position.x, camera.position.y, camera.position.z );
-				
+
 			}
 
 		}
@@ -2532,9 +2532,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 			 material.skinning ) {
 
 			if ( p_uniforms.objectMatrix !== null ) {
-				
+
 				_gl.uniformMatrix4fv( p_uniforms.objectMatrix, false, object._objectMatrixArray );
-				
+
 			}
 
 		}
@@ -2545,10 +2545,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 			 material.skinning ) {
 
 			if( p_uniforms.viewMatrix !== null ) {
-				
+
 				_gl.uniformMatrix4fv( p_uniforms.viewMatrix, false, _viewMatrixArray );
-				
-			} 
+
+			}
 
 		}
 
@@ -2631,7 +2631,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					attribute = material.attributes[ a ];
 
 					if( attribute.buffer ) {
-						
+
 						_gl.bindBuffer( _gl.ARRAY_BUFFER, attribute.buffer );
 						_gl.vertexAttribPointer( attributes[ a ], attribute.size, _gl.FLOAT, false, 0, 0 );
 
@@ -2862,9 +2862,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 		// load updated influences uniform
 
 		if( material.program.uniforms.morphTargetInfluences !== null ) {
-			
+
 			_gl.uniform1fv( material.program.uniforms.morphTargetInfluences, object.__webglMorphTargetInfluences );
-			
+
 		}
 
 	}
@@ -2915,15 +2915,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 					ny = ( nay + nby + ncy ) / 3;
 					nz = ( naz + nbz + ncz ) / 3;
 
-					normalArray[ i ] 	 = nx; 
+					normalArray[ i ] 	 = nx;
 					normalArray[ i + 1 ] = ny;
 					normalArray[ i + 2 ] = nz;
 
-					normalArray[ i + 3 ] = nx; 
+					normalArray[ i + 3 ] = nx;
 					normalArray[ i + 4 ] = ny;
 					normalArray[ i + 5 ] = nz;
 
-					normalArray[ i + 6 ] = nx; 
+					normalArray[ i + 6 ] = nx;
 					normalArray[ i + 7 ] = ny;
 					normalArray[ i + 8 ] = nz;
 
@@ -3407,10 +3407,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 	/*
 	 * Stencil Shadows
 	 * method: we're rendering the world in light, then the shadow
-	 *         volumes into the stencil and last a big darkening 
+	 *         volumes into the stencil and last a big darkening
 	 *         quad over the whole thing. This is not how "you're
 	 *	       supposed to" do stencil shadows but is much faster
-	 * 
+	 *
 	 */
 
 	function renderStencilShadows( scene ) {
@@ -3543,7 +3543,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	/*
 	 * Render sprites
-	 * 
+	 *
 	 */
 
 	function renderSprites( scene, camera ) {
@@ -3623,7 +3623,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					if ( object.useScreenCoordinates ) {
 
 						_gl.uniform1i( uniforms.useScreenCoordinates, 1 );
-						_gl.uniform3f( uniforms.screenPosition, ( object.position.x - halfViewportWidth  ) / halfViewportWidth, 
+						_gl.uniform3f( uniforms.screenPosition, ( object.position.x - halfViewportWidth  ) / halfViewportWidth,
 																( halfViewportHeight - object.position.y ) / halfViewportHeight,
 																  Math.max( 0, Math.min( 1, object.position.z )));
 
@@ -3695,11 +3695,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	/*
 	 * Render lens flares
-	 * Method: renders 16x16 0xff00ff-colored points scattered over the light source area, 
-	 *         reads these back and calculates occlusion.  
-	 *         Then LensFlare.updateLensFlares() is called to re-position and 
+	 * Method: renders 16x16 0xff00ff-colored points scattered over the light source area,
+	 *         reads these back and calculates occlusion.
+	 *         Then LensFlare.updateLensFlares() is called to re-position and
 	 *         update transparency of flares. Then they are rendered.
-	 * 
+	 *
 	 */
 
 	function renderLensFlares( scene, camera ) {
@@ -3731,10 +3731,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 
 		if ( ! _lensFlareAttributesEnabled ) {
-		
+
 			_gl.enableVertexAttribArray( _lensFlare.attributes.vertex );
 			_gl.enableVertexAttribArray( _lensFlare.attributes.uv );
-			
+
 			_lensFlareAttributesEnabled = true;
 
 		}
@@ -3783,7 +3783,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			screenPositionPixels[ 1 ] = screenPosition[ 1 ] * halfViewportHeight + halfViewportHeight;
 
 
-			// screen cull 
+			// screen cull
 
 			if ( _lensFlare.hasVertexTexture || ( screenPositionPixels[ 0 ] > 0 &&
 				screenPositionPixels[ 0 ] < _viewportWidth &&
@@ -4238,6 +4238,22 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	function removeInstancesDirect( objlist, object ) {
+
+		var o, ol;
+
+		for ( o = objlist.length - 1; o >= 0; o -- ) {
+
+			if ( objlist[ o ] == object ) {
+
+				objlist.splice( o, 1 );
+
+			}
+
+		}
+
+	};
+
 	function removeObject( object, scene ) {
 
 		// must check as shadow volume before mesh (as they are also meshes)
@@ -4255,7 +4271,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else if ( object instanceof THREE.Sprite ) {
 
-			removeInstances( scene.__webglSprites, object );
+			removeInstancesDirect( scene.__webglSprites, object );
 
 		} else if ( object instanceof THREE.LensFlare ) {
 
@@ -4487,7 +4503,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		].join("\n");
 
 		var prefix_vertex = [
-			
+
 			_supportsVertexTextures ? "#define VERTEX_TEXTURES" : "",
 
 			"#define MAX_DIR_LIGHTS " + parameters.maxDirLights,
@@ -4820,7 +4836,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 		*/
-		
+
 		_gl.activeTexture( _gl.TEXTURE0 + slot );
 		_gl.bindTexture( _gl.TEXTURE_2D, texture.__webglTexture );
 
@@ -4907,7 +4923,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				_gl.renderbufferStorage( _gl.RENDERBUFFER, _gl.DEPTH_COMPONENT16, renderTexture.width, renderTexture.height );
 				_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.DEPTH_ATTACHMENT, _gl.RENDERBUFFER, renderTexture.__webglRenderbuffer );
 
-			/* For some reason this is not working. Defaulting to RGBA4.	
+			/* For some reason this is not working. Defaulting to RGBA4.
 			} else if( !renderTexture.depthBuffer && renderTexture.stencilBuffer ) {
 
 				_gl.renderbufferStorage( _gl.RENDERBUFFER, _gl.STENCIL_INDEX8, renderTexture.width, renderTexture.height );
@@ -5035,7 +5051,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			case THREE.LinearFilter:
 			case THREE.LinearMipMapNearestFilter:
-			case THREE.LinearMipMapLinearFilter: 
+			case THREE.LinearMipMapLinearFilter:
 			default:
 
 				return _gl.LINEAR; break;
