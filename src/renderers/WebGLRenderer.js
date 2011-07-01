@@ -270,7 +270,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// prepare sprites
 	
-	_sprite = {};
+	var _sprite = {};
 
 	_sprite.vertices = new Float32Array( 8 + 8 );
 	_sprite.faces    = new Uint16Array( 6 );
