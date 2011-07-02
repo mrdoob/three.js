@@ -22,46 +22,69 @@ THREE.Trident = function ( params /** Object */) {
 	
 	params = params || THREE.Trident.defaultParams;
 	
-	if(params !== THREE.Trident.defaultParams){
+	if ( params !== THREE.Trident.defaultParams ){
 		for ( var key in THREE.Trident.defaultParams) {
-			if(!params.hasOwnProperty(key)){
+			if( !params.hasOwnProperty( key ) ){
 				params[key] = THREE.Trident.defaultParams[key];
 			}
 		}
 	}
 	
-	this.scale = new THREE.Vector3( params.scale, params.scale, params.scale );
-	this.addChild( getSegment( new THREE.Vector3(params.length,0,0), params.xAxisColor ) );
-	this.addChild( getSegment( new THREE.Vector3(0,params.length,0), params.yAxisColor ) );
-	this.addChild( getSegment( new THREE.Vector3(0,0,params.length), params.zAxisColor ) );
+	this.materials = new Array;
 	
-	if(params.showArrows){
-		cone = getCone(params.xAxisColor);
+	this.getCone = function( color ) {
+		var material = new THREE.LineBasicMaterial( { color : color } );
+		this.materials.push(material);
+		
+		//0.1 required to get a cone with a mapped bottom face
+		return new THREE.Mesh( new THREE.CylinderGeometry( 30, 0.1, params.length / 20, params.length / 5 ), material );
+	};
+
+	this.getSegment = function( point, color ) {
+		var geom = new THREE.Geometry();
+		geom.vertices = [new THREE.Vertex(), new THREE.Vertex(point)];
+		
+		var material = new THREE.LineBasicMaterial( { color : color } );
+		this.materials.push(material);
+		
+		return new THREE.Line( geom, material );
+	};
+	
+	this.scale = new THREE.Vector3( params.scale, params.scale, params.scale );
+	this.addChild( this.getSegment( new THREE.Vector3(params.length,0,0), params.xAxisColor ) );
+	this.addChild( this.getSegment( new THREE.Vector3(0,params.length,0), params.yAxisColor ) );
+	this.addChild( this.getSegment( new THREE.Vector3(0,0,params.length), params.zAxisColor ) );
+	
+	if ( params.showArrows ) {
+		cone = this.getCone(params.xAxisColor);
 		cone.rotation.y = - hPi;
 		cone.position.x = params.length;
 		this.addChild( cone );
 		
-		cone = getCone(params.yAxisColor);
+		cone = this.getCone(params.yAxisColor);
 		cone.rotation.x = hPi;
 		cone.position.y = params.length;
 		this.addChild( cone );
 		
-		cone = getCone(params.zAxisColor);
+		cone = this.getCone(params.zAxisColor);
 		cone.rotation.y = Math.PI;
 		cone.position.z = params.length;
 		this.addChild( cone );
 	}
-
-	function getCone ( color ) {
-		//0.1 required to get a cone with a mapped bottom face
-		return new THREE.Mesh( new THREE.CylinderGeometry( 30, 0.1, params.length / 20, params.length / 5 ), new THREE.MeshBasicMaterial( { color : color } ) );
-	}
-
-	function getSegment ( point, color ){
-		var geom = new THREE.Geometry();
-		geom.vertices = [new THREE.Vertex(), new THREE.Vertex(point)];
-		return new THREE.Line( geom, new THREE.LineBasicMaterial( { color : color } ) );
-	}
+	
+	this.hide = function() {
+		for (var i = 0; i < this.materials.length; i++) {
+		  material = this.materials[ i ];
+			material.opacity = 0;
+		}
+	};
+	
+	this.show = function() {
+		for (var i = 0; i < this.materials.length; i++) {
+		  material = this.materials[ i ];
+			material.opacity = 1;
+		}
+	};
 };
 
 THREE.Trident.prototype = new THREE.Object3D();
