@@ -1,7 +1,7 @@
 /**
  * @author chriskillpack / http://chriskillpack.com/
  *
- * QuakeCamera has been renamed FPCamera. This property exists for backwards
+ * QuakeCamera has been renamed FirstPersonCamera. This property exists for backwards
  * compatibility only.
  */
-THREE.QuakeCamera = THREE.FPCamera;
+THREE.QuakeCamera = THREE.FirstPersonCamera;
