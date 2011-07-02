@@ -3,6 +3,8 @@
  * @author mr.doob / http://mrdoob.com/
  */
 
+if ( THREE.WebGLRenderer ) {
+
 THREE.ShaderUtils = {
 
 	lib: {
@@ -109,8 +111,8 @@ THREE.ShaderUtils = {
 				"uNormalScale": { type: "f", value: 1.0 },
 
 				"tDisplacement": { type: "t", value: 5, texture: null },
-				"uDisplacementBias": { type: "f", value: -0.5 },
-				"uDisplacementScale": { type: "f", value: 2.5 },
+				"uDisplacementBias": { type: "f", value: 0.0 },
+				"uDisplacementScale": { type: "f", value: 1.0 },
 
 				"uDiffuseColor": { type: "c", value: new THREE.Color( 0xeeeeee ) },
 				"uSpecularColor": { type: "c", value: new THREE.Color( 0x111111 ) },
@@ -196,8 +198,8 @@ THREE.ShaderUtils = {
 
 						"for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {",
 
-							"vec3 pointVector = normalize( vPointLight[ 0 ].xyz );",
-							"vec3 pointHalfVector = normalize( vPointLight[ 0 ].xyz + vViewPosition );",
+							"vec3 pointVector = normalize( vPointLight[ i ].xyz );",
+							"vec3 pointHalfVector = normalize( vPointLight[ i ].xyz + vViewPosition );",
 							"float pointDistance = vPointLight[ i ].w;",
 
 							"float pointDotNormalHalf = dot( normal, pointHalfVector );",
@@ -207,7 +209,7 @@ THREE.ShaderUtils = {
 							"if ( pointDotNormalHalf >= 0.0 )",
 								"pointSpecularWeight = specularTex.r * pow( pointDotNormalHalf, uShininess );",
 
-							"pointTotal  += pointDistance * vec4( pointLightColor[ 0 ], 1.0 ) * ( mColor * pointDiffuseWeight + mSpecular * pointSpecularWeight * pointDiffuseWeight );",
+							"pointTotal  += pointDistance * vec4( pointLightColor[ i ], 1.0 ) * ( mColor * pointDiffuseWeight + mSpecular * pointSpecularWeight * pointDiffuseWeight );",
 
 						"}",
 
@@ -221,7 +223,7 @@ THREE.ShaderUtils = {
 
 						"for( int i = 0; i < MAX_DIR_LIGHTS; i++ ) {",
 
-							"vec4 lDirection = viewMatrix * vec4( directionalLightDirection[ 0 ], 0.0 );",
+							"vec4 lDirection = viewMatrix * vec4( directionalLightDirection[ i ], 0.0 );",
 
 							"vec3 dirVector = normalize( lDirection.xyz );",
 							"vec3 dirHalfVector = normalize( lDirection.xyz + vViewPosition );",
@@ -233,7 +235,7 @@ THREE.ShaderUtils = {
 							"if ( dirDotNormalHalf >= 0.0 )",
 								"dirSpecularWeight = specularTex.r * pow( dirDotNormalHalf, uShininess );",
 
-							"dirTotal  += vec4( directionalLightColor[ 0 ], 1.0 ) * ( mColor * dirDiffuseWeight + mSpecular * dirSpecularWeight * dirDiffuseWeight );",
+							"dirTotal  += vec4( directionalLightColor[ i ], 1.0 ) * ( mColor * dirDiffuseWeight + mSpecular * dirSpecularWeight * dirDiffuseWeight );",
 
 						"}",
 
@@ -653,5 +655,7 @@ THREE.ShaderUtils = {
 		return values;
 
 	}
+
+};
 
 };

@@ -28,7 +28,7 @@
 		a { color: green; }
 		b { color: green; }
 
-	</style> 
+	</style>
 
 	<script type="text/javascript" src="../build/Three.js"></script>
 	<script type="text/javascript" src="js/Detector.js"></script>
@@ -81,7 +81,7 @@
 	function init() {
 
 		container = document.createElement( 'div' );
-		document.body.appendChild( container ); 
+		document.body.appendChild( container );
 
 
 		scene = new THREE.Scene();
@@ -96,7 +96,7 @@
 
 		camera = new THREE.TrackballCamera({
 
-			fov: 25, 
+			fov: 25,
 			aspect: width / height,
 			near: 50,
 			far: 1e7,
@@ -150,11 +150,6 @@
 		uniforms[ "enableDiffuse" ].value = true;
 		uniforms[ "enableSpecular" ].value = true;
 
-		uniforms[ "uDirLightPos" ].value = dirLight.position;
-		uniforms[ "uDirLightColor" ].value = dirLight.color;
-
-		uniforms[ "uAmbientLightColor" ].value = ambientLight.color;
-
 		uniforms[ "uDiffuseColor" ].value.setHex( 0xffffff );
 		uniforms[ "uSpecularColor" ].value.setHex( 0xaaaaaa );
 		uniforms[ "uAmbientColor" ].value.setHex( 0x000000 );
@@ -162,11 +157,12 @@
 		uniforms[ "uShininess" ].value = 30;
 
 		var materialNormalMap = new THREE.MeshShaderMaterial({
-			fragmentShader: shader.fragmentShader, 
-			vertexShader: shader.vertexShader, 
-			uniforms: uniforms 
+			fragmentShader: shader.fragmentShader,
+			vertexShader: shader.vertexShader,
+			uniforms: uniforms,
+			lights: true
 		});
-		
+
 
 		// planet
 
@@ -215,7 +211,7 @@
 		}
 
 		var stars,
-		starsMaterials = [ 
+		starsMaterials = [
 			new THREE.ParticleBasicMaterial( { color: 0x555555, size: 2, sizeAttenuation: false } ),
 			new THREE.ParticleBasicMaterial( { color: 0x555555, size: 1, sizeAttenuation: false } ),
 			new THREE.ParticleBasicMaterial( { color: 0x333333, size: 2, sizeAttenuation: false } ),
@@ -272,7 +268,7 @@
 	function animate() {
 
 		requestAnimationFrame( animate );
- 
+
 		render();
 		stats.update();
 
@@ -284,7 +280,7 @@
 		dt = ( t - time ) / 1000;
 		time = t;
 
-		meshPlanet.rotation.y += rotationSpeed * dt; 
+		meshPlanet.rotation.y += rotationSpeed * dt;
 		meshClouds.rotation.y += 1.25 * rotationSpeed * dt;
 
 		var angle = dt * rotationSpeed;
