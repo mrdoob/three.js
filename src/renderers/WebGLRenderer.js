@@ -4232,6 +4232,22 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	function removeInstancesDirect( objlist, object ) {
+
+		var o, ol;
+
+		for ( o = objlist.length - 1; o >= 0; o -- ) {
+
+			if ( objlist[ o ] == object ) {
+
+				objlist.splice( o, 1 );
+
+			}
+
+		}
+
+	};
+
 	function removeObject( object, scene ) {
 
 		// must check as shadow volume before mesh (as they are also meshes)
@@ -4249,7 +4265,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else if ( object instanceof THREE.Sprite ) {
 
-			removeInstances( scene.__webglSprites, object );
+			removeInstancesDirect( scene.__webglSprites, object );
 
 		} else if ( object instanceof THREE.LensFlare ) {
 
