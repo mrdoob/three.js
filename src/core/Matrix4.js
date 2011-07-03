@@ -165,27 +165,6 @@ THREE.Matrix4.prototype = {
 		b31 = b.n31, b32 = b.n32, b33 = b.n33, b34 = b.n34,
 		b41 = b.n41, b42 = b.n42, b43 = b.n43, b44 = b.n44;
 
-		this.n11 = a11 * b11 + a12 * b21 + a13 * b31;
-		this.n12 = a11 * b12 + a12 * b22 + a13 * b32;
-		this.n13 = a11 * b13 + a12 * b23 + a13 * b33;
-		this.n14 = a11 * b14 + a12 * b24 + a13 * b34 + a14;
-
-		this.n21 = a21 * b11 + a22 * b21 + a23 * b31;
-		this.n22 = a21 * b12 + a22 * b22 + a23 * b32;
-		this.n23 = a21 * b13 + a22 * b23 + a23 * b33;
-		this.n24 = a21 * b14 + a22 * b24 + a23 * b34 + a24;
-
-		this.n31 = a31 * b11 + a32 * b21 + a33 * b31;
-		this.n32 = a31 * b12 + a32 * b22 + a33 * b32;
-		this.n33 = a31 * b13 + a32 * b23 + a33 * b33;
-		this.n34 = a31 * b14 + a32 * b24 + a33 * b34 + a34;
-
-		this.n41 = a41 * b11 + a42 * b21 + a43 * b31;
-		this.n42 = a41 * b12 + a42 * b22 + a43 * b32;
-		this.n43 = a41 * b13 + a42 * b23 + a43 * b33;
-		this.n44 = a41 * b14 + a42 * b24 + a43 * b34 + a44;
-
-		/*
 		this.n11 = a11 * b11 + a12 * b21 + a13 * b31 + a14 * b41;
 		this.n12 = a11 * b12 + a12 * b22 + a13 * b32 + a14 * b42;
 		this.n13 = a11 * b13 + a12 * b23 + a13 * b33 + a14 * b43;
@@ -205,7 +184,6 @@ THREE.Matrix4.prototype = {
 		this.n42 = a41 * b12 + a42 * b22 + a43 * b32 + a44 * b42;
 		this.n43 = a41 * b13 + a42 * b23 + a43 * b33 + a44 * b43;
 		this.n44 = a41 * b14 + a42 * b24 + a43 * b34 + a44 * b44;
-		*/
 
 		return this;
 
@@ -532,29 +510,115 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	setRotationFromEuler: function( v ) {
+	setRotationFromEuler: function( v, order ) {
 
 		var x = v.x, y = v.y, z = v.z,
 		a = Math.cos( x ), b = Math.sin( x ),
 		c = Math.cos( y ), d = Math.sin( y ),
-		e = Math.cos( z ), f = Math.sin( z ),
-		ad = a * d, bd = b * d;
+		e = Math.cos( z ), f = Math.sin( z );
 
-		this.n11 = c * e;
-		this.n12 = - c * f;
-		this.n13 = d;
+		switch ( order ) {
+			case 'YXZ':
+				var ce = c * e, cf = c * f, de = d * e, df = d * f;
 
-		this.n21 = bd * e + a * f;
-		this.n22 = - bd * f + a * e;
-		this.n23 = - b * c;
+				this.n11 = ce + df * b;
+				this.n12 = de * b - cf;
+				this.n13 = a * d;
 
-		this.n31 = - ad * e + b * f;
-		this.n32 = ad * f + b * e;
-		this.n33 = a * c;
+				this.n21 = a * f;
+				this.n22 = a * e;
+				this.n23 = - b;
+
+				this.n31 = cf * b - de;
+				this.n32 = df + ce * b;
+				this.n33 = a * c;
+				break;
+
+			case 'ZXY':
+				var ce = c * e, cf = c * f, de = d * e, df = d * f;
+
+				this.n11 = ce - df * b;
+				this.n12 = - a * f;
+				this.n13 = de + cf * b;
+
+				this.n21 = cf + de * b;
+				this.n22 = a * e;
+				this.n23 = df - ce * b;
+
+				this.n31 = - a * d;
+				this.n32 = b;
+				this.n33 = a * c;
+				break;
+
+			case 'ZYX':
+				var ae = a * e, af = a * f, be = b * e, bf = b * f;
+
+				this.n11 = c * e;
+				this.n12 = be * d - af;
+				this.n13 = ae * d + bf;
+
+				this.n21 = c * f;
+				this.n22 = bf * d + ae;
+				this.n23 = af * d - be;
+
+				this.n31 = - d;
+				this.n32 = b * c;
+				this.n33 = a * c;
+				break;
+
+			case 'YZX':
+				var ac = a * c, ad = a * d, bc = b * c, bd = b * d;
+
+				this.n11 = c * e;
+				this.n12 = bd - ac * f;
+				this.n13 = bc * f + ad;
+
+				this.n21 = f;
+				this.n22 = a * e;
+				this.n23 = - b * e;
+
+				this.n31 = - d * e;
+				this.n32 = ad * f + bc;
+				this.n33 = ac - bd * f;
+				break;
+
+			case 'XZY':
+				var ac = a * c, ad = a * d, bc = b * c, bd = b * d;
+
+				this.n11 = c * e;
+				this.n12 = - f;
+				this.n13 = d * e;
+
+				this.n21 = ac * f + bd;
+				this.n22 = a * e;
+				this.n23 = ad * f - bc;
+
+				this.n31 = bc * f - ad;
+				this.n32 = b * e;
+				this.n33 = bd * f + ac;
+				break;
+
+			default: // 'XYZ'
+				var ae = a * e, af = a * f, be = b * e, bf = b * f;
+
+				this.n11 = c * e;
+				this.n12 = - c * f;
+				this.n13 = d;
+
+				this.n21 = af + be * d;
+				this.n22 = ae - bf * d;
+				this.n23 = - b * c;
+
+				this.n31 = bf - ae * d;
+				this.n32 = be + af * d;
+				this.n33 = a * c;
+				break;
+		}
 
 		return this;
 
 	},
+
 
 	setRotationFromQuaternion: function( q ) {
 

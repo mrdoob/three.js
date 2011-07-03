@@ -150,17 +150,17 @@ THREE.Ray.prototype = {
 
 		function distanceFromIntersection( origin, direction, object ) {
 
-			var vector, dot, intersect, distance;
+			var vector, dot, intersect, distance,
+			position = object.matrixWorld.getPosition();
 
-			vector = object.position.clone().subSelf( origin );
+			vector = position.clone().subSelf( origin );
 			dot = vector.dot( direction );
 
-			// TODO: Double check this
-			// if ( dot < 0 ) return false; // Object is behind origin
-
 			intersect = origin.clone().addSelf( direction.clone().multiplyScalar( dot ) );
-			distance = object.position.distanceTo( intersect );
+			distance = position.distanceTo( intersect );
 
+			// TODO: Check if distance is negative (object behind camera).			
+			
 			return distance;
 
 		}

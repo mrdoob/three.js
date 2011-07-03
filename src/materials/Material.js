@@ -14,6 +14,9 @@ THREE.Material = function ( parameters ) {
 	this.blending = parameters.blending !== undefined ? parameters.blending : THREE.NormalBlending;
 	this.depthTest = parameters.depthTest !== undefined ? parameters.depthTest : true;
 
+	this.polygonOffset = parameters.polygonOffset !== undefined ? parameters.polygonOffset : false;
+	this.polygonOffsetFactor = parameters.polygonOffsetFactor !== undefined ? parameters.polygonOffsetFactor : 0;
+	this.polygonOffsetUnits = parameters.polygonOffsetUnits !== undefined ? parameters.polygonOffsetUnits : 0;
 
 }
 
