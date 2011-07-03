@@ -152,7 +152,7 @@ THREE.CollisionSystem.prototype.rayMesh = function( r, me ) {
         var p3 = face instanceof THREE.Face4 ? me.mesh.geometry.vertices[ face.d ].position : null;
 
         if (face instanceof THREE.Face3) {
-            var nd = this.rayTriangle( rt, p0, p1, p2, d, this.collisionNormal );
+            var nd = this.rayTriangle( rt, p0, p1, p2, d, this.collisionNormal, me.mesh.doubleSided );
 
             if( nd < d ) {
 
@@ -167,7 +167,7 @@ THREE.CollisionSystem.prototype.rayMesh = function( r, me ) {
         
         else if (face instanceof THREE.Face4) {
             
-            var nd = this.rayTriangle( rt, p0, p1, p3, d, this.collisionNormal );
+            var nd = this.rayTriangle( rt, p0, p1, p3, d, this.collisionNormal, me.mesh.doubleSided );
             
             if( nd < d ) {
 
@@ -178,7 +178,7 @@ THREE.CollisionSystem.prototype.rayMesh = function( r, me ) {
 
             }
             
-            nd = this.rayTriangle( rt, p1, p2, p3, d, this.collisionNormal );
+            nd = this.rayTriangle( rt, p1, p2, p3, d, this.collisionNormal, me.mesh.doubleSided );
             
             if( nd < d ) {
 
@@ -188,7 +188,7 @@ THREE.CollisionSystem.prototype.rayMesh = function( r, me ) {
                 me.normal.normalize();
 
             }
-
+            
         }
 
 	}
@@ -197,7 +197,7 @@ THREE.CollisionSystem.prototype.rayMesh = function( r, me ) {
 
 };
 
-THREE.CollisionSystem.prototype.rayTriangle = function( ray, p0, p1, p2, mind, n ) {
+THREE.CollisionSystem.prototype.rayTriangle = function( ray, p0, p1, p2, mind, n, doubleSided ) {
 
 	var e1 = THREE.CollisionSystem.__v1,
 		e2 = THREE.CollisionSystem.__v2;
@@ -211,7 +211,20 @@ THREE.CollisionSystem.prototype.rayTriangle = function( ray, p0, p1, p2, mind, n
 	n.cross( e1, e2 )
 
 	var dot = n.dot( ray.direction );
-	if ( !( dot < 0 ) ) return Number.MAX_VALUE;
+	if ( !( dot < 0 ) ) {
+		
+		if ( doubleSided ) {
+		
+			n.multiplyScalar (-1.0);
+			dot *= -1.0;
+		
+		} else {
+			
+			return Number.MAX_VALUE;
+		
+		}
+	
+	}
 
 	var d = n.dot( p0 );
 	var t = d - n.dot( ray.origin );
