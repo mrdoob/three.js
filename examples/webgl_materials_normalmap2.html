@@ -84,8 +84,8 @@
 
 			function init() {
 
-				container = document.createElement('div');
-				document.body.appendChild(container);
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
 
 				camera = new THREE.Camera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 900;
@@ -125,21 +125,13 @@
 				uniforms[ "enableDiffuse" ].value = true;
 				uniforms[ "enableSpecular" ].value = false;
 
-				uniforms[ "uPointLightPos" ].value = pointLight.position;
-				uniforms[ "uPointLightColor" ].value = pointLight.color;
-
-				uniforms[ "uDirLightPos" ].value = directionalLight.position;
-				uniforms[ "uDirLightColor" ].value = directionalLight.color;
-
-				uniforms[ "uAmbientLightColor" ].value = ambientLight.color;
-
 				uniforms[ "uDiffuseColor" ].value.setHex( diffuse );
 				uniforms[ "uSpecularColor" ].value.setHex( specular );
 				uniforms[ "uAmbientColor" ].value.setHex( ambient );
 
 				uniforms[ "uShininess" ].value = shininess;
 
-				var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms };
+				var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true };
 				var material = new THREE.MeshShaderMaterial( parameters );
 
 				loader = new THREE.JSONLoader( true );

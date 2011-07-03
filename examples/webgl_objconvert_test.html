@@ -16,7 +16,7 @@
 			a { color:skyblue }
 			canvas { pointer-events:none; z-index:10; }
 			#log { position:absolute; top:0; display:block; text-align:left; z-index:1000; pointer-events:none; }
-			#d { text-align:center; margin:1em 0 -150px 0; z-index:0; position:relative; display:block }
+			#d { text-align:center; margin:1em 0 -9.2em 0; z-index:0; position:relative; display:block }
 			.button { background:#000; color:#fff; padding:0.2em 0.5em; cursor:pointer }
 			.inactive { background:#999; color:#eee }
 		</style>
@@ -109,7 +109,9 @@
 				geometry = new THREE.PlaneGeometry( 100, 100, 15, 10 );
 	
 				mesh = new THREE.Mesh( geometry, xm );
+				mesh.position.x = 0;
 				mesh.position.y = FLOOR;
+				mesh.position.z = 0;
 				mesh.rotation.x = 1.57;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 10;
 				mesh.doubleSided = true;
@@ -121,8 +123,7 @@
 				var material_spheres = new THREE.MeshLambertMaterial( { color: 0xdddddd } ),
 					sphere = new THREE.SphereGeometry( 100, 16, 8 );
 
-				for ( var i = 0; i < 10; i ++ ) {
-
+				for ( var i=0; i<10; i++ ) {
 					mesh = new THREE.Mesh( sphere, material_spheres );
 					mesh.position.x = 500 * (Math.random() - 0.5);
 					mesh.position.y = 300 * (Math.random() - 0) + FLOOR;
@@ -131,7 +132,6 @@
 					mesh.overdraw = true;
 					mesh.updateMatrix();
 					scene.addObject(mesh);
-
 				}
 
 

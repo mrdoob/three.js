@@ -89,7 +89,7 @@ EXTRAS_FILES = [
 'extras/ShaderUtils.js',
 'extras/animation/AnimationHandler.js',
 'extras/animation/Animation.js',
-'extras/cameras/FPCamera.js',
+'extras/cameras/FirstPersonCamera.js',
 'extras/cameras/PathCamera.js',
 'extras/cameras/FlyCamera.js',
 'extras/cameras/RollCamera.js',

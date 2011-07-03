@@ -77,8 +77,6 @@ THREE.TextGeometry.prototype.set = function ( text, parameters ) {
 
 	var data = THREE.FontUtils.drawText( text );
 
-	//console.log("data", data);
-
 	var vertices = data.points;
 	var faces = data.faces;
 	var contour = data.contour;
@@ -88,8 +86,6 @@ THREE.TextGeometry.prototype.set = function ( text, parameters ) {
 
 	scope.vertices = [];
 	scope.faces = [];
-
-	//console.log(this);
 
 	var i, 
 		vert, vlen = vertices.length, 
@@ -300,11 +296,11 @@ THREE.FontUtils = {
 	},
 
 
-	extractPoints : function( points, characters ) {
+	extractPoints : function( allPoints, charactersPoints ) {
 
 		// Quick exit
 
-		if ( points.length < 3 ) {
+		if ( allPoints.length < 3 ) {
 
 			//throw "not valid polygon";
 
@@ -312,7 +308,7 @@ THREE.FontUtils = {
 
 			return {
 
-				points: points,
+				points: allPoints,
 				faces: []
 
 			};
@@ -323,22 +319,22 @@ THREE.FontUtils = {
 
 		var p, point, shape,
 			all,
+			ch, singleCharPoints,
 			isolatedShapes = [];
 
 		// Use a quick hashmap for locating duplicates
 
-		for ( var c in characters ) {
+		for ( var c = 0; c < charactersPoints.length; c ++ ) {
 
-			points = characters[ c ];
-
+			singleCharPoints = charactersPoints[ c ];
 
 			all = [];
 
 			// Use a quick hashmap for locating duplicates
 
-			for ( var p in points ) {
+			for ( var p = 0; p < singleCharPoints.length; p ++ ) {
 
-				point = points[ p ];
+				point = singleCharPoints[ p ];
 				all.push( point.x + "," + point.y );
 
 			}
@@ -348,10 +344,10 @@ THREE.FontUtils = {
 			// We check the first loop whether its CW or CCW direction to determine
 			// whether its shapes or holes first
 
-			endPt = all.slice(1).indexOf( all[0] );
-			var shapesFirst = this.Triangulate.area( points.slice( 0, endPt + 1 ) ) < 0;
+			endPt = all.slice( 1 ).indexOf( all[ 0 ] );
+			var shapesFirst = this.Triangulate.area( singleCharPoints.slice( 0, endPt + 1 ) ) < 0;
 
-			//console.log(points.length, "shapesFirst",shapesFirst);
+			//console.log( singleCharPoints.length, "shapesFirst", shapesFirst );
 
 			holes = [];
 			endPt = -1;
@@ -364,7 +360,7 @@ THREE.FontUtils = {
 
 				if ( endPt <= firstIndex ) break; 
 
-				var contours = points.slice( firstIndex, endPt + 1 );
+				var contours = singleCharPoints.slice( firstIndex, endPt + 1 );
 
 				if ( shapesFirst ) {
 
@@ -393,7 +389,7 @@ THREE.FontUtils = {
 
 					if ( this.Triangulate.area( contours ) < 0 ) {
 
-						isolatedShapes.push( {shape: contours, holes: holes } );
+						isolatedShapes.push( { shape: contours, holes: holes } );
 						holes = [];
 
 					} else {
@@ -568,8 +564,8 @@ THREE.FontUtils = {
 
 		}
 	
-		var points = [];
-		var triangulatedVertices = [];
+		var triangulatedPoints = [];
+		var triangulatedFaces = [];
 		var lastTriangles = 0;
 
 		for ( shapeId = 0; shapeId < isolatedShapes.length; shapeId ++ ) {
@@ -577,7 +573,7 @@ THREE.FontUtils = {
 			shapeGroup = isolatedShapes[ shapeId ];
 
 			shape = shapeGroup.shape;
-			points = points.concat( shape );
+			triangulatedPoints = triangulatedPoints.concat( shape );
 
 			var triangles = THREE.FontUtils.Triangulate( shape, true );
 
@@ -593,7 +589,7 @@ THREE.FontUtils = {
 
 			}
 
-			triangulatedVertices = triangulatedVertices.concat( triangles );
+			triangulatedFaces = triangulatedFaces.concat( triangles );
 			lastTriangles += shape.length;
 
 		}
@@ -613,11 +609,11 @@ THREE.FontUtils = {
 
 				found = false;
 
-				for ( j=0; j < points.length && !found; j++ ) {
+				for ( j = 0; j < triangulatedPoints.length && !found; j++ ) {
 
 					l = v * 3 + k;
 
-					if ( points[ j ].equals( verts[ l ] ) ) {
+					if ( triangulatedPoints[ j ].equals( verts[ l ] ) ) {
 
 						face.push( j );
 						found = true;
@@ -630,8 +626,8 @@ THREE.FontUtils = {
 
 				if ( !found ) {
 
-					points.push( verts[ l ] );
-					face.push( points.length - 1 );
+					triangulatedPoints.push( verts[ l ] );
+					face.push( triangulatedPoints.length - 1 );
 
 					console.log( "not found" )
 
@@ -639,17 +635,17 @@ THREE.FontUtils = {
 
 			}
 
-			triangulatedVertices.push( face );
+			triangulatedFaces.push( face );
 
 		}
 
 
-		//console.log("triangles", triangulatedVertices.length, "points", points);
+		//console.log( "triangles", triangulatedFaces.length, "points", triangulatedPoints );
 
 		return {
 
-			points: points,
-			faces: triangulatedVertices
+			points: triangulatedPoints,
+			faces: triangulatedFaces
 
 		};
 
@@ -657,7 +653,7 @@ THREE.FontUtils = {
 
 	drawText : function( text ) {
 
-		var characterpts = [], pts = [];
+		var characterPts = [], allPts = [];
 
 		// RenderText
 
@@ -672,8 +668,8 @@ THREE.FontUtils = {
 
 			var ret = this.extractGlyphPoints( chars[ i ], face, scale, offset );
 			offset += ret.offset;
-			characterpts.push(ret.points);
-			pts = pts.concat(ret.points);
+			characterPts.push( ret.points );
+			allPts = allPts.concat( ret.points );
 
 		}
 
@@ -681,29 +677,28 @@ THREE.FontUtils = {
 
 		var width = offset / 2;
 
-		for ( p = 0; p < pts.length; p++ ) {
+		for ( p = 0; p < allPts.length; p++ ) {
 
-			pts[ p ].x -= width;
+			allPts[ p ].x -= width;
 
 		}
 
-		var extract = this.extractPoints( pts, characterpts );
-
-		extract.contour = pts;
+		var extract = this.extractPoints( allPts, characterPts );
+		extract.contour = allPts;
 
 		var bezelPoints = [];
 
 		var centroids = [], forCentroids = [], expandOutwards = [], sum = new THREE.Vector2(), lastV;
 
-		i = pts.length;
+		i = allPts.length;
 
 		while ( --i >= 0 ) {
 
 			if ( !lastV ) {
 
-				lastV = pts[ i ];
+				lastV = allPts[ i ];
 
-			} else if ( lastV.equals( pts[ i ] ) ) {
+			} else if ( lastV.equals( allPts[ i ] ) ) {
 
 				// We reached the last point of a closed loop
 
@@ -719,23 +714,23 @@ THREE.FontUtils = {
 
 			}
 
-			sum.addSelf( pts[ i ] );
-			forCentroids.push( pts[ i ] );
+			sum.addSelf( allPts[ i ] );
+			forCentroids.push( allPts[ i ] );
 
 		}
 
 
-		i = pts.length;
+		i = allPts.length;
 		p = 0;
 		var pt, centroid ;
 		var dirV, adj;
 
 		while ( --i >= 0 ) {
 
-			pt = pts[ i ];
-			centroid = centroids[p];
+			pt = allPts[ i ];
+			centroid = centroids[ p ];
 
-			dirV = pt.clone().subSelf( centroid) ;
+			dirV = pt.clone().subSelf( centroid );
 			adj = this.bezelSize / dirV.length();
 
 			if ( expandOutwards[ p ] ) {
@@ -754,9 +749,9 @@ THREE.FontUtils = {
 
 			if ( !lastV ) {
 
-				lastV = pts[ i ];
+				lastV = allPts[ i ];
 
-			} else if ( lastV.equals( pts[ i ] ) ) {
+			} else if ( lastV.equals( allPts[ i ] ) ) {
 
 				// We reached the last point of a closed loop
 
@@ -770,11 +765,13 @@ THREE.FontUtils = {
 
 
 		/*
-		for ( p = 0; p < pts.length; p++ ) {
-			pt = pts[ p ];
-			bezelPoints.push (new THREE.Vector2(pt.x + this.bezelSize, pt.y + this.bezelSize));
+		for ( p = 0; p < allPts.length; p++ ) {
 
-		}*/
+			pt = allPts[ p ];
+			bezelPoints.push( new THREE.Vector2( pt.x + this.bezelSize, pt.y + this.bezelSize ) );
+
+		}
+		*/
 
 		extract.bezel = bezelPoints;
 

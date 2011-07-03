@@ -30,7 +30,7 @@
  * }
  */
 
-THREE.FPCamera = function ( parameters ) {
+THREE.FirstPersonCamera = function ( parameters ) {
 
 	THREE.Camera.call( this, parameters.fov, parameters.aspect, parameters.near, parameters.far, parameters.target );
 
@@ -307,12 +307,12 @@ THREE.FPCamera = function ( parameters ) {
 };
 
 
-THREE.FPCamera.prototype = new THREE.Camera();
-THREE.FPCamera.prototype.constructor = THREE.FPCamera;
-THREE.FPCamera.prototype.supr = THREE.Camera.prototype;
+THREE.FirstPersonCamera.prototype = new THREE.Camera();
+THREE.FirstPersonCamera.prototype.constructor = THREE.FirstPersonCamera;
+THREE.FirstPersonCamera.prototype.supr = THREE.Camera.prototype;
 
 
-THREE.FPCamera.prototype.translate = function ( distance, axis ) {
+THREE.FirstPersonCamera.prototype.translate = function ( distance, axis ) {
 
 	this.matrix.rotateAxis( axis );
 

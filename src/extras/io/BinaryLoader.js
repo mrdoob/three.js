@@ -227,6 +227,8 @@ THREE.BinaryLoader.prototype = {
 			this.computeCentroids();
 			this.computeFaceNormals();
 
+			if ( THREE.Loader.prototype.hasNormals( this ) ) this.computeTangents();
+
 			//var e = (new Date).getTime();
 
 			//log( "binary data parse time: " + (e-s) + " ms" );
