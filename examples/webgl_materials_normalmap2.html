@@ -169,7 +169,10 @@
 
 				geometry.computeTangents();
 
-				mesh1 = THREE.SceneUtils.addMesh( scene, geometry, scale, 0, - 50, 0, 0, 0, 0, material );
+				mesh1 = new THREE.Mesh( geometry, material );
+				mesh1.position.y = - 50;
+				mesh1.scale.x = mesh1.scale.y = mesh1.scale.z = scale;
+				scene.addObject( mesh1 );
 
 				loader.statusDomElement.style.display = "none";
 

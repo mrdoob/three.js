@@ -32,9 +32,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_oldFlipSided = null,
 	_oldBlending = null,
 	_oldDepth = null,
-    _oldPolygonOffset = null;
-    _oldPolygonOffsetFactor = null;
-    _oldPolygonOffsetUnits = null;
+	_oldPolygonOffset = null,
+	_oldPolygonOffsetFactor = null,
+	_oldPolygonOffsetUnits = null,
 	_cullEnabled = true,
 
 	_viewportX = 0,

@@ -196,7 +196,23 @@
 				pointLight.position.z = 10000;
 				scene.addLight( pointLight );
 
-				THREE.SceneUtils.addPanoramaCubeWebGL( sceneCube, 100000, textureCube );
+				// Skybox
+
+				var shader = THREE.ShaderUtils.lib["cube"];
+				shader.uniforms["tCube"].texture = textureCube;
+
+				var material = new THREE.MeshShaderMaterial( {
+
+					fragmentShader: shader.fragmentShader,
+					vertexShader: shader.vertexShader,
+					uniforms: shader.uniforms
+
+				} ),
+
+				mesh = new THREE.Mesh( new THREE.CubeGeometry( 100000, 100000, 100000, 1, 1, 1, null, true ), material );
+				sceneCube.addObject( mesh );
+
+				//
 
 				webglRenderer = new THREE.WebGLRenderer();
 				webglRenderer.setSize( window.innerWidth, window.innerHeight );
@@ -546,13 +562,20 @@
 					mi = CARS[ car ].init_material,
 					bm = CARS[ car ].body_materials;
 
-				for( var i in CARS[ car ].mmap ) {
+				for ( var i in CARS[ car ].mmap ) {
 
 					geometry.materials[ i ][ 0 ] = CARS[ car ].mmap[ i ];
 
 				}
 
-				CARS[ car ].object = THREE.SceneUtils.addMesh( scene, geometry, s, 0, 0, 0, r[0], r[1], r[2], m );
+				var mesh = new THREE.Mesh( geometry, m );
+				mesh.rotation.x = r[ 0 ];
+				mesh.rotation.y = r[ 1 ];
+				mesh.rotation.z = r[ 2 ];
+				mesh.scale.x = mesh.scale.y = mesh.scale.z = s;
+				scene.addObject( mesh );
+
+				CARS[ car ].object = mesh;
 
 				CARS[ car ].buttons = createButtons( materials.body, car );
 				attachButtonMaterials( materials.body, geometry, bm, car );
