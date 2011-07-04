@@ -102,19 +102,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		console.log(
+			navigator.userAgent + " | " +
+			_gl.getParameter( _gl.VERSION ) + " | " +
+			_gl.getParameter( _gl.VENDOR ) + " | " +
+			_gl.getParameter( _gl.RENDERER ) + " | " +
+			_gl.getParameter( _gl.SHADING_LANGUAGE_VERSION )
+		);
+
 	} catch ( error ) {
 
 		console.error( error );
 
 	}
-
-	console.log(
-		navigator.userAgent + " | " +
-		_gl.getParameter( _gl.VERSION ) + " | " +
-		_gl.getParameter( _gl.VENDOR ) + " | " +
-		_gl.getParameter( _gl.RENDERER ) + " | " +
-		_gl.getParameter( _gl.SHADING_LANGUAGE_VERSION )
-	);
 
 	_gl.clearColor( 0, 0, 0, 1 );
 	_gl.clearDepth( 1 );
@@ -131,8 +131,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_gl.blendFunc( _gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA );
 
 	_gl.clearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
-
-	// _gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, true );
 
 	_cullEnabled = true;
 
@@ -4523,29 +4521,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		program = _gl.createProgram();
 
-		var prefix_fragment = [
-
-			"#ifdef GL_ES",
-			"precision highp float;",
-			"#endif",
-
-			"#define MAX_DIR_LIGHTS " + parameters.maxDirLights,
-			"#define MAX_POINT_LIGHTS " + parameters.maxPointLights,
-
-			parameters.fog ? "#define USE_FOG" : "",
-			parameters.fog instanceof THREE.FogExp2 ? "#define FOG_EXP2" : "",
-
-			parameters.map ? "#define USE_MAP" : "",
-			parameters.envMap ? "#define USE_ENVMAP" : "",
-			parameters.lightMap ? "#define USE_LIGHTMAP" : "",
-			parameters.vertexColors ? "#define USE_COLOR" : "",
-
-			"uniform mat4 viewMatrix;",
-			"uniform vec3 cameraPosition;",
-			""
-
-		].join("\n");
-
 		var prefix_vertex = [
 
 			_supportsVertexTextures ? "#define VERTEX_TEXTURES" : "",
@@ -4606,6 +4581,29 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			"#endif",
 
+			""
+
+		].join("\n");
+
+		var prefix_fragment = [
+
+			"#ifdef GL_ES",
+			"precision highp float;",
+			"#endif",
+
+			"#define MAX_DIR_LIGHTS " + parameters.maxDirLights,
+			"#define MAX_POINT_LIGHTS " + parameters.maxPointLights,
+
+			parameters.fog ? "#define USE_FOG" : "",
+			parameters.fog instanceof THREE.FogExp2 ? "#define FOG_EXP2" : "",
+
+			parameters.map ? "#define USE_MAP" : "",
+			parameters.envMap ? "#define USE_ENVMAP" : "",
+			parameters.lightMap ? "#define USE_LIGHTMAP" : "",
+			parameters.vertexColors ? "#define USE_COLOR" : "",
+
+			"uniform mat4 viewMatrix;",
+			"uniform vec3 cameraPosition;",
 			""
 
 		].join("\n");
@@ -4839,6 +4837,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				texture.__webglTexture = _gl.createTexture();
 
 				_gl.bindTexture( _gl.TEXTURE_2D, texture.__webglTexture );
+				// _gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, true );
 				_gl.texImage2D( _gl.TEXTURE_2D, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, texture.image );
 
 				texture.__webglInit = true;
@@ -4846,12 +4845,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 			} else {
 
 				_gl.bindTexture( _gl.TEXTURE_2D, texture.__webglTexture );
-				// _gl.texImage2D( _gl.TEXTURE_2D, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, texture.image );
-				_gl.texSubImage2D( _gl.TEXTURE_2D, 0, 0, 0, _gl.RGBA, _gl.UNSIGNED_BYTE, texture.image );
+				// _gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, true );
+				_gl.texImage2D( _gl.TEXTURE_2D, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, texture.image );
+				// _gl.texSubImage2D( _gl.TEXTURE_2D, 0, 0, 0, _gl.RGBA, _gl.UNSIGNED_BYTE, texture.image );
 
 			}
 
 			setTextureParameters( _gl.TEXTURE_2D, texture, texture.image );
+
 			_gl.bindTexture( _gl.TEXTURE_2D, null );
 
 			texture.needsUpdate = false;

@@ -140,17 +140,6 @@ THREE.ShaderChunk = {
 
 	// COLOR MAP (triangles)
 
-	map_pars_fragment: [
-
-	"#ifdef USE_MAP",
-
-		"varying vec2 vUv;",
-		"uniform sampler2D map;",
-
-	"#endif"
-
-	].join("\n"),
-
 	map_pars_vertex: [
 
 	"#ifdef USE_MAP",
@@ -162,11 +151,12 @@ THREE.ShaderChunk = {
 
 	].join("\n"),
 
-	map_fragment: [
+	map_pars_fragment: [
 
 	"#ifdef USE_MAP",
 
-		"gl_FragColor = gl_FragColor * texture2D( map, vUv );",
+		"varying vec2 vUv;",
+		"uniform sampler2D map;",
 
 	"#endif"
 
@@ -177,6 +167,16 @@ THREE.ShaderChunk = {
 	"#ifdef USE_MAP",
 
 		"vUv = uv * offsetRepeat.zw + offsetRepeat.xy;",
+
+	"#endif"
+
+	].join("\n"),
+
+	map_fragment: [
+
+	"#ifdef USE_MAP",
+
+		"gl_FragColor = gl_FragColor * texture2D( map, vUv );",
 
 	"#endif"
 
@@ -632,17 +632,17 @@ THREE.ShaderLib = {
 
 		vertexShader: [
 
-			"uniform 	vec3 	screenPosition;",
-			"uniform	vec2	scale;",
-			"uniform	float	rotation;",
-			"uniform    int     renderType;",
+			"uniform vec3 screenPosition;",
+			"uniform vec2 scale;",
+			"uniform float rotation;",
+			"uniform int renderType;",
 
-			"uniform	sampler2D	occlusionMap;",
+			"uniform sampler2D occlusionMap;",
 
-			"attribute 	vec2 	position;",
-			"attribute  vec2	UV;",
-			"varying	vec2	vUV;",
-			"varying	float	vVisibility;",
+			"attribute vec2 position;",
+			"attribute vec2 UV;",
+			"varying vec2 vUV;",
+			"varying float vVisibility;",
 
 			"void main() {",
 
@@ -684,12 +684,12 @@ THREE.ShaderLib = {
 				"precision highp float;",
 			"#endif",
 
-			"uniform	sampler2D	map;",
-			"uniform	float		opacity;",
-			"uniform    int         renderType;",
+			"uniform sampler2D map;",
+			"uniform float opacity;",
+			"uniform int renderType;",
 
-			"varying	vec2		vUV;",
-			"varying	float		vVisibility;",
+			"varying vec2 vUV;",
+			"varying float vVisibility;",
 
 			"void main() {",
 
@@ -725,15 +725,15 @@ THREE.ShaderLib = {
 
 		vertexShader: [
 
-			"uniform 	vec3 	screenPosition;",
-			"uniform	vec2	scale;",
-			"uniform	float	rotation;",
-			"uniform    int     renderType;",
+			"uniform vec3 screenPosition;",
+			"uniform vec2 scale;",
+			"uniform float rotation;",
+			"uniform int renderType;",
 
-			"attribute 	vec2 	position;",
-			"attribute  vec2	UV;",
+			"attribute vec2 position;",
+			"attribute vec2 UV;",
 
-			"varying	vec2	vUV;",
+			"varying vec2 vUV;",
 
 			"void main() {",
 
@@ -760,12 +760,12 @@ THREE.ShaderLib = {
 				"precision highp float;",
 			"#endif",
 
-			"uniform	sampler2D	map;",
-			"uniform	sampler2D	occlusionMap;",
-			"uniform	float		opacity;",
-			"uniform    int         renderType;",
+			"uniform sampler2D map;",
+			"uniform sampler2D occlusionMap;",
+			"uniform float opacity;",
+			"uniform int renderType;",
 
-			"varying	vec2		vUV;",
+			"varying vec2 vUV;",
 
 			"void main() {",
 
@@ -808,25 +808,24 @@ THREE.ShaderLib = {
 
 		vertexShader: [
 
-			"uniform	int		useScreenCoordinates;",
-			"uniform    int     affectedByDistance;",
-			"uniform	vec3	screenPosition;",
-			"uniform 	mat4 	modelViewMatrix;",
-			"uniform 	mat4 	projectionMatrix;",
-			"uniform    float   rotation;",
-			"uniform    vec2    scale;",
-			"uniform    vec2    alignment;",
-			"uniform    vec2    uvOffset;",
-			"uniform	vec2    uvScale;",
+			"uniform int useScreenCoordinates;",
+			"uniform int affectedByDistance;",
+			"uniform vec3 screenPosition;",
+			"uniform mat4 modelViewMatrix;",
+			"uniform mat4 projectionMatrix;",
+			"uniform float rotation;",
+			"uniform vec2 scale;",
+			"uniform vec2 alignment;",
+			"uniform vec2 uvOffset;",
+			"uniform vec2 uvScale;",
 
-			"attribute 	vec2 	position;",
-			"attribute  vec2	uv;",
+			"attribute vec2 position;",
+			"attribute vec2 uv;",
 
-			"varying	vec2	vUV;",
+			"varying vec2 vUV;",
 
 			"void main() {",
 
-				//"vUV = uvOffset + vec2( uv.x, 1.0 - uv.y ) * uvScale;",
 				"vUV = uvOffset + uv * uvScale;",
 
 				"vec2 alignedPosition = position + alignment;",
@@ -860,10 +859,10 @@ THREE.ShaderLib = {
 				"precision highp float;",
 			"#endif",
 
-			"uniform	sampler2D	map;",
-			"uniform	float		opacity;",
+			"uniform sampler2D map;",
+			"uniform float opacity;",
 
-			"varying	vec2		vUV;",
+			"varying vec2 vUV;",
 
 			"void main() {",
 
