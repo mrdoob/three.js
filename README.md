@@ -147,7 +147,7 @@ This code creates a camera, then creates a scene, adds a cube on it, creates a &
 * Renamed `QuakeCamera` to `FirstPersonCamera`. ([chriskillpack](http://github.com/chriskillpack))
 * Improved Normal Map Shader. ([alteredq](http://github.com/alteredq))
 * `Collision` now supports `Object3D.flipSided` and `Object3D.doubleSided`. ([NINE78](http://github.com/NINE78))
-* Removed most of `SeceneUtils` methods. ([mrdoob](http://github.com/mrdoob))
+* Removed most of `SceneUtils` methods. ([mrdoob](http://github.com/mrdoob))
 * Removed `Sound` object and `SoundRenderer`. ([mrdoob](http://github.com/mrdoob))
 
 
