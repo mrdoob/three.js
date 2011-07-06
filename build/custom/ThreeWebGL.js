@@ -1,4 +1,4 @@
-// ThreeWebGL.js r41/ROME - http://github.com/mrdoob/three.js
+// ThreeWebGL.js r42 - http://github.com/mrdoob/three.js
 var THREE=THREE||{};if(!window.Int32Array)window.Int32Array=Array,window.Float32Array=Array;THREE.Color=function(b){this.setHex(b)};
 THREE.Color.prototype={copy:function(b){this.r=b.r;this.g=b.g;this.b=b.b;this.hex=b.hex},setHex:function(b){this.hex=~~b&16777215;this.updateRGB()},setRGB:function(b,d,e){this.r=b;this.g=d;this.b=e;this.updateHex()},setHSV:function(b,d,e){var f,g,i,h,j,k;if(e==0)f=g=i=0;else switch(h=Math.floor(b*6),j=b*6-h,b=e*(1-d),k=e*(1-d*j),d=e*(1-d*(1-j)),h){case 1:f=k;g=e;i=b;break;case 2:f=b;g=e;i=d;break;case 3:f=b;g=k;i=e;break;case 4:f=d;g=b;i=e;break;case 5:f=e;g=b;i=k;break;case 6:case 0:f=e,g=d,i=b}this.setRGB(f,
 g,i)},updateHex:function(){this.hex=~~(this.r*255)<<16^~~(this.g*255)<<8^~~(this.b*255)},updateRGB:function(){this.r=(this.hex>>16&255)/255;this.g=(this.hex>>8&255)/255;this.b=(this.hex&255)/255},clone:function(){return new THREE.Color(this.hex)}};THREE.Vector2=function(b,d){this.set(b||0,d||0)};
