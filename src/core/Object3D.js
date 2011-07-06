@@ -13,12 +13,15 @@ THREE.Object3D = function() {
 
 	this.position = new THREE.Vector3();
 	this.rotation = new THREE.Vector3();
+	this.eulerOrder = 'XYZ';
 	this.scale = new THREE.Vector3( 1, 1, 1 );
 
 	this.dynamic = false; // when true it retains arrays so they can be updated with __dirty*
 	
 	this.doubleSided = false;
 	this.flipSided = false;
+
+	this.renderDepth = null;
 
 	this.rotationAutoUpdate = true;
 
@@ -173,7 +176,7 @@ THREE.Object3D.prototype = {
 
 		} else {
 
-			this.matrix.setRotationFromEuler( this.rotation );
+			this.matrix.setRotationFromEuler( this.rotation, this.eulerOrder );
 
 		}
 

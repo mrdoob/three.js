@@ -3,6 +3,8 @@
  * @author mr.doob / http://mrdoob.com/
  */
 
+if ( THREE.WebGLRenderer ) {
+
 THREE.ShaderUtils = {
 
 	lib: {
@@ -86,12 +88,16 @@ THREE.ShaderUtils = {
 		//	Normal map shader
 		//		- Blinn-Phong
 		//		- normal + diffuse + specular + AO + displacement maps
-		//		- 1 point and 1 directional lights
+		//		- point and directional lights (use with "lights: true" material option)
 		 ------------------------------------------------------------------------- */
 
 		'normal' : {
 
-			uniforms: {
+			uniforms: THREE.UniformsUtils.merge( [
+
+				THREE.UniformsLib[ "lights" ],
+
+				{
 
 				"enableAO"		: { type: "i", value: 0 },
 				"enableDiffuse"	: { type: "i", value: 0 },
@@ -105,36 +111,26 @@ THREE.ShaderUtils = {
 				"uNormalScale": { type: "f", value: 1.0 },
 
 				"tDisplacement": { type: "t", value: 5, texture: null },
-				"uDisplacementBias": { type: "f", value: -0.5 },
-				"uDisplacementScale": { type: "f", value: 2.5 },
-
-				"uPointLightPos": { type: "v3", value: new THREE.Vector3() },
-				"uPointLightColor": { type: "c", value: new THREE.Color( 0xeeeeee ) },
-
-				"uDirLightPos":	{ type: "v3", value: new THREE.Vector3() },
-				"uDirLightColor": { type: "c", value: new THREE.Color( 0xeeeeee ) },
-
-				"uAmbientLightColor": { type: "c", value: new THREE.Color( 0x050505 ) },
+				"uDisplacementBias": { type: "f", value: 0.0 },
+				"uDisplacementScale": { type: "f", value: 1.0 },
 
 				"uDiffuseColor": { type: "c", value: new THREE.Color( 0xeeeeee ) },
 				"uSpecularColor": { type: "c", value: new THREE.Color( 0x111111 ) },
 				"uAmbientColor": { type: "c", value: new THREE.Color( 0x050505 ) },
-				"uShininess": { type: "f", value: 30 }
+				"uShininess": { type: "f", value: 30 },
+				"uOpacity": { type: "f", value: 1 }
 
-			},
+				}
+
+			] ),
 
 			fragmentShader: [
-
-				"uniform vec3 uDirLightPos;",
-
-				"uniform vec3 uAmbientLightColor;",
-				"uniform vec3 uDirLightColor;",
-				"uniform vec3 uPointLightColor;",
 
 				"uniform vec3 uAmbientColor;",
 				"uniform vec3 uDiffuseColor;",
 				"uniform vec3 uSpecularColor;",
 				"uniform float uShininess;",
+				"uniform float uOpacity;",
 
 				"uniform bool enableDiffuse;",
 				"uniform bool enableSpecular;",
@@ -152,24 +148,38 @@ THREE.ShaderUtils = {
 				"varying vec3 vNormal;",
 				"varying vec2 vUv;",
 
-				"varying vec3 vPointLightVector;",
+				"uniform vec3 ambientLightColor;",
+
+				"#if MAX_DIR_LIGHTS > 0",
+					"uniform vec3 directionalLightColor[ MAX_DIR_LIGHTS ];",
+					"uniform vec3 directionalLightDirection[ MAX_DIR_LIGHTS ];",
+				"#endif",
+
+				"#if MAX_POINT_LIGHTS > 0",
+					"uniform vec3 pointLightColor[ MAX_POINT_LIGHTS ];",
+					"varying vec4 vPointLight[ MAX_POINT_LIGHTS ];",
+				"#endif",
+
 				"varying vec3 vViewPosition;",
 
 				"void main() {",
 
-					"vec3 diffuseTex = vec3( 1.0, 1.0, 1.0 );",
-					"vec3 aoTex = vec3( 1.0, 1.0, 1.0 );",
-					"vec3 specularTex = vec3( 1.0, 1.0, 1.0 );",
+					"gl_FragColor = vec4( 1.0 );",
+
+					"vec4 mColor = vec4( uDiffuseColor, uOpacity );",
+					"vec4 mSpecular = vec4( uSpecularColor, uOpacity );",
+
+					"vec3 specularTex = vec3( 1.0 );",
 
 					"vec3 normalTex = texture2D( tNormal, vUv ).xyz * 2.0 - 1.0;",
 					"normalTex.xy *= uNormalScale;",
 					"normalTex = normalize( normalTex );",
 
 					"if( enableDiffuse )",
-						"diffuseTex = texture2D( tDiffuse, vUv ).xyz;",
+						"gl_FragColor = gl_FragColor * texture2D( tDiffuse, vUv );",
 
 					"if( enableAO )",
-						"aoTex = texture2D( tAO, vUv ).xyz;",
+						"gl_FragColor = gl_FragColor * texture2D( tAO, vUv );",
 
 					"if( enableSpecular )",
 						"specularTex = texture2D( tSpecular, vUv ).xyz;",
@@ -180,51 +190,70 @@ THREE.ShaderUtils = {
 					"vec3 normal = normalize( finalNormal );",
 					"vec3 viewPosition = normalize( vViewPosition );",
 
-					// point light
+					// point lights
 
-					"vec4 pointDiffuse  = vec4( 0.0, 0.0, 0.0, 0.0 );",
-					"vec4 pointSpecular = vec4( 0.0, 0.0, 0.0, 0.0 );",
+					"#if MAX_POINT_LIGHTS > 0",
 
-					"vec3 pointVector = normalize( vPointLightVector );",
-					"vec3 pointHalfVector = normalize( vPointLightVector + vViewPosition );",
+						"vec4 pointTotal  = vec4( 0.0 );",
 
-					"float pointDotNormalHalf = dot( normal, pointHalfVector );",
-					"float pointDiffuseWeight = max( dot( normal, pointVector ), 0.0 );",
+						"for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {",
 
-					"float pointSpecularWeight = 0.0;",
-					"if ( pointDotNormalHalf >= 0.0 )",
-						"pointSpecularWeight = specularTex.r * pow( pointDotNormalHalf, uShininess );",
+							"vec3 pointVector = normalize( vPointLight[ i ].xyz );",
+							"vec3 pointHalfVector = normalize( vPointLight[ i ].xyz + vViewPosition );",
+							"float pointDistance = vPointLight[ i ].w;",
 
-					"pointDiffuse  += vec4( uDiffuseColor, 1.0 ) * pointDiffuseWeight;",
-					"pointSpecular += vec4( uSpecularColor, 1.0 ) * pointSpecularWeight * pointDiffuseWeight;",
+							"float pointDotNormalHalf = dot( normal, pointHalfVector );",
+							"float pointDiffuseWeight = max( dot( normal, pointVector ), 0.0 );",
 
-					// directional light
+							"float pointSpecularWeight = 0.0;",
+							"if ( pointDotNormalHalf >= 0.0 )",
+								"pointSpecularWeight = specularTex.r * pow( pointDotNormalHalf, uShininess );",
 
-					"vec4 dirDiffuse  = vec4( 0.0, 0.0, 0.0, 0.0 );",
-					"vec4 dirSpecular = vec4( 0.0, 0.0, 0.0, 0.0 );",
+							"pointTotal  += pointDistance * vec4( pointLightColor[ i ], 1.0 ) * ( mColor * pointDiffuseWeight + mSpecular * pointSpecularWeight * pointDiffuseWeight );",
 
-					"vec4 lDirection = viewMatrix * vec4( uDirLightPos, 0.0 );",
+						"}",
 
-					"vec3 dirVector = normalize( lDirection.xyz );",
-					"vec3 dirHalfVector = normalize( lDirection.xyz + vViewPosition );",
+					"#endif",
 
-					"float dirDotNormalHalf = dot( normal, dirHalfVector );",
-					"float dirDiffuseWeight = max( dot( normal, dirVector ), 0.0 );",
+					// directional lights
 
-					"float dirSpecularWeight = 0.0;",
-					"if ( dirDotNormalHalf >= 0.0 )",
-						"dirSpecularWeight = specularTex.r * pow( dirDotNormalHalf, uShininess );",
+					"#if MAX_DIR_LIGHTS > 0",
 
-					"dirDiffuse  += vec4( uDiffuseColor, 1.0 ) * dirDiffuseWeight;",
-					"dirSpecular += vec4( uSpecularColor, 1.0 ) * dirSpecularWeight * dirDiffuseWeight;",
+						"vec4 dirTotal  = vec4( 0.0 );",
+
+						"for( int i = 0; i < MAX_DIR_LIGHTS; i++ ) {",
+
+							"vec4 lDirection = viewMatrix * vec4( directionalLightDirection[ i ], 0.0 );",
+
+							"vec3 dirVector = normalize( lDirection.xyz );",
+							"vec3 dirHalfVector = normalize( lDirection.xyz + vViewPosition );",
+
+							"float dirDotNormalHalf = dot( normal, dirHalfVector );",
+							"float dirDiffuseWeight = max( dot( normal, dirVector ), 0.0 );",
+
+							"float dirSpecularWeight = 0.0;",
+							"if ( dirDotNormalHalf >= 0.0 )",
+								"dirSpecularWeight = specularTex.r * pow( dirDotNormalHalf, uShininess );",
+
+							"dirTotal  += vec4( directionalLightColor[ i ], 1.0 ) * ( mColor * dirDiffuseWeight + mSpecular * dirSpecularWeight * dirDiffuseWeight );",
+
+						"}",
+
+					"#endif",
 
 					// all lights contribution summation
 
-					"vec4 totalLight = vec4( uAmbientLightColor * uAmbientColor, 1.0 );",
-					"totalLight += vec4( uDirLightColor, 1.0 ) * ( dirDiffuse + dirSpecular );",
-					"totalLight += vec4( uPointLightColor, 1.0 ) * ( pointDiffuse + pointSpecular );",
+					"vec4 totalLight = vec4( ambientLightColor * uAmbientColor, uOpacity );",
 
-					"gl_FragColor = vec4( totalLight.xyz * aoTex * diffuseTex, 1.0 );",
+					"#if MAX_DIR_LIGHTS > 0",
+						"totalLight += dirTotal;",
+					"#endif",
+
+					"#if MAX_POINT_LIGHTS > 0",
+						"totalLight += pointTotal;",
+					"#endif",
+
+					"gl_FragColor = gl_FragColor * totalLight;",
 
 				"}"
 
@@ -233,8 +262,6 @@ THREE.ShaderUtils = {
 			vertexShader: [
 
 				"attribute vec4 tangent;",
-
-				"uniform vec3 uPointLightPos;",
 
 				"#ifdef VERTEX_TEXTURES",
 
@@ -249,7 +276,15 @@ THREE.ShaderUtils = {
 				"varying vec3 vNormal;",
 				"varying vec2 vUv;",
 
-				"varying vec3 vPointLightVector;",
+				"#if MAX_POINT_LIGHTS > 0",
+
+					"uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];",
+					"uniform float pointLightDistance[ MAX_POINT_LIGHTS ];",
+
+					"varying vec4 vPointLight[ MAX_POINT_LIGHTS ];",
+
+				"#endif",
+
 				"varying vec3 vViewPosition;",
 
 				"void main() {",
@@ -269,10 +304,28 @@ THREE.ShaderUtils = {
 
 					"vUv = uv;",
 
-					// point light
+					// point lights
 
-					"vec4 lPosition = viewMatrix * vec4( uPointLightPos, 1.0 );",
-					"vPointLightVector = normalize( lPosition.xyz - mvPosition.xyz );",
+					"#if MAX_POINT_LIGHTS > 0",
+
+						"for( int i = 0; i < MAX_POINT_LIGHTS; i++ ) {",
+
+							"vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );",
+
+							"vec3 lVector = lPosition.xyz - mvPosition.xyz;",
+
+							"float lDistance = 1.0;",
+
+							"if ( pointLightDistance[ i ] > 0.0 )",
+								"lDistance = 1.0 - min( ( length( lVector ) / pointLightDistance[ i ] ), 1.0 );",
+
+							"lVector = normalize( lVector );",
+
+							"vPointLight[ i ] = vec4( lVector, lDistance );",
+
+						"}",
+
+					"#endif",
 
 					// displacement mapping
 
@@ -602,5 +655,7 @@ THREE.ShaderUtils = {
 		return values;
 
 	}
+
+};
 
 };

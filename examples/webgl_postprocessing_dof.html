@@ -299,21 +299,12 @@
 
 					// Render scene into texture
 
-					if ( singleMaterial )
-						zmaterial[ 0 ] = cubeMaterial;
-					else
-						for( i = 0; i < nobjects; i++ ) objects[ i ].materials[ 0 ] = materials[ i ];
-
-
+					scene.overrideMaterial = null;
 					renderer.render( scene, camera, postprocessing.rtTextureColor, true );
 
 					// Render depth into texture
 
-					if ( singleMaterial )
-						zmaterial[ 0 ] = material_depth;
-					else
-						for( i = 0; i < nobjects; i++ ) objects[i].materials[ 0 ] = material_depth;
-
+					scene.overrideMaterial = material_depth;
 					renderer.render( scene, camera, postprocessing.rtTextureDepth, true );
 
 					// Render bokeh composite

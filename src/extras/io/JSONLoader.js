@@ -26,7 +26,7 @@ THREE.JSONLoader.prototype.load = function ( parameters ) {
 
 	var scope = this,
 		url = parameters.model,
-		callback = parameters.callback, 
+		callback = parameters.callback,
 		texture_path = parameters.texture_path ? parameters.texture_path : this.extractUrlbase( url ),
 		worker = new Worker( url );
 
@@ -58,6 +58,8 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texture_path
 
 	geometry.computeCentroids();
 	geometry.computeFaceNormals();
+
+	if ( this.hasNormals( geometry ) ) geometry.computeTangents();
 
 	// geometry.computeEdgeFaces();
 
@@ -351,7 +353,7 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texture_path
 
 				}
 
-			} 
+			}
 
 		}
 
@@ -376,7 +378,7 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texture_path
 
 				}
 
-			} 
+			}
 
 		}
 

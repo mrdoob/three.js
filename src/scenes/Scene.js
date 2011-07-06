@@ -11,6 +11,8 @@ THREE.Scene = function () {
 
 	this.fog = null;
 
+	this.overrideMaterial = null;
+
 	this.collisions = null;
 
 	this.objects = [];

@@ -20,13 +20,11 @@
 # Init
 # ################################################################
 
-# To support reload properly, try to access a package var,
-# if it's there, reload everything
 
 bl_info = {
     "name": "three.js format",
     "author": "mrdoob, kikko, alteredq, remoe, pxf",
-    "version": (1, 0, 1),
+    "version": (1, 0, 2),
     "blender": (2, 5, 7),
     "api": 35622,
     "location": "File > Import-Export",
@@ -36,6 +34,11 @@ bl_info = {
     "tracker_url": "https://github.com/mrdoob/three.js/issues",
     "category": "Import-Export"}
 
+# To support reload properly, try to access a package var,
+# if it's there, reload everything
+
+import bpy
+
 if "bpy" in locals():
     import imp
     if "export_threejs" in locals():
@@ -43,9 +46,8 @@ if "bpy" in locals():
     if "import_threejs" in locals():
         imp.reload(import_threejs)
 
-import bpy
 from bpy.props import *
-from io_utils import ExportHelper, ImportHelper
+from bpy_extras.io_utils import ExportHelper, ImportHelper
 
 # ################################################################
 # Custom properties
@@ -177,7 +179,7 @@ def save_settings_export(properties):
     "option_embed_meshes" : properties.option_embed_meshes,
     "option_url_base_html" : properties.option_url_base_html,
     "option_copy_textures" : properties.option_copy_textures,
-    
+
     "option_lights" : properties.option_lights,
     "option_cameras" : properties.option_cameras,
 
@@ -356,7 +358,7 @@ class ExportTHREEJS(bpy.types.Operator, ExportHelper):
         row = layout.row()
         row.prop(self.properties, "option_embed_meshes")
         row.prop(self.properties, "option_copy_textures")
-        
+
         row = layout.row()
         row.prop(self.properties, "option_url_base_html")
 

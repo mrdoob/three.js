@@ -79,7 +79,7 @@ COLORS = [0xeeeeee, 0xee0000, 0x00ee00, 0x0000ee, 0xeeee00, 0x00eeee, 0xee00ee]
 TEMPLATE_SCENE_ASCII = """\
 /* Converted from: %(fname)s
  *
- * File generated with Blender 2.57 Exporter
+ * File generated with Blender 2.58 Exporter
  * https://github.com/mrdoob/three.js/tree/master/utils/exporters/blender/
  *
  * objects:    %(nobjects)s
@@ -222,7 +222,7 @@ TEMPLATE_HEX = "0x%06x"
 
 TEMPLATE_FILE_ASCII = """\
 /*
- * File generated with Blender 2.57 Exporter
+ * File generated with Blender 2.58 Exporter
  * https://github.com/mrdoob/three.js/tree/master/utils/exporters/blender/
  *
  * vertices: %(nvertex)d
@@ -825,12 +825,12 @@ def handle_texture(id, textures, material, filepath, option_copy_textures):
             wrap_y = "repeat"
 
             if texture.use_mirror_x:
-                wrap_x = "mirror" 
+                wrap_x = "mirror"
             if texture.use_mirror_y:
                 wrap_y = "mirror"
 
             material[wrapName] = [wrap_x, wrap_y]
-            
+
         if slot.use_map_normal:
             if slot.normal_factor != 1.0:
                 material['mapNormalFactor'] = slot.normal_factor
@@ -906,7 +906,7 @@ def generate_ascii_model(mesh, scene,
     "ncolor"    : ncolor,
     "nmaterial" : nmaterial,
     "nedges"    : nedges,
-    
+
     "model"     : model_string
     }
 
@@ -975,7 +975,7 @@ def generate_mesh_string(obj, scene,
     option_copy_textures_model = False
     if export_single_model and option_copy_textures:
         option_copy_textures_model = True
-        
+
     text, model_string = generate_ascii_model(mesh, scene,
                                 option_vertices,
                                 option_vertices_truncate,
@@ -994,7 +994,7 @@ def generate_mesh_string(obj, scene,
     # remove temp mesh
 
     bpy.data.meshes.remove(mesh)
-    
+
     return text, model_string
 
 def export_mesh(obj, scene, filepath,
@@ -1161,7 +1161,7 @@ def generate_objects(data):
                 group_string = generate_string_list(group_ids)
 
             triggerType = obj.THREE_triggerType
-                
+
             object_string = TEMPLATE_EMPTY % {
             "object_id"   : generate_string(object_id),
             "group_id"    : group_string,
@@ -1197,7 +1197,7 @@ def generate_geometries(data):
             if name not in geo_set:
 
                 geometry_id = "geo_%s" % name
-                
+
                 if data["embed_meshes"]:
 
                     embed_id = "emb_%s" % name
@@ -1253,7 +1253,7 @@ def generate_textures_scene(data):
                 wrap_y = "repeat"
 
                 if texture.use_mirror_x:
-                    wrap_x = "mirror" 
+                    wrap_x = "mirror"
                 if texture.use_mirror_y:
                     wrap_y = "mirror"
 
@@ -1345,10 +1345,10 @@ def extract_material_data(m, option_colors):
     return material
 
 def guess_material_textures(material):
-    textures = { 
+    textures = {
         'diffuse' : None,
         'light'   : None,
-        'normal'  : None 
+        'normal'  : None
     }
 
     # just take first textures of each, for the moment three.js materials can't handle more
@@ -1409,7 +1409,7 @@ def generate_material_string(material):
 
     if material['vertexColors']:
         parameters += ', "vertexColors": "vertex"'
-        
+
     material_string = TEMPLATE_MATERIAL_SCENE % {
     "material_id" : generate_string(material_id),
     "type"        : generate_string(material_type),
@@ -1536,7 +1536,7 @@ def generate_lights(data):
             chunks.append(light_string)
 
         return ",\n\n".join(chunks)
-        
+
     return ""
 
 # #####################################################
@@ -1544,20 +1544,20 @@ def generate_lights(data):
 # #####################################################
 
 def generate_embeds(data):
-    
+
     if data["embed_meshes"]:
 
         chunks = []
-        
+
         for e in data["embeds"]:
-            
+
             embed = '"emb_%s": {%s}' % (e, data["embeds"][e])
             chunks.append(embed)
-            
+
         return ",\n\n".join(chunks)
 
     return ""
-    
+
 # #####################################################
 # Scene exporter - generate ASCII scene
 # #####################################################
@@ -1643,7 +1643,7 @@ def export_scene(scene, filepath, flipyz, option_colors, option_lights, option_c
     "filepath"     : filepath,
     "flipyz"       : flipyz,
     "use_colors"   : option_colors,
-    "use_lights"   : option_lights, 
+    "use_lights"   : option_lights,
     "use_cameras"  : option_cameras,
     "embed_meshes" : option_embed_meshes,
     "base_html"    : option_url_base_html,
@@ -1705,9 +1705,9 @@ def save(operator, context, filepath = "",
                     name = obj.data.name
 
                 if name not in geo_set:
-                    
+
                     if option_embed_meshes:
-                        
+
                         text, model_string = generate_mesh_string(obj, scene,
                                                         option_vertices,
                                                         option_vertices_truncate,
@@ -1723,7 +1723,7 @@ def save(operator, context, filepath = "",
                                                         False,          # export_single_model
                                                         False,          # option_copy_textures
                                                         filepath)
-                        
+
                         embeds[name] = model_string
 
                     else:
@@ -1747,14 +1747,14 @@ def save(operator, context, filepath = "",
 
                     geo_set.add(name)
 
-        export_scene(scene, filepath, 
-                     option_flip_yz, 
-                     option_colors, 
-                     option_lights, 
-                     option_cameras, 
-                     option_embed_meshes, 
-                     embeds, 
-                     option_url_base_html, 
+        export_scene(scene, filepath,
+                     option_flip_yz,
+                     option_colors,
+                     option_lights,
+                     option_cameras,
+                     option_embed_meshes,
+                     embeds,
+                     option_url_base_html,
                      option_copy_textures)
 
     else:
