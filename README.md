@@ -134,6 +134,23 @@ This code creates a camera, then creates a scene, adds a cube on it, creates a &
 
 ### Change Log ###
 
+2011 07 06 - **r42** (277.852 KB, gzip, gzip: 69.469 KB)
+
+* Added `AnaglypWebGLRenderer` and `CrosseyedWebGLRenderer`. ([mrdoob](http://github.com/mrdoob), [alteredq](http://github.com/alteredq) and [marklundin](http://github.com/marklundin))
+* Added `TextGeometry`. ([zz85](http://github.com/zz85) and [alteredq](http://github.com/alteredq))
+* Added `setViewOffset` method to `Camera`. ([greggman](http://github.com/greggman))
+* Renamed geometries to `*Geometry`. ([mrdoob](http://github.com/mrdoob))
+* Improved Blender exporter. ([alteredq](http://github.com/alteredq), [sweetfish](http://github.com/sweetfish) and [Jhonnyg](https://github.com/Jhonnyg))
+* Added Blender 2.58 exporter. ([georgik](http://github.com/georgik))
+* Fixed `Matrix4.multiply()`. (thanks [lukem1](http://github.com/lukem1)) 
+* Added support for additional Euler rotation orders in `Matrix4`. ([rectalogic](http://github.com/rectalogic))
+* Renamed `QuakeCamera` to `FirstPersonCamera`. ([chriskillpack](http://github.com/chriskillpack))
+* Improved Normal Map Shader. ([alteredq](http://github.com/alteredq))
+* `Collision` now supports `Object3D.flipSided` and `Object3D.doubleSided`. ([NINE78](http://github.com/NINE78))
+* Removed most of `SceneUtils` methods. ([mrdoob](http://github.com/mrdoob))
+* Removed `Sound` object and `SoundRenderer`. ([mrdoob](http://github.com/mrdoob))
+
+
 2011 05 31 - **r41/ROME** (265.317 KB, gzip: 64.849 KB)
 
 (Up to this point, some [rome](http://ro.me) specific features managed to get in the lib. The aim is to clean this up in next revisions.)
@@ -142,19 +159,19 @@ This code creates a camera, then creates a scene, adds a cube on it, creates a &
 * Fixes on WebGL attributes. ([alteredq](http://github.com/alteredq) and [empaempa](http://github.com/empaempa))
 * Reduced overall memory footprint. ([mrdoob](http://github.com/mrdoob))
 * Added `Face4` support to `CollisionSystem`. ([NINE78](http://github.com/NINE78))
-* Made Blender exporter work on 2.57. ([remoe](https://github.com/remoe))
-* Added `Particle` support to `Ray`. ([mrdoob](http://github.com/mrdoob) and [jaycrossler](https://github.com/jaycrossler))
+* Added Blender 2.57 exporter. ([remoe](http://github.com/remoe))
+* Added `Particle` support to `Ray`. ([mrdoob](http://github.com/mrdoob) and [jaycrossler](http://github.com/jaycrossler))
 * Improved `Ray.intersectObject` performance by checking boundingSphere first. ([mrdoob](http://github.com/mrdoob))
-* Added `TrackballCamera. ([egraether](https://github.com/egraether))
+* Added `TrackballCamera`. ([egraether](http://github.com/egraether))
 * Added `repeat` and `offset` properties to `Texture`. ([mrdoob](http://github.com/mrdoob) and [alteredq](http://github.com/alteredq))
-* Cleaned up `Vector2`, `Vector3` and `Vector4`. ([egraether](https://github.com/egraether))
+* Cleaned up `Vector2`, `Vector3` and `Vector4`. ([egraether](http://github.com/egraether))
 
 
 2011 04 24 - **r40** (263.774 KB, gzip: 64.320 KB)
 
 * Fixed `Object3D.lookAt`. ([mrdoob](http://github.com/mrdoob))
 * More and more Blender exporter goodness. ([alteredq](http://github.com/alteredq) and [mrdoob](http://github.com/mrdoob))
-* Improved `CollisionSystem`. ([drojdjou](https://github.com/drojdjou) and [alteredq](http://github.com/alteredq))
+* Improved `CollisionSystem`. ([drojdjou](http://github.com/drojdjou) and [alteredq](http://github.com/alteredq))
 * Fixes on WebGLRenderer. ([empaempa](http://github.com/empaempa))
 * Added `Trident` object. ([sroucheray](http://github.com/sroucheray))
 * Added `data` object to Renderers for getting number of vertices/faces/callDraws from last render. ([mrdoob](http://github.com/mrdoob))
@@ -238,7 +255,7 @@ This code creates a camera, then creates a scene, adds a cube on it, creates a &
 * `Scene` now supports `Fog` and `FogExp2`. `WebGLRenderer` only right now. ([alteredq](http://github.com/alteredq))
 * Added `setClearColor( hex, opacity )` to `WebGLRenderer` and `CanvasRenderer` ([alteredq](http://github.com/alteredq) & [mrdoob](http://github.com/mrdoob))
 * `WebGLRenderer` shader system refactored improving performance. ([alteredq](http://github.com/alteredq))
-* `Projector` now does frustum culling of all the objects using their sphereBoundingBox. (thx [errynp](https://github.com/errynp))
+* `Projector` now does frustum culling of all the objects using their sphereBoundingBox. (thx [errynp](http://github.com/errynp))
 * `material` property changed to `materials` globaly.
 
 
@@ -272,7 +289,7 @@ This code creates a camera, then creates a scene, adds a cube on it, creates a &
 * `Loader` class allows load geometry asynchronously at runtime. ([alteredq](http://github.com/alteredq))
 * `MeshPhongMaterial` working with `WebGLRenderer`. ([alteredq](http://github.com/alteredq))
 * Support for *huge* objects. Max 500k polys and counting. ([alteredq](http://github.com/alteredq))
-* `Projector.unprojectVector` and `Ray` class to check intersections with faces (based on [mindlapse](https://github.com/mindlapse) work)
+* `Projector.unprojectVector` and `Ray` class to check intersections with faces (based on [mindlapse](http://github.com/mindlapse) work)
 * Fixed `Projector` z-sorting (not as jumpy anymore).
 * Fixed Orthographic projection (was y-inverted).
 * Hmmm.. lib file size starting to get too big...
