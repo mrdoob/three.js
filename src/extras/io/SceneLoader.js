@@ -535,7 +535,7 @@ THREE.SceneLoader.prototype = {
 					if ( modelJson ) {
 
 						jsonLoader.createModel( modelJson, create_callback_embed( dg ), texture_path );
-						
+
 					}
 
 				}
@@ -713,8 +713,19 @@ THREE.SceneLoader.prototype = {
 
 					}
 
-					uniforms[ "enableAO" ].value = false;
-					uniforms[ "enableSpecular" ].value = false;
+					if ( m.parameters.lightMap ) {
+
+						uniforms[ "tAO" ].texture = m.parameters.lightMap;
+						uniforms[ "enableAO" ].value = true;
+
+					}
+
+					if ( m.parameters.specularMap ) {
+
+						uniforms[ "tSpecular" ].texture = result.textures[ m.parameters.specularMap ];
+						uniforms[ "enableSpecular" ].value = true;
+
+					}
 
 					uniforms[ "uDiffuseColor" ].value.setHex( diffuse );
 					uniforms[ "uSpecularColor" ].value.setHex( specular );
