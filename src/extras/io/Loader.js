@@ -354,7 +354,7 @@ THREE.Loader.prototype = {
 
 			}
 
-			var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true };
+			var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true, fog: true };
 
 			material = new THREE.MeshShaderMaterial( parameters );
 
