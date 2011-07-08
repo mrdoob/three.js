@@ -2,18 +2,28 @@
  * @author mr.doob / http://mrdoob.com/
  * @author mikael emtinger / http://gomo.se/
  * @author greggman / http://games.greggman.com/
+ *
+ * parameters = {
+ *	fov: <float>,
+ *	aspect: <float>,
+ *	near: <float>,
+ *	far: <float>,
+ *	target: <THREE.Object3D>,
+ * }
  */
 
-THREE.Camera = function ( fov, aspect, near, far, target ) {
+THREE.Camera = function ( parameters ) {
 
 	THREE.Object3D.call( this );
 
-	this.fov = fov || 50;
-	this.aspect = aspect || 1;
-	this.near = near || 0.1;
-	this.far = far || 2000;
+  parameters = parameters || {};
 
-	this.target = target || new THREE.Object3D();
+	this.fov = parameters.fov || 50;
+	this.aspect = parameters.aspect || 1;
+	this.near = parameters.near || 0.1;
+	this.far = parameters.far || 2000;
+
+	this.target = parameters.target || new THREE.Object3D();
 	this.useTarget = true;
 
 	this.matrixWorldInverse = new THREE.Matrix4();

@@ -26,7 +26,7 @@
 
 THREE.FlyCamera = function ( parameters ) {
 
-	THREE.Camera.call( this, parameters.fov, parameters.aspect, parameters.near, parameters.far, parameters.target );
+	THREE.Camera.call( this, parameters );
 
 	this.tmpQuaternion = new THREE.Quaternion();
 	
