@@ -42,7 +42,7 @@
 				info.innerHTML = '<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> webgl - interactive cubes';
 				container.appendChild( info );
 
-				camera = new THREE.Camera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.Camera( { fov: 70, aspect: window.innerWidth / window.innerHeight, near: 1, far: 10000 } );
 				camera.position.y = 300;
 				camera.position.z = 500;
 

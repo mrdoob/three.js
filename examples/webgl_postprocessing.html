@@ -93,7 +93,7 @@
 				cameraOrtho.projectionMatrix = THREE.Matrix4.makeOrtho( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
 				cameraOrtho.position.z = 100;
 
-				cameraPerspective = new THREE.Camera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
+				cameraPerspective = new THREE.Camera( { fov: 50, aspect: window.innerWidth / window.innerHeight, near: 1, far: 10000 } );
 				cameraPerspective.position.z = 900;
 
 				sceneModel = new THREE.Scene();

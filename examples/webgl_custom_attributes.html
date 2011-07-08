@@ -98,7 +98,7 @@
 
 		function init() {
 
-			camera = new THREE.Camera( 30, WIDTH / HEIGHT, 1, 10000 );
+			camera = new THREE.Camera( { fov: 30, aspect: WIDTH / HEIGHT, near: 1, far: 10000 } );
 			camera.position.z = 300;
 
 			scene = new THREE.Scene();

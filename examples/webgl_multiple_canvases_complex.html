@@ -120,7 +120,7 @@
 
 					container = document.getElementById( containerId );
 
-					camera = new THREE.Camera( 20, container.clientWidth / container.clientHeight, 1, 10000 );
+					camera = new THREE.Camera( { fov: 20, aspect: container.clientWidth / container.clientHeight, near: 1, far: 10000 } );
 					camera.setViewOffset(fullWidth, fullHeight, viewX, viewY, viewWidth, viewHeight);
 					camera.position.z = 1800;
 

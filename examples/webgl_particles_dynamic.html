@@ -75,7 +75,7 @@
 
                 container = document.getElementById( 'container' );
 
-				camera = new THREE.Camera( 20, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 50000 );
+				camera = new THREE.Camera( { fov: 20, aspect: SCREEN_WIDTH / SCREEN_HEIGHT, near: 1, far: 50000 } );
 				camera.position.z = 7000;
 				camera.position.y = 700;
 
