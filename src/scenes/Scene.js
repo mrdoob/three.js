@@ -67,7 +67,43 @@ THREE.Scene.prototype.update = function () {
 
 	for ( var i = 0; i < this.objects.length; i ++ ) {
 
-		this.objects[ i ].update( null, false );
+		updateObjectMatrixWorld( this.objects[ i ], false );
+
+	}
+
+	function updateObjectMatrixWorld( object, forceUpdate ) {
+
+		object.matrixAutoUpdate && object.updateMatrix();
+
+		// update matrixWorld
+
+		if ( object.matrixWorldNeedsUpdate || forceUpdate ) {
+
+			if ( object.parent ) {
+
+				object.matrixWorld.multiply( object.parent.matrixWorld, object.matrix );
+
+			} else {
+
+				object.matrixWorld.copy( object.matrix );
+
+			}
+
+			object.matrixRotationWorld.extractRotation( object.matrixWorld, object.scale );
+
+			object.matrixWorldNeedsUpdate = false;
+
+			forceUpdate = true;
+
+		}
+
+		// update children
+
+		for ( var i = 0, l = object.children.length; i < l; i ++ ) {
+
+			updateObjectMatrixWorld( object.children[ i ], forceUpdate );
+
+		}
 
 	}
 
