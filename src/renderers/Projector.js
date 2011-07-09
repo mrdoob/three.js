@@ -63,7 +63,11 @@ THREE.Projector = function() {
 
 			object = objects[ o ];
 
-			if ( !object.visible || ( object instanceof THREE.Mesh && !isInFrustum( object ) ) ) continue;
+			if ( ! object.visible || ( object instanceof THREE.Mesh && !isInFrustum( object ) ) ) {
+	
+				continue;
+
+			}
 
 			_object = getNextObjectInPool();
 
@@ -101,9 +105,11 @@ THREE.Projector = function() {
 
 		camera.matrixAutoUpdate && camera.update( undefined, true );
 
-		scene.update( undefined, false, camera );
+		// scene.update( undefined, false, camera );
+		scene.update();
 
 		_projScreenMatrix.multiply( camera.projectionMatrix, camera.matrixWorldInverse );
+
 		computeFrustum( _projScreenMatrix );
 
 		objects = this.projectObjects( scene, camera, true );

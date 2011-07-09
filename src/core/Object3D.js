@@ -88,52 +88,39 @@ THREE.Object3D.prototype = {
 
 	},
 
-	addChild: function ( child ) {
+	addObject: function ( object ) {
 
-		if ( this.children.indexOf( child ) === - 1 ) {
+		if ( this.children.indexOf( object ) === - 1 ) {
 
-			if( child.parent !== undefined ) {
+			if ( object.parent !== undefined ) {
 
-				child.parent.removeChild( child );
-
-			}
-
-			child.parent = this;
-			this.children.push( child );
-
-			// add to scene
-
-			var scene = this;
-
-			while ( scene.parent !== undefined ) {
-
-				scene = scene.parent;
+				object.parent.removeObject( object );
 
 			}
 
-			if ( scene !== undefined && scene instanceof THREE.Scene )  {
+			object.parent = this;
 
-				scene.addChildRecurse( child );
+			this.children.push( object );
 
-			}
+		}		
+
+	},
+
+	removeObject: function ( object ) {
+
+		var index = this.children.indexOf( object );
+
+		if ( index !== - 1 ) {
+
+			object.parent = undefined;
+
+			this.children.splice( index, 1 );
 
 		}
 
 	},
 
-	removeChild: function ( child ) {
-
-		var childIndex = this.children.indexOf( child );
-
-		if ( childIndex !== - 1 ) {
-
-			child.parent = undefined;
-			this.children.splice( childIndex, 1 );
-
-		}
-
-	},
-
+	/*
 	getChildByName: function ( name, doRecurse ) {
 
 		var c, cl, child, recurseResult;
@@ -165,6 +152,7 @@ THREE.Object3D.prototype = {
 		return undefined;
 
 	},
+	*/
 
 	updateMatrix: function () {
 
@@ -191,7 +179,7 @@ THREE.Object3D.prototype = {
 
 	},
 
-	update: function ( parentMatrixWorld, forceUpdate, camera ) {
+	update: function ( parentMatrixWorld, forceUpdate/*, camera*/ ) {
 
 		this.matrixAutoUpdate && this.updateMatrix();
 
@@ -221,10 +209,15 @@ THREE.Object3D.prototype = {
 
 		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
 
-			this.children[ i ].update( this.matrixWorld, forceUpdate, camera );
+			this.children[ i ].update( this.matrixWorld, forceUpdate/*, camera*/ );
 
 		}
 
 	}
 
 };
+
+// Deprecated
+
+THREE.Object3D.prototype.addChild = THREE.Object3D.prototype.addObject;
+THREE.Object3D.prototype.removeChild = THREE.Object3D.prototype.removeObject;
