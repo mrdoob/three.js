@@ -95,6 +95,7 @@ THREE.ShaderUtils = {
 
 			uniforms: THREE.UniformsUtils.merge( [
 
+				THREE.UniformsLib[ "fog" ],
 				THREE.UniformsLib[ "lights" ],
 
 				{
@@ -161,6 +162,8 @@ THREE.ShaderUtils = {
 				"#endif",
 
 				"varying vec3 vViewPosition;",
+
+				THREE.ShaderChunk[ "fog_pars_fragment" ],
 
 				"void main() {",
 
@@ -254,6 +257,8 @@ THREE.ShaderUtils = {
 					"#endif",
 
 					"gl_FragColor = gl_FragColor * totalLight;",
+
+					THREE.ShaderChunk[ "fog_fragment" ],
 
 				"}"
 

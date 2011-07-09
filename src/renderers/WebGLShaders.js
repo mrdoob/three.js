@@ -588,12 +588,16 @@ THREE.UniformsLib = {
 		"refractionRatio" : { type: "f", value: 0.98 },
 		"combine" : { type: "i", value: 0 },
 
+		"morphTargetInfluences" : { type: "f", value: 0 }
+
+	},
+
+	fog : {
+
 		"fogDensity" : { type: "f", value: 0.00025 },
 		"fogNear" : { type: "f", value: 1 },
 		"fogFar" : { type: "f", value: 2000 },
-		"fogColor" : { type: "c", value: new THREE.Color( 0xffffff ) },
-
-		"morphTargetInfluences" : { type: "f", value: 0 }
+		"fogColor" : { type: "c", value: new THREE.Color( 0xffffff ) }
 
 	},
 
@@ -664,7 +668,7 @@ THREE.ShaderLib = {
 
 					"vVisibility = (       visibility.r / 9.0 ) *",
 								  "( 1.0 - visibility.g / 9.0 ) *",
-								  "(       visibility.b / 9.0 ) *", 
+								  "(       visibility.b / 9.0 ) *",
 								  "( 1.0 - visibility.a / 9.0 );",
 
 					"pos.x = cos( rotation ) * position.x - sin( rotation ) * position.y;",
@@ -1016,7 +1020,12 @@ THREE.ShaderLib = {
 
 	'basic': {
 
-		uniforms: THREE.UniformsLib[ "common" ],
+		uniforms: THREE.UniformsUtils.merge( [
+
+			THREE.UniformsLib[ "common" ],
+			THREE.UniformsLib[ "fog" ]
+
+		] ),
 
 		fragmentShader: [
 
@@ -1072,7 +1081,13 @@ THREE.ShaderLib = {
 
 	'lambert': {
 
-		uniforms: THREE.UniformsUtils.merge( [ THREE.UniformsLib[ "common" ], THREE.UniformsLib[ "lights" ] ] ),
+		uniforms: THREE.UniformsUtils.merge( [
+
+			THREE.UniformsLib[ "common" ],
+			THREE.UniformsLib[ "fog" ],
+			THREE.UniformsLib[ "lights" ]
+
+		] ),
 
 		fragmentShader: [
 
@@ -1141,7 +1156,9 @@ THREE.ShaderLib = {
 		uniforms: THREE.UniformsUtils.merge( [
 
 			THREE.UniformsLib[ "common" ],
+			THREE.UniformsLib[ "fog" ],
 			THREE.UniformsLib[ "lights" ],
+
 			{
 				"ambient"  : { type: "c", value: new THREE.Color( 0x050505 ) },
 				"specular" : { type: "c", value: new THREE.Color( 0x111111 ) },

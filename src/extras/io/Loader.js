@@ -293,6 +293,12 @@ THREE.Loader.prototype = {
 
 		}
 
+		if ( m.mapSpecular && texture_path ) {
+
+			create_texture( mpars, "specularMap", m.mapSpecular, m.mapSpecularRepeat, m.mapSpecularOffset, m.mapSpecularWrap );
+
+		}
+
 		// special case for normal mapped material
 
 		if ( m.mapNormal ) {
@@ -320,10 +326,21 @@ THREE.Loader.prototype = {
 
 			}
 
-			// for the moment don't handle specular, AO and displacement textures
+			if ( mpars.specularMap ) {
 
-			uniforms[ "enableAO" ].value = false;
-			uniforms[ "enableSpecular" ].value = false;
+				uniforms[ "tSpecular" ].texture = mpars.specularMap;
+				uniforms[ "enableSpecular" ].value = true;
+
+			}
+
+			if ( mpars.lightMap ) {
+
+				uniforms[ "tAO" ].texture = mpars.lightMap;
+				uniforms[ "enableAO" ].value = true;
+
+			}
+
+			// for the moment don't handle displacement texture
 
 			uniforms[ "uDiffuseColor" ].value.setHex( diffuse );
 			uniforms[ "uSpecularColor" ].value.setHex( specular );
@@ -337,7 +354,7 @@ THREE.Loader.prototype = {
 
 			}
 
-			var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true };
+			var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true, fog: true };
 
 			material = new THREE.MeshShaderMaterial( parameters );
 

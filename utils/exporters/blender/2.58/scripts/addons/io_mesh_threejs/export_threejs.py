@@ -761,6 +761,7 @@ def extract_materials(mesh, scene, option_colors, option_copy_textures, filepath
             handle_texture('diffuse', textures, material, filepath, option_copy_textures)
             handle_texture('light', textures, material, filepath, option_copy_textures)
             handle_texture('normal', textures, material, filepath, option_copy_textures)
+            handle_texture('specular', textures, material, filepath, option_copy_textures)
 
             material["vertexColors"] = m.THREE_useVertexColors and option_colors
 
@@ -771,7 +772,10 @@ def extract_materials(mesh, scene, option_colors, option_copy_textures, filepath
             #else:
             #    material['shading'] = "Lambert"
 
-            material['shading'] = m.THREE_materialType
+            if textures['normal']:
+                material['shading'] = "Phong"
+            else:
+                material['shading'] = m.THREE_materialType
 
     return materials
 
@@ -1324,6 +1328,7 @@ def extract_material_data(m, option_colors):
 
     material['mapDiffuse'] = ""
     material['mapLight'] = ""
+    material['mapSpecular'] = ""
     material['mapNormal'] = ""
     material['mapNormalFactor'] = 1.0
 
@@ -1334,6 +1339,9 @@ def extract_material_data(m, option_colors):
 
     if textures['light']:
         material['mapLight'] = textures['light']['texture'].image.name
+
+    if textures['specular']:
+        material['mapSpecular'] = textures['specular']['texture'].image.name
 
     if textures['normal']:
         material['mapNormal'] = textures['normal']['texture'].image.name
@@ -1348,7 +1356,8 @@ def guess_material_textures(material):
     textures = {
         'diffuse' : None,
         'light'   : None,
-        'normal'  : None
+        'normal'  : None,
+        'specular': None
     }
 
     # just take first textures of each, for the moment three.js materials can't handle more
@@ -1363,6 +1372,9 @@ def guess_material_textures(material):
                 if texture.use_normal_map:
                     textures['normal'] = { "texture": texture, "slot": slot }
 
+                elif slot.use_map_specular or slot.use_map_hardness:
+                    textures['specular'] = { "texture": texture, "slot": slot }
+
                 else:
                     if not textures['diffuse']:
                         textures['diffuse'] = { "texture": texture, "slot": slot }
@@ -1370,19 +1382,30 @@ def guess_material_textures(material):
                     else:
                         textures['light'] = { "texture": texture, "slot": slot }
 
-                if textures['diffuse'] and textures['normal'] and textures['light']:
+                if textures['diffuse'] and textures['normal'] and textures['light'] and textures['specular']:
                     break
 
     return textures
 
 def generate_material_string(material):
+
+    material_id = material["name"]
+
+    # default to Lambert
+
+    shading = material.get("shading", "Lambert")
+
+    # normal mapped materials must use Phong
+    # to get all required parameters for normal shader
+
+    if material['mapNormal']:
+        shading = "Phong"
+
     type_map = {
     "Lambert"   : "MeshLambertMaterial",
     "Phong"     : "MeshPhongMaterial"
     }
 
-    material_id = material["name"]
-    shading = material.get("shading", "Lambert")
     material_type = type_map.get(shading, "MeshBasicMaterial")
 
     parameters = '"color": %d' % rgb2int(material["colorDiffuse"])
@@ -1395,6 +1418,7 @@ def generate_material_string(material):
 
     colorMap = material['mapDiffuse']
     lightMap = material['mapLight']
+    specularMap = material['mapSpecular']
     normalMap = material['mapNormal']
     normalMapFactor = material['mapNormalFactor']
 
@@ -1402,8 +1426,11 @@ def generate_material_string(material):
         parameters += ', "map": %s' % generate_string(colorMap)
     if lightMap:
         parameters += ', "lightMap": %s' % generate_string(lightMap)
+    if specularMap:
+        parameters += ', "specularMap": %s' % generate_string(specularMap)
     if normalMap:
         parameters += ', "normalMap": %s' % generate_string(normalMap)
+
     if normalMapFactor != 1.0:
         parameters += ', "normalMapFactor": %f' % normalMapFactor
 
