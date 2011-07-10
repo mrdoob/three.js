@@ -19,9 +19,9 @@
  * }
  */
 
-THREE.RollCamera = function ( fov, aspect, near, far ) {
+THREE.RollCamera = function ( parameters ) {
 
-	THREE.Camera.call( this, fov, aspect, near, far );
+	THREE.Camera.call( this, parameters );
 
 	// API
 

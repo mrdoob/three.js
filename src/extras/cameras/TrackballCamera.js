@@ -36,7 +36,7 @@ THREE.TrackballCamera = function ( parameters ) {
 
 	parameters = parameters || {};
 
-	THREE.Camera.call( this, parameters.fov, parameters.aspect, parameters.near, parameters.far, parameters.target );
+	THREE.Camera.call( this, parameters );
 
 	this.domElement = parameters.domElement || document;
 

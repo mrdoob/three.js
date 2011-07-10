@@ -91,7 +91,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
+				camera = new THREE.Camera( { fov: 60, aspect: window.innerWidth / window.innerHeight, near: 1, far: 100000 } );
 				camera.projectionMatrix = THREE.Matrix4.makeOrtho( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
 				camera.position.z = 6200;
 

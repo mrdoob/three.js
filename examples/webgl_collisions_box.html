@@ -56,7 +56,7 @@ function init() {
 
 	info = document.getElementById("info");
 
-	camera = new THREE.Camera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
+	camera = new THREE.Camera( { fov: 40, aspect: window.innerWidth / window.innerHeight, near: 1, far: 10000 } );
 	camera.position.z = -500;
 
 	scene = new THREE.Scene();
