@@ -10,6 +10,7 @@ THREE.ImageUtils = {
 			texture = new THREE.Texture( image, mapping );
 
 		image.onload = function () { texture.needsUpdate = true; if ( callback ) callback( this ); };
+		image.crossOrigin = '';
 		image.src = path;
 
 		return texture;
@@ -35,6 +36,7 @@ THREE.ImageUtils = {
 
 			};
 
+			images[ i ].crossOrigin = '';
 			images[ i ].src = array[ i ];
 
 		}
