@@ -663,6 +663,8 @@ THREE.FontUtils = {
 			offset = 0, 
 			chars = String( text ).split( '' ), 
 			length = chars.length;
+		
+		var fontPaths = [];
 
 		for ( i = 0; i < length; i++ ) {
 
@@ -670,6 +672,7 @@ THREE.FontUtils = {
 			offset += ret.offset;
 			characterPts.push( ret.points );
 			allPts = allPts.concat( ret.points );
+			fontPaths.push( ret.path );
 
 		}
 
@@ -849,6 +852,8 @@ THREE.FontUtils = {
 	extractGlyphPoints : function( c, face, scale, offset ) {
 
 		var pts = [];
+		var path = new THREE.Path();
+		
 
 		var i, i2,
 			outline, action, length,
@@ -880,6 +885,8 @@ THREE.FontUtils = {
 					x = outline[ i++ ] * scaleX + offset;
 					y = outline[ i++ ] * scaleY;
 					pts.push( new THREE.Vector2( x, y ) );
+					
+					path.moveTo(x,y);
 					break;
 
 				case 'l':
@@ -889,6 +896,7 @@ THREE.FontUtils = {
 					x = outline[ i++ ] * scaleX + offset;
 					y = outline[ i++ ] * scaleY;
 					pts.push( new THREE.Vector2( x, y ) );
+					path.lineTo(x,y);
 					break;
 					
 				case 'q':
@@ -899,6 +907,8 @@ THREE.FontUtils = {
 					cpy  = outline[ i++ ] * scaleY;
 					cpx1 = outline[ i++ ] * scaleX + offset;
 					cpy1 = outline[ i++ ] * scaleY;
+					
+					path.quadraticCurveTo(cpx1, cpy1, cpx, cpy);
 			  
 					laste = pts[ pts.length - 1 ];
 			  
@@ -930,6 +940,8 @@ THREE.FontUtils = {
 					cpy1 = outline[ i++ ] * -scaleY;
 					cpx2 = outline[ i++ ] *  scaleX + offset;
 					cpy2 = outline[ i++ ] * -scaleY;
+					
+					path.quadraticCurveTo(cpx, cpy, cpx1, cpy1, cpx2, cpy2);
 			  
 					laste = pts[ pts.length - 1 ];
 			  
@@ -955,8 +967,11 @@ THREE.FontUtils = {
 
 			}
 		}
+		
+		path.debug(document.getElementById("boo"));
+		console.log(path);
 
-		return { offset: glyph.ha*scale, points:pts };
+		return { offset: glyph.ha*scale, points:pts, path:path};
 	}
 
 };
