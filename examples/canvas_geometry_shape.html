@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js canvas/webgl - geometry - text</title>
+		<title>three.js canvas - geometry - shapes</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
 		<style type="text/css">
@@ -20,10 +20,7 @@
 
 		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
-		      
-		<!-- load the font file from canvas-text -->
-		<script type="text/javascript" src="../src/extras/geometries/Path.js"></script>
-	 
+
 
 		<script type="text/javascript">
 
@@ -55,7 +52,7 @@
 				info.style.top = '10px';
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
-				info.innerHTML = 'Simple Dynamic 3D Shapes Example by <a href="http://www.lab4games.net/zz85/blog">zz85</a><br/>Drag to spin the text';
+				info.innerHTML = 'Simple procedurally generated 3D shapes example by <a href="http://www.lab4games.net/zz85/blog">zz85</a><br/>Drag to spin';
 				container.appendChild( info );
 
 				camera = new THREE.Camera( 50, window.innerWidth / window.innerHeight, 1, 1000 );
@@ -65,153 +62,163 @@
 
 				scene = new THREE.Scene();
 
-				var californiaPts=[];
-				californiaPts.push( new THREE.Vector2 (610, 320) );
-				californiaPts.push( new THREE.Vector2 (450, 300) );
-				californiaPts.push( new THREE.Vector2 (392, 392) );
-				californiaPts.push( new THREE.Vector2 (266, 438) );
-				californiaPts.push( new THREE.Vector2 (190, 570) );
-				californiaPts.push( new THREE.Vector2 (190, 600) );
-				californiaPts.push( new THREE.Vector2 (160, 620) );
-				californiaPts.push( new THREE.Vector2 (160, 650) );
-				californiaPts.push( new THREE.Vector2 (180, 640) );
-				californiaPts.push( new THREE.Vector2 (165, 680) );
-				californiaPts.push( new THREE.Vector2 (150, 670) );
-				californiaPts.push( new THREE.Vector2 (90, 737) );
-				californiaPts.push( new THREE.Vector2 (80, 795) );
-				californiaPts.push( new THREE.Vector2 (50, 835) );
-				californiaPts.push( new THREE.Vector2 (64, 870) );
-				californiaPts.push( new THREE.Vector2 (60, 945) );
-				californiaPts.push( new THREE.Vector2 (300, 945) );
-				californiaPts.push( new THREE.Vector2 (300, 743) );
-				californiaPts.push( new THREE.Vector2 (600, 473) );
-				californiaPts.push( new THREE.Vector2 (626, 425) );
-				californiaPts.push( new THREE.Vector2 (600, 370) );
-				californiaPts.push( new THREE.Vector2 (610, 320) );
+				parent = new THREE.Object3D();
+				parent.position.y = 50;
+				scene.addChild( parent );
 
+				function addGeometry( geometry, color, x, y, z, rx, ry, rz, s ) {
 
-				var californiaShape = new THREE.Shape(californiaPts);
-				var california3d = new THREE.ExtrudeGeometry( californiaShape, {
-					amount: 20
-				});
-				
-				var extrudeSettings = {
-					amount: 30
-				};
-				
-				var triangleShape = new THREE.Shape();
-				triangleShape.moveTo(80, 20);
-				triangleShape.lineTo(40, 80);
-				triangleShape.lineTo(120, 80);
-				triangleShape.lineTo(80,20); // close path
-				
-				var triangle3d = triangleShape.extrude(extrudeSettings);
-				
-				var x = 0, y = 0;
-				
-				var heartShape = new THREE.Shape(); // From http://blog.burlock.org/html5/130-paths
-				heartShape.moveTo(x + 25, y + 25);
-				heartShape.bezierCurveTo(x + 25, y + 25, x + 20, y, x, y);
-				heartShape.bezierCurveTo(x - 30, y, x - 30, y + 35,x - 30,y + 35);
-				heartShape.bezierCurveTo(x - 30, y + 55, x - 10, y + 77, x + 25, y + 95);
-				heartShape.bezierCurveTo(x + 60, y + 77, x + 80, y + 55, x + 80, y + 35);
-				heartShape.bezierCurveTo(x + 80, y + 35, x + 80, y, x + 50, y);
-				heartShape.bezierCurveTo(x + 35, y, x + 25, y + 25, x + 25, y + 25);
-				var heart3d = heartShape.extrude(extrudeSettings);
-				
-				//heartShape.debug(document.getElementById("debug"));
-				var sqLength = 80;
-				var squareShape = new THREE.Shape();
-				squareShape.moveTo(0,0);
-				squareShape.lineTo(0, sqLength);
-				squareShape.lineTo(sqLength, sqLength);
-				squareShape.lineTo(sqLength, 0);
-				squareShape.lineTo(0, 0);
-				var square3d = squareShape.extrude(extrudeSettings);
-				
-				var rectLength = 120, rectWidth = 40;
-				var rectShape = new THREE.Shape();
-				rectShape.moveTo(0,0);
-				rectShape.lineTo(0, rectWidth);
-				rectShape.lineTo(rectLength, rectWidth);
-				rectShape.lineTo(rectLength, 0);
-				rectShape.lineTo(0, 0);
-				var rect3d = rectShape.extrude(extrudeSettings);
-				
-				
-				var roundedRectShape = new THREE.Shape();
-				roundedRect(roundedRectShape, 0, 0, 50,50, 20);
-				var roundedRect3d = roundedRectShape.extrude(extrudeSettings);
-				
-				
-				function roundedRect(ctx,x,y,width,height,radius){  
-					ctx.moveTo(x,y+radius);  
-					ctx.lineTo(x,y+height-radius);  
-					ctx.quadraticCurveTo(x,y+height,x+radius,y+height);  
-					ctx.lineTo(x+width-radius,y+height);  
-					ctx.quadraticCurveTo(x+width,y+height,x+width,y+height-radius);  
-					ctx.lineTo(x+width,y+radius);  
-					ctx.quadraticCurveTo(x+width,y,x+width-radius,y);  
-					ctx.lineTo(x+radius,y);  
-					ctx.quadraticCurveTo(x,y,x,y+radius);  
+					var mesh = new THREE.Mesh( geometry, [ new THREE.MeshBasicMaterial( { color: color } ), new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true } ) ] );
+					mesh.position.set( x, y, z );
+					mesh.rotation.set( rx, ry, rz );
+					mesh.scale.set( s, s, s );
+					parent.addChild( mesh );
+
 				}
-				
-				var circleRadius = 20;
+
+				var extrudeSettings = {	amount: 20 };
+
+				// California
+
+				var californiaPts = [];
+
+				californiaPts.push( new THREE.Vector2 ( 610, 320 ) );
+				californiaPts.push( new THREE.Vector2 ( 450, 300 ) );
+				californiaPts.push( new THREE.Vector2 ( 392, 392 ) );
+				californiaPts.push( new THREE.Vector2 ( 266, 438 ) );
+				californiaPts.push( new THREE.Vector2 ( 190, 570 ) );
+				californiaPts.push( new THREE.Vector2 ( 190, 600 ) );
+				californiaPts.push( new THREE.Vector2 ( 160, 620 ) );
+				californiaPts.push( new THREE.Vector2 ( 160, 650 ) );
+				californiaPts.push( new THREE.Vector2 ( 180, 640 ) );
+				californiaPts.push( new THREE.Vector2 ( 165, 680 ) );
+				californiaPts.push( new THREE.Vector2 ( 150, 670 ) );
+				californiaPts.push( new THREE.Vector2 (  90, 737 ) );
+				californiaPts.push( new THREE.Vector2 (  80, 795 ) );
+				californiaPts.push( new THREE.Vector2 (  50, 835 ) );
+				californiaPts.push( new THREE.Vector2 (  64, 870 ) );
+				californiaPts.push( new THREE.Vector2 (  60, 945 ) );
+				californiaPts.push( new THREE.Vector2 ( 300, 945 ) );
+				californiaPts.push( new THREE.Vector2 ( 300, 743 ) );
+				californiaPts.push( new THREE.Vector2 ( 600, 473 ) );
+				californiaPts.push( new THREE.Vector2 ( 626, 425 ) );
+				californiaPts.push( new THREE.Vector2 ( 600, 370 ) );
+				californiaPts.push( new THREE.Vector2 ( 610, 320 ) );
+
+				var californiaShape = new THREE.Shape( californiaPts );
+				var california3d = new THREE.ExtrudeGeometry( californiaShape, { amount: 20	} );
+
+				// Triangle
+
+				var triangleShape = new THREE.Shape();
+				triangleShape.moveTo(  80, 20 );
+				triangleShape.lineTo(  40, 80 );
+				triangleShape.lineTo( 120, 80 );
+				triangleShape.lineTo(  80, 20 ); // close path
+
+				var triangle3d = triangleShape.extrude( extrudeSettings );
+
+
+				// Heart
+
+				var x = 0, y = 0;
+
+				var heartShape = new THREE.Shape(); // From http://blog.burlock.org/html5/130-paths
+
+				heartShape.moveTo( x + 25, y + 25 );
+				heartShape.bezierCurveTo( x + 25, y + 25, x + 20, y, x, y );
+				heartShape.bezierCurveTo( x - 30, y, x - 30, y + 35,x - 30,y + 35 );
+				heartShape.bezierCurveTo( x - 30, y + 55, x - 10, y + 77, x + 25, y + 95 );
+				heartShape.bezierCurveTo( x + 60, y + 77, x + 80, y + 55, x + 80, y + 35 );
+				heartShape.bezierCurveTo( x + 80, y + 35, x + 80, y, x + 50, y );
+				heartShape.bezierCurveTo( x + 35, y, x + 25, y + 25, x + 25, y + 25 );
+
+				var heart3d = heartShape.extrude( extrudeSettings );
+
+				//heartShape.debug( document.getElementById("debug") );
+
+				// Square
+
+				var sqLength = 80;
+
+				var squareShape = new THREE.Shape();
+				squareShape.moveTo( 0,0 );
+				squareShape.lineTo( 0, sqLength );
+				squareShape.lineTo( sqLength, sqLength );
+				squareShape.lineTo( sqLength, 0 );
+				squareShape.lineTo( 0, 0 );
+
+				var square3d = squareShape.extrude( extrudeSettings );
+
+				// Rectangle
+
+				var rectLength = 120, rectWidth = 40;
+
+				var rectShape = new THREE.Shape();
+				rectShape.moveTo( 0,0 );
+				rectShape.lineTo( 0, rectWidth );
+				rectShape.lineTo( rectLength, rectWidth );
+				rectShape.lineTo( rectLength, 0 );
+				rectShape.lineTo( 0, 0 );
+
+				var rect3d = rectShape.extrude( extrudeSettings );
+
+				// Rounded rectangle
+
+				var roundedRectShape = new THREE.Shape();
+				roundedRect( roundedRectShape, 0, 0, 50, 50, 20 );
+
+				var roundedRect3d = roundedRectShape.extrude( extrudeSettings );
+
+				function roundedRect( ctx, x, y, width, height, radius ){
+
+					ctx.moveTo( x, y + radius );
+					ctx.lineTo( x, y + height - radius );
+					ctx.quadraticCurveTo( x, y + height, x + radius, y + height );
+					ctx.lineTo( x + width - radius, y + height) ;
+					ctx.quadraticCurveTo( x + width, y + height, x + width, y + height - radius );
+					ctx.lineTo( x + width, y + radius );
+					ctx.quadraticCurveTo( x + width, y, x + width - radius, y );
+					ctx.lineTo( x + radius, y );
+					ctx.quadraticCurveTo( x, y, x, y + radius );
+
+				}
+
+				// Circle
+
+				var circleRadius = 40;
 				var circleShape = new THREE.Shape();
-				circleShape.moveTo(0,circleRadius);
-				circleShape.quadraticCurveTo(circleRadius, circleRadius,circleRadius,0); 
-				circleShape.quadraticCurveTo(circleRadius, -circleRadius,0,-circleRadius);
-				circleShape.quadraticCurveTo(-circleRadius, -circleRadius,-circleRadius,0);
-				circleShape.quadraticCurveTo(-circleRadius, circleRadius,0,circleRadius);
-				var circle3d = circleShape.extrude(extrudeSettings);
-				
-				
+				circleShape.moveTo( 0, circleRadius );
+				circleShape.quadraticCurveTo( circleRadius, circleRadius, circleRadius, 0 );
+				circleShape.quadraticCurveTo( circleRadius, -circleRadius, 0, -circleRadius );
+				circleShape.quadraticCurveTo( -circleRadius, -circleRadius, -circleRadius, 0 );
+				circleShape.quadraticCurveTo( -circleRadius, circleRadius, 0, circleRadius );
+
+				var circle3d = circleShape.extrude( extrudeSettings );
+
+				// Fish
+
 				x = y = 0;
-				var fishShape = new THREE.Shape(); 
-				fishShape.moveTo(x,y);
-				fishShape.quadraticCurveTo(x + 50, y - 80, x + 90, y - 10);
-				fishShape.quadraticCurveTo(x + 100, y - 10, x + 115, y - 40);
-				fishShape.quadraticCurveTo(x + 115, y, x + 115, y + 40);
-				fishShape.quadraticCurveTo(x + 100, y + 10, x + 90, y + 10);
-				fishShape.quadraticCurveTo(x + 50, y + 80, x, y);
-				var fish3d = fishShape.extrude(extrudeSettings);
-				
-				// TOFIX: swap order of points around.
-				
-			
-                var textMaterial = new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, wireframe:false } );
-                text = new THREE.Mesh( square3d, textMaterial );
 
-                text.doubleSided = false;
+				var fishShape = new THREE.Shape();
 
-                text.position.y = 100;
-               // text.position.y = 100;
-                text.position.z = 200;
+				fishShape.moveTo( x, y );
+				fishShape.quadraticCurveTo( x + 50, y + 80, x + 90, y + 10 );
+				fishShape.quadraticCurveTo( x + 100, y + 10, x + 115, y + 40 );
+				fishShape.quadraticCurveTo( x + 100, y, x + 115, y - 40 );
+				fishShape.quadraticCurveTo( x + 100, y + 10, x + 90, y - 10 );
+				fishShape.quadraticCurveTo( x + 50, y - 80, x, y );
 
-                text.rotation.x = 0;
-                text.rotation.y = Math.PI*2;
-				text.overdraw = true;
+				var fish3d = fishShape.extrude( extrudeSettings );
 
-                scene.addObject( text );
+				addGeometry( california3d, 	0xffaa00, -300, -100, 0,     0, 0, 0, 0.25 );
+				addGeometry( triangle3d, 	0xffee00, -180,    0, 0,     0, 0, 0, 1 );
+				addGeometry( roundedRect3d, 0x005500, -150,  150, 0,     0, 0, 0, 1 );
+				addGeometry( square3d, 		0x0055ff,  150,  100, 0,     0, 0, 0, 1 );
+				addGeometry( heart3d, 		0xff1100,    0,  100, 0,   3.14, 0, 0, 1 );
+				addGeometry( circle3d, 		0x00ff11,  150,    0, 0,     0, 0, 0, 1 );
+				addGeometry( fish3d, 		0x222222,  -50,  200, 0,     0, 0, 0, 1 );
 
-
-				var triangleMesh = new THREE.Mesh( triangle3d, textMaterial );
-				triangleMesh.position.x = 180;
-				triangleMesh.position.y = 50;
-				
-				
-				
-				scene.addObject( triangleMesh );
-				
-
-				// Plane
-
-				plane = new THREE.Mesh( new THREE.PlaneGeometry( 800, 800 ), new THREE.MeshBasicMaterial( { color: 0xe0e0e0, wireframe:true }) );
-				plane.rotation.x = - 90 * ( Math.PI / 180 );
-                plane.position.x = 0;
-				plane.overdraw = true;
-
-				//scene.addObject( plane );
 
 				renderer = new THREE.CanvasRenderer();
                 renderer.setSize( window.innerWidth, window.innerHeight );
@@ -307,7 +314,7 @@
 
 			function render() {
 
-				plane.rotation.z = text.rotation.y += ( targetRotation - text.rotation.y ) * 0.05;
+				parent.rotation.y += ( targetRotation - parent.rotation.y ) * 0.05;
 				renderer.render( scene, camera );
 
 			}
