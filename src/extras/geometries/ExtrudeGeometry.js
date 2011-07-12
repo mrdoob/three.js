@@ -13,7 +13,16 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 	var bezelSize = options.bezelSize !== undefined ? options.bezelSize : 8;
 	var bezelEnabled = options.bezelEnabled !== undefined ? options.bezelEnabled : false;
 	var steps = options.steps !== undefined ? options.steps : 3;
-
+	var extrudePath = options.path !== undefined ? options.path : null;
+	var extrudeByPath = false, extrudePts;
+	if (extrudePath) {
+		extrudePts = extrudePath.getPoints();
+		steps = extrudePts.length ;
+		extrudeByPath = true;
+	}
+	
+	// TODO, extrude by path's tangents? also via 3d path?
+	
 	THREE.Geometry.call( this );
 
     var vertices = shape.getPoints();
@@ -25,7 +34,9 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 	var bezelPoints = [];
 	
 	var reverse = THREE.FontUtils.Triangulate.area( vertices ) > 0 ;
-	console.log(reverse);
+	
+	//console.log(reverse);
+	
 	var i,
 		vert, vlen = vertices.length,
 		face, flen = faces.length,
@@ -44,11 +55,15 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 	// Including  Front facing vertices
 	var s=1;
 	for ( ; s <= steps; s++ ) {
-		console.log(s);
+		
 		for ( i = 0; i < vlen; i++ ) {
 
 			vert = vertices[ i ];
-			v( vert.x, vert.y, amount/steps * s );
+			if (!extrudeByPath) {
+				v( vert.x, vert.y, amount/steps * s );
+			} else {
+				v( vert.x, vert.y + extrudePts[s-1].y, extrudePts[s-1].x );
+			}
 
 		}	
 	}
