@@ -22,7 +22,9 @@ THREE.ExtrudeGeometry = function( shape, options ) {
     var scope = this;
 
 	var bezelPoints = [];
-
+	
+	var reverse = THREE.FontUtils.Triangulate.area( vertices ) > 0 ;
+	console.log(reverse);
 	var i,
 		vert, vlen = vertices.length,
 		face, flen = faces.length,
@@ -86,16 +88,18 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 	var j, k, l, m;
 
 
-	// Faces Sides
+	// Sides Faces 
 
-	contour.push( contour[ 0 ] ); // in order not to check for boundary indices every time
+	//contour.push( contour[ 0 ] ); // in order not to check for boundary indices every time
 
 	i = contour.length;
 
-	while ( --i > 0 ) {
+	while ( --i >= 0 ) {
 
 		lastV = contour[ i ];
 
+		// TO OPTIMISE. Reduce this step of checking vertices.
+		/*
 		for ( j = 0; j < vlen; j++ ) {
 
 			if ( vertices[ j ].equals( contour[ i ] ) ) break;
@@ -106,11 +110,22 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 
 			if ( vertices[ k ].equals( contour[ i - 1 ] ) ) break;
 
-		}
+		}*/
+		
+		//TOREMOVE
+		//console.log('a', i,j, i-1, k);
+		j = i ;
+		//if (j==vertices.length) j = 0;
+		k = i - 1;
+		if (k<0) k = vertices.length-1;
+		//console.log('b', i,j, i-1, k,vertices.length);
 
 		// Create faces for the z-sides of the text
 
 		f4( j, k, k + vlen, j + vlen );
+		// REverse
+		//f4( k, j, j + vlen, k + vlen);
+	
 
 	}
 
@@ -128,14 +143,20 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 	}
 
 	function f3( a, b, c ) {
-
-		scope.faces.push( new THREE.Face3( a, b, c ) );
+		if (reverse) {
+			scope.faces.push( new THREE.Face3( c, b, a ) );
+		} else {
+			scope.faces.push( new THREE.Face3( a, b, c ) );
+		}
 
 	}
 
 	function f4( a, b, c, d ) {
-
-		scope.faces.push( new THREE.Face4( a, b, c, d ) );
+		if (reverse) {
+			scope.faces.push( new THREE.Face4( d, c , b , a ) );
+		} else {
+			scope.faces.push( new THREE.Face4( a, b, c, d ) );
+		}
 
 	}
 

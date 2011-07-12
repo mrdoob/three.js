@@ -21,13 +21,13 @@ THREE.PathActions = {
 	LINE_TO: 'lineTo',
 	QUADRATIC_CURVE_TO: 'quadraticCurveTo', // BEZIER quadratic CURVE
 	BEZIER_CURVE_TO: 'bezierCurveTo', 		// BEZIER cubic CURVE
-	CSPLINE_TO: 'cSplineTo' 				// TODO cardinal splines
+	CSPLINE_THRU: 'cSplineTo' 				// TODO cardinal splines
 
 };
 
 /* Create path using straight lines to connect all points */
 
-THREE.Path.prototype.fromPoints = function( vectors ) {
+THREE.Path.prototype.fromPoints = function( vectors /*Array of Vector*/ ) {
 
 	var v = 0, vlen = vectors.length;
 
@@ -70,6 +70,13 @@ THREE.Path.prototype.bezierCurveTo = function( aCP1x, aCP1y,
 	this.actions.push( { action: THREE.PathActions.BEZIER_CURVE_TO, args: args } );
 
 };
+
+THREE.Path.prototype.splineThru = function( pts /*Array of Vector*/ ) {
+	var args = Array.prototype.slice.call( arguments );
+	this.actions.push( { action: THREE.PathActions.CSPLINE_THRU, args: args } );
+}
+
+// TODO ARC
 
 /* Return an array of vectors based on contour of the path */
 
@@ -184,6 +191,10 @@ THREE.Path.prototype.getPoints = function( divisions ) {
 			}
 
 			break;
+			
+		case THREE.PathActions.CSPLINE_THRU:
+			
+			break;
 
 		}
 
@@ -192,6 +203,8 @@ THREE.Path.prototype.getPoints = function( divisions ) {
 	return points;
 
 };
+
+
 
 
 THREE.Path.prototype.getMinAndMax = function() {

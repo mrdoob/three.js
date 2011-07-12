@@ -22,8 +22,11 @@ THREE.Shape.prototype.constructor = THREE.Path;
 /* Returns vertices of triangulated faces | get faces */
 
 THREE.Shape.prototype.triangulate = function() {
-
-	return THREE.FontUtils.Triangulate( this.getPoints(), true );
+	var pts = this.getPoints();
+	if (THREE.FontUtils.Triangulate.area( pts ) > 0 ) {
+		pts = pts.reverse();
+	};
+	return THREE.FontUtils.Triangulate( pts, true );
 
 };
 
