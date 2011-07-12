@@ -211,6 +211,30 @@
 
 				var fish3d = fishShape.extrude( extrudeSettings );
 
+				// Spline shape + Path Extrusion
+
+				var splinepts = [];
+				splinepts.push( new THREE.Vector2 ( 350, 100 ) );
+				splinepts.push( new THREE.Vector2 ( 400, 450 ) );
+				splinepts.push( new THREE.Vector2 ( -140, 350 ) );
+				splinepts.push( new THREE.Vector2 ( 0, 0 ) );
+
+				var splineShape = new THREE.Shape(  );
+				splineShape.moveTo( 0, 0 );
+				splineShape.splineThru( splinepts );
+
+				//splineShape.debug( document.getElementById("debug") );
+
+				var extrudePath = new THREE.Path();
+
+				extrudePath.lineTo( 10, 10 );
+				extrudePath.quadraticCurveTo( 80, 60, 160, 10 );
+				extrudePath.quadraticCurveTo( 240, -40, 320, 10 );
+
+				extrudeSettings.path = extrudePath;
+
+				var splineShape3d = splineShape.extrude( extrudeSettings );
+
 				addGeometry( california3d, 	0xffaa00, -300, -100, 0,     0, 0, 0, 0.25 );
 				addGeometry( triangle3d, 	0xffee00, -180,    0, 0,     0, 0, 0, 1 );
 				addGeometry( roundedRect3d, 0x005500, -150,  150, 0,     0, 0, 0, 1 );
@@ -218,7 +242,7 @@
 				addGeometry( heart3d, 		0xff1100,    0,  100, 0,   3.14, 0, 0, 1 );
 				addGeometry( circle3d, 		0x00ff11,  150,    0, 0,     0, 0, 0, 1 );
 				addGeometry( fish3d, 		0x222222,  -50,  200, 0,     0, 0, 0, 1 );
-
+				addGeometry( splineShape3d, 0x888888,  -50,  -100, -50,     0, 0, 0, 0.2 );
 
 				renderer = new THREE.CanvasRenderer();
                 renderer.setSize( window.innerWidth, window.innerHeight );

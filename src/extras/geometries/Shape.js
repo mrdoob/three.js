@@ -23,11 +23,19 @@ THREE.Shape.prototype.constructor = THREE.Path;
 
 THREE.Shape.prototype.triangulate = function() {
 
-	return THREE.FontUtils.Triangulate( this.getPoints(), true );
+	var pts = this.getPoints();
+
+	if ( THREE.FontUtils.Triangulate.area( pts ) > 0 ) {
+
+		pts = pts.reverse();
+
+	};
+
+	return THREE.FontUtils.Triangulate( pts, true );
 
 };
 
-/* Convenience Method to return ExtrudeGeometry */
+/* Convenience method to return ExtrudeGeometry */
 
 THREE.Shape.prototype.extrude = function( options ) {
 

@@ -1039,7 +1039,7 @@ THREE.FontUtils = {
 
 				//throw ( "Warning, unable to triangulate polygon!" );
 				//return null;
-
+				// Sometimes warning is fine, especially polygons are triangulated in reverse.
 				console.log( "Warning, unable to triangulate polygon!" );
 
 				if ( indices ) return vertIndices;

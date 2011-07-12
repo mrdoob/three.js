@@ -21,13 +21,13 @@ THREE.PathActions = {
 	LINE_TO: 'lineTo',
 	QUADRATIC_CURVE_TO: 'quadraticCurveTo', // BEZIER quadratic CURVE
 	BEZIER_CURVE_TO: 'bezierCurveTo', 		// BEZIER cubic CURVE
-	CSPLINE_TO: 'cSplineTo' 				// TODO cardinal splines
+	CSPLINE_THRU: 'splineThru' 				// TODO cardinal splines
 
 };
 
 /* Create path using straight lines to connect all points */
 
-THREE.Path.prototype.fromPoints = function( vectors ) {
+THREE.Path.prototype.fromPoints = function( vectors /*Array of Vector*/ ) {
 
 	var v = 0, vlen = vectors.length;
 
@@ -70,6 +70,15 @@ THREE.Path.prototype.bezierCurveTo = function( aCP1x, aCP1y,
 	this.actions.push( { action: THREE.PathActions.BEZIER_CURVE_TO, args: args } );
 
 };
+
+THREE.Path.prototype.splineThru = function( pts /*Array of Vector*/ ) {
+
+	var args = Array.prototype.slice.call( arguments );
+	this.actions.push( { action: THREE.PathActions.CSPLINE_THRU, args: args } );
+
+}
+
+// TODO ARC
 
 /* Return an array of vectors based on contour of the path */
 
@@ -185,11 +194,71 @@ THREE.Path.prototype.getPoints = function( divisions ) {
 
 			break;
 
+		case THREE.PathActions.CSPLINE_THRU:
+
+			laste = this.actions[ i - 1 ].args;
+			var last = new THREE.Vector2( laste[ laste.length - 2 ], laste[ laste.length - 1 ] );
+			var spts = args[ 0 ];
+			var n = divisions * spts.length;
+
+			spts.unshift( last );
+
+			var spline = new Spline2();
+
+			for ( j = 0; j < n; j ++ ) {
+
+				points.push( spline.get2DPoint( spts, j / n ) ) ;
+
+			}
+
+			break;
+
 		}
 
 	}
 
 	return points;
+
+};
+
+var Spline2 = function () {
+
+	var c = [], v2,
+		point, intPoint, weight;
+
+	this.get2DPoint = function ( points, k ) {
+
+		v2 = new THREE.Vector2();
+		point = ( points.length - 1 ) * k;
+
+		intPoint = Math.floor( point );
+		weight = point - intPoint;
+
+		c[ 0 ] = intPoint == 0 ? intPoint : intPoint - 1;
+		c[ 1 ] = intPoint;
+		c[ 2 ] = intPoint > points.length - 2 ? intPoint : intPoint + 1;
+		c[ 3 ] = intPoint > points.length - 3 ? intPoint : intPoint + 2;
+
+		v2.x = interpolate( points[ c[ 0 ] ].x, points[ c[ 1 ] ].x, points[ c[ 2 ] ].x, points[ c[ 3 ] ].x, weight );
+		v2.y = interpolate( points[ c[ 0 ] ].y, points[ c[ 1 ] ].y, points[ c[ 2 ] ].y, points[ c[ 3 ] ].y, weight );
+
+		//console.log('point',point, v2);
+
+		return v2;
+
+	}
+
+	// Catmull-Rom
+
+	function interpolate( p0, p1, p2, p3, t ) {
+
+		var v0 = ( p2 - p0 ) * 0.5;
+		var v1 = ( p3 - p1 ) * 0.5;
+		var t2 = t * t;
+		var t3 = t * t2;
+		return ( 2 * p1 - 2 * p2 + v0 + v1 ) * t3 + ( - 3 * p1 + 3 * p2 - 2 * v0 - v1 ) * t2 + v0 * t + p1;
+
+	}
 
 };
 
@@ -237,12 +306,14 @@ THREE.Path.prototype.debug = function( canvas ) {
 
 	// JUST A STUB
 
+	var bounds = this.getMinAndMax();
+
 	if ( !canvas ) {
 
 		canvas = document.createElement( "canvas" );
 
-		canvas.setAttribute( 'width',  200 );
-		canvas.setAttribute( 'height', 200 );
+		canvas.setAttribute( 'width',  bounds.maxX + 100 );
+		canvas.setAttribute( 'height', bounds.maxY + 100 );
 
 		document.body.appendChild( canvas );
 
@@ -250,7 +321,7 @@ THREE.Path.prototype.debug = function( canvas ) {
 
 	var ctx = canvas.getContext( "2d" );
 	ctx.fillStyle = "white";
-	ctx.fillRect( 0, 0, 200, 200 );
+	ctx.fillRect( 0, 0, canvas.width, canvas.height );
 
 	ctx.strokeStyle = "black";
 	ctx.beginPath();
@@ -268,7 +339,11 @@ THREE.Path.prototype.debug = function( canvas ) {
 
 		// Short hand for now
 
-		ctx[ action ].apply( ctx, args );
+		if ( action != THREE.PathActions.CSPLINE_THRU ) {
+
+			ctx[ action ].apply( ctx, args );
+
+		}
 
 		/*
 		switch ( action ) {
