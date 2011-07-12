@@ -12,6 +12,7 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 	var bezelThickness = options.bezelThickness !== undefined ? options.bezelThickness : 10;
 	var bezelSize = options.bezelSize !== undefined ? options.bezelSize : 8;
 	var bezelEnabled = options.bezelEnabled !== undefined ? options.bezelEnabled : false;
+	var steps = options.steps !== undefined ? options.steps : 3;
 
 	THREE.Geometry.call( this );
 
@@ -39,14 +40,29 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 
 	}
 
-	// Front facing vertices
+	// Add Steped vertices...
+	// Including  Front facing vertices
+	var s=1;
+	for ( ; s <= steps; s++ ) {
+		console.log(s);
+		for ( i = 0; i < vlen; i++ ) {
 
+			vert = vertices[ i ];
+			v( vert.x, vert.y, amount/steps * s );
+
+		}	
+	}
+	
+	/*
+	// Front facing vertices
 	for ( i = 0; i < vlen; i++ ) {
 
 		vert = vertices[ i ];
 		v( vert.x, vert.y, amount );
 
 	}
+	*/
+	
 
 	if ( bezelEnabled ) {
 
@@ -80,7 +96,7 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 	for ( i = 0; i < flen; i++ ) {
 
 		face = faces[ i ];
-		f3( face[ 0 ] + vlen, face[ 1 ] + vlen, face[ 2 ] + vlen );
+		f3( face[ 0 ] + vlen* steps, face[ 1 ] + vlen* steps, face[ 2 ] + vlen* steps );
 
 	}
 
@@ -122,10 +138,19 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 
 		// Create faces for the z-sides of the text
 
-		f4( j, k, k + vlen, j + vlen );
+		//f4( j, k, k + vlen, j + vlen );
 		// REverse
 		//f4( k, j, j + vlen, k + vlen);
+		//
+		var s=0;
+		for ( ; s < steps; s++ ) {
+			var slen1 = vlen * s;
+			var slen2 = vlen * (s + 1);
+				
+				f4( j + slen1, k + slen1, k + slen2, j + slen2 );
 	
+		}
+		//
 
 	}
 
