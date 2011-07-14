@@ -327,6 +327,9 @@ THREE.Path.prototype.createPathGeometry = function(divisions, lineMaterial) {
     return(pathGeometry);
 };
 
+
+// ALL THINGS BELOW TO BE REFACTORSED
+// QN: Transform final pts or transform ACTIONS or add transform filters?
 THREE.Path.prototype.getPoint = function(t) {
 	var x0, y0, x1, y1, x2, y2;
 	x0 = this.actions[0].args[0];
@@ -368,18 +371,61 @@ THREE.Path.prototype.getNormalVector = function(t) {
 	
 };
 
+THREE.Path.prototype.cacheArcLengths = function() {
+	var divisions = 200;
+	var cache = [];
+	var p=1;
+	var last = this.getPoint(0), current;
+	var sum = 0;
+	for (; p <= divisions; p++) {
+		current = this.getPoint (p/divisions);
+		sum += current.distanceTo(last);
+		cache.push(sum);
+		last = current;
+	}
+	
+	this.arcLengthCache = cache;
+	return {sums: cache, sum:sum};
+	
+};
+
+/* Given u (0..1), get a t to find p. This gives you pt which are equi distance */
+
+THREE.Path.prototype.getUtoTmapping = function(u, distance) {
+	
+	//var arcs = this.cacheArcLengths();
+	var cache = this.arcLengthCache; 
+	var i = 0,il = cache.length;
+	
+	var distanceForU = u * cache[cache.length-1];
+	if (distance) distanceForU = distance;
+	
+	// Should do binary search + sub division + interpolation if needed
+	while (i<il) {
+		if (cache[i]>distanceForU) break;
+		i++;
+	}
+	
+	var t= i/il;
+	return t;
+	
+	
+};
+
+
 var tangentQuad = function (t, p0, p1, p2 ) {
 	return 2 * ( 1 - t ) * ( p1 - p0 ) + 2 * t * ( p2 - p1 ) ;
 }
+
 
 // FUTURE refactor path = an array of lines -> straight, bezier, splines, arc, funcexpr lines
 // Read http://www.planetclegg.com/projects/WarpingTextToSplines.html
 THREE.Path.prototype.transform = function(path) {
 	path = new THREE.Path();
 	path.moveTo(0,0);
-	path.quadraticCurveTo(100,50, 400,0);
+	path.quadraticCurveTo(200,20, 240,80);
 	
-	
+	console.log(path.cacheArcLengths());
 	
 	
 	var thisBounds = this.getMinAndMax();
@@ -390,6 +436,8 @@ THREE.Path.prototype.transform = function(path) {
 		oldX = p.x;
 		oldY = p.y;
 		var xNorm = oldX/ thisBounds.maxX;
+		
+		xNorm = path.getUtoTmapping(xNorm, oldX); // 3 styles. 1) wrap stretched. 2) wrap stretch by arc length 3) warp by actual distance
 		
 		var pathPt = path.getPoint(xNorm);
 		var normal = path.getNormalVector(xNorm).multiplyScalar(oldY);;
