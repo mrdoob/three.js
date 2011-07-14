@@ -420,7 +420,7 @@ THREE.Projector = function() {
 	function isInFrustum( object ) {
 
 		var distance, matrix = object.matrixWorld,
-		radius = - object.geometry.boundingSphere.radius * Math.max( object.scale.x, Math.max( object.scale.y, object.scale.z ) );
+		radius = - object.geometry.boundingSphere.radius * Math.max( object.scaleWorld.x, Math.max( object.scaleWorld.y, object.scaleWorld.z ) );
 
 		for ( var i = 0; i < 6; i ++ ) {
 
