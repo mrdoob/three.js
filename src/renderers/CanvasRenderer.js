@@ -986,15 +986,18 @@ THREE.CanvasRenderer = function ( parameters ) {
 		function expand( v1, v2 ) {
 
 			var x = v2.x - v1.x, y =  v2.y - v1.y,
-			unit = 1 / Math.sqrt( x * x + y * y );
+			det = x * x + y * y, idet;
 
-			x *= unit; y *= unit;
+			if ( det == 0 ) return;
+
+			idet = 1 / Math.sqrt( det );
+
+			x *= idet; y *= idet;
 
 			v2.x += x; v2.y += y;
 			v1.x -= x; v1.y -= y;
 
 		}
-
 	};
 
 	// Context cached methods.
