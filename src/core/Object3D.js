@@ -11,25 +11,25 @@ THREE.Object3D = function() {
 
 	this.up = new THREE.Vector3( 0, 1, 0 );
 
+	this.eulerOrder = 'XYZ';
+
 	this.position = new THREE.Vector3();
 	this.rotation = new THREE.Vector3();
-	this.eulerOrder = 'XYZ';
 	this.scale = new THREE.Vector3( 1, 1, 1 );
+	this.scaleWorld = new THREE.Vector3( 1, 1, 1 );
 
-	this.dynamic = false; // when true it retains arrays so they can be updated with __dirty*
+	this.dynamic = false; // WebGLRenderer: when true it retains arrays so they can be updated with __dirty*
 	
 	this.doubleSided = false;
 	this.flipSided = false;
 
 	this.renderDepth = null;
 
-	this.rotationAutoUpdate = true;
-
 	this.matrix = new THREE.Matrix4();
+	this.matrixAutoUpdate = true;
+
 	this.matrixWorld = new THREE.Matrix4();
 	this.matrixRotationWorld = new THREE.Matrix4();
-
-	this.matrixAutoUpdate = true;
 	this.matrixWorldNeedsUpdate = true;
 
 	this.quaternion = new THREE.Quaternion();
@@ -79,12 +79,7 @@ THREE.Object3D.prototype = {
 		// TODO: Add hierarchy support.
 
 		this.matrix.lookAt( vector, this.position, this.up );
-
-		if ( this.rotationAutoUpdate ) {
-
-			this.rotation.setRotationFromMatrix( this.matrix );
-
-		}
+		this.rotation.setRotationFromMatrix( this.matrix );
 
 	},
 
@@ -176,6 +171,44 @@ THREE.Object3D.prototype = {
 		}
 
 		this.matrixWorldNeedsUpdate = true;
+
+	},
+
+	updateWorldMatrices: function ( force ) {
+
+		if ( this.matrixWorldNeedsUpdate || force ) {
+
+			if ( this.parent ) {
+
+				this.matrixWorld.multiply( this.parent.matrixWorld, this.matrix );
+				this.scaleWorld.multiply( this.parent.scaleWorld, this.scale );
+
+			} else {
+
+				this.matrixWorld.copy( this.matrix );
+				this.scaleWorld.copy( this.scale );
+
+			}
+
+			this.matrixRotationWorld.extractRotation( this.matrixWorld, this.scaleWorld );
+
+			this.matrixWorldNeedsUpdate = false;
+
+			force = true;
+
+		}
+
+		// update children
+
+		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+
+			var child = this.children[ i ];
+			
+			child.matrixAutoUpdate && child.updateMatrix();
+			child.updateWorldMatrices( force );
+
+		}
+
 
 	}
 
