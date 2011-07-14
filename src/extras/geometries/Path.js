@@ -78,13 +78,21 @@ THREE.Path.prototype.splineThru = function( pts /*Array of Vector*/ ) {
 
 }
 
-// TODO ARC
+// TODO ARC (x,y, x-radius, y-radius, startAngle, endAngle)
+THREE.Path.prototype.arc = function() {
+	
+};
 
+// TODO
+// Create a new func eg. sin (theta) x
+THREE.Path.prototype.addExprFunc = function(exprName, func) {
+};
+	
 /* Return an array of vectors based on contour of the path */
 
 THREE.Path.prototype.getPoints = function( divisions ) {
 
-	divisions = divisions || 12;
+	divisions = divisions || 4;
 
 	var points = [];
 
@@ -300,6 +308,122 @@ THREE.Path.prototype.getMinAndMax = function() {
 
 };
 
+// createPathGeometry by SolarCoordinates
+/* Returns Object3D with line segments stored as children  */
+THREE.Path.prototype.createPathGeometry = function(divisions, lineMaterial) {
+    var pts = this.getPoints(divisions);
+
+    var segment, pathGeometry = new THREE.Object3D;
+    if(!lineMaterial) lineMaterial = new THREE.LineBasicMaterial( { color:0x000000, opacity:0.7 } );
+
+    for(var i=1; i<pts.length; i++) {
+        var pathSegment = new THREE.Geometry();
+        pathSegment.vertices.push( new THREE.Vertex( new THREE.Vector3( pts[i-1].x, pts[i-1].y, 0 ) ) );
+        pathSegment.vertices.push( new THREE.Vertex( new THREE.Vector3( pts[i].x, pts[i].y, 0) ) );
+        segment = new THREE.Line( pathSegment , lineMaterial );
+        pathGeometry.addChild(segment);
+    }
+
+    return(pathGeometry);
+};
+
+THREE.Path.prototype.getPoint = function(t) {
+	var x0, y0, x1, y1, x2, y2;
+	x0 = this.actions[0].args[0];
+	y0 = this.actions[0].args[1];
+	x1 = this.actions[1].args[0];
+	y1 = this.actions[1].args[1];
+	x2 = this.actions[1].args[2];
+	y2 = this.actions[1].args[3];
+	
+	var tx, ty;
+	
+	tx = THREE.FontUtils.b2( t, x0, x1, x2 );
+	ty = THREE.FontUtils.b2( t, y0, y1, y2 );
+	
+	return new THREE.Vector2( tx, ty );
+};
+
+THREE.Path.prototype.getNormalVector = function(t) {
+	// iterate sub segments
+	// 	get lengths for sub segments
+	// 	if segment is bezier
+	//		perform sub devisions or perform integrals.
+	var x0, y0, x1, y1, x2, y2;
+	x0 = this.actions[0].args[0];
+	y0 = this.actions[0].args[1];
+	x1 = this.actions[1].args[0];
+	y1 = this.actions[1].args[1];
+	x2 = this.actions[1].args[2];
+	y2 = this.actions[1].args[3];
+	
+	var tx, ty;
+	
+	tx = tangentQuad( t, x0, x1, x2 );
+	ty = tangentQuad( t, y0, y1, y2 );
+	
+	// return normal
+	
+	return new THREE.Vector2( -ty , tx ).unit();
+	
+};
+
+var tangentQuad = function (t, p0, p1, p2 ) {
+	return 2 * ( 1 - t ) * ( p1 - p0 ) + 2 * t * ( p2 - p1 ) ;
+}
+
+// FUTURE refactor path = an array of lines -> straight, bezier, splines, arc, funcexpr lines
+// Read http://www.planetclegg.com/projects/WarpingTextToSplines.html
+THREE.Path.prototype.transform = function(path) {
+	path = new THREE.Path();
+	path.moveTo(0,0);
+	path.quadraticCurveTo(100,50, 400,0);
+	
+	
+	
+	
+	var thisBounds = this.getMinAndMax();
+	var oldPts = this.getPoints();
+	var i, il, p, oldX, oldY, xNorm;
+	for (i=0,il=oldPts.length; i< il;i++){
+		p = oldPts[i];
+		oldX = p.x;
+		oldY = p.y;
+		var xNorm = oldX/ thisBounds.maxX;
+		
+		var pathPt = path.getPoint(xNorm);
+		var normal = path.getNormalVector(xNorm).multiplyScalar(oldY);;
+		
+		p.x = pathPt.x + normal.x;
+		p.y = pathPt.y + normal.y;
+		
+		//p.x = a * oldX + b * oldY + c;
+		//p.y = d * oldY + e * oldX + f;
+		
+	}
+	
+	return oldPts;
+	
+};
+
+// Read http://www.tinaja.com/glib/nonlingr.pdf
+//nonlinear transforms
+THREE.Path.prototype.nltransform = function(a,b,c,d,e,f) {
+
+	var oldPts = this.getPoints();
+	var i, il, p, oldX, oldY;
+	for (i=0,il=oldPts.length; i< il;i++){
+		p = oldPts[i];
+		oldX = p.x;
+		oldY = p.y;
+		p.x = a * oldX + b * oldY + c;
+		p.y = d * oldY + e * oldX + f;
+		
+	}
+	return oldPts;
+	
+};
+
 /* Draws this path onto a 2d canvas easily */
 
 THREE.Path.prototype.debug = function( canvas ) {
@@ -380,8 +504,23 @@ THREE.Path.prototype.debug = function( canvas ) {
 
 	ctx.strokeStyle = "red";
 
-	var p, points = this.getPoints();
-
+	//var p, points = this.getPoints();
+	var theta = -90 /180 * Math.PI;
+	var p, points = this.transform(0.866, - 0.866,0, 0.500 , 0.50,-50);
+									
+									//0.866, - 0.866,0, 0.500 , 0.50,-50
+				// Math.cos(theta),Math.sin(theta),100,
+				// Math.cos(theta),-Math.sin(theta),-50
+// translate, scale, rotation
+									// a - horiztonal size 
+									// b - lean 
+									// c - x offset
+									// d - vertical size
+									// e - climb
+									// f - y offset
+									// 1,0,0,
+									// -1,0,100
+									
 	for ( i = 0, il = points.length; i < il; i ++ ) {
 
 		p = points[ i ];
