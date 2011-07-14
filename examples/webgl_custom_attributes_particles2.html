@@ -33,6 +33,7 @@
 		<script src="../build/Three.js"></script>
 
 		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
+		<script type="text/javascript" src="js/Detector.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script type="x-shader/x-vertex" id="vertexshader">
@@ -75,6 +76,8 @@
 
 
 		<script type="text/javascript">
+
+		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 		var renderer, scene, camera, stats;
 
