@@ -39,7 +39,7 @@ THREE.LOD.prototype.add = function ( object3D, visibleAtDistance ) {
 	}
 
 	this.LODs.splice( l, 0, { visibleAtDistance: visibleAtDistance, object3D: object3D } );
-	this.addChild( object3D );
+	this.addObject( object3D );
 
 };
 

@@ -31,25 +31,25 @@ THREE.Trident = function ( params /** Object */) {
 	}
 	
 	this.scale = new THREE.Vector3( params.scale, params.scale, params.scale );
-	this.addChild( getSegment( new THREE.Vector3(params.length,0,0), params.xAxisColor ) );
-	this.addChild( getSegment( new THREE.Vector3(0,params.length,0), params.yAxisColor ) );
-	this.addChild( getSegment( new THREE.Vector3(0,0,params.length), params.zAxisColor ) );
+	this.addObject( getSegment( new THREE.Vector3( params.length, 0, 0 ), params.xAxisColor ) );
+	this.addObject( getSegment( new THREE.Vector3( 0, params.length, 0 ), params.yAxisColor ) );
+	this.addObject( getSegment( new THREE.Vector3( 0, 0, params.length ), params.zAxisColor ) );
 	
 	if(params.showArrows){
 		cone = getCone(params.xAxisColor);
 		cone.rotation.y = - hPi;
 		cone.position.x = params.length;
-		this.addChild( cone );
+		this.addObject( cone );
 		
 		cone = getCone(params.yAxisColor);
 		cone.rotation.x = hPi;
 		cone.position.y = params.length;
-		this.addChild( cone );
+		this.addObject( cone );
 		
 		cone = getCone(params.zAxisColor);
 		cone.rotation.y = Math.PI;
 		cone.position.z = params.length;
-		this.addChild( cone );
+		this.addObject( cone );
 	}
 
 	function getCone ( color ) {

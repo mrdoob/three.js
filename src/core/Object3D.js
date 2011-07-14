@@ -6,6 +6,8 @@
 
 THREE.Object3D = function() {
 
+	this.name = "";
+
 	this.parent = undefined;
 	this.children = [];
 
@@ -42,8 +44,6 @@ THREE.Object3D = function() {
 	this.visible = true;
 
 	this._vector = new THREE.Vector3();
-
-	this.name = "";
 
 };
 
@@ -180,8 +180,3 @@ THREE.Object3D.prototype = {
 	}
 
 };
-
-// Deprecated
-
-THREE.Object3D.prototype.addChild = THREE.Object3D.prototype.addObject;
-THREE.Object3D.prototype.removeChild = THREE.Object3D.prototype.removeObject;

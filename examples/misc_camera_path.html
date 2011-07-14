@@ -102,7 +102,7 @@
 									  
 					mesh.updateMatrix();
 					mesh.matrixAutoUpdate = false;
-					scene.addChild( mesh );
+					scene.addObject( mesh );
 					
 				}
 
@@ -112,14 +112,14 @@
 
 				light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 1, 1, 1 );
-				scene.addChild( light );
+				scene.addLight( light );
 
 				light = new THREE.DirectionalLight( 0x002288 );
 				light.position.set( -1, -1, -1 );
-				scene.addChild( light );
+				scene.addLight( light );
 
 				light = new THREE.AmbientLight( 0x222222 );
-				scene.addChild( light );
+				scene.addLight( light );
 
 
 				// renderer
