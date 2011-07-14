@@ -94,8 +94,11 @@
 		<script type="text/javascript" src="../src/extras/cameras/RollCamera.js"></script>
 		<script type="text/javascript" src="../src/extras/cameras/TrackballCamera.js"></script>
 		<script type="text/javascript" src="../src/extras/cameras/QuakeCamera.js"></script>
+		<script type="text/javascript" src="../src/extras/geometries/Path.js"></script>
+		<script type="text/javascript" src="../src/extras/geometries/Shape.js"></script>
 		<script type="text/javascript" src="../src/extras/geometries/CubeGeometry.js"></script>
 		<script type="text/javascript" src="../src/extras/geometries/CylinderGeometry.js"></script>
+		<script type="text/javascript" src="../src/extras/geometries/ExtrudeGeometry.js"></script>
 		<script type="text/javascript" src="../src/extras/geometries/IcosahedronGeometry.js"></script>
 		<script type="text/javascript" src="../src/extras/geometries/LatheGeometry.js"></script>
 		<script type="text/javascript" src="../src/extras/geometries/PlaneGeometry.js"></script>
@@ -146,7 +149,6 @@
 			var debugContext;
 
 			init();
-			// render();
 			animate();
 
 			function init() {
@@ -186,15 +188,13 @@
 
 				objects = [];
 
-				geometry = new THREE.SphereGeometry( 100, 8, 6 );
-				// material = new THREE.MeshBasicMaterial( { envMap: THREE.ImageUtils.loadTexture( 'textures/metal.jpg', new THREE.SphericalReflectionMapping() ) } );
+				geometry = new THREE.SphereGeometry( 100, 16, 8 );
+				material = new THREE.MeshBasicMaterial( { envMap: THREE.ImageUtils.loadTexture( 'textures/metal.jpg', new THREE.SphericalReflectionMapping() ) } );
 
-				material = new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading } );
-
-				for ( var i = 0; i < 1; i ++ ) {
+				for ( var i = 0; i < 10; i ++ ) {
 
 					sphere = new THREE.Mesh( geometry, material );
-					sphere.overdraw = true;
+					// sphere.overdraw = true;
 
 					sphere.position.x = Math.random() * 1000 - 500;
 					sphere.position.y = Math.random() * 1000 - 500;
@@ -204,56 +204,20 @@
 					sphere.rotation.y = Math.random() * 200 - 100;
 					sphere.rotation.z = Math.random() * 200 - 100;
 
-					sphere.scale.x = sphere.scale.y = sphere.scale.z = 0.5;
+					sphere.scale.x = sphere.scale.y = sphere.scale.z = Math.random() + 0.5;
 
 					objects.push( sphere );
 
 					scene.addObject( sphere );
 
-					for ( var j = 0; j < 5; j ++ ) {
-
-						sphere2 = new THREE.Mesh( geometry, material );
-						sphere2.overdraw = true;
-
-						sphere2.position.x = Math.random() * 500 - 250;
-						sphere2.position.y = Math.random() * 500 - 250;
-						sphere2.position.z = Math.random() * 500 - 250;
-
-						sphere2.rotation.x = Math.random() * 200 - 100;
-						sphere2.rotation.y = Math.random() * 200 - 100;
-						sphere2.rotation.z = Math.random() * 200 - 100;
-
-						sphere2.scale.x = sphere2.scale.y = sphere2.scale.z = 0.5;
-
-						sphere.addChild( sphere2 );
-
-						for ( var k = 0; k < 5; k ++ ) {
-
-							sphere3 = new THREE.Mesh( geometry, material );
-							sphere3.overdraw = true;
-
-							sphere3.position.x = Math.random() * 500 - 250;
-							sphere3.position.y = Math.random() * 500 - 250;
-							sphere3.position.z = Math.random() * 500 - 250;
-
-							sphere3.rotation.x = Math.random() * 200 - 100;
-							sphere3.rotation.y = Math.random() * 200 - 100;
-							sphere3.rotation.z = Math.random() * 200 - 100;
-
-							sphere3.scale.x = sphere3.scale.y = sphere3.scale.z = 0.5;
-
-							sphere2.addChild( sphere3 );
-
-						}
-
-
-					}
-
 				}
 
 				// Lights
 
-				var directionalLight = new THREE.DirectionalLight( 0x0000ff, 2 );
+				var ambientLight = new THREE.AmbientLight( Math.random() * 0x202020 );
+				scene.addLight( ambientLight );
+
+				var directionalLight = new THREE.DirectionalLight( Math.random() * 0xffffff );
 				directionalLight.position.x = Math.random() - 0.5;
 				directionalLight.position.y = Math.random() - 0.5;
 				directionalLight.position.z = Math.random() - 0.5;
