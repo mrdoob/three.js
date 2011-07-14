@@ -910,7 +910,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			det = u1 * v2 - u2 * v1;
 
-			if ( det == 0 ) return;
+			if ( /*Math.abs*/ ( det < 0 ? - det : det ) < 1 ) return;
 
 			idet = 1 / det;
 
