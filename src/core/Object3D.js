@@ -16,6 +16,7 @@ THREE.Object3D = function() {
 	this.position = new THREE.Vector3();
 	this.rotation = new THREE.Vector3();
 	this.scale = new THREE.Vector3( 1, 1, 1 );
+
 	this.scaleWorld = new THREE.Vector3( 1, 1, 1 );
 
 	this.dynamic = false; // WebGLRenderer: when true it retains arrays so they can be updated with __dirty*
@@ -115,40 +116,6 @@ THREE.Object3D.prototype = {
 
 	},
 
-	/*
-	getChildByName: function ( name, doRecurse ) {
-
-		var c, cl, child, recurseResult;
-
-		for ( c = 0, cl = this.children.length; c < cl; c++ ) {
-
-			child = this.children[ c ];
-
-			if ( child.name === name ) {
-
-				return child;
-
-			}
-
-			if ( doRecurse ) {
-
-				recurseResult = child.getChildByName( name, doRecurse );
-
-				if ( recurseResult !== undefined ) {
-
-					return recurseResult;
-
-				}
-
-			}
-
-		}
-
-		return undefined;
-
-	},
-	*/
-
 	updateMatrix: function () {
 
 		this.matrix.setPosition( this.position );
@@ -190,6 +157,8 @@ THREE.Object3D.prototype = {
 
 			}
 
+			// TODO: This is not correct, but works on common cases.
+
 			this.matrixRotationWorld.extractRotation( this.matrixWorld, this.scaleWorld );
 
 			this.matrixWorldNeedsUpdate = false;
@@ -197,8 +166,6 @@ THREE.Object3D.prototype = {
 			force = true;
 
 		}
-
-		// update children
 
 		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
 
