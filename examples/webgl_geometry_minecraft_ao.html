@@ -431,7 +431,7 @@
 						mesh.position.y = h * 100;
 						mesh.position.z = z * 100 - worldHalfDepth * 100;
 
-						GeometryUtils.merge( geometry, mesh );
+						THREE.GeometryUtils.merge( geometry, mesh );
 
 					}
 
@@ -521,7 +521,7 @@
 				canvas.width = canvas.height = size;
 
 				var texture = new THREE.Texture( canvas, new THREE.UVMapping(), THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping, THREE.NearestFilter, THREE.LinearMipMapLinearFilter );
-				
+
 				function generateTexture() {
 
 					if( count == 3 ) {
@@ -578,7 +578,7 @@
 
 				var texture = new THREE.Texture( canvas, new THREE.UVMapping(), THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping, THREE.NearestFilter, THREE.LinearMipMapLinearFilter );
 				texture.needsUpdate = true;
-				
+
 				return new THREE.MeshLambertMaterial( { map: texture } );
 
 			}

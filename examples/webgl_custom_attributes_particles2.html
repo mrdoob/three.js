@@ -132,7 +132,7 @@
 
 			var geometry2 = new THREE.CubeGeometry( 0.8 * radius, 0.8 * radius, 0.8 * radius, 10, 10, 10 );
 
-			GeometryUtils.merge( geometry, geometry2 );
+			THREE.GeometryUtils.merge( geometry, geometry2 );
 
 			sphere = new THREE.ParticleSystem( geometry, shaderMaterial );
 

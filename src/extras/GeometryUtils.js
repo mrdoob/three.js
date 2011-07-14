@@ -1,4 +1,8 @@
-var GeometryUtils = {
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
+THREE.GeometryUtils = {
 
 	merge: function ( geometry1, object2 /* mesh | geometry */ ) {
 
