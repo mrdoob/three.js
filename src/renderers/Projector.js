@@ -52,8 +52,6 @@ THREE.Projector = function() {
 
 	this.getObjectsInFrustum = function ( scene, camera, sort ) {
 
-		scene.update();
-
 		_projScreenMatrix.multiply( camera.projectionMatrix, camera.matrixWorldInverse );
 		computeFrustum( _projScreenMatrix );
 
@@ -72,7 +70,7 @@ THREE.Projector = function() {
 		function checkObject( object ) {
 
 			if ( ! object.visible ) return;
-		
+
 			if ( ! ( object instanceof THREE.Mesh && ! isInFrustum( object ) ) ) {
 
 				_object = getNextObjectInPool();

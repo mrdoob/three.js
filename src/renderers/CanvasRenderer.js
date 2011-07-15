@@ -163,6 +163,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		this.autoClear ? this.clear() : _context.setTransform( 1, 0, 0, - 1, _canvasWidthHalf, _canvasHeightHalf );
 
+		scene.update();
+
 		_this.data.vertices = 0;
 		_this.data.faces = 0;
 

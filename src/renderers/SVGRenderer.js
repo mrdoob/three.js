@@ -42,9 +42,9 @@ THREE.SVGRenderer = function () {
 
 	}
 
-	this.setQuality = function( quality ) {
+	this.setQuality = function ( quality ) {
 
-		switch(quality) {
+		switch ( quality ) {
 
 			case "high": _quality = 1; break;
 			case "low": _quality = 0; break;
@@ -53,7 +53,7 @@ THREE.SVGRenderer = function () {
 
 	};
 
-	this.setSize = function( width, height ) {
+	this.setSize = function ( width, height ) {
 
 		_svgWidth = width; _svgHeight = height;
 		_svgWidthHalf = _svgWidth / 2; _svgHeightHalf = _svgHeight / 2;
@@ -76,11 +76,13 @@ THREE.SVGRenderer = function () {
 
 	};
 
-	this.render = function( scene, camera ) {
+	this.render = function ( scene, camera ) {
 
 		var e, el, m, ml, fm, fml, element, material;
 
 		this.autoClear && this.clear();
+
+		scene.update();
 
 		_this.data.vertices = 0;
 		_this.data.faces = 0;

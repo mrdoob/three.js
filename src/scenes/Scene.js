@@ -32,7 +32,7 @@ THREE.Scene.prototype.removeObject = function ( object ) {
 
 	var index = this.objects.indexOf( object );
 
-	if( index !== - 1 ) {
+	if ( index !== - 1 ) {
 
 		this.objects.splice( index, 1 );
 		this.__objectsRemoved.push( object );
