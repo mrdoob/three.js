@@ -7,19 +7,6 @@
 
 THREE.WebGLRenderer = function ( parameters ) {
 
-	// Currently you can use just up to 4 directional / point lights total.
-	// Chrome barfs on shader linking when there are more than 4 lights :(
-
-	// The problem comes from shader using too many varying vectors.
-
-	// This is not GPU limitation as the same shader works ok in Firefox
-	// and Chrome with "--use-gl=desktop" flag.
-
-	// Difference comes from Chrome on Windows using by default ANGLE,
-	// thus going DirectX9 route (while FF uses OpenGL).
-
-	// See http://code.google.com/p/chromium/issues/detail?id=63491
-
 	var _this = this,
 	_gl, _programs = [],
 	_currentProgram = null,
@@ -2310,7 +2297,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		// heuristics to create shader parameters according to lights in the scene
 		// (not to blow over maxLights budget)
 
-		maxLightCount = allocateLights( lights, 4 );
+		maxLightCount = allocateLights( lights, 79 );
 
 		maxBones = allocateBones( object );
 
