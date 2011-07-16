@@ -38,8 +38,19 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 		reverse = false;
 	}
 	
-    //var faces = THREE.Shape.Utils.triangulate2(vertices);
-	var faces = THREE.FontUtils.Triangulate( vertices, true );
+	
+	var holes =  shape.getHoles();
+	
+	
+    var faces = THREE.Shape.Utils.triangulate2(vertices, holes);
+	console.log(faces);
+	//var faces = THREE.FontUtils.Triangulate( vertices, true );
+	
+	var ahole ;
+	for (var h in holes) {
+		ahole = holes[h];
+		vertices = vertices.concat(ahole);
+	}
 	
     var contour = vertices;
 

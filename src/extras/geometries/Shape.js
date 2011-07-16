@@ -27,29 +27,49 @@ THREE.Shape.prototype.extrude = function( options ) {
 
 };
 
+THREE.Shape.prototype.getHoles = function() {
+	var holesPts = [];
+	var i=0, il= this.holes.length;
+	for (; i<il; i++ ) {
+		holesPts[i] = this.holes[i].getSpacedPoints();
+	}
+
+	return holesPts;
+
+};
+
+
+
+
 THREE.Shape.Utils = {
-	triangulate2 : function(pts) {
+	triangulate2 : function(pts, holes) {
 		// For use Poly2Tri.js 
 	
 		//var pts = this.getPoints();
+		var allpts = pts.concat();
 		var shape = [];
 		for (var p in pts) {
-			shape.push(new js.poly2tri.Point(pts[p].x, pts[p].y))
+			shape.push(new js.poly2tri.Point(pts[p].x, pts[p].y));
+		}
+		
+		var swctx = new js.poly2tri.SweepContext(shape);
+		
+		for (var h in holes) {
+			var aHole = holes[h];
+			var newHole = []
+			for (i in aHole) {
+				newHole.push(new js.poly2tri.Point(aHole[i].x, aHole[i].y));
+				allpts.push(aHole[i]);
+			}
+			swctx.AddHole(newHole);
 		}
 
-		var swctx = new js.poly2tri.SweepContext(shape);
-		/*
-			for (var idx in holes)
-			{
-				swctx.AddHole(holes[idx]);
-			}
-		*/
 		var find;
 		var findIndexForPt = function (pt) {
 			find = new THREE.Vector2(pt.x, pt.y);
 			var p;
-			for (p=0, pl = pts.length; p<pl; p++) {
-				if (pts[p].equals(find)) return p;
+			for (p=0, pl = allpts.length; p<pl; p++) {
+				if (allpts[p].equals(find)) return p;
 			}
 			return -1;
 		};
