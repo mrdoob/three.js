@@ -30,7 +30,7 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 
 	THREE.Geometry.call( this );
 
-    var vertices = shape.getPoints();
+    var vertices = shape.getSpacedPoints();
 	var reverse = THREE.FontUtils.Triangulate.area( vertices ) > 0 ;
 	if (reverse) {
 		//faces = THREE.FontUtils.Triangulate( vertices.reverse(), true );

@@ -43,6 +43,7 @@ THREE.Shape.prototype.getSpacedPoints = function(divisions) {
 	var pts = [];
 	for (var i=0; i< divisions;i++) {
 		pts.push(this.getPoint(i/divisions));
+		if(!this.getPoint(i/divisions)) throw "DIE";
 	}
 	//console.log(pts);
 	return pts;
