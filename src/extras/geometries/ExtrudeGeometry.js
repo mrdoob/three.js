@@ -30,15 +30,15 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 
 	THREE.Geometry.call( this );
 
-    var vertices = shape.getPoints(); // getSpacedPoints() you can get variable divisions by dividing by total lenght
+    var vertices = shape.getPoints(); // getPoints | getSpacedPoints() you can get variable divisions by dividing by total lenght
 	var reverse = THREE.FontUtils.Triangulate.area( vertices ) > 0 ;
 	if (reverse) {
 		//faces = THREE.FontUtils.Triangulate( vertices.reverse(), true );
 		vertices = vertices.reverse();
 		reverse = false;
 	}
-   // var faces = shape.triangulate();
 	
+    //var faces = THREE.Shape.Utils.triangulate2(vertices);
 	var faces = THREE.FontUtils.Triangulate( vertices, true );
 	
     var contour = vertices;

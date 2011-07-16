@@ -19,25 +19,6 @@ THREE.Shape = function ( ) {
 THREE.Shape.prototype = new THREE.Path();
 THREE.Shape.prototype.constructor = THREE.Path;
 
-
-/* TODO. Get rid of this */
-/* Returns vertices of triangulated faces | get faces */
-THREE.Shape.prototype.triangulate = function() {
-	
-	var pts = this.getPoints();
-	//var pts = this.getPoints2();
-	
-	/* */
-	if ( THREE.FontUtils.Triangulate.area( pts ) > 0 ) {
-
-		pts = pts.reverse();
-
-	};
-
-//	return this.triangulate2(pts);
-	return THREE.FontUtils.Triangulate( pts, true );
-};
-
 THREE.Shape.prototype.getSpacedPoints = function(divisions) {
 	if (!divisions) divisions = 40;
 	var pts = [];
@@ -52,7 +33,7 @@ THREE.Shape.prototype.getSpacedPoints = function(divisions) {
 
 THREE.Shape.Utils = {
 	triangulate2 : function(pts) {
-		// For Poly2Tri.js 
+		// For use Poly2Tri.js 
 	
 		//var pts = this.getPoints();
 		var shape = [];
@@ -92,8 +73,8 @@ THREE.Shape.Utils = {
 		}
 
 
-		console.log(facesPts);
-		console.log("triangles", triangles.length, triangles);
+	//	console.log(facesPts);
+	//	console.log("triangles", triangles.length, triangles);
 
 		// Returns array of faces with 3 element each
 	return facesPts;
