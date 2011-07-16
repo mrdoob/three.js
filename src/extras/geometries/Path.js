@@ -55,15 +55,29 @@ THREE.Path.prototype.moveTo = function( x, y ) {
 THREE.Path.prototype.lineTo = function( x, y ) {
 
 	var args = Array.prototype.slice.call( arguments );
-	this.actions.push( { action: THREE.PathActions.LINE_TO, args: args } );
-
+	
+	var lastargs = this.actions[ this.actions.length - 1 ].args;
+	var x0 = lastargs[ lastargs.length - 2 ];
+	var y0 = lastargs[ lastargs.length - 1 ];
+	var curve = new THREE.StraightCurve( x0, y0, x, y );
+	
+	this.actions.push( { action: THREE.PathActions.LINE_TO, args: args, curve:curve } );
+	
 };
 
 THREE.Path.prototype.quadraticCurveTo = function( aCPx, aCPy, aX, aY ) {
 
 	var args = Array.prototype.slice.call( arguments );
-	this.actions.push( { action: THREE.PathActions.QUADRATIC_CURVE_TO, args: args });
+	
+	var lastargs = this.actions[ this.actions.length - 1 ].args;
+	var x0 = lastargs[ lastargs.length - 2 ];
+	var y0 = lastargs[ lastargs.length - 1 ];
 
+	var curve = new THREE.QuadraticBezierCurve( x0, y0, aCPx, aCPy, aX, aY );
+	
+	this.actions.push( { action: THREE.PathActions.QUADRATIC_CURVE_TO, args: args, curve:curve });
+	//console.log(curve, curve.getPoints(), curve.getSpacedPoints());
+	//console.log(curve.getPointAt(0), curve.getPointAt(0),curve.getUtoTmapping(0), curve.getSpacedPoints());
 };
 
 THREE.Path.prototype.bezierCurveTo = function( aCP1x, aCP1y,
@@ -71,14 +85,31 @@ THREE.Path.prototype.bezierCurveTo = function( aCP1x, aCP1y,
                                                aX, aY) {
 
 	var args = Array.prototype.slice.call( arguments );
-	this.actions.push( { action: THREE.PathActions.BEZIER_CURVE_TO, args: args } );
+	
+	var lastargs = this.actions[ this.actions.length - 1 ].args;
+	var x0 = lastargs[ lastargs.length - 2 ];
+	var y0 = lastargs[ lastargs.length - 1 ];
+
+	var curve = new THREE.QuadraticBezierCurve( x0, y0, aCP1x, aCP1y,
+	                                               aCP2x, aCP2y,
+	                                               aX, aY );
+	
+	this.actions.push( { action: THREE.PathActions.BEZIER_CURVE_TO, args: args, curve:curve });
 
 };
 
 THREE.Path.prototype.splineThru = function( pts /*Array of Vector*/ ) {
 
 	var args = Array.prototype.slice.call( arguments );
-	this.actions.push( { action: THREE.PathActions.CSPLINE_THRU, args: args } );
+	var lastargs = this.actions[ this.actions.length - 1 ].args;
+	var x0 = lastargs[ lastargs.length - 2 ];
+	var y0 = lastargs[ lastargs.length - 1 ];
+
+	pts.unshift(new THREE.Vector2(x0, y0));
+	var curve = new THREE.SplineCurve( pts );
+	
+	this.actions.push( { action: THREE.PathActions.CSPLINE_THRU, args: args,curve:curve } );
+	//console.log(curve, curve.getPoints(), curve.getSpacedPoints());
 
 }
 
@@ -378,57 +409,33 @@ THREE.Path.prototype.createPathGeometry = function(divisions, lineMaterial) {
 // 3. Get t for the curve
 // 4. Return curve.getPointAt(t')
 THREE.Path.prototype.getPoint = function(t) {
+	var d = t * this.getLength();
+	
+	// loop where sum != 0, sum > d , sum+1 <d
 };
 
 // Compute Lengths and Cache Them
 THREE.Path.prototype.getLength = function() {
 	// Loop all actions/path
 	// Push sums into cached array
+	var lengths = [], sums = 0;
+	var i=0, il = this.actions.length, curve;
+	for (;i<il;i++) {
+		curve = this.actions[il].curve;
+		if (curve) {
+			sums += curve.getLength();
+			lengths.push(sums);
+		} else {
+			lengths.push(0);
+		}
+		
+	}
+	return sums;
+	
 };
-
-THREE.Line = function (x1, y1, x2, y2) {
-	this.x1 = x1;
-	this.y1 = y1;
-	this.x2 = x2;
-	this.y2 = y2;
-};
-
-THREE.Line.prototype.getPoints(divisions) {
-	if (!divisions) divisions = 200;
-	var d, pts = [];
-	for (d=0;d<divisions;d++) {
-		pts.push(this.getPoint(d/divisions));
-	};
-	return pts;
-};
-
-
-/*
-curve.getPoints();
-curve.getPoint(t);
-curve.getPointAtArcLength(t);
-curve.transform(params);
-curve.getTangentAt(t)
-*/
 
 // ALL THINGS BELOW TO BE REFACTORED
 // QN: Transform final pts or transform ACTIONS or add transform filters?
-THREE.Path.prototype.getPoint = function(t) {
-	var x0, y0, x1, y1, x2, y2;
-	x0 = this.actions[0].args[0];
-	y0 = this.actions[0].args[1];
-	x1 = this.actions[1].args[0];
-	y1 = this.actions[1].args[1];
-	x2 = this.actions[1].args[2];
-	y2 = this.actions[1].args[3];
-	
-	var tx, ty;
-	
-	tx = THREE.FontUtils.b2( t, x0, x1, x2 );
-	ty = THREE.FontUtils.b2( t, y0, y1, y2 );
-	
-	return new THREE.Vector2( tx, ty );
-};
 
 THREE.Path.prototype.getNormalVector = function(t) {
 	// iterate sub segments
@@ -453,48 +460,6 @@ THREE.Path.prototype.getNormalVector = function(t) {
 	return new THREE.Vector2( -ty , tx ).unit();
 	
 };
-
-THREE.Path.prototype.cacheArcLengths = function() {
-	var divisions = 200;
-	var cache = [];
-	var p=1;
-	var last = this.getPoint(0), current;
-	var sum = 0;
-	for (; p <= divisions; p++) {
-		current = this.getPoint (p/divisions);
-		sum += current.distanceTo(last);
-		cache.push(sum);
-		last = current;
-	}
-	
-	this.arcLengthCache = cache;
-	return {sums: cache, sum:sum};
-	
-};
-
-/* Given u (0..1), get a t to find p. This gives you pt which are equi distance */
-
-THREE.Path.prototype.getUtoTmapping = function(u, distance) {
-	
-	//var arcs = this.cacheArcLengths();
-	var cache = this.arcLengthCache; 
-	var i = 0,il = cache.length;
-	
-	var distanceForU = u * cache[cache.length-1];
-	if (distance) distanceForU = distance;
-	
-	// Should do binary search + sub division + interpolation if needed
-	while (i<il) {
-		if (cache[i]>distanceForU) break;
-		i++;
-	}
-	
-	var t= i/il;
-	return t;
-	
-	
-};
-
 
 var tangentQuad = function (t, p0, p1, p2 ) {
 	return 2 * ( 1 - t ) * ( p1 - p0 ) + 2 * t * ( p2 - p1 ) ;
