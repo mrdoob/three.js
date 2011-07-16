@@ -191,7 +191,7 @@ THREE.SplineCurve = function ( points ) {
 };
 
 THREE.SplineCurve.prototype = new THREE.Curve();
-THREE.SplineCurve.prototype.constructor = THREE.CubicBezierCurve;
+THREE.SplineCurve.prototype.constructor = THREE.SplineCurve;
 
 
 
@@ -216,6 +216,42 @@ THREE.SplineCurve.prototype.getPoint = function ( t /* between 0 .. 1 */) {
 	return v;
 
 }
+
+
+
+THREE.ArcCurve = function ( aX, aY, aRadius,
+                                 aStartAngle, aEndAngle, aClockwise ) {
+	this.aX = aX;
+	this.aY = aY;
+	this.aRadius = aRadius;
+	this.aStartAngle = aStartAngle;
+	this.aEndAngle = aEndAngle;
+	this.aClockwise;
+};
+
+THREE.ArcCurve.prototype = new THREE.Curve();
+THREE.ArcCurve.prototype.constructor = THREE.ArcCurve;
+
+
+
+/* Basic function to overwrite and implement */
+THREE.ArcCurve.prototype.getPoint = function ( t /* between 0 .. 1 */) {
+			
+	var deltaAngle = this.aEndAngle - this.aStartAngle;
+	if (this.aClockwise) {
+		t = 1 - t;
+	}
+	var angle = this.aStartAngle + t * deltaAngle;
+
+	var tx = this.aX + this.aRadius * Math.cos(angle);
+	var ty = this.aY + this.aRadius * Math.sin(angle);
+
+	return new THREE.Vector2( tx, ty );
+	
+}
+
+
+
 
 THREE.Curve.Utils = {
 	tangentQuadraticBezier: function (t, p0, p1, p2 ) {

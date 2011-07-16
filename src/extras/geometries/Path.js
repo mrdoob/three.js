@@ -126,6 +126,10 @@ THREE.Path.prototype.arc = function(aX, aY, aRadius,
                                  aStartAngle, aEndAngle, aClockwise) {
 	
 	var args = Array.prototype.slice.call( arguments );
+	var curve = new THREE.ArcCurve( aX, aY, aRadius,
+	                                 aStartAngle, aEndAngle, aClockwise );
+	this.curves.push( curve );
+	
 	this.actions.push( { action: THREE.PathActions.ARC, args: args } );
    
 
@@ -142,6 +146,18 @@ return sine(disnt) * ampt
 THREE.Path.prototype.addExprFunc = function(exprName, func) {
 };
 */
+
+
+THREE.Path.prototype.getSpacedPoints = function(divisions) {
+	if (!divisions) divisions = 40;
+	var pts = [];
+	for (var i=0; i< divisions;i++) {
+		pts.push(this.getPoint(i/divisions));
+		//if(!this.getPoint(i/divisions)) throw "DIE";
+	}
+	//console.log(pts);
+	return pts;
+}
 	
 /* Return an array of vectors based on contour of the path */
 

@@ -19,17 +19,13 @@ THREE.Shape = function ( ) {
 THREE.Shape.prototype = new THREE.Path();
 THREE.Shape.prototype.constructor = THREE.Path;
 
-THREE.Shape.prototype.getSpacedPoints = function(divisions) {
-	if (!divisions) divisions = 40;
-	var pts = [];
-	for (var i=0; i< divisions;i++) {
-		pts.push(this.getPoint(i/divisions));
-		if(!this.getPoint(i/divisions)) throw "DIE";
-	}
-	//console.log(pts);
-	return pts;
-}
+/* Convenience method to return ExtrudeGeometry */
+THREE.Shape.prototype.extrude = function( options ) {
 
+	var extruded =  new THREE.ExtrudeGeometry( this, options );
+	return extruded;
+
+};
 
 THREE.Shape.Utils = {
 	triangulate2 : function(pts) {
@@ -81,11 +77,4 @@ THREE.Shape.Utils = {
 	}
 	
 };
-/* Convenience method to return ExtrudeGeometry */
 
-THREE.Shape.prototype.extrude = function( options ) {
-
-	var extruded =  new THREE.ExtrudeGeometry( this, options );
-	return extruded;
-
-};
