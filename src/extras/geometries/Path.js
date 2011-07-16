@@ -1,6 +1,7 @@
 /**
  * @author zz85 / http://www.lab4games.net/zz85/blog
- * Creates free form path.
+ * Creates free form 2d path using series of points, lines or curves.
+ *
  **/
 
 THREE.Path = function ( points ) {
@@ -19,11 +20,14 @@ THREE.PathActions = {
 
 	MOVE_TO: 'moveTo',
 	LINE_TO: 'lineTo',
-	QUADRATIC_CURVE_TO: 'quadraticCurveTo', // BEZIER quadratic CURVE
-	BEZIER_CURVE_TO: 'bezierCurveTo', 		// BEZIER cubic CURVE
-	CSPLINE_THRU: 'splineThru' 				// TODO cardinal splines
+	QUADRATIC_CURVE_TO: 'quadraticCurveTo', // Bezier quadratic curve
+	BEZIER_CURVE_TO: 'bezierCurveTo', 		// Bezier cubic curve
+	CSPLINE_THRU: 'splineThru',				// Catmull-rom spline
+	ARC: 'arc'								// Circle
 
 };
+
+//TODO Clean up PATH API
 
 /* Create path using straight lines to connect all points */
 
@@ -78,21 +82,34 @@ THREE.Path.prototype.splineThru = function( pts /*Array of Vector*/ ) {
 
 }
 
+// FUTURE: Change the API or follow canvas API?
 // TODO ARC (x,y, x-radius, y-radius, startAngle, endAngle)
-THREE.Path.prototype.arc = function() {
+THREE.Path.prototype.arc = function(aX, aY, aRadius,
+                                 aStartAngle, aEndAngle, aClockwise) {
 	
-};
+	var args = Array.prototype.slice.call( arguments );
+	this.actions.push( { action: THREE.PathActions.ARC, args: args } );
+   
 
-// TODO
+ };
+
+/*
+// FUTURE ENHANCEMENTS
+example usage?
+Path.addExprFunc('sineCurveTo', sineCurveGetPtFunction)
+Path.sineCurveTo(x,y, amptitude);
+sineCurve.getPoint(t); 
+return sine(disnt) * ampt
 // Create a new func eg. sin (theta) x
 THREE.Path.prototype.addExprFunc = function(exprName, func) {
 };
+*/
 	
 /* Return an array of vectors based on contour of the path */
 
 THREE.Path.prototype.getPoints = function( divisions ) {
 
-	divisions = divisions || 4;
+	divisions = divisions || 12;
 
 	var points = [];
 
@@ -220,8 +237,30 @@ THREE.Path.prototype.getPoints = function( divisions ) {
 			}
 
 			break;
+		case THREE.PathActions.ARC:
+			
+			laste = this.actions[ i - 1 ].args;
+			var aX = args[0], aY = args[1], aRadius = args[2],
+			            aStartAngle = args[3], aEndAngle = args[4], aClockwise = args[5];
+			
+			var lastx = laste[ laste.length - 2 ],
+				lasty = laste[ laste.length - 1 ] ;
+				
+			var deltaAngle = aEndAngle - aStartAngle;
+			var angle;
+			for ( j = 1; j <= divisions * 2; j ++ ) {
+				angle = aStartAngle + j/divisions/2 * deltaAngle;
+				
+				
+				 tx = lastx + aX + aRadius * Math.cos(angle);
+				 ty = lasty + aY + aRadius * Math.sin(angle);
 
-		}
+				points.push( new THREE.Vector2( tx, ty ) );
+			}
+
+		  break;
+
+		} // end switch
 
 	}
 
@@ -271,6 +310,7 @@ var Spline2 = function () {
 };
 
 
+
 THREE.Path.prototype.getMinAndMax = function() {
 
 	var points = this.getPoints();
@@ -295,7 +335,7 @@ THREE.Path.prototype.getMinAndMax = function() {
 
 	}
 
-	// TODO find mid-pt?
+	// TODO Include CG or find mid-pt?
 
 	return {
 
@@ -308,6 +348,8 @@ THREE.Path.prototype.getMinAndMax = function() {
 
 };
 
+
+// TODO. Test
 // createPathGeometry by SolarCoordinates
 /* Returns Object3D with line segments stored as children  */
 THREE.Path.prototype.createPathGeometry = function(divisions, lineMaterial) {
@@ -327,8 +369,49 @@ THREE.Path.prototype.createPathGeometry = function(divisions, lineMaterial) {
     return(pathGeometry);
 };
 
+// To get accurate point with reference to
+// entire path distance at time t,
+// following has to be done
 
-// ALL THINGS BELOW TO BE REFACTORSED
+// 1. Length of each sub path have to be known
+// 2. Locate and identify type of curve
+// 3. Get t for the curve
+// 4. Return curve.getPointAt(t')
+THREE.Path.prototype.getPoint = function(t) {
+};
+
+// Compute Lengths and Cache Them
+THREE.Path.prototype.getLength = function() {
+	// Loop all actions/path
+	// Push sums into cached array
+};
+
+THREE.Line = function (x1, y1, x2, y2) {
+	this.x1 = x1;
+	this.y1 = y1;
+	this.x2 = x2;
+	this.y2 = y2;
+};
+
+THREE.Line.prototype.getPoints(divisions) {
+	if (!divisions) divisions = 200;
+	var d, pts = [];
+	for (d=0;d<divisions;d++) {
+		pts.push(this.getPoint(d/divisions));
+	};
+	return pts;
+};
+
+
+/*
+curve.getPoints();
+curve.getPoint(t);
+curve.getPointAtArcLength(t);
+curve.transform(params);
+curve.getTangentAt(t)
+*/
+
+// ALL THINGS BELOW TO BE REFACTORED
 // QN: Transform final pts or transform ACTIONS or add transform filters?
 THREE.Path.prototype.getPoint = function(t) {
 	var x0, y0, x1, y1, x2, y2;
@@ -423,7 +506,7 @@ var tangentQuad = function (t, p0, p1, p2 ) {
 THREE.Path.prototype.transform = function(path) {
 	path = new THREE.Path();
 	path.moveTo(0,0);
-	path.quadraticCurveTo(200,20, 240,80);
+	path.quadraticCurveTo(100,20, 140,80);
 	
 	console.log(path.cacheArcLengths());
 	
@@ -437,7 +520,8 @@ THREE.Path.prototype.transform = function(path) {
 		oldY = p.y;
 		var xNorm = oldX/ thisBounds.maxX;
 		
-		xNorm = path.getUtoTmapping(xNorm, oldX); // 3 styles. 1) wrap stretched. 2) wrap stretch by arc length 3) warp by actual distance
+		// If using actual distance, for length > path, requires line extrusions
+		//xNorm = path.getUtoTmapping(xNorm, oldX); // 3 styles. 1) wrap stretched. 2) wrap stretch by arc length 3) warp by actual distance
 		
 		var pathPt = path.getPoint(xNorm);
 		var normal = path.getNormalVector(xNorm).multiplyScalar(oldY);;
@@ -455,9 +539,16 @@ THREE.Path.prototype.transform = function(path) {
 };
 
 // Read http://www.tinaja.com/glib/nonlingr.pdf
-//nonlinear transforms
-THREE.Path.prototype.nltransform = function(a,b,c,d,e,f) {
+// nonlinear transforms
 
+THREE.Path.prototype.nltransform = function(a,b,c,d,e,f) {
+		// a - horiztonal size 
+		// b - lean 
+		// c - x offset
+		// d - vertical size
+		// e - climb
+		// f - y offset
+		
 	var oldPts = this.getPoints();
 	var i, il, p, oldX, oldY;
 	for (i=0,il=oldPts.length; i< il;i++){
@@ -472,11 +563,12 @@ THREE.Path.prototype.nltransform = function(a,b,c,d,e,f) {
 	
 };
 
+
+// FUTURE Export JSON Format
+
 /* Draws this path onto a 2d canvas easily */
 
 THREE.Path.prototype.debug = function( canvas ) {
-
-	// JUST A STUB
 
 	var bounds = this.getMinAndMax();
 
@@ -548,10 +640,11 @@ THREE.Path.prototype.debug = function( canvas ) {
 	ctx.stroke();
 	ctx.closePath();
 
-	// DebugPoints
+	// Debug Points
 
 	ctx.strokeStyle = "red";
 
+	/* TO CLEAN UP */
 	//var p, points = this.getPoints();
 	var theta = -90 /180 * Math.PI;
 	var p, points = this.transform(0.866, - 0.866,0, 0.500 , 0.50,-50);

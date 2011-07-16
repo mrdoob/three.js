@@ -677,7 +677,7 @@ THREE.FontUtils = {
 			
 		}
 		
-		path.debug(document.getElementById("boo"));
+		//path.debug(document.getElementById("boo"));
 		console.log(path);
 		
 
@@ -880,7 +880,7 @@ THREE.FontUtils = {
 			for ( i = 0; i < length; ) {
 
 				action = outline[ i++ ];
-				console.log(action);
+				//console.log(action);
 				switch( action ) {
 
 				case 'm':
