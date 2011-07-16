@@ -31,14 +31,23 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 	THREE.Geometry.call( this );
 
     var vertices = shape.getPoints();
-    var faces = shape.triangulate();
+	var reverse = THREE.FontUtils.Triangulate.area( vertices ) > 0 ;
+	if (reverse) {
+		//faces = THREE.FontUtils.Triangulate( vertices.reverse(), true );
+		vertices = vertices.reverse();
+		reverse = false;
+	}
+   // var faces = shape.triangulate();
+	
+	var faces = THREE.FontUtils.Triangulate( vertices, true );
+	
     var contour = vertices;
 
     var scope = this;
 
 	var bezelPoints = [];
 
-	var reverse = THREE.FontUtils.Triangulate.area( vertices ) > 0 ;
+	
 
 	//console.log(reverse);
 

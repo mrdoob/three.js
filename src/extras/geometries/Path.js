@@ -7,7 +7,8 @@
 THREE.Path = function ( points ) {
 
 	this.actions = [];
-
+	this.curves = [];
+	
 	if ( points ) {
 
 		this.fromPoints( points );
@@ -36,6 +37,7 @@ THREE.Path.prototype.fromPoints = function( vectors /*Array of Vector*/ ) {
 	var v = 0, vlen = vectors.length;
 
 	this.moveTo( vectors[ 0 ].x, vectors[ 0 ].y );
+	
 
 	for ( v = 1; v < vlen; v++ ) {
 
@@ -60,6 +62,7 @@ THREE.Path.prototype.lineTo = function( x, y ) {
 	var x0 = lastargs[ lastargs.length - 2 ];
 	var y0 = lastargs[ lastargs.length - 1 ];
 	var curve = new THREE.StraightCurve( x0, y0, x, y );
+	this.curves.push( curve );
 	
 	this.actions.push( { action: THREE.PathActions.LINE_TO, args: args, curve:curve } );
 	
@@ -74,6 +77,7 @@ THREE.Path.prototype.quadraticCurveTo = function( aCPx, aCPy, aX, aY ) {
 	var y0 = lastargs[ lastargs.length - 1 ];
 
 	var curve = new THREE.QuadraticBezierCurve( x0, y0, aCPx, aCPy, aX, aY );
+	this.curves.push( curve );
 	
 	this.actions.push( { action: THREE.PathActions.QUADRATIC_CURVE_TO, args: args, curve:curve });
 	//console.log(curve, curve.getPoints(), curve.getSpacedPoints());
@@ -90,9 +94,10 @@ THREE.Path.prototype.bezierCurveTo = function( aCP1x, aCP1y,
 	var x0 = lastargs[ lastargs.length - 2 ];
 	var y0 = lastargs[ lastargs.length - 1 ];
 
-	var curve = new THREE.QuadraticBezierCurve( x0, y0, aCP1x, aCP1y,
+	var curve = new THREE.CubicBezierCurve( x0, y0, aCP1x, aCP1y,
 	                                               aCP2x, aCP2y,
 	                                               aX, aY );
+	this.curves.push( curve );
 	
 	this.actions.push( { action: THREE.PathActions.BEZIER_CURVE_TO, args: args, curve:curve });
 
@@ -104,9 +109,11 @@ THREE.Path.prototype.splineThru = function( pts /*Array of Vector*/ ) {
 	var lastargs = this.actions[ this.actions.length - 1 ].args;
 	var x0 = lastargs[ lastargs.length - 2 ];
 	var y0 = lastargs[ lastargs.length - 1 ];
-
-	pts.unshift(new THREE.Vector2(x0, y0));
-	var curve = new THREE.SplineCurve( pts );
+	
+	var npts = [new THREE.Vector2(x0, y0)];
+	npts=  npts.concat(pts.unshift);
+	var curve = new THREE.SplineCurve( npts );
+	this.curves.push( curve );
 	
 	this.actions.push( { action: THREE.PathActions.CSPLINE_THRU, args: args,curve:curve } );
 	//console.log(curve, curve.getPoints(), curve.getSpacedPoints());
@@ -254,16 +261,19 @@ THREE.Path.prototype.getPoints = function( divisions ) {
 
 			laste = this.actions[ i - 1 ].args;
 			var last = new THREE.Vector2( laste[ laste.length - 2 ], laste[ laste.length - 1 ] );
-			var spts = args[ 0 ];
-			var n = divisions * spts.length;
+			var spts = [last];
+			
+			var n = divisions * args[ 0 ].length;
 
-			spts.unshift( last );
+			spts = spts.concat(args[ 0 ]);
+			console.log(args[ 0 ].length,spts.length,args[ 0 ],spts );
+			//var spline = new Spline2();
+			
+			
+			var spline = new THREE.SplineCurve(spts);
+			for ( j = 1; j <= n; j ++ ) {
 
-			var spline = new Spline2();
-
-			for ( j = 0; j < n; j ++ ) {
-
-				points.push( spline.get2DPoint( spts, j / n ) ) ;
+				points.push( spline.getPointAt( j / n ) ) ;
 
 			}
 
@@ -380,6 +390,57 @@ THREE.Path.prototype.getMinAndMax = function() {
 };
 
 
+// To get accurate point with reference to
+// entire path distance at time t,
+// following has to be done
+
+// 1. Length of each sub path have to be known
+// 2. Locate and identify type of curve
+// 3. Get t for the curve
+// 4. Return curve.getPointAt(t')
+THREE.Path.prototype.getPoint = function(t) {
+	var d = t * this.getLength();
+	var curveLengths = this.sums;
+	var i =0, diff, curve;
+	
+	// To think about boundaries points.
+	while (i < curveLengths.length) {
+		if (curveLengths[i]>= d) {
+			diff = curveLengths[i] - d;
+			curve = this.curves[i];
+			var u = 1 - diff / curve.getLength();
+			
+			return curve.getPointAt(u);
+			
+			break;
+		}
+		i++;
+	}
+	
+	return null;
+	
+	// loop where sum != 0, sum > d , sum+1 <d
+};
+
+// Compute Lengths and Cache Them
+THREE.Path.prototype.getLength = function() {
+	// Loop all actions/path
+	// Push sums into cached array
+	var lengths = [], sums = 0;
+	var i=0, il = this.curves.length, curve;
+	for (;i<il;i++) {
+		sums+= this.curves[i].getLength();
+		lengths.push(sums);
+	}
+	
+	this.sums = lengths;
+	
+	return sums;
+	
+};
+
+
+
 // TODO. Test
 // createPathGeometry by SolarCoordinates
 /* Returns Object3D with line segments stored as children  */
@@ -400,71 +461,10 @@ THREE.Path.prototype.createPathGeometry = function(divisions, lineMaterial) {
     return(pathGeometry);
 };
 
-// To get accurate point with reference to
-// entire path distance at time t,
-// following has to be done
 
-// 1. Length of each sub path have to be known
-// 2. Locate and identify type of curve
-// 3. Get t for the curve
-// 4. Return curve.getPointAt(t')
-THREE.Path.prototype.getPoint = function(t) {
-	var d = t * this.getLength();
-	
-	// loop where sum != 0, sum > d , sum+1 <d
-};
-
-// Compute Lengths and Cache Them
-THREE.Path.prototype.getLength = function() {
-	// Loop all actions/path
-	// Push sums into cached array
-	var lengths = [], sums = 0;
-	var i=0, il = this.actions.length, curve;
-	for (;i<il;i++) {
-		curve = this.actions[il].curve;
-		if (curve) {
-			sums += curve.getLength();
-			lengths.push(sums);
-		} else {
-			lengths.push(0);
-		}
-		
-	}
-	return sums;
-	
-};
 
 // ALL THINGS BELOW TO BE REFACTORED
 // QN: Transform final pts or transform ACTIONS or add transform filters?
-
-THREE.Path.prototype.getNormalVector = function(t) {
-	// iterate sub segments
-	// 	get lengths for sub segments
-	// 	if segment is bezier
-	//		perform sub devisions or perform integrals.
-	var x0, y0, x1, y1, x2, y2;
-	x0 = this.actions[0].args[0];
-	y0 = this.actions[0].args[1];
-	x1 = this.actions[1].args[0];
-	y1 = this.actions[1].args[1];
-	x2 = this.actions[1].args[2];
-	y2 = this.actions[1].args[3];
-	
-	var tx, ty;
-	
-	tx = tangentQuad( t, x0, x1, x2 );
-	ty = tangentQuad( t, y0, y1, y2 );
-	
-	// return normal
-	
-	return new THREE.Vector2( -ty , tx ).unit();
-	
-};
-
-var tangentQuad = function (t, p0, p1, p2 ) {
-	return 2 * ( 1 - t ) * ( p1 - p0 ) + 2 * t * ( p2 - p1 ) ;
-}
-
 
 // FUTURE refactor path = an array of lines -> straight, bezier, splines, arc, funcexpr lines
 // Read http://www.planetclegg.com/projects/WarpingTextToSplines.html

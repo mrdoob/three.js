@@ -49,7 +49,7 @@ THREE.Curve.prototype.getLengths = function(divisions) {
 	if (!divisions) divisions = 200;
 	
 	if (this.cacheLengths && (this.cacheLengths.length==divisions)) {
-		console.log("catched",this.cacheLengths);
+		//console.log("catched",this.cacheLengths);
 		return this.cacheLengths;
 	}
 	
@@ -138,6 +138,31 @@ THREE.QuadraticBezierCurve.prototype.getPoint = function ( t /* between 0 .. 1 *
 	return new THREE.Vector2( tx, ty );
 };
 
+
+THREE.QuadraticBezierCurve.prototype.getNormalVector = function(t) {
+	// iterate sub segments
+	// 	get lengths for sub segments
+	// 	if segment is bezier
+	//		perform sub devisions or perform integrals.
+	var x0, y0, x1, y1, x2, y2;
+	x0 = this.actions[0].args[0];
+	y0 = this.actions[0].args[1];
+	x1 = this.actions[1].args[0];
+	y1 = this.actions[1].args[1];
+	x2 = this.actions[1].args[2];
+	y2 = this.actions[1].args[3];
+	
+	var tx, ty;
+	
+	tx = THREE.Curve.Utils.tangentQuadraticBezier( t, this.x0, this.x1, this.x2 );
+	ty = THREE.Curve.Utils.tangentQuadraticBezier( t, this.y0, this.y1, this.y2 );
+	
+	// return normal unit vector
+	return new THREE.Vector2( -ty , tx ).unit();
+	
+};
+
+
 THREE.CubicBezierCurve = function ( x0, y0, x1, y1, x2, y2, x3, y3 ) {
 	this.x0 = x0;
 	this.y0 = y0;
@@ -155,8 +180,8 @@ THREE.CubicBezierCurve.prototype.constructor = THREE.CubicBezierCurve;
 THREE.CubicBezierCurve.prototype.getPoint = function ( t /* between 0 .. 1 */) {
 	var tx, ty;
 
-	tx = THREE.FontUtils.b2( t, this.x0, this.x1, this.x2 );
-	ty = THREE.FontUtils.b2( t, this.y0, this.y1, this.y2 );
+	tx = THREE.FontUtils.b3( t, this.x0, this.x1, this.x2, this.x3 );
+	ty = THREE.FontUtils.b3( t, this.y0, this.y1, this.y2, this.y3 );
 
 	return new THREE.Vector2( tx, ty );
 };
@@ -193,8 +218,19 @@ THREE.SplineCurve.prototype.getPoint = function ( t /* between 0 .. 1 */) {
 }
 
 THREE.Curve.Utils = {
+	tangentQuadraticBezier: function (t, p0, p1, p2 ) {
+		return 2 * ( 1 - t ) * ( p1 - p0 ) + 2 * t * ( p2 - p1 ) ;
+	},
+	
+	tangentSpline: function (t, p0, p1, p2, p3) {
+		// To check if my formulas are correct
+		var h00 = 6 * t * t - 6 * t; // derived from 2t^3 − 3t^2 + 1
+		var h10 = 3 * t * t - 4 * t + 1; // t^3 − 2t^2 + t
+		var h01 = -6 * t * t + 6 * t; // − 2t3 + 3t2
+		var h11 = 3 * t * t - 2 * t;// t3 − t2
+		
+	},
 	// Catmull-Rom
-
 	interpolate: function( p0, p1, p2, p3, t ) {
 
 		var v0 = ( p2 - p0 ) * 0.5;

@@ -19,11 +19,13 @@ THREE.Shape = function ( ) {
 THREE.Shape.prototype = new THREE.Path();
 THREE.Shape.prototype.constructor = THREE.Path;
 
-/* Returns vertices of triangulated faces | get faces */
 
+/* TODO. Get rid of this */
+/* Returns vertices of triangulated faces | get faces */
 THREE.Shape.prototype.triangulate = function() {
 	
 	var pts = this.getPoints();
+	//var pts = this.getPoints2();
 	
 	/* */
 	if ( THREE.FontUtils.Triangulate.area( pts ) > 0 ) {
@@ -36,54 +38,65 @@ THREE.Shape.prototype.triangulate = function() {
 	return THREE.FontUtils.Triangulate( pts, true );
 };
 
+THREE.Shape.prototype.getSpacedPoints = function(divisions) {
+	if (!divisions) divisions = 40;
+	var pts = [];
+	for (var i=0; i< divisions;i++) {
+		pts.push(this.getPoint(i/divisions));
+	}
+	//console.log(pts);
+	return pts;
+}
 
-THREE.Shape.prototype.triangulate2 = function(pts) {
-	// For Poly2Tri.js 
+
+THREE.Shape.Utils = {
+	triangulate2 : function(pts) {
+		// For Poly2Tri.js 
 	
-	//var pts = this.getPoints();
-	var shape = [];
-	for (var p in pts) {
-		shape.push(new js.poly2tri.Point(pts[p].x, pts[p].y))
-	}
-
-	var swctx = new js.poly2tri.SweepContext(shape);
-	/*
-		for (var idx in holes)
-		{
-			swctx.AddHole(holes[idx]);
+		//var pts = this.getPoints();
+		var shape = [];
+		for (var p in pts) {
+			shape.push(new js.poly2tri.Point(pts[p].x, pts[p].y))
 		}
-	*/
-	var find;
-	var findIndexForPt = function (pt) {
-		find = new THREE.Vector2(pt.x, pt.y);
-		var p;
-		for (p=0, pl = pts.length; p<pl; p++) {
-			if (pts[p].equals(find)) return p;
+
+		var swctx = new js.poly2tri.SweepContext(shape);
+		/*
+			for (var idx in holes)
+			{
+				swctx.AddHole(holes[idx]);
+			}
+		*/
+		var find;
+		var findIndexForPt = function (pt) {
+			find = new THREE.Vector2(pt.x, pt.y);
+			var p;
+			for (p=0, pl = pts.length; p<pl; p++) {
+				if (pts[p].equals(find)) return p;
+			}
+			return -1;
+		};
+		// triangulate
+		js.poly2tri.sweep.Triangulate(swctx);
+
+		var triangles =  swctx.GetTriangles();
+		var tr ;
+		var facesPts = [];
+		for (var t in triangles) {
+			tr =  triangles[t];
+			facesPts.push([
+				findIndexForPt(tr.GetPoint(0)), 
+				findIndexForPt(tr.GetPoint(1)), 
+				findIndexForPt(tr.GetPoint(2))
+					]); 
 		}
-		return -1;
-	};
-	// triangulate
-	js.poly2tri.sweep.Triangulate(swctx);
-
-	var triangles =  swctx.GetTriangles();
-	var tr ;
-	var facesPts = [];
-	for (var t in triangles) {
-		tr =  triangles[t];
-		facesPts.push([
-			findIndexForPt(tr.GetPoint(0)), 
-			findIndexForPt(tr.GetPoint(1)), 
-			findIndexForPt(tr.GetPoint(2))
-				]); 
-	}
 
 
-	console.log(facesPts);
-	console.log("triangles", triangles.length, triangles);
+		console.log(facesPts);
+		console.log("triangles", triangles.length, triangles);
 
-	// Returns array of faces with 3 element each
+		// Returns array of faces with 3 element each
 	return facesPts;
-
+	}
 	
 };
 /* Convenience method to return ExtrudeGeometry */
