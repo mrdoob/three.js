@@ -266,10 +266,7 @@ THREE.Path.prototype.getPoints = function( divisions ) {
 			var n = divisions * args[ 0 ].length;
 
 			spts = spts.concat(args[ 0 ]);
-			console.log(args[ 0 ].length,spts.length,args[ 0 ],spts );
-			//var spline = new Spline2();
-			
-			
+
 			var spline = new THREE.SplineCurve(spts);
 			for ( j = 1; j <= n; j ++ ) {
 
@@ -308,49 +305,6 @@ THREE.Path.prototype.getPoints = function( divisions ) {
 	return points;
 
 };
-
-var Spline2 = function () {
-
-	var c = [], v2,
-		point, intPoint, weight;
-
-	this.get2DPoint = function ( points, k ) {
-
-		v2 = new THREE.Vector2();
-		point = ( points.length - 1 ) * k;
-
-		intPoint = Math.floor( point );
-		weight = point - intPoint;
-
-		c[ 0 ] = intPoint == 0 ? intPoint : intPoint - 1;
-		c[ 1 ] = intPoint;
-		c[ 2 ] = intPoint > points.length - 2 ? intPoint : intPoint + 1;
-		c[ 3 ] = intPoint > points.length - 3 ? intPoint : intPoint + 2;
-
-		v2.x = interpolate( points[ c[ 0 ] ].x, points[ c[ 1 ] ].x, points[ c[ 2 ] ].x, points[ c[ 3 ] ].x, weight );
-		v2.y = interpolate( points[ c[ 0 ] ].y, points[ c[ 1 ] ].y, points[ c[ 2 ] ].y, points[ c[ 3 ] ].y, weight );
-
-		//console.log('point',point, v2);
-
-		return v2;
-
-	}
-
-	// Catmull-Rom
-
-	function interpolate( p0, p1, p2, p3, t ) {
-
-		var v0 = ( p2 - p0 ) * 0.5;
-		var v1 = ( p3 - p1 ) * 0.5;
-		var t2 = t * t;
-		var t3 = t * t2;
-		return ( 2 * p1 - 2 * p2 + v0 + v1 ) * t3 + ( - 3 * p1 + 3 * p2 - 2 * v0 - v1 ) * t2 + v0 * t + p1;
-
-	}
-
-};
-
-
 
 THREE.Path.prototype.getMinAndMax = function() {
 
