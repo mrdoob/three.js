@@ -202,7 +202,7 @@ THREE.ShaderUtils = {
 						"for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {",
 
 							"vec3 pointVector = normalize( vPointLight[ i ].xyz );",
-							"vec3 pointHalfVector = normalize( vPointLight[ i ].xyz + vViewPosition );",
+							"vec3 pointHalfVector = normalize( vPointLight[ i ].xyz + viewPosition );",
 							"float pointDistance = vPointLight[ i ].w;",
 
 							"float pointDotNormalHalf = dot( normal, pointHalfVector );",
@@ -229,7 +229,7 @@ THREE.ShaderUtils = {
 							"vec4 lDirection = viewMatrix * vec4( directionalLightDirection[ i ], 0.0 );",
 
 							"vec3 dirVector = normalize( lDirection.xyz );",
-							"vec3 dirHalfVector = normalize( lDirection.xyz + vViewPosition );",
+							"vec3 dirHalfVector = normalize( lDirection.xyz + viewPosition );",
 
 							"float dirDotNormalHalf = dot( normal, dirHalfVector );",
 							"float dirDiffuseWeight = max( dot( normal, dirVector ), 0.0 );",
