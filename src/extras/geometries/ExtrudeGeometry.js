@@ -7,11 +7,10 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 
 	var amount = options.amount !== undefined ? options.amount : 100;
 
-	// todo: bezel
-
-	var bezelThickness = options.bezelThickness !== undefined ? options.bezelThickness : 10;
-	var bezelSize = options.bezelSize !== undefined ? options.bezelSize : 8;
-	var bezelEnabled = options.bezelEnabled !== undefined ? options.bezelEnabled : false;
+	// todo: bevel
+	var bevelThickness = options.bevelThickness !== undefined ? options.bevelThickness : 10;
+	var bevelSize = options.bevelSize !== undefined ? options.bevelSize : 8;
+	var bevelEnabled = options.bevelEnabled !== undefined ? options.bevelEnabled : false;
 
 	var steps = options.steps !== undefined ? options.steps : 1;
 	var extrudePath = options.path !== undefined ? options.path : null;
@@ -30,6 +29,7 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 
 	THREE.Geometry.call( this );
 
+	// getPoints
     var vertices = shape.getSpacedPoints(); // getPoints | getSpacedPoints() you can get variable divisions by dividing by total lenght
 	var reverse = THREE.FontUtils.Triangulate.area( vertices ) > 0 ;
 	if (reverse) {
@@ -41,10 +41,14 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 	
 	var holes =  shape.getHoles();
 	
-	
+	//var faces = THREE.Shape.Utils.triangulateShape(vertices, holes);	
     var faces = THREE.Shape.Utils.triangulate2(vertices, holes);
-	console.log(faces);
+
+
+	//console.log(faces);
 	//var faces = THREE.FontUtils.Triangulate( vertices, true );
+	
+	var contour = vertices; // vertices has all points but contour has only points of circumference
 	
 	var ahole ;
 	for (var h in holes) {
@@ -52,11 +56,12 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 		vertices = vertices.concat(ahole);
 	}
 	
-    var contour = vertices;
-
-    var scope = this;
-
-	var bezelPoints = [];
+	console.log("same?", contour.length, vertices.length);
+	
+	var scope = this;
+	
+   
+	var bevelPoints = [];
 
 	
 
@@ -65,7 +70,7 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 	var i,
 		vert, vlen = vertices.length,
 		face, flen = faces.length,
-		bezelPt, blen = bezelPoints.length;
+		bevelPt, blen = bevelPoints.length;
 
 	// Back facing vertices
 
@@ -112,19 +117,19 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 	*/
 
 
-	if ( bezelEnabled ) {
+	if ( bevelEnabled ) {
 
 		for ( i = 0; i < blen; i++ ) {
 
-			bezelPt = bezelPoints[ i ];
-			v( bezelPt.x, bezelPt.y, bezelThickness );
+			bevelPt = bevelPoints[ i ];
+			v( bevelPt.x, bevelPt.y, bevelThickness );
 
 		}
 
 		for ( i = 0; i < blen; i++ ) {
 
-			bezelPt = bezelPoints[ i ];
-			v( bezelPt.x, bezelPt.y, amount - bezelThickness );
+			bevelPt = bevelPoints[ i ];
+			v( bevelPt.x, bevelPt.y, amount - bevelThickness );
 
 		}
 
@@ -185,7 +190,7 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 
 		k = i - 1;
 
-		if ( k < 0 ) k = vertices.length - 1;
+		if ( k < 0 ) k = contour.length - 1;
 
 		//console.log('b', i,j, i-1, k,vertices.length);
 

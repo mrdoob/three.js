@@ -1069,9 +1069,15 @@ THREE.FontUtils = {
 
 				/* output Triangle */
 
+				/*
 				result.push( contour[ a ] );
 				result.push( contour[ b ] );
 				result.push( contour[ c ] );
+				*/
+				result.push( [ contour[ a ], 
+					contour[ b ],
+					contour[ c ] ] );
+				
 
 				vertIndices.push( [ verts[ u ], verts[ v ], verts[ w ] ] );
 
