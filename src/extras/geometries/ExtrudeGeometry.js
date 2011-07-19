@@ -11,6 +11,7 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 	var bevelThickness = options.bevelThickness !== undefined ? options.bevelThickness : 10;
 	var bevelSize = options.bevelSize !== undefined ? options.bevelSize : 8;
 	var bevelEnabled = options.bevelEnabled !== undefined ? options.bevelEnabled : false;
+	var bevelSegments = 3;
 
 	var steps = options.steps !== undefined ? options.steps : 1;
 	var extrudePath = options.path !== undefined ? options.path : null;
@@ -29,39 +30,66 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 
 	THREE.Geometry.call( this );
 
+	
+	// Variables initalization
+	var ahole, h, hl; // looping of holes
+	var scope = this;
+	var bevelPoints = [];
+
+
 	// getPoints
     var vertices = shape.getSpacedPoints(); // getPoints | getSpacedPoints() you can get variable divisions by dividing by total lenght
+
+	var holes =  shape.getHoles();
+	
+
 	var reverse = THREE.FontUtils.Triangulate.area( vertices ) > 0 ;
+
+
 	if (reverse) {
+		console.debug("REVERSED");
 		vertices = vertices.reverse();
-		reverse = false;
+		
+		// Maybe we should also check if holes are in the opposite direction...
+		
+		for (h = 0, hl = holes.length;  h < hl; h++ ) {
+			
+			ahole = holes[h];
+			if (THREE.FontUtils.Triangulate.area(ahole) < 0 ) {
+				
+				holes[h] = ahole.reverse();
+				
+			}
+		}
+		
+		reverse = false; // If vertices are in order now, we shouldn't need to worry about them again (hopefully)!
 	}
 	
-	var holes =  shape.getHoles();
+	
 	
 	var faces = THREE.Shape.Utils.triangulateShape(vertices, holes);
     //var faces = THREE.Shape.Utils.triangulate2(vertices, holes);
 
 
 	//console.log(faces);
-	//var faces = THREE.FontUtils.Triangulate( vertices, true );
+	
+	////
+	///   Handle Vertices
+	////
 	
 	var contour = vertices; // vertices has all points but contour has only points of circumference
 	
-	var ahole, h, hl;
 	
 	for (h = 0, hl = holes.length;  h < hl; h++ ) {
+
 		ahole = holes[h];
+
 		vertices = vertices.concat(ahole);
+
 	}
 	
 	console.log("same?", contour.length, vertices.length);
 	
-	var scope = this;
-	
-   
-	var bevelPoints = [];
-
 	
 
 	//console.log(reverse);
@@ -84,6 +112,7 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 	}
 
 	// Add steped vertices...
+	
 	// Including front facing vertices
 
 	var s = 1;
@@ -136,6 +165,12 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 		}
 
 	}
+	
+	
+	////
+	///   Handle Faces
+	////
+	
 
 	// Bottom faces
 
@@ -167,7 +202,8 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 	
 	for (h = 0, hl = holes.length;  h < hl; h++ ) {
 		ahole = holes[h];
-		sidewalls(ahole);
+		sidewalls(ahole); 
+		//, true
 		layeroffset += ahole.length;
 	}
 	
@@ -179,14 +215,11 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 
 			tmpPt = contour[ i ];
 
-
-
-			//TOREMOVE
-			//console.log('a', i,j, i-1, k);
-
 			j = i;
 		
 			k = i - 1;
+
+			//TOREMOVE
 
 			if ( k < 0 ) k = contour.length - 1;
 
@@ -205,6 +238,7 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 				var slen2 = vlen * ( s + 1 );
 
 				f4( layeroffset + j + slen1, layeroffset + k + slen1, layeroffset + k + slen2, layeroffset + j + slen2 );
+				
 
 			}
 
@@ -228,29 +262,29 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 
 	function f3( a, b, c ) {
 
-		if ( reverse ) { // Can be removed
-
-			scope.faces.push( new THREE.Face3( c, b, a ) );
-
-		} else {
-
-			scope.faces.push( new THREE.Face3( a, b, c ) );
-
-		}
+		// if ( reverse ) { // Can now be removed
+		// 
+		// 		scope.faces.push( new THREE.Face3( c, b, a ) );
+		// 
+		// 	} else {
+		// 
+		 		scope.faces.push( new THREE.Face3( a, b, c ) );
+		// 
+		// 	}
 
 	}
 
 	function f4( a, b, c, d ) {
 
-		if ( reverse ) {
-
-			scope.faces.push( new THREE.Face4( d, c, b, a ) );
-
-		} else {
-
-			scope.faces.push( new THREE.Face4( a, b, c, d ) );
-
-		}
+		// if ( reverse ) {
+		// 
+		// 		scope.faces.push( new THREE.Face4( d, c, b, a ) );
+		// 
+		// 	} else {
+		// 
+		 		scope.faces.push( new THREE.Face4( a, b, c, d ) );
+		// 
+		// 	}
 
 	}
 
