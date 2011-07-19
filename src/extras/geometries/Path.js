@@ -129,7 +129,7 @@ THREE.Path.prototype.arc = function(aX, aY, aRadius,
 	var curve = new THREE.ArcCurve( aX, aY, aRadius,
 	                                 aStartAngle, aEndAngle, aClockwise );
 	this.curves.push( curve );
-	
+	console.log('arc', args);
 	this.actions.push( { action: THREE.PathActions.ARC, args: args } );
    
 
@@ -219,8 +219,6 @@ THREE.Path.prototype.getPoints = function( divisions ) {
 
 			for ( j = 1; j <= divisions; j ++ ) {
 
-				// TODO use LOD for divisions
-
 				t = j / divisions;
 
 				tx = THREE.FontUtils.b2( t, cpx0, cpx1, cpx );
@@ -295,22 +293,42 @@ THREE.Path.prototype.getPoints = function( divisions ) {
 			
 			laste = this.actions[ i - 1 ].args;
 			var aX = args[0], aY = args[1], aRadius = args[2],
-			            aStartAngle = args[3], aEndAngle = args[4], aClockwise = args[5];
+			            aStartAngle = args[3], aEndAngle = args[4], aClockwise = !!args[5];
 			
 			var lastx = laste[ laste.length - 2 ],
 				lasty = laste[ laste.length - 1 ] ;
 				
+			if (laste.length==0) {
+				lastx = lasty = 0;
+			}
+			
+			console.log(args, lastx, lasty);
+				
 			var deltaAngle = aEndAngle - aStartAngle;
 			var angle;
-			for ( j = 1; j <= divisions * 2; j ++ ) {
-				angle = aStartAngle + j/divisions/2 * deltaAngle;
+			var tdivisions = divisions * 2;
+			var t;
+			for ( j = 0; j < tdivisions; j ++ ) {
+			
+				t = j/tdivisions;
 				
+				//if (aClockwise) {
+			//		t = 1 - t;
+			//	}
+				
+				
+				angle = aStartAngle + t * deltaAngle;
+			
 				
 				 tx = lastx + aX + aRadius * Math.cos(angle);
 				 ty = lasty + aY + aRadius * Math.sin(angle);
+				
+					console.log('t', t, 'angle', angle, 'tx', tx, 'ty', ty);
 
 				points.push( new THREE.Vector2( tx, ty ) );
 			}
+			
+			console.log(points);
 
 		  break;
 

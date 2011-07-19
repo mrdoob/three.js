@@ -27,13 +27,16 @@ THREE.Shape.prototype.extrude = function( options ) {
 
 };
 
+/* Return array of holes' getPoints() */
 THREE.Shape.prototype.getHoles = function() {
+
 	var holesPts = [];
 	var i=0, il= this.holes.length;
-	for (; i<il; i++ ) {
-		holesPts[i] = this.holes[i].getSpacedPoints();
-	}
 
+	for (; i<il; i++ ) {
+		holesPts[i] = this.holes[i].getSpacedPoints(); //getSpacedPoints getPoints
+	}
+	
 	return holesPts;
 
 };

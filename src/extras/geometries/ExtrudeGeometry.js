@@ -33,16 +33,14 @@ THREE.ExtrudeGeometry = function( shape, options ) {
     var vertices = shape.getSpacedPoints(); // getPoints | getSpacedPoints() you can get variable divisions by dividing by total lenght
 	var reverse = THREE.FontUtils.Triangulate.area( vertices ) > 0 ;
 	if (reverse) {
-		//faces = THREE.FontUtils.Triangulate( vertices.reverse(), true );
 		vertices = vertices.reverse();
 		reverse = false;
 	}
 	
-	
 	var holes =  shape.getHoles();
 	
-	//var faces = THREE.Shape.Utils.triangulateShape(vertices, holes);	
-    var faces = THREE.Shape.Utils.triangulate2(vertices, holes);
+	var faces = THREE.Shape.Utils.triangulateShape(vertices, holes);
+    //var faces = THREE.Shape.Utils.triangulate2(vertices, holes);
 
 
 	//console.log(faces);
@@ -50,8 +48,9 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 	
 	var contour = vertices; // vertices has all points but contour has only points of circumference
 	
-	var ahole ;
-	for (var h in holes) {
+	var ahole, h, hl;
+	
+	for (h = 0, hl = holes.length;  h < hl; h++ ) {
 		ahole = holes[h];
 		vertices = vertices.concat(ahole);
 	}
@@ -70,7 +69,10 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 	var i,
 		vert, vlen = vertices.length,
 		face, flen = faces.length,
-		bevelPt, blen = bevelPoints.length;
+		cont, clen = contour.length,
+		hol, hlen;
+		
+	var	bevelPt, blen = bevelPoints.length;
 
 	// Back facing vertices
 
@@ -153,69 +155,62 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 
 	}
 
-	var lastV;
+	var tmpPt;
 	var j, k, l, m;
 
+	var layeroffset = 0;
+	
 	// Sides faces
+	
+	sidewalls(contour);
+	layeroffset += contour.length;
+	
+	for (h = 0, hl = holes.length;  h < hl; h++ ) {
+		ahole = holes[h];
+		sidewalls(ahole);
+		layeroffset += ahole.length;
+	}
+	
+	function sidewalls(contour) {
+	
+		i = contour.length;
 
-	//contour.push( contour[ 0 ] ); // in order not to check for boundary indices every time
+		while ( --i >= 0 ) {
 
-	i = contour.length;
+			tmpPt = contour[ i ];
 
-	while ( --i >= 0 ) {
 
-		lastV = contour[ i ];
 
-		// TO OPTIMISE. Reduce this step of checking vertices.
+			//TOREMOVE
+			//console.log('a', i,j, i-1, k);
 
-		/*
-		for ( j = 0; j < vlen; j++ ) {
+			j = i;
+		
+			k = i - 1;
 
-			if ( vertices[ j ].equals( contour[ i ] ) ) break;
+			if ( k < 0 ) k = contour.length - 1;
 
-		}
+			//console.log('b', i,j, i-1, k,vertices.length);
 
-		for ( k = 0; k < vlen; k++ ) {
+			// Create faces for the z-sides of the text
 
-			if ( vertices[ k ].equals( contour[ i - 1 ] ) ) break;
+			//f4( j, k, k + vlen, j + vlen );
 
-		}
-		*/
+	
+			var s = 0;
 
-		//TOREMOVE
-		//console.log('a', i,j, i-1, k);
+			for ( ; s < steps; s++ ) {
 
-		j = i;
-		//if (j==vertices.length) j = 0;
+				var slen1 = vlen * s;
+				var slen2 = vlen * ( s + 1 );
 
-		k = i - 1;
+				f4( layeroffset + j + slen1, layeroffset + k + slen1, layeroffset + k + slen2, layeroffset + j + slen2 );
 
-		if ( k < 0 ) k = contour.length - 1;
+			}
 
-		//console.log('b', i,j, i-1, k,vertices.length);
-
-		// Create faces for the z-sides of the text
-
-		//f4( j, k, k + vlen, j + vlen );
-
-		// Reverse
-		//f4( k, j, j + vlen, k + vlen);
-
-		//
-
-		var s = 0;
-
-		for ( ; s < steps; s++ ) {
-
-			var slen1 = vlen * s;
-			var slen2 = vlen * ( s + 1 );
-
-			f4( j + slen1, k + slen1, k + slen2, j + slen2 );
+			//
 
 		}
-
-		//
-
 	}
 
 
@@ -233,7 +228,7 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 
 	function f3( a, b, c ) {
 
-		if ( reverse ) {
+		if ( reverse ) { // Can be removed
 
 			scope.faces.push( new THREE.Face3( c, b, a ) );
 
