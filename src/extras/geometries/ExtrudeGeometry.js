@@ -8,10 +8,10 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 	var amount = options.amount !== undefined ? options.amount : 100;
 
 	// todo: bevel
-	var bevelThickness = options.bevelThickness !== undefined ? options.bevelThickness : 8; // 10
-	var bevelSize = options.bevelSize !== undefined ? options.bevelSize : 8; // 8 
+	var bevelThickness = options.bevelThickness !== undefined ? options.bevelThickness : 4; // 10
+	var bevelSize = options.bevelSize !== undefined ? options.bevelSize : 6; // 8 
 	var bevelEnabled = options.bevelEnabled !== undefined ? options.bevelEnabled : false;
-	var bevelSegments = 6;
+	var bevelSegments = 4;
 
 	var steps = options.steps !== undefined ? options.steps : 1;
 	var extrudePath = options.path !== undefined ? options.path : null;
@@ -195,7 +195,8 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 		// ****
 		t =  b / bevelSegments;
 		z = bevelThickness * t;
-		bs = bevelSize * t ;
+		bs = bevelSize * (1-Math.sin ((1-t) * Math.PI/2 )); //bevelSize * t ;
+		
 
 		//bs = Math.sqrt(- (t* t) - 2 * t * bevelThickness);
 		
@@ -224,7 +225,7 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 		
 			t =  b / bevelSegments;
 			z = bevelThickness * t;
-			bs = bevelSize * t;
+			bs = bevelSize * (1-Math.sin ((1-t) * Math.PI/2 )); 
 			
 			// contract shape
 			for ( i = 0, il = contour.length; i < il; i++ ) {
