@@ -103,6 +103,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 		_canvas.height = _canvasHeight;
 
 		_clipRect.set( - _canvasWidthHalf, - _canvasHeightHalf, _canvasWidthHalf, _canvasHeightHalf );
+		_clearRect.set( - _canvasWidthHalf, - _canvasHeightHalf, _canvasWidthHalf, _canvasHeightHalf );
 
 		_contextGlobalAlpha = 1;
 		_contextGlobalCompositeOperation = 0;
@@ -910,7 +911,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			det = u1 * v2 - u2 * v1;
 
-			if ( det == 0 ) return;
+			if ( /*Math.abs*/ ( det < 0 ? - det : det ) < 1 ) return;
 
 			idet = 1 / det;
 
@@ -986,15 +987,18 @@ THREE.CanvasRenderer = function ( parameters ) {
 		function expand( v1, v2 ) {
 
 			var x = v2.x - v1.x, y =  v2.y - v1.y,
-			unit = 1 / Math.sqrt( x * x + y * y );
+			det = x * x + y * y, idet;
 
-			x *= unit; y *= unit;
+			if ( det == 0 ) return;
+
+			idet = 1 / Math.sqrt( det );
+
+			x *= idet; y *= idet;
 
 			v2.x += x; v2.y += y;
 			v1.x -= x; v1.y -= y;
 
 		}
-
 	};
 
 	// Context cached methods.
