@@ -47,6 +47,8 @@ THREE.Path.prototype.fromPoints = function( vectors /*Array of Vector*/ ) {
 
 };
 
+// startPath() endPath()?
+
 THREE.Path.prototype.moveTo = function( x, y ) {
 
 	var args = Array.prototype.slice.call( arguments );
@@ -308,13 +310,13 @@ THREE.Path.prototype.getPoints = function( divisions ) {
 			var angle;
 			var tdivisions = divisions * 2;
 			var t;
-			for ( j = 0; j < tdivisions; j ++ ) {
+			for ( j = 1; j <= tdivisions; j ++ ) {
 			
 				t = j/tdivisions;
 				
-				//if (aClockwise) {
-			//		t = 1 - t;
-			//	}
+				if (!aClockwise) {
+					t = 1 - t;
+				}
 				
 				
 				angle = aStartAngle + t * deltaAngle;

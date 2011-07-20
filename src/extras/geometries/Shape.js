@@ -28,18 +28,44 @@ THREE.Shape.prototype.extrude = function( options ) {
 };
 
 /* Return array of holes' getPoints() */
-THREE.Shape.prototype.getHoles = function() {
-
+THREE.Shape.prototype.getHoles = function(spaced) {
+	
+	var getPoints;
+	if (spaced) {
+		getPoints = 'getSpacedPoints';
+	} else {
+		getPoints = 'getPoints';
+	}
 	var holesPts = [];
 	var i=0, il= this.holes.length;
 
 	for (; i<il; i++ ) {
-		holesPts[i] = this.holes[i].getSpacedPoints(); //getSpacedPoints getPoints
+		holesPts[i] = this.holes[i][getPoints](); //getSpacedPoints getPoints
 	}
 	
 	return holesPts;
 
 };
+
+/* Returns points of shape and holes 
+spaced, when true returns points spaced by regular distances
+otherwise return keypoints based on segments paramater
+*/
+THREE.Shape.prototype.extractAllPoints = function(spaced) {
+	
+	var getPoints;
+	if (spaced) {
+		getPoints = 'getSpacedPoints';
+	} else {
+		getPoints = 'getPoints';
+	}
+	
+	return {
+		shape: this[getPoints](),
+		holes: this.getHoles(spaced)
+	};
+}
+
 
 
 
@@ -70,6 +96,7 @@ THREE.Shape.Utils = {
 				verts = [];
 		
 		for (h = 0; h < holes.length; h++) {
+		//for ( h = holes.length; h-- > 0; ) {
 			hole = holes[h];
 			/*
 			shapeholes[h].concat(); // preserves original 
@@ -79,6 +106,7 @@ THREE.Shape.Utils = {
 			
 			shortest = Number.POSITIVE_INFINITY;
 			
+			// THIS THING NEEDS TO BE DONE CORRECTLY AGAIN :( 
 			
 			// Find the shortest pair of pts between shape and hole
 						
@@ -90,11 +118,12 @@ THREE.Shape.Utils = {
 			for ( h2 = 0; h2 < hole.length; h2++ ) {
 
 				pts1 = hole[ h2 ];
-
+				var dist = [];
 				for ( p = 0; p < shape.length; p++ ) {
 
 					pts2 = shape[ p ];
 					d = pts1.distanceTo( pts2 );
+					dist.push(d);
 
 					if ( d < shortest ) {
 
@@ -107,21 +136,25 @@ THREE.Shape.Utils = {
 				}
 
 			}
+			console.log("shortest", shortest, dist);
 
 			prevShapeVert = ( shapeIndex - 1 ) >= 0 ? shapeIndex - 1 : shape.length - 1;
 			prevHoleVert = ( holeIndex - 1 ) >= 0 ? holeIndex - 1 : hole.length - 1;
 			
-			var areaapts = [];
-			areaapts.push( hole[ holeIndex ] );
-			areaapts.push( shape[ shapeIndex ] );
-			areaapts.push( shape[ prevShapeVert ] );
+			var areaapts = [
+				hole[ holeIndex ], 
+				shape[ shapeIndex ],
+				shape[ prevShapeVert ]
+			];
+			
 
 			var areaa = THREE.FontUtils.Triangulate.area( areaapts );
 
-			var areabpts = [];
-			areabpts.push( hole[ holeIndex ] );
-			areabpts.push( hole[ prevHoleVert ] );
-			areabpts.push( shape[ shapeIndex ] );
+			var areabpts = [
+				hole[ holeIndex ],
+				hole[ prevHoleVert ],
+				shape[ shapeIndex ]
+			];
 
 			var areab = THREE.FontUtils.Triangulate.area( areabpts );
 
@@ -136,28 +169,32 @@ THREE.Shape.Utils = {
 			shapeIndex %= shape.length;
 
 			if ( holeIndex < 0 ) { holeIndex += hole.length;  }
-			holeIndex %= shape.length;
+			holeIndex %= hole.length;
 
 			prevShapeVert = ( shapeIndex - 1 ) >= 0 ? shapeIndex - 1 : shape.length - 1;
 			prevHoleVert = ( holeIndex - 1 ) >= 0 ? holeIndex - 1 : hole.length - 1;
 			
-			areaapts = [];
-			areaapts.push( hole[ holeIndex ] );
-			areaapts.push( shape[ shapeIndex ] );
-			areaapts.push( shape[ prevShapeVert ] );
-
+			areaapts = [
+				hole[ holeIndex ], 
+				shape[ shapeIndex ],
+				shape[ prevShapeVert ]
+			];
+			
 			var areaa2 = THREE.FontUtils.Triangulate.area( areaapts );
 
-			areabpts = [];
-			areabpts.push( hole[ holeIndex ] );
-			areabpts.push( hole[ prevHoleVert ] );
-			areabpts.push( shape[ shapeIndex ] );
+			areabpts = [
+				hole[ holeIndex ],
+				hole[ prevHoleVert ],
+				shape[ shapeIndex ]
+			];
 
 			var areab2 = THREE.FontUtils.Triangulate.area( areabpts );
+			console.log(areaa,areab ,areaa2,areab2, ( areaa + areab ),  ( areaa2 + areab2 ));
+
 
 			if ( ( areaa + areab ) > ( areaa2 + areab2 ) ) {
 				// In case areas are not correct. 
-				
+				console.log("USE THIS");
 				shapeIndex = oldShapeIndex;
 				holeIndex = oldHoleIndex ;
 
@@ -165,11 +202,13 @@ THREE.Shape.Utils = {
 				shapeIndex %= shape.length;
 
 				if ( holeIndex < 0 ) { holeIndex += hole.length;  }
-				holeIndex %= shape.length;
+				holeIndex %= hole.length;
 
 				prevShapeVert = ( shapeIndex - 1 ) >= 0 ? shapeIndex - 1 : shape.length - 1;
 				prevHoleVert = ( holeIndex - 1 ) >= 0 ? holeIndex - 1 : hole.length - 1;
 
+			} else {
+				console.log("USE THAT ")
 			}
 
 			tmpShape1 = shape.slice( 0, shapeIndex );
@@ -194,6 +233,7 @@ THREE.Shape.Utils = {
 			verts.push( triangleb );
 
 			shape = tmpShape1.concat( tmpHole1 ).concat( tmpHole2 ).concat( tmpShape2 );
+			//shape = tmpHole1.concat( tmpHole2 );
 			
 		}
 		
