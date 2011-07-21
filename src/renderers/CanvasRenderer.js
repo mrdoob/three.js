@@ -120,12 +120,16 @@ THREE.CanvasRenderer = function ( parameters ) {
 		_clearColor = color;
 		_clearOpacity = opacity;
 
+		_clearRect.set( - _canvasWidthHalf, - _canvasHeightHalf, _canvasWidthHalf, _canvasHeightHalf );
+
 	};
 
 	this.setClearColorHex = function( hex, opacity ) {
 
 		_clearColor.setHex( hex );
 		_clearOpacity = opacity;
+
+		_clearRect.set( - _canvasWidthHalf, - _canvasHeightHalf, _canvasWidthHalf, _canvasHeightHalf );
 
 	};
 
