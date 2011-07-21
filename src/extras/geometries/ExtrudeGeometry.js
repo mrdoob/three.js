@@ -8,16 +8,19 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 	var amount = options.amount !== undefined ? options.amount : 100;
 
 	// todo: bevel
+
 	var bevelThickness = options.bevelThickness !== undefined ? options.bevelThickness : 8; // 10
-	var bevelSize = options.bevelSize !== undefined ? options.bevelSize : bevelThickness; // 8 
+	var bevelSize = options.bevelSize !== undefined ? options.bevelSize : bevelThickness; // 8
 	var bevelEnabled = options.bevelEnabled !== undefined ? options.bevelEnabled : true; // false
 	var bevelSegments = options.bevelSegments !== undefined ? options.bevelSegments : 3;
+
 	// We should set bevel segments to 0 if bevel is not enabled.
-	if (!bevelEnabled) bevelSegments = 0 ;
-	
+
+	if ( !bevelEnabled ) bevelSegments = 0;
+
 
 	var steps = options.steps !== undefined ? options.steps : 1;
-	
+
 	var extrudePath = options.path !== undefined ? options.path : null;
 	var extrudePts, extrudeByPath = false;
 
@@ -28,102 +31,109 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 		extrudeByPath = true;
 
 	}
-	
+
 
 	// TODO, extrude by path's tangents? also via 3d path?
 
 	THREE.Geometry.call( this );
 
-	
 	// Variables initalization
+
 	var ahole, h, hl; // looping of holes
 	var scope = this;
 	var bevelPoints = [];
 
 
 	// getPoints
-	var shapePoints = shape.extractAllPoints(false);
 	// false for getPoints | true for getSpacedPoints() for points with equal divisions
-	
-    var vertices = shapePoints.shape; 
-	var holes =  shapePoints.holes;
-	
+
+	var shapePoints = shape.extractAllPoints( false );
+
+    var vertices = shapePoints.shape;
+	var holes = shapePoints.holes;
+
 	var reverse = !THREE.Shape.Utils.isClockWise( vertices ) ;
 
-	if (reverse) {
+	if ( reverse ) {
 
 		vertices = vertices.reverse();
-		
-		// Maybe we should also check if holes are in the opposite direction, just to be safe...
-		
-		for (h = 0, hl = holes.length;  h < hl; h++ ) {
-			
-			ahole = holes[h];
-			if (THREE.Shape.Utils.isClockWise(ahole)) {
-				
-				holes[h] = ahole.reverse();
-				
+
+		// Maybe we should also check if holes are in the opposite direction, just to be safe ...
+
+		for ( h = 0, hl = holes.length;  h < hl; h++ ) {
+
+			ahole = holes[ h ];
+
+			if ( THREE.Shape.Utils.isClockWise( ahole ) ) {
+
+				holes[ h ] = ahole.reverse();
+
 			}
+
 		}
-		
+
 		reverse = false; // If vertices are in order now, we shouldn't need to worry about them again (hopefully)!
+
 	}
-	
-	
-	
-	var faces = THREE.Shape.Utils.triangulateShape(vertices, holes);
-	//var faces = THREE.Shape.Utils.triangulate2(vertices, holes);
+
+
+	var faces = THREE.Shape.Utils.triangulateShape( vertices, holes );
+	//var faces = THREE.Shape.Utils.triangulate2( vertices, holes );
 
 	//console.log(faces);
-	
+
 	////
 	///   Handle Vertices
 	////
-	
+
 	var contour = vertices; // vertices has all points but contour has only points of circumference
-	
-	for (h = 0, hl = holes.length;  h < hl; h++ ) {
 
-		ahole = holes[h];
+	for ( h = 0, hl = holes.length;  h < hl; h ++ ) {
 
-		vertices = vertices.concat(ahole);
+		ahole = holes[ h ];
+
+		vertices = vertices.concat( ahole );
 
 	}
-	
+
 	// Find all centroids of shapes and holes
-	
-	var b;	
+
+	var i, il;
 	var sum = new THREE.Vector2();
-	var contourCentroid, holesCentroids;
-	
-	for (i=0, il = contour.length; i<il; i++) {
-		sum.addSelf(contour[i]);
+
+	for ( i = 0, il = contour.length; i < il; i ++ ) {
+
+		sum.addSelf( contour[ i ] );
+
 	}
-	
-	contourCentroid = sum.divideScalar( contour.length ) ;
-	
-	holesCentroids = [];
-	
-	
-	for (h=0, hl = holes.length; h<hl; h++) {
+
+	var contourCentroid = sum.divideScalar( contour.length );
+
+	var holesCentroids = [];
+
+	for ( h = 0, hl = holes.length; h < hl; h ++ ) {
+
 		sum = new THREE.Vector2();
-		ahole = holes[h];
-		
-		for (i=0, il = ahole.length; i<il; i++) {
-			sum.addSelf(ahole[i]);
+		ahole = holes[ h ];
+
+		for ( i=0, il = ahole.length; i < il; i ++ ) {
+
+			sum.addSelf( ahole[ i ] );
+
 		}
-		
-		holesCentroids[h] = sum.divideScalar( ahole.length ) ;
-		
+
+		holesCentroids[ h ] = sum.divideScalar( ahole.length );
+
 	}
-	
-	function scalePt (pt, centroid, size, expandOutwards /* Boolean */ ) {
-		vectorFromCentroid = pt.clone().subSelf( centroid );
-		adj = size / vectorFromCentroid.length();
+
+	function scalePt ( pt, centroid, size, expandOutwards /* Boolean */ ) {
+
+		var vectorFromCentroid = pt.clone().subSelf( centroid );
+		var adj = size / vectorFromCentroid.length();
 
 		if ( expandOutwards ) {
 
-			adj += 1;
+			adj = 1 + adj;
 
 		}  else {
 
@@ -132,57 +142,60 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 		}
 
 		return vectorFromCentroid.multiplyScalar( adj ).addSelf( centroid );
+
 	}
-	
 
 
-	var i,
+	var b, bs, t, z,
 		vert, vlen = vertices.length,
 		face, flen = faces.length,
-		cont, clen = contour.length,
-		hol, hlen;
-		
+		cont, clen = contour.length;
 
-	var bs;
-	
 	// Loop bevelSegments, 1 for the front, 1 for the back
-	
-	for (b=bevelSegments; b > 0; b--) {
-		t =  b / bevelSegments;
+
+	for ( b = bevelSegments; b > 0; b-- ) {
+
+		t = b / bevelSegments;
 		z = bevelThickness * t;
+
 		// Formula could probably be simplified
-		bs = bevelSize * (1-Math.sin ((1-t) * Math.PI/2 )) ; //bevelSize * t ;
+
+		bs = bevelSize * ( 1 - Math.sin ( ( 1 - t ) * Math.PI/2 ) ) ; // bevelSize * t ;
 
 		// contract shape
-		for ( i = 0, il = contour.length; i < il; i++ ) {
-			
-			vert = scalePt(contour[i], contourCentroid, bs , false);
-			v( vert.x, vert.y,  -z);
-			
+
+		for ( i = 0, il = contour.length; i < il; i ++ ) {
+
+			vert = scalePt( contour[ i ], contourCentroid, bs, false );
+			v( vert.x, vert.y, -z );
+
 		}
-		
+
 		// expand holes
+
 		for ( h = 0, hl = holes.length; h < hl; h++ ) {
-			
-			ahole = holes[h];
+
+			ahole = holes[ h ];
+
 			for ( i = 0, il = ahole.length; i < il; i++ ) {
-				vert = scalePt(ahole[i], holesCentroids[h] , bs , true);	
-				v( vert.x, vert.y,  -z);
+
+				vert = scalePt( ahole[ i ], holesCentroids[ h ], bs, true );
+				v( vert.x, vert.y,  -z );
+
 			}
-			
+
 		}
-		
+
 	}
-	
-	
+
+
 	// Back facing vertices
 
 	for ( i = 0; i < vlen; i++ ) {
 
 		vert = vertices[ i ];
 		//v( vert.x, vert.y, 0 );
-		
-		
+
 		if ( !extrudeByPath ) {
 
 			v( vert.x, vert.y, 0 );
@@ -195,11 +208,12 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 
 	}
 
-	// Add steped vertices...
+	// Add stepped vertices...
 	// Including front facing vertices
 
-	var s = 1;
-	for ( ; s <= steps; s++ ) {
+	var s;
+
+	for ( s = 1; s <= steps; s++ ) {
 
 		for ( i = 0; i < vlen; i ++ ) {
 
@@ -218,76 +232,79 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 		}
 
 	}
-	
-	
-	// Add Bevel Segments planes
-
-	for (b=1; b <= bevelSegments; b++) {
-		
-			t =  b / bevelSegments;
-			z = bevelThickness * t;
-			bs = bevelSize * (1-Math.sin ((1-t) * Math.PI/2 )); 
-			
-			// contract shape
-			for ( i = 0, il = contour.length; i < il; i++ ) {
-
-				vert = scalePt(contour[i], contourCentroid, bs , false);
-				v( vert.x, vert.y,  amount + z);
-
-			}
-
-			// expand holes
-			for ( h = 0, hl = holes.length; h < hl; h++ ) {
-
-				ahole = holes[h];
-				for ( i = 0, il = ahole.length; i < il; i++ ) {
-					vert = scalePt(ahole[i], holesCentroids[h] , bs , true);
-					
-					if ( !extrudeByPath ) {
-
-						v( vert.x, vert.y,  amount + z);
-
-					} else {
-
-						v( vert.x, vert.y + extrudePts[ steps - 1 ].y, extrudePts[ steps - 1 ].x +z);
-
-					}
-					
-				}
-
-			}
-		
-	}
-	
 
 
+	// Add bevel segments planes
 
-	
-	////
-	///   Handle Faces
-	////
-	
+	for ( b = 1; b <= bevelSegments; b++ ) {
 
-	// Bottom faces
-	if (bevelEnabled ) {
-		
-		
-		var layer = 0 ; //steps + 1
-		var offset = vlen * layer;
-		
-		for ( i = 0; i < flen; i++ ) {
+		t = b / bevelSegments;
+		z = bevelThickness * t;
+		bs = bevelSize * ( 1-Math.sin ( ( 1 - t ) * Math.PI/2 ) );
 
-			face = faces[ i ];
-			f3( face[ 2 ]+ offset, face[ 1 ]+ offset, face[ 0 ] + offset);
+		// contract shape
+
+		for ( i = 0, il = contour.length; i < il; i++ ) {
+
+			vert = scalePt( contour[ i ], contourCentroid, bs, false );
+			v( vert.x, vert.y,  amount + z);
 
 		}
 
-		layer = steps + bevelSegments* 2;
+		// expand holes
+
+		for ( h = 0, hl = holes.length; h < hl; h++ ) {
+
+			ahole = holes[ h ];
+
+			for ( i = 0, il = ahole.length; i < il; i++ ) {
+
+				vert = scalePt( ahole[ i ], holesCentroids[h], bs, true );
+
+				if ( !extrudeByPath ) {
+
+					v( vert.x, vert.y,  amount + z );
+
+				} else {
+
+					v( vert.x, vert.y + extrudePts[ steps - 1 ].y, extrudePts[ steps - 1 ].x +z );
+
+				}
+
+			}
+
+		}
+
+	}
+
+
+	////
+	///   Handle Faces
+	////
+
+	// not used anywhere
+	// var layers = ( steps + bevelSegments * 2 ) * vlen;
+
+	// Bottom faces
+
+	if ( bevelEnabled ) {
+
+		var layer = 0 ; // steps + 1
+		var offset = vlen * layer;
+
+		for ( i = 0; i < flen; i ++ ) {
+
+			face = faces[ i ];
+			f3( face[ 2 ]+ offset, face[ 1 ]+ offset, face[ 0 ] + offset );
+
+		}
+
+		layer = steps + bevelSegments * 2;
 		offset = vlen * layer;
-		
+
 		// Top faces
-		var layers = (steps + bevelSegments * 2)  * vlen; 
-		for ( i = 0; i < flen; i++ ) {
+
+		for ( i = 0; i < flen; i ++ ) {
 
 			face = faces[ i ];
 			f3( face[ 0 ] + offset, face[ 1 ] + offset, face[ 2 ] + offset );
@@ -304,35 +321,40 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 		}
 
 		// Top faces
-		var layers = (steps + bevelSegments * 2)  * vlen; 
-		for ( i = 0; i < flen; i++ ) {
+
+		for ( i = 0; i < flen; i ++ ) {
 
 			face = faces[ i ];
-			f3( face[ 0 ] + vlen* steps, face[ 1 ] + vlen * steps, face[ 2 ] + vlen * steps );
+			f3( face[ 0 ] + vlen * steps, face[ 1 ] + vlen * steps, face[ 2 ] + vlen * steps );
 
 		}
+
 	}
 
 	var tmpPt;
 	var j, k, l, m;
 
 	var layeroffset = 0;
-	
+
 	// Sides faces
-	
-	sidewalls(contour);
+
+	sidewalls( contour );
 	layeroffset += contour.length;
-	
-	for (h = 0, hl = holes.length;  h < hl; h++ ) {
-		ahole = holes[h];
-		sidewalls(ahole); 
+
+	for ( h = 0, hl = holes.length;  h < hl; h ++ ) {
+
+		ahole = holes[ h ];
+		sidewalls( ahole );
+
 		//, true
 		layeroffset += ahole.length;
+
 	}
 
-	// Create faces for the z-sides of the shape	
-	function sidewalls(contour) {
-	
+	// Create faces for the z-sides of the shape
+
+	function sidewalls( contour ) {
+
 		i = contour.length;
 
 		while ( --i >= 0 ) {
@@ -340,7 +362,6 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 			tmpPt = contour[ i ];
 
 			j = i;
-		
 			k = i - 1;
 
 			if ( k < 0 ) k = contour.length - 1;
@@ -349,20 +370,19 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 
 			var s = 0;
 
-			for ( ; s < (steps  + bevelSegments * 2) ; s++ ) {
+			for ( s = 0; s < ( steps  + bevelSegments * 2 ); s ++ ) {
 
 				var slen1 = vlen * s;
 				var slen2 = vlen * ( s + 1 );
-		
-			
+
 				f4( layeroffset + j + slen1, layeroffset + k + slen1, layeroffset + k + slen2, layeroffset + j + slen2 );
-				
 
 			}
 
 		}
+
 	}
-	
+
 	// UVs to be added
 
 	this.computeCentroids();
@@ -378,13 +398,13 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 	function f3( a, b, c ) {
 
 		// if ( reverse ) { // Can now be removed
-		// 
+		//
 		// 		scope.faces.push( new THREE.Face3( c, b, a ) );
-		// 
+		//
 		// 	} else {
-		// 
+		//
 		 		scope.faces.push( new THREE.Face3( a, b, c ) );
-		// 
+		//
 		// 	}
 
 	}

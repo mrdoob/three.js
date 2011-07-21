@@ -62,13 +62,18 @@
 
 				scene = new THREE.Scene();
 
+				var light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( 0, 0, 1 );
+				light.position.normalize();
+				scene.addLight( light );
+
 				parent = new THREE.Object3D();
 				parent.position.y = 50;
 				scene.addChild( parent );
 
 				function addGeometry( geometry, color, x, y, z, rx, ry, rz, s ) {
 
-					var mesh = new THREE.Mesh( geometry, [ new THREE.MeshBasicMaterial( { color: color } ), new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true } ) ] );
+					var mesh = new THREE.Mesh( geometry, [ new THREE.MeshLambertMaterial( { color: color } ), new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true } ) ] );
 					mesh.position.set( x, y, z );
 					mesh.rotation.set( rx, ry, rz );
 					mesh.scale.set( s, s, s );
@@ -76,7 +81,7 @@
 
 				}
 
-				var extrudeSettings = {	amount: 20,  bevelEnabled: true, bevelSegments: 2, steps: 2 }; //amount: 40, steps: 2 
+				var extrudeSettings = {	amount: 20,  bevelEnabled: true, bevelSegments: 2, steps: 2 }; //amount: 40, steps: 2
 
 				// California
 
@@ -210,20 +215,21 @@
 				fishShape.quadraticCurveTo( x + 50, y - 80, x, y );
 
 				var fish3d = fishShape.extrude( extrudeSettings );
-				
+
 				// Arc Circle
+
 				var arcShape = new THREE.Shape();
 				arcShape.moveTo( 0, 0);
-				arcShape.arc(10,10, 40, 0, Math.PI*2,false);
-				
+				arcShape.arc( 10, 10, 40, 0, Math.PI*2, false );
+
 				var holePath = new THREE.Path();
-				holePath.moveTo( 0, 0);
-				holePath.arc(10, 10, 10, 0, Math.PI*2, true);
-				arcShape.holes.push(holePath);
-				
+				holePath.moveTo( 0, 0 );
+				holePath.arc( 10, 10, 10, 0, Math.PI*2, true );
+				arcShape.holes.push( holePath );
+
 				var arc3d = arcShape.extrude( extrudeSettings );
 
-				// Spline shape + Path Extrusion
+				// Spline shape + path extrusion
 
 				var splinepts = [];
 				splinepts.push( new THREE.Vector2 ( 350, 100 ) );
@@ -239,7 +245,7 @@
 
 				var extrudePath = new THREE.Path();
 
-				extrudePath.moveTo(0,0);
+				extrudePath.moveTo( 0, 0 );
 				extrudePath.lineTo( 10, 10 );
 				extrudePath.quadraticCurveTo( 80, 60, 160, 10 );
 				extrudePath.quadraticCurveTo( 240, -40, 320, 10 );
@@ -259,7 +265,7 @@
 				addGeometry( splineShape3d, 		0x888888,  -50,  -100, -50,     0, 0, 0, 0.2 );
 				addGeometry( arc3d, 		0xbb4422,  150,    0, 0,     0, 0, 0, 1 );
 
-				renderer = new THREE.CanvasRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
                 renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.appendChild( renderer.domElement );

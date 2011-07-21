@@ -426,7 +426,7 @@ THREE.Path.prototype.getPoint = function( t ) {
 
 	while ( i < curveLengths.length ) {
 
-		if ( curveLengths[ i ] >= d) {
+		if ( curveLengths[ i ] >= d ) {
 
 			diff = curveLengths[ i ] - d;
 			curve = this.curves[ i ];
@@ -488,7 +488,7 @@ THREE.Path.prototype.createPathGeometry = function( divisions, lineMaterial ) {
 
         var pathSegment = new THREE.Geometry();
         pathSegment.vertices.push( new THREE.Vertex( new THREE.Vector3( pts[i-1].x, pts[i-1].y, 0 ) ) );
-        pathSegment.vertices.push( new THREE.Vertex( new THREE.Vector3( pts[i].x, pts[i].y, 0) ) );
+        pathSegment.vertices.push( new THREE.Vertex( new THREE.Vector3( pts[i].x, pts[i].y, 0 ) ) );
         segment = new THREE.Line( pathSegment , lineMaterial );
         pathGeometry.addChild(segment);
 
