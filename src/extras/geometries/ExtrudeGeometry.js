@@ -3,7 +3,7 @@
  * Creates extruded geometry from a path shape.
  **/
 
-THREE.ExtrudeGeometry = function( shape, options ) {
+THREE.ExtrudeGeometry = function ( shape, options ) {
 
 	var amount = options.amount !== undefined ? options.amount : 100;
 
@@ -43,11 +43,7 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 	var scope = this;
 	var bevelPoints = [];
 
-
-	// getPoints
-	// false for getPoints | true for getSpacedPoints() for points with equal divisions
-
-	var shapePoints = shape.extractAllPoints( false );
+	var shapePoints = shape.extractAllPoints(); // use shape.extractAllSpacedPoints() for points with equal divisions
 
     var vertices = shapePoints.shape;
 	var holes = shapePoints.holes;
@@ -60,7 +56,7 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 
 		// Maybe we should also check if holes are in the opposite direction, just to be safe ...
 
-		for ( h = 0, hl = holes.length;  h < hl; h++ ) {
+		for ( h = 0, hl = holes.length;  h < hl; h ++ ) {
 
 			ahole = holes[ h ];
 
@@ -77,7 +73,7 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 	}
 
 
-	var faces = THREE.Shape.Utils.triangulateShape( vertices, holes );
+	var faces = THREE.Shape.Utils.triangulateShape ( vertices, holes );
 	//var faces = THREE.Shape.Utils.triangulate2( vertices, holes );
 
 	//console.log(faces);
@@ -153,7 +149,7 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 
 	// Loop bevelSegments, 1 for the front, 1 for the back
 
-	for ( b = bevelSegments; b > 0; b-- ) {
+	for ( b = bevelSegments; b > 0; b -- ) {
 
 		t = b / bevelSegments;
 		z = bevelThickness * t;
@@ -191,7 +187,7 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 
 	// Back facing vertices
 
-	for ( i = 0; i < vlen; i++ ) {
+	for ( i = 0; i < vlen; i ++ ) {
 
 		vert = vertices[ i ];
 		//v( vert.x, vert.y, 0 );
@@ -213,7 +209,7 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 
 	var s;
 
-	for ( s = 1; s <= steps; s++ ) {
+	for ( s = 1; s <= steps; s ++ ) {
 
 		for ( i = 0; i < vlen; i ++ ) {
 
@@ -221,7 +217,7 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 
 			if ( !extrudeByPath ) {
 
-				v( vert.x, vert.y, amount/steps * s );
+				v( vert.x, vert.y, amount / steps * s );
 
 			} else {
 
@@ -236,7 +232,7 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 
 	// Add bevel segments planes
 
-	for ( b = 1; b <= bevelSegments; b++ ) {
+	for ( b = 1; b <= bevelSegments; b ++ ) {
 
 		t = b / bevelSegments;
 		z = bevelThickness * t;

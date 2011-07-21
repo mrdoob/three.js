@@ -33,7 +33,7 @@ THREE.PathActions = {
 // Create path using straight lines to connect all points
 // - vectors: array of Vector2
 
-THREE.Path.prototype.fromPoints = function( vectors ) {
+THREE.Path.prototype.fromPoints = function ( vectors ) {
 
 	this.moveTo( vectors[ 0 ].x, vectors[ 0 ].y );
 
@@ -49,14 +49,14 @@ THREE.Path.prototype.fromPoints = function( vectors ) {
 
 // startPath() endPath()?
 
-THREE.Path.prototype.moveTo = function( x, y ) {
+THREE.Path.prototype.moveTo = function ( x, y ) {
 
 	var args = Array.prototype.slice.call( arguments );
 	this.actions.push( { action: THREE.PathActions.MOVE_TO, args: args } );
 
 };
 
-THREE.Path.prototype.lineTo = function( x, y ) {
+THREE.Path.prototype.lineTo = function ( x, y ) {
 
 	var args = Array.prototype.slice.call( arguments );
 
@@ -86,8 +86,8 @@ THREE.Path.prototype.quadraticCurveTo = function( aCPx, aCPy, aX, aY ) {
 
 	this.actions.push( { action: THREE.PathActions.QUADRATIC_CURVE_TO, args: args, curve: curve } );
 
-	//console.log(curve, curve.getPoints(), curve.getSpacedPoints());
-	//console.log(curve.getPointAt(0), curve.getPointAt(0),curve.getUtoTmapping(0), curve.getSpacedPoints());
+	//console.log( curve, curve.getPoints(), curve.getSpacedPoints() );
+	//console.log( curve.getPointAt(0), curve.getPointAt(0), curve.getUtoTmapping(0), curve.getSpacedPoints() );
 
 };
 
@@ -134,8 +134,8 @@ THREE.Path.prototype.splineThru = function( pts /*Array of Vector*/ ) {
 // FUTURE: Change the API or follow canvas API?
 // TODO ARC ( x, y, x - radius, y - radius, startAngle, endAngle )
 
-THREE.Path.prototype.arc = function(aX, aY, aRadius,
-									aStartAngle, aEndAngle, aClockwise ) {
+THREE.Path.prototype.arc = function ( aX, aY, aRadius,
+									  aStartAngle, aEndAngle, aClockwise ) {
 
 	var args = Array.prototype.slice.call( arguments );
 	var curve = new THREE.ArcCurve( aX, aY, aRadius,
@@ -162,7 +162,7 @@ THREE.Path.prototype.arc = function(aX, aY, aRadius,
 */
 
 
-THREE.Path.prototype.getSpacedPoints = function( divisions ) {
+THREE.Path.prototype.getSpacedPoints = function ( divisions ) {
 
 	if ( !divisions ) divisions = 40;
 
@@ -369,7 +369,7 @@ THREE.Path.prototype.getPoints = function( divisions ) {
 
 };
 
-THREE.Path.prototype.getMinAndMax = function() {
+THREE.Path.prototype.getMinAndMax = function () {
 
 	var points = this.getPoints();
 

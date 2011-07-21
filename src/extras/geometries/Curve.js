@@ -17,7 +17,7 @@
  *	Abstract Curve base class
  **************************************************************/
 
-THREE.Curve = function() {
+THREE.Curve = function () {
 
 };
 
@@ -88,7 +88,7 @@ THREE.Curve.prototype.getLength = function () {
 
 // Get list of cumulative segment lengths
 
-THREE.Curve.prototype.getLengths = function( divisions ) {
+THREE.Curve.prototype.getLengths = function ( divisions ) {
 
 	if ( !divisions ) divisions = 200;
 
@@ -119,7 +119,7 @@ THREE.Curve.prototype.getLengths = function( divisions ) {
 
 // Given u ( 0 .. 1 ), get a t to find p. This gives you points which are equi distance
 
-THREE.Curve.prototype.getUtoTmapping = function( u, distance ) {
+THREE.Curve.prototype.getUtoTmapping = function ( u, distance ) {
 
 	var lengths = this.getLengths();
 	var i = 0, il = lengths.length;
