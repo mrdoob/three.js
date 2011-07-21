@@ -136,7 +136,7 @@ THREE.Shape.Utils = {
 				}
 
 			}
-			console.log("shortest", shortest, dist);
+			//console.log("shortest", shortest, dist);
 
 			prevShapeVert = ( shapeIndex - 1 ) >= 0 ? shapeIndex - 1 : shape.length - 1;
 			prevHoleVert = ( holeIndex - 1 ) >= 0 ? holeIndex - 1 : hole.length - 1;
@@ -189,12 +189,12 @@ THREE.Shape.Utils = {
 			];
 
 			var areab2 = THREE.FontUtils.Triangulate.area( areabpts );
-			console.log(areaa,areab ,areaa2,areab2, ( areaa + areab ),  ( areaa2 + areab2 ));
+			//console.log(areaa,areab ,areaa2,areab2, ( areaa + areab ),  ( areaa2 + areab2 ));
 
 
 			if ( ( areaa + areab ) > ( areaa2 + areab2 ) ) {
 				// In case areas are not correct. 
-				console.log("USE THIS");
+				//console.log("USE THIS");
 				shapeIndex = oldShapeIndex;
 				holeIndex = oldHoleIndex ;
 
@@ -208,7 +208,7 @@ THREE.Shape.Utils = {
 				prevHoleVert = ( holeIndex - 1 ) >= 0 ? holeIndex - 1 : hole.length - 1;
 
 			} else {
-				console.log("USE THAT ")
+				//console.log("USE THAT ")
 			}
 
 			tmpShape1 = shape.slice( 0, shapeIndex );
@@ -295,7 +295,7 @@ THREE.Shape.Utils = {
 		return triangles.concat(isolatedPts);
 	
 	}, // end triangulate shapes
-	
+	/*
 	triangulate2 : function(pts, holes) {
 		// For use Poly2Tri.js 
 	
@@ -348,6 +348,10 @@ THREE.Shape.Utils = {
 
 		// Returns array of faces with 3 element each
 	return facesPts;
+	},*/
+	
+	isClockWise: function (pts) {
+		return THREE.FontUtils.Triangulate.area( pts ) < 0 
 	}
 	
 };

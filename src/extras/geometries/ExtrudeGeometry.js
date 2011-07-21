@@ -11,7 +11,7 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 	var bevelThickness = options.bevelThickness !== undefined ? options.bevelThickness : 8; // 10
 	var bevelSize = options.bevelSize !== undefined ? options.bevelSize : bevelThickness; // 8 
 	var bevelEnabled = options.bevelEnabled !== undefined ? options.bevelEnabled : true; // false
-	var bevelSegments = options.bevelSegments !== undefined ? options.bevelSegments : 6;
+	var bevelSegments = options.bevelSegments !== undefined ? options.bevelSegments : 3;
 	// We should set bevel segments to 0 if bevel is not enabled.
 	if (!bevelEnabled) bevelSegments = 0 ;
 	
@@ -43,25 +43,23 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 
 	// getPoints
 	var shapePoints = shape.extractAllPoints(false);
-	// getPoints | getSpacedPoints() you can get variable divisions by dividing by total length
+	// false for getPoints | true for getSpacedPoints() for points with equal divisions
 	
     var vertices = shapePoints.shape; 
 	var holes =  shapePoints.holes;
 	
-
-	var reverse = THREE.FontUtils.Triangulate.area( vertices ) > 0 ;
-
+	var reverse = !THREE.Shape.Utils.isClockWise( vertices ) ;
 
 	if (reverse) {
 
 		vertices = vertices.reverse();
 		
-		// Maybe we should also check if holes are in the opposite direction...
+		// Maybe we should also check if holes are in the opposite direction, just to be safe...
 		
 		for (h = 0, hl = holes.length;  h < hl; h++ ) {
 			
 			ahole = holes[h];
-			if (THREE.FontUtils.Triangulate.area(ahole) < 0 ) {
+			if (THREE.Shape.Utils.isClockWise(ahole)) {
 				
 				holes[h] = ahole.reverse();
 				
@@ -73,10 +71,8 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 	
 	
 	
-	//var faces = THREE.Shape.Utils.triangulateShape(vertices, holes);
-    
-	var faces = THREE.Shape.Utils.triangulate2(vertices, holes);
-
+	var faces = THREE.Shape.Utils.triangulateShape(vertices, holes);
+	//var faces = THREE.Shape.Utils.triangulate2(vertices, holes);
 
 	//console.log(faces);
 	
@@ -273,7 +269,7 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 	
 
 	// Bottom faces
-	if (true||  bevelEnabled ) {
+	if (bevelEnabled ) {
 		
 		
 		var layer = 0 ; //steps + 1
@@ -333,7 +329,8 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 		//, true
 		layeroffset += ahole.length;
 	}
-	
+
+	// Create faces for the z-sides of the shape	
 	function sidewalls(contour) {
 	
 		i = contour.length;
@@ -346,17 +343,10 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 		
 			k = i - 1;
 
-			//TOREMOVE
-
 			if ( k < 0 ) k = contour.length - 1;
 
 			//console.log('b', i,j, i-1, k,vertices.length);
 
-			// Create faces for the z-sides of the text
-
-			//f4( j, k, k + vlen, j + vlen );
-
-	
 			var s = 0;
 
 			for ( ; s < (steps  + bevelSegments * 2) ; s++ ) {
@@ -364,44 +354,11 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 				var slen1 = vlen * s;
 				var slen2 = vlen * ( s + 1 );
 		
-				
-
+			
 				f4( layeroffset + j + slen1, layeroffset + k + slen1, layeroffset + k + slen2, layeroffset + j + slen2 );
 				
 
 			}
-			/*
-
-			// if we have bevel in the correct order, we could potentially do everything in a loop.
-			for ( s = steps + 1; s < (steps + bevelSegments) ; s++ ) {
-
-				var slen1 = vlen * s;
-				
-				var slen2 = vlen * ( s + 1 );
-				if ( (s+1)==(steps + bevelSegments) ) {
-					slen2 = vlen * 0;
-				}
-
-				f4( layeroffset + j + slen1, layeroffset + k + slen1, layeroffset + k + slen2, layeroffset + j + slen2 );
-			
-			}
-			
-			// if we have bevel in the correct order, we could potentially do everything in a loop.
-			for ( s =  (steps + bevelSegments * 2); s > (steps + bevelSegments) ; s-- ) {
-
-				var slen1 = vlen * s;
-				
-				var slen2 = vlen * ( s -1 );
-				if ( (s )==(steps + bevelSegments) ) {
-					slen2 = vlen * steps;
-				}
-
-				f4( layeroffset + j + slen1, layeroffset + k + slen1, layeroffset + k + slen2, layeroffset + j + slen2 );
-			
-			}
-			*/
-
-			//
 
 		}
 	}

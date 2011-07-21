@@ -76,7 +76,7 @@
 
 				}
 
-				var extrudeSettings = {	amount: 20 };
+				var extrudeSettings = {	amount: 20,  bevelEnabled: true, bevelSegments: 2, steps: 2 }; //amount: 40, steps: 2 
 
 				// California
 
@@ -210,6 +210,18 @@
 				fishShape.quadraticCurveTo( x + 50, y - 80, x, y );
 
 				var fish3d = fishShape.extrude( extrudeSettings );
+				
+				// Arc Circle
+				var arcShape = new THREE.Shape();
+				arcShape.moveTo( 0, 0);
+				arcShape.arc(10,10, 40, 0, Math.PI*2,false);
+				
+				var holePath = new THREE.Path();
+				holePath.moveTo( 0, 0);
+				holePath.arc(10, 10, 10, 0, Math.PI*2, true);
+				arcShape.holes.push(holePath);
+				
+				var arc3d = arcShape.extrude( extrudeSettings );
 
 				// Spline shape + Path Extrusion
 
@@ -227,11 +239,13 @@
 
 				var extrudePath = new THREE.Path();
 
+				extrudePath.moveTo(0,0);
 				extrudePath.lineTo( 10, 10 );
 				extrudePath.quadraticCurveTo( 80, 60, 160, 10 );
 				extrudePath.quadraticCurveTo( 240, -40, 320, 10 );
 
 				extrudeSettings.path = extrudePath;
+				extrudeSettings.bevelEnabled = false;
 
 				var splineShape3d = splineShape.extrude( extrudeSettings );
 
@@ -240,9 +254,10 @@
 				addGeometry( roundedRect3d, 0x005500, -150,  150, 0,     0, 0, 0, 1 );
 				addGeometry( square3d, 		0x0055ff,  150,  100, 0,     0, 0, 0, 1 );
 				addGeometry( heart3d, 		0xff1100,    0,  100, 0,   3.14, 0, 0, 1 );
-				addGeometry( circle3d, 		0x00ff11,  150,    0, 0,     0, 0, 0, 1 );
+				addGeometry( circle3d, 		0x00ff11,  120,  250, 0,     0, 0, 0, 1 );
 				addGeometry( fish3d, 		0x222222,  -50,  200, 0,     0, 0, 0, 1 );
-				addGeometry( splineShape3d, 0x888888,  -50,  -100, -50,     0, 0, 0, 0.2 );
+				addGeometry( splineShape3d, 		0x888888,  -50,  -100, -50,     0, 0, 0, 0.2 );
+				addGeometry( arc3d, 		0xbb4422,  150,    0, 0,     0, 0, 0, 1 );
 
 				renderer = new THREE.CanvasRenderer();
                 renderer.setSize( window.innerWidth, window.innerHeight );

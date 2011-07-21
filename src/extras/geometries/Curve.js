@@ -226,7 +226,7 @@ THREE.ArcCurve = function ( aX, aY, aRadius,
 	this.aRadius = aRadius;
 	this.aStartAngle = aStartAngle;
 	this.aEndAngle = aEndAngle;
-	this.aClockwise;
+	this.aClockwise = aClockwise;
 };
 
 THREE.ArcCurve.prototype = new THREE.Curve();
@@ -238,7 +238,7 @@ THREE.ArcCurve.prototype.constructor = THREE.ArcCurve;
 THREE.ArcCurve.prototype.getPoint = function ( t /* between 0 .. 1 */) {
 			
 	var deltaAngle = this.aEndAngle - this.aStartAngle;
-	if (this.aClockwise) {
+	if (!this.aClockwise) {
 		t = 1 - t;
 	}
 	var angle = this.aStartAngle + t * deltaAngle;

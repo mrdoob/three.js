@@ -131,7 +131,7 @@ THREE.Path.prototype.arc = function(aX, aY, aRadius,
 	var curve = new THREE.ArcCurve( aX, aY, aRadius,
 	                                 aStartAngle, aEndAngle, aClockwise );
 	this.curves.push( curve );
-	console.log('arc', args);
+	//console.log('arc', args);
 	this.actions.push( { action: THREE.PathActions.ARC, args: args } );
    
 
@@ -304,7 +304,6 @@ THREE.Path.prototype.getPoints = function( divisions ) {
 				lastx = lasty = 0;
 			}
 			
-			console.log(args, lastx, lasty);
 				
 			var deltaAngle = aEndAngle - aStartAngle;
 			var angle;
@@ -325,12 +324,12 @@ THREE.Path.prototype.getPoints = function( divisions ) {
 				 tx = lastx + aX + aRadius * Math.cos(angle);
 				 ty = lasty + aY + aRadius * Math.sin(angle);
 				
-					console.log('t', t, 'angle', angle, 'tx', tx, 'ty', ty);
+				//console.log('t', t, 'angle', angle, 'tx', tx, 'ty', ty);
 
 				points.push( new THREE.Vector2( tx, ty ) );
 			}
 			
-			console.log(points);
+			//console.log(points);
 
 		  break;
 
