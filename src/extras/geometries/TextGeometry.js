@@ -666,15 +666,20 @@ THREE.FontUtils = {
 
 		var fontPaths = [];
 
+		var path = new THREE.Path();
 		for ( i = 0; i < length; i++ ) {
-
-			var ret = this.extractGlyphPoints( chars[ i ], face, scale, offset );
+			
+			var ret = this.extractGlyphPoints( chars[ i ], face, scale, offset, path );
 			offset += ret.offset;
 			characterPts.push( ret.points );
 			allPts = allPts.concat( ret.points );
-			fontPaths.push( ret.path );
-
+			//fontPaths.push( ret.path );
+			
 		}
+		
+		//path.debug(document.getElementById("boo"));
+		console.log(path);
+		
 
 		// get the width
 
@@ -849,10 +854,10 @@ THREE.FontUtils = {
 	},
 
 
-	extractGlyphPoints : function( c, face, scale, offset ) {
+	extractGlyphPoints : function( c, face, scale, offset, path ) {
 
 		var pts = [];
-		var path = new THREE.Path();
+		
 
 
 		var i, i2,
@@ -875,7 +880,7 @@ THREE.FontUtils = {
 			for ( i = 0; i < length; ) {
 
 				action = outline[ i++ ];
-
+				//console.log(action);
 				switch( action ) {
 
 				case 'm':
@@ -941,7 +946,7 @@ THREE.FontUtils = {
 					cpx2 = outline[ i++ ] *  scaleX + offset;
 					cpy2 = outline[ i++ ] * -scaleY;
 
-					path.quadraticCurveTo( cpx, cpy, cpx1, cpy1, cpx2, cpy2 );
+					path.bezierCurveTo( cpx, cpy, cpx1, cpy1, cpx2, cpy2 );
 
 					laste = pts[ pts.length - 1 ];
 
@@ -968,8 +973,7 @@ THREE.FontUtils = {
 			}
 		}
 
-		path.debug(document.getElementById("boo"));
-		console.log(path);
+
 
 		return { offset: glyph.ha*scale, points:pts, path:path};
 	}
@@ -1065,9 +1069,15 @@ THREE.FontUtils = {
 
 				/* output Triangle */
 
+				/*
 				result.push( contour[ a ] );
 				result.push( contour[ b ] );
 				result.push( contour[ c ] );
+				*/
+				result.push( [ contour[ a ], 
+					contour[ b ],
+					contour[ c ] ] );
+				
 
 				vertIndices.push( [ verts[ u ], verts[ v ], verts[ w ] ] );
 
