@@ -71,7 +71,9 @@
 				parent.position.y = 50;
 				scene.addChild( parent );
 
-				function addGeometry( geometry, points, color, x, y, z, rx, ry, rz, s ) {
+				function addGeometry( geometry, points, spacedPoints, color, x, y, z, rx, ry, rz, s ) {
+
+					// 3d shape
 
 					var mesh = new THREE.Mesh( geometry, [ new THREE.MeshLambertMaterial( { color: color } ), new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true } ) ] );
 					mesh.position.set( x, y, z - 75 );
@@ -79,29 +81,51 @@
 					mesh.scale.set( s, s, s );
 					parent.addChild( mesh );
 
+					// solid line
+
 					var line = new THREE.Line( points, new THREE.LineBasicMaterial( { color: color, linewidth: 2 } ) );
 					line.position.set( x, y, z + 25 );
 					line.rotation.set( rx, ry, rz );
 					line.scale.set( s, s, s );
 					parent.addChild( line );
 
-					var line = new THREE.Line( points, new THREE.LineBasicMaterial( { color: color, opacity: 0.2 } ) );
+					// transparent line from real points
+
+					var line = new THREE.Line( points, new THREE.LineBasicMaterial( { color: color, opacity: 0.5 } ) );
 					line.position.set( x, y, z + 75 );
 					line.rotation.set( rx, ry, rz );
 					line.scale.set( s, s, s );
 					parent.addChild( line );
 
+					// vertices from real points
+
 					var pgeo = THREE.GeometryUtils.clone( points );
-					var particles = new THREE.ParticleSystem( pgeo, new THREE.ParticleBasicMaterial( { color: color, size: 2,opacity: 0.5 } ) );
+					var particles = new THREE.ParticleSystem( pgeo, new THREE.ParticleBasicMaterial( { color: color, size: 2, opacity: 0.75 } ) );
 					particles.position.set( x, y, z + 75 );
 					particles.rotation.set( rx, ry, rz );
 					particles.scale.set( s, s, s );
 					parent.addChild( particles );
 
+					// transparent line from equidistance sampled points
+
+					var line = new THREE.Line( spacedPoints, new THREE.LineBasicMaterial( { color: color, opacity: 0.2 } ) );
+					line.position.set( x, y, z + 100 );
+					line.rotation.set( rx, ry, rz );
+					line.scale.set( s, s, s );
+					parent.addChild( line );
+
+					// equidistance sampled points
+
+					var pgeo = THREE.GeometryUtils.clone( spacedPoints );
+					var particles2 = new THREE.ParticleSystem( pgeo, new THREE.ParticleBasicMaterial( { color: color, size: 2, opacity: 0.5 } ) );
+					particles2.position.set( x, y, z + 100 );
+					particles2.rotation.set( rx, ry, rz );
+					particles2.scale.set( s, s, s );
+					parent.addChild( particles2 );
+
 				}
 
-				var lineDivisions = 12, lineMaterial = new THREE.LineBasicMaterial( { color: 0xff0000 } );
-				var extrudeSettings = {	amount: 20,  bevelEnabled: true, bevelSegments: 2, steps: 2 }; //amount: 40, steps: 2
+				var extrudeSettings = {	amount: 20,  bevelEnabled: true, bevelSegments: 2, steps: 2 }; // amount: 40, steps: 2
 
 				// California
 
@@ -131,8 +155,10 @@
 				californiaPts.push( new THREE.Vector2 ( 610, 320 ) );
 
 				var californiaShape = new THREE.Shape( californiaPts );
+
 				var california3d = new THREE.ExtrudeGeometry( californiaShape, { amount: 20	} );
 				var californiaPoints = californiaShape.createPointsGeometry();
+				var californiaSpacedPoints = californiaShape.createSpacedPointsGeometry( 100 );
 
 				// Triangle
 
@@ -144,6 +170,7 @@
 
 				var triangle3d = triangleShape.extrude( extrudeSettings );
 				var trianglePoints = triangleShape.createPointsGeometry();
+				var triangleSpacedPoints = triangleShape.createSpacedPointsGeometry();
 
 
 				// Heart
@@ -162,6 +189,7 @@
 
 				var heart3d = heartShape.extrude( extrudeSettings );
 				var heartPoints = heartShape.createPointsGeometry();
+				var heartSpacedPoints = heartShape.createSpacedPointsGeometry();
 
 				//heartShape.debug( document.getElementById("debug") );
 
@@ -178,6 +206,7 @@
 
 				var square3d = squareShape.extrude( extrudeSettings );
 				var squarePoints = squareShape.createPointsGeometry();
+				var squareSpacedPoints = squareShape.createSpacedPointsGeometry();
 
 				// Rectangle
 
@@ -192,6 +221,7 @@
 
 				var rect3d = rectShape.extrude( extrudeSettings );
 				var rectPoints = rectShape.createPointsGeometry();
+				var rectSpacedPoints = rectShape.createSpacedPointsGeometry();
 
 				// Rounded rectangle
 
@@ -200,6 +230,7 @@
 
 				var roundedRect3d = roundedRectShape.extrude( extrudeSettings );
 				var roundedRectPoints = roundedRectShape.createPointsGeometry();
+				var roundedRectSpacedPoints = roundedRectShape.createSpacedPointsGeometry();
 
 				function roundedRect( ctx, x, y, width, height, radius ){
 
@@ -227,6 +258,7 @@
 
 				var circle3d = circleShape.extrude( extrudeSettings );
 				var circlePoints = circleShape.createPointsGeometry();
+				var circleSpacedPoints = circleShape.createSpacedPointsGeometry();
 
 				// Fish
 
@@ -243,6 +275,7 @@
 
 				var fish3d = fishShape.extrude( extrudeSettings );
 				var fishPoints = fishShape.createPointsGeometry();
+				var fishSpacedPoints = fishShape.createSpacedPointsGeometry();
 
 				// Arc circle
 
@@ -257,6 +290,7 @@
 
 				var arc3d = arcShape.extrude( extrudeSettings );
 				var arcPoints = arcShape.createPointsGeometry();
+				var arcSpacedPoints = arcShape.createSpacedPointsGeometry();
 
 				// Spline shape + path extrusion
 
@@ -284,16 +318,17 @@
 
 				var splineShape3d = splineShape.extrude( extrudeSettings );
 				var splinePoints = splineShape.createPointsGeometry( );
+				var splineSpacedPoints = splineShape.createSpacedPointsGeometry( );
 
-				addGeometry( california3d, californiaPoints,	0xffaa00, -300, -100, 0,     0, 0, 0, 0.25 );
-				addGeometry( triangle3d, trianglePoints,		0xffee00, -180,    0, 0,     0, 0, 0, 1 );
-				addGeometry( roundedRect3d, roundedRectPoints, 	0x005500, -150,  150, 0,     0, 0, 0, 1 );
-				addGeometry( square3d, squarePoints,			0x0055ff,  150,  100, 0,     0, 0, 0, 1 );
-				addGeometry( heart3d, heartPoints,				0xff1100,    0,  100, 0,   3.14, 0, 0, 1 );
-				addGeometry( circle3d, circlePoints,			0x00ff11,  120,  250, 0,     0, 0, 0, 1 );
-				addGeometry( fish3d, fishPoints,				0x222222,  -50,  200, 0,     0, 0, 0, 1 );
-				addGeometry( splineShape3d, splinePoints, 		0x888888,  -50,  -100, -50,  0, 0, 0, 0.2 );
-				addGeometry( arc3d, arcPoints,					0xbb4422,  150,    0, 0,     0, 0, 0, 1 );
+				addGeometry( california3d, californiaPoints, californiaSpacedPoints,	0xffaa00, -300, -100, 0,     0, 0, 0, 0.25 );
+				addGeometry( triangle3d, trianglePoints, triangleSpacedPoints, 			0xffee00, -180,    0, 0,     0, 0, 0, 1 );
+				addGeometry( roundedRect3d, roundedRectPoints, roundedRectSpacedPoints,	0x005500, -150,  150, 0,     0, 0, 0, 1 );
+				addGeometry( square3d, squarePoints, squareSpacedPoints,				0x0055ff,  150,  100, 0,     0, 0, 0, 1 );
+				addGeometry( heart3d, heartPoints, heartSpacedPoints,					0xff1100,    0,  100, 0,   3.14, 0, 0, 1 );
+				addGeometry( circle3d, circlePoints, circleSpacedPoints,				0x00ff11,  120,  250, 0,     0, 0, 0, 1 );
+				addGeometry( fish3d, fishPoints, fishSpacedPoints,						0x222222,  -50,  200, 0,     0, 0, 0, 1 );
+				addGeometry( splineShape3d, splinePoints, splineSpacedPoints,			0x888888,  -50,  -100, -50,  0, 0, 0, 0.2 );
+				addGeometry( arc3d, arcPoints, arcSpacedPoints,							0xbb4422,  150,    0, 0,     0, 0, 0, 1 );
 
 				//
 

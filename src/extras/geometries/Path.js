@@ -165,21 +165,27 @@ THREE.Path.prototype.arc = function ( aX, aY, aRadius,
 */
 
 
-THREE.Path.prototype.getSpacedPoints = function ( divisions ) {
+THREE.Path.prototype.getSpacedPoints = function ( divisions, closedPath ) {
 
 	if ( !divisions ) divisions = 40;
 
-	var pts = [];
+	var points = [];
+
 	for ( var i = 0; i < divisions; i++ ) {
 
-		pts.push( this.getPoint( i / divisions ) );
+		points.push( this.getPoint( i / divisions ) );
 
-		//if(!this.getPoint(i/divisions)) throw "DIE";
+		//if( !this.getPoint( i / divisions ) ) throw "DIE";
 
 	}
 
-	//console.log(pts);
-	return pts;
+	if ( closedPath ) {
+
+		points.push( points[ 0 ] );
+
+	}
+
+	return points;
 
 };
 
@@ -481,24 +487,37 @@ THREE.Path.prototype.getLength = function() {
 };
 
 
-/// Returns geometry created from path points (for Line or ParticleSystem objects)
+/// Generate geometry from path points (for Line or ParticleSystem objects)
 
 THREE.Path.prototype.createPointsGeometry = function( divisions ) {
 
     var pts = this.getPoints( divisions, true );
+	return this.createGeometry( pts );
+
+};
+
+// Generate geometry from equidistance sampling along the path
+
+THREE.Path.prototype.createSpacedPointsGeometry = function( divisions ) {
+
+    var pts = this.getSpacedPoints( divisions, true );
+	return this.createGeometry( pts );
+
+};
+
+THREE.Path.prototype.createGeometry = function( points ) {
 
 	var geometry = new THREE.Geometry();
 
-    for( var i = 0; i < pts.length; i ++ ) {
+    for( var i = 0; i < points.length; i ++ ) {
 
-        geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( pts[ i ].x, pts[ i ].y, 0 ) ) );
+        geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( points[ i ].x, points[ i ].y, 0 ) ) );
 
     }
 
     return geometry;
 
 };
-
 
 
 // ALL THINGS BELOW TO BE REFACTORED
