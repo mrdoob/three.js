@@ -317,7 +317,9 @@ THREE.SplineCurve.prototype.getPoint = function ( t ) {
  **************************************************************/
 
 THREE.ArcCurve = function ( aX, aY, aRadius,
-							aStartAngle, aEndAngle, aClockwise ) {
+							aStartAngle, aEndAngle,
+							aClockwise ) {
+
 	this.aX = aX;
 	this.aY = aY;
 

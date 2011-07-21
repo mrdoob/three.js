@@ -71,16 +71,36 @@
 				parent.position.y = 50;
 				scene.addChild( parent );
 
-				function addGeometry( geometry, color, x, y, z, rx, ry, rz, s ) {
+				function addGeometry( geometry, points, color, x, y, z, rx, ry, rz, s ) {
 
 					var mesh = new THREE.Mesh( geometry, [ new THREE.MeshLambertMaterial( { color: color } ), new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true } ) ] );
-					mesh.position.set( x, y, z );
+					mesh.position.set( x, y, z - 75 );
 					mesh.rotation.set( rx, ry, rz );
 					mesh.scale.set( s, s, s );
 					parent.addChild( mesh );
 
+					var line = new THREE.Line( points, new THREE.LineBasicMaterial( { color: color, linewidth: 2 } ) );
+					line.position.set( x, y, z + 25 );
+					line.rotation.set( rx, ry, rz );
+					line.scale.set( s, s, s );
+					parent.addChild( line );
+
+					var line = new THREE.Line( points, new THREE.LineBasicMaterial( { color: color, opacity: 0.2 } ) );
+					line.position.set( x, y, z + 75 );
+					line.rotation.set( rx, ry, rz );
+					line.scale.set( s, s, s );
+					parent.addChild( line );
+
+					var pgeo = THREE.GeometryUtils.clone( points );
+					var particles = new THREE.ParticleSystem( pgeo, new THREE.ParticleBasicMaterial( { color: color, size: 2,opacity: 0.5 } ) );
+					particles.position.set( x, y, z + 75 );
+					particles.rotation.set( rx, ry, rz );
+					particles.scale.set( s, s, s );
+					parent.addChild( particles );
+
 				}
 
+				var lineDivisions = 12, lineMaterial = new THREE.LineBasicMaterial( { color: 0xff0000 } );
 				var extrudeSettings = {	amount: 20,  bevelEnabled: true, bevelSegments: 2, steps: 2 }; //amount: 40, steps: 2
 
 				// California
@@ -112,6 +132,7 @@
 
 				var californiaShape = new THREE.Shape( californiaPts );
 				var california3d = new THREE.ExtrudeGeometry( californiaShape, { amount: 20	} );
+				var californiaPoints = californiaShape.createPointsGeometry();
 
 				// Triangle
 
@@ -122,6 +143,7 @@
 				triangleShape.lineTo(  80, 20 ); // close path
 
 				var triangle3d = triangleShape.extrude( extrudeSettings );
+				var trianglePoints = triangleShape.createPointsGeometry();
 
 
 				// Heart
@@ -139,6 +161,7 @@
 				heartShape.bezierCurveTo( x + 35, y, x + 25, y + 25, x + 25, y + 25 );
 
 				var heart3d = heartShape.extrude( extrudeSettings );
+				var heartPoints = heartShape.createPointsGeometry();
 
 				//heartShape.debug( document.getElementById("debug") );
 
@@ -154,6 +177,7 @@
 				squareShape.lineTo( 0, 0 );
 
 				var square3d = squareShape.extrude( extrudeSettings );
+				var squarePoints = squareShape.createPointsGeometry();
 
 				// Rectangle
 
@@ -167,6 +191,7 @@
 				rectShape.lineTo( 0, 0 );
 
 				var rect3d = rectShape.extrude( extrudeSettings );
+				var rectPoints = rectShape.createPointsGeometry();
 
 				// Rounded rectangle
 
@@ -174,6 +199,7 @@
 				roundedRect( roundedRectShape, 0, 0, 50, 50, 20 );
 
 				var roundedRect3d = roundedRectShape.extrude( extrudeSettings );
+				var roundedRectPoints = roundedRectShape.createPointsGeometry();
 
 				function roundedRect( ctx, x, y, width, height, radius ){
 
@@ -200,6 +226,7 @@
 				circleShape.quadraticCurveTo( -circleRadius, circleRadius, 0, circleRadius );
 
 				var circle3d = circleShape.extrude( extrudeSettings );
+				var circlePoints = circleShape.createPointsGeometry();
 
 				// Fish
 
@@ -215,11 +242,12 @@
 				fishShape.quadraticCurveTo( x + 50, y - 80, x, y );
 
 				var fish3d = fishShape.extrude( extrudeSettings );
+				var fishPoints = fishShape.createPointsGeometry();
 
-				// Arc Circle
+				// Arc circle
 
 				var arcShape = new THREE.Shape();
-				arcShape.moveTo( 0, 0);
+				arcShape.moveTo( 0, 0 );
 				arcShape.arc( 10, 10, 40, 0, Math.PI*2, false );
 
 				var holePath = new THREE.Path();
@@ -228,6 +256,7 @@
 				arcShape.holes.push( holePath );
 
 				var arc3d = arcShape.extrude( extrudeSettings );
+				var arcPoints = arcShape.createPointsGeometry();
 
 				// Spline shape + path extrusion
 
@@ -254,16 +283,19 @@
 				extrudeSettings.bevelEnabled = false;
 
 				var splineShape3d = splineShape.extrude( extrudeSettings );
+				var splinePoints = splineShape.createPointsGeometry( );
 
-				addGeometry( california3d, 	0xffaa00, -300, -100, 0,     0, 0, 0, 0.25 );
-				addGeometry( triangle3d, 	0xffee00, -180,    0, 0,     0, 0, 0, 1 );
-				addGeometry( roundedRect3d, 0x005500, -150,  150, 0,     0, 0, 0, 1 );
-				addGeometry( square3d, 		0x0055ff,  150,  100, 0,     0, 0, 0, 1 );
-				addGeometry( heart3d, 		0xff1100,    0,  100, 0,   3.14, 0, 0, 1 );
-				addGeometry( circle3d, 		0x00ff11,  120,  250, 0,     0, 0, 0, 1 );
-				addGeometry( fish3d, 		0x222222,  -50,  200, 0,     0, 0, 0, 1 );
-				addGeometry( splineShape3d, 		0x888888,  -50,  -100, -50,     0, 0, 0, 0.2 );
-				addGeometry( arc3d, 		0xbb4422,  150,    0, 0,     0, 0, 0, 1 );
+				addGeometry( california3d, californiaPoints,	0xffaa00, -300, -100, 0,     0, 0, 0, 0.25 );
+				addGeometry( triangle3d, trianglePoints,		0xffee00, -180,    0, 0,     0, 0, 0, 1 );
+				addGeometry( roundedRect3d, roundedRectPoints, 	0x005500, -150,  150, 0,     0, 0, 0, 1 );
+				addGeometry( square3d, squarePoints,			0x0055ff,  150,  100, 0,     0, 0, 0, 1 );
+				addGeometry( heart3d, heartPoints,				0xff1100,    0,  100, 0,   3.14, 0, 0, 1 );
+				addGeometry( circle3d, circlePoints,			0x00ff11,  120,  250, 0,     0, 0, 0, 1 );
+				addGeometry( fish3d, fishPoints,				0x222222,  -50,  200, 0,     0, 0, 0, 1 );
+				addGeometry( splineShape3d, splinePoints, 		0x888888,  -50,  -100, -50,  0, 0, 0, 0.2 );
+				addGeometry( arc3d, arcPoints,					0xbb4422,  150,    0, 0,     0, 0, 0, 1 );
+
+				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
                 renderer.setSize( window.innerWidth, window.innerHeight );

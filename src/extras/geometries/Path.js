@@ -127,7 +127,7 @@ THREE.Path.prototype.splineThru = function( pts /*Array of Vector*/ ) {
 
 	this.actions.push( { action: THREE.PathActions.CSPLINE_THRU, args: args, curve: curve } );
 
-	//console.log(curve, curve.getPoints(), curve.getSpacedPoints());
+	//console.log( curve, curve.getPoints(), curve.getSpacedPoints() );
 
 };
 
@@ -138,10 +138,13 @@ THREE.Path.prototype.arc = function ( aX, aY, aRadius,
 									  aStartAngle, aEndAngle, aClockwise ) {
 
 	var args = Array.prototype.slice.call( arguments );
+
 	var curve = new THREE.ArcCurve( aX, aY, aRadius,
 									aStartAngle, aEndAngle, aClockwise );
 	this.curves.push( curve );
-	//console.log('arc', args);
+
+	// console.log( 'arc', args );
+
 	this.actions.push( { action: THREE.PathActions.ARC, args: args } );
 
  };
@@ -182,7 +185,7 @@ THREE.Path.prototype.getSpacedPoints = function ( divisions ) {
 
 /* Return an array of vectors based on contour of the path */
 
-THREE.Path.prototype.getPoints = function( divisions ) {
+THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 	divisions = divisions || 12;
 
@@ -204,7 +207,7 @@ THREE.Path.prototype.getPoints = function( divisions ) {
 
 		case THREE.PathActions.MOVE_TO:
 
-			//points.push( new THREE.Vector2( args[ 0 ], args[ 1 ] ) );
+			// points.push( new THREE.Vector2( args[ 0 ], args[ 1 ] ) );
 
 			break;
 
@@ -365,6 +368,12 @@ THREE.Path.prototype.getPoints = function( divisions ) {
 
 	}
 
+	if ( closedPath ) {
+
+		points.push( points[ 0 ] );
+
+	}
+
 	return points;
 
 };
@@ -471,30 +480,22 @@ THREE.Path.prototype.getLength = function() {
 
 };
 
-// TODO: rewrite to use single Line object
 
-// createPathGeometry by SolarCoordinates
+/// Returns geometry created from path points (for Line or ParticleSystem objects)
 
-/* Returns Object3D with line segments stored as children  */
+THREE.Path.prototype.createPointsGeometry = function( divisions ) {
 
-THREE.Path.prototype.createPathGeometry = function( divisions, lineMaterial ) {
+    var pts = this.getPoints( divisions, true );
 
-    var pts = this.getPoints( divisions );
+	var geometry = new THREE.Geometry();
 
-    var segment, pathGeometry = new THREE.Object3D;
-    if ( !lineMaterial ) lineMaterial = new THREE.LineBasicMaterial( { color: 0x000000, opacity: 0.7 } );
+    for( var i = 0; i < pts.length; i ++ ) {
 
-    for( var i = 1; i < pts.length; i++ ) {
-
-        var pathSegment = new THREE.Geometry();
-        pathSegment.vertices.push( new THREE.Vertex( new THREE.Vector3( pts[i-1].x, pts[i-1].y, 0 ) ) );
-        pathSegment.vertices.push( new THREE.Vertex( new THREE.Vector3( pts[i].x, pts[i].y, 0 ) ) );
-        segment = new THREE.Line( pathSegment , lineMaterial );
-        pathGeometry.addChild(segment);
+        geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( pts[ i ].x, pts[ i ].y, 0 ) ) );
 
     }
 
-    return pathGeometry;
+    return geometry;
 
 };
 
