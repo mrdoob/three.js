@@ -50,10 +50,12 @@ THREE.Projector = function() {
 
 	};
 
-	this.projectObjects = function ( scene, camera, sort ) {
+	this.getObjectsInFrustum = function ( scene, camera, sort ) {
 
-		var renderList = [],
-		o, ol, objects, object, matrix;
+		_projScreenMatrix.multiply( camera.projectionMatrix, camera.matrixWorldInverse );
+		computeFrustum( _projScreenMatrix );
+
+		var o, ol, object, objects, objectsInFrustum = [];
 
 		_objectCount = 0;
 
@@ -61,29 +63,41 @@ THREE.Projector = function() {
 
 		for ( o = 0, ol = objects.length; o < ol; o ++ ) {
 
-			object = objects[ o ];
-
-			if ( !object.visible || ( object instanceof THREE.Mesh && !isInFrustum( object ) ) ) continue;
-
-			_object = getNextObjectInPool();
-
-			_vector3.copy( object.position );
-			_projScreenMatrix.multiplyVector3( _vector3 );
-
-			_object.object = object;
-			_object.z = _vector3.z;
-
-			renderList.push( _object );
+			checkObject( objects[ o ] );
 
 		}
 
-		sort && renderList.sort( painterSort );
+		function checkObject( object ) {
 
-		return renderList;
+			if ( ! object.visible ) return;
+
+			if ( ! ( object instanceof THREE.Mesh && ! isInFrustum( object ) ) ) {
+
+				_object = getNextObjectInPool();
+
+				_vector3.copy( object.position );
+				_projScreenMatrix.multiplyVector3( _vector3 );
+
+				_object.object = object;
+				_object.z = _vector3.z;
+
+				objectsInFrustum.push( _object );
+
+			}
+
+			for ( var i = 0, l = object.children.length; i < l; i ++ ) {
+
+				checkObject( object.children[ i ] );
+
+			}
+
+		};
+
+		sort && objectsInFrustum.sort( painterSort );
+
+		return objectsInFrustum;
 
 	};
-
-	// TODO: Rename to projectElements?
 
 	this.projectScene = function ( scene, camera, sort ) {
 
@@ -101,12 +115,7 @@ THREE.Projector = function() {
 
 		camera.matrixAutoUpdate && camera.update( undefined, true );
 
-		scene.update( undefined, false, camera );
-
-		_projScreenMatrix.multiply( camera.projectionMatrix, camera.matrixWorldInverse );
-		computeFrustum( _projScreenMatrix );
-
-		objects = this.projectObjects( scene, camera, true );
+		objects = this.getObjectsInFrustum( scene, camera, true );
 
 		for ( o = 0, ol = objects.length; o < ol; o++ ) {
 
@@ -409,7 +418,7 @@ THREE.Projector = function() {
 	function isInFrustum( object ) {
 
 		var distance, matrix = object.matrixWorld,
-		radius = - object.geometry.boundingSphere.radius * Math.max( object.scale.x, Math.max( object.scale.y, object.scale.z ) );
+		radius = - object.geometry.boundingSphere.radius * Math.max( object.scaleWorld.x, Math.max( object.scaleWorld.y, object.scaleWorld.z ) );
 
 		for ( var i = 0; i < 6; i ++ ) {
 

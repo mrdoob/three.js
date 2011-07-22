@@ -7,7 +7,9 @@
 
 THREE.Geometry = function () {
 
-	this.id = "Geometry" + THREE.GeometryIdCounter ++;
+	this.id = THREE.GeometryIdCounter ++;
+
+	console.log( this, this.id );
 
 	this.vertices = [];
 	this.colors = []; // one-to-one vertex colors, used in ParticleSystem, Line and Ribbon

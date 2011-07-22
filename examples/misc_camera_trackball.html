@@ -93,7 +93,7 @@
 				
 				var material =  new THREE.MeshLambertMaterial( { color:0xffffff } );
 
-				for( var i = 0; i < 500; i++ ) {
+				for ( var i = 0; i < 500; i++ ) {
 					
 					var mesh = new THREE.Mesh( cube, material );
 					mesh.position.set(( Math.random() - 0.5 ) * 1000,
@@ -102,54 +102,29 @@
 									  
 					mesh.updateMatrix();
 					mesh.matrixAutoUpdate = false;
-					scene.addChild( mesh );
+
+					scene.addObject( mesh );
 					
 				}
-
-
-				// create cross
-
-				/*
-				cross = new THREE.Object3D();
-				cross.scale.set( 0.5, 0.5, 0.5 );
-				cross.matrixAutoUpdate = false;
-
-				var material = new THREE.MeshPhongMaterial( { color:0xff0000 } );
-				var mesh = new THREE.Mesh( new THREE.Cube( 40, 5, 5 ), material );
-				mesh.position.x = 20;
-				cross.addChild( mesh );
-
-				var material = new THREE.MeshPhongMaterial( { color:0x00ff00 } );
-				var mesh = new THREE.Mesh( new THREE.Cube( 5, 40, 5 ), material );
-				mesh.position.y = 20;
-				cross.addChild( mesh );
-
-				var material = new THREE.MeshPhongMaterial( { color:0x0000ff } );
-				var mesh = new THREE.Mesh( new THREE.Cube( 5, 5, 40 ), material );
-				mesh.position.z = 20;
-
-				cross.addChild( mesh );
-				camera.addChild( cross );
-				*/
 
 
 				// lights
 
 				light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 1, 1, 1 );
-				scene.addChild( light );
+				scene.addLight( light );
 
 				light = new THREE.DirectionalLight( 0x002288 );
 				light.position.set( -1, -1, -1 );
-				scene.addChild( light );
+				scene.addLight( light );
 
 				light = new THREE.AmbientLight( 0x222222 );
-				scene.addChild( light );
+				scene.addLight( light );
 
 
 				// renderer
 
-				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer = new THREE.WebGLRenderer();
 				renderer.setClearColorHex( 0xffffff, 1 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 

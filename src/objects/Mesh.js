@@ -11,14 +11,13 @@ THREE.Mesh = function ( geometry, materials ) {
 	this.geometry = geometry;
 	this.materials = materials && materials.length ? materials : [ materials ];
 
-	this.overdraw = false; // TODO: Move to material?
-
+	this.overdraw = false; // Workaround for antialias gaps in CanvasRenderer
 
 	if ( this.geometry ) {
 
 		// calc bound radius
 
-		if( !this.geometry.boundingSphere ) {
+		if( ! this.geometry.boundingSphere ) {
 
 			this.geometry.computeBoundingSphere();
 

@@ -233,7 +233,7 @@
 				textMesh1.rotation.x = 0;
 				textMesh1.rotation.y = Math.PI * 2;
 
-				parent.addChild( textMesh1 );
+				parent.addObject( textMesh1 );
 
 				if ( mirror ) {
 
@@ -246,17 +246,17 @@
 					textMesh2.rotation.x = Math.PI;
 					textMesh2.rotation.y = Math.PI * 2;
 
-					parent.addChild( textMesh2 );
+					parent.addObject( textMesh2 );
 					
 				}
 
 				parent.position.y = 100;
-				scene.addChild( parent );
+				scene.addObject( parent );
 
 				var plane = new THREE.Mesh( new THREE.PlaneGeometry( 10000, 10000 ), new THREE.MeshBasicMaterial( { color: 0xffffff, opacity: 0.5, transparent: true } ) );
 				plane.rotation.x = -1.57;
 				plane.position.y = 100;
-				scene.addChild( plane );
+				scene.addObject( plane );
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -445,7 +445,7 @@
 				textMesh1.rotation.x = 0;
 				textMesh1.rotation.y = Math.PI * 2;
 
-				parent.addChild( textMesh1 );
+				parent.addObject( textMesh1 );
 
 				if ( mirror ) {
 
@@ -461,7 +461,7 @@
 					textMesh2.rotation.y = Math.PI * 2;
 					
 					
-					parent.addChild( textMesh2 );
+					parent.addObject( textMesh2 );
 					
 				}
 

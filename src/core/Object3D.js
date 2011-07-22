@@ -6,30 +6,33 @@
 
 THREE.Object3D = function() {
 
+	this.name = "";
+
 	this.parent = undefined;
 	this.children = [];
 
 	this.up = new THREE.Vector3( 0, 1, 0 );
 
+	this.eulerOrder = 'XYZ';
+
 	this.position = new THREE.Vector3();
 	this.rotation = new THREE.Vector3();
-	this.eulerOrder = 'XYZ';
 	this.scale = new THREE.Vector3( 1, 1, 1 );
 
-	this.dynamic = false; // when true it retains arrays so they can be updated with __dirty*
+	this.scaleWorld = new THREE.Vector3( 1, 1, 1 );
+
+	this.dynamic = false; // WebGLRenderer: when true it retains arrays so they can be updated with __dirty*
 	
 	this.doubleSided = false;
 	this.flipSided = false;
 
 	this.renderDepth = null;
 
-	this.rotationAutoUpdate = true;
-
 	this.matrix = new THREE.Matrix4();
+	this.matrixAutoUpdate = true;
+
 	this.matrixWorld = new THREE.Matrix4();
 	this.matrixRotationWorld = new THREE.Matrix4();
-
-	this.matrixAutoUpdate = true;
 	this.matrixWorldNeedsUpdate = true;
 
 	this.quaternion = new THREE.Quaternion();
@@ -41,8 +44,6 @@ THREE.Object3D = function() {
 	this.visible = true;
 
 	this._vector = new THREE.Vector3();
-
-	this.name = "";
 
 };
 
@@ -79,90 +80,39 @@ THREE.Object3D.prototype = {
 		// TODO: Add hierarchy support.
 
 		this.matrix.lookAt( vector, this.position, this.up );
-
-		if ( this.rotationAutoUpdate ) {
-
-			this.rotation.setRotationFromMatrix( this.matrix );
-
-		}
+		this.rotation.setRotationFromMatrix( this.matrix );
 
 	},
 
-	addChild: function ( child ) {
+	addObject: function ( object ) {
 
-		if ( this.children.indexOf( child ) === - 1 ) {
+		if ( this.children.indexOf( object ) === - 1 ) {
 
-			if( child.parent !== undefined ) {
+			if ( object.parent !== undefined ) {
 
-				child.parent.removeChild( child );
-
-			}
-
-			child.parent = this;
-			this.children.push( child );
-
-			// add to scene
-
-			var scene = this;
-
-			while ( scene.parent !== undefined ) {
-
-				scene = scene.parent;
+				object.parent.removeObject( object );
 
 			}
 
-			if ( scene !== undefined && scene instanceof THREE.Scene )  {
+			object.parent = this;
 
-				scene.addChildRecurse( child );
+			this.children.push( object );
 
-			}
-
-		}
+		}		
 
 	},
 
-	removeChild: function ( child ) {
+	removeObject: function ( object ) {
 
-		var childIndex = this.children.indexOf( child );
+		var index = this.children.indexOf( object );
 
-		if ( childIndex !== - 1 ) {
+		if ( index !== - 1 ) {
 
-			child.parent = undefined;
-			this.children.splice( childIndex, 1 );
+			object.parent = undefined;
 
-		}
-
-	},
-
-	getChildByName: function ( name, doRecurse ) {
-
-		var c, cl, child, recurseResult;
-
-		for ( c = 0, cl = this.children.length; c < cl; c++ ) {
-
-			child = this.children[ c ];
-
-			if ( child.name === name ) {
-
-				return child;
-
-			}
-
-			if ( doRecurse ) {
-
-				recurseResult = child.getChildByName( name, doRecurse );
-
-				if ( recurseResult !== undefined ) {
-
-					return recurseResult;
-
-				}
-
-			}
+			this.children.splice( index, 1 );
 
 		}
-
-		return undefined;
 
 	},
 
@@ -191,39 +141,41 @@ THREE.Object3D.prototype = {
 
 	},
 
-	update: function ( parentMatrixWorld, forceUpdate, camera ) {
+	updateWorldMatrices: function ( force ) {
 
-		this.matrixAutoUpdate && this.updateMatrix();
+		if ( this.matrixWorldNeedsUpdate || force ) {
 
-		// update matrixWorld
+			if ( this.parent ) {
 
-		if ( this.matrixWorldNeedsUpdate || forceUpdate ) {
-
-			if ( parentMatrixWorld ) {
-
-				this.matrixWorld.multiply( parentMatrixWorld, this.matrix );
+				this.matrixWorld.multiply( this.parent.matrixWorld, this.matrix );
+				this.scaleWorld.multiply( this.parent.scaleWorld, this.scale );
 
 			} else {
 
 				this.matrixWorld.copy( this.matrix );
+				this.scaleWorld.copy( this.scale );
 
 			}
 
-			this.matrixRotationWorld.extractRotation( this.matrixWorld, this.scale );
+			// TODO: This is not correct, but works on common cases.
+
+			this.matrixRotationWorld.extractRotation( this.matrixWorld, this.scaleWorld );
 
 			this.matrixWorldNeedsUpdate = false;
 
-			forceUpdate = true;
+			force = true;
 
 		}
-
-		// update children
 
 		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
 
-			this.children[ i ].update( this.matrixWorld, forceUpdate, camera );
+			var child = this.children[ i ];
+			
+			child.matrixAutoUpdate && child.updateMatrix();
+			child.updateWorldMatrices( force );
 
 		}
+
 
 	}
 

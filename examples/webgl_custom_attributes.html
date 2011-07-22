@@ -142,14 +142,14 @@
 			var values = attributes.displacement.value;
 
 
-			for( var v = 0; v < vertices.length; v++ ) {
+			for ( var v = 0; v < vertices.length; v++ ) {
 
 				values[ v ] = 0;
 				noise[ v ] = Math.random() * 5;
 
 			}
 
-			scene.addChild( sphere );
+			scene.addObject( sphere );
 
 			renderer = new THREE.WebGLRenderer( { clearColor: 0x050505, clearAlpha: 1 } );
 			renderer.setSize( WIDTH, HEIGHT );

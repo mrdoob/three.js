@@ -7,7 +7,7 @@ THREE.ShadowVolume = function( meshOrGeometry, isStatic ) {
 	if( meshOrGeometry instanceof THREE.Mesh ) {
 
 		THREE.Mesh.call( this, meshOrGeometry.geometry, isStatic ? [ new THREE.ShadowVolumeDynamicMaterial() ] : [ new THREE.ShadowVolumeDynamicMaterial() ] );
-		meshOrGeometry.addChild( this );
+		meshOrGeometry.addObject( this );
 
 	} else {
 
@@ -19,9 +19,9 @@ THREE.ShadowVolume = function( meshOrGeometry, isStatic ) {
 
 };
 
-THREE.ShadowVolume.prototype             = new THREE.Mesh();
+THREE.ShadowVolume.prototype = new THREE.Mesh();
 THREE.ShadowVolume.prototype.constructor = THREE.ShadowVolume;
-THREE.ShadowVolume.prototype.supr        = THREE.Mesh.prototype;
+THREE.ShadowVolume.prototype.supr = THREE.Mesh.prototype;
 
 
 /*
@@ -46,7 +46,7 @@ THREE.ShadowVolume.prototype.calculateShadowVolumeGeometry = function() {
 		var vertexOffset = 0;
 		var vertexOffsetPerFace = [];
 
-		for( f = 0, fl = faces.length; f < fl; f++ ) {
+		for ( f = 0, fl = faces.length; f < fl; f++ ) {
 
 			face = faces[ f ];
 

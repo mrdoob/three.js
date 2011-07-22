@@ -92,7 +92,6 @@ EXTRAS_FILES = [
 'extras/cameras/FlyCamera.js',
 'extras/cameras/RollCamera.js',
 'extras/cameras/TrackballCamera.js',
-'extras/cameras/QuakeCamera.js',
 'extras/geometries/Path.js',
 'extras/geometries/Shape.js',
 'extras/geometries/CubeGeometry.js',

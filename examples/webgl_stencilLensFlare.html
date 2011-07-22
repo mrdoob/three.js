@@ -57,17 +57,17 @@
 
 				var mesh1 = new THREE.Mesh( cube, material0 );
 				mesh1.position.z = -150;
-				scene.addChild( mesh1 );
+				scene.addObject( mesh1 );
 
 				var mesh2 = new THREE.Mesh( cube, material1 );
 				mesh2.position.x = -150;
 				mesh2.rotation.y = 90 * Math.PI / 180;
-				scene.addChild( mesh2 );
+				scene.addObject( mesh2 );
 
 				var mesh3 = new THREE.Mesh( cube, material2 );
 				mesh3.position.y = -150;
 				mesh3.rotation.x = 90 * Math.PI / 180;
-				scene.addChild( mesh3 );
+				scene.addObject( mesh3 );
 
 				new THREE.ShadowVolume( mesh1 )
 				new THREE.ShadowVolume( mesh2 )
@@ -81,10 +81,10 @@
 				var sphere = new THREE.SphereGeometry( 40 );
 				var cylinder = new THREE.CylinderGeometry( 10, 10, 20, 40, 0, 0 );
 				mesh = new THREE.Mesh( torus, material1 );
-				scene.addChild( mesh );
+				scene.addObject( mesh );
 
 				boxMesh = new THREE.Mesh( cube, material2 );
-				scene.addChild( boxMesh );
+				scene.addObject( boxMesh );
 
 				new THREE.ShadowVolume( mesh );
 				new THREE.ShadowVolume( boxMesh );
@@ -93,26 +93,26 @@
 				// lights
 
 				light = new THREE.PointLight( 0xffffff );
-				scene.addChild( light );
+				scene.addLight( light );
 
 
 				light = new THREE.DirectionalLight( 0xffffff );
 				light.castShadow = true;
 				light.position.set( 0, 1, 0 );
-				scene.addChild( light );
+				scene.addLight( light );
 
 
 				var cube = new THREE.SphereGeometry( 2 );
 				lightCube = new THREE.Mesh( cube, material2 );
 				lightCube.visible = false;
-				scene.addChild( lightCube );
+				scene.addObject( lightCube );
 
 				var lensFlare = new THREE.LensFlare( THREE.ImageUtils.loadTexture( "textures/lensflare0.png" ), 128, 0.0, THREE.AdditiveBlending );
 				lensFlare.add( THREE.ImageUtils.loadTexture( "textures/lensflare1.png" ), 256, 0.33, THREE.AdditiveBlending );
 				lensFlare.add( lensFlare.lensFlares[ 1 ].texture, 300, 0.66, THREE.AdditiveBlending );
 				lensFlare.add( lensFlare.lensFlares[ 1 ].texture, 400, 1.0, THREE.AdditiveBlending );
 
-				lightCube.addChild( lensFlare );
+				lightCube.addObject( lensFlare );
 
 
 				// renderer

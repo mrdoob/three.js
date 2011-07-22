@@ -75,6 +75,7 @@
 		<script type="text/javascript" src="../src/renderers/SVGRenderer.js"></script>
 		<script type="text/javascript" src="../src/renderers/WebGLShaders.js"></script>
 		<script type="text/javascript" src="../src/renderers/WebGLRenderer.js"></script>
+		<script type="text/javascript" src="../src/renderers/WebGLRenderer2.js"></script>
 		<script type="text/javascript" src="../src/renderers/WebGLRenderTarget.js"></script>
 		<script type="text/javascript" src="../src/renderers/renderables/RenderableVertex.js"></script>
 		<script type="text/javascript" src="../src/renderers/renderables/RenderableFace3.js"></script>
@@ -94,7 +95,6 @@
 		<script type="text/javascript" src="../src/extras/cameras/FlyCamera.js"></script>
 		<script type="text/javascript" src="../src/extras/cameras/RollCamera.js"></script>
 		<script type="text/javascript" src="../src/extras/cameras/TrackballCamera.js"></script>
-		<script type="text/javascript" src="../src/extras/cameras/QuakeCamera.js"></script>
 		<script type="text/javascript" src="../src/extras/geometries/Path.js"></script>
 		<script type="text/javascript" src="../src/extras/geometries/Shape.js"></script>
 		<script type="text/javascript" src="../src/extras/geometries/CubeGeometry.js"></script>
@@ -132,7 +132,7 @@
 			var container, stats;
 
 			var camera, scene;
-			var canvasRenderer, svgRenderer, webglRenderer;
+			var canvasRenderer, svgRenderer, webglRenderer, webglRenderer2;
 
 			var mesh, qrcode;
 
@@ -238,15 +238,23 @@
 				canvasRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				container.appendChild( canvasRenderer.domElement );
 
+				/*
 				svgRenderer = new THREE.SVGRenderer();
 				svgRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				svgRenderer.setQuality( 'low' );
 				container.appendChild( svgRenderer.domElement );
+				*/
 
 				webglRenderer = new THREE.WebGLRenderer();
 				webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				// webglRenderer.setFaceCulling( 0 );
 				container.appendChild( webglRenderer.domElement );
+
+				webglRenderer2 = new THREE.WebGLRenderer2();
+				webglRenderer2.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				// webglRenderer.setFaceCulling( 0 );
+				container.appendChild( webglRenderer2.domElement );
+
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
@@ -290,8 +298,9 @@
 				*/
 
 				canvasRenderer.render( scene, camera );
-				svgRenderer.render( scene, camera );
+				// svgRenderer.render( scene, camera );
 				webglRenderer.render( scene, camera );
+				webglRenderer2.render( scene, camera );
 
 			}
 

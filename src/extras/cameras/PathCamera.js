@@ -275,10 +275,10 @@ THREE.PathCamera = function ( parameters ) {
 			particleObj = new THREE.ParticleSystem( particleGeo, new THREE.ParticleBasicMaterial( { color: 0xffaa00, size: 3 } ) );
 
 		lineObj.scale.set( 1, 1, 1 );
-		parent.addChild( lineObj );
+		parent.addObject( lineObj );
 
 		particleObj.scale.set( 1, 1, 1 );
-		parent.addChild( particleObj );
+		parent.addObject( particleObj );
 
 		var waypoint,
 			geo = new THREE.SphereGeometry( 1, 16, 8 ),
@@ -289,7 +289,7 @@ THREE.PathCamera = function ( parameters ) {
 			waypoint = new THREE.Mesh( geo, mat );
 			waypoint.position.copy( spline.points[ i ] );
 			waypoint.updateMatrix();
-			parent.addChild( waypoint );
+			parent.addObject( waypoint );
 
 		}
 
@@ -320,15 +320,15 @@ THREE.PathCamera = function ( parameters ) {
 
 		this.animation = initAnimationPath( this.animationParent, this.spline, this.id, this.duration );
 
-		this.animationParent.addChild( this );
-		this.animationParent.addChild( this.target );
-		this.animationParent.addChild( dummyChild );
+		this.animationParent.addObject( this );
+		this.animationParent.addObject( this.target );
+		this.animationParent.addObject( dummyChild );
 
 	} else {
 
 		this.animation = initAnimationPath( this.animationParent, this.spline, this.id, this.duration );
-		this.animationParent.addChild( this.target );
-		this.animationParent.addChild( this );
+		this.animationParent.addObject( this.target );
+		this.animationParent.addObject( this );
 
 	}
 

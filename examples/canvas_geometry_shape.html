@@ -64,7 +64,8 @@
 
 				parent = new THREE.Object3D();
 				parent.position.y = 50;
-				scene.addChild( parent );
+
+				scene.addObject( parent );
 
 				function addGeometry( geometry, color, x, y, z, rx, ry, rz, s ) {
 
@@ -72,7 +73,8 @@
 					mesh.position.set( x, y, z );
 					mesh.rotation.set( rx, ry, rz );
 					mesh.scale.set( s, s, s );
-					parent.addChild( mesh );
+					
+					parent.addObject( mesh );
 
 				}
 
