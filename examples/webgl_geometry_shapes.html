@@ -62,21 +62,70 @@
 
 				scene = new THREE.Scene();
 
+				var light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( 0, 0, 1 );
+				light.position.normalize();
+				scene.addLight( light );
+
 				parent = new THREE.Object3D();
 				parent.position.y = 50;
 				scene.addChild( parent );
 
-				function addGeometry( geometry, color, x, y, z, rx, ry, rz, s ) {
+				function addGeometry( geometry, points, spacedPoints, color, x, y, z, rx, ry, rz, s ) {
 
-					var mesh = new THREE.Mesh( geometry, [ new THREE.MeshBasicMaterial( { color: color } ), new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true } ) ] );
-					mesh.position.set( x, y, z );
+					// 3d shape
+
+					var mesh = new THREE.Mesh( geometry, [ new THREE.MeshLambertMaterial( { color: color } ), new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true } ) ] );
+					mesh.position.set( x, y, z - 75 );
 					mesh.rotation.set( rx, ry, rz );
 					mesh.scale.set( s, s, s );
 					parent.addChild( mesh );
 
+					// solid line
+
+					var line = new THREE.Line( points, new THREE.LineBasicMaterial( { color: color, linewidth: 2 } ) );
+					line.position.set( x, y, z + 25 );
+					line.rotation.set( rx, ry, rz );
+					line.scale.set( s, s, s );
+					parent.addChild( line );
+
+					// transparent line from real points
+
+					var line = new THREE.Line( points, new THREE.LineBasicMaterial( { color: color, opacity: 0.5 } ) );
+					line.position.set( x, y, z + 75 );
+					line.rotation.set( rx, ry, rz );
+					line.scale.set( s, s, s );
+					parent.addChild( line );
+
+					// vertices from real points
+
+					var pgeo = THREE.GeometryUtils.clone( points );
+					var particles = new THREE.ParticleSystem( pgeo, new THREE.ParticleBasicMaterial( { color: color, size: 2, opacity: 0.75 } ) );
+					particles.position.set( x, y, z + 75 );
+					particles.rotation.set( rx, ry, rz );
+					particles.scale.set( s, s, s );
+					parent.addChild( particles );
+
+					// transparent line from equidistance sampled points
+
+					var line = new THREE.Line( spacedPoints, new THREE.LineBasicMaterial( { color: color, opacity: 0.2 } ) );
+					line.position.set( x, y, z + 100 );
+					line.rotation.set( rx, ry, rz );
+					line.scale.set( s, s, s );
+					parent.addChild( line );
+
+					// equidistance sampled points
+
+					var pgeo = THREE.GeometryUtils.clone( spacedPoints );
+					var particles2 = new THREE.ParticleSystem( pgeo, new THREE.ParticleBasicMaterial( { color: color, size: 2, opacity: 0.5 } ) );
+					particles2.position.set( x, y, z + 100 );
+					particles2.rotation.set( rx, ry, rz );
+					particles2.scale.set( s, s, s );
+					parent.addChild( particles2 );
+
 				}
 
-				var extrudeSettings = {	amount: 20 };
+				var extrudeSettings = {	amount: 20,  bevelEnabled: true, bevelSegments: 2, steps: 2 }; // amount: 40, steps: 2
 
 				// California
 
@@ -106,7 +155,10 @@
 				californiaPts.push( new THREE.Vector2 ( 610, 320 ) );
 
 				var californiaShape = new THREE.Shape( californiaPts );
+
 				var california3d = new THREE.ExtrudeGeometry( californiaShape, { amount: 20	} );
+				var californiaPoints = californiaShape.createPointsGeometry();
+				var californiaSpacedPoints = californiaShape.createSpacedPointsGeometry( 100 );
 
 				// Triangle
 
@@ -117,6 +169,8 @@
 				triangleShape.lineTo(  80, 20 ); // close path
 
 				var triangle3d = triangleShape.extrude( extrudeSettings );
+				var trianglePoints = triangleShape.createPointsGeometry();
+				var triangleSpacedPoints = triangleShape.createSpacedPointsGeometry();
 
 
 				// Heart
@@ -134,6 +188,8 @@
 				heartShape.bezierCurveTo( x + 35, y, x + 25, y + 25, x + 25, y + 25 );
 
 				var heart3d = heartShape.extrude( extrudeSettings );
+				var heartPoints = heartShape.createPointsGeometry();
+				var heartSpacedPoints = heartShape.createSpacedPointsGeometry();
 
 				//heartShape.debug( document.getElementById("debug") );
 
@@ -149,6 +205,8 @@
 				squareShape.lineTo( 0, 0 );
 
 				var square3d = squareShape.extrude( extrudeSettings );
+				var squarePoints = squareShape.createPointsGeometry();
+				var squareSpacedPoints = squareShape.createSpacedPointsGeometry();
 
 				// Rectangle
 
@@ -162,6 +220,8 @@
 				rectShape.lineTo( 0, 0 );
 
 				var rect3d = rectShape.extrude( extrudeSettings );
+				var rectPoints = rectShape.createPointsGeometry();
+				var rectSpacedPoints = rectShape.createSpacedPointsGeometry();
 
 				// Rounded rectangle
 
@@ -169,6 +229,8 @@
 				roundedRect( roundedRectShape, 0, 0, 50, 50, 20 );
 
 				var roundedRect3d = roundedRectShape.extrude( extrudeSettings );
+				var roundedRectPoints = roundedRectShape.createPointsGeometry();
+				var roundedRectSpacedPoints = roundedRectShape.createSpacedPointsGeometry();
 
 				function roundedRect( ctx, x, y, width, height, radius ){
 
@@ -195,6 +257,8 @@
 				circleShape.quadraticCurveTo( -circleRadius, circleRadius, 0, circleRadius );
 
 				var circle3d = circleShape.extrude( extrudeSettings );
+				var circlePoints = circleShape.createPointsGeometry();
+				var circleSpacedPoints = circleShape.createSpacedPointsGeometry();
 
 				// Fish
 
@@ -210,8 +274,25 @@
 				fishShape.quadraticCurveTo( x + 50, y - 80, x, y );
 
 				var fish3d = fishShape.extrude( extrudeSettings );
+				var fishPoints = fishShape.createPointsGeometry();
+				var fishSpacedPoints = fishShape.createSpacedPointsGeometry();
 
-				// Spline shape + Path Extrusion
+				// Arc circle
+
+				var arcShape = new THREE.Shape();
+				arcShape.moveTo( 0, 0 );
+				arcShape.arc( 10, 10, 40, 0, Math.PI*2, false );
+
+				var holePath = new THREE.Path();
+				holePath.moveTo( 0, 0 );
+				holePath.arc( 10, 10, 10, 0, Math.PI*2, true );
+				arcShape.holes.push( holePath );
+
+				var arc3d = arcShape.extrude( extrudeSettings );
+				var arcPoints = arcShape.createPointsGeometry();
+				var arcSpacedPoints = arcShape.createSpacedPointsGeometry();
+
+				// Spline shape + path extrusion
 
 				var splinepts = [];
 				splinepts.push( new THREE.Vector2 ( 350, 100 ) );
@@ -227,24 +308,31 @@
 
 				var extrudePath = new THREE.Path();
 
+				extrudePath.moveTo( 0, 0 );
 				extrudePath.lineTo( 10, 10 );
 				extrudePath.quadraticCurveTo( 80, 60, 160, 10 );
 				extrudePath.quadraticCurveTo( 240, -40, 320, 10 );
 
 				extrudeSettings.path = extrudePath;
+				extrudeSettings.bevelEnabled = false;
 
 				var splineShape3d = splineShape.extrude( extrudeSettings );
+				var splinePoints = splineShape.createPointsGeometry( );
+				var splineSpacedPoints = splineShape.createSpacedPointsGeometry( );
 
-				addGeometry( california3d, 	0xffaa00, -300, -100, 0,     0, 0, 0, 0.25 );
-				addGeometry( triangle3d, 	0xffee00, -180,    0, 0,     0, 0, 0, 1 );
-				addGeometry( roundedRect3d, 0x005500, -150,  150, 0,     0, 0, 0, 1 );
-				addGeometry( square3d, 		0x0055ff,  150,  100, 0,     0, 0, 0, 1 );
-				addGeometry( heart3d, 		0xff1100,    0,  100, 0,   3.14, 0, 0, 1 );
-				addGeometry( circle3d, 		0x00ff11,  150,    0, 0,     0, 0, 0, 1 );
-				addGeometry( fish3d, 		0x222222,  -50,  200, 0,     0, 0, 0, 1 );
-				addGeometry( splineShape3d, 0x888888,  -50,  -100, -50,     0, 0, 0, 0.2 );
+				addGeometry( california3d, californiaPoints, californiaSpacedPoints,	0xffaa00, -300, -100, 0,     0, 0, 0, 0.25 );
+				addGeometry( triangle3d, trianglePoints, triangleSpacedPoints, 			0xffee00, -180,    0, 0,     0, 0, 0, 1 );
+				addGeometry( roundedRect3d, roundedRectPoints, roundedRectSpacedPoints,	0x005500, -150,  150, 0,     0, 0, 0, 1 );
+				addGeometry( square3d, squarePoints, squareSpacedPoints,				0x0055ff,  150,  100, 0,     0, 0, 0, 1 );
+				addGeometry( heart3d, heartPoints, heartSpacedPoints,					0xff1100,    0,  100, 0,   3.14, 0, 0, 1 );
+				addGeometry( circle3d, circlePoints, circleSpacedPoints,				0x00ff11,  120,  250, 0,     0, 0, 0, 1 );
+				addGeometry( fish3d, fishPoints, fishSpacedPoints,						0x222222,  -50,  200, 0,     0, 0, 0, 1 );
+				addGeometry( splineShape3d, splinePoints, splineSpacedPoints,			0x888888,  -50,  -100, -50,  0, 0, 0, 0.2 );
+				addGeometry( arc3d, arcPoints, arcSpacedPoints,							0xbb4422,  150,    0, 0,     0, 0, 0, 1 );
 
-				renderer = new THREE.CanvasRenderer();
+				//
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
                 renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.appendChild( renderer.domElement );
