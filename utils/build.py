@@ -13,6 +13,7 @@ import sys
 
 COMMON_FILES = [
 'Three.js',
+'core/Utils.js',
 'core/Color.js',
 'core/Vector.js',
 'core/Vector2.js',
@@ -119,6 +120,7 @@ EXTRAS_FILES = [
 
 CANVAS_FILES = [
 'Three.js',
+'core/Utils.js',
 'core/Color.js',
 'core/Vector.js',
 'core/Vector2.js',
@@ -169,6 +171,7 @@ CANVAS_FILES = [
 
 DOM_FILES = [
 'Three.js',
+'core/Utils.js',
 'core/Color.js',
 'core/Vector.js',
 'core/Vector2.js',
@@ -196,6 +199,7 @@ DOM_FILES = [
 
 SVG_FILES = [
 'Three.js',
+'core/Utils.js',
 'core/Color.js',
 'core/Vector.js',
 'core/Vector2.js',
@@ -243,6 +247,7 @@ SVG_FILES = [
 
 WEBGL_FILES = [
 'Three.js',
+'core/Utils.js',
 'core/Color.js',
 'core/Vector.js',
 'core/Vector2.js',

@@ -5,67 +5,50 @@
  * @author egraether / http://egraether.com/
  */
 
-THREE._Vector = ( function() {
+THREE._Vector = {
 
-	function negate() {
+	negate : function() {
 
 		return this.multiplyScalar( -1 );
 
-	}
+	},
 
-	function isZero() {
+	isZero : function() {
 
 		return this.lengthSq() < 0.0001; // almostZero
 
-	}
+	},
 
 
-	function length() {
+	length : function() {
 
 		return Math.sqrt( this.lengthSq() );
 
-	}
+	},
 
-	function normalize() {
+	normalize : function() {
 
 		return this.divideScalar( this.length() );
 
-	}
+	},
 
-	function setLength( l ) {
+	setLength : function( l ) {
 
 		return this.normalize().multiplyScalar( l );
 
-	}
+	},
 
 
-	function distanceToSquared( v ) {
+	distanceToSquared : function( v ) {
 
 		return this.clone().subSelf( v ).lengthSq();
 
-	}
+	},
 
-	function distanceTo( v ) {
+	distanceTo : function( v ) {
 
 		return Math.sqrt( this.distanceToSquared( v ) );
 
 	}
 
-
-	return function() {
-
-		this.negate = negate;
-		this.isZero = isZero;
-
-		this.length = length;
-		this.setLength = setLength;
-
-		// deprecated unit is reference to normalize
-		this.normalize = this.unit = normalize;
-
-		this.distanceToSquared = distanceToSquared;
-		this.distanceTo = distanceTo;
-
-	};
-
-})();
+};

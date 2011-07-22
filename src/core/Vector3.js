@@ -228,4 +228,4 @@ THREE.Vector3.prototype = {
 
 };
 
-THREE._Vector.call(THREE.Vector3.prototype);
+THREE.Utils.extend( THREE.Vector3.prototype, THREE._Vector );

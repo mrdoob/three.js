@@ -131,4 +131,4 @@ THREE.Vector2.prototype = {
 
 };
 
-THREE._Vector.call(THREE.Vector2.prototype);
+THREE.Utils.extend( THREE.Vector2.prototype, THREE._Vector );

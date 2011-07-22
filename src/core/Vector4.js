@@ -152,4 +152,4 @@ THREE.Vector4.prototype = {
 
 };
 
-THREE._Vector.call(THREE.Vector4.prototype);
+THREE.Utils.extend( THREE.Vector4.prototype, THREE._Vector );
