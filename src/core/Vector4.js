@@ -126,12 +126,6 @@ THREE.Vector4.prototype = {
 	},
 
 
-	negate : function() {
-
-		return this.multiplyScalar( -1 );
-
-	},
-
 	dot : function ( v ) {
 
 		return this.x * v.x + this.y * v.y + this.z * v.z + this.w * v.w;
@@ -141,24 +135,6 @@ THREE.Vector4.prototype = {
 	lengthSq : function () {
 
 		return this.dot( this );
-
-	},
-
-	length : function () {
-
-		return Math.sqrt( this.lengthSq() );
-
-	},
-
-	normalize : function () {
-
-		return this.divideScalar( this.length() );
-
-	},
-
-	setLength : function ( l ) {
-
-		return this.normalize().multiplyScalar( l );
 
 	},
 
@@ -175,3 +151,5 @@ THREE.Vector4.prototype = {
 	},
 
 };
+
+THREE._Vector.call(THREE.Vector4.prototype);

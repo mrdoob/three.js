@@ -106,12 +106,6 @@ THREE.Vector2.prototype = {
 	},
 
 
-	negate : function() {
-
-		return this.multiplyScalar( -1 );
-
-	},
-
 	dot : function ( v ) {
 
 		return this.x * v.x + this.y * v.y;
@@ -124,50 +118,11 @@ THREE.Vector2.prototype = {
 
 	},
 
-	length : function () {
 
-		return Math.sqrt( this.lengthSq() );
-
-	},
-
-	normalize : function () {
-
-		return this.divideScalar( this.length() );
-
-	},
-	
-	distanceTo : function ( v ) {
-
-		return Math.sqrt( this.distanceToSquared( v ) );
-
-	},
-
-	distanceToSquared : function ( v ) {
-
-		var dx = this.x - v.x, dy = this.y - v.y;
-		return dx * dx + dy * dy;
-
-	},
-
-
-	setLength : function ( l ) {
-
-		return this.normalize().multiplyScalar( l );
-
-	},
-
-	// deprecated: same as normalize
-
-	unit : function () {
-
-		return this.normalize();
-
-	},
-	
 	// danger, works only on numbers which are exactly the same
 	// (which may be not what is expected thanks to floating point precision)
 	// (should be probably using some tiny epsilon instead of equality)
-	
+
 	equals : function( v ) {
 
 		return ( ( v.x == this.x ) && ( v.y == this.y ) );
@@ -175,3 +130,5 @@ THREE.Vector2.prototype = {
 	}
 
 };
+
+THREE._Vector.call(THREE.Vector2.prototype);

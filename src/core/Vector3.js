@@ -153,12 +153,6 @@ THREE.Vector3.prototype = {
 	},
 
 
-	negate : function() {
-
-		return this.multiplyScalar( -1 );
-
-	},
-
 	dot : function ( v ) {
 
 		return this.x * v.x + this.y * v.y + this.z * v.z;
@@ -171,30 +165,12 @@ THREE.Vector3.prototype = {
 
 	},
 
-	length : function () {
-
-		return Math.sqrt( this.lengthSq() );
-
-	},
-
 	lengthManhattan : function () {
 
 		// correct version
 		// return Math.abs( this.x ) + Math.abs( this.y ) + Math.abs( this.z );
 
 		return this.x + this.y + this.z;
-
-	},
-
-	normalize : function () {
-
-		return this.divideScalar( this.length() );
-
-	},
-
-	setLength : function ( l ) {
-
-		return this.normalize().multiplyScalar( l );
 
 	},
 
@@ -218,19 +194,6 @@ THREE.Vector3.prototype = {
 			this.x * v.y - this.y * v.x
 
 		);
-
-	},
-
-
-	distanceTo : function ( v ) {
-
-		return Math.sqrt( this.distanceToSquared( v ) );
-
-	},
-
-	distanceToSquared : function ( v ) {
-
-		return new THREE.Vector3().sub( this, v ).lengthSq();
 
 	},
 
@@ -261,12 +224,8 @@ THREE.Vector3.prototype = {
 
 		}
 
-	},
-
-	isZero : function () {
-
-		return ( this.lengthSq() < 0.0001 /* almostZero */ );
-
 	}
 
 };
+
+THREE._Vector.call(THREE.Vector3.prototype);
