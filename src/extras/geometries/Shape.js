@@ -7,7 +7,7 @@
 // STEP 2 Turn path into shape.
 // STEP 3 ExtrudeGeometry takes in Shape/Shapes
 // STEP 3a - Extract points from each shape, turn to vertices
-// STEP 3b - Triangulate each shape
+// STEP 3b - Triangulate each shape, add faces.
 
 THREE.Shape = function ( ) {
 
@@ -30,7 +30,7 @@ THREE.Shape.prototype.extrude = function( options ) {
 
 /* Return array of holes' getPoints() */
 
-THREE.Shape.prototype.getHoles = function( spaced ) {
+THREE.Shape.prototype.getHoles = function( spaced, divisions ) {
 
 	var getPoints = spaced ? 'getSpacedPoints' : 'getPoints';
 
@@ -38,7 +38,7 @@ THREE.Shape.prototype.getHoles = function( spaced ) {
 
 	for ( i = 0; i < il; i ++ ) {
 
-		holesPts[ i ] = this.holes[ i ][ getPoints ](); // getSpacedPoints getPoints
+		holesPts[ i ] = this.holes[ i ][ getPoints ]( divisions ); // getSpacedPoints getPoints
 
 	}
 
@@ -51,19 +51,23 @@ THREE.Shape.prototype.getHoles = function( spaced ) {
    otherwise return keypoints based on segments paramater
 */
 
-THREE.Shape.prototype.extractAllPoints = function( spaced ) {
+THREE.Shape.prototype.extractAllPoints = function( spaced, divisions ) {
 
 	var getPoints = spaced ? 'getSpacedPoints' : 'getPoints';
 
 	return {
 
-		shape: this[ getPoints ](),
-		holes: this.getHoles( spaced )
+		shape: this[ getPoints ]( divisions ),
+		holes: this.getHoles( spaced, divisions )
 
 	};
 
 };
 
+
+/**************************************************************
+ *	Utils
+ **************************************************************/
 
 THREE.Shape.Utils = {
 
@@ -91,7 +95,6 @@ THREE.Shape.Utils = {
 			verts = [];
 
 		for ( h = 0; h < holes.length; h++ ) {
-		//for ( h = holes.length; h-- > 0; ) {
 
 			hole = holes[ h ];
 
@@ -108,8 +111,8 @@ THREE.Shape.Utils = {
 
 			// Find the shortest pair of pts between shape and hole
 
-			// TODO we could optimize with
-			// http://en.wikipedia.org/wiki/Proximity_problems
+			// Note: Actually, I'm not sure now if we could optimize this to be faster than O(m*n)
+			// But one thing is that we could speed this up by not running square roots on the pts differences
 			// http://en.wikipedia.org/wiki/Closest_pair_of_points
 			// http://stackoverflow.com/questions/1602164/shortest-distance-between-points-algorithm
 
@@ -320,7 +323,6 @@ THREE.Shape.Utils = {
 
 		}
 
-		//console.log("edited?" , triangles);
 		return triangles.concat( isolatedPts );
 
 	}, // end triangulate shapes
@@ -328,9 +330,8 @@ THREE.Shape.Utils = {
 	/*
 	triangulate2 : function( pts, holes ) {
 
-		// For use Poly2Tri.js
+		// For use with Poly2Tri.js
 
-		//var pts = this.getPoints();
 		var allpts = pts.concat();
 		var shape = [];
 		for (var p in pts) {
@@ -358,6 +359,7 @@ THREE.Shape.Utils = {
 			}
 			return -1;
 		};
+		
 		// triangulate
 		js.poly2tri.sweep.Triangulate(swctx);
 

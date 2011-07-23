@@ -1,6 +1,15 @@
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author mr.doob / http://mrdoob.com/
+ *
+ * ShaderUtils currently contains
+ *	fresnel
+ *	normal
+ * 	cube
+ * 	convolution
+ * 	film
+ * 	screen
+ *	basic
  */
 
 if ( THREE.WebGLRenderer ) {

@@ -76,188 +76,27 @@ THREE.TextGeometry.prototype.set = function ( text, parameters ) {
 	// Get a Font data json object
 
 	var data = THREE.FontUtils.drawText( text );
-
-	var vertices = data.points;
-	var faces = data.faces;
-	var contour = data.contour;
-	var bezelPoints = data.bezel;
-
-	var scope = this;
-
-	scope.vertices = [];
-	scope.faces = [];
-
-	var i,
-		vert, vlen = vertices.length,
-		face, flen = faces.length,
-		bezelPt, blen = bezelPoints.length;
-
-	// Back facing vertices
-
-	for ( i = 0; i < vlen; i++ ) {
-
-		vert = vertices[ i ];
-		v( vert.x, vert.y, 0 );
-
-	}
-
-	// Front facing vertices
-
-	for ( i = 0; i < vlen; i++ ) {
-
-		vert = vertices[ i ];
-		v( vert.x, vert.y, height );
-
-	}
-
-	if ( bezelEnabled ) {
-
-		for ( i = 0; i < blen; i++ ) {
-
-			bezelPt = bezelPoints[ i ];
-			v( bezelPt.x, bezelPt.y, bezelThickness );
-
-		}
-
-		for ( i = 0; i < blen; i++ ) {
-
-			bezelPt = bezelPoints[ i ];
-			v( bezelPt.x, bezelPt.y, height - bezelThickness );
-
-		}
-
-	}
-
-	// Bottom faces
-
-	for ( i = 0; i < flen; i++ ) {
-
-		face = faces[ i ];
-		f3( face[ 2 ], face[ 1 ], face[ 0 ] );
-
-	}
-
-	// Top faces
-
-	for ( i = 0; i < flen; i++ ) {
-
-		face = faces[ i ];
-		f3( face[ 0 ] + vlen, face[ 1 ] + vlen, face[ 2 ] + vlen );
-
-	}
-
-	var lastV;
-	var j, k, l, m;
-
-	if ( bezelEnabled ) {
-
-		i = bezelPoints.length;
-
-		while ( --i > 0 ) {
-
-			if ( !lastV ) {
-
-				lastV = contour[ i ];
-
-			} else if ( lastV.equals( contour[ i ] ) ) {
-
-				// We reached the last point of a closed loop
-
-				lastV = null;
-				continue;
-
-			}
-
-			l = vlen * 2 + i;
-			m = l - 1;
-
-			// Create faces for the z-sides of the text
-
-			f4( l, m, m + blen, l + blen );
-
-			for ( j = 0; j < vlen; j++ ) {
-
-				if ( vertices[ j ].equals( contour[ i ] ) ) break;
-
-			}
-
-			for ( k = 0; k < vlen; k++ ) {
-
-				if ( vertices[ k ].equals( contour[ i - 1 ] ) ) break;
-
-			}
-
-			// Create faces for the z-sides of the text
-
-			f4( j, k, m, l );
-			f4( l + blen, m + blen, k + vlen, j + vlen );
-
-		}
-
-	} else {
-
-		i = contour.length;
-
-		while ( --i > 0 ) {
-
-			if ( !lastV ) {
-
-				lastV = contour[ i ];
-
-			} else if ( lastV.equals( contour[ i ] ) ) {
-
-				// We reached the last point of a closed loop
-
-				lastV = null;
-				continue;
-
-			}
-
-			for ( j = 0; j < vlen; j++ ) {
-
-				if ( vertices[ j ].equals( contour[ i ] ) ) break;
-
-			}
-
-			for ( k = 0; k < vlen; k++ ) {
-
-				if ( vertices[ k ].equals( contour[ i - 1 ] ) ) break;
-
-			}
-
-			// Create faces for the z-sides of the text
-
-			f4( j, k, k + vlen, j + vlen );
-
-		}
-	}
-
-
-	// UVs to be added
-
-	this.computeCentroids();
-	this.computeFaceNormals();
-	//this.computeVertexNormals();
-
-	function v( x, y, z ) {
-
-		scope.vertices.push( new THREE.Vertex( new THREE.Vector3( x, y, z ) ) );
-
-	}
-
-	function f3( a, b, c ) {
-
-		scope.faces.push( new THREE.Face3( a, b, c ) );
-
-	}
-
-	function f4( a, b, c, d ) {
-
-		scope.faces.push( new THREE.Face4( a, b, c, d ) );
-
-	}
-
-
+	
+	var path = data.path;
+	
+	//path.debug(document.getElementById("boo"));
+	
+	this.fontShapes = path.toShapes();
+	console.log(path);
+	//console.log(fontShapes);
+	
+	// Either find actions or curves.
+	
+	
+	
+
+
+};
+
+THREE.TextGeometry.prototype.get = function () {
+	var text3d = new THREE.ExtrudeGeometry( this.fontShapes , { amount: 20, bevelEnabled:false, bevelThickness:3	} );
+	// TOFIX: Fillet Cap
+	return text3d;	
 };
 
 THREE.FontUtils = {
@@ -677,9 +516,6 @@ THREE.FontUtils = {
 			
 		}
 		
-		//path.debug(document.getElementById("boo"));
-		console.log(path);
-		
 
 		// get the width
 
@@ -693,6 +529,7 @@ THREE.FontUtils = {
 
 		var extract = this.extractPoints( allPts, characterPts );
 		extract.contour = allPts;
+		extract.path = path;
 
 		var bezelPoints = [];
 

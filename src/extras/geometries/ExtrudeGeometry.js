@@ -3,11 +3,32 @@
  * Creates extruded geometry from a path shape.
  **/
 
-THREE.ExtrudeGeometry = function( shape, options ) {
+THREE.ExtrudeGeometry = function( shapes, options ) {
+	
+	THREE.Geometry.call( this );
+	
+	shapes = shapes instanceof Array ? shapes : [ shapes ];
+	
+	var s=0, sl = shapes.length, shape;
+	
+	for (;s<sl;s++) {
+		shape = shapes[s];
+		console.log(shape);
+		this.addShape( shape, options );
+		
+	}
+	
+};
+	
+THREE.ExtrudeGeometry.prototype = new THREE.Geometry();
+
+THREE.ExtrudeGeometry.prototype.constructor = THREE.ExtrudeGeometry;
+	
+	
+THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	var amount = options.amount !== undefined ? options.amount : 100;
 
-	// todo: bevel
 	var bevelThickness = options.bevelThickness !== undefined ? options.bevelThickness : 8; // 10
 	var bevelSize = options.bevelSize !== undefined ? options.bevelSize : bevelThickness; // 8 
 	var bevelEnabled = options.bevelEnabled !== undefined ? options.bevelEnabled : true; // false
@@ -31,18 +52,17 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 	
 
 	// TODO, extrude by path's tangents? also via 3d path?
-
-	THREE.Geometry.call( this );
-
 	
 	// Variables initalization
 	var ahole, h, hl; // looping of holes
 	var scope = this;
 	var bevelPoints = [];
-
+	
+	var shapesOffset = this.vertices.length;
+	
 
 	// getPoints
-	var shapePoints = shape.extractAllPoints(false);
+	var shapePoints = shape.extractAllPoints(false, 8);
 	// false for getPoints | true for getSpacedPoints() for points with equal divisions
 	
     var vertices = shapePoints.shape; 
@@ -376,6 +396,9 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 	}
 
 	function f3( a, b, c ) {
+		a += shapesOffset;
+		b += shapesOffset;
+		c += shapesOffset;
 
 		// if ( reverse ) { // Can now be removed
 		// 
@@ -390,7 +413,11 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 	}
 
 	function f4( a, b, c, d ) {
-
+		
+		a += shapesOffset;
+		b += shapesOffset;
+		c += shapesOffset;
+		d += shapesOffset;
 
  		scope.faces.push( new THREE.Face4( a, b, c, d ) );
 
@@ -399,5 +426,3 @@ THREE.ExtrudeGeometry = function( shape, options ) {
 };
 
 
-THREE.ExtrudeGeometry.prototype = new THREE.Geometry();
-THREE.ExtrudeGeometry.prototype.constructor = THREE.ExtrudeGeometry;

@@ -694,3 +694,86 @@ THREE.Path.prototype.debug = function( canvas ) {
 	}
 
 };
+
+// Breaks path into shapes
+THREE.Path.prototype.toShapes = function() {
+	
+	var i, il, item, action, args;
+
+	var subPaths = [], lastPath = new THREE.Path();
+
+	for ( i = 0, il = this.actions.length; i < il; i ++ ) {
+
+		item = this.actions[ i ];
+
+		args = item.args;
+		action = item.action;
+		
+		if (action==THREE.PathActions.MOVE_TO) {
+			if (lastPath.actions!=0) {
+				
+				subPaths.push(lastPath);
+				lastPath = new THREE.Path();
+				
+			}
+		}
+		lastPath[action].apply( lastPath, args);
+		
+	}
+	
+	if (lastPath.actions!=0) {	
+	
+		subPaths.push(lastPath);
+		
+	}
+	
+	console.log(subPaths);
+	
+	var holesFirst = !THREE.Shape.Utils.isClockWise(subPaths[0].getPoints());
+	var tmpShape, shapes = [];
+	var tmpPath;
+	
+	if (holesFirst) {
+		tmpShape = new THREE.Shape();
+		for ( i=0, il = subPaths.length; i<il; i++) {
+		
+			tmpPath = subPaths[i];
+			
+			if (THREE.Shape.Utils.isClockWise(tmpPath.getPoints())) {
+				tmpShape.actions = tmpPath.actions;
+				tmpShape.curves = tmpPath.curves;
+				
+				shapes.push(tmpShape);
+				tmpShape = new THREE.Shape();
+				
+			} else {
+				tmpShape.holes.push(tmpPath);
+			}
+		
+		}
+	} else {
+		// Shapes first
+		for ( i=0, il = subPaths.length; i<il; i++) {
+		
+			tmpPath = subPaths[i];
+			
+			if (THREE.Shape.Utils.isClockWise(tmpPath.getPoints())) {
+				
+				
+				if (tmpShape) shapes.push(tmpShape);
+				tmpShape = new THREE.Shape();
+				tmpShape.actions = tmpPath.actions;
+				tmpShape.curves = tmpPath.curves;
+				
+			} else {
+				tmpShape.holes.push(tmpPath);
+			}
+		
+		}
+		shapes.push(tmpShape);
+	}
+	
+	console.log("shape", shapes);
+	
+	return shapes;
+};
