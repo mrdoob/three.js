@@ -1,9 +1,14 @@
 /**
  * @author oosmoxiecode
  * based on http://code.google.com/p/away3d/source/browse/trunk/fp10/Away3DLite/src/away3dlite/primitives/Torus.as?r=2888
+ * radius: major radius (default 100)
+ * tube: minor radius (default 40)
+ * segmentsR: # of segments around tube (default 8)
+ * segmentsT: # of segments along tube (default 6)
+ * arc: amount of angle to sweep the circle (default 2 * Math.PI)
  */
 
-THREE.Torus = function ( radius, tube, segmentsR, segmentsT ) {
+THREE.Torus = function ( radius, tube, segmentsR, segmentsT, arc ) {
 
 	THREE.Geometry.call( this );
 
@@ -13,6 +18,7 @@ THREE.Torus = function ( radius, tube, segmentsR, segmentsT ) {
 	this.tube = tube || 40;
 	this.segmentsR = segmentsR || 8;
 	this.segmentsT = segmentsT || 6;
+	this.arc = arc || (2 * Math.PI);
 
 	var temp_uv = [];
 
@@ -20,7 +26,7 @@ THREE.Torus = function ( radius, tube, segmentsR, segmentsT ) {
 
 		for ( var i = 0; i <= this.segmentsT; ++i ) {
 
-			var u = i / this.segmentsT * 2 * Math.PI;
+			var u = i / this.segmentsT * this.angle;
 			var v = j / this.segmentsR * 2 * Math.PI;
 			var x = (this.radius + this.tube*Math.cos(v))*Math.cos(u);
 			var y = (this.radius + this.tube*Math.cos(v))*Math.sin(u);
