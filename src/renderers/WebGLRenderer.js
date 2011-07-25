@@ -2603,8 +2603,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-
-
 		if ( material.morphTargets ) {
 
 			material.numSupportedMorphTargets = 0;
@@ -2812,6 +2810,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.uniform3fv( p_uniforms.directionalLightDirection, dirLight );
 			_gl.uniformMatrix4fv( p_uniforms.objectMatrix, false, object._objectMatrixArray );
 			_gl.uniformMatrix4fv( p_uniforms.viewMatrix, false, _viewMatrixArray );
+
 		}
 
 
@@ -2844,7 +2843,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else {
 
-			setupMorphTargets( material, geometryGroup, object );
+			if ( object.morphTargetBase ) {
+
+				setupMorphTargets( material, geometryGroup, object );
+
+			}
 
 		}
 
@@ -3063,7 +3066,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglMorphTargetsBuffers[ order[ m ] ] );
 				_gl.vertexAttribPointer( attributes[ "morphTarget" + m ], 3, _gl.FLOAT, false, 0, 0 );
 
-				object.__webglMorphTargetInfluences[ m ] = influences[ order[ m ]];
+				object.__webglMorphTargetInfluences[ m ] = influences[ order[ m ] ];
 
 				m ++;
 			}
@@ -3765,6 +3768,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 						_gl.uniformMatrix4fv( p_uniforms.projectionMatrix, false, _projectionMatrixArray );
 						_gl.uniformMatrix4fv( p_uniforms.viewMatrix, false, _viewMatrixArray );
 						_gl.uniform3fv( p_uniforms.directionalLightDirection, dirLight );
+
 					}
 
 
@@ -4984,6 +4988,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 			} else if( type == "v4" ) {
 
 				_gl.uniform4f( location, value.x, value.y, value.z, value.w );
+
+			} else if( type == "m4" ) {
+
+				if ( ! uniform._array ) {
+
+					uniform._array = new Float32Array( 16 );
+
+				}
+
+				value.flattenToArray( uniform._array );
+				_gl.uniformMatrix4fv( location, false, uniform._array );
 
 			} else if( type == "c" ) {
 
