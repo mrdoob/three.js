@@ -142,7 +142,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 			_clearRect.inflate( 1 );
 			_clearRect.minSelf( _clipRect );
 
-			if ( _clearColor.hex == 0x000000 && _clearOpacity == 0 ) {
+			if ( _clearOpacity == 0 ) {
 
 				_context.clearRect( _clearRect.getX(), _clearRect.getY(), _clearRect.getWidth(), _clearRect.getHeight() );
 
@@ -151,7 +151,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 				setBlending( THREE.NormalBlending );
 				setOpacity( 1 );
 
-				_context.fillStyle = 'rgba(' + Math.floor( _clearColor.r * 255 ) + ',' + Math.floor( _clearColor.g * 255 ) + ',' + Math.floor( _clearColor.b * 255 ) + ',' + _clearOpacity + ')';
+				_contextFillStyle = 'rgba(' + Math.floor( _clearColor.r * 255 ) + ',' + Math.floor( _clearColor.g * 255 ) + ',' + Math.floor( _clearColor.b * 255 ) + ',' + _clearOpacity + ')'
+				_context.fillStyle = _contextFillStyle;
 				_context.fillRect( _clearRect.getX(), _clearRect.getY(), _clearRect.getWidth(), _clearRect.getHeight() );
 
 			}
