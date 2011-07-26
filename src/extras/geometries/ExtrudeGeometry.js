@@ -187,20 +187,20 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 		
 		var anglea = Math.atan2(pt_j.y - pt_i.y, pt_j.x - pt_i.x);
 		var angleb = Math.atan2(pt_k.y - pt_i.y, pt_k.x - pt_i.x);
-		
+	
 		if ( anglea > angleb) {
 			angleb += Math.PI*2;
 		}
-		
+					
 		
 		// var anglea = Math.atan2(pt_i.y - pt_j.y, pt_i.x - pt_j.x);
-		// 	var angleb = Math.atan2(pt_i.y - pt_k.y, pt_i.x - pt_k.x);
-		// 	
+		//	var angleb = Math.atan2(pt_i.y - pt_k.y, pt_i.x - pt_k.x);
+		 	
 		// 	console.log('>?', anglea > angleb);
 		// 	
-		// 	if ( anglea < angleb) {
-		// 		angleb += Math.PI*2;
-		// 	}
+		// if ( anglea < angleb) {
+ 		// 	angleb += Math.PI*2;
+	 	// 	 	}
 		
 		
 		//x = Math.cos(anglea) + Math.cos(angleb);
@@ -212,8 +212,8 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 				
 		//console.log('angle1', anglea * RAD_TO_DEGREES,'angle2', angleb * RAD_TO_DEGREES, 'anglec', anglec *RAD_TO_DEGREES);
 		
-		var x = Math.cos(anglec);
-		var y = Math.sin(anglec);
+		var x = -Math.cos(anglec);
+		var y = -Math.sin(anglec);
 	
 		var vec = new THREE.Vector2(x,y).normalize();
 		
@@ -238,7 +238,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 		
 	}
 	
-	var holesMovements = [], oneHoleMovements;
+	var holesMovements = [], oneHoleMovements, verticesMovements = contourMovements.concat();
 	
 	for ( h = 0, hl = holes.length; h < hl; h++ ) {
 
@@ -256,6 +256,8 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 		}
 		
 		holesMovements.push(oneHoleMovements);
+		verticesMovements = verticesMovements.concat(oneHoleMovements);
+		
 
 	}
 	
@@ -269,8 +271,8 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 		z = bevelThickness * t;
 
 		// Formula could probably be simplified
-		bs = bevelSize * (1-Math.sin ((1-t) * Math.PI/2 )) ; //bevelSize * t ;
-		//bs = bevelSize * t ;
+		//bs = bevelSize * (Math.sin ((1-t) * Math.PI/2 )) ; //bevelSize * t ;
+		bs = bevelSize * (1-t) ;
 		
 		// contract shape
 		for ( i = 0, il = contour.length; i < il; i++ ) {
@@ -281,6 +283,8 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 
 		}
+		
+		console.log(bs);
 
 		// expand holes
 
@@ -312,6 +316,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 		if ( !extrudeByPath ) {
 
+			vert = scalePt2(vert, verticesMovements[i], bs);
 			v( vert.x, vert.y, 0 );
 
 		} else {
@@ -334,7 +339,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 			vert = vertices[ i ];
 
 			if ( !extrudeByPath ) {
-
+				vert = scalePt2(vert, verticesMovements[i], bs);
 				v( vert.x, vert.y, amount / steps * s );
 
 			} else {
