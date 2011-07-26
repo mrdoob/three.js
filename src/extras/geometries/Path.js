@@ -710,7 +710,7 @@ THREE.Path.prototype.toShapes = function() {
 		action = item.action;
 		
 		if (action==THREE.PathActions.MOVE_TO) {
-			if (lastPath.actions!=0) {
+			if (lastPath.actions.length!=0) {
 				
 				subPaths.push(lastPath);
 				lastPath = new THREE.Path();
@@ -721,7 +721,7 @@ THREE.Path.prototype.toShapes = function() {
 		
 	}
 	
-	if (lastPath.actions!=0) {	
+	if (lastPath.actions.length!=0) {	
 	
 		subPaths.push(lastPath);
 		
@@ -732,6 +732,8 @@ THREE.Path.prototype.toShapes = function() {
 	var holesFirst = !THREE.Shape.Utils.isClockWise(subPaths[0].getPoints());
 	var tmpShape, shapes = [];
 	var tmpPath;
+	
+	console.log("Holes first", holesFirst);
 	
 	if (holesFirst) {
 		tmpShape = new THREE.Shape();
@@ -746,8 +748,12 @@ THREE.Path.prototype.toShapes = function() {
 				shapes.push(tmpShape);
 				tmpShape = new THREE.Shape();
 				
+				console.log('cw', i);
+				
 			} else {
 				tmpShape.holes.push(tmpPath);
+				console.log('ccw', i);
+				
 			}
 		
 		}

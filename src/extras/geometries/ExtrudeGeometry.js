@@ -29,7 +29,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	var amount = options.amount !== undefined ? options.amount : 100;
 
-	var bevelThickness = options.bevelThickness !== undefined ? options.bevelThickness : 8; // 10
+	var bevelThickness = options.bevelThickness !== undefined ? options.bevelThickness : 6; // 10
 	var bevelSize = options.bevelSize !== undefined ? options.bevelSize : bevelThickness; // 8 
 	var bevelEnabled = options.bevelEnabled !== undefined ? options.bevelEnabled : true; // false
 	var bevelSegments = options.bevelSegments !== undefined ? options.bevelSegments : 3;
@@ -177,72 +177,39 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	
 	function getBevelVec(pt_i, pt_j, pt_k) {
+		
 		var anglea = Math.atan2(pt_j.y - pt_i.y, pt_j.x - pt_i.x);
 		var angleb = Math.atan2(pt_k.y - pt_i.y, pt_k.x - pt_i.x);
-		//var anglea = Math.atan2(pt_i.y - pt_j.y, pt_i.x - pt_j.x);
-		//var angleb = Math.atan2(pt_i.y - pt_k.y, pt_i.x - pt_k.x);
-		//if (anglea < 0 ) anglea += Math.PI * 2;
-		/*
-		if (angleb <= 0 ) {
-			angleb += Math.PI * 2;
-			console.log('ping');
+		
+		if ( anglea > angleb) {
+			angleb += Math.PI*2;
 		}
-		*/
 		
 		
-		x = Math.cos(anglea) + Math.cos(angleb);
-		y = Math.sin(anglea) + Math.sin(angleb);
-		anglec = Math.atan2(y,x);
+		// var anglea = Math.atan2(pt_i.y - pt_j.y, pt_i.x - pt_j.x);
+		// 	var angleb = Math.atan2(pt_i.y - pt_k.y, pt_i.x - pt_k.x);
+		// 	
+		// 	console.log('>?', anglea > angleb);
+		// 	
+		// 	if ( anglea < angleb) {
+		// 		angleb += Math.PI*2;
+		// 	}
 		
 		
-		console.log('angle1', anglea * RAD_TO_DEGREES,'angle2', angleb * RAD_TO_DEGREES, 'anglec', anglec *RAD_TO_DEGREES);
+		//x = Math.cos(anglea) + Math.cos(angleb);
+		//y = Math.sin(anglea) + Math.sin(angleb);
+		//anglec = Math.atan2(y,x);
 		
-		/*
-		x = bevelSize * Math.cos(anglec);
-		y = bevelSize * Math.sin(anglec);
 		
-		var vec = new THREE.Vector2(x,y).divideScalar(bevelSize);
-		*/
+		anglec = (anglea + angleb ) / 2;
+				
+		//console.log('angle1', anglea * RAD_TO_DEGREES,'angle2', angleb * RAD_TO_DEGREES, 'anglec', anglec *RAD_TO_DEGREES);
 		
 		var x = Math.cos(anglec);
 		var y = Math.sin(anglec);
-		
-		// Check quadrants?
-		console.log(x,y,'x,y');
-		
-		/*
-		var quad1 = Math.PI/2;
-		var quad2 = Math.PI;
-		var quad3 = Math.PI * 3/2
-		var quad4 = Math.PI * 2
-		
-		anglec %= quad4;
-		if (anglec < 0 ) anglec += quad4;
-		console.log('>0', anglec * RAD_TO_DEGREES);
 	
-		if (anglec < quad1) {
-
-			
-		} else
-		if (anglec < quad2) {
-			x = -x;
-			
-		} else if (anglec < quad3) {
-			y = -y;
-			x = -x;
-		} else if (anglec < quad4) {
-			
-			y = -y;
-		} else {
-			console.log("die");
-			
-			
-		}
-		*/
+		var vec = new THREE.Vector2(x,y).normalize();
 		
-		var vec = new THREE.Vector2(x,y);
-		
-		console.log('xy', x, y, vec, pt_i.x +x , pt_i.y + y);
 		return vec;
 	}
 	
@@ -253,9 +220,8 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 		if (k==il) k = 0;
 		
 		//  (j)---(i)---(k)
-		console.log('i,j,k', i, j , k)
+		// console.log('i,j,k', i, j , k)
 
-		
 		var pt_i = contour[ i ];
 		var pt_j = contour[ j ];
 		var pt_k = contour[ k ];
@@ -266,7 +232,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 	}
 	
 	var holesMovements = [], oneHoleMovements;
-	// expand holes
+	
 	for ( h = 0, hl = holes.length; h < hl; h++ ) {
 
 		ahole = holes[h];
@@ -278,9 +244,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 			if (k==il) k = 0;
 
 			//  (j)---(i)---(k)
-
 			oneHoleMovements[i]= getBevelVec(ahole[ i ], ahole[ j ], ahole[ k ] );
-
 
 		}
 		

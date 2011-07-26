@@ -44,6 +44,22 @@ THREE.TextGeometry = function ( text, parameters ) {
 
 };
 
+/*
+	var text3d = new TextGeometry(text);
+	
+	FactoryStyle
+	var text3d = FontUtils.createText(text);
+
+	var textPath = new TextPath(text);
+	var textShapes = textPath.toShapes();
+	var text3d = new ExtrudeGeometry(textShapes, options);
+	
+	var textShapes = FontUtils.getTextShapes(text);
+	text3d = new ExtrudeGeometry(textShapes, options);
+	
+
+ */
+
 THREE.TextGeometry.prototype = new THREE.Geometry();
 THREE.TextGeometry.prototype.constructor = THREE.TextGeometry;
 
@@ -73,19 +89,6 @@ THREE.TextGeometry.prototype.set = function ( text, parameters ) {
 
 	THREE.FontUtils.bezelSize = bezelSize;
 
-	// Get a Font data json object
-
-	var data = THREE.FontUtils.drawText( text );
-	
-	var path = data.path;
-	
-	//path.debug(document.getElementById("boo"));
-	
-	this.fontShapes = path.toShapes();
-	console.log(path);
-	//console.log(fontShapes);
-	
-	// Either find actions or curves.
 	
 	
 	
@@ -94,8 +97,26 @@ THREE.TextGeometry.prototype.set = function ( text, parameters ) {
 };
 
 THREE.TextGeometry.prototype.get = function () {
-	var text3d = new THREE.ExtrudeGeometry( this.fontShapes , { amount: 20, bevelEnabled:false, bevelThickness:3	} );
+	
+	
+	// Get a Font data json object
+
+	var data = THREE.FontUtils.drawText( this.text );
+	
+	var paths = data.paths;
+	var shapes = [];
+	for (var p=0, pl = paths.length; p<pl; p++) {
+		shapes = shapes.concat(paths[p].toShapes());
+	}
+
+	//console.log(path);
+	//console.log(fontShapes);
+	
+	// Either find actions or curves.
+	
+	var text3d = new THREE.ExtrudeGeometry( shapes , { amount: 20, bevelEnabled:true, bevelThickness:3	} );
 	// TOFIX: Fillet Cap
+	// FIX HOLES
 	return text3d;	
 };
 
@@ -505,14 +526,14 @@ THREE.FontUtils = {
 
 		var fontPaths = [];
 
-		var path = new THREE.Path();
+		
 		for ( i = 0; i < length; i++ ) {
-			
+			var path = new THREE.Path();
 			var ret = this.extractGlyphPoints( chars[ i ], face, scale, offset, path );
 			offset += ret.offset;
 			characterPts.push( ret.points );
 			allPts = allPts.concat( ret.points );
-			//fontPaths.push( ret.path );
+			fontPaths.push( ret.path );
 			
 		}
 		
@@ -529,7 +550,7 @@ THREE.FontUtils = {
 
 		var extract = this.extractPoints( allPts, characterPts );
 		extract.contour = allPts;
-		extract.path = path;
+		extract.paths = fontPaths;
 
 		var bezelPoints = [];
 
