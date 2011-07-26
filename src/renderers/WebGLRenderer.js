@@ -92,6 +92,39 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.autoClear = true;
 	this.sortObjects = true;
 
+	// shadow map
+
+	this.shadowMapBias = 0.0039;
+	this.shadowMapDarkness = 0.5;
+	this.shadowMapWidth = 512;
+	this.shadowMapHeight = 512;
+
+	this.shadowCameraNear = 1;
+	this.shadowCameraFar = 5000;
+	this.shadowCameraFov = 50;
+
+	this.shadowMap = null;
+	this.shadowMapEnabled = false;
+
+	var _cameraLight,
+		_shadowMatrix = new THREE.Matrix4();
+
+	var depthShader = THREE.ShaderLib[ "depthRGBA" ];
+	var depthUniforms = THREE.UniformsUtils.clone( depthShader.uniforms );
+
+	var _depthMaterial = new THREE.MeshShaderMaterial( { fragmentShader: depthShader.fragmentShader,
+														 vertexShader: depthShader.vertexShader,
+														 uniforms: depthUniforms } );
+
+	var _depthMaterialMorph = new THREE.MeshShaderMaterial( { fragmentShader: depthShader.fragmentShader,
+															  vertexShader: depthShader.vertexShader,
+															  uniforms: depthUniforms,
+															  morphTargets: true
+															} );
+
+	_depthMaterial._shadowPass = true;
+	_depthMaterialMorph._shadowPass = true;
+
 	// Init GL
 
 	try {
@@ -401,18 +434,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.setStencilShadowDarkness = function( value ) {
 
 		_stencilShadow.darkness = value;
+
 	};
 
 	this.getContext = function() {
 
 		return _gl;
 
-	}
-
+	};
 
 	function setupLights ( program, lights ) {
 
-		var l, ll, light, r = 0, g = 0, b = 0,
+		var l, ll, light, n,
+		r = 0, g = 0, b = 0,
 		color, position, intensity, distance,
 
 		zlights = _lights,
@@ -449,13 +483,29 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				doffset = dlength * 3;
 
-				dcolors[ doffset ] = color.r * intensity;
+				dcolors[ doffset ]     = color.r * intensity;
 				dcolors[ doffset + 1 ] = color.g * intensity;
 				dcolors[ doffset + 2 ] = color.b * intensity;
 
-				dpositions[ doffset ] = position.x;
+				dpositions[ doffset ]     = position.x;
 				dpositions[ doffset + 1 ] = position.y;
 				dpositions[ doffset + 2 ] = position.z;
+
+				dlength += 1;
+
+			} else if ( light instanceof THREE.SpotLight ) { // hack, not a proper spotlight
+
+				doffset = dlength * 3;
+
+				dcolors[ doffset ]     = color.r * intensity;
+				dcolors[ doffset + 1 ] = color.g * intensity;
+				dcolors[ doffset + 2 ] = color.b * intensity;
+
+				n = 1 / position.length();
+
+				dpositions[ doffset ]     = position.x * n;
+				dpositions[ doffset + 1 ] = position.y * n;
+				dpositions[ doffset + 2 ] = position.z * n;
 
 				dlength += 1;
 
@@ -463,11 +513,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				poffset = plength * 3;
 
-				pcolors[ poffset ] = color.r * intensity;
+				pcolors[ poffset ]     = color.r * intensity;
 				pcolors[ poffset + 1 ] = color.g * intensity;
 				pcolors[ poffset + 2 ] = color.b * intensity;
 
-				ppositions[ poffset ] = position.x;
+				ppositions[ poffset ]     = position.x;
 				ppositions[ poffset + 1 ] = position.y;
 				ppositions[ poffset + 2 ] = position.z;
 
@@ -923,6 +973,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		obj_skinVerticesB = geometry.skinVerticesB,
 		obj_skinIndices = geometry.skinIndices,
 		obj_skinWeights = geometry.skinWeights,
+
 		obj_edgeFaces = object instanceof THREE.ShadowVolume ? geometry.edgeFaces : undefined,
 
 		morphTargets = geometry.morphTargets;
@@ -1944,6 +1995,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				_gl.bufferData( _gl.ARRAY_BUFFER, morphTargetsArrays[ vk ], hint );
 
 			}
+
 		}
 
 		if ( dirtyColors && offset_color > 0 ) {
@@ -2511,6 +2563,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	function refreshUniformsShadow( uniforms, material ) {
+
+		if ( uniforms.shadowMatrix ) {
+
+			uniforms.shadowMatrix.value.copy( _shadowMatrix );
+			uniforms.shadowMap.texture = _this.shadowMap;
+
+			uniforms.shadowDarkness.value = _this.shadowMapDarkness;
+			uniforms.shadowBias.value = _this.shadowMapBias;
+
+		}
+
+	};
+
 	this.initMaterial = function ( material, lights, fog, object ) {
 
 		var u, a, identifiers, i, parameters, maxLightCount, maxBones, shaderID;
@@ -2563,6 +2629,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		maxBones = allocateBones( object );
 
 		parameters = {
+
 			map: !!material.map, envMap: !!material.envMap, lightMap: !!material.lightMap,
 			vertexColors: material.vertexColors,
 			fog: fog, sizeAttenuation: material.sizeAttenuation,
@@ -2570,7 +2637,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 			morphTargets: material.morphTargets,
 			maxMorphTargets: this.maxMorphTargets,
 			maxDirLights: maxLightCount.directional, maxPointLights: maxLightCount.point,
-			maxBones: maxBones
+			maxBones: maxBones,
+			shadowMapEnabled: this.shadowMapEnabled && object.receiveShadow
+
 		};
 
 		material.program = buildProgram( shaderID, material.fragmentShader, material.vertexShader, material.uniforms, material.attributes, parameters );
@@ -2606,7 +2675,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( material.morphTargets ) {
 
 			material.numSupportedMorphTargets = 0;
-
 
 			if ( attributes.morphTarget0 >= 0 ) {
 
@@ -2664,14 +2732,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			object.__webglMorphTargetInfluences = new Float32Array( this.maxMorphTargets );
-
-			for ( var i = 0, il = this.maxMorphTargets; i < il; i ++ ) {
-
-				object.__webglMorphTargetInfluences[ i ] = 0;
-
-			}
-
 		}
 
 	};
@@ -2681,6 +2741,22 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( ! material.program ) {
 
 			_this.initMaterial( material, lights, fog, object );
+
+		}
+
+		if ( material.morphTargets ) {
+
+			if ( ! object.__webglMorphTargetInfluences ) {
+
+				object.__webglMorphTargetInfluences = new Float32Array( _this.maxMorphTargets );
+
+				for ( var i = 0, il = this.maxMorphTargets; i < il; i ++ ) {
+
+					object.__webglMorphTargetInfluences[ i ] = 0;
+
+				}
+
+			}
 
 		}
 
@@ -2752,6 +2828,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 		} else if ( material instanceof THREE.MeshNormalMaterial ) {
 
 			m_uniforms.opacity.value = material.opacity;
+
+		}
+
+		if ( object.receiveShadow && ! material._shadowPass ) {
+
+			refreshUniformsShadow( m_uniforms, material );
+
 		}
 
 		// load common uniforms
@@ -2776,7 +2859,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material instanceof THREE.MeshShaderMaterial ||
 			 material.envMap ||
-			 material.skinning ) {
+			 material.skinning ||
+			 object.receiveShadow ) {
 
 			if ( p_uniforms.objectMatrix !== null ) {
 
@@ -3098,6 +3182,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 						candidateInfluence = influences[ candidate ];
 
 					}
+
 				}
 
 				_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglMorphTargetsBuffers[ candidate ] );
@@ -3108,7 +3193,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 				used[ candidate ] = 1;
 				candidateInfluence = -1;
 				m ++;
+
 			}
+
 		}
 
 		// load updated influences uniform
@@ -3384,12 +3471,174 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	function renderShadowMap( scene, camera ) {
+
+		var i, il, light,
+			oil,
+			material,
+			o, ol, webglObject, object,
+			lights = scene.lights,
+			fog = null;
+
+		if ( ! _cameraLight ) {
+
+			_cameraLight = new THREE.Camera( _this.shadowCameraFov, camera.aspect, _this.shadowCameraNear, _this.shadowCameraFar );
+
+		}
+
+		if ( ! _this.shadowMap ) {
+
+			var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat };
+			//var pars = { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat };
+			_this.shadowMap = new THREE.WebGLRenderTarget( _this.shadowMapWidth, _this.shadowMapHeight, pars );
+
+		}
+
+		for ( i = 0, il = lights.length; i < il; i ++ ) {
+
+			light = lights[ i ];
+
+			if ( light instanceof THREE.SpotLight && light.castShadow ) {
+
+				_cameraLight.position.copy( light.position );
+				_cameraLight.target.position.copy( light.target.position );
+
+				_cameraLight.update( undefined, true );
+
+				scene.update( undefined, false, _cameraLight );
+
+				// compute shadow matrix
+
+				_shadowMatrix.set( 0.5, 0.0, 0.0, 0.5,
+								   0.0, 0.5, 0.0, 0.5,
+								   0.0, 0.0, 0.5, 0.5,
+								   0.0, 0.0, 0.0, 1.0 );
+
+				_shadowMatrix.multiplySelf( _cameraLight.projectionMatrix );
+				_shadowMatrix.multiplySelf( _cameraLight.matrixWorldInverse );
+
+				// render shadow map
+
+				_cameraLight.matrixWorldInverse.flattenToArray( _viewMatrixArray );
+				_cameraLight.projectionMatrix.flattenToArray( _projectionMatrixArray );
+
+				_projScreenMatrix.multiply( _cameraLight.projectionMatrix, _cameraLight.matrixWorldInverse );
+				computeFrustum( _projScreenMatrix );
+
+				_this.initWebGLObjects( scene );
+
+				setRenderTarget( _this.shadowMap );
+
+				// using arbitrary clear color in depth pass
+				// creates variance in shadows
+
+				_gl.clearColor( 1, 1, 1, 1 );
+				//_gl.clearColor( 0, 0, 0, 1 );
+
+				_this.clear();
+
+				_gl.clearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
+
+
+				// set matrices & frustum culling
+
+				ol = scene.__webglObjects.length;
+				oil = scene.__webglObjectsImmediate.length;
+
+				for ( o = 0; o < ol; o ++ ) {
+
+					webglObject = scene.__webglObjects[ o ];
+					object = webglObject.object;
+
+					if ( object.visible && object.castShadow ) {
+
+						if ( ! ( object instanceof THREE.Mesh ) || isInFrustum( object ) ) {
+
+							object.matrixWorld.flattenToArray( object._objectMatrixArray );
+
+							setupMatrices( object, _cameraLight, false );
+
+							webglObject.render = true;
+
+						} else {
+
+							webglObject.render = false;
+
+						}
+
+					} else {
+
+						webglObject.render = false;
+
+					}
+
+				}
+
+				setDepthTest( true );
+				setBlending( THREE.NormalBlending ); // maybe blending should be just disabled?
+
+				//_gl.cullFace( _gl.FRONT );
+
+				for ( o = 0; o < ol; o ++ ) {
+
+					webglObject = scene.__webglObjects[ o ];
+
+					if ( webglObject.render ) {
+
+						object = webglObject.object;
+						buffer = webglObject.buffer;
+
+						setObjectFaces( object );
+
+						material = object.geometry.morphTargets.length ? _depthMaterialMorph : _depthMaterial;
+
+						renderBuffer( _cameraLight, lights, fog, material, buffer, object );
+
+					}
+
+				}
+
+
+				for ( o = 0; o < oil; o++ ) {
+
+					webglObject = scene.__webglObjectsImmediate[ o ];
+					object = webglObject.object;
+
+					if ( object.visible && object.castShadow ) {
+
+						if( object.matrixAutoUpdate ) {
+
+							object.matrixWorld.flattenToArray( object._objectMatrixArray );
+
+						}
+
+						setupMatrices( object, _cameraLight, false );
+
+						setObjectFaces( object );
+
+						program = setProgram( _cameraLight, lights, fog, _depthMaterial, object );
+						object.render( function( object ) { renderBufferImmediate( object, program, _depthMaterial.shading ); } );
+
+					}
+
+				}
+
+				//_gl.cullFace( _gl.BACK );
+
+			}
+
+		}
+
+	};
+
 	this.render = function( scene, camera, renderTarget, forceClear ) {
 
 		var i, program, opaque, transparent, material,
 			o, ol, oil, webglObject, object, buffer,
 			lights = scene.lights,
 			fog = scene.fog;
+
+		if ( this.shadowMapEnabled ) renderShadowMap( scene, camera );
 
 		_this.data.vertices = 0;
 		_this.data.faces = 0;
@@ -3430,7 +3679,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					object.matrixWorld.flattenToArray( object._objectMatrixArray );
 
-					setupMatrices( object, camera );
+					setupMatrices( object, camera, true );
 
 					unrollBufferMaterials( webglObject );
 
@@ -3488,7 +3737,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				setupMatrices( object, camera );
+				setupMatrices( object, camera, true );
 
 				unrollImmediateBufferMaterials( webglObject );
 
@@ -4183,10 +4432,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 	};
 
 
-	function setupMatrices( object, camera ) {
+	function setupMatrices( object, camera, computeNormalMatrix ) {
 
 		object._modelViewMatrix.multiplyToArray( camera.matrixWorldInverse, object.matrixWorld, object._modelViewMatrixArray );
-		THREE.Matrix4.makeInvert3x3( object._modelViewMatrix ).transposeIntoArray( object._normalMatrixArray );
+
+		if ( computeNormalMatrix ) {
+
+			THREE.Matrix4.makeInvert3x3( object._modelViewMatrix ).transposeIntoArray( object._normalMatrixArray );
+
+		}
 
 	};
 
@@ -4795,6 +5049,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			parameters.vertexColors ? "#define USE_COLOR" : "",
 			parameters.skinning ? "#define USE_SKINNING" : "",
 			parameters.morphTargets ? "#define USE_MORPHTARGETS" : "",
+			parameters.shadowMapEnabled ? "#define USE_SHADOWMAP" : "",
 
 			parameters.sizeAttenuation ? "#define USE_SIZEATTENUATION" : "",
 
@@ -4860,6 +5115,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			parameters.envMap ? "#define USE_ENVMAP" : "",
 			parameters.lightMap ? "#define USE_LIGHTMAP" : "",
 			parameters.vertexColors ? "#define USE_COLOR" : "",
+			parameters.shadowMapEnabled ? "#define USE_SHADOWMAP" : "",
 
 			"uniform mat4 viewMatrix;",
 			"uniform vec3 cameraPosition;",
@@ -4953,10 +5209,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		for( u in uniforms ) {
 
-			location = program.uniforms[u];
+			location = program.uniforms[ u ];
 			if ( !location ) continue;
 
-			uniform = uniforms[u];
+			uniform = uniforms[ u ];
 
 			type = uniform.type;
 			value = uniform.value;
@@ -5608,6 +5864,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			light = lights[ l ];
 
+			if ( light instanceof THREE.SpotLight ) dirLights++; // hack, not a proper spotlight
 			if ( light instanceof THREE.DirectionalLight ) dirLights++;
 			if ( light instanceof THREE.PointLight ) pointLights++;
 
