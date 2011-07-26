@@ -518,7 +518,9 @@ THREE.Matrix4.prototype = {
 		e = Math.cos( z ), f = Math.sin( z );
 
 		switch ( order ) {
+
 			case 'YXZ':
+
 				var ce = c * e, cf = c * f, de = d * e, df = d * f;
 
 				this.n11 = ce + df * b;
@@ -535,6 +537,7 @@ THREE.Matrix4.prototype = {
 				break;
 
 			case 'ZXY':
+
 				var ce = c * e, cf = c * f, de = d * e, df = d * f;
 
 				this.n11 = ce - df * b;
@@ -551,6 +554,7 @@ THREE.Matrix4.prototype = {
 				break;
 
 			case 'ZYX':
+
 				var ae = a * e, af = a * f, be = b * e, bf = b * f;
 
 				this.n11 = c * e;
@@ -567,6 +571,7 @@ THREE.Matrix4.prototype = {
 				break;
 
 			case 'YZX':
+
 				var ac = a * c, ad = a * d, bc = b * c, bd = b * d;
 
 				this.n11 = c * e;
@@ -583,6 +588,7 @@ THREE.Matrix4.prototype = {
 				break;
 
 			case 'XZY':
+
 				var ac = a * c, ad = a * d, bc = b * c, bd = b * d;
 
 				this.n11 = c * e;
@@ -599,6 +605,7 @@ THREE.Matrix4.prototype = {
 				break;
 
 			default: // 'XYZ'
+
 				var ae = a * e, af = a * f, be = b * e, bf = b * f;
 
 				this.n11 = c * e;
@@ -613,6 +620,7 @@ THREE.Matrix4.prototype = {
 				this.n32 = be + af * d;
 				this.n33 = a * c;
 				break;
+
 		}
 
 		return this;

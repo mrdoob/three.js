@@ -15,9 +15,9 @@
  *  weight: 		<string>,		// font weight (normal, bold)
  *  style: 			<string>,		// font style  (normal, italics)
  *
- *  bezelEnabled:	<bool>,			// turn on bezel
- *  bezelThickness: <float>, 		// how deep into text bezel goes
- *  bezelSize:		<float>, 		// how far from text outline is bezel
+ *  bevelEnabled:	<bool>,			// turn on bevel
+ *  bevelThickness: <float>, 		// how deep into text bevel goes
+ *  bevelSize:		<float>, 		// how far from text outline is bevel
  *  }
  *
  * It uses techniques used in:
@@ -76,9 +76,9 @@ THREE.TextGeometry.prototype.set = function ( text, parameters ) {
 	var weight = parameters.weight !== undefined ? parameters.weight : "normal";
 	var style = parameters.style !== undefined ? parameters.style : "normal";
 
-	var bezelThickness = parameters.bezelThickness !== undefined ? parameters.bezelThickness : 10;
-	var bezelSize = parameters.bezelSize !== undefined ? parameters.bezelSize : 8;
-	var bezelEnabled = parameters.bezelEnabled !== undefined ? parameters.bezelEnabled : false;
+	var bevelThickness = parameters.bevelThickness !== undefined ? parameters.bevelThickness : 10;
+	var bevelSize = parameters.bevelSize !== undefined ? parameters.bevelSize : 8;
+	var bevelEnabled = parameters.bevelEnabled !== undefined ? parameters.bevelEnabled : false;
 
 	THREE.FontUtils.size = size;
 	THREE.FontUtils.divisions = curveSegments;
@@ -87,11 +87,7 @@ THREE.TextGeometry.prototype.set = function ( text, parameters ) {
 	THREE.FontUtils.weight = weight;
 	THREE.FontUtils.style = style;
 
-	THREE.FontUtils.bezelSize = bezelSize;
-
-	
-	
-	
+	THREE.FontUtils.bevelSize = bevelSize;
 
 
 };
@@ -529,6 +525,7 @@ THREE.FontUtils = {
 		
 		for ( i = 0; i < length; i++ ) {
 			var path = new THREE.Path();
+
 			var ret = this.extractGlyphPoints( chars[ i ], face, scale, offset, path );
 			offset += ret.offset;
 			characterPts.push( ret.points );
@@ -536,7 +533,6 @@ THREE.FontUtils = {
 			fontPaths.push( ret.path );
 			
 		}
-		
 
 		// get the width
 
@@ -552,7 +548,7 @@ THREE.FontUtils = {
 		extract.contour = allPts;
 		extract.paths = fontPaths;
 
-		var bezelPoints = [];
+		var bevelPoints = [];
 
 		var centroids = [], forCentroids = [], expandOutwards = [], sum = new THREE.Vector2(), lastV;
 
@@ -597,7 +593,7 @@ THREE.FontUtils = {
 			centroid = centroids[ p ];
 
 			dirV = pt.clone().subSelf( centroid );
-			adj = this.bezelSize / dirV.length();
+			adj = this.bevelSize / dirV.length();
 
 			if ( expandOutwards[ p ] ) {
 
@@ -610,7 +606,7 @@ THREE.FontUtils = {
 			}
 
 			adj = dirV.multiplyScalar( adj ).addSelf( centroid );
-			bezelPoints.unshift( adj );
+			bevelPoints.unshift( adj );
 
 
 			if ( !lastV ) {
@@ -634,12 +630,12 @@ THREE.FontUtils = {
 		for ( p = 0; p < allPts.length; p++ ) {
 
 			pt = allPts[ p ];
-			bezelPoints.push( new THREE.Vector2( pt.x + this.bezelSize, pt.y + this.bezelSize ) );
+			bevelPoints.push( new THREE.Vector2( pt.x + this.bevelSize, pt.y + this.bevelSize ) );
 
 		}
 		*/
 
-		extract.bezel = bezelPoints;
+		extract.bevel = bevelPoints;
 
 		return extract;
 
@@ -715,7 +711,7 @@ THREE.FontUtils = {
 	extractGlyphPoints : function( c, face, scale, offset, path ) {
 
 		var pts = [];
-		
+
 
 
 		var i, i2,
@@ -932,10 +928,10 @@ THREE.FontUtils = {
 				result.push( contour[ b ] );
 				result.push( contour[ c ] );
 				*/
-				result.push( [ contour[ a ], 
+				result.push( [ contour[ a ],
 					contour[ b ],
 					contour[ c ] ] );
-				
+
 
 				vertIndices.push( [ verts[ u ], verts[ v ], verts[ w ] ] );
 

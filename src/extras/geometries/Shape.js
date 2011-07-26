@@ -19,26 +19,26 @@ THREE.Shape = function ( ) {
 THREE.Shape.prototype = new THREE.Path();
 THREE.Shape.prototype.constructor = THREE.Path;
 
-/* Convenience method to return ExtrudeGeometry */
+// Convenience method to return ExtrudeGeometry
 
-THREE.Shape.prototype.extrude = function( options ) {
+THREE.Shape.prototype.extrude = function ( options ) {
 
 	var extruded = new THREE.ExtrudeGeometry( this, options );
 	return extruded;
 
 };
 
-/* Return array of holes' getPoints() */
+// Get points of holes
 
-THREE.Shape.prototype.getHoles = function( spaced, divisions ) {
 
-	var getPoints = spaced ? 'getSpacedPoints' : 'getPoints';
+THREE.Shape.prototype.getPointsHoles = function () {
+
 
 	var i, il = this.holes.length, holesPts = [];
 
 	for ( i = 0; i < il; i ++ ) {
 
-		holesPts[ i ] = this.holes[ i ][ getPoints ]( divisions ); // getSpacedPoints getPoints
+		holesPts[ i ] = this.holes[ i ].getPoints();
 
 	}
 
@@ -46,24 +46,48 @@ THREE.Shape.prototype.getHoles = function( spaced, divisions ) {
 
 };
 
-/* Returns points of shape and holes
-   spaced, when true returns points spaced by regular distances
-   otherwise return keypoints based on segments paramater
-*/
+// Get points of holes (spaced by regular distance)
 
-THREE.Shape.prototype.extractAllPoints = function( spaced, divisions ) {
+THREE.Shape.prototype.getSpacedPointsHoles = function () {
 
-	var getPoints = spaced ? 'getSpacedPoints' : 'getPoints';
+	var i, il = this.holes.length, holesPts = [];
+
+	for ( i = 0; i < il; i ++ ) {
+
+		holesPts[ i ] = this.holes[ i ].getSpacedPoints();
+
+	}
+
+	return holesPts;
+
+};
+
+
+// Get points of shape and holes (keypoints based on segments parameter)
+
+THREE.Shape.prototype.extractAllPoints = function () {
 
 	return {
 
-		shape: this[ getPoints ]( divisions ),
-		holes: this.getHoles( spaced, divisions )
+		shape: this.getPoints(),
+		holes: this.getPointsHoles()
 
 	};
 
 };
 
+// Get points of shape and holes (spaced by regular distance)
+
+THREE.Shape.prototype.extractAllSpacedPoints = function () {
+
+	return {
+
+		shape: this.getSpacedPoints(),
+		holes: this.getSpacedPointsHoles()
+
+	};
+
+};
 
 /**************************************************************
  *	Utils
@@ -75,7 +99,8 @@ THREE.Shape.Utils = {
 		contour - array of vector2 for contour
 		holes   - array of array of vector2
 	*/
-	removeHoles: function( contour, holes ) {
+
+	removeHoles: function ( contour, holes ) {
 
 		var shape = contour.concat(); // work on this shape
 		var allpoints = shape.concat();
@@ -266,7 +291,7 @@ THREE.Shape.Utils = {
 
 	},
 
-	triangulateShape: function( contour, holes ) {
+	triangulateShape: function ( contour, holes ) {
 
 		var shapeWithoutHoles = THREE.Shape.Utils.removeHoles( contour, holes );
 

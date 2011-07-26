@@ -33,7 +33,7 @@ THREE.PathActions = {
 // Create path using straight lines to connect all points
 // - vectors: array of Vector2
 
-THREE.Path.prototype.fromPoints = function( vectors ) {
+THREE.Path.prototype.fromPoints = function ( vectors ) {
 
 	this.moveTo( vectors[ 0 ].x, vectors[ 0 ].y );
 
@@ -49,14 +49,14 @@ THREE.Path.prototype.fromPoints = function( vectors ) {
 
 // startPath() endPath()?
 
-THREE.Path.prototype.moveTo = function( x, y ) {
+THREE.Path.prototype.moveTo = function ( x, y ) {
 
 	var args = Array.prototype.slice.call( arguments );
 	this.actions.push( { action: THREE.PathActions.MOVE_TO, args: args } );
 
 };
 
-THREE.Path.prototype.lineTo = function( x, y ) {
+THREE.Path.prototype.lineTo = function ( x, y ) {
 
 	var args = Array.prototype.slice.call( arguments );
 
@@ -86,8 +86,8 @@ THREE.Path.prototype.quadraticCurveTo = function( aCPx, aCPy, aX, aY ) {
 
 	this.actions.push( { action: THREE.PathActions.QUADRATIC_CURVE_TO, args: args, curve: curve } );
 
-	//console.log(curve, curve.getPoints(), curve.getSpacedPoints());
-	//console.log(curve.getPointAt(0), curve.getPointAt(0),curve.getUtoTmapping(0), curve.getSpacedPoints());
+	//console.log( curve, curve.getPoints(), curve.getSpacedPoints() );
+	//console.log( curve.getPointAt(0), curve.getPointAt(0), curve.getUtoTmapping(0), curve.getSpacedPoints() );
 
 };
 
@@ -127,21 +127,24 @@ THREE.Path.prototype.splineThru = function( pts /*Array of Vector*/ ) {
 
 	this.actions.push( { action: THREE.PathActions.CSPLINE_THRU, args: args, curve: curve } );
 
-	//console.log(curve, curve.getPoints(), curve.getSpacedPoints());
+	//console.log( curve, curve.getPoints(), curve.getSpacedPoints() );
 
 };
 
 // FUTURE: Change the API or follow canvas API?
 // TODO ARC ( x, y, x - radius, y - radius, startAngle, endAngle )
 
-THREE.Path.prototype.arc = function(aX, aY, aRadius,
-									aStartAngle, aEndAngle, aClockwise ) {
+THREE.Path.prototype.arc = function ( aX, aY, aRadius,
+									  aStartAngle, aEndAngle, aClockwise ) {
 
 	var args = Array.prototype.slice.call( arguments );
+
 	var curve = new THREE.ArcCurve( aX, aY, aRadius,
 									aStartAngle, aEndAngle, aClockwise );
 	this.curves.push( curve );
-	//console.log('arc', args);
+
+	// console.log( 'arc', args );
+
 	this.actions.push( { action: THREE.PathActions.ARC, args: args } );
 
  };
@@ -162,27 +165,33 @@ THREE.Path.prototype.arc = function(aX, aY, aRadius,
 */
 
 
-THREE.Path.prototype.getSpacedPoints = function( divisions ) {
+THREE.Path.prototype.getSpacedPoints = function ( divisions, closedPath ) {
 
 	if ( !divisions ) divisions = 40;
 
-	var pts = [];
+	var points = [];
+
 	for ( var i = 0; i < divisions; i++ ) {
 
-		pts.push( this.getPoint( i / divisions ) );
+		points.push( this.getPoint( i / divisions ) );
 
-		//if(!this.getPoint(i/divisions)) throw "DIE";
+		//if( !this.getPoint( i / divisions ) ) throw "DIE";
 
 	}
 
-	//console.log(pts);
-	return pts;
+	if ( closedPath ) {
+
+		points.push( points[ 0 ] );
+
+	}
+
+	return points;
 
 };
 
 /* Return an array of vectors based on contour of the path */
 
-THREE.Path.prototype.getPoints = function( divisions ) {
+THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 	divisions = divisions || 12;
 
@@ -204,7 +213,7 @@ THREE.Path.prototype.getPoints = function( divisions ) {
 
 		case THREE.PathActions.MOVE_TO:
 
-			//points.push( new THREE.Vector2( args[ 0 ], args[ 1 ] ) );
+			// points.push( new THREE.Vector2( args[ 0 ], args[ 1 ] ) );
 
 			break;
 
@@ -365,11 +374,17 @@ THREE.Path.prototype.getPoints = function( divisions ) {
 
 	}
 
+	if ( closedPath ) {
+
+		points.push( points[ 0 ] );
+
+	}
+
 	return points;
 
 };
 
-THREE.Path.prototype.getMinAndMax = function() {
+THREE.Path.prototype.getMinAndMax = function () {
 
 	var points = this.getPoints();
 
@@ -426,7 +441,7 @@ THREE.Path.prototype.getPoint = function( t ) {
 
 	while ( i < curveLengths.length ) {
 
-		if ( curveLengths[ i ] >= d) {
+		if ( curveLengths[ i ] >= d ) {
 
 			diff = curveLengths[ i ] - d;
 			curve = this.curves[ i ];
@@ -471,33 +486,38 @@ THREE.Path.prototype.getLength = function() {
 
 };
 
-// TODO: rewrite to use single Line object
 
-// createPathGeometry by SolarCoordinates
+/// Generate geometry from path points (for Line or ParticleSystem objects)
 
-/* Returns Object3D with line segments stored as children  */
+THREE.Path.prototype.createPointsGeometry = function( divisions ) {
 
-THREE.Path.prototype.createPathGeometry = function( divisions, lineMaterial ) {
-
-    var pts = this.getPoints( divisions );
-
-    var segment, pathGeometry = new THREE.Object3D;
-    if ( !lineMaterial ) lineMaterial = new THREE.LineBasicMaterial( { color: 0x000000, opacity: 0.7 } );
-
-    for( var i = 1; i < pts.length; i++ ) {
-
-        var pathSegment = new THREE.Geometry();
-        pathSegment.vertices.push( new THREE.Vertex( new THREE.Vector3( pts[i-1].x, pts[i-1].y, 0 ) ) );
-        pathSegment.vertices.push( new THREE.Vertex( new THREE.Vector3( pts[i].x, pts[i].y, 0) ) );
-        segment = new THREE.Line( pathSegment , lineMaterial );
-        pathGeometry.addChild(segment);
-
-    }
-
-    return pathGeometry;
+    var pts = this.getPoints( divisions, true );
+	return this.createGeometry( pts );
 
 };
 
+// Generate geometry from equidistance sampling along the path
+
+THREE.Path.prototype.createSpacedPointsGeometry = function( divisions ) {
+
+    var pts = this.getSpacedPoints( divisions, true );
+	return this.createGeometry( pts );
+
+};
+
+THREE.Path.prototype.createGeometry = function( points ) {
+
+	var geometry = new THREE.Geometry();
+
+    for( var i = 0; i < points.length; i ++ ) {
+
+        geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( points[ i ].x, points[ i ].y, 0 ) ) );
+
+    }
+
+    return geometry;
+
+};
 
 
 // ALL THINGS BELOW TO BE REFACTORED
