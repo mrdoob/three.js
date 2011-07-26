@@ -4,7 +4,10 @@
  **/
 
 THREE.ExtrudeGeometry = function( shapes, options ) {
-	
+	if( typeof( shapes ) == "undefined" ) {
+		shapes = [];
+	}
+			
 	THREE.Geometry.call( this );
 	
 	shapes = shapes instanceof Array ? shapes : [ shapes ];
@@ -12,8 +15,9 @@ THREE.ExtrudeGeometry = function( shapes, options ) {
 	var s=0, sl = shapes.length, shape;
 	
 	for (;s<sl;s++) {
+		
 		shape = shapes[s];
-		console.log(shape);
+		//console.log(shape);
 		this.addShape( shape, options );
 		
 	}
@@ -29,7 +33,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	var amount = options.amount !== undefined ? options.amount : 100;
 
-	var bevelThickness = options.bevelThickness !== undefined ? options.bevelThickness : 6; // 10
+	var bevelThickness = options.bevelThickness !== undefined ? options.bevelThickness : 10; // 10
 	var bevelSize = options.bevelSize !== undefined ? options.bevelSize : bevelThickness; // 8 
 
 	var bevelEnabled = options.bevelEnabled !== undefined ? options.bevelEnabled : true; // false
@@ -264,15 +268,15 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 	
 	
 	// Loop bevelSegments, 1 for the front, 1 for the back
-
-	for ( b = bevelSegments; b > 0; b -- ) {
+	for ( b = 0; b < bevelSegments; b ++ ) {
+	//for ( b = bevelSegments; b > 0; b -- ) {
 
 		t = b / bevelSegments;
-		z = bevelThickness * t;
+		z = bevelThickness * ( 1-t);
 
-		// Formula could probably be simplified
-		//bs = bevelSize * (Math.sin ((1-t) * Math.PI/2 )) ; //bevelSize * t ;
-		bs = bevelSize * (1-t) ;
+		//z = bevelThickness * t;
+		bs = bevelSize * (Math.sin ((t) * Math.PI/2 )) ; // curved 
+		//bs = bevelSize * t ; // linear
 		
 		// contract shape
 		for ( i = 0, il = contour.length; i < il; i++ ) {
@@ -284,8 +288,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 		}
 		
-		console.log(bs);
-
+		
 		// expand holes
 
 		for ( h = 0, hl = holes.length; h < hl; h++ ) {
@@ -306,17 +309,17 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	}
 
+	bs = bevelSize;
 
 	// Back facing vertices
 
 	for ( i = 0; i < vlen; i ++ ) {
 
-		vert = vertices[ i ];
-		//v( vert.x, vert.y, 0 );
+		//vert = vertices[ i ];
+		vert = scalePt2(vertices[ i ], verticesMovements[i], bs);
 
 		if ( !extrudeByPath ) {
 
-			vert = scalePt2(vert, verticesMovements[i], bs);
 			v( vert.x, vert.y, 0 );
 
 		} else {
@@ -336,10 +339,11 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 		for ( i = 0; i < vlen; i ++ ) {
 
-			vert = vertices[ i ];
+			//vert = vertices[ i ];
+			vert = scalePt2(vertices[ i ], verticesMovements[i], bs);
 
 			if ( !extrudeByPath ) {
-				vert = scalePt2(vert, verticesMovements[i], bs);
+				
 				v( vert.x, vert.y, amount / steps * s );
 
 			} else {
@@ -355,17 +359,20 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	// Add bevel segments planes
 
-	for ( b = 1; b <= bevelSegments; b ++ ) {
-
+	//for ( b = 1; b <= bevelSegments; b ++ ) {
+	for ( b = bevelSegments-1; b >= 0; b -- ) {
+	
 		t = b / bevelSegments;
-		z = bevelThickness * t;
-		bs = bevelSize * ( 1-Math.sin ( ( 1 - t ) * Math.PI/2 ) );
+		z = bevelThickness * (1-t);
+		//bs = bevelSize * ( 1-Math.sin ( ( 1 - t ) * Math.PI/2 ) );
+		bs = bevelSize * Math.sin ( t * Math.PI/2 ) ;
 
 		// contract shape
 
 		for ( i = 0, il = contour.length; i < il; i++ ) {
 
-			vert = scalePt( contour[ i ], contourCentroid, bs, false );
+			vert = scalePt2(contour[i], contourMovements[i], bs);
+			//vert = scalePt( contour[ i ], contourCentroid, bs, false );
 			v( vert.x, vert.y,  amount + z);
 
 		}
@@ -375,10 +382,12 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 		for ( h = 0, hl = holes.length; h < hl; h++ ) {
 
 			ahole = holes[ h ];
+			oneHoleMovements = holesMovements[h];
 
 			for ( i = 0, il = ahole.length; i < il; i++ ) {
 
-				vert = scalePt( ahole[ i ], holesCentroids[h], bs, true );
+				//vert = scalePt( ahole[ i ], holesCentroids[h], bs, true );
+				vert = scalePt2(ahole[i], oneHoleMovements[i], bs);
 
 				if ( !extrudeByPath ) {
 

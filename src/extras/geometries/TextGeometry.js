@@ -35,35 +35,18 @@
  *
  */
 
-THREE.TextGeometry = function ( text, parameters ) {
 
-	THREE.Geometry.call( this );
+THREE.TextPath = function ( text, parameters ) {
+
+	THREE.Path.call( this );
 
 	this.parameters = parameters || {};
 	this.set( text );
 
 };
 
-/*
-	var text3d = new TextGeometry(text);
-	
-	FactoryStyle
-	var text3d = FontUtils.createText(text);
 
-	var textPath = new TextPath(text);
-	var textShapes = textPath.toShapes();
-	var text3d = new ExtrudeGeometry(textShapes, options);
-	
-	var textShapes = FontUtils.getTextShapes(text);
-	text3d = new ExtrudeGeometry(textShapes, options);
-	
-
- */
-
-THREE.TextGeometry.prototype = new THREE.Geometry();
-THREE.TextGeometry.prototype.constructor = THREE.TextGeometry;
-
-THREE.TextGeometry.prototype.set = function ( text, parameters ) {
+THREE.TextPath.prototype.set = function ( text, parameters ) {
 
 	this.text = text;
 	var parameters = parameters || this.parameters;
@@ -92,7 +75,9 @@ THREE.TextGeometry.prototype.set = function ( text, parameters ) {
 
 };
 
-THREE.TextGeometry.prototype.get = function () {
+
+
+THREE.TextPath.prototype.toShapes = function () {
 	
 	
 	// Get a Font data json object
@@ -104,17 +89,50 @@ THREE.TextGeometry.prototype.get = function () {
 	for (var p=0, pl = paths.length; p<pl; p++) {
 		shapes = shapes.concat(paths[p].toShapes());
 	}
+	
+	return shapes;
 
 	//console.log(path);
 	//console.log(fontShapes);
 	
 	// Either find actions or curves.
 	
-	var text3d = new THREE.ExtrudeGeometry( shapes , { amount: 20, bevelEnabled:true, bevelThickness:3	} );
-	// TOFIX: Fillet Cap
-	// FIX HOLES
-	return text3d;	
+	//var text3d = new THREE.ExtrudeGeometry( shapes , { amount: 20, bevelEnabled:true, bevelThickness:3	} );
+
+	//return text3d;
 };
+
+
+THREE.TextGeometry = function ( text, parameters ) {
+	var textPath = new THREE.TextPath(text, parameters );
+	var textShapes = textPath.toShapes();
+	console.log("params", parameters);
+	THREE.ExtrudeGeometry.call( this,  textShapes, parameters);
+
+
+};
+
+/*
+	var text3d = new TextGeometry(text);
+	
+	FactoryStyle
+	var text3d = FontUtils.createText(text);
+
+	var textPath = new TextPath(text);
+	var textShapes = textPath.toShapes();
+	var text3d = new ExtrudeGeometry(textShapes, options);
+	
+	var textShapes = FontUtils.getTextShapes(text);
+	text3d = new ExtrudeGeometry(textShapes, options);
+	
+
+ */
+
+THREE.TextGeometry.prototype = new THREE.ExtrudeGeometry();
+THREE.TextGeometry.prototype.constructor = THREE.TextGeometry;
+
+
+
 
 THREE.FontUtils = {
 

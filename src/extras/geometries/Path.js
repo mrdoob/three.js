@@ -747,13 +747,14 @@ THREE.Path.prototype.toShapes = function() {
 		
 	}
 	
-	console.log(subPaths);
+	//console.log(subPaths);
+	if (subPaths.length ==0) return [];
 	
 	var holesFirst = !THREE.Shape.Utils.isClockWise(subPaths[0].getPoints());
 	var tmpShape, shapes = [];
 	var tmpPath;
 	
-	console.log("Holes first", holesFirst);
+	//console.log("Holes first", holesFirst);
 	
 	if (holesFirst) {
 		tmpShape = new THREE.Shape();
@@ -768,11 +769,11 @@ THREE.Path.prototype.toShapes = function() {
 				shapes.push(tmpShape);
 				tmpShape = new THREE.Shape();
 				
-				console.log('cw', i);
+				//console.log('cw', i);
 				
 			} else {
 				tmpShape.holes.push(tmpPath);
-				console.log('ccw', i);
+				//console.log('ccw', i);
 				
 			}
 		
@@ -799,7 +800,7 @@ THREE.Path.prototype.toShapes = function() {
 		shapes.push(tmpShape);
 	}
 	
-	console.log("shape", shapes);
+	//console.log("shape", shapes);
 	
 	return shapes;
 };
