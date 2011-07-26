@@ -154,7 +154,10 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 		return vectorFromCentroid.multiplyScalar( adj ).addSelf( centroid );
 	}
 	
-
+	function scalePt2 (pt, vec, size ) {
+		return vec.clone().multiplyScalar( size ).addSelf( pt );
+	}
+	
 
 	var i,
 		vert, vlen = vertices.length,
@@ -165,32 +168,147 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	var bs;
 	
+	//------
+	// Find directions for point movement
+	//
+	
+	var RAD_TO_DEGREES = 180 / Math.PI;
+
+	
+	function getBevelVec(u, v /*Vector2*/) {
+		console.log(u,v);
+		//u = u.normalize();
+		//v = v.normalize();
+		var scalar = u.dot(v);
+		var product = u.length() * v.length();
+		// scalar = product * cos (theta)
+		
+		var theta = Math.acos( scalar / product );
+		
+		console.log('theta', theta * RAD_TO_DEGREES);
+		
+		var angle = Math.PI *2 - theta / 2;
+		angle /= 2;
+		
+		var uw = u.length() * bevelSize * Math.cos(angle);
+		var wv = bevelSize * v.length() * Math.cos(angle);
+		// ax + by = c
+		// dx + ey = d
+		
+			console.log('uw', uw, 'wv', wv);
+		
+		var a = u.x, b = u.y, c = uw,
+			d = v.x, e = v.y, f = wv;
+			
+		var y = (f - c) / (e - b);
+		var x = (f - c) / (d - a);
+		
+		
+		var vec3 = new THREE.Vector2(x, y).normalize();
+		console.log('xy', x, y, vec3);
+		return vec3;
+	}
+	
+	var contourMovements = [];
+	
+	for ( i = 0, il = contour.length, j = il-1, k = i + 1; i < il; i++,j++,k++ ) {
+		if (j==il) j = 0;
+		if (k==il) k = 0;
+		
+		//  (j)---(i)---(k)
+		console.log('i,j,k', i, j , k)
+		var v1 = contour[ j ].clone().subSelf(contour[ i ]); //.normalize();
+		var v2 = contour[ k ].clone().subSelf(contour[ i ]); //.normalize();
+		
+		//var v1 = contour[ i ].clone().subSelf(contour[ j ]);
+		//var v2 = contour[ k ].clone().subSelf(contour[ i ]);
+		
+		var pt_i = contour[ i ];
+		var pt_j = contour[ j ];
+		var pt_k = contour[ k ];
+		
+		console.log(pt_i, pt_j, pt_k);
+		
+		var anglea = Math.atan2(pt_i.y - pt_j.y, pt_i.x - pt_j.x);
+		//var angleb = Math.atan2(pt_k.y - pt_i.y, pt_k.x - pt_i.x);
+		var angleb = Math.atan2(pt_i.y - pt_k.y, pt_i.x - pt_k.x);
+		
+		var anglec = (angleb - anglea ) / 2 + anglea;
+		
+		console.log('angle1', anglea * RAD_TO_DEGREES,'angle2', angleb * RAD_TO_DEGREES, 'anglec', anglec *RAD_TO_DEGREES);
+		
+		x = -bevelSize * Math.cos(anglec);
+		y = -bevelSize * Math.sin(anglec);
+		
+		contourMovements[i]= new THREE.Vector2(x,y).normalize();
+		console.log('xy', x, y, contourMovements[i], pt_i.x +x , pt_i.y + y);
+		
+		//contourMovements[i]= getBevelVec(v1, v2);
+		
+		
+	}
+	
+	var holesMovements = [], oneHoleMovements;
+	// expand holes
+	for ( h = 0, hl = holes.length; h < hl; h++ ) {
+
+		ahole = holes[h];
+		
+		oneHoleMovements = [];
+		
+		for ( i = 0, il = ahole.length, j = il-1, k = i + 1; i < il; i++,j++,k++ ) {
+			if (j==il) j = 0;
+			if (k==il) k = 0;
+
+			//  (j)---(i)---(k)
+
+			var v1 = ahole[ i ].clone().subSelf(ahole[ j ]);
+			var v2 = ahole[ k ].clone().subSelf(ahole[ i ]);
+
+			oneHoleMovements[i]= getBevelVec(v1, v2);
+
+
+		}
+		
+		holesMovements.push(oneHoleMovements);
+
+	}
+	
+	
+	
 	// Loop bevelSegments, 1 for the front, 1 for the back
 	
 	for (b=bevelSegments; b > 0; b--) {
 		t =  b / bevelSegments;
 		z = bevelThickness * t;
 		// Formula could probably be simplified
-		bs = bevelSize * (1-Math.sin ((1-t) * Math.PI/2 )) ; //bevelSize * t ;
-
+		//bs = bevelSize * (1-Math.sin ((1-t) * Math.PI/2 )) ; //bevelSize * t ;
+		bs = bevelSize * t ;
+		
 		// contract shape
 		for ( i = 0, il = contour.length; i < il; i++ ) {
-			
-			vert = scalePt(contour[i], contourCentroid, bs , false);
-			v( vert.x, vert.y,  -z);
-			
+
+			vert = scalePt2(contour[i], contourMovements[i], bs);
+			v( vert.x, vert.y,  - z);
+
 		}
-		
+
 		// expand holes
 		for ( h = 0, hl = holes.length; h < hl; h++ ) {
-			
+
 			ahole = holes[h];
-			for ( i = 0, il = ahole.length; i < il; i++ ) {
-				vert = scalePt(ahole[i], holesCentroids[h] , bs , true);	
-				v( vert.x, vert.y,  -z);
-			}
+			oneHoleMovements = holesMovements[h];
 			
+			for ( i = 0, il = ahole.length; i < il; i++ ) {
+
+				vert = scalePt2(ahole[i], oneHoleMovements[i], bs);
+				v( vert.x, vert.y,  -z );
+
+			}
+
 		}
+		
+		
 		
 	}
 	
@@ -400,15 +518,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 		b += shapesOffset;
 		c += shapesOffset;
 
-		// if ( reverse ) { // Can now be removed
-		// 
-		// 		scope.faces.push( new THREE.Face3( c, b, a ) );
-		// 
-		// 	} else {
-		// 
-		 		scope.faces.push( new THREE.Face3( a, b, c ) );
-		// 
-		// 	}
+		scope.faces.push( new THREE.Face3( a, b, c ) );
 
 	}
 
