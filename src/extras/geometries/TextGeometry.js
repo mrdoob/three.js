@@ -501,13 +501,13 @@ THREE.FontUtils = {
 		// 
 		// }
 
-		var extract = this.extractPoints( allPts, characterPts );
+		//var extract = this.extractPoints( allPts, characterPts );
 		//extract.contour = allPts;
 		
-		extract.paths = fontPaths;
-		extract.offset = width;
+		//extract.paths = fontPaths;
+		//extract.offset = width;
 		
-		return extract;
+		return {paths : fontPaths,offset : width };
 
 	},
 
