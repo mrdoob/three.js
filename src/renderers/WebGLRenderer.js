@@ -103,11 +103,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.shadowCameraFar = 5000;
 	this.shadowCameraFov = 50;
 
-	this.shadowMap = null;
+	this.shadowMap = [];
 	this.shadowMapEnabled = false;
 
 	var _cameraLight,
-		_shadowMatrix = new THREE.Matrix4();
+		_shadowMatrix = [];
 
 	var depthShader = THREE.ShaderLib[ "depthRGBA" ];
 	var depthUniforms = THREE.UniformsUtils.clone( depthShader.uniforms );
@@ -2567,8 +2567,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( uniforms.shadowMatrix ) {
 
-			uniforms.shadowMatrix.value.copy( _shadowMatrix );
-			uniforms.shadowMap.texture = _this.shadowMap;
+			for ( var i = 0; i < _shadowMatrix.length; i ++ ) {
+
+				uniforms.shadowMatrix.value[ i ] = _shadowMatrix[ i ];
+				uniforms.shadowMap.texture[ i ] = _this.shadowMap[ i ];
+
+
+			}
 
 			uniforms.shadowDarkness.value = _this.shadowMapDarkness;
 			uniforms.shadowBias.value = _this.shadowMapBias;
@@ -2579,7 +2584,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.initMaterial = function ( material, lights, fog, object ) {
 
-		var u, a, identifiers, i, parameters, maxLightCount, maxBones, shaderID;
+		var u, a, identifiers, i, parameters, maxLightCount, maxBones, maxShadows, shaderID;
 
 		if ( material instanceof THREE.MeshDepthMaterial ) {
 
@@ -2626,6 +2631,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		maxLightCount = allocateLights( lights, 4 );
 
+		maxShadows = allocateShadows( lights );
+
 		maxBones = allocateBones( object );
 
 		parameters = {
@@ -2638,7 +2645,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			maxMorphTargets: this.maxMorphTargets,
 			maxDirLights: maxLightCount.directional, maxPointLights: maxLightCount.point,
 			maxBones: maxBones,
-			shadowMapEnabled: this.shadowMapEnabled && object.receiveShadow
+			shadowMapEnabled: this.shadowMapEnabled && object.receiveShadow,
+			maxShadows: maxShadows
 
 		};
 
@@ -3464,7 +3472,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-
 	function painterSort( a, b ) {
 
 		return b.z - a.z;
@@ -3474,6 +3481,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 	function renderShadowMap( scene, camera ) {
 
 		var i, il, light,
+			j = 0,
+			shadowMap, shadowMatrix,
 			oil,
 			material,
 			o, ol, webglObject, object,
@@ -3486,19 +3495,27 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		if ( ! _this.shadowMap ) {
-
-			var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat };
-			//var pars = { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat };
-			_this.shadowMap = new THREE.WebGLRenderTarget( _this.shadowMapWidth, _this.shadowMapHeight, pars );
-
-		}
-
 		for ( i = 0, il = lights.length; i < il; i ++ ) {
 
 			light = lights[ i ];
 
 			if ( light instanceof THREE.SpotLight && light.castShadow ) {
+
+				if ( ! _this.shadowMap[ j ] ) {
+
+					var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat };
+					_this.shadowMap[ j ] = new THREE.WebGLRenderTarget( _this.shadowMapWidth, _this.shadowMapHeight, pars );
+
+				}
+
+				if ( ! _shadowMatrix[ j ] ) {
+
+					_shadowMatrix[ j ] = new THREE.Matrix4();
+
+				}
+
+				shadowMap = _this.shadowMap[ j ];
+				shadowMatrix = _shadowMatrix[ j ];
 
 				_cameraLight.position.copy( light.position );
 				_cameraLight.target.position.copy( light.target.position );
@@ -3509,13 +3526,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				// compute shadow matrix
 
-				_shadowMatrix.set( 0.5, 0.0, 0.0, 0.5,
-								   0.0, 0.5, 0.0, 0.5,
-								   0.0, 0.0, 0.5, 0.5,
-								   0.0, 0.0, 0.0, 1.0 );
+				shadowMatrix.set( 0.5, 0.0, 0.0, 0.5,
+								  0.0, 0.5, 0.0, 0.5,
+								  0.0, 0.0, 0.5, 0.5,
+								  0.0, 0.0, 0.0, 1.0 );
 
-				_shadowMatrix.multiplySelf( _cameraLight.projectionMatrix );
-				_shadowMatrix.multiplySelf( _cameraLight.matrixWorldInverse );
+				shadowMatrix.multiplySelf( _cameraLight.projectionMatrix );
+				shadowMatrix.multiplySelf( _cameraLight.matrixWorldInverse );
 
 				// render shadow map
 
@@ -3527,7 +3544,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				_this.initWebGLObjects( scene );
 
-				setRenderTarget( _this.shadowMap );
+				setRenderTarget( shadowMap );
 
 				// using arbitrary clear color in depth pass
 				// creates variance in shadows
@@ -3624,6 +3641,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 				//_gl.cullFace( _gl.BACK );
+
+				j ++;
 
 			}
 
@@ -5041,6 +5060,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			"#define MAX_DIR_LIGHTS " + parameters.maxDirLights,
 			"#define MAX_POINT_LIGHTS " + parameters.maxPointLights,
 
+			"#define MAX_SHADOWS " + parameters.maxShadows,
+
 			"#define MAX_BONES " + parameters.maxBones,
 
 			parameters.map ? "#define USE_MAP" : "",
@@ -5107,6 +5128,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			"#define MAX_DIR_LIGHTS " + parameters.maxDirLights,
 			"#define MAX_POINT_LIGHTS " + parameters.maxPointLights,
+
+			"#define MAX_SHADOWS " + parameters.maxShadows,
 
 			parameters.fog ? "#define USE_FOG" : "",
 			parameters.fog instanceof THREE.FogExp2 ? "#define FOG_EXP2" : "",
@@ -5205,7 +5228,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function loadUniformsGeneric( program, uniforms ) {
 
-		var u, uniform, value, type, location, texture;
+		var u, uniform, value, type, location, texture, i, il;
 
 		for( u in uniforms ) {
 
@@ -5256,6 +5279,22 @@ THREE.WebGLRenderer = function ( parameters ) {
 				value.flattenToArray( uniform._array );
 				_gl.uniformMatrix4fv( location, false, uniform._array );
 
+			} else if( type == "m4v" ) {
+
+				if ( ! uniform._array ) {
+
+					uniform._array = new Float32Array( 16 * value.length );
+
+				}
+
+				for ( i = 0, il = value.length; i < il; i ++ ) {
+
+					value[ i ].flattenToArrayOffset( uniform._array, i * 16 );
+
+				}
+
+				_gl.uniformMatrix4fv( location, false, uniform._array );
+
 			} else if( type == "c" ) {
 
 				_gl.uniform3f( location, value.r, value.g, value.b );
@@ -5275,6 +5314,32 @@ THREE.WebGLRenderer = function ( parameters ) {
 				} else {
 
 					setTexture( texture, value );
+
+				}
+
+			} else if( type == "tv" ) {
+
+				if ( ! uniform._array ) {
+
+					uniform._array = [];
+
+					for( i = 0, il = uniform.texture.length; i < il; i ++ ) {
+
+						uniform._array[ i ] = value + i;
+
+					}
+
+				}
+
+				_gl.uniform1iv( location, uniform._array );
+
+				for( i = 0, il = uniform.texture.length; i < il; i ++ ) {
+
+					texture = uniform.texture[ i ];
+
+					if ( !texture ) continue;
+
+					setTexture( texture, uniform._array[ i ] );
 
 				}
 
@@ -5864,9 +5929,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			light = lights[ l ];
 
-			if ( light instanceof THREE.SpotLight ) dirLights++; // hack, not a proper spotlight
-			if ( light instanceof THREE.DirectionalLight ) dirLights++;
-			if ( light instanceof THREE.PointLight ) pointLights++;
+			if ( light instanceof THREE.SpotLight ) dirLights ++; // hack, not a proper spotlight
+			if ( light instanceof THREE.DirectionalLight ) dirLights ++;
+			if ( light instanceof THREE.PointLight ) pointLights ++;
 
 		}
 
@@ -5885,6 +5950,24 @@ THREE.WebGLRenderer = function ( parameters ) {
 		return { 'directional' : maxDirLights, 'point' : maxPointLights };
 
 	};
+
+	function allocateShadows( lights ) {
+
+		var l, ll, light,
+			maxShadows = 0;
+
+		for ( l = 0, ll = lights.length; l < ll; l++ ) {
+
+			light = lights[ l ];
+
+			if ( light instanceof THREE.SpotLight && light.castShadow ) maxShadows ++;
+
+		}
+
+		return maxShadows;
+
+	};
+
 
 	/* DEBUG
 	function getGLParams() {

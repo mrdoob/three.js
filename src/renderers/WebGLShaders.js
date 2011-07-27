@@ -107,7 +107,7 @@ THREE.ShaderChunk = {
 	"#ifdef USE_ENVMAP",
 
 		"vec4 mPosition = objectMatrix * vec4( position, 1.0 );",
-		"vec3 nWorld = mat3( objectMatrix[0].xyz, objectMatrix[1].xyz, objectMatrix[2].xyz ) * normal;",
+		"vec3 nWorld = mat3( objectMatrix[ 0 ].xyz, objectMatrix[ 1 ].xyz, objectMatrix[ 2 ].xyz ) * normal;",
 
 		"if ( useRefract ) {",
 
@@ -275,7 +275,7 @@ THREE.ShaderChunk = {
 
 		"#if MAX_DIR_LIGHTS > 0",
 
-		"for( int i = 0; i < MAX_DIR_LIGHTS; i++ ) {",
+		"for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {",
 
 			"vec4 lDirection = viewMatrix * vec4( directionalLightDirection[ i ], 0.0 );",
 			"float directionalLightWeighting = max( dot( transformedNormal, normalize( lDirection.xyz ) ), 0.0 );",
@@ -287,7 +287,7 @@ THREE.ShaderChunk = {
 
 		"#if MAX_POINT_LIGHTS > 0",
 
-			"for( int i = 0; i < MAX_POINT_LIGHTS; i++ ) {",
+			"for( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {",
 
 				"vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );",
 
@@ -369,7 +369,7 @@ THREE.ShaderChunk = {
 		"vec4 dirDiffuse  = vec4( 0.0 );",
 		"vec4 dirSpecular = vec4( 0.0 );" ,
 
-		"for( int i = 0; i < MAX_DIR_LIGHTS; i++ ) {",
+		"for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {",
 
 			"vec4 lDirection = viewMatrix * vec4( directionalLightDirection[ i ], 0.0 );",
 
@@ -536,12 +536,12 @@ THREE.ShaderChunk = {
 
 	"#ifdef USE_SHADOWMAP",
 
-		"uniform sampler2D shadowMap;",
+		"uniform sampler2D shadowMap[ MAX_SHADOWS ];",
 
 		"uniform float shadowDarkness;",
 		"uniform float shadowBias;",
 
-		"varying vec4 vShadowCoord;",
+		"varying vec4 vShadowCoord[ MAX_SHADOWS ];",
 
 		"float unpackDepth( const in vec4 rgba_depth ) {",
 
@@ -559,18 +559,30 @@ THREE.ShaderChunk = {
 
 	"#ifdef USE_SHADOWMAP",
 
-		"vec3 shadowCoord = vShadowCoord.xyz / vShadowCoord.w;",
+		"vec4 shadowColor = vec4( 1.0 );",
 
-		"vec4 rgbaDepth = texture2D( shadowMap, shadowCoord.xy );",
-		"float fDepth = unpackDepth( rgbaDepth );",
+		"for( int i = 0; i < MAX_SHADOWS; i ++ ) {",
 
-		"if ( fDepth < ( shadowCoord.z + shadowBias ) && ( shadowCoord.x >= 0.0 && shadowCoord.x <= 1.0 && shadowCoord.y >= 0.0 && shadowCoord.y <= 1.0 ) )",
-			"gl_FragColor = gl_FragColor * vec4( vec3( shadowDarkness ), 1.0 );",
+			"vec3 shadowCoord = vShadowCoord[ i ].xyz / vShadowCoord[ i ].w;",
 
-		// uncomment to see light frustum boundaries
-		//"if ( !( shadowCoord.x >= 0.0 && shadowCoord.x <= 1.0 && shadowCoord.y >= 0.0 && shadowCoord.y <= 1.0 ) )",
-		//	"gl_FragColor =  gl_FragColor * vec4( 1.0, 0.0, 0.0, 1.0 );",
+			"vec4 rgbaDepth = texture2D( shadowMap[ i ], shadowCoord.xy );",
+			"float fDepth = unpackDepth( rgbaDepth );",
 
+			"if ( fDepth < ( shadowCoord.z + shadowBias ) && ( shadowCoord.x >= 0.0 && shadowCoord.x <= 1.0 && shadowCoord.y >= 0.0 && shadowCoord.y <= 1.0 ) )",
+
+				// spot with multiple shadows is darker
+				"shadowColor = shadowColor * vec4( vec3( shadowDarkness ), 1.0 );",
+
+				// spot with multiple shadows has the same color as single shadow spot
+				//"shadowColor = min( shadowColor, vec4( vec3( shadowDarkness ), 1.0 ) );",
+
+			// uncomment to see light frustum boundaries
+			//"if ( !( shadowCoord.x >= 0.0 && shadowCoord.x <= 1.0 && shadowCoord.y >= 0.0 && shadowCoord.y <= 1.0 ) )",
+			//	"gl_FragColor =  gl_FragColor * vec4( 1.0, 0.0, 0.0, 1.0 );",
+
+		"}",
+
+		"gl_FragColor = gl_FragColor * shadowColor;",
 
 	"#endif"
 
@@ -580,8 +592,8 @@ THREE.ShaderChunk = {
 
 	"#ifdef USE_SHADOWMAP",
 
-		"varying vec4 vShadowCoord;",
-		"uniform mat4 shadowMatrix;",
+		"varying vec4 vShadowCoord[ MAX_SHADOWS ];",
+		"uniform mat4 shadowMatrix[ MAX_SHADOWS ];",
 
 	"#endif"
 
@@ -591,7 +603,11 @@ THREE.ShaderChunk = {
 
 	"#ifdef USE_SHADOWMAP",
 
-		"vShadowCoord = shadowMatrix * objectMatrix * vec4( position, 1.0 );",
+		"for( int i = 0; i < MAX_SHADOWS; i ++ ) {",
+
+			"vShadowCoord[ i ] = shadowMatrix[ i ] * objectMatrix * vec4( position, 1.0 );",
+
+		"}",
 
 	"#endif"
 
@@ -722,8 +738,8 @@ THREE.UniformsLib = {
 
 	shadowmap: {
 
-		"shadowMap": { type: "t", value: 3, texture: null },
-		"shadowMatrix" : { type: "m4", value: new THREE.Matrix4() },
+		"shadowMap": { type: "tv", value: 3, texture: [] },
+		"shadowMatrix" : { type: "m4v", value: [] },
 
 		"shadowBias" : { type: "f", value: 0.0039 },
 		"shadowDarkness": { type: "f", value: 0.2 }
