@@ -91,6 +91,8 @@ THREE.Color.prototype = {
 
 		return new THREE.Color( this.hex );
 
-	}
+	},
+	
+	constructor : THREE.Color
 
 };

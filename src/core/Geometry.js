@@ -502,7 +502,9 @@ THREE.Geometry.prototype = {
 
 		}
 
-	}
+	},
+	
+	constructor : THREE.Geometry
 
 };
 

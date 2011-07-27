@@ -366,6 +366,8 @@ THREE.Loader.prototype = {
 
 		return material;
 
-	}
+	},
+	
+	constructor : THREE.Loader
 
 };

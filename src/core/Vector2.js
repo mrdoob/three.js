@@ -172,6 +172,8 @@ THREE.Vector2.prototype = {
 
 		return ( ( v.x == this.x ) && ( v.y == this.y ) );
 
-	}
+	},
+	
+	constructor : THREE.Vector2
 
 };

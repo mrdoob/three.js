@@ -173,5 +173,7 @@ THREE.Vector4.prototype = {
 		return this;
 
 	},
+	
+	constructor : THREE.Vector4
 
 };
