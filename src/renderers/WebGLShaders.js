@@ -559,22 +559,63 @@ THREE.ShaderChunk = {
 
 	"#ifdef USE_SHADOWMAP",
 
+		"#ifdef SHADOWMAP_SOFT",
+
+			"const float xPixelOffset = 1.0 / SHADOWMAP_WIDTH;",
+			"const float yPixelOffset = 1.0 / SHADOWMAP_HEIGHT;",
+
+		"#endif",
+
 		"vec4 shadowColor = vec4( 1.0 );",
 
 		"for( int i = 0; i < MAX_SHADOWS; i ++ ) {",
 
 			"vec3 shadowCoord = vShadowCoord[ i ].xyz / vShadowCoord[ i ].w;",
 
-			"vec4 rgbaDepth = texture2D( shadowMap[ i ], shadowCoord.xy );",
-			"float fDepth = unpackDepth( rgbaDepth );",
+			"if ( shadowCoord.x >= 0.0 && shadowCoord.x <= 1.0 && shadowCoord.y >= 0.0 && shadowCoord.y <= 1.0 ) {",
 
-			"if ( fDepth < ( shadowCoord.z + shadowBias ) && ( shadowCoord.x >= 0.0 && shadowCoord.x <= 1.0 && shadowCoord.y >= 0.0 && shadowCoord.y <= 1.0 ) )",
+				"#ifdef SHADOWMAP_SOFT",
 
-				// spot with multiple shadows is darker
-				"shadowColor = shadowColor * vec4( vec3( shadowDarkness ), 1.0 );",
+					// Percentage-close filtering
+					// (9 pixel kernel)
+					// http://fabiensanglard.net/shadowmappingPCF/
 
-				// spot with multiple shadows has the same color as single shadow spot
-				//"shadowColor = min( shadowColor, vec4( vec3( shadowDarkness ), 1.0 ) );",
+					"float shadow = 0.0;",
+
+					"for ( float y = -1.25; y <= 1.25; y += 1.25 )",
+						"for ( float x = -1.25; x <= 1.25; x += 1.25 ) {",
+
+							"vec4 rgbaDepth = texture2D( shadowMap[ i ], vec2( x * xPixelOffset, y * yPixelOffset ) + shadowCoord.xy );",
+							"float fDepth = unpackDepth( rgbaDepth );",
+
+							"if ( fDepth < ( shadowCoord.z + shadowBias ) )",
+								"shadow += 1.0;",
+
+					"}",
+
+					"shadow /= 9.0;",
+
+					"shadowColor = shadowColor * vec4( vec3( ( 1.0 - shadowDarkness * shadow ) ), 1.0 );",
+
+				"#else",
+
+					"vec4 rgbaDepth = texture2D( shadowMap[ i ], shadowCoord.xy );",
+					"float fDepth = unpackDepth( rgbaDepth );",
+
+					"if ( fDepth < ( shadowCoord.z + shadowBias ) )",
+
+						// spot with multiple shadows is darker
+
+						"shadowColor = shadowColor * vec4( vec3( shadowDarkness ), 1.0 );",
+
+						// spot with multiple shadows has the same color as single shadow spot
+
+						//"shadowColor = min( shadowColor, vec4( vec3( shadowDarkness ), 1.0 ) );",
+
+				"#endif",
+
+			"}",
+
 
 			// uncomment to see light frustum boundaries
 			//"if ( !( shadowCoord.x >= 0.0 && shadowCoord.x <= 1.0 && shadowCoord.y >= 0.0 && shadowCoord.y <= 1.0 ) )",
@@ -1045,7 +1086,7 @@ THREE.ShaderLib = {
 			"void main() {",
 
 				"vec4 pos      = objectMatrix * vec4( position, 1.0 );",
-				"vec3 norm     = mat3( objectMatrix[0].xyz, objectMatrix[1].xyz, objectMatrix[2].xyz ) * normal;",
+				"vec3 norm     = mat3( objectMatrix[ 0 ].xyz, objectMatrix[ 1 ].xyz, objectMatrix[ 2 ].xyz ) * normal;",
 				"vec4 extruded = vec4( directionalLightDirection * 5000.0 * step( 0.0, dot( directionalLightDirection, norm ) ), 0.0 );",
 
 				"gl_Position   = projectionMatrix * viewMatrix * ( pos + extruded );",
@@ -1359,7 +1400,9 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "color_vertex" ],
 
 				"#ifndef USE_ENVMAP",
+
 					"vec4 mPosition = objectMatrix * vec4( position, 1.0 );",
+
 				"#endif",
 
 				"vViewPosition = cameraPosition - mPosition.xyz;",
