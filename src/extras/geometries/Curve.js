@@ -206,8 +206,8 @@ THREE.QuadraticBezierCurve.prototype.getPoint = function ( t ) {
 
 	var tx, ty;
 
-	tx = THREE.FontUtils.b2( t, this.x0, this.x1, this.x2 );
-	ty = THREE.FontUtils.b2( t, this.y0, this.y1, this.y2 );
+	tx = THREE.Shape.Utils.b2( t, this.x0, this.x1, this.x2 );
+	ty = THREE.Shape.Utils.b2( t, this.y0, this.y1, this.y2 );
 
 	return new THREE.Vector2( tx, ty );
 
@@ -270,8 +270,8 @@ THREE.CubicBezierCurve.prototype.getPoint = function ( t ) {
 
 	var tx, ty;
 
-	tx = THREE.FontUtils.b3( t, this.x0, this.x1, this.x2, this.x3 );
-	ty = THREE.FontUtils.b3( t, this.y0, this.y1, this.y2, this.y3 );
+	tx = THREE.Shape.Utils.b3( t, this.x0, this.x1, this.x2, this.x3 );
+	ty = THREE.Shape.Utils.b3( t, this.y0, this.y1, this.y2, this.y3 );
 
 	return new THREE.Vector2( tx, ty );
 
@@ -485,9 +485,9 @@ THREE.QuadraticBezierCurve3 = THREE.Curve.create(
 
 		var tx, ty, tz;
 
-		tx = THREE.FontUtils.b2( t, this.x0, this.x1, this.x2 );
-		ty = THREE.FontUtils.b2( t, this.y0, this.y1, this.y2 );
-		tz = THREE.FontUtils.b2( t, this.z0, this.z1, this.z2 );
+		tx = THREE.Shape.Utils.b2( t, this.x0, this.x1, this.x2 );
+		ty = THREE.Shape.Utils.b2( t, this.y0, this.y1, this.y2 );
+		tz = THREE.Shape.Utils.b2( t, this.z0, this.z1, this.z2 );
 
 		return new THREE.Vector2( tx, ty, tz );
 

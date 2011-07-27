@@ -6,6 +6,7 @@
 THREE.ExtrudeGeometry = function( shapes, options ) {
 	if( typeof( shapes ) == "undefined" ) {
 		shapes = [];
+		return;
 	}
 			
 	THREE.Geometry.call( this );
@@ -33,8 +34,8 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	var amount = options.amount !== undefined ? options.amount : 100;
 
-	var bevelThickness = options.bevelThickness !== undefined ? options.bevelThickness : 10; // 10
-	var bevelSize = options.bevelSize !== undefined ? options.bevelSize : bevelThickness; // 8 
+	var bevelThickness = options.bevelThickness !== undefined ? options.bevelThickness : 6; // 10
+	var bevelSize = options.bevelSize !== undefined ? options.bevelSize : bevelThickness - 2; // 8 
 
 	var bevelEnabled = options.bevelEnabled !== undefined ? options.bevelEnabled : true; // false
 	var bevelSegments = options.bevelSegments !== undefined ? options.bevelSegments : 3;
@@ -68,6 +69,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 	
 	var shapesOffset = this.vertices.length;
 
+	//extractAllPoints
 	var shapePoints = shape.extractAllPoints(); // use shape.extractAllSpacedPoints() for points with equal divisions
 
     var vertices = shapePoints.shape;

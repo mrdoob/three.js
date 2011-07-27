@@ -251,8 +251,8 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 				t = j / divisions;
 
-				tx = THREE.FontUtils.b2( t, cpx0, cpx1, cpx );
-				ty = THREE.FontUtils.b2( t, cpy0, cpy1, cpy );
+				tx = THREE.Shape.Utils.b2( t, cpx0, cpx1, cpx );
+				ty = THREE.Shape.Utils.b2( t, cpy0, cpy1, cpy );
 
 				points.push( new THREE.Vector2( tx, ty ) );
 
@@ -292,8 +292,8 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 				t = j / divisions;
 
-				tx = THREE.FontUtils.b3( t, cpx0, cpx1, cpx2, cpx );
-				ty = THREE.FontUtils.b3( t, cpy0, cpy1, cpy2, cpy );
+				tx = THREE.Shape.Utils.b3( t, cpx0, cpx1, cpx2, cpx );
+				ty = THREE.Shape.Utils.b3( t, cpy0, cpy1, cpy2, cpy );
 
 				points.push( new THREE.Vector2( tx, ty ) );
 
@@ -681,10 +681,10 @@ THREE.Path.prototype.debug = function( canvas ) {
 
 	/* TO CLEAN UP */
 
-	//var p, points = this.getPoints();
+	var p, points = this.getPoints();
 
-	var theta = -90 /180 * Math.PI;
-	var p, points = this.transform( 0.866, - 0.866,0, 0.500 , 0.50,-50 );
+	//var theta = -90 /180 * Math.PI;
+	//var p, points = this.transform( 0.866, - 0.866,0, 0.500 , 0.50,-50 );
 
 	//0.866, - 0.866,0, 0.500 , 0.50,-50
 
@@ -693,14 +693,6 @@ THREE.Path.prototype.debug = function( canvas ) {
 
 	// translate, scale, rotation
 
-	// a - horizontal size
-	// b - lean
-	// c - x offset
-	// d - vertical size
-	// e - climb
-	// f - y offset
-	// 1,0,0,
-	// -1,0,100
 
 	for ( i = 0, il = points.length; i < il; i ++ ) {
 

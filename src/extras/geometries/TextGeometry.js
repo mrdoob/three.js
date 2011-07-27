@@ -36,102 +36,35 @@
  */
 
 
-THREE.TextPath = function ( text, parameters ) {
-
-	THREE.Path.call( this );
-
-	this.parameters = parameters || {};
-	this.set( text );
-
-};
-
-
-THREE.TextPath.prototype.set = function ( text, parameters ) {
-
-	this.text = text;
-	var parameters = parameters || this.parameters;
-
-	var size = parameters.size !== undefined ? parameters.size : 100;
-	var height = parameters.height !== undefined ? parameters.height : 50;
-	var curveSegments = parameters.curveSegments !== undefined ? parameters.curveSegments: 4;
-
-	var font = parameters.font !== undefined ? parameters.font : "helvetiker";
-	var weight = parameters.weight !== undefined ? parameters.weight : "normal";
-	var style = parameters.style !== undefined ? parameters.style : "normal";
-
-	var bevelThickness = parameters.bevelThickness !== undefined ? parameters.bevelThickness : 10;
-	var bevelSize = parameters.bevelSize !== undefined ? parameters.bevelSize : 8;
-	var bevelEnabled = parameters.bevelEnabled !== undefined ? parameters.bevelEnabled : false;
-
-	THREE.FontUtils.size = size;
-	THREE.FontUtils.divisions = curveSegments;
-
-	THREE.FontUtils.face = font;
-	THREE.FontUtils.weight = weight;
-	THREE.FontUtils.style = style;
-
-	THREE.FontUtils.bevelSize = bevelSize;
-
-
-};
-
-
-
-THREE.TextPath.prototype.toShapes = function () {
-	
-	
-	// Get a Font data json object
-
-	var data = THREE.FontUtils.drawText( this.text );
-	
-	var paths = data.paths;
-	var shapes = [];
-	for (var p=0, pl = paths.length; p<pl; p++) {
-		shapes = shapes.concat(paths[p].toShapes());
-	}
-	
-	return shapes;
-
-	//console.log(path);
-	//console.log(fontShapes);
-	
-	// Either find actions or curves.
-	
-	//var text3d = new THREE.ExtrudeGeometry( shapes , { amount: 20, bevelEnabled:true, bevelThickness:3	} );
-
-	//return text3d;
-};
-
 
 THREE.TextGeometry = function ( text, parameters ) {
 	var textPath = new THREE.TextPath(text, parameters );
 	var textShapes = textPath.toShapes();
-	console.log("params", parameters);
+	
 	THREE.ExtrudeGeometry.call( this,  textShapes, parameters);
 
 
 };
 
-/*
-	var text3d = new TextGeometry(text);
-	
-	FactoryStyle
-	var text3d = FontUtils.createText(text);
-
-	var textPath = new TextPath(text);
-	var textShapes = textPath.toShapes();
-	var text3d = new ExtrudeGeometry(textShapes, options);
-	
-	var textShapes = FontUtils.getTextShapes(text);
-	text3d = new ExtrudeGeometry(textShapes, options);
-	
-
- */
-
 THREE.TextGeometry.prototype = new THREE.ExtrudeGeometry();
 THREE.TextGeometry.prototype.constructor = THREE.TextGeometry;
 
 
+
+/*
+	// TextGeometry Wrapper 
+	var text3d = new TextGeometry(text, options);
+	
+	// Complete Manner
+	var textPath = new TextPath(text, options);
+	var textShapes = textPath.toShapes();
+	var text3d = new ExtrudeGeometry(textShapes, options);
+	
+	// Factory Method
+	var textShapes = FontUtils.getTextShapes(text, options);
+	text3d = new ExtrudeGeometry(textShapes, options);
+
+*/
 
 
 THREE.FontUtils = {
@@ -151,6 +84,12 @@ THREE.FontUtils = {
 		return this.faces[ this.face ][ this.weight ][ this.style ];
 
 	},
+	
+	getTextShapes: function(text, options) {
+		var textPath = new TextPath(text, options);
+		var textShapes = textPath.toShapes();
+		return textShapes;
+	},
 
 	loadFace : function( data ) {
 
@@ -169,7 +108,7 @@ THREE.FontUtils = {
 
 	},
 
-
+/* LAGACY CODE
 	extractPoints : function( allPoints, charactersPoints ) {
 
 		// Quick exit
@@ -288,7 +227,7 @@ THREE.FontUtils = {
 
 		//console.log("isolatedShapes", isolatedShapes);
 
-		/* For each isolated shape, find the closest points and break to the hole to allow triangulation*/
+		// For each isolated shape, find the closest points and break to the hole to allow triangulation
 
 		// Find closest points between holes
 
@@ -523,7 +462,7 @@ THREE.FontUtils = {
 
 		};
 
-	},
+	},*/
 
 	drawText : function( text ) {
 
@@ -546,8 +485,8 @@ THREE.FontUtils = {
 
 			var ret = this.extractGlyphPoints( chars[ i ], face, scale, offset, path );
 			offset += ret.offset;
-			characterPts.push( ret.points );
-			allPts = allPts.concat( ret.points );
+			//characterPts.push( ret.points );
+			//allPts = allPts.concat( ret.points );
 			fontPaths.push( ret.path );
 			
 		}
@@ -555,175 +494,24 @@ THREE.FontUtils = {
 		// get the width
 
 		var width = offset / 2;
-
-		for ( p = 0; p < allPts.length; p++ ) {
-
-			allPts[ p ].x -= width;
-
-		}
+		// 
+		// for ( p = 0; p < allPts.length; p++ ) {
+		// 
+		// 	allPts[ p ].x -= width;
+		// 
+		// }
 
 		var extract = this.extractPoints( allPts, characterPts );
-		extract.contour = allPts;
+		//extract.contour = allPts;
+		
 		extract.paths = fontPaths;
-
-		var bevelPoints = [];
-
-		var centroids = [], forCentroids = [], expandOutwards = [], sum = new THREE.Vector2(), lastV;
-
-		i = allPts.length;
-
-		while ( --i >= 0 ) {
-
-			if ( !lastV ) {
-
-				lastV = allPts[ i ];
-
-			} else if ( lastV.equals( allPts[ i ] ) ) {
-
-				// We reached the last point of a closed loop
-
-				lastV = null;
-
-				var bool = this.Triangulate.area( forCentroids ) > 0;
-				expandOutwards.push( bool );
-				centroids.push( sum.divideScalar( forCentroids.length ) );
-				forCentroids = [];
-
-				sum = new THREE.Vector2();
-				continue;
-
-			}
-
-			sum.addSelf( allPts[ i ] );
-			forCentroids.push( allPts[ i ] );
-
-		}
-
-
-		i = allPts.length;
-		p = 0;
-		var pt, centroid ;
-		var dirV, adj;
-
-		while ( --i >= 0 ) {
-
-			pt = allPts[ i ];
-			centroid = centroids[ p ];
-
-			dirV = pt.clone().subSelf( centroid );
-			adj = this.bevelSize / dirV.length();
-
-			if ( expandOutwards[ p ] ) {
-
-				adj += 1;
-
-			}  else {
-
-				adj = 1 - adj;
-
-			}
-
-			adj = dirV.multiplyScalar( adj ).addSelf( centroid );
-			bevelPoints.unshift( adj );
-
-
-			if ( !lastV ) {
-
-				lastV = allPts[ i ];
-
-			} else if ( lastV.equals( allPts[ i ] ) ) {
-
-				// We reached the last point of a closed loop
-
-				lastV = null;
-				p++;
-				continue;
-
-			}
-
-		}
-
-
-		/*
-		for ( p = 0; p < allPts.length; p++ ) {
-
-			pt = allPts[ p ];
-			bevelPoints.push( new THREE.Vector2( pt.x + this.bevelSize, pt.y + this.bevelSize ) );
-
-		}
-		*/
-
-		extract.bevel = bevelPoints;
-
+		extract.offset = width;
+		
 		return extract;
 
 	},
 
 
-	// Bezier Curves formulas obtained from
-	// http://en.wikipedia.org/wiki/B%C3%A9zier_curve
-
-	// Quad Bezier Functions
-
-	b2p0: function ( t, p ) {
-
-		var k = 1 - t;
-		return k * k * p;
-
-	},
-
-	b2p1: function ( t, p ) {
-
-		return 2 * ( 1 - t ) * t * p;
-
-	},
-
-	b2p2: function ( t, p ) {
-
-		return t * t * p;
-
-	},
-
-	b2: function ( t, p0, p1, p2 ) {
-
-		return this.b2p0( t, p0 ) + this.b2p1( t, p1 ) + this.b2p2( t, p2 );
-
-	},
-
-	// Cubic Bezier Functions
-
-	b3p0: function ( t, p ) {
-
-		var k = 1 - t;
-		return k * k * k * p;
-
-	},
-
-	b3p1: function ( t, p ) {
-
-		var k = 1 - t;
-		return 3 * k * k * t * p;
-
-	},
-
-	b3p2: function ( t, p ) {
-
-		var k = 1 - t;
-		return 3 * k * t * t * p;
-
-	},
-
-	b3p3: function ( t, p ) {
-
-		return t * t * t * p;
-
-	},
-
-	b3: function ( t, p0, p1, p2, p3 ) {
-
-		return this.b3p0( t, p0 ) + this.b3p1( t, p1 ) + this.b3p2( t, p2 ) +  this.b3p3( t, p3 );
-
-	},
 
 
 	extractGlyphPoints : function( c, face, scale, offset, path ) {
@@ -797,8 +585,8 @@ THREE.FontUtils = {
 						for ( i2 = 1, divisions = this.divisions; i2 <= divisions; i2++ ) {
 
 							var t = i2 / divisions;
-							var tx = THREE.FontUtils.b2( t, cpx0, cpx1, cpx );
-							var ty = THREE.FontUtils.b2( t, cpy0, cpy1, cpy );
+							var tx = THREE.Shape.Utils.b2( t, cpx0, cpx1, cpx );
+							var ty = THREE.Shape.Utils.b2( t, cpy0, cpy1, cpy );
 							pts.push( new THREE.Vector2( tx, ty ) );
 
 					  }
@@ -830,8 +618,8 @@ THREE.FontUtils = {
 						for ( i2 = 1, divisions = this.divisions; i2 <= divisions; i2++ ) {
 
 							var t = i2 / divisions;
-							var tx = THREE.FontUtils.b3( t, cpx0, cpx1, cpx2, cpx );
-							var ty = THREE.FontUtils.b3( t, cpy0, cpy1, cpy2, cpy );
+							var tx = THREE.Shape.Utils.b3( t, cpx0, cpx1, cpx2, cpx );
+							var ty = THREE.Shape.Utils.b3( t, cpy0, cpy1, cpy2, cpy );
 							pts.push( new THREE.Vector2( tx, ty ) );
 
 						}
