@@ -699,8 +699,9 @@ THREE.Path.prototype.debug = function( canvas ) {
 };
 
 // Breaks path into shapes
+
 THREE.Path.prototype.toShapes = function() {
-	
+
 	var i, il, item, action, args;
 
 	var subPaths = [], lastPath = new THREE.Path();
@@ -711,79 +712,97 @@ THREE.Path.prototype.toShapes = function() {
 
 		args = item.args;
 		action = item.action;
-		
-		if (action==THREE.PathActions.MOVE_TO) {
-			if (lastPath.actions.length!=0) {
-				
-				subPaths.push(lastPath);
+
+		if ( action == THREE.PathActions.MOVE_TO ) {
+
+			if ( lastPath.actions.length != 0 ) {
+
+				subPaths.push( lastPath );
 				lastPath = new THREE.Path();
-				
+
 			}
+
 		}
-		lastPath[action].apply( lastPath, args);
-		
+
+		lastPath[ action ].apply( lastPath, args );
+
 	}
-	
-	if (lastPath.actions.length!=0) {	
-	
-		subPaths.push(lastPath);
-		
+
+	if ( lastPath.actions.length != 0 ) {
+
+		subPaths.push( lastPath );
+
 	}
-	
+
 	//console.log(subPaths);
-	if (subPaths.length ==0) return [];
-	
-	var holesFirst = !THREE.Shape.Utils.isClockWise(subPaths[0].getPoints());
-	var tmpShape, shapes = [];
-	var tmpPath;
-	
+
+	if ( subPaths.length ==0 ) return [];
+
+	var holesFirst = !THREE.Shape.Utils.isClockWise( subPaths[ 0 ].getPoints() );
+
+	var tmpPath, tmpShape, shapes = [];
+
 	//console.log("Holes first", holesFirst);
-	
-	if (holesFirst) {
+
+	if ( holesFirst ) {
+
 		tmpShape = new THREE.Shape();
-		for ( i=0, il = subPaths.length; i<il; i++) {
-		
-			tmpPath = subPaths[i];
-			
-			if (THREE.Shape.Utils.isClockWise(tmpPath.getPoints())) {
+
+		for ( i = 0, il = subPaths.length; i < il; i ++ ) {
+
+			tmpPath = subPaths[ i ];
+
+			if ( THREE.Shape.Utils.isClockWise( tmpPath.getPoints() ) ) {
+
 				tmpShape.actions = tmpPath.actions;
 				tmpShape.curves = tmpPath.curves;
-				
-				shapes.push(tmpShape);
+
+				shapes.push( tmpShape );
 				tmpShape = new THREE.Shape();
-				
+
 				//console.log('cw', i);
-				
+
 			} else {
-				tmpShape.holes.push(tmpPath);
+
+				tmpShape.holes.push( tmpPath );
+
 				//console.log('ccw', i);
-				
+
 			}
-		
+
 		}
+
 	} else {
+
 		// Shapes first
-		for ( i=0, il = subPaths.length; i<il; i++) {
-		
-			tmpPath = subPaths[i];
-			
-			if (THREE.Shape.Utils.isClockWise(tmpPath.getPoints())) {
-				
-				
-				if (tmpShape) shapes.push(tmpShape);
+
+		for ( i = 0, il = subPaths.length; i < il; i ++ ) {
+
+			tmpPath = subPaths[ i ];
+
+			if ( THREE.Shape.Utils.isClockWise( tmpPath.getPoints() ) ) {
+
+
+				if ( tmpShape ) shapes.push( tmpShape );
+
 				tmpShape = new THREE.Shape();
 				tmpShape.actions = tmpPath.actions;
 				tmpShape.curves = tmpPath.curves;
-				
+
 			} else {
-				tmpShape.holes.push(tmpPath);
+
+				tmpShape.holes.push( tmpPath );
+
 			}
-		
+
 		}
-		shapes.push(tmpShape);
+
+		shapes.push( tmpShape );
+
 	}
-	
+
 	//console.log("shape", shapes);
-	
+
 	return shapes;
+
 };

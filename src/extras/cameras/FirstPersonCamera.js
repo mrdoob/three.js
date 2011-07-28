@@ -253,11 +253,20 @@ THREE.FirstPersonCamera = function ( parameters ) {
 
 		}
 
+		var verticalLookRatio = 1;
+
+		if ( this.constrainVertical ) {
+
+			verticalLookRatio = 3.14 / ( this.verticalMax - this.verticalMin );
+
+		}
+
 		this.lon += this.mouseX * actualLookSpeed;
-		if( this.lookVertical ) this.lat -= this.mouseY * actualLookSpeed;
+		if( this.lookVertical ) this.lat -= this.mouseY * actualLookSpeed * verticalLookRatio;
 
 		this.lat = Math.max( - 85, Math.min( 85, this.lat ) );
 		this.phi = ( 90 - this.lat ) * Math.PI / 180;
+
 		this.theta = this.lon * Math.PI / 180;
 
 		if ( this.constrainVertical ) {

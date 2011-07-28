@@ -30,7 +30,6 @@ THREE.Shape.prototype.extrude = function ( options ) {
 
 // Get points of holes
 
-
 THREE.Shape.prototype.getPointsHoles = function () {
 
 
@@ -352,7 +351,7 @@ THREE.Shape.Utils = {
 
 	}, // end triangulate shapes
 
-	/*	
+	/*
 	triangulate2 : function( pts, holes ) {
 
 		// For use with Poly2Tri.js
@@ -384,7 +383,7 @@ THREE.Shape.Utils = {
 			}
 			return -1;
 		};
-		
+
 		// triangulate
 		js.poly2tri.sweep.Triangulate(swctx);
 
@@ -414,7 +413,7 @@ THREE.Shape.Utils = {
 		return THREE.FontUtils.Triangulate.area( pts ) < 0;
 
 	},
-	
+
 	// Bezier Curves formulas obtained from
 	// http://en.wikipedia.org/wiki/B%C3%A9zier_curve
 
@@ -479,6 +478,6 @@ THREE.Shape.Utils = {
 		return this.b3p0( t, p0 ) + this.b3p1( t, p1 ) + this.b3p2( t, p2 ) +  this.b3p3( t, p3 );
 
 	}
-	
+
 };
 

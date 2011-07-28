@@ -35,14 +35,22 @@
  *
  */
 
-
-
 THREE.TextGeometry = function ( text, parameters ) {
-	var textPath = new THREE.TextPath(text, parameters );
-	var textShapes = textPath.toShapes();
-	
-	THREE.ExtrudeGeometry.call( this,  textShapes, parameters);
 
+	var textPath = new THREE.TextPath( text, parameters );
+	var textShapes = textPath.toShapes();
+
+	// translate parameters to ExtrudeGeometry API
+
+	parameters.amount = parameters.height !== undefined ? parameters.height : 50;
+
+	// defaults
+
+	if ( parameters.bevelThickness === undefined ) parameters.bevelThickness = 10;
+	if ( parameters.bevelSize === undefined ) parameters.bevelSize = 8;
+	if ( parameters.bevelEnabled === undefined ) parameters.bevelEnabled = false;
+
+	THREE.ExtrudeGeometry.call( this, textShapes, parameters );
 
 };
 
@@ -50,19 +58,21 @@ THREE.TextGeometry.prototype = new THREE.ExtrudeGeometry();
 THREE.TextGeometry.prototype.constructor = THREE.TextGeometry;
 
 
-
 /*
-	// TextGeometry Wrapper 
-	var text3d = new TextGeometry(text, options);
-	
-	// Complete Manner
-	var textPath = new TextPath(text, options);
+	// TextGeometry wrapper
+
+	var text3d = new TextGeometry( text, options );
+
+	// Complete manner
+
+	var textPath = new TextPath( text, options );
 	var textShapes = textPath.toShapes();
-	var text3d = new ExtrudeGeometry(textShapes, options);
-	
+	var text3d = new ExtrudeGeometry( textShapes, options );
+
 	// Factory Method
-	var textShapes = FontUtils.getTextShapes(text, options);
-	text3d = new ExtrudeGeometry(textShapes, options);
+
+	var textShapes = FontUtils.getTextShapes( text, options );
+	text3d = new ExtrudeGeometry( textShapes, options );
 
 */
 
@@ -84,11 +94,13 @@ THREE.FontUtils = {
 		return this.faces[ this.face ][ this.weight ][ this.style ];
 
 	},
-	
-	getTextShapes: function(text, options) {
-		var textPath = new TextPath(text, options);
+
+	getTextShapes: function( text, options ) {
+
+		var textPath = new TextPath( text, options );
 		var textShapes = textPath.toShapes();
 		return textShapes;
+
 	},
 
 	loadFace : function( data ) {
@@ -108,7 +120,8 @@ THREE.FontUtils = {
 
 	},
 
-/* LAGACY CODE
+/* LEGACY CODE
+
 	extractPoints : function( allPoints, charactersPoints ) {
 
 		// Quick exit
@@ -479,8 +492,8 @@ THREE.FontUtils = {
 
 		var fontPaths = [];
 
-		
-		for ( i = 0; i < length; i++ ) {
+		for ( i = 0; i < length; i ++ ) {
+
 			var path = new THREE.Path();
 
 			var ret = this.extractGlyphPoints( chars[ i ], face, scale, offset, path );
@@ -488,26 +501,26 @@ THREE.FontUtils = {
 			//characterPts.push( ret.points );
 			//allPts = allPts.concat( ret.points );
 			fontPaths.push( ret.path );
-			
+
 		}
 
 		// get the width
 
 		var width = offset / 2;
-		// 
+		//
 		// for ( p = 0; p < allPts.length; p++ ) {
-		// 
+		//
 		// 	allPts[ p ].x -= width;
-		// 
+		//
 		// }
 
 		//var extract = this.extractPoints( allPts, characterPts );
 		//extract.contour = allPts;
-		
+
 		//extract.paths = fontPaths;
 		//extract.offset = width;
-		
-		return {paths : fontPaths,offset : width };
+
+		return { paths : fontPaths, offset : width };
 
 	},
 
@@ -517,8 +530,6 @@ THREE.FontUtils = {
 	extractGlyphPoints : function( c, face, scale, offset, path ) {
 
 		var pts = [];
-
-
 
 		var i, i2,
 			outline, action, length,
@@ -539,8 +550,10 @@ THREE.FontUtils = {
 
 			for ( i = 0; i < length; ) {
 
-				action = outline[ i++ ];
-				//console.log(action);
+				action = outline[ i ++ ];
+
+				//console.log( action );
+
 				switch( action ) {
 
 				case 'm':
@@ -549,9 +562,10 @@ THREE.FontUtils = {
 
 					x = outline[ i++ ] * scaleX + offset;
 					y = outline[ i++ ] * scaleY;
+
 					pts.push( new THREE.Vector2( x, y ) );
 
-					path.moveTo(x,y);
+					path.moveTo( x, y );
 					break;
 
 				case 'l':
