@@ -586,6 +586,10 @@ THREE.ShaderChunk = {
 						"for ( float x = -1.25; x <= 1.25; x += 1.25 ) {",
 
 							"vec4 rgbaDepth = texture2D( shadowMap[ i ], vec2( x * xPixelOffset, y * yPixelOffset ) + shadowCoord.xy );",
+
+							// doesn't seem to produce any noticeable visual difference compared to simple "texture2D" lookup
+							//"vec4 rgbaDepth = texture2DProj( shadowMap[ i ], vec4( vShadowCoord[ i ].w * ( vec2( x * xPixelOffset, y * yPixelOffset ) + shadowCoord.xy ), 0.05, vShadowCoord[ i ].w ) );",
+
 							"float fDepth = unpackDepth( rgbaDepth );",
 
 							"if ( fDepth < ( shadowCoord.z + shadowBias ) )",
