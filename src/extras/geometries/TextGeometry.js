@@ -678,7 +678,7 @@ THREE.FontUtils = {
 		}
 
 		//path.debug(document.getElementById("boo"));
-		console.log(path);
+		//console.log(path);
 
 
 		// get the width

@@ -17,7 +17,7 @@ THREE.Object3D = function() {
 	this.scale = new THREE.Vector3( 1, 1, 1 );
 
 	this.dynamic = false; // when true it retains arrays so they can be updated with __dirty*
-	
+
 	this.doubleSided = false;
 	this.flipSided = false;
 
@@ -39,6 +39,9 @@ THREE.Object3D = function() {
 	this.boundRadiusScale = 1.0;
 
 	this.visible = true;
+
+	this.castShadow = false;
+	this.receiveShadow = false;
 
 	this._vector = new THREE.Vector3();
 
