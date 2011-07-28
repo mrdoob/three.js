@@ -84,6 +84,7 @@
 
 				bevelThickness = 2,
 				bevelSize = 1.5,
+				bevelSegments = 3,
 				bevelEnabled = true,
 
 				font = "optimer", 		// helvetiker, optimer, gentilis, droid sans, droid serif
@@ -204,54 +205,14 @@
 
 				}
 
-				textGeo = new THREE.TextGeometry( text, {
-
-					size: size,
-					height: height,
-					curveSegments: curveSegments,
-
-					font: font,
-					weight: weight,
-					style: style,
-
-					bevelThickness: bevelThickness,
-					bevelSize: bevelSize,
-					bevelEnabled: bevelEnabled
-
-				});
-
 				textMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, wireframe: false } );
 
 				parent = new THREE.Object3D();
-
-				textMesh1 = new THREE.Mesh( textGeo, textMaterial );
-
-				textMesh1.position.x = 0;
-				textMesh1.position.y = hover;
-				textMesh1.position.z = 0;
-
-				textMesh1.rotation.x = 0;
-				textMesh1.rotation.y = Math.PI * 2;
-
-				parent.addChild( textMesh1 );
-
-				if ( mirror ) {
-
-					textMesh2 = new THREE.Mesh( textGeo, textMaterial );
-
-					textMesh2.position.x = 0;
-					textMesh2.position.y = -hover;
-					textMesh2.position.z = height;
-
-					textMesh2.rotation.x = Math.PI;
-					textMesh2.rotation.y = Math.PI * 2;
-
-					parent.addChild( textMesh2 );
-
-				}
-
 				parent.position.y = 100;
+
 				scene.addChild( parent );
+
+				createText();
 
 				var plane = new THREE.Mesh( new THREE.PlaneGeometry( 10000, 10000 ), new THREE.MeshBasicMaterial( { color: 0xffffff, opacity: 0.5, transparent: true } ) );
 				plane.rotation.x = -1.57;
@@ -414,11 +375,7 @@
 
 			}
 
-			function refreshText() {
-
-				updatePermalink();
-
-				scene.removeChild( textMesh1 );
+			function createText() {
 
 				textGeo = new THREE.TextGeometry( text, {
 
@@ -436,9 +393,12 @@
 
 				});
 
+				textGeo.computeBoundingBox();
+				var centerOffset = -0.5 * ( textGeo.boundingBox.x[ 1 ] - textGeo.boundingBox.x[ 0 ] );
+
 				textMesh1 = new THREE.Mesh( textGeo, textMaterial );
 
-				textMesh1.position.x = 0;
+				textMesh1.position.x = centerOffset;
 				textMesh1.position.y = hover;
 				textMesh1.position.z = 0;
 
@@ -449,21 +409,31 @@
 
 				if ( mirror ) {
 
-					scene.removeChild( textMesh2 );
-
 					textMesh2 = new THREE.Mesh( textGeo, textMaterial );
 
-					textMesh2.position.x = 0;
+					textMesh2.position.x = centerOffset;
 					textMesh2.position.y = -hover;
 					textMesh2.position.z = height;
 
 					textMesh2.rotation.x = Math.PI;
 					textMesh2.rotation.y = Math.PI * 2;
 
-
 					parent.addChild( textMesh2 );
 
 				}
+
+			}
+
+			function refreshText() {
+
+				updatePermalink();
+
+				scene.removeChild( textMesh1 );
+				if ( mirror ) scene.removeChild( textMesh2 );
+
+				if ( !text ) return;
+
+				createText();
 
 			}
 

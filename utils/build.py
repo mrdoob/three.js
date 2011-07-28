@@ -97,6 +97,7 @@ EXTRAS_FILES = [
 'extras/geometries/Curve.js',
 'extras/geometries/Path.js',
 'extras/geometries/Shape.js',
+'extras/geometries/TextPath.js',
 'extras/geometries/CubeGeometry.js',
 'extras/geometries/CylinderGeometry.js',
 'extras/geometries/ExtrudeGeometry.js',
