@@ -40,6 +40,8 @@ THREE.FirstPersonCamera = function ( parameters ) {
 	this.noFly = false;
 	this.lookVertical = true;
 	this.autoForward = false;
+        this.mouseBtnForward = true;
+        this.mouseBtnReverse = true;
 
 	this.activeLook = true;
 
@@ -65,6 +67,9 @@ THREE.FirstPersonCamera = function ( parameters ) {
 
 		if ( parameters.autoForward !== undefined ) this.autoForward = parameters.autoForward;
 
+		if ( parameters.mouseBtnForward !== undefined ) this.mouseBtnForward = parameters.mouseBtnForward;
+		if ( parameters.mouseBtnReverse !== undefined ) this.mouseBtnReverse = parameters.mouseBtnReverse;
+		
 		if ( parameters.activeLook !== undefined ) this.activeLook = parameters.activeLook;
 
 		if ( parameters.heightSpeed !== undefined ) this.heightSpeed = parameters.heightSpeed;
@@ -110,8 +115,8 @@ THREE.FirstPersonCamera = function ( parameters ) {
 
 			switch ( event.button ) {
 
-				case 0: this.moveForward = true; break;
-				case 2: this.moveBackward = true; break;
+				case 0: this.moveForward = this.mouseBtnForward; break;
+				case 2: this.moveBackward = this.mouseBtnReverse; break;
 
 			}
 
