@@ -596,7 +596,7 @@ THREE.Path.prototype.nltransform = function( a, b, c, d, e, f ) {
 
 THREE.Path.prototype.debug = function( canvas ) {
 
-	var bounds = this.getMinAndMax();
+	var bounds = this.getBoundingBox();
 
 	if ( !canvas ) {
 

@@ -38,8 +38,6 @@ THREE.ExtrudeGeometry = function( shapes, options ) {
 
 		shape = shapes[ s ];
 
-		//console.log(shape);
-
 		this.addShape( shape, options );
 
 	}
@@ -60,17 +58,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	var bevelEnabled = options.bevelEnabled !== undefined ? options.bevelEnabled : true; // false
 
-	// We should set bevel segments to 0 if bevel is not enabled.
-	// (also bevelThickness and bevelSize make mess when bevel is not enabled,
-	//  whole shape gets thicker)
 
-	if ( !bevelEnabled ) {
-
-		bevelSegments = 0;
-		//bevelThickness = 0;
-		//bevelSize = 0;
-
-	}
 
 	var steps = options.steps !== undefined ? options.steps : 1;
 
@@ -78,11 +66,21 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 	var extrudePts, extrudeByPath = false;
 
 	if ( extrudePath ) {
-
+		
 		extrudePts = extrudePath.getPoints();
 		steps = extrudePts.length;
 		extrudeByPath = true;
+		bevelEnabled = false; // bevels not supported for path extrusion
+	}
+	
+	// Safeguards if bevels are not enabled
 
+	if ( !bevelEnabled ) {
+
+		bevelSegments = 0;
+		bevelThickness = 0;
+		bevelSize = 0;
+		
 	}
 
 
@@ -96,7 +94,6 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	var shapesOffset = this.vertices.length;
 
-	//extractAllPoints
 	var shapePoints = shape.extractAllPoints(); // use shape.extractAllSpacedPoints() for points with equal divisions
 
     var vertices = shapePoints.shape;
@@ -146,11 +143,13 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	}
 
-	// Find all centroids of shapes and holes
+	
 
 	var i, il;
 
 	// We no longer need centroids
+	
+	// Find all centroids of shapes and holes
 
 	//var sum = new THREE.Vector2();
 
@@ -254,6 +253,9 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 			p, q, v_dot_w_hat, q_sub_p_dot_w_hat, 
 			s,intersection;
 			
+		// good reading for line-line intersection
+		//http://sputsoft.com/blog/2010/03/line-line-intersection.html
+			
 		// define a as vector j->i
 		// define b as vectot k->i
 		a = new THREE.Vector2(pt_i.x - pt_j.x, pt_i.y - pt_j.y);
@@ -280,13 +282,10 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 		p = pt_j.clone().addSelf(v_hat);
 		q = pt_k.clone().addSelf(w_hat);
 		
-		// good reading for line-line intersection
-		//http://sputsoft.com/blog/2010/03/line-line-intersection.html
-		
 		v_dot_w_hat = v.dot(w_hat);
 		q_sub_p_dot_w_hat = q.clone().subSelf(p).dot(w_hat);
 		
-		// We shoud not get these
+		// We should not reach these conditions
 		if (v_dot_w_hat ==0 ) {
 			console.log("Either infinite or no solutions!");
 			if (q_sub_p_dot_w_hat ==0 ) {
@@ -305,7 +304,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 		
 		intersection = v.clone().multiplyScalar(s).addSelf(p);
 		
-		return intersection.subSelf(pt_i); // .normalize() Don't normalize!
+		return intersection.subSelf(pt_i); // Don't normalize!, otherwise sharp corners become ugly
 
 	}
 
@@ -594,6 +593,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 	}
 
 	// UVs to be added
+	// How can we create UVs on this?
 
 	this.computeCentroids();
 	this.computeFaceNormals();
