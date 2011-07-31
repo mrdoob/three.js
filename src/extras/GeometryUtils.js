@@ -179,6 +179,250 @@ THREE.GeometryUtils = {
 
 		return cloneGeo;
 
+	},
+
+	// Get random point in triangle (via barycentric coordinates)
+	// 	(uniform distribution)
+	// 	http://www.cgafaq.info/wiki/Random_Point_In_Triangle
+
+	randomPointInTriangle: function( vectorA, vectorB, vectorC ) {
+
+		var a, b, c,
+			point = new THREE.Vector3(),
+			tmp = THREE.GeometryUtils.__v1;
+
+		a = Math.random();
+		b = Math.random();
+
+		if ( ( a + b ) > 1 ) {
+
+			a = 1 - a;
+			b = 1 - b;
+
+		}
+
+		c = 1 - a - b;
+
+		point.copy( vectorA );
+		point.multiplyScalar( a );
+
+		tmp.copy( vectorB );
+		tmp.multiplyScalar( b );
+
+		point.addSelf( tmp );
+
+		tmp.copy( vectorC );
+		tmp.multiplyScalar( c );
+
+		point.addSelf( tmp );
+
+		return point;
+
+	},
+
+	// Get random point in face (triangle / quad)
+	// (uniform distribution)
+
+	randomPointInFace: function( face, geometry, useCachedAreas ) {
+
+		var vA, vB, vC, vD;
+
+		if ( face instanceof THREE.Face3 ) {
+
+			vA = geometry.vertices[ face.a ].position;
+			vB = geometry.vertices[ face.b ].position;
+			vC = geometry.vertices[ face.c ].position;
+
+			return THREE.GeometryUtils.randomPointInTriangle( vA, vB, vC );
+
+		} else if ( face instanceof THREE.Face4 ) {
+
+			vA = geometry.vertices[ face.a ].position;
+			vB = geometry.vertices[ face.b ].position;
+			vC = geometry.vertices[ face.c ].position;
+			vD = geometry.vertices[ face.d ].position;
+
+			var area1, area2;
+
+			if ( useCachedAreas ) {
+
+				if ( face._area1 && face._area2 ) {
+
+					area1 = face._area1;
+					area2 = face._area2;
+
+				} else {
+
+					area1 = THREE.GeometryUtils.triangleArea( vA, vB, vD );
+					area2 = THREE.GeometryUtils.triangleArea( vB, vC, vD );
+
+					face._area1 = area1;
+					face._area2 = area2;
+
+				}
+
+			} else {
+
+				area1 = THREE.GeometryUtils.triangleArea( vA, vB, vD ),
+				area2 = THREE.GeometryUtils.triangleArea( vB, vC, vD );
+
+			}
+
+			var r = Math.random() * ( area1 + area2 );
+
+			if ( r < area1 ) {
+
+				return THREE.GeometryUtils.randomPointInTriangle( vA, vB, vD );
+
+			} else {
+
+				return THREE.GeometryUtils.randomPointInTriangle( vB, vC, vD );
+
+			}
+
+		}
+
+	},
+
+	// Get uniformly distributed random points in mesh
+	// 	- create array with cumulative sums of face areas
+	//  - pick random number from 0 to total area
+	//  - find corresponding place in area array by binary search
+	//	- get random point in face
+
+	randomPointsInGeometry: function( geometry, n ) {
+
+		var face, i,
+			faces = geometry.faces,
+			vertices = geometry.vertices,
+			il = faces.length,
+			totalArea = 0,
+			cumulativeAreas = [],
+			vA, vB, vC, vD;
+
+		// precompute face areas
+
+		for ( i = 0; i < il; i ++ ) {
+
+			face = faces[ i ];
+
+			if ( face instanceof THREE.Face3 ) {
+
+				vA = vertices[ face.a ].position;
+				vB = vertices[ face.b ].position;
+				vC = vertices[ face.c ].position;
+
+				face._area = THREE.GeometryUtils.triangleArea( vA, vB, vC );
+
+			} else if ( face instanceof THREE.Face4 ) {
+
+				vA = vertices[ face.a ].position;
+				vB = vertices[ face.b ].position;
+				vC = vertices[ face.c ].position;
+				vD = vertices[ face.d ].position;
+
+				face._area1 = THREE.GeometryUtils.triangleArea( vA, vB, vD );
+				face._area2 = THREE.GeometryUtils.triangleArea( vB, vC, vD );
+
+				face._area = face._area1 + face._area2;
+
+			}
+
+			totalArea += face._area;
+
+			cumulativeAreas[ i ] = totalArea;
+
+		}
+
+		// binary search cumulative areas array
+
+		function binarySearchIndices( value ) {
+
+			function binarySearch( start, end ) {
+
+				// return closest larger index
+				// if exact number is not found
+
+				if ( end < start )
+					return start;
+
+				var mid = start + Math.floor( ( end - start ) / 2 );
+
+				if ( cumulativeAreas[ mid ] > value ) {
+
+					return binarySearch( start, mid - 1 );
+
+				} else if ( cumulativeAreas[ mid ] < value ) {
+
+					return binarySearch( mid + 1, end );
+
+				} else {
+
+					return mid;
+
+				}
+
+			}
+
+			var result = binarySearch( 0, cumulativeAreas.length - 1 )
+			return result;
+
+		}
+
+		// pick random face weighted by face area
+
+		var r, index,
+			result = [];
+
+		var stats = {};
+
+		for ( i = 0; i < n; i ++ ) {
+
+			r = Math.random() * totalArea;
+
+			index = binarySearchIndices( r );
+
+			result[ i ] = THREE.GeometryUtils.randomPointInFace( faces[ index ], geometry, true );
+
+			if ( ! stats[ index ] ) {
+
+				stats[ index ] = 1;
+
+			} else {
+
+				stats[ index ] += 1;
+
+			}
+
+		}
+
+		return result;
+
+	},
+
+	// Get triangle area (by Heron's formula)
+	// 	http://en.wikipedia.org/wiki/Heron%27s_formula
+
+	triangleArea: function( vectorA, vectorB, vectorC ) {
+
+		var s, a, b, c,
+			tmp = THREE.GeometryUtils.__v1;
+
+		tmp.sub( vectorA, vectorB );
+		a = tmp.length();
+
+		tmp.sub( vectorA, vectorC );
+		b = tmp.length();
+
+		tmp.sub( vectorB, vectorC );
+		c = tmp.length();
+
+		s = 0.5 * ( a + b + c );
+
+		return Math.sqrt( s * ( s - a ) * ( s - b ) * ( s - c ) );
+
 	}
 
 };
+
+THREE.GeometryUtils.__v1 = new THREE.Vector3();
