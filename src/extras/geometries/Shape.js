@@ -136,7 +136,8 @@ THREE.Shape.Utils = {
 			// Find the shortest pair of pts between shape and hole
 
 			// Note: Actually, I'm not sure now if we could optimize this to be faster than O(m*n)
-			// But one thing is that we could speed this up by not running square roots on the pts differences
+			// Using distanceToSquared() intead of distanceTo() should speed a little 
+			// since running square roots operations are reduced.
 			// http://en.wikipedia.org/wiki/Closest_pair_of_points
 			// http://stackoverflow.com/questions/1602164/shortest-distance-between-points-algorithm
 
@@ -148,7 +149,7 @@ THREE.Shape.Utils = {
 				for ( p = 0; p < shape.length; p++ ) {
 
 					pts2 = shape[ p ];
-					d = pts1.distanceTo( pts2 );
+					d = pts1.distanceToSquared( pts2 );
 					dist.push( d );
 
 					if ( d < shortest ) {

@@ -38,8 +38,6 @@ THREE.ExtrudeGeometry = function( shapes, options ) {
 
 		shape = shapes[ s ];
 
-		//console.log(shape);
-
 		this.addShape( shape, options );
 
 	}
@@ -52,6 +50,8 @@ THREE.ExtrudeGeometry.prototype.constructor = THREE.ExtrudeGeometry;
 
 THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
+	//var startTime = Date.now();
+
 	var amount = options.amount !== undefined ? options.amount : 100;
 
 	var bevelThickness = options.bevelThickness !== undefined ? options.bevelThickness : 6; // 10
@@ -60,17 +60,6 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	var bevelEnabled = options.bevelEnabled !== undefined ? options.bevelEnabled : true; // false
 
-	// We should set bevel segments to 0 if bevel is not enabled.
-	// (also bevelThickness and bevelSize make mess when bevel is not enabled,
-	//  whole shape gets thicker)
-
-	if ( !bevelEnabled ) {
-
-		bevelSegments = 0;
-		bevelThickness = 0;
-		bevelSize = 0;
-
-	}
 
 	var steps = options.steps !== undefined ? options.steps : 1;
 
@@ -82,6 +71,17 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 		extrudePts = extrudePath.getPoints();
 		steps = extrudePts.length;
 		extrudeByPath = true;
+		bevelEnabled = false; // bevels not supported for path extrusion
+
+	}
+
+	// Safeguards if bevels are not enabled
+
+	if ( !bevelEnabled ) {
+
+		bevelSegments = 0;
+		bevelThickness = 0;
+		bevelSize = 0;
 
 	}
 
@@ -96,7 +96,6 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	var shapesOffset = this.vertices.length;
 
-	//extractAllPoints
 	var shapePoints = shape.extractAllPoints(); // use shape.extractAllSpacedPoints() for points with equal divisions
 
     var vertices = shapePoints.shape;
@@ -110,7 +109,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 		// Maybe we should also check if holes are in the opposite direction, just to be safe ...
 
-		for ( h = 0, hl = holes.length;  h < hl; h ++ ) {
+		for ( h = 0, hl = holes.length; h < hl; h ++ ) {
 
 			ahole = holes[ h ];
 
@@ -146,60 +145,65 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	}
 
-	// Find all centroids of shapes and holes
 
 	var i, il;
-	var sum = new THREE.Vector2();
 
-	for ( i = 0, il = contour.length; i < il; i ++ ) {
+	// We no longer need centroids
 
-		sum.addSelf( contour[ i ] );
+	// Find all centroids of shapes and holes
 
-	}
+	//var sum = new THREE.Vector2();
 
-	var contourCentroid = sum.divideScalar( contour.length );
-
-	var holesCentroids = [];
-
-	for ( h = 0, hl = holes.length; h < hl; h ++ ) {
-
-		sum = new THREE.Vector2();
-		ahole = holes[ h ];
-
-		for ( i=0, il = ahole.length; i < il; i ++ ) {
-
-			sum.addSelf( ahole[ i ] );
-
-		}
-
-		holesCentroids[ h ] = sum.divideScalar( ahole.length );
-
-	}
-
-	function scalePt ( pt, centroid, size, expandOutwards /* Boolean */ ) {
-
-		var vectorFromCentroid = pt.clone().subSelf( centroid );
-		var adj = size / vectorFromCentroid.length();
-
-		if ( expandOutwards ) {
-
-			adj = 1 + adj;
-
-		}  else {
-
-			adj = 1 - adj;
-
-		}
-
-		return vectorFromCentroid.multiplyScalar( adj ).addSelf( centroid );
-
-	}
+	// for ( i = 0, il = contour.length; i < il; i ++ ) {
+	//
+	// 	sum.addSelf( contour[ i ] );
+	//
+	// }
+	//
+	// var contourCentroid = sum.divideScalar( contour.length );
+	//
+	// var holesCentroids = [];
+	//
+	// for ( h = 0, hl = holes.length; h < hl; h ++ ) {
+	//
+	// 	sum = new THREE.Vector2();
+	// 	ahole = holes[ h ];
+	//
+	// 	for ( i=0, il = ahole.length; i < il; i ++ ) {
+	//
+	// 		sum.addSelf( ahole[ i ] );
+	//
+	// 	}
+	//
+	// 	holesCentroids[ h ] = sum.divideScalar( ahole.length );
+	//
+	// }
+	//
+	// function scalePt ( pt, centroid, size, expandOutwards /* Boolean */ ) {
+	//
+	// 	var vectorFromCentroid = pt.clone().subSelf( centroid );
+	// 	var adj = size / vectorFromCentroid.length();
+	//
+	// 	if ( expandOutwards ) {
+	//
+	// 		adj = 1 + adj;
+	//
+	// 	}  else {
+	//
+	// 		adj = 1 - adj;
+	//
+	// 	}
+	//
+	// 	return vectorFromCentroid.multiplyScalar( adj ).addSelf( centroid );
+	//
+	// }
 
 
 	function scalePt2 ( pt, vec, size ) {
 
-		//return vec.clone().multiplyScalar( size ).addSelf( pt );
-		return pt.clone().addSelf( vec.clone().multiplyScalar( size ) );
+		if ( !vec ) console.log( "die" );
+
+		return vec.clone().multiplyScalar( size ).addSelf( pt );
 
 	}
 
@@ -218,6 +222,14 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	function getBevelVec( pt_i, pt_j, pt_k ) {
 
+		// Algorithm 2
+
+		return getBevelVec2( pt_i, pt_j, pt_k );
+
+	}
+
+	function getBevelVec1( pt_i, pt_j, pt_k ) {
+
 		var anglea = Math.atan2( pt_j.y - pt_i.y, pt_j.x - pt_i.x );
 		var angleb = Math.atan2( pt_k.y - pt_i.y, pt_k.x - pt_i.x );
 
@@ -227,30 +239,97 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 		}
 
-		// var anglea = Math.atan2(pt_i.y - pt_j.y, pt_i.x - pt_j.x);
-		//	var angleb = Math.atan2(pt_i.y - pt_k.y, pt_i.x - pt_k.x);
-
-		// 	console.log('>?', anglea > angleb);
-		//
-		// if ( anglea < angleb) {
- 		// 	angleb += Math.PI*2;
-	 	// 	 	}
-
-
-		//x = Math.cos(anglea) + Math.cos(angleb);
-		//y = Math.sin(anglea) + Math.sin(angleb);
-		//anglec = Math.atan2(y,x);
-
 		anglec = ( anglea + angleb ) / 2;
+
 
 		//console.log('angle1', anglea * RAD_TO_DEGREES,'angle2', angleb * RAD_TO_DEGREES, 'anglec', anglec *RAD_TO_DEGREES);
 
 		var x = - Math.cos( anglec );
 		var y = - Math.sin( anglec );
 
-		var vec = new THREE.Vector2( x, y ).normalize();
+		var vec = new THREE.Vector2( x, y ); //.normalize();
 
 		return vec;
+
+	}
+
+	function getBevelVec2( pt_i, pt_j, pt_k ) {
+
+		var a, b, v, w, v_hat, w_hat,
+			p, q, v_dot_w_hat, q_sub_p_dot_w_hat,
+			s, intersection;
+
+		// good reading for line-line intersection
+		// http://sputsoft.com/blog/2010/03/line-line-intersection.html
+
+		// define a as vector j->i
+		// define b as vectot k->i
+
+		a = new THREE.Vector2( pt_i.x - pt_j.x, pt_i.y - pt_j.y );
+		b = new THREE.Vector2( pt_i.x - pt_k.x, pt_i.y - pt_k.y );
+
+		// get unit vectors
+
+		v = a.normalize();
+		w = b.normalize();
+
+		// normals from pt i
+
+		v_hat = new THREE.Vector2( -v.y, v.x ); // v hat
+		w_hat = new THREE.Vector2( w.y, -w.x ); // w hat
+
+		// pts from i
+
+		p = pt_i.clone().addSelf( v_hat );
+		q = pt_i.clone().addSelf( w_hat );
+
+		if ( p.equals( q ) ) {
+
+			//console.log("Warning: lines are straight");
+			return w_hat;
+
+		}
+
+		// Points from j, k. helps prevents points cross overover most of the time
+
+		p = pt_j.clone().addSelf( v_hat );
+		q = pt_k.clone().addSelf( w_hat );
+
+		v_dot_w_hat = v.dot( w_hat );
+		q_sub_p_dot_w_hat = q.clone().subSelf( p ).dot( w_hat );
+
+		// We should not reach these conditions
+
+		if ( v_dot_w_hat == 0 ) {
+
+			console.log( "Either infinite or no solutions!" );
+
+			if (q_sub_p_dot_w_hat == 0 ) {
+
+				console.log( "Its finite solutions." );
+
+			} else {
+
+				console.log( "Too bad, no solutions." );
+
+			}
+
+		}
+
+		s = q_sub_p_dot_w_hat / v_dot_w_hat;
+
+		if ( s < 0) {
+
+			// in case of emergecy, revert to algorithm 1.
+			// console.log("opps");
+
+			return getBevelVec1( pt_i, pt_j, pt_k );
+
+		}
+
+		intersection = v.clone().multiplyScalar( s ).addSelf( p );
+
+		return intersection.subSelf( pt_i ); // Don't normalize!, otherwise sharp corners become ugly
 
 	}
 
@@ -344,8 +423,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	for ( i = 0; i < vlen; i ++ ) {
 
-		//vert = vertices[ i ];
-		vert = scalePt2( vertices[ i ], verticesMovements[ i ], bs );
+		vert = bevelEnabled ? scalePt2( vertices[ i ], verticesMovements[ i ], bs ) : vertices[ i ];
 
 		if ( !extrudeByPath ) {
 
@@ -368,8 +446,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 		for ( i = 0; i < vlen; i ++ ) {
 
-			//vert = vertices[ i ];
-			vert = scalePt2(vertices[ i ], verticesMovements[i], bs);
+			vert = bevelEnabled ? scalePt2(vertices[ i ], verticesMovements[i], bs) : vertices[ i ];
 
 			if ( !extrudeByPath ) {
 
@@ -400,9 +477,9 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 		for ( i = 0, il = contour.length; i < il; i ++ ) {
 
-			vert = scalePt2(contour[i], contourMovements[i], bs);
+			vert = scalePt2(contour[ i ], contourMovements[ i ], bs );
 			//vert = scalePt( contour[ i ], contourCentroid, bs, false );
-			v( vert.x, vert.y,  amount + z);
+			v( vert.x, vert.y,  amount + z );
 
 		}
 
@@ -416,7 +493,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 			for ( i = 0, il = ahole.length; i < il; i++ ) {
 
 				//vert = scalePt( ahole[ i ], holesCentroids[h], bs, true );
-				vert = scalePt2(ahole[i], oneHoleMovements[i], bs);
+				vert = scalePt2( ahole[ i ], oneHoleMovements[ i ], bs );
 
 				if ( !extrudeByPath ) {
 
@@ -424,7 +501,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 				} else {
 
-					v( vert.x, vert.y + extrudePts[ steps - 1 ].y, extrudePts[ steps - 1 ].x +z );
+					v( vert.x, vert.y + extrudePts[ steps - 1 ].y, extrudePts[ steps - 1 ].x + z );
 
 				}
 
@@ -541,10 +618,13 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 	}
 
 	// UVs to be added
+	// How can we create UVs on this?
 
 	this.computeCentroids();
 	this.computeFaceNormals();
 	//this.computeVertexNormals();
+
+	//console.log("took", (Date.now()- startTime) );
 
 	function v( x, y, z ) {
 

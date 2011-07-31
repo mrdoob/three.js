@@ -149,21 +149,6 @@ THREE.Path.prototype.arc = function ( aX, aY, aRadius,
 
  };
 
-/*
-// FUTURE ENHANCEMENTS
-
- example usage?
-
- Path.addExprFunc('sineCurveTo', sineCurveGetPtFunction)
- Path.sineCurveTo(x,y, amptitude);
- sineCurve.getPoint(t);
- return sine(disnt) * ampt
-
- // Create a new func eg. sin (theta) x
- THREE.Path.prototype.addExprFunc = function(exprName, func) {
- };
-*/
-
 
 THREE.Path.prototype.getSpacedPoints = function ( divisions, closedPath ) {
 
@@ -384,7 +369,10 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 };
 
-THREE.Path.prototype.getMinAndMax = function () {
+
+// Returns min and max coordinates, as well as centroid
+
+THREE.Path.prototype.getBoundingBox = function () {
 
 	var points = this.getPoints();
 
@@ -394,7 +382,9 @@ THREE.Path.prototype.getMinAndMax = function () {
 	maxX = maxY = Number.NEGATIVE_INFINITY;
 	minX = minY = Number.POSITIVE_INFINITY;
 
-	var p, i, il;
+	var p, i, il, sum;
+
+	sum = new THREE.Vector2();
 
 	for ( i = 0, il = points.length; i < il; i ++ ) {
 
@@ -406,16 +396,17 @@ THREE.Path.prototype.getMinAndMax = function () {
 		if ( p.y > maxY ) maxY = p.y;
 		else if ( p.y < maxY ) minY = p.y;
 
-	}
+		sum.addSelf( p.x, p.y );
 
-	// TODO Include CG or find mid-pt?
+	}
 
 	return {
 
 		minX: minX,
 		minY: minY,
 		maxX: maxX,
-		maxY: maxY
+		maxY: maxY,
+		centroid: sum.divideScalar( il )
 
 	};
 
@@ -534,7 +525,7 @@ THREE.Path.prototype.transform = function( path ) {
 
 	console.log( path.cacheArcLengths() );
 
-	var thisBounds = this.getMinAndMax();
+	var thisBounds = this.getBoundingBox();
 	var oldPts = this.getPoints();
 
 	var i, il, p, oldX, oldY, xNorm;
@@ -605,7 +596,7 @@ THREE.Path.prototype.nltransform = function( a, b, c, d, e, f ) {
 
 THREE.Path.prototype.debug = function( canvas ) {
 
-	var bounds = this.getMinAndMax();
+	var bounds = this.getBoundingBox();
 
 	if ( !canvas ) {
 
