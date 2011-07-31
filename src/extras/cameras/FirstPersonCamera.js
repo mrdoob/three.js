@@ -60,7 +60,7 @@ THREE.FirstPersonCamera = function ( parameters ) {
 		strafeLeft: [37, 65],
 		strafeRight: [39, 68],
 		toggleActiveLook: [81],
-		toggleFreezeCamera: [27],    
+		toggleFreezeCamera: [27]
 	}
 	this.activeLook = true;
 
