@@ -151,9 +151,9 @@ THREE.FirstPersonCamera = function ( parameters ) {
 		eventBindings[this.movementBindings.strafeRight[i]] = this.STRAFE_RIGHT;
 	}
 	for ( var i=0; i < this.movementBindings.toggleActiveLook.length; i++ ) {
-                eventBindings[this.movementBindings.toggleActiveLook[i]] = this.TOGGLE_ACTIVE_LOOK;
-        }
-        for ( var i=0; i < this.movementBindings.toggleFreezeCamera.length; i++ ) {
+		eventBindings[this.movementBindings.toggleActiveLook[i]] = this.TOGGLE_ACTIVE_LOOK;
+	}
+	for ( var i=0; i < this.movementBindings.toggleFreezeCamera.length; i++ ) {
 		eventBindings[this.movementBindings.toggleFreezeCamera[i]] = this.TOGGLE_FREEZE_CAMERA;
 	}
 
