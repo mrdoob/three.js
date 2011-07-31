@@ -136,7 +136,7 @@ THREE.Shape.Utils = {
 			// Find the shortest pair of pts between shape and hole
 
 			// Note: Actually, I'm not sure now if we could optimize this to be faster than O(m*n)
-			// Using distanceToSquared() intead of distanceTo() should speed a little 
+			// Using distanceToSquared() intead of distanceTo() should speed a little
 			// since running square roots operations are reduced.
 			// http://en.wikipedia.org/wiki/Closest_pair_of_points
 			// http://stackoverflow.com/questions/1602164/shortest-distance-between-points-algorithm
@@ -308,13 +308,13 @@ THREE.Shape.Utils = {
 
 		var v, f, i, face;
 
-		for ( v = 0; v < triangles.length; v++ ) {
+		for ( v = 0; v < triangles.length; v ++ ) {
 
 			face = triangles[ v ];
 
-			for ( f = 0; f < 3; f++ ) { // For 3 pts in faces
+			for ( f = 0; f < 3; f ++ ) { // For 3 pts in faces
 
-				for ( i = 0; i < allpoints.length; i++ ) { // Go through all points
+				for ( i = 0; i < allpoints.length; i ++ ) { // Go through all points
 
 					if ( allpoints[ i ].equals( face[ f ] ) ) { // If matches
 
@@ -328,13 +328,13 @@ THREE.Shape.Utils = {
 
 		}
 
-		for ( v = 0; v < isolatedPts.length; v++ ) {
+		for ( v = 0; v < isolatedPts.length; v ++ ) {
 
 			face = isolatedPts[ v ];
 
-			for ( f = 0; f < 3; f++ ) { // For 3 pts in faces
+			for ( f = 0; f < 3; f ++ ) { // For 3 pts in faces
 
-				for ( i = 0; i < allpoints.length; i++ ) { // Go thru all points
+				for ( i = 0; i < allpoints.length; i ++ ) { // Go thru all points
 
 					if ( allpoints[ i ].equals( face[ f ] ) ) { // If matches
 

@@ -255,8 +255,14 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	function getBevelVec2( pt_i, pt_j, pt_k ) {
 
-		var a, b, v, w, v_hat, w_hat,
-			p, q, v_dot_w_hat, q_sub_p_dot_w_hat,
+		var a = THREE.ExtrudeGeometry.__v1,
+			b = THREE.ExtrudeGeometry.__v2,
+			v_hat = THREE.ExtrudeGeometry.__v3,
+			w_hat = THREE.ExtrudeGeometry.__v4,
+			p = THREE.ExtrudeGeometry.__v5,
+			q = THREE.ExtrudeGeometry.__v6,
+			v, w,
+			v_dot_w_hat, q_sub_p_dot_w_hat,
 			s, intersection;
 
 		// good reading for line-line intersection
@@ -265,8 +271,8 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 		// define a as vector j->i
 		// define b as vectot k->i
 
-		a = new THREE.Vector2( pt_i.x - pt_j.x, pt_i.y - pt_j.y );
-		b = new THREE.Vector2( pt_i.x - pt_k.x, pt_i.y - pt_k.y );
+		a.set( pt_i.x - pt_j.x, pt_i.y - pt_j.y );
+		b.set( pt_i.x - pt_k.x, pt_i.y - pt_k.y );
 
 		// get unit vectors
 
@@ -275,28 +281,28 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 		// normals from pt i
 
-		v_hat = new THREE.Vector2( -v.y, v.x ); // v hat
-		w_hat = new THREE.Vector2( w.y, -w.x ); // w hat
+		v_hat.set( -v.y, v.x );
+		w_hat.set( w.y, -w.x );
 
 		// pts from i
 
-		p = pt_i.clone().addSelf( v_hat );
-		q = pt_i.clone().addSelf( w_hat );
+		p.copy( pt_i ).addSelf( v_hat );
+		q.copy( pt_i ).addSelf( w_hat );
 
 		if ( p.equals( q ) ) {
 
 			//console.log("Warning: lines are straight");
-			return w_hat;
+			return w_hat.clone();
 
 		}
 
 		// Points from j, k. helps prevents points cross overover most of the time
 
-		p = pt_j.clone().addSelf( v_hat );
-		q = pt_k.clone().addSelf( w_hat );
+		p.copy( pt_j ).addSelf( v_hat );
+		q.copy( pt_k ).addSelf( w_hat );
 
 		v_dot_w_hat = v.dot( w_hat );
-		q_sub_p_dot_w_hat = q.clone().subSelf( p ).dot( w_hat );
+		q_sub_p_dot_w_hat = q.subSelf( p ).dot( w_hat );
 
 		// We should not reach these conditions
 
@@ -304,7 +310,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 			console.log( "Either infinite or no solutions!" );
 
-			if (q_sub_p_dot_w_hat == 0 ) {
+			if ( q_sub_p_dot_w_hat == 0 ) {
 
 				console.log( "Its finite solutions." );
 
@@ -318,7 +324,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 		s = q_sub_p_dot_w_hat / v_dot_w_hat;
 
-		if ( s < 0) {
+		if ( s < 0 ) {
 
 			// in case of emergecy, revert to algorithm 1.
 			// console.log("opps");
@@ -327,9 +333,9 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 		}
 
-		intersection = v.clone().multiplyScalar( s ).addSelf( p );
+		intersection = v.multiplyScalar( s ).addSelf( p );
 
-		return intersection.subSelf( pt_i ); // Don't normalize!, otherwise sharp corners become ugly
+		return intersection.subSelf( pt_i ).clone(); // Don't normalize!, otherwise sharp corners become ugly
 
 	}
 
@@ -446,7 +452,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 		for ( i = 0; i < vlen; i ++ ) {
 
-			vert = bevelEnabled ? scalePt2(vertices[ i ], verticesMovements[i], bs) : vertices[ i ];
+			vert = bevelEnabled ? scalePt2( vertices[ i ], verticesMovements[ i ], bs ) : vertices[ i ];
 
 			if ( !extrudeByPath ) {
 
@@ -477,7 +483,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 		for ( i = 0, il = contour.length; i < il; i ++ ) {
 
-			vert = scalePt2(contour[ i ], contourMovements[ i ], bs );
+			vert = scalePt2( contour[ i ], contourMovements[ i ], bs );
 			//vert = scalePt( contour[ i ], contourCentroid, bs, false );
 			v( vert.x, vert.y,  amount + z );
 
@@ -624,7 +630,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 	this.computeFaceNormals();
 	//this.computeVertexNormals();
 
-	//console.log("took", (Date.now()- startTime) );
+	//console.log( "took", ( Date.now() - startTime ) );
 
 	function v( x, y, z ) {
 
@@ -656,3 +662,9 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 };
 
 
+THREE.ExtrudeGeometry.__v1 = new THREE.Vector2();
+THREE.ExtrudeGeometry.__v2 = new THREE.Vector2();
+THREE.ExtrudeGeometry.__v3 = new THREE.Vector2();
+THREE.ExtrudeGeometry.__v4 = new THREE.Vector2();
+THREE.ExtrudeGeometry.__v5 = new THREE.Vector2();
+THREE.ExtrudeGeometry.__v6 = new THREE.Vector2();
