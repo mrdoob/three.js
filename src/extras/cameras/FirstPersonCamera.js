@@ -261,7 +261,6 @@ THREE.FirstPersonCamera = function ( parameters ) {
 			}
 
 			this.lon += this.mouseX * actualLookSpeed;
-                        //alert("lon: "+this.lon+" "+this.mouseX+", "+actualLookSpeed);
 			if( this.lookVertical ) this.lat -= this.mouseY * actualLookSpeed;
 
 			this.lat = Math.max( - 85, Math.min( 85, this.lat ) );
