@@ -16,7 +16,14 @@
  *  noFly: <bool>,
  *  lookVertical: <bool>,
  *  autoForward: <bool>,
-
+ *
+ *  movementBindings.forward <Array>,
+ *  movementBindings.reverse <Array>,
+ *  movementBindings.strafeLeft <Array>,
+ *  movementBindings.strafeRight <Array>,
+ *  movementBindings.toggleActiveLook <Array>,
+ *  movementBindings.toggleFreezeCamera <Array>,
+ *
  *  constrainVertical: <bool>,
  *  verticalMin: <float>,
  *  verticalMax: <float>,
@@ -41,6 +48,20 @@ THREE.FirstPersonCamera = function ( parameters ) {
 	this.lookVertical = true;
 	this.autoForward = false;
 
+	this.FORWARD = 0;
+	this.REVERSE = 1;
+	this.STRAFE_LEFT = 2;
+	this.STRAFE_RIGHT = 3;
+	this.TOGGLE_ACTIVE_LOOK = 4;
+	this.TOGGLE_FREEZE_CAMERA = 5;
+	this.movementBindings = {
+		forward: [38, 87, 0],
+		reverse: [40, 83, 2],
+		strafeLeft: [37, 65],
+		strafeRight: [39, 68],
+		toggleActiveLook: [81],
+		toggleFreezeCamera: [27]
+	}
 	this.activeLook = true;
 
 	this.heightSpeed = false;
@@ -65,6 +86,21 @@ THREE.FirstPersonCamera = function ( parameters ) {
 
 		if ( parameters.autoForward !== undefined ) this.autoForward = parameters.autoForward;
 
+		if ( parameters.movementBindings !== undefined ) {
+			if (parameters.movementBindings.forward !== undefined )
+				this.movementBindings.forward = parameters.movementBindings.forward;
+			if (parameters.movementBindings.reverse !== undefined )
+				this.movementBindings.reverse = parameters.movementBindings.reverse;
+			if (parameters.movementBindings.strafeLeft !== undefined )
+				this.movementBindings.strafeLeft = parameters.movementBindings.strafeLeft;
+			if (parameters.movementBindings.strafeRight !== undefined )
+				this.movementBindings.strafeRight = parameters.movementBindings.strafeRight;
+			if (parameters.movementBindings.toggleActiveLook !== undefined )
+				this.movementBindings.toggleActiveLook = parameters.movementBindings.toggleActiveLook;
+			if (parameters.movementBindings.toggleFreezeCamera !== undefined )
+				this.movementBindings.toggleFreezeCamera = parameters.movementBindings.toggleFreezeCamera;  
+		}
+		
 		if ( parameters.activeLook !== undefined ) this.activeLook = parameters.activeLook;
 
 		if ( parameters.heightSpeed !== undefined ) this.heightSpeed = parameters.heightSpeed;
@@ -101,20 +137,40 @@ THREE.FirstPersonCamera = function ( parameters ) {
 	this.windowHalfX = window.innerWidth / 2;
 	this.windowHalfY = window.innerHeight / 2;
 
+	var eventBindings = { };
+	for ( var i=0; i < this.movementBindings.forward.length; i++ ) {
+		eventBindings[this.movementBindings.forward[i]] = this.FORWARD;
+	}
+	for ( var i=0; i < this.movementBindings.reverse.length; i++ ) {
+		eventBindings[this.movementBindings.reverse[i]] = this.REVERSE;
+	}
+	for ( var i=0; i < this.movementBindings.strafeLeft.length; i++ ) {
+		eventBindings[this.movementBindings.strafeLeft[i]] = this.STRAFE_LEFT;
+	}
+	for ( var i=0; i < this.movementBindings.strafeRight.length; i++ ) {
+		eventBindings[this.movementBindings.strafeRight[i]] = this.STRAFE_RIGHT;
+	}
+	for ( var i=0; i < this.movementBindings.toggleActiveLook.length; i++ ) {
+		eventBindings[this.movementBindings.toggleActiveLook[i]] = this.TOGGLE_ACTIVE_LOOK;
+	}
+	for ( var i=0; i < this.movementBindings.toggleFreezeCamera.length; i++ ) {
+		eventBindings[this.movementBindings.toggleFreezeCamera[i]] = this.TOGGLE_FREEZE_CAMERA;
+	}
+
 	this.onMouseDown = function ( event ) {
-
-		event.preventDefault();
-		event.stopPropagation();
-
-		if ( this.activeLook ) {
-
-			switch ( event.button ) {
-
-				case 0: this.moveForward = true; break;
-				case 2: this.moveBackward = true; break;
-
+		if (!this.freeze) {
+			event.preventDefault();
+			event.stopPropagation();
+			if ( eventBindings[event.button] !== undefined ) {
+				switch ( eventBindings[event.button] ) {
+					case this.FORWARD: this.moveForward = true; break;
+					case this.REVERSE: this.moveBackward = true; break;
+					case this.STRAFE_LEFT: this.moveLeft = true; break;
+					case this.STRAFE_RIGHT: this.moveRight = true; break;
+					case this.TOGGLE_ACTIVE_LOOK: this.activeLook = !this.activeLook; break;
+					case this.TOGGLE_FREEZE_CAMERA: this.freeze = !this.freeze; break;
+				};
 			}
-
 		}
 
 		this.mouseDragOn = true;
@@ -122,19 +178,17 @@ THREE.FirstPersonCamera = function ( parameters ) {
 	};
 
 	this.onMouseUp = function ( event ) {
-
-		event.preventDefault();
-		event.stopPropagation();
-
-		if ( this.activeLook ) {
-
-			switch ( event.button ) {
-
-				case 0: this.moveForward = false; break;
-				case 2: this.moveBackward = false; break;
-
+		if (!this.freeze) {
+			event.preventDefault();
+			event.stopPropagation();
+			if ( eventBindings[event.button] !== undefined ) {
+				switch ( eventBindings[event.button] ) {
+				case this.FORWARD: this.moveForward = false; break;
+				case this.REVERSE: this.moveBackward = false; break;
+				case this.STRAFE_LEFT: this.moveLeft = false; break;
+				case this.STRAFE_RIGHT: this.moveRight = false; break;
+				};
 			}
-
 		}
 
 		this.mouseDragOn = false;
@@ -148,46 +202,25 @@ THREE.FirstPersonCamera = function ( parameters ) {
 
 	};
 
+
 	this.onKeyDown = function ( event ) {
-
-		switch( event.keyCode ) {
-
-			case 38: /*up*/
-			case 87: /*W*/ this.moveForward = true; break;
-
-			case 37: /*left*/
-			case 65: /*A*/ this.moveLeft = true; break;
-
-			case 40: /*down*/
-			case 83: /*S*/ this.moveBackward = true; break;
-
-			case 39: /*right*/
-			case 68: /*D*/ this.moveRight = true; break;
-
-			case 81: this.freeze = !this.freeze; break;
-
-		}
-
+		switch ( eventBindings[event.keyCode] ) {
+			case this.FORWARD: this.moveForward = true; break;
+			case this.REVERSE: this.moveBackward = true; break;
+			case this.STRAFE_LEFT: this.moveLeft = true; break;
+			case this.STRAFE_RIGHT: this.moveRight = true; break;
+			case this.TOGGLE_ACTIVE_LOOK: this.activeLook = !this.activeLook; break;
+			case this.TOGGLE_FREEZE_CAMERA: this.freeze = !this.freeze; break;
+		};
 	};
 
 	this.onKeyUp = function ( event ) {
-
-		switch( event.keyCode ) {
-
-			case 38: /*up*/
-			case 87: /*W*/ this.moveForward = false; break;
-
-			case 37: /*left*/
-			case 65: /*A*/ this.moveLeft = false; break;
-
-			case 40: /*down*/
-			case 83: /*S*/ this.moveBackward = false; break;
-
-			case 39: /*right*/
-			case 68: /*D*/ this.moveRight = false; break;
-
-		}
-
+		switch ( eventBindings[event.keyCode] ) {
+			case this.FORWARD: this.moveForward = false; break;
+			case this.REVERSE: this.moveBackward = false; break;
+			case this.STRAFE_LEFT: this.moveLeft = false; break;
+			case this.STRAFE_RIGHT: this.moveRight = false; break;                          
+		};
 	};
 
 	this.update = function() {
@@ -195,9 +228,9 @@ THREE.FirstPersonCamera = function ( parameters ) {
 		var now = new Date().getTime();
 		this.tdiff = ( now - this.lastUpdate ) / 1000;
 		this.lastUpdate = now;
-		
-		if ( !this.freeze ) {
+		var actualLookSpeed, actualMoveSpeed;	
 
+		if ( !this.freeze ) {
 
 			if ( this.heightSpeed ) {
 
@@ -212,14 +245,14 @@ THREE.FirstPersonCamera = function ( parameters ) {
 
 			}
 
-			var actualMoveSpeed = this.tdiff * this.movementSpeed;
+			actualMoveSpeed = this.tdiff * this.movementSpeed;
 
 			if ( this.moveForward || ( this.autoForward && !this.moveBackward ) ) this.translateZ( - ( actualMoveSpeed + this.autoSpeedFactor ) );
 			if ( this.moveBackward ) this.translateZ( actualMoveSpeed );
 			if ( this.moveLeft ) this.translateX( - actualMoveSpeed );
 			if ( this.moveRight ) this.translateX( actualMoveSpeed );
 
-			var actualLookSpeed = this.tdiff * this.lookSpeed;
+			actualLookSpeed = this.tdiff * this.lookSpeed;
 
 			if ( !this.activeLook ) {
 
@@ -242,7 +275,11 @@ THREE.FirstPersonCamera = function ( parameters ) {
 			targetPosition.z = position.z + 100 * Math.sin( this.phi ) * Math.sin( this.theta );
 
 		}
-
+		else {
+			actualMoveSpeed = 0.0;
+			actualLookSpeed = 0.0;
+		}
+               		
 		this.lon += this.mouseX * actualLookSpeed;
 		if( this.lookVertical ) this.lat -= this.mouseY * actualLookSpeed;
 
