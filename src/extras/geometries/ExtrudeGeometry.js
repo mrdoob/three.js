@@ -21,6 +21,8 @@
 
 THREE.ExtrudeGeometry = function( shapes, options ) {
 
+	// var startTime = Date.now();
+
 	if( typeof( shapes ) == "undefined" ) {
 
 		shapes = [];
@@ -41,6 +43,9 @@ THREE.ExtrudeGeometry = function( shapes, options ) {
 		this.addShape( shape, options );
 
 	}
+	
+	// console.log( "faces", this.faces.length, "vertices", this.vertices.length );	
+	// console.log( "took", ( Date.now() - startTime ) );
 
 };
 
@@ -50,7 +55,7 @@ THREE.ExtrudeGeometry.prototype.constructor = THREE.ExtrudeGeometry;
 
 THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
-	//var startTime = Date.now();
+
 
 	var amount = options.amount !== undefined ? options.amount : 100;
 
@@ -59,7 +64,8 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 	var bevelSegments = options.bevelSegments !== undefined ? options.bevelSegments : 3;
 
 	var bevelEnabled = options.bevelEnabled !== undefined ? options.bevelEnabled : true; // false
-
+	
+	var curveSegments = options.curveSegments !== undefined ? options.curveSegments : 2;
 
 	var steps = options.steps !== undefined ? options.steps : 1;
 
@@ -96,7 +102,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	var shapesOffset = this.vertices.length;
 
-	var shapePoints = shape.extractAllPoints(); // use shape.extractAllSpacedPoints() for points with equal divisions
+	var shapePoints = shape.extractAllPoints(curveSegments); // use shape.extractAllSpacedPoints() for points with equal divisions
 
     var vertices = shapePoints.shape;
 	var holes = shapePoints.holes;
@@ -630,7 +636,6 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 	this.computeFaceNormals();
 	//this.computeVertexNormals();
 
-	//console.log( "took", ( Date.now() - startTime ) );
 
 	function v( x, y, z ) {
 
