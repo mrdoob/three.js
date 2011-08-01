@@ -60,6 +60,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	var bevelEnabled = options.bevelEnabled !== undefined ? options.bevelEnabled : true; // false
 
+	var curveSegments = options.curveSegments !== undefined ? options.curveSegments : 12;
 
 	var steps = options.steps !== undefined ? options.steps : 1;
 
@@ -68,7 +69,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	if ( extrudePath ) {
 
-		extrudePts = extrudePath.getPoints();
+		extrudePts = extrudePath.getPoints( curveSegments );
 		steps = extrudePts.length;
 		extrudeByPath = true;
 		bevelEnabled = false; // bevels not supported for path extrusion
@@ -96,7 +97,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	var shapesOffset = this.vertices.length;
 
-	var shapePoints = shape.extractAllPoints(); // use shape.extractAllSpacedPoints() for points with equal divisions
+	var shapePoints = shape.extractAllPoints( curveSegments ); // use shape.extractAllSpacedPoints( curveSegments ) for points with equal divisions
 
     var vertices = shapePoints.shape;
 	var holes = shapePoints.holes;

@@ -30,14 +30,14 @@ THREE.Shape.prototype.extrude = function ( options ) {
 
 // Get points of holes
 
-THREE.Shape.prototype.getPointsHoles = function () {
+THREE.Shape.prototype.getPointsHoles = function ( divisions ) {
 
 
 	var i, il = this.holes.length, holesPts = [];
 
 	for ( i = 0; i < il; i ++ ) {
 
-		holesPts[ i ] = this.holes[ i ].getPoints();
+		holesPts[ i ] = this.holes[ i ].getPoints( divisions );
 
 	}
 
@@ -47,13 +47,13 @@ THREE.Shape.prototype.getPointsHoles = function () {
 
 // Get points of holes (spaced by regular distance)
 
-THREE.Shape.prototype.getSpacedPointsHoles = function () {
+THREE.Shape.prototype.getSpacedPointsHoles = function ( divisions ) {
 
 	var i, il = this.holes.length, holesPts = [];
 
 	for ( i = 0; i < il; i ++ ) {
 
-		holesPts[ i ] = this.holes[ i ].getSpacedPoints();
+		holesPts[ i ] = this.holes[ i ].getSpacedPoints( divisions );
 
 	}
 
@@ -64,12 +64,12 @@ THREE.Shape.prototype.getSpacedPointsHoles = function () {
 
 // Get points of shape and holes (keypoints based on segments parameter)
 
-THREE.Shape.prototype.extractAllPoints = function () {
+THREE.Shape.prototype.extractAllPoints = function ( divisions ) {
 
 	return {
 
-		shape: this.getPoints(),
-		holes: this.getPointsHoles()
+		shape: this.getPoints( divisions ),
+		holes: this.getPointsHoles( divisions )
 
 	};
 
@@ -77,12 +77,12 @@ THREE.Shape.prototype.extractAllPoints = function () {
 
 // Get points of shape and holes (spaced by regular distance)
 
-THREE.Shape.prototype.extractAllSpacedPoints = function () {
+THREE.Shape.prototype.extractAllSpacedPoints = function ( divisions ) {
 
 	return {
 
-		shape: this.getSpacedPoints(),
-		holes: this.getSpacedPointsHoles()
+		shape: this.getSpacedPoints( divisions ),
+		holes: this.getSpacedPointsHoles( divisions )
 
 	};
 
