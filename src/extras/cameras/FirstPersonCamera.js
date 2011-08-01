@@ -89,7 +89,7 @@ THREE.FirstPersonCamera = function ( parameters ) {
 		if ( parameters.movementBindings !== undefined ) {
 			if (parameters.movementBindings.forward !== undefined )
 				this.movementBindings.forward = parameters.movementBindings.forward;
-			if (parameters.movementBindings.revers !== undefined )
+			if (parameters.movementBindings.reverse !== undefined )
 				this.movementBindings.reverse = parameters.movementBindings.reverse;
 			if (parameters.movementBindings.strafeLeft !== undefined )
 				this.movementBindings.strafeLeft = parameters.movementBindings.strafeLeft;
