@@ -392,8 +392,6 @@ THREE.Curve.Utils = {
 };
 
 
-
-
 /*
 getPoint DONE
 getLength DONE
@@ -409,52 +407,48 @@ curve.getTangentAt(t)
  *	3D Curves
  **************************************************************/
 
+// A Factory method for creating new curve subclasses
 
-// A Factory Method for creating new curve subclasses
-THREE.Curve.create = function(constructor, getpointfunc) {
-    
+THREE.Curve.create = function( constructor, getPointFunc ) {
+
     var subClass = constructor;
-    subClass.prototype = new THREE.Curve();
-    subClass.prototype.constructor = constructor;
-    subClass.prototype.getPoint = getpointfunc;
-    return subClass;
-    
-};
 
+	subClass.prototype = new THREE.Curve();
+
+	subClass.prototype.constructor = constructor;
+    subClass.prototype.getPoint = getPointFunc;
+
+	return subClass;
+
+};
 
 
 /**************************************************************
  *	Line3D
  **************************************************************/
 
-
 THREE.LineCurve3 = THREE.Curve.create(
-	
-	function ( x1, y1, z1, x2, y2, z2 ) {
 
-		this.x1 = x1;
-		this.y1 = y1;
-		this.z1 = z1;
+	function ( v1, v2 ) {
 
-		this.x2 = x2;
-		this.y2 = y2;
-		this.z2 = z2;
+		this.v1 = v1;
+		this.v2 = v2;
 
 	},
-	
+
 	function ( t ) {
 
-		var dx = this.x2 - this.x1;
-		var dy = this.y2 - this.y1;
-		var dz = this.z2 - this.z1;
-		
-		var tx = this.x1 + dx * t;
-		var ty = this.y1 + dy * t;
-		var tz = this.z1 + dz * t;
+		var r = new THREE.Vector3();
 
-		return new THREE.Vector3( tx, ty, tz );
+
+		r.sub( v2, v1 ); // diff
+		r.multiplyScalar( t );
+		r.addSelf( this.v1 );
+
+		return r;
 
 	}
+
 );
 
 
@@ -463,33 +457,25 @@ THREE.LineCurve3 = THREE.Curve.create(
  **************************************************************/
 
 THREE.QuadraticBezierCurve3 = THREE.Curve.create(
-	function ( x0, y0, z0,
-			x1, y1, z1,
-			x2, y2, z2 ) { // Qn should we use 2 Vector3 instead?
 
-		this.x0 = x0;
-		this.y0 = y0;
-		this.z0 = z0;
+	function ( v0, v1, v2 ) { // Qn should we use 2 Vector3 instead?
 
-		this.x1 = x1;
-		this.y1 = y1;
-		this.z1 = z1;
-
-		this.x2 = x2;
-		this.y2 = y2;
-		this.z2 = z2;
+		this.v0 = v0;
+		this.v1 = v1;
+		this.v2 = v2;
 
 	},
-	
+
 	function ( t ) {
 
 		var tx, ty, tz;
 
-		tx = THREE.Shape.Utils.b2( t, this.x0, this.x1, this.x2 );
-		ty = THREE.Shape.Utils.b2( t, this.y0, this.y1, this.y2 );
-		tz = THREE.Shape.Utils.b2( t, this.z0, this.z1, this.z2 );
+		tx = THREE.Shape.Utils.b2( t, this.v0.x, this.v1.x, this.v2.x );
+		ty = THREE.Shape.Utils.b2( t, this.v0.y, this.v1.y, this.v2.y );
+		tz = THREE.Shape.Utils.b2( t, this.v0.z, this.v1.z, this.v2.z );
 
-		return new THREE.Vector2( tx, ty, tz );
+		return new THREE.Vector3( tx, ty, tz );
 
 	}
+
 );
