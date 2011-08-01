@@ -303,24 +303,45 @@ THREE.Shape.Utils = {
 
 		// To maintain reference to old shape, one must match coordinates, or offset the indices from original arrays. It's probably easier to do the first.
 
-		//console.log("triangles",triangles, triangles.length);
-		//console.log("allpoints",allpoints, allpoints.length);
+		//console.log( "triangles",triangles, triangles.length );
+		//console.log( "allpoints",allpoints, allpoints.length );
 
-		var v, f, i, face;
+		var i, il, f, face,
+			key, index,
+			allPointsMap = {},
+			isolatedPointsMap = {};
 
-		for ( v = 0; v < triangles.length; v ++ ) {
+		// prepare all points map
 
-			face = triangles[ v ];
+		for ( i = 0, il = allpoints.length; i < il; i ++ ) {
 
-			for ( f = 0; f < 3; f ++ ) { // For 3 pts in faces
+			key = allpoints[ i ].x + ":" + allpoints[ i ].y;
 
-				for ( i = 0; i < allpoints.length; i ++ ) { // Go through all points
+			if ( allPointsMap[ key ] !== undefined ) {
 
-					if ( allpoints[ i ].equals( face[ f ] ) ) { // If matches
+				console.log( "Duplicate point", key );
 
-						face[ f ] = i; // face now has reference to index
+			}
 
-					}
+			allPointsMap[ key ] = i;
+
+		}
+
+		// check all face vertices against all points map
+
+		for ( i = 0, il = triangles.length; i < il; i ++ ) {
+
+			face = triangles[ i ];
+
+			for ( f = 0; f < 3; f ++ ) {
+
+				key = face[ f ].x + ":" + face[ f ].y;
+
+				index = allPointsMap[ key ];
+
+				if ( index !== undefined ) {
+
+					face[ f ] = index;
 
 				}
 
@@ -328,19 +349,21 @@ THREE.Shape.Utils = {
 
 		}
 
-		for ( v = 0; v < isolatedPts.length; v ++ ) {
+		// check isolated points vertices against all points map
 
-			face = isolatedPts[ v ];
+		for ( i = 0, il = isolatedPts.length; i < il; i ++ ) {
 
-			for ( f = 0; f < 3; f ++ ) { // For 3 pts in faces
+			face = isolatedPts[ i ];
 
-				for ( i = 0; i < allpoints.length; i ++ ) { // Go thru all points
+			for ( f = 0; f < 3; f ++ ) {
 
-					if ( allpoints[ i ].equals( face[ f ] ) ) { // If matches
+				key = face[ f ].x + ":" + face[ f ].y;
 
-						face[ f ] = i; // face now has reference to index
+				index = allPointsMap[ key ];
 
-					}
+				if ( index !== undefined ) {
+
+					face[ f ] = index;
 
 				}
 
