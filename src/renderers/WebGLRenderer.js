@@ -5436,22 +5436,22 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( texture.needsUpdate ) {
 
-			if ( !texture.__webglInit ) {
+			if ( ! texture.__webglInit ) {
 
 				texture.__webglTexture = _gl.createTexture();
-
-				_gl.bindTexture( _gl.TEXTURE_2D, texture.__webglTexture );
-				// _gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, true );
-				_gl.texImage2D( _gl.TEXTURE_2D, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, texture.image );
-
 				texture.__webglInit = true;
+
+			}
+
+			_gl.bindTexture( _gl.TEXTURE_2D, texture.__webglTexture );
+
+			if ( texture.image.data ) {
+
+				_gl.texImage2D( _gl.TEXTURE_2D, 0, paramThreeToGL( texture.format ), texture.image.width, texture.image.height, 0, paramThreeToGL( texture.format ), _gl.UNSIGNED_BYTE, texture.image.data );
 
 			} else {
 
-				_gl.bindTexture( _gl.TEXTURE_2D, texture.__webglTexture );
-				// _gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, true );
 				_gl.texImage2D( _gl.TEXTURE_2D, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, texture.image );
-				// _gl.texSubImage2D( _gl.TEXTURE_2D, 0, 0, 0, _gl.RGBA, _gl.UNSIGNED_BYTE, texture.image );
 
 			}
 
@@ -5466,16 +5466,21 @@ THREE.WebGLRenderer = function ( parameters ) {
 		/*
 		if ( texture.needsUpdate ) {
 
-			if ( texture.__webglTexture ) {
+			if ( !texture.__webglInit ) {
 
-				texture.__webglTexture = _gl.deleteTexture( texture.__webglTexture );
+				texture.__webglTexture = _gl.createTexture();
+
+				_gl.bindTexture( _gl.TEXTURE_2D, texture.__webglTexture );
+				_gl.texImage2D( _gl.TEXTURE_2D, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, texture.image );
+
+				texture.__webglInit = true;
+
+			} else {
+
+				_gl.bindTexture( _gl.TEXTURE_2D, texture.__webglTexture );
+				 _gl.texSubImage2D( _gl.TEXTURE_2D, 0, 0, 0, _gl.RGBA, _gl.UNSIGNED_BYTE, texture.image );
 
 			}
-
-			texture.__webglTexture = _gl.createTexture();
-
-			_gl.bindTexture( _gl.TEXTURE_2D, texture.__webglTexture );
-			_gl.texImage2D( _gl.TEXTURE_2D, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, texture.image );
 
 			setTextureParameters( _gl.TEXTURE_2D, texture, texture.image );
 
