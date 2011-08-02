@@ -2650,7 +2650,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			shadowMapSoft: this.shadowMapSoft,
 			shadowMapWidth: this.shadowMapWidth,
 			shadowMapHeight: this.shadowMapHeight,
-			maxShadows: maxShadows
+			maxShadows: maxShadows,
+			alphaTest: material.alphaTest
 
 		};
 
@@ -5136,6 +5137,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			"#define MAX_POINT_LIGHTS " + parameters.maxPointLights,
 
 			"#define MAX_SHADOWS " + parameters.maxShadows,
+
+			parameters.alphaTest ? "#define ALPHATEST " + parameters.alphaTest: "",
 
 			parameters.fog ? "#define USE_FOG" : "",
 			parameters.fog instanceof THREE.FogExp2 ? "#define FOG_EXP2" : "",

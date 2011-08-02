@@ -340,8 +340,8 @@ THREE.ShaderChunk = {
 
 	"#if MAX_POINT_LIGHTS > 0",
 
-		"vec4 pointDiffuse  = vec4( 0.0 );",
-		"vec4 pointSpecular = vec4( 0.0 );",
+		"vec4 pointDiffuse  = vec4( vec3( 0.0 ), 1.0 );",
+		"vec4 pointSpecular = vec4( vec3( 0.0 ), 1.0 );",
 
 		"for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {",
 
@@ -366,8 +366,8 @@ THREE.ShaderChunk = {
 
 	"#if MAX_DIR_LIGHTS > 0",
 
-		"vec4 dirDiffuse  = vec4( 0.0 );",
-		"vec4 dirSpecular = vec4( 0.0 );" ,
+		"vec4 dirDiffuse  = vec4( vec3( 0.0 ), 1.0 );",
+		"vec4 dirSpecular = vec4( vec3( 0.0 ), 1.0 );" ,
 
 		"for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {",
 
@@ -657,6 +657,18 @@ THREE.ShaderChunk = {
 	"#endif"
 
 	].join("\n"),
+
+	// ALPHATEST
+
+	alphatest_fragment: [
+
+	"#ifdef ALPHATEST",
+
+		"if ( gl_FragColor.a < ALPHATEST ) discard;",
+
+	"#endif"
+
+	].join("\n")
 
 };
 
@@ -1208,6 +1220,7 @@ THREE.ShaderLib = {
 				"gl_FragColor = vec4( diffuse, opacity );",
 
 				THREE.ShaderChunk[ "map_fragment" ],
+				THREE.ShaderChunk[ "alphatest_fragment" ],
 				THREE.ShaderChunk[ "lightmap_fragment" ],
 				THREE.ShaderChunk[ "color_fragment" ],
 				THREE.ShaderChunk[ "envmap_fragment" ],
@@ -1275,9 +1288,12 @@ THREE.ShaderLib = {
 			"void main() {",
 
 				"gl_FragColor = vec4( diffuse, opacity );",
-				"gl_FragColor = gl_FragColor * vec4( vLightWeighting, 1.0 );",
 
 				THREE.ShaderChunk[ "map_fragment" ],
+				THREE.ShaderChunk[ "alphatest_fragment" ],
+
+				"gl_FragColor = gl_FragColor * vec4( vLightWeighting, 1.0 );",
+
 				THREE.ShaderChunk[ "lightmap_fragment" ],
 				THREE.ShaderChunk[ "color_fragment" ],
 				THREE.ShaderChunk[ "envmap_fragment" ],
@@ -1364,9 +1380,12 @@ THREE.ShaderLib = {
 			"void main() {",
 
 				"gl_FragColor = vec4( vLightWeighting, 1.0 );",
-				THREE.ShaderChunk[ "lights_fragment" ],
 
 				THREE.ShaderChunk[ "map_fragment" ],
+				THREE.ShaderChunk[ "alphatest_fragment" ],
+
+				THREE.ShaderChunk[ "lights_fragment" ],
+
 				THREE.ShaderChunk[ "lightmap_fragment" ],
 				THREE.ShaderChunk[ "color_fragment" ],
 				THREE.ShaderChunk[ "envmap_fragment" ],
@@ -1450,6 +1469,7 @@ THREE.ShaderLib = {
 				"gl_FragColor = vec4( psColor, opacity );",
 
 				THREE.ShaderChunk[ "map_particle_fragment" ],
+				THREE.ShaderChunk[ "alphatest_fragment" ],
 				THREE.ShaderChunk[ "color_fragment" ],
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
 				THREE.ShaderChunk[ "fog_fragment" ],
