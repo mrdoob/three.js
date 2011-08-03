@@ -228,6 +228,8 @@ THREE.Object3D.prototype = {
 
 		}
 
-	}
+	},
+	
+	constructor : THREE.Object3D
 
 };

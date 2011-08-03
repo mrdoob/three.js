@@ -34,7 +34,9 @@ THREE.Texture.prototype = {
 
 		return clonedTexture;
 
-	}
+	},
+	
+	constructor : THREE.Texture
 
 };
 

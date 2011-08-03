@@ -34,6 +34,8 @@ THREE.Matrix3.prototype = {
 
 		return this;
 
-	}
+	},
+	
+	constructor : THREE.Matrix3
 
 };

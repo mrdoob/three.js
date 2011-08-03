@@ -689,7 +689,9 @@ THREE.Matrix4.prototype = {
 		this.n23 = m.n23 * invScaleZ;
 		this.n33 = m.n33 * invScaleZ;
 
-	}
+	},
+	
+	constructor : THREE.Matrix4
 
 };
 
