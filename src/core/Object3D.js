@@ -52,32 +52,34 @@ THREE.Object3D = function() {
 
 THREE.Object3D.prototype = {
 
-	translate : function ( distance, axis ) {
+	constructor: THREE.Object3D,
+
+	translate: function ( distance, axis ) {
 
 		this.matrix.rotateAxis( axis );
 		this.position.addSelf( axis.multiplyScalar( distance ) );
 
 	},
 
-	translateX : function ( distance ) {
+	translateX: function ( distance ) {
 
 		this.translate( distance, this._vector.set( 1, 0, 0 ) );
 
 	},
 
-	translateY : function ( distance ) {
+	translateY: function ( distance ) {
 
 		this.translate( distance, this._vector.set( 0, 1, 0 ) );
 
 	},
 
-	translateZ : function ( distance ) {
+	translateZ: function ( distance ) {
 
 		this.translate( distance, this._vector.set( 0, 0, 1 ) );
 
 	},
 
-	lookAt : function ( vector ) {
+	lookAt: function ( vector ) {
 
 		// TODO: Add hierarchy support.
 
@@ -228,8 +230,6 @@ THREE.Object3D.prototype = {
 
 		}
 
-	},
-	
-	constructor : THREE.Object3D
+	}
 
 };

@@ -10,7 +10,9 @@ THREE.Color = function ( hex ) {
 
 THREE.Color.prototype = {
 
-	copy : function ( color ) {
+	constructor: THREE.Color,
+
+	copy: function ( color ) {
 
 		this.r = color.r;
 		this.g = color.g;
@@ -19,14 +21,14 @@ THREE.Color.prototype = {
 
 	},
 
-	setHex : function ( hex ) {
+	setHex: function ( hex ) {
 
 		this.hex = ( ~~ hex ) & 0xffffff;
 		this.updateRGB();
 
 	},
 
-	setRGB : function ( r, g, b ) {
+	setRGB: function ( r, g, b ) {
 
 		this.r = r;
 		this.g = g;
@@ -36,7 +38,7 @@ THREE.Color.prototype = {
 
 	},
 
-	setHSV : function ( h, s, v ) {
+	setHSV: function ( h, s, v ) {
 
 		// based on MochiKit implementation by Bob Ippolito
 		// h,s,v ranges are < 0.0 - 1.0 >
@@ -73,13 +75,13 @@ THREE.Color.prototype = {
 
 	},
 
-	updateHex : function () {
+	updateHex: function () {
 
 		this.hex = ~~ ( this.r * 255 ) << 16 ^ ~~ ( this.g * 255 ) << 8 ^ ~~ ( this.b * 255 );
 
 	},
 
-	updateRGB : function () {
+	updateRGB: function () {
 
 		this.r = ( this.hex >> 16 & 255 ) / 255;
 		this.g = ( this.hex >> 8 & 255 ) / 255;
@@ -87,12 +89,10 @@ THREE.Color.prototype = {
 
 	},
 
-	clone : function () {
+	clone: function () {
 
 		return new THREE.Color( this.hex );
 
-	},
-	
-	constructor : THREE.Color
+	}
 
 };

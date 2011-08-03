@@ -18,7 +18,9 @@ THREE.Quaternion = function( x, y, z, w ) {
 
 THREE.Quaternion.prototype = {
 
-	set : function ( x, y, z, w ) {
+	constructor: THREE.Quaternion,
+
+	set: function ( x, y, z, w ) {
 
 		this.x = x;
 		this.y = y;
@@ -29,7 +31,7 @@ THREE.Quaternion.prototype = {
 
 	},
 
-	copy : function ( q ) {
+	copy: function ( q ) {
 
 		this.x = q.x;
 		this.y = q.y;
@@ -40,7 +42,7 @@ THREE.Quaternion.prototype = {
 
 	},
 
-	setFromEuler : function ( vec3 ) {
+	setFromEuler: function ( vec3 ) {
 
 		var c = 0.5 * Math.PI / 360, // 0.5 is an optimization
 		x = vec3.x * c,
@@ -83,7 +85,7 @@ THREE.Quaternion.prototype = {
 
 	},
 	
-	calculateW  : function () {
+	calculateW : function () {
 
 		this.w = - Math.sqrt( Math.abs( 1.0 - this.x * this.x - this.y * this.y - this.z * this.z ) );
 
@@ -91,7 +93,7 @@ THREE.Quaternion.prototype = {
 
 	},
 
-	inverse : function () {
+	inverse: function () {
 
 		this.x *= -1;
 		this.y *= -1;
@@ -101,13 +103,13 @@ THREE.Quaternion.prototype = {
 
 	},
 
-	length : function () {
+	length: function () {
 
 		return Math.sqrt( this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w );
 
 	},
 
-	normalize : function () {
+	normalize: function () {
 
 		var l = Math.sqrt( this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w );
 
@@ -133,7 +135,7 @@ THREE.Quaternion.prototype = {
 
 	},
 
-	multiplySelf : function ( quat2 ) {
+	multiplySelf: function ( quat2 ) {
 
 		var qax = this.x,  qay = this.y,  qaz = this.z,  qaw = this.w,
 		qbx = quat2.x, qby = quat2.y, qbz = quat2.z, qbw = quat2.w;
@@ -160,7 +162,7 @@ THREE.Quaternion.prototype = {
 
 	},
 
-	multiplyVector3 : function ( vec, dest ) {
+	multiplyVector3: function ( vec, dest ) {
 
 		if( !dest ) { dest = vec; }
 
@@ -182,9 +184,7 @@ THREE.Quaternion.prototype = {
 
 		return dest;
 
-	},
-	
-	constructor : THREE.Quaternion
+	}
 
 }
 

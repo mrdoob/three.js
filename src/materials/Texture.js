@@ -25,13 +25,13 @@ THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter ) 
 
 THREE.Texture.prototype = {
 
+	constructor: THREE.Texture,
+
 	clone: function () {
 
 		return new THREE.Texture( this.image, this.mapping, this.wrapS, this.wrapT, this.magFilter, this.minFilter );
 
-	},
-	
-	constructor : THREE.Texture
+	}
 
 };
 

@@ -18,7 +18,9 @@ THREE.Vector2 = function ( x, y ) {
 
 THREE.Vector2.prototype = {
 
-	set : function ( x, y ) {
+	constructor: THREE.Vector2,
+
+	set: function ( x, y ) {
 
 		this.x = x;
 		this.y = y;
@@ -27,7 +29,7 @@ THREE.Vector2.prototype = {
 
 	},
 
-	copy : function ( v ) {
+	copy: function ( v ) {
 
 		this.x = v.x;
 		this.y = v.y;
@@ -36,14 +38,14 @@ THREE.Vector2.prototype = {
 
 	},
 
-	clone : function () {
+	clone: function () {
 
 		return new THREE.Vector2( this.x, this.y );
 
 	},
 
 
-	add : function ( v1, v2 ) {
+	add: function ( v1, v2 ) {
 
 		this.x = v1.x + v2.x;
 		this.y = v1.y + v2.y;
@@ -52,7 +54,7 @@ THREE.Vector2.prototype = {
 
 	},
 
-	addSelf : function ( v ) {
+	addSelf: function ( v ) {
 
 		this.x += v.x;
 		this.y += v.y;
@@ -61,7 +63,7 @@ THREE.Vector2.prototype = {
 
 	},
 
-	sub : function ( v1, v2 ) {
+	sub: function ( v1, v2 ) {
 
 		this.x = v1.x - v2.x;
 		this.y = v1.y - v2.y;
@@ -70,7 +72,7 @@ THREE.Vector2.prototype = {
 
 	},
 
-	subSelf : function ( v ) {
+	subSelf: function ( v ) {
 
 		this.x -= v.x;
 		this.y -= v.y;
@@ -79,7 +81,7 @@ THREE.Vector2.prototype = {
 
 	},
 
-	multiplyScalar : function ( s ) {
+	multiplyScalar: function ( s ) {
 
 		this.x *= s;
 		this.y *= s;
@@ -88,7 +90,7 @@ THREE.Vector2.prototype = {
 
 	},
 
-	divideScalar : function ( s ) {
+	divideScalar: function ( s ) {
 
 		if ( s ) {
 
@@ -106,43 +108,43 @@ THREE.Vector2.prototype = {
 	},
 
 
-	negate : function() {
+	negate: function() {
 
 		return this.multiplyScalar( -1 );
 
 	},
 
-	dot : function ( v ) {
+	dot: function ( v ) {
 
 		return this.x * v.x + this.y * v.y;
 
 	},
 
-	lengthSq : function () {
+	lengthSq: function () {
 
 		return this.x * this.x + this.y * this.y;
 
 	},
 
-	length : function () {
+	length: function () {
 
 		return Math.sqrt( this.lengthSq() );
 
 	},
 
-	normalize : function () {
+	normalize: function () {
 
 		return this.divideScalar( this.length() );
 
 	},
 	
-	distanceTo : function ( v ) {
+	distanceTo: function ( v ) {
 
 		return Math.sqrt( this.distanceToSquared( v ) );
 
 	},
 
-	distanceToSquared : function ( v ) {
+	distanceToSquared: function ( v ) {
 
 		var dx = this.x - v.x, dy = this.y - v.y;
 		return dx * dx + dy * dy;
@@ -150,7 +152,7 @@ THREE.Vector2.prototype = {
 	},
 
 
-	setLength : function ( l ) {
+	setLength: function ( l ) {
 
 		return this.normalize().multiplyScalar( l );
 
@@ -158,7 +160,7 @@ THREE.Vector2.prototype = {
 
 	// deprecated: same as normalize
 
-	unit : function () {
+	unit: function () {
 
 		return this.normalize();
 
@@ -168,12 +170,10 @@ THREE.Vector2.prototype = {
 	// (which may be not what is expected thanks to floating point precision)
 	// (should be probably using some tiny epsilon instead of equality)
 	
-	equals : function( v ) {
+	equals: function( v ) {
 
 		return ( ( v.x == this.x ) && ( v.y == this.y ) );
 
-	},
-	
-	constructor : THREE.Vector2
+	}
 
 };

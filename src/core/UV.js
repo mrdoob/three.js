@@ -15,7 +15,9 @@ THREE.UV = function ( u, v ) {
 
 THREE.UV.prototype = {
 
-	set : function ( u, v ) {
+	constructor: THREE.UV,
+
+	set: function ( u, v ) {
 
 		this.u = u;
 		this.v = v;
@@ -24,7 +26,7 @@ THREE.UV.prototype = {
 
 	},
 
-	copy : function ( uv ) {
+	copy: function ( uv ) {
 
 		this.set(
 
@@ -35,8 +37,6 @@ THREE.UV.prototype = {
 
 		return this;
 
-	},
-	
-	constructor : THREE.UV
+	}
 
 };
