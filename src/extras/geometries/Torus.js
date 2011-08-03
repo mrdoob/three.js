@@ -26,7 +26,7 @@ THREE.Torus = function ( radius, tube, segmentsR, segmentsT, arc ) {
 
 		for ( var i = 0; i <= this.segmentsT; ++i ) {
 
-			var u = i / this.segmentsT * this.angle;
+			var u = i / this.segmentsT * this.arc;
 			var v = j / this.segmentsR * 2 * Math.PI;
 			var x = (this.radius + this.tube*Math.cos(v))*Math.cos(u);
 			var y = (this.radius + this.tube*Math.cos(v))*Math.sin(u);
