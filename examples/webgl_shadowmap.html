@@ -188,21 +188,25 @@
 
 					size: 200,
 					height: 50,
-					curveSegments: 7,
+					curveSegments: 12,
 
 					font: "helvetiker",
 					weight: "bold",
 					style: "normal",
 
-					bevelThickness: 1,
+					bevelThickness: 2,
 					bevelSize: 5,
 					bevelEnabled: true
 
 				});
 
+				textGeo.computeBoundingBox();
+				var centerOffset = -0.5 * ( textGeo.boundingBox.x[ 1 ] - textGeo.boundingBox.x[ 0 ] );
+
 				var textMaterial = new THREE.MeshPhongMaterial( { color: 0xff0000, specular: 0xffffff, ambient: 0xaa0000 } );
 
 				var mesh = new THREE.Mesh( textGeo, textMaterial );
+				mesh.position.x = centerOffset;
 				mesh.position.y = FLOOR + 67;
 
 				mesh.castShadow = true;

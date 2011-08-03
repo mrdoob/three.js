@@ -7,7 +7,7 @@
 // STEP 2 Turn path into shape.
 // STEP 3 ExtrudeGeometry takes in Shape/Shapes
 // STEP 3a - Extract points from each shape, turn to vertices
-// STEP 3b - Triangulate each shape
+// STEP 3b - Triangulate each shape, add faces.
 
 THREE.Shape = function ( ) {
 
@@ -30,13 +30,14 @@ THREE.Shape.prototype.extrude = function ( options ) {
 
 // Get points of holes
 
-THREE.Shape.prototype.getPointsHoles = function () {
+THREE.Shape.prototype.getPointsHoles = function ( divisions ) {
+
 
 	var i, il = this.holes.length, holesPts = [];
 
 	for ( i = 0; i < il; i ++ ) {
 
-		holesPts[ i ] = this.holes[ i ].getPoints();
+		holesPts[ i ] = this.holes[ i ].getPoints( divisions );
 
 	}
 
@@ -46,13 +47,13 @@ THREE.Shape.prototype.getPointsHoles = function () {
 
 // Get points of holes (spaced by regular distance)
 
-THREE.Shape.prototype.getSpacedPointsHoles = function () {
+THREE.Shape.prototype.getSpacedPointsHoles = function ( divisions ) {
 
 	var i, il = this.holes.length, holesPts = [];
 
 	for ( i = 0; i < il; i ++ ) {
 
-		holesPts[ i ] = this.holes[ i ].getSpacedPoints();
+		holesPts[ i ] = this.holes[ i ].getSpacedPoints( divisions );
 
 	}
 
@@ -60,14 +61,15 @@ THREE.Shape.prototype.getSpacedPointsHoles = function () {
 
 };
 
+
 // Get points of shape and holes (keypoints based on segments parameter)
 
-THREE.Shape.prototype.extractAllPoints = function () {
+THREE.Shape.prototype.extractAllPoints = function ( divisions ) {
 
 	return {
 
-		shape: this.getPoints(),
-		holes: this.getPointsHoles()
+		shape: this.getPoints( divisions ),
+		holes: this.getPointsHoles( divisions )
 
 	};
 
@@ -75,16 +77,20 @@ THREE.Shape.prototype.extractAllPoints = function () {
 
 // Get points of shape and holes (spaced by regular distance)
 
-THREE.Shape.prototype.extractAllSpacedPoints = function () {
+THREE.Shape.prototype.extractAllSpacedPoints = function ( divisions ) {
 
 	return {
 
-		shape: this.getSpacedPoints(),
-		holes: this.getSpacedPointsHoles()
+		shape: this.getSpacedPoints( divisions ),
+		holes: this.getSpacedPointsHoles( divisions )
 
 	};
 
 };
+
+/**************************************************************
+ *	Utils
+ **************************************************************/
 
 THREE.Shape.Utils = {
 
@@ -113,7 +119,6 @@ THREE.Shape.Utils = {
 			verts = [];
 
 		for ( h = 0; h < holes.length; h++ ) {
-		//for ( h = holes.length; h-- > 0; ) {
 
 			hole = holes[ h ];
 
@@ -130,8 +135,9 @@ THREE.Shape.Utils = {
 
 			// Find the shortest pair of pts between shape and hole
 
-			// TODO we could optimize with
-			// http://en.wikipedia.org/wiki/Proximity_problems
+			// Note: Actually, I'm not sure now if we could optimize this to be faster than O(m*n)
+			// Using distanceToSquared() intead of distanceTo() should speed a little
+			// since running square roots operations are reduced.
 			// http://en.wikipedia.org/wiki/Closest_pair_of_points
 			// http://stackoverflow.com/questions/1602164/shortest-distance-between-points-algorithm
 
@@ -143,7 +149,7 @@ THREE.Shape.Utils = {
 				for ( p = 0; p < shape.length; p++ ) {
 
 					pts2 = shape[ p ];
-					d = pts1.distanceTo( pts2 );
+					d = pts1.distanceToSquared( pts2 );
 					dist.push( d );
 
 					if ( d < shortest ) {
@@ -297,24 +303,45 @@ THREE.Shape.Utils = {
 
 		// To maintain reference to old shape, one must match coordinates, or offset the indices from original arrays. It's probably easier to do the first.
 
-		//console.log("triangles",triangles, triangles.length);
-		//console.log("allpoints",allpoints, allpoints.length);
+		//console.log( "triangles",triangles, triangles.length );
+		//console.log( "allpoints",allpoints, allpoints.length );
 
-		var v, f, i, face;
+		var i, il, f, face,
+			key, index,
+			allPointsMap = {},
+			isolatedPointsMap = {};
 
-		for ( v = 0; v < triangles.length; v++ ) {
+		// prepare all points map
 
-			face = triangles[ v ];
+		for ( i = 0, il = allpoints.length; i < il; i ++ ) {
 
-			for ( f = 0; f < 3; f++ ) { // For 3 pts in faces
+			key = allpoints[ i ].x + ":" + allpoints[ i ].y;
 
-				for ( i = 0; i < allpoints.length; i++ ) { // Go through all points
+			if ( allPointsMap[ key ] !== undefined ) {
 
-					if ( allpoints[ i ].equals( face[ f ] ) ) { // If matches
+				console.log( "Duplicate point", key );
 
-						face[ f ] = i; // face now has reference to index
+			}
 
-					}
+			allPointsMap[ key ] = i;
+
+		}
+
+		// check all face vertices against all points map
+
+		for ( i = 0, il = triangles.length; i < il; i ++ ) {
+
+			face = triangles[ i ];
+
+			for ( f = 0; f < 3; f ++ ) {
+
+				key = face[ f ].x + ":" + face[ f ].y;
+
+				index = allPointsMap[ key ];
+
+				if ( index !== undefined ) {
+
+					face[ f ] = index;
 
 				}
 
@@ -322,19 +349,21 @@ THREE.Shape.Utils = {
 
 		}
 
-		for ( v = 0; v < isolatedPts.length; v++ ) {
+		// check isolated points vertices against all points map
 
-			face = isolatedPts[ v ];
+		for ( i = 0, il = isolatedPts.length; i < il; i ++ ) {
 
-			for ( f = 0; f < 3; f++ ) { // For 3 pts in faces
+			face = isolatedPts[ i ];
 
-				for ( i = 0; i < allpoints.length; i++ ) { // Go thru all points
+			for ( f = 0; f < 3; f ++ ) {
 
-					if ( allpoints[ i ].equals( face[ f ] ) ) { // If matches
+				key = face[ f ].x + ":" + face[ f ].y;
 
-						face[ f ] = i; // face now has reference to index
+				index = allPointsMap[ key ];
 
-					}
+				if ( index !== undefined ) {
+
+					face[ f ] = index;
 
 				}
 
@@ -342,7 +371,6 @@ THREE.Shape.Utils = {
 
 		}
 
-		//console.log("edited?" , triangles);
 		return triangles.concat( isolatedPts );
 
 	}, // end triangulate shapes
@@ -350,9 +378,8 @@ THREE.Shape.Utils = {
 	/*
 	triangulate2 : function( pts, holes ) {
 
-		// For use Poly2Tri.js
+		// For use with Poly2Tri.js
 
-		//var pts = this.getPoints();
 		var allpts = pts.concat();
 		var shape = [];
 		for (var p in pts) {
@@ -380,6 +407,7 @@ THREE.Shape.Utils = {
 			}
 			return -1;
 		};
+
 		// triangulate
 		js.poly2tri.sweep.Triangulate(swctx);
 
@@ -402,11 +430,76 @@ THREE.Shape.Utils = {
 		// Returns array of faces with 3 element each
 	return facesPts;
 	},
-	*/
+*/
 
 	isClockWise: function ( pts ) {
 
 		return THREE.FontUtils.Triangulate.area( pts ) < 0;
+
+	},
+
+	// Bezier Curves formulas obtained from
+	// http://en.wikipedia.org/wiki/B%C3%A9zier_curve
+
+	// Quad Bezier Functions
+
+	b2p0: function ( t, p ) {
+
+		var k = 1 - t;
+		return k * k * p;
+
+	},
+
+	b2p1: function ( t, p ) {
+
+		return 2 * ( 1 - t ) * t * p;
+
+	},
+
+	b2p2: function ( t, p ) {
+
+		return t * t * p;
+
+	},
+
+	b2: function ( t, p0, p1, p2 ) {
+
+		return this.b2p0( t, p0 ) + this.b2p1( t, p1 ) + this.b2p2( t, p2 );
+
+	},
+
+	// Cubic Bezier Functions
+
+	b3p0: function ( t, p ) {
+
+		var k = 1 - t;
+		return k * k * k * p;
+
+	},
+
+	b3p1: function ( t, p ) {
+
+		var k = 1 - t;
+		return 3 * k * k * t * p;
+
+	},
+
+	b3p2: function ( t, p ) {
+
+		var k = 1 - t;
+		return 3 * k * t * t * p;
+
+	},
+
+	b3p3: function ( t, p ) {
+
+		return t * t * t * p;
+
+	},
+
+	b3: function ( t, p0, p1, p2, p3 ) {
+
+		return this.b3p0( t, p0 ) + this.b3p1( t, p1 ) + this.b3p2( t, p2 ) +  this.b3p3( t, p3 );
 
 	}
 

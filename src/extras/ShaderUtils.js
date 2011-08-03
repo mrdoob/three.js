@@ -1,6 +1,15 @@
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author mr.doob / http://mrdoob.com/
+ *
+ * ShaderUtils currently contains
+ *	fresnel
+ *	normal
+ * 	cube
+ * 	convolution
+ * 	film
+ * 	screen
+ *	basic
  */
 
 if ( THREE.WebGLRenderer ) {
@@ -197,7 +206,7 @@ THREE.ShaderUtils = {
 
 					"#if MAX_POINT_LIGHTS > 0",
 
-						"vec4 pointTotal  = vec4( 0.0 );",
+						"vec4 pointTotal = vec4( vec3( 0.0 ), 1.0 );",
 
 						"for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {",
 
@@ -222,7 +231,7 @@ THREE.ShaderUtils = {
 
 					"#if MAX_DIR_LIGHTS > 0",
 
-						"vec4 dirTotal  = vec4( 0.0 );",
+						"vec4 dirTotal = vec4( vec3( 0.0 ), 1.0 );",
 
 						"for( int i = 0; i < MAX_DIR_LIGHTS; i++ ) {",
 

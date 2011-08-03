@@ -18,6 +18,8 @@ THREE.Material = function ( parameters ) {
 	this.polygonOffsetFactor = parameters.polygonOffsetFactor !== undefined ? parameters.polygonOffsetFactor : 0;
 	this.polygonOffsetUnits = parameters.polygonOffsetUnits !== undefined ? parameters.polygonOffsetUnits : 0;
 
+	this.alphaTest = parameters.alphaTest !== undefined ? parameters.alphaTest : 0;
+
 }
 
 THREE.NoShading = 0;

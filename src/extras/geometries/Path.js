@@ -149,21 +149,6 @@ THREE.Path.prototype.arc = function ( aX, aY, aRadius,
 
  };
 
-/*
-// FUTURE ENHANCEMENTS
-
- example usage?
-
- Path.addExprFunc('sineCurveTo', sineCurveGetPtFunction)
- Path.sineCurveTo(x,y, amptitude);
- sineCurve.getPoint(t);
- return sine(disnt) * ampt
-
- // Create a new func eg. sin (theta) x
- THREE.Path.prototype.addExprFunc = function(exprName, func) {
- };
-*/
-
 
 THREE.Path.prototype.getSpacedPoints = function ( divisions, closedPath ) {
 
@@ -251,8 +236,8 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 				t = j / divisions;
 
-				tx = THREE.FontUtils.b2( t, cpx0, cpx1, cpx );
-				ty = THREE.FontUtils.b2( t, cpy0, cpy1, cpy );
+				tx = THREE.Shape.Utils.b2( t, cpx0, cpx1, cpx );
+				ty = THREE.Shape.Utils.b2( t, cpy0, cpy1, cpy );
 
 				points.push( new THREE.Vector2( tx, ty ) );
 
@@ -292,8 +277,8 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 				t = j / divisions;
 
-				tx = THREE.FontUtils.b3( t, cpx0, cpx1, cpx2, cpx );
-				ty = THREE.FontUtils.b3( t, cpy0, cpy1, cpy2, cpy );
+				tx = THREE.Shape.Utils.b3( t, cpx0, cpx1, cpx2, cpx );
+				ty = THREE.Shape.Utils.b3( t, cpy0, cpy1, cpy2, cpy );
 
 				points.push( new THREE.Vector2( tx, ty ) );
 
@@ -384,7 +369,10 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 };
 
-THREE.Path.prototype.getMinAndMax = function () {
+
+// Returns min and max coordinates, as well as centroid
+
+THREE.Path.prototype.getBoundingBox = function () {
 
 	var points = this.getPoints();
 
@@ -394,7 +382,9 @@ THREE.Path.prototype.getMinAndMax = function () {
 	maxX = maxY = Number.NEGATIVE_INFINITY;
 	minX = minY = Number.POSITIVE_INFINITY;
 
-	var p, i, il;
+	var p, i, il, sum;
+
+	sum = new THREE.Vector2();
 
 	for ( i = 0, il = points.length; i < il; i ++ ) {
 
@@ -406,16 +396,17 @@ THREE.Path.prototype.getMinAndMax = function () {
 		if ( p.y > maxY ) maxY = p.y;
 		else if ( p.y < maxY ) minY = p.y;
 
-	}
+		sum.addSelf( p.x, p.y );
 
-	// TODO Include CG or find mid-pt?
+	}
 
 	return {
 
 		minX: minX,
 		minY: minY,
 		maxX: maxX,
-		maxY: maxY
+		maxY: maxY,
+		centroid: sum.divideScalar( il )
 
 	};
 
@@ -534,7 +525,7 @@ THREE.Path.prototype.transform = function( path ) {
 
 	console.log( path.cacheArcLengths() );
 
-	var thisBounds = this.getMinAndMax();
+	var thisBounds = this.getBoundingBox();
 	var oldPts = this.getPoints();
 
 	var i, il, p, oldX, oldY, xNorm;
@@ -605,7 +596,7 @@ THREE.Path.prototype.nltransform = function( a, b, c, d, e, f ) {
 
 THREE.Path.prototype.debug = function( canvas ) {
 
-	var bounds = this.getMinAndMax();
+	var bounds = this.getBoundingBox();
 
 	if ( !canvas ) {
 
@@ -681,10 +672,10 @@ THREE.Path.prototype.debug = function( canvas ) {
 
 	/* TO CLEAN UP */
 
-	//var p, points = this.getPoints();
+	var p, points = this.getPoints();
 
-	var theta = -90 /180 * Math.PI;
-	var p, points = this.transform( 0.866, - 0.866,0, 0.500 , 0.50,-50 );
+	//var theta = -90 /180 * Math.PI;
+	//var p, points = this.transform( 0.866, - 0.866,0, 0.500 , 0.50,-50 );
 
 	//0.866, - 0.866,0, 0.500 , 0.50,-50
 
@@ -693,14 +684,6 @@ THREE.Path.prototype.debug = function( canvas ) {
 
 	// translate, scale, rotation
 
-	// a - horizontal size
-	// b - lean
-	// c - x offset
-	// d - vertical size
-	// e - climb
-	// f - y offset
-	// 1,0,0,
-	// -1,0,100
 
 	for ( i = 0, il = points.length; i < il; i ++ ) {
 
@@ -712,5 +695,114 @@ THREE.Path.prototype.debug = function( canvas ) {
 		ctx.closePath();
 
 	}
+
+};
+
+// Breaks path into shapes
+
+THREE.Path.prototype.toShapes = function() {
+
+	var i, il, item, action, args;
+
+	var subPaths = [], lastPath = new THREE.Path();
+
+	for ( i = 0, il = this.actions.length; i < il; i ++ ) {
+
+		item = this.actions[ i ];
+
+		args = item.args;
+		action = item.action;
+
+		if ( action == THREE.PathActions.MOVE_TO ) {
+
+			if ( lastPath.actions.length != 0 ) {
+
+				subPaths.push( lastPath );
+				lastPath = new THREE.Path();
+
+			}
+
+		}
+
+		lastPath[ action ].apply( lastPath, args );
+
+	}
+
+	if ( lastPath.actions.length != 0 ) {
+
+		subPaths.push( lastPath );
+
+	}
+
+	//console.log(subPaths);
+
+	if ( subPaths.length ==0 ) return [];
+
+	var holesFirst = !THREE.Shape.Utils.isClockWise( subPaths[ 0 ].getPoints() );
+
+	var tmpPath, tmpShape, shapes = [];
+
+	//console.log("Holes first", holesFirst);
+
+	if ( holesFirst ) {
+
+		tmpShape = new THREE.Shape();
+
+		for ( i = 0, il = subPaths.length; i < il; i ++ ) {
+
+			tmpPath = subPaths[ i ];
+
+			if ( THREE.Shape.Utils.isClockWise( tmpPath.getPoints() ) ) {
+
+				tmpShape.actions = tmpPath.actions;
+				tmpShape.curves = tmpPath.curves;
+
+				shapes.push( tmpShape );
+				tmpShape = new THREE.Shape();
+
+				//console.log('cw', i);
+
+			} else {
+
+				tmpShape.holes.push( tmpPath );
+
+				//console.log('ccw', i);
+
+			}
+
+		}
+
+	} else {
+
+		// Shapes first
+
+		for ( i = 0, il = subPaths.length; i < il; i ++ ) {
+
+			tmpPath = subPaths[ i ];
+
+			if ( THREE.Shape.Utils.isClockWise( tmpPath.getPoints() ) ) {
+
+
+				if ( tmpShape ) shapes.push( tmpShape );
+
+				tmpShape = new THREE.Shape();
+				tmpShape.actions = tmpPath.actions;
+				tmpShape.curves = tmpPath.curves;
+
+			} else {
+
+				tmpShape.holes.push( tmpPath );
+
+			}
+
+		}
+
+		shapes.push( tmpShape );
+
+	}
+
+	//console.log("shape", shapes);
+
+	return shapes;
 
 };

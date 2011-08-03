@@ -206,8 +206,8 @@ THREE.QuadraticBezierCurve.prototype.getPoint = function ( t ) {
 
 	var tx, ty;
 
-	tx = THREE.FontUtils.b2( t, this.x0, this.x1, this.x2 );
-	ty = THREE.FontUtils.b2( t, this.y0, this.y1, this.y2 );
+	tx = THREE.Shape.Utils.b2( t, this.x0, this.x1, this.x2 );
+	ty = THREE.Shape.Utils.b2( t, this.y0, this.y1, this.y2 );
 
 	return new THREE.Vector2( tx, ty );
 
@@ -270,8 +270,8 @@ THREE.CubicBezierCurve.prototype.getPoint = function ( t ) {
 
 	var tx, ty;
 
-	tx = THREE.FontUtils.b3( t, this.x0, this.x1, this.x2, this.x3 );
-	ty = THREE.FontUtils.b3( t, this.y0, this.y1, this.y2, this.y3 );
+	tx = THREE.Shape.Utils.b3( t, this.x0, this.x1, this.x2, this.x3 );
+	ty = THREE.Shape.Utils.b3( t, this.y0, this.y1, this.y2, this.y3 );
 
 	return new THREE.Vector2( tx, ty );
 
@@ -281,7 +281,7 @@ THREE.CubicBezierCurve.prototype.getPoint = function ( t ) {
  *	Spline curve
  **************************************************************/
 
-THREE.SplineCurve = function ( points ) {
+THREE.SplineCurve = function ( points /* array of Vector2*/ ) {
 
 	this.points = points;
 
@@ -392,8 +392,6 @@ THREE.Curve.Utils = {
 };
 
 
-
-
 /*
 getPoint DONE
 getLength DONE
@@ -404,3 +402,80 @@ curve.getPointAtArcLength(t); DONE
 curve.transform(params);
 curve.getTangentAt(t)
 */
+
+/**************************************************************
+ *	3D Curves
+ **************************************************************/
+
+// A Factory method for creating new curve subclasses
+
+THREE.Curve.create = function( constructor, getPointFunc ) {
+
+    var subClass = constructor;
+
+	subClass.prototype = new THREE.Curve();
+
+	subClass.prototype.constructor = constructor;
+    subClass.prototype.getPoint = getPointFunc;
+
+	return subClass;
+
+};
+
+
+/**************************************************************
+ *	Line3D
+ **************************************************************/
+
+THREE.LineCurve3 = THREE.Curve.create(
+
+	function ( v1, v2 ) {
+
+		this.v1 = v1;
+		this.v2 = v2;
+
+	},
+
+	function ( t ) {
+
+		var r = new THREE.Vector3();
+
+
+		r.sub( v2, v1 ); // diff
+		r.multiplyScalar( t );
+		r.addSelf( this.v1 );
+
+		return r;
+
+	}
+
+);
+
+
+/**************************************************************
+ *	Quadratic Bezier 3D curve
+ **************************************************************/
+
+THREE.QuadraticBezierCurve3 = THREE.Curve.create(
+
+	function ( v0, v1, v2 ) { // Qn should we use 2 Vector3 instead?
+
+		this.v0 = v0;
+		this.v1 = v1;
+		this.v2 = v2;
+
+	},
+
+	function ( t ) {
+
+		var tx, ty, tz;
+
+		tx = THREE.Shape.Utils.b2( t, this.v0.x, this.v1.x, this.v2.x );
+		ty = THREE.Shape.Utils.b2( t, this.v0.y, this.v1.y, this.v2.y );
+		tz = THREE.Shape.Utils.b2( t, this.v0.z, this.v1.z, this.v2.z );
+
+		return new THREE.Vector3( tx, ty, tz );
+
+	}
+
+);

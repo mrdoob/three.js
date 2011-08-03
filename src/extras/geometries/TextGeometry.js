@@ -37,228 +37,45 @@
 
 THREE.TextGeometry = function ( text, parameters ) {
 
-	THREE.Geometry.call( this );
+	var textPath = new THREE.TextPath( text, parameters );
+	var textShapes = textPath.toShapes();
 
-	this.parameters = parameters || {};
-	this.set( text );
+	// translate parameters to ExtrudeGeometry API
+
+	parameters.amount = parameters.height !== undefined ? parameters.height : 50;
+
+	// defaults
+
+	if ( parameters.bevelThickness === undefined ) parameters.bevelThickness = 10;
+	if ( parameters.bevelSize === undefined ) parameters.bevelSize = 8;
+	if ( parameters.bevelEnabled === undefined ) parameters.bevelEnabled = false;
+
+	THREE.ExtrudeGeometry.call( this, textShapes, parameters );
 
 };
 
-THREE.TextGeometry.prototype = new THREE.Geometry();
+THREE.TextGeometry.prototype = new THREE.ExtrudeGeometry();
 THREE.TextGeometry.prototype.constructor = THREE.TextGeometry;
 
-THREE.TextGeometry.prototype.set = function ( text, parameters ) {
 
-	this.text = text;
-	var parameters = parameters || this.parameters;
+/*
+	// TextGeometry wrapper
 
-	var size = parameters.size !== undefined ? parameters.size : 100;
-	var height = parameters.height !== undefined ? parameters.height : 50;
-	var curveSegments = parameters.curveSegments !== undefined ? parameters.curveSegments: 4;
+	var text3d = new TextGeometry( text, options );
 
-	var font = parameters.font !== undefined ? parameters.font : "helvetiker";
-	var weight = parameters.weight !== undefined ? parameters.weight : "normal";
-	var style = parameters.style !== undefined ? parameters.style : "normal";
+	// Complete manner
 
-	var bevelThickness = parameters.bevelThickness !== undefined ? parameters.bevelThickness : 10;
-	var bevelSize = parameters.bevelSize !== undefined ? parameters.bevelSize : 8;
-	var bevelEnabled = parameters.bevelEnabled !== undefined ? parameters.bevelEnabled : false;
+	var textPath = new TextPath( text, options );
+	var textShapes = textPath.toShapes();
+	var text3d = new ExtrudeGeometry( textShapes, options );
 
-	THREE.FontUtils.size = size;
-	THREE.FontUtils.divisions = curveSegments;
+	// Factory Method
 
-	THREE.FontUtils.face = font;
-	THREE.FontUtils.weight = weight;
-	THREE.FontUtils.style = style;
+	var textShapes = FontUtils.getTextShapes( text, options );
+	text3d = new ExtrudeGeometry( textShapes, options );
 
-	THREE.FontUtils.bevelSize = bevelSize;
+*/
 
-	// Get a Font data json object
-
-	var data = THREE.FontUtils.drawText( text );
-
-	var vertices = data.points;
-	var faces = data.faces;
-	var contour = data.contour;
-	var bevelPoints = data.bevel;
-
-	var scope = this;
-
-	scope.vertices = [];
-	scope.faces = [];
-
-	var i,
-		vert, vlen = vertices.length,
-		face, flen = faces.length,
-		bevelPt, blen = bevelPoints.length;
-
-	// Back facing vertices
-
-	for ( i = 0; i < vlen; i++ ) {
-
-		vert = vertices[ i ];
-		v( vert.x, vert.y, 0 );
-
-	}
-
-	// Front facing vertices
-
-	for ( i = 0; i < vlen; i++ ) {
-
-		vert = vertices[ i ];
-		v( vert.x, vert.y, height );
-
-	}
-
-	if ( bevelEnabled ) {
-
-		for ( i = 0; i < blen; i++ ) {
-
-			bevelPt = bevelPoints[ i ];
-			v( bevelPt.x, bevelPt.y, bevelThickness );
-
-		}
-
-		for ( i = 0; i < blen; i++ ) {
-
-			bevelPt = bevelPoints[ i ];
-			v( bevelPt.x, bevelPt.y, height - bevelThickness );
-
-		}
-
-	}
-
-	// Bottom faces
-
-	for ( i = 0; i < flen; i++ ) {
-
-		face = faces[ i ];
-		f3( face[ 2 ], face[ 1 ], face[ 0 ] );
-
-	}
-
-	// Top faces
-
-	for ( i = 0; i < flen; i++ ) {
-
-		face = faces[ i ];
-		f3( face[ 0 ] + vlen, face[ 1 ] + vlen, face[ 2 ] + vlen );
-
-	}
-
-	var lastV;
-	var j, k, l, m;
-
-	if ( bevelEnabled ) {
-
-		i = bevelPoints.length;
-
-		while ( --i > 0 ) {
-
-			if ( !lastV ) {
-
-				lastV = contour[ i ];
-
-			} else if ( lastV.equals( contour[ i ] ) ) {
-
-				// We reached the last point of a closed loop
-
-				lastV = null;
-				continue;
-
-			}
-
-			l = vlen * 2 + i;
-			m = l - 1;
-
-			// Create faces for the z-sides of the text
-
-			f4( l, m, m + blen, l + blen );
-
-			for ( j = 0; j < vlen; j++ ) {
-
-				if ( vertices[ j ].equals( contour[ i ] ) ) break;
-
-			}
-
-			for ( k = 0; k < vlen; k++ ) {
-
-				if ( vertices[ k ].equals( contour[ i - 1 ] ) ) break;
-
-			}
-
-			// Create faces for the z-sides of the text
-
-			f4( j, k, m, l );
-			f4( l + blen, m + blen, k + vlen, j + vlen );
-
-		}
-
-	} else {
-
-		i = contour.length;
-
-		while ( --i > 0 ) {
-
-			if ( !lastV ) {
-
-				lastV = contour[ i ];
-
-			} else if ( lastV.equals( contour[ i ] ) ) {
-
-				// We reached the last point of a closed loop
-
-				lastV = null;
-				continue;
-
-			}
-
-			for ( j = 0; j < vlen; j++ ) {
-
-				if ( vertices[ j ].equals( contour[ i ] ) ) break;
-
-			}
-
-			for ( k = 0; k < vlen; k++ ) {
-
-				if ( vertices[ k ].equals( contour[ i - 1 ] ) ) break;
-
-			}
-
-			// Create faces for the z-sides of the text
-
-			f4( j, k, k + vlen, j + vlen );
-
-		}
-	}
-
-
-	// UVs to be added
-
-	this.computeCentroids();
-	this.computeFaceNormals();
-	//this.computeVertexNormals();
-
-	function v( x, y, z ) {
-
-		scope.vertices.push( new THREE.Vertex( new THREE.Vector3( x, y, z ) ) );
-
-	}
-
-	function f3( a, b, c ) {
-
-		scope.faces.push( new THREE.Face3( a, b, c ) );
-
-	}
-
-	function f4( a, b, c, d ) {
-
-		scope.faces.push( new THREE.Face4( a, b, c, d ) );
-
-	}
-
-
-};
 
 THREE.FontUtils = {
 
@@ -275,6 +92,14 @@ THREE.FontUtils = {
 	getFace : function() {
 
 		return this.faces[ this.face ][ this.weight ][ this.style ];
+
+	},
+
+	getTextShapes: function( text, options ) {
+
+		var textPath = new TextPath( text, options );
+		var textShapes = textPath.toShapes();
+		return textShapes;
 
 	},
 
@@ -295,6 +120,7 @@ THREE.FontUtils = {
 
 	},
 
+/* LEGACY CODE
 
 	extractPoints : function( allPoints, charactersPoints ) {
 
@@ -414,7 +240,7 @@ THREE.FontUtils = {
 
 		//console.log("isolatedShapes", isolatedShapes);
 
-		/* For each isolated shape, find the closest points and break to the hole to allow triangulation*/
+		// For each isolated shape, find the closest points and break to the hole to allow triangulation
 
 		// Find closest points between holes
 
@@ -649,7 +475,7 @@ THREE.FontUtils = {
 
 		};
 
-	},
+	},*/
 
 	drawText : function( text ) {
 
@@ -666,199 +492,44 @@ THREE.FontUtils = {
 
 		var fontPaths = [];
 
-		var path = new THREE.Path();
-		for ( i = 0; i < length; i++ ) {
+		for ( i = 0; i < length; i ++ ) {
+
+			var path = new THREE.Path();
 
 			var ret = this.extractGlyphPoints( chars[ i ], face, scale, offset, path );
 			offset += ret.offset;
-			characterPts.push( ret.points );
-			allPts = allPts.concat( ret.points );
-			//fontPaths.push( ret.path );
+			//characterPts.push( ret.points );
+			//allPts = allPts.concat( ret.points );
+			fontPaths.push( ret.path );
 
 		}
-
-		//path.debug(document.getElementById("boo"));
-		//console.log(path);
-
 
 		// get the width
 
 		var width = offset / 2;
+		//
+		// for ( p = 0; p < allPts.length; p++ ) {
+		//
+		// 	allPts[ p ].x -= width;
+		//
+		// }
 
-		for ( p = 0; p < allPts.length; p++ ) {
+		//var extract = this.extractPoints( allPts, characterPts );
+		//extract.contour = allPts;
 
-			allPts[ p ].x -= width;
+		//extract.paths = fontPaths;
+		//extract.offset = width;
 
-		}
-
-		var extract = this.extractPoints( allPts, characterPts );
-		extract.contour = allPts;
-
-		var bevelPoints = [];
-
-		var centroids = [], forCentroids = [], expandOutwards = [], sum = new THREE.Vector2(), lastV;
-
-		i = allPts.length;
-
-		while ( --i >= 0 ) {
-
-			if ( !lastV ) {
-
-				lastV = allPts[ i ];
-
-			} else if ( lastV.equals( allPts[ i ] ) ) {
-
-				// We reached the last point of a closed loop
-
-				lastV = null;
-
-				var bool = this.Triangulate.area( forCentroids ) > 0;
-				expandOutwards.push( bool );
-				centroids.push( sum.divideScalar( forCentroids.length ) );
-				forCentroids = [];
-
-				sum = new THREE.Vector2();
-				continue;
-
-			}
-
-			sum.addSelf( allPts[ i ] );
-			forCentroids.push( allPts[ i ] );
-
-		}
-
-
-		i = allPts.length;
-		p = 0;
-		var pt, centroid ;
-		var dirV, adj;
-
-		while ( --i >= 0 ) {
-
-			pt = allPts[ i ];
-			centroid = centroids[ p ];
-
-			dirV = pt.clone().subSelf( centroid );
-			adj = this.bevelSize / dirV.length();
-
-			if ( expandOutwards[ p ] ) {
-
-				adj += 1;
-
-			}  else {
-
-				adj = 1 - adj;
-
-			}
-
-			adj = dirV.multiplyScalar( adj ).addSelf( centroid );
-			bevelPoints.unshift( adj );
-
-
-			if ( !lastV ) {
-
-				lastV = allPts[ i ];
-
-			} else if ( lastV.equals( allPts[ i ] ) ) {
-
-				// We reached the last point of a closed loop
-
-				lastV = null;
-				p++;
-				continue;
-
-			}
-
-		}
-
-
-		/*
-		for ( p = 0; p < allPts.length; p++ ) {
-
-			pt = allPts[ p ];
-			bevelPoints.push( new THREE.Vector2( pt.x + this.bevelSize, pt.y + this.bevelSize ) );
-
-		}
-		*/
-
-		extract.bevel = bevelPoints;
-
-		return extract;
+		return { paths : fontPaths, offset : width };
 
 	},
 
 
-	// Bezier Curves formulas obtained from
-	// http://en.wikipedia.org/wiki/B%C3%A9zier_curve
-
-	// Quad Bezier Functions
-
-	b2p0: function ( t, p ) {
-
-		var k = 1 - t;
-		return k * k * p;
-
-	},
-
-	b2p1: function ( t, p ) {
-
-		return 2 * ( 1 - t ) * t * p;
-
-	},
-
-	b2p2: function ( t, p ) {
-
-		return t * t * p;
-
-	},
-
-	b2: function ( t, p0, p1, p2 ) {
-
-		return this.b2p0( t, p0 ) + this.b2p1( t, p1 ) + this.b2p2( t, p2 );
-
-	},
-
-	// Cubic Bezier Functions
-
-	b3p0: function ( t, p ) {
-
-		var k = 1 - t;
-		return k * k * k * p;
-
-	},
-
-	b3p1: function ( t, p ) {
-
-		var k = 1 - t;
-		return 3 * k * k * t * p;
-
-	},
-
-	b3p2: function ( t, p ) {
-
-		var k = 1 - t;
-		return 3 * k * t * t * p;
-
-	},
-
-	b3p3: function ( t, p ) {
-
-		return t * t * t * p;
-
-	},
-
-	b3: function ( t, p0, p1, p2, p3 ) {
-
-		return this.b3p0( t, p0 ) + this.b3p1( t, p1 ) + this.b3p2( t, p2 ) +  this.b3p3( t, p3 );
-
-	},
 
 
 	extractGlyphPoints : function( c, face, scale, offset, path ) {
 
 		var pts = [];
-
-
 
 		var i, i2,
 			outline, action, length,
@@ -879,8 +550,10 @@ THREE.FontUtils = {
 
 			for ( i = 0; i < length; ) {
 
-				action = outline[ i++ ];
-				//console.log(action);
+				action = outline[ i ++ ];
+
+				//console.log( action );
+
 				switch( action ) {
 
 				case 'm':
@@ -889,9 +562,10 @@ THREE.FontUtils = {
 
 					x = outline[ i++ ] * scaleX + offset;
 					y = outline[ i++ ] * scaleY;
+
 					pts.push( new THREE.Vector2( x, y ) );
 
-					path.moveTo(x,y);
+					path.moveTo( x, y );
 					break;
 
 				case 'l':
@@ -925,8 +599,8 @@ THREE.FontUtils = {
 						for ( i2 = 1, divisions = this.divisions; i2 <= divisions; i2++ ) {
 
 							var t = i2 / divisions;
-							var tx = THREE.FontUtils.b2( t, cpx0, cpx1, cpx );
-							var ty = THREE.FontUtils.b2( t, cpy0, cpy1, cpy );
+							var tx = THREE.Shape.Utils.b2( t, cpx0, cpx1, cpx );
+							var ty = THREE.Shape.Utils.b2( t, cpy0, cpy1, cpy );
 							pts.push( new THREE.Vector2( tx, ty ) );
 
 					  }
@@ -958,8 +632,8 @@ THREE.FontUtils = {
 						for ( i2 = 1, divisions = this.divisions; i2 <= divisions; i2++ ) {
 
 							var t = i2 / divisions;
-							var tx = THREE.FontUtils.b3( t, cpx0, cpx1, cpx2, cpx );
-							var ty = THREE.FontUtils.b3( t, cpy0, cpy1, cpy2, cpy );
+							var tx = THREE.Shape.Utils.b3( t, cpx0, cpx1, cpx2, cpx );
+							var ty = THREE.Shape.Utils.b3( t, cpy0, cpy1, cpy2, cpy );
 							pts.push( new THREE.Vector2( tx, ty ) );
 
 						}
