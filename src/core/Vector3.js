@@ -267,6 +267,8 @@ THREE.Vector3.prototype = {
 
 		return ( this.lengthSq() < 0.0001 /* almostZero */ );
 
-	}
+	},
+	
+	constructor : THREE.Vector3
 
 };

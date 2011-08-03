@@ -180,6 +180,8 @@ THREE.Ray.prototype = {
 
 		}
 
-	}
+	},
+	
+	constructor : THREE.Ray
 
 };

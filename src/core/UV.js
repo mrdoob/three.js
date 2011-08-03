@@ -35,6 +35,8 @@ THREE.UV.prototype = {
 
 		return this;
 
-	}
+	},
+	
+	constructor : THREE.UV
 
 };

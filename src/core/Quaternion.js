@@ -182,7 +182,9 @@ THREE.Quaternion.prototype = {
 
 		return dest;
 
-	}
+	},
+	
+	constructor : THREE.Quaternion
 
 }
 

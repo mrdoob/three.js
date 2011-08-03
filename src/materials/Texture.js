@@ -29,7 +29,9 @@ THREE.Texture.prototype = {
 
 		return new THREE.Texture( this.image, this.mapping, this.wrapS, this.wrapT, this.magFilter, this.minFilter );
 
-	}
+	},
+	
+	constructor : THREE.Texture
 
 };
 
