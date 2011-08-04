@@ -65,6 +65,7 @@ THREE.Mesh.prototype.getMorphTargetIndexByName = function( name ) {
 		return this.morphTargetDictionary[ name ];
 	}
 
-	console.log( "THREE.Mesh.getMorphTargetIndexByName: morph target " + name + " does not exist. Returning 0." );	
+	console.log( "THREE.Mesh.getMorphTargetIndexByName: morph target " + name + " does not exist. Returning 0." );
 	return 0;
+
 }
