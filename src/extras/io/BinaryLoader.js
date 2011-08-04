@@ -767,6 +767,8 @@ THREE.BinaryLoader.prototype = {
 		uv.push( new THREE.UV( u4, v4 ) );
 		where.push( uv );
 
-	}
+	},
+	
+	constructor : THREE.BinaryLoader
 
 };

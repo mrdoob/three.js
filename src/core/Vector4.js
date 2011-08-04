@@ -20,7 +20,9 @@ THREE.Vector4 = function ( x, y, z, w ) {
 
 THREE.Vector4.prototype = {
 
-	set : function ( x, y, z, w ) {
+	constructor: THREE.Vector4,
+
+	set: function ( x, y, z, w ) {
 
 		this.x = x;
 		this.y = y;
@@ -31,7 +33,7 @@ THREE.Vector4.prototype = {
 
 	},
 
-	copy : function ( v ) {
+	copy: function ( v ) {
 
 		return this.set(
 
@@ -44,14 +46,14 @@ THREE.Vector4.prototype = {
 
 	},
 
-	clone : function () {
+	clone: function () {
 
 		return new THREE.Vector4( this.x, this.y, this.z, this.w );
 
 	},
 
 
-	add : function ( v1, v2 ) {
+	add: function ( v1, v2 ) {
 
 		this.x = v1.x + v2.x;
 		this.y = v1.y + v2.y;
@@ -62,7 +64,7 @@ THREE.Vector4.prototype = {
 
 	},
 
-	addSelf : function ( v ) {
+	addSelf: function ( v ) {
 
 		this.x += v.x;
 		this.y += v.y;
@@ -73,7 +75,7 @@ THREE.Vector4.prototype = {
 
 	},
 
-	sub : function ( v1, v2 ) {
+	sub: function ( v1, v2 ) {
 
 		this.x = v1.x - v2.x;
 		this.y = v1.y - v2.y;
@@ -84,7 +86,7 @@ THREE.Vector4.prototype = {
 
 	},
 
-	subSelf : function ( v ) {
+	subSelf: function ( v ) {
 
 		this.x -= v.x;
 		this.y -= v.y;
@@ -95,7 +97,7 @@ THREE.Vector4.prototype = {
 
 	},
 
-	multiplyScalar : function ( s ) {
+	multiplyScalar: function ( s ) {
 
 		this.x *= s;
 		this.y *= s;
@@ -106,7 +108,7 @@ THREE.Vector4.prototype = {
 
 	},
 
-	divideScalar : function ( s ) {
+	divideScalar: function ( s ) {
 
 		if ( s ) {
 
@@ -126,44 +128,44 @@ THREE.Vector4.prototype = {
 	},
 
 
-	negate : function() {
+	negate: function() {
 
 		return this.multiplyScalar( -1 );
 
 	},
 
-	dot : function ( v ) {
+	dot: function ( v ) {
 
 		return this.x * v.x + this.y * v.y + this.z * v.z + this.w * v.w;
 
 	},
 
-	lengthSq : function () {
+	lengthSq: function () {
 
 		return this.dot( this );
 
 	},
 
-	length : function () {
+	length: function () {
 
 		return Math.sqrt( this.lengthSq() );
 
 	},
 
-	normalize : function () {
+	normalize: function () {
 
 		return this.divideScalar( this.length() );
 
 	},
 
-	setLength : function ( l ) {
+	setLength: function ( l ) {
 
 		return this.normalize().multiplyScalar( l );
 
 	},
 
 
-	lerpSelf : function ( v, alpha ) {
+	lerpSelf: function ( v, alpha ) {
 
 		this.x += (v.x - this.x) * alpha;
 		this.y += (v.y - this.y) * alpha;
@@ -172,6 +174,6 @@ THREE.Vector4.prototype = {
 
 		return this;
 
-	},
+	}
 
 };

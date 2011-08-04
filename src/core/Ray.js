@@ -11,6 +11,8 @@ THREE.Ray = function ( origin, direction ) {
 
 THREE.Ray.prototype = {
 
+	constructor: THREE.Ray,
+
 	intersectScene: function ( scene ) {
 
 		return this.intersectObjects( scene.objects );

@@ -763,6 +763,8 @@ THREE.SceneLoader.prototype = {
 
 		};
 
-	}
+	},
+	
+	constructor : THREE.SceneLoader
 
 };

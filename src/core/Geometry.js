@@ -34,6 +34,8 @@ THREE.Geometry = function () {
 
 THREE.Geometry.prototype = {
 
+	constructor : THREE.Geometry,
+
 	computeCentroids: function () {
 
 		var f, fl, face;
