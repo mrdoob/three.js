@@ -586,9 +586,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( geometryGroup.numMorphTargets ) {
 
 			var m, ml;
+
 			geometryGroup.__webglMorphTargetsBuffers = [];
 
-			for ( m = 0, ml = geometryGroup.numMorphTargets; m < ml; m++ ) {
+			for ( m = 0, ml = geometryGroup.numMorphTargets; m < ml; m ++ ) {
 
 				geometryGroup.__webglMorphTargetsBuffers.push( _gl.createBuffer() );
 
@@ -804,7 +805,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			geometryGroup.__morphTargetsArrays = [];
 
-			for ( m = 0, ml = geometryGroup.numMorphTargets; m < ml; m++ ) {
+			for ( m = 0, ml = geometryGroup.numMorphTargets; m < ml; m ++ ) {
 
 				geometryGroup.__morphTargetsArrays.push( new Float32Array( nvertices * 3 ) );
 
@@ -1650,7 +1651,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( dirtyMorphTargets ) {
 
-					for ( vk = 0, vkl = morphTargets.length; vk < vkl; vk++ ) {
+					for ( vk = 0, vkl = morphTargets.length; vk < vkl; vk ++ ) {
 
 						v1 = morphTargets[ vk ].vertices[ face.a ].position;
 						v2 = morphTargets[ vk ].vertices[ face.b ].position;
@@ -2703,59 +2704,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			material.numSupportedMorphTargets = 0;
 
-			if ( attributes.morphTarget0 >= 0 ) {
+			var id, base = "morphTarget";
 
-				_gl.enableVertexAttribArray( attributes.morphTarget0 );
-				material.numSupportedMorphTargets ++;
+			for ( i = 0; i < this.maxMorphTargets; i ++ ) {
 
-			}
+				id = base + i;
 
-			if ( attributes.morphTarget1 >= 0 ) {
+				if ( attributes[ id ] >= 0 ) {
 
-				_gl.enableVertexAttribArray( attributes.morphTarget1 );
-				material.numSupportedMorphTargets ++;
+					_gl.enableVertexAttribArray( attributes[ id ] );
+					material.numSupportedMorphTargets ++;
 
-			}
-
-			if ( attributes.morphTarget2 >= 0 ) {
-
-				_gl.enableVertexAttribArray( attributes.morphTarget2 );
-				material.numSupportedMorphTargets ++;
-
-			}
-
-			if ( attributes.morphTarget3 >= 0 ) {
-
-				_gl.enableVertexAttribArray( attributes.morphTarget3 );
-				material.numSupportedMorphTargets ++;
-
-			}
-
-			if ( attributes.morphTarget4 >= 0 ) {
-
-				_gl.enableVertexAttribArray( attributes.morphTarget4 );
-				material.numSupportedMorphTargets ++;
-
-			}
-
-			if ( attributes.morphTarget5 >= 0 ) {
-
-				_gl.enableVertexAttribArray( attributes.morphTarget5 );
-				material.numSupportedMorphTargets ++;
-
-			}
-
-			if ( attributes.morphTarget6 >= 0 ) {
-
-				_gl.enableVertexAttribArray( attributes.morphTarget6 );
-				material.numSupportedMorphTargets ++;
-
-			}
-
-			if ( attributes.morphTarget7 >= 0 ) {
-
-				_gl.enableVertexAttribArray( attributes.morphTarget7 );
-				material.numSupportedMorphTargets ++;
+				}
 
 			}
 
@@ -2777,7 +2737,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				object.__webglMorphTargetInfluences = new Float32Array( _this.maxMorphTargets );
 
-				for ( var i = 0, il = this.maxMorphTargets; i < il; i ++ ) {
+				for ( var i = 0, il = _this.maxMorphTargets; i < il; i ++ ) {
 
 					object.__webglMorphTargetInfluences[ i ] = 0;
 
@@ -3152,7 +3112,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var attributes = material.program.attributes;
 
-		if (  object.morphTargetBase !== - 1 ) {
+		if ( object.morphTargetBase !== - 1 ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglMorphTargetsBuffers[ object.morphTargetBase ] );
 			_gl.vertexAttribPointer( attributes.position, 3, _gl.FLOAT, false, 0, 0 );
@@ -5218,7 +5178,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		];
 
-		for ( i = 0; i < parameters.maxMorphTargets; i++ ) {
+		for ( i = 0; i < parameters.maxMorphTargets; i ++ ) {
 
 			identifiers.push( "morphTarget" + i );
 

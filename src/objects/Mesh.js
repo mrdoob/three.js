@@ -36,7 +36,7 @@ THREE.Mesh = function ( geometry, materials ) {
 			this.morphTargetInfluences = [];
 			this.morphTargetDictionary = {};
 
-			for( var m = 0; m < this.geometry.morphTargets.length; m++ ) {
+			for( var m = 0; m < this.geometry.morphTargets.length; m ++ ) {
 
 				this.morphTargetInfluences.push( 0 );
 				this.morphTargetDictionary[ this.geometry.morphTargets[ m ].name ] = m;
