@@ -43,6 +43,8 @@ THREE.FirstPersonCamera = function ( parameters ) {
 
 	this.activeLook = true;
 
+        this.moveOnClick = true;
+
 	this.heightSpeed = false;
 	this.heightCoef = 1.0;
 	this.heightMin = 0.0;
@@ -64,6 +66,8 @@ THREE.FirstPersonCamera = function ( parameters ) {
 		if ( parameters.lookVertical !== undefined ) this.lookVertical = parameters.lookVertical;
 
 		if ( parameters.autoForward !== undefined ) this.autoForward = parameters.autoForward;
+
+	        if ( parameters.moveOnClick !== undefined ) this.moveOnClick = parameters.moveOnClick;
 
 		if ( parameters.activeLook !== undefined ) this.activeLook = parameters.activeLook;
 
@@ -106,7 +110,7 @@ THREE.FirstPersonCamera = function ( parameters ) {
 		event.preventDefault();
 		event.stopPropagation();
 
-		if ( this.activeLook ) {
+		if ( this.activeLook && this.moveOnClick ) {
 
 			switch ( event.button ) {
 
@@ -126,7 +130,7 @@ THREE.FirstPersonCamera = function ( parameters ) {
 		event.preventDefault();
 		event.stopPropagation();
 
-		if ( this.activeLook ) {
+		if ( this.activeLook && this.moveOnClick ) {
 
 			switch ( event.button ) {
 
