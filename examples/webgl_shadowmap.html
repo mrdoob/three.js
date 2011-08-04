@@ -57,10 +57,6 @@
 
 			var sceneHUD, cameraOrtho, hudMaterial;
 
-			var initPos = new THREE.Vector3( 700, 50, 1900 );
-			var initLight = new THREE.Vector3( 0, 1500, 1000 );
-			var deltaCam = new THREE.Vector3();
-
 			var morphs = [];
 
 			var light;
@@ -83,11 +79,6 @@
 
 				camera.position.set( 700, 50, 1900 );
 				camera.lon = -110;
-
-				// SHADOW TEXTURE
-
-				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat };
-				shadowTexture = new THREE.WebGLRenderTarget( SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT, pars );
 
 				// SCENE
 
