@@ -3586,7 +3586,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						setObjectFaces( object );
 
-						material = object.geometry.morphTargets.length ? _depthMaterialMorph : _depthMaterial;
+						if ( object.customDepthMaterial ) {
+
+							material =  object.customDepthMaterial;
+
+						} else if ( object.geometry.morphTargets.length ) {
+
+							material =  _depthMaterialMorph;
+
+						} else {
+
+							material = _depthMaterial;
+
+						}
 
 						renderBuffer( _cameraLight, lights, fog, material, buffer, object );
 

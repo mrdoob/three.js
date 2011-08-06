@@ -191,8 +191,8 @@ THREE.GeometryUtils = {
 			point = new THREE.Vector3(),
 			tmp = THREE.GeometryUtils.__v1;
 
-		a = Math.random();
-		b = Math.random();
+		a = THREE.GeometryUtils.random();
+		b = THREE.GeometryUtils.random();
 
 		if ( ( a + b ) > 1 ) {
 
@@ -268,7 +268,7 @@ THREE.GeometryUtils = {
 
 			}
 
-			var r = Math.random() * ( area1 + area2 );
+			var r = THREE.GeometryUtils.random() * ( area1 + area2 );
 
 			if ( r < area1 ) {
 
@@ -378,7 +378,7 @@ THREE.GeometryUtils = {
 
 		for ( i = 0; i < n; i ++ ) {
 
-			r = Math.random() * totalArea;
+			r = THREE.GeometryUtils.random() * totalArea;
 
 			index = binarySearchIndices( r );
 
@@ -421,8 +421,19 @@ THREE.GeometryUtils = {
 
 		return Math.sqrt( s * ( s - a ) * ( s - b ) * ( s - c ) );
 
+	},
+
+	// Get 16 bits of randomness
+	// (standard Math.random() creates repetitive patterns when applied over larger space)
+
+	random16: function() {
+
+		return ( 65280 * Math.random() + 255 * Math.random() ) / 65535;
+
 	}
 
 };
+
+THREE.GeometryUtils.random = THREE.GeometryUtils.random16;
 
 THREE.GeometryUtils.__v1 = new THREE.Vector3();
