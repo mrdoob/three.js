@@ -1429,7 +1429,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( dirtyElements ) {
 
-					faceArray[ offset_face ] = vertexIndex;
+					faceArray[ offset_face ] 	 = vertexIndex;
 					faceArray[ offset_face + 1 ] = vertexIndex + 1;
 					faceArray[ offset_face + 2 ] = vertexIndex + 2;
 
@@ -2111,7 +2111,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( dirtyVertices ) {
 
-			for ( v = 0; v < vl; v++ ) {
+			for ( v = 0; v < vl; v ++ ) {
 
 				vertex = vertices[ v ].position;
 
@@ -2130,7 +2130,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( dirtyColors ) {
 
-			for ( c = 0; c < cl; c++ ) {
+			for ( c = 0; c < cl; c ++ ) {
 
 				color = colors[ c ];
 
@@ -2165,7 +2165,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( dirtyVertices ) {
 
-			for ( v = 0; v < vl; v++ ) {
+			for ( v = 0; v < vl; v ++ ) {
 
 				vertex = vertices[ v ].position;
 
@@ -2184,7 +2184,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( dirtyColors ) {
 
-			for ( c = 0; c < cl; c++ ) {
+			for ( c = 0; c < cl; c ++ ) {
 
 				color = colors[ c ];
 
@@ -2265,7 +2265,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			for ( c = 0; c < cl; c++ ) {
+			for ( c = 0; c < cl; c ++ ) {
 
 				offset = c * 3;
 
@@ -2368,7 +2368,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( dirtyColors ) {
 
-				for ( c = 0; c < cl; c++ ) {
+				for ( c = 0; c < cl; c ++ ) {
 
 					color = colors[ c ];
 
@@ -3407,7 +3407,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		transparent.count = 0;
 		opaque.count = 0;
 
-		for ( m = 0, ml = object.materials.length; m < ml; m++ ) {
+		for ( m = 0, ml = object.materials.length; m < ml; m ++ ) {
 
 			material = object.materials[ m ];
 			material.transparent ? addToFixedArray( transparent, material ) : addToFixedArray( opaque, material );
@@ -3427,13 +3427,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 		transparent.count = 0;
 		opaque.count = 0;
 
-		for ( m = 0, ml = object.materials.length; m < ml; m++ ) {
+		for ( m = 0, ml = object.materials.length; m < ml; m ++ ) {
 
 			meshMaterial = object.materials[ m ];
 
 			if ( meshMaterial instanceof THREE.MeshFaceMaterial ) {
 
-				for ( i = 0, l = buffer.materials.length; i < l; i++ ) {
+				for ( i = 0, l = buffer.materials.length; i < l; i ++ ) {
 
 					material = buffer.materials[ i ];
 					if ( material ) material.transparent ? addToFixedArray( transparent, material ) : addToFixedArray( opaque, material );
@@ -3607,7 +3607,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 
-				for ( o = 0; o < oil; o++ ) {
+				for ( o = 0; o < oil; o ++ ) {
 
 					webglObject = scene.__webglObjectsImmediate[ o ];
 					object = webglObject.object;
@@ -3678,7 +3678,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		ol = scene.__webglObjects.length;
 
-		for ( o = 0; o < ol; o++ ) {
+		for ( o = 0; o < ol; o ++ ) {
 
 			webglObject = scene.__webglObjects[ o ];
 			object = webglObject.object;
@@ -3734,7 +3734,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		oil = scene.__webglObjectsImmediate.length;
 
-		for ( o = 0; o < oil; o++ ) {
+		for ( o = 0; o < oil; o ++ ) {
 
 			webglObject = scene.__webglObjectsImmediate[ o ];
 			object = webglObject.object;
@@ -3777,7 +3777,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			for ( o = 0; o < oil; o++ ) {
+			for ( o = 0; o < oil; o ++ ) {
 
 				webglObject = scene.__webglObjectsImmediate[ o ];
 				object = webglObject.object;
@@ -3796,10 +3796,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 		} else {
 
 			// opaque pass
+			// (front-to-back order)
 
 			setBlending( THREE.NormalBlending );
 
-			for ( o = 0; o < ol; o ++ ) {
+			for ( o = ol - 1; o >= 0; o -- ) {
 
 				webglObject = scene.__webglObjects[ o ];
 
@@ -3855,6 +3856,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 			// transparent pass
+			// (back-to-front order)
 
 			for ( o = 0; o < ol; o ++ ) {
 
