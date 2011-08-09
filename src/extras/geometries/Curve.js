@@ -91,17 +91,19 @@ THREE.Curve.prototype.getLength = function () {
 THREE.Curve.prototype.getLengths = function ( divisions ) {
 
 	if ( !divisions ) divisions = 200;
-
-	if ( this.cacheLengths && ( this.cacheLengths.length == divisions ) ) {
+	
+	if ( this.cacheLengths && ( this.cacheLengths.length == divisions + 1 ) ) {
 
 		//console.log( "cached", this.cacheLengths );
 		return this.cacheLengths;
 
 	}
-
+	
 	var cache = [];
 	var current, last = this.getPoint( 0 );
 	var p, sum = 0;
+	
+	cache.push(0);
 
 	for ( p = 1; p <= divisions; p++ ) {
 
@@ -113,42 +115,89 @@ THREE.Curve.prototype.getLengths = function ( divisions ) {
 	}
 
 	this.cacheLengths = cache;
+	
 	return cache; // { sums: cache, sum:sum }; Sum is in the last element.
 
 };
 
 // Given u ( 0 .. 1 ), get a t to find p. This gives you points which are equi distance
-
 THREE.Curve.prototype.getUtoTmapping = function ( u, distance ) {
 
-	var lengths = this.getLengths();
-	var i = 0, il = lengths.length;
+	var arcLengths = this.getLengths();
+	var i = 0, il = arcLengths.length;
 
-	var distanceForU;
+	var targetArcLength; // The targetted u distance value to get
 
 	if ( distance ) {
 
-		distanceForU = distance;
+		targetArcLength = distance;
 
 	} else {
 
-		distanceForU = u * lengths[ il - 1 ];
+		targetArcLength = u * arcLengths[ il - 1 ];
 
 	}
 
-	// TODO Should do binary search + sub division + interpolation when needed
+	// // TODO Should do binary search + sub division + interpolation when needed
+	// time = Date.now();
+	// while ( i < il ) {
+	// 	
+	// 	i++;
+	// 
+	// 	if ( targetArcLength < arcLengths[ i ] ) break;
+	// 
+	// }
+	// 
+	// i--;
+	// console.log('o' , i, Date.now()- time);
+	
+	time = Date.now();
+	// binary search for the index with largest value smaller than target u distance
+	var low=0, high = il-1, comparison;
 
-	while ( i < il ) {
+	while (low <= high) {
 
-		if ( lengths[ i ] > distanceForU ) break;
-
-		i++;
-
+		i = Math.floor((low + high) / 2);
+	  	comparison = arcLengths[ i ] - targetArcLength;
+		
+	  	if (comparison < 0) { 
+			low = i + 1; continue; 
+		} else if (comparison > 0) {
+			high = i - 1; continue; 
+		} else {
+			high = i;
+			break;
+			// DONE
+		}
+	
 	}
+	
+	i = high;
+	
+	//console.log('b' , i, low, high, Date.now()- time);
 
-	var t = i / il;
+	
+	if (arcLengths[i] == targetArcLength) {
+		var t = i / (il - 1);
+		return t;
+	}
+	
+	// We could get finer grain ar lengths, or use simple interpolatation between two points
+	var lengthBefore = arcLengths[i];
+    var lengthAfter = arcLengths[i+1];
+    var segmentLength = lengthAfter - lengthBefore;
+
+    // determine where we are between the 'before' and 'after' points.
+    var segmentFraction = (targetArcLength - lengthBefore) / segmentLength;
+
+    // add that fractional amount to t 
+    t = (i + segmentFraction) / (il -1);
+
 	return t;
-
+	
+	
+	
+	
 };
 
 
@@ -180,6 +229,14 @@ THREE.LineCurve.prototype.getPoint = function ( t ) {
 	return new THREE.Vector2( tx, ty );
 
 };
+
+THREE.LineCurve.prototype.getNormalVector = function( t ) {
+	tx = this.x2 - this.x1;
+	ty = this.y2 - this.y1;
+
+	// return normal unit vector
+	return new THREE.Vector2( -ty , tx ).unit();
+}
 
 /**************************************************************
  *	Quadratic Bezier curve
@@ -223,14 +280,14 @@ THREE.QuadraticBezierCurve.prototype.getNormalVector = function( t ) {
 
 	var x0, y0, x1, y1, x2, y2;
 
-	x0 = this.actions[ 0 ].args[ 0 ];
-	y0 = this.actions[ 0 ].args[ 1 ];
-
-	x1 = this.actions[ 1 ].args[ 0 ];
-	y1 = this.actions[ 1 ].args[ 1 ];
-
-	x2 = this.actions[ 1 ].args[ 2 ];
-	y2 = this.actions[ 1 ].args[ 3 ];
+	// x0 = this.actions[ 0 ].args[ 0 ];
+	// y0 = this.actions[ 0 ].args[ 1 ];
+	// 
+	// x1 = this.actions[ 1 ].args[ 0 ];
+	// y1 = this.actions[ 1 ].args[ 1 ];
+	// 
+	// x2 = this.actions[ 1 ].args[ 2 ];
+	// y2 = this.actions[ 1 ].args[ 3 ];
 
 	var tx, ty;
 

@@ -517,16 +517,28 @@ THREE.Path.prototype.createGeometry = function( points ) {
 // FUTURE refactor path = an array of lines -> straight, bezier, splines, arc, funcexpr lines
 // Read http://www.planetclegg.com/projects/WarpingTextToSplines.html
 
-THREE.Path.prototype.transform = function( path ) {
+// This returns getPoints() bend/wrapped around the contour of a path.
 
-	path = new THREE.Path();
-	path.moveTo( 0, 0 );
-	path.quadraticCurveTo( 100, 20, 140, 80 );
+THREE.Path.prototype.transform = function( path, segments ) {
 
-	console.log( path.cacheArcLengths() );
+	var bounds = this.getBoundingBox();
+	var oldPts = this.getPoints( segments ); // getPoints getSpacedPoints
+	
+	// path = new THREE.Path();
+	// path.moveTo( 0, 0 );
+	// path.quadraticCurveTo( 100, 20, 140, 80 );
+	
+	path = new THREE.QuadraticBezierCurve( 0, 0, 150, 100, 400, 0)
+	//path = new THREE.QuadraticBezierCurve( 0, 0,  bounds.maxX/2, 50, bounds.maxX , 0);
+	
+	//path = new THREE.LineCurve( 0, 0,  400, 0);
+	
 
-	var thisBounds = this.getBoundingBox();
-	var oldPts = this.getPoints();
+	//console.log( path.cacheArcLengths() );
+	//path.getLengths(400);
+	//segments = 40;
+	
+	
 
 	var i, il, p, oldX, oldY, xNorm;
 
@@ -537,19 +549,19 @@ THREE.Path.prototype.transform = function( path ) {
 		oldX = p.x;
 		oldY = p.y;
 
-		var xNorm = oldX/ thisBounds.maxX;
+		var xNorm = oldX/ bounds.maxX;
 
 		// If using actual distance, for length > path, requires line extrusions
 		//xNorm = path.getUtoTmapping(xNorm, oldX); // 3 styles. 1) wrap stretched. 2) wrap stretch by arc length 3) warp by actual distance
 
+		xNorm = path.getUtoTmapping(xNorm, oldX );
+		
 		var pathPt = path.getPoint( xNorm );
 		var normal = path.getNormalVector( xNorm ).multiplyScalar( oldY );
 
 		p.x = pathPt.x + normal.x;
 		p.y = pathPt.y + normal.y;
 
-		//p.x = a * oldX + b * oldY + c;
-		//p.y = d * oldY + e * oldX + f;
 
 	}
 

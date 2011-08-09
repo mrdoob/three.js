@@ -63,6 +63,8 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 	var curveSegments = options.curveSegments !== undefined ? options.curveSegments : 12;
 
 	var steps = options.steps !== undefined ? options.steps : 1;
+	
+	var bendPath = options.bendPath;
 
 	var extrudePath = options.path !== undefined ? options.path : null;
 	var extrudePts, extrudeByPath = false;
@@ -98,7 +100,9 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 	var shapesOffset = this.vertices.length;
 
 	var shapePoints = shape.extractAllPoints( curveSegments ); // use shape.extractAllSpacedPoints( curveSegments ) for points with equal divisions
+	shapePoints = shape.extractAllPointsWithBend( curveSegments, bendPath ); 
 
+	
     var vertices = shapePoints.shape;
 	var holes = shapePoints.holes;
 
@@ -129,7 +133,11 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	var faces = THREE.Shape.Utils.triangulateShape ( vertices, holes );
 	//var faces = THREE.Shape.Utils.triangulate2( vertices, holes );
-
+	
+	// shapePoints = shape.extractAllPointsWithBend( curveSegments, bendPath ); 
+	// 	vertices = shapePoints.shape;
+	// 	holes = shapePoints.holes;
+	
 	//console.log(faces);
 
 	////

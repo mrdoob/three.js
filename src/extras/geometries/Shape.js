@@ -30,14 +30,23 @@ THREE.Shape.prototype.extrude = function ( options ) {
 
 // Get points of holes
 
-THREE.Shape.prototype.getPointsHoles = function ( divisions ) {
+THREE.Shape.prototype.getPointsHoles = function ( divisions, bend ) {
 
 
 	var i, il = this.holes.length, holesPts = [];
 
 	for ( i = 0; i < il; i ++ ) {
 
-		holesPts[ i ] = this.holes[ i ].getPoints( divisions );
+		if (bend) {
+			
+			holesPts[ i ] = this.holes[ i ].transform( bend, divisions );
+			
+		} else {
+			
+			holesPts[ i ] = this.holes[ i ].getPoints( divisions );
+		
+		}
+		
 
 	}
 
@@ -70,6 +79,17 @@ THREE.Shape.prototype.extractAllPoints = function ( divisions ) {
 
 		shape: this.getPoints( divisions ),
 		holes: this.getPointsHoles( divisions )
+
+	};
+
+};
+
+THREE.Shape.prototype.extractAllPointsWithBend = function ( divisions, bend ) {
+
+	return {
+
+		shape: this.transform( bend, divisions ),
+		holes: this.getPointsHoles( divisions, bend )
 
 	};
 
@@ -131,16 +151,13 @@ THREE.Shape.Utils = {
 
 			shortest = Number.POSITIVE_INFINITY;
 
-			// THIS THING NEEDS TO BE DONE CORRECTLY AGAIN :(
-
+			
 			// Find the shortest pair of pts between shape and hole
 
 			// Note: Actually, I'm not sure now if we could optimize this to be faster than O(m*n)
 			// Using distanceToSquared() intead of distanceTo() should speed a little
 			// since running square roots operations are reduced.
-			// http://en.wikipedia.org/wiki/Closest_pair_of_points
-			// http://stackoverflow.com/questions/1602164/shortest-distance-between-points-algorithm
-
+			
 			for ( h2 = 0; h2 < hole.length; h2 ++ ) {
 
 				pts1 = hole[ h2 ];
@@ -276,7 +293,6 @@ THREE.Shape.Utils = {
 			verts.push( triangleb );
 
 			shape = tmpShape1.concat( tmpHole1 ).concat( tmpHole2 ).concat( tmpShape2 );
-			//shape = tmpHole1.concat( tmpHole2 );
 
 		}
 

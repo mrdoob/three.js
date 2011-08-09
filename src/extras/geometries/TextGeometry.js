@@ -49,6 +49,13 @@ THREE.TextGeometry = function ( text, parameters ) {
 	if ( parameters.bevelThickness === undefined ) parameters.bevelThickness = 10;
 	if ( parameters.bevelSize === undefined ) parameters.bevelSize = 8;
 	if ( parameters.bevelEnabled === undefined ) parameters.bevelEnabled = false;
+	
+	
+	var bend = new THREE.Path();
+	bend.moveTo(0,0);
+	bend.quadraticCurveTo( 500, 100, 1000, 0 );
+	
+	parameters.bendPath = bend;
 
 	THREE.ExtrudeGeometry.call( this, textShapes, parameters );
 
