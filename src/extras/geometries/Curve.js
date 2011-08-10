@@ -200,13 +200,51 @@ THREE.Curve.prototype.getUtoTmapping = function ( u, distance ) {
 	
 };
 
+// In case any sub curves does not implements its normal finding, 
+// we get 2 points with a small delta, and find a gradient of the 2 pts
+// makes an ok approximation
+
+THREE.Curve.prototype.getNormalVector = function( t ) {
+
+	var pt1 = this.getPoint(t-0.001);
+	var pt2 = this.getPoint(t+0.001);
+	
+	
+	__vec1.sub(pt2, pt1);
+	return new THREE.Vector2( -__vec1.y , __vec1.x ).unit();
+
+};
+
+THREE.Curve.prototype.getTangentUnit = function( t ) {
+
+	var pt1 = this.getPoint(t-0.001);
+	var pt2 = this.getPoint(t+0.001);
+	
+	
+	__vec1.sub(pt2, pt1);
+	return new THREE.Vector2( __vec1.x , __vec1.y ).unit();
+
+};
+
+
+var __vec1 = new THREE.Vector2(); // tmp Vector
 
 /**************************************************************
  *	Line
  **************************************************************/
 
-THREE.LineCurve = function ( x1, y1, x2, y2 ) {
 
+
+THREE.LineCurve = function ( v1, v2 ) {
+
+	this.v1 = v1;
+	this.v2 = v2;
+
+};
+
+THREE.LineCurve.oldConstruct = function ( x1, y1, x2, y2 ) {
+	//instanceof THREE.Vector2  oldConstruct.apply(this);
+	
 	this.x1 = x1;
 	this.y1 = y1;
 
@@ -219,18 +257,29 @@ THREE.LineCurve.prototype = new THREE.Curve();
 THREE.LineCurve.prototype.constructor = THREE.LineCurve;
 
 THREE.LineCurve.prototype.getPoint = function ( t ) {
-
-	var dx = this.x2 - this.x1;
-	var dy = this.y2 - this.y1;
-
-	var tx = this.x1 + dx * t;
-	var ty = this.y1 + dy * t;
-
-	return new THREE.Vector2( tx, ty );
+	
+	var tmpVector = new THREE.Vector2();
+	tmpVector.sub(this.v2, this.v1);
+	tmpVector.multiplyScalar(t);
+	return tmpVector;
+	
+	// var dx = this.x2 - this.x1;
+	// 	var dy = this.y2 - this.y1;
+	// 
+	// 	var tx = this.x1 + dx * t;
+	// 	var ty = this.y1 + dy * t;
+	// 
+	// 	return new THREE.Vector2( tx, ty );
 
 };
 
 THREE.LineCurve.prototype.getNormalVector = function( t ) {
+	
+	//__vec1 = new THREE.Vector2();
+	__vec1.sub(this.v2, this.v1);
+	return new THREE.Vector2( -__vec1.y , __vec1.x ).unit();
+	
+	
 	tx = this.x2 - this.x1;
 	ty = this.y2 - this.y1;
 
@@ -242,7 +291,16 @@ THREE.LineCurve.prototype.getNormalVector = function( t ) {
  *	Quadratic Bezier curve
  **************************************************************/
 
-THREE.QuadraticBezierCurve = function ( x0, y0, x1, y1, x2, y2 ) {
+
+THREE.QuadraticBezierCurve = function ( v0, v1, v2 ) {
+
+	this.v0 = v0;
+	this.v1 = v1;
+	this.v2 = v2;
+
+};
+
+THREE.QuadraticBezierCurve.old = function ( x0, y0, x1, y1, x2, y2 ) {
 
 	this.x0 = x0;
 	this.y0 = y0;
@@ -255,6 +313,7 @@ THREE.QuadraticBezierCurve = function ( x0, y0, x1, y1, x2, y2 ) {
 
 };
 
+
 THREE.QuadraticBezierCurve.prototype = new THREE.Curve();
 THREE.QuadraticBezierCurve.prototype.constructor = THREE.QuadraticBezierCurve;
 
@@ -262,23 +321,26 @@ THREE.QuadraticBezierCurve.prototype.constructor = THREE.QuadraticBezierCurve;
 THREE.QuadraticBezierCurve.prototype.getPoint = function ( t ) {
 
 	var tx, ty;
+	
+	tx = THREE.Shape.Utils.b2( t, this.v0.x, this.v1.x, this.v2.x );
+	ty = THREE.Shape.Utils.b2( t, this.v0.y, this.v1.y, this.v2.y );
 
-	tx = THREE.Shape.Utils.b2( t, this.x0, this.x1, this.x2 );
-	ty = THREE.Shape.Utils.b2( t, this.y0, this.y1, this.y2 );
+	// tx = THREE.Shape.Utils.b2( t, this.x0, this.x1, this.x2 );
+	// 	ty = THREE.Shape.Utils.b2( t, this.y0, this.y1, this.y2 );
 
 	return new THREE.Vector2( tx, ty );
 
 };
 
 
-THREE.QuadraticBezierCurve.prototype.getNormalVector = function( t ) {
+THREE.QuadraticBezierCurve.prototype.getNormalVector2 = function( t ) {
 
 	// iterate sub segments
 	// 	get lengths for sub segments
 	// 	if segment is bezier
 	//		perform subdivisions or perform integrals
 
-	var x0, y0, x1, y1, x2, y2;
+	// var x0, y0, x1, y1, x2, y2;
 
 	// x0 = this.actions[ 0 ].args[ 0 ];
 	// y0 = this.actions[ 0 ].args[ 1 ];
@@ -291,8 +353,8 @@ THREE.QuadraticBezierCurve.prototype.getNormalVector = function( t ) {
 
 	var tx, ty;
 
-	tx = THREE.Curve.Utils.tangentQuadraticBezier( t, this.x0, this.x1, this.x2 );
-	ty = THREE.Curve.Utils.tangentQuadraticBezier( t, this.y0, this.y1, this.y2 );
+	tx = THREE.Curve.Utils.tangentQuadraticBezier( t, this.v0.x, this.v1.x, this.v2.x );
+	ty = THREE.Curve.Utils.tangentQuadraticBezier( t, this.v0.y, this.v1.y, this.v2.y );
 
 	// return normal unit vector
 	return new THREE.Vector2( -ty , tx ).unit();
@@ -304,7 +366,16 @@ THREE.QuadraticBezierCurve.prototype.getNormalVector = function( t ) {
  *	Cubic Bezier curve
  **************************************************************/
 
-THREE.CubicBezierCurve = function ( x0, y0, x1, y1, x2, y2, x3, y3 ) {
+THREE.CubicBezierCurve = function ( v0, v1, v2, v3 ) {
+
+	this.v0 = v0;
+	this.v1 = v1;
+	this.v2 = v2;
+	this.v3 = v3;
+	
+};
+
+THREE.CubicBezierCurve.old = function ( x0, y0, x1, y1, x2, y2, x3, y3 ) {
 
 	this.x0 = x0;
 	this.y0 = y0;
@@ -326,13 +397,26 @@ THREE.CubicBezierCurve.prototype.constructor = THREE.CubicBezierCurve;
 THREE.CubicBezierCurve.prototype.getPoint = function ( t ) {
 
 	var tx, ty;
-
-	tx = THREE.Shape.Utils.b3( t, this.x0, this.x1, this.x2, this.x3 );
-	ty = THREE.Shape.Utils.b3( t, this.y0, this.y1, this.y2, this.y3 );
+	
+	tx = THREE.Shape.Utils.b3( t, this.v0.x, this.v1.x, this.v2.x, this.v3.x );
+	ty = THREE.Shape.Utils.b3( t, this.v0.y, this.v1.y, this.v2.y, this.v3.y );
 
 	return new THREE.Vector2( tx, ty );
 
 };
+
+THREE.CubicBezierCurve.prototype.getNormalVector = function( t ) {
+
+	var tx, ty;
+
+	tx = THREE.Curve.Utils.tangentCubicBezier( t, this.v0.x, this.v1.x, this.v2.x, this.v3.x );
+	ty = THREE.Curve.Utils.tangentCubicBezier( t, this.v0.y, this.v1.y, this.v2.y, this.v3.y );
+
+	// return normal unit vector
+	return new THREE.Vector2( -ty , tx ).unit();
+
+};
+
 
 /**************************************************************
  *	Spline curve
@@ -422,6 +506,20 @@ THREE.Curve.Utils = {
 		return 2 * ( 1 - t ) * ( p1 - p0 ) + 2 * t * ( p2 - p1 );
 
 	},
+	
+	//derivative
+	tangentCubicBezier: function (t, p0, p1, p2, p3 ) {
+		// return -3 * (1 - 2*t + t*t) * p0 - 
+		// 		            3 * t * (4 - 3*t) * p1 + 
+		// 		            3 * t * (2 - 3*t) * p2 + 
+		// 		            3 * t * t * p3;
+		
+		return -3 * p0 * (1 - t) * (1 - t)  +
+			3 * p1 * (1 - t) * (1-t) - 6 *t *p1 * (1-t) +
+			6 * t *  p2 * (1-t) - 3 * t * t * p2 + 
+			3 * t * t * p3;
+	},
+	
 
 	tangentSpline: function ( t, p0, p1, p2, p3 ) {
 
@@ -515,7 +613,7 @@ THREE.LineCurve3 = THREE.Curve.create(
 
 THREE.QuadraticBezierCurve3 = THREE.Curve.create(
 
-	function ( v0, v1, v2 ) { // Qn should we use 2 Vector3 instead?
+	function ( v0, v1, v2 ) {
 
 		this.v0 = v0;
 		this.v1 = v1;

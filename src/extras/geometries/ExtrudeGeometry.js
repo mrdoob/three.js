@@ -100,7 +100,10 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 	var shapesOffset = this.vertices.length;
 
 	var shapePoints = shape.extractAllPoints( curveSegments ); // use shape.extractAllSpacedPoints( curveSegments ) for points with equal divisions
-	shapePoints = shape.extractAllPointsWithBend( curveSegments, bendPath ); 
+	
+	if (bendPath) {
+		shapePoints = shape.extractAllPointsWithBend( curveSegments, bendPath ); 
+	}
 
 	
     var vertices = shapePoints.shape;

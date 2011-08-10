@@ -50,12 +50,34 @@ THREE.TextGeometry = function ( text, parameters ) {
 	if ( parameters.bevelSize === undefined ) parameters.bevelSize = 8;
 	if ( parameters.bevelEnabled === undefined ) parameters.bevelEnabled = false;
 	
+	if ( parameters.bend ) {
+		
+		var b = textShapes[textShapes.length-1].getBoundingBox();
+		var max = b.maxX;
+		
+		parameters.bendPath = new THREE.QuadraticBezierCurve( new THREE.Vector2(0, 0), 
+			 		new THREE.Vector2(max/2, 120), new THREE.Vector2(max, 0));
+		
+	}
 	
-	var bend = new THREE.Path();
-	bend.moveTo(0,0);
-	bend.quadraticCurveTo( 500, 100, 1000, 0 );
+	// path = new THREE.CubicBezierCurve( new THREE.Vector2(0, 0), 
+	//  		new THREE.Vector2(100, 100), new THREE.Vector2(200, 100), new THREE.Vector2(500, 0));
+	// 
+	//path = new THREE.QuadraticBezierCurve( 0, 0,  bounds.maxX/2, 50, bounds.maxX , 0);
 	
-	parameters.bendPath = bend;
+	//path = new THREE.LineCurve( 0, 0,  400, 0);
+	//path = new THREE.LineCurve( new THREE.Vector2(0, 0),  new THREE.Vector2(400, 100));
+	
+	// var bend = new THREE.Path();
+	// bend.moveTo(0,0);
+	// bend.quadraticCurveTo( 500, 100, 1000, 0 );
+	// 
+	
+	// parameters.bendPath = path;
+	
+	
+
+
 
 	THREE.ExtrudeGeometry.call( this, textShapes, parameters );
 

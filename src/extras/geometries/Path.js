@@ -514,9 +514,7 @@ THREE.Path.prototype.createGeometry = function( points ) {
 // ALL THINGS BELOW TO BE REFACTORED
 // QN: Transform final pts or transform ACTIONS or add transform filters?
 
-// FUTURE refactor path = an array of lines -> straight, bezier, splines, arc, funcexpr lines
 // Read http://www.planetclegg.com/projects/WarpingTextToSplines.html
-
 // This returns getPoints() bend/wrapped around the contour of a path.
 
 THREE.Path.prototype.transform = function( path, segments ) {
@@ -524,21 +522,9 @@ THREE.Path.prototype.transform = function( path, segments ) {
 	var bounds = this.getBoundingBox();
 	var oldPts = this.getPoints( segments ); // getPoints getSpacedPoints
 	
-	// path = new THREE.Path();
-	// path.moveTo( 0, 0 );
-	// path.quadraticCurveTo( 100, 20, 140, 80 );
-	
-	path = new THREE.QuadraticBezierCurve( 0, 0, 150, 100, 400, 0)
-	//path = new THREE.QuadraticBezierCurve( 0, 0,  bounds.maxX/2, 50, bounds.maxX , 0);
-	
-	//path = new THREE.LineCurve( 0, 0,  400, 0);
-	
-
 	//console.log( path.cacheArcLengths() );
-	//path.getLengths(400);
+	path.getLengths(400);
 	//segments = 40;
-	
-	
 
 	var i, il, p, oldX, oldY, xNorm;
 
@@ -555,6 +541,7 @@ THREE.Path.prototype.transform = function( path, segments ) {
 		//xNorm = path.getUtoTmapping(xNorm, oldX); // 3 styles. 1) wrap stretched. 2) wrap stretch by arc length 3) warp by actual distance
 
 		xNorm = path.getUtoTmapping(xNorm, oldX );
+		// check for out of bounds?
 		
 		var pathPt = path.getPoint( xNorm );
 		var normal = path.getNormalVector( xNorm ).multiplyScalar( oldY );
