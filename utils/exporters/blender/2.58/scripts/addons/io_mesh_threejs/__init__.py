@@ -24,7 +24,7 @@
 bl_info = {
     "name": "three.js format",
     "author": "mrdoob, kikko, alteredq, remoe, pxf",
-    "version": (1, 0, 2),
+    "version": (1, 1, 0),
     "blender": (2, 5, 7),
     "api": 35622,
     "location": "File > Import-Export",
@@ -183,6 +183,10 @@ def save_settings_export(properties):
     "option_lights" : properties.option_lights,
     "option_cameras" : properties.option_cameras,
 
+    "option_animation" : properties.option_animation,
+    "option_frame_step" : properties.option_frame_step,
+    "option_all_meshes" : properties.option_all_meshes,
+
     "option_flip_yz"      : properties.option_flip_yz,
 
     "option_materials"       : properties.option_materials,
@@ -235,6 +239,10 @@ def restore_settings_export(properties):
     properties.option_lights = settings.get("option_lights", False)
     properties.option_cameras = settings.get("option_cameras", False)
 
+    properties.option_animation = settings.get("option_animation", False)
+    properties.option_frame_step = settings.get("option_frame_step", 1)
+    properties.option_all_meshes = settings.get("option_all_meshes", True)
+
 # ################################################################
 # Exporter
 # ################################################################
@@ -268,12 +276,16 @@ class ExportTHREEJS(bpy.types.Operator, ExportHelper):
     option_flip_yz = BoolProperty(name = "Flip YZ", description = "Flip YZ", default = True)
 
     option_export_scene = BoolProperty(name = "Scene", description = "Export scene", default = False)
-    option_embed_meshes = BoolProperty(name = "Embed", description = "Embed meshes", default = True)
+    option_embed_meshes = BoolProperty(name = "Embed meshes", description = "Embed meshes", default = True)
     option_copy_textures = BoolProperty(name = "Copy textures", description = "Copy textures", default = False)
     option_url_base_html = BoolProperty(name = "HTML as url base", description = "Use HTML as url base ", default = False)
 
     option_lights = BoolProperty(name = "Lights", description = "Export default scene lights", default = False)
     option_cameras = BoolProperty(name = "Cameras", description = "Export default scene cameras", default = False)
+
+    option_animation = BoolProperty(name = "Animation", description = "Export animation (morphs)", default = False)
+    option_frame_step = IntProperty(name = "Frame step", description = "Animation frame step", min = 1, max = 1000, soft_min = 1, soft_max = 1000, default = 1)
+    option_all_meshes = BoolProperty(name = "All meshes", description = "All meshes (merged)", default = True)
 
     def invoke(self, context, event):
         restore_settings_export(self.properties)
@@ -346,17 +358,36 @@ class ExportTHREEJS(bpy.types.Operator, ExportHelper):
         layout.separator()
 
         row = layout.row()
-        row.label(text="Beta:")
+        row.label(text="--------- Experimental ---------")
+        layout.separator()
+
+        row = layout.row()
+        row.label(text="Scene:")
 
         row = layout.row()
         row.prop(self.properties, "option_export_scene")
+        row.prop(self.properties, "option_embed_meshes")
 
         row = layout.row()
         row.prop(self.properties, "option_lights")
         row.prop(self.properties, "option_cameras")
+        layout.separator()
 
         row = layout.row()
-        row.prop(self.properties, "option_embed_meshes")
+        row.label(text="Animation:")
+
+        row = layout.row()
+        row.prop(self.properties, "option_animation")
+        row.prop(self.properties, "option_frame_step")
+        layout.separator()
+
+        row = layout.row()
+        row.label(text="Settings:")
+
+        row = layout.row()
+        row.prop(self.properties, "option_all_meshes")
+
+        row = layout.row()
         row.prop(self.properties, "option_copy_textures")
 
         row = layout.row()
