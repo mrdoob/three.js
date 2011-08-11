@@ -862,7 +862,8 @@ def handle_texture(id, textures, material, filepath, option_copy_textures):
 # ASCII model generator
 # #####################################################
 
-def generate_ascii_model(meshes, scene,
+def generate_ascii_model(meshes, morphs,
+                         scene,
                          option_vertices,
                          option_vertices_truncate,
                          option_faces,
@@ -875,7 +876,9 @@ def generate_ascii_model(meshes, scene,
                          flipyz,
                          option_scale,
                          option_copy_textures,
-                         filepath):
+                         filepath,
+                         option_animation,
+                         option_frame_step):
 
     vertices = []
 
@@ -935,11 +938,21 @@ def generate_ascii_model(meshes, scene,
             mesh_materials, nmaterial = generate_materials_string(mesh, scene, mesh_extract_colors, object.draw_type, option_copy_textures, filepath, nmaterial)
             materials.append(mesh_materials)
 
-    edges_string = ""
-    nedges = 0
 
     morphTargets_string = ""
     nmorphTarget = 0
+
+    if option_animation:
+        chunks = []
+        for i, morphVertices in enumerate(morphs):
+            morphTarget = '{ "name": "%s_%06d", "vertices": [%s] }' % ("animation", i, morphVertices)
+            chunks.append(morphTarget)
+
+        morphTargets_string = ",\n\t".join(chunks)
+        nmorphTarget = len(morphs)
+
+    edges_string = ""
+    nedges = 0
 
     if option_edges:
         chunks = []
@@ -958,7 +971,7 @@ def generate_ascii_model(meshes, scene,
 
     faces_string, nfaces = generate_faces(normals, uvs, colors, meshes, option_normals, option_colors, option_uv_coords, option_materials, flipyz, option_faces)
 
-    materials_string = ",".join(materials)
+    materials_string = ",\n\n".join(materials)
 
     model_string = TEMPLATE_MODEL_ASCII % {
     "scale" : option_scale,
@@ -999,6 +1012,34 @@ def generate_ascii_model(meshes, scene,
 # Model exporter - export single mesh
 # #####################################################
 
+def extract_meshes(objects, scene, export_single_model, option_scale):
+
+    meshes = []
+
+    for object in objects:
+
+        if object.type == "MESH" and object.THREE_exportGeometry:
+
+            # collapse modifiers into mesh
+
+            mesh = object.to_mesh(scene, True, 'RENDER')
+
+            if not mesh:
+                raise Exception("Error, could not get mesh data from object [%s]" % object.name)
+
+            # that's what Blender's native export_obj.py does
+            # to flip YZ
+
+            if export_single_model:
+                X_ROT = mathutils.Matrix.Rotation(-math.pi/2, 4, 'X')
+                mesh.transform(X_ROT * object.matrix_world)
+
+            mesh.calc_normals()
+            mesh.transform(mathutils.Matrix.Scale(option_scale, 4))
+            meshes.append([mesh, object])
+
+    return meshes
+
 def generate_mesh_string(objects, scene,
                 option_vertices,
                 option_vertices_truncate,
@@ -1013,32 +1054,43 @@ def generate_mesh_string(objects, scene,
                 option_scale,
                 export_single_model,
                 option_copy_textures,
-                filepath):
+                filepath,
+                option_animation,
+                option_frame_step):
 
-    meshes = []
+    meshes = extract_meshes(objects, scene, export_single_model, option_scale)
 
-    for object in objects:
+    morphs = []
 
-        # collapse modifiers into mesh
+    if option_animation:
 
-        mesh = object.to_mesh(scene, True, 'RENDER')
+        original_frame = scene.frame_current # save animation state
 
-        if not mesh:
-            raise Exception("Error, could not get mesh data from object [%s]" % object.name)
+        scene_frames = range(scene.frame_start, scene.frame_end + 1, option_frame_step)
 
-        # that's what Blender's native export_obj.py does
-        # to flip YZ
+        for frame in scene_frames:
+            scene.frame_set(frame, 0.0)
 
-        if export_single_model:
-            X_ROT = mathutils.Matrix.Rotation(-math.pi/2, 4, 'X')
-            mesh.transform(X_ROT * object.matrix_world)
+            anim_meshes = extract_meshes(objects, scene, export_single_model, option_scale)
 
-        mesh.calc_normals()
-        mesh.transform(mathutils.Matrix.Scale(option_scale, 4))
-        meshes.append([mesh, object])
+            frame_vertices = []
+
+            for mesh, object in anim_meshes:
+                frame_vertices.extend(mesh.vertices[:])
+
+            morphVertices = generate_vertices(frame_vertices, option_vertices_truncate, option_vertices)
+            morphs.append(morphVertices)
+
+            # remove temp meshes
+
+            for mesh, object in anim_meshes:
+                bpy.data.meshes.remove(mesh)
+
+        scene.frame_set(original_frame, 0.0) # restore animation state
 
 
-    text, model_string = generate_ascii_model(meshes, scene,
+    text, model_string = generate_ascii_model(meshes, morphs,
+                                scene,
                                 option_vertices,
                                 option_vertices_truncate,
                                 option_faces,
@@ -1051,7 +1103,9 @@ def generate_mesh_string(objects, scene,
                                 flipyz,
                                 option_scale,
                                 option_copy_textures,
-                                filepath)
+                                filepath,
+                                option_animation,
+                                option_frame_step)
 
     # remove temp meshes
 
@@ -1074,7 +1128,9 @@ def export_mesh(objects,
                 flipyz,
                 option_scale,
                 export_single_model,
-                option_copy_textures):
+                option_copy_textures,
+                option_animation,
+                option_frame_step):
 
     """Export single mesh"""
 
@@ -1093,7 +1149,9 @@ def export_mesh(objects,
                 option_scale,
                 export_single_model,
                 option_copy_textures,
-                filepath)
+                filepath,
+                option_animation,
+                option_frame_step)
 
     write_file(filepath, text)
 
@@ -1816,7 +1874,9 @@ def save(operator, context, filepath = "",
                                                         option_scale,
                                                         False,          # export_single_model
                                                         False,          # option_copy_textures
-                                                        filepath)
+                                                        filepath,
+                                                        option_animation,
+                                                        option_frame_step)
 
                         embeds[name] = model_string
 
@@ -1837,7 +1897,9 @@ def save(operator, context, filepath = "",
                                     option_flip_yz,
                                     option_scale,
                                     False,          # export_single_model
-                                    option_copy_textures)
+                                    option_copy_textures,
+                                    option_animation,
+                                    option_frame_step)
 
                     geo_set.add(name)
 
@@ -1866,6 +1928,8 @@ def save(operator, context, filepath = "",
                     option_flip_yz,
                     option_scale,
                     True,            # export_single_model
-                    option_copy_textures)
+                    option_copy_textures,
+                    option_animation,
+                    option_frame_step)
 
     return {'FINISHED'}
