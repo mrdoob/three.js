@@ -64,6 +64,7 @@
 				scene = new THREE.Scene();
 
 				mesh = new THREE.Mesh( new THREE.PlaneGeometry( 300, 300, 3, 3 ), new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/shadow.png' ) } ) );
+				mesh.overdraw = true;
 				mesh.position.y = - 250;
 				mesh.rotation.x = - 90 * Math.PI / 180;
 				scene.addObject(mesh);

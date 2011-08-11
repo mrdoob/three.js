@@ -6,6 +6,8 @@
 
 THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter ) {
 
+	this.id = THREE.TextureCount ++;
+
 	this.image = image;
 
 	this.mapping = mapping !== undefined ? mapping : new THREE.UVMapping();
@@ -39,6 +41,8 @@ THREE.Texture.prototype = {
 	}
 
 };
+
+THREE.TextureCount = 0;
 
 THREE.MultiplyOperation = 0;
 THREE.MixOperation = 1;

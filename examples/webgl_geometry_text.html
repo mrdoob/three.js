@@ -200,8 +200,7 @@
 				} else {
 
 					pointLight.color.setHSV( Math.random(), 0.95, 0.85 );
-					pointLight.color.updateHex();
-					hex = decimalToHex( pointLight.color.hex );
+					hex = decimalToHex( pointLight.color.getHex() );
 
 				}
 
@@ -240,8 +239,7 @@
 				document.getElementById( "color" ).addEventListener( 'click', function() {
 
 					pointLight.color.setHSV( Math.random(), 0.95, 0.85 );
-					pointLight.color.updateHex();
-					hex = decimalToHex( pointLight.color.hex );
+					hex = decimalToHex( pointLight.color.getHex() );
 
 					updatePermalink();
 

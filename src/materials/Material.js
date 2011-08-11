@@ -4,7 +4,7 @@
 
 THREE.Material = function ( parameters ) {
 
-	this.id = THREE.MaterialCounter.value ++;
+	this.id = THREE.MaterialCount ++;
 
 	parameters = parameters || {};
 
@@ -22,6 +22,8 @@ THREE.Material = function ( parameters ) {
 
 }
 
+THREE.MaterialCount = 0;
+
 THREE.NoShading = 0;
 THREE.FlatShading = 1;
 THREE.SmoothShading = 2;
@@ -35,6 +37,3 @@ THREE.AdditiveBlending = 1;
 THREE.SubtractiveBlending = 2;
 THREE.MultiplyBlending = 3;
 THREE.AdditiveAlphaBlending = 4;
-
-
-THREE.MaterialCounter = { value: 0 };
