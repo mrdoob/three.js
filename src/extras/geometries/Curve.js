@@ -200,34 +200,41 @@ THREE.Curve.prototype.getUtoTmapping = function ( u, distance ) {
 	
 };
 
-// In case any sub curves does not implements its normal finding, 
+// In case any sub curves does not implements its tangent / normal finding, 
 // we get 2 points with a small delta, and find a gradient of the 2 pts
-// makes an ok approximation
+// which seems to make a reasonable approximation
 
 THREE.Curve.prototype.getNormalVector = function( t ) {
 
-	var pt1 = this.getPoint(t-0.001);
-	var pt2 = this.getPoint(t+0.001);
+	var vec = this.getTangent(t);
 	
-	
-	__vec1.sub(pt2, pt1);
-	return new THREE.Vector2( -__vec1.y , __vec1.x ).unit();
+	return new THREE.Vector2( -vec.y , vec.x );
 
 };
 
-THREE.Curve.prototype.getTangentUnit = function( t ) {
+// Returns a unit vector tangent at t
+THREE.Curve.prototype.getTangent = function( t ) {
 
-	var pt1 = this.getPoint(t-0.001);
-	var pt2 = this.getPoint(t+0.001);
+	var delta = 0.0001;
+	var pt1 = this.getPoint(t-delta);
+	var pt2 = this.getPoint(t+delta);
 	
-	
-	__vec1.sub(pt2, pt1);
-	return new THREE.Vector2( __vec1.x , __vec1.y ).unit();
+	var vec = new THREE.Vector2();
+	vec.sub(pt2, pt1);
+	return vec.unit();
 
 };
 
 
 var __vec1 = new THREE.Vector2(); // tmp Vector
+
+
+/**************************************************************
+ *	Curved Path - a curve path is simply a array of connected
+ *  curves, but retains the api of a curve
+ **************************************************************/
+
+
 
 /**************************************************************
  *	Line
@@ -273,18 +280,11 @@ THREE.LineCurve.prototype.getPoint = function ( t ) {
 
 };
 
-THREE.LineCurve.prototype.getNormalVector = function( t ) {
+THREE.LineCurve.prototype.getTangent = function( t ) {
 	
-	//__vec1 = new THREE.Vector2();
 	__vec1.sub(this.v2, this.v1);
-	return new THREE.Vector2( -__vec1.y , __vec1.x ).unit();
+	return new THREE.Vector2( __vec1.x , __vec1.y ).unit();
 	
-	
-	tx = this.x2 - this.x1;
-	ty = this.y2 - this.y1;
-
-	// return normal unit vector
-	return new THREE.Vector2( -ty , tx ).unit();
 }
 
 /**************************************************************
@@ -325,20 +325,17 @@ THREE.QuadraticBezierCurve.prototype.getPoint = function ( t ) {
 	tx = THREE.Shape.Utils.b2( t, this.v0.x, this.v1.x, this.v2.x );
 	ty = THREE.Shape.Utils.b2( t, this.v0.y, this.v1.y, this.v2.y );
 
-	// tx = THREE.Shape.Utils.b2( t, this.x0, this.x1, this.x2 );
-	// 	ty = THREE.Shape.Utils.b2( t, this.y0, this.y1, this.y2 );
-
 	return new THREE.Vector2( tx, ty );
 
 };
 
 
-THREE.QuadraticBezierCurve.prototype.getNormalVector2 = function( t ) {
+THREE.QuadraticBezierCurve.prototype.getTangent = function( t ) {
 
 	// iterate sub segments
 	// 	get lengths for sub segments
 	// 	if segment is bezier
-	//		perform subdivisions or perform integrals
+	//		perform subdivisions
 
 	// var x0, y0, x1, y1, x2, y2;
 
@@ -356,8 +353,8 @@ THREE.QuadraticBezierCurve.prototype.getNormalVector2 = function( t ) {
 	tx = THREE.Curve.Utils.tangentQuadraticBezier( t, this.v0.x, this.v1.x, this.v2.x );
 	ty = THREE.Curve.Utils.tangentQuadraticBezier( t, this.v0.y, this.v1.y, this.v2.y );
 
-	// return normal unit vector
-	return new THREE.Vector2( -ty , tx ).unit();
+	// returns unit vector
+	return new THREE.Vector2( tx , ty ).unit();
 
 };
 
@@ -405,7 +402,7 @@ THREE.CubicBezierCurve.prototype.getPoint = function ( t ) {
 
 };
 
-THREE.CubicBezierCurve.prototype.getNormalVector = function( t ) {
+THREE.CubicBezierCurve.prototype.getTangent = function( t ) {
 
 	var tx, ty;
 
@@ -413,7 +410,7 @@ THREE.CubicBezierCurve.prototype.getNormalVector = function( t ) {
 	ty = THREE.Curve.Utils.tangentCubicBezier( t, this.v0.y, this.v1.y, this.v2.y, this.v3.y );
 
 	// return normal unit vector
-	return new THREE.Vector2( -ty , tx ).unit();
+	return new THREE.Vector2( tx , ty ).unit();
 
 };
 
@@ -507,13 +504,8 @@ THREE.Curve.Utils = {
 
 	},
 	
-	//derivative
+	// Puay Bing, thanks for helping with this derivative!
 	tangentCubicBezier: function (t, p0, p1, p2, p3 ) {
-		// return -3 * (1 - 2*t + t*t) * p0 - 
-		// 		            3 * t * (4 - 3*t) * p1 + 
-		// 		            3 * t * (2 - 3*t) * p2 + 
-		// 		            3 * t * t * p3;
-		
 		return -3 * p0 * (1 - t) * (1 - t)  +
 			3 * p1 * (1 - t) * (1-t) - 6 *t *p1 * (1-t) +
 			6 * t *  p2 * (1-t) - 3 * t * t * p2 + 
@@ -529,6 +521,8 @@ THREE.Curve.Utils = {
 		var h10 = 3 * t * t - 4 * t + 1; // t^3 − 2t^2 + t
 		var h01 = -6 * t * t + 6 * t; 	// − 2t3 + 3t2
 		var h11 = 3 * t * t - 2 * t;	// t3 − t2
+		
+		return h00 + h10 + h01 + h11;
 
 	},
 
@@ -554,8 +548,8 @@ getLengths DONE
 
 curve.getPoints(); DONE
 curve.getPointAtArcLength(t); DONE
-curve.transform(params);
-curve.getTangentAt(t)
+curve.transform(params); 
+curve.getTangentAt(t); DONE
 */
 
 /**************************************************************

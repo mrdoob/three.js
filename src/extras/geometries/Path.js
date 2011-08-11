@@ -8,6 +8,7 @@ THREE.Path = function ( points ) {
 
 	this.actions = [];
 	this.curves = [];
+	this.bends = [];
 
 	if ( points ) {
 
@@ -512,19 +513,50 @@ THREE.Path.prototype.createGeometry = function( points ) {
 
 
 // ALL THINGS BELOW TO BE REFACTORED
-// QN: Transform final pts or transform ACTIONS or add transform filters?
 
-// Read http://www.planetclegg.com/projects/WarpingTextToSplines.html
-// This returns getPoints() bend/wrapped around the contour of a path.
+// Wrap path / Bend modifiers?
+THREE.Path.prototype.addWrapPath = function ( bendpath ) {
+	this.bends.push(bendpath);
+};
 
-THREE.Path.prototype.transform = function( path, segments ) {
+THREE.Path.prototype.getTransformedPoints = function( segments, bends ) {
+
+	var oldPts = this.getPoints( segments ); // getPoints getSpacedPoints
+	var i, il;
+	
+	if (!bends) {
+		bends = this.bends;
+	}
+	
+	for (i=0, il=bends.length; i<il;i++) {
+		oldPts = this.getWrapPoints( oldPts, bends[i] );
+	}
+	
+	return oldPts;
+
+};
+
+THREE.Path.prototype.getTransformedSpacedPoints = function( segments, bends ) {
+
+	var oldPts = this.getSpacedPoints( segments );
+	
+	var i, il;
+	
+	if (!bends) {
+		bends = this.bends;
+	}
+	
+	for (i=0, il=bends.length; i<il;i++) {
+		oldPts = this.getWrapPoints( oldPts, bends[i] );
+	}
+	
+	return oldPts;
+
+};
+
+THREE.Path.prototype.getWrapPoints = function (oldPts, path ) {
 
 	var bounds = this.getBoundingBox();
-	var oldPts = this.getPoints( segments ); // getPoints getSpacedPoints
-	
-	//console.log( path.cacheArcLengths() );
-	path.getLengths(400);
-	//segments = 40;
 
 	var i, il, p, oldX, oldY, xNorm;
 
@@ -553,6 +585,20 @@ THREE.Path.prototype.transform = function( path, segments ) {
 	}
 
 	return oldPts;
+};
+
+// Read http://www.planetclegg.com/projects/WarpingTextToSplines.html
+// This returns getPoints() bend/wrapped around the contour of a path.
+THREE.Path.prototype.transform = function( path, segments ) {
+
+	var bounds = this.getBoundingBox();
+	var oldPts = this.getPoints( segments ); // getPoints getSpacedPoints
+	
+	//console.log( path.cacheArcLengths() );
+	//path.getLengths(400);
+	//segments = 40;
+	
+	return this.getWrapPoints( oldPts, path );
 
 };
 

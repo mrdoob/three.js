@@ -99,12 +99,18 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	var shapesOffset = this.vertices.length;
 
+
+	if (bendPath) {
+		shape.addWrapPath(bendPath);
+		//shapePoints = shape.extractAllPointsWithBend( curveSegments, bendPath ); 
+		
+	}
+	
 	var shapePoints = shape.extractAllPoints( curveSegments ); // use shape.extractAllSpacedPoints( curveSegments ) for points with equal divisions
 	
-	if (bendPath) {
-		shapePoints = shape.extractAllPointsWithBend( curveSegments, bendPath ); 
-	}
-
+	
+	
+	
 	
     var vertices = shapePoints.shape;
 	var holes = shapePoints.holes;
