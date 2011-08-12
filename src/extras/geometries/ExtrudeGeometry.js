@@ -16,6 +16,9 @@
  *  bevelThickness: <float>, 		// how deep into text bevel goes
  *  bevelSize:		<float>, 		// how far from text outline is bevel
  *  bevelSegments:	<int>, 			// number of bevel layers
+ *
+ *  extrudePath:	<THREE.CurvePath>	// path to extrude shape along
+ *  bendPath:		<THREE.CurvePath> 	// path to bend the geometry around
  *  }
   **/
 
@@ -64,8 +67,12 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	var steps = options.steps !== undefined ? options.steps : 1;
 
-	var extrudePath = options.path !== undefined ? options.path : null;
+	var bendPath = options.bendPath;
+
+	var extrudePath = options.extrudePath;
 	var extrudePts, extrudeByPath = false;
+
+	var useSpacedPoints = options.useSpacedPoints !== undefined ? options.useSpacedPoints : false;
 
 	if ( extrudePath ) {
 
@@ -97,7 +104,28 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	var shapesOffset = this.vertices.length;
 
-	var shapePoints = shape.extractAllPoints( curveSegments ); // use shape.extractAllSpacedPoints( curveSegments ) for points with equal divisions
+
+	if ( bendPath ) {
+
+		shape.addWrapPath( bendPath );
+
+		//shapePoints = shape.extractAllPointsWithBend( curveSegments, bendPath );
+
+	}
+
+	var shapePoints;
+
+	if ( !useSpacedPoints ) {
+
+	  	shapePoints = shape.extractAllPoints( curveSegments ); //
+
+	} else {
+
+		// QN - Would it be better to pass useSpacePoints parameter to shape, just like bendpath ?
+
+		shapePoints = shape.extractAllSpacedPoints( curveSegments ) // for points with equal divisions
+
+	}
 
     var vertices = shapePoints.shape;
 	var holes = shapePoints.holes;
@@ -129,6 +157,11 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	var faces = THREE.Shape.Utils.triangulateShape ( vertices, holes );
 	//var faces = THREE.Shape.Utils.triangulate2( vertices, holes );
+
+	// Would it be better to move points after triangulation?
+	// shapePoints = shape.extractAllPointsWithBend( curveSegments, bendPath );
+	// 	vertices = shapePoints.shape;
+	// 	holes = shapePoints.holes;
 
 	//console.log(faces);
 

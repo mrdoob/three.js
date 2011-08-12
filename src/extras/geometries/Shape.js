@@ -32,12 +32,11 @@ THREE.Shape.prototype.extrude = function ( options ) {
 
 THREE.Shape.prototype.getPointsHoles = function ( divisions ) {
 
-
 	var i, il = this.holes.length, holesPts = [];
 
 	for ( i = 0; i < il; i ++ ) {
 
-		holesPts[ i ] = this.holes[ i ].getPoints( divisions );
+		holesPts[ i ] = this.holes[ i ].getTransformedPoints( divisions, this.bends );
 
 	}
 
@@ -53,7 +52,7 @@ THREE.Shape.prototype.getSpacedPointsHoles = function ( divisions ) {
 
 	for ( i = 0; i < il; i ++ ) {
 
-		holesPts[ i ] = this.holes[ i ].getSpacedPoints( divisions );
+		holesPts[ i ] = this.holes[ i ].getTransformedSpacedPoints( divisions, this.bends );
 
 	}
 
@@ -68,12 +67,24 @@ THREE.Shape.prototype.extractAllPoints = function ( divisions ) {
 
 	return {
 
-		shape: this.getPoints( divisions ),
+		shape: this.getTransformedPoints( divisions ),
 		holes: this.getPointsHoles( divisions )
 
 	};
 
 };
+
+//
+// THREE.Shape.prototype.extractAllPointsWithBend = function ( divisions, bend ) {
+//
+// 	return {
+//
+// 		shape: this.transform( bend, divisions ),
+// 		holes: this.getPointsHoles( divisions, bend )
+//
+// 	};
+//
+// };
 
 // Get points of shape and holes (spaced by regular distance)
 
@@ -81,7 +92,7 @@ THREE.Shape.prototype.extractAllSpacedPoints = function ( divisions ) {
 
 	return {
 
-		shape: this.getSpacedPoints( divisions ),
+		shape: this.getTransformedSpacedPoints( divisions ),
 		holes: this.getSpacedPointsHoles( divisions )
 
 	};
@@ -118,7 +129,7 @@ THREE.Shape.Utils = {
 			tmpHole1, tmpHole2,
 			verts = [];
 
-		for ( h = 0; h < holes.length; h++ ) {
+		for ( h = 0; h < holes.length; h ++ ) {
 
 			hole = holes[ h ];
 
@@ -131,15 +142,12 @@ THREE.Shape.Utils = {
 
 			shortest = Number.POSITIVE_INFINITY;
 
-			// THIS THING NEEDS TO BE DONE CORRECTLY AGAIN :(
 
 			// Find the shortest pair of pts between shape and hole
 
 			// Note: Actually, I'm not sure now if we could optimize this to be faster than O(m*n)
 			// Using distanceToSquared() intead of distanceTo() should speed a little
 			// since running square roots operations are reduced.
-			// http://en.wikipedia.org/wiki/Closest_pair_of_points
-			// http://stackoverflow.com/questions/1602164/shortest-distance-between-points-algorithm
 
 			for ( h2 = 0; h2 < hole.length; h2 ++ ) {
 
@@ -276,7 +284,6 @@ THREE.Shape.Utils = {
 			verts.push( triangleb );
 
 			shape = tmpShape1.concat( tmpHole1 ).concat( tmpHole2 ).concat( tmpShape2 );
-			//shape = tmpHole1.concat( tmpHole2 );
 
 		}
 

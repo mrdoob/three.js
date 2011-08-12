@@ -6,8 +6,9 @@
 
 THREE.Path = function ( points ) {
 
+	THREE.CurvePath.call(this);
+
 	this.actions = [];
-	this.curves = [];
 
 	if ( points ) {
 
@@ -16,6 +17,10 @@ THREE.Path = function ( points ) {
 	}
 
 };
+
+THREE.Path.prototype = new THREE.CurvePath();
+THREE.Path.prototype.constructor = THREE.Path;
+
 
 THREE.PathActions = {
 
@@ -65,10 +70,10 @@ THREE.Path.prototype.lineTo = function ( x, y ) {
 	var x0 = lastargs[ lastargs.length - 2 ];
 	var y0 = lastargs[ lastargs.length - 1 ];
 
-	var curve = new THREE.LineCurve( x0, y0, x, y );
+	var curve = new THREE.LineCurve( new THREE.Vector2( x0, y0 ), new THREE.Vector2( x, y ) );
 	this.curves.push( curve );
 
-	this.actions.push( { action: THREE.PathActions.LINE_TO, args: args, curve: curve } );
+	this.actions.push( { action: THREE.PathActions.LINE_TO, args: args } );
 
 };
 
@@ -81,13 +86,12 @@ THREE.Path.prototype.quadraticCurveTo = function( aCPx, aCPy, aX, aY ) {
 	var x0 = lastargs[ lastargs.length - 2 ];
 	var y0 = lastargs[ lastargs.length - 1 ];
 
-	var curve = new THREE.QuadraticBezierCurve( x0, y0, aCPx, aCPy, aX, aY );
+	var curve = new THREE.QuadraticBezierCurve( new THREE.Vector2( x0, y0 ),
+												new THREE.Vector2( aCPx, aCPy ),
+												new THREE.Vector2( aX, aY ) );
 	this.curves.push( curve );
 
-	this.actions.push( { action: THREE.PathActions.QUADRATIC_CURVE_TO, args: args, curve: curve } );
-
-	//console.log( curve, curve.getPoints(), curve.getSpacedPoints() );
-	//console.log( curve.getPointAt(0), curve.getPointAt(0), curve.getUtoTmapping(0), curve.getSpacedPoints() );
+	this.actions.push( { action: THREE.PathActions.QUADRATIC_CURVE_TO, args: args } );
 
 };
 
@@ -102,12 +106,13 @@ THREE.Path.prototype.bezierCurveTo = function( aCP1x, aCP1y,
 	var x0 = lastargs[ lastargs.length - 2 ];
 	var y0 = lastargs[ lastargs.length - 1 ];
 
-	var curve = new THREE.CubicBezierCurve( x0, y0, aCP1x, aCP1y,
-	                                                aCP2x, aCP2y,
-	                                                aX, aY );
+	var curve = new THREE.CubicBezierCurve( new THREE.Vector2( x0, y0 ),
+											new THREE.Vector2( aCP1x, aCP1y ),
+											new THREE.Vector2( aCP2x, aCP2y ),
+											new THREE.Vector2( aX, aY ) );
 	this.curves.push( curve );
 
-	this.actions.push( { action: THREE.PathActions.BEZIER_CURVE_TO, args: args, curve: curve } );
+	this.actions.push( { action: THREE.PathActions.BEZIER_CURVE_TO, args: args } );
 
 };
 
@@ -125,9 +130,7 @@ THREE.Path.prototype.splineThru = function( pts /*Array of Vector*/ ) {
 	var curve = new THREE.SplineCurve( npts );
 	this.curves.push( curve );
 
-	this.actions.push( { action: THREE.PathActions.CSPLINE_THRU, args: args, curve: curve } );
-
-	//console.log( curve, curve.getPoints(), curve.getSpacedPoints() );
+	this.actions.push( { action: THREE.PathActions.CSPLINE_THRU, args: args } );
 
 };
 
@@ -156,7 +159,7 @@ THREE.Path.prototype.getSpacedPoints = function ( divisions, closedPath ) {
 
 	var points = [];
 
-	for ( var i = 0; i < divisions; i++ ) {
+	for ( var i = 0; i < divisions; i ++ ) {
 
 		points.push( this.getPoint( i / divisions ) );
 
@@ -164,11 +167,11 @@ THREE.Path.prototype.getSpacedPoints = function ( divisions, closedPath ) {
 
 	}
 
-	if ( closedPath ) {
-
-		points.push( points[ 0 ] );
-
-	}
+	// if ( closedPath ) {
+	//
+	// 	points.push( points[ 0 ] );
+	//
+	// }
 
 	return points;
 
@@ -187,7 +190,7 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 		laste, j,
 		t, tx, ty;
 
-	for ( i = 0, il = this.actions.length; i < il; i++ ) {
+	for ( i = 0, il = this.actions.length; i < il; i ++ ) {
 
 		item = this.actions[ i ];
 
@@ -298,6 +301,7 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 			spts = spts.concat( args[ 0 ] );
 
 			var spline = new THREE.SplineCurve( spts );
+
 			for ( j = 1; j <= n; j ++ ) {
 
 				points.push( spline.getPointAt( j / n ) ) ;
@@ -370,190 +374,19 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 };
 
 
-// Returns min and max coordinates, as well as centroid
 
-THREE.Path.prototype.getBoundingBox = function () {
+// This was used for testing purposes. Should be removed soon.
 
-	var points = this.getPoints();
+THREE.Path.prototype.transform = function( path, segments ) {
 
-	var maxX, maxY;
-	var minX, minY;
+	var bounds = this.getBoundingBox();
+	var oldPts = this.getPoints( segments ); // getPoints getSpacedPoints
 
-	maxX = maxY = Number.NEGATIVE_INFINITY;
-	minX = minY = Number.POSITIVE_INFINITY;
+	//console.log( path.cacheArcLengths() );
+	//path.getLengths(400);
+	//segments = 40;
 
-	var p, i, il, sum;
-
-	sum = new THREE.Vector2();
-
-	for ( i = 0, il = points.length; i < il; i ++ ) {
-
-		p = points[ i ];
-
-		if ( p.x > maxX ) maxX = p.x;
-		else if ( p.x < minX ) minX = p.x;
-
-		if ( p.y > maxY ) maxY = p.y;
-		else if ( p.y < maxY ) minY = p.y;
-
-		sum.addSelf( p.x, p.y );
-
-	}
-
-	return {
-
-		minX: minX,
-		minY: minY,
-		maxX: maxX,
-		maxY: maxY,
-		centroid: sum.divideScalar( il )
-
-	};
-
-};
-
-
-// To get accurate point with reference to
-// entire path distance at time t,
-// following has to be done
-
-// 1. Length of each sub path have to be known
-// 2. Locate and identify type of curve
-// 3. Get t for the curve
-// 4. Return curve.getPointAt(t')
-
-THREE.Path.prototype.getPoint = function( t ) {
-
-	var d = t * this.getLength();
-	var curveLengths = this.sums;
-	var i = 0, diff, curve;
-
-	// To think about boundaries points.
-
-	while ( i < curveLengths.length ) {
-
-		if ( curveLengths[ i ] >= d ) {
-
-			diff = curveLengths[ i ] - d;
-			curve = this.curves[ i ];
-
-			var u = 1 - diff / curve.getLength();
-
-			return curve.getPointAt( u );
-
-			break;
-		}
-
-		i++;
-
-	}
-
-	return null;
-
-	// loop where sum != 0, sum > d , sum+1 <d
-
-};
-
-// Compute lengths and cache them
-
-THREE.Path.prototype.getLength = function() {
-
-	// Loop all actions/path
-	// Push sums into cached array
-
-	var lengths = [], sums = 0;
-	var i, il = this.curves.length;
-
-	for ( i = 0; i < il ; i++ ) {
-
-		sums += this.curves[ i ].getLength();
-		lengths.push( sums );
-
-	}
-
-	this.sums = lengths;
-
-	return sums;
-
-};
-
-
-/// Generate geometry from path points (for Line or ParticleSystem objects)
-
-THREE.Path.prototype.createPointsGeometry = function( divisions ) {
-
-    var pts = this.getPoints( divisions, true );
-	return this.createGeometry( pts );
-
-};
-
-// Generate geometry from equidistance sampling along the path
-
-THREE.Path.prototype.createSpacedPointsGeometry = function( divisions ) {
-
-    var pts = this.getSpacedPoints( divisions, true );
-	return this.createGeometry( pts );
-
-};
-
-THREE.Path.prototype.createGeometry = function( points ) {
-
-	var geometry = new THREE.Geometry();
-
-    for( var i = 0; i < points.length; i ++ ) {
-
-        geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( points[ i ].x, points[ i ].y, 0 ) ) );
-
-    }
-
-    return geometry;
-
-};
-
-
-// ALL THINGS BELOW TO BE REFACTORED
-// QN: Transform final pts or transform ACTIONS or add transform filters?
-
-// FUTURE refactor path = an array of lines -> straight, bezier, splines, arc, funcexpr lines
-// Read http://www.planetclegg.com/projects/WarpingTextToSplines.html
-
-THREE.Path.prototype.transform = function( path ) {
-
-	path = new THREE.Path();
-	path.moveTo( 0, 0 );
-	path.quadraticCurveTo( 100, 20, 140, 80 );
-
-	console.log( path.cacheArcLengths() );
-
-	var thisBounds = this.getBoundingBox();
-	var oldPts = this.getPoints();
-
-	var i, il, p, oldX, oldY, xNorm;
-
-	for ( i = 0, il = oldPts.length; i < il; i ++ ) {
-
-		p = oldPts[ i ];
-
-		oldX = p.x;
-		oldY = p.y;
-
-		var xNorm = oldX/ thisBounds.maxX;
-
-		// If using actual distance, for length > path, requires line extrusions
-		//xNorm = path.getUtoTmapping(xNorm, oldX); // 3 styles. 1) wrap stretched. 2) wrap stretch by arc length 3) warp by actual distance
-
-		var pathPt = path.getPoint( xNorm );
-		var normal = path.getNormalVector( xNorm ).multiplyScalar( oldY );
-
-		p.x = pathPt.x + normal.x;
-		p.y = pathPt.y + normal.y;
-
-		//p.x = a * oldX + b * oldY + c;
-		//p.y = d * oldY + e * oldX + f;
-
-	}
-
-	return oldPts;
+	return this.getWrapPoints( oldPts, path );
 
 };
 
@@ -736,7 +569,7 @@ THREE.Path.prototype.toShapes = function() {
 
 	//console.log(subPaths);
 
-	if ( subPaths.length ==0 ) return [];
+	if ( subPaths.length == 0 ) return [];
 
 	var holesFirst = !THREE.Shape.Utils.isClockWise( subPaths[ 0 ].getPoints() );
 

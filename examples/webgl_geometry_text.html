@@ -33,6 +33,7 @@
 			<span class="button" id="font">change font</span>,
 			<span class="button" id="weight">change weight</span>,
 			<span class="button" id="bevel">change bevel</span>,
+			<span class="button" id="bend">bend</span>,
 			<span class="button" id="postprocessing">change postprocessing</span>,
 			<a id="permalink" href="#">permalink</a>
 		</div>
@@ -44,12 +45,8 @@
 		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
-		<!-- load the font file from canvas-text -->
+		<!-- load the font files -->
 
-		<!--
-
-
-		-->
 		<script type="text/javascript" src="fonts/gentilis_bold.typeface.js"></script>
 		<script type="text/javascript" src="fonts/gentilis_regular.typeface.js"></script>
 		<script type="text/javascript" src="fonts/optimer_bold.typeface.js"></script>
@@ -61,6 +58,7 @@
 		<script type="text/javascript" src="fonts/droid/droid_serif_regular.typeface.js"></script>
 		<script type="text/javascript" src="fonts/droid/droid_serif_bold.typeface.js"></script>
 
+		<!-- todo async loader for fonts -->
 
 		<script type="text/javascript">
 
@@ -86,6 +84,7 @@
 				bevelSize = 1.5,
 				bevelSegments = 3,
 				bevelEnabled = true,
+				bend = true,
 
 				font = "optimer", 		// helvetiker, optimer, gentilis, droid sans, droid serif
 				weight = "bold",		// normal bold
@@ -164,7 +163,7 @@
 				scene.addLight( dirLight );
 
 				var pointLight = new THREE.PointLight( 0xffffff, 1.5 );
-				pointLight.position.set( 0, 100, 50 );
+				pointLight.position.set( 0, 100, 90 );
 				scene.addLight( pointLight );
 
 				//text = capitalize( font ) + " " + capitalize( weight );
@@ -182,7 +181,8 @@
 					var weighthash = hash.substring( 7, 8 );
 					var pphash 	   = hash.substring( 8, 9 );
 					var bevelhash  = hash.substring( 9, 10 );
-					var texthash   = hash.substring( 11 );
+					var bendhash   = hash.substring( 10, 11 );
+					var texthash   = hash.substring( 12 );
 
 					hex = colorhash;
 					pointLight.color.setHex( parseInt( colorhash, 16 ) );
@@ -192,6 +192,7 @@
 
 					postprocessing.enabled = parseInt( pphash );
 					bevelEnabled = parseInt( bevelhash );
+					bend = parseInt( bendhash );
 
 					text = decodeURI( texthash );
 
@@ -297,6 +298,13 @@
 
 				}, false );
 
+				document.getElementById( "bend" ).addEventListener( 'click', function() {
+
+					bend = !bend;
+					refreshText();
+
+				}, false );
+
 				document.getElementById( "postprocessing" ).addEventListener( 'click', function() {
 
 					postprocessing.enabled = !postprocessing.enabled;
@@ -319,7 +327,8 @@
 
 			function updatePermalink() {
 
-				var link = hex + fontMap[ font ] + weightMap[ weight ] + boolToNum( postprocessing.enabled ) + boolToNum( bevelEnabled ) + "#" + encodeURI( text );
+				var link = hex + fontMap[ font ] + weightMap[ weight ] + boolToNum( postprocessing.enabled ) + boolToNum( bevelEnabled )
+				+ boolToNum( bend ) + "#" + encodeURI( text );
 
 				permalink.href = "#" + link;
 				window.location.hash = link;
@@ -374,7 +383,6 @@
 			}
 
 			function createText() {
-
 				textGeo = new THREE.TextGeometry( text, {
 
 					size: size,
@@ -387,7 +395,9 @@
 
 					bevelThickness: bevelThickness,
 					bevelSize: bevelSize,
-					bevelEnabled: bevelEnabled
+					bevelEnabled: bevelEnabled,
+
+					bend: bend
 
 				});
 
