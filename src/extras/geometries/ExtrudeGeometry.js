@@ -68,6 +68,8 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	var extrudePath = options.path !== undefined ? options.path : null;
 	var extrudePts, extrudeByPath = false;
+	
+	var useSpacedPoints = options.useSpacedPoints !== undefined ? options.useSpacedPoints : false;
 
 	if ( extrudePath ) {
 
@@ -106,11 +108,14 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 		
 	}
 	
-	var shapePoints = shape.extractAllPoints( curveSegments ); // use shape.extractAllSpacedPoints( curveSegments ) for points with equal divisions
+	var shapePoints;
 	
-	
-	
-	
+	if (!useSpacedPoints) {
+	  	shapePoints = shape.extractAllPoints( curveSegments ); // 
+	} else {
+		// QN - Would it be better to pass useSpacePoints parameter to shape, just like bendpath ?
+		shapePoints = shape.extractAllSpacedPoints( curveSegments ) // for points with equal divisions
+	}
 	
     var vertices = shapePoints.shape;
 	var holes = shapePoints.holes;
@@ -143,6 +148,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 	var faces = THREE.Shape.Utils.triangulateShape ( vertices, holes );
 	//var faces = THREE.Shape.Utils.triangulate2( vertices, holes );
 	
+	// Would it be better to move points after triangulation?
 	// shapePoints = shape.extractAllPointsWithBend( curveSegments, bendPath ); 
 	// 	vertices = shapePoints.shape;
 	// 	holes = shapePoints.holes;

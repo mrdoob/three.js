@@ -53,7 +53,7 @@ THREE.Shape.prototype.getSpacedPointsHoles = function ( divisions ) {
 
 	for ( i = 0; i < il; i ++ ) {
 
-		holesPts[ i ] = this.holes[ i ].getSpacedPoints( divisions, this.bends );
+		holesPts[ i ] = this.holes[ i ].getTransformedSpacedPoints( divisions, this.bends );
 
 	}
 

@@ -60,22 +60,47 @@ THREE.TextGeometry = function ( text, parameters ) {
 		
 	}
 	
-	// path = new THREE.CubicBezierCurve( new THREE.Vector2(0, 0), 
-	//  		new THREE.Vector2(100, 100), new THREE.Vector2(200, 100), new THREE.Vector2(500, 0));
+	// // Bend Testings.
 	// 
-	//path = new THREE.QuadraticBezierCurve( 0, 0,  bounds.maxX/2, 50, bounds.maxX , 0);
-	
-	//path = new THREE.LineCurve( 0, 0,  400, 0);
-	//path = new THREE.LineCurve( new THREE.Vector2(0, 0),  new THREE.Vector2(400, 100));
-	
-	// var bend = new THREE.Path();
-	// bend.moveTo(0,0);
-	// bend.quadraticCurveTo( 500, 100, 1000, 0 );
-	// 
-	
+	// var path = new THREE.CurvePath();
+	// 	
+	// path.add(new THREE.CubicBezierCurve( 
+	// 		new THREE.Vector2(0, 0), 
+	//   		new THREE.Vector2(10, 100), 
+	// 		new THREE.Vector2(200, -10), 
+	// 		new THREE.Vector2(300, 0)
+	// 	));
+	// 	
+	// path.add(new THREE.QuadraticBezierCurve( 
+	// 	new THREE.Vector2(300, 0), 
+	//   		new THREE.Vector2(450, -10), 
+	// 	new THREE.Vector2(500, 100)
+	// ));
+	//  
 	// parameters.bendPath = path;
 	
+	// var path = new THREE.CurvePath();
+	// 	path.add(new THREE.LineCurve( 0, 0,  250, 0));
+	// 	path.add(new THREE.LineCurve( 250, 0,  300, 200));
+	// 	
+	// 	parameters.bendPath = path;
 	
+	// var path = new THREE.SplineCurve([
+	// 		new THREE.Vector2(0, 0),
+	// 		new THREE.Vector2(100, 40),
+	// 		new THREE.Vector2(200, 0),
+	// 		new THREE.Vector2(400, 20)
+	// 	]);
+	// 
+	// console.log(path);
+	// 
+	// path = new THREE.LineCurve( new THREE.Vector2(0, 0),  new THREE.Vector2(400, 100));
+	
+	// var bend = new THREE.Path();
+	// 	bend.moveTo(0,0);
+	// 	bend.quadraticCurveTo( 500, 100, 1000, 0 );
+	// 	
+	// 	parameters.bendPath = bend;
 
 
 

@@ -92,10 +92,10 @@ THREE.Curve.prototype.getLengths = function ( divisions ) {
 
 	if ( !divisions ) divisions = 200;
 	
-	if ( this.cacheLengths && ( this.cacheLengths.length == divisions + 1 ) ) {
+	if ( this.cacheArcLengths && ( this.cacheArcLengths.length == divisions + 1 ) ) {
 
-		//console.log( "cached", this.cacheLengths );
-		return this.cacheLengths;
+		//console.log( "cached", this.cacheArcLengths );
+		return this.cacheArcLengths;
 
 	}
 	
@@ -114,7 +114,7 @@ THREE.Curve.prototype.getLengths = function ( divisions ) {
 
 	}
 
-	this.cacheLengths = cache;
+	this.cacheArcLengths = cache;
 	
 	return cache; // { sums: cache, sum:sum }; Sum is in the last element.
 
@@ -216,8 +216,15 @@ THREE.Curve.prototype.getNormalVector = function( t ) {
 THREE.Curve.prototype.getTangent = function( t ) {
 
 	var delta = 0.0001;
-	var pt1 = this.getPoint(t-delta);
-	var pt2 = this.getPoint(t+delta);
+	var t1 = t-delta;
+	var t2 = t+delta;
+	
+	// Capping in case of danger
+	if (t1<0) t1 = 0;
+	if (t2>1) t2 = 1;
+	
+	var pt1 = this.getPoint(t1);
+	var pt2 = this.getPoint(t2);
 	
 	var vec = new THREE.Vector2();
 	vec.sub(pt2, pt1);
@@ -229,35 +236,26 @@ THREE.Curve.prototype.getTangent = function( t ) {
 var __vec1 = new THREE.Vector2(); // tmp Vector
 
 
-/**************************************************************
- *	Curved Path - a curve path is simply a array of connected
- *  curves, but retains the api of a curve
- **************************************************************/
-
 
 
 /**************************************************************
  *	Line
  **************************************************************/
 
-
-
 THREE.LineCurve = function ( v1, v2 ) {
+	if (!(v1 instanceof THREE.Vector2 )) {
+		// Fall back for old constuctor signature - should be removed over time
+		THREE.LineCurve.oldConstructor.apply(this, arguments);
+		return;
+	}
 
 	this.v1 = v1;
 	this.v2 = v2;
-
+	
 };
 
-THREE.LineCurve.oldConstruct = function ( x1, y1, x2, y2 ) {
-	//instanceof THREE.Vector2  oldConstruct.apply(this);
-	
-	this.x1 = x1;
-	this.y1 = y1;
-
-	this.x2 = x2;
-	this.y2 = y2;
-
+THREE.LineCurve.oldConstructor = function ( x1, y1, x2, y2 ) {
+	this.constructor(new THREE.Vector2(x1, y1), new THREE.Vector2(x2, y2));
 };
 
 THREE.LineCurve.prototype = new THREE.Curve();
@@ -267,10 +265,10 @@ THREE.LineCurve.prototype.getPoint = function ( t ) {
 	
 	var tmpVector = new THREE.Vector2();
 	tmpVector.sub(this.v2, this.v1);
-	tmpVector.multiplyScalar(t);
+	tmpVector.multiplyScalar(t).addSelf(this.v1);
 	return tmpVector;
 	
-	// var dx = this.x2 - this.x1;
+	// 	var dx = this.x2 - this.x1;
 	// 	var dy = this.y2 - this.y1;
 	// 
 	// 	var tx = this.x1 + dx * t;
@@ -278,6 +276,11 @@ THREE.LineCurve.prototype.getPoint = function ( t ) {
 	// 
 	// 	return new THREE.Vector2( tx, ty );
 
+};
+
+// Line curve is linear, so we can overwrite default getPointAt
+THREE.LineCurve.prototype.getPointAt = function ( u ) {
+	return this.getPoint( u );
 };
 
 THREE.LineCurve.prototype.getTangent = function( t ) {
@@ -293,26 +296,18 @@ THREE.LineCurve.prototype.getTangent = function( t ) {
 
 
 THREE.QuadraticBezierCurve = function ( v0, v1, v2 ) {
-
+	if (!(v1 instanceof THREE.Vector2 )) {
+		var args = Array.prototype.slice.call(arguments);
+		v0 = new THREE.Vector2(args[0], args[1]);
+		v1 = new THREE.Vector2(args[2], args[3]);
+		v2 = new THREE.Vector2(args[4], args[5]);
+	}
+	
 	this.v0 = v0;
 	this.v1 = v1;
 	this.v2 = v2;
 
 };
-
-THREE.QuadraticBezierCurve.old = function ( x0, y0, x1, y1, x2, y2 ) {
-
-	this.x0 = x0;
-	this.y0 = y0;
-
-	this.x1 = x1;
-	this.y1 = y1;
-
-	this.x2 = x2;
-	this.y2 = y2;
-
-};
-
 
 THREE.QuadraticBezierCurve.prototype = new THREE.Curve();
 THREE.QuadraticBezierCurve.prototype.constructor = THREE.QuadraticBezierCurve;
@@ -365,27 +360,19 @@ THREE.QuadraticBezierCurve.prototype.getTangent = function( t ) {
 
 THREE.CubicBezierCurve = function ( v0, v1, v2, v3 ) {
 
+	if (!(v1 instanceof THREE.Vector2 )) {
+		var args = Array.prototype.slice.call(arguments);
+		v0 = new THREE.Vector2(args[0], args[1]);
+		v1 = new THREE.Vector2(args[2], args[3]);
+		v2 = new THREE.Vector2(args[4], args[5]);
+		v3 = new THREE.Vector2(args[6], args[7]);
+	}
+
 	this.v0 = v0;
 	this.v1 = v1;
 	this.v2 = v2;
 	this.v3 = v3;
 	
-};
-
-THREE.CubicBezierCurve.old = function ( x0, y0, x1, y1, x2, y2, x3, y3 ) {
-
-	this.x0 = x0;
-	this.y0 = y0;
-
-	this.x1 = x1;
-	this.y1 = y1;
-
-	this.x2 = x2;
-	this.y2 = y2;
-
-	this.x3 = x3;
-	this.y3 = y3;
-
 };
 
 THREE.CubicBezierCurve.prototype = new THREE.Curve();
