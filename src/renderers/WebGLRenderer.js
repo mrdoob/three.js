@@ -887,7 +887,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	};
 
 
-	function setMeshBuffers ( geometryGroup, object, hint ) {
+	function setMeshBuffers( geometryGroup, object, hint, dispose ) {
 
 		if ( ! geometryGroup.__inittedArrays ) {
 
@@ -2076,7 +2076,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		if ( ! object.dynamic ) {
+		if ( dispose ) {
 
 			delete geometryGroup.__inittedArrays;
 			delete geometryGroup.__colorArray;
@@ -4715,7 +4715,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					 geometry.__dirtyUvs || geometry.__dirtyNormals ||
 					 geometry.__dirtyColors || geometry.__dirtyTangents || customAttributeDirty ) {
 
-					setMeshBuffers( geometryGroup, object, _gl.DYNAMIC_DRAW );
+					setMeshBuffers( geometryGroup, object, _gl.DYNAMIC_DRAW, !geometry.dynamic );
 
 				}
 

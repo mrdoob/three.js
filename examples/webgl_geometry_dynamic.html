@@ -90,6 +90,7 @@
 				camera.target.position.y = camera.position.y;
 
 				geometry = new THREE.PlaneGeometry( 20000, 20000, worldWidth - 1, worldDepth - 1 );
+				geometry.dynamic = true;
 
 				var i, j, il, jl;
 
@@ -111,7 +112,6 @@
 				material = new THREE.MeshBasicMaterial( { color:0x0044ff, opacity:1, map: texture } );
 
 				mesh = new THREE.Mesh( geometry, material );
-				mesh.dynamic = true;
 				mesh.rotation.x = - 90 * Math.PI / 180;
 				scene.addObject( mesh );
 
