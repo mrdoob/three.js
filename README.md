@@ -66,7 +66,7 @@ More? [#three.js on irc.freenode.net](http://webchat.freenode.net/?channels=thre
 [![Infinite beanstalk](http://mrdoob.github.com/three.js/assets/projects/19_beanstalk.png)](http://inear.se/beanstalk/)
 [![Mission Control](http://mrdoob.github.com/three.js/assets/projects/18_missioncontrol.png)](http://superfad.com/missioncontrol/)
 [![ROME](http://mrdoob.github.com/three.js/assets/projects/17_rome.png)](http://ro.me/)
-[![Globe](http://mrdoob.github.com/three.js/assets/projects/16_globe.png)](http://data-arts.appspot.com/globe/)
+[![Globe](http://mrdoob.github.com/three.js/assets/projects/16_globe.png)](http://data-arts.appspot.com/globe)
 [![Photoparticles](http://mrdoob.github.com/three.js/assets/projects/15_photoparticles.png)](http://lab.aerotwist.com/webgl/photoparticles/)
 [![Plumegraph](http://mrdoob.github.com/three.js/assets/projects/14_plumegraph.png)](http://plumegraph.org/)
 [![HelloRacer](http://mrdoob.github.com/three.js/assets/projects/13_helloracer.png)](http://helloracer.com/webgl/)
@@ -154,7 +154,7 @@ This code creates a camera, then creates a scene, adds a cube on it, creates a &
 
 2011 05 31 - **r41/ROME** (265.317 KB, gzip: 64.849 KB)
 
-(Up to this point, some [rome](http://ro.me) specific features managed to get in the lib. The aim is to clean this up in next revisions.)
+(Up to this point, some [RO.ME](http://ro.me) specific features managed to get in the lib. The aim is to clean this up in next revisions.)
 
 * Improved Blender Object and Scene exporters. ([alteredq](http://github.com/alteredq))
 * Fixes on WebGL attributes. ([alteredq](http://github.com/alteredq) and [empaempa](http://github.com/empaempa))
