@@ -1,0 +1,1 @@
+g++ objcompress.cc -O2 -Wall -o objcompress

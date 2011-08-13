@@ -114,6 +114,7 @@ EXTRAS_FILES = [
 'extras/io/JSONLoader.js',
 'extras/io/BinaryLoader.js',
 'extras/io/SceneLoader.js',
+'extras/io/UTF8Loader.js',
 'extras/objects/MarchingCubes.js',
 'extras/objects/Trident.js',
 'extras/physics/Collisions.js',
