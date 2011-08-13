@@ -163,7 +163,7 @@ THREE.UTF8Loader.prototype = {
 
 		var Model = function ( texture_path ) {
 
-			var s = (new Date).getTime();
+			//var s = (new Date).getTime();
 
 			var scope = this;
 
@@ -186,9 +186,9 @@ THREE.UTF8Loader.prototype = {
 			this.computeFaceNormals();
 			//this.computeTangents();
 
-			var e = (new Date).getTime();
+			//var e = (new Date).getTime();
 
-			console.log( "utf8 data parse time: " + (e-s) + " ms" );
+			//console.log( "utf8 data parse time: " + (e-s) + " ms" );
 
 			function init_vertices( data, stride, offset ) {
 
