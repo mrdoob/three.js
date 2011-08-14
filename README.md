@@ -146,7 +146,7 @@ This code creates a camera, then creates a scene, adds a cube on it, creates a &
 * Improved uniform handling in `WebGLRenderer`. ([alteredq](http://github.com/alteredq))
 * Implemented Shadow Mapping in `WebGLRenderer`. ([alteredq](http://github.com/alteredq))
 * Added `Spotlight` light type. ([alteredq](http://github.com/alteredq))
-* Fixed constructor-less prototypes. ([pushmatrix](http://github.com/pushmatrix)
+* Fixed constructor-less prototypes. ([pushmatrix](http://github.com/pushmatrix))
 * Added `DataTexture`. ([alteredq](http://github.com/alteredq))
 * `WebGLRenderer` opaque pass now renders from front to back. ([alteredq](http://github.com/alteredq))
 * Simplified `Color`. ([mrdoob](http://github.com/mrdoob))
