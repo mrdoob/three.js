@@ -192,21 +192,35 @@ var DAE = (function() {
 		obj.matrixAutoUpdate = false;
 		obj.matrix = node.matrix;
 
-		// controllers
+		// FIXME: controllers
 		for (i =0; i < node.controllers.length; i++) {
 			var controller = controllers[node.controllers[i].url];
 			switch (controller.type) {
 				case 'skin':
-					if (geometries[controller.skin.geometry]) {
+					if (geometries[controller.skin.source]) {
 						var inst_geom = new InstanceGeometry();
-						inst_geom.url = controller.skin.geometry;
+						inst_geom.url = controller.skin.source;
 						inst_geom.instance_material = node.controllers[i].instance_material;
 						node.geometries.push(inst_geom);
 						skinned = true;
+					} else if (controllers[controller.skin.source]) {
+						var second = controllers[controller.skin.source];
+						if (second.morph && geometries[second.morph.source]) {
+							var inst_geom = new InstanceGeometry();
+							inst_geom.url = second.morph.source;
+							inst_geom.instance_material = node.controllers[i].instance_material;
+							node.geometries.push(inst_geom);
+						}
 					}
 					break;
 				case 'morph': // unsupported
-					console.log("DAE: morph-controller not yet supported.")
+					if (geometries[controller.morph.source]) {
+						var inst_geom = new InstanceGeometry();
+						inst_geom.url = controller.morph.source;
+						inst_geom.instance_material = node.controllers[i].instance_material;
+						node.geometries.push(inst_geom);
+					}
+					console.log("DAE: morph-controller partially supported.")
 				default:
 					break;
 			}
@@ -339,14 +353,78 @@ var DAE = (function() {
 					this.skin = (new Skin()).parse(child);
 					this.type = child.nodeName;
 					break;
+				case 'morph':
+					this.morph = (new Morph()).parse(child);
+					this.type = child.nodeName;
+					break;
 				default:
 					break;
 			}
 		}
 		return this;
 	}
+	function Morph() {
+		this.method;
+		this.source;
+		this.targets;
+		this.weights;
+	}
+	Morph.prototype.parse = function(element) {
+		var sources = {};
+		var inputs = [];
+		var i;
+		this.method = element.getAttribute('method');
+		this.source = element.getAttribute('source').replace(/^#/, '');
+		for (i = 0; i < element.childNodes.length; i++) {
+			var child = element.childNodes[i];
+			if (child.nodeType != 1) continue;
+			switch (child.nodeName) {
+				case 'source':
+					var source = (new Source()).parse(child);
+					sources[source.id] = source;
+					break;
+				case 'targets':
+					inputs = this.parseInputs(child);
+					break;
+				default:
+					console.log(child.nodeName);
+					break;
+			}
+		}
+		for (i = 0; i < inputs.length; i++) {
+			var input = inputs[i];
+			var source = sources[input.source];
+			switch (input.semantic) {
+				case 'MORPH_TARGET':
+					this.targets = source.read();
+					break;
+				case 'MORPH_WEIGHT':
+					this.weights = source.read();
+					break;
+				default:
+					break;
+			}
+		}
+		return this;
+	}
+	Morph.prototype.parseInputs = function(element) {
+		var inputs = [];
+		for (var i = 0; i < element.childNodes.length; i++) {
+			var child = element.childNodes[i];
+			if (child.nodeType != 1) continue;
+			switch (child.nodeName) {
+				case 'input':
+					inputs.push((new Input()).parse(child));
+					break;
+				default:
+					break;
+			}
+		}
+		return inputs;
+	}
+	
 	function Skin() {
-		this.geometry = "";
+		this.source = "";
 		this.bindShapeMatrix = null;
 		this.invBindMatrices = [];
 		this.joints = [];
@@ -355,7 +433,7 @@ var DAE = (function() {
 	Skin.prototype.parse = function(element) {
 		var sources = {};
 		var joints, weights;
-		this.geometry = element.getAttribute('source').replace(/^#/, '');
+		this.source = element.getAttribute('source').replace(/^#/, '');
 		this.invBindMatrices = [];
 		this.joints = [];
 		this.weights = [];
@@ -739,6 +817,11 @@ var DAE = (function() {
 				case 'triangles':
 					this.primitives.push((new Triangles().parse(child)));
 					break;
+				case 'polygons':
+					console.warn('polygon holes not yet supported!');
+				case 'polylist':
+					this.primitives.push((new Polylist().parse(child)));
+					break;
 				default:
 					break;
 			}
@@ -751,10 +834,114 @@ var DAE = (function() {
 		return this;
 	}
 	
+	function Polylist() {
+	}
+	Polylist.prototype = new Triangles();
+	Polylist.prototype.constructor = Polylist;
+	Polylist.prototype.create = function() {
+		var p = this.p, inputs = this.inputs, num_inputs = this.inputs.length;
+		var idx = 0, input;
+		var i, j, k, v, n, t;
+		var texture_sets = [];
+		var polygons = [];
+		
+		for (j = 0; j < inputs.length; j++) {
+			input = inputs[j];
+			if (input.semantic == 'TEXCOORD') {
+				texture_sets.push(input.set);
+			}
+		}
+		
+		for (i = 0; i < this.vcount.length; i++) {
+			var num_verts = this.vcount[i]
+			var vs = [], ns = [], ts = [];
+			for (j = 0; j < num_verts; j++) {
+				for (k = 0; k < num_inputs; k++) {
+					input = inputs[k];
+					source = sources[input.source];
+					index = p[idx + input.offset];
+					numParams = source.accessor.params.length;
+					idx32 = index * numParams;
+					switch (input.semantic) {
+						case 'VERTEX':
+							v = new THREE.Vertex(new THREE.Vector3(source.data[idx32+0], source.data[idx32+1], source.data[idx32+2]));
+							v.daeId = vs.length;
+							vs.push(v);
+							break;
+						case 'NORMAL':
+							n = new THREE.Vector3(source.data[idx32+0], source.data[idx32+1], source.data[idx32+2]);
+							n.daeId = ns.length;
+							ns.push(n);
+							break;
+						case 'TEXCOORD':
+							if (ts[input.set] == undefined) ts[input.set] = [];
+							t = new THREE.UV(source.data[idx32+0], source.data[idx32+1]);
+							t.daeId = ts[input.set].length;
+							ts[input.set].push(t);
+							break;
+						default:
+							break;
+					}
+				}
+				idx += num_inputs;
+			}
+			polygons.push([vs, ns, ts])
+		}
+		
+		this.geometry = new THREE.Geometry();
+		this.triangulate(polygons, texture_sets);
+	}
+	Polylist.prototype.triangulate = function(polygons, texture_sets) {
+		var i, j, k;
+		
+		function clone(v) {
+			var x = v.position.x;
+			var y = v.position.y;
+			var z = v.position.z;
+			return new THREE.Vertex(new THREE.Vector3(x, y, z));
+		}
+		for (i = 0; i < polygons.length; i++) {
+			var polygon = polygons[i];
+			var v = polygon[0];
+			var n = polygon[1];
+			var t = polygon[2];
+			var uvs = [];
+			for (j = 0; j < texture_sets.length; j++) {
+				uvs.push(t[texture_sets[j]]);
+			}
+			var has_uv = (uvs.length > 0 && uvs[0].length > 0);
+			if (v.length < 3) continue;
+			var va = v[0];
+			var na = n[0];
+
+			for (j = 1; j < v.length - 1; j++) {
+				var vb = v[j];
+				var vc = v[j+1];
+				var nb = n[j];
+				var nc = n[j+1];
+
+				var c = this.geometry.vertices.length;
+				this.geometry.vertices.push(va, vb, vc);
+				this.geometry.faces.push( new THREE.Face3(c+0, c+1, c+2, [na, nb, nc] ) );
+				if (has_uv) {
+					for (k = 0; k < uvs.length; k++) {
+						this.geometry.faceVertexUvs[ k ].push( [uvs[k][0], uvs[k][j], uvs[k][j+1]] );
+					}
+				}
+			}
+		}
+		this.geometry.material = this.material;
+		this.geometry.computeCentroids();
+		this.geometry.computeFaceNormals();
+		this.geometry.computeVertexNormals();
+		this.geometry.computeBoundingBox();
+	}
+	
 	function Triangles() {
 		this.material = "";
 		this.count = 0;
 		this.inputs = [];
+		this.vcount;
 		this.p = [];
 		this.aabb = new AABB();
 		this.geometry = new THREE.Geometry();
@@ -842,6 +1029,9 @@ var DAE = (function() {
 			switch (child.nodeName) {
 				case 'input':
 					this.inputs.push((new Input()).parse(element.childNodes[i]));
+					break;
+				case 'vcount':
+					this.vcount = _ints(child.textContent);
 					break;
 				case 'p':
 					this.p = _ints(child.textContent);
@@ -1011,6 +1201,7 @@ var DAE = (function() {
 			var param = this.accessor.params[0];
 			//console.log(param.name + " " + param.type);
 			switch (param.type) {
+				case 'IDREF':
 				case 'Name':
 				case 'float':
 					return this.data;

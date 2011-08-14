@@ -33,11 +33,11 @@
 			var particleLight, pointLight;
 			var dae;
 			
-			DAE.load('./models/monster.dae', colladaReady);
+			DAE.load('./models/skin_and_morph.dae', colladaReady);
 			
 			function colladaReady(collada) {
 				dae = collada.scene;
-				dae.scale.x = dae.scale.y = dae.scale.z = 0.005;
+				dae.scale.x = dae.scale.y = dae.scale.z = 0.03;
 				dae.updateMatrix();
 
 				init();
@@ -217,7 +217,7 @@
 				var timer = new Date().getTime() * 0.0005;
 
 				camera.position.x = Math.cos( timer ) * 10;
-				camera.position.y = 2;
+				camera.position.y = 5;
 				camera.position.z = Math.sin( timer ) * 10;
 
 				for ( var i = 0, l = objects.length; i < l; i++ ) {
