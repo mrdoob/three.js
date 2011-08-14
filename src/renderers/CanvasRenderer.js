@@ -141,8 +141,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		if ( !_clearRect.isEmpty() ) {
 
-			_clearRect.inflate( 2 );
 			_clearRect.minSelf( _clipRect );
+			_clearRect.inflate( 2 );
 
 			if ( _clearOpacity < 1 ) {
 
@@ -886,12 +886,19 @@ THREE.CanvasRenderer = function ( parameters ) {
 			// http://extremelysatisfactorytotalitarianism.com/blog/?p=2120
 
 			var a, b, c, d, e, f, det, idet,
+			offsetX = texture.offset.x / texture.repeat.x,
+			offsetY = texture.offset.y / texture.repeat.y,
 			width = ( texture.image.width - 1 ) * texture.repeat.x,
 			height = ( texture.image.height - 1 ) * texture.repeat.y;
 
-			u0 *= width; v0 *= height;
-			u1 *= width; v1 *= height;
-			u2 *= width; v2 *= height;
+			u0 = ( u0 + offsetX ) * width;
+			v0 = ( v0 + offsetY ) * height;
+
+			u1 = ( u1 + offsetX ) * width;
+			v1 = ( v1 + offsetY ) * height;
+
+			u2 = ( u2 + offsetX ) * width;
+			v2 = ( v2 + offsetY ) * height;
 
 			x1 -= x0; y1 -= y0;
 			x2 -= x0; y2 -= y0;
@@ -919,7 +926,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 		}
 
 		function clipImage( x0, y0, x1, y1, x2, y2, u0, v0, u1, v1, u2, v2, image ) {
-		
+
 			// http://extremelysatisfactorytotalitarianism.com/blog/?p=2120
 
 			var a, b, c, d, e, f, det, idet,
@@ -953,7 +960,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 			_context.clip();
 			_context.drawImage( image, 0, 0 );
 			_context.restore();
-		
+
 		}
 
 		function getGradientTexture( color1, color2, color3, color4 ) {
@@ -1113,7 +1120,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 		}
 
 	}
-	
+
 	function setFillStyle( style ) {
 
 		if ( _contextFillStyle != style ) {

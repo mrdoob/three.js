@@ -5,7 +5,7 @@ three.js
 
 The aim of the project is to create a lightweight 3D engine with a very low level of complexity — in other words, for dummies. The engine can render using &lt;canvas&gt;, &lt;svg&gt; and WebGL.
 
-[Contributors](https://github.com/mrdoob/three.js/contributors) — [Getting Started](http://www.aerotwist.com/lab/getting-started-with-three-js/) — [API Reference](https://github.com/mrdoob/three.js/wiki/API-Reference)
+[Contributors](http://github.com/mrdoob/three.js/contributors) — [Getting Started](http://www.aerotwist.com/lab/getting-started-with-three-js/) — [API Reference](http://github.com/mrdoob/three.js/wiki/API-Reference)
 
 More? [#three.js on irc.freenode.net](http://webchat.freenode.net/?channels=three.js)
 
@@ -135,13 +135,33 @@ This code creates a camera, then creates a scene, adds a cube on it, creates a &
 
 ### Change Log ###
 
-2011 07 06 - **r42** (277.852 KB, gzip, gzip: 69.469 KB)
+
+2011 08 14 - **r43** (298.199 KB, gzip: 74.805 KB)
+
+* Improved Blender exporter - 2.58 (and 2.59) support, normals maps, specular, ao maps... ([alteredq](http://github.com/alteredq))
+* Added [CORS](http://www.w3.org/TR/cors/) to `ImageUtils`. ([mrdoob](http://github.com/mrdoob))
+* Refactored `TextGeometry` and added `Shape`, `Curve`, `Path`, `ExtrudeGeometry`, `TextPath`. ([zz85](http://github.com/zz85) and [alteredq](http://github.com/alteredq))
+* Added handling of custom attributes for `ParticleSystems`. ([alteredq](http://github.com/alteredq))
+* Fixed `CanvasRenderer.setClearColor`. ([mrdoob](http://github.com/mrdoob), [StephenHopkins](http://github.com/StephenHopkins) and [sebleedelisle](http://github.com/sebleedelisle))
+* Improved uniform handling in `WebGLRenderer`. ([alteredq](http://github.com/alteredq))
+* Implemented Shadow Mapping in `WebGLRenderer`. ([alteredq](http://github.com/alteredq))
+* Added `Spotlight` light type. ([alteredq](http://github.com/alteredq))
+* Fixed constructor-less prototypes. ([pushmatrix](http://github.com/pushmatrix)
+* Added `DataTexture`. ([alteredq](http://github.com/alteredq))
+* `WebGLRenderer` opaque pass now renders from front to back. ([alteredq](http://github.com/alteredq))
+* Simplified `Color`. ([mrdoob](http://github.com/mrdoob))
+* Added `preserveDrawingBuffer` option to `WebGLRenderer`. ([jeromeetienne](http://github.com/jeromeetienne))
+* Added `UTF8Loader` for loading the new, uber compressed, [UTF8 format](http://code.google.com/p/webgl-loader/). ([alteredq](http://github.com/alteredq))
+* `CanvasRenderer` now supports `RepeatWrapping`, `texture.offset` and `texture.repeat`. ([mrdoob](http://github.com/mrdoob))
+* Removed Stencil Shadows and Lensflare code. ([mrdoob](http://github.com/mrdoob))
+
+2011 07 06 - **r42** (277.852 KB, gzip: 69.469 KB)
 
 * Added `AnaglypWebGLRenderer` and `CrosseyedWebGLRenderer`. ([mrdoob](http://github.com/mrdoob), [alteredq](http://github.com/alteredq) and [marklundin](http://github.com/marklundin))
 * Added `TextGeometry`. ([zz85](http://github.com/zz85) and [alteredq](http://github.com/alteredq))
 * Added `setViewOffset` method to `Camera`. ([greggman](http://github.com/greggman))
 * Renamed geometries to `*Geometry`. ([mrdoob](http://github.com/mrdoob))
-* Improved Blender exporter. ([alteredq](http://github.com/alteredq), [sweetfish](http://github.com/sweetfish) and [Jhonnyg](https://github.com/Jhonnyg))
+* Improved Blender exporter. ([alteredq](http://github.com/alteredq), [sweetfish](http://github.com/sweetfish) and [Jhonnyg](http://github.com/Jhonnyg))
 * Added Blender 2.58 exporter. ([georgik](http://github.com/georgik))
 * Fixed `Matrix4.multiply()`. (thanks [lukem1](http://github.com/lukem1)) 
 * Added support for additional Euler rotation orders in `Matrix4`. ([rectalogic](http://github.com/rectalogic))
