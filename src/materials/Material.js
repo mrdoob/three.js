@@ -4,7 +4,7 @@
 
 THREE.Material = function ( parameters ) {
 
-	this.id = THREE.MaterialCounter.value ++;
+	this.id = THREE.MaterialCount ++;
 
 	parameters = parameters || {};
 
@@ -18,7 +18,11 @@ THREE.Material = function ( parameters ) {
 	this.polygonOffsetFactor = parameters.polygonOffsetFactor !== undefined ? parameters.polygonOffsetFactor : 0;
 	this.polygonOffsetUnits = parameters.polygonOffsetUnits !== undefined ? parameters.polygonOffsetUnits : 0;
 
+	this.alphaTest = parameters.alphaTest !== undefined ? parameters.alphaTest : 0;
+
 }
+
+THREE.MaterialCount = 0;
 
 THREE.NoShading = 0;
 THREE.FlatShading = 1;
@@ -33,6 +37,3 @@ THREE.AdditiveBlending = 1;
 THREE.SubtractiveBlending = 2;
 THREE.MultiplyBlending = 3;
 THREE.AdditiveAlphaBlending = 4;
-
-
-THREE.MaterialCounter = { value: 0 };

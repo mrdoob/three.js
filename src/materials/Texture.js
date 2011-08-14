@@ -6,6 +6,8 @@
 
 THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter ) {
 
+	this.id = THREE.TextureCount ++;
+
 	this.image = image;
 
 	this.mapping = mapping !== undefined ? mapping : new THREE.UVMapping();
@@ -25,13 +27,22 @@ THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter ) 
 
 THREE.Texture.prototype = {
 
+	constructor: THREE.Texture,
+
 	clone: function () {
 
-		return new THREE.Texture( this.image, this.mapping, this.wrapS, this.wrapT, this.magFilter, this.minFilter );
+		var clonedTexture = new THREE.Texture( this.image, this.mapping, this.wrapS, this.wrapT, this.magFilter, this.minFilter );
+
+		clonedTexture.offset.copy( this.offset );
+		clonedTexture.repeat.copy( this.repeat );
+
+		return clonedTexture;
 
 	}
 
 };
+
+THREE.TextureCount = 0;
 
 THREE.MultiplyOperation = 0;
 THREE.MixOperation = 1;

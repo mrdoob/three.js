@@ -13,7 +13,7 @@
 	</head>
 	<body>
 
-		<!-- 
+		<!--
 		<script type="text/javascript" src="../build/Three.js"></script>
 		-->
 
@@ -40,6 +40,7 @@
 		<script type="text/javascript" src="../src/lights/AmbientLight.js"></script>
 		<script type="text/javascript" src="../src/lights/DirectionalLight.js"></script>
 		<script type="text/javascript" src="../src/lights/PointLight.js"></script>
+		<script type="text/javascript" src="../src/lights/SpotLight.js"></script>
 		<script type="text/javascript" src="../src/lights/LensFlare.js"></script>
 		<script type="text/javascript" src="../src/materials/Material.js"></script>
 		<script type="text/javascript" src="../src/materials/Mappings.js"></script>
@@ -63,7 +64,6 @@
 		<script type="text/javascript" src="../src/objects/Bone.js"></script>
 		<script type="text/javascript" src="../src/objects/SkinnedMesh.js"></script>
 		<script type="text/javascript" src="../src/objects/Ribbon.js"></script>
-		<script type="text/javascript" src="../src/objects/Sound.js"></script>
 		<script type="text/javascript" src="../src/objects/LOD.js"></script>
 		<script type="text/javascript" src="../src/objects/ShadowVolume.js"></script>
 		<script type="text/javascript" src="../src/objects/Sprite.js"></script>
@@ -77,7 +77,6 @@
 		<script type="text/javascript" src="../src/renderers/WebGLShaders.js"></script>
 		<script type="text/javascript" src="../src/renderers/WebGLRenderer.js"></script>
 		<script type="text/javascript" src="../src/renderers/WebGLRenderTarget.js"></script>
-		<script type="text/javascript" src="../src/renderers/SoundRenderer.js"></script>
 		<script type="text/javascript" src="../src/renderers/renderables/RenderableVertex.js"></script>
 		<script type="text/javascript" src="../src/renderers/renderables/RenderableFace3.js"></script>
 		<script type="text/javascript" src="../src/renderers/renderables/RenderableFace4.js"></script>
@@ -96,8 +95,12 @@
 		<script type="text/javascript" src="../src/extras/cameras/FlyCamera.js"></script>
 		<script type="text/javascript" src="../src/extras/cameras/RollCamera.js"></script>
 		<script type="text/javascript" src="../src/extras/cameras/TrackballCamera.js"></script>
+		<script type="text/javascript" src="../src/extras/cameras/QuakeCamera.js"></script>
+		<script type="text/javascript" src="../src/extras/geometries/Path.js"></script>
+		<script type="text/javascript" src="../src/extras/geometries/Shape.js"></script>
 		<script type="text/javascript" src="../src/extras/geometries/CubeGeometry.js"></script>
 		<script type="text/javascript" src="../src/extras/geometries/CylinderGeometry.js"></script>
+		<script type="text/javascript" src="../src/extras/geometries/ExtrudeGeometry.js"></script>
 		<script type="text/javascript" src="../src/extras/geometries/IcosahedronGeometry.js"></script>
 		<script type="text/javascript" src="../src/extras/geometries/LatheGeometry.js"></script>
 		<script type="text/javascript" src="../src/extras/geometries/PlaneGeometry.js"></script>
@@ -115,7 +118,7 @@
 		<script type="text/javascript" src="../src/extras/physics/CollisionUtils.js"></script>
 		<script type="text/javascript" src="../src/extras/renderers/AnaglyphWebGLRenderer.js"></script>
 		<script type="text/javascript" src="../src/extras/renderers/CrosseyedWebGLRenderer.js"></script>
-		
+
 		<script type="text/javascript" src="obj/Qrcode.js"></script>
 
 		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
@@ -218,7 +221,7 @@
 				geometry.computeFaceNormals();
 				geometry.computeCentroids();
 
-				mesh = new THREE.Mesh( geometry, [ new THREE.MeshFaceMaterial(), new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, wireframe: true, wireframeLinewidth: 10 } ) ] );
+				mesh = new THREE.Mesh( geometry, [ new THREE.MeshFaceMaterial(), new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, transparent: true, wireframe: true, wireframeLinewidth: 10 } ) ] );
 				mesh.doubleSided = true;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
 				scene.addObject( mesh );

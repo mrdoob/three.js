@@ -30,9 +30,13 @@ THREE.Geometry = function () {
 
 	this.hasTangents = false;
 
+	this.dynamic = false; // unless set to true the *Arrays will be deleted once sent to a buffer.
+
 };
 
 THREE.Geometry.prototype = {
+
+	constructor : THREE.Geometry,
 
 	computeCentroids: function () {
 

@@ -138,7 +138,7 @@
 
 		uniforms[ "uShininess" ].value = 30;
 
-		var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true };
+		var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true, fog: true };
 		var materialNormalMap = new THREE.MeshShaderMaterial( parameters );
 
 		// planet

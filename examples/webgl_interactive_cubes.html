@@ -145,7 +145,7 @@
 						if ( INTERSECTED ) INTERSECTED.materials[ 0 ].color.setHex( INTERSECTED.currentHex );
 
 						INTERSECTED = intersects[ 0 ].object;
-						INTERSECTED.currentHex = INTERSECTED.materials[ 0 ].color.hex;
+						INTERSECTED.currentHex = INTERSECTED.materials[ 0 ].color.getHex();
 						INTERSECTED.materials[ 0 ].color.setHex( 0xff0000 );
 
 					}

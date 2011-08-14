@@ -20,11 +20,11 @@
 
 		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
-		      
+
 		<!-- load the font file from canvas-text -->
 
 		<script type="text/javascript" src="fonts/helvetiker_regular.typeface.js"></script>
-        
+
 
 		<script type="text/javascript">
 
@@ -69,47 +69,44 @@
 				// Get text from hash
 
 				var theText = "Hello three.js! :)";
-				
+
 				var hash = document.location.hash.substr( 1 );
-				
+
 				if ( hash.length !== 0 ) {
-                   
+
 					theText = hash;
 
 				}
-                
-		var text3d = new THREE.TextGeometry( theText, {
 
-					size: 80, 
+				var text3d = new THREE.TextGeometry( theText, {
+
+					size: 80,
 					height: 20,
 					curveSegments: 2,
 					font: "helvetiker"
 
 				});
 
-                var textMaterial = new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, wireframe:false } );
+				text3d.computeBoundingBox();
+				var centerOffset = -0.5 * ( text3d.boundingBox.x[ 1 ] - text3d.boundingBox.x[ 0 ] );
+
+                var textMaterial = new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, wireframe: false } );
                 text = new THREE.Mesh( text3d, textMaterial );
 
                 text.doubleSided = false;
 
-                text.position.y = 0;
+                text.position.x = centerOffset;
                 text.position.y = 100;
                 text.position.z = 0;
 
                 text.rotation.x = 0;
-                text.rotation.y = Math.PI*2;
+                text.rotation.y = Math.PI * 2;
 				text.overdraw = true;
 
-                scene.addObject( text );
+				parent = new THREE.Object3D();
+                parent.addChild( text );
 
-				// Plane
-
-				plane = new THREE.Mesh( new THREE.PlaneGeometry( 800, 800 ), new THREE.MeshBasicMaterial( { color: 0xe0e0e0, wireframe:true }) );
-				plane.rotation.x = - 90 * ( Math.PI / 180 );
-                plane.position.x = 0;
-				plane.overdraw = true;
-
-				//scene.addObject( plane );
+				scene.addObject( parent );
 
 				renderer = new THREE.CanvasRenderer();
                 renderer.setSize( window.innerWidth, window.innerHeight );
@@ -205,7 +202,7 @@
 
 			function render() {
 
-				plane.rotation.z = text.rotation.y += ( targetRotation - text.rotation.y ) * 0.05;
+				parent.rotation.y += ( targetRotation - parent.rotation.y ) * 0.05;
 				renderer.render( scene, camera );
 
 			}

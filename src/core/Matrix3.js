@@ -6,7 +6,9 @@ THREE.Matrix3 = function () {
 
 THREE.Matrix3.prototype = {
 
-	transpose : function () {
+	constructor: THREE.Matrix3,
+
+	transpose: function () {
 
 		var tmp, m = this.m;
 
@@ -18,7 +20,7 @@ THREE.Matrix3.prototype = {
 
 	},
 
-	transposeIntoArray : function ( r ) {
+	transposeIntoArray: function ( r ) {
 
 		var m = this.m;
 

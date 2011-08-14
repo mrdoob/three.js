@@ -102,12 +102,12 @@
 				xc.fillStyle = "#555";
 				xc.fillRect(96, 96, 32, 32);
 
-				var xm = new THREE.MeshBasicMaterial( { map: new THREE.Texture( x, THREE.UVMapping, THREE.RepeatWrapping, THREE.RepeatWrapping ) } );
+				var xm = new THREE.MeshBasicMaterial( { map: new THREE.Texture( x, new THREE.UVMapping(), THREE.RepeatWrapping, THREE.RepeatWrapping ) } );
 				xm.map.needsUpdate = true;
 				xm.map.repeat.set( 10, 10 );
 
 				geometry = new THREE.PlaneGeometry( 100, 100, 15, 10 );
-	
+
 				mesh = new THREE.Mesh( geometry, xm );
 				mesh.position.x = 0;
 				mesh.position.y = FLOOR;
@@ -229,7 +229,7 @@
 					xc.font = "50pt arial bold";
 					xc.fillText(i, 10, 64);
 
-					var xm = new THREE.MeshBasicMaterial( { map: new THREE.Texture( x ) } );
+					var xm = new THREE.MeshBasicMaterial( { map: new THREE.Texture( x ), transparent: true } );
 					xm.map.needsUpdate = true;
 
 					mesh = new THREE.Mesh( new THREE.PlaneGeometry( size, size ), xm );

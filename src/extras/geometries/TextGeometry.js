@@ -15,250 +15,124 @@
  *  weight: 		<string>,		// font weight (normal, bold)
  *  style: 			<string>,		// font style  (normal, italics)
  *
- *  bezelEnabled:	<bool>,			// turn on bezel
- *  bezelThickness: <float>, 		// how deep into text bezel goes
- *  bezelSize:		<float>, 		// how far from text outline is bezel
+ *  bevelEnabled:	<bool>,			// turn on bevel
+ *  bevelThickness: <float>, 		// how deep into text bevel goes
+ *  bevelSize:		<float>, 		// how far from text outline is bevel
+ *
+ *  bend:			<bool>			// bend according to hardcoded curve (for the moment)
  *  }
- *  
- * It uses techniques used in
- * 
+ *
+ * It uses techniques used in:
+ *
  * 	typeface.js and canvastext
- * 		For converting fonts and rendering with javascript 
+ * 		For converting fonts and rendering with javascript
  *		http://typeface.neocracy.org
- * 
+ *
  *	Triangulation ported from AS3
  *		Simple Polygon Triangulation
  *		http://actionsnippet.com/?p=1462
  *
- * 	A Method to triangulate shapes with holes 
+ * 	A Method to triangulate shapes with holes
  *		http://www.sakri.net/blog/2009/06/12/an-approach-to-triangulating-polygons-with-holes/
  *
  */
- 
+
 THREE.TextGeometry = function ( text, parameters ) {
 
-	THREE.Geometry.call( this );
+	var textPath = new THREE.TextPath( text, parameters );
+	var textShapes = textPath.toShapes();
 
-	this.parameters = parameters || {};
-	this.set( text );
+	// translate parameters to ExtrudeGeometry API
+
+	parameters.amount = parameters.height !== undefined ? parameters.height : 50;
+
+	// defaults
+
+	if ( parameters.bevelThickness === undefined ) parameters.bevelThickness = 10;
+	if ( parameters.bevelSize === undefined ) parameters.bevelSize = 8;
+	if ( parameters.bevelEnabled === undefined ) parameters.bevelEnabled = false;
+
+	if ( parameters.bend ) {
+
+		var b = textShapes[ textShapes.length - 1 ].getBoundingBox();
+		var max = b.maxX;
+
+		parameters.bendPath = new THREE.QuadraticBezierCurve( new THREE.Vector2( 0, 0 ),
+															  new THREE.Vector2( max / 2, 120 ),
+															  new THREE.Vector2( max, 0 ) );
+
+	}
+
+	// // Bend Testings.
+	//
+	// var path = new THREE.CurvePath();
+	//
+	// path.add(new THREE.CubicBezierCurve(
+	// 		new THREE.Vector2(0, 0),
+	//   		new THREE.Vector2(10, 100),
+	// 		new THREE.Vector2(200, -10),
+	// 		new THREE.Vector2(300, 0)
+	// 	));
+	//
+	// path.add(new THREE.QuadraticBezierCurve(
+	// 	new THREE.Vector2(300, 0),
+	//   		new THREE.Vector2(450, -10),
+	// 	new THREE.Vector2(500, 100)
+	// ));
+	//
+	// parameters.bendPath = path;
+
+	// var path = new THREE.CurvePath();
+	// 	path.add(new THREE.LineCurve( 0, 0,  250, 0));
+	// 	path.add(new THREE.LineCurve( 250, 0,  300, 200));
+	//
+	// 	parameters.bendPath = path;
+
+	// var path = new THREE.SplineCurve([
+	// 		new THREE.Vector2(0, 0),
+	// 		new THREE.Vector2(100, 40),
+	// 		new THREE.Vector2(200, 0),
+	// 		new THREE.Vector2(400, 20)
+	// 	]);
+	//
+	// console.log(path);
+	//
+	// path = new THREE.LineCurve( new THREE.Vector2(0, 0),  new THREE.Vector2(400, 100));
+
+	// var bend = new THREE.Path();
+	// 	bend.moveTo(0,0);
+	// 	bend.quadraticCurveTo( 500, 100, 1000, 0 );
+	//
+	// 	parameters.bendPath = bend;
+
+
+
+	THREE.ExtrudeGeometry.call( this, textShapes, parameters );
 
 };
 
-THREE.TextGeometry.prototype = new THREE.Geometry();
+THREE.TextGeometry.prototype = new THREE.ExtrudeGeometry();
 THREE.TextGeometry.prototype.constructor = THREE.TextGeometry;
 
-THREE.TextGeometry.prototype.set = function ( text, parameters ) {
 
-	this.text = text;
-	var parameters = parameters || this.parameters;
+/*
+	// TextGeometry wrapper
 
-	var size = parameters.size !== undefined ? parameters.size : 100;
-	var height = parameters.height !== undefined ? parameters.height : 50;
-	var curveSegments = parameters.curveSegments !== undefined ? parameters.curveSegments: 4;
+	var text3d = new TextGeometry( text, options );
 
-	var font = parameters.font !== undefined ? parameters.font : "helvetiker";
-	var weight = parameters.weight !== undefined ? parameters.weight : "normal";
-	var style = parameters.style !== undefined ? parameters.style : "normal";
+	// Complete manner
 
-	var bezelThickness = parameters.bezelThickness !== undefined ? parameters.bezelThickness : 10;
-	var bezelSize = parameters.bezelSize !== undefined ? parameters.bezelSize : 8;
-	var bezelEnabled = parameters.bezelEnabled !== undefined ? parameters.bezelEnabled : false;
+	var textPath = new TextPath( text, options );
+	var textShapes = textPath.toShapes();
+	var text3d = new ExtrudeGeometry( textShapes, options );
 
-	THREE.FontUtils.size = size;
-	THREE.FontUtils.divisions = curveSegments;
+	// Factory Method
 
-	THREE.FontUtils.face = font;
-	THREE.FontUtils.weight = weight;
-	THREE.FontUtils.style = style;
+	var textShapes = FontUtils.getTextShapes( text, options );
+	text3d = new ExtrudeGeometry( textShapes, options );
 
-	THREE.FontUtils.bezelSize = bezelSize;
+*/
 
-	// Get a Font data json object
-
-	var data = THREE.FontUtils.drawText( text );
-
-	var vertices = data.points;
-	var faces = data.faces;
-	var contour = data.contour;
-	var bezelPoints = data.bezel;
-
-	var scope = this;
-
-	scope.vertices = [];
-	scope.faces = [];
-
-	var i, 
-		vert, vlen = vertices.length, 
-		face, flen = faces.length,
-		bezelPt, blen = bezelPoints.length;
-
-	// Back facing vertices
-
-	for ( i = 0; i < vlen; i++ ) {
-
-		vert = vertices[ i ];
-		v( vert.x, vert.y, 0 );
-
-	}
-
-	// Front facing vertices
-
-	for ( i = 0; i < vlen; i++ ) {
-	
-		vert = vertices[ i ];
-		v( vert.x, vert.y, height );
-
-	}
-
-	if ( bezelEnabled ) {
-
-		for ( i = 0; i < blen; i++ ) {
-
-			bezelPt = bezelPoints[ i ];
-			v( bezelPt.x, bezelPt.y, bezelThickness );
-
-		}
-
-		for ( i = 0; i < blen; i++ ) {
-
-			bezelPt = bezelPoints[ i ];
-			v( bezelPt.x, bezelPt.y, height - bezelThickness );
-
-		}
-
-	}
-
-	// Bottom faces
-
-	for ( i = 0; i < flen; i++ ) {
-
-		face = faces[ i ];
-		f3( face[ 2 ], face[ 1 ], face[ 0 ] );
-
-	}
-
-	// Top faces
-
-	for ( i = 0; i < flen; i++ ) {
-
-		face = faces[ i ];
-		f3( face[ 0 ] + vlen, face[ 1 ] + vlen, face[ 2 ] + vlen );
-
-	}
-
-	var lastV;
-	var j, k, l, m;
-
-	if ( bezelEnabled ) {
-
-		i = bezelPoints.length;
-
-		while ( --i > 0 ) {
-
-			if ( !lastV ) {
-
-				lastV = contour[ i ];
-
-			} else if ( lastV.equals( contour[ i ] ) ) {
-
-				// We reached the last point of a closed loop
-
-				lastV = null;
-				continue;
-
-			}
-
-			l = vlen * 2 + i;
-			m = l - 1;
-
-			// Create faces for the z-sides of the text
-
-			f4( l, m, m + blen, l + blen );
-
-			for ( j = 0; j < vlen; j++ ) {
-
-				if ( vertices[ j ].equals( contour[ i ] ) ) break;
-
-			}
-
-			for ( k = 0; k < vlen; k++ ) {
-
-				if ( vertices[ k ].equals( contour[ i - 1 ] ) ) break;
-
-			}
-
-			// Create faces for the z-sides of the text
-
-			f4( j, k, m, l );
-			f4( l + blen, m + blen, k + vlen, j + vlen );
-
-		}
-
-	} else {
-
-		i = contour.length;
-
-		while ( --i > 0 ) {
-
-			if ( !lastV ) {
-
-				lastV = contour[ i ];
-
-			} else if ( lastV.equals( contour[ i ] ) ) {
-
-				// We reached the last point of a closed loop
-
-				lastV = null;
-				continue;
-
-			}
-
-			for ( j = 0; j < vlen; j++ ) {
-
-				if ( vertices[ j ].equals( contour[ i ] ) ) break;
-
-			}
-
-			for ( k = 0; k < vlen; k++ ) {
-
-				if ( vertices[ k ].equals( contour[ i - 1 ] ) ) break;
-
-			}
-
-			// Create faces for the z-sides of the text
-
-			f4( j, k, k + vlen, j + vlen );
-
-		}
-	}
-
-
-	// UVs to be added
-
-	this.computeCentroids();
-	this.computeFaceNormals();
-	//this.computeVertexNormals();
-
-	function v( x, y, z ) {
-
-		scope.vertices.push( new THREE.Vertex( new THREE.Vector3( x, y, z ) ) );
-
-	}
-
-	function f3( a, b, c ) {
-
-		scope.faces.push( new THREE.Face3( a, b, c) );
-
-	}
-
-	function f4( a, b, c, d ) {
-
-		scope.faces.push( new THREE.Face4( a, b, c, d) );
-
-	}
-
-
-};
 
 THREE.FontUtils = {
 
@@ -278,6 +152,14 @@ THREE.FontUtils = {
 
 	},
 
+	getTextShapes: function( text, options ) {
+
+		var textPath = new TextPath( text, options );
+		var textShapes = textPath.toShapes();
+		return textShapes;
+
+	},
+
 	loadFace : function( data ) {
 
 		var family = data.familyName.toLowerCase();
@@ -285,7 +167,7 @@ THREE.FontUtils = {
 		var ThreeFont = this;
 
 		ThreeFont.faces[ family ] = ThreeFont.faces[ family ] || {};
-	
+
 		ThreeFont.faces[ family ][ data.cssFontWeight ] = ThreeFont.faces[ family ][ data.cssFontWeight ] || {};
 		ThreeFont.faces[ family ][ data.cssFontWeight ][ data.cssFontStyle ] = data;
 
@@ -295,6 +177,7 @@ THREE.FontUtils = {
 
 	},
 
+/* LEGACY CODE
 
 	extractPoints : function( allPoints, charactersPoints ) {
 
@@ -358,7 +241,7 @@ THREE.FontUtils = {
 				firstPt = all[ firstIndex ];
 				endPt = all.slice( firstIndex + 1 ).indexOf( firstPt ) + firstIndex;
 
-				if ( endPt <= firstIndex ) break; 
+				if ( endPt <= firstIndex ) break;
 
 				var contours = singleCharPoints.slice( firstIndex, endPt + 1 );
 
@@ -414,7 +297,7 @@ THREE.FontUtils = {
 
 		//console.log("isolatedShapes", isolatedShapes);
 
-		/* For each isolated shape, find the closest points and break to the hole to allow triangulation*/
+		// For each isolated shape, find the closest points and break to the hole to allow triangulation
 
 		// Find closest points between holes
 
@@ -472,7 +355,7 @@ THREE.FontUtils = {
 				prevShapeVert = ( shapeIndex - 1 ) >= 0 ? shapeIndex - 1 : shape.length - 1;
 				nextShapeVert = ( shapeIndex + 1 ) < shape.length ? shapeIndex + 1 : 0;
 
-				prevHoleVert = ( holeIndex - 1 ) >= 0 ? holeIndex - 1 : hole.length - 1; 
+				prevHoleVert = ( holeIndex - 1 ) >= 0 ? holeIndex - 1 : hole.length - 1;
 				nextHoleVert = ( holeIndex + 1 ) < hole.length ? holeIndex + 1 : 0 ;
 
 				var areaapts = [];
@@ -495,7 +378,7 @@ THREE.FontUtils = {
 				var oldShapeIndex = shapeIndex, oldHoleIndex = holeIndex;
 				shapeIndex += shapeOffset;
 				holeIndex += holeOffset;
-				
+
 				if ( shapeIndex < 0 ) { shapeIndex += shape.length;  }
 				shapeIndex %= shape.length;
 
@@ -505,7 +388,7 @@ THREE.FontUtils = {
 				prevShapeVert = ( shapeIndex - 1 ) >= 0 ? shapeIndex - 1 : shape.length - 1;
 				nextShapeVert = ( shapeIndex + 1 ) < shape.length ? shapeIndex + 1 : 0;
 
-				prevHoleVert = ( holeIndex - 1 ) >= 0 ? holeIndex - 1 : hole.length - 1; 
+				prevHoleVert = ( holeIndex - 1 ) >= 0 ? holeIndex - 1 : hole.length - 1;
 				nextHoleVert = ( holeIndex + 1 ) < hole.length ? holeIndex + 1 : 0 ;
 
 
@@ -538,7 +421,7 @@ THREE.FontUtils = {
 					prevShapeVert = ( shapeIndex - 1 ) >= 0 ? shapeIndex - 1 : shape.length - 1;
 					nextShapeVert = ( shapeIndex + 1 ) < shape.length ? shapeIndex + 1 : 0;
 
-					prevHoleVert = ( holeIndex - 1 ) >= 0 ? holeIndex - 1 : hole.length - 1; 
+					prevHoleVert = ( holeIndex - 1 ) >= 0 ? holeIndex - 1 : hole.length - 1;
 					nextHoleVert = ( holeIndex + 1 ) < hole.length ? holeIndex + 1 : 0 ;
 
 				}
@@ -563,7 +446,7 @@ THREE.FontUtils = {
 			shapeGroup.shape = shape;
 
 		}
-	
+
 		var triangulatedPoints = [];
 		var triangulatedFaces = [];
 		var lastTriangles = 0;
@@ -593,7 +476,7 @@ THREE.FontUtils = {
 			lastTriangles += shape.length;
 
 		}
-  
+
 
 		// Now we push the "cut" vertices back to the triangulated indices.
 
@@ -649,7 +532,7 @@ THREE.FontUtils = {
 
 		};
 
-	},
+	},*/
 
 	drawText : function( text ) {
 
@@ -660,193 +543,48 @@ THREE.FontUtils = {
 		var i, p,
 			face = this.getFace(),
 			scale = this.size / face.resolution,
-			offset = 0, 
-			chars = String( text ).split( '' ), 
+			offset = 0,
+			chars = String( text ).split( '' ),
 			length = chars.length;
 
-		for ( i = 0; i < length; i++ ) {
+		var fontPaths = [];
 
-			var ret = this.extractGlyphPoints( chars[ i ], face, scale, offset );
+		for ( i = 0; i < length; i ++ ) {
+
+			var path = new THREE.Path();
+
+			var ret = this.extractGlyphPoints( chars[ i ], face, scale, offset, path );
 			offset += ret.offset;
-			characterPts.push( ret.points );
-			allPts = allPts.concat( ret.points );
+			//characterPts.push( ret.points );
+			//allPts = allPts.concat( ret.points );
+			fontPaths.push( ret.path );
 
 		}
 
-		// get the width 
+		// get the width
 
 		var width = offset / 2;
+		//
+		// for ( p = 0; p < allPts.length; p++ ) {
+		//
+		// 	allPts[ p ].x -= width;
+		//
+		// }
 
-		for ( p = 0; p < allPts.length; p++ ) {
+		//var extract = this.extractPoints( allPts, characterPts );
+		//extract.contour = allPts;
 
-			allPts[ p ].x -= width;
+		//extract.paths = fontPaths;
+		//extract.offset = width;
 
-		}
-
-		var extract = this.extractPoints( allPts, characterPts );
-		extract.contour = allPts;
-
-		var bezelPoints = [];
-
-		var centroids = [], forCentroids = [], expandOutwards = [], sum = new THREE.Vector2(), lastV;
-
-		i = allPts.length;
-
-		while ( --i >= 0 ) {
-
-			if ( !lastV ) {
-
-				lastV = allPts[ i ];
-
-			} else if ( lastV.equals( allPts[ i ] ) ) {
-
-				// We reached the last point of a closed loop
-
-				lastV = null;
-
-				var bool = this.Triangulate.area( forCentroids ) > 0;
-				expandOutwards.push( bool );
-				centroids.push( sum.divideScalar( forCentroids.length ) );
-				forCentroids = [];
-
-				sum = new THREE.Vector2();
-				continue;
-
-			}
-
-			sum.addSelf( allPts[ i ] );
-			forCentroids.push( allPts[ i ] );
-
-		}
-
-
-		i = allPts.length;
-		p = 0;
-		var pt, centroid ;
-		var dirV, adj;
-
-		while ( --i >= 0 ) {
-
-			pt = allPts[ i ];
-			centroid = centroids[ p ];
-
-			dirV = pt.clone().subSelf( centroid );
-			adj = this.bezelSize / dirV.length();
-
-			if ( expandOutwards[ p ] ) {
-
-				adj += 1;
-
-			}  else {
-
-				adj = 1 - adj;
-
-			}
-
-			adj = dirV.multiplyScalar( adj ).addSelf( centroid );
-			bezelPoints.unshift( adj );
-
-
-			if ( !lastV ) {
-
-				lastV = allPts[ i ];
-
-			} else if ( lastV.equals( allPts[ i ] ) ) {
-
-				// We reached the last point of a closed loop
-
-				lastV = null;
-				p++;
-				continue;
-
-			}
-
-		}
-
-
-		/*
-		for ( p = 0; p < allPts.length; p++ ) {
-
-			pt = allPts[ p ];
-			bezelPoints.push( new THREE.Vector2( pt.x + this.bezelSize, pt.y + this.bezelSize ) );
-
-		}
-		*/
-
-		extract.bezel = bezelPoints;
-
-		return extract;
+		return { paths : fontPaths, offset : width };
 
 	},
 
 
-	// Bezier Curves formulas obtained from
-	// http://en.wikipedia.org/wiki/B%C3%A9zier_curve
-
-	// Quad Bezier Functions
-
-	b2p0: function ( t, p ) {
-
-		var k = 1 - t;
-		return k * k * p;
-
-	},
-
-	b2p1: function ( t, p ) {
-
-		return 2 * ( 1 - t ) * t * p;
-
-	},
-
-	b2p2: function ( t, p ) {
-
-		return t * t * p;
-
-	},
-
-	b2: function ( t, p0, p1, p2 ) {
-
-		return this.b2p0( t, p0 ) + this.b2p1( t, p1 ) + this.b2p2( t, p2 );
-
-	},
-
-	// Cubic Bezier Functions
-
-	b3p0: function ( t, p ) {
-
-		var k = 1 - t;
-		return k * k * k * p;
-
-	},
-
-	b3p1: function ( t, p ) {
-
-		var k = 1 - t;
-		return 3 * k * k * t * p;
-
-	},
-
-	b3p2: function ( t, p ) {
-
-		var k = 1 - t;
-		return 3 * k * t * t * p;
-
-	},
-
-	b3p3: function ( t, p ) {
-
-		return t * t * t * p;
-
-	},
-
-	b3: function ( t, p0, p1, p2, p3 ) {
-
-		return this.b3p0( t, p0 ) + this.b3p1( t, p1 ) + this.b3p2( t, p2 ) +  this.b3p3( t, p3 );
-
-	},
 
 
-	extractGlyphPoints : function( c, face, scale, offset ) {
+	extractGlyphPoints : function( c, face, scale, offset, path ) {
 
 		var pts = [];
 
@@ -856,21 +594,23 @@ THREE.FontUtils = {
 			x, y, cpx, cpy, cpx0, cpy0, cpx1, cpy1, cpx2, cpy2,
 			laste,
 			glyph = face.glyphs[ c ] || face.glyphs[ ctxt.options.fallbackCharacter ];
-	
+
 		if ( !glyph ) return;
-  
+
 		if ( glyph.o ) {
-	  
+
 			outline = glyph._cachedOutline || ( glyph._cachedOutline = glyph.o.split( ' ' ) );
 			length = outline.length;
-		
+
 			scaleX = scale;
 			scaleY = scale;
-		 
+
 			for ( i = 0; i < length; ) {
 
-				action = outline[ i++ ];
-  
+				action = outline[ i ++ ];
+
+				//console.log( action );
+
 				switch( action ) {
 
 				case 'm':
@@ -879,7 +619,10 @@ THREE.FontUtils = {
 
 					x = outline[ i++ ] * scaleX + offset;
 					y = outline[ i++ ] * scaleY;
+
 					pts.push( new THREE.Vector2( x, y ) );
+
+					path.moveTo( x, y );
 					break;
 
 				case 'l':
@@ -889,60 +632,65 @@ THREE.FontUtils = {
 					x = outline[ i++ ] * scaleX + offset;
 					y = outline[ i++ ] * scaleY;
 					pts.push( new THREE.Vector2( x, y ) );
+					path.lineTo(x,y);
 					break;
-					
+
 				case 'q':
 
 					// QuadraticCurveTo
-				  
+
 					cpx  = outline[ i++ ] * scaleX + offset;
 					cpy  = outline[ i++ ] * scaleY;
 					cpx1 = outline[ i++ ] * scaleX + offset;
 					cpy1 = outline[ i++ ] * scaleY;
-			  
+
+					path.quadraticCurveTo(cpx1, cpy1, cpx, cpy);
+
 					laste = pts[ pts.length - 1 ];
-			  
+
 					if ( laste ) {
 
 						cpx0 = laste.x;
 						cpy0 = laste.y;
-				
+
 						for ( i2 = 1, divisions = this.divisions; i2 <= divisions; i2++ ) {
 
 							var t = i2 / divisions;
-							var tx = THREE.FontUtils.b2( t, cpx0, cpx1, cpx );
-							var ty = THREE.FontUtils.b2( t, cpy0, cpy1, cpy );
+							var tx = THREE.Shape.Utils.b2( t, cpx0, cpx1, cpx );
+							var ty = THREE.Shape.Utils.b2( t, cpy0, cpy1, cpy );
 							pts.push( new THREE.Vector2( tx, ty ) );
 
 					  }
 
-				  }              
-			  
+				  }
+
 				  break;
 
 				case 'b':
 
 					// Cubic Bezier Curve
-				  
+
 					cpx  = outline[ i++ ] *  scaleX + offset;
 					cpy  = outline[ i++ ] *  scaleY;
 					cpx1 = outline[ i++ ] *  scaleX + offset;
 					cpy1 = outline[ i++ ] * -scaleY;
 					cpx2 = outline[ i++ ] *  scaleX + offset;
 					cpy2 = outline[ i++ ] * -scaleY;
-			  
+
+					path.bezierCurveTo( cpx, cpy, cpx1, cpy1, cpx2, cpy2 );
+
 					laste = pts[ pts.length - 1 ];
-			  
+
 					if ( laste ) {
 
 						cpx0 = laste.x;
 						cpy0 = laste.y;
-				
+
 						for ( i2 = 1, divisions = this.divisions; i2 <= divisions; i2++ ) {
 
 							var t = i2 / divisions;
-							var tx = THREE.FontUtils.b3( t, cpx0, cpx1, cpx2, cpx );
-							var ty = THREE.FontUtils.b3( t, cpy0, cpy1, cpy2, cpy );
+							var tx = THREE.Shape.Utils.b3( t, cpx0, cpx1, cpx2, cpx );
+							var ty = THREE.Shape.Utils.b3( t, cpy0, cpy1, cpy2, cpy );
 							pts.push( new THREE.Vector2( tx, ty ) );
 
 						}
@@ -956,7 +704,9 @@ THREE.FontUtils = {
 			}
 		}
 
-		return { offset: glyph.ha*scale, points:pts };
+
+
+		return { offset: glyph.ha*scale, points:pts, path:path};
 	}
 
 };
@@ -964,17 +714,17 @@ THREE.FontUtils = {
 
 
 /**
- * This code is a quick port of code written in C++ which was submitted to 
- * flipcode.com by John W. Ratcliff  // July 22, 2000 
+ * This code is a quick port of code written in C++ which was submitted to
+ * flipcode.com by John W. Ratcliff  // July 22, 2000
  * See original code and more information here:
  * http://www.flipcode.com/archives/Efficient_Polygon_Triangulation.shtml
- * 
+ *
  * ported to actionscript by Zevan Rosser
  * www.actionsnippet.com
- * 
+ *
  * ported to javascript by Joshua Koo
  * http://www.lab4games.net/zz85/blog
- * 
+ *
  */
 
 
@@ -982,7 +732,7 @@ THREE.FontUtils = {
 
 	var EPSILON = 0.0000000001;
 
-	// takes in an contour array and returns 
+	// takes in an contour array and returns
 
 	var process = function( contour, indices ) {
 
@@ -991,7 +741,7 @@ THREE.FontUtils = {
 		if ( n < 3 ) return null;
 
 		var result = [],
-			verts = [], 
+			verts = [],
 			vertIndices = [];
 
 		/* we want a counter-clockwise polygon in verts */
@@ -1024,7 +774,7 @@ THREE.FontUtils = {
 
 				//throw ( "Warning, unable to triangulate polygon!" );
 				//return null;
-
+				// Sometimes warning is fine, especially polygons are triangulated in reverse.
 				console.log( "Warning, unable to triangulate polygon!" );
 
 				if ( indices ) return vertIndices;
@@ -1033,39 +783,45 @@ THREE.FontUtils = {
 			}
 
 			/* three consecutive vertices in current polygon, <u,v,w> */
-			
+
 			u = v; 	 	if ( nv <= u ) u = 0;     /* previous */
 			v = u + 1;  if ( nv <= v ) v = 0;     /* new v    */
 			w = v + 1;  if ( nv <= w ) w = 0;     /* next     */
-			
+
 			if ( snip( contour, u, v, w, nv, verts ) ) {
 
 				var a, b, c, s, t;
-			
+
 				/* true names of the vertices */
 
-				a = verts[ u ]; 
-				b = verts[ v ]; 
+				a = verts[ u ];
+				b = verts[ v ];
 				c = verts[ w ];
 
 				/* output Triangle */
 
+				/*
 				result.push( contour[ a ] );
 				result.push( contour[ b ] );
 				result.push( contour[ c ] );
+				*/
+				result.push( [ contour[ a ],
+					contour[ b ],
+					contour[ c ] ] );
+
 
 				vertIndices.push( [ verts[ u ], verts[ v ], verts[ w ] ] );
-			
+
 				/* remove v from the remaining polygon */
 
 				for( s = v, t = v + 1; t < nv; s++, t++ ) {
-					
-					verts[ s ] = verts[ t ]; 
+
+					verts[ s ] = verts[ t ];
 
 				}
 
 				nv--;
-			
+
 				/* reset error detection counter */
 
 				count = 2 * nv;
@@ -1073,19 +829,19 @@ THREE.FontUtils = {
 			}
 
 		}
-		
+
 		if ( indices ) return vertIndices;
 		return result;
 
 	};
-	
+
 	// calculate area of the contour polygon
 
 	var area = function ( contour ) {
 
 		var n = contour.length;
 		var a = 0.0;
-		
+
 		for( var p = n - 1, q = 0; q < n; p = q++ ) {
 
 			a += contour[ p ].x * contour[ q ].y - contour[ q ].x * contour[ p ].y;
@@ -1095,7 +851,7 @@ THREE.FontUtils = {
 		return a * 0.5;
 
 	};
-	
+
 	// see if p is inside triangle abc
 
 	var insideTriangle = function( ax, ay,
@@ -1107,23 +863,23 @@ THREE.FontUtils = {
 		  var cX, cY, apx, apy;
 		  var bpx, bpy, cpx, cpy;
 		  var cCROSSap, bCROSScp, aCROSSbp;
-		
+
 		  aX = cx - bx;  aY = cy - by;
 		  bX = ax - cx;  bY = ay - cy;
 		  cX = bx - ax;  cY = by - ay;
 		  apx= px  -ax;  apy= py - ay;
 		  bpx= px - bx;  bpy= py - by;
 		  cpx= px - cx;  cpy= py - cy;
-		
+
 		  aCROSSbp = aX*bpy - aY*bpx;
 		  cCROSSap = cX*apy - cY*apx;
 		  bCROSScp = bX*cpy - bY*cpx;
-		
+
 		  return ( (aCROSSbp >= 0.0) && (bCROSScp >= 0.0) && (cCROSSap >= 0.0) );
 
 	};
-	
-	
+
+
 	var snip = function ( contour, u, v, w, n, verts ) {
 
 		var p;
@@ -1138,13 +894,13 @@ THREE.FontUtils = {
 
 		cx = contour[ verts[ w ] ].x;
 		cy = contour[ verts[ w ] ].y;
-		
+
 		if ( EPSILON > (((bx-ax)*(cy-ay)) - ((by-ay)*(cx-ax))) ) return false;
-		
+
 			for ( p = 0; p < n; p++ ) {
 
 				if( (p == u) || (p == v) || (p == w) ) continue;
-			
+
 				px = contour[ verts[ p ] ].x
 				py = contour[ verts[ p ] ].y
 
@@ -1155,11 +911,11 @@ THREE.FontUtils = {
 		  return true;
 
 	};
-	
-	
+
+
 	namespace.Triangulate = process;
 	namespace.Triangulate.area = area;
-	
+
 	return namespace;
 
 })(THREE.FontUtils);

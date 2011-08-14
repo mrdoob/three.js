@@ -1318,6 +1318,8 @@ THREE.LoaderOld.prototype = {
 		chunks.pop();
 		return chunks.join( "/" );
 		
-	}
+	},
+	
+	constructor : THREE.LoaderOld
 
 };

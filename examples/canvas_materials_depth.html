@@ -73,9 +73,12 @@
 				var material = new THREE.MeshDepthMaterial();
 
 				plane = new THREE.Mesh( new THREE.PlaneGeometry( 1000, 1000, 10, 10 ), material );
+				plane.overdraw = true;
+				plane.doubleSided = true;
+				
 				plane.rotation.x = - 90 * ( Math.PI / 180 );
 				plane.position.y = - 100;
-				plane.doubleSided = true;
+
 				scene.addObject( plane );
 
 				// Spheres

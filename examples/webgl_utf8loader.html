@@ -1,0 +1,174 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>three.js webgl - io - UTF8 loader</title>
+		<meta charset="utf-8">
+		<style type="text/css">
+			body {
+				font-family: Monospace;
+				background-color: #000;
+				color: #fff;
+				margin: 0px;
+				overflow: hidden;
+			}
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				z-index: 100;
+				display:block;
+			}
+			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
+		</style>
+	</head>
+
+	<body>
+		<div id="info">
+		<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> -
+		<a href="http://code.google.com/p/webgl-loader/" target="_blank">UTF8 format</a> loader test -
+		models from <a href="http://www.sci.utah.edu/~wald/animrep/" target="_blank">The Utah 3D Animation Repository</a>
+		</div>
+
+		<script type="text/javascript" src="../build/Three.js"></script>
+
+		<script type="text/javascript" src="js/Detector.js"></script>
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
+		<script type="text/javascript" src="js/Stats.js"></script>
+
+		<script type="text/javascript">
+
+			var SCREEN_WIDTH = window.innerWidth;
+			var SCREEN_HEIGHT = window.innerHeight;
+
+			var NEAR = 1;
+			var FAR = 2000;
+
+			var FLOOR = -150;
+
+			var container, stats;
+
+			var camera, scene, renderer;
+
+			var mesh, zmesh, geometry;
+
+			var mouseX = 0, mouseY = 0;
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+			document.addEventListener('mousemove', onDocumentMouseMove, false);
+
+			init();
+			animate();
+
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.Camera( 20, SCREEN_WIDTH / SCREEN_HEIGHT, NEAR, FAR );
+				camera.position.z = 800;
+				camera.updateMatrix();
+
+				scene = new THREE.Scene();
+				scene.fog = new THREE.Fog( 0x000000, 800, FAR );
+
+
+				var path = "textures/cube/SwedishRoyalCastle/";
+				var format = '.jpg';
+				var urls = [
+						path + 'px' + format, path + 'nx' + format,
+						path + 'py' + format, path + 'ny' + format,
+						path + 'pz' + format, path + 'nz' + format
+					];
+
+				reflectionCube = THREE.ImageUtils.loadTextureCube( urls );
+
+				// LIGHTS
+
+				var ambient = new THREE.AmbientLight( 0x221100 );
+				scene.addLight( ambient );
+
+				var directionalLight = new THREE.DirectionalLight( 0xffeedd );
+				directionalLight.position.set( 0, 0, 1 );
+				directionalLight.position.normalize();
+				scene.addLight( directionalLight );
+
+				// RENDERER
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+
+				renderer.setClearColor( scene.fog.color, 1 );
+
+				renderer.domElement.style.position = "relative";
+				container.appendChild( renderer.domElement );
+
+				// STATS
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				stats.domElement.style.zIndex = 100;
+				container.appendChild( stats.domElement );
+
+				var loader = new THREE.UTF8Loader();
+
+				loader.load( { model: "utf8/hand.utf8",
+								scale: 0.815141, offsetX: -0.371823, offsetY: -0.011920, offsetZ: -0.416061,
+								callback: function( geometry ) { callbackModel( geometry, 400, 0xffffff, 125, FLOOR, 0 ); } } );
+
+				loader.load( { model: "utf8/ben.utf8",
+								scale: 0.707192, offsetX: -0.109362, offsetY: -0.006435, offsetZ: -0.268751,
+								callback: function( geometry ) { callbackModel( geometry, 400, 0xffaa00, -125, FLOOR, 0 ); } } );
+
+			}
+
+			function callbackModel( geometry, s, color, x, y, z ) {
+
+				var material = new THREE.MeshLambertMaterial( { color: color, map: THREE.ImageUtils.loadTexture( "textures/UV.jpg" ), envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3 } );
+				//material.shading =  THREE.FlatShading;
+
+				var mesh = new THREE.Mesh( geometry, material );
+
+				mesh.position.set( x, y, z );
+				mesh.scale.set( s, s, s );
+
+				scene.addObject( mesh );
+
+			}
+
+			function onDocumentMouseMove( event ) {
+
+				mouseX = ( event.clientX - windowHalfX );
+				mouseY = ( event.clientY - windowHalfY );
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				camera.position.x += ( mouseX - camera.position.x ) * .05;
+				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

@@ -20,8 +20,24 @@
 # Init
 # ################################################################
 
+
+bl_info = {
+    "name": "three.js format",
+    "author": "mrdoob, kikko, alteredq, remoe, pxf",
+    "version": (1, 1, 0),
+    "blender": (2, 5, 7),
+    "api": 35622,
+    "location": "File > Import-Export",
+    "description": "Import-Export three.js meshes",
+    "warning": "",
+    "wiki_url": "https://github.com/mrdoob/three.js/tree/master/utils/exporters/blender",
+    "tracker_url": "https://github.com/mrdoob/three.js/issues",
+    "category": "Import-Export"}
+
 # To support reload properly, try to access a package var,
 # if it's there, reload everything
+
+import bpy
 
 if "bpy" in locals():
     import imp
@@ -30,9 +46,8 @@ if "bpy" in locals():
     if "import_threejs" in locals():
         imp.reload(import_threejs)
 
-import bpy
 from bpy.props import *
-from io_utils import ExportHelper, ImportHelper
+from bpy_extras.io_utils import ExportHelper, ImportHelper
 
 # ################################################################
 # Custom properties
@@ -162,9 +177,15 @@ def save_settings_export(properties):
     settings = {
     "option_export_scene" : properties.option_export_scene,
     "option_embed_meshes" : properties.option_embed_meshes,
-    
+    "option_url_base_html" : properties.option_url_base_html,
+    "option_copy_textures" : properties.option_copy_textures,
+
     "option_lights" : properties.option_lights,
     "option_cameras" : properties.option_cameras,
+
+    "option_animation" : properties.option_animation,
+    "option_frame_step" : properties.option_frame_step,
+    "option_all_meshes" : properties.option_all_meshes,
 
     "option_flip_yz"      : properties.option_flip_yz,
 
@@ -212,9 +233,15 @@ def restore_settings_export(properties):
 
     properties.option_export_scene = settings.get("option_export_scene", False)
     properties.option_embed_meshes = settings.get("option_embed_meshes", True)
+    properties.option_url_base_html = settings.get("option_url_base_html", False)
+    properties.option_copy_textures = settings.get("option_copy_textures", False)
 
     properties.option_lights = settings.get("option_lights", False)
     properties.option_cameras = settings.get("option_cameras", False)
+
+    properties.option_animation = settings.get("option_animation", False)
+    properties.option_frame_step = settings.get("option_frame_step", 1)
+    properties.option_all_meshes = settings.get("option_all_meshes", True)
 
 # ################################################################
 # Exporter
@@ -249,10 +276,16 @@ class ExportTHREEJS(bpy.types.Operator, ExportHelper):
     option_flip_yz = BoolProperty(name = "Flip YZ", description = "Flip YZ", default = True)
 
     option_export_scene = BoolProperty(name = "Scene", description = "Export scene", default = False)
-    option_embed_meshes = BoolProperty(name = "Embed", description = "Embed meshes", default = True)
-    
+    option_embed_meshes = BoolProperty(name = "Embed meshes", description = "Embed meshes", default = True)
+    option_copy_textures = BoolProperty(name = "Copy textures", description = "Copy textures", default = False)
+    option_url_base_html = BoolProperty(name = "HTML as url base", description = "Use HTML as url base ", default = False)
+
     option_lights = BoolProperty(name = "Lights", description = "Export default scene lights", default = False)
     option_cameras = BoolProperty(name = "Cameras", description = "Export default scene cameras", default = False)
+
+    option_animation = BoolProperty(name = "Animation", description = "Export animation (morphs)", default = False)
+    option_frame_step = IntProperty(name = "Frame step", description = "Animation frame step", min = 1, max = 1000, soft_min = 1, soft_max = 1000, default = 1)
+    option_all_meshes = BoolProperty(name = "All meshes", description = "All meshes (merged)", default = True)
 
     def invoke(self, context, event):
         restore_settings_export(self.properties)
@@ -271,6 +304,7 @@ class ExportTHREEJS(bpy.types.Operator, ExportHelper):
         save_settings_export(self.properties)
 
         filepath = self.filepath
+
         import io_mesh_threejs.export_threejs
         return io_mesh_threejs.export_threejs.save(self, context, **self.properties)
 
@@ -282,8 +316,8 @@ class ExportTHREEJS(bpy.types.Operator, ExportHelper):
 
         row = layout.row()
         row.prop(self.properties, "option_vertices")
-        row = layout.row()
-        row.enabled = self.properties.option_vertices
+        # row = layout.row()
+        # row.enabled = self.properties.option_vertices
         # row.prop(self.properties, "option_vertices_deltas")
         row.prop(self.properties, "option_vertices_truncate")
         layout.separator()
@@ -324,15 +358,41 @@ class ExportTHREEJS(bpy.types.Operator, ExportHelper):
         layout.separator()
 
         row = layout.row()
-        row.label(text="Beta:")
+        row.label(text="--------- Experimental ---------")
+        layout.separator()
+
+        row = layout.row()
+        row.label(text="Scene:")
 
         row = layout.row()
         row.prop(self.properties, "option_export_scene")
-        row.prop(self.properties, "option_lights")
-        row.prop(self.properties, "option_cameras")
+        row.prop(self.properties, "option_embed_meshes")
 
         row = layout.row()
-        row.prop(self.properties, "option_embed_meshes")
+        row.prop(self.properties, "option_lights")
+        row.prop(self.properties, "option_cameras")
+        layout.separator()
+
+        row = layout.row()
+        row.label(text="Animation:")
+
+        row = layout.row()
+        row.prop(self.properties, "option_animation")
+        row.prop(self.properties, "option_frame_step")
+        layout.separator()
+
+        row = layout.row()
+        row.label(text="Settings:")
+
+        row = layout.row()
+        row.prop(self.properties, "option_all_meshes")
+
+        row = layout.row()
+        row.prop(self.properties, "option_copy_textures")
+
+        row = layout.row()
+        row.prop(self.properties, "option_url_base_html")
+
         layout.separator()
 
 
@@ -348,10 +408,12 @@ def menu_func_import(self, context):
     self.layout.operator(ImportTHREEJS.bl_idname, text="Three.js (.js)")
 
 def register():
+    bpy.utils.register_module(__name__)
     bpy.types.INFO_MT_file_export.append(menu_func_export)
     bpy.types.INFO_MT_file_import.append(menu_func_import)
 
 def unregister():
+    bpy.utils.unregister_module(__name__)
     bpy.types.INFO_MT_file_export.remove(menu_func_export)
     bpy.types.INFO_MT_file_import.remove(menu_func_import)
 

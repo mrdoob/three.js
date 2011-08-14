@@ -93,8 +93,12 @@
 		<script type="text/javascript" src="../src/extras/cameras/FlyCamera.js"></script>
 		<script type="text/javascript" src="../src/extras/cameras/RollCamera.js"></script>
 		<script type="text/javascript" src="../src/extras/cameras/TrackballCamera.js"></script>
+		<script type="text/javascript" src="../src/extras/cameras/QuakeCamera.js"></script>
+		<script type="text/javascript" src="../src/extras/geometries/Path.js"></script>
+		<script type="text/javascript" src="../src/extras/geometries/Shape.js"></script>
 		<script type="text/javascript" src="../src/extras/geometries/CubeGeometry.js"></script>
 		<script type="text/javascript" src="../src/extras/geometries/CylinderGeometry.js"></script>
+		<script type="text/javascript" src="../src/extras/geometries/ExtrudeGeometry.js"></script>
 		<script type="text/javascript" src="../src/extras/geometries/IcosahedronGeometry.js"></script>
 		<script type="text/javascript" src="../src/extras/geometries/LatheGeometry.js"></script>
 		<script type="text/javascript" src="../src/extras/geometries/PlaneGeometry.js"></script>
@@ -190,7 +194,7 @@
 				for ( var i = 0; i < 10; i ++ ) {
 
 					sphere = new THREE.Mesh( geometry, material );
-					// sphere.overdraw = true;
+					sphere.overdraw = true;
 
 					sphere.position.x = Math.random() * 1000 - 500;
 					sphere.position.y = Math.random() * 1000 - 500;

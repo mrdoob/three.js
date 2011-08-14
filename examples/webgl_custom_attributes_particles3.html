@@ -1,0 +1,282 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>three.js webgl - custom attributes [particles][billboards][alphatest]</title>
+		<style>
+			body {
+				color: #ffffff;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				font-weight: bold;
+
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+			}
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+				z-index:100;
+			}
+
+		</style>
+	</head>
+
+	<body>
+		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - custom attributes example - particles - billboards - alphatest</div>
+		<div id="container"></div>
+
+		<script src="../build/Three.js"></script>
+
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
+		<script type="text/javascript" src="js/Detector.js"></script>
+		<script type="text/javascript" src="js/Stats.js"></script>
+
+		<script type="x-shader/x-vertex" id="vertexshader">
+
+			attribute float size;
+			attribute vec4 ca;
+
+			varying vec4 vColor;
+
+			void main() {
+
+				vColor = ca;
+
+				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+
+				gl_PointSize = size * ( 150.0 / length( mvPosition.xyz ) );
+
+				gl_Position = projectionMatrix * mvPosition;
+
+			}
+
+		</script>
+
+		<script type="x-shader/x-fragment" id="fragmentshader">
+
+			uniform vec3 color;
+			uniform sampler2D texture;
+
+			varying vec4 vColor;
+
+			void main() {
+
+				vec4 outColor = texture2D( texture, gl_PointCoord );
+
+				if ( outColor.a < 0.5 ) discard;
+
+				gl_FragColor = outColor * vec4( color * vColor.xyz, 1.0 );
+
+				float depth = gl_FragCoord.z / gl_FragCoord.w;
+				const vec3 fogColor = vec3( 0.0 );
+
+				float fogFactor = smoothstep( 200.0, 600.0, depth );
+				gl_FragColor = mix( gl_FragColor, vec4( fogColor, gl_FragColor.w ), fogFactor );
+
+			}
+
+		</script>
+
+
+		<script type="text/javascript">
+
+		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+		var renderer, scene, camera, stats;
+
+		var object, uniforms, attributes;
+
+		var vc1;
+
+		var WIDTH = window.innerWidth,
+			HEIGHT = window.innerHeight;
+
+		init();
+		animate();
+
+		function init() {
+
+			camera = new THREE.Camera( 40, WIDTH / HEIGHT, 1, 1000 );
+			camera.position.z = 500;
+
+			scene = new THREE.Scene();
+
+			attributes = {
+
+				size: {	type: 'f', value: [] },
+				ca:   {	type: 'c', value: [] }
+
+			};
+
+			uniforms = {
+
+				amplitude: { type: "f", value: 1.0 },
+				color:     { type: "c", value: new THREE.Color( 0xffffff ) },
+				texture:   { type: "t", value: 0, texture: THREE.ImageUtils.loadTexture( "textures/sprites/ball.png" ) },
+
+			};
+
+			uniforms.texture.texture.wrapS = uniforms.texture.texture.wrapT = THREE.RepeatWrapping;
+
+			var shaderMaterial = new THREE.MeshShaderMaterial( {
+
+				uniforms: 		uniforms,
+				attributes:     attributes,
+				vertexShader:   document.getElementById( 'vertexshader' ).textContent,
+				fragmentShader: document.getElementById( 'fragmentshader' ).textContent
+
+			});
+
+
+			var radius = 100, inner = 0.6 * radius;
+			var geometry = new THREE.Geometry();
+
+			for ( var i = 0; i < 100000; i++ ) {
+
+				vector = new THREE.Vector3( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 );
+
+				vector.multiplyScalar( radius );
+
+				if ( ( vector.x > inner || vector.x < -inner ) ||
+				     ( vector.y > inner || vector.y < -inner ) ||
+				     ( vector.z > inner || vector.z < -inner )  )
+
+				geometry.vertices.push( new THREE.Vertex( vector ) );
+
+			}
+
+			vc1 = geometry.vertices.length;
+
+			var m, dummyMaterial = new THREE.MeshFaceMaterial();
+
+			radius = 200;
+			var geometry2 = new THREE.CubeGeometry( radius, 0.1 * radius, 0.1 * radius, 50, 5, 5 );
+
+			function addGeo( geo, x, y, z, ry ) {
+
+				m = new THREE.Mesh( geo, dummyMaterial );
+				m.rotation.y = ry;
+				m.position.set( x, y, z );
+				THREE.GeometryUtils.merge( geometry, m );
+
+			}
+
+			// side 1
+
+			addGeo( geometry2, 0,  110,  110, 0 );
+			addGeo( geometry2, 0,  110, -110, 0 );
+			addGeo( geometry2, 0, -110,  110, 0 );
+			addGeo( geometry2, 0, -110, -110, 0 );
+
+			// side 2
+
+			addGeo( geometry2,  110,  110, 0, 1.57 );
+			addGeo( geometry2,  110, -110, 0, 1.57 );
+			addGeo( geometry2, -110,  110, 0, 1.57 );
+			addGeo( geometry2, -110, -110, 0, 1.57 );
+
+			// corner edges
+
+			var geometry3 = new THREE.CubeGeometry( 0.1 * radius, radius * 1.2, 0.1 * radius, 5, 60, 5 );
+
+			addGeo( geometry3,  110, 0,  110, 0 );
+			addGeo( geometry3,  110, 0, -110, 0 );
+			addGeo( geometry3, -110, 0,  110, 0 );
+			addGeo( geometry3, -110, 0, -110, 0 );
+
+			// particle system
+
+			object = new THREE.ParticleSystem( geometry, shaderMaterial );
+			object.dynamic = true;
+
+			// custom attributes
+
+			var vertices = object.geometry.vertices;
+
+			var values_size = attributes.size.value;
+			var values_color = attributes.ca.value;
+
+			for( var v = 0; v < vertices.length; v++ ) {
+
+				values_size[ v ] = 10;
+				values_color[ v ] = new THREE.Color( 0xffffff );
+
+				if ( v < vc1 ) {
+
+					values_color[ v ].setHSV( 0.5 + 0.2 * ( v / vc1 ), 0.99, 1.0 );
+
+				} else {
+
+					values_size[ v ] = 55;
+					values_color[ v ].setHSV( 0.1, 0.99, 1.0 );
+
+				}
+
+			}
+
+			console.log( vertices.length );
+
+			scene.addObject( object );
+
+			renderer = new THREE.WebGLRenderer( { clearColor: 0x000000, clearAlpha: 1 } );
+			renderer.setSize( WIDTH, HEIGHT );
+
+			var container = document.getElementById( 'container' );
+			container.appendChild( renderer.domElement );
+
+			stats = new Stats();
+			stats.domElement.style.position = 'absolute';
+			stats.domElement.style.top = '0px';
+			container.appendChild( stats.domElement );
+
+		}
+
+		function cap( x, a, b ) {
+
+			return ( x < a ) ? a : ( ( x > b ) ? b : x );
+
+		}
+
+		var i, value;
+
+		function animate() {
+
+			requestAnimationFrame( animate );
+
+			render();
+			stats.update();
+
+		}
+
+		function render() {
+
+			var time = new Date().getTime() * 0.01;
+
+			object.rotation.y = 0.02 * time;
+			object.rotation.z = 0.02 * time;
+
+			for( i = 0; i < attributes.size.value.length; i++ ) {
+
+				if ( i < vc1 )
+					attributes.size.value[ i ] = 26 + 32 * Math.sin( 0.1 * i + 0.6 * time );
+
+
+			}
+
+			attributes.size.needsUpdate = true;
+
+			renderer.render( scene, camera );
+
+		}
+
+
+	</script>
+
+</body>
+
+</html>

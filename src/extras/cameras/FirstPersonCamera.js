@@ -164,6 +164,9 @@ THREE.FirstPersonCamera = function ( parameters ) {
 			case 39: /*right*/
 			case 68: /*D*/ this.moveRight = true; break;
 
+			case 82: /*R*/ this.moveUp = true; break;
+			case 70: /*F*/ this.moveDown = true; break;
+
 			case 81: this.freeze = !this.freeze; break;
 
 		}
@@ -186,6 +189,9 @@ THREE.FirstPersonCamera = function ( parameters ) {
 			case 39: /*right*/
 			case 68: /*D*/ this.moveRight = false; break;
 
+			case 82: /*R*/ this.moveUp = false; break;
+			case 70: /*F*/ this.moveDown = false; break;
+
 		}
 
 	};
@@ -195,7 +201,7 @@ THREE.FirstPersonCamera = function ( parameters ) {
 		var now = new Date().getTime();
 		this.tdiff = ( now - this.lastUpdate ) / 1000;
 		this.lastUpdate = now;
-		
+
 		if ( !this.freeze ) {
 
 
@@ -216,8 +222,12 @@ THREE.FirstPersonCamera = function ( parameters ) {
 
 			if ( this.moveForward || ( this.autoForward && !this.moveBackward ) ) this.translateZ( - ( actualMoveSpeed + this.autoSpeedFactor ) );
 			if ( this.moveBackward ) this.translateZ( actualMoveSpeed );
+
 			if ( this.moveLeft ) this.translateX( - actualMoveSpeed );
 			if ( this.moveRight ) this.translateX( actualMoveSpeed );
+
+			if ( this.moveUp ) this.translateY( actualMoveSpeed );
+			if ( this.moveDown ) this.translateY( - actualMoveSpeed );
 
 			var actualLookSpeed = this.tdiff * this.lookSpeed;
 
@@ -243,11 +253,20 @@ THREE.FirstPersonCamera = function ( parameters ) {
 
 		}
 
+		var verticalLookRatio = 1;
+
+		if ( this.constrainVertical ) {
+
+			verticalLookRatio = 3.14 / ( this.verticalMax - this.verticalMin );
+
+		}
+
 		this.lon += this.mouseX * actualLookSpeed;
-		if( this.lookVertical ) this.lat -= this.mouseY * actualLookSpeed;
+		if( this.lookVertical ) this.lat -= this.mouseY * actualLookSpeed * verticalLookRatio;
 
 		this.lat = Math.max( - 85, Math.min( 85, this.lat ) );
 		this.phi = ( 90 - this.lat ) * Math.PI / 180;
+
 		this.theta = this.lon * Math.PI / 180;
 
 		if ( this.constrainVertical ) {

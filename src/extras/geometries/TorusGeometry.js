@@ -54,8 +54,6 @@ THREE.TorusGeometry = function ( radius, tube, segmentsR, segmentsT ) {
 
 	}
 
-	delete temp_uv;
-
 	this.computeCentroids();
 	this.computeFaceNormals();
 	this.computeVertexNormals();

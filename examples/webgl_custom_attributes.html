@@ -31,6 +31,7 @@
 		<div id="container"></div>
 
 		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
+		<script type="text/javascript" src="js/Detector.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script src="../build/Three.js"></script>
@@ -84,6 +85,8 @@
 
 		<script type="text/javascript">
 
+		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
 		var renderer, scene, camera, stats;
 
 		var sphere, uniforms, attributes;
@@ -131,9 +134,9 @@
 
 			var radius = 50, segments = 128, rings = 64;
 			var geometry = new THREE.SphereGeometry( radius, segments, rings );
+			geometry.dynamic = true;
 
 			sphere = new THREE.Mesh( geometry, shaderMaterial );
-			sphere.dynamic = true;
 
 			var vertices = sphere.geometry.vertices;
 			var values = attributes.displacement.value;

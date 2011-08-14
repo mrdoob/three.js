@@ -1,0 +1,411 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>three.js webgl - shadow map</title>
+		<meta charset="utf-8">
+		<style type="text/css">
+			body {
+				font-family: Monospace;
+				background-color: #000;
+				color: #fff;
+				margin: 0px;
+				overflow: hidden;
+			}
+			#info {
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				z-index: 100;
+				display:block;
+			}
+			#info a { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
+		</style>
+	</head>
+
+	<body>
+
+		<div id="info">
+		<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - shadowmap - models by <a href="http://mirada.com/">mirada</a> from <a href="http://ro.me">rome</a></br>
+		move camera with WASD / RF + mouse
+		</div>
+
+		<script type="text/javascript" src="../build/Three.js"></script>
+
+		<script type="text/javascript" src="js/Detector.js"></script>
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
+		<script type="text/javascript" src="js/Stats.js"></script>
+
+		<script type="text/javascript" src="fonts/helvetiker_bold.typeface.js"></script>
+
+		<script type="text/javascript">
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var SHADOW_MAP_WIDTH = 1024, SHADOW_MAP_HEIGHT = 1024;
+
+			var MARGIN = 100;
+
+			var SCREEN_WIDTH = window.innerWidth;
+			var SCREEN_HEIGHT = window.innerHeight - 2 * MARGIN;
+			var FLOOR = -250;
+
+			var camera, scene, renderer;
+			var container, stats;
+
+			var NEAR = 5, FAR = 3000;
+
+			var sceneHUD, cameraOrtho, hudMaterial;
+
+			var morphs = [];
+
+			var light;
+
+			init();
+			animate();
+
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				// SCENE CAMERA
+
+				camera = new THREE.FirstPersonCamera( { fov: 23, aspect: SCREEN_WIDTH / SCREEN_HEIGHT, near: NEAR, far: FAR,
+														lookSpeed: 0.0125, movementSpeed: 500, noFly: false, lookVertical: true,
+														constrainVertical: true, verticalMin: 1.5, verticalMax: 2.0
+														} );
+
+				camera.position.set( 700, 50, 1900 );
+				camera.lon = -110;
+
+				// SCENE
+
+				scene = new THREE.Scene();
+				scene.fog = new THREE.Fog( 0xffaa55, 1000, FAR );
+				THREE.ColorUtils.adjustHSV( scene.fog.color, 0.02, -0.15, -0.65 );
+
+				// LIGHTS
+
+				var ambient = new THREE.AmbientLight( 0x444444 );
+				scene.addLight( ambient );
+
+				light = new THREE.SpotLight( 0xffffff );
+				light.position.set( 0, 1500, 1000 );
+				light.target.position.set( 0, 0, 0 );
+				light.castShadow = true;
+				scene.addLight( light );
+
+				createHUD();
+				createScene();
+
+				// RENDERER
+
+				renderer = new THREE.WebGLRenderer( { clearColor: 0x000000, clearAlpha: 1, antialias: false } );
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				renderer.domElement.style.position = "relative";
+				renderer.domElement.style.top = MARGIN + 'px';
+				container.appendChild( renderer.domElement );
+
+				renderer.setClearColor( scene.fog.color, 1 );
+				renderer.autoClear = false;
+
+				renderer.shadowCameraNear = 3;
+				renderer.shadowCameraFar = camera.far;
+				renderer.shadowCameraFov = 50;
+
+				renderer.shadowMapBias = 0.0039;
+				renderer.shadowMapDarkness = 0.5;
+				renderer.shadowMapWidth = SHADOW_MAP_WIDTH;
+				renderer.shadowMapHeight = SHADOW_MAP_HEIGHT;
+
+				renderer.shadowMapEnabled = true;
+				renderer.shadowMapSoft = true;
+
+				// STATS
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				stats.domElement.style.zIndex = 100;
+				//container.appendChild( stats.domElement );
+
+			}
+
+			function createHUD() {
+
+				cameraOrtho = new THREE.Camera( 45, SHADOW_MAP_WIDTH / SHADOW_MAP_HEIGHT, NEAR, FAR );
+				cameraOrtho.projectionMatrix = THREE.Matrix4.makeOrtho( SCREEN_WIDTH / - 2, SCREEN_WIDTH / 2,  SCREEN_HEIGHT / 2, SCREEN_HEIGHT / - 2, -10, 1000 );
+				cameraOrtho.position.z = 10;
+
+				var shader = THREE.ShaderUtils.lib[ "screen" ];
+				var uniforms = new THREE.UniformsUtils.clone( shader.uniforms );
+
+				hudMaterial = new THREE.MeshShaderMaterial( { vertexShader: shader.vertexShader, fragmentShader: shader.fragmentShader, uniforms: uniforms } );
+
+				var hudGeo = new THREE.PlaneGeometry( SHADOW_MAP_WIDTH / 2, SHADOW_MAP_HEIGHT / 2 );
+				var hudMesh = new THREE.Mesh( hudGeo, hudMaterial );
+				hudMesh.position.x = ( SCREEN_WIDTH - SHADOW_MAP_WIDTH / 2 ) * -0.5;
+				hudMesh.position.y = ( SCREEN_HEIGHT - SHADOW_MAP_HEIGHT / 2 ) * -0.5;
+
+				sceneHUD = new THREE.Scene();
+				sceneHUD.addObject( hudMesh );
+
+			}
+
+			function createScene( ) {
+
+				// GROUND
+
+				var geometry = new THREE.PlaneGeometry( 100, 100 );
+				var planeMaterial = new THREE.MeshLambertMaterial( { color: 0xffdd99 } );
+				THREE.ColorUtils.adjustHSV( planeMaterial.color, 0, 0, 0.9 );
+
+				var ground = new THREE.Mesh( geometry, planeMaterial );
+
+				ground.position.set( 0, FLOOR, 0 );
+				ground.rotation.x = -1.57;
+				ground.scale.set( 100, 100, 100 );
+
+				ground.castShadow = false;
+				ground.receiveShadow = true;
+
+				scene.addObject( ground );
+
+				// TEXT
+
+				var textGeo = new THREE.TextGeometry( "THREE.JS", {
+
+					size: 200,
+					height: 50,
+					curveSegments: 12,
+
+					font: "helvetiker",
+					weight: "bold",
+					style: "normal",
+
+					bevelThickness: 2,
+					bevelSize: 5,
+					bevelEnabled: true
+
+				});
+
+				textGeo.computeBoundingBox();
+				var centerOffset = -0.5 * ( textGeo.boundingBox.x[ 1 ] - textGeo.boundingBox.x[ 0 ] );
+
+				var textMaterial = new THREE.MeshPhongMaterial( { color: 0xff0000, specular: 0xffffff, ambient: 0xaa0000 } );
+
+				var mesh = new THREE.Mesh( textGeo, textMaterial );
+				mesh.position.x = centerOffset;
+				mesh.position.y = FLOOR + 67;
+
+				mesh.castShadow = true;
+				mesh.receiveShadow = true;
+
+				scene.addObject( mesh );
+
+				// CUBES
+
+				var mesh = new THREE.Mesh( new THREE.CubeGeometry( 1500, 220, 150 ), planeMaterial );
+
+				mesh.position.y = FLOOR - 50;
+				mesh.position.z = 20;
+
+				mesh.castShadow = true;
+				mesh.receiveShadow = true;
+
+				scene.addObject( mesh );
+
+				var mesh = new THREE.Mesh( new THREE.CubeGeometry( 1600, 170, 250 ), planeMaterial );
+
+				mesh.position.y = FLOOR - 50;
+				mesh.position.z = 20;
+
+				mesh.castShadow = true;
+				mesh.receiveShadow = true;
+
+				scene.addObject( mesh );
+
+				// MORPHS
+
+				function addMorph( geometry, speed, duration, x, y, z, fudgeColor ) {
+
+					var material = new THREE.MeshLambertMaterial( { color: 0xffaa55, morphTargets: true, vertexColors: THREE.FaceColors } );
+
+					if ( fudgeColor ) THREE.ColorUtils.adjustHSV( material.color, 0, 0.5 - Math.random(), 0.5 - Math.random() );
+
+					var meshAnim = new THREE.Mesh( geometry, material );
+
+					meshAnim.position.set( x, y, z );
+					meshAnim.rotation.y = 1.57;
+
+					meshAnim.castShadow = true;
+					meshAnim.receiveShadow = false;
+
+					scene.addObject( meshAnim );
+
+					morphs.push( { mesh: meshAnim, lastKeyframe: 0, currentKeyframe: 0,
+								   offset: Math.random() * 6, speed: speed, duration: duration,
+								   oldTime: new Date().getTime() } );
+
+				}
+
+				function morphColorsToFaceColors( geometry ) {
+
+					if ( geometry.morphColors && geometry.morphColors.length ) {
+
+						var colorMap = geometry.morphColors[ 0 ];
+
+						for ( var i = 0; i < colorMap.colors.length; i ++ ) {
+
+							geometry.faces[ i ].color = colorMap.colors[ i ];
+
+						}
+
+					}
+
+				}
+
+				var loader = new THREE.JSONLoader();
+
+				loader.load( { model: "models/animated/horse.js", callback: function( geometry ) {
+
+					morphColorsToFaceColors( geometry );
+
+					addMorph( geometry, 0.55, 1000, 100 - Math.random() * 1000, FLOOR, 300, true );
+					addMorph( geometry, 0.55, 1000, 100 - Math.random() * 1000, FLOOR, 450, true );
+					addMorph( geometry, 0.55, 1000, 100 - Math.random() * 1000, FLOOR, 600, true );
+
+					addMorph( geometry, 0.55, 1000, 100 - Math.random() * 1000, FLOOR, -300, true );
+					addMorph( geometry, 0.55, 1000, 100 - Math.random() * 1000, FLOOR, -450, true );
+					addMorph( geometry, 0.55, 1000, 100 - Math.random() * 1000, FLOOR, -600, true );
+
+				} } );
+
+				/*
+				loader.load( { model: "obj/morphs/fox.js", callback: function( geometry ) {
+
+					morphColorsToFaceColors( geometry );
+					addMorph( geometry, 0.2, 1000, 100 - Math.random() * 500, FLOOR - 5, 600 );
+
+				} } );
+
+				loader.load( { model: "obj/morphs/shdw3walk.js", callback: function( geometry ) {
+
+					morphColorsToFaceColors( geometry );
+					addMorph( geometry, 0.04, 2000, -500, FLOOR + 60, 245 );
+
+				} } );
+
+				loader.load( { model: "obj/morphs/flamingo.js", callback: function( geometry ) {
+
+					morphColorsToFaceColors( geometry );
+					addMorph( geometry, 0.5, 1000, 500 - Math.random() * 500, FLOOR + 350, 40 );
+
+				} } );
+
+				loader.load( { model: "obj/morphs/stork.js", callback: function( geometry ) {
+
+					morphColorsToFaceColors( geometry );
+					addMorph( geometry, 0.35, 1000, 500 - Math.random() * 500, FLOOR + 350, 340 );
+
+				} } );
+
+				loader.load( { model: "obj/morphs/mountainlion.js", callback: function( geometry ) {
+
+					morphColorsToFaceColors( geometry );
+					addMorph( geometry, 0.4, 1000, 500 - Math.random() * 500, FLOOR - 5, 700 );
+
+				} } );
+
+				loader.load( { model: "obj/morphs/bearBrown.js", callback: function( geometry ) {
+
+					morphColorsToFaceColors( geometry );
+					addMorph( geometry, 0.3, 2500, -500, FLOOR - 5, -750 );
+
+				} } );
+
+				loader.load( { model: "obj/morphs/parrot.js", callback: function( geometry ) {
+
+					morphColorsToFaceColors( geometry );
+					addMorph( geometry, 0.45, 500, 500 - Math.random() * 500, FLOOR + 300, 700 );
+
+				} } );
+
+				*/
+
+			}
+
+
+			var t = 0, newTime, delta;
+
+
+			function updateMorph( morph ) {
+
+				// Alternate morph targets
+
+				var interpolation = morph.duration / ( morph.mesh.geometry.morphTargets.length - 1 );
+
+				var time = ( new Date().getTime()  + morph.offset * 100 ) % morph.duration;
+				var keyframe = Math.floor( time / interpolation ) + 1;
+
+				var mesh = morph.mesh;
+
+				if ( keyframe != morph.currentKeyframe ) {
+
+					mesh.morphTargetInfluences[ morph.lastKeyframe ] = 0;
+					mesh.morphTargetInfluences[ morph.currentKeyframe ] = 1;
+					mesh.morphTargetInfluences[ keyframe ] = 0;
+
+					morph.lastKeyframe = morph.currentKeyframe;
+					morph.currentKeyframe = keyframe;
+
+				}
+
+				mesh.morphTargetInfluences[ keyframe ] = ( time % interpolation ) / interpolation;
+				mesh.morphTargetInfluences[ morph.lastKeyframe ] = 1 - mesh.morphTargetInfluences[ keyframe ];
+
+				var newTime = new Date().getTime();
+				delta = newTime - morph.oldTime;
+				morph.oldTime = newTime;
+
+				mesh.position.x += morph.speed * delta;
+
+				if ( mesh.position.x  > 2000 )  {
+
+					mesh.position.x = -1000 - Math.random() * 500;
+
+				}
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				for ( var i = 0; i < morphs.length; i++ ) updateMorph( morphs[ i ] );
+
+				renderer.clear();
+				renderer.render( scene, camera );
+
+				// Render debug HUD with shadow map
+
+				//hudMaterial.uniforms.tDiffuse.texture = renderer.shadowMap[ 0 ];
+				//renderer.render( sceneHUD, cameraOrtho );
+
+			}
+
+		</script>
+
+	</body>
+</html>

@@ -26,14 +26,15 @@
 	<body>
 
 		<div id="info">
-		<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - procedural 3D text by <a href="http://www.lab4games.net/zz85/blog" target="_blank">zz85</a> &amp; alteredq 
+		<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - procedural 3D text by <a href="http://www.lab4games.net/zz85/blog" target="_blank">zz85</a> &amp; alteredq
 		(fonts from <a href="http://typeface.neocracy.org/">typeface.js</a> and <a href="http://en.wikipedia.org/wiki/Droid_%28font%29">Droid</a>)
 		<br/>type to enter new text, drag to spin the text
-		<br/><span class="button" id="color">change color</span>, 
-			<span class="button" id="font">change font</span>, 
+		<br/><span class="button" id="color">change color</span>,
+			<span class="button" id="font">change font</span>,
 			<span class="button" id="weight">change weight</span>,
-			<span class="button" id="bezel">change bezel</span>,
-			<span class="button" id="postprocessing">change postprocessing</span>, 
+			<span class="button" id="bevel">change bevel</span>,
+			<span class="button" id="bend">bend</span>,
+			<span class="button" id="postprocessing">change postprocessing</span>,
 			<a id="permalink" href="#">permalink</a>
 		</div>
 
@@ -43,13 +44,9 @@
 		<script type="text/javascript" src="js/Detector.js"></script>
 		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
-			  
-		<!-- load the font file from canvas-text -->
 
-		<!--
-		
-		
-		-->
+		<!-- load the font files -->
+
 		<script type="text/javascript" src="fonts/gentilis_bold.typeface.js"></script>
 		<script type="text/javascript" src="fonts/gentilis_regular.typeface.js"></script>
 		<script type="text/javascript" src="fonts/optimer_bold.typeface.js"></script>
@@ -60,7 +57,8 @@
 		<script type="text/javascript" src="fonts/droid/droid_sans_bold.typeface.js"></script>
 		<script type="text/javascript" src="fonts/droid/droid_serif_regular.typeface.js"></script>
 		<script type="text/javascript" src="fonts/droid/droid_serif_bold.typeface.js"></script>
-		
+
+		<!-- todo async loader for fonts -->
 
 		<script type="text/javascript">
 
@@ -82,9 +80,11 @@
 
 				curveSegments = 6,
 
-				bezelThickness = 2,
-				bezelSize = 1.5,
-				bezelEnabled = true,
+				bevelThickness = 2,
+				bevelSize = 1.5,
+				bevelSegments = 3,
+				bevelEnabled = true,
+				bend = true,
 
 				font = "optimer", 		// helvetiker, optimer, gentilis, droid sans, droid serif
 				weight = "bold",		// normal bold
@@ -134,9 +134,9 @@
 			}
 
 			function decimalToHex( d ) {
-  
+
 				var hex = Number( d ).toString( 16 );
-				hex = "000000".substr( 0, 6 - hex.length ) + hex; 
+				hex = "000000".substr( 0, 6 - hex.length ) + hex;
 				return hex.toUpperCase();
 
 			}
@@ -163,7 +163,7 @@
 				scene.addLight( dirLight );
 
 				var pointLight = new THREE.PointLight( 0xffffff, 1.5 );
-				pointLight.position.set( 0, 100, 50 );
+				pointLight.position.set( 0, 100, 90 );
 				scene.addLight( pointLight );
 
 				//text = capitalize( font ) + " " + capitalize( weight );
@@ -180,8 +180,9 @@
 					var fonthash   = hash.substring( 6, 7 );
 					var weighthash = hash.substring( 7, 8 );
 					var pphash 	   = hash.substring( 8, 9 );
-					var bezelhash  = hash.substring( 9, 10 );
-					var texthash   = hash.substring( 11 );
+					var bevelhash  = hash.substring( 9, 10 );
+					var bendhash   = hash.substring( 10, 11 );
+					var texthash   = hash.substring( 12 );
 
 					hex = colorhash;
 					pointLight.color.setHex( parseInt( colorhash, 16 ) );
@@ -190,7 +191,8 @@
 					weight = reverseWeightMap[ parseInt( weighthash ) ];
 
 					postprocessing.enabled = parseInt( pphash );
-					bezelEnabled = parseInt( bezelhash );
+					bevelEnabled = parseInt( bevelhash );
+					bend = parseInt( bendhash );
 
 					text = decodeURI( texthash );
 
@@ -199,59 +201,18 @@
 				} else {
 
 					pointLight.color.setHSV( Math.random(), 0.95, 0.85 );
-					pointLight.color.updateHex();
-					hex = decimalToHex( pointLight.color.hex );
+					hex = decimalToHex( pointLight.color.getHex() );
 
 				}
 
-				textGeo = new THREE.TextGeometry( text, {
-
-					size: size, 
-					height: height,
-					curveSegments: curveSegments,
-
-					font: font,
-					weight: weight,
-					style: style,
-
-					bezelThickness: bezelThickness,
-					bezelSize: bezelSize,
-					bezelEnabled: bezelEnabled
-
-				});
-				
 				textMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, wireframe: false } );
 
 				parent = new THREE.Object3D();
-				
-				textMesh1 = new THREE.Mesh( textGeo, textMaterial );
-
-				textMesh1.position.x = 0;
-				textMesh1.position.y = hover;
-				textMesh1.position.z = 0;
-
-				textMesh1.rotation.x = 0;
-				textMesh1.rotation.y = Math.PI * 2;
-
-				parent.addChild( textMesh1 );
-
-				if ( mirror ) {
-
-					textMesh2 = new THREE.Mesh( textGeo, textMaterial );
-
-					textMesh2.position.x = 0;
-					textMesh2.position.y = -hover;
-					textMesh2.position.z = height;
-
-					textMesh2.rotation.x = Math.PI;
-					textMesh2.rotation.y = Math.PI * 2;
-
-					parent.addChild( textMesh2 );
-					
-				}
-
 				parent.position.y = 100;
+
 				scene.addChild( parent );
+
+				createText();
 
 				var plane = new THREE.Mesh( new THREE.PlaneGeometry( 10000, 10000 ), new THREE.MeshBasicMaterial( { color: 0xffffff, opacity: 0.5, transparent: true } ) );
 				plane.rotation.x = -1.57;
@@ -260,7 +221,7 @@
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				
+
 				renderer.setClearColor( scene.fog.color, 1 );
 
 				container.appendChild( renderer.domElement );
@@ -277,91 +238,98 @@
 				document.addEventListener( 'keydown', onDocumentKeyDown, false );
 
 				document.getElementById( "color" ).addEventListener( 'click', function() {
-				
+
 					pointLight.color.setHSV( Math.random(), 0.95, 0.85 );
-					pointLight.color.updateHex();
-					hex = decimalToHex( pointLight.color.hex );
-					
+					hex = decimalToHex( pointLight.color.getHex() );
+
 					updatePermalink();
-					
+
 				}, false );
 
 				document.getElementById( "font" ).addEventListener( 'click', function() {
-				
+
 					if ( font == "helvetiker" ) {
 
 						font = "optimer";
 
 					} else if ( font == "optimer" ) {
-						
+
 						font = "gentilis";
-						
+
 					} else if ( font == "gentilis" ) {
-						
+
 						font = "droid sans";
-						
+
 					} else if ( font == "droid sans" ) {
-						
+
 						font = "droid serif";
 
 					} else {
-					
+
 						font = "helvetiker";
-						
+
 					}
-					
+
 					refreshText();
-					
+
 				}, false );
 
 				document.getElementById( "weight" ).addEventListener( 'click', function() {
-				
+
 					if ( weight == "bold" ) {
 
 						weight = "normal";
 
 					} else {
-					
+
 						weight = "bold";
-						
+
 					}
-					
+
 					refreshText();
-					
+
 				}, false );
 
-				document.getElementById( "bezel" ).addEventListener( 'click', function() {
-				
-					bezelEnabled = !bezelEnabled;
-					
+				document.getElementById( "bevel" ).addEventListener( 'click', function() {
+
+					bevelEnabled = !bevelEnabled;
+
 					refreshText();
-					
+
+				}, false );
+
+				document.getElementById( "bend" ).addEventListener( 'click', function() {
+
+					bend = !bend;
+					refreshText();
+
 				}, false );
 
 				document.getElementById( "postprocessing" ).addEventListener( 'click', function() {
-				
+
 					postprocessing.enabled = !postprocessing.enabled;
 					updatePermalink();
-					
+
 				}, false );
 
 				initPostprocessing();
 				renderer.autoClear = false;
 
 			}
-			
+
 			//
-			
+
 			function boolToNum( b ) {
-				
+
 				return b ? 1 : 0;
 
 			}
-			
+
 			function updatePermalink() {
-			
-				var link = hex + fontMap[ font ] + weightMap[ weight ] + boolToNum( postprocessing.enabled ) + boolToNum( bezelEnabled ) + "#" + encodeURI( text );
-				
+
+				var link = hex + fontMap[ font ] + weightMap[ weight ] + boolToNum( postprocessing.enabled ) + boolToNum( bevelEnabled )
+				+ boolToNum( bend ) + "#" + encodeURI( text );
+
 				permalink.href = "#" + link;
 				window.location.hash = link;
 
@@ -370,14 +338,14 @@
 			function onDocumentKeyDown( event ) {
 
 				if ( firstLetter ) {
-				
+
 					firstLetter = false;
 					text = "";
 
 				}
-				
+
 				var keyCode = event.keyCode;
-				
+
 				// backspace
 
 				if ( keyCode == 8 ) {
@@ -388,23 +356,23 @@
 					refreshText();
 
 					return false;
-					
+
 				}
 
 			}
-			
+
 			function onDocumentKeyPress( event ) {
-				
+
 				var keyCode = event.which;
-				
+
 				// backspace
 
 				if ( keyCode == 8 ) {
-					
+
 					event.preventDefault();
-					
+
 				} else {
-				
+
 					var ch = String.fromCharCode( keyCode );
 					text += ch;
 
@@ -413,16 +381,11 @@
 				}
 
 			}
-			
-			function refreshText() {
 
-				updatePermalink();
-				
-				scene.removeChild( textMesh1 );
-
+			function createText() {
 				textGeo = new THREE.TextGeometry( text, {
 
-					size: size, 
+					size: size,
 					height: height,
 					curveSegments: curveSegments,
 
@@ -430,15 +393,20 @@
 					weight: weight,
 					style: style,
 
-					bezelThickness: bezelThickness,
-					bezelSize: bezelSize,
-					bezelEnabled: bezelEnabled
+					bevelThickness: bevelThickness,
+					bevelSize: bevelSize,
+					bevelEnabled: bevelEnabled,
+
+					bend: bend
 
 				});
 
+				textGeo.computeBoundingBox();
+				var centerOffset = -0.5 * ( textGeo.boundingBox.x[ 1 ] - textGeo.boundingBox.x[ 0 ] );
+
 				textMesh1 = new THREE.Mesh( textGeo, textMaterial );
 
-				textMesh1.position.x = 0;
+				textMesh1.position.x = centerOffset;
 				textMesh1.position.y = hover;
 				textMesh1.position.z = 0;
 
@@ -449,24 +417,34 @@
 
 				if ( mirror ) {
 
-					scene.removeChild( textMesh2 );
-
 					textMesh2 = new THREE.Mesh( textGeo, textMaterial );
 
-					textMesh2.position.x = 0;
+					textMesh2.position.x = centerOffset;
 					textMesh2.position.y = -hover;
 					textMesh2.position.z = height;
 
 					textMesh2.rotation.x = Math.PI;
 					textMesh2.rotation.y = Math.PI * 2;
-					
-					
+
 					parent.addChild( textMesh2 );
-					
+
 				}
 
 			}
-			
+
+			function refreshText() {
+
+				updatePermalink();
+
+				scene.removeChild( textMesh1 );
+				if ( mirror ) scene.removeChild( textMesh2 );
+
+				if ( !text ) return;
+
+				createText();
+
+			}
+
 			function onDocumentMouseDown( event ) {
 
 				event.preventDefault();
@@ -531,7 +509,7 @@
 			}
 
 			//
-			
+
 			function initPostprocessing() {
 
 				postprocessing.scene = new THREE.Scene();
@@ -621,9 +599,9 @@
 				time = new Date().getTime();
 				delta = 0.1 * ( time - oldTime );
 				oldTime = time;
-				
+
 				parent.rotation.y += ( targetRotation - parent.rotation.y ) * 0.05;
-				
+
 				if ( postprocessing.enabled ) {
 
 					renderer.clear();
@@ -669,7 +647,7 @@
 					renderer.clear();
 					renderer.render( scene, camera );
 
-				}				
+				}
 
 			}
 
