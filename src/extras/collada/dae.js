@@ -1,3 +1,7 @@
+/**
+ * @author Tim Knip / http://www.floorplanner.com/ / tim at floorplanner.com
+ */
+
 var DAE = (function() {
 	var COLLADA = null;
 	var scene = null;
