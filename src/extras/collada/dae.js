@@ -11,6 +11,7 @@ var DAE = (function() {
 	var effects = {};
 	var visualScenes;
 	var readyCallbackFunc = null;
+	var baseUrl;
 	
 	function load(url, readyCallback) {
 		if (document.implementation && document.implementation.createDocument) {
@@ -33,7 +34,7 @@ var DAE = (function() {
 					if(req.status == 0 || req.status == 200) {
 						
 						readyCallbackFunc = readyCallback;
-						parse(req.responseXML);
+						parse(req.responseXML, undefined, url);
 					}
 				}
 			}
@@ -44,10 +45,14 @@ var DAE = (function() {
 		}
 	}
 	
-	function parse(doc, callBack) {
+	function parse(doc, callBack, url) {
 		COLLADA = doc;
 		callBack = callBack || readyCallbackFunc;
-		
+		if (url !== undefined) {
+			var parts = url.split('/');
+			parts.pop();
+			baseUrl = parts.join('/') + '/';
+		}
 		images = parseLib("//dae:library_images/dae:image", _Image, "image");
 		materials = parseLib("//dae:library_materials/dae:material", Material, "material");
 		effects = parseLib("//dae:library_effects/dae:effect", Effect, "effect");
@@ -218,8 +223,7 @@ var DAE = (function() {
 					var symbol = inst_material.symbol;
 					var effect_id = materials[target].instance_effect.url;
 					var effect = effects[effect_id];
-					var shader = effect.shader;
-					shaders[symbol] = shader;
+					shaders[symbol] = effect;
 				}
 			}
 
@@ -234,15 +238,27 @@ var DAE = (function() {
 				var primitives = geometry.mesh.primitives;
 				for (j = 0; j < primitives.length; j++) {
 					var symbol = primitives[j].material;
-					var shader = shaders[symbol];
+					var effect = shaders[symbol];
+					var shader = effect.shader;
 					var ambient = shader.ambient ? shader.ambient.color : 0x505050;
 					var diffuse = shader.diffuse ? shader.diffuse.color : 0xff0000;
 					var specular = shader.specular ? shader.specular.color : null;
 					var transparency = shader.transparency;
 					var use_transparency = (transparency !== undefined && transparency < 1.0);
 					var opacity = use_transparency ? transparency : 1.0;
-				
+					var texture;
+					
+					if (shader.diffuse && shader.diffuse.isTexture() && effect.sampler && effect.surface) {
+						if (effect.sampler.source == effect.surface.sid) {
+							var image = images[effect.surface.init_from];
+							if (image) {
+								texture = THREE.ImageUtils.loadTexture(baseUrl + image.init_from);
+							}
+						}
+					}
+					
 					var mat = new THREE.MeshLambertMaterial( { 
+						map: texture,
 						color: diffuse.hex, 
 						opacity: opacity, 
 						transparent: use_transparency,
@@ -250,6 +266,7 @@ var DAE = (function() {
 					
 					if (shader.type != 'lambert' && shader.shininess && specular && ambient) {
 						mat = new THREE.MeshPhongMaterial( { 
+							map: texture,
 							ambient: ambient.hex, 
 							color: diffuse.hex, 
 							specular: specular.hex, 
@@ -1047,8 +1064,8 @@ var DAE = (function() {
 					this.color.a = rgba[3];
 					break;
 				case 'texture':
-					//this.texture = child.getAttribute('texture');
-					//this.texcoord = child.getAttribute('texcoord');
+					this.texture = child.getAttribute('texture');
+					this.texcoord = child.getAttribute('texcoord');
 					break;
 				default:
 					break;
@@ -1086,22 +1103,136 @@ var DAE = (function() {
 		return this;
 	}
 	
+	function Surface(effect) {
+		this.effect = effect;
+		this.init_from;
+		this.format;
+	}
+	Surface.prototype.parse = function(element) {
+		for (var i = 0; i < element.childNodes.length; i++) {
+			var child = element.childNodes[i];
+			if (child.nodeType != 1) continue;
+			switch (child.nodeName) {
+				case 'init_from':
+					this.init_from = child.textContent;
+					break;
+				case 'format':
+					this.format = child.textContent;
+					break;
+				default:
+					console.log("unhandled Surface prop: " + child.nodeName);
+					break;
+			}
+		}
+		return this;
+	}
+	function Sampler2D(effect) {
+		this.effect = effect;
+		this.source;
+		this.wrap_s;
+		this.wrap_t;
+		this.minfilter;
+		this.magfilter;
+		this.mipfilter;
+	}
+	Sampler2D.prototype.parse = function(element) {
+		for (var i = 0; i < element.childNodes.length; i++) {
+			var child = element.childNodes[i];
+			if (child.nodeType != 1) continue;
+			switch (child.nodeName) {
+				case 'source':
+					this.source = child.textContent;
+					break;
+				case 'minfilter':
+					this.minfilter = child.textContent;
+					break;
+				case 'magfilter':
+					this.magfilter = child.textContent;
+					break;
+				case 'mipfilter':
+					this.mipfilter = child.textContent;
+					break;
+				case 'wrap_s':
+					this.wrap_s = child.textContent;
+					break;
+				case 'wrap_t':
+					this.wrap_t = child.textContent;
+					break;
+				default:
+					console.log("unhandled Sampler2D prop: " + child.nodeName);
+					break;
+			}
+		}
+		return this;
+	}
+	
 	function Effect() {
 		this.id = "";
 		this.name = "";
 		this.shader = null;
+		this.surface;
+		this.sampler;
 	}
 	Effect.prototype.parse = function(element) {
 		this.id = element.getAttribute('id');
 		this.name = element.getAttribute('name');
-		var technique = COLLADA.evaluate(".//dae:technique", 
-			element, 
-			_nsResolver, 
-			XPathResult.ORDERED_NODE_ITERATOR_TYPE, 
-			null).iterateNext();
-		if (!technique) return null;
-		for (var i = 0; i < technique.childNodes.length; i++) {
-			var child = technique.childNodes[i];
+		
+		for (var i = 0; i < element.childNodes.length; i++) {
+			var child = element.childNodes[i];
+			if (child.nodeType != 1) continue;
+			switch (child.nodeName) {
+				case 'profile_COMMON':
+					this.parseProfileCOMMON(child);
+					break;
+				default:
+					break;
+			}
+		}
+		return this;
+	}
+	Effect.prototype.parseNewparam = function(element) {
+		var sid = element.getAttribute('sid');
+		for (var i = 0; i < element.childNodes.length; i++) {
+			var child = element.childNodes[i];
+			if (child.nodeType != 1) continue;
+			switch (child.nodeName) {
+				case 'surface':
+					this.surface = (new Surface(this)).parse(child);
+					this.surface.sid = sid;
+					break;
+				case 'sampler2D':
+					this.sampler = (new Sampler2D(this)).parse(child);
+					this.sampler.sid = sid;
+					break;
+				default:
+					console.log(child.nodeName);
+					break;
+			}
+		}
+	}
+	Effect.prototype.parseProfileCOMMON = function(element) {
+		for (var i = 0; i < element.childNodes.length; i++) {
+			var child = element.childNodes[i];
+			if (child.nodeType != 1) continue;
+			switch (child.nodeName) {
+				case 'profile_COMMON':
+					this.parseProfileCOMMON(child);
+					break;
+				case 'technique':
+					this.parseTechnique(child);
+					break;
+				case 'newparam':
+					this.parseNewparam(child);
+					break;
+				default:
+					console.log(child.nodeName);
+					break;
+			}
+		}
+	}
+	Effect.prototype.parseTechnique= function(element) {
+		for (var i = 0; i < element.childNodes.length; i++) {
+			var child = element.childNodes[i];
 			if (child.nodeType != 1) continue;
 			switch (child.nodeName) {
 				case 'lambert':
@@ -1113,7 +1244,6 @@ var DAE = (function() {
 					break;
 			}
 		}
-		return this;
 	}
 	
 	function InstanceEffect() {
