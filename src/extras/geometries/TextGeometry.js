@@ -83,11 +83,14 @@ THREE.TextGeometry = function ( text, parameters ) {
 	// parameters.bendPath = path;
 
 	// var path = new THREE.CurvePath();
-	// 	path.add(new THREE.LineCurve( 0, 0,  250, 0));
-	// 	path.add(new THREE.LineCurve( 250, 0,  300, 200));
-	//
+	// 	path.add(new THREE.LineCurve( 0, 50,  250, 150));
+	// 	path.add(new THREE.LineCurve( 250, 150,  400, 50));
+	// path.add(new THREE.LineCurve( 400, 50,  0, 50));
 	// 	parameters.bendPath = path;
-
+	
+	// var path = new THREE.ArcCurve(0, 0, 200, Math.PI * 0, Math.PI * 2, true);
+	// 		parameters.bendPath = path;
+	
 	// var path = new THREE.SplineCurve([
 	// 		new THREE.Vector2(0, 0),
 	// 		new THREE.Vector2(100, 40),

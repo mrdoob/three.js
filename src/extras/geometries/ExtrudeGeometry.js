@@ -182,57 +182,6 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	var i, il;
 
-	// We no longer need centroids
-
-	// Find all centroids of shapes and holes
-
-	//var sum = new THREE.Vector2();
-
-	// for ( i = 0, il = contour.length; i < il; i ++ ) {
-	//
-	// 	sum.addSelf( contour[ i ] );
-	//
-	// }
-	//
-	// var contourCentroid = sum.divideScalar( contour.length );
-	//
-	// var holesCentroids = [];
-	//
-	// for ( h = 0, hl = holes.length; h < hl; h ++ ) {
-	//
-	// 	sum = new THREE.Vector2();
-	// 	ahole = holes[ h ];
-	//
-	// 	for ( i=0, il = ahole.length; i < il; i ++ ) {
-	//
-	// 		sum.addSelf( ahole[ i ] );
-	//
-	// 	}
-	//
-	// 	holesCentroids[ h ] = sum.divideScalar( ahole.length );
-	//
-	// }
-	//
-	// function scalePt ( pt, centroid, size, expandOutwards /* Boolean */ ) {
-	//
-	// 	var vectorFromCentroid = pt.clone().subSelf( centroid );
-	// 	var adj = size / vectorFromCentroid.length();
-	//
-	// 	if ( expandOutwards ) {
-	//
-	// 		adj = 1 + adj;
-	//
-	// 	}  else {
-	//
-	// 		adj = 1 - adj;
-	//
-	// 	}
-	//
-	// 	return vectorFromCentroid.multiplyScalar( adj ).addSelf( centroid );
-	//
-	// }
-
-
 	function scalePt2 ( pt, vec, size ) {
 
 		if ( !vec ) console.log( "die" );
@@ -361,8 +310,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 		if ( s < 0 ) {
 
 			// in case of emergecy, revert to algorithm 1.
-			// console.log("opps");
-
+	
 			return getBevelVec1( pt_i, pt_j, pt_k );
 
 		}
@@ -518,7 +466,6 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 		for ( i = 0, il = contour.length; i < il; i ++ ) {
 
 			vert = scalePt2( contour[ i ], contourMovements[ i ], bs );
-			//vert = scalePt( contour[ i ], contourCentroid, bs, false );
 			v( vert.x, vert.y,  amount + z );
 
 		}
@@ -532,7 +479,6 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 			for ( i = 0, il = ahole.length; i < il; i++ ) {
 
-				//vert = scalePt( ahole[ i ], holesCentroids[h], bs, true );
 				vert = scalePt2( ahole[ i ], oneHoleMovements[ i ], bs );
 
 				if ( !extrudeByPath ) {
