@@ -70,7 +70,7 @@ var DAE = (function() {
 		for (var i = 0; i < daeScene.nodes.length; i++) {
 			scene.addChild(createSceneGraph(daeScene.nodes[i]));
 		}
-		
+
 		createAnimations();
 
 		var result = {
@@ -274,10 +274,9 @@ var DAE = (function() {
 							}
 						}
 					}
-					
 					var mat = new THREE.MeshLambertMaterial( { 
 						map: texture,
-						color: diffuse.hex, 
+						color: diffuse.getHex(), 
 						opacity: opacity, 
 						transparent: use_transparency,
 						shading: THREE.SmoothShading } );
@@ -285,9 +284,9 @@ var DAE = (function() {
 					if (shader.type != 'lambert' && shader.shininess && specular && ambient) {
 						mat = new THREE.MeshPhongMaterial( { 
 							map: texture,
-							ambient: ambient.hex, 
-							color: diffuse.hex, 
-							specular: specular.hex, 
+							ambient: ambient.getHex(), 
+							color: diffuse.getHex(), 
+							specular: specular.getHex(), 
 							shininess: shader.shininess, 
 							shading: THREE.SmoothShading,
 							opacity: opacity,
@@ -913,7 +912,6 @@ var DAE = (function() {
 			if (v.length < 3) continue;
 			var va = v[0];
 			var na = n[0];
-
 			for (j = 1; j < v.length - 1; j++) {
 				var vb = v[j];
 				var vc = v[j+1];
@@ -976,6 +974,7 @@ var DAE = (function() {
 							v = new THREE.Vertex(new THREE.Vector3(source.data[idx32+0], source.data[idx32+1], source.data[idx32+2]));
 							v.daeId = vs.length;
 							vs.push(v);
+							
 							break;
 						case 'NORMAL':
 							n = new THREE.Vector3(source.data[idx32+0], source.data[idx32+1], source.data[idx32+2]);
@@ -998,6 +997,7 @@ var DAE = (function() {
 			if (has_v) {
 				var c = this.geometry.vertices.length;
 				this.geometry.vertices.push(vs[0], vs[1], vs[2]);
+				
 				this.geometry.faces.push( new THREE.Face3(c+0, c+1, c+2, ns ) );
 				if (has_t) {
 					for (k = 0; k < texture_sets.length; k++) {
@@ -1011,7 +1011,7 @@ var DAE = (function() {
 		this.geometry.computeCentroids();
 		this.geometry.computeFaceNormals();
 		this.geometry.computeVertexNormals();
-		this.geometry.computeBoundingBox();
+		this.geometry.computeBoundingBox();	
 	}
 	Triangles.prototype.setVertices = function(vertices) {
 		for (var i = 0; i < this.inputs.length; i++) {
@@ -1611,6 +1611,59 @@ var DAE = (function() {
 		} else {
 			return defaultValue;
 		}
+	}
+	
+	function _format_float(f, num) {
+		if (f === undefined) {
+			var s = '0.';
+			while (s.length < num + 2) {
+				s += '0';
+			}
+			return s;
+		}
+		var parts = f.toString().split('.');
+		num = num || 2;
+		parts[1] = parts.length > 1 ? parts[1].substr(0, num) : "0";
+		while(parts[1].length < num) {
+			parts[1] += '0';
+		}
+		return parts.join('.');
+	}
+	
+	function _hash_vertex(v, n, t0, t1, precision) {
+		precision = precision || 2;
+		var s = v instanceof THREE.Vertex ? _hash_vector3(v.position, precision) : _hash_vector3(v, precision);
+		if (n === undefined) {
+			s += '_0.00,0.00,0.00';
+		} else {
+			s += '_' + _hash_vector3(n, precision);
+		}
+		if (t0 === undefined) {
+			s += '_0.00,0.00';
+		} else {
+			s += '_' + _hash_uv(t0, precision);
+		}
+		if (t1 === undefined) {
+			s += '_0.00,0.00';
+		} else {
+			s += '_' + _hash_uv(t1, precision);
+		}
+		return s;
+	}
+	
+	function _hash_uv(uv, num) {
+		var s = '';
+		s += _format_float(uv.u, num) + ',';
+		s += _format_float(uv.v, num);
+		return s;
+	}
+	
+	function _hash_vector3(vec, num) {
+		var s = '';
+		s += _format_float(vec.x, num) + ',';
+		s += _format_float(vec.y, num) + ',';
+		s += _format_float(vec.z, num);
+		return s;
 	}
 	
 	function evaluateXPath(node, query) {
