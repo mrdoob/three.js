@@ -38,7 +38,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 	_color2 = new THREE.Color( 0x000000 ),
 	_color3 = new THREE.Color( 0x000000 ),
 	_color4 = new THREE.Color( 0x000000 ),
-	
+
 	_patterns = [],
 
 	_near, _far,
@@ -98,8 +98,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		_canvasWidth = width;
 		_canvasHeight = height;
-		_canvasWidthHalf = _canvasWidth / 2;
-		_canvasHeightHalf = _canvasHeight / 2;
+		_canvasWidthHalf = Math.floor( _canvasWidth / 2 );
+		_canvasHeightHalf = Math.floor( _canvasHeight / 2 );
 
 		_canvas.width = _canvasWidth;
 		_canvas.height = _canvasHeight;
@@ -119,7 +119,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	this.setClearColor = function( color, opacity ) {
 
-		_clearColor = color;
+		_clearColor.copy( color );
 		_clearOpacity = opacity;
 
 		_clearRect.set( - _canvasWidthHalf, - _canvasHeightHalf, _canvasWidthHalf, _canvasHeightHalf );
@@ -141,27 +141,30 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		if ( !_clearRect.isEmpty() ) {
 
-			_clearRect.inflate( 1 );
 			_clearRect.minSelf( _clipRect );
+			_clearRect.inflate( 2 );
 
-			if ( _clearOpacity == 0 ) {
+			if ( _clearOpacity < 1 ) {
 
-				_context.clearRect( _clearRect.getX(), _clearRect.getY(), _clearRect.getWidth(), _clearRect.getHeight() );
+				_context.clearRect( Math.floor( _clearRect.getX() ), Math.floor( _clearRect.getY() ), Math.floor( _clearRect.getWidth() ), Math.floor( _clearRect.getHeight() ) );
 
-			} else {
+			}
+
+			if ( _clearOpacity > 0 ) {
 
 				setBlending( THREE.NormalBlending );
 				setOpacity( 1 );
 
-				setContextFillStyle( 'rgba(' + Math.floor( _clearColor.r * 255 ) + ',' + Math.floor( _clearColor.g * 255 ) + ',' + Math.floor( _clearColor.b * 255 ) + ',' + _clearOpacity + ')' );
+				setFillStyle( 'rgba(' + Math.floor( _clearColor.r * 255 ) + ',' + Math.floor( _clearColor.g * 255 ) + ',' + Math.floor( _clearColor.b * 255 ) + ',' + _clearOpacity + ')' );
 
-				_context.fillRect( _clearRect.getX(), _clearRect.getY(), _clearRect.getWidth(), _clearRect.getHeight() );
+				_context.fillRect( Math.floor( _clearRect.getX() ), Math.floor( _clearRect.getY() ), Math.floor( _clearRect.getWidth() ), Math.floor( _clearRect.getHeight() ) );
 
 			}
 
 			_clearRect.empty();
 
 		}
+
 
 	};
 
@@ -862,33 +865,40 @@ THREE.CanvasRenderer = function ( parameters ) {
 			_context.fill();
 
 		}
-		
+
 		function patternPath( x0, y0, x1, y1, x2, y2, u0, v0, u1, v1, u2, v2, texture ) {
 
 			if ( texture.image.width == 0 ) return;
 
 			if ( texture.needsUpdate == true || _patterns[ texture.id ] == undefined ) {
-			
+
 				var repeatX = texture.wrapS == THREE.RepeatWrapping;
 				var repeatY = texture.wrapT == THREE.RepeatWrapping;
-				
+
 				_patterns[ texture.id ] = _context.createPattern( texture.image, repeatX && repeatY ? 'repeat' : repeatX && !repeatY ? 'repeat-x' : !repeatX && repeatY ? 'repeat-y' : 'no-repeat' );
-				
+
 				texture.needsUpdate = false;
-				
+
 			}
-			
+
 			setFillStyle( _patterns[ texture.id ] );
 
 			// http://extremelysatisfactorytotalitarianism.com/blog/?p=2120
 
 			var a, b, c, d, e, f, det, idet,
+			offsetX = texture.offset.x / texture.repeat.x,
+			offsetY = texture.offset.y / texture.repeat.y,
 			width = ( texture.image.width - 1 ) * texture.repeat.x,
 			height = ( texture.image.height - 1 ) * texture.repeat.y;
 
-			u0 *= width; v0 *= height;
-			u1 *= width; v1 *= height;
-			u2 *= width; v2 *= height;
+			u0 = ( u0 + offsetX ) * width;
+			v0 = ( v0 + offsetY ) * height;
+
+			u1 = ( u1 + offsetX ) * width;
+			v1 = ( v1 + offsetY ) * height;
+
+			u2 = ( u2 + offsetX ) * width;
+			v2 = ( v2 + offsetY ) * height;
 
 			x1 -= x0; y1 -= y0;
 			x2 -= x0; y2 -= y0;
@@ -916,7 +926,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 		}
 
 		function clipImage( x0, y0, x1, y1, x2, y2, u0, v0, u1, v1, u2, v2, image ) {
-		
+
 			// http://extremelysatisfactorytotalitarianism.com/blog/?p=2120
 
 			var a, b, c, d, e, f, det, idet,
@@ -950,7 +960,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 			_context.clip();
 			_context.drawImage( image, 0, 0 );
 			_context.restore();
-		
+
 		}
 
 		function getGradientTexture( color1, color2, color3, color4 ) {
@@ -1110,7 +1120,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 		}
 
 	}
-	
+
 	function setFillStyle( style ) {
 
 		if ( _contextFillStyle != style ) {
