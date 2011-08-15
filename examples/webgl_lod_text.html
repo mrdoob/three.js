@@ -96,7 +96,7 @@
 				light.position.normalize();
 				scene.addLight( light );
 
-				var wireMaterial = new THREE.MeshLambertMaterial( { color: 0x000000, wireframe: true } );
+				var wireMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff, opacity: 0.5, wireframe: true } );
 				
 				function getOptionsWithSegments(x,b, bevel) {
 					return {
