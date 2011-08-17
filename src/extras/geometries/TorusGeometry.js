@@ -3,7 +3,7 @@
  * based on http://code.google.com/p/away3d/source/browse/trunk/fp10/Away3DLite/src/away3dlite/primitives/Torus.as?r=2888
  */
 
-THREE.TorusGeometry = function ( radius, tube, segmentsR, segmentsT ) {
+THREE.TorusGeometry = function ( radius, tube, segmentsR, segmentsT, arc ) {
 
 	THREE.Geometry.call( this );
 
@@ -13,14 +13,15 @@ THREE.TorusGeometry = function ( radius, tube, segmentsR, segmentsT ) {
 	this.tube = tube || 40;
 	this.segmentsR = segmentsR || 8;
 	this.segmentsT = segmentsT || 6;
+	this.arc = arc || (2 * Math.PI);
 
 	var temp_uv = [];
 
 	for ( var j = 0; j <= this.segmentsR; ++j ) {
 
 		for ( var i = 0; i <= this.segmentsT; ++i ) {
-
-			var u = i / this.segmentsT * 2 * Math.PI;
+		
+			var u = i / this.segmentsT * this.arc;
 			var v = j / this.segmentsR * 2 * Math.PI;
 			var x = (this.radius + this.tube*Math.cos(v))*Math.cos(u);
 			var y = (this.radius + this.tube*Math.cos(v))*Math.sin(u);
