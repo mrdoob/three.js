@@ -237,8 +237,11 @@ THREE.FirstPersonCamera = function ( parameters ) {
 
 			}
 
-			this.lon += this.mouseX * actualLookSpeed;
-			if( this.lookVertical ) this.lat -= this.mouseY * actualLookSpeed;
+      var mx = Math.sin(1.0 / this.windowHalfX * this.mouseX) * this.windowHalfX,
+        my = Math.sin(1.0 / this.windowHalfY * this.mouseY) * this.windowHalfY;
+      
+			this.lon += mx * actualLookSpeed;
+			if( this.lookVertical ) this.lat -= my * actualLookSpeed;
 
 			this.lat = Math.max( - 85, Math.min( 85, this.lat ) );
 			this.phi = ( 90 - this.lat ) * Math.PI / 180;
