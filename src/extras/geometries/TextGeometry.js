@@ -67,20 +67,20 @@ THREE.TextGeometry = function ( text, parameters ) {
 	// // Bend Testings.
 	//
 	// var path = new THREE.CurvePath();
-	//
+	// 
 	// path.add(new THREE.CubicBezierCurve(
 	// 		new THREE.Vector2(0, 0),
 	//   		new THREE.Vector2(10, 100),
 	// 		new THREE.Vector2(200, -10),
 	// 		new THREE.Vector2(300, 0)
 	// 	));
-	//
+	// 
 	// path.add(new THREE.QuadraticBezierCurve(
 	// 	new THREE.Vector2(300, 0),
 	//   		new THREE.Vector2(450, -10),
 	// 	new THREE.Vector2(500, 100)
 	// ));
-	//
+	// 
 	// parameters.bendPath = path;
 
 	// var path = new THREE.CurvePath();

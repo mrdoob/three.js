@@ -37,6 +37,8 @@ THREE.ExtrudeGeometry = function( shapes, options ) {
 
 	var s, sl = shapes.length, shape;
 
+	this.shapebb = shapes[ sl - 1 ].getBoundingBox();
+	
 	for ( s = 0; s < sl; s ++ ) {
 
 		shape = shapes[ s ];
@@ -44,6 +46,16 @@ THREE.ExtrudeGeometry = function( shapes, options ) {
 		this.addShape( shape, options );
 
 	}
+	
+	
+	// UVs to be added
+	// How can we create UVs on this?
+
+	this.computeCentroids();
+	this.computeFaceNormals();
+	this.computeVertexNormals();
+
+	//console.log( "took", ( Date.now() - startTime ) );
 
 };
 
@@ -52,8 +64,6 @@ THREE.ExtrudeGeometry.prototype.constructor = THREE.ExtrudeGeometry;
 
 
 THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
-
-	//var startTime = Date.now();
 
 	var amount = options.amount !== undefined ? options.amount : 100;
 
@@ -73,6 +83,13 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 	var extrudePts, extrudeByPath = false;
 
 	var useSpacedPoints = options.useSpacedPoints !== undefined ? options.useSpacedPoints : false;
+	
+	var material = options.material;
+	var shapebb = this.shapebb;
+	//shapebb = shape.getBoundingBox();
+	
+	console.log(shapebb,material);
+	
 
 	if ( extrudePath ) {
 
@@ -502,9 +519,6 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 	///   Handle Faces
 	////
 
-	// not used anywhere
-	// var layers = ( steps + bevelSegments * 2 ) * vlen;
-
 	// Bottom faces
 
 	if ( bevelEnabled ) {
@@ -603,14 +617,6 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	}
 
-	// UVs to be added
-	// How can we create UVs on this?
-
-	this.computeCentroids();
-	this.computeFaceNormals();
-	//this.computeVertexNormals();
-
-	//console.log( "took", ( Date.now() - startTime ) );
 
 	function v( x, y, z ) {
 
@@ -624,7 +630,20 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 		b += shapesOffset;
 		c += shapesOffset;
 
-		scope.faces.push( new THREE.Face3( a, b, c ) );
+		scope.faces.push( new THREE.Face3( a, b, c , null, null, material ) );
+		//normal, color, materials
+		
+		var mx = shapebb.minX, my = shapebb.minY;
+		var uy = shapebb.maxY; // - shapebb.minY;
+		var ux = shapebb.maxX; // - shapebb.minX;
+	
+		
+		scope.faceVertexUvs[ 0 ].push( [
+					new THREE.UV( (scope.vertices[a].position.x ) / ux, (scope.vertices[a].position.y ) / uy ),
+					new THREE.UV( (scope.vertices[b].position.x ) / ux, (scope.vertices[b].position.y ) / uy ),
+					new THREE.UV( (scope.vertices[c].position.x ) / ux, (scope.vertices[c].position.y ) / uy ),
+					
+				] );
 
 	}
 
@@ -636,6 +655,13 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 		d += shapesOffset;
 
  		scope.faces.push( new THREE.Face4( a, b, c, d ) );
+
+		scope.faceVertexUvs[ 0 ].push( [
+					new THREE.UV( 0, 0 ),
+					new THREE.UV( 1, 0 ),
+					new THREE.UV( 1, 1 ),
+					new THREE.UV( 0, 1 )
+				] );
 
 	}
 
