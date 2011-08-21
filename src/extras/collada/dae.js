@@ -280,8 +280,10 @@ var DAE = (function() {
 			var instance_geometry = node.geometries[i];
 			var instance_materials = instance_geometry.instance_material;
 			var geometry = geometries[instance_geometry.url];
-			var used_effects = {};
-
+			var used_materials = {};
+			var num_materials = 0;
+			var first_material;
+			
 			if (geometry) {
 				if (!geometry.mesh || !geometry.mesh.primitives)
 					continue;
@@ -295,41 +297,43 @@ var DAE = (function() {
 					for (j = 0; j < instance_materials.length; j++) {
 						var inst_material = instance_materials[j];
 						var effect_id = materials[inst_material.target].instance_effect.url;
-						used_effects[inst_material.symbol] = effects[effect_id];
+						var shader = effects[effect_id].shader;
+						
+						shader.material.opacity = !shader.material.opacity ? 1 : shader.material.opacity;
+						used_materials[inst_material.symbol] = shader.material;
+						first_material = shader.material;
+						num_materials++;
 					}
 				}
 				
-				var primitives = geometry.mesh.primitives;
-				
-				for (j = 0; j < primitives.length; j++) {
-					var effect = used_effects[ primitives[j].material ];
-					var shader = effect.shader;
-					var geom = primitives[j].geometry;
-					var material = shader.material;
-					var mesh;
-					
-					if (skinController !== undefined && j == 0) {
-						//createSkin(geom, skinController);
-						//material.skinning = true;
-						mesh = new THREE.SkinnedMesh( geom, material );
-						mesh.skeleton = skinController.skeleton;
-						mesh.skinController = controllers[skinController.url];
-						mesh.name = 'skin_' + skins.length;
-						skins.push(mesh);
-					} else {
-						if (morphController !== undefined) {
-							console.log("morphing")
-							createMorph(geom, morphController);
-							material.morphTargets = true;
-							mesh = new THREE.Mesh( geom, material );
-							mesh.name = 'morph_' + morphs.length;
-							morphs.push(mesh);
-						} else {
-							mesh = new THREE.Mesh( geom, material );
-						}
+				var mesh;
+				var material = first_material || new THREE.MeshLambertMaterial({ color: 0xdddddd, shading: THREE.FlatShading });
+				var geom = geometry.mesh.geometry3js;
+				if (num_materials > 1) {
+					material = new THREE.MeshFaceMaterial();
+					for (j = 0; j < geom.faces.length; j++) {
+						var face = geom.faces[j];
+						face.materials = [ used_materials[face.daeMaterial] ];
 					}
-					obj.addChild(mesh);
 				}
+				
+				if (skinController !== undefined) {
+					mesh = new THREE.SkinnedMesh( geom, material );
+					mesh.skeleton = skinController.skeleton;
+					mesh.skinController = controllers[skinController.url];
+					mesh.name = 'skin_' + skins.length;
+					skins.push(mesh);
+				} else if (morphController !== undefined) {
+					createMorph(geom, morphController);
+					material.morphTargets = true;
+					mesh = new THREE.Mesh( geom, material );
+					mesh.name = 'morph_' + morphs.length;
+					morphs.push(mesh);
+				} else {
+					mesh = new THREE.Mesh( geom, material );
+				}
+						
+				obj.addChild(mesh);
 			}
 		}
 		
@@ -998,10 +1002,11 @@ var DAE = (function() {
 		this.geometry = geometry.id;
 		this.primitives = [];
 		this.vertices = null;
+		this.geometry3js;
 	}
 	Mesh.prototype.parse = function(element) {
 		this.primitives = [];
-		var i;
+		var i, j;
 		for (i = 0; i < element.childNodes.length; i++) {
 			var child = element.childNodes[i];
 			switch (child.nodeName) {
@@ -1023,24 +1028,42 @@ var DAE = (function() {
 					break;
 			}
 		}
+		
+		var vertex_store = {};
+		function get_vertex(v, index)  {
+			var hash = _hash_vector3(v.position);
+			if (vertex_store[hash] === undefined) {
+				vertex_store[hash] = {v:v, index:index};
+			}
+			return vertex_store[hash];
+		}
+		
+		this.geometry3js = new THREE.Geometry();
+		var vertexData = sources[this.vertices.input['POSITION'].source].data;
+		for (i = 0, j = 0; i < vertexData.length; i += 3, j++) {
+			var v = new THREE.Vertex(new THREE.Vector3(vertexData[i], vertexData[i+1], vertexData[i+2]));
+			get_vertex(v, j);
+			this.geometry3js.vertices.push(v);
+		}
+
 		for (i = 0; i < this.primitives.length; i++) {
 			primitive = this.primitives[i];
 			primitive.setVertices(this.vertices);
-			primitive.create();
+			this.handlePrimitive(primitive, this.geometry3js, vertex_store);
 		}
+		
+		this.geometry3js.computeCentroids();
+		this.geometry3js.computeFaceNormals();
+		this.geometry3js.computeVertexNormals();
+		this.geometry3js.computeBoundingBox();
+		
 		return this;
 	}
-	
-	function Polylist() {
-	}
-	Polylist.prototype = new Triangles();
-	Polylist.prototype.constructor = Polylist;
-	Polylist.prototype.create = function() {
-		var p = this.p, inputs = this.inputs, num_inputs = this.inputs.length;
-		var idx = 0, input;
-		var i, j, k, v, n, t;
+	Mesh.prototype.handlePrimitive = function(primitive, geom, vertex_store) {
+		var i = 0, j, k, p = primitive.p, inputs = primitive.inputs;
+		var input, index, idx32;
+		var vcIndex = 0, vcount = 3;
 		var texture_sets = [];
-		var polygons = [];
 		
 		for (j = 0; j < inputs.length; j++) {
 			input = inputs[j];
@@ -1048,137 +1071,15 @@ var DAE = (function() {
 				texture_sets.push(input.set);
 			}
 		}
-		
-		for (i = 0; i < this.vcount.length; i++) {
-			var num_verts = this.vcount[i]
-			var vs = [], ns = [], ts = [];
-			for (j = 0; j < num_verts; j++) {
-				for (k = 0; k < num_inputs; k++) {
-					input = inputs[k];
-					source = sources[input.source];
-					index = p[idx + input.offset];
-					numParams = source.accessor.params.length;
-					idx32 = index * numParams;
-					switch (input.semantic) {
-						case 'VERTEX':
-							v = new THREE.Vertex(new THREE.Vector3(source.data[idx32+0], source.data[idx32+1], source.data[idx32+2]));
-							v.daeId = index;
-							vs.push(v);
-							break;
-						case 'NORMAL':
-							n = new THREE.Vector3(source.data[idx32+0], source.data[idx32+1], source.data[idx32+2]);
-							n.daeId = ns.length;
-							ns.push(n);
-							break;
-						case 'TEXCOORD':
-							if (ts[input.set] == undefined) ts[input.set] = [];
-							t = new THREE.UV(source.data[idx32+0], (flip_uv ? 1-source.data[idx32+1] : source.data[idx32+1]));
-							t.daeId = ts[input.set].length;
-							ts[input.set].push(t);
-							break;
-						default:
-							break;
-					}
-				}
-				idx += num_inputs;
-			}
-			polygons.push([vs, ns, ts])
-		}
-		
-		this.geometry = new THREE.Geometry();
-		this.triangulate(polygons, texture_sets);
-	}
-	Polylist.prototype.triangulate = function(polygons, texture_sets) {
-		var i, j, k;
-		var vertex_store = {};
-		var last_index = 0;
-		
-		function get_vertex(v)  {
-			var hash = _hash_vector3(v.position);
-			if (vertex_store[hash] === undefined) {
-				vertex_store[hash] = {v:v, index:last_index++};
-			}
-			return vertex_store[hash];
-		}
-		
-		for (i = 0; i < polygons.length; i++) {
-			var polygon = polygons[i];
-			var v = polygon[0];
-			var n = polygon[1];
-			var t = polygon[2];
-			var uvs = [];
-			for (j = 0; j < texture_sets.length; j++) {
-				uvs.push(t[texture_sets[j]]);
-			}
-			var has_uv = (uvs.length > 0 && uvs[0].length > 0);
-			if (v.length < 3) continue;
-			var va = get_vertex(v[0]);
-			var na = n[0];
-			for (j = 1; j < v.length - 1; j++) {
-				var vb = get_vertex(v[j]);
-				var vc = get_vertex(v[j+1]);
-				var a = va.v.daeId;
-				var b = vb.v.daeId;
-				var c = vc.v.daeId;
-				var nb = n[j];
-				var nc = n[j+1];
-				this.geometry.faces.push( new THREE.Face3(a, b, c, [na, nb, nc] ) );
-				if (has_uv) {
-					for (k = 0; k < uvs.length; k++) {
-						this.geometry.faceVertexUvs[ k ].push( [uvs[k][0], uvs[k][j], uvs[k][j+1]] );
-					}
-				}
-			}
-		}
-		for (var hash in vertex_store) {
-			this.geometry.vertices[vertex_store[hash].v.daeId] = vertex_store[hash].v;
-		}
-		this.geometry.material = this.material;
-		this.geometry.computeCentroids();
-		this.geometry.computeFaceNormals();
-		this.geometry.computeVertexNormals();
-		this.geometry.computeBoundingBox();
-	}
-	
-	function Triangles(flip_uv) {
-		this.material = "";
-		this.count = 0;
-		this.inputs = [];
-		this.vcount;
-		this.p = [];
-		this.aabb = new AABB();
-		this.geometry = new THREE.Geometry();
-	}
-	Triangles.prototype.create = function() {
-		var i = 0, j, k, p = this.p, inputs = this.inputs, input, index;
-		var v, n, t;
-		var texture_sets = [];
-		var vertex_store = {};
-		var last_index = 0;
-		
-		function get_vertex(v)  {
-			var hash = _hash_vector3(v.position);
-			if (vertex_store[hash] === undefined) {
-				vertex_store[hash] = {v:v, index:last_index++};
-			}
-			return vertex_store[hash];
-		}
-		
-		for (j = 0; j < inputs.length; j++) {
-			input = inputs[j];
-			if (input.semantic == 'TEXCOORD') {
-				texture_sets.push(input.set);
-			}
-		}
-		
-		this.geometry = new THREE.Geometry();
-		var daeIdx = 0;
 		
 		while (i < p.length) {
-			vs = [];
-			ns = [];
-			ts = {};
-			for (j = 0; j < 3; j++) {
+			var vs = [];
+			var ns = [];
+			var ts = {};
+			if (primitive.vcount) {
+				vcount = primitive.vcount[vcIndex++];
+			}
+			for (j = 0; j < vcount; j++) {
 				for (k = 0; k < inputs.length; k++) {
 					input = inputs[k];
 					source = sources[input.source];
@@ -1187,51 +1088,57 @@ var DAE = (function() {
 					idx32 = index * numParams;
 					switch (input.semantic) {
 						case 'VERTEX':
-							v = new THREE.Vertex(new THREE.Vector3(source.data[idx32+0], source.data[idx32+1], source.data[idx32+2]));
-							v.daeId = index;
-							vs.push(v);
+							var hash = _hash_vector3(geom.vertices[index].position);
+							vs.push(vertex_store[hash].index);
 							break;
 						case 'NORMAL':
-							n = new THREE.Vector3(source.data[idx32+0], source.data[idx32+1], source.data[idx32+2]);
-							n.daeId = daeIdx;
-							ns.push(n);
+							ns.push(new THREE.Vector3(source.data[idx32+0], source.data[idx32+1], source.data[idx32+2]));
 							break;
 						case 'TEXCOORD':
 							if (ts[input.set] == undefined) ts[input.set] = [];
-							t = new THREE.UV(source.data[idx32+0], source.data[idx32+1]);
-							t.daeId = daeIdx;
-							ts[input.set].push(t);
+							ts[input.set].push(new THREE.UV(source.data[idx32+0], source.data[idx32+1]));
 							break;
 						default:
 							break;
 					}
 				}
-				
 			}
-
-			var has_v = (vs.length == 3);
-			var has_t = (texture_sets.length > 0 && ts[texture_sets[0]].length == 3);
-			if (has_v) {
-				var a = get_vertex(vs[0]);
-				var b = get_vertex(vs[1]);
-				var c = get_vertex(vs[2]);
-				this.geometry.faces.push( new THREE.Face3(a.v.daeId, b.v.daeId, c.v.daeId, ns ) );
-				if (has_t) {
+			var face = new THREE.Face3(vs[0], vs[1], vs[2], [ns[0], ns[1], ns[2]]);
+			var uv;
+			face.daeMaterial = primitive.material;
+			geom.faces.push(face);
+			for (k = 0; k < texture_sets.length; k++) {
+				uv = ts[texture_sets[k]];
+				geom.faceVertexUvs[ k ].push( [uv[0], uv[1], uv[2]] );
+			}
+			if (vcount > 3) {
+				for (j = 2; j < vs.length -1; j++) {
+					face = new THREE.Face3(vs[0], vs[j], vs[j+1], [ns[0], ns[j], ns[j+1]]);
+					face.daeMaterial = primitive.material;
+					geom.faces.push(face);
 					for (k = 0; k < texture_sets.length; k++) {
-						this.geometry.faceVertexUvs[ k ].push( ts[texture_sets[k]] );
+						uv = ts[texture_sets[k]];
+						geom.faceVertexUvs[ k ].push( [uv[0], uv[j], uv[j+1]] );
 					}
 				}
 			}
-			i += 3 * inputs.length;
+			
+			i += inputs.length * vcount;
 		}
-		for (var hash in vertex_store) {
-			this.geometry.vertices[vertex_store[hash].v.daeId] = vertex_store[hash].v;
-		}
-		this.geometry.material = this.material;
-		this.geometry.computeCentroids();
-		this.geometry.computeFaceNormals();
-		this.geometry.computeVertexNormals();
-		this.geometry.computeBoundingBox();	
+	}
+	
+	function Polylist() {
+	}
+	Polylist.prototype = new Triangles();
+	Polylist.prototype.constructor = Polylist;
+	
+	function Triangles(flip_uv) {
+		this.material = "";
+		this.count = 0;
+		this.inputs = [];
+		this.vcount;
+		this.p = [];
+		this.geometry = new THREE.Geometry();
 	}
 	Triangles.prototype.setVertices = function(vertices) {
 		for (var i = 0; i < this.inputs.length; i++) {
@@ -1262,63 +1169,6 @@ var DAE = (function() {
 		}
 		return this;
 	}
-	Triangles.prototype.calcNormals = function(v, n) {
-		var i;
-		var v0 = [0, 0, 0];
-		var v1 = [0, 0, 0];
-		var v2 = [0, 0, 0];
-		var n0 = [0, 0, 0];
-		for (i = 0; i < v.length; i += 9) {
-			v0[0] = v[i+0]; v0[1] = v[i+1]; v0[2] = v[i+2];
-			v1[0] = v[i+3]; v1[1] = v[i+4]; v1[2] = v[i+5];
-			v2[0] = v[i+6]; v2[1] = v[i+7]; v2[2] = v[i+8];
-			// sub
-			v1[0] = v1[0] - v0[0];
-			v1[1] = v1[1] - v0[1];
-			v1[2] = v1[2] - v0[2];
-			v2[0] = v2[0] - v0[0];
-			v2[1] = v2[1] - v0[1];
-			v2[2] = v2[2] - v0[2];
-			// cross
-			n0[0] = v1[1] * v2[2] - v1[2] * v2[1];
-			n0[1] = v1[2] * v2[0] - v1[0] * v2[2];
-			n0[2] = v1[0] * v2[1] - v1[1] * v2[0];
-			// normalize
-			length = 1.0 / Math.sqrt(n0[0]*n0[0]+n0[1]*n0[1]+n0[2]*n0[2]);
-			if (length == 0) length = 1.0;
-			n[i+0] = n[i+3] = n[i+6] = n0[0] * length;
-			n[i+1] = n[i+4] = n[i+7] = n0[1] * length;
-			n[i+2] = n[i+5] = n[i+8] = n0[2] * length;
-		}
-	}
-	
-	function AABB() {
-		this.minx = 0;	this.miny = 0;	this.minz = 0;
-		this.maxx = 0;	this.maxy = 0;	this.maxz = 0;
-	}
-	AABB.prototype.reset = function() {
-		this.minx = this.miny = this.minz = Number.MAX_VALUE;
-		this.maxx = this.maxy = this.maxz = Number.MIN_VALUE;
-		return this;
-	}
-	AABB.prototype.setTriangles = function(positions) {
-		this.reset();
-		for (var i = 0; i < positions.length; i += 3) {
-			this.minx = Math.min(this.minx, positions[i+0]); 
-			this.miny = Math.min(this.miny, positions[i+1]);
-			this.minz = Math.min(this.minz, positions[i+2]);
-			this.maxx = Math.max(this.maxx, positions[i+0]);
-			this.maxy = Math.max(this.maxy, positions[i+1]);
-			this.maxz = Math.max(this.maxz, positions[i+2]);
-		}
-		return this;
-	}
-	AABB.prototype.centerX = function() { return this.minx + (this.sizeX() / 2); }
-	AABB.prototype.centerY = function() { return this.miny + (this.sizeY() / 2); }
-	AABB.prototype.centerZ = function() { return this.minz + (this.sizeZ() / 2); }
-	AABB.prototype.sizeX = function() { return this.maxx - this.minx; }
-	AABB.prototype.sizeY = function() { return this.maxy - this.miny; }
-	AABB.prototype.sizeZ = function() { return this.maxz - this.minz; }
 	
 	function Accessor() {
 		this.source = "";
@@ -1547,8 +1397,8 @@ var DAE = (function() {
 										props['map'] = THREE.ImageUtils.loadTexture(baseUrl + image.init_from);
 										props['map'].wrapS = THREE.RepeatWrapping;
 										props['map'].wrapT = THREE.RepeatWrapping;
-									//	props['map'].repeat.x = 1;
-									//	props['map'].repeat.y = 1;
+										props['map'].repeat.x = 1;
+										props['map'].repeat.y = -1;
 									}
 								}
 							}
@@ -2046,4 +1896,3 @@ var DAE = (function() {
 		geometries : geometries
 	};
 })();
-
