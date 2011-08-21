@@ -19,6 +19,7 @@ var DAE = (function() {
 	var baseUrl;
 	var morphs;
 	var skins;
+	var preferredShading = THREE.SmoothShading;
 	
 	function load(url, readyCallback) {
 		if (document.implementation && document.implementation.createDocument) {
@@ -101,6 +102,9 @@ var DAE = (function() {
 		return result;
 	}
 	
+	function setPreferredShading(shading) {
+		preferredShading = shading;
+	}
 	function parseLib(q, classSpec, prefix) {
 		var elements = COLLADA.evaluate(q, 
 			COLLADA, 
@@ -1427,7 +1431,7 @@ var DAE = (function() {
 			}
 		}
 
-		props['shading'] = THREE.SmoothShading;
+		props['shading'] = preferredShading;
 		this.material = new THREE.MeshLambertMaterial(props);
 		
 		switch (this.type) {
@@ -1893,6 +1897,7 @@ var DAE = (function() {
 	}
 	return {
 		load: load,
+		setPreferredShading: setPreferredShading,
 		geometries : geometries
 	};
 })();
