@@ -7,6 +7,7 @@
  *  size: 			<float>, 	// size of the text
  *  height: 		<float>, 	// thickness to extrude text
  *  curveSegments: 	<int>,		// number of points on the curves
+ *  steps: 			<int>,		// number of points for z-side extrusions
  *
  *  font: 			<string>,		// font name
  *  weight: 		<string>,		// font weight (normal, bold)
@@ -85,10 +86,9 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 	var useSpacedPoints = options.useSpacedPoints !== undefined ? options.useSpacedPoints : false;
 	
 	var material = options.material;
+	var zmaterial = options.extrudeMaterial;
 	var shapebb = this.shapebb;
 	//shapebb = shape.getBoundingBox();
-	
-	console.log(shapebb,material);
 	
 
 	if ( extrudePath ) {
@@ -125,8 +125,6 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 	if ( bendPath ) {
 
 		shape.addWrapPath( bendPath );
-
-		//shapePoints = shape.extractAllPointsWithBend( curveSegments, bendPath );
 
 	}
 
@@ -602,14 +600,37 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 			//console.log('b', i,j, i-1, k,vertices.length);
 
-			var s = 0;
+			var s = 0, sl = steps  + bevelSegments * 2;
 
-			for ( s = 0; s < ( steps  + bevelSegments * 2 ); s ++ ) {
+			for ( s = 0; s < sl; s ++ ) {
 
 				var slen1 = vlen * s;
 				var slen2 = vlen * ( s + 1 );
-
-				f4( layeroffset + j + slen1, layeroffset + k + slen1, layeroffset + k + slen2, layeroffset + j + slen2 );
+				var a = layeroffset + j + slen1,
+					b = layeroffset + k + slen1,
+					c = layeroffset + k + slen2,
+					d = layeroffset + j + slen2;
+					
+				f4( a, b, c, d );
+				
+				if (zmaterial) {
+					var v1 = s / sl;
+					var v2 = (s+1) / sl;
+					
+					var ztol = (amount + bevelThickness * 2 );
+				
+					var u1 = (scope.vertices[a].position.z + bevelThickness) / ztol;
+					var u2 = (scope.vertices[d].position.z + bevelThickness) / ztol;
+				
+					//console.log(vy1, vy2);
+					scope.faceVertexUvs[ 0 ].push( [
+						new THREE.UV( u1, v1 ),
+						new THREE.UV( u2, v1 ),
+						new THREE.UV( u2, v2 ),
+						new THREE.UV( u1, v2 )
+					] );
+				}
+				
 
 			}
 
@@ -633,17 +654,19 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 		scope.faces.push( new THREE.Face3( a, b, c , null, null, material ) );
 		//normal, color, materials
 		
-		var mx = shapebb.minX, my = shapebb.minY;
-		var uy = shapebb.maxY; // - shapebb.minY;
-		var ux = shapebb.maxX; // - shapebb.minX;
-	
+		if (material) {
+			var mx = shapebb.minX, my = shapebb.minY;
+			var uy = shapebb.maxY; // - shapebb.minY;
+			var ux = shapebb.maxX; // - shapebb.minX;
+
 		
-		scope.faceVertexUvs[ 0 ].push( [
-					new THREE.UV( (scope.vertices[a].position.x ) / ux, (scope.vertices[a].position.y ) / uy ),
-					new THREE.UV( (scope.vertices[b].position.x ) / ux, (scope.vertices[b].position.y ) / uy ),
-					new THREE.UV( (scope.vertices[c].position.x ) / ux, (scope.vertices[c].position.y ) / uy ),
-					
-				] );
+			scope.faceVertexUvs[ 0 ].push( [
+				new THREE.UV( (scope.vertices[a].position.x ) / ux, (scope.vertices[a].position.y ) / uy ),
+				new THREE.UV( (scope.vertices[b].position.x ) / ux, (scope.vertices[b].position.y ) / uy ),
+				new THREE.UV( (scope.vertices[c].position.x ) / ux, (scope.vertices[c].position.y ) / uy ),
+				
+			] );
+		}
 
 	}
 
@@ -654,14 +677,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 		c += shapesOffset;
 		d += shapesOffset;
 
- 		scope.faces.push( new THREE.Face4( a, b, c, d ) );
-
-		scope.faceVertexUvs[ 0 ].push( [
-					new THREE.UV( 0, 0 ),
-					new THREE.UV( 1, 0 ),
-					new THREE.UV( 1, 1 ),
-					new THREE.UV( 0, 1 )
-				] );
+ 		scope.faces.push( new THREE.Face4( a, b, c, d, null, null, zmaterial ) );
 
 	}
 
