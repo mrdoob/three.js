@@ -345,60 +345,7 @@ var DAE = (function() {
 			}
 		}
 	}
-	function test(geometry, skin) {
-		var maxId = -1000;
-		var skinIndices = [];
-		var skinWeights = [];
-		for (var i = 0; i < geometry.vertices.length; i++) {
-			var v = geometry.vertices[i];
-			var weights = skin.weights[v.daeId];
-			var vi = new THREE.Vector3();
-			var wi = new THREE.Vector3();
-			for (var j = 0; j < weights.length && j < 2; j++) {
-				var vw = weights[j];
-				var jointIdx = getJointId(skin, vw.joint);
-				if (j == 0) {
-					vi.x = jointIdx;
-					wi.x = vw.weight;
-				} else {
-					vi.y = jointIdx;
-					wi.y = vw.weight;
-				}
-			}
-			skinIndices.push(vi);
-			skinWeights.push(wi);
-		}
-		geometry.skinIndices = skinIndices;
-		geometry.skinWeights = skinWeights;
-		geometry.bones = [];
-		var hierarchy = [];
-		
-		for (var i = 0; i < skin.joints.length; i++) {
-			var bone = skin.joints[i];
-			var idx = i == 0 ? -1 : Math.round(Math.random()*10);
-			var n = daeScene.getChildBySid(bone, true);
-			if (n && n.keys) {
-				hierarchy.push({parent:idx, keys:n.keys});
-			
-			
-			geometry.bones.push({
-				parent: idx,
-				pos: [0, 0, 0],
-				rotq: [0, 0, 0, 1],
-				scl: [1,1,1],
-				rot: [0,0,0]
-			});
-		}
-		}
-		geometry.animation = {
-			name: 'take_001',
-			fps: 30,
-			length: 3.333,
-			JIT: undefined,
-			hierarchy: hierarchy
-		};
-		console.log(hierarchy)
-	}
+	
 	function getLibraryNode(id) {
 		return COLLADA.evaluate(".//dae:library_nodes//dae:node[@id='"+id+"']", 
 			COLLADA, 
