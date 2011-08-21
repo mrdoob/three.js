@@ -308,10 +308,12 @@ var DAE = (function() {
 					var material = shader.material;
 					var mesh;
 					
-					if (skinController !== undefined) {
+					if (skinController !== undefined && j == 0) {
 						//createSkin(geom, skinController);
 						//material.skinning = true;
 						mesh = new THREE.SkinnedMesh( geom, material );
+						mesh.skeleton = skinController.skeleton;
+						mesh.skinController = controllers[skinController.url];
 						mesh.name = 'skin_' + skins.length;
 						skins.push(mesh);
 					} else {
@@ -640,7 +642,6 @@ var DAE = (function() {
 			}
 		}
 		var index = 0;
-		
 		for (var i = 0; i < vcount.length; i++) {
 			var numBones = vcount[i];
 			var vertex_weights = [];
@@ -651,7 +652,7 @@ var DAE = (function() {
 					var value = v[index + input.offset];
 					switch (input.semantic) {
 						case 'JOINT':
-							influence.joint = this.joints[value];
+							influence.joint = value;//this.joints[value];
 							break;
 						case 'WEIGHT':
 							influence.weight = sources[input.source].data[value];
@@ -662,6 +663,9 @@ var DAE = (function() {
 				}
 				vertex_weights.push(influence);
 				index += inputs.length;
+			}
+			for (var j = 0; j < vertex_weights.length; j++) {
+				vertex_weights[j].index = i;
 			}
 			this.weights.push(vertex_weights);
 		}
@@ -1058,7 +1062,7 @@ var DAE = (function() {
 					switch (input.semantic) {
 						case 'VERTEX':
 							v = new THREE.Vertex(new THREE.Vector3(source.data[idx32+0], source.data[idx32+1], source.data[idx32+2]));
-							v.daeId = vs.length;
+							v.daeId = index;
 							vs.push(v);
 							break;
 						case 'NORMAL':
@@ -1113,9 +1117,9 @@ var DAE = (function() {
 			for (j = 1; j < v.length - 1; j++) {
 				var vb = get_vertex(v[j]);
 				var vc = get_vertex(v[j+1]);
-				var a = va.index;
-				var b = vb.index;
-				var c = vc.index;
+				var a = va.v.daeId;
+				var b = vb.v.daeId;
+				var c = vc.v.daeId;
 				var nb = n[j];
 				var nc = n[j+1];
 				this.geometry.faces.push( new THREE.Face3(a, b, c, [na, nb, nc] ) );
@@ -1127,7 +1131,7 @@ var DAE = (function() {
 			}
 		}
 		for (var hash in vertex_store) {
-			this.geometry.vertices.push(vertex_store[hash].v);
+			this.geometry.vertices[vertex_store[hash].v.daeId] = vertex_store[hash].v;
 		}
 		this.geometry.material = this.material;
 		this.geometry.computeCentroids();
@@ -1211,7 +1215,7 @@ var DAE = (function() {
 				var a = get_vertex(vs[0]);
 				var b = get_vertex(vs[1]);
 				var c = get_vertex(vs[2]);
-				this.geometry.faces.push( new THREE.Face3(a.index, b.index, c.index, ns ) );
+				this.geometry.faces.push( new THREE.Face3(a.v.daeId, b.v.daeId, c.v.daeId, ns ) );
 				if (has_t) {
 					for (k = 0; k < texture_sets.length; k++) {
 						this.geometry.faceVertexUvs[ k ].push( ts[texture_sets[k]] );
@@ -1221,7 +1225,7 @@ var DAE = (function() {
 			i += 3 * inputs.length;
 		}
 		for (var hash in vertex_store) {
-			this.geometry.vertices.push(vertex_store[hash].v);
+			this.geometry.vertices[vertex_store[hash].v.daeId] = vertex_store[hash].v;
 		}
 		this.geometry.material = this.material;
 		this.geometry.computeCentroids();
