@@ -152,6 +152,7 @@ var DAE = (function() {
 	function calcAnimationBounds() {
 		var start = 1000000;
 		var end = -start;
+		var frames = 0;
 		
 		for (id in animations) {
 			var animation = animations[id];
@@ -160,9 +161,10 @@ var DAE = (function() {
 				sampler.create();	
 				start = Math.min(start, sampler.startTime);
 				end = Math.max(end, sampler.endTime);
+				frames = Math.max(frames, sampler.input.length);
 			}
 		}
-		return {start:start, end:end}
+		return {start:start, end:end, frames:frames}
 	}
 	
 	function createMorph(geometry, ctrl) {
@@ -224,6 +226,127 @@ var DAE = (function() {
 			for (var i = 0; i < geometry.vertices.length; i++) {
 				skin.bindShapeMatrix.multiplyVector3(geometry.vertices[i].position);
 			}
+		}
+	}
+	
+	function setupSkeleton(node, bones, frame, parent) {
+		node.world = node.world || new THREE.Matrix4();
+		node.world.copy(node.matrix);
+		
+		if (node.channels && node.channels.length) {
+			var channel = node.channels[0];
+			var m = channel.sampler.output[frame];
+			if (m instanceof THREE.Matrix4) {
+				node.world.copy(m);
+			}
+		}
+		
+		if (parent) {
+			node.world.multiply(parent, node.world);
+		}
+
+		bones.push(node);
+		
+		for (var i = 0; i < node.nodes.length; i++) {
+			setupSkeleton(node.nodes[i], bones, frame, node.world);
+		}
+	}
+	
+	function setupSkinningMatrices(bones, skin) {
+		// FIXME: this is dumb...
+		for (var i = 0; i < bones.length; i++) {
+			var bone = bones[i];
+			var found = -1;
+			for (var j = 0; j < skin.joints.length; j++) {
+				if (bone.sid == skin.joints[j]) {
+					found = j;
+					break;
+				}
+			}
+			if (found >= 0){
+				var inv = skin.invBindMatrices[found];
+				bone.invBindMatrix = inv;
+				bone.skinningMatrix = new THREE.Matrix4();
+				bone.skinningMatrix.multiply(bone.world, inv);
+				bone.weights = [];
+				for (var j = 0; j < skin.weights.length; j++) {
+					for (var k = 0; k < skin.weights[j].length; k++) {
+						var w = skin.weights[j][k];
+						if (w.joint == found) {
+							bone.weights.push(w);
+						}
+					}
+				}
+			} else {
+				throw "could not find joint!";
+			}
+		}
+	}
+	
+	function applySkin(geometry, instanceCtrl, frame) {
+		var skinController = controllers[instanceCtrl.url];
+		
+		frame = frame !== undefined ? frame : 40;
+		
+		if (!skinController || !skinController.skin) {
+			console.log("could not find skin controller!");
+			return;
+		}
+
+		if (!instanceCtrl.skeleton || !instanceCtrl.skeleton.length) {
+			console.log("could not find the skeleton for the skin!");
+			return;
+		}
+		
+		var animationBounds = calcAnimationBounds();
+		var skeleton = daeScene.getChildById(instanceCtrl.skeleton[0], true) ||
+					   daeScene.getChildBySid(instanceCtrl.skeleton[0], true);
+		var i, j, w, vidx, weight;
+		var v = new THREE.Vector3(), o, s;
+
+		// move vertices to bind shape
+		for (i = 0; i < geometry.vertices.length; i++) {
+			skinController.skin.bindShapeMatrix.multiplyVector3(geometry.vertices[i].position);
+		}
+		
+		// process animation, or simply pose the rig if no animation
+		for (frame = 0; frame < animationBounds.frames; frame++) {
+			var bones = [];
+			var skinned = [];
+			
+			// zero skinned vertices
+			for (i = 0; i < geometry.vertices.length; i++) {
+				skinned.push( new THREE.Vertex( new THREE.Vector3() ) );
+			}
+			
+			// process the frame and setup the rig with a fresh 
+			// transform, possibly from the bone's animation channel(s)
+			setupSkeleton(skeleton, bones, frame);
+			setupSkinningMatrices(bones, skinController.skin);
+			
+			// skin 'm
+			for (i = 0; i < bones.length; i++) {
+				for (j = 0; j < bones[i].weights.length; j++) {
+					w = bones[i].weights[j];
+					vidx = w.index;
+					weight = w.weight;
+				
+					o = geometry.vertices[vidx];
+					s = skinned[vidx];
+				
+					v.x = o.position.x;
+					v.y = o.position.y;
+					v.z = o.position.z;
+				
+					bones[i].skinningMatrix.multiplyVector3(v);
+				
+					s.position.x += (v.x * weight);
+					s.position.y += (v.y * weight);
+					s.position.z += (v.z * weight);
+				}
+			}
+			
+			geometry.morphTargets.push( { name: "target_" + frame, vertices: skinned } );
 		}
 	}
 	
@@ -322,9 +445,12 @@ var DAE = (function() {
 				}
 				
 				if (skinController !== undefined) {
+					applySkin(geom, skinController);
+					material.morphTargets = true;
 					mesh = new THREE.SkinnedMesh( geom, material );
 					mesh.skeleton = skinController.skeleton;
 					mesh.skinController = controllers[skinController.url];
+					mesh.skinInstanceController = skinController;
 					mesh.name = 'skin_' + skins.length;
 					skins.push(mesh);
 				} else if (morphController !== undefined) {
@@ -1898,6 +2024,7 @@ var DAE = (function() {
 	return {
 		load: load,
 		setPreferredShading: setPreferredShading,
+		applySkin: applySkin,
 		geometries : geometries
 	};
 })();

@@ -31,14 +31,16 @@
 
 			var camera, scene, renderer, objects;
 			var particleLight, pointLight;
-			var dae;
+			var dae, skin;
 			
 			DAE.load('./models/monster.dae', colladaReady);
 			
 			function colladaReady(collada) {
 				dae = collada.scene;
-				dae.scale.x = dae.scale.y = dae.scale.z = 0.003;
-				//dae.rotation.x = -Math.PI/2;
+				skin = collada.skins[0];
+
+				dae.scale.x = dae.scale.y = dae.scale.z = 0.002;
+				dae.rotation.x = -Math.PI/2;
 				dae.updateMatrix();
 
 				init();
@@ -59,7 +61,7 @@
 
 				// Grid
 
-				var line_material = new THREE.LineBasicMaterial( { color: 0x0, opacity: 0.2 } ),
+				var line_material = new THREE.LineBasicMaterial( { color: 0xcccccc, opacity: 0.2 } ),
 					geometry = new THREE.Geometry(),
 					floor = -0.04, step = 1, size = 14;
 
@@ -75,85 +77,18 @@
 
 				var line = new THREE.Line( geometry, line_material, THREE.LinePieces );
 				scene.addObject( line );
-
-				// Materials
-
-				var generatedTexture = new THREE.Texture( generateTexture() );
-				generatedTexture.needsUpdate = true;
-
-				var materials = [];
-				materials.push( new THREE.MeshLambertMaterial( { map: generatedTexture } ) );
-				materials.push( new THREE.MeshLambertMaterial( { color: 0xdddddd, shading: THREE.FlatShading } ) );
-				materials.push( new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.FlatShading } ) );
-				materials.push( new THREE.MeshNormalMaterial( ) );
-				materials.push( new THREE.MeshBasicMaterial( { color: 0x665500, blending: THREE.AdditiveBlending } ) );
-				//materials.push( new THREE.MeshBasicMaterial( { color: 0xff0000, blending: THREE.SubtractiveBlending } ) );
-
-				materials.push( new THREE.MeshLambertMaterial( { color: 0xdddddd, shading: THREE.SmoothShading } ) );
-				materials.push( new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.SmoothShading } ) );
-				materials.push( new THREE.MeshNormalMaterial( { shading: THREE.SmoothShading } ) );
-				materials.push( new THREE.MeshBasicMaterial( { color: 0xffaa00, wireframe: true } ) );
-
-				materials.push( new THREE.MeshDepthMaterial() );
-				materials.push( new THREE.MeshBasicMaterial( { map: generatedTexture } ) );
-
-				// Spheres geometry
-
-				var geometry_smooth = new THREE.SphereGeometry( 70, 32, 16 );
-				var geometry_flat = new THREE.SphereGeometry( 70, 32, 16 );
-				var geometry_pieces = new THREE.SphereGeometry( 70, 32, 16 ); // Extra geometry to be broken down for MeshFaceMaterial
-
-				for ( var i = 0, l = geometry_pieces.faces.length; i < l; i ++ ) {
-
-					var face = geometry_pieces.faces[ i ];
-					if ( Math.random() > 0.7 ) face.materials = [ materials[ Math.floor( Math.random() * materials.length )  ] ];
-
-				}
-
-				materials.push( new THREE.MeshFaceMaterial() );
-
-				objects = [];
-
-				var sphere, geometry, material;
-
-				for ( var i = 0, l = materials.length; i < l; i ++ ) {
-
-					material = materials[ i ];
-
-					geometry = material instanceof THREE.MeshFaceMaterial ? geometry_pieces :
-							   ( material.shading == THREE.FlatShading ? geometry_flat : geometry_smooth );
-
-					sphere = new THREE.Mesh( geometry, material );
-
-					sphere.position.x = ( i % 4 ) * 200 - 400;
-					sphere.position.z = Math.floor( i / 4 ) * 200 - 200;
-
-					sphere.rotation.x = Math.random() * 200 - 100;
-					sphere.rotation.y = Math.random() * 200 - 100;
-					sphere.rotation.z = Math.random() * 200 - 100;
-
-					objects.push( sphere );
-
-					//scene.addObject( sphere );
-
-				}
 				
-				//dae.rotation.x = -Math.PI/2;
+				// Add the COLLADA
 				scene.addObject(dae);
-				//var wall = dae_geometries['wall-geometry'][0];
-		
-				//var dae = new THREE.Mesh( wall, materials[3] );
-				//dae.scale.x = dae.scale.y = dae.scale.z = 100.0;				
-				//scene.addObject(dae);
 
 				particleLight = new THREE.Mesh( new THREE.SphereGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
 				scene.addObject( particleLight );
 
 				// Lights
 
-				scene.addLight( new THREE.AmbientLight( 0x202020 ) );
+				scene.addLight( new THREE.AmbientLight( 0xaaaaaa) );
 
-				var directionalLight = new THREE.DirectionalLight(/*Math.random() * 0xffffff*/0xcccccc);
+				var directionalLight = new THREE.DirectionalLight(/*Math.random() * 0xffffff*/0xbbbbbb);
 				directionalLight.position.x = Math.random() - 0.5;
 				directionalLight.position.y = Math.random() - 0.5;
 				directionalLight.position.z = Math.random() - 0.5;
@@ -175,39 +110,23 @@
 
 			}
 
-			function generateTexture() {
-
-				var canvas = document.createElement( 'canvas' );
-				canvas.width = 256;
-				canvas.height = 256;
-
-				var context = canvas.getContext( '2d' );
-				var image = context.getImageData( 0, 0, 256, 256 );
-
-				var x = 0, y = 0;
-
-				for ( var i = 0, j = 0, l = image.data.length; i < l; i += 4, j ++ ) {
-
-					x = j % 256;
-					y = x == 0 ? y + 1 : y;
-
-					image.data[ i + 2 ] = Math.floor( x ^ y );
-					image.data[ i + 3 ] = 255;
-
-				}
-
-				context.putImageData( image, 0, 0 );
-
-				return canvas;
-
-			}
-
 			//
-
+			var t = 0;
 			function animate() {
 
 				requestAnimationFrame( animate );
+				
+				if (t > 101) t = 0;
+				if (skin) {
+					// guess this can be done smarter...
+					for (var i = 0; i < skin.morphTargetInfluences.length; i++) {
+						skin.morphTargetInfluences[i] = 0;
+					}
+					skin.morphTargetInfluences[Math.floor(t)] = 1;
 
+					t += 0.5;
+				}
+				
 				render();
 				stats.update();
 
