@@ -33,12 +33,12 @@
 			var particleLight, pointLight;
 			var dae;
 			
-			DAE.load('./models/Seymour-tim.dae', colladaReady);
+			DAE.load('./models/monster.dae', colladaReady);
 			
 			function colladaReady(collada) {
 				dae = collada.scene;
-				dae.scale.x = dae.scale.y = dae.scale.z = 1;
-				dae.rotation.x = -Math.PI/2;
+				dae.scale.x = dae.scale.y = dae.scale.z = 0.003;
+				//dae.rotation.x = -Math.PI/2;
 				dae.updateMatrix();
 
 				init();
