@@ -359,7 +359,7 @@ A regular skin controller would point at a geometry we wanted to skin.  In this 
 taking the output of a morph controller (which is geometry) and skinning that.
 *******************************************************************************************
     	-->
-     <skin source="#pCylinderShape1-morph">
+     <skin source="#pCylinderShape1">
        <!--
 *******************************************************************************************
 The bind shape matrix describes how to transform the pCylinderShape1-morph geometry into the
