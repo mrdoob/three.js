@@ -236,8 +236,8 @@ var DAE = (function() {
 		
 		obj.name = node.id || "";
 		obj.matrixAutoUpdate = false;
-		obj.matrix = node.matrix;
-		
+		obj.matrix = node.matrix.clone();
+
 		// FIXME: controllers
 		for (i =0; i < node.controllers.length; i++) {
 			var controller = controllers[node.controllers[i].url];
