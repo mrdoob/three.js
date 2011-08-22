@@ -6,6 +6,7 @@
  * @author D1plo1d / http://github.com/D1plo1d
  * @author alteredq / http://alteredqualia.com/
  * @author mikael emtinger / http://gomo.se/
+ * @author timknip / http://www.floorplanner.com/
  */
 
 THREE.Matrix4 = function ( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43, n44 ) {
@@ -667,6 +668,59 @@ THREE.Matrix4.prototype = {
 
 	},
 
+	compose: function ( translation, rotation, scale ) {
+		var mr = new THREE.Matrix4();
+		var ms = new THREE.Matrix4();
+		
+		mr.setRotationFromQuaternion(rotation);
+		ms.setScale(scale.x, scale.y, scale.z);
+		
+		this.multiply(mr, ms);
+		this.n14 = translation.x;
+		this.n24 = translation.y;
+		this.n34 = translation.z;
+		
+		return this;
+	},
+	
+	decompose: function ( translation, rotation, scale ) {
+		// grab the axis vecs
+		var x = new THREE.Vector3(this.n11, this.n21, this.n31);
+		var y = new THREE.Vector3(this.n12, this.n22, this.n32);
+		var z = new THREE.Vector3(this.n13, this.n23, this.n33);
+	
+		translation = (translation instanceof THREE.Vector3) ? translation : new THREE.Vector3();
+		rotation = (rotation instanceof THREE.Quaternion) ? rotation : new THREE.Quaternion();
+		scale = (scale instanceof THREE.Vector3) ? scale : new THREE.Vector3();
+	
+		scale.x = x.length();
+		scale.y = y.length();
+		scale.z = z.length();
+	
+		translation.x = this.n14;
+		translation.y = this.n24;
+		translation.z = this.n34;
+	
+		// scale the rotation part
+		var matrix = this.clone();
+	
+		matrix.n11 /= scale.x;
+		matrix.n21 /= scale.x;
+		matrix.n31 /= scale.x;
+	
+		matrix.n12 /= scale.y;
+		matrix.n22 /= scale.y;
+		matrix.n32 /= scale.y;
+	
+		matrix.n13 /= scale.z;
+		matrix.n23 /= scale.z;
+		matrix.n33 /= scale.z;
+	
+		rotation.setFromRotationMatrix(matrix);
+		
+		return [translation, rotation, scale];
+	},
+
 	extractPosition: function ( m ) {
 
 		this.n14 = m.n14;
@@ -674,7 +728,7 @@ THREE.Matrix4.prototype = {
 		this.n34 = m.n34;
 
 	},
-
+	
 	extractRotation: function ( m, s ) {
 
 		var invScaleX = 1 / s.x, invScaleY = 1 / s.y, invScaleZ = 1 / s.z;

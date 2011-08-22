@@ -85,6 +85,23 @@ THREE.Quaternion.prototype = {
 
 	},
 	
+	setFromRotationMatrix: function ( m ) {
+		// Adapted from: http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
+		function copySign(a, b) {
+			return b < 0 ? -Math.abs(a) : Math.abs(a);
+		}
+		var absQ = Math.pow(m.determinant(), 1.0 / 3.0);
+		this.w = Math.sqrt( Math.max( 0, absQ + m.n11 + m.n22 + m.n33 ) ) / 2; 
+		this.x = Math.sqrt( Math.max( 0, absQ + m.n11 - m.n22 - m.n33 ) ) / 2; 
+		this.y = Math.sqrt( Math.max( 0, absQ - m.n11 + m.n22 - m.n33 ) ) / 2; 
+		this.z = Math.sqrt( Math.max( 0, absQ - m.n11 - m.n22 + m.n33 ) ) / 2; 
+		this.x = copySign( this.x, ( m.n32 - m.n23 ) );
+		this.y = copySign( this.y, ( m.n13 - m.n31 ) );
+		this.z = copySign( this.z, ( m.n21 - m.n12 ) );
+		this.normalize();
+		return this;
+	},
+	
 	calculateW : function () {
 
 		this.w = - Math.sqrt( Math.abs( 1.0 - this.x * this.x - this.y * this.y - this.z * this.z ) );
