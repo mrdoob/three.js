@@ -4,9 +4,11 @@
  * Creates extruded geometry from a path shape.
  *
  * parameters = {
+ *
  *  size: 			<float>, 	// size of the text
  *  height: 		<float>, 	// thickness to extrude text
  *  curveSegments: 	<int>,		// number of points on the curves
+ *  steps: 			<int>,		// number of points for z-side extrusions
  *
  *  font: 			<string>,		// font name
  *  weight: 		<string>,		// font weight (normal, bold)
@@ -19,6 +21,10 @@
  *
  *  extrudePath:	<THREE.CurvePath>	// path to extrude shape along
  *  bendPath:		<THREE.CurvePath> 	// path to bend the geometry around
+ *
+ *  material:		 <THREE.Material>	// material for front and back faces
+ *  extrudeMaterial: <THREE.Material>	// material for extrusion and beveled faces
+ *
  *  }
   **/
 
@@ -37,6 +43,8 @@ THREE.ExtrudeGeometry = function( shapes, options ) {
 
 	var s, sl = shapes.length, shape;
 
+	this.shapebb = shapes[ sl - 1 ].getBoundingBox();
+
 	for ( s = 0; s < sl; s ++ ) {
 
 		shape = shapes[ s ];
@@ -45,6 +53,21 @@ THREE.ExtrudeGeometry = function( shapes, options ) {
 
 	}
 
+
+	// UVs to be added
+	// How can we create UVs on this?
+
+	this.computeCentroids();
+	this.computeFaceNormals();
+
+	// can't really use automatic vertex normals
+	// as then front and back sides get smoothed too
+	// should do separate smoothing just for sides
+
+	//this.computeVertexNormals();
+
+	//console.log( "took", ( Date.now() - startTime ) );
+
 };
 
 THREE.ExtrudeGeometry.prototype = new THREE.Geometry();
@@ -52,8 +75,6 @@ THREE.ExtrudeGeometry.prototype.constructor = THREE.ExtrudeGeometry;
 
 
 THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
-
-	//var startTime = Date.now();
 
 	var amount = options.amount !== undefined ? options.amount : 100;
 
@@ -73,6 +94,13 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 	var extrudePts, extrudeByPath = false;
 
 	var useSpacedPoints = options.useSpacedPoints !== undefined ? options.useSpacedPoints : false;
+
+	var material = options.material;
+	var extrudeMaterial = options.extrudeMaterial;
+
+	var shapebb = this.shapebb;
+	//shapebb = shape.getBoundingBox();
+
 
 	if ( extrudePath ) {
 
@@ -108,8 +136,6 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 	if ( bendPath ) {
 
 		shape.addWrapPath( bendPath );
-
-		//shapePoints = shape.extractAllPointsWithBend( curveSegments, bendPath );
 
 	}
 
@@ -310,7 +336,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 		if ( s < 0 ) {
 
 			// in case of emergecy, revert to algorithm 1.
-	
+
 			return getBevelVec1( pt_i, pt_j, pt_k );
 
 		}
@@ -502,9 +528,6 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 	///   Handle Faces
 	////
 
-	// not used anywhere
-	// var layers = ( steps + bevelSegments * 2 ) * vlen;
-
 	// Bottom faces
 
 	if ( bevelEnabled ) {
@@ -588,14 +611,39 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 			//console.log('b', i,j, i-1, k,vertices.length);
 
-			var s = 0;
+			var s = 0, sl = steps  + bevelSegments * 2;
 
-			for ( s = 0; s < ( steps  + bevelSegments * 2 ); s ++ ) {
+			for ( s = 0; s < sl; s ++ ) {
 
 				var slen1 = vlen * s;
 				var slen2 = vlen * ( s + 1 );
+				var a = layeroffset + j + slen1,
+					b = layeroffset + k + slen1,
+					c = layeroffset + k + slen2,
+					d = layeroffset + j + slen2;
 
-				f4( layeroffset + j + slen1, layeroffset + k + slen1, layeroffset + k + slen2, layeroffset + j + slen2 );
+				f4( a, b, c, d );
+
+				if ( extrudeMaterial ) {
+
+					var v1 = s / sl;
+					var v2 = ( s + 1 ) / sl;
+
+					var ztol = ( amount + bevelThickness * 2 );
+
+					var u1 = ( scope.vertices[ a ].position.z + bevelThickness ) / ztol;
+					var u2 = ( scope.vertices[ d ].position.z + bevelThickness ) / ztol;
+
+					//console.log(vy1, vy2);
+
+					scope.faceVertexUvs[ 0 ].push( [
+						new THREE.UV( u1, v1 ),
+						new THREE.UV( u2, v1 ),
+						new THREE.UV( u2, v2 ),
+						new THREE.UV( u1, v2 )
+					] );
+				}
+
 
 			}
 
@@ -603,14 +651,6 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	}
 
-	// UVs to be added
-	// How can we create UVs on this?
-
-	this.computeCentroids();
-	this.computeFaceNormals();
-	//this.computeVertexNormals();
-
-	//console.log( "took", ( Date.now() - startTime ) );
 
 	function v( x, y, z ) {
 
@@ -624,7 +664,33 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 		b += shapesOffset;
 		c += shapesOffset;
 
-		scope.faces.push( new THREE.Face3( a, b, c ) );
+		scope.faces.push( new THREE.Face3( a, b, c, null, null, material ) );
+		//normal, color, materials
+
+		if ( material ) {
+
+			var mx = shapebb.minX, my = shapebb.minY;
+
+			var uy = shapebb.maxY; // - shapebb.minY;
+			var ux = shapebb.maxX; // - shapebb.minX;
+
+			var ax = scope.vertices[ a ].position.x,
+				ay = scope.vertices[ a ].position.y,
+
+				bx = scope.vertices[ b ].position.x,
+				by = scope.vertices[ b ].position.y,
+
+				cx = scope.vertices[ c ].position.x,
+				cy = scope.vertices[ c ].position.y;
+
+			scope.faceVertexUvs[ 0 ].push( [
+
+				new THREE.UV( ax / ux, ay / uy ),
+				new THREE.UV( bx / ux, by / uy ),
+				new THREE.UV( cx / ux, cy / uy ),
+
+			] );
+		}
 
 	}
 
@@ -635,7 +701,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 		c += shapesOffset;
 		d += shapesOffset;
 
- 		scope.faces.push( new THREE.Face4( a, b, c, d ) );
+ 		scope.faces.push( new THREE.Face4( a, b, c, d, null, null, extrudeMaterial ) );
 
 	}
 
