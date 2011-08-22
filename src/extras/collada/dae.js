@@ -14,8 +14,12 @@ var DAE = (function() {
 	var materials = {};
 	var effects = {};
 	var visualScenes;
+	var flip_uv = true;
 	var readyCallbackFunc = null;
 	var baseUrl;
+	var morphs;
+	var skins;
+	var preferredShading = THREE.SmoothShading;
 	
 	function load(url, readyCallback) {
 		if (document.implementation && document.implementation.createDocument) {
@@ -65,6 +69,9 @@ var DAE = (function() {
 		animations = parseLib("//dae:library_animations/dae:animation", Animation, "animation");
 		visualScenes = parseLib(".//dae:library_visual_scenes/dae:visual_scene", VisualScene, "visual_scene");
 		
+		morphs = [];
+		skins = [];
+		
 		daeScene = parseScene();
 		scene = new THREE.Object3D();
 		for (var i = 0; i < daeScene.nodes.length; i++) {
@@ -75,6 +82,8 @@ var DAE = (function() {
 
 		var result = {
 			scene: scene, 
+			morphs: morphs,
+			skins: skins,
 			dae: {
 				images: images,
 				materials: materials,
@@ -93,6 +102,9 @@ var DAE = (function() {
 		return result;
 	}
 	
+	function setPreferredShading(shading) {
+		preferredShading = shading;
+	}
 	function parseLib(q, classSpec, prefix) {
 		var elements = COLLADA.evaluate(q, 
 			COLLADA, 
@@ -128,64 +140,98 @@ var DAE = (function() {
 	}
 	
 	function createAnimations() {
+		calcAnimationBounds();
 		for (animation_id in animations) {
 			createAnimation(animations[animation_id]);
 		}
 	}
 	
 	function createAnimation(animation) {
+	}
+	
+	function calcAnimationBounds() {
+		var start = 1000000;
+		var end = -start;
 		
-		for (var i = 0; i < animation.channel.length; i++) {
-			var channel = animation.channel[i];
-			var sampler = animation.sampler[i];
-			
-			var parts = channel.target.split("/");
-			var id = parts.shift();
-			var node = daeScene.getChildById(id, true);
-			var object = scene.getChildByName(id, true);
-			
-			if (!node || !object) {
-				console.error("Dae::createAnimation : could not find node with id=" + id);
+		for (id in animations) {
+			var animation = animations[id];
+			for (var i = 0; i < animation.sampler.length; i++) {
+				var sampler = animation.sampler[i];
+				sampler.create();	
+				start = Math.min(start, sampler.startTime);
+				end = Math.max(end, sampler.endTime);
+			}
+		}
+		return {start:start, end:end}
+	}
+	
+	function createMorph(geometry, ctrl) {
+		var morphCtrl = ctrl instanceof InstanceController ? controllers[ctrl.url] : ctrl;
+		if (!morphCtrl || !morphCtrl.morph) {
+			console.log("could not find morph controller!");
+			return;
+		}
+		var morph = morphCtrl.morph;
+
+		for (var i = 0; i < morph.targets.length; i++) {
+			var target_id = morph.targets[i];
+			var daeGeometry = geometries[target_id];
+			if (!daeGeometry.mesh || 
+				!daeGeometry.mesh.primitives || 
+				!daeGeometry.mesh.primitives.length) {
 				continue;
 			}
-			
-			if (parts.length > 1) {
-				console.log("Dae::createAnimation : can only handle simple paths [" + channel.target + "]");
-				continue;
+			var target = daeGeometry.mesh.primitives[0].geometry;
+			if (target.vertices.length === geometry.vertices.length) {
+				geometry.morphTargets.push( { name: "target_1", vertices: target.vertices } );
 			}
-			var sid = parts.shift();
-			var dotSyntax = (sid.indexOf(".") >= 0);
-			var arrSyntax = (sid.indexOf("(") >= 0);
-			var arrIndices;
-			var member;
-			
-			if (dotSyntax) {
-				parts = sid.split(".");
-				sid = parts.shift();
-				member = parts.shift();
-			} else if (arrSyntax) {
-				arrIndices = sid.split("(");
-				sid = arrIndices.shift();
-				for (var j = 0; j < arrIndices.length; j++) {
-					arrIndices[j] = parseInt(arrIndices[j].replace(/\)/, ''));
-				}
-			}
-			var transform = node.getTransformBySid(sid);
-			
-			sampler.create();
-			switch (transform.type) {
-				case 'matrix':
-					//console.log(sampler.output[0]);
-					break;
-				default:
-					break;
+		}
+		geometry.morphTargets.push( { name: "target_Z", vertices: geometry.vertices } );
+	}
+	
+	function createSkin(geometry, ctrl, applyBindShape) {
+		var skinCtrl = controllers[ctrl.url];
+		if (!skinCtrl || !skinCtrl.skin) {
+			console.log("could not find skin controller!");
+			return;
+		}
+		if (!ctrl.skeleton || !ctrl.skeleton.length) {
+			console.log("could not find the skeleton for the skin!");
+			return;
+		}
+		var skin = skinCtrl.skin;
+		var skeleton = daeScene.getChildById(ctrl.skeleton[0]);
+		var hierarchy = [];
+		
+		applyBindShape = applyBindShape !== undefined ? applyBindShape : true;
+		
+		var bones = [];
+		geometry.skinWeights = [];
+		geometry.skinIndices = [];
+		
+		createBones(geometry.bones, skin, hierarchy, skeleton, null, -1);
+		createWeights(skin, geometry.bones, geometry.skinIndices, geometry.skinWeights);
+		/*
+		geometry.animation = {
+			name: 'take_001',
+			fps: 30,
+			length: 2,
+			JIT: true,
+			hierarchy: hierarchy
+		};
+		*/
+		if (applyBindShape) {
+			for (var i = 0; i < geometry.vertices.length; i++) {
+				skin.bindShapeMatrix.multiplyVector3(geometry.vertices[i].position);
 			}
 		}
 	}
 	
-	function createSceneGraph(node) {
+	function createSceneGraph(node, parent) {
 		var obj = new THREE.Object3D();
 		var skinned = false;
+		var skinController;
+		var morphController;
 		var i;
 		
 		obj.name = node.id || "";
@@ -203,8 +249,13 @@ var DAE = (function() {
 						inst_geom.instance_material = node.controllers[i].instance_material;
 						node.geometries.push(inst_geom);
 						skinned = true;
+						skinController = node.controllers[i];
 					} else if (controllers[controller.skin.source]) {
+						// urgh: controller can be chained
+						// handle the most basic case...
 						var second = controllers[controller.skin.source];
+						morphController = second;
+					//	skinController = node.controllers[i];
 						if (second.morph && geometries[second.morph.source]) {
 							var inst_geom = new InstanceGeometry();
 							inst_geom.url = second.morph.source;
@@ -213,12 +264,13 @@ var DAE = (function() {
 						}
 					}
 					break;
-				case 'morph': // unsupported
+				case 'morph':
 					if (geometries[controller.morph.source]) {
 						var inst_geom = new InstanceGeometry();
 						inst_geom.url = controller.morph.source;
 						inst_geom.instance_material = node.controllers[i].instance_material;
 						node.geometries.push(inst_geom);
+						morphController = node.controllers[i];
 					}
 					console.log("DAE: morph-controller partially supported.")
 				default:
@@ -226,25 +278,16 @@ var DAE = (function() {
 			}
 		}
 		
+		// FIXME: multi-material mesh?
 		// geometries
 		for (i = 0; i < node.geometries.length; i++) {
 			var instance_geometry = node.geometries[i];
 			var instance_materials = instance_geometry.instance_material;
 			var geometry = geometries[instance_geometry.url];
-			var shaders = {};
+			var used_materials = {};
+			var num_materials = 0;
+			var first_material;
 			
-			// collect materials for this geometry instance
-			if (instance_materials) {
-				for (j = 0; j < instance_materials.length; j++) {
-					var inst_material = instance_materials[j];
-					var target = inst_material.target;
-					var symbol = inst_material.symbol;
-					var effect_id = materials[target].instance_effect.url;
-					var effect = effects[effect_id];
-					shaders[symbol] = effect;
-				}
-			}
-
 			if (geometry) {
 				if (!geometry.mesh || !geometry.mesh.primitives)
 					continue;
@@ -253,62 +296,64 @@ var DAE = (function() {
 					obj.name = geometry.id;
 				}
 				
-				var primitives = geometry.mesh.primitives;
-				for (j = 0; j < primitives.length; j++) {
-					var symbol = primitives[j].material;
-					var effect = shaders[symbol];
-					var shader = effect.shader;
-					var ambient = shader.ambient ? shader.ambient.color : 0x505050;
-					var diffuse = shader.diffuse ? shader.diffuse.color : 0xff0000;
-					var specular = shader.specular ? shader.specular.color : null;
-					var transparency = shader.transparency;
-					var use_transparency = (transparency !== undefined && transparency < 1.0);
-					var opacity = use_transparency ? transparency : 1.0;
-					var texture;
-					
-					if (shader.diffuse && shader.diffuse.isTexture() && effect.sampler && effect.surface) {
-						if (effect.sampler.source == effect.surface.sid) {
-							var image = images[effect.surface.init_from];
-							if (image) {
-								texture = THREE.ImageUtils.loadTexture(baseUrl + image.init_from);
-							}
-						}
-					}
-					var mat = new THREE.MeshLambertMaterial( { 
-						map: texture,
-						color: diffuse.getHex(), 
-						opacity: opacity, 
-						transparent: use_transparency,
-						shading: THREE.SmoothShading } );
-					
-					if (shader.type != 'lambert' && shader.shininess && specular && ambient) {
-						mat = new THREE.MeshPhongMaterial( { 
-							map: texture,
-							ambient: ambient.getHex(), 
-							color: diffuse.getHex(), 
-							specular: specular.getHex(), 
-							shininess: shader.shininess, 
-							shading: THREE.SmoothShading,
-							opacity: opacity,
-							transparent: use_transparency } )
-					}
-					if (Math.abs(primitives[j].geometry.boundingBox.z[0]) < 0.01) {
-						obj.matrix.n34 += Math.random() * 0.001;
-					}
-					if (skinned) {
-						obj.addChild(new THREE.SkinnedMesh( primitives[j].geometry, mat ));
-					} else {
-						obj.addChild(new THREE.Mesh( primitives[j].geometry, mat ));
+				// collect used fx for this geometry-instance
+				if (instance_materials) {
+					for (j = 0; j < instance_materials.length; j++) {
+						var inst_material = instance_materials[j];
+						var effect_id = materials[inst_material.target].instance_effect.url;
+						var shader = effects[effect_id].shader;
+						
+						shader.material.opacity = !shader.material.opacity ? 1 : shader.material.opacity;
+						used_materials[inst_material.symbol] = shader.material;
+						first_material = shader.material;
+						num_materials++;
 					}
 				}
+				
+				var mesh;
+				var material = first_material || new THREE.MeshLambertMaterial({ color: 0xdddddd, shading: THREE.FlatShading });
+				var geom = geometry.mesh.geometry3js;
+				if (num_materials > 1) {
+					material = new THREE.MeshFaceMaterial();
+					for (j = 0; j < geom.faces.length; j++) {
+						var face = geom.faces[j];
+						face.materials = [ used_materials[face.daeMaterial] ];
+					}
+				}
+				
+				if (skinController !== undefined) {
+					mesh = new THREE.SkinnedMesh( geom, material );
+					mesh.skeleton = skinController.skeleton;
+					mesh.skinController = controllers[skinController.url];
+					mesh.name = 'skin_' + skins.length;
+					skins.push(mesh);
+				} else if (morphController !== undefined) {
+					createMorph(geom, morphController);
+					material.morphTargets = true;
+					mesh = new THREE.Mesh( geom, material );
+					mesh.name = 'morph_' + morphs.length;
+					morphs.push(mesh);
+				} else {
+					mesh = new THREE.Mesh( geom, material );
+				}
+						
+				obj.addChild(mesh);
 			}
 		}
 		
 		for (i = 0; i < node.nodes.length; i++) {
-			obj.addChild(createSceneGraph(node.nodes[i]));
+			obj.addChild(createSceneGraph(node.nodes[i], node));
 		}
 		
 		return obj;
+	}
+	
+	function getJointId(skin, id) {
+		for (var i = 0; i < skin.joints.length; i++) {
+			if (skin.joints[i] == id) {
+				return i;
+			}
+		}
 	}
 	
 	function getLibraryNode(id) {
@@ -317,6 +362,103 @@ var DAE = (function() {
 			_nsResolver, 
 			XPathResult.ORDERED_NODE_ITERATOR_TYPE, 
 			null).iterateNext();
+	}
+	
+	function getChannelsForNode(node) {
+		var channels = [];
+		var startTime = 1000000;
+		var endTime = -1000000;
+		for (var id in animations) {
+			var animation = animations[id];
+			for (var i = 0; i < animation.channel.length; i++) {
+				var channel = animation.channel[i];
+				var sampler = animation.sampler[i];
+				var id = channel.target.split('/')[0];
+				if (id == node.id) {
+					sampler.create();
+					channel.sampler = sampler;
+					startTime = Math.min(startTime, sampler.startTime);
+					endTime = Math.max(endTime, sampler.endTime);
+					channels.push(channel);
+				}
+			}
+		}
+		if (channels.length) {
+			node.startTime = startTime;
+			node.endTime = endTime;	
+		}
+		return channels;
+	}
+	
+	function calcFrameDuration(node) {
+		var minT = 10000000;
+		for (i = 0; i < node.channels.length; i++) {
+			var sampler = node.channels[i].sampler;
+			
+			for (var j = 0; j < sampler.input.length - 1; j++) {
+				var t0 = sampler.input[j];
+				var t1 = sampler.input[j+1];
+				minT = Math.min(minT, t1 - t0);
+			}
+		}
+		return minT;
+	}
+	
+	function calcMatrixAt(node, t) {
+		var animated = {};
+		var i, j;
+		for (i = 0; i < node.channels.length; i++) {
+			var channel = node.channels[i];
+			animated[ channel.sid ] = channel;
+		}
+		var matrix = new THREE.Matrix4();
+		for (i = 0; i < node.transforms.length; i++) {
+			var transform = node.transforms[i];
+			var channel = animated[transform.sid];
+			if (channel !== undefined) {
+				var sampler = channel.sampler;
+				var value;
+				for (var j = 0; j < sampler.input.length - 1; j++) {
+					if (sampler.input[j+1] > t) {
+						value = sampler.output[j];
+						//console.log(value.flatten)
+						break;
+					}
+				}
+				if (value !== undefined) {
+					if (value instanceof THREE.Matrix4) {
+						matrix = matrix.multiply(matrix, value);
+					} else {
+						// FIXME: handle other types
+						matrix = matrix.multiply(matrix, transform.matrix);
+					}
+				} else {
+					matrix = matrix.multiply(matrix, transform.matrix);
+				}
+			} else {
+				matrix = matrix.multiply(matrix, transform.matrix);
+			}
+		}
+		return matrix;
+	}
+	
+	function bakeAnimations(node) {
+		if (node.channels && node.channels.length) {
+			var frameDuration = calcFrameDuration(node);
+			var t, matrix;
+			var keys = [];
+			for (t = node.startTime; t < node.endTime; t += frameDuration) {
+				matrix = calcMatrixAt(node, t);
+				//keys.push({time: t, mat: matrix.flatten()})
+				keys.push({
+					time: t,
+					pos: [matrix.n14, matrix.n24, matrix.n34],
+					rotq: [0, 0, 0, 1],
+					scl: [1,1,1]
+				});
+			}
+			node.keys = keys;
+		}
 	}
 	
 	function _Image() {
@@ -441,7 +583,14 @@ var DAE = (function() {
 			if (child.nodeType != 1) continue;
 			switch (child.nodeName) {
 				case 'bind_shape_matrix':
-					this.bindShapeMatrix = new THREE.Matrix4(_floats(child.textContent));
+					var f = _floats(child.textContent);
+					this.bindShapeMatrix = new THREE.Matrix4();
+					this.bindShapeMatrix.set(
+						f[0], f[1], f[2], f[3],
+						f[4], f[5], f[6], f[7],
+						f[8], f[9], f[10], f[11],
+						f[12], f[13], f[14], f[15]
+						);
 					break;
 				case 'source':
 					var src = new Source().parse(child);
@@ -501,7 +650,6 @@ var DAE = (function() {
 			}
 		}
 		var index = 0;
-		
 		for (var i = 0; i < vcount.length; i++) {
 			var numBones = vcount[i];
 			var vertex_weights = [];
@@ -512,7 +660,7 @@ var DAE = (function() {
 					var value = v[index + input.offset];
 					switch (input.semantic) {
 						case 'JOINT':
-							influence.joint = this.joints[value];
+							influence.joint = value;//this.joints[value];
 							break;
 						case 'WEIGHT':
 							influence.weight = sources[input.source].data[value];
@@ -523,6 +671,9 @@ var DAE = (function() {
 				}
 				vertex_weights.push(influence);
 				index += inputs.length;
+			}
+			for (var j = 0; j < vertex_weights.length; j++) {
+				vertex_weights[j].index = i;
 			}
 			this.weights.push(vertex_weights);
 		}
@@ -537,6 +688,15 @@ var DAE = (function() {
 	VisualScene.prototype.getChildById = function(id, recursive) {
 		for (var i = 0; i < this.nodes.length; i++) {
 			var node = this.nodes[i].getChildById(id, recursive);
+			if (node) {
+				return node;
+			}
+		}
+		return null;
+	}
+	VisualScene.prototype.getChildBySid = function(sid, recursive) {
+		for (var i = 0; i < this.nodes.length; i++) {
+			var node = this.nodes[i].getChildBySid(sid, recursive);
 			if (node) {
 				return node;
 			}
@@ -559,7 +719,6 @@ var DAE = (function() {
 					break;
 			}
 		}
-		
 		return this;
 	}
 	
@@ -571,7 +730,37 @@ var DAE = (function() {
 		this.controllers = [];
 		this.transforms = [];
 		this.geometries = [];
+		this.channels = [];
 		this.matrix = new THREE.Matrix4();
+	}
+	Node.prototype.getChannelForTransform = function(transformSid) {
+		for (var i = 0; i < this.channels.length; i++) {
+			var channel = this.channels[i];
+			var parts = channel.target.split('/');
+			var id = parts.shift();
+			var sid = parts.shift();
+			var dotSyntax = (sid.indexOf(".") >= 0);
+			var arrSyntax = (sid.indexOf("(") >= 0);
+			var arrIndices;
+			var member;
+			
+			if (dotSyntax) {
+				parts = sid.split(".");
+				sid = parts.shift();
+				member = parts.shift();
+			} else if (arrSyntax) {
+				arrIndices = sid.split("(");
+				sid = arrIndices.shift();
+				for (var j = 0; j < arrIndices.length; j++) {
+					arrIndices[j] = parseInt(arrIndices[j].replace(/\)/, ''));
+				}
+			}
+			if (sid == transformSid) {
+				channel.info = {sid:sid, dotSyntax:dotSyntax, arrSyntax:arrSyntax, arrIndices:arrIndices};
+				return channel;
+			}
+		}
+		return null;
 	}
 	Node.prototype.getChildById = function(id, recursive) {
 		if (this.id == id) {
@@ -580,6 +769,20 @@ var DAE = (function() {
 		if (recursive) {
 			for (var i = 0; i < this.nodes.length; i++) {
 				var n = this.nodes[i].getChildById(id, recursive);
+				if (n) {
+					return n;
+				}
+			}
+		}
+		return null;
+	}
+	Node.prototype.getChildBySid = function(sid, recursive) {
+		if (this.sid == sid) {
+			return this;
+		}
+		if (recursive) {
+			for (var i = 0; i < this.nodes.length; i++) {
+				var n = this.nodes[i].getChildBySid(sid, recursive);
 				if (n) {
 					return n;
 				}
@@ -646,7 +849,10 @@ var DAE = (function() {
 					break;
 			}
 		}
+		this.channels = getChannelsForNode(this);
+		bakeAnimations(this);
 		this.updateMatrix();
+		
 		return this;
 	}
 	Node.prototype.updateMatrix = function() {
@@ -800,10 +1006,11 @@ var DAE = (function() {
 		this.geometry = geometry.id;
 		this.primitives = [];
 		this.vertices = null;
+		this.geometry3js;
 	}
 	Mesh.prototype.parse = function(element) {
 		this.primitives = [];
-		var i;
+		var i, j;
 		for (i = 0; i < element.childNodes.length; i++) {
 			var child = element.childNodes[i];
 			switch (child.nodeName) {
@@ -825,128 +1032,41 @@ var DAE = (function() {
 					break;
 			}
 		}
+		
+		var vertex_store = {};
+		function get_vertex(v, index)  {
+			var hash = _hash_vector3(v.position);
+			if (vertex_store[hash] === undefined) {
+				vertex_store[hash] = {v:v, index:index};
+			}
+			return vertex_store[hash];
+		}
+		
+		this.geometry3js = new THREE.Geometry();
+		var vertexData = sources[this.vertices.input['POSITION'].source].data;
+		for (i = 0, j = 0; i < vertexData.length; i += 3, j++) {
+			var v = new THREE.Vertex(new THREE.Vector3(vertexData[i], vertexData[i+1], vertexData[i+2]));
+			get_vertex(v, j);
+			this.geometry3js.vertices.push(v);
+		}
+
 		for (i = 0; i < this.primitives.length; i++) {
 			primitive = this.primitives[i];
 			primitive.setVertices(this.vertices);
-			primitive.create();
+			this.handlePrimitive(primitive, this.geometry3js, vertex_store);
 		}
+		
+		this.geometry3js.computeCentroids();
+		this.geometry3js.computeFaceNormals();
+		this.geometry3js.computeVertexNormals();
+		this.geometry3js.computeBoundingBox();
+		
 		return this;
 	}
-	
-	function Polylist() {
-	}
-	Polylist.prototype = new Triangles();
-	Polylist.prototype.constructor = Polylist;
-	Polylist.prototype.create = function() {
-		var p = this.p, inputs = this.inputs, num_inputs = this.inputs.length;
-		var idx = 0, input;
-		var i, j, k, v, n, t;
-		var texture_sets = [];
-		var polygons = [];
-		
-		for (j = 0; j < inputs.length; j++) {
-			input = inputs[j];
-			if (input.semantic == 'TEXCOORD') {
-				texture_sets.push(input.set);
-			}
-		}
-		
-		for (i = 0; i < this.vcount.length; i++) {
-			var num_verts = this.vcount[i]
-			var vs = [], ns = [], ts = [];
-			for (j = 0; j < num_verts; j++) {
-				for (k = 0; k < num_inputs; k++) {
-					input = inputs[k];
-					source = sources[input.source];
-					index = p[idx + input.offset];
-					numParams = source.accessor.params.length;
-					idx32 = index * numParams;
-					switch (input.semantic) {
-						case 'VERTEX':
-							v = new THREE.Vertex(new THREE.Vector3(source.data[idx32+0], source.data[idx32+1], source.data[idx32+2]));
-							v.daeId = vs.length;
-							vs.push(v);
-							break;
-						case 'NORMAL':
-							n = new THREE.Vector3(source.data[idx32+0], source.data[idx32+1], source.data[idx32+2]);
-							n.daeId = ns.length;
-							ns.push(n);
-							break;
-						case 'TEXCOORD':
-							if (ts[input.set] == undefined) ts[input.set] = [];
-							t = new THREE.UV(source.data[idx32+0], source.data[idx32+1]);
-							t.daeId = ts[input.set].length;
-							ts[input.set].push(t);
-							break;
-						default:
-							break;
-					}
-				}
-				idx += num_inputs;
-			}
-			polygons.push([vs, ns, ts])
-		}
-		
-		this.geometry = new THREE.Geometry();
-		this.triangulate(polygons, texture_sets);
-	}
-	Polylist.prototype.triangulate = function(polygons, texture_sets) {
-		var i, j, k;
-		
-		function clone(v) {
-			var x = v.position.x;
-			var y = v.position.y;
-			var z = v.position.z;
-			return new THREE.Vertex(new THREE.Vector3(x, y, z));
-		}
-		for (i = 0; i < polygons.length; i++) {
-			var polygon = polygons[i];
-			var v = polygon[0];
-			var n = polygon[1];
-			var t = polygon[2];
-			var uvs = [];
-			for (j = 0; j < texture_sets.length; j++) {
-				uvs.push(t[texture_sets[j]]);
-			}
-			var has_uv = (uvs.length > 0 && uvs[0].length > 0);
-			if (v.length < 3) continue;
-			var va = v[0];
-			var na = n[0];
-			for (j = 1; j < v.length - 1; j++) {
-				var vb = v[j];
-				var vc = v[j+1];
-				var nb = n[j];
-				var nc = n[j+1];
-
-				var c = this.geometry.vertices.length;
-				this.geometry.vertices.push(va, vb, vc);
-				this.geometry.faces.push( new THREE.Face3(c+0, c+1, c+2, [na, nb, nc] ) );
-				if (has_uv) {
-					for (k = 0; k < uvs.length; k++) {
-						this.geometry.faceVertexUvs[ k ].push( [uvs[k][0], uvs[k][j], uvs[k][j+1]] );
-					}
-				}
-			}
-		}
-		this.geometry.material = this.material;
-		this.geometry.computeCentroids();
-		this.geometry.computeFaceNormals();
-		this.geometry.computeVertexNormals();
-		this.geometry.computeBoundingBox();
-	}
-	
-	function Triangles() {
-		this.material = "";
-		this.count = 0;
-		this.inputs = [];
-		this.vcount;
-		this.p = [];
-		this.aabb = new AABB();
-		this.geometry = new THREE.Geometry();
-	}
-	Triangles.prototype.create = function() {
-		var i = 0, j, k, p = this.p, inputs = this.inputs, input, index;
-		var v, n, t;
+	Mesh.prototype.handlePrimitive = function(primitive, geom, vertex_store) {
+		var i = 0, j, k, p = primitive.p, inputs = primitive.inputs;
+		var input, index, idx32;
+		var vcIndex = 0, vcount = 3;
 		var texture_sets = [];
 		
 		for (j = 0; j < inputs.length; j++) {
@@ -956,13 +1076,14 @@ var DAE = (function() {
 			}
 		}
 		
-		this.geometry = new THREE.Geometry();
-
 		while (i < p.length) {
-			vs = [];
-			ns = [];
-			ts = {};
-			for (j = 0; j < 3; j++) {
+			var vs = [];
+			var ns = [];
+			var ts = {};
+			if (primitive.vcount) {
+				vcount = primitive.vcount[vcIndex++];
+			}
+			for (j = 0; j < vcount; j++) {
 				for (k = 0; k < inputs.length; k++) {
 					input = inputs[k];
 					source = sources[input.source];
@@ -971,47 +1092,57 @@ var DAE = (function() {
 					idx32 = index * numParams;
 					switch (input.semantic) {
 						case 'VERTEX':
-							v = new THREE.Vertex(new THREE.Vector3(source.data[idx32+0], source.data[idx32+1], source.data[idx32+2]));
-							v.daeId = vs.length;
-							vs.push(v);
-							
+							var hash = _hash_vector3(geom.vertices[index].position);
+							vs.push(vertex_store[hash].index);
 							break;
 						case 'NORMAL':
-							n = new THREE.Vector3(source.data[idx32+0], source.data[idx32+1], source.data[idx32+2]);
-							n.daeId = ns.length;
-							ns.push(n);
+							ns.push(new THREE.Vector3(source.data[idx32+0], source.data[idx32+1], source.data[idx32+2]));
 							break;
 						case 'TEXCOORD':
 							if (ts[input.set] == undefined) ts[input.set] = [];
-							t = new THREE.UV(source.data[idx32+0], source.data[idx32+1]);
-							t.daeId = ts[input.set].length;
-							ts[input.set].push(t);
+							ts[input.set].push(new THREE.UV(source.data[idx32+0], source.data[idx32+1]));
 							break;
 						default:
 							break;
 					}
 				}
 			}
-			var has_v = (vs.length == 3);
-			var has_t = (texture_sets.length > 0 && ts[texture_sets[0]].length == 3);
-			if (has_v) {
-				var c = this.geometry.vertices.length;
-				this.geometry.vertices.push(vs[0], vs[1], vs[2]);
-				
-				this.geometry.faces.push( new THREE.Face3(c+0, c+1, c+2, ns ) );
-				if (has_t) {
+			var face = new THREE.Face3(vs[0], vs[1], vs[2], [ns[0], ns[1], ns[2]]);
+			var uv;
+			face.daeMaterial = primitive.material;
+			geom.faces.push(face);
+			for (k = 0; k < texture_sets.length; k++) {
+				uv = ts[texture_sets[k]];
+				geom.faceVertexUvs[ k ].push( [uv[0], uv[1], uv[2]] );
+			}
+			if (vcount > 3) {
+				for (j = 2; j < vs.length -1; j++) {
+					face = new THREE.Face3(vs[0], vs[j], vs[j+1], [ns[0], ns[j], ns[j+1]]);
+					face.daeMaterial = primitive.material;
+					geom.faces.push(face);
 					for (k = 0; k < texture_sets.length; k++) {
-						this.geometry.faceVertexUvs[ k ].push( ts[texture_sets[k]] );
+						uv = ts[texture_sets[k]];
+						geom.faceVertexUvs[ k ].push( [uv[0], uv[j], uv[j+1]] );
 					}
 				}
 			}
-			i += 3 * inputs.length;
+			
+			i += inputs.length * vcount;
 		}
-		this.geometry.material = this.material;
-		this.geometry.computeCentroids();
-		this.geometry.computeFaceNormals();
-		this.geometry.computeVertexNormals();
-		this.geometry.computeBoundingBox();	
+	}
+	
+	function Polylist() {
+	}
+	Polylist.prototype = new Triangles();
+	Polylist.prototype.constructor = Polylist;
+	
+	function Triangles(flip_uv) {
+		this.material = "";
+		this.count = 0;
+		this.inputs = [];
+		this.vcount;
+		this.p = [];
+		this.geometry = new THREE.Geometry();
 	}
 	Triangles.prototype.setVertices = function(vertices) {
 		for (var i = 0; i < this.inputs.length; i++) {
@@ -1042,63 +1173,6 @@ var DAE = (function() {
 		}
 		return this;
 	}
-	Triangles.prototype.calcNormals = function(v, n) {
-		var i;
-		var v0 = [0, 0, 0];
-		var v1 = [0, 0, 0];
-		var v2 = [0, 0, 0];
-		var n0 = [0, 0, 0];
-		for (i = 0; i < v.length; i += 9) {
-			v0[0] = v[i+0]; v0[1] = v[i+1]; v0[2] = v[i+2];
-			v1[0] = v[i+3]; v1[1] = v[i+4]; v1[2] = v[i+5];
-			v2[0] = v[i+6]; v2[1] = v[i+7]; v2[2] = v[i+8];
-			// sub
-			v1[0] = v1[0] - v0[0];
-			v1[1] = v1[1] - v0[1];
-			v1[2] = v1[2] - v0[2];
-			v2[0] = v2[0] - v0[0];
-			v2[1] = v2[1] - v0[1];
-			v2[2] = v2[2] - v0[2];
-			// cross
-			n0[0] = v1[1] * v2[2] - v1[2] * v2[1];
-			n0[1] = v1[2] * v2[0] - v1[0] * v2[2];
-			n0[2] = v1[0] * v2[1] - v1[1] * v2[0];
-			// normalize
-			length = 1.0 / Math.sqrt(n0[0]*n0[0]+n0[1]*n0[1]+n0[2]*n0[2]);
-			if (length == 0) length = 1.0;
-			n[i+0] = n[i+3] = n[i+6] = n0[0] * length;
-			n[i+1] = n[i+4] = n[i+7] = n0[1] * length;
-			n[i+2] = n[i+5] = n[i+8] = n0[2] * length;
-		}
-	}
-	
-	function AABB() {
-		this.minx = 0;	this.miny = 0;	this.minz = 0;
-		this.maxx = 0;	this.maxy = 0;	this.maxz = 0;
-	}
-	AABB.prototype.reset = function() {
-		this.minx = this.miny = this.minz = Number.MAX_VALUE;
-		this.maxx = this.maxy = this.maxz = Number.MIN_VALUE;
-		return this;
-	}
-	AABB.prototype.setTriangles = function(positions) {
-		this.reset();
-		for (var i = 0; i < positions.length; i += 3) {
-			this.minx = Math.min(this.minx, positions[i+0]); 
-			this.miny = Math.min(this.miny, positions[i+1]);
-			this.minz = Math.min(this.minz, positions[i+2]);
-			this.maxx = Math.max(this.maxx, positions[i+0]);
-			this.maxy = Math.max(this.maxy, positions[i+1]);
-			this.maxz = Math.max(this.maxz, positions[i+2]);
-		}
-		return this;
-	}
-	AABB.prototype.centerX = function() { return this.minx + (this.sizeX() / 2); }
-	AABB.prototype.centerY = function() { return this.miny + (this.sizeY() / 2); }
-	AABB.prototype.centerZ = function() { return this.minz + (this.sizeZ() / 2); }
-	AABB.prototype.sizeX = function() { return this.maxx - this.minx; }
-	AABB.prototype.sizeY = function() { return this.maxy - this.miny; }
-	AABB.prototype.sizeZ = function() { return this.maxz - this.minz; }
 	
 	function Accessor() {
 		this.source = "";
@@ -1207,7 +1281,15 @@ var DAE = (function() {
 					return this.data;
 				case 'float4x4':
 					for (var j = 0; j < this.data.length; j += 16) {
-						result.push(new THREE.Matrix4(this.data.slice(j, j+16)));
+						var s = this.data.slice(j, j+16);
+						var m = new THREE.Matrix4();
+						m.set(
+							s[0], s[1], s[2], s[3],
+							s[4], s[5], s[6], s[7],
+							s[8], s[9], s[10], s[11],
+							s[12], s[13], s[14], s[15]
+							);
+						result.push(m);
 					}
 					break;
 				default:
@@ -1269,8 +1351,10 @@ var DAE = (function() {
 		return this;
 	}
 	
-	function Shader(type) {
+	function Shader(type, effect) {
 		this.type = type;
+		this.effect = effect;
+		this.material;
 	}
 	Shader.prototype.parse = function(element) {
 		for (var i = 0; i < element.childNodes.length; i++) {
@@ -1295,7 +1379,74 @@ var DAE = (function() {
 					break;
 			}
 		}
+		this.create();
 		return this;
+	}
+	Shader.prototype.create = function() {
+		var props = {};
+		var transparent = (this['transparency'] !== undefined && this['transparency'] < 1.0);
+		for (var prop in this) {
+			switch (prop) {
+				case 'ambient':
+				case 'emission':
+				case 'diffuse':
+				case 'specular':
+					var cot = this[prop];
+					if (cot instanceof ColorOrTexture) {
+						if (cot.isTexture()) {
+							if (this.effect.sampler && this.effect.surface) {
+								if (this.effect.sampler.source == this.effect.surface.sid) {
+									var image = images[this.effect.surface.init_from];
+									if (image) {
+										props['map'] = THREE.ImageUtils.loadTexture(baseUrl + image.init_from);
+										props['map'].wrapS = THREE.RepeatWrapping;
+										props['map'].wrapT = THREE.RepeatWrapping;
+										props['map'].repeat.x = 1;
+										props['map'].repeat.y = -1;
+									}
+								}
+							}
+						} else {
+							if (prop == 'diffuse') {
+								props['color'] = cot.color.getHex();
+							} else if (!transparent){
+								props[prop] = cot.color.getHex();
+							}
+						}
+					}
+					break;
+				case 'shininess':
+				case 'reflectivity':
+					props[prop] = this[prop];
+					break;
+				case 'transparency':
+					if (transparent) {
+						props['transparent'] = true;
+						props['opacity'] = this[prop];
+						transparent = true;
+					}
+					break;
+				default:
+					break;
+			}
+		}
+
+		props['shading'] = preferredShading;
+		this.material = new THREE.MeshLambertMaterial(props);
+		
+		switch (this.type) {
+			case 'constant':
+			case 'lambert':
+				break;
+			case 'phong':
+			case 'blinn':
+			default:
+				if (!transparent) {
+					this.material = new THREE.MeshPhongMaterial(props);
+				}
+				break;
+		}
+		return this.material;
 	}
 	
 	function Surface(effect) {
@@ -1368,16 +1519,23 @@ var DAE = (function() {
 		this.surface;
 		this.sampler;
 	}
+	Effect.prototype.create = function() {
+		if (this.shader == null) {
+			return null;
+		}
+		
+	}
 	Effect.prototype.parse = function(element) {
 		this.id = element.getAttribute('id');
 		this.name = element.getAttribute('name');
+		this.shader = null;
 		
 		for (var i = 0; i < element.childNodes.length; i++) {
 			var child = element.childNodes[i];
 			if (child.nodeType != 1) continue;
 			switch (child.nodeName) {
 				case 'profile_COMMON':
-					this.parseProfileCOMMON(child);
+					this.parseTechnique(this.parseProfileCOMMON(child));
 					break;
 				default:
 					break;
@@ -1399,6 +1557,8 @@ var DAE = (function() {
 					this.sampler = (new Sampler2D(this)).parse(child);
 					this.sampler.sid = sid;
 					break;
+				case 'extra':
+					break;
 				default:
 					console.log(child.nodeName);
 					break;
@@ -1406,6 +1566,7 @@ var DAE = (function() {
 		}
 	}
 	Effect.prototype.parseProfileCOMMON = function(element) {
+		var technique;
 		for (var i = 0; i < element.childNodes.length; i++) {
 			var child = element.childNodes[i];
 			if (child.nodeType != 1) continue;
@@ -1414,16 +1575,19 @@ var DAE = (function() {
 					this.parseProfileCOMMON(child);
 					break;
 				case 'technique':
-					this.parseTechnique(child);
+					technique = child;
 					break;
 				case 'newparam':
 					this.parseNewparam(child);
+					break;
+				case 'extra':
 					break;
 				default:
 					console.log(child.nodeName);
 					break;
 			}
 		}
+		return technique;
 	}
 	Effect.prototype.parseTechnique= function(element) {
 		for (var i = 0; i < element.childNodes.length; i++) {
@@ -1433,7 +1597,7 @@ var DAE = (function() {
 				case 'lambert':
 				case 'blinn':
 				case 'phong':
-					this.shader = (new Shader(child.nodeName)).parse(child);
+					this.shader = (new Shader(child.nodeName, this)).parse(child);
 					break;
 				default:
 					break;
@@ -1480,14 +1644,45 @@ var DAE = (function() {
 		}
 		return this;
 	}
+
 	function Channel(animation) {
 		this.animation = animation;
 		this.source = "";
 		this.target = "";
+		this.sid;
+		this.dotSyntax;
+		this.arrSyntax;
+		this.arrIndices;
+		this.member;
 	}
 	Channel.prototype.parse = function(element) {
 		this.source = element.getAttribute('source').replace(/^#/, '');
 		this.target = element.getAttribute('target');
+		
+		var parts = this.target.split('/');
+		var id = parts.shift();
+		var sid = parts.shift();
+		var dotSyntax = (sid.indexOf(".") >= 0);
+		var arrSyntax = (sid.indexOf("(") >= 0);
+		var arrIndices;
+		var member;
+		
+		if (dotSyntax) {
+			parts = sid.split(".");
+			sid = parts.shift();
+			member = parts.shift();
+		} else if (arrSyntax) {
+			arrIndices = sid.split("(");
+			sid = arrIndices.shift();
+			for (var j = 0; j < arrIndices.length; j++) {
+				arrIndices[j] = parseInt(arrIndices[j].replace(/\)/, ''));
+			}
+		}
+		this.sid = sid;
+		this.dotSyntax = dotSyntax;
+		this.arrSyntax = arrSyntax;
+		this.arrIndices = arrIndices;
+		this.member = member;
 		return this;
 	}	
 	function Sampler(animation) {
@@ -1497,6 +1692,9 @@ var DAE = (function() {
 		this.input;
 		this.output;
 		this.interpolation;
+		this.startTime;
+		this.endTime;
+		this.duration = 0;
 	}
 	Sampler.prototype.parse = function(element) {
 		this.id = element.getAttribute('id');
@@ -1528,10 +1726,27 @@ var DAE = (function() {
 				case 'INTERPOLATION':
 					this.interpolation = source.read();
 					break;
+				case 'IN_TANGENT':
+					break;
+				case 'OUT_TANGENT':
+					break;
 				default:
 					console.log(input.semantic);
 					break;
 			}
+		}
+		
+		this.startTime = 0;
+		this.endTime = 0;
+		this.duration = 0;
+		if (this.input.length) {
+			this.startTime = 100000000;
+			this.endTime = -100000000;
+			for (var i = 0; i < this.input.length; i++) {
+				this.startTime = Math.min(this.startTime, this.input[i]);
+				this.endTime = Math.max(this.endTime, this.input[i]);
+			}
+			this.duration = this.endTime - this.startTime;
 		}
 	}
 	
@@ -1682,7 +1897,7 @@ var DAE = (function() {
 	}
 	return {
 		load: load,
+		setPreferredShading: setPreferredShading,
 		geometries : geometries
 	};
 })();
-
