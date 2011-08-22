@@ -717,6 +717,8 @@ THREE.Matrix4.prototype = {
 		matrix.n33 /= scale.z;
 	
 		rotation.setFromRotationMatrix(matrix);
+		
+		return [translation, rotation, scale];
 	},
 
 	extractPosition: function ( m ) {
