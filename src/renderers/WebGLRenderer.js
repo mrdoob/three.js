@@ -4640,7 +4640,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function loadUniformsGeneric( program, uniforms ) {
 
-		var u, uniform, value, type, location, texture, i, il;
+		var u, uniform, value, type, location, texture, i, il, offset;
 
 		for( u in uniforms ) {
 
@@ -4652,33 +4652,77 @@ THREE.WebGLRenderer = function ( parameters ) {
 			type = uniform.type;
 			value = uniform.value;
 
+			// single integer
+
 			if( type == "i" ) {
 
 				_gl.uniform1i( location, value );
+
+			// single float
 
 			} else if( type == "f" ) {
 
 				_gl.uniform1f( location, value );
 
-			} else if( type == "fv1" ) {
-
-				_gl.uniform1fv( location, value );
-
-			} else if( type == "fv" ) {
-
-				_gl.uniform3fv( location, value );
+			// single THREE.Vector2
 
 			} else if( type == "v2" ) {
 
 				_gl.uniform2f( location, value.x, value.y );
 
+			// single THREE.Vector3
+
 			} else if( type == "v3" ) {
 
 				_gl.uniform3f( location, value.x, value.y, value.z );
 
+			// single THREE.Vector4
+
 			} else if( type == "v4" ) {
 
 				_gl.uniform4f( location, value.x, value.y, value.z, value.w );
+
+			// single THREE.Color
+
+			} else if( type == "c" ) {
+
+				_gl.uniform3f( location, value.r, value.g, value.b );
+
+			// flat array of floats (JS or typed array)
+
+			} else if( type == "fv1" ) {
+
+				_gl.uniform1fv( location, value );
+
+			// flat array of floats with 3 x N size (JS or typed array)
+
+			} else if( type == "fv" ) {
+
+				_gl.uniform3fv( location, value );
+
+			// array of THREE.Vector3
+
+			} else if( type == "v3v" ) {
+
+				if ( ! uniform._array ) {
+
+					uniform._array = new Float32Array( 3 * value.length );
+
+				}
+
+				for ( i = 0, il = value.length; i < il; i ++ ) {
+
+					offset = i * 3;
+
+					uniform._array[ offset ] 	 = value[ i ].x;
+					uniform._array[ offset + 1 ] = value[ i ].y;
+					uniform._array[ offset + 2 ] = value[ i ].z;
+
+				}
+
+				_gl.uniform3fv( location, uniform._array );
+
+			// single THREE.Matrix4
 
 			} else if( type == "m4" ) {
 
@@ -4690,6 +4734,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				value.flattenToArray( uniform._array );
 				_gl.uniformMatrix4fv( location, false, uniform._array );
+
+			// array of THREE.Matrix4
 
 			} else if( type == "m4v" ) {
 
@@ -4707,9 +4753,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				_gl.uniformMatrix4fv( location, false, uniform._array );
 
-			} else if( type == "c" ) {
 
-				_gl.uniform3f( location, value.r, value.g, value.b );
+			// single THREE.Texture (2d or cube)
 
 			} else if( type == "t" ) {
 
@@ -4728,6 +4773,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 					setTexture( texture, value );
 
 				}
+
+			// array of THREE.Texture (2d)
 
 			} else if( type == "tv" ) {
 
