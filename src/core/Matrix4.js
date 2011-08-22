@@ -669,56 +669,71 @@ THREE.Matrix4.prototype = {
 	},
 
 	compose: function ( translation, rotation, scale ) {
-		var mr = new THREE.Matrix4();
-		var ms = new THREE.Matrix4();
-		
-		mr.setRotationFromQuaternion(rotation);
-		ms.setScale(scale.x, scale.y, scale.z);
-		
-		this.multiply(mr, ms);
+
+		var mRotation = THREE.Matrix4.__m1;
+		var mScale = THREE.Matrix4.__m2;
+
+		mRotation.identity();
+		mRotation.setRotationFromQuaternion( rotation );
+
+		mScale.setScale( scale.x, scale.y, scale.z );
+
+		this.multiply( mRotation, mScale );
+
 		this.n14 = translation.x;
 		this.n24 = translation.y;
 		this.n34 = translation.z;
-		
+
 		return this;
+
 	},
-	
+
 	decompose: function ( translation, rotation, scale ) {
-		// grab the axis vecs
-		var x = new THREE.Vector3(this.n11, this.n21, this.n31);
-		var y = new THREE.Vector3(this.n12, this.n22, this.n32);
-		var z = new THREE.Vector3(this.n13, this.n23, this.n33);
-	
-		translation = (translation instanceof THREE.Vector3) ? translation : new THREE.Vector3();
-		rotation = (rotation instanceof THREE.Quaternion) ? rotation : new THREE.Quaternion();
-		scale = (scale instanceof THREE.Vector3) ? scale : new THREE.Vector3();
-	
+
+		// grab the axis vectors
+
+		var x = THREE.Matrix4.__v1;
+		var y = THREE.Matrix4.__v2;
+		var z = THREE.Matrix4.__v3;
+
+		x.set( this.n11, this.n21, this.n31 );
+		y.set( this.n12, this.n22, this.n32 );
+		z.set( this.n13, this.n23, this.n33 );
+
+		translation = ( translation instanceof THREE.Vector3 ) ? translation : new THREE.Vector3();
+		rotation = ( rotation instanceof THREE.Quaternion ) ? rotation : new THREE.Quaternion();
+		scale = ( scale instanceof THREE.Vector3 ) ? scale : new THREE.Vector3();
+
 		scale.x = x.length();
 		scale.y = y.length();
 		scale.z = z.length();
-	
+
 		translation.x = this.n14;
 		translation.y = this.n24;
 		translation.z = this.n34;
-	
+
 		// scale the rotation part
-		var matrix = this.clone();
-	
+
+		var matrix = THREE.Matrix4.__m1;
+
+		matrix.copy( this );
+
 		matrix.n11 /= scale.x;
 		matrix.n21 /= scale.x;
 		matrix.n31 /= scale.x;
-	
+
 		matrix.n12 /= scale.y;
 		matrix.n22 /= scale.y;
 		matrix.n32 /= scale.y;
-	
+
 		matrix.n13 /= scale.z;
 		matrix.n23 /= scale.z;
 		matrix.n33 /= scale.z;
-	
-		rotation.setFromRotationMatrix(matrix);
-		
-		return [translation, rotation, scale];
+
+		rotation.setFromRotationMatrix( matrix );
+
+		return [ translation, rotation, scale ];
+
 	},
 
 	extractPosition: function ( m ) {
@@ -728,7 +743,7 @@ THREE.Matrix4.prototype = {
 		this.n34 = m.n34;
 
 	},
-	
+
 	extractRotation: function ( m, s ) {
 
 		var invScaleX = 1 / s.x, invScaleY = 1 / s.y, invScaleZ = 1 / s.z;
@@ -824,8 +839,10 @@ THREE.Matrix4.makeFrustum = function ( left, right, bottom, top, near, far ) {
 	var m, x, y, a, b, c, d;
 
 	m = new THREE.Matrix4();
+
 	x = 2 * near / ( right - left );
 	y = 2 * near / ( top - bottom );
+
 	a = ( right + left ) / ( right - left );
 	b = ( top + bottom ) / ( top - bottom );
 	c = - ( far + near ) / ( far - near );
@@ -858,9 +875,11 @@ THREE.Matrix4.makeOrtho = function ( left, right, top, bottom, near, far ) {
 	var m, x, y, z, w, h, p;
 
 	m = new THREE.Matrix4();
+
 	w = right - left;
 	h = top - bottom;
 	p = far - near;
+
 	x = ( right + left ) / w;
 	y = ( top + bottom ) / h;
 	z = ( far + near ) / p;
@@ -877,3 +896,6 @@ THREE.Matrix4.makeOrtho = function ( left, right, top, bottom, near, far ) {
 THREE.Matrix4.__v1 = new THREE.Vector3();
 THREE.Matrix4.__v2 = new THREE.Vector3();
 THREE.Matrix4.__v3 = new THREE.Vector3();
+
+THREE.Matrix4.__m1 = new THREE.Matrix4();
+THREE.Matrix4.__m2 = new THREE.Matrix4();
