@@ -86,16 +86,17 @@
 
 				// Lights
 
-				scene.addLight( new THREE.AmbientLight( 0xaaaaaa) );
+				scene.addLight( new THREE.AmbientLight( 0xcccccc) );
 
-				var directionalLight = new THREE.DirectionalLight(/*Math.random() * 0xffffff*/0xbbbbbb);
+				var directionalLight = new THREE.DirectionalLight(/*Math.random() * 0xffffff*/0xeeeeee);
 				directionalLight.position.x = Math.random() - 0.5;
 				directionalLight.position.y = Math.random() - 0.5;
 				directionalLight.position.z = Math.random() - 0.5;
 				directionalLight.position.normalize();
 				scene.addLight( directionalLight );
 
-				pointLight = new THREE.PointLight( 0xdddddd, 0.6 );
+				pointLight = new THREE.PointLight( 0xffffff , 4);
+				pointLight.position.x = 10000;
 				scene.addLight( pointLight );
 
 				renderer = new THREE.WebGLRenderer();
@@ -140,9 +141,9 @@
 				camera.position.y = 2;
 				camera.position.z = Math.sin( timer ) * 10;
 
-				particleLight.position.x = Math.sin( timer * 4 ) * 300;
-				particleLight.position.y = Math.cos( timer * 5 ) * 400;
-				particleLight.position.z = Math.cos( timer * 4 ) * 300;
+				particleLight.position.x = Math.sin( timer * 4 ) * 3009;
+				particleLight.position.y = Math.cos( timer * 5 ) * 4000;
+				particleLight.position.z = Math.cos( timer * 4 ) * 3009;
 
 				pointLight.position.x = particleLight.position.x;
 				pointLight.position.y = particleLight.position.y;

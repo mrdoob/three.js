@@ -267,7 +267,7 @@ var DAE = (function() {
 				var inv = skin.invBindMatrices[found];
 				bone.invBindMatrix = inv;
 				bone.skinningMatrix = new THREE.Matrix4();
-				bone.skinningMatrix.multiply(bone.world, inv);
+				bone.skinningMatrix.multiply(bone.world, inv); // (IBMi * JMi)
 				bone.weights = [];
 				for (var j = 0; j < skin.weights.length; j++) {
 					for (var k = 0; k < skin.weights[j].length; k++) {
@@ -1225,7 +1225,7 @@ var DAE = (function() {
 							ns.push(new THREE.Vector3(source.data[idx32+0], source.data[idx32+1], source.data[idx32+2]));
 							break;
 						case 'TEXCOORD':
-							if (ts[input.set] == undefined) ts[input.set] = [];
+							if (ts[input.set] === undefined) ts[input.set] = [];
 							ts[input.set].push(new THREE.UV(source.data[idx32+0], source.data[idx32+1]));
 							break;
 						default:
@@ -1568,7 +1568,7 @@ var DAE = (function() {
 			case 'blinn':
 			default:
 				if (!transparent) {
-					this.material = new THREE.MeshPhongMaterial(props);
+				//	this.material = new THREE.MeshPhongMaterial(props);
 				}
 				break;
 		}
