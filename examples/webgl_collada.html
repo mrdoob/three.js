@@ -22,7 +22,7 @@
 		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 		<script type="text/javascript" src="../src/extras/collada/dae.js"></script>
-		
+
 		<script type="text/javascript">
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
@@ -32,12 +32,13 @@
 			var camera, scene, renderer, objects;
 			var particleLight, pointLight;
 			var dae, skin;
-			
-			DAE.load('./models/monster.dae', colladaReady);
-			
-			function colladaReady(collada) {
+
+			DAE.load( './models/monster.dae', colladaReady );
+
+			function colladaReady( collada ) {
+
 				dae = collada.scene;
-				skin = collada.skins[0];
+				skin = collada.skins[ 0 ];
 
 				dae.scale.x = dae.scale.y = dae.scale.z = 0.002;
 				dae.rotation.x = -Math.PI/2;
@@ -45,12 +46,13 @@
 
 				init();
 				animate();
+
 			}
-			
+
 			function init() {
-					
-				container = document.createElement('div');
-				document.body.appendChild(container);
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
 
 				camera = new THREE.Camera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.x = 2;
@@ -77,25 +79,26 @@
 
 				var line = new THREE.Line( geometry, line_material, THREE.LinePieces );
 				scene.addObject( line );
-				
+
 				// Add the COLLADA
-				scene.addObject(dae);
+
+				scene.addObject( dae );
 
 				particleLight = new THREE.Mesh( new THREE.SphereGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
 				scene.addObject( particleLight );
 
 				// Lights
 
-				scene.addLight( new THREE.AmbientLight( 0xcccccc) );
+				scene.addLight( new THREE.AmbientLight( 0xcccccc ) );
 
-				var directionalLight = new THREE.DirectionalLight(/*Math.random() * 0xffffff*/0xeeeeee);
+				var directionalLight = new THREE.DirectionalLight(/*Math.random() * 0xffffff*/0xeeeeee );
 				directionalLight.position.x = Math.random() - 0.5;
 				directionalLight.position.y = Math.random() - 0.5;
 				directionalLight.position.z = Math.random() - 0.5;
 				directionalLight.position.normalize();
 				scene.addLight( directionalLight );
 
-				pointLight = new THREE.PointLight( 0xffffff , 4);
+				pointLight = new THREE.PointLight( 0xffffff, 4 );
 				pointLight.position.x = 10000;
 				scene.addLight( pointLight );
 
@@ -112,22 +115,35 @@
 			}
 
 			//
+
 			var t = 0;
 			function animate() {
 
 				requestAnimationFrame( animate );
-				
-				if (t > 101) t = 0;
-				if (skin) {
+
+				if ( t > 30 ) t = 0;
+
+				if ( skin ) {
+
 					// guess this can be done smarter...
-					for (var i = 0; i < skin.morphTargetInfluences.length; i++) {
-						skin.morphTargetInfluences[i] = 0;
+
+					// (Indeed, there are way more frames than needed and interpolation is not used at all
+					//  could be something like - one morph per each skinning pose keyframe, or even less,
+					//  animation could be resampled, morphing interpolation handles sparse keyframes quite well.
+					//  Simple animation cycles like this look ok with 10-15 frames instead of 100 ;)
+
+					for ( var i = 0; i < skin.morphTargetInfluences.length; i++ ) {
+
+						skin.morphTargetInfluences[ i ] = 0;
+
 					}
-					skin.morphTargetInfluences[Math.floor(t)] = 1;
+
+					skin.morphTargetInfluences[ Math.floor( t ) ] = 1;
 
 					t += 0.5;
+
 				}
-				
+
 				render();
 				stats.update();
 
