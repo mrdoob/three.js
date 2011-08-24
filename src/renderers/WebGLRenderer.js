@@ -4891,7 +4891,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl.bindTexture( _gl.TEXTURE_2D, texture.__webglTexture );
 
-			if ( texture.image.data ) {
+			if ( texture instanceof THREE.DataTexture) {
 
 				_gl.texImage2D( _gl.TEXTURE_2D, 0, paramThreeToGL( texture.format ), texture.image.width, texture.image.height, 0, paramThreeToGL( texture.format ), _gl.UNSIGNED_BYTE, texture.image.data );
 
