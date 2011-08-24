@@ -121,7 +121,7 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
-			var postprocessing = { enabled : true };
+			var postprocessing = { enabled : false };
 			var glow = 0.9;
 
 			init();
@@ -222,7 +222,7 @@
 				plane.position.y = 100;
 				scene.addChild( plane );
 
-				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				renderer.setClearColor( scene.fog.color, 1 );
@@ -386,6 +386,7 @@
 			}
 
 			function createText() {
+
 				textGeo = new THREE.TextGeometry( text, {
 
 					size: size,
@@ -403,12 +404,54 @@
 					bend: bend,
 
 					material: textMaterialFront,
-					extrudeMaterial: bevelEnabled ? textMaterialSide : textMaterialFront
+					extrudeMaterial: textMaterialSide
 
 				});
 
 				textGeo.computeBoundingBox();
 				textGeo.computeVertexNormals();
+
+				// "fix" side normals by removing z-component of normals for side faces
+				// (this doesn't work well for beveled geometry as then we lose nice curvature around z-axis)
+
+				if ( ! bevelEnabled ) {
+
+					var triangleAreaHeuristics = 0.1 * ( height * size );
+
+					for ( var i = 0; i < textGeo.faces.length; i ++ ) {
+
+						var face = textGeo.faces[ i ];
+
+						if ( face.materials[ 0 ].id == textMaterialSide.id ) {
+
+							for ( var j = 0; j < face.vertexNormals.length; j ++ ) {
+
+								face.vertexNormals[ j ].z = 0;
+								face.vertexNormals[ j ].normalize();
+
+							}
+
+							var va = textGeo.vertices[ face.a ].position;
+							var vb = textGeo.vertices[ face.b ].position;
+							var vc = textGeo.vertices[ face.c ].position;
+
+							var s = THREE.GeometryUtils.triangleArea( va, vb, vc );
+
+							if ( s > triangleAreaHeuristics ) {
+
+								for ( var j = 0; j < face.vertexNormals.length; j ++ ) {
+
+									face.vertexNormals[ j ].copy( face.normal );
+
+								}
+
+							}
+
+						}
+
+					}
+
+				}
 
 				var centerOffset = -0.5 * ( textGeo.boundingBox.x[ 1 ] - textGeo.boundingBox.x[ 0 ] );
 
