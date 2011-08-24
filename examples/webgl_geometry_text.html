@@ -386,6 +386,7 @@
 			}
 
 			function createText() {
+
 				textGeo = new THREE.TextGeometry( text, {
 
 					size: size,
@@ -403,12 +404,37 @@
 					bend: bend,
 
 					material: textMaterialFront,
-					extrudeMaterial: bevelEnabled ? textMaterialSide : textMaterialFront
+					extrudeMaterial: textMaterialSide
 
 				});
 
 				textGeo.computeBoundingBox();
 				textGeo.computeVertexNormals();
+
+				// "fix" side normals by removing z-component of normals for side faces
+				// (this doesn't work well for beveled geometry as then we lose nice curvature around z-axis)
+
+				if ( ! bevelEnabled ) {
+
+					for ( var i = 0; i < textGeo.faces.length; i ++ ) {
+
+						var face = textGeo.faces[ i ];
+
+						if ( face.materials[ 0 ].id == textMaterialSide.id ) {
+
+							for ( var j = 0; j < face.vertexNormals.length; j ++ ) {
+
+								face.vertexNormals[ j ].z = 0;
+								face.vertexNormals[ j ].normalize();
+
+							}
+
+						}
+
+
+					}
+
+				}
 
 				var centerOffset = -0.5 * ( textGeo.boundingBox.x[ 1 ] - textGeo.boundingBox.x[ 0 ] );
 
