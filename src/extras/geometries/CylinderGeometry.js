@@ -28,13 +28,37 @@ THREE.CylinderGeometry = function ( numSegs, topRad, botRad, height, topOffset, 
 
 	// Body faces
 
+	var na, nb, nc, nd;
+
+	var nz = topRad - botRad;
+
 	for ( i = 0; i < numSegs; i++ ) {
 
-		f4(
-			i,
-			i + numSegs,
-			numSegs + ( i + 1 ) % numSegs,
-			( i + 1 ) % numSegs
+		na = new THREE.Vector3();
+		na.copy( scope.vertices[ i ].position );
+		na.z = nz;
+		na.normalize();
+
+		nb = new THREE.Vector3();
+		nb.copy( scope.vertices[ i + numSegs ].position );
+		nb.z = nz;
+		nb.normalize();
+
+		nc = new THREE.Vector3();
+		nc.copy( scope.vertices[ numSegs + ( i + 1 ) % numSegs ].position );
+		nc.z = nz;
+		nc.normalize();
+
+		nd = new THREE.Vector3();
+		nd.copy( scope.vertices[ ( i + 1 ) % numSegs ].position );
+		nd.z = nz;
+		nd.normalize();
+
+		f4n( i,
+			 i + numSegs,
+			 numSegs + ( i + 1 ) % numSegs,
+			 ( i + 1 ) % numSegs,
+			 na, nb, nc, nd
 		);
 
 	}
@@ -43,16 +67,19 @@ THREE.CylinderGeometry = function ( numSegs, topRad, botRad, height, topOffset, 
 
 	if ( botRad > 0 ) {
 
+		var nbottom = new THREE.Vector3( 0, 0, -1 );
+
 		v( 0, 0, - halfHeight - ( botOffset || 0 ) );
 
 		for ( i = numSegs; i < numSegs + ( numSegs / 2 ); i++ ) {
 
-			f4(
-				2 * numSegs,
-				( 2 * i - 2 * numSegs ) % numSegs,
-				( 2 * i - 2 * numSegs + 1 ) % numSegs,
-				( 2 * i - 2 * numSegs + 2 ) % numSegs
+			f4n( 2 * numSegs,
+				 ( 2 * i - 2 * numSegs ) % numSegs,
+				 ( 2 * i - 2 * numSegs + 1 ) % numSegs,
+				 ( 2 * i - 2 * numSegs + 2 ) % numSegs,
+				 nbottom, nbottom, nbottom, nbottom
 			);
+
 
 		}
 
@@ -62,15 +89,17 @@ THREE.CylinderGeometry = function ( numSegs, topRad, botRad, height, topOffset, 
 
 	if ( topRad > 0 ) {
 
+		var ntop = new THREE.Vector3( 0, 0, 1 );
+
 		v( 0, 0, halfHeight + ( topOffset || 0 ) );
 
 		for ( i = numSegs + ( numSegs / 2 ); i < 2 * numSegs; i ++ ) {
 
-			f4(
-				2 * numSegs + 1,
-				( 2 * i - 2 * numSegs + 2 ) % numSegs + numSegs,
-				( 2 * i - 2 * numSegs + 1 ) % numSegs + numSegs,
-				( 2 * i - 2 * numSegs ) % numSegs + numSegs
+			f4n( 2 * numSegs + 1,
+				 ( 2 * i - 2 * numSegs + 2 ) % numSegs + numSegs,
+				 ( 2 * i - 2 * numSegs + 1 ) % numSegs + numSegs,
+				 ( 2 * i - 2 * numSegs ) % numSegs + numSegs,
+				 ntop, ntop, ntop, ntop
 			);
 
 		}
@@ -103,7 +132,6 @@ THREE.CylinderGeometry = function ( numSegs, topRad, botRad, height, topOffset, 
 
 	this.computeCentroids();
 	this.computeFaceNormals();
-	// this.computeVertexNormals();
 
 	function v( x, y, z ) {
 
@@ -111,9 +139,9 @@ THREE.CylinderGeometry = function ( numSegs, topRad, botRad, height, topOffset, 
 
 	}
 
-	function f4( a, b, c, d ) {
+	function f4n( a, b, c, d, na, nb, nc, nd ) {
 
-		scope.faces.push( new THREE.Face4( a, b, c, d ) );
+		scope.faces.push( new THREE.Face4( a, b, c, d, [ na, nb, nc, nd ] ) );
 
 	}
 
