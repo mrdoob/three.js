@@ -4842,6 +4842,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
+			_gl.activeTexture( _gl.TEXTURE0 + slot );
 			_gl.bindTexture( _gl.TEXTURE_2D, texture.__webglTexture );
 
 			if ( texture.image.data ) {
@@ -4856,10 +4857,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			setTextureParameters( _gl.TEXTURE_2D, texture, texture.image );
 
-			_gl.bindTexture( _gl.TEXTURE_2D, null );
-
 			texture.needsUpdate = false;
 
+		} else {
+			_gl.activeTexture( _gl.TEXTURE0 + slot );
+			_gl.bindTexture( _gl.TEXTURE_2D, texture.__webglTexture );
 		}
 
 		/*
@@ -4889,10 +4891,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 		*/
-
-		_gl.activeTexture( _gl.TEXTURE0 + slot );
-		_gl.bindTexture( _gl.TEXTURE_2D, texture.__webglTexture );
-
 
 	};
 
