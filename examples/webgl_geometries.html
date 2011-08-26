@@ -57,7 +57,7 @@
 
 				material = [
 					new THREE.MeshLambertMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/UV.jpg' ) } ),
-					new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true, opacity: 0.1 } )
+					new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true, transparent: true, opacity: 0.1 } )
 				];
 
 				objects[ 0 ] = object = new THREE.Mesh( new THREE.CubeGeometry( 100, 100, 100, 4, 4, 4 ), material );

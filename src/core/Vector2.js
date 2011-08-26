@@ -7,12 +7,8 @@
 
 THREE.Vector2 = function ( x, y ) {
 
-	this.set(
-
-		x || 0,
-		y || 0
-
-	);
+	this.x = x || 0;
+	this.y = y || 0;
 
 };
 
