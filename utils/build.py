@@ -70,6 +70,7 @@ COMMON_FILES = [
 'renderers/WebGLShaders.js',
 'renderers/WebGLRenderer.js',
 'renderers/WebGLRenderTarget.js',
+'renderers/WebGLRenderTargetCube.js',
 'renderers/renderables/RenderableVertex.js',
 'renderers/renderables/RenderableFace3.js',
 'renderers/renderables/RenderableFace4.js',
@@ -293,7 +294,8 @@ WEBGL_FILES = [
 'renderers/Projector.js',
 'renderers/WebGLShaders.js',
 'renderers/WebGLRenderer.js',
-'renderers/WebGLRenderTarget.js'
+'renderers/WebGLRenderTarget.js',
+'renderers/WebGLRenderTargetCube.js',
 ]
 
 def merge(files):
