@@ -63,7 +63,7 @@ THREE.Ray.prototype = {
 
 			var distance = distanceFromIntersection( this.origin, this.direction, object );
 
-			if ( ! distance || distance > object.geometry.boundingSphere.radius * Math.max( object.scale.x, Math.max( object.scale.y, object.scale.z ) ) ) {
+			if ( !object.flipSided && !object.doubleSided && distance > object.geometry.boundingSphere.radius * Math.max( object.scale.x, Math.max( object.scale.y, object.scale.z ) ) ) {
 
 				return [];
 
@@ -161,8 +161,8 @@ THREE.Ray.prototype = {
 			intersect = origin.clone().addSelf( direction.clone().multiplyScalar( dot ) );
 			distance = position.distanceTo( intersect );
 
-			// TODO: Check if distance is negative (object behind camera).			
-			
+			// TODO: Check if distance is negative (object behind camera).
+
 			return distance;
 
 		}
