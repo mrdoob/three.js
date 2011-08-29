@@ -152,8 +152,7 @@
 				quad.position.z = -100;
 				sceneRTT.addObject( quad );
 
-				var loader = new THREE.BinaryLoader();
-				loader.load( { model: "obj/torus/Torus_bin.js", callback: function( geometry ) { createMesh( geometry, sceneRTT ) } } );
+				createMesh( new THREE.TorusGeometry( 100, 25, 15, 30 ), sceneRTT );
 
 				quad = new THREE.Mesh( plane, materialScreen );
 				quad.position.z = -100;
@@ -202,12 +201,12 @@
 
 				zmesh1 = new THREE.Mesh( geometry, mat1 );
 				zmesh1.position.set( 0, 0, 100 );
-				zmesh1.scale.set( 150, 150, 150 );
+				zmesh1.scale.set( 1.5, 1.5, 1.5 );
 				xscene.addObject( zmesh1 );
 
 				zmesh2 = new THREE.Mesh( geometry, mat2 );
 				zmesh2.position.set( 0, 150, 100 );
-				zmesh2.scale.set( 75, 75, 75 );
+				zmesh2.scale.set( 0.75, 0.75, 0.75 );
 				xscene.addObject( zmesh2 );
 
 			}
@@ -239,11 +238,8 @@
 
 				if ( zmesh1 && zmesh2 ) {
 
-					zmesh1.rotation.x = 1.57;
-					zmesh1.rotation.z = time;
-
-					zmesh2.rotation.z = 1.57;
-					zmesh2.rotation.y = -time;
+					zmesh1.rotation.y = - time;
+					zmesh2.rotation.y = - time + Math.PI / 2;
 
 				}
 

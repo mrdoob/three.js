@@ -95,7 +95,7 @@ THREE.Ray.prototype = {
 				vector = objMatrix.multiplyVector3( face.centroid.clone() ).subSelf( origin );
 				dot = vector.dot( direction );
 
-				if ( dot < 0 ) continue;
+				if ( dot <= 0 ) continue;
 
 				//
 
@@ -169,7 +169,7 @@ THREE.Ray.prototype = {
 			vector = position.clone().subSelf( origin );
 			dot = vector.dot( direction );
 
-			if ( dot < 0 ) return null; // check if position behind origin.
+			if ( dot <= 0 ) return null; // check if position behind origin.
 
 			intersect = origin.clone().addSelf( direction.clone().multiplyScalar( dot ) );
 			distance = position.distanceTo( intersect );
