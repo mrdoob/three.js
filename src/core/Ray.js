@@ -42,7 +42,7 @@ THREE.Ray.prototype = {
 
 			var distance = distanceFromIntersection( this.origin, this.direction, object );
 
-			if ( ! distance || distance > object.scale.x ) {
+			if ( distance > object.scale.x ) {
 
 				return [];
 
@@ -63,7 +63,7 @@ THREE.Ray.prototype = {
 
 			var distance = distanceFromIntersection( this.origin, this.direction, object );
 
-			if ( !object.flipSided && !object.doubleSided && distance > object.geometry.boundingSphere.radius * Math.max( object.scale.x, Math.max( object.scale.y, object.scale.z ) ) ) {
+			if ( distance > object.geometry.boundingSphere.radius * Math.max( object.scale.x, Math.max( object.scale.y, object.scale.z ) ) ) {
 
 				return [];
 
