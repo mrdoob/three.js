@@ -25,7 +25,6 @@
 		    }
 
 		    a { color: red; }
-
 		</style>
 	</head>
 	<body>
@@ -38,6 +37,11 @@
 
 		<script type="text/javascript" src="../build/Three.js"></script>
 
+		<script type="text/javascript" src="js/postprocessing/EffectComposer.js"></script>
+		<script type="text/javascript" src="js/postprocessing/RenderPass.js"></script>
+		<script type="text/javascript" src="js/postprocessing/BloomPass.js"></script>
+		<script type="text/javascript" src="js/postprocessing/FilmPass.js"></script>
+
 		<script type="text/javascript" src="js/Detector.js"></script>
 		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
@@ -45,19 +49,22 @@
 		<!-- Time modulated procedural color fragment shader -->
 
 		<script id="fs-colors" type="x-shader/x-fragment">
+
 			varying vec2 vUv;
 			uniform float time;
 
-			void main(void) {
+			void main() {
 
 				gl_FragColor = vec4( time, vUv.x, vUv.y, 1.0 );
 
 			}
+
 		</script>
 
 		<!-- Generic vertex shader -->
 
 		<script id="vs-generic" type="x-shader/x-vertex">
+
 			varying vec2 vUv;
 
 			void main() {
@@ -66,6 +73,7 @@
 				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 			}
+
 		</script>
 
 
@@ -75,7 +83,9 @@
 
 			var container, stats;
 
-			var cameraOrtho, cameraPerspective, sceneModel, sceneScreen, sceneBG, renderer, mesh, directionalLight;
+			var composer;
+
+			var cameraOrtho, cameraPerspective, sceneModel, sceneBG, renderer, mesh, directionalLight;
 
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
@@ -97,20 +107,22 @@
 				cameraPerspective = new THREE.Camera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
 				cameraPerspective.position.z = 900;
 
+				//
+
 				sceneModel = new THREE.Scene();
-				sceneScreen = new THREE.Scene();
-				sceneBG = new THREE.Scene();
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff );
 				directionalLight.position.set( 0, 0, 1 );
 				directionalLight.position.normalize();
 				sceneModel.addLight( directionalLight );
 
-				var pars1 = { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBFormat },
-					pars2 = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter,  format: THREE.RGBFormat };
-				rtTexture1 = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars1 );
-				rtTexture2 = new THREE.WebGLRenderTarget( 256, 512, pars2 );
-				rtTexture3 = new THREE.WebGLRenderTarget( 512, 256, pars2 );
+				loader = new THREE.JSONLoader( true );
+				document.body.appendChild( loader.statusDomElement );
+				loader.load( { model: "obj/leeperrysmith/LeePerrySmith.js", callback: function( geometry ) { createMesh( geometry, sceneModel, 100 ) } } );
+
+				//
+
+				sceneBG = new THREE.Scene();
 
 				materialColor = new THREE.MeshShaderMaterial( {
 
@@ -121,70 +133,13 @@
 
 				} );
 
-				var screen_shader = THREE.ShaderUtils.lib[ "screen" ];
-				var screen_uniforms = THREE.UniformsUtils.clone( screen_shader.uniforms );
-
-				screen_uniforms[ "tDiffuse" ].texture = rtTexture1;
-				screen_uniforms[ "opacity" ].value = 0.4;
-
-				materialScreen = new THREE.MeshShaderMaterial( {
-
-					uniforms: screen_uniforms,
-					vertexShader: screen_shader.vertexShader,
-					fragmentShader: screen_shader.fragmentShader,
-					blending: THREE.AdditiveBlending,
-					transparent: true
-
-				} );
-
-				var film_shader = THREE.ShaderUtils.lib["film"];
-				var film_uniforms = THREE.UniformsUtils.clone( film_shader.uniforms );
-
-				film_uniforms[ "tDiffuse" ].texture = rtTexture1;
-				film_uniforms[ "nIntensity" ].value = 0.25;
-				film_uniforms[ "sIntensity" ].value = 0.5;
-
-				materialFilm = new THREE.MeshShaderMaterial( {
-
-					uniforms: film_uniforms,
-					vertexShader: film_shader.vertexShader,
-					fragmentShader: film_shader.fragmentShader
-
-				} );
-
-				var increment = 0.001953125;
-
-				blurx = new THREE.Vector2( increment, 0.0 ),
-				blury = new THREE.Vector2( 0.0, increment );
-
-				var convolution_shader = THREE.ShaderUtils.lib[ "convolution" ];
-				var convolution_uniforms = THREE.UniformsUtils.clone( convolution_shader.uniforms );
-
-				convolution_uniforms[ "tDiffuse" ].texture = rtTexture1;
-				convolution_uniforms[ "uImageIncrement" ].value = blurx;
-				convolution_uniforms[ "cKernel" ].value = THREE.ShaderUtils.buildKernel( 4.0 );
-
-				materialConvolution = new THREE.MeshShaderMaterial( {
-
-					uniforms: convolution_uniforms,
-					vertexShader:   "#define KERNEL_SIZE 25.0\n" + convolution_shader.vertexShader,
-					fragmentShader: "#define KERNEL_SIZE 25\n"   + convolution_shader.fragmentShader
-
-				} );
-
 				var plane = new THREE.PlaneGeometry( window.innerWidth, window.innerHeight );
 
 				quadBG = new THREE.Mesh( plane, materialColor );
 				quadBG.position.z = -500;
 				sceneBG.addObject( quadBG );
 
-				loader = new THREE.JSONLoader( true );
-				document.body.appendChild( loader.statusDomElement );
-				loader.load( { model: "obj/leeperrysmith/LeePerrySmith.js", callback: function( geometry ) { createMesh( geometry, sceneModel, 100 ) } } );
-
-				quadScreen = new THREE.Mesh( plane, materialConvolution );
-				quadScreen.position.z = -100;
-				sceneScreen.addObject( quadScreen );
+				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -195,7 +150,24 @@
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
-				//container.appendChild( stats.domElement );
+				container.appendChild( stats.domElement );
+
+				//
+
+				var renderBackground = new THREE.RenderPass( sceneBG, cameraOrtho );
+				var renderModel = new THREE.RenderPass( sceneModel, cameraPerspective );
+				var effectBloom = new THREE.BloomPass( 1.0 );
+				var effectFilm = new THREE.FilmPass( 0.25, 0.5 );
+
+				renderModel.clear = false;
+				effectFilm.renderToScreen = true;
+
+				composer = new THREE.EffectComposer( renderer );
+
+				composer.addPass( renderBackground );
+				composer.addPass( renderModel );
+				composer.addPass( effectBloom );
+				composer.addPass( effectFilm );
 
 			}
 
@@ -264,50 +236,12 @@
 
 				}
 
-				materialColor.uniforms.time.value += delta/2;
-				materialFilm.uniforms.time.value += delta;
+				materialColor.uniforms.time.value += delta / 2;
 
 				renderer.clear();
-
-				// Render scene into texture
-
-				// background
-
-				renderer.render( sceneBG, cameraOrtho, rtTexture1, true );
-
-				// model
-
-				renderer.render( sceneModel, cameraPerspective, rtTexture1, false );
-
-				// Render quad with blured scene into texture (convolution pass 1)
-
-				quadScreen.materials[ 0 ] = materialConvolution;
-				materialConvolution.uniforms.tDiffuse.texture = rtTexture1;
-				materialConvolution.uniforms.uImageIncrement.value = blurx;
-				renderer.render( sceneScreen, cameraOrtho, rtTexture2, true );
-
-				// Render quad with blured scene into texture (convolution pass 2)
-
-				materialConvolution.uniforms.tDiffuse.texture = rtTexture2;
-				materialConvolution.uniforms.uImageIncrement.value = blury;
-				renderer.render( sceneScreen, cameraOrtho, rtTexture3, true );
-
-				// Render original scene with superimposed blur into texture
-
-				quadScreen.materials[ 0 ] = materialScreen;
-
-				materialScreen.uniforms.tDiffuse.texture = rtTexture3;
-				materialScreen.uniforms.opacity.value = 1.0;
-				renderer.render( sceneScreen, cameraOrtho, rtTexture1, false );
-
-				// Render final scene to the screen with film shader
-
-				materialFilm.uniforms.tDiffuse.texture = rtTexture1;
-				quadScreen.materials[ 0 ] = materialFilm;
-				renderer.render( sceneScreen, cameraOrtho );
+				composer.render( delta );
 
 			}
-
 
 		</script>
 	</body>
