@@ -156,8 +156,8 @@
 				
 				var hearts = function ( context ) {
 					context.globalAlpha = 0.5;
-					var x = -4, y = 0;
-					context.scale(1, -1);
+					var x = 0, y = 0;
+					context.scale(0.1, -0.1); // Scale so canvas render can redraw within bounds
 					context.beginPath();
 					 // From http://blog.burlock.org/html5/130-paths
 					context.bezierCurveTo( x + 2.5, y + 2.5, x + 2.0, y, x, y );
@@ -183,7 +183,7 @@
 					
 					particle = new THREE.Particle( material );
 
-					particle.scale.x = particle.scale.y = Math.random() * 2 +1;
+					particle.scale.x = particle.scale.y = Math.random() * 20 +20;
 					particleCloud.addChild( particle );	
 
 					return particle;
