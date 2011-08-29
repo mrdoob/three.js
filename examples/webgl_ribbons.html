@@ -227,8 +227,7 @@
 
 				postprocessing.scene = new THREE.Scene();
 
-				postprocessing.camera = new THREE.Camera();
-				postprocessing.camera.projectionMatrix = THREE.Matrix4.makeOrtho( window.innerWidth / - 2, window.innerWidth / 2,  window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
+				postprocessing.camera = new THREE.OrthoCamera( window.innerWidth / - 2, window.innerWidth / 2,  window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
 				postprocessing.camera.position.z = 100;
 
 				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
@@ -236,11 +235,11 @@
 				postprocessing.rtTexture2 = new THREE.WebGLRenderTarget( 512, 512, pars );
 				postprocessing.rtTexture3 = new THREE.WebGLRenderTarget( 512, 512, pars );
 
-				var screen_shader = THREE.ShaderUtils.lib["screen"];
+				var screen_shader = THREE.ShaderUtils.lib[ "screen" ];
 				var screen_uniforms = THREE.UniformsUtils.clone( screen_shader.uniforms );
 
-				screen_uniforms["tDiffuse"].texture = postprocessing.rtTexture1;
-				screen_uniforms["opacity"].value = 1.0;
+				screen_uniforms[ "tDiffuse" ].texture = postprocessing.rtTexture1;
+				screen_uniforms[ "opacity" ].value = 1.0;
 
 				postprocessing.materialScreen = new THREE.MeshShaderMaterial( {
 
@@ -252,15 +251,15 @@
 
 				} );
 
-				var convolution_shader = THREE.ShaderUtils.lib["convolution"];
+				var convolution_shader = THREE.ShaderUtils.lib[ "convolution" ];
 				var convolution_uniforms = THREE.UniformsUtils.clone( convolution_shader.uniforms );
 
 				postprocessing.blurx = new THREE.Vector2( 0.001953125, 0.0 ),
 				postprocessing.blury = new THREE.Vector2( 0.0, 0.001953125 );
 
-				convolution_uniforms["tDiffuse"].texture = postprocessing.rtTexture1;
-				convolution_uniforms["uImageIncrement"].value = postprocessing.blurx;
-				convolution_uniforms["cKernel"].value = THREE.ShaderUtils.buildKernel( 4.0 );
+				convolution_uniforms[ "tDiffuse" ].texture = postprocessing.rtTexture1;
+				convolution_uniforms[ "uImageIncrement" ].value = postprocessing.blurx;
+				convolution_uniforms[ "cKernel" ].value = THREE.ShaderUtils.buildKernel( 4.0 );
 
 				postprocessing.materialConvolution = new THREE.MeshShaderMaterial( {
 
@@ -327,7 +326,7 @@
 
 					// Render quad with blured scene into texture (convolution pass 1)
 
-					postprocessing.quad.materials = [ postprocessing.materialConvolution ];
+					postprocessing.quad.materials[ 0 ] = postprocessing.materialConvolution;
 
 					postprocessing.materialConvolution.uniforms.tDiffuse.texture = postprocessing.rtTexture1;
 					postprocessing.materialConvolution.uniforms.uImageIncrement.value = postprocessing.blurx;
@@ -343,7 +342,7 @@
 
 					// Render original scene with superimposed blur to texture
 
-					postprocessing.quad.materials = [ postprocessing.materialScreen ];
+					postprocessing.quad.materials[ 0 ] = postprocessing.materialScreen;
 
 					postprocessing.materialScreen.uniforms.tDiffuse.texture = postprocessing.rtTexture3;
 					postprocessing.materialScreen.uniforms.opacity.value = 1.2;

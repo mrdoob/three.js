@@ -203,8 +203,7 @@
 
 				postprocessing.scene = new THREE.Scene();
 
-				postprocessing.camera = new THREE.Camera();
-				postprocessing.camera.projectionMatrix = THREE.Matrix4.makeOrtho( window.innerWidth / - 2, window.innerWidth / 2,  window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
+				postprocessing.camera = new THREE.OrthoCamera( window.innerWidth / - 2, window.innerWidth / 2,  window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
 				postprocessing.camera.position.z = 100;
 
 				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
@@ -291,7 +290,7 @@
 
 					// Render quad with blured scene into texture (convolution pass 1)
 
-					postprocessing.quad.materials = [ postprocessing.materialConvolution ];
+					postprocessing.quad.materials[ 0 ] = postprocessing.materialConvolution;
 
 					postprocessing.materialConvolution.uniforms.tDiffuse.texture = postprocessing.rtTexture1;
 					postprocessing.materialConvolution.uniforms.uImageIncrement.value = postprocessing.blurx;
@@ -307,7 +306,7 @@
 
 					// Render original scene with superimposed blur to texture
 
-					postprocessing.quad.materials = [ postprocessing.materialScreen ];
+					postprocessing.quad.materials[ 0 ] = postprocessing.materialScreen;
 
 					postprocessing.materialScreen.uniforms.tDiffuse.texture = postprocessing.rtTexture3;
 					postprocessing.materialScreen.uniforms.opacity.value = 1.25;
@@ -317,7 +316,7 @@
 					// Render to screen
 
 					postprocessing.materialFilm.uniforms.time.value += 0.01;
-					postprocessing.quad.materials = [ postprocessing.materialFilm ];
+					postprocessing.quad.materials[ 0 ] = postprocessing.materialFilm;
 
 					postprocessing.materialScreen.uniforms.tDiffuse.texture = postprocessing.rtTexture1;
 					renderer.render( postprocessing.scene, postprocessing.camera );
