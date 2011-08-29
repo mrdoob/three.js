@@ -282,8 +282,7 @@
 
 		postprocessing.scene = new THREE.Scene();
 
-		postprocessing.camera = new THREE.Camera();
-		postprocessing.camera.projectionMatrix = THREE.Matrix4.makeOrtho( SCREEN_WIDTH / - 2, SCREEN_WIDTH / 2,  SCREEN_HEIGHT / 2, SCREEN_HEIGHT / - 2, -10000, 10000 );
+		postprocessing.camera = new THREE.OrthoCamera( SCREEN_WIDTH / - 2, SCREEN_WIDTH / 2,  SCREEN_HEIGHT / 2, SCREEN_HEIGHT / - 2, -10000, 10000 );
 		postprocessing.camera.position.z = 100;
 
 		var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat };

@@ -43,6 +43,7 @@
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<!-- Time modulated procedural color fragment shader -->
+
 		<script id="fs-colors" type="x-shader/x-fragment">
 			varying vec2 vUv;
 			uniform float time;
@@ -55,6 +56,7 @@
 		</script>
 
 		<!-- Generic vertex shader -->
+
 		<script id="vs-generic" type="x-shader/x-vertex">
 			varying vec2 vUv;
 
@@ -89,8 +91,7 @@
 
 				container = document.getElementById( 'container' );
 
-				cameraOrtho = new THREE.Camera();
-				cameraOrtho.projectionMatrix = THREE.Matrix4.makeOrtho( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
+				cameraOrtho = new THREE.OrthoCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
 				cameraOrtho.position.z = 100;
 
 				cameraPerspective = new THREE.Camera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
@@ -101,9 +102,7 @@
 				sceneBG = new THREE.Scene();
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff );
-				directionalLight.position.x = 0;
-				directionalLight.position.y = 0;
-				directionalLight.position.z = 1;
+				directionalLight.position.set( 0, 0, 1 );
 				directionalLight.position.normalize();
 				sceneModel.addLight( directionalLight );
 
@@ -122,11 +121,11 @@
 
 				} );
 
-				var screen_shader = THREE.ShaderUtils.lib["screen"];
+				var screen_shader = THREE.ShaderUtils.lib[ "screen" ];
 				var screen_uniforms = THREE.UniformsUtils.clone( screen_shader.uniforms );
 
-				screen_uniforms["tDiffuse"].texture = rtTexture1;
-				screen_uniforms["opacity"].value = 0.4;
+				screen_uniforms[ "tDiffuse" ].texture = rtTexture1;
+				screen_uniforms[ "opacity" ].value = 0.4;
 
 				materialScreen = new THREE.MeshShaderMaterial( {
 
@@ -141,9 +140,9 @@
 				var film_shader = THREE.ShaderUtils.lib["film"];
 				var film_uniforms = THREE.UniformsUtils.clone( film_shader.uniforms );
 
-				film_uniforms["tDiffuse"].texture = rtTexture1;
-				film_uniforms["nIntensity"].value = 0.25;
-				film_uniforms["sIntensity"].value = 0.5;
+				film_uniforms[ "tDiffuse" ].texture = rtTexture1;
+				film_uniforms[ "nIntensity" ].value = 0.25;
+				film_uniforms[ "sIntensity" ].value = 0.5;
 
 				materialFilm = new THREE.MeshShaderMaterial( {
 
@@ -158,12 +157,12 @@
 				blurx = new THREE.Vector2( increment, 0.0 ),
 				blury = new THREE.Vector2( 0.0, increment );
 
-				var convolution_shader = THREE.ShaderUtils.lib["convolution"];
+				var convolution_shader = THREE.ShaderUtils.lib[ "convolution" ];
 				var convolution_uniforms = THREE.UniformsUtils.clone( convolution_shader.uniforms );
 
-				convolution_uniforms["tDiffuse"].texture = rtTexture1;
-				convolution_uniforms["uImageIncrement"].value = blurx;
-				convolution_uniforms["cKernel"].value = THREE.ShaderUtils.buildKernel( 4.0 );
+				convolution_uniforms[ "tDiffuse" ].texture = rtTexture1;
+				convolution_uniforms[ "uImageIncrement" ].value = blurx;
+				convolution_uniforms[ "cKernel" ].value = THREE.ShaderUtils.buildKernel( 4.0 );
 
 				materialConvolution = new THREE.MeshShaderMaterial( {
 
@@ -190,6 +189,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.autoClear = false;
+
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -232,11 +232,9 @@
 				var mat2 = new THREE.MeshShaderMaterial( parameters );
 
 				mesh = new THREE.Mesh( geometry, mat2 );
-				mesh.position.x = 0;
-				mesh.position.y = -50;
-				mesh.position.z = 0;
-				mesh.scale.x = mesh.scale.y = mesh.scale.z = scale;
-				mesh.updateMatrix();
+				mesh.position.set( 0, -50, 0 );
+				mesh.scale.set( scale, scale, scale );
+
 				scene.addObject( mesh );
 
 				loader.statusDomElement.style.display = "none";
@@ -283,7 +281,7 @@
 
 				// Render quad with blured scene into texture (convolution pass 1)
 
-				quadScreen.materials = [ materialConvolution ];
+				quadScreen.materials[ 0 ] = materialConvolution;
 				materialConvolution.uniforms.tDiffuse.texture = rtTexture1;
 				materialConvolution.uniforms.uImageIncrement.value = blurx;
 				renderer.render( sceneScreen, cameraOrtho, rtTexture2, true );
@@ -296,7 +294,7 @@
 
 				// Render original scene with superimposed blur into texture
 
-				quadScreen.materials = [ materialScreen ];
+				quadScreen.materials[ 0 ] = materialScreen;
 
 				materialScreen.uniforms.tDiffuse.texture = rtTexture3;
 				materialScreen.uniforms.opacity.value = 1.0;
@@ -305,7 +303,7 @@
 				// Render final scene to the screen with film shader
 
 				materialFilm.uniforms.tDiffuse.texture = rtTexture1;
-				quadScreen.materials = [ materialFilm ];
+				quadScreen.materials[ 0 ] = materialFilm;
 				renderer.render( sceneScreen, cameraOrtho );
 
 			}
