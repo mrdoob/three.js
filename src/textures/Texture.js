@@ -47,6 +47,19 @@ THREE.TextureCount = 0;
 THREE.MultiplyOperation = 0;
 THREE.MixOperation = 1;
 
+// Mapping modes
+
+THREE.CubeReflectionMapping = function () {};
+THREE.CubeRefractionMapping = function () {};
+
+THREE.LatitudeReflectionMapping = function () {};
+THREE.LatitudeRefractionMapping = function () {};
+
+THREE.SphericalReflectionMapping = function () {};
+THREE.SphericalRefractionMapping = function () {};
+
+THREE.UVMapping = function () {};
+
 // Wrapping modes
 
 THREE.RepeatWrapping = 0;
