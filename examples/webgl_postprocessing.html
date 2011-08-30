@@ -11,7 +11,7 @@
 			text-align:center;
 			font-weight: bold;
 
-			background-color: #fff;
+			background-color: #000;
 			margin: 0px;
 			overflow: hidden;
 		    }
@@ -20,7 +20,7 @@
 			color:#fff;
 			background-color: rgba( 0, 0, 0, 0.5 );
 			position: relative;
-			margin: 0 auto -2em;
+			margin: 0 auto -2.1em;
 			top: 0px;
 			width: 550px;
 			padding: 5px;
@@ -45,10 +45,9 @@
 		<script type="text/javascript" src="js/postprocessing/RenderPass.js"></script>
 		<script type="text/javascript" src="js/postprocessing/BloomPass.js"></script>
 		<script type="text/javascript" src="js/postprocessing/FilmPass.js"></script>
-		<script type="text/javascript" src="js/postprocessing/SepiaPass.js"></script>
 		<script type="text/javascript" src="js/postprocessing/DotScreenPass.js"></script>
-		<script type="text/javascript" src="js/postprocessing/ScreenPass.js"></script>
-		<script type="text/javascript" src="js/postprocessing/VignettePass.js"></script>
+		<script type="text/javascript" src="js/postprocessing/TexturePass.js"></script>
+		<script type="text/javascript" src="js/postprocessing/ShaderPass.js"></script>
 
 		<script type="text/javascript" src="js/Detector.js"></script>
 		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
@@ -99,7 +98,7 @@
 			var halfWidth = window.innerWidth / 2;
 			var halfHeight = window.innerHeight / 2;
 
-			var rtTexture, materialColor, material2D, quadBG1, quadBG2;
+			var materialColor, material2D, quadBG, renderScene;
 
 			var delta = 0.01;
 
@@ -144,10 +143,10 @@
 
 				var plane = new THREE.PlaneGeometry( 1, 1 );
 
-				quadBG1 = new THREE.Mesh( plane, materialColor );
-				quadBG1.position.z = -500;
-				quadBG1.scale.set( window.innerWidth, window.innerHeight, 1 );
-				sceneBG.addObject( quadBG1 );
+				quadBG = new THREE.Mesh( plane, materialColor );
+				quadBG.position.z = -500;
+				quadBG.scale.set( window.innerWidth, window.innerHeight, 1 );
+				sceneBG.addObject( quadBG );
 
 				//
 
@@ -162,22 +161,38 @@
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
-				//container.appendChild( stats.domElement );
+				container.appendChild( stats.domElement );
 
 				//
 
-				var effectBloom = new THREE.BloomPass( 0.75 );
-				var effectFilm = new THREE.FilmPass( 0.75, 0.025, 648, false );
+				var shaderBleach = THREE.ShaderUtils.lib[ "bleachbypass" ];
+				var shaderSepia = THREE.ShaderUtils.lib[ "sepia" ];
+				var shaderVignette = THREE.ShaderUtils.lib[ "vignette" ];
+				var shaderScreen = THREE.ShaderUtils.lib[ "screen" ];
+
+				var effectBleach = new THREE.ShaderPass( shaderBleach );
+				var effectSepia = new THREE.ShaderPass( shaderSepia );
+				var effectVignette = new THREE.ShaderPass( shaderVignette );
+				var effectScreen = new THREE.ShaderPass( shaderScreen );
+
+				effectBleach.uniforms[ "opacity" ].value = 0.95;
+
+				effectSepia.uniforms[ "amount" ].value = 0.6;
+
+				effectVignette.uniforms[ "offset" ].value = 0.95;
+				effectVignette.uniforms[ "darkness" ].value = 1.6;
+
+				var effectBloom = new THREE.BloomPass( 0.5 );
+				var effectFilm = new THREE.FilmPass( 0.5, 0.025, 648, false );
 				var effectFilmBW = new THREE.FilmPass( 0.35, 0.5, 2048, true );
-				var effectSepia = new THREE.SepiaPass( 1.0 );
-				var effectScreen = new THREE.ScreenPass();
 				var effectDotScreen = new THREE.DotScreenPass( new THREE.Vector2( 0, 0 ), 0.5, 0.4 );
-				var effectVignette = new THREE.VignettePass( 0.95, 1.6 );
 
 				//effectFilm.renderToScreen = true;
 				//effectFilmBW.renderToScreen = true;
 				//effectDotScreen.renderToScreen = true;
+				//effectBleach.renderToScreen = true;
 				effectVignette.renderToScreen = true;
+				//effectScreen.renderToScreen = true;
 
 				//
 
@@ -193,33 +208,13 @@
 
 				//
 
-				scene2D = new THREE.Scene();
-
-				var shader = THREE.ShaderUtils.lib[ "screen" ];
-
-				material2D = new THREE.MeshShaderMaterial( {
-
-					uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
-					vertexShader: shader.vertexShader,
-					fragmentShader: shader.fragmentShader
-
-				} );
-
-				material2D.uniforms[ "tDiffuse" ].texture = composerScene.renderTarget;
-
-				quadBG2 = new THREE.Mesh( plane, material2D );
-				quadBG2.position.z = -500;
-				quadBG2.scale.set( window.innerWidth, window.innerHeight, 1 );
-				scene2D.addObject( quadBG2 );
-
-				var renderScene = new THREE.RenderPass( scene2D, cameraOrtho );
+				renderScene = new THREE.TexturePass( composerScene.renderTarget );
 
 				//
 
 				composer1 = new THREE.EffectComposer( renderer );
 
 				composer1.addPass( renderScene );
-				composer1.addPass( effectBloom );
 				composer1.addPass( effectFilmBW );
 				composer1.addPass( effectVignette );
 
@@ -246,6 +241,8 @@
 
 				composer4.addPass( renderScene );
 				composer4.addPass( effectBloom );
+				composer4.addPass( effectFilm );
+				composer4.addPass( effectBleach );
 				composer4.addPass( effectVignette );
 
 				//
@@ -280,10 +277,9 @@
 				composer3.reset();
 				composer4.reset();
 
-				material2D.uniforms[ "tDiffuse" ].texture = composerScene.renderTarget;
+				renderScene.uniforms[ "tDiffuse" ].texture = composerScene.renderTarget;
 
-				quadBG1.scale.set( window.innerWidth, window.innerHeight, 1 );
-				quadBG2.scale.set( window.innerWidth, window.innerHeight, 1 );
+				quadBG.scale.set( window.innerWidth, window.innerHeight, 1 );
 
 			}
 

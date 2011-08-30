@@ -35,7 +35,7 @@
 
 		<script type="text/javascript" src="js/postprocessing/EffectComposer.js"></script>
 		<script type="text/javascript" src="js/postprocessing/RenderPass.js"></script>
-		<script type="text/javascript" src="js/postprocessing/ScreenPass.js"></script>
+		<script type="text/javascript" src="js/postprocessing/ShaderPass.js"></script>
 		<script type="text/javascript" src="js/postprocessing/BloomPass.js"></script>
 
 		<script type="text/javascript" src="js/Detector.js"></script>
@@ -198,7 +198,9 @@
 
 				var renderModel = new THREE.RenderPass( scene, camera );
 				var effectBloom = new THREE.BloomPass( 1.0 );
-				var effectScreen = new THREE.ScreenPass();
+				var effectScreen = new THREE.ShaderPass( THREE.ShaderUtils.lib[ "screen" ] );
+
+				effectScreen.renderToScreen = true;
 
 				composer = new THREE.EffectComposer( renderer );
 

@@ -2,12 +2,14 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.ScreenPass = function( opacity ) {
+THREE.TexturePass = function( texture, opacity ) {
 
 	var shader = THREE.ShaderUtils.lib[ "screen" ];
 
 	this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+
 	this.uniforms[ "opacity" ].value = ( opacity !== undefined ) ? opacity : 1.0;
+	this.uniforms[ "tDiffuse" ].texture = texture;
 
 	this.material = new THREE.MeshShaderMaterial( {
 
@@ -19,15 +21,13 @@ THREE.ScreenPass = function( opacity ) {
 
 };
 
-THREE.ScreenPass.prototype = {
+THREE.TexturePass.prototype = {
 
 	render: function ( renderer, renderTarget, delta ) {
 
-		this.uniforms[ "tDiffuse" ].texture = renderTarget;
-
 		THREE.EffectComposer.quad.materials[ 0 ] = this.material;
 
-		renderer.render( THREE.EffectComposer.scene, THREE.EffectComposer.camera );
+		renderer.render( THREE.EffectComposer.scene, THREE.EffectComposer.camera, renderTarget );
 
 	}
 

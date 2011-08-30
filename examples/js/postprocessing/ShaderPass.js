@@ -2,14 +2,11 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.VignettePass = function( offset, darkness ) {
+THREE.ShaderPass = function( shader, textureID ) {
 
-	var shader = THREE.ShaderUtils.lib[ "vignette" ];
+	this.textureID = ( textureID !== undefined ) ? textureID : "tDiffuse";
 
 	this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
-
-	if ( offset !== undefined )	this.uniforms[ "offset"].value = offset;
-	if ( darkness !== undefined ) this.uniforms[ "darkness"].value = darkness;
 
 	this.material = new THREE.MeshShaderMaterial( {
 
@@ -23,11 +20,11 @@ THREE.VignettePass = function( offset, darkness ) {
 
 };
 
-THREE.VignettePass.prototype = {
+THREE.ShaderPass.prototype = {
 
 	render: function ( renderer, renderTarget, delta ) {
 
-		this.uniforms[ "tDiffuse" ].texture = renderTarget;
+		this.uniforms[ this.textureID ].texture = renderTarget;
 
 		THREE.EffectComposer.quad.materials[ 0 ] = this.material;
 

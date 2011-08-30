@@ -420,14 +420,15 @@ THREE.ShaderUtils = {
 
 			vertexShader: [
 
-				"varying vec2 vUv;",
-
-				"uniform vec2 uImageIncrement;",
 				//"#define KERNEL_SIZE 25.0",
 
-				"void main(void) {",
+				"uniform vec2 uImageIncrement;",
 
-					"vUv = uv - ((KERNEL_SIZE - 1.0) / 2.0) * uImageIncrement;",
+				"varying vec2 vUv;",
+
+				"void main() {",
+
+					"vUv = uv - ( ( KERNEL_SIZE - 1.0 ) / 2.0 ) * uImageIncrement;",
 					"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
 				"}"
@@ -436,22 +437,26 @@ THREE.ShaderUtils = {
 
 			fragmentShader: [
 
-				"varying vec2 vUv;",
+				//"#define KERNEL_SIZE 25",
+				"uniform float cKernel[ KERNEL_SIZE ];",
 
 				"uniform sampler2D tDiffuse;",
 				"uniform vec2 uImageIncrement;",
 
-				//"#define KERNEL_SIZE 25",
-				"uniform float cKernel[KERNEL_SIZE];",
+				"varying vec2 vUv;",
 
-				"void main(void) {",
+				"void main() {",
 
 					"vec2 imageCoord = vUv;",
 					"vec4 sum = vec4( 0.0, 0.0, 0.0, 0.0 );",
-					"for( int i=0; i<KERNEL_SIZE; ++i ) {",
-						"sum += texture2D( tDiffuse, imageCoord ) * cKernel[i];",
+
+					"for( int i = 0; i < KERNEL_SIZE; i ++ ) {",
+
+						"sum += texture2D( tDiffuse, imageCoord ) * cKernel[ i ];",
 						"imageCoord += uImageIncrement;",
+
 					"}",
+
 					"gl_FragColor = sum;",
 
 				"}"
@@ -510,9 +515,6 @@ THREE.ShaderUtils = {
 
 			fragmentShader: [
 
-				"varying vec2 vUv;",
-				"uniform sampler2D tDiffuse;",
-
 				// control parameter
 				"uniform float time;",
 
@@ -526,6 +528,10 @@ THREE.ShaderUtils = {
 
 				// scanlines effect count value (0 = no effect, 4096 = full effect)
 				"uniform float sCount;",
+
+				"uniform sampler2D tDiffuse;",
+
+				"varying vec2 vUv;",
 
 				"void main() {",
 
@@ -551,7 +557,9 @@ THREE.ShaderUtils = {
 
 					// convert to grayscale if desired
 					"if( grayscale ) {",
+
 						"cResult = vec3( cResult.r * 0.3 + cResult.g * 0.59 + cResult.b * 0.11 );",
+
 					"}",
 
 					"gl_FragColor =  vec4( cResult, cTextureScreen.a );",
@@ -595,8 +603,9 @@ THREE.ShaderUtils = {
 
 				"uniform float amount;",
 
-				"varying vec2 vUv;",
 				"uniform sampler2D tDiffuse;",
+
+				"varying vec2 vUv;",
 
 				"void main() {",
 
@@ -653,8 +662,9 @@ THREE.ShaderUtils = {
 				"uniform float scale;",
 				"uniform vec2 tSize;",
 
-				"varying vec2 vUv;",
 				"uniform sampler2D tDiffuse;",
+
+				"varying vec2 vUv;",
 
 				"float pattern() {",
 
@@ -715,8 +725,9 @@ THREE.ShaderUtils = {
 				"uniform float offset;",
 				"uniform float darkness;",
 
-				"varying vec2 vUv;",
 				"uniform sampler2D tDiffuse;",
+
+				"varying vec2 vUv;",
 
 				"void main() {",
 
@@ -735,6 +746,69 @@ THREE.ShaderUtils = {
 					"color.rgb *= smoothstep( 0.8, offset * 0.799, dist *( darkness + offset ) );",
 					"gl_FragColor = color;",
 					*/
+
+				"}"
+
+			].join("\n")
+
+		},
+
+		/* -------------------------------------------------------------------------
+		//	Bleach bypass shader [http://en.wikipedia.org/wiki/Bleach_bypass]
+		//	- based on Nvidia example
+		//		http://developer.download.nvidia.com/shaderlibrary/webpages/shader_library.html#post_bleach_bypass
+		 ------------------------------------------------------------------------- */
+
+		'bleachbypass': {
+
+			uniforms: {
+
+				tDiffuse: { type: "t", value: 0, texture: null },
+				opacity:  { type: "f", value: 1.0 }
+
+			},
+
+			vertexShader: [
+
+				"varying vec2 vUv;",
+
+				"void main() {",
+
+					"vUv = vec2( uv.x, 1.0 - uv.y );",
+					"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+
+				"}"
+
+			].join("\n"),
+
+			fragmentShader: [
+
+				"uniform float opacity;",
+
+				"uniform sampler2D tDiffuse;",
+
+				"varying vec2 vUv;",
+
+				"void main() {",
+
+					"vec4 base = texture2D( tDiffuse, vUv );",
+
+					"vec3 lumCoeff = vec3( 0.25, 0.65, 0.1 );",
+					"float lum = dot( lumCoeff, base.rgb );",
+					"vec3 blend = vec3( lum );",
+
+					"float L = min( 1.0, max( 0.0, 10.0 * ( lum - 0.45 ) ) );",
+
+					"vec3 result1 = 2.0 * base.rgb * blend;",
+					"vec3 result2 = 1.0 - 2.0 * ( 1.0 - blend ) * ( 1.0 - base.rgb );",
+
+					"vec3 newColor = mix( result1, result2, L );",
+
+					"float A2 = opacity * base.a;",
+					"vec3 mixRGB = A2 * newColor.rgb;",
+					"mixRGB += ( ( 1.0 - A2 ) * base.rgb );",
+
+					"gl_FragColor = vec4( mixRGB, base.a );",
 
 				"}"
 
@@ -770,9 +844,11 @@ THREE.ShaderUtils = {
 
 			fragmentShader: [
 
-				"varying vec2 vUv;",
-				"uniform sampler2D tDiffuse;",
 				"uniform float opacity;",
+
+				"uniform sampler2D tDiffuse;",
+
+				"varying vec2 vUv;",
 
 				"void main() {",
 
