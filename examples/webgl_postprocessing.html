@@ -17,8 +17,8 @@
 		    }
 
 		    #info {
-			color:#000;
-			background-color: rgba( 255, 255, 255, 0.95 );
+			color:#fff;
+			background-color: rgba( 0, 0, 0, 0.5 );
 			position: relative;
 			margin: 0 auto -2em;
 			top: 0px;
@@ -48,6 +48,7 @@
 		<script type="text/javascript" src="js/postprocessing/SepiaPass.js"></script>
 		<script type="text/javascript" src="js/postprocessing/DotScreenPass.js"></script>
 		<script type="text/javascript" src="js/postprocessing/ScreenPass.js"></script>
+		<script type="text/javascript" src="js/postprocessing/VignettePass.js"></script>
 
 		<script type="text/javascript" src="js/Detector.js"></script>
 		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
@@ -62,7 +63,8 @@
 
 			void main() {
 
-				gl_FragColor = vec4( time, vUv.x, vUv.y, 1.0 );
+				//gl_FragColor = vec4( time, vUv.x, vUv.y, 1.0 );
+				gl_FragColor = vec4( 0.2, 0.4, 0.5, 1.0 );
 
 			}
 
@@ -155,23 +157,27 @@
 
 				container.appendChild( renderer.domElement );
 
+				//
+
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				//container.appendChild( stats.domElement );
 
 				//
 
 				var effectBloom = new THREE.BloomPass( 0.75 );
-				var effectFilm = new THREE.FilmPass( 0.35, 0.5, 2048, false );
+				var effectFilm = new THREE.FilmPass( 0.75, 0.025, 648, false );
 				var effectFilmBW = new THREE.FilmPass( 0.35, 0.5, 2048, true );
 				var effectSepia = new THREE.SepiaPass( 1.0 );
 				var effectScreen = new THREE.ScreenPass();
 				var effectDotScreen = new THREE.DotScreenPass( new THREE.Vector2( 0, 0 ), 0.5, 0.4 );
+				var effectVignette = new THREE.VignettePass( 0.95, 1.6 );
 
-				effectFilm.renderToScreen = true;
-				effectFilmBW.renderToScreen = true;
-				effectDotScreen.renderToScreen = true;
+				//effectFilm.renderToScreen = true;
+				//effectFilmBW.renderToScreen = true;
+				//effectDotScreen.renderToScreen = true;
+				effectVignette.renderToScreen = true;
 
 				//
 
@@ -215,6 +221,7 @@
 				composer1.addPass( renderScene );
 				composer1.addPass( effectBloom );
 				composer1.addPass( effectFilmBW );
+				composer1.addPass( effectVignette );
 
 				//
 
@@ -222,6 +229,7 @@
 
 				composer2.addPass( renderScene );
 				composer2.addPass( effectDotScreen );
+				composer2.addPass( effectVignette );
 
 				//
 
@@ -230,6 +238,7 @@
 				composer3.addPass( renderScene );
 				composer3.addPass( effectSepia );
 				composer3.addPass( effectFilm );
+				composer3.addPass( effectVignette );
 
 				//
 
@@ -237,8 +246,7 @@
 
 				composer4.addPass( renderScene );
 				composer4.addPass( effectBloom );
-				composer4.addPass( effectSepia );
-				composer4.addPass( effectScreen );
+				composer4.addPass( effectVignette );
 
 				//
 
