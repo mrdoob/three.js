@@ -41,6 +41,7 @@
 		<script type="text/javascript" src="js/postprocessing/RenderPass.js"></script>
 		<script type="text/javascript" src="js/postprocessing/BloomPass.js"></script>
 		<script type="text/javascript" src="js/postprocessing/FilmPass.js"></script>
+		<script type="text/javascript" src="js/postprocessing/SepiaPass.js"></script>
 
 		<script type="text/javascript" src="js/Detector.js"></script>
 		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
@@ -156,8 +157,9 @@
 
 				var renderBackground = new THREE.RenderPass( sceneBG, cameraOrtho );
 				var renderModel = new THREE.RenderPass( sceneModel, cameraPerspective );
-				var effectBloom = new THREE.BloomPass( 1.0 );
-				var effectFilm = new THREE.FilmPass( 0.25, 0.5 );
+				var effectBloom = new THREE.BloomPass( 0.75 );
+				var effectFilm = new THREE.FilmPass( 0.35, 0.5, 2048, false );
+				var effectSepia = new THREE.SepiaPass( 1.0 );
 
 				renderModel.clear = false;
 				effectFilm.renderToScreen = true;
@@ -167,7 +169,32 @@
 				composer.addPass( renderBackground );
 				composer.addPass( renderModel );
 				composer.addPass( effectBloom );
+				composer.addPass( effectSepia );
 				composer.addPass( effectFilm );
+
+				//
+
+				onWindowResize();
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize( event ) {
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				cameraPerspective.aspect = window.innerWidth / window.innerHeight;
+				cameraPerspective.updateProjectionMatrix();
+
+				cameraOrtho.left = window.innerWidth / - 2;
+				cameraOrtho.right = window.innerWidth / 2;
+				cameraOrtho.top = window.innerHeight / 2;
+				cameraOrtho.bottom = window.innerHeight / - 2;
+
+				cameraOrtho.updateProjectionMatrix();
+
+				composer.reset();
 
 			}
 
