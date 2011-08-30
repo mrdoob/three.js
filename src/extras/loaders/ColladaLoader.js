@@ -2,7 +2,7 @@
  * @author Tim Knip / http://www.floorplanner.com/ / tim at floorplanner.com
  */
 
-var DAE = (function() {
+var ColladaLoader = function() {
 	var COLLADA = null;
 	var scene = null;
 	var daeScene;
@@ -20,7 +20,7 @@ var DAE = (function() {
 	var morphs;
 	var skins;
 	var preferredShading = THREE.SmoothShading;
-	
+
 	function load(url, readyCallback) {
 		if (document.implementation && document.implementation.createDocument) {
 			var namespaceURL = "http://www.collada.org/2005/11/COLLADASchema";
@@ -40,7 +40,7 @@ var DAE = (function() {
 			req.onreadystatechange = function() {
 				if(req.readyState == 4) {
 					if(req.status == 0 || req.status == 200) {
-						
+
 						readyCallbackFunc = readyCallback;
 						parse(req.responseXML, undefined, url);
 					}
@@ -2027,4 +2027,4 @@ var DAE = (function() {
 		applySkin: applySkin,
 		geometries : geometries
 	};
-})();
+};

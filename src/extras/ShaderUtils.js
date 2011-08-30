@@ -562,6 +562,186 @@ THREE.ShaderUtils = {
 
 		},
 
+
+		/* -------------------------------------------------------------------------
+		//	Sepia tone shader
+		//  - based on glfx.js sepia shader
+		//		https://github.com/evanw/glfx.js
+		 ------------------------------------------------------------------------- */
+
+		'sepia': {
+
+			uniforms: {
+
+				tDiffuse: { type: "t", value: 0, texture: null },
+				amount:   { type: "f", value: 1.0 }
+
+			},
+
+			vertexShader: [
+
+				"varying vec2 vUv;",
+
+				"void main() {",
+
+					"vUv = vec2( uv.x, 1.0 - uv.y );",
+					"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+
+				"}"
+
+			].join("\n"),
+
+			fragmentShader: [
+
+				"uniform float amount;",
+
+				"varying vec2 vUv;",
+				"uniform sampler2D tDiffuse;",
+
+				"void main() {",
+
+					"vec4 color = texture2D( tDiffuse, vUv );",
+					"vec3 c = color.rgb;",
+
+					"color.r = dot( c, vec3( 1.0 - 0.607 * amount, 0.769 * amount, 0.189 * amount ) );",
+					"color.g = dot( c, vec3( 0.349 * amount, 1.0 - 0.314 * amount, 0.168 * amount ) );",
+					"color.b = dot( c, vec3( 0.272 * amount, 0.534 * amount, 1.0 - 0.869 * amount ) );",
+
+					"gl_FragColor = vec4( min( vec3( 1.0 ), color.rgb ), color.a );",
+
+				"}"
+
+			].join("\n")
+
+		},
+
+		/* -------------------------------------------------------------------------
+		//	Dot screen shader
+		//  - based on glfx.js sepia shader
+		//		https://github.com/evanw/glfx.js
+		 ------------------------------------------------------------------------- */
+
+		'dotscreen': {
+
+			uniforms: {
+
+				tDiffuse: { type: "t", value: 0, texture: null },
+				tSize:    { type: "v2", value: new THREE.Vector2( 256, 256 ) },
+				center:   { type: "v2", value: new THREE.Vector2( 0.5, 0.5 ) },
+				angle:	  { type: "f", value: 1.57 },
+				scale:	  { type: "f", value: 1.0 }
+
+			},
+
+			vertexShader: [
+
+				"varying vec2 vUv;",
+
+				"void main() {",
+
+					"vUv = vec2( uv.x, 1.0 - uv.y );",
+					"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+
+				"}"
+
+			].join("\n"),
+
+			fragmentShader: [
+
+				"uniform vec2 center;",
+				"uniform float angle;",
+				"uniform float scale;",
+				"uniform vec2 tSize;",
+
+				"varying vec2 vUv;",
+				"uniform sampler2D tDiffuse;",
+
+				"float pattern() {",
+
+					"float s = sin( angle ), c = cos( angle );",
+
+					"vec2 tex = vUv * tSize - center;",
+					"vec2 point = vec2( c * tex.x - s * tex.y, s * tex.x + c * tex.y ) * scale;",
+
+					"return ( sin( point.x ) * sin( point.y ) ) * 4.0;",
+
+				"}",
+
+				"void main() {",
+
+					"vec4 color = texture2D( tDiffuse, vUv );",
+
+					"float average = ( color.r + color.g + color.b ) / 3.0;",
+
+					"gl_FragColor = vec4( vec3( average * 10.0 - 5.0 + pattern() ), color.a );",
+
+				"}"
+
+			].join("\n")
+
+		},
+
+		/* ------------------------------------------------------------------------------------------------
+		//	Vignette shader
+		//	- based on PaintEffect postprocess from ro.me
+		//		http://code.google.com/p/3-dreams-of-black/source/browse/deploy/js/effects/PaintEffect.js
+		 ------------------------------------------------------------------------------------------------ */
+
+		'vignette': {
+
+			uniforms: {
+
+				tDiffuse: { type: "t", value: 0, texture: null },
+				offset:   { type: "f", value: 1.0 },
+				darkness: { type: "f", value: 1.0 }
+
+			},
+
+			vertexShader: [
+
+				"varying vec2 vUv;",
+
+				"void main() {",
+
+					"vUv = vec2( uv.x, 1.0 - uv.y );",
+					"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+
+				"}"
+
+			].join("\n"),
+
+			fragmentShader: [
+
+				"uniform float offset;",
+				"uniform float darkness;",
+
+				"varying vec2 vUv;",
+				"uniform sampler2D tDiffuse;",
+
+				"void main() {",
+
+					// Eskil's vignette
+
+					"vec4 texel = texture2D( tDiffuse, vUv );",
+					"vec2 uv = ( vUv - vec2( 0.5 ) ) * vec2( offset );",
+					"gl_FragColor = vec4( mix( texel.rgb, vec3( 1.0 - darkness ), dot( uv, uv ) ), texel.a );",
+
+					/*
+					// alternative version from glfx.js
+					// this one makes more "dusty" look (as opposed to "burned")
+
+					"vec4 color = texture2D( tDiffuse, vUv );",
+					"float dist = distance( vUv, vec2( 0.5 ) );",
+					"color.rgb *= smoothstep( 0.8, offset * 0.799, dist *( darkness + offset ) );",
+					"gl_FragColor = color;",
+					*/
+
+				"}"
+
+			].join("\n")
+
+		},
+
 		/* -------------------------------------------------------------------------
 		//	Full-screen textured quad shader
 		 ------------------------------------------------------------------------- */
@@ -571,7 +751,7 @@ THREE.ShaderUtils = {
 			uniforms: {
 
 				tDiffuse: { type: "t", value: 0, texture: null },
-				opacity: { type: "f", value: 1.0 }
+				opacity:  { type: "f", value: 1.0 }
 
 			},
 

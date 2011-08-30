@@ -21,7 +21,7 @@
 		<script type="text/javascript" src="js/Detector.js"></script>
 		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
-		<script type="text/javascript" src="../src/extras/collada/dae.js"></script>
+		<script type="text/javascript" src="../src/extras/loaders/ColladaLoader.js"></script>
 
 		<script type="text/javascript">
 
@@ -33,9 +33,8 @@
 			var particleLight, pointLight;
 			var dae, skin;
 
-			DAE.load( './models/monster.dae', colladaReady );
-
-			function colladaReady( collada ) {
+			var loader = new ColladaLoader();
+			loader.load( './models/monster.dae', function colladaReady( collada ) {
 
 				dae = collada.scene;
 				skin = collada.skins[ 0 ];
@@ -47,7 +46,7 @@
 				init();
 				animate();
 
-			}
+			} );
 
 			function init() {
 

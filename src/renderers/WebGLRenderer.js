@@ -5065,7 +5065,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		var framebuffer, width, height;
+		var framebuffer, width, height, vx, vy;
 
 		if ( renderTexture ) {
 
@@ -5082,18 +5082,23 @@ THREE.WebGLRenderer = function ( parameters ) {
 			width = renderTexture.width;
 			height = renderTexture.height;
 
+			vx = 0;
+			vy = 0;
+
 		} else {
 
 			framebuffer = null;
 			width = _viewportWidth;
 			height = _viewportHeight;
+			vx = _viewportX;
+			vy = _viewportY;
 
 		}
 
 		if ( framebuffer != _currentFramebuffer ) {
 
 			_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
-			_gl.viewport( _viewportX, _viewportY, width, height );
+			_gl.viewport( vx, vy, width, height );
 
 			_currentFramebuffer = framebuffer;
 

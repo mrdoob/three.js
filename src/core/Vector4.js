@@ -7,14 +7,10 @@
 
 THREE.Vector4 = function ( x, y, z, w ) {
 
-	this.set(
-
-		x || 0,
-		y || 0,
-		z || 0,
-		w || 1
-
-	);
+	this.x = x || 0;
+	this.y = y || 0;
+	this.z = z || 0;
+	this.w = w || 1;
 
 };
 
@@ -35,14 +31,10 @@ THREE.Vector4.prototype = {
 
 	copy: function ( v ) {
 
-		return this.set(
-
-			v.x,
-			v.y,
-			v.z,
-			v.w || 1.0
-
-		);
+		this.x = v.x;
+		this.y = v.y;
+		this.z = v.z;
+		this.w = v.w || 1;
 
 	},
 
@@ -119,7 +111,10 @@ THREE.Vector4.prototype = {
 
 		} else {
 
-			this.set( 0, 0, 0, 1 );
+			this.x = 0;
+			this.y = 0;
+			this.z = 0;
+			this.w = 1;
 
 		}
 
@@ -167,10 +162,10 @@ THREE.Vector4.prototype = {
 
 	lerpSelf: function ( v, alpha ) {
 
-		this.x += (v.x - this.x) * alpha;
-		this.y += (v.y - this.y) * alpha;
-		this.z += (v.z - this.z) * alpha;
-		this.w += (v.w - this.w) * alpha;
+		this.x += ( v.x - this.x ) * alpha;
+		this.y += ( v.y - this.y ) * alpha;
+		this.z += ( v.z - this.z ) * alpha;
+		this.w += ( v.w - this.w ) * alpha;
 
 		return this;
 
