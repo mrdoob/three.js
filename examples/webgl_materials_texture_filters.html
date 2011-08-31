@@ -109,6 +109,7 @@
 
 				context.fillStyle = "#444";
 				context.fillRect( 0, 0, 128, 128 );
+
 				context.fillStyle = "#fff";
 				context.fillRect( 0, 0, 64, 64);
 				context.fillRect( 64, 64, 64, 64 );
@@ -117,36 +118,25 @@
 					materialCanvas = new THREE.MeshBasicMaterial( { map: textureCanvas } );
 
 				textureCanvas.needsUpdate = true;
+				textureCanvas.repeat.set( 1000, 1000 );
 
 				var textureCanvas2 = new THREE.Texture( imageCanvas, THREE.UVMapping, THREE.RepeatWrapping, THREE.RepeatWrapping, THREE.NearestFilter, THREE.NearestFilter );
-					materialCanvas2 = new THREE.MeshBasicMaterial( { color:0xffccaa, map: textureCanvas2 } );
+					materialCanvas2 = new THREE.MeshBasicMaterial( { color: 0xffccaa, map: textureCanvas2 } );
 
 				textureCanvas2.needsUpdate = true;
+				textureCanvas2.repeat.set( 1000, 1000 );
 
-				var i, j, uvs, geometryRepeat = new THREE.PlaneGeometry( 100, 100, 1, 1 );
-
-				for ( i = 0; i < geometryRepeat.faceVertexUvs[ 0 ].length; i ++ ) {
-
-					uvs = geometryRepeat.faceVertexUvs[ 0 ][ i ];
-
-					for ( j = 0; j < uvs.length; j ++ ) {
-
-						uvs[ j ].u *= 1000;
-						uvs[ j ].v *= 1000;
-
-					}
-
-				}
+				var geometry = new THREE.PlaneGeometry( 100, 100 );
 
 
-				var meshCanvas = new THREE.Mesh( geometryRepeat, materialCanvas );
+				var meshCanvas = new THREE.Mesh( geometry, materialCanvas );
 				meshCanvas.rotation.x = Math.PI / 2;
-				meshCanvas.scale.x = meshCanvas.scale.y = meshCanvas.scale.z = 1000;
+				meshCanvas.scale.set( 1000, 1000, 1000 );
 				meshCanvas.doubleSided = true;
 
-				var meshCanvas2 = new THREE.Mesh( geometryRepeat, materialCanvas2 );
+				var meshCanvas2 = new THREE.Mesh( geometry, materialCanvas2 );
 				meshCanvas2.rotation.x = Math.PI / 2;
-				meshCanvas2.scale.x = meshCanvas2.scale.y = meshCanvas2.scale.z = 1000;
+				meshCanvas2.scale.set( 1000, 1000, 1000 );
 				meshCanvas2.doubleSided = true;
 
 
@@ -160,7 +150,7 @@
 					scene.addObject( meshCanvas );
 					scene2.addObject( meshCanvas2 );
 
-					var geometry = new THREE.PlaneGeometry( 100, 100, 1, 1 ),
+					var geometry = new THREE.PlaneGeometry( 100, 100 ),
 						mesh = new THREE.Mesh( geometry, materialPainting ),
 						mesh2 = new THREE.Mesh( geometry, materialPainting2 );
 
@@ -174,15 +164,14 @@
 
 						zscene.addObject( zmesh );
 
-						var meshFrame = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x000000 } )  );
+						var meshFrame = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x000000, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 5 } )  );
 
-						meshFrame.position.z = -0.5;
 						meshFrame.scale.x = 1.1 * image.width / 100;
 						meshFrame.scale.y = 1.1 * image.height / 100;
 
 						zscene.addObject( meshFrame );
 
-						var meshShadow = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 0.9 } )  );
+						var meshShadow = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 0.9, transparent: true } )  );
 
 						meshShadow.position.z = - 1.1 * image.height/2;
 						meshShadow.scale.x = 1.1 * image.width / 100;
@@ -202,8 +191,8 @@
 
 				var texturePainting = THREE.ImageUtils.loadTexture( "textures/758px-Canestra_di_frutta_(Caravaggio).jpg", THREE.UVMapping, callbackPainting ),
 					texturePainting2 = new THREE.Texture(),
-					materialPainting = new THREE.MeshBasicMaterial( { color:0xffffff, map: texturePainting } ),
-					materialPainting2 = new THREE.MeshBasicMaterial( { color:0xffccaa, map: texturePainting2 } );
+					materialPainting = new THREE.MeshBasicMaterial( { color: 0xffffff, map: texturePainting } ),
+					materialPainting2 = new THREE.MeshBasicMaterial( { color: 0xffccaa, map: texturePainting2 } );
 
 				texturePainting2.minFilter = texturePainting2.magFilter = THREE.NearestFilter;
 				texturePainting.minFilter = texturePainting.magFilter = THREE.LinearFilter;
@@ -211,11 +200,11 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				renderer.domElement.style.position = "relative";
-				container.appendChild( renderer.domElement );
-
 				renderer.setClearColor( scene.fog.color, 1 );
 				renderer.autoClear = false;
+
+				renderer.domElement.style.position = "relative";
+				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
