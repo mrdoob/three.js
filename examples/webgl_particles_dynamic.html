@@ -41,6 +41,8 @@
 
         <script type="text/javascript" src="../build/Three.js"></script>
 
+		<script type="text/javascript" src="js/ShaderExtras.js"></script>
+
         <script type="text/javascript" src="js/Stats.js"></script>
         <script type="text/javascript" src="js/Detector.js"></script>
 		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
@@ -355,7 +357,7 @@
 				effect.rtTexture2 = new THREE.WebGLRenderTarget( 256, 512, pars );
 				effect.rtTexture3 = new THREE.WebGLRenderTarget( 512, 256, pars );
 
-				var screen_shader = THREE.ShaderUtils.lib["screen"];
+				var screen_shader = THREE.ShaderExtras[ "screen" ];
 				var screen_uniforms = THREE.UniformsUtils.clone( screen_shader.uniforms );
 
 				screen_uniforms["tDiffuse"].texture = effect.rtTexture3;
@@ -371,7 +373,7 @@
 
 				} );
 
-				var convolution_shader = THREE.ShaderUtils.lib["convolution"];
+				var convolution_shader = THREE.ShaderExtras[ "convolution" ];
 				var convolution_uniforms = THREE.UniformsUtils.clone( convolution_shader.uniforms );
 
 				effect.blurx = new THREE.Vector2( 0.001953125, 0.0 ),
@@ -379,7 +381,7 @@
 
 				convolution_uniforms["tDiffuse"].texture = effect.rtTexture1;
 				convolution_uniforms["uImageIncrement"].value = effect.blurx;
-				convolution_uniforms["cKernel"].value = THREE.ShaderUtils.buildKernel( 4.0 );
+				convolution_uniforms["cKernel"].value = THREE.ShaderExtras.buildKernel( 4.0 );
 
 				effect.materialConvolution = new THREE.MeshShaderMaterial( {
 
@@ -389,7 +391,7 @@
 
 				} );
 
-				var film_shader = THREE.ShaderUtils.lib["film"];
+				var film_shader = THREE.ShaderExtras[ "film" ];
 				var film_uniforms = THREE.UniformsUtils.clone( film_shader.uniforms );
 
 				film_uniforms["tDiffuse"].texture = effect.rtTexture1;

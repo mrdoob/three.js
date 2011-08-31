@@ -18,7 +18,7 @@ THREE.BloomPass = function( strength, kernelSize, sigma, resolution ) {
 
 	// screen material
 
-	var screenShader = THREE.ShaderUtils.lib[ "screen" ];
+	var screenShader = THREE.ShaderExtras[ "screen" ];
 
 	this.screenUniforms = THREE.UniformsUtils.clone( screenShader.uniforms );
 
@@ -36,12 +36,12 @@ THREE.BloomPass = function( strength, kernelSize, sigma, resolution ) {
 
 	// convolution material
 
-	var convolutionShader = THREE.ShaderUtils.lib[ "convolution" ];
+	var convolutionShader = THREE.ShaderExtras[ "convolution" ];
 
 	this.convolutionUniforms = THREE.UniformsUtils.clone( convolutionShader.uniforms );
 
 	this.convolutionUniforms[ "uImageIncrement" ].value = THREE.BloomPass.blurx;
-	this.convolutionUniforms[ "cKernel" ].value = THREE.ShaderUtils.buildKernel( sigma );
+	this.convolutionUniforms[ "cKernel" ].value = THREE.ShaderExtras.buildKernel( sigma );
 
 	this.materialConvolution = new THREE.MeshShaderMaterial( {
 

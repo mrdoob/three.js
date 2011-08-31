@@ -4,7 +4,7 @@
 
 THREE.TexturePass = function( texture, opacity ) {
 
-	var shader = THREE.ShaderUtils.lib[ "screen" ];
+	var shader = THREE.ShaderExtras[ "screen" ];
 
 	this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 

@@ -41,6 +41,8 @@
 
 		<script type="text/javascript" src="../build/Three.js"></script>
 
+		<script type="text/javascript" src="js/ShaderExtras.js"></script>
+
 		<script type="text/javascript" src="js/postprocessing/EffectComposer.js"></script>
 		<script type="text/javascript" src="js/postprocessing/RenderPass.js"></script>
 		<script type="text/javascript" src="js/postprocessing/BloomPass.js"></script>
@@ -165,10 +167,10 @@
 
 				//
 
-				var shaderBleach = THREE.ShaderUtils.lib[ "bleachbypass" ];
-				var shaderSepia = THREE.ShaderUtils.lib[ "sepia" ];
-				var shaderVignette = THREE.ShaderUtils.lib[ "vignette" ];
-				var shaderScreen = THREE.ShaderUtils.lib[ "screen" ];
+				var shaderBleach = THREE.ShaderExtras[ "bleachbypass" ];
+				var shaderSepia = THREE.ShaderExtras[ "sepia" ];
+				var shaderVignette = THREE.ShaderExtras[ "vignette" ];
+				var shaderScreen = THREE.ShaderExtras[ "screen" ];
 
 				var effectBleach = new THREE.ShaderPass( shaderBleach );
 				var effectSepia = new THREE.ShaderPass( shaderSepia );

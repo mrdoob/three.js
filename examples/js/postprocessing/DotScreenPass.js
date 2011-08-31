@@ -4,7 +4,7 @@
 
 THREE.DotScreenPass = function( center, angle, scale ) {
 
-	var shader = THREE.ShaderUtils.lib[ "dotscreen" ];
+	var shader = THREE.ShaderExtras[ "dotscreen" ];
 
 	this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
