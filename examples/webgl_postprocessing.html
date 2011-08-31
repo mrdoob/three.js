@@ -102,6 +102,8 @@
 
 			var materialColor, material2D, quadBG, renderScene;
 
+			var rtParameters;
+
 			var delta = 0.01;
 
 			init();
@@ -187,7 +189,7 @@
 				var effectBloom = new THREE.BloomPass( 0.5 );
 				var effectFilm = new THREE.FilmPass( 0.5, 0.025, 648, false );
 				var effectFilmBW = new THREE.FilmPass( 0.35, 0.5, 2048, true );
-				var effectDotScreen = new THREE.DotScreenPass( new THREE.Vector2( 0, 0 ), 0.5, 0.4 );
+				var effectDotScreen = new THREE.DotScreenPass( new THREE.Vector2( 0, 0 ), 0.5, 0.6 );
 
 				//effectFilm.renderToScreen = true;
 				//effectFilmBW.renderToScreen = true;
@@ -212,9 +214,14 @@
 
 				renderScene = new THREE.TexturePass( composerScene.renderTarget );
 
+				rtParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBufer: false };
+
+				var rtWidth  = window.innerWidth / 2;
+				var rtHeight = window.innerHeight / 2;
+
 				//
 
-				composer1 = new THREE.EffectComposer( renderer );
+				composer1 = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth, rtHeight, rtParameters ) );
 
 				composer1.addPass( renderScene );
 				composer1.addPass( effectFilmBW );
@@ -222,7 +229,7 @@
 
 				//
 
-				composer2 = new THREE.EffectComposer( renderer );
+				composer2 = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth, rtHeight, rtParameters ) );
 
 				composer2.addPass( renderScene );
 				composer2.addPass( effectDotScreen );
@@ -230,7 +237,7 @@
 
 				//
 
-				composer3 = new THREE.EffectComposer( renderer );
+				composer3 = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth, rtHeight, rtParameters ) );
 
 				composer3.addPass( renderScene );
 				composer3.addPass( effectSepia );
@@ -239,7 +246,7 @@
 
 				//
 
-				composer4 = new THREE.EffectComposer( renderer );
+				composer4 = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth, rtHeight, rtParameters ) );
 
 				composer4.addPass( renderScene );
 				composer4.addPass( effectBloom );
@@ -278,6 +285,11 @@
 				composer2.reset();
 				composer3.reset();
 				composer4.reset();
+
+				composer1.renderTarget = new THREE.WebGLRenderTarget( halfWidth, halfHeight, rtParameters );
+				composer2.renderTarget = new THREE.WebGLRenderTarget( halfWidth, halfHeight, rtParameters );
+				composer3.renderTarget = new THREE.WebGLRenderTarget( halfWidth, halfHeight, rtParameters );
+				composer4.renderTarget = new THREE.WebGLRenderTarget( halfWidth, halfHeight, rtParameters );
 
 				renderScene.uniforms[ "tDiffuse" ].texture = composerScene.renderTarget;
 
