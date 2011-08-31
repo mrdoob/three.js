@@ -19,15 +19,17 @@ THREE.TexturePass = function( texture, opacity ) {
 
 	} );
 
+	this.needsSwap = false;
+
 };
 
 THREE.TexturePass.prototype = {
 
-	render: function ( renderer, renderTarget, delta ) {
+	render: function ( renderer, writeBuffer, readBuffer, delta ) {
 
 		THREE.EffectComposer.quad.materials[ 0 ] = this.material;
 
-		renderer.render( THREE.EffectComposer.scene, THREE.EffectComposer.camera, renderTarget );
+		renderer.render( THREE.EffectComposer.scene, THREE.EffectComposer.camera, readBuffer );
 
 	}
 

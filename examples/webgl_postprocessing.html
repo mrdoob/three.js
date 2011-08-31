@@ -281,17 +281,12 @@
 
 				composerScene.reset();
 
-				composer1.reset();
-				composer2.reset();
-				composer3.reset();
-				composer4.reset();
+				composer1.reset( new THREE.WebGLRenderTarget( halfWidth, halfHeight, rtParameters ) );
+				composer2.reset( new THREE.WebGLRenderTarget( halfWidth, halfHeight, rtParameters ) );
+				composer3.reset( new THREE.WebGLRenderTarget( halfWidth, halfHeight, rtParameters ) );
+				composer4.reset( new THREE.WebGLRenderTarget( halfWidth, halfHeight, rtParameters ) );
 
-				composer1.renderTarget = new THREE.WebGLRenderTarget( halfWidth, halfHeight, rtParameters );
-				composer2.renderTarget = new THREE.WebGLRenderTarget( halfWidth, halfHeight, rtParameters );
-				composer3.renderTarget = new THREE.WebGLRenderTarget( halfWidth, halfHeight, rtParameters );
-				composer4.renderTarget = new THREE.WebGLRenderTarget( halfWidth, halfHeight, rtParameters );
-
-				renderScene.uniforms[ "tDiffuse" ].texture = composerScene.renderTarget;
+				renderScene.uniforms[ "tDiffuse" ].texture = composerScene.renderTarget2;
 
 				quadBG.scale.set( window.innerWidth, window.innerHeight, 1 );
 

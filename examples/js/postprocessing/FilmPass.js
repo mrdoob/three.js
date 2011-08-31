@@ -22,14 +22,15 @@ THREE.FilmPass = function( noiseIntensity, scanlinesIntensity, scanlinesCount, g
 	if ( scanlinesCount !== undefined ) this.uniforms.sCount.value = scanlinesCount;
 
 	this.renderToScreen = false;
+	this.needsSwap = true;
 
 };
 
 THREE.FilmPass.prototype = {
 
-	render: function ( renderer, renderTarget, delta ) {
+	render: function ( renderer, writeBuffer, readBuffer, delta ) {
 
-		this.uniforms[ "tDiffuse" ].texture = renderTarget;
+		this.uniforms[ "tDiffuse" ].texture = readBuffer;
 		this.uniforms[ "time" ].value += delta;
 
 		THREE.EffectComposer.quad.materials[ 0 ] = this.material;
@@ -40,7 +41,7 @@ THREE.FilmPass.prototype = {
 
 		} else {
 
-			renderer.render( THREE.EffectComposer.scene, THREE.EffectComposer.camera, renderTarget, false );
+			renderer.render( THREE.EffectComposer.scene, THREE.EffectComposer.camera, writeBuffer, false );
 
 		}
 

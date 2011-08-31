@@ -17,14 +17,15 @@ THREE.ShaderPass = function( shader, textureID ) {
 	} );
 
 	this.renderToScreen = false;
+	this.needsSwap = true;
 
 };
 
 THREE.ShaderPass.prototype = {
 
-	render: function ( renderer, renderTarget, delta ) {
+	render: function ( renderer, writeBuffer, readBuffer, delta ) {
 
-		this.uniforms[ this.textureID ].texture = renderTarget;
+		this.uniforms[ this.textureID ].texture = readBuffer;
 
 		THREE.EffectComposer.quad.materials[ 0 ] = this.material;
 
@@ -34,7 +35,7 @@ THREE.ShaderPass.prototype = {
 
 		} else {
 
-			renderer.render( THREE.EffectComposer.scene, THREE.EffectComposer.camera, renderTarget, false );
+			renderer.render( THREE.EffectComposer.scene, THREE.EffectComposer.camera, writeBuffer, false );
 
 		}
 
