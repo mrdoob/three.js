@@ -541,11 +541,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( geometryGroup.numMorphTargets ) {
 
-			var m, ml;
-
-			geometryGroup.__webglMorphTargetsBuffers = [];
-
-			for ( m = 0, ml = geometryGroup.numMorphTargets; m < ml; m ++ ) {
+			for ( var m = 0, ml = geometryGroup.numMorphTargets; m < ml; m ++ ) {
 
 				_gl.deleteBuffer( geometryGroup.__webglMorphTargetsBuffers[ m ] );
 
