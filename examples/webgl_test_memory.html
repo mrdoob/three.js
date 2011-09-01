@@ -1,0 +1,95 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>three.js - webgl</title>
+		<meta charset="utf-8">
+		<style type="text/css">
+			body {
+				background:#fff;
+				padding:0;
+				margin:0;
+				overflow:hidden;
+			}
+
+		</style>
+	</head>
+
+	<body>
+
+		<script type="text/javascript" src="../build/Three.js"></script>
+
+		<script type="text/javascript">
+
+			var container;
+
+			var camera, scene, renderer;
+
+			init();
+			setInterval( render, 1000 / 60 );
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.Camera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.z = 200;
+
+				scene = new THREE.Scene();
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+			}
+
+			function createImage() {
+
+				var canvas = document.createElement( 'canvas' );
+				canvas.width = 256;
+				canvas.height = 256;
+
+				var context = canvas.getContext( '2d' );
+				context.fillStyle = 'rgb(' + Math.floor( Math.random() * 256 ) + ',' + Math.floor( Math.random() * 256 ) + ',' + Math.floor( Math.random() * 256 ) + ')';
+				context.fillRect( 0, 0, 256, 256 );
+
+				return canvas;
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+
+			}
+
+			function render() {
+
+				var geometry = new THREE.SphereGeometry( 50, Math.random() * 64, Math.random() * 32 );
+
+				var texture = new THREE.Texture( createImage() );
+				texture.needsUpdate = true;
+
+				var material = new THREE.MeshBasicMaterial( { map: texture, wireframe: true } )
+
+				var mesh = new THREE.Mesh( geometry, material );
+
+				scene.addObject( mesh );
+
+				renderer.render( scene, camera );
+
+				scene.removeObject( mesh );
+
+				renderer.deallocateObject( mesh );
+				renderer.deallocateTexture( texture );
+
+			}
+
+		</script>
+
+	</body>
+</html>
