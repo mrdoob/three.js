@@ -51,17 +51,19 @@ THREE.BloomPass = function( strength, kernelSize, sigma, resolution ) {
 
 	} );
 
+	this.needsSwap = false;
+
 };
 
 THREE.BloomPass.prototype = {
 
-	render: function ( renderer, renderTarget, delta ) {
+	render: function ( renderer, writeBuffer, readBuffer, delta ) {
 
 		// Render quad with blured scene into texture (convolution pass 1)
 
 		THREE.EffectComposer.quad.materials[ 0 ] = this.materialConvolution;
 
-		this.convolutionUniforms[ "tDiffuse" ].texture = renderTarget;
+		this.convolutionUniforms[ "tDiffuse" ].texture = readBuffer;
 		this.convolutionUniforms[ "uImageIncrement" ].value = THREE.BloomPass.blurX;
 
 		renderer.render( THREE.EffectComposer.scene, THREE.EffectComposer.camera, this.renderTargetX, true );
@@ -79,7 +81,7 @@ THREE.BloomPass.prototype = {
 
 		this.screenUniforms[ "tDiffuse" ].texture = this.renderTargetY;
 
-		renderer.render( THREE.EffectComposer.scene, THREE.EffectComposer.camera, renderTarget, false );
+		renderer.render( THREE.EffectComposer.scene, THREE.EffectComposer.camera, readBuffer, false );
 
 	}
 
