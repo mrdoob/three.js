@@ -138,6 +138,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	_gl.clearColor( 0, 0, 0, 1 );
 	_gl.clearDepth( 1 );
+	_gl.clearStencil( 0 );
 
 	_gl.enable( _gl.DEPTH_TEST );
 	_gl.depthFunc( _gl.LEQUAL );
@@ -3450,6 +3451,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 		}
+
+	};
+
+	this.clearTarget = function ( renderTarget, colorBit, depthBit, stencilBit ) {
+
+		setRenderTarget( renderTarget );
+
+		var bits = 0;
+
+		if ( colorBit ) bits |= _gl.COLOR_BUFFER_BIT;
+		if ( depthBit ) bits |= _gl.DEPTH_BUFFER_BIT;
+		if ( stencilBit ) bits |= _gl.STENCIL_BUFFER_BIT;
+
+		_gl.clear( bits );
 
 	};
 

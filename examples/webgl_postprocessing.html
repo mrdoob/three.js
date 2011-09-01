@@ -41,6 +41,7 @@
 
 		<script type="text/javascript" src="../build/Three.js"></script>
 
+
 		<script type="text/javascript" src="js/ShaderExtras.js"></script>
 
 		<script type="text/javascript" src="js/postprocessing/EffectComposer.js"></script>
@@ -50,6 +51,7 @@
 		<script type="text/javascript" src="js/postprocessing/DotScreenPass.js"></script>
 		<script type="text/javascript" src="js/postprocessing/TexturePass.js"></script>
 		<script type="text/javascript" src="js/postprocessing/ShaderPass.js"></script>
+		<script type="text/javascript" src="js/postprocessing/MaskPass.js"></script>
 
 		<script type="text/javascript" src="js/Detector.js"></script>
 		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
@@ -65,6 +67,7 @@
 			void main() {
 
 				//gl_FragColor = vec4( time, vUv.x, vUv.y, 1.0 );
+				//gl_FragColor = vec4( 0.4, 0.4, 0.4, 1.0 );
 				gl_FragColor = vec4( 0.2, 0.4, 0.5, 1.0 );
 
 			}
@@ -100,7 +103,7 @@
 			var halfWidth = window.innerWidth / 2;
 			var halfHeight = window.innerHeight / 2;
 
-			var materialColor, material2D, quadBG, renderScene;
+			var materialColor, material2D, quadBG, quadMask, renderScene;
 
 			var rtParameters;
 
@@ -154,8 +157,20 @@
 
 				//
 
+				var sceneMask = new THREE.Scene();
+
+				var plane = new THREE.PlaneGeometry( 1, 1 );
+
+				quadMask = new THREE.Mesh( plane, new THREE.MeshBasicMaterial( { color: 0xffaa00 } )  );
+				quadMask.position.z = -300;
+				quadMask.scale.set( window.innerWidth / 2, window.innerHeight/2, 1 );
+				sceneMask.addObject( quadMask );
+
+				//
+
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setClearColorHex( 0x000000, 1 );
 				renderer.autoClear = false;
 
 				container.appendChild( renderer.domElement );
@@ -165,7 +180,7 @@
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				//container.appendChild( stats.domElement );
 
 				//
 
@@ -181,7 +196,7 @@
 
 				effectBleach.uniforms[ "opacity" ].value = 0.95;
 
-				effectSepia.uniforms[ "amount" ].value = 0.6;
+				effectSepia.uniforms[ "amount" ].value = 0.9;
 
 				effectVignette.uniforms[ "offset" ].value = 0.95;
 				effectVignette.uniforms[ "darkness" ].value = 1.6;
@@ -189,7 +204,12 @@
 				var effectBloom = new THREE.BloomPass( 0.5 );
 				var effectFilm = new THREE.FilmPass( 0.5, 0.025, 648, false );
 				var effectFilmBW = new THREE.FilmPass( 0.35, 0.5, 2048, true );
+				var effectFilmBW2 = new THREE.FilmPass( 0.05, 0.5, 2048, true );
 				var effectDotScreen = new THREE.DotScreenPass( new THREE.Vector2( 0, 0 ), 0.5, 0.6 );
+
+				//var renderMask = new THREE.MaskPass( sceneMask, cameraOrtho );
+				var renderMask = new THREE.MaskPass( sceneModel, cameraPerspective );
+				var clearMask = new THREE.ClearMaskPass();
 
 				//effectFilm.renderToScreen = true;
 				//effectFilmBW.renderToScreen = true;
@@ -214,7 +234,7 @@
 
 				renderScene = new THREE.TexturePass( composerScene.renderTarget );
 
-				rtParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBufer: false };
+				rtParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBufer: true };
 
 				var rtWidth  = window.innerWidth / 2;
 				var rtHeight = window.innerHeight / 2;
@@ -224,7 +244,9 @@
 				composer1 = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth, rtHeight, rtParameters ) );
 
 				composer1.addPass( renderScene );
+				//composer1.addPass( renderMask );
 				composer1.addPass( effectFilmBW );
+				//composer1.addPass( clearMask );
 				composer1.addPass( effectVignette );
 
 				//
@@ -232,7 +254,10 @@
 				composer2 = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth, rtHeight, rtParameters ) );
 
 				composer2.addPass( renderScene );
+				composer2.addPass( renderMask );
 				composer2.addPass( effectDotScreen );
+				composer2.addPass( clearMask );
+				composer2.addPass( effectFilmBW2 );
 				composer2.addPass( effectVignette );
 
 				//
@@ -240,8 +265,10 @@
 				composer3 = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth, rtHeight, rtParameters ) );
 
 				composer3.addPass( renderScene );
+				//composer3.addPass( renderMask );
 				composer3.addPass( effectSepia );
 				composer3.addPass( effectFilm );
+				//composer3.addPass( clearMask );
 				composer3.addPass( effectVignette );
 
 				//
@@ -249,14 +276,18 @@
 				composer4 = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth, rtHeight, rtParameters ) );
 
 				composer4.addPass( renderScene );
+				//composer4.addPass( renderMask );
 				composer4.addPass( effectBloom );
 				composer4.addPass( effectFilm );
 				composer4.addPass( effectBleach );
+				//composer4.addPass( clearMask );
 				composer4.addPass( effectVignette );
 
 				//
 
-				onWindowResize();
+				//onWindowResize();
+
+				renderScene.uniforms[ "tDiffuse" ].texture = composerScene.renderTarget2;
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -289,6 +320,7 @@
 				renderScene.uniforms[ "tDiffuse" ].texture = composerScene.renderTarget2;
 
 				quadBG.scale.set( window.innerWidth, window.innerHeight, 1 );
+				quadMask.scale.set( window.innerWidth / 2, window.innerHeight / 2, 1 );
 
 			}
 

@@ -57,7 +57,9 @@ THREE.BloomPass = function( strength, kernelSize, sigma, resolution ) {
 
 THREE.BloomPass.prototype = {
 
-	render: function ( renderer, writeBuffer, readBuffer, delta ) {
+	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
+
+		if ( maskActive ) renderer.context.disable( renderer.context.STENCIL_TEST );
 
 		// Render quad with blured scene into texture (convolution pass 1)
 
@@ -80,6 +82,8 @@ THREE.BloomPass.prototype = {
 		THREE.EffectComposer.quad.materials[ 0 ] = this.materialScreen;
 
 		this.screenUniforms[ "tDiffuse" ].texture = this.renderTargetY;
+
+		if ( maskActive ) renderer.context.enable( renderer.context.STENCIL_TEST );
 
 		renderer.render( THREE.EffectComposer.scene, THREE.EffectComposer.camera, readBuffer, false );
 

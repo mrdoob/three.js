@@ -22,6 +22,8 @@ THREE.EffectComposer = function( renderer, renderTarget ) {
 
 	this.passes = [];
 
+	this.copyPass = new THREE.ShaderPass( THREE.ShaderExtras[ "screen" ] );
+
 };
 
 THREE.EffectComposer.prototype = {
@@ -42,15 +44,44 @@ THREE.EffectComposer.prototype = {
 
 	render: function ( delta ) {
 
+		this.writeBuffer = this.renderTarget1;
+		this.readBuffer = this.renderTarget2;
+
+		var maskActive = false;
+
 		var i, il = this.passes.length;
 
 		for ( i = 0; i < il; i ++ ) {
 
-			this.passes[ i ].render( this.renderer, this.writeBuffer, this.readBuffer, delta );
+			this.passes[ i ].render( this.renderer, this.writeBuffer, this.readBuffer, delta, maskActive );
 
 			if ( this.passes[ i ].needsSwap ) {
 
+				if ( maskActive ) {
+
+					var context = this.renderer.context;
+
+					context.stencilFunc( context.NOTEQUAL, 1, 0xffffffff );
+
+					this.copyPass.render( this.renderer, this.writeBuffer, this.readBuffer, delta );
+
+					context.stencilFunc( context.EQUAL, 1, 0xffffffff );
+
+				}
+
 				this.swapBuffers();
+
+			}
+
+			if ( this.passes[ i ] instanceof THREE.MaskPass ) {
+
+				maskActive = true;
+
+			}
+
+			if ( this.passes[ i ] instanceof THREE.ClearMaskPass ) {
+
+				maskActive = false;
 
 			}
 
