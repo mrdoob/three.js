@@ -12,6 +12,8 @@ THREE.Projector = function() {
 	_line, _lineCount, _linePool = [],
 	_particle, _particleCount, _particlePool = [],
 
+	_objectList = [], _renderList = [],
+
 	_vector3 = new THREE.Vector4(),
 	_vector4 = new THREE.Vector4(),
 	_projScreenMatrix = new THREE.Matrix4(),
@@ -52,9 +54,9 @@ THREE.Projector = function() {
 
 	this.projectObjects = function ( scene, camera, sort ) {
 
-		var renderList = [],
-		o, ol, objects, object, matrix;
+		var o, ol, objects, object, matrix;
 
+		_objectList.length = 0;
 		_objectCount = 0;
 
 		objects = scene.objects;
@@ -73,13 +75,13 @@ THREE.Projector = function() {
 			_object.object = object;
 			_object.z = _vector3.z;
 
-			renderList.push( _object );
+			_objectList.push( _object );
 
 		}
 
-		sort && renderList.sort( painterSort );
+		sort && _objectList.sort( painterSort );
 
-		return renderList;
+		return _objectList;
 
 	};
 
@@ -87,12 +89,14 @@ THREE.Projector = function() {
 
 	this.projectScene = function ( scene, camera, sort ) {
 
-		var renderList = [], near = camera.near, far = camera.far,
+		var near = camera.near, far = camera.far,
 		o, ol, v, vl, f, fl, n, nl, c, cl, u, ul, objects, object,
 		objectMatrix, objectMatrixRotation, objectMaterials, objectOverdraw,
 		geometry, vertices, vertex, vertexPositionScreen,
 		faces, face, faceVertexNormals, normal, faceVertexUvs, uvs,
 		v1, v2, v3, v4;
+
+		_renderList.length = 0;
 
 		_face3Count = 0;
 		_face4Count = 0;
@@ -241,7 +245,7 @@ THREE.Projector = function() {
 
 					_face.z = _face.centroidScreen.z;
 
-					renderList.push( _face );
+					_renderList.push( _face );
 
 				}
 
@@ -280,7 +284,7 @@ THREE.Projector = function() {
 
 						_line.materials = object.materials;
 
-						renderList.push( _line );
+						_renderList.push( _line );
 
 					}
 				}
@@ -306,7 +310,7 @@ THREE.Projector = function() {
 
 					_particle.materials = object.materials;
 
-					renderList.push( _particle );
+					_renderList.push( _particle );
 
 				}
 
@@ -314,9 +318,9 @@ THREE.Projector = function() {
 
 		}
 
-		sort && renderList.sort( painterSort );
+		sort && _renderList.sort( painterSort );
 
-		return renderList;
+		return _renderList;
 
 	};
 
