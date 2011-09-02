@@ -1428,7 +1428,7 @@ THREE.ShaderLib = {
 
 				"#endif",
 
-				"vViewPosition = cameraPosition - mPosition.xyz;",
+				"vViewPosition = -mvPosition.xyz;",
 
 				"vec3 transformedNormal = normalize( normalMatrix * normal );",
 				"vNormal = transformedNormal;",
