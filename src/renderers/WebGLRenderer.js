@@ -4207,7 +4207,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-
 		return false;
 
 	};
@@ -4246,9 +4245,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			// check all geometry groups
 
-			for ( g in geometry.geometryGroups ) {
+			for( var i = 0, il = geometry.geometryGroupsList.length; i < il; i ++ ) {
 
-				geometryGroup = geometry.geometryGroups[ g ];
+				geometryGroup = geometry.geometryGroupsList[ i ];
 
 				customAttributeDirty = areCustomAttributesDirty( geometryGroup );
 
@@ -4400,7 +4399,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var hash_array = [];
 
-			for ( i = 0, l = material.length; i < l; i++ ) {
+			for ( i = 0, l = material.length; i < l; i ++ ) {
 
 				if ( material[ i ] == undefined ) {
 
@@ -4418,7 +4417,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		for ( f = 0, fl = geometry.faces.length; f < fl; f++ ) {
+		for ( f = 0, fl = geometry.faces.length; f < fl; f ++ ) {
 
 			face = geometry.faces[ f ];
 			materials = face.materials;
@@ -4456,6 +4455,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			geometry.geometryGroups[ ghash ].faces.push( f );
 			geometry.geometryGroups[ ghash ].vertices += vertices;
+
+		}
+
+		geometry.geometryGroupsList = [];
+
+		for ( var g in geometry.geometryGroups ) {
+
+			geometry.geometryGroupsList.push( geometry.geometryGroups[ g ] );
 
 		}
 
@@ -5420,13 +5427,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 			material, meshMaterial,
 			materials = [];
 
-		for ( m = 0, ml = object.materials.length; m < ml; m++ ) {
+		for ( m = 0, ml = object.materials.length; m < ml; m ++ ) {
 
 			meshMaterial = object.materials[ m ];
 
 			if ( meshMaterial instanceof THREE.MeshFaceMaterial ) {
 
-				for ( i = 0, l = geometryGroup.materials.length; i < l; i++ ) {
+				for ( i = 0, l = geometryGroup.materials.length; i < l; i ++ ) {
 
 					material = geometryGroup.materials[ i ];
 
