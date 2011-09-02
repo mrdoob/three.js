@@ -3464,7 +3464,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( object.visible && object.castShadow ) {
 
-						if ( ! ( object instanceof THREE.Mesh ) || isInFrustum( object ) ) {
+						if ( ! ( object instanceof THREE.Mesh ) || ! ( object.frustumCulled ) || isInFrustum( object ) ) {
 
 							object.matrixWorld.flattenToArray( object._objectMatrixArray );
 
@@ -3615,7 +3615,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( object.visible ) {
 
-				if ( ! ( object instanceof THREE.Mesh ) || isInFrustum( object ) ) {
+				if ( ! ( object instanceof THREE.Mesh ) || ! ( object.frustumCulled ) || isInFrustum( object ) ) {
 
 					object.matrixWorld.flattenToArray( object._objectMatrixArray );
 

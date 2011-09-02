@@ -45,6 +45,8 @@ THREE.Object3D = function() {
 	this.castShadow = false;
 	this.receiveShadow = false;
 
+	this.frustumCulled = true;
+
 	this._vector = new THREE.Vector3();
 
 	this.name = "";
