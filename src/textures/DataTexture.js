@@ -15,17 +15,13 @@ THREE.DataTexture = function ( data, width, height, format, mapping, wrapS, wrap
 THREE.DataTexture.prototype = new THREE.Texture();
 THREE.DataTexture.prototype.constructor = THREE.DataTexture;
 
-THREE.DataTexture.prototype = {
+THREE.DataTexture.prototype.clone = function () {
 
-	clone: function () {
+	var clonedTexture = new THREE.DataTexture( this.data.slice( 0 ), this.mapping, this.wrapS, this.wrapT, this.magFilter, this.minFilter );
 
-		var clonedTexture = new THREE.DataTexture( this.data.slice( 0 ), this.mapping, this.wrapS, this.wrapT, this.magFilter, this.minFilter );
+	clonedTexture.offset.copy( this.offset );
+	clonedTexture.repeat.copy( this.repeat );
 
-		clonedTexture.offset.copy( this.offset );
-		clonedTexture.repeat.copy( this.repeat );
-
-		return clonedTexture;
-
-	}
+	return clonedTexture;
 
 };
