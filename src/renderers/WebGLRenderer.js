@@ -290,7 +290,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	this.getContext = function() {
+	this.getContext = function () {
 
 		return _gl;
 

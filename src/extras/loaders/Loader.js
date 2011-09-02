@@ -55,7 +55,7 @@ THREE.Loader.prototype = {
 
 	},
 
-	extractUrlbase: function( url ) {
+	extractUrlbase: function ( url ) {
 
 		var chunks = url.split( "/" );
 		chunks.pop();
@@ -63,11 +63,11 @@ THREE.Loader.prototype = {
 
 	},
 
-	init_materials: function( scope, materials, texture_path ) {
+	init_materials: function ( scope, materials, texture_path ) {
 
 		scope.materials = [];
 
-		for ( var i = 0; i < materials.length; ++i ) {
+		for ( var i = 0; i < materials.length; ++ i ) {
 
 			scope.materials[ i ] = [ THREE.Loader.prototype.createMaterial( materials[ i ], texture_path ) ];
 
@@ -75,7 +75,7 @@ THREE.Loader.prototype = {
 
 	},
 
-	hasNormals: function( scope ) {
+	hasNormals: function ( scope ) {
 
 		var m, i, il = scope.materials.length;
 
@@ -136,7 +136,7 @@ THREE.Loader.prototype = {
 
 		}
 
-		function create_texture( where, name, sourceFile, repeat, offset, wrap ) {
+		function create_texture ( where, name, sourceFile, repeat, offset, wrap ) {
 
 			var texture = document.createElement( 'canvas' );
 
@@ -174,7 +174,7 @@ THREE.Loader.prototype = {
 
 		}
 
-		function rgb2hex( rgb ) {
+		function rgb2hex ( rgb ) {
 
 			return ( rgb[ 0 ] * 255 << 16 ) + ( rgb[ 1 ] * 255 << 8 ) + rgb[ 2 ] * 255;
 
@@ -367,7 +367,7 @@ THREE.Loader.prototype = {
 		return material;
 
 	},
-	
+
 	constructor : THREE.Loader
 
 };
