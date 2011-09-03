@@ -185,6 +185,8 @@
 					var intersects = ray.intersectObject( plane );
 					offset.copy( intersects[ 0 ].point ).subSelf( plane.position );
 
+					container.style.cursor = 'move';
+
 				}
 			}
 
@@ -193,6 +195,8 @@
 				event.preventDefault();
 
 				SELECTED = null;
+
+				container.style.cursor = 'auto';
 
 			}
 
