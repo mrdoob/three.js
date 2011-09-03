@@ -7,6 +7,7 @@
 THREE.Object3D = function() {
 
 	this.id = THREE.Object3DCount ++;
+	this.name = "";
 
 	this.parent = undefined;
 	this.children = [];
@@ -48,8 +49,6 @@ THREE.Object3D = function() {
 	this.frustumCulled = true;
 
 	this._vector = new THREE.Vector3();
-
-	this.name = "";
 
 };
 
