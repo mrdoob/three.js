@@ -15,7 +15,7 @@ More? [#three.js on irc.freenode.net](http://webchat.freenode.net/?channels=thre
 
 #### WebGL (Context 3D) ####
 
-[![equirectangular](http://mrdoob.github.com/three.js/assets/examples/44_equirectangular.png)](http://mrdoob.github.com/three.js/examples/webgl_panorama_equirectangular.html)
+[![equirectangular](http://mrdoob.github.com/three.js/assets/examples/44_equirectangular.png)](http://mrdoob.github.com/three.js/examples/webgl_panorama_equirectangular.html =109x82)
 [![scissors](http://mrdoob.github.com/three.js/assets/examples/42_scissors.png)](http://mrdoob.github.com/three.js/examples/webgl_materials_texture_filters.html)
 [![lookat](http://mrdoob.github.com/three.js/assets/examples/41_lookat.png)](http://mrdoob.github.com/three.js/examples/misc_lookat.html)
 [![video](http://mrdoob.github.com/three.js/assets/examples/40_video.png)](http://mrdoob.github.com/three.js/examples/webgl_materials_video.html)
