@@ -21,7 +21,7 @@
 
 		<script type="text/javascript">
 
-			var container, data, stats;
+			var container, stats;
 			var camera, scene, projector, renderer;
 			var objects = [], plane;
 
@@ -50,18 +50,9 @@
 
 				scene = new THREE.Scene();
 
-				var light = new THREE.DirectionalLight( 0xffffff, 2 );
-				light.position.x = 1;
-				light.position.y = 1;
-				light.position.z = 1;
-				light.position.normalize();
-				scene.addLight( light );
-
-				var light = new THREE.DirectionalLight( 0xffffff );
-				light.position.x = - 1;
-				light.position.y = - 1;
-				light.position.z = - 1;
-				light.position.normalize();
+				var light = new THREE.SpotLight( 0xffffff, 2 );
+				light.position.set( 0, 500, 2000 );
+				light.castShadow = true;
 				scene.addLight( light );
 
 				var geometry = new THREE.CubeGeometry( 40, 40, 40 );
@@ -69,7 +60,7 @@
 				for ( var i = 0; i < 200; i ++ ) {
 
 					var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
-					object.position.x = Math.random() * 800 - 400;
+					object.position.x = Math.random() * 1000 - 500;
 					object.position.y = Math.random() * 600 - 300;
 					object.position.z = Math.random() * 800 - 400;
 					object.rotation.x = ( Math.random() * 360 ) * Math.PI / 180;
@@ -78,6 +69,8 @@
 					object.scale.x = Math.random() * 2 + 1;
 					object.scale.y = Math.random() * 2 + 1;
 					object.scale.z = Math.random() * 2 + 1;
+					object.castShadow = true;
+					object.receiveShadow = true;
 					scene.addObject( object );
 
 					objects.push( object );
@@ -93,15 +86,20 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.sortObjects = false;
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild(renderer.domElement);
 
-				data = document.createElement( 'div' );
-				data.style.position = 'absolute';
-				data.style.whiteSpace = 'nowrap';
-				data.style.color = '#404040';
-				data.style.padding = '8px';
-				data.style.backgroundColor = '#ffffff';
-				container.appendChild( data );
+				renderer.shadowCameraNear = 3;
+				renderer.shadowCameraFar = camera.far;
+				renderer.shadowCameraFov = 50;
+
+				renderer.shadowMapBias = 0.0039;
+				renderer.shadowMapDarkness = 0.5;
+				renderer.shadowMapWidth = 1024;
+				renderer.shadowMapHeight = 1024;
+
+				renderer.shadowMapEnabled = true;
+				renderer.shadowMapSoft = true;
+
+				container.appendChild(renderer.domElement);
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
@@ -117,9 +115,6 @@
 			function onDocumentMouseMove( event ) {
 
 				event.preventDefault();
-
-				data.style.left = ( - 20 + event.clientX) + 'px';
-				data.style.top = ( 10 + event.clientY ) + 'px';
 
 				mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
 				mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
@@ -151,17 +146,20 @@
 
 						INTERSECTED = intersects[ 0 ].object;
 						INTERSECTED.currentHex = INTERSECTED.materials[ 0 ].color.getHex();
-						INTERSECTED.materials[ 0 ].color.setHex( 0xff0000 );
 
 						plane.position.copy( INTERSECTED.position );
 
 					}
+
+					container.style.cursor = 'pointer';
 
 				} else {
 
 					if ( INTERSECTED ) INTERSECTED.materials[ 0 ].color.setHex( INTERSECTED.currentHex );
 
 					INTERSECTED = null;
+
+					container.style.cursor = 'auto';
 
 				}
 
@@ -211,25 +209,9 @@
 
 			}
 
-			var radius = 100;
-			var theta = 0;
-
 			function render() {
 
-				theta += 0.2;
-
 				renderer.render( scene, camera );
-
-				if ( INTERSECTED ) {
-
-					data.style.visibility = 'visible';
-					data.innerHTML = 'x: ' + INTERSECTED.position.x + '<br>y: ' + INTERSECTED.position.y + '<br>z: ' + INTERSECTED.position.z;
-
-				} else {
-
-					data.style.visibility = 'hidden';
-
-				}
 
 			}
 
