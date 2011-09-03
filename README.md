@@ -136,6 +136,21 @@ This code creates a camera, then creates a scene, adds a cube on it, creates a &
 ### Change Log ###
 
 
+2011 09 04 - **r44** (330.356 KB, gzip: 84.039 KB)
+
+* Added `ColladaLoader`. ([timknip2](https://github.com/timknip2))
+* Improved `ExtrudeGeometry`. ([zz85](http://github.com/zz85))
+* Fixed `CylinderGeometry` normals. ([alteredq](http://github.com/alteredq))
+* Fixed issue with `WebGLRenderer.setTexture` ([rectalogic](https://github.com/rectalogic))
+* Fixed `TorusGeometry` normals. ([mrdoob](http://github.com/mrdoob))
+* Fixed `Ray` behind-ray intersects. ([mrdoob](http://github.com/mrdoob))
+* Added `OrthoCamera`. ([alteredq](http://github.com/alteredq))
+* Refactored postprocessing effects used in some examples. ([alteredq](http://github.com/alteredq))
+* Added `.deallocateObject()` and `.deallocateTexture()` methods to `WebGLRenderer`. ([mrdoob](http://github.com/mrdoob))
+* Fixed a glitch in normal and phong shader. ([evanw](http://github.com/evanw) and [alteredq](http://github.com/alteredq))
+* Added `.frustumCulled` property to `Object3D`. ([alteredq](http://github.com/alteredq) and [mrdoob](http://github.com/mrdoob))
+
+
 2011 08 14 - **r43** (298.199 KB, gzip: 74.805 KB)
 
 * Improved Blender exporter - 2.58 (and 2.59) support, normals maps, specular, ao maps... ([alteredq](http://github.com/alteredq))
@@ -154,6 +169,7 @@ This code creates a camera, then creates a scene, adds a cube on it, creates a &
 * Added `UTF8Loader` for loading the new, uber compressed, [UTF8 format](http://code.google.com/p/webgl-loader/). ([alteredq](http://github.com/alteredq))
 * `CanvasRenderer` now supports `RepeatWrapping`, `texture.offset` and `texture.repeat`. ([mrdoob](http://github.com/mrdoob))
 * Removed Stencil Shadows and Lensflare code. ([mrdoob](http://github.com/mrdoob))
+
 
 2011 07 06 - **r42** (277.852 KB, gzip: 69.469 KB)
 

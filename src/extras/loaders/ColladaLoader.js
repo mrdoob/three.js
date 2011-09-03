@@ -923,10 +923,10 @@ var ColladaLoader = function () {
 
 	function Morph() {
 
-		this.method;
-		this.source;
-		this.targets;
-		this.weights;
+		this.method = null;
+		this.source = null;
+		this.targets = null;
+		this.weights = null;
 
 	};
 
@@ -1731,7 +1731,7 @@ var ColladaLoader = function () {
 		this.geometry = geometry.id;
 		this.primitives = [];
 		this.vertices = null;
-		this.geometry3js;
+		this.geometry3js = null;
 
 	};
 
@@ -1944,7 +1944,7 @@ var ColladaLoader = function () {
 		this.material = "";
 		this.count = 0;
 		this.inputs = [];
-		this.vcount;
+		this.vcount = null;
 		this.p = [];
 		this.geometry = new THREE.Geometry();
 
@@ -2290,7 +2290,7 @@ var ColladaLoader = function () {
 
 		this.type = type;
 		this.effect = effect;
-		this.material;
+		this.material = null;
 
 	};
 
@@ -2428,11 +2428,13 @@ var ColladaLoader = function () {
 
 			default:
 
+				/*
 				if ( !transparent ) {
 
 				//	this.material = new THREE.MeshPhongMaterial(props);
 
 				}
+				*/
 
 				break;
 
@@ -2445,8 +2447,8 @@ var ColladaLoader = function () {
 	function Surface ( effect ) {
 
 		this.effect = effect;
-		this.init_from;
-		this.format;
+		this.init_from = null;
+		this.format = null;
 
 	};
 
@@ -2485,12 +2487,12 @@ var ColladaLoader = function () {
 	function Sampler2D ( effect ) {
 
 		this.effect = effect;
-		this.source;
-		this.wrap_s;
-		this.wrap_t;
-		this.minfilter;
-		this.magfilter;
-		this.mipfilter;
+		this.source = null;
+		this.wrap_s = null;
+		this.wrap_t = null;
+		this.minfilter = null;
+		this.magfilter = null;
+		this.mipfilter = null;
 
 	};
 
@@ -2551,8 +2553,8 @@ var ColladaLoader = function () {
 		this.id = "";
 		this.name = "";
 		this.shader = null;
-		this.surface;
-		this.sampler;
+		this.surface = null;
+		this.sampler = null;
 
 	};
 
@@ -2770,11 +2772,11 @@ var ColladaLoader = function () {
 		this.animation = animation;
 		this.source = "";
 		this.target = "";
-		this.sid;
-		this.dotSyntax;
-		this.arrSyntax;
-		this.arrIndices;
-		this.member;
+		this.sid = null;
+		this.dotSyntax = null;
+		this.arrSyntax = null;
+		this.arrIndices = null;
+		this.member = null;
 
 	};
 
@@ -2828,11 +2830,11 @@ var ColladaLoader = function () {
 		this.id = "";
 		this.animation = animation;
 		this.inputs = [];
-		this.input;
-		this.output;
-		this.interpolation;
-		this.startTime;
-		this.endTime;
+		this.input = null;
+		this.output = null;
+		this.interpolation = null;
+		this.startTime = null;
+		this.endTime = null;
 		this.duration = 0;
 
 	};

@@ -21,7 +21,7 @@
 
 		<script type="text/javascript">
 
-			var container, stats;
+			var container, data, stats;
 			var camera, scene, projector, renderer;
 			var objects = [], plane;
 
@@ -91,8 +91,15 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.sortObjects = false;
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				container.appendChild(renderer.domElement);
+
+				data = document.createElement( 'div' );
+				data.style.position = 'absolute';
+				data.style.whiteSpace = 'nowrap';
+				data.style.color = '#404040';
+				data.style.padding = '8px';
+				data.style.backgroundColor = '#ffffff';
+				container.appendChild( data );
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
@@ -108,6 +115,9 @@
 			function onDocumentMouseMove( event ) {
 
 				event.preventDefault();
+
+				data.style.left = ( - 20 + event.clientX) + 'px';
+				data.style.top = ( 10 + event.clientY ) + 'px';
 
 				mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
 				mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
@@ -201,6 +211,17 @@
 				theta += 0.2;
 
 				renderer.render( scene, camera );
+
+				if ( INTERSECTED ) {
+
+					data.style.visibility = 'visible';
+					data.innerHTML = 'x: ' + INTERSECTED.position.x + '<br>y: ' + INTERSECTED.position.y + '<br>z: ' + INTERSECTED.position.z;
+
+				} else {
+
+					data.style.visibility = 'hidden';
+
+				}
 
 			}
 
