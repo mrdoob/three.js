@@ -18,7 +18,7 @@ THREE.LOD.prototype.supr = THREE.Object3D.prototype;
  * Add
  */
 
-THREE.LOD.prototype.add = function ( object3D, visibleAtDistance ) {
+THREE.LOD.prototype.addLevel = function ( object3D, visibleAtDistance ) {
 
 	if ( visibleAtDistance === undefined ) {
 
@@ -39,7 +39,7 @@ THREE.LOD.prototype.add = function ( object3D, visibleAtDistance ) {
 	}
 
 	this.LODs.splice( l, 0, { visibleAtDistance: visibleAtDistance, object3D: object3D } );
-	this.addChild( object3D );
+	this.add( object3D );
 
 };
 
