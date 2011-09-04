@@ -45,7 +45,7 @@
 				info.innerHTML = '<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> webgl - draggable cubes';
 				container.appendChild( info );
 
-				camera = new THREE.Camera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.Camera( 70, window.innerWidth / window.innerHeight, 1, 5000 );
 				camera.position.z = 1000;
 
 				scene = new THREE.Scene();
@@ -83,15 +83,15 @@
 
 				projector = new THREE.Projector();
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.sortObjects = false;
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				renderer.shadowCameraNear = 3;
 				renderer.shadowCameraFar = camera.far;
-				renderer.shadowCameraFov = 50;
+				renderer.shadowCameraFov = 30;
 
-				renderer.shadowMapBias = 0.0039;
+				renderer.shadowMapBias = 0.00389;
 				renderer.shadowMapDarkness = 0.5;
 				renderer.shadowMapWidth = 1024;
 				renderer.shadowMapHeight = 1024;
