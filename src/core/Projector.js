@@ -65,7 +65,7 @@ THREE.Projector = function() {
 
 			object = objects[ o ];
 
-			if ( !object.visible || ( object instanceof THREE.Mesh && !( object.frustumCulled && isInFrustum( object ) ) ) ) continue;
+			if ( !object.visible || ( object instanceof THREE.Mesh && ( object.frustumCulled && !isInFrustum( object ) ) ) ) continue;
 
 			_object = getNextObjectInPool();
 

@@ -4,7 +4,7 @@
 
 THREE.DotScreenPass = function( center, angle, scale ) {
 
-	var shader = THREE.ShaderUtils.lib[ "dotscreen" ];
+	var shader = THREE.ShaderExtras[ "dotscreen" ];
 
 	this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
@@ -23,15 +23,16 @@ THREE.DotScreenPass = function( center, angle, scale ) {
 	} );
 
 	this.renderToScreen = false;
+	this.needsSwap = true;
 
 };
 
 THREE.DotScreenPass.prototype = {
 
-	render: function ( renderer, renderTarget, delta ) {
+	render: function ( renderer, writeBuffer, readBuffer, delta ) {
 
-		this.uniforms[ "tDiffuse" ].texture = renderTarget;
-		this.uniforms[ "tSize" ].value.set( renderTarget.width, renderTarget.height );
+		this.uniforms[ "tDiffuse" ].texture = readBuffer;
+		this.uniforms[ "tSize" ].value.set( readBuffer.width, readBuffer.height );
 
 		THREE.EffectComposer.quad.materials[ 0 ] = this.material;
 
@@ -41,7 +42,7 @@ THREE.DotScreenPass.prototype = {
 
 		} else {
 
-			renderer.render( THREE.EffectComposer.scene, THREE.EffectComposer.camera, renderTarget, false );
+			renderer.render( THREE.EffectComposer.scene, THREE.EffectComposer.camera, writeBuffer, false );
 
 		}
 

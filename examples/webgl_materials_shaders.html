@@ -16,7 +16,6 @@
 			h1 { }
 			a { color:skyblue }
 			canvas { pointer-events:none; z-index:10; }
-			#log { position:absolute; top:50px; text-align:left; display:block; z-index:100 }
 			#d { text-align:center; margin:1em 0 -19.7em 0; z-index:0; position:relative; display:block }
 			.button { background:orange; color:#fff; padding:0.2em 0.5em; cursor:pointer }
 			.inactive { background:#999; color:#eee }
@@ -38,8 +37,6 @@
 			<p>Canvas renderer is very slow on anything other than Chrome.
 			<p>Blinn-Phong shader only works in WebGL, canvas has only diffuse materials.
 		</div>
-
-		<pre id="log"></pre>
 
 		<script type="text/javascript" src="../build/Three.js"></script>
 
@@ -69,8 +66,8 @@
 			var render_canvas = 1, render_gl = 1;
 			var has_gl = 0;
 
-			var bcanvas = document.getElementById("rcanvas");
-			var bwebgl = document.getElementById("rwebgl");
+			var bcanvas = document.getElementById( "rcanvas" );
+			var bwebgl = document.getElementById( "rwebgl" );
 
 			init();
 			animate();
@@ -82,16 +79,14 @@
 			function addMesh( geometry, scale, x, y, z, rx, ry, rz, material ) {
 
 				mesh = new THREE.Mesh( geometry, material );
-				mesh.scale.x = mesh.scale.y = mesh.scale.z = scale;
-				mesh.position.x = x;
-				mesh.position.y = y;
-				mesh.position.z = z;
-				mesh.rotation.x = rx;
-				mesh.rotation.y = ry;
-				mesh.rotation.z = rz;
+
+				mesh.scale.set( scale, scale, scale );
+				mesh.position.set( x, y, z );
+				mesh.rotation.set( rx, ry, rz );
+
 				mesh.overdraw = true;
-				mesh.updateMatrix();
-				scene.addObject(mesh);
+
+				scene.addObject( mesh );
 
 			}
 
@@ -112,28 +107,24 @@
 				scene.addLight( ambient );
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff );
-				directionalLight.position.x = 1;
-				directionalLight.position.y = 1;
-				directionalLight.position.z = 2;
+				directionalLight.position.set( 1, 1, 2 );
 				directionalLight.position.normalize();
 				scene.addLight( directionalLight );
 
 				pointLight = new THREE.PointLight( 0xffffff );
-				pointLight.position.x = 0;
-				pointLight.position.y = 0;
-				pointLight.position.z = 0;
 				scene.addLight( pointLight );
 
 				// light representation
+
 				sphere = new THREE.SphereGeometry( 100, 16, 8 );
 				lightMesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) );
-				lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
+				lightMesh.scale.set( 0.05, 0.05, 0.05 );
 				lightMesh.position = pointLight.position;
 				lightMesh.overdraw = true;
-				lightMesh.updateMatrix();
 				scene.addObject( lightMesh );
 
 				// material samples
+
 				sphere = new THREE.SphereGeometry( 100, 32, 32 );
 
 				var y1 = 0, y2 = - 200;
@@ -159,16 +150,22 @@
 				addMesh( sphere, 1,  600, y1, 0, 0,0,0, new THREE.MeshPhongMaterial( { ambient: 0x000000, color: 0x5500ff, specular: 0x555555, shininess: 30 } ) );
 				addMesh( sphere, 1,  600, y2, 0, 0,0,0, new THREE.MeshLambertMaterial( { color: 0x5500ff } ) );
 
+				addToruses( new THREE.TorusGeometry( 100, 20, 32, 32 ) );
+
+				//
+
 				if ( render_gl ) {
 
 					try {
+
 						webglRenderer = new THREE.WebGLRenderer();
 						webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 						webglRenderer.domElement.style.position = "relative";
 						container.appendChild( webglRenderer.domElement );
 						has_gl = 1;
-					}
-					catch (e) {
+
+					} catch (e) {
+
 					}
 
 				}
@@ -181,6 +178,7 @@
 
 				}
 
+				//
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
@@ -191,27 +189,21 @@
 				bcanvas.addEventListener("click", toggleCanvas, false);
 				bwebgl.addEventListener("click", toggleWebGL, false);
 
-				var loader = new THREE.JSONLoader();
-				loader.load( { model: "obj/torus/Torus_slim.js", callback: function( geometry ) { createScene( geometry ) } } );
-				
-				//var loader = new THREE.BinaryLoader();
-				//loader.load( { model: "obj/torus/Torus_bin.js", callback: function( geometry ) { createScene( geometry ) } } );
-
 				document.addEventListener('mousemove', onDocumentMouseMove, false);
 
 			}
 
-			function createScene( geometry ) {
+			function addToruses( geometry ) {
 
-				var s = 80, t = s + 20, y = 200;
+				var s = 0.85, t = s + 100, y = 200, rx = 0;
 
-				addMesh( geometry, s, -6*t, y, 0, 1.57,0,0, new THREE.MeshPhongMaterial( { ambient: 0x000000, color: 0x000000, specular: 0x333333, shininess: 10 } ) );
-				addMesh( geometry, s, -4*t, y, 0, 1.57,0,0, new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0x888888, specular: 0x333333, shininess: 10 } ) );
-				addMesh( geometry, s, -2*t, y, 0, 1.57,0,0, new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0x030303, specular: 0xff5500, shininess: 10 } ) );
-				addMesh( geometry, s,    0, y, 0, 1.57,0,0, new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0x030303, specular: 0xffaa00, shininess: 10 } ) );
-				addMesh( geometry, s,  2*t, y, 0, 1.57,0,0, new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0x030303, specular: 0x55ff00, shininess: 10 } ) );
-				addMesh( geometry, s,  4*t, y, 0, 1.57,0,0, new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0x030303, specular: 0x0055ff, shininess: 10 } ) );
-				addMesh( geometry, s,  6*t, y, 0, 1.57,0,0, new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0x030303, specular: 0x5500ff, shininess: 10 } ) );
+				addMesh( geometry, s, -6*t, y, 0, rx,0,0, new THREE.MeshPhongMaterial( { ambient: 0x000000, color: 0x000000, specular: 0x333333, shininess: 10 } ) );
+				addMesh( geometry, s, -4*t, y, 0, rx,0,0, new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0x888888, specular: 0x333333, shininess: 10 } ) );
+				addMesh( geometry, s, -2*t, y, 0, rx,0,0, new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0x030303, specular: 0xff5500, shininess: 10 } ) );
+				addMesh( geometry, s,    0, y, 0, rx,0,0, new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0x030303, specular: 0xffaa00, shininess: 10 } ) );
+				addMesh( geometry, s,  2*t, y, 0, rx,0,0, new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0x030303, specular: 0x55ff00, shininess: 10 } ) );
+				addMesh( geometry, s,  4*t, y, 0, rx,0,0, new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0x030303, specular: 0x0055ff, shininess: 10 } ) );
+				addMesh( geometry, s,  6*t, y, 0, rx,0,0, new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0x030303, specular: 0x5500ff, shininess: 10 } ) );
 
 			}
 
@@ -240,21 +232,12 @@
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
-				camera.updateMatrix();
 
-				lightMesh.position.x = 700*Math.cos( timer );
-				lightMesh.position.z = 700*Math.sin( timer );
-				lightMesh.updateMatrix();
+				lightMesh.position.x = 700 * Math.cos( timer );
+				lightMesh.position.z = 700 * Math.sin( timer );
 
 				if ( render_canvas ) canvasRenderer.render( scene, camera );
 				if ( render_gl && has_gl ) webglRenderer.render( scene, camera );
-
-			}
-
-			function log(text) {
-
-				var e = document.getElementById("log");
-				e.innerHTML = text + "<br/>" + e.innerHTML;
 
 			}
 

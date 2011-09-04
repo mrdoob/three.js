@@ -6,6 +6,9 @@
 
 THREE.Object3D = function() {
 
+	this.id = THREE.Object3DCount ++;
+	this.name = "";
+
 	this.parent = undefined;
 	this.children = [];
 
@@ -43,9 +46,9 @@ THREE.Object3D = function() {
 	this.castShadow = false;
 	this.receiveShadow = false;
 
-	this._vector = new THREE.Vector3();
+	this.frustumCulled = true;
 
-	this.name = "";
+	this._vector = new THREE.Vector3();
 
 };
 
@@ -233,3 +236,5 @@ THREE.Object3D.prototype = {
 	}
 
 };
+
+THREE.Object3DCount = 0;

@@ -18,7 +18,7 @@ THREE.BloomPass = function( strength, kernelSize, sigma, resolution ) {
 
 	// screen material
 
-	var screenShader = THREE.ShaderUtils.lib[ "screen" ];
+	var screenShader = THREE.ShaderExtras[ "screen" ];
 
 	this.screenUniforms = THREE.UniformsUtils.clone( screenShader.uniforms );
 
@@ -36,12 +36,12 @@ THREE.BloomPass = function( strength, kernelSize, sigma, resolution ) {
 
 	// convolution material
 
-	var convolutionShader = THREE.ShaderUtils.lib[ "convolution" ];
+	var convolutionShader = THREE.ShaderExtras[ "convolution" ];
 
 	this.convolutionUniforms = THREE.UniformsUtils.clone( convolutionShader.uniforms );
 
 	this.convolutionUniforms[ "uImageIncrement" ].value = THREE.BloomPass.blurx;
-	this.convolutionUniforms[ "cKernel" ].value = THREE.ShaderUtils.buildKernel( sigma );
+	this.convolutionUniforms[ "cKernel" ].value = THREE.ShaderExtras.buildKernel( sigma );
 
 	this.materialConvolution = new THREE.MeshShaderMaterial( {
 
@@ -51,17 +51,21 @@ THREE.BloomPass = function( strength, kernelSize, sigma, resolution ) {
 
 	} );
 
+	this.needsSwap = false;
+
 };
 
 THREE.BloomPass.prototype = {
 
-	render: function ( renderer, renderTarget, delta ) {
+	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
+
+		if ( maskActive ) renderer.context.disable( renderer.context.STENCIL_TEST );
 
 		// Render quad with blured scene into texture (convolution pass 1)
 
 		THREE.EffectComposer.quad.materials[ 0 ] = this.materialConvolution;
 
-		this.convolutionUniforms[ "tDiffuse" ].texture = renderTarget;
+		this.convolutionUniforms[ "tDiffuse" ].texture = readBuffer;
 		this.convolutionUniforms[ "uImageIncrement" ].value = THREE.BloomPass.blurX;
 
 		renderer.render( THREE.EffectComposer.scene, THREE.EffectComposer.camera, this.renderTargetX, true );
@@ -79,7 +83,9 @@ THREE.BloomPass.prototype = {
 
 		this.screenUniforms[ "tDiffuse" ].texture = this.renderTargetY;
 
-		renderer.render( THREE.EffectComposer.scene, THREE.EffectComposer.camera, renderTarget, false );
+		if ( maskActive ) renderer.context.enable( renderer.context.STENCIL_TEST );
+
+		renderer.render( THREE.EffectComposer.scene, THREE.EffectComposer.camera, readBuffer, false );
 
 	}
 

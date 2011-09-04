@@ -241,7 +241,7 @@
 				postprocessing.rtTextureDepth = new THREE.WebGLRenderTarget( window.innerWidth, height, pars );
 				postprocessing.rtTextureColor = new THREE.WebGLRenderTarget( window.innerWidth, height, pars );
 
-				var bokeh_shader = ShaderExtras[ "bokeh" ];
+				var bokeh_shader = THREE.ShaderExtras[ "bokeh" ];
 
 				postprocessing.bokeh_uniforms = THREE.UniformsUtils.clone( bokeh_shader.uniforms );
 
