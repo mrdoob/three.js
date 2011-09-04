@@ -96,18 +96,18 @@ THREE.Object3D.prototype = {
 
 	},
 
-	addChild: function ( child ) {
+	add: function ( object ) {
 
-		if ( this.children.indexOf( child ) === - 1 ) {
+		if ( this.children.indexOf( object ) === - 1 ) {
 
-			if( child.parent !== undefined ) {
+			if( object.parent !== undefined ) {
 
-				child.parent.removeChild( child );
+				object.parent.removeChild( object );
 
 			}
 
-			child.parent = this;
-			this.children.push( child );
+			object.parent = this;
+			this.children.push( object );
 
 			// add to scene
 
@@ -121,7 +121,7 @@ THREE.Object3D.prototype = {
 
 			if ( scene !== undefined && scene instanceof THREE.Scene )  {
 
-				scene.addChildRecurse( child );
+				scene.addChildRecurse( object );
 
 			}
 
@@ -129,13 +129,13 @@ THREE.Object3D.prototype = {
 
 	},
 
-	removeChild: function ( child ) {
+	remove: function ( object ) {
 
-		var childIndex = this.children.indexOf( child );
+		var childIndex = this.children.indexOf( object );
 
 		if ( childIndex !== - 1 ) {
 
-			child.parent = undefined;
+			object.parent = undefined;
 			this.children.splice( childIndex, 1 );
 
 		}
@@ -232,6 +232,22 @@ THREE.Object3D.prototype = {
 			this.children[ i ].update( this.matrixWorld, forceUpdate, camera );
 
 		}
+
+	},
+
+	// DEPRECATED
+
+	addChild: function ( child ) {
+
+		console.warn( 'DEPRECATED: Object3D.addChild() is now Object3D.add()' );
+		this.add( child );
+
+	},
+
+	removeChild: function ( child ) {
+
+		console.warn( 'DEPRECATED: Object3D.removeChild() is now Object3D.remove()' );
+		this.remove( child );
 
 	}
 

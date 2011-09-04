@@ -27,18 +27,18 @@ THREE.Scene.prototype = new THREE.Object3D();
 THREE.Scene.prototype.constructor = THREE.Scene;
 THREE.Scene.prototype.supr = THREE.Object3D.prototype;
 
-THREE.Scene.prototype.addChild = function( child ) {
+THREE.Scene.prototype.add = function ( object ) {
 
-	this.supr.addChild.call( this, child );
-	this.addChildRecurse( child );
+	this.supr.add.call( this, object );
+	this.addChildRecurse( object );
 
 }
 
-THREE.Scene.prototype.addChildRecurse = function( child ) {
+THREE.Scene.prototype.addChildRecurse = function ( child ) {
 
 	if ( child instanceof THREE.Light ) {
 
-		if ( this.lights.indexOf( child ) === -1 ) {
+		if ( this.lights.indexOf( child ) === - 1 ) {
 
 			this.lights.push( child );
 
@@ -46,7 +46,7 @@ THREE.Scene.prototype.addChildRecurse = function( child ) {
 
 	} else if ( !( child instanceof THREE.Camera || child instanceof THREE.Bone ) ) {
 
-		if ( this.objects.indexOf( child ) === -1 ) {
+		if ( this.objects.indexOf( child ) === - 1 ) {
 
 			this.objects.push( child );
 			this.__objectsAdded.push( child );
@@ -55,7 +55,7 @@ THREE.Scene.prototype.addChildRecurse = function( child ) {
 
 	}
 
-	for ( var c = 0; c < child.children.length; c++ ) {
+	for ( var c = 0; c < child.children.length; c ++ ) {
 
 		this.addChildRecurse( child.children[ c ] );
 
@@ -63,15 +63,14 @@ THREE.Scene.prototype.addChildRecurse = function( child ) {
 
 }
 
+THREE.Scene.prototype.remove = function ( object ) {
 
-THREE.Scene.prototype.removeChild = function( child ) {
-
-	this.supr.removeChild.call( this, child );
-	this.removeChildRecurse( child );
+	this.supr.remove.call( this, object );
+	this.removeChildRecurse( object );
 
 }
 
-THREE.Scene.prototype.removeChildRecurse = function( child ) {
+THREE.Scene.prototype.removeChildRecurse = function ( child ) {
 
 	if ( child instanceof THREE.Light ) {
 
@@ -96,7 +95,7 @@ THREE.Scene.prototype.removeChildRecurse = function( child ) {
 
 	}
 
-	for ( var c = 0; c < child.children.length; c++ ) {
+	for ( var c = 0; c < child.children.length; c ++ ) {
 
 		this.removeChildRecurse( child.children[ c ] );
 
@@ -104,7 +103,46 @@ THREE.Scene.prototype.removeChildRecurse = function( child ) {
 
 }
 
-THREE.Scene.prototype.addObject = THREE.Scene.prototype.addChild;
-THREE.Scene.prototype.removeObject = THREE.Scene.prototype.removeChild;
-THREE.Scene.prototype.addLight = THREE.Scene.prototype.addChild;
-THREE.Scene.prototype.removeLight = THREE.Scene.prototype.removeChild;
+// DEPRECATED
+
+THREE.Scene.prototype.addChild = function ( child ) {
+
+	console.warn( 'DEPRECATED: Scene.addChild() is now Scene.add()' );
+	this.add( child );
+
+}
+
+THREE.Scene.prototype.addObject = function ( child ) {
+
+	console.warn( 'DEPRECATED: Scene.addObject() is now Scene.add()' );
+	this.add( child );
+
+}
+
+THREE.Scene.prototype.addLight = function ( child ) {
+
+	console.warn( 'DEPRECATED: Scene.addLight() is now Scene.add()' );
+	this.add( child );
+
+}
+
+THREE.Scene.prototype.removeChild = function ( child ) {
+
+	console.warn( 'DEPRECATED: Scene.removeChild() is now Scene.remove()' );
+	this.remove( child );
+
+}
+
+THREE.Scene.prototype.removeObject = function ( child ) {
+
+	console.warn( 'DEPRECATED: Scene.removeObject() is now Scene.remove()' );
+	this.remove( child );
+
+}
+
+THREE.Scene.prototype.removeLight = function ( child ) {
+
+	console.warn( 'DEPRECATED: Scene.removeLight() is now Scene.remove()' );
+	this.remove( child );
+
+}

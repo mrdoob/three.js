@@ -42,12 +42,12 @@
 
 				scene = new THREE.Scene();
 
-				scene.addLight( new THREE.AmbientLight( 0x505050 ) );
+				scene.add( new THREE.AmbientLight( 0x505050 ) );
 
 				var light = new THREE.SpotLight( 0xffffff, 1.5 );
 				light.position.set( 0, 500, 2000 );
 				light.castShadow = true;
-				scene.addLight( light );
+				scene.add( light );
 
 				var geometry = new THREE.CubeGeometry( 40, 40, 40 );
 
@@ -65,7 +65,7 @@
 					object.scale.z = Math.random() * 2 + 1;
 					object.castShadow = true;
 					object.receiveShadow = true;
-					scene.addObject( object );
+					scene.add( object );
 
 					objects.push( object );
 
@@ -74,7 +74,7 @@
 				plane = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 2000, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 0.25, transparent: true, wireframe: true } ) );
 				plane.lookAt( camera.position );
 				plane.visible = false;
-				scene.addObject( plane );
+				scene.add( plane );
 
 				projector = new THREE.Projector();
 
