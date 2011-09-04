@@ -192,6 +192,8 @@
 
 				event.preventDefault();
 
+				plane.position.copy( INTERSECTED.position );
+
 				SELECTED = null;
 
 				container.style.cursor = 'auto';
