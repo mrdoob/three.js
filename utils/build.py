@@ -296,6 +296,82 @@ WEBGL_FILES = [
 'renderers/WebGLRenderTarget.js'
 ]
 
+WORKER_FILES = [
+'Three.js',
+'core/Color.js',
+'core/Vector2.js',
+'core/Vector3.js',
+'core/Vector4.js',
+'core/Ray.js',
+'core/Rectangle.js',
+'core/Matrix3.js',
+'core/Matrix4.js',
+'core/Object3D.js',
+'core/Quaternion.js',
+'core/Vertex.js',
+'core/Face3.js',
+'core/Face4.js',
+'core/UV.js',
+'core/Geometry.js',
+'core/Spline.js',
+'core/Edge.js',
+'materials/Material.js',
+'materials/Mappings.js',
+'materials/LineBasicMaterial.js',
+'materials/MeshBasicMaterial.js',
+'materials/MeshLambertMaterial.js',
+'materials/MeshPhongMaterial.js',
+'materials/MeshDepthMaterial.js',
+'materials/MeshNormalMaterial.js',
+'materials/MeshFaceMaterial.js',
+'materials/MeshShaderMaterial.js',
+'materials/ParticleBasicMaterial.js',
+'materials/ParticleCanvasMaterial.js',
+'materials/ParticleDOMMaterial.js',
+'materials/Texture.js',
+'materials/DataTexture.js',
+'objects/Particle.js',
+'objects/ParticleSystem.js',
+'objects/Line.js',
+'objects/Mesh.js',
+'objects/Bone.js',
+'objects/SkinnedMesh.js',
+'objects/Ribbon.js',
+'objects/LOD.js',
+'objects/Sprite.js',
+'extras/ColorUtils.js',
+'extras/GeometryUtils.js',
+'extras/ImageUtils.js',
+'extras/SceneUtils.js',
+'extras/ShaderUtils.js',
+'extras/animation/AnimationHandler.js',
+'extras/animation/Animation.js',
+'extras/geometries/Curve.js',
+'extras/geometries/CurvePath.js',
+'extras/geometries/Path.js',
+'extras/geometries/Shape.js',
+'extras/geometries/TextPath.js',
+'extras/geometries/CubeGeometry.js',
+'extras/geometries/CylinderGeometry.js',
+'extras/geometries/ExtrudeGeometry.js',
+'extras/geometries/IcosahedronGeometry.js',
+'extras/geometries/LatheGeometry.js',
+'extras/geometries/PlaneGeometry.js',
+'extras/geometries/SphereGeometry.js',
+'extras/geometries/TextGeometry.js',
+'extras/geometries/TorusGeometry.js',
+'extras/geometries/TorusKnotGeometry.js',
+'extras/io/Loader.js',
+'extras/io/JSONLoader.js',
+'extras/io/BinaryLoader.js',
+'extras/io/SceneLoader.js',
+'extras/io/UTF8Loader.js',
+'extras/objects/MarchingCubes.js',
+'extras/objects/Trident.js',
+'extras/physics/Collisions.js',
+'extras/physics/CollisionUtils.js'
+]
+
 def merge(files):
 
 	buffer = []
@@ -395,6 +471,7 @@ def parse_args():
 		parser.add_argument('--webgl', help='Build ThreeWebGL.js', action='store_true')
 		parser.add_argument('--svg', help='Build ThreeSVG.js', action='store_true')
 		parser.add_argument('--dom', help='Build ThreeDOM.js', action='store_true')
+		parser.add_argument('--worker', help='Build ThreeWorker.js', action='store_true')
 		parser.add_argument('--debug', help='Generate debug versions', action='store_const', const=True, default=False)
 		parser.add_argument('--minified', help='Generate minified versions', action='store_const', const=True, default=False)
 		parser.add_argument('--all', help='Build all Three.js versions', action='store_true')
@@ -410,6 +487,7 @@ def parse_args():
 		parser.add_option('--webgl', dest='webgl', help='Build ThreeWebGL.js', action='store_true')
 		parser.add_option('--svg', dest='svg', help='Build ThreeSVG.js', action='store_true')
 		parser.add_option('--dom', dest='dom', help='Build ThreeDOM.js', action='store_true')
+		parser.add_option('--worker', dest='worker', help='Build ThreeWorker.js', action='store_true')
 		parser.add_option('--debug', dest='debug', help='Generate debug versions', action='store_const', const=True, default=False)
 		parser.add_option('--minified', help='Generate minified versions', action='store_const', const=True, default=False)
 		parser.add_option('--all', dest='all', help='Build all Three.js versions', action='store_true')
@@ -436,7 +514,8 @@ def main(argv=None):
 	['ThreeDOM', 'includes_dom', DOM_FILES, args.dom],
 	['ThreeSVG', 'includes_svg', SVG_FILES, args.svg],
 	['ThreeWebGL', 'includes_webgl', WEBGL_FILES, args.webgl],
-	['ThreeExtras', 'includes_extras', EXTRAS_FILES, args.extras]
+	['ThreeExtras', 'includes_extras', EXTRAS_FILES, args.extras],
+	['ThreeWorker', 'includes_worker', WORKER_FILES, args.worker]
 	]
 
 	for fname_lib, fname_inc, files, enabled in config:
