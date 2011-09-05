@@ -15,14 +15,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_gl, _programs = [],
 	_currentProgram = null,
 	_currentFramebuffer = null,
-	_currentDepthMask = true,
 
 	// gl state cache
 
 	_oldDoubleSided = null,
 	_oldFlipSided = null,
 	_oldBlending = null,
-	_oldDepth = null,
+	_oldDepthTest = null,
+	_oldDepthWrite = null,
 	_oldPolygonOffset = null,
 	_oldPolygonOffsetFactor = null,
 	_oldPolygonOffsetUnits = null,
@@ -256,13 +256,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.enable( _gl.SCISSOR_TEST );
 		else
 			_gl.disable( _gl.SCISSOR_TEST );
-
-	};
-
-	this.enableDepthBufferWrite = function ( enable ) {
-
-		_currentDepthMask = enable;
-		_gl.depthMask( enable );
 
 	};
 
@@ -3221,11 +3214,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function setDepthTest( test ) {
+	function setDepthTest( depthTest ) {
 
-		if ( _oldDepth != test ) {
+		if ( _oldDepthTest != depthTest ) {
 
-			if( test ) {
+			if( depthTest ) {
 
 				_gl.enable( _gl.DEPTH_TEST );
 
@@ -3235,7 +3228,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			_oldDepth = test;
+			_oldDepthTest = depthTest;
+
+		}
+
+	};
+
+	function setDepthWrite( depthWrite ) {
+
+		if ( _oldDepthWrite != depthWrite ) {
+
+			_gl.depthMask( depthWrite );
+			_oldDepthWrite = depthWrite;
 
 		}
 
@@ -3747,6 +3751,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 						material = opaque.list[ i ];
 
 						setDepthTest( material.depthTest );
+						setDepthWrite( material.depthWrite );
 						setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
 						renderBuffer( camera, lights, fog, material, buffer, object );
 
@@ -3774,6 +3779,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 						material = opaque.list[ i ];
 
 						setDepthTest( material.depthTest );
+						setDepthWrite( material.depthWrite );
 						setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
 
 						program = setProgram( camera, lights, fog, material, object );
@@ -3806,6 +3812,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						setBlending( material.blending );
 						setDepthTest( material.depthTest );
+						setDepthWrite( material.depthWrite );
 						setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
 
 						renderBuffer( camera, lights, fog, material, buffer, object );
@@ -3835,6 +3842,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						setBlending( material.blending );
 						setDepthTest( material.depthTest );
+						setDepthWrite( material.depthWrite );
 						setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
 
 						program = setProgram( camera, lights, fog, material, object );
@@ -3891,7 +3899,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_gl.useProgram( _sprite.program );
 		_currentProgram = _sprite.program;
 		_oldBlending = -1;
-		_oldDepth = -1;
+		_oldDepthTest = -1;
 
 		if ( !_spriteAttributesEnabled ) {
 
@@ -4015,7 +4023,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_gl.enable( _gl.CULL_FACE );
 		_gl.enable( _gl.DEPTH_TEST );
-		_gl.depthMask( _currentDepthMask );
+		_gl.depthMask( _oldDepthWrite );
 
 	}
 
