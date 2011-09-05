@@ -2,7 +2,7 @@
  * @author mr.doob / http://mrdoob.com/
  */
 
-THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, segmentsRadius, segmentsHeight ) {
+THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, segmentsRadius, segmentsHeight, openEnded ) {
 
 	THREE.Geometry.call( this );
 
@@ -71,7 +71,7 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, segmentsRad
 
 	// top cap
 
-	if ( radiusTop > 0 ) {
+	if ( !openEnded && radiusTop > 0 ) {
 
 		this.vertices.push( new THREE.Vertex( new THREE.Vector3( 0, heightHalf, 0 ) ) );
 
@@ -98,7 +98,7 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, segmentsRad
 
 	// bottom cap
 
-	if ( radiusBottom > 0 ) {
+	if ( !openEnded && radiusBottom > 0 ) {
 
 		this.vertices.push( new THREE.Vertex( new THREE.Vector3( 0, - heightHalf, 0 ) ) );
 
