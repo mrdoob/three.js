@@ -568,4 +568,4 @@ THREE.FontUtils = {
 })(THREE.FontUtils);
 
 // To use the typeface.js face files, hook up the API
-window._typeface_js = { faces: THREE.FontUtils.faces, loadFace: THREE.FontUtils.loadFace };
+self._typeface_js = { faces: THREE.FontUtils.faces, loadFace: THREE.FontUtils.loadFace };
