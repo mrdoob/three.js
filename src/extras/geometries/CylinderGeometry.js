@@ -87,7 +87,7 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, segmentsRad
 
 			var uv1 = uvs[ 0 ][ x ].clone();
 			var uv2 = uvs[ 0 ][ x + 1 ].clone();
-			var uv3 = new THREE.UV();
+			var uv3 = new THREE.UV( uv2.u, 0 );
 
 			this.faces.push( new THREE.Face3( v1, v2, v3, [ n1, n2, n3 ] ) );
 			this.faceVertexUvs[ 0 ].push( [ uv1, uv2, uv3 ] );
@@ -104,17 +104,17 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, segmentsRad
 
 		for ( x = 0; x < segmentsX; x ++ ) {
 
-			var v1 = vertices[ y ][ x ];
-			var v2 = this.vertices.length - 1;
-			var v3 = vertices[ y ][ x + 1 ];
+			var v1 = vertices[ y ][ x + 1 ];
+			var v2 = vertices[ y ][ x ];
+			var v3 = this.vertices.length - 1;
 
 			var n1 = new THREE.Vector3( 0, - 1, 0 );
 			var n2 = new THREE.Vector3( 0, - 1, 0 );
 			var n3 = new THREE.Vector3( 0, - 1, 0 );
 
-			var uv1 = uvs[ y ][ x ].clone();
-			var uv2 = new THREE.UV( 1, 1 );
-			var uv3 = uvs[ y ][ x + 1 ].clone();
+			var uv1 = uvs[ y ][ x + 1 ].clone();
+			var uv2 = uvs[ y ][ x ].clone();
+			var uv3 = new THREE.UV( uv2.u, 1 );
 
 			this.faces.push( new THREE.Face3( v1, v2, v3, [ n1, n2, n3 ] ) );
 			this.faceVertexUvs[ 0 ].push( [ uv1, uv2, uv3 ] );
