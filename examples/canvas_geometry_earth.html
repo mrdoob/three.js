@@ -67,11 +67,11 @@
 				mesh.overdraw = true;
 				mesh.position.y = - 250;
 				mesh.rotation.x = - 90 * Math.PI / 180;
-				scene.addObject(mesh);
+				scene.add(mesh);
 
 				mesh = new THREE.Mesh( new THREE.SphereGeometry( 200, 20, 20 ), new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/land_ocean_ice_cloud_2048.jpg' ) } ) );
 				mesh.overdraw = true;
-				scene.addObject(mesh);
+				scene.add(mesh);
 
 				renderer = new THREE.CanvasRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );

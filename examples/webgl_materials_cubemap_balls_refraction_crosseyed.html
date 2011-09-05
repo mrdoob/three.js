@@ -95,7 +95,7 @@
 					mesh.position.y = Math.random() * 10000 - 5000;
 					mesh.position.z = Math.random() * 10000 - 5000;
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 3 + 1;
-					scene.addObject( mesh );
+					scene.add( mesh );
 
 					spheres.push( mesh );
 
@@ -115,7 +115,7 @@
 				} ),
 
 				mesh = new THREE.Mesh( new THREE.CubeGeometry( 100000, 100000, 100000, 1, 1, 1, null, true ), material );
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				//
 

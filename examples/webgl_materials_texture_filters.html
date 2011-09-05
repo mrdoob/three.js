@@ -147,8 +147,8 @@
 					texturePainting2.image = image;
 					texturePainting2.needsUpdate = true;
 
-					scene.addObject( meshCanvas );
-					scene2.addObject( meshCanvas2 );
+					scene.add( meshCanvas );
+					scene2.add( meshCanvas2 );
 
 					var geometry = new THREE.PlaneGeometry( 100, 100 ),
 						mesh = new THREE.Mesh( geometry, materialPainting ),
@@ -162,14 +162,14 @@
 						zmesh.scale.x = image.width / 100;
 						zmesh.scale.y = image.height / 100;
 
-						zscene.addObject( zmesh );
+						zscene.add( zmesh );
 
 						var meshFrame = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x000000, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 5 } )  );
 
 						meshFrame.scale.x = 1.1 * image.width / 100;
 						meshFrame.scale.y = 1.1 * image.height / 100;
 
-						zscene.addObject( meshFrame );
+						zscene.add( meshFrame );
 
 						var meshShadow = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 0.9, transparent: true } )  );
 
@@ -177,7 +177,7 @@
 						meshShadow.scale.x = 1.1 * image.width / 100;
 						meshShadow.scale.y = 1.1 * image.height / 100;
 						meshShadow.rotation.x = -Math.PI / 2;
-						zscene.addObject( meshShadow );
+						zscene.add( meshShadow );
 
 						meshShadow.position.y = - 1.1 * image.height/2;
 

@@ -52,21 +52,21 @@
 				light.position.y = 1;
 				light.position.z = 1;
 				light.position.normalize();
-				scene.addLight( light );
+				scene.add( light );
 
 				var light = new THREE.DirectionalLight( 0xffefef, 2 );
 				light.position.x = - 1;
 				light.position.y = - 1;
 				light.position.z = - 1;
 				light.position.normalize();
-				scene.addLight( light );
+				scene.add( light );
 
 				var loader = new THREE.JSONLoader( true );
 				loader.load( { model: "models/animated/horse.js", callback: function( geometry ) {
 
 					mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: 0x606060, morphTargets: true } ) );
 					mesh.scale.set( 1.5, 1.5, 1.5 );
-					scene.addObject( mesh );
+					scene.add( mesh );
 
 				} } );
 

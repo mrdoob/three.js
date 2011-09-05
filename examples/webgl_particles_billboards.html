@@ -87,13 +87,13 @@
 				particles = new THREE.ParticleSystem( geometry, material );
 				particles.sortParticles = true;
 				particles.updateMatrix();
-				scene.addObject( particles );
+				scene.add( particles );
 
 				var light = new THREE.DirectionalLight( 0xffffff );
 				light.position.x = 0;
 				light.position.y = 0;
 				light.position.z = 1;
-				scene.addLight( light );
+				scene.add( light );
 
 				renderer = new THREE.WebGLRenderer( { clearAlpha: 1 });
 				renderer.setSize( window.innerWidth, window.innerHeight );

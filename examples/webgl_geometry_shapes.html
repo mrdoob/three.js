@@ -65,11 +65,11 @@
 				var light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0, 0, 1 );
 				light.position.normalize();
-				scene.addLight( light );
+				scene.add( light );
 
 				parent = new THREE.Object3D();
 				parent.position.y = 50;
-				scene.addChild( parent );
+				scene.add( parent );
 
 				function addGeometry( geometry, points, spacedPoints, color, x, y, z, rx, ry, rz, s ) {
 
@@ -79,7 +79,7 @@
 					mesh.position.set( x, y, z - 75 );
 					mesh.rotation.set( rx, ry, rz );
 					mesh.scale.set( s, s, s );
-					parent.addChild( mesh );
+					parent.add( mesh );
 
 					// solid line
 
@@ -87,7 +87,7 @@
 					line.position.set( x, y, z + 25 );
 					line.rotation.set( rx, ry, rz );
 					line.scale.set( s, s, s );
-					parent.addChild( line );
+					parent.add( line );
 
 					// transparent line from real points
 
@@ -95,7 +95,7 @@
 					line.position.set( x, y, z + 75 );
 					line.rotation.set( rx, ry, rz );
 					line.scale.set( s, s, s );
-					parent.addChild( line );
+					parent.add( line );
 
 					// vertices from real points
 
@@ -104,7 +104,7 @@
 					particles.position.set( x, y, z + 75 );
 					particles.rotation.set( rx, ry, rz );
 					particles.scale.set( s, s, s );
-					parent.addChild( particles );
+					parent.add( particles );
 
 					// transparent line from equidistance sampled points
 
@@ -112,7 +112,7 @@
 					line.position.set( x, y, z + 100 );
 					line.rotation.set( rx, ry, rz );
 					line.scale.set( s, s, s );
-					parent.addChild( line );
+					parent.add( line );
 
 					// equidistance sampled points
 
@@ -121,7 +121,7 @@
 					particles2.position.set( x, y, z + 100 );
 					particles2.rotation.set( rx, ry, rz );
 					particles2.scale.set( s, s, s );
-					parent.addChild( particles2 );
+					parent.add( particles2 );
 
 				}
 

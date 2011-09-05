@@ -82,10 +82,6 @@
 				scene = new THREE.Scene();
 				scene.fog = new THREE.FogExp2( 0xaaccff, 0.0007 );
 
-				//var light = new THREE.PointLight( 0xffffff, 2 );
-				//light.position.y = 500;
-				//scene.addLight( light );
-
 				camera.position.y = 200;
 				camera.target.position.y = camera.position.y;
 
@@ -113,7 +109,7 @@
 
 				mesh = new THREE.Mesh( geometry, material );
 				mesh.rotation.x = - 90 * Math.PI / 180;
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				renderer = new THREE.WebGLRenderer( { clearColor:0xaaccff, clearAlpha: 1 } );
 				renderer.setSize( window.innerWidth, window.innerHeight );

@@ -60,7 +60,7 @@
 
 			var mesh, zmesh, geometry;
 
-			var directionalLight, pointLight;
+			var directionalLight;
 
 			var mouseX = 0;
 			var mouseY = 0;
@@ -108,7 +108,7 @@
 					mesh.position.y = 500 * ( Math.random() - 0.5 );
 					mesh.position.z = 500 * ( Math.random() - 0.5 );
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = 0.25 * (Math.random() + 0.5);
-					scene.addObject(mesh);
+					scene.add(mesh);
 
 				}
 
@@ -116,24 +116,18 @@
 				// LIGHTS
 
 				var ambient = new THREE.AmbientLight( 0x101010 );
-				scene.addLight( ambient );
+				scene.add( ambient );
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff );
 				directionalLight.position.y = -70;
 				directionalLight.position.z = 100;
 				directionalLight.position.normalize();
-				scene.addLight( directionalLight );
-
-				pointLight = new THREE.PointLight( 0xffaa00 );
-				pointLight.position.x = 0;
-				pointLight.position.y = 0;
-				pointLight.position.z = 120;
-				//scene.addLight( pointLight );
+				scene.add( directionalLight );
 
 				mesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xff0000 } ) );
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 0.1;
-				mesh.position = pointLight.position;
-				scene.addObject(mesh);
+				mesh.position.set( 0, 0, 120 );
+				scene.add(mesh);
 
 				if ( render_gl ) {
 					try {
@@ -230,7 +224,7 @@
 				zmesh.scale.x = zmesh.scale.y = zmesh.scale.z = 3;
 				zmesh.overdraw = true;
 				zmesh.updateMatrix();
-				scene.addObject(zmesh);
+				scene.add(zmesh);
 
 				// PLANES with all materials from the model
 
@@ -250,7 +244,7 @@
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = 1;
 					mesh.doubleSided = true;
 					mesh.updateMatrix();
-					scene.addObject(mesh);
+					scene.add(mesh);
 
 					// number
 					var x = document.createElement( "canvas" );
@@ -272,7 +266,7 @@
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = 1;
 					mesh.doubleSided = true;
 					mesh.updateMatrix();
-					scene.addObject(mesh);
+					scene.add(mesh);
 				}
 
 			}

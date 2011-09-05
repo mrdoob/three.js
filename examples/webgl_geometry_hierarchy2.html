@@ -66,7 +66,7 @@
 					child = new THREE.Mesh( geometry, material );
 					child.position.x = 100;
 
-					object.addChild( child );
+					object.add( child );
 					object = child;
 
 					objects.push( child );
@@ -80,7 +80,7 @@
 					child = new THREE.Mesh( geometry, material );
 					child.position.x = - 100;
 
-					object.addChild( child );
+					object.add( child );
 					object = child;
 
 					objects.push( child );
@@ -94,7 +94,7 @@
 					child = new THREE.Mesh( geometry, material );
 					child.position.y = - 100;
 
-					object.addChild( child );
+					object.add( child );
 					object = child;
 
 					objects.push( child );
@@ -108,7 +108,7 @@
 					child = new THREE.Mesh( geometry, material );
 					child.position.y = 100;
 
-					object.addChild( child );
+					object.add( child );
 					object = child;
 
 					objects.push( child );
@@ -122,7 +122,7 @@
 					child = new THREE.Mesh( geometry, material );
 					child.position.z = - 100;
 
-					object.addChild( child );
+					object.add( child );
 					object = child;
 
 					objects.push( child );
@@ -136,14 +136,14 @@
 					child = new THREE.Mesh( geometry, material );
 					child.position.z = 100;
 
-					object.addChild( child );
+					object.add( child );
 					object = child;
 
 					objects.push( child );
 
 				}
 
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );

@@ -76,11 +76,11 @@ function init() {
 	container.appendChild( renderer.domElement );
 	
 	var ambientLight = new THREE.AmbientLight( 0x606060 );
-	scene.addLight( ambientLight );
+	scene.add( ambientLight );
 
 	sun = new THREE.DirectionalLight( 0xffffff );
 	sun.position = camera.position.clone();
-	scene.addLight( sun );
+	scene.add( sun );
 	
 	loadCube();
 	
@@ -91,7 +91,7 @@ function init() {
 	geom.vertices.push( new THREE.Vertex( new THREE.Vector3( 100, 0, 0) ) );
 	
 	line = new THREE.Line(geom, lineMat);
-	scene.addObject( line );
+	scene.add( line );
 
 	stats = new Stats();
 	stats.domElement.style.position = 'absolute';
@@ -127,7 +127,7 @@ function addCube( p, g) {
 	var mesh = new THREE.Mesh( g, new THREE.MeshLambertMaterial( { color: 0x003300 } ) );
 	mesh.position = p;
 
-	scene.addObject( mesh );
+	scene.add( mesh );
 	var mc = THREE.CollisionUtils.MeshColliderWBox(mesh);
 	THREE.Collisions.colliders.push( mc );
 	meshes.push( mesh );

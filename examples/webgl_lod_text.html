@@ -89,12 +89,12 @@
 
 				var light = new THREE.PointLight( 0xff2200 );
 				light.position.set( 0, 0, 0 );
-				scene.addLight( light );
+				scene.add( light );
 
 				var light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0, 0, 1 );
 				light.position.normalize();
-				scene.addLight( light );
+				scene.add( light );
 
 				var wireMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff, opacity: 0.5, wireframe: true } );
 				
@@ -154,7 +154,7 @@
 					lod.position.z = 10000 * ( 0.5 - Math.random() );
 					lod.updateMatrix();
 					lod.matrixAutoUpdate = false;
-					scene.addObject( lod );
+					scene.add( lod );
 
 				}
 

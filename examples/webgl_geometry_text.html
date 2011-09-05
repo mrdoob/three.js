@@ -175,11 +175,11 @@
 				var dirLight = new THREE.DirectionalLight( 0xffffff, 0.125 );
 				dirLight.position.set( 0, 0, 1 );
 				dirLight.position.normalize();
-				scene.addLight( dirLight );
+				scene.add( dirLight );
 
 				var pointLight = new THREE.PointLight( 0xffffff, 1.5 );
 				pointLight.position.set( 0, 100, 90 );
-				scene.addLight( pointLight );
+				scene.add( pointLight );
 
 				//text = capitalize( font ) + " " + capitalize( weight );
 				//text = "abcdefghijklmnopqrstuvwxyz0123456789";
@@ -228,14 +228,14 @@
 				parent = new THREE.Object3D();
 				parent.position.y = 100;
 
-				scene.addChild( parent );
+				scene.add( parent );
 
 				createText();
 
 				var plane = new THREE.Mesh( new THREE.PlaneGeometry( 10000, 10000 ), new THREE.MeshBasicMaterial( { color: 0xffffff, opacity: 0.5, transparent: true } ) );
 				plane.rotation.x = -1.57;
 				plane.position.y = 100;
-				scene.addChild( plane );
+				scene.add( plane );
 
 				// RENDERER
 
@@ -499,7 +499,7 @@
 				textMesh1.rotation.x = 0;
 				textMesh1.rotation.y = Math.PI * 2;
 
-				parent.addChild( textMesh1 );
+				parent.add( textMesh1 );
 
 				if ( mirror ) {
 
@@ -512,7 +512,7 @@
 					textMesh2.rotation.x = Math.PI;
 					textMesh2.rotation.y = Math.PI * 2;
 
-					parent.addChild( textMesh2 );
+					parent.add( textMesh2 );
 
 				}
 
@@ -522,8 +522,8 @@
 
 				updatePermalink();
 
-				scene.removeChild( textMesh1 );
-				if ( mirror ) scene.removeChild( textMesh2 );
+				scene.remove( textMesh1 );
+				if ( mirror ) scene.remove( textMesh2 );
 
 				if ( !text ) return;
 

@@ -84,17 +84,17 @@
 				// LIGHTS
 
 				var ambient = new THREE.AmbientLight( 0xffffff );
-				scene.addLight( ambient );
+				scene.add( ambient );
 
 				pointLight = new THREE.PointLight( 0xffffff, 2 );
-				scene.addLight( pointLight );
+				scene.add( pointLight );
 
 				// light representation
 				sphere = new THREE.SphereGeometry( 100, 16, 8 );
 				lightMesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color:0xffaa00 } ) );
 				lightMesh.position = pointLight.position;
 				lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
-				scene.addObject(lightMesh);
+				scene.add(lightMesh);
 
 				var path = "textures/cube/SwedishRoyalCastle/";
 				var format = '.jpg';
@@ -126,7 +126,7 @@
 				} ),
 
 				mesh = new THREE.Mesh( new THREE.CubeGeometry( 10, 10, 10, 1, 1, 1, null, true ), material );
-				sceneCube.addObject( mesh );
+				sceneCube.add( mesh );
 
 				//
 
@@ -155,19 +155,19 @@
 				var mesh = new THREE.Mesh( geometry, m1 );
 				mesh.position.z = - 100;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = s;
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				var mesh = new THREE.Mesh( geometry, m2 );
 				mesh.position.x = - 900;
 				mesh.position.z = - 100;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = s;
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				var mesh = new THREE.Mesh( geometry, m3 );
 				mesh.position.x = 900;
 				mesh.position.z = - 100;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = s;
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				loader.statusDomElement.style.display = "none";
 

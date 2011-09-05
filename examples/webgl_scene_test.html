@@ -372,18 +372,18 @@
 					object.rotation.z = Math.random() * 6;
 					object.matrixAutoUpdate = false;
 					object.updateMatrix();
-					result.scene.addObject( object );
+					result.scene.add( object );
 
 				}
 
 				result.scene.matrixAutoUpdate = false;
 
 				light = new THREE.PointLight( 0xffffff );
-				result.scene.addLight( light );
+				result.scene.add( light );
 
 				light = new THREE.DirectionalLight( 0x111111 );
 				light.position.x = 1;
-				result.scene.addLight( light );
+				result.scene.add( light );
 
 				return result;
 

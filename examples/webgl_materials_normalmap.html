@@ -92,18 +92,18 @@
 				// LIGHTS
 
 				ambientLight = new THREE.AmbientLight( 0x111111 );
-				scene.addLight( ambientLight );
+				scene.add( ambientLight );
 
 				pointLight = new THREE.PointLight( 0xffff55 );
 				pointLight.position.z = 10000;
-				scene.addLight( pointLight );
+				scene.add( pointLight );
 
 				directionalLight = new THREE.DirectionalLight( 0xaaaa88 );
 				directionalLight.position.x = 1;
 				directionalLight.position.y = 1;
 				directionalLight.position.z = 0.5;
 				directionalLight.position.normalize();
-				scene.addLight( directionalLight );
+				scene.add( directionalLight );
 
 				// light representation
 
@@ -111,7 +111,7 @@
 				lightMesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) );
 				lightMesh.position = pointLight.position;
 				lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
-				scene.addObject(lightMesh);
+				scene.add(lightMesh);
 
 				// common material parameters
 
@@ -176,12 +176,12 @@
 				mesh1 = new THREE.Mesh( geometry, material1 );
 				mesh1.position.x = - scale * 12;
 				mesh1.scale.set( scale, scale, scale );
-				scene.addObject( mesh1 );
+				scene.add( mesh1 );
 
 				mesh2 = new THREE.Mesh( geometry, material2 );
 				mesh2.position.x = scale * 12;
 				mesh2.scale.set( scale, scale, scale );
-				scene.addObject( mesh2 );
+				scene.add( mesh2 );
 
 				loader.statusDomElement.style.display = "none";
 

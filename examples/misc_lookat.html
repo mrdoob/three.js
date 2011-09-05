@@ -68,7 +68,7 @@
 				var material = new THREE.MeshNormalMaterial( { shading: THREE.SmoothShading } );
 
 				target = new THREE.Mesh( new THREE.SphereGeometry( 100, 20, 20 ), material );
-				scene.addObject( target );
+				scene.add( target );
 
 				for ( var i = 0; i < 1000; i ++ ) {
 
@@ -77,7 +77,7 @@
 					mesh.position.y = Math.random() * 4000 - 2000;
 					mesh.position.z = Math.random() * 4000 - 2000;
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 4 + 2;
-					scene.addObject( mesh );
+					scene.add( mesh );
 
 				}
 

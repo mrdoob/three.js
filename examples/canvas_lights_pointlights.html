@@ -62,16 +62,16 @@
 
 				scene = new THREE.Scene();
 
-				scene.addLight( new THREE.AmbientLight( 0x00020 ) );
+				scene.add( new THREE.AmbientLight( 0x00020 ) );
 
 				light1 = new THREE.PointLight( 0xff0040, 1, 50 );
-				scene.addLight( light1 );
+				scene.add( light1 );
 
 				light2 = new THREE.PointLight( 0x0040ff, 1, 50 );
-				scene.addLight( light2 );
+				scene.add( light2 );
 
 				light3 = new THREE.PointLight( 0x80ff80, 1, 50 );
-				scene.addLight( light3 );
+				scene.add( light3 );
 
 				var PI2 = Math.PI * 2;
 				var program = function ( context ) {
@@ -85,19 +85,19 @@
 
 				particle1 = new THREE.Particle( new THREE.ParticleCanvasMaterial( { color: 0xff0040, program: program } ) );
 				particle1.scale.x = particle1.scale.y = particle1.scale.z = 0.5;
-				scene.addObject( particle1 );
+				scene.add( particle1 );
 
 				particle2 = new THREE.Particle( new THREE.ParticleCanvasMaterial( { color: 0x0040ff, program: program } ) );
 				particle2.scale.x = particle2.scale.y = particle2.scale.z = 0.5;
-				scene.addObject( particle2 );
+				scene.add( particle2 );
 
 				particle3 = new THREE.Particle( new THREE.ParticleCanvasMaterial( { color: 0x80ff80, program: program } ) );
 				particle3.scale.x = particle3.scale.y = particle3.scale.z = 0.5;
-				scene.addObject( particle3 );
+				scene.add( particle3 );
 
 				mesh = new THREE.Mesh( new WaltHead(), new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading } ) );
 				mesh.overdraw = true;
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				renderer = new THREE.CanvasRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );

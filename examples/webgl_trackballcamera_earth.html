@@ -126,10 +126,7 @@
 		dirLight = new THREE.DirectionalLight( 0xFFFFFF );
 		dirLight.position.set( -1, 0, 1 );
 		dirLight.position.normalize();
-		scene.addLight( dirLight );
-
-		ambientLight = new THREE.AmbientLight( 0xFFFFFF );
-		//scene.addLight( ambientLight );
+		scene.add( dirLight );
 
 		var planetTexture = THREE.ImageUtils.loadTexture( "textures/planets/earth_atmos_2048.jpg" ),
 		cloudsTexture     = THREE.ImageUtils.loadTexture( "textures/planets/earth_clouds_1024.png" ),
@@ -172,7 +169,7 @@
 		meshPlanet = new THREE.Mesh( geometry, materialNormalMap );
 		meshPlanet.rotation.y = 1.3;
 		meshPlanet.rotation.z = tilt;
-		scene.addObject( meshPlanet );
+		scene.add( meshPlanet );
 
 
 		// clouds
@@ -182,7 +179,7 @@
 		meshClouds = new THREE.Mesh( geometry, materialClouds );
 		meshClouds.scale.set( cloudsScale, cloudsScale, cloudsScale );
 		meshClouds.rotation.z = tilt;
-		scene.addObject( meshClouds );
+		scene.add( meshClouds );
 
 
 		// moon
@@ -192,7 +189,7 @@
 		meshMoon = new THREE.Mesh( geometry, materialMoon );
 		meshMoon.position.set( radius * 5, 0, 0 );
 		meshMoon.scale.set( moonScale, moonScale, moonScale );
-		scene.addObject( meshMoon );
+		scene.add( meshMoon );
 
 
 		// stars
@@ -234,7 +231,7 @@
 			stars.matrixAutoUpdate = false;
 			stars.updateMatrix();
 
-			scene.addObject( stars );
+			scene.add( stars );
 
 		}
 

@@ -63,7 +63,7 @@
 				object = new THREE.Mesh( new WaltHead(), new THREE.MeshNormalMaterial() );
 				object.overdraw = true;
 				object.scale.x = object.scale.y = object.scale.z = 10;
-				scene.addObject( object );
+				scene.add( object );
 
 				renderer = new THREE.CanvasRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );

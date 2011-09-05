@@ -95,19 +95,19 @@
 				// LIGHTS
 
 				ambientLight = new THREE.AmbientLight( 0x444444 );
-				scene.addLight( ambientLight );
+				scene.add( ambientLight );
 
 				pointLight = new THREE.PointLight( 0xffffff );
 				pointLight.position.z = 600;
 
-				scene.addLight( pointLight );
+				scene.add( pointLight );
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff );
 				directionalLight.position.x = 1;
 				directionalLight.position.y = 1;
 				directionalLight.position.z = - 1;
 				directionalLight.position.normalize();
-				scene.addLight( directionalLight );
+				scene.add( directionalLight );
 
 				// material parameters
 
@@ -164,7 +164,7 @@
 				mesh1 = new THREE.Mesh( geometry, material );
 				mesh1.position.y = - 50;
 				mesh1.scale.x = mesh1.scale.y = mesh1.scale.z = scale;
-				scene.addObject( mesh1 );
+				scene.add( mesh1 );
 
 				loader.statusDomElement.style.display = "none";
 

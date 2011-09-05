@@ -91,13 +91,13 @@
 				// LIGHTS
 
 				var ambient = new THREE.AmbientLight( 0x444444 );
-				scene.addLight( ambient );
+				scene.add( ambient );
 
 				light = new THREE.SpotLight( 0xffffff );
 				light.position.set( 0, 1500, 1000 );
 				light.target.position.set( 0, 0, 0 );
 				light.castShadow = true;
-				scene.addLight( light );
+				scene.add( light );
 
 				createHUD();
 				createScene();
@@ -151,7 +151,7 @@
 				hudMesh.position.y = ( SCREEN_HEIGHT - SHADOW_MAP_HEIGHT / 2 ) * -0.5;
 
 				sceneHUD = new THREE.Scene();
-				sceneHUD.addObject( hudMesh );
+				sceneHUD.add( hudMesh );
 
 			}
 
@@ -172,7 +172,7 @@
 				ground.castShadow = false;
 				ground.receiveShadow = true;
 
-				scene.addObject( ground );
+				scene.add( ground );
 
 				// TEXT
 
@@ -204,7 +204,7 @@
 				mesh.castShadow = true;
 				mesh.receiveShadow = true;
 
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				// CUBES
 
@@ -216,7 +216,7 @@
 				mesh.castShadow = true;
 				mesh.receiveShadow = true;
 
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				var mesh = new THREE.Mesh( new THREE.CubeGeometry( 1600, 170, 250 ), planeMaterial );
 
@@ -226,7 +226,7 @@
 				mesh.castShadow = true;
 				mesh.receiveShadow = true;
 
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				// MORPHS
 
@@ -244,7 +244,7 @@
 					meshAnim.castShadow = true;
 					meshAnim.receiveShadow = false;
 
-					scene.addObject( meshAnim );
+					scene.add( meshAnim );
 
 					morphs.push( { mesh: meshAnim, lastKeyframe: 0, currentKeyframe: 0,
 								   offset: Math.random() * 6, speed: speed, duration: duration,

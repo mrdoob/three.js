@@ -53,14 +53,14 @@
 				light.position.y = 1;
 				light.position.z = 1;
 				light.position.normalize();
-				scene.addLight( light );
+				scene.add( light );
 
 				var light = new THREE.DirectionalLight( 0xffffff );
 				light.position.x = - 1;
 				light.position.y = - 1;
 				light.position.z = - 1;
 				light.position.normalize();
-				scene.addLight( light );
+				scene.add( light );
 
 				var geometry = new THREE.CubeGeometry( 20, 20, 20 );
 
@@ -76,7 +76,7 @@
 					object.scale.x = Math.random() * 2 + 1;
 					object.scale.y = Math.random() * 2 + 1;
 					object.scale.z = Math.random() * 2 + 1;
-					scene.addObject( object );
+					scene.add( object );
 
 				}
 

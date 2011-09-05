@@ -73,10 +73,10 @@
                 container.appendChild(renderer.domElement);
 
                 var ambientLight = new THREE.AmbientLight(0x606060);
-                scene.addLight(ambientLight);
+                scene.add(ambientLight);
 
                 sun = new THREE.DirectionalLight(0xffffff);
-                scene.addLight(sun);
+                scene.add(sun);
 
                 //makeWall(480);
                 //makeWall(360);
@@ -91,7 +91,7 @@
                 plane = new THREE.Mesh( new THREE.PlaneGeometry( 30000, 30000, 10, 10 ), new THREE.MeshLambertMaterial( { color: 0x003300 } ) );
                 plane.position.y = - 480;
                 plane.rotation.x = Math.PI / - 2;
-                scene.addObject( plane );
+                scene.add( plane );
                 geoms.push( plane );
 
                 var cplane = new THREE.PlaneCollider( plane.position, new THREE.Vector3( 0, 1, 0 ) );
@@ -123,7 +123,7 @@
             function createCube(s, p){
                 var cube = new THREE.Mesh(new THREE.CubeGeometry( s, s, s ), new THREE.MeshLambertMaterial( { color: 0x003300 } ) );
                 cube.position = p;
-                scene.addObject(cube);
+                scene.add(cube);
                 geoms.push(cube);
                 THREE.Collisions.colliders.push(THREE.CollisionUtils.MeshAABB(cube, p));
             }
@@ -131,7 +131,7 @@
             function createSphere(rad, p){
                 var sphere = new THREE.Mesh( new THREE.SphereGeometry( rad, 10, 10 ), new THREE.MeshLambertMaterial( { color: 0x003300 } ) );
                 sphere.position = p;
-                scene.addObject(sphere);
+                scene.add(sphere);
                 geoms.push(sphere);
 
                 var sc = new THREE.SphereCollider(p, rad);

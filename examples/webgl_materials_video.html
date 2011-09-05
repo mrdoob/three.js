@@ -97,7 +97,7 @@
 				var light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0.5, 1, 1 );
 				light.position.normalize();
-				scene.addLight( light );
+				scene.add( light );
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -160,7 +160,7 @@
 
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = 1;
 
-					scene.addObject(mesh);
+					scene.add(mesh);
 
 					mesh.dx = 0.001 * ( 0.5 - Math.random() );
 					mesh.dy = 0.001 * ( 0.5 - Math.random() );

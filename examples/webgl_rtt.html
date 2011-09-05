@@ -121,12 +121,12 @@
 				var light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0, 0, 1 );
 				light.position.normalize();
-				sceneRTT.addLight( light );
+				sceneRTT.add( light );
 
 				light = new THREE.DirectionalLight( 0xffaaaa, 1.5 );
 				light.position.set( 0, 0, -1 );
 				light.position.normalize();
-				sceneRTT.addLight( light );
+				sceneRTT.add( light );
 
 				rtTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBFormat } );
 
@@ -150,13 +150,13 @@
 
 				quad = new THREE.Mesh( plane, material );
 				quad.position.z = -100;
-				sceneRTT.addObject( quad );
+				sceneRTT.add( quad );
 
 				createMesh( new THREE.TorusGeometry( 100, 25, 15, 30 ), sceneRTT );
 
 				quad = new THREE.Mesh( plane, materialScreen );
 				quad.position.z = -100;
-				sceneScreen.addObject( quad );
+				sceneScreen.add( quad );
 
 				var n = 5,
 					geometry = new THREE.SphereGeometry( 10, 64, 32 ),
@@ -174,7 +174,7 @@
 
 						mesh.rotation.y = 1.57;
 
-						scene.addObject( mesh );
+						scene.add( mesh );
 
 					}
 				}
@@ -202,12 +202,12 @@
 				zmesh1 = new THREE.Mesh( geometry, mat1 );
 				zmesh1.position.set( 0, 0, 100 );
 				zmesh1.scale.set( 1.5, 1.5, 1.5 );
-				xscene.addObject( zmesh1 );
+				xscene.add( zmesh1 );
 
 				zmesh2 = new THREE.Mesh( geometry, mat2 );
 				zmesh2.position.set( 0, 150, 100 );
 				zmesh2.scale.set( 0.75, 0.75, 0.75 );
-				xscene.addObject( zmesh2 );
+				xscene.add( zmesh2 );
 
 			}
 
