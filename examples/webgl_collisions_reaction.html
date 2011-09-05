@@ -74,18 +74,18 @@
                 scene = new THREE.Scene();
 
                 sphere = new THREE.Mesh( new THREE.SphereGeometry( sphereSize, 10, 10 ), new THREE.MeshLambertMaterial( { color: 0xff0000 } ) );
-                scene.addObject( sphere );
+                scene.add( sphere );
 
                 renderer = new THREE.WebGLRenderer();
                 renderer.setSize(window.innerWidth, window.innerHeight);
                 container.appendChild(renderer.domElement);
 
                 var ambientLight = new THREE.AmbientLight(0xdddddd);
-                scene.addLight(ambientLight);
+                scene.add(ambientLight);
 
                 sun = new THREE.DirectionalLight(0xffffff);
                 sun.position = new THREE.Vector3(1, -1, 1).normalize();
-                scene.addLight(sun);
+                scene.add(sun);
 
                 createObstacles();
 
@@ -93,7 +93,7 @@
 				geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(0,  0,  0) ) );
 				geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(10, 0,  0) ) );
 				debugNormal = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0xff0000 } ) );
-				scene.addObject( debugNormal );
+				scene.add( debugNormal );
 
                 container.onmousemove = onDocumentMouseMove;
                 animate();
@@ -110,7 +110,7 @@
                 var cube = new THREE.Mesh( new THREE.CubeGeometry( sx, sy, sz ), new THREE.MeshLambertMaterial( { color: 0x003300 } ) );
                 cube.position = p;
 		cube.rotation.y = ry;
-                scene.addObject(cube);
+                scene.add(cube);
                 THREE.Collisions.colliders.push( THREE.CollisionUtils.MeshOBB(cube) );
 				cubes.push(cube);
 				return cube;

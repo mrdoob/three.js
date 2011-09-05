@@ -129,7 +129,7 @@
 				directionalLight = new THREE.DirectionalLight( 0xffffff );
 				directionalLight.position.set( 0, 0, 1 );
 				directionalLight.position.normalize();
-				sceneModel.addLight( directionalLight );
+				sceneModel.add( directionalLight );
 
 				loader = new THREE.JSONLoader( true );
 				document.body.appendChild( loader.statusDomElement );
@@ -153,7 +153,7 @@
 				quadBG = new THREE.Mesh( plane, materialColor );
 				quadBG.position.z = -500;
 				quadBG.scale.set( window.innerWidth, window.innerHeight, 1 );
-				sceneBG.addObject( quadBG );
+				sceneBG.add( quadBG );
 
 				//
 
@@ -164,7 +164,7 @@
 				quadMask = new THREE.Mesh( plane, new THREE.MeshBasicMaterial( { color: 0xffaa00 } )  );
 				quadMask.position.z = -300;
 				quadMask.scale.set( window.innerWidth / 2, window.innerHeight/2, 1 );
-				sceneMask.addObject( quadMask );
+				sceneMask.add( quadMask );
 
 				//
 
@@ -360,7 +360,7 @@
 				mesh.position.set( 0, -50, 0 );
 				mesh.scale.set( scale, scale, scale );
 
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				loader.statusDomElement.style.display = "none";
 

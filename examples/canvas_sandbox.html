@@ -178,12 +178,12 @@
 
 					var line = new THREE.Line( geometry, material );
 					line.position.z = ( i * 100 ) - 500;
-					scene.addObject( line );
+					scene.add( line );
 
 					var line = new THREE.Line( geometry, material );
 					line.position.x = ( i * 100 ) - 500;
 					line.rotation.y = 90 * Math.PI / 180;
-					scene.addObject( line );
+					scene.add( line );
 
 				}
 
@@ -211,24 +211,24 @@
 
 					objects.push( sphere );
 
-					scene.addObject( sphere );
+					scene.add( sphere );
 
 				}
 
 				// Lights
 
 				var ambientLight = new THREE.AmbientLight( Math.random() * 0x202020 );
-				scene.addLight( ambientLight );
+				scene.add( ambientLight );
 
 				var directionalLight = new THREE.DirectionalLight( Math.random() * 0xffffff );
 				directionalLight.position.x = Math.random() - 0.5;
 				directionalLight.position.y = Math.random() - 0.5;
 				directionalLight.position.z = Math.random() - 0.5;
 				directionalLight.position.normalize();
-				scene.addLight( directionalLight );
+				scene.add( directionalLight );
 
 				pointLight = new THREE.PointLight( 0xff0000, 1 );
-				scene.addLight( pointLight );
+				scene.add( pointLight );
 
 				renderer = new THREE.CanvasRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );

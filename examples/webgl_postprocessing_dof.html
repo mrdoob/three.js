@@ -147,7 +147,7 @@
 					mesh.matrixAutoUpdate = false;
 					mesh.updateMatrix();
 
-					scene.addObject( mesh );
+					scene.add( mesh );
 					objects.push( mesh );
 
 					c++;
@@ -260,7 +260,7 @@
 
 				postprocessing.quad = new THREE.Mesh( new THREE.PlaneGeometry( window.innerWidth, window.innerHeight ), postprocessing.materialBokeh );
 				postprocessing.quad.position.z = - 500;
-				postprocessing.scene.addObject( postprocessing.quad );
+				postprocessing.scene.add( postprocessing.quad );
 
 			}
 

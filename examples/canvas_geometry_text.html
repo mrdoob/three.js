@@ -104,9 +104,9 @@
 				text.overdraw = true;
 
 				parent = new THREE.Object3D();
-                parent.addChild( text );
+                parent.add( text );
 
-				scene.addObject( parent );
+				scene.add( parent );
 
 				renderer = new THREE.CanvasRenderer();
                 renderer.setSize( window.innerWidth, window.innerHeight );

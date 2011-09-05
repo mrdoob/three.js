@@ -94,7 +94,7 @@
 				directionalLight = new THREE.DirectionalLight( 0xffffff );
 				directionalLight.position.set( 0, 0, 1 );
 				directionalLight.position.normalize();
-				scene.addLight( directionalLight );
+				scene.add( directionalLight );
 
 				aloader = new THREE.JSONLoader( );
 				bloader = new THREE.BinaryLoader( true );
@@ -155,12 +155,12 @@
 				//
 
 				parent = new THREE.Object3D();
-				scene.addObject( parent );
+				scene.add( parent );
 
 				var grid = new THREE.ParticleSystem( new THREE.PlaneGeometry( 15000, 15000, 64, 64 ), new THREE.ParticleBasicMaterial( { color: 0xff0000, size: 10 } ) );
 				grid.rotation.x = 1.57;
 				grid.position.y = -400;
-				parent.addChild( grid );
+				parent.add( grid );
 
 				totaln += 1;
 				total += grid.geometry.vertices.length;
@@ -254,7 +254,7 @@
 						mesh.position.y = y + clones[ i ][ 1 ];
 						mesh.position.z = z + clones[ i ][ 2 ];
 
-						parent.addChild( mesh );
+						parent.add( mesh );
 
 						clonemeshes.push( { mesh: mesh, speed: 0.5 + Math.random() } );
 
@@ -272,7 +272,7 @@
 					mesh.position.y = y;
 					mesh.position.z = z;
 
-					parent.addChild( mesh );
+					parent.add( mesh );
 
 					totaln += 1;
 					total += vl;

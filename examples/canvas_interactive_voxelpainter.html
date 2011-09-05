@@ -62,12 +62,12 @@
 
 					var line = new THREE.Line( geometry, material );
 					line.position.z = ( i * 50 ) - 500;
-					scene.addObject( line );
+					scene.add( line );
 
 					var line = new THREE.Line( geometry, material );
 					line.position.x = ( i * 50 ) - 500;
 					line.rotation.y = 90 * Math.PI / 180;
-					scene.addObject( line );
+					scene.add( line );
 
 				}
 
@@ -75,7 +75,7 @@
 
 				plane = new THREE.Mesh( new THREE.PlaneGeometry( 1000, 1000, 20, 20 ), new THREE.MeshFaceMaterial() );
 				plane.rotation.x = - 90 * Math.PI / 180;
-				scene.addObject( plane );
+				scene.add( plane );
 
 				mouse2D = new THREE.Vector3( 0, 10000, 0.5 );
 				ray = new THREE.Ray( camera.position, null );
@@ -83,21 +83,21 @@
 				// Lights
 
 				var ambientLight = new THREE.AmbientLight( 0x606060 );
-				scene.addLight( ambientLight );
+				scene.add( ambientLight );
 
 				var directionalLight = new THREE.DirectionalLight( 0xffffff );
 				directionalLight.position.x = Math.random() - 0.5;
 				directionalLight.position.y = Math.random() - 0.5;
 				directionalLight.position.z = Math.random() - 0.5;
 				directionalLight.position.normalize();
-				scene.addLight( directionalLight );
+				scene.add( directionalLight );
 
 				var directionalLight = new THREE.DirectionalLight( 0x808080 );
 				directionalLight.position.x = Math.random() - 0.5;
 				directionalLight.position.y = Math.random() - 0.5;
 				directionalLight.position.z = Math.random() - 0.5;
 				directionalLight.position.normalize();
-				scene.addLight( directionalLight );
+				scene.add( directionalLight );
 
 				renderer = new THREE.CanvasRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -137,7 +137,7 @@
 
 						if ( intersects[ 0 ].object != plane ) {
 
-							scene.removeObject( intersects[ 0 ].object );
+							scene.remove( intersects[ 0 ].object );
 
 						}
 
@@ -152,7 +152,7 @@
 						voxel.matrixAutoUpdate = false;
 						voxel.updateMatrix();
 						voxel.overdraw = true;
-						scene.addObject( voxel );
+						scene.add( voxel );
 
 					}
 

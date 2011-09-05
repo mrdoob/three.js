@@ -438,17 +438,17 @@
 				}
 
 				mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial() );
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				var ambientLight = new THREE.AmbientLight( 0xcccccc );
-				scene.addLight( ambientLight );
+				scene.add( ambientLight );
 
 				var directionalLight = new THREE.DirectionalLight( 0xffffff, 1.5 );
 				directionalLight.position.x = 1;
 				directionalLight.position.y = 1;
 				directionalLight.position.z = 0.5;
 				directionalLight.position.normalize();
-				scene.addLight( directionalLight );
+				scene.add( directionalLight );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );

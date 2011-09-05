@@ -102,7 +102,7 @@
 									  
 					mesh.updateMatrix();
 					mesh.matrixAutoUpdate = false;
-					scene.addChild( mesh );
+					scene.add( mesh );
 					
 				}
 
@@ -117,19 +117,19 @@
 				var material = new THREE.MeshPhongMaterial( { color:0xff0000 } );
 				var mesh = new THREE.Mesh( new THREE.Cube( 40, 5, 5 ), material );
 				mesh.position.x = 20;
-				cross.addChild( mesh );
+				cross.add( mesh );
 
 				var material = new THREE.MeshPhongMaterial( { color:0x00ff00 } );
 				var mesh = new THREE.Mesh( new THREE.Cube( 5, 40, 5 ), material );
 				mesh.position.y = 20;
-				cross.addChild( mesh );
+				cross.add( mesh );
 
 				var material = new THREE.MeshPhongMaterial( { color:0x0000ff } );
 				var mesh = new THREE.Mesh( new THREE.Cube( 5, 5, 40 ), material );
 				mesh.position.z = 20;
 
-				cross.addChild( mesh );
-				camera.addChild( cross );
+				cross.add( mesh );
+				camera.add( cross );
 				*/
 
 
@@ -137,14 +137,14 @@
 
 				light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 1, 1, 1 );
-				scene.addChild( light );
+				scene.add( light );
 
 				light = new THREE.DirectionalLight( 0x002288 );
 				light.position.set( -1, -1, -1 );
-				scene.addChild( light );
+				scene.add( light );
 
 				light = new THREE.AmbientLight( 0x222222 );
-				scene.addChild( light );
+				scene.add( light );
 
 
 				// renderer

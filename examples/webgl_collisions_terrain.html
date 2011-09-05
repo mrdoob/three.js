@@ -69,18 +69,18 @@ function init() {
 	ray.direction = new THREE.Vector3(0, -1, 0);
 
 	sphere = new THREE.Mesh( new THREE.SphereGeometry( sphereSize, 10, 10 ), new THREE.MeshLambertMaterial( { color: 0xff0000 } ) );
-	scene.addObject(sphere);
+	scene.add(sphere);
 
 	renderer = new THREE.WebGLRenderer();
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	container.appendChild(renderer.domElement);
 
 	var ambientLight = new THREE.AmbientLight( 0x444444 );
-	scene.addLight( ambientLight );
+	scene.add( ambientLight );
 
 	sun = new THREE.DirectionalLight( 0xaaaaaa );
 	sun.position = new THREE.Vector3(-1,1, -1).normalize();
-	scene.addLight( sun );
+	scene.add( sun );
 
 	loadCube();
 
@@ -93,7 +93,7 @@ function init() {
 function loadCube(p) {
 	var onGeometry = function( geometry ) {
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: 0xf3e4b8 } ) );
-		scene.addObject( mesh );
+		scene.add( mesh );
 		THREE.Collisions.colliders.push( THREE.CollisionUtils.MeshColliderWBox(mesh) );
 	};
 

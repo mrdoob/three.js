@@ -76,11 +76,11 @@ function init() {
 	container.appendChild( renderer.domElement );
 	
 	var ambientLight = new THREE.AmbientLight( 0x606060 );
-	scene.addLight( ambientLight );
+	scene.add( ambientLight );
 
 	sun = new THREE.DirectionalLight( 0xffffff );
 	sun.position = camera.position.clone();
-	scene.addLight( sun );
+	scene.add( sun );
 	
 	loadCube();
 
@@ -174,7 +174,7 @@ function addCube( p, g) {
 	//mesh.scale.y = Math.random() + 0.5;
 	//mesh.scale.z = Math.random() + 0.5;
 	
-	scene.addObject( mesh );
+	scene.add( mesh );
 	var mc = THREE.CollisionUtils.MeshColliderWBox(mesh);
 	THREE.Collisions.colliders.push( mc );
 	meshes.push( mesh );

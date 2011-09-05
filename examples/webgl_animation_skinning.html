@@ -86,7 +86,7 @@
 				light = new THREE.DirectionalLight( 0xffffff, 1.5 );
 				light.position.set( 0, 1, 1 );
 				light.position.normalize();
-				scene.addLight( light );
+				scene.add( light );
 
 				var planeSimple = new THREE.PlaneGeometry( 200, 300 );
 				var planeTesselated = new THREE.PlaneGeometry( 100, 300, 25, 40 );
@@ -98,12 +98,12 @@
 				floor.position.y = -10;
 				floor.rotation.x = -1.57;
 				floor.scale.set( 25, 25, 25 );
-				scene.addObject( floor );
+				scene.add( floor );
 
 				floor = new THREE.Mesh( planeTesselated, matWire );
 				floor.rotation.x = -1.57;
 				floor.scale.set( 25, 25, 25 );
-				scene.addObject( floor );
+				scene.add( floor );
 
 				renderer = new THREE.WebGLRenderer( { clearColor: 0xffffff, clearAlpha: 1 } );
 				renderer.setSize( window.innerWidth, height );
@@ -161,7 +161,7 @@
 						buffalo.position.y = buffalo.boundRadius * 0.5;
 						buffalo.rotation.y = 0.2 - Math.random() * 0.4;
 
-						scene.addObject( buffalo );
+						scene.add( buffalo );
 
 						buffalos.push( buffalo );
 

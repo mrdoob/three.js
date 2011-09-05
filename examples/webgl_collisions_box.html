@@ -68,11 +68,11 @@ function init() {
 	container.appendChild(renderer.domElement);
 
 	var ambientLight = new THREE.AmbientLight( 0x606060 );
-	scene.addLight( ambientLight );
+	scene.add( ambientLight );
 
 	sun = new THREE.DirectionalLight( 0xffffff );
 	sun.position = camera.position.clone();
-	scene.addLight( sun );
+	scene.add( sun );
 
 	createCube( 200, new THREE.Vector3( 0,0,0 ) );
 
@@ -94,7 +94,7 @@ function createCube( s, p ) {
 	);
 
 	cube.position = p;
-	scene.addObject( cube );
+	scene.add( cube );
 
 	THREE.Collisions.colliders.push( THREE.CollisionUtils.MeshOBB( cube ) );
 

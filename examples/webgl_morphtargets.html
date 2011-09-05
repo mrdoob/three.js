@@ -103,10 +103,10 @@
 
 				var light = new THREE.PointLight( 0xff2200 );
 				light.position.set( 100, 100, 100 );
-				scene.addLight( light );
+				scene.add( light );
 
 				var light = new THREE.AmbientLight( 0x333333 );
-				scene.addLight( light );
+				scene.add( light );
 
 
 				var geometry = new THREE.CubeGeometry( 100, 100, 100 );
@@ -138,7 +138,7 @@
 
 				mesh = new THREE.Mesh( geometry, material );
 
-				scene.addChild( mesh );
+				scene.add( mesh );
 
 
 				renderer = new THREE.WebGLRenderer( { clearColor:0x222222, clearAlpha: 1 } );

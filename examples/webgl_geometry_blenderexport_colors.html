@@ -66,12 +66,10 @@
 
 				scene = new THREE.Scene();
 
-				//scene.addLight( new THREE.AmbientLight( 0x333333 )  );
-
 				light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0, 0, 1 );
 				light.position.normalize();
-				scene.addLight( light );
+				scene.add( light );
 
 				var loader = new THREE.JSONLoader();
 				loader.load( { model: "obj/cubecolors/cubecolors.js", callback: createScene1 } );
@@ -100,7 +98,7 @@
 				mesh = new THREE.Mesh( geometry, material );
 				mesh.position.x = 400;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 250;
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 			}
 
@@ -113,7 +111,7 @@
 				mesh2 = new THREE.Mesh( geometry, material );
 				mesh2.position.x = - 400;
 				mesh2.scale.x = mesh2.scale.y = mesh2.scale.z = 250;
-				scene.addObject( mesh2 );
+				scene.add( mesh2 );
 
 			}
 

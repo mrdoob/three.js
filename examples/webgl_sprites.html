@@ -71,27 +71,27 @@
 					sprite.position.normalize();
 					sprite.position.multiplyScalar( radius );
 
-					group.addChild( sprite );
+					group.add( sprite );
 				}
 
-				scene.addChild( group );
+				scene.add( group );
 
 				// add 2d-sprites
 
 				sprite = new THREE.Sprite( { map: mapA, alignment:THREE.SpriteAlignment.topLeft } );
 				sprite.position.set( 100, 100, 0 );
 				sprite.opacity = 0.25;
-				scene.addChild( sprite );
+				scene.add( sprite );
 
 				sprite = new THREE.Sprite( { map: mapA, alignment:THREE.SpriteAlignment.topLeft } );
 				sprite.position.set( 150, 150, 2 );
 				sprite.opacity = 0.5;
-				scene.addChild( sprite );
+				scene.add( sprite );
 
 				sprite = new THREE.Sprite( { map: mapA, alignment:THREE.SpriteAlignment.topLeft } );
 				sprite.position.set( 200, 200, 3 );
 				sprite.opacity = 1;
-				scene.addChild( sprite );
+				scene.add( sprite );
 
 				// renderer
 

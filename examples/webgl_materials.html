@@ -63,7 +63,7 @@
 				}
 
 				var line = new THREE.Line( geometry, line_material, THREE.LinePieces );
-				scene.addObject( line );
+				scene.add( line );
 
 				// Materials
 
@@ -123,26 +123,26 @@
 
 					objects.push( sphere );
 
-					scene.addObject( sphere );
+					scene.add( sphere );
 
 				}
 
 				particleLight = new THREE.Mesh( new THREE.SphereGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
-				scene.addObject( particleLight );
+				scene.add( particleLight );
 
 				// Lights
 
-				scene.addLight( new THREE.AmbientLight( 0x202020 ) );
+				scene.add( new THREE.AmbientLight( 0x202020 ) );
 
 				var directionalLight = new THREE.DirectionalLight( Math.random() * 0xffffff );
 				directionalLight.position.x = Math.random() - 0.5;
 				directionalLight.position.y = Math.random() - 0.5;
 				directionalLight.position.z = Math.random() - 0.5;
 				directionalLight.position.normalize();
-				scene.addLight( directionalLight );
+				scene.add( directionalLight );
 
 				pointLight = new THREE.PointLight( 0xffffff, 1 );
-				scene.addLight( pointLight );
+				scene.add( pointLight );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );

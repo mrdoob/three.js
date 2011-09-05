@@ -170,27 +170,27 @@
 				// LIGHTS
 
 				var ambient = new THREE.AmbientLight( 0x555555 );
-				scene.addLight( ambient );
+				scene.add( ambient );
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
 				directionalLight.position.x = 2;
 				directionalLight.position.y = 1.2;
 				directionalLight.position.z = 10;
 				directionalLight.position.normalize();
-				scene.addLight( directionalLight );
+				scene.add( directionalLight );
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
 				directionalLight.position.x = - 2;
 				directionalLight.position.y = 1.2;
 				directionalLight.position.z = - 10;
 				directionalLight.position.normalize();
-				scene.addLight( directionalLight );
+				scene.add( directionalLight );
 
 				pointLight = new THREE.PointLight( 0xffaa00, 2 );
 				pointLight.position.x = 2000;
 				pointLight.position.y = 1200;
 				pointLight.position.z = 10000;
-				scene.addLight( pointLight );
+				scene.add( pointLight );
 
 				// Skybox
 
@@ -206,7 +206,7 @@
 				} ),
 
 				mesh = new THREE.Mesh( new THREE.CubeGeometry( 100000, 100000, 100000, 1, 1, 1, null, true ), material );
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				//
 
@@ -568,7 +568,7 @@
 				mesh.rotation.y = r[ 1 ];
 				mesh.rotation.z = r[ 2 ];
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = s;
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				CARS[ car ].object = mesh;
 

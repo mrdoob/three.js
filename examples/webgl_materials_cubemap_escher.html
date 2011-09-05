@@ -85,7 +85,7 @@
 
 				var mesh = new THREE.Mesh( geometry, material );
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 16;
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				// Skybox
 
@@ -101,7 +101,7 @@
 				} ),
 
 				mesh = new THREE.Mesh( new THREE.CubeGeometry( 6000, 6000, 6000, 1, 1, 1, null, true ), material );
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				//
 

@@ -101,7 +101,7 @@
 					mesh.position.z = 500 * ( Math.random() - 0.5 );
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = 0.25 * ( Math.random() + 0.5 );
 					mesh.overdraw = true;
-					scene.addObject( mesh );
+					scene.add( mesh );
 
 				}
 
@@ -109,30 +109,30 @@
 
 				mesh = new THREE.Mesh( new THREE.TorusGeometry( 100, 25, 15, 30 ), new THREE.MeshLambertMaterial( { color: 0xffffff } ) );
 				mesh.overdraw = true;
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				// Lights
 
 				var ambient = new THREE.AmbientLight( 0x101010 );
-				scene.addLight( ambient );
+				scene.add( ambient );
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff );
 				directionalLight.position.y = -70;
 				directionalLight.position.z = 100;
 				directionalLight.position.normalize();
-				scene.addLight( directionalLight );
+				scene.add( directionalLight );
 
 				pointLight = new THREE.PointLight( 0xffaa00 );
 				pointLight.position.x = 0;
 				pointLight.position.y = 0;
 				pointLight.position.z = 0;
-				scene.addLight( pointLight );
+				scene.add( pointLight );
 
 				lightMesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) );
 				lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
 				lightMesh.position = pointLight.position;
 				lightMesh.overdraw = true;
-				scene.addObject(lightMesh);
+				scene.add(lightMesh);
 
 
 				if ( render_canvas ) {
@@ -193,7 +193,7 @@
 
 			function render() {
 
-				counter == 30 ? scene.removeLight( directionalLight ) : counter ++;
+				counter == 30 ? scene.remove( directionalLight ) : counter ++;
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;

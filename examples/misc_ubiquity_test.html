@@ -27,6 +27,7 @@
 		<script type="text/javascript" src="../src/core/Matrix3.js"></script>
 		<script type="text/javascript" src="../src/core/Matrix4.js"></script>
 		<script type="text/javascript" src="../src/core/Object3D.js"></script>
+		<script type="text/javascript" src="../src/core/Projector.js"></script>
 		<script type="text/javascript" src="../src/core/Quaternion.js"></script>
 		<script type="text/javascript" src="../src/core/Vertex.js"></script>
 		<script type="text/javascript" src="../src/core/Face3.js"></script>
@@ -36,6 +37,7 @@
 		<script type="text/javascript" src="../src/core/Spline.js"></script>
 		<script type="text/javascript" src="../src/core/Edge.js"></script>
 		<script type="text/javascript" src="../src/cameras/Camera.js"></script>
+		<script type="text/javascript" src="../src/cameras/OrthoCamera.js"></script>
 		<script type="text/javascript" src="../src/lights/Light.js"></script>
 		<script type="text/javascript" src="../src/lights/AmbientLight.js"></script>
 		<script type="text/javascript" src="../src/lights/DirectionalLight.js"></script>
@@ -67,7 +69,6 @@
 		<script type="text/javascript" src="../src/scenes/Scene.js"></script>
 		<script type="text/javascript" src="../src/scenes/Fog.js"></script>
 		<script type="text/javascript" src="../src/scenes/FogExp2.js"></script>
-		<script type="text/javascript" src="../src/renderers/Projector.js"></script>
 		<script type="text/javascript" src="../src/renderers/DOMRenderer.js"></script>
 		<script type="text/javascript" src="../src/renderers/CanvasRenderer.js"></script>
 		<script type="text/javascript" src="../src/renderers/SVGRenderer.js"></script>
@@ -86,6 +87,11 @@
 		<script type="text/javascript" src="../src/extras/ImageUtils.js"></script>
 		<script type="text/javascript" src="../src/extras/SceneUtils.js"></script>
 		<script type="text/javascript" src="../src/extras/ShaderUtils.js"></script>
+		<script type="text/javascript" src="../src/extras/core/Curve.js"></script>
+		<script type="text/javascript" src="../src/extras/core/CurvePath.js"></script>
+		<script type="text/javascript" src="../src/extras/core/Path.js"></script>
+		<script type="text/javascript" src="../src/extras/core/Shape.js"></script>
+		<script type="text/javascript" src="../src/extras/core/TextPath.js"></script>
 		<script type="text/javascript" src="../src/extras/animation/AnimationHandler.js"></script>
 		<script type="text/javascript" src="../src/extras/animation/Animation.js"></script>
 		<script type="text/javascript" src="../src/extras/cameras/FirstPersonCamera.js"></script>
@@ -94,11 +100,6 @@
 		<script type="text/javascript" src="../src/extras/cameras/RollCamera.js"></script>
 		<script type="text/javascript" src="../src/extras/cameras/TrackballCamera.js"></script>
 		<script type="text/javascript" src="../src/extras/cameras/QuakeCamera.js"></script>
-		<script type="text/javascript" src="../src/extras/geometries/Curve.js"></script>
-		<script type="text/javascript" src="../src/extras/geometries/CurvePath.js"></script>
-		<script type="text/javascript" src="../src/extras/geometries/Path.js"></script>
-		<script type="text/javascript" src="../src/extras/geometries/Shape.js"></script>
-		<script type="text/javascript" src="../src/extras/geometries/TextPath.js"></script>
 		<script type="text/javascript" src="../src/extras/geometries/CubeGeometry.js"></script>
 		<script type="text/javascript" src="../src/extras/geometries/CylinderGeometry.js"></script>
 		<script type="text/javascript" src="../src/extras/geometries/ExtrudeGeometry.js"></script>
@@ -110,8 +111,9 @@
 		<script type="text/javascript" src="../src/extras/geometries/TorusGeometry.js"></script>
 		<script type="text/javascript" src="../src/extras/geometries/TorusKnotGeometry.js"></script>
 		<script type="text/javascript" src="../src/extras/loaders/Loader.js"></script>
-		<script type="text/javascript" src="../src/extras/loaders/JSONLoader.js"></script>
 		<script type="text/javascript" src="../src/extras/loaders/BinaryLoader.js"></script>
+		<script type="text/javascript" src="../src/extras/loaders/ColladaLoader.js"></script>
+		<script type="text/javascript" src="../src/extras/loaders/JSONLoader.js"></script>
 		<script type="text/javascript" src="../src/extras/loaders/SceneLoader.js"></script>
 		<script type="text/javascript" src="../src/extras/loaders/UTF8Loader.js"></script>
 		<script type="text/javascript" src="../src/extras/objects/MarchingCubes.js"></script>
@@ -163,7 +165,7 @@
 
 				qrcode = mesh = new THREE.Mesh( new Qrcode(), new THREE.MeshFaceMaterial() );
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				// CUBES
 
@@ -174,7 +176,7 @@
 				mesh.rotation.x = Math.random();
 				mesh.rotation.y = Math.random();
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				mesh = new THREE.Mesh( cube, new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } ) );
 				mesh.position.x = 500;
@@ -182,7 +184,7 @@
 				mesh.rotation.x = Math.random();
 				mesh.rotation.y = Math.random();
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				// PLANE
 
@@ -190,14 +192,15 @@
 				mesh.position.y = -500;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
 				mesh.doubleSided = true;
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				// CYLINDER
 
-				mesh = new THREE.Mesh( new THREE.CylinderGeometry( 10, 20, 100, 200, - 50, - 20 ), new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } ) );
+				mesh = new THREE.Mesh( new THREE.CylinderGeometry( 20, 100, 200, 10 ), new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } ) );
 				mesh.position.x = -500;
+				mesh.rotation.x = - Math.PI / 2;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				// POLYFIELD
 
@@ -226,16 +229,16 @@
 				mesh = new THREE.Mesh( geometry, [ new THREE.MeshFaceMaterial(), new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, transparent: true, wireframe: true, wireframeLinewidth: 10 } ) ] );
 				mesh.doubleSided = true;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 
 				// LIGHTS
 
 				var ambient = new THREE.AmbientLight( 0x80ffff );
-				scene.addLight( ambient );
+				scene.add( ambient );
 
 				var directional = new THREE.DirectionalLight( 0xffff00 );
-				scene.addLight( directional );
+				scene.add( directional );
 
 				canvasRenderer = new THREE.CanvasRenderer();
 				canvasRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );

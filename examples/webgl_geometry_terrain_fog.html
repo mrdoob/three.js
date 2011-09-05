@@ -96,7 +96,7 @@
 
 				mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { map: texture } ) );
 				mesh.rotation.x = - 90 * Math.PI / 180;
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				renderer = new THREE.WebGLRenderer( { clearColor: 0xefd1b5, clearAlpha: 1 } );
 				renderer.setSize( window.innerWidth, window.innerHeight );

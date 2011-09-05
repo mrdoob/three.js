@@ -79,7 +79,7 @@
 				plane.rotation.x = - 90 * ( Math.PI / 180 );
 				plane.position.y = - 100;
 
-				scene.addObject( plane );
+				scene.add( plane );
 
 				// Spheres
 
@@ -108,24 +108,24 @@
 					cube.scale.x = cube.scale.y = cube.scale.z = Math.random() + 0.5;
 					*/
 
-					scene.addObject(cube);
+					scene.add(cube);
 
 				}
 
 				// Lights
 
 				var ambientLight = new THREE.AmbientLight( Math.random() * 0x202020 );
-				scene.addLight( ambientLight );
+				scene.add( ambientLight );
 
 				var directionalLight = new THREE.DirectionalLight( Math.random() * 0xffffff );
 				directionalLight.position.x = Math.random() - 0.5;
 				directionalLight.position.y = Math.random() - 0.5;
 				directionalLight.position.z = Math.random() - 0.5;
 				directionalLight.position.normalize();
-				scene.addLight( directionalLight );
+				scene.add( directionalLight );
 
 				var pointLight = new THREE.PointLight( 0xff0000, 1 );
-				scene.addLight( pointLight );
+				scene.add( pointLight );
 
 				renderer = new THREE.CanvasRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );

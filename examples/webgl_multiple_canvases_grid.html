@@ -145,7 +145,7 @@
 					light = new THREE.DirectionalLight( 0xffffff );
 					light.position.set( 0, 0, 1 );
 					light.position.normalize();
-					scene.addLight( light );
+					scene.add( light );
 
 					var shadowMaterial = new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/shadow.png' ) } );
 					var shadowGeo = new THREE.PlaneGeometry( 300, 300, 1, 1 );
@@ -153,19 +153,19 @@
 					mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
 					mesh.position.y = - 250;
 					mesh.rotation.x = - 90 * Math.PI / 180;
-					scene.addObject( mesh );
+					scene.add( mesh );
 
 					mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
 					mesh.position.y = - 250;
 					mesh.position.x = - 400;
 					mesh.rotation.x = - 90 * Math.PI / 180;
-					scene.addObject( mesh );
+					scene.add( mesh );
 
 					mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
 					mesh.position.y = - 250;
 					mesh.position.x = 400;
 					mesh.rotation.x = - 90 * Math.PI / 180;
-					scene.addObject( mesh );
+					scene.add( mesh );
 
 					var faceIndices = [ 'a', 'b', 'c', 'd' ];
 
@@ -220,19 +220,19 @@
 					mesh.position.x = -400;
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = 200;
 					mesh.rotation.x = -1.87;
-					scene.addObject( mesh );
+					scene.add( mesh );
 
 					mesh2 = new THREE.Mesh( geometry2, materials  );
 					mesh2.position.x = 400;
 					mesh2.rotation.x = 0;
 					mesh2.scale = mesh.scale;
-					scene.addObject( mesh2 );
+					scene.add( mesh2 );
 
 					mesh3 = new THREE.Mesh( geometry3, materials  );
 					mesh3.position.x = 0;
 					mesh3.rotation.x = 0;
 					mesh3.scale = mesh.scale;
-					scene.addObject( mesh3 );
+					scene.add( mesh3 );
 
 					renderer = new THREE.WebGLRenderer( { antialias: true } );
 					renderer.setSize( container.clientWidth, container.clientHeight );
