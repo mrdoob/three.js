@@ -502,7 +502,7 @@ THREE.SceneLoader.prototype = {
 
 				} else if ( g.type == "cylinder" ) {
 
-					geometry = new THREE.CylinderGeometry( g.numSegs, g.topRad, g.botRad, g.height, g.topOffset, g.botOffset );
+					geometry = new THREE.CylinderGeometry( g.topRad, g.height, g.numSegs, 1, g.topRad, g.botRad );
 					result.geometries[ dg ] = geometry;
 
 				} else if ( g.type == "torus" ) {
