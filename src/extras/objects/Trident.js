@@ -11,7 +11,7 @@ THREE.Trident = function () {
 	lineGeometry.vertices.push( new THREE.Vertex() );
 	lineGeometry.vertices.push( new THREE.Vertex( new THREE.Vector3( 0, 100, 0 ) ) );
 
-	var coneGeometry = new THREE.CylinderGeometry( 5, 25, 5, 1, 0, 5 );
+	var coneGeometry = new THREE.CylinderGeometry( 0, 5, 25, 5, 1 );
 
 	// x
 

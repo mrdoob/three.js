@@ -186,22 +186,20 @@ var scene = {
 	
 	"cylinder": {
 		"type"    : "cylinder",
-		"numSegs"  : 32, 
 		"topRad"   : 5, 
 		"botRad"   : 5,
 		"height"   : 50,
-		"topOffset": 0,
-		"botOffset": 0
+		"radSegs"  : 32, 
+		"heightSegs": 1
 	},
 
 	"cone": {
 		"type"    : "cylinder",
-		"numSegs"  : 32, 
 		"topRad"   : 0, 
 		"botRad"   : 5,
 		"height"   : 50,
-		"topOffset": 0,
-		"botOffset": 0
+		"radSegs"  : 32, 
+		"heightSegs" : 1
 	},
 	
 	"WaltHead": {

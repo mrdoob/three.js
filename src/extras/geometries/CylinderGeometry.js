@@ -2,13 +2,12 @@
  * @author mr.doob / http://mrdoob.com/
  */
 
-THREE.CylinderGeometry = function ( radius, height, segmentsRadius, segmentsHeight, radiusTop, radiusBottom ) {
+THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, segmentsRadius, segmentsHeight ) {
 
 	THREE.Geometry.call( this );
 
-	var radius = radius || 20;
-	var radiusTop = radiusTop != null ? radiusTop : radius;
-	var radiusBottom = radiusBottom != null ? radiusBottom : radius;
+	var radiusTop = radiusTop != null ? radiusTop : 20;
+	var radiusBottom = radiusBottom != null ? radiusBottom : 20;
 	var height = height || 100;
 	var heightHalf = height / 2;
 	var segmentsX = segmentsRadius || 8;
