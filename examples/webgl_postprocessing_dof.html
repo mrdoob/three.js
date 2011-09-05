@@ -185,9 +185,9 @@
 
 				var matChanger = function( ) {
 
-					postprocessing.bokeh_uniforms["focus"].value = effectController.focus;
-					postprocessing.bokeh_uniforms["aperture"].value = effectController.aperture;
-					postprocessing.bokeh_uniforms["maxblur"].value = effectController.maxblur;
+					postprocessing.bokeh_uniforms[ "focus" ].value = effectController.focus;
+					postprocessing.bokeh_uniforms[ "aperture" ].value = effectController.aperture;
+					postprocessing.bokeh_uniforms[ "maxblur" ].value = effectController.maxblur;
 
 				};
 
@@ -234,22 +234,21 @@
 
 				postprocessing.scene = new THREE.Scene();
 
-				postprocessing.camera = new THREE.Camera();
-				postprocessing.camera.projectionMatrix = THREE.Matrix4.makeOrtho( window.innerWidth / - 2, window.innerWidth / 2,  window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
+				postprocessing.camera = new THREE.OrthoCamera( window.innerWidth / - 2, window.innerWidth / 2,  window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
 				postprocessing.camera.position.z = 100;
 
 				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
 				postprocessing.rtTextureDepth = new THREE.WebGLRenderTarget( window.innerWidth, height, pars );
 				postprocessing.rtTextureColor = new THREE.WebGLRenderTarget( window.innerWidth, height, pars );
 
-				var bokeh_shader = ShaderExtras["bokeh"];
+				var bokeh_shader = THREE.ShaderExtras[ "bokeh" ];
 
 				postprocessing.bokeh_uniforms = THREE.UniformsUtils.clone( bokeh_shader.uniforms );
 
-				postprocessing.bokeh_uniforms["tColor"].texture = postprocessing.rtTextureColor;
-				postprocessing.bokeh_uniforms["tDepth"].texture = postprocessing.rtTextureDepth;
-				postprocessing.bokeh_uniforms["focus"].value = 1.1;
-				postprocessing.bokeh_uniforms["aspect"].value = window.innerWidth / height;
+				postprocessing.bokeh_uniforms[ "tColor" ].texture = postprocessing.rtTextureColor;
+				postprocessing.bokeh_uniforms[ "tDepth" ].texture = postprocessing.rtTextureDepth;
+				postprocessing.bokeh_uniforms[ "focus" ].value = 1.1;
+				postprocessing.bokeh_uniforms[ "aspect" ].value = window.innerWidth / height;
 
 				postprocessing.materialBokeh = new THREE.MeshShaderMaterial( {
 

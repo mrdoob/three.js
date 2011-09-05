@@ -41,6 +41,15 @@
 
 		<script type="text/javascript" src="../build/Three.js"></script>
 
+		<script type="text/javascript" src="js/ShaderExtras.js"></script>
+
+		<script type="text/javascript" src="js/postprocessing/EffectComposer.js"></script>
+		<script type="text/javascript" src="js/postprocessing/RenderPass.js"></script>
+		<script type="text/javascript" src="js/postprocessing/ShaderPass.js"></script>
+		<script type="text/javascript" src="js/postprocessing/MaskPass.js"></script>
+		<script type="text/javascript" src="js/postprocessing/BloomPass.js"></script>
+		<script type="text/javascript" src="js/postprocessing/FilmPass.js"></script>
+
 		<script type="text/javascript" src="js/Detector.js"></script>
 		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
@@ -68,7 +77,9 @@
 
 			var camera, scene, renderer;
 
-			var textMesh1, textMesh2, textGeo, textMaterial, parent;
+			var composer;
+
+			var textMesh1, textMesh2, textGeo, faceMaterial, textMaterialFront, textMaterialSide, parent;
 
 			var firstLetter = true;
 
@@ -78,7 +89,7 @@
 				size = 70,
 				hover = 30,
 
-				curveSegments = 6,
+				curveSegments = 4,
 
 				bevelThickness = 2,
 				bevelSize = 1.5,
@@ -121,7 +132,7 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
-			var postprocessing = { enabled : true };
+			var postprocessing = { enabled : false };
 			var glow = 0.9;
 
 			init();
@@ -148,10 +159,14 @@
 
 				permalink = document.getElementById( "permalink" );
 
+				// CAMERA
+
 				camera = new THREE.Camera( 30, window.innerWidth / window.innerHeight, 1, 1500 );
 				camera.position.y = 400;
 				camera.position.z = 700;
 				camera.target.position.y = 100;
+
+				// SCENE
 
 				scene = new THREE.Scene();
 
@@ -205,7 +220,10 @@
 
 				}
 
-				textMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, wireframe: false } );
+				faceMaterial = new THREE.MeshFaceMaterial();
+
+				textMaterialFront = new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.FlatShading } );
+				textMaterialSide = new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.SmoothShading } );
 
 				parent = new THREE.Object3D();
 				parent.position.y = 100;
@@ -219,17 +237,23 @@
 				plane.position.y = 100;
 				scene.addChild( plane );
 
-				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				// RENDERER
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				renderer.setClearColor( scene.fog.color, 1 );
 
 				container.appendChild( renderer.domElement );
 
+				// STATS
+
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
 				//container.appendChild( stats.domElement );
+
+				// EVENTS
 
 				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
@@ -312,8 +336,22 @@
 
 				}, false );
 
-				initPostprocessing();
+
+				// POSTPROCESSING
+
 				renderer.autoClear = false;
+
+				var renderModel = new THREE.RenderPass( scene, camera );
+				var effectBloom = new THREE.BloomPass( 0.25 );
+				var effectFilm = new THREE.FilmPass( 0.5, 0.125, 2048, false );
+
+				effectFilm.renderToScreen = true;
+
+				composer = new THREE.EffectComposer( renderer );
+
+				composer.addPass( renderModel );
+				composer.addPass( effectBloom );
+				composer.addPass( effectFilm );
 
 			}
 
@@ -383,6 +421,7 @@
 			}
 
 			function createText() {
+
 				textGeo = new THREE.TextGeometry( text, {
 
 					size: size,
@@ -397,14 +436,61 @@
 					bevelSize: bevelSize,
 					bevelEnabled: bevelEnabled,
 
-					bend: bend
+					bend: bend,
+
+					material: textMaterialFront,
+					extrudeMaterial: textMaterialSide
 
 				});
 
 				textGeo.computeBoundingBox();
+				textGeo.computeVertexNormals();
+
+				// "fix" side normals by removing z-component of normals for side faces
+				// (this doesn't work well for beveled geometry as then we lose nice curvature around z-axis)
+
+				if ( ! bevelEnabled ) {
+
+					var triangleAreaHeuristics = 0.1 * ( height * size );
+
+					for ( var i = 0; i < textGeo.faces.length; i ++ ) {
+
+						var face = textGeo.faces[ i ];
+
+						if ( face.materials[ 0 ].id == textMaterialSide.id ) {
+
+							for ( var j = 0; j < face.vertexNormals.length; j ++ ) {
+
+								face.vertexNormals[ j ].z = 0;
+								face.vertexNormals[ j ].normalize();
+
+							}
+
+							var va = textGeo.vertices[ face.a ].position;
+							var vb = textGeo.vertices[ face.b ].position;
+							var vc = textGeo.vertices[ face.c ].position;
+
+							var s = THREE.GeometryUtils.triangleArea( va, vb, vc );
+
+							if ( s > triangleAreaHeuristics ) {
+
+								for ( var j = 0; j < face.vertexNormals.length; j ++ ) {
+
+									face.vertexNormals[ j ].copy( face.normal );
+
+								}
+
+							}
+
+						}
+
+					}
+
+				}
+
 				var centerOffset = -0.5 * ( textGeo.boundingBox.x[ 1 ] - textGeo.boundingBox.x[ 0 ] );
 
-				textMesh1 = new THREE.Mesh( textGeo, textMaterial );
+				textMesh1 = new THREE.Mesh( textGeo, faceMaterial );
 
 				textMesh1.position.x = centerOffset;
 				textMesh1.position.y = hover;
@@ -417,7 +503,7 @@
 
 				if ( mirror ) {
 
-					textMesh2 = new THREE.Mesh( textGeo, textMaterial );
+					textMesh2 = new THREE.Mesh( textGeo, faceMaterial );
 
 					textMesh2.position.x = centerOffset;
 					textMesh2.position.y = -hover;
@@ -510,77 +596,6 @@
 
 			//
 
-			function initPostprocessing() {
-
-				postprocessing.scene = new THREE.Scene();
-
-				postprocessing.camera = new THREE.Camera();
-				postprocessing.camera.projectionMatrix = THREE.Matrix4.makeOrtho( window.innerWidth / - 2, window.innerWidth / 2,  window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
-				postprocessing.camera.position.z = 100;
-
-				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
-				postprocessing.rtTexture1 = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
-				postprocessing.rtTexture2 = new THREE.WebGLRenderTarget( 512, 512, pars );
-				postprocessing.rtTexture3 = new THREE.WebGLRenderTarget( 512, 512, pars );
-
-				var screen_shader = THREE.ShaderUtils.lib["screen"];
-				var screen_uniforms = THREE.UniformsUtils.clone( screen_shader.uniforms );
-
-				screen_uniforms["tDiffuse"].texture = postprocessing.rtTexture1;
-				screen_uniforms["opacity"].value = 1.0;
-
-				postprocessing.materialScreen = new THREE.MeshShaderMaterial( {
-
-					uniforms: screen_uniforms,
-					vertexShader: screen_shader.vertexShader,
-					fragmentShader: screen_shader.fragmentShader,
-					blending: THREE.AdditiveBlending,
-					transparent: true
-
-				} );
-
-				var convolution_shader = THREE.ShaderUtils.lib["convolution"];
-				var convolution_uniforms = THREE.UniformsUtils.clone( convolution_shader.uniforms );
-
-				postprocessing.blurx = new THREE.Vector2( 0.001953125, 0.0 ),
-				postprocessing.blury = new THREE.Vector2( 0.0, 0.001953125 );
-
-				convolution_uniforms["tDiffuse"].texture = postprocessing.rtTexture1;
-				convolution_uniforms["uImageIncrement"].value = postprocessing.blurx;
-				convolution_uniforms["cKernel"].value = THREE.ShaderUtils.buildKernel( 4.0 );
-
-				postprocessing.materialConvolution = new THREE.MeshShaderMaterial( {
-
-					uniforms: convolution_uniforms,
-					vertexShader:   "#define KERNEL_SIZE 25.0\n" + convolution_shader.vertexShader,
-					fragmentShader: "#define KERNEL_SIZE 25\n"   + convolution_shader.fragmentShader
-
-				} );
-
-				var film_shader = THREE.ShaderUtils.lib["film"];
-				var film_uniforms = THREE.UniformsUtils.clone( film_shader.uniforms );
-
-				film_uniforms["tDiffuse"].texture = postprocessing.rtTexture1;
-
-				postprocessing.materialFilm = new THREE.MeshShaderMaterial( { uniforms: film_uniforms, vertexShader: film_shader.vertexShader, fragmentShader: film_shader.fragmentShader } );
-				postprocessing.materialFilm.uniforms.grayscale.value = 0;
-				postprocessing.materialFilm.uniforms.nIntensity.value = 0.15;
-				postprocessing.materialFilm.uniforms.sIntensity.value = 0.25;
-				postprocessing.materialFilm.uniforms.sCount.value = 2048;
-
-				//postprocessing.materialFilm.uniforms.nIntensity.value = 0;
-				//postprocessing.materialFilm.uniforms.sIntensity.value = 0;
-
-				postprocessing.materialScreen.uniforms.opacity.value = glow;
-
-				postprocessing.quad = new THREE.Mesh( new THREE.PlaneGeometry( window.innerWidth, window.innerHeight ), postprocessing.materialConvolution );
-				postprocessing.quad.position.z = - 500;
-				postprocessing.scene.addObject( postprocessing.quad );
-
-			}
-
-			//
-
 			function animate() {
 
 				requestAnimationFrame( animate );
@@ -602,49 +617,14 @@
 
 				parent.rotation.y += ( targetRotation - parent.rotation.y ) * 0.05;
 
+				renderer.clear();
+
 				if ( postprocessing.enabled ) {
 
-					renderer.clear();
-
-					// Render scene into texture
-
-					renderer.render( scene, camera, postprocessing.rtTexture1, true );
-
-					// Render quad with blured scene into texture (convolution pass 1)
-
-					postprocessing.quad.materials[ 0 ] = postprocessing.materialConvolution;
-
-					postprocessing.materialConvolution.uniforms.tDiffuse.texture = postprocessing.rtTexture1;
-					postprocessing.materialConvolution.uniforms.uImageIncrement.value = postprocessing.blurx;
-
-					renderer.render( postprocessing.scene, postprocessing.camera, postprocessing.rtTexture2, true );
-
-					// Render quad with blured scene into texture (convolution pass 2)
-
-					postprocessing.materialConvolution.uniforms.tDiffuse.texture = postprocessing.rtTexture2;
-					postprocessing.materialConvolution.uniforms.uImageIncrement.value = postprocessing.blury;
-
-					renderer.render( postprocessing.scene, postprocessing.camera, postprocessing.rtTexture3, true );
-
-					// Render original scene with superimposed blur to texture
-
-					postprocessing.quad.materials[ 0 ] = postprocessing.materialScreen;
-
-					postprocessing.materialScreen.uniforms.tDiffuse.texture = postprocessing.rtTexture3;
-
-					renderer.render( postprocessing.scene, postprocessing.camera, postprocessing.rtTexture1, false );
-
-					// Render to screen
-
-					postprocessing.materialFilm.uniforms.time.value += 0.01;
-					postprocessing.quad.materials[ 0 ] = postprocessing.materialFilm;
-
-					postprocessing.materialScreen.uniforms.tDiffuse.texture = postprocessing.rtTexture1;
-					renderer.render( postprocessing.scene, postprocessing.camera );
+					composer.render( 0.05 );
 
 				} else {
 
-					renderer.clear();
 					renderer.render( scene, camera );
 
 				}

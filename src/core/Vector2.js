@@ -7,12 +7,8 @@
 
 THREE.Vector2 = function ( x, y ) {
 
-	this.set(
-
-		x || 0,
-		y || 0
-
-	);
+	this.x = x || 0;
+	this.y = y || 0;
 
 };
 
@@ -137,7 +133,7 @@ THREE.Vector2.prototype = {
 		return this.divideScalar( this.length() );
 
 	},
-	
+
 	distanceTo: function ( v ) {
 
 		return Math.sqrt( this.distanceToSquared( v ) );
@@ -158,18 +154,6 @@ THREE.Vector2.prototype = {
 
 	},
 
-	// deprecated: same as normalize
-
-	unit: function () {
-
-		return this.normalize();
-
-	},
-	
-	// danger, works only on numbers which are exactly the same
-	// (which may be not what is expected thanks to floating point precision)
-	// (should be probably using some tiny epsilon instead of equality)
-	
 	equals: function( v ) {
 
 		return ( ( v.x == this.x ) && ( v.y == this.y ) );

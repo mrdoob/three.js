@@ -105,6 +105,12 @@
 
 				}
 
+				// Torus
+
+				mesh = new THREE.Mesh( new THREE.TorusGeometry( 100, 25, 15, 30 ), new THREE.MeshLambertMaterial( { color: 0xffffff } ) );
+				mesh.overdraw = true;
+				scene.addObject( mesh );
+
 				// Lights
 
 				var ambient = new THREE.AmbientLight( 0x101010 );
@@ -163,26 +169,7 @@
 				bcanvas.addEventListener("click", toggleCanvas, false);
 				bwebgl.addEventListener("click", toggleWebGL, false);
 
-
-				//var loader = new THREE.JSONLoader();
-				//loader.load( { model: "obj/torus/Torus_slim.js", callback: function( geometry ) { createMesh( geometry ) } } );
-				
-				var loader = new THREE.BinaryLoader();
-				loader.load( { model: "obj/torus/Torus_bin.js", callback: function( geometry ) { createMesh( geometry ) } } );
-
 			}
-
-			function createMesh( geometry ) {
-
-				zmesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: 0xffffff } ) );
-				zmesh.position.x = zmesh.position.y = zmesh.position.z = 0;
-				zmesh.scale.x = zmesh.scale.y = zmesh.scale.z = 100;
-				zmesh.overdraw = true;
-				zmesh.updateMatrix();
-				scene.addObject( zmesh );
-
-			}
-
 
 			function onDocumentMouseMove( event ) {
 
@@ -215,7 +202,7 @@
 
 					if ( i%3 == 1 )
 
-						scene.objects[i].rotation.x += 0.05;
+						scene.objects[i].rotation.z += 0.05;
 
 					else if ( i%3 == 2 )
 
@@ -223,7 +210,7 @@
 
 					else if ( i%3 == 0 )
 
-						scene.objects[i].rotation.z += 0.05;
+						scene.objects[i].rotation.x += 0.05;
 
 				}
 

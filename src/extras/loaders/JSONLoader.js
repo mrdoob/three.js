@@ -405,4 +405,4 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texture_path
 
 	callback( geometry );
 
-}
+};

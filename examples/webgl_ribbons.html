@@ -33,6 +33,14 @@
 
 		<script type="text/javascript" src="../build/Three.js"></script>
 
+		<script type="text/javascript" src="js/ShaderExtras.js"></script>
+
+		<script type="text/javascript" src="js/postprocessing/EffectComposer.js"></script>
+		<script type="text/javascript" src="js/postprocessing/MaskPass.js"></script>
+		<script type="text/javascript" src="js/postprocessing/RenderPass.js"></script>
+		<script type="text/javascript" src="js/postprocessing/ShaderPass.js"></script>
+		<script type="text/javascript" src="js/postprocessing/BloomPass.js"></script>
+
 		<script type="text/javascript" src="js/Detector.js"></script>
 		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
@@ -57,6 +65,8 @@
 
 			var postprocessing = { enabled  : true };
 
+			var composer;
+
 			init();
 			animate();
 
@@ -70,12 +80,6 @@
 
 				scene = new THREE.Scene();
 				scene.fog = new THREE.FogExp2( 0x000000, 0.0016 );
-
-				renderer = new THREE.WebGLRenderer( { antialias: false } );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( renderer.domElement );
-
-				renderer.setClearColor( scene.fog.color, 1 );
 
 				geometry = new THREE.Geometry();
 				geometry2 = new THREE.Geometry();
@@ -99,12 +103,11 @@
 					vector = new THREE.Vector3( x, y, z );
 					geometry.vertices.push( new THREE.Vertex( vector ) );
 
-
 					vector = new THREE.Vector3( x, y, z );
 					geometry2.vertices.push( new THREE.Vertex( vector ) );
 
-					h = i2%2 ? 1 : 0.15;
-					if( i2%4 <= 2 ) h -= 0.15;
+					h = i2 % 2 ? 1 : 0.15;
+					if( i2 % 4 <= 2 ) h -= 0.15;
 
 					color = new THREE.Color( 0xffffff );
 					color.setHSV( 0.1 , 0, h );
@@ -116,22 +119,17 @@
 				var tmpRot = new THREE.Matrix4();
 				tmpRot.setRotationAxis( new THREE.Vector3( 1, 0, 0 ), 1.57 );
 
-				var material_base = new THREE.MeshBasicMaterial( { color:0xffffff, vertexColors:true } );
-
-				renderer.initMaterial( material_base, scene.lights, scene.fog );
-
 				xgrid = 34;
 				ygrid = 15;
 				nribbons = xgrid * ygrid;
 
 				c = 0;
-				for ( i = 0; i < xgrid; i++ )
-				for ( j = 0; j < ygrid; j++ ) {
+				for ( i = 0; i < xgrid; i ++ )
+				for ( j = 0; j < ygrid; j ++ ) {
 
-					materials[c] = new THREE.MeshBasicMaterial( { color:0xffffff, vertexColors:true } );
-					//materials[c].program = material_base.program;
+					materials[ c ] = new THREE.MeshBasicMaterial( { color: 0xffffff, vertexColors: true } );
 
-					ribbon = new THREE.Ribbon( i % 2 ? geometry : geometry2, materials[c] );
+					ribbon = new THREE.Ribbon( i % 2 ? geometry : geometry2, materials[ c ] );
 					ribbon.rotation.x = 0;
 					ribbon.rotation.y = 1.57;
 					ribbon.rotation.z = 3.14;
@@ -141,7 +139,7 @@
 					z = 0;
 					ribbon.position.set( x, y, z );
 
-					materials[c].color.setHSV( i/xgrid, 0.3 +  0.7*j/ygrid, 1 );
+					materials[c].color.setHSV( i / xgrid, 0.3 +  0.7 * j / ygrid, 1 );
 
 					ribbon.doubleSided = true;
 					ribbon.matrixAutoUpdate = false;
@@ -171,23 +169,47 @@
 					ribbons.push( ribbon );
 					scene.addObject( ribbon );
 
-					c++;
+					c ++;
 
 				}
 
 				scene.matrixAutoUpdate = false;
 
-				initPostprocessing();
+				//
+
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.autoClear = false;
+				renderer.setClearColor( scene.fog.color, 1 );
+
+				container.appendChild( renderer.domElement );
+
+				//
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
 				container.appendChild( stats.domElement );
 
+				//
+
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+
+				//
+
+				var renderModel = new THREE.RenderPass( scene, camera );
+				var effectBloom = new THREE.BloomPass( 1.0 );
+				var effectScreen = new THREE.ShaderPass( THREE.ShaderExtras[ "screen" ] );
+
+				effectScreen.renderToScreen = true;
+
+				composer = new THREE.EffectComposer( renderer );
+
+				composer.addPass( renderModel );
+				composer.addPass( effectBloom );
+				composer.addPass( effectScreen );
 
 			}
 
@@ -223,59 +245,6 @@
 
 			}
 
-			function initPostprocessing() {
-
-				postprocessing.scene = new THREE.Scene();
-
-				postprocessing.camera = new THREE.Camera();
-				postprocessing.camera.projectionMatrix = THREE.Matrix4.makeOrtho( window.innerWidth / - 2, window.innerWidth / 2,  window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
-				postprocessing.camera.position.z = 100;
-
-				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
-				postprocessing.rtTexture1 = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
-				postprocessing.rtTexture2 = new THREE.WebGLRenderTarget( 512, 512, pars );
-				postprocessing.rtTexture3 = new THREE.WebGLRenderTarget( 512, 512, pars );
-
-				var screen_shader = THREE.ShaderUtils.lib["screen"];
-				var screen_uniforms = THREE.UniformsUtils.clone( screen_shader.uniforms );
-
-				screen_uniforms["tDiffuse"].texture = postprocessing.rtTexture1;
-				screen_uniforms["opacity"].value = 1.0;
-
-				postprocessing.materialScreen = new THREE.MeshShaderMaterial( {
-
-					uniforms: screen_uniforms,
-					vertexShader: screen_shader.vertexShader,
-					fragmentShader: screen_shader.fragmentShader,
-					blending: THREE.AdditiveBlending,
-					transparent: true
-
-				} );
-
-				var convolution_shader = THREE.ShaderUtils.lib["convolution"];
-				var convolution_uniforms = THREE.UniformsUtils.clone( convolution_shader.uniforms );
-
-				postprocessing.blurx = new THREE.Vector2( 0.001953125, 0.0 ),
-				postprocessing.blury = new THREE.Vector2( 0.0, 0.001953125 );
-
-				convolution_uniforms["tDiffuse"].texture = postprocessing.rtTexture1;
-				convolution_uniforms["uImageIncrement"].value = postprocessing.blurx;
-				convolution_uniforms["cKernel"].value = THREE.ShaderUtils.buildKernel( 4.0 );
-
-				postprocessing.materialConvolution = new THREE.MeshShaderMaterial( {
-
-					uniforms: convolution_uniforms,
-					vertexShader:   "#define KERNEL_SIZE 25.0\n" + convolution_shader.vertexShader,
-					fragmentShader: "#define KERNEL_SIZE 25\n"   + convolution_shader.fragmentShader
-
-				} );
-
-				postprocessing.quad = new THREE.Mesh( new THREE.PlaneGeometry( window.innerWidth, window.innerHeight ), postprocessing.materialConvolution );
-				postprocessing.quad.position.z = -500;
-				postprocessing.scene.addObject( postprocessing.quad );
-
-			}
-
 			//
 
 			function animate() {
@@ -294,73 +263,30 @@
 				camera.position.x += ( mouseX - camera.position.x ) * 0.036;
 				camera.position.y += ( - (mouseY) - camera.position.y ) * 0.036;
 
-				for ( i = -n; i < n; i++ ) {
+				for ( i = -n; i < n; i ++ ) {
 
 					i2 = i + n;
 
 					z  =  10 * Math.sin( i2 * 0.1 + time*30 );
 					z2 =  20 * Math.cos( Math.sin( i2 * 0.1 + time * 20 ) );
 
-					geometry.vertices[i2].position.z = z;
-					geometry2.vertices[i2].position.z = z2;
+					geometry.vertices[ i2 ].position.z = z;
+					geometry2.vertices[ i2 ].position.z = z2;
 
 				}
 
 				geometry.__dirtyVertices = true;
 				geometry2.__dirtyVertices = true;
 
-
 				for( i = 0; i < nribbons; i++ ) {
 
-					h = ( 360 * ( i/nribbons + time ) % 360 ) / 360;
-					materials[i].color.setHSV( h, 0.5+0.5*(i%20/20), 1 );
+					h = ( 360 * ( i / nribbons + time ) % 360 ) / 360;
+					materials[ i ].color.setHSV( h, 0.5 + 0.5 * ( i % 20 / 20 ), 1 );
 
 				}
 
-				if ( postprocessing.enabled ) {
-
-					renderer.clear();
-
-					// Render scene into texture
-
-					renderer.render( scene, camera, postprocessing.rtTexture1, true );
-
-					// Render quad with blured scene into texture (convolution pass 1)
-
-					postprocessing.quad.materials = [ postprocessing.materialConvolution ];
-
-					postprocessing.materialConvolution.uniforms.tDiffuse.texture = postprocessing.rtTexture1;
-					postprocessing.materialConvolution.uniforms.uImageIncrement.value = postprocessing.blurx;
-
-					renderer.render( postprocessing.scene, postprocessing.camera, postprocessing.rtTexture2, true );
-
-					// Render quad with blured scene into texture (convolution pass 2)
-
-					postprocessing.materialConvolution.uniforms.tDiffuse.texture = postprocessing.rtTexture2;
-					postprocessing.materialConvolution.uniforms.uImageIncrement.value = postprocessing.blury;
-
-					renderer.render( postprocessing.scene, postprocessing.camera, postprocessing.rtTexture3, true );
-
-					// Render original scene with superimposed blur to texture
-
-					postprocessing.quad.materials = [ postprocessing.materialScreen ];
-
-					postprocessing.materialScreen.uniforms.tDiffuse.texture = postprocessing.rtTexture3;
-					postprocessing.materialScreen.uniforms.opacity.value = 1.2;
-
-					renderer.render( postprocessing.scene, postprocessing.camera, postprocessing.rtTexture1, false );
-
-					// Render to screen
-
-					postprocessing.materialScreen.uniforms.tDiffuse.texture = postprocessing.rtTexture1;
-					renderer.render( postprocessing.scene, postprocessing.camera );
-
-				} else {
-
-					renderer.clear();
-					renderer.render( scene, camera );
-
-				}
+				renderer.clear();
+				composer.render( 0.1 );
 
 			}
 

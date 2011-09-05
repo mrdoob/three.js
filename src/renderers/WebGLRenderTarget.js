@@ -25,3 +25,26 @@ THREE.WebGLRenderTarget = function ( width, height, options ) {
 	this.stencilBuffer = options.stencilBuffer !== undefined ? options.stencilBuffer : true;
 
 };
+
+THREE.WebGLRenderTarget.prototype.clone = function() {
+
+	var tmp = new THREE.WebGLRenderTarget( this.width, this.height );
+
+	tmp.wrapS = this.wrapS;
+	tmp.wrapT = this.wrapT;
+
+	tmp.magFilter = this.magFilter;
+	tmp.minFilter = this.minFilter;
+
+	tmp.offset.copy( this.offset );
+	tmp.repeat.copy( this.repeat );
+
+	tmp.format = this.format;
+	tmp.type = this.type;
+
+	tmp.depthBuffer = this.depthBuffer;
+	tmp.stencilBuffer = this.stencilBuffer;
+
+	return tmp;
+
+};

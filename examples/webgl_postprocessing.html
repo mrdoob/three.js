@@ -11,51 +11,73 @@
 			text-align:center;
 			font-weight: bold;
 
-			background-color: #fff;
+			background-color: #000;
 			margin: 0px;
 			overflow: hidden;
 		    }
 
 		    #info {
-					color:#000;
-			position: absolute;
-			top: 0px; width: 100%;
+			color:#fff;
+			background-color: rgba( 0, 0, 0, 0.5 );
+			position: relative;
+			margin: 0 auto -2.1em;
+			top: 0px;
+			width: 550px;
 			padding: 5px;
-
+			z-index:100;
 		    }
 
 		    a { color: red; }
-
 		</style>
 	</head>
 	<body>
 
-		<div id="container"></div>
 		<div id="info">
 			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl postprocessing example -
 			<a href="http://www.ir-ltd.net/infinite-3d-head-scan-released/" target="_blank">Lee Perry-Smith</a> head
 		</div>
 
+		<div id="container"></div>
+
 		<script type="text/javascript" src="../build/Three.js"></script>
+
+
+		<script type="text/javascript" src="js/ShaderExtras.js"></script>
+
+		<script type="text/javascript" src="js/postprocessing/EffectComposer.js"></script>
+		<script type="text/javascript" src="js/postprocessing/RenderPass.js"></script>
+		<script type="text/javascript" src="js/postprocessing/BloomPass.js"></script>
+		<script type="text/javascript" src="js/postprocessing/FilmPass.js"></script>
+		<script type="text/javascript" src="js/postprocessing/DotScreenPass.js"></script>
+		<script type="text/javascript" src="js/postprocessing/TexturePass.js"></script>
+		<script type="text/javascript" src="js/postprocessing/ShaderPass.js"></script>
+		<script type="text/javascript" src="js/postprocessing/MaskPass.js"></script>
 
 		<script type="text/javascript" src="js/Detector.js"></script>
 		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<!-- Time modulated procedural color fragment shader -->
+
 		<script id="fs-colors" type="x-shader/x-fragment">
+
 			varying vec2 vUv;
 			uniform float time;
 
-			void main(void) {
+			void main() {
 
-				gl_FragColor = vec4( time, vUv.x, vUv.y, 1.0 );
+				//gl_FragColor = vec4( time, vUv.x, vUv.y, 1.0 );
+				//gl_FragColor = vec4( 0.4, 0.4, 0.4, 1.0 );
+				gl_FragColor = vec4( 0.2, 0.4, 0.5, 1.0 );
 
 			}
+
 		</script>
 
 		<!-- Generic vertex shader -->
+
 		<script id="vs-generic" type="x-shader/x-vertex">
+
 			varying vec2 vUv;
 
 			void main() {
@@ -64,6 +86,7 @@
 				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 			}
+
 		</script>
 
 
@@ -73,12 +96,16 @@
 
 			var container, stats;
 
-			var cameraOrtho, cameraPerspective, sceneModel, sceneScreen, sceneBG, renderer, mesh, directionalLight;
+			var composerScene, composer1, composer2, composer3, composer4;
 
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
+			var cameraOrtho, cameraPerspective, sceneModel, sceneBG, renderer, mesh, directionalLight;
 
-			var rtTexture, materialColor, materialScreen, materialFilm, materialConvolution, blurx, blury, quadBG, quadScreen;
+			var halfWidth = window.innerWidth / 2;
+			var halfHeight = window.innerHeight / 2;
+
+			var materialColor, material2D, quadBG, quadMask, renderScene;
+
+			var rtParameters;
 
 			var delta = 0.01;
 
@@ -89,29 +116,28 @@
 
 				container = document.getElementById( 'container' );
 
-				cameraOrtho = new THREE.Camera();
-				cameraOrtho.projectionMatrix = THREE.Matrix4.makeOrtho( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
+				cameraOrtho = new THREE.OrthoCamera( -halfWidth, halfWidth, halfHeight, -halfHeight, -10000, 10000 );
 				cameraOrtho.position.z = 100;
 
 				cameraPerspective = new THREE.Camera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
 				cameraPerspective.position.z = 900;
 
+				//
+
 				sceneModel = new THREE.Scene();
-				sceneScreen = new THREE.Scene();
-				sceneBG = new THREE.Scene();
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff );
-				directionalLight.position.x = 0;
-				directionalLight.position.y = 0;
-				directionalLight.position.z = 1;
+				directionalLight.position.set( 0, 0, 1 );
 				directionalLight.position.normalize();
 				sceneModel.addLight( directionalLight );
 
-				var pars1 = { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBFormat },
-					pars2 = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter,  format: THREE.RGBFormat };
-				rtTexture1 = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars1 );
-				rtTexture2 = new THREE.WebGLRenderTarget( 256, 512, pars2 );
-				rtTexture3 = new THREE.WebGLRenderTarget( 512, 256, pars2 );
+				loader = new THREE.JSONLoader( true );
+				document.body.appendChild( loader.statusDomElement );
+				loader.load( { model: "obj/leeperrysmith/LeePerrySmith.js", callback: function( geometry ) { createMesh( geometry, sceneModel, 100 ) } } );
+
+				//
+
+				sceneBG = new THREE.Scene();
 
 				materialColor = new THREE.MeshShaderMaterial( {
 
@@ -122,80 +148,179 @@
 
 				} );
 
-				var screen_shader = THREE.ShaderUtils.lib["screen"];
-				var screen_uniforms = THREE.UniformsUtils.clone( screen_shader.uniforms );
-
-				screen_uniforms["tDiffuse"].texture = rtTexture1;
-				screen_uniforms["opacity"].value = 0.4;
-
-				materialScreen = new THREE.MeshShaderMaterial( {
-
-					uniforms: screen_uniforms,
-					vertexShader: screen_shader.vertexShader,
-					fragmentShader: screen_shader.fragmentShader,
-					blending: THREE.AdditiveBlending,
-					transparent: true
-
-				} );
-
-				var film_shader = THREE.ShaderUtils.lib["film"];
-				var film_uniforms = THREE.UniformsUtils.clone( film_shader.uniforms );
-
-				film_uniforms["tDiffuse"].texture = rtTexture1;
-				film_uniforms["nIntensity"].value = 0.25;
-				film_uniforms["sIntensity"].value = 0.5;
-
-				materialFilm = new THREE.MeshShaderMaterial( {
-
-					uniforms: film_uniforms,
-					vertexShader: film_shader.vertexShader,
-					fragmentShader: film_shader.fragmentShader
-
-				} );
-
-				var increment = 0.001953125;
-
-				blurx = new THREE.Vector2( increment, 0.0 ),
-				blury = new THREE.Vector2( 0.0, increment );
-
-				var convolution_shader = THREE.ShaderUtils.lib["convolution"];
-				var convolution_uniforms = THREE.UniformsUtils.clone( convolution_shader.uniforms );
-
-				convolution_uniforms["tDiffuse"].texture = rtTexture1;
-				convolution_uniforms["uImageIncrement"].value = blurx;
-				convolution_uniforms["cKernel"].value = THREE.ShaderUtils.buildKernel( 4.0 );
-
-				materialConvolution = new THREE.MeshShaderMaterial( {
-
-					uniforms: convolution_uniforms,
-					vertexShader:   "#define KERNEL_SIZE 25.0\n" + convolution_shader.vertexShader,
-					fragmentShader: "#define KERNEL_SIZE 25\n"   + convolution_shader.fragmentShader
-
-				} );
-
-				var plane = new THREE.PlaneGeometry( window.innerWidth, window.innerHeight );
+				var plane = new THREE.PlaneGeometry( 1, 1 );
 
 				quadBG = new THREE.Mesh( plane, materialColor );
 				quadBG.position.z = -500;
+				quadBG.scale.set( window.innerWidth, window.innerHeight, 1 );
 				sceneBG.addObject( quadBG );
 
-				loader = new THREE.JSONLoader( true );
-				document.body.appendChild( loader.statusDomElement );
-				loader.load( { model: "obj/leeperrysmith/LeePerrySmith.js", callback: function( geometry ) { createMesh( geometry, sceneModel, 100 ) } } );
+				//
 
-				quadScreen = new THREE.Mesh( plane, materialConvolution );
-				quadScreen.position.z = -100;
-				sceneScreen.addObject( quadScreen );
+				var sceneMask = new THREE.Scene();
+
+				var plane = new THREE.PlaneGeometry( 1, 1 );
+
+				quadMask = new THREE.Mesh( plane, new THREE.MeshBasicMaterial( { color: 0xffaa00 } )  );
+				quadMask.position.z = -300;
+				quadMask.scale.set( window.innerWidth / 2, window.innerHeight/2, 1 );
+				sceneMask.addObject( quadMask );
+
+				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setClearColorHex( 0x000000, 1 );
 				renderer.autoClear = false;
+
 				container.appendChild( renderer.domElement );
+
+				//
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
 				//container.appendChild( stats.domElement );
+
+				//
+
+				var shaderBleach = THREE.ShaderExtras[ "bleachbypass" ];
+				var shaderSepia = THREE.ShaderExtras[ "sepia" ];
+				var shaderVignette = THREE.ShaderExtras[ "vignette" ];
+				var shaderScreen = THREE.ShaderExtras[ "screen" ];
+
+				var effectBleach = new THREE.ShaderPass( shaderBleach );
+				var effectSepia = new THREE.ShaderPass( shaderSepia );
+				var effectVignette = new THREE.ShaderPass( shaderVignette );
+				var effectScreen = new THREE.ShaderPass( shaderScreen );
+
+				effectBleach.uniforms[ "opacity" ].value = 0.95;
+
+				effectSepia.uniforms[ "amount" ].value = 0.9;
+
+				effectVignette.uniforms[ "offset" ].value = 0.95;
+				effectVignette.uniforms[ "darkness" ].value = 1.6;
+
+				var effectBloom = new THREE.BloomPass( 0.5 );
+				var effectFilm = new THREE.FilmPass( 0.5, 0.025, 648, false );
+				var effectFilmBW = new THREE.FilmPass( 0.35, 0.5, 2048, true );
+				var effectFilmBW2 = new THREE.FilmPass( 0.05, 0.5, 2048, true );
+				var effectDotScreen = new THREE.DotScreenPass( new THREE.Vector2( 0, 0 ), 0.5, 0.6 );
+
+				//var renderMask = new THREE.MaskPass( sceneMask, cameraOrtho );
+				var renderMask = new THREE.MaskPass( sceneModel, cameraPerspective );
+				var clearMask = new THREE.ClearMaskPass();
+
+				//effectFilm.renderToScreen = true;
+				//effectFilmBW.renderToScreen = true;
+				//effectDotScreen.renderToScreen = true;
+				//effectBleach.renderToScreen = true;
+				effectVignette.renderToScreen = true;
+				//effectScreen.renderToScreen = true;
+
+				//
+
+				var renderBackground = new THREE.RenderPass( sceneBG, cameraOrtho );
+				var renderModel = new THREE.RenderPass( sceneModel, cameraPerspective );
+
+				renderModel.clear = false;
+
+				composerScene = new THREE.EffectComposer( renderer );
+
+				composerScene.addPass( renderBackground );
+				composerScene.addPass( renderModel );
+
+				//
+
+				renderScene = new THREE.TexturePass( composerScene.renderTarget );
+
+				rtParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBufer: true };
+
+				var rtWidth  = window.innerWidth / 2;
+				var rtHeight = window.innerHeight / 2;
+
+				//
+
+				composer1 = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth, rtHeight, rtParameters ) );
+
+				composer1.addPass( renderScene );
+				//composer1.addPass( renderMask );
+				composer1.addPass( effectFilmBW );
+				//composer1.addPass( clearMask );
+				composer1.addPass( effectVignette );
+
+				//
+
+				composer2 = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth, rtHeight, rtParameters ) );
+
+				composer2.addPass( renderScene );
+				composer2.addPass( renderMask );
+				composer2.addPass( effectDotScreen );
+				composer2.addPass( clearMask );
+				composer2.addPass( effectFilmBW2 );
+				composer2.addPass( effectVignette );
+
+				//
+
+				composer3 = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth, rtHeight, rtParameters ) );
+
+				composer3.addPass( renderScene );
+				//composer3.addPass( renderMask );
+				composer3.addPass( effectSepia );
+				composer3.addPass( effectFilm );
+				//composer3.addPass( clearMask );
+				composer3.addPass( effectVignette );
+
+				//
+
+				composer4 = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth, rtHeight, rtParameters ) );
+
+				composer4.addPass( renderScene );
+				//composer4.addPass( renderMask );
+				composer4.addPass( effectBloom );
+				composer4.addPass( effectFilm );
+				composer4.addPass( effectBleach );
+				//composer4.addPass( clearMask );
+				composer4.addPass( effectVignette );
+
+				//
+
+				//onWindowResize();
+
+				renderScene.uniforms[ "tDiffuse" ].texture = composerScene.renderTarget2;
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize( event ) {
+
+				halfWidth = window.innerWidth / 2;
+				halfHeight = window.innerHeight / 2;
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				cameraPerspective.aspect = window.innerWidth / window.innerHeight;
+				cameraPerspective.updateProjectionMatrix();
+
+				cameraOrtho.left = -halfWidth;
+				cameraOrtho.right = halfWidth;
+				cameraOrtho.top = halfHeight;
+				cameraOrtho.bottom = -halfHeight;
+
+				cameraOrtho.updateProjectionMatrix();
+
+				composerScene.reset();
+
+				composer1.reset( new THREE.WebGLRenderTarget( halfWidth, halfHeight, rtParameters ) );
+				composer2.reset( new THREE.WebGLRenderTarget( halfWidth, halfHeight, rtParameters ) );
+				composer3.reset( new THREE.WebGLRenderTarget( halfWidth, halfHeight, rtParameters ) );
+				composer4.reset( new THREE.WebGLRenderTarget( halfWidth, halfHeight, rtParameters ) );
+
+				renderScene.uniforms[ "tDiffuse" ].texture = composerScene.renderTarget2;
+
+				quadBG.scale.set( window.innerWidth, window.innerHeight, 1 );
+				quadMask.scale.set( window.innerWidth / 2, window.innerHeight / 2, 1 );
 
 			}
 
@@ -232,11 +357,9 @@
 				var mat2 = new THREE.MeshShaderMaterial( parameters );
 
 				mesh = new THREE.Mesh( geometry, mat2 );
-				mesh.position.x = 0;
-				mesh.position.y = -50;
-				mesh.position.z = 0;
-				mesh.scale.x = mesh.scale.y = mesh.scale.z = scale;
-				mesh.updateMatrix();
+				mesh.position.set( 0, -50, 0 );
+				mesh.scale.set( scale, scale, scale );
+
 				scene.addObject( mesh );
 
 				loader.statusDomElement.style.display = "none";
@@ -266,50 +389,26 @@
 
 				}
 
-				materialColor.uniforms.time.value += delta/2;
-				materialFilm.uniforms.time.value += delta;
+				materialColor.uniforms.time.value += delta / 2;
+
+				renderer.setViewport( 0, 0, 2 * halfWidth, 2 * halfHeight );
 
 				renderer.clear();
+				composerScene.render( delta );
 
-				// Render scene into texture
+				renderer.setViewport( 0, 0, halfWidth, halfHeight );
+				composer1.render( delta );
 
-				// background
+				renderer.setViewport( halfWidth, 0, halfWidth, halfHeight );
+				composer2.render( delta );
 
-				renderer.render( sceneBG, cameraOrtho, rtTexture1, true );
+				renderer.setViewport( 0, halfHeight, halfWidth, halfHeight );
+				composer3.render( delta );
 
-				// model
-
-				renderer.render( sceneModel, cameraPerspective, rtTexture1, false );
-
-				// Render quad with blured scene into texture (convolution pass 1)
-
-				quadScreen.materials = [ materialConvolution ];
-				materialConvolution.uniforms.tDiffuse.texture = rtTexture1;
-				materialConvolution.uniforms.uImageIncrement.value = blurx;
-				renderer.render( sceneScreen, cameraOrtho, rtTexture2, true );
-
-				// Render quad with blured scene into texture (convolution pass 2)
-
-				materialConvolution.uniforms.tDiffuse.texture = rtTexture2;
-				materialConvolution.uniforms.uImageIncrement.value = blury;
-				renderer.render( sceneScreen, cameraOrtho, rtTexture3, true );
-
-				// Render original scene with superimposed blur into texture
-
-				quadScreen.materials = [ materialScreen ];
-
-				materialScreen.uniforms.tDiffuse.texture = rtTexture3;
-				materialScreen.uniforms.opacity.value = 1.0;
-				renderer.render( sceneScreen, cameraOrtho, rtTexture1, false );
-
-				// Render final scene to the screen with film shader
-
-				materialFilm.uniforms.tDiffuse.texture = rtTexture1;
-				quadScreen.materials = [ materialFilm ];
-				renderer.render( sceneScreen, cameraOrtho );
+				renderer.setViewport( halfWidth, halfHeight, halfWidth, halfHeight );
+				composer4.render( delta );
 
 			}
-
 
 		</script>
 	</body>

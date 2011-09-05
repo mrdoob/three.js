@@ -47,7 +47,7 @@
 
 		<script type="text/javascript">
 
-			var SCREEN_WIDTH = window.innerWidth/2;
+			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
 			var FLOOR = - 250;
 
@@ -79,7 +79,7 @@
 			init();
 			animate();
 
-			//render_canvas = !has_gl;
+			render_canvas = !has_gl;
 			bwebgl.style.display = has_gl ? "inline" : "none";
 			bcanvas.className = render_canvas ? "button" : "button inactive";
 
@@ -135,14 +135,6 @@
 				mesh.position = pointLight.position;
 				scene.addObject(mesh);
 
-				if ( render_canvas ) {
-
-					canvasRenderer = new THREE.CanvasRenderer();
-					canvasRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-					container.appendChild( canvasRenderer.domElement );
-
-				}
-
 				if ( render_gl ) {
 					try {
 						webglRenderer = new THREE.WebGLRenderer();
@@ -154,6 +146,15 @@
 					catch (e) {
 					}
 				}
+
+				if ( render_canvas ) {
+
+					canvasRenderer = new THREE.CanvasRenderer();
+					canvasRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+					container.appendChild( canvasRenderer.domElement );
+
+				}
+
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
@@ -204,15 +205,15 @@
 					xc2.fillRect(i*4, 5, 2, 54);
 				}
 
-				var xm1 = new THREE.MeshLambertMaterial( { map: new THREE.Texture( x1 ) } );
-				var xm2 = new THREE.MeshLambertMaterial( { map: new THREE.Texture( x2 ) } );
+				var xm1 = new THREE.MeshLambertMaterial( { map: new THREE.Texture( x1 ), transparent: true } );
+				var xm2 = new THREE.MeshLambertMaterial( { map: new THREE.Texture( x2 ), transparent: true  } );
 				xm1.map.needsUpdate = true;
 				xm2.map.needsUpdate = true;
 
-				geometry.materials[0].push ( xm1 ); // goes to faces with material 0
-				geometry.materials[1].push ( xm2 ); // goes to faces with material 1
+				geometry.materials[0].push( xm1 ); // goes to faces with material 0
+				geometry.materials[1].push( xm2 ); // goes to faces with material 1
 
-				geometry.materials[4].push ( new THREE.MeshLambertMaterial( { color: 0xff0000, opacity:0.5 } ) );
+				geometry.materials[4].push( new THREE.MeshLambertMaterial( { color: 0xff0000, opacity: 0.5, transparent: true } ) );
 
 				var materials = [ new THREE.MeshFaceMaterial() ];
 
@@ -222,7 +223,7 @@
 				// full-mesh color overlay
 				//materials.push( new THREE.MeshBasicMaterial { color: 0xff0000, opacity: 0.5 } ) );
 
-				zmesh = new THREE.Mesh( geometry, materials, 1 );
+				zmesh = new THREE.Mesh( geometry, materials );
 				zmesh.position.x = -80;
 				zmesh.position.z = 50;
 				zmesh.position.y = FLOOR;
@@ -261,7 +262,7 @@
 					xc.font = "50pt arial bold";
 					xc.fillText(i, 10, 64);
 
-					var xm = new THREE.MeshBasicMaterial( { map: new THREE.Texture( x ) } );
+					var xm = new THREE.MeshBasicMaterial( { map: new THREE.Texture( x ), transparent: true  } );
 					xm.map.needsUpdate = true;
 
 					mesh = new THREE.Mesh( new THREE.PlaneGeometry( size, size ), xm );

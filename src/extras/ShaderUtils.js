@@ -2,14 +2,12 @@
  * @author alteredq / http://alteredqualia.com/
  * @author mr.doob / http://mrdoob.com/
  *
- * ShaderUtils currently contains
+ * ShaderUtils currently contains:
+ *
  *	fresnel
  *	normal
  * 	cube
- * 	convolution
- * 	film
- * 	screen
- *	basic
+ *
  */
 
 if ( THREE.WebGLRenderer ) {
@@ -304,9 +302,11 @@ THREE.ShaderUtils = {
 				"void main() {",
 
 					"vec4 mPosition = objectMatrix * vec4( position, 1.0 );",
-					"vViewPosition = cameraPosition - mPosition.xyz;",
 
 					"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
+
+					"vViewPosition = -mvPosition.xyz;",
+
 					"vNormal = normalize( normalMatrix * normal );",
 
 					// tangent and binormal vectors
@@ -400,273 +400,7 @@ THREE.ShaderUtils = {
 
 			].join("\n")
 
-		},
-
-		/* ------------------------------------------------------------------------
-		//	Convolution shader
-		//	  - ported from o3d sample to WebGL / GLSL
-		//			http://o3d.googlecode.com/svn/trunk/samples/convolution.html
-		------------------------------------------------------------------------ */
-
-		'convolution': {
-
-			uniforms: {
-
-				"tDiffuse" : { type: "t", value: 0, texture: null },
-				"uImageIncrement" : { type: "v2", value: new THREE.Vector2( 0.001953125, 0.0 ) },
-				"cKernel" : { type: "fv1", value: [] }
-
-			},
-
-			vertexShader: [
-
-				"varying vec2 vUv;",
-
-				"uniform vec2 uImageIncrement;",
-				//"#define KERNEL_SIZE 25.0",
-
-				"void main(void) {",
-
-					"vUv = uv - ((KERNEL_SIZE - 1.0) / 2.0) * uImageIncrement;",
-					"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
-
-				"}"
-
-			].join("\n"),
-
-			fragmentShader: [
-
-				"varying vec2 vUv;",
-
-				"uniform sampler2D tDiffuse;",
-				"uniform vec2 uImageIncrement;",
-
-				//"#define KERNEL_SIZE 25",
-				"uniform float cKernel[KERNEL_SIZE];",
-
-				"void main(void) {",
-
-					"vec2 imageCoord = vUv;",
-					"vec4 sum = vec4( 0.0, 0.0, 0.0, 0.0 );",
-					"for( int i=0; i<KERNEL_SIZE; ++i ) {",
-						"sum += texture2D( tDiffuse, imageCoord ) * cKernel[i];",
-						"imageCoord += uImageIncrement;",
-					"}",
-					"gl_FragColor = sum;",
-
-				"}"
-
-
-			].join("\n")
-
-		},
-
-		/* -------------------------------------------------------------------------
-
-		// Film grain & scanlines shader
-
-		//	- ported from HLSL to WebGL / GLSL
-		//	  http://www.truevision3d.com/forums/showcase/staticnoise_colorblackwhite_scanline_shaders-t18698.0.html
-
-		// Screen Space Static Postprocessor
-		//
-		// Produces an analogue noise overlay similar to a film grain / TV static
-		//
-		// Original implementation and noise algorithm
-		// Pat 'Hawthorne' Shearon
-		//
-		// Optimized scanlines + noise version with intensity scaling
-		// Georg 'Leviathan' Steinrohder
-
-		// This version is provided under a Creative Commons Attribution 3.0 License
-		// http://creativecommons.org/licenses/by/3.0/
-		 ------------------------------------------------------------------------- */
-
-		'film': {
-
-			uniforms: {
-
-				tDiffuse:   { type: "t", value: 0, texture: null },
-				time: 	    { type: "f", value: 0.0 },
-				nIntensity: { type: "f", value: 0.5 },
-				sIntensity: { type: "f", value: 0.05 },
-				sCount: 	{ type: "f", value: 4096 },
-				grayscale:  { type: "i", value: 1 }
-
-			},
-
-			vertexShader: [
-
-				"varying vec2 vUv;",
-
-				"void main() {",
-
-					"vUv = vec2( uv.x, 1.0 - uv.y );",
-					"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
-
-				"}"
-
-			].join("\n"),
-
-			fragmentShader: [
-
-				"varying vec2 vUv;",
-				"uniform sampler2D tDiffuse;",
-
-				// control parameter
-				"uniform float time;",
-
-				"uniform bool grayscale;",
-
-				// noise effect intensity value (0 = no effect, 1 = full effect)
-				"uniform float nIntensity;",
-
-				// scanlines effect intensity value (0 = no effect, 1 = full effect)
-				"uniform float sIntensity;",
-
-				// scanlines effect count value (0 = no effect, 4096 = full effect)
-				"uniform float sCount;",
-
-				"void main() {",
-
-					// sample the source
-					"vec4 cTextureScreen = texture2D( tDiffuse, vUv );",
-
-					// make some noise
-					"float x = vUv.x * vUv.y * time *  1000.0;",
-					"x = mod( x, 13.0 ) * mod( x, 123.0 );",
-					"float dx = mod( x, 0.01 );",
-
-					// add noise
-					"vec3 cResult = cTextureScreen.rgb + cTextureScreen.rgb * clamp( 0.1 + dx * 100.0, 0.0, 1.0 );",
-
-					// get us a sine and cosine
-					"vec2 sc = vec2( sin( vUv.y * sCount ), cos( vUv.y * sCount ) );",
-
-					// add scanlines
-					"cResult += cTextureScreen.rgb * vec3( sc.x, sc.y, sc.x ) * sIntensity;",
-
-					// interpolate between source and result by intensity
-					"cResult = cTextureScreen.rgb + clamp( nIntensity, 0.0,1.0 ) * ( cResult - cTextureScreen.rgb );",
-
-					// convert to grayscale if desired
-					"if( grayscale ) {",
-						"cResult = vec3( cResult.r * 0.3 + cResult.g * 0.59 + cResult.b * 0.11 );",
-					"}",
-
-					"gl_FragColor =  vec4( cResult, cTextureScreen.a );",
-
-				"}"
-
-			].join("\n")
-
-		},
-
-		/* -------------------------------------------------------------------------
-		//	Full-screen textured quad shader
-		 ------------------------------------------------------------------------- */
-
-		'screen': {
-
-			uniforms: {
-
-				tDiffuse: { type: "t", value: 0, texture: null },
-				opacity: { type: "f", value: 1.0 }
-
-			},
-
-			vertexShader: [
-
-				"varying vec2 vUv;",
-
-				"void main() {",
-
-					"vUv = vec2( uv.x, 1.0 - uv.y );",
-					"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
-
-				"}"
-
-			].join("\n"),
-
-			fragmentShader: [
-
-				"varying vec2 vUv;",
-				"uniform sampler2D tDiffuse;",
-				"uniform float opacity;",
-
-				"void main() {",
-
-					"vec4 texel = texture2D( tDiffuse, vUv );",
-					"gl_FragColor = opacity * texel;",
-
-				"}"
-
-			].join("\n")
-
-		},
-
-
-		/* -------------------------------------------------------------------------
-		//	Simple test shader
-		 ------------------------------------------------------------------------- */
-
-		'basic': {
-
-			uniforms: {},
-
-			vertexShader: [
-
-				"void main() {",
-
-					"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
-
-				"}"
-
-			].join("\n"),
-
-			fragmentShader: [
-
-				"void main() {",
-
-					"gl_FragColor = vec4( 1.0, 0.0, 0.0, 0.5 );",
-
-				"}"
-
-			].join("\n")
-
 		}
-
-	},
-
-	buildKernel: function( sigma ) {
-
-		// We lop off the sqrt(2 * pi) * sigma term, since we're going to normalize anyway.
-
-		function gauss( x, sigma ) {
-
-			return Math.exp( - ( x * x ) / ( 2.0 * sigma * sigma ) );
-
-		}
-
-		var i, values, sum, halfWidth, kMaxKernelSize = 25, kernelSize = 2 * Math.ceil( sigma * 3.0 ) + 1;
-
-		if ( kernelSize > kMaxKernelSize ) kernelSize = kMaxKernelSize;
-		halfWidth = ( kernelSize - 1 ) * 0.5
-
-		values = new Array( kernelSize );
-		sum = 0.0;
-		for ( i = 0; i < kernelSize; ++i ) {
-
-			values[ i ] = gauss( i - halfWidth, sigma );
-			sum += values[ i ];
-
-		}
-
-		// normalize the kernel
-
-		for ( i = 0; i < kernelSize; ++i ) values[ i ] /= sum;
-
-		return values;
 
 	}
 

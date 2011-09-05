@@ -1,0 +1,172 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>three.js webgl - collada</title>
+		<meta charset="utf-8">
+		<style type="text/css">
+			body {
+				font-family: Monospace;
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+			}
+			#log { color:#fff; position:absolute; top:50px; text-align:left; display:block; z-index:100; pointer-events:none; }
+		</style>
+	</head>
+	<body>
+		<pre id="log"></pre>
+
+		<script type="text/javascript" src="../build/Three.js"></script>
+
+		<script type="text/javascript" src="js/Detector.js"></script>
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
+		<script type="text/javascript" src="js/Stats.js"></script>
+
+		<script type="text/javascript">
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, stats;
+
+			var camera, scene, renderer, objects;
+			var particleLight, pointLight;
+			var dae, skin;
+
+			var loader = new ColladaLoader();
+			loader.load( './models/monster.dae', function colladaReady( collada ) {
+
+				dae = collada.scene;
+				skin = collada.skins[ 0 ];
+
+				dae.scale.x = dae.scale.y = dae.scale.z = 0.002;
+				dae.rotation.x = -Math.PI/2;
+				dae.updateMatrix();
+
+				init();
+				animate();
+
+			} );
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.Camera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.x = 2;
+				camera.position.y = 2;
+				camera.position.z = 3;
+
+				scene = new THREE.Scene();
+
+				// Grid
+
+				var line_material = new THREE.LineBasicMaterial( { color: 0xcccccc, opacity: 0.2 } ),
+					geometry = new THREE.Geometry(),
+					floor = -0.04, step = 1, size = 14;
+
+				for ( var i = 0; i <= size / step * 2; i ++ ) {
+
+					geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( - size, floor, i * step - size ) ) );
+					geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(   size, floor, i * step - size ) ) );
+
+					geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( i * step - size, floor, -size ) ) );
+					geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( i * step - size, floor,  size ) ) );
+
+				}
+
+				var line = new THREE.Line( geometry, line_material, THREE.LinePieces );
+				scene.addObject( line );
+
+				// Add the COLLADA
+
+				scene.addObject( dae );
+
+				particleLight = new THREE.Mesh( new THREE.SphereGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
+				scene.addObject( particleLight );
+
+				// Lights
+
+				scene.addLight( new THREE.AmbientLight( 0xcccccc ) );
+
+				var directionalLight = new THREE.DirectionalLight(/*Math.random() * 0xffffff*/0xeeeeee );
+				directionalLight.position.x = Math.random() - 0.5;
+				directionalLight.position.y = Math.random() - 0.5;
+				directionalLight.position.z = Math.random() - 0.5;
+				directionalLight.position.normalize();
+				scene.addLight( directionalLight );
+
+				pointLight = new THREE.PointLight( 0xffffff, 4 );
+				pointLight.position.x = 10000;
+				scene.addLight( pointLight );
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild( stats.domElement );
+
+			}
+
+			//
+
+			var t = 0;
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				if ( t > 30 ) t = 0;
+
+				if ( skin ) {
+
+					// guess this can be done smarter...
+
+					// (Indeed, there are way more frames than needed and interpolation is not used at all
+					//  could be something like - one morph per each skinning pose keyframe, or even less,
+					//  animation could be resampled, morphing interpolation handles sparse keyframes quite well.
+					//  Simple animation cycles like this look ok with 10-15 frames instead of 100 ;)
+
+					for ( var i = 0; i < skin.morphTargetInfluences.length; i++ ) {
+
+						skin.morphTargetInfluences[ i ] = 0;
+
+					}
+
+					skin.morphTargetInfluences[ Math.floor( t ) ] = 1;
+
+					t += 0.5;
+
+				}
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				var timer = new Date().getTime() * 0.0005;
+
+				camera.position.x = Math.cos( timer ) * 10;
+				camera.position.y = 2;
+				camera.position.z = Math.sin( timer ) * 10;
+
+				particleLight.position.x = Math.sin( timer * 4 ) * 3009;
+				particleLight.position.y = Math.cos( timer * 5 ) * 4000;
+				particleLight.position.z = Math.cos( timer * 4 ) * 3009;
+
+				pointLight.position.x = particleLight.position.x;
+				pointLight.position.y = particleLight.position.y;
+				pointLight.position.z = particleLight.position.z;
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>

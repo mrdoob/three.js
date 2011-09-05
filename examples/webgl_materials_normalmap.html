@@ -33,25 +33,18 @@
 
 			#vt { display:none }
 			#vt, #vt a { color:orange; }
-			.code { }
-
-			#log { position:absolute; top:50px; text-align:left; display:block; z-index:100 }
 		</style>
 	</head>
 
 	<body>
-		<pre id="log"></pre>
 
 		<div id="info">
 			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl (<span id="description">normal + ao + displacement</span>) map demo.
 			ninja head from <a href="http://developer.amd.com/archive/gpu/MeshMapper/pages/default.aspx" target="_blank">AMD GPU MeshMapper</a>
 
-			<div id="vt">displacement mapping needs vertex textures (GPU with Shader Model 3.0)<br/>
-			on Windows use <span class="code">Chrome --use-gl=desktop</span> <br/>
-			or Firefox 4 (about:config => webgl.mochitest_native_gl=true)<br/>
-			please star this <a href="http://code.google.com/p/chromium/issues/detail?id=52497">Chrome issue</a> to get ANGLE support
-			</div>
+			<div id="vt">displacement mapping needs vertex textures (GPU with Shader Model 3.0)</div>
 		</div>
+
 
 		<script type="text/javascript" src="../build/Three.js"></script>
 		<script type="text/javascript" src="js/Detector.js"></script>
@@ -66,7 +59,7 @@
 
 			var container, stats, loader;
 
-			var camera, scene, webglRenderer;
+			var camera, scene, renderer;
 
 			var mesh, zmesh, lightMesh, geometry;
 			var mesh1, mesh2;
@@ -91,8 +84,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
-				camera.projectionMatrix = THREE.Matrix4.makeOrtho( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
+				camera = new THREE.OrthoCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
 				camera.position.z = 6200;
 
 				scene = new THREE.Scene();
@@ -116,7 +108,7 @@
 				// light representation
 
 				var sphere = new THREE.SphereGeometry( 100, 16, 8 );
-				lightMesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color:0xffaa00 } ) );
+				lightMesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) );
 				lightMesh.position = pointLight.position;
 				lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
 				scene.addObject(lightMesh);
@@ -140,7 +132,7 @@
 				uniforms[ "tDisplacement" ].texture = THREE.ImageUtils.loadTexture( "textures/normal/ninja/displacement.jpg" );
 				uniforms[ "uDisplacementBias" ].value = - 0.428408 * scale;
 				uniforms[ "uDisplacementScale" ].value = 2.436143 * scale;
-				
+
 				uniforms[ "uDiffuseColor" ].value.setHex( diffuse );
 				uniforms[ "uSpecularColor" ].value.setHex( specular );
 				uniforms[ "uAmbientColor" ].value.setHex( ambient );
@@ -157,13 +149,13 @@
 
 				loader.load( { model: "obj/ninja/NinjaLo_bin.js", callback: function( geometry ) { createScene( geometry, scale, material1, material2 ) } } );
 
-				webglRenderer = new THREE.WebGLRenderer();
-				webglRenderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( webglRenderer.domElement );
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
 
-				var description = "normal + ao" + ( webglRenderer.supportsVertexTextures() ? " + displacement" : " + <strike>displacement</strike>" );
+				var description = "normal + ao" + ( renderer.supportsVertexTextures() ? " + displacement" : " + <strike>displacement</strike>" );
 				document.getElementById( "description" ).innerHTML = description;
-				document.getElementById( "vt" ).style.display = webglRenderer.supportsVertexTextures() ? "none" : "block";
+				document.getElementById( "vt" ).style.display = renderer.supportsVertexTextures() ? "none" : "block";
 
 				if ( statsEnabled ) {
 
@@ -183,12 +175,12 @@
 
 				mesh1 = new THREE.Mesh( geometry, material1 );
 				mesh1.position.x = - scale * 12;
-				mesh1.scale.x = mesh1.scale.y = mesh1.scale.z = scale;
+				mesh1.scale.set( scale, scale, scale );
 				scene.addObject( mesh1 );
 
 				mesh2 = new THREE.Mesh( geometry, material2 );
 				mesh2.position.x = scale * 12;
-				mesh2.scale.x = mesh2.scale.y = mesh2.scale.z = scale;
+				mesh2.scale.set( scale, scale, scale );
 				scene.addObject( mesh2 );
 
 				loader.statusDomElement.style.display = "none";
@@ -236,14 +228,7 @@
 
 				r += 0.01;
 
-				webglRenderer.render( scene, camera );
-
-			}
-
-			function log( text ) {
-
-				var e = document.getElementById("log");
-				e.innerHTML = text + "<br/>" + e.innerHTML;
+				renderer.render( scene, camera );
 
 			}
 

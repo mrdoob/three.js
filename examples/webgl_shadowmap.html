@@ -32,6 +32,8 @@
 
 		<script type="text/javascript" src="../build/Three.js"></script>
 
+		<script type="text/javascript" src="js/ShaderExtras.js"></script>
+
 		<script type="text/javascript" src="js/Detector.js"></script>
 		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 		<script type="text/javascript" src="js/Stats.js"></script>
@@ -135,11 +137,10 @@
 
 			function createHUD() {
 
-				cameraOrtho = new THREE.Camera( 45, SHADOW_MAP_WIDTH / SHADOW_MAP_HEIGHT, NEAR, FAR );
-				cameraOrtho.projectionMatrix = THREE.Matrix4.makeOrtho( SCREEN_WIDTH / - 2, SCREEN_WIDTH / 2,  SCREEN_HEIGHT / 2, SCREEN_HEIGHT / - 2, -10, 1000 );
+				cameraOrtho = new THREE.OrthoCamera( SCREEN_WIDTH / - 2, SCREEN_WIDTH / 2,  SCREEN_HEIGHT / 2, SCREEN_HEIGHT / - 2, -10, 1000 );
 				cameraOrtho.position.z = 10;
 
-				var shader = THREE.ShaderUtils.lib[ "screen" ];
+				var shader = THREE.ShaderExtras[ "screen" ];
 				var uniforms = new THREE.UniformsUtils.clone( shader.uniforms );
 
 				hudMaterial = new THREE.MeshShaderMaterial( { vertexShader: shader.vertexShader, fragmentShader: shader.fragmentShader, uniforms: uniforms } );

@@ -123,7 +123,8 @@
 				var material_spheres = new THREE.MeshLambertMaterial( { color: 0xdddddd } ),
 					sphere = new THREE.SphereGeometry( 100, 16, 8 );
 
-				for ( var i=0; i<10; i++ ) {
+				for ( var i = 0; i < 10; i ++ ) {
+
 					mesh = new THREE.Mesh( sphere, material_spheres );
 					mesh.position.x = 500 * (Math.random() - 0.5);
 					mesh.position.y = 300 * (Math.random() - 0) + FLOOR;
@@ -132,6 +133,7 @@
 					mesh.overdraw = true;
 					mesh.updateMatrix();
 					scene.addObject(mesh);
+
 				}
 
 
@@ -210,6 +212,7 @@
 				for ( var i = 0; i < materials.length; i ++ ) {
 
 					// material
+
 					mesh = new THREE.Mesh( new THREE.PlaneGeometry( size, size ), materials[i] );
 					mesh.position.x = i * (size + 5) - ( ( materials.length - 1 )* ( size + 5 )/2);
 					mesh.position.y = FLOOR + size/2 + bottom;
@@ -220,6 +223,7 @@
 					scene.addObject(mesh);
 
 					// number
+
 					var x = document.createElement( "canvas" );
 					var xc = x.getContext("2d");
 					x.width = x.height = 128;
@@ -240,6 +244,7 @@
 					mesh.doubleSided = true;
 					mesh.updateMatrix();
 					scene.addObject(mesh);
+
 				}
 
 			}
@@ -268,13 +273,8 @@
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 				camera.updateMatrix();
 
-				if ( zmesh && 0 ) {
-					zmesh.rotation.y += 0.005;
-					zmesh.updateMatrix();
-				}
-
-				if ( render_canvas ) canvasRenderer.render( scene, camera );
 				if ( render_gl && has_gl ) webglRenderer.render( scene, camera );
+				if ( render_canvas ) canvasRenderer.render( scene, camera );
 
 			}
 

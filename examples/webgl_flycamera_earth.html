@@ -32,6 +32,15 @@
 	</style>
 
 	<script type="text/javascript" src="../build/Three.js"></script>
+
+	<script type="text/javascript" src="js/ShaderExtras.js"></script>
+
+	<script type="text/javascript" src="js/postprocessing/EffectComposer.js"></script>
+	<script type="text/javascript" src="js/postprocessing/ShaderPass.js"></script>
+	<script type="text/javascript" src="js/postprocessing/MaskPass.js"></script>
+	<script type="text/javascript" src="js/postprocessing/RenderPass.js"></script>
+	<script type="text/javascript" src="js/postprocessing/FilmPass.js"></script>
+
 	<script type="text/javascript" src="js/Detector.js"></script>
 	<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
 	<script type="text/javascript" src="js/Stats.js"></script>
@@ -59,19 +68,13 @@
 	var SCREEN_HEIGHT = window.innerHeight - MARGIN * 2;
 	var SCREEN_WIDTH  = window.innerWidth;
 
-	var ENABLE_LENSFLARES = false;
-
-	var lensFlare, lensFlareRotate;
-
 	var container, stats;
 	var camera, scene, sceneCube, renderer;
 	var geometry, meshPlanet, meshClouds, meshMoon;
 	var dirLight, pointLight, ambientLight;
 	var lastUpdate = new Date().getTime();
 
-	var t, d, dPlanet, dMoon, dMoonVec = new THREE.Vector3();
-
-	var postprocessing = { enabled : true, bloom: false };
+	var delta, d, dPlanet, dMoon, dMoonVec = new THREE.Vector3();
 
 	init();
 	animate();
@@ -104,10 +107,6 @@
         dirLight.position.set( -1, 0, 1 );
         dirLight.position.normalize();
         scene.addLight( dirLight );
-
-        pointLight = new THREE.PointLight( 0x000000 );
-        pointLight.position.set( -5000, 0, 5000 );
-        //scene.addLight( pointLight );
 
 		ambientLight = new THREE.AmbientLight( 0x000000 );
 		scene.addLight( ambientLight );
@@ -153,7 +152,7 @@
 
 		// clouds
 
-        var materialClouds = new THREE.MeshLambertMaterial( { color: 0xffffff, map: cloudsTexture, transparent:true } );
+        var materialClouds = new THREE.MeshLambertMaterial( { color: 0xffffff, map: cloudsTexture, transparent: true } );
 
 		meshClouds = new THREE.Mesh( geometry, materialClouds );
 		meshClouds.scale.set( cloudsScale, cloudsScale, cloudsScale );
@@ -174,7 +173,7 @@
 		var i, r = radius,
 			starsGeometry = [ new THREE.Geometry(), new THREE.Geometry() ];
 
-		for ( i = 0; i < 250; ++i ) {
+		for ( i = 0; i < 250; i ++ ) {
 
 			vector1 = new THREE.Vector3( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 );
 			vector1.multiplyScalar( r );
@@ -201,9 +200,10 @@
 							   new THREE.ParticleBasicMaterial( { color: 0x1a1a1a, size: 1, sizeAttenuation: false } )
 							];
 
-		for ( i = 10; i < 30; i ++) {
+		for ( i = 10; i < 30; i ++ ) {
 
 			stars = new THREE.ParticleSystem( starsGeometry[ i % 2 ], starsMaterials[ i % 6 ] );
+
 			stars.rotation.x = Math.random() * 6;
 			stars.rotation.y = Math.random() * 6;
 			stars.rotation.z = Math.random() * 6;
@@ -218,38 +218,10 @@
 
 		}
 
-		if ( ENABLE_LENSFLARES ) {
-
-			lensFlare = new THREE.LensFlare( THREE.ImageUtils.loadTexture( "textures/lensflare/lensflare0.png" ), 700, 0.0, THREE.AdditiveBlending );
-
-			lensFlare.add( THREE.ImageUtils.loadTexture( "textures/lensflare/lensflare2.png" ), 512, 0.0, THREE.AdditiveBlending );
-			lensFlare.add( lensFlare.lensFlares[ 1 ].texture, 512, 0.0, THREE.AdditiveBlending );
-			lensFlare.add( lensFlare.lensFlares[ 1 ].texture, 512, 0.0, THREE.AdditiveBlending );
-
-			lensFlare.add( THREE.ImageUtils.loadTexture( "textures/lensflare/lensflare3.png" ), 60, 0.6, THREE.AdditiveBlending );
-			lensFlare.add( lensFlare.lensFlares[ 4 ].texture, 70, 0.7, THREE.AdditiveBlending );
-			lensFlare.add( lensFlare.lensFlares[ 4 ].texture, 120, 0.9, THREE.AdditiveBlending );
-			lensFlare.add( lensFlare.lensFlares[ 4 ].texture, 70, 1.0, THREE.AdditiveBlending );
-
-			lensFlare.customUpdateCallback = lensFlareUpdateCallback;
-			lensFlare.position.set( 0, 0, -99000 );
-
-
-			lensFlareRotate = new THREE.Object3D();
-			lensFlareRotate.addChild( lensFlare );
-
-			scene.addChild( lensFlareRotate );
-
-			lensFlareRotate.rotation.x = Math.PI;
-			lensFlareRotate.rotation.y = Math.PI / 2;
-
-		}
-
         renderer = new THREE.WebGLRenderer( { clearAlpha: 1, clearColor: 0x000000 } );
         renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
         renderer.sortObjects = false;
 
-		initPostprocessing();
 		renderer.autoClear = false;
 
         container.appendChild( renderer.domElement );
@@ -258,9 +230,21 @@
         stats.domElement.style.position = 'absolute';
         stats.domElement.style.top = '0px';
         stats.domElement.style.zIndex = 100;
-        //container.appendChild( stats.domElement );
+        container.appendChild( stats.domElement );
 
 		window.addEventListener( 'resize', onWindowResize, false );
+
+		// postprocessing
+
+		var renderModel = new THREE.RenderPass( scene, camera );
+		var effectFilm = new THREE.FilmPass( 0.35, 0.75, 2048, false );
+
+		effectFilm.renderToScreen = true;
+
+		composer = new THREE.EffectComposer( renderer );
+
+		composer.addPass( renderModel );
+		composer.addPass( effectFilm );
 
 	};
 
@@ -274,73 +258,9 @@
 		camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
 		camera.updateProjectionMatrix();
 
-		initPostprocessing();
+		composer.reset();
 
 	}
-
-	function initPostprocessing() {
-
-		postprocessing.scene = new THREE.Scene();
-
-		postprocessing.camera = new THREE.Camera();
-		postprocessing.camera.projectionMatrix = THREE.Matrix4.makeOrtho( SCREEN_WIDTH / - 2, SCREEN_WIDTH / 2,  SCREEN_HEIGHT / 2, SCREEN_HEIGHT / - 2, -10000, 10000 );
-		postprocessing.camera.position.z = 100;
-
-		var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat };
-		postprocessing.rtTexture1 = new THREE.WebGLRenderTarget( SCREEN_WIDTH, SCREEN_HEIGHT, pars );
-		postprocessing.rtTexture2 = new THREE.WebGLRenderTarget( 512, 512, pars );
-		postprocessing.rtTexture3 = new THREE.WebGLRenderTarget( 512, 512, pars );
-
-		var screen_shader = THREE.ShaderUtils.lib["screen"];
-		var screen_uniforms = THREE.UniformsUtils.clone( screen_shader.uniforms );
-
-		screen_uniforms["tDiffuse"].texture = postprocessing.rtTexture1;
-		screen_uniforms["opacity"].value = 1.0;
-
-		postprocessing.materialScreen = new THREE.MeshShaderMaterial( {
-
-			uniforms: screen_uniforms,
-			vertexShader: screen_shader.vertexShader,
-			fragmentShader: screen_shader.fragmentShader,
-			blending: THREE.AdditiveBlending,
-			transparent: true
-
-		} );
-
-		var convolution_shader = THREE.ShaderUtils.lib["convolution"];
-		var convolution_uniforms = THREE.UniformsUtils.clone( convolution_shader.uniforms );
-
-		postprocessing.blurx = new THREE.Vector2( 0.001953125, 0.0 ),
-		postprocessing.blury = new THREE.Vector2( 0.0, 0.001953125 );
-
-		convolution_uniforms["tDiffuse"].texture = postprocessing.rtTexture1;
-		convolution_uniforms["uImageIncrement"].value = postprocessing.blurx;
-		convolution_uniforms["cKernel"].value = THREE.ShaderUtils.buildKernel( 4.0 );
-
-		postprocessing.materialConvolution = new THREE.MeshShaderMaterial( {
-
-			uniforms: convolution_uniforms,
-			vertexShader:   "#define KERNEL_SIZE 25.0\n" + convolution_shader.vertexShader,
-			fragmentShader: "#define KERNEL_SIZE 25\n"   + convolution_shader.fragmentShader
-
-		} );
-
-		var film_shader = THREE.ShaderUtils.lib["film"];
-		var film_uniforms = THREE.UniformsUtils.clone( film_shader.uniforms );
-
-		film_uniforms["tDiffuse"].texture = postprocessing.rtTexture1;
-
-		postprocessing.materialFilm = new THREE.MeshShaderMaterial( { uniforms: film_uniforms, vertexShader: film_shader.vertexShader, fragmentShader: film_shader.fragmentShader } );
-		postprocessing.materialFilm.uniforms.grayscale.value = 0;
-		postprocessing.materialFilm.uniforms.nIntensity.value = 0.35;
-		postprocessing.materialFilm.uniforms.sIntensity.value = 0.75;
-		postprocessing.materialFilm.uniforms.sCount.value = 2048;
-
-		postprocessing.quad = new THREE.Mesh( new THREE.PlaneGeometry( SCREEN_WIDTH, SCREEN_HEIGHT ), postprocessing.materialConvolution );
-		postprocessing.quad.position.z = - 500;
-		postprocessing.scene.addObject( postprocessing.quad );
-
-	};
 
 	function cap_bottom( val, bottom ) {
 
@@ -348,33 +268,6 @@
 
 	};
 
-	function lensFlareUpdateCallback( object ) {
-
-		var f, fl = object.lensFlares.length;
-		var flare;
-		var vecX = -object.positionScreen.x * 2;
-		var vecY = -object.positionScreen.y * 2;
-
-
-		for( f = 0; f < fl; f++ ) {
-
-			   flare = object.lensFlares[ f ];
-
-			   flare.x = object.positionScreen.x + vecX * flare.distance;
-			   flare.y = object.positionScreen.y + vecY * flare.distance;
-
-			   flare.rotation = 0;
-
-			   flare.opacity = cap_bottom( 1 - 0.01 * d / radius, 0 );
-
-		}
-
-		// hard coded stuff
-
-		object.lensFlares[ 2 ].y += 0.025;
-		object.lensFlares[ 3 ].rotation = object.positionScreen.x * 0.5 + 45 * Math.PI / 180;
-
-	};
 
 	function animate() {
 
@@ -396,10 +289,10 @@
 
 		// rotate the planet and clouds
 
-		t = this.getFrametime();
+		delta = this.getFrametime();
 
-        meshPlanet.rotation.y += rotationSpeed * t;
-		meshClouds.rotation.y += 1.25 * rotationSpeed * t;
+        meshPlanet.rotation.y += rotationSpeed * delta;
+		meshClouds.rotation.y += 1.25 * rotationSpeed * delta;
 
 		// slow down as we approach the surface
 
@@ -420,63 +313,8 @@
 
         camera.movementSpeed = 0.33 * d;
 
-		if ( ENABLE_LENSFLARES ) {
-
-			lensFlareRotate.position.set( camera.position.x, camera.position.y, camera.position.z );
-
-		}
-
-		if ( postprocessing.enabled ) {
-
-			renderer.clear();
-
-			// Render scene into texture
-
-			renderer.render( scene, camera, postprocessing.rtTexture1, true );
-
-			if ( postprocessing.bloom ) {
-
-				// Render quad with blured scene into texture (convolution pass 1)
-
-				postprocessing.quad.materials = [ postprocessing.materialConvolution ];
-
-				postprocessing.materialConvolution.uniforms.tDiffuse.texture = postprocessing.rtTexture1;
-				postprocessing.materialConvolution.uniforms.uImageIncrement.value = postprocessing.blurx;
-
-				renderer.render( postprocessing.scene, postprocessing.camera, postprocessing.rtTexture2, true );
-
-				// Render quad with blured scene into texture (convolution pass 2)
-
-				postprocessing.materialConvolution.uniforms.tDiffuse.texture = postprocessing.rtTexture2;
-				postprocessing.materialConvolution.uniforms.uImageIncrement.value = postprocessing.blury;
-
-				renderer.render( postprocessing.scene, postprocessing.camera, postprocessing.rtTexture3, true );
-
-				// Render original scene with superimposed blur to texture
-
-				postprocessing.quad.materials = [ postprocessing.materialScreen ];
-
-				postprocessing.materialScreen.uniforms.tDiffuse.texture = postprocessing.rtTexture3;
-				postprocessing.materialScreen.uniforms.opacity.value = 0.75;
-
-				renderer.render( postprocessing.scene, postprocessing.camera, postprocessing.rtTexture1, false );
-
-			}
-
-			// Render to screen
-
-			postprocessing.materialFilm.uniforms.time.value += 0.01;
-			postprocessing.quad.materials = [ postprocessing.materialFilm ];
-
-			postprocessing.materialScreen.uniforms.tDiffuse.texture = postprocessing.rtTexture1;
-			renderer.render( postprocessing.scene, postprocessing.camera );
-
-		} else {
-
-			renderer.clear();
-			renderer.render( scene, camera );
-
-		}
+		renderer.clear();
+		composer.render( delta );
 
 	};
 

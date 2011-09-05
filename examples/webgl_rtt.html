@@ -39,24 +39,25 @@
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<script id="fragment_shader_screen" type="x-shader/x-fragment">
+
 			varying vec2 vUv;
 			uniform sampler2D tDiffuse;
 
-			void main(void) {
+			void main() {
 
-				//gl_FragColor = texture2D( tDiffuse, vec2( vUv.x, 1.0 - vUv.y ) );
 				gl_FragColor = texture2D( tDiffuse, vUv );
 
 			}
+
 		</script>
 
 		<script id="fragment_shader_pass_1" type="x-shader/x-fragment">
+
 			varying vec2 vUv;
 			uniform float time;
 
-			void main(void) {
+			void main() {
 
-				//gl_FragColor = vec4( time, vUv.x, vUv.y, 1.0 );
 				float r = vUv.x;
 				if( vUv.y < 0.5 ) r = 0.0;
 				float g = vUv.y;
@@ -65,18 +66,20 @@
 				gl_FragColor = vec4( r, g, time, 1.0 );
 
 			}
+
 		</script>
 
 		<script id="vertexShader" type="x-shader/x-vertex">
+
 			varying vec2 vUv;
 
 			void main() {
 
 				vUv = uv;
-				//gl_Position = vec4( position, 1.0 );
 				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 			}
+
 		</script>
 
 
@@ -104,8 +107,7 @@
 
 				container = document.getElementById( 'container' );
 
-				cameraRTT = new THREE.Camera();
-				cameraRTT.projectionMatrix = THREE.Matrix4.makeOrtho( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
+				cameraRTT = new THREE.OrthoCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
 				cameraRTT.position.z = 100;
 
 				camera = new THREE.Camera( 30, window.innerWidth / window.innerHeight, 1, 10000 );
@@ -117,16 +119,12 @@
 				sceneScreen = new THREE.Scene();
 
 				var light = new THREE.DirectionalLight( 0xffffff );
-				light.position.x = 0;
-				light.position.y = 0;
-				light.position.z = 1;
+				light.position.set( 0, 0, 1 );
 				light.position.normalize();
 				sceneRTT.addLight( light );
 
 				light = new THREE.DirectionalLight( 0xffaaaa, 1.5 );
-				light.position.x = 0;
-				light.position.y = 0;
-				light.position.z = -1;
+				light.position.set( 0, 0, -1 );
 				light.position.normalize();
 				sceneRTT.addLight( light );
 
@@ -148,16 +146,13 @@
 
 				} );
 
-				// var mt = new THREE.MeshBasicMaterial( { color:0xffffff, map: ImageUtils.loadTexture( "textures/land_ocean_ice_cloud_2048.jpg" ) } );
-
 				var plane = new THREE.PlaneGeometry( window.innerWidth, window.innerHeight );
 
 				quad = new THREE.Mesh( plane, material );
 				quad.position.z = -100;
 				sceneRTT.addObject( quad );
 
-				var loader = new THREE.BinaryLoader();
-				loader.load( { model: "obj/torus/Torus_bin.js", callback: function( geometry ) { createMesh( geometry, sceneRTT ) } } );
+				createMesh( new THREE.TorusGeometry( 100, 25, 15, 30 ), sceneRTT );
 
 				quad = new THREE.Mesh( plane, materialScreen );
 				quad.position.z = -100;
@@ -166,17 +161,19 @@
 				var n = 5,
 					geometry = new THREE.SphereGeometry( 10, 64, 32 ),
 					material2 = new THREE.MeshLambertMaterial( { color:0xffffff, map: rtTexture } );
-					//material2 = new THREE.MeshBasicMaterial( { color:0xffffff, map: rtTexture } );
 
-				for( var j = 0; j < n; j++ ) {
+				for( var j = 0; j < n; j ++ ) {
 
-					for( var i = 0; i < n; i++ ) {
+					for( var i = 0; i < n; i ++ ) {
 
 						mesh = new THREE.Mesh( geometry, material2 );
+
 						mesh.position.x = ( i - (n-1)/2 ) * 20;
 						mesh.position.y = ( j - (n-1)/2 ) * 20;
 						mesh.position.z = 0;
+
 						mesh.rotation.y = 1.57;
+
 						scene.addObject( mesh );
 
 					}
@@ -185,6 +182,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.autoClear = false;
+
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -198,21 +196,17 @@
 
 			function createMesh( geometry, xscene ) {
 
-				var mat1 = new THREE.MeshPhongMaterial( { color: 0x555555, specular:0xffaa00, shininess:5 } ),
-					mat2 = new THREE.MeshPhongMaterial( { color: 0x550000, specular:0xff2200, shininess:5 } );
+				var mat1 = new THREE.MeshPhongMaterial( { color: 0x555555, specular: 0xffaa00, shininess: 5 } ),
+					mat2 = new THREE.MeshPhongMaterial( { color: 0x550000, specular: 0xff2200, shininess: 5 } );
 
 				zmesh1 = new THREE.Mesh( geometry, mat1 );
-				zmesh1.position.x = 0;
-				zmesh1.position.y = 0;
-				zmesh1.position.z = 100;
-				zmesh1.scale.x = zmesh1.scale.y = zmesh1.scale.z = 150;
+				zmesh1.position.set( 0, 0, 100 );
+				zmesh1.scale.set( 1.5, 1.5, 1.5 );
 				xscene.addObject( zmesh1 );
 
 				zmesh2 = new THREE.Mesh( geometry, mat2 );
-				zmesh2.position.x = 0;
-				zmesh2.position.y = 150;
-				zmesh2.position.z = 100;
-				zmesh2.scale.x = zmesh2.scale.y = zmesh2.scale.z = 75;
+				zmesh2.position.set( 0, 150, 100 );
+				zmesh2.scale.set( 0.75, 0.75, 0.75 );
 				xscene.addObject( zmesh2 );
 
 			}
@@ -244,11 +238,8 @@
 
 				if ( zmesh1 && zmesh2 ) {
 
-					zmesh1.rotation.x = 1.57;
-					zmesh1.rotation.z = time;
-
-					zmesh2.rotation.z = 1.57;
-					zmesh2.rotation.y = -time;
+					zmesh1.rotation.y = - time;
+					zmesh2.rotation.y = - time + Math.PI / 2;
 
 				}
 
@@ -271,7 +262,6 @@
 
 				renderer.enableDepthBufferWrite( false );
 				renderer.render( sceneScreen, cameraRTT );
-				//renderer.render( sceneRTT, cameraRTT );
 				renderer.enableDepthBufferWrite( true );
 
 				// Render second scene to screen
