@@ -127,7 +127,7 @@ THREE.SVGRenderer = function () {
 				_bboxRect.addPoint( _v1.positionScreen.x, _v1.positionScreen.y );
 				_bboxRect.addPoint( _v2.positionScreen.x, _v2.positionScreen.y );
 
-				if ( !_clipRect.instersects( _bboxRect ) ) {
+				if ( !_clipRect.intersects( _bboxRect ) ) {
 
 					continue;
 
@@ -154,7 +154,7 @@ THREE.SVGRenderer = function () {
 				_bboxRect.addPoint( _v2.positionScreen.x, _v2.positionScreen.y );
 				_bboxRect.addPoint( _v3.positionScreen.x, _v3.positionScreen.y );
 
-				if ( !_clipRect.instersects( _bboxRect ) ) {
+				if ( !_clipRect.intersects( _bboxRect ) ) {
 
 					continue;
 
@@ -199,7 +199,7 @@ THREE.SVGRenderer = function () {
 				_bboxRect.addPoint( _v3.positionScreen.x, _v3.positionScreen.y );
 				_bboxRect.addPoint( _v4.positionScreen.x, _v4.positionScreen.y );
 
-				if ( !_clipRect.instersects( _bboxRect) ) {
+				if ( !_clipRect.intersects( _bboxRect) ) {
 
 					continue;
 

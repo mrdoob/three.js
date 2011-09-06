@@ -222,7 +222,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 				_bboxRect.addPoint( _v1.positionScreen.x, _v1.positionScreen.y );
 				_bboxRect.addPoint( _v2.positionScreen.x, _v2.positionScreen.y );
 
-				if ( _clipRect.instersects( _bboxRect ) ) {
+				if ( _clipRect.intersects( _bboxRect ) ) {
 
 					m = 0; ml = element.materials.length;
 
@@ -256,7 +256,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 						      _v2.positionScreen.x, _v2.positionScreen.y,
 						      _v3.positionScreen.x, _v3.positionScreen.y );
 
-				if ( _clipRect.instersects( _bboxRect ) ) {
+				if ( _clipRect.intersects( _bboxRect ) ) {
 
 					m = 0; ml = element.meshMaterials.length;
 
@@ -313,7 +313,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 				_bboxRect.addPoint( _v3.positionScreen.x, _v3.positionScreen.y );
 				_bboxRect.addPoint( _v4.positionScreen.x, _v4.positionScreen.y );
 
-				if ( _clipRect.instersects( _bboxRect ) ) {
+				if ( _clipRect.intersects( _bboxRect ) ) {
 
 					m = 0; ml = element.meshMaterials.length;
 
@@ -477,7 +477,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 					_bboxRect.set( v1.x - width, v1.y - height, v1.x  + width, v1.y + height );
 
-					if ( !_clipRect.instersects( _bboxRect ) ) {
+					if ( !_clipRect.intersects( _bboxRect ) ) {
 
 						return;
 
@@ -513,7 +513,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				_bboxRect.set( v1.x - width, v1.y - height, v1.x + width, v1.y + height );
 
-				if ( !_clipRect.instersects( _bboxRect ) ) {
+				if ( !_clipRect.intersects( _bboxRect ) ) {
 
 					return;
 
