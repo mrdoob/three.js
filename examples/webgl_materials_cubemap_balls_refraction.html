@@ -111,11 +111,12 @@
 
 					fragmentShader: shader.fragmentShader,
 					vertexShader: shader.vertexShader,
-					uniforms: shader.uniforms
+					uniforms: shader.uniforms,
+					depthWrite: false
 
 				} ),
 
-				mesh = new THREE.Mesh( new THREE.CubeGeometry( 100000, 100000, 100000, 1, 1, 1, null, true ), material );
+				mesh = new THREE.Mesh( new THREE.CubeGeometry( 100, 100, 100, 1, 1, 1, null, true ), material );
 				sceneCube.add( mesh );
 
 				//
