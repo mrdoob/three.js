@@ -52,6 +52,8 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, segmentsRad
 			var v3 = vertices[ y + 1 ][ x + 1 ];
 			var v4 = vertices[ y ][ x + 1 ];
 
+			// FIXME: These normals aren't right for cones.
+
 			var n1 = this.vertices[ v1 ].position.clone().setY( 0 ).normalize();
 			var n2 = this.vertices[ v2 ].position.clone().setY( 0 ).normalize();
 			var n3 = this.vertices[ v3 ].position.clone().setY( 0 ).normalize();

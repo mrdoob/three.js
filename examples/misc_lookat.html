@@ -41,7 +41,7 @@
 
 			var camera, scene, renderer;
 
-			var mesh, zmesh, lightMesh, geometry, target;
+			var mesh, zmesh, lightMesh, geometry, sphere;
 
 			var mouseX = 0, mouseY = 0;
 
@@ -64,11 +64,13 @@
 
 				scene = new THREE.Scene();
 
-				var geometry = new THREE.CylinderGeometry( 3, 10, 0.1, 100 );
-				var material = new THREE.MeshNormalMaterial( { shading: THREE.SmoothShading } );
+				sphere = new THREE.Mesh( new THREE.SphereGeometry( 100, 20, 20 ), new THREE.MeshNormalMaterial( { shading: THREE.SmoothShading } ) );
+				scene.add( sphere );
 
-				target = new THREE.Mesh( new THREE.SphereGeometry( 100, 20, 20 ), material );
-				scene.add( target );
+				var geometry = new THREE.CylinderGeometry( 0, 10, 100, 3 );
+				THREE.GeometryUtils.applyMatrix( geometry, new THREE.Matrix4().setRotationFromEuler( new THREE.Vector3( Math.PI / 2, Math.PI, 0 ) ) );
+
+				var material = new THREE.MeshNormalMaterial();
 
 				for ( var i = 0; i < 1000; i ++ ) {
 
@@ -121,13 +123,13 @@
 
 				var time = new Date().getTime() * 0.0005;
 
-				target.position.x = Math.sin( time * 0.7 ) * 2000;
-				target.position.y = Math.cos( time * 0.5 ) * 2000;
-				target.position.z = Math.cos( time * 0.3 ) * 2000;
+				sphere.position.x = Math.sin( time * 0.7 ) * 2000;
+				sphere.position.y = Math.cos( time * 0.5 ) * 2000;
+				sphere.position.z = Math.cos( time * 0.3 ) * 2000;
 
 				for ( var i = 0, l = scene.objects.length; i < l; i ++ ) {
 
-					scene.objects[ i ].lookAt( target.position );
+					scene.objects[ i ].lookAt( sphere.position );
 
 				}
 
