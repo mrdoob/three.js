@@ -5,12 +5,43 @@
 
 THREE.GeometryUtils = {
 
+	applyMatrix: function ( geometry, matrix ) {
+
+		var matrixRotation = new THREE.Matrix4();
+		matrixRotation.extractRotation( matrix, new THREE.Vector3( 1, 1, 1 ) );
+
+		for ( var i = 0, il = geometry.vertices.length; i < il; i ++ ) {
+
+			var vertex = geometry.vertices[ i ];
+
+			matrix.multiplyVector3( vertex.position );
+
+		}
+
+		for ( var i = 0, il = geometry.faces.length; i < il; i ++ ) {
+
+			var face = geometry.faces[ i ];
+
+			matrixRotation.multiplyVector3( face.normal );
+
+			for ( var j = 0, jl = face.vertexNormals.length; j < jl; j ++ ) {
+
+				matrixRotation.multiplyVector3( face.vertexNormals[ j ] );
+
+			}
+
+			matrix.multiplyVector3( face.centroid );
+
+		}
+
+	},
+
 	merge: function ( geometry1, object2 /* mesh | geometry */ ) {
 
-		var isMesh = object2 instanceof THREE.Mesh,
+		var matrix, matrixRotation,
 		vertexOffset = geometry1.vertices.length,
 		uvPosition = geometry1.faceVertexUvs[ 0 ].length,
-		geometry2 = isMesh ? object2.geometry : object2,
+		geometry2 = object2 instanceof THREE.Mesh ? object2.geometry : object2,
 		vertices1 = geometry1.vertices,
 		vertices2 = geometry2.vertices,
 		faces1 = geometry1.faces,
@@ -18,7 +49,15 @@ THREE.GeometryUtils = {
 		uvs1 = geometry1.faceVertexUvs[ 0 ],
 		uvs2 = geometry2.faceVertexUvs[ 0 ];
 
-		isMesh && object2.matrixAutoUpdate && object2.updateMatrix();
+		if ( object2 instanceof THREE.Mesh ) {
+
+			object2.matrixAutoUpdate && object2.updateMatrix();
+
+			matrix = object2.matrix;
+			matrixRotation = new THREE.Matrix4();
+			matrixRotation.extractRotation( matrix, object2.scale );
+
+		}
 
 		// vertices
 
@@ -28,7 +67,7 @@ THREE.GeometryUtils = {
 
 			var vertexCopy = new THREE.Vertex( vertex.position.clone() );
 
-			isMesh && object2.matrix.multiplyVector3( vertexCopy.position );
+			if ( matrix ) matrix.multiplyVector3( vertexCopy.position );
 
 			vertices1.push( vertexCopy );
 
@@ -54,10 +93,15 @@ THREE.GeometryUtils = {
 
 			faceCopy.normal.copy( face.normal );
 
+			if ( matrixRotation ) matrixRotation.multiplyVector3( faceCopy.normal );
+
 			for ( var j = 0, jl = faceVertexNormals.length; j < jl; j ++ ) {
 
-				normal = faceVertexNormals[ j ];
-				faceCopy.vertexNormals.push( normal.clone() );
+				normal = faceVertexNormals[ j ].clone();
+
+				if ( matrixRotation ) matrixRotation.multiplyVector3( normal );
+
+				faceCopy.vertexNormals.push( normal );
 
 			}
 
@@ -73,6 +117,7 @@ THREE.GeometryUtils = {
 			faceCopy.materials = face.materials.slice();
 
 			faceCopy.centroid.copy( face.centroid );
+			if ( matrix ) matrix.multiplyVector3( faceCopy.centroid );
 
 			faces1.push( faceCopy );
 
