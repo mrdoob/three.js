@@ -277,9 +277,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	this.getClearColor = function ( color ) {
+	this.getClearColor = function () {
 
-		color.copy( _clearColor );
+		return _clearColor;
 
 	};
 

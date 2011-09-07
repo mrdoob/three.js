@@ -25,7 +25,7 @@ THREE.RenderPass.prototype = {
 
 		if ( this.clearColor ) {
 
-			renderer.getClearColor( this.oldClearColor );
+			this.oldClearColor.copy( renderer.getClearColor() );
 			renderer.setClearColor( this.clearColor, 1 );
 
 		}
