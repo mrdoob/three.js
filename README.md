@@ -10,7 +10,7 @@ The aim of the project is to create a lightweight 3D engine with a very low leve
 More? [#three.js on irc.freenode.net](http://webchat.freenode.net/?channels=three.js)
 
 
-### Examples ###
+### Featured Examples ([View all](http://mrdoob.github.com/three.js/)) ###
 
 
 #### WebGL (Context 3D) ####
