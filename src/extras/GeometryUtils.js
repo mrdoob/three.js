@@ -5,37 +5,6 @@
 
 THREE.GeometryUtils = {
 
-	applyMatrix: function ( geometry, matrix ) {
-
-		var matrixRotation = new THREE.Matrix4();
-		matrixRotation.extractRotation( matrix, new THREE.Vector3( 1, 1, 1 ) );
-
-		for ( var i = 0, il = geometry.vertices.length; i < il; i ++ ) {
-
-			var vertex = geometry.vertices[ i ];
-
-			matrix.multiplyVector3( vertex.position );
-
-		}
-
-		for ( var i = 0, il = geometry.faces.length; i < il; i ++ ) {
-
-			var face = geometry.faces[ i ];
-
-			matrixRotation.multiplyVector3( face.normal );
-
-			for ( var j = 0, jl = face.vertexNormals.length; j < jl; j ++ ) {
-
-				matrixRotation.multiplyVector3( face.vertexNormals[ j ] );
-
-			}
-
-			matrix.multiplyVector3( face.centroid );
-
-		}
-
-	},
-
 	merge: function ( geometry1, object2 /* mesh | geometry */ ) {
 
 		var matrix, matrixRotation,
