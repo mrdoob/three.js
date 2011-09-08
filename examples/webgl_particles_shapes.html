@@ -515,16 +515,15 @@
 				var radius = 15;
 				var blurAmountX = radius / window.innerWidth;
 				var blurAmountY = radius / window.innerHeight;
-				
+
 				var hblur = new THREE.ShaderPass( THREE.ShaderExtras[ "horizontalBlur" ] );
 				var vblur = new THREE.ShaderPass( THREE.ShaderExtras[ "verticalBlur" ] );
-				
-				hblur.uniforms['h'].value =  1 / window.innerWidth;
-				vblur.uniforms['v'].value =  1 / window.innerHeight;
-				
 
-				effectBlurX.uniforms['delta'].value = new THREE.Vector2( blurAmountX, 0 );
-				effectBlurY.uniforms['delta'].value = new THREE.Vector2( 0, blurAmountY );
+				hblur.uniforms[ 'h' ].value =  1 / window.innerWidth;
+				vblur.uniforms[ 'v' ].value =  1 / window.innerHeight;
+
+				effectBlurX.uniforms[ 'delta' ].value = new THREE.Vector2( blurAmountX, 0 );
+				effectBlurY.uniforms[ 'delta' ].value = new THREE.Vector2( 0, blurAmountY );
 
 				effectFocus.uniforms[ 'sampleDistance' ].value = 0.99; //0.94
 				effectFocus.uniforms[ 'waveFactor' ].value = 0.003;  //0.00125
@@ -533,11 +532,11 @@
 
 				composer = new THREE.EffectComposer( renderer );
 				composer.addPass( renderScene );
-				//composer.addPass( hblur );
-				//composer.addPass( vblur );
-				composer.addPass( effectBlurX );
-				composer.addPass( effectBlurY ); 
-				//composer.addPass( effectScreen ); 
+				composer.addPass( hblur );
+				composer.addPass( vblur );
+				//composer.addPass( effectBlurX );
+				//composer.addPass( effectBlurY );
+				//composer.addPass( effectScreen );
 				//composer.addPass( effectFocus );
 				//composer.addPass( effectFilm );
 
