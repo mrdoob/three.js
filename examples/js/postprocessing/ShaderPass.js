@@ -25,7 +25,11 @@ THREE.ShaderPass.prototype = {
 
 	render: function ( renderer, writeBuffer, readBuffer, delta ) {
 
-		this.uniforms[ this.textureID ].texture = readBuffer;
+		if ( this.uniforms[ this.textureID ] ) {
+
+			this.uniforms[ this.textureID ].texture = readBuffer;
+
+		}
 
 		THREE.EffectComposer.quad.materials[ 0 ] = this.material;
 

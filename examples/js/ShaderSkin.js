@@ -8,13 +8,17 @@ THREE.ShaderSkin = {
 
 	/* ------------------------------------------------------------------------------------------
 	//	Skin shader
-	//		- Blinn-Phong
-	//		- normal + diffuse maps
-	//		- four blur layers
+	//		- Blinn-Phong diffuse term (using normal + diffuse maps)
+	//		- subsurface scattering approximation by four blur layers
+	//		- physically based specular term (Kelemen/Szirmay-Kalos specular reflectance)
+	//
 	//		- point and directional lights (use with "lights: true" material option)
 	//
 	//		- based on Nvidia Advanced Skin Rendering GDC 2007 presentation
+	//		  and GPU Gems 3 Chapter 14. Advanced Techniques for Realistic Real-Time Skin Rendering
+	//
 	//			http://developer.download.nvidia.com/presentations/2007/gdc/Advanced_Skin.pdf
+	//			http://http.developer.nvidia.com/GPUGems3/gpugems3_ch14.html
 	// ------------------------------------------------------------------------------------------ */
 
 	'skin' : {
@@ -36,13 +40,17 @@ THREE.ShaderSkin = {
 			"tBlur3"	: { type: "t", value: 4, texture: null },
 			"tBlur4"	: { type: "t", value: 5, texture: null },
 
+			"tBeckmann"	: { type: "t", value: 6, texture: null },
+
 			"uNormalScale": { type: "f", value: 1.0 },
 
 			"uDiffuseColor":  { type: "c", value: new THREE.Color( 0xeeeeee ) },
 			"uSpecularColor": { type: "c", value: new THREE.Color( 0x111111 ) },
 			"uAmbientColor":  { type: "c", value: new THREE.Color( 0x050505 ) },
-			"uShininess": 	  { type: "f", value: 30 },
-			"uOpacity": 	  { type: "f", value: 1 }
+			"uOpacity": 	  { type: "f", value: 1 },
+
+			"uRoughness": 	  		{ type: "f", value: 0.15 },
+			"uSpecularBrightness": 	{ type: "f", value: 0.75 }
 
 			}
 
@@ -53,8 +61,10 @@ THREE.ShaderSkin = {
 			"uniform vec3 uAmbientColor;",
 			"uniform vec3 uDiffuseColor;",
 			"uniform vec3 uSpecularColor;",
-			"uniform float uShininess;",
 			"uniform float uOpacity;",
+
+			"uniform float uRoughness;",
+			"uniform float uSpecularBrightness;",
 
 			"uniform int passID;",
 
@@ -65,6 +75,8 @@ THREE.ShaderSkin = {
 			"uniform sampler2D tBlur2;",
 			"uniform sampler2D tBlur3;",
 			"uniform sampler2D tBlur4;",
+
+			"uniform sampler2D tBeckmann;",
 
 			"uniform float uNormalScale;",
 
@@ -89,14 +101,52 @@ THREE.ShaderSkin = {
 
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
 
+			"float fresnelReflectance( vec3 H, vec3 V, float F0 ) {",
+
+				"float base = 1.0 - dot( V, H );",
+				"float exponential = pow( base, 5.0 );",
+
+				"return exponential + F0 * ( 1.0 - exponential );",
+
+			"}",
+
+			// Kelemen/Szirmay-Kalos specular BRDF
+
+			"float KS_Skin_Specular( vec3 N,", 		// Bumped surface normal
+									"vec3 L,", 		// Points to light
+									"vec3 V,", 		// Points to eye
+									"float m,",  	// Roughness
+									"float rho_s", 	// Specular brightness
+									") {",
+
+				"float result = 0.0;",
+				"float ndotl = dot( N, L );",
+
+				"if( ndotl > 0.0 ) {",
+
+					"vec3 h = L + V;", // Unnormalized half-way vector
+					"vec3 H = normalize( h );",
+
+					"float ndoth = dot( N, H );",
+
+					"float PH = pow( 2.0 * texture2D( tBeckmann, vec2( ndoth, m ) ).x, 10.0 );",
+					"float F = fresnelReflectance( H, V, 0.028 );",
+					"float frSpec = max( PH * F / dot( h, h ), 0.0 );",
+
+					"result = ndotl * rho_s * frSpec;", // BRDF * dot(N,L) * rho_s
+
+				"}",
+
+				"return result;",
+
+			"}",
+
 			"void main() {",
 
 				"gl_FragColor = vec4( 1.0 );",
 
 				"vec4 mColor = vec4( uDiffuseColor, uOpacity );",
 				"vec4 mSpecular = vec4( uSpecularColor, uOpacity );",
-
-				"vec3 specularTex = vec3( 1.0 );",
 
 				"vec3 normalTex = texture2D( tNormal, vUv ).xyz * 2.0 - 1.0;",
 				"normalTex.xy *= uNormalScale;",
@@ -107,7 +157,6 @@ THREE.ShaderSkin = {
 
 				"gl_FragColor = gl_FragColor * pow( colDiffuse, vec4( 0.5 ) );",
 
-
 				"mat3 tsb = mat3( vTangent, vBinormal, vNormal );",
 				"vec3 finalNormal = tsb * normalTex;",
 
@@ -116,7 +165,7 @@ THREE.ShaderSkin = {
 
 				// point lights
 
-				"vec4 specularTotal = vec4( vec3( 0.0 ), 1.0 );",
+				"vec3 specularTotal = vec3( 0.0 );",
 
 				"#if MAX_POINT_LIGHTS > 0",
 
@@ -125,19 +174,14 @@ THREE.ShaderSkin = {
 					"for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {",
 
 						"vec3 pointVector = normalize( vPointLight[ i ].xyz );",
-						"vec3 pointHalfVector = normalize( vPointLight[ i ].xyz + viewPosition );",
 						"float pointDistance = vPointLight[ i ].w;",
 
-						"float pointDotNormalHalf = dot( normal, pointHalfVector );",
 						"float pointDiffuseWeight = max( dot( normal, pointVector ), 0.0 );",
 
-						"float pointSpecularWeight = 0.0;",
-
-						"if ( passID == 1 && pointDotNormalHalf >= 0.0 )",
-							"pointSpecularWeight = specularTex.r * pow( pointDotNormalHalf, uShininess );",
-
 						"pointTotal  += pointDistance * vec4( pointLightColor[ i ], 1.0 ) * ( mColor * pointDiffuseWeight );",
-						"specularTotal  += pointDistance * vec4( pointLightColor[ i ], 1.0 ) * ( mSpecular * pointSpecularWeight * pointDiffuseWeight );",
+
+						"if ( passID == 1 )",
+							"specularTotal += pointDistance * mSpecular.xyz * pointLightColor[ i ] * KS_Skin_Specular( normal, pointVector, viewPosition, uRoughness, uSpecularBrightness );",
 
 					"}",
 
@@ -154,17 +198,13 @@ THREE.ShaderSkin = {
 						"vec4 lDirection = viewMatrix * vec4( directionalLightDirection[ i ], 0.0 );",
 
 						"vec3 dirVector = normalize( lDirection.xyz );",
-						"vec3 dirHalfVector = normalize( lDirection.xyz + viewPosition );",
 
-						"float dirDotNormalHalf = dot( normal, dirHalfVector );",
 						"float dirDiffuseWeight = max( dot( normal, dirVector ), 0.0 );",
 
-						"float dirSpecularWeight = 0.0;",
-						"if ( passID == 1 && dirDotNormalHalf >= 0.0 )",
-							"dirSpecularWeight = specularTex.r * pow( dirDotNormalHalf, uShininess );",
-
 						"dirTotal  += vec4( directionalLightColor[ i ], 1.0 ) * ( mColor * dirDiffuseWeight );",
-						"specularTotal += vec4( directionalLightColor[ i ], 1.0 ) * ( mSpecular * dirSpecularWeight * dirDiffuseWeight );",
+
+						"if ( passID == 1 )",
+							"specularTotal += mSpecular.xyz * directionalLightColor[ i ] * KS_Skin_Specular( normal, dirVector, viewPosition, uRoughness, uSpecularBrightness );",
 
 					"}",
 
@@ -224,8 +264,7 @@ THREE.ShaderSkin = {
 
 					"gl_FragColor.xyz *= pow( colDiffuse.xyz, vec3( 0.5 ) );",
 
-					"gl_FragColor += specularTotal;",
-					"gl_FragColor.xyz += ambientLightColor * uAmbientColor * colDiffuse.xyz;",
+					"gl_FragColor.xyz += ambientLightColor * uAmbientColor * colDiffuse.xyz + specularTotal;",
 
 					"#ifndef VERSION1",
 
@@ -406,7 +445,65 @@ THREE.ShaderSkin = {
 
 		].join("\n")
 
-	}
+	},
 
+	/* ------------------------------------------------------------------------------------------
+	// Beckmann distribution function
+	//	- to be used in specular term of skin shader
+	//	- render a screen-aligned quad to precompute a 512 x 512 texture
+	//
+	//		- from http://developer.nvidia.com/node/171
+	 ------------------------------------------------------------------------------------------ */
+
+	"beckmann" : {
+
+		uniforms: {},
+
+		vertexShader: [
+
+			"varying vec2 vUv;",
+
+			"void main() {",
+
+				"vUv = vec2( uv.x, 1.0 - uv.y );",
+				"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+
+			"}"
+
+		].join("\n"),
+
+		fragmentShader: [
+
+			"varying vec2 vUv;",
+
+			"float PHBeckmann( float ndoth, float m ) {",
+
+				"float alpha = acos( ndoth );",
+				"float ta = tan( alpha );",
+
+				"float val = 1.0 / ( m * m * pow( ndoth, 4.0 ) ) * exp( -( ta * ta ) / ( m * m ) );",
+				"return val;",
+
+			"}",
+
+			"float KSTextureCompute( vec2 tex ) {",
+
+				// Scale the value to fit within [0,1] – invert upon lookup.
+
+				"return 0.5 * pow( PHBeckmann( tex.x, tex.y ), 0.1 );",
+
+			"}",
+
+			"void main() {",
+
+				"float x = KSTextureCompute( vUv );",
+
+				"gl_FragColor = vec4( x, x, x, 1.0 );",
+
+			"}"
+
+		].join("\n")
+
+	}
 
 };

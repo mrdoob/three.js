@@ -43,7 +43,6 @@
 
 		<script type="text/javascript" src="../build/Three.js"></script>
 
-
 		<script type="text/javascript" src="js/ShaderExtras.js"></script>
 		<script type="text/javascript" src="js/ShaderSkin.js"></script>
 
@@ -71,7 +70,7 @@
 
 			var mesh;
 
-			var composer, composerUV1, composerUV2, composerUV3;
+			var composer, composerUV1, composerUV2, composerUV3, composerBeckmann;
 
 			var directionalLight, pointLight, ambientLight;
 
@@ -99,6 +98,7 @@
 				ambientLight = new THREE.AmbientLight( 0x222222 );
 				scene.add( ambientLight );
 
+
 				directionalLight = new THREE.DirectionalLight( 0xffeedd, 1 );
 				directionalLight.position.set( 1, -1, 1 );
 				directionalLight.position.normalize();
@@ -108,7 +108,7 @@
 
 				var ambient = 0x111111, diffuse = 0xbbbbbb, specular = 0x070707, shininess = 50;
 
-				specular = 0x090909;
+				specular = 0x555555;
 
 				var shader = THREE.ShaderSkin[ "skin" ];
 
@@ -125,7 +125,8 @@
 				uniformsUV[ "uSpecularColor" ].value.setHex( specular );
 				uniformsUV[ "uAmbientColor" ].value.setHex( ambient );
 
-				uniformsUV[ "uShininess" ].value = shininess;
+				uniformsUV[ "uRoughness" ].value = 0.185;
+				uniformsUV[ "uSpecularBrightness" ].value = 0.8;
 
 				var uniforms = THREE.UniformsUtils.clone( uniformsUV );
 				uniforms[ "tDiffuse" ].texture = uniformsUV[ "tDiffuse" ].texture;
@@ -222,6 +223,14 @@
 
 				//
 
+				var effectBeckmann = new THREE.ShaderPass( THREE.ShaderSkin[ "beckmann" ] );
+
+				composerBeckmann = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtwidth, rtheight, pars ) );
+
+				composerBeckmann.addPass( effectBeckmann );
+
+				//
+
 				var effectBloom = new THREE.BloomPass( 0.25 );
 
 				var effectBleach = new THREE.ShaderPass( THREE.ShaderExtras[ "bleachbypass" ] );
@@ -241,6 +250,8 @@
 				uniforms[ "tBlur2" ].texture = composerUV1.renderTarget2;
 				uniforms[ "tBlur3" ].texture = composerUV2.renderTarget2;
 				uniforms[ "tBlur4" ].texture = composerUV3.renderTarget2;
+
+				uniforms[ "tBeckmann" ].texture = composerBeckmann.renderTarget1;
 
 
 			}
@@ -291,6 +302,9 @@
 				}
 
 				renderer.clear();
+
+				composerBeckmann.render();
+
 
 				composerScene.render();
 
