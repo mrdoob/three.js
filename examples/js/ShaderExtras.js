@@ -772,7 +772,7 @@ THREE.ShaderExtras = {
 
 		fragmentShader: [
 
-		"#define ITERATIONS 20.0",
+		"#define ITERATIONS 10.0",
 
 		"uniform sampler2D texture;",
 		"uniform vec2 delta;",
@@ -840,6 +840,111 @@ THREE.ShaderExtras = {
 				"gl_FragColor = vec4( 1.0, 0.0, 0.0, 0.5 );",
 
 			"}"
+
+		].join("\n")
+
+	},
+
+	/* --------------------------------------------------------------------------------------------------
+	//	Vertical and Horizontal blur shaders
+	//	- described in from http://www.gamerendering.com/2008/10/11/gaussian-blur-filter-shader/
+	//		and used in www.cake23.de/traveling-wavefronts-lit-up.html
+	 -------------------------------------------------------------------------------------------------- */
+	
+	
+	'horizontalBlur': {
+
+		uniforms: {
+			"tDiffuse": { type: "t", value: 0, texture: null },
+			"h": { type: "f", value: 1.0/512.0 }
+		},
+
+		vertexShader: [
+
+			"varying vec2 vUv;",
+
+			"void main() {",
+
+				"vUv = vec2( uv.x, 1.0 - uv.y );",
+				"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+
+			"}"
+
+		].join("\n"),
+
+		fragmentShader: [
+		
+			// original shader from http://www.gamerendering.com/2008/10/11/gaussian-blur-filter-shader/
+			// horizontal blur fragment shader
+			"uniform sampler2D tDiffuse;",
+			"varying vec2 vUv;",
+			"uniform float h;",
+			"void main(void)", // fragment
+			"{",
+				//"float h = 1.0/512.0;",
+				"vec4 sum = vec4(0.0);",
+				"sum += texture2D(tDiffuse, vec2(vUv.x - 4.0*h, vUv.y) ) * 0.05;",
+				"sum += texture2D(tDiffuse, vec2(vUv.x - 3.0*h, vUv.y) ) * 0.09;",
+				"sum += texture2D(tDiffuse, vec2(vUv.x - 2.0*h, vUv.y) ) * 0.12;",
+				"sum += texture2D(tDiffuse, vec2(vUv.x - 1.0*h, vUv.y) ) * 0.15;",
+				"sum += texture2D(tDiffuse, vec2(vUv.x + 0.0*h, vUv.y) ) * 0.16;",
+				"sum += texture2D(tDiffuse, vec2(vUv.x + 1.0*h, vUv.y) ) * 0.15;",
+				"sum += texture2D(tDiffuse, vec2(vUv.x + 2.0*h, vUv.y) ) * 0.12;",
+				"sum += texture2D(tDiffuse, vec2(vUv.x + 3.0*h, vUv.y) ) * 0.09;",
+				"sum += texture2D(tDiffuse, vec2(vUv.x + 4.0*h, vUv.y) ) * 0.05;",
+				"gl_FragColor = sum; ",
+			    // "gl_FragColor.xyz = sum.xyz/0.98;", // normalize
+			    // 	"gl_FragColor.a = 1.;",
+			"}"
+			
+
+		].join("\n")
+
+	},
+	
+	'verticalBlur': {
+
+		uniforms: {
+			"tDiffuse": { type: "t", value: 0, texture: null },
+			"v": { type: "f", value: 1.0/512.0 }
+		},
+
+		vertexShader: [
+
+			"varying vec2 vUv;",
+
+			"void main() {",
+
+				"vUv = vec2( uv.x, 1.0 - uv.y );",
+				"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+
+			"}"
+
+		].join("\n"),
+
+		fragmentShader: [
+			"uniform sampler2D tDiffuse;",
+			"varying vec2 vUv;",
+			"uniform float v;",
+			
+			"void main(void)", // fragment
+			"{",
+				//"float v = pixelSize.y;",
+				"vec4 sum = vec4(0.0);",
+				"sum += texture2D(tDiffuse, vec2(vUv.x, - 4.0*v + vUv.y) ) * 0.05;",
+				"sum += texture2D(tDiffuse, vec2(vUv.x, - 3.0*v + vUv.y) ) * 0.09;",
+				"sum += texture2D(tDiffuse, vec2(vUv.x, - 2.0*v + vUv.y) ) * 0.12;",
+				"sum += texture2D(tDiffuse, vec2(vUv.x, - 1.0*v + vUv.y) ) * 0.15;",
+				"sum += texture2D(tDiffuse, vec2(vUv.x, + 0.0*v + vUv.y) ) * 0.16;",
+				"sum += texture2D(tDiffuse, vec2(vUv.x, + 1.0*v + vUv.y) ) * 0.15;",
+				"sum += texture2D(tDiffuse, vec2(vUv.x, + 2.0*v + vUv.y) ) * 0.12;",
+				"sum += texture2D(tDiffuse, vec2(vUv.x, + 3.0*v + vUv.y) ) * 0.09;",
+				"sum += texture2D(tDiffuse, vec2(vUv.x, + 4.0*v + vUv.y) ) * 0.05;",
+				"gl_FragColor = sum;",
+			    //"gl_FragColor.xyz = sum.xyz/0.98;",
+				//"gl_FragColor.a = 1.;",
+			"}"
+			
 
 		].join("\n")
 

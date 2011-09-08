@@ -316,8 +316,6 @@
 
 					context.fill();
 
-					//var idata =context.getImageData(0, 0, canvas.width, canvas.height);
-					//document.body.appendChild(canvas);
 					return canvas;
 
 				}
@@ -517,6 +515,13 @@
 				var radius = 15;
 				var blurAmountX = radius / window.innerWidth;
 				var blurAmountY = radius / window.innerHeight;
+				
+				var hblur = new THREE.ShaderPass( THREE.ShaderExtras[ "horizontalBlur" ] );
+				var vblur = new THREE.ShaderPass( THREE.ShaderExtras[ "verticalBlur" ] );
+				
+				hblur.uniforms['h'].value =  1 / window.innerWidth;
+				vblur.uniforms['v'].value =  1 / window.innerHeight;
+				
 
 				effectBlurX.uniforms['delta'].value = new THREE.Vector2( blurAmountX, 0 );
 				effectBlurY.uniforms['delta'].value = new THREE.Vector2( 0, blurAmountY );
@@ -528,14 +533,16 @@
 
 				composer = new THREE.EffectComposer( renderer );
 				composer.addPass( renderScene );
-				//composer.addPass( effectBlurX );
-				//composer.addPass( effectBlurY );
-				//composer.addPass( effectScreen );
-				composer.addPass( effectFocus );
+				//composer.addPass( hblur );
+				//composer.addPass( vblur );
+				composer.addPass( effectBlurX );
+				composer.addPass( effectBlurY ); 
+				//composer.addPass( effectScreen ); 
+				//composer.addPass( effectFocus );
 				//composer.addPass( effectFilm );
 
-				//effectBlurY.renderToScreen = true;
-
+				vblur.renderToScreen = true;
+				effectBlurY.renderToScreen = true;
 				effectFocus.renderToScreen = true;
 				effectScreen.renderToScreen = true;
 				effectFilm.renderToScreen = true;
