@@ -80,6 +80,8 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
+			var firstPass = true;
+
 			init();
 			animate();
 
@@ -303,8 +305,13 @@
 
 				renderer.clear();
 
-				composerBeckmann.render();
 
+				if ( firstPass ) {
+
+					composerBeckmann.render();
+					firstPass = false;
+
+				}
 
 				composerScene.render();
 
