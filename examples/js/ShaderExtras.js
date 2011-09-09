@@ -901,7 +901,8 @@ THREE.ShaderExtras = {
 				"sum += texture2D( tDiffuse, vec2( vUv.x + 3.0 * h, vUv.y ) ) * 0.09;",
 				"sum += texture2D( tDiffuse, vec2( vUv.x + 4.0 * h, vUv.y ) ) * 0.05;",
 
-			    "gl_FragColor = sum / 0.98;", // normalize
+				"gl_FragColor.xyz = sum.xyz/0.98;", // normalize
+				"gl_FragColor.a = 1.;",
 
 			"}"
 
@@ -953,7 +954,8 @@ THREE.ShaderExtras = {
 				"sum += texture2D( tDiffuse, vec2( vUv.x, vUv.y + 3.0 * v ) ) * 0.09;",
 				"sum += texture2D( tDiffuse, vec2( vUv.x, vUv.y + 4.0 * v ) ) * 0.05;",
 
-			    "gl_FragColor.xyz = sum / 0.98;",
+				"gl_FragColor.xyz = sum.xyz/0.98;",
+				"gl_FragColor.a = 1.;",
 
 			"}"
 
