@@ -122,7 +122,7 @@ var Code = function () {
 				if ( object.scale.y != 1 ) string += '\n\tmesh.scale.y = ' + object.scale.y + ';';
 				if ( object.scale.z != 1 ) string += '\n\tmesh.scale.z = ' + object.scale.z + ';';
 
-				string += '\n\tscene.add( mesh );';
+				string += '\n\tscene.addObject( mesh );'; // string += '\n\tscene.add( mesh );';
 
 				_list.push( string );
 

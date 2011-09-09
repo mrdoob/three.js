@@ -6,13 +6,6 @@ UI.Viewports = function () {
 	var _HOVERED, _SELECTED;
 	var _offset = new THREE.Vector3();
 
-	var _views = [
-		{ x: 0, y: 0, width: 0, height: 0 },
-		{ x: 0, y: 0, width: 0, height: 0 },
-		{ x: 0, y: 0, width: 0, height: 0 },
-		{ x: 0, y: 0, width: 0, height: 0 }
-	];
-
 	//
 
 	var _domElement = document.createElement( 'div' );
@@ -21,23 +14,28 @@ UI.Viewports = function () {
 
 	//
 
-	var _cameras = [];
+	var _views = [
+		{ x: null, y: null, width: null, height: null, camera: null },
+		{ x: null, y: null, width: null, height: null, camera: null },
+		{ x: null, y: null, width: null, height: null, camera: null },
+		{ x: null, y: null, width: null, height: null, camera: null }
+	];
 
-	_cameras[ 0 ] = new THREE.Camera( 50, 1, 1, 5000 ); // top
-	_cameras[ 0 ].useTarget = false;
-	_cameras[ 0 ].position.y = 1000;
-	_cameras[ 0 ].rotation.x = - Math.PI / 2;
+	_views[ 0 ].camera = new THREE.Camera( 50, 1, 1, 5000 ); // top
+	_views[ 0 ].camera.useTarget = false;
+	_views[ 0 ].camera.position.y = 1000;
+	_views[ 0 ].camera.rotation.x = - Math.PI / 2;
 
-	_cameras[ 1 ] = new THREE.Camera( 50, 1, 1, 5000 ); // front
-	_cameras[ 1 ].position.z = 1000;
+	_views[ 1 ].camera = new THREE.Camera( 50, 1, 1, 5000 ); // front
+	_views[ 1 ].camera.position.z = 1000;
 
-	_cameras[ 2 ] = new THREE.Camera( 50, 1, 1, 5000 ); // left
-	_cameras[ 2 ].position.x = - 1000;
+	_views[ 2 ].camera = new THREE.Camera( 50, 1, 1, 5000 ); // left
+	_views[ 2 ].camera.position.x = - 1000;
 
-	_cameras[ 3 ] = new THREE.Camera( 50, 1, 1, 5000 ); // perspective
-	_cameras[ 3 ].position.x = 1000;
-	_cameras[ 3 ].position.y = 1000;
-	_cameras[ 3 ].position.z = 1000;
+	_views[ 3 ].camera = new THREE.Camera( 50, 1, 1, 5000 ); // perspective
+	_views[ 3 ].camera.position.x = 1000;
+	_views[ 3 ].camera.position.y = 1000;
+	_views[ 3 ].camera.position.z = 1000;
 
 	// guides
 
@@ -75,7 +73,7 @@ UI.Viewports = function () {
 
 		var mouse = getViewportMouse( event.clientX, event.clientY );
 
-		var camera = _cameras[ mouse.id ];
+		var camera = _views[ mouse.view ].camera;
 		var vector = new THREE.Vector3( mouse.x * 2 - 1, - mouse.y * 2 + 1, 0.5 );
 		_projector.unprojectVector( vector, camera );
 
@@ -98,7 +96,7 @@ UI.Viewports = function () {
 
 		var mouse = getViewportMouse( event.clientX, event.clientY );
 
-		var camera = _cameras[ mouse.id ];
+		var camera = _views[ mouse.view ].camera;
 		var vector = new THREE.Vector3( mouse.x * 2 - 1, - mouse.y * 2 + 1, 0.5 );
 		_projector.unprojectVector( vector, camera );
 
@@ -123,7 +121,7 @@ UI.Viewports = function () {
 			_HOVERED = intersects[ 0 ].object;
 
 			_plane.position.set( 0, 0, 0 );
-			_plane.lookAt( _cameras[ mouse.id ].position );
+			_plane.lookAt( camera.position );
 			_plane.position.copy( _HOVERED.position );
 
 			_render();
@@ -153,14 +151,16 @@ UI.Viewports = function () {
 
 			event.preventDefault();
 
-			var id = getViewportMouse( event.clientX, event.clientY ).id;
+			var mouse = getViewportMouse( event.clientX, event.clientY );
+			var camera = _views[ mouse.view ].camera;
+			var vector = camera.position.clone();
 			var amount = event.wheelDeltaY * 0.2;
-			var vector = _cameras[ id ].position.clone();
 
 			if ( vector.length() - amount < 10 ) return;
 
 			vector.normalize().multiplyScalar( amount );
-			_cameras[ id ].position.subSelf( vector );
+			camera.position.subSelf( vector );
+
 			_render();
 
 		}
@@ -274,7 +274,7 @@ UI.Viewports = function () {
 
 			return {
 
-				id: 0,
+				view: 0,
 				x: x / _views[ 0 ].width,
 				y: y / _views[ 0 ].height
 
@@ -284,7 +284,7 @@ UI.Viewports = function () {
 
 			return {
 
-				id: 1,
+				view: 1,
 				x: ( x - _views[ 1 ].x ) / _views[ 1 ].width,
 				y: y / _views[ 1 ].height
 
@@ -294,7 +294,7 @@ UI.Viewports = function () {
 
 			return {
 
-				id: 2,
+				view: 2,
 				x: x / _views[ 2 ].width,
 				y: ( y - _views[ 2 ].y ) / _views[ 2 ].height
 
@@ -304,7 +304,7 @@ UI.Viewports = function () {
 
 			return {
 
-				id: 3,
+				view: 3,
 				x: ( x - _views[ 3 ].x ) / _views[ 3 ].width,
 				y: ( y - _views[ 3 ].y ) / _views[ 3 ].height
 
@@ -373,17 +373,17 @@ UI.Viewports = function () {
 
 	var _updateCameras = function () {
 
-		_cameras[ 0 ].aspect = _views[ 0 ].width / _views[ 0 ].height;
-		_cameras[ 0 ].updateProjectionMatrix();
+		_views[ 0 ].camera.aspect = _views[ 0 ].width / _views[ 0 ].height;
+		_views[ 0 ].camera.updateProjectionMatrix();
 
-		_cameras[ 1 ].aspect = _views[ 1 ].width / _views[ 1 ].height;
-		_cameras[ 1 ].updateProjectionMatrix();
+		_views[ 1 ].camera.aspect = _views[ 1 ].width / _views[ 1 ].height;
+		_views[ 1 ].camera.updateProjectionMatrix();
 
-		_cameras[ 2 ].aspect = _views[ 2 ].width / _views[ 2 ].height;
-		_cameras[ 2 ].updateProjectionMatrix();
+		_views[ 2 ].camera.aspect = _views[ 2 ].width / _views[ 2 ].height;
+		_views[ 2 ].camera.updateProjectionMatrix();
 
-		_cameras[ 3 ].aspect = _views[ 3 ].width / _views[ 3 ].height;
-		_cameras[ 3 ].updateProjectionMatrix();
+		_views[ 3 ].camera.aspect = _views[ 3 ].width / _views[ 3 ].height;
+		_views[ 3 ].camera.updateProjectionMatrix();
 
 
 	};
@@ -401,20 +401,20 @@ UI.Viewports = function () {
 		_renderer.clear();
 
 		_renderer.setViewport( 0, _height - _height * _yhalf, _views[ 0 ].width, _views[ 0 ].height );
-		_renderer.render( _sceneHelpers, _cameras[ 0 ] );
-		_renderer.render( _scene, _cameras[ 0 ] );
+		_renderer.render( _sceneHelpers, _views[ 0 ].camera );
+		_renderer.render( _scene, _views[ 0 ].camera );
 
 		_renderer.setViewport( _width * _xhalf, _height - _height * _yhalf, _views[ 1 ].width, _views[ 1 ].height );
-		_renderer.render( _sceneHelpers, _cameras[ 1 ] );
-		_renderer.render( _scene, _cameras[ 1 ] );
+		_renderer.render( _sceneHelpers, _views[ 1 ].camera );
+		_renderer.render( _scene, _views[ 1 ].camera );
 
 		_renderer.setViewport( 0, 0, _views[ 2 ].width, _views[ 2 ].height );
-		_renderer.render( _sceneHelpers, _cameras[ 2 ] );
-		_renderer.render( _scene, _cameras[ 2 ] );
+		_renderer.render( _sceneHelpers, _views[ 2 ].camera );
+		_renderer.render( _scene, _views[ 2 ].camera );
 
 		_renderer.setViewport( _width * _xhalf, 0, _views[ 3 ].width, _views[ 3 ].height );
-		_renderer.render( _sceneHelpers, _cameras[ 3 ] );
-		_renderer.render( _scene, _cameras[ 3 ] );
+		_renderer.render( _sceneHelpers, _views[ 3 ].camera );
+		_renderer.render( _scene, _views[ 3 ].camera );
 
 	};
 
