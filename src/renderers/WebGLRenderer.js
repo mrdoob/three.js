@@ -283,6 +283,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	this.getClearAlpha = function () {
+
+		return _clearAlpha;
+
+	};
+
 	this.clear = function () {
 
 		_gl.clear( _gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT | _gl.STENCIL_BUFFER_BIT );

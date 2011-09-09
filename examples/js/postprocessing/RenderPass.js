@@ -2,18 +2,21 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.RenderPass = function ( scene, camera, overrideMaterial, clearColor ) {
+THREE.RenderPass = function ( scene, camera, overrideMaterial, clearColor, clearAlpha ) {
 
 	this.scene = scene;
 	this.camera = camera;
 
 	this.overrideMaterial = overrideMaterial;
+
 	this.clearColor = clearColor;
+	this.clearAlpha = ( clearAlpha !== undefined ) ? clearAlpha : 1;
 
 	this.clear = true;
 	this.needsSwap = false;
 
 	this.oldClearColor = new THREE.Color();
+	this.oldClearAlpha = 1;
 
 };
 
@@ -26,7 +29,9 @@ THREE.RenderPass.prototype = {
 		if ( this.clearColor ) {
 
 			this.oldClearColor.copy( renderer.getClearColor() );
-			renderer.setClearColor( this.clearColor, 1 );
+			this.oldClearAlpha = renderer.getClearAlpha();
+
+			renderer.setClearColor( this.clearColor, this.clearAlpha );
 
 		}
 
@@ -34,7 +39,7 @@ THREE.RenderPass.prototype = {
 
 		if ( this.clearColor ) {
 
-			renderer.setClearColor( this.oldClearColor, 1 );
+			renderer.setClearColor( this.oldClearColor, this.oldClearAlpha );
 
 		}
 

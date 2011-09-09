@@ -18,6 +18,7 @@ THREE.ShaderPass = function( shader, textureID ) {
 
 	this.renderToScreen = false;
 	this.needsSwap = true;
+	this.clear = false;
 
 };
 
@@ -39,7 +40,7 @@ THREE.ShaderPass.prototype = {
 
 		} else {
 
-			renderer.render( THREE.EffectComposer.scene, THREE.EffectComposer.camera, writeBuffer, false );
+			renderer.render( THREE.EffectComposer.scene, THREE.EffectComposer.camera, writeBuffer, this.clear );
 
 		}
 
