@@ -85,7 +85,7 @@ var Code = function () {
 
 		if ( _html ) {
 
-			string = '<!doctype html>\n<html>\n\t<body>\n\t\t<script src=\"js/Three.js\"></script>\n\t\t<script src=\"js/RequestAnimationFrame.js\"></script>\n\t\t<script>\n' + ( '\n' + string ).replace( /\n/gi, '\n\t\t\t' ) + '\n\n\t\t</script>\n\t</body>\n</html>';
+			string = '&lt;!doctype html&gt;\n&lt;html&gt;\n\t&lt;body&gt;\n\t\t&lt;script src=\"js/Three.js\"&gt;&lt;/script&gt;\n\t\t&lt;script src=\"js/RequestAnimationFrame.js\"&gt;&lt;/script&gt;\n\t\t&lt;script&gt;\n' + ( '\n' + string ).replace( /\n/gi, '\n\t\t\t' ) + '\n\n\t\t&lt;/script&gt;\n\t&lt;/body&gt;\n&lt;/html&gt;';
 
 		}
 
