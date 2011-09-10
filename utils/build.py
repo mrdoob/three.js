@@ -283,6 +283,7 @@ WEBGL_FILES = [
 'materials/MeshShaderMaterial.js',
 'materials/ParticleBasicMaterial.js',
 'textures/Texture.js',
+'textures/DataTexture.js',
 'objects/Particle.js',
 'objects/ParticleSystem.js',
 'objects/Line.js',
