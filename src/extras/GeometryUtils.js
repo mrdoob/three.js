@@ -444,7 +444,26 @@ THREE.GeometryUtils = {
 
 		return ( 65280 * Math.random() + 255 * Math.random() ) / 65535;
 
+	},
+
+	center: function( geometry ) {
+
+		geometry.computeBoundingBox();
+
+		var matrix = new THREE.Matrix4();
+
+		var dx = -0.5 * ( geometry.boundingBox.x[ 1 ] + geometry.boundingBox.x[ 0 ] );
+		var dy = -0.5 * ( geometry.boundingBox.y[ 1 ] + geometry.boundingBox.y[ 0 ] );
+		var dz = -0.5 * ( geometry.boundingBox.z[ 1 ] + geometry.boundingBox.z[ 0 ] );
+
+		matrix.setTranslation( dx, dy, dz );
+
+		geometry.applyMatrix( matrix );
+
+		geometry.computeBoundingBox();
+
 	}
+
 
 };
 
