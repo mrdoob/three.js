@@ -10,8 +10,9 @@ THREE.Camera = function ( fov, aspect, near, far, target ) {
 
 	this.fov = fov || 50;
 	this.aspect = aspect || 1;
-	this.near = near || 0.1;
-	this.far = far || 2000;
+
+	this.near = ( near !== undefined ) ? near : 0.1;
+	this.far = ( far !== undefined ) ? far : 2000;
 
 	this.target = target || new THREE.Object3D();
 	this.useTarget = true;
