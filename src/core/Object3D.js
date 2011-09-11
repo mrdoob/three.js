@@ -132,11 +132,11 @@ THREE.Object3D.prototype = {
 	remove: function ( object ) {
 		var scene = this;
 
-		var childIndex = this.children.indexOf( child );
+		var childIndex = this.children.indexOf( object );
 
 		if ( childIndex !== - 1 ) {
 
-			child.parent = undefined;
+			object.parent = undefined;
 			this.children.splice( childIndex, 1 );
 
 			// remove from scene
@@ -149,7 +149,7 @@ THREE.Object3D.prototype = {
 
 			if ( scene !== undefined && scene instanceof THREE.Scene ) {
 
-				scene.removeChildRecurse( child );
+				scene.removeChildRecurse( object );
 
 			}
 
