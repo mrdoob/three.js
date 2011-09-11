@@ -130,30 +130,30 @@ THREE.Object3D.prototype = {
 	},
 
 	removeChild: function ( child ) {
-        var scene = this;
+		var scene = this;
 
 		var childIndex = this.children.indexOf( child );
 
 		if ( childIndex !== - 1 ) {
 
-            child.parent = undefined;
-            this.children.splice( childIndex, 1 );
+			child.parent = undefined;
+			this.children.splice( childIndex, 1 );
 
-            // remove from scene
+			// remove from scene
 
-            while ( scene.parent !== undefined ) {
+			while ( scene.parent !== undefined ) {
 
-                scene = scene.parent;
+				scene = scene.parent;
 
-            }
+			}
 
-            if ( scene !== undefined && scene instanceof THREE.Scene ) {
+			if ( scene !== undefined && scene instanceof THREE.Scene ) {
 
-                scene.removeChildRecurse( child );
+				scene.removeChildRecurse( child );
 
-            }
+			}
 
-        }
+		}
 
 	},
 
