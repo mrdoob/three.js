@@ -2591,7 +2591,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			map: !!material.map, envMap: !!material.envMap, lightMap: !!material.lightMap,
 			vertexColors: material.vertexColors,
-			fog: fog, sizeAttenuation: material.sizeAttenuation,
+			fog: fog, useFog: material.fog,
+			sizeAttenuation: material.sizeAttenuation,
 			skinning: material.skinning,
 			morphTargets: material.morphTargets,
 			maxMorphTargets: this.maxMorphTargets,
@@ -2698,14 +2699,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// refresh uniforms common to several materials
 
-		if ( fog && (
-			 material instanceof THREE.MeshBasicMaterial ||
-			 material instanceof THREE.MeshLambertMaterial ||
-			 material instanceof THREE.MeshPhongMaterial ||
-			 material instanceof THREE.LineBasicMaterial ||
-			 material instanceof THREE.ParticleBasicMaterial ||
-			 material.fog )
-			) {
+		if ( fog && material.fog ) {
 
 			refreshUniformsFog( m_uniforms, fog );
 
@@ -4687,8 +4681,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			parameters.alphaTest ? "#define ALPHATEST " + parameters.alphaTest: "",
 
-			parameters.fog ? "#define USE_FOG" : "",
-			parameters.fog instanceof THREE.FogExp2 ? "#define FOG_EXP2" : "",
+			( parameters.useFog && parameters.fog ) ? "#define USE_FOG" : "",
+			( parameters.useFog && parameters.fog instanceof THREE.FogExp2 ) ? "#define FOG_EXP2" : "",
 
 			parameters.map ? "#define USE_MAP" : "",
 			parameters.envMap ? "#define USE_ENVMAP" : "",

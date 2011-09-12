@@ -5,15 +5,17 @@
  * parameters = {
  *  color: <hex>,
  *  opacity: <float>,
- 
+ *
  *  blending: THREE.NormalBlending,
  *  depthTest: <bool>,
- 
+ *
  *  linewidth: <float>,
- *  linecap: "round",  
+ *  linecap: "round",
  *  linejoin: "round",
- 
+ *
  *  vertexColors: <bool>
+ *
+ *  fog: <bool>
  * }
  */
 
@@ -30,6 +32,8 @@ THREE.LineBasicMaterial = function ( parameters ) {
 	this.linejoin = parameters.linejoin !== undefined ? parameters.linejoin : 'round';
 
 	this.vertexColors = parameters.vertexColors ? parameters.vertexColors : false;
+
+	this.fog = parameters.fog !== undefined ? parameters.fog : true;
 
 };
 
