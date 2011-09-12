@@ -143,7 +143,7 @@
 				var shader = THREE.ShaderExtras[ "screen" ];
 				var uniforms = new THREE.UniformsUtils.clone( shader.uniforms );
 
-				hudMaterial = new THREE.MeshShaderMaterial( { vertexShader: shader.vertexShader, fragmentShader: shader.fragmentShader, uniforms: uniforms } );
+				hudMaterial = new THREE.ShaderMaterial( { vertexShader: shader.vertexShader, fragmentShader: shader.fragmentShader, uniforms: uniforms } );
 
 				var hudGeo = new THREE.PlaneGeometry( SHADOW_MAP_WIDTH / 2, SHADOW_MAP_HEIGHT / 2 );
 				var hudMesh = new THREE.Mesh( hudGeo, hudMaterial );

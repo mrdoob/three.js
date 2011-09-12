@@ -139,7 +139,7 @@ THREE.SceneLoader.prototype = {
 
 									materials[ i ] = result.materials[ o.materials[i] ];
 
-									hasNormals = materials[ i ] instanceof THREE.MeshShaderMaterial;
+									hasNormals = materials[ i ] instanceof THREE.ShaderMaterial;
 
 								}
 
@@ -741,7 +741,7 @@ THREE.SceneLoader.prototype = {
 
 					var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true, fog: true };
 
-					material = new THREE.MeshShaderMaterial( parameters );
+					material = new THREE.ShaderMaterial( parameters );
 
 				} else {
 
@@ -764,7 +764,7 @@ THREE.SceneLoader.prototype = {
 		};
 
 	},
-	
+
 	constructor : THREE.SceneLoader
 
 };

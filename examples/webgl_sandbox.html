@@ -45,6 +45,7 @@
 		<script type="text/javascript" src="../src/core/Matrix3.js"></script>
 		<script type="text/javascript" src="../src/core/Matrix4.js"></script>
 		<script type="text/javascript" src="../src/core/Object3D.js"></script>
+		<script type="text/javascript" src="../src/core/Projector.js"></script>
 		<script type="text/javascript" src="../src/core/Quaternion.js"></script>
 		<script type="text/javascript" src="../src/core/Vertex.js"></script>
 		<script type="text/javascript" src="../src/core/Face3.js"></script>
@@ -54,6 +55,7 @@
 		<script type="text/javascript" src="../src/core/Spline.js"></script>
 		<script type="text/javascript" src="../src/core/Edge.js"></script>
 		<script type="text/javascript" src="../src/cameras/Camera.js"></script>
+		<script type="text/javascript" src="../src/cameras/OrthoCamera.js"></script>
 		<script type="text/javascript" src="../src/lights/Light.js"></script>
 		<script type="text/javascript" src="../src/lights/AmbientLight.js"></script>
 		<script type="text/javascript" src="../src/lights/DirectionalLight.js"></script>
@@ -67,7 +69,7 @@
 		<script type="text/javascript" src="../src/materials/MeshDepthMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/MeshNormalMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/MeshFaceMaterial.js"></script>
-		<script type="text/javascript" src="../src/materials/MeshShaderMaterial.js"></script>
+		<script type="text/javascript" src="../src/materials/ShaderMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/ParticleBasicMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/ParticleCanvasMaterial.js"></script>
 		<script type="text/javascript" src="../src/materials/ParticleDOMMaterial.js"></script>
@@ -85,7 +87,6 @@
 		<script type="text/javascript" src="../src/scenes/Scene.js"></script>
 		<script type="text/javascript" src="../src/scenes/Fog.js"></script>
 		<script type="text/javascript" src="../src/scenes/FogExp2.js"></script>
-		<script type="text/javascript" src="../src/renderers/Projector.js"></script>
 		<script type="text/javascript" src="../src/renderers/DOMRenderer.js"></script>
 		<script type="text/javascript" src="../src/renderers/CanvasRenderer.js"></script>
 		<script type="text/javascript" src="../src/renderers/SVGRenderer.js"></script>
@@ -104,6 +105,11 @@
 		<script type="text/javascript" src="../src/extras/ImageUtils.js"></script>
 		<script type="text/javascript" src="../src/extras/SceneUtils.js"></script>
 		<script type="text/javascript" src="../src/extras/ShaderUtils.js"></script>
+		<script type="text/javascript" src="../src/extras/core/Curve.js"></script>
+		<script type="text/javascript" src="../src/extras/core/CurvePath.js"></script>
+		<script type="text/javascript" src="../src/extras/core/Path.js"></script>
+		<script type="text/javascript" src="../src/extras/core/Shape.js"></script>
+		<script type="text/javascript" src="../src/extras/core/TextPath.js"></script>
 		<script type="text/javascript" src="../src/extras/animation/AnimationHandler.js"></script>
 		<script type="text/javascript" src="../src/extras/animation/Animation.js"></script>
 		<script type="text/javascript" src="../src/extras/cameras/FirstPersonCamera.js"></script>
@@ -112,11 +118,6 @@
 		<script type="text/javascript" src="../src/extras/cameras/RollCamera.js"></script>
 		<script type="text/javascript" src="../src/extras/cameras/TrackballCamera.js"></script>
 		<script type="text/javascript" src="../src/extras/cameras/QuakeCamera.js"></script>
-		<script type="text/javascript" src="../src/extras/geometries/Curve.js"></script>
-		<script type="text/javascript" src="../src/extras/geometries/CurvePath.js"></script>
-		<script type="text/javascript" src="../src/extras/geometries/Path.js"></script>
-		<script type="text/javascript" src="../src/extras/geometries/Shape.js"></script>
-		<script type="text/javascript" src="../src/extras/geometries/TextPath.js"></script>
 		<script type="text/javascript" src="../src/extras/geometries/CubeGeometry.js"></script>
 		<script type="text/javascript" src="../src/extras/geometries/CylinderGeometry.js"></script>
 		<script type="text/javascript" src="../src/extras/geometries/ExtrudeGeometry.js"></script>
@@ -128,8 +129,9 @@
 		<script type="text/javascript" src="../src/extras/geometries/TorusGeometry.js"></script>
 		<script type="text/javascript" src="../src/extras/geometries/TorusKnotGeometry.js"></script>
 		<script type="text/javascript" src="../src/extras/loaders/Loader.js"></script>
-		<script type="text/javascript" src="../src/extras/loaders/JSONLoader.js"></script>
 		<script type="text/javascript" src="../src/extras/loaders/BinaryLoader.js"></script>
+		<script type="text/javascript" src="../src/extras/loaders/ColladaLoader.js"></script>
+		<script type="text/javascript" src="../src/extras/loaders/JSONLoader.js"></script>
 		<script type="text/javascript" src="../src/extras/loaders/SceneLoader.js"></script>
 		<script type="text/javascript" src="../src/extras/loaders/UTF8Loader.js"></script>
 		<script type="text/javascript" src="../src/extras/objects/MarchingCubes.js"></script>
@@ -190,7 +192,7 @@
 					new THREE.MeshBasicMaterial( { map: texture, fog: false } ),
 					new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/land_ocean_ice_cloud_2048.jpg' ) } ),
 					new THREE.MeshBasicMaterial( { map: texture2, envMap: THREE.ImageUtils.loadTexture( 'textures/envmap.png', new THREE.SphericalReflectionMapping() ) } ),
-					new THREE.MeshShaderMaterial( { uniforms: uniforms, vertexShader: vertexShader, fragmentShader: fragmentShader } )
+					new THREE.ShaderMaterial( { uniforms: uniforms, vertexShader: vertexShader, fragmentShader: fragmentShader } )
 
 					/*
 					new THREE.MeshLambertMaterial( { color: 0xdddddd, shading: THREE.FlatShading } ),
@@ -203,7 +205,7 @@
 					new THREE.MeshBasicMaterial( { envMap: texture2, fog: false } ),
 					new THREE.MeshLambertMaterial( { map: ImageUtils.loadTexture( 'textures/land_ocean_ice_cloud_2048.jpg' ) } ),
 					new THREE.MeshLambertMaterial( { map: texture2, envMap: ImageUtils.loadTexture( 'textures/envmap.png', new THREE.SphericalReflectionMapping() ) } ),
-					new THREE.MeshShaderMaterial( { uniforms: uniforms, vertexShader: vertexShader, fragmentShader: fragmentShader } )
+					new THREE.ShaderMaterial( { uniforms: uniforms, vertexShader: vertexShader, fragmentShader: fragmentShader } )
 					*/
 
 				];

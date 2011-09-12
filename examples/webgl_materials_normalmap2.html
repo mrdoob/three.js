@@ -35,13 +35,10 @@
 			#vt, #vt a { color:orange; }
 			.code { }
 
-			#log { position:absolute; top:50px; text-align:left; display:block; z-index:100 }
 		</style>
 	</head>
 
 	<body>
-		<pre id="log"></pre>
-
 		<div id="info">
 			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl normalmap demo.
 			<a href="http://www.ir-ltd.net/infinite-3d-head-scan-released/" target="_blank">Lee Perry-Smith</a> head.
@@ -115,7 +112,7 @@
 
 				var shader = THREE.ShaderUtils.lib[ "normal" ];
 				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
- 
+
 				uniforms[ "tNormal" ].texture = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
 				uniforms[ "uNormalScale" ].value = - 0.75;
 
@@ -132,7 +129,7 @@
 				uniforms[ "uShininess" ].value = shininess;
 
 				var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true };
-				var material = new THREE.MeshShaderMaterial( parameters );
+				var material = new THREE.ShaderMaterial( parameters );
 
 				loader = new THREE.JSONLoader( true );
 				document.body.appendChild( loader.statusDomElement );
@@ -200,13 +197,6 @@
 				}
 
 				webglRenderer.render( scene, camera );
-
-			}
-
-			function log( text ) {
-
-				var e = document.getElementById("log");
-				e.innerHTML = text + "<br/>" + e.innerHTML;
 
 			}
 

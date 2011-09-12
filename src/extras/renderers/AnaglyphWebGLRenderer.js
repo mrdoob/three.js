@@ -5,7 +5,7 @@
 
 if ( THREE.WebGLRenderer ) {
 
-	THREE.AnaglyphWebGLRenderer = function ( parameters ) {	
+	THREE.AnaglyphWebGLRenderer = function ( parameters ) {
 
 		THREE.WebGLRenderer.call( this, parameters );
 
@@ -15,7 +15,7 @@ if ( THREE.WebGLRenderer ) {
 			eyeLeft = new THREE.Matrix4(),
 			focalLength = 125,
 			aspect, near, fov;
-	
+
 		_cameraL.useTarget = _cameraR.useTarget = false;
 		_cameraL.matrixAutoUpdate = _cameraR.matrixAutoUpdate = false;
 
@@ -25,7 +25,7 @@ if ( THREE.WebGLRenderer ) {
 		var _camera = new THREE.Camera( 53, 1, 1, 10000 );
 		_camera.position.z = 2;
 
-		_material = new THREE.MeshShaderMaterial( {
+		_material = new THREE.ShaderMaterial( {
 
 			uniforms: {
 
@@ -85,23 +85,23 @@ if ( THREE.WebGLRenderer ) {
 		};
 
 		/*
-		 * Renderer now uses an asymmetric perspective projection (http://paulbourke.net/miscellaneous/stereographics/stereorender/). 
+		 * Renderer now uses an asymmetric perspective projection (http://paulbourke.net/miscellaneous/stereographics/stereorender/).
 		 * Each camera is offset by the eye seperation and its projection matrix is also skewed asymetrically back to converge on the same
-		 * projection plane. Added a focal length parameter to, this is where the parallax is equal to 0. 
+		 * projection plane. Added a focal length parameter to, this is where the parallax is equal to 0.
 		 */
-		this.render = function ( scene, camera, renderTarget, forceClear ) {	
-		
-		
+		this.render = function ( scene, camera, renderTarget, forceClear ) {
+
+
 			camera.update( null, true );
-		
+
 			var hasCameraChanged = 	aspect !== camera.aspect || near !== camera.near || fov !== camera.fov;
-								
+
 			if( hasCameraChanged ) {
-		
+
 				aspect = camera.aspect;
 				near = camera.near;
-				fov = camera.fov;	
-		
+				fov = camera.fov;
+
 				var projectionMatrix = camera.projectionMatrix.clone(),
 					eyeSep = focalLength / 30 * 0.5,
 					eyeSepOnProjection = eyeSep * near / focalLength,
@@ -111,23 +111,23 @@ if ( THREE.WebGLRenderer ) {
 				//translate xOffset
 				eyeRight.n14 = eyeSep;
 				eyeLeft.n14 = -eyeSep;
-	
+
 				//For left eye
 				xmin = -ymax * aspect + eyeSepOnProjection;
 				xmax = ymax * aspect + eyeSepOnProjection;
 				projectionMatrix.n11 = 2 * near / ( xmax - xmin );
 				projectionMatrix.n13 = ( xmax + xmin ) / ( xmax - xmin );
 				_cameraL.projectionMatrix = projectionMatrix.clone();
-			
-				//for right eye		
+
+				//for right eye
 				xmin = -ymax * aspect - eyeSepOnProjection;
 				xmax = ymax * aspect - eyeSepOnProjection;
 				projectionMatrix.n11 = 2 * near / ( xmax - xmin );
 				projectionMatrix.n13 = ( xmax + xmin ) / ( xmax - xmin );
 				_cameraR.projectionMatrix = projectionMatrix.clone();
-				
-			}	
-		
+
+			}
+
 			_cameraL.matrix = camera.matrixWorld.clone().multiplySelf( eyeLeft );
 			_cameraL.update(null, true);
 			_cameraL.position.copy( camera.position );
@@ -141,11 +141,11 @@ if ( THREE.WebGLRenderer ) {
 			_cameraR.near = near;
 			_cameraR.far = camera.far;
 			_render.call( _this, scene, _cameraR, _renderTargetR, true );
-		
+
 			_render.call( _this, _scene, _camera );
 
 		};
 
 	};
-	
+
 }

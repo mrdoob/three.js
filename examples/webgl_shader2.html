@@ -218,7 +218,7 @@
 
 				for( var i = 0; i < params.length; i++ ) {
 
-					material = new THREE.MeshShaderMaterial( {
+					material = new THREE.ShaderMaterial( {
 
 						uniforms: params[ i ][ 1 ],
 						vertexShader: document.getElementById( 'vertexShader' ).textContent,

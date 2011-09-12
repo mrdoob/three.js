@@ -14,7 +14,7 @@ THREE.DotScreenPass = function( center, angle, scale ) {
 	if ( angle !== undefined )	this.uniforms[ "angle"].value = angle;
 	if ( scale !== undefined )	this.uniforms[ "scale"].value = scale;
 
-	this.material = new THREE.MeshShaderMaterial( {
+	this.material = new THREE.ShaderMaterial( {
 
 		uniforms: this.uniforms,
 		vertexShader: shader.vertexShader,

@@ -15,8 +15,8 @@
 			}
 			a {	color: #ff0080;	text-decoration: none; }
 			a:hover { color: #0080ff; }
-			#log { position:absolute; top:50px; text-align:left; display:block; z-index:100; pointer-events:none; }
-			#d { text-align:center; margin:1em auto -9.0em; z-index:1000; position:relative; display:block; 
+
+			#d { text-align:center; margin:1em auto -9.0em; z-index:1000; position:relative; display:block;
 				 background:rgba(0,0,0,0.75); padding:0.25em; width:300px; border-radius:10px; -webkit-box-shadow: 0px 0px 10px rgba(0,0,0,0.5) }
 			#oldie { margin-top:15em !important }
 		</style>
@@ -28,8 +28,6 @@
 			<p>Original artwork by <a href="http://en.wikipedia.org/wiki/Hand_with_Reflecting_Sphere" target="_blank">M. C. Escher</a>
 			<p>Texture by <a href="http://brainwagon.org/2002/12/05/fun-with-environment-maps/" target="_blank">Mark VandeWettering</a>
 		</div>
-
-		<pre id="log"></pre>
 
 		<script type="text/javascript" src="../build/Three.js"></script>
 
@@ -75,8 +73,8 @@
 
 				var r = "textures/cube/Escher/";
 
-				var urls = [ r + "px.jpg", r + "nx.jpg", 
-							 r + "py.jpg", r + "ny.jpg", 
+				var urls = [ r + "px.jpg", r + "nx.jpg",
+							 r + "py.jpg", r + "ny.jpg",
 							 r + "pz.jpg", r + "nz.jpg" ];
 
 				var textureCube = THREE.ImageUtils.loadTextureCube( urls );
@@ -89,10 +87,10 @@
 
 				// Skybox
 
-				var shader = THREE.ShaderUtils.lib["cube"];
-				shader.uniforms["tCube"].texture = textureCube;
+				var shader = THREE.ShaderUtils.lib[ "cube" ];
+				shader.uniforms[ "tCube" ].texture = textureCube;
 
-				var material = new THREE.MeshShaderMaterial( {
+				var material = new THREE.ShaderMaterial( {
 
 					fragmentShader: shader.fragmentShader,
 					vertexShader: shader.vertexShader,
@@ -145,13 +143,6 @@
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 
 				webglRenderer.render( scene, camera );
-
-			}
-
-			function log(text) {
-
-				var e = document.getElementById("log");
-				e.innerHTML = text + "<br/>" + e.innerHTML;
 
 			}
 

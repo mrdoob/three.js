@@ -4,16 +4,16 @@
  * parameters = {
  *  fragmentShader: <string>,
  *  vertexShader: <string>,
- 
+
  *  uniforms: { "parameter1": { type: "f", value: 1.0 }, "parameter2": { type: "i" value2: 2 } },
- 
+
  *  shading: THREE.SmoothShading,
  *  blending: THREE.NormalBlending,
  *  depthTest: <bool>,
- 
+
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>,
- 
+
  *  lights: <bool>,
  *  vertexColors: <bool>,
  *  skinning: <bool>,
@@ -21,7 +21,7 @@
  * }
  */
 
-THREE.MeshShaderMaterial = function ( parameters ) {
+THREE.ShaderMaterial = function ( parameters ) {
 
 	THREE.Material.call( this, parameters );
 
@@ -45,5 +45,5 @@ THREE.MeshShaderMaterial = function ( parameters ) {
 
 };
 
-THREE.MeshShaderMaterial.prototype = new THREE.Material();
-THREE.MeshShaderMaterial.prototype.constructor = THREE.MeshShaderMaterial;
+THREE.ShaderMaterial.prototype = new THREE.Material();
+THREE.ShaderMaterial.prototype.constructor = THREE.ShaderMaterial;

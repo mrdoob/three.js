@@ -11,7 +11,7 @@ THREE.TexturePass = function( texture, opacity ) {
 	this.uniforms[ "opacity" ].value = ( opacity !== undefined ) ? opacity : 1.0;
 	this.uniforms[ "tDiffuse" ].texture = texture;
 
-	this.material = new THREE.MeshShaderMaterial( {
+	this.material = new THREE.ShaderMaterial( {
 
 		uniforms: this.uniforms,
 		vertexShader: shader.vertexShader,

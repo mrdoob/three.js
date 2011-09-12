@@ -139,8 +139,8 @@
 				var parametersUV = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShaderUV, uniforms: uniformsUV, lights: true };
 
 
-				material = new THREE.MeshShaderMaterial( parameters );
-				var materialUV = new THREE.MeshShaderMaterial( parametersUV );
+				material = new THREE.ShaderMaterial( parameters );
+				var materialUV = new THREE.ShaderMaterial( parametersUV );
 
 				// LOADER
 

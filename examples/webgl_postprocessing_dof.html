@@ -250,7 +250,7 @@
 				postprocessing.bokeh_uniforms[ "focus" ].value = 1.1;
 				postprocessing.bokeh_uniforms[ "aspect" ].value = window.innerWidth / height;
 
-				postprocessing.materialBokeh = new THREE.MeshShaderMaterial( {
+				postprocessing.materialBokeh = new THREE.ShaderMaterial( {
 
 					uniforms: postprocessing.bokeh_uniforms,
 					vertexShader: bokeh_shader.vertexShader,

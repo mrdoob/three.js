@@ -24,7 +24,7 @@ THREE.BloomPass = function( strength, kernelSize, sigma, resolution ) {
 
 	this.screenUniforms[ "opacity" ].value = strength;
 
-	this.materialScreen = new THREE.MeshShaderMaterial( {
+	this.materialScreen = new THREE.ShaderMaterial( {
 
 		uniforms: this.screenUniforms,
 		vertexShader: screenShader.vertexShader,
@@ -43,7 +43,7 @@ THREE.BloomPass = function( strength, kernelSize, sigma, resolution ) {
 	this.convolutionUniforms[ "uImageIncrement" ].value = THREE.BloomPass.blurx;
 	this.convolutionUniforms[ "cKernel" ].value = THREE.ShaderExtras.buildKernel( sigma );
 
-	this.materialConvolution = new THREE.MeshShaderMaterial( {
+	this.materialConvolution = new THREE.ShaderMaterial( {
 
 		uniforms: this.convolutionUniforms,
 		vertexShader:   "#define KERNEL_SIZE " + kernelSize + ".0\n" + convolutionShader.vertexShader,

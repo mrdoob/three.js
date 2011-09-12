@@ -139,7 +139,7 @@
 
 				sceneBG = new THREE.Scene();
 
-				materialColor = new THREE.MeshShaderMaterial( {
+				materialColor = new THREE.ShaderMaterial( {
 
 					uniforms: { time: { type: "f", value: 0.0 } },
 					vertexShader: getText( 'vs-generic' ),
@@ -354,7 +354,7 @@
 				uniforms[ "uShininess" ].value = shininess;
 
 				var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true };
-				var mat2 = new THREE.MeshShaderMaterial( parameters );
+				var mat2 = new THREE.ShaderMaterial( parameters );
 
 				mesh = new THREE.Mesh( geometry, mat2 );
 				mesh.position.set( 0, -50, 0 );

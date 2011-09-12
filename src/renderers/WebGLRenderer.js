@@ -105,9 +105,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var depthShader = THREE.ShaderLib[ "depthRGBA" ];
 	var depthUniforms = THREE.UniformsUtils.clone( depthShader.uniforms );
 
-	var _depthMaterial = new THREE.MeshShaderMaterial( { fragmentShader: depthShader.fragmentShader, vertexShader: depthShader.vertexShader, uniforms: depthUniforms } );
+	var _depthMaterial = new THREE.ShaderMaterial( { fragmentShader: depthShader.fragmentShader, vertexShader: depthShader.vertexShader, uniforms: depthUniforms } );
 
-	var _depthMaterialMorph = new THREE.MeshShaderMaterial( { fragmentShader: depthShader.fragmentShader, vertexShader: depthShader.vertexShader, uniforms: depthUniforms, morphTargets: true } );
+	var _depthMaterialMorph = new THREE.ShaderMaterial( { fragmentShader: depthShader.fragmentShader, vertexShader: depthShader.vertexShader, uniforms: depthUniforms, morphTargets: true } );
 
 	_depthMaterial._shadowPass = true;
 	_depthMaterialMorph._shadowPass = true;
@@ -2762,7 +2762,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		// load material specific uniforms
 		// (shader material also gets them for the sake of genericity)
 
-		if ( material instanceof THREE.MeshShaderMaterial ||
+		if ( material instanceof THREE.ShaderMaterial ||
 			 material instanceof THREE.MeshPhongMaterial ||
 			 material.envMap ) {
 
@@ -2774,7 +2774,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		if ( material instanceof THREE.MeshShaderMaterial ||
+		if ( material instanceof THREE.ShaderMaterial ||
 			 material.envMap ||
 			 material.skinning ||
 			 object.receiveShadow ) {
@@ -2789,7 +2789,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material instanceof THREE.MeshPhongMaterial ||
 			 material instanceof THREE.MeshLambertMaterial ||
-			 material instanceof THREE.MeshShaderMaterial ||
+			 material instanceof THREE.ShaderMaterial ||
 			 material.skinning ) {
 
 			if( p_uniforms.viewMatrix !== null ) {
@@ -5537,7 +5537,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			m = materials[ i ];
 
-			if ( m.map || m.lightMap || m instanceof THREE.MeshShaderMaterial ) {
+			if ( m.map || m.lightMap || m instanceof THREE.ShaderMaterial ) {
 
 				return true;
 

@@ -43,7 +43,9 @@
 		<script type="text/javascript" src="js/Stats.js"></script>
 
 		<!-- HDR fragment shader -->
+
 		<script id="fs-hdr" type="x-shader/x-fragment">
+
 			uniform sampler2D   tDiffuse;
 			uniform float       exposure;
 			uniform float       brightMax;
@@ -64,8 +66,8 @@
 
 			}
 
-			void main(void)
-			{
+			void main()	{
+
 				vec4 color = texture2D( tDiffuse, vUv );
 				color.xyz  = decode_pnghdr( color );
 
@@ -78,18 +80,24 @@
 				color *= YD;
 
 				gl_FragColor = vec4( color.xyz, 1.0 );
+
 			}
+
 		</script>
 
 		<!-- HDR vertex shader -->
+
 		<script id="vs-hdr" type="x-shader/x-vertex">
+
 			varying vec2 vUv;
 
-			void main(void)
-			{
+			void main()	{
+
 				vUv  = uv;
 				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
 			}
+
 		</script>
 
 
@@ -131,7 +139,7 @@
 				texture.minFilter = THREE.LinearFilter;
 				texture.magFilter = THREE.NearestFilter;
 
-				materialHDR = new THREE.MeshShaderMaterial( {
+				materialHDR = new THREE.ShaderMaterial( {
 
 					uniforms: {
 						tDiffuse:  { type: "t", value: 0, texture: texture },
@@ -205,18 +213,6 @@
 				// Render final scene to the screen with film shader
 
 				renderer.render( scene, camera );
-
-			}
-
-			function is_browser_compatible() {
-
-				// WebGL support
-
-				try { var test = new Float32Array(1); } catch(e) { return false; }
-
-				// Web workers
-
-				return !!window.Worker;
 
 			}
 

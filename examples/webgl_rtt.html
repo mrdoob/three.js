@@ -130,7 +130,7 @@
 
 				rtTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBFormat } );
 
-				material = new THREE.MeshShaderMaterial( {
+				material = new THREE.ShaderMaterial( {
 
 					uniforms: { time: { type: "f", value: 0.0 } },
 					vertexShader: document.getElementById( 'vertexShader' ).textContent,
@@ -138,7 +138,7 @@
 
 				} );
 
-				var materialScreen = new THREE.MeshShaderMaterial( {
+				var materialScreen = new THREE.ShaderMaterial( {
 
 					uniforms: { tDiffuse: { type: "t", value: 0, texture: rtTexture } },
 					vertexShader: document.getElementById( 'vertexShader' ).textContent,

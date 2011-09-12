@@ -83,7 +83,7 @@ THREE.Loader.prototype = {
 
 			m = scope.materials[ i ][ 0 ];
 
-			if ( m instanceof THREE.MeshShaderMaterial ) return true;
+			if ( m instanceof THREE.ShaderMaterial ) return true;
 
 		}
 
@@ -356,7 +356,7 @@ THREE.Loader.prototype = {
 
 			var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true, fog: true };
 
-			material = new THREE.MeshShaderMaterial( parameters );
+			material = new THREE.ShaderMaterial( parameters );
 
 		} else {
 
