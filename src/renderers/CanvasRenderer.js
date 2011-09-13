@@ -645,7 +645,19 @@ THREE.CanvasRenderer = function ( parameters ) {
 						calculateLight( scene, element.v2.positionWorld, element.vertexNormalsWorld[ 1 ], _color2 );
 						calculateLight( scene, element.v3.positionWorld, element.vertexNormalsWorld[ 2 ], _color3 );
 
-						_color4.r =  ( _color2.r + _color3.r ) * 0.5;
+						_color1.r = Math.max( 0, Math.min( material.color.r * _color1.r, 1 ) );
+						_color1.g = Math.max( 0, Math.min( material.color.g * _color1.g, 1 ) );
+						_color1.b = Math.max( 0, Math.min( material.color.b * _color1.b, 1 ) );
+
+						_color2.r = Math.max( 0, Math.min( material.color.r * _color2.r, 1 ) );
+						_color2.g = Math.max( 0, Math.min( material.color.g * _color2.g, 1 ) );
+						_color2.b = Math.max( 0, Math.min( material.color.b * _color2.b, 1 ) );
+
+						_color3.r = Math.max( 0, Math.min( material.color.r * _color3.r, 1 ) );
+						_color3.g = Math.max( 0, Math.min( material.color.g * _color3.g, 1 ) );
+						_color3.b = Math.max( 0, Math.min( material.color.b * _color3.b, 1 ) );
+
+						_color4.r = ( _color2.r + _color3.r ) * 0.5;
 						_color4.g = ( _color2.g + _color3.g ) * 0.5;
 						_color4.b = ( _color2.b + _color3.b ) * 0.5;
 
@@ -750,6 +762,22 @@ THREE.CanvasRenderer = function ( parameters ) {
 						calculateLight( scene, element.v2.positionWorld, element.vertexNormalsWorld[ 1 ], _color2 );
 						calculateLight( scene, element.v4.positionWorld, element.vertexNormalsWorld[ 3 ], _color3 );
 						calculateLight( scene, element.v3.positionWorld, element.vertexNormalsWorld[ 2 ], _color4 );
+
+						_color1.r = Math.max( 0, Math.min( material.color.r * _color1.r, 1 ) );
+						_color1.g = Math.max( 0, Math.min( material.color.g * _color1.g, 1 ) );
+						_color1.b = Math.max( 0, Math.min( material.color.b * _color1.b, 1 ) );
+
+						_color2.r = Math.max( 0, Math.min( material.color.r * _color2.r, 1 ) );
+						_color2.g = Math.max( 0, Math.min( material.color.g * _color2.g, 1 ) );
+						_color2.b = Math.max( 0, Math.min( material.color.b * _color2.b, 1 ) );
+
+						_color3.r = Math.max( 0, Math.min( material.color.r * _color3.r, 1 ) );
+						_color3.g = Math.max( 0, Math.min( material.color.g * _color3.g, 1 ) );
+						_color3.b = Math.max( 0, Math.min( material.color.b * _color3.b, 1 ) );
+
+						_color4.r = Math.max( 0, Math.min( material.color.r * _color4.r, 1 ) );
+						_color4.g = Math.max( 0, Math.min( material.color.g * _color4.g, 1 ) );
+						_color4.b = Math.max( 0, Math.min( material.color.b * _color4.b, 1 ) );
 
 						_image = getGradientTexture( _color1, _color2, _color3, _color4 );
 
