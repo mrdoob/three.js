@@ -10,6 +10,13 @@
 				margin: 0px;
 				overflow: hidden;
 			}
+			#currentColor {
+				display		: inline-block;
+				width		: 15px;
+				height		: 15px;
+				background-color: #F660AB;
+				border		: solid 2px black;
+			}
 
 			#oldie { background-color: #ddd !important }
 		</style>
@@ -31,10 +38,17 @@
 			var projector, plane, cube;
 			var mouse2D, mouse3D, ray,
 			rollOveredFace, isShiftDown = false,
-			theta = 45, isCtrlDown = false;
+			theta = 45, isAltDown = false;
+			var cubeColors	= [
+				new THREE.Color().setRGB(1, 0, 0),
+				new THREE.Color().setRGB(0, 1, 0),
+				new THREE.Color().setRGB(0, 0, 1),	
+				new THREE.Color().setRGB(1, 1, 0)	
+			];
+			var cubeType	= 0;
 
 			var rollOverMesh, rollOverMaterial, voxelPosition = new THREE.Vector3(), tmpVec = new THREE.Vector3();
-			var cubeGeo, cubeMaterial;
+			var cubeGeo, cubeMaterials = [];
 			var i, intersector;
 
 			init();
@@ -51,7 +65,7 @@
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
 				info.style['z-index'] = '1';
-				info.innerHTML = '<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - voxel painter - webgl<br /><strong>click</strong>: add voxel, <strong>control + click</strong>: remove voxel, <strong>shift + click</strong>: rotate, <a href="javascript:save();">save .png</a>';
+				info.innerHTML = '<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - voxel painter - webgl<br /><strong>click</strong>: add voxel, <strong>alt + click</strong>: remove voxel, <strong>shift + click</strong>: rotate, <a href="javascript:save();">save .png</a> current color: <div id="currentColor"></div>';
 				container.appendChild( info );
 
 				camera = new THREE.Camera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
@@ -71,8 +85,13 @@
 				// cubes
 
 				cubeGeo = new THREE.CubeGeometry( 50, 50, 50 );
-				cubeMaterial = new THREE.MeshLambertMaterial( { color: 0x00ff80, shading: THREE.FlatShading, map: THREE.ImageUtils.loadTexture( "textures/square-outline-textured.png" ) } );
-				cubeMaterial.color.setHSV( 0.1, 0.7, 1.0 );
+				for( i = 0; i < cubeColors.length; i++ ) {
+					cubeMaterials[i] = new THREE.MeshLambertMaterial( { color: 0x00ff80, shading: THREE.FlatShading, map: THREE.ImageUtils.loadTexture( "textures/square-outline-textured.png" ) } );
+					cubeMaterials[i].color.copy( cubeColors[i] );
+					cubeMaterials[i]._cubeType	= i;
+				}
+				setCubeType(cubeType);
+
 				// picking
 
 				projector = new THREE.Projector();
@@ -176,7 +195,7 @@
 
 					// delete cube
 
-					if ( isCtrlDown ) {
+					if ( isAltDown ) {
 
 						if ( intersector.object != plane ) {
 
@@ -191,7 +210,7 @@
 						intersector = getRealIntersector( intersects );
 						setVoxelPosition( intersector );
 
-						var voxel = new THREE.Mesh( cubeGeo, cubeMaterial );
+						var voxel = new THREE.Mesh( cubeGeo, cubeMaterials[cubeType] );
 						voxel.position.copy( voxelPosition );
 						voxel.matrixAutoUpdate = false;
 						voxel.updateMatrix();
@@ -201,13 +220,60 @@
 
 				}
 			}
+			
+			function setCubeType(type) {
+
+				cubeType = type;
+
+				document.getElementById("currentColor").style.backgroundColor	= cubeColors[cubeType].getContextStyle();
+
+			}
+			
+			function saveJSON() {
+
+console.log("scene", scene);
+
+				var children	= scene.children;
+				var items	= [];
+				for( var i = 0; i < children.length; i++ ) {
+					var child	= children[i];
+					if( child instanceof THREE.Mesh === false )			continue;
+					if( child.geometry instanceof THREE.CubeGeometry === false )	continue;
+					if( child === rollOverMesh )					continue;
+
+					items.push({
+						x	: (child.position.x - 25) / 50,
+						y	: (child.position.y - 25) / 50,
+						z	: (child.position.z - 25) / 50,
+						type	: child.materials[0]._cubeType
+					});
+				}
+				
+				console.log("items");
+				console.dir(items);
+			}
+			
+			function loadJSON() {
+
+				alert('try to load');
+				// TODO delete all cubes and push the new one
+
+			}
 
 			function onDocumentKeyDown( event ) {
 
 				switch( event.keyCode ) {
 
 					case 16: isShiftDown = true; break;
-					case 17: isCtrlDown = true; break;
+					case 18: isAltDown = true; break;
+
+					case 'S'.charCodeAt(0): saveJSON();	break;
+					case 'L'.charCodeAt(0): loadJSON();	break;
+
+					case '0'.charCodeAt(0): setCubeType(0);	break;
+					case '1'.charCodeAt(0): setCubeType(1);	break;
+					case '2'.charCodeAt(0): setCubeType(2);	break;
+					case '3'.charCodeAt(0): setCubeType(3);	break;
 
 				}
 
@@ -218,7 +284,7 @@
 				switch( event.keyCode ) {
 
 					case 16: isShiftDown = false; break;
-					case 17: isCtrlDown = false; break;
+					case 18: isAltDown = false; break;
 
 				}
 			}
