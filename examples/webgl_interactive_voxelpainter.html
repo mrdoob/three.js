@@ -65,10 +65,10 @@
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
 				info.style['z-index'] = '1';
-				info.innerHTML = '<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - voxel painter - webgl<br /><strong>click</strong>: add voxel, <strong>alt + click</strong>: remove voxel, <strong>shift + click</strong>: rotate, <a href="javascript:save();">save .png</a> current color: <div id="currentColor"></div>';
+				info.innerHTML = '<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - voxel painter - webgl<br /><strong>click</strong>: add voxel, <strong>alt + click</strong>: remove voxel, <strong>shift + click</strong>: rotate, <strong>drop json</strong>: load map file<br/><a href="javascript:savePNG();">save .png</a>, <a href="javascript:saveJSON();">save .json</a>, current color: <div id="currentColor"></div>';
 				container.appendChild( info );
 
-				camera = new THREE.Camera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.Camera( 30, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.y = 800;
 				camera.target.position.y = 200;
 
@@ -141,7 +141,32 @@
 				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 				document.addEventListener( 'keydown', onDocumentKeyDown, false );
 				document.addEventListener( 'keyup', onDocumentKeyUp, false );
+				document.addEventListener( 'drop', onDrop, false);
+				document.addEventListener( 'dragover', onDragOver, false);
 
+			}
+
+			function onDragOver(event) {
+				event.preventDefault();
+				event.stopPropagation();
+			}
+
+			function onDrop(event) {
+				console.log("kkk")
+				event.preventDefault();
+				event.stopPropagation();
+
+				for(var i = 0; i < event.dataTransfer.files.length; i++){
+					var file	= event.dataTransfer.files[i];
+					var reader	= new FileReader();
+					reader.onload = function (event){
+						var dataUri	= event.target.result;
+						var base64	= dataUri.match(/[^,]*,(.*)/)[1];
+						
+						console.log("dataUri", base64)
+					};
+					reader.readAsDataURL(file);
+				}
 			}
 
 			function getRealIntersector( intersects ) {
@@ -255,8 +280,36 @@
 			
 			function loadJSON() {
 
-				alert('try to load');
-				// TODO delete all cubes and push the new one
+				// delete all cubes
+				var children	= scene.children.slice(0);
+
+				for( var i = 0; i < children.length; i++ ) {
+
+					if( children[i] instanceof THREE.Mesh === false ) continue;
+					if( children[i].geometry instanceof THREE.CubeGeometry === false ) continue;
+					if( children[i] === rollOverMesh ) continue;
+
+					scene.removeChild( children[i] );
+
+				}				
+
+				// push new cubes
+				var items	= [{"x":3,"y":0,"z":4,"t":0},{"x":3,"y":0,"z":2,"t":0},{"x":3,"y":0,"z":-5,"t":0},{"x":7,"y":0,"z":4,"t":2},{"x":6,"y":0,"z":4,"t":2},{"x":5,"y":0,"z":4,"t":2},{"x":4,"y":0,"z":4,"t":2},{"x":-2,"y":0,"z":6,"t":0},{"x":-3,"y":0,"z":6,"t":0},{"x":-4,"y":0,"z":6,"t":0},{"x":-5,"y":0,"z":5,"t":0},{"x":-5,"y":0,"z":6,"t":0},{"x":-1,"y":0,"z":6,"t":0},{"x":0,"y":0,"z":6,"t":0},{"x":1,"y":0,"z":6,"t":0},{"x":-7,"y":0,"z":-9,"t":0},{"x":-7,"y":0,"z":-8,"t":0},{"x":-7,"y":0,"z":-4,"t":0},{"x":-7,"y":0,"z":-3,"t":0},{"x":0,"y":0,"z":-3,"t":0},{"x":0,"y":0,"z":-2,"t":0},{"x":0,"y":0,"z":-1,"t":0},{"x":0,"y":0,"z":0,"t":0},{"x":1,"y":0,"z":0,"t":0},{"x":2,"y":0,"z":0,"t":0},{"x":3,"y":0,"z":0,"t":0},{"x":4,"y":0,"z":0,"t":0},{"x":1,"y":0,"z":-1,"t":0},{"x":2,"y":0,"z":-1,"t":0},{"x":3,"y":0,"z":-1,"t":0},{"x":4,"y":0,"z":-1,"t":0},{"x":1,"y":0,"z":-2,"t":0},{"x":2,"y":0,"z":-2,"t":0},{"x":3,"y":0,"z":-2,"t":0},{"x":4,"y":0,"z":-2,"t":0},{"x":1,"y":0,"z":-3,"t":0},{"x":2,"y":0,"z":-3,"t":0},{"x":3,"y":0,"z":-3,"t":0},{"x":4,"y":0,"z":-3,"t":0},{"x":-6,"y":0,"z":-3,"t":0},{"x":-6,"y":1,"z":-3,"t":0},{"x":-7,"y":1,"z":-4,"t":0},{"x":-7,"y":1,"z":-3,"t":0},{"x":-7,"y":1,"z":-8,"t":0},{"x":-7,"y":1,"z":-9,"t":0},{"x":-7,"y":3,"z":-8,"t":0},{"x":-7,"y":2,"z":-8,"t":0},{"x":-7,"y":0,"z":-10,"t":0},{"x":-7,"y":1,"z":-10,"t":0},{"x":-7,"y":2,"z":-9,"t":0},{"x":-7,"y":3,"z":-9,"t":0},{"x":-7,"y":2,"z":-10,"t":0},{"x":-7,"y":3,"z":-10,"t":0},{"x":-7,"y":2,"z":-4,"t":0},{"x":-7,"y":3,"z":-4,"t":0},{"x":-7,"y":2,"z":-3,"t":0},{"x":-6,"y":2,"z":-3,"t":0},{"x":-7,"y":3,"z":-3,"t":0},{"x":-6,"y":3,"z":-3,"t":0},{"x":-7,"y":0,"z":-5,"t":1},{"x":-7,"y":1,"z":-5,"t":1},{"x":-7,"y":2,"z":-5,"t":1},{"x":-7,"y":3,"z":-5,"t":1},{"x":-7,"y":3,"z":-6,"t":1},{"x":-7,"y":3,"z":-7,"t":1}];
+
+				for( var i = 0; i < items.length; i++ ){
+					var item = items[i];
+
+					var mesh = new THREE.Mesh( cubeGeo, cubeMaterials[item.t] );
+					mesh.position.x = item.x * 50 + 25;
+					mesh.position.y = item.y * 50 + 25;
+					mesh.position.z = item.z * 50 + 25;
+					mesh.matrixAutoUpdate = true;
+					mesh.updateMatrix();
+					scene.addObject( mesh );
+					
+				}
+
+				
 
 			}
 
@@ -289,7 +342,7 @@
 				}
 			}
 
-			function save() {
+			function savePNG() {
 
 				window.open( renderer.domElement.toDataURL('image/png'), 'mywindow' );
 
