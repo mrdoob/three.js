@@ -231,8 +231,6 @@
 			
 			function saveJSON() {
 
-console.log("scene", scene);
-
 				var children	= scene.children;
 				var items	= [];
 				for( var i = 0; i < children.length; i++ ) {
@@ -245,12 +243,14 @@ console.log("scene", scene);
 						x	: (child.position.x - 25) / 50,
 						y	: (child.position.y - 25) / 50,
 						z	: (child.position.z - 25) / 50,
-						type	: child.materials[0]._cubeType
+						t	: child.materials[0]._cubeType
 					});
 				}
 				
-				console.log("items");
-				console.dir(items);
+				// open a window with the json
+				var dataUri	= "data:application/json;charset=utf-8,"+JSON.stringify(items);
+				window.open( dataUri, 'mywindow' );
+
 			}
 			
 			function loadJSON() {
