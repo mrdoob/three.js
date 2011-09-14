@@ -14,9 +14,6 @@ UI.Toolbar = function () {
 		var material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
 		var mesh = new THREE.Mesh( geometry, material );
 
-		geometry.code = 'new THREE.CubeGeometry( 100, 100, 100, 4, 4, 4 )';
-		material.code = 'new THREE.MeshBasicMaterial( { color: 0xffffff } )';
-
 		signals.added.dispatch( mesh );
 
 	}, false );
@@ -32,9 +29,6 @@ UI.Toolbar = function () {
 		var material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
 		var mesh = new THREE.Mesh( geometry, material );
 
-		geometry.code = 'new THREE.SphereGeometry( 75, 20, 10 )';
-		material.code = 'new THREE.MeshBasicMaterial( { color: 0xffffff } )';
-
 		signals.added.dispatch( mesh );
 
 	}, false );
@@ -49,9 +43,6 @@ UI.Toolbar = function () {
 		var geometry = new THREE.TorusGeometry( 50, 20, 20, 20 );
 		var material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
 		var mesh = new THREE.Mesh( geometry, material );
-
-		geometry.code = 'new THREE.TorusGeometry( 50, 20, 20, 20 )';
-		material.code = 'new THREE.MeshBasicMaterial( { color: 0xffffff } )';
 
 		signals.added.dispatch( mesh );
 

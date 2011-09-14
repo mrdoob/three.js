@@ -65,6 +65,7 @@ var Code = function () {
 
 			'',
 			'\trenderer = new THREE.WebGLRenderer()',
+			'\tdocument.body.appendChild( renderer.domElement );',
 			'',
 			'}',
 			'',
@@ -106,8 +107,8 @@ var Code = function () {
 			if ( object instanceof THREE.Mesh ) {
 
 				var string = '';
-				string += '\n\tvar geometry = ' + object.geometry.code + ';';
-				string += '\n\tvar material = ' + object.materials[ 0 ].code + ';';
+				string += '\n\tvar geometry = ' + object.geometry.gui.getCode() + ';';
+				string += '\n\tvar material = ' + object.materials[ 0 ].gui.getCode() + ';';
 				string += '\n\tvar mesh = new THREE.Mesh( geometry, material );';
 
 				if ( object.position.x != 0 ) string += '\n\tmesh.position.x = ' + object.position.x + ';';

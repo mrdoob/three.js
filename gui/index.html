@@ -41,6 +41,7 @@
 		<script type="text/javascript" src="js/UI.Viewports.js"></script>
 		<script type="text/javascript" src="js/UI.Toolbar.js"></script>
 		<script type="text/javascript" src="js/Code.js"></script>
+		<script type="text/javascript" src="js/Code.Templates.js"></script>
 
 		<script>
 
@@ -108,9 +109,6 @@
 			var geometry = new THREE.SphereGeometry( 75, 20, 10 );
 			var material = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
 			var mesh = new THREE.Mesh( geometry, material );
-
-			geometry.code = 'new THREE.SphereGeometry( 75, 20, 10 )';
-			material.code = 'new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } )';
 
 			signals.added.dispatch( mesh );
 
