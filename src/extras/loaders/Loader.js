@@ -59,7 +59,7 @@ THREE.Loader.prototype = {
 
 		var chunks = url.split( "/" );
 		chunks.pop();
-		return chunks.join( "/" );
+		return chunks.length < 1 ? "." : chunks.join( "/" );
 
 	},
 
