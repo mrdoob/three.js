@@ -254,14 +254,14 @@ THREE.Object3D.prototype = {
 
 	addChild: function ( child ) {
 
-		console.warn( 'DEPRECATED: Object3D.addChild() is now Object3D.add(). Called in ' + arguments.callee.caller.name + '().' );
+		console.warn( 'DEPRECATED: Object3D.addChild() is now Object3D.add().' );
 		this.add( child );
 
 	},
 
 	removeChild: function ( child ) {
 
-		console.warn( 'DEPRECATED: Object3D.removeChild() is now Object3D.remove(). Called in ' + arguments.callee.caller.name + '().' );
+		console.warn( 'DEPRECATED: Object3D.removeChild() is now Object3D.remove().' );
 		this.remove( child );
 
 	}
