@@ -35,10 +35,14 @@ THREE.SVGRenderer = function () {
 	this.sortObjects = true;
 	this.sortElements = true;
 
-	this.data = {
+	this.info = {
 
-		vertices: 0,
-		faces: 0
+		render: {
+
+			vertices: 0,
+			faces: 0
+
+		}
 
 	}
 
@@ -82,8 +86,8 @@ THREE.SVGRenderer = function () {
 
 		this.autoClear && this.clear();
 
-		_this.data.vertices = 0;
-		_this.data.faces = 0;
+		_this.info.render.vertices = 0;
+		_this.info.render.faces = 0;
 
 		_renderList = _projector.projectScene( scene, camera, this.sortElements );
 
@@ -373,8 +377,8 @@ THREE.SVGRenderer = function () {
 
 	function renderFace3( v1, v2, v3, element, material, scene ) {
 
-		_this.data.vertices += 3;
-		_this.data.faces ++;
+		_this.info.render.vertices += 3;
+		_this.info.render.faces ++;
 
 		_svgNode = getPathNode( _pathCount ++ );
 		_svgNode.setAttribute( 'd', 'M ' + v1.positionScreen.x + ' ' + v1.positionScreen.y + ' L ' + v2.positionScreen.x + ' ' + v2.positionScreen.y + ' L ' + v3.positionScreen.x + ',' + v3.positionScreen.y + 'z' );
@@ -430,8 +434,8 @@ THREE.SVGRenderer = function () {
 
 	function renderFace4( v1, v2, v3, v4, element, material, scene ) {
 
-		_this.data.vertices += 4;
-		_this.data.faces ++;
+		_this.info.render.vertices += 4;
+		_this.info.render.faces ++;
 
 		_svgNode = getPathNode( _pathCount ++ );
 		_svgNode.setAttribute( 'd', 'M ' + v1.positionScreen.x + ' ' + v1.positionScreen.y + ' L ' + v2.positionScreen.x + ' ' + v2.positionScreen.y + ' L ' + v3.positionScreen.x + ',' + v3.positionScreen.y + ' L ' + v4.positionScreen.x + ',' + v4.positionScreen.y + 'z' );

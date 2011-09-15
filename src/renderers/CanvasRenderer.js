@@ -87,10 +87,14 @@ THREE.CanvasRenderer = function ( parameters ) {
 	this.sortObjects = true;
 	this.sortElements = true;
 
-	this.data = {
+	this.info = {
 
-		vertices: 0,
-		faces: 0
+		render: {
+
+			vertices: 0,
+			faces: 0
+
+		}
 
 	}
 
@@ -174,8 +178,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		this.autoClear ? this.clear() : _context.setTransform( 1, 0, 0, - 1, _canvasWidthHalf, _canvasHeightHalf );
 
-		_this.data.vertices = 0;
-		_this.data.faces = 0;
+		_this.info.render.vertices = 0;
+		_this.info.render.faces = 0;
 
 		_renderList = _projector.projectScene( scene, camera, this.sortElements );
 
@@ -561,8 +565,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		function renderFace3( v1, v2, v3, uv1, uv2, uv3, element, material, scene ) {
 
-			_this.data.vertices += 3;
-			_this.data.faces ++;
+			_this.info.render.vertices += 3;
+			_this.info.render.faces ++;
 
 			setOpacity( material.opacity );
 			setBlending( material.blending );
@@ -718,8 +722,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		function renderFace4( v1, v2, v3, v4, v5, v6, element, material, scene ) {
 
-			_this.data.vertices += 4;
-			_this.data.faces ++;
+			_this.info.render.vertices += 4;
+			_this.info.render.faces ++;
 
 			setOpacity( material.opacity );
 			setBlending( material.blending );

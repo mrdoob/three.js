@@ -72,11 +72,23 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_clearAlpha = parameters.clearAlpha !== undefined ? parameters.clearAlpha : 0;
 	_maxLights = parameters.maxLights !== undefined ? parameters.maxLights : 4;
 
-	this.data = {
+	this.info = {
 
-		vertices: 0,
-		faces: 0,
-		drawCalls: 0
+		memory: {
+
+			programs: 0,
+			geometries: 0,
+			textures: 0
+
+		},
+
+		render: {
+
+			calls: 0,
+			vertices: 0,
+			faces: 0
+
+		}
 
 	};
 
@@ -344,6 +356,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		texture.__webglInit = false;
 		_gl.deleteTexture( texture.__webglTexture );
 
+		_this.info.memory.textures --;
+
 	};
 
 	//
@@ -456,6 +470,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		geometry.__webglVertexBuffer = _gl.createBuffer();
 		geometry.__webglColorBuffer = _gl.createBuffer();
 
+		_this.info.geometries ++;
+
 	};
 
 	function createLineBuffers( geometry ) {
@@ -463,12 +479,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 		geometry.__webglVertexBuffer = _gl.createBuffer();
 		geometry.__webglColorBuffer = _gl.createBuffer();
 
+		_this.info.memory.geometries ++;
+
 	};
 
 	function createRibbonBuffers( geometry ) {
 
 		geometry.__webglVertexBuffer = _gl.createBuffer();
 		geometry.__webglColorBuffer = _gl.createBuffer();
+
+		_this.info.memory.geometries ++;
 
 	};
 
@@ -503,6 +523,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		_this.info.memory.geometries ++;
+
 	};
 
 	// Buffer deallocation
@@ -512,6 +534,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_gl.deleteBuffer( geometry.__webglVertexBuffer );
 		_gl.deleteBuffer( geometry.__webglColorBuffer );
 
+		_this.info.memory.geometries --;
+
 	};
 
 	function deleteLineBuffers( geometry ) {
@@ -519,12 +543,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_gl.deleteBuffer( geometry.__webglVertexBuffer );
 		_gl.deleteBuffer( geometry.__webglColorBuffer );
 
+		_this.info.memory.geometries --;
+
 	};
 
 	function deleteRibbonBuffers( geometry ) {
 
 		_gl.deleteBuffer( geometry.__webglVertexBuffer );
 		_gl.deleteBuffer( geometry.__webglColorBuffer );
+
+		_this.info.memory.geometries --;
 
 	};
 
@@ -554,6 +582,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 		}
+
+		_this.info.memory.geometries --;
 
 	};
 
@@ -635,10 +665,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						size = 1;		// "f" and "i"
 
-						if( attribute.type === "v2" ) size = 2;
-						else if( attribute.type === "v3" ) size = 3;
-						else if( attribute.type === "v4" ) size = 4;
-						else if( attribute.type === "c"  ) size = 3;
+						if ( attribute.type === "v2" ) size = 2;
+						else if ( attribute.type === "v3" ) size = 3;
+						else if ( attribute.type === "v4" ) size = 4;
+						else if ( attribute.type === "c"  ) size = 3;
 
 						attribute.size = size;
 						attribute.array = new Float32Array( nvertices * size );
@@ -2985,9 +3015,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			_this.data.vertices += geometryGroup.__webglFaceCount;
-			_this.data.faces += geometryGroup.__webglFaceCount / 3;
-			_this.data.drawCalls ++;
+			_this.info.render.calls ++;
+			_this.info.render.vertices += geometryGroup.__webglFaceCount;
+			_this.info.render.faces += geometryGroup.__webglFaceCount / 3;
 
 		// render lines
 
@@ -2998,7 +3028,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.lineWidth( material.linewidth );
 			_gl.drawArrays( primitives, 0, geometryGroup.__webglLineCount );
 
-			_this.data.drawCalls ++;
+			_this.info.render.calls ++;
 
 		// render particles
 
@@ -3006,7 +3036,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl.drawArrays( _gl.POINTS, 0, geometryGroup.__webglParticleCount );
 
-			_this.data.drawCalls ++;
+			_this.info.render.calls ++;
 
 		// render ribbon
 
@@ -3014,7 +3044,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl.drawArrays( _gl.TRIANGLE_STRIP, 0, geometryGroup.__webglVertexCount );
 
-			_this.data.drawCalls ++;
+			_this.info.render.calls ++;
 
 		}
 
@@ -3590,9 +3620,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( this.shadowMapEnabled ) renderShadowMap( scene, camera );
 
-		_this.data.vertices = 0;
-		_this.data.faces = 0;
-		_this.data.drawCalls = 0;
+		_this.info.render.calls = 0;
+		_this.info.render.vertices = 0;
+		_this.info.render.faces = 0;
 
 		camera.matrixAutoUpdate && camera.update( undefined, true );
 
@@ -4761,6 +4791,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_programs.push( { program: program, code: code } );
 
+		_this.info.memory.programs = _programs.length;
+
 		return program;
 
 	};
@@ -5037,6 +5069,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				texture.__webglInit = true;
 				texture.__webglTexture = _gl.createTexture();
+
+				_this.info.memory.textures ++;
 
 			}
 
