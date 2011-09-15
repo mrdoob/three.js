@@ -3426,7 +3426,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( ! _cameraLight ) {
 
-			_cameraLight = new THREE.Camera( _this.shadowCameraFov, camera.aspect, _this.shadowCameraNear, _this.shadowCameraFar );
+			_cameraLight = new THREE.Camera( _this.shadowCameraFov, _this.shadowMapWidth / _this.shadowMapHeight, _this.shadowCameraNear, _this.shadowCameraFar );
 
 		}
 
