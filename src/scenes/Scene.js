@@ -107,42 +107,42 @@ THREE.Scene.prototype.removeChildRecurse = function ( child ) {
 
 THREE.Scene.prototype.addChild = function ( child ) {
 
-	console.warn( 'DEPRECATED: Scene.addChild() is now Scene.add()' );
+	console.warn( 'DEPRECATED: Scene.addChild() is now Scene.add(). Called in ' + arguments.callee.caller.name + '().' );
 	this.add( child );
 
 }
 
 THREE.Scene.prototype.addObject = function ( child ) {
 
-	console.warn( 'DEPRECATED: Scene.addObject() is now Scene.add()' );
+	console.warn( 'DEPRECATED: Scene.addObject() is now Scene.add(). Called in ' + arguments.callee.caller.name + '().' );
 	this.add( child );
 
 }
 
 THREE.Scene.prototype.addLight = function ( child ) {
 
-	console.warn( 'DEPRECATED: Scene.addLight() is now Scene.add()' );
+	console.warn( 'DEPRECATED: Scene.addLight() is now Scene.add(). Called in ' + arguments.callee.caller.name + '().' );
 	this.add( child );
 
 }
 
 THREE.Scene.prototype.removeChild = function ( child ) {
 
-	console.warn( 'DEPRECATED: Scene.removeChild() is now Scene.remove()' );
+	console.warn( 'DEPRECATED: Scene.removeChild() is now Scene.remove(). Called in ' + arguments.callee.caller.name + '().' );
 	this.remove( child );
 
 }
 
 THREE.Scene.prototype.removeObject = function ( child ) {
 
-	console.warn( 'DEPRECATED: Scene.removeObject() is now Scene.remove()' );
+	console.warn( 'DEPRECATED: Scene.removeObject() is now Scene.remove(). Called in ' + arguments.callee.caller.name + '().' );
 	this.remove( child );
 
 }
 
 THREE.Scene.prototype.removeLight = function ( child ) {
 
-	console.warn( 'DEPRECATED: Scene.removeLight() is now Scene.remove()' );
+	console.warn( 'DEPRECATED: Scene.removeLight() is now Scene.remove(). Called in ' + arguments.callee.caller.name + '().' );
 	this.remove( child );
 
 }
