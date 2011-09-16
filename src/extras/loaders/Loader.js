@@ -59,7 +59,7 @@ THREE.Loader.prototype = {
 
 		var chunks = url.split( "/" );
 		chunks.pop();
-		return chunks.join( "/" );
+		return chunks.length < 1 ? "." : chunks.join( "/" );
 
 	},
 
@@ -136,7 +136,7 @@ THREE.Loader.prototype = {
 
 		}
 
-		function create_texture ( where, name, sourceFile, repeat, offset, wrap ) {
+		function create_texture( where, name, sourceFile, repeat, offset, wrap ) {
 
 			var texture = document.createElement( 'canvas' );
 
@@ -174,7 +174,7 @@ THREE.Loader.prototype = {
 
 		}
 
-		function rgb2hex ( rgb ) {
+		function rgb2hex( rgb ) {
 
 			return ( rgb[ 0 ] * 255 << 16 ) + ( rgb[ 1 ] * 255 << 8 ) + rgb[ 2 ] * 255;
 
