@@ -571,6 +571,7 @@ THREE.ShaderChunk = {
 		"for( int i = 0; i < MAX_SHADOWS; i ++ ) {",
 
 			"vec3 shadowCoord = vShadowCoord[ i ].xyz / vShadowCoord[ i ].w;",
+			"shadowCoord.z += shadowBias;",
 
 			"if ( shadowCoord.x >= 0.0 && shadowCoord.x <= 1.0 && shadowCoord.y >= 0.0 && shadowCoord.y <= 1.0 ) {",
 
@@ -592,7 +593,7 @@ THREE.ShaderChunk = {
 
 							"float fDepth = unpackDepth( rgbaDepth );",
 
-							"if ( fDepth < ( shadowCoord.z + shadowBias ) )",
+							"if ( fDepth < shadowCoord.z )",
 								"shadow += 1.0;",
 
 					"}",
@@ -606,7 +607,7 @@ THREE.ShaderChunk = {
 					"vec4 rgbaDepth = texture2D( shadowMap[ i ], shadowCoord.xy );",
 					"float fDepth = unpackDepth( rgbaDepth );",
 
-					"if ( fDepth < ( shadowCoord.z + shadowBias ) )",
+					"if ( fDepth < shadowCoord.z )",
 
 						// spot with multiple shadows is darker
 
