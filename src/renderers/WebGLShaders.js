@@ -1039,6 +1039,7 @@ THREE.ShaderLib = {
 				"precision highp float;",
 			"#endif",
 
+			"uniform vec3 color;",
 			"uniform sampler2D map;",
 			"uniform float opacity;",
 
@@ -1046,9 +1047,8 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-				"vec4 color = texture2D( map, vUV );",
-				"color.a *= opacity;",
-				"gl_FragColor = color;",
+				"vec4 texture = texture2D( map, vUV );",
+				"gl_FragColor = vec4( color * texture.xyz, texture.a * opacity );",
 
 			"}"
 

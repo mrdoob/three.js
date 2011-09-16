@@ -25,6 +25,8 @@
 
 			var camera, scene, renderer;
 
+			var mapC;
+
 			var group;
 			var time = 0;
 
@@ -52,12 +54,14 @@
 				var radius = 500;
 				var mapA = THREE.ImageUtils.loadTexture( "textures/sprite0.png" );
 				var mapB = THREE.ImageUtils.loadTexture( "textures/sprite1.png" );
+				mapC = THREE.ImageUtils.loadTexture( "textures/sprite2.png" );
 
 				group = new THREE.Object3D();
 
-				for( var a = 0; a < amount; a++ ) {
+				for( var a = 0; a < amount; a ++ ) {
 
-					var sprite = new THREE.Sprite( { map: mapA, useScreenCoordinates: false } );
+					var sprite = new THREE.Sprite( { map: mapC, useScreenCoordinates: false, color: 0xffffff } );
+
 					sprite.position.set( Math.random() - 0.5,
 					                     Math.random() - 0.5,
 					                     Math.random() - 0.5 );
@@ -66,12 +70,19 @@
 
 						sprite.map = mapB;
 
+					} else {
+
+						sprite.color.setHSV( 0.5 * Math.random(), 0.8, 0.9 );
+						sprite.uvScale.set( 2, 2 );
+						sprite.uvOffset.set( -0.5, -0.5 );
+
 					}
 
 					sprite.position.normalize();
 					sprite.position.multiplyScalar( radius );
 
 					group.add( sprite );
+
 				}
 
 				scene.add( group );
@@ -121,14 +132,17 @@
 
 			function render() {
 
-				for ( var c = 0; c < group.children.length; c++ ) {
+				for ( var c = 0; c < group.children.length; c ++ ) {
 
-					var sprite = group.children[ c ];
+					var sprite = group.children[ c ];
 					var scale = Math.sin( time + sprite.position.x * 0.01 ) * 0.3 + 1.0;
 
 					sprite.rotation += 0.1 * ( c / group.children.length );
 					sprite.scale.set( scale, scale, 1.0 );
-					sprite.opacity = Math.sin( time + sprite.position.x * 0.01 ) * 0.4 + 0.6;
+
+					if ( sprite.map !== mapC )
+						sprite.opacity = Math.sin( time + sprite.position.x * 0.01 ) * 0.4 + 0.6;
+
 				}
 
 				group.rotation.x = time * 0.5;
@@ -141,12 +155,6 @@
 
 			}
 
-			function log( text ) {
-
-				var e = document.getElementById("log");
-				e.innerHTML = text + "<br/>" + e.innerHTML;
-
-			}
 		</script>
 	</body>
 </html>

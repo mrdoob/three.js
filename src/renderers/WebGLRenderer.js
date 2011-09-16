@@ -202,28 +202,34 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_sprite.elementBuffer = _gl.createBuffer();
 
 	_gl.bindBuffer( _gl.ARRAY_BUFFER, _sprite.vertexBuffer );
-	_gl.bufferData( _gl.ARRAY_BUFFER,  _sprite.vertices, _gl.STATIC_DRAW );
+	_gl.bufferData( _gl.ARRAY_BUFFER, _sprite.vertices, _gl.STATIC_DRAW );
 
 	_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, _sprite.elementBuffer );
 	_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, _sprite.faces, _gl.STATIC_DRAW );
 
 
 	_sprite.program = _gl.createProgram();
-	_gl.attachShader( _sprite.program, getShader( "fragment", THREE.ShaderLib.sprite.fragmentShader ));
-	_gl.attachShader( _sprite.program, getShader( "vertex",   THREE.ShaderLib.sprite.vertexShader   ));
+	_gl.attachShader( _sprite.program, getShader( "fragment", THREE.ShaderLib.sprite.fragmentShader ) );
+	_gl.attachShader( _sprite.program, getShader( "vertex",   THREE.ShaderLib.sprite.vertexShader   ) );
 	_gl.linkProgram( _sprite.program );
 
 	_sprite.attributes = {};
 	_sprite.uniforms = {};
+
 	_sprite.attributes.position           = _gl.getAttribLocation ( _sprite.program, "position" );
 	_sprite.attributes.uv                 = _gl.getAttribLocation ( _sprite.program, "uv" );
+
 	_sprite.uniforms.uvOffset             = _gl.getUniformLocation( _sprite.program, "uvOffset" );
 	_sprite.uniforms.uvScale              = _gl.getUniformLocation( _sprite.program, "uvScale" );
+
 	_sprite.uniforms.rotation             = _gl.getUniformLocation( _sprite.program, "rotation" );
 	_sprite.uniforms.scale                = _gl.getUniformLocation( _sprite.program, "scale" );
 	_sprite.uniforms.alignment            = _gl.getUniformLocation( _sprite.program, "alignment" );
+
+	_sprite.uniforms.color                = _gl.getUniformLocation( _sprite.program, "color" );
 	_sprite.uniforms.map                  = _gl.getUniformLocation( _sprite.program, "map" );
 	_sprite.uniforms.opacity              = _gl.getUniformLocation( _sprite.program, "opacity" );
+
 	_sprite.uniforms.useScreenCoordinates = _gl.getUniformLocation( _sprite.program, "useScreenCoordinates" );
 	_sprite.uniforms.affectedByDistance   = _gl.getUniformLocation( _sprite.program, "affectedByDistance" );
 	_sprite.uniforms.screenPosition    	  = _gl.getUniformLocation( _sprite.program, "screenPosition" );
@@ -3922,7 +3928,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var o, ol, object;
 		var attributes = _sprite.attributes;
 		var uniforms = _sprite.uniforms;
-		var anyCustom = false;
 		var invAspect = _viewportHeight / _viewportWidth;
 		var size, scale = [];
 		var screenPosition;
@@ -3963,7 +3968,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// update positions and sort
 
-		for( o = 0, ol = scene.__webglSprites.length; o < ol; o++ ) {
+		for( o = 0, ol = scene.__webglSprites.length; o < ol; o ++ ) {
 
 			object = scene.__webglSprites[ o ];
 
@@ -3984,76 +3989,60 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// render all non-custom shader sprites
 
-		for ( o = 0, ol = scene.__webglSprites.length; o < ol; o++ ) {
+		for ( o = 0, ol = scene.__webglSprites.length; o < ol; o ++ ) {
 
 			object = scene.__webglSprites[ o ];
 
-			if ( object.material === undefined ) {
+			if ( object.map && object.map.image && object.map.image.width ) {
 
-				if ( object.map && object.map.image && object.map.image.width ) {
+				if ( object.useScreenCoordinates ) {
 
-					if ( object.useScreenCoordinates ) {
+					_gl.uniform1i( uniforms.useScreenCoordinates, 1 );
+					_gl.uniform3f( uniforms.screenPosition, ( object.position.x - halfViewportWidth  ) / halfViewportWidth,
+															( halfViewportHeight - object.position.y ) / halfViewportHeight,
+															  Math.max( 0, Math.min( 1, object.position.z )));
 
-						_gl.uniform1i( uniforms.useScreenCoordinates, 1 );
-						_gl.uniform3f( uniforms.screenPosition, ( object.position.x - halfViewportWidth  ) / halfViewportWidth,
-																( halfViewportHeight - object.position.y ) / halfViewportHeight,
-																  Math.max( 0, Math.min( 1, object.position.z )));
+				} else {
 
-					} else {
+					_gl.uniform1i( uniforms.useScreenCoordinates, 0 );
+					_gl.uniform1i( uniforms.affectedByDistance, object.affectedByDistance ? 1 : 0 );
+					_gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, object._modelViewMatrixArray );
 
-
-
-						_gl.uniform1i( uniforms.useScreenCoordinates, 0 );
-						_gl.uniform1i( uniforms.affectedByDistance, object.affectedByDistance ? 1 : 0 );
-						_gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, object._modelViewMatrixArray );
-
-					}
-
-					size = object.map.image.width / ( object.scaleByViewport ? _viewportHeight : 1 );
-					scale[ 0 ] = size * invAspect * object.scale.x;
-					scale[ 1 ] = size * object.scale.y;
-
-					_gl.uniform2f( uniforms.uvScale, object.uvScale.x, object.uvScale.y );
-					_gl.uniform2f( uniforms.uvOffset, object.uvOffset.x, object.uvOffset.y );
-					_gl.uniform2f( uniforms.alignment, object.alignment.x, object.alignment.y );
-					_gl.uniform1f( uniforms.opacity, object.opacity );
-					_gl.uniform1f( uniforms.rotation, object.rotation );
-					_gl.uniform2fv( uniforms.scale, scale );
-
-					if ( object.mergeWith3D && !mergeWith3D ) {
-
-						_gl.enable( _gl.DEPTH_TEST );
-						mergeWith3D = true;
-
-					} else if ( !object.mergeWith3D && mergeWith3D ) {
-
-						_gl.disable( _gl.DEPTH_TEST );
-						mergeWith3D = false;
-
-					}
-
-					setBlending( object.blending );
-					setTexture( object.map, 0 );
-
-					_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
 				}
 
-			} else {
+				size = object.map.image.width / ( object.scaleByViewport ? _viewportHeight : 1 );
+				scale[ 0 ] = size * invAspect * object.scale.x;
+				scale[ 1 ] = size * object.scale.y;
 
-				anyCustom = true;
+				_gl.uniform2f( uniforms.uvScale, object.uvScale.x, object.uvScale.y );
+				_gl.uniform2f( uniforms.uvOffset, object.uvOffset.x, object.uvOffset.y );
+				_gl.uniform2f( uniforms.alignment, object.alignment.x, object.alignment.y );
+				_gl.uniform1f( uniforms.opacity, object.opacity );
+				_gl.uniform3f( uniforms.color, object.color.r, object.color.g, object.color.b );
+				_gl.uniform1f( uniforms.rotation, object.rotation );
+				_gl.uniform2fv( uniforms.scale, scale );
+
+				if ( object.mergeWith3D && !mergeWith3D ) {
+
+					_gl.enable( _gl.DEPTH_TEST );
+					mergeWith3D = true;
+
+				} else if ( !object.mergeWith3D && mergeWith3D ) {
+
+					_gl.disable( _gl.DEPTH_TEST );
+					mergeWith3D = false;
+
+				}
+
+				setBlending( object.blending );
+				setTexture( object.map, 0 );
+
+				_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
 
 			}
 
 		}
 
-
-		// loop through all custom
-
-		/*
-		if( anyCustom ) {
-
-		}
-		*/
 
 		// restore gl
 
