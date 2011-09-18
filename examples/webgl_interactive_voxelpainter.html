@@ -43,7 +43,13 @@
 				new THREE.Color().setRGB(1, 0, 0),
 				new THREE.Color().setRGB(0, 1, 0),
 				new THREE.Color().setRGB(0, 0, 1),	
-				new THREE.Color().setRGB(1, 1, 0)	
+				new THREE.Color().setRGB(1, 1, 0),
+				new THREE.Color().setRGB(1, 0, 1),
+				new THREE.Color().setRGB(0, 1, 1),	
+				new THREE.Color().setRGB(1, 0.5, 0.5),	
+				new THREE.Color().setRGB(1, 0.5, 1),	
+				new THREE.Color().setRGB(0.5, 0.5, 1),	
+				new THREE.Color().setRGB(0.5, 0.5, 0.5),	
 			];
 			var cubeType	= 0;
 
@@ -65,7 +71,7 @@
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
 				info.style['z-index'] = '1';
-				info.innerHTML = '<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - voxel painter - webgl<br /><strong>click</strong>: add voxel, <strong>alt + click</strong>: remove voxel, <strong>shift + click</strong>: rotate, <strong>drop json</strong>: load map file<br/><a href="javascript:savePNG();">save .png</a>, <a href="javascript:saveJSON();">save .json</a>, current color: <div id="currentColor"></div>';
+				info.innerHTML = '<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - voxel painter - webgl<br /><strong>click</strong>: add voxel, <strong>alt + click</strong>: remove voxel, <strong>shift + click</strong>: rotate<br/><strong>0 to 9 keys</strong>: change color, <strong>drop json</strong>: load map file, <a href="javascript:savePNG();">save .png</a>, <a href="javascript:saveJSON();">save .json</a>, current color: <div id="currentColor"></div>';
 				container.appendChild( info );
 
 				camera = new THREE.Camera( 30, window.innerWidth / window.innerHeight, 1, 10000 );
@@ -98,7 +104,9 @@
 
 				// grid
 
-				plane = new THREE.Mesh( new THREE.PlaneGeometry( 1000, 1000, 20, 20 ), new THREE.MeshBasicMaterial( { color: 0x555555, wireframe: true } ) );
+				var planeW	= 50;
+				var planeH	= 50;
+				plane = new THREE.Mesh( new THREE.PlaneGeometry( planeW*50, planeH*50, planeW, planeH ), new THREE.MeshBasicMaterial( { color: 0x555555, wireframe: true } ) );
 				plane.rotation.x = - 90 * Math.PI / 180;
 				scene.addObject( plane );
 
@@ -111,17 +119,7 @@
 				scene.addLight( ambientLight );
 
 				var directionalLight = new THREE.DirectionalLight( 0xffffff );
-				directionalLight.position.x = Math.random() - 0.5;
-				directionalLight.position.y = Math.random() - 0.5;
-				directionalLight.position.z = Math.random() - 0.5;
-				directionalLight.position.normalize();
-				scene.addLight( directionalLight );
-
-				var directionalLight = new THREE.DirectionalLight( 0x808080 );
-				directionalLight.position.x = Math.random() - 0.5;
-				directionalLight.position.y = Math.random() - 0.5;
-				directionalLight.position.z = Math.random() - 0.5;
-				directionalLight.position.normalize();
+				directionalLight.position.set(1,1,1).normalize();
 				scene.addLight( directionalLight );
 
 				renderer = new THREE.WebGLRenderer({
@@ -151,17 +149,21 @@
 			}
 
 			function onDrop(event) {
+
 				event.preventDefault();
 
 				for(var i = 0; i < event.dataTransfer.files.length; i++){
+
 					var file	= event.dataTransfer.files[i];
 					var reader	= new FileReader();
+
 					reader.onload = function (event){
 						var dataUri	= event.target.result;
 						var base64	= dataUri.match(/[^,]*,(.*)/)[1];
 						var json	= window.atob(base64);
 						loadJSON( json )
 					};
+
 					reader.readAsDataURL(file);
 				}
 			}
@@ -255,8 +257,11 @@
 
 				var children	= scene.children;
 				var voxels	= [];
+
 				for( var i = 0; i < children.length; i++ ) {
+
 					var child	= children[i];
+
 					if( child instanceof THREE.Mesh === false )			continue;
 					if( child.geometry instanceof THREE.CubeGeometry === false )	continue;
 					if( child === rollOverMesh )					continue;
@@ -267,6 +272,7 @@
 						z	: (child.position.z - 25) / 50,
 						t	: child.materials[0]._cubeType
 					});
+
 				}
 				
 				// open a window with the json
@@ -302,6 +308,7 @@
 					mesh.position.z = voxel.z * 50 + 25;
 					mesh.matrixAutoUpdate = true;
 					mesh.updateMatrix();
+
 					scene.addObject( mesh );
 					
 				}
@@ -315,13 +322,16 @@
 					case 16: isShiftDown = true; break;
 					case 18: isAltDown = true; break;
 
-					case 'S'.charCodeAt(0): saveJSON();	break;
-					case 'L'.charCodeAt(0): loadJSON();	break;
-
 					case '0'.charCodeAt(0): setCubeType(0);	break;
 					case '1'.charCodeAt(0): setCubeType(1);	break;
 					case '2'.charCodeAt(0): setCubeType(2);	break;
 					case '3'.charCodeAt(0): setCubeType(3);	break;
+					case '4'.charCodeAt(0): setCubeType(4);	break;
+					case '5'.charCodeAt(0): setCubeType(5);	break;
+					case '6'.charCodeAt(0): setCubeType(6);	break;
+					case '7'.charCodeAt(0): setCubeType(7);	break;
+					case '8'.charCodeAt(0): setCubeType(8);	break;
+					case '9'.charCodeAt(0): setCubeType(9);	break;
 
 				}
 
