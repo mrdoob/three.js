@@ -10,6 +10,13 @@
 				margin: 0px;
 				overflow: hidden;
 			}
+			#currentColor {
+				display		: inline-block;
+				width		: 15px;
+				height		: 15px;
+				background-color: #F660AB;
+				border		: solid 2px black;
+			}
 
 			#oldie { background-color: #ddd !important }
 		</style>
@@ -31,10 +38,23 @@
 			var projector, plane, cube;
 			var mouse2D, mouse3D, ray,
 			rollOveredFace, isShiftDown = false,
-			theta = 45, isCtrlDown = false;
+			theta = 45, isAltDown = false;
+			var cubeColors	= [
+				new THREE.Color().setRGB(1, 0, 0),
+				new THREE.Color().setRGB(0, 1, 0),
+				new THREE.Color().setRGB(0, 0, 1),	
+				new THREE.Color().setRGB(1, 1, 0),
+				new THREE.Color().setRGB(1, 0, 1),
+				new THREE.Color().setRGB(0, 1, 1),	
+				new THREE.Color().setRGB(1, 0.5, 0.5),	
+				new THREE.Color().setRGB(1, 0.5, 1),	
+				new THREE.Color().setRGB(0.5, 0.5, 1),	
+				new THREE.Color().setRGB(0.5, 0.5, 0.5),	
+			];
+			var cubeType	= 0;
 
 			var rollOverMesh, rollOverMaterial, voxelPosition = new THREE.Vector3(), tmpVec = new THREE.Vector3();
-			var cubeGeo, cubeMaterial;
+			var cubeGeo, cubeMaterials = [];
 			var i, intersector;
 
 			init();
@@ -50,10 +70,11 @@
 				info.style.top = '10px';
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - voxel painter - webgl<br /><strong>click</strong>: add voxel, <strong>control + click</strong>: remove voxel, <strong>shift + click</strong>: rotate, <a href="javascript:save();return false;">save .png</a>';
+				info.style['z-index'] = '1';
+				info.innerHTML = '<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - voxel painter - webgl<br /><strong>click</strong>: add voxel, <strong>alt + click</strong>: remove voxel, <strong>shift + click</strong>: rotate<br/><strong>0 to 9 keys</strong>: change color, <strong>drop json</strong>: load map file, <a href="javascript:savePNG();">save .png</a>, <a href="javascript:saveJSON();">save .json</a>, current color: <div id="currentColor"></div>';
 				container.appendChild( info );
 
-				camera = new THREE.Camera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.Camera( 30, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.y = 800;
 				camera.target.position.y = 200;
 
@@ -70,15 +91,22 @@
 				// cubes
 
 				cubeGeo = new THREE.CubeGeometry( 50, 50, 50 );
-				cubeMaterial = new THREE.MeshLambertMaterial( { color: 0x00ff80, shading: THREE.FlatShading, map: THREE.ImageUtils.loadTexture( "textures/square-outline-textured.png" ) } );
-				cubeMaterial.color.setHSV( 0.1, 0.7, 1.0 );
+				for( i = 0; i < cubeColors.length; i++ ) {
+					cubeMaterials[i] = new THREE.MeshLambertMaterial( { color: 0x00ff80, shading: THREE.FlatShading, map: THREE.ImageUtils.loadTexture( "textures/square-outline-textured.png" ) } );
+					cubeMaterials[i].color.copy( cubeColors[i] );
+					cubeMaterials[i]._cubeType	= i;
+				}
+				setCubeType(cubeType);
+
 				// picking
 
 				projector = new THREE.Projector();
 
 				// grid
 
-				plane = new THREE.Mesh( new THREE.PlaneGeometry( 1000, 1000, 20, 20 ), new THREE.MeshBasicMaterial( { color: 0x555555, wireframe: true } ) );
+				var planeW	= 50;
+				var planeH	= 50;
+				plane = new THREE.Mesh( new THREE.PlaneGeometry( planeW*50, planeH*50, planeW, planeH ), new THREE.MeshBasicMaterial( { color: 0x555555, wireframe: true } ) );
 				plane.rotation.x = - 90 * Math.PI / 180;
 				scene.addObject( plane );
 
@@ -91,20 +119,13 @@
 				scene.addLight( ambientLight );
 
 				var directionalLight = new THREE.DirectionalLight( 0xffffff );
-				directionalLight.position.x = Math.random() - 0.5;
-				directionalLight.position.y = Math.random() - 0.5;
-				directionalLight.position.z = Math.random() - 0.5;
-				directionalLight.position.normalize();
+				directionalLight.position.set(1,1,1).normalize();
 				scene.addLight( directionalLight );
 
-				var directionalLight = new THREE.DirectionalLight( 0x808080 );
-				directionalLight.position.x = Math.random() - 0.5;
-				directionalLight.position.y = Math.random() - 0.5;
-				directionalLight.position.z = Math.random() - 0.5;
-				directionalLight.position.normalize();
-				scene.addLight( directionalLight );
-
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer({
+					antialias		: true,
+					preserveDrawingBuffer	: true
+				});
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.appendChild( renderer.domElement );
@@ -118,7 +139,33 @@
 				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 				document.addEventListener( 'keydown', onDocumentKeyDown, false );
 				document.addEventListener( 'keyup', onDocumentKeyUp, false );
+				document.addEventListener( 'drop', onDrop, false);
+				document.addEventListener( 'dragover', onDragOver, false);
 
+			}
+
+			function onDragOver(event) {
+				event.preventDefault();
+			}
+
+			function onDrop(event) {
+
+				event.preventDefault();
+
+				for(var i = 0; i < event.dataTransfer.files.length; i++){
+
+					var file	= event.dataTransfer.files[i];
+					var reader	= new FileReader();
+
+					reader.onload = function (event){
+						var dataUri	= event.target.result;
+						var base64	= dataUri.match(/[^,]*,(.*)/)[1];
+						var json	= window.atob(base64);
+						loadJSON( json )
+					};
+
+					reader.readAsDataURL(file);
+				}
 			}
 
 			function getRealIntersector( intersects ) {
@@ -172,7 +219,7 @@
 
 					// delete cube
 
-					if ( isCtrlDown ) {
+					if ( isAltDown ) {
 
 						if ( intersector.object != plane ) {
 
@@ -187,7 +234,7 @@
 						intersector = getRealIntersector( intersects );
 						setVoxelPosition( intersector );
 
-						var voxel = new THREE.Mesh( cubeGeo, cubeMaterial );
+						var voxel = new THREE.Mesh( cubeGeo, cubeMaterials[cubeType] );
 						voxel.position.copy( voxelPosition );
 						voxel.matrixAutoUpdate = false;
 						voxel.updateMatrix();
@@ -197,13 +244,94 @@
 
 				}
 			}
+			
+			function setCubeType(type) {
+
+				cubeType = type;
+
+				document.getElementById("currentColor").style.backgroundColor	= cubeColors[cubeType].getContextStyle();
+
+			}
+			
+			function saveJSON() {
+
+				var children	= scene.children;
+				var voxels	= [];
+
+				for( var i = 0; i < children.length; i++ ) {
+
+					var child	= children[i];
+
+					if( child instanceof THREE.Mesh === false )			continue;
+					if( child.geometry instanceof THREE.CubeGeometry === false )	continue;
+					if( child === rollOverMesh )					continue;
+
+					voxels.push({
+						x	: (child.position.x - 25) / 50,
+						y	: (child.position.y - 25) / 50,
+						z	: (child.position.z - 25) / 50,
+						t	: child.materials[0]._cubeType
+					});
+
+				}
+				
+				// open a window with the json
+				var dataUri	= "data:application/json;charset=utf-8,"+JSON.stringify(voxels);
+				window.open( dataUri, 'mywindow' );
+
+			}
+			
+			function loadJSON(mapJSON) {
+
+				// delete all cubes
+				var children	= scene.children.slice(0);
+
+				for( var i = 0; i < children.length; i++ ) {
+
+					if( children[i] instanceof THREE.Mesh === false ) continue;
+					if( children[i].geometry instanceof THREE.CubeGeometry === false ) continue;
+					if( children[i] === rollOverMesh ) continue;
+
+					scene.removeChild( children[i] );
+
+				}				
+
+				// push new cubes
+				var voxels	= JSON.parse(mapJSON);
+
+				for( var i = 0; i < voxels.length; i++ ){
+					var voxel = voxels[i];
+
+					var mesh = new THREE.Mesh( cubeGeo, cubeMaterials[voxel.t] );
+					mesh.position.x = voxel.x * 50 + 25;
+					mesh.position.y = voxel.y * 50 + 25;
+					mesh.position.z = voxel.z * 50 + 25;
+					mesh.matrixAutoUpdate = true;
+					mesh.updateMatrix();
+
+					scene.addObject( mesh );
+					
+				}
+
+			}
 
 			function onDocumentKeyDown( event ) {
 
 				switch( event.keyCode ) {
 
 					case 16: isShiftDown = true; break;
-					case 17: isCtrlDown = true; break;
+					case 18: isAltDown = true; break;
+
+					case '0'.charCodeAt(0): setCubeType(0);	break;
+					case '1'.charCodeAt(0): setCubeType(1);	break;
+					case '2'.charCodeAt(0): setCubeType(2);	break;
+					case '3'.charCodeAt(0): setCubeType(3);	break;
+					case '4'.charCodeAt(0): setCubeType(4);	break;
+					case '5'.charCodeAt(0): setCubeType(5);	break;
+					case '6'.charCodeAt(0): setCubeType(6);	break;
+					case '7'.charCodeAt(0): setCubeType(7);	break;
+					case '8'.charCodeAt(0): setCubeType(8);	break;
+					case '9'.charCodeAt(0): setCubeType(9);	break;
 
 				}
 
@@ -214,12 +342,12 @@
 				switch( event.keyCode ) {
 
 					case 16: isShiftDown = false; break;
-					case 17: isCtrlDown = false; break;
+					case 18: isAltDown = false; break;
 
 				}
 			}
 
-			function save() {
+			function savePNG() {
 
 				window.open( renderer.domElement.toDataURL('image/png'), 'mywindow' );
 
