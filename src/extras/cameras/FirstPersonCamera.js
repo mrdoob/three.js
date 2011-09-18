@@ -98,11 +98,21 @@ THREE.FirstPersonCamera = function ( parameters ) {
 
 	this.mouseDragOn = false;
 
-	this.windowHalfX = window.innerWidth / 2;
-	this.windowHalfY = window.innerHeight / 2;
+	if ( this.domElement === document ) {
+		this.viewHalfX = window.innerWidth / 2;
+		this.viewHalfY = window.innerHeight / 2;
+	} else {
+		this.viewHalfX = this.domElement.offsetWidth / 2;
+		this.viewHalfY = this.domElement.offsetHeight / 2;
+		this.domElement.setAttribute( 'tabindex', -1 );
+	}
 
 	this.onMouseDown = function ( event ) {
 
+		if ( this.domElement !== document ) {
+			this.domElement.focus();
+		}
+		
 		event.preventDefault();
 		event.stopPropagation();
 
@@ -143,8 +153,13 @@ THREE.FirstPersonCamera = function ( parameters ) {
 
 	this.onMouseMove = function ( event ) {
 
-		this.mouseX = event.clientX - this.windowHalfX;
-		this.mouseY = event.clientY - this.windowHalfY;
+		if ( this.domElement === document ) {
+			this.mouseX = event.pageX - this.viewHalfX;
+			this.mouseY = event.pageY - this.viewHalfY;
+		} else {
+			this.mouseX = event.pageX - this.domElement.offsetLeft - this.viewHalfX;
+			this.mouseY = event.pageY - this.domElement.offsetTop - this.viewHalfY;
+		}
 
 	};
 
