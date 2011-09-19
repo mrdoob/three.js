@@ -2,7 +2,7 @@
  * @author Tim Knip / http://www.floorplanner.com/ / tim at floorplanner.com
  */
 
-var ColladaLoader = function () {
+THREE.ColladaLoader = function () {
 
 	var COLLADA = null;
 	var scene = null;
