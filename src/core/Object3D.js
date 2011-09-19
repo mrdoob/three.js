@@ -130,6 +130,7 @@ THREE.Object3D.prototype = {
 	},
 
 	remove: function ( object ) {
+
 		var scene = this;
 
 		var childIndex = this.children.indexOf( object );
@@ -161,7 +162,7 @@ THREE.Object3D.prototype = {
 
 		var c, cl, child, recurseResult;
 
-		for ( c = 0, cl = this.children.length; c < cl; c++ ) {
+		for ( c = 0, cl = this.children.length; c < cl; c ++ ) {
 
 			child = this.children[ c ];
 

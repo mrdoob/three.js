@@ -4114,7 +4114,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			object.matrixWorld.flattenToArray( object._objectMatrixArray );
 
-
 			if ( object instanceof THREE.Mesh ) {
 
 				geometry = object.geometry;
@@ -4148,8 +4147,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					}
 
-					addBuffer( scene.__webglObjects, geometryGroup, object );
-
 				}
 
 			} else if ( object instanceof THREE.Ribbon ) {
@@ -4166,8 +4163,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				addBuffer( scene.__webglObjects, geometry, object );
-
 			} else if ( object instanceof THREE.Line ) {
 
 				geometry = object.geometry;
@@ -4181,8 +4176,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 					geometry.__dirtyColors = true;
 
 				}
-
-				addBuffer( scene.__webglObjects, geometry, object );
 
 			} else if ( object instanceof THREE.ParticleSystem ) {
 
@@ -4198,6 +4191,29 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
+			}
+
+		}
+
+		if ( ! object.__webglActive ) {
+
+			if ( object instanceof THREE.Mesh ) {
+
+				geometry = object.geometry;
+
+				for ( g in geometry.geometryGroups ) {
+
+					geometryGroup = geometry.geometryGroups[ g ];
+
+					addBuffer( scene.__webglObjects, geometryGroup, object );
+
+				}
+
+			} else if ( object instanceof THREE.Ribbon ||
+						object instanceof THREE.Line ||
+						object instanceof THREE.ParticleSystem ) {
+
+				geometry = object.geometry;
 				addBuffer( scene.__webglObjects, geometry, object );
 
 			} else if ( THREE.MarchingCubes !== undefined && object instanceof THREE.MarchingCubes ) {
@@ -4210,9 +4226,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			/*else if ( object instanceof THREE.Particle ) {
-
-			}*/
+			object.__webglActive = true;
 
 		}
 
@@ -4351,9 +4365,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			// it updates itself in render callback
 
-		} else if ( object instanceof THREE.Particle ) {
-
-		}*/
+		}
+		*/
 
 		/*
 		delete geometry.vertices;
@@ -4413,6 +4426,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			removeInstances( scene.__webglObjectsImmediate, object );
 
 		}
+
+		object.__webglActive = false;
 
 	};
 
