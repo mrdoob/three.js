@@ -1717,6 +1717,11 @@ THREE.ColladaLoader = function () {
 					this.mesh = (new Mesh(this)).parse(child);
 					break;
 
+				case 'extra':
+					
+					// console.log( child );
+					break;
+
 				default:
 					break;
 			}
@@ -1834,9 +1839,11 @@ THREE.ColladaLoader = function () {
 
 			input = inputs[j];
 
-			if ( input.semantic == 'TEXCOORD' ) {
+			switch ( input.semantic ) {
 
-				texture_sets.push(input.set);
+				case 'TEXCOORD':
+					texture_sets.push( input.set );
+					break;
 
 			}
 
@@ -1847,6 +1854,7 @@ THREE.ColladaLoader = function () {
 			var vs = [];
 			var ns = [];
 			var ts = {};
+			var cs = [];
 
 			if ( primitive.vcount ) {
 
@@ -1864,7 +1872,7 @@ THREE.ColladaLoader = function () {
 					numParams = source.accessor.params.length;
 					idx32 = index * numParams;
 
-					switch (input.semantic) {
+					switch ( input.semantic ) {
 
 						case 'VERTEX':
 
@@ -1883,6 +1891,12 @@ THREE.ColladaLoader = function () {
 							ts[input.set].push( new THREE.UV( source.data[idx32+0], source.data[idx32+1] ) );
 							break;
 
+						case 'COLOR':
+							
+							cs.push( new THREE.Color().setRGB(  source.data[idx32+0], source.data[idx32+1], source.data[idx32+2] ) );
+
+							break;
+
 						default:
 							break;
 
@@ -1892,8 +1906,18 @@ THREE.ColladaLoader = function () {
 
 			}
 
-			var face = new THREE.Face3( vs[0], vs[1], vs[2], [ ns[0], ns[1], ns[2] ] );
-			var uv;
+
+			var face, uv;
+
+			if ( vcount == 3 ) {
+
+				face = new THREE.Face3( vs[0], vs[1], vs[2], [ ns[0], ns[1], ns[2] ] );
+
+			} else if ( vcount == 4 ) {
+			
+				face = new THREE.Face4( vs[0], vs[1], vs[2], vs[3], [ ns[0], ns[1], ns[2], ns[3] ] );
+
+			}
 
 			face.daeMaterial = primitive.material;
 			geom.faces.push( face );
@@ -1905,6 +1929,7 @@ THREE.ColladaLoader = function () {
 
 			}
 
+			/*
 			if ( vcount > 3 ) {
 
 				for ( j = 2; j < vs.length - 1; j ++ ) {
@@ -1925,6 +1950,7 @@ THREE.ColladaLoader = function () {
 				}
 
 			}
+			*/
 
 			i += inputs.length * vcount;
 
