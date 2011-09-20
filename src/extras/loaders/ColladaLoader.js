@@ -7,6 +7,9 @@ THREE.ColladaLoader = function () {
 	var COLLADA = null;
 	var scene = null;
 	var daeScene;
+
+	var readyCallbackFunc = null;
+
  	var sources = {};
 	var images = {};
 	var animations = {};
@@ -14,12 +17,13 @@ THREE.ColladaLoader = function () {
 	var geometries = {};
 	var materials = {};
 	var effects = {};
+
 	var visualScenes;
-	var flip_uv = true;
-	var readyCallbackFunc = null;
 	var baseUrl;
 	var morphs;
 	var skins;
+
+	var flip_uv = true;
 	var preferredShading = THREE.SmoothShading;
 
 	function load ( url, readyCallback ) {
@@ -29,8 +33,12 @@ THREE.ColladaLoader = function () {
 			var namespaceURL = "http://www.collada.org/2005/11/COLLADASchema";
 			var rootTagName = "COLLADA";
 
-			var xmldoc = document.implementation.createDocument(namespaceURL, rootTagName, null);
+			var xmldoc = document.implementation.createDocument( namespaceURL, rootTagName, null );
 			var me = this;
+
+			// force reloading
+			// (should be configurable? sometimes caching is desirable)
+
 			url += "?rnd=" + Math.random();
 
 			var req = new XMLHttpRequest();
@@ -38,7 +46,8 @@ THREE.ColladaLoader = function () {
 			if( req.overrideMimeType ) {
 
 				// need this? yes... if extension is other then *.xml :-S
-				req.overrideMimeType("text/xml");
+
+				req.overrideMimeType( "text/xml" );
 
 			}
 
@@ -62,7 +71,7 @@ THREE.ColladaLoader = function () {
 
 		} else {
 
-			alert("Don't know how to parse XML!");
+			alert( "Don't know how to parse XML!" );
 
 		}
 
@@ -75,9 +84,9 @@ THREE.ColladaLoader = function () {
 
 		if ( url !== undefined ) {
 
-			var parts = url.split('/');
+			var parts = url.split( '/' );
 			parts.pop();
-			baseUrl = parts.join('/') + '/';
+			baseUrl = parts.join( '/' ) + '/';
 
 		}
 
@@ -95,7 +104,7 @@ THREE.ColladaLoader = function () {
 		daeScene = parseScene();
 		scene = new THREE.Object3D();
 
-		for ( var i = 0; i < daeScene.nodes.length; i++ ) {
+		for ( var i = 0; i < daeScene.nodes.length; i ++ ) {
 
 			scene.addChild( createSceneGraph( daeScene.nodes[ i ] ) );
 
@@ -246,7 +255,7 @@ THREE.ColladaLoader = function () {
 
 			if ( !daeGeometry.mesh ||
 				 !daeGeometry.mesh.primitives ||
-				 !daeGeometry.mesh.primitives.length) {
+				 !daeGeometry.mesh.primitives.length ) {
 				 continue;
 			}
 
@@ -257,6 +266,7 @@ THREE.ColladaLoader = function () {
 				geometry.morphTargets.push( { name: "target_1", vertices: target.vertices } );
 
 			}
+
 		}
 
 		geometry.morphTargets.push( { name: "target_Z", vertices: geometry.vertices } );
@@ -269,14 +279,14 @@ THREE.ColladaLoader = function () {
 
 		if ( !skinCtrl || !skinCtrl.skin ) {
 
-			console.log("could not find skin controller!");
+			console.log( "could not find skin controller!" );
 			return;
 
 		}
 
 		if ( !ctrl.skeleton || !ctrl.skeleton.length ) {
 
-			console.log("could not find the skeleton for the skin!");
+			console.log( "could not find the skeleton for the skin!" );
 			return;
 
 		}
@@ -328,7 +338,7 @@ THREE.ColladaLoader = function () {
 
 			if ( m instanceof THREE.Matrix4 ) {
 
-				node.world.copy(m);
+				node.world.copy( m );
 
 			}
 
@@ -370,7 +380,7 @@ THREE.ColladaLoader = function () {
 
 			}
 
-			if ( found >= 0 ){
+			if ( found >= 0 ) {
 
 				var inv = skin.invBindMatrices[ found ];
 
@@ -509,49 +519,60 @@ THREE.ColladaLoader = function () {
 
 		// FIXME: controllers
 
-		for ( i =0; i < node.controllers.length; i ++ ) {
+		for ( i = 0; i < node.controllers.length; i ++ ) {
 
-			var controller = controllers[node.controllers[i].url];
+			var controller = controllers[ node.controllers[ i ].url ];
 
 			switch ( controller.type ) {
 
 				case 'skin':
 
-					if ( geometries[controller.skin.source] ) {
+					if ( geometries[ controller.skin.source ] ) {
 
 						var inst_geom = new InstanceGeometry();
-						inst_geom.url = controller.skin.source;
-						inst_geom.instance_material = node.controllers[i].instance_material;
-						node.geometries.push(inst_geom);
-						skinned = true;
-						skinController = node.controllers[i];
 
-					} else if (controllers[controller.skin.source]) {
+						inst_geom.url = controller.skin.source;
+						inst_geom.instance_material = node.controllers[ i ].instance_material;
+
+						node.geometries.push( inst_geom );
+						skinned = true;
+						skinController = node.controllers[ i ];
+
+					} else if ( controllers[ controller.skin.source ] ) {
 
 						// urgh: controller can be chained
 						// handle the most basic case...
-						var second = controllers[controller.skin.source];
+
+						var second = controllers[ controller.skin.source ];
 						morphController = second;
 					//	skinController = node.controllers[i];
-						if (second.morph && geometries[second.morph.source]) {
+
+						if ( second.morph && geometries[ second.morph.source ] ) {
+
 							var inst_geom = new InstanceGeometry();
+
 							inst_geom.url = second.morph.source;
-							inst_geom.instance_material = node.controllers[i].instance_material;
-							node.geometries.push(inst_geom);
+							inst_geom.instance_material = node.controllers[ i ].instance_material;
+
+							node.geometries.push( inst_geom );
+
 						}
+
 					}
 
 					break;
 
 				case 'morph':
 
-					if ( geometries[controller.morph.source] ) {
+					if ( geometries[ controller.morph.source ] ) {
 
 						var inst_geom = new InstanceGeometry();
+
 						inst_geom.url = controller.morph.source;
-						inst_geom.instance_material = node.controllers[i].instance_material;
-						node.geometries.push(inst_geom);
-						morphController = node.controllers[i];
+						inst_geom.instance_material = node.controllers[ i ].instance_material;
+
+						node.geometries.push( inst_geom );
+						morphController = node.controllers[ i ];
 
 					}
 
@@ -559,7 +580,9 @@ THREE.ColladaLoader = function () {
 
 				default:
 					break;
+
 			}
+
 		}
 
 		// FIXME: multi-material mesh?
@@ -576,10 +599,10 @@ THREE.ColladaLoader = function () {
 
 			if ( geometry ) {
 
-				if (!geometry.mesh || !geometry.mesh.primitives)
+				if ( !geometry.mesh || !geometry.mesh.primitives )
 					continue;
 
-				if (obj.name.length == 0) {
+				if ( obj.name.length == 0 ) {
 
 					obj.name = geometry.id;
 
@@ -902,11 +925,13 @@ THREE.ColladaLoader = function () {
 			switch ( child.nodeName ) {
 
 				case 'skin':
+
 					this.skin = (new Skin()).parse(child);
 					this.type = child.nodeName;
 					break;
 
 				case 'morph':
+
 					this.morph = (new Morph()).parse(child);
 					this.type = child.nodeName;
 					break;
@@ -1135,17 +1160,17 @@ THREE.ColladaLoader = function () {
 
 				case 'input':
 
-					inputs.push((new Input()).parse(child));
+					inputs.push( ( new Input() ).parse( child ) );
 					break;
 
 				case 'v':
 
-					v = _ints(child.textContent);
+					v = _ints( child.textContent );
 					break;
 
 				case 'vcount':
 
-					vcount = _ints(child.textContent);
+					vcount = _ints( child.textContent );
 					break;
 
 				default:
@@ -1326,9 +1351,9 @@ THREE.ColladaLoader = function () {
 
 			}
 
-			if (sid == transformSid) {
+			if ( sid == transformSid ) {
 
-				channel.info = {sid:sid, dotSyntax:dotSyntax, arrSyntax:arrSyntax, arrIndices:arrIndices};
+				channel.info = { sid: sid, dotSyntax: dotSyntax, arrSyntax: arrSyntax, arrIndices: arrIndices };
 				return channel;
 
 			}
@@ -1356,6 +1381,7 @@ THREE.ColladaLoader = function () {
 				if ( n ) {
 
 					return n;
+
 				}
 
 			}
@@ -1383,6 +1409,7 @@ THREE.ColladaLoader = function () {
 				if ( n ) {
 
 					return n;
+
 				}
 
 			}
@@ -1424,7 +1451,7 @@ THREE.ColladaLoader = function () {
 		for ( var i = 0; i < element.childNodes.length; i ++ ) {
 
 			var child = element.childNodes[ i ];
-			if (child.nodeType != 1) continue;
+			if ( child.nodeType != 1 ) continue;
 
 			switch ( child.nodeName ) {
 
@@ -1615,6 +1642,7 @@ THREE.ColladaLoader = function () {
 							instance = instances.iterateNext();
 
 						}
+
 					}
 
 					break;
@@ -1654,7 +1682,7 @@ THREE.ColladaLoader = function () {
 
 	};
 
-	InstanceGeometry.prototype.parse = function( element ) {
+	InstanceGeometry.prototype.parse = function ( element ) {
 
 		this.url = element.getAttribute('url').replace(/^#/, '');
 		this.instance_material = [];
@@ -1662,7 +1690,7 @@ THREE.ColladaLoader = function () {
 		for ( var i = 0; i < element.childNodes.length; i ++ ) {
 
 			var child = element.childNodes[i];
-			if (child.nodeType != 1) continue;
+			if ( child.nodeType != 1 ) continue;
 
 			if ( child.nodeName == 'bind_material' ) {
 
@@ -1672,7 +1700,7 @@ THREE.ColladaLoader = function () {
 					XPathResult.ORDERED_NODE_ITERATOR_TYPE,
 					null);
 
-				if (instances) {
+				if ( instances ) {
 
 					var instance = instances.iterateNext();
 
@@ -1718,7 +1746,7 @@ THREE.ColladaLoader = function () {
 					break;
 
 				case 'extra':
-					
+
 					// console.log( child );
 					break;
 
@@ -1748,32 +1776,32 @@ THREE.ColladaLoader = function () {
 
 		for ( i = 0; i < element.childNodes.length; i ++ ) {
 
-			var child = element.childNodes[i];
+			var child = element.childNodes[ i ];
 
-			switch (child.nodeName) {
+			switch ( child.nodeName ) {
 
 				case 'source':
 
-					_source(child);
+					_source( child );
 					break;
 
 				case 'vertices':
 
-					this.vertices = (new Vertices()).parse(child);
+					this.vertices = ( new Vertices() ).parse( child );
 					break;
 
 				case 'triangles':
 
-					this.primitives.push((new Triangles().parse(child)));
+					this.primitives.push( ( new Triangles().parse( child ) ) );
 					break;
 
 				case 'polygons':
 
-					console.warn('polygon holes not yet supported!');
+					console.warn( 'polygon holes not yet supported!' );
 
 				case 'polylist':
 
-					this.primitives.push((new Polylist().parse(child)));
+					this.primitives.push( ( new Polylist().parse( child ) ) );
 					break;
 
 				default:
@@ -1791,7 +1819,7 @@ THREE.ColladaLoader = function () {
 
 			if ( vertex_store[ hash ] === undefined ) {
 
-				vertex_store[ hash ] = { v:v, index:index };
+				vertex_store[ hash ] = { v: v, index: index };
 
 			}
 
@@ -1805,16 +1833,16 @@ THREE.ColladaLoader = function () {
 
 		for ( i = 0, j = 0; i < vertexData.length; i += 3, j ++ ) {
 
-			var v = new THREE.Vertex( new THREE.Vector3( vertexData[i], vertexData[i+1], vertexData[i+2] ) );
-			get_vertex(v, j);
-			this.geometry3js.vertices.push(v);
+			var v = new THREE.Vertex( new THREE.Vector3( vertexData[ i ], vertexData[ i + 1 ], vertexData[ i + 2 ] ) );
+			get_vertex( v, j );
+			this.geometry3js.vertices.push( v );
 
 		}
 
 		for ( i = 0; i < this.primitives.length; i ++ ) {
 
-			primitive = this.primitives[i];
-			primitive.setVertices(this.vertices);
+			primitive = this.primitives[ i ];
+			primitive.setVertices( this.vertices );
 			this.handlePrimitive( primitive, this.geometry3js, vertex_store );
 
 		}
@@ -1837,7 +1865,7 @@ THREE.ColladaLoader = function () {
 
 		for ( j = 0; j < inputs.length; j ++ ) {
 
-			input = inputs[j];
+			input = inputs[ j ];
 
 			switch ( input.semantic ) {
 
@@ -1866,9 +1894,10 @@ THREE.ColladaLoader = function () {
 
 				for ( k = 0; k < inputs.length; k ++ ) {
 
-					input = inputs[k];
-					source = sources[input.source];
-					index = p[i + (j*inputs.length) + input.offset];
+					input = inputs[ k ];
+					source = sources[ input.source ];
+
+					index = p[ i + ( j * inputs.length ) + input.offset ];
 					numParams = source.accessor.params.length;
 					idx32 = index * numParams;
 
@@ -1876,24 +1905,27 @@ THREE.ColladaLoader = function () {
 
 						case 'VERTEX':
 
-							var hash = _hash_vector3( geom.vertices[index].position );
-							vs.push(vertex_store[hash].index);
+							var hash = _hash_vector3( geom.vertices[ index ].position );
+							vs.push( vertex_store[ hash ].index );
+
 							break;
 
 						case 'NORMAL':
 
-							ns.push( new THREE.Vector3( source.data[idx32+0], source.data[idx32+1], source.data[idx32+2] ) );
+							ns.push( new THREE.Vector3( source.data[ idx32 ], source.data[ idx32 + 1 ], source.data[ idx32 + 2 ] ) );
+
 							break;
 
 						case 'TEXCOORD':
 
-							if (ts[input.set] === undefined) ts[input.set] = [];
-							ts[input.set].push( new THREE.UV( source.data[idx32+0], source.data[idx32+1] ) );
+							if ( ts[ input.set ] === undefined ) ts[ input.set ] = [];
+							ts[ input.set ].push( new THREE.UV( source.data[ idx32 ], source.data[ idx32 + 1 ] ) );
+
 							break;
 
 						case 'COLOR':
-							
-							cs.push( new THREE.Color().setRGB(  source.data[idx32+0], source.data[idx32+1], source.data[idx32+2] ) );
+
+							cs.push( new THREE.Color().setRGB( source.data[ idx32 ], source.data[ idx32 + 1 ], source.data[ idx32 + 2 ] ) );
 
 							break;
 
@@ -1914,7 +1946,7 @@ THREE.ColladaLoader = function () {
 				face = new THREE.Face3( vs[0], vs[1], vs[2], [ ns[0], ns[1], ns[2] ] );
 
 			} else if ( vcount == 4 ) {
-			
+
 				face = new THREE.Face4( vs[0], vs[1], vs[2], vs[3], [ ns[0], ns[1], ns[2], ns[3] ] );
 
 			}
@@ -1990,11 +2022,11 @@ THREE.ColladaLoader = function () {
 
 	};
 
-	Triangles.prototype.parse = function(element) {
+	Triangles.prototype.parse = function ( element ) {
 
 		this.inputs = [];
-		this.material = element.getAttribute('material');
-		this.count = _attr_as_int(element, 'count', 0);
+		this.material = element.getAttribute( 'material' );
+		this.count = _attr_as_int( element, 'count', 0 );
 
 		for ( var i = 0; i < element.childNodes.length; i ++ ) {
 
@@ -2004,17 +2036,17 @@ THREE.ColladaLoader = function () {
 
 				case 'input':
 
-					this.inputs.push((new Input()).parse(element.childNodes[i]));
+					this.inputs.push( ( new Input() ).parse( element.childNodes[ i ] ) );
 					break;
 
 				case 'vcount':
 
-					this.vcount = _ints(child.textContent);
+					this.vcount = _ints( child.textContent );
 					break;
 
 				case 'p':
 
-					this.p = _ints(child.textContent);
+					this.p = _ints( child.textContent );
 					break;
 
 				default:
@@ -2037,23 +2069,23 @@ THREE.ColladaLoader = function () {
 
 	};
 
-	Accessor.prototype.parse = function( element ) {
+	Accessor.prototype.parse = function ( element ) {
 
 		this.params = [];
-		this.source = element.getAttribute('source');
-		this.count = _attr_as_int(element, 'count', 0);
-		this.stride = _attr_as_int(element, 'stride', 0);
+		this.source = element.getAttribute( 'source' );
+		this.count = _attr_as_int( element, 'count', 0 );
+		this.stride = _attr_as_int( element, 'stride', 0 );
 
 		for ( var i = 0; i < element.childNodes.length; i ++ ) {
 
-			var child = element.childNodes[i];
+			var child = element.childNodes[ i ];
 
 			if ( child.nodeName == 'param' ) {
 
 				var param = {};
-				param['name'] = child.getAttribute('name');
-				param['type'] = child.getAttribute('type');
-				this.params.push(param);
+				param[ 'name' ] = child.getAttribute( 'name' );
+				param[ 'type' ] = child.getAttribute( 'type' );
+				this.params.push( param );
 
 			}
 
@@ -2133,26 +2165,26 @@ THREE.ColladaLoader = function () {
 
 				case 'bool_array':
 
-					this.data = _bools(child.textContent);
+					this.data = _bools( child.textContent );
 					this.type = child.nodeName;
 					break;
 
 				case 'float_array':
 
-					this.data = _floats(child.textContent);
+					this.data = _floats( child.textContent );
 					this.type = child.nodeName;
 					break;
 
 				case 'int_array':
 
-					this.data = _ints(child.textContent);
+					this.data = _ints( child.textContent );
 					this.type = child.nodeName;
 					break;
 
 				case 'IDREF_array':
 				case 'Name_array':
 
-					this.data = _strings(child.textContent);
+					this.data = _strings( child.textContent );
 					this.type = child.nodeName;
 					break;
 
@@ -2160,9 +2192,9 @@ THREE.ColladaLoader = function () {
 
 					for ( var j = 0; j < child.childNodes.length; j ++ ) {
 
-						if ( child.childNodes[j].nodeName == 'accessor' ) {
+						if ( child.childNodes[ j ].nodeName == 'accessor' ) {
 
-							this.accessor = (new Accessor()).parse(child.childNodes[j]);
+							this.accessor = ( new Accessor() ).parse( child.childNodes[ j ] );
 							break;
 
 						}
@@ -2187,11 +2219,11 @@ THREE.ColladaLoader = function () {
 
 		//for (var i = 0; i < this.accessor.params.length; i++) {
 
-			var param = this.accessor.params[0];
+			var param = this.accessor.params[ 0 ];
 
 			//console.log(param.name + " " + param.type);
 
-			switch (param.type) {
+			switch ( param.type ) {
 
 				case 'IDREF':
 				case 'Name':
@@ -2203,7 +2235,7 @@ THREE.ColladaLoader = function () {
 
 					for ( var j = 0; j < this.data.length; j += 16 ) {
 
-						var s = this.data.slice(j, j+16);
+						var s = this.data.slice( j, j + 16 );
 						var m = new THREE.Matrix4();
 						m.set(
 							s[0], s[1], s[2], s[3],
@@ -2211,7 +2243,7 @@ THREE.ColladaLoader = function () {
 							s[8], s[9], s[10], s[11],
 							s[12], s[13], s[14], s[15]
 							);
-						result.push(m);
+						result.push( m );
 					}
 
 					break;
@@ -2239,14 +2271,16 @@ THREE.ColladaLoader = function () {
 
 	Material.prototype.parse = function ( element ) {
 
-		this.id = element.getAttribute('id');
-		this.name = element.getAttribute('name');
+		this.id = element.getAttribute( 'id' );
+		this.name = element.getAttribute( 'name' );
 
 		for ( var i = 0; i < element.childNodes.length; i ++ ) {
 
-			if (element.childNodes[i].nodeName == 'instance_effect') {
-				this.instance_effect = (new InstanceEffect()).parse(element.childNodes[i]);
+			if ( element.childNodes[ i ].nodeName == 'instance_effect' ) {
+
+				this.instance_effect = ( new InstanceEffect() ).parse( element.childNodes[ i ] );
 				break;
+
 			}
 
 		}
@@ -2257,8 +2291,8 @@ THREE.ColladaLoader = function () {
 
 	function ColorOrTexture () {
 
-		this.color = new THREE.Color(0);
-		this.color.setRGB(Math.random(), Math.random(), Math.random());
+		this.color = new THREE.Color( 0 );
+		this.color.setRGB( Math.random(), Math.random(), Math.random() );
 		this.color.a = 1.0;
 
 		this.texture = null;
@@ -2268,13 +2302,13 @@ THREE.ColladaLoader = function () {
 
 	ColorOrTexture.prototype.isColor = function () {
 
-		return (this.texture == null);
+		return ( this.texture == null );
 
 	};
 
 	ColorOrTexture.prototype.isTexture = function () {
 
-		return (this.texture != null);
+		return ( this.texture != null );
 
 	};
 
@@ -2282,16 +2316,16 @@ THREE.ColladaLoader = function () {
 
 		for ( var i = 0; i < element.childNodes.length; i ++ ) {
 
-			var child = element.childNodes[i];
-			if (child.nodeType != 1) continue;
+			var child = element.childNodes[ i ];
+			if ( child.nodeType != 1 ) continue;
 
 			switch ( child.nodeName ) {
 
 				case 'color':
 
-					var rgba = _floats(child.textContent);
+					var rgba = _floats( child.textContent );
 					this.color = new THREE.Color(0);
-					this.color.setRGB(rgba[0], rgba[1], rgba[2]);
+					this.color.setRGB( rgba[0], rgba[1], rgba[2] );
 					this.color.a = rgba[3];
 					break;
 
@@ -2324,10 +2358,10 @@ THREE.ColladaLoader = function () {
 
 		for ( var i = 0; i < element.childNodes.length; i ++ ) {
 
-			var child = element.childNodes[i];
-			if (child.nodeType != 1) continue;
+			var child = element.childNodes[ i ];
+			if ( child.nodeType != 1 ) continue;
 
-			switch (child.nodeName) {
+			switch ( child.nodeName ) {
 
 				case 'ambient':
 				case 'emission':
@@ -2335,16 +2369,18 @@ THREE.ColladaLoader = function () {
 				case 'specular':
 				case 'transparent':
 
-					this[child.nodeName] = (new ColorOrTexture()).parse(child);
+					this[ child.nodeName ] = ( new ColorOrTexture() ).parse( child );
 					break;
 
 				case 'shininess':
 				case 'reflectivity':
 				case 'transparency':
 
-					var f = evaluateXPath(child, ".//dae:float");
-					if (f.length > 0)
-						this[child.nodeName] = parseFloat(f[0].textContent);
+					var f = evaluateXPath( child, ".//dae:float" );
+
+					if ( f.length > 0 )
+						this[ child.nodeName ] = parseFloat( f[ 0 ].textContent );
+
 					break;
 
 				default:
@@ -2381,7 +2417,7 @@ THREE.ColladaLoader = function () {
 
 							if ( this.effect.sampler && this.effect.surface ) {
 
-								if (this.effect.sampler.source == this.effect.surface.sid) {
+								if ( this.effect.sampler.source == this.effect.surface.sid ) {
 
 									var image = images[this.effect.surface.init_from];
 
@@ -2394,19 +2430,20 @@ THREE.ColladaLoader = function () {
 										props['map'].repeat.y = -1;
 
 									}
+
 								}
 
 							}
 
 						} else {
 
-							if (prop == 'diffuse') {
+							if ( prop == 'diffuse' ) {
 
-								props['color'] = cot.color.getHex();
+								props[ 'color' ] = cot.color.getHex();
 
-							} else if (!transparent) {
+							} else if ( !transparent ) {
 
-								props[prop] = cot.color.getHex();
+								props[ prop ] = cot.color.getHex();
 
 							}
 
@@ -2419,18 +2456,19 @@ THREE.ColladaLoader = function () {
 				case 'shininess':
 				case 'reflectivity':
 
-					props[prop] = this[prop];
+					props[ prop ] = this[ prop ];
 					break;
 
 				case 'transparency':
 
 					if ( transparent ) {
 
-						props['transparent'] = true;
-						props['opacity'] = this[prop];
+						props[ 'transparent' ] = true;
+						props[ 'opacity' ] = this[ prop ];
 						transparent = true;
 
 					}
+
 					break;
 
 				default:
@@ -2482,8 +2520,8 @@ THREE.ColladaLoader = function () {
 
 		for ( var i = 0; i < element.childNodes.length; i ++ ) {
 
-			var child = element.childNodes[i];
-			if (child.nodeType != 1) continue;
+			var child = element.childNodes[ i ];
+			if ( child.nodeType != 1 ) continue;
 
 			switch ( child.nodeName ) {
 
@@ -2499,7 +2537,7 @@ THREE.ColladaLoader = function () {
 
 				default:
 
-					console.log("unhandled Surface prop: " + child.nodeName);
+					console.log( "unhandled Surface prop: " + child.nodeName );
 					break;
 
 			}
@@ -2529,7 +2567,7 @@ THREE.ColladaLoader = function () {
 			var child = element.childNodes[ i ];
 			if ( child.nodeType != 1 ) continue;
 
-			switch ( child.nodeName) {
+			switch ( child.nodeName ) {
 
 				case 'source':
 
@@ -2563,7 +2601,7 @@ THREE.ColladaLoader = function () {
 
 				default:
 
-					console.log("unhandled Sampler2D prop: " + child.nodeName);
+					console.log( "unhandled Sampler2D prop: " + child.nodeName );
 					break;
 
 			}
@@ -2709,7 +2747,7 @@ THREE.ColladaLoader = function () {
 		for ( var i = 0; i < element.childNodes.length; i ++ ) {
 
 			var child = element.childNodes[i];
-			if (child.nodeType != 1) continue;
+			if ( child.nodeType != 1 ) continue;
 
 			switch ( child.nodeName ) {
 
@@ -2976,6 +3014,7 @@ THREE.ColladaLoader = function () {
 		if ( nsPrefix == "dae" ) {
 
 			return "http://www.collada.org/2005/11/COLLADASchema";
+
 		}
 
 		return null;
@@ -2987,9 +3026,10 @@ THREE.ColladaLoader = function () {
 		var raw = _strings( str );
 		var data = [];
 
-		for (var i = 0; i < raw.length; i ++ ) {
+		for ( var i = 0; i < raw.length; i ++ ) {
 
 			data.push( (raw[i] == 'true' || raw[i] == '1') ? true : false );
+
 		}
 
 		return data;
