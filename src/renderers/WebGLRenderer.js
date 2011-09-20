@@ -3973,6 +3973,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			object = scene.__webglSprites[ o ];
 
+			if ( !object.visible ) continue;
+
 			if( !object.useScreenCoordinates ) {
 
 				object._modelViewMatrix.multiplyToArray( camera.matrixWorldInverse, object.matrixWorld, object._modelViewMatrixArray );
@@ -3988,13 +3990,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		scene.__webglSprites.sort( painterSort );
 
-		// render all non-custom shader sprites
+		// render all sprites
 
 		for ( o = 0, ol = scene.__webglSprites.length; o < ol; o ++ ) {
 
 			object = scene.__webglSprites[ o ];
 
-			if ( object.map && object.map.image && object.map.image.width ) {
+			if ( object.visible && object.map && object.map.image && object.map.image.width ) {
 
 				if ( object.useScreenCoordinates ) {
 
@@ -4012,14 +4014,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 				size = object.map.image.width / ( object.scaleByViewport ? _viewportHeight : 1 );
+
 				scale[ 0 ] = size * invAspect * object.scale.x;
 				scale[ 1 ] = size * object.scale.y;
 
 				_gl.uniform2f( uniforms.uvScale, object.uvScale.x, object.uvScale.y );
 				_gl.uniform2f( uniforms.uvOffset, object.uvOffset.x, object.uvOffset.y );
 				_gl.uniform2f( uniforms.alignment, object.alignment.x, object.alignment.y );
+
 				_gl.uniform1f( uniforms.opacity, object.opacity );
 				_gl.uniform3f( uniforms.color, object.color.r, object.color.g, object.color.b );
+
 				_gl.uniform1f( uniforms.rotation, object.rotation );
 				_gl.uniform2fv( uniforms.scale, scale );
 

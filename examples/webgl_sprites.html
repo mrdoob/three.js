@@ -43,7 +43,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.Camera( 60, window.innerWidth / window.innerHeight, 1, 5000 );
 				camera.position.z = 1500;
 
 				scene = new THREE.Scene();
@@ -89,17 +89,17 @@
 
 				// add 2d-sprites
 
-				sprite = new THREE.Sprite( { map: mapA, alignment:THREE.SpriteAlignment.topLeft } );
+				sprite = new THREE.Sprite( { map: mapA, alignment: THREE.SpriteAlignment.topLeft } );
 				sprite.position.set( 100, 100, 0 );
 				sprite.opacity = 0.25;
 				scene.add( sprite );
 
-				sprite = new THREE.Sprite( { map: mapA, alignment:THREE.SpriteAlignment.topLeft } );
+				sprite = new THREE.Sprite( { map: mapA, alignment: THREE.SpriteAlignment.topLeft } );
 				sprite.position.set( 150, 150, 2 );
 				sprite.opacity = 0.5;
 				scene.add( sprite );
 
-				sprite = new THREE.Sprite( { map: mapA, alignment:THREE.SpriteAlignment.topLeft } );
+				sprite = new THREE.Sprite( { map: mapA, alignment: THREE.SpriteAlignment.topLeft } );
 				sprite.position.set( 200, 200, 3 );
 				sprite.opacity = 1;
 				scene.add( sprite );
