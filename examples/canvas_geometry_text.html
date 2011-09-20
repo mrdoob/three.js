@@ -1,9 +1,9 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
-		<title>three.js canvas/webgl - geometry - text</title>
+		<title>three.js canvas - geometry - text</title>
 		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style type="text/css">
 			body {
 				font-family: Monospace;
@@ -90,26 +90,26 @@
 				text3d.computeBoundingBox();
 				var centerOffset = -0.5 * ( text3d.boundingBox.x[ 1 ] - text3d.boundingBox.x[ 0 ] );
 
-                var textMaterial = new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, wireframe: false } );
-                text = new THREE.Mesh( text3d, textMaterial );
+				var textMaterial = new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, wireframe: false } );
+				text = new THREE.Mesh( text3d, textMaterial );
 
-                text.doubleSided = false;
+				text.doubleSided = false;
 
-                text.position.x = centerOffset;
-                text.position.y = 100;
-                text.position.z = 0;
+				text.position.x = centerOffset;
+				text.position.y = 100;
+				text.position.z = 0;
 
-                text.rotation.x = 0;
-                text.rotation.y = Math.PI * 2;
+				text.rotation.x = 0;
+				text.rotation.y = Math.PI * 2;
 				text.overdraw = true;
 
 				parent = new THREE.Object3D();
-                parent.add( text );
+				parent.add( text );
 
 				scene.add( parent );
 
 				renderer = new THREE.CanvasRenderer();
-                renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.appendChild( renderer.domElement );
 
