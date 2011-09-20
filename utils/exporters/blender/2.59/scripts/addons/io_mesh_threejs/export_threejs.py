@@ -1012,7 +1012,7 @@ def generate_ascii_model(meshes, morphs,
 # Model exporter - export single mesh
 # #####################################################
 
-def extract_meshes(objects, scene, export_single_model, option_scale):
+def extract_meshes(objects, scene, export_single_model, option_scale, flipyz):
 
     meshes = []
 
@@ -1030,7 +1030,7 @@ def extract_meshes(objects, scene, export_single_model, option_scale):
             # that's what Blender's native export_obj.py does
             # to flip YZ
 
-            if export_single_model:
+            if flipyz and export_single_model:
                 X_ROT = mathutils.Matrix.Rotation(-math.pi/2, 4, 'X')
                 mesh.transform(X_ROT * object.matrix_world)
 
@@ -1058,7 +1058,7 @@ def generate_mesh_string(objects, scene,
                 option_animation,
                 option_frame_step):
 
-    meshes = extract_meshes(objects, scene, export_single_model, option_scale)
+    meshes = extract_meshes(objects, scene, export_single_model, option_scale, flipyz)
 
     morphs = []
 
@@ -1071,7 +1071,7 @@ def generate_mesh_string(objects, scene,
         for frame in scene_frames:
             scene.frame_set(frame, 0.0)
 
-            anim_meshes = extract_meshes(objects, scene, export_single_model, option_scale)
+            anim_meshes = extract_meshes(objects, scene, export_single_model, option_scale, flipyz)
 
             frame_vertices = []
 
