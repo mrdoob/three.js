@@ -69,7 +69,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_preserveDrawingBuffer = parameters.preserveDrawingBuffer !== undefined ? parameters.preserveDrawingBuffer : false,
 	_antialias = parameters.antialias !== undefined ? parameters.antialias : false,
 	_clearColor = parameters.clearColor !== undefined ? new THREE.Color( parameters.clearColor ) : new THREE.Color( 0x000000 ),
-	_clearAlpha = parameters.clearAlpha !== undefined ? parameters.clearAlpha : 0;
+	_clearAlpha = parameters.clearAlpha !== undefined ? parameters.clearAlpha : 0,
 	_maxLights = parameters.maxLights !== undefined ? parameters.maxLights : 4;
 
 	this.info = {
@@ -180,7 +180,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_sprite.vertices = new Float32Array( 8 + 8 );
 	_sprite.faces    = new Uint16Array( 6 );
 
-	i = 0;
+	var i = 0;
 
 	_sprite.vertices[ i++ ] = -1; _sprite.vertices[ i++ ] = -1;	// vertex 0
 	_sprite.vertices[ i++ ] = 0;  _sprite.vertices[ i++ ] = 1;	// uv 0
@@ -195,6 +195,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_sprite.vertices[ i++ ] = 0;  _sprite.vertices[ i++ ] = 0;	// uv 3
 
 	i = 0;
+
 	_sprite.faces[ i++ ] = 0; _sprite.faces[ i++ ] = 1; _sprite.faces[ i++ ] = 2;
 	_sprite.faces[ i++ ] = 0; _sprite.faces[ i++ ] = 2; _sprite.faces[ i++ ] = 3;
 
