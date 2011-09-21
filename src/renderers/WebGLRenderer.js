@@ -3320,7 +3320,7 @@ THREE.WebGLRenderer = function ( parameters ) {
       root = root.parent;
     }
 
-    radius = - object.geometry.boundingsphere.radius * Math.max( scale.x, Math.max( scale.y, scale.z ) );
+    radius = - object.geometry.boundingSphere.radius * Math.max( scale.x, Math.max( scale.y, scale.z ) );
 
 		for ( var i = 0; i < 6; i ++ ) {
 
