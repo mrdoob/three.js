@@ -1943,14 +1943,14 @@ THREE.ColladaLoader = function () {
 
 			if ( vcount == 3 ) {
 
-				face = new THREE.Face3( vs[0], vs[1], vs[2], [ ns[0], ns[1], ns[2] ] );
+				face = new THREE.Face3( vs[0], vs[1], vs[2], [ ns[0], ns[1], ns[2] ], cs.length ? cs : new THREE.Color() );
 
 			} else if ( vcount == 4 ) {
 
-				face = new THREE.Face4( vs[0], vs[1], vs[2], vs[3], [ ns[0], ns[1], ns[2], ns[3] ] );
+				face = new THREE.Face4( vs[0], vs[1], vs[2], vs[3], [ ns[0], ns[1], ns[2], ns[3] ], cs.length ? cs : new THREE.Color() );
 
 			}
-
+			
 			face.daeMaterial = primitive.material;
 			geom.faces.push( face );
 
