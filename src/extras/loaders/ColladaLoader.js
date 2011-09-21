@@ -106,7 +106,7 @@ THREE.ColladaLoader = function () {
 
 		for ( var i = 0; i < daeScene.nodes.length; i ++ ) {
 
-			scene.addChild( createSceneGraph( daeScene.nodes[ i ] ) );
+			scene.add( createSceneGraph( daeScene.nodes[ i ] ) );
 
 		}
 
@@ -675,7 +675,7 @@ THREE.ColladaLoader = function () {
 
 				}
 
-				obj.addChild( mesh );
+				obj.add( mesh );
 
 			}
 
@@ -683,7 +683,7 @@ THREE.ColladaLoader = function () {
 
 		for ( i = 0; i < node.nodes.length; i ++ ) {
 
-			obj.addChild(createSceneGraph(node.nodes[i], node));
+			obj.add( createSceneGraph( node.nodes[i], node ) );
 
 		}
 

@@ -1,256 +1,254 @@
+<!doctype html>
+<html lang="en">
+	<head> 
+		<title>three.js webgl - intersection: ray with mesh (through box)</title> 
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style type="text/css"> 
+			body {
+				font-family: Monospace;
+				background-color: #f0f0f0;
+				margin: 0px;
+				overflow: hidden;
+			}
+			 
+			#oldie { background-color: #ddd !important }
 
-<html> 
- 
-<head> 
-<title>three.js webgl - intersection: ray with mesh (through box)</title> 
-<meta http-equiv="content-type" content="text/html; charset=utf-8"> 
-<style type="text/css"> 
+			#info {
+				position: absolute;
+				top: 30px; left: 10px; width: 800px;
+				color: #000000;
+				padding: 5px;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: left;
+				z-index:100;
+			}
 
-body {
-	font-family: Monospace;
-	background-color: #f0f0f0;
-	margin: 0px;
-	overflow: hidden;
-}
- 
-#oldie { background-color: #ddd !important }
+			#options {
+				position: absolute;
+				top: 10px; left: 10px; width: 800px;
+				color: #000000;
+				padding: 5px;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: left;
+				z-index:100;
+			}
+		</style>
+		 
+		<script type="text/javascript" src="../build/Three.js"></script> 
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
+		<script type="text/javascript" src="js/Stats.js"></script>
 
-#info {
-	position: absolute;
-	top: 30px; left: 10px; width: 800px;
-	color: #000000;
-	padding: 5px;
-	font-family: Monospace;
-	font-size: 13px;
-	text-align: left;
-	z-index:100;
-}
+		<script type="text/javascript"> 
 
-#options {
-	position: absolute;
-	top: 10px; left: 10px; width: 800px;
-	color: #000000;
-	padding: 5px;
-	font-family: Monospace;
-	font-size: 13px;
-	text-align: left;
-	z-index:100;
-}
+			var camera, scene, projector, renderer,
+			info, mouse = { x: 0, y: 0 }, sun, loader, stats;
 
-</style>
- 
-<script type="text/javascript" src="../build/Three.js"></script> 
-<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-<script type="text/javascript" src="js/Stats.js"></script>
+			var meshes = [];
 
-<script type="text/javascript"> 
+			var theta = 0;
+			var camdist = 1500;
 
-var camera, scene, projector, renderer,
-info, mouse = { x: 0, y: 0 }, sun, loader, stats;
+			var totalFaces = 0, totalColliders = 0;
 
-var meshes = [];
+			function init() {
 
-var theta = 0;
-var camdist = 1500;
-
-var totalFaces = 0, totalColliders = 0;
-
-function init() {
-
-	container = document.createElement( 'div' );
-	document.body.appendChild( container );
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
 	
-	info = document.getElementById("info");
+				info = document.getElementById("info");
 	
-	camera = new THREE.Camera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
-	camera.position.z = camdist;
+				camera = new THREE.Camera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.z = camdist;
 	
-	loader = new THREE.JSONLoader(  );
+				loader = new THREE.JSONLoader(  );
 
-	scene = new THREE.Scene();
+				scene = new THREE.Scene();
 
-	projector = new THREE.Projector();
+				projector = new THREE.Projector();
 
-	renderer = new THREE.WebGLRenderer();
-	renderer.setSize( window.innerWidth, window.innerHeight );
-	container.appendChild( renderer.domElement );
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
 	
-	var ambientLight = new THREE.AmbientLight( 0x606060 );
-	scene.add( ambientLight );
+				var ambientLight = new THREE.AmbientLight( 0x606060 );
+				scene.add( ambientLight );
 
-	sun = new THREE.DirectionalLight( 0xffffff );
-	sun.position = camera.position.clone();
-	scene.add( sun );
+				sun = new THREE.DirectionalLight( 0xffffff );
+				sun.position = camera.position.clone();
+				scene.add( sun );
 	
-	loadCube();
+				loadCube();
 
-	stats = new Stats();
-	stats.domElement.style.position = 'absolute';
-	stats.domElement.style.top = '0px';
-	container.appendChild( stats.domElement );
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild( stats.domElement );
 
-	container.onmousemove = onDocumentMouseMove;
-	animate();
+				container.onmousemove = onDocumentMouseMove;
+				animate();
 
-}
+			}
 
-function loadCube(p) {
+			function loadCube(p) {
 
-	var onGeometry = function( geometry ) {	
+				var onGeometry = function( geometry ) {	
 	
-		var sx = 300;
-		var sy = 240;
-		var sz = 300;
+					var sx = 300;
+					var sy = 240;
+					var sz = 300;
 		
-		addCube( new THREE.Vector3(-sx,	0,	0), geometry );
-		addCube( new THREE.Vector3(	0,	0,	0), geometry );
-		addCube( new THREE.Vector3( sx,	0,	0), geometry );
+					addCube( new THREE.Vector3(-sx,	0,	0), geometry );
+					addCube( new THREE.Vector3(	0,	0,	0), geometry );
+					addCube( new THREE.Vector3( sx,	0,	0), geometry );
 		
-		addCube( new THREE.Vector3(-sx, sy,	0), geometry );
-		addCube( new THREE.Vector3(	0,  sy,	0), geometry );
-		addCube( new THREE.Vector3( sx, sy,	0), geometry );
+					addCube( new THREE.Vector3(-sx, sy,	0), geometry );
+					addCube( new THREE.Vector3(	0,  sy,	0), geometry );
+					addCube( new THREE.Vector3( sx, sy,	0), geometry );
 		
-		addCube( new THREE.Vector3(-sx,-sy,	0), geometry );
-		addCube( new THREE.Vector3(	0, -sy,	0), geometry );
-		addCube( new THREE.Vector3( sx,-sy,	0), geometry );
+					addCube( new THREE.Vector3(-sx,-sy,	0), geometry );
+					addCube( new THREE.Vector3(	0, -sy,	0), geometry );
+					addCube( new THREE.Vector3( sx,-sy,	0), geometry );
 		
-		addCube( new THREE.Vector3(-sx,	0,	sz), geometry );
-		addCube( new THREE.Vector3(	0,	0,	sz), geometry );
-		addCube( new THREE.Vector3( sx,	0,	sz), geometry );
+					addCube( new THREE.Vector3(-sx,	0,	sz), geometry );
+					addCube( new THREE.Vector3(	0,	0,	sz), geometry );
+					addCube( new THREE.Vector3( sx,	0,	sz), geometry );
 		
-		addCube( new THREE.Vector3(-sx, sy,	sz), geometry );
-		addCube( new THREE.Vector3(	0,  sy,	sz), geometry );
-		addCube( new THREE.Vector3( sx, sy,	sz), geometry );
+					addCube( new THREE.Vector3(-sx, sy,	sz), geometry );
+					addCube( new THREE.Vector3(	0,  sy,	sz), geometry );
+					addCube( new THREE.Vector3( sx, sy,	sz), geometry );
 		
-		addCube( new THREE.Vector3(-sx,-sy,	sz), geometry );
-		addCube( new THREE.Vector3(	0, -sy,	sz), geometry );
-		addCube( new THREE.Vector3( sx,-sy,	sz), geometry );
+					addCube( new THREE.Vector3(-sx,-sy,	sz), geometry );
+					addCube( new THREE.Vector3(	0, -sy,	sz), geometry );
+					addCube( new THREE.Vector3( sx,-sy,	sz), geometry );
 		
-		addCube( new THREE.Vector3(-sx,	0,	-sz), geometry );
-		addCube( new THREE.Vector3(	0,	0,	-sz), geometry );
-		addCube( new THREE.Vector3( sx,	0,	-sz), geometry );
+					addCube( new THREE.Vector3(-sx,	0,	-sz), geometry );
+					addCube( new THREE.Vector3(	0,	0,	-sz), geometry );
+					addCube( new THREE.Vector3( sx,	0,	-sz), geometry );
 		
-		addCube( new THREE.Vector3(-sx, sy,	-sz), geometry );
-		addCube( new THREE.Vector3(	0,  sy,	-sz), geometry );
-		addCube( new THREE.Vector3( sx, sy,	-sz), geometry );
+					addCube( new THREE.Vector3(-sx, sy,	-sz), geometry );
+					addCube( new THREE.Vector3(	0,  sy,	-sz), geometry );
+					addCube( new THREE.Vector3( sx, sy,	-sz), geometry );
 		
-		addCube( new THREE.Vector3(-sx,-sy,	-sz), geometry );
-		addCube( new THREE.Vector3(	0, -sy,	-sz), geometry );
-		addCube( new THREE.Vector3( sx,-sy,	-sz), geometry );
+					addCube( new THREE.Vector3(-sx,-sy,	-sz), geometry );
+					addCube( new THREE.Vector3(	0, -sy,	-sz), geometry );
+					addCube( new THREE.Vector3( sx,-sy,	-sz), geometry );
 		
-		addCube( new THREE.Vector3(-sx,	0,	-sz*2), geometry );
-		addCube( new THREE.Vector3(	0,	0,	-sz*2), geometry );
-		addCube( new THREE.Vector3( sx,	0,	-sz*2), geometry );
+					addCube( new THREE.Vector3(-sx,	0,	-sz*2), geometry );
+					addCube( new THREE.Vector3(	0,	0,	-sz*2), geometry );
+					addCube( new THREE.Vector3( sx,	0,	-sz*2), geometry );
 		
-		addCube( new THREE.Vector3(-sx, sy,	-sz*2), geometry );
-		addCube( new THREE.Vector3(	0,  sy,	-sz*2), geometry );
-		addCube( new THREE.Vector3( sx, sy,	-sz*2), geometry );
+					addCube( new THREE.Vector3(-sx, sy,	-sz*2), geometry );
+					addCube( new THREE.Vector3(	0,  sy,	-sz*2), geometry );
+					addCube( new THREE.Vector3( sx, sy,	-sz*2), geometry );
 		
-		addCube( new THREE.Vector3(-sx,-sy,	-sz*2), geometry );
-		addCube( new THREE.Vector3(	0, -sy,	-sz*2), geometry );
-		addCube( new THREE.Vector3( sx,-sy,	-sz*2), geometry );
+					addCube( new THREE.Vector3(-sx,-sy,	-sz*2), geometry );
+					addCube( new THREE.Vector3(	0, -sy,	-sz*2), geometry );
+					addCube( new THREE.Vector3( sx,-sy,	-sz*2), geometry );
 		
-		// info.innerHTML = "Total colliders: " + totalColliders + " (Faces: " + totalFaces + ")<br>";
+					// info.innerHTML = "Total colliders: " + totalColliders + " (Faces: " + totalFaces + ")<br>";
 	
-	};
+				};
 
 	
-	loader.load( { model: "obj/suzanne/suzanneHi.js", callback: onGeometry } );
-}
+				loader.load( { model: "obj/suzanne/suzanneHi.js", callback: onGeometry } );
+			}
 
-function addCube( p, g) {
+			function addCube( p, g) {
 
-	totalFaces += g.faces.length;
-	totalColliders++;
+				totalFaces += g.faces.length;
+				totalColliders++;
 
-	var mesh = new THREE.Mesh( g, new THREE.MeshLambertMaterial( { color: 0x003300 } ) );
-	mesh.position = p;
+				var mesh = new THREE.Mesh( g, new THREE.MeshLambertMaterial( { color: 0x003300 } ) );
+				mesh.position = p;
 	
-	//mesh.rotation.x = Math.random() * Math.PI;
-	//mesh.rotation.y = Math.random() * Math.PI;
-	//mesh.rotation.z = Math.random() * Math.PI;
+				//mesh.rotation.x = Math.random() * Math.PI;
+				//mesh.rotation.y = Math.random() * Math.PI;
+				//mesh.rotation.z = Math.random() * Math.PI;
 	
-	//mesh.scale.x = Math.random() + 0.5;
-	//mesh.scale.y = Math.random() + 0.5;
-	//mesh.scale.z = Math.random() + 0.5;
+				//mesh.scale.x = Math.random() + 0.5;
+				//mesh.scale.y = Math.random() + 0.5;
+				//mesh.scale.z = Math.random() + 0.5;
 	
-	scene.add( mesh );
-	var mc = THREE.CollisionUtils.MeshColliderWBox(mesh);
-	THREE.Collisions.colliders.push( mc );
-	meshes.push( mesh );
+				scene.add( mesh );
+				var mc = THREE.CollisionUtils.MeshColliderWBox(mesh);
+				THREE.Collisions.colliders.push( mc );
+				meshes.push( mesh );
 
-};
+			};
 
-function onDocumentMouseMove( event ) {
+			function onDocumentMouseMove( event ) {
 
-	event.preventDefault();	
-	mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-	mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+				event.preventDefault();	
+				mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+				mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
-};
+			};
 
 
-function animate() {
+			function animate() {
 
-	requestAnimationFrame( animate );
+				requestAnimationFrame( animate );
 	
-	if( meshes.length == 0 ) return;
+				if( meshes.length == 0 ) return;
 	
-	var i, l = meshes.length;
+				var i, l = meshes.length;
 	
-	for ( i = 0; i < l; i++ ) {
+				for ( i = 0; i < l; i++ ) {
 
-		meshes[ i ].materials[ 0 ].color.setHex( 0x003300 );
+					meshes[ i ].materials[ 0 ].color.setHex( 0x003300 );
 
-	}
+				}
 
-	var vector = new THREE.Vector3( mouse.x, mouse.y, 0.5 );
-	projector.unprojectVector( vector, camera );
+				var vector = new THREE.Vector3( mouse.x, mouse.y, 0.5 );
+				projector.unprojectVector( vector, camera );
 
-	var ray = new THREE.Ray( camera.position, vector.subSelf( camera.position ).normalize() );
+				var ray = new THREE.Ray( camera.position, vector.subSelf( camera.position ).normalize() );
 
-	var c = THREE.Collisions.rayCastNearest( ray );
+				var c = THREE.Collisions.rayCastNearest( ray );
 	
-	if( c ) {
+				if( c ) {
 	
-		//info.innerHTML += "Found @ distance " + c.distance;
-		c.mesh.materials[ 0 ].color.setHex( 0xbb0000 );
+					//info.innerHTML += "Found @ distance " + c.distance;
+					c.mesh.materials[ 0 ].color.setHex( 0xbb0000 );
 
-	} else {
+				} else {
 	
-		//info.innerHTML += "No intersection";
+					//info.innerHTML += "No intersection";
 
-	}
+				}
 
-	camera.position.x = camdist * Math.cos( theta );
-	camera.position.z = camdist * Math.sin( theta );
-	camera.position.y = camdist/2 * Math.sin( theta * 2) ;
+				camera.position.x = camdist * Math.cos( theta );
+				camera.position.z = camdist * Math.sin( theta );
+				camera.position.y = camdist/2 * Math.sin( theta * 2) ;
 
-	sun.position.copy( camera.position );
-	sun.position.normalize();
+				sun.position.copy( camera.position );
+				sun.position.normalize();
 
-	theta += 0.005;		
+				theta += 0.005;		
 
-	renderer.render( scene, camera );
+				renderer.render( scene, camera );
 	
-	stats.update();
+				stats.update();
 	
-};
+			};
 
-function vts(v) {
+			function vts(v) {
 
-	if(!v) return "undefined<br>";
-	else return v.x + " , " + v.y + " , " + v.z + "<br>";
+				if(!v) return "undefined<br>";
+				else return v.x + " , " + v.y + " , " + v.z + "<br>";
 
-};
+			};
 
-</script>
+		</script>
 
-</head> 
+	</head> 
 
-<body onload="init();"> 
-<div id="info"></div>
-<div id="options"></div>
-</body> 
+	<body onload="init();"> 
+		<div id="info"></div>
+		<div id="options"></div>
+	</body> 
 
 </html> 
