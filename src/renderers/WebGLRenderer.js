@@ -3308,8 +3308,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function isInFrustum( object ) {
 
-		var distance, matrix = object.matrixWorld,
-		radius = - object.geometry.boundingSphere.radius * Math.max( object.scale.x, Math.max( object.scale.y, object.scale.z ) );
+		var 
+      distance,
+      radius,
+      matrix = object.matrixWorld,
+      scale = object.scale.clone(),
+      root = object.parent;
+
+    while ( root ) {
+      scale.multiplySelf( root.scale );
+      root = root.parent;
+    }
+
+    radius = - object.geometry.boundingsphere.radius * Math.max( scale.x, Math.max( scale.y, scale.z ) );
 
 		for ( var i = 0; i < 6; i ++ ) {
 
