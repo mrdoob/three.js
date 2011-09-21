@@ -33,6 +33,7 @@ if ( THREE.WebGLRenderer ) {
 				"mapRight": { type: "t", value: 1, texture: _renderTargetR }
 
 			},
+
 			vertexShader: [
 
 				"varying vec2 vUv;",
@@ -45,6 +46,7 @@ if ( THREE.WebGLRenderer ) {
 				"}"
 
 			].join("\n"),
+
 			fragmentShader: [
 
 				"uniform sampler2D mapLeft;",
@@ -70,7 +72,7 @@ if ( THREE.WebGLRenderer ) {
 		} );
 
 		var _scene = new THREE.Scene();
-		_scene.addObject( new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), _material ) );
+		_scene.add( new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), _material ) );
 
 		this.setSize = function ( width, height ) {
 
@@ -89,12 +91,12 @@ if ( THREE.WebGLRenderer ) {
 		 * Each camera is offset by the eye seperation and its projection matrix is also skewed asymetrically back to converge on the same
 		 * projection plane. Added a focal length parameter to, this is where the parallax is equal to 0.
 		 */
-		this.render = function ( scene, camera, renderTarget, forceClear ) {
 
+		this.render = function ( scene, camera, renderTarget, forceClear ) {
 
 			camera.update( null, true );
 
-			var hasCameraChanged = 	aspect !== camera.aspect || near !== camera.near || fov !== camera.fov;
+			var hasCameraChanged = aspect !== camera.aspect || near !== camera.near || fov !== camera.fov;
 
 			if( hasCameraChanged ) {
 
@@ -109,10 +111,12 @@ if ( THREE.WebGLRenderer ) {
 					xmin, xmax;
 
 				//translate xOffset
+
 				eyeRight.n14 = eyeSep;
 				eyeLeft.n14 = -eyeSep;
 
 				//For left eye
+
 				xmin = -ymax * aspect + eyeSepOnProjection;
 				xmax = ymax * aspect + eyeSepOnProjection;
 				projectionMatrix.n11 = 2 * near / ( xmax - xmin );
@@ -120,6 +124,7 @@ if ( THREE.WebGLRenderer ) {
 				_cameraL.projectionMatrix = projectionMatrix.clone();
 
 				//for right eye
+
 				xmin = -ymax * aspect - eyeSepOnProjection;
 				xmax = ymax * aspect - eyeSepOnProjection;
 				projectionMatrix.n11 = 2 * near / ( xmax - xmin );
@@ -129,14 +134,14 @@ if ( THREE.WebGLRenderer ) {
 			}
 
 			_cameraL.matrix = camera.matrixWorld.clone().multiplySelf( eyeLeft );
-			_cameraL.update(null, true);
+			_cameraL.update( null, true );
 			_cameraL.position.copy( camera.position );
 			_cameraL.near = near;
 			_cameraL.far = camera.far;
 			_render.call( _this, scene, _cameraL, _renderTargetL, true );
 
 			_cameraR.matrix = camera.matrixWorld.clone().multiplySelf( eyeRight );
-			_cameraR.update(null, true);
+			_cameraR.update( null, true );
 			_cameraR.position.copy( camera.position );
 			_cameraR.near = near;
 			_cameraR.far = camera.far;
@@ -148,4 +153,4 @@ if ( THREE.WebGLRenderer ) {
 
 	};
 
-}
+};

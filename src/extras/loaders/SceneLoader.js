@@ -191,7 +191,7 @@ THREE.SceneLoader.prototype = {
 								object.scale.set( s[0], s[1], s[2] );
 								object.visible = o.visible;
 
-								result.scene.addObject( object );
+								result.scene.add( object );
 
 								result.objects[ dd ] = object;
 
@@ -208,7 +208,7 @@ THREE.SceneLoader.prototype = {
 									//object.materials = [ new THREE.MeshBasicMaterial( { color: 0xff0000 } ) ];
 
 									var shadow = new THREE.ShadowVolume( geometry )
-									result.scene.addChild( shadow );
+									result.scene.add( shadow );
 
 									shadow.position = object.position;
 									shadow.rotation = object.rotation;
@@ -260,7 +260,7 @@ THREE.SceneLoader.prototype = {
 							object.scale.set( s[0], s[1], s[2] );
 							object.visible = ( o.visible !== undefined ) ? o.visible : false;
 
-							result.scene.addObject( object );
+							result.scene.add( object );
 
 							result.objects[ dd ] = object;
 							result.empties[ dd ] = object;
@@ -410,7 +410,7 @@ THREE.SceneLoader.prototype = {
 
 				}
 
-				result.scene.addLight( light );
+				result.scene.add( light );
 
 				result.lights[ dl ] = light;
 

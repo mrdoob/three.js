@@ -126,7 +126,7 @@ THREE.EffectComposer.quad.position.z = -100;
 THREE.EffectComposer.quad.scale.set( window.innerWidth, window.innerHeight, 1 );
 
 THREE.EffectComposer.scene = new THREE.Scene();
-THREE.EffectComposer.scene.addObject( THREE.EffectComposer.quad );
+THREE.EffectComposer.scene.add( THREE.EffectComposer.quad );
 
 // shared ortho camera
 
