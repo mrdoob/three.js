@@ -83,7 +83,6 @@
 
 			a { color:red }
 			canvas { pointer-events:none; z-index:10; }
-			#log { position:absolute; top:0; display:block; text-align:left; z-index:1000; pointer-events:none; }
 
 			#scene_explorer {
 				background:transparent;
@@ -147,8 +146,6 @@
 				<div id="start" class="disabled">Start</div>
 			</center>
 		</div>
-
-		<pre id="log"></pre>
 
 		<script src="../build/Three.js"></script>
 
@@ -301,7 +298,7 @@
 					$( "start" ).className = "enabled";
 
 					handle_update( result, 1 );
-					
+
 					console.log( result );
 
 				}
@@ -309,10 +306,10 @@
 				$( "progress" ).style.display = "block";
 
 				var loader = new THREE.SceneLoader();
-				
+
 				loader.callbackSync = callbackSync;
 				loader.callbackProgress = callbackProgress;
-				
+
 				loader.load( "scenes/test_scene.js", callbackFinished );
 
 				$( "plus_exp" ).addEventListener( 'click', createToggle( "exp" ), false );
@@ -407,13 +404,6 @@
 				camera.position.y += ( - mouseY - camera.position.y ) * .001;
 
 				renderer.render( scene, camera );
-
-			}
-
-			function log( text ) {
-
-				var e = $("log");
-				e.innerHTML = text + "<br/>" + e.innerHTML;
 
 			}
 

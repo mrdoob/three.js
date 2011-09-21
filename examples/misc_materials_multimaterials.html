@@ -16,7 +16,7 @@
 			h1 { }
 			a { color:skyblue }
 			canvas { pointer-events:none; z-index:10; }
-			#log { position:absolute; top:50px; text-align:left; display:block; z-index:1; pointer-events:none; }
+
 			#d { text-align:center; margin:1em 0 -15.7em 0; z-index:0; position:relative; display:block }
 			.button { background:#000; color:#fff; padding:0.2em 0.5em; cursor:pointer }
 			.inactive { background:#999; color:#eee }
@@ -38,8 +38,6 @@
 			<p>Canvas renderer is very slow on anything other than Chrome.
 
 		</div>
-
-		<pre id="log"></pre>
 
 		<script src="../build/Three.js"></script>
 
@@ -301,12 +299,6 @@
 
 			}
 
-			function log(text) {
-
-				var e = document.getElementById("log");
-				e.innerHTML = text + "<br/>" + e.innerHTML;
-
-			}
 
 			function toggleCanvas() {
 

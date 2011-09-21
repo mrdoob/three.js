@@ -29,13 +29,9 @@
 			a:hover {
 				color: #0080ff;
 			}
-
-			#log { color:#fff; position:absolute; top:50px; text-align:left; display:block; z-index:100; pointer-events:none; }
 		</style>
 	</head>
 	<body>
-
-		<pre id="log"></pre>
 
 		<div id="container"></div>
 		<div id="info">
@@ -154,13 +150,6 @@
 				light3.position.z = Math.sin( time * 0.5 ) * 30;
 
 				renderer.render( scene, camera );
-
-			}
-
-			function log( text ) {
-
-				var e = document.getElementById("log");
-				e.innerHTML = text + "<br/>" + e.innerHTML;
 
 			}
 
