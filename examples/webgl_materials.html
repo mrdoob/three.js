@@ -77,7 +77,7 @@
 				//materials.push( new THREE.MeshBasicMaterial( { color: 0xff0000, blending: THREE.SubtractiveBlending } ) );
 
 				materials.push( new THREE.MeshLambertMaterial( { color: 0xdddddd, shading: THREE.SmoothShading } ) );
-				materials.push( new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.SmoothShading } ) );
+				materials.push( new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.SmoothShading, map: THREE.ImageUtils.loadTexture( "textures/planets/earth_specular_2048.jpg" ) } ) );
 				materials.push( new THREE.MeshNormalMaterial( { shading: THREE.SmoothShading } ) );
 				materials.push( new THREE.MeshBasicMaterial( { color: 0xffaa00, wireframe: true } ) );
 
