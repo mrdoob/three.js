@@ -1,299 +1,299 @@
-<!DOCTYPE html>
-<html>
-	<title>three.js webgl - trackball camera - earth</title>
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - trackball camera - earth</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background: #000;
+				color: #EEE;
+				padding: 0;
+				margin: 0;
+				font-weight: bold;
+				overflow: hidden;
 
-	<style type="text/css">
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: center;
+			}
 
-		body {
-			background: #000;
-			color: #EEE;
-			padding: 0;
-			margin: 0;
-			font-weight: bold;
-			overflow: hidden;
+			#info {
+				position: absolute;
+				top: 0px;
+				width: 100%;
+				padding: 5px;
+				z-index: 100;
+			}
 
-			font-family: Monospace;
-			font-size: 13px;
-			text-align: center;
-		}
+			a { color: green; }
+			b { color: green; }
+		</style>
 
-		#info {
-			position: absolute;
-			top: 0px;
-			width: 100%;
-			padding: 5px;
-			z-index: 100;
-		}
+		<script src="../build/Three.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
-		a { color: green; }
-		b { color: green; }
+	</head>
 
-	</style>
+	<body>
 
-	<script src="../build/Three.js"></script>
-	<script src="js/Detector.js"></script>
-	<script src="js/RequestAnimationFrame.js"></script>
-	<script src="js/Stats.js"></script>
+		<div id="info">
+			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - earth [trackball camera]<br/><br/>
+			<b>MOVE</b> mouse &amp; press <b>LEFT/A:</b> rotate, <b>MIDDLE/S:</b> zoom, <b>RIGHT/D:</b> pan
+		</div>
 
-</head>
+		<script>
 
-<body>
+			var radius = 6371,
+			tilt = 0.41,
+			rotationSpeed = 0.1,
 
-<div id="info">
-	<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - earth [trackball camera]<br/><br/>
-	<b>MOVE</b> mouse &amp; press <b>LEFT/A:</b> rotate, <b>MIDDLE/S:</b> zoom, <b>RIGHT/D:</b> pan
-</div>
+			cloudsScale = 1.005,
+			moonScale = 0.23,
 
-<script>
+			height = window.innerHeight,
+			width  = window.innerWidth,
 
-	var radius = 6371,
-	tilt = 0.41,
-	rotationSpeed = 0.1,
+			container, stats,
 
-	cloudsScale = 1.005,
-	moonScale = 0.23,
+			camera, scene, renderer,
+			geometry, meshPlanet, meshClouds, meshMoon,
+			dirLight, ambientLight,
 
-	height = window.innerHeight,
-	width  = window.innerWidth,
+			time = new Date().getTime();
 
-	container, stats,
+			window.onload = function() {
 
-	camera, scene, renderer,
-	geometry, meshPlanet, meshClouds, meshMoon,
-	dirLight, ambientLight,
+				if ( !Detector.webgl ) {
 
-	time = new Date().getTime();
+					Detector.addGetWebGLMessage();
+					return;
 
-	window.onload = function() {
+				}
 
-		if ( !Detector.webgl ) {
+				init();
+				animate();
 
-			Detector.addGetWebGLMessage();
-			return;
+			}
 
-		}
+			function init() {
 
-		init();
-		animate();
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
 
-	}
 
-	function init() {
+				scene = new THREE.Scene();
 
-		container = document.createElement( 'div' );
-		document.body.appendChild( container );
 
+				renderer = new THREE.WebGLRenderer( { clearAlpha: 1, clearColor: 0x000000 } );
+				renderer.setSize( width, height );
+				renderer.sortObjects = false;
+				renderer.autoClear = false;
+				container.appendChild( renderer.domElement );
 
-		scene = new THREE.Scene();
 
+				camera = new THREE.TrackballCamera({
 
-		renderer = new THREE.WebGLRenderer( { clearAlpha: 1, clearColor: 0x000000 } );
-		renderer.setSize( width, height );
-		renderer.sortObjects = false;
-		renderer.autoClear = false;
-		container.appendChild( renderer.domElement );
+					fov: 25,
+					aspect: width / height,
+					near: 50,
+					far: 1e7,
 
+					rotateSpeed: 1.0,
+					zoomSpeed: 1.2,
+					panSpeed: 0.2,
 
-		camera = new THREE.TrackballCamera({
+					noZoom: false,
+					noPan: false,
 
-			fov: 25,
-			aspect: width / height,
-			near: 50,
-			far: 1e7,
+					staticMoving: false,
+					dynamicDampingFactor: 0.3,
 
-			rotateSpeed: 1.0,
-			zoomSpeed: 1.2,
-			panSpeed: 0.2,
+					minDistance: radius * 1.1,
+					maxDistance: radius * 100,
 
-			noZoom: false,
-			noPan: false,
+					keys: [ 65, 83, 68 ], // [ rotateKey, zoomKey, panKey ],
 
-			staticMoving: false,
-			dynamicDampingFactor: 0.3,
+					domElement: renderer.domElement,
 
-			minDistance: radius * 1.1,
-			maxDistance: radius * 100,
+				});
 
-			keys: [ 65, 83, 68 ], // [ rotateKey, zoomKey, panKey ],
+				camera.position.z = radius * 7;
 
-			domElement: renderer.domElement,
 
-		});
+				dirLight = new THREE.DirectionalLight( 0xFFFFFF );
+				dirLight.position.set( -1, 0, 1 );
+				dirLight.position.normalize();
+				scene.add( dirLight );
 
-		camera.position.z = radius * 7;
+				var planetTexture = THREE.ImageUtils.loadTexture( "textures/planets/earth_atmos_2048.jpg" ),
+				cloudsTexture     = THREE.ImageUtils.loadTexture( "textures/planets/earth_clouds_1024.png" ),
+				normalTexture     = THREE.ImageUtils.loadTexture( "textures/planets/earth_normal_2048.jpg" ),
+				specularTexture   = THREE.ImageUtils.loadTexture( "textures/planets/earth_specular_2048.jpg" ),
+				moonTexture       = THREE.ImageUtils.loadTexture( "textures/planets/moon_1024.jpg" );
 
+				var shader = THREE.ShaderUtils.lib[ "normal" ],
+				uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
-		dirLight = new THREE.DirectionalLight( 0xFFFFFF );
-		dirLight.position.set( -1, 0, 1 );
-		dirLight.position.normalize();
-		scene.add( dirLight );
+				uniforms[ "tNormal" ].texture = normalTexture;
+				uniforms[ "uNormalScale" ].value = 0.85;
 
-		var planetTexture = THREE.ImageUtils.loadTexture( "textures/planets/earth_atmos_2048.jpg" ),
-		cloudsTexture     = THREE.ImageUtils.loadTexture( "textures/planets/earth_clouds_1024.png" ),
-		normalTexture     = THREE.ImageUtils.loadTexture( "textures/planets/earth_normal_2048.jpg" ),
-		specularTexture   = THREE.ImageUtils.loadTexture( "textures/planets/earth_specular_2048.jpg" ),
-		moonTexture       = THREE.ImageUtils.loadTexture( "textures/planets/moon_1024.jpg" );
+				uniforms[ "tDiffuse" ].texture = planetTexture;
+				uniforms[ "tSpecular" ].texture = specularTexture;
 
-		var shader = THREE.ShaderUtils.lib[ "normal" ],
-		uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+				uniforms[ "enableAO" ].value = false;
+				uniforms[ "enableDiffuse" ].value = true;
+				uniforms[ "enableSpecular" ].value = true;
 
-		uniforms[ "tNormal" ].texture = normalTexture;
-		uniforms[ "uNormalScale" ].value = 0.85;
+				uniforms[ "uDiffuseColor" ].value.setHex( 0xffffff );
+				uniforms[ "uSpecularColor" ].value.setHex( 0xaaaaaa );
+				uniforms[ "uAmbientColor" ].value.setHex( 0x000000 );
 
-		uniforms[ "tDiffuse" ].texture = planetTexture;
-		uniforms[ "tSpecular" ].texture = specularTexture;
+				uniforms[ "uShininess" ].value = 30;
 
-		uniforms[ "enableAO" ].value = false;
-		uniforms[ "enableDiffuse" ].value = true;
-		uniforms[ "enableSpecular" ].value = true;
+				var materialNormalMap = new THREE.ShaderMaterial({
+					fragmentShader: shader.fragmentShader,
+					vertexShader: shader.vertexShader,
+					uniforms: uniforms,
+					lights: true
+				});
 
-		uniforms[ "uDiffuseColor" ].value.setHex( 0xffffff );
-		uniforms[ "uSpecularColor" ].value.setHex( 0xaaaaaa );
-		uniforms[ "uAmbientColor" ].value.setHex( 0x000000 );
 
-		uniforms[ "uShininess" ].value = 30;
+				// planet
 
-		var materialNormalMap = new THREE.ShaderMaterial({
-			fragmentShader: shader.fragmentShader,
-			vertexShader: shader.vertexShader,
-			uniforms: uniforms,
-			lights: true
-		});
+				geometry = new THREE.SphereGeometry( radius, 100, 50 );
+				geometry.computeTangents();
 
+				meshPlanet = new THREE.Mesh( geometry, materialNormalMap );
+				meshPlanet.rotation.y = 1.3;
+				meshPlanet.rotation.z = tilt;
+				scene.add( meshPlanet );
 
-		// planet
 
-		geometry = new THREE.SphereGeometry( radius, 100, 50 );
-		geometry.computeTangents();
+				// clouds
 
-		meshPlanet = new THREE.Mesh( geometry, materialNormalMap );
-		meshPlanet.rotation.y = 1.3;
-		meshPlanet.rotation.z = tilt;
-		scene.add( meshPlanet );
+				var materialClouds = new THREE.MeshLambertMaterial( { color: 0xffffff, map: cloudsTexture, transparent:true } );
 
+				meshClouds = new THREE.Mesh( geometry, materialClouds );
+				meshClouds.scale.set( cloudsScale, cloudsScale, cloudsScale );
+				meshClouds.rotation.z = tilt;
+				scene.add( meshClouds );
 
-		// clouds
 
-		var materialClouds = new THREE.MeshLambertMaterial( { color: 0xffffff, map: cloudsTexture, transparent:true } );
+				// moon
 
-		meshClouds = new THREE.Mesh( geometry, materialClouds );
-		meshClouds.scale.set( cloudsScale, cloudsScale, cloudsScale );
-		meshClouds.rotation.z = tilt;
-		scene.add( meshClouds );
+				var materialMoon = new THREE.MeshPhongMaterial( { color: 0xffffff, map: moonTexture } );
 
+				meshMoon = new THREE.Mesh( geometry, materialMoon );
+				meshMoon.position.set( radius * 5, 0, 0 );
+				meshMoon.scale.set( moonScale, moonScale, moonScale );
+				scene.add( meshMoon );
 
-		// moon
 
-		var materialMoon = new THREE.MeshPhongMaterial( { color: 0xffffff, map: moonTexture } );
+				// stars
 
-		meshMoon = new THREE.Mesh( geometry, materialMoon );
-		meshMoon.position.set( radius * 5, 0, 0 );
-		meshMoon.scale.set( moonScale, moonScale, moonScale );
-		scene.add( meshMoon );
+				var i,
+				vector,
+				starsGeometry = new THREE.Geometry();
 
+				for ( i = 0; i < 1500; i++ ) {
 
-		// stars
+					vector = new THREE.Vector3( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 );
+					vector.multiplyScalar( radius );
 
-		var i,
-		vector,
-		starsGeometry = new THREE.Geometry();
+					starsGeometry.vertices.push( new THREE.Vertex( vector ) );
 
-		for ( i = 0; i < 1500; i++ ) {
+				}
 
-			vector = new THREE.Vector3( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 );
-			vector.multiplyScalar( radius );
+				var stars,
+				starsMaterials = [
+					new THREE.ParticleBasicMaterial( { color: 0x555555, size: 2, sizeAttenuation: false } ),
+					new THREE.ParticleBasicMaterial( { color: 0x555555, size: 1, sizeAttenuation: false } ),
+					new THREE.ParticleBasicMaterial( { color: 0x333333, size: 2, sizeAttenuation: false } ),
+					new THREE.ParticleBasicMaterial( { color: 0x3a3a3a, size: 1, sizeAttenuation: false } ),
+					new THREE.ParticleBasicMaterial( { color: 0x1a1a1a, size: 2, sizeAttenuation: false } ),
+					new THREE.ParticleBasicMaterial( { color: 0x1a1a1a, size: 1, sizeAttenuation: false } )
+				];
 
-			starsGeometry.vertices.push( new THREE.Vertex( vector ) );
+				for ( i = 10; i < 30; i++ ) {
 
-		}
+					stars = new THREE.ParticleSystem( starsGeometry, starsMaterials[ i % 6 ] );
 
-		var stars,
-		starsMaterials = [
-			new THREE.ParticleBasicMaterial( { color: 0x555555, size: 2, sizeAttenuation: false } ),
-			new THREE.ParticleBasicMaterial( { color: 0x555555, size: 1, sizeAttenuation: false } ),
-			new THREE.ParticleBasicMaterial( { color: 0x333333, size: 2, sizeAttenuation: false } ),
-			new THREE.ParticleBasicMaterial( { color: 0x3a3a3a, size: 1, sizeAttenuation: false } ),
-			new THREE.ParticleBasicMaterial( { color: 0x1a1a1a, size: 2, sizeAttenuation: false } ),
-			new THREE.ParticleBasicMaterial( { color: 0x1a1a1a, size: 1, sizeAttenuation: false } )
-		];
+					stars.rotation.x = Math.random() * 6;
+					stars.rotation.y = Math.random() * 6;
+					stars.rotation.z = Math.random() * 6;
 
-		for ( i = 10; i < 30; i++ ) {
+					var s = i * 10;
+					stars.scale.set( s, s, s );
 
-			stars = new THREE.ParticleSystem( starsGeometry, starsMaterials[ i % 6 ] );
+					stars.matrixAutoUpdate = false;
+					stars.updateMatrix();
 
-			stars.rotation.x = Math.random() * 6;
-			stars.rotation.y = Math.random() * 6;
-			stars.rotation.z = Math.random() * 6;
+					scene.add( stars );
 
-			var s = i * 10;
-			stars.scale.set( s, s, s );
+				}
 
-			stars.matrixAutoUpdate = false;
-			stars.updateMatrix();
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				stats.domElement.style.zIndex = 100;
+				container.appendChild( stats.domElement );
 
-			scene.add( stars );
+				window.addEventListener( 'resize', onWindowResize, false );
 
-		}
+			};
 
-		stats = new Stats();
-		stats.domElement.style.position = 'absolute';
-		stats.domElement.style.top = '0px';
-		stats.domElement.style.zIndex = 100;
-		container.appendChild( stats.domElement );
+			function onWindowResize( event ) {
 
-		window.addEventListener( 'resize', onWindowResize, false );
+				width = window.innerWidth;
+				height = window.innerHeight;
 
-	};
+				renderer.setSize( width, height );
 
-	function onWindowResize( event ) {
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
 
-		width = window.innerWidth;
-		height = window.innerHeight;
+				camera.screen.width = width;
+				camera.screen.height = height;
 
-		renderer.setSize( width, height );
+				camera.radius = ( width + height ) / 4;
 
-		camera.aspect = width / height;
-		camera.updateProjectionMatrix();
+			};
 
-		camera.screen.width = width;
-		camera.screen.height = height;
+			function animate() {
 
-		camera.radius = ( width + height ) / 4;
+				requestAnimationFrame( animate );
 
-	};
+				render();
+				stats.update();
 
-	function animate() {
+			};
 
-		requestAnimationFrame( animate );
+			function render() {
 
-		render();
-		stats.update();
+				var t = new Date().getTime(),
+				dt = ( t - time ) / 1000;
+				time = t;
 
-	};
+				meshPlanet.rotation.y += rotationSpeed * dt;
+				meshClouds.rotation.y += 1.25 * rotationSpeed * dt;
 
-	function render() {
+				var angle = dt * rotationSpeed;
 
-		var t = new Date().getTime(),
-		dt = ( t - time ) / 1000;
-		time = t;
+				meshMoon.position = new THREE.Vector3(
+					Math.cos( angle ) * meshMoon.position.x - Math.sin( angle ) * meshMoon.position.z,
+					0,
+					Math.sin( angle ) * meshMoon.position.x + Math.cos( angle ) * meshMoon.position.z
+				);
+				meshMoon.rotation.y -= angle;
 
-		meshPlanet.rotation.y += rotationSpeed * dt;
-		meshClouds.rotation.y += 1.25 * rotationSpeed * dt;
+				renderer.clear();
+				renderer.render( scene, camera );
 
-		var angle = dt * rotationSpeed;
+			};
 
-		meshMoon.position = new THREE.Vector3(
-			Math.cos( angle ) * meshMoon.position.x - Math.sin( angle ) * meshMoon.position.z,
-			0,
-			Math.sin( angle ) * meshMoon.position.x + Math.cos( angle ) * meshMoon.position.z
-		);
-		meshMoon.rotation.y -= angle;
-
-		renderer.clear();
-		renderer.render( scene, camera );
-
-	};
-
-</script>
-</body>
+		</script>
+	</body>
 </html>
