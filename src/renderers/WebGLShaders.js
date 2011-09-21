@@ -391,21 +391,24 @@ THREE.ShaderChunk = {
 
 	"#endif",
 
-	"vec4 totalLight = vec4( ambient, opacity );",
+	"vec4 totalDiffuse = vec4( vec3( 0.0 ), opacity );",
+	"vec4 totalSpecular = vec4( ambient, opacity );",
 
 	"#if MAX_DIR_LIGHTS > 0",
 
-		"totalLight += dirDiffuse + dirSpecular;",
+		"totalDiffuse += dirDiffuse;",
+		"totalSpecular += dirSpecular;",
 
 	"#endif",
 
 	"#if MAX_POINT_LIGHTS > 0",
 
-		"totalLight += pointDiffuse + pointSpecular;",
+		"totalDiffuse += pointDiffuse;",
+		"totalSpecular += pointSpecular;",
 
 	"#endif",
 
-	"gl_FragColor = gl_FragColor * totalLight;"
+	"gl_FragColor = gl_FragColor * totalDiffuse + totalSpecular;"
 
 	].join("\n"),
 
