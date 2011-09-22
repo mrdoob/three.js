@@ -3305,22 +3305,21 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 	};
-
+	
 	function isInFrustum( object ) {
-
 		var 
-      distance,
-      radius,
-      matrix = object.matrixWorld,
-      scale = object.scale.clone(),
-      root = object.parent;
+			distance,
+			radius,
+			matrix = object.matrixWorld,
+			radiusScale = object.boundRadiusScale,
+			root = object.parent;
 
-    while ( root ) {
-      scale.multiplySelf( root.scale );
-      root = root.parent;
-    }
+		while ( root ) {
+			radiusScale *= root.boundRadiusScale;
+			root = root.parent;
+		}
 
-    radius = - object.geometry.boundingSphere.radius * Math.max( scale.x, Math.max( scale.y, scale.z ) );
+		radius = - object.geometry.boundingSphere.radius * radiusScale; 
 
 		for ( var i = 0; i < 6; i ++ ) {
 
