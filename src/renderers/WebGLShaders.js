@@ -340,8 +340,8 @@ THREE.ShaderChunk = {
 
 	"#if MAX_POINT_LIGHTS > 0",
 
-		"vec4 pointDiffuse  = vec4( vec3( 0.0 ), 1.0 );",
-		"vec4 pointSpecular = vec4( vec3( 0.0 ), 1.0 );",
+		"vec4 pointDiffuse  = vec4( vec3( 0.0 ), opacity );",
+		"vec4 pointSpecular = vec4( vec3( 0.0 ), opacity );",
 
 		"for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {",
 
@@ -366,8 +366,8 @@ THREE.ShaderChunk = {
 
 	"#if MAX_DIR_LIGHTS > 0",
 
-		"vec4 dirDiffuse  = vec4( vec3( 0.0 ), 1.0 );",
-		"vec4 dirSpecular = vec4( vec3( 0.0 ), 1.0 );" ,
+		"vec4 dirDiffuse  = vec4( vec3( 0.0 ), opacity );",
+		"vec4 dirSpecular = vec4( vec3( 0.0 ), opacity );" ,
 
 		"for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {",
 
@@ -1379,7 +1379,7 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-				"gl_FragColor = vec4( vLightWeighting, 1.0 );",
+				"gl_FragColor = vec4( vLightWeighting, opacity );",
 
 				THREE.ShaderChunk[ "map_fragment" ],
 				THREE.ShaderChunk[ "alphatest_fragment" ],
