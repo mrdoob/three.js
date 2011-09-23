@@ -408,7 +408,7 @@ THREE.ShaderChunk = {
 
 	"#endif",
 
-	"gl_FragColor = gl_FragColor * totalDiffuse + totalSpecular;"
+	"gl_FragColor.xyz = gl_FragColor.xyz * totalDiffuse.xyz + totalSpecular.xyz;"
 
 	].join("\n"),
 
@@ -1138,7 +1138,7 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-				"gl_FragColor = vec4( vLightWeighting, 1.0 );",
+				"gl_FragColor = vec4( vLightWeighting, opacity );",
 
 				THREE.ShaderChunk[ "map_fragment" ],
 				THREE.ShaderChunk[ "alphatest_fragment" ],
