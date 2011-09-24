@@ -174,10 +174,7 @@ THREE.ShaderUtils = {
 
 				"void main() {",
 
-					"gl_FragColor = vec4( 1.0 );",
-
-					"vec4 mColor = vec4( uDiffuseColor, uOpacity );",
-					"vec4 mSpecular = vec4( uSpecularColor, uOpacity );",
+					"gl_FragColor = vec4( vec3( 1.0 ), uOpacity );",
 
 					"vec3 specularTex = vec3( 1.0 );",
 
@@ -189,7 +186,7 @@ THREE.ShaderUtils = {
 						"gl_FragColor = gl_FragColor * texture2D( tDiffuse, vUv );",
 
 					"if( enableAO )",
-						"gl_FragColor = gl_FragColor * texture2D( tAO, vUv );",
+						"gl_FragColor.xyz = gl_FragColor.xyz * texture2D( tAO, vUv ).xyz;",
 
 					"if( enableSpecular )",
 						"specularTex = texture2D( tSpecular, vUv ).xyz;",
@@ -204,7 +201,8 @@ THREE.ShaderUtils = {
 
 					"#if MAX_POINT_LIGHTS > 0",
 
-						"vec4 pointTotal = vec4( vec3( 0.0 ), 1.0 );",
+						"vec3 pointDiffuse = vec3( 0.0 );",
+						"vec3 pointSpecular = vec3( 0.0 );",
 
 						"for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {",
 
@@ -219,7 +217,8 @@ THREE.ShaderUtils = {
 							"if ( pointDotNormalHalf >= 0.0 )",
 								"pointSpecularWeight = specularTex.r * pow( pointDotNormalHalf, uShininess );",
 
-							"pointTotal  += pointDistance * vec4( pointLightColor[ i ], 1.0 ) * ( mColor * pointDiffuseWeight + mSpecular * pointSpecularWeight * pointDiffuseWeight );",
+							"pointDiffuse += pointDistance * pointLightColor[ i ] * uDiffuseColor * pointDiffuseWeight;",
+							"pointSpecular += pointDistance * pointLightColor[ i ] * uSpecularColor * pointSpecularWeight;",
 
 						"}",
 
@@ -229,7 +228,8 @@ THREE.ShaderUtils = {
 
 					"#if MAX_DIR_LIGHTS > 0",
 
-						"vec4 dirTotal = vec4( vec3( 0.0 ), 1.0 );",
+						"vec3 dirDiffuse = vec3( 0.0 );",
+						"vec3 dirSpecular = vec3( 0.0 );",
 
 						"for( int i = 0; i < MAX_DIR_LIGHTS; i++ ) {",
 
@@ -245,7 +245,8 @@ THREE.ShaderUtils = {
 							"if ( dirDotNormalHalf >= 0.0 )",
 								"dirSpecularWeight = specularTex.r * pow( dirDotNormalHalf, uShininess );",
 
-							"dirTotal  += vec4( directionalLightColor[ i ], 1.0 ) * ( mColor * dirDiffuseWeight + mSpecular * dirSpecularWeight * dirDiffuseWeight );",
+							"dirDiffuse += directionalLightColor[ i ] * uDiffuseColor * dirDiffuseWeight;",
+							"dirSpecular += directionalLightColor[ i ] * uSpecularColor * dirSpecularWeight;",
 
 						"}",
 
@@ -253,17 +254,24 @@ THREE.ShaderUtils = {
 
 					// all lights contribution summation
 
-					"vec4 totalLight = vec4( ambientLightColor * uAmbientColor, uOpacity );",
+					"vec3 totalDiffuse = vec3( 0.0 );",
+					"vec3 totalSpecular = vec3( 0.0 );",
 
 					"#if MAX_DIR_LIGHTS > 0",
-						"totalLight += dirTotal;",
+
+						"totalDiffuse += dirDiffuse;",
+						"totalSpecular += dirSpecular;",
+
 					"#endif",
 
 					"#if MAX_POINT_LIGHTS > 0",
-						"totalLight += pointTotal;",
+
+						"totalDiffuse += pointDiffuse;",
+						"totalSpecular += pointSpecular;",
+
 					"#endif",
 
-					"gl_FragColor = gl_FragColor * totalLight;",
+					"gl_FragColor.xyz = gl_FragColor.xyz * totalDiffuse + totalSpecular + ambientLightColor * uAmbientColor;",
 
 					THREE.ShaderChunk[ "fog_fragment" ],
 

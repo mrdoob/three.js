@@ -134,13 +134,13 @@
 				uniforms[ "enableSpecular" ].value = true;
 
 				uniforms[ "uDiffuseColor" ].value.setHex( 0xffffff );
-				uniforms[ "uSpecularColor" ].value.setHex( 0xaaaaaa );
+				uniforms[ "uSpecularColor" ].value.setHex( 0x333333 );
 				uniforms[ "uAmbientColor" ].value.setHex( 0x000000 );
 
-				uniforms[ "uShininess" ].value = 30;
+				uniforms[ "uShininess" ].value = 15;
 
 				var parameters = {
-				
+
 					fragmentShader: shader.fragmentShader,
 					vertexShader: shader.vertexShader,
 					uniforms: uniforms,
