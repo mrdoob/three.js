@@ -198,9 +198,11 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 	var contour = vertices; // vertices has all points but contour has only points of circumference
 
 	for ( h = 0, hl = holes.length;  h < hl; h ++ ) {
-		
-		Array.prototype.push.apply( vertices, holes[ h ] );
-		
+
+		ahole = holes[ h ];
+
+		vertices = vertices.concat( ahole );
+
 	}
 
 
@@ -382,7 +384,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 		}
 
 		holesMovements.push( oneHoleMovements );
-		Array.prototype.push.apply( verticesMovements, oneHoleMovements );
+		verticesMovements = verticesMovements.concat( oneHoleMovements );
 
 	}
 
