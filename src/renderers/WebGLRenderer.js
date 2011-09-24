@@ -3314,7 +3314,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			radiusScale = object.boundRadiusScale,
 			root = object.parent;
 			
-		if ( object.frustumInheritScale ) {
+		if ( object.frustumCullingInheritScale ) {
 			while ( root ) {
 				radiusScale *= root.boundRadiusScale;
 				root = root.parent;
