@@ -3973,7 +3973,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			object = scene.__webglSprites[ o ];
 
-			if ( !object.visible ) continue;
+			if ( !object.visible || object.opacity == 0 ) continue;
 
 			if( !object.useScreenCoordinates ) {
 
@@ -3996,7 +3996,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			object = scene.__webglSprites[ o ];
 
-			if ( object.visible && object.map && object.map.image && object.map.image.width ) {
+			if ( !object.visible || object.opacity == 0 ) continue;
+
+			if ( object.map && object.map.image && object.map.image.width ) {
 
 				if ( object.useScreenCoordinates ) {
 
