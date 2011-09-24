@@ -2226,7 +2226,7 @@ THREE.ColladaLoader = function () {
 			switch ( param.type ) {
 
 				case 'IDREF':
-				case 'Name':
+				case 'Name': case 'name':
 				case 'float':
 
 					return this.data;
