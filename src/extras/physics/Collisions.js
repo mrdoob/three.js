@@ -52,8 +52,8 @@ THREE.Collisions = new THREE.CollisionSystem();
 
 THREE.CollisionSystem.prototype.merge = function( collisionSystem ) {
 
-	this.colliders = this.colliders.concat( collisionSystem.colliders );
-	this.hits = this.hits.concat( collisionSystem.hits );
+	Array.prototype.push.apply( this.colliders, collisionSystem.colliders );
+	Array.prototype.push.apply( this.hits, collisionSystem.hits );
 
 };
 
