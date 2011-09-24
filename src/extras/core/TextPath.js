@@ -50,7 +50,7 @@ THREE.TextPath.prototype.toShapes = function () {
 
 	for ( var p = 0, pl = paths.length; p < pl; p ++ ) {
 
-		shapes = shapes.concat( paths[ p ].toShapes() );
+		Array.prototype.push.apply( shapes, paths[ p ].toShapes() );
 
 	}
 
