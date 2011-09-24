@@ -3313,15 +3313,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 			matrix = object.matrixWorld,
 			radiusScale = object.boundRadiusScale,
 			root = object.parent;
-
-		while ( root ) {
-			radiusScale *= root.boundRadiusScale;
-			root = root.parent;
+			
+		if ( object.frustumInheritScale ) {
+			while ( root ) {
+				radiusScale *= root.boundRadiusScale;
+				root = root.parent;
+			}
 		}
 
 		radius = - object.geometry.boundingSphere.radius * radiusScale; 
 
-		for ( var i = 0; i < 6; i ++ ) {
+		for ( var i = 0; i < 6; i++ ) {
 
 			distance = _frustum[ i ].x * matrix.n14 + _frustum[ i ].y * matrix.n24 + _frustum[ i ].z * matrix.n34 + _frustum[ i ].w;
 			if ( distance <= radius ) return false;
