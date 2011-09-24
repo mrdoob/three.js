@@ -51,7 +51,7 @@
 
 			var camera, scene, renderer,
 			particle1, particle2, particle2,
-			light1, light2, light3,
+			light1, light2, light3, light4,
 			object,loader;
 
 			init();
@@ -82,7 +82,7 @@
 
 				loader.load( { model: "obj/walt/WaltHead_bin.js", callback: callback } );
 
-				scene.add( new THREE.AmbientLight( 0x00000 ) );
+				scene.add( new THREE.AmbientLight( 0x000000 ) );
 
 				light1 = new THREE.PointLight( 0xff0040, 2, 50 );
 				scene.add( light1 );
@@ -92,6 +92,9 @@
 
 				light3 = new THREE.PointLight( 0x80ff80, 2, 50 );
 				scene.add( light3 );
+
+				light4 = new THREE.PointLight( 0xffaa00, 2, 50 );
+				scene.add( light4 );
 
 				var sphere = new THREE.SphereGeometry( 0.5, 16, 8 );
 
@@ -107,17 +110,20 @@
 				l3.position = light3.position;
 				scene.add( l3 );
 
+				var l4 = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) );
+				l4.position = light4.position;
+				scene.add( l4 );
+
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				/*
+
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
 				stats.domElement.style.zIndex = 100;
-				container.appendChild( stats.domElement );
-				*/
+				//container.appendChild( stats.domElement );
 
 			}
 
@@ -128,6 +134,8 @@
 				requestAnimationFrame( animate );
 
 				render();
+
+				stats.update();
 
 			}
 
@@ -148,6 +156,10 @@
 				light3.position.x = Math.sin( time * 0.7 ) * 30;
 				light3.position.y = Math.cos( time * 0.3 ) * 40;
 				light3.position.z = Math.sin( time * 0.5 ) * 30;
+
+				light4.position.x = Math.sin( time * 0.3 ) * 30;
+				light4.position.y = Math.cos( time * 0.7 ) * 40;
+				light4.position.z = Math.sin( time * 0.5 ) * 30;
 
 				renderer.render( scene, camera );
 
