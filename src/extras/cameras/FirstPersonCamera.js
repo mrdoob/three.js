@@ -49,7 +49,7 @@ THREE.FirstPersonCamera = function ( parameters ) {
 
 	this.constrainVertical = false;
 	this.verticalMin = 0;
-	this.verticalMax = 3.14;
+	this.verticalMax = Math.PI;
 
 	this.domElement = document;
 
@@ -272,7 +272,7 @@ THREE.FirstPersonCamera = function ( parameters ) {
 
 		if ( this.constrainVertical ) {
 
-			verticalLookRatio = 3.14 / ( this.verticalMax - this.verticalMin );
+			verticalLookRatio = Math.PI / ( this.verticalMax - this.verticalMin );
 
 		}
 
@@ -286,7 +286,7 @@ THREE.FirstPersonCamera = function ( parameters ) {
 
 		if ( this.constrainVertical ) {
 
-			this.phi = map_linear( this.phi, 0, 3.14, this.verticalMin, this.verticalMax );
+			this.phi = map_linear( this.phi, 0, Math.PI, this.verticalMin, this.verticalMax );
 
 		}
 

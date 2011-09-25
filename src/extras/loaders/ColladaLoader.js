@@ -1961,29 +1961,6 @@ THREE.ColladaLoader = function () {
 
 			}
 
-			/*
-			if ( vcount > 3 ) {
-
-				for ( j = 2; j < vs.length - 1; j ++ ) {
-
-					face = new THREE.Face3( vs[0], vs[j], vs[j+1], [ns[0], ns[j], ns[j+1]] );
-
-					face.daeMaterial = primitive.material;
-
-					geom.faces.push(face);
-
-					for ( k = 0; k < texture_sets.length; k ++ ) {
-
-						uv = ts[ texture_sets[ k ] ];
-						geom.faceVertexUvs[ k ].push( [ uv[0], uv[j], uv[j+1] ] );
-
-					}
-
-				}
-
-			}
-			*/
-
 			i += inputs.length * vcount;
 
 		}
