@@ -12,11 +12,12 @@ THREE.RenderPass = function ( scene, camera, overrideMaterial, clearColor, clear
 	this.clearColor = clearColor;
 	this.clearAlpha = ( clearAlpha !== undefined ) ? clearAlpha : 1;
 
-	this.clear = true;
-	this.needsSwap = false;
-
 	this.oldClearColor = new THREE.Color();
 	this.oldClearAlpha = 1;
+
+	this.enabled = true;
+	this.clear = true;
+	this.needsSwap = false;
 
 };
 

@@ -17,6 +17,8 @@ THREE.ShaderPass = function( shader, textureID ) {
 	} );
 
 	this.renderToScreen = false;
+
+	this.enabled = true;
 	this.needsSwap = true;
 	this.clear = false;
 

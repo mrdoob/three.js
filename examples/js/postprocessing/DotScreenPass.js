@@ -22,6 +22,7 @@ THREE.DotScreenPass = function( center, angle, scale ) {
 
 	} );
 
+	this.enabled = true;
 	this.renderToScreen = false;
 	this.needsSwap = true;
 

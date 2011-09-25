@@ -16,8 +16,9 @@
  *  dofmipmap
  *  focus
  *  triangleBlur
- *  horizontalBlur
- *  verticalBlur
+ *  horizontalBlur + verticalBlur
+ *  horizontalTiltShift + verticalTiltShift
+ *  blend
  */
 
 THREE.ShaderExtras = {
@@ -1078,6 +1079,56 @@ THREE.ShaderExtras = {
 
 			"}"
 
+
+		].join("\n")
+
+	},
+
+	/* -------------------------------------------------------------------------
+	//	Blend two textures
+	 ------------------------------------------------------------------------- */
+
+	'blend': {
+
+		uniforms: {
+
+			tDiffuse1: { type: "t", value: 0, texture: null },
+			tDiffuse2: { type: "t", value: 1, texture: null },
+			mixRatio:  { type: "f", value: 0.5 },
+			opacity:   { type: "f", value: 1.0 }
+
+		},
+
+		vertexShader: [
+
+			"varying vec2 vUv;",
+
+			"void main() {",
+
+				"vUv = vec2( uv.x, 1.0 - uv.y );",
+				"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+
+			"}"
+
+		].join("\n"),
+
+		fragmentShader: [
+
+			"uniform float opacity;",
+			"uniform float mixRatio;",
+
+			"uniform sampler2D tDiffuse1;",
+			"uniform sampler2D tDiffuse2;",
+
+			"varying vec2 vUv;",
+
+			"void main() {",
+
+				"vec4 texel1 = texture2D( tDiffuse1, vUv );",
+				"vec4 texel2 = texture2D( tDiffuse2, vUv );",
+				"gl_FragColor = opacity * mix( texel1, texel2, mixRatio );",
+
+			"}"
 
 		].join("\n")
 

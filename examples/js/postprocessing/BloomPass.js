@@ -51,6 +51,7 @@ THREE.BloomPass = function( strength, kernelSize, sigma, resolution ) {
 
 	} );
 
+	this.enabled = true;
 	this.needsSwap = false;
 	this.clear = false;
 
