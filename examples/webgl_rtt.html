@@ -163,7 +163,7 @@
 
 				var n = 5,
 					geometry = new THREE.SphereGeometry( 10, 64, 32 ),
-					material2 = new THREE.MeshLambertMaterial( { color:0xffffff, map: rtTexture } );
+					material2 = new THREE.MeshLambertMaterial( { color: 0xffffff, map: rtTexture } );
 
 				for( var j = 0; j < n; j ++ ) {
 
@@ -175,11 +175,12 @@
 						mesh.position.y = ( j - (n-1)/2 ) * 20;
 						mesh.position.z = 0;
 
-						mesh.rotation.y = 1.57;
+						mesh.rotation.y = Math.PI/2;
 
 						scene.add( mesh );
 
 					}
+
 				}
 
 				renderer = new THREE.WebGLRenderer();

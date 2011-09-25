@@ -722,28 +722,28 @@
 				if ( topleft ) {
 
 					if ( debug_corner_colors ) color = "rgba(200, 0, 0, ";
-					drawCorner( ctx, sx, sy, 0, 1.57, color, step, half );
+					drawCorner( ctx, sx, sy, 0, Math.PI / 2 , color, step, half );
 
 				}
 
 				if ( bottomleft ) {
 
 					if ( debug_corner_colors ) color = "rgba(0, 200, 0, ";
-					drawCorner( ctx, sx, sy + full, 4.71, 6.28, color, step, half );
+					drawCorner( ctx, sx, sy + full, 1.5 * Math.PI, 2 * Math.PI, color, step, half );
 
 				}
 
 				if ( bottomright ) {
 
 					if ( debug_corner_colors ) color = "rgba(0, 0, 200, ";
-					drawCorner( ctx, sx + full, sy + full, 3.14, 4.71, color, step, half );
+					drawCorner( ctx, sx + full, sy + full, Math.PI, 1.5 * Math.PI, color, step, half );
 
 				}
 
 				if ( topright ) {
 
 					if ( debug_corner_colors ) color = "rgba(200, 0, 200, ";
-					drawCorner( ctx, sx + full, sy, 1.57, 3.14, color, step, half );
+					drawCorner( ctx, sx + full, sy, Math.PI / 2, Math.PI, color, step, half );
 
 				}
 
