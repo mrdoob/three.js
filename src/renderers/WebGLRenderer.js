@@ -15,6 +15,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_gl, _programs = [],
 	_currentProgram = null,
 	_currentFramebuffer = null,
+	_currentMaterialId = -1,
 
 	// gl state cache
 
@@ -390,7 +391,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		doffset = 0,
 		poffset = 0;
 
-		for ( l = 0, ll = lights.length; l < ll; l++ ) {
+		for ( l = 0, ll = lights.length; l < ll; l ++ ) {
 
 			light = lights[ l ];
 			color = light.color;
@@ -458,8 +459,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		// null eventual remains from removed lights
 		// (this is to avoid if in shader)
 
-		for( l = dlength * 3; l < dcolors.length; l++ ) dcolors[ l ] = 0.0;
-		for( l = plength * 3; l < pcolors.length; l++ ) pcolors[ l ] = 0.0;
+		for ( l = dlength * 3, ll = dcolors.length; l < ll; l ++ ) dcolors[ l ] = 0.0;
+		for ( l = plength * 3, ll = pcolors.length; l < ll; l ++ ) pcolors[ l ] = 0.0;
 
 		zlights.point.length = plength;
 		zlights.directional.length = dlength;
@@ -2695,6 +2696,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		material.uniformsList = [];
+
+		for ( u in material.uniforms ) {
+
+			material.uniformsList.push( [ material.uniforms[ u ], u ] );
+
+		}
+
 	};
 
 	function setProgram( camera, lights, fog, material, object ) {
@@ -2721,6 +2730,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		var refreshMaterial = false;
+
 		var program = material.program,
 			p_uniforms = program.uniforms,
 			m_uniforms = material.uniforms;
@@ -2730,86 +2741,119 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.useProgram( program );
 			_currentProgram = program;
 
-		}
-
-		_gl.uniformMatrix4fv( p_uniforms.projectionMatrix, false, _projectionMatrixArray );
-
-		// refresh uniforms common to several materials
-
-		if ( fog && material.fog ) {
-
-			refreshUniformsFog( m_uniforms, fog );
+			refreshMaterial = true;
 
 		}
 
-		if ( material instanceof THREE.MeshPhongMaterial ||
-			 material instanceof THREE.MeshLambertMaterial ||
-			 material.lights ) {
+		if ( material.id != _currentMaterialId ) {
 
-			setupLights( program, lights );
-			refreshUniformsLights( m_uniforms, _lights );
+			_currentMaterialId = material.id;
+			refreshMaterial = true;
 
 		}
 
-		if ( material instanceof THREE.MeshBasicMaterial ||
-			 material instanceof THREE.MeshLambertMaterial ||
-			 material instanceof THREE.MeshPhongMaterial ) {
+		if ( refreshMaterial ) {
 
-			refreshUniformsCommon( m_uniforms, material );
+			_gl.uniformMatrix4fv( p_uniforms.projectionMatrix, false, _projectionMatrixArray );
 
-		}
+			// refresh uniforms common to several materials
 
-		// refresh single material specific uniforms
+			if ( fog && material.fog ) {
 
-		if ( material instanceof THREE.LineBasicMaterial ) {
+				refreshUniformsFog( m_uniforms, fog );
 
-			refreshUniformsLine( m_uniforms, material );
+			}
 
-		} else if ( material instanceof THREE.ParticleBasicMaterial ) {
+			if ( material instanceof THREE.MeshPhongMaterial ||
+				 material instanceof THREE.MeshLambertMaterial ||
+				 material.lights ) {
 
-			refreshUniformsParticle( m_uniforms, material );
+				setupLights( program, lights );
+				refreshUniformsLights( m_uniforms, _lights );
 
-		} else if ( material instanceof THREE.MeshPhongMaterial ) {
+			}
 
-			refreshUniformsPhong( m_uniforms, material );
+			if ( material instanceof THREE.MeshBasicMaterial ||
+				 material instanceof THREE.MeshLambertMaterial ||
+				 material instanceof THREE.MeshPhongMaterial ) {
 
-		} else if ( material instanceof THREE.MeshDepthMaterial ) {
+				refreshUniformsCommon( m_uniforms, material );
 
-			m_uniforms.mNear.value = camera.near;
-			m_uniforms.mFar.value = camera.far;
-			m_uniforms.opacity.value = material.opacity;
+			}
 
-		} else if ( material instanceof THREE.MeshNormalMaterial ) {
+			// refresh single material specific uniforms
 
-			m_uniforms.opacity.value = material.opacity;
+			if ( material instanceof THREE.LineBasicMaterial ) {
 
-		}
+				refreshUniformsLine( m_uniforms, material );
 
-		if ( object.receiveShadow && ! material._shadowPass ) {
+			} else if ( material instanceof THREE.ParticleBasicMaterial ) {
 
-			refreshUniformsShadow( m_uniforms, material );
+				refreshUniformsParticle( m_uniforms, material );
 
-		}
+			} else if ( material instanceof THREE.MeshPhongMaterial ) {
 
-		// load common uniforms
+				refreshUniformsPhong( m_uniforms, material );
 
-		loadUniformsGeneric( program, m_uniforms );
-		loadUniformsMatrices( p_uniforms, object );
+			} else if ( material instanceof THREE.MeshDepthMaterial ) {
 
-		// load material specific uniforms
-		// (shader material also gets them for the sake of genericity)
+				m_uniforms.mNear.value = camera.near;
+				m_uniforms.mFar.value = camera.far;
+				m_uniforms.opacity.value = material.opacity;
 
-		if ( material instanceof THREE.ShaderMaterial ||
-			 material instanceof THREE.MeshPhongMaterial ||
-			 material.envMap ) {
+			} else if ( material instanceof THREE.MeshNormalMaterial ) {
 
-			if( p_uniforms.cameraPosition !== null ) {
+				m_uniforms.opacity.value = material.opacity;
 
-				_gl.uniform3f( p_uniforms.cameraPosition, camera.position.x, camera.position.y, camera.position.z );
+			}
+
+			if ( object.receiveShadow && ! material._shadowPass ) {
+
+				refreshUniformsShadow( m_uniforms, material );
+
+			}
+
+			// load common uniforms
+
+			loadUniformsGeneric( program, material.uniformsList );
+
+			// load material specific uniforms
+			// (shader material also gets them for the sake of genericity)
+
+			if ( material instanceof THREE.ShaderMaterial ||
+				 material instanceof THREE.MeshPhongMaterial ||
+				 material.envMap ) {
+
+				if( p_uniforms.cameraPosition !== null ) {
+
+					_gl.uniform3f( p_uniforms.cameraPosition, camera.position.x, camera.position.y, camera.position.z );
+
+				}
+
+			}
+
+			if ( material instanceof THREE.MeshPhongMaterial ||
+				 material instanceof THREE.MeshLambertMaterial ||
+				 material instanceof THREE.ShaderMaterial ||
+				 material.skinning ) {
+
+				if( p_uniforms.viewMatrix !== null ) {
+
+					_gl.uniformMatrix4fv( p_uniforms.viewMatrix, false, _viewMatrixArray );
+
+				}
+
+			}
+
+			if ( material.skinning ) {
+
+				loadUniformsSkinning( p_uniforms, object );
 
 			}
 
 		}
+
+		loadUniformsMatrices( p_uniforms, object );
 
 		if ( material instanceof THREE.ShaderMaterial ||
 			 material.envMap ||
@@ -2821,25 +2865,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 				_gl.uniformMatrix4fv( p_uniforms.objectMatrix, false, object._objectMatrixArray );
 
 			}
-
-		}
-
-		if ( material instanceof THREE.MeshPhongMaterial ||
-			 material instanceof THREE.MeshLambertMaterial ||
-			 material instanceof THREE.ShaderMaterial ||
-			 material.skinning ) {
-
-			if( p_uniforms.viewMatrix !== null ) {
-
-				_gl.uniformMatrix4fv( p_uniforms.viewMatrix, false, _viewMatrixArray );
-
-			}
-
-		}
-
-		if ( material.skinning ) {
-
-			loadUniformsSkinning( p_uniforms, object );
 
 		}
 
@@ -3443,6 +3468,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( light instanceof THREE.SpotLight && light.castShadow ) {
 
+				_currentMaterialId = -1;
+
 				if ( ! _this.shadowMap[ j ] ) {
 
 					var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat };
@@ -3624,6 +3651,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			o, ol, oil, webglObject, object, buffer,
 			lights = scene.lights,
 			fog = scene.fog;
+
+		_currentMaterialId = -1;
 
 		if ( this.shadowMapEnabled ) renderShadowMap( scene, camera );
 
@@ -4831,14 +4860,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function loadUniformsGeneric( program, uniforms ) {
 
-		var u, uniform, value, type, location, texture, i, il, offset;
+		var uniform, value, type, location, texture, i, il, j, jl, offset;
 
-		for( u in uniforms ) {
+		for( j = 0, jl = uniforms.length; j < jl; j ++ ) {
 
-			location = program.uniforms[ u ];
+			location = program.uniforms[ uniforms[ j ][ 1 ] ];
 			if ( !location ) continue;
 
-			uniform = uniforms[ u ];
+			uniform = uniforms[ j ][ 0 ];
 
 			type = uniform.type;
 			value = uniform.value;

@@ -49,13 +49,17 @@ THREE.EffectComposer.prototype = {
 
 		var maskActive = false;
 
-		var i, il = this.passes.length;
+		var pass, i, il = this.passes.length;
 
 		for ( i = 0; i < il; i ++ ) {
 
-			this.passes[ i ].render( this.renderer, this.writeBuffer, this.readBuffer, delta, maskActive );
+			pass = this.passes[ i ];
 
-			if ( this.passes[ i ].needsSwap ) {
+			if ( !pass.enabled ) continue;
+
+			pass.render( this.renderer, this.writeBuffer, this.readBuffer, delta, maskActive );
+
+			if ( pass.needsSwap ) {
 
 				if ( maskActive ) {
 
@@ -73,13 +77,11 @@ THREE.EffectComposer.prototype = {
 
 			}
 
-			if ( this.passes[ i ] instanceof THREE.MaskPass ) {
+			if ( pass instanceof THREE.MaskPass ) {
 
 				maskActive = true;
 
-			}
-
-			if ( this.passes[ i ] instanceof THREE.ClearMaskPass ) {
+			} else if ( pass instanceof THREE.ClearMaskPass ) {
 
 				maskActive = false;
 

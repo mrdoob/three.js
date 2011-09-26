@@ -108,14 +108,11 @@
 				geometry = new THREE.PlaneGeometry( 100, 100, 15, 10 );
 
 				mesh = new THREE.Mesh( geometry, xm );
-				mesh.position.x = 0;
-				mesh.position.y = FLOOR;
-				mesh.position.z = 0;
-				mesh.rotation.x = 1.57;
-				mesh.scale.x = mesh.scale.y = mesh.scale.z = 10;
+				mesh.position.set( 0, FLOOR, 0 );
+				mesh.rotation.x = Math.PI/2;
+				mesh.scale.set( 10, 10, 10 );
 				mesh.doubleSided = true;
-				mesh.updateMatrix();
-				scene.add(mesh);
+				scene.add( mesh );
 
 				// SPHERES
 
@@ -125,13 +122,12 @@
 				for ( var i = 0; i < 10; i ++ ) {
 
 					mesh = new THREE.Mesh( sphere, material_spheres );
-					mesh.position.x = 500 * (Math.random() - 0.5);
-					mesh.position.y = 300 * (Math.random() - 0) + FLOOR;
-					mesh.position.z = 100 * (Math.random() - 1);
-					mesh.scale.x = mesh.scale.y = mesh.scale.z = 0.25 * (Math.random() + 0.5);
+					mesh.position.x = 500 * ( Math.random() - 0.5 );
+					mesh.position.y = 300 * ( Math.random() - 0 ) + FLOOR;
+					mesh.position.z = 100 * ( Math.random() - 1 );
+					mesh.scale.x = mesh.scale.y = mesh.scale.z = 0.25 * ( Math.random() + 0.5 );
 					mesh.overdraw = true;
-					mesh.updateMatrix();
-					scene.add(mesh);
+					scene.add( mesh );
 
 				}
 
@@ -142,13 +138,13 @@
 				scene.add( ambient );
 
 				var directionalLight = new THREE.DirectionalLight( 0xffeedd );
-				directionalLight.position.y = -70;
-				directionalLight.position.z = 100;
+				directionalLight.position.set( 0, -70, 100 );
 				directionalLight.position.normalize();
 				scene.add( directionalLight );
 
 
 				if ( render_gl ) {
+
 					try {
 						webglRenderer = new THREE.WebGLRenderer();
 						webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
@@ -158,12 +154,15 @@
 					}
 					catch (e) {
 					}
+
 				}
 
 				if( render_canvas ) {
+
 					canvasRenderer = new THREE.CanvasRenderer();
 					canvasRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 					container.appendChild( canvasRenderer.domElement );
+
 				}
 
 				stats = new Stats();
@@ -177,8 +176,8 @@
 
 				//var loader = new THREE.BinaryLoader(),
 				var loader = new THREE.JSONLoader(),
-					callbackMale   = function( geometry ) { createScene( geometry,  90, 50, FLOOR, 105 ) },
-					callbackFemale = function( geometry ) { createScene( geometry, -80, 50, FLOOR, 0 ) };
+					callbackMale   = function( geometry ) { createScene( geometry,  90, FLOOR, 50, 105 ) },
+					callbackFemale = function( geometry ) { createScene( geometry, -80, FLOOR, 50, 0 ) };
 
 				loader.load( { model: "obj/male02/Male02_slim.js", callback: callbackMale } );
 				loader.load( { model: "obj/female02/Female02_slim.js", callback: callbackFemale } );
@@ -191,13 +190,10 @@
 			function createScene( geometry, x, y, z, b ) {
 
 				zmesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial() );
-				zmesh.position.x = x;
-				zmesh.position.z = y;
-				zmesh.position.y = z;
-				zmesh.scale.x = zmesh.scale.y = zmesh.scale.z = 3;
+				zmesh.position.set( x, y, z );
+				zmesh.scale.set( 3, 3, 3 );
 				zmesh.overdraw = true;
-				zmesh.updateMatrix();
-				scene.add(zmesh);
+				scene.add( zmesh );
 
 				createMaterialsPalette( geometry.materials, 100, b );
 
@@ -213,33 +209,29 @@
 					mesh.position.x = i * (size + 5) - ( ( materials.length - 1 )* ( size + 5 )/2);
 					mesh.position.y = FLOOR + size/2 + bottom;
 					mesh.position.z = -100;
-					mesh.scale.x = mesh.scale.y = mesh.scale.z = 1;
 					mesh.doubleSided = true;
-					mesh.updateMatrix();
-					scene.add(mesh);
+					scene.add( mesh );
 
 					// number
 
 					var x = document.createElement( "canvas" );
-					var xc = x.getContext("2d");
+					var xc = x.getContext( "2d" );
 					x.width = x.height = 128;
 					xc.shadowColor = "#000";
 					xc.shadowBlur = 7;
 					xc.fillStyle = "orange";
 					xc.font = "50pt arial bold";
-					xc.fillText(i, 10, 64);
+					xc.fillText( i, 10, 64 );
 
 					var xm = new THREE.MeshBasicMaterial( { map: new THREE.Texture( x ), transparent: true } );
 					xm.map.needsUpdate = true;
 
 					mesh = new THREE.Mesh( new THREE.PlaneGeometry( size, size ), xm );
-					mesh.position.x = i * (size + 5) - ( ( materials.length - 1 )* ( size + 5 )/2);
+					mesh.position.x = i * ( size + 5 ) - ( ( materials.length - 1 )* ( size + 5 )/2);
 					mesh.position.y = FLOOR + size/2 + bottom;
 					mesh.position.z = -99;
-					mesh.scale.x = mesh.scale.y = mesh.scale.z = 1;
 					mesh.doubleSided = true;
-					mesh.updateMatrix();
-					scene.add(mesh);
+					scene.add( mesh );
 
 				}
 
@@ -267,7 +259,6 @@
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
-				camera.updateMatrix();
 
 				if ( render_gl && has_gl ) webglRenderer.render( scene, camera );
 				if ( render_canvas ) canvasRenderer.render( scene, camera );

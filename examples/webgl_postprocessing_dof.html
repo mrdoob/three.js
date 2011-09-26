@@ -84,6 +84,8 @@
 				renderer.setSize( window.innerWidth, height );
 				container.appendChild( renderer.domElement );
 
+				renderer.sortObjects = false;
+
 				material_depth = new THREE.MeshDepthMaterial();
 
 				var path = "textures/cube/SwedishRoyalCastle/";

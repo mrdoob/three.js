@@ -19,6 +19,7 @@ THREE.TexturePass = function( texture, opacity ) {
 
 	} );
 
+	this.enabled = true;
 	this.needsSwap = false;
 
 };

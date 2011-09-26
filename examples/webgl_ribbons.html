@@ -118,7 +118,7 @@
 				}
 
 				var tmpRot = new THREE.Matrix4();
-				tmpRot.setRotationAxis( new THREE.Vector3( 1, 0, 0 ), 1.57 );
+				tmpRot.setRotationAxis( new THREE.Vector3( 1, 0, 0 ), Math.PI/2 );
 
 				xgrid = 34;
 				ygrid = 15;
@@ -132,8 +132,8 @@
 
 					ribbon = new THREE.Ribbon( i % 2 ? geometry : geometry2, materials[ c ] );
 					ribbon.rotation.x = 0;
-					ribbon.rotation.y = 1.57;
-					ribbon.rotation.z = 3.14;
+					ribbon.rotation.y = Math.PI / 2;
+					ribbon.rotation.z = Math.PI;
 
 					x = 40 * ( i - xgrid/2 );
 					y = 40 * ( j - ygrid/2 );

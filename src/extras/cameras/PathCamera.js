@@ -47,8 +47,8 @@ THREE.PathCamera = function ( parameters ) {
 	this.lookSpeed = 0.005;
 	this.lookVertical = true;
 	this.lookHorizontal = true;
-	this.verticalAngleMap   = { srcRange: [ 0, 6.28 ], dstRange: [ 0, 6.28 ] };
-	this.horizontalAngleMap = { srcRange: [ 0, 6.28 ], dstRange: [ 0, 6.28 ] };
+	this.verticalAngleMap   = { srcRange: [ 0, 2 * Math.PI ], dstRange: [ 0, 2 * Math.PI ] };
+	this.horizontalAngleMap = { srcRange: [ 0, 2 * Math.PI ], dstRange: [ 0, 2 * Math.PI ] };
 
 	this.domElement = document;
 
@@ -117,24 +117,24 @@ THREE.PathCamera = function ( parameters ) {
 		dstRange = this.verticalAngleMap.dstRange;
 
 		//this.phi = map_linear( this.phi, srcRange[ 0 ], srcRange[ 1 ], dstRange[ 0 ], dstRange[ 1 ] );
-		
+
 		var tmpPhi = map_linear( this.phi, srcRange[ 0 ], srcRange[ 1 ], dstRange[ 0 ], dstRange[ 1 ] );
 		var tmpPhiFullRange = dstRange[ 1 ] - dstRange[ 0 ];
 		var tmpPhiNormalized = ( tmpPhi - dstRange[ 0 ] ) / tmpPhiFullRange;
-		
+
 		this.phi = TWEEN.Easing.Quadratic.EaseInOut( tmpPhiNormalized ) * tmpPhiFullRange + dstRange[ 0 ];
-		
+
 		// constrain horizontal look angle
 
 		srcRange = this.horizontalAngleMap.srcRange;
 		dstRange = this.horizontalAngleMap.dstRange;
 
 		//this.theta = map_linear( this.theta, srcRange[ 0 ], srcRange[ 1 ], dstRange[ 0 ], dstRange[ 1 ] );
-		
+
 		var tmpTheta = map_linear( this.theta, srcRange[ 0 ], srcRange[ 1 ], dstRange[ 0 ], dstRange[ 1 ] );
 		var tmpThetaFullRange = dstRange[ 1 ] - dstRange[ 0 ];
 		var tmpThetaNormalized = ( tmpTheta - dstRange[ 0 ] ) / tmpThetaFullRange;
-		
+
 		this.theta = TWEEN.Easing.Quadratic.EaseInOut( tmpThetaNormalized ) * tmpThetaFullRange + dstRange[ 0 ];
 
 		var targetPosition = this.target.position,
