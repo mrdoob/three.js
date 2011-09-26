@@ -390,7 +390,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		doffset = 0,
 		poffset = 0;
 
-		for ( l = 0, ll = lights.length; l < ll; l++ ) {
+		for ( l = 0, ll = lights.length; l < ll; l ++ ) {
 
 			light = lights[ l ];
 			color = light.color;
@@ -458,8 +458,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		// null eventual remains from removed lights
 		// (this is to avoid if in shader)
 
-		for( l = dlength * 3; l < dcolors.length; l++ ) dcolors[ l ] = 0.0;
-		for( l = plength * 3; l < pcolors.length; l++ ) pcolors[ l ] = 0.0;
+		for ( l = dlength * 3, ll = dcolors.length; l < ll; l ++ ) dcolors[ l ] = 0.0;
+		for ( l = plength * 3, ll = pcolors.length; l < ll; l ++ ) pcolors[ l ] = 0.0;
 
 		zlights.point.length = plength;
 		zlights.directional.length = dlength;
@@ -2695,6 +2695,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		material.uniformsList = [];
+
+		for ( u in material.uniforms ) {
+
+			material.uniformsList.push( [ material.uniforms[ u ], u ] );
+
+		}
+
 	};
 
 	function setProgram( camera, lights, fog, material, object ) {
@@ -2793,7 +2801,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// load common uniforms
 
-		loadUniformsGeneric( program, m_uniforms );
+		loadUniformsGeneric( program, material.uniformsList );
 		loadUniformsMatrices( p_uniforms, object );
 
 		// load material specific uniforms
@@ -4831,14 +4839,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function loadUniformsGeneric( program, uniforms ) {
 
-		var u, uniform, value, type, location, texture, i, il, offset;
+		var uniform, value, type, location, texture, i, il, j, jl, offset;
 
-		for( u in uniforms ) {
+		for( j = 0, jl = uniforms.length; j < jl; j ++ ) {
 
-			location = program.uniforms[ u ];
+			location = program.uniforms[ uniforms[ j ][ 1 ] ];
 			if ( !location ) continue;
 
-			uniform = uniforms[ u ];
+			uniform = uniforms[ j ][ 0 ];
 
 			type = uniform.type;
 			value = uniform.value;
