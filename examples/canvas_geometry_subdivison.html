@@ -87,7 +87,7 @@
 
 				for ( var i = 0; i < 6; i ++ ) {
 
-					materials.push( [ new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, wireframe: true } ) ] );
+					materials.push( [ new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, wireframe: false } ) ] );
 
 				}
 				
@@ -106,7 +106,9 @@
 				//PlaneGeometry not supported
 				
 				// quick fix for duplicated vertices
-				geometry.checkDupVertices();
+				// /geometry.checkDupVertices( true );
+				
+				console.log(geometry);
 				
 				smooth = createSubdivision(geometry, 2);
 				
@@ -163,7 +165,12 @@
 				// }
 				
 
-				cube = new THREE.Mesh( smooth, new THREE.MeshBasicMaterial( { color: 0x405040, wireframe:true,  opacity:0.8 } ) ); //new THREE.MeshFaceMaterial()
+				// cube = new THREE.Mesh( smooth, new THREE.MeshBasicMaterial( { color: 0x405040, wireframe:false,  opacity:0.8 } ) ); 
+				cube = new THREE.Mesh( smooth, new THREE.MeshFaceMaterial() ); 
+				// material =  new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.FlatShading } );
+				// 	 new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.SmoothShading } );
+				
+				//
 				cube.doubleSided = true;
 				cube.position.y = 150;
 				cube.overdraw = true;

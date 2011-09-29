@@ -547,29 +547,36 @@ THREE.Geometry.prototype = {
 
 	}, 
 	
-	checkDupVertices: function() {
+	checkDupVertices: function(toPatch) {
+		
 		var uniqueVertices = {}, patch = {};
 		var v, key;
-		var precision = 1;
+		var precision = 1000;
 		var i,il, face;
 		
 		for (i=0,il=this.vertices.length;i<il;i++) {
 			
 			v = this.vertices[i].position;
-			//key = [v.x.toFixed(precision), v.y.toFixed(precision), v.z.toFixed(precision)].join('_');
-			key = [Math.round(v.x * 1000), Math.round(v.y* 1000), Math.round(v.z* 1000)].join('_');
+			key = [Math.round(v.x * precision), Math.round(v.y* precision), Math.round(v.z* precision)].join('_');
 			
 			if (uniqueVertices[key]===undefined) {
 				uniqueVertices[key] = i;
 			} else {
-				//console.log('HEY ', i, 'should be using ', uniqueVertices[key]);
+				console.log('Duplicate vertex found. ', i, ' could be using ', uniqueVertices[key]);
 				patch[i] = uniqueVertices[key];
 			}
 			
 		};
 		
+		
+		
+		if (!toPatch) return;
+		
 		// Start to patch.
-		//console.log(patch);
+		console.log('Start' , patch, toPatch);
+		
+		
+		//TODO: Clear delete vertices?
 		
 		var runPatch = function(i) {
 			if (patch[i] !== undefined) {
@@ -578,6 +585,7 @@ THREE.Geometry.prototype = {
 			}
 			return i;
 		};
+		
 		for( i = 0, il = this.faces.length; i < il; i ++ ) {
 
 			face = this.faces[ i ];
