@@ -14,7 +14,7 @@ THREE.Geometry = function () {
 
 	this.faces = [];
 
-	this.edges = [];
+	//this.edges = [];
 
 	this.faceUvs = [[]];
 	this.faceVertexUvs = [[]];
@@ -487,9 +487,7 @@ THREE.Geometry.prototype = {
 				// to triangles: a,b,d / b,c,d
 				// shared edge is: b,d
 
-				// should shared edge be included?
-				// comment out if not
-
+				// add edge B-D only if you wish to slice a face4
 				// hash = edge_hash( face.b, face.d ); 
 				// addToMap( vfMap, hash, i );
 
@@ -513,6 +511,7 @@ THREE.Geometry.prototype = {
 		
 	
 		this.vfMap = vfMap;
+		this.edges = [];
 		
 		var numOfEdges = 0;
 		for (i in vfMap) {
@@ -525,25 +524,7 @@ THREE.Geometry.prototype = {
 		
 		//console.log('vfMap', vfMap, 'this.edges',this.edges, 'numOfEdges', numOfEdges);
 
-		// Not sure what the below does.
-		
-		// for( i = 0, il = this.edges.length; i < il; i ++ ) {
-		// 
-		// 	edge = this.edges[ i ];
-		// 
-		// 	v1 = edge.vertexIndices[ 0 ];
-		// 	v2 = edge.vertexIndices[ 1 ];
-		// 
-		// 	edge.faceIndices = vfMap[ edge_hash( v1, v2 ) ].array;
-		// 
-		// 	for( j = 0; j < edge.faceIndices.length; j ++ ) {
-		// 
-		// 		faceIndex = edge.faceIndices[ j ];
-		// 		edge.faces.push( this.faces[ faceIndex ] );
-		// 
-		// 	}
-		// 
-		// }
+		return vfMap;
 
 	}, 
 	

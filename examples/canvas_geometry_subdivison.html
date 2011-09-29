@@ -106,9 +106,9 @@
 				//PlaneGeometry not supported
 				
 				// quick fix for duplicated vertices
-				// /geometry.checkDupVertices( true );
+				geometry.checkDupVertices( true );
 				
-				console.log(geometry);
+				//console.log(geometry);
 				
 				smooth = createSubdivision(geometry, 2);
 				
@@ -130,8 +130,6 @@
 						context.scale(0.1,-0.1);
 
 						context.fillText(i, 0,0);
-						
-						
 						
 					};
 					
