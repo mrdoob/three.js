@@ -450,19 +450,11 @@ THREE.Geometry.prototype = {
 			if ( map[ hash ] === undefined ) {
 
 				map[ hash ] = { "set": {}, "array": [] };
-				map[ hash ].set[ i ] = 1;
-				map[ hash ].array.push( i );
-
-			} else {
-
-				if( map[ hash ].set[ i ] === undefined ) {
-
-					map[ hash ].set[ i ] = 1;
-					map[ hash ].array.push( i );
-
-				}
-
-			}
+				
+			} 
+			
+			map[ hash ].set[ i ] = 1;
+			map[ hash ].array.push( i );
 
 		};
 
@@ -486,7 +478,7 @@ THREE.Geometry.prototype = {
 				hash = edge_hash( face.b, face.c );
 				addToMap( vfMap, hash, i );
 
-				hash = edge_hash( face.a, face.c );
+				hash = edge_hash( face.c, face.a );
 				addToMap( vfMap, hash, i );
 
 			} else if ( face instanceof THREE.Face4 ) {
@@ -504,13 +496,13 @@ THREE.Geometry.prototype = {
 				hash = edge_hash( face.a, face.b );
 				addToMap( vfMap, hash, i );
 
-				hash = edge_hash( face.a, face.d );
-				addToMap( vfMap, hash, i );
-
 				hash = edge_hash( face.b, face.c );
 				addToMap( vfMap, hash, i );
 
 				hash = edge_hash( face.c, face.d );
+				addToMap( vfMap, hash, i );
+				
+				hash = edge_hash( face.d, face.a );
 				addToMap( vfMap, hash, i );
 
 			}
@@ -553,6 +545,59 @@ THREE.Geometry.prototype = {
 		// 
 		// }
 
+	}, 
+	
+	checkDupVertices: function() {
+		var uniqueVertices = {}, patch = {};
+		var v, key;
+		var precision = 1;
+		var i,il, face;
+		
+		for (i=0,il=this.vertices.length;i<il;i++) {
+			
+			v = this.vertices[i].position;
+			//key = [v.x.toFixed(precision), v.y.toFixed(precision), v.z.toFixed(precision)].join('_');
+			key = [Math.round(v.x * 1000), Math.round(v.y* 1000), Math.round(v.z* 1000)].join('_');
+			
+			if (uniqueVertices[key]===undefined) {
+				uniqueVertices[key] = i;
+			} else {
+				//console.log('HEY ', i, 'should be using ', uniqueVertices[key]);
+				patch[i] = uniqueVertices[key];
+			}
+			
+		};
+		
+		// Start to patch.
+		//console.log(patch);
+		
+		var runPatch = function(i) {
+			if (patch[i] !== undefined) {
+				//console.log('fixing',i, 'to', patch[i]);
+				return patch[i];
+			}
+			return i;
+		};
+		for( i = 0, il = this.faces.length; i < il; i ++ ) {
+
+			face = this.faces[ i ];
+
+			if ( face instanceof THREE.Face3 ) {
+				face.a = runPatch(face.a);
+				face.b = runPatch(face.b);
+				face.c = runPatch(face.c);
+			
+			} if ( face instanceof THREE.Face4 ) {
+
+				face.a = runPatch(face.a);
+				face.b = runPatch(face.b);
+				face.c = runPatch(face.c);
+				face.d = runPatch(face.d);
+			
+			}
+		}
+		
+		//console.log(this);
 	}
 
 };

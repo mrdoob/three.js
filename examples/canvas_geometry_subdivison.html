@@ -22,7 +22,11 @@
 		
 		<script src="../src/core/Geometry.js"></script>
 		<script src="../src/extras/geometries/CubeGeometry.js"></script>
-
+		<script src="../src/extras/geometries/CylinderGeometry.js"></script>
+		<script src="../src/extras/geometries/SubdivisionGeometry.js"></script>
+		
+		<script src="fonts/helvetiker_regular.typeface.js"></script>
+		
 		<script>
 
 			var container, stats;
@@ -87,7 +91,22 @@
 
 				}
 				
-				geometry = new THREE.CubeGeometry( 200, 200, 200, 1, 1, 1, materials );
+				geometry = new THREE.CubeGeometry( 200, 200, 200, 2, 2, 2, materials );
+				
+				//geometry = new THREE.SphereGeometry( 200, 1, 1);
+				//geometry = new THREE.CylinderGeometry( 50, 50, 200 );
+				// geometry = new THREE.TextGeometry( '&', {
+				// 						size: 200,
+				// 						height: 50,
+				// 						curveSegments: 1,
+				// 						font: "helvetiker"
+				// 
+				// 					});
+					
+				//PlaneGeometry not supported
+				
+				// quick fix for duplicated vertices
+				geometry.checkDupVertices();
 				
 				smooth = createSubdivision(geometry, 2);
 				
@@ -100,19 +119,48 @@
 					context.fill();
 
 				}
+				
+				var drawText = function(i) {
+					
+					return function ( context ) {
+
+						context.beginPath();
+						context.scale(0.1,-0.1);
+
+						context.fillText(i, 0,0);
+						
+						
+						
+					};
+					
+
+				}
+
+
 
 				group = new THREE.Object3D();
 				group.position.y = 150;
 				scene.add( group );
 
-				for ( var i = 0; i < smooth.vertices.length; i++ ) {
-
-					particle = new THREE.Particle( new THREE.ParticleCanvasMaterial( { color: Math.random() * 0x808008 + 0x808080, program: program } ) );
-					particle.position = smooth.vertices[i].position;
-					var pos = smooth.vertices.position
-					particle.scale.x = particle.scale.y = 5;
-					group.add( particle );
-				}
+				// Debug new Points
+				// for ( var i = 0; i < smooth.vertices.length; i++ ) {
+				// 
+				// 	particle = new THREE.Particle( new THREE.ParticleCanvasMaterial( { color: Math.random() * 0x808008 + 0x808080, program: program } ) );
+				// 	particle.position = smooth.vertices[i].position;
+				// 	var pos = smooth.vertices.position
+				// 	particle.scale.x = particle.scale.y = 5;
+				// 	group.add( particle );
+				// }
+				
+				// Debug original points
+				// for ( var i = 0; i < geometry.vertices.length; i++ ) {
+				// 
+				// 	particle = new THREE.Particle( new THREE.ParticleCanvasMaterial( { color: Math.random() * 0x808008 + 0x808080, program: drawText(i) } ) );
+				// 	particle.position = smooth.vertices[i].position;
+				// 	var pos = geometry.vertices.position
+				// 	particle.scale.x = particle.scale.y = 30;
+				// 	group.add( particle );
+				// }
 				
 
 				cube = new THREE.Mesh( smooth, new THREE.MeshBasicMaterial( { color: 0x405040, wireframe:true,  opacity:0.8 } ) ); //new THREE.MeshFaceMaterial()
