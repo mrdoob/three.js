@@ -3636,7 +3636,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 						setObjectFaces( object );
 
 						program = setProgram( _cameraLight, lights, fog, _depthMaterial, object );
-						object.render( function( object ) { renderBufferImmediate( object, program, _depthMaterial.shading ); } );
+						if ( object.immediateRenderCallback ) {
+							object.immediateRenderCallback( program, _gl, _frustum );
+						}
+						else {
+							object.render( function( object ) { renderBufferImmediate( object, program, _depthMaterial.shading ); } );
+						}
 
 					}
 
@@ -3814,7 +3819,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 					setObjectFaces( object );
 
 					program = setProgram( camera, lights, fog, scene.overrideMaterial, object );
-					object.render( function( object ) { renderBufferImmediate( object, program, scene.overrideMaterial.shading ); } );
+					if ( object.immediateRenderCallback ) {
+							object.immediateRenderCallback( program, _gl, _frustum );
+						}
+						else {
+							object.render( function( object ) { renderBufferImmediate( object, program, _depthMaterial.shading ); } );
+						}
 
 				}
 
@@ -3876,7 +3886,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 						setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
 
 						program = setProgram( camera, lights, fog, material, object );
-						object.render( function( object ) { renderBufferImmediate( object, program, material.shading ); } );
+						if ( object.immediateRenderCallback ) {
+							object.immediateRenderCallback( program, _gl, _frustum );
+						}
+						else {
+							object.render( function( object ) { renderBufferImmediate( object, program, _depthMaterial.shading ); } );
+						}
 
 					}
 
@@ -3939,7 +3954,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 						setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
 
 						program = setProgram( camera, lights, fog, material, object );
-						object.render( function( object ) { renderBufferImmediate( object, program, material.shading ); } );
+						if ( object.immediateRenderCallback ) {
+							object.immediateRenderCallback( program, _gl, _frustum );
+						}
+						else {
+							object.render( function( object ) { renderBufferImmediate( object, program, _depthMaterial.shading ); } );
+						}
 
 					}
 
@@ -4275,7 +4295,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				geometry = object.geometry;
 				addBuffer( scene.__webglObjects, geometry, object );
 
-			} else if ( THREE.MarchingCubes !== undefined && object instanceof THREE.MarchingCubes ) {
+			} else if ( THREE.MarchingCubes !== undefined && object instanceof THREE.MarchingCubes || object.immediateRenderCallback ) {
 
 				addBufferImmediate( scene.__webglObjectsImmediate, object );
 
@@ -4480,7 +4500,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			removeInstancesDirect( scene.__webglSprites, object );
 
-		} else if ( object instanceof THREE.MarchingCubes ) {
+		} else if ( object instanceof THREE.MarchingCubes || object.immediateRenderCallback ) {
 
 			removeInstances( scene.__webglObjectsImmediate, object );
 
