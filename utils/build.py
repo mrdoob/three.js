@@ -93,6 +93,7 @@ EXTRAS_FILES = [
 'extras/core/TextPath.js',
 'extras/animation/AnimationHandler.js',
 'extras/animation/Animation.js',
+'extras/cameras/CubeCamera.js',
 'extras/cameras/FirstPersonCamera.js',
 'extras/cameras/PathCamera.js',
 'extras/cameras/FlyCamera.js',
