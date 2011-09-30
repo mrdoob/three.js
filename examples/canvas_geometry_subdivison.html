@@ -91,8 +91,10 @@
 
 				}
 				
+				
 				geometry = new THREE.CubeGeometry( 200, 200, 200, 2, 2, 2, materials );
 				
+				//geometry = new THREE.TorusGeometry( 100, 60, 4, 8, Math.PI*2 );
 				//geometry = new THREE.SphereGeometry( 200, 1, 1);
 				//geometry = new THREE.CylinderGeometry( 50, 50, 200 );
 				// geometry = new THREE.TextGeometry( '&', {
@@ -152,7 +154,7 @@
 				// 	group.add( particle );
 				// }
 				
-				// Debug original points
+				//Debug original points
 				// for ( var i = 0; i < geometry.vertices.length; i++ ) {
 				// 
 				// 	particle = new THREE.Particle( new THREE.ParticleCanvasMaterial( { color: Math.random() * 0x808008 + 0x808080, program: drawText(i) } ) );
@@ -163,8 +165,8 @@
 				// }
 				
 
-				// cube = new THREE.Mesh( smooth, new THREE.MeshBasicMaterial( { color: 0x405040, wireframe:false,  opacity:0.8 } ) ); 
-				cube = new THREE.Mesh( smooth, new THREE.MeshFaceMaterial() ); 
+				 cube = new THREE.Mesh( smooth, new THREE.MeshBasicMaterial( { color: 0x405040, wireframe:true,  opacity:0.8 } ) ); 
+				//cube = new THREE.Mesh( smooth, new THREE.MeshFaceMaterial() ); 
 				// material =  new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.FlatShading } );
 				// 	 new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.SmoothShading } );
 				
