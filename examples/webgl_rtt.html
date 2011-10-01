@@ -112,8 +112,8 @@
 				cameraRTT.position.z = 100;
 
 				camera = new THREE.Camera( 30, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.useTarget = true;
 				camera.position.z = 100;
-				camera.updateMatrix();
 
 				scene = new THREE.Scene();
 				sceneRTT = new THREE.Scene();
