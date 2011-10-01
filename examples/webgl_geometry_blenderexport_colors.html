@@ -97,7 +97,10 @@
 
 				var material = [ new THREE.MeshFaceMaterial(), new THREE.MeshLambertMaterial( { color: 0xffffff, opacity:0.9, shading:THREE.FlatShading, wireframe: true, wireframeLinewidth: 2 } ) ];
 
-				mesh = THREE.SceneUtils.addMesh( scene, geometry, 250, 400, 0, 0, 0, 0, 0, material );
+				mesh = new THREE.Mesh( geometry, material );
+				mesh.position.x = 400;
+				mesh.scale.x = mesh.scale.y = mesh.scale.z = 250;
+				scene.addObject( mesh );
 
 			}
 
@@ -107,7 +110,10 @@
 
 				var material = new THREE.MeshFaceMaterial();
 
-				mesh2 = THREE.SceneUtils.addMesh( scene, geometry, 250, -400, 0, 0, 0, 0, 0, material );
+				mesh2 = new THREE.Mesh( geometry, material );
+				mesh2.position.x = - 400;
+				mesh2.scale.x = mesh2.scale.y = mesh2.scale.z = 250;
+				scene.addObject( mesh2 );
 
 			}
 

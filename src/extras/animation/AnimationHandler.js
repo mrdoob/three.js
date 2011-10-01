@@ -42,7 +42,7 @@ THREE.AnimationHandler = (function() {
 
 
 	//--- add ---
-	
+
 	that.add = function( data ) {
 
 		if( library[ data.name ] !== undefined )
@@ -55,61 +55,61 @@ THREE.AnimationHandler = (function() {
 
 
 	//--- get ---
-	
+
 	that.get = function( name ) {
-		
+
 		if( typeof name === "string" ) {
-			
+
 			if( library[ name ] ) {
-				
+
 				return library[ name ];
-			
+
 			} else {
-				
+
 				console.log( "THREE.AnimationHandler.get: Couldn't find animation " + name );
 				return null;
 
 			}
 
 		} else {
-			
+
 			// todo: add simple tween library
 
 		}
-		
+
 	};
 
 	//--- parse ---
-	
+
 	that.parse = function( root ) {
-		
+
 		// setup hierarchy
 
 		var hierarchy = [];
-	
+
 		if ( root instanceof THREE.SkinnedMesh ) {
-	
+
 			for( var b = 0; b < root.bones.length; b++ ) {
-	
+
 				hierarchy.push( root.bones[ b ] );
-	
+
 			}
-	
+
 		} else {
-	
+
 			parseRecurseHierarchy( root, hierarchy );
-	
+
 		}
-		
+
 		return hierarchy;
 
 	};
 
 	var parseRecurseHierarchy = function( root, hierarchy ) {
-		
+
 		hierarchy.push( root );
-		
-		for( var c = 0; c < root.children.length; c++ ) 
+
+		for( var c = 0; c < root.children.length; c++ )
 			parseRecurseHierarchy( root.children[ c ], hierarchy );
 
 	}
@@ -118,16 +118,16 @@ THREE.AnimationHandler = (function() {
 	//--- init data ---
 
 	var initData = function( data ) {
- 
+
 		if( data.initialized === true )
 			return;
-		
+
 
 		// loop through all keys
 
-		for( var h = 0; h < data.hierarchy.length; h++ ) {
+		for( var h = 0; h < data.hierarchy.length; h ++ ) {
 
-			for( var k = 0; k < data.hierarchy[ h ].keys.length; k++ ) {
+			for( var k = 0; k < data.hierarchy[ h ].keys.length; k ++ ) {
 
 				// remove minus times
 
@@ -148,77 +148,81 @@ THREE.AnimationHandler = (function() {
 
 
 			// prepare morph target keys
-			
+
 			if( data.hierarchy[ h ].keys[ 0 ].morphTargets !== undefined ) {
 
 				// get all used
 
 				var usedMorphTargets = {};
-				
-				for( var k = 0; k < data.hierarchy[ h ].keys.length; k++ ) {
-	
-					for( var m = 0; m < data.hierarchy[ h ].keys[ k ].morphTargets.length; m++ ) {
-						
+
+				for( var k = 0; k < data.hierarchy[ h ].keys.length; k ++ ) {
+
+					for( var m = 0; m < data.hierarchy[ h ].keys[ k ].morphTargets.length; m ++ ) {
+
 						var morphTargetName = data.hierarchy[ h ].keys[ k ].morphTargets[ m ];
 						usedMorphTargets[ morphTargetName ] = -1;
-					}					
-				
-				}
-				
-				data.hierarchy[ h ].usedMorphTargets = usedMorphTargets;
-				
-				
-				// set all used on all frames
-				
-				for( var k = 0; k < data.hierarchy[ h ].keys.length; k++ ) {
-	
-					var influences = {};
-	
-					for( var morphTargetName in usedMorphTargets ) {
-			
-						for( var m = 0; m < data.hierarchy[ h ].keys[ k ].morphTargets.length; m++ ) {
-	
-							if( data.hierarchy[ h ].keys[ k ].morphTargets[ m ] === morphTargetName ) {
-								
-								influences[ morphTargetName ] = data.hierarchy[ h ].keys[ k ].morphTargetsInfluences[ m ];
-								break;	
-							}
-					
-						}
-						
-						if( m === data.hierarchy[ h ].keys[ k ].morphTargets.length ) {
-							
-							influences[ morphTargetName ] = 0;
-						}
-	
+
 					}
-				
+
+				}
+
+				data.hierarchy[ h ].usedMorphTargets = usedMorphTargets;
+
+
+				// set all used on all frames
+
+				for( var k = 0; k < data.hierarchy[ h ].keys.length; k ++ ) {
+
+					var influences = {};
+
+					for( var morphTargetName in usedMorphTargets ) {
+
+						for( var m = 0; m < data.hierarchy[ h ].keys[ k ].morphTargets.length; m ++ ) {
+
+							if( data.hierarchy[ h ].keys[ k ].morphTargets[ m ] === morphTargetName ) {
+
+								influences[ morphTargetName ] = data.hierarchy[ h ].keys[ k ].morphTargetsInfluences[ m ];
+								break;
+
+							}
+
+						}
+
+						if( m === data.hierarchy[ h ].keys[ k ].morphTargets.length ) {
+
+							influences[ morphTargetName ] = 0;
+
+						}
+
+					}
+
 					data.hierarchy[ h ].keys[ k ].morphTargetsInfluences = influences;
+
 				}
-			
+
 			}
-			
-			
+
+
 			// remove all keys that are on the same time
-			
-			for( var k = 1; k < data.hierarchy[ h ].keys.length; k++ ) {
-				
+
+			for( var k = 1; k < data.hierarchy[ h ].keys.length; k ++ ) {
+
 				if( data.hierarchy[ h ].keys[ k ].time === data.hierarchy[ h ].keys[ k - 1 ].time ) {
-					
+
 					data.hierarchy[ h ].keys.splice( k, 1 );
-					k--;
-				
+					k --;
+
 				}
-				
+
 			}
 
 
 			// set index
-			
-			for( var k = 1; k < data.hierarchy[ h ].keys.length; k++ ) {
-				
+
+			for( var k = 1; k < data.hierarchy[ h ].keys.length; k ++ ) {
+
 				data.hierarchy[ h ].keys[ k ].index = k;
-				
+
 			}
 
 		}
@@ -231,8 +235,8 @@ THREE.AnimationHandler = (function() {
 		data.JIT = {};
 		data.JIT.hierarchy = [];
 
-		for( var h = 0; h < data.hierarchy.length; h++ )
-			data.JIT.hierarchy.push( new Array( lengthInFrames ));
+		for( var h = 0; h < data.hierarchy.length; h ++ )
+			data.JIT.hierarchy.push( new Array( lengthInFrames ) );
 
 
 		// done
@@ -249,4 +253,5 @@ THREE.AnimationHandler = (function() {
 	that.CATMULLROM_FORWARD = 2;
 
 	return that;
+
 }());

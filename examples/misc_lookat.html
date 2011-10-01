@@ -64,10 +64,10 @@
 
 				scene = new THREE.Scene();
 
-				var geometry = new THREE.Cylinder( 3, 10, 0.1, 100 );
+				var geometry = new THREE.CylinderGeometry( 3, 10, 0.1, 100 );
 				var material = new THREE.MeshNormalMaterial( { shading: THREE.SmoothShading } );
 
-				target = new THREE.Mesh( new THREE.Sphere( 100, 20, 20 ), material );
+				target = new THREE.Mesh( new THREE.SphereGeometry( 100, 20, 20 ), material );
 				scene.addObject( target );
 
 				for ( var i = 0; i < 1000; i ++ ) {

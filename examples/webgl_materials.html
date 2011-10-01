@@ -75,7 +75,7 @@
 				materials.push( new THREE.MeshLambertMaterial( { color: 0xdddddd, shading: THREE.FlatShading } ) );
 				materials.push( new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.FlatShading } ) );
 				materials.push( new THREE.MeshNormalMaterial( ) );
-				materials.push( new THREE.MeshBasicMaterial( { color: 0x665500, blending: THREE.AdditiveBlending } ) );
+				materials.push( new THREE.MeshBasicMaterial( { color: 0xffaa00, transparent: true, blending: THREE.AdditiveBlending } ) );
 				//materials.push( new THREE.MeshBasicMaterial( { color: 0xff0000, blending: THREE.SubtractiveBlending } ) );
 
 				materials.push( new THREE.MeshLambertMaterial( { color: 0xdddddd, shading: THREE.SmoothShading } ) );
@@ -88,9 +88,9 @@
 
 				// Spheres geometry
 
-				var geometry_smooth = new THREE.Sphere( 70, 32, 16 );
-				var geometry_flat = new THREE.Sphere( 70, 32, 16 );
-				var geometry_pieces = new THREE.Sphere( 70, 32, 16 ); // Extra geometry to be broken down for MeshFaceMaterial
+				var geometry_smooth = new THREE.SphereGeometry( 70, 32, 16 );
+				var geometry_flat = new THREE.SphereGeometry( 70, 32, 16 );
+				var geometry_pieces = new THREE.SphereGeometry( 70, 32, 16 ); // Extra geometry to be broken down for MeshFaceMaterial
 
 				for ( var i = 0, l = geometry_pieces.faces.length; i < l; i ++ ) {
 
@@ -127,7 +127,7 @@
 
 				}
 
-				particleLight = new THREE.Mesh( new THREE.Sphere( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
+				particleLight = new THREE.Mesh( new THREE.SphereGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
 				scene.addObject( particleLight );
 
 				// Lights

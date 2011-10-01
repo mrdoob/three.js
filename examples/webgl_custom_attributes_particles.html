@@ -1,0 +1,224 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>three.js webgl - custom attributes [particles]</title>
+		<style>
+			body {
+				color: #ffffff;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				font-weight: bold;
+
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+			}
+			#info {
+				color: #fff;
+				background-color: rgba( 0, 0, 0, 0.75 );
+				position: relative;
+				top: 0px; width: 100%;
+				padding: 5px;
+				z-index:100;
+				width:33em;
+				margin:0 auto -2em;
+			}
+			a { color: #ff0000 }
+		</style>
+	</head>
+
+	<body>
+		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - custom attributes example - particles</div>
+		<div id="container"></div>
+
+		<script src="../build/Three.js"></script>
+
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
+		<script type="text/javascript" src="js/Detector.js"></script>
+		<script type="text/javascript" src="js/Stats.js"></script>
+
+		<script type="x-shader/x-vertex" id="vertexshader">
+
+			uniform float amplitude;
+			attribute float size;
+			attribute vec3 customColor;
+
+			varying vec3 vColor;
+
+			void main() {
+
+				vColor = customColor;
+
+				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+
+				//gl_PointSize = size;
+				gl_PointSize = size * ( 300.0 / length( mvPosition.xyz ) );
+
+				gl_Position = projectionMatrix * mvPosition;
+
+			}
+
+		</script>
+
+		<script type="x-shader/x-fragment" id="fragmentshader">
+
+			uniform vec3 color;
+			uniform sampler2D texture;
+
+			varying vec3 vColor;
+
+			void main() {
+
+				gl_FragColor = vec4( color * vColor, 1.0 );
+				gl_FragColor = gl_FragColor * texture2D( texture, gl_PointCoord );
+
+			}
+
+		</script>
+
+
+		<script type="text/javascript">
+
+		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+		var renderer, scene, camera, stats;
+
+		var sphere, uniforms, attributes;
+
+		var noise = [];
+
+		var WIDTH = window.innerWidth,
+			HEIGHT = window.innerHeight;
+
+		init();
+		animate();
+
+		function init() {
+
+			camera = new THREE.Camera( 40, WIDTH / HEIGHT, 1, 10000 );
+			camera.position.z = 300;
+
+			scene = new THREE.Scene();
+
+			attributes = {
+
+				size: {	type: 'f', value: [] },
+				customColor: { type: 'c', value: [] }
+
+			};
+
+			uniforms = {
+
+				amplitude: { type: "f", value: 1.0 },
+				color:     { type: "c", value: new THREE.Color( 0xffffff ) },
+				texture:   { type: "t", value: 0, texture: THREE.ImageUtils.loadTexture( "textures/sprites/spark1.png" ) },
+
+			};
+
+			var shaderMaterial = new THREE.MeshShaderMaterial( {
+
+				uniforms: 		uniforms,
+				attributes:     attributes,
+				vertexShader:   document.getElementById( 'vertexshader' ).textContent,
+				fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
+
+				blending: 		THREE.AdditiveBlending,
+				depthTest: 		false,
+				transparent:	true
+
+			});
+
+
+			var radius = 200;
+			var geometry = new THREE.Geometry();
+
+			for ( var i = 0; i < 100000; i++ ) {
+
+				vector = new THREE.Vector3( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 );
+				vector.multiplyScalar( radius );
+
+				geometry.vertices.push( new THREE.Vertex( vector ) );
+
+			}
+
+			sphere = new THREE.ParticleSystem( geometry, shaderMaterial );
+
+			sphere.dynamic = true;
+			//sphere.sortParticles = true;
+
+			var vertices = sphere.geometry.vertices;
+			var values_size = attributes.size.value;
+			var values_color = attributes.customColor.value;
+
+
+			for( var v = 0; v < vertices.length; v++ ) {
+
+				values_size[ v ] = 10;
+				values_color[ v ] = new THREE.Color( 0xffaa00 );
+
+				if ( vertices[ v ].position.x < 0 )
+					values_color[ v ].setHSV( 0.5 + 0.1 * ( v / vertices.length ), 0.7, 0.9 );
+				else
+					values_color[ v ].setHSV( 0.0 + 0.1 * ( v / vertices.length ), 0.9, 0.9 );
+
+			}
+
+			scene.addChild( sphere );
+
+			renderer = new THREE.WebGLRenderer( { clearColor: 0x000000, clearAlpha: 1 } );
+			renderer.setSize( WIDTH, HEIGHT );
+
+			var container = document.getElementById( 'container' );
+			container.appendChild( renderer.domElement );
+
+			stats = new Stats();
+			stats.domElement.style.position = 'absolute';
+			stats.domElement.style.top = '0px';
+			container.appendChild( stats.domElement );
+
+		}
+
+		function cap( x, a, b ) {
+
+			return ( x < a ) ? a : ( ( x > b ) ? b : x );
+
+		}
+
+		var i, value;
+
+		function animate() {
+
+			requestAnimationFrame( animate );
+
+			render();
+			stats.update();
+
+		}
+
+		function render() {
+
+			var time = new Date().getTime() * 0.005;
+
+			sphere.rotation.z = 0.01 * time;
+
+			for( i = 0; i < attributes.size.value.length; i++ ) {
+
+				attributes.size.value[ i ] = 14 + 13 * Math.sin( 0.1 * i + time );
+
+
+			}
+
+			attributes.size.needsUpdate = true;
+
+			renderer.render( scene, camera );
+
+		}
+
+
+	</script>
+
+</body>
+
+</html>

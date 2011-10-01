@@ -48,7 +48,7 @@
         </script>
         <script type="text/javascript">
 
-            var scene, camera, renderer, info, mouse2d, sun, loader, sphere, debugNormal;
+            var camera, scene, renderer, info, mouse2d, sun, loader, sphere, debugNormal;
 
             var range = 400;
             var speed = 1;
@@ -73,10 +73,8 @@
 
                 scene = new THREE.Scene();
 
-                sphere = new THREE.Mesh(new THREE.Sphere(sphereSize, 10, 10), new THREE.MeshLambertMaterial({
-                    color: 0xff0000
-                }));
-                scene.addObject(sphere);
+                sphere = new THREE.Mesh( new THREE.SphereGeometry( sphereSize, 10, 10 ), new THREE.MeshLambertMaterial( { color: 0xff0000 } ) );
+                scene.addObject( sphere );
 
                 renderer = new THREE.WebGLRenderer();
                 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -108,11 +106,10 @@
             }
 
             function createCube(sx, sy, sz, p, ry){
-                var cube = new THREE.Mesh(new THREE.Cube(sx, sy, sz, 1, 1, 1), new THREE.MeshLambertMaterial({
-                    color: 0x003300//, wireframe: true
-                }));
+                
+                var cube = new THREE.Mesh( new THREE.CubeGeometry( sx, sy, sz ), new THREE.MeshLambertMaterial( { color: 0x003300 } ) );
                 cube.position = p;
-				cube.rotation.y = ry;
+		cube.rotation.y = ry;
                 scene.addObject(cube);
                 THREE.Collisions.colliders.push( THREE.CollisionUtils.MeshOBB(cube) );
 				cubes.push(cube);

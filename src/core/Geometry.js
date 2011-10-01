@@ -7,7 +7,7 @@
 
 THREE.Geometry = function () {
 
-	this.id = "Geometry" + THREE.GeometryIdCounter ++;
+	this.id = THREE.GeometryCount ++;
 
 	this.vertices = [];
 	this.colors = []; // one-to-one vertex colors, used in ParticleSystem, Line and Ribbon
@@ -30,9 +30,13 @@ THREE.Geometry = function () {
 
 	this.hasTangents = false;
 
+	this.dynamic = false; // unless set to true the *Arrays will be deleted once sent to a buffer.
+
 };
 
 THREE.Geometry.prototype = {
+
+	constructor : THREE.Geometry,
 
 	computeCentroids: function () {
 
@@ -388,7 +392,9 @@ THREE.Geometry.prototype = {
 
 	computeBoundingSphere: function () {
 
-		var radius = this.boundingSphere === null ? 0 : this.boundingSphere.radius;
+		// var radius = this.boundingSphere === null ? 0 : this.boundingSphere.radius;
+
+		var radius = 0;
 
 		for ( var v = 0, vl = this.vertices.length; v < vl; v ++ ) {
 
@@ -504,4 +510,4 @@ THREE.Geometry.prototype = {
 
 };
 
-THREE.GeometryIdCounter = 0;
+THREE.GeometryCount = 0;

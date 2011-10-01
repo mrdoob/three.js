@@ -51,14 +51,52 @@
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var container;
-			var camera, scene, renderer, soundRenderer;
+			var camera, scene, renderer;
 			var light, pointLight;
-			var cameraControl;
 
 			var mesh;
 			var material_sphere1, material_sphere2;
 
-			var postprocessing = { enabled: true };
+			var sound1, sound2;
+
+			var Sound = function ( sources, radius, volume ) {
+
+				var audio = document.createElement( 'audio' );
+
+				for ( var i = 0; i < sources.length; i ++ ) {
+
+					var source = document.createElement( 'source' );
+					source.src = sources[ i ];
+
+					audio.appendChild( source );
+
+				}
+
+				this.position = new THREE.Vector3();
+
+				this.play = function () {
+
+					audio.play();
+
+				}
+
+				this.update = function ( camera ) {
+
+					var distance = this.position.distanceTo( camera.position );
+
+					if ( distance <= radius ) {
+
+						audio.volume = volume * ( 1 - distance / radius );
+
+					} else {
+
+						audio.volume = 0;
+
+					}
+
+				}
+
+			}
 
 			init();
 			animate();
@@ -70,7 +108,7 @@
 				scene  = new THREE.Scene();
 				scene.fog = new THREE.FogExp2( 0x000000, 0.0035 );
 
-				camera = new THREE.QuakeCamera( {
+				camera = new THREE.FirstPersonCamera( {
 					fov: 50, aspect: window.innerWidth / window.innerHeight, near: 1, far: 10000,
 					movementSpeed: 70, lookSpeed: 0.05, noFly: true, lookVertical: false
 				} );
@@ -82,12 +120,12 @@
 				light.position.normalize();
 				scene.addLight( light );
 
-				var sphere = new THREE.Sphere( 20, 32, 16 );
+				var sphere = new THREE.SphereGeometry( 20, 32, 16 );
 
 				material_sphere1 = new THREE.MeshLambertMaterial( { color: 0xffaa00, shading: THREE.FlatShading } );
 				material_sphere2 = new THREE.MeshLambertMaterial( { color: 0xff2200, shading: THREE.FlatShading } );
 
-				var cube = new THREE.Cube( 5, 40, 5 );
+				var cube = new THREE.CubeGeometry( 5, 40, 5 );
 				var material_cube = new THREE.MeshLambertMaterial( { color: 0xffff00, shading: THREE.FlatShading } );
 				material_cube.color.setHSV( 0.1, 0.7, 1 );
 
@@ -98,33 +136,23 @@
 				var mesh1 = new THREE.Mesh( sphere, material_sphere1 );
 				mesh1.position.set( -250, 30, 0 );
 				mesh1.scale.set( s, s, s );
-
-				var sound1 = new THREE.Sound( [ "sounds/358232_j_s_song.mp3", "sounds/358232_j_s_song.ogg" ] , 275, 20, true );
-				//var sound1 = new THREE.Sound( "sounds/358232_j_s_song.ogg", 275, 20, true );
-				sound1.play();
-
-				var dbg = new THREE.Mesh( cube, material_cube );
-				dbg.position.set( 0, -10 ,0 );
-				mesh1.addChild( dbg );
-
-				mesh1.addChild( sound1 );
 				scene.addObject( mesh1 );
 
+				sound1 = new Sound( [ 'sounds/358232_j_s_song.mp3', 'sounds/358232_j_s_song.ogg' ], 275, 1 );
+				sound1.position.copy( mesh1.position );
+				sound1.play();
+
+				//
 
 				var mesh2 = new THREE.Mesh( sphere, material_sphere2 );
 				mesh2.position.set( 250, 30, 0 );
 				mesh2.scale.set( s, s, s );
+				scene.addObject( mesh2 );
 
-				var sound2 = new THREE.Sound( [ "sounds/376737_Skullbeatz___Bad_Cat_Maste.mp3", "sounds/376737_Skullbeatz___Bad_Cat_Maste.ogg" ], 275, 20, true );
-				//var sound2 = new THREE.Sound( "sounds/376737_Skullbeatz___Bad_Cat_Maste.ogg", 275, 20, true );
+				sound2 = new Sound( [ 'sounds/376737_Skullbeatz___Bad_Cat_Maste.mp3', 'sounds/376737_Skullbeatz___Bad_Cat_Maste.ogg' ], 275, 1 );
+				sound2.position.copy( mesh2.position );
 				sound2.play();
 
-				var dbg = new THREE.Mesh( cube, material_cube );
-				dbg.position.set( 0, -10, 0 );
-				mesh2.addChild( dbg );
-
-				mesh2.addChild( sound2 );
-				scene.addObject( mesh2 );
 
 				// ground
 
@@ -132,7 +160,7 @@
 				material_wireframe.color.setHSV( 0.1, 0.2, 0.25 );
 
 
-				var plane = new THREE.Plane( 1000, 1000, 100, 100 );
+				var plane = new THREE.PlaneGeometry( 1000, 1000, 100, 100 );
 				mesh = new THREE.Mesh( plane, material_wireframe );
 				mesh.position.y = 0.1;
 				mesh.rotation.x = -1.57;
@@ -142,75 +170,16 @@
 				renderer = new THREE.WebGLRenderer( { clearColor: 0x000000, clearAlpha: 1, antialias: false } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				soundRenderer = new THREE.SoundRenderer();
-
 				container.innerHTML = "";
 				container.appendChild( renderer.domElement );
-				container.appendChild( soundRenderer.domElement );
 
-				initPostprocessing();
 				renderer.autoClear = false;
-
-			}
-
-
-			function initPostprocessing() {
-
-				postprocessing.scene = new THREE.Scene();
-
-				postprocessing.camera = new THREE.Camera();
-				postprocessing.camera.projectionMatrix = THREE.Matrix4.makeOrtho( window.innerWidth / - 2, window.innerWidth / 2,  window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
-				postprocessing.camera.position.z = 100;
-
-				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
-				postprocessing.rtTexture1 = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
-				postprocessing.rtTexture2 = new THREE.WebGLRenderTarget( 512, 512, pars );
-				postprocessing.rtTexture3 = new THREE.WebGLRenderTarget( 512, 512, pars );
-
-				var screen_shader = THREE.ShaderUtils.lib["screen"];
-				var screen_uniforms = THREE.UniformsUtils.clone( screen_shader.uniforms );
-
-				screen_uniforms["tDiffuse"].texture = postprocessing.rtTexture1;
-				screen_uniforms["opacity"].value = 1.0;
-
-				postprocessing.materialScreen = new THREE.MeshShaderMaterial( {
-
-					uniforms: screen_uniforms,
-					vertexShader: screen_shader.vertexShader,
-					fragmentShader: screen_shader.fragmentShader,
-					blending: THREE.AdditiveBlending,
-					transparent: true
-
-				} );
-
-				var convolution_shader = THREE.ShaderUtils.lib["convolution"];
-				var convolution_uniforms = THREE.UniformsUtils.clone( convolution_shader.uniforms );
-
-				postprocessing.blurx = new THREE.Vector2( 0.001953125, 0.0 ),
-				postprocessing.blury = new THREE.Vector2( 0.0, 0.001953125 );
-
-				convolution_uniforms["tDiffuse"].texture = postprocessing.rtTexture1;
-				convolution_uniforms["uImageIncrement"].value = postprocessing.blurx;
-				convolution_uniforms["cKernel"].value = THREE.ShaderUtils.buildKernel( 4.0 );
-
-				postprocessing.materialConvolution = new THREE.MeshShaderMaterial( {
-
-					uniforms: convolution_uniforms,
-					vertexShader:   "#define KERNEL_SIZE 25.0\n" + convolution_shader.vertexShader,
-					fragmentShader: "#define KERNEL_SIZE 25\n"   + convolution_shader.fragmentShader
-
-				} );
-
-				postprocessing.quad = new THREE.Mesh( new THREE.Plane( window.innerWidth, window.innerHeight ), postprocessing.materialConvolution );
-				postprocessing.quad.position.z = - 500;
-				postprocessing.scene.addObject( postprocessing.quad );
 
 			}
 
 			function animate() {
 
 				requestAnimationFrame( animate );
-
 				render();
 
 			}
@@ -223,52 +192,11 @@
 				material_sphere1.color.setHSV( 0.0, 0.3 + 0.7 * ( 1 + Math.cos(time) ) / 2, 1 );
 				material_sphere2.color.setHSV( 0.1, 0.3 + 0.7 * ( 1 + Math.sin(time) ) / 2, 1 );
 
-				if ( postprocessing.enabled ) {
+				renderer.clear();
+				renderer.render( scene, camera );
 
-					renderer.clear();
-
-					// Render scene into texture
-
-					renderer.render( scene, camera, postprocessing.rtTexture1, true );
-
-					// Render quad with blured scene into texture (convolution pass 1)
-
-					postprocessing.quad.materials = [ postprocessing.materialConvolution ];
-
-					postprocessing.materialConvolution.uniforms.tDiffuse.texture = postprocessing.rtTexture1;
-					postprocessing.materialConvolution.uniforms.uImageIncrement.value = postprocessing.blurx;
-
-					renderer.render( postprocessing.scene, postprocessing.camera, postprocessing.rtTexture2, true );
-
-					// Render quad with blured scene into texture (convolution pass 2)
-
-					postprocessing.materialConvolution.uniforms.tDiffuse.texture = postprocessing.rtTexture2;
-					postprocessing.materialConvolution.uniforms.uImageIncrement.value = postprocessing.blury;
-
-					renderer.render( postprocessing.scene, postprocessing.camera, postprocessing.rtTexture3, true );
-
-					// Render original scene with superimposed blur to texture
-
-					postprocessing.quad.materials = [ postprocessing.materialScreen ];
-
-					postprocessing.materialScreen.uniforms.tDiffuse.texture = postprocessing.rtTexture3;
-					postprocessing.materialScreen.uniforms.opacity.value = 1.3;
-
-					renderer.render( postprocessing.scene, postprocessing.camera, postprocessing.rtTexture1, false );
-
-					// Render to screen
-
-					postprocessing.materialScreen.uniforms.tDiffuse.texture = postprocessing.rtTexture1;
-					renderer.render( postprocessing.scene, postprocessing.camera );
-
-				} else {
-
-					renderer.clear();
-					renderer.render( scene, camera );
-
-				}
-
-				soundRenderer.render( scene, camera );
+				sound1.update( camera );
+				sound2.update( camera );
 
 			}
 

@@ -4,18 +4,16 @@
 
 THREE.UV = function ( u, v ) {
 
-	this.set(
-
-		u || 0,
-		v || 0
-
-	);
+	this.u = u || 0;
+	this.v = v || 0;
 
 };
 
 THREE.UV.prototype = {
 
-	set : function ( u, v ) {
+	constructor: THREE.UV,
+
+	set: function ( u, v ) {
 
 		this.u = u;
 		this.v = v;
@@ -24,16 +22,18 @@ THREE.UV.prototype = {
 
 	},
 
-	copy : function ( uv ) {
+	copy: function ( uv ) {
 
-		this.set(
-
-			uv.u,
-			uv.v
-
-		);
+		this.u = uv.u;
+		this.v = uv.v;
 
 		return this;
+
+	},
+
+	clone: function () {
+
+		return new THREE.UV( this.u, this.v );
 
 	}
 

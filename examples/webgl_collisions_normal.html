@@ -45,18 +45,15 @@ body {
 
 <script type="text/javascript"> 
 
-var scene, camera, renderer, info, mouse2d, sun, loader, stats, line;
+var camera, scene, projector, renderer,
+info, mouse = { x: 0, y: 0 }, sun, loader, stats, line;
+
 var meshes = [];
 
 var theta = 0;
 var camdist = 500;
 
-var totalFaces = 0;
-var totalColliders = 0;
-
-var ray = new THREE.Ray();
-var matrix = new THREE.Matrix4(),
-	matrix2 = new THREE.Matrix4();
+var totalFaces = 0, totalColliders = 0;
 
 function init() {
 
@@ -67,11 +64,12 @@ function init() {
 	
 	camera = new THREE.Camera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
 	camera.position.z = camdist;
-	mouse2d = new THREE.Vector3( 0, 0, 1 );
 	
 	loader = new THREE.JSONLoader(  );
 
 	scene = new THREE.Scene();
+
+	projector = new THREE.Projector();
 
 	renderer = new THREE.WebGLRenderer();
 	renderer.setSize( window.innerWidth, window.innerHeight );
@@ -139,9 +137,8 @@ function addCube( p, g) {
 function onDocumentMouseMove( event ) {
 
 	event.preventDefault();	
-	mouse2d.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-	mouse2d.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-	mouse2d.z = 1;
+	mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+	mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
 };
 
@@ -149,20 +146,13 @@ function onDocumentMouseMove( event ) {
 function animate() {
 
 	requestAnimationFrame( animate );
-	
-	ray.origin.copy( mouse2d );
 
-	matrix.copy( camera.matrixWorld );
-	matrix.multiplySelf( THREE.Matrix4.makeInvert( camera.projectionMatrix, matrix2 ) );
-	matrix.multiplyVector3( ray.origin );
+	var vector = new THREE.Vector3( mouse.x, mouse.y, 0.5 );
+	projector.unprojectVector( vector, camera );
+
+	var ray = new THREE.Ray( camera.position, vector.subSelf( camera.position ).normalize() );
 	
-	ray.direction.copy( ray.origin );
-	ray.direction.subSelf( camera.position );
-	
-	//var ray2 = new THREE.Ray();
-	//ray2.origin = ray.origin.clone();
-	
-	if( meshes.length == 0 ) return;
+	if ( meshes.length == 0 ) return;
 	
 	var i, l = meshes.length;
 	

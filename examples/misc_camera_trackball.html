@@ -1,0 +1,194 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>three.js webgl - trackball camera</title>
+		<meta charset="utf-8">
+		<style type="text/css">
+		    body {
+			color: #000;
+			font-family:Monospace;
+			font-size:13px;
+			text-align:center;
+			font-weight: bold;
+
+			background-color: #fff;
+			margin: 0px;
+			overflow: hidden;
+		    }
+
+		    #info {
+					color:#000;
+			position: absolute;
+			top: 0px; width: 100%;
+			padding: 5px;
+
+		    }
+
+		    a { color: red; }
+
+		</style>
+	</head>
+
+	<body>
+		<div id="container"></div>
+		<div id="info">
+			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - trackball camera example</br>
+			MOVE mouse & press LEFT/A: rotate, MIDDLE/S: zoom, RIGHT/D: pan
+		</div>
+
+		<script type="text/javascript" src="../build/Three.js"></script>
+
+		<script type="text/javascript" src="js/Stats.js"></script>
+
+		<script type="text/javascript">
+		
+			var statsEnabled = true;
+
+			var container, stats;
+
+			var camera, scene, renderer;
+
+			var cross;
+
+			init();
+
+			function init() {
+
+				// scene and camera
+
+				scene = new THREE.Scene();
+				scene.fog = new THREE.FogExp2( 0xffffff, 0.002 );
+
+				camera = new THREE.TrackballCamera({
+
+					fov: 60, 
+					aspect: window.innerWidth / window.innerHeight,
+					near: 1,
+					far: 1e3,
+
+					rotateSpeed: 1.0,
+					zoomSpeed: 1.2,
+					panSpeed: 0.8,
+
+					noZoom: false,
+					noPan: false,
+
+					staticMoving: true,
+					dynamicDampingFactor: 0.3,
+
+					keys: [ 65, 83, 68 ]
+
+				});
+
+				camera.position.z = 500;
+
+				// world
+
+				var cube = new THREE.CubeGeometry( 20, 60, 20 );
+				
+				cube.vertices[ 0 ].position.multiplyScalar( 0.01 );
+				cube.vertices[ 1 ].position.multiplyScalar( 0.01 );
+				cube.vertices[ 4 ].position.multiplyScalar( 0.01 );
+				cube.vertices[ 5 ].position.multiplyScalar( 0.01 );
+				
+				var material =  new THREE.MeshLambertMaterial( { color:0xffffff } );
+
+				for( var i = 0; i < 500; i++ ) {
+					
+					var mesh = new THREE.Mesh( cube, material );
+					mesh.position.set(( Math.random() - 0.5 ) * 1000,
+									  ( Math.random() - 0.5 ) * 1000,
+									  ( Math.random() - 0.5 ) * 1000 );
+									  
+					mesh.updateMatrix();
+					mesh.matrixAutoUpdate = false;
+					scene.addChild( mesh );
+					
+				}
+
+
+				// create cross
+
+				/*
+				cross = new THREE.Object3D();
+				cross.scale.set( 0.5, 0.5, 0.5 );
+				cross.matrixAutoUpdate = false;
+
+				var material = new THREE.MeshPhongMaterial( { color:0xff0000 } );
+				var mesh = new THREE.Mesh( new THREE.Cube( 40, 5, 5 ), material );
+				mesh.position.x = 20;
+				cross.addChild( mesh );
+
+				var material = new THREE.MeshPhongMaterial( { color:0x00ff00 } );
+				var mesh = new THREE.Mesh( new THREE.Cube( 5, 40, 5 ), material );
+				mesh.position.y = 20;
+				cross.addChild( mesh );
+
+				var material = new THREE.MeshPhongMaterial( { color:0x0000ff } );
+				var mesh = new THREE.Mesh( new THREE.Cube( 5, 5, 40 ), material );
+				mesh.position.z = 20;
+
+				cross.addChild( mesh );
+				camera.addChild( cross );
+				*/
+
+
+				// lights
+
+				light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( 1, 1, 1 );
+				scene.addChild( light );
+
+				light = new THREE.DirectionalLight( 0x002288 );
+				light.position.set( -1, -1, -1 );
+				scene.addChild( light );
+
+				light = new THREE.AmbientLight( 0x222222 );
+				scene.addChild( light );
+
+
+				// renderer
+
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer.setClearColorHex( 0xffffff, 1 );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				container = document.getElementById( 'container' );
+				container.appendChild( renderer.domElement );
+
+				if ( statsEnabled ) {
+
+					stats = new Stats();
+					stats.domElement.style.position = 'absolute';
+					stats.domElement.style.top = '0px';
+					stats.domElement.style.zIndex = 100;
+					container.appendChild( stats.domElement );
+
+				}
+
+				setInterval( loop, 1000 / 60 );
+
+			}
+
+
+			function loop() {
+
+				/*
+				cross.matrix.copy( camera.matrix );
+				cross.matrix.n14 = 0;
+				cross.matrix.n24 = 0;
+				cross.matrix.n34 = -200;
+				cross.matrixWorldNeedsUpdate = true;
+				*/
+
+				renderer.render( scene, camera );
+
+				if ( statsEnabled ) stats.update();
+
+			}
+
+
+		</script>
+
+	</body>
+</html>

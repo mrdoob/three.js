@@ -88,7 +88,8 @@
 				scene.addLight( pointLight );
 
 				// light representation
-				sphere = new THREE.Sphere( 100, 16, 8 );
+
+				sphere = new THREE.SphereGeometry( 100, 16, 8 );
 				lightMesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color:0xffaa00 } ) );
 				lightMesh.position = pointLight.position;
 				lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
@@ -108,7 +109,23 @@
 				var cubeMaterial2 = new THREE.MeshBasicMaterial( { color: 0xccfffd, envMap: textureCube, refractionRatio: 0.985 } );
 				var cubeMaterial1 = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube, refractionRatio: 0.98 } )
 
-				THREE.SceneUtils.addPanoramaCubeWebGL( sceneCube, 100000, textureCube );
+				// Skybox
+
+				var shader = THREE.ShaderUtils.lib["cube"];
+				shader.uniforms["tCube"].texture = textureCube;
+
+				var material = new THREE.MeshShaderMaterial( {
+
+					fragmentShader: shader.fragmentShader,
+					vertexShader: shader.vertexShader,
+					uniforms: shader.uniforms
+
+				} ),
+
+				mesh = new THREE.Mesh( new THREE.CubeGeometry( 100000, 100000, 100000, 1, 1, 1, null, true ), material );
+				sceneCube.addObject( mesh );
+
+				//
 
 				webglRenderer = new THREE.WebGLRenderer();
 				webglRenderer.setSize( window.innerWidth, window.innerHeight );
@@ -132,11 +149,24 @@
 
 			function createScene( geometry, m1, m2, m3 ) {
 
-				var s = 1.5, z = -1000;
+				var s = 1.5, z = - 1000;
 
-				THREE.SceneUtils.addMesh( scene, geometry, s,      0, 0, z, 0,0,0, m1 );
-				THREE.SceneUtils.addMesh( scene, geometry, s,   -900, 0, z, 0,0,0, m2 );
-				THREE.SceneUtils.addMesh( scene, geometry, s,    900, 0, z, 0,0,0, m3 );
+				var mesh = new THREE.Mesh( geometry, m1 );
+				mesh.position.z = z;
+				mesh.scale.x = mesh.scale.y = mesh.scale.z = s;
+				scene.addObject( mesh );
+
+				var mesh = new THREE.Mesh( geometry, m2 );
+				mesh.position.x = - 900;
+				mesh.position.z = z;
+				mesh.scale.x = mesh.scale.y = mesh.scale.z = s;
+				scene.addObject( mesh );
+
+				var mesh = new THREE.Mesh( geometry, m3 );
+				mesh.position.x = 900;
+				mesh.position.z = z;
+				mesh.scale.x = mesh.scale.y = mesh.scale.z = s;
+				scene.addObject( mesh );
 
 				loader.statusDomElement.style.display = "none";
 

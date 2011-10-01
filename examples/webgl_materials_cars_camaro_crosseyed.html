@@ -1,0 +1,262 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>three.js webgl - materials - cube reflection [camaro]</title>
+		<meta charset="utf-8">
+		<style type="text/css">
+			body {
+				background:#000;
+				color:#fff;
+				padding:0;
+				margin:0;
+				overflow:hidden;
+				font-family:georgia;
+				text-align:center;
+			}
+			h1 { }
+			a { color:skyblue }
+			canvas { pointer-events:none; z-index:10; position:relative; }
+			#log { position:absolute; top:50px; text-align:left; display:block; z-index:100 }
+			#d { text-align:center; margin:1em 0 -2.5em 0; z-index:0; position:relative; display:block }
+			#buttons { margin:0.5em 0 0 0 }
+			button { font-family:georgia; border:0; background:#222; color:#fff; padding:0.2em 0.5em; cursor:pointer; border-radius:3px }
+			button:hover { background:#333 }
+		</style>
+	</head>
+
+	<body>
+		<div id="d">
+			<div id="info">
+				<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl cube reflection demo. chevrolet camaro by <a href="http://www.turbosquid.com/3d-models/blender-camaro/411348" target="_blank">dskfnwn</a>
+					- O, P : change eye separation
+				</div>
+				
+			<div id="buttons"></div>
+		</div>
+
+		<div id="log"></div>
+
+		<script type="text/javascript" src="../build/Three.js"></script>
+		
+		<script type="text/javascript" src="js/Detector.js"></script>
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
+		<script type="text/javascript" src="js/Stats.js"></script>
+
+		<script type="text/javascript">
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var SCREEN_WIDTH = window.innerWidth;
+			var SCREEN_HEIGHT = window.innerHeight;
+
+			var container, stats;
+
+			var camera, scene, webglRenderer;
+
+			var lightMesh;
+
+			var directionalLight, pointLight;
+
+			var mouseX = 0, mouseY = 0;
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.Camera( 70, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
+				camera.position.z = 1000;
+				camera.updateMatrix();
+
+				scene = new THREE.Scene();
+
+				// LIGHTS
+
+				var ambient = new THREE.AmbientLight( 0x555555 );
+				scene.addLight( ambient );
+
+				directionalLight = new THREE.DirectionalLight( 0xffffff );
+				directionalLight.position.x = 1;
+				directionalLight.position.y = 1;
+				directionalLight.position.z = 0.5;
+				directionalLight.position.normalize();
+				scene.addLight( directionalLight );
+
+				pointLight = new THREE.PointLight( 0xffaa00 );
+				pointLight.position.x = 0;
+				pointLight.position.y = 0;
+				pointLight.position.z = 0;
+				scene.addLight( pointLight );
+
+
+				sphere = new THREE.SphereGeometry( 100, 16, 8, 1 );
+				lightMesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) );
+				lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
+				lightMesh.position = pointLight.position;
+				lightMesh.overdraw = true;
+				lightMesh.updateMatrix();
+				scene.addObject(lightMesh);
+
+
+				webglRenderer = new THREE.CrosseyedWebGLRenderer( { separation: 20, antialias: true } );
+				webglRenderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( webglRenderer.domElement );
+
+				webglRenderer.setFaceCulling( 0 );
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				stats.domElement.style.zIndex = 100;
+				container.appendChild( stats.domElement );
+
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.addEventListener( 'keydown', onKeyDown, false );
+
+				var r = "textures/cube/SwedishRoyalCastle/";
+				var urls = [ r + "px.jpg", r + "nx.jpg",
+							 r + "py.jpg", r + "ny.jpg",
+							 r + "pz.jpg", r + "nz.jpg" ];
+
+				var textureCube = THREE.ImageUtils.loadTextureCube( urls );
+
+				var camaroMaterials = {
+
+					body: [],
+					chrome: new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: textureCube } ),
+					darkchrome: new THREE.MeshLambertMaterial( { color: 0x444444, envMap: textureCube } ),
+					glass: new THREE.MeshBasicMaterial( { color: 0x223344, envMap: textureCube, opacity: 0.25, combine: THREE.MixOperation, reflectivity: 0.25, transparent: true } ),
+					tire: new THREE.MeshLambertMaterial( { color: 0x050505 } ),
+					interior: new THREE.MeshPhongMaterial( { color: 0x050505, shininess: 20 } ),
+					black: new THREE.MeshLambertMaterial( { color: 0x000000 } )
+
+				}
+
+				camaroMaterials.body.push( [ "Orange", new THREE.MeshLambertMaterial( { color: 0xff6600, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.3 } ) ] );
+				camaroMaterials.body.push( [ "Blue", new THREE.MeshLambertMaterial( { color: 0x226699, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.3 } ) ] );
+				camaroMaterials.body.push( [ "Red", new THREE.MeshLambertMaterial( { color: 0x660000, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.5 } ) ] );
+				camaroMaterials.body.push( [ "Black", new THREE.MeshLambertMaterial( { color: 0x000000, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.5 } ) ] );
+				camaroMaterials.body.push( [ "White", new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.5 } ) ] );
+
+				camaroMaterials.body.push( [ "Carmine", new THREE.MeshPhongMaterial( { color: 0x770000, specular:0xffaaaa, envMap: textureCube, combine: THREE.MultiplyOperation } ) ] );
+				camaroMaterials.body.push( [ "Gold", new THREE.MeshPhongMaterial( { color: 0xaa9944, specular:0xbbaa99, shininess:50, envMap: textureCube, combine: THREE.MultiplyOperation } ) ] );
+				camaroMaterials.body.push( [ "Bronze", new THREE.MeshPhongMaterial( { color: 0x150505, specular:0xee6600, shininess:10, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.5 } ) ] );
+				camaroMaterials.body.push( [ "Chrome", new THREE.MeshPhongMaterial( { color: 0xffffff, specular:0xffffff, envMap: textureCube, combine: THREE.MultiplyOperation } ) ] );
+
+				var loader = new THREE.BinaryLoader();
+				loader.load( { model: "obj/camaro/CamaroNoUv_bin.js", callback: function( geometry ) { createScene( geometry, camaroMaterials ) } } );
+
+			}
+
+			function $( id ) { return document.getElementById( id ) }
+
+
+			function createButtons( materials, geometry ) {
+
+				var i, src = "", parent = $( "buttons" );
+
+				for( i = 0; i < materials.length; i++ ) {
+
+					src += '<button id="m' + i + '">' + materials[ i ][ 0 ] + '</button>';
+
+				}
+
+				parent.innerHTML = src;
+
+				for( i = 0; i < materials.length; i++ ) {
+
+					$( "m" + i ).counter = i;
+					$( "m" + i ).addEventListener( 'click', function() { geometry.materials[ 0 ][ 0 ] = materials[ this.counter ][ 1 ] }, false );
+
+				}
+
+			}
+
+			function createScene( geometry, materials ) {
+
+				var s = 75, m = new THREE.MeshFaceMaterial();
+
+				geometry.materials[ 0 ][ 0 ] = materials.body[ 0 ][ 1 ]; // car body
+				geometry.materials[ 1 ][ 0 ] = materials.chrome; // wheels chrome
+				geometry.materials[ 2 ][ 0 ] = materials.chrome; // grille chrome
+				geometry.materials[ 3 ][ 0 ] = materials.darkchrome; // door lines
+				geometry.materials[ 4 ][ 0 ] = materials.glass; // windshield
+				geometry.materials[ 5 ][ 0 ] = materials.interior; // interior
+				geometry.materials[ 6 ][ 0 ] = materials.tire; // tire
+				geometry.materials[ 7 ][ 0 ] = materials.black; // tireling
+				geometry.materials[ 8 ][ 0 ] = materials.black; // behind grille
+
+				var mesh = new THREE.Mesh( geometry, m );
+				mesh.rotation.y = 1;
+				mesh.scale.x = mesh.scale.y = mesh.scale.z = s;
+				scene.addObject( mesh );
+
+				createButtons( materials.body, geometry );
+
+			}
+
+			function onDocumentMouseMove( event ) {
+
+				mouseX = ( event.clientX - windowHalfX );
+				mouseY = ( event.clientY - windowHalfY );
+
+			}
+
+			function onKeyDown ( event ) {
+
+				switch( event.keyCode ) {
+				
+					/* O */
+					case 79: webglRenderer.separation -= 0.5; break;
+					
+					/* P */
+					case 80: webglRenderer.separation += 0.5; break;
+
+				}
+
+				console.log( webglRenderer.separation );
+
+			};
+
+			// 
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				var timer = - new Date().getTime() * 0.0002;
+
+				camera.position.x += ( mouseX - camera.position.x ) * .05;
+				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+
+				lightMesh.position.x = 1500 * Math.cos( timer );
+				lightMesh.position.z = 1500 * Math.sin( timer );
+
+				webglRenderer.render( scene, camera );
+
+			}
+
+			function log(text) {
+
+				var e = document.getElementById("log");
+				e.innerHTML = text + "<br/>" + e.innerHTML;
+
+			}
+
+		</script>
+
+	</body>
+</html>

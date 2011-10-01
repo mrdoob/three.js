@@ -70,7 +70,7 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.QuakeCamera( {
+				camera = new THREE.FirstPersonCamera( {
 
 					fov: 60, aspect: window.innerWidth / window.innerHeight, near: 1, far: 20000,
 					movementSpeed: 500, lookSpeed: 0.1, noFly: false, lookVertical: true
@@ -89,25 +89,14 @@
 				camera.position.y = 200;
 				camera.target.position.y = camera.position.y;
 
-				geometry = new THREE.Plane( 20000, 20000, worldWidth - 1, worldDepth - 1 );
+				geometry = new THREE.PlaneGeometry( 20000, 20000, worldWidth - 1, worldDepth - 1 );
+				geometry.dynamic = true;
 
 				var i, j, il, jl;
 
 				for ( i = 0, il = geometry.vertices.length; i < il; i ++ ) {
 
 					geometry.vertices[ i ].position.z = 35 * Math.sin( i/2 );
-
-				}
-
-				for( i = 0; i < geometry.faceVertexUvs[ 0 ].length; i++ ) {
-
-					var uvs = geometry.faceVertexUvs[ 0 ][ i ];
-					for ( j = 0, jl = uvs.length; j < jl; j++ ) {
-
-						uvs[ j ].u *= 5;
-						uvs[ j ].v *= 5;
-
-					}
 
 				}
 
@@ -119,10 +108,10 @@
 
 				var texture = THREE.ImageUtils.loadTexture( "textures/water.jpg" );
 				texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+				texture.repeat.set( 5, 5 );
 				material = new THREE.MeshBasicMaterial( { color:0x0044ff, opacity:1, map: texture } );
 
 				mesh = new THREE.Mesh( geometry, material );
-				mesh.dynamic = true;
 				mesh.rotation.x = - 90 * Math.PI / 180;
 				scene.addObject( mesh );
 

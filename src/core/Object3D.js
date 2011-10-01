@@ -6,6 +6,9 @@
 
 THREE.Object3D = function() {
 
+	this.id = THREE.Object3DCount ++;
+	this.name = "";
+
 	this.parent = undefined;
 	this.children = [];
 
@@ -13,9 +16,15 @@ THREE.Object3D = function() {
 
 	this.position = new THREE.Vector3();
 	this.rotation = new THREE.Vector3();
+	this.eulerOrder = 'XYZ';
 	this.scale = new THREE.Vector3( 1, 1, 1 );
 
 	this.dynamic = false; // when true it retains arrays so they can be updated with __dirty*
+
+	this.doubleSided = false;
+	this.flipSided = false;
+
+	this.renderDepth = null;
 
 	this.rotationAutoUpdate = true;
 
@@ -34,41 +43,46 @@ THREE.Object3D = function() {
 
 	this.visible = true;
 
+	this.castShadow = false;
+	this.receiveShadow = false;
+
+	this.frustumCulled = true;
+
 	this._vector = new THREE.Vector3();
-	
-	this.name = "";
 
 };
 
 
 THREE.Object3D.prototype = {
 
-	translate : function ( distance, axis ) {
+	constructor: THREE.Object3D,
+
+	translate: function ( distance, axis ) {
 
 		this.matrix.rotateAxis( axis );
 		this.position.addSelf( axis.multiplyScalar( distance ) );
 
 	},
 
-	translateX : function ( distance ) {
+	translateX: function ( distance ) {
 
 		this.translate( distance, this._vector.set( 1, 0, 0 ) );
 
 	},
 
-	translateY : function ( distance ) {
+	translateY: function ( distance ) {
 
 		this.translate( distance, this._vector.set( 0, 1, 0 ) );
 
 	},
 
-	translateZ : function ( distance ) {
+	translateZ: function ( distance ) {
 
 		this.translate( distance, this._vector.set( 0, 0, 1 ) );
 
 	},
 
-	lookAt : function ( vector ) {
+	lookAt: function ( vector ) {
 
 		// TODO: Add hierarchy support.
 
@@ -116,6 +130,7 @@ THREE.Object3D.prototype = {
 	},
 
 	removeChild: function ( child ) {
+		var scene = this;
 
 		var childIndex = this.children.indexOf( child );
 
@@ -124,40 +139,54 @@ THREE.Object3D.prototype = {
 			child.parent = undefined;
 			this.children.splice( childIndex, 1 );
 
+			// remove from scene
+
+			while ( scene.parent !== undefined ) {
+
+				scene = scene.parent;
+
+			}
+
+			if ( scene !== undefined && scene instanceof THREE.Scene ) {
+
+				scene.removeChildRecurse( child );
+
+			}
+
 		}
 
 	},
-	
+
 	getChildByName: function ( name, doRecurse ) {
-		
+
 		var c, cl, child, recurseResult;
-		
-		for( c = 0, cl = this.children.length; c < cl; c++ ) {
-			
+
+		for ( c = 0, cl = this.children.length; c < cl; c++ ) {
+
 			child = this.children[ c ];
-			
-			if( child.name === name ) {
-				
+
+			if ( child.name === name ) {
+
 				return child;
-				
+
 			}
-			
-			if( doRecurse ) {
-				
+
+			if ( doRecurse ) {
+
 				recurseResult = child.getChildByName( name, doRecurse );
-				
-				if( recurseResult !== undefined ) {
-					
+
+				if ( recurseResult !== undefined ) {
+
 					return recurseResult;
-					
+
 				}
-				
+
 			}
-			
+
 		}
-		
+
 		return undefined;
-		
+
 	},
 
 	updateMatrix: function () {
@@ -170,7 +199,7 @@ THREE.Object3D.prototype = {
 
 		} else {
 
-			this.matrix.setRotationFromEuler( this.rotation );
+			this.matrix.setRotationFromEuler( this.rotation, this.eulerOrder );
 
 		}
 
@@ -222,3 +251,5 @@ THREE.Object3D.prototype = {
 	}
 
 };
+
+THREE.Object3DCount = 0;

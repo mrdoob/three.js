@@ -4,48 +4,47 @@
 
 THREE.Color = function ( hex ) {
 
-	this.setHex( hex );
+	if ( hex !== undefined ) this.setHex( hex );
+	return this;
 
 };
 
 THREE.Color.prototype = {
 
-	copy : function ( color ) {
+	constructor: THREE.Color,
+	
+	r: 1, g: 1, b: 1,
+
+	copy: function ( color ) {
 
 		this.r = color.r;
 		this.g = color.g;
 		this.b = color.b;
-		this.hex = color.hex;
+
+		return this;
 
 	},
 
-	setHex : function ( hex ) {
-
-		this.hex = ( ~~ hex ) & 0xffffff;
-		this.updateRGB();
-
-	},
-
-	setRGB : function ( r, g, b ) {
+	setRGB: function ( r, g, b ) {
 
 		this.r = r;
 		this.g = g;
 		this.b = b;
 
-		this.updateHex();
+		return this;
 
 	},
 
-	setHSV : function ( h, s, v ) {
+	setHSV: function ( h, s, v ) {
 
 		// based on MochiKit implementation by Bob Ippolito
 		// h,s,v ranges are < 0.0 - 1.0 >
 
-		var r, g, b, i, f, p, q, t;
+		var i, f, p, q, t;
 
-		if ( v == 0.0 ) {
+		if ( v == 0 ) {
 
-			r = g = b = 0;
+			this.r = this.g = this.b = 0;
 
 		} else {
 
@@ -57,39 +56,49 @@ THREE.Color.prototype = {
 
 			switch ( i ) {
 
-				case 1: r = q; g = v; b = p; break;
-				case 2: r = p; g = v; b = t; break;
-				case 3: r = p; g = q; b = v; break;
-				case 4: r = t; g = p; b = v; break;
-				case 5: r = v; g = p; b = q; break;
+				case 1: this.r = q; this.g = v; this.b = p; break;
+				case 2: this.r = p; this.g = v; this.b = t; break;
+				case 3: this.r = p; this.g = q; this.b = v; break;
+				case 4: this.r = t; this.g = p; this.b = v; break;
+				case 5: this.r = v; this.g = p; this.b = q; break;
 				case 6: // fall through
-				case 0: r = v; g = t; b = p; break;
+				case 0: this.r = v; this.g = t; this.b = p; break;
 
 			}
 
 		}
 
-		this.setRGB( r, g, b );
+		return this;
 
 	},
 
-	updateHex : function () {
+	setHex: function ( hex ) {
 
-		this.hex = ~~ ( this.r * 255 ) << 16 ^ ~~ ( this.g * 255 ) << 8 ^ ~~ ( this.b * 255 );
+		hex = Math.floor( hex );
 
-	},
+		this.r = ( hex >> 16 & 255 ) / 255;
+		this.g = ( hex >> 8 & 255 ) / 255;
+		this.b = ( hex & 255 ) / 255;
 
-	updateRGB : function () {
-
-		this.r = ( this.hex >> 16 & 255 ) / 255;
-		this.g = ( this.hex >> 8 & 255 ) / 255;
-		this.b = ( this.hex & 255 ) / 255;
+		return this;
 
 	},
 
-	clone : function () {
+	getHex: function () {
 
-		return new THREE.Color( this.hex );
+		return ~~ ( this.r * 255 ) << 16 ^ ~~ ( this.g * 255 ) << 8 ^ ~~ ( this.b * 255 );
+
+	},
+
+	getContextStyle: function () {
+
+		return 'rgb(' + Math.floor( this.r * 255 ) + ',' + Math.floor( this.g * 255 ) + ',' + Math.floor( this.b * 255 ) + ')';
+
+	},
+
+	clone: function () {
+
+		return new THREE.Color().setRGB( this.r, this.g, this.b );
 
 	}
 

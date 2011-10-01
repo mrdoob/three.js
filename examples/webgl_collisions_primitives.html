@@ -48,22 +48,25 @@
 
         <script type="text/javascript">
 
-            var scene, camera, renderer, info, mouse2d, sun;
+            var camera, scene, projector, renderer,
+            info, mouse = { x: 0, y: 0 }, sun;
 
             var theta = 0;
             var camdist = 1500;
             var geoms = [];
 
-            function init(){
+            function init () {
+
                 container = document.createElement('div');
                 document.body.appendChild(container);
 
                 info = document.getElementById("info");
 
                 camera = new THREE.Camera(40, window.innerWidth / window.innerHeight, 1, 10000);
-                mouse2d = new THREE.Vector3(0, 0, 1);
 
                 scene = new THREE.Scene();
+
+                projector = new THREE.Projector();
 
                 renderer = new THREE.WebGLRenderer();
                 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -85,22 +88,20 @@
                 //makeWall(-360);
                 //makeWall(-480);
 
-                plane = new THREE.Mesh(new THREE.Plane(30000, 30000, 10, 10), new THREE.MeshLambertMaterial({
-                    color: 0x003300
-                }));
-                plane.position.y = -480;
-                plane.rotation.x = Math.PI / -2;
-                scene.addObject(plane);
-                geoms.push(plane);
+                plane = new THREE.Mesh( new THREE.PlaneGeometry( 30000, 30000, 10, 10 ), new THREE.MeshLambertMaterial( { color: 0x003300 } ) );
+                plane.position.y = - 480;
+                plane.rotation.x = Math.PI / - 2;
+                scene.addObject( plane );
+                geoms.push( plane );
 
-                var cplane = new THREE.PlaneCollider(plane.position, new THREE.Vector3(0, 1, 0));
+                var cplane = new THREE.PlaneCollider( plane.position, new THREE.Vector3( 0, 1, 0 ) );
                 cplane.mesh = plane;
-                THREE.Collisions.colliders.push(cplane);
+                THREE.Collisions.colliders.push( cplane );
 
-				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+		stats = new Stats();
+		stats.domElement.style.position = 'absolute';
+		stats.domElement.style.top = '0px';
+		container.appendChild( stats.domElement );
 
                 container.onmousemove = onDocumentMouseMove;
                 animate();
@@ -120,9 +121,7 @@
             }
 
             function createCube(s, p){
-                var cube = new THREE.Mesh(new THREE.Cube(s, s, s, 1, 1, 1), new THREE.MeshLambertMaterial({
-                    color: 0x003300
-                }));
+                var cube = new THREE.Mesh(new THREE.CubeGeometry( s, s, s ), new THREE.MeshLambertMaterial( { color: 0x003300 } ) );
                 cube.position = p;
                 scene.addObject(cube);
                 geoms.push(cube);
@@ -130,9 +129,7 @@
             }
 
             function createSphere(rad, p){
-                var sphere = new THREE.Mesh(new THREE.Sphere(rad, 10, 10), new THREE.MeshLambertMaterial({
-                    color: 0x003300
-                }));
+                var sphere = new THREE.Mesh( new THREE.SphereGeometry( rad, 10, 10 ), new THREE.MeshLambertMaterial( { color: 0x003300 } ) );
                 sphere.position = p;
                 scene.addObject(sphere);
                 geoms.push(sphere);
@@ -143,23 +140,23 @@
             }
 
             function onDocumentMouseMove(event){
+
                 event.preventDefault();
-                mouse2d.x = (event.clientX / window.innerWidth) * 2 - 1;
-                mouse2d.y = -(event.clientY / window.innerHeight) * 2 + 1;
-                mouse2d.z = 1;
+                mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+                mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
             }
 
             function animate(){
-                requestAnimationFrame(animate);
 
-                var r = new THREE.Ray();
-                r.origin = mouse2d.clone();
-                var matrix = camera.matrixWorld.clone();
-                matrix.multiplySelf(THREE.Matrix4.makeInvert(camera.projectionMatrix));
-                matrix.multiplyVector3(r.origin);
-                r.direction = r.origin.clone().subSelf(camera.position);
+                requestAnimationFrame( animate );
 
-                for (var i = 0; i < geoms.length; i++) {
+                var vector = new THREE.Vector3( mouse.x, mouse.y, 0.5 );
+                projector.unprojectVector( vector, camera );
+
+                var ray = new THREE.Ray( camera.position, vector.subSelf( camera.position ).normalize() );
+
+                for ( var i = 0; i < geoms.length; i++) {
                     geoms[i].materials[0].color = new THREE.Color(0x007700);
                 }
 
@@ -168,14 +165,14 @@
                     // Raycast all
 
                     ts = new Date().getTime();
-                    var cs = THREE.Collisions.rayCastAll( r );
+                    var cs = THREE.Collisions.rayCastAll( ray );
                     tt = new Date().getTime() - ts;
 
                     if ( cs.length > 0 ) {
 
                         info.innerHTML = cs.length + " colliders found in " + tt;
 
-                        for ( var i = 0; i < cs.length; i++ ) {
+                        for ( var i = 0; i < cs.length; i ++ ) {
 
                             cs[ i ].mesh.materials[ 0 ].color.setHex( 0xaa0000 );
 
@@ -192,7 +189,7 @@
                     // Raycast nearest
 
                     ts = new Date().getTime();
-                    var c = THREE.Collisions.rayCastNearest( r );
+                    var c = THREE.Collisions.rayCastNearest( ray );
                     tt = new Date().getTime() - ts;
 
                     if ( c ) {
@@ -217,7 +214,8 @@
 
                 renderer.render( scene, camera );
 
-				stats.update();
+                stats.update();
+
             }
 
             function vts(v){

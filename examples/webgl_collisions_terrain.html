@@ -43,15 +43,14 @@ body {
 
 <script type="text/javascript">
 
-var scene, camera, renderer, info, mouse2d, sun, loader, sphere, ray;
+var camera, scene, renderer,
+info, mouse2d, sun, loader, sphere, ray;
 
-var theta = 0;
-var radius = 250;
-var speed = 0.0015;
-var sphereSize = 4;
+var theta = 0, radius = 250, speed = 0.002, sphereSize = 4;
 
 
 function init() {
+
 	container = document.createElement( 'div' );
 	document.body.appendChild( container );
 
@@ -69,9 +68,8 @@ function init() {
 	ray.origin.y = 10000;
 	ray.direction = new THREE.Vector3(0, -1, 0);
 
-	sphere = new THREE.Mesh( new THREE.Sphere( sphereSize, 10, 10 ), new THREE.MeshLambertMaterial( { color: 0xff0000 } ) );
+	sphere = new THREE.Mesh( new THREE.SphereGeometry( sphereSize, 10, 10 ), new THREE.MeshLambertMaterial( { color: 0xff0000 } ) );
 	scene.addObject(sphere);
-	camera.target = sphere;
 
 	renderer = new THREE.WebGLRenderer();
 	renderer.setSize( window.innerWidth, window.innerHeight );
@@ -123,10 +121,9 @@ function animate() {
 		//info.innerHTML = "No intersection";
 	}
 
-
-
-
 	theta += speed;
+
+	camera.target.position.copy( sphere.position );
 
 	renderer.render( scene, camera );
 }

@@ -92,7 +92,7 @@
 				scene.addLight( pointLight );
 
 
-				sphere = new THREE.Sphere( 100, 16, 8, 1 );
+				sphere = new THREE.SphereGeometry( 100, 16, 8, 1 );
 				lightMesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) );
 				lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
 				lightMesh.position = pointLight.position;
@@ -187,7 +187,10 @@
 				geometry.materials[ 7 ][ 0 ] = materials.black; // tireling
 				geometry.materials[ 8 ][ 0 ] = materials.black; // behind grille
 
-				THREE.SceneUtils.addMesh( scene, geometry, s, 0, 0, 0, 0.0, 1.0, 0.0, m );
+				var mesh = new THREE.Mesh( geometry, m );
+				mesh.rotation.y = 1;
+				mesh.scale.x = mesh.scale.y = mesh.scale.z = s;
+				scene.addObject( mesh );
 
 				createButtons( materials.body, geometry );
 

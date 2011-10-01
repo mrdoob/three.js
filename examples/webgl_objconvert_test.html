@@ -16,7 +16,7 @@
 			a { color:skyblue }
 			canvas { pointer-events:none; z-index:10; }
 			#log { position:absolute; top:0; display:block; text-align:left; z-index:1000; pointer-events:none; }
-			#d { text-align:center; margin:1em 0 -15.7em 0; z-index:0; position:relative; display:block }
+			#d { text-align:center; margin:1em 0 -9.2em 0; z-index:0; position:relative; display:block }
 			.button { background:#000; color:#fff; padding:0.2em 0.5em; cursor:pointer }
 			.inactive { background:#999; color:#eee }
 		</style>
@@ -32,12 +32,6 @@
 
 			<p>Models by <a href="http://sketchup.google.com/3dwarehouse/details?mid=2c6fd128fca34052adc5f5b98d513da1">Reallusion</a>
 			<a href="http://sketchup.google.com/3dwarehouse/details?mid=f526cc4abf7cb68d76cab47c765b7255">iClone</a>.
-
-			<p>Using a modified version of <a href="http://github.com/alteredq/three.js">Three.js</a> by mrdoob.
-
-			<br/>
-			<p>Best viewed in Chrome 9 or Firefox 4 using WebGL renderer.
-			<p>Canvas renderer is very slow on anything other than Chrome.
 		</div>
 
 		<pre id="log"></pre>
@@ -108,22 +102,12 @@
 				xc.fillStyle = "#555";
 				xc.fillRect(96, 96, 32, 32);
 
-				var xm = new THREE.MeshBasicMaterial( { map: new THREE.Texture( x, THREE.UVMapping, THREE.RepeatWrapping, THREE.RepeatWrapping ) } );
+				var xm = new THREE.MeshBasicMaterial( { map: new THREE.Texture( x, new THREE.UVMapping(), THREE.RepeatWrapping, THREE.RepeatWrapping ) } );
 				xm.map.needsUpdate = true;
+				xm.map.repeat.set( 10, 10 );
 
-				geometry = new THREE.Plane( 100, 100, 15, 10 );
-				for( var i = 0; i < geometry.faceVertexUvs[ 0 ].length; i++ ) {
+				geometry = new THREE.PlaneGeometry( 100, 100, 15, 10 );
 
-					var uvs = geometry.faceVertexUvs[ 0 ][ i ];
-
-					for ( j = 0, jl = uvs.length; j < jl; j++ ) {
-
-						uvs[ j ].u *= 10;
-						uvs[ j ].v *= 10;
-
-					}
-
-				}
 				mesh = new THREE.Mesh( geometry, xm );
 				mesh.position.x = 0;
 				mesh.position.y = FLOOR;
@@ -137,8 +121,10 @@
 				// SPHERES
 
 				var material_spheres = new THREE.MeshLambertMaterial( { color: 0xdddddd } ),
-					sphere = new THREE.Sphere( 100, 16, 8 );
-				for (var i=0; i<10; i++) {
+					sphere = new THREE.SphereGeometry( 100, 16, 8 );
+
+				for ( var i = 0; i < 10; i ++ ) {
+
 					mesh = new THREE.Mesh( sphere, material_spheres );
 					mesh.position.x = 500 * (Math.random() - 0.5);
 					mesh.position.y = 300 * (Math.random() - 0) + FLOOR;
@@ -147,6 +133,7 @@
 					mesh.overdraw = true;
 					mesh.updateMatrix();
 					scene.addObject(mesh);
+
 				}
 
 
@@ -225,7 +212,8 @@
 				for ( var i = 0; i < materials.length; i ++ ) {
 
 					// material
-					mesh = new THREE.Mesh( new THREE.Plane( size, size ), materials[i] );
+
+					mesh = new THREE.Mesh( new THREE.PlaneGeometry( size, size ), materials[i] );
 					mesh.position.x = i * (size + 5) - ( ( materials.length - 1 )* ( size + 5 )/2);
 					mesh.position.y = FLOOR + size/2 + bottom;
 					mesh.position.z = -100;
@@ -235,6 +223,7 @@
 					scene.addObject(mesh);
 
 					// number
+
 					var x = document.createElement( "canvas" );
 					var xc = x.getContext("2d");
 					x.width = x.height = 128;
@@ -244,10 +233,10 @@
 					xc.font = "50pt arial bold";
 					xc.fillText(i, 10, 64);
 
-					var xm = new THREE.MeshBasicMaterial( { map: new THREE.Texture( x ) } );
+					var xm = new THREE.MeshBasicMaterial( { map: new THREE.Texture( x ), transparent: true } );
 					xm.map.needsUpdate = true;
 
-					mesh = new THREE.Mesh( new THREE.Plane( size, size ), xm );
+					mesh = new THREE.Mesh( new THREE.PlaneGeometry( size, size ), xm );
 					mesh.position.x = i * (size + 5) - ( ( materials.length - 1 )* ( size + 5 )/2);
 					mesh.position.y = FLOOR + size/2 + bottom;
 					mesh.position.z = -99;
@@ -255,6 +244,7 @@
 					mesh.doubleSided = true;
 					mesh.updateMatrix();
 					scene.addObject(mesh);
+
 				}
 
 			}
@@ -283,13 +273,8 @@
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 				camera.updateMatrix();
 
-				if ( zmesh && 0 ) {
-					zmesh.rotation.y += 0.005;
-					zmesh.updateMatrix();
-				}
-
-				if ( render_canvas ) canvasRenderer.render( scene, camera );
 				if ( render_gl && has_gl ) webglRenderer.render( scene, camera );
+				if ( render_canvas ) canvasRenderer.render( scene, camera );
 
 			}
 

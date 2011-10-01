@@ -44,7 +44,8 @@ body {
 
 <script type="text/javascript">
 
-var scene, camera, renderer, info, mouse2d, sun, cube;
+var camera, scene, projector, renderer,
+info, mouse = { x: 0, y: 0 }, sun, cube;
 
 var bounce = 0;
 
@@ -57,9 +58,10 @@ function init() {
 
 	camera = new THREE.Camera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
 	camera.position.z = -500;
-	mouse2d = new THREE.Vector3( 0, 0, 1 );
 
 	scene = new THREE.Scene();
+
+	projector = new THREE.Projector();
 
 	renderer = new THREE.WebGLRenderer();
 	renderer.setSize( window.innerWidth, window.innerHeight );
@@ -87,8 +89,8 @@ function init() {
 function createCube( s, p ) {
 
 	cube = new THREE.Mesh (
-		new THREE.Cube( s,s,s, 1,1,1 ),
-		new THREE.MeshLambertMaterial( { color: 0x003300 })
+		new THREE.CubeGeometry( s, s, s ),
+		new THREE.MeshLambertMaterial( { color: 0x003300 } )
 	);
 
 	cube.position = p;
@@ -101,9 +103,8 @@ function createCube( s, p ) {
 function onDocumentMouseMove( event ) {
 
 	event.preventDefault();
-	mouse2d.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-	mouse2d.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-	mouse2d.z = 1;
+	mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+	mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
 };
 
@@ -111,19 +112,16 @@ function animate() {
 
 	requestAnimationFrame( animate );
 
-	var r = new THREE.Ray();
-	r.origin.copy( mouse2d );
-
-	var matrix = camera.matrixWorld.clone();
-	matrix.multiplySelf( THREE.Matrix4.makeInvert( camera.projectionMatrix ) );
-	matrix.multiplyVector3( r.origin );
-	r.direction = r.origin.clone().subSelf( camera.position );
-
 	info.innerHTML = "";
 
-	var c = THREE.Collisions.rayCastNearest( r );
+	var vector = new THREE.Vector3( mouse.x, mouse.y, 0.5 );
+	projector.unprojectVector( vector, camera );
 
-	if( c ) {
+	var ray = new THREE.Ray( camera.position, vector.subSelf( camera.position ).normalize() );
+
+	var c = THREE.Collisions.rayCastNearest( ray );
+
+	if ( c ) {
 
 		info.innerHTML += "Found @ distance " + c.distance.toFixed(2);
 		c.mesh.materials[ 0 ].color.setHex( 0xaa0000 );

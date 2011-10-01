@@ -50,14 +50,11 @@
 
         <script type="text/javascript">
 
-            var scene, camera, renderer, info, mouse2d, sun, loader, sphere;
+            var camera, scene, renderer, info, mouse2d, sun, loader, sphere;
 
-            var range = 400;
-            var speed = 1;
-            var sphereSize = 4;
+            var range = 400, speed = 1, sphereSize = 4;
 
-			var cubes = [];
-
+            var cubes = [];
 
             function init(){
                 container = document.createElement('div');
@@ -70,16 +67,14 @@
 		camera.position.x = 300;
 		camera.position.z = 0;
 
-                mouse2d = new THREE.Vector3(0, 0, 1);
+                mouse2d = new THREE.Vector3( 0, 0, 1 );
 
-                loader = new THREE.Loader(true);
+                loader = new THREE.Loader( true );
 
                 scene = new THREE.Scene();
 
-                sphere = new THREE.Mesh(new THREE.Sphere(sphereSize, 10, 10), new THREE.MeshLambertMaterial({
-                    color: 0xff0000
-                }));
-                scene.addObject(sphere);
+                sphere = new THREE.Mesh( new THREE.SphereGeometry( sphereSize, 10, 10 ), new THREE.MeshLambertMaterial( { color: 0xff0000 } ) );
+                scene.addObject( sphere );
 
                 renderer = new THREE.WebGLRenderer();
                 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -105,9 +100,7 @@
             }
 
             function createCube(sx, sy, sz, p){
-                var cube = new THREE.Mesh(new THREE.Cube(sx, sy, sz, 1, 1, 1), new THREE.MeshLambertMaterial({
-                    color: 0x003300//, wireframe: true
-                }));
+                var cube = new THREE.Mesh(new THREE.CubeGeometry( sx, sy, sz ), new THREE.MeshLambertMaterial( { color: 0x003300 } ) );
                 cube.position = p;
                 scene.addObject(cube);
                 THREE.Collisions.colliders.push( THREE.CollisionUtils.MeshOBB(cube) );

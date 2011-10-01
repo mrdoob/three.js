@@ -83,7 +83,7 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.QuakeCamera( {
+				camera = new THREE.FirstPersonCamera( {
 
 					fov: 50, aspect: window.innerWidth / window.innerHeight, near: 1, far: 20000,
 					constrainVertical: true, verticalMin: 1.1, verticalMax: 2.2,
@@ -371,7 +371,7 @@
 
 						sides = { px: px, nx: nx, py: true, ny: false, pz: pz, nz: nz };
 
-						cube = new THREE.Cube( 100, 100, 100, 1, 1, 1, materials, false, sides );
+						cube = new THREE.CubeGeometry( 100, 100, 100, 1, 1, 1, materials, false, sides );
 
 						// set UV tiles
 
@@ -431,7 +431,7 @@
 						mesh.position.y = h * 100;
 						mesh.position.z = z * 100 - worldHalfDepth * 100;
 
-						GeometryUtils.merge( geometry, mesh );
+						THREE.GeometryUtils.merge( geometry, mesh );
 
 					}
 
@@ -521,7 +521,7 @@
 				canvas.width = canvas.height = size;
 
 				var texture = new THREE.Texture( canvas, new THREE.UVMapping(), THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping, THREE.NearestFilter, THREE.LinearMipMapLinearFilter );
-				
+
 				function generateTexture() {
 
 					if( count == 3 ) {
@@ -578,7 +578,7 @@
 
 				var texture = new THREE.Texture( canvas, new THREE.UVMapping(), THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping, THREE.NearestFilter, THREE.LinearMipMapLinearFilter );
 				texture.needsUpdate = true;
-				
+
 				return new THREE.MeshLambertMaterial( { map: texture } );
 
 			}

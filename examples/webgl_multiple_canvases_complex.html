@@ -1,0 +1,264 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>three.js webgl - multiple canvases - complex</title>
+		<meta charset="utf-8">
+		<style type="text/css">
+			body {
+				color: #808080;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+
+				background-color: #fff;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+			}
+
+			#container1, #container2, #container3 {
+				position: relative;
+				border: 1px solid red;
+			}
+
+			#container1 {
+				width: 300px;
+				height: 200px;
+			}
+
+			#container2 {
+				width: 400px;
+				height: 100px;
+				left: 150px;
+			}
+
+			#container3 {
+				width: 200px;
+				height: 300px;
+				left: 75px;
+			}
+
+			a {
+
+				color: #0080ff;
+			}
+
+		</style>
+	</head>
+	<body>
+
+		<div id="container">
+			<div id="container1"></div>
+			<div id="container2"></div>
+			<div id="container3"></div>
+		</div>
+		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> webgl - multiple canvases - complex</div>
+
+		<script type="text/javascript" src="../build/Three.js"></script>
+
+		<script type="text/javascript" src="js/Detector.js"></script>
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
+		<script type="text/javascript" src="js/Stats.js"></script>
+
+		<script type="text/javascript">
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var apps = [];
+
+			init();
+			animate();
+
+			function init() {
+
+				var container1 = document.getElementById( 'container1' );
+				var container2 = document.getElementById( 'container2' );
+				var container3 = document.getElementById( 'container3' );
+
+				var fullWidth = 550;
+				var fullHeight = 600;
+
+				apps.push( new App( 'container1', fullWidth, fullHeight,   0,   0, container1.clientWidth, container1.clientHeight ) );
+				apps.push( new App( 'container2', fullWidth, fullHeight, 150, 200, container2.clientWidth, container2.clientHeight ) );
+				apps.push( new App( 'container3', fullWidth, fullHeight,  75, 300, container3.clientWidth, container3.clientHeight ) );
+
+			}
+
+			function animate() {
+
+				for ( var i = 0; i < apps.length; ++i ) {
+
+					apps[ i ].animate();
+
+				}
+
+				requestAnimationFrame( animate );
+
+			}
+
+			function App( containerId, fullWidth, fullHeight, viewX, viewY, viewWidth, viewHeight ) {
+
+				var container, stats;
+
+				var camera, scene, renderer;
+
+				var mesh, mesh2, mesh3, light;
+
+				var mouseX = 0, mouseY = 0;
+
+				var windowHalfX = window.innerWidth / 2;
+				var windowHalfY = window.innerHeight / 2;
+
+				init();
+
+				function init() {
+
+					container = document.getElementById( containerId );
+
+					camera = new THREE.Camera( 20, container.clientWidth / container.clientHeight, 1, 10000 );
+					camera.setViewOffset(fullWidth, fullHeight, viewX, viewY, viewWidth, viewHeight);
+					camera.position.z = 1800;
+
+					scene = new THREE.Scene();
+
+					light = new THREE.DirectionalLight( 0xffffff );
+					light.position.set( 0, 0, 1 );
+					light.position.normalize();
+					scene.addLight( light );
+
+					var shadowMaterial = new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/shadow.png' ) } );
+					var shadowGeo = new THREE.PlaneGeometry( 300, 300, 1, 1 );
+
+					mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
+					mesh.position.y = - 250;
+					mesh.rotation.x = - 90 * Math.PI / 180;
+					scene.addObject( mesh );
+
+					mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
+					mesh.position.y = - 250;
+					mesh.position.x = - 400;
+					mesh.rotation.x = - 90 * Math.PI / 180;
+					scene.addObject( mesh );
+
+					mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
+					mesh.position.y = - 250;
+					mesh.position.x = 400;
+					mesh.rotation.x = - 90 * Math.PI / 180;
+					scene.addObject( mesh );
+
+					var faceIndices = [ 'a', 'b', 'c', 'd' ];
+
+					var color, f, f2, f3, p, n, vertexIndex,
+
+						geometry  = new THREE.IcosahedronGeometry( 1 ),
+						geometry2 = new THREE.IcosahedronGeometry( 1 ),
+						geometry3 = new THREE.IcosahedronGeometry( 1 );
+
+					for ( var i = 0; i < geometry.faces.length; i++ ) {
+
+						f  = geometry.faces[ i ];
+						f2 = geometry2.faces[ i ];
+						f3 = geometry3.faces[ i ];
+
+						n = ( f instanceof THREE.Face3 ) ? 3 : 4;
+
+						for( var j = 0; j < n; j++ ) {
+
+							vertexIndex = f[ faceIndices[ j ] ];
+
+							p = geometry.vertices[ vertexIndex ].position;
+
+							color = new THREE.Color( 0xffffff );
+							color.setHSV( ( p.y + 1 ) / 2, 1.0, 1.0 );
+
+							f.vertexColors[ j ] = color;
+
+							color = new THREE.Color( 0xffffff );
+							color.setHSV( 0.0, ( p.y + 1 ) / 2, 1.0 );
+
+							f2.vertexColors[ j ] = color;
+
+							color = new THREE.Color( 0xffffff );
+							color.setHSV( 0.125 * vertexIndex/geometry.vertices.length, 1.0, 1.0 );
+
+							f3.vertexColors[ j ] = color;
+
+						}
+
+					}
+
+
+					var materials = [
+
+						new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors } ),
+						new THREE.MeshBasicMaterial( { color: 0x000000, shading: THREE.FlatShading, wireframe: true } )
+
+					];
+
+					mesh = new THREE.Mesh( geometry, materials  );
+					mesh.position.x = -400;
+					mesh.scale.x = mesh.scale.y = mesh.scale.z = 200;
+					mesh.rotation.x = -1.87;
+					scene.addObject( mesh );
+
+					mesh2 = new THREE.Mesh( geometry2, materials  );
+					mesh2.position.x = 400;
+					mesh2.rotation.x = 0;
+					mesh2.scale = mesh.scale;
+					scene.addObject( mesh2 );
+
+					mesh3 = new THREE.Mesh( geometry3, materials  );
+					mesh3.position.x = 0;
+					mesh3.rotation.x = 0;
+					mesh3.scale = mesh.scale;
+					scene.addObject( mesh3 );
+
+					renderer = new THREE.WebGLRenderer( { antialias: true } );
+					renderer.setSize( container.clientWidth, container.clientHeight );
+
+					container.appendChild( renderer.domElement );
+
+					stats = new Stats();
+					stats.domElement.style.position = 'absolute';
+					stats.domElement.style.top = '0px';
+					container.appendChild( stats.domElement );
+
+					document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+				}
+
+				function onDocumentMouseMove( event ) {
+
+					mouseX = ( event.clientX - windowHalfX );
+					mouseY = ( event.clientY - windowHalfY );
+
+				}
+
+				//
+
+				this.animate = function() {
+
+					render();
+					stats.update();
+
+				};
+
+				function render() {
+
+					camera.position.x += ( mouseX - camera.position.x ) * 0.05;
+					camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
+
+					renderer.render( scene, camera );
+
+				}
+			}
+
+		</script>
+
+	</body>
+</html>

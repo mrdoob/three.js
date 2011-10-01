@@ -22,6 +22,7 @@ COMMON_FILES = [
 'core/Matrix3.js',
 'core/Matrix4.js',
 'core/Object3D.js',
+'core/Projector.js',
 'core/Quaternion.js',
 'core/Vertex.js',
 'core/Face3.js',
@@ -31,13 +32,13 @@ COMMON_FILES = [
 'core/Spline.js',
 'core/Edge.js',
 'cameras/Camera.js',
+'cameras/OrthoCamera.js',
 'lights/Light.js',
 'lights/AmbientLight.js',
 'lights/DirectionalLight.js',
 'lights/PointLight.js',
-'lights/LensFlare.js',
+'lights/SpotLight.js',
 'materials/Material.js',
-'materials/Mappings.js',
 'materials/LineBasicMaterial.js',
 'materials/MeshBasicMaterial.js',
 'materials/MeshLambertMaterial.js',
@@ -46,11 +47,11 @@ COMMON_FILES = [
 'materials/MeshNormalMaterial.js',
 'materials/MeshFaceMaterial.js',
 'materials/MeshShaderMaterial.js',
-'materials/ShadowVolumeDynamicMaterial.js',
 'materials/ParticleBasicMaterial.js',
 'materials/ParticleCanvasMaterial.js',
 'materials/ParticleDOMMaterial.js',
-'materials/Texture.js',
+'textures/Texture.js',
+'textures/DataTexture.js',
 'objects/Particle.js',
 'objects/ParticleSystem.js',
 'objects/Line.js',
@@ -58,21 +59,18 @@ COMMON_FILES = [
 'objects/Bone.js',
 'objects/SkinnedMesh.js',
 'objects/Ribbon.js',
-'objects/Sound.js',
 'objects/LOD.js',
-'objects/ShadowVolume.js',
 'objects/Sprite.js',
 'scenes/Scene.js',
 'scenes/Fog.js',
 'scenes/FogExp2.js',
-'renderers/Projector.js',
 'renderers/DOMRenderer.js',
 'renderers/CanvasRenderer.js',
 'renderers/SVGRenderer.js',
 'renderers/WebGLShaders.js',
 'renderers/WebGLRenderer.js',
 'renderers/WebGLRenderTarget.js',
-'renderers/SoundRenderer.js',
+'renderers/WebGLRenderTargetCube.js',
 'renderers/renderables/RenderableVertex.js',
 'renderers/renderables/RenderableFace3.js',
 'renderers/renderables/RenderableFace4.js',
@@ -87,28 +85,41 @@ EXTRAS_FILES = [
 'extras/ImageUtils.js',
 'extras/SceneUtils.js',
 'extras/ShaderUtils.js',
+'extras/core/Curve.js',
+'extras/core/CurvePath.js',
+'extras/core/Path.js',
+'extras/core/Shape.js',
+'extras/core/TextPath.js',
 'extras/animation/AnimationHandler.js',
 'extras/animation/Animation.js',
-'extras/cameras/QuakeCamera.js',
+'extras/cameras/FirstPersonCamera.js',
 'extras/cameras/PathCamera.js',
 'extras/cameras/FlyCamera.js',
 'extras/cameras/RollCamera.js',
-'extras/geometries/Cube.js',
-'extras/geometries/Cylinder.js',
-'extras/geometries/Icosahedron.js',
-'extras/geometries/Lathe.js',
-'extras/geometries/Plane.js',
-'extras/geometries/Sphere.js',
-'extras/geometries/Torus.js',
-'extras/geometries/TorusKnot.js',
-'extras/io/Loader.js',
-'extras/io/JSONLoader.js',
-'extras/io/BinaryLoader.js',
-'extras/io/SceneLoader.js',
+'extras/cameras/TrackballCamera.js',
+'extras/cameras/QuakeCamera.js',
+'extras/geometries/CubeGeometry.js',
+'extras/geometries/CylinderGeometry.js',
+'extras/geometries/ExtrudeGeometry.js',
+'extras/geometries/IcosahedronGeometry.js',
+'extras/geometries/LatheGeometry.js',
+'extras/geometries/PlaneGeometry.js',
+'extras/geometries/SphereGeometry.js',
+'extras/geometries/TextGeometry.js',
+'extras/geometries/TorusGeometry.js',
+'extras/geometries/TorusKnotGeometry.js',
+'extras/loaders/Loader.js',
+'extras/loaders/BinaryLoader.js',
+'extras/loaders/ColladaLoader.js',
+'extras/loaders/JSONLoader.js',
+'extras/loaders/SceneLoader.js',
+'extras/loaders/UTF8Loader.js',
 'extras/objects/MarchingCubes.js',
 'extras/objects/Trident.js',
 'extras/physics/Collisions.js',
-'extras/physics/CollisionUtils.js'
+'extras/physics/CollisionUtils.js',
+'extras/renderers/AnaglyphWebGLRenderer.js',
+'extras/renderers/CrosseyedWebGLRenderer.js'
 ]
 
 CANVAS_FILES = [
@@ -122,6 +133,7 @@ CANVAS_FILES = [
 'core/Matrix3.js',
 'core/Matrix4.js',
 'core/Object3D.js',
+'core/Projector.js',
 'core/Quaternion.js',
 'core/Vertex.js',
 'core/Face3.js',
@@ -129,12 +141,12 @@ CANVAS_FILES = [
 'core/UV.js',
 'core/Geometry.js',
 'cameras/Camera.js',
+'cameras/OrthoCamera.js',
 'lights/Light.js',
 'lights/AmbientLight.js',
 'lights/DirectionalLight.js',
 'lights/PointLight.js',
 'materials/Material.js',
-'materials/Mappings.js',
 'materials/LineBasicMaterial.js',
 'materials/MeshBasicMaterial.js',
 'materials/MeshLambertMaterial.js',
@@ -144,16 +156,13 @@ CANVAS_FILES = [
 'materials/MeshFaceMaterial.js',
 'materials/ParticleBasicMaterial.js',
 'materials/ParticleCanvasMaterial.js',
-'materials/Texture.js',
+'textures/Texture.js',
 'objects/Particle.js',
 'objects/Line.js',
 'objects/Mesh.js',
 'objects/Bone.js',
-'objects/Sound.js',
 'scenes/Scene.js',
-'renderers/Projector.js',
 'renderers/CanvasRenderer.js',
-'renderers/SoundRenderer.js',
 'renderers/renderables/RenderableVertex.js',
 'renderers/renderables/RenderableFace3.js',
 'renderers/renderables/RenderableFace4.js',
@@ -173,20 +182,19 @@ DOM_FILES = [
 'core/Matrix3.js',
 'core/Matrix4.js',
 'core/Object3D.js',
+'core/Projector.js',
 'core/Quaternion.js',
 'core/Vertex.js',
 'core/Face3.js',
 'core/Face4.js',
 'core/UV.js',
 'cameras/Camera.js',
+'cameras/OrthoCamera.js',
 'materials/ParticleDOMMaterial.js',
 'objects/Particle.js',
 'objects/Bone.js',
-'objects/Sound.js',
 'scenes/Scene.js',
-'renderers/Projector.js',
 'renderers/DOMRenderer.js',
-'renderers/SoundRenderer.js',
 'renderers/renderables/RenderableParticle.js'
 ]
 
@@ -201,6 +209,7 @@ SVG_FILES = [
 'core/Matrix3.js',
 'core/Matrix4.js',
 'core/Object3D.js',
+'core/Projector.js',
 'core/Quaternion.js',
 'core/Vertex.js',
 'core/Face3.js',
@@ -208,6 +217,7 @@ SVG_FILES = [
 'core/UV.js',
 'core/Geometry.js',
 'cameras/Camera.js',
+'cameras/OrthoCamera.js',
 'lights/Light.js',
 'lights/AmbientLight.js',
 'lights/DirectionalLight.js',
@@ -225,11 +235,8 @@ SVG_FILES = [
 'objects/Line.js',
 'objects/Mesh.js',
 'objects/Bone.js',
-'objects/Sound.js',
 'scenes/Scene.js',
-'renderers/Projector.js',
 'renderers/SVGRenderer.js',
-'renderers/SoundRenderer.js',
 'renderers/renderables/RenderableVertex.js',
 'renderers/renderables/RenderableFace3.js',
 'renderers/renderables/RenderableFace4.js',
@@ -249,6 +256,7 @@ WEBGL_FILES = [
 'core/Matrix3.js',
 'core/Matrix4.js',
 'core/Object3D.js',
+'core/Projector.js',
 'core/Quaternion.js',
 'core/Vertex.js',
 'core/Face3.js',
@@ -258,13 +266,13 @@ WEBGL_FILES = [
 'core/Spline.js',
 'core/Edge.js',
 'cameras/Camera.js',
+'cameras/OrthoCamera.js',
 'lights/Light.js',
 'lights/AmbientLight.js',
 'lights/DirectionalLight.js',
 'lights/PointLight.js',
-'lights/LensFlare.js',
+'lights/SpotLight.js',
 'materials/Material.js',
-'materials/Mappings.js',
 'materials/LineBasicMaterial.js',
 'materials/MeshBasicMaterial.js',
 'materials/MeshLambertMaterial.js',
@@ -274,26 +282,24 @@ WEBGL_FILES = [
 'materials/MeshFaceMaterial.js',
 'materials/MeshShaderMaterial.js',
 'materials/ParticleBasicMaterial.js',
-'materials/ShadowVolumeDynamicMaterial.js',
-'materials/Texture.js',
+'textures/Texture.js',
+'textures/DataTexture.js',
+'objects/Particle.js',
 'objects/ParticleSystem.js',
 'objects/Line.js',
 'objects/Mesh.js',
 'objects/Bone.js',
 'objects/SkinnedMesh.js',
 'objects/Ribbon.js',
-'objects/Sound.js',
 'objects/LOD.js',
-'objects/ShadowVolume.js',
 'objects/Sprite.js',
 'scenes/Scene.js',
 'scenes/Fog.js',
 'scenes/FogExp2.js',
-'renderers/Projector.js',
-'renderers/SoundRenderer.js',
 'renderers/WebGLShaders.js',
 'renderers/WebGLRenderer.js',
-'renderers/WebGLRenderTarget.js'
+'renderers/WebGLRenderTarget.js',
+'renderers/WebGLRenderTargetCube.js',
 ]
 
 def merge(files):
@@ -320,8 +326,8 @@ def compress(text):
 		handle.write(text)
 
 	out_tuple = tempfile.mkstemp()
-	# os.system("java -jar yuicompressor-2.4.2.jar %s --type js -o %s --charset utf-8 -v" % (in_tuple[1], out_tuple[1]))
-	os.system("java -jar compiler.jar --language_in=ECMASCRIPT5 --js %s --js_output_file %s" % (in_tuple[1], out_tuple[1]))
+
+	os.system("java -jar compiler/compiler.jar --language_in=ECMASCRIPT5_STRICT --js %s --js_output_file %s" % (in_tuple[1], out_tuple[1]))
 
 	with os.fdopen(out_tuple[0], 'r') as handle:
 		compressed = handle.read()
@@ -351,7 +357,7 @@ def makeDebug(text):
 	return text
 
 
-def buildLib(files, debug, unminified, filename):
+def buildLib(files, debug, minified, filename):
 
 	text = merge(files)
 
@@ -370,9 +376,9 @@ def buildLib(files, debug, unminified, filename):
 	print "Compiling", filename
 	print "=" * 40
 
-	if not unminified:
+	if minified:
 		text = compress(text)
-	
+
 	output(addHeader(text, filename), folder + filename)
 
 
@@ -396,7 +402,7 @@ def parse_args():
 		parser.add_argument('--svg', help='Build ThreeSVG.js', action='store_true')
 		parser.add_argument('--dom', help='Build ThreeDOM.js', action='store_true')
 		parser.add_argument('--debug', help='Generate debug versions', action='store_const', const=True, default=False)
-		parser.add_argument('--unminified', help='Generate unminified versions', action='store_const', const=True, default=False)
+		parser.add_argument('--minified', help='Generate minified versions', action='store_const', const=True, default=False)
 		parser.add_argument('--all', help='Build all Three.js versions', action='store_true')
 
 		args = parser.parse_args()
@@ -411,7 +417,7 @@ def parse_args():
 		parser.add_option('--svg', dest='svg', help='Build ThreeSVG.js', action='store_true')
 		parser.add_option('--dom', dest='dom', help='Build ThreeDOM.js', action='store_true')
 		parser.add_option('--debug', dest='debug', help='Generate debug versions', action='store_const', const=True, default=False)
-		parser.add_option('--unminified', help='Generate unminified versions', action='store_const', const=True, default=False)
+		parser.add_option('--minified', help='Generate minified versions', action='store_const', const=True, default=False)
 		parser.add_option('--all', dest='all', help='Build all Three.js versions', action='store_true')
 
 		args, remainder = parser.parse_args()
@@ -428,7 +434,7 @@ def main(argv=None):
 
 	args = parse_args()
 	debug = args.debug
-	unminified = args.unminified
+	minified = args.minified
 
 	config = [
 	['Three', 'includes', COMMON_FILES + EXTRAS_FILES, args.common],
@@ -441,7 +447,7 @@ def main(argv=None):
 
 	for fname_lib, fname_inc, files, enabled in config:
 		if enabled or args.all:
-			buildLib(files, debug, unminified, fname_lib)
+			buildLib(files, debug, minified, fname_lib)
 			if args.includes:
 				buildIncludes(files, fname_inc)
 

@@ -1,0 +1,169 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>three.js canvas - interactive particles</title>
+		<meta charset="utf-8">
+		<style type="text/css">
+			body {
+				font-family: Monospace;
+				background-color: #f0f0f0;
+				margin: 0px;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+	<body>
+
+		<script type="text/javascript" src="../build/Three.js"></script>
+
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
+		<script type="text/javascript" src="js/Stats.js"></script>
+
+		<script type="text/javascript">
+
+			var container, stats;
+			var camera, scene, projector, renderer;
+
+			var PI2 = Math.PI * 2;
+
+			var programFill = function ( context ) {
+
+				context.beginPath();
+				context.arc( 0, 0, 1, 0, PI2, true );
+				context.closePath();
+				context.fill();
+
+			}
+
+			var programStroke = function ( context ) {
+
+				context.lineWidth = 0.05;
+				context.beginPath();
+				context.arc( 0, 0, 1, 0, PI2, true );
+				context.closePath();
+				context.stroke();
+
+			}
+
+			var mouse = { x: 0, y: 0 }, INTERSECTED;
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				var info = document.createElement( 'div' );
+				info.style.position = 'absolute';
+				info.style.top = '10px';
+				info.style.width = '100%';
+				info.style.textAlign = 'center';
+				info.innerHTML = '<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> canvas - interactive particles';
+				container.appendChild( info );
+
+				camera = new THREE.Camera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.y = 300;
+				camera.position.z = 500;
+
+				scene = new THREE.Scene();
+
+				for ( var i = 0; i < 100; i ++ ) {
+
+					var particle = new THREE.Particle( new THREE.ParticleCanvasMaterial( { color: Math.random() * 0x808080 + 0x808080, program: programStroke } ) );
+					particle.position.x = Math.random() * 800 - 400;
+					particle.position.y = Math.random() * 800 - 400;
+					particle.position.z = Math.random() * 800 - 400;
+					particle.scale.x = particle.scale.y = Math.random() * 10 + 10;
+					scene.addObject( particle );
+
+				}
+
+				projector = new THREE.Projector();
+
+				renderer = new THREE.CanvasRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild( stats.domElement );
+
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+			}
+
+			function onDocumentMouseMove( event ) {
+
+				event.preventDefault();
+
+				mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+				mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			var radius = 600;
+			var theta = 0;
+
+			function render() {
+
+				// rotate camera
+
+				theta += 0.2;
+
+				camera.position.x = radius * Math.sin( theta * Math.PI / 360 );
+				camera.position.y = radius * Math.sin( theta * Math.PI / 360 );
+				camera.position.z = radius * Math.cos( theta * Math.PI / 360 );
+
+				// find intersections
+
+				camera.update();
+
+				var vector = new THREE.Vector3( mouse.x, mouse.y, 0.5 );
+				projector.unprojectVector( vector, camera );
+
+				var ray = new THREE.Ray( camera.position, vector.subSelf( camera.position ).normalize() );
+
+				var intersects = ray.intersectScene( scene );
+
+				if ( intersects.length > 0 ) {
+
+					if ( INTERSECTED != intersects[ 0 ].object ) {
+
+						if ( INTERSECTED ) INTERSECTED.materials[ 0 ].program = programStroke;
+
+						INTERSECTED = intersects[ 0 ].object;
+						INTERSECTED.materials[ 0 ].program = programFill;
+
+					}
+
+				} else {
+
+					if ( INTERSECTED ) INTERSECTED.materials[ 0 ].program = programStroke;
+
+					INTERSECTED = null;
+
+				}
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

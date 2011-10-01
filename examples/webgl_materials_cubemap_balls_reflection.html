@@ -77,7 +77,7 @@
 				scene = new THREE.Scene();
 				sceneCube = new THREE.Scene();
 
-				var geometry = new THREE.Sphere( 100, 32, 16 );
+				var geometry = new THREE.SphereGeometry( 100, 32, 16 );
 
 				var path = "textures/cube/pisa/";
 				var format = '.png';
@@ -103,7 +103,23 @@
 
 				}
 
-				THREE.SceneUtils.addPanoramaCubeWebGL( sceneCube, 100000, textureCube );
+				// Skybox
+
+				var shader = THREE.ShaderUtils.lib["cube"];
+				shader.uniforms["tCube"].texture = textureCube;
+
+				var material = new THREE.MeshShaderMaterial( {
+
+					fragmentShader: shader.fragmentShader,
+					vertexShader: shader.vertexShader,
+					uniforms: shader.uniforms
+
+				} ),
+
+				mesh = new THREE.Mesh( new THREE.CubeGeometry( 100000, 100000, 100000, 1, 1, 1, null, true ), material );
+				sceneCube.addObject( mesh );
+
+				//
 
 				webglRenderer = new THREE.WebGLRenderer();
 				webglRenderer.setSize( window.innerWidth, window.innerHeight );

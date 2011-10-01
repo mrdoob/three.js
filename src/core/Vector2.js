@@ -1,22 +1,22 @@
 /**
  * @author mr.doob / http://mrdoob.com/
  * @author philogb / http://blog.thejit.org/
+ * @author egraether / http://egraether.com/
+ * @author zz85 / http://www.lab4games.net/zz85/blog
  */
 
 THREE.Vector2 = function ( x, y ) {
 
-	this.set(
-
-		x || 0,
-		y || 0
-
-	);
+	this.x = x || 0;
+	this.y = y || 0;
 
 };
 
 THREE.Vector2.prototype = {
 
-	set : function ( x, y ) {
+	constructor: THREE.Vector2,
+
+	set: function ( x, y ) {
 
 		this.x = x;
 		this.y = y;
@@ -25,120 +25,138 @@ THREE.Vector2.prototype = {
 
 	},
 
-	copy : function ( v ) {
+	copy: function ( v ) {
 
-		this.set(
-
-			v.x,
-			v.y
-
-		);
+		this.x = v.x;
+		this.y = v.y;
 
 		return this;
 
 	},
 
-	addSelf : function ( v ) {
+	clone: function () {
 
-		this.set(
+		return new THREE.Vector2( this.x, this.y );
 
-			this.x + v.x,
-			this.y + v.y
+	},
 
-		);
+
+	add: function ( v1, v2 ) {
+
+		this.x = v1.x + v2.x;
+		this.y = v1.y + v2.y;
 
 		return this;
 
 	},
 
-	add : function ( v1, v2 ) {
+	addSelf: function ( v ) {
 
-		this.set(
-
-			v1.x + v2.x,
-			v1.y + v2.y
-
-		);
+		this.x += v.x;
+		this.y += v.y;
 
 		return this;
 
 	},
 
-	subSelf : function ( v ) {
+	sub: function ( v1, v2 ) {
 
-		this.set(
-
-			this.x - v.x,
-			this.y - v.y
-
-		);
+		this.x = v1.x - v2.x;
+		this.y = v1.y - v2.y;
 
 		return this;
 
 	},
 
-	sub : function ( v1, v2 ) {
+	subSelf: function ( v ) {
 
-		this.set(
-
-			v1.x - v2.x,
-			v1.y - v2.y
-
-		);
+		this.x -= v.x;
+		this.y -= v.y;
 
 		return this;
 
 	},
 
-	multiplyScalar : function ( s ) {
+	multiplyScalar: function ( s ) {
 
-		this.set(
-
-			this.x * s,
-			this.y * s
-
-		);
+		this.x *= s;
+		this.y *= s;
 
 		return this;
 
 	},
 
-	negate : function() {
+	divideScalar: function ( s ) {
 
-		this.set(
+		if ( s ) {
 
-			- this.x,
-			- this.y
+			this.x /= s;
+			this.y /= s;
 
-		);
+		} else {
 
-		return this;
+			this.set( 0, 0 );
 
-	},
-
-	unit : function () {
-
-		this.multiplyScalar( 1 / this.length() );
+		}
 
 		return this;
 
 	},
 
-	length : function () {
 
-		return Math.sqrt( this.lengthSq() );
+	negate: function() {
+
+		return this.multiplyScalar( -1 );
 
 	},
 
-	lengthSq : function () {
+	dot: function ( v ) {
+
+		return this.x * v.x + this.y * v.y;
+
+	},
+
+	lengthSq: function () {
 
 		return this.x * this.x + this.y * this.y;
 
 	},
 
-	clone : function () {
+	length: function () {
 
-		return new THREE.Vector2( this.x, this.y );
+		return Math.sqrt( this.lengthSq() );
+
+	},
+
+	normalize: function () {
+
+		return this.divideScalar( this.length() );
+
+	},
+
+	distanceTo: function ( v ) {
+
+		return Math.sqrt( this.distanceToSquared( v ) );
+
+	},
+
+	distanceToSquared: function ( v ) {
+
+		var dx = this.x - v.x, dy = this.y - v.y;
+		return dx * dx + dy * dy;
+
+	},
+
+
+	setLength: function ( l ) {
+
+		return this.normalize().multiplyScalar( l );
+
+	},
+
+	equals: function( v ) {
+
+		return ( ( v.x == this.x ) && ( v.y == this.y ) );
 
 	}
 

@@ -3,24 +3,23 @@
  * @author kile / http://kile.stravaganza.org/
  * @author philogb / http://blog.thejit.org/
  * @author mikael emtinger / http://gomo.se/
+ * @author egraether / http://egraether.com/
  */
 
 THREE.Vector3 = function ( x, y, z ) {
 
-	this.set(
-
-		x || 0,
-		y || 0,
-		z || 0
-
-	);
+	this.x = x || 0;
+	this.y = y || 0;
+	this.z = z || 0;
 
 };
 
 
 THREE.Vector3.prototype = {
 
-	set : function ( x, y, z ) {
+	constructor: THREE.Vector3,
+
+	set: function ( x, y, z ) {
 
 		this.x = x;
 		this.y = y;
@@ -30,257 +29,215 @@ THREE.Vector3.prototype = {
 
 	},
 
-	copy : function ( v ) {
+	copy: function ( v ) {
 
-		this.set(
+		this.x = v.x;
+		this.y = v.y;
+		this.z = v.z;
 
-			v.x,
-			v.y,
-			v.z
+		return this;
 
-		);
+	},
+
+	clone: function () {
+
+		return new THREE.Vector3( this.x, this.y, this.z );
+
+	},
+
+
+	add: function ( v1, v2 ) {
+
+		this.x = v1.x + v2.x;
+		this.y = v1.y + v2.y;
+		this.z = v1.z + v2.z;
+
+		return this;
+
+	},
+
+	addSelf: function ( v ) {
+
+		this.x += v.x;
+		this.y += v.y;
+		this.z += v.z;
+
+		return this;
+
+	},
+
+	addScalar: function ( s ) {
+
+		this.x += s;
+		this.y += s;
+		this.z += s;
+
+		return this;
+
+	},
+
+	sub: function ( v1, v2 ) {
+
+		this.x = v1.x - v2.x;
+		this.y = v1.y - v2.y;
+		this.z = v1.z - v2.z;
+
+		return this;
+
+	},
+
+	subSelf: function ( v ) {
+
+		this.x -= v.x;
+		this.y -= v.y;
+		this.z -= v.z;
+
+		return this;
+
+	},
+
+	multiply: function ( a, b ) {
+
+		this.x = a.x * b.x;
+		this.y = a.y * b.y;
+		this.z = a.z * b.z;
+
+		return this;
+
+	},
+
+	multiplySelf: function ( v ) {
+
+		this.x *= v.x;
+		this.y *= v.y;
+		this.z *= v.z;
+
+		return this;
+
+	},
+
+	multiplyScalar: function ( s ) {
+
+		this.x *= s;
+		this.y *= s;
+		this.z *= s;
+
+		return this;
+
+	},
+
+	divideSelf: function ( v ) {
+
+		this.x /= v.x;
+		this.y /= v.y;
+		this.z /= v.z;
+
+		return this;
+
+	},
+
+	divideScalar: function ( s ) {
+
+		if ( s ) {
+
+			this.x /= s;
+			this.y /= s;
+			this.z /= s;
+
+		} else {
+
+			this.set( 0, 0, 0 );
+
+		}
 
 		return this;
 
 	},
 
 
-	add : function ( a, b ) {
+	negate: function() {
 
-		this.set(
-
-			a.x + b.x,
-			a.y + b.y,
-			a.z + b.z
-
-		);
-
-		return this;
+		return this.multiplyScalar( -1 );
 
 	},
 
-
-	addSelf : function ( v ) {
-
-		this.set(
-
-			this.x + v.x,
-			this.y + v.y,
-			this.z + v.z
-
-		);
-
-		return this;
-
-	},
-
-
-	addScalar : function ( s ) {
-
-		this.set(
-
-			this.x + s,
-			this.y + s,
-			this.z + s
-
-		);
-
-		return this;
-
-	},
-
-
-	sub : function ( a, b ) {
-
-		this.set(
-
-			a.x - b.x,
-			a.y - b.y,
-			a.z - b.z
-
-		);
-
-		return this;
-
-	},
-
-	subSelf : function ( v ) {
-
-		this.set(
-
-			this.x - v.x,
-			this.y - v.y,
-			this.z - v.z
-
-		);
-
-		return this;
-
-	},
-
-
-	cross : function ( a, b ) {
-
-		this.set(
-
-			a.y * b.z - a.z * b.y,
-			a.z * b.x - a.x * b.z,
-			a.x * b.y - a.y * b.x
-
-		);
-
-		return this;
-
-	},
-
-	crossSelf : function ( v ) {
-
-		var tx = this.x, ty = this.y, tz = this.z;
-
-		this.set(
-
-			ty * v.z - tz * v.y,
-			tz * v.x - tx * v.z,
-			tx * v.y - ty * v.x
-
-		);
-
-		return this;
-
-	},
-
-	multiply : function ( a, b ) {
-
-		this.set(
-
-			a.x * b.x,
-			a.y * b.y,
-			a.z * b.z
-
-		);
-
-		return this;
-
-	},
-
-	multiplySelf : function ( v ) {
-
-		this.set(
-
-			this.x * v.x,
-			this.y * v.y,
-			this.z * v.z
-
-		);
-
-		return this;
-
-	},
-
-	multiplyScalar : function ( s ) {
-
-		this.set(
-
-			this.x * s,
-			this.y * s,
-			this.z * s
-
-		);
-
-		return this;
-
-	},
-
-	divideSelf : function ( v ) {
-
-		this.set(
-
-			this.x / v.x,
-			this.y / v.y,
-			this.z / v.z
-
-		);
-
-		return this;
-
-	},
-
-	divideScalar : function ( s ) {
-
-		this.set(
-
-			this.x / s,
-			this.y / s,
-			this.z / s
-
-		);
-
-		return this;
-
-	},
-
-	negate : function () {
-
-		this.set(
-
-			- this.x,
-			- this.y,
-			- this.z
-
-		);
-
-		return this;
-
-	},
-
-	dot : function ( v ) {
+	dot: function ( v ) {
 
 		return this.x * v.x + this.y * v.y + this.z * v.z;
 
 	},
 
-	distanceTo : function ( v ) {
-
-		return Math.sqrt( this.distanceToSquared( v ) );
-
-	},
-
-	distanceToSquared : function ( v ) {
-
-		var dx = this.x - v.x, dy = this.y - v.y, dz = this.z - v.z;
-		return dx * dx + dy * dy + dz * dz;
-
-	},
-
-	length : function () {
-
-		return Math.sqrt( this.lengthSq() );
-
-	},
-
-	lengthSq : function () {
+	lengthSq: function () {
 
 		return this.x * this.x + this.y * this.y + this.z * this.z;
 
 	},
 
-	lengthManhattan : function () {
+	length: function () {
+
+		return Math.sqrt( this.lengthSq() );
+
+	},
+
+	lengthManhattan: function () {
+
+		// correct version
+		// return Math.abs( this.x ) + Math.abs( this.y ) + Math.abs( this.z );
 
 		return this.x + this.y + this.z;
 
 	},
 
-	normalize : function () {
+	normalize: function () {
 
-		var l = this.length();
+		return this.divideScalar( this.length() );
 
-		l > 0 ? this.multiplyScalar( 1 / l ) : this.set( 0, 0, 0 );
+	},
+
+	setLength: function ( l ) {
+
+		return this.normalize().multiplyScalar( l );
+
+	},
+
+
+	cross: function ( a, b ) {
+
+		this.x = a.y * b.z - a.z * b.y;
+		this.y = a.z * b.x - a.x * b.z;
+		this.z = a.x * b.y - a.y * b.x;
 
 		return this;
 
 	},
 
-	setPositionFromMatrix : function ( m ) {
+	crossSelf: function ( v ) {
+
+		return this.set(
+
+			this.y * v.z - this.z * v.y,
+			this.z * v.x - this.x * v.z,
+			this.x * v.y - this.y * v.x
+
+		);
+
+	},
+
+
+	distanceTo: function ( v ) {
+
+		return Math.sqrt( this.distanceToSquared( v ) );
+
+	},
+
+	distanceToSquared: function ( v ) {
+
+		return new THREE.Vector3().sub( this, v ).lengthSq();
+
+	},
+
+
+	setPositionFromMatrix: function ( m ) {
 
 		this.x = m.n14;
 		this.y = m.n24;
@@ -288,7 +245,7 @@ THREE.Vector3.prototype = {
 
 	},
 
-	setRotationFromMatrix : function ( m ) {
+	setRotationFromMatrix: function ( m ) {
 
 		var cosY = Math.cos( this.y );
 
@@ -308,22 +265,9 @@ THREE.Vector3.prototype = {
 
 	},
 
-	setLength : function ( l ) {
+	isZero: function () {
 
-		return this.normalize().multiplyScalar( l );
-
-	},
-
-	isZero : function () {
-
-		var almostZero = 0.0001;
-		return ( Math.abs( this.x ) < almostZero ) && ( Math.abs( this.y ) < almostZero ) && ( Math.abs( this.z ) < almostZero );
-
-	},
-
-	clone : function () {
-
-		return new THREE.Vector3( this.x, this.y, this.z );
+		return ( this.lengthSq() < 0.0001 /* almostZero */ );
 
 	}
 

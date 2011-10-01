@@ -72,7 +72,7 @@
 				scene.addLight( light );
 
 				var shadowMaterial = new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/shadow.png' ) } );
-				var shadowGeo = new THREE.Plane( 300, 300, 1, 1 );
+				var shadowGeo = new THREE.PlaneGeometry( 300, 300, 1, 1 );
 
 				mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
 				mesh.position.y = - 250;
@@ -95,9 +95,9 @@
 
 				var color, f, f2, f3, p, n, vertexIndex,
 
-					geometry  = new THREE.Icosahedron( 1 ),
-					geometry2 = new THREE.Icosahedron( 1 ),
-					geometry3 = new THREE.Icosahedron( 1 );
+					geometry  = new THREE.IcosahedronGeometry( 1 ),
+					geometry2 = new THREE.IcosahedronGeometry( 1 ),
+					geometry3 = new THREE.IcosahedronGeometry( 1 );
 
 				for ( var i = 0; i < geometry.faces.length; i++ ) {
 

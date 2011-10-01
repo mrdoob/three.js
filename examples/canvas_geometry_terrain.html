@@ -70,7 +70,7 @@
 				var material = new THREE.MeshBasicMaterial( { map: new THREE.Texture( generateTexture( data, 1024, 1024 ) ) } );
 
 				var quality = 16, step = 1024 / quality;
-				var plane = new THREE.Plane( 2000, 2000, quality - 1, quality - 1 );
+				var plane = new THREE.PlaneGeometry( 2000, 2000, quality - 1, quality - 1 );
 
 				for ( var i = 0, l = plane.vertices.length; i < l; i ++ ) {
 

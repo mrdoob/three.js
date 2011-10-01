@@ -67,7 +67,7 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.QuakeCamera( {
+				camera = new THREE.FirstPersonCamera( {
 
 					fov: 60, aspect: window.innerWidth / window.innerHeight, near: 1, far: 20000,
 					movementSpeed: 1000, lookSpeed: 0.1, noFly: false, lookVertical: true
@@ -83,7 +83,7 @@
 				camera.position.y = data[ worldHalfWidth + worldHalfDepth * worldWidth ] + 500;
 				camera.target.position.y = camera.position.y;
 
-				var geometry = new THREE.Plane( 7500, 7500, worldWidth - 1, worldDepth - 1 );
+				var geometry = new THREE.PlaneGeometry( 7500, 7500, worldWidth - 1, worldDepth - 1 );
 
 				for ( var i = 0, l = geometry.vertices.length; i < l; i ++ ) {
 
