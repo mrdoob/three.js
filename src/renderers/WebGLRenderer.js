@@ -97,7 +97,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.maxMorphTargets = 8;
 	this.domElement = _canvas;
+
 	this.autoClear = true;
+	this.autoClearColor = true;
+	this.autoClearDepth = true;
+	this.autoClearStencil = true;
+
 	this.sortObjects = true;
 
 	// shadow map
@@ -3702,7 +3707,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( this.autoClear || forceClear ) {
 
-			this.clear();
+			this.clear( this.autoClearColor, this.autoClearDepth, this.autoClearStencil );
 
 		}
 

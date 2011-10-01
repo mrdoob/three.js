@@ -82,7 +82,7 @@
 				renderer = new THREE.WebGLRenderer( { preserveDrawingBuffer: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.sortObjects = false;
-				renderer.autoClear = false;
+				renderer.autoClearColor = false;
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -116,7 +116,6 @@
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 
-				renderer.clear( false );
 				renderer.render( scene, camera );
 
 			}
