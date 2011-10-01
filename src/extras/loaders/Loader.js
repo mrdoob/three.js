@@ -15,6 +15,8 @@ THREE.Loader = function ( showStatus ) {
 
 THREE.Loader.prototype = {
 
+	constructor: THREE.Loader,
+
 	addStatusElement: function () {
 
 		var e = document.createElement( "div" );
@@ -366,8 +368,6 @@ THREE.Loader.prototype = {
 
 		return material;
 
-	},
-
-	constructor : THREE.Loader
+	}
 
 };
