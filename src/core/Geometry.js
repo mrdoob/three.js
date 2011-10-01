@@ -3,6 +3,7 @@
  * @author kile / http://kile.stravaganza.org/
  * @author alteredq / http://alteredqualia.com/
  * @author mikael emtinger / http://gomo.se/
+ * @author zz85 / http://www.lab4games.net/zz85/blog
  */
 
 THREE.Geometry = function () {
@@ -528,9 +529,72 @@ THREE.Geometry.prototype = {
 
 	}, 
 	
+	/* 
+	 * Merge Vertices which distances close enough 
+     *
+	 */
+	mergeVertices: function() {
+
+		var unique = [], changes = [], scope = this;
+		
+		var isEqual = function(a, b) {
+			var epsilon = 0.0001;
+			return (Math.abs(a - b) < epsilon);
+		}
+		
+		for ( var i = 0, il = scope.vertices.length; i < il; i ++ ) {
+
+			var v = scope.vertices[ i ],
+			duplicate = false;
+
+			for ( var j = 0, jl = unique.length; j < jl; j ++ ) {
+
+				var vu = unique[ j ];
+
+				if( isEqual(v.position.x, vu.position.x) && isEqual(v.position.y, vu.position.y) && isEqual(v.position.z, vu.position.z) ) {
+
+					changes[ i ] = j;
+					duplicate = true;
+					break;
+
+				}
+
+			}
+
+			if ( ! duplicate ) {
+
+				changes[ i ] = unique.length;
+				unique.push( new THREE.Vertex( v.position.clone() ) );
+
+			}
+
+		}
+
+		for ( i = 0, il = scope.faces.length; i < il; i ++ ) {
+
+			var face = scope.faces[ i ];
+
+			face.a = changes[ face.a ];
+			face.b = changes[ face.b ];
+			face.c = changes[ face.c ];
+			face.d = changes[ face.d ];
+
+		}
+
+		scope.vertices = unique;
+
+	},
+	
+	/* 
+	 * Checks for duplicate vertices with hashmap. 
+	 * If toPatch is true, duplicated vertices are removed
+	 * and faces' vertices are updated. 
+	 */
 	checkDupVertices: function(toPatch) {
 		
 		var uniqueVertices = {}, patch = {};
+		var unique = [], changes = [];
+		
 		var v, key;
 		var precision = 1000;
 		var i,il, face;
@@ -542,9 +606,12 @@ THREE.Geometry.prototype = {
 			
 			if (uniqueVertices[key]===undefined) {
 				uniqueVertices[key] = i;
+				unique.push(this.vertices[i]);
+				changes[i] = unique.length - 1;
 			} else {
 				console.log('Duplicate vertex found. ', i, ' could be using ', uniqueVertices[key]);
 				patch[i] = uniqueVertices[key];
+				changes[i] = changes[uniqueVertices[key]];
 			}
 			
 		};
@@ -554,17 +621,17 @@ THREE.Geometry.prototype = {
 		if (!toPatch) return;
 		
 		// Start to patch.
-		console.log('Start' , patch, toPatch);
-		
-		
-		//TODO: Clear delete vertices?
+		//console.log('Start Patching' , patch, toPatch, changes);
 		
 		var runPatch = function(i) {
-			if (patch[i] !== undefined) {
-				//console.log('fixing',i, 'to', patch[i]);
-				return patch[i];
-			}
-			return i;
+			
+			return changes[i];
+			
+			// if (patch[i] !== undefined) {
+			// 	//console.log('fixing',i, 'to', patch[i]);
+			// 	return patch[i];
+			// }
+			// return i;
 		};
 		
 		for( i = 0, il = this.faces.length; i < il; i ++ ) {
@@ -585,6 +652,9 @@ THREE.Geometry.prototype = {
 			
 			}
 		}
+		
+		// Use unique set of vertices
+		this.vertices = unique;
 		
 		//console.log(this);
 	}

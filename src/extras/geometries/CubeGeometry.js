@@ -59,8 +59,8 @@ THREE.CubeGeometry = function ( width, height, depth, segmentsWidth, segmentsHei
 	this.sides.ny && buildPlane( 'x', 'z',   1 * flip, - 1, width, depth, - height_half, this.materials[ 3 ] ); // ny
 	this.sides.pz && buildPlane( 'x', 'y',   1 * flip, - 1, width, height, depth_half, this.materials[ 4 ] );   // pz
 	this.sides.nz && buildPlane( 'x', 'y', - 1 * flip, - 1, width, height, - depth_half, this.materials[ 5 ] ); // nz
-
-	mergeVertices();
+	
+	THREE.Geometry.prototype.mergeVertices.call(this);
 
 	function buildPlane( u, v, udir, vdir, width, height, depth, material ) {
 
@@ -130,52 +130,6 @@ THREE.CubeGeometry = function ( width, height, depth, segmentsWidth, segmentsHei
 
 	}
 
-	function mergeVertices() {
-
-		var unique = [], changes = [];
-
-		for ( var i = 0, il = scope.vertices.length; i < il; i ++ ) {
-
-			var v = scope.vertices[ i ],
-			duplicate = false;
-
-			for ( var j = 0, jl = unique.length; j < jl; j ++ ) {
-
-				var vu = unique[ j ];
-
-				if( v.position.x == vu.position.x && v.position.y == vu.position.y && v.position.z == vu.position.z ) {
-
-					changes[ i ] = j;
-					duplicate = true;
-					break;
-
-				}
-
-			}
-
-			if ( ! duplicate ) {
-
-				changes[ i ] = unique.length;
-				unique.push( new THREE.Vertex( v.position.clone() ) );
-
-			}
-
-		}
-
-		for ( i = 0, il = scope.faces.length; i < il; i ++ ) {
-
-			var face = scope.faces[ i ];
-
-			face.a = changes[ face.a ];
-			face.b = changes[ face.b ];
-			face.c = changes[ face.c ];
-			face.d = changes[ face.d ];
-
-		}
-
-		scope.vertices = unique;
-
-	}
 
 	this.computeCentroids();
 	this.computeFaceNormals();
