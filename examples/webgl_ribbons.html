@@ -77,6 +77,7 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.Camera( 70, window.innerWidth / window.innerHeight, 1, 3000 );
+				camera.useTarget = true;
 				camera.position.z = 1200;
 
 				scene = new THREE.Scene();
@@ -262,7 +263,7 @@
 				var time = new Date().getTime() * 0.00005;
 
 				camera.position.x += ( mouseX - camera.position.x ) * 0.036;
-				camera.position.y += ( - (mouseY) - camera.position.y ) * 0.036;
+				camera.position.y += ( - mouseY - camera.position.y ) * 0.036;
 
 				for ( i = -n; i < n; i ++ ) {
 
