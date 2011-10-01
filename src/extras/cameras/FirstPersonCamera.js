@@ -34,6 +34,8 @@ THREE.FirstPersonCamera = function ( parameters ) {
 
 	THREE.Camera.call( this, parameters.fov, parameters.aspect, parameters.near, parameters.far, parameters.target );
 
+	this.useTarget = true;
+
 	this.movementSpeed = 1.0;
 	this.lookSpeed = 0.005;
 

@@ -88,8 +88,8 @@
 				document.body.appendChild(container);
 
 				camera = new THREE.Camera( 75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
+				camera.useTarget = true;
 				camera.position.z = 500;
-				camera.updateMatrix();
 
 				scene = new THREE.Scene();
 
@@ -222,7 +222,6 @@
 				zmesh.position.y = FLOOR;
 				zmesh.scale.x = zmesh.scale.y = zmesh.scale.z = 3;
 				zmesh.overdraw = true;
-				zmesh.updateMatrix();
 				scene.add(zmesh);
 
 				// PLANES with all materials from the model
@@ -242,7 +241,6 @@
 					mesh.position.z = -100;
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = 1;
 					mesh.doubleSided = true;
-					mesh.updateMatrix();
 					scene.add(mesh);
 
 					// number
@@ -264,7 +262,6 @@
 					mesh.position.z = - 99;
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = 1;
 					mesh.doubleSided = true;
-					mesh.updateMatrix();
 					scene.add(mesh);
 				}
 
@@ -292,7 +289,6 @@
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
-				camera.updateMatrix();
 
 				if ( render_canvas ) canvasRenderer.render( scene, camera );
 				if ( render_gl && has_gl ) webglRenderer.render( scene, camera );
