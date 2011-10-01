@@ -4,6 +4,8 @@
 
 THREE.Material = function ( parameters ) {
 
+	this.name = '';
+
 	this.id = THREE.MaterialCount ++;
 
 	parameters = parameters || {};

@@ -263,6 +263,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_viewportHeight = height;
 
 		_gl.viewport( _viewportX, _viewportY, _viewportWidth, _viewportHeight );
+		_gl.clear( _gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT | _gl.STENCIL_BUFFER_BIT );
 
 	};
 
@@ -311,9 +312,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	this.clear = function () {
+	this.clear = function ( color, depth, stencil ) {
 
-		_gl.clear( _gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT | _gl.STENCIL_BUFFER_BIT );
+		var bits = 0;
+
+		if ( color == undefined || color ) bits |= _gl.COLOR_BUFFER_BIT;
+		if ( depth == undefined || depth ) bits |= _gl.DEPTH_BUFFER_BIT;
+		if ( stencil == undefined || stencil ) bits |= _gl.STENCIL_BUFFER_BIT;
+
+		_gl.clear( bits );
 
 	};
 
@@ -3657,17 +3664,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	this.clearTarget = function ( renderTarget, colorBit, depthBit, stencilBit ) {
+	this.clearTarget = function ( renderTarget, color, depth, stencil ) {
 
 		setRenderTarget( renderTarget );
-
-		var bits = 0;
-
-		if ( colorBit ) bits |= _gl.COLOR_BUFFER_BIT;
-		if ( depthBit ) bits |= _gl.DEPTH_BUFFER_BIT;
-		if ( stencilBit ) bits |= _gl.STENCIL_BUFFER_BIT;
-
-		_gl.clear( bits );
+		this.clear( color, depth, stencil );
 
 	};
 

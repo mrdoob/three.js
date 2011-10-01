@@ -60,6 +60,7 @@
 				container = document.getElementById( 'container' );
 
 				camera = new THREE.Camera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.useTarget = true;
 				camera.position.z = 500;
 
 				scene = new THREE.Scene();
