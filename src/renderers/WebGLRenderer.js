@@ -268,7 +268,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_viewportHeight = height;
 
 		_gl.viewport( _viewportX, _viewportY, _viewportWidth, _viewportHeight );
-		_gl.clear( _gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT | _gl.STENCIL_BUFFER_BIT );
 
 	};
 
@@ -280,10 +279,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.enableScissorTest = function ( enable ) {
 
-		if ( enable )
-			_gl.enable( _gl.SCISSOR_TEST );
-		else
-			_gl.disable( _gl.SCISSOR_TEST );
+		enable ? _gl.enable( _gl.SCISSOR_TEST ) : _gl.disable( _gl.SCISSOR_TEST );
 
 	};
 
