@@ -15,8 +15,6 @@ THREE.Geometry = function () {
 
 	this.faces = [];
 
-	//this.edges = [];
-
 	this.faceUvs = [[]];
 	this.faceVertexUvs = [[]];
 
@@ -439,73 +437,18 @@ THREE.Geometry.prototype = {
 	},
 	
 	/* 
-	 * Merge Vertices which distances close enough 
-     *
-	 */
-	mergeVertices: function() {
-
-		var unique = [], changes = [], scope = this;
-		
-		var isEqual = function(a, b) {
-			var epsilon = 0.0001;
-			return (Math.abs(a - b) < epsilon);
-		}
-		
-		for ( var i = 0, il = scope.vertices.length; i < il; i ++ ) {
-
-			var v = scope.vertices[ i ],
-			duplicate = false;
-
-			for ( var j = 0, jl = unique.length; j < jl; j ++ ) {
-
-				var vu = unique[ j ];
-
-				if( isEqual(v.position.x, vu.position.x) && isEqual(v.position.y, vu.position.y) && isEqual(v.position.z, vu.position.z) ) {
-
-					changes[ i ] = j;
-					duplicate = true;
-					break;
-
-				}
-
-			}
-
-			if ( ! duplicate ) {
-
-				changes[ i ] = unique.length;
-				unique.push( new THREE.Vertex( v.position.clone() ) );
-
-			}
-
-		}
-
-		for ( i = 0, il = scope.faces.length; i < il; i ++ ) {
-
-			var face = scope.faces[ i ];
-
-			face.a = changes[ face.a ];
-			face.b = changes[ face.b ];
-			face.c = changes[ face.c ];
-			face.d = changes[ face.d ];
-
-		}
-
-		scope.vertices = unique;
-
-	},
-	
-	/* 
 	 * Checks for duplicate vertices with hashmap. 
-	 * If toPatch is true, duplicated vertices are removed
+	 * Duplicated vertices are removed
 	 * and faces' vertices are updated. 
 	 */
-	checkDupVertices: function(toPatch) {
+	mergeVertices: function() {
 		
-		var uniqueVertices = {}, patch = {};
+		var verticesMap = {}; // Hashmap for looking up vertice by position coordinates (and making sure they are unique)
 		var unique = [], changes = [];
 		
 		var v, key;
-		var precision = 1000;
+		var precisionPoints = 4; // number of decimal points, eg. 4 for epsilon of 0.0001 
+		var precision = Math.pow(10, precisionPoints)
 		var i,il, face;
 		
 		for (i=0,il=this.vertices.length;i<il;i++) {
@@ -513,51 +456,34 @@ THREE.Geometry.prototype = {
 			v = this.vertices[i].position;
 			key = [Math.round(v.x * precision), Math.round(v.y* precision), Math.round(v.z* precision)].join('_');
 			
-			if (uniqueVertices[key]===undefined) {
-				uniqueVertices[key] = i;
+			if (verticesMap[key]===undefined) {
+				verticesMap[key] = i;
 				unique.push(this.vertices[i]);
 				changes[i] = unique.length - 1;
 			} else {
-				console.log('Duplicate vertex found. ', i, ' could be using ', uniqueVertices[key]);
-				patch[i] = uniqueVertices[key];
-				changes[i] = changes[uniqueVertices[key]];
+				//console.log('Duplicate vertex found. ', i, ' could be using ', verticesMap[key]);
+				changes[i] = changes[verticesMap[key]];
 			}
 			
 		};
 		
 		
-		
-		if (!toPatch) return;
-		
-		// Start to patch.
-		//console.log('Start Patching' , patch, toPatch, changes);
-		
-		var runPatch = function(i) {
-			
-			return changes[i];
-			
-			// if (patch[i] !== undefined) {
-			// 	//console.log('fixing',i, 'to', patch[i]);
-			// 	return patch[i];
-			// }
-			// return i;
-		};
-		
+		// Start to patch face indices.
 		for( i = 0, il = this.faces.length; i < il; i ++ ) {
 
 			face = this.faces[ i ];
 
 			if ( face instanceof THREE.Face3 ) {
-				face.a = runPatch(face.a);
-				face.b = runPatch(face.b);
-				face.c = runPatch(face.c);
+				face.a = changes[face.a];
+				face.b = changes[face.b];
+				face.c = changes[face.c];
 			
 			} if ( face instanceof THREE.Face4 ) {
 
-				face.a = runPatch(face.a);
-				face.b = runPatch(face.b);
-				face.c = runPatch(face.c);
-				face.d = runPatch(face.d);
+				face.a = changes[face.a];
+				face.b = changes[face.b];
+				face.c = changes[face.c];
+				face.d = changes[face.d];
 			
 			}
 		}
@@ -565,7 +491,6 @@ THREE.Geometry.prototype = {
 		// Use unique set of vertices
 		this.vertices = unique;
 		
-		//console.log(this);
 	}
 
 };
