@@ -16,6 +16,13 @@ THREE.CubeCamera = function ( near, far, height, resolution ) {
 	this.cameraPZ = new THREE.Camera( fov, aspect, near, far );
 	this.cameraNZ = new THREE.Camera( fov, aspect, near, far );
 
+	this.cameraPX.useTarget = true;
+	this.cameraNX.useTarget = true;
+	this.cameraPY.useTarget = true;
+	this.cameraNY.useTarget = true;
+	this.cameraPZ.useTarget = true;
+	this.cameraNZ.useTarget = true;
+
 	this.height = height;
 	this.position = new THREE.Vector3( 0, height, 0 );
 
