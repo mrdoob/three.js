@@ -57,9 +57,9 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.Camera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.useTarget = true;
 				camera.position.y = 150;
 				camera.position.z = 400;
+				camera.useTarget = true;
 				camera.target.position.y = 150;
 
 				scene = new THREE.Scene();

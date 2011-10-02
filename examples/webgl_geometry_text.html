@@ -164,7 +164,8 @@
 				camera = new THREE.Camera( 30, window.innerWidth / window.innerHeight, 1, 1500 );
 				camera.position.y = 400;
 				camera.position.z = 700;
-				camera.target.position.y = 100;
+				camera.useTarget = true;
+				camera.target.position.y = 150;
 
 				// SCENE
 

@@ -22,7 +22,6 @@
 		<script src="js/Stats.js"></script>
 		<script src="js/Tween.js"></script>
 		<script src="js/Sparks.js"></script>
-		
 
 		<!-- load the font file from canvas-text -->
 
@@ -45,8 +44,7 @@
 
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
-			
-			
+
 			var heartShape, particleCloud, sparksEmitter, emitterPos;
 			var _rotation = 0;
 			var timeOnShapePath = 0;
@@ -70,7 +68,6 @@
 				camera = new THREE.Camera( 50, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.y = 150;
 				camera.position.z = 700;
-				camera.target.position.y = 150;
 
 				scene = new THREE.Scene();
 

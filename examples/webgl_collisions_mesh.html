@@ -11,7 +11,7 @@
 				margin: 0px;
 				overflow: hidden;
 			}
-			 
+
 			#oldie { background-color: #ddd !important }
 
 			#info {
@@ -36,7 +36,7 @@
 				z-index:100;
 			}
 		</style>
-		 
+
 		<script src="../build/Three.js"></script> 
 		<script src="js/RequestAnimationFrame.js"></script>
 		<script src="js/Stats.js"></script>
@@ -57,13 +57,14 @@
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
-	
+
 				info = document.getElementById("info");
-	
+
 				camera = new THREE.Camera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = camdist;
-	
-				loader = new THREE.JSONLoader(  );
+				camera.useTarget = true;
+
+				loader = new THREE.JSONLoader();
 
 				scene = new THREE.Scene();
 
@@ -72,14 +73,14 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
-	
+
 				var ambientLight = new THREE.AmbientLight( 0x606060 );
 				scene.add( ambientLight );
 
 				sun = new THREE.DirectionalLight( 0xffffff );
 				sun.position = camera.position.clone();
 				scene.add( sun );
-	
+
 				loadCube();
 
 				stats = new Stats();
@@ -95,65 +96,64 @@
 			function loadCube(p) {
 
 				var onGeometry = function( geometry ) {	
-	
+
 					var sx = 300;
 					var sy = 240;
 					var sz = 300;
-		
+
 					addCube( new THREE.Vector3(-sx,	0,	0), geometry );
 					addCube( new THREE.Vector3(	0,	0,	0), geometry );
 					addCube( new THREE.Vector3( sx,	0,	0), geometry );
-		
+
 					addCube( new THREE.Vector3(-sx, sy,	0), geometry );
 					addCube( new THREE.Vector3(	0,  sy,	0), geometry );
 					addCube( new THREE.Vector3( sx, sy,	0), geometry );
-		
+
 					addCube( new THREE.Vector3(-sx,-sy,	0), geometry );
 					addCube( new THREE.Vector3(	0, -sy,	0), geometry );
 					addCube( new THREE.Vector3( sx,-sy,	0), geometry );
-		
+
 					addCube( new THREE.Vector3(-sx,	0,	sz), geometry );
 					addCube( new THREE.Vector3(	0,	0,	sz), geometry );
 					addCube( new THREE.Vector3( sx,	0,	sz), geometry );
-		
+
 					addCube( new THREE.Vector3(-sx, sy,	sz), geometry );
 					addCube( new THREE.Vector3(	0,  sy,	sz), geometry );
 					addCube( new THREE.Vector3( sx, sy,	sz), geometry );
-		
+
 					addCube( new THREE.Vector3(-sx,-sy,	sz), geometry );
 					addCube( new THREE.Vector3(	0, -sy,	sz), geometry );
 					addCube( new THREE.Vector3( sx,-sy,	sz), geometry );
-		
+
 					addCube( new THREE.Vector3(-sx,	0,	-sz), geometry );
 					addCube( new THREE.Vector3(	0,	0,	-sz), geometry );
 					addCube( new THREE.Vector3( sx,	0,	-sz), geometry );
-		
+
 					addCube( new THREE.Vector3(-sx, sy,	-sz), geometry );
 					addCube( new THREE.Vector3(	0,  sy,	-sz), geometry );
 					addCube( new THREE.Vector3( sx, sy,	-sz), geometry );
-		
+
 					addCube( new THREE.Vector3(-sx,-sy,	-sz), geometry );
 					addCube( new THREE.Vector3(	0, -sy,	-sz), geometry );
 					addCube( new THREE.Vector3( sx,-sy,	-sz), geometry );
-		
+
 					addCube( new THREE.Vector3(-sx,	0,	-sz*2), geometry );
 					addCube( new THREE.Vector3(	0,	0,	-sz*2), geometry );
 					addCube( new THREE.Vector3( sx,	0,	-sz*2), geometry );
-		
+
 					addCube( new THREE.Vector3(-sx, sy,	-sz*2), geometry );
 					addCube( new THREE.Vector3(	0,  sy,	-sz*2), geometry );
 					addCube( new THREE.Vector3( sx, sy,	-sz*2), geometry );
-		
+
 					addCube( new THREE.Vector3(-sx,-sy,	-sz*2), geometry );
 					addCube( new THREE.Vector3(	0, -sy,	-sz*2), geometry );
 					addCube( new THREE.Vector3( sx,-sy,	-sz*2), geometry );
-		
-					// info.innerHTML = "Total colliders: " + totalColliders + " (Faces: " + totalFaces + ")<br>";
-	
+
 				};
 
-	
+
 				loader.load( { model: "obj/suzanne/suzanneHi.js", callback: onGeometry } );
+
 			}
 
 			function addCube( p, g) {
@@ -163,15 +163,7 @@
 
 				var mesh = new THREE.Mesh( g, new THREE.MeshLambertMaterial( { color: 0x003300 } ) );
 				mesh.position = p;
-	
-				//mesh.rotation.x = Math.random() * Math.PI;
-				//mesh.rotation.y = Math.random() * Math.PI;
-				//mesh.rotation.z = Math.random() * Math.PI;
-	
-				//mesh.scale.x = Math.random() + 0.5;
-				//mesh.scale.y = Math.random() + 0.5;
-				//mesh.scale.z = Math.random() + 0.5;
-	
+
 				scene.add( mesh );
 				var mc = THREE.CollisionUtils.MeshColliderWBox(mesh);
 				THREE.Collisions.colliders.push( mc );
@@ -191,11 +183,11 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
-	
+
 				if( meshes.length == 0 ) return;
-	
+
 				var i, l = meshes.length;
-	
+
 				for ( i = 0; i < l; i++ ) {
 
 					meshes[ i ].materials[ 0 ].color.setHex( 0x003300 );
@@ -208,14 +200,14 @@
 				var ray = new THREE.Ray( camera.position, vector.subSelf( camera.position ).normalize() );
 
 				var c = THREE.Collisions.rayCastNearest( ray );
-	
+
 				if( c ) {
-	
+
 					//info.innerHTML += "Found @ distance " + c.distance;
 					c.mesh.materials[ 0 ].color.setHex( 0xbb0000 );
 
 				} else {
-	
+
 					//info.innerHTML += "No intersection";
 
 				}
@@ -227,12 +219,12 @@
 				sun.position.copy( camera.position );
 				sun.position.normalize();
 
-				theta += 0.005;		
+				theta += 0.005;
 
 				renderer.render( scene, camera );
-	
+
 				stats.update();
-	
+
 			};
 
 			function vts(v) {
