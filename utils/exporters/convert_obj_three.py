@@ -17,7 +17,6 @@ Notes:
         -t ascii|binary			export ascii or binary format (ascii has more features, binary just supports vertices, faces, normals, uvs and materials)
         -d invert|normal		invert transparency
         -b						bake material colors into face colors
-        -e						export edges
         -x 10.0                 scale and truncate
         -f 2                    morph frame sampling step
 
@@ -26,7 +25,6 @@ Notes:
         will be in ASCII format
         original model is assumed to use non-inverted transparency / dissolve (0.0 fully transparent, 1.0 fully opaque)
         no face colors baking
-        no edges export
         no scale and truncate
         morph frame step = 1 (all files will be processed)
 
@@ -106,7 +104,6 @@ How to get proper OBJ + MTL files with Blender
             UVs
             Normals
             Materials
-            Edges
 
         - select empty folder
         - give your exported file name with "obj" extension
@@ -154,7 +151,6 @@ SCALE = 1.0
 FRAMESTEP = 1
 
 BAKE_COLORS = False
-EXPORT_EDGES = False
 
 # default colors for debugging (each material gets one distinct color):
 # white, red, green, blue, yellow, cyan, magenta
@@ -171,7 +167,6 @@ TEMPLATE_FILE_ASCII = u"""\
 //  colors: %(ncolor)d
 //  uvs: %(nuv)d
 //  materials: %(nmaterial)d
-//  edges: %(nedge)d
 //
 //  Generated with OBJ -> Three.js converter
 //  http://github.com/alteredq/three.js/blob/master/utils/exporters/convert_obj_three.py
@@ -197,9 +192,7 @@ var model = {
 
     "uvs": [[%(uvs)s]],
 
-    "faces": [%(faces)s],
-
-    "edges" : [%(edges)s]
+    "faces": [%(faces)s]
 
 };
 
@@ -238,7 +231,6 @@ TEMPLATE_N = "%.5g,%.5g,%.5g"
 TEMPLATE_UV = "%.5g,%.5g"
 TEMPLATE_COLOR = "%.3g,%.3g,%.3g"
 TEMPLATE_COLOR_DEC = "%d"
-TEMPLATE_EDGE = "%d,%d"
 
 TEMPLATE_MORPH_VERTICES = '\t{ "name": "%s", "vertices": [%s] }'
 TEMPLATE_MORPH_COLORS   = '\t{ "name": "%s", "colors": [%s] }'
@@ -707,9 +699,6 @@ def generate_color_rgb(c):
 def generate_color_decimal(c):
     return TEMPLATE_COLOR_DEC % hexcolor(c)
 
-def generate_edge(e):
-    return TEMPLATE_EDGE % (e[0], e[1])
-
 # #####################################################
 # Morphs
 # #####################################################
@@ -848,74 +837,6 @@ def generate_morph_colors(colorfiles, n_vertices, n_faces):
         morphColors = "\n%s\n\t" % ",\n".join(generate_morph_color(name, colors) for name, colors in morphColorData)
 
     return morphColors, colorFaces, materialColors
-
-# #####################################################
-# Edges
-# #####################################################
-def edge_hash(a, b):
-    return "%d_%d" % (min(a, b), max(a, b))
-
-def add_unique_edge(a, b, edge_set, edges):
-    h = edge_hash(a[0], b[0])
-    if h not in edge_set:
-        x = min(a[1], b[1])
-        y = max(a[1], b[1])
-        edges.append([x, y])
-        edge_set.add(h)
-
-def compute_edges(faces, vertices):
-    edges = []
-
-    # compute unique vertices
-
-    unique_vertices = {}
-    vertex_count = 0
-
-    for i, v in enumerate(vertices):
-        key = veckey3(v)
-        if key not in unique_vertices:
-            unique_vertices[key] = [vertex_count, i]
-            vertex_count += 1
-
-    # find edges between unique vertices
-
-    edge_set = set()
-
-    for f in faces:
-        vertex_indices = f["vertex"]
-        unique_indices = []
-
-        for vi in vertex_indices:
-            v = vertices[vi - 1]
-            key = veckey3(v)
-            unique_indices.append(unique_vertices[key])
-
-        if len(unique_indices) == 3:
-            a = unique_indices[0]
-            b = unique_indices[1]
-            c = unique_indices[2]
-
-            add_unique_edge(a, b, edge_set, edges)
-            add_unique_edge(b, c, edge_set, edges)
-            add_unique_edge(a, c, edge_set, edges)
-
-        elif len(unique_indices) == 4:
-            a = unique_indices[0]
-            b = unique_indices[1]
-            c = unique_indices[2]
-            d = unique_indices[3]
-
-            # this should be inside edge of quad, should it go in?
-            # add_unique_edge(b, d, edge_set, edges)
-
-            add_unique_edge(a, b, edge_set, edges)
-            add_unique_edge(a, d, edge_set, edges)
-            add_unique_edge(b, c, edge_set, edges)
-            add_unique_edge(c, d, edge_set, edges)
-
-    edges.sort()
-
-    return edges
 
 # #####################################################
 # Materials
@@ -1151,16 +1072,6 @@ def convert_ascii(infile, morphfiles, colorfiles, outfile):
         colors_string = ",".join(generate_color_decimal(c) for c in materialColors)
         ncolor = len(materialColors)
 
-    # generate edges string
-
-    nedge = 0
-    edges_string = ""
-
-    if EXPORT_EDGES:
-        edges = compute_edges(faces, vertices)
-        nedge = len(edges)
-        edges_string  = ",".join(generate_edge(e) for e in edges)
-
     # generate ascii model string
 
     text = TEMPLATE_FILE_ASCII % {
@@ -1172,7 +1083,6 @@ def convert_ascii(infile, morphfiles, colorfiles, outfile):
     "nnormal"   : nnormal,
     "ncolor"    : ncolor,
     "nmaterial" : len(materials),
-    "nedge"     : nedge,
 
     "materials" : generate_materials_string(materials, mtllib, infile),
 
@@ -1185,8 +1095,6 @@ def convert_ascii(infile, morphfiles, colorfiles, outfile):
     "morphColors"   : morphColors,
 
     "faces"     : ",".join(generate_face(f, fc) for f, fc in zip(faces, colorFaces)),
-
-    "edges"    : edges_string,
 
     "scale"    : SCALE
     }
@@ -1523,7 +1431,7 @@ if __name__ == "__main__":
 
     # get parameters from the command line
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hbei:m:c:b:o:a:s:t:d:x:f:", ["help", "bakecolors", "edges", "input=", "morphs=", "colors=", "output=", "align=", "shading=", "type=", "dissolve=", "truncatescale=", "framestep="])
+        opts, args = getopt.getopt(sys.argv[1:], "hbi:m:c:b:o:a:s:t:d:x:f:", ["help", "bakecolors", "input=", "morphs=", "colors=", "output=", "align=", "shading=", "type=", "dissolve=", "truncatescale=", "framestep="])
 
     except getopt.GetoptError:
         usage()
@@ -1568,9 +1476,6 @@ if __name__ == "__main__":
 
         elif o in ("-b", "--bakecolors"):
             BAKE_COLORS = True
-
-        elif o in ("-e", "--edges"):
-            EXPORT_EDGES = True
 
         elif o in ("-x", "--truncatescale"):
             TRUNCATE = True
