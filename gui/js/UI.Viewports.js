@@ -22,16 +22,13 @@ UI.Viewports = function () {
 	];
 
 	_views[ 0 ].camera = new THREE.Camera( 50, 1, 1, 5000 ); // top
-	_views[ 0 ].camera.useTarget = false;
 	_views[ 0 ].camera.position.y = 1000;
 	_views[ 0 ].camera.rotation.x = - Math.PI / 2;
 
 	_views[ 1 ].camera = new THREE.Camera( 50, 1, 1, 5000 ); // front
-	_views[ 1 ].camera.useTarget = false;	
 	_views[ 1 ].camera.position.z = 1000;
 
 	_views[ 2 ].camera = new THREE.Camera( 50, 1, 1, 5000 ); // left
-	_views[ 2 ].camera.useTarget = false;
 	_views[ 2 ].camera.position.x = - 1000;
 	_views[ 2 ].camera.rotation.y = - Math.PI / 2;
 
@@ -39,6 +36,7 @@ UI.Viewports = function () {
 	_views[ 3 ].camera.position.x = 1000;
 	_views[ 3 ].camera.position.y = 1000;
 	_views[ 3 ].camera.position.z = 1000;
+	_views[ 3 ].camera.useTarget = true;
 
 	// guides
 
