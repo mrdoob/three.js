@@ -74,8 +74,10 @@
 
 				camera = new THREE.Camera( 50, window.innerWidth / window.innerHeight, 1, 5000 );
 				camera.position.z = 2000;
+				camera.useTarget = true;
 
 				cameraCube = new THREE.Camera( 50, window.innerWidth / window.innerHeight, 1, 100 );
+				cameraCube.useTarget = true;
 
 				scene = new THREE.Scene();
 				sceneCube = new THREE.Scene();

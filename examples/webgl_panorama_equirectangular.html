@@ -57,6 +57,7 @@
 				container = document.getElementById( 'container' );
 
 				camera = new THREE.Camera( fov, window.innerWidth / window.innerHeight, 1, 1100 );
+				camera.useTarget = true;
 
 				scene = new THREE.Scene();
 

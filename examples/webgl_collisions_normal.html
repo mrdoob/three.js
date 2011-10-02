@@ -11,7 +11,7 @@
 				margin: 0px;
 				overflow: hidden;
 			}
-			 
+
 			#oldie { background-color: #ddd !important }
 
 			#info {
@@ -36,7 +36,7 @@
 				z-index:100;
 			}
 		</style>
-		 
+
 		<script src="../build/Three.js"></script> 
 		<script src="js/RequestAnimationFrame.js"></script>
 		<script src="js/Stats.js"></script>
@@ -57,12 +57,13 @@
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
-	
+
 				info = document.getElementById("info");
-	
+
 				camera = new THREE.Camera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = camdist;
-	
+				camera.useTarget = true;
+
 				loader = new THREE.JSONLoader(  );
 
 				scene = new THREE.Scene();
@@ -72,22 +73,22 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
-	
+
 				var ambientLight = new THREE.AmbientLight( 0x606060 );
 				scene.add( ambientLight );
 
 				sun = new THREE.DirectionalLight( 0xffffff );
 				sun.position = camera.position.clone();
 				scene.add( sun );
-	
+
 				loadCube();
-	
+
 				var lineMat = new THREE.LineBasicMaterial( { color: 0xff0000, opacity: 1, linewidth: 3 } );
-	
+
 				var geom = new THREE.Geometry();
 				geom.vertices.push( new THREE.Vertex( new THREE.Vector3(-100, 0, 0) ) );
 				geom.vertices.push( new THREE.Vertex( new THREE.Vector3( 100, 0, 0) ) );
-	
+
 				line = new THREE.Line(geom, lineMat);
 				scene.add( line );
 
@@ -104,16 +105,16 @@
 			function loadCube(p) {
 
 				var onGeometry = function( geometry ) {	
-	
+
 					var sx = 300;
 					var sy = 240;
 					var sz = 300;
-		
+
 					addCube( new THREE.Vector3(	0,	0,	0), geometry );
-		
+
 				};
 
-	
+
 				loader.load( { model: "obj/suzanne/suzanneHi.js", callback: onGeometry } );
 			}
 
@@ -149,34 +150,34 @@
 				projector.unprojectVector( vector, camera );
 
 				var ray = new THREE.Ray( camera.position, vector.subSelf( camera.position ).normalize() );
-	
+
 				if ( meshes.length == 0 ) return;
-	
+
 				var i, l = meshes.length;
-	
+
 				for ( i = 0; i < l; i++ ) {
 					meshes[ i ].materials[ 0 ].color.setHex( 0x003300 );
 				}
-	
+
 				info.innerHTML = "";
 
 
 				var c = THREE.Collisions.rayCastNearest( ray );
-	
+
 				if( c ) {
-	
+
 					info.innerHTML += "Found @ normal " + vts(c.normal);
-		
+
 					var poi = ray.origin.clone().addSelf( ray.direction.clone().multiplyScalar(c.distance) );
 					line.geometry.vertices[0].position = poi;
 					line.geometry.vertices[1].position = poi.clone().addSelf(c.normal.multiplyScalar(100));
 					line.geometry.__dirtyVertices = true; 
 					line.geometry.__dirtyElements = true;
-		
+
 					c.mesh.materials[ 0 ].color.setHex( 0xbb0000 );
 
 				} else {
-	
+
 					info.innerHTML += "No intersection";
 
 				}
@@ -188,12 +189,12 @@
 				sun.position.copy( camera.position );
 				sun.position.normalize();
 
-				theta += 0.005;		
+				theta += 0.005;
 
 				renderer.render( scene, camera );
-	
+
 				stats.update();
-	
+
 			};
 
 			function vts(v) {

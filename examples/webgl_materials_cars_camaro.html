@@ -70,7 +70,7 @@
 
 				camera = new THREE.Camera( 70, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
 				camera.position.z = 1000;
-				camera.updateMatrix();
+				camera.useTarget = true;
 
 				scene = new THREE.Scene();
 
@@ -98,7 +98,6 @@
 				lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
 				lightMesh.position = pointLight.position;
 				lightMesh.overdraw = true;
-				lightMesh.updateMatrix();
 				scene.add(lightMesh);
 
 

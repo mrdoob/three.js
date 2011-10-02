@@ -46,8 +46,8 @@
 				container.appendChild( info );
 
 				camera = new THREE.Camera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.useTarget = true;
 				camera.position.y = 800;
+				camera.useTarget = true;
 				camera.target.position.y = 200;
 
 				scene = new THREE.Scene();

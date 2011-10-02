@@ -62,11 +62,10 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.Camera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.useTarget = true;
 				camera.position.x = 1000;
 				camera.position.y = 1000;
 				camera.position.z = 1000;
-				// camera.target.position.y = 150;
+				camera.useTarget = true;
 
 				scene = new THREE.Scene();
 
@@ -77,7 +76,7 @@
 				plane = new THREE.Mesh( new THREE.PlaneGeometry( 1000, 1000, 10, 10 ), material );
 				plane.overdraw = true;
 				plane.doubleSided = true;
-				
+
 				plane.rotation.x = - 90 * ( Math.PI / 180 );
 				plane.position.y = - 100;
 
@@ -96,19 +95,9 @@
 					cube.position.x = ( i % 5 ) * 200 - 400;
 					cube.position.z = Math.floor( i / 5 ) * 200 - 350;
 
-					/*
-					cube.position.x = Math.random() * 1000 - 500;
-					cube.position.y = Math.random() * 1000 - 500;
-					cube.position.z = Math.random() * 1000 - 500;
-					*/
-
 					cube.rotation.x = Math.random() * 200 - 100;
 					cube.rotation.y = Math.random() * 200 - 100;
 					cube.rotation.z = Math.random() * 200 - 100;
-
-					/*
-					cube.scale.x = cube.scale.y = cube.scale.z = Math.random() + 0.5;
-					*/
 
 					scene.add(cube);
 

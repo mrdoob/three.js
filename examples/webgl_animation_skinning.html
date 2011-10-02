@@ -78,6 +78,7 @@
 				camera = new THREE.Camera( 25, window.innerWidth / height, 1, 10000 );
 				camera.position.y = 185;
 				camera.position.z = 2500;
+				camera.useTarget = true;
 
 				scene = new THREE.Scene();
 				scene.fog = new THREE.FogExp2( 0xffffff, 0.0003 );

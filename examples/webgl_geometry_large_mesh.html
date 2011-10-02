@@ -96,8 +96,6 @@
 				mesh.rotation.x = rx;
 				mesh.rotation.y = ry;
 				mesh.rotation.z = rz;
-				mesh.overdraw = true;
-				mesh.updateMatrix();
 				scene.add(mesh);
 
 			}
@@ -109,7 +107,7 @@
 
 				camera = new THREE.Camera( 50, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
 				camera.position.z = 1500;
-				camera.updateMatrix();
+				camera.useTarget = true;
 
 				scene = new THREE.Scene();
 
@@ -136,8 +134,6 @@
 				lightMesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) );
 				lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
 				lightMesh.position = pointLight.position;
-				lightMesh.overdraw = true;
-				lightMesh.updateMatrix();
 				scene.add( lightMesh );
 
 
@@ -222,11 +218,9 @@
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
-				camera.updateMatrix();
 
 				lightMesh.position.x = 700*Math.cos(r);
 				lightMesh.position.z = 700*Math.sin(r);
-				lightMesh.updateMatrix();
 
 				r += 0.01;
 
