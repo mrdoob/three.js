@@ -140,6 +140,7 @@
 					camera = new THREE.Camera( 20, container.clientWidth / container.clientHeight, 1, 10000 );
 					camera.setViewOffset( fullWidth, fullHeight, viewX, viewY, viewWidth, viewHeight );
 					camera.position.z = 1800;
+					camera.useTarget = true;
 
 					scene = new THREE.Scene();
 

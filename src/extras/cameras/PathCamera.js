@@ -33,6 +33,8 @@ THREE.PathCamera = function ( parameters ) {
 
 	this.id = "PathCamera" + THREE.PathCameraIdCounter ++;
 
+	this.useTarget = true;
+
 	this.duration = 10 * 1000; // milliseconds
 	this.waypoints = [];
 

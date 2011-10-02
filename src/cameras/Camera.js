@@ -15,7 +15,7 @@ THREE.Camera = function ( fov, aspect, near, far, target ) {
 	this.far = ( far !== undefined ) ? far : 2000;
 
 	this.target = target || new THREE.Object3D();
-	this.useTarget = true;
+	this.useTarget = false;
 
 	this.matrixWorldInverse = new THREE.Matrix4();
 	this.projectionMatrix = null;

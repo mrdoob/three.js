@@ -47,6 +47,7 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.Camera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.useTarget = true;
 				camera.position.z = 3200;
 
 				scene = new THREE.Scene();
@@ -79,9 +80,10 @@
 
 				} } );
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { preserveDrawingBuffer: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.sortObjects = false;
+				renderer.autoClearColor = false;
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();

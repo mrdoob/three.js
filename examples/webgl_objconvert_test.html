@@ -81,7 +81,7 @@
 
 				camera = new THREE.Camera( 75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
 				camera.position.z = 500;
-				camera.updateMatrix();
+				camera.useTarget = true;
 
 				scene = new THREE.Scene();
 

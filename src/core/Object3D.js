@@ -6,8 +6,9 @@
 
 THREE.Object3D = function() {
 
+	this.name = '';
+
 	this.id = THREE.Object3DCount ++;
-	this.name = "";
 
 	this.parent = undefined;
 	this.children = [];
@@ -86,7 +87,15 @@ THREE.Object3D.prototype = {
 
 		// TODO: Add hierarchy support.
 
-		this.matrix.lookAt( vector, this.position, this.up );
+		if ( this instanceof THREE.Camera ) {
+
+			this.matrix.lookAt( this.position, vector, this.up );
+
+		} else {
+
+			this.matrix.lookAt( vector, this.position, this.up );
+
+		}
 
 		if ( this.rotationAutoUpdate ) {
 

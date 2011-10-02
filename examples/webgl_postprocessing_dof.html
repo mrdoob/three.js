@@ -41,7 +41,7 @@
 		<link href="js/gui/gui.css" media="screen" rel="stylesheet" type="text/css" />
 		<script src="js/gui/gui.min.js"></script>
 
-        <div id="info">
+		<div id="info">
 			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl depth-of-field with bokeh example -
 			shader by <a href="http://artmartinsh.blogspot.com/2010/02/glsl-lens-blur-filter-with-bokeh.html">Martins Upitis</a>
 		</div>
@@ -77,6 +77,7 @@
 
 				camera = new THREE.Camera( 70, window.innerWidth / height, 1, 3000 );
 				camera.position.z = 200;
+				camera.useTarget = true;
 
 				scene = new THREE.Scene();
 

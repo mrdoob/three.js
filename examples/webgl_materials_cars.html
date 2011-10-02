@@ -164,10 +164,10 @@
 				document.body.appendChild(container);
 
 				camera = new THREE.Camera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
-				// camera.position.z = 1000;
-				camera.updateMatrix();
+				camera.useTarget = true;
 
 				cameraCube = new THREE.Camera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
+				cameraCube.useTarget = true;
 
 				scene = new THREE.Scene();
 				sceneCube = new THREE.Scene();

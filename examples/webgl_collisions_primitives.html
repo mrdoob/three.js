@@ -63,6 +63,7 @@
 				info = document.getElementById("info");
 
 				camera = new THREE.Camera(40, window.innerWidth / window.innerHeight, 1, 10000);
+				camera.useTarget = true;
 
 				scene = new THREE.Scene();
 
@@ -78,15 +79,11 @@
 				sun = new THREE.DirectionalLight(0xffffff);
 				scene.add(sun);
 
-				//makeWall(480);
-				//makeWall(360);
 				makeWall(240);
 				makeWall(120);
 				makeWall(0);
 				makeWall(-120);
 				makeWall(-240);
-				//makeWall(-360);
-				//makeWall(-480);
 
 				plane = new THREE.Mesh( new THREE.PlaneGeometry( 30000, 30000, 10, 10 ), new THREE.MeshLambertMaterial( { color: 0x003300 } ) );
 				plane.position.y = - 480;

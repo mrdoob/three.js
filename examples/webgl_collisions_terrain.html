@@ -57,6 +57,8 @@
 
 				camera = new THREE.Camera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.y = 120;
+				camera.useTarget = true;
+
 				mouse2d = new THREE.Vector3( 0, 0, 1 );
 
 				loader = new THREE.JSONLoader();

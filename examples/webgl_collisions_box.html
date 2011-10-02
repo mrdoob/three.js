@@ -55,7 +55,8 @@
 				info = document.getElementById("info");
 
 				camera = new THREE.Camera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.z = -500;
+				camera.position.z = - 500;
+				camera.useTarget = true;
 
 				scene = new THREE.Scene();
 

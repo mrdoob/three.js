@@ -56,20 +56,32 @@
 				return smooth;
 			}
 			
+			// Create new object by parameters
+			var createSomething = function(klass, args) {
+				var F = function(klass, args) {
+				    return klass.apply(this, args);
+				}
+				F.prototype = klass.prototype;
+
+				return new F(klass, args);
+			};
+			
 			init();
 			animate();
+			
+			var info;
 
 			function init() {
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				var info = document.createElement( 'div' );
+				info = document.createElement( 'div' );
 				info.style.position = 'absolute';
 				info.style.top = '10px';
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
-				info.innerHTML = 'Drag to spin the cube';
+				info.innerHTML = 'Drag to spin the geometry ';
 				container.appendChild( info );
 
 				camera = new THREE.Camera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
@@ -92,57 +104,45 @@
 
 				}
 				
+				var createGeometry = function(i, subdivisions) {
+					var params = geometriesParams[i];
+					
+					info.innerHTML = 'Drag to spin the geometry THREE.' + params.type
+					 	+ ' with ' + subdivisions + ' subdivisions'; //+ params.args;
+					
+					geometry = createSomething(THREE[params.type], params.args);
+					
+					geometry.mergeVertices();
+					smooth = createSubdivision(geometry, subdivisions);
+					return smooth;
+				};
+				
+				
+				var geometriesParams = [
+				
+					{type: 'CubeGeometry', args: [ 200, 200, 200, 2, 2, 2, materials ] }, 
+					{type: 'TorusGeometry', args: [ 100, 60, 4, 8, Math.PI*2 ] }, 
+					{type: 'SphereGeometry', args: [ 200, 1, 1 ] }, 
+					{type: 'CylinderGeometry', args: [ 25, 75, 200, 8, 3 ] }, 
+					{type: 'TextGeometry', args: ['&', {
+											size: 200,
+											height: 50,
+											curveSegments: 1,
+											font: "helvetiker"
+
+										}]}, 
+				
+				];
+				
+				smooth = createGeometry(3, 2);
 				
 				//geometry = new THREE.CubeGeometry( 200, 200, 200, 2, 2, 2, materials );
-				geometry = new THREE.CubeGeometry( 200, 200, 200, 1, 1, 3, materials );
-				
-				//geometry = new THREE.IcosahedronGeometry( 1 );
-				
-				//geometry = new THREE.TorusGeometry( 100, 60, 4, 8, Math.PI*2 );
-				//geometry = new THREE.SphereGeometry( 200, 1, 1);
-				//geometry = new THREE.CylinderGeometry( 50, 50, 200 );
-				// geometry = new THREE.TextGeometry( '&', {
-				// 						size: 200,
-				// 						height: 50,
-				// 						curveSegments: 1,
-				// 						font: "helvetiker"
-				// 
-				// 					});
-					
-				//PlaneGeometry not supported 
-				
-				
 				// make sure mergeVertices(); is run to fix quick duplicated vertices
-				geometry.mergeVertices();
-
+				// geometry.mergeVertices();
+				// smooth = createSubdivision(geometry, 2);
 				
-				//console.log(geometry);
 				
-				smooth = createSubdivision(geometry, 2);
-				
-				var PI2 = Math.PI * 2;
-				var program = function ( context ) {
 
-					context.beginPath();
-					context.arc( 0, 0, 1, 0, PI2, true );
-					context.closePath();
-					context.fill();
-
-				}
-				
-				var drawText = function(i) {
-					
-					return function ( context ) {
-
-						context.beginPath();
-						context.scale(0.1,-0.1);
-
-						context.fillText(i, 0,0);
-						
-					};
-					
-
-				}
 
 
 
@@ -151,6 +151,16 @@
 				scene.add( group );
 
 				// Debug new Points
+				// var PI2 = Math.PI * 2;
+				// var program = function ( context ) {
+				// 
+				// 	context.beginPath();
+				// 	context.arc( 0, 0, 1, 0, PI2, true );
+				// 	context.closePath();
+				// 	context.fill();
+				// 
+				// }
+				// 
 				// for ( var i = 0; i < smooth.vertices.length; i++ ) {
 				// 
 				// 	particle = new THREE.Particle( new THREE.ParticleCanvasMaterial( { color: Math.random() * 0x808008 + 0x808080, program: program } ) );
@@ -161,6 +171,19 @@
 				// }
 				
 				//Debug original points
+				
+				// var drawText = function(i) {
+				// 	
+				// 	return function ( context ) {
+				// 
+				// 		context.beginPath();
+				// 		context.scale(0.1,-0.1);
+				// 
+				// 		context.fillText(i, 0,0);
+				// 		
+				// 	};
+				// 						
+				// }
 				// for ( var i = 0; i < geometry.vertices.length; i++ ) {
 				// 
 				// 	particle = new THREE.Particle( new THREE.ParticleCanvasMaterial( { color: Math.random() * 0x808008 + 0x808080, program: drawText(i) } ) );
@@ -171,16 +194,23 @@
 				// }
 				
 
-				 cube = new THREE.Mesh( smooth, new THREE.MeshBasicMaterial( { color: 0x405040, wireframe:true,  opacity:0.8 } ) ); 
-				//cube = new THREE.Mesh( smooth, new THREE.MeshFaceMaterial() ); 
-				// material =  new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.FlatShading } );
-				// 	 new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.SmoothShading } );
+				var meshmaterials = [
+					new THREE.MeshBasicMaterial( { color: 0x405040, wireframe:true,  opacity:0.8 } )
+				];
+
+				// new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors } ),
+				// new THREE.MeshBasicMaterial( { color: 0x000000, shading: THREE.FlatShading, wireframe: true } )
+				// new THREE.MeshFaceMaterial() 
+				// new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.FlatShading } );
+				// new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.SmoothShading } );
+
+				 cube = new THREE.Mesh( smooth, meshmaterials ); 
+
 				// cube.scale.x = 200;
 				// cube.scale.y = 200;
 				// cube.scale.z = 200;
 				
 				
-				//
 				cube.doubleSided = true;
 				cube.position.y = 150;
 				cube.overdraw = true;
@@ -193,7 +223,7 @@
 				plane.overdraw = true;
 				scene.add( plane );
 
-				renderer = new THREE.CanvasRenderer();
+				renderer = new THREE.CanvasRenderer(); // WebGLRenderer CanvasRenderer
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.appendChild( renderer.domElement );

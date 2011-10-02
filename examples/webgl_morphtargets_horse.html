@@ -44,6 +44,7 @@
 
 				camera = new THREE.Camera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.y = 300;
+				camera.useTarget = true;
 				camera.target.position.y = 150;
 
 				scene = new THREE.Scene();

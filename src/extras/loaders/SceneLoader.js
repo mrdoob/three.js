@@ -360,10 +360,12 @@ THREE.SceneLoader.prototype = {
 				if ( c.type == "perspective" ) {
 
 					camera = new THREE.Camera( c.fov, c.aspect, c.near, c.far );
+					camera.useTarget = true;
 
 				} else if ( c.type == "ortho" ) {
 
 					camera = new THREE.Camera();
+					camera.useTarget = true;
 					camera.projectionMatrix = THREE.Matrix4.makeOrtho( c.left, c.right, c.top, c.bottom, c.near, c.far );
 
 				}

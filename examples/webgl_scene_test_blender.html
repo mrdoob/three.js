@@ -186,7 +186,7 @@
 			function handle_update( result, pieces ) {
 
 				refreshSceneView( result );
-				renderer.initWebGLObjects( result.scene );
+				//renderer.initWebGLObjects( result.scene );
 
 				var m, material, count = 0;
 
@@ -318,6 +318,7 @@
 				};
 
 				result.camera.position.z = 100;
+				result.camera.useTarget = true;
 
 				var object, geometry, material, light, count = 500, range = 200;
 

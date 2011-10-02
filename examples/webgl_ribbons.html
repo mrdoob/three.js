@@ -78,6 +78,7 @@
 
 				camera = new THREE.Camera( 70, window.innerWidth / window.innerHeight, 1, 3000 );
 				camera.position.z = 1200;
+				camera.useTarget = true;
 
 				scene = new THREE.Scene();
 				scene.fog = new THREE.FogExp2( 0x000000, 0.0016 );
@@ -262,7 +263,7 @@
 				var time = new Date().getTime() * 0.00005;
 
 				camera.position.x += ( mouseX - camera.position.x ) * 0.036;
-				camera.position.y += ( - (mouseY) - camera.position.y ) * 0.036;
+				camera.position.y += ( - mouseY - camera.position.y ) * 0.036;
 
 				for ( i = -n; i < n; i ++ ) {
 

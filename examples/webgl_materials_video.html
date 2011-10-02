@@ -49,7 +49,6 @@
 
 		<script src="js/Detector.js"></script>
 		<script src="js/RequestAnimationFrame.js"></script>
-		<script src="js/Stats.js"></script>
 
 		<video id="video" autoplay loop style="display:none">
 			<source src="textures/sintel.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
@@ -60,7 +59,7 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var container, stats;
+			var container;
 
 			var camera, scene, renderer;
 
@@ -92,6 +91,7 @@
 
 				camera = new THREE.Camera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 500;
+				camera.useTarget = true;
 
 				scene = new THREE.Scene();
 
@@ -106,9 +106,6 @@
 				container.appendChild( renderer.domElement );
 
 				video = document.getElementById( 'video' );
-
-				//video.volume = 0;
-				//video.muted = true;
 
 				texture = new THREE.Texture( video );
 				texture.minFilter = THREE.LinearFilter;
@@ -146,8 +143,6 @@
 
 					material = materials[ cube_count ];
 
-					//material.program = material_base.program;
-
 					material.hue = i/xgrid;
 					material.saturation = j/ygrid;
 
@@ -173,11 +168,6 @@
 				}
 
 				renderer.autoClear = false;
-
-				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				//container.appendChild( stats.domElement );
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
@@ -231,7 +221,6 @@
 				requestAnimationFrame( animate );
 
 				render();
-				stats.update();
 
 			}
 

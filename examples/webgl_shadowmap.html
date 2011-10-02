@@ -75,10 +75,13 @@
 
 				// SCENE CAMERA
 
-				camera = new THREE.FirstPersonCamera( { fov: 23, aspect: SCREEN_WIDTH / SCREEN_HEIGHT, near: NEAR, far: FAR,
-														lookSpeed: 0.0125, movementSpeed: 500, noFly: false, lookVertical: true,
-														constrainVertical: true, verticalMin: 1.5, verticalMax: 2.0
-														} );
+				camera = new THREE.FirstPersonCamera( {
+
+					fov: 23, aspect: SCREEN_WIDTH / SCREEN_HEIGHT, near: NEAR, far: FAR,
+					lookSpeed: 0.0125, movementSpeed: 500, noFly: false, lookVertical: true,
+					constrainVertical: true, verticalMin: 1.5, verticalMax: 2.0
+
+				} );
 
 				camera.position.set( 700, 50, 1900 );
 				camera.lon = -110;

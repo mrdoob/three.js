@@ -31,14 +31,13 @@
 				<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl cube reflection demo. chevrolet camaro by <a href="http://www.turbosquid.com/3d-models/blender-camaro/411348" target="_blank">dskfnwn</a>
 					- O, P : change eye separation
 				</div>
-				
 			<div id="buttons"></div>
 		</div>
 
 		<div id="log"></div>
 
 		<script src="../build/Three.js"></script>
-		
+
 		<script src="js/Detector.js"></script>
 		<script src="js/RequestAnimationFrame.js"></script>
 		<script src="js/Stats.js"></script>
@@ -73,7 +72,7 @@
 
 				camera = new THREE.Camera( 70, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
 				camera.position.z = 1000;
-				camera.updateMatrix();
+				camera.useTarget = true;
 
 				scene = new THREE.Scene();
 
@@ -101,7 +100,6 @@
 				lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
 				lightMesh.position = pointLight.position;
 				lightMesh.overdraw = true;
-				lightMesh.updateMatrix();
 				scene.add(lightMesh);
 
 
