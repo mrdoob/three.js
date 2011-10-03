@@ -44,6 +44,8 @@
 
 			var mesh, zmesh, lightMesh, geometry, sphere;
 
+			var center = new THREE.Vector3();
+
 			var mouseX = 0, mouseY = 0;
 
 			var windowHalfX = window.innerWidth / 2;
@@ -60,9 +62,8 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 3200;
-				camera.useTarget = true;
 
 				scene = new THREE.Scene();
 
@@ -120,9 +121,6 @@
 
 			function render() {
 
-				camera.position.x += ( mouseX - camera.position.x ) * .05;
-				camera.position.y += ( - mouseY - camera.position.y ) * .05;
-
 				var time = new Date().getTime() * 0.0005;
 
 				sphere.position.x = Math.sin( time * 0.7 ) * 2000;
@@ -134,6 +132,10 @@
 					scene.objects[ i ].lookAt( sphere.position );
 
 				}
+
+				camera.position.x += ( mouseX - camera.position.x ) * .05;
+				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+				camera.lookAt( center );
 
 				renderer.render( scene, camera );
 
