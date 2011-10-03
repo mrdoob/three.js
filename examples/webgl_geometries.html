@@ -137,7 +137,7 @@
 
 				camera.position.x = Math.cos( timer ) * 800;
 				camera.position.z = Math.sin( timer ) * 800;
-				camera.lookAt( group.position );
+				camera.lookAt( scene.center );
 
 				for ( var i = 0, l = group.children.length; i < l; i++ ) {
 

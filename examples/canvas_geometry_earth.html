@@ -45,7 +45,7 @@
 
 			var camera, scene, renderer;
 
-			var mesh, center = new THREE.Vector3();
+			var mesh;
 
 			var mouseX = 0, mouseY = 0;
 
@@ -110,7 +110,7 @@
 
 				camera.position.x += ( mouseX - camera.position.x ) * 0.05;
 				camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
-				camera.lookAt( center );
+				camera.lookAt( scene.center );
 
 				mesh.rotation.y -= 0.005;
 

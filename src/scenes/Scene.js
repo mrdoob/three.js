@@ -11,6 +11,8 @@ THREE.Scene = function () {
 
 	this.fog = null;
 
+	this.center = new THREE.Vector3();
+
 	this.overrideMaterial = null;
 
 	this.collisions = null;
@@ -50,15 +52,15 @@ THREE.Scene.prototype.addChildRecurse = function ( child ) {
 
 			this.objects.push( child );
 			this.__objectsAdded.push( child );
-			
+
 			// check if previously removed
-			
+
 			var i = this.__objectsRemoved.indexOf( child );
-			
+
 			if ( i !== -1 ) {
-				
+
 				this.__objectsRemoved.splice( i, 1 );
-				
+
 			}
 
 		}
@@ -104,11 +106,11 @@ THREE.Scene.prototype.removeChildRecurse = function ( child ) {
 			// check if previously added
 
 			var ai = this.__objectsAdded.indexOf( child );
-			
+
 			if ( ai !== -1 ) {
-				
+
 				this.__objectsAdded.splice( ai, 1 );
-				
+
 			}
 		}
 

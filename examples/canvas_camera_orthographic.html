@@ -25,7 +25,6 @@
 
 			var container, stats;
 			var camera, scene, renderer;
-			var center = new THREE.Vector3();
 
 			init();
 			animate();
@@ -137,7 +136,7 @@
 
 				camera.position.x = Math.cos( timer ) * 200;
 				camera.position.z = Math.sin( timer ) * 200;
-				camera.lookAt( center );
+				camera.lookAt( scene.center );
 
 				renderer.render( scene, camera );
 

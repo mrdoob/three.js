@@ -27,7 +27,7 @@
 
 			var camera, scene, renderer;
 
-			var geometry, group, center = new THREE.Vector3();
+			var geometry, group;
 
 			var mouseX = 0, mouseY = 0;
 
@@ -107,7 +107,7 @@
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
-				camera.lookAt( center );
+				camera.lookAt( scene.center );
 
 				group.rotation.x = Math.sin( new Date().getTime() * 0.0007 ) * 0.5;
 				group.rotation.y = Math.sin( new Date().getTime() * 0.0003 ) * 0.5;
