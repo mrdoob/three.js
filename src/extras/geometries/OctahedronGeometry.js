@@ -5,10 +5,11 @@
  * to make a sharp edge choose a material that uses face normals instead.
  *
  * @author daniel.deady@knectar.com
+ * @param radius
  * @param detail Final number of triangles = 4^detail * 8
  */
 
-THREE.OctahedronGeometry = function ( detail ) {
+THREE.OctahedronGeometry = function ( radius, detail ) {
 
 	THREE.Geometry.call( this );
 
@@ -40,7 +41,7 @@ THREE.OctahedronGeometry = function ( detail ) {
 	function prepare( vector ) {
 
 		var normal = vector.clone().normalize();
-		var vertex = new THREE.Vertex( normal );
+		var vertex = new THREE.Vertex( normal.clone().multiplyScalar( radius ) );
 		vertex.index = that.vertices.push( vertex ) - 1;
 
 		// Texture coords are equivalent to map coords, calculate angle and convert to fraction of a circle.
@@ -129,7 +130,7 @@ THREE.OctahedronGeometry = function ( detail ) {
 
 	}
 
-	this.boundingSphere = { radius: 1 };
+	this.boundingSphere = { radius: radius };
 
 };
 
