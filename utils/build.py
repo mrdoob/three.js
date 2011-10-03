@@ -104,6 +104,7 @@ EXTRAS_FILES = [
 'extras/geometries/ExtrudeGeometry.js',
 'extras/geometries/IcosahedronGeometry.js',
 'extras/geometries/LatheGeometry.js',
+'extras/geometries/OctahedronGeometry.js',
 'extras/geometries/PlaneGeometry.js',
 'extras/geometries/SphereGeometry.js',
 'extras/geometries/TextGeometry.js',
