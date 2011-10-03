@@ -27,9 +27,7 @@
 
 			var container, stats;
 
-			var camera, scene, renderer;
-
-			var objects = [];
+			var camera, scene, group, renderer;
 
 			init();
 			animate();
@@ -39,10 +37,8 @@
 				container = document.createElement('div');
 				document.body.appendChild(container);
 
-				camera = new THREE.Camera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.y = 200;
-				camera.position.z = 800;
-				camera.useTarget = true;
 
 				scene = new THREE.Scene();
 
@@ -59,28 +55,31 @@
 					new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true, transparent: true, opacity: 0.1 } )
 				];
 
-				objects[ 0 ] = object = new THREE.Mesh( new THREE.CubeGeometry( 100, 100, 100, 4, 4, 4 ), material );
+				group = new THREE.Object3D();
+				scene.add( group );
+
+				object = new THREE.Mesh( new THREE.CubeGeometry( 100, 100, 100, 4, 4, 4 ), material );
 				object.position.x = - 200;
 				object.position.z = 200;
-				scene.add( object );
+				group.add( object );
 
 
-				objects[ 1 ] = object = new THREE.Mesh( new THREE.CylinderGeometry( 25, 75, 100, 40, 5 ), material );
+				object = new THREE.Mesh( new THREE.CylinderGeometry( 25, 75, 100, 40, 5 ), material );
 				object.position.z = 200;
-				scene.add( object );
+				group.add( object );
 
-				objects[ 2 ] = object = new THREE.Mesh( new THREE.IcosahedronGeometry( 2 ), material );
+				object = new THREE.Mesh( new THREE.IcosahedronGeometry( 2 ), material );
 				object.position.x = 200;
 				object.position.z = 200;
 				object.scale.x = object.scale.y = object.scale.z = 75;
-				scene.add( object );
+				group.add( object );
 
-				objects[ 3 ] = object = new THREE.Mesh( new THREE.PlaneGeometry( 100, 100, 4, 4 ), material );
+				object = new THREE.Mesh( new THREE.PlaneGeometry( 100, 100, 4, 4 ), material );
 				object.position.x = - 200;
-				scene.add( object );
+				group.add( object );
 
-				objects[ 4 ] = object = new THREE.Mesh( new THREE.SphereGeometry( 75, 20, 10 ), material );
-				scene.add( object );
+				object = new THREE.Mesh( new THREE.SphereGeometry( 75, 20, 10 ), material );
+				group.add( object );
 
 				var points = [];
 
@@ -90,24 +89,24 @@
 
 				}
 
-				objects[ 5 ] = object = new THREE.Mesh( new THREE.LatheGeometry( points, 20 ), material );
+				object = new THREE.Mesh( new THREE.LatheGeometry( points, 20 ), material );
 				object.position.x = 200;
-				scene.add( object );
+				group.add( object );
 
-				objects[ 6 ] = object = new THREE.Mesh( new THREE.TorusGeometry( 50, 20, 20, 20 ), material );
+				object = new THREE.Mesh( new THREE.TorusGeometry( 50, 20, 20, 20 ), material );
 				object.position.x = - 200;
 				object.position.z = - 200;
-				scene.add( object );
+				group.add( object );
 
-				objects[ 7 ] = object = new THREE.Mesh( new THREE.TorusKnotGeometry( 50, 10, 50, 20 ), material );
+				object = new THREE.Mesh( new THREE.TorusKnotGeometry( 50, 10, 50, 20 ), material );
 				object.position.z = - 200;
-				scene.add( object );
+				group.add( object );
 
-				objects[ 8 ] = object = new THREE.Trident();
+				object = new THREE.Axes();
 				object.position.x = 200;
 				object.position.z = - 200;
 				object.scale.x = object.scale.y = object.scale.z = 0.5;
-				scene.add( object );
+				group.add( object );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -138,10 +137,11 @@
 
 				camera.position.x = Math.cos( timer ) * 800;
 				camera.position.z = Math.sin( timer ) * 800;
+				camera.lookAt( group.position );
 
-				for ( var i = 0, l = objects.length; i < l; i++ ) {
+				for ( var i = 0, l = group.children.length; i < l; i++ ) {
 
-					var object = objects[ i ];
+					var object = group.children[ i ];
 
 					object.rotation.x += 0.01;
 					object.rotation.y += 0.005;

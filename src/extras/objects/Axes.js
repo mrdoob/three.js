@@ -3,7 +3,7 @@
  * @author mr.doob / http://mrdoob.com/
  */
 
-THREE.Trident = function () {
+THREE.Axes = function () {
 
 	THREE.Object3D.call( this );
 
@@ -46,5 +46,5 @@ THREE.Trident = function () {
 
 };
 
-THREE.Trident.prototype = new THREE.Object3D();
-THREE.Trident.prototype.constructor = THREE.Trident;
+THREE.Axes.prototype = new THREE.Object3D();
+THREE.Axes.prototype.constructor = THREE.Axes;

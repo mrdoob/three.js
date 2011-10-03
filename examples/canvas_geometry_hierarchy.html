@@ -44,9 +44,8 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 500;
-				camera.useTarget = true;
 
 				scene = new THREE.Scene();
 
@@ -106,16 +105,13 @@
 
 			function render() {
 
-				var rx = Math.sin( new Date().getTime() * 0.0007 ) * 0.5,
-				ry = Math.sin( new Date().getTime() * 0.0003 ) * 0.5,
-				rz = Math.sin( new Date().getTime() * 0.0002 ) * 0.5;
-
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+				camera.lookAt( group.position );
 
-				group.rotation.x = rx;
-				group.rotation.y = ry;
-				group.rotation.z = rz;
+				group.rotation.x = Math.sin( new Date().getTime() * 0.0007 ) * 0.5;
+				group.rotation.y = Math.sin( new Date().getTime() * 0.0003 ) * 0.5;
+				group.rotation.z = Math.sin( new Date().getTime() * 0.0002 ) * 0.5;
 
 				renderer.render( scene, camera );
 
