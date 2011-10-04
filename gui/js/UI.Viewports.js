@@ -21,18 +21,18 @@ UI.Viewports = function () {
 		{ x: null, y: null, width: null, height: null, camera: null }
 	];
 
-	_views[ 0 ].camera = new THREE.Camera( 50, 1, 1, 5000 ); // top
+	_views[ 0 ].camera = new THREE.PerspectiveCamera( 50, 1, 1, 5000 ); // top
 	_views[ 0 ].camera.position.y = 1000;
 	_views[ 0 ].camera.rotation.x = - Math.PI / 2;
 
-	_views[ 1 ].camera = new THREE.Camera( 50, 1, 1, 5000 ); // front
+	_views[ 1 ].camera = new THREE.PerspectiveCamera( 50, 1, 1, 5000 ); // front
 	_views[ 1 ].camera.position.z = 1000;
 
-	_views[ 2 ].camera = new THREE.Camera( 50, 1, 1, 5000 ); // left
+	_views[ 2 ].camera = new THREE.PerspectiveCamera( 50, 1, 1, 5000 ); // left
 	_views[ 2 ].camera.position.x = - 1000;
 	_views[ 2 ].camera.rotation.y = - Math.PI / 2;
 
-	_views[ 3 ].camera = new THREE.Camera( 50, 1, 1, 5000 ); // perspective
+	_views[ 3 ].camera = new THREE.PerspectiveCamera( 50, 1, 1, 5000 ); // perspective
 	_views[ 3 ].camera.position.x = 1000;
 	_views[ 3 ].camera.position.y = 1000;
 	_views[ 3 ].camera.position.z = 1000;
@@ -66,7 +66,7 @@ UI.Viewports = function () {
 
 	var _projector = new THREE.Projector();
 
-	var _renderer = new THREE.WebGLRenderer( /*{ antialias: true }*/ );
+	var _renderer = new THREE.WebGLRenderer( { antialias: true } );
 	_renderer.autoClear = false;
 	_renderer.domElement.addEventListener( 'mousedown', function ( event ) {
 
@@ -398,6 +398,8 @@ UI.Viewports = function () {
 		_yr.style.width = _width + 'px';
 
 		//
+
+		_views[ 3 ].camera.lookAt( _scene.origin );
 
 		_renderer.clear();
 

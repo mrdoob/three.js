@@ -107,7 +107,7 @@
 			// Add Sphere
 
 			var geometry = new THREE.SphereGeometry( 75, 20, 10 );
-			var material = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
+			var material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
 			var mesh = new THREE.Mesh( geometry, material );
 
 			signals.added.dispatch( mesh );
