@@ -17,6 +17,10 @@ THREE.SubdivisionModifier = function( subdivisions ) {
 	
 	this.subdivisions = (subdivisions === undefined ) ? 1 : subdivisions;
 	
+	// Settings
+	this.useOldVertexColors = false;
+	this.supportUVs = true;
+	
 };
 
 //THREE.SubdivisionModifier.prototype = new THREE.Modifier();
@@ -45,12 +49,17 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 	function v( x, y, z ) {
 		newVertices.push( new THREE.Vertex( new THREE.Vector3( x, y, z ) ) );
 	}
+	
+	var scope = this;
 
-	function f4( a, b, c, d, color, material ) {
+	function f4( a, b, c, d, oldFace ) {
 		
-		newFaces.push( new THREE.Face4( a, b, c, d, null, color, material) );
+		var newFace = new THREE.Face4( a, b, c, d, null, oldFace.color, oldFace.material );
+		if (scope.useOldVertexColors) newFace.vertexColors = oldFace.vertexColors;
 		
-		if (!supportUVs || uvForVertices.length!=0) {
+		newFaces.push( newFace );
+		
+		if (!scope.supportUVs || uvForVertices.length!=0) {
 			newUVs.push( [
 				uvForVertices[a],
 				uvForVertices[b],
@@ -150,8 +159,6 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 	
 	var uvForVertices = [];
 	
-	var supportUVs = true;
-		
 	// Step 1
 	//	For each face, add a face point
 	//	Set each face point to be the centroid of all original points for the respective face.
@@ -183,7 +190,7 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 		newPoints.push( new THREE.Vertex(face.centroid) );
 		
 		
-		if (!supportUVs || uvForVertices.length==0) continue;
+		if (!scope.supportUVs || uvForVertices.length==0) continue;
 		
 		// Prepare subdivided uv
 		
@@ -251,7 +258,7 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 	
 		edgeCount ++;
 		
-		if (!supportUVs || uvForVertices.length==0) continue;
+		if (!scope.supportUVs || uvForVertices.length==0) continue;
 		
 		// Prepare subdivided uv
 		
@@ -290,9 +297,9 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 			hashCA = edge_hash( face.c, face.a );
 
 			
-			f4( currentVerticeIndex, edgePoints[hashAB], face.b, edgePoints[hashBC], face.color, face.material);
-			f4( currentVerticeIndex, edgePoints[hashBC], face.c, edgePoints[hashCA], face.color, face.material);
-			f4( currentVerticeIndex, edgePoints[hashCA], face.a, edgePoints[hashAB], face.color, face.material);
+			f4( currentVerticeIndex, edgePoints[hashAB], face.b, edgePoints[hashBC], face );
+			f4( currentVerticeIndex, edgePoints[hashBC], face.c, edgePoints[hashCA], face );
+			f4( currentVerticeIndex, edgePoints[hashCA], face.a, edgePoints[hashAB], face );
 			// face subdivide color and materials too? 
 			
 			
@@ -305,10 +312,10 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 			hashCD = edge_hash( face.c, face.d );
 			hashDA = edge_hash( face.d, face.a );
 			
-			f4( currentVerticeIndex, edgePoints[hashAB], face.b, edgePoints[hashBC], face.color, face.material);
-			f4( currentVerticeIndex, edgePoints[hashBC], face.c, edgePoints[hashCD], face.color, face.material);
-			f4( currentVerticeIndex, edgePoints[hashCD], face.d, edgePoints[hashDA], face.color, face.material);
-			f4( currentVerticeIndex, edgePoints[hashDA], face.a, edgePoints[hashAB], face.color, face.material);
+			f4( currentVerticeIndex, edgePoints[hashAB], face.b, edgePoints[hashBC], face );
+			f4( currentVerticeIndex, edgePoints[hashBC], face.c, edgePoints[hashCD], face );
+			f4( currentVerticeIndex, edgePoints[hashCD], face.d, edgePoints[hashDA], face );
+			f4( currentVerticeIndex, edgePoints[hashDA], face.a, edgePoints[hashAB], face );
 
 				
 		} else {
