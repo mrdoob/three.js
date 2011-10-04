@@ -32,7 +32,7 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 	
 	var repeats = this.subdivisions;
 	
-	while ( repeats-- ) {
+	while ( repeats-- > 0 ) {
 		this.smooth( geometry );
 	}
 	
@@ -230,27 +230,34 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 		faceIndexA = edge[0]; // face index a
 		faceIndexB = edge[1]; // face index b
 		
+		edgeVertex = i.split('_');
+		edgeVertexA = edgeVertex[0];
+		edgeVertexB = edgeVertex[1];
+		
+		
 		avg = new THREE.Vector3();
 		
 		//console.log(i, faceIndexB,facePoints[faceIndexB]);
 		
 		if (edge.length!=2) {
-			console.log('warning, edge fail', edge);
-			continue;
+			//console.log('warning, ', i, 'edge has only 1 connecting face', edge);
+			
+			avg.addSelf(originalPoints[edgeVertexA].position);
+			avg.addSelf(originalPoints[edgeVertexB].position);
+			
+			avg.multiplyScalar(0.5);
+			
+		} else {
+		
+			avg.addSelf(facePoints[faceIndexA]);
+			avg.addSelf(facePoints[faceIndexB]);
+		
+			avg.addSelf(originalPoints[edgeVertexA].position);
+			avg.addSelf(originalPoints[edgeVertexB].position);
+		
+			avg.multiplyScalar(0.25);
+		
 		}
-		
-		avg.addSelf(facePoints[faceIndexA]);
-		avg.addSelf(facePoints[faceIndexB]);
-		
-		
-		edgeVertex = i.split('_');
-		edgeVertexA = edgeVertex[0];
-		edgeVertexB = edgeVertex[1];
-		
-		avg.addSelf(originalPoints[edgeVertexA].position);
-		avg.addSelf(originalPoints[edgeVertexB].position);
-		
-		avg.multiplyScalar(0.25);
 		
 		edgePoints[i] = originalVerticesLength + originalFaces.length + edgeCount;
 		
@@ -372,9 +379,12 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 		faceIndexB = edge[1]; // face index b
 		
 		addVertexFaceMap(edgeVertexA, faceIndexA);
-		addVertexFaceMap(edgeVertexA, faceIndexB);
+		if (faceIndexB) addVertexFaceMap(edgeVertexA, faceIndexB);
+		else addVertexFaceMap(edgeVertexA, faceIndexA);
+		
 		addVertexFaceMap(edgeVertexB, faceIndexA);
-		addVertexFaceMap(edgeVertexB, faceIndexB);
+		if (faceIndexB) addVertexFaceMap(edgeVertexB, faceIndexB);
+		else addVertexFaceMap(edgeVertexB, faceIndexA);
 		
 	}
 	

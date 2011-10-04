@@ -27,9 +27,9 @@
 		<script src="../src/extras/modifiers/SubdivisionModifier.js"></script>
 		
 		<script src="fonts/helvetiker_regular.typeface.js"></script>
-		<!--
+		
 		<script src="obj/WaltHead.js"></script>
-		-->
+		<!-- -->
 		
 		<script>
 
@@ -60,98 +60,103 @@
 			};
 			
 			
-			function createSubdivision ( geometry, repeats ) {
+			// Cube
 
-				repeats = (repeats === undefined ) ? 1 : repeats;
+			var materials = [];
 
-				var smooth = geometry;
+			for ( var i = 0; i < 6; i ++ ) {
 
-				while (repeats--) {
-					smooth = new THREE.SubdivisionGeometry(smooth);
-				}
+				materials.push( [ new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, wireframe: false } ) ] );
 
-				return smooth;
-			};
+			}
+			
+			THREE.WaltHead = WaltHead;
+			
+			var geometriesParams = [
+			
+				{type: 'CubeGeometry', args: [ 200, 200, 200, 2, 2, 2, materials ] }, 
+				{type: 'TorusGeometry', args: [ 100, 60, 4, 8, Math.PI*2 ] }, 
+				{type: 'SphereGeometry', args: [ 100, 3, 3 ] }, 
+				{type: 'IcosahedronGeometry', args: [ 1 ], scale: 200 }, 
+				{type: 'CylinderGeometry', args: [ 25, 75, 200, 8, 3 ]} , 
+				{type: 'TextGeometry', args: ['&', {
+										size: 200,
+										height: 50,
+										curveSegments: 1,
+										font: "helvetiker"
 
+									}]},
+				{type: 'PlaneGeometry', args: [ 200, 200, 4, 4 ] }, 
+				
+				{type: 'WaltHead', args: [ ], scale: 6 } 
+			
+			];
+		
+			
+			var info;
+			var subdivisions = 2;
+			var geometryIndex = 0;
+			
+			// Start Scene
 			
 			init();
 			animate();
+
+			function nextSubdivision(x) {
+				subdivisions += x;
+				addStuff();
+				
+			}
+
+			function nextGeometry() {
+				
+				geometryIndex++;
+				if (geometryIndex>geometriesParams.length-1) {
+					geometryIndex = 0;
+				}
+				addStuff();
+				
+			}
 			
-			var info;
-
-			function init() {
-
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
-
-				info = document.createElement( 'div' );
-				info.style.position = 'absolute';
-				info.style.top = '10px';
-				info.style.width = '100%';
-				info.style.textAlign = 'center';
-				info.innerHTML = 'Drag to spin the geometry ';
-				container.appendChild( info );
-
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
-				camera.position.y = 150;
-				camera.position.z = 500;
-				//camera.target.position.y = 150;
-
-				scene = new THREE.Scene();
-
+			function addStuff() {
 				
-				
-				
-				// Cube
-
-				var materials = [];
-
-				for ( var i = 0; i < 6; i ++ ) {
-
-					materials.push( [ new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, wireframe: false } ) ] );
-
+				if (cube) {
+					scene.remove(group);
+					scene.remove(cube);
 				}
 				
-				var geometriesParams = [
 				
-					{type: 'CubeGeometry', args: [ 200, 200, 200, 2, 2, 2, materials ] }, 
-					{type: 'TorusGeometry', args: [ 100, 60, 4, 8, Math.PI*2 ] }, 
-					{type: 'SphereGeometry', args: [ 200, 1, 1 ] }, 
-					{type: 'CylinderGeometry', args: [ 25, 75, 200, 8, 3 ] }, 
-					{type: 'TextGeometry', args: ['&', {
-											size: 200,
-											height: 50,
-											curveSegments: 1,
-											font: "helvetiker"
+				var modifier = new THREE.SubdivisionModifier( subdivisions );
 
-										}]}
 				
-				];
-				
-				
-				var modifier = new THREE.SubdivisionModifier( 2 );
+				var params = geometriesParams[geometryIndex];
 
-				var params = geometriesParams[1];
 
-				info.innerHTML = 'Drag to spin the geometry THREE.' + params.type
-				 	+ ' with ' + modifier.subdivisions + ' subdivisions'; //+ params.args;
 
 				//geometry = new THREE.CubeGeometry( 200, 200, 200, 2, 2, 2, materials );
 				geometry = createSomething(THREE[params.type], params.args);
 
 				// Cloning original geometry for debuging
 				smooth = geometry;
-				geometry = THREE.GeometryUtils.clone( geometry );
+				
+				if (subdivisions>0) {
+					// Really werid, you get an error after
+					// you clone an object with no subdivisions
+					geometry = THREE.GeometryUtils.clone( geometry );
+				}
 				
 				// mergeVertices(); is run in case of duplicated vertices
 				smooth.mergeVertices();
 				modifier.modify( smooth );
 				
 				
-				
-				
-				
-
+				info.innerHTML = 'Drag to spin the geometry THREE.' + params.type
+				 	+ ' with ' + modifier.subdivisions + ' subdivisions'  + 
+					'<br/>Subdivision <a href="#" onclick="nextSubdivision(1); return false;">+</a>/<a href="#" onclick="nextSubdivision(-1); return false;">-</a>' + 
+					'<br/>Geometry: <a href="#" onclick="nextGeometry();return false;">next</a>' +
+					'<br/>vertices count: before ' + geometry.vertices.length + ' after ' + smooth.vertices.length +
+					'<br/>face count: before ' + geometry.faces.length + ' after ' + smooth.faces.length
+				; //+ params.args;
 				
 				var faceABCD = "abcd";
 				var color, f, p, n, vertexIndex;
@@ -186,24 +191,24 @@
 				scene.add( group );
 
 				// Debug new Points
-				var PI2 = Math.PI * 2;
-				var program = function ( context ) {
-				
-					context.beginPath();
-					context.arc( 0, 0, 1, 0, PI2, true );
-					context.closePath();
-					context.fill();
-				
-				}
-				
-				for ( var i = 0; i < smooth.vertices.length; i++ ) {
-				
-					particle = new THREE.Particle( new THREE.ParticleCanvasMaterial( { color: Math.random() * 0x808008 + 0x808080, program: program } ) );
-					particle.position = smooth.vertices[i].position;
-					var pos = smooth.vertices.position
-					particle.scale.x = particle.scale.y = 5;
-					group.add( particle );
-				}
+				// var PI2 = Math.PI * 2;
+				// var program = function ( context ) {
+				// 
+				// 	context.beginPath();
+				// 	context.arc( 0, 0, 1, 0, PI2, true );
+				// 	context.closePath();
+				// 	context.fill();
+				// 
+				// }
+				// 
+				// for ( var i = 0; i < smooth.vertices.length; i++ ) {
+				// 
+				// 	particle = new THREE.Particle( new THREE.ParticleCanvasMaterial( { color: Math.random() * 0x808008 + 0x808080, program: program } ) );
+				// 	particle.position = smooth.vertices[i].position;
+				// 	var pos = smooth.vertices.position
+				// 	particle.scale.x = particle.scale.y = 5;
+				// 	group.add( particle );
+				// }
 				
 				//Debug original points
 				
@@ -227,10 +232,10 @@
 				// 	particle.scale.x = particle.scale.y = 30;
 				// 	group.add( particle );
 				// }
-				
+				// 
 
 				var meshmaterials = [
-				 	//new THREE.MeshBasicMaterial( { color: 0x000000, shading: THREE.FlatShading, wireframe: true } )
+				 	// new THREE.MeshBasicMaterial( { color: 0x000000, shading: THREE.FlatShading, wireframe: true } )
 					new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors } ),
 					new THREE.MeshBasicMaterial( { color: 0x405040, wireframe:true,  opacity:0.8 } )
 				];
@@ -242,16 +247,40 @@
 				// new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.SmoothShading } );
 
 				 cube = new THREE.Mesh( smooth, meshmaterials ); 
-
-				// cube.scale.x = 200;
-				// cube.scale.y = 200;
-				// cube.scale.z = 200;
+	
+				var toscale =  params.scale ? params.scale : 1;
+				cube.scale.x = toscale;
+				cube.scale.y = toscale;
+				cube.scale.z = toscale;
 				
 				
 				cube.doubleSided = true;
 				cube.position.y = 150;
 				cube.overdraw = true;
 				scene.add( cube );
+			}
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				info = document.createElement( 'div' );
+				info.style.position = 'absolute';
+				info.style.top = '10px';
+				info.style.width = '100%';
+				info.style.textAlign = 'center';
+				info.innerHTML = 'Drag to spin the geometry ';
+				container.appendChild( info );
+
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.y = 150;
+				camera.position.z = 500;
+				//camera.target.position.y = 150;
+
+				scene = new THREE.Scene();
+
+				addStuff();
 
 				renderer = new THREE.WebGLRenderer(); // WebGLRenderer CanvasRenderer
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -344,7 +373,7 @@
 			}
 
 			function render() {
-
+				
 				group.rotation.y = cube.rotation.y += ( targetYRotation - cube.rotation.y ) * 0.05;
 				renderer.render( scene, camera );
 
