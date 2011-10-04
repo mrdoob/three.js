@@ -48,7 +48,7 @@
 
 			var container, stats;
 
-			var camera, scene, canvasRenderer, webglRenderer;
+			var camera, scene, target, canvasRenderer, webglRenderer;
 
 			var mesh, zmesh, lightMesh, geometry;
 
@@ -79,9 +79,10 @@
 				container = document.createElement('div');
 				document.body.appendChild(container);
 
-				camera = new THREE.Camera( 75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
+				camera = new THREE.PerspectiveCamera( 75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
 				camera.position.z = 500;
-				camera.useTarget = true;
+
+				target = new THREE.Vector3( 0, 0, 0 );
 
 				scene = new THREE.Scene();
 
@@ -194,6 +195,8 @@
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+
+				camera.lookAt( target );
 
 				for ( var i = 0, l = scene.objects.length; i < l; i ++ ) {
 

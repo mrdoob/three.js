@@ -53,7 +53,7 @@
 			var container;
 			var stats;
 
-			var camera;
+			var camera, target;
 			var scene;
 			var canvasRenderer, webglRenderer;
 
@@ -84,12 +84,13 @@
 
 			function init() {
 
-				container = document.createElement('div');
-				document.body.appendChild(container);
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
+				camera = new THREE.PerspectiveCamera( 75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
 				camera.position.z = 500;
-				camera.useTarget = true;
+
+				target = new THREE.Vector3( 0, 0, 0 );
 
 				scene = new THREE.Scene();
 
@@ -99,15 +100,15 @@
 
 				for ( var i = 0; i < 10; i ++ ) {
 
-					//mesh = new THREE.Mesh( sphere, new THREE.MeshLambertMaterial( ) );
 					mesh = new THREE.Mesh( sphere, [ new THREE.MeshLambertMaterial( { color: 0xffffff } ), new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true,  wireframeLinewidth: 1.5 } ) ] );
-					//mesh = new THREE.Mesh( sphere, new THREE.MeshLambertMaterial( { color: 0x00aa00, wireframe: true,  wireframeLinewidth: 1.5 } ) );
-					//mesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { wireframe: true,  wireframeLinewidth: 2.5 } ) );
+
 					mesh.position.x = 500 * ( Math.random() - 0.5 );
 					mesh.position.y = 500 * ( Math.random() - 0.5 );
 					mesh.position.z = 500 * ( Math.random() - 0.5 );
-					mesh.scale.x = mesh.scale.y = mesh.scale.z = 0.25 * (Math.random() + 0.5);
-					scene.add(mesh);
+
+					mesh.scale.x = mesh.scale.y = mesh.scale.z = 0.25 * ( Math.random() + 0.5 );
+
+					scene.add( mesh );
 
 				}
 
@@ -118,15 +119,14 @@
 				scene.add( ambient );
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff );
-				directionalLight.position.y = -70;
-				directionalLight.position.z = 100;
+				directionalLight.position.set( 0, -70, 100 );
 				directionalLight.position.normalize();
 				scene.add( directionalLight );
 
 				mesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xff0000 } ) );
-				mesh.scale.x = mesh.scale.y = mesh.scale.z = 0.1;
+				mesh.scale.set( 0.1, 0.1, 0.1 );
 				mesh.position.set( 0, 0, 120 );
-				scene.add(mesh);
+				scene.add( mesh );
 
 				if ( render_gl ) {
 					try {
@@ -184,18 +184,23 @@
 				xc1.fillStyle = "hsla("+0+",90%,50%,0.15);"
 				xc1.fillRect(40, 70, 60, 50);
 
-				for(var i=0;i<500;i++) {
+				for( var i = 0; i < 500; i ++ ) {
+
 					xc1.fillStyle = "hsla("+60*Math.random()+",90%,50%,0.5);"
-					xc1.fillRect(40+60*Math.random(), 118+10*Math.random(), 2, 10);
+					xc1.fillRect( 40+60*Math.random(), 118+10*Math.random(), 2, 10 );
+
 				}
 
 				var x2 = document.createElement( "canvas" );
 				var xc2 = x2.getContext("2d");
 				x2.width = x2.height = 128;
 				xc2.fillStyle = "rgba(0,0,0,0.5)";
-				for(var i=0;i<14;i++) {
-					xc2.fillRect(0, 5+i*4, 54, 2);
-					xc2.fillRect(i*4, 5, 2, 54);
+
+				for( var i = 0; i < 14; i ++ ) {
+
+					xc2.fillRect( 0, 5+i*4, 54, 2 );
+					xc2.fillRect( i*4, 5, 2, 54 );
+
 				}
 
 				var xm1 = new THREE.MeshLambertMaterial( { map: new THREE.Texture( x1 ), transparent: true } );
@@ -289,6 +294,7 @@
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+				camera.lookAt( target );
 
 				if ( render_canvas ) canvasRenderer.render( scene, camera );
 				if ( render_gl && has_gl ) webglRenderer.render( scene, camera );

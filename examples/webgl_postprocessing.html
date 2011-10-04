@@ -117,10 +117,10 @@
 
 				container = document.getElementById( 'container' );
 
-				cameraOrtho = new THREE.OrthoCamera( -halfWidth, halfWidth, halfHeight, -halfHeight, -10000, 10000 );
+				cameraOrtho = new THREE.OrthographicCamera( -halfWidth, halfWidth, halfHeight, -halfHeight, -10000, 10000 );
 				cameraOrtho.position.z = 100;
 
-				cameraPerspective = new THREE.Camera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
+				cameraPerspective = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
 				cameraPerspective.position.z = 900;
 
 				//

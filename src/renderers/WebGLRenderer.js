@@ -3487,8 +3487,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( ! _cameraLight ) {
 
-			_cameraLight = new THREE.Camera( _this.shadowCameraFov, _this.shadowMapWidth / _this.shadowMapHeight, _this.shadowCameraNear, _this.shadowCameraFar );
-			_cameraLight.useTarget = true;
+			_cameraLight = new THREE.PerspectiveCamera( _this.shadowCameraFov, _this.shadowMapWidth / _this.shadowMapHeight, _this.shadowCameraNear, _this.shadowCameraFar );
 
 		}
 
@@ -3517,7 +3516,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				shadowMatrix = _shadowMatrix[ j ];
 
 				_cameraLight.position.copy( light.position );
-				_cameraLight.target.position.copy( light.target.position );
+				_cameraLight.lookAt( light.target.position );
 
 				_cameraLight.update( undefined, true );
 

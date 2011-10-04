@@ -44,12 +44,11 @@
 
 			function init() {
 
-				container = document.createElement('div');
-				document.body.appendChild(container);
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
+				camera = new THREE.PerspectiveCamera( 75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
 				camera.position.z = 500;
-				camera.useTarget = true;
 
 				scene = new THREE.Scene();
 
@@ -177,10 +176,9 @@
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
-				camera.updateMatrix();
+				camera.lookAt( scene.position );
 
 				mesh.rotation.y += 0.01;
-				mesh.updateMatrix();
 
 				/*
 				qrcode.rotation.x += 0.01;
