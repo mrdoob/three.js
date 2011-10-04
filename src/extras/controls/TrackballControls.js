@@ -1,42 +1,12 @@
 /**
  * @author Eberhard Graether / http://egraether.com/
-
- * parameters = {
- *	fov: <float>,
- *	aspect: <float>,
- *	near: <float>,
- *	far: <float>,
- *	target: <THREE.Object3D>,
-
- *	radius: <float>,
- *	screen: { width : <float>, height : <float>, offsetLeft : <float>, offsetTop : <float> },
-
- *	rotateSpeed: <float>,
- *	zoomSpeed: <float>,
- *	panSpeed: <float>,
-
- *	noZoom: <bool>,
- *	noPan: <bool>,
-
- *	staticMoving: <bool>,
- *	dynamicDampingFactor: <float>,
-
- *	minDistance: <float>,
- *	maxDistance: <float>,
-
- *	keys: <Array>, // [ rotateKey, zoomKey, panKey ],
-
- *	domElement: <HTMLElement>,
- * }
  */
 
-THREE.TrackballCamera = function ( parameters ) {
+THREE.TrackballCamera = function ( object ) {
 
 	// target.position is modified when panning
 
-	parameters = parameters || {};
-
-	THREE.Camera.call( this, parameters.fov, parameters.aspect, parameters.near, parameters.far, parameters.target );
+	this.object = object;
 
 	this.domElement = parameters.domElement || document;
 
@@ -366,7 +336,7 @@ THREE.TrackballCamera = function ( parameters ) {
 		_state = this.STATE.NONE;
 
 	};
-	
+
 	function bind( scope, fn ) {
 
 		return function () {
@@ -387,9 +357,5 @@ THREE.TrackballCamera = function ( parameters ) {
 	window.addEventListener( 'keyup',   bind( this, keyup ), false );
 
 };
-
-THREE.TrackballCamera.prototype = new THREE.Camera();
-THREE.TrackballCamera.prototype.constructor = THREE.TrackballCamera;
-THREE.TrackballCamera.prototype.supr = THREE.Camera.prototype;
 
 THREE.TrackballCamera.prototype.STATE = { NONE : -1, ROTATE : 0, ZOOM : 1, PAN : 2 };

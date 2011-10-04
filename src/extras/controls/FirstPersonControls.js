@@ -2,39 +2,11 @@
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  * @author paulirish / http://paulirish.com/
- *
- * parameters = {
- *  fov: <float>,
- *  aspect: <float>,
- *  near: <float>,
- *  far: <float>,
- *  target: <THREE.Object3D>,
-
- *  movementSpeed: <float>,
- *  lookSpeed: <float>,
-
- *  noFly: <bool>,
- *  lookVertical: <bool>,
- *  autoForward: <bool>,
-
- *  constrainVertical: <bool>,
- *  verticalMin: <float>,
- *  verticalMax: <float>,
-
- *  heightSpeed: <bool>,
- *  heightCoef: <float>,
- *  heightMin: <float>,
- *  heightMax: <float>,
-
- *  domElement: <HTMLElement>,
- * }
  */
 
-THREE.FirstPersonCamera = function ( parameters ) {
+THREE.FirstPersonControls = function ( object ) {
 
-	THREE.Camera.call( this, parameters.fov, parameters.aspect, parameters.near, parameters.far, parameters.target );
-
-	this.useTarget = true;
+	this.object = object;
 
 	this.movementSpeed = 1.0;
 	this.lookSpeed = 0.005;
@@ -57,30 +29,6 @@ THREE.FirstPersonCamera = function ( parameters ) {
 
 	this.lastUpdate = new Date().getTime();
 	this.tdiff = 0;
-
-	if ( parameters ) {
-
-		if ( parameters.movementSpeed !== undefined ) this.movementSpeed = parameters.movementSpeed;
-		if ( parameters.lookSpeed !== undefined ) this.lookSpeed  = parameters.lookSpeed;
-		if ( parameters.noFly !== undefined ) this.noFly = parameters.noFly;
-		if ( parameters.lookVertical !== undefined ) this.lookVertical = parameters.lookVertical;
-
-		if ( parameters.autoForward !== undefined ) this.autoForward = parameters.autoForward;
-
-		if ( parameters.activeLook !== undefined ) this.activeLook = parameters.activeLook;
-
-		if ( parameters.heightSpeed !== undefined ) this.heightSpeed = parameters.heightSpeed;
-		if ( parameters.heightCoef !== undefined ) this.heightCoef = parameters.heightCoef;
-		if ( parameters.heightMin !== undefined ) this.heightMin = parameters.heightMin;
-		if ( parameters.heightMax !== undefined ) this.heightMax = parameters.heightMax;
-
-		if ( parameters.constrainVertical !== undefined ) this.constrainVertical = parameters.constrainVertical;
-		if ( parameters.verticalMin !== undefined ) this.verticalMin = parameters.verticalMin;
-		if ( parameters.verticalMax !== undefined ) this.verticalMax = parameters.verticalMax;
-
-		if ( parameters.domElement !== undefined ) this.domElement = parameters.domElement;
-
-	}
 
 	this.autoSpeedFactor = 0.0;
 
@@ -114,7 +62,7 @@ THREE.FirstPersonCamera = function ( parameters ) {
 		if ( this.domElement !== document ) {
 			this.domElement.focus();
 		}
-		
+
 		event.preventDefault();
 		event.stopPropagation();
 
@@ -170,19 +118,19 @@ THREE.FirstPersonCamera = function ( parameters ) {
 		switch( event.keyCode ) {
 
 			case 38: /*up*/
-			case 87: /*W*/ this.moveForward = true; break;
+			case 87: /*W*/ this.object.moveForward = true; break;
 
 			case 37: /*left*/
-			case 65: /*A*/ this.moveLeft = true; break;
+			case 65: /*A*/ this.object.moveLeft = true; break;
 
 			case 40: /*down*/
-			case 83: /*S*/ this.moveBackward = true; break;
+			case 83: /*S*/ this.object.moveBackward = true; break;
 
 			case 39: /*right*/
-			case 68: /*D*/ this.moveRight = true; break;
+			case 68: /*D*/ this.object.moveRight = true; break;
 
-			case 82: /*R*/ this.moveUp = true; break;
-			case 70: /*F*/ this.moveDown = true; break;
+			case 82: /*R*/ this.object.moveUp = true; break;
+			case 70: /*F*/ this.object.moveDown = true; break;
 
 			case 81: this.freeze = !this.freeze; break;
 
@@ -195,19 +143,19 @@ THREE.FirstPersonCamera = function ( parameters ) {
 		switch( event.keyCode ) {
 
 			case 38: /*up*/
-			case 87: /*W*/ this.moveForward = false; break;
+			case 87: /*W*/ this.object.moveForward = false; break;
 
 			case 37: /*left*/
-			case 65: /*A*/ this.moveLeft = false; break;
+			case 65: /*A*/ this.object.moveLeft = false; break;
 
 			case 40: /*down*/
-			case 83: /*S*/ this.moveBackward = false; break;
+			case 83: /*S*/ this.object.moveBackward = false; break;
 
 			case 39: /*right*/
-			case 68: /*D*/ this.moveRight = false; break;
+			case 68: /*D*/ this.object.moveRight = false; break;
 
-			case 82: /*R*/ this.moveUp = false; break;
-			case 70: /*F*/ this.moveDown = false; break;
+			case 82: /*R*/ this.object.moveUp = false; break;
+			case 70: /*F*/ this.object.moveDown = false; break;
 
 		}
 
@@ -224,8 +172,8 @@ THREE.FirstPersonCamera = function ( parameters ) {
 
 			if ( this.heightSpeed ) {
 
-				var y = clamp( this.position.y, this.heightMin, this.heightMax ),
-					delta = y - this.heightMin;
+				var y = clamp( this.object.position.y, this.heightMin, this.heightMax );
+				var delta = y - this.heightMin;
 
 				this.autoSpeedFactor = this.tdiff * ( delta * this.heightCoef );
 
@@ -339,26 +287,5 @@ THREE.FirstPersonCamera = function ( parameters ) {
 		return x < a ? a : ( x > b ? b : x );
 
 	};
-
-};
-
-
-THREE.FirstPersonCamera.prototype = new THREE.Camera();
-THREE.FirstPersonCamera.prototype.constructor = THREE.FirstPersonCamera;
-THREE.FirstPersonCamera.prototype.supr = THREE.Camera.prototype;
-
-
-THREE.FirstPersonCamera.prototype.translate = function ( distance, axis ) {
-
-	this.matrix.rotateAxis( axis );
-
-	if ( this.noFly ) {
-
-		axis.y = 0;
-
-	}
-
-	this.position.addSelf( axis.multiplyScalar( distance ) );
-	this.target.position.addSelf( axis.multiplyScalar( distance ) );
 
 };

@@ -1,56 +1,21 @@
 /**
  * @author James Baicoianu / http://www.baicoianu.com/
-
- * parameters = {
- *	fov: <float>,
- *	aspect: <float>,
- *	near: <float>,
- *	far: <float>,
- *	target: <THREE.Object3D>,
-
- *	movementSpeed: <float>,
- *	rollSpeed: <float>,
-
- *	noFly: <bool>,
- *	lookVertical: <bool>,
- *	autoForward: <bool>,
-
- *	heightSpeed: <bool>,
- *	heightCoef: <float>,
- *	heightMin: <float>,
- *	heightMax: <float>,
-
- *	domElement: <HTMLElement>,
- * }
  */
 
-THREE.FlyCamera = function ( parameters ) {
+THREE.FlyControls = function ( object ) {
 
-	THREE.Camera.call( this, parameters.fov, parameters.aspect, parameters.near, parameters.far, parameters.target );
+	this.object = object;
 
 	this.tmpQuaternion = new THREE.Quaternion();
-	
+
 	this.movementSpeed = 1.0;
 	this.rollSpeed = 0.005;
 
 	this.dragToLook = false;
 	this.autoForward = false;
-	
+
 	this.domElement = document;
 
-	if ( parameters ) {
-
-		if ( parameters.movementSpeed !== undefined ) this.movementSpeed = parameters.movementSpeed;
-		if ( parameters.rollSpeed !== undefined ) this.rollSpeed	= parameters.rollSpeed;
-
-		if ( parameters.dragToLook !== undefined ) this.dragToLook = parameters.dragToLook;
-		if ( parameters.autoForward !== undefined ) this.autoForward = parameters.autoForward;
-
-		if ( parameters.domElement !== undefined ) this.domElement = parameters.domElement;
-
-	}
-
-	this.useTarget = false;
 	this.useQuaternion = true;
 
 	this.mouseStatus = 0;
@@ -61,9 +26,9 @@ THREE.FlyCamera = function ( parameters ) {
 
 	this.lastUpdate = -1;
 	this.tdiff = 0;
-	
+
 	if ( this.domElement === document ) {
-		
+
 	} else {
 		this.domElement.setAttribute( 'tabindex', -1 );
 	}
@@ -147,11 +112,11 @@ THREE.FlyCamera = function ( parameters ) {
 	};
 
 	this.mousedown = function(event) {
-		
+
 		if ( this.domElement !== document ) {
 			this.domElement.focus();
 		}
-		
+
 		event.preventDefault();
 		event.stopPropagation();
 
@@ -163,8 +128,8 @@ THREE.FlyCamera = function ( parameters ) {
 
 			switch ( event.button ) {
 
-				case 0: this.moveForward = true; break;
-				case 2: this.moveBackward = true; break;
+				case 0: this.object.moveForward = true; break;
+				case 2: this.object.moveBackward = true; break;
 
 			}
 
@@ -179,10 +144,10 @@ THREE.FlyCamera = function ( parameters ) {
 			var container = this.getContainerDimensions();
 			var halfWidth  = container.size[ 0 ] / 2;
 			var halfHeight = container.size[ 1 ] / 2;
-			
+
 			this.moveState.yawLeft   = - ( ( event.pageX - container.offset[ 0 ] ) - halfWidth  ) / halfWidth;
 			this.moveState.pitchDown =   ( ( event.pageY - container.offset[ 1 ] ) - halfHeight ) / halfHeight;
-			
+
 			this.updateRotationVector();
 
 		}
@@ -214,29 +179,29 @@ THREE.FlyCamera = function ( parameters ) {
 		this.updateRotationVector();
 
 	};
-	
+
 	this.update = function( parentMatrixWorld, forceUpdate, camera ) {
 
 		var now = new Date().getTime();
-		
+
 		if ( this.lastUpdate == -1 ) this.lastUpdate = now;
-		
+
 		this.tdiff = ( now - this.lastUpdate ) / 1000;
 		this.lastUpdate = now;
 
 		var moveMult = this.tdiff * this.movementSpeed;
 		var rotMult = this.tdiff * this.rollSpeed;
 
-		this.translateX( this.moveVector.x * moveMult );
-		this.translateY( this.moveVector.y * moveMult );
-		this.translateZ( this.moveVector.z * moveMult );
+		this.object.translateX( this.moveVector.x * moveMult );
+		this.object.translateY( this.moveVector.y * moveMult );
+		this.object.translateZ( this.moveVector.z * moveMult );
 
 		this.tmpQuaternion.set( this.rotationVector.x * rotMult, this.rotationVector.y * rotMult, this.rotationVector.z * rotMult, 1 ).normalize();
-		this.quaternion.multiplySelf( this.tmpQuaternion );
-		
-		this.matrix.setPosition( this.position );
-		this.matrix.setRotationFromQuaternion( this.quaternion );
-		this.matrixWorldNeedsUpdate = true;
+		this.object.quaternion.multiplySelf( this.tmpQuaternion );
+
+		this.object.matrix.setPosition( this.position );
+		this.object.matrix.setRotationFromQuaternion( this.quaternion );
+		this.object.matrixWorldNeedsUpdate = true;
 
 		this.supr.update.call( this );
 
@@ -245,7 +210,7 @@ THREE.FlyCamera = function ( parameters ) {
 	this.updateMovementVector = function() {
 
 		var forward = ( this.moveState.forward || ( this.autoForward && !this.moveState.back ) ) ? 1 : 0;
-		
+
 		this.moveVector.x = ( -this.moveState.left    + this.moveState.right );
 		this.moveVector.y = ( -this.moveState.down    + this.moveState.up );
 		this.moveVector.z = ( -forward + this.moveState.back );
@@ -267,7 +232,7 @@ THREE.FlyCamera = function ( parameters ) {
 	this.getContainerDimensions = function() {
 
 		if ( this.domElement != document ) {
-			
+
 			return {
 				size	: [ this.domElement.offsetWidth, this.domElement.offsetHeight ],
 				offset	: [ this.domElement.offsetLeft,  this.domElement.offsetTop ] 
@@ -293,19 +258,15 @@ THREE.FlyCamera = function ( parameters ) {
 		};
 
 	};
-	
+
 	this.domElement.addEventListener( 'mousemove', bind( this, this.mousemove ), false );
 	this.domElement.addEventListener( 'mousedown', bind( this, this.mousedown ), false );
 	this.domElement.addEventListener( 'mouseup',   bind( this, this.mouseup ), false );
 
 	this.domElement.addEventListener( 'keydown', bind( this, this.keydown ), false );
 	this.domElement.addEventListener( 'keyup',   bind( this, this.keyup ), false );
-	
+
 	this.updateMovementVector();
-	this.updateRotationVector();	
+	this.updateRotationVector();
 
 };
-
-THREE.FlyCamera.prototype = new THREE.Camera();
-THREE.FlyCamera.prototype.constructor = THREE.FlyCamera;
-THREE.FlyCamera.prototype.supr = THREE.Camera.prototype;

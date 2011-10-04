@@ -1,39 +1,12 @@
 /**
  * @author alteredq / http://alteredqualia.com/
- *
- * parameters = {
- *  fov: <float>,
- *  aspect: <float>,
- *  near: <float>,
- *  far: <float>,
- *  target: <THREE.Object3D>,
-
- *  waypoints: <Array>,	// [ [x,y,z], [x,y,z] ... ]
- *  duration: <float>, 	// seconds
-
- *  useConstantSpeed: <bool>,
- *  resamplingCoef: <float>,
-
- *  createDebugPath: <bool>,
- *  createDebugDummy: <bool>,
-
- *  lookSpeed: <float>,
- *  lookVertical: <bool>,
- *  lookHorizontal: <bool>,
- *  verticalAngleMap: { srcRange: [ <float>, <float> ], dstRange: [ <float>, <float> ] }
- *  horizontalAngleMap: { srcRange: [ <float>, <float> ], dstRange: [ <float>, <float> ] }
-
- *  domElement: <HTMLElement>,
- * }
  */
 
-THREE.PathCamera = function ( parameters ) {
+THREE.PathControls = function ( object ) {
 
-	THREE.Camera.call( this, parameters.fov, parameters.aspect, parameters.near, parameters.far, parameters.target );
+	this.object = object;
 
 	this.id = "PathCamera" + THREE.PathCameraIdCounter ++;
-
-	this.useTarget = true;
 
 	this.duration = 10 * 1000; // milliseconds
 	this.waypoints = [];
@@ -53,27 +26,6 @@ THREE.PathCamera = function ( parameters ) {
 	this.horizontalAngleMap = { srcRange: [ 0, 2 * Math.PI ], dstRange: [ 0, 2 * Math.PI ] };
 
 	this.domElement = document;
-
-	if ( parameters ) {
-
-		if ( parameters.duration !== undefined ) this.duration = parameters.duration * 1000;
-		if ( parameters.waypoints !== undefined ) this.waypoints = parameters.waypoints;
-
-		if ( parameters.useConstantSpeed !== undefined ) this.useConstantSpeed = parameters.useConstantSpeed;
-		if ( parameters.resamplingCoef !== undefined ) this.resamplingCoef = parameters.resamplingCoef;
-
-		if ( parameters.createDebugPath !== undefined ) this.createDebugPath = parameters.createDebugPath;
-		if ( parameters.createDebugDummy !== undefined ) this.createDebugDummy = parameters.createDebugDummy;
-
-		if ( parameters.lookSpeed !== undefined ) this.lookSpeed = parameters.lookSpeed;
-		if ( parameters.lookVertical !== undefined ) this.lookVertical = parameters.lookVertical;
-		if ( parameters.lookHorizontal !== undefined ) this.lookHorizontal = parameters.lookHorizontal;
-		if ( parameters.verticalAngleMap !== undefined ) this.verticalAngleMap = parameters.verticalAngleMap;
-		if ( parameters.horizontalAngleMap !== undefined ) this.horizontalAngleMap = parameters.horizontalAngleMap;
-
-		if ( parameters.domElement !== undefined ) this.domElement = parameters.domElement;
-
-	}
 
 	this.mouseX = 0;
 	this.mouseY = 0;
@@ -354,9 +306,5 @@ THREE.PathCamera = function ( parameters ) {
 	this.domElement.addEventListener( 'mousemove', bind( this, this.onMouseMove ), false );
 
 };
-
-THREE.PathCamera.prototype = new THREE.Camera();
-THREE.PathCamera.prototype.constructor = THREE.PathCamera;
-THREE.PathCamera.prototype.supr = THREE.Camera.prototype;
 
 THREE.PathCameraIdCounter = 0;
