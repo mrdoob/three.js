@@ -1,9 +1,26 @@
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
+ * @author zz85 / http://www.lab4games.net/zz85/blog/
  */
 
 THREE.GeometryUtils = {
+	
+	// Convience method for creating subdivision geometry  
+	
+	createSubdivision: function( geometry, repeats ) {
+		
+		repeats = (repeats === undefined ) ? 1 : repeats;
+		
+		var smooth = geometry;
+		
+		while (repeats--) {
+			smooth = new THREE.SubdivisionGeometry(smooth);
+		}
+		
+		return smooth;
+	},
+	
 
 	merge: function ( geometry1, object2 /* mesh | geometry */ ) {
 
