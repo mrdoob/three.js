@@ -35,10 +35,9 @@
 				container = document.createElement('div');
 				document.body.appendChild(container);
 
-				camera = new THREE.Camera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.y = 200;
 				camera.position.z = 800;
-				camera.useTarget = true;
 
 				scene = new THREE.Scene();
 
@@ -196,6 +195,7 @@
 
 				camera.position.x = Math.cos( timer ) * 1000;
 				camera.position.z = Math.sin( timer ) * 1000;
+				camera.lookAt( scene.origin );
 
 				for ( var i = 0, l = objects.length; i < l; i++ ) {
 

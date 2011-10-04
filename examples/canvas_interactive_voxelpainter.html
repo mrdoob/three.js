@@ -27,7 +27,8 @@
 			var projector, plane;
 			var mouse2D, mouse3D, ray,
 			rollOveredFace, isShiftDown = false,
-			theta = 45, isCtrlDown = false;
+			theta = 45, isCtrlDown = false,
+			target = new THREE.Vector3( 0, 200, 0 );
 
 			init();
 			animate();
@@ -45,10 +46,8 @@
 				info.innerHTML = '<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - voxel painter<br /><strong>click</strong>: add voxel, <strong>control + click</strong>: remove voxel, <strong>shift</strong>: rotate, <a href="javascript:save();return false;">save .png</a>';
 				container.appendChild( info );
 
-				camera = new THREE.Camera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.y = 800;
-				camera.useTarget = true;
-				camera.target.position.y = 200;
 
 				scene = new THREE.Scene();
 
@@ -207,6 +206,10 @@
 
 				}
 
+				camera.position.x = 1400 * Math.sin( theta * Math.PI / 360 );
+				camera.position.z = 1400 * Math.cos( theta * Math.PI / 360 );
+				camera.lookAt( target );
+
 				mouse3D = projector.unprojectVector( mouse2D.clone(), camera );
 				ray.direction = mouse3D.subSelf( camera.position ).normalize();
 
@@ -227,9 +230,6 @@
 					 rollOveredFace = null;
 
 				}
-
-				camera.position.x = 1400 * Math.sin( theta * Math.PI / 360 );
-				camera.position.z = 1400 * Math.cos( theta * Math.PI / 360 );
 
 				renderer.render( scene, camera );
 

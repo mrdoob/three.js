@@ -61,9 +61,8 @@
 				info.innerHTML = '<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - video demo. playing <a href="http://durian.blender.org/" target="_blank">sintel</a> trailer';
 				container.appendChild(info);
 
-				camera = new THREE.Camera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 1000;
-				camera.useTarget = true;
 
 				scene = new THREE.Scene();
 
@@ -190,11 +189,12 @@
 
 				camera.position.x += ( mouseX - camera.position.x ) * 0.05;
 				camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
+				camera.lookAt( scene.origin );
 
 				if ( video.readyState === video.HAVE_ENOUGH_DATA ) {
 
 					imageContext.drawImage( video, 0, 0 );
-					
+
 					if ( texture ) texture.needsUpdate = true;
 					if ( textureReflection ) textureReflection.needsUpdate = true;
 

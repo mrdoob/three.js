@@ -42,10 +42,9 @@
 				info.innerHTML = '<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - clickable objects';
 				container.appendChild( info );
 
-				camera = new THREE.Camera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.y = 300;
 				camera.position.z = 500;
-				camera.useTarget = true;
 
 				scene = new THREE.Scene();
 
@@ -139,9 +138,11 @@
 				TWEEN.update();
 
 				theta += 0.2;
+
 				camera.position.x = radius * Math.sin( theta * Math.PI / 360 );
 				camera.position.y = radius * Math.sin( theta * Math.PI / 360 );
 				camera.position.z = radius * Math.cos( theta * Math.PI / 360 );
+				camera.lookAt( scene.origin );
 
 				renderer.render( scene, camera );
 

@@ -59,7 +59,7 @@
 
 				var container = document.getElementById( 'container' );
 
-				camera = new THREE.Camera( 65, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new THREE.PerspectiveCamera( 65, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.z = 100;
 
 				scene = new THREE.Scene();

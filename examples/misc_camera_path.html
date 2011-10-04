@@ -39,48 +39,43 @@
 
 		<script src="../build/Three.js"></script>
 
+		<script src="js/RequestAnimationFrame.js"></script>
 		<script src="js/Stats.js"></script>
-		<script src="js/Tween.js"></script>
+
 
 		<script>
 
-			var statsEnabled = true;
-
 			var container, stats;
 
-			var camera, scene, renderer;
+			var camera, controls, scene, renderer;
 
 			var cross;
 
 			init();
+			animate();
 
 			function init() {
-
-				// scene and camera
 
 				scene = new THREE.Scene();
 				scene.fog = new THREE.FogExp2( 0xffffff, 0.002 );
 
-				var waypoints = [
-					[ -500, 0, 0 ],
-					[ 0, 200, 0 ],
-					[ 500, 0, 0 ]
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
 
-				];
-
-				camera = new THREE.PathCamera( {
-
-					fov: 40, aspect: window.innerWidth / window.innerHeight, near: 1, far: 1000,
-					waypoints: waypoints, duration: 28,
-					useConstantSpeed: true, resamplingCoef: 1,
-					createDebugPath: true, createDebugDummy: true,
-					lookSpeed: 0.0006, lookVertical: true, lookHorizontal: true,
-					verticalAngleMap:   { srcRange: [ 0, 2 * Math.PI ], dstRange: [ 1.1, 3.8 ] },
-					horizontalAngleMap: { srcRange: [ 0, 2 * Math.PI ], dstRange: [ 0.3, Math.PI - 0.3 ] }
-
-				} );
-
-				camera.lon = 180;
+				/*
+				controls = new THREE.PathControls( camera );
+				controls.waypoints = [ [ -500, 0, 0 ], [ 0, 200, 0 ], [ 500, 0, 0 ] ];
+				controls.duration = 28
+				controls.useConstantSpeed = true;
+				controls.resamplingCoef = 1;
+				controls.createDebugPath = true;
+				controls.createDebugDummy = true;
+				controls.lookSpeed = 0.0006;
+				controls.lookVertical = true;
+				controls.lookHorizontal = true;
+				controls.verticalAngleMap = { srcRange: [ 0, 2 * Math.PI ], dstRange: [ 1.1, 3.8 ] };
+				controls.horizontalAngleMap = { srcRange: [ 0, 2 * Math.PI ], dstRange: [ 0.3, Math.PI - 0.3 ] };
+				controls.lon = 180;
+				*/
 
 				// world
 
@@ -93,20 +88,20 @@
 
 				var material =  new THREE.MeshLambertMaterial( { color:0xffffff } );
 
-				for( var i = 0; i < 500; i++ ) {
+				for ( var i = 0; i < 500; i ++ ) {
 
 					var mesh = new THREE.Mesh( cube, material );
-					mesh.position.set(( Math.random() - 0.5 ) * 1000,
-									  ( Math.random() - 0.5 ) * 1000,
-									  ( Math.random() - 0.5 ) * 1000 );
+					mesh.position.set(
+						( Math.random() - 0.5 ) * 1000,
+						( Math.random() - 0.5 ) * 1000,
+						( Math.random() - 0.5 ) * 1000
+					);
 
 					mesh.updateMatrix();
 					mesh.matrixAutoUpdate = false;
 					scene.add( mesh );
 
 				}
-
-				scene.add( camera.animationParent );
 
 				// lights
 
@@ -131,38 +126,26 @@
 				container = document.getElementById( 'container' );
 				container.appendChild( renderer.domElement );
 
-				if ( statsEnabled ) {
-
-					stats = new Stats();
-					stats.domElement.style.position = 'absolute';
-					stats.domElement.style.top = '0px';
-					stats.domElement.style.zIndex = 100;
-					container.appendChild( stats.domElement );
-
-				}
-
-				setInterval( loop, 1000 / 60 );
-
-				camera.animation.play( true, 0 );
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				stats.domElement.style.zIndex = 100;
+				container.appendChild( stats.domElement );
 
 			}
 
+			function animate() {
 
-			function loop() {
+				requestAnimationFrame( animate );
 
-				THREE.AnimationHandler.update( 1000/60 );
+				render();
+				stats.update();
 
-				/*
-				cross.matrix.copy( camera.matrix );
-				cross.matrix.n14 = 0;
-				cross.matrix.n24 = 0;
-				cross.matrix.n34 = -200;
-				cross.matrixWorldNeedsUpdate = true;
-				*/
+			}
+
+			function render() {
 
 				renderer.render( scene, camera );
-
-				if ( statsEnabled ) stats.update();
 
 			}
 
