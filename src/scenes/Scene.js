@@ -11,7 +11,7 @@ THREE.Scene = function () {
 
 	this.fog = null;
 
-	this.center = new THREE.Vector3();
+	this.origin = new THREE.Vector3();
 
 	this.overrideMaterial = null;
 

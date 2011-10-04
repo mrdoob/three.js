@@ -136,7 +136,7 @@
 
 				camera.position.x = Math.cos( timer ) * 200;
 				camera.position.z = Math.sin( timer ) * 200;
-				camera.lookAt( scene.center );
+				camera.lookAt( scene.origin );
 
 				renderer.render( scene, camera );
 

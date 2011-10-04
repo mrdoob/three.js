@@ -107,7 +107,7 @@
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
-				camera.lookAt( scene.center );
+				camera.lookAt( scene.origin );
 
 				group.rotation.x = Math.sin( new Date().getTime() * 0.0007 ) * 0.5;
 				group.rotation.y = Math.sin( new Date().getTime() * 0.0003 ) * 0.5;
