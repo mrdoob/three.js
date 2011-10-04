@@ -47,8 +47,6 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var statsEnabled = true;
-
 			var container, stats;
 
 			var camera, controls, scene, renderer;
@@ -123,19 +121,13 @@
 				container = document.getElementById( 'container' );
 				container.appendChild( renderer.domElement );
 
-				if ( statsEnabled ) {
-
-					stats = new Stats();
-					stats.domElement.style.position = 'absolute';
-					stats.domElement.style.top = '0px';
-					stats.domElement.style.zIndex = 100;
-					container.appendChild( stats.domElement );
-
-				}
-
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				stats.domElement.style.zIndex = 100;
+				container.appendChild( stats.domElement );
 
 			}
-
 
 			function animate() {
 
@@ -144,7 +136,7 @@
 				render();
 				stats.update();
 
-			};
+			}
 
 			function render() {
 

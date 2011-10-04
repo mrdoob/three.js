@@ -31,6 +31,7 @@
 		</style>
 
 		<script src="../build/Three.js"></script>
+
 		<script src="js/Detector.js"></script>
 		<script src="js/RequestAnimationFrame.js"></script>
 		<script src="js/Stats.js"></script>
@@ -58,7 +59,7 @@
 
 			container, stats,
 
-			camera, scene, renderer,
+			camera, controls, scene, renderer,
 			geometry, meshPlanet, meshClouds, meshMoon,
 			dirLight, ambientLight,
 
@@ -83,49 +84,37 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-
 				scene = new THREE.Scene();
-
 
 				renderer = new THREE.WebGLRenderer( { clearAlpha: 1, clearColor: 0x000000 } );
 				renderer.setSize( width, height );
 				renderer.sortObjects = false;
 				renderer.autoClear = false;
+
 				container.appendChild( renderer.domElement );
 
-
-				camera = new THREE.TrackballCamera({
-
-					fov: 25,
-					aspect: width / height,
-					near: 50,
-					far: 1e7,
-
-					rotateSpeed: 1.0,
-					zoomSpeed: 1.2,
-					panSpeed: 0.2,
-
-					noZoom: false,
-					noPan: false,
-
-					staticMoving: false,
-					dynamicDampingFactor: 0.3,
-
-					minDistance: radius * 1.1,
-					maxDistance: radius * 100,
-
-					keys: [ 65, 83, 68 ], // [ rotateKey, zoomKey, panKey ],
-
-					domElement: renderer.domElement,
-
-				});
-
+				camera = new THREE.PerspectiveCamera( 25, width / height, 50, 1e7 );
 				camera.position.z = radius * 7;
 
+				controls = new THREE.TrackballControls( camera, renderer.domElement );
+
+				controls.rotateSpeed = 1.0;
+				controls.zoomSpeed = 1.2;
+				controls.panSpeed = 0.2;
+
+				controls.noZoom = false;
+				controls.noPan = false;
+
+				controls.staticMoving = false;
+				controls.dynamicDampingFactor = 0.3;
+
+				controls.minDistance = radius * 1.1;
+				controls.maxDistance = radius * 100;
+
+				controls.keys = [ 65, 83, 68 ]; // [ rotateKey, zoomKey, panKey ]
 
 				dirLight = new THREE.DirectionalLight( 0xFFFFFF );
-				dirLight.position.set( -1, 0, 1 );
-				dirLight.position.normalize();
+				dirLight.position.set( -1, 0, 1 ).normalize();
 				scene.add( dirLight );
 
 				var planetTexture = THREE.ImageUtils.loadTexture( "textures/planets/earth_atmos_2048.jpg" ),
@@ -288,6 +277,8 @@
 					Math.sin( angle ) * meshMoon.position.x + Math.cos( angle ) * meshMoon.position.z
 				);
 				meshMoon.rotation.y -= angle;
+
+				controls.update();
 
 				renderer.clear();
 				renderer.render( scene, camera );
