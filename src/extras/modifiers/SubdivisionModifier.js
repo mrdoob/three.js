@@ -52,10 +52,39 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 	
 	var scope = this;
 
-	function f4( a, b, c, d, oldFace ) {
+	function f4( a, b, c, d, oldFace, orders ) {
+		
+		// TODO move vertex selection over here!
 		
 		var newFace = new THREE.Face4( a, b, c, d, null, oldFace.color, oldFace.material );
-		if (scope.useOldVertexColors) newFace.vertexColors = oldFace.vertexColors;
+		
+		if (scope.useOldVertexColors) {
+			
+			newFace.vertexColors = []; 
+			
+			var color, tmpColor, order;
+			for (var i=0;i<4;i++) {
+				order = orders[i];
+				
+				color = new THREE.Color(),
+				color.setRGB(0,0,0);
+				
+				for (var j=0, jl=0; j<order.length;j++) {
+					tmpColor = oldFace.vertexColors[order[j]-1];
+					color.r += tmpColor.r;
+					color.g += tmpColor.g;
+					color.b += tmpColor.b;
+				}
+				
+				color.r /= order.length;
+				color.g /= order.length;
+				color.b /= order.length;
+				
+				newFace.vertexColors[i] = color;
+				
+			}
+			
+		}
 		
 		newFaces.push( newFace );
 		
@@ -304,9 +333,9 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 			hashCA = edge_hash( face.c, face.a );
 
 			
-			f4( currentVerticeIndex, edgePoints[hashAB], face.b, edgePoints[hashBC], face );
-			f4( currentVerticeIndex, edgePoints[hashBC], face.c, edgePoints[hashCA], face );
-			f4( currentVerticeIndex, edgePoints[hashCA], face.a, edgePoints[hashAB], face );
+			f4( currentVerticeIndex, edgePoints[hashAB], face.b, edgePoints[hashBC], face, ['123', '12', '2', '23'] );
+			f4( currentVerticeIndex, edgePoints[hashBC], face.c, edgePoints[hashCA], face, ['123', '23', '3', '31'] );
+			f4( currentVerticeIndex, edgePoints[hashCA], face.a, edgePoints[hashAB], face, ['123', '31', '1', '12'] );
 			// face subdivide color and materials too? 
 			
 			
@@ -319,10 +348,10 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 			hashCD = edge_hash( face.c, face.d );
 			hashDA = edge_hash( face.d, face.a );
 			
-			f4( currentVerticeIndex, edgePoints[hashAB], face.b, edgePoints[hashBC], face );
-			f4( currentVerticeIndex, edgePoints[hashBC], face.c, edgePoints[hashCD], face );
-			f4( currentVerticeIndex, edgePoints[hashCD], face.d, edgePoints[hashDA], face );
-			f4( currentVerticeIndex, edgePoints[hashDA], face.a, edgePoints[hashAB], face );
+			f4( currentVerticeIndex, edgePoints[hashAB], face.b, edgePoints[hashBC], face, ['1234', '12', '2', '23']  );
+			f4( currentVerticeIndex, edgePoints[hashBC], face.c, edgePoints[hashCD], face, ['1234', '13', '3', '34']  );
+			f4( currentVerticeIndex, edgePoints[hashCD], face.d, edgePoints[hashDA], face, ['1234', '34', '4', '41']  );
+			f4( currentVerticeIndex, edgePoints[hashDA], face.a, edgePoints[hashAB], face, ['1234', '41', '1', '12']  );
 
 				
 		} else {
