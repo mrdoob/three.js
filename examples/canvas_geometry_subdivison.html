@@ -25,6 +25,7 @@
 		<script src="../src/extras/geometries/CylinderGeometry.js"></script>
 		<script src="../src/extras/geometries/TorusGeometry.js"></script>
 		<script src="../src/extras/geometries/SubdivisionGeometry.js"></script>
+		<script src="../src/extras/modifiers/SubdivisionModifier.js"></script>
 		
 		<script src="fonts/helvetiker_regular.typeface.js"></script>
 		<!--
@@ -59,6 +60,21 @@
 				return new F(klass, args);
 			};
 			
+			
+			function createSubdivision ( geometry, repeats ) {
+
+				repeats = (repeats === undefined ) ? 1 : repeats;
+
+				var smooth = geometry;
+
+				while (repeats--) {
+					smooth = new THREE.SubdivisionGeometry(smooth);
+				}
+
+				return smooth;
+			};
+
+			
 			init();
 			animate();
 			
@@ -77,10 +93,10 @@
 				info.innerHTML = 'Drag to spin the geometry ';
 				container.appendChild( info );
 
-				camera = new THREE.Camera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.y = 150;
 				camera.position.z = 500;
-				camera.target.position.y = 150;
+				//camera.target.position.y = 150;
 
 				scene = new THREE.Scene();
 
@@ -97,6 +113,10 @@
 
 				}
 				
+				var modifier = new THREE.SubdivisionModifier( 3 );
+				
+				
+				
 				var createGeometry = function(i, subdivisions) {
 					var params = geometriesParams[i];
 					
@@ -106,8 +126,9 @@
 					geometry = createSomething(THREE[params.type], params.args);
 					
 					geometry.mergeVertices();
-					smooth = THREE.GeometryUtils.createSubdivision(geometry, subdivisions);
-					return smooth;
+					//smooth = createSubdivision(geometry, subdivisions);
+					modifier.modify( geometry );
+					return geometry;
 				};
 				
 				
@@ -128,7 +149,8 @@
 				
 				];
 				
-				smooth = createGeometry(0, 3);
+				smooth = createGeometry(3, 2);
+				
 				
 				//geometry = new THREE.CubeGeometry( 200, 200, 200, 2, 2, 2, materials );
 				// make sure mergeVertices(); is run to fix quick duplicated vertices
