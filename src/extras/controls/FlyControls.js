@@ -2,11 +2,14 @@
  * @author James Baicoianu / http://www.baicoianu.com/
  */
 
-THREE.FlyControls = function ( object ) {
+THREE.FlyControls = function ( object, domElement ) {
 
 	this.object = object;
 
-	this.tmpQuaternion = new THREE.Quaternion();
+	this.domElement = ( domElement !== undefined ) ? domElement : document;
+	if ( domElement ) this.domElement.setAttribute( 'tabindex', -1 );
+
+	// API
 
 	this.movementSpeed = 1.0;
 	this.rollSpeed = 0.005;
@@ -14,9 +17,13 @@ THREE.FlyControls = function ( object ) {
 	this.dragToLook = false;
 	this.autoForward = false;
 
-	this.domElement = document;
+	// disable default target object behavior
 
-	this.useQuaternion = true;
+	this.object.useQuaternion = true;
+
+	// internals
+
+	this.tmpQuaternion = new THREE.Quaternion();
 
 	this.mouseStatus = 0;
 
@@ -26,12 +33,6 @@ THREE.FlyControls = function ( object ) {
 
 	this.lastUpdate = -1;
 	this.tdiff = 0;
-
-	if ( this.domElement === document ) {
-
-	} else {
-		this.domElement.setAttribute( 'tabindex', -1 );
-	}
 
 	this.handleEvent = function ( event ) {
 
@@ -111,10 +112,12 @@ THREE.FlyControls = function ( object ) {
 
 	};
 
-	this.mousedown = function(event) {
+	this.mousedown = function( event ) {
 
 		if ( this.domElement !== document ) {
+
 			this.domElement.focus();
+
 		}
 
 		event.preventDefault();
@@ -199,11 +202,10 @@ THREE.FlyControls = function ( object ) {
 		this.tmpQuaternion.set( this.rotationVector.x * rotMult, this.rotationVector.y * rotMult, this.rotationVector.z * rotMult, 1 ).normalize();
 		this.object.quaternion.multiplySelf( this.tmpQuaternion );
 
-		this.object.matrix.setPosition( this.position );
-		this.object.matrix.setRotationFromQuaternion( this.quaternion );
+		this.object.matrix.setPosition( this.object.position );
+		this.object.matrix.setRotationFromQuaternion( this.object.quaternion );
 		this.object.matrixWorldNeedsUpdate = true;
 
-		this.supr.update.call( this );
 
 	};
 
@@ -235,14 +237,14 @@ THREE.FlyControls = function ( object ) {
 
 			return {
 				size	: [ this.domElement.offsetWidth, this.domElement.offsetHeight ],
-				offset	: [ this.domElement.offsetLeft,  this.domElement.offsetTop ] 
+				offset	: [ this.domElement.offsetLeft,  this.domElement.offsetTop ]
 			};
 
 		} else {
 
 			return {
 				size	: [ window.innerWidth, window.innerHeight ],
-				offset	: [ 0, 0 ] 
+				offset	: [ 0, 0 ]
 			};
 
 		}

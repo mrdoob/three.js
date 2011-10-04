@@ -4,10 +4,12 @@
  * @author paulirish / http://paulirish.com/
  */
 
-THREE.FirstPersonControls = function ( object ) {
+THREE.FirstPersonControls = function ( object, domElement ) {
 
 	this.object = object;
 	this.target = new THREE.Vector3( 0, 0, 0 );
+
+	this.domElement = ( domElement !== undefined ) ? domElement : document;
 
 	this.movementSpeed = 1.0;
 	this.lookSpeed = 0.005;
@@ -25,8 +27,6 @@ THREE.FirstPersonControls = function ( object ) {
 	this.constrainVertical = false;
 	this.verticalMin = 0;
 	this.verticalMax = Math.PI;
-
-	this.domElement = document;
 
 	this.lastUpdate = new Date().getTime();
 	this.tdiff = 0;

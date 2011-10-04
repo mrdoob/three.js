@@ -102,7 +102,7 @@
 
 		function init() {
 
-			camera = new THREE.Camera( 30, WIDTH / HEIGHT, 1, 10000 );
+			camera = new THREE.PerspectiveCamera( 30, WIDTH / HEIGHT, 1, 10000 );
 			camera.position.z = 300;
 
 			scene = new THREE.Scene();

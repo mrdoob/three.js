@@ -34,7 +34,7 @@
 		<div id="container"></div>
 		<div id="info">
 			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - trackball camera example</br>
-			MOVE mouse & press LEFT/A: rotate, MIDDLE/S: zoom, RIGHT/D: pan
+			MOVE mouse &amp; press LEFT/A: rotate, MIDDLE/S: zoom, RIGHT/D: pan
 		</div>
 
 		<script src="../build/Three.js"></script>
@@ -42,7 +42,7 @@
 		<script src="js/Stats.js"></script>
 
 		<script>
-		
+
 			var statsEnabled = true;
 
 			var container, stats;
@@ -62,7 +62,7 @@
 
 				camera = new THREE.TrackballCamera({
 
-					fov: 60, 
+					fov: 60,
 					aspect: window.innerWidth / window.innerHeight,
 					near: 1,
 					far: 1e3,
@@ -86,52 +86,26 @@
 				// world
 
 				var cube = new THREE.CubeGeometry( 20, 60, 20 );
-				
+
 				cube.vertices[ 0 ].position.multiplyScalar( 0.01 );
 				cube.vertices[ 1 ].position.multiplyScalar( 0.01 );
 				cube.vertices[ 4 ].position.multiplyScalar( 0.01 );
 				cube.vertices[ 5 ].position.multiplyScalar( 0.01 );
-				
+
 				var material =  new THREE.MeshLambertMaterial( { color:0xffffff } );
 
 				for( var i = 0; i < 500; i++ ) {
-					
+
 					var mesh = new THREE.Mesh( cube, material );
 					mesh.position.set(( Math.random() - 0.5 ) * 1000,
 									  ( Math.random() - 0.5 ) * 1000,
 									  ( Math.random() - 0.5 ) * 1000 );
-									  
+
 					mesh.updateMatrix();
 					mesh.matrixAutoUpdate = false;
 					scene.add( mesh );
-					
+
 				}
-
-
-				// create cross
-
-				/*
-				cross = new THREE.Object3D();
-				cross.scale.set( 0.5, 0.5, 0.5 );
-				cross.matrixAutoUpdate = false;
-
-				var material = new THREE.MeshPhongMaterial( { color:0xff0000 } );
-				var mesh = new THREE.Mesh( new THREE.Cube( 40, 5, 5 ), material );
-				mesh.position.x = 20;
-				cross.add( mesh );
-
-				var material = new THREE.MeshPhongMaterial( { color:0x00ff00 } );
-				var mesh = new THREE.Mesh( new THREE.Cube( 5, 40, 5 ), material );
-				mesh.position.y = 20;
-				cross.add( mesh );
-
-				var material = new THREE.MeshPhongMaterial( { color:0x0000ff } );
-				var mesh = new THREE.Mesh( new THREE.Cube( 5, 5, 40 ), material );
-				mesh.position.z = 20;
-
-				cross.add( mesh );
-				camera.add( cross );
-				*/
 
 
 				// lights
@@ -173,14 +147,6 @@
 
 
 			function loop() {
-
-				/*
-				cross.matrix.copy( camera.matrix );
-				cross.matrix.n14 = 0;
-				cross.matrix.n24 = 0;
-				cross.matrix.n34 = -200;
-				cross.matrixWorldNeedsUpdate = true;
-				*/
 
 				renderer.render( scene, camera );
 

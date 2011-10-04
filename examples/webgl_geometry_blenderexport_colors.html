@@ -62,15 +62,13 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.Camera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 1800;
-				camera.useTarget = true;
 
 				scene = new THREE.Scene();
 
 				light = new THREE.DirectionalLight( 0xffffff );
-				light.position.set( 0, 0, 1 );
-				light.position.normalize();
+				light.position.set( 0, 0, 1 ).normalize();
 				scene.add( light );
 
 				var loader = new THREE.JSONLoader();
@@ -140,13 +138,16 @@
 				camera.position.x += ( mouseX - camera.position.x ) * 0.05;
 				camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
 
+				camera.lookAt( scene.position );
+
 				if ( mesh ) {
 
 					mesh.rotation.x += 0.01;
 					mesh.rotation.y += 0.01;
 				}
-				
+
 				if ( mesh2 ) {
+
 					mesh2.rotation.x += 0.01;
 					mesh2.rotation.y += 0.01;
 

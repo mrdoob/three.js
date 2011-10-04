@@ -3,9 +3,10 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.RollControls = function ( object ) {
+THREE.RollControls = function ( object, domElement ) {
 
 	this.object = object;
+	this.domElement = ( domElement !== undefined ) ? domElement : document;
 
 	// API
 
@@ -18,12 +19,9 @@ THREE.RollControls = function ( object ) {
 
 	this.constrainVertical = [ -0.9, 0.9 ];
 
-	this.domElement = document;
+	// disable default target object behavior
 
-	// disable default camera behavior
-
-	this.useTarget = false;
-	this.matrixAutoUpdate = false;
+	this.object.matrixAutoUpdate = false;
 
 	// internals
 
@@ -68,9 +66,9 @@ THREE.RollControls = function ( object ) {
 		var actualSpeed = this.delta * this.movementSpeed;
 		var forwardOrAuto = ( forwardSpeed > 0 || ( this.autoForward && ! ( forwardSpeed < 0 ) ) ) ? 1 : forwardSpeed;
 
-		this.translateZ( actualSpeed * forwardOrAuto );
-		this.translateX( actualSpeed * sideSpeed );
-		this.translateY( actualSpeed * upSpeed );
+		this.object.translateZ( -actualSpeed * forwardOrAuto );
+		this.object.translateX( actualSpeed * sideSpeed );
+		this.object.translateY( actualSpeed * upSpeed );
 
 		if( doRoll ) {
 
@@ -101,9 +99,9 @@ THREE.RollControls = function ( object ) {
 		xTemp.cross( yTemp, zTemp ).normalize();
 		yTemp.cross( zTemp, xTemp ).normalize();
 
-		this.matrix.n11 = xTemp.x; this.matrix.n12 = yTemp.x; this.matrix.n13 = zTemp.x;
-		this.matrix.n21 = xTemp.y; this.matrix.n22 = yTemp.y; this.matrix.n23 = zTemp.y;
-		this.matrix.n31 = xTemp.z; this.matrix.n32 = yTemp.z; this.matrix.n33 = zTemp.z;
+		this.object.matrix.n11 = xTemp.x; this.object.matrix.n12 = yTemp.x; this.object.matrix.n13 = zTemp.x;
+		this.object.matrix.n21 = xTemp.y; this.object.matrix.n22 = yTemp.y; this.object.matrix.n23 = zTemp.y;
+		this.object.matrix.n31 = xTemp.z; this.object.matrix.n32 = yTemp.z; this.object.matrix.n33 = zTemp.z;
 
 		// calculate roll matrix
 
@@ -113,42 +111,39 @@ THREE.RollControls = function ( object ) {
 
 		// multiply camera with roll
 
-		this.matrix.multiplySelf( rollMatrix );
-		this.matrixWorldNeedsUpdate = true;
+		this.object.matrix.multiplySelf( rollMatrix );
+		this.object.matrixWorldNeedsUpdate = true;
 
 		// set position
 
-		this.matrix.n14 = this.position.x;
-		this.matrix.n24 = this.position.y;
-		this.matrix.n34 = this.position.z;
+		this.object.matrix.n14 = this.object.position.x;
+		this.object.matrix.n24 = this.object.position.y;
+		this.object.matrix.n34 = this.object.position.z;
 
-		// call supr
-
-		this.supr.update.call( this );
 
 	};
 
 	this.translateX = function ( distance ) {
 
-		this.position.x += this.matrix.n11 * distance;
-		this.position.y += this.matrix.n21 * distance;
-		this.position.z += this.matrix.n31 * distance;
+		this.object.position.x += this.object.matrix.n11 * distance;
+		this.object.position.y += this.object.matrix.n21 * distance;
+		this.object.position.z += this.object.matrix.n31 * distance;
 
 	};
 
 	this.translateY = function ( distance ) {
 
-		this.position.x += this.matrix.n12 * distance;
-		this.position.y += this.matrix.n22 * distance;
-		this.position.z += this.matrix.n32 * distance;
+		this.object.position.x += this.object.matrix.n12 * distance;
+		this.object.position.y += this.object.matrix.n22 * distance;
+		this.object.position.z += this.object.matrix.n32 * distance;
 
 	};
 
 	this.translateZ = function ( distance ) {
 
-		this.position.x -= this.matrix.n13 * distance;
-		this.position.y -= this.matrix.n23 * distance;
-		this.position.z -= this.matrix.n33 * distance;
+		this.object.position.x -= this.object.matrix.n13 * distance;
+		this.object.position.y -= this.object.matrix.n23 * distance;
+		this.object.position.z -= this.object.matrix.n33 * distance;
 
 	};
 
@@ -157,7 +152,7 @@ THREE.RollControls = function ( object ) {
 
 		// please note that the amount is NOT degrees, but a scale value
 
-		xTemp.set( this.matrix.n11, this.matrix.n21, this.matrix.n31 );
+		xTemp.set( this.object.matrix.n11, this.object.matrix.n21, this.object.matrix.n31 );
 		xTemp.multiplyScalar( amount );
 
 		this.forward.subSelf( xTemp );
@@ -169,7 +164,7 @@ THREE.RollControls = function ( object ) {
 
 		// please note that the amount is NOT degrees, but a scale value
 
-		yTemp.set( this.matrix.n12, this.matrix.n22, this.matrix.n32 );
+		yTemp.set( this.object.matrix.n12, this.object.matrix.n22, this.object.matrix.n32 );
 		yTemp.multiplyScalar( amount );
 
 		this.forward.addSelf( yTemp );
@@ -270,6 +265,6 @@ THREE.RollControls = function ( object ) {
 	this.domElement.addEventListener( 'mousedown', onMouseDown, false );
 	this.domElement.addEventListener( 'mouseup', onMouseUp, false );
 	this.domElement.addEventListener( 'keydown', onKeyDown, false );
-	this.domElement.addEventListener( 'keyup', onKeyUp, false );	
+	this.domElement.addEventListener( 'keyup', onKeyUp, false );
 
 };

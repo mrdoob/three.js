@@ -55,9 +55,8 @@
 
 				info = document.getElementById("info");
 
-				camera = new THREE.Camera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.y = 120;
-				camera.useTarget = true;
 
 				mouse2d = new THREE.Vector3( 0, 0, 1 );
 
@@ -85,10 +84,9 @@
 
 				loadCube();
 
-
-
 				container.onmousemove = onDocumentMouseMove;
 				animate();
+
 			}
 
 			function loadCube(p) {
@@ -109,6 +107,7 @@
 			}
 
 			function animate() {
+
 				requestAnimationFrame( animate );
 
 				ray.origin.x = radius * Math.cos(theta);
@@ -124,7 +123,7 @@
 
 				theta += speed;
 
-				camera.target.position.copy( sphere.position );
+				camera.lookAt( sphere.position );
 
 				renderer.render( scene, camera );
 			}

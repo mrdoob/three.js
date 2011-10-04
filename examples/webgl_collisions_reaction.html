@@ -61,13 +61,10 @@
 
 				info = document.getElementById("info");
 
-				camera = new THREE.Camera(40, window.innerWidth / window.innerHeight, 1, 10000);
-				camera.position.y = 120;
-				camera.position.x = 300;
-				camera.position.z = 0;
-				camera.useTarget = true;
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.set( 300, 120, 0 );
 
-				mouse2d = new THREE.Vector3(0, 0, 1);
+				mouse2d = new THREE.Vector3( 0, 0, 1 );
 
 				loader = new THREE.Loader(true);
 
@@ -114,8 +111,10 @@
 				cube.position = p;
 				cube.rotation.y = ry;
 				scene.add(cube);
+
 				THREE.Collisions.colliders.push( THREE.CollisionUtils.MeshOBB(cube) );
 				cubes.push(cube);
+
 				return cube;
 
 			}
@@ -129,45 +128,46 @@
 
 			}
 
-			function animate(){
+			function animate() {
 
-				requestAnimationFrame(animate);
+				requestAnimationFrame( animate );
 
-				for (var i = 0; i < cubes.length; i++) {
-					cubes[i].materials[0].color = new THREE.Color(0x003300);
-				}
-
-				var ray = new THREE.Ray( sphere.position, new THREE.Vector3(0,0,1) );
+				var ray = new THREE.Ray( sphere.position, new THREE.Vector3( 0, 0, 1 ) );
 
 				//debugNormal.position = sphere.position;
 
+				var c = THREE.Collisions.rayCastNearest( ray );
 
+				if ( !c || c.distance > speed ) {
 
-				var c = THREE.Collisions.rayCastNearest(ray);
-
-				if (!c || c.distance > speed) {
 					sphere.position.z += speed;
+
 				}
 
-				if(c && c.normal) {
-					info.innerHTML = vts(c.normal);
+				if( c && c.normal ) {
+
+					info.innerHTML = vts( c.normal );
+
 					var poi = ray.origin.clone().addSelf( ray.direction.clone().multiplyScalar( c.distance ) );
-					debugNormal.geometry.vertices[0].position = poi.clone().addSelf( new THREE.Vector3(2,2,2) );
+					debugNormal.geometry.vertices[0].position = poi.clone().addSelf( new THREE.Vector3( 2, 2, 2 ) );
 					debugNormal.geometry.vertices[1].position = poi.clone().addSelf( c.normal.clone() );
+
 				}
 
-				if (sphere.position.z > range) sphere.position = new THREE.Vector3(0,0,0);
+				if ( sphere.position.z > range ) sphere.position.set( 0, 0, 0);
 
 				camera.position.x = Math.cos(mouse2d.x * Math.PI) * 300;
 				camera.position.y = Math.cos(mouse2d.y * Math.PI) * 300;
 				camera.position.z = 200 + Math.sin(mouse2d.x * Math.PI) * 300 +  Math.sin(mouse2d.y * Math.PI) * 300;
 
-				renderer.render(scene, camera);
+				camera.lookAt( scene.position );
+
+				renderer.render( scene, camera );
 
 			}
 
 			function vts(v) {
-			
+
 				if (!v)
 					return "undefined<br>";
 				else

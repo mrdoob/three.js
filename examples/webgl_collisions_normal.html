@@ -1,10 +1,10 @@
 <!doctype html>
 <html lang="en">
-	<head> 
-		<title>three.js webgl - intersection: ray/mesh readinf normal</title> 
+	<head>
+		<title>three.js webgl - intersection: ray/mesh readinf normal</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style> 
+		<style>
 			body {
 				font-family: Monospace;
 				background-color: #f0f0f0;
@@ -37,11 +37,11 @@
 			}
 		</style>
 
-		<script src="../build/Three.js"></script> 
+		<script src="../build/Three.js"></script>
 		<script src="js/RequestAnimationFrame.js"></script>
 		<script src="js/Stats.js"></script>
 
-		<script> 
+		<script>
 
 			var camera, scene, projector, renderer,
 			info, mouse = { x: 0, y: 0 }, sun, loader, stats, line;
@@ -60,9 +60,8 @@
 
 				info = document.getElementById("info");
 
-				camera = new THREE.Camera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = camdist;
-				camera.useTarget = true;
 
 				loader = new THREE.JSONLoader(  );
 
@@ -102,15 +101,15 @@
 
 			}
 
-			function loadCube(p) {
+			function loadCube( p ) {
 
-				var onGeometry = function( geometry ) {	
+				var onGeometry = function( geometry ) {
 
 					var sx = 300;
 					var sy = 240;
 					var sz = 300;
 
-					addCube( new THREE.Vector3(	0,	0,	0), geometry );
+					addCube( new THREE.Vector3(	0, 0, 0 ), geometry );
 
 				};
 
@@ -135,7 +134,7 @@
 
 			function onDocumentMouseMove( event ) {
 
-				event.preventDefault();	
+				event.preventDefault();
 				mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
 				mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
@@ -171,7 +170,7 @@
 					var poi = ray.origin.clone().addSelf( ray.direction.clone().multiplyScalar(c.distance) );
 					line.geometry.vertices[0].position = poi;
 					line.geometry.vertices[1].position = poi.clone().addSelf(c.normal.multiplyScalar(100));
-					line.geometry.__dirtyVertices = true; 
+					line.geometry.__dirtyVertices = true;
 					line.geometry.__dirtyElements = true;
 
 					c.mesh.materials[ 0 ].color.setHex( 0xbb0000 );
@@ -184,7 +183,9 @@
 
 				camera.position.x = camdist * Math.cos( theta );
 				camera.position.z = camdist * Math.sin( theta );
-				camera.position.y = camdist/2 * Math.sin( theta * 2) ;
+				camera.position.y = camdist/2 * Math.sin( theta * 2 );
+
+				camera.lookAt( scene.position );
 
 				sun.position.copy( camera.position );
 				sun.position.normalize();
@@ -206,11 +207,11 @@
 
 		</script>
 
-	</head> 
+	</head>
 
-	<body onload="init();"> 
+	<body onload="init();">
 		<div id="info"></div>
 		<div id="options"></div>
-	</body> 
+	</body>
 
-</html> 
+</html>
