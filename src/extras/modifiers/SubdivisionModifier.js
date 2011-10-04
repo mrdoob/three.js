@@ -331,14 +331,10 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 			hashAB = edge_hash( face.a, face.b );
 			hashBC = edge_hash( face.b, face.c );
 			hashCA = edge_hash( face.c, face.a );
-
 			
 			f4( currentVerticeIndex, edgePoints[hashAB], face.b, edgePoints[hashBC], face, ['123', '12', '2', '23'] );
 			f4( currentVerticeIndex, edgePoints[hashBC], face.c, edgePoints[hashCA], face, ['123', '23', '3', '31'] );
 			f4( currentVerticeIndex, edgePoints[hashCA], face.a, edgePoints[hashAB], face, ['123', '31', '1', '12'] );
-			// face subdivide color and materials too? 
-			
-			
 			
 		} else if ( face instanceof THREE.Face4 ) {
 			// create 4 face4s
@@ -349,7 +345,7 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 			hashDA = edge_hash( face.d, face.a );
 			
 			f4( currentVerticeIndex, edgePoints[hashAB], face.b, edgePoints[hashBC], face, ['1234', '12', '2', '23']  );
-			f4( currentVerticeIndex, edgePoints[hashBC], face.c, edgePoints[hashCD], face, ['1234', '13', '3', '34']  );
+			f4( currentVerticeIndex, edgePoints[hashBC], face.c, edgePoints[hashCD], face, ['1234', '23', '3', '34']  );
 			f4( currentVerticeIndex, edgePoints[hashCD], face.d, edgePoints[hashDA], face, ['1234', '34', '4', '41']  );
 			f4( currentVerticeIndex, edgePoints[hashDA], face.a, edgePoints[hashAB], face, ['1234', '41', '1', '12']  );
 

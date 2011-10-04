@@ -152,10 +152,10 @@
 				
 				info.innerHTML = 'Drag to spin the geometry THREE.' + params.type
 				 	+ ' with ' + modifier.subdivisions + ' subdivisions'  + 
-					'<br/>Subdivision <a href="#" onclick="nextSubdivision(1); return false;">+</a>/<a href="#" onclick="nextSubdivision(-1); return false;">-</a>' + 
+					'<br/>Subdivisions: <a href="#" onclick="nextSubdivision(1); return false;">more</a> / <a href="#" onclick="nextSubdivision(-1); return false;">less</a>' + 
 					'<br/>Geometry: <a href="#" onclick="nextGeometry();return false;">next</a>' +
-					'<br/>vertices count: before ' + geometry.vertices.length + ' after ' + smooth.vertices.length +
-					'<br/>face count: before ' + geometry.faces.length + ' after ' + smooth.faces.length
+					'<br/>Vertices count: before ' + geometry.vertices.length + ' after ' + smooth.vertices.length +
+					'<br/>Face count: before ' + geometry.faces.length + ' after ' + smooth.faces.length
 				; //+ params.args;
 				
 				var faceABCD = "abcd";
@@ -190,49 +190,62 @@
 				group.position.y = 150;
 				scene.add( group );
 
+
+				var debugNewPoints = false;
+				var debugOldPoints = false;
+				
 				// Debug new Points
-				// var PI2 = Math.PI * 2;
-				// var program = function ( context ) {
-				// 
-				// 	context.beginPath();
-				// 	context.arc( 0, 0, 1, 0, PI2, true );
-				// 	context.closePath();
-				// 	context.fill();
-				// 
-				// }
-				// 
-				// for ( var i = 0; i < smooth.vertices.length; i++ ) {
-				// 
-				// 	particle = new THREE.Particle( new THREE.ParticleCanvasMaterial( { color: Math.random() * 0x808008 + 0x808080, program: program } ) );
-				// 	particle.position = smooth.vertices[i].position;
-				// 	var pos = smooth.vertices.position
-				// 	particle.scale.x = particle.scale.y = 5;
-				// 	group.add( particle );
-				// }
+				
+				if (debugNewPoints) {
+					var PI2 = Math.PI * 2;
+					var program = function ( context ) {
+			
+						context.beginPath();
+						context.arc( 0, 0, 1, 0, PI2, true );
+						context.closePath();
+						context.fill();
+			
+					}
+			
+					for ( var i = 0; i < smooth.vertices.length; i++ ) {
+			
+						particle = new THREE.Particle( new THREE.ParticleCanvasMaterial( { color: Math.random() * 0x808008 + 0x808080, program: program } ) );
+						particle.position = smooth.vertices[i].position;
+						var pos = smooth.vertices.position
+						particle.scale.x = particle.scale.y = 5;
+						group.add( particle );
+					}
+				
+				}
+				
 				
 				//Debug original points
 				
-				// var drawText = function(i) {
-				// 	
-				// 	return function ( context ) {
-				// 
-				// 		context.beginPath();
-				// 		context.scale(0.1,-0.1);
-				// 
-				// 		context.fillText(i, 0,0);
-				// 		
-				// 	};
-				// 						
-				// }
-				// for ( var i = 0; i < geometry.vertices.length; i++ ) {
-				// 
-				// 	particle = new THREE.Particle( new THREE.ParticleCanvasMaterial( { color: Math.random() * 0x808008 + 0x808080, program: drawText(i) } ) );
-				// 	particle.position = smooth.vertices[i].position;
-				// 	var pos = geometry.vertices.position
-				// 	particle.scale.x = particle.scale.y = 30;
-				// 	group.add( particle );
-				// }
-				// 
+				if (debugOldPoints) {
+					
+					var drawText = function(i) {
+					
+						return function ( context ) {
+				
+							context.beginPath();
+							context.scale(0.1,-0.1);
+				
+							context.fillText(i, 0,0);
+						
+						};
+										
+					}
+					
+					for ( var i = 0; i < geometry.vertices.length; i++ ) {
+				
+						particle = new THREE.Particle( new THREE.ParticleCanvasMaterial( { color: Math.random() * 0x808008 + 0x808080, program: drawText(i) } ) );
+						particle.position = smooth.vertices[i].position;
+						var pos = geometry.vertices.position
+						particle.scale.x = particle.scale.y = 30;
+						group.add( particle );
+					}
+				}
+				
 
 				var meshmaterials = [
 				 	// new THREE.MeshBasicMaterial( { color: 0x000000, shading: THREE.FlatShading, wireframe: true } )
@@ -246,7 +259,7 @@
 				// new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.FlatShading } );
 				// new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.SmoothShading } );
 
-				 cube = new THREE.Mesh( smooth, meshmaterials ); 
+				cube = new THREE.Mesh( smooth, meshmaterials ); 
 	
 				var toscale =  params.scale ? params.scale : 1;
 				cube.scale.x = toscale;
