@@ -32,7 +32,7 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 	
 	var repeats = this.subdivisions;
 	
-	while ( repeats-- ) {
+	while ( repeats-- > 0 ) {
 		this.smooth( geometry );
 	}
 	
@@ -52,10 +52,39 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 	
 	var scope = this;
 
-	function f4( a, b, c, d, oldFace ) {
+	function f4( a, b, c, d, oldFace, orders ) {
+		
+		// TODO move vertex selection over here!
 		
 		var newFace = new THREE.Face4( a, b, c, d, null, oldFace.color, oldFace.material );
-		if (scope.useOldVertexColors) newFace.vertexColors = oldFace.vertexColors;
+		
+		if (scope.useOldVertexColors) {
+			
+			newFace.vertexColors = []; 
+			
+			var color, tmpColor, order;
+			for (var i=0;i<4;i++) {
+				order = orders[i];
+				
+				color = new THREE.Color(),
+				color.setRGB(0,0,0);
+				
+				for (var j=0, jl=0; j<order.length;j++) {
+					tmpColor = oldFace.vertexColors[order[j]-1];
+					color.r += tmpColor.r;
+					color.g += tmpColor.g;
+					color.b += tmpColor.b;
+				}
+				
+				color.r /= order.length;
+				color.g /= order.length;
+				color.b /= order.length;
+				
+				newFace.vertexColors[i] = color;
+				
+			}
+			
+		}
 		
 		newFaces.push( newFace );
 		
@@ -230,27 +259,34 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 		faceIndexA = edge[0]; // face index a
 		faceIndexB = edge[1]; // face index b
 		
+		edgeVertex = i.split('_');
+		edgeVertexA = edgeVertex[0];
+		edgeVertexB = edgeVertex[1];
+		
+		
 		avg = new THREE.Vector3();
 		
 		//console.log(i, faceIndexB,facePoints[faceIndexB]);
 		
 		if (edge.length!=2) {
-			console.log('warning, edge fail', edge);
-			continue;
+			//console.log('warning, ', i, 'edge has only 1 connecting face', edge);
+			
+			avg.addSelf(originalPoints[edgeVertexA].position);
+			avg.addSelf(originalPoints[edgeVertexB].position);
+			
+			avg.multiplyScalar(0.5);
+			
+		} else {
+		
+			avg.addSelf(facePoints[faceIndexA]);
+			avg.addSelf(facePoints[faceIndexB]);
+		
+			avg.addSelf(originalPoints[edgeVertexA].position);
+			avg.addSelf(originalPoints[edgeVertexB].position);
+		
+			avg.multiplyScalar(0.25);
+		
 		}
-		
-		avg.addSelf(facePoints[faceIndexA]);
-		avg.addSelf(facePoints[faceIndexB]);
-		
-		
-		edgeVertex = i.split('_');
-		edgeVertexA = edgeVertex[0];
-		edgeVertexB = edgeVertex[1];
-		
-		avg.addSelf(originalPoints[edgeVertexA].position);
-		avg.addSelf(originalPoints[edgeVertexB].position);
-		
-		avg.multiplyScalar(0.25);
 		
 		edgePoints[i] = originalVerticesLength + originalFaces.length + edgeCount;
 		
@@ -297,9 +333,9 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 			hashCA = edge_hash( face.c, face.a );
 
 			
-			f4( currentVerticeIndex, edgePoints[hashAB], face.b, edgePoints[hashBC], face );
-			f4( currentVerticeIndex, edgePoints[hashBC], face.c, edgePoints[hashCA], face );
-			f4( currentVerticeIndex, edgePoints[hashCA], face.a, edgePoints[hashAB], face );
+			f4( currentVerticeIndex, edgePoints[hashAB], face.b, edgePoints[hashBC], face, ['123', '12', '2', '23'] );
+			f4( currentVerticeIndex, edgePoints[hashBC], face.c, edgePoints[hashCA], face, ['123', '23', '3', '31'] );
+			f4( currentVerticeIndex, edgePoints[hashCA], face.a, edgePoints[hashAB], face, ['123', '31', '1', '12'] );
 			// face subdivide color and materials too? 
 			
 			
@@ -312,10 +348,10 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 			hashCD = edge_hash( face.c, face.d );
 			hashDA = edge_hash( face.d, face.a );
 			
-			f4( currentVerticeIndex, edgePoints[hashAB], face.b, edgePoints[hashBC], face );
-			f4( currentVerticeIndex, edgePoints[hashBC], face.c, edgePoints[hashCD], face );
-			f4( currentVerticeIndex, edgePoints[hashCD], face.d, edgePoints[hashDA], face );
-			f4( currentVerticeIndex, edgePoints[hashDA], face.a, edgePoints[hashAB], face );
+			f4( currentVerticeIndex, edgePoints[hashAB], face.b, edgePoints[hashBC], face, ['1234', '12', '2', '23']  );
+			f4( currentVerticeIndex, edgePoints[hashBC], face.c, edgePoints[hashCD], face, ['1234', '13', '3', '34']  );
+			f4( currentVerticeIndex, edgePoints[hashCD], face.d, edgePoints[hashDA], face, ['1234', '34', '4', '41']  );
+			f4( currentVerticeIndex, edgePoints[hashDA], face.a, edgePoints[hashAB], face, ['1234', '41', '1', '12']  );
 
 				
 		} else {
@@ -372,9 +408,12 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 		faceIndexB = edge[1]; // face index b
 		
 		addVertexFaceMap(edgeVertexA, faceIndexA);
-		addVertexFaceMap(edgeVertexA, faceIndexB);
+		if (faceIndexB) addVertexFaceMap(edgeVertexA, faceIndexB);
+		else addVertexFaceMap(edgeVertexA, faceIndexA);
+		
 		addVertexFaceMap(edgeVertexB, faceIndexA);
-		addVertexFaceMap(edgeVertexB, faceIndexB);
+		if (faceIndexB) addVertexFaceMap(edgeVertexB, faceIndexB);
+		else addVertexFaceMap(edgeVertexB, faceIndexA);
 		
 	}
 	
