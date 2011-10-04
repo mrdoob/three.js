@@ -108,7 +108,6 @@ EXTRAS_FILES = [
 'extras/geometries/CubeGeometry.js',
 'extras/geometries/CylinderGeometry.js',
 'extras/geometries/ExtrudeGeometry.js',
-'extras/geometries/SubdivisionGeometry.js',
 'extras/geometries/IcosahedronGeometry.js',
 'extras/geometries/LatheGeometry.js',
 'extras/geometries/OctahedronGeometry.js',

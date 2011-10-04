@@ -37,7 +37,7 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 // Performs an iteration of Catmull-Clark Subdivision
 THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 	
-	console.log( 'running smooth' );
+	//console.log( 'running smooth' );
 	
 	// New set of vertices, faces and uvs
 	var newVertices = [], newFaces = [], newUVs = [];
@@ -73,12 +73,11 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 
 			if ( map[ hash ] === undefined ) {
 
-				map[ hash ] = { "set": {}, "array": [] };
+				map[ hash ] = [];
 				
 			} 
 			
-			map[ hash ].set[ i ] = 1;
-			map[ hash ].array.push( i );
+			map[ hash ].push( i );
 
 		};
 
@@ -107,14 +106,6 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 
 			} else if ( face instanceof THREE.Face4 ) {
 
-				// in WebGLRenderer quad is tesselated
-				// to triangles: a,b,d / b,c,d
-				// shared edge is: b,d
-
-				// add edge B-D only if you wish to slice a face4
-				// hash = edge_hash( face.b, face.d ); 
-				// addToMap( vfMap, hash, i );
-
 				hash = edge_hash( face.a, face.b );
 				addToMap( vfMap, hash, i );
 
@@ -133,18 +124,16 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 
 		// extract faces
 		
-	
-		geometry.vfMap = vfMap;
-		geometry.edges = [];
-		
-		var numOfEdges = 0;
-		for (i in vfMap) {
-			numOfEdges++;
-			
-			edge = vfMap[i];
-			geometry.edges.push(edge.array);
-			
-		}
+		// var edges = [];
+		// 
+		// var numOfEdges = 0;
+		// for (i in vfMap) {
+		// 	numOfEdges++;
+		// 	
+		// 	edge = vfMap[i];
+		// 	edges.push(edge);
+		// 	
+		// }
 		
 		//console.log('vfMap', vfMap, 'geometry.edges',geometry.edges, 'numOfEdges', numOfEdges);
 
@@ -224,14 +213,13 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 	var edge, faceIndexA, faceIndexB, avg;
 	
 	//console.log('vfMap', vfMap);
-	
-	var edgeInfo;
+
 	var edgeCount = 0;
 	var originalVerticesLength = originalPoints.length;
 	var edgeVertex, edgeVertexA, edgeVertexB;
 	for (i in vfMap) {
-		edgeInfo = vfMap[i];
-		edge = edgeInfo.array;
+		edge = vfMap[i];
+		
 		faceIndexA = edge[0]; // face index a
 		faceIndexB = edge[1]; // face index b
 		
@@ -364,7 +352,7 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 	
 	// Prepares vertexEdgeMap and vertexFaceMap
 	for (i in vfMap) { // This is for every edge
-		edgeInfo = vfMap[i];
+		edge = vfMap[i];
 		
 		edgeVertex = i.split('_');
 		edgeVertexA = edgeVertex[0];
@@ -373,7 +361,6 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 		addVertexEdgeMap(edgeVertexA, [edgeVertexA, edgeVertexB] );
 		addVertexEdgeMap(edgeVertexB, [edgeVertexA, edgeVertexB] );
 		
-		edge = edgeInfo.array;
 		faceIndexA = edge[0]; // face index a
 		faceIndexB = edge[1]; // face index b
 		
