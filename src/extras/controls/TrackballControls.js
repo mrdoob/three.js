@@ -2,7 +2,7 @@
  * @author Eberhard Graether / http://egraether.com/
  */
 
-THREE.TrackballCamera = function ( object ) {
+THREE.TrackballControls = function ( object ) {
 
 	// target.position is modified when panning
 
@@ -358,4 +358,4 @@ THREE.TrackballCamera = function ( object ) {
 
 };
 
-THREE.TrackballCamera.prototype.STATE = { NONE : -1, ROTATE : 0, ZOOM : 1, PAN : 2 };
+THREE.TrackballControls.prototype.STATE = { NONE : -1, ROTATE : 0, ZOOM : 1, PAN : 2 };
