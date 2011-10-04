@@ -4,7 +4,7 @@
  */
 
 THREE.GeometryUtils = {
-
+	
 	merge: function ( geometry1, object2 /* mesh | geometry */ ) {
 
 		var matrix, matrixRotation,

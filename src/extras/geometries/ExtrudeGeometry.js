@@ -54,9 +54,6 @@ THREE.ExtrudeGeometry = function( shapes, options ) {
 	}
 
 
-	// UVs to be added
-	// How can we create UVs on this?
-
 	this.computeCentroids();
 	this.computeFaceNormals();
 
