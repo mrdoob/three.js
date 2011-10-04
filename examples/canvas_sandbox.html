@@ -46,6 +46,8 @@
 			pitchUp = false, pitchDown = false,
 			rollLeft = false, rollRight = false;
 
+			var target = new THREE.Vector3( 0, 150, 0 );
+
 			var debugContext;
 
 			init();
@@ -56,11 +58,9 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.y = 150;
 				camera.position.z = 400;
-				camera.useTarget = true;
-				camera.target.position.y = 150;
 
 				scene = new THREE.Scene();
 
@@ -218,11 +218,13 @@
 				if ( pitchUp ) camera.rotation.x += 0.01;
 				if ( pitchDown ) camera.rotation.x -= 0.01;
 
-				if ( yawLeft ) camera.target.position.x -= 5;
-				if ( yawRight ) camera.target.position.x += 5;
+				if ( yawLeft ) target.x -= 5;
+				if ( yawRight ) target.x += 5;
 
 				if ( rollLeft ) camera.rotation.z += 0.01;
 				if ( rollRight ) camera.rotation.z -= 0.01;
+
+				camera.lookAt( target );
 
 				debugContext.clearRect( -256, -256, 512, 512 );
 
@@ -237,9 +239,9 @@
 				// camera
 
 				debugContext.moveTo( camera.position.x * 0.1, camera.position.z * 0.1 );
-				debugContext.lineTo( camera.target.position.x * 0.1, camera.target.position.z * 0.1 );
+				debugContext.lineTo( target.x * 0.1, target.z * 0.1 );
 				debugContext.rect( camera.position.x * 0.1 - 5, camera.position.z * 0.1 - 5, 10, 10 );
-				debugContext.rect( camera.target.position.x * 0.1 - 5, camera.target.position.z * 0.1 - 5, 10, 10 );
+				debugContext.rect( target.x * 0.1 - 5, target.z * 0.1 - 5, 10, 10 );
 				debugContext.rect( - 50, - 50, 100, 100 );
 
 				for ( var i = 0, l = objects.length; i < l; i++ ) {
