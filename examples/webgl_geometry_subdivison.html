@@ -110,7 +110,7 @@
 
 			function nextSubdivision( x ) {
 
-				subdivisions += x;
+				subdivisions = Math.max( 0, subdivisions + x );
 				addStuff();
 
 			}
@@ -144,22 +144,11 @@
 
 				var params = geometriesParams[ geometryIndex ];
 
-
-				//geometry = new THREE.CubeGeometry( 200, 200, 200, 2, 2, 2, materials );
 				geometry = createSomething( THREE[ params.type ], params.args );
 
 				// Cloning original geometry for debuging
 
-				smooth = geometry;
-
-				if ( subdivisions > 0 ) {
-
-					// Really werid, you get an error after
-					// you clone an object with no subdivisions
-
-					geometry = THREE.GeometryUtils.clone( geometry );
-
-				}
+				smooth = THREE.GeometryUtils.clone( geometry );
 
 				// mergeVertices(); is run in case of duplicated vertices
 				smooth.mergeVertices();
@@ -167,10 +156,10 @@
 
 				info.innerHTML = 'Drag to spin the geometry THREE.' + params.type
 				 	+ ' with ' + modifier.subdivisions + ' subdivisions'  +
-					'<br/>Subdivision <a href="#" onclick="nextSubdivision(1); return false;">+</a>/<a href="#" onclick="nextSubdivision(-1); return false;">-</a>' +
-					'<br/>Geometry: <a href="#" onclick="nextGeometry();return false;">next</a>' +
-					'<br/>vertices count: before ' + geometry.vertices.length + ' after ' + smooth.vertices.length +
-					'<br/>face count: before ' + geometry.faces.length + ' after ' + smooth.faces.length
+					'<br>Subdivision <a href="#" onclick="nextSubdivision(1); return false;">+</a>/<a href="#" onclick="nextSubdivision(-1); return false;">-</a>' +
+					'<br>Geometry: <a href="#" onclick="nextGeometry();return false;">next</a>' +
+					'<br>vertices count: before ' + geometry.vertices.length + ' after ' + smooth.vertices.length +
+					'<br>face count: before ' + geometry.faces.length + ' after ' + smooth.faces.length
 				; //+ params.args;
 
 				var faceABCD = "abcd";
@@ -200,7 +189,7 @@
 
 
 				group = new THREE.Object3D();
-				group.position.y = 150;
+				group.add( new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x0000ff, wireframe: true } ) ) );
 				scene.add( group );
 
 				// Debug new Points
@@ -247,19 +236,9 @@
 				// }
 				//
 
-				var meshmaterials = [
-				 	// new THREE.MeshBasicMaterial( { color: 0x000000, shading: THREE.FlatShading, wireframe: true } )
-					new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors } ),
-					new THREE.MeshBasicMaterial( { color: 0x405040, wireframe:true,  opacity:0.8 } )
-				];
+				var material = new THREE.MeshLambertMaterial( { color: 0xffffff, vertexColors: THREE.VertexColors } );
 
-				// new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors } ),
-				// new THREE.MeshBasicMaterial( { color: 0x000000, shading: THREE.FlatShading, wireframe: true } )
-				// new THREE.MeshFaceMaterial()
-				// new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.FlatShading } );
-				// new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.SmoothShading } );
-
-				 cube = new THREE.Mesh( smooth, meshmaterials );
+				cube = new THREE.Mesh( smooth, material );
 
 				var toscale =  params.scale ? params.scale : 1;
 
@@ -267,9 +246,9 @@
 				cube.scale.y = toscale;
 				cube.scale.z = toscale;
 
-				cube.position.y = 150;
-
 				scene.add( cube );
+
+				group.scale.copy( cube.scale );
 
 			}
 
@@ -287,10 +266,13 @@
 				container.appendChild( info );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
-				camera.position.y = 150;
 				camera.position.z = 500;
 
 				scene = new THREE.Scene();
+
+				var light = new THREE.PointLight( 0xffffff, 1.5 );
+				light.position.set( 1000, 1000, 2000 );
+				scene.add( light );
 
 				addStuff();
 
@@ -387,11 +369,10 @@
 
 			function render() {
 
-				group.rotation.y = cube.rotation.y += ( targetYRotation - cube.rotation.y ) * 0.05;
-				renderer.render( scene, camera );
-
 				group.rotation.x = cube.rotation.x += ( targetXRotation - cube.rotation.x ) * 0.05;
-				//console.log(cube.rotation.x);
+				group.rotation.y = cube.rotation.y += ( targetYRotation - cube.rotation.y ) * 0.05;
+
+				renderer.render( scene, camera );
 
 			}
 

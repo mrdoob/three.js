@@ -142,7 +142,7 @@
 				camera.position.x = radius * Math.sin( theta * Math.PI / 360 );
 				camera.position.y = radius * Math.sin( theta * Math.PI / 360 );
 				camera.position.z = radius * Math.cos( theta * Math.PI / 360 );
-				camera.lookAt( scene.origin );
+				camera.lookAt( scene.position );
 
 				renderer.render( scene, camera );
 

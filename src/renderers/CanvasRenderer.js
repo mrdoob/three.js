@@ -374,7 +374,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 			var l, ll, light, lightColor,
 			lights = scene.lights;
 
-			_ambientLight.setRGB( 0, 0, 0 );
+			_ambientLight.copy( scene.ambientColor );
 			_directionalLights.setRGB( 0, 0, 0 );
 			_pointLights.setRGB( 0, 0, 0 );
 
@@ -383,13 +383,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 				light = lights[ l ];
 				lightColor = light.color;
 
-				if ( light instanceof THREE.AmbientLight ) {
-
-					_ambientLight.r += lightColor.r;
-					_ambientLight.g += lightColor.g;
-					_ambientLight.b += lightColor.b;
-
-				} else if ( light instanceof THREE.DirectionalLight ) {
+				if ( light instanceof THREE.DirectionalLight ) {
 
 					// for particles
 
