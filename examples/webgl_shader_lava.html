@@ -140,7 +140,7 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.Camera( 35, windowHalfX / windowHalfY, 1, 3000 );
+				camera = new THREE.PerspectiveCamera( 35, windowHalfX / windowHalfY, 1, 3000 );
 				camera.position.z = 4;
 
 				scene = new THREE.Scene();

@@ -62,10 +62,10 @@
 			var render_canvas = 1, render_gl = 1;
 			var has_gl = 0;
 
-			var bcanvas = document.getElementById("rcanvas");
-			var bwebgl = document.getElementById("rwebgl");
+			var bcanvas = document.getElementById( "rcanvas" );
+			var bwebgl = document.getElementById( "rwebgl" );
 
-			document.addEventListener('mousemove', onDocumentMouseMove, false);
+			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
 			init();
 			animate();
@@ -76,12 +76,11 @@
 
 			function init() {
 
-				container = document.createElement('div');
-				document.body.appendChild(container);
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
+				camera = new THREE.PerspectiveCamera( 75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
 				camera.position.z = 500;
-				camera.useTarget = true;
 
 				scene = new THREE.Scene();
 
@@ -122,11 +121,15 @@
 				for ( var i = 0; i < 10; i ++ ) {
 
 					mesh = new THREE.Mesh( sphere, material_spheres );
+
 					mesh.position.x = 500 * ( Math.random() - 0.5 );
 					mesh.position.y = 300 * ( Math.random() - 0 ) + FLOOR;
 					mesh.position.z = 100 * ( Math.random() - 1 );
+
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = 0.25 * ( Math.random() + 0.5 );
+
 					mesh.overdraw = true;
+
 					scene.add( mesh );
 
 				}
@@ -138,19 +141,23 @@
 				scene.add( ambient );
 
 				var directionalLight = new THREE.DirectionalLight( 0xffeedd );
-				directionalLight.position.set( 0, -70, 100 );
-				directionalLight.position.normalize();
+				directionalLight.position.set( 0, -70, 100 ).normalize();
 				scene.add( directionalLight );
 
+				// RENDERER
 
 				if ( render_gl ) {
 
 					try {
+
 						webglRenderer = new THREE.WebGLRenderer();
 						webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 						webglRenderer.domElement.style.position = "relative";
+
 						container.appendChild( webglRenderer.domElement );
+
 						has_gl = 1;
+
 					}
 					catch (e) {
 					}
@@ -165,11 +172,15 @@
 
 				}
 
+				// STATS
+
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
 				stats.domElement.style.zIndex = 100;
 				container.appendChild( stats.domElement );
+
+				//
 
 				bcanvas.addEventListener("click", toggleCanvas, false);
 				bwebgl.addEventListener("click", toggleWebGL, false);
@@ -259,6 +270,8 @@
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+
+				camera.lookAt( scene.position );
 
 				if ( render_gl && has_gl ) webglRenderer.render( scene, camera );
 				if ( render_canvas ) canvasRenderer.render( scene, camera );

@@ -90,8 +90,7 @@
 				scene.add( ambient );
 
 				var directionalLight = new THREE.DirectionalLight( 0xffeedd );
-				directionalLight.position.set( 0, 0, 1 );
-				directionalLight.position.normalize();
+				directionalLight.position.set( 0, 0, 1 ).normalize();
 				scene.add( directionalLight );
 
 				// RENDERER
@@ -160,7 +159,8 @@
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
-				camera.lookAt( scene.center );
+
+				camera.lookAt( scene.position );
 
 				renderer.render( scene, camera );
 

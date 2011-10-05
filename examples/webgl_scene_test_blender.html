@@ -313,12 +313,11 @@
 				var result = {
 
 					scene:  new THREE.Scene(),
-					camera: new THREE.Camera( 65, window.innerWidth / window.innerHeight, 1, 1000 )
+					camera: new THREE.PerspectiveCamera( 65, window.innerWidth / window.innerHeight, 1, 1000 )
 
 				};
 
 				result.camera.position.z = 100;
-				result.camera.useTarget = true;
 
 				var object, geometry, material, light, count = 500, range = 200;
 
@@ -328,14 +327,18 @@
 				for( var i = 0; i < count; i++ ) {
 
 					object = new THREE.Mesh( geometry, material );
+
 					object.position.x = ( Math.random() - 0.5 ) * range;
 					object.position.y = ( Math.random() - 0.5 ) * range;
 					object.position.z = ( Math.random() - 0.5 ) * range;
+
 					object.rotation.x = Math.random() * 6;
 					object.rotation.y = Math.random() * 6;
 					object.rotation.z = Math.random() * 6;
+
 					object.matrixAutoUpdate = false;
 					object.updateMatrix();
+
 					result.scene.add( object );
 
 				}
@@ -368,6 +371,8 @@
 
 				camera.position.x += ( mouseX - camera.position.x ) * .001;
 				camera.position.y += ( - mouseY - camera.position.y ) * .001;
+
+				camera.lookAt( scene.position );
 
 				renderer.render( scene, camera );
 
