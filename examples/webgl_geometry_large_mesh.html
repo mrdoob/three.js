@@ -105,9 +105,8 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 50, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
+				camera = new THREE.PerspectiveCamera( 50, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
 				camera.position.z = 1500;
-				camera.useTarget = true;
 
 				scene = new THREE.Scene();
 
@@ -117,19 +116,15 @@
 				scene.add( ambient );
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
-				directionalLight.position.x = 1;
-				directionalLight.position.y = 1;
-				directionalLight.position.z = 2;
-				directionalLight.position.normalize();
+				directionalLight.position.set( 1, 1, 2 ).normalize();
 				scene.add( directionalLight );
 
 				pointLight = new THREE.PointLight( 0xffaa00 );
-				pointLight.position.x = 0;
-				pointLight.position.y = 0;
-				pointLight.position.z = 0;
+				pointLight.position.set( 0, 0, 0 );
 				scene.add( pointLight );
 
 				// light representation
+
 				sphere = new THREE.SphereGeometry( 100, 16, 8, 1 );
 				lightMesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) );
 				lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
@@ -219,8 +214,10 @@
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 
-				lightMesh.position.x = 700*Math.cos(r);
-				lightMesh.position.z = 700*Math.sin(r);
+				camera.lookAt( scene.position );
+
+				lightMesh.position.x = 700 * Math.cos( r );
+				lightMesh.position.z = 700 * Math.sin( r );
 
 				r += 0.01;
 

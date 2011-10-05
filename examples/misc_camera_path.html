@@ -39,11 +39,14 @@
 
 		<script src="../build/Three.js"></script>
 
+		<script src="js/Detector.js"></script>
 		<script src="js/RequestAnimationFrame.js"></script>
 		<script src="js/Stats.js"></script>
 
 
 		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var container, stats;
 
@@ -61,21 +64,23 @@
 
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
 
-				/*
 				controls = new THREE.PathControls( camera );
+
 				controls.waypoints = [ [ -500, 0, 0 ], [ 0, 200, 0 ], [ 500, 0, 0 ] ];
 				controls.duration = 28
 				controls.useConstantSpeed = true;
-				controls.resamplingCoef = 1;
-				controls.createDebugPath = true;
-				controls.createDebugDummy = true;
+				//controls.createDebugPath = true;
+				//controls.createDebugDummy = true;
 				controls.lookSpeed = 0.0006;
 				controls.lookVertical = true;
 				controls.lookHorizontal = true;
 				controls.verticalAngleMap = { srcRange: [ 0, 2 * Math.PI ], dstRange: [ 1.1, 3.8 ] };
 				controls.horizontalAngleMap = { srcRange: [ 0, 2 * Math.PI ], dstRange: [ 0.3, Math.PI - 0.3 ] };
 				controls.lon = 180;
-				*/
+
+				controls.init();
+
+				scene.add( controls.animationParent );
 
 				// world
 
@@ -126,11 +131,17 @@
 				container = document.getElementById( 'container' );
 				container.appendChild( renderer.domElement );
 
+				// stats
+
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
 				stats.domElement.style.zIndex = 100;
 				container.appendChild( stats.domElement );
+
+				// start animation
+
+				controls.animation.play( true, 0 );
 
 			}
 
@@ -145,6 +156,9 @@
 
 			function render() {
 
+				THREE.AnimationHandler.update( 1/60 );
+
+				controls.update();
 				renderer.render( scene, camera );
 
 			}

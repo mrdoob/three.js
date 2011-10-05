@@ -44,9 +44,8 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 500;
-				camera.useTarget = true;
 
 				scene = new THREE.Scene();
 				scene.fog = new THREE.Fog( 0xffffff, 1, 10000 );
@@ -76,6 +75,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.sortObjects = false;
+
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -112,6 +112,8 @@
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+
+				camera.lookAt( scene.position );
 
 				group.rotation.x = rx;
 				group.rotation.y = ry;

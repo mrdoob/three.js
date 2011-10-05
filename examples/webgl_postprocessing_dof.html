@@ -75,9 +75,8 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 70, window.innerWidth / height, 1, 3000 );
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / height, 1, 3000 );
 				camera.position.z = 200;
-				camera.useTarget = true;
 
 				scene = new THREE.Scene();
 
@@ -238,7 +237,7 @@
 
 				postprocessing.scene = new THREE.Scene();
 
-				postprocessing.camera = new THREE.OrthoCamera( window.innerWidth / - 2, window.innerWidth / 2,  window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
+				postprocessing.camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2,  window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
 				postprocessing.camera.position.z = 100;
 
 				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
@@ -283,6 +282,8 @@
 
 				camera.position.x += ( mouseX - camera.position.x ) * 0.036;
 				camera.position.y += ( - (mouseY) - camera.position.y ) * 0.036;
+
+				camera.lookAt( scene.position );
 
 				if ( !singleMaterial ) {
 

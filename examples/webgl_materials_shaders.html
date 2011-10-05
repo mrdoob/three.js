@@ -93,12 +93,11 @@
 
 			function init() {
 
-				container = document.createElement('div');
-				document.body.appendChild(container);
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
+				camera = new THREE.PerspectiveCamera( 75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
 				camera.position.z = 1000;
-				camera.useTarget = true;
 
 				scene = new THREE.Scene();
 
@@ -108,8 +107,7 @@
 				scene.add( ambient );
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff );
-				directionalLight.position.set( 1, 1, 2 );
-				directionalLight.position.normalize();
+				directionalLight.position.set( 1, 1, 2 ).normalize();
 				scene.add( directionalLight );
 
 				pointLight = new THREE.PointLight( 0xffffff );
@@ -233,6 +231,8 @@
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+
+				camera.lookAt( scene.position );
 
 				lightMesh.position.x = 700 * Math.cos( timer );
 				lightMesh.position.z = 700 * Math.sin( timer );

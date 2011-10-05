@@ -7,6 +7,7 @@
 		<style>
 			body {
 				font-family: Monospace;
+				color: #aaa;
 				background-color: #000;
 				margin: 0px;
 				overflow: hidden;
@@ -114,14 +115,13 @@
 				info.style.top = '10px';
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
-				info.innerHTML = 'Three.js with WebGL Love. Simple Particle Systems with Shapes by <a href="http://www.lab4games.net/zz85/blog">zz85</a><br/>Move your mouse. Click to pause/resume.';
+				info.innerHTML = 'Three.js - simple particle systems with shapes by <a href="http://www.lab4games.net/zz85/blog">zz85</a><br/>Move your mouse. Click to pause/resume.';
 				container.appendChild( info );
 
 				// CAMERA
 
-				camera = new THREE.Camera( 70, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.y = 150;
-				camera.position.z = 400;
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.set( 0, 150, 400 );
 
 				// SCENE
 

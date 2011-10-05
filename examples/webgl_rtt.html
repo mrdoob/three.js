@@ -108,25 +108,22 @@
 
 				container = document.getElementById( 'container' );
 
-				cameraRTT = new THREE.OrthoCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
+				cameraRTT = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
 				cameraRTT.position.z = 100;
 
-				camera = new THREE.Camera( 30, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 100;
-				camera.useTarget = true;
 
 				scene = new THREE.Scene();
 				sceneRTT = new THREE.Scene();
 				sceneScreen = new THREE.Scene();
 
 				var light = new THREE.DirectionalLight( 0xffffff );
-				light.position.set( 0, 0, 1 );
-				light.position.normalize();
+				light.position.set( 0, 0, 1 ).normalize();
 				sceneRTT.add( light );
 
 				light = new THREE.DirectionalLight( 0xffaaaa, 1.5 );
-				light.position.set( 0, 0, -1 );
-				light.position.normalize();
+				light.position.set( 0, 0, -1 ).normalize();
 				sceneRTT.add( light );
 
 				rtTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBFormat } );
@@ -239,6 +236,8 @@
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+
+				camera.lookAt( scene.position );
 
 				if ( zmesh1 && zmesh2 ) {
 

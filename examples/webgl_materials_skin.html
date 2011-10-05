@@ -91,7 +91,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 35, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 900;
 
 				scene = new THREE.Scene();
@@ -103,8 +103,7 @@
 
 
 				directionalLight = new THREE.DirectionalLight( 0xffeedd, 1 );
-				directionalLight.position.set( 1, -1, 1 );
-				directionalLight.position.normalize();
+				directionalLight.position.set( 1, -1, 1 ).normalize();
 				scene.add( directionalLight );
 
 				// MATERIALS

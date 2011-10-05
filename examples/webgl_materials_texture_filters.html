@@ -89,12 +89,11 @@
 
 			function init() {
 
-				container = document.createElement('div');
-				document.body.appendChild(container);
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 35, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 5000 );
+				camera = new THREE.PerspectiveCamera( 35, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 5000 );
 				camera.position.z = 1500;
-				camera.useTarget = true;
 
 				scene = new THREE.Scene();
 				scene2 = new THREE.Scene();
@@ -240,6 +239,8 @@
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - ( mouseY - 200) - camera.position.y ) * .05;
+
+				camera.lookAt( scene.position );
 
 				renderer.enableScissorTest( false );
 				renderer.clear();

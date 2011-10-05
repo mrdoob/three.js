@@ -86,18 +86,16 @@
 
 			function init() {
 
-				container = document.createElement('div');
+				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 500;
-				camera.useTarget = true;
 
 				scene = new THREE.Scene();
 
 				var light = new THREE.DirectionalLight( 0xffffff );
-				light.position.set( 0.5, 1, 1 );
-				light.position.normalize();
+				light.position.set( 0.5, 1, 1 ).normalize();
 				scene.add( light );
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
@@ -232,6 +230,8 @@
 
 				camera.position.x += ( mouseX - camera.position.x ) * 0.05;
 				camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
+
+				camera.lookAt( scene.position );
 
 				if ( video.readyState === video.HAVE_ENOUGH_DATA ) {
 

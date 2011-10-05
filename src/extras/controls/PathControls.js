@@ -2,11 +2,14 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.PathControls = function ( object ) {
+THREE.PathControls = function ( object, domElement ) {
 
 	this.object = object;
+	this.domElement = ( domElement !== undefined ) ? domElement : document;
 
-	this.id = "PathCamera" + THREE.PathCameraIdCounter ++;
+	this.id = "PathControls" + THREE.PathControlsIdCounter ++;
+
+	// API
 
 	this.duration = 10 * 1000; // milliseconds
 	this.waypoints = [];
@@ -25,7 +28,9 @@ THREE.PathControls = function ( object ) {
 	this.verticalAngleMap   = { srcRange: [ 0, 2 * Math.PI ], dstRange: [ 0, 2 * Math.PI ] };
 	this.horizontalAngleMap = { srcRange: [ 0, 2 * Math.PI ], dstRange: [ 0, 2 * Math.PI ] };
 
-	this.domElement = document;
+	// internals
+
+	this.target = new THREE.Object3D();
 
 	this.mouseX = 0;
 	this.mouseY = 0;
@@ -37,12 +42,16 @@ THREE.PathControls = function ( object ) {
 	this.theta = 0;
 
 	if ( this.domElement === document ) {
+
 		this.viewHalfX = window.innerWidth / 2;
 		this.viewHalfY = window.innerHeight / 2;
+
 	} else {
+
 		this.viewHalfX = this.domElement.offsetWidth / 2;
 		this.viewHalfY = this.domElement.offsetHeight / 2;
 		this.domElement.setAttribute( 'tabindex', -1 );
+
 	}
 
 	var PI2 = Math.PI * 2,
@@ -50,7 +59,7 @@ THREE.PathControls = function ( object ) {
 
 	// methods
 
-	this.update = function ( parentMatrixWorld, forceUpdate, camera ) {
+	this.update = function () {
 
 		var srcRange, dstRange;
 
@@ -70,52 +79,46 @@ THREE.PathControls = function ( object ) {
 		srcRange = this.verticalAngleMap.srcRange;
 		dstRange = this.verticalAngleMap.dstRange;
 
-		//this.phi = map_linear( this.phi, srcRange[ 0 ], srcRange[ 1 ], dstRange[ 0 ], dstRange[ 1 ] );
-
 		var tmpPhi = map_linear( this.phi, srcRange[ 0 ], srcRange[ 1 ], dstRange[ 0 ], dstRange[ 1 ] );
 		var tmpPhiFullRange = dstRange[ 1 ] - dstRange[ 0 ];
 		var tmpPhiNormalized = ( tmpPhi - dstRange[ 0 ] ) / tmpPhiFullRange;
 
-		this.phi = TWEEN.Easing.Quadratic.EaseInOut( tmpPhiNormalized ) * tmpPhiFullRange + dstRange[ 0 ];
+		this.phi = QuadraticEaseInOut( tmpPhiNormalized ) * tmpPhiFullRange + dstRange[ 0 ];
 
 		// constrain horizontal look angle
 
 		srcRange = this.horizontalAngleMap.srcRange;
 		dstRange = this.horizontalAngleMap.dstRange;
 
-		//this.theta = map_linear( this.theta, srcRange[ 0 ], srcRange[ 1 ], dstRange[ 0 ], dstRange[ 1 ] );
-
 		var tmpTheta = map_linear( this.theta, srcRange[ 0 ], srcRange[ 1 ], dstRange[ 0 ], dstRange[ 1 ] );
 		var tmpThetaFullRange = dstRange[ 1 ] - dstRange[ 0 ];
 		var tmpThetaNormalized = ( tmpTheta - dstRange[ 0 ] ) / tmpThetaFullRange;
 
-		this.theta = TWEEN.Easing.Quadratic.EaseInOut( tmpThetaNormalized ) * tmpThetaFullRange + dstRange[ 0 ];
+		this.theta = QuadraticEaseInOut( tmpThetaNormalized ) * tmpThetaFullRange + dstRange[ 0 ];
 
 		var targetPosition = this.target.position,
-			position = this.position;
-
-		/*
-		targetPosition.x = position.x + 100 * Math.sin( this.phi ) * Math.cos( this.theta );
-		targetPosition.y = position.y + 100 * Math.cos( this.phi );
-		targetPosition.z = position.z + 100 * Math.sin( this.phi ) * Math.sin( this.theta );
-		*/
+			position = this.object.position;
 
 		targetPosition.x = 100 * Math.sin( this.phi ) * Math.cos( this.theta );
 		targetPosition.y = 100 * Math.cos( this.phi );
 		targetPosition.z = 100 * Math.sin( this.phi ) * Math.sin( this.theta );
 
-		this.supr.update.call( this, parentMatrixWorld, forceUpdate, camera );
+		this.object.lookAt( this.target.position );
 
 	};
 
 	this.onMouseMove = function ( event ) {
 
 		if ( this.domElement === document ) {
+
 			this.mouseX = event.pageX - this.viewHalfX;
 			this.mouseY = event.pageY - this.viewHalfY;
+
 		} else {
+
 			this.mouseX = event.pageX - this.domElement.offsetLeft - this.viewHalfX;
 			this.mouseY = event.pageY - this.domElement.offsetTop - this.viewHalfY;
+
 		}
 
 	};
@@ -148,6 +151,13 @@ THREE.PathControls = function ( object ) {
 			dz = a[ 2 ] - b[ 2 ];
 
 		return Math.sqrt( dx * dx + dy * dy + dz * dz );
+
+	};
+
+	function QuadraticEaseInOut ( k ) {
+
+		if ( ( k *= 2 ) < 1 ) return 0.5 * k * k;
+		return - 0.5 * ( --k * ( k - 2 ) - 1 );
 
 	};
 
@@ -240,10 +250,10 @@ THREE.PathControls = function ( object ) {
 			particleObj = new THREE.ParticleSystem( particleGeo, new THREE.ParticleBasicMaterial( { color: 0xffaa00, size: 3 } ) );
 
 		lineObj.scale.set( 1, 1, 1 );
-		parent.addChild( lineObj );
+		parent.add( lineObj );
 
 		particleObj.scale.set( 1, 1, 1 );
-		parent.addChild( particleObj );
+		parent.add( particleObj );
 
 		var waypoint,
 			geo = new THREE.SphereGeometry( 1, 16, 8 ),
@@ -253,58 +263,61 @@ THREE.PathControls = function ( object ) {
 
 			waypoint = new THREE.Mesh( geo, mat );
 			waypoint.position.copy( spline.points[ i ] );
-			waypoint.updateMatrix();
-			parent.addChild( waypoint );
+			parent.add( waypoint );
 
 		}
 
 	};
 
-	// constructor
+	this.init = function ( ) {
 
-	this.spline = new THREE.Spline();
-	this.spline.initFromArray( this.waypoints );
+		// constructor
 
-	if ( this.useConstantSpeed ) {
+		this.spline = new THREE.Spline();
+		this.spline.initFromArray( this.waypoints );
 
-		this.spline.reparametrizeByArcLength( this.resamplingCoef );
+		if ( this.useConstantSpeed ) {
 
-	}
+			this.spline.reparametrizeByArcLength( this.resamplingCoef );
 
-	if ( this.createDebugDummy ) {
+		}
 
-		var dummyParentMaterial = new THREE.MeshLambertMaterial( { color: 0x0077ff } ),
-		dummyChildMaterial  = new THREE.MeshLambertMaterial( { color: 0x00ff00 } ),
-		dummyParentGeo = new THREE.CubeGeometry( 10, 10, 20 ),
-		dummyChildGeo  = new THREE.CubeGeometry( 2, 2, 10 );
+		if ( this.createDebugDummy ) {
 
-		this.animationParent = new THREE.Mesh( dummyParentGeo, dummyParentMaterial );
+			var dummyParentMaterial = new THREE.MeshLambertMaterial( { color: 0x0077ff } ),
+			dummyChildMaterial  = new THREE.MeshLambertMaterial( { color: 0x00ff00 } ),
+			dummyParentGeo = new THREE.CubeGeometry( 10, 10, 20 ),
+			dummyChildGeo  = new THREE.CubeGeometry( 2, 2, 10 );
 
-		var dummyChild = new THREE.Mesh( dummyChildGeo, dummyChildMaterial );
-		dummyChild.position.set( 0, 10, 0 );
+			this.animationParent = new THREE.Mesh( dummyParentGeo, dummyParentMaterial );
 
-		this.animation = initAnimationPath( this.animationParent, this.spline, this.id, this.duration );
+			var dummyChild = new THREE.Mesh( dummyChildGeo, dummyChildMaterial );
+			dummyChild.position.set( 0, 10, 0 );
 
-		this.animationParent.addChild( this );
-		this.animationParent.addChild( this.target );
-		this.animationParent.addChild( dummyChild );
+			this.animation = initAnimationPath( this.animationParent, this.spline, this.id, this.duration );
 
-	} else {
+			this.animationParent.add( this.object );
+			this.animationParent.add( this.target );
+			this.animationParent.add( dummyChild );
 
-		this.animation = initAnimationPath( this.animationParent, this.spline, this.id, this.duration );
-		this.animationParent.addChild( this.target );
-		this.animationParent.addChild( this );
+		} else {
 
-	}
+			this.animation = initAnimationPath( this.animationParent, this.spline, this.id, this.duration );
+			this.animationParent.add( this.target );
+			this.animationParent.add( this.object );
 
-	if ( this.createDebugPath ) {
+		}
 
-		createPath( this.debugPath, this.spline );
+		if ( this.createDebugPath ) {
 
-	}
+			createPath( this.debugPath, this.spline );
 
-	this.domElement.addEventListener( 'mousemove', bind( this, this.onMouseMove ), false );
+		}
+
+		this.domElement.addEventListener( 'mousemove', bind( this, this.onMouseMove ), false );
+
+	};
 
 };
 
-THREE.PathCameraIdCounter = 0;
+THREE.PathControlsIdCounter = 0;

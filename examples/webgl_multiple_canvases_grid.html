@@ -137,16 +137,14 @@
 
 					container = document.getElementById( containerId );
 
-					camera = new THREE.Camera( 20, container.clientWidth / container.clientHeight, 1, 10000 );
+					camera = new THREE.PerspectiveCamera( 20, container.clientWidth / container.clientHeight, 1, 10000 );
 					camera.setViewOffset( fullWidth, fullHeight, viewX, viewY, viewWidth, viewHeight );
 					camera.position.z = 1800;
-					camera.useTarget = true;
 
 					scene = new THREE.Scene();
 
 					light = new THREE.DirectionalLight( 0xffffff );
-					light.position.set( 0, 0, 1 );
-					light.position.normalize();
+					light.position.set( 0, 0, 1 ).normalize();
 					scene.add( light );
 
 					var shadowMaterial = new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/shadow.png' ) } );
@@ -271,9 +269,12 @@
 					camera.position.x += ( mouseX - camera.position.x ) * 0.05;
 					camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
 
+					camera.lookAt( scene.position );
+
 					renderer.render( scene, camera );
 
 				}
+
 			}
 
 		</script>

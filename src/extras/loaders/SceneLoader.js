@@ -359,21 +359,18 @@ THREE.SceneLoader.prototype = {
 
 				if ( c.type == "perspective" ) {
 
-					camera = new THREE.Camera( c.fov, c.aspect, c.near, c.far );
-					camera.useTarget = true;
+					camera = new THREE.PerspectiveCamera( c.fov, c.aspect, c.near, c.far );
 
 				} else if ( c.type == "ortho" ) {
 
-					camera = new THREE.Camera();
-					camera.useTarget = true;
-					camera.projectionMatrix = THREE.Matrix4.makeOrtho( c.left, c.right, c.top, c.bottom, c.near, c.far );
+					camera = new THREE.OrthographicCamera( c.left, c.right, c.top, c.bottom, c.near, c.far );
 
 				}
 
 				p = c.position;
 				t = c.target;
 				camera.position.set( p[0], p[1], p[2] );
-				camera.target.position.set( t[0], t[1], t[2] );
+				camera.target = new THREE.Vector3( t[0], t[1], t[2] );
 
 				result.cameras[ dc ] = camera;
 

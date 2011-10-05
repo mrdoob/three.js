@@ -53,7 +53,7 @@
 
 			var container, stats;
 
-			var camera, scene, renderer;
+			var camera, controls, scene, renderer;
 
 			var mesh, texture;
 
@@ -68,21 +68,18 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.FirstPersonCamera( {
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
 
-					fov: 60, aspect: window.innerWidth / window.innerHeight, near: 1, far: 20000,
-					movementSpeed: 1000, lookSpeed: 0.1, noFly: false, lookVertical: true
+				controls = new THREE.FirstPersonControls( camera );
 
-				} );
-
-				camera.target.position.z = - 100;
+				controls.movementSpeed = 1000;
+				controls.lookSpeed = 0.1;
 
 				scene = new THREE.Scene();
 
 				data = generateHeight( worldWidth, worldDepth );
 
 				camera.position.y = data[ worldHalfWidth + worldHalfDepth * worldWidth ] + 500;
-				camera.target.position.y = camera.position.y;
 
 				var geometry = new THREE.PlaneGeometry( 7500, 7500, worldWidth - 1, worldDepth - 1 );
 
@@ -221,6 +218,7 @@
 
 			function render() {
 
+				controls.update();
 				renderer.render( scene, camera );
 
 			}

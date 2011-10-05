@@ -7,11 +7,10 @@ THREE.Scene = function () {
 
 	THREE.Object3D.call( this );
 
-	this.matrixAutoUpdate = false;
-
+	this.ambientColor = new THREE.Color();
 	this.fog = null;
 
-	this.origin = new THREE.Vector3();
+	this.matrixAutoUpdate = false;
 
 	this.overrideMaterial = null;
 
@@ -30,6 +29,14 @@ THREE.Scene.prototype.constructor = THREE.Scene;
 THREE.Scene.prototype.supr = THREE.Object3D.prototype;
 
 THREE.Scene.prototype.add = function ( object ) {
+
+	if ( object instanceof THREE.AmbientLight ) {
+
+		console.warn( 'DEPRECATED: AmbientLight( hex ) is now scene.ambientColor.setHex( hex ).' );
+		this.ambientColor.setHex( object.color.getHex() );
+		return;
+
+	}
 
 	this.supr.add.call( this, object );
 	this.addChildRecurse( object );

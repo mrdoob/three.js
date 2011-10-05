@@ -17,7 +17,7 @@
 			h1 { }
 			a { color:skyblue; text-decoration:none }
 			canvas { pointer-events:none; z-index:10; position:relative; }
-			#log { position:absolute; top:50px; text-align:left; display:block; z-index:100 }
+
 			#d { position:absolute; width: 100%; text-align:center; margin:1em 0 -4.5em 0; z-index:1000; }
 
 			.bwrap { margin:0.5em 0 0 0 }
@@ -54,8 +54,6 @@
 
 			<div id="buttons_materials" class="bwrap"></div>
 		</div>
-
-		<div id="log"></div>
 
 		<script src="../build/Three.js"></script>
 
@@ -140,8 +138,8 @@
 
 			var container, stats;
 
-			var camera, scene, webglRenderer;
-			var cameraCube, sceneCube;
+			var camera, scene, renderer;
+			var cameraCube, sceneCube, cubeTarget;
 
 			var m, mi;
 
@@ -160,14 +158,13 @@
 
 			function init() {
 
-				container = document.createElement('div');
-				document.body.appendChild(container);
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
-				camera.useTarget = true;
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
+				cameraCube = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
 
-				cameraCube = new THREE.Camera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
-				cameraCube.useTarget = true;
+				cubeTarget = new THREE.Vector3( 0, 0, 0 );
 
 				scene = new THREE.Scene();
 				sceneCube = new THREE.Scene();
@@ -178,23 +175,15 @@
 				scene.add( ambient );
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
-				directionalLight.position.x = 2;
-				directionalLight.position.y = 1.2;
-				directionalLight.position.z = 10;
-				directionalLight.position.normalize();
+				directionalLight.position.set( 2, 1.2, 10 ).normalize();
 				scene.add( directionalLight );
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
-				directionalLight.position.x = - 2;
-				directionalLight.position.y = 1.2;
-				directionalLight.position.z = - 10;
-				directionalLight.position.normalize();
+				directionalLight.position.set( -2, 1.2, -10 ).normalize();
 				scene.add( directionalLight );
 
 				pointLight = new THREE.PointLight( 0xffaa00, 2 );
-				pointLight.position.x = 2000;
-				pointLight.position.y = 1200;
-				pointLight.position.z = 10000;
+				pointLight.position.set( 2000, 1200, 10000 );
 				scene.add( pointLight );
 
 				// Skybox
@@ -216,11 +205,12 @@
 
 				//
 
-				webglRenderer = new THREE.WebGLRenderer();
-				webglRenderer.setSize( window.innerWidth, window.innerHeight );
-				webglRenderer.setFaceCulling( 0 );
-				webglRenderer.autoClear = false;
-				container.appendChild( webglRenderer.domElement );
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setFaceCulling( 0 );
+				renderer.autoClear = false;
+
+				container.appendChild( renderer.domElement );
 
 				if ( STATS_ENABLED ) {
 
@@ -232,7 +222,7 @@
 
 				}
 
-				document.addEventListener('mousemove', onDocumentMouseMove, false);
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
 				var r = "textures/cube/Bridge2/";
 				var urls = [ r + "posx.jpg", r + "negx.jpg",
@@ -571,10 +561,13 @@
 				}
 
 				var mesh = new THREE.Mesh( geometry, m );
+
 				mesh.rotation.x = r[ 0 ];
 				mesh.rotation.y = r[ 1 ];
 				mesh.rotation.z = r[ 2 ];
+
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = s;
+
 				scene.add( mesh );
 
 				CARS[ car ].object = mesh;
@@ -614,22 +607,19 @@
 				camera.position.x = 1000 * Math.cos( timer );
 				camera.position.z = 1000 * Math.sin( timer );
 
-				cameraCube.target.position.x = - camera.position.x;
-				cameraCube.target.position.y = - camera.position.y;
-				cameraCube.target.position.z = - camera.position.z;
+				camera.lookAt( scene.position );
 
-				webglRenderer.clear();
-				webglRenderer.render( sceneCube, cameraCube );
-				webglRenderer.render( scene, camera );
+				cubeTarget.x = - camera.position.x;
+				cubeTarget.y = - camera.position.y;
+				cubeTarget.z = - camera.position.z;
+
+				cameraCube.lookAt( cubeTarget );
+
+				renderer.clear();
+				renderer.render( sceneCube, cameraCube );
+				renderer.render( scene, camera );
 
 				if ( STATS_ENABLED ) stats.update();
-
-			}
-
-			function log( text ) {
-
-				var e = document.getElementById("log");
-				e.innerHTML = text + "<br/>" + e.innerHTML;
 
 			}
 

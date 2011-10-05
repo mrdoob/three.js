@@ -64,7 +64,7 @@
 
 			var container, stats, loader;
 
-			var camera, scene, webglRenderer;
+			var camera, scene, renderer;
 
 			var mesh, zmesh, lightMesh, geometry;
 			var mesh1;
@@ -85,7 +85,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 900;
 
 				scene = new THREE.Scene();
@@ -101,15 +101,12 @@
 				scene.add( pointLight );
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff );
-				directionalLight.position.x = 1;
-				directionalLight.position.y = 1;
-				directionalLight.position.z = - 1;
-				directionalLight.position.normalize();
+				directionalLight.position.set( 1, 1, -1 ).normalize();
 				scene.add( directionalLight );
 
 				// material parameters
 
-				var ambient = 0x444444, diffuse = 0x888888, specular = 0x080810, shininess = 2;
+				var ambient = 0x111111, diffuse = 0xaaaaaa, specular = 0x080810, shininess = 2;
 
 				var shader = THREE.ShaderUtils.lib[ "normal" ];
 				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
@@ -137,9 +134,9 @@
 
 				loader.load( { model: "obj/leeperrysmith/LeePerrySmith.js", callback: function( geometry ) { createScene( geometry, 100, material ) } } );
 
-				webglRenderer = new THREE.WebGLRenderer();
-				webglRenderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( webglRenderer.domElement );
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
 
 				if ( statsEnabled ) {
 
@@ -160,8 +157,10 @@
 				geometry.computeTangents();
 
 				mesh1 = new THREE.Mesh( geometry, material );
+
 				mesh1.position.y = - 50;
 				mesh1.scale.x = mesh1.scale.y = mesh1.scale.z = scale;
+
 				scene.add( mesh1 );
 
 				loader.statusDomElement.style.display = "none";
@@ -197,7 +196,7 @@
 
 				}
 
-				webglRenderer.render( scene, camera );
+				renderer.render( scene, camera );
 
 			}
 

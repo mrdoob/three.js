@@ -46,7 +46,7 @@
 
 			var container, timer;
 
-			var camera, scene, webglRenderer;
+			var camera, scene, renderer;
 
 			var mesh, zmesh, lightMesh, geometry;
 			var spheres = [];
@@ -69,9 +69,8 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
 				camera.position.z = 3200;
-				camera.useTarget = true;
 
 				scene = new THREE.Scene();
 
@@ -91,10 +90,13 @@
 				for ( var i = 0; i < 500; i ++ ) {
 
 					var mesh = new THREE.Mesh( geometry, material );
+
 					mesh.position.x = Math.random() * 10000 - 5000;
 					mesh.position.y = Math.random() * 10000 - 5000;
 					mesh.position.z = Math.random() * 10000 - 5000;
+
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 3 + 1;
+
 					scene.add( mesh );
 
 					spheres.push( mesh );
@@ -119,9 +121,9 @@
 
 				//
 
-				webglRenderer = new THREE.AnaglyphWebGLRenderer();
-				webglRenderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( webglRenderer.domElement );
+				renderer = new THREE.AnaglyphWebGLRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
 
 			}
 
@@ -149,6 +151,8 @@
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 
+				camera.lookAt( scene.position );
+
 				for ( var i = 0, il = spheres.length; i < il; i ++ ) {
 
 					var sphere = spheres[ i ];
@@ -158,7 +162,7 @@
 
 				}
 
-				webglRenderer.render( scene, camera );
+				renderer.render( scene, camera );
 
 			}
 

@@ -124,16 +124,13 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.Camera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 900;
 
 				scene = new THREE.Scene();
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff );
-				directionalLight.position.x = 0;
-				directionalLight.position.y = 0;
-				directionalLight.position.z = 1;
-				directionalLight.position.normalize();
+				directionalLight.position.set( 0, 0, 1 ).normalize();
 				scene.add( directionalLight );
 
 				var texture = THREE.ImageUtils.loadTexture( "textures/memorial.png" );
