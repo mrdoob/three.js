@@ -35,11 +35,12 @@ THREE.Projector = function() {
 
 
 	this.projectVector = function ( vector, camera ) {
-		
+
 		_projScreenMatrix.multiply( camera.projectionMatrix, camera.matrixWorldInverse );
 		_projScreenMatrix.multiplyVector3( vector );
 
 		return vector;
+		
 	};
 
 	this.unprojectVector = function ( vector, camera ) {
@@ -48,22 +49,31 @@ THREE.Projector = function() {
 		_projScreenMatrix.multiplyVector3( vector );
 
 		return vector;
+		
 	};
 
+	/**
+	 * Translates a 2D point from NDC to a THREE.Ray
+	 * that can be used for picking.
+	 * @vector - THREE.Vector3 that represents 2D point
+	 * @camera - camera
+	 */
 	this.pickingRay = function ( vector, camera ) {
-		var end, dir, ray, t;
 
+		var end, ray, t;
+
+		// set two vectors with opposing z values
 		vector.z = -1.0;
 		end = new THREE.Vector3( vector.x, vector.y, 1.0 );
 
 		this.unprojectVector( vector, camera );
 		this.unprojectVector( end, camera );
 
-		dir = new THREE.Vector3();
-		dir.sub( end, vector );
-		dir.normalize();
+		// find direction from vector to end
+		end.subSelf( vector ).normalize();
 
-		return new THREE.Ray( vector, dir );
+		return new THREE.Ray( vector, end );
+		
 	};
 
 	this.projectObjects = function ( scene, camera, sort ) {
