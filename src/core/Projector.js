@@ -35,18 +35,41 @@ THREE.Projector = function() {
 
 
 	this.projectVector = function ( vector, camera ) {
-
-		_projScreenMatrix.multiply( camera.projectionMatrix, camera.matrixWorldInverse );
+		
+        _projScreenMatrix.multiply( camera.projectionMatrix, camera.matrixWorldInverse );
 		_projScreenMatrix.multiplyVector3( vector );
 
 		return vector;
-
 	};
 
 	this.unprojectVector = function ( vector, camera ) {
+        var end, dir, t;
+
+        if ( camera instanceof THREE.OrthographicCamera ) {
+        
+            vector.z = 0.0;
+            end = new THREE.Vector3( vector.x, vector.y, 1.0);        
+        
+        }
 
 		_projScreenMatrix.multiply( camera.matrixWorld, THREE.Matrix4.makeInvert( camera.projectionMatrix ) );
 		_projScreenMatrix.multiplyVector3( vector );
+
+        if ( camera instanceof THREE.OrthographicCamera ) {
+
+            _projScreenMatrix.multiplyVector3( end );
+
+            dir = new THREE.Vector3();
+            dir.sub( end, vector );
+            dir.normalize();
+        
+            t = vector.y / - ( dir.y );
+
+            vector.set( vector.x + t * dir.x,
+                        vector.y + t * dir.y,
+                        vector.z + t * dir.z );
+        
+        }
 
 		return vector;
 
