@@ -48,7 +48,7 @@
 
 		<script>
 
-			var camera, scene, renderer, info, mouse2d, sun, loader, sphere;
+			var camera, cameraTarget, scene, renderer, info, mouse2d, sun, loader, sphere;
 
 			var range = 400, speed = 1, sphereSize = 4;
 
@@ -61,11 +61,8 @@
 
 				info = document.getElementById("info");
 
-				camera = new THREE.Camera(40, window.innerWidth / window.innerHeight, 1, 10000);
-				camera.position.y = 120;
-				camera.position.x = 300;
-				camera.position.z = 0;
-				camera.useTarget = true;
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.set( 300, 120, 0 );
 
 				mouse2d = new THREE.Vector3( 0, 0, 1 );
 
@@ -77,15 +74,15 @@
 				scene.add( sphere );
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.setSize(window.innerWidth, window.innerHeight);
-				container.appendChild(renderer.domElement);
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
 
-				var ambientLight = new THREE.AmbientLight(0xdddddd);
-				scene.add(ambientLight);
+				var ambientLight = new THREE.AmbientLight( 0xdddddd );
+				scene.add( ambientLight );
 
-				sun = new THREE.DirectionalLight(0xffffff);
-				sun.position = new THREE.Vector3(1, -1, 1).normalize();
-				scene.add(sun);
+				sun = new THREE.DirectionalLight( 0xffffff );
+				sun.position.set( 1, -1, 1 ).normalize();
+				scene.add( sun );
 
 				createObstacles();
 
@@ -96,24 +93,27 @@
 
 			function createObstacles(){
 
-				createCube(100, 50, 10, new THREE.Vector3(0, 0, 100));
-				camera.target = createCube(100, 50, 10, new THREE.Vector3(0, 0, 200));
+				createCube( 100, 50, 10, new THREE.Vector3(0, 0, 100) );
+
+				cameraTarget = createCube( 100, 50, 10, new THREE.Vector3( 0, 0, 200 )) ;
+
 				createCube(100, 50, 10, new THREE.Vector3(0, 0, 300));
 
 			}
 
-			function createCube(sx, sy, sz, p) {
+			function createCube( sx, sy, sz, p ) {
 
-				var cube = new THREE.Mesh(new THREE.CubeGeometry( sx, sy, sz ), new THREE.MeshLambertMaterial( { color: 0x003300 } ) );
+				var cube = new THREE.Mesh( new THREE.CubeGeometry( sx, sy, sz ), new THREE.MeshLambertMaterial( { color: 0x003300 } ) );
 				cube.position = p;
-				scene.add(cube);
-				THREE.Collisions.colliders.push( THREE.CollisionUtils.MeshOBB(cube) );
-				cubes.push(cube);
+				scene.add( cube );
+
+				THREE.Collisions.colliders.push( THREE.CollisionUtils.MeshOBB( cube ) );
+				cubes.push( cube );
 				return cube;
 
 			}
 
-			function onDocumentMouseMove(event){
+			function onDocumentMouseMove( event ){
 
 				event.preventDefault();
 				mouse2d.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -124,28 +124,28 @@
 
 			function animate() {
 
-				requestAnimationFrame(animate);
+				requestAnimationFrame( animate );
 
 				sphere.position.z += speed;
 
-				if(sphere.position.z > range) sphere.position.z = 0;
+				if( sphere.position.z > range ) sphere.position.z = 0;
 
-				for (var i = 0; i < cubes.length; i++) {
-				
-					cubes[i].materials[0].color = new THREE.Color(0x003300);
-				
+				for ( var i = 0; i < cubes.length; i++ ) {
+
+					cubes[ i ].materials[ 0 ].color.setHex( 0x003300 );
+
 				}
 
-				var ray = new THREE.Ray( sphere.position, new THREE.Vector3(0,0,1) );
+				var ray = new THREE.Ray( sphere.position, new THREE.Vector3( 0, 0, 1 ) );
 
-				var c = THREE.Collisions.rayCastNearest(ray);
-				
-				if (c && c.distance == -1) {
+				var c = THREE.Collisions.rayCastNearest( ray );
+
+				if ( c && c.distance == -1 ) {
 
 					info.innerHTML = "Colliding!";
-					c.mesh.materials[0].color = new THREE.Color(0xff0000);
+					c.mesh.materials[ 0 ].color.setHex( 0xff0000 );
 
-				} else if(c && c.distance >= 0) {
+				} else if( c && c.distance >= 0 ) {
 
 					info.innerHTML = "Approaching @ " + c.distance;
 
@@ -158,7 +158,9 @@
 				camera.position.x = Math.cos(mouse2d.x * Math.PI) * 300;
 				camera.position.z = 200 + Math.sin(mouse2d.x * Math.PI) * 300;
 
-				renderer.render(scene, camera);
+				camera.lookAt( cameraTarget.position );
+
+				renderer.render( scene, camera );
 
 			}
 

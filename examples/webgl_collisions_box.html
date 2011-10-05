@@ -54,9 +54,8 @@
 
 				info = document.getElementById("info");
 
-				camera = new THREE.Camera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = - 500;
-				camera.useTarget = true;
 
 				scene = new THREE.Scene();
 
@@ -137,6 +136,8 @@
 				cube.rotation.y += 0.02;
 				cube.position.x = Math.sin(bounce) * 100;
 				bounce += 0.01;
+
+				camera.lookAt( scene.position );
 
 				renderer.render( scene, camera );
 

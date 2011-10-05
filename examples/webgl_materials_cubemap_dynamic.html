@@ -86,7 +86,7 @@
 
 			var container, stats;
 
-			var camera, scene, renderer;
+			var camera, cameraTarget, scene, renderer;
 			var renderTarget, renderTargetParameters;
 
 			var spotLight, ambientLight;
@@ -142,9 +142,10 @@
 
 				// SCENE CAMERA
 
-				camera = new THREE.Camera( 18, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
-				camera.useTarget = true;
+				camera = new THREE.PerspectiveCamera( 18, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
 				camera.position.set( 2000, 0, 2000 );
+
+				cameraTarget = new THREE.Vector3( 0, 0, 0 );
 
 				// SCENE
 
@@ -606,9 +607,9 @@
 					near = bb.y[ 1 ] + margin * depth,
 					far  = bb.y[ 0 ] - margin * depth;
 
-				var topCamera = new THREE.OrthoCamera( left, right, top, bottom, near, far );
-				topCamera.useTarget = true;
+				var topCamera = new THREE.OrthographicCamera( left, right, top, bottom, near, far );
 				topCamera.position.y = bb.y[ 1 ];
+				topCamera.lookAt( shadowScene.position );
 
 				var renderShadow = new THREE.RenderPass( shadowScene, topCamera );
 
@@ -655,8 +656,10 @@
 					camera.position.set( 350, 500, 2200 );
 					//camera.position.set( 0, 3000, -500 );
 
-					camera.target.position.z = 500;
-					camera.target.position.y = 150;
+					cameraTarget.z = 500;
+					cameraTarget.y = 150;
+
+					camera.lookAt( cameraTarget );
 
 				}
 
@@ -710,7 +713,7 @@
 
 					}
 
-					camera.target.position.set( 0, 150, 500 );
+					cameraTarget.set( 0, 150, 500 );
 
 				} else {
 
@@ -719,7 +722,7 @@
 					oldCar.root.remove( camera );
 
 					camera.position.set( 2000, 0, 2000 );
-					camera.target.position.set( 0, 0, 0 );
+					cameraTarget.set( 0, 0, 0 );
 
 					spotLight.position.set( 0, 1800, 1500 );
 
@@ -967,8 +970,8 @@
 
 				if ( ! FOLLOW_CAMERA ) {
 
-					camera.target.position.x = currentCar.root.position.x;
-					camera.target.position.z = currentCar.root.position.z;
+					cameraTarget.x = currentCar.root.position.x;
+					cameraTarget.z = currentCar.root.position.z;
 
 				} else {
 
@@ -1006,6 +1009,8 @@
 
 				renderer.autoClear = false;
 				renderer.shadowMapEnabled = true;
+
+				camera.lookAt( cameraTarget );
 
 				renderer.clear();
 				composer.render( 0.1 );

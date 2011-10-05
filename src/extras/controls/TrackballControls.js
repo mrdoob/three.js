@@ -2,36 +2,35 @@
  * @author Eberhard Graether / http://egraether.com/
  */
 
-THREE.TrackballControls = function ( object ) {
-
-	// target.position is modified when panning
+THREE.TrackballControls = function ( object, domElement ) {
 
 	this.object = object;
 
-	this.domElement = parameters.domElement || document;
+	this.domElement = ( domElement !== undefined ) ? domElement : document;
 
-	this.screen = parameters.screen || { width : window.innerWidth, height : window.innerHeight, offsetLeft : 0, offsetTop : 0 };
-	this.radius = parameters.radius || ( this.screen.width + this.screen.height ) / 4;
+	// API
 
-	this.rotateSpeed = parameters.rotateSpeed || 1.0;
-	this.zoomSpeed = parameters.zoomSpeed || 1.2;
-	this.panSpeed = parameters.panSpeed || 0.3;
+	this.screen = { width: window.innerWidth, height: window.innerHeight, offsetLeft: 0, offsetTop: 0 };
+	this.radius = ( this.screen.width + this.screen.height ) / 4;
 
-	this.noZoom = parameters.noZoom || false;
-	this.noPan = parameters.noPan || false;
+	this.rotateSpeed = 1.0;
+	this.zoomSpeed = 1.2;
+	this.panSpeed = 0.3;
 
-	this.staticMoving = parameters.staticMoving || false;
-	this.dynamicDampingFactor = parameters.dynamicDampingFactor || 0.2;
+	this.noZoom = false;
+	this.noPan = false;
 
-	this.minDistance = parameters.minDistance || 0;
-	this.maxDistance = parameters.maxDistance || Infinity;
+	this.staticMoving = false;
+	this.dynamicDampingFactor = 0.2;
 
-	this.keys = parameters.keys || [ 65 /*A*/, 83 /*S*/, 68 /*D*/ ];
+	this.minDistance = 0;
+	this.maxDistance = Infinity;
 
-	this.useTarget = true;
+	this.keys = [ 65 /*A*/, 83 /*S*/, 68 /*D*/ ];
 
+	// internals
 
-	//internals
+	this.target = new THREE.Vector3( 0, 0, 0 );
 
 	var _keyPressed = false,
 	_state = this.STATE.NONE,
@@ -89,10 +88,10 @@ THREE.TrackballControls = function ( object ) {
 
 		}
 
-		_eye = this.position.clone().subSelf( this.target.position );
+		_eye.copy( this.object.position ).subSelf( this.target );
 
-		var projection = this.up.clone().setLength( mouseOnBall.y );
-		projection.addSelf( this.up.clone().crossSelf( _eye ).setLength( mouseOnBall.x ) );
+		var projection = this.object.up.clone().setLength( mouseOnBall.y );
+		projection.addSelf( this.object.up.clone().crossSelf( _eye ).setLength( mouseOnBall.x ) );
 		projection.addSelf( _eye.setLength( mouseOnBall.z ) );
 
 		return projection;
@@ -105,15 +104,15 @@ THREE.TrackballControls = function ( object ) {
 
 		if ( angle ) {
 
-			var axis = (new THREE.Vector3()).cross( _rotateStart, _rotateEnd ).normalize(),
-			quaternion = new THREE.Quaternion();
+			var axis = ( new THREE.Vector3() ).cross( _rotateStart, _rotateEnd ).normalize(),
+				quaternion = new THREE.Quaternion();
 
 			angle *= this.rotateSpeed;
 
 			quaternion.setFromAxisAngle( axis, -angle );
 
 			quaternion.multiplyVector3( _eye );
-			quaternion.multiplyVector3( this.up );
+			quaternion.multiplyVector3( this.object.up );
 
 			quaternion.multiplyVector3( _rotateEnd );
 
@@ -162,11 +161,11 @@ THREE.TrackballControls = function ( object ) {
 
 			mouseChange.multiplyScalar( _eye.length() * this.panSpeed );
 
-			var pan = _eye.clone().crossSelf( this.up ).setLength( mouseChange.x );
-			pan.addSelf( this.up.clone().setLength( mouseChange.y ) );
+			var pan = _eye.clone().crossSelf( this.object.up ).setLength( mouseChange.x );
+			pan.addSelf( this.object.up.clone().setLength( mouseChange.y ) );
 
-			this.position.addSelf( pan );
-			this.target.position.addSelf( pan );
+			this.object.position.addSelf( pan );
+			this.target.addSelf( pan );
 
 			if ( this.staticMoving ) {
 
@@ -186,15 +185,15 @@ THREE.TrackballControls = function ( object ) {
 
 		if ( !this.noZoom || !this.noPan ) {
 
-			if ( this.position.lengthSq() > this.maxDistance * this.maxDistance ) {
+			if ( this.object.position.lengthSq() > this.maxDistance * this.maxDistance ) {
 
-				this.position.setLength( this.maxDistance );
+				this.object.position.setLength( this.maxDistance );
 
 			}
 
 			if ( _eye.lengthSq() < this.minDistance * this.minDistance ) {
 
-				this.position.add( this.target.position, _eye.setLength( this.minDistance ) );
+				this.object.position.add( this.target, _eye.setLength( this.minDistance ) );
 
 			}
 
@@ -202,9 +201,9 @@ THREE.TrackballControls = function ( object ) {
 
 	};
 
-	this.update = function( parentMatrixWorld, forceUpdate, camera ) {
+	this.update = function() {
 
-		_eye = this.position.clone().subSelf( this.target.position ),
+		_eye.copy( this.object.position ).subSelf( this.target );
 
 		this.rotateCamera();
 
@@ -220,11 +219,11 @@ THREE.TrackballControls = function ( object ) {
 
 		}
 
-		this.position.add( this.target.position, _eye );
+		this.object.position.add( this.target, _eye );
 
 		this.checkDistances();
 
-		this.supr.update.call( this, parentMatrixWorld, forceUpdate, camera );
+		this.object.lookAt( this.target );
 
 	};
 
@@ -269,7 +268,7 @@ THREE.TrackballControls = function ( object ) {
 
 	};
 
-	function mousedown(event) {
+	function mousedown( event ) {
 
 		event.preventDefault();
 		event.stopPropagation();

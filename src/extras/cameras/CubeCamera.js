@@ -9,19 +9,19 @@ THREE.CubeCamera = function ( near, far, height, resolution ) {
 
 	var fov = 90, aspect = 1;
 
-	this.cameraPX = new THREE.Camera( fov, aspect, near, far );
-	this.cameraNX = new THREE.Camera( fov, aspect, near, far );
-	this.cameraPY = new THREE.Camera( fov, aspect, near, far );
-	this.cameraNY = new THREE.Camera( fov, aspect, near, far );
-	this.cameraPZ = new THREE.Camera( fov, aspect, near, far );
-	this.cameraNZ = new THREE.Camera( fov, aspect, near, far );
+	this.cameraPX = new THREE.PerspectiveCamera( fov, aspect, near, far );
+	this.cameraNX = new THREE.PerspectiveCamera( fov, aspect, near, far );
+	this.cameraPY = new THREE.PerspectiveCamera( fov, aspect, near, far );
+	this.cameraNY = new THREE.PerspectiveCamera( fov, aspect, near, far );
+	this.cameraPZ = new THREE.PerspectiveCamera( fov, aspect, near, far );
+	this.cameraNZ = new THREE.PerspectiveCamera( fov, aspect, near, far );
 
-	this.cameraPX.useTarget = true;
-	this.cameraNX.useTarget = true;
-	this.cameraPY.useTarget = true;
-	this.cameraNY.useTarget = true;
-	this.cameraPZ.useTarget = true;
-	this.cameraNZ.useTarget = true;
+	this.cameraPXTarget = new THREE.Vector3( 0, 0, 0 );
+	this.cameraNXTarget = new THREE.Vector3( 0, 0, 0 );
+	this.cameraPYTarget = new THREE.Vector3( 0, 0, 0 );
+	this.cameraNYTarget = new THREE.Vector3( 0, 0, 0 );
+	this.cameraPZTarget = new THREE.Vector3( 0, 0, 0 );
+	this.cameraNZTarget = new THREE.Vector3( 0, 0, 0 );
 
 	this.height = height;
 	this.position = new THREE.Vector3( 0, height, 0 );
@@ -44,14 +44,23 @@ THREE.CubeCamera = function ( near, far, height, resolution ) {
 		this.position.x = position.x;
 		this.position.z = position.z;
 
-		this.cameraPX.target.position.add( this.position, new THREE.Vector3( -1,  0,  0 ) );
-		this.cameraNX.target.position.add( this.position, new THREE.Vector3(  1,  0,  0 ) );
+		this.cameraPXTarget.add( this.position, new THREE.Vector3( -1,  0,  0 ) );
+		this.cameraNXTarget.add( this.position, new THREE.Vector3(  1,  0,  0 ) );
 
-		this.cameraPY.target.position.add( this.position, new THREE.Vector3(  0,  1,  0 ) );
-		this.cameraNY.target.position.add( this.position, new THREE.Vector3(  0, -1,  0 ) );
+		this.cameraPYTarget.add( this.position, new THREE.Vector3(  0,  1,  0 ) );
+		this.cameraNYTarget.add( this.position, new THREE.Vector3(  0, -1,  0 ) );
 
-		this.cameraPZ.target.position.add( this.position, new THREE.Vector3(  0,  0,  1 ) );
-		this.cameraNZ.target.position.add( this.position, new THREE.Vector3(  0,  0, -1 ) );
+		this.cameraPZTarget.add( this.position, new THREE.Vector3(  0,  0,  1 ) );
+		this.cameraNZTarget.add( this.position, new THREE.Vector3(  0,  0, -1 ) );
+
+		this.cameraPX.lookAt( this.cameraPXTarget );
+		this.cameraNX.lookAt( this.cameraNXTarget );
+
+		this.cameraPY.lookAt( this.cameraPYTarget );
+		this.cameraNY.lookAt( this.cameraNYTarget );
+
+		this.cameraPZ.lookAt( this.cameraPZTarget );
+		this.cameraNZ.lookAt( this.cameraNZTarget );
 
 	};
 

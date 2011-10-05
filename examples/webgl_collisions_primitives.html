@@ -57,27 +57,26 @@
 
 			function init () {
 
-				container = document.createElement('div');
-				document.body.appendChild(container);
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
 
-				info = document.getElementById("info");
+				info = document.getElementById( "info" );
 
-				camera = new THREE.Camera(40, window.innerWidth / window.innerHeight, 1, 10000);
-				camera.useTarget = true;
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
 
 				scene = new THREE.Scene();
 
 				projector = new THREE.Projector();
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.setSize(window.innerWidth, window.innerHeight);
-				container.appendChild(renderer.domElement);
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
 
-				var ambientLight = new THREE.AmbientLight(0x606060);
-				scene.add(ambientLight);
+				var ambientLight = new THREE.AmbientLight( 0x606060 );
+				scene.add( ambientLight );
 
-				sun = new THREE.DirectionalLight(0xffffff);
-				scene.add(sun);
+				sun = new THREE.DirectionalLight( 0xffffff );
+				scene.add( sun );
 
 				makeWall(240);
 				makeWall(120);
@@ -106,26 +105,36 @@
 			}
 
 			function makeWall(z){
+
 				var mx = 120 * 2;
-				for (var i = -mx; i <= mx; i += 120) {
-					for (var j = -mx; j <= mx; j += 120) {
-					if (Math.random() > 0.5)
-						createCube(100, new THREE.Vector3(j, i, z));
+
+				for ( var i = -mx; i <= mx; i += 120 ) {
+
+					for ( var j = -mx; j <= mx; j += 120 ) {
+
+					if ( Math.random() > 0.5 )
+						createCube( 100, new THREE.Vector3( j, i, z ) );
 					else
-						createSphere(50, new THREE.Vector3(j, i, z));
+						createSphere( 50, new THREE.Vector3( j, i, z ) );
+
 					}
+
 				}
+
 			}
 
-			function createCube(s, p){
+			function createCube( s, p ) {
+
 				var cube = new THREE.Mesh(new THREE.CubeGeometry( s, s, s ), new THREE.MeshLambertMaterial( { color: 0x003300 } ) );
 				cube.position = p;
 				scene.add(cube);
 				geoms.push(cube);
 				THREE.Collisions.colliders.push(THREE.CollisionUtils.MeshAABB(cube, p));
+
 			}
 
-			function createSphere(rad, p){
+			function createSphere( rad, p ) {
+
 				var sphere = new THREE.Mesh( new THREE.SphereGeometry( rad, 10, 10 ), new THREE.MeshLambertMaterial( { color: 0x003300 } ) );
 				sphere.position = p;
 				scene.add(sphere);
@@ -134,12 +143,15 @@
 				var sc = new THREE.SphereCollider(p, rad);
 				sc.mesh = sphere;
 				THREE.Collisions.colliders.push(sc);
+
 			}
 
 			function onDocumentMouseMove(event){
+
 				event.preventDefault();
 				mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
 				mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
 			}
 
 			function animate(){
@@ -203,7 +215,10 @@
 				camera.position.x = camdist * Math.cos(theta);
 				camera.position.z = camdist * Math.sin(theta);
 				camera.position.y = camdist / 2 * Math.sin(theta * 2);
-				sun.position = camera.position.clone();
+
+				camera.lookAt( scene.position );
+
+				sun.position.copy( camera.position );
 				sun.position.normalize();
 				theta += 0.005;
 
