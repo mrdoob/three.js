@@ -36,39 +36,34 @@ THREE.Projector = function() {
 
 	this.projectVector = function ( vector, camera ) {
 		
-        _projScreenMatrix.multiply( camera.projectionMatrix, camera.matrixWorldInverse );
+		_projScreenMatrix.multiply( camera.projectionMatrix, camera.matrixWorldInverse );
 		_projScreenMatrix.multiplyVector3( vector );
 
 		return vector;
 	};
 
-	this.unprojectVector = function ( vector, camera, ray ) {
-        var end, dir, t;
-
-        //if ( camera instanceof THREE.OrthographicCamera ) {
-        
-            vector.z = -1.0;
-            end = new THREE.Vector3( vector.x, vector.y, 1.0);        
-            
-        //}
+	this.unprojectVector = function ( vector, camera ) {
 
 		_projScreenMatrix.multiply( camera.matrixWorld, THREE.Matrix4.makeInvert( camera.projectionMatrix ) );
 		_projScreenMatrix.multiplyVector3( vector );
 
-       // if ( camera instanceof THREE.OrthographicCamera ) {
-
-            _projScreenMatrix.multiplyVector3( end );
-
-            dir = new THREE.Vector3();
-            dir.sub( end, vector );
-            dir.normalize();
-        
-            ray.origin = vector;
-            ray.direction = dir;
-       // }
-
 		return vector;
+	};
 
+	this.pickingRay = function ( vector, camera ) {
+		var end, dir, ray, t;
+
+		vector.z = -1.0;
+		end = new THREE.Vector3( vector.x, vector.y, 1.0 );
+
+		this.unprojectVector( vector, camera );
+		this.unprojectVector( end, camera );
+
+		dir = new THREE.Vector3();
+		dir.sub( end, vector );
+		dir.normalize();
+
+		return new THREE.Ray( vector, dir );
 	};
 
 	this.projectObjects = function ( scene, camera, sort ) {
