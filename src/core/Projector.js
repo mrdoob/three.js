@@ -42,20 +42,20 @@ THREE.Projector = function() {
 		return vector;
 	};
 
-	this.unprojectVector = function ( vector, camera ) {
+	this.unprojectVector = function ( vector, camera, ray ) {
         var end, dir, t;
 
-        if ( camera instanceof THREE.OrthographicCamera ) {
+        //if ( camera instanceof THREE.OrthographicCamera ) {
         
-            vector.z = 0.0;
+            vector.z = -1.0;
             end = new THREE.Vector3( vector.x, vector.y, 1.0);        
-        
-        }
+            
+        //}
 
 		_projScreenMatrix.multiply( camera.matrixWorld, THREE.Matrix4.makeInvert( camera.projectionMatrix ) );
 		_projScreenMatrix.multiplyVector3( vector );
 
-        if ( camera instanceof THREE.OrthographicCamera ) {
+       // if ( camera instanceof THREE.OrthographicCamera ) {
 
             _projScreenMatrix.multiplyVector3( end );
 
@@ -63,13 +63,9 @@ THREE.Projector = function() {
             dir.sub( end, vector );
             dir.normalize();
         
-            t = vector.y / - ( dir.y );
-
-            vector.set( vector.x + t * dir.x,
-                        vector.y + t * dir.y,
-                        vector.z + t * dir.z );
-        
-        }
+            ray.origin = vector;
+            ray.direction = dir;
+       // }
 
 		return vector;
 
