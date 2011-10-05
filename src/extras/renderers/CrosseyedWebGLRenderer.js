@@ -14,11 +14,11 @@ if ( THREE.WebGLRenderer ) {
 
 		var _width, _height;
 
-		var _cameraL = new THREE.Camera();
-		_cameraL.useTarget = true;
+		var _cameraL = new THREE.PerspectiveCamera();
+		_cameraL.target = new THREE.Vector3( 0, 0, 0 );
 
-		var _cameraR = new THREE.Camera();
-		_cameraR.useTarget = true;
+		var _cameraR = new THREE.PerspectiveCamera();
+		_cameraR.target = new THREE.Vector3( 0, 0, 0 );
 
 		_this.separation = 10;
 		if ( parameters && parameters.separation !== undefined ) _this.separation = parameters.separation;
@@ -47,14 +47,16 @@ if ( THREE.WebGLRenderer ) {
 			_cameraL.updateProjectionMatrix();
 
 			_cameraL.position.copy( camera.position );
-			_cameraL.target.position.copy( camera.target.position );
+			_cameraL.target.copy( camera.target );
 			_cameraL.translateX( _this.separation );
+			_cameraL.lookAt( _cameraL.target );
 
 			_cameraR.projectionMatrix = _cameraL.projectionMatrix;
 
 			_cameraR.position.copy( camera.position );
-			_cameraR.target.position.copy( camera.target.position );
+			_cameraR.target.copy( camera.target );
 			_cameraR.translateX( - _this.separation );
+			_cameraR.lookAt( _cameraR.target );
 
 			this.setViewport( 0, 0, _width, _height );
 			_render.call( _this, scene, _cameraL );

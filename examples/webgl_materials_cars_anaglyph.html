@@ -17,7 +17,7 @@
 			h1 { }
 			a { color:skyblue; text-decoration:none }
 			canvas { pointer-events:none; z-index:10; position:relative; }
-			#log { position:absolute; top:50px; text-align:left; display:block; z-index:100 }
+
 			#d { position:absolute; width: 100%; text-align:center; margin:1em 0 -4.5em 0; z-index:1000; }
 
 			.bwrap { margin:0.5em 0 0 0 }
@@ -54,8 +54,6 @@
 
 			<div id="buttons_materials" class="bwrap"></div>
 		</div>
-
-		<div id="log"></div>
 
 		<script src="../build/Three.js"></script>
 
@@ -140,7 +138,7 @@
 
 			var container, stats;
 
-			var camera, scene, webglRenderer;
+			var camera, scene, renderer;
 
 			var m, mi;
 
@@ -159,11 +157,10 @@
 
 			function init() {
 
-				container = document.createElement('div');
-				document.body.appendChild(container);
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
-				camera.useTarget = true;
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
 
 				scene = new THREE.Scene();
 
@@ -173,29 +170,21 @@
 				scene.add( ambient );
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
-				directionalLight.position.x = 2;
-				directionalLight.position.y = 1.2;
-				directionalLight.position.z = 10;
-				directionalLight.position.normalize();
+				directionalLight.position.set( 2, 1.2, 10 ).normalize();
 				scene.add( directionalLight );
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
-				directionalLight.position.x = - 2;
-				directionalLight.position.y = 1.2;
-				directionalLight.position.z = - 10;
-				directionalLight.position.normalize();
+				directionalLight.position.set( - 2, 1.2, -10 ).normalize();
 				scene.add( directionalLight );
 
 				pointLight = new THREE.PointLight( 0xffaa00, 2 );
-				pointLight.position.x = 2000;
-				pointLight.position.y = 1200;
-				pointLight.position.z = 10000;
+				pointLight.position.set( 2000, 1200, 10000 );
 				scene.add( pointLight );
 
 				// Skybox
 
-				var shader = THREE.ShaderUtils.lib["cube"];
-				shader.uniforms["tCube"].texture = textureCube;
+				var shader = THREE.ShaderUtils.lib[ "cube" ];
+				shader.uniforms[ "tCube" ].texture = textureCube;
 
 				var material = new THREE.ShaderMaterial( {
 
@@ -210,10 +199,11 @@
 
 				//
 
-				webglRenderer = new THREE.AnaglyphWebGLRenderer();
-				webglRenderer.setSize( window.innerWidth, window.innerHeight );
-				webglRenderer.setFaceCulling( 0 );
-				container.appendChild( webglRenderer.domElement );
+				renderer = new THREE.AnaglyphWebGLRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setFaceCulling( 0 );
+
+				container.appendChild( renderer.domElement );
 
 				if ( STATS_ENABLED ) {
 
@@ -607,18 +597,14 @@
 				camera.position.x = 1000 * Math.cos( timer );
 				camera.position.z = 1000 * Math.sin( timer );
 
-				webglRenderer.render( scene, camera );
+				camera.lookAt( scene.position );
+
+				renderer.render( scene, camera );
 
 				if ( STATS_ENABLED ) stats.update();
 
 			}
 
-			function log( text ) {
-
-				var e = document.getElementById("log");
-				e.innerHTML = text + "<br/>" + e.innerHTML;
-
-			}
 
 		</script>
 

@@ -10,19 +10,23 @@ if ( THREE.WebGLRenderer ) {
 		THREE.WebGLRenderer.call( this, parameters );
 
 		var _this = this, _setSize = this.setSize, _render = this.render;
-		var _cameraL = new THREE.Camera(), _cameraR = new THREE.Camera();
+
+		var _cameraL = new THREE.PerspectiveCamera(),
+			_cameraR = new THREE.PerspectiveCamera();
+
 		var eyeRight = new THREE.Matrix4(),
 			eyeLeft = new THREE.Matrix4(),
 			focalLength = 125,
 			aspect, near, fov;
 
-		_cameraL.useTarget = _cameraR.useTarget = false;
 		_cameraL.matrixAutoUpdate = _cameraR.matrixAutoUpdate = false;
 
 		var _params = { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat };
-		var _renderTargetL = new THREE.WebGLRenderTarget( 512, 512, _params ), _renderTargetR = new THREE.WebGLRenderTarget( 512, 512, _params );
 
-		var _camera = new THREE.Camera( 53, 1, 1, 10000 );
+		var _renderTargetL = new THREE.WebGLRenderTarget( 512, 512, _params ),
+			_renderTargetR = new THREE.WebGLRenderTarget( 512, 512, _params );
+
+		var _camera = new THREE.PerspectiveCamera( 53, 1, 1, 10000 );
 		_camera.position.z = 2;
 
 		_material = new THREE.ShaderMaterial( {

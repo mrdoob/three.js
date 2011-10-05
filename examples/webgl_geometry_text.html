@@ -75,7 +75,7 @@
 
 			var container, stats, permalink, hex, color;
 
-			var camera, scene, renderer;
+			var camera, cameraTarget, scene, renderer;
 
 			var composer;
 
@@ -161,11 +161,10 @@
 
 				// CAMERA
 
-				camera = new THREE.Camera( 30, window.innerWidth / window.innerHeight, 1, 1500 );
-				camera.position.y = 400;
-				camera.position.z = 700;
-				camera.useTarget = true;
-				camera.target.position.y = 150;
+				camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 1500 );
+				camera.position.set( 0, 400, 700 );
+
+				cameraTarget = new THREE.Vector3( 0, 150, 0 );
 
 				// SCENE
 
@@ -174,8 +173,7 @@
 				scene.fog = new THREE.Fog( 0x000000, 250, 1400 );
 
 				var dirLight = new THREE.DirectionalLight( 0xffffff, 0.125 );
-				dirLight.position.set( 0, 0, 1 );
-				dirLight.position.normalize();
+				dirLight.position.set( 0, 0, 1 ).normalize();
 				scene.add( dirLight );
 
 				var pointLight = new THREE.PointLight( 0xffffff, 1.5 );
@@ -617,6 +615,8 @@
 				oldTime = time;
 
 				parent.rotation.y += ( targetRotation - parent.rotation.y ) * 0.05;
+
+				camera.lookAt( cameraTarget );
 
 				renderer.clear();
 

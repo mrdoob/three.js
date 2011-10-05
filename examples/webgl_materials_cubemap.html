@@ -48,7 +48,7 @@
 			var container, stats;
 
 			var camera, scene, renderer;
-			var cameraCube, sceneCube;
+			var cameraCube, sceneCube, cubeTarget;
 
 			var mesh, zmesh, lightMesh, geometry;
 
@@ -72,12 +72,12 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 50, window.innerWidth / window.innerHeight, 1, 5000 );
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 5000 );
 				camera.position.z = 2000;
-				camera.useTarget = true;
 
-				cameraCube = new THREE.Camera( 50, window.innerWidth / window.innerHeight, 1, 100 );
-				cameraCube.useTarget = true;
+				cameraCube = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 100 );
+
+				cubeTarget = new THREE.Vector3( 0, 0, 0 );
 
 				scene = new THREE.Scene();
 				sceneCube = new THREE.Scene();
@@ -138,11 +138,15 @@
 				renderer.autoClear = false;
 				container.appendChild( renderer.domElement );
 
+				//
+
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
 				stats.domElement.style.zIndex = 100;
 				container.appendChild( stats.domElement );
+
+				//
 
 				loader = new THREE.BinaryLoader( true );
 				document.body.appendChild( loader.statusDomElement );
@@ -201,10 +205,13 @@
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 
-				cameraCube.target.position.x = - camera.position.x;
-				cameraCube.target.position.y = - camera.position.y;
-				cameraCube.target.position.z = - camera.position.z;
+				camera.lookAt( scene.position );
 
+				cubeTarget.x = - camera.position.x;
+				cubeTarget.y = - camera.position.y;
+				cubeTarget.z = - camera.position.z;
+
+				cameraCube.lookAt( cubeTarget );
 
 				lightMesh.position.x = 1500 * Math.cos( timer );
 				lightMesh.position.z = 1500 * Math.sin( timer );

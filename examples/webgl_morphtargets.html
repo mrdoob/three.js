@@ -94,9 +94,8 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 45, window.innerWidth / window.innerHeight, 1, 15000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 15000 );
 				camera.position.z = 500;
-				camera.useTarget = true;
 
 
 				scene = new THREE.Scene();
@@ -173,14 +172,9 @@
 				//camera.position.x += ( mouseX - camera.position.x ) * .005;
 				camera.position.y += ( - mouseY - camera.position.y ) * .01;
 
+				camera.lookAt( scene.position );
+
 				renderer.render( scene, camera );
-
-			}
-
-			function log( text ) {
-
-				var e = document.getElementById("log");
-				e.innerHTML = text + "<br/>" + e.innerHTML;
 
 			}
 

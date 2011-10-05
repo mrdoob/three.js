@@ -79,9 +79,8 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 33, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 33, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 700;
-				camera.useTarget = true;
 
 				scene = new THREE.Scene();
 
@@ -265,6 +264,8 @@
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY + 200 - camera.position.y ) * .05;
+
+				camera.lookAt( scene.position );
 
 				var time = new Date().getTime() * 0.0005;
 

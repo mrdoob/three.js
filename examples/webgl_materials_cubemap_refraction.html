@@ -48,8 +48,8 @@
 
 			var container, stats;
 
-			var camera, scene, webglRenderer;
-			var cameraCube, sceneCube;
+			var camera, scene, renderer;
+			var cameraCube, sceneCube, cubeTarget;
 
 			var mesh, zmesh, lightMesh, geometry;
 
@@ -70,12 +70,12 @@
 				container = document.createElement('div');
 				document.body.appendChild(container);
 
-				camera = new THREE.Camera( 50, window.innerWidth / window.innerHeight, 1, 100000 );
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 100000 );
 				camera.position.z = 2000;
-				camera.useTarget = true;
 
-				cameraCube = new THREE.Camera( 50, window.innerWidth / window.innerHeight, 1, 100000 );
-				cameraCube.useTarget = true;
+				cameraCube = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 100000 );
+
+				cubeTarget = new THREE.Vector3( 0, 0, 0 );
 
 				scene = new THREE.Scene();
 				sceneCube = new THREE.Scene();
@@ -94,7 +94,7 @@
 				lightMesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color:0xffaa00 } ) );
 				lightMesh.position = pointLight.position;
 				lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
-				scene.add(lightMesh);
+				scene.add( lightMesh );
 
 				// material samples
 
@@ -128,10 +128,10 @@
 
 				//
 
-				webglRenderer = new THREE.WebGLRenderer();
-				webglRenderer.setSize( window.innerWidth, window.innerHeight );
-				webglRenderer.autoClear = false;
-				container.appendChild( webglRenderer.domElement );
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.autoClear = false;
+				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
@@ -198,17 +198,20 @@
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 
-				cameraCube.target.position.x = - camera.position.x;
-				cameraCube.target.position.y = - camera.position.y;
-				cameraCube.target.position.z = - camera.position.z;
+				camera.lookAt( scene.position );
 
+				cubeTarget.x = - camera.position.x;
+				cubeTarget.y = - camera.position.y;
+				cubeTarget.z = - camera.position.z;
+
+				cameraCube.lookAt( cubeTarget );
 
 				lightMesh.position.x = 1500 * Math.cos( timer );
 				lightMesh.position.z = 1500 * Math.sin( timer );
 
-				webglRenderer.clear();
-				webglRenderer.render( sceneCube, cameraCube );
-				webglRenderer.render( scene, camera );
+				renderer.clear();
+				renderer.render( sceneCube, cameraCube );
+				renderer.render( scene, camera );
 
 			}
 

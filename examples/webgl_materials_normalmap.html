@@ -85,7 +85,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.OrthoCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
+				camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
 				camera.position.z = 6200;
 
 				scene = new THREE.Scene();
@@ -100,10 +100,7 @@
 				scene.add( pointLight );
 
 				directionalLight = new THREE.DirectionalLight( 0xaaaa88 );
-				directionalLight.position.x = 1;
-				directionalLight.position.y = 1;
-				directionalLight.position.z = 0.5;
-				directionalLight.position.normalize();
+				directionalLight.position.set( 1, 1, 0.5 ).normalize();
 				scene.add( directionalLight );
 
 				// light representation
@@ -112,7 +109,7 @@
 				lightMesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) );
 				lightMesh.position = pointLight.position;
 				lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
-				scene.add(lightMesh);
+				scene.add( lightMesh );
 
 				// common material parameters
 
@@ -145,14 +142,20 @@
 
 				var material2 = new THREE.MeshPhongMaterial( { color: diffuse, specular: specular, ambient: ambient, shininess: shininess } );
 
+				//
+
 				loader = new THREE.BinaryLoader( true );
 				document.body.appendChild( loader.statusDomElement );
 
 				loader.load( { model: "obj/ninja/NinjaLo_bin.js", callback: function( geometry ) { createScene( geometry, scale, material1, material2 ) } } );
 
+				//
+
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
+
+				//
 
 				var description = "normal + ao" + ( renderer.supportsVertexTextures() ? " + displacement" : " + <strike>displacement</strike>" );
 				document.getElementById( "description" ).innerHTML = description;

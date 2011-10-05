@@ -42,25 +42,23 @@
 				info.innerHTML = '<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> webgl - morph targets - horse. model by <a href="http://mirada.com/">mirada</a> from <a href="http://ro.me">rome</a>';
 				container.appendChild( info );
 
-				camera = new THREE.Camera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
+				//
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.y = 300;
-				camera.useTarget = true;
-				camera.target.position.y = 150;
+
+				camera.target = new THREE.Vector3( 0, 150, 0 );
 
 				scene = new THREE.Scene();
 
+				//
+
 				var light = new THREE.DirectionalLight( 0xefefff, 2 );
-				light.position.x = 1;
-				light.position.y = 1;
-				light.position.z = 1;
-				light.position.normalize();
+				light.position.set( 1, 1, 1 ).normalize();
 				scene.add( light );
 
 				var light = new THREE.DirectionalLight( 0xffefef, 2 );
-				light.position.x = - 1;
-				light.position.y = - 1;
-				light.position.z = - 1;
-				light.position.normalize();
+				light.position.set( -1, -1, -1 ).normalize();
 				scene.add( light );
 
 				var loader = new THREE.JSONLoader( true );
@@ -72,11 +70,15 @@
 
 				} } );
 
+				//
+
 				renderer = new THREE.WebGLRenderer();
 				renderer.sortObjects = false;
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.appendChild(renderer.domElement);
+
+				//
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
@@ -106,8 +108,11 @@
 			function render() {
 
 				theta += 0.2;
+
 				camera.position.x = radius * Math.sin( theta * Math.PI / 360 );
 				camera.position.z = radius * Math.cos( theta * Math.PI / 360 );
+
+				camera.lookAt( camera.target );
 
 				if ( mesh ) {
 
