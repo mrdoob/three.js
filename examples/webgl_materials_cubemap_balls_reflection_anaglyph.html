@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - materials - cube reflection [balls]</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				background:#777;
 				padding:0;
@@ -20,7 +21,7 @@
 				font-family:Monospace;
 				font-size:13px;
 				text-align:center;
-				z-index:1000; 
+				z-index:1000;
 			}
 
 			a {
@@ -34,18 +35,18 @@
 	<body>
 		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl cube reflection demo. skybox by <a href="http://ict.debevec.org/~debevec/" target="_blank">Paul Debevec</a></div>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/Detector.js"></script>
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
 
-		<script type="text/javascript">
+		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var container, timer;
 
-			var camera, scene, webglRenderer;
+			var camera, scene, renderer;
 
 			var mesh, zmesh, lightMesh, geometry;
 			var spheres = [];
@@ -68,7 +69,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
 				camera.position.z = 3200;
 
 				scene = new THREE.Scene();
@@ -89,11 +90,14 @@
 				for ( var i = 0; i < 500; i ++ ) {
 
 					var mesh = new THREE.Mesh( geometry, material );
+
 					mesh.position.x = Math.random() * 10000 - 5000;
 					mesh.position.y = Math.random() * 10000 - 5000;
 					mesh.position.z = Math.random() * 10000 - 5000;
+
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 3 + 1;
-					scene.addObject( mesh );
+
+					scene.add( mesh );
 
 					spheres.push( mesh );
 
@@ -101,10 +105,10 @@
 
 				// Skybox
 
-				var shader = THREE.ShaderUtils.lib["cube"];
-				shader.uniforms["tCube"].texture = textureCube;
+				var shader = THREE.ShaderUtils.lib[ "cube" ];
+				shader.uniforms[ "tCube" ].texture = textureCube;
 
-				var material = new THREE.MeshShaderMaterial( {
+				var material = new THREE.ShaderMaterial( {
 
 					fragmentShader: shader.fragmentShader,
 					vertexShader: shader.vertexShader,
@@ -112,14 +116,15 @@
 
 				} ),
 
-				mesh = new THREE.Mesh( new THREE.CubeGeometry( 100000, 100000, 100000, 1, 1, 1, null, true ), material );
-				scene.addObject( mesh );
+				mesh = new THREE.Mesh( new THREE.CubeGeometry( 100000, 100000, 100000 ), material );
+				mesh.flipSided = true;
+				scene.add( mesh );
 
 				//
 
-				webglRenderer = new THREE.AnaglyphWebGLRenderer();
-				webglRenderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( webglRenderer.domElement );
+				renderer = new THREE.AnaglyphWebGLRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
 
 			}
 
@@ -147,6 +152,8 @@
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 
+				camera.lookAt( scene.position );
+
 				for ( var i = 0, il = spheres.length; i < il; i ++ ) {
 
 					var sphere = spheres[ i ];
@@ -156,7 +163,7 @@
 
 				}
 
-				webglRenderer.render( scene, camera );
+				renderer.render( scene, camera );
 
 			}
 

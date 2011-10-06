@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js misc - materials - multi-materials</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				background:#fff;
 				padding:0;
@@ -15,7 +16,7 @@
 			h1 { }
 			a { color:skyblue }
 			canvas { pointer-events:none; z-index:10; }
-			#log { position:absolute; top:50px; text-align:left; display:block; z-index:1; pointer-events:none; }
+
 			#d { text-align:center; margin:1em 0 -15.7em 0; z-index:0; position:relative; display:block }
 			.button { background:#000; color:#fff; padding:0.2em 0.5em; cursor:pointer }
 			.inactive { background:#999; color:#eee }
@@ -38,14 +39,12 @@
 
 		</div>
 
-		<pre id="log"></pre>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
-
-		<script type="text/javascript">
+		<script>
 
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
@@ -54,13 +53,13 @@
 			var container;
 			var stats;
 
-			var camera;
+			var camera, target;
 			var scene;
 			var canvasRenderer, webglRenderer;
 
 			var mesh, zmesh, geometry;
 
-			var directionalLight, pointLight;
+			var directionalLight;
 
 			var mouseX = 0;
 			var mouseY = 0;
@@ -85,12 +84,13 @@
 
 			function init() {
 
-				container = document.createElement('div');
-				document.body.appendChild(container);
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
+				camera = new THREE.PerspectiveCamera( 75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
 				camera.position.z = 500;
-				camera.updateMatrix();
+
+				target = new THREE.Vector3( 0, 0, 0 );
 
 				scene = new THREE.Scene();
 
@@ -100,15 +100,15 @@
 
 				for ( var i = 0; i < 10; i ++ ) {
 
-					//mesh = new THREE.Mesh( sphere, new THREE.MeshLambertMaterial( ) );
 					mesh = new THREE.Mesh( sphere, [ new THREE.MeshLambertMaterial( { color: 0xffffff } ), new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true,  wireframeLinewidth: 1.5 } ) ] );
-					//mesh = new THREE.Mesh( sphere, new THREE.MeshLambertMaterial( { color: 0x00aa00, wireframe: true,  wireframeLinewidth: 1.5 } ) );
-					//mesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { wireframe: true,  wireframeLinewidth: 2.5 } ) );
+
 					mesh.position.x = 500 * ( Math.random() - 0.5 );
 					mesh.position.y = 500 * ( Math.random() - 0.5 );
 					mesh.position.z = 500 * ( Math.random() - 0.5 );
-					mesh.scale.x = mesh.scale.y = mesh.scale.z = 0.25 * (Math.random() + 0.5);
-					scene.addObject(mesh);
+
+					mesh.scale.x = mesh.scale.y = mesh.scale.z = 0.25 * ( Math.random() + 0.5 );
+
+					scene.add( mesh );
 
 				}
 
@@ -116,24 +116,17 @@
 				// LIGHTS
 
 				var ambient = new THREE.AmbientLight( 0x101010 );
-				scene.addLight( ambient );
+				scene.add( ambient );
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff );
-				directionalLight.position.y = -70;
-				directionalLight.position.z = 100;
+				directionalLight.position.set( 0, -70, 100 );
 				directionalLight.position.normalize();
-				scene.addLight( directionalLight );
-
-				pointLight = new THREE.PointLight( 0xffaa00 );
-				pointLight.position.x = 0;
-				pointLight.position.y = 0;
-				pointLight.position.z = 120;
-				//scene.addLight( pointLight );
+				scene.add( directionalLight );
 
 				mesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xff0000 } ) );
-				mesh.scale.x = mesh.scale.y = mesh.scale.z = 0.1;
-				mesh.position = pointLight.position;
-				scene.addObject(mesh);
+				mesh.scale.set( 0.1, 0.1, 0.1 );
+				mesh.position.set( 0, 0, 120 );
+				scene.add( mesh );
 
 				if ( render_gl ) {
 					try {
@@ -191,18 +184,23 @@
 				xc1.fillStyle = "hsla("+0+",90%,50%,0.15);"
 				xc1.fillRect(40, 70, 60, 50);
 
-				for(var i=0;i<500;i++) {
+				for( var i = 0; i < 500; i ++ ) {
+
 					xc1.fillStyle = "hsla("+60*Math.random()+",90%,50%,0.5);"
-					xc1.fillRect(40+60*Math.random(), 118+10*Math.random(), 2, 10);
+					xc1.fillRect( 40+60*Math.random(), 118+10*Math.random(), 2, 10 );
+
 				}
 
 				var x2 = document.createElement( "canvas" );
 				var xc2 = x2.getContext("2d");
 				x2.width = x2.height = 128;
 				xc2.fillStyle = "rgba(0,0,0,0.5)";
-				for(var i=0;i<14;i++) {
-					xc2.fillRect(0, 5+i*4, 54, 2);
-					xc2.fillRect(i*4, 5, 2, 54);
+
+				for( var i = 0; i < 14; i ++ ) {
+
+					xc2.fillRect( 0, 5+i*4, 54, 2 );
+					xc2.fillRect( i*4, 5, 2, 54 );
+
 				}
 
 				var xm1 = new THREE.MeshLambertMaterial( { map: new THREE.Texture( x1 ), transparent: true } );
@@ -229,8 +227,7 @@
 				zmesh.position.y = FLOOR;
 				zmesh.scale.x = zmesh.scale.y = zmesh.scale.z = 3;
 				zmesh.overdraw = true;
-				zmesh.updateMatrix();
-				scene.addObject(zmesh);
+				scene.add(zmesh);
 
 				// PLANES with all materials from the model
 
@@ -249,8 +246,7 @@
 					mesh.position.z = -100;
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = 1;
 					mesh.doubleSided = true;
-					mesh.updateMatrix();
-					scene.addObject(mesh);
+					scene.add(mesh);
 
 					// number
 					var x = document.createElement( "canvas" );
@@ -271,8 +267,7 @@
 					mesh.position.z = - 99;
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = 1;
 					mesh.doubleSided = true;
-					mesh.updateMatrix();
-					scene.addObject(mesh);
+					scene.add(mesh);
 				}
 
 			}
@@ -299,19 +294,13 @@
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
-				camera.updateMatrix();
+				camera.lookAt( target );
 
 				if ( render_canvas ) canvasRenderer.render( scene, camera );
 				if ( render_gl && has_gl ) webglRenderer.render( scene, camera );
 
 			}
 
-			function log(text) {
-
-				var e = document.getElementById("log");
-				e.innerHTML = text + "<br/>" + e.innerHTML;
-
-			}
 
 			function toggleCanvas() {
 

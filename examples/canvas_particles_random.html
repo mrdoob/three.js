@@ -1,10 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js canvas - particles - random</title>
 		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				background-color: #000000;
 				margin: 0px;
@@ -18,12 +18,12 @@
 	</head>
 	<body>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
-		<script type="text/javascript">
+		<script>
 
 			var container, stats;
 			var camera, scene, renderer, group, particle;
@@ -40,7 +40,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 75, window.innerWidth / window.innerHeight, 1, 3000 );
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 3000 );
 				camera.position.z = 1000;
 
 				scene = new THREE.Scene();
@@ -56,7 +56,7 @@
 				}
 
 				group = new THREE.Object3D();
-				scene.addObject( group );
+				scene.add( group );
 
 				for ( var i = 0; i < 1000; i++ ) {
 
@@ -65,7 +65,7 @@
 					particle.position.y = Math.random() * 2000 - 1000;
 					particle.position.z = Math.random() * 2000 - 1000;
 					particle.scale.x = particle.scale.y = Math.random() * 10 + 5;
-					group.addChild( particle );
+					group.add( particle );
 				}
 
 				renderer = new THREE.CanvasRenderer();
@@ -127,6 +127,7 @@
 
 				camera.position.x += ( mouseX - camera.position.x ) * 0.05;
 				camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
+				camera.lookAt( scene.position );
 
 				group.rotation.x += 0.01;
 				group.rotation.y += 0.02;

@@ -1,10 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js canvas - geometry - shapes</title>
 		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				font-family: Monospace;
 				background-color: #f0f0f0;
@@ -16,13 +16,13 @@
 	<body>
 		<canvas id="debug" style="position:absolute; left:100px"></canvas>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
 
-		<script type="text/javascript">
+		<script>
 
 			var container, stats;
 
@@ -55,21 +55,20 @@
 				info.innerHTML = 'Simple procedurally generated 3D shapes example by <a href="http://www.lab4games.net/zz85/blog">zz85</a><br/>Drag to spin';
 				container.appendChild( info );
 
-				camera = new THREE.Camera( 50, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.y = 150;
 				camera.position.z = 500;
-				camera.target.position.y = 150;
 
 				scene = new THREE.Scene();
 
 				var light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0, 0, 1 );
 				light.position.normalize();
-				scene.addLight( light );
+				scene.add( light );
 
 				parent = new THREE.Object3D();
 				parent.position.y = 50;
-				scene.addChild( parent );
+				scene.add( parent );
 
 				function addGeometry( geometry, points, spacedPoints, color, x, y, z, rx, ry, rz, s ) {
 
@@ -79,7 +78,7 @@
 					mesh.position.set( x, y, z - 75 );
 					mesh.rotation.set( rx, ry, rz );
 					mesh.scale.set( s, s, s );
-					parent.addChild( mesh );
+					parent.add( mesh );
 
 					// solid line
 
@@ -87,7 +86,7 @@
 					line.position.set( x, y, z + 25 );
 					line.rotation.set( rx, ry, rz );
 					line.scale.set( s, s, s );
-					parent.addChild( line );
+					parent.add( line );
 
 					// transparent line from real points
 
@@ -95,7 +94,7 @@
 					line.position.set( x, y, z + 75 );
 					line.rotation.set( rx, ry, rz );
 					line.scale.set( s, s, s );
-					parent.addChild( line );
+					parent.add( line );
 
 					// vertices from real points
 
@@ -104,7 +103,7 @@
 					particles.position.set( x, y, z + 75 );
 					particles.rotation.set( rx, ry, rz );
 					particles.scale.set( s, s, s );
-					parent.addChild( particles );
+					parent.add( particles );
 
 					// transparent line from equidistance sampled points
 
@@ -112,7 +111,7 @@
 					line.position.set( x, y, z + 100 );
 					line.rotation.set( rx, ry, rz );
 					line.scale.set( s, s, s );
-					parent.addChild( line );
+					parent.add( line );
 
 					// equidistance sampled points
 
@@ -121,7 +120,7 @@
 					particles2.position.set( x, y, z + 100 );
 					particles2.rotation.set( rx, ry, rz );
 					particles2.scale.set( s, s, s );
-					parent.addChild( particles2 );
+					parent.add( particles2 );
 
 				}
 
@@ -362,12 +361,12 @@
 				addGeometry( triangle3d, trianglePoints, triangleSpacedPoints, 			0xffee00, -180,    0, 0,     0, 0, 0, 1 );
 				addGeometry( roundedRect3d, roundedRectPoints, roundedRectSpacedPoints,	0x005500, -150,  150, 0,     0, 0, 0, 1 );
 				addGeometry( square3d, squarePoints, squareSpacedPoints,				0x0055ff,  150,  100, 0,     0, 0, 0, 1 );
-				addGeometry( heart3d, heartPoints, heartSpacedPoints,					0xff1100,    0,  100, 0,   3.14, 0, 0, 1 );
+				addGeometry( heart3d, heartPoints, heartSpacedPoints,					0xff1100,    0,  100, 0, 	 Math.PI, 0, 0, 1 );
 				addGeometry( circle3d, circlePoints, circleSpacedPoints,				0x00ff11,  120,  250, 0,     0, 0, 0, 1 );
 				addGeometry( fish3d, fishPoints, fishSpacedPoints,						0x222222,  -60,  200, 0,     0, 0, 0, 1 );
 				addGeometry( splineShape3d, splinePoints, splineSpacedPoints,			0x888888,  -50,  -100, -50,  0, 0, 0, 0.2 );
 				addGeometry( arc3d, arcPoints, arcSpacedPoints,							0xbb4422,  150,    0, 0,     0, 0, 0, 1 );
-				addGeometry( smiley3d, smileyPoints, smileySpacedPoints,				0xee00ff,  -270,    250, 0,     Math.PI, 0, 0, 1 );
+				addGeometry( smiley3d, smileyPoints, smileySpacedPoints,				0xee00ff,  -270,    250, 0,  Math.PI, 0, 0, 1 );
 
 
 				//

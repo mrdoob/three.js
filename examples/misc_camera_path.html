@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - path camera</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 		    body {
 			color: #000;
 			font-family:Monospace;
@@ -33,93 +34,92 @@
 		<div id="container"></div>
 		<div id="info">
 			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - path camera example</br>
-			mouse look around 
+			mouse look around
 		</div>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/Stats.js"></script>
-		<script type="text/javascript" src="js/Tween.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
-		<script type="text/javascript">
-		
-			var statsEnabled = true;
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var container, stats;
 
-			var camera, scene, renderer;
+			var camera, controls, scene, renderer;
 
 			var cross;
 
 			init();
+			animate();
 
 			function init() {
 
-				// scene and camera
-
 				scene = new THREE.Scene();
-				scene.fog = new THREE.FogExp2( 0xffffff, 0.002 );				
+				scene.fog = new THREE.FogExp2( 0xffffff, 0.002 );
 
-				var waypoints = [
-					[ -500, 0, 0 ],
-					[ 0, 200, 0 ],
-					[ 500, 0, 0 ]
-					
-				];
-				
-				camera = new THREE.PathCamera( {
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
 
-					fov: 40, aspect: window.innerWidth / window.innerHeight, near: 1, far: 1000,
-					waypoints: waypoints, duration: 28,
-					useConstantSpeed: true, resamplingCoef: 1,
-					createDebugPath: true, createDebugDummy: true,
-					lookSpeed: 0.0006, lookVertical: true, lookHorizontal: true,
-					verticalAngleMap:   { srcRange: [ 0.00, 6.28 ], dstRange: [ 1.1, 3.8 ] },
-					horizontalAngleMap: { srcRange: [ 0.00, 6.28 ], dstRange: [ 0.3, Math.PI - 0.3 ] }
+				controls = new THREE.PathControls( camera );
 
-				 } );
+				controls.waypoints = [ [ -500, 0, 0 ], [ 0, 200, 0 ], [ 500, 0, 0 ] ];
+				controls.duration = 28
+				controls.useConstantSpeed = true;
+				//controls.createDebugPath = true;
+				//controls.createDebugDummy = true;
+				controls.lookSpeed = 0.0006;
+				controls.lookVertical = true;
+				controls.lookHorizontal = true;
+				controls.verticalAngleMap = { srcRange: [ 0, 2 * Math.PI ], dstRange: [ 1.1, 3.8 ] };
+				controls.horizontalAngleMap = { srcRange: [ 0, 2 * Math.PI ], dstRange: [ 0.3, Math.PI - 0.3 ] };
+				controls.lon = 180;
 
+				controls.init();
 
-				camera.lon = 180;
+				scene.add( controls.animationParent );
 
 				// world
 
 				var cube = new THREE.CubeGeometry( 20, 60, 20 );
-				
+
 				cube.vertices[ 0 ].position.multiplyScalar( 0.01 );
 				cube.vertices[ 1 ].position.multiplyScalar( 0.01 );
 				cube.vertices[ 4 ].position.multiplyScalar( 0.01 );
 				cube.vertices[ 5 ].position.multiplyScalar( 0.01 );
-				
+
 				var material =  new THREE.MeshLambertMaterial( { color:0xffffff } );
 
-				for( var i = 0; i < 500; i++ ) {
-					
+				for ( var i = 0; i < 500; i ++ ) {
+
 					var mesh = new THREE.Mesh( cube, material );
-					mesh.position.set(( Math.random() - 0.5 ) * 1000,
-									  ( Math.random() - 0.5 ) * 1000,
-									  ( Math.random() - 0.5 ) * 1000 );
-									  
+					mesh.position.set(
+						( Math.random() - 0.5 ) * 1000,
+						( Math.random() - 0.5 ) * 1000,
+						( Math.random() - 0.5 ) * 1000
+					);
+
 					mesh.updateMatrix();
 					mesh.matrixAutoUpdate = false;
-					scene.addChild( mesh );
-					
+					scene.add( mesh );
+
 				}
 
-				scene.addObject( camera.animationParent );
-
-				// lights				
+				// lights
 
 				light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 1, 1, 1 );
-				scene.addChild( light );
+				scene.add( light );
 
 				light = new THREE.DirectionalLight( 0x002288 );
 				light.position.set( -1, -1, -1 );
-				scene.addChild( light );
+				scene.add( light );
 
 				light = new THREE.AmbientLight( 0x222222 );
-				scene.addChild( light );
+				scene.add( light );
 
 
 				// renderer
@@ -131,38 +131,35 @@
 				container = document.getElementById( 'container' );
 				container.appendChild( renderer.domElement );
 
-				if ( statsEnabled ) {
+				// stats
 
-					stats = new Stats();
-					stats.domElement.style.position = 'absolute';
-					stats.domElement.style.top = '0px';
-					stats.domElement.style.zIndex = 100;
-					container.appendChild( stats.domElement );
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				stats.domElement.style.zIndex = 100;
+				container.appendChild( stats.domElement );
 
-				}
+				// start animation
 
-				setInterval( loop, 1000 / 60 );
-				
-				camera.animation.play( true, 0 );
+				controls.animation.play( true, 0 );
 
 			}
 
+			function animate() {
 
-			function loop() {
+				requestAnimationFrame( animate );
 
-				THREE.AnimationHandler.update( 1000/60 );
-				
-				/*
-				cross.matrix.copy( camera.matrix );
-				cross.matrix.n14 = 0;
-				cross.matrix.n24 = 0;
-				cross.matrix.n34 = -200;
-				cross.matrixWorldNeedsUpdate = true;
-				*/
+				render();
+				stats.update();
 
+			}
+
+			function render() {
+
+				THREE.AnimationHandler.update( 1/60 );
+
+				controls.update();
 				renderer.render( scene, camera );
-
-				if ( statsEnabled ) stats.update();
 
 			}
 

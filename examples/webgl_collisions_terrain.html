@@ -1,145 +1,145 @@
-<html>
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - intersection: ray with terrain mesh (through box)</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #f0f0f0;
+				margin: 0px;
+				overflow: hidden;
+			}
 
-<head>
-<title>three.js webgl - intersection: ray with terrain mesh (through box)</title>
-<meta http-equiv="content-type" content="text/html; charset=utf-8">
-<style type="text/css">
+			#oldie { background-color: #ddd !important }
 
-body {
-	font-family: Monospace;
-	background-color: #f0f0f0;
-	margin: 0px;
-	overflow: hidden;
-}
+			#info {
+				position: absolute;
+				top: 30px; left: 10px; width: 800px;
+				color: #000000;
+				padding: 5px;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: left;
+				z-index:100;
+			}
 
-#oldie { background-color: #ddd !important }
+			#options {
+				position: absolute;
+				top: 10px; left: 10px; width: 800px;
+				color: #000000;
+				padding: 5px;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: left;
+				z-index:100;
+			}
+		</style>
 
-#info {
-	position: absolute;
-	top: 30px; left: 10px; width: 800px;
-	color: #000000;
-	padding: 5px;
-	font-family: Monospace;
-	font-size: 13px;
-	text-align: left;
-	z-index:100;
-}
+		<script src="../build/Three.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
 
-#options {
-	position: absolute;
-	top: 10px; left: 10px; width: 800px;
-	color: #000000;
-	padding: 5px;
-	font-family: Monospace;
-	font-size: 13px;
-	text-align: left;
-	z-index:100;
-}
+		<script>
 
-</style>
+			var camera, scene, renderer,
+			info, mouse2d, sun, loader, sphere, ray;
 
-<script type="text/javascript" src="../build/Three.js"></script>
-<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-
-<script type="text/javascript">
-
-var camera, scene, renderer,
-info, mouse2d, sun, loader, sphere, ray;
-
-var theta = 0, radius = 250, speed = 0.002, sphereSize = 4;
-
-
-function init() {
-
-	container = document.createElement( 'div' );
-	document.body.appendChild( container );
-
-	info = document.getElementById("info");
-
-	camera = new THREE.Camera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
-	camera.position.y = 120;
-	mouse2d = new THREE.Vector3( 0, 0, 1 );
-
-	loader = new THREE.JSONLoader();
-
-	scene = new THREE.Scene();
-
-	ray = new THREE.Ray();
-	ray.origin.y = 10000;
-	ray.direction = new THREE.Vector3(0, -1, 0);
-
-	sphere = new THREE.Mesh( new THREE.SphereGeometry( sphereSize, 10, 10 ), new THREE.MeshLambertMaterial( { color: 0xff0000 } ) );
-	scene.addObject(sphere);
-
-	renderer = new THREE.WebGLRenderer();
-	renderer.setSize( window.innerWidth, window.innerHeight );
-	container.appendChild(renderer.domElement);
-
-	var ambientLight = new THREE.AmbientLight( 0x444444 );
-	scene.addLight( ambientLight );
-
-	sun = new THREE.DirectionalLight( 0xaaaaaa );
-	sun.position = new THREE.Vector3(-1,1, -1).normalize();
-	scene.addLight( sun );
-
-	loadCube();
+			var theta = 0, radius = 250, speed = 0.002, sphereSize = 4;
 
 
+			function init() {
 
-	container.onmousemove = onDocumentMouseMove;
-	animate();
-}
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
 
-function loadCube(p) {
-	var onGeometry = function( geometry ) {
-		var mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: 0xf3e4b8 } ) );
-		scene.addObject( mesh );
-		THREE.Collisions.colliders.push( THREE.CollisionUtils.MeshColliderWBox(mesh) );
-	};
+				info = document.getElementById("info");
 
-	loader.load( { model: "obj/terrain.js", callback: onGeometry } );
-}
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.y = 120;
 
-function onDocumentMouseMove( event ) {
-	event.preventDefault();
-	mouse2d.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-	mouse2d.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-	mouse2d.z = 1;
-}
+				mouse2d = new THREE.Vector3( 0, 0, 1 );
 
-function animate() {
-	requestAnimationFrame( animate );
+				loader = new THREE.JSONLoader();
 
-	ray.origin.x = radius * Math.cos(theta);
-	ray.origin.z = radius * Math.sin(theta);
+				scene = new THREE.Scene();
 
-	var c = THREE.Collisions.rayCastNearest(ray);
-	if(c) {
-		//info.innerHTML = "Found @ distance " + c.distance;
-		sphere.position = ray.origin.clone().subSelf( new THREE.Vector3(0, c.distance - sphereSize/2, 0) );
-	} else {
-		//info.innerHTML = "No intersection";
-	}
+				ray = new THREE.Ray();
+				ray.origin.y = 10000;
+				ray.direction = new THREE.Vector3(0, -1, 0);
 
-	theta += speed;
+				sphere = new THREE.Mesh( new THREE.SphereGeometry( sphereSize, 10, 10 ), new THREE.MeshLambertMaterial( { color: 0xff0000 } ) );
+				scene.add(sphere);
 
-	camera.target.position.copy( sphere.position );
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild(renderer.domElement);
 
-	renderer.render( scene, camera );
-}
+				var ambientLight = new THREE.AmbientLight( 0x444444 );
+				scene.add( ambientLight );
 
-function vts(v) {
-	if(!v) return "undefined<br>";
-	else return v.x + " , " + v.y + " , " + v.z + "<br>";
-}
+				sun = new THREE.DirectionalLight( 0xaaaaaa );
+				sun.position = new THREE.Vector3(-1,1, -1).normalize();
+				scene.add( sun );
 
-</script>
+				loadCube();
 
-</head>
+				container.onmousemove = onDocumentMouseMove;
+				animate();
 
-<body onload="init();">
-<div id="info"></div>
-<div id="options"></div>
-</body>
+			}
+
+			function loadCube(p) {
+
+				loader.load( { model: "obj/terrain.js", callback: function( geometry ) {
+					var mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: 0xf3e4b8 } ) );
+					scene.add( mesh );
+					THREE.Collisions.colliders.push( THREE.CollisionUtils.MeshColliderWBox(mesh) );
+				} } );
+
+			}
+
+			function onDocumentMouseMove( event ) {
+				event.preventDefault();
+				mouse2d.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+				mouse2d.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+				mouse2d.z = 1;
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				ray.origin.x = radius * Math.cos(theta);
+				ray.origin.z = radius * Math.sin(theta);
+
+				var c = THREE.Collisions.rayCastNearest(ray);
+				if(c) {
+					//info.innerHTML = "Found @ distance " + c.distance;
+					sphere.position = ray.origin.clone().subSelf( new THREE.Vector3(0, c.distance - sphereSize/2, 0) );
+				} else {
+					//info.innerHTML = "No intersection";
+				}
+
+				theta += speed;
+
+				camera.lookAt( sphere.position );
+
+				renderer.render( scene, camera );
+			}
+
+			function vts(v) {
+				if(!v) return "undefined<br>";
+				else return v.x + " , " + v.y + " , " + v.z + "<br>";
+			}
+
+		</script>
+
+	</head>
+
+	<body onload="init();">
+		<div id="info"></div>
+		<div id="options"></div>
+	</body>
 
 </html>

@@ -95,7 +95,7 @@ This code creates a camera, then creates a scene, adds a cube on it, creates a &
 
 		function init() {
 
-			camera = new THREE.Camera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
+			camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
 			camera.position.z = 1000;
 
 			scene = new THREE.Scene();
@@ -104,7 +104,7 @@ This code creates a camera, then creates a scene, adds a cube on it, creates a &
 			material = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
 
 			mesh = new THREE.Mesh( geometry, material );
-			scene.addObject( mesh );
+			scene.add( mesh );
 
 			renderer = new THREE.CanvasRenderer();
 			renderer.setSize( window.innerWidth, window.innerHeight );
@@ -134,6 +134,42 @@ This code creates a camera, then creates a scene, adds a cube on it, creates a &
 
 
 ### Change Log ###
+
+2011 10 06 - **r45** (340.081 KB, gzip: 86.401 KB)
+
+* `Object/Scene.add*()` and `Object/Scene.remove*()` are now `Object/Scene.add()` and `Object/Scene.remove()`. ([mrdoob](http://github.com/mrdoob))
+* `LOD.add()` is now `LOD.addLevel()`. ([mrdoob](http://github.com/mrdoob))
+* Reworked `CylinderGeometry`. ([mrdoob](http://github.com/mrdoob))
+* Added `.depthWrite` and `.fog` to `Material`. ([alteredq](http://github.com/alteredq))
+* Added `.applyMatrix` to `Geometry`. ([mrdoob](http://github.com/mrdoob))
+* Improved postprocessing stack in `/examples/js/postprocessing`. ([alteredq](http://github.com/alteredq))
+* Added a realistic sking shading example. ([alteredq](http://github.com/alteredq))
+* Started of a GUI for composing scenes and autogenerate code. ([mrdoob](http://github.com/mrdoob))
+* Added `.center()` to `GeometryUtils`. ([alteredq](http://github.com/alteredq))
+* Fixed buggy scenegraph manipulation (adding/removing objects). ([jsermeno](http://github.com/jsermeno), [alteredq](http://github.com/alteredq) and [skython](http://github.com/skython))
+* Renamed `MeshShaderMaterial` to `ShaderMaterial`. ([alteredq](http://github.com/alteredq))
+* Fixed `CanvasRenderer` ignoring color of `SmoothShading`ed `MeshLambertMaterial`. ([mrdoob](http://github.com/mrdoob))
+* Renamed `renderer.data` to `renderer.info`. ([mrdoob](http://github.com/mrdoob))
+* Fixed ShadowMap aspect ratio. ([kig](http://github.com/kig) and [alteredq](http://github.com/alteredq))
+* Fixed `Loader`'s `extractUrlbase()` incorrect output for short urls. ([rectalogic](http://github.com/rectalogic) and [alteredq](http://github.com/alteredq))
+* Added `.color` and `.visible` support to `Sprite`. ([alteredq](http://github.com/alteredq))
+* Added `Face4`, Vertex Colors and Maya support to `ColladaLoader`. ([mrdoob](http://github.com/mrdoob))
+* Rewrite of lighting shader code. ([alteredq](http://github.com/alteredq))
+* Improved internal array concatenation approach. ([pyrotechnick](http://github.com/pyrotechnick))
+* `WebGLRenderer` performance improvements. ([alteredq](http://github.com/alteredq))
+* Added lower level immediate rendering support to `WebGLRenderer`. ([NINE78](http://github.com/NINE78) and [alteredq](http://github.com/alteredq))
+* Added `CubeCamera` for rendering cubemaps. ([alteredq](http://github.com/alteredq))
+* Improved `GeometryUtils`'s `.mergeVertices()` performance. ([zz85](http://github.com/zz85))
+* Removed `Camera`'s `.target`. ([mrdoob](http://github.com/mrdoob))
+* `WebGLRenderer`'s `.clear()` is now `.clear( color, depth, stencil )`. ([mrdoob](http://github.com/mrdoob))
+* Added `.autoClearColor`, `.autoClearDepth` and `.autoClearStencil` to `WebGLRenderer`. ([mrdoob](http://github.com/mrdoob) and [alteredq](http://github.com/alteredq))
+* Added `OctahedronGeometry`. ([clockworkgeek](http://github.com/clockworkgeek))
+* Splitted `Camera` into `PerspectiveCamera` and `OrthographicCamera`. ([mrdoob](http://github.com/mrdoob) and [alteredq](http://github.com/alteredq))
+* Special cameras are now `*Controls`. ([alteredq](http://github.com/alteredq) and [mrdoob](http://github.com/mrdoob))
+* Added `SubdivisionModifier`. ([zz85](http://github.com/zz85))
+* `Projector`'s `unprojectVector()` now also works with `OrthographicCamera`. ([jsermeno](http://github.com/jsermeno))
+* Added `.setLens()` method to `PerspectiveCamera`. ([zz85](http://github.com/zz85))
+* Added Shadow Maps and `Texture`'s `.offset` and `.repeat` support to Normal Map shader. ([alteredq](http://github.com/alteredq))
 
 
 2011 09 04 - **r44** (330.356 KB, gzip: 84.039 KB)

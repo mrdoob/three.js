@@ -1,8 +1,9 @@
 <!doctype html>
-<html>
+<html lang="en">
 	<head>
-		<meta charset="utf-8" />
 		<title>three.js webgl - custom attributes [particles][billboards][alphatest]</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
 				color: #ffffff;
@@ -32,9 +33,9 @@
 
 		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Detector.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/Stats.js"></script>
 
 		<script type="x-shader/x-vertex" id="vertexshader">
 
@@ -83,7 +84,7 @@
 		</script>
 
 
-		<script type="text/javascript">
+		<script>
 
 		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
@@ -101,7 +102,7 @@
 
 		function init() {
 
-			camera = new THREE.Camera( 40, WIDTH / HEIGHT, 1, 1000 );
+			camera = new THREE.PerspectiveCamera( 40, WIDTH / HEIGHT, 1, 1000 );
 			camera.position.z = 500;
 
 			scene = new THREE.Scene();
@@ -123,7 +124,7 @@
 
 			uniforms.texture.texture.wrapS = uniforms.texture.texture.wrapT = THREE.RepeatWrapping;
 
-			var shaderMaterial = new THREE.MeshShaderMaterial( {
+			var shaderMaterial = new THREE.ShaderMaterial( {
 
 				uniforms: 		uniforms,
 				attributes:     attributes,
@@ -175,10 +176,10 @@
 
 			// side 2
 
-			addGeo( geometry2,  110,  110, 0, 1.57 );
-			addGeo( geometry2,  110, -110, 0, 1.57 );
-			addGeo( geometry2, -110,  110, 0, 1.57 );
-			addGeo( geometry2, -110, -110, 0, 1.57 );
+			addGeo( geometry2,  110,  110, 0, Math.PI/2 );
+			addGeo( geometry2,  110, -110, 0, Math.PI/2 );
+			addGeo( geometry2, -110,  110, 0, Math.PI/2 );
+			addGeo( geometry2, -110, -110, 0, Math.PI/2 );
 
 			// corner edges
 
@@ -221,7 +222,7 @@
 
 			console.log( vertices.length );
 
-			scene.addObject( object );
+			scene.add( object );
 
 			renderer = new THREE.WebGLRenderer( { clearColor: 0x000000, clearAlpha: 1 } );
 			renderer.setSize( WIDTH, HEIGHT );

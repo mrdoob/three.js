@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js canvas - geometry - terrain</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				color: #71544e;
 				font-family:Monospace;
@@ -33,14 +34,14 @@
 		<div id="container"><br /><br /><br /><br /><br />Generating...</div> 
 		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - terrain demo. <a href="canvas_geometry_terrain.html">generate another</a></div> 
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/ImprovedNoise.js"></script>
+		<script src="js/ImprovedNoise.js"></script>
 
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
-		<script type="text/javascript">
+		<script>
 
 			var container, stats;
 
@@ -48,8 +49,7 @@
 
 			var mesh;
 
-			var mouseX = 0;
-			var mouseY = 0;
+			var mouseX = 0, mouseY = 0;
 
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
@@ -61,7 +61,7 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.Camera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 500;
 
 				scene = new THREE.Scene();
@@ -84,7 +84,7 @@
 				mesh = new THREE.Mesh( plane, material );
 				mesh.rotation.x = -90 * Math.PI / 180;
 				mesh.overdraw = true;
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				renderer = new THREE.CanvasRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -195,6 +195,7 @@
 
 				camera.position.x += ( mouseX - camera.position.x ) * 0.05;
 				camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
+				camera.lookAt( scene.position );
 
 				renderer.render( scene, camera );
 

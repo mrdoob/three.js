@@ -4,9 +4,9 @@
 
 var THREE = THREE || {};
 
-if ( ! window.Int32Array ) {
+if ( ! self.Int32Array ) {
 
-	window.Int32Array = Array;
-	window.Float32Array = Array;
+	self.Int32Array = Array;
+	self.Float32Array = Array;
 
 }

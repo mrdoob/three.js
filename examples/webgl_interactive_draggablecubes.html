@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - draggable cubes</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				font-family: Monospace;
 				background-color: #f0f0f0;
@@ -14,12 +15,12 @@
 	</head>
 	<body>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
-		<script type="text/javascript">
+		<script>
 
 			var container, stats;
 			var camera, scene, projector, renderer;
@@ -37,35 +38,40 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 1000;
 
 				scene = new THREE.Scene();
 
-				scene.addLight( new THREE.AmbientLight( 0x505050 ) );
+				scene.add( new THREE.AmbientLight( 0x505050 ) );
 
 				var light = new THREE.SpotLight( 0xffffff, 1.5 );
 				light.position.set( 0, 500, 2000 );
 				light.castShadow = true;
-				scene.addLight( light );
+				scene.add( light );
 
 				var geometry = new THREE.CubeGeometry( 40, 40, 40 );
 
 				for ( var i = 0; i < 200; i ++ ) {
 
 					var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
+
 					object.position.x = Math.random() * 1000 - 500;
 					object.position.y = Math.random() * 600 - 300;
 					object.position.z = Math.random() * 800 - 400;
+
 					object.rotation.x = ( Math.random() * 360 ) * Math.PI / 180;
 					object.rotation.y = ( Math.random() * 360 ) * Math.PI / 180;
 					object.rotation.z = ( Math.random() * 360 ) * Math.PI / 180;
+
 					object.scale.x = Math.random() * 2 + 1;
 					object.scale.y = Math.random() * 2 + 1;
 					object.scale.z = Math.random() * 2 + 1;
+
 					object.castShadow = true;
 					object.receiveShadow = true;
-					scene.addObject( object );
+
+					scene.add( object );
 
 					objects.push( object );
 
@@ -74,11 +80,11 @@
 				plane = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 2000, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 0.25, transparent: true, wireframe: true } ) );
 				plane.lookAt( camera.position );
 				plane.visible = false;
-				scene.addObject( plane );
+				scene.add( plane );
 
 				projector = new THREE.Projector();
 
-				renderer = new THREE.WebGLRenderer( { antialias : true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.sortObjects = false;
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -196,9 +202,13 @@
 
 				event.preventDefault();
 
-				plane.position.copy( INTERSECTED.position );
+				if ( INTERSECTED ) {
 
-				SELECTED = null;
+					plane.position.copy( INTERSECTED.position );
+
+					SELECTED = null;
+
+				}
 
 				container.style.cursor = 'auto';
 

@@ -8,7 +8,7 @@ THREE.ShaderPass = function( shader, textureID ) {
 
 	this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
-	this.material = new THREE.MeshShaderMaterial( {
+	this.material = new THREE.ShaderMaterial( {
 
 		uniforms: this.uniforms,
 		vertexShader: shader.vertexShader,
@@ -17,7 +17,10 @@ THREE.ShaderPass = function( shader, textureID ) {
 	} );
 
 	this.renderToScreen = false;
+
+	this.enabled = true;
 	this.needsSwap = true;
+	this.clear = false;
 
 };
 
@@ -25,7 +28,11 @@ THREE.ShaderPass.prototype = {
 
 	render: function ( renderer, writeBuffer, readBuffer, delta ) {
 
-		this.uniforms[ this.textureID ].texture = readBuffer;
+		if ( this.uniforms[ this.textureID ] ) {
+
+			this.uniforms[ this.textureID ].texture = readBuffer;
+
+		}
 
 		THREE.EffectComposer.quad.materials[ 0 ] = this.material;
 
@@ -35,7 +42,7 @@ THREE.ShaderPass.prototype = {
 
 		} else {
 
-			renderer.render( THREE.EffectComposer.scene, THREE.EffectComposer.camera, writeBuffer, false );
+			renderer.render( THREE.EffectComposer.scene, THREE.EffectComposer.camera, writeBuffer, this.clear );
 
 		}
 

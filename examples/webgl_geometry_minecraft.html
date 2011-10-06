@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - geometry - minecraft</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				color: #61443e;
 				font-family:Monospace;
@@ -40,15 +41,15 @@
 		<div id="container"><br /><br /><br /><br /><br />Generating world...</div>
 		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - <a href="http://www.minecraft.net/" target="_blank">minecraft</a> demo. featuring <a href="http://painterlypack.net/" target="_blank">painterly pack</a><br />(left click: forward, right click: backward)</div>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/ImprovedNoise.js"></script>
+		<script src="js/ImprovedNoise.js"></script>
 
-		<script type="text/javascript" src="js/Detector.js"></script>
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
-		<script type="text/javascript">
+		<script>
 
 			if ( ! Detector.webgl ) {
 
@@ -59,7 +60,7 @@
 
 			var container, stats;
 
-			var camera, scene, renderer;
+			var camera, controls, scene, renderer;
 
 			var mesh;
 
@@ -75,14 +76,13 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.FirstPersonCamera( {
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
 
-					fov: 60, aspect: window.innerWidth / window.innerHeight, near: 1, far: 20000,
-					movementSpeed: 1000, lookSpeed: 0.125, noFly: false, lookVertical: true
+				controls = new THREE.FirstPersonControls( camera );
 
-				} );
-
-				camera.target.position.z = - 100;
+				controls.movementSpeed = 1000;
+				controls.lookSpeed = 0.125;
+				controls.lookVertical = true;
 
 				scene = new THREE.Scene();
 
@@ -109,14 +109,13 @@
 					nx = ( i & 4 ) == 4;
 					pz = ( i & 2 ) == 2;
 					nz = ( i & 1 ) == 1;
-					cubes[ i ] = new THREE.CubeGeometry( 100, 100, 100, 1, 1, 1, materials, false, { px: px, nx: nx, py: true, ny: false, pz: pz, nz: nz } );
+					cubes[ i ] = new THREE.CubeGeometry( 100, 100, 100, 1, 1, 1, materials, { px: px, nx: nx, py: true, ny: false, pz: pz, nz: nz } );
 
 				}
 
 				var geometry = new THREE.Geometry();
 
 				camera.position.y = getY( worldHalfWidth, worldHalfDepth ) * 100 + 100;
-				camera.target.position.y = camera.position.y;
 
 				for ( var z = 0; z < worldDepth; z ++ ) {
 
@@ -126,10 +125,10 @@
 
 						h = getY( x, z );
 
-						h2 = getY( x - 1, z );
+						h2 = getY( x + 1, z );
 						px = ( h2 != h && h2 != h + 1 ) || x == 0 ? 1 : 0;
 
-						h2 = getY( x + 1, z );
+						h2 = getY( x - 1, z );
 						nx = ( h2 != h && h2 != h + 1 ) || x == worldWidth - 1 ? 1 : 0;
 
 						h2 = getY( x, z + 1 );
@@ -151,17 +150,17 @@
 				}
 
 				mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial() );
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				var ambientLight = new THREE.AmbientLight( 0xcccccc );
-				scene.addLight( ambientLight );
+				scene.add( ambientLight );
 
 				var directionalLight = new THREE.DirectionalLight( 0xffffff, 1.5 );
 				directionalLight.position.x = 1;
 				directionalLight.position.y = 1;
 				directionalLight.position.z = 0.5;
 				directionalLight.position.normalize();
-				scene.addLight( directionalLight );
+				scene.add( directionalLight );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -234,6 +233,7 @@
 
 			function render() {
 
+				controls.update();
 				renderer.render( scene, camera );
 
 			}

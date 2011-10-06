@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - geometry hierarchy 2</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				background:#fff;
 				padding:0;
@@ -15,12 +16,12 @@
 	</head>
 	<body>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
-		<script type="text/javascript">
+		<script>
 
 			var container, stats;
 
@@ -43,7 +44,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 500;
 
 				scene = new THREE.Scene();
@@ -66,7 +67,7 @@
 					child = new THREE.Mesh( geometry, material );
 					child.position.x = 100;
 
-					object.addChild( child );
+					object.add( child );
 					object = child;
 
 					objects.push( child );
@@ -80,7 +81,7 @@
 					child = new THREE.Mesh( geometry, material );
 					child.position.x = - 100;
 
-					object.addChild( child );
+					object.add( child );
 					object = child;
 
 					objects.push( child );
@@ -94,7 +95,7 @@
 					child = new THREE.Mesh( geometry, material );
 					child.position.y = - 100;
 
-					object.addChild( child );
+					object.add( child );
 					object = child;
 
 					objects.push( child );
@@ -108,7 +109,7 @@
 					child = new THREE.Mesh( geometry, material );
 					child.position.y = 100;
 
-					object.addChild( child );
+					object.add( child );
 					object = child;
 
 					objects.push( child );
@@ -122,7 +123,7 @@
 					child = new THREE.Mesh( geometry, material );
 					child.position.z = - 100;
 
-					object.addChild( child );
+					object.add( child );
 					object = child;
 
 					objects.push( child );
@@ -136,14 +137,14 @@
 					child = new THREE.Mesh( geometry, material );
 					child.position.z = 100;
 
-					object.addChild( child );
+					object.add( child );
 					object = child;
 
 					objects.push( child );
 
 				}
 
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -184,6 +185,8 @@
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+
+				camera.lookAt( scene.position );
 
 				for ( var i = 0, l = objects.length; i < l; i ++ ) {
 

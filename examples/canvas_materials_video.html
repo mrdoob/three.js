@@ -1,10 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js canvas - materials - video</title>
 		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				font-family: Monospace;
 				background-color: #f0f0f0;
@@ -15,17 +15,17 @@
 	</head>
 	<body>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
 		<video id="video" autoplay style="display:none">
 			<source src="textures/sintel.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
 			<source src="textures/sintel.ogv" type='video/ogg; codecs="theora, vorbis"'>
 		</video>
 
-		<script type="text/javascript">
+		<script>
 
 			var AMOUNT = 100;
 
@@ -61,7 +61,7 @@
 				info.innerHTML = '<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - video demo. playing <a href="http://durian.blender.org/" target="_blank">sintel</a> trailer';
 				container.appendChild(info);
 
-				camera = new THREE.Camera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 1000;
 
 				scene = new THREE.Scene();
@@ -109,7 +109,7 @@
 				mesh = new THREE.Mesh( plane, material );
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 1.5;
 				mesh.overdraw = true;
-				scene.addObject(mesh);
+				scene.add(mesh);
 
 				mesh = new THREE.Mesh( plane, materialReflection );
 				mesh.position.y = -306;
@@ -117,7 +117,7 @@
 				mesh.rotation.x = 180 * Math.PI / 180;
 				mesh.doubleSided = true;
 				mesh.overdraw = true;
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				//
 
@@ -148,7 +148,7 @@
 						particle.position.x = ix * separation - ( ( amountx * separation ) / 2 );
 						particle.position.y = -153
 						particle.position.z = iy * separation - ( ( amounty * separation ) / 2 );
-						scene.addObject( particle );
+						scene.add( particle );
 
 					}
 				}
@@ -189,11 +189,12 @@
 
 				camera.position.x += ( mouseX - camera.position.x ) * 0.05;
 				camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
+				camera.lookAt( scene.position );
 
 				if ( video.readyState === video.HAVE_ENOUGH_DATA ) {
 
 					imageContext.drawImage( video, 0, 0 );
-					
+
 					if ( texture ) texture.needsUpdate = true;
 					if ( textureReflection ) textureReflection.needsUpdate = true;
 

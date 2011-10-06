@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - level-of-details</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				background:#000;
 				color:#fff;
@@ -35,13 +36,13 @@
 		</div>
 
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/Detector.js"></script>
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
-		<script type="text/javascript">
+		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
@@ -66,7 +67,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 45, window.innerWidth / window.innerHeight, 1, 15000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 15000 );
 				camera.position.z = 1000;
 
 				scene = new THREE.Scene();
@@ -74,12 +75,11 @@
 
 				var light = new THREE.PointLight( 0xff2200 );
 				light.position.set( 0, 0, 0 );
-				scene.addLight( light );
+				scene.add( light );
 
 				var light = new THREE.DirectionalLight( 0xffffff );
-				light.position.set( 0, 0, 1 );
-				light.position.normalize();
-				scene.addLight( light );
+				light.position.set( 0, 0, 1 ).normalize();
+				scene.add( light );
 
 				var material = new THREE.MeshLambertMaterial( { color: 0xffffff, wireframe: true } );
 
@@ -104,7 +104,7 @@
 						mesh.scale.set( 1.5, 1.5, 1.5 );
 						mesh.updateMatrix();
 						mesh.matrixAutoUpdate = false;
-						lod.add( mesh, geometry[ i ][ 1 ] );
+						lod.addLevel( mesh, geometry[ i ][ 1 ] );
 
 					}
 
@@ -113,15 +113,16 @@
 					lod.position.z = 10000 * ( 0.5 - Math.random() );
 					lod.updateMatrix();
 					lod.matrixAutoUpdate = false;
-					scene.addObject( lod );
+					scene.add( lod );
 
 				}
 
 
 
-				renderer = new THREE.WebGLRenderer( { clearColor:0x000000, clearAlpha: 1 } );
+				renderer = new THREE.WebGLRenderer( { clearColor: 0x000000, clearAlpha: 1 } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.sortObjects = false;
+
 				container.appendChild( renderer.domElement );
 
 			}
@@ -145,14 +146,9 @@
 				camera.position.x += ( mouseX - camera.position.x ) * .005;
 				camera.position.y += ( - mouseY - camera.position.y ) * .01;
 
+				camera.lookAt( scene.position );
+
 				renderer.render( scene, camera );
-
-			}
-
-			function log( text ) {
-
-				var e = document.getElementById("log");
-				e.innerHTML = text + "<br/>" + e.innerHTML;
 
 			}
 

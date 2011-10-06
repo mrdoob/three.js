@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js canvas - interactive - voxel painter</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				font-family: Monospace;
 				background-color: #f0f0f0;
@@ -14,19 +15,20 @@
 	</head>
 	<body>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
-		<script type="text/javascript">
+		<script>
 
 			var container, stats;
 			var camera, scene, renderer;
 			var projector, plane;
 			var mouse2D, mouse3D, ray,
 			rollOveredFace, isShiftDown = false,
-			theta = 45, isCtrlDown = false;
+			theta = 45, isCtrlDown = false,
+			target = new THREE.Vector3( 0, 200, 0 );
 
 			init();
 			animate();
@@ -41,12 +43,11 @@
 				info.style.top = '10px';
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - voxel painter<br /><strong>click</strong>: add voxel, <strong>control + click</strong>: remove voxel, <strong>shift + click</strong>: rotate, <a href="javascript:save();return false;">save .png</a>';
+				info.innerHTML = '<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - voxel painter<br /><strong>click</strong>: add voxel, <strong>control + click</strong>: remove voxel, <strong>shift</strong>: rotate, <a href="javascript:save();return false;">save .png</a>';
 				container.appendChild( info );
 
-				camera = new THREE.Camera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.y = 800;
-				camera.target.position.y = 200;
 
 				scene = new THREE.Scene();
 
@@ -62,12 +63,12 @@
 
 					var line = new THREE.Line( geometry, material );
 					line.position.z = ( i * 50 ) - 500;
-					scene.addObject( line );
+					scene.add( line );
 
 					var line = new THREE.Line( geometry, material );
 					line.position.x = ( i * 50 ) - 500;
 					line.rotation.y = 90 * Math.PI / 180;
-					scene.addObject( line );
+					scene.add( line );
 
 				}
 
@@ -75,7 +76,7 @@
 
 				plane = new THREE.Mesh( new THREE.PlaneGeometry( 1000, 1000, 20, 20 ), new THREE.MeshFaceMaterial() );
 				plane.rotation.x = - 90 * Math.PI / 180;
-				scene.addObject( plane );
+				scene.add( plane );
 
 				mouse2D = new THREE.Vector3( 0, 10000, 0.5 );
 				ray = new THREE.Ray( camera.position, null );
@@ -83,21 +84,21 @@
 				// Lights
 
 				var ambientLight = new THREE.AmbientLight( 0x606060 );
-				scene.addLight( ambientLight );
+				scene.add( ambientLight );
 
 				var directionalLight = new THREE.DirectionalLight( 0xffffff );
 				directionalLight.position.x = Math.random() - 0.5;
 				directionalLight.position.y = Math.random() - 0.5;
 				directionalLight.position.z = Math.random() - 0.5;
 				directionalLight.position.normalize();
-				scene.addLight( directionalLight );
+				scene.add( directionalLight );
 
 				var directionalLight = new THREE.DirectionalLight( 0x808080 );
 				directionalLight.position.x = Math.random() - 0.5;
 				directionalLight.position.y = Math.random() - 0.5;
 				directionalLight.position.z = Math.random() - 0.5;
 				directionalLight.position.normalize();
-				scene.addLight( directionalLight );
+				scene.add( directionalLight );
 
 				renderer = new THREE.CanvasRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -137,7 +138,7 @@
 
 						if ( intersects[ 0 ].object != plane ) {
 
-							scene.removeObject( intersects[ 0 ].object );
+							scene.remove( intersects[ 0 ].object );
 
 						}
 
@@ -152,7 +153,7 @@
 						voxel.matrixAutoUpdate = false;
 						voxel.updateMatrix();
 						voxel.overdraw = true;
-						scene.addObject( voxel );
+						scene.add( voxel );
 
 					}
 
@@ -205,6 +206,10 @@
 
 				}
 
+				camera.position.x = 1400 * Math.sin( theta * Math.PI / 360 );
+				camera.position.z = 1400 * Math.cos( theta * Math.PI / 360 );
+				camera.lookAt( target );
+
 				mouse3D = projector.unprojectVector( mouse2D.clone(), camera );
 				ray.direction = mouse3D.subSelf( camera.position ).normalize();
 
@@ -225,9 +230,6 @@
 					 rollOveredFace = null;
 
 				}
-
-				camera.position.x = 1400 * Math.sin( theta * Math.PI / 360 );
-				camera.position.z = 1400 * Math.cos( theta * Math.PI / 360 );
 
 				renderer.render( scene, camera );
 

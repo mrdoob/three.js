@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - materials - shaders [Monjori]</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				color: #ffffff;
 				font-family:Monospace;
@@ -32,14 +33,14 @@
 	</head>
 	<body>
 
-		<div id="container"></div> 
-		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - shader demo. featuring <a href="http://www.pouet.net/prod.php?which=52761" target="_blank">Monjori by Mic</a></div> 
+		<div id="container"></div>
+		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - shader demo. featuring <a href="http://www.pouet.net/prod.php?which=52761" target="_blank">Monjori by Mic</a></div>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/Detector.js"></script>
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
 		<script id="vertexShader" type="x-shader/x-vertex">
 			void main()
@@ -84,7 +85,7 @@
 			}
 		</script>
 
-		<script type="text/javascript">
+		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
@@ -117,7 +118,7 @@
 					resolution: { type: "v2", value: new THREE.Vector2() }
 				};
 
-				material = new THREE.MeshShaderMaterial( {
+				material = new THREE.ShaderMaterial( {
 
 					uniforms: uniforms,
 					vertexShader: document.getElementById( 'vertexShader' ).textContent,
@@ -126,7 +127,7 @@
 					} );
 
 				mesh = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), material );
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				renderer = new THREE.WebGLRenderer();
 				container.appendChild( renderer.domElement );

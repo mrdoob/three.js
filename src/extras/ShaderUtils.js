@@ -104,6 +104,7 @@ THREE.ShaderUtils = {
 
 				THREE.UniformsLib[ "fog" ],
 				THREE.UniformsLib[ "lights" ],
+				THREE.UniformsLib[ "shadowmap" ],
 
 				{
 
@@ -126,7 +127,10 @@ THREE.ShaderUtils = {
 				"uSpecularColor": { type: "c", value: new THREE.Color( 0x111111 ) },
 				"uAmbientColor": { type: "c", value: new THREE.Color( 0x050505 ) },
 				"uShininess": { type: "f", value: 30 },
-				"uOpacity": { type: "f", value: 1 }
+				"uOpacity": { type: "f", value: 1 },
+
+				"uOffset" : { type: "v2", value: new THREE.Vector2( 0, 0 ) },
+				"uRepeat" : { type: "v2", value: new THREE.Vector2( 1, 1 ) }
 
 				}
 
@@ -170,14 +174,12 @@ THREE.ShaderUtils = {
 
 				"varying vec3 vViewPosition;",
 
+				THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
 				THREE.ShaderChunk[ "fog_pars_fragment" ],
 
 				"void main() {",
 
-					"gl_FragColor = vec4( 1.0 );",
-
-					"vec4 mColor = vec4( uDiffuseColor, uOpacity );",
-					"vec4 mSpecular = vec4( uSpecularColor, uOpacity );",
+					"gl_FragColor = vec4( vec3( 1.0 ), uOpacity );",
 
 					"vec3 specularTex = vec3( 1.0 );",
 
@@ -189,7 +191,7 @@ THREE.ShaderUtils = {
 						"gl_FragColor = gl_FragColor * texture2D( tDiffuse, vUv );",
 
 					"if( enableAO )",
-						"gl_FragColor = gl_FragColor * texture2D( tAO, vUv );",
+						"gl_FragColor.xyz = gl_FragColor.xyz * texture2D( tAO, vUv ).xyz;",
 
 					"if( enableSpecular )",
 						"specularTex = texture2D( tSpecular, vUv ).xyz;",
@@ -204,7 +206,8 @@ THREE.ShaderUtils = {
 
 					"#if MAX_POINT_LIGHTS > 0",
 
-						"vec4 pointTotal = vec4( vec3( 0.0 ), 1.0 );",
+						"vec3 pointDiffuse = vec3( 0.0 );",
+						"vec3 pointSpecular = vec3( 0.0 );",
 
 						"for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {",
 
@@ -219,7 +222,8 @@ THREE.ShaderUtils = {
 							"if ( pointDotNormalHalf >= 0.0 )",
 								"pointSpecularWeight = specularTex.r * pow( pointDotNormalHalf, uShininess );",
 
-							"pointTotal  += pointDistance * vec4( pointLightColor[ i ], 1.0 ) * ( mColor * pointDiffuseWeight + mSpecular * pointSpecularWeight * pointDiffuseWeight );",
+							"pointDiffuse += pointDistance * pointLightColor[ i ] * uDiffuseColor * pointDiffuseWeight;",
+							"pointSpecular += pointDistance * pointLightColor[ i ] * uSpecularColor * pointSpecularWeight;",
 
 						"}",
 
@@ -229,7 +233,8 @@ THREE.ShaderUtils = {
 
 					"#if MAX_DIR_LIGHTS > 0",
 
-						"vec4 dirTotal = vec4( vec3( 0.0 ), 1.0 );",
+						"vec3 dirDiffuse = vec3( 0.0 );",
+						"vec3 dirSpecular = vec3( 0.0 );",
 
 						"for( int i = 0; i < MAX_DIR_LIGHTS; i++ ) {",
 
@@ -245,7 +250,8 @@ THREE.ShaderUtils = {
 							"if ( dirDotNormalHalf >= 0.0 )",
 								"dirSpecularWeight = specularTex.r * pow( dirDotNormalHalf, uShininess );",
 
-							"dirTotal  += vec4( directionalLightColor[ i ], 1.0 ) * ( mColor * dirDiffuseWeight + mSpecular * dirSpecularWeight * dirDiffuseWeight );",
+							"dirDiffuse += directionalLightColor[ i ] * uDiffuseColor * dirDiffuseWeight;",
+							"dirSpecular += directionalLightColor[ i ] * uSpecularColor * dirSpecularWeight;",
 
 						"}",
 
@@ -253,18 +259,26 @@ THREE.ShaderUtils = {
 
 					// all lights contribution summation
 
-					"vec4 totalLight = vec4( ambientLightColor * uAmbientColor, uOpacity );",
+					"vec3 totalDiffuse = vec3( 0.0 );",
+					"vec3 totalSpecular = vec3( 0.0 );",
 
 					"#if MAX_DIR_LIGHTS > 0",
-						"totalLight += dirTotal;",
+
+						"totalDiffuse += dirDiffuse;",
+						"totalSpecular += dirSpecular;",
+
 					"#endif",
 
 					"#if MAX_POINT_LIGHTS > 0",
-						"totalLight += pointTotal;",
+
+						"totalDiffuse += pointDiffuse;",
+						"totalSpecular += pointSpecular;",
+
 					"#endif",
 
-					"gl_FragColor = gl_FragColor * totalLight;",
+					"gl_FragColor.xyz = gl_FragColor.xyz * totalDiffuse + totalSpecular + ambientLightColor * uAmbientColor;",
 
+					THREE.ShaderChunk[ "shadowmap_fragment" ],
 					THREE.ShaderChunk[ "fog_fragment" ],
 
 				"}"
@@ -274,6 +288,9 @@ THREE.ShaderUtils = {
 			vertexShader: [
 
 				"attribute vec4 tangent;",
+
+				"uniform vec2 uOffset;",
+				"uniform vec2 uRepeat;",
 
 				"#ifdef VERTEX_TEXTURES",
 
@@ -299,9 +316,9 @@ THREE.ShaderUtils = {
 
 				"varying vec3 vViewPosition;",
 
-				"void main() {",
+				THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
 
-					"vec4 mPosition = objectMatrix * vec4( position, 1.0 );",
+				"void main() {",
 
 					"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
 
@@ -316,7 +333,7 @@ THREE.ShaderUtils = {
 					"vBinormal = cross( vNormal, vTangent ) * tangent.w;",
 					"vBinormal = normalize( vBinormal );",
 
-					"vUv = uv;",
+					"vUv = uv * uRepeat + uOffset;",
 
 					// point lights
 
@@ -355,6 +372,8 @@ THREE.ShaderUtils = {
 						"gl_Position = projectionMatrix * mvPosition;",
 
 					"#endif",
+
+					THREE.ShaderChunk[ "shadowmap_vertex" ],
 
 				"}"
 

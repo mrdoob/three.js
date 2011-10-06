@@ -6,13 +6,15 @@
  *  color: <hex>,
  *  opacity: <float>,
  *  map: new THREE.Texture( <Image> ),
- 
+ *
  *  size: <float>,
- 
+ *
  *  blending: THREE.NormalBlending,
  *  depthTest: <bool>,
- 
- *  vertexColors: <bool>
+ *
+ *  vertexColors: <bool>,
+ *
+ *  fog: <bool>
  * }
  */
 
@@ -30,6 +32,8 @@ THREE.ParticleBasicMaterial = function ( parameters ) {
 	this.sizeAttenuation = parameters.sizeAttenuation !== undefined ? parameters.sizeAttenuation : true;
 
 	this.vertexColors = parameters.vertexColors !== undefined ? parameters.vertexColors : false;
+
+	this.fog = parameters.fog !== undefined ? parameters.fog : true;
 
 };
 

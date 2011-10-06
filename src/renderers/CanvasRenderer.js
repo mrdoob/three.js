@@ -87,10 +87,14 @@ THREE.CanvasRenderer = function ( parameters ) {
 	this.sortObjects = true;
 	this.sortElements = true;
 
-	this.data = {
+	this.info = {
 
-		vertices: 0,
-		faces: 0
+		render: {
+
+			vertices: 0,
+			faces: 0
+
+		}
 
 	}
 
@@ -174,8 +178,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		this.autoClear ? this.clear() : _context.setTransform( 1, 0, 0, - 1, _canvasWidthHalf, _canvasHeightHalf );
 
-		_this.data.vertices = 0;
-		_this.data.faces = 0;
+		_this.info.render.vertices = 0;
+		_this.info.render.faces = 0;
 
 		_renderList = _projector.projectScene( scene, camera, this.sortElements );
 
@@ -222,7 +226,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 				_bboxRect.addPoint( _v1.positionScreen.x, _v1.positionScreen.y );
 				_bboxRect.addPoint( _v2.positionScreen.x, _v2.positionScreen.y );
 
-				if ( _clipRect.instersects( _bboxRect ) ) {
+				if ( _clipRect.intersects( _bboxRect ) ) {
 
 					m = 0; ml = element.materials.length;
 
@@ -256,7 +260,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 						      _v2.positionScreen.x, _v2.positionScreen.y,
 						      _v3.positionScreen.x, _v3.positionScreen.y );
 
-				if ( _clipRect.instersects( _bboxRect ) ) {
+				if ( _clipRect.intersects( _bboxRect ) ) {
 
 					m = 0; ml = element.meshMaterials.length;
 
@@ -313,7 +317,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 				_bboxRect.addPoint( _v3.positionScreen.x, _v3.positionScreen.y );
 				_bboxRect.addPoint( _v4.positionScreen.x, _v4.positionScreen.y );
 
-				if ( _clipRect.instersects( _bboxRect ) ) {
+				if ( _clipRect.intersects( _bboxRect ) ) {
 
 					m = 0; ml = element.meshMaterials.length;
 
@@ -477,7 +481,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 					_bboxRect.set( v1.x - width, v1.y - height, v1.x  + width, v1.y + height );
 
-					if ( !_clipRect.instersects( _bboxRect ) ) {
+					if ( !_clipRect.intersects( _bboxRect ) ) {
 
 						return;
 
@@ -513,7 +517,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				_bboxRect.set( v1.x - width, v1.y - height, v1.x + width, v1.y + height );
 
-				if ( !_clipRect.instersects( _bboxRect ) ) {
+				if ( !_clipRect.intersects( _bboxRect ) ) {
 
 					return;
 
@@ -561,8 +565,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		function renderFace3( v1, v2, v3, uv1, uv2, uv3, element, material, scene ) {
 
-			_this.data.vertices += 3;
-			_this.data.faces ++;
+			_this.info.render.vertices += 3;
+			_this.info.render.faces ++;
 
 			setOpacity( material.opacity );
 			setBlending( material.blending );
@@ -645,7 +649,19 @@ THREE.CanvasRenderer = function ( parameters ) {
 						calculateLight( scene, element.v2.positionWorld, element.vertexNormalsWorld[ 1 ], _color2 );
 						calculateLight( scene, element.v3.positionWorld, element.vertexNormalsWorld[ 2 ], _color3 );
 
-						_color4.r =  ( _color2.r + _color3.r ) * 0.5;
+						_color1.r = Math.max( 0, Math.min( material.color.r * _color1.r, 1 ) );
+						_color1.g = Math.max( 0, Math.min( material.color.g * _color1.g, 1 ) );
+						_color1.b = Math.max( 0, Math.min( material.color.b * _color1.b, 1 ) );
+
+						_color2.r = Math.max( 0, Math.min( material.color.r * _color2.r, 1 ) );
+						_color2.g = Math.max( 0, Math.min( material.color.g * _color2.g, 1 ) );
+						_color2.b = Math.max( 0, Math.min( material.color.b * _color2.b, 1 ) );
+
+						_color3.r = Math.max( 0, Math.min( material.color.r * _color3.r, 1 ) );
+						_color3.g = Math.max( 0, Math.min( material.color.g * _color3.g, 1 ) );
+						_color3.b = Math.max( 0, Math.min( material.color.b * _color3.b, 1 ) );
+
+						_color4.r = ( _color2.r + _color3.r ) * 0.5;
 						_color4.g = ( _color2.g + _color3.g ) * 0.5;
 						_color4.b = ( _color2.b + _color3.b ) * 0.5;
 
@@ -706,8 +722,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		function renderFace4( v1, v2, v3, v4, v5, v6, element, material, scene ) {
 
-			_this.data.vertices += 4;
-			_this.data.faces ++;
+			_this.info.render.vertices += 4;
+			_this.info.render.faces ++;
 
 			setOpacity( material.opacity );
 			setBlending( material.blending );
@@ -750,6 +766,22 @@ THREE.CanvasRenderer = function ( parameters ) {
 						calculateLight( scene, element.v2.positionWorld, element.vertexNormalsWorld[ 1 ], _color2 );
 						calculateLight( scene, element.v4.positionWorld, element.vertexNormalsWorld[ 3 ], _color3 );
 						calculateLight( scene, element.v3.positionWorld, element.vertexNormalsWorld[ 2 ], _color4 );
+
+						_color1.r = Math.max( 0, Math.min( material.color.r * _color1.r, 1 ) );
+						_color1.g = Math.max( 0, Math.min( material.color.g * _color1.g, 1 ) );
+						_color1.b = Math.max( 0, Math.min( material.color.b * _color1.b, 1 ) );
+
+						_color2.r = Math.max( 0, Math.min( material.color.r * _color2.r, 1 ) );
+						_color2.g = Math.max( 0, Math.min( material.color.g * _color2.g, 1 ) );
+						_color2.b = Math.max( 0, Math.min( material.color.b * _color2.b, 1 ) );
+
+						_color3.r = Math.max( 0, Math.min( material.color.r * _color3.r, 1 ) );
+						_color3.g = Math.max( 0, Math.min( material.color.g * _color3.g, 1 ) );
+						_color3.b = Math.max( 0, Math.min( material.color.b * _color3.b, 1 ) );
+
+						_color4.r = Math.max( 0, Math.min( material.color.r * _color4.r, 1 ) );
+						_color4.g = Math.max( 0, Math.min( material.color.g * _color4.g, 1 ) );
+						_color4.b = Math.max( 0, Math.min( material.color.b * _color4.b, 1 ) );
 
 						_image = getGradientTexture( _color1, _color2, _color3, _color4 );
 

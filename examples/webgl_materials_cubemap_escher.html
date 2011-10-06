@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - materials - cube reflection [Escher]</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				background:#fff;
 				color:#fff;
@@ -15,8 +16,8 @@
 			}
 			a {	color: #ff0080;	text-decoration: none; }
 			a:hover { color: #0080ff; }
-			#log { position:absolute; top:50px; text-align:left; display:block; z-index:100; pointer-events:none; }
-			#d { text-align:center; margin:1em auto -9.0em; z-index:1000; position:relative; display:block; 
+
+			#d { text-align:center; margin:1em auto -9.0em; z-index:1000; position:relative; display:block;
 				 background:rgba(0,0,0,0.75); padding:0.25em; width:300px; border-radius:10px; -webkit-box-shadow: 0px 0px 10px rgba(0,0,0,0.5) }
 			#oldie { margin-top:15em !important }
 		</style>
@@ -29,15 +30,13 @@
 			<p>Texture by <a href="http://brainwagon.org/2002/12/05/fun-with-environment-maps/" target="_blank">Mark VandeWettering</a>
 		</div>
 
-		<pre id="log"></pre>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
-		<script type="text/javascript" src="js/Detector.js"></script>
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
-
-		<script type="text/javascript">
+		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
@@ -45,7 +44,7 @@
 
 			var container, stats;
 
-			var camera, scene, webglRenderer;
+			var camera, scene, renderer;
 
 			var mesh, zmesh, lightMesh, geometry;
 
@@ -64,10 +63,10 @@
 
 			function init() {
 
-				container = document.createElement('div');
-				document.body.appendChild(container);
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 75, window.innerWidth / window.innerHeight, 1, 100000 );
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 100000 );
 				camera.position.z = 3200;
 
 				scene = new THREE.Scene();
@@ -75,8 +74,8 @@
 
 				var r = "textures/cube/Escher/";
 
-				var urls = [ r + "px.jpg", r + "nx.jpg", 
-							 r + "py.jpg", r + "ny.jpg", 
+				var urls = [ r + "px.jpg", r + "nx.jpg",
+							 r + "py.jpg", r + "ny.jpg",
 							 r + "pz.jpg", r + "nz.jpg" ];
 
 				var textureCube = THREE.ImageUtils.loadTextureCube( urls );
@@ -85,14 +84,14 @@
 
 				var mesh = new THREE.Mesh( geometry, material );
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 16;
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				// Skybox
 
-				var shader = THREE.ShaderUtils.lib["cube"];
-				shader.uniforms["tCube"].texture = textureCube;
+				var shader = THREE.ShaderUtils.lib[ "cube" ];
+				shader.uniforms[ "tCube" ].texture = textureCube;
 
-				var material = new THREE.MeshShaderMaterial( {
+				var material = new THREE.ShaderMaterial( {
 
 					fragmentShader: shader.fragmentShader,
 					vertexShader: shader.vertexShader,
@@ -100,14 +99,15 @@
 
 				} ),
 
-				mesh = new THREE.Mesh( new THREE.CubeGeometry( 6000, 6000, 6000, 1, 1, 1, null, true ), material );
-				scene.addObject( mesh );
+				mesh = new THREE.Mesh( new THREE.CubeGeometry( 6000, 6000, 6000 ), material );
+				mesh.flipSided = true;
+				scene.add( mesh );
 
 				//
 
-				webglRenderer = new THREE.WebGLRenderer();
-				webglRenderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( webglRenderer.domElement );
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
 
 				if ( statsEnabled ) {
 
@@ -144,14 +144,9 @@
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 
-				webglRenderer.render( scene, camera );
+				camera.lookAt( scene.position );
 
-			}
-
-			function log(text) {
-
-				var e = document.getElementById("log");
-				e.innerHTML = text + "<br/>" + e.innerHTML;
+				renderer.render( scene, camera );
 
 			}
 

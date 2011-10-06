@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - io - OBJ converter</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				background:#fff;
 				padding:0;
@@ -15,7 +16,7 @@
 			h1 { }
 			a { color:skyblue }
 			canvas { pointer-events:none; z-index:10; }
-			#log { position:absolute; top:0; display:block; text-align:left; z-index:1000; pointer-events:none; }
+
 			#d { text-align:center; margin:1em 0 -9.2em 0; z-index:0; position:relative; display:block }
 			.button { background:#000; color:#fff; padding:0.2em 0.5em; cursor:pointer }
 			.inactive { background:#999; color:#eee }
@@ -34,15 +35,13 @@
 			<a href="http://sketchup.google.com/3dwarehouse/details?mid=f526cc4abf7cb68d76cab47c765b7255">iClone</a>.
 		</div>
 
-		<pre id="log"></pre>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
-		<script type="text/javascript" src="js/Detector.js"></script>
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
-
-		<script type="text/javascript">
+		<script>
 
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
@@ -63,10 +62,10 @@
 			var render_canvas = 1, render_gl = 1;
 			var has_gl = 0;
 
-			var bcanvas = document.getElementById("rcanvas");
-			var bwebgl = document.getElementById("rwebgl");
+			var bcanvas = document.getElementById( "rcanvas" );
+			var bwebgl = document.getElementById( "rwebgl" );
 
-			document.addEventListener('mousemove', onDocumentMouseMove, false);
+			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
 			init();
 			animate();
@@ -77,12 +76,11 @@
 
 			function init() {
 
-				container = document.createElement('div');
-				document.body.appendChild(container);
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
+				camera = new THREE.PerspectiveCamera( 75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
 				camera.position.z = 500;
-				camera.updateMatrix();
 
 				scene = new THREE.Scene();
 
@@ -109,14 +107,11 @@
 				geometry = new THREE.PlaneGeometry( 100, 100, 15, 10 );
 
 				mesh = new THREE.Mesh( geometry, xm );
-				mesh.position.x = 0;
-				mesh.position.y = FLOOR;
-				mesh.position.z = 0;
-				mesh.rotation.x = 1.57;
-				mesh.scale.x = mesh.scale.y = mesh.scale.z = 10;
+				mesh.position.set( 0, FLOOR, 0 );
+				mesh.rotation.x = Math.PI/2;
+				mesh.scale.set( 10, 10, 10 );
 				mesh.doubleSided = true;
-				mesh.updateMatrix();
-				scene.addObject(mesh);
+				scene.add( mesh );
 
 				// SPHERES
 
@@ -126,13 +121,16 @@
 				for ( var i = 0; i < 10; i ++ ) {
 
 					mesh = new THREE.Mesh( sphere, material_spheres );
-					mesh.position.x = 500 * (Math.random() - 0.5);
-					mesh.position.y = 300 * (Math.random() - 0) + FLOOR;
-					mesh.position.z = 100 * (Math.random() - 1);
-					mesh.scale.x = mesh.scale.y = mesh.scale.z = 0.25 * (Math.random() + 0.5);
+
+					mesh.position.x = 500 * ( Math.random() - 0.5 );
+					mesh.position.y = 300 * ( Math.random() - 0 ) + FLOOR;
+					mesh.position.z = 100 * ( Math.random() - 1 );
+
+					mesh.scale.x = mesh.scale.y = mesh.scale.z = 0.25 * ( Math.random() + 0.5 );
+
 					mesh.overdraw = true;
-					mesh.updateMatrix();
-					scene.addObject(mesh);
+
+					scene.add( mesh );
 
 				}
 
@@ -140,35 +138,41 @@
 				// LIGHTS
 
 				var ambient = new THREE.AmbientLight( 0x221100 );
-				scene.addLight( ambient );
+				scene.add( ambient );
 
 				var directionalLight = new THREE.DirectionalLight( 0xffeedd );
-				directionalLight.position.y = -70;
-				directionalLight.position.z = 100;
-				directionalLight.position.normalize();
-				scene.addLight( directionalLight );
+				directionalLight.position.set( 0, -70, 100 ).normalize();
+				scene.add( directionalLight );
 
-				var pointLight = new THREE.PointLight( 0xff0000, 1 );
-				//scene.addLight( pointLight );
-
+				// RENDERER
 
 				if ( render_gl ) {
+
 					try {
+
 						webglRenderer = new THREE.WebGLRenderer();
 						webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 						webglRenderer.domElement.style.position = "relative";
+
 						container.appendChild( webglRenderer.domElement );
+
 						has_gl = 1;
+
 					}
 					catch (e) {
 					}
+
 				}
 
 				if( render_canvas ) {
+
 					canvasRenderer = new THREE.CanvasRenderer();
 					canvasRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 					container.appendChild( canvasRenderer.domElement );
+
 				}
+
+				// STATS
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
@@ -176,13 +180,15 @@
 				stats.domElement.style.zIndex = 100;
 				container.appendChild( stats.domElement );
 
+				//
+
 				bcanvas.addEventListener("click", toggleCanvas, false);
 				bwebgl.addEventListener("click", toggleWebGL, false);
 
 				//var loader = new THREE.BinaryLoader(),
 				var loader = new THREE.JSONLoader(),
-					callbackMale   = function( geometry ) { createScene( geometry,  90, 50, FLOOR, 105 ) },
-					callbackFemale = function( geometry ) { createScene( geometry, -80, 50, FLOOR, 0 ) };
+					callbackMale   = function( geometry ) { createScene( geometry,  90, FLOOR, 50, 105 ) },
+					callbackFemale = function( geometry ) { createScene( geometry, -80, FLOOR, 50, 0 ) };
 
 				loader.load( { model: "obj/male02/Male02_slim.js", callback: callbackMale } );
 				loader.load( { model: "obj/female02/Female02_slim.js", callback: callbackFemale } );
@@ -195,13 +201,10 @@
 			function createScene( geometry, x, y, z, b ) {
 
 				zmesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial() );
-				zmesh.position.x = x;
-				zmesh.position.z = y;
-				zmesh.position.y = z;
-				zmesh.scale.x = zmesh.scale.y = zmesh.scale.z = 3;
+				zmesh.position.set( x, y, z );
+				zmesh.scale.set( 3, 3, 3 );
 				zmesh.overdraw = true;
-				zmesh.updateMatrix();
-				scene.addObject(zmesh);
+				scene.add( zmesh );
 
 				createMaterialsPalette( geometry.materials, 100, b );
 
@@ -217,33 +220,29 @@
 					mesh.position.x = i * (size + 5) - ( ( materials.length - 1 )* ( size + 5 )/2);
 					mesh.position.y = FLOOR + size/2 + bottom;
 					mesh.position.z = -100;
-					mesh.scale.x = mesh.scale.y = mesh.scale.z = 1;
 					mesh.doubleSided = true;
-					mesh.updateMatrix();
-					scene.addObject(mesh);
+					scene.add( mesh );
 
 					// number
 
 					var x = document.createElement( "canvas" );
-					var xc = x.getContext("2d");
+					var xc = x.getContext( "2d" );
 					x.width = x.height = 128;
 					xc.shadowColor = "#000";
 					xc.shadowBlur = 7;
 					xc.fillStyle = "orange";
 					xc.font = "50pt arial bold";
-					xc.fillText(i, 10, 64);
+					xc.fillText( i, 10, 64 );
 
 					var xm = new THREE.MeshBasicMaterial( { map: new THREE.Texture( x ), transparent: true } );
 					xm.map.needsUpdate = true;
 
 					mesh = new THREE.Mesh( new THREE.PlaneGeometry( size, size ), xm );
-					mesh.position.x = i * (size + 5) - ( ( materials.length - 1 )* ( size + 5 )/2);
+					mesh.position.x = i * ( size + 5 ) - ( ( materials.length - 1 )* ( size + 5 )/2);
 					mesh.position.y = FLOOR + size/2 + bottom;
 					mesh.position.z = -99;
-					mesh.scale.x = mesh.scale.y = mesh.scale.z = 1;
 					mesh.doubleSided = true;
-					mesh.updateMatrix();
-					scene.addObject(mesh);
+					scene.add( mesh );
 
 				}
 
@@ -271,17 +270,11 @@
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
-				camera.updateMatrix();
+
+				camera.lookAt( scene.position );
 
 				if ( render_gl && has_gl ) webglRenderer.render( scene, camera );
 				if ( render_canvas ) canvasRenderer.render( scene, camera );
-
-			}
-
-			function log( text ) {
-
-				var e = document.getElementById("log");
-				e.innerHTML = text + "<br/>" + e.innerHTML;
 
 			}
 

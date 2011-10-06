@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js canvas - panorama fisheye demo</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				background-color: rgb(200,200,200);
 				margin: 0px;
@@ -31,19 +32,19 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - panorama fisheye demo. cubemap by <a href="http://www.zfight.com/" target="_blank">Jochum Skoglund</a>. (mousewheel: change fov)</div>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript">
+		<script>
 
 			var camera, scene, renderer;
 
-			var fov = 75,
-			texture_placeholder,
+			var texture_placeholder,
 			isUserInteracting = false,
 			onMouseDownMouseX = 0, onMouseDownMouseY = 0,
 			lon = 90, onMouseDownLon = 0,
 			lat = 0, onMouseDownLat = 0,
-			phi = 0, theta = 0;
+			phi = 0, theta = 0,
+			target = new THREE.Vector3();
 
 			init();
 
@@ -53,7 +54,7 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.Camera( fov, window.innerWidth / window.innerHeight, 1, 1100 );
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1100 );
 
 				scene = new THREE.Scene();
 
@@ -76,9 +77,10 @@
 
 				];
 
-				mesh = new THREE.Mesh( new THREE.CubeGeometry( 300, 300, 300, 7, 7, 7, materials, true ), new THREE.MeshFaceMaterial() );
+				mesh = new THREE.Mesh( new THREE.CubeGeometry( 300, 300, 300, 7, 7, 7, materials ), new THREE.MeshFaceMaterial() );
+				mesh.scale.x = - 1;
 				mesh.overdraw = true;
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				for ( var i = 0, l = mesh.geometry.vertices.length; i < l; i ++ ) {
 
@@ -107,20 +109,18 @@
 
 			function loadTexture( path ) {
 
-				var texture = new THREE.Texture( texture_placeholder ),
-					material = new THREE.MeshBasicMaterial( { map: texture } );
+				var texture = new THREE.Texture( texture_placeholder );
+				var material = new THREE.MeshBasicMaterial( { map: texture } );
 
 				var image = new Image();
-
 				image.onload = function () {
 
 					texture.needsUpdate = true;
 					material.map.image = this;
-					
+
 					render();
 
 				};
-
 				image.src = path;
 
 				return material;
@@ -165,23 +165,24 @@
 
 				if ( event.wheelDeltaY ) {
 
-					fov -= event.wheelDeltaY * 0.05;
+					camera.fov -= event.wheelDeltaY * 0.05;
 
 				// Opera / Explorer 9
 
 				} else if ( event.wheelDelta ) {
 
-					fov -= event.wheelDelta * 0.05;
+					camera.fov -= event.wheelDelta * 0.05;
 
 				// Firefox
 
 				} else if ( event.detail ) {
 
-					fov += event.detail * 1.0;
+					camera.fov -= event.detail * 0.05;
 
 				}
 
-				camera.projectionMatrix = THREE.Matrix4.makePerspective( fov, window.innerWidth / window.innerHeight, 1, 1100 );
+				camera.updateProjectionMatrix();
+
 				render();
 
 			}
@@ -189,7 +190,7 @@
 
 			function onDocumentTouchStart( event ) {
 
-				if( event.touches.length == 1 ) {
+				if ( event.touches.length == 1 ) {
 
 					event.preventDefault();
 
@@ -198,12 +199,14 @@
 
 					onPointerDownLon = lon;
 					onPointerDownLat = lat;
+
 				}
+
 			}
 
 			function onDocumentTouchMove( event ) {
 
-				if( event.touches.length == 1 ) {
+				if ( event.touches.length == 1 ) {
 
 					event.preventDefault();
 
@@ -213,6 +216,7 @@
 					render();
 
 				}
+
 			}
 
 			function render() {
@@ -221,13 +225,14 @@
 				phi = ( 90 - lat ) * Math.PI / 180;
 				theta = lon * Math.PI / 180;
 
-				camera.target.position.x = 500 * Math.sin( phi ) * Math.cos( theta );
-				camera.target.position.y = 500 * Math.cos( phi );
-				camera.target.position.z = 500 * Math.sin( phi ) * Math.sin( theta );
+				target.x = 500 * Math.sin( phi ) * Math.cos( theta );
+				target.y = 500 * Math.cos( phi );
+				target.z = 500 * Math.sin( phi ) * Math.sin( theta );
 
-				camera.position.x = - camera.target.position.x;
-				camera.position.y = - camera.target.position.y;
-				camera.position.z = - camera.target.position.z;
+				camera.position.x = - target.x;
+				camera.position.y = - target.y;
+				camera.position.z = - target.z;
+				camera.lookAt( target );
 
 				renderer.render( scene, camera );
 

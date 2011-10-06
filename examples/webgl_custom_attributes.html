@@ -1,8 +1,9 @@
 <!doctype html>
-<html>
+<html lang="en">
 	<head>
-		<meta charset="utf-8" />
 		<title>three.js webgl - custom attributes</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
 				color: #ffffff;
@@ -30,9 +31,9 @@
 		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - custom attributes example</div>
 		<div id="container"></div>
 
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Detector.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/Stats.js"></script>
 
 		<script src="../build/Three.js"></script>
 
@@ -83,7 +84,7 @@
 		</script>
 
 
-		<script type="text/javascript">
+		<script>
 
 		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
@@ -101,7 +102,7 @@
 
 		function init() {
 
-			camera = new THREE.Camera( 30, WIDTH / HEIGHT, 1, 10000 );
+			camera = new THREE.PerspectiveCamera( 30, WIDTH / HEIGHT, 1, 10000 );
 			camera.position.z = 300;
 
 			scene = new THREE.Scene();
@@ -122,7 +123,7 @@
 
 			uniforms.texture.texture.wrapS = uniforms.texture.texture.wrapT = THREE.RepeatWrapping;
 
-			var shaderMaterial = new THREE.MeshShaderMaterial( {
+			var shaderMaterial = new THREE.ShaderMaterial( {
 
 				uniforms: 		uniforms,
 				attributes:     attributes,
@@ -149,7 +150,7 @@
 
 			}
 
-			scene.addChild( sphere );
+			scene.add( sphere );
 
 			renderer = new THREE.WebGLRenderer( { clearColor: 0x050505, clearAlpha: 1 } );
 			renderer.setSize( WIDTH, HEIGHT );

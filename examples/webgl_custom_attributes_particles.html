@@ -1,8 +1,9 @@
 <!doctype html>
-<html>
+<html lang="en">
 	<head>
-		<meta charset="utf-8" />
 		<title>three.js webgl - custom attributes [particles]</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
 				color: #ffffff;
@@ -35,9 +36,9 @@
 
 		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Detector.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/Stats.js"></script>
 
 		<script type="x-shader/x-vertex" id="vertexshader">
 
@@ -79,7 +80,7 @@
 		</script>
 
 
-		<script type="text/javascript">
+		<script>
 
 		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
@@ -97,7 +98,7 @@
 
 		function init() {
 
-			camera = new THREE.Camera( 40, WIDTH / HEIGHT, 1, 10000 );
+			camera = new THREE.PerspectiveCamera( 40, WIDTH / HEIGHT, 1, 10000 );
 			camera.position.z = 300;
 
 			scene = new THREE.Scene();
@@ -117,7 +118,7 @@
 
 			};
 
-			var shaderMaterial = new THREE.MeshShaderMaterial( {
+			var shaderMaterial = new THREE.ShaderMaterial( {
 
 				uniforms: 		uniforms,
 				attributes:     attributes,
@@ -165,7 +166,7 @@
 
 			}
 
-			scene.addChild( sphere );
+			scene.add( sphere );
 
 			renderer = new THREE.WebGLRenderer( { clearColor: 0x000000, clearAlpha: 1 } );
 			renderer.setSize( WIDTH, HEIGHT );

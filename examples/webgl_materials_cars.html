@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - materials - cube reflection [cars]</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				background:#000;
 				color:#fff;
@@ -16,7 +17,7 @@
 			h1 { }
 			a { color:skyblue; text-decoration:none }
 			canvas { pointer-events:none; z-index:10; position:relative; }
-			#log { position:absolute; top:50px; text-align:left; display:block; z-index:100 }
+
 			#d { position:absolute; width: 100%; text-align:center; margin:1em 0 -4.5em 0; z-index:1000; }
 
 			.bwrap { margin:0.5em 0 0 0 }
@@ -54,15 +55,13 @@
 			<div id="buttons_materials" class="bwrap"></div>
 		</div>
 
-		<div id="log"></div>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
-		<script type="text/javascript" src="js/Detector.js"></script>
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
-
-		<script type="text/javascript">
+		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
@@ -75,7 +74,7 @@
 					name:	"Bugatti Veyron",
 					url: 	"obj/veyron/VeyronNoUv_bin.js",
 					author: '<a href="http://artist-3d.com/free_3d_models/dnm/model_disp.php?uid=1129" target="_blank">Troyano</a>',
-					init_rotation: [ 0, 0, 0 /*0.3, 1.57, 0.0*/ ],
+					init_rotation: [ 0, 0, 0 ],
 					scale: 5.5,
 					init_material: 4,
 					body_materials: [ 2 ],
@@ -91,7 +90,7 @@
 					name: 	"Lamborghini Gallardo",
 					url:	"obj/gallardo/GallardoNoUv_bin.js",
 					author: '<a href="http://artist-3d.com/free_3d_models/dnm/model_disp.php?uid=1711" target="_blank">machman_3d</a>',
-					init_rotation: [ 0, 0, 0 /*0.2, 1.77, 0.0*/ ],
+					init_rotation: [ 0, 0, 0 ],
 					scale: 3.7,
 					init_material: 9,
 					body_materials: [ 3 ],
@@ -107,7 +106,7 @@
 					name: 	"Ferrari F50",
 					url:	"obj/f50/F50NoUv_bin.js",
 					author: '<a href="http://artist-3d.com/free_3d_models/dnm/model_disp.php?uid=1687" target="_blank">daniel sathya</a>',
-					init_rotation: [ 0, 0, 0 /*0.2, 1.37, 0.0*/ ],
+					init_rotation: [ 0, 0, 0 ],
 					scale: 0.175,
 					init_material: 2,
 					body_materials: [ 3, 6, 7, 8, 9, 10, 23, 24 ],
@@ -139,8 +138,8 @@
 
 			var container, stats;
 
-			var camera, scene, webglRenderer;
-			var cameraCube, sceneCube;
+			var camera, scene, renderer;
+			var cameraCube, sceneCube, cubeTarget;
 
 			var m, mi;
 
@@ -159,14 +158,13 @@
 
 			function init() {
 
-				container = document.createElement('div');
-				document.body.appendChild(container);
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
-				// camera.position.z = 1000;
-				camera.updateMatrix();
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
+				cameraCube = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
 
-				cameraCube = new THREE.Camera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
+				cubeTarget = new THREE.Vector3( 0, 0, 0 );
 
 				scene = new THREE.Scene();
 				sceneCube = new THREE.Scene();
@@ -174,51 +172,46 @@
 				// LIGHTS
 
 				var ambient = new THREE.AmbientLight( 0x555555 );
-				scene.addLight( ambient );
+				scene.add( ambient );
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
-				directionalLight.position.x = 2;
-				directionalLight.position.y = 1.2;
-				directionalLight.position.z = 10;
-				directionalLight.position.normalize();
-				scene.addLight( directionalLight );
+				directionalLight.position.set( 2, 1.2, 10 ).normalize();
+				scene.add( directionalLight );
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
-				directionalLight.position.x = - 2;
-				directionalLight.position.y = 1.2;
-				directionalLight.position.z = - 10;
-				directionalLight.position.normalize();
-				scene.addLight( directionalLight );
+				directionalLight.position.set( -2, 1.2, -10 ).normalize();
+				scene.add( directionalLight );
 
 				pointLight = new THREE.PointLight( 0xffaa00, 2 );
-				pointLight.position.x = 2000;
-				pointLight.position.y = 1200;
-				pointLight.position.z = 10000;
-				scene.addLight( pointLight );
+				pointLight.position.set( 2000, 1200, 10000 );
+				scene.add( pointLight );
 
 				// Skybox
 
-				var shader = THREE.ShaderUtils.lib["cube"];
-				shader.uniforms["tCube"].texture = textureCube;
+				var shader = THREE.ShaderUtils.lib[ "cube" ];
+				shader.uniforms[ "tCube" ].texture = textureCube;
 
-				var material = new THREE.MeshShaderMaterial( {
+				var material = new THREE.ShaderMaterial( {
 
 					fragmentShader: shader.fragmentShader,
 					vertexShader: shader.vertexShader,
-					uniforms: shader.uniforms
+					uniforms: shader.uniforms,
+					depthWrite: false
 
 				} ),
 
-				mesh = new THREE.Mesh( new THREE.CubeGeometry( 100000, 100000, 100000, 1, 1, 1, null, true ), material );
-				sceneCube.addObject( mesh );
+				mesh = new THREE.Mesh( new THREE.CubeGeometry( 100, 100, 100 ), material );
+				mesh.flipSided = true;
+				sceneCube.add( mesh );
 
 				//
 
-				webglRenderer = new THREE.WebGLRenderer();
-				webglRenderer.setSize( window.innerWidth, window.innerHeight );
-				webglRenderer.setFaceCulling( 0 );
-				webglRenderer.autoClear = false;
-				container.appendChild( webglRenderer.domElement );
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setFaceCulling( 0 );
+				renderer.autoClear = false;
+
+				container.appendChild( renderer.domElement );
 
 				if ( STATS_ENABLED ) {
 
@@ -230,7 +223,7 @@
 
 				}
 
-				document.addEventListener('mousemove', onDocumentMouseMove, false);
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
 				var r = "textures/cube/Bridge2/";
 				var urls = [ r + "posx.jpg", r + "negx.jpg",
@@ -569,11 +562,14 @@
 				}
 
 				var mesh = new THREE.Mesh( geometry, m );
+
 				mesh.rotation.x = r[ 0 ];
 				mesh.rotation.y = r[ 1 ];
 				mesh.rotation.z = r[ 2 ];
+
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = s;
-				scene.addObject( mesh );
+
+				scene.add( mesh );
 
 				CARS[ car ].object = mesh;
 
@@ -612,22 +608,19 @@
 				camera.position.x = 1000 * Math.cos( timer );
 				camera.position.z = 1000 * Math.sin( timer );
 
-				cameraCube.target.position.x = - camera.position.x;
-				cameraCube.target.position.y = - camera.position.y;
-				cameraCube.target.position.z = - camera.position.z;
+				camera.lookAt( scene.position );
 
-				webglRenderer.clear();
-				webglRenderer.render( sceneCube, cameraCube );
-				webglRenderer.render( scene, camera );
+				cubeTarget.x = - camera.position.x;
+				cubeTarget.y = - camera.position.y;
+				cubeTarget.z = - camera.position.z;
+
+				cameraCube.lookAt( cubeTarget );
+
+				renderer.clear();
+				renderer.render( sceneCube, cameraCube );
+				renderer.render( scene, camera );
 
 				if ( STATS_ENABLED ) stats.update();
-
-			}
-
-			function log( text ) {
-
-				var e = document.getElementById("log");
-				e.innerHTML = text + "<br/>" + e.innerHTML;
 
 			}
 

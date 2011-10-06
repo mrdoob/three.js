@@ -193,7 +193,6 @@ def save_settings_export(properties):
     "option_normals"         : properties.option_normals,
     "option_colors"          : properties.option_colors,
     "option_uv_coords"       : properties.option_uv_coords,
-    "option_edges"           : properties.option_edges,
     "option_faces"           : properties.option_faces,
     "option_vertices"        : properties.option_vertices,
 
@@ -220,7 +219,6 @@ def restore_settings_export(properties):
     properties.option_vertices_truncate = settings.get("option_vertices_truncate", False)
     properties.option_faces = settings.get("option_faces", True)
     properties.option_normals = settings.get("option_normals", True)
-    properties.option_edges = settings.get("option_edges", False)
 
     properties.option_colors = settings.get("option_colors", True)
     properties.option_uv_coords = settings.get("option_uv_coords", True)
@@ -263,7 +261,6 @@ class ExportTHREEJS(bpy.types.Operator, ExportHelper):
     option_faces_deltas = BoolProperty(name = "Deltas", description = "Delta faces", default = False)
 
     option_normals = BoolProperty(name = "Normals", description = "Export normals", default = True)
-    option_edges = BoolProperty(name = "Edges", description = "Export edges", default = False)
 
     option_colors = BoolProperty(name = "Colors", description = "Export vertex colors", default = True)
     option_uv_coords = BoolProperty(name = "UVs", description = "Export texture coordinates", default = True)
@@ -331,10 +328,6 @@ class ExportTHREEJS(bpy.types.Operator, ExportHelper):
 
         row = layout.row()
         row.prop(self.properties, "option_normals")
-        layout.separator()
-
-        row = layout.row()
-        row.prop(self.properties, "option_edges")
         layout.separator()
 
         row = layout.row()

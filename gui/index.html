@@ -1,0 +1,134 @@
+<html>
+	<head>
+		<title>three.js gui</title>
+		<style>
+			@font-face {
+
+				font-family: 'Inconsolata';
+				src: url('files/inconsolata.woff') format('woff');
+				font-weight: normal;
+				font-style: normal;
+
+			}
+
+			body {
+
+				margin: 0;
+				overflow: hidden;
+
+			}
+
+			button {
+
+				cursor: pointer;
+
+			}
+
+			pre {
+
+				font-family: 'Inconsolata';
+
+			}
+		</style>
+	</head>
+	<body>
+
+		<script type="text/javascript" src="../build/Three.js"></script>
+
+		<script type="text/javascript" src="js/libs/signals.min.js"></script>
+
+		<script type="text/javascript" src="js/UI.js"></script>
+		<script type="text/javascript" src="js/UI.Viewports.js"></script>
+		<script type="text/javascript" src="js/UI.Toolbar.js"></script>
+		<script type="text/javascript" src="js/Code.js"></script>
+		<script type="text/javascript" src="js/Code.Templates.js"></script>
+
+		<script>
+
+			var Signal = signals.Signal;
+
+			var signals = {
+
+				added: new Signal(),
+				updated: new Signal()
+
+			};
+
+			var ui = new UI();
+			document.body.appendChild( ui.getDOMElement() );
+
+			var code = new Code()
+			document.body.appendChild( code.getDOMElement() );
+
+			var xhalf = 0.7;
+
+			var xr = document.createElement( 'div' );
+			xr.style.position = 'absolute';
+			xr.style.top = '0px';
+			xr.style.width = '1px';
+			xr.style.borderLeft = '1px solid #e0e0e0';
+			// xr.style.backgroundColor = '#ffffff';
+			xr.style.cursor = 'col-resize';
+			xr.addEventListener( 'mousedown', function ( event ) {
+
+				event.preventDefault();
+
+				document.body.style.cursor = 'col-resize';
+				document.addEventListener( 'mousemove', onMouseMove, false );
+				document.addEventListener( 'mouseup', onMouseUp, false );
+
+				function onMouseMove( event ) {
+
+					event.preventDefault();
+
+					xhalf = Math.max( 0, Math.min( 1, event.clientX / window.innerWidth ) );
+
+					update();
+
+				}
+
+				function onMouseUp( event ) {
+
+					document.body.style.cursor = 'auto';
+					document.removeEventListener( 'mousemove', onMouseMove, false );
+					document.removeEventListener( 'mouseup', onMouseUp, false );
+
+				}
+
+			}, false );
+			xr.addEventListener( 'dblclick', function ( event ) {
+
+				xhalf = 0.7;
+				update();
+
+			}, false );
+			document.body.appendChild( xr );
+
+			// Add Sphere
+
+			var geometry = new THREE.SphereGeometry( 75, 20, 10 );
+			var material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
+			var mesh = new THREE.Mesh( geometry, material );
+
+			signals.added.dispatch( mesh );
+
+			//
+
+			update();
+			window.addEventListener( 'resize', function ( event ) { update() }, false );
+
+			function update() {
+
+				ui.setSize( window.innerWidth * xhalf, window.innerHeight );
+
+				code.setPosition( window.innerWidth * xhalf, 0 );
+				code.setSize( window.innerWidth - ( window.innerWidth * xhalf ), window.innerHeight );
+
+				xr.style.left = ( window.innerWidth * xhalf )  + 'px';
+				xr.style.height = window.innerHeight + 'px';
+
+			}
+
+		</script>
+	</body>
+</html>

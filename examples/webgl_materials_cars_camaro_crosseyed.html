@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - materials - cube reflection [camaro]</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				background:#000;
 				color:#fff;
@@ -16,7 +17,7 @@
 			h1 { }
 			a { color:skyblue }
 			canvas { pointer-events:none; z-index:10; position:relative; }
-			#log { position:absolute; top:50px; text-align:left; display:block; z-index:100 }
+
 			#d { text-align:center; margin:1em 0 -2.5em 0; z-index:0; position:relative; display:block }
 			#buttons { margin:0.5em 0 0 0 }
 			button { font-family:georgia; border:0; background:#222; color:#fff; padding:0.2em 0.5em; cursor:pointer; border-radius:3px }
@@ -30,19 +31,16 @@
 				<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl cube reflection demo. chevrolet camaro by <a href="http://www.turbosquid.com/3d-models/blender-camaro/411348" target="_blank">dskfnwn</a>
 					- O, P : change eye separation
 				</div>
-				
 			<div id="buttons"></div>
 		</div>
 
-		<div id="log"></div>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
-		
-		<script type="text/javascript" src="js/Detector.js"></script>
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
-		<script type="text/javascript">
+		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
@@ -51,7 +49,7 @@
 
 			var container, stats;
 
-			var camera, scene, webglRenderer;
+			var camera, scene, renderer;
 
 			var lightMesh;
 
@@ -70,45 +68,40 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 70, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
+				camera = new THREE.PerspectiveCamera( 70, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
 				camera.position.z = 1000;
-				camera.updateMatrix();
+
+				camera.target = new THREE.Vector3( 0, 0, 0 );
 
 				scene = new THREE.Scene();
 
 				// LIGHTS
 
 				var ambient = new THREE.AmbientLight( 0x555555 );
-				scene.addLight( ambient );
+				scene.add( ambient );
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff );
-				directionalLight.position.x = 1;
-				directionalLight.position.y = 1;
-				directionalLight.position.z = 0.5;
-				directionalLight.position.normalize();
-				scene.addLight( directionalLight );
+				directionalLight.position.set( 1, 1, 0.5 ).normalize();
+				scene.add( directionalLight );
 
 				pointLight = new THREE.PointLight( 0xffaa00 );
-				pointLight.position.x = 0;
-				pointLight.position.y = 0;
-				pointLight.position.z = 0;
-				scene.addLight( pointLight );
+				pointLight.position.set( 0, 0, 0 );
+				scene.add( pointLight );
 
 
 				sphere = new THREE.SphereGeometry( 100, 16, 8, 1 );
 				lightMesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) );
 				lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
 				lightMesh.position = pointLight.position;
-				lightMesh.overdraw = true;
-				lightMesh.updateMatrix();
-				scene.addObject(lightMesh);
+				scene.add( lightMesh );
 
 
-				webglRenderer = new THREE.CrosseyedWebGLRenderer( { separation: 20, antialias: true } );
-				webglRenderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( webglRenderer.domElement );
+				renderer = new THREE.CrosseyedWebGLRenderer( { separation: 20, antialias: true } );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setFaceCulling( 0 );
 
-				webglRenderer.setFaceCulling( 0 );
+				container.appendChild( renderer.domElement );
+
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
@@ -195,7 +188,7 @@
 				var mesh = new THREE.Mesh( geometry, m );
 				mesh.rotation.y = 1;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = s;
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				createButtons( materials.body, geometry );
 
@@ -211,20 +204,20 @@
 			function onKeyDown ( event ) {
 
 				switch( event.keyCode ) {
-				
+
 					/* O */
-					case 79: webglRenderer.separation -= 0.5; break;
-					
+					case 79: renderer.separation -= 0.5; break;
+
 					/* P */
-					case 80: webglRenderer.separation += 0.5; break;
+					case 80: renderer.separation += 0.5; break;
 
 				}
 
-				console.log( webglRenderer.separation );
+				console.log( renderer.separation );
 
 			};
 
-			// 
+			//
 
 			function animate() {
 
@@ -242,19 +235,15 @@
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 
+				camera.lookAt( camera.target );
+
 				lightMesh.position.x = 1500 * Math.cos( timer );
 				lightMesh.position.z = 1500 * Math.sin( timer );
 
-				webglRenderer.render( scene, camera );
+				renderer.render( scene, camera );
 
 			}
 
-			function log(text) {
-
-				var e = document.getElementById("log");
-				e.innerHTML = text + "<br/>" + e.innerHTML;
-
-			}
 
 		</script>
 

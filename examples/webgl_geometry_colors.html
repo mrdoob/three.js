@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - geometry - vertex colors</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				color: #808080;
 				font-family:Monospace;
@@ -33,13 +34,13 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - vertex colors - webgl</div>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/Detector.js"></script>
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
-		<script type="text/javascript">
+		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
@@ -61,7 +62,7 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.Camera( 20, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 20, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 1800;
 
 				scene = new THREE.Scene();
@@ -69,7 +70,7 @@
 				light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0, 0, 1 );
 				light.position.normalize();
-				scene.addLight( light );
+				scene.add( light );
 
 				var shadowMaterial = new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/shadow.png' ) } );
 				var shadowGeo = new THREE.PlaneGeometry( 300, 300, 1, 1 );
@@ -77,19 +78,19 @@
 				mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
 				mesh.position.y = - 250;
 				mesh.rotation.x = - 90 * Math.PI / 180;
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
 				mesh.position.y = - 250;
 				mesh.position.x = - 400;
 				mesh.rotation.x = - 90 * Math.PI / 180;
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
 				mesh.position.y = - 250;
 				mesh.position.x = 400;
 				mesh.rotation.x = - 90 * Math.PI / 180;
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				var faceIndices = [ 'a', 'b', 'c', 'd' ];
 
@@ -144,19 +145,19 @@
 				mesh.position.x = -400;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 200;
 				mesh.rotation.x = -1.87;
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				mesh2 = new THREE.Mesh( geometry2, materials  );
 				mesh2.position.x = 400;
 				mesh2.rotation.x = 0;
 				mesh2.scale = mesh.scale;
-				scene.addObject( mesh2 );
+				scene.add( mesh2 );
 
 				mesh3 = new THREE.Mesh( geometry3, materials  );
 				mesh3.position.x = 0;
 				mesh3.rotation.x = 0;
 				mesh3.scale = mesh.scale;
-				scene.addObject( mesh3 );
+				scene.add( mesh3 );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -194,6 +195,8 @@
 
 				camera.position.x += ( mouseX - camera.position.x ) * 0.05;
 				camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
+
+				camera.lookAt( scene.position );
 
 				renderer.render( scene, camera );
 

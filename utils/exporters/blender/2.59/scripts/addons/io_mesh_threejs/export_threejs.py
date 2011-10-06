@@ -222,7 +222,7 @@ TEMPLATE_HEX = "0x%06x"
 
 TEMPLATE_FILE_ASCII = """\
 /*
- * File generated with Blender 2.58 Exporter
+ * File generated with Blender 2.59 Exporter
  * https://github.com/mrdoob/three.js/tree/master/utils/exporters/blender/
  *
  * vertices: %(nvertex)d
@@ -231,7 +231,6 @@ TEMPLATE_FILE_ASCII = """\
  * uvs: %(nuv)d
  * colors: %(ncolor)d
  * materials: %(nmaterial)d
- * edges: %(nedges)d
  * morphTargets: %(nmorphTarget)d
  *
  */
@@ -263,9 +262,8 @@ TEMPLATE_MODEL_ASCII = """\
 
     "uvs": [[%(uvs)s]],
 
-    "faces": [%(faces)s],
+    "faces": [%(faces)s]
 
-    "edges" : [%(edges)s]
 """
 
 TEMPLATE_VERTEX = "%f,%f,%f"
@@ -274,7 +272,6 @@ TEMPLATE_VERTEX_TRUNCATE = "%d,%d,%d"
 TEMPLATE_N = "%f,%f,%f"
 TEMPLATE_UV = "%f,%f"
 TEMPLATE_C = "%d"
-TEMPLATE_EDGE = "%d,%d"
 
 # #####################################################
 # Utils
@@ -453,9 +450,6 @@ def generate_vertex_color(c):
 
 def generate_uv(uv):
     return TEMPLATE_UV % (uv[0], 1.0 - uv[1])
-
-def generate_edge(e, offset):
-    return TEMPLATE_EDGE % (e.vertices[0] + offset, e.vertices[1] + offset)
 
 # #####################################################
 # Model exporter - faces
@@ -868,7 +862,6 @@ def generate_ascii_model(meshes, morphs,
                          option_vertices_truncate,
                          option_faces,
                          option_normals,
-                         option_edges,
                          option_uv_coords,
                          option_materials,
                          option_colors,
@@ -884,8 +877,6 @@ def generate_ascii_model(meshes, morphs,
 
     vertex_offset = 0
     vertex_offsets = []
-
-    edges = []
 
     nnormal = 0
     normals = {}
@@ -923,8 +914,6 @@ def generate_ascii_model(meshes, morphs,
 
         vertices.extend(mesh.vertices[:])
 
-        edges.append(mesh.edges[:])
-
         if option_normals:
             nnormal = extract_vertex_normals(mesh, normals, nnormal)
 
@@ -951,17 +940,6 @@ def generate_ascii_model(meshes, morphs,
         morphTargets_string = ",\n\t".join(chunks)
         nmorphTarget = len(morphs)
 
-    edges_string = ""
-    nedges = 0
-
-    if option_edges:
-        chunks = []
-        for edges_mesh, offset in zip(edges, vertex_offsets):
-            for edge in edges_mesh:
-                chunks.append(generate_edge(edge, offset))
-        nedges = len(chunks)
-        edges_string  = ",".join(chunks)
-
     if align_model == 1:
         center(vertices)
     elif align_model == 2:
@@ -986,8 +964,6 @@ def generate_ascii_model(meshes, morphs,
 
     "faces"    : faces_string,
 
-    "edges"    : edges_string,
-
     "morphTargets" : morphTargets_string
     }
 
@@ -998,7 +974,6 @@ def generate_ascii_model(meshes, morphs,
     "nnormal"   : nnormal,
     "ncolor"    : ncolor,
     "nmaterial" : nmaterial,
-    "nedges"    : nedges,
     "nmorphTarget": nmorphTarget,
 
     "model"     : model_string
@@ -1045,7 +1020,6 @@ def generate_mesh_string(objects, scene,
                 option_vertices_truncate,
                 option_faces,
                 option_normals,
-                option_edges,
                 option_uv_coords,
                 option_materials,
                 option_colors,
@@ -1095,7 +1069,6 @@ def generate_mesh_string(objects, scene,
                                 option_vertices_truncate,
                                 option_faces,
                                 option_normals,
-                                option_edges,
                                 option_uv_coords,
                                 option_materials,
                                 option_colors,
@@ -1120,7 +1093,6 @@ def export_mesh(objects,
                 option_vertices_truncate,
                 option_faces,
                 option_normals,
-                option_edges,
                 option_uv_coords,
                 option_materials,
                 option_colors,
@@ -1140,7 +1112,6 @@ def export_mesh(objects,
                 option_vertices_truncate,
                 option_faces,
                 option_normals,
-                option_edges,
                 option_uv_coords,
                 option_materials,
                 option_colors,
@@ -1807,7 +1778,6 @@ def save(operator, context, filepath = "",
          option_vertices_truncate = False,
          option_faces = True,
          option_normals = True,
-         option_edges = False,
          option_uv_coords = True,
          option_materials = True,
          option_colors = True,
@@ -1865,7 +1835,6 @@ def save(operator, context, filepath = "",
                                                         option_vertices_truncate,
                                                         option_faces,
                                                         option_normals,
-                                                        option_edges,
                                                         option_uv_coords,
                                                         option_materials,
                                                         option_colors,
@@ -1889,7 +1858,6 @@ def save(operator, context, filepath = "",
                                     option_vertices_truncate,
                                     option_faces,
                                     option_normals,
-                                    option_edges,
                                     option_uv_coords,
                                     option_materials,
                                     option_colors,
@@ -1920,7 +1888,6 @@ def save(operator, context, filepath = "",
                     option_vertices_truncate,
                     option_faces,
                     option_normals,
-                    option_edges,
                     option_uv_coords,
                     option_materials,
                     option_colors,

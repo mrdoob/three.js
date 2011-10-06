@@ -138,7 +138,7 @@ THREE.Shape.Utils = {
 			holes.push( hole );
 			*/
 
-			allpoints = allpoints.concat( hole );
+			Array.prototype.push.apply( allpoints, hole );
 
 			shortest = Number.POSITIVE_INFINITY;
 

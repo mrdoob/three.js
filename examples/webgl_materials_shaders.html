@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - materials - shaders [Phong, Lambert]</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				background:#000;
 				color:#fff;
@@ -38,13 +39,13 @@
 			<p>Blinn-Phong shader only works in WebGL, canvas has only diffuse materials.
 		</div>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/Detector.js"></script>
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
-		<script type="text/javascript">
+		<script>
 
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
@@ -86,33 +87,31 @@
 
 				mesh.overdraw = true;
 
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 			}
 
 			function init() {
 
-				container = document.createElement('div');
-				document.body.appendChild(container);
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
+				camera = new THREE.PerspectiveCamera( 75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
 				camera.position.z = 1000;
-				camera.updateMatrix();
 
 				scene = new THREE.Scene();
 
 				// LIGHTS
 
 				var ambient = new THREE.AmbientLight( 0x101010 );
-				scene.addLight( ambient );
+				scene.add( ambient );
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff );
-				directionalLight.position.set( 1, 1, 2 );
-				directionalLight.position.normalize();
-				scene.addLight( directionalLight );
+				directionalLight.position.set( 1, 1, 2 ).normalize();
+				scene.add( directionalLight );
 
 				pointLight = new THREE.PointLight( 0xffffff );
-				scene.addLight( pointLight );
+				scene.add( pointLight );
 
 				// light representation
 
@@ -121,7 +120,7 @@
 				lightMesh.scale.set( 0.05, 0.05, 0.05 );
 				lightMesh.position = pointLight.position;
 				lightMesh.overdraw = true;
-				scene.addObject( lightMesh );
+				scene.add( lightMesh );
 
 				// material samples
 
@@ -232,6 +231,8 @@
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+
+				camera.lookAt( scene.position );
 
 				lightMesh.position.x = 700 * Math.cos( timer );
 				lightMesh.position.z = 700 * Math.sin( timer );

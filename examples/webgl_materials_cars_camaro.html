@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - materials - cube reflection [camaro]</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				background:#000;
 				color:#fff;
@@ -16,7 +17,7 @@
 			h1 { }
 			a { color:skyblue }
 			canvas { pointer-events:none; z-index:10; position:relative; }
-			#log { position:absolute; top:50px; text-align:left; display:block; z-index:100 }
+
 			#d { text-align:center; margin:1em 0 -2.5em 0; z-index:0; position:relative; display:block }
 			#buttons { margin:0.5em 0 0 0 }
 			button { font-family:georgia; border:0; background:#222; color:#fff; padding:0.2em 0.5em; cursor:pointer; border-radius:3px }
@@ -31,15 +32,13 @@
 			<div id="buttons"></div>
 		</div>
 
-		<div id="log"></div>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
-		<script type="text/javascript" src="js/Detector.js"></script>
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
-
-		<script type="text/javascript">
+		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
@@ -48,7 +47,7 @@
 
 			var container, stats;
 
-			var camera, scene, webglRenderer;
+			var camera, scene, renderer;
 
 			var lightMesh;
 
@@ -64,52 +63,44 @@
 
 			function init() {
 
-				container = document.createElement('div');
-				document.body.appendChild(container);
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 70, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
+				camera = new THREE.PerspectiveCamera( 70, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
 				camera.position.z = 1000;
-				camera.updateMatrix();
 
 				scene = new THREE.Scene();
 
 				// LIGHTS
 
 				var ambient = new THREE.AmbientLight( 0x555555 );
-				scene.addLight( ambient );
+				scene.add( ambient );
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff );
-				directionalLight.position.x = 1;
-				directionalLight.position.y = 1;
-				directionalLight.position.z = 0.5;
-				directionalLight.position.normalize();
-				scene.addLight( directionalLight );
+				directionalLight.position.set( 1, 1, 0.5 ).normalize();
+				scene.add( directionalLight );
 
 				pointLight = new THREE.PointLight( 0xffaa00 );
-				pointLight.position.x = 0;
-				pointLight.position.y = 0;
-				pointLight.position.z = 0;
-				scene.addLight( pointLight );
+				pointLight.position.set( 0, 0, 0 );
+				scene.add( pointLight );
 
-
-				sphere = new THREE.SphereGeometry( 100, 16, 8, 1 );
+				sphere = new THREE.SphereGeometry( 100, 16, 8 );
 				lightMesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) );
-				lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
+				lightMesh.scale.set( 0.05, 0.05, 0.05 );
 				lightMesh.position = pointLight.position;
-				lightMesh.overdraw = true;
-				lightMesh.updateMatrix();
-				scene.addObject(lightMesh);
+				scene.add( lightMesh );
 
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				renderer.setFaceCulling( 0 );
 
-				webglRenderer = new THREE.WebGLRenderer();
-				webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				webglRenderer.setFaceCulling( 0 );
-				container.appendChild( webglRenderer.domElement );
+				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
 				stats.domElement.style.zIndex = 100;
+
 				container.appendChild( stats.domElement );
 
 				document.addEventListener('mousemove', onDocumentMouseMove, false);
@@ -190,7 +181,7 @@
 				var mesh = new THREE.Mesh( geometry, m );
 				mesh.rotation.y = 1;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = s;
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				createButtons( materials.body, geometry );
 
@@ -203,7 +194,7 @@
 
 			}
 
-			// 
+			//
 
 			function animate() {
 
@@ -221,19 +212,15 @@
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 
+				camera.lookAt( scene.position );
+
 				lightMesh.position.x = 1500 * Math.cos( timer );
 				lightMesh.position.z = 1500 * Math.sin( timer );
 
-				webglRenderer.render( scene, camera );
+				renderer.render( scene, camera );
 
 			}
 
-			function log(text) {
-
-				var e = document.getElementById("log");
-				e.innerHTML = text + "<br/>" + e.innerHTML;
-
-			}
 
 		</script>
 
