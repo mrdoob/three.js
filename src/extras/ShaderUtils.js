@@ -94,7 +94,7 @@ THREE.ShaderUtils = {
 		/* -------------------------------------------------------------------------
 		//	Normal map shader
 		//		- Blinn-Phong
-		//		- normal + diffuse + specular + AO + displacement maps
+		//		- normal + diffuse + specular + AO + displacement + reflection + shadow maps
 		//		- point and directional lights (use with "lights: true" material option)
 		 ------------------------------------------------------------------------- */
 
@@ -108,18 +108,20 @@ THREE.ShaderUtils = {
 
 				{
 
-				"enableAO"		: { type: "i", value: 0 },
-				"enableDiffuse"	: { type: "i", value: 0 },
-				"enableSpecular": { type: "i", value: 0 },
+				"enableAO"		  : { type: "i", value: 0 },
+				"enableDiffuse"	  : { type: "i", value: 0 },
+				"enableSpecular"  : { type: "i", value: 0 },
+				"enableReflection": { type: "i", value: 0 },
 
-				"tDiffuse"	: { type: "t", value: 0, texture: null },
-				"tNormal"	: { type: "t", value: 2, texture: null },
-				"tSpecular"	: { type: "t", value: 3, texture: null },
-				"tAO"		: { type: "t", value: 4, texture: null },
+				"tDiffuse"	   : { type: "t", value: 0, texture: null },
+				"tCube"		   : { type: "t", value: 1, texture: null },
+				"tNormal"	   : { type: "t", value: 2, texture: null },
+				"tSpecular"	   : { type: "t", value: 3, texture: null },
+				"tAO"		   : { type: "t", value: 4, texture: null },
+				"tDisplacement": { type: "t", value: 5, texture: null },
 
 				"uNormalScale": { type: "f", value: 1.0 },
 
-				"tDisplacement": { type: "t", value: 5, texture: null },
 				"uDisplacementBias": { type: "f", value: 0.0 },
 				"uDisplacementScale": { type: "f", value: 1.0 },
 
@@ -128,6 +130,8 @@ THREE.ShaderUtils = {
 				"uAmbientColor": { type: "c", value: new THREE.Color( 0x050505 ) },
 				"uShininess": { type: "f", value: 30 },
 				"uOpacity": { type: "f", value: 1 },
+
+				"uReflectivity": { type: "f", value: 0.5 },
 
 				"uOffset" : { type: "v2", value: new THREE.Vector2( 0, 0 ) },
 				"uRepeat" : { type: "v2", value: new THREE.Vector2( 1, 1 ) }
@@ -147,13 +151,17 @@ THREE.ShaderUtils = {
 				"uniform bool enableDiffuse;",
 				"uniform bool enableSpecular;",
 				"uniform bool enableAO;",
+				"uniform bool enableReflection;",
 
 				"uniform sampler2D tDiffuse;",
 				"uniform sampler2D tNormal;",
 				"uniform sampler2D tSpecular;",
 				"uniform sampler2D tAO;",
 
+				"uniform samplerCube tCube;",
+
 				"uniform float uNormalScale;",
+				"uniform float uReflectivity;",
 
 				"varying vec3 vTangent;",
 				"varying vec3 vBinormal;",
@@ -277,6 +285,15 @@ THREE.ShaderUtils = {
 					"#endif",
 
 					"gl_FragColor.xyz = gl_FragColor.xyz * totalDiffuse + totalSpecular + ambientLightColor * uAmbientColor;",
+
+					"if ( enableReflection ) {",
+
+						"vec3 wPos = cameraPosition - vViewPosition;",
+						"vec3 vReflect = reflect( normalize( wPos ), normal );",
+						"vec4 cubeColor = textureCube( tCube, vec3( -vReflect.x, vReflect.yz ) );",
+						"gl_FragColor.xyz = mix( gl_FragColor.xyz, cubeColor.xyz, uReflectivity );",
+
+					"}",
 
 					THREE.ShaderChunk[ "shadowmap_fragment" ],
 					THREE.ShaderChunk[ "fog_fragment" ],

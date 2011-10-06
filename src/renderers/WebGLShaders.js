@@ -835,7 +835,7 @@ THREE.UniformsLib = {
 
 	shadowmap: {
 
-		"shadowMap": { type: "tv", value: 3, texture: [] },
+		"shadowMap": { type: "tv", value: 6, texture: [] },
 		"shadowMatrix" : { type: "m4v", value: [] },
 
 		"shadowBias" : { type: "f", value: 0.0039 },
