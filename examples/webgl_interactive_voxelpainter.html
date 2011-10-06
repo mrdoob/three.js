@@ -22,13 +22,16 @@
 		<script src="js/Detector.js"></script>
 		<script src="js/RequestAnimationFrame.js"></script>
 		<script src="js/Stats.js"></script>
+		
+		<link href="js/gui/gui.css" media="screen" rel="stylesheet" type="text/css" />
+		<script src="js/gui/gui.min.js"></script>
 
 		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var container, stats;
-			var camera, cameraTarget, scene, renderer;
+			var camera, cameraTarget, cameraPerspective, cameraOrtho, scene, renderer;
 			var projector, plane, cube;
 			var mouse2D, mouse3D, ray,
 			rollOveredFace, isShiftDown = false,
@@ -38,6 +41,10 @@
 			var cubeGeo, cubeMaterial;
 			var i, intersector;
 
+			var gui, voxelConfig = {
+				orthographicProjection: false
+			};
+			
 			init();
 			animate();
 
@@ -54,10 +61,17 @@
 				info.innerHTML = '<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - voxel painter - webgl<br /><strong>click</strong>: add voxel, <strong>control + click</strong>: remove voxel, <strong>shift + click</strong>: rotate, <a href="javascript:save();return false;">save .png</a>';
 				container.appendChild( info );
 
-				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.y = 800;
+				cameraPerspective = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
+				cameraPerspective.position.y = 800;
 
-				cameraTarget = new THREE.Vector3( 0, 200, 0 );
+				cameraOrtho = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, - 2000, 10000 );
+                cameraOrtho.position.x = 1000;
+                cameraOrtho.position.y = 707.106;
+                cameraOrtho.position.z = 1000;
+
+				camera = cameraPerspective;
+
+				cameraTarget = new THREE.Vector3( 0, 0, 0 );
 
 				scene = new THREE.Scene();
 
@@ -86,7 +100,6 @@
 				scene.add( plane );
 
 				mouse2D = new THREE.Vector3( 0, 10000, 0.5 );
-				ray = new THREE.Ray( camera.position, null );
 
 				// Lights
 
@@ -121,7 +134,20 @@
 				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 				document.addEventListener( 'keydown', onDocumentKeyDown, false );
 				document.addEventListener( 'keyup', onDocumentKeyUp, false );
-
+				
+				// add GUI
+				gui = new GUI();
+				gui.add(voxelConfig, 'orthographicProjection').onChange(function(){
+					
+					if ( voxelConfig.orthographicProjection ) {
+						camera = cameraOrtho;
+						theta = 90;
+					} else {
+						camera = cameraPerspective;
+					}
+				
+				});
+				
 			}
 
 			function getRealIntersector( intersects ) {
@@ -247,8 +273,7 @@
 
 				}
 
-				mouse3D = projector.unprojectVector( mouse2D.clone(), camera );
-				ray.direction = mouse3D.subSelf( camera.position ).normalize();
+				ray = projector.pickingRay( mouse2D.clone(), camera );
 
 				var intersects = ray.intersectScene( scene );
 
