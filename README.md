@@ -135,7 +135,7 @@ This code creates a camera, then creates a scene, adds a cube on it, creates a &
 
 ### Change Log ###
 
-2011 10 06 - **r45** (340.081 KB, gzip: 86.401 KB)
+2011 10 06 - **r45** (340.607 KB, gzip: 86.462 KB)
 
 * `Object/Scene.add*()` and `Object/Scene.remove*()` are now `Object/Scene.add()` and `Object/Scene.remove()`. ([mrdoob](http://github.com/mrdoob))
 * `LOD.add()` is now `LOD.addLevel()`. ([mrdoob](http://github.com/mrdoob))
@@ -169,7 +169,7 @@ This code creates a camera, then creates a scene, adds a cube on it, creates a &
 * Added `SubdivisionModifier`. ([zz85](http://github.com/zz85))
 * `Projector`'s `unprojectVector()` now also works with `OrthographicCamera`. ([jsermeno](http://github.com/jsermeno))
 * Added `.setLens()` method to `PerspectiveCamera`. ([zz85](http://github.com/zz85))
-* Added Shadow Maps and `Texture`'s `.offset` and `.repeat` support to Normal Map shader. ([alteredq](http://github.com/alteredq))
+* Added Shadow Maps, `Texture`'s `.offset` and `.repeat` and reflections support to Normal Map shader. ([alteredq](http://github.com/alteredq))
 
 
 2011 09 04 - **r44** (330.356 KB, gzip: 84.039 KB)
