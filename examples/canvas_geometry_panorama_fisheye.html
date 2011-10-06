@@ -77,7 +77,8 @@
 
 				];
 
-				mesh = new THREE.Mesh( new THREE.CubeGeometry( 300, 300, 300, 7, 7, 7, materials, true ), new THREE.MeshFaceMaterial() );
+				mesh = new THREE.Mesh( new THREE.CubeGeometry( 300, 300, 300, 7, 7, 7, materials ), new THREE.MeshFaceMaterial() );
+				mesh.scale.x = - 1;
 				mesh.overdraw = true;
 				scene.add( mesh );
 
