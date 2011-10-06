@@ -125,10 +125,10 @@
 
 						h = getY( x, z );
 
-						h2 = getY( x - 1, z );
+						h2 = getY( x + 1, z );
 						px = ( h2 != h && h2 != h + 1 ) || x == 0 ? 1 : 0;
 
-						h2 = getY( x + 1, z );
+						h2 = getY( x - 1, z );
 						nx = ( h2 != h && h2 != h + 1 ) || x == worldWidth - 1 ? 1 : 0;
 
 						h2 = getY( x, z + 1 );

@@ -53,8 +53,8 @@ THREE.CubeGeometry = function ( width, height, depth, segmentsWidth, segmentsHei
 
 	}
 
-	this.sides.px && buildPlane( 'z', 'y',   1 * flip, - 1, depth, height, - width_half, this.materials[ 0 ] ); // px
-	this.sides.nx && buildPlane( 'z', 'y', - 1 * flip, - 1, depth, height, width_half, this.materials[ 1 ] );   // nx
+	this.sides.px && buildPlane( 'z', 'y', - 1 * flip, - 1, depth, height, width_half, this.materials[ 0 ] ); // px
+	this.sides.nx && buildPlane( 'z', 'y',   1 * flip, - 1, depth, height, - width_half, this.materials[ 1 ] );   // nx
 	this.sides.py && buildPlane( 'x', 'z',   1 * flip,   1, width, depth, height_half, this.materials[ 2 ] );   // py
 	this.sides.ny && buildPlane( 'x', 'z',   1 * flip, - 1, width, depth, - height_half, this.materials[ 3 ] ); // ny
 	this.sides.pz && buildPlane( 'x', 'y',   1 * flip, - 1, width, height, depth_half, this.materials[ 4 ] );   // pz
