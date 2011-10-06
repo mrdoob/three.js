@@ -12,7 +12,7 @@
 				overflow: hidden;
 				color: purple;
 			}
-			
+
 			a {
 				color: red;
 			}
@@ -33,29 +33,29 @@
 
 			init();
 			animate();
-			
+
 			function setFov(fov) {
 				camera.setFov(fov);
-				
+
 				document.getElementById('fov').innerHTML = 'FOV '+ fov.toFixed(2) +'&deg;' ;
 			}
-			
+
 			function setLens(lens) {
 				// try adding a tween effect while changing focal length, and it'd be even cooler!
 				var fov = camera.setLens(lens);
-				
+
 				document.getElementById('fov').innerHTML = 'Converted ' + lens + 'mm lens to FOV '+ fov.toFixed(2) +'&deg;' ;
 			}
-			
+
 			function setOrthographic() {
 				camera.toOrthographic();
-				
+
 				document.getElementById('fov').innerHTML = 'Orthographic mode' ;
 			}
-			
+
 			function setPerspective() {
 				camera.toPerspective();
-				
+
 				document.getElementById('fov').innerHTML = 'Perspective mode' ;
 			}
 
@@ -77,9 +77,9 @@
 				'<br/>Fov: <a href="#" onclick="setFov(30);return false;">30&deg;</a> | <a href="#" onclick="setFov(50);return false;">50&deg;</a> | <a href="#" onclick="setFov(70);return false;">70&deg;</a> | <a href="#" onclick="setFov(100);return false;">100&deg;</a> <br/><div id="fov"/>';
 				container.appendChild( info );
 
-				
+
 				camera = new THREE.CombinedCamera( window.innerWidth, window.innerHeight, 70, 1, 1000, -1000, 1000, 1000 );
-				
+
 				camera.position.x = 200;
 				camera.position.y = 100;
 				camera.position.z = 200;

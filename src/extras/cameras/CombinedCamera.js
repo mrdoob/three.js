@@ -10,11 +10,11 @@
 THREE.CombinedCamera = function ( width, height, fov, near, far, orthonear, orthofar ) {
 
 	THREE.Camera.call( this );
-	
+
 	// We could also handle the projectionMatrix internally, but just wanted to test nested camera objects
 	this.cameraO = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 	orthonear, orthofar );
 	this.cameraP = new THREE.PerspectiveCamera( fov, width/height, near, far );
-	
+
 	this.toPerspective();
 
 };
@@ -31,16 +31,19 @@ THREE.CombinedCamera.prototype.toPerspective = function () {
 };
 
 THREE.CombinedCamera.prototype.toOrthographic = function () {
+
 	this.near = this.cameraO.near;
 	this.far = this.cameraO.far;
 	this.projectionMatrix = this.cameraO.projectionMatrix;
+
 };
 
 THREE.CombinedCamera.prototype.setFov = function(fov) {
+
 	this.cameraP.fov = fov;
 	this.cameraP.updateProjectionMatrix();
 	this.toPerspective();
-	
+
 };
 
 /*
@@ -50,11 +53,11 @@ THREE.CombinedCamera.prototype.setFov = function(fov) {
 */
 THREE.CombinedCamera.prototype.setLens = function(focalLength, framesize) {
 
-    if (!framesize) framesize = 43.25; // 36x24mm
+	if (!framesize) framesize = 43.25; // 36x24mm
 
-    var fov = 2 * Math.atan( framesize / (focalLength * 2));
-    fov = 180 / Math.PI * fov;
+	var fov = 2 * Math.atan( framesize / (focalLength * 2));
+	fov = 180 / Math.PI * fov;
 	this.setFov(fov);
-	
+
 	return fov;
 };
