@@ -100,7 +100,7 @@
 			function createObstacles(){
 
 				createCube(100, 50, 10, new THREE.Vector3( 20, 0, 100), Math.PI / 4);
-				camera.target = createCube(100, 50, 10, new THREE.Vector3(-20, 0, 200), -Math.PI / 4);
+				camera.target = createCube(100, 50, 10, new THREE.Vector3(-20, 0, 200), -Math.PI / 4).position;
 				createCube(100, 50, 10, new THREE.Vector3( 20, 0, 300), Math.PI / 4);
 
 			}
@@ -160,7 +160,7 @@
 				camera.position.y = Math.cos(mouse2d.y * Math.PI) * 300;
 				camera.position.z = 200 + Math.sin(mouse2d.x * Math.PI) * 300 +  Math.sin(mouse2d.y * Math.PI) * 300;
 
-				camera.lookAt( scene.position );
+				camera.lookAt( camera.target );
 
 				renderer.render( scene, camera );
 

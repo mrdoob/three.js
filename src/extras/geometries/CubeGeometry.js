@@ -3,15 +3,14 @@
  * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Cube.as
  */
 
-THREE.CubeGeometry = function ( width, height, depth, segmentsWidth, segmentsHeight, segmentsDepth, materials, flipped, sides ) {
+THREE.CubeGeometry = function ( width, height, depth, segmentsWidth, segmentsHeight, segmentsDepth, materials, sides ) {
 
 	THREE.Geometry.call( this );
 
 	var scope = this,
 	width_half = width / 2,
 	height_half = height / 2,
-	depth_half = depth / 2,
-	flip = flipped ? - 1 : 1;
+	depth_half = depth / 2;
 
 	if ( materials !== undefined ) {
 
@@ -53,13 +52,13 @@ THREE.CubeGeometry = function ( width, height, depth, segmentsWidth, segmentsHei
 
 	}
 
-	this.sides.px && buildPlane( 'z', 'y', - 1 * flip, - 1, depth, height, width_half, this.materials[ 0 ] ); // px
-	this.sides.nx && buildPlane( 'z', 'y',   1 * flip, - 1, depth, height, - width_half, this.materials[ 1 ] );   // nx
-	this.sides.py && buildPlane( 'x', 'z',   1 * flip,   1, width, depth, height_half, this.materials[ 2 ] );   // py
-	this.sides.ny && buildPlane( 'x', 'z',   1 * flip, - 1, width, depth, - height_half, this.materials[ 3 ] ); // ny
-	this.sides.pz && buildPlane( 'x', 'y',   1 * flip, - 1, width, height, depth_half, this.materials[ 4 ] );   // pz
-	this.sides.nz && buildPlane( 'x', 'y', - 1 * flip, - 1, width, height, - depth_half, this.materials[ 5 ] ); // nz
-	
+	this.sides.px && buildPlane( 'z', 'y', - 1, - 1, depth, height, width_half, this.materials[ 0 ] ); // px
+	this.sides.nx && buildPlane( 'z', 'y',   1, - 1, depth, height, - width_half, this.materials[ 1 ] );   // nx
+	this.sides.py && buildPlane( 'x', 'z',   1,   1, width, depth, height_half, this.materials[ 2 ] );   // py
+	this.sides.ny && buildPlane( 'x', 'z',   1, - 1, width, depth, - height_half, this.materials[ 3 ] ); // ny
+	this.sides.pz && buildPlane( 'x', 'y',   1, - 1, width, height, depth_half, this.materials[ 4 ] );   // pz
+	this.sides.nz && buildPlane( 'x', 'y', - 1, - 1, width, height, - depth_half, this.materials[ 5 ] ); // nz
+
 	this.mergeVertices();
 
 	function buildPlane( u, v, udir, vdir, width, height, depth, material ) {
