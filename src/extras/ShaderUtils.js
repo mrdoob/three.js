@@ -127,7 +127,10 @@ THREE.ShaderUtils = {
 				"uSpecularColor": { type: "c", value: new THREE.Color( 0x111111 ) },
 				"uAmbientColor": { type: "c", value: new THREE.Color( 0x050505 ) },
 				"uShininess": { type: "f", value: 30 },
-				"uOpacity": { type: "f", value: 1 }
+				"uOpacity": { type: "f", value: 1 },
+
+				"uOffset" : { type: "v2", value: new THREE.Vector2( 0, 0 ) },
+				"uRepeat" : { type: "v2", value: new THREE.Vector2( 1, 1 ) }
 
 				}
 
@@ -286,6 +289,9 @@ THREE.ShaderUtils = {
 
 				"attribute vec4 tangent;",
 
+				"uniform vec2 uOffset;",
+				"uniform vec2 uRepeat;",
+
 				"#ifdef VERTEX_TEXTURES",
 
 					"uniform sampler2D tDisplacement;",
@@ -329,7 +335,7 @@ THREE.ShaderUtils = {
 					"vBinormal = cross( vNormal, vTangent ) * tangent.w;",
 					"vBinormal = normalize( vBinormal );",
 
-					"vUv = uv;",
+					"vUv = uv * uRepeat + uOffset;",
 
 					// point lights
 
