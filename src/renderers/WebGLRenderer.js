@@ -410,13 +410,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 			intensity = light.intensity;
 			distance = light.distance;
 
-			if ( /*light instanceof THREE.AmbientLight ) {
+			if ( light instanceof THREE.AmbientLight ) {
 
 				r += color.r;
 				g += color.g;
 				b += color.b;
 
-			} else if (*/ light instanceof THREE.DirectionalLight ) {
+			} else if ( light instanceof THREE.DirectionalLight ) {
 
 				doffset = dlength * 3;
 

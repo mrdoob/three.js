@@ -245,7 +245,7 @@ THREE.SVGRenderer = function () {
 		var l, ll, light, lightColor,
 		lights = scene.lights;
 
-		_ambientLight.copy( scene.ambientColor );
+		_ambientLight.setRGB( 0, 0, 0 );
 		_directionalLights.setRGB( 0, 0, 0 );
 		_pointLights.setRGB( 0, 0, 0 );
 
@@ -254,7 +254,13 @@ THREE.SVGRenderer = function () {
 			light = lights[ l ];
 			lightColor = light.color;
 
-			if ( light instanceof THREE.DirectionalLight ) {
+			if ( light instanceof THREE.AmbientLight ) {
+
+				_ambientLight.r += lightColor.r;
+				_ambientLight.g += lightColor.g;
+				_ambientLight.b += lightColor.b;
+
+			} else if ( light instanceof THREE.DirectionalLight ) {
 
 				_directionalLights.r += lightColor.r;
 				_directionalLights.g += lightColor.g;
