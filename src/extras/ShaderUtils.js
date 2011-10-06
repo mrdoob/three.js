@@ -104,6 +104,7 @@ THREE.ShaderUtils = {
 
 				THREE.UniformsLib[ "fog" ],
 				THREE.UniformsLib[ "lights" ],
+				THREE.UniformsLib[ "shadowmap" ],
 
 				{
 
@@ -170,6 +171,7 @@ THREE.ShaderUtils = {
 
 				"varying vec3 vViewPosition;",
 
+				THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
 				THREE.ShaderChunk[ "fog_pars_fragment" ],
 
 				"void main() {",
@@ -273,6 +275,7 @@ THREE.ShaderUtils = {
 
 					"gl_FragColor.xyz = gl_FragColor.xyz * totalDiffuse + totalSpecular + ambientLightColor * uAmbientColor;",
 
+					THREE.ShaderChunk[ "shadowmap_fragment" ],
 					THREE.ShaderChunk[ "fog_fragment" ],
 
 				"}"
@@ -306,6 +309,8 @@ THREE.ShaderUtils = {
 				"#endif",
 
 				"varying vec3 vViewPosition;",
+
+				THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
 
 				"void main() {",
 
@@ -363,6 +368,8 @@ THREE.ShaderUtils = {
 						"gl_Position = projectionMatrix * mvPosition;",
 
 					"#endif",
+
+					THREE.ShaderChunk[ "shadowmap_vertex" ],
 
 				"}"
 
