@@ -100,6 +100,7 @@ EXTRAS_FILES = [
 'extras/cameras/FlyCamera.js',
 'extras/cameras/RollCamera.js',
 'extras/cameras/TrackballCamera.js',
+'extras/cameras/CombinedCamera.js',
 'extras/controls/FirstPersonControls.js',
 'extras/controls/PathControls.js',
 'extras/controls/FlyControls.js',
