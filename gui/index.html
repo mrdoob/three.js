@@ -45,6 +45,9 @@
 
 		<script>
 
+			var BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
+			var URL = window.URL || window.webkitURL || window.mozURL;
+
 			var Signal = signals.Signal;
 
 			var signals = {
@@ -121,33 +124,61 @@
 				event.preventDefault();
 
 				var file = event.dataTransfer.files[ 0 ];
+				var extension = file.fileName.split( '.' )[1].toLowerCase();
 				var reader = new FileReader();
 
 				reader.onload = function ( event ) {
 
-					var parser = new DOMParser();
-					var xml = parser.parseFromString( event.target.result, 'text/xml' );
+					var contents = event.target.result;
 
-					var loader = new THREE.ColladaLoader();
-					loader.parse( xml, function ( collada ) {
+					switch ( extension ) {
 
-						console.log( collada );
+						case 'dae':
 
-						signals.added.dispatch( collada.scene );
+							var parser = new DOMParser();
+							var xml = parser.parseFromString( contents, 'text/xml' );
 
-					} );
+							var loader = new THREE.ColladaLoader();
+							loader.parse( xml, function ( collada ) {
 
-					/*
-					var loader = new THREE.JSONLoader();
-					loader.createModel( event.target.result, function ( geometry ) {
+								// console.log( collada );
 
-						var material = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
-						var mesh = new THREE.Mesh( geometry, material );
+								signals.added.dispatch( collada.scene );
 
-						signals.added.dispatch( mesh );
+							} );
 
-					} );
-					*/
+							break;
+
+						case 'js':
+
+							var blob = new BlobBuilder();
+							blob.append( contents );
+
+							var url = window.URL.createObjectURL( blob.getBlob() );
+
+							var loader = new THREE.JSONLoader();
+							loader.load( { model: url, callback: function ( geometry ) {
+
+								geometry.gui = {
+									paremeters: {
+									},
+									getCode: function () {
+
+										return 'new THREE.JSONLoader( TODO )';
+
+									}
+								};
+
+								var material = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
+								var mesh = new THREE.Mesh( geometry, material );
+
+								signals.added.dispatch( mesh );
+
+							} } );
+
+							break;
+
+					}
 
 				};
 

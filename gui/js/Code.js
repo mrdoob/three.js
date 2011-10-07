@@ -14,16 +14,15 @@ var Code = function () {
 	_checkbox.style.margin = '20px 6px 0px 20px';
 	_checkbox.addEventListener( 'click', function () { _html = !_html; _update(); }, false );
 	_domElement.appendChild( _checkbox );
-	
+
 	var _preview = document.createElement( 'a' );
 	_preview.href = '#';
 	_preview.innerHTML = 'preview';
 	_preview.style.margin = '20px 6px 0px 20px';
-	_preview.addEventListener( 'click', 
-		function () { 
-			
-			
+	_preview.addEventListener( 'click', function () { 
+
 			// Get unescaped code gen
+
 			var temp=document.createElement("pre");
 			temp.innerHTML = _codegen( true );
 			temp = temp.firstChild.nodeValue;
@@ -31,7 +30,7 @@ var Code = function () {
 			temp = temp.replace("js/RequestAnimationFrame.js", "../examples/js/RequestAnimationFrame.js");
 			aaa = temp;
 			console.log('test', temp);
-			
+
 			var opener = window.open('','myconsole',
 			  'width=800,height=400'
 			   +',menubar=1'
@@ -39,15 +38,14 @@ var Code = function () {
 			   +',status=1'
 			   +',scrollbars=1'
 			   +',resizable=1');
-			
-			
+
 			opener.document.writeln( temp );
 			opener.document.close();
-			
+
 		}, false 
 	);
 	_domElement.appendChild( _preview );
-	
+
 
 	/*
 	var _checkboxText = document.createElement( 'span' );
@@ -68,7 +66,7 @@ var Code = function () {
 	//
 
 	var _list = [];
-	
+
 	var _codegen = function (html) {
 		var string = '';
 
@@ -113,7 +111,7 @@ var Code = function () {
 			'function render() {',
 			'',
 			'\trenderer.render( scene, camera );',
-			'\trenderer.setSize( window.innerWidth, window.innerHeight );',			
+			'\trenderer.setSize( window.innerWidth, window.innerHeight );',
 			'',
 			'}'
 
@@ -143,6 +141,13 @@ var Code = function () {
 		for ( var i = 0, l = scene.objects.length; i < l; i ++ ) {
 
 			var object = scene.objects[ i ];
+
+			if ( object.geometry == undefined || object.geometry.gui == undefined ) {
+
+				_list.push( 'TODO' );
+				continue;
+
+			}
 
 			if ( object instanceof THREE.Mesh ) {
 
