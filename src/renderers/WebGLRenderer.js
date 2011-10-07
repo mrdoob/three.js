@@ -3693,7 +3693,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_this.info.render.vertices = 0;
 		_this.info.render.faces = 0;
 
-		camera.matrixAutoUpdate && camera.update( undefined, true );
+		// hack: find parent of camera.
+		if (camera.matrixAutoUpdate) {
+			var parent = camera;
+			while ( parent.parent ) {
+				parent = parent.parent;
+			}
+			parent.update( undefined, true );
+		}
 
 		scene.update( undefined, false, camera );
 
