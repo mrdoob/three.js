@@ -3220,6 +3220,7 @@ THREE.ColladaLoader = function () {
 	return {
 
 		load: load,
+		parse: parse,
 		setPreferredShading: setPreferredShading,
 		applySkin: applySkin,
 		geometries : geometries

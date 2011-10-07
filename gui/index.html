@@ -104,6 +104,57 @@
 			}, false );
 			document.body.appendChild( xr );
 
+			//
+
+			document.addEventListener( 'dragover', function ( event ) {
+
+				event.preventDefault();
+
+			}, false );
+			document.addEventListener( 'dragleave', function ( event ) {
+
+				event.preventDefault();
+
+			}, false );
+			document.addEventListener( 'drop', function ( event ) {
+
+				event.preventDefault();
+
+				var file = event.dataTransfer.files[ 0 ];
+				var reader = new FileReader();
+
+				reader.onload = function ( event ) {
+
+					var parser = new DOMParser();
+					var xml = parser.parseFromString( event.target.result, 'text/xml' );
+
+					var loader = new THREE.ColladaLoader();
+					loader.parse( xml, function ( collada ) {
+
+						console.log( collada );
+
+						signals.added.dispatch( collada.scene );
+
+					} );
+
+					/*
+					var loader = new THREE.JSONLoader();
+					loader.createModel( event.target.result, function ( geometry ) {
+
+						var material = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
+						var mesh = new THREE.Mesh( geometry, material );
+
+						signals.added.dispatch( mesh );
+
+					} );
+					*/
+
+				};
+
+				reader.readAsText( file );
+
+			}, false );
+
 			// Add Sphere
 
 			var geometry = new THREE.SphereGeometry( 75, 20, 10 );
