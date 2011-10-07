@@ -103,7 +103,7 @@ THREE.Object3D.prototype = {
 
 			if( object.parent !== undefined ) {
 
-				object.parent.removeChild( object );
+				object.parent.remove( object );
 
 			}
 

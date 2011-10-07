@@ -38,6 +38,14 @@ THREE.Ray.prototype = {
 
 	intersectObject: function ( object ) {
 
+		var intersect, intersects = [];
+
+		for ( var i = 0, l = object.children.length; i < l; i ++ ) {
+
+			Array.prototype.push.apply( intersects, this.intersectObject( object.children[ i ] ) );
+
+		}
+
 		if ( object instanceof THREE.Particle ) {
 
 			var distance = distanceFromIntersection( this.origin, this.direction, object.matrixWorld.getPosition() );
@@ -48,14 +56,16 @@ THREE.Ray.prototype = {
 
 			}
 
-			return [ {
+			intersect = {
 
 				distance: distance,
 				point: object.position,
 				face: null,
 				object: object
 
-			} ];
+			};
+
+			intersects.push( intersect );
 
 		} else if ( object instanceof THREE.Mesh ) {
 
@@ -65,7 +75,7 @@ THREE.Ray.prototype = {
 
 			if ( distance == null || distance > object.geometry.boundingSphere.radius * Math.max( object.scale.x, Math.max( object.scale.y, object.scale.z ) ) ) {
 
-				return [];
+				return intersects;
 
 			}
 
@@ -78,7 +88,6 @@ THREE.Ray.prototype = {
 			geometry = object.geometry,
 			vertices = geometry.vertices,
 			objMatrix,
-			intersect, intersects = [],
 			intersectPoint;
 
 			for ( f = 0, fl = geometry.faces.length; f < fl; f ++ ) {
@@ -152,15 +161,11 @@ THREE.Ray.prototype = {
 
 			}
 
-			intersects.sort( function ( a, b ) { return a.distance - b.distance; } );
-
-			return intersects;
-
-		} else {
-
-			return [];
-
 		}
+
+		return intersects;
+
+		//
 
 		function distanceFromIntersection( origin, direction, position ) {
 
