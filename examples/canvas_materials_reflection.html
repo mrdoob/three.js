@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js canvas - spherical reflection</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				background-color: #000000;
 				margin: 0px;
@@ -37,14 +38,14 @@
 			Walt Disney head by <a href="http://www.davidoreilly.com/2009/01/walt-disneys-head-on-a-plate" target="_blank">David OReilly</a>. Reflection texture by <a href="http://kewlers.scene.org/" target="_blank">Kewlers</a>.
 		</div>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
-		<script type="text/javascript" src="../src/extras/ImageUtils.js"></script>
+		<script src="../build/Three.js"></script>
+		<script src="../src/extras/ImageUtils.js"></script>
 
-		<script type="text/javascript" src="obj/WaltHead.js"></script>
+		<script src="obj/WaltHead.js"></script>
 
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
 
-		<script type="text/javascript">
+		<script>
 
 			var camera, scene, renderer,
 			particle1, particle2, particle2,
@@ -58,7 +59,7 @@
 
 				var container = document.getElementById( 'container' );
 
-				camera = new THREE.Camera( 65, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new THREE.PerspectiveCamera( 65, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.z = 100;
 
 				scene = new THREE.Scene();
@@ -68,7 +69,7 @@
 
 				mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { envMap: THREE.ImageUtils.loadTexture( 'textures/metal.jpg', new THREE.SphericalReflectionMapping() ) } ) );
 				mesh.overdraw = true;
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				renderer = new THREE.CanvasRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );

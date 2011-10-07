@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js canvas - geometry - earth</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				color: #808080;
 				font-family:Monospace;
@@ -33,12 +34,12 @@
 		<div id="container"></div> 
 		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - earth demo</div>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
-		<script type="text/javascript">
+		<script>
 
 			var container, stats;
 
@@ -58,7 +59,7 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.Camera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 500;
 
 				scene = new THREE.Scene();
@@ -67,11 +68,11 @@
 				mesh.overdraw = true;
 				mesh.position.y = - 250;
 				mesh.rotation.x = - 90 * Math.PI / 180;
-				scene.addObject(mesh);
+				scene.add(mesh);
 
 				mesh = new THREE.Mesh( new THREE.SphereGeometry( 200, 20, 20 ), new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/land_ocean_ice_cloud_2048.jpg' ) } ) );
 				mesh.overdraw = true;
-				scene.addObject(mesh);
+				scene.add(mesh);
 
 				renderer = new THREE.CanvasRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -109,6 +110,7 @@
 
 				camera.position.x += ( mouseX - camera.position.x ) * 0.05;
 				camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
+				camera.lookAt( scene.position );
 
 				mesh.rotation.y -= 0.005;
 

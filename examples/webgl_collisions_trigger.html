@@ -1,161 +1,184 @@
-<html>
-    <head>
-        <title>three.js webgl - collision detection</title>
-        <meta http-equiv="content-type" content="text/html; charset=utf-8">
-        <style type="text/css">
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - collision detection</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #f0f0f0;
+				margin: 0px;
+				overflow: hidden;
+			}
 
-            body {
-                font-family: Monospace;
-                background-color: #f0f0f0;
-                margin: 0px;
-                overflow: hidden;
-            }
+			#oldie {
+				background-color: #ddd !important
+			}
 
-            #oldie {
-                background-color: #ddd !important
-            }
+			#info {
+				position: absolute;
+				top: 30px;
+				left: 10px;
+				width: 800px;
+				color: #000000;
+				padding: 5px;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: left;
+				z-index: 100;
+			}
 
-            #info {
-                position: absolute;
-                top: 30px;
-                left: 10px;
-                width: 800px;
-                color: #000000;
-                padding: 5px;
-                font-family: Monospace;
-                font-size: 13px;
-                text-align: left;
-                z-index: 100;
-            }
+			#options {
+				position: absolute;
+				top: 10px;
+				left: 10px;
+				width: 800px;
+				color: #000000;
+				padding: 5px;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: left;
+				z-index: 100;
+			}
+		</style>
 
-            #options {
-                position: absolute;
-                top: 10px;
-                left: 10px;
-                width: 800px;
-                color: #000000;
-                padding: 5px;
-                font-family: Monospace;
-                font-size: 13px;
-                text-align: left;
-                z-index: 100;
-            }
+		<script src="../build/Three.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
 
-        </style>
+		<script>
 
-        <script type="text/javascript" src="../build/Three.js">
-        </script>
-        <script type="text/javascript" src="js/RequestAnimationFrame.js">
-        </script>
+			var camera, cameraTarget, scene, renderer, info, mouse2d, sun, loader, sphere;
 
-        <script type="text/javascript">
+			var range = 400, speed = 1, sphereSize = 4;
 
-            var camera, scene, renderer, info, mouse2d, sun, loader, sphere;
+			var cubes = [];
 
-            var range = 400, speed = 1, sphereSize = 4;
+			function init() {
 
-            var cubes = [];
+				container = document.createElement('div');
+				document.body.appendChild(container);
 
-            function init(){
-                container = document.createElement('div');
-                document.body.appendChild(container);
+				info = document.getElementById("info");
 
-                info = document.getElementById("info");
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.set( 300, 120, 0 );
 
-                camera = new THREE.Camera(40, window.innerWidth / window.innerHeight, 1, 10000);
-		camera.position.y = 120;
-		camera.position.x = 300;
-		camera.position.z = 0;
+				mouse2d = new THREE.Vector3( 0, 0, 1 );
 
-                mouse2d = new THREE.Vector3( 0, 0, 1 );
+				loader = new THREE.Loader( true );
 
-                loader = new THREE.Loader( true );
+				scene = new THREE.Scene();
 
-                scene = new THREE.Scene();
+				sphere = new THREE.Mesh( new THREE.SphereGeometry( sphereSize, 10, 10 ), new THREE.MeshLambertMaterial( { color: 0xff0000 } ) );
+				scene.add( sphere );
 
-                sphere = new THREE.Mesh( new THREE.SphereGeometry( sphereSize, 10, 10 ), new THREE.MeshLambertMaterial( { color: 0xff0000 } ) );
-                scene.addObject( sphere );
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
 
-                renderer = new THREE.WebGLRenderer();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-                container.appendChild(renderer.domElement);
+				var ambientLight = new THREE.AmbientLight( 0xdddddd );
+				scene.add( ambientLight );
 
-                var ambientLight = new THREE.AmbientLight(0xdddddd);
-                scene.addLight(ambientLight);
+				sun = new THREE.DirectionalLight( 0xffffff );
+				sun.position.set( 1, -1, 1 ).normalize();
+				scene.add( sun );
 
-                sun = new THREE.DirectionalLight(0xffffff);
-                sun.position = new THREE.Vector3(1, -1, 1).normalize();
-                scene.addLight(sun);
+				createObstacles();
 
-                createObstacles();
+				container.onmousemove = onDocumentMouseMove;
+				animate();
 
-                container.onmousemove = onDocumentMouseMove;
-                animate();
-            }
+			}
 
-            function createObstacles(){
-                createCube(100, 50, 10, new THREE.Vector3(0, 0, 100));
-				camera.target = createCube(100, 50, 10, new THREE.Vector3(0, 0, 200));
+			function createObstacles(){
+
+				createCube( 100, 50, 10, new THREE.Vector3(0, 0, 100) );
+
+				cameraTarget = createCube( 100, 50, 10, new THREE.Vector3( 0, 0, 200 )) ;
+
 				createCube(100, 50, 10, new THREE.Vector3(0, 0, 300));
-            }
 
-            function createCube(sx, sy, sz, p){
-                var cube = new THREE.Mesh(new THREE.CubeGeometry( sx, sy, sz ), new THREE.MeshLambertMaterial( { color: 0x003300 } ) );
-                cube.position = p;
-                scene.addObject(cube);
-                THREE.Collisions.colliders.push( THREE.CollisionUtils.MeshOBB(cube) );
-				cubes.push(cube);
+			}
+
+			function createCube( sx, sy, sz, p ) {
+
+				var cube = new THREE.Mesh( new THREE.CubeGeometry( sx, sy, sz ), new THREE.MeshLambertMaterial( { color: 0x003300 } ) );
+				cube.position = p;
+				scene.add( cube );
+
+				THREE.Collisions.colliders.push( THREE.CollisionUtils.MeshOBB( cube ) );
+				cubes.push( cube );
 				return cube;
-            }
 
-            function onDocumentMouseMove(event){
-                event.preventDefault();
-                mouse2d.x = (event.clientX / window.innerWidth) * 2 - 1;
-                mouse2d.y = -(event.clientY / window.innerHeight) * 2 + 1;
-                mouse2d.z = 1;
-            }
+			}
 
-            function animate(){
-                requestAnimationFrame(animate);
+			function onDocumentMouseMove( event ){
 
-                sphere.position.z += speed;
-                if(sphere.position.z > range) sphere.position.z = 0;
+				event.preventDefault();
+				mouse2d.x = (event.clientX / window.innerWidth) * 2 - 1;
+				mouse2d.y = -(event.clientY / window.innerHeight) * 2 + 1;
+				mouse2d.z = 1;
 
-				for (var i = 0; i < cubes.length; i++) {
-					cubes[i].materials[0].color = new THREE.Color(0x003300);
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				sphere.position.z += speed;
+
+				if( sphere.position.z > range ) sphere.position.z = 0;
+
+				for ( var i = 0; i < cubes.length; i++ ) {
+
+					cubes[ i ].materials[ 0 ].color.setHex( 0x003300 );
+
 				}
 
-				var ray = new THREE.Ray( sphere.position, new THREE.Vector3(0,0,1) );
+				var ray = new THREE.Ray( sphere.position, new THREE.Vector3( 0, 0, 1 ) );
 
-				var c = THREE.Collisions.rayCastNearest(ray);
-				if (c && c.distance == -1) {
+				var c = THREE.Collisions.rayCastNearest( ray );
+
+				if ( c && c.distance == -1 ) {
+
 					info.innerHTML = "Colliding!";
-					c.mesh.materials[0].color = new THREE.Color(0xff0000);
-				} else if(c && c.distance >= 0) {
+					c.mesh.materials[ 0 ].color.setHex( 0xff0000 );
+
+				} else if( c && c.distance >= 0 ) {
+
 					info.innerHTML = "Approaching @ " + c.distance;
+
 				} else {
+
 					info.innerHTML = "No collider in sight.";
+
 				}
 
 				camera.position.x = Math.cos(mouse2d.x * Math.PI) * 300;
 				camera.position.z = 200 + Math.sin(mouse2d.x * Math.PI) * 300;
 
-                renderer.render(scene, camera);
-            }
+				camera.lookAt( cameraTarget.position );
 
-            function vts(v){
-                if (!v)
-                    return "undefined<br>";
-                else
-                    return v.x + " , " + v.y + " , " + v.z + "<br>";
-            }
+				renderer.render( scene, camera );
 
-        </script>
-    </head>
-    <body onload="init();">
-        <div id="info">
-        </div>
-        <div id="options">
-        </div>
-    </body>
+			}
+
+			function vts(v){
+
+				if (!v)
+					return "undefined<br>";
+				else
+					return v.x + " , " + v.y + " , " + v.z + "<br>";
+
+			}
+
+		</script>
+	</head>
+	<body onload="init();">
+		<div id="info">
+		</div>
+		<div id="options">
+		</div>
+	</body>
 </html>

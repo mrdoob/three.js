@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js canvas - interactive - cubes</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				font-family: Monospace;
 				background-color: #f0f0f0;
@@ -14,12 +15,12 @@
 	</head>
 	<body>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
-		<script type="text/javascript">
+		<script>
 
 			var container, stats;
 			var camera, scene, projector, renderer;
@@ -43,7 +44,7 @@
 				info.innerHTML = '<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - clickable objects';
 				container.appendChild( info );
 
-				camera = new THREE.Camera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.y = 300;
 				camera.position.z = 500;
 
@@ -63,7 +64,7 @@
 					object.rotation.x = ( Math.random() * 360 ) * Math.PI / 180;
 					object.rotation.y = ( Math.random() * 360 ) * Math.PI / 180;
 					object.rotation.z = ( Math.random() * 360 ) * Math.PI / 180;
-					scene.addObject( object );
+					scene.add( object );
 
 					objects.push( object );
 
@@ -118,7 +119,7 @@
 					var particle = new THREE.Particle( particleMaterial );
 					particle.position = intersects[ 0 ].point;
 					particle.scale.x = particle.scale.y = 8;
-					scene.addObject( particle );
+					scene.add( particle );
 
 				}
 
@@ -149,9 +150,11 @@
 			function render() {
 
 				theta += 0.2;
+
 				camera.position.x = radius * Math.sin( theta * Math.PI / 360 );
 				camera.position.y = radius * Math.sin( theta * Math.PI / 360 );
 				camera.position.z = radius * Math.cos( theta * Math.PI / 360 );
+				camera.lookAt( scene.position );
 
 				renderer.render( scene, camera );
 

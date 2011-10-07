@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - ribbons</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				background-color: #000000;
 				margin: 0px;
@@ -31,26 +32,26 @@
 
 	<body>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/ShaderExtras.js"></script>
+		<script src="js/ShaderExtras.js"></script>
 
-		<script type="text/javascript" src="js/postprocessing/EffectComposer.js"></script>
-		<script type="text/javascript" src="js/postprocessing/MaskPass.js"></script>
-		<script type="text/javascript" src="js/postprocessing/RenderPass.js"></script>
-		<script type="text/javascript" src="js/postprocessing/ShaderPass.js"></script>
-		<script type="text/javascript" src="js/postprocessing/BloomPass.js"></script>
+		<script src="js/postprocessing/EffectComposer.js"></script>
+		<script src="js/postprocessing/MaskPass.js"></script>
+		<script src="js/postprocessing/RenderPass.js"></script>
+		<script src="js/postprocessing/ShaderPass.js"></script>
+		<script src="js/postprocessing/BloomPass.js"></script>
 
-		<script type="text/javascript" src="js/Detector.js"></script>
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
 		<div id="info">
 			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl ribbons example
 		</div>
 
 
-		<script type="text/javascript">
+		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
@@ -75,7 +76,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 70, window.innerWidth / window.innerHeight, 1, 3000 );
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 3000 );
 				camera.position.z = 1200;
 
 				scene = new THREE.Scene();
@@ -117,7 +118,7 @@
 				}
 
 				var tmpRot = new THREE.Matrix4();
-				tmpRot.setRotationAxis( new THREE.Vector3( 1, 0, 0 ), 1.57 );
+				tmpRot.setRotationAxis( new THREE.Vector3( 1, 0, 0 ), Math.PI/2 );
 
 				xgrid = 34;
 				ygrid = 15;
@@ -131,8 +132,8 @@
 
 					ribbon = new THREE.Ribbon( i % 2 ? geometry : geometry2, materials[ c ] );
 					ribbon.rotation.x = 0;
-					ribbon.rotation.y = 1.57;
-					ribbon.rotation.z = 3.14;
+					ribbon.rotation.y = Math.PI / 2;
+					ribbon.rotation.z = Math.PI;
 
 					x = 40 * ( i - xgrid/2 );
 					y = 40 * ( j - ygrid/2 );
@@ -167,7 +168,7 @@
 					ribbon.boundRadiusScale = Math.max( ribbon.scale.x, Math.max( ribbon.scale.y, ribbon.scale.z ) );
 
 					ribbons.push( ribbon );
-					scene.addObject( ribbon );
+					scene.add( ribbon );
 
 					c ++;
 
@@ -261,7 +262,9 @@
 				var time = new Date().getTime() * 0.00005;
 
 				camera.position.x += ( mouseX - camera.position.x ) * 0.036;
-				camera.position.y += ( - (mouseY) - camera.position.y ) * 0.036;
+				camera.position.y += ( - mouseY - camera.position.y ) * 0.036;
+
+				camera.lookAt( scene.position );
 
 				for ( i = -n; i < n; i ++ ) {
 

@@ -1,10 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - geometry - text</title>
 		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				font-family: Monospace;
 				background-color: #000;
@@ -39,43 +39,43 @@
 		</div>
 
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/ShaderExtras.js"></script>
+		<script src="js/ShaderExtras.js"></script>
 
-		<script type="text/javascript" src="js/postprocessing/EffectComposer.js"></script>
-		<script type="text/javascript" src="js/postprocessing/RenderPass.js"></script>
-		<script type="text/javascript" src="js/postprocessing/ShaderPass.js"></script>
-		<script type="text/javascript" src="js/postprocessing/MaskPass.js"></script>
-		<script type="text/javascript" src="js/postprocessing/BloomPass.js"></script>
-		<script type="text/javascript" src="js/postprocessing/FilmPass.js"></script>
+		<script src="js/postprocessing/EffectComposer.js"></script>
+		<script src="js/postprocessing/RenderPass.js"></script>
+		<script src="js/postprocessing/ShaderPass.js"></script>
+		<script src="js/postprocessing/MaskPass.js"></script>
+		<script src="js/postprocessing/BloomPass.js"></script>
+		<script src="js/postprocessing/FilmPass.js"></script>
 
-		<script type="text/javascript" src="js/Detector.js"></script>
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
 		<!-- load the font files -->
 
-		<script type="text/javascript" src="fonts/gentilis_bold.typeface.js"></script>
-		<script type="text/javascript" src="fonts/gentilis_regular.typeface.js"></script>
-		<script type="text/javascript" src="fonts/optimer_bold.typeface.js"></script>
-		<script type="text/javascript" src="fonts/optimer_regular.typeface.js"></script>
-		<script type="text/javascript" src="fonts/helvetiker_bold.typeface.js"></script>
-		<script type="text/javascript" src="fonts/helvetiker_regular.typeface.js"></script>
-		<script type="text/javascript" src="fonts/droid/droid_sans_regular.typeface.js"></script>
-		<script type="text/javascript" src="fonts/droid/droid_sans_bold.typeface.js"></script>
-		<script type="text/javascript" src="fonts/droid/droid_serif_regular.typeface.js"></script>
-		<script type="text/javascript" src="fonts/droid/droid_serif_bold.typeface.js"></script>
+		<script src="fonts/gentilis_bold.typeface.js"></script>
+		<script src="fonts/gentilis_regular.typeface.js"></script>
+		<script src="fonts/optimer_bold.typeface.js"></script>
+		<script src="fonts/optimer_regular.typeface.js"></script>
+		<script src="fonts/helvetiker_bold.typeface.js"></script>
+		<script src="fonts/helvetiker_regular.typeface.js"></script>
+		<script src="fonts/droid/droid_sans_regular.typeface.js"></script>
+		<script src="fonts/droid/droid_sans_bold.typeface.js"></script>
+		<script src="fonts/droid/droid_serif_regular.typeface.js"></script>
+		<script src="fonts/droid/droid_serif_bold.typeface.js"></script>
 
 		<!-- todo async loader for fonts -->
 
-		<script type="text/javascript">
+		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var container, stats, permalink, hex, color;
 
-			var camera, scene, renderer;
+			var camera, cameraTarget, scene, renderer;
 
 			var composer;
 
@@ -161,10 +161,10 @@
 
 				// CAMERA
 
-				camera = new THREE.Camera( 30, window.innerWidth / window.innerHeight, 1, 1500 );
-				camera.position.y = 400;
-				camera.position.z = 700;
-				camera.target.position.y = 100;
+				camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 1500 );
+				camera.position.set( 0, 400, 700 );
+
+				cameraTarget = new THREE.Vector3( 0, 150, 0 );
 
 				// SCENE
 
@@ -173,13 +173,12 @@
 				scene.fog = new THREE.Fog( 0x000000, 250, 1400 );
 
 				var dirLight = new THREE.DirectionalLight( 0xffffff, 0.125 );
-				dirLight.position.set( 0, 0, 1 );
-				dirLight.position.normalize();
-				scene.addLight( dirLight );
+				dirLight.position.set( 0, 0, 1 ).normalize();
+				scene.add( dirLight );
 
 				var pointLight = new THREE.PointLight( 0xffffff, 1.5 );
 				pointLight.position.set( 0, 100, 90 );
-				scene.addLight( pointLight );
+				scene.add( pointLight );
 
 				//text = capitalize( font ) + " " + capitalize( weight );
 				//text = "abcdefghijklmnopqrstuvwxyz0123456789";
@@ -228,14 +227,14 @@
 				parent = new THREE.Object3D();
 				parent.position.y = 100;
 
-				scene.addChild( parent );
+				scene.add( parent );
 
 				createText();
 
 				var plane = new THREE.Mesh( new THREE.PlaneGeometry( 10000, 10000 ), new THREE.MeshBasicMaterial( { color: 0xffffff, opacity: 0.5, transparent: true } ) );
-				plane.rotation.x = -1.57;
+				plane.rotation.x = -Math.PI/2;
 				plane.position.y = 100;
-				scene.addChild( plane );
+				scene.add( plane );
 
 				// RENDERER
 
@@ -499,7 +498,7 @@
 				textMesh1.rotation.x = 0;
 				textMesh1.rotation.y = Math.PI * 2;
 
-				parent.addChild( textMesh1 );
+				parent.add( textMesh1 );
 
 				if ( mirror ) {
 
@@ -512,7 +511,7 @@
 					textMesh2.rotation.x = Math.PI;
 					textMesh2.rotation.y = Math.PI * 2;
 
-					parent.addChild( textMesh2 );
+					parent.add( textMesh2 );
 
 				}
 
@@ -522,8 +521,8 @@
 
 				updatePermalink();
 
-				scene.removeChild( textMesh1 );
-				if ( mirror ) scene.removeChild( textMesh2 );
+				scene.remove( textMesh1 );
+				if ( mirror ) scene.remove( textMesh2 );
 
 				if ( !text ) return;
 
@@ -616,6 +615,8 @@
 				oldTime = time;
 
 				parent.rotation.y += ( targetRotation - parent.rotation.y ) * 0.05;
+
+				camera.lookAt( cameraTarget );
 
 				renderer.clear();
 

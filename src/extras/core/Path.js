@@ -123,9 +123,9 @@ THREE.Path.prototype.splineThru = function( pts /*Array of Vector*/ ) {
 
 	var x0 = lastargs[ lastargs.length - 2 ];
 	var y0 = lastargs[ lastargs.length - 1 ];
-
+//---
 	var npts = [ new THREE.Vector2( x0, y0 ) ];
-	npts =  npts.concat( pts );
+	Array.prototype.push.apply( npts, pts );
 
 	var curve = new THREE.SplineCurve( npts );
 	this.curves.push( curve );

@@ -44,7 +44,7 @@ THREE.Quaternion.prototype = {
 
 	setFromEuler: function ( vec3 ) {
 
-		var c = 0.5 * Math.PI / 360, // 0.5 is an optimization
+		var c = Math.PI / 360, // 0.5 * Math.PI / 360, // 0.5 is an optimization
 		x = vec3.x * c,
 		y = vec3.y * c,
 		z = vec3.z * c,

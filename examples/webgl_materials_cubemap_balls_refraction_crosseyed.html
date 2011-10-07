@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - materials - cube refraction [balls]</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				background:#777;
 				padding:0;
@@ -20,7 +21,7 @@
 				font-family:Monospace;
 				font-size:13px;
 				text-align:center;
-				z-index:1000; 
+				z-index:1000;
 			}
 
 			a {
@@ -37,18 +38,18 @@
 			- O, P : change eye separation
 		</div>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/Detector.js"></script>
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
 
-		<script type="text/javascript">
+		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var container, timer;
 
-			var camera, scene, webglRenderer;
+			var camera, scene, renderer;
 
 			var mesh, zmesh, lightMesh, geometry;
 			var spheres = [];
@@ -70,8 +71,10 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
 				camera.position.z = 3200;
+
+				camera.target = new THREE.Vector3( 0, 0, 0 );
 
 				scene = new THREE.Scene();
 
@@ -95,7 +98,7 @@
 					mesh.position.y = Math.random() * 10000 - 5000;
 					mesh.position.z = Math.random() * 10000 - 5000;
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 3 + 1;
-					scene.addObject( mesh );
+					scene.add( mesh );
 
 					spheres.push( mesh );
 
@@ -103,10 +106,10 @@
 
 				// Skybox
 
-				var shader = THREE.ShaderUtils.lib["cube"];
-				shader.uniforms["tCube"].texture = textureCube;
+				var shader = THREE.ShaderUtils.lib[ "cube" ];
+				shader.uniforms[ "tCube" ].texture = textureCube;
 
-				var material = new THREE.MeshShaderMaterial( {
+				var material = new THREE.ShaderMaterial( {
 
 					fragmentShader: shader.fragmentShader,
 					vertexShader: shader.vertexShader,
@@ -114,15 +117,16 @@
 
 				} ),
 
-				mesh = new THREE.Mesh( new THREE.CubeGeometry( 100000, 100000, 100000, 1, 1, 1, null, true ), material );
-				scene.addObject( mesh );
+				mesh = new THREE.Mesh( new THREE.CubeGeometry( 100000, 100000, 100000 ), material );
+				mesh.flipSided = true;
+				scene.add( mesh );
 
 				//
 
-				webglRenderer = new THREE.CrosseyedWebGLRenderer( { separation: 90 } );
-				webglRenderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( webglRenderer.domElement );
-				
+				renderer = new THREE.CrosseyedWebGLRenderer( { separation: 90 } );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
 				document.addEventListener( 'keydown', onKeyDown, false );
 
 			}
@@ -137,16 +141,16 @@
 			function onKeyDown ( event ) {
 
 				switch( event.keyCode ) {
-				
+
 					/* O */
-					case 79: webglRenderer.separation -= 0.5; break;
-					
+					case 79: renderer.separation -= 0.5; break;
+
 					/* P */
-					case 80: webglRenderer.separation += 0.5; break;
+					case 80: renderer.separation += 0.5; break;
 
 				}
 
-				console.log( webglRenderer.separation );
+				console.log( renderer.separation );
 
 			};
 
@@ -176,7 +180,7 @@
 
 				}
 
-				webglRenderer.render( scene, camera );
+				renderer.render( scene, camera );
 
 			}
 

@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - geometry - minecraft - ao</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				color: #61443e;
 				font-family:Monospace;
@@ -47,15 +48,15 @@
 			<button id="baot">texture + ao</button>
 		</div>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/ImprovedNoise.js"></script>
+		<script src="js/ImprovedNoise.js"></script>
 
-		<script type="text/javascript" src="js/Detector.js"></script>
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
-		<script type="text/javascript">
+		<script>
 
 			if ( ! Detector.webgl ) {
 
@@ -68,7 +69,7 @@
 
 			var container, stats;
 
-			var camera, scene, renderer;
+			var camera, controls, scene, renderer;
 
 			var mesh, mat;
 
@@ -83,18 +84,17 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.FirstPersonCamera( {
-
-					fov: 50, aspect: window.innerWidth / window.innerHeight, near: 1, far: 20000,
-					constrainVertical: true, verticalMin: 1.1, verticalMax: 2.2,
-					movementSpeed: 1000, lookSpeed: 0.125, noFly: false, lookVertical: true, autoForward: false
-
-				} );
-
-				camera.target.position.z = - 100;
-
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 20000 );
 				camera.position.y = getY( worldHalfWidth, worldHalfDepth ) * 100 + 100;
-				camera.target.position.y = camera.position.y;
+
+				controls = new THREE.FirstPersonControls( camera );
+
+				controls.movementSpeed = 1000;
+				controls.lookSpeed = 0.125;
+				controls.lookVertical = true;
+				controls.constrainVertical = true;
+				controls.verticalMin = 1.1;
+				controls.verticalMax = 2.2;
 
 				scene = new THREE.Scene();
 				scene.fog = new THREE.FogExp2( 0xffffff, 0.00015 );
@@ -363,15 +363,15 @@
 
 						px = nx = pz = nz = 0;
 
-						px = !nleft  || x == 0 ? 1 : 0;
-						nx = !nright || x == worldWidth - 1 ? 1 : 0;
+						px = !nright || x == 0 ? 1 : 0;
+						nx = !nleft  || x == worldWidth - 1 ? 1 : 0;
 
 						pz = !nback  || z == worldDepth - 1 ? 1 : 0;
 						nz = !nfront || z == 0 ? 1 : 0;
 
 						sides = { px: px, nx: nx, py: true, ny: false, pz: pz, nz: nz };
 
-						cube = new THREE.CubeGeometry( 100, 100, 100, 1, 1, 1, materials, false, sides );
+						cube = new THREE.CubeGeometry( 100, 100, 100, 1, 1, 1, materials, sides );
 
 						// set UV tiles
 
@@ -438,17 +438,17 @@
 				}
 
 				mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial() );
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				var ambientLight = new THREE.AmbientLight( 0xcccccc );
-				scene.addLight( ambientLight );
+				scene.add( ambientLight );
 
 				var directionalLight = new THREE.DirectionalLight( 0xffffff, 1.5 );
 				directionalLight.position.x = 1;
 				directionalLight.position.y = 1;
 				directionalLight.position.z = 0.5;
 				directionalLight.position.normalize();
-				scene.addLight( directionalLight );
+				scene.add( directionalLight );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -721,28 +721,28 @@
 				if ( topleft ) {
 
 					if ( debug_corner_colors ) color = "rgba(200, 0, 0, ";
-					drawCorner( ctx, sx, sy, 0, 1.57, color, step, half );
+					drawCorner( ctx, sx, sy, 0, Math.PI / 2 , color, step, half );
 
 				}
 
 				if ( bottomleft ) {
 
 					if ( debug_corner_colors ) color = "rgba(0, 200, 0, ";
-					drawCorner( ctx, sx, sy + full, 4.71, 6.28, color, step, half );
+					drawCorner( ctx, sx, sy + full, 1.5 * Math.PI, 2 * Math.PI, color, step, half );
 
 				}
 
 				if ( bottomright ) {
 
 					if ( debug_corner_colors ) color = "rgba(0, 0, 200, ";
-					drawCorner( ctx, sx + full, sy + full, 3.14, 4.71, color, step, half );
+					drawCorner( ctx, sx + full, sy + full, Math.PI, 1.5 * Math.PI, color, step, half );
 
 				}
 
 				if ( topright ) {
 
 					if ( debug_corner_colors ) color = "rgba(200, 0, 200, ";
-					drawCorner( ctx, sx + full, sy, 1.57, 3.14, color, step, half );
+					drawCorner( ctx, sx + full, sy, Math.PI / 2, Math.PI, color, step, half );
 
 				}
 
@@ -802,6 +802,7 @@
 
 			function render() {
 
+				controls.update();
 				renderer.render( scene, camera );
 
 			}

@@ -1,8 +1,10 @@
-<html>
+<!doctype html>
+<html lang="en">
 	<head>
-		<meta http-equiv="content-type" content="text/html; charset=utf-8"/> 
 		<title>three.js canvas - geometry - birds</title>
-		<style type="text/css"> 
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style> 
 			body {
 				color: #808080;
 				font-family:Monospace;
@@ -26,13 +28,13 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - birds demo</div>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
-		<script type="text/javascript" src="obj/Bird.js"></script>
+		<script src="../build/Three.js"></script>
+		<script src="obj/Bird.js"></script>
 
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
-		<script type="text/javascript">
+		<script>
 
 			// Based on http://www.openprocessing.org/visuals/?visualID=6910
 
@@ -317,7 +319,7 @@
 
 		</script>
 
-		<script type="text/javascript">
+		<script>
 
 			var SCREEN_WIDTH = window.innerWidth,
 			SCREEN_HEIGHT = window.innerHeight,
@@ -336,7 +338,7 @@
 
 			function init() {
 
-				camera = new THREE.Camera( 75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
 				camera.position.z = 450;
 
 				scene = new THREE.Scene();
@@ -361,7 +363,7 @@
 					bird.position = boids[ i ].position;
 					bird.doubleSided = true;
 					// bird.scale.x = bird.scale.y = bird.scale.z = 10;
-					scene.addObject( bird );
+					scene.add( bird );
 
 
 				}

@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - materials - shaders [Fresnel]</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				background:#000;
 				padding:0;
@@ -20,35 +21,31 @@
 				font-family:Monospace;
 				font-size:13px;
 				text-align:center;
-				z-index:1000; 
+				z-index:1000;
 			}
 
-			a {
-				color: #ffffff;
-			}
-			#log { position:absolute; top:50px; text-align:left; display:block; z-index:100 }
+			a {	color: #ffffff;	}
 
 			#oldie a { color:#0b0 }
 		</style>
 	</head>
 
 	<body>
-		<pre id="log"></pre>
 
 		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl cube Fresnel shader demo. texture by <a href="http://www.humus.name/index.php?page=Textures" target="_blank">Humus</a> </div>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/Detector.js"></script>
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
 
-		<script type="text/javascript">
+		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var container, timer;
 
-			var camera, scene, webglRenderer;
+			var camera, scene, renderer;
 			var cameraCube, sceneCube;
 
 			var mesh, zmesh, lightMesh, geometry;
@@ -68,13 +65,15 @@
 
 			function init() {
 
-				container = document.createElement('div');
-				document.body.appendChild(container);
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
 				camera.position.z = 3200;
 
-				cameraCube = new THREE.Camera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
+				cameraCube = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
+
+				cubeTarget = new THREE.Vector3( 0, 0, 0 );
 
 				scene = new THREE.Scene();
 				sceneCube = new THREE.Scene();
@@ -92,22 +91,25 @@
 
 				var textureCube = THREE.ImageUtils.loadTextureCube( urls );
 
-				var shader = THREE.ShaderUtils.lib["fresnel"];
+				var shader = THREE.ShaderUtils.lib[ "fresnel" ];
 				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
-				uniforms["tCube"].texture = textureCube;
+				uniforms[ "tCube" ].texture = textureCube;
 
 				var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms };
-				var material = new THREE.MeshShaderMaterial( parameters );
+				var material = new THREE.ShaderMaterial( parameters );
 
 				for ( var i = 0; i < 500; i ++ ) {
 
 					var mesh = new THREE.Mesh( geometry, material );
+
 					mesh.position.x = Math.random() * 10000 - 5000;
 					mesh.position.y = Math.random() * 10000 - 5000;
 					mesh.position.z = Math.random() * 10000 - 5000;
+
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 3 + 1;
-					scene.addObject( mesh );
+
+					scene.add( mesh );
 
 					spheres.push( mesh );
 
@@ -117,10 +119,10 @@
 
 				// Skybox
 
-				var shader = THREE.ShaderUtils.lib["cube"];
-				shader.uniforms["tCube"].texture = textureCube;
+				var shader = THREE.ShaderUtils.lib[ "cube" ];
+				shader.uniforms[ "tCube" ].texture = textureCube;
 
-				var material = new THREE.MeshShaderMaterial( {
+				var material = new THREE.ShaderMaterial( {
 
 					fragmentShader: shader.fragmentShader,
 					vertexShader: shader.vertexShader,
@@ -128,15 +130,16 @@
 
 				} ),
 
-				mesh = new THREE.Mesh( new THREE.CubeGeometry( 100000, 100000, 100000, 1, 1, 1, null, true ), material );
-				sceneCube.addObject( mesh );
+				mesh = new THREE.Mesh( new THREE.CubeGeometry( 100000, 100000, 100000 ), material );
+				mesh.flipSided = true;
+				sceneCube.add( mesh );
 
 				//
 
-				webglRenderer = new THREE.WebGLRenderer( { antialias: false } );
-				webglRenderer.setSize( window.innerWidth, window.innerHeight );
-				webglRenderer.autoClear = false;
-				container.appendChild( webglRenderer.domElement );
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.autoClear = false;
+				container.appendChild( renderer.domElement );
 
 			}
 
@@ -164,9 +167,13 @@
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 
-				cameraCube.target.position.x = - camera.position.x;
-				cameraCube.target.position.y = - camera.position.y;
-				cameraCube.target.position.z = - camera.position.z;
+				camera.lookAt( scene.position );
+
+				cubeTarget.x = - camera.position.x;
+				cubeTarget.y = - camera.position.y;
+				cubeTarget.z = - camera.position.z;
+
+				cameraCube.lookAt( cubeTarget );
 
 				for ( var i = 0, il = spheres.length; i < il; i ++ ) {
 
@@ -177,16 +184,9 @@
 
 				}
 
-				webglRenderer.clear();
-				webglRenderer.render( sceneCube, cameraCube );
-				webglRenderer.render( scene, camera );
-
-			}
-
-			function log( text ) {
-
-				var e = document.getElementById("log");
-				e.innerHTML = text + "<br/>" + e.innerHTML;
+				renderer.clear();
+				renderer.render( sceneCube, cameraCube );
+				renderer.render( scene, camera );
 
 			}
 

@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js canvas - depth material</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				font-family: Monospace;
 				background-color: #000000;
@@ -14,18 +15,18 @@
 	</head>
 	<body>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
-		<script type="text/javascript">
+		<script>
 
 			var container, stats;
 
 			var camera, scene, renderer;
 
-			var cube, plane;
+			var cube, plane, target = new THREE.Vector3();
 
 			var targetRotation = 0;
 			var targetRotationOnMouseDown = 0;
@@ -60,11 +61,10 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.x = 1000;
 				camera.position.y = 1000;
 				camera.position.z = 1000;
-				// camera.target.position.y = 150;
 
 				scene = new THREE.Scene();
 
@@ -75,11 +75,11 @@
 				plane = new THREE.Mesh( new THREE.PlaneGeometry( 1000, 1000, 10, 10 ), material );
 				plane.overdraw = true;
 				plane.doubleSided = true;
-				
+
 				plane.rotation.x = - 90 * ( Math.PI / 180 );
 				plane.position.y = - 100;
 
-				scene.addObject( plane );
+				scene.add( plane );
 
 				// Spheres
 
@@ -94,38 +94,28 @@
 					cube.position.x = ( i % 5 ) * 200 - 400;
 					cube.position.z = Math.floor( i / 5 ) * 200 - 350;
 
-					/*
-					cube.position.x = Math.random() * 1000 - 500;
-					cube.position.y = Math.random() * 1000 - 500;
-					cube.position.z = Math.random() * 1000 - 500;
-					*/
-
 					cube.rotation.x = Math.random() * 200 - 100;
 					cube.rotation.y = Math.random() * 200 - 100;
 					cube.rotation.z = Math.random() * 200 - 100;
 
-					/*
-					cube.scale.x = cube.scale.y = cube.scale.z = Math.random() + 0.5;
-					*/
-
-					scene.addObject(cube);
+					scene.add(cube);
 
 				}
 
 				// Lights
 
 				var ambientLight = new THREE.AmbientLight( Math.random() * 0x202020 );
-				scene.addLight( ambientLight );
+				scene.add( ambientLight );
 
 				var directionalLight = new THREE.DirectionalLight( Math.random() * 0xffffff );
 				directionalLight.position.x = Math.random() - 0.5;
 				directionalLight.position.y = Math.random() - 0.5;
 				directionalLight.position.z = Math.random() - 0.5;
 				directionalLight.position.normalize();
-				scene.addLight( directionalLight );
+				scene.add( directionalLight );
 
 				var pointLight = new THREE.PointLight( 0xff0000, 1 );
-				scene.addLight( pointLight );
+				scene.add( pointLight );
 
 				renderer = new THREE.CanvasRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -217,11 +207,13 @@
 				if ( pitchUp ) camera.rotation.x += 0.01; // camera.rotateX( 1 );
 				if ( pitchDown ) camera.rotation.x -= 0.01; // camera.rotateX( - 1 );
 
-				if ( yawLeft ) camera.target.position.x -= 10; // camera.rotation.y += 0.01; // camera.rotateY( 1 );
-				if ( yawRight ) camera.target.position.x += 10; // camera.rotation.y -= 0.01; // camera.rotateY( - 1 );
+				if ( yawLeft ) target.x -= 10; // camera.rotation.y += 0.01; // camera.rotateY( 1 );
+				if ( yawRight ) target.x += 10; // camera.rotation.y -= 0.01; // camera.rotateY( - 1 );
 
 				if ( rollLeft ) camera.rotation.z += 0.01; // camera.rotateZ( 1 );
 				if ( rollRight ) camera.rotation.z -= 0.01; // camera.rotateZ( - 1 );
+
+				camera.lookAt( target );
 
 				debugContext.clearRect( - 256, - 256, 512, 512 );
 
@@ -236,9 +228,9 @@
 				// camera
 
 				debugContext.moveTo( camera.position.x * 0.1, camera.position.z * 0.1 );
-				debugContext.lineTo( camera.target.position.x * 0.1, camera.target.position.z * 0.1 );
+				debugContext.lineTo( target.x * 0.1, target.z * 0.1 );
 				debugContext.rect( camera.position.x * 0.1 - 5, camera.position.z * 0.1 - 5, 10, 10 );
-				debugContext.rect( camera.target.position.x * 0.1 - 5, camera.target.position.z * 0.1 - 5, 10, 10 );
+				debugContext.rect( target.x * 0.1 - 5, target.z * 0.1 - 5, 10, 10 );
 				debugContext.rect( - 50, - 50, 100, 100 );
 
 				for ( var i = 1; i < scene.objects.length; i++ ) {

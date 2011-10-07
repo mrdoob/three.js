@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - io - UTF8 loader</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				font-family: Monospace;
 				background-color: #000;
@@ -31,19 +32,16 @@
 		models from <a href="http://www.sci.utah.edu/~wald/animrep/" target="_blank">The Utah 3D Animation Repository</a>
 		</div>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/Detector.js"></script>
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
-		<script type="text/javascript">
+		<script>
 
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
-
-			var NEAR = 1;
-			var FAR = 2000;
 
 			var FLOOR = -150;
 
@@ -69,33 +67,31 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 20, SCREEN_WIDTH / SCREEN_HEIGHT, NEAR, FAR );
+				camera = new THREE.PerspectiveCamera( 20, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 2000 );
 				camera.position.z = 800;
-				camera.updateMatrix();
 
 				scene = new THREE.Scene();
-				scene.fog = new THREE.Fog( 0x000000, 800, FAR );
+				scene.fog = new THREE.Fog( 0x000000, 800, camera.far );
 
 
 				var path = "textures/cube/SwedishRoyalCastle/";
 				var format = '.jpg';
 				var urls = [
-						path + 'px' + format, path + 'nx' + format,
-						path + 'py' + format, path + 'ny' + format,
-						path + 'pz' + format, path + 'nz' + format
-					];
+					path + 'px' + format, path + 'nx' + format,
+					path + 'py' + format, path + 'ny' + format,
+					path + 'pz' + format, path + 'nz' + format
+				];
 
 				reflectionCube = THREE.ImageUtils.loadTextureCube( urls );
 
 				// LIGHTS
 
 				var ambient = new THREE.AmbientLight( 0x221100 );
-				scene.addLight( ambient );
+				scene.add( ambient );
 
 				var directionalLight = new THREE.DirectionalLight( 0xffeedd );
-				directionalLight.position.set( 0, 0, 1 );
-				directionalLight.position.normalize();
-				scene.addLight( directionalLight );
+				directionalLight.position.set( 0, 0, 1 ).normalize();
+				scene.add( directionalLight );
 
 				// RENDERER
 
@@ -137,7 +133,7 @@
 				mesh.position.set( x, y, z );
 				mesh.scale.set( s, s, s );
 
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 			}
 
@@ -163,6 +159,8 @@
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+
+				camera.lookAt( scene.position );
 
 				renderer.render( scene, camera );
 

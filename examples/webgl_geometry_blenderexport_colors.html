@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - io blender - vertex colors</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				color: #eee;
 				font-family:Monospace;
@@ -33,13 +34,13 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> webgl - io blender - vertex colors</div>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/Detector.js"></script>
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
-		<script type="text/javascript">
+		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
@@ -61,17 +62,14 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.Camera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 1800;
 
 				scene = new THREE.Scene();
 
-				//scene.addLight( new THREE.AmbientLight( 0x333333 )  );
-
 				light = new THREE.DirectionalLight( 0xffffff );
-				light.position.set( 0, 0, 1 );
-				light.position.normalize();
-				scene.addLight( light );
+				light.position.set( 0, 0, 1 ).normalize();
+				scene.add( light );
 
 				var loader = new THREE.JSONLoader();
 				loader.load( { model: "obj/cubecolors/cubecolors.js", callback: createScene1 } );
@@ -100,7 +98,7 @@
 				mesh = new THREE.Mesh( geometry, material );
 				mesh.position.x = 400;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 250;
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 			}
 
@@ -113,7 +111,7 @@
 				mesh2 = new THREE.Mesh( geometry, material );
 				mesh2.position.x = - 400;
 				mesh2.scale.x = mesh2.scale.y = mesh2.scale.z = 250;
-				scene.addObject( mesh2 );
+				scene.add( mesh2 );
 
 			}
 
@@ -140,13 +138,16 @@
 				camera.position.x += ( mouseX - camera.position.x ) * 0.05;
 				camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
 
+				camera.lookAt( scene.position );
+
 				if ( mesh ) {
 
 					mesh.rotation.x += 0.01;
 					mesh.rotation.y += 0.01;
 				}
-				
+
 				if ( mesh2 ) {
+
 					mesh2.rotation.x += 0.01;
 					mesh2.rotation.y += 0.01;
 

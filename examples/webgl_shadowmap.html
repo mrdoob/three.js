@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - shadow map</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				font-family: Monospace;
 				background-color: #000;
@@ -30,21 +31,21 @@
 		move camera with WASD / RF + mouse
 		</div>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/ShaderExtras.js"></script>
+		<script src="js/ShaderExtras.js"></script>
 
-		<script type="text/javascript" src="js/Detector.js"></script>
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
-		<script type="text/javascript" src="fonts/helvetiker_bold.typeface.js"></script>
+		<script src="fonts/helvetiker_bold.typeface.js"></script>
 
-		<script type="text/javascript">
+		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var SHADOW_MAP_WIDTH = 1024, SHADOW_MAP_HEIGHT = 1024;
+			var SHADOW_MAP_WIDTH = 2048, SHADOW_MAP_HEIGHT = 1024;
 
 			var MARGIN = 100;
 
@@ -52,7 +53,7 @@
 			var SCREEN_HEIGHT = window.innerHeight - 2 * MARGIN;
 			var FLOOR = -250;
 
-			var camera, scene, renderer;
+			var camera, controls, scene, renderer;
 			var container, stats;
 
 			var NEAR = 5, FAR = 3000;
@@ -74,13 +75,20 @@
 
 				// SCENE CAMERA
 
-				camera = new THREE.FirstPersonCamera( { fov: 23, aspect: SCREEN_WIDTH / SCREEN_HEIGHT, near: NEAR, far: FAR,
-														lookSpeed: 0.0125, movementSpeed: 500, noFly: false, lookVertical: true,
-														constrainVertical: true, verticalMin: 1.5, verticalMax: 2.0
-														} );
-
+				camera = new THREE.PerspectiveCamera( 23, SCREEN_WIDTH / SCREEN_HEIGHT, NEAR, FAR );
 				camera.position.set( 700, 50, 1900 );
-				camera.lon = -110;
+
+				controls = new THREE.FirstPersonControls( camera );
+
+				controls.lookSpeed = 0.0125;
+				controls.movementSpeed = 500;
+				controls.noFly = false;
+				controls.lookVertical = true;
+				controls.constrainVertical = true;
+				controls.verticalMin = 1.5;
+				controls.verticalMax = 2.0;
+
+				controls.lon = -110;
 
 				// SCENE
 
@@ -91,13 +99,13 @@
 				// LIGHTS
 
 				var ambient = new THREE.AmbientLight( 0x444444 );
-				scene.addLight( ambient );
+				scene.add( ambient );
 
 				light = new THREE.SpotLight( 0xffffff );
 				light.position.set( 0, 1500, 1000 );
 				light.target.position.set( 0, 0, 0 );
 				light.castShadow = true;
-				scene.addLight( light );
+				scene.add( light );
 
 				createHUD();
 				createScene();
@@ -137,13 +145,13 @@
 
 			function createHUD() {
 
-				cameraOrtho = new THREE.OrthoCamera( SCREEN_WIDTH / - 2, SCREEN_WIDTH / 2,  SCREEN_HEIGHT / 2, SCREEN_HEIGHT / - 2, -10, 1000 );
+				cameraOrtho = new THREE.OrthographicCamera( SCREEN_WIDTH / - 2, SCREEN_WIDTH / 2,  SCREEN_HEIGHT / 2, SCREEN_HEIGHT / - 2, -10, 1000 );
 				cameraOrtho.position.z = 10;
 
 				var shader = THREE.ShaderExtras[ "screen" ];
 				var uniforms = new THREE.UniformsUtils.clone( shader.uniforms );
 
-				hudMaterial = new THREE.MeshShaderMaterial( { vertexShader: shader.vertexShader, fragmentShader: shader.fragmentShader, uniforms: uniforms } );
+				hudMaterial = new THREE.ShaderMaterial( { vertexShader: shader.vertexShader, fragmentShader: shader.fragmentShader, uniforms: uniforms } );
 
 				var hudGeo = new THREE.PlaneGeometry( SHADOW_MAP_WIDTH / 2, SHADOW_MAP_HEIGHT / 2 );
 				var hudMesh = new THREE.Mesh( hudGeo, hudMaterial );
@@ -151,7 +159,9 @@
 				hudMesh.position.y = ( SCREEN_HEIGHT - SHADOW_MAP_HEIGHT / 2 ) * -0.5;
 
 				sceneHUD = new THREE.Scene();
-				sceneHUD.addObject( hudMesh );
+				sceneHUD.add( hudMesh );
+
+				cameraOrtho.lookAt( sceneHUD.position );
 
 			}
 
@@ -166,13 +176,13 @@
 				var ground = new THREE.Mesh( geometry, planeMaterial );
 
 				ground.position.set( 0, FLOOR, 0 );
-				ground.rotation.x = -1.57;
+				ground.rotation.x = -Math.PI/2;
 				ground.scale.set( 100, 100, 100 );
 
 				ground.castShadow = false;
 				ground.receiveShadow = true;
 
-				scene.addObject( ground );
+				scene.add( ground );
 
 				// TEXT
 
@@ -204,7 +214,7 @@
 				mesh.castShadow = true;
 				mesh.receiveShadow = true;
 
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				// CUBES
 
@@ -216,7 +226,7 @@
 				mesh.castShadow = true;
 				mesh.receiveShadow = true;
 
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				var mesh = new THREE.Mesh( new THREE.CubeGeometry( 1600, 170, 250 ), planeMaterial );
 
@@ -226,7 +236,7 @@
 				mesh.castShadow = true;
 				mesh.receiveShadow = true;
 
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				// MORPHS
 
@@ -239,12 +249,12 @@
 					var meshAnim = new THREE.Mesh( geometry, material );
 
 					meshAnim.position.set( x, y, z );
-					meshAnim.rotation.y = 1.57;
+					meshAnim.rotation.y = Math.PI/2;
 
 					meshAnim.castShadow = true;
 					meshAnim.receiveShadow = false;
 
-					scene.addObject( meshAnim );
+					scene.add( meshAnim );
 
 					morphs.push( { mesh: meshAnim, lastKeyframe: 0, currentKeyframe: 0,
 								   offset: Math.random() * 6, speed: speed, duration: duration,
@@ -395,6 +405,8 @@
 			function render() {
 
 				for ( var i = 0; i < morphs.length; i++ ) updateMorph( morphs[ i ] );
+
+				controls.update();
 
 				renderer.clear();
 				renderer.render( scene, camera );

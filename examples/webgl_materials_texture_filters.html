@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - materials - texture filtering</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				color: #aaa;
 				font-family:Monospace;
@@ -60,13 +61,13 @@
 		min: <span class="c">Nearest</span>
 		</div>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/Detector.js"></script>
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
-		<script type="text/javascript">
+		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
@@ -88,10 +89,10 @@
 
 			function init() {
 
-				container = document.createElement('div');
-				document.body.appendChild(container);
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 35, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 5000 );
+				camera = new THREE.PerspectiveCamera( 35, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 5000 );
 				camera.position.z = 1500;
 
 				scene = new THREE.Scene();
@@ -147,8 +148,8 @@
 					texturePainting2.image = image;
 					texturePainting2.needsUpdate = true;
 
-					scene.addObject( meshCanvas );
-					scene2.addObject( meshCanvas2 );
+					scene.add( meshCanvas );
+					scene2.add( meshCanvas2 );
 
 					var geometry = new THREE.PlaneGeometry( 100, 100 ),
 						mesh = new THREE.Mesh( geometry, materialPainting ),
@@ -162,14 +163,14 @@
 						zmesh.scale.x = image.width / 100;
 						zmesh.scale.y = image.height / 100;
 
-						zscene.addObject( zmesh );
+						zscene.add( zmesh );
 
 						var meshFrame = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x000000, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 5 } )  );
 
 						meshFrame.scale.x = 1.1 * image.width / 100;
 						meshFrame.scale.y = 1.1 * image.height / 100;
 
-						zscene.addObject( meshFrame );
+						zscene.add( meshFrame );
 
 						var meshShadow = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 0.9, transparent: true } )  );
 
@@ -177,7 +178,7 @@
 						meshShadow.scale.x = 1.1 * image.width / 100;
 						meshShadow.scale.y = 1.1 * image.height / 100;
 						meshShadow.rotation.x = -Math.PI / 2;
-						zscene.addObject( meshShadow );
+						zscene.add( meshShadow );
 
 						meshShadow.position.y = - 1.1 * image.height/2;
 
@@ -238,6 +239,8 @@
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - ( mouseY - 200) - camera.position.y ) * .05;
+
+				camera.lookAt( scene.position );
 
 				renderer.enableScissorTest( false );
 				renderer.clear();

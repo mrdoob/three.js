@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js - webgl</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				background:#fff;
 				padding:0;
@@ -16,9 +17,9 @@
 
 	<body>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript">
+		<script>
 
 			var container;
 
@@ -32,7 +33,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 200;
 
 				scene = new THREE.Scene();
@@ -78,11 +79,11 @@
 
 				var mesh = new THREE.Mesh( geometry, material );
 
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				renderer.render( scene, camera );
 
-				scene.removeObject( mesh );
+				scene.remove( mesh );
 
 				renderer.deallocateObject( mesh );
 				renderer.deallocateTexture( texture );

@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - animation - skinning</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				color: #000;
 				font-family:Monospace;
@@ -39,13 +40,13 @@
 		</div>
 
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Detector.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/Stats.js"></script>
 
-		<script type="text/javascript">
+		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
@@ -74,9 +75,8 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.Camera( 25, window.innerWidth / height, 1, 10000 );
-				camera.position.y = 185;
-				camera.position.z = 2500;
+				camera = new THREE.PerspectiveCamera( 25, window.innerWidth / height, 1, 10000 );
+				camera.position.set( 0, 185, 2500 );
 
 				scene = new THREE.Scene();
 				scene.fog = new THREE.FogExp2( 0xffffff, 0.0003 );
@@ -86,7 +86,7 @@
 				light = new THREE.DirectionalLight( 0xffffff, 1.5 );
 				light.position.set( 0, 1, 1 );
 				light.position.normalize();
-				scene.addLight( light );
+				scene.add( light );
 
 				var planeSimple = new THREE.PlaneGeometry( 200, 300 );
 				var planeTesselated = new THREE.PlaneGeometry( 100, 300, 25, 40 );
@@ -96,14 +96,14 @@
 
 				floor = new THREE.Mesh( planeSimple, matSolid );
 				floor.position.y = -10;
-				floor.rotation.x = -1.57;
+				floor.rotation.x = -Math.PI/2;
 				floor.scale.set( 25, 25, 25 );
-				scene.addObject( floor );
+				scene.add( floor );
 
 				floor = new THREE.Mesh( planeTesselated, matWire );
-				floor.rotation.x = -1.57;
+				floor.rotation.x = -Math.PI/2;
 				floor.scale.set( 25, 25, 25 );
-				scene.addObject( floor );
+				scene.add( floor );
 
 				renderer = new THREE.WebGLRenderer( { clearColor: 0xffffff, clearAlpha: 1 } );
 				renderer.setSize( window.innerWidth, height );
@@ -161,7 +161,7 @@
 						buffalo.position.y = buffalo.boundRadius * 0.5;
 						buffalo.rotation.y = 0.2 - Math.random() * 0.4;
 
-						scene.addObject( buffalo );
+						scene.add( buffalo );
 
 						buffalos.push( buffalo );
 
@@ -211,7 +211,7 @@
 				oldTime = time;
 
 				camera.position.x += ( mouseX - camera.position.x ) * 0.05;
-				//camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
+				camera.lookAt( scene.position );
 
 				if ( buffalos && playback ) {
 

@@ -1,28 +1,26 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - collada</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				font-family: Monospace;
 				background-color: #000000;
 				margin: 0px;
 				overflow: hidden;
 			}
-			#log { color:#fff; position:absolute; top:50px; text-align:left; display:block; z-index:100; pointer-events:none; }
 		</style>
 	</head>
 	<body>
-		<pre id="log"></pre>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
-		<script type="text/javascript" src="js/Detector.js"></script>
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
-
-		<script type="text/javascript">
+		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
@@ -32,7 +30,7 @@
 			var particleLight, pointLight;
 			var dae, skin;
 
-			var loader = new ColladaLoader();
+			var loader = new THREE.ColladaLoader();
 			loader.load( './models/monster.dae', function colladaReady( collada ) {
 
 				dae = collada.scene;
@@ -52,10 +50,8 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.x = 2;
-				camera.position.y = 2;
-				camera.position.z = 3;
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.set( 2, 2, 3 );
 
 				scene = new THREE.Scene();
 
@@ -76,29 +72,29 @@
 				}
 
 				var line = new THREE.Line( geometry, line_material, THREE.LinePieces );
-				scene.addObject( line );
+				scene.add( line );
 
 				// Add the COLLADA
 
-				scene.addObject( dae );
+				scene.add( dae );
 
 				particleLight = new THREE.Mesh( new THREE.SphereGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
-				scene.addObject( particleLight );
+				scene.add( particleLight );
 
 				// Lights
 
-				scene.addLight( new THREE.AmbientLight( 0xcccccc ) );
+				scene.add( new THREE.AmbientLight( 0xcccccc ) );
 
 				var directionalLight = new THREE.DirectionalLight(/*Math.random() * 0xffffff*/0xeeeeee );
 				directionalLight.position.x = Math.random() - 0.5;
 				directionalLight.position.y = Math.random() - 0.5;
 				directionalLight.position.z = Math.random() - 0.5;
 				directionalLight.position.normalize();
-				scene.addLight( directionalLight );
+				scene.add( directionalLight );
 
 				pointLight = new THREE.PointLight( 0xffffff, 4 );
 				pointLight.position.x = 10000;
-				scene.addLight( pointLight );
+				scene.add( pointLight );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -154,6 +150,8 @@
 				camera.position.x = Math.cos( timer ) * 10;
 				camera.position.y = 2;
 				camera.position.z = Math.sin( timer ) * 10;
+
+				camera.lookAt( scene.position );
 
 				particleLight.position.x = Math.sin( timer * 4 ) * 3009;
 				particleLight.position.y = Math.cos( timer * 5 ) * 4000;

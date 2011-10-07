@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - materials - video</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				background-color: #000;
 				color: #fff;
@@ -36,30 +37,29 @@
 			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl video demo. playing <a href="http://durian.blender.org/" target="_blank">sintel</a> trailer
 		</div>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/ShaderExtras.js"></script>
+		<script src="js/ShaderExtras.js"></script>
 
-		<script type="text/javascript" src="js/postprocessing/EffectComposer.js"></script>
-		<script type="text/javascript" src="js/postprocessing/RenderPass.js"></script>
-		<script type="text/javascript" src="js/postprocessing/MaskPass.js"></script>
-		<script type="text/javascript" src="js/postprocessing/BloomPass.js"></script>
-		<script type="text/javascript" src="js/postprocessing/ShaderPass.js"></script>
+		<script src="js/postprocessing/EffectComposer.js"></script>
+		<script src="js/postprocessing/RenderPass.js"></script>
+		<script src="js/postprocessing/MaskPass.js"></script>
+		<script src="js/postprocessing/BloomPass.js"></script>
+		<script src="js/postprocessing/ShaderPass.js"></script>
 
-		<script type="text/javascript" src="js/Detector.js"></script>
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
 
 		<video id="video" autoplay loop style="display:none">
 			<source src="textures/sintel.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
 			<source src="textures/sintel.ogv" type='video/ogg; codecs="theora, vorbis"'>
 		</video>
 
-		<script type="text/javascript">
+		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var container, stats;
+			var container;
 
 			var camera, scene, renderer;
 
@@ -86,18 +86,17 @@
 
 			function init() {
 
-				container = document.createElement('div');
+				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 500;
 
 				scene = new THREE.Scene();
 
 				var light = new THREE.DirectionalLight( 0xffffff );
-				light.position.set( 0.5, 1, 1 );
-				light.position.normalize();
-				scene.addLight( light );
+				light.position.set( 0.5, 1, 1 ).normalize();
+				scene.add( light );
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -105,9 +104,6 @@
 				container.appendChild( renderer.domElement );
 
 				video = document.getElementById( 'video' );
-
-				//video.volume = 0;
-				//video.muted = true;
 
 				texture = new THREE.Texture( video );
 				texture.minFilter = THREE.LinearFilter;
@@ -145,8 +141,6 @@
 
 					material = materials[ cube_count ];
 
-					//material.program = material_base.program;
-
 					material.hue = i/xgrid;
 					material.saturation = j/ygrid;
 
@@ -160,7 +154,7 @@
 
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = 1;
 
-					scene.addObject(mesh);
+					scene.add(mesh);
 
 					mesh.dx = 0.001 * ( 0.5 - Math.random() );
 					mesh.dy = 0.001 * ( 0.5 - Math.random() );
@@ -172,11 +166,6 @@
 				}
 
 				renderer.autoClear = false;
-
-				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				//container.appendChild( stats.domElement );
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
@@ -230,7 +219,6 @@
 				requestAnimationFrame( animate );
 
 				render();
-				stats.update();
 
 			}
 
@@ -242,6 +230,8 @@
 
 				camera.position.x += ( mouseX - camera.position.x ) * 0.05;
 				camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
+
+				camera.lookAt( scene.position );
 
 				if ( video.readyState === video.HAVE_ENOUGH_DATA ) {
 

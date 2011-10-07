@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js canvas - performance</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				font-family: Monospace;
 				background-color: #f0f0f0;
@@ -14,12 +15,12 @@
 	</head>
 	<body>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
-		<script type="text/javascript">
+		<script>
 
 			var container, stats;
 
@@ -44,8 +45,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.z = 1000;
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.y = 1000;
 				camera.position.z = 1000;
 
@@ -63,12 +63,12 @@
 
 					var line = new THREE.Line( geometry, material );
 					line.position.z = ( i * 100 ) - 500;
-					scene.addObject( line );
+					scene.add( line );
 
 					var line = new THREE.Line( geometry, material );
 					line.position.x = ( i * 100 ) - 500;
 					line.rotation.y = 90 * Math.PI / 180;
-					scene.addObject( line );
+					scene.add( line );
 
 				}
 
@@ -85,23 +85,23 @@
 					sphere.position.x = ( i % 5 ) * 200 - 400;
 					sphere.position.z = Math.floor( i / 5 ) * 200 - 400;
 
-					scene.addObject( sphere );
+					scene.add( sphere );
 
 				}
 
 				// Lights
 
 				var ambientLight = new THREE.AmbientLight( Math.random() * 0x202020 );
-				scene.addLight( ambientLight );
+				scene.add( ambientLight );
 
 				var directionalLight = new THREE.DirectionalLight( Math.random() * 0xffffff );
 				directionalLight.position.x = 0;
 				directionalLight.position.y = 1;
 				directionalLight.position.z = 0;
-				scene.addLight( directionalLight );
+				scene.add( directionalLight );
 
 				var pointLight = new THREE.PointLight( 0xff0000, 1, 500 );
-				scene.addLight( pointLight );
+				scene.add( pointLight );
 
 				renderer = new THREE.CanvasRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -127,6 +127,8 @@
 			}
 
 			function render() {
+
+				camera.lookAt( scene.position );
 
 				renderer.render( scene, camera );
 

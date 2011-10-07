@@ -139,7 +139,7 @@ THREE.SceneLoader.prototype = {
 
 									materials[ i ] = result.materials[ o.materials[i] ];
 
-									hasNormals = materials[ i ] instanceof THREE.MeshShaderMaterial;
+									hasNormals = materials[ i ] instanceof THREE.ShaderMaterial;
 
 								}
 
@@ -191,7 +191,7 @@ THREE.SceneLoader.prototype = {
 								object.scale.set( s[0], s[1], s[2] );
 								object.visible = o.visible;
 
-								result.scene.addObject( object );
+								result.scene.add( object );
 
 								result.objects[ dd ] = object;
 
@@ -208,7 +208,7 @@ THREE.SceneLoader.prototype = {
 									//object.materials = [ new THREE.MeshBasicMaterial( { color: 0xff0000 } ) ];
 
 									var shadow = new THREE.ShadowVolume( geometry )
-									result.scene.addChild( shadow );
+									result.scene.add( shadow );
 
 									shadow.position = object.position;
 									shadow.rotation = object.rotation;
@@ -260,7 +260,7 @@ THREE.SceneLoader.prototype = {
 							object.scale.set( s[0], s[1], s[2] );
 							object.visible = ( o.visible !== undefined ) ? o.visible : false;
 
-							result.scene.addObject( object );
+							result.scene.add( object );
 
 							result.objects[ dd ] = object;
 							result.empties[ dd ] = object;
@@ -359,19 +359,18 @@ THREE.SceneLoader.prototype = {
 
 				if ( c.type == "perspective" ) {
 
-					camera = new THREE.Camera( c.fov, c.aspect, c.near, c.far );
+					camera = new THREE.PerspectiveCamera( c.fov, c.aspect, c.near, c.far );
 
 				} else if ( c.type == "ortho" ) {
 
-					camera = new THREE.Camera();
-					camera.projectionMatrix = THREE.Matrix4.makeOrtho( c.left, c.right, c.top, c.bottom, c.near, c.far );
+					camera = new THREE.OrthographicCamera( c.left, c.right, c.top, c.bottom, c.near, c.far );
 
 				}
 
 				p = c.position;
 				t = c.target;
 				camera.position.set( p[0], p[1], p[2] );
-				camera.target.position.set( t[0], t[1], t[2] );
+				camera.target = new THREE.Vector3( t[0], t[1], t[2] );
 
 				result.cameras[ dc ] = camera;
 
@@ -410,7 +409,7 @@ THREE.SceneLoader.prototype = {
 
 				}
 
-				result.scene.addLight( light );
+				result.scene.add( light );
 
 				result.lights[ dl ] = light;
 
@@ -502,7 +501,7 @@ THREE.SceneLoader.prototype = {
 
 				} else if ( g.type == "cylinder" ) {
 
-					geometry = new THREE.CylinderGeometry( g.numSegs, g.topRad, g.botRad, g.height, g.topOffset, g.botOffset );
+					geometry = new THREE.CylinderGeometry( g.topRad, g.botRad, g.height, g.radSegs, g.heightSegs );
 					result.geometries[ dg ] = geometry;
 
 				} else if ( g.type == "torus" ) {
@@ -741,7 +740,7 @@ THREE.SceneLoader.prototype = {
 
 					var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true, fog: true };
 
-					material = new THREE.MeshShaderMaterial( parameters );
+					material = new THREE.ShaderMaterial( parameters );
 
 				} else {
 
@@ -764,7 +763,7 @@ THREE.SceneLoader.prototype = {
 		};
 
 	},
-	
+
 	constructor : THREE.SceneLoader
 
 };

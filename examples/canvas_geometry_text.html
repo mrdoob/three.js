@@ -1,10 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
-		<title>three.js canvas/webgl - geometry - text</title>
+		<title>three.js canvas - geometry - text</title>
 		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				font-family: Monospace;
 				background-color: #f0f0f0;
@@ -16,17 +16,17 @@
 	<body>
 
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
 		<!-- load the font file from canvas-text -->
 
-		<script type="text/javascript" src="fonts/helvetiker_regular.typeface.js"></script>
+		<script src="fonts/helvetiker_regular.typeface.js"></script>
 
 
-		<script type="text/javascript">
+		<script>
 
 			var container, stats;
 
@@ -59,10 +59,9 @@
 				info.innerHTML = 'Simple Dynamic 3D Text Example by <a href="http://www.lab4games.net/zz85/blog">zz85</a><br/>Drag to spin the text';
 				container.appendChild( info );
 
-				camera = new THREE.Camera( 50, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.y = 150;
 				camera.position.z = 500;
-				camera.target.position.y = 150;
 
 				scene = new THREE.Scene();
 
@@ -90,26 +89,26 @@
 				text3d.computeBoundingBox();
 				var centerOffset = -0.5 * ( text3d.boundingBox.x[ 1 ] - text3d.boundingBox.x[ 0 ] );
 
-                var textMaterial = new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, wireframe: false } );
-                text = new THREE.Mesh( text3d, textMaterial );
+				var textMaterial = new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, wireframe: false } );
+				text = new THREE.Mesh( text3d, textMaterial );
 
-                text.doubleSided = false;
+				text.doubleSided = false;
 
-                text.position.x = centerOffset;
-                text.position.y = 100;
-                text.position.z = 0;
+				text.position.x = centerOffset;
+				text.position.y = 100;
+				text.position.z = 0;
 
-                text.rotation.x = 0;
-                text.rotation.y = Math.PI * 2;
+				text.rotation.x = 0;
+				text.rotation.y = Math.PI * 2;
 				text.overdraw = true;
 
 				parent = new THREE.Object3D();
-                parent.addChild( text );
+				parent.add( text );
 
-				scene.addObject( parent );
+				scene.add( parent );
 
 				renderer = new THREE.CanvasRenderer();
-                renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.appendChild( renderer.domElement );
 

@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - animation - morph targets</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				background:#000;
 				color:#fff;
@@ -61,13 +62,13 @@
 		</div>
 
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/Detector.js"></script>
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
-		<script type="text/javascript">
+		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
@@ -93,7 +94,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 45, window.innerWidth / window.innerHeight, 1, 15000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 15000 );
 				camera.position.z = 500;
 
 
@@ -103,10 +104,10 @@
 
 				var light = new THREE.PointLight( 0xff2200 );
 				light.position.set( 100, 100, 100 );
-				scene.addLight( light );
+				scene.add( light );
 
 				var light = new THREE.AmbientLight( 0x333333 );
-				scene.addLight( light );
+				scene.add( light );
 
 
 				var geometry = new THREE.CubeGeometry( 100, 100, 100 );
@@ -138,7 +139,7 @@
 
 				mesh = new THREE.Mesh( geometry, material );
 
-				scene.addChild( mesh );
+				scene.add( mesh );
 
 
 				renderer = new THREE.WebGLRenderer( { clearColor:0x222222, clearAlpha: 1 } );
@@ -171,14 +172,9 @@
 				//camera.position.x += ( mouseX - camera.position.x ) * .005;
 				camera.position.y += ( - mouseY - camera.position.y ) * .01;
 
+				camera.lookAt( scene.position );
+
 				renderer.render( scene, camera );
-
-			}
-
-			function log( text ) {
-
-				var e = document.getElementById("log");
-				e.innerHTML = text + "<br/>" + e.innerHTML;
 
 			}
 

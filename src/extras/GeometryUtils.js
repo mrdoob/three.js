@@ -4,13 +4,13 @@
  */
 
 THREE.GeometryUtils = {
-
+	
 	merge: function ( geometry1, object2 /* mesh | geometry */ ) {
 
-		var isMesh = object2 instanceof THREE.Mesh,
+		var matrix, matrixRotation,
 		vertexOffset = geometry1.vertices.length,
 		uvPosition = geometry1.faceVertexUvs[ 0 ].length,
-		geometry2 = isMesh ? object2.geometry : object2,
+		geometry2 = object2 instanceof THREE.Mesh ? object2.geometry : object2,
 		vertices1 = geometry1.vertices,
 		vertices2 = geometry2.vertices,
 		faces1 = geometry1.faces,
@@ -18,7 +18,15 @@ THREE.GeometryUtils = {
 		uvs1 = geometry1.faceVertexUvs[ 0 ],
 		uvs2 = geometry2.faceVertexUvs[ 0 ];
 
-		isMesh && object2.matrixAutoUpdate && object2.updateMatrix();
+		if ( object2 instanceof THREE.Mesh ) {
+
+			object2.matrixAutoUpdate && object2.updateMatrix();
+
+			matrix = object2.matrix;
+			matrixRotation = new THREE.Matrix4();
+			matrixRotation.extractRotation( matrix, object2.scale );
+
+		}
 
 		// vertices
 
@@ -28,7 +36,7 @@ THREE.GeometryUtils = {
 
 			var vertexCopy = new THREE.Vertex( vertex.position.clone() );
 
-			isMesh && object2.matrix.multiplyVector3( vertexCopy.position );
+			if ( matrix ) matrix.multiplyVector3( vertexCopy.position );
 
 			vertices1.push( vertexCopy );
 
@@ -54,10 +62,15 @@ THREE.GeometryUtils = {
 
 			faceCopy.normal.copy( face.normal );
 
+			if ( matrixRotation ) matrixRotation.multiplyVector3( faceCopy.normal );
+
 			for ( var j = 0, jl = faceVertexNormals.length; j < jl; j ++ ) {
 
-				normal = faceVertexNormals[ j ];
-				faceCopy.vertexNormals.push( normal.clone() );
+				normal = faceVertexNormals[ j ].clone();
+
+				if ( matrixRotation ) matrixRotation.multiplyVector3( normal );
+
+				faceCopy.vertexNormals.push( normal );
 
 			}
 
@@ -73,6 +86,7 @@ THREE.GeometryUtils = {
 			faceCopy.materials = face.materials.slice();
 
 			faceCopy.centroid.copy( face.centroid );
+			if ( matrix ) matrix.multiplyVector3( faceCopy.centroid );
 
 			faces1.push( faceCopy );
 
@@ -430,7 +444,26 @@ THREE.GeometryUtils = {
 
 		return ( 65280 * Math.random() + 255 * Math.random() ) / 65535;
 
+	},
+
+	center: function( geometry ) {
+
+		geometry.computeBoundingBox();
+
+		var matrix = new THREE.Matrix4();
+
+		var dx = -0.5 * ( geometry.boundingBox.x[ 1 ] + geometry.boundingBox.x[ 0 ] );
+		var dy = -0.5 * ( geometry.boundingBox.y[ 1 ] + geometry.boundingBox.y[ 0 ] );
+		var dz = -0.5 * ( geometry.boundingBox.z[ 1 ] + geometry.boundingBox.z[ 0 ] );
+
+		matrix.setTranslation( dx, dy, dz );
+
+		geometry.applyMatrix( matrix );
+
+		geometry.computeBoundingBox();
+
 	}
+
 
 };
 

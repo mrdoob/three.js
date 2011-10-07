@@ -26,7 +26,7 @@ THREE.Ray.prototype = {
 
 		for ( i = 0, l = objects.length; i < l; i ++ ) {
 
-			intersects = intersects.concat( this.intersectObject( objects[ i ] ) );
+			Array.prototype.push.apply( intersects, this.intersectObject( objects[ i ] ) );
 
 		}
 

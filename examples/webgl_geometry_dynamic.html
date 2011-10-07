@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - geometry - dynamic</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				color: #61443e;
 				font-family:Monospace;
@@ -39,13 +40,13 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - dynamic geometry demo - webgl<br />(left click: forward, right click: backward)</div>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/Detector.js"></script>
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
-		<script type="text/javascript">
+		<script>
 
 			if ( ! Detector.webgl ) {
 
@@ -56,7 +57,7 @@
 
 			var container, stats;
 
-			var camera, scene, renderer;
+			var camera, controls, scene, renderer;
 
 			var mesh, texture,geometry, material;
 
@@ -70,24 +71,16 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.FirstPersonCamera( {
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
+				camera.position.y = 200;
 
-					fov: 60, aspect: window.innerWidth / window.innerHeight, near: 1, far: 20000,
-					movementSpeed: 500, lookSpeed: 0.1, noFly: false, lookVertical: true
+				controls = new THREE.FirstPersonControls( camera );
 
-				} );
-
-				camera.target.position.z = - 100;
+				controls.movementSpeed = 500;
+				controls.lookSpeed = 0.1
 
 				scene = new THREE.Scene();
 				scene.fog = new THREE.FogExp2( 0xaaccff, 0.0007 );
-
-				//var light = new THREE.PointLight( 0xffffff, 2 );
-				//light.position.y = 500;
-				//scene.addLight( light );
-
-				camera.position.y = 200;
-				camera.target.position.y = camera.position.y;
 
 				geometry = new THREE.PlaneGeometry( 20000, 20000, worldWidth - 1, worldDepth - 1 );
 				geometry.dynamic = true;
@@ -109,13 +102,14 @@
 				var texture = THREE.ImageUtils.loadTexture( "textures/water.jpg" );
 				texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 				texture.repeat.set( 5, 5 );
-				material = new THREE.MeshBasicMaterial( { color:0x0044ff, opacity:1, map: texture } );
+
+				material = new THREE.MeshBasicMaterial( { color: 0x0044ff, map: texture } );
 
 				mesh = new THREE.Mesh( geometry, material );
 				mesh.rotation.x = - 90 * Math.PI / 180;
-				scene.addObject( mesh );
+				scene.add( mesh );
 
-				renderer = new THREE.WebGLRenderer( { clearColor:0xaaccff, clearAlpha: 1 } );
+				renderer = new THREE.WebGLRenderer( { clearColor: 0xaaccff, clearAlpha: 1 } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.innerHTML = "";
@@ -157,7 +151,8 @@
 				mesh.geometry.__dirtyVertices = true;
 				//mesh.geometry.__dirtyNormals = true;
 
-				renderer.render(scene, camera);
+				controls.update();
+				renderer.render( scene, camera );
 
 			}
 

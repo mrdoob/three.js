@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - io - scene loader</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				background:#000;
 				color:#fff;
@@ -82,7 +83,6 @@
 
 			a { color:red }
 			canvas { pointer-events:none; z-index:10; }
-			#log { position:absolute; top:0; display:block; text-align:left; z-index:1000; pointer-events:none; }
 
 			#scene_explorer {
 				background:transparent;
@@ -147,15 +147,13 @@
 			</center>
 		</div>
 
-		<pre id="log"></pre>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
-		<script type="text/javascript" src="js/Detector.js"></script>
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
-
-		<script type="text/javascript">
+		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
@@ -166,8 +164,6 @@
 
 			var camera, scene, loaded;
 			var renderer;
-
-			var mesh, zmesh, geometry;
 
 			var mouseX = 0, mouseY = 0;
 
@@ -188,7 +184,7 @@
 			function handle_update( result, pieces ) {
 
 				refreshSceneView( result );
-				renderer.initWebGLObjects( result.scene );
+				//renderer.initWebGLObjects( result.scene );
 
 				var m, material, count = 0;
 
@@ -300,7 +296,7 @@
 					$( "start" ).className = "enabled";
 
 					handle_update( result, 1 );
-					
+
 					console.log( result );
 
 				}
@@ -308,10 +304,10 @@
 				$( "progress" ).style.display = "block";
 
 				var loader = new THREE.SceneLoader();
-				
+
 				loader.callbackSync = callbackSync;
 				loader.callbackProgress = callbackProgress;
-				
+
 				loader.load( "scenes/test_scene.js", callbackFinished );
 
 				$( "plus_exp" ).addEventListener( 'click', createToggle( "exp" ), false );
@@ -350,7 +346,7 @@
 				var result = {
 
 					scene:  new THREE.Scene(),
-					camera: new THREE.Camera( 65, window.innerWidth / window.innerHeight, 1, 1000 )
+					camera: new THREE.PerspectiveCamera( 65, window.innerWidth / window.innerHeight, 1, 1000 )
 
 				};
 
@@ -364,26 +360,30 @@
 				for( var i = 0; i < count; i++ ) {
 
 					object = new THREE.Mesh( geometry, material );
+
 					object.position.x = ( Math.random() - 0.5 ) * range;
 					object.position.y = ( Math.random() - 0.5 ) * range;
 					object.position.z = ( Math.random() - 0.5 ) * range;
+
 					object.rotation.x = Math.random() * 6;
 					object.rotation.y = Math.random() * 6;
 					object.rotation.z = Math.random() * 6;
+
 					object.matrixAutoUpdate = false;
 					object.updateMatrix();
-					result.scene.addObject( object );
+
+					result.scene.add( object );
 
 				}
 
 				result.scene.matrixAutoUpdate = false;
 
 				light = new THREE.PointLight( 0xffffff );
-				result.scene.addLight( light );
+				result.scene.add( light );
 
 				light = new THREE.DirectionalLight( 0x111111 );
 				light.position.x = 1;
-				result.scene.addLight( light );
+				result.scene.add( light );
 
 				return result;
 
@@ -405,14 +405,9 @@
 				camera.position.x += ( mouseX - camera.position.x ) * .001;
 				camera.position.y += ( - mouseY - camera.position.y ) * .001;
 
+				camera.lookAt( scene.position );
+
 				renderer.render( scene, camera );
-
-			}
-
-			function log( text ) {
-
-				var e = $("log");
-				e.innerHTML = text + "<br/>" + e.innerHTML;
 
 			}
 

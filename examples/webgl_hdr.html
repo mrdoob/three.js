@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - materials - HDR texture</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 		    body {
 			color: #000;
 			font-family:Monospace;
@@ -36,14 +37,16 @@
 			based on <a href="http://spidergl.org/example.php?id=13" target="_blank">SpiderGL</a>
 		</div>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/Detector.js"></script>
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
 		<!-- HDR fragment shader -->
+
 		<script id="fs-hdr" type="x-shader/x-fragment">
+
 			uniform sampler2D   tDiffuse;
 			uniform float       exposure;
 			uniform float       brightMax;
@@ -64,8 +67,8 @@
 
 			}
 
-			void main(void)
-			{
+			void main()	{
+
 				vec4 color = texture2D( tDiffuse, vUv );
 				color.xyz  = decode_pnghdr( color );
 
@@ -78,22 +81,28 @@
 				color *= YD;
 
 				gl_FragColor = vec4( color.xyz, 1.0 );
+
 			}
+
 		</script>
 
 		<!-- HDR vertex shader -->
+
 		<script id="vs-hdr" type="x-shader/x-vertex">
+
 			varying vec2 vUv;
 
-			void main(void)
-			{
+			void main()	{
+
 				vUv  = uv;
 				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
 			}
+
 		</script>
 
 
-		<script type="text/javascript">
+		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
@@ -115,23 +124,20 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.Camera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 900;
 
 				scene = new THREE.Scene();
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff );
-				directionalLight.position.x = 0;
-				directionalLight.position.y = 0;
-				directionalLight.position.z = 1;
-				directionalLight.position.normalize();
-				scene.addLight( directionalLight );
+				directionalLight.position.set( 0, 0, 1 ).normalize();
+				scene.add( directionalLight );
 
 				var texture = THREE.ImageUtils.loadTexture( "textures/memorial.png" );
 				texture.minFilter = THREE.LinearFilter;
 				texture.magFilter = THREE.NearestFilter;
 
-				materialHDR = new THREE.MeshShaderMaterial( {
+				materialHDR = new THREE.ShaderMaterial( {
 
 					uniforms: {
 						tDiffuse:  { type: "t", value: 0, texture: texture },
@@ -147,7 +153,7 @@
 
 				quad = new THREE.Mesh( plane, materialHDR );
 				quad.position.z = -100;
-				scene.addObject( quad );
+				scene.add( quad );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -205,18 +211,6 @@
 				// Render final scene to the screen with film shader
 
 				renderer.render( scene, camera );
-
-			}
-
-			function is_browser_compatible() {
-
-				// WebGL support
-
-				try { var test = new Float32Array(1); } catch(e) { return false; }
-
-				// Web workers
-
-				return !!window.Worker;
 
 			}
 

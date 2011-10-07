@@ -1,164 +1,164 @@
-<html>
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - intersection: ray with box</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #f0f0f0;
+				margin: 0px;
+				overflow: hidden;
+			}
 
-<head>
-<title>three.js webgl - intersection: ray with box</title>
-<meta http-equiv="content-type" content="text/html; charset=utf-8">
-<style type="text/css">
+			#oldie { background-color: #ddd !important }
 
-body {
-	font-family: Monospace;
-	background-color: #f0f0f0;
-	margin: 0px;
-	overflow: hidden;
-}
+			#info {
+				position: absolute;
+				top: 30px; left: 150px; width: 800px;
+				color: #000000;
+				padding: 5px;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: left;
+				z-index:100;
+			}
 
-#oldie { background-color: #ddd !important }
+			#options {
+				position: absolute;
+				top: 10px; left: 10px; width: 800px;
+				color: #000000;
+				padding: 5px;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: left;
+				z-index:100;
+			}
+		</style>
+		<script src="../build/Three.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
-#info {
-	position: absolute;
-	top: 30px; left: 150px; width: 800px;
-	color: #000000;
-	padding: 5px;
-	font-family: Monospace;
-	font-size: 13px;
-	text-align: left;
-	z-index:100;
-}
+		<script>
 
-#options {
-	position: absolute;
-	top: 10px; left: 10px; width: 800px;
-	color: #000000;
-	padding: 5px;
-	font-family: Monospace;
-	font-size: 13px;
-	text-align: left;
-	z-index:100;
-}
+			var camera, scene, projector, renderer,
+			info, mouse = { x: 0, y: 0 }, sun, cube;
 
-</style>
+			var bounce = 0;
 
-<script type="text/javascript" src="../build/Three.js"></script>
-<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-<script type="text/javascript" src="js/Stats.js"></script>
+			function init() {
 
-<script type="text/javascript">
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
 
-var camera, scene, projector, renderer,
-info, mouse = { x: 0, y: 0 }, sun, cube;
+				info = document.getElementById("info");
 
-var bounce = 0;
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.z = - 500;
 
-function init() {
+				scene = new THREE.Scene();
 
-	container = document.createElement( 'div' );
-	document.body.appendChild( container );
+				projector = new THREE.Projector();
 
-	info = document.getElementById("info");
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild(renderer.domElement);
 
-	camera = new THREE.Camera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
-	camera.position.z = -500;
+				var ambientLight = new THREE.AmbientLight( 0x606060 );
+				scene.add( ambientLight );
 
-	scene = new THREE.Scene();
+				sun = new THREE.DirectionalLight( 0xffffff );
+				sun.position = camera.position.clone();
+				scene.add( sun );
 
-	projector = new THREE.Projector();
+				createCube( 200, new THREE.Vector3( 0,0,0 ) );
 
-	renderer = new THREE.WebGLRenderer();
-	renderer.setSize( window.innerWidth, window.innerHeight );
-	container.appendChild(renderer.domElement);
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild( stats.domElement );
 
-	var ambientLight = new THREE.AmbientLight( 0x606060 );
-	scene.addLight( ambientLight );
+				container.onmousemove = onDocumentMouseMove;
+				animate();
 
-	sun = new THREE.DirectionalLight( 0xffffff );
-	sun.position = camera.position.clone();
-	scene.addLight( sun );
+			}
 
-	createCube( 200, new THREE.Vector3( 0,0,0 ) );
+			function createCube( s, p ) {
 
-	stats = new Stats();
-	stats.domElement.style.position = 'absolute';
-	stats.domElement.style.top = '0px';
-	container.appendChild( stats.domElement );
+				cube = new THREE.Mesh (
+					new THREE.CubeGeometry( s, s, s ),
+					new THREE.MeshLambertMaterial( { color: 0x003300 } )
+				);
 
-	container.onmousemove = onDocumentMouseMove;
-	animate();
+				cube.position = p;
+				scene.add( cube );
 
-}
+				THREE.Collisions.colliders.push( THREE.CollisionUtils.MeshOBB( cube ) );
 
-function createCube( s, p ) {
+			};
 
-	cube = new THREE.Mesh (
-		new THREE.CubeGeometry( s, s, s ),
-		new THREE.MeshLambertMaterial( { color: 0x003300 } )
-	);
+			function onDocumentMouseMove( event ) {
 
-	cube.position = p;
-	scene.addObject( cube );
+				event.preventDefault();
+				mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+				mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
-	THREE.Collisions.colliders.push( THREE.CollisionUtils.MeshOBB( cube ) );
+			};
 
-};
+			function animate() {
 
-function onDocumentMouseMove( event ) {
+				requestAnimationFrame( animate );
 
-	event.preventDefault();
-	mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-	mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+				info.innerHTML = "";
 
-};
+				var vector = new THREE.Vector3( mouse.x, mouse.y, 0.5 );
+				projector.unprojectVector( vector, camera );
 
-function animate() {
+				var ray = new THREE.Ray( camera.position, vector.subSelf( camera.position ).normalize() );
 
-	requestAnimationFrame( animate );
+				var c = THREE.Collisions.rayCastNearest( ray );
 
-	info.innerHTML = "";
+				if ( c ) {
 
-	var vector = new THREE.Vector3( mouse.x, mouse.y, 0.5 );
-	projector.unprojectVector( vector, camera );
+					info.innerHTML += "Found @ distance " + c.distance.toFixed(2);
+					c.mesh.materials[ 0 ].color.setHex( 0xaa0000 );
 
-	var ray = new THREE.Ray( camera.position, vector.subSelf( camera.position ).normalize() );
+				} else {
 
-	var c = THREE.Collisions.rayCastNearest( ray );
+					info.innerHTML += "No intersection";
+					cube.materials[0].color.setHex( 0x003300 );
 
-	if ( c ) {
-
-		info.innerHTML += "Found @ distance " + c.distance.toFixed(2);
-		c.mesh.materials[ 0 ].color.setHex( 0xaa0000 );
-
-	} else {
-
-		info.innerHTML += "No intersection";
-		cube.materials[0].color.setHex( 0x003300 );
-
-	}
+				}
 
 
-	cube.rotation.x += 0.01;
-	cube.rotation.y += 0.02;
-	cube.position.x = Math.sin(bounce) * 100;
-	bounce += 0.01;
+				cube.rotation.x += 0.01;
+				cube.rotation.y += 0.02;
+				cube.position.x = Math.sin(bounce) * 100;
+				bounce += 0.01;
 
-	renderer.render( scene, camera );
+				camera.lookAt( scene.position );
 
-	stats.update();
+				renderer.render( scene, camera );
 
-};
+				stats.update();
 
-function vts(v) {
+			};
 
-	if(!v) return "undefined<br>";
-	else return v.x + " , " + v.y + " , " + v.z + "<br>";
+			function vts(v) {
 
-};
+				if(!v) return "undefined<br>";
+				else return v.x + " , " + v.y + " , " + v.z + "<br>";
 
-</script>
+			};
 
-</head>
+		</script>
 
-<body onload="init();">
-<div id="info"></div>
-<div id="options"></div>
-</body>
+	</head>
+
+	<body onload="init();">
+		<div id="info"></div>
+		<div id="options"></div>
+	</body>
 
 </html>
