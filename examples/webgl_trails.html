@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - performance</title>
+		<title>three.js webgl - trails</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
-				background:#fff;
+				background:#000;
 				padding:0;
 				margin:0;
 				font-weight: bold;
@@ -37,7 +37,6 @@
 			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
 			init();
-			// render();
 			animate();
 
 
@@ -47,39 +46,35 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.x = 100000;
 				camera.position.z = 3200;
 
 				scene = new THREE.Scene();
 
-				var material = new THREE.MeshNormalMaterial( { shading: THREE.SmoothShading } );
+				var colors = [ 0x000000, 0xff0080, 0x8000ff, 0xffffff ];
+				var geometry = new THREE.Geometry();
 
-				var loader = new THREE.JSONLoader();
-				loader.load( { model: 'obj/Suzanne.js', callback: function ( geometry ) {
+				for ( var i = 0; i < 2000; i ++ ) {
 
-					geometry.computeVertexNormals();
+					var vertex = new THREE.Vertex();
+					vertex.position.x = Math.random() * 4000 - 2000;
+					vertex.position.y = Math.random() * 4000 - 2000;
+					vertex.position.z = Math.random() * 4000 - 2000;
+					geometry.vertices.push( vertex );
 
-					for ( var i = 0; i < 5000; i ++ ) {
+					geometry.colors.push( new THREE.Color( colors[ Math.floor( Math.random() * colors.length ) ] ) );
 
-						var mesh = new THREE.Mesh( geometry, material );
+				}
 
-						mesh.position.x = Math.random() * 10000 - 5000;
-						mesh.position.y = Math.random() * 10000 - 5000;
-						mesh.position.z = Math.random() * 10000 - 5000;
-						mesh.rotation.x = Math.random() * 360 * ( Math.PI / 180 );
-						mesh.rotation.y = Math.random() * 360 * ( Math.PI / 180 );
-						mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 50 + 100;
-						mesh.matrixAutoUpdate = false;
-						mesh.updateMatrix();
+				var material = new THREE.ParticleBasicMaterial( { size: 1, vertexColors: THREE. VertexColors, depthTest: false, opacity: 0.5, sizeAttenuation: false } );
 
-						scene.add( mesh );
-
-					}
-
-				} } );
+				var mesh = new THREE.ParticleSystem( geometry, material );
+				scene.add( mesh );
 
 				renderer = new THREE.WebGLRenderer( { preserveDrawingBuffer: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.sortObjects = false;
+				renderer.autoClearColor = false;
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
