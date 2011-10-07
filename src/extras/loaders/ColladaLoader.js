@@ -86,7 +86,7 @@ THREE.ColladaLoader = function () {
 
 			var parts = url.split( '/' );
 			parts.pop();
-			baseUrl = parts.join( '/' ) + '/';
+			baseUrl = parts.length < 1 ? '' : parts.join( '/' ) + '/';
 
 		}
 
@@ -369,6 +369,8 @@ THREE.ColladaLoader = function () {
 			var bone = bones[ i ];
 			var found = -1;
 
+			if ( bone.type != 'JOINT' ) continue;
+
 			for ( var j = 0; j < skin.joints.length; j ++ ) {
 
 				if ( bone.sid == skin.joints[ j ] ) {
@@ -408,7 +410,7 @@ THREE.ColladaLoader = function () {
 
 			} else {
 
-				throw "could not find joint!";
+				throw 'ColladaLoader: Could not find joint \'' + bone.sid + '\'.';
 
 			}
 
@@ -424,14 +426,14 @@ THREE.ColladaLoader = function () {
 
 		if ( !skinController || !skinController.skin ) {
 
-			console.log("could not find skin controller!");
+			console.log( 'ColladaLoader: Could not find skin controller.' );
 			return;
 
 		}
 
 		if ( !instanceCtrl.skeleton || !instanceCtrl.skeleton.length ) {
 
-			console.log("could not find the skeleton for the skin!");
+			console.log( 'ColladaLoader: Could not find the skeleton for the skin. ' );
 			return;
 
 		}
@@ -475,6 +477,8 @@ THREE.ColladaLoader = function () {
 			// skin 'm
 
 			for ( i = 0; i < bones.length; i ++ ) {
+
+				if ( bones[ i ].type != 'JOINT' ) continue;
 
 				for ( j = 0; j < bones[ i ].weights.length; j ++ ) {
 
@@ -576,7 +580,7 @@ THREE.ColladaLoader = function () {
 
 					}
 
-					console.log("DAE: morph-controller partially supported.");
+					console.log( 'ColladaLoader: Morph-controller partially supported.' );
 
 				default:
 					break;
@@ -2179,7 +2183,7 @@ THREE.ColladaLoader = function () {
 					break;
 
 				default:
-					//console.log(child.nodeName);
+					// console.log(child.nodeName);
 					break;
 
 			}
@@ -2227,7 +2231,7 @@ THREE.ColladaLoader = function () {
 
 				default:
 
-					console.log('Dae::Source:read dont know how to read ' + param.type);
+					console.log( 'ColladaLoader: Source: Read dont know how to read ' + param.type + '.' );
 					break;
 
 			}

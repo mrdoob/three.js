@@ -135,7 +135,7 @@ This code creates a camera, then creates a scene, adds a cube on it, creates a &
 
 ### Change Log ###
 
-2011 10 06 - **r45** (340.607 KB, gzip: 86.462 KB)
+2011 10 06 - **r45** (340.863 KB, gzip: 86.568 KB)
 
 * `Object/Scene.add*()` and `Object/Scene.remove*()` are now `Object/Scene.add()` and `Object/Scene.remove()`. ([mrdoob](http://github.com/mrdoob))
 * `LOD.add()` is now `LOD.addLevel()`. ([mrdoob](http://github.com/mrdoob))

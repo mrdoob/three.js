@@ -59,9 +59,9 @@ THREE.Loader.prototype = {
 
 	extractUrlbase: function ( url ) {
 
-		var chunks = url.split( "/" );
-		chunks.pop();
-		return chunks.length < 1 ? "." : chunks.join( "/" );
+		var parts = url.split( '/' );
+		parts.pop();
+		return parts.length < 1 ? '' : parts.join( '/' ) + '/';
 
 	},
 
