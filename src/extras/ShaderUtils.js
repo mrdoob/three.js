@@ -223,7 +223,7 @@ THREE.ShaderUtils = {
 							"vec3 pointHalfVector = normalize( vPointLight[ i ].xyz + viewPosition );",
 							"float pointDistance = vPointLight[ i ].w;",
 
-							"float pointDotNormalHalf = dot( normal, pointHalfVector );",
+							"float pointDotNormalHalf = max( dot( normal, pointHalfVector ), 0.0 );",
 							"float pointDiffuseWeight = max( dot( normal, pointVector ), 0.0 );",
 
 							"float pointSpecularWeight = specularTex.r * pow( pointDotNormalHalf, uShininess );",
@@ -249,7 +249,7 @@ THREE.ShaderUtils = {
 							"vec3 dirVector = normalize( lDirection.xyz );",
 							"vec3 dirHalfVector = normalize( lDirection.xyz + viewPosition );",
 
-							"float dirDotNormalHalf = dot( normal, dirHalfVector );",
+							"float dirDotNormalHalf = max( dot( normal, dirHalfVector ), 0.0 );",
 							"float dirDiffuseWeight = max( dot( normal, dirVector ), 0.0 );",
 
 							"float dirSpecularWeight = specularTex.r * pow( dirDotNormalHalf, uShininess );",
