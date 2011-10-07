@@ -14,6 +14,40 @@ var Code = function () {
 	_checkbox.style.margin = '20px 6px 0px 20px';
 	_checkbox.addEventListener( 'click', function () { _html = !_html; _update(); }, false );
 	_domElement.appendChild( _checkbox );
+	
+	var _preview = document.createElement( 'a' );
+	_preview.href = '#';
+	_preview.innerHTML = 'preview';
+	_preview.style.margin = '20px 6px 0px 20px';
+	_preview.addEventListener( 'click', 
+		function () { 
+			
+			
+			// Get unescaped code gen
+			var temp=document.createElement("pre");
+			temp.innerHTML = _codegen( true );
+			temp = temp.firstChild.nodeValue;
+			temp = temp.replace("js/Three.js", "../build/Three.js");
+			temp = temp.replace("js/RequestAnimationFrame.js", "../examples/js/RequestAnimationFrame.js");
+			aaa = temp;
+			console.log('test', temp);
+			
+			var opener = window.open('','myconsole',
+			  'width=800,height=400'
+			   +',menubar=1'
+			   +',toolbar=0'
+			   +',status=1'
+			   +',scrollbars=1'
+			   +',resizable=1');
+			
+			
+			opener.document.writeln( temp );
+			opener.document.close();
+			
+		}, false 
+	);
+	_domElement.appendChild( _preview );
+	
 
 	/*
 	var _checkboxText = document.createElement( 'span' );
@@ -34,9 +68,8 @@ var Code = function () {
 	//
 
 	var _list = [];
-
-	var _update = function () {
-
+	
+	var _codegen = function (html) {
 		var string = '';
 
 		string += [
@@ -48,7 +81,8 @@ var Code = function () {
 			'',
 			'function init() {',
 			'',
-			'\tcamera = new THREE.Camera();',
+			'\tcamera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );',
+			'\tcamera.position.z = 500;',
 			'',
 			'\tscene = new THREE.Scene();',
 			''
@@ -79,18 +113,24 @@ var Code = function () {
 			'function render() {',
 			'',
 			'\trenderer.render( scene, camera );',
+			'\trenderer.setSize( window.innerWidth, window.innerHeight );',			
 			'',
 			'}'
 
 		].join( '\n' );
 
-		if ( _html ) {
+		if ( html ) {
 
 			string = '&lt;!doctype html&gt;\n&lt;html&gt;\n\t&lt;body&gt;\n\t\t&lt;script src=\"js/Three.js\"&gt;&lt;/script&gt;\n\t\t&lt;script src=\"js/RequestAnimationFrame.js\"&gt;&lt;/script&gt;\n\t\t&lt;script&gt;\n' + ( '\n' + string ).replace( /\n/gi, '\n\t\t\t' ) + '\n\n\t\t&lt;/script&gt;\n\t&lt;/body&gt;\n&lt;/html&gt;';
 
 		}
 
-		_code.innerHTML = string;
+		return string;
+	}
+
+	var _update = function () {
+
+		_code.innerHTML = _codegen( _html );
 
 	}
 
