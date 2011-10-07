@@ -36,7 +36,6 @@ UI.Viewports = function () {
 	_views[ 3 ].camera.position.x = 1000;
 	_views[ 3 ].camera.position.y = 1000;
 	_views[ 3 ].camera.position.z = 1000;
-	_views[ 3 ].camera.useTarget = true;
 
 	// guides
 
@@ -399,7 +398,7 @@ UI.Viewports = function () {
 
 		//
 
-		_views[ 3 ].camera.lookAt( _scene.origin );
+		_views[ 3 ].camera.lookAt( _scene.position );
 
 		_renderer.clear();
 
