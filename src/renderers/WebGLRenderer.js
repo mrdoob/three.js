@@ -2893,7 +2893,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		attributes = program.attributes;
 
 		var updateBuffers = false,
-			geometryGroupHash = geometryGroup.id * 0xffffff + program.id;
+			wireframeBit = material.wireframe ? 1 : 0,
+			geometryGroupHash = ( geometryGroup.id * 0xffffff ) + ( program.id * 2 ) + wireframeBit;
 
 		if ( geometryGroupHash != _currentGeometryGroupHash ) {
 
@@ -3694,12 +3695,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_this.info.render.faces = 0;
 
 		// hack: find parent of camera.
-		if (camera.matrixAutoUpdate) {
+
+		if ( camera.matrixAutoUpdate ) {
+
 			var parent = camera;
+
 			while ( parent.parent ) {
+
 				parent = parent.parent;
+
 			}
+
 			parent.update( undefined, true );
+
 		}
 
 		scene.update( undefined, false, camera );
