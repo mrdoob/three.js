@@ -226,12 +226,10 @@ THREE.ShaderUtils = {
 							"float pointDotNormalHalf = dot( normal, pointHalfVector );",
 							"float pointDiffuseWeight = max( dot( normal, pointVector ), 0.0 );",
 
-							"float pointSpecularWeight = 0.0;",
-							"if ( pointDotNormalHalf >= 0.0 )",
-								"pointSpecularWeight = specularTex.r * pow( pointDotNormalHalf, uShininess );",
+							"float pointSpecularWeight = specularTex.r * pow( pointDotNormalHalf, uShininess );",
 
 							"pointDiffuse += pointDistance * pointLightColor[ i ] * uDiffuseColor * pointDiffuseWeight;",
-							"pointSpecular += pointDistance * pointLightColor[ i ] * uSpecularColor * pointSpecularWeight;",
+							"pointSpecular += pointDistance * pointLightColor[ i ] * uSpecularColor * pointSpecularWeight * pointDiffuseWeight;",
 
 						"}",
 
@@ -254,12 +252,10 @@ THREE.ShaderUtils = {
 							"float dirDotNormalHalf = dot( normal, dirHalfVector );",
 							"float dirDiffuseWeight = max( dot( normal, dirVector ), 0.0 );",
 
-							"float dirSpecularWeight = 0.0;",
-							"if ( dirDotNormalHalf >= 0.0 )",
-								"dirSpecularWeight = specularTex.r * pow( dirDotNormalHalf, uShininess );",
+							"float dirSpecularWeight = specularTex.r * pow( dirDotNormalHalf, uShininess );",
 
 							"dirDiffuse += directionalLightColor[ i ] * uDiffuseColor * dirDiffuseWeight;",
-							"dirSpecular += directionalLightColor[ i ] * uSpecularColor * dirSpecularWeight;",
+							"dirSpecular += directionalLightColor[ i ] * uSpecularColor * dirSpecularWeight * dirDiffuseWeight;",
 
 						"}",
 
