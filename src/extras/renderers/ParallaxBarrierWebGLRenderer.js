@@ -1,5 +1,6 @@
 /**
  * @author mrdoob / http://mrdoob.com/
+ * @author marklundin / http://mark-lundin.com/
  */
 
 if ( THREE.WebGLRenderer ) {
