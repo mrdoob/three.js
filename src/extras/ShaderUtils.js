@@ -280,7 +280,7 @@ THREE.ShaderUtils = {
 
 					"#endif",
 
-					"gl_FragColor.xyz = gl_FragColor.xyz * totalDiffuse + totalSpecular + ambientLightColor * uAmbientColor;",
+					"gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor * uAmbientColor) + totalSpecular;",
 
 					"if ( enableReflection ) {",
 
