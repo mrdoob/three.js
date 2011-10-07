@@ -21,14 +21,14 @@ UI.Viewports = function () {
 		{ x: null, y: null, width: null, height: null, camera: null }
 	];
 
-	_views[ 0 ].camera = new THREE.PerspectiveCamera( 50, 1, 1, 5000 ); // top
+	_views[ 0 ].camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, - 2000, 2000 ); // top
 	_views[ 0 ].camera.position.y = 1000;
 	_views[ 0 ].camera.rotation.x = - Math.PI / 2;
 
-	_views[ 1 ].camera = new THREE.PerspectiveCamera( 50, 1, 1, 5000 ); // front
+	_views[ 1 ].camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, - 2000, 2000 ); // front
 	_views[ 1 ].camera.position.z = 1000;
 
-	_views[ 2 ].camera = new THREE.PerspectiveCamera( 50, 1, 1, 5000 ); // left
+	_views[ 2 ].camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, - 2000, 2000 ); // left
 	_views[ 2 ].camera.position.x = - 1000;
 	_views[ 2 ].camera.rotation.y = - Math.PI / 2;
 
@@ -65,7 +65,7 @@ UI.Viewports = function () {
 
 	var _projector = new THREE.Projector();
 
-	var _renderer = new THREE.WebGLRenderer( { antialias: true } );
+	var _renderer = new THREE.WebGLRenderer( /*{ antialias: true }*/ );
 	_renderer.autoClear = false;
 	_renderer.domElement.addEventListener( 'mousedown', function ( event ) {
 
@@ -373,13 +373,22 @@ UI.Viewports = function () {
 
 	var _updateCameras = function () {
 
-		_views[ 0 ].camera.aspect = _views[ 0 ].width / _views[ 0 ].height;
+		_views[ 0 ].camera.left = _views[ 0 ].width / - 2;
+		_views[ 0 ].camera.right = _views[ 0 ].width / 2;
+		_views[ 0 ].camera.top = _views[ 0 ].height / 2;
+		_views[ 0 ].camera.bottom = _views[ 0 ].height / - 2;
 		_views[ 0 ].camera.updateProjectionMatrix();
 
-		_views[ 1 ].camera.aspect = _views[ 1 ].width / _views[ 1 ].height;
+		_views[ 1 ].camera.left = _views[ 1 ].width / - 2;
+		_views[ 1 ].camera.right = _views[ 1 ].width / 2;
+		_views[ 1 ].camera.top = _views[ 1 ].height / 2;
+		_views[ 1 ].camera.bottom = _views[ 1 ].height / - 2;
 		_views[ 1 ].camera.updateProjectionMatrix();
 
-		_views[ 2 ].camera.aspect = _views[ 2 ].width / _views[ 2 ].height;
+		_views[ 2 ].camera.left = _views[ 2 ].width / - 2;
+		_views[ 2 ].camera.right = _views[ 2 ].width / 2;
+		_views[ 2 ].camera.top = _views[ 2 ].height / 2;
+		_views[ 2 ].camera.bottom = _views[ 2 ].height / - 2;
 		_views[ 2 ].camera.updateProjectionMatrix();
 
 		_views[ 3 ].camera.aspect = _views[ 3 ].width / _views[ 3 ].height;
