@@ -388,13 +388,10 @@ THREE.ShaderChunk = {
 				"float pointDotNormalHalf = dot( normal, pointHalfVector );",
 				"float pointDiffuseWeight = max( dot( normal, pointVector ), 0.0 );",
 
-				"float pointSpecularWeight = 0.0;",
-
-				"if ( pointDotNormalHalf >= 0.0 )",
-					"pointSpecularWeight = pow( pointDotNormalHalf, shininess );",
+				"float pointSpecularWeight = pow( pointDotNormalHalf, shininess );",
 
 				"pointDiffuse  += diffuse * pointLightColor[ i ] * pointDiffuseWeight * pointDistance;",
-				"pointSpecular += specular * pointLightColor[ i ] * pointSpecularWeight * pointDistance;",
+				"pointSpecular += specular * pointLightColor[ i ] * pointSpecularWeight * pointDiffuseWeight * pointDistance;",
 
 			"}",
 
@@ -416,12 +413,10 @@ THREE.ShaderChunk = {
 
 				"float dirDiffuseWeight = max( dot( normal, dirVector ), 0.0 );",
 
-				"float dirSpecularWeight = 0.0;",
-				"if ( dirDotNormalHalf >= 0.0 )",
-					"dirSpecularWeight = pow( dirDotNormalHalf, shininess );",
+				"float dirSpecularWeight = pow( dirDotNormalHalf, shininess );",
 
 				"dirDiffuse  += diffuse * directionalLightColor[ i ] * dirDiffuseWeight;",
-				"dirSpecular += specular * directionalLightColor[ i ] * dirSpecularWeight;",
+				"dirSpecular += specular * directionalLightColor[ i ] * dirSpecularWeight * dirDiffuseWeight;",
 
 			"}",
 
@@ -444,7 +439,7 @@ THREE.ShaderChunk = {
 
 		"#endif",
 
-		"gl_FragColor.xyz = gl_FragColor.xyz * totalDiffuse + totalSpecular + ambientLightColor * ambient;"
+		"gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor * ambient ) + totalSpecular;"
 
 	].join("\n"),
 
