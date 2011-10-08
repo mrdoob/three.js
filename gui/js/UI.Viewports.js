@@ -21,16 +21,38 @@ UI.Viewports = function () {
 		{ x: null, y: null, width: null, height: null, camera: null }
 	];
 
-	_views[ 0 ].camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, - 2000, 2000 ); // top
-	_views[ 0 ].camera.position.y = 1000;
-	_views[ 0 ].camera.rotation.x = - Math.PI / 2;
 
-	_views[ 1 ].camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, - 2000, 2000 ); // front
-	_views[ 1 ].camera.position.z = 1000;
+	//_views[ 0 ].camera = new THREE.PerspectiveCamera( 50, 1, 1, 5000 ); // front
+	_views[ 0 ].camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, - 2000, 2000 ); // front
+	_views[ 0 ].camera.position.z = 1000;
 
-	_views[ 2 ].camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, - 2000, 2000 ); // left
-	_views[ 2 ].camera.position.x = - 1000;
-	_views[ 2 ].camera.rotation.y = - Math.PI / 2;
+	//_views[ 2 ].camera = new THREE.PerspectiveCamera( 50, 1, 1, 5000 ); // top
+	_views[ 2 ].camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, - 2000, 2000 ); // top
+	_views[ 2 ].camera.position.y = 1000;
+	_views[ 2 ].camera.rotation.x = - Math.PI / 2;
+
+ 	//_views[ 3 ].camera = new THREE.PerspectiveCamera( 50, 1, 1, 5000 ); // left
+	_views[ 1 ].camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, - 2000, 2000 ); // left
+	_views[ 1 ].camera.position.x = - 1000;
+	_views[ 1 ].camera.rotation.y = -Math.PI / 2;
+	
+	// var toLeft = function() {
+	// 	this.rotation.x = 0;
+	// 	this.rotation.y = - Math.PI / 2;
+	// 	this.rotation.z = 0;
+	// }
+	// 
+	// var toRight = function() {
+	// 	this.rotation.x = 0;
+	// 	this.rotation.y = Math.PI / 2;
+	// 	this.rotation.z = 0;
+	// }
+	// 
+	// var toTop = function() {
+	// 	this.rotation.x = - Math.PI / 2;
+	// 	this.rotation.y = 0;
+	// 	this.rotation.z = 0;
+	// }
 
 	_views[ 3 ].camera = new THREE.PerspectiveCamera( 50, 1, 1, 5000 ); // perspective
 	_views[ 3 ].camera.position.x = 1000;

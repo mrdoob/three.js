@@ -29,7 +29,7 @@ var Code = function () {
 			temp = temp.firstChild.nodeValue;
 			temp = temp.replace("js/Three.js", "../build/Three.js");
 			temp = temp.replace("js/RequestAnimationFrame.js", "../examples/js/RequestAnimationFrame.js");
-			aaa = temp;
+
 			console.log('test', temp);
 			
 			var opener = window.open('','myconsole',
