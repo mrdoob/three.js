@@ -97,6 +97,7 @@ var Code = function () {
 
 			'',
 			'\trenderer = new THREE.WebGLRenderer()',
+			'\trenderer.setSize( window.innerWidth, window.innerHeight );',
 			'\tdocument.body.appendChild( renderer.domElement );',
 			'',
 			'}',
@@ -111,7 +112,6 @@ var Code = function () {
 			'function render() {',
 			'',
 			'\trenderer.render( scene, camera );',
-			'\trenderer.setSize( window.innerWidth, window.innerHeight );',
 			'',
 			'}'
 
