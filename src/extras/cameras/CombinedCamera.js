@@ -11,11 +11,23 @@ THREE.CombinedCamera = function ( width, height, fov, near, far, orthonear, orth
 
 	THREE.Camera.call( this );
 
+	this.fov = fov;
+	
+	this.left = -width / 2;
+	this.right = width / 2
+	this.top = height / 2;
+	this.bottom = -height / 2;
+	
 	// We could also handle the projectionMatrix internally, but just wanted to test nested camera objects
 	this.cameraO = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 	orthonear, orthofar );
 	this.cameraP = new THREE.PerspectiveCamera( fov, width/height, near, far );
+	console.log(this.cameraO);
 
+	this.zoom = 1;
+	
 	this.toPerspective();
+	
+	
 
 };
 
@@ -26,28 +38,36 @@ THREE.CombinedCamera.prototype.toPerspective = function () {
 
 	this.near = this.cameraP.near;
 	this.far = this.cameraP.far;
+	this.cameraP.fov =  this.fov / this.zoom ;
+	this.cameraP.updateProjectionMatrix();
 	this.projectionMatrix = this.cameraP.projectionMatrix;
 	
-	this.isPersepective = true;
-	this.isOrthographics = false;
+	this.inPersepectiveMode = true;
+	this.inOrthographicMode = false;
 
 };
 
 THREE.CombinedCamera.prototype.toOrthographic = function () {
 
+	this.cameraO.left = this.left / this.zoom;
+	this.cameraO.right = this.right / this.zoom;
+	this.cameraO.top = this.top / this.zoom;
+	this.cameraO.bottom = this.bottom / this.zoom;
+	
+	this.cameraO.updateProjectionMatrix();
+
 	this.near = this.cameraO.near;
 	this.far = this.cameraO.far;
 	this.projectionMatrix = this.cameraO.projectionMatrix;
 	
-	this.isPersepective = false;
-	this.isOrthographics = true;
+	this.inPersepectiveMode = false;
+	this.inOrthographicMode = true;
 
 };
 
-THREE.CombinedCamera.prototype.setFov = function(fov) {
-
-	this.cameraP.fov = fov;
-	this.cameraP.updateProjectionMatrix();
+THREE.CombinedCamera.prototype.setFov = function(fov) {	
+	this.fov = fov;
+	
 	this.toPerspective();
 
 };
@@ -66,6 +86,20 @@ THREE.CombinedCamera.prototype.setLens = function(focalLength, framesize) {
 	this.setFov(fov);
 
 	return fov;
+};
+
+
+THREE.CombinedCamera.prototype.setZoom = function(zoom) {
+
+	this.zoom = zoom;
+	
+	if (this.inPersepectiveMode) {
+		this.toPerspective();
+	} else {
+		this.toOrthographic();
+	}
+	
+
 };
 
 THREE.CombinedCamera.prototype.toFrontView = function() {
