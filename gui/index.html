@@ -45,8 +45,8 @@
 
 		<script>
 
-			var BlobBuilderShim = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
-			var URLShim = window.URL || window.webkitURL || window.mozURL;
+			window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
+			window.URL = window.URL || window.webkitURL || window.mozURL;
 
 			var Signal = signals.Signal;
 
@@ -151,10 +151,10 @@
 
 						case 'js':
 
-							var blob = new BlobBuilderShim();
+							var blob = new BlobBuilder();
 							blob.append( contents );
 
-							var url = URLShim.createObjectURL( blob.getBlob() );
+							var url = URL.createObjectURL( blob.getBlob() );
 
 							var loader = new THREE.JSONLoader();
 							loader.load( { model: url, callback: function ( geometry ) {
