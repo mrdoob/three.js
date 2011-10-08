@@ -27,6 +27,9 @@ THREE.CombinedCamera.prototype.toPerspective = function () {
 	this.near = this.cameraP.near;
 	this.far = this.cameraP.far;
 	this.projectionMatrix = this.cameraP.projectionMatrix;
+	
+	this.isPersepective = true;
+	this.isOrthographics = false;
 
 };
 
@@ -35,6 +38,9 @@ THREE.CombinedCamera.prototype.toOrthographic = function () {
 	this.near = this.cameraO.near;
 	this.far = this.cameraO.far;
 	this.projectionMatrix = this.cameraO.projectionMatrix;
+	
+	this.isPersepective = false;
+	this.isOrthographics = true;
 
 };
 
@@ -61,3 +67,48 @@ THREE.CombinedCamera.prototype.setLens = function(focalLength, framesize) {
 
 	return fov;
 };
+
+THREE.CombinedCamera.prototype.toFrontView = function() {
+	this.rotation.x = 0;
+	this.rotation.y = 0;
+	this.rotation.z = 0;
+	
+	//TODO: Better way to disable camera.lookAt()?
+	this.rotationAutoUpdate = false;
+};
+
+THREE.CombinedCamera.prototype.toBackView = function() {
+	this.rotation.x = 0;
+	this.rotation.y = Math.PI;
+	this.rotation.z = 0;
+	this.rotationAutoUpdate = false;
+};
+	
+THREE.CombinedCamera.prototype.toLeftView = function() {
+	this.rotation.x = 0;
+	this.rotation.y = - Math.PI / 2;
+	this.rotation.z = 0;
+	this.rotationAutoUpdate = false;
+};
+
+THREE.CombinedCamera.prototype.toRightView = function() {
+	this.rotation.x = 0;
+	this.rotation.y = Math.PI / 2;
+	this.rotation.z = 0;
+	this.rotationAutoUpdate = false;
+};
+
+THREE.CombinedCamera.prototype.toTopView = function() {
+	this.rotation.x = - Math.PI / 2;
+	this.rotation.y = 0;
+	this.rotation.z = 0;
+	this.rotationAutoUpdate = false;
+};
+
+THREE.CombinedCamera.prototype.toBottomView = function() {
+	this.rotation.x = Math.PI / 2;
+	this.rotation.y = 0;
+	this.rotation.z = 0;
+	this.rotationAutoUpdate = false;
+};
+
