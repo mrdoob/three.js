@@ -14,8 +14,9 @@ THREE.Projector = function() {
 
 	_objectList = [], _renderList = [],
 
-	_vector3 = new THREE.Vector4(),
+	_vector3 = new THREE.Vector3(),
 	_vector4 = new THREE.Vector4(),
+
 	_projScreenMatrix = new THREE.Matrix4(),
 	_projScreenObjectMatrix = new THREE.Matrix4(),
 
@@ -36,11 +37,13 @@ THREE.Projector = function() {
 
 	this.projectVector = function ( vector, camera ) {
 
+		THREE.Matrix4.makeInvert( camera.matrixWorld, camera.matrixWorldInverse );
+
 		_projScreenMatrix.multiply( camera.projectionMatrix, camera.matrixWorldInverse );
 		_projScreenMatrix.multiplyVector3( vector );
 
 		return vector;
-		
+
 	};
 
 	this.unprojectVector = function ( vector, camera ) {
@@ -49,7 +52,7 @@ THREE.Projector = function() {
 		_projScreenMatrix.multiplyVector3( vector );
 
 		return vector;
-		
+
 	};
 
 	/**
@@ -73,7 +76,7 @@ THREE.Projector = function() {
 		end.subSelf( vector ).normalize();
 
 		return new THREE.Ray( vector, end );
-		
+
 	};
 
 	this.projectObjects = function ( scene, camera, sort ) {
@@ -131,7 +134,10 @@ THREE.Projector = function() {
 
 		scene.update( undefined, false, camera );
 
+		THREE.Matrix4.makeInvert( camera.matrixWorld, camera.matrixWorldInverse );
+
 		_projScreenMatrix.multiply( camera.projectionMatrix, camera.matrixWorldInverse );
+
 		computeFrustum( _projScreenMatrix );
 
 		objects = this.projectObjects( scene, camera, true );

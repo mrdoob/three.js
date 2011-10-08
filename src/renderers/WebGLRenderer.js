@@ -2893,7 +2893,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		attributes = program.attributes;
 
 		var updateBuffers = false,
-			geometryGroupHash = geometryGroup.id * 0xffffff + program.id;
+			wireframeBit = material.wireframe ? 1 : 0,
+			geometryGroupHash = ( geometryGroup.id * 0xffffff ) + ( program.id * 2 ) + wireframeBit;
 
 		if ( geometryGroupHash != _currentGeometryGroupHash ) {
 
@@ -3522,12 +3523,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				scene.update( undefined, false, _cameraLight );
 
+				THREE.Matrix4.makeInvert( _cameraLight.matrixWorld, _cameraLight.matrixWorldInverse );
+
 				// compute shadow matrix
 
-				shadowMatrix.set( 0.5, 0.0, 0.0, 0.5,
-								  0.0, 0.5, 0.0, 0.5,
-								  0.0, 0.0, 0.5, 0.5,
-								  0.0, 0.0, 0.0, 1.0 );
+				shadowMatrix.set(
+					0.5, 0.0, 0.0, 0.5,
+					0.0, 0.5, 0.0, 0.5,
+					0.0, 0.0, 0.5, 0.5,
+					0.0, 0.0, 0.0, 1.0
+				);
 
 				shadowMatrix.multiplySelf( _cameraLight.projectionMatrix );
 				shadowMatrix.multiplySelf( _cameraLight.matrixWorldInverse );
@@ -3538,6 +3543,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				_cameraLight.projectionMatrix.flattenToArray( _projectionMatrixArray );
 
 				_projScreenMatrix.multiply( _cameraLight.projectionMatrix, _cameraLight.matrixWorldInverse );
+
 				computeFrustum( _projScreenMatrix );
 
 				_this.initWebGLObjects( scene );
@@ -3694,15 +3700,24 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_this.info.render.faces = 0;
 
 		// hack: find parent of camera.
-		if (camera.matrixAutoUpdate) {
+
+		if ( camera.matrixAutoUpdate ) {
+
 			var parent = camera;
+
 			while ( parent.parent ) {
+
 				parent = parent.parent;
+
 			}
+
 			parent.update( undefined, true );
+
 		}
 
 		scene.update( undefined, false, camera );
+
+		THREE.Matrix4.makeInvert( camera.matrixWorld, camera.matrixWorldInverse );
 
 		camera.matrixWorldInverse.flattenToArray( _viewMatrixArray );
 		camera.projectionMatrix.flattenToArray( _projectionMatrixArray );

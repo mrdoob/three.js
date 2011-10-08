@@ -143,7 +143,7 @@ This code creates a camera, then creates a scene, adds a cube on it, creates a &
 * Added `.depthWrite` and `.fog` to `Material`. ([alteredq](http://github.com/alteredq))
 * Added `.applyMatrix` to `Geometry`. ([mrdoob](http://github.com/mrdoob))
 * Improved postprocessing stack in `/examples/js/postprocessing`. ([alteredq](http://github.com/alteredq))
-* Added a realistic sking shading example. ([alteredq](http://github.com/alteredq))
+* Added a realistic skin shading example. ([alteredq](http://github.com/alteredq))
 * Started of a GUI for composing scenes and autogenerate code. ([mrdoob](http://github.com/mrdoob))
 * Added `.center()` to `GeometryUtils`. ([alteredq](http://github.com/alteredq))
 * Fixed buggy scenegraph manipulation (adding/removing objects). ([jsermeno](http://github.com/jsermeno), [alteredq](http://github.com/alteredq) and [skython](http://github.com/skython))
