@@ -131,22 +131,6 @@
 
 					switch ( extension ) {
 
-						case 'dae':
-
-							var parser = new DOMParser();
-							var xml = parser.parseFromString( contents, 'text/xml' );
-
-							var loader = new THREE.ColladaLoader();
-							loader.parse( xml, function ( collada ) {
-
-								// console.log( collada );
-
-								signals.added.dispatch( collada.scene );
-
-							} );
-
-							break;
-
 						case 'js':
 
 							var blob = new BlobBuilder();
@@ -155,7 +139,7 @@
 							var url = URL.createObjectURL( blob.getBlob() );
 
 							var loader = new THREE.JSONLoader();
-							loader.load( { model: url, callback: function ( geometry ) {
+							loader.load( url, function ( geometry ) {
 
 								geometry.gui = {
 									paremeters: {
@@ -172,9 +156,27 @@
 
 								signals.added.dispatch( mesh );
 
-							} } );
+							} );
 
 							break;
+
+						case 'dae':
+
+							var parser = new DOMParser();
+							var xml = parser.parseFromString( contents, 'text/xml' );
+
+							var loader = new THREE.ColladaLoader();
+							loader.parse( xml, function ( collada ) {
+
+								// console.log( collada );
+
+								signals.added.dispatch( collada.scene );
+
+							} );
+
+							break;
+
+
 
 					}
 
