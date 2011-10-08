@@ -79,40 +79,45 @@ THREE.Projector = function() {
 
 	};
 
-	this.projectObjects = function ( scene, camera, sort ) {
-
-		var o, ol, objects, object, matrix;
+	this.projectObjects = function ( object, sort ) {
 
 		_objectList.length = 0;
 		_objectCount = 0;
 
-		objects = scene.objects;
+		var projectObject = function ( object ) {
 
-		for ( o = 0, ol = objects.length; o < ol; o ++ ) {
+			if ( object.visible == false ) return;
 
-			object = objects[ o ];
+			if ( object instanceof THREE.Particle || object instanceof THREE.Line ||
+			( object instanceof THREE.Mesh && ( !object.frustumCulled || isInFrustum( object ) ) ) ) {
 
-			if ( !object.visible || ( object instanceof THREE.Mesh && ( object.frustumCulled && !isInFrustum( object ) ) ) ) continue;
+				_object = getNextObjectInPool();
 
-			_object = getNextObjectInPool();
+				_vector3.copy( object.position );
+				_projScreenMatrix.multiplyVector3( _vector3 );
 
-			_vector3.copy( object.position );
-			_projScreenMatrix.multiplyVector3( _vector3 );
+				_object.object = object;
+				_object.z = _vector3.z;
 
-			_object.object = object;
-			_object.z = _vector3.z;
+				_objectList.push( _object );
 
-			_objectList.push( _object );
+			}
 
-		}
+			for ( var c = 0, cl = object.children.length; c < cl; c ++ ) {
+
+				projectObject( object.children[ c ] );
+
+			}
+
+		};
+
+		projectObject( scene );
 
 		sort && _objectList.sort( painterSort );
 
 		return _objectList;
 
 	};
-
-	// TODO: Rename to projectElements?
 
 	this.projectScene = function ( scene, camera, sort ) {
 
@@ -130,9 +135,14 @@ THREE.Projector = function() {
 		_lineCount = 0;
 		_particleCount = 0;
 
-		camera.matrixAutoUpdate && camera.update( undefined, true );
+		if ( camera.parent == null ) {
 
-		scene.update( undefined, false, camera );
+			console.warn( "Camera is not on the Scene. Adding it..." );
+			scene.add( camera );
+
+		}
+
+		scene.updateMatrixWorld();
 
 		THREE.Matrix4.makeInvert( camera.matrixWorld, camera.matrixWorldInverse );
 
@@ -140,7 +150,7 @@ THREE.Projector = function() {
 
 		computeFrustum( _projScreenMatrix );
 
-		objects = this.projectObjects( scene, camera, true );
+		objects = this.projectObjects( scene, true );
 
 		for ( o = 0, ol = objects.length; o < ol; o++ ) {
 
@@ -149,7 +159,6 @@ THREE.Projector = function() {
 			if ( !object.visible ) continue;
 
 			objectMatrix = object.matrixWorld;
-			objectMatrixRotation = object.matrixRotationWorld;
 
 			objectMaterials = object.materials;
 			objectOverdraw = object.overdraw;
@@ -162,6 +171,8 @@ THREE.Projector = function() {
 				vertices = geometry.vertices;
 				faces = geometry.faces;
 				faceVertexUvs = geometry.faceVertexUvs;
+
+				objectMatrixRotation = object.matrixRotationWorld.extractRotation( object.matrixWorld );
 
 				for ( v = 0, vl = vertices.length; v < vl; v ++ ) {
 

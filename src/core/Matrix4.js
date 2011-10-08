@@ -102,6 +102,72 @@ THREE.Matrix4.prototype = {
 
 	},
 
+	multiply: function ( a, b ) {
+
+		var a11 = a.n11, a12 = a.n12, a13 = a.n13, a14 = a.n14,
+		a21 = a.n21, a22 = a.n22, a23 = a.n23, a24 = a.n24,
+		a31 = a.n31, a32 = a.n32, a33 = a.n33, a34 = a.n34,
+		a41 = a.n41, a42 = a.n42, a43 = a.n43, a44 = a.n44,
+
+		b11 = b.n11, b12 = b.n12, b13 = b.n13, b14 = b.n14,
+		b21 = b.n21, b22 = b.n22, b23 = b.n23, b24 = b.n24,
+		b31 = b.n31, b32 = b.n32, b33 = b.n33, b34 = b.n34,
+		b41 = b.n41, b42 = b.n42, b43 = b.n43, b44 = b.n44;
+
+		this.n11 = a11 * b11 + a12 * b21 + a13 * b31 + a14 * b41;
+		this.n12 = a11 * b12 + a12 * b22 + a13 * b32 + a14 * b42;
+		this.n13 = a11 * b13 + a12 * b23 + a13 * b33 + a14 * b43;
+		this.n14 = a11 * b14 + a12 * b24 + a13 * b34 + a14 * b44;
+
+		this.n21 = a21 * b11 + a22 * b21 + a23 * b31 + a24 * b41;
+		this.n22 = a21 * b12 + a22 * b22 + a23 * b32 + a24 * b42;
+		this.n23 = a21 * b13 + a22 * b23 + a23 * b33 + a24 * b43;
+		this.n24 = a21 * b14 + a22 * b24 + a23 * b34 + a24 * b44;
+
+		this.n31 = a31 * b11 + a32 * b21 + a33 * b31 + a34 * b41;
+		this.n32 = a31 * b12 + a32 * b22 + a33 * b32 + a34 * b42;
+		this.n33 = a31 * b13 + a32 * b23 + a33 * b33 + a34 * b43;
+		this.n34 = a31 * b14 + a32 * b24 + a33 * b34 + a34 * b44;
+
+		this.n41 = a41 * b11 + a42 * b21 + a43 * b31 + a44 * b41;
+		this.n42 = a41 * b12 + a42 * b22 + a43 * b32 + a44 * b42;
+		this.n43 = a41 * b13 + a42 * b23 + a43 * b33 + a44 * b43;
+		this.n44 = a41 * b14 + a42 * b24 + a43 * b34 + a44 * b44;
+
+		return this;
+
+	},
+
+	multiplySelf: function ( m ) {
+
+		return this.multiply( this, m );
+
+	},
+
+	multiplyToArray: function ( a, b, r ) {
+
+		this.multiply( a, b );
+
+		r[ 0 ] = this.n11; r[ 1 ] = this.n21; r[ 2 ] = this.n31; r[ 3 ] = this.n41;
+		r[ 4 ] = this.n12; r[ 5 ] = this.n22; r[ 6 ] = this.n32; r[ 7 ] = this.n42;
+		r[ 8 ]  = this.n13; r[ 9 ]  = this.n23; r[ 10 ] = this.n33; r[ 11 ] = this.n43;
+		r[ 12 ] = this.n14; r[ 13 ] = this.n24; r[ 14 ] = this.n34; r[ 15 ] = this.n44;
+
+		return this;
+
+	},
+
+	multiplyScalar: function ( s ) {
+
+		this.n11 *= s; this.n12 *= s; this.n13 *= s; this.n14 *= s;
+		this.n21 *= s; this.n22 *= s; this.n23 *= s; this.n24 *= s;
+		this.n31 *= s; this.n32 *= s; this.n33 *= s; this.n34 *= s;
+		this.n41 *= s; this.n42 *= s; this.n43 *= s; this.n44 *= s;
+
+		return this;
+
+	},
+
 	multiplyVector3: function ( v ) {
 
 		var vx = v.x, vy = v.y, vz = v.z,
@@ -153,74 +219,6 @@ THREE.Matrix4.prototype = {
 		v.w = ( a.w ) ? this.n41 * a.x + this.n42 * a.y + this.n43 * a.z + this.n44 * a.w : 1;
 
 		return v;
-
-	},
-
-	multiply: function ( a, b ) {
-
-		var a11 = a.n11, a12 = a.n12, a13 = a.n13, a14 = a.n14,
-		a21 = a.n21, a22 = a.n22, a23 = a.n23, a24 = a.n24,
-		a31 = a.n31, a32 = a.n32, a33 = a.n33, a34 = a.n34,
-		a41 = a.n41, a42 = a.n42, a43 = a.n43, a44 = a.n44,
-
-		b11 = b.n11, b12 = b.n12, b13 = b.n13, b14 = b.n14,
-		b21 = b.n21, b22 = b.n22, b23 = b.n23, b24 = b.n24,
-		b31 = b.n31, b32 = b.n32, b33 = b.n33, b34 = b.n34,
-		b41 = b.n41, b42 = b.n42, b43 = b.n43, b44 = b.n44;
-
-		this.n11 = a11 * b11 + a12 * b21 + a13 * b31 + a14 * b41;
-		this.n12 = a11 * b12 + a12 * b22 + a13 * b32 + a14 * b42;
-		this.n13 = a11 * b13 + a12 * b23 + a13 * b33 + a14 * b43;
-		this.n14 = a11 * b14 + a12 * b24 + a13 * b34 + a14 * b44;
-
-		this.n21 = a21 * b11 + a22 * b21 + a23 * b31 + a24 * b41;
-		this.n22 = a21 * b12 + a22 * b22 + a23 * b32 + a24 * b42;
-		this.n23 = a21 * b13 + a22 * b23 + a23 * b33 + a24 * b43;
-		this.n24 = a21 * b14 + a22 * b24 + a23 * b34 + a24 * b44;
-
-		this.n31 = a31 * b11 + a32 * b21 + a33 * b31 + a34 * b41;
-		this.n32 = a31 * b12 + a32 * b22 + a33 * b32 + a34 * b42;
-		this.n33 = a31 * b13 + a32 * b23 + a33 * b33 + a34 * b43;
-		this.n34 = a31 * b14 + a32 * b24 + a33 * b34 + a34 * b44;
-
-		this.n41 = a41 * b11 + a42 * b21 + a43 * b31 + a44 * b41;
-		this.n42 = a41 * b12 + a42 * b22 + a43 * b32 + a44 * b42;
-		this.n43 = a41 * b13 + a42 * b23 + a43 * b33 + a44 * b43;
-		this.n44 = a41 * b14 + a42 * b24 + a43 * b34 + a44 * b44;
-
-		return this;
-
-	},
-
-	multiplyToArray: function ( a, b, r ) {
-
-		this.multiply( a, b );
-
-		r[ 0 ] = this.n11; r[ 1 ] = this.n21; r[ 2 ] = this.n31; r[ 3 ] = this.n41;
-		r[ 4 ] = this.n12; r[ 5 ] = this.n22; r[ 6 ] = this.n32; r[ 7 ] = this.n42;
-		r[ 8 ]  = this.n13; r[ 9 ]  = this.n23; r[ 10 ] = this.n33; r[ 11 ] = this.n43;
-		r[ 12 ] = this.n14; r[ 13 ] = this.n24; r[ 14 ] = this.n34; r[ 15 ] = this.n44;
-
-		return this;
-
-	},
-
-	multiplySelf: function ( m ) {
-
-		this.multiply( this, m );
-
-		return this;
-
-	},
-
-	multiplyScalar: function ( s ) {
-
-		this.n11 *= s; this.n12 *= s; this.n13 *= s; this.n14 *= s;
-		this.n21 *= s; this.n22 *= s; this.n23 *= s; this.n24 *= s;
-		this.n31 *= s; this.n32 *= s; this.n33 *= s; this.n34 *= s;
-		this.n41 *= s; this.n42 *= s; this.n43 *= s; this.n44 *= s;
-
-		return this;
 
 	},
 
@@ -742,23 +740,31 @@ THREE.Matrix4.prototype = {
 		this.n24 = m.n24;
 		this.n34 = m.n34;
 
+		return this;
+
 	},
 
-	extractRotation: function ( m, s ) {
+	extractRotation: function ( m ) {
 
-		var invScaleX = 1 / s.x, invScaleY = 1 / s.y, invScaleZ = 1 / s.z;
+		var vector = THREE.Matrix4.__v1;
 
-		this.n11 = m.n11 * invScaleX;
-		this.n21 = m.n21 * invScaleX;
-		this.n31 = m.n31 * invScaleX;
+		var scaleX = vector.set( m.n11, m.n21, m.n31 ).length();
+		var scaleY = vector.set( m.n12, m.n22, m.n32 ).length();
+		var scaleZ = vector.set( m.n13, m.n23, m.n33 ).length();
 
-		this.n12 = m.n12 * invScaleY;
-		this.n22 = m.n22 * invScaleY;
-		this.n32 = m.n32 * invScaleY;
+		this.n11 = m.n11 / scaleX;
+		this.n21 = m.n21 / scaleX;
+		this.n31 = m.n31 / scaleX;
 
-		this.n13 = m.n13 * invScaleZ;
-		this.n23 = m.n23 * invScaleZ;
-		this.n33 = m.n33 * invScaleZ;
+		this.n12 = m.n12 / scaleY;
+		this.n22 = m.n22 / scaleY;
+		this.n32 = m.n32 / scaleY;
+
+		this.n13 = m.n13 / scaleZ;
+		this.n23 = m.n23 / scaleZ;
+		this.n33 = m.n33 / scaleZ;
+
+		return this;
 
 	}
 

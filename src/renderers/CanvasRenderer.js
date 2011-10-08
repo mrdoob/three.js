@@ -188,7 +188,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 		_context.fillRect( _clipRect.getX(), _clipRect.getY(), _clipRect.getWidth(), _clipRect.getHeight() );
 		*/
 
-		_enableLighting = scene.lights.length > 0;
+		// _enableLighting = scene.lights.length > 0;
 
 		if ( _enableLighting ) {
 

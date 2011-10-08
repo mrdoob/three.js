@@ -15,7 +15,7 @@ THREE.Ray.prototype = {
 
 	intersectScene: function ( scene ) {
 
-		return this.intersectObjects( scene.objects );
+		return this.intersectObjects( scene.children );
 
 	},
 
@@ -89,6 +89,8 @@ THREE.Ray.prototype = {
 			vertices = geometry.vertices,
 			objMatrix,
 			intersectPoint;
+
+			object.matrixRotationWorld.extractRotation( object.matrixWorld );
 
 			for ( f = 0, fl = geometry.faces.length; f < fl; f ++ ) {
 
