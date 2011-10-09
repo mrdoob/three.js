@@ -14,8 +14,11 @@ THREE.Camera = function () {
 
 	THREE.Object3D.call( this );
 
-	this.projectionMatrix = new THREE.Matrix4();
 	this.matrixWorldInverse = new THREE.Matrix4();
+
+	this.projectionMatrix = new THREE.Matrix4();
+	this.projectionMatrixInverse = new THREE.Matrix4();
+
 
 };
 
