@@ -216,22 +216,6 @@ THREE.Object3D.prototype = {
 
 		}
 
-	},
-
-	// DEPRECATED
-
-	addChild: function ( child ) {
-
-		console.warn( 'DEPRECATED: Object3D.addChild() is now Object3D.add().' );
-		this.add( child );
-
-	},
-
-	removeChild: function ( child ) {
-
-		console.warn( 'DEPRECATED: Object3D.removeChild() is now Object3D.remove().' );
-		this.remove( child );
-
 	}
 
 };
