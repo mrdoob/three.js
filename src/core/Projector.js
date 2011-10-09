@@ -6,8 +6,7 @@
 
 THREE.Projector = function() {
 
-	var _object, _objectCount, _objectPool = [],
-	_vertex, _vertexCount, _vertexPool = [],
+	var _vertex, _vertexCount, _vertexPool = [],
 	_face, _face3Count, _face3Pool = [], _face4Count, _face4Pool = [],
 	_line, _lineCount, _linePool = [],
 	_particle, _particleCount, _particlePool = [],
@@ -360,16 +359,6 @@ THREE.Projector = function() {
 	};
 
 	// Pools
-
-	function getNextObjectInPool() {
-
-		var object = _objectPool[ _objectCount ] = _objectPool[ _objectCount ] || new THREE.RenderableObject();
-
-		_objectCount ++;
-
-		return object;
-
-	}
 
 	function getNextVertexInPool() {
 
