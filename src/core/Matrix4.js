@@ -746,21 +746,21 @@ THREE.Matrix4.prototype = {
 
 		var vector = THREE.Matrix4.__v1;
 
-		var scaleX = vector.set( m.n11, m.n21, m.n31 ).length();
-		var scaleY = vector.set( m.n12, m.n22, m.n32 ).length();
-		var scaleZ = vector.set( m.n13, m.n23, m.n33 ).length();
+		var scaleX = 1 / vector.set( m.n11, m.n21, m.n31 ).length();
+		var scaleY = 1 / vector.set( m.n12, m.n22, m.n32 ).length();
+		var scaleZ = 1 / vector.set( m.n13, m.n23, m.n33 ).length();
 
-		this.n11 = m.n11 / scaleX;
-		this.n21 = m.n21 / scaleX;
-		this.n31 = m.n31 / scaleX;
+		this.n11 = m.n11 * scaleX;
+		this.n21 = m.n21 * scaleX;
+		this.n31 = m.n31 * scaleX;
 
-		this.n12 = m.n12 / scaleY;
-		this.n22 = m.n22 / scaleY;
-		this.n32 = m.n32 / scaleY;
+		this.n12 = m.n12 * scaleY;
+		this.n22 = m.n22 * scaleY;
+		this.n32 = m.n32 * scaleY;
 
-		this.n13 = m.n13 / scaleZ;
-		this.n23 = m.n23 / scaleZ;
-		this.n33 = m.n33 / scaleZ;
+		this.n13 = m.n13 * scaleZ;
+		this.n23 = m.n23 * scaleZ;
+		this.n33 = m.n33 * scaleZ;
 
 		return this;
 
