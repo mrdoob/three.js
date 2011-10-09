@@ -72,6 +72,15 @@
 				materials.push( [ new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, wireframe: false } ) ] );
 
 			}
+			
+			var loader = new THREE.JSONLoader();
+			loader.load( 'obj/WaltHeadLo.js', function ( geometry ) {
+
+				THREE.WaltHead = function() {
+					return geometry;
+				};
+
+			} );
 
 			var geometriesParams = [
 
@@ -87,7 +96,8 @@
 										font: "helvetiker"
 
 									}]},
-				{type: 'PlaneGeometry', args: [ 200, 200, 4, 4 ] }
+				{type: 'PlaneGeometry', args: [ 200, 200, 4, 4 ] },
+				{type: 'WaltHead', args: [ ], scale: 6 }
 
 			];
 
