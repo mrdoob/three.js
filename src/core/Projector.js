@@ -12,7 +12,7 @@ THREE.Projector = function() {
 	_line, _lineCount, _linePool = [],
 	_particle, _particleCount, _particlePool = [],
 
-	_objectList = [], _renderList = [],
+	_renderData = { objects: [], lights: [], elements: [] },
 
 	_vector3 = new THREE.Vector3(),
 	_vector4 = new THREE.Vector4(),
@@ -37,7 +37,7 @@ THREE.Projector = function() {
 
 	this.projectVector = function ( vector, camera ) {
 
-		THREE.Matrix4.makeInvert( camera.matrixWorld, camera.matrixWorldInverse );
+		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
 		_projScreenMatrix.multiply( camera.projectionMatrix, camera.matrixWorldInverse );
 		_projScreenMatrix.multiplyVector3( vector );
@@ -48,7 +48,9 @@ THREE.Projector = function() {
 
 	this.unprojectVector = function ( vector, camera ) {
 
-		_projScreenMatrix.multiply( camera.matrixWorld, THREE.Matrix4.makeInvert( camera.projectionMatrix ) );
+		camera.projectionMatrixInverse.getInverse( camera.projectionMatrix );
+
+		_projScreenMatrix.multiply( camera.matrixWorld, camera.projectionMatrixInverse );
 		_projScreenMatrix.multiplyVector3( vector );
 
 		return vector;
@@ -79,10 +81,10 @@ THREE.Projector = function() {
 
 	};
 
-	this.projectObjects = function ( object, sort ) {
+	this.projectGraph = function ( object ) {
 
-		_objectList.length = 0;
-		_objectCount = 0;
+		_renderData.objects.length = 0;
+		_renderData.lights.length = 0;
 
 		var projectObject = function ( object ) {
 
@@ -91,15 +93,11 @@ THREE.Projector = function() {
 			if ( object instanceof THREE.Particle || object instanceof THREE.Line ||
 			( object instanceof THREE.Mesh && ( !object.frustumCulled || isInFrustum( object ) ) ) ) {
 
-				_object = getNextObjectInPool();
+				_renderData.objects.push( object );
 
-				_vector3.copy( object.position );
-				_projScreenMatrix.multiplyVector3( _vector3 );
+			} else if ( object instanceof THREE.Light ) {
 
-				_object.object = object;
-				_object.z = _vector3.z;
-
-				_objectList.push( _object );
+				_renderData.lights.push( object );
 
 			}
 
@@ -111,29 +109,27 @@ THREE.Projector = function() {
 
 		};
 
-		projectObject( scene );
+		projectObject( object );
 
-		sort && _objectList.sort( painterSort );
-
-		return _objectList;
+		return _renderData;
 
 	};
 
 	this.projectScene = function ( scene, camera, sort ) {
 
 		var near = camera.near, far = camera.far,
-		o, ol, v, vl, f, fl, n, nl, c, cl, u, ul, objects, object,
+		o, ol, v, vl, f, fl, n, nl, c, cl, u, ul, object,
 		objectMatrix, objectMatrixRotation, objectMaterials, objectOverdraw,
 		geometry, vertices, vertex, vertexPositionScreen,
 		faces, face, faceVertexNormals, normal, faceVertexUvs, uvs,
 		v1, v2, v3, v4;
 
-		_renderList.length = 0;
-
 		_face3Count = 0;
 		_face4Count = 0;
 		_lineCount = 0;
 		_particleCount = 0;
+
+		_renderData.elements.length = 0;
 
 		if ( camera.parent == null ) {
 
@@ -144,19 +140,17 @@ THREE.Projector = function() {
 
 		scene.updateMatrixWorld();
 
-		THREE.Matrix4.makeInvert( camera.matrixWorld, camera.matrixWorldInverse );
+		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
 		_projScreenMatrix.multiply( camera.projectionMatrix, camera.matrixWorldInverse );
 
 		computeFrustum( _projScreenMatrix );
 
-		objects = this.projectObjects( scene, true );
+		_renderData = this.projectGraph( scene );
 
-		for ( o = 0, ol = objects.length; o < ol; o++ ) {
+		for ( o = 0, ol = _renderData.objects.length; o < ol; o++ ) {
 
-			object = objects[ o ].object;
-
-			if ( !object.visible ) continue;
+			object = _renderData.objects[ o ];
 
 			objectMatrix = object.matrixWorld;
 
@@ -286,7 +280,7 @@ THREE.Projector = function() {
 
 					_face.z = _face.centroidScreen.z;
 
-					_renderList.push( _face );
+					_renderData.elements.push( _face );
 
 				}
 
@@ -325,7 +319,7 @@ THREE.Projector = function() {
 
 						_line.materials = object.materials;
 
-						_renderList.push( _line );
+						_renderData.elements.push( _line );
 
 					}
 				}
@@ -351,7 +345,7 @@ THREE.Projector = function() {
 
 					_particle.materials = object.materials;
 
-					_renderList.push( _particle );
+					_renderData.elements.push( _particle );
 
 				}
 
@@ -359,9 +353,9 @@ THREE.Projector = function() {
 
 		}
 
-		sort && _renderList.sort( painterSort );
+		sort && _renderData.elements.sort( painterSort );
 
-		return _renderList;
+		return _renderData;
 
 	};
 
