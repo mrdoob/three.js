@@ -21,13 +21,16 @@ THREE.CombinedCamera = function ( width, height, fov, near, far, orthonear, orth
 	// We could also handle the projectionMatrix internally, but just wanted to test nested camera objects
 	this.cameraO = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 	orthonear, orthofar );
 	this.cameraP = new THREE.PerspectiveCamera( fov, width/height, near, far );
-	console.log(this.cameraO);
 
 	this.zoom = 1;
 	
 	this.toPerspective();
 	
 	
+	var aspect = width/height;
+	
+	
+
 
 };
 
@@ -49,10 +52,41 @@ THREE.CombinedCamera.prototype.toPerspective = function () {
 
 THREE.CombinedCamera.prototype.toOrthographic = function () {
 
-	this.cameraO.left = this.left / this.zoom;
-	this.cameraO.right = this.right / this.zoom;
-	this.cameraO.top = this.top / this.zoom;
-	this.cameraO.bottom = this.bottom / this.zoom;
+	// Orthographic from Perspective
+	var fov = this.fov / this.zoom;
+	var aspect = this.cameraP.aspect;
+	var near = this.cameraP.near;
+	var far = this.cameraP.far;
+	
+	
+	var nearHalfHeight = Math.tan( fov / 2 ) * near;
+	var nearPlaneHeight = 2 * nearHalfHeight;
+	var nearPlaneWidth = nearPlaneHeight * aspect;
+	var nearHalfWidth = nearPlaneWidth / 2;
+	
+	var farHalfHeight = Math.tan( fov / 2 ) * far;
+	var farPlaneHeight = 2 * farHalfHeight;
+	var farPlaneWidth = farPlaneHeight * aspect;
+	var farHalfWidth = farPlaneWidth / 2;
+	
+	var averageHalfWidth = Math.abs(nearHalfWidth + farHalfWidth) / 2;
+	var averageHalfHeight = Math.abs(nearHalfHeight + farHalfHeight) / 2;
+	
+	
+	this.cameraO.left = -averageHalfWidth;
+	this.cameraO.right = averageHalfWidth;
+	this.cameraO.top = averageHalfHeight;
+	this.cameraO.bottom = -averageHalfHeight;
+	
+	// this.cameraO.left = -farHalfWidth;
+	// this.cameraO.right = farHalfWidth;
+	// this.cameraO.top = farHalfHeight;
+	// this.cameraO.bottom = -farHalfHeight;
+
+	// this.cameraO.left = this.left / this.zoom;
+	// this.cameraO.right = this.right / this.zoom;
+	// this.cameraO.top = this.top / this.zoom;
+	// this.cameraO.bottom = this.bottom / this.zoom;
 	
 	this.cameraO.updateProjectionMatrix();
 
