@@ -53,30 +53,27 @@ THREE.CombinedCamera.prototype.toPerspective = function () {
 THREE.CombinedCamera.prototype.toOrthographic = function () {
 
 	// Orthographic from Perspective
-	var fov = this.fov / this.zoom;
+	var fov = this.fov;
 	var aspect = this.cameraP.aspect;
 	var near = this.cameraP.near;
 	var far = this.cameraP.far;
 	
 	
-	var nearHalfHeight = Math.tan( fov / 2 ) * near;
-	var nearPlaneHeight = 2 * nearHalfHeight;
-	var nearPlaneWidth = nearPlaneHeight * aspect;
-	var nearHalfWidth = nearPlaneWidth / 2;
+	// Just pretend we want the mid plane of the viewing frustum
+	var hyperfocus = ( near + far ) / 2; 
 	
-	var farHalfHeight = Math.tan( fov / 2 ) * far;
-	var farPlaneHeight = 2 * farHalfHeight;
-	var farPlaneWidth = farPlaneHeight * aspect;
-	var farHalfWidth = farPlaneWidth / 2;
+	var halfHeight = Math.tan( fov / 2 ) * hyperfocus;
+	var planeHeight = 2 * halfHeight;
+	var planeWidth = planeHeight * aspect;
+	var halfWidth = planeWidth / 2;
 	
-	var averageHalfWidth = Math.abs(nearHalfWidth + farHalfWidth) / 2;
-	var averageHalfHeight = Math.abs(nearHalfHeight + farHalfHeight) / 2;
+	halfHeight /= this.zoom;
+	halfWidth /= this.zoom;
 	
-	
-	this.cameraO.left = -averageHalfWidth;
-	this.cameraO.right = averageHalfWidth;
-	this.cameraO.top = averageHalfHeight;
-	this.cameraO.bottom = -averageHalfHeight;
+	this.cameraO.left = -halfWidth;
+	this.cameraO.right = halfWidth;
+	this.cameraO.top = halfHeight;
+	this.cameraO.bottom = -halfHeight;
 	
 	// this.cameraO.left = -farHalfWidth;
 	// this.cameraO.right = farHalfWidth;
