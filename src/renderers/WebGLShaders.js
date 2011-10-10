@@ -63,6 +63,7 @@ THREE.ShaderChunk = {
 
 			"uniform float reflectivity;",
 			"uniform samplerCube envMap;",
+			"uniform float flipEnvMap;",
 			"uniform int combine;",
 
 		"#endif"
@@ -73,15 +74,15 @@ THREE.ShaderChunk = {
 
 		"#ifdef USE_ENVMAP",
 
-			"vec4 cubeColor = textureCube( envMap, vec3( -vReflect.x, vReflect.yz ) );",
+			"vec4 cubeColor = textureCube( envMap, vec3( flipEnvMap * vReflect.x, vReflect.yz ) );",
 
 			"if ( combine == 1 ) {",
 
-				"gl_FragColor = vec4( mix( gl_FragColor.xyz, cubeColor.xyz, reflectivity ), opacity );",
+				"gl_FragColor.xyz = mix( gl_FragColor.xyz, cubeColor.xyz, reflectivity );",
 
 			"} else {",
 
-				"gl_FragColor = gl_FragColor * cubeColor;",
+				"gl_FragColor.xyz = gl_FragColor.xyz * cubeColor.xyz;",
 
 			"}",
 
@@ -782,6 +783,7 @@ THREE.UniformsLib = {
 		"lightMap" : { type: "t", value: 2, texture: null },
 
 		"envMap" : { type: "t", value: 1, texture: null },
+		"flipEnvMap" : { type: "f", value: -1 },
 		"useRefract" : { type: "i", value: 0 },
 		"reflectivity" : { type: "f", value: 1.0 },
 		"refractionRatio" : { type: "f", value: 0.98 },

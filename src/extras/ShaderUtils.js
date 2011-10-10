@@ -400,7 +400,8 @@ THREE.ShaderUtils = {
 
 		'cube': {
 
-			uniforms: { "tCube": { type: "t", value: 1, texture: null } },
+			uniforms: { "tCube": { type: "t", value: 1, texture: null },
+						"tFlip": { type: "f", value: -1 } },
 
 			vertexShader: [
 
@@ -420,13 +421,14 @@ THREE.ShaderUtils = {
 			fragmentShader: [
 
 				"uniform samplerCube tCube;",
+				"uniform float tFlip;",
 
 				"varying vec3 vViewPosition;",
 
 				"void main() {",
 
 					"vec3 wPos = cameraPosition - vViewPosition;",
-					"gl_FragColor = textureCube( tCube, vec3( - wPos.x, wPos.yz ) );",
+					"gl_FragColor = textureCube( tCube, vec3( tFlip * wPos.x, wPos.yz ) );",
 
 				"}"
 

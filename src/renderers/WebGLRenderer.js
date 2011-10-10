@@ -2502,6 +2502,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		uniforms.lightMap.texture = material.lightMap;
 
 		uniforms.envMap.texture = material.envMap;
+		uniforms.flipEnvMap.value = ( material.envMap instanceof THREE.WebGLRenderTargetCube ) ? 1 : -1;
 		uniforms.reflectivity.value = material.reflectivity;
 		uniforms.refractionRatio.value = material.refractionRatio;
 		uniforms.combine.value = material.combine;
