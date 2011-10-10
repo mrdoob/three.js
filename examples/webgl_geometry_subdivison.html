@@ -406,10 +406,6 @@
 				group.rotation.x = cube.rotation.x += ( targetXRotation - cube.rotation.x ) * 0.05;
 				group.rotation.y = cube.rotation.y += ( targetYRotation - cube.rotation.y ) * 0.05;
 				
-				cube.updateMatrixWorld();
-				group.updateMatrixWorld();
-				
-				
 				renderer.render( scene, camera );
 
 			}
