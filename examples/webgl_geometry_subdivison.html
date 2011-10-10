@@ -73,14 +73,7 @@
 
 			}
 			
-			var loader = new THREE.JSONLoader();
-			loader.load( 'obj/WaltHeadLo.js', function ( geometry ) {
-
-				THREE.WaltHead = function() {
-					return geometry;
-				};
-
-			} );
+			
 
 			var geometriesParams = [
 
@@ -96,10 +89,24 @@
 										font: "helvetiker"
 
 									}]},
-				{type: 'PlaneGeometry', args: [ 200, 200, 4, 4 ] },
-				{type: 'WaltHead', args: [ ], scale: 6 }
+				{type: 'PlaneGeometry', args: [ 200, 200, 4, 4 ] }
+				
 
 			];
+			
+			if (location.protocol !== "file:") {
+				var loader = new THREE.JSONLoader();
+				loader.load( 'obj/WaltHeadLo.js', function ( geometry ) {
+			
+					geometriesParams.push({type: 'WaltHead', args: [ ], scale: 6 });
+				
+					THREE.WaltHead = function() {
+						return geometry;
+					};
+			
+				} );
+			
+			}
 
 
 			var info;
@@ -398,7 +405,11 @@
 
 				group.rotation.x = cube.rotation.x += ( targetXRotation - cube.rotation.x ) * 0.05;
 				group.rotation.y = cube.rotation.y += ( targetYRotation - cube.rotation.y ) * 0.05;
-
+				
+				cube.updateMatrixWorld();
+				group.updateMatrixWorld();
+				
+				
 				renderer.render( scene, camera );
 
 			}
