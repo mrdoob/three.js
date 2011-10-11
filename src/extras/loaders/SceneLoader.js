@@ -760,6 +760,9 @@ THREE.SceneLoader.prototype = {
 
 			scope.callbackSync( result );
 
+                        // just in case there are no async elements:
+			async_callback_gate();
+
 		};
 
 	},
