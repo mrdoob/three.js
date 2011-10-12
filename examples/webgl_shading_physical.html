@@ -169,6 +169,7 @@
 		<script src="js/Detector.js"></script>
 		<script src="js/RequestAnimationFrame.js"></script>
 		<script src="js/Stats.js"></script>
+		<script src="js/Tween.js"></script>
 
 		<script>
 
@@ -179,12 +180,15 @@
 
 			var FAR = 10000;
 
+			var DAY = 0;
+
 			var container, stats;
 
 			var camera, scene, renderer;
 
 			var mesh, geometry;
 
+			var sunLight, pointLight, ambientLight;
 
 			init();
 			animate();
@@ -195,9 +199,10 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, SCREEN_WIDTH / SCREEN_HEIGHT, 2, FAR );
-				camera.position.set( 700, 250, 1200 );
+				camera.position.set( 500, 400, 1200 );
 
 				controls = new THREE.TrackballControls( camera );
+				controls.target.set( 0, 120, 0 );
 
 				controls.rotateSpeed = 1.0;
 				controls.zoomSpeed = 1.2;
@@ -207,7 +212,7 @@
 				controls.noPan = false;
 
 				controls.staticMoving = true;
-				controls.dynamicDampingFactor = 0.3;
+				controls.dynamicDampingFactor = 0.15;
 
 				controls.keys = [ 65, 83, 68 ];
 
@@ -220,8 +225,12 @@
 				scene = new THREE.Scene();
 
 				scene.fog = new THREE.Fog( 0x00aaff, 1000, FAR );
-				scene.fog.color.setHSV( 0.13, 0.25, 0.99 );
-				//THREE.ColorUtils.adjustHSV( scene.fog.color, 0, 0, 0.5 );
+
+				if ( DAY )
+					scene.fog.color.setHSV( 0.13, 0.25, 0.99 );
+				else
+					scene.fog.color.setHSV( 0.13, 0.25, 0.1 );
+
 
 				// TEXTURES
 
@@ -270,7 +279,7 @@
 
 				// GROUND
 
-				var groundMaterial = new THREE.MeshPhongMaterial( { shininess: 80, ambient: 0x222222, color: 0xffffff, specular: 0xffffff, map: textureSquares } );
+				var groundMaterial = new THREE.MeshPhongMaterial( { shininess: 80, ambient: 0x444444, color: 0xffffff, specular: 0xffffff, map: textureSquares } );
 				//groundMaterial.color.setHSV( 0.1, 0.1, 0.99 );
 
 				var planeGeometry = new THREE.PlaneGeometry( 100, 100 );
@@ -298,9 +307,9 @@
 
 				} );
 
-				var materialLambert = new THREE.MeshPhongMaterial( { shininess: 50, color: 0xffffff, map: textureNoiseColor } );
-				var materialPhong = new THREE.MeshPhongMaterial( { shininess: 50, ambient: 0x222222, color: 0xffffff, specular: 0x999999, map: textureLava } );
-				var materialPhongCube = new THREE.MeshPhongMaterial( { shininess: 50, ambient: 0x222222, color: 0xffffff, specular: 0x999999, envMap: cubeTarget } );
+				var materialLambert = new THREE.MeshPhongMaterial( { shininess: 50, ambient: 0x444444, color: 0xffffff, map: textureNoiseColor } );
+				var materialPhong = new THREE.MeshPhongMaterial( { shininess: 50, ambient: 0x444444, color: 0xffffff, specular: 0x999999, map: textureLava } );
+				var materialPhongCube = new THREE.MeshPhongMaterial( { shininess: 50, ambient: 0x444444, color: 0xffffff, specular: 0x999999, envMap: cubeTarget } );
 
 				// OBJECTS
 
@@ -314,7 +323,7 @@
 
 				function addObjectColor( geometry, color, x, y, z, ry ) {
 
-					var material = new THREE.MeshPhongMaterial( { color: color, ambient: 0x222222 } );
+					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, ambient: 0x444444 } );
 					return addObject( geometry, material, x, y, z, ry );
 
 				}
@@ -361,17 +370,30 @@
 
 				// LIGHTS
 
-				var ambient = new THREE.AmbientLight( 0x222222 );
-				scene.add( ambient );
+				var sunIntensity = 0.3,
+					pointIntensity = 1,
+					pointColor = 0xffaa00;
 
-				var pointLight = new THREE.PointLight( 0xffffff, 1 );
-				pointLight.position.set( -1000, 1000, -1000 );
-				//scene.add( pointLight );
+				if ( DAY ) {
 
-				var spotLight = new THREE.SpotLight( 0xffffff, 1 );
-				spotLight.position.set( 1000, 2000, 1000 );
-				spotLight.castShadow = true;
-				scene.add( spotLight );
+					sunIntensity = 1;
+					pointIntensity = 0.5;
+					pointColor = 0xffffff;
+
+				}
+
+				ambientLight = new THREE.AmbientLight( 0xffffff );
+				ambientLight.color.setHSV( 0.1, 0.9, 0.25 );
+				scene.add( ambientLight );
+
+				pointLight = new THREE.PointLight( 0xffaa00, pointIntensity, 5000 );
+				pointLight.position.set( 0, 0, 0 );
+				scene.add( pointLight );
+
+				sunLight = new THREE.SpotLight( 0xffffff, sunIntensity );
+				sunLight.position.set( 1000, 2000, 1000 );
+				sunLight.castShadow = true;
+				scene.add( sunLight );
 
 				// RENDERER
 
@@ -391,7 +413,7 @@
 				//
 
 				renderer.shadowMapEnabled = true;
-				renderer.shadowMapDarkness = 0.75;
+				renderer.shadowMapDarkness = 0.5 * sunIntensity;
 				renderer.shadowMapBias = 0.00390125;
 
 				//
@@ -417,6 +439,7 @@
 				// EVENTS
 
 				window.addEventListener( 'resize', onWindowResize, false );
+				document.addEventListener( 'keydown', onKeyDown, false );
 
 				// COMPOSER
 
@@ -458,6 +481,15 @@
 
 				//composer.addPass( effectVignette );
 
+				// TWEEN
+
+				parameters = { control: 0 };
+
+				direction = -1;
+
+				tweenDay = new TWEEN.Tween( parameters ).to( { control: 100 }, 1000 ).easing( TWEEN.Easing.Exponential.EaseOut );
+				tweenNight = new TWEEN.Tween( parameters ).to( { control: 0 }, 1000 ).easing( TWEEN.Easing.Exponential.EaseOut );
+
 			}
 
 			//
@@ -486,6 +518,42 @@
 
 			//
 
+			function onKeyDown ( event ) {
+
+				switch( event.keyCode ) {
+
+					case 78: /*N*/   if ( direction == 1 ) {
+
+										tweenDay.stop();
+										tweenNight.start();
+
+										direction = -1;
+
+									} else {
+
+										tweenNight.stop();
+										tweenDay.start();
+
+										direction = 1;
+
+									}
+					break;
+
+				}
+
+			};
+
+			//
+
+			function map_linear( x, sa, sb, ea, eb ) {
+
+				return ( x  - sa ) * ( eb - ea ) / ( sb - sa ) + ea;
+
+			};
+
+
+			//
+
 			function animate() {
 
 				requestAnimationFrame( animate );
@@ -497,7 +565,18 @@
 
 			function render() {
 
+				TWEEN.update();
 				controls.update();
+
+				scene.fog.color.setHSV( 0.13, 0.25, map_linear( parameters.control, 0, 100, 0.1, 0.99 ) );
+				renderer.setClearColor( scene.fog.color, 1 );
+
+				sunLight.intensity = map_linear( parameters.control, 0, 100, 0.3, 1 );
+				pointLight.intensity = map_linear( parameters.control, 0, 100, 1, 0.5 );
+
+				pointLight.color.setHSV( 0.1, map_linear( parameters.control, 0, 100, 0.99, 0 ), 0.9 );
+
+				renderer.shadowMapDarkness = 0.5 * sunLight.intensity;
 
 				mesh.visible = false;
 
