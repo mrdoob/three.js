@@ -447,6 +447,7 @@
 
 				//
 
+				renderer.shadowMapAutoUpdate = false;
 				renderer.shadowMapEnabled = true;
 				renderer.shadowMapDarkness = 0.5 * sunIntensity;
 				renderer.shadowMapBias = 0.00390125;
@@ -613,6 +614,8 @@
 				renderer.shadowMapDarkness = 0.5 * sunLight.intensity;
 
 				mesh.visible = false;
+
+				renderer.updateShadowMap( scene, camera );
 
 				renderer.autoClear = true;
 				cubeCamera.updatePosition( mesh.position );

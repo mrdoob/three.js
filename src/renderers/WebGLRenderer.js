@@ -123,7 +123,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.shadowCameraFov = 50;
 
 	this.shadowMap = [];
+
 	this.shadowMapEnabled = false;
+	this.shadowMapAutoUpdate = true;
 	this.shadowMapSoft = true;
 
 	var _cameraLight, _shadowMatrix = [];
@@ -3756,6 +3758,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	this.updateShadowMap = function ( scene, camera ) {
+
+		renderShadowMap( scene, camera );
+
+	};
+
 	this.render = function( scene, camera, renderTarget, forceClear ) {
 
 		var i, program, opaque, transparent, material,
@@ -3765,7 +3773,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_currentMaterialId = -1;
 
-		if ( this.shadowMapEnabled ) renderShadowMap( scene, camera );
+		if ( this.shadowMapEnabled && this.shadowMapAutoUpdate ) renderShadowMap( scene, camera );
 
 		_this.info.render.calls = 0;
 		_this.info.render.vertices = 0;
