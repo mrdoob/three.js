@@ -88,6 +88,7 @@
 		<script type="text/javascript" src="../src/objects/Mesh.js"></script>
 		<script type="text/javascript" src="../src/objects/Bone.js"></script>
 		<script type="text/javascript" src="../src/objects/SkinnedMesh.js"></script>
+		<script type="text/javascript" src="../src/objects/MorphAnimMesh.js"></script>
 		<script type="text/javascript" src="../src/objects/Ribbon.js"></script>
 		<script type="text/javascript" src="../src/objects/LOD.js"></script>
 		<script type="text/javascript" src="../src/objects/Sprite.js"></script>
@@ -110,6 +111,7 @@
 		<script type="text/javascript" src="../src/extras/ColorUtils.js"></script>
 		<script type="text/javascript" src="../src/extras/GeometryUtils.js"></script>
 		<script type="text/javascript" src="../src/extras/ImageUtils.js"></script>
+		<script type="text/javascript" src="../src/extras/MathUtils.js"></script>
 		<script type="text/javascript" src="../src/extras/SceneUtils.js"></script>
 		<script type="text/javascript" src="../src/extras/ShaderUtils.js"></script>
 		<script type="text/javascript" src="../src/extras/core/Curve.js"></script>
@@ -189,6 +191,14 @@
 			var mesh, geometry;
 
 			var sunLight, pointLight, ambientLight;
+
+			var morph;
+
+			var composer, effectFXAA, hblur, vblur;
+
+			var parameters, tweenDirection, tweenDay, tweenNight;
+
+			var oldTime;
 
 			init();
 			animate();
@@ -368,6 +378,31 @@
 
 				addObjectColor( new THREE.SphereGeometry( 100, 32, 26 ), 0xffffff, -300, 100, 300, 0 );
 
+				// MORPHS
+
+				var loader = new THREE.JSONLoader();
+
+				loader.load( "models/animated/sittingBox.js", function( geometry ) {
+
+					var morphMaterial = new THREE.MeshPhongMaterial( { ambient: 0x444444, color: 0x000000, specular: 0xff9900, shininess: 50, morphTargets: true } );
+					morphMaterial.shading = THREE.FlatShading;
+
+					//geometry.computeVertexNormals();
+					morph = new THREE.MorphAnimMesh( geometry, morphMaterial );
+
+					var s = 200;
+					morph.scale.set( s, s, s );
+
+					morph.duration = 8000;
+					morph.mirroredLoop = true;
+
+					morph.castShadow = true;
+					morph.receiveShadow = true;
+
+					scene.add( morph );
+
+				} );
+
 				// LIGHTS
 
 				var sunIntensity = 0.3,
@@ -485,7 +520,7 @@
 
 				parameters = { control: 0 };
 
-				direction = -1;
+				tweenDirection = -1;
 
 				tweenDay = new TWEEN.Tween( parameters ).to( { control: 100 }, 1000 ).easing( TWEEN.Easing.Exponential.EaseOut );
 				tweenNight = new TWEEN.Tween( parameters ).to( { control: 0 }, 1000 ).easing( TWEEN.Easing.Exponential.EaseOut );
@@ -522,35 +557,26 @@
 
 				switch( event.keyCode ) {
 
-					case 78: /*N*/   if ( direction == 1 ) {
+					case 78: /*N*/   if ( tweenDirection == 1 ) {
 
 										tweenDay.stop();
 										tweenNight.start();
 
-										direction = -1;
+										tweenDirection = -1;
 
 									} else {
 
 										tweenNight.stop();
 										tweenDay.start();
 
-										direction = 1;
+										tweenDirection = 1;
 
 									}
 					break;
 
 				}
 
-			};
-
-			//
-
-			function map_linear( x, sa, sb, ea, eb ) {
-
-				return ( x  - sa ) * ( eb - ea ) / ( sb - sa ) + ea;
-
-			};
-
+			}
 
 			//
 
@@ -565,16 +591,24 @@
 
 			function render() {
 
+				if ( oldTime === undefined ) oldTime = new Date().getTime();
+
+				var newTime = new Date().getTime();
+				var delta = newTime - oldTime;
+				oldTime = newTime;
+
 				TWEEN.update();
 				controls.update();
 
-				scene.fog.color.setHSV( 0.13, 0.25, map_linear( parameters.control, 0, 100, 0.1, 0.99 ) );
+				if ( morph ) morph.updateAnimation( delta );
+
+				scene.fog.color.setHSV( 0.13, 0.25, THREE.MathUtils.mapLinear( parameters.control, 0, 100, 0.1, 0.99 ) );
 				renderer.setClearColor( scene.fog.color, 1 );
 
-				sunLight.intensity = map_linear( parameters.control, 0, 100, 0.3, 1 );
-				pointLight.intensity = map_linear( parameters.control, 0, 100, 1, 0.5 );
+				sunLight.intensity = THREE.MathUtils.mapLinear( parameters.control, 0, 100, 0.3, 1 );
+				pointLight.intensity = THREE.MathUtils.mapLinear( parameters.control, 0, 100, 1, 0.5 );
 
-				pointLight.color.setHSV( 0.1, map_linear( parameters.control, 0, 100, 0.99, 0 ), 0.9 );
+				pointLight.color.setHSV( 0.1, THREE.MathUtils.mapLinear( parameters.control, 0, 100, 0.99, 0 ), 0.9 );
 
 				renderer.shadowMapDarkness = 0.5 * sunLight.intensity;
 

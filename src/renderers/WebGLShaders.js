@@ -702,19 +702,7 @@ THREE.ShaderChunk = {
 						"}",
 
 						"shadow /= 9.0;",
-
-						"#ifdef GAMMA_OUTPUT",
-
-							"vec3 darkening = vec3( ( 1.0 - shadowDarkness * shadow ) );",
-							"darkening *= darkening;",
-
-							"shadowColor = shadowColor * darkening;",
-
-						"#else",
-
-							"shadowColor = shadowColor * vec3( ( 1.0 - shadowDarkness * shadow ) );",
-
-						"#endif",
+						"shadowColor = shadowColor * vec3( ( 1.0 - shadowDarkness * shadow ) );",
 
 					"#else",
 
@@ -741,6 +729,12 @@ THREE.ShaderChunk = {
 				//	"gl_FragColor.xyz =  gl_FragColor.xyz * vec3( 1.0, 0.0, 0.0 );",
 
 			"}",
+
+			"#ifdef GAMMA_OUTPUT",
+
+				"shadowColor *= shadowColor;",
+
+			"#endif",
 
 			"gl_FragColor.xyz = gl_FragColor.xyz * shadowColor;",
 
