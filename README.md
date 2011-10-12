@@ -63,6 +63,7 @@ More? [#three.js on irc.freenode.net](http://webchat.freenode.net/?channels=thre
 
 ### Featured projects ###
 
+<a href="http://lights.elliegoulding.com/"><img src="http://mrdoob.github.com/three.js/assets/projects/20_lights.png" width="109" height="82" alt="Lights"></a>
 <a href="http://inear.se/beanstalk/"><img src="http://mrdoob.github.com/three.js/assets/projects/19_beanstalk.png" width="109" height="82" alt="Infinite beanstalk"></a>
 <a href="http://superfad.com/missioncontrol/"><img src="http://mrdoob.github.com/three.js/assets/projects/18_missioncontrol.png" width="109" height="82" alt="Mission Control"></a>
 <a href="http://ro.me/"><img src="http://mrdoob.github.com/three.js/assets/projects/17_rome.png" width="109" height="82" alt="ROME"></a>

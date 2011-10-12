@@ -13,7 +13,7 @@ THREE.OctahedronGeometry = function ( radius, detail ) {
 
 	THREE.Geometry.call( this );
 
-	detail = isFinite(detail) ? detail : 3; // allow a zero value
+	detail = detail || 0;
 
 	var that = this; // ugly scope hack
 
