@@ -10,9 +10,15 @@ THREE.MathUtils = {
 
 	},
 
-	mapLinear: function( x, sa, sb, ea, eb ) {
+	clampBottom: function ( x, a ) {
 
-		return ( x  - sa ) * ( eb - ea ) / ( sb - sa ) + ea;
+		return x < a ? a : x;
+
+	},
+
+	mapLinear: function( x, a1, a2, b1, b2 ) {
+
+		return b1 + ( x - a1 ) * ( b2 - b1 ) / ( a2 - a1 );
 
 	}
 

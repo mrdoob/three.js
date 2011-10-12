@@ -873,14 +873,6 @@
 
 			}
 
-			function clamp( x, a, b ) { return x < a ? a : ( x > b ? b : x ); }
-
-			function map_linear( x, sa, sb, ea, eb ) {
-
-				return ( x  - sa ) * ( eb - ea ) / ( sb - sa ) + ea;
-
-			};
-
 			function render() {
 
 				var newTime = new Date().getTime();
@@ -889,7 +881,7 @@
 
 				// day / night
 
-				v = clamp( v + 0.5 * delta * vdir, 0.1, 0.9 );
+				v = THREE.MathUtils.clamp( v + 0.5 * delta * vdir, 0.1, 0.9 );
 				scene.fog.color.setHSV( 0.51, 0.5, v );
 
 				renderer.setClearColor( scene.fog.color, 1 );
@@ -942,10 +934,10 @@
 
 				}
 
-				effectBloom.screenUniforms[ "opacity" ].value = map_linear( vnorm, 0, 1, 1, 0.75 );
+				effectBloom.screenUniforms[ "opacity" ].value = THREE.MathUtils.mapLinear( vnorm, 0, 1, 1, 0.75 );
 
-				ambientLight.color.setHSV( 0, 0, map_linear( vnorm, 0, 1, 0.07, 0.33 ) );
-				groundBasic.color.setHSV( 0.1, 0.45, map_linear( vnorm, 0, 1, 0.725, 0.995 ) );
+				ambientLight.color.setHSV( 0, 0, THREE.MathUtils.mapLinear( vnorm, 0, 1, 0.07, 0.33 ) );
+				groundBasic.color.setHSV( 0.1, 0.45, THREE.MathUtils.mapLinear( vnorm, 0, 1, 0.725, 0.995 ) );
 
 				// blur
 
