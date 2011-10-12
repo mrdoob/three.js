@@ -105,6 +105,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.sortObjects = true;
 
+	// physically based shading
+
+	this.gammaInput = false;
+	this.gammaOutput = false;
+	this.physicallyBasedShading = false;
+
 	// shadow map
 
 	this.shadowMapBias = 0.0039;
@@ -412,17 +418,37 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( light instanceof THREE.AmbientLight ) {
 
-				r += color.r;
-				g += color.g;
-				b += color.b;
+				if ( _this.gammaInput ) {
+
+					r += color.r * color.r;
+					g += color.g * color.g;
+					b += color.b * color.b;
+
+				} else {
+
+					r += color.r;
+					g += color.g;
+					b += color.b;
+
+				}
 
 			} else if ( light instanceof THREE.DirectionalLight ) {
 
 				doffset = dlength * 3;
 
-				dcolors[ doffset ]     = color.r * intensity;
-				dcolors[ doffset + 1 ] = color.g * intensity;
-				dcolors[ doffset + 2 ] = color.b * intensity;
+				if ( _this.gammaInput ) {
+
+					dcolors[ doffset ]     = color.r * color.r * intensity * intensity;
+					dcolors[ doffset + 1 ] = color.g * color.g * intensity * intensity;
+					dcolors[ doffset + 2 ] = color.b * color.b * intensity * intensity;
+
+				} else {
+
+					dcolors[ doffset ]     = color.r * intensity;
+					dcolors[ doffset + 1 ] = color.g * intensity;
+					dcolors[ doffset + 2 ] = color.b * intensity;
+
+				}
 
 				dpositions[ doffset ]     = position.x;
 				dpositions[ doffset + 1 ] = position.y;
@@ -434,9 +460,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				doffset = dlength * 3;
 
-				dcolors[ doffset ]     = color.r * intensity;
-				dcolors[ doffset + 1 ] = color.g * intensity;
-				dcolors[ doffset + 2 ] = color.b * intensity;
+				if ( _this.gammaInput ) {
+
+					dcolors[ doffset ]     = color.r * color.r * intensity * intensity;
+					dcolors[ doffset + 1 ] = color.g * color.g * intensity * intensity;
+					dcolors[ doffset + 2 ] = color.b * color.b * intensity * intensity;
+
+				} else {
+
+					dcolors[ doffset ]     = color.r * intensity;
+					dcolors[ doffset + 1 ] = color.g * intensity;
+					dcolors[ doffset + 2 ] = color.b * intensity;
+
+				}
 
 				n = 1 / position.length();
 
@@ -450,9 +486,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				poffset = plength * 3;
 
-				pcolors[ poffset ]     = color.r * intensity;
-				pcolors[ poffset + 1 ] = color.g * intensity;
-				pcolors[ poffset + 2 ] = color.b * intensity;
+				if ( _this.gammaInput ) {
+
+					pcolors[ poffset ]     = color.r * color.r * intensity * intensity;
+					pcolors[ poffset + 1 ] = color.g * color.g * intensity * intensity;
+					pcolors[ poffset + 2 ] = color.b * color.b * intensity * intensity;
+
+				} else {
+
+					pcolors[ poffset ]     = color.r * intensity;
+					pcolors[ poffset + 1 ] = color.g * intensity;
+					pcolors[ poffset + 2 ] = color.b * intensity;
+
+				}
 
 				ppositions[ poffset ]     = position.x;
 				ppositions[ poffset + 1 ] = position.y;
@@ -2489,8 +2535,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function refreshUniformsCommon( uniforms, material ) {
 
-		uniforms.diffuse.value = material.color;
 		uniforms.opacity.value = material.opacity;
+
+		if ( _this.gammaInput ) {
+
+			uniforms.diffuse.value.copyGammaToLinear( material.color );
+
+		} else {
+
+			uniforms.diffuse.value = material.color;
+
+		}
 
 		uniforms.map.texture = material.map;
 		if ( material.map ) {
@@ -2503,7 +2558,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		uniforms.envMap.texture = material.envMap;
 		uniforms.flipEnvMap.value = ( material.envMap instanceof THREE.WebGLRenderTargetCube ) ? 1 : -1;
-		uniforms.reflectivity.value = material.reflectivity;
+
+		if ( _this.gammaInput ) {
+
+			//uniforms.reflectivity.value = material.reflectivity * material.reflectivity;
+			uniforms.reflectivity.value = material.reflectivity;
+
+		} else {
+
+			uniforms.reflectivity.value = material.reflectivity;
+
+		}
+
 		uniforms.refractionRatio.value = material.refractionRatio;
 		uniforms.combine.value = material.combine;
 		uniforms.useRefract.value = material.envMap && material.envMap.mapping instanceof THREE.CubeRefractionMapping;
@@ -2547,9 +2613,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function refreshUniformsPhong( uniforms, material ) {
 
-		uniforms.ambient.value = material.ambient;
-		uniforms.specular.value = material.specular;
 		uniforms.shininess.value = material.shininess;
+
+		if ( _this.gammaInput ) {
+
+			uniforms.ambient.value.copyGammaToLinear( material.ambient );
+			uniforms.specular.value.copyGammaToLinear( material.specular );
+
+		} else {
+
+			uniforms.ambient.value = material.ambient;
+			uniforms.specular.value = material.specular;
+
+		}
 
 	};
 
@@ -4759,6 +4835,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_supportsVertexTextures ? "#define VERTEX_TEXTURES" : "",
 
+			_this.gammaInput ? "#define GAMMA_INPUT" : "",
+			_this.gammaOutput ? "#define GAMMA_OUTPUT" : "",
+			_this.physicallyBasedShading ? "#define PHYSICALLY_BASED_SHADING" : "",
+
 			"#define MAX_DIR_LIGHTS " + parameters.maxDirLights,
 			"#define MAX_POINT_LIGHTS " + parameters.maxPointLights,
 
@@ -4836,6 +4916,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 			"#define MAX_SHADOWS " + parameters.maxShadows,
 
 			parameters.alphaTest ? "#define ALPHATEST " + parameters.alphaTest: "",
+
+			_this.gammaInput ? "#define GAMMA_INPUT" : "",
+			_this.gammaOutput ? "#define GAMMA_OUTPUT" : "",
+			_this.physicallyBasedShading ? "#define PHYSICALLY_BASED_SHADING" : "",
 
 			( parameters.useFog && parameters.fog ) ? "#define USE_FOG" : "",
 			( parameters.useFog && parameters.fog instanceof THREE.FogExp2 ) ? "#define FOG_EXP2" : "",
