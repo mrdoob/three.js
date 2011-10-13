@@ -4,7 +4,7 @@
  */
 
 THREE.GeometryUtils = {
-	
+
 	merge: function ( geometry1, object2 /* mesh | geometry */ ) {
 
 		var matrix, matrixRotation,
@@ -437,15 +437,6 @@ THREE.GeometryUtils = {
 
 	},
 
-	// Get 16 bits of randomness
-	// (standard Math.random() creates repetitive patterns when applied over larger space)
-
-	random16: function() {
-
-		return ( 65280 * Math.random() + 255 * Math.random() ) / 65535;
-
-	},
-
 	center: function( geometry ) {
 
 		geometry.computeBoundingBox();
@@ -467,6 +458,6 @@ THREE.GeometryUtils = {
 
 };
 
-THREE.GeometryUtils.random = THREE.GeometryUtils.random16;
+THREE.GeometryUtils.random = THREE.Math.random16;
 
 THREE.GeometryUtils.__v1 = new THREE.Vector3();
