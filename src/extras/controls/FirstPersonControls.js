@@ -28,9 +28,6 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 	this.verticalMin = 0;
 	this.verticalMax = Math.PI;
 
-	this.lastUpdate = new Date().getTime();
-	this.tdiff = 0;
-
 	this.autoSpeedFactor = 0.0;
 
 	this.mouseX = 0;
@@ -172,21 +169,18 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 	};
 
-	this.update = function() {
+	this.update = function( delta ) {
 
-		var now = new Date().getTime();
-		this.tdiff = ( now - this.lastUpdate ) / 1000;
-		this.lastUpdate = now;
+		delta *= 0.001;
 
 		if ( !this.freeze ) {
-
 
 			if ( this.heightSpeed ) {
 
 				var y = THREE.Math.clamp( this.object.position.y, this.heightMin, this.heightMax );
-				var delta = y - this.heightMin;
+				var heightDelta = y - this.heightMin;
 
-				this.autoSpeedFactor = this.tdiff * ( delta * this.heightCoef );
+				this.autoSpeedFactor = delta * ( heightDelta * this.heightCoef );
 
 			} else {
 
@@ -194,7 +188,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 			}
 
-			var actualMoveSpeed = this.tdiff * this.movementSpeed;
+			var actualMoveSpeed = delta * this.movementSpeed;
 
 			if ( this.moveForward || ( this.autoForward && !this.moveBackward ) ) this.object.translateZ( - ( actualMoveSpeed + this.autoSpeedFactor ) );
 			if ( this.moveBackward ) this.object.translateZ( actualMoveSpeed );
@@ -205,7 +199,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 			if ( this.moveUp ) this.object.translateY( actualMoveSpeed );
 			if ( this.moveDown ) this.object.translateY( - actualMoveSpeed );
 
-			var actualLookSpeed = this.tdiff * this.lookSpeed;
+			var actualLookSpeed = delta * this.lookSpeed;
 
 			if ( !this.activeLook ) {
 

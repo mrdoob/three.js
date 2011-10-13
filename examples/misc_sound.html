@@ -192,12 +192,13 @@
 
 			function render() {
 
-				var time = clock.elapsed() * 0.005;
+				var delta = clock.delta(),
+					time = clock.elapsedTime * 0.005;
 
-				controls.update();
+				controls.update( delta );
 
-				material_sphere1.color.setHSV( 0.0, 0.3 + 0.7 * ( 1 + Math.cos(time) ) / 2, 1 );
-				material_sphere2.color.setHSV( 0.1, 0.3 + 0.7 * ( 1 + Math.sin(time) ) / 2, 1 );
+				material_sphere1.color.setHSV( 0.0, 0.3 + 0.7 * ( 1 + Math.cos( time ) ) / 2, 1 );
+				material_sphere2.color.setHSV( 0.1, 0.3 + 0.7 * ( 1 + Math.sin( time ) ) / 2, 1 );
 
 				renderer.clear();
 				renderer.render( scene, camera );
