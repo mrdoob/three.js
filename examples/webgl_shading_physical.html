@@ -47,6 +47,7 @@
 		<script type="text/javascript" src="../src/core/Vector4.js"></script>
 		<script type="text/javascript" src="../src/core/Ray.js"></script>
 		<script type="text/javascript" src="../src/core/Rectangle.js"></script>
+		<script type="text/javascript" src="../src/core/Math.js"></script>
 		<script type="text/javascript" src="../src/core/Matrix3.js"></script>
 		<script type="text/javascript" src="../src/core/Matrix4.js"></script>
 		<script type="text/javascript" src="../src/core/Object3D.js"></script>
@@ -111,7 +112,6 @@
 		<script type="text/javascript" src="../src/extras/ColorUtils.js"></script>
 		<script type="text/javascript" src="../src/extras/GeometryUtils.js"></script>
 		<script type="text/javascript" src="../src/extras/ImageUtils.js"></script>
-		<script type="text/javascript" src="../src/extras/MathUtils.js"></script>
 		<script type="text/javascript" src="../src/extras/SceneUtils.js"></script>
 		<script type="text/javascript" src="../src/extras/ShaderUtils.js"></script>
 		<script type="text/javascript" src="../src/extras/core/Curve.js"></script>
@@ -603,13 +603,13 @@
 
 				if ( morph ) morph.updateAnimation( delta );
 
-				scene.fog.color.setHSV( 0.13, 0.25, THREE.MathUtils.mapLinear( parameters.control, 0, 100, 0.1, 0.99 ) );
+				scene.fog.color.setHSV( 0.13, 0.25, THREE.Math.mapLinear( parameters.control, 0, 100, 0.1, 0.99 ) );
 				renderer.setClearColor( scene.fog.color, 1 );
 
-				sunLight.intensity = THREE.MathUtils.mapLinear( parameters.control, 0, 100, 0.3, 1 );
-				pointLight.intensity = THREE.MathUtils.mapLinear( parameters.control, 0, 100, 1, 0.5 );
+				sunLight.intensity = THREE.Math.mapLinear( parameters.control, 0, 100, 0.3, 1 );
+				pointLight.intensity = THREE.Math.mapLinear( parameters.control, 0, 100, 1, 0.5 );
 
-				pointLight.color.setHSV( 0.1, THREE.MathUtils.mapLinear( parameters.control, 0, 100, 0.99, 0 ), 0.9 );
+				pointLight.color.setHSV( 0.1, THREE.Math.mapLinear( parameters.control, 0, 100, 0.99, 0 ), 0.9 );
 
 				renderer.shadowMapDarkness = 0.5 * sunLight.intensity;
 

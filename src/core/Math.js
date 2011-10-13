@@ -2,7 +2,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.MathUtils = {
+THREE.Math = {
 
 	clamp: function ( x, a, b ) {
 

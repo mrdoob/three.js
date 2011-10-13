@@ -183,7 +183,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 			if ( this.heightSpeed ) {
 
-				var y = THREE.MathUtils.clamp( this.object.position.y, this.heightMin, this.heightMax );
+				var y = THREE.Math.clamp( this.object.position.y, this.heightMin, this.heightMax );
 				var delta = y - this.heightMin;
 
 				this.autoSpeedFactor = this.tdiff * ( delta * this.heightCoef );
@@ -247,7 +247,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 		if ( this.constrainVertical ) {
 
-			this.phi = THREE.MathUtils.mapLinear( this.phi, 0, Math.PI, this.verticalMin, this.verticalMax );
+			this.phi = THREE.Math.mapLinear( this.phi, 0, Math.PI, this.verticalMin, this.verticalMax );
 
 		}
 

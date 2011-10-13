@@ -10,9 +10,9 @@ THREE.ColorUtils = {
 
 		THREE.ColorUtils.rgbToHsv( color, hsv );
 
-		hsv.h = THREE.MathUtils.clamp( hsv.h + h, 0, 1 );
-		hsv.s = THREE.MathUtils.clamp( hsv.s + s, 0, 1 );
-		hsv.v = THREE.MathUtils.clamp( hsv.v + v, 0, 1 );
+		hsv.h = THREE.Math.clamp( hsv.h + h, 0, 1 );
+		hsv.s = THREE.Math.clamp( hsv.s + s, 0, 1 );
+		hsv.v = THREE.Math.clamp( hsv.v + v, 0, 1 );
 
 		color.setHSV( hsv.h, hsv.s, hsv.v );
 

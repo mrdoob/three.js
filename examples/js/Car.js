@@ -126,28 +126,28 @@ THREE.Car = function () {
 
 		if ( controls.moveForward ) {
 
-			this.speed = THREE.MathUtils.clamp( this.speed + delta * this.FRONT_ACCELERATION, this.MAX_REVERSE_SPEED, this.MAX_SPEED );
-			this.acceleration = THREE.MathUtils.clamp( this.acceleration + delta, -1, 1 );
+			this.speed = THREE.Math.clamp( this.speed + delta * this.FRONT_ACCELERATION, this.MAX_REVERSE_SPEED, this.MAX_SPEED );
+			this.acceleration = THREE.Math.clamp( this.acceleration + delta, -1, 1 );
 
 		}
 
 		if ( controls.moveBackward ) {
 
 
-			this.speed = THREE.MathUtils.clamp( this.speed - delta * this.BACK_ACCELERATION, this.MAX_REVERSE_SPEED, this.MAX_SPEED );
-			this.acceleration = THREE.MathUtils.clamp( this.acceleration - delta, -1, 1 );
+			this.speed = THREE.Math.clamp( this.speed - delta * this.BACK_ACCELERATION, this.MAX_REVERSE_SPEED, this.MAX_SPEED );
+			this.acceleration = THREE.Math.clamp( this.acceleration - delta, -1, 1 );
 
 		}
 
 		if ( controls.moveLeft ) {
 
-			this.wheelOrientation = THREE.MathUtils.clamp( this.wheelOrientation + delta * this.WHEEL_ANGULAR_ACCELERATION, - this.MAX_WHEEL_ROTATION, this.MAX_WHEEL_ROTATION );
+			this.wheelOrientation = THREE.Math.clamp( this.wheelOrientation + delta * this.WHEEL_ANGULAR_ACCELERATION, - this.MAX_WHEEL_ROTATION, this.MAX_WHEEL_ROTATION );
 
 		}
 
 		if ( controls.moveRight ) {
 
-			this.wheelOrientation = THREE.MathUtils.clamp( this.wheelOrientation - delta * this.WHEEL_ANGULAR_ACCELERATION, - this.MAX_WHEEL_ROTATION, this.MAX_WHEEL_ROTATION );
+			this.wheelOrientation = THREE.Math.clamp( this.wheelOrientation - delta * this.WHEEL_ANGULAR_ACCELERATION, - this.MAX_WHEEL_ROTATION, this.MAX_WHEEL_ROTATION );
 
 		}
 
@@ -159,15 +159,15 @@ THREE.Car = function () {
 
 				var k = exponentialEaseOut( this.speed / this.MAX_SPEED );
 
-				this.speed = THREE.MathUtils.clamp( this.speed - k * delta * this.FRONT_DECCELERATION, 0, this.MAX_SPEED );
-				this.acceleration = THREE.MathUtils.clamp( this.acceleration - k * delta, 0, 1 );
+				this.speed = THREE.Math.clamp( this.speed - k * delta * this.FRONT_DECCELERATION, 0, this.MAX_SPEED );
+				this.acceleration = THREE.Math.clamp( this.acceleration - k * delta, 0, 1 );
 
 			} else {
 
 				var k = exponentialEaseOut( this.speed / this.MAX_REVERSE_SPEED );
 
-				this.speed = THREE.MathUtils.clamp( this.speed + k * delta * this.BACK_ACCELERATION, this.MAX_REVERSE_SPEED, 0 );
-				this.acceleration = THREE.MathUtils.clamp( this.acceleration + k * delta, -1, 0 );
+				this.speed = THREE.Math.clamp( this.speed + k * delta * this.BACK_ACCELERATION, this.MAX_REVERSE_SPEED, 0 );
+				this.acceleration = THREE.Math.clamp( this.acceleration + k * delta, -1, 0 );
 
 			}
 
@@ -180,11 +180,11 @@ THREE.Car = function () {
 
 			if ( this.wheelOrientation > 0 ) {
 
-				this.wheelOrientation = THREE.MathUtils.clamp( this.wheelOrientation - delta * this.WHEEL_ANGULAR_DECCELERATION, 0, this.MAX_WHEEL_ROTATION );
+				this.wheelOrientation = THREE.Math.clamp( this.wheelOrientation - delta * this.WHEEL_ANGULAR_DECCELERATION, 0, this.MAX_WHEEL_ROTATION );
 
 			} else {
 
-				this.wheelOrientation = THREE.MathUtils.clamp( this.wheelOrientation + delta * this.WHEEL_ANGULAR_DECCELERATION, - this.MAX_WHEEL_ROTATION, 0 );
+				this.wheelOrientation = THREE.Math.clamp( this.wheelOrientation + delta * this.WHEEL_ANGULAR_DECCELERATION, - this.MAX_WHEEL_ROTATION, 0 );
 
 			}
 
