@@ -64,7 +64,7 @@
 
 			var light;
 
-			var delta, newTime, oldTime;
+			var clock = new THREE.Clock();
 
 			init();
 			animate();
@@ -364,11 +364,7 @@
 
 			function render() {
 
-				if ( oldTime === undefined ) oldTime = Date.now();
-
-				newTime = Date.now();
-				delta = newTime - oldTime;
-				oldTime = newTime;
+				var delta = clock.delta();
 
 				for ( var i = 0; i < morphs.length; i ++ ) {
 

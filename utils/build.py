@@ -13,6 +13,7 @@ import sys
 
 COMMON_FILES = [
 'Three.js',
+'core/Clock.js',
 'core/Color.js',
 'core/Vector2.js',
 'core/Vector3.js',

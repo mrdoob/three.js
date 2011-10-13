@@ -42,6 +42,7 @@
 
 		<script type="text/javascript" src="../src/Three.js"></script>
 		<script type="text/javascript" src="../src/core/Color.js"></script>
+		<script type="text/javascript" src="../src/core/Clock.js"></script>
 		<script type="text/javascript" src="../src/core/Vector2.js"></script>
 		<script type="text/javascript" src="../src/core/Vector3.js"></script>
 		<script type="text/javascript" src="../src/core/Vector4.js"></script>
@@ -198,7 +199,7 @@
 
 			var parameters, tweenDirection, tweenDay, tweenNight;
 
-			var oldTime;
+			var clock = new THREE.Clock();
 
 			init();
 			animate();
@@ -592,11 +593,7 @@
 
 			function render() {
 
-				if ( oldTime === undefined ) oldTime = Date.now();
-
-				var newTime = Date.now();
-				var delta = newTime - oldTime;
-				oldTime = newTime;
+				var delta = clock.delta();
 
 				TWEEN.update();
 				controls.update();

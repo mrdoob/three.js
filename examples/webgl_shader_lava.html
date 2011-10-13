@@ -121,7 +121,7 @@
 
 			var container, stats;
 
-			var start_time;
+			var clock = new THREE.Clock();
 
 			var camera, scene, renderer, composer;
 
@@ -144,8 +144,6 @@
 				camera.position.z = 4;
 
 				scene = new THREE.Scene();
-
-				start_time = Date.now();
 
 				uniforms = {
 
@@ -240,10 +238,12 @@
 
 			function render() {
 
-				uniforms.time.value += 0.02;
+				var delta = 0.05 * clock.delta();
 
-				mesh.rotation.y += 0.00125;
-				mesh.rotation.x += 0.005;
+				uniforms.time.value += 0.02 * delta;
+
+				mesh.rotation.y += 0.00125 * delta;
+				mesh.rotation.x += 0.005 * delta;
 
 				renderer.clear();
 				composer.render( 0.01 );

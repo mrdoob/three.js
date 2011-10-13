@@ -93,7 +93,7 @@
 
 			var cubeCamera;
 
-			var oldTime = Date.now();
+			var clock = new THREE.Clock();
 
 			var controlsGallardo = {
 
@@ -875,9 +875,7 @@
 
 			function render() {
 
-				var newTime = Date.now();
-				var delta = 0.001 * ( newTime - oldTime );
-				oldTime = newTime;
+				var delta = 0.001 * clock.delta();
 
 				// day / night
 

@@ -60,6 +60,8 @@
 
 			var sound1, sound2;
 
+			var clock = new THREE.Clock();
+
 			var Sound = function ( sources, radius, volume ) {
 
 				var audio = document.createElement( 'audio' );
@@ -190,7 +192,7 @@
 
 			function render() {
 
-				var time = new Date().getTime() * 0.005;
+				var time = clock.elapsed() * 0.005;
 
 				controls.update();
 
