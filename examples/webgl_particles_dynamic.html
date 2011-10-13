@@ -297,13 +297,9 @@
 
 			function render () {
 
-				if ( ! oldTime ) {
+				if ( ! oldTime ) oldTime = Date.now();
 
-					oldTime = new Date().getTime();
-
-				}
-
-				time = new Date().getTime();
+				time = Date.now();
 
 				delta = 0.01 * ( time - oldTime );
 				oldTime = time;

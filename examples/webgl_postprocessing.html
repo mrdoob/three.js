@@ -380,7 +380,7 @@
 
 			function render() {
 
-				var time = new Date().getTime() * 0.0004;
+				var time = Date.now() * 0.0004;
 
 				if ( mesh ) mesh.rotation.y = -time;
 

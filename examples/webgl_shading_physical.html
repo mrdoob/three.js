@@ -592,9 +592,9 @@
 
 			function render() {
 
-				if ( oldTime === undefined ) oldTime = new Date().getTime();
+				if ( oldTime === undefined ) oldTime = Date.now();
 
-				var newTime = new Date().getTime();
+				var newTime = Date.now();
 				var delta = newTime - oldTime;
 				oldTime = newTime;
 
