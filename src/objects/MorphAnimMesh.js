@@ -10,14 +10,12 @@ THREE.MorphAnimMesh = function( geometry, materials ) {
 
 	this.duration = 1000; // milliseconds
 	this.mirroredLoop = false;
+	this.time = 0;
 
 	// internals
 
 	this.lastKeyframe = 0;
 	this.currentKeyframe = 0;
-
-	this.time = 0;
-	this.offset = 0;
 
 	this.direction = 1;
 	this.directionBackwards = false;
@@ -29,7 +27,7 @@ THREE.MorphAnimMesh.prototype.constructor = THREE.MorphAnimMesh;
 
 THREE.MorphAnimMesh.prototype.updateAnimation = function ( delta ) {
 
-	var frameTime = this.duration / this.geometry.morphTargets.length;
+	var frameTime = this.duration / ( this.geometry.morphTargets.length - 1 );
 
 	this.time += this.direction * delta;
 

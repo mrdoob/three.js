@@ -60,9 +60,11 @@
 
 			var sceneHUD, cameraOrtho, hudMaterial;
 
-			var morphs = [];
+			var morph, morphs = [];
 
 			var light;
+
+			var delta, newTime, oldTime;
 
 			init();
 			animate();
@@ -246,7 +248,11 @@
 
 					if ( fudgeColor ) THREE.ColorUtils.adjustHSV( material.color, 0, 0.5 - Math.random(), 0.5 - Math.random() );
 
-					var meshAnim = new THREE.Mesh( geometry, material );
+					var meshAnim = new THREE.MorphAnimMesh( geometry, material );
+
+					meshAnim.speed = speed;
+					meshAnim.duration = duration;
+					meshAnim.time = 600 * Math.random();
 
 					meshAnim.position.set( x, y, z );
 					meshAnim.rotation.y = Math.PI/2;
@@ -256,9 +262,7 @@
 
 					scene.add( meshAnim );
 
-					morphs.push( { mesh: meshAnim, lastKeyframe: 0, currentKeyframe: 0,
-								   offset: Math.random() * 6, speed: speed, duration: duration,
-								   oldTime: new Date().getTime() } );
+					morphs.push( meshAnim );
 
 				}
 
@@ -343,51 +347,7 @@
 					addMorph( geometry, 0.45, 500, 500 - Math.random() * 500, FLOOR + 300, 700 );
 
 				} } );
-
 				*/
-
-			}
-
-
-			var t = 0, newTime, delta;
-
-
-			function updateMorph( morph ) {
-
-				// Alternate morph targets
-
-				var interpolation = morph.duration / ( morph.mesh.geometry.morphTargets.length - 1 );
-
-				var time = ( new Date().getTime()  + morph.offset * 100 ) % morph.duration;
-				var keyframe = Math.floor( time / interpolation ) + 1;
-
-				var mesh = morph.mesh;
-
-				if ( keyframe != morph.currentKeyframe ) {
-
-					mesh.morphTargetInfluences[ morph.lastKeyframe ] = 0;
-					mesh.morphTargetInfluences[ morph.currentKeyframe ] = 1;
-					mesh.morphTargetInfluences[ keyframe ] = 0;
-
-					morph.lastKeyframe = morph.currentKeyframe;
-					morph.currentKeyframe = keyframe;
-
-				}
-
-				mesh.morphTargetInfluences[ keyframe ] = ( time % interpolation ) / interpolation;
-				mesh.morphTargetInfluences[ morph.lastKeyframe ] = 1 - mesh.morphTargetInfluences[ keyframe ];
-
-				var newTime = new Date().getTime();
-				delta = newTime - morph.oldTime;
-				morph.oldTime = newTime;
-
-				mesh.position.x += morph.speed * delta;
-
-				if ( mesh.position.x  > 2000 )  {
-
-					mesh.position.x = -1000 - Math.random() * 500;
-
-				}
 
 			}
 
@@ -404,7 +364,27 @@
 
 			function render() {
 
-				for ( var i = 0; i < morphs.length; i++ ) updateMorph( morphs[ i ] );
+				if ( oldTime === undefined ) oldTime = new Date().getTime();
+
+				newTime = new Date().getTime();
+				delta = newTime - oldTime;
+				oldTime = newTime;
+
+				for ( var i = 0; i < morphs.length; i ++ ) {
+
+					morph = morphs[ i ];
+
+					morph.updateAnimation( delta );
+
+					morph.position.x += morph.speed * delta;
+
+					if ( morph.position.x  > 2000 )  {
+
+						morph.position.x = -1000 - Math.random() * 500;
+
+					}
+
+				}
 
 				controls.update();
 
