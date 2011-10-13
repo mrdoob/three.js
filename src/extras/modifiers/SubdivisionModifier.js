@@ -504,7 +504,7 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 		}
 		
 		if (sharpEdgeCount>2) {
-			
+			// TODO
 		}
 		
 		F.divideScalar(f);

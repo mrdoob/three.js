@@ -117,6 +117,7 @@ EXTRAS_FILES = [
 'extras/geometries/TorusGeometry.js',
 'extras/geometries/TorusKnotGeometry.js',
 'extras/modifiers/SubdivisionModifier.js',
+'extras/modifiers/ScaleModifier.js',
 'extras/loaders/Loader.js',
 'extras/loaders/BinaryLoader.js',
 'extras/loaders/ColladaLoader.js',
