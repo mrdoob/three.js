@@ -700,9 +700,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( material.attributes ) {
 
-				if ( geometry.__webglCustomAttributes === undefined ) {
+				if ( geometry.__webglCustomAttributesList === undefined ) {
 
-					geometry.__webglCustomAttributes = {};
+					geometry.__webglCustomAttributesList = [];
 
 				}
 
@@ -746,7 +746,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					}
 
-					geometry.__webglCustomAttributes[ a ] = attribute;
+					geometry.__webglCustomAttributesList.push( attribute );
 
 				}
 
@@ -887,9 +887,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( material.attributes ) {
 
-				if ( geometryGroup.__webglCustomAttributes === undefined ) {
+				if ( geometryGroup.__webglCustomAttributesList === undefined ) {
 
-					geometryGroup.__webglCustomAttributes = {};
+					geometryGroup.__webglCustomAttributesList = [];
 
 				}
 
@@ -929,7 +929,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					}
 
-					geometryGroup.__webglCustomAttributes[ a ] = attribute;
+					geometryGroup.__webglCustomAttributesList.push( attribute );
 
 				}
 
@@ -962,7 +962,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		si1, si2, si3, si4,
 		sa1, sa2, sa3, sa4,
 		sb1, sb2, sb3, sb4,
-		m, ml, i,
+		m, ml, i, il,
 		vn, uvi, uv2i,
 		vk, vkl, vka,
 		a,
@@ -998,7 +998,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		morphTargetsArrays = geometryGroup.__morphTargetsArrays,
 
-		customAttributes = geometryGroup.__webglCustomAttributes,
+		customAttributes = geometryGroup.__webglCustomAttributesList,
 		customAttribute,
 
 		faceArray = geometryGroup.__faceArray,
@@ -1038,10 +1038,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( customAttributes ) {
 
-			for ( a in customAttributes ) {
+			for ( i = 0, il = customAttributes.length; i < il; i ++ ) {
 
-				customAttributes[ a ].offset = 0;
-				customAttributes[ a ].offsetSrc = 0;
+				customAttributes[ i ].offset = 0;
+				customAttributes[ i ].offsetSrc = 0;
 
 			}
 
@@ -1099,9 +1099,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( customAttributes ) {
 
-					for ( a in customAttributes ) {
+					for ( i = 0, il = customAttributes.length; i < il; i ++ ) {
 
-						customAttribute = customAttributes[ a ];
+						customAttribute = customAttributes[ i ];
 
 						if ( customAttribute.__original.needsUpdate ) {
 
@@ -1536,9 +1536,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( customAttributes ) {
 
-					for ( a in customAttributes ) {
+					for ( i = 0, il = customAttributes.length; i < il; i ++ ) {
 
-						customAttribute = customAttributes[ a ];
+						customAttribute = customAttributes[ i ];
 
 						if ( customAttribute.__original.needsUpdate ) {
 
@@ -2024,9 +2024,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( customAttributes ) {
 
-			for ( a in customAttributes ) {
+			for ( i = 0, il = customAttributes.length; i < il; i ++ ) {
 
-				customAttribute = customAttributes[ a ];
+				customAttribute = customAttributes[ i ];
 
 				if ( customAttribute.__original.needsUpdate ) {
 
@@ -2257,16 +2257,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 		dirtyElements = geometry.__dirtyElements,
 		dirtyColors = geometry.__dirtyColors,
 
-		customAttributes = geometry.__webglCustomAttributes,
+		customAttributes = geometry.__webglCustomAttributesList,
+		i, il,
 		a, ca, cal, v1,
 		offset_custom,
 		customAttribute;
 
 		if ( customAttributes ) {
 
-			for ( a in customAttributes ) {
+			for ( i = 0, il = customAttributes.length; i < il; i ++ ) {
 
-				customAttributes[ a ].offset = 0;
+				customAttributes[ i ].offset = 0;
 
 			}
 
@@ -2315,9 +2316,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( customAttributes ) {
 
-				for ( a in customAttributes ) {
+				for ( i = 0, il = customAttributes.length; i < il; i ++ ) {
 
-					customAttribute = customAttributes[ a ];
+					customAttribute = customAttributes[ i ];
 
 					cal = customAttribute.value.length;
 
@@ -2388,7 +2389,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( dirtyVertices ) {
 
-				for ( v = 0; v < vl; v++ ) {
+				for ( v = 0; v < vl; v ++ ) {
 
 					vertex = vertices[ v ].position;
 
@@ -2420,9 +2421,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( customAttributes ) {
 
-				for ( a in customAttributes ) {
+				for ( i = 0, il = customAttributes.length; i < il; i ++ ) {
 
-					customAttribute = customAttributes[ a ];
+					customAttribute = customAttributes[ i ];
 
 					if ( customAttribute.__original.needsUpdate ) {
 
@@ -2509,9 +2510,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( customAttributes ) {
 
-			for ( a in customAttributes ) {
+			for ( i = 0, il = customAttributes.length; i < il; i ++ ) {
 
-				customAttribute = customAttributes[ a ];
+				customAttribute = customAttributes[ i ];
 
 				if ( customAttribute.__original.needsUpdate || object.sortParticles ) {
 
@@ -2965,7 +2966,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material.opacity == 0 ) return;
 
-		var program, attributes, linewidth, primitives, a, attribute;
+		var program, attributes, linewidth, primitives, a, attribute, i, il;
 
 		program = setProgram( camera, lights, fog, material, object );
 
@@ -3010,45 +3011,22 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			// Use the per-geometryGroup custom attribute arrays which are setup in initMeshBuffers
 
-			if ( geometryGroup.__webglCustomAttributes ) {
+			if ( geometryGroup.__webglCustomAttributesList ) {
 
-				for( a in geometryGroup.__webglCustomAttributes ) {
+				for ( i = 0, il = geometryGroup.__webglCustomAttributesList.length; i < il; i ++ ) {
 
-					if( attributes[ a ] >= 0 ) {
+					attribute = geometryGroup.__webglCustomAttributesList[ i ];
 
-						attribute = geometryGroup.__webglCustomAttributes[ a ];
+					if( attributes[ attribute.buffer.belongsToAttribute ] >= 0 ) {
 
 						_gl.bindBuffer( _gl.ARRAY_BUFFER, attribute.buffer );
-						_gl.vertexAttribPointer( attributes[ a ], attribute.size, _gl.FLOAT, false, 0, 0 );
+						_gl.vertexAttribPointer( attributes[ attribute.buffer.belongsToAttribute ], attribute.size, _gl.FLOAT, false, 0, 0 );
 
 					}
 
 				}
 
 			}
-
-
-	/*		if ( material.attributes ) {
-
-				for( a in material.attributes ) {
-
-					if( attributes[ a ] !== undefined && attributes[ a ] >= 0 ) {
-
-						attribute = material.attributes[ a ];
-
-						if( attribute.buffer ) {
-
-							_gl.bindBuffer( _gl.ARRAY_BUFFER, attribute.buffer );
-							_gl.vertexAttribPointer( attributes[ a ], attribute.size, _gl.FLOAT, false, 0, 0 );
-
-						}
-
-					}
-
-				}
-
-			}*/
-
 
 
 			// colors
