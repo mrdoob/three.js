@@ -59,12 +59,14 @@ THREE.PathControls = function ( object, domElement ) {
 
 	// methods
 
-	this.update = function () {
+	this.update = function ( delta ) {
+
+		delta *= 0.001;
 
 		var srcRange, dstRange;
 
-		if( this.lookHorizontal ) this.lon += this.mouseX * this.lookSpeed;
-		if( this.lookVertical )   this.lat -= this.mouseY * this.lookSpeed;
+		if( this.lookHorizontal ) this.lon += this.mouseX * this.lookSpeed * delta;
+		if( this.lookVertical )   this.lat -= this.mouseY * this.lookSpeed * delta;
 
 		this.lon = Math.max( 0, Math.min( 360, this.lon ) );
 		this.lat = Math.max( - 85, Math.min( 85, this.lat ) );

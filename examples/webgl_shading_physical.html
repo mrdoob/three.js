@@ -596,7 +596,7 @@
 				var delta = clock.delta();
 
 				TWEEN.update();
-				controls.update();
+				controls.update( delta );
 
 				if ( morph ) morph.updateAnimation( delta );
 
