@@ -59,7 +59,7 @@
 
 			var camera, controls, scene, renderer;
 
-			var mesh, texture,geometry, material;
+			var mesh, texture, geometry, material;
 
 			var worldWidth = 128, worldDepth = 128,
 			worldHalfWidth = worldWidth / 2, worldHalfDepth = worldDepth / 2;
@@ -139,8 +139,8 @@
 
 			function render() {
 
-				var delta = clock.delta(),
-					time = clock.elapsedTime * 0.01;
+				var delta = clock.getDelta(),
+					time = clock.getElapsedTime() * 10;
 
 				for ( var i = 0, l = geometry.vertices.length; i < l; i ++ ) {
 

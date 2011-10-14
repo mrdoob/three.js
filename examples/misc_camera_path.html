@@ -158,9 +158,9 @@
 
 			function render() {
 
-				var delta = clock.delta();
+				var delta = clock.getDelta();
 
-				THREE.AnimationHandler.update( 0.001 * delta );
+				THREE.AnimationHandler.update( delta );
 
 				controls.update( delta );
 				renderer.render( scene, camera );

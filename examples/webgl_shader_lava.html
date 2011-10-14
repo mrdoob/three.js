@@ -171,8 +171,6 @@
 				} );
 
 				mesh = new THREE.Mesh( new THREE.TorusGeometry( size, 0.3, 30, 30 ), [ material /*, new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, wireframeLinewidth: 2 } ) */ ] );
-				mesh.position.x = 0;
-				mesh.position.y = 0;
 				mesh.rotation.x = 0.3;
 				scene.add( mesh );
 
@@ -238,12 +236,12 @@
 
 			function render() {
 
-				var delta = 0.05 * clock.delta();
+				var delta = 5 * clock.getDelta();
 
-				uniforms.time.value += 0.02 * delta;
+				uniforms.time.value += 0.2 * delta;
 
-				mesh.rotation.y += 0.00125 * delta;
-				mesh.rotation.x += 0.005 * delta;
+				mesh.rotation.y += 0.0125 * delta;
+				mesh.rotation.x += 0.05 * delta;
 
 				renderer.clear();
 				composer.render( 0.01 );

@@ -593,10 +593,10 @@
 
 			function render() {
 
-				var delta = clock.delta();
+				var delta = 1000 * clock.getDelta();
 
 				TWEEN.update();
-				controls.update( delta );
+				controls.update();
 
 				if ( morph ) morph.updateAnimation( delta );
 

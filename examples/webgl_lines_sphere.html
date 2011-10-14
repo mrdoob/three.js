@@ -87,7 +87,7 @@
 					geometry = new THREE.Geometry();
 
 
-				for ( i = 0; i < 1500; ++i ) {
+				for ( i = 0; i < 1500; i ++ ) {
 
 					vector1 = new THREE.Vector3( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 );
 					vector1.normalize();
@@ -169,17 +169,16 @@
 
 			function render() {
 
-				//camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY + 200 - camera.position.y ) * .05;
 				camera.lookAt( scene.position );
 
 				renderer.render( scene, camera );
 
-				var time = new Date().getTime() * 0.0001;
+				var time = Date.now() * 0.0001;
 
-				for( var i = 0; i<scene.objects.length; i++ ) {
+				for( var i = 0; i < scene.objects.length; i ++ ) {
 
-					scene.objects[i].rotation.y = time * ( i < 4 ? i+1 : - (i+1) );
+					scene.objects[ i ].rotation.y = time * ( i < 4 ? ( i + 1 ) : - ( i + 1 ) );
 
 					if ( i < 5 ) scene.objects[i].scale.x = scene.objects[i].scale.y = scene.objects[i].scale.z = scene.objects[i].originalScale * (i/5+1) * (1 + 0.5 * Math.sin( 7*time ) );
 

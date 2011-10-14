@@ -71,7 +71,7 @@
 
 				sprite = THREE.ImageUtils.loadTexture( "textures/sprites/ball.png" );
 
-				for ( i = 0; i < 5000; i++ ) {
+				for ( i = 0; i < 5000; i ++ ) {
 
 					x = 2000 * Math.random() - 1000;
 					y = 2000 * Math.random() - 1000;
@@ -171,7 +171,7 @@
 
 			function render() {
 
-				var time = new Date().getTime() * 0.00005;
+				var time = Date.now() * 0.00005;
 
 				camera.position.x += ( mouseX - camera.position.x ) * 0.05;
 				camera.position.y += ( - mouseY - camera.position.y ) * 0.05;

@@ -44,8 +44,6 @@ THREE.RollControls = function ( object, domElement ) {
 
 	this.update = function ( delta ) {
 
-		delta *= 0.001;
-
 		if ( this.mouseLook ) {
 
 			var actualLookSpeed = delta * this.lookSpeed;

@@ -153,8 +153,6 @@
 			var loader = new THREE.BinaryLoader( true );
 			document.body.appendChild( loader.statusDomElement );
 
-			var clock = new THREE.Clock();
-
 			init();
 			animate();
 
@@ -603,7 +601,7 @@
 
 			function render() {
 
-				var timer = -0.0002 * clock.elapsed();
+				var timer = -0.0002 * Date.now();
 
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 

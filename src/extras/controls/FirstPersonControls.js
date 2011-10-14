@@ -171,8 +171,6 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 	this.update = function( delta ) {
 
-		delta *= 0.001;
-
 		if ( !this.freeze ) {
 
 			if ( this.heightSpeed ) {

@@ -61,8 +61,6 @@ THREE.PathControls = function ( object, domElement ) {
 
 	this.update = function ( delta ) {
 
-		delta *= 0.001;
-
 		var srcRange, dstRange;
 
 		if( this.lookHorizontal ) this.lon += this.mouseX * this.lookSpeed * delta;

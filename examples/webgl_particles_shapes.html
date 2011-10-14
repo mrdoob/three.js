@@ -82,8 +82,6 @@
 
 			var text, plane;
 
-			var oldTime = new Date().getTime() * 0.001;
-			var delta = 1;
 			var speed = 50;
 
 			var pointLight;
@@ -97,6 +95,7 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
+			var delta = 1, clock = new THREE.Clock();
 
 			var heartShape, particleCloud, sparksEmitter, emitterPos;
 			var _rotation = 0;
@@ -624,9 +623,7 @@
 
 			function render() {
 
-				var time = new Date().getTime() * 0.001;
-				delta = speed * ( time - oldTime );
-				oldTime = time;
+				delta = speed * clock.getDelta();
 
 				particleCloud.geometry.__dirtyVertices = true;
 

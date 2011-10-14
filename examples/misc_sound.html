@@ -192,8 +192,8 @@
 
 			function render() {
 
-				var delta = clock.delta(),
-					time = clock.elapsedTime * 0.005;
+				var delta = clock.getDelta(),
+					time = clock.getElapsedTime() * 5;
 
 				controls.update( delta );
 

@@ -282,10 +282,10 @@
 
 				// rotate the planet and clouds
 
-				var delta = clock.delta();
+				var delta = clock.getDelta();
 
-				meshPlanet.rotation.y += 0.001 * rotationSpeed * delta;
-				meshClouds.rotation.y += 0.001 * 1.25 * rotationSpeed * delta;
+				meshPlanet.rotation.y += rotationSpeed * delta;
+				meshClouds.rotation.y += 1.25 * rotationSpeed * delta;
 
 				// slow down as we approach the surface
 
@@ -308,7 +308,7 @@
 				controls.update( delta );
 
 				renderer.clear();
-				composer.render( 0.001 * delta );
+				composer.render( delta );
 
 			};
 

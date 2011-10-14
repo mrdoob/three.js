@@ -75,6 +75,8 @@
 
 			var composer, effectFocus;
 
+			var clock = new THREE.Clock();
+
 			init();
 			animate();
 
@@ -98,7 +100,7 @@
 
 				document.body.appendChild( bloader.statusDomElement );
 
-				aloader.load( { model: "obj/terrain.js", callback: function( geometry ) {
+				aloader.load( "obj/terrain.js", function( geometry ) {
 
 					createMesh( geometry, scene, 16.8, -11000, -200,  -5000, 0x00ff44, false );
 					createMesh( geometry, scene, 16.8,  11000, -200, -15000, 0x00ff33, false );
@@ -109,7 +111,7 @@
 					createMesh( geometry, scene, 16.8,  13000, -200,   5000, 0x00ff55, false );
 					createMesh( geometry, scene, 16.8,  13000, -200,  -5000, 0x00ff66, false );
 
-				} } );
+				} );
 
 				bloader.load( { model: "obj/veyron/VeyronNoUv_bin.js", callback: function( geometry ) { createMesh( geometry, scene, 6.8, 2200, -200, -100, 0x0055ff, false ) } } );
 
@@ -285,8 +287,7 @@
 			}
 
 
-			var j, jl, cm, data, vertices, vertices_tmp, vl, d, vt,
-				time, oldTime, delta;
+			var j, jl, cm, data, vertices, vertices_tmp, vl, d, vt;
 
 			function animate () {
 
@@ -297,25 +298,20 @@
 
 			function render () {
 
-				if ( ! oldTime ) oldTime = Date.now();
-
-				time = Date.now();
-
-				delta = 0.01 * ( time - oldTime );
-				oldTime = time;
+				delta = 10 * clock.getDelta();;
 
 				delta = delta < 2 ? delta : 2;
 
 				parent.rotation.y += -0.02 * delta;
 
-				for( j = 0, jl = clonemeshes.length; j < jl; j++ ) {
+				for( j = 0, jl = clonemeshes.length; j < jl; j ++ ) {
 
 					cm = clonemeshes[ j ];
 					cm.mesh.rotation.y += -0.1 * delta * cm.speed;
 
 				}
 
-				for( j = 0, jl = meshes.length; j < jl; j++ ) {
+				for( j = 0, jl = meshes.length; j < jl; j ++ ) {
 
 					data = meshes[ j ];
 					mesh = data.mesh;

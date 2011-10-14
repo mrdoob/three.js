@@ -72,8 +72,8 @@
 				scene.add( light );
 
 				var loader = new THREE.JSONLoader();
-				loader.load( { model: "obj/cubecolors/cubecolors.js", callback: createScene1 } );
-				loader.load( { model: "obj/cubecolors/cube_fvc.js", callback: createScene2 } );
+				loader.load( "obj/cubecolors/cubecolors.js", createScene1 );
+				loader.load( "obj/cubecolors/cube_fvc.js", createScene2 );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );

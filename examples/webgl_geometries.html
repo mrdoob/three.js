@@ -59,26 +59,25 @@
 				scene.add( group );
 
 				object = new THREE.Mesh( new THREE.CubeGeometry( 100, 100, 100, 4, 4, 4 ), material );
-				object.position.x = - 200;
-				object.position.z = 200;
+				object.position.set( -200, 0, 200 );
 				group.add( object );
 
 
 				object = new THREE.Mesh( new THREE.CylinderGeometry( 25, 75, 100, 40, 5 ), material );
-				object.position.z = 200;
+				object.position.set( 0, 0, 200 );
 				group.add( object );
 
 				object = new THREE.Mesh( new THREE.IcosahedronGeometry( 2 ), material );
-				object.position.x = 200;
-				object.position.z = 200;
+				object.position.set( 200, 0, 200 );
 				object.scale.x = object.scale.y = object.scale.z = 75;
 				group.add( object );
 
 				object = new THREE.Mesh( new THREE.PlaneGeometry( 100, 100, 4, 4 ), material );
-				object.position.x = - 200;
+				object.position.set( -200, 0, 0 );
 				group.add( object );
 
 				object = new THREE.Mesh( new THREE.SphereGeometry( 75, 20, 10 ), material );
+				object.position.set( 0, 0, 0 );
 				group.add( object );
 
 				var points = [];
@@ -90,21 +89,19 @@
 				}
 
 				object = new THREE.Mesh( new THREE.LatheGeometry( points, 20 ), material );
-				object.position.x = 200;
+				object.position.set( 200, 0, 0 );
 				group.add( object );
 
 				object = new THREE.Mesh( new THREE.TorusGeometry( 50, 20, 20, 20 ), material );
-				object.position.x = - 200;
-				object.position.z = - 200;
+				object.position.set( -200, 0, -200 );
 				group.add( object );
 
 				object = new THREE.Mesh( new THREE.TorusKnotGeometry( 50, 10, 50, 20 ), material );
-				object.position.z = - 200;
+				object.position.set( 0, 0, -200 );
 				group.add( object );
 
 				object = new THREE.Axes();
-				object.position.x = 200;
-				object.position.z = - 200;
+				object.position.set( 200, 0, -200 );
 				object.scale.x = object.scale.y = object.scale.z = 0.5;
 				group.add( object );
 
@@ -133,13 +130,14 @@
 
 			function render() {
 
-				var timer = new Date().getTime() * 0.0001;
+				var timer = Date.now() * 0.0001;
 
 				camera.position.x = Math.cos( timer ) * 800;
 				camera.position.z = Math.sin( timer ) * 800;
+
 				camera.lookAt( scene.position );
 
-				for ( var i = 0, l = group.children.length; i < l; i++ ) {
+				for ( var i = 0, l = group.children.length; i < l; i ++ ) {
 
 					var object = group.children[ i ];
 

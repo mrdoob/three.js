@@ -129,15 +129,19 @@
 				scene.add( mesh );
 
 				if ( render_gl ) {
+
 					try {
+
 						webglRenderer = new THREE.WebGLRenderer();
 						webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 						webglRenderer.domElement.style.position = "relative";
 						container.appendChild( webglRenderer.domElement );
 						has_gl = 1;
+
 					}
 					catch (e) {
 					}
+
 				}
 
 				if ( render_canvas ) {
@@ -160,10 +164,10 @@
 
 				//var loader = new THREE.BinaryLoader(),
 				var loader = new THREE.JSONLoader(),
-					callback = function( geometry ) { createScene( geometry) };
+					callback = function( geometry ) { createScene( geometry ) };
 
-				loader.load( { model: "obj/female02/Female02_slim.js", callback: callback } );
-				//loader.load( { model: "obj/female02/Female02_bin.js", callback: callback } );
+				loader.load( "obj/female02/Female02_slim.js", callback );
+				//loader.load( "obj/female02/Female02_bin.js", callback );
 
 			}
 

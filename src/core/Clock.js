@@ -25,22 +25,22 @@ THREE.Clock.prototype.start = function () {
 
 THREE.Clock.prototype.stop = function () {
 
-	this.elapsed();
+	this.getElapsedTime();
 
 	this.running = false;
 
 };
 
-THREE.Clock.prototype.elapsed = function () {
+THREE.Clock.prototype.getElapsedTime = function () {
 
-	this.elapsedTime += this.delta();
+	this.elapsedTime += this.getDelta();
 
 	return this.elapsedTime;
 
 };
 
 
-THREE.Clock.prototype.delta = function () {
+THREE.Clock.prototype.getDelta = function () {
 
 	var diff = 0;
 
@@ -53,7 +53,7 @@ THREE.Clock.prototype.delta = function () {
 	if ( this.running ) {
 
 		var newTime = Date.now();
-		diff = newTime - this.oldTime;
+		diff = 0.001 * ( newTime - this.oldTime );
 		this.oldTime = newTime;
 
 		this.elapsedTime += diff;

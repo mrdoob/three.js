@@ -68,8 +68,8 @@
 
 				var i, material, container;
 
-				container = document.createElement('div');
-				document.body.appendChild(container);
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 33, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 700;
@@ -105,14 +105,18 @@
 								   [ m1, scale*0.5, [2*d, -d, 0], g1 ], [ m1, scale*0.5, [-2*d, -d, 0], g1 ],
 								   ];
 
-				for ( i = 0; i < parameters.length; ++i ) {
+				for ( i = 0; i < parameters.length; i ++ ) {
 
 					p = parameters[ i ];
+
 					line = new THREE.Line( p[ 3 ],  p[ 0 ] );
+
 					line.scale.x = line.scale.y = line.scale.z =  p[ 1 ];
+
 					line.position.x = p[ 2 ][ 0 ];
 					line.position.y = p[ 2 ][ 1 ];
 					line.position.z = p[ 2 ][ 2 ];
+
 					scene.add( line );
 
 				}
@@ -212,11 +216,11 @@
 
 				camera.lookAt( scene.position );
 
-				var time = new Date().getTime() * 0.0015;
+				var time = Date.now() * 0.0015;
 
-				for( var i = 0; i < scene.objects.length; i++ ) {
+				for( var i = 0; i < scene.objects.length; i ++ ) {
 
-					scene.objects[ i ].rotation.y = time * ( i % 2 ? 1 : -1);
+					scene.objects[ i ].rotation.y = time * ( i % 2 ? 1 : -1 );
 
 				}
 

@@ -86,8 +86,7 @@
 				scene.fog.color.setHSV( 0.1, 0.10, 1 );
 
 				light = new THREE.DirectionalLight( 0xffffff, 1.5 );
-				light.position.set( 0, 1, 1 );
-				light.position.normalize();
+				light.position.set( 0, 1, 1 ).normalize();
 				scene.add( light );
 
 				var planeSimple = new THREE.PlaneGeometry( 200, 300 );
@@ -123,7 +122,7 @@
 				document.addEventListener( 'click', startAnimation, false );
 
 				var loader = new THREE.JSONLoader();
-				loader.load( { model: "obj/buffalo/buffalo.js", callback: createScene } );
+				loader.load( "obj/buffalo/buffalo.js", createScene );
 
 				loop();
 
@@ -204,16 +203,16 @@
 
 				requestAnimationFrame( loop, renderer.domElement );
 
-				var delta = clock.delta();
+				var delta = clock.getDelta();
 
-				THREE.AnimationHandler.update( 0.001 * delta );
+				THREE.AnimationHandler.update( delta );
 
 				camera.position.x += ( mouseX - camera.position.x ) * 0.05;
 				camera.lookAt( scene.position );
 
 				if ( buffalos && playback ) {
 
-					var elapsed = clock.elapsed() * 0.001;
+					var elapsed = clock.getElapsedTime();
 
 					camera.position.z += 2 * Math.sin( elapsed );
 
