@@ -212,7 +212,7 @@ THREE.Quaternion.slerp = function ( qa, qb, qm, t ) {
 	var cosHalfTheta = qa.w * qb.w + qa.x * qb.x + qa.y * qb.y + qa.z * qb.z;
 
 	if (cosHalfTheta < 0) {
-		qm.w = -qb.w; qm.x = -qb.x; qm.y = -qb.y; qm.z = qb.z;
+		qm.w = -qb.w; qm.x = -qb.x; qm.y = -qb.y; qm.z = -qb.z;
 		cosHalfTheta = -cosHalfTheta;
 	} else {
 		qm.copy(qb);
