@@ -169,8 +169,8 @@
 				var s = Date.now(),
 					callback = function( geometry ) { createScene( geometry, s ) };
 
-				//loader.load( { model: 'obj/lucy/Lucy100k_slim.js', callback: callback } );
-				loader.load( { model: 'obj/lucy/Lucy100k_bin.js', callback: callback } );
+				//loader.load( 'obj/lucy/Lucy100k_slim.js', callback );
+				loader.load( 'obj/lucy/Lucy100k_bin.js', callback );
 
 			}
 

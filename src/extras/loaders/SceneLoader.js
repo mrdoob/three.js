@@ -516,15 +516,11 @@ THREE.SceneLoader.prototype = {
 
 				} else if ( g.type == "bin_mesh" ) {
 
-					binLoader.load( { model: get_url( g.url, data.urlBaseType ),
-									  callback: create_callback( dg )
-									} );
+					binLoader.load( get_url( g.url, data.urlBaseType ), create_callback( dg ) );
 
 				} else if ( g.type == "ascii_mesh" ) {
 
-					jsonLoader.load( { model: get_url( g.url, data.urlBaseType ),
-									   callback: create_callback( dg )
-									} );
+					jsonLoader.load( get_url( g.url, data.urlBaseType ), create_callback( dg ) );
 
 				} else if ( g.type == "embedded_mesh" ) {
 

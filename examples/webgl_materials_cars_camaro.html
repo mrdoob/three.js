@@ -136,7 +136,7 @@
 				camaroMaterials.body.push( [ "Chrome", new THREE.MeshPhongMaterial( { color: 0xffffff, specular:0xffffff, envMap: textureCube, combine: THREE.MultiplyOperation } ) ] );
 
 				var loader = new THREE.BinaryLoader();
-				loader.load( { model: "obj/camaro/CamaroNoUv_bin.js", callback: function( geometry ) { createScene( geometry, camaroMaterials ) } } );
+				loader.load( "obj/camaro/CamaroNoUv_bin.js", function( geometry ) { createScene( geometry, camaroMaterials ) } );
 
 			}
 
@@ -155,7 +155,7 @@
 
 				parent.innerHTML = src;
 
-				for( i = 0; i < materials.length; i++ ) {
+				for( i = 0; i < materials.length; i ++ ) {
 
 					$( "m" + i ).counter = i;
 					$( "m" + i ).addEventListener( 'click', function() { geometry.materials[ 0 ][ 0 ] = materials[ this.counter ][ 1 ] }, false );

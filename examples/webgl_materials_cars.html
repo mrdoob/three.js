@@ -458,7 +458,7 @@
 
 				}
 
-				loader.load( { model: CARS[ "veyron" ].url, callback: function( geometry ) { createScene( geometry, "veyron" ) } } );
+				loader.load( CARS[ "veyron" ].url, function( geometry ) { createScene( geometry, "veyron" ) } );
 
 				for( var c in CARS ) initCarButton( c );
 
@@ -471,7 +471,7 @@
 					if ( ! CARS[ car ].object ) {
 
 						loader.statusDomElement.style.display = "block";
-						loader.load( { model: CARS[ car ].url, callback: function( geometry ) { createScene( geometry, car ) } } );
+						loader.load( CARS[ car ].url, function( geometry ) { createScene( geometry, car ) } );
 
 					} else {
 
@@ -479,7 +479,7 @@
 
 					}
 
-				}, false);
+				}, false );
 
 			}
 
@@ -510,13 +510,13 @@
 
 				var buttons, i, src = "";
 
-				for( i = 0; i < materials.length; i++ ) {
+				for( i = 0; i < materials.length; i ++ ) {
 
 					src += '<button id="' + button_name( car, i ) + '">' + materials[ i ][ 0 ] + '</button> ';
 
 				}
 
-				buttons = document.createElement("div");
+				buttons = document.createElement( "div" );
 				buttons.innerHTML = src;
 
 				$( "buttons_materials" ).appendChild( buttons );
@@ -527,7 +527,7 @@
 
 			function attachButtonMaterials( materials, geometry, material_indices, car ) {
 
-				for( var i = 0; i < materials.length; i++ ) {
+				for( var i = 0; i < materials.length; i ++ ) {
 
 					$( button_name( car, i ) ).counter = i;
 					$( button_name( car, i ) ).addEventListener( 'click', function() {

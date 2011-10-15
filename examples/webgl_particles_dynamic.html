@@ -113,9 +113,9 @@
 
 				} );
 
-				bloader.load( { model: "obj/veyron/VeyronNoUv_bin.js", callback: function( geometry ) { createMesh( geometry, scene, 6.8, 2200, -200, -100, 0x0055ff, false ) } } );
+				bloader.load( "obj/veyron/VeyronNoUv_bin.js", function( geometry ) { createMesh( geometry, scene, 6.8, 2200, -200, -100, 0x0055ff, false ) } );
 
-				bloader.load( { model: "obj/female02/Female02_bin.js", callback: function( geometry ) {
+				bloader.load( "obj/female02/Female02_bin.js", function( geometry ) {
 
 					createMesh( geometry, scene, 4.05, -1000, -350,    0, 0xffdd44, true );
 					createMesh( geometry, scene, 4.05,     0, -350,    0, 0xffffff, true );
@@ -123,16 +123,16 @@
 					createMesh( geometry, scene, 4.05,   250, -350, 1500, 0xff9955, true );
 					createMesh( geometry, scene, 4.05,   250, -350, 2500, 0xff77dd, true );
 
-				} } );
+				} );
 
-				bloader.load( { model: "obj/male02/Male02_bin.js", callback: function( geometry ) {
+				bloader.load( "obj/male02/Male02_bin.js", function( geometry ) {
 
 					createMesh( geometry, scene, 4.05,  -500, -350,   600, 0xff7744, true );
 					createMesh( geometry, scene, 4.05,   500, -350,     0, 0xff5522, true );
 					createMesh( geometry, scene, 4.05,  -250, -350,  1500, 0xff9922, true );
 					createMesh( geometry, scene, 4.05,  -250, -350, -1500, 0xff99ff, true );
 
-				} } );
+				} );
 
 				//
 

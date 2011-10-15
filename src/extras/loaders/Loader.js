@@ -65,7 +65,7 @@ THREE.Loader.prototype = {
 
 	},
 
-	init_materials: function ( scope, materials, texture_path ) {
+	initMaterials: function ( scope, materials, texture_path ) {
 
 		scope.materials = [];
 

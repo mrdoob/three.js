@@ -143,7 +143,7 @@
 				loader = new THREE.BinaryLoader( true );
 				document.body.appendChild( loader.statusDomElement );
 
-				loader.load( { model: 'obj/lucy/Lucy100k_bin.js', callback: function( geometry ) { createScene( geometry, cubeMaterial1, cubeMaterial2, cubeMaterial3 ) } } );
+				loader.load( 'obj/lucy/Lucy100k_bin.js', function( geometry ) { createScene( geometry, cubeMaterial1, cubeMaterial2, cubeMaterial3 ) } );
 
 				document.addEventListener('mousemove', onDocumentMouseMove, false);
 
