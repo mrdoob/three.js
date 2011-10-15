@@ -28,7 +28,7 @@ var Code = function () {
 			temp = temp.firstChild.nodeValue;
 			temp = temp.replace("js/Three.js", "../build/Three.js");
 			temp = temp.replace("js/RequestAnimationFrame.js", "../examples/js/RequestAnimationFrame.js");
-			aaa = temp;
+
 			console.log('test', temp);
 
 			var opener = window.open('','myconsole',
@@ -97,6 +97,7 @@ var Code = function () {
 
 			'',
 			'\trenderer = new THREE.WebGLRenderer()',
+			'\trenderer.setSize( window.innerWidth, window.innerHeight );',
 			'\tdocument.body.appendChild( renderer.domElement );',
 			'',
 			'}',
@@ -111,7 +112,6 @@ var Code = function () {
 			'function render() {',
 			'',
 			'\trenderer.render( scene, camera );',
-			'\trenderer.setSize( window.innerWidth, window.innerHeight );',
 			'',
 			'}'
 
