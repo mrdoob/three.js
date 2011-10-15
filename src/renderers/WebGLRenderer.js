@@ -3484,8 +3484,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 			oil,
 			material,
 			o, ol, webglObject, object,
-			lights = scene.lights,
+			lights,
 			fog = null;
+
+		_this.initWebGLObjects( scene );
+
+		lights = scene.__webglLights;
 
 		if ( ! _cameraLight ) {
 
@@ -3520,11 +3524,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 				_cameraLight.position.copy( light.position );
 				_cameraLight.lookAt( light.target.position );
 
-				_cameraLight.update( undefined, true );
+				if ( _cameraLight.parent == null ) {
 
-				scene.update( undefined, false, _cameraLight );
+					console.warn( "Camera is not on the Scene. Adding it..." );
+					scene.add( _cameraLight );
 
-				THREE.Matrix4.makeInvert( _cameraLight.matrixWorld, _cameraLight.matrixWorldInverse );
+				}
+
+				scene.updateMatrixWorld();
+
+				_cameraLight.matrixWorldInverse.getInverse( _cameraLight.matrixWorld );
 
 				// compute shadow matrix
 
@@ -3547,7 +3556,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				computeFrustum( _projScreenMatrix );
 
-				_this.initWebGLObjects( scene );
+
 
 				setRenderTarget( shadowMap );
 
@@ -3689,7 +3698,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var i, program, opaque, transparent, material,
 			o, ol, oil, webglObject, object, buffer,
-			lights = scene.lights,
+			lights,
 			fog = scene.fog;
 
 		_currentMaterialId = -1;
@@ -3700,25 +3709,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_this.info.render.vertices = 0;
 		_this.info.render.faces = 0;
 
-		// hack: find parent of camera.
+		if ( camera.parent == null ) {
 
-		if ( camera.matrixAutoUpdate ) {
-
-			var parent = camera;
-
-			while ( parent.parent ) {
-
-				parent = parent.parent;
-
-			}
-
-			parent.update( undefined, true );
+			console.warn( "Camera is not on the Scene. Adding it..." );
+			scene.add( camera );
 
 		}
 
-		scene.update( undefined, false, camera );
+		scene.updateMatrixWorld();
 
-		THREE.Matrix4.makeInvert( camera.matrixWorld, camera.matrixWorldInverse );
+		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
 		camera.matrixWorldInverse.flattenToArray( _viewMatrixArray );
 		camera.projectionMatrix.flattenToArray( _projectionMatrixArray );
@@ -3727,6 +3727,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		computeFrustum( _projScreenMatrix );
 
 		this.initWebGLObjects( scene );
+
+		lights = scene.__webglLights;
 
 		setRenderTarget( renderTarget );
 
@@ -4198,9 +4200,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 			scene.__webglObjects = [];
 			scene.__webglObjectsImmediate = [];
 			scene.__webglSprites = [];
+			scene.__webglLights = [];
 
 		}
 
+		THREE.SceneUtils.traverseHierarchy( scene, function ( node ) {
+
+			addObject( node, scene );
+
+		} );
+/*
 		while ( scene.__objectsAdded.length ) {
 
 			addObject( scene.__objectsAdded[ 0 ], scene );
@@ -4214,7 +4223,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			scene.__objectsRemoved.splice( 0, 1 );
 
 		}
-
+*/
 		// update must be called after objects adding / removal
 
 		for ( var o = 0, ol = scene.__webglObjects.length; o < ol; o ++ ) {
@@ -4350,6 +4359,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 			} else if ( object instanceof THREE.Sprite ) {
 
 				scene.__webglSprites.push( object );
+
+			} else if ( object instanceof THREE.Light ) {
+
+				scene.__webglLights.push( object );
 
 			}
 
@@ -5705,7 +5718,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// material must use some texture to require uvs
 
-		for ( i = 0; i < ml; i++ ) {
+		for ( i = 0; i < ml; i ++ ) {
 
 			m = materials[ i ];
 
