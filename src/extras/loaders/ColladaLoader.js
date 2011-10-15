@@ -517,10 +517,6 @@ THREE.ColladaLoader = function () {
 		var morphController;
 		var i;
 
-		obj.name = node.id || "";
-		obj.matrixAutoUpdate = false;
-		obj.matrix = node.matrix;
-
 		// FIXME: controllers
 
 		for ( i = 0; i < node.controllers.length; i ++ ) {
@@ -676,14 +672,18 @@ THREE.ColladaLoader = function () {
 				} else {
 
 					mesh = new THREE.Mesh( geom, material );
+					// mesh.geom.name = geometry.id;
 
 				}
 
-				obj.add( mesh );
+				node.geometries.length > 1 ? obj.add( mesh ) : obj = mesh;
 
 			}
 
 		}
+
+		obj.name = node.id || "";
+		node.matrix.decompose( obj.position, obj.rotation, obj.scale );
 
 		for ( i = 0; i < node.nodes.length; i ++ ) {
 
