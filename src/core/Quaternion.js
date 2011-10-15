@@ -207,7 +207,16 @@ THREE.Quaternion.prototype = {
 
 THREE.Quaternion.slerp = function ( qa, qb, qm, t ) {
 
+	// http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/slerp/
+
 	var cosHalfTheta = qa.w * qb.w + qa.x * qb.x + qa.y * qb.y + qa.z * qb.z;
+
+	if (cosHalfTheta < 0) {
+		qm.w = -qb.w; qm.x = -qb.x; qm.y = -qb.y; qm.z = -qb.z;
+		cosHalfTheta = -cosHalfTheta;
+	} else {
+		qm.copy(qb);
+	}
 
 	if ( Math.abs( cosHalfTheta ) >= 1.0 ) {
 
@@ -233,10 +242,10 @@ THREE.Quaternion.slerp = function ( qa, qb, qm, t ) {
 	var ratioA = Math.sin( ( 1 - t ) * halfTheta ) / sinHalfTheta,
 	ratioB = Math.sin( t * halfTheta ) / sinHalfTheta; 
 
-	qm.w = ( qa.w * ratioA + qb.w * ratioB );
-	qm.x = ( qa.x * ratioA + qb.x * ratioB );
-	qm.y = ( qa.y * ratioA + qb.y * ratioB );
-	qm.z = ( qa.z * ratioA + qb.z * ratioB );
+	qm.w = ( qa.w * ratioA + qm.w * ratioB );
+	qm.x = ( qa.x * ratioA + qm.x * ratioB );
+	qm.y = ( qa.y * ratioA + qm.y * ratioB );
+	qm.z = ( qa.z * ratioA + qm.z * ratioB );
 
 	return qm;
 
