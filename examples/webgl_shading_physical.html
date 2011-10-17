@@ -596,6 +596,8 @@
 
 			function render() {
 
+				// update
+
 				var delta = 1000 * clock.getDelta();
 
 				TWEEN.update();
@@ -613,9 +615,13 @@
 
 				renderer.shadowMapDarkness = 0.5 * sunLight.intensity;
 
-				mesh.visible = false;
+				// render shadow map
 
 				renderer.updateShadowMap( scene, camera );
+
+				// render cube map
+
+				mesh.visible = false;
 
 				renderer.autoClear = true;
 				cubeCamera.updatePosition( mesh.position );
@@ -623,6 +629,8 @@
 				renderer.autoClear = false;
 
 				mesh.visible = true;
+
+				// render scene
 
 				//renderer.render( scene, camera );
 				//renderer.clearTarget( null, 1, 1, 1 );
