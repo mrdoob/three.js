@@ -192,7 +192,7 @@
 				renderer.shadowCameraFov = 50;
 
 				renderer.shadowMapBias = 0.003885;
-				renderer.shadowMapDarkness = 0.55;
+				renderer.shadowMapDarkness = 0.5;
 				renderer.shadowMapWidth = SHADOW_MAP_WIDTH;
 				renderer.shadowMapHeight = SHADOW_MAP_HEIGHT;
 
@@ -223,18 +223,18 @@
 
 					body: [],
 
-					"Chrome": 		new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: cubeTarget  } ),
-					"ChromeN": 		new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: cubeTarget, combine: THREE.MixOperation, reflectivity: 0.75  } ),
-					"Dark chrome": 	new THREE.MeshLambertMaterial( { color: 0x444444, envMap: cubeTarget } ),
+					"Chrome": 		new THREE.MeshLambertMaterial( { color: 0xffffff, ambient: 0xffffff, envMap: cubeTarget  } ),
+					"ChromeN": 		new THREE.MeshLambertMaterial( { color: 0xffffff, ambient: 0xffffff, envMap: cubeTarget, combine: THREE.MixOperation, reflectivity: 0.75  } ),
+					"Dark chrome": 	new THREE.MeshLambertMaterial( { color: 0x444444, ambient: 0x444444, envMap: cubeTarget } ),
 
-					"Black rough":	new THREE.MeshLambertMaterial( { color: 0x050505 } ),
+					"Black rough":	new THREE.MeshLambertMaterial( { color: 0x050505, ambient: 0x050505 } ),
 
-					"Dark glass":	new THREE.MeshLambertMaterial( { color: 0x101020, envMap: cubeTarget, opacity: 0.5, transparent: true } ),
-					"Orange glass":	new THREE.MeshLambertMaterial( { color: 0xffbb00, opacity: 0.5, transparent: true } ),
-					"Red glass": 	new THREE.MeshLambertMaterial( { color: 0xff0000, opacity: 0.5, transparent: true } ),
+					"Dark glass":	new THREE.MeshLambertMaterial( { color: 0x101020, ambient: 0x101020, envMap: cubeTarget, opacity: 0.5, transparent: true } ),
+					"Orange glass":	new THREE.MeshLambertMaterial( { color: 0xffbb00, ambient: 0xffbb00, opacity: 0.5, transparent: true } ),
+					"Red glass": 	new THREE.MeshLambertMaterial( { color: 0xff0000, ambient: 0xff0000, opacity: 0.5, transparent: true } ),
 
-					"Black metal":	new THREE.MeshLambertMaterial( { color: 0x222222, envMap: cubeTarget, combine: THREE.MultiplyOperation } ),
-					"Orange metal": new THREE.MeshLambertMaterial( { color: 0xff6600, envMap: cubeTarget, combine: THREE.MultiplyOperation } )
+					"Black metal":	new THREE.MeshLambertMaterial( { color: 0x222222, ambient: 0x222222, envMap: cubeTarget, combine: THREE.MultiplyOperation } ),
+					"Orange metal": new THREE.MeshLambertMaterial( { color: 0xff6600, ambient: 0xff6600, envMap: cubeTarget, combine: THREE.MultiplyOperation } )
 
 				}
 
