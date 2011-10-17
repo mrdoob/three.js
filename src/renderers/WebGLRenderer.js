@@ -2632,6 +2632,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	function refreshUniformsLambert( uniforms, material ) {
+
+		if ( _this.gammaInput ) {
+
+			uniforms.ambient.value.copyGammaToLinear( material.ambient );
+
+		} else {
+
+			uniforms.ambient.value = material.ambient;
+
+		}
+
+	};
 
 	function refreshUniformsLights( uniforms, lights ) {
 
@@ -2884,6 +2897,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 			} else if ( material instanceof THREE.MeshPhongMaterial ) {
 
 				refreshUniformsPhong( m_uniforms, material );
+
+			} else if ( material instanceof THREE.MeshLambertMaterial ) {
+
+				refreshUniformsLambert( m_uniforms, material );
 
 			} else if ( material instanceof THREE.MeshDepthMaterial ) {
 

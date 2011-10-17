@@ -174,6 +174,7 @@
 				var geometry = new THREE.PlaneGeometry( 100, 100 );
 				var planeMaterial = new THREE.MeshLambertMaterial( { color: 0xffdd99 } );
 				THREE.ColorUtils.adjustHSV( planeMaterial.color, 0, 0, 0.9 );
+				planeMaterial.ambient = planeMaterial.color;
 
 				var ground = new THREE.Mesh( geometry, planeMaterial );
 
@@ -246,7 +247,12 @@
 
 					var material = new THREE.MeshLambertMaterial( { color: 0xffaa55, morphTargets: true, vertexColors: THREE.FaceColors } );
 
-					if ( fudgeColor ) THREE.ColorUtils.adjustHSV( material.color, 0, 0.5 - Math.random(), 0.5 - Math.random() );
+					if ( fudgeColor ) {
+
+						THREE.ColorUtils.adjustHSV( material.color, 0, 0.5 - Math.random(), 0.5 - Math.random() );
+						material.ambient = material.color;
+
+					}
 
 					var meshAnim = new THREE.MorphAnimMesh( geometry, material );
 

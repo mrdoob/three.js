@@ -51,7 +51,7 @@
 				scene.add( light );
 
 				material = [
-					new THREE.MeshLambertMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/UV.jpg' ) } ),
+					new THREE.MeshLambertMaterial( { ambient: 0xbbbbbb, map: THREE.ImageUtils.loadTexture( 'textures/UV.jpg' ) } ),
 					new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true, transparent: true, opacity: 0.1 } )
 				];
 

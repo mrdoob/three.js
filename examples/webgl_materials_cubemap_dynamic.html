@@ -238,7 +238,7 @@
 
 				}
 
-				mlib.body.push( [ "Orange", new THREE.MeshLambertMaterial( { color: 0x883300, envMap: cubeTarget, combine: THREE.MixOperation, reflectivity: 0.1 } ) ] );
+				mlib.body.push( [ "Orange", new THREE.MeshLambertMaterial( { color: 0x883300, ambient: 0x883300, envMap: cubeTarget, combine: THREE.MixOperation, reflectivity: 0.1 } ) ] );
 				mlib.body.push( [ "Blue", 	new THREE.MeshLambertMaterial( { color: 0x113355, envMap: cubeTarget, combine: THREE.MixOperation, reflectivity: 0.1 } ) ] );
 				mlib.body.push( [ "Red", 	new THREE.MeshLambertMaterial( { color: 0x660000, envMap: cubeTarget, combine: THREE.MixOperation, reflectivity: 0.1 } ) ] );
 				mlib.body.push( [ "Black", 	new THREE.MeshLambertMaterial( { color: 0x000000, envMap: cubeTarget, combine: THREE.MixOperation, reflectivity: 0.2 } ) ] );
@@ -549,7 +549,7 @@
 
 			function addObject( geometry, color, x, y, z, sy ) {
 
-				var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: color } ) );
+				var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: color, ambient: color } ) );
 				object.position.set( x, y, z );
 				scene.add( object );
 

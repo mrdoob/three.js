@@ -255,6 +255,9 @@ THREE.ShaderChunk = {
 
 	lights_pars_vertex: [
 
+		"uniform vec3 ambient;",
+		"uniform vec3 diffuse;",
+
 		"uniform bool enableLighting;",
 		"uniform vec3 ambientLightColor;",
 
@@ -283,7 +286,7 @@ THREE.ShaderChunk = {
 
 		"} else {",
 
-			"vLightWeighting = ambientLightColor;",
+			"vLightWeighting = vec3( 0.0 );",
 
 			"#if MAX_DIR_LIGHTS > 0",
 
@@ -318,6 +321,8 @@ THREE.ShaderChunk = {
 				"}",
 
 			"#endif",
+
+			"vLightWeighting = vLightWeighting * diffuse + ambient * ambientLightColor;",
 
 		"}"
 
@@ -500,7 +505,7 @@ THREE.ShaderChunk = {
 
 		"#endif",
 
-		"gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor * ambient * diffuse ) + totalSpecular;"
+		"gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor * ambient ) + totalSpecular;"
 
 	].join("\n"),
 
@@ -1155,7 +1160,11 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ "common" ],
 			THREE.UniformsLib[ "fog" ],
 			THREE.UniformsLib[ "lights" ],
-			THREE.UniformsLib[ "shadowmap" ]
+			THREE.UniformsLib[ "shadowmap" ],
+
+			{
+				"ambient"  : { type: "c", value: new THREE.Color( 0x050505 ) }
+			}
 
 		] ),
 
@@ -1196,7 +1205,6 @@ THREE.ShaderLib = {
 
 		fragmentShader: [
 
-			"uniform vec3 diffuse;",
 			"uniform float opacity;",
 
 			"varying vec3 vLightWeighting;",
@@ -1210,12 +1218,12 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-				"gl_FragColor = vec4( diffuse, opacity );",
+				"gl_FragColor = vec4( vec3 ( 1.0 ), opacity );",
 
 				THREE.ShaderChunk[ "map_fragment" ],
 				THREE.ShaderChunk[ "alphatest_fragment" ],
 
-				"gl_FragColor = gl_FragColor * vec4( vLightWeighting, 1.0 );",
+				"gl_FragColor.xyz = gl_FragColor.xyz * vLightWeighting;",
 
 				THREE.ShaderChunk[ "lightmap_fragment" ],
 				THREE.ShaderChunk[ "color_fragment" ],

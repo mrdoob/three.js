@@ -335,6 +335,9 @@
 				function addObjectColor( geometry, color, x, y, z, ry ) {
 
 					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, ambient: 0x444444 } );
+					//var material = new THREE.MeshPhongMaterial( { color: color, ambient: color } );
+					//THREE.ColorUtils.adjustHSV( material.ambient, 0, 0, -0.5 );
+
 					return addObject( geometry, material, x, y, z, ry );
 
 				}
@@ -385,7 +388,7 @@
 
 				loader.load( "models/animated/sittingBox.js", function( geometry ) {
 
-					var morphMaterial = new THREE.MeshPhongMaterial( { ambient: 0x444444, color: 0x000000, specular: 0xff9900, shininess: 50, morphTargets: true } );
+					var morphMaterial = new THREE.MeshPhongMaterial( { ambient: 0x222222, color: 0x000000, specular: 0xff9900, shininess: 50, morphTargets: true } );
 					morphMaterial.shading = THREE.FlatShading;
 
 					//geometry.computeVertexNormals();

@@ -56,6 +56,8 @@
 
 					var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
 
+					object.materials[ 0 ].ambient = object.materials[ 0 ].color;
+
 					object.position.x = Math.random() * 1000 - 500;
 					object.position.y = Math.random() * 600 - 300;
 					object.position.z = Math.random() * 800 - 400;
