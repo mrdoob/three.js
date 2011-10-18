@@ -505,7 +505,15 @@ THREE.ShaderChunk = {
 
 		"#endif",
 
-		"gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor * ambient ) + totalSpecular;"
+		"#ifdef METAL",
+
+			"gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor * ambient + totalSpecular );",
+
+		"#else",
+
+			"gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor * ambient ) + totalSpecular;",
+
+		"#endif",
 
 	].join("\n"),
 
