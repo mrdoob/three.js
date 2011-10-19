@@ -44,6 +44,7 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 	this.shininess = parameters.shininess !== undefined ? parameters.shininess : 30;
 
 	this.metal = parameters.metal !== undefined ? parameters.metal : false;
+	this.perPixel = parameters.perPixel !== undefined ? parameters.perPixel : false;
 
 	this.map = parameters.map !== undefined ? parameters.map : null;
 

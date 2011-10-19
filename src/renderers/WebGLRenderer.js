@@ -2745,7 +2745,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			shadowMapHeight: this.shadowMapHeight,
 			maxShadows: maxShadows,
 			alphaTest: material.alphaTest,
-			metal: material.metal
+			metal: material.metal,
+			perPixel: material.perPixel
 
 		};
 
@@ -4934,6 +4935,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			parameters.vertexColors ? "#define USE_COLOR" : "",
 
 			parameters.metal ? "#define METAL" : "",
+			parameters.perPixel ? "#define PHONG_PER_PIXEL" : "",
 
 			parameters.shadowMapEnabled ? "#define USE_SHADOWMAP" : "",
 			parameters.shadowMapSoft ? "#define SHADOWMAP_SOFT" : "",

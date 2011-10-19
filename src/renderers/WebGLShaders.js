@@ -253,7 +253,7 @@ THREE.ShaderChunk = {
 
 	// LIGHTS LAMBERT
 
-	lights_pars_vertex: [
+	lights_lambert_pars_vertex: [
 
 		"uniform vec3 ambient;",
 		"uniform vec3 diffuse;",
@@ -278,7 +278,7 @@ THREE.ShaderChunk = {
 
 	].join("\n"),
 
-	lights_vertex: [
+	lights_lambert_vertex: [
 
 		"if ( !enableLighting ) {",
 
@@ -333,12 +333,14 @@ THREE.ShaderChunk = {
 	lights_phong_pars_vertex: [
 
 		"#if MAX_POINT_LIGHTS > 0",
+		"#ifndef PHONG_PER_PIXEL",
 
 			"uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];",
 			"uniform float pointLightDistance[ MAX_POINT_LIGHTS ];",
 
 			"varying vec4 vPointLight[ MAX_POINT_LIGHTS ];",
 
+		"#endif",
 		"#endif"
 
 	].join("\n"),
@@ -347,6 +349,7 @@ THREE.ShaderChunk = {
 	lights_phong_vertex: [
 
 		"#if MAX_POINT_LIGHTS > 0",
+		"#ifndef PHONG_PER_PIXEL",
 
 			"for( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {",
 
@@ -366,10 +369,11 @@ THREE.ShaderChunk = {
 			"}",
 
 		"#endif",
+		"#endif"
 
 	].join("\n"),
 
-	lights_pars_fragment: [
+	lights_phong_pars_fragment: [
 
 		"uniform vec3 ambientLightColor;",
 
@@ -383,7 +387,17 @@ THREE.ShaderChunk = {
 		"#if MAX_POINT_LIGHTS > 0",
 
 			"uniform vec3 pointLightColor[ MAX_POINT_LIGHTS ];",
-			"varying vec4 vPointLight[ MAX_POINT_LIGHTS ];",
+
+			"#ifdef PHONG_PER_PIXEL",
+
+				"uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];",
+				"uniform float pointLightDistance[ MAX_POINT_LIGHTS ];",
+
+			"#else",
+
+				"varying vec4 vPointLight[ MAX_POINT_LIGHTS ];",
+
+			"#endif",
 
 		"#endif",
 
@@ -392,7 +406,7 @@ THREE.ShaderChunk = {
 
 	].join("\n"),
 
-	lights_fragment: [
+	lights_phong_fragment: [
 
 		"vec3 normal = normalize( vNormal );",
 		"vec3 viewPosition = normalize( vViewPosition );",
@@ -404,18 +418,37 @@ THREE.ShaderChunk = {
 
 			"for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {",
 
-				"vec3 pointVector = normalize( vPointLight[ i ].xyz );",
-				"vec3 pointHalfVector = normalize( vPointLight[ i ].xyz + viewPosition );",
-				"float pointDistance = vPointLight[ i ].w;",
+				"#ifdef PHONG_PER_PIXEL",
+
+					"vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );",
+
+					"vec3 lVector = lPosition.xyz + vViewPosition.xyz;",
+
+					"float lDistance = 1.0;",
+
+					"if ( pointLightDistance[ i ] > 0.0 )",
+						"lDistance = 1.0 - min( ( length( lVector ) / pointLightDistance[ i ] ), 1.0 );",
+
+					"lVector = normalize( lVector );",
+
+				"#else",
+
+					"vec3 lVector = normalize( vPointLight[ i ].xyz );",
+					"float lDistance = vPointLight[ i ].w;",
+
+				"#endif",
+
+				"vec3 pointHalfVector = normalize( lVector + viewPosition );",
+				"float pointDistance = lDistance;",
 
 				"float pointDotNormalHalf = max( dot( normal, pointHalfVector ), 0.0 );",
-				"float pointDiffuseWeight = max( dot( normal, pointVector ), 0.0 );",
+				"float pointDiffuseWeight = max( dot( normal, lVector ), 0.0 );",
 
 				"float pointSpecularWeight = pow( pointDotNormalHalf, shininess );",
 
 				"#ifdef PHYSICALLY_BASED_SHADING",
 
-					"vec3 schlick = specular + vec3( 1.0 - specular ) * pow( dot( pointVector, pointHalfVector ), 5.0 );",
+					"vec3 schlick = specular + vec3( 1.0 - specular ) * pow( dot( lVector, pointHalfVector ), 5.0 );",
 					"pointSpecular += schlick * pointLightColor[ i ] * pointSpecularWeight * pointDiffuseWeight * pointDistance;",
 
 				"#else",
@@ -1183,7 +1216,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "map_pars_vertex" ],
 			THREE.ShaderChunk[ "lightmap_pars_vertex" ],
 			THREE.ShaderChunk[ "envmap_pars_vertex" ],
-			THREE.ShaderChunk[ "lights_pars_vertex" ],
+			THREE.ShaderChunk[ "lights_lambert_pars_vertex" ],
 			THREE.ShaderChunk[ "color_pars_vertex" ],
 			THREE.ShaderChunk[ "skinning_pars_vertex" ],
 			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
@@ -1200,7 +1233,7 @@ THREE.ShaderLib = {
 
 				"vec3 transformedNormal = normalize( normalMatrix * normal );",
 
-				THREE.ShaderChunk[ "lights_vertex" ],
+				THREE.ShaderChunk[ "lights_lambert_vertex" ],
 				THREE.ShaderChunk[ "skinning_vertex" ],
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
 				THREE.ShaderChunk[ "default_vertex" ],
@@ -1296,7 +1329,7 @@ THREE.ShaderLib = {
 
 				"vViewPosition = -mvPosition.xyz;",
 
-				"vec3 transformedNormal = normalize( normalMatrix * normal );",
+				"vec3 transformedNormal = normalMatrix * normal;",
 				"vNormal = transformedNormal;",
 
 				THREE.ShaderChunk[ "lights_phong_vertex" ],
@@ -1323,7 +1356,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "lightmap_pars_fragment" ],
 			THREE.ShaderChunk[ "envmap_pars_fragment" ],
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
-			THREE.ShaderChunk[ "lights_pars_fragment" ],
+			THREE.ShaderChunk[ "lights_phong_pars_fragment" ],
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
 
 			"void main() {",
@@ -1333,7 +1366,7 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "map_fragment" ],
 				THREE.ShaderChunk[ "alphatest_fragment" ],
 
-				THREE.ShaderChunk[ "lights_fragment" ],
+				THREE.ShaderChunk[ "lights_phong_fragment" ],
 
 				THREE.ShaderChunk[ "lightmap_fragment" ],
 				THREE.ShaderChunk[ "color_fragment" ],
