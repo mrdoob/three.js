@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - interactive - voxel painter</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				font-family: Monospace;
 				background-color: #f0f0f0;
@@ -16,18 +17,21 @@
 	</head>
 	<body>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/Detector.js"></script>
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
+		
+		<link href="js/gui/gui.css" media="screen" rel="stylesheet" type="text/css" />
+		<script src="js/gui/gui.min.js"></script>
 
-		<script type="text/javascript">
+		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var container, stats;
-			var camera, scene, renderer;
+			var camera, cameraTarget, scene, renderer;
 			var projector, plane, cube;
 			var mouse2D, mouse3D, ray,
 			rollOveredFace, isShiftDown = false,
@@ -37,6 +41,10 @@
 			var cubeGeo, cubeMaterial;
 			var i, intersector;
 
+			var gui, voxelConfig = {
+				orthographicProjection: false
+			};
+			
 			init();
 			animate();
 
@@ -53,9 +61,10 @@
 				info.innerHTML = '<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - voxel painter - webgl<br /><strong>click</strong>: add voxel, <strong>control + click</strong>: remove voxel, <strong>shift + click</strong>: rotate, <a href="javascript:save();return false;">save .png</a>';
 				container.appendChild( info );
 
-				camera = new THREE.Camera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.CombinedCamera( window.innerWidth, window.innerHeight, 45, 1, 10000, -2000, 10000 );
 				camera.position.y = 800;
-				camera.target.position.y = 200;
+				
+				cameraTarget = new THREE.Vector3( 0, 0, 0 );
 
 				scene = new THREE.Scene();
 
@@ -64,14 +73,14 @@
 				rollOverGeo = new THREE.CubeGeometry( 50, 50, 50 );
 				rollOverMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, transparent: true } );
 				rollOverMesh = new THREE.Mesh( rollOverGeo, rollOverMaterial );
-				scene.addObject( rollOverMesh );
-
+				scene.add( rollOverMesh );
 
 				// cubes
 
 				cubeGeo = new THREE.CubeGeometry( 50, 50, 50 );
 				cubeMaterial = new THREE.MeshLambertMaterial( { color: 0x00ff80, shading: THREE.FlatShading, map: THREE.ImageUtils.loadTexture( "textures/square-outline-textured.png" ) } );
 				cubeMaterial.color.setHSV( 0.1, 0.7, 1.0 );
+
 				// picking
 
 				projector = new THREE.Projector();
@@ -80,29 +89,28 @@
 
 				plane = new THREE.Mesh( new THREE.PlaneGeometry( 1000, 1000, 20, 20 ), new THREE.MeshBasicMaterial( { color: 0x555555, wireframe: true } ) );
 				plane.rotation.x = - 90 * Math.PI / 180;
-				scene.addObject( plane );
+				scene.add( plane );
 
 				mouse2D = new THREE.Vector3( 0, 10000, 0.5 );
-				ray = new THREE.Ray( camera.position, null );
 
 				// Lights
 
 				var ambientLight = new THREE.AmbientLight( 0x606060 );
-				scene.addLight( ambientLight );
+				scene.add( ambientLight );
 
 				var directionalLight = new THREE.DirectionalLight( 0xffffff );
 				directionalLight.position.x = Math.random() - 0.5;
 				directionalLight.position.y = Math.random() - 0.5;
 				directionalLight.position.z = Math.random() - 0.5;
 				directionalLight.position.normalize();
-				scene.addLight( directionalLight );
+				scene.add( directionalLight );
 
 				var directionalLight = new THREE.DirectionalLight( 0x808080 );
 				directionalLight.position.x = Math.random() - 0.5;
 				directionalLight.position.y = Math.random() - 0.5;
 				directionalLight.position.z = Math.random() - 0.5;
 				directionalLight.position.normalize();
-				scene.addLight( directionalLight );
+				scene.add( directionalLight );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -118,7 +126,24 @@
 				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 				document.addEventListener( 'keydown', onDocumentKeyDown, false );
 				document.addEventListener( 'keyup', onDocumentKeyUp, false );
-
+				
+				// add GUI
+				gui = new GUI();
+				gui.add(voxelConfig, 'orthographicProjection').onChange(function(){
+					
+					if ( voxelConfig.orthographicProjection ) {
+						camera.toOrthographic();
+						camera.position.x = 1000;
+               			camera.position.y = 707.106;
+                		camera.position.z = 1000;
+						theta = 90;
+					} else {
+						camera.toPerspective();
+						camera.position.y = 800;
+					}
+				
+				});
+				
 			}
 
 			function getRealIntersector( intersects ) {
@@ -176,7 +201,7 @@
 
 						if ( intersector.object != plane ) {
 
-							scene.removeObject( intersector.object );
+							scene.remove( intersector.object );
 
 						}
 
@@ -191,7 +216,7 @@
 						voxel.position.copy( voxelPosition );
 						voxel.matrixAutoUpdate = false;
 						voxel.updateMatrix();
-						scene.addObject( voxel );
+						scene.add( voxel );
 
 					}
 
@@ -244,8 +269,7 @@
 
 				}
 
-				mouse3D = projector.unprojectVector( mouse2D.clone(), camera );
-				ray.direction = mouse3D.subSelf( camera.position ).normalize();
+				ray = projector.pickingRay( mouse2D.clone(), camera );
 
 				var intersects = ray.intersectScene( scene );
 
@@ -263,6 +287,8 @@
 
 				camera.position.x = 1400 * Math.sin( theta * Math.PI / 360 );
 				camera.position.z = 1400 * Math.cos( theta * Math.PI / 360 );
+
+				camera.lookAt( cameraTarget );
 
 				renderer.render( scene, camera );
 

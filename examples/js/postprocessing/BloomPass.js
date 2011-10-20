@@ -7,7 +7,7 @@ THREE.BloomPass = function( strength, kernelSize, sigma, resolution ) {
 	strength = ( strength !== undefined ) ? strength : 1;
 	kernelSize = ( kernelSize !== undefined ) ? kernelSize : 25;
 	sigma = ( sigma !== undefined ) ? sigma : 4.0;
-	resolution = ( resolution !== resolution ) ? resolution : 256;
+	resolution = ( resolution !== undefined ) ? resolution : 256;
 
 	// render targets
 
@@ -24,7 +24,7 @@ THREE.BloomPass = function( strength, kernelSize, sigma, resolution ) {
 
 	this.screenUniforms[ "opacity" ].value = strength;
 
-	this.materialScreen = new THREE.MeshShaderMaterial( {
+	this.materialScreen = new THREE.ShaderMaterial( {
 
 		uniforms: this.screenUniforms,
 		vertexShader: screenShader.vertexShader,
@@ -43,7 +43,7 @@ THREE.BloomPass = function( strength, kernelSize, sigma, resolution ) {
 	this.convolutionUniforms[ "uImageIncrement" ].value = THREE.BloomPass.blurx;
 	this.convolutionUniforms[ "cKernel" ].value = THREE.ShaderExtras.buildKernel( sigma );
 
-	this.materialConvolution = new THREE.MeshShaderMaterial( {
+	this.materialConvolution = new THREE.ShaderMaterial( {
 
 		uniforms: this.convolutionUniforms,
 		vertexShader:   "#define KERNEL_SIZE " + kernelSize + ".0\n" + convolutionShader.vertexShader,
@@ -51,7 +51,9 @@ THREE.BloomPass = function( strength, kernelSize, sigma, resolution ) {
 
 	} );
 
+	this.enabled = true;
 	this.needsSwap = false;
+	this.clear = false;
 
 };
 
@@ -70,6 +72,7 @@ THREE.BloomPass.prototype = {
 
 		renderer.render( THREE.EffectComposer.scene, THREE.EffectComposer.camera, this.renderTargetX, true );
 
+
 		// Render quad with blured scene into texture (convolution pass 2)
 
 		this.convolutionUniforms[ "tDiffuse" ].texture = this.renderTargetX;
@@ -85,7 +88,7 @@ THREE.BloomPass.prototype = {
 
 		if ( maskActive ) renderer.context.enable( renderer.context.STENCIL_TEST );
 
-		renderer.render( THREE.EffectComposer.scene, THREE.EffectComposer.camera, readBuffer, false );
+		renderer.render( THREE.EffectComposer.scene, THREE.EffectComposer.camera, readBuffer, this.clear );
 
 	}
 

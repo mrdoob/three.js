@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - geometry - terrain</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				color: #61443e;
 				font-family:Monospace;
@@ -33,15 +34,15 @@
 		<div id="container"><br /><br /><br /><br /><br />Generating world...</div>
 		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl terrain demo<br />(left click: forward, right click: backward)</div>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/ImprovedNoise.js"></script>
+		<script src="js/ImprovedNoise.js"></script>
 
-		<script type="text/javascript" src="js/Detector.js"></script>
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
-		<script type="text/javascript">
+		<script>
 
 			if ( ! Detector.webgl ) {
 
@@ -52,7 +53,7 @@
 
 			var container, stats;
 
-			var camera, scene, renderer;
+			var camera, controls, scene, renderer;
 
 			var mesh, texture;
 
@@ -67,21 +68,18 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.FirstPersonCamera( {
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
 
-					fov: 60, aspect: window.innerWidth / window.innerHeight, near: 1, far: 20000,
-					movementSpeed: 1000, lookSpeed: 0.1, noFly: false, lookVertical: true
+				controls = new THREE.FirstPersonControls( camera );
 
-				} );
-
-				camera.target.position.z = - 100;
+				controls.movementSpeed = 1000;
+				controls.lookSpeed = 0.1;
 
 				scene = new THREE.Scene();
 
 				data = generateHeight( worldWidth, worldDepth );
 
 				camera.position.y = data[ worldHalfWidth + worldHalfDepth * worldWidth ] + 500;
-				camera.target.position.y = camera.position.y;
 
 				var geometry = new THREE.PlaneGeometry( 7500, 7500, worldWidth - 1, worldDepth - 1 );
 
@@ -96,7 +94,7 @@
 
 				mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { map: texture } ) );
 				mesh.rotation.x = - 90 * Math.PI / 180;
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -220,6 +218,7 @@
 
 			function render() {
 
+				controls.update();
 				renderer.render( scene, camera );
 
 			}

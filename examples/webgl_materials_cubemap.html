@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - materials - cube reflection / refraction [Walt]</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				background:#000;
 				color:#fff;
@@ -17,7 +18,7 @@
 			a:hover { color: #0080ff; }
 
 			canvas { pointer-events:none; z-index:10; }
-			#log { position:absolute; top:50px; text-align:left; display:block; z-index:100; pointer-events:none; }
+
 			#d { text-align:center; margin:1em 0 -7.5em 0; z-index:1000; position:relative; display:block }
 			.button { background:orange; color:#fff; padding:0.2em 0.5em; cursor:pointer }
 			.inactive { background:#999; color:#eee }
@@ -34,22 +35,20 @@
 			<p>Texture by <a href="http://www.humus.name/index.php?page=Textures" target="_blank">Humus</a>
 		</div>
 
-		<pre id="log"></pre>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
-		<script type="text/javascript" src="js/Detector.js"></script>
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
-
-		<script type="text/javascript">
+		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var container, stats;
 
 			var camera, scene, renderer;
-			var cameraCube, sceneCube;
+			var cameraCube, sceneCube, cubeTarget;
 
 			var mesh, zmesh, lightMesh, geometry;
 
@@ -73,10 +72,12 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 50, window.innerWidth / window.innerHeight, 1, 5000 );
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 5000 );
 				camera.position.z = 2000;
 
-				cameraCube = new THREE.Camera( 50, window.innerWidth / window.innerHeight, 1, 100 );
+				cameraCube = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 100 );
+
+				cubeTarget = new THREE.Vector3( 0, 0, 0 );
 
 				scene = new THREE.Scene();
 				sceneCube = new THREE.Scene();
@@ -84,17 +85,18 @@
 				// LIGHTS
 
 				var ambient = new THREE.AmbientLight( 0xffffff );
-				scene.addLight( ambient );
+				scene.add( ambient );
 
 				pointLight = new THREE.PointLight( 0xffffff, 2 );
-				scene.addLight( pointLight );
+				scene.add( pointLight );
 
 				// light representation
+
 				sphere = new THREE.SphereGeometry( 100, 16, 8 );
-				lightMesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color:0xffaa00 } ) );
+				lightMesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) );
 				lightMesh.position = pointLight.position;
 				lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
-				scene.addObject(lightMesh);
+				scene.add( lightMesh );
 
 				var path = "textures/cube/SwedishRoyalCastle/";
 				var format = '.jpg';
@@ -114,19 +116,21 @@
 
 				// Skybox
 
-				var shader = THREE.ShaderUtils.lib["cube"];
-				shader.uniforms["tCube"].texture = reflectionCube;
+				var shader = THREE.ShaderUtils.lib[ "cube" ];
+				shader.uniforms[ "tCube" ].texture = reflectionCube;
 
-				var material = new THREE.MeshShaderMaterial( {
+				var material = new THREE.ShaderMaterial( {
 
 					fragmentShader: shader.fragmentShader,
 					vertexShader: shader.vertexShader,
-					uniforms: shader.uniforms
+					uniforms: shader.uniforms,
+					depthWrite: false
 
 				} ),
 
-				mesh = new THREE.Mesh( new THREE.CubeGeometry( 10, 10, 10, 1, 1, 1, null, true ), material );
-				sceneCube.addObject( mesh );
+				mesh = new THREE.Mesh( new THREE.CubeGeometry( 100, 100, 100 ), material );
+				mesh.flipSided = true;
+				sceneCube.add( mesh );
 
 				//
 
@@ -135,11 +139,15 @@
 				renderer.autoClear = false;
 				container.appendChild( renderer.domElement );
 
+				//
+
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
 				stats.domElement.style.zIndex = 100;
 				container.appendChild( stats.domElement );
+
+				//
 
 				loader = new THREE.BinaryLoader( true );
 				document.body.appendChild( loader.statusDomElement );
@@ -155,19 +163,19 @@
 				var mesh = new THREE.Mesh( geometry, m1 );
 				mesh.position.z = - 100;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = s;
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				var mesh = new THREE.Mesh( geometry, m2 );
 				mesh.position.x = - 900;
 				mesh.position.z = - 100;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = s;
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				var mesh = new THREE.Mesh( geometry, m3 );
 				mesh.position.x = 900;
 				mesh.position.z = - 100;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = s;
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				loader.statusDomElement.style.display = "none";
 
@@ -198,28 +206,23 @@
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 
-				cameraCube.target.position.x = - camera.position.x;
-				cameraCube.target.position.y = - camera.position.y;
-				cameraCube.target.position.z = - camera.position.z;
+				camera.lookAt( scene.position );
 
+				cubeTarget.x = - camera.position.x;
+				cubeTarget.y = - camera.position.y;
+				cubeTarget.z = - camera.position.z;
+
+				cameraCube.lookAt( cubeTarget );
 
 				lightMesh.position.x = 1500 * Math.cos( timer );
 				lightMesh.position.z = 1500 * Math.sin( timer );
 
 				renderer.clear();
-				renderer.enableDepthBufferWrite( false );
 				renderer.render( sceneCube, cameraCube );
-				renderer.enableDepthBufferWrite( true );
 				renderer.render( scene, camera );
 
 			}
 
-			function log(text) {
-
-				var e = document.getElementById("log");
-				e.innerHTML = text + "<br/>" + e.innerHTML;
-
-			}
 		</script>
 
 	</body>

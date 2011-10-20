@@ -163,17 +163,7 @@ THREE.Rectangle = function () {
 
 	};
 
-	/*
-	this.contains = function ( x, y ) {
-
-		return x > _left && x < _right && y > _top && y < _bottom;
-
-	};
-	*/
-
-	this.instersects = function ( r ) {
-
-		// return this.contains( r.getLeft(), r.getTop() ) || this.contains( r.getRight(), r.getTop() ) || this.contains( r.getLeft(), r.getBottom() ) || this.contains( r.getRight(), r.getBottom() );
+	this.intersects = function ( r ) {
 
 		return Math.min( _right, r.getRight() ) - Math.max( _left, r.getLeft() ) >= 0 &&
 		        Math.min( _bottom, r.getBottom() ) - Math.max( _top, r.getTop() ) >= 0;

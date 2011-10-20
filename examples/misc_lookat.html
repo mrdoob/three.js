@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js misc - lookAt</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				color: #404040;
 				font-family:Monospace;
@@ -30,18 +31,18 @@
 	<body>
 		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - Object3D::lookAt() demo</div>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
-		<script type="text/javascript">
+		<script>
 
 			var container, stats;
 
 			var camera, scene, renderer;
 
-			var mesh, zmesh, lightMesh, geometry, target;
+			var mesh, zmesh, lightMesh, geometry, sphere;
 
 			var mouseX = 0, mouseY = 0;
 
@@ -59,16 +60,18 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 3200;
 
 				scene = new THREE.Scene();
 
-				var geometry = new THREE.CylinderGeometry( 3, 10, 0.1, 100 );
-				var material = new THREE.MeshNormalMaterial( { shading: THREE.SmoothShading } );
+				sphere = new THREE.Mesh( new THREE.SphereGeometry( 100, 20, 20 ), new THREE.MeshNormalMaterial( { shading: THREE.SmoothShading } ) );
+				scene.add( sphere );
 
-				target = new THREE.Mesh( new THREE.SphereGeometry( 100, 20, 20 ), material );
-				scene.addObject( target );
+				var geometry = new THREE.CylinderGeometry( 0, 10, 100, 3 );
+				geometry.applyMatrix( new THREE.Matrix4().setRotationFromEuler( new THREE.Vector3( Math.PI / 2, Math.PI, 0 ) ) );
+
+				var material = new THREE.MeshNormalMaterial();
 
 				for ( var i = 0; i < 1000; i ++ ) {
 
@@ -77,7 +80,7 @@
 					mesh.position.y = Math.random() * 4000 - 2000;
 					mesh.position.z = Math.random() * 4000 - 2000;
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 4 + 2;
-					scene.addObject( mesh );
+					scene.add( mesh );
 
 				}
 
@@ -116,20 +119,21 @@
 
 			function render() {
 
-				camera.position.x += ( mouseX - camera.position.x ) * .05;
-				camera.position.y += ( - mouseY - camera.position.y ) * .05;
-
 				var time = new Date().getTime() * 0.0005;
 
-				target.position.x = Math.sin( time * 0.7 ) * 2000;
-				target.position.y = Math.cos( time * 0.5 ) * 2000;
-				target.position.z = Math.cos( time * 0.3 ) * 2000;
+				sphere.position.x = Math.sin( time * 0.7 ) * 2000;
+				sphere.position.y = Math.cos( time * 0.5 ) * 2000;
+				sphere.position.z = Math.cos( time * 0.3 ) * 2000;
 
 				for ( var i = 0, l = scene.objects.length; i < l; i ++ ) {
 
-					scene.objects[ i ].lookAt( target.position );
+					scene.objects[ i ].lookAt( sphere.position );
 
 				}
+
+				camera.position.x += ( mouseX - camera.position.x ) * .05;
+				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+				camera.lookAt( scene.position );
 
 				renderer.render( scene, camera );
 

@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - equirectangular panorama demo</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				background-color: #000000;
 				margin: 0px;
@@ -28,13 +29,13 @@
 	</head>
 	<body>
 
-		<div id="container"></div> 
+		<div id="container"></div>
 		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js webgl</a> - equirectangular panorama demo. photo by <a href="http://www.flickr.com/photos/jonragnarsson/2294472375/" target="_blank">Jón Ragnarsson</a>.</div>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
+		<script src="../build/Three.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
 
-		<script type="text/javascript">
+		<script>
 
 			var camera, scene, renderer;
 
@@ -55,13 +56,15 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.Camera( fov, window.innerWidth / window.innerHeight, 1, 1100 );
+				camera = new THREE.PerspectiveCamera( fov, window.innerWidth / window.innerHeight, 1, 1100 );
+
+				camera.target = new THREE.Vector3( 0, 0, 0 );
 
 				scene = new THREE.Scene();
 
 				mesh = new THREE.Mesh( new THREE.SphereGeometry( 500, 60, 40 ), new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/2294472375_24a3b8ef46_o.jpg' ) } ) );
 				mesh.scale.x = -1;
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -146,15 +149,17 @@
 				phi = ( 90 - lat ) * Math.PI / 180;
 				theta = lon * Math.PI / 180;
 
-				camera.target.position.x = 500 * Math.sin( phi ) * Math.cos( theta );
-				camera.target.position.y = 500 * Math.cos( phi );
-				camera.target.position.z = 500 * Math.sin( phi ) * Math.sin( theta );
+				camera.target.x = 500 * Math.sin( phi ) * Math.cos( theta );
+				camera.target.y = 500 * Math.cos( phi );
+				camera.target.z = 500 * Math.sin( phi ) * Math.sin( theta );
+
+				camera.lookAt( camera.target );
 
 				/*
 				// distortion
-				camera.position.x = - camera.target.position.x;
-				camera.position.y = - camera.target.position.y;
-				camera.position.z = - camera.target.position.z;
+				camera.position.x = - camera.target.x;
+				camera.position.y = - camera.target.y;
+				camera.position.z = - camera.target.z;
 				*/
 
 				renderer.render( scene, camera );

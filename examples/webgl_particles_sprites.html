@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - particles - sprites</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				background-color: #000000;
 				margin: 0px;
@@ -36,13 +37,13 @@
 			snowflakes by <a href="http://en.wikipedia.org/wiki/File:Sketch_of_snow_crystal_by_Ren%C3%A9_Descartes.jpg">Ren&eacute;  Descartes</a>
 		</div>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/Detector.js"></script>
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
-		<script type="text/javascript">
+		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
@@ -61,7 +62,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 75, window.innerWidth / window.innerHeight, 1, 3000 );
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 3000 );
 				camera.position.z = 1000;
 
 				scene = new THREE.Scene();
@@ -95,14 +96,16 @@
 					materials[i].color.setHSV( color[0], color[1], color[2] );
 
 					particles = new THREE.ParticleSystem( geometry, materials[i] );
+
 					particles.rotation.x = Math.random() * 6;
 					particles.rotation.y = Math.random() * 6;
 					particles.rotation.z = Math.random() * 6;
-					scene.addObject( particles );
+
+					scene.add( particles );
 
 				}
 
-				renderer = new THREE.WebGLRenderer( { clearAlpha: 1 });
+				renderer = new THREE.WebGLRenderer( { clearAlpha: 1 } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
@@ -166,6 +169,8 @@
 
 				camera.position.x += ( mouseX - camera.position.x ) * 0.05;
 				camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
+
+				camera.lookAt( scene.position );
 
 				for( i = 0; i < scene.objects.length; i++ ) {
 

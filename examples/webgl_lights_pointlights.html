@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - lights - point lights</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				background-color: #000;
 				margin: 0px;
@@ -28,13 +29,9 @@
 			a:hover {
 				color: #0080ff;
 			}
-
-			#log { color:#fff; position:absolute; top:50px; text-align:left; display:block; z-index:100; pointer-events:none; }
 		</style>
 	</head>
 	<body>
-
-		<pre id="log"></pre>
 
 		<div id="container"></div>
 		<div id="info">
@@ -42,20 +39,19 @@
 			Walt Disney head by <a href="http://www.davidoreilly.com/2009/01/walt-disneys-head-on-a-plate" target="_blank">David OReilly</a>
 		</div>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/Detector.js"></script>
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
 
-		<script type="text/javascript">
+		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var camera, scene, renderer,
 			particle1, particle2, particle2,
-			light1, light2, light3,
-			object,loader;
+			light1, light2, light3, light4,
+			object, loader;
 
 			init();
 			animate();
@@ -64,12 +60,11 @@
 
 				var container = document.getElementById( 'container' );
 
-				camera = new THREE.Camera( 50, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.z = 100;
 
 				scene = new THREE.Scene();
 
-				//loader = new THREE.JSONLoader( true );
 				loader = new THREE.BinaryLoader( true );
 				document.body.appendChild( loader.statusDomElement );
 
@@ -77,60 +72,49 @@
 
 					object = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( { ambient: 0x555555, color: 0x555555, specular: 0xffffff, shininess: 50, shading: THREE.SmoothShading }  )  );
 					object.scale.x = object.scale.y = object.scale.z = 0.80;
-					scene.addObject( object );
+					scene.add( object );
 
 					loader.statusDomElement.style.display = "none";
 
 				};
 
-				//loader.load( { model: "obj/walt/WaltHead_slim.js", callback: callback } );
 				loader.load( { model: "obj/walt/WaltHead_bin.js", callback: callback } );
 
-				/*
-				var directionalLight = new THREE.DirectionalLight( 0x111111, 0.9 );
-				directionalLight.position.x = 1;
-				directionalLight.position.y = 1;
-				directionalLight.position.z = 2;
-				directionalLight.position.normalize();
-				scene.addLight( directionalLight );
-				*/
-
-				scene.addLight( new THREE.AmbientLight( 0x00000 ) );
+				scene.add( new THREE.AmbientLight( 0x000000 ) );
 
 				light1 = new THREE.PointLight( 0xff0040, 2, 50 );
-				scene.addLight( light1 );
+				scene.add( light1 );
 
 				light2 = new THREE.PointLight( 0x0040ff, 2, 50 );
-				scene.addLight( light2 );
+				scene.add( light2 );
 
 				light3 = new THREE.PointLight( 0x80ff80, 2, 50 );
-				scene.addLight( light3 );
+				scene.add( light3 );
+
+				light4 = new THREE.PointLight( 0xffaa00, 2, 50 );
+				scene.add( light4 );
 
 				var sphere = new THREE.SphereGeometry( 0.5, 16, 8 );
 
 				var l1 = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xff0040 } ) );
 				l1.position = light1.position;
-				scene.addObject( l1 );
+				scene.add( l1 );
 
 				var l2 = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0x0040ff } ) );
 				l2.position = light2.position;
-				scene.addObject( l2 );
+				scene.add( l2 );
 
 				var l3 = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0x80ff80 } ) );
 				l3.position = light3.position;
-				scene.addObject( l3 );
+				scene.add( l3 );
+
+				var l4 = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) );
+				l4.position = light4.position;
+				scene.add( l4 );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
-
-				/*
-				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				stats.domElement.style.zIndex = 100;
-				container.appendChild( stats.domElement );
-				*/
 
 			}
 
@@ -162,14 +146,11 @@
 				light3.position.y = Math.cos( time * 0.3 ) * 40;
 				light3.position.z = Math.sin( time * 0.5 ) * 30;
 
+				light4.position.x = Math.sin( time * 0.3 ) * 30;
+				light4.position.y = Math.cos( time * 0.7 ) * 40;
+				light4.position.z = Math.sin( time * 0.5 ) * 30;
+
 				renderer.render( scene, camera );
-
-			}
-
-			function log( text ) {
-
-				var e = document.getElementById("log");
-				e.innerHTML = text + "<br/>" + e.innerHTML;
 
 			}
 

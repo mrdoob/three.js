@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - performance</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				background:#fff;
 				padding:0;
@@ -15,12 +16,12 @@
 	</head>
 	<body>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
-		<script type="text/javascript">
+		<script>
 
 			var container, stats;
 
@@ -45,7 +46,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 3200;
 
 				scene = new THREE.Scene();
@@ -72,15 +73,16 @@
 
 						//mesh.frustumCulled = false;
 
-						scene.addObject( mesh );
+						scene.add( mesh );
 
 					}
 
 				} } );
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { preserveDrawingBuffer: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.sortObjects = false;
+				renderer.autoClearColor = false;
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -113,6 +115,8 @@
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+
+				camera.lookAt( scene.position );
 
 				renderer.render( scene, camera );
 

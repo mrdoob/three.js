@@ -1,10 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js canvas - camera - orthographic</title>
 		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				font-family: Monospace;
 				background-color: #f0f0f0;
@@ -15,13 +15,13 @@
 	</head>
 	<body>
 
-		<script type="text/javascript" src="../build/custom/ThreeCanvas.js"></script>
-		<script type="text/javascript" src="../build/custom/ThreeExtras.js"></script>
+		<script src="../build/custom/ThreeCanvas.js"></script>
+		<script src="../build/custom/ThreeExtras.js"></script>
 
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
-		<script type="text/javascript">
+		<script>
 
 			var container, stats;
 			var camera, scene, renderer;
@@ -42,7 +42,7 @@
 				info.innerHTML = '<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - orthographic view';
 				container.appendChild( info );
 
-				camera = new THREE.OrthoCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, - 2000, 1000 );
+				camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, - 2000, 1000 );
 				camera.position.x = 200;
 				camera.position.y = 100;
 				camera.position.z = 200;
@@ -59,12 +59,12 @@
 
 					var line = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0x000000, opacity: 0.2 } ) );
 					line.position.z = ( i * 50 ) - 500;
-					scene.addObject( line );
+					scene.add( line );
 
 					var line = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0x000000, opacity: 0.2 } ) );
 					line.position.x = ( i * 50 ) - 500;
 					line.rotation.y = 90 * Math.PI / 180;
-					scene.addObject( line );
+					scene.add( line );
 
 				}
 
@@ -84,28 +84,28 @@
 					cube.position.y = ( cube.scale.y * 50 ) / 2;
 					cube.position.z = Math.floor( ( Math.random() * 1000 - 500 ) / 50 ) * 50 + 25;
 
-					scene.addObject(cube);
+					scene.add(cube);
 
 				}
 
 				// Lights
 
 				var ambientLight = new THREE.AmbientLight( Math.random() * 0x10 );
-				scene.addLight( ambientLight );
+				scene.add( ambientLight );
 
 				var directionalLight = new THREE.DirectionalLight( Math.random() * 0xffffff );
 				directionalLight.position.x = Math.random() - 0.5;
 				directionalLight.position.y = Math.random() - 0.5;
 				directionalLight.position.z = Math.random() - 0.5;
 				directionalLight.position.normalize();
-				scene.addLight( directionalLight );
+				scene.add( directionalLight );
 
 				var directionalLight = new THREE.DirectionalLight( Math.random() * 0xffffff );
 				directionalLight.position.x = Math.random() - 0.5;
 				directionalLight.position.y = Math.random() - 0.5;
 				directionalLight.position.z = Math.random() - 0.5;
 				directionalLight.position.normalize();
-				scene.addLight( directionalLight );
+				scene.add( directionalLight );
 
 				renderer = new THREE.CanvasRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -136,6 +136,7 @@
 
 				camera.position.x = Math.cos( timer ) * 200;
 				camera.position.z = Math.sin( timer ) * 200;
+				camera.lookAt( scene.position );
 
 				renderer.render( scene, camera );
 

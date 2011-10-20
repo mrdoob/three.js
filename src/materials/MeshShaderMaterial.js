@@ -1,49 +1,7 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- *
- * parameters = {
- *  fragmentShader: <string>,
- *  vertexShader: <string>,
- 
- *  uniforms: { "parameter1": { type: "f", value: 1.0 }, "parameter2": { type: "i" value2: 2 } },
- 
- *  shading: THREE.SmoothShading,
- *  blending: THREE.NormalBlending,
- *  depthTest: <bool>,
- 
- *  wireframe: <boolean>,
- *  wireframeLinewidth: <float>,
- 
- *  lights: <bool>,
- *  vertexColors: <bool>,
- *  skinning: <bool>,
- *  morphTargets: <bool>,
- * }
- */
-
 THREE.MeshShaderMaterial = function ( parameters ) {
 
-	THREE.Material.call( this, parameters );
+	console.warn( 'DEPRECATED: MeshShaderMaterial() is now ShaderMaterial().' );
 
-	parameters = parameters || {};
-
-	this.fragmentShader = parameters.fragmentShader !== undefined ? parameters.fragmentShader : "void main() {}";
-	this.vertexShader = parameters.vertexShader !== undefined ? parameters.vertexShader : "void main() {}";
-	this.uniforms = parameters.uniforms !== undefined ? parameters.uniforms : {};
-	this.attributes = parameters.attributes;
-
-	this.shading = parameters.shading !== undefined ? parameters.shading : THREE.SmoothShading;
-
-	this.wireframe = parameters.wireframe !== undefined ? parameters.wireframe : false;
-	this.wireframeLinewidth = parameters.wireframeLinewidth !== undefined ? parameters.wireframeLinewidth : 1;
-
-	this.fog = parameters.fog !== undefined ? parameters.fog : false; // set to use scene fog
-	this.lights = parameters.lights !== undefined ? parameters.lights : false; // set to use scene lights
-	this.vertexColors = parameters.vertexColors !== undefined ? parameters.vertexColors : false; // set to use "color" attribute stream
-	this.skinning = parameters.skinning !== undefined ? parameters.skinning : false; // set to use skinning attribute streams
-	this.morphTargets = parameters.morphTargets !== undefined ? parameters.morphTargets : false; // set to use morph targets
+	return new THREE.ShaderMaterial( parameters );
 
 };
-
-THREE.MeshShaderMaterial.prototype = new THREE.Material();
-THREE.MeshShaderMaterial.prototype.constructor = THREE.MeshShaderMaterial;

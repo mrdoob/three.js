@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - geometry - large mesh</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				background:#000;
 				color:#fff;
@@ -44,12 +45,12 @@
 
 		<pre id="log"></pre>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
-		<script type="text/javascript">
+		<script>
 
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
@@ -95,9 +96,7 @@
 				mesh.rotation.x = rx;
 				mesh.rotation.y = ry;
 				mesh.rotation.z = rz;
-				mesh.overdraw = true;
-				mesh.updateMatrix();
-				scene.addObject(mesh);
+				scene.add(mesh);
 
 			}
 
@@ -106,38 +105,31 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 50, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
+				camera = new THREE.PerspectiveCamera( 50, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
 				camera.position.z = 1500;
-				camera.updateMatrix();
 
 				scene = new THREE.Scene();
 
 				// LIGHTS
 
 				var ambient = new THREE.AmbientLight( 0x101010 );
-				scene.addLight( ambient );
+				scene.add( ambient );
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
-				directionalLight.position.x = 1;
-				directionalLight.position.y = 1;
-				directionalLight.position.z = 2;
-				directionalLight.position.normalize();
-				scene.addLight( directionalLight );
+				directionalLight.position.set( 1, 1, 2 ).normalize();
+				scene.add( directionalLight );
 
 				pointLight = new THREE.PointLight( 0xffaa00 );
-				pointLight.position.x = 0;
-				pointLight.position.y = 0;
-				pointLight.position.z = 0;
-				scene.addLight( pointLight );
+				pointLight.position.set( 0, 0, 0 );
+				scene.add( pointLight );
 
 				// light representation
+
 				sphere = new THREE.SphereGeometry( 100, 16, 8, 1 );
 				lightMesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) );
 				lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
 				lightMesh.position = pointLight.position;
-				lightMesh.overdraw = true;
-				lightMesh.updateMatrix();
-				scene.addObject( lightMesh );
+				scene.add( lightMesh );
 
 
 				if ( render_gl ) {
@@ -221,11 +213,11 @@
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
-				camera.updateMatrix();
 
-				lightMesh.position.x = 700*Math.cos(r);
-				lightMesh.position.z = 700*Math.sin(r);
-				lightMesh.updateMatrix();
+				camera.lookAt( scene.position );
+
+				lightMesh.position.x = 700 * Math.cos( r );
+				lightMesh.position.z = 700 * Math.sin( r );
 
 				r += 0.01;
 

@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - materials - normal map</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				background:#000;
 				color:#fff;
@@ -39,19 +40,19 @@
 	<body>
 
 		<div id="info">
-			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl (<span id="description">normal + ao + displacement</span>) map demo.
+			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl (<span id="description">normal + ao + displacement + environment + shadow</span>) map demo.
 			ninja head from <a href="http://developer.amd.com/archive/gpu/MeshMapper/pages/default.aspx" target="_blank">AMD GPU MeshMapper</a>
 
 			<div id="vt">displacement mapping needs vertex textures (GPU with Shader Model 3.0)</div>
 		</div>
 
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
-		<script type="text/javascript" src="js/Detector.js"></script>
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
-		<script type="text/javascript">
+		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
@@ -84,26 +85,45 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.OrthoCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
-				camera.position.z = 6200;
+				camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
+				camera.position.z = 1500;
 
 				scene = new THREE.Scene();
 
 				// LIGHTS
 
 				ambientLight = new THREE.AmbientLight( 0x111111 );
-				scene.addLight( ambientLight );
+				scene.add( ambientLight );
 
-				pointLight = new THREE.PointLight( 0xffff55 );
+				pointLight = new THREE.PointLight( 0xff0000 );
 				pointLight.position.z = 10000;
-				scene.addLight( pointLight );
+				pointLight.distance = 4000;
+				scene.add( pointLight );
 
-				directionalLight = new THREE.DirectionalLight( 0xaaaa88 );
-				directionalLight.position.x = 1;
-				directionalLight.position.y = 1;
-				directionalLight.position.z = 0.5;
-				directionalLight.position.normalize();
-				scene.addLight( directionalLight );
+				pointLight2 = new THREE.PointLight( 0xff5500 );
+				pointLight2.position.z = 1000;
+				pointLight2.distance = 2000;
+				scene.add( pointLight2 );
+
+				pointLight3 = new THREE.PointLight( 0x0000ff );
+				pointLight3.position.x = -1000;
+				pointLight3.position.z = 1000;
+				pointLight3.distance = 2000;
+				scene.add( pointLight3 );
+
+				directionalLight = new THREE.SpotLight( 0xaaaaaa );
+				directionalLight.position.set( 1000, 500, 1000 );
+				directionalLight.castShadow = true;
+				scene.add( directionalLight );
+
+				directionalLight2 = new THREE.DirectionalLight( 0xaaff33, 0 );
+				directionalLight2.position.set( -1, 1, 0.5 ).normalize();
+				//scene.add( directionalLight2 );
+
+				directionalLight3 = new THREE.DirectionalLight( 0xaaff33 );
+				directionalLight3.position.set( -1, 1, 0.5 ).normalize();
+				//scene.add( directionalLight3 );
+
 
 				// light representation
 
@@ -111,11 +131,21 @@
 				lightMesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) );
 				lightMesh.position = pointLight.position;
 				lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
-				scene.addObject(lightMesh);
+				//scene.add( lightMesh );
+
+				var path = "textures/cube/SwedishRoyalCastle/";
+				var format = '.jpg';
+				var urls = [
+						path + 'px' + format, path + 'nx' + format,
+						path + 'py' + format, path + 'ny' + format,
+						path + 'pz' + format, path + 'nz' + format
+					];
+
+				var reflectionCube = THREE.ImageUtils.loadTextureCube( urls );
 
 				// common material parameters
 
-				var ambient = 0x050505, diffuse = 0x555555, specular = 0xaa6600, shininess = 10, scale = 23;
+				var ambient = 0x050505, diffuse = 0x331100, specular = 0xffffff, shininess = 10, scale = 23;
 
 				// normal map shader
 
@@ -125,6 +155,7 @@
 				uniforms[ "enableAO" ].value = true;
 				uniforms[ "enableDiffuse" ].value = false;
 				uniforms[ "enableSpecular" ].value = false;
+				uniforms[ "enableReflection" ].value = true;
 
 				uniforms[ "tNormal" ].texture = THREE.ImageUtils.loadTexture( "textures/normal/ninja/normal.jpg" );
 				uniforms[ "tAO" ].texture = THREE.ImageUtils.loadTexture( "textures/normal/ninja/ao.jpg" );
@@ -139,21 +170,39 @@
 
 				uniforms[ "uShininess" ].value = shininess;
 
-				var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true };
-				var material1 = new THREE.MeshShaderMaterial( parameters );
+				uniforms[ "tCube" ].texture = reflectionCube;
+				uniforms[ "uReflectivity" ].value = 0.1;
 
-				var material2 = new THREE.MeshPhongMaterial( { color: diffuse, specular: specular, ambient: ambient, shininess: shininess } );
+				var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true, fog: false };
+				var material1 = new THREE.ShaderMaterial( parameters );
+
+				var material2 = new THREE.MeshPhongMaterial( { color: diffuse, specular: specular, ambient: ambient, shininess: shininess, envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.1 } );
+
+				//
 
 				loader = new THREE.BinaryLoader( true );
 				document.body.appendChild( loader.statusDomElement );
 
 				loader.load( { model: "obj/ninja/NinjaLo_bin.js", callback: function( geometry ) { createScene( geometry, scale, material1, material2 ) } } );
 
-				renderer = new THREE.WebGLRenderer();
+				//
+
+				renderer = new THREE.WebGLRenderer( { maxLights: 8 } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				var description = "normal + ao" + ( renderer.supportsVertexTextures() ? " + displacement" : " + <strike>displacement</strike>" );
+				//
+
+				renderer.shadowCameraFov = 70;
+				renderer.shadowMapBias = 0.0039;
+
+				renderer.shadowMapEnabled = true;
+				renderer.shadowMapSoft = true;
+
+
+				//
+
+				var description = "normal + ao" + ( renderer.supportsVertexTextures() ? " + displacement + environment + shadow" : " + <strike>displacement</strike>" );
 				document.getElementById( "description" ).innerHTML = description;
 				document.getElementById( "vt" ).style.display = renderer.supportsVertexTextures() ? "none" : "block";
 
@@ -176,12 +225,16 @@
 				mesh1 = new THREE.Mesh( geometry, material1 );
 				mesh1.position.x = - scale * 12;
 				mesh1.scale.set( scale, scale, scale );
-				scene.addObject( mesh1 );
+				mesh1.castShadow = true;
+				mesh1.receiveShadow = true;
+				scene.add( mesh1 );
 
 				mesh2 = new THREE.Mesh( geometry, material2 );
 				mesh2.position.x = scale * 12;
 				mesh2.scale.set( scale, scale, scale );
-				scene.addObject( mesh2 );
+				mesh2.castShadow = true;
+				mesh2.receiveShadow = true;
+				scene.add( mesh2 );
 
 				loader.statusDomElement.style.display = "none";
 

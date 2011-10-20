@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - postprocessing - depth-of-field</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				background-color: #000000;
 				margin: 0px;
@@ -30,23 +31,23 @@
 	</head>
 
 	<body>
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/Detector.js"></script>
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/ShaderExtras.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/ShaderExtras.js"></script>
+		<script src="js/Stats.js"></script>
 
 		<link href="js/gui/gui.css" media="screen" rel="stylesheet" type="text/css" />
-		<script type="text/javascript" src="js/gui/gui.min.js"></script>
+		<script src="js/gui/gui.min.js"></script>
 
-        <div id="info">
+		<div id="info">
 			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl depth-of-field with bokeh example -
 			shader by <a href="http://artmartinsh.blogspot.com/2010/02/glsl-lens-blur-filter-with-bokeh.html">Martins Upitis</a>
 		</div>
 
 
-		<script type="text/javascript">
+		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
@@ -74,7 +75,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 70, window.innerWidth / height, 1, 3000 );
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / height, 1, 3000 );
 				camera.position.z = 200;
 
 				scene = new THREE.Scene();
@@ -82,6 +83,8 @@
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.setSize( window.innerWidth, height );
 				container.appendChild( renderer.domElement );
+
+				renderer.sortObjects = false;
 
 				material_depth = new THREE.MeshDepthMaterial();
 
@@ -147,7 +150,7 @@
 					mesh.matrixAutoUpdate = false;
 					mesh.updateMatrix();
 
-					scene.addObject( mesh );
+					scene.add( mesh );
 					objects.push( mesh );
 
 					c++;
@@ -234,7 +237,7 @@
 
 				postprocessing.scene = new THREE.Scene();
 
-				postprocessing.camera = new THREE.OrthoCamera( window.innerWidth / - 2, window.innerWidth / 2,  window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
+				postprocessing.camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2,  window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
 				postprocessing.camera.position.z = 100;
 
 				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
@@ -250,7 +253,7 @@
 				postprocessing.bokeh_uniforms[ "focus" ].value = 1.1;
 				postprocessing.bokeh_uniforms[ "aspect" ].value = window.innerWidth / height;
 
-				postprocessing.materialBokeh = new THREE.MeshShaderMaterial( {
+				postprocessing.materialBokeh = new THREE.ShaderMaterial( {
 
 					uniforms: postprocessing.bokeh_uniforms,
 					vertexShader: bokeh_shader.vertexShader,
@@ -260,7 +263,7 @@
 
 				postprocessing.quad = new THREE.Mesh( new THREE.PlaneGeometry( window.innerWidth, window.innerHeight ), postprocessing.materialBokeh );
 				postprocessing.quad.position.z = - 500;
-				postprocessing.scene.addObject( postprocessing.quad );
+				postprocessing.scene.add( postprocessing.quad );
 
 			}
 
@@ -279,6 +282,8 @@
 
 				camera.position.x += ( mouseX - camera.position.x ) * 0.036;
 				camera.position.y += ( - (mouseY) - camera.position.y ) * 0.036;
+
+				camera.lookAt( scene.position );
 
 				if ( !singleMaterial ) {
 

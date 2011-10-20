@@ -8,7 +8,7 @@ THREE.FilmPass = function( noiseIntensity, scanlinesIntensity, scanlinesCount, g
 
 	this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
-	this.material = new THREE.MeshShaderMaterial( {
+	this.material = new THREE.ShaderMaterial( {
 
 		uniforms: this.uniforms,
 		vertexShader: shader.vertexShader,
@@ -21,6 +21,7 @@ THREE.FilmPass = function( noiseIntensity, scanlinesIntensity, scanlinesCount, g
 	if ( scanlinesIntensity !== undefined ) this.uniforms.sIntensity.value = scanlinesIntensity;
 	if ( scanlinesCount !== undefined ) this.uniforms.sCount.value = scanlinesCount;
 
+	this.enabled = true;
 	this.renderToScreen = false;
 	this.needsSwap = true;
 

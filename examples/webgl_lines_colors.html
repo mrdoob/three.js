@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - lines - cubes - colors</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				background-color: #000000;
 				margin: 0px;
@@ -43,21 +44,21 @@
 			[<a href="http://en.wikipedia.org/wiki/Hilbert_curve">Hilbert curve</a> thanks to <a href="http://www.openprocessing.org/visuals/?visualID=15599">Thomas Diewald</a>]
 		</div>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/ShaderExtras.js"></script>
+		<script src="js/ShaderExtras.js"></script>
 
-		<script type="text/javascript" src="js/postprocessing/EffectComposer.js"></script>
-		<script type="text/javascript" src="js/postprocessing/MaskPass.js"></script>
-		<script type="text/javascript" src="js/postprocessing/RenderPass.js"></script>
-		<script type="text/javascript" src="js/postprocessing/ShaderPass.js"></script>
-		<script type="text/javascript" src="js/postprocessing/BloomPass.js"></script>
+		<script src="js/postprocessing/EffectComposer.js"></script>
+		<script src="js/postprocessing/MaskPass.js"></script>
+		<script src="js/postprocessing/RenderPass.js"></script>
+		<script src="js/postprocessing/ShaderPass.js"></script>
+		<script src="js/postprocessing/BloomPass.js"></script>
 
-		<script type="text/javascript" src="js/Detector.js"></script>
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
-		<script type="text/javascript">
+		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
@@ -78,7 +79,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 33, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 33, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 700;
 
 				scene = new THREE.Scene();
@@ -135,7 +136,7 @@
 					line.position.x = p[ 2 ][ 0 ];
 					line.position.y = p[ 2 ][ 1 ];
 					line.position.z = p[ 2 ][ 2 ];
-					scene.addObject( line );
+					scene.add( line );
 
 				}
 
@@ -157,12 +158,16 @@
 				var renderModel = new THREE.RenderPass( scene, camera );
 				var effectBloom = new THREE.BloomPass( 1.3 );
 				var effectScreen = new THREE.ShaderPass( THREE.ShaderExtras[ "screen" ] );
+				var effectFXAA = new THREE.ShaderPass( THREE.ShaderExtras[ "fxaa" ] );
+
+				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
 
 				effectScreen.renderToScreen = true;
 
 				composer = new THREE.EffectComposer( renderer );
 
 				composer.addPass( renderModel );
+				composer.addPass( effectFXAA );
 				composer.addPass( effectBloom );
 				composer.addPass( effectScreen );
 
@@ -194,14 +199,14 @@
 
 					var tmp = [];
 
-					tmp = tmp.concat( hilbert3D ( vec[ 0 ], half, iterations, v0, v3, v4, v7, v6, v5, v2, v1 ) );
-					tmp = tmp.concat( hilbert3D ( vec[ 1 ], half, iterations, v0, v7, v6, v1, v2, v5, v4, v3 ) );
-					tmp = tmp.concat( hilbert3D ( vec[ 2 ], half, iterations, v0, v7, v6, v1, v2, v5, v4, v3 ) );
-					tmp = tmp.concat( hilbert3D ( vec[ 3 ], half, iterations, v2, v3, v0, v1, v6, v7, v4, v5 ) );
-					tmp = tmp.concat( hilbert3D ( vec[ 4 ], half, iterations, v2, v3, v0, v1, v6, v7, v4, v5 ) );
-					tmp = tmp.concat( hilbert3D ( vec[ 5 ], half, iterations, v4, v3, v2, v5, v6, v1, v0, v7 ) );
-					tmp = tmp.concat( hilbert3D ( vec[ 6 ], half, iterations, v4, v3, v2, v5, v6, v1, v0, v7 ) );
-					tmp = tmp.concat( hilbert3D ( vec[ 7 ], half, iterations, v6, v5, v2, v1, v0, v3, v4, v7 ) );
+					Array.prototype.push.apply( tmp, hilbert3D ( vec[ 0 ], half, iterations, v0, v3, v4, v7, v6, v5, v2, v1 ) );
+					Array.prototype.push.apply( tmp, hilbert3D ( vec[ 1 ], half, iterations, v0, v7, v6, v1, v2, v5, v4, v3 ) );
+					Array.prototype.push.apply( tmp, hilbert3D ( vec[ 2 ], half, iterations, v0, v7, v6, v1, v2, v5, v4, v3 ) );
+					Array.prototype.push.apply( tmp, hilbert3D ( vec[ 3 ], half, iterations, v2, v3, v0, v1, v6, v7, v4, v5 ) );
+					Array.prototype.push.apply( tmp, hilbert3D ( vec[ 4 ], half, iterations, v2, v3, v0, v1, v6, v7, v4, v5 ) );
+					Array.prototype.push.apply( tmp, hilbert3D ( vec[ 5 ], half, iterations, v4, v3, v2, v5, v6, v1, v0, v7 ) );
+					Array.prototype.push.apply( tmp, hilbert3D ( vec[ 6 ], half, iterations, v4, v3, v2, v5, v6, v1, v0, v7 ) );
+					Array.prototype.push.apply( tmp, hilbert3D ( vec[ 7 ], half, iterations, v6, v5, v2, v1, v0, v3, v4, v7 ) );
 
 					return tmp;
 
@@ -251,12 +256,16 @@
 				requestAnimationFrame( animate );
 				render();
 
+				stats.update();
+
 			}
 
 			function render() {
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY + 200 - camera.position.y ) * .05;
+
+				camera.lookAt( scene.position );
 
 				var time = new Date().getTime() * 0.0005;
 

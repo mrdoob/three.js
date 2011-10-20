@@ -15,6 +15,8 @@ THREE.Loader = function ( showStatus ) {
 
 THREE.Loader.prototype = {
 
+	constructor: THREE.Loader,
+
 	addStatusElement: function () {
 
 		var e = document.createElement( "div" );
@@ -57,9 +59,9 @@ THREE.Loader.prototype = {
 
 	extractUrlbase: function ( url ) {
 
-		var chunks = url.split( "/" );
-		chunks.pop();
-		return chunks.join( "/" );
+		var parts = url.split( '/' );
+		parts.pop();
+		return parts.length < 1 ? '' : parts.join( '/' ) + '/';
 
 	},
 
@@ -83,7 +85,7 @@ THREE.Loader.prototype = {
 
 			m = scope.materials[ i ][ 0 ];
 
-			if ( m instanceof THREE.MeshShaderMaterial ) return true;
+			if ( m instanceof THREE.ShaderMaterial ) return true;
 
 		}
 
@@ -136,7 +138,7 @@ THREE.Loader.prototype = {
 
 		}
 
-		function create_texture ( where, name, sourceFile, repeat, offset, wrap ) {
+		function create_texture( where, name, sourceFile, repeat, offset, wrap ) {
 
 			var texture = document.createElement( 'canvas' );
 
@@ -174,7 +176,7 @@ THREE.Loader.prototype = {
 
 		}
 
-		function rgb2hex ( rgb ) {
+		function rgb2hex( rgb ) {
 
 			return ( rgb[ 0 ] * 255 << 16 ) + ( rgb[ 1 ] * 255 << 8 ) + rgb[ 2 ] * 255;
 
@@ -356,7 +358,7 @@ THREE.Loader.prototype = {
 
 			var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true, fog: true };
 
-			material = new THREE.MeshShaderMaterial( parameters );
+			material = new THREE.ShaderMaterial( parameters );
 
 		} else {
 
@@ -366,8 +368,6 @@ THREE.Loader.prototype = {
 
 		return material;
 
-	},
-
-	constructor : THREE.Loader
+	}
 
 };

@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - postprocessing</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 		    body {
 			color: #000;
 			font-family:Monospace;
@@ -39,23 +40,23 @@
 
 		<div id="container"></div>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
 
-		<script type="text/javascript" src="js/ShaderExtras.js"></script>
+		<script src="js/ShaderExtras.js"></script>
 
-		<script type="text/javascript" src="js/postprocessing/EffectComposer.js"></script>
-		<script type="text/javascript" src="js/postprocessing/RenderPass.js"></script>
-		<script type="text/javascript" src="js/postprocessing/BloomPass.js"></script>
-		<script type="text/javascript" src="js/postprocessing/FilmPass.js"></script>
-		<script type="text/javascript" src="js/postprocessing/DotScreenPass.js"></script>
-		<script type="text/javascript" src="js/postprocessing/TexturePass.js"></script>
-		<script type="text/javascript" src="js/postprocessing/ShaderPass.js"></script>
-		<script type="text/javascript" src="js/postprocessing/MaskPass.js"></script>
+		<script src="js/postprocessing/EffectComposer.js"></script>
+		<script src="js/postprocessing/RenderPass.js"></script>
+		<script src="js/postprocessing/BloomPass.js"></script>
+		<script src="js/postprocessing/FilmPass.js"></script>
+		<script src="js/postprocessing/DotScreenPass.js"></script>
+		<script src="js/postprocessing/TexturePass.js"></script>
+		<script src="js/postprocessing/ShaderPass.js"></script>
+		<script src="js/postprocessing/MaskPass.js"></script>
 
-		<script type="text/javascript" src="js/Detector.js"></script>
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
 		<!-- Time modulated procedural color fragment shader -->
 
@@ -90,7 +91,7 @@
 		</script>
 
 
-		<script type="text/javascript">
+		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
@@ -116,10 +117,10 @@
 
 				container = document.getElementById( 'container' );
 
-				cameraOrtho = new THREE.OrthoCamera( -halfWidth, halfWidth, halfHeight, -halfHeight, -10000, 10000 );
+				cameraOrtho = new THREE.OrthographicCamera( -halfWidth, halfWidth, halfHeight, -halfHeight, -10000, 10000 );
 				cameraOrtho.position.z = 100;
 
-				cameraPerspective = new THREE.Camera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
+				cameraPerspective = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
 				cameraPerspective.position.z = 900;
 
 				//
@@ -129,7 +130,7 @@
 				directionalLight = new THREE.DirectionalLight( 0xffffff );
 				directionalLight.position.set( 0, 0, 1 );
 				directionalLight.position.normalize();
-				sceneModel.addLight( directionalLight );
+				sceneModel.add( directionalLight );
 
 				loader = new THREE.JSONLoader( true );
 				document.body.appendChild( loader.statusDomElement );
@@ -139,7 +140,7 @@
 
 				sceneBG = new THREE.Scene();
 
-				materialColor = new THREE.MeshShaderMaterial( {
+				materialColor = new THREE.ShaderMaterial( {
 
 					uniforms: { time: { type: "f", value: 0.0 } },
 					vertexShader: getText( 'vs-generic' ),
@@ -153,7 +154,7 @@
 				quadBG = new THREE.Mesh( plane, materialColor );
 				quadBG.position.z = -500;
 				quadBG.scale.set( window.innerWidth, window.innerHeight, 1 );
-				sceneBG.addObject( quadBG );
+				sceneBG.add( quadBG );
 
 				//
 
@@ -164,7 +165,7 @@
 				quadMask = new THREE.Mesh( plane, new THREE.MeshBasicMaterial( { color: 0xffaa00 } )  );
 				quadMask.position.z = -300;
 				quadMask.scale.set( window.innerWidth / 2, window.innerHeight/2, 1 );
-				sceneMask.addObject( quadMask );
+				sceneMask.add( quadMask );
 
 				//
 
@@ -232,7 +233,7 @@
 
 				//
 
-				renderScene = new THREE.TexturePass( composerScene.renderTarget );
+				renderScene = new THREE.TexturePass( composerScene.renderTarget2 );
 
 				rtParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBufer: true };
 
@@ -354,13 +355,13 @@
 				uniforms[ "uShininess" ].value = shininess;
 
 				var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true };
-				var mat2 = new THREE.MeshShaderMaterial( parameters );
+				var mat2 = new THREE.ShaderMaterial( parameters );
 
 				mesh = new THREE.Mesh( geometry, mat2 );
 				mesh.position.set( 0, -50, 0 );
 				mesh.scale.set( scale, scale, scale );
 
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				loader.statusDomElement.style.display = "none";
 

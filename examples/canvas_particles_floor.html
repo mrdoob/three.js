@@ -1,10 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js canvas - particles - floor</title>
 		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				background-color: #000000;
 				margin: 0px;
@@ -18,12 +18,12 @@
 	</head>
 	<body>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
-		<script type="text/javascript">
+		<script>
 
 			var SEPARATION = 100;
 			var AMOUNTX = 50;
@@ -44,7 +44,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.Camera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 1000;
 
 				scene = new THREE.Scene();
@@ -71,7 +71,7 @@
 						particle = new THREE.Particle( material );
 						particle.position.x = ix * SEPARATION - ( ( AMOUNTX * SEPARATION ) / 2 );
 						particle.position.z = iy * SEPARATION - ( ( AMOUNTY * SEPARATION ) / 2 );
-						scene.addObject( particle );
+						scene.add( particle );
 					}
 				}
 
@@ -134,6 +134,7 @@
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+				camera.lookAt( scene.position );
 
 				renderer.render( scene, camera );
 

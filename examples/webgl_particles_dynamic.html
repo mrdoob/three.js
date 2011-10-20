@@ -1,72 +1,71 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
-    <head>
-        <title>three.js webgl - particles - dynamic - postprocessing</title>
-        <meta charset="utf-8">
-        <style type="text/css">
-            body {
-                color: #fff;
-                font-family:Monospace;
-                font-size:13px;
-                text-align:center;
-                font-weight: bold;
+	<head>
+		<title>three.js webgl - particles - dynamic - postprocessing</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+		    body {
+			color: #fff;
+			font-family:Monospace;
+			font-size:13px;
+			text-align:center;
+			font-weight: bold;
 
-                background-color: #000;
-                margin: 0px;
-                overflow: hidden;
-            }
+			background-color: #000;
+			margin: 0px;
+			overflow: hidden;
+		    }
 
-            #info {
-				color:#fff;
-                position: absolute;
-                top: 0px; width: 100%;
-                padding: 5px;
+		    #info {
+					color:#fff;
+			position: absolute;
+			top: 0px; width: 100%;
+			padding: 5px;
 
-            }
+		    }
 
-            a { color: red; }
+		    a { color: red; }
 
-        </style>
-    </head>
-    <body>
+		</style>
+	</head>
+	<body>
 
-        <div id="container"></div>
-        <div id="info">
-			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl dynamic particles + postprocessing
-			- models by <a href="http://sketchup.google.com/3dwarehouse/details?mid=2c6fd128fca34052adc5f5b98d513da1" target="_blank">Reallusion</a>
-			<a href="http://sketchup.google.com/3dwarehouse/details?mid=f526cc4abf7cb68d76cab47c765b7255" target="_blank">iClone</a>,
-			<a href="http://artist-3d.com/free_3d_models/dnm/model_disp.php?uid=1129" target="_blank">Troyano</a>
+		<div id="container"></div>
+		<div id="info">
+				<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl dynamic particles + postprocessing
+				- models by <a href="http://sketchup.google.com/3dwarehouse/details?mid=2c6fd128fca34052adc5f5b98d513da1" target="_blank">Reallusion</a>
+				<a href="http://sketchup.google.com/3dwarehouse/details?mid=f526cc4abf7cb68d76cab47c765b7255" target="_blank">iClone</a>,
+				<a href="http://artist-3d.com/free_3d_models/dnm/model_disp.php?uid=1129" target="_blank">Troyano</a>
 
-		</div>
+			</div>
 
-        <script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/ShaderExtras.js"></script>
+		<script src="js/ShaderExtras.js"></script>
 
-		<script type="text/javascript" src="js/postprocessing/EffectComposer.js"></script>
-		<script type="text/javascript" src="js/postprocessing/MaskPass.js"></script>
-		<script type="text/javascript" src="js/postprocessing/RenderPass.js"></script>
-		<script type="text/javascript" src="js/postprocessing/BloomPass.js"></script>
-		<script type="text/javascript" src="js/postprocessing/ShaderPass.js"></script>
-		<script type="text/javascript" src="js/postprocessing/FilmPass.js"></script>
+		<script src="js/postprocessing/EffectComposer.js"></script>
+		<script src="js/postprocessing/MaskPass.js"></script>
+		<script src="js/postprocessing/RenderPass.js"></script>
+		<script src="js/postprocessing/BloomPass.js"></script>
+		<script src="js/postprocessing/ShaderPass.js"></script>
+		<script src="js/postprocessing/FilmPass.js"></script>
 
-        <script type="text/javascript" src="js/Stats.js"></script>
-        <script type="text/javascript" src="js/Detector.js"></script>
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
 
-        <script type="text/javascript">
+		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var SCREEN_HEIGHT = window.innerHeight;
 			var SCREEN_WIDTH = window.innerWidth;
 
-            var container, stats;
+			var container;
 
-            var camera, scene, renderer, mesh, directionalLight;
+			var camera, scene, renderer, mesh, directionalLight;
 
-			var parent,
-				meshes = [], clonemeshes = [];
+			var parent, meshes = [], clonemeshes = [];
 
 			var p;
 
@@ -76,25 +75,23 @@
 
 			var composer, effectFocus;
 
-            init();
-            animate();
+			init();
+			animate();
 
-            function init() {
+			function init() {
 
-                container = document.getElementById( 'container' );
+				container = document.getElementById( 'container' );
 
-				camera = new THREE.Camera( 20, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 50000 );
-				camera.position.z = 7000;
-				camera.position.y = 700;
+				camera = new THREE.PerspectiveCamera( 20, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 50000 );
+				camera.position.set( 0, 700, 7000 );
 
-                scene = new THREE.Scene();
+				scene = new THREE.Scene();
 
 				scene.fog = new THREE.FogExp2( 0x000104, 0.0000675 );
 
-				directionalLight = new THREE.DirectionalLight( 0xffffff );
-				directionalLight.position.set( 0, 0, 1 );
-				directionalLight.position.normalize();
-				scene.addLight( directionalLight );
+				camera.lookAt( scene.position );
+
+				//
 
 				aloader = new THREE.JSONLoader( );
 				bloader = new THREE.BinaryLoader( true );
@@ -137,30 +134,23 @@
 
 				//
 
-                renderer = new THREE.WebGLRenderer( { clearColor: 0x000000, clearAlpha: 1, antialias: false } );
+				renderer = new THREE.WebGLRenderer( { clearColor: 0x000000, clearAlpha: 1, antialias: false } );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.autoClear = false;
 				renderer.sortObjects = false;
-                container.appendChild( renderer.domElement );
+				container.appendChild( renderer.domElement );
 
 				renderer.setClearColor( scene.fog.color, 1 );
 
 				//
 
-                stats = new Stats();
-                stats.domElement.style.position = 'absolute';
-                stats.domElement.style.top = '0px';
-                //container.appendChild( stats.domElement );
-
-				//
-
 				parent = new THREE.Object3D();
-				scene.addObject( parent );
+				scene.add( parent );
 
 				var grid = new THREE.ParticleSystem( new THREE.PlaneGeometry( 15000, 15000, 64, 64 ), new THREE.ParticleBasicMaterial( { color: 0xff0000, size: 10 } ) );
-				grid.rotation.x = 1.57;
+				grid.rotation.x = Math.PI/2;
 				grid.position.y = -400;
-				parent.addChild( grid );
+				parent.add( grid );
 
 				totaln += 1;
 				total += grid.geometry.vertices.length;
@@ -189,7 +179,7 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-            }
+			}
 
 			//
 
@@ -199,6 +189,8 @@
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
+
+				camera.lookAt( scene.position );
 
 				composer.reset();
 
@@ -219,7 +211,7 @@
 				var geometry = new THREE.Geometry();
 				var vertices_tmp = [];
 
-				for( i = 0; i < vl; i++ ) {
+				for ( i = 0; i < vl; i ++ ) {
 
 					p = vertices[ i ].position;
 
@@ -229,21 +221,22 @@
 				}
 
 				var clones = [
-								[  6000, 0, -4000 ],
-								[  5000, 0, 0 ],
-								[  1000, 0, 5000 ],
-								[  1000, 0, -5000 ],
-								[  4000, 0, 2000 ],
-								[ -4000, 0, 1000 ],
-								[ -5000, 0, -5000 ],
 
-								[ 0, 0, 0 ]
+					[  6000, 0, -4000 ],
+					[  5000, 0, 0 ],
+					[  1000, 0, 5000 ],
+					[  1000, 0, -5000 ],
+					[  4000, 0, 2000 ],
+					[ -4000, 0, 1000 ],
+					[ -5000, 0, -5000 ],
 
-							  ];
+					[ 0, 0, 0 ]
+
+				];
 
 				if ( dynamic ) {
 
-					for( i = 0; i < clones.length; i++ ) {
+					for ( i = 0; i < clones.length; i ++ ) {
 
 						c = ( i < clones.length -1 ) ? 0x252525 : color;
 
@@ -254,7 +247,7 @@
 						mesh.position.y = y + clones[ i ][ 1 ];
 						mesh.position.z = z + clones[ i ][ 2 ];
 
-						parent.addChild( mesh );
+						parent.add( mesh );
 
 						clonemeshes.push( { mesh: mesh, speed: 0.5 + Math.random() } );
 
@@ -272,7 +265,7 @@
 					mesh.position.y = y;
 					mesh.position.z = z;
 
-					parent.addChild( mesh );
+					parent.add( mesh );
 
 					totaln += 1;
 					total += vl;
@@ -281,13 +274,13 @@
 
 				bloader.statusDomElement.style.display = "none";
 
-				meshes.push( { mesh: mesh, vertices: geometry.vertices, vertices_tmp: vertices_tmp, vl: vl,
-							  down: 0, up: 0, direction: 0, speed: 35, delay: Math.floor( 200 + 200 * Math.random() ),
-							  started: false, start: Math.floor( 100 + 200 * Math.random() ),
-							  dynamic: dynamic,
-							  bb: geometry.boundingBox } );
-
-				//console.log( total, totaln );
+				meshes.push( {
+					mesh: mesh, vertices: geometry.vertices, vertices_tmp: vertices_tmp, vl: vl,
+					down: 0, up: 0, direction: 0, speed: 35, delay: Math.floor( 200 + 200 * Math.random() ),
+					started: false, start: Math.floor( 100 + 200 * Math.random() ),
+					dynamic: dynamic,
+					bb: geometry.boundingBox
+				} );
 
 			}
 
@@ -295,16 +288,14 @@
 			var j, jl, cm, data, vertices, vertices_tmp, vl, d, vt,
 				time, oldTime, delta;
 
-			function animate() {
+			function animate () {
 
 				requestAnimationFrame( animate );
-
 				render();
-				stats.update();
 
 			}
 
-            function render() {
+			function render () {
 
 				if ( ! oldTime ) {
 
@@ -477,9 +468,10 @@
 				renderer.clear();
 				composer.render( 0.01 );
 
-            }
+			}
 
-        </script>
+		</script>
 
-    </body>
+	</body>
+
 </html>

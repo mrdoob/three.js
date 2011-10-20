@@ -9,10 +9,10 @@ THREE.SpotLight = function ( hex, intensity, distance, castShadow ) {
 	this.position = new THREE.Vector3( 0, 1, 0 );
 	this.target = new THREE.Object3D();
 
-	this.intensity = intensity || 1;
-	this.distance = distance || 0;
+	this.intensity = ( intensity !== undefined ) ? intensity : 1;
+	this.distance = ( distance !== undefined ) ? distance : 0;
 
-	this.castShadow = castShadow !== undefined ? castShadow : false;
+	this.castShadow = ( castShadow !== undefined ) ? castShadow : false;
 
 };
 

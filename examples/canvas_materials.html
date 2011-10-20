@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js canvas - materials</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				font-family: Monospace;
 				background-color: #202020;
@@ -14,12 +15,12 @@
 	</head>
 	<body>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
-		<script type="text/javascript">
+		<script>
 
 			var container, stats;
 
@@ -34,7 +35,7 @@
 				container = document.createElement('div');
 				document.body.appendChild(container);
 
-				camera = new THREE.Camera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.y = 200;
 				camera.position.z = 800;
 
@@ -53,13 +54,13 @@
 					var line = new THREE.Line( geometry, material );
 					line.position.y = - 120;
 					line.position.z = ( i * 100 ) - 500;
-					scene.addObject( line );
+					scene.add( line );
 
 					var line = new THREE.Line( geometry, material );
 					line.position.x = ( i * 100 ) - 500;
 					line.position.y = - 120;
 					line.rotation.y = 90 * Math.PI / 180;
-					scene.addObject( line );
+					scene.add( line );
 
 				}
 
@@ -107,7 +108,7 @@
 
 					objects.push( sphere );
 
-					scene.addObject( sphere );
+					scene.add( sphere );
 
 				}
 
@@ -123,21 +124,21 @@
 
 				particleLight = new THREE.Particle( new THREE.ParticleCanvasMaterial( { color: 0xffffff, program: program } ) );
 				particleLight.scale.x = particleLight.scale.y = particleLight.scale.z = 4;
-				scene.addObject( particleLight );
+				scene.add( particleLight );
 
 				// Lights
 
-				scene.addLight( new THREE.AmbientLight( Math.random() * 0x202020 ) );
+				scene.add( new THREE.AmbientLight( Math.random() * 0x202020 ) );
 
 				var directionalLight = new THREE.DirectionalLight( Math.random() * 0xffffff );
 				directionalLight.position.x = Math.random() - 0.5;
 				directionalLight.position.y = Math.random() - 0.5;
 				directionalLight.position.z = Math.random() - 0.5;
 				directionalLight.position.normalize();
-				scene.addLight( directionalLight );
+				scene.add( directionalLight );
 
 				pointLight = new THREE.PointLight( 0xffffff, 1 );
-				scene.addLight( pointLight );
+				scene.add( pointLight );
 
 				renderer = new THREE.CanvasRenderer();
 				// renderer = new THREE.WebGLRenderer();
@@ -194,6 +195,7 @@
 
 				camera.position.x = Math.cos( timer ) * 1000;
 				camera.position.z = Math.sin( timer ) * 1000;
+				camera.lookAt( scene.position );
 
 				for ( var i = 0, l = objects.length; i < l; i++ ) {
 

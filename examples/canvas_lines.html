@@ -1,10 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js canvas - lines - random</title>
 		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				background-color: #000000;
 				margin: 0px;
@@ -18,11 +18,11 @@
 	</head>
 	<body>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
 
-		<script type="text/javascript">
+		<script>
 
 			var mouseX = 0, mouseY = 0,
 
@@ -46,7 +46,7 @@
 				container = document.createElement('div');
 				document.body.appendChild(container);
 
-				camera = new THREE.Camera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 100;
 
 				scene = new THREE.Scene();
@@ -83,7 +83,7 @@
 					particle.position.normalize();
 					particle.position.multiplyScalar( Math.random() * 10 + 450 );
 					particle.scale.x = particle.scale.y = 5;
-					scene.addObject( particle );
+					scene.add( particle );
 
 					geometry.vertices.push( new THREE.Vertex( particle.position ) );
 
@@ -92,7 +92,7 @@
 				// lines
 
 				var line = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 0.5 } ) );
-				scene.addObject( line );
+				scene.add( line );
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
@@ -147,6 +147,7 @@
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY + 200 - camera.position.y ) * .05;
+				camera.lookAt( scene.position );
 
 				renderer.render( scene, camera );
 

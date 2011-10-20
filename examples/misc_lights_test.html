@@ -1,10 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js misc - lights - point + directional</title>
 		<meta charset="utf-8">
-		<style type="text/css">
-
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				background:#fff;
 				padding:0;
@@ -16,11 +16,10 @@
 			h1 { }
 			a { color:skyblue }
 			canvas { pointer-events:none; z-index:10; }
-			#log { position:absolute; top:50px; text-align:left; display:block; z-index:100; }
+
 			#d { text-align:center; margin:1em 0 -15.7em 0; z-index:0; position:relative; display:block }
 			.button { background:#000; color:#fff; padding:0.2em 0.5em; cursor:pointer }
 			.inactive { background:#999; color:#eee }
-
 		</style>
 	</head>
 
@@ -36,14 +35,12 @@
 			<p>Canvas renderer is very slow on anything other than Chrome.
 		</div>
 
-		<pre id="log"></pre>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
-
-		<script type="text/javascript">
+		<script>
 
 			var SCREEN_WIDTH = window.innerWidth / 2;
 			var SCREEN_HEIGHT = window.innerHeight;
@@ -51,7 +48,7 @@
 
 			var container, stats;
 
-			var camera, scene, canvasRenderer, webglRenderer;
+			var camera, scene, target, canvasRenderer, webglRenderer;
 
 			var mesh, zmesh, lightMesh, geometry;
 
@@ -82,9 +79,10 @@
 				container = document.createElement('div');
 				document.body.appendChild(container);
 
-				camera = new THREE.Camera( 75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
+				camera = new THREE.PerspectiveCamera( 75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
 				camera.position.z = 500;
-				camera.updateMatrix();
+
+				target = new THREE.Vector3( 0, 0, 0 );
 
 				scene = new THREE.Scene();
 
@@ -101,7 +99,7 @@
 					mesh.position.z = 500 * ( Math.random() - 0.5 );
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = 0.25 * ( Math.random() + 0.5 );
 					mesh.overdraw = true;
-					scene.addObject( mesh );
+					scene.add( mesh );
 
 				}
 
@@ -109,30 +107,30 @@
 
 				mesh = new THREE.Mesh( new THREE.TorusGeometry( 100, 25, 15, 30 ), new THREE.MeshLambertMaterial( { color: 0xffffff } ) );
 				mesh.overdraw = true;
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				// Lights
 
 				var ambient = new THREE.AmbientLight( 0x101010 );
-				scene.addLight( ambient );
+				scene.add( ambient );
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff );
 				directionalLight.position.y = -70;
 				directionalLight.position.z = 100;
 				directionalLight.position.normalize();
-				scene.addLight( directionalLight );
+				scene.add( directionalLight );
 
 				pointLight = new THREE.PointLight( 0xffaa00 );
 				pointLight.position.x = 0;
 				pointLight.position.y = 0;
 				pointLight.position.z = 0;
-				scene.addLight( pointLight );
+				scene.add( pointLight );
 
 				lightMesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) );
 				lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
 				lightMesh.position = pointLight.position;
 				lightMesh.overdraw = true;
-				scene.addObject(lightMesh);
+				scene.add(lightMesh);
 
 
 				if ( render_canvas ) {
@@ -193,10 +191,12 @@
 
 			function render() {
 
-				counter == 30 ? scene.removeLight( directionalLight ) : counter ++;
+				counter == 30 ? scene.remove( directionalLight ) : counter ++;
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+
+				camera.lookAt( target );
 
 				for ( var i = 0, l = scene.objects.length; i < l; i ++ ) {
 
@@ -222,13 +222,6 @@
 
 				if ( render_canvas ) canvasRenderer.render( scene, camera );
 				if ( render_gl && has_gl ) webglRenderer.render( scene, camera );
-
-			}
-
-			function log(text) {
-
-				var e = document.getElementById("log");
-				e.innerHTML = text + "<br/>" + e.innerHTML;
 
 			}
 

@@ -1,9 +1,10 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - materials - shaders [lava]</title>
 		<meta charset="utf-8">
-		<style type="text/css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
 			body {
 				color: #ffffff;
 				font-family:Monospace;
@@ -35,20 +36,20 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - shader material demo. featuring lava shader by <a href="http://irrlicht.sourceforge.net/phpBB2/viewtopic.php?t=21057" target="_blank">TheGameMaker</a></div>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script src="../build/Three.js"></script>
 
-		<script type="text/javascript" src="js/ShaderExtras.js"></script>
+		<script src="js/ShaderExtras.js"></script>
 
-		<script type="text/javascript" src="js/postprocessing/EffectComposer.js"></script>
-		<script type="text/javascript" src="js/postprocessing/ShaderPass.js"></script>
-		<script type="text/javascript" src="js/postprocessing/MaskPass.js"></script>
-		<script type="text/javascript" src="js/postprocessing/RenderPass.js"></script>
-		<script type="text/javascript" src="js/postprocessing/BloomPass.js"></script>
-		<script type="text/javascript" src="js/postprocessing/FilmPass.js"></script>
+		<script src="js/postprocessing/EffectComposer.js"></script>
+		<script src="js/postprocessing/ShaderPass.js"></script>
+		<script src="js/postprocessing/MaskPass.js"></script>
+		<script src="js/postprocessing/RenderPass.js"></script>
+		<script src="js/postprocessing/BloomPass.js"></script>
+		<script src="js/postprocessing/FilmPass.js"></script>
 
-		<script type="text/javascript" src="js/Detector.js"></script>
-		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
-		<script type="text/javascript" src="js/Stats.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
 
 		<script id="fragmentShader" type="x-shader/x-fragment">
 
@@ -114,7 +115,7 @@
 
 		</script>
 
-		<script type="text/javascript">
+		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
@@ -139,7 +140,7 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.Camera( 35, windowHalfX / windowHalfY, 1, 3000 );
+				camera = new THREE.PerspectiveCamera( 35, windowHalfX / windowHalfY, 1, 3000 );
 				camera.position.z = 4;
 
 				scene = new THREE.Scene();
@@ -163,7 +164,7 @@
 
 				var size = 0.65;
 
-				material = new THREE.MeshShaderMaterial( {
+				material = new THREE.ShaderMaterial( {
 
 					uniforms: uniforms,
 					vertexShader: document.getElementById( 'vertexShader' ).textContent,
@@ -175,7 +176,7 @@
 				mesh.position.x = 0;
 				mesh.position.y = 0;
 				mesh.rotation.x = 0.3;
-				scene.addObject( mesh );
+				scene.add( mesh );
 
 				//
 
