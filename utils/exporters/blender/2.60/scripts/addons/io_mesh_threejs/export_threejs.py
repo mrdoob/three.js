@@ -79,7 +79,7 @@ COLORS = [0xeeeeee, 0xee0000, 0x00ee00, 0x0000ee, 0xeeee00, 0x00eeee, 0xee00ee]
 TEMPLATE_SCENE_ASCII = """\
 /* Converted from: %(fname)s
  *
- * File generated with Blender 2.58 Exporter
+ * File generated with Blender 2.60 Exporter
  * https://github.com/mrdoob/three.js/tree/master/utils/exporters/blender/
  *
  * objects:    %(nobjects)s
