@@ -130,7 +130,7 @@
 
 				for ( var i = 0; i < cubes.length; i++ ) {
 
-					cubes[ i ].materials[ 0 ].color.setHex( 0x003300 );
+					cubes[ i ].material.color.setHex( 0x003300 );
 
 				}
 
@@ -141,7 +141,7 @@
 				if ( c && c.distance == -1 ) {
 
 					info.innerHTML = "Colliding!";
-					c.mesh.materials[ 0 ].color.setHex( 0xff0000 );
+					c.mesh.material.color.setHex( 0xff0000 );
 
 				} else if( c && c.distance >= 0 ) {
 

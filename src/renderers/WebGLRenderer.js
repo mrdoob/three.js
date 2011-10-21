@@ -748,6 +748,24 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	function getBufferMaterial( object, geometryGroup ) {
+
+		var material;
+
+		if ( object.material && ! ( object.material instanceof THREE.MeshFaceMaterial ) ) {
+
+			material = object.material;
+
+		} else if ( geometryGroup.materialIndex >= 0 ) {
+
+			material = object.geometry.materials[ geometryGroup.materialIndex ];
+
+		}
+
+		return material;
+
+	};
+
 	function initMeshBuffers ( geometryGroup, object ) {
 
 		var f, fl, fi, face,
@@ -785,7 +803,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		material = ( geometryGroup.materialIndex >= 0 ) ? geometry.materials[ geometryGroup.materialIndex ] : object.material;
+		material = getBufferMaterial( object, geometryGroup );
 
 		uvType = bufferGuessUVType( material );
 		normalType = bufferGuessNormalType( material );
@@ -4408,7 +4426,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function areCustomAttributesDirty( geometryGroup, object ) {
 
-		var material = ( geometryGroup.materialIndex >= 0 ) ? object.geometry.materials[ geometryGroup.materialIndex ] : object.material;
+		var material = getBufferMaterial( object, geometryGroup );
 
 		if ( material.attributes ) {
 
@@ -4426,7 +4444,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function clearCustomAttributes( geometryGroup, object ) {
 
-		var material = ( geometryGroup.materialIndex >= 0 ) ? object.geometry.materials[ geometryGroup.materialIndex ] : object.material;
+		var material = getBufferMaterial( object, geometryGroup );
 
 		if ( material.attributes ) {
 

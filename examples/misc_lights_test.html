@@ -59,7 +59,7 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
-			var render_canvas = 1, render_gl = 1;
+			var render_canvas = 0, render_gl = 1;
 			var has_gl = 0;
 
 			var bcanvas = document.getElementById( 'rcanvas' );
@@ -115,22 +115,17 @@
 				scene.add( ambient );
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff );
-				directionalLight.position.y = -70;
-				directionalLight.position.z = 100;
-				directionalLight.position.normalize();
+				directionalLight.position.set( 0, -70, 100 ).normalize();
 				scene.add( directionalLight );
 
 				pointLight = new THREE.PointLight( 0xffaa00 );
-				pointLight.position.x = 0;
-				pointLight.position.y = 0;
-				pointLight.position.z = 0;
 				scene.add( pointLight );
 
 				lightMesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) );
 				lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
 				lightMesh.position = pointLight.position;
 				lightMesh.overdraw = true;
-				scene.add(lightMesh);
+				scene.add( lightMesh );
 
 
 				if ( render_canvas ) {

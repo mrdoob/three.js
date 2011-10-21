@@ -85,7 +85,7 @@
 				light.position.set( 0, 0, 1 ).normalize();
 				scene.add( light );
 
-				var wireMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff, opacity: 0.5, wireframe: true } );
+				var wireMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff, opacity: 0.5, wireframe: true, transparent: true } );
 
 				function getOptionsWithSegments( x, b, bevel ) {
 
@@ -109,6 +109,7 @@
 				var theText = "&"; // Try $ :)
 
 				// we could use TextPath and ExtrudeGeometry if we wish to optimize stuff futher
+
 				var geometry = [
 
 					[ new THREE.TextGeometry( theText, getOptionsWithSegments(8, 6, true)),
@@ -132,7 +133,7 @@
 
 					for ( i = 0; i < geometry.length; i++ ) {
 
-						mesh = new THREE.Mesh( geometry[ i ][ 0 ], geometry[ i ][ 2 ] );
+						mesh = new THREE.Mesh( geometry[ i ][ 0 ], geometry[ i ][ 2 ][ 1 ] );
 						mesh.scale.set( 1.5, 1.5, 1.5 );
 						mesh.updateMatrix();
 						mesh.matrixAutoUpdate = false;
