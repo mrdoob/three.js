@@ -3351,7 +3351,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setObjectFaces( object ) {
 
-		if ( _oldDoubleSided != object.doubleSided ) {
+		if ( _oldDoubleSided !== object.doubleSided ) {
 
 			if( object.doubleSided ) {
 
@@ -3367,7 +3367,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		if ( _oldFlipSided != object.flipSided ) {
+		if ( _oldFlipSided !== object.flipSided ) {
 
 			if( object.flipSided ) {
 
