@@ -105,6 +105,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.sortObjects = true;
 
+	this.autoUpdateObjects = true;
+
 	// physically based shading
 
 	this.gammaInput = false;
@@ -3629,8 +3631,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 				_projScreenMatrix.multiply( _cameraLight.projectionMatrix, _cameraLight.matrixWorldInverse );
 				computeFrustum( _projScreenMatrix );
 
-				_this.initWebGLObjects( scene );
-
 				setRenderTarget( shadowMap );
 
 				// using arbitrary clear color in depth pass
@@ -3782,6 +3782,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_currentMaterialId = -1;
 
+		if ( this.autoUpdateObjects ) this.initWebGLObjects( scene );
+
 		if ( this.shadowMapEnabled && this.shadowMapAutoUpdate ) renderShadowMap( scene, camera );
 
 		_this.info.render.calls = 0;
@@ -3811,8 +3813,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_projScreenMatrix.multiply( camera.projectionMatrix, camera.matrixWorldInverse );
 		computeFrustum( _projScreenMatrix );
-
-		this.initWebGLObjects( scene );
 
 		setRenderTarget( renderTarget );
 
@@ -3845,9 +3845,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( this.sortObjects ) {
 
-						if ( webglObject.object.renderDepth ) {
+						if ( object.renderDepth ) {
 
-							webglObject.z = webglObject.object.renderDepth;
+							webglObject.z = object.renderDepth;
 
 						} else {
 

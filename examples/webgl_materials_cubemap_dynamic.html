@@ -987,6 +987,9 @@
 
 					cubeCamera.updatePosition( currentCar.root.position );
 
+					renderer.autoUpdateObjects = false;
+					renderer.initWebGLObjects( scene );
+
 					renderer.autoClear = true;
 					cubeCamera.updateCubeMap( renderer, scene );
 
@@ -999,6 +1002,7 @@
 
 				renderer.autoClear = false;
 				renderer.shadowMapEnabled = true;
+				renderer.autoUpdateObjects = true;
 
 				camera.lookAt( cameraTarget );
 
