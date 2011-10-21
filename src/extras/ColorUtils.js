@@ -33,7 +33,7 @@ THREE.ColorUtils = {
 		var saturation;
 		var value = max;
 
-		if ( min == max )	{
+		if ( min === max )	{
 
 			hue = 0;
 			saturation = 0;
@@ -43,11 +43,11 @@ THREE.ColorUtils = {
 			var delta = ( max - min );
 			saturation = delta / max;
 
-			if ( r == max )	{
+			if ( r === max ) {
 
 				hue = ( g - b ) / delta;
 
-			} else if ( g == max ) {
+			} else if ( g === max ) {
 
 				hue = 2 + ( ( b - r ) / delta );
 

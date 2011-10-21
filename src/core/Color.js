@@ -62,7 +62,7 @@ THREE.Color.prototype = {
 
 		var i, f, p, q, t;
 
-		if ( v == 0 ) {
+		if ( v === 0 ) {
 
 			this.r = this.g = this.b = 0;
 

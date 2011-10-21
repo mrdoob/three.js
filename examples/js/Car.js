@@ -364,6 +364,6 @@ THREE.Car = function () {
 	function cubicEaseOut( k ) { return --k * k * k + 1; }
 	function circularEaseOut( k ) { return Math.sqrt( 1 - --k * k ); }
 	function sinusoidalEaseOut( k ) { return Math.sin( k * Math.PI / 2 ); }
-	function exponentialEaseOut( k ) { return k == 1 ? 1 : - Math.pow( 2, - 10 * k ) + 1; }
+	function exponentialEaseOut( k ) { return k === 1 ? 1 : - Math.pow( 2, - 10 * k ) + 1; }
 
 };

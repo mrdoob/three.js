@@ -30,7 +30,7 @@
 
 THREE.ExtrudeGeometry = function( shapes, options ) {
 
-	if( typeof( shapes ) == "undefined" ) {
+	if( typeof( shapes ) === "undefined" ) {
 
 		shapes = [];
 		return;
@@ -312,11 +312,11 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 		// We should not reach these conditions
 
-		if ( v_dot_w_hat == 0 ) {
+		if ( v_dot_w_hat === 0 ) {
 
 			console.log( "Either infinite or no solutions!" );
 
-			if ( q_sub_p_dot_w_hat == 0 ) {
+			if ( q_sub_p_dot_w_hat === 0 ) {
 
 				console.log( "Its finite solutions." );
 
@@ -348,8 +348,8 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	for ( i = 0, il = contour.length, j = il-1, k = i + 1; i < il; i++, j++, k++ ) {
 
-		if ( j == il ) j = 0;
-		if ( k == il ) k = 0;
+		if ( j === il ) j = 0;
+		if ( k === il ) k = 0;
 
 		//  (j)---(i)---(k)
 		// console.log('i,j,k', i, j , k)
@@ -372,8 +372,8 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 		for ( i = 0, il = ahole.length, j = il - 1, k = i + 1; i < il; i++, j++, k++ ) {
 
-			if ( j == il ) j = 0;
-			if ( k == il ) k = 0;
+			if ( j === il ) j = 0;
+			if ( k === il ) k = 0;
 
 			//  (j)---(i)---(k)
 			oneHoleMovements[ i ]= getBevelVec( ahole[ i ], ahole[ j ], ahole[ k ] );

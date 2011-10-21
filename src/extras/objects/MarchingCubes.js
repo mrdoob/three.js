@@ -54,7 +54,7 @@ THREE.MarchingCubes = function ( resolution, materials ) {
 		this.hasNormal = false;
 
 		this.positionArray = new Float32Array( this.maxCount * 3 );
-		this.normalArray   = new Float32Array( this.maxCount * 3 );		
+		this.normalArray   = new Float32Array( this.maxCount * 3 );
 
 	};
 
@@ -117,7 +117,7 @@ THREE.MarchingCubes = function ( resolution, materials ) {
 
 		var q3 = q * 3;
 
-		if ( this.normal_cache [ q3 ] == 0.0 ) {
+		if ( this.normal_cache [ q3 ] === 0.0 ) {
 
 			this.normal_cache[ q3     ] = this.field[ q - 1  ] 	    - this.field[ q + 1 ];
 			this.normal_cache[ q3 + 1 ] = this.field[ q - this.yd ] - this.field[ q + this.yd ];
@@ -163,16 +163,16 @@ THREE.MarchingCubes = function ( resolution, materials ) {
 		// if cube is entirely in/out of the surface - bail, nothing to draw
 
 		var bits = THREE.edgeTable[ cubeindex ];
-		if ( bits == 0 ) return 0;
+		if ( bits === 0 ) return 0;
 
 		var d = this.delta,
-			fx2 = fx + d, 
-			fy2 = fy + d, 
+			fx2 = fx + d,
+			fy2 = fy + d,
 			fz2 = fz + d;
 
 		// top of the cube
 
-		if ( bits & 1 ) { 
+		if ( bits & 1 ) {
 
 			this.compNorm( q );
 			this.compNorm( q1 );
@@ -180,23 +180,23 @@ THREE.MarchingCubes = function ( resolution, materials ) {
 
 		};
 
-		if ( bits & 2 ) { 
+		if ( bits & 2 ) {
 
-			this.compNorm( q1 );  
-			this.compNorm( q1y );  
+			this.compNorm( q1 );
+			this.compNorm( q1y );
 			this.VIntY( q1 * 3, this.vlist, this.nlist, 3, isol, fx2, fy, fz, field1, field3 );
 
 		};
 
-		if ( bits & 4 ) { 
+		if ( bits & 4 ) {
 
-			this.compNorm( qy ); 
-			this.compNorm( q1y );  
-			this.VIntX( qy * 3, this.vlist, this.nlist, 6, isol, fx, fy2, fz, field2, field3 ); 
+			this.compNorm( qy );
+			this.compNorm( q1y );
+			this.VIntX( qy * 3, this.vlist, this.nlist, 6, isol, fx, fy2, fz, field2, field3 );
 
 		};
 
-		if ( bits & 8 ) { 
+		if ( bits & 8 ) {
 
 			this.compNorm( q );
 			this.compNorm( qy );
@@ -206,19 +206,19 @@ THREE.MarchingCubes = function ( resolution, materials ) {
 
 		// bottom of the cube
 
-		if ( bits & 16 )  { 
+		if ( bits & 16 )  {
 
 			this.compNorm( qz );
 			this.compNorm( q1z );
-			this.VIntX( qz * 3, this.vlist, this.nlist, 12, isol, fx, fy, fz2, field4, field5 ); 
+			this.VIntX( qz * 3, this.vlist, this.nlist, 12, isol, fx, fy, fz2, field4, field5 );
 
 		};
 
-		if ( bits & 32 )  { 
+		if ( bits & 32 )  {
 
-			this.compNorm( q1z );  
-			this.compNorm( q1yz ); 
-			this.VIntY( q1z * 3,  this.vlist, this.nlist, 15, isol, fx2, fy, fz2, field5, field7 ); 
+			this.compNorm( q1z );
+			this.compNorm( q1yz );
+			this.VIntY( q1z * 3,  this.vlist, this.nlist, 15, isol, fx2, fy, fz2, field5, field7 );
 
 		};
 
@@ -226,7 +226,7 @@ THREE.MarchingCubes = function ( resolution, materials ) {
 
 			this.compNorm( qyz );
 			this.compNorm( q1yz );
-			this.VIntX( qyz * 3, this.vlist, this.nlist, 18, isol, fx, fy2, fz2, field6, field7 ); 
+			this.VIntX( qyz * 3, this.vlist, this.nlist, 18, isol, fx, fy2, fz2, field6, field7 );
 
 		};
 
@@ -234,7 +234,7 @@ THREE.MarchingCubes = function ( resolution, materials ) {
 
 			this.compNorm( qz );
 			this.compNorm( qyz );
-			this.VIntY( qz * 3,  this.vlist, this.nlist, 21, isol, fx, fy, fz2, field4, field6 ); 
+			this.VIntY( qz * 3,  this.vlist, this.nlist, 21, isol, fx, fy, fz2, field4, field6 );
 
 		};
 
@@ -252,7 +252,7 @@ THREE.MarchingCubes = function ( resolution, materials ) {
 
 			this.compNorm( q1 );
 			this.compNorm( q1z );
-			this.VIntZ( q1 * 3,  this.vlist, this.nlist, 27, isol, fx2, fy,  fz, field1, field5 ); 
+			this.VIntZ( q1 * 3,  this.vlist, this.nlist, 27, isol, fx2, fy,  fz, field1, field5 );
 
 		};
 
@@ -260,15 +260,15 @@ THREE.MarchingCubes = function ( resolution, materials ) {
 
 			this.compNorm( q1y );
 			this.compNorm( q1yz );
-			this.VIntZ( q1y * 3, this.vlist, this.nlist, 30, isol, fx2, fy2, fz, field3, field7 ); 
+			this.VIntZ( q1y * 3, this.vlist, this.nlist, 30, isol, fx2, fy2, fz, field3, field7 );
 
 		};
 
-		if ( bits & 2048 ) { 
+		if ( bits & 2048 ) {
 
 			this.compNorm( qy );
 			this.compNorm( qyz );
-			this.VIntZ( qy * 3, this.vlist, this.nlist, 33, isol, fx,  fy2, fz, field2, field6 ); 
+			this.VIntZ( qy * 3, this.vlist, this.nlist, 33, isol, fx,  fy2, fz, field2, field6 );
 
 		};
 
@@ -319,15 +319,15 @@ THREE.MarchingCubes = function ( resolution, materials ) {
 		this.positionArray[ c + 7 ] = pos[ o3 + 1 ];
 		this.positionArray[ c + 8 ] = pos[ o3 + 2 ];
 
-		this.normalArray[ c ] = norm[ o1 ]; 
+		this.normalArray[ c ] = norm[ o1 ];
 		this.normalArray[ c + 1 ] = norm[ o1 + 1 ];
 		this.normalArray[ c + 2 ] = norm[ o1 + 2 ];
 
-		this.normalArray[ c + 3 ] = norm[ o2 ]; 
+		this.normalArray[ c + 3 ] = norm[ o2 ];
 		this.normalArray[ c + 4 ] = norm[ o2 + 1 ];
 		this.normalArray[ c + 5 ] = norm[ o2 + 2 ];
 
-		this.normalArray[ c + 6 ] = norm[ o3 ]; 
+		this.normalArray[ c + 6 ] = norm[ o3 ];
 		this.normalArray[ c + 7 ] = norm[ o3 + 1 ];
 		this.normalArray[ c + 8 ] = norm[ o3 + 2 ];
 
@@ -354,7 +354,7 @@ THREE.MarchingCubes = function ( resolution, materials ) {
 
 	this.end = function( render_callback ) {
 
-		if ( this.count == 0 )
+		if ( this.count === 0 )
 			return;
 
 		for ( var i = this.count * 3; i < this.positionArray.length; i++ )
@@ -602,7 +602,7 @@ THREE.MarchingCubes = function ( resolution, materials ) {
 
 		var geo_callback = function( object ) {
 
-			var i, x, y, z, vertex, position, normal, 
+			var i, x, y, z, vertex, position, normal,
 				face, a, b, c, na, nb, nc;
 
 

@@ -74,16 +74,16 @@ THREE.CubeGeometry = function ( width, height, depth, segmentsWidth, segmentsHei
 		height_half = height / 2,
 		offset = scope.vertices.length;
 
-		if ( ( u == 'x' && v == 'y' ) || ( u == 'y' && v == 'x' ) ) {
+		if ( ( u === 'x' && v === 'y' ) || ( u === 'y' && v === 'x' ) ) {
 
 			w = 'z';
 
-		} else if ( ( u == 'x' && v == 'z' ) || ( u == 'z' && v == 'x' ) ) {
+		} else if ( ( u === 'x' && v === 'z' ) || ( u === 'z' && v === 'x' ) ) {
 
 			w = 'y';
 			gridY = segmentsDepth || 1;
 
-		} else if ( ( u == 'z' && v == 'y' ) || ( u == 'y' && v == 'z' ) ) {
+		} else if ( ( u === 'z' && v === 'y' ) || ( u === 'y' && v === 'z' ) ) {
 
 			w = 'x';
 			gridX = segmentsDepth || 1;
