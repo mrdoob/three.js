@@ -227,7 +227,7 @@
 				pointLight = new THREE.PointLight( 0xffffff, 2, 800 );
 				scene.add( pointLight );
 
-				particleLight.materials[ 0 ].color = pointLight.color;
+				particleLight.material.color = pointLight.color;
 				pointLight.position = particleLight.position;
 
 				//

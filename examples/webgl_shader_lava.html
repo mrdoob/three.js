@@ -170,7 +170,7 @@
 
 				} );
 
-				mesh = new THREE.Mesh( new THREE.TorusGeometry( size, 0.3, 30, 30 ), [ material /*, new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, wireframeLinewidth: 2 } ) */ ] );
+				mesh = new THREE.Mesh( new THREE.TorusGeometry( size, 0.3, 30, 30 ), material );
 				mesh.rotation.x = 0.3;
 				scene.add( mesh );
 

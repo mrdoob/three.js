@@ -688,67 +688,59 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		geometry.__webglParticleCount = nvertices;
 
-		geometry.__materials = object.materials;
-
 		// custom attributes
 
-		var m, ml, material;
+		var material = object.material;
 
-		for ( m = 0, ml = object.materials.length; m < ml; m ++ ) {
+		if ( material.attributes ) {
 
-			material = object.materials[ m ];
+			if ( geometry.__webglCustomAttributesList === undefined ) {
 
-			if ( material.attributes ) {
+				geometry.__webglCustomAttributesList = [];
 
-				if ( geometry.__webglCustomAttributesList === undefined ) {
+			}
 
-					geometry.__webglCustomAttributesList = [];
+			for ( var a in material.attributes ) {
+
+				// Do a shallow copy of the attribute object so different geometryGroup chunks use different
+				// attribute buffers which are correctly indexed in the setMeshBuffers function
+
+				// Not sure how to best translate this into non-indexed arrays
+				// used for particles, as there are no geometry chunks here
+				// Probably could be simplified
+
+				originalAttribute = material.attributes[ a ];
+
+				attribute = {};
+
+				for ( property in originalAttribute ) {
+
+					attribute[ property ] = originalAttribute[ property ];
+
+				}
+
+				if( !attribute.__webglInitialized || attribute.createUniqueBuffers ) {
+
+					attribute.__webglInitialized = true;
+
+					size = 1;		// "f" and "i"
+
+					if ( attribute.type === "v2" ) size = 2;
+					else if ( attribute.type === "v3" ) size = 3;
+					else if ( attribute.type === "v4" ) size = 4;
+					else if ( attribute.type === "c"  ) size = 3;
+
+					attribute.size = size;
+					attribute.array = new Float32Array( nvertices * size );
+					attribute.buffer = _gl.createBuffer();
+					attribute.buffer.belongsToAttribute = a;
+
+					originalAttribute.needsUpdate = true;
+					attribute.__original = originalAttribute;
 
 				}
 
-				for ( a in material.attributes ) {
-
-					// Do a shallow copy of the attribute object so different geometryGroup chunks use different
-					// attribute buffers which are correctly indexed in the setMeshBuffers function
-
-					// Not sure how to best translate this into non-indexed arrays
-					// used for particles, as there are no geometry chunks here
-					// Probably could be simplified
-
-					originalAttribute = material.attributes[ a ];
-
-					attribute = {};
-
-					for ( property in originalAttribute ) {
-
-						attribute[ property ] = originalAttribute[ property ];
-
-					}
-
-					if( !attribute.__webglInitialized || attribute.createUniqueBuffers ) {
-
-						attribute.__webglInitialized = true;
-
-						size = 1;		// "f" and "i"
-
-						if ( attribute.type === "v2" ) size = 2;
-						else if ( attribute.type === "v3" ) size = 3;
-						else if ( attribute.type === "v4" ) size = 4;
-						else if ( attribute.type === "c"  ) size = 3;
-
-						attribute.size = size;
-						attribute.array = new Float32Array( nvertices * size );
-						attribute.buffer = _gl.createBuffer();
-						attribute.buffer.belongsToAttribute = a;
-
-						originalAttribute.needsUpdate = true;
-						attribute.__original = originalAttribute;
-
-					}
-
-					geometry.__webglCustomAttributesList.push( attribute );
-
-				}
+				geometry.__webglCustomAttributesList.push( attribute );
 
 			}
 
@@ -765,14 +757,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 		uvType,
 		vertexColorType,
 		normalType,
-		materials, material,
+		material,
 		attribute, property, originalAttribute,
 
 		geometry = object.geometry,
 		obj_faces = geometry.faces,
 		chunk_faces = geometryGroup.faces;
 
-		for ( f = 0, fl = chunk_faces.length; f < fl; f++ ) {
+		for ( f = 0, fl = chunk_faces.length; f < fl; f ++ ) {
 
 			fi = chunk_faces[ f ];
 			face = obj_faces[ fi ];
@@ -793,21 +785,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		materials = unrollGroupMaterials( geometryGroup, object );
+		material = ( geometryGroup.materialIndex >= 0 ) ? geometry.materials[ geometryGroup.materialIndex ] : object.material;
 
-		// this will not work if materials would change in run-time
-		// it should be refreshed every frame
-		// but need to do unrollGroupMaterials
-		// more properly without push to array
-		// like unrollBufferMaterials
+		uvType = bufferGuessUVType( material );
+		normalType = bufferGuessNormalType( material );
+		vertexColorType = bufferGuessVertexColorType( material );
 
-		geometryGroup.__materials = materials;
-
-		uvType = bufferGuessUVType( materials, geometryGroup, object );
-		normalType = bufferGuessNormalType( materials, geometryGroup, object );
-		vertexColorType = bufferGuessVertexColorType( materials, geometryGroup, object );
-
-		//console.log("uvType",uvType, "normalType",normalType, "vertexColorType",vertexColorType, object, geometryGroup, materials );
+		//console.log( "uvType", uvType, "normalType", normalType, "vertexColorType", vertexColorType, object, geometryGroup, material );
 
 		geometryGroup.__vertexArray = new Float32Array( nvertices * 3 );
 
@@ -881,57 +865,51 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// custom attributes
 
-		for ( m = 0, ml = materials.length; m < ml; m ++ ) {
+		if ( material.attributes ) {
 
-			material = materials[ m ];
+			if ( geometryGroup.__webglCustomAttributesList === undefined ) {
 
-			if ( material.attributes ) {
+				geometryGroup.__webglCustomAttributesList = [];
 
-				if ( geometryGroup.__webglCustomAttributesList === undefined ) {
+			}
 
-					geometryGroup.__webglCustomAttributesList = [];
+			for ( var a in material.attributes ) {
+
+				// Do a shallow copy of the attribute object so different geometryGroup chunks use different
+				// attribute buffers which are correctly indexed in the setMeshBuffers function
+
+				originalAttribute = material.attributes[ a ];
+
+				attribute = {};
+
+				for ( property in originalAttribute ) {
+
+					attribute[ property ] = originalAttribute[ property ];
+
+				}
+
+				if( !attribute.__webglInitialized || attribute.createUniqueBuffers ) {
+
+					attribute.__webglInitialized = true;
+
+					size = 1;		// "f" and "i"
+
+					if( attribute.type === "v2" ) size = 2;
+					else if( attribute.type === "v3" ) size = 3;
+					else if( attribute.type === "v4" ) size = 4;
+					else if( attribute.type === "c"  ) size = 3;
+
+					attribute.size = size;
+					attribute.array = new Float32Array( nvertices * size );
+					attribute.buffer = _gl.createBuffer();
+					attribute.buffer.belongsToAttribute = a;
+
+					originalAttribute.needsUpdate = true;
+					attribute.__original = originalAttribute;
 
 				}
 
-				for ( a in material.attributes ) {
-
-					// Do a shallow copy of the attribute object so different geometryGroup chunks use different
-					// attribute buffers which are correctly indexed in the setMeshBuffers function
-
-					originalAttribute = material.attributes[ a ];
-
-					attribute = {};
-
-					for ( property in originalAttribute ) {
-
-						attribute[ property ] = originalAttribute[ property ];
-
-					}
-
-					if( !attribute.__webglInitialized || attribute.createUniqueBuffers ) {
-
-						attribute.__webglInitialized = true;
-
-						size = 1;		// "f" and "i"
-
-						if( attribute.type === "v2" ) size = 2;
-						else if( attribute.type === "v3" ) size = 3;
-						else if( attribute.type === "v4" ) size = 4;
-						else if( attribute.type === "c"  ) size = 3;
-
-						attribute.size = size;
-						attribute.array = new Float32Array( nvertices * size );
-						attribute.buffer = _gl.createBuffer();
-						attribute.buffer.belongsToAttribute = a;
-
-						originalAttribute.needsUpdate = true;
-						attribute.__original = originalAttribute;
-
-					}
-
-					geometryGroup.__webglCustomAttributesList.push( attribute );
-
-				}
+				geometryGroup.__webglCustomAttributesList.push( attribute );
 
 			}
 
@@ -2551,6 +2529,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		uniforms.map.texture = material.map;
+
 		if ( material.map ) {
 
 			uniforms.offsetRepeat.value.set( material.map.offset.x, material.map.offset.y, material.map.repeat.x, material.map.repeat.y );
@@ -3491,9 +3470,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function unrollImmediateBufferMaterials( globject ) {
+	function unrollImmediateBufferMaterial( globject ) {
 
-		var i, l, m, ml, material,
+		var material,
 			object = globject.object,
 			opaque = globject.opaque,
 			transparent = globject.transparent;
@@ -3501,16 +3480,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		transparent.count = 0;
 		opaque.count = 0;
 
-		for ( m = 0, ml = object.materials.length; m < ml; m ++ ) {
-
-			material = object.materials[ m ];
-			material.transparent ? addToFixedArray( transparent, material ) : addToFixedArray( opaque, material );
-
-		}
+		material = object.material;
+		material.transparent ? addToFixedArray( transparent, material ) : addToFixedArray( opaque, material );
 
 	};
 
-	function unrollBufferMaterials( globject ) {
+	function unrollBufferMaterial( globject ) {
 
 		var i, l, m, ml, material, meshMaterial,
 			object = globject.object,
@@ -3521,25 +3496,23 @@ THREE.WebGLRenderer = function ( parameters ) {
 		transparent.count = 0;
 		opaque.count = 0;
 
-		for ( m = 0, ml = object.materials.length; m < ml; m ++ ) {
+		meshMaterial = object.material;
 
-			meshMaterial = object.materials[ m ];
+		if ( meshMaterial instanceof THREE.MeshFaceMaterial ) {
 
-			if ( meshMaterial instanceof THREE.MeshFaceMaterial ) {
+			materialIndex = buffer.materialIndex;
 
-				for ( i = 0, l = buffer.materials.length; i < l; i ++ ) {
+			if ( materialIndex >= 0 ) {
 
-					material = buffer.materials[ i ];
-					if ( material ) material.transparent ? addToFixedArray( transparent, material ) : addToFixedArray( opaque, material );
-
-				}
-
-			} else {
-
-				material = meshMaterial;
-				if ( material ) material.transparent ? addToFixedArray( transparent, material ) : addToFixedArray( opaque, material );
+				material = object.geometry.materials[ materialIndex ];
+				material.transparent ? addToFixedArray( transparent, material ) : addToFixedArray( opaque, material );
 
 			}
+
+		} else {
+
+			material = meshMaterial;
+			if ( material ) material.transparent ? addToFixedArray( transparent, material ) : addToFixedArray( opaque, material );
 
 		}
 
@@ -3827,7 +3800,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					setupMatrices( object, camera, true );
 
-					unrollBufferMaterials( webglObject );
+					unrollBufferMaterial( webglObject );
 
 					webglObject.render = true;
 
@@ -3885,7 +3858,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				setupMatrices( object, camera, true );
 
-				unrollImmediateBufferMaterials( webglObject );
+				unrollImmediateBufferMaterial( webglObject );
 
 			}
 
@@ -4433,23 +4406,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function areCustomAttributesDirty( geometryGroup ) {
+	function areCustomAttributesDirty( geometryGroup, object ) {
 
-		var a, m, ml, material, materials;
+		var material = ( geometryGroup.materialIndex >= 0 ) ? object.geometry.materials[ geometryGroup.materialIndex ] : object.material;
 
-		materials = geometryGroup.__materials;
+		if ( material.attributes ) {
 
-		for ( m = 0, ml = materials.length; m < ml; m ++ ) {
+			for ( var a in material.attributes ) {
 
-			material = materials[ m ];
-
-			if ( material.attributes ) {
-
-				for ( a in material.attributes ) {
-
-					if ( material.attributes[ a ].needsUpdate ) return true;
-
-				}
+				if ( material.attributes[ a ].needsUpdate ) return true;
 
 			}
 
@@ -4459,23 +4424,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function clearCustomAttributes( geometryGroup ) {
+	function clearCustomAttributes( geometryGroup, object ) {
 
-		var a, m, ml, material, materials;
+		var material = ( geometryGroup.materialIndex >= 0 ) ? object.geometry.materials[ geometryGroup.materialIndex ] : object.material;
 
-		materials = geometryGroup.__materials;
+		if ( material.attributes ) {
 
-		for ( m = 0, ml = materials.length; m < ml; m ++ ) {
+			for ( var a in material.attributes ) {
 
-			material = materials[ m ];
-
-			if ( material.attributes ) {
-
-				for ( a in material.attributes ) {
-
-					material.attributes[ a ].needsUpdate = false;
-
-				}
+				material.attributes[ a ].needsUpdate = false;
 
 			}
 
@@ -4497,7 +4454,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				geometryGroup = geometry.geometryGroupsList[ i ];
 
-				customAttributeDirty = areCustomAttributesDirty( geometryGroup );
+				customAttributeDirty = areCustomAttributesDirty( geometryGroup, object );
 
 				if ( geometry.__dirtyVertices || geometry.__dirtyMorphTargets || geometry.__dirtyElements ||
 					 geometry.__dirtyUvs || geometry.__dirtyNormals ||
@@ -4517,7 +4474,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			geometry.__dirtyTangents = false;
 			geometry.__dirtyColors = false;
 
-			clearCustomAttributes( geometryGroup );
+			clearCustomAttributes( geometryGroup, object );
 
 		} else if ( object instanceof THREE.Ribbon ) {
 
@@ -4549,7 +4506,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			geometry = object.geometry;
 
-			customAttributeDirty = areCustomAttributesDirty( geometry );
+			customAttributeDirty = areCustomAttributesDirty( geometry, object );
 
 			if ( geometry.__dirtyVertices || geometry.__dirtyColors || object.sortParticles || customAttributeDirty ) {
 
@@ -4560,7 +4517,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			geometry.__dirtyVertices = false;
 			geometry.__dirtyColors = false;
 
-			clearCustomAttributes( geometry );
+			clearCustomAttributes( geometry, object );
 
 		}/* else if ( THREE.MarchingCubes !== undefined && object instanceof THREE.MarchingCubes ) {
 
@@ -4634,44 +4591,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function sortFacesByMaterial( geometry ) {
 
-		// TODO
-		// Should optimize by grouping faces with ColorFill / ColorStroke materials
-		// which could then use vertex color attributes instead of each being
-		// in its separate VBO
-
-		var i, l, f, fl, face, material, materials, vertices, mhash, ghash, hash_map = {};
+		var i, l, f, fl, face, materialIndex, vertices, mhash, ghash, hash_map = {};
 		var numMorphTargets = geometry.morphTargets !== undefined ? geometry.morphTargets.length : 0;
 
 		geometry.geometryGroups = {};
 
-		function materialHash( material ) {
-
-			var hash_array = [];
-
-			for ( i = 0, l = material.length; i < l; i ++ ) {
-
-				if ( material[ i ] == undefined ) {
-
-					hash_array.push( "undefined" );
-
-				} else {
-
-					hash_array.push( material[ i ].id );
-
-				}
-
-			}
-
-			return hash_array.join( '_' );
-
-		}
-
 		for ( f = 0, fl = geometry.faces.length; f < fl; f ++ ) {
 
 			face = geometry.faces[ f ];
-			materials = face.materials;
+			materialIndex = face.materialIndex;
 
-			mhash = materialHash( materials );
+			mhash = ( materialIndex !== undefined ) ? materialIndex : -1;
 
 			if ( hash_map[ mhash ] == undefined ) {
 
@@ -4683,7 +4613,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( geometry.geometryGroups[ ghash ] == undefined ) {
 
-				geometry.geometryGroups[ ghash ] = { 'faces': [], 'materials': materials, 'vertices': 0, 'numMorphTargets': numMorphTargets };
+				geometry.geometryGroups[ ghash ] = { 'faces': [], 'materialIndex': materialIndex, 'vertices': 0, 'numMorphTargets': numMorphTargets };
 
 			}
 
@@ -4696,7 +4626,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( geometry.geometryGroups[ ghash ] == undefined ) {
 
-					geometry.geometryGroups[ ghash ] = { 'faces': [], 'materials': materials, 'vertices': 0, 'numMorphTargets': numMorphTargets };
+					geometry.geometryGroups[ ghash ] = { 'faces': [], 'materialIndex': materialIndex, 'vertices': 0, 'numMorphTargets': numMorphTargets };
 
 				}
 
@@ -4721,21 +4651,25 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function addBuffer( objlist, buffer, object ) {
 
-		objlist.push( {
-			buffer: buffer, object: object,
-			opaque: { list: [], count: 0 },
-			transparent: { list: [], count: 0 }
-		} );
+		objlist.push(
+			{
+				buffer: buffer, object: object,
+				opaque: { list: [], count: 0 },
+				transparent: { list: [], count: 0 }
+			}
+		);
 
 	};
 
 	function addBufferImmediate( objlist, object ) {
 
-		objlist.push( {
-			object: object,
-			opaque: { list: [], count: 0 },
-			transparent: { list: [], count: 0 }
-		} );
+		objlist.push(
+			{
+				object: object,
+				opaque: { list: [], count: 0 },
+				transparent: { list: [], count: 0 }
+			}
+		);
 
 	};
 
@@ -5652,103 +5586,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function bufferNeedsSmoothNormals( geometryGroup, object ) {
+	function bufferGuessVertexColorType( material ) {
 
-		var m, ml, i, l, meshMaterial, needsSmoothNormals = false;
+		if ( material.vertexColors ) {
 
-		for ( m = 0, ml = object.materials.length; m < ml; m++ ) {
-
-			meshMaterial = object.materials[ m ];
-
-			if ( meshMaterial instanceof THREE.MeshFaceMaterial ) {
-
-				for ( i = 0, l = geometryGroup.materials.length; i < l; i++ ) {
-
-					if ( materialNeedsSmoothNormals( geometryGroup.materials[ i ] ) ) {
-
-						needsSmoothNormals = true;
-						break;
-
-					}
-
-				}
-
-			} else {
-
-				if ( materialNeedsSmoothNormals( meshMaterial ) ) {
-
-					needsSmoothNormals = true;
-					break;
-
-				}
-
-			}
-
-			if ( needsSmoothNormals ) break;
-
-		}
-
-		return needsSmoothNormals;
-
-	};
-
-	function unrollGroupMaterials( geometryGroup, object ) {
-
-		var m, ml, i, il,
-			material, meshMaterial,
-			materials = [];
-
-		for ( m = 0, ml = object.materials.length; m < ml; m ++ ) {
-
-			meshMaterial = object.materials[ m ];
-
-			if ( meshMaterial instanceof THREE.MeshFaceMaterial ) {
-
-				for ( i = 0, l = geometryGroup.materials.length; i < l; i ++ ) {
-
-					material = geometryGroup.materials[ i ];
-
-					if ( material ) {
-
-						materials.push( material );
-
-					}
-
-				}
-
-			} else {
-
-				material = meshMaterial;
-
-				if ( material ) {
-
-					materials.push( material );
-
-				}
-
-			}
-
-		}
-
-		return materials;
-
-	};
-
-	function bufferGuessVertexColorType( materials, geometryGroup, object ) {
-
-		var i, m, ml = materials.length;
-
-		// use vertexColor type from the first material in unrolled materials
-
-		for ( i = 0; i < ml; i ++ ) {
-
-			m = materials[ i ];
-
-			if ( m.vertexColors ) {
-
-				return m.vertexColors;
-
-			}
+			return material.vertexColors;
 
 		}
 
@@ -5756,49 +5598,35 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function bufferGuessNormalType( materials, geometryGroup, object ) {
-
-		var i, m, ml = materials.length;
+	function bufferGuessNormalType( material ) {
 
 		// only MeshBasicMaterial and MeshDepthMaterial don't need normals
 
-		for ( i = 0; i < ml; i ++ ) {
+		if ( ( material instanceof THREE.MeshBasicMaterial && !material.envMap ) || material instanceof THREE.MeshDepthMaterial ) {
 
-			m = materials[ i ];
-
-			if ( ( m instanceof THREE.MeshBasicMaterial && !m.envMap ) || m instanceof THREE.MeshDepthMaterial ) continue;
-
-			if ( materialNeedsSmoothNormals( m ) ) {
-
-				return THREE.SmoothShading;
-
-			} else {
-
-				return THREE.FlatShading;
-
-			}
+			return false;
 
 		}
 
-		return false;
+		if ( materialNeedsSmoothNormals( material ) ) {
+
+			return THREE.SmoothShading;
+
+		} else {
+
+			return THREE.FlatShading;
+
+		}
 
 	};
 
-	function bufferGuessUVType( materials, geometryGroup, object ) {
-
-		var i, m, ml = materials.length;
+	function bufferGuessUVType( material ) {
 
 		// material must use some texture to require uvs
 
-		for ( i = 0; i < ml; i++ ) {
+		if ( material.map || material.lightMap || material instanceof THREE.ShaderMaterial ) {
 
-			m = materials[ i ];
-
-			if ( m.map || m.lightMap || m instanceof THREE.ShaderMaterial ) {
-
-				return true;
-
-			}
+			return true;
 
 		}
 

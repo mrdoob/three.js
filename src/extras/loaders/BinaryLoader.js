@@ -687,22 +687,19 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 
 	function f3 ( scope, a, b, c, mi ) {
 
-		var material = scope.materials[ mi ];
-		scope.faces.push( new THREE.Face3( a, b, c, null, null, material ) );
+		scope.faces.push( new THREE.Face3( a, b, c, null, null, mi ) );
 
 	};
 
 	function f4 ( scope, a, b, c, d, mi ) {
 
-		var material = scope.materials[ mi ];
-		scope.faces.push( new THREE.Face4( a, b, c, d, null, null, material ) );
+		scope.faces.push( new THREE.Face4( a, b, c, d, null, null, mi ) );
 
 	};
 
 	function f3n ( scope, normals, a, b, c, mi, na, nb, nc ) {
 
-		var material = scope.materials[ mi ],
-			nax = normals[ na*3     ],
+		var nax = normals[ na*3     ],
 			nay = normals[ na*3 + 1 ],
 			naz = normals[ na*3 + 2 ],
 
@@ -719,14 +716,13 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 						   new THREE.Vector3( nbx, nby, nbz ),
 						   new THREE.Vector3( ncx, ncy, ncz )],
 						  null,
-						  material ) );
+						  mi ) );
 
 	};
 
 	function f4n ( scope, normals, a, b, c, d, mi, na, nb, nc, nd ) {
 
-		var material = scope.materials[ mi ],
-			nax = normals[ na*3     ],
+		var nax = normals[ na*3     ],
 			nay = normals[ na*3 + 1 ],
 			naz = normals[ na*3 + 2 ],
 
@@ -748,7 +744,7 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 						   new THREE.Vector3( ncx, ncy, ncz ),
 						   new THREE.Vector3( ndx, ndy, ndz )],
 						  null,
-						  material ) );
+						  mi ) );
 
 	};
 

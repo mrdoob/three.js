@@ -222,6 +222,8 @@
 
 				geometry.computeTangents();
 
+				geometry.materials = [ material1 ];
+
 				mesh1 = new THREE.Mesh( geometry, material1 );
 				mesh1.position.x = - scale * 12;
 				mesh1.scale.set( scale, scale, scale );
@@ -237,6 +239,8 @@
 				scene.add( mesh2 );
 
 				loader.statusDomElement.style.display = "none";
+
+				console.log( mesh1 );
 
 			}
 

@@ -35,7 +35,7 @@ THREE.DotScreenPass.prototype = {
 		this.uniforms[ "tDiffuse" ].texture = readBuffer;
 		this.uniforms[ "tSize" ].value.set( readBuffer.width, readBuffer.height );
 
-		THREE.EffectComposer.quad.materials[ 0 ] = this.material;
+		THREE.EffectComposer.quad.material = this.material;
 
 		if ( this.renderToScreen ) {
 

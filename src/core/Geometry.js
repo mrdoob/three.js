@@ -13,6 +13,8 @@ THREE.Geometry = function () {
 	this.vertices = [];
 	this.colors = []; // one-to-one vertex colors, used in ParticleSystem, Line and Ribbon
 
+	this.materials = [];
+
 	this.faces = [];
 
 	this.faceUvs = [[]];
@@ -435,27 +437,27 @@ THREE.Geometry.prototype = {
 		this.boundingSphere = { radius: radius };
 
 	},
-	
-	/* 
-	 * Checks for duplicate vertices with hashmap. 
+
+	/*
+	 * Checks for duplicate vertices with hashmap.
 	 * Duplicated vertices are removed
-	 * and faces' vertices are updated. 
+	 * and faces' vertices are updated.
 	 */
 	mergeVertices: function() {
-		
+
 		var verticesMap = {}; // Hashmap for looking up vertice by position coordinates (and making sure they are unique)
 		var unique = [], changes = [];
-		
+
 		var v, key;
-		var precisionPoints = 4; // number of decimal points, eg. 4 for epsilon of 0.0001 
+		var precisionPoints = 4; // number of decimal points, eg. 4 for epsilon of 0.0001
 		var precision = Math.pow(10, precisionPoints)
 		var i,il, face;
-		
+
 		for (i=0,il=this.vertices.length;i<il;i++) {
-			
+
 			v = this.vertices[i].position;
 			key = [Math.round(v.x * precision), Math.round(v.y* precision), Math.round(v.z* precision)].join('_');
-			
+
 			if (verticesMap[key]===undefined) {
 				verticesMap[key] = i;
 				unique.push(this.vertices[i]);
@@ -464,10 +466,10 @@ THREE.Geometry.prototype = {
 				//console.log('Duplicate vertex found. ', i, ' could be using ', verticesMap[key]);
 				changes[i] = changes[verticesMap[key]];
 			}
-			
+
 		};
-		
-		
+
+
 		// Start to patch face indices.
 		for( i = 0, il = this.faces.length; i < il; i ++ ) {
 
@@ -477,20 +479,20 @@ THREE.Geometry.prototype = {
 				face.a = changes[face.a];
 				face.b = changes[face.b];
 				face.c = changes[face.c];
-			
+
 			} if ( face instanceof THREE.Face4 ) {
 
 				face.a = changes[face.a];
 				face.b = changes[face.b];
 				face.c = changes[face.c];
 				face.d = changes[face.d];
-			
+
 			}
 		}
-		
+
 		// Use unique set of vertices
 		this.vertices = unique;
-		
+
 	}
 
 };

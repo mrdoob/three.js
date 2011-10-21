@@ -177,7 +177,7 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texture_path
 			if ( hasMaterial ) {
 
 				materialIndex = faces[ offset ++ ];
-				face.materials = geometry.materials[ materialIndex ];
+				face.materialIndex = materialIndex;
 
 			}
 

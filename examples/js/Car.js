@@ -106,8 +106,8 @@ THREE.Car = function () {
 
 		var loader = new THREE.JSONLoader();
 
-		loader.load( { model: bodyURL, callback: function( geometry ) { createBody( geometry ) } } );
-		loader.load( { model: wheelURL, callback: function( geometry ) { createWheels( geometry ) } } );
+		loader.load( bodyURL, function( geometry ) { createBody( geometry ) } );
+		loader.load( wheelURL, function( geometry ) { createWheels( geometry ) } );
 
 	};
 
@@ -115,8 +115,8 @@ THREE.Car = function () {
 
 		var loader = new THREE.BinaryLoader();
 
-		loader.load( { model: bodyURL, callback: function( geometry ) { createBody( geometry ) } } );
-		loader.load( { model: wheelURL, callback: function( geometry ) { createWheels( geometry ) } } );
+		loader.load( bodyURL, function( geometry ) { createBody( geometry ) } );
+		loader.load( wheelURL, function( geometry ) { createWheels( geometry ) } );
 
 	};
 

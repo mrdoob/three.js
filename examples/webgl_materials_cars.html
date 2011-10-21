@@ -532,9 +532,9 @@
 					$( button_name( car, i ) ).counter = i;
 					$( button_name( car, i ) ).addEventListener( 'click', function() {
 
-						for ( var j = 0; j < material_indices.length; j++ ) {
+						for ( var j = 0; j < material_indices.length; j ++ ) {
 
-							geometry.materials[ material_indices [ j ] ][ 0 ] = materials[ this.counter ][ 1 ];
+							geometry.materials[ material_indices [ j ] ] = materials[ this.counter ][ 1 ];
 
 						}
 
@@ -557,7 +557,7 @@
 
 				for ( var i in CARS[ car ].mmap ) {
 
-					geometry.materials[ i ][ 0 ] = CARS[ car ].mmap[ i ];
+					geometry.materials[ i ] = CARS[ car ].mmap[ i ];
 
 				}
 

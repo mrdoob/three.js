@@ -71,7 +71,7 @@ THREE.Loader.prototype = {
 
 		for ( var i = 0; i < materials.length; ++ i ) {
 
-			scope.materials[ i ] = [ THREE.Loader.prototype.createMaterial( materials[ i ], texture_path ) ];
+			scope.materials[ i ] = THREE.Loader.prototype.createMaterial( materials[ i ], texture_path );
 
 		}
 
@@ -81,9 +81,9 @@ THREE.Loader.prototype = {
 
 		var m, i, il = scope.materials.length;
 
-		for( i = 0; i < il; i++ ) {
+		for( i = 0; i < il; i ++ ) {
 
-			m = scope.materials[ i ][ 0 ];
+			m = scope.materials[ i ];
 
 			if ( m instanceof THREE.ShaderMaterial ) return true;
 

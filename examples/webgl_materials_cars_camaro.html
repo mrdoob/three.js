@@ -147,7 +147,7 @@
 
 				var i, src = "", parent = $( "buttons" );
 
-				for( i = 0; i < materials.length; i++ ) {
+				for( i = 0; i < materials.length; i ++ ) {
 
 					src += '<button id="m' + i + '">' + materials[ i ][ 0 ] + '</button>';
 
@@ -158,7 +158,7 @@
 				for( i = 0; i < materials.length; i ++ ) {
 
 					$( "m" + i ).counter = i;
-					$( "m" + i ).addEventListener( 'click', function() { geometry.materials[ 0 ][ 0 ] = materials[ this.counter ][ 1 ] }, false );
+					$( "m" + i ).addEventListener( 'click', function() { geometry.materials[ 0 ] = materials[ this.counter ][ 1 ] }, false );
 
 				}
 
@@ -168,15 +168,15 @@
 
 				var s = 75, m = new THREE.MeshFaceMaterial();
 
-				geometry.materials[ 0 ][ 0 ] = materials.body[ 0 ][ 1 ]; // car body
-				geometry.materials[ 1 ][ 0 ] = materials.chrome; // wheels chrome
-				geometry.materials[ 2 ][ 0 ] = materials.chrome; // grille chrome
-				geometry.materials[ 3 ][ 0 ] = materials.darkchrome; // door lines
-				geometry.materials[ 4 ][ 0 ] = materials.glass; // windshield
-				geometry.materials[ 5 ][ 0 ] = materials.interior; // interior
-				geometry.materials[ 6 ][ 0 ] = materials.tire; // tire
-				geometry.materials[ 7 ][ 0 ] = materials.black; // tireling
-				geometry.materials[ 8 ][ 0 ] = materials.black; // behind grille
+				geometry.materials[ 0 ] = materials.body[ 0 ][ 1 ]; // car body
+				geometry.materials[ 1 ] = materials.chrome; // wheels chrome
+				geometry.materials[ 2 ] = materials.chrome; // grille chrome
+				geometry.materials[ 3 ] = materials.darkchrome; // door lines
+				geometry.materials[ 4 ] = materials.glass; // windshield
+				geometry.materials[ 5 ] = materials.interior; // interior
+				geometry.materials[ 6 ] = materials.tire; // tire
+				geometry.materials[ 7 ] = materials.black; // tireling
+				geometry.materials[ 8 ] = materials.black; // behind grille
 
 				var mesh = new THREE.Mesh( geometry, m );
 				mesh.rotation.y = 1;

@@ -346,7 +346,7 @@
 
 					var tmpMesh = new THREE.Mesh( geometry, material );
 
-					THREE.ColorUtils.adjustHSV( tmpMesh.materials[ 0 ].color, 0.1, -0.1, 0 );
+					THREE.ColorUtils.adjustHSV( tmpMesh.material.color, 0.1, -0.1, 0 );
 
 					tmpMesh.position.set( x, y, z );
 

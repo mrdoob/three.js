@@ -441,10 +441,12 @@
 
 					bend: bend,
 
-					material: textMaterialFront,
-					extrudeMaterial: textMaterialSide
+					material: 0,
+					extrudeMaterial: 1
 
 				});
+
+				textGeo.materials = [ textMaterialFront, textMaterialSide ];
 
 				textGeo.computeBoundingBox();
 				textGeo.computeVertexNormals();
@@ -460,7 +462,7 @@
 
 						var face = textGeo.faces[ i ];
 
-						if ( face.materials[ 0 ].id == textMaterialSide.id ) {
+						if ( face.materialIndex == 1 ) {
 
 							for ( var j = 0; j < face.vertexNormals.length; j ++ ) {
 

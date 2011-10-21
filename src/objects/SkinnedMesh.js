@@ -2,9 +2,9 @@
  * @author mikael emtinger / http://gomo.se/
  */
 
-THREE.SkinnedMesh = function( geometry, materials ) {
+THREE.SkinnedMesh = function( geometry, material ) {
 
-	THREE.Mesh.call( this, geometry, materials );
+	THREE.Mesh.call( this, geometry, material );
 
 	// init bones
 
