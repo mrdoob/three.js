@@ -856,7 +856,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		geometryGroup.__faceArray = new Uint16Array( ntris * 3 + ( object.geometry.edgeFaces ? object.geometry.edgeFaces.length * 2 * 3 : 0 ));
+		geometryGroup.__faceArray = new Uint16Array( ntris * 3 );
 		geometryGroup.__lineArray = new Uint16Array( nlines * 2 );
 
 		if ( geometryGroup.numMorphTargets ) {
@@ -877,7 +877,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		geometryGroup.__vertexColorType = vertexColorType;
 		geometryGroup.__normalType = normalType;
 
-		geometryGroup.__webglFaceCount = ntris * 3 + ( object.geometry.edgeFaces ? object.geometry.edgeFaces.length * 2 * 3 : 0 );
+		geometryGroup.__webglFaceCount = ntris * 3;
 		geometryGroup.__webglLineCount = nlines * 2;
 
 
@@ -3490,29 +3490,28 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function unrollImmediateBufferMaterial( globject ) {
 
-		var material,
-			object = globject.object,
-			opaque = globject.opaque,
-			transparent = globject.transparent;
+		var object = globject.object,
+			material = object.material;
 
-		transparent.count = 0;
-		opaque.count = 0;
+		if ( material.transparent ) {
 
-		material = object.material;
-		material.transparent ? addToFixedArray( transparent, material ) : addToFixedArray( opaque, material );
+			globject.transparent = material;
+			globject.opaque = null;
+
+		} else {
+
+			globject.opaque = material;
+			globject.transparent = null;
+
+		}
 
 	};
 
 	function unrollBufferMaterial( globject ) {
 
-		var i, l, m, ml, material, meshMaterial,
-			object = globject.object,
+		var object = globject.object,
 			buffer = globject.buffer,
-			opaque = globject.opaque,
-			transparent = globject.transparent;
-
-		transparent.count = 0;
-		opaque.count = 0;
+			material, materialIndex, meshMaterial;
 
 		meshMaterial = object.material;
 
@@ -3523,14 +3522,40 @@ THREE.WebGLRenderer = function ( parameters ) {
 			if ( materialIndex >= 0 ) {
 
 				material = object.geometry.materials[ materialIndex ];
-				material.transparent ? addToFixedArray( transparent, material ) : addToFixedArray( opaque, material );
+
+				if ( material.transparent ) {
+
+					globject.transparent = material;
+					globject.opaque = null;
+
+				} else {
+
+					globject.opaque = material;
+					globject.transparent = null;
+
+				}
 
 			}
 
 		} else {
 
 			material = meshMaterial;
-			if ( material ) material.transparent ? addToFixedArray( transparent, material ) : addToFixedArray( opaque, material );
+
+			if ( material ) {
+
+				if ( material.transparent ) {
+
+					globject.transparent = material;
+					globject.opaque = null;
+
+				} else {
+
+					globject.opaque = material;
+					globject.transparent = null;
+
+				}
+
+			}
 
 		}
 
@@ -3754,7 +3779,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.render = function( scene, camera, renderTarget, forceClear ) {
 
-		var i, program, opaque, transparent, material,
+		var i, program, material,
 			o, ol, oil, webglObject, object, buffer,
 			lights = scene.lights,
 			fog = scene.fog;
@@ -3946,20 +3971,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					object = webglObject.object;
 					buffer = webglObject.buffer;
-					opaque = webglObject.opaque;
+					material = webglObject.opaque;
+
+					if ( ! material ) continue;
 
 					setObjectFaces( object );
 
-					for ( i = 0; i < opaque.count; i ++ ) {
-
-						material = opaque.list[ i ];
-
-						setDepthTest( material.depthTest );
-						setDepthWrite( material.depthWrite );
-						setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
-						renderBuffer( camera, lights, fog, material, buffer, object );
-
-					}
+					setDepthTest( material.depthTest );
+					setDepthWrite( material.depthWrite );
+					setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
+					renderBuffer( camera, lights, fog, material, buffer, object );
 
 				}
 
@@ -3967,7 +3988,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			// opaque pass (immediate simulator)
 
-			for ( o = 0; o < oil; o++ ) {
+			for ( o = 0; o < oil; o ++ ) {
 
 				webglObject = scene.__webglObjectsImmediate[ o ];
 				object = webglObject.object;
@@ -3976,29 +3997,25 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					_currentGeometryGroupHash = -1;
 
-					opaque = webglObject.opaque;
+					material = webglObject.opaque;
+
+					if ( ! material ) continue;
 
 					setObjectFaces( object );
 
-					for( i = 0; i < opaque.count; i++ ) {
+					setDepthTest( material.depthTest );
+					setDepthWrite( material.depthWrite );
+					setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
 
-						material = opaque.list[ i ];
+					program = setProgram( camera, lights, fog, material, object );
 
-						setDepthTest( material.depthTest );
-						setDepthWrite( material.depthWrite );
-						setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
+					if ( object.immediateRenderCallback ) {
 
-						program = setProgram( camera, lights, fog, material, object );
+						object.immediateRenderCallback( program, _gl, _frustum );
 
-						if ( object.immediateRenderCallback ) {
+					} else {
 
-							object.immediateRenderCallback( program, _gl, _frustum );
-
-						} else {
-
-							object.render( function( object ) { renderBufferImmediate( object, program, material.shading ); } );
-
-						}
+						object.render( function( object ) { renderBufferImmediate( object, program, material.shading ); } );
 
 					}
 
@@ -4017,22 +4034,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					object = webglObject.object;
 					buffer = webglObject.buffer;
-					transparent = webglObject.transparent;
+					material = webglObject.transparent;
+
+					if ( ! material ) continue;
 
 					setObjectFaces( object );
 
-					for ( i = 0; i < transparent.count; i ++ ) {
+					setBlending( material.blending );
+					setDepthTest( material.depthTest );
+					setDepthWrite( material.depthWrite );
+					setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
 
-						material = transparent.list[ i ];
-
-						setBlending( material.blending );
-						setDepthTest( material.depthTest );
-						setDepthWrite( material.depthWrite );
-						setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
-
-						renderBuffer( camera, lights, fog, material, buffer, object );
-
-					}
+					renderBuffer( camera, lights, fog, material, buffer, object );
 
 				}
 
@@ -4040,7 +4053,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			// transparent pass (immediate simulator)
 
-			for ( o = 0; o < oil; o++ ) {
+			for ( o = 0; o < oil; o ++ ) {
 
 				webglObject = scene.__webglObjectsImmediate[ o ];
 				object = webglObject.object;
@@ -4049,30 +4062,26 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					_currentGeometryGroupHash = -1;
 
-					transparent = webglObject.transparent;
+					material = webglObject.transparent;
+
+					if ( ! material ) continue;
 
 					setObjectFaces( object );
 
-					for ( i = 0; i < transparent.count; i ++ ) {
+					setBlending( material.blending );
+					setDepthTest( material.depthTest );
+					setDepthWrite( material.depthWrite );
+					setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
 
-						material = transparent.list[ i ];
+					program = setProgram( camera, lights, fog, material, object );
 
-						setBlending( material.blending );
-						setDepthTest( material.depthTest );
-						setDepthWrite( material.depthWrite );
-						setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
+					if ( object.immediateRenderCallback ) {
 
-						program = setProgram( camera, lights, fog, material, object );
+						object.immediateRenderCallback( program, _gl, _frustum );
 
-						if ( object.immediateRenderCallback ) {
+					} else {
 
-							object.immediateRenderCallback( program, _gl, _frustum );
-
-						} else {
-
-							object.render( function( object ) { renderBufferImmediate( object, program, material.shading ); } );
-
-						}
+						object.render( function( object ) { renderBufferImmediate( object, program, material.shading ); } );
 
 					}
 
@@ -4671,9 +4680,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		objlist.push(
 			{
-				buffer: buffer, object: object,
-				opaque: { list: [], count: 0 },
-				transparent: { list: [], count: 0 }
+				buffer: buffer,
+				object: object,
+				opaque: null,
+				transparent: null
 			}
 		);
 
@@ -4684,8 +4694,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		objlist.push(
 			{
 				object: object,
-				opaque: { list: [], count: 0 },
-				transparent: { list: [], count: 0 }
+				opaque: null,
+				transparent: null
 			}
 		);
 
@@ -5754,4 +5764,3 @@ THREE.WebGLRenderer = function ( parameters ) {
 	}
 	*/
 };
-
