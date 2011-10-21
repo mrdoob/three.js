@@ -750,19 +750,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function getBufferMaterial( object, geometryGroup ) {
 
-		var material;
-
 		if ( object.material && ! ( object.material instanceof THREE.MeshFaceMaterial ) ) {
 
-			material = object.material;
+			return object.material;
 
 		} else if ( geometryGroup.materialIndex >= 0 ) {
 
-			material = object.geometry.materials[ geometryGroup.materialIndex ];
+			return object.geometry.materials[ geometryGroup.materialIndex ];
 
 		}
-
-		return material;
 
 	};
 
@@ -4293,7 +4289,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		for ( var o = 0, ol = scene.__webglObjects.length; o < ol; o ++ ) {
 
-			updateObject( scene.__webglObjects[ o ].object, scene );
+			updateObject( scene.__webglObjects[ o ].object );
 
 		}
 
@@ -4433,17 +4429,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function areCustomAttributesDirty( geometryGroup, object ) {
+	function areCustomAttributesDirty( material ) {
 
-		var material = getBufferMaterial( object, geometryGroup );
+		for ( var a in material.attributes ) {
 
-		if ( material.attributes ) {
-
-			for ( var a in material.attributes ) {
-
-				if ( material.attributes[ a ].needsUpdate ) return true;
-
-			}
+			if ( material.attributes[ a ].needsUpdate ) return true;
 
 		}
 
@@ -4451,29 +4441,22 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function clearCustomAttributes( geometryGroup, object ) {
+	function clearCustomAttributes( material ) {
 
-		var material = getBufferMaterial( object, geometryGroup );
+		for ( var a in material.attributes ) {
 
-		if ( material.attributes ) {
-
-			for ( var a in material.attributes ) {
-
-				material.attributes[ a ].needsUpdate = false;
-
-			}
+			material.attributes[ a ].needsUpdate = false;
 
 		}
 
 	};
 
-	function updateObject( object, scene ) {
+	function updateObject( object ) {
 
-		var g, geometry, geometryGroup, a, customAttributeDirty;
+		var geometry = object.geometry,
+			geometryGroup, customAttributesDirty, material;
 
 		if ( object instanceof THREE.Mesh ) {
-
-			geometry = object.geometry;
 
 			// check all geometry groups
 
@@ -4481,11 +4464,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				geometryGroup = geometry.geometryGroupsList[ i ];
 
-				customAttributeDirty = areCustomAttributesDirty( geometryGroup, object );
+				material = getBufferMaterial( object, geometryGroup );
+
+				customAttributesDirty = material.attributes && areCustomAttributesDirty( material );
 
 				if ( geometry.__dirtyVertices || geometry.__dirtyMorphTargets || geometry.__dirtyElements ||
 					 geometry.__dirtyUvs || geometry.__dirtyNormals ||
-					 geometry.__dirtyColors || geometry.__dirtyTangents || customAttributeDirty ) {
+					 geometry.__dirtyColors || geometry.__dirtyTangents || customAttributesDirty ) {
 
 					setMeshBuffers( geometryGroup, object, _gl.DYNAMIC_DRAW, !geometry.dynamic );
 
@@ -4498,16 +4483,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 			geometry.__dirtyElements = false;
 			geometry.__dirtyUvs = false;
 			geometry.__dirtyNormals = false;
-			geometry.__dirtyTangents = false;
 			geometry.__dirtyColors = false;
+			geometry.__dirtyTangents = false;
 
-			clearCustomAttributes( geometryGroup, object );
+			material.attributes && clearCustomAttributes( material );
 
 		} else if ( object instanceof THREE.Ribbon ) {
 
-			geometry = object.geometry;
-
-			if( geometry.__dirtyVertices || geometry.__dirtyColors ) {
+			if ( geometry.__dirtyVertices || geometry.__dirtyColors ) {
 
 				setRibbonBuffers( geometry, _gl.DYNAMIC_DRAW );
 
@@ -4518,9 +4501,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else if ( object instanceof THREE.Line ) {
 
-			geometry = object.geometry;
-
-			if( geometry.__dirtyVertices ||  geometry.__dirtyColors ) {
+			if ( geometry.__dirtyVertices ||  geometry.__dirtyColors ) {
 
 				setLineBuffers( geometry, _gl.DYNAMIC_DRAW );
 
@@ -4531,11 +4512,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else if ( object instanceof THREE.ParticleSystem ) {
 
-			geometry = object.geometry;
+			material = getBufferMaterial( object, geometryGroup );
 
-			customAttributeDirty = areCustomAttributesDirty( geometry, object );
+			customAttributesDirty = material.attributes && areCustomAttributesDirty( material );
 
-			if ( geometry.__dirtyVertices || geometry.__dirtyColors || object.sortParticles || customAttributeDirty ) {
+			if ( geometry.__dirtyVertices || geometry.__dirtyColors || object.sortParticles || customAttributesDirty ) {
 
 				setParticleBuffers( geometry, _gl.DYNAMIC_DRAW, object );
 
@@ -4544,28 +4525,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 			geometry.__dirtyVertices = false;
 			geometry.__dirtyColors = false;
 
-			clearCustomAttributes( geometry, object );
-
-		}/* else if ( THREE.MarchingCubes !== undefined && object instanceof THREE.MarchingCubes ) {
-
-			// it updates itself in render callback
+			material.attributes && clearCustomAttributes( material );
 
 		}
-		*/
-
-		/*
-		delete geometry.vertices;
-		delete geometry.faces;
-		delete geometryGroup.faces;
-		*/
 
 	};
 
 	function removeInstances( objlist, object ) {
 
-		var o, ol;
-
-		for ( o = objlist.length - 1; o >= 0; o -- ) {
+		for ( var o = objlist.length - 1; o >= 0; o -- ) {
 
 			if ( objlist[ o ].object === object ) {
 
@@ -4579,9 +4547,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function removeInstancesDirect( objlist, object ) {
 
-		var o, ol;
-
-		for ( o = objlist.length - 1; o >= 0; o -- ) {
+		for ( var o = objlist.length - 1; o >= 0; o -- ) {
 
 			if ( objlist[ o ] === object ) {
 
@@ -4618,8 +4584,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function sortFacesByMaterial( geometry ) {
 
-		var i, l, f, fl, face, materialIndex, vertices, mhash, ghash, hash_map = {};
-		var numMorphTargets = geometry.morphTargets !== undefined ? geometry.morphTargets.length : 0;
+		var f, fl, face, materialIndex, vertices,
+			materialHash, groupHash,
+			hash_map = {};
+
+		var numMorphTargets = geometry.morphTargets.length;
 
 		geometry.geometryGroups = {};
 
@@ -4628,39 +4597,39 @@ THREE.WebGLRenderer = function ( parameters ) {
 			face = geometry.faces[ f ];
 			materialIndex = face.materialIndex;
 
-			mhash = ( materialIndex !== undefined ) ? materialIndex : -1;
+			materialHash = ( materialIndex !== undefined ) ? materialIndex : -1;
 
-			if ( hash_map[ mhash ] === undefined ) {
+			if ( hash_map[ materialHash ] === undefined ) {
 
-				hash_map[ mhash ] = { 'hash': mhash, 'counter': 0 };
+				hash_map[ materialHash ] = { 'hash': materialHash, 'counter': 0 };
 
 			}
 
-			ghash = hash_map[ mhash ].hash + '_' + hash_map[ mhash ].counter;
+			groupHash = hash_map[ materialHash ].hash + '_' + hash_map[ materialHash ].counter;
 
-			if ( geometry.geometryGroups[ ghash ] === undefined ) {
+			if ( geometry.geometryGroups[ groupHash ] === undefined ) {
 
-				geometry.geometryGroups[ ghash ] = { 'faces': [], 'materialIndex': materialIndex, 'vertices': 0, 'numMorphTargets': numMorphTargets };
+				geometry.geometryGroups[ groupHash ] = { 'faces': [], 'materialIndex': materialIndex, 'vertices': 0, 'numMorphTargets': numMorphTargets };
 
 			}
 
 			vertices = face instanceof THREE.Face3 ? 3 : 4;
 
-			if ( geometry.geometryGroups[ ghash ].vertices + vertices > 65535 ) {
+			if ( geometry.geometryGroups[ groupHash ].vertices + vertices > 65535 ) {
 
-				hash_map[ mhash ].counter += 1;
-				ghash = hash_map[ mhash ].hash + '_' + hash_map[ mhash ].counter;
+				hash_map[ materialHash ].counter += 1;
+				groupHash = hash_map[ materialHash ].hash + '_' + hash_map[ materialHash ].counter;
 
-				if ( geometry.geometryGroups[ ghash ] === undefined ) {
+				if ( geometry.geometryGroups[ groupHash ] === undefined ) {
 
-					geometry.geometryGroups[ ghash ] = { 'faces': [], 'materialIndex': materialIndex, 'vertices': 0, 'numMorphTargets': numMorphTargets };
+					geometry.geometryGroups[ groupHash ] = { 'faces': [], 'materialIndex': materialIndex, 'vertices': 0, 'numMorphTargets': numMorphTargets };
 
 				}
 
 			}
 
-			geometry.geometryGroups[ ghash ].faces.push( f );
-			geometry.geometryGroups[ ghash ].vertices += vertices;
+			geometry.geometryGroups[ groupHash ].faces.push( f );
+			geometry.geometryGroups[ groupHash ].vertices += vertices;
 
 		}
 
@@ -5259,7 +5228,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.activeTexture( _gl.TEXTURE0 + slot );
 			_gl.bindTexture( _gl.TEXTURE_2D, texture.__webglTexture );
 
-			if ( texture instanceof THREE.DataTexture) {
+			if ( texture instanceof THREE.DataTexture ) {
 
 				_gl.texImage2D( _gl.TEXTURE_2D, 0, paramThreeToGL( texture.format ), texture.image.width, texture.image.height, 0, paramThreeToGL( texture.format ), _gl.UNSIGNED_BYTE, texture.image.data );
 
