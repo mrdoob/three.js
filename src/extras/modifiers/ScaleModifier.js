@@ -12,17 +12,7 @@ THREE.ScaleModifier = function( scale /*Vector3*/ ) {
 THREE.ScaleModifier.prototype.constructor = THREE.ScaleModifier;
 
 THREE.ScaleModifier.prototype.modify = function ( geometry ) {
-	var i,il;
-	var scale = this.scale, v;
-	for (i=0,il=geometry.vertices.length;i<il;i++) {
 	
-		v = geometry.vertices[i].position;
-		v.multiplySelf(scale);
+	geometry.applyMatrix( new THREE.Matrix4().setScale( this.scale.x, this.scale.y, this.scale.z ) );
 	
-	}
-
-	geometry.computeCentroids();
-	geometry.computeFaceNormals();
-	geometry.computeVertexNormals();
-
 };
