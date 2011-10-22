@@ -99,7 +99,11 @@ THREE.CombinedCamera.prototype.toOrthographic = function () {
 THREE.CombinedCamera.prototype.setFov = function(fov) {	
 	this.fov = fov;
 	
-	this.toPerspective();
+	if (this.inPersepectiveMode) {
+		this.toPerspective();
+	} else {
+		this.toOrthographic();
+	}
 
 };
 
