@@ -59,7 +59,7 @@ THREE.Bone.prototype.update = function( parentSkinMatrix, forceUpdate, camera ) 
 		this.matrixWorld.multiply( this.skin.matrixWorld, this.skinMatrix );
 
 
-		for ( i = 0; i < l; i++ ) {
+		for ( i = 0; i < l; i ++ ) {
 
 			child = this.children[ i ];
 
@@ -77,7 +77,7 @@ THREE.Bone.prototype.update = function( parentSkinMatrix, forceUpdate, camera ) 
 
 	} else {
 
-		for ( i = 0; i < l; i++ ) {
+		for ( i = 0; i < l; i ++ ) {
 
 			this.children[ i ].update( this.skinMatrix, forceUpdate, camera );
 
@@ -92,7 +92,7 @@ THREE.Bone.prototype.update = function( parentSkinMatrix, forceUpdate, camera ) 
  * Add child
  */
 
-THREE.Bone.prototype.addChild = function( child ) {
+THREE.Bone.prototype.add = function( child ) {
 
 	if ( this.children.indexOf( child ) === - 1 ) {
 

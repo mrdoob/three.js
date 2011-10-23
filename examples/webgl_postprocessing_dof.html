@@ -124,9 +124,9 @@
 				//var s = 0.25;
 				var s = 60;
 
-				for ( i = 0; i < xgrid; i++ )
-				for ( j = 0; j < ygrid; j++ )
-				for ( k = 0; k < zgrid; k++ ) {
+				for ( i = 0; i < xgrid; i ++ )
+				for ( j = 0; j < ygrid; j ++ )
+				for ( k = 0; k < zgrid; k ++ ) {
 
 					if ( singleMaterial ) {
 
@@ -153,7 +153,7 @@
 					scene.add( mesh );
 					objects.push( mesh );
 
-					c++;
+					c ++;
 
 				}
 
@@ -278,7 +278,7 @@
 
 			function render() {
 
-				var time = new Date().getTime() * 0.00005;
+				var time = Date.now() * 0.00005;
 
 				camera.position.x += ( mouseX - camera.position.x ) * 0.036;
 				camera.position.y += ( - (mouseY) - camera.position.y ) * 0.036;
@@ -287,10 +287,9 @@
 
 				if ( !singleMaterial ) {
 
-					for( i = 0; i < nobjects; i++ ) {
+					for( i = 0; i < nobjects; i ++ ) {
 
-						h = ( 360 * ( i/nobjects + time ) % 360 ) / 360;
-						//materials[ i ].color.setHSV( h, 0.5 + 0.5 * ( i % 20 / 20 ), 1 );
+						h = ( 360 * ( i / nobjects + time ) % 360 ) / 360;
 						materials[ i ].color.setHSV( h, 1, 1 );
 
 					}

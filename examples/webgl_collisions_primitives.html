@@ -163,8 +163,10 @@
 
 				var ray = new THREE.Ray( camera.position, vector.subSelf( camera.position ).normalize() );
 
-				for ( var i = 0; i < geoms.length; i++) {
-					geoms[i].materials[0].color = new THREE.Color(0x007700);
+				for ( var i = 0; i < geoms.length; i ++ ) {
+
+					geoms[ i ].material.color.setHex( 0x007700 );
+
 				}
 
 				if ( !document.getElementById( "nearest" ).checked ) {
@@ -181,7 +183,7 @@
 
 						for ( var i = 0; i < cs.length; i ++ ) {
 
-							cs[ i ].mesh.materials[ 0 ].color.setHex( 0xaa0000 );
+							cs[ i ].mesh.material.color.setHex( 0xaa0000 );
 
 						}
 
@@ -202,7 +204,7 @@
 					if ( c ) {
 
 						info.innerHTML = "Found in " + tt + " @ distance " + c.distance;
-						c.mesh.materials[ 0 ].color.setHex( 0xaa0000 );
+						c.mesh.material.color.setHex( 0xaa0000 );
 
 					} else {
 

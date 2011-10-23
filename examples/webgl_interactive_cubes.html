@@ -143,17 +143,17 @@
 
 					if ( INTERSECTED != intersects[ 0 ].object ) {
 
-						if ( INTERSECTED ) INTERSECTED.materials[ 0 ].color.setHex( INTERSECTED.currentHex );
+						if ( INTERSECTED ) INTERSECTED.material.color.setHex( INTERSECTED.currentHex );
 
 						INTERSECTED = intersects[ 0 ].object;
-						INTERSECTED.currentHex = INTERSECTED.materials[ 0 ].color.getHex();
-						INTERSECTED.materials[ 0 ].color.setHex( 0xff0000 );
+						INTERSECTED.currentHex = INTERSECTED.material.color.getHex();
+						INTERSECTED.material.color.setHex( 0xff0000 );
 
 					}
 
 				} else {
 
-					if ( INTERSECTED ) INTERSECTED.materials[ 0 ].color.setHex( INTERSECTED.currentHex );
+					if ( INTERSECTED ) INTERSECTED.material.color.setHex( INTERSECTED.currentHex );
 
 					INTERSECTED = null;
 

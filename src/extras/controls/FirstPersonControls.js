@@ -28,9 +28,6 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 	this.verticalMin = 0;
 	this.verticalMax = Math.PI;
 
-	this.lastUpdate = new Date().getTime();
-	this.tdiff = 0;
-
 	this.autoSpeedFactor = 0.0;
 
 	this.mouseX = 0;
@@ -172,21 +169,16 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 	};
 
-	this.update = function() {
-
-		var now = new Date().getTime();
-		this.tdiff = ( now - this.lastUpdate ) / 1000;
-		this.lastUpdate = now;
+	this.update = function( delta ) {
 
 		if ( !this.freeze ) {
 
-
 			if ( this.heightSpeed ) {
 
-				var y = clamp( this.object.position.y, this.heightMin, this.heightMax );
-				var delta = y - this.heightMin;
+				var y = THREE.Math.clamp( this.object.position.y, this.heightMin, this.heightMax );
+				var heightDelta = y - this.heightMin;
 
-				this.autoSpeedFactor = this.tdiff * ( delta * this.heightCoef );
+				this.autoSpeedFactor = delta * ( heightDelta * this.heightCoef );
 
 			} else {
 
@@ -194,7 +186,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 			}
 
-			var actualMoveSpeed = this.tdiff * this.movementSpeed;
+			var actualMoveSpeed = delta * this.movementSpeed;
 
 			if ( this.moveForward || ( this.autoForward && !this.moveBackward ) ) this.object.translateZ( - ( actualMoveSpeed + this.autoSpeedFactor ) );
 			if ( this.moveBackward ) this.object.translateZ( actualMoveSpeed );
@@ -205,7 +197,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 			if ( this.moveUp ) this.object.translateY( actualMoveSpeed );
 			if ( this.moveDown ) this.object.translateY( - actualMoveSpeed );
 
-			var actualLookSpeed = this.tdiff * this.lookSpeed;
+			var actualLookSpeed = delta * this.lookSpeed;
 
 			if ( !this.activeLook ) {
 
@@ -247,7 +239,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 		if ( this.constrainVertical ) {
 
-			this.phi = map_linear( this.phi, 0, Math.PI, this.verticalMin, this.verticalMax );
+			this.phi = THREE.Math.mapLinear( this.phi, 0, Math.PI, this.verticalMin, this.verticalMax );
 
 		}
 
@@ -278,24 +270,6 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 			fn.apply( scope, arguments );
 
 		};
-
-	};
-
-	function map_linear( x, sa, sb, ea, eb ) {
-
-		return ( x  - sa ) * ( eb - ea ) / ( sb - sa ) + ea;
-
-	};
-
-	function clamp_bottom( x, a ) {
-
-		return x < a ? a : x;
-
-	};
-
-	function clamp( x, a, b ) {
-
-		return x < a ? a : ( x > b ? b : x );
 
 	};
 

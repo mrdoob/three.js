@@ -84,24 +84,24 @@ THREE.Quaternion.prototype = {
 		return this;
 
 	},
-	
+
 	setFromRotationMatrix: function ( m ) {
 		// Adapted from: http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
 		function copySign(a, b) {
 			return b < 0 ? -Math.abs(a) : Math.abs(a);
 		}
 		var absQ = Math.pow(m.determinant(), 1.0 / 3.0);
-		this.w = Math.sqrt( Math.max( 0, absQ + m.n11 + m.n22 + m.n33 ) ) / 2; 
-		this.x = Math.sqrt( Math.max( 0, absQ + m.n11 - m.n22 - m.n33 ) ) / 2; 
-		this.y = Math.sqrt( Math.max( 0, absQ - m.n11 + m.n22 - m.n33 ) ) / 2; 
-		this.z = Math.sqrt( Math.max( 0, absQ - m.n11 - m.n22 + m.n33 ) ) / 2; 
+		this.w = Math.sqrt( Math.max( 0, absQ + m.n11 + m.n22 + m.n33 ) ) / 2;
+		this.x = Math.sqrt( Math.max( 0, absQ + m.n11 - m.n22 - m.n33 ) ) / 2;
+		this.y = Math.sqrt( Math.max( 0, absQ - m.n11 + m.n22 - m.n33 ) ) / 2;
+		this.z = Math.sqrt( Math.max( 0, absQ - m.n11 - m.n22 + m.n33 ) ) / 2;
 		this.x = copySign( this.x, ( m.n32 - m.n23 ) );
 		this.y = copySign( this.y, ( m.n13 - m.n31 ) );
 		this.z = copySign( this.z, ( m.n21 - m.n12 ) );
 		this.normalize();
 		return this;
 	},
-	
+
 	calculateW : function () {
 
 		this.w = - Math.sqrt( Math.abs( 1.0 - this.x * this.x - this.y * this.y - this.z * this.z ) );
@@ -130,7 +130,7 @@ THREE.Quaternion.prototype = {
 
 		var l = Math.sqrt( this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w );
 
-		if ( l == 0 ) {
+		if ( l === 0 ) {
 
 			this.x = 0;
 			this.y = 0;
@@ -174,7 +174,7 @@ THREE.Quaternion.prototype = {
 		this.y = -q1.x * q2.z + q1.y * q2.w + q1.z * q2.x + q1.w * q2.y;
 		this.z =  q1.x * q2.y - q1.y * q2.x + q1.z * q2.w + q1.w * q2.z;
 		this.w = -q1.x * q2.x - q1.y * q2.y - q1.z * q2.z + q1.w * q2.w;
-		
+
 		return this;
 
 	},
@@ -228,7 +228,7 @@ THREE.Quaternion.slerp = function ( qa, qb, qm, t ) {
 	var halfTheta = Math.acos( cosHalfTheta ),
 	sinHalfTheta = Math.sqrt( 1.0 - cosHalfTheta * cosHalfTheta );
 
-	if ( Math.abs( sinHalfTheta ) < 0.001 ) { 
+	if ( Math.abs( sinHalfTheta ) < 0.001 ) {
 
 		qm.w = 0.5 * ( qa.w + qb.w );
 		qm.x = 0.5 * ( qa.x + qb.x );
@@ -240,7 +240,7 @@ THREE.Quaternion.slerp = function ( qa, qb, qm, t ) {
 	}
 
 	var ratioA = Math.sin( ( 1 - t ) * halfTheta ) / sinHalfTheta,
-	ratioB = Math.sin( t * halfTheta ) / sinHalfTheta; 
+	ratioB = Math.sin( t * halfTheta ) / sinHalfTheta;
 
 	qm.w = ( qa.w * ratioA + qm.w * ratioB );
 	qm.x = ( qa.x * ratioA + qm.x * ratioB );

@@ -74,9 +74,10 @@
 			var camera, controls, scene, sceneCube, renderer;
 			var geometry, meshPlanet, meshClouds, meshMoon;
 			var dirLight, pointLight, ambientLight;
-			var lastUpdate = new Date().getTime();
 
-			var delta, d, dPlanet, dMoon, dMoonVec = new THREE.Vector3();
+			var d, dPlanet, dMoon, dMoonVec = new THREE.Vector3();
+
+			var clock = new THREE.Clock();
 
 			init();
 			animate();
@@ -187,7 +188,7 @@
 
 				}
 
-				for ( i = 0; i < 1500; ++i ) {
+				for ( i = 0; i < 1500; i ++ ) {
 
 					vector1 = new THREE.Vector3( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 );
 					vector1.multiplyScalar( r );
@@ -266,14 +267,7 @@
 
 				composer.reset();
 
-			}
-
-			function cap_bottom( val, bottom ) {
-
-				return val < bottom ? bottom : val;
-
 			};
-
 
 			function animate() {
 
@@ -284,18 +278,11 @@
 
 			};
 
-
-			function cap( val, bottom ) {
-
-				return val > bottom ? val : bottom;
-
-			};
-
 			function render() {
 
 				// rotate the planet and clouds
 
-				delta = this.getFrametime();
+				var delta = clock.getDelta();
 
 				meshPlanet.rotation.y += rotationSpeed * delta;
 				meshClouds.rotation.y += 1.25 * rotationSpeed * delta;
@@ -318,19 +305,10 @@
 				}
 
 				controls.movementSpeed = 0.33 * d;
-				controls.update();
+				controls.update( delta );
 
 				renderer.clear();
 				composer.render( delta );
-
-			};
-
-			function getFrametime() {
-
-				var now = new Date().getTime();
-				var tdiff = ( now - lastUpdate ) / 1000;
-				lastUpdate = now;
-				return tdiff;
 
 			};
 

@@ -77,6 +77,8 @@
 			worldHalfWidth = worldWidth / 2, worldHalfDepth = worldDepth / 2,
 			data = generateHeight( worldWidth, worldDepth );
 
+			var clock = new THREE.Clock();
+
 			init();
 			animate();
 
@@ -443,11 +445,8 @@
 				var ambientLight = new THREE.AmbientLight( 0xcccccc );
 				scene.add( ambientLight );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffffff, 1.5 );
-				directionalLight.position.x = 1;
-				directionalLight.position.y = 1;
-				directionalLight.position.z = 0.5;
-				directionalLight.position.normalize();
+				var directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
+				directionalLight.position.set( 1, 1, 0.5 ).normalize();
 				scene.add( directionalLight );
 
 				renderer = new THREE.WebGLRenderer();
@@ -503,7 +502,7 @@
 
 				}
 
-				return new THREE.MeshLambertMaterial( { map: texture } );
+				return new THREE.MeshLambertMaterial( { map: texture, ambient: 0xbbbbbb } );
 
 			}
 
@@ -802,7 +801,7 @@
 
 			function render() {
 
-				controls.update();
+				controls.update( clock.getDelta() );
 				renderer.render( scene, camera );
 
 			}

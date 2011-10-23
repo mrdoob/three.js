@@ -2,9 +2,9 @@
  * @author mikael emtinger / http://gomo.se/
  */
 
-THREE.SkinnedMesh = function( geometry, materials ) {
+THREE.SkinnedMesh = function( geometry, material ) {
 
-	THREE.Mesh.call( this, geometry, materials );
+	THREE.Mesh.call( this, geometry, material );
 
 	// init bones
 
@@ -16,7 +16,7 @@ THREE.SkinnedMesh = function( geometry, materials ) {
 
 	if ( this.geometry.bones !== undefined ) {
 
-		for ( b = 0; b < this.geometry.bones.length; b++ ) {
+		for ( b = 0; b < this.geometry.bones.length; b ++ ) {
 
 			gbone = this.geometry.bones[ b ];
 
@@ -27,7 +27,7 @@ THREE.SkinnedMesh = function( geometry, materials ) {
 			bone = this.addBone();
 
 			bone.name = gbone.name;
-			bone.position.set( p[0], p[1], p[2] ); 
+			bone.position.set( p[0], p[1], p[2] );
 			bone.quaternion.set( q[0], q[1], q[2], q[3] );
 			bone.useQuaternion = true;
 
@@ -43,18 +43,18 @@ THREE.SkinnedMesh = function( geometry, materials ) {
 
 		}
 
-		for ( b = 0; b < this.bones.length; b++ ) {
+		for ( b = 0; b < this.bones.length; b ++ ) {
 
 			gbone = this.geometry.bones[ b ];
 			bone = this.bones[ b ];
 
 			if ( gbone.parent === -1 ) {
 
-				this.addChild( bone );
+				this.add( bone );
 
 			} else {
 
-				this.bones[ gbone.parent ].addChild( bone );
+				this.bones[ gbone.parent ].add( bone );
 
 			}
 
@@ -115,7 +115,7 @@ THREE.SkinnedMesh.prototype.update = function ( parentMatrixWorld, forceUpdate, 
 
 		var child, i, l = this.children.length;
 
-		for ( i = 0; i < l; i++ ) {
+		for ( i = 0; i < l; i ++ ) {
 
 			child = this.children[ i ];
 
@@ -138,7 +138,7 @@ THREE.SkinnedMesh.prototype.update = function ( parentMatrixWorld, forceUpdate, 
 			ba = this.bones;
 			bm = this.boneMatrices;
 
-		for ( b = 0; b < bl; b++ ) {
+		for ( b = 0; b < bl; b ++ ) {
 
 			ba[ b ].skinMatrix.flattenToArrayOffset( bm, b * 16 );
 
@@ -150,7 +150,7 @@ THREE.SkinnedMesh.prototype.update = function ( parentMatrixWorld, forceUpdate, 
 
 
 /*
- * Add 
+ * Add
  */
 
 THREE.SkinnedMesh.prototype.addBone = function( bone ) {
@@ -177,7 +177,7 @@ THREE.SkinnedMesh.prototype.pose = function() {
 
 	var bim, bone, boneInverses = [];
 
-	for ( var b = 0; b < this.bones.length; b++ ) {
+	for ( var b = 0; b < this.bones.length; b ++ ) {
 
 		bone = this.bones[ b ];
 
@@ -187,7 +187,7 @@ THREE.SkinnedMesh.prototype.pose = function() {
 
 	}
 
-	// project vertices to local 
+	// project vertices to local
 
 	if ( this.geometry.skinVerticesA === undefined ) {
 
@@ -196,7 +196,7 @@ THREE.SkinnedMesh.prototype.pose = function() {
 
 		var orgVertex, vertex;
 
-		for ( var i = 0; i < this.geometry.skinIndices.length; i++ ) {
+		for ( var i = 0; i < this.geometry.skinIndices.length; i ++ ) {
 
 			orgVertex = this.geometry.vertices[ i ].position;
 

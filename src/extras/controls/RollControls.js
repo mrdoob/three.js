@@ -28,9 +28,6 @@ THREE.RollControls = function ( object, domElement ) {
 	this.forward = new THREE.Vector3( 0, 0, 1 );
 	this.roll = 0;
 
-	this.lastUpdate = -1;
-	this.delta = 0;
-
 	var xTemp = new THREE.Vector3();
 	var yTemp = new THREE.Vector3();
 	var zTemp = new THREE.Vector3();
@@ -45,25 +42,18 @@ THREE.RollControls = function ( object, domElement ) {
 
 	// custom update
 
-	this.update = function() {
-
-		var now = new Date().getTime();
-
-		if ( this.lastUpdate == -1 ) this.lastUpdate = now;
-
-		this.delta = ( now - this.lastUpdate ) / 1000;
-		this.lastUpdate = now;
+	this.update = function ( delta ) {
 
 		if ( this.mouseLook ) {
 
-			var actualLookSpeed = this.delta * this.lookSpeed;
+			var actualLookSpeed = delta * this.lookSpeed;
 
 			this.rotateHorizontally( actualLookSpeed * mouseX );
 			this.rotateVertically( actualLookSpeed * mouseY );
 
 		}
 
-		var actualSpeed = this.delta * this.movementSpeed;
+		var actualSpeed = delta * this.movementSpeed;
 		var forwardOrAuto = ( forwardSpeed > 0 || ( this.autoForward && ! ( forwardSpeed < 0 ) ) ) ? 1 : forwardSpeed;
 
 		this.object.translateZ( -actualSpeed * forwardOrAuto );
@@ -72,7 +62,7 @@ THREE.RollControls = function ( object, domElement ) {
 
 		if( doRoll ) {
 
-			this.roll += this.rollSpeed * this.delta * rollDirection;
+			this.roll += this.rollSpeed * delta * rollDirection;
 
 		}
 

@@ -13,19 +13,19 @@ THREE.JSONLoader.prototype = new THREE.Loader();
 THREE.JSONLoader.prototype.constructor = THREE.JSONLoader;
 THREE.JSONLoader.prototype.supr = THREE.Loader.prototype;
 
-
 THREE.JSONLoader.prototype.load = function ( url, callback, texturePath ) {
 
-	var scope = this, worker;
+	var worker, scope = this;
 
 	if ( url instanceof Object ) {
 
 		console.warn( 'DEPRECATED: JSONLoader( parameters ) is now JSONLoader( url, callback, texturePath ).' );
 
-		var object = url;
-		url = object.model;
-		callback = object.callback;
-		texturePath = object.texture_path;
+		var parameters = url;
+
+		url = parameters.model;
+		callback = parameters.callback;
+		texturePath = parameters.texture_path;
 
 	}
 
@@ -40,7 +40,7 @@ THREE.JSONLoader.prototype.load = function ( url, callback, texturePath ) {
 	};
 
 	this.onLoadStart();
-	worker.postMessage( new Date().getTime() );
+	worker.postMessage( Date.now() );
 
 };
 
@@ -50,7 +50,7 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texture_path
 	geometry = new THREE.Geometry(),
 	scale = ( json.scale !== undefined ) ? 1.0 / json.scale : 1.0;
 
-	this.init_materials( geometry, json.materials, texture_path );
+	this.initMaterials( geometry, json.materials, texture_path );
 
 	parseModel( scale );
 
@@ -177,7 +177,7 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texture_path
 			if ( hasMaterial ) {
 
 				materialIndex = faces[ offset ++ ];
-				face.materials = geometry.materials[ materialIndex ];
+				face.materialIndex = materialIndex;
 
 			}
 

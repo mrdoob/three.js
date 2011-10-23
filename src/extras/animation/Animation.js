@@ -37,17 +37,17 @@ THREE.Animation.prototype.play = function( loop, startTimeMS ) {
 
 		var h, hl = this.hierarchy.length,
 			object;
-		
+
 		for ( h = 0; h < hl; h++ ) {
 
 			object = this.hierarchy[ h ];
-			
+
 			if ( this.interpolationType !== THREE.AnimationHandler.CATMULLROM_FORWARD ) {
 
 				object.useQuaternion = true;
 
 			}
-			
+
 			object.matrixAutoUpdate = true;
 
 			if ( object.animationCache === undefined ) {
@@ -89,15 +89,15 @@ THREE.Animation.prototype.play = function( loop, startTimeMS ) {
 THREE.Animation.prototype.pause = function() {
 
 	if( this.isPaused ) {
-		
+
 		THREE.AnimationHandler.addToUpdate( this );
-		
+
 	} else {
-		
+
 		THREE.AnimationHandler.removeFromUpdate( this );
-		
+
 	}
-	
+
 	this.isPaused = !this.isPaused;
 
 };
@@ -110,31 +110,31 @@ THREE.Animation.prototype.stop = function() {
 	this.isPlaying = false;
 	this.isPaused  = false;
 	THREE.AnimationHandler.removeFromUpdate( this );
-	
-	
+
+
 	// reset JIT matrix and remove cache
-	
+
 	for ( var h = 0; h < this.hierarchy.length; h++ ) {
-		
+
 		if ( this.hierarchy[ h ].animationCache !== undefined ) {
-			
+
 			if( this.hierarchy[ h ] instanceof THREE.Bone ) {
-			
+
 				this.hierarchy[ h ].skinMatrix = this.hierarchy[ h ].animationCache.originalMatrix;
-				
+
 			} else {
-				
+
 				this.hierarchy[ h ].matrix = this.hierarchy[ h ].animationCache.originalMatrix;
 
 			}
-			
-			
+
+
 			delete this.hierarchy[ h ].animationCache;
 
 		}
 
 	}
- 	
+
 };
 
 
@@ -161,10 +161,10 @@ THREE.Animation.prototype.update = function( deltaTimeMS ) {
 	var JIThierarchy = this.data.JIT.hierarchy;
 	var currentTime, unloopedCurrentTime;
 	var currentPoint, forwardPoint, angle;
-	
+
 
 	// update
-	
+
 	this.currentTime += deltaTimeMS * this.timeScale;
 
 	unloopedCurrentTime = this.currentTime;
@@ -178,43 +178,43 @@ THREE.Animation.prototype.update = function( deltaTimeMS ) {
 
 		object = this.hierarchy[ h ];
 		animationCache = object.animationCache;
-	
+
 		// use JIT?
-	
+
 		if ( this.JITCompile && JIThierarchy[ h ][ frame ] !== undefined ) {
 
 			if( object instanceof THREE.Bone ) {
-				
+
 				object.skinMatrix = JIThierarchy[ h ][ frame ];
-				
+
 				object.matrixAutoUpdate = false;
 				object.matrixWorldNeedsUpdate = false;
 
 			} else {
-			
+
 				object.matrix = JIThierarchy[ h ][ frame ];
-				
+
 				object.matrixAutoUpdate = false;
 				object.matrixWorldNeedsUpdate = true;
 
 			}
-			
+
 		// use interpolation
-	
+
 		} else {
 
 			// make sure so original matrix and not JIT matrix is set
 
 			if ( this.JITCompile ) {
-				
+
 				if( object instanceof THREE.Bone ) {
-					
+
 					object.skinMatrix = object.animationCache.originalMatrix;
-					
+
 				} else {
-					
+
 					object.matrix = object.animationCache.originalMatrix;
-					
+
 				}
 
 			}
@@ -244,10 +244,10 @@ THREE.Animation.prototype.update = function( deltaTimeMS ) {
 							nextKey = this.getNextKeyWith( type, h, 1 );
 
 							while( nextKey.time < currentTime ) {
-	
+
 								prevKey = nextKey;
 								nextKey = this.getNextKeyWith( type, h, nextKey.index + 1 );
-	
+
 							}
 
 						} else {
@@ -286,7 +286,7 @@ THREE.Animation.prototype.update = function( deltaTimeMS ) {
 
 				if ( scale < 0 || scale > 1 ) {
 
-					console.log( "THREE.Animation.update: Warning! Scale out of bounds:" + scale + " on bone " + h ); 
+					console.log( "THREE.Animation.update: Warning! Scale out of bounds:" + scale + " on bone " + h );
 					scale = scale < 0 ? 0 : 1;
 
 				}
@@ -295,17 +295,17 @@ THREE.Animation.prototype.update = function( deltaTimeMS ) {
 
 				if ( type === "pos" ) {
 
-					vector = object.position; 
+					vector = object.position;
 
 					if( this.interpolationType === THREE.AnimationHandler.LINEAR ) {
-						
+
 						vector.x = prevXYZ[ 0 ] + ( nextXYZ[ 0 ] - prevXYZ[ 0 ] ) * scale;
 						vector.y = prevXYZ[ 1 ] + ( nextXYZ[ 1 ] - prevXYZ[ 1 ] ) * scale;
 						vector.z = prevXYZ[ 2 ] + ( nextXYZ[ 2 ] - prevXYZ[ 2 ] ) * scale;
 
 					} else if ( this.interpolationType === THREE.AnimationHandler.CATMULLROM ||
-							    this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {						
-		
+							    this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {
+
 						this.points[ 0 ] = this.getPrevKeyWith( "pos", h, prevKey.index - 1 )[ "pos" ];
 						this.points[ 1 ] = prevXYZ;
 						this.points[ 2 ] = nextXYZ;
@@ -314,23 +314,23 @@ THREE.Animation.prototype.update = function( deltaTimeMS ) {
 						scale = scale * 0.33 + 0.33;
 
 						currentPoint = this.interpolateCatmullRom( this.points, scale );
-						
+
 						vector.x = currentPoint[ 0 ];
 						vector.y = currentPoint[ 1 ];
 						vector.z = currentPoint[ 2 ];
-						
+
 						if( this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {
-							
-							forwardPoint = this.interpolateCatmullRom( this.points, scale * 1.01 );							
-							
+
+							forwardPoint = this.interpolateCatmullRom( this.points, scale * 1.01 );
+
 							this.target.set( forwardPoint[ 0 ], forwardPoint[ 1 ], forwardPoint[ 2 ] );
 							this.target.subSelf( vector );
 							this.target.y = 0;
 							this.target.normalize();
-							
+
 							angle = Math.atan2( this.target.x, this.target.z );
 							object.rotation.set( 0, angle, 0 );
-							
+
 						}
 
 					}
@@ -342,7 +342,7 @@ THREE.Animation.prototype.update = function( deltaTimeMS ) {
 				} else if( type === "scl" ) {
 
 					vector = object.scale;
-					
+
 					vector.x = prevXYZ[ 0 ] + ( nextXYZ[ 0 ] - prevXYZ[ 0 ] ) * scale;
 					vector.y = prevXYZ[ 1 ] + ( nextXYZ[ 1 ] - prevXYZ[ 1 ] ) * scale;
 					vector.z = prevXYZ[ 2 ] + ( nextXYZ[ 2 ] - prevXYZ[ 2 ] ) * scale;
@@ -358,25 +358,25 @@ THREE.Animation.prototype.update = function( deltaTimeMS ) {
 	// update JIT?
 
 	if ( this.JITCompile ) {
-		
+
 		if ( JIThierarchy[ 0 ][ frame ] === undefined ) {
-	
+
 			this.hierarchy[ 0 ].update( undefined, true );
-	
+
 			for ( var h = 0; h < this.hierarchy.length; h++ ) {
-	
+
 				if( this.hierarchy[ h ] instanceof THREE.Bone ) {
-	
+
 					JIThierarchy[ h ][ frame ] = this.hierarchy[ h ].skinMatrix.clone();
-					
+
 				} else {
-	
+
 					JIThierarchy[ h ][ frame ] = this.hierarchy[ h ].matrix.clone();
-				
+
 				}
-	
+
 			}
-	
+
 		}
 
 	}
@@ -384,18 +384,18 @@ THREE.Animation.prototype.update = function( deltaTimeMS ) {
 };
 
 // Catmull-Rom spline
- 
+
 THREE.Animation.prototype.interpolateCatmullRom = function ( points, scale ) {
 
 	var c = [], v3 = [],
 	point, intPoint, weight, w2, w3,
 	pa, pb, pc, pd;
-	
+
 	point = ( points.length - 1 ) * scale;
 	intPoint = Math.floor( point );
 	weight = point - intPoint;
 
-	c[ 0 ] = intPoint == 0 ? intPoint : intPoint - 1;
+	c[ 0 ] = intPoint === 0 ? intPoint : intPoint - 1;
 	c[ 1 ] = intPoint;
 	c[ 2 ] = intPoint > points.length - 2 ? intPoint : intPoint + 1;
 	c[ 3 ] = intPoint > points.length - 3 ? intPoint : intPoint + 2;
@@ -407,11 +407,11 @@ THREE.Animation.prototype.interpolateCatmullRom = function ( points, scale ) {
 
 	w2 = weight * weight;
 	w3 = weight * w2;
-	
+
 	v3[ 0 ] = this.interpolate( pa[ 0 ], pb[ 0 ], pc[ 0 ], pd[ 0 ], weight, w2, w3 );
 	v3[ 1 ] = this.interpolate( pa[ 1 ], pb[ 1 ], pc[ 1 ], pd[ 1 ], weight, w2, w3 );
 	v3[ 2 ] = this.interpolate( pa[ 2 ], pb[ 2 ], pc[ 2 ], pd[ 2 ], weight, w2, w3 );
-	
+
 	return v3;
 
 };
@@ -430,16 +430,16 @@ THREE.Animation.prototype.interpolate = function( p0, p1, p2, p3, t, t2, t3 ) {
 // Get next key with
 
 THREE.Animation.prototype.getNextKeyWith = function( type, h, key ) {
-	
+
 	var keys = this.data.hierarchy[ h ].keys;
-	
+
 	if ( this.interpolationType === THREE.AnimationHandler.CATMULLROM ||
 		 this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {
-			 
+
 		key = key < keys.length - 1 ? key : keys.length - 1;
 
 	} else {
-		
+
 		key = key % keys.length;
 
 	}
@@ -461,16 +461,16 @@ THREE.Animation.prototype.getNextKeyWith = function( type, h, key ) {
 // Get previous key with
 
 THREE.Animation.prototype.getPrevKeyWith = function( type, h, key ) {
-	
+
 	var keys = this.data.hierarchy[ h ].keys;
-	
+
 	if ( this.interpolationType === THREE.AnimationHandler.CATMULLROM ||
 		 this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {
-			 
+
 		key = key > 0 ? key : 0;
 
 	} else {
-		
+
 		key = key >= 0 ? key : key + keys.length;
 
 	}

@@ -13,12 +13,14 @@ import sys
 
 COMMON_FILES = [
 'Three.js',
+'core/Clock.js',
 'core/Color.js',
 'core/Vector2.js',
 'core/Vector3.js',
 'core/Vector4.js',
 'core/Ray.js',
 'core/Rectangle.js',
+'core/Math.js',
 'core/Matrix3.js',
 'core/Matrix4.js',
 'core/Object3D.js',
@@ -60,6 +62,7 @@ COMMON_FILES = [
 'objects/Mesh.js',
 'objects/Bone.js',
 'objects/SkinnedMesh.js',
+'objects/MorphAnimMesh.js',
 'objects/Ribbon.js',
 'objects/LOD.js',
 'objects/Sprite.js',

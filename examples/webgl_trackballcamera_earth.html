@@ -63,7 +63,7 @@
 			geometry, meshPlanet, meshClouds, meshMoon,
 			dirLight, ambientLight,
 
-			time = new Date().getTime();
+			clock = new THREE.Clock();
 
 			window.onload = function() {
 
@@ -187,7 +187,7 @@
 				vector,
 				starsGeometry = new THREE.Geometry();
 
-				for ( i = 0; i < 1500; i++ ) {
+				for ( i = 0; i < 1500; i ++ ) {
 
 					vector = new THREE.Vector3( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 );
 					vector.multiplyScalar( radius );
@@ -206,7 +206,7 @@
 					new THREE.ParticleBasicMaterial( { color: 0x1a1a1a, size: 1, sizeAttenuation: false } )
 				];
 
-				for ( i = 10; i < 30; i++ ) {
+				for ( i = 10; i < 30; i ++ ) {
 
 					stars = new THREE.ParticleSystem( starsGeometry, starsMaterials[ i % 6 ] );
 
@@ -262,14 +262,12 @@
 
 			function render() {
 
-				var t = new Date().getTime(),
-				dt = ( t - time ) / 1000;
-				time = t;
+				var delta = clock.getDelta();
 
-				meshPlanet.rotation.y += rotationSpeed * dt;
-				meshClouds.rotation.y += 1.25 * rotationSpeed * dt;
+				meshPlanet.rotation.y += rotationSpeed * delta;
+				meshClouds.rotation.y += 1.25 * rotationSpeed * delta;
 
-				var angle = dt * rotationSpeed;
+				var angle = delta * rotationSpeed;
 
 				meshMoon.position = new THREE.Vector3(
 					Math.cos( angle ) * meshMoon.position.x - Math.sin( angle ) * meshMoon.position.z,

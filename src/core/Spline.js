@@ -32,7 +32,7 @@ THREE.Spline = function ( points ) {
 		intPoint = Math.floor( point );
 		weight = point - intPoint;
 
-		c[ 0 ] = intPoint == 0 ? intPoint : intPoint - 1;
+		c[ 0 ] = intPoint === 0 ? intPoint : intPoint - 1;
 		c[ 1 ] = intPoint;
 		c[ 2 ] = intPoint > this.points.length - 2 ? intPoint : intPoint + 1;
 		c[ 3 ] = intPoint > this.points.length - 3 ? intPoint : intPoint + 2;

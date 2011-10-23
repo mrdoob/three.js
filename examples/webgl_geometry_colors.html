@@ -48,7 +48,7 @@
 
 			var camera, scene, renderer;
 
-			var mesh, mesh2, mesh3, light;
+			var mesh, group1, group2, group3, light;
 
 			var mouseX = 0, mouseY = 0;
 
@@ -100,7 +100,7 @@
 					geometry2 = new THREE.IcosahedronGeometry( 1 ),
 					geometry3 = new THREE.IcosahedronGeometry( 1 );
 
-				for ( var i = 0; i < geometry.faces.length; i++ ) {
+				for ( var i = 0; i < geometry.faces.length; i ++ ) {
 
 					f  = geometry.faces[ i ];
 					f2 = geometry2.faces[ i ];
@@ -137,27 +137,27 @@
 				var materials = [
 
 					new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors } ),
-					new THREE.MeshBasicMaterial( { color: 0x000000, shading: THREE.FlatShading, wireframe: true } )
+					new THREE.MeshBasicMaterial( { color: 0x000000, shading: THREE.FlatShading, wireframe: true, transparent: true } )
 
 				];
 
-				mesh = new THREE.Mesh( geometry, materials  );
-				mesh.position.x = -400;
-				mesh.scale.x = mesh.scale.y = mesh.scale.z = 200;
-				mesh.rotation.x = -1.87;
-				scene.add( mesh );
+				group1 = THREE.SceneUtils.createMultiMaterialObject( geometry, materials );
+				group1.position.x = -400;
+				group1.rotation.x = -1.87;
+				group1.scale.set( 200, 200, 200 );
+				scene.add( group1 );
 
-				mesh2 = new THREE.Mesh( geometry2, materials  );
-				mesh2.position.x = 400;
-				mesh2.rotation.x = 0;
-				mesh2.scale = mesh.scale;
-				scene.add( mesh2 );
+				group2 = THREE.SceneUtils.createMultiMaterialObject( geometry2, materials );
+				group2.position.x = 400;
+				group2.rotation.x = 0;
+				group2.scale = group1.scale;
+				scene.add( group2 );
 
-				mesh3 = new THREE.Mesh( geometry3, materials  );
-				mesh3.position.x = 0;
-				mesh3.rotation.x = 0;
-				mesh3.scale = mesh.scale;
-				scene.add( mesh3 );
+				group3 = THREE.SceneUtils.createMultiMaterialObject( geometry3, materials );
+				group3.position.x = 0;
+				group3.rotation.x = 0;
+				group3.scale = group1.scale;
+				scene.add( group3 );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );

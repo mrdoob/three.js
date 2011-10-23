@@ -47,7 +47,7 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var container, timer;
+			var container;
 
 			var camera, scene, renderer;
 
@@ -166,7 +166,7 @@
 
 			function render() {
 
-				timer = new Date().getTime() * 0.0001;
+				var timer = 0.0001 * Date.now();
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;

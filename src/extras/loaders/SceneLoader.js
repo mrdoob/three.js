@@ -134,12 +134,14 @@ THREE.SceneLoader.prototype = {
 
 								var hasNormals = false;
 
-								materials = [];
-								for( i = 0; i < o.materials.length; i++ ) {
+								// not anymore support for multiple materials
+								// shouldn't really be array
 
-									materials[ i ] = result.materials[ o.materials[i] ];
+								for( i = 0; i < o.materials.length; i ++ ) {
 
-									hasNormals = materials[ i ] instanceof THREE.ShaderMaterial;
+									materials = result.materials[ o.materials[ i ] ];
+
+									hasNormals = materials instanceof THREE.ShaderMaterial;
 
 								}
 
@@ -160,7 +162,7 @@ THREE.SceneLoader.prototype = {
 
 								if ( materials.length == 0 ) {
 
-									materials[ 0 ] = new THREE.MeshFaceMaterial();
+									materials = new THREE.MeshFaceMaterial();
 
 								}
 
@@ -169,7 +171,7 @@ THREE.SceneLoader.prototype = {
 
 								if ( materials.length > 1 ) {
 
-									materials = [ new THREE.MeshFaceMaterial() ];
+									materials = new THREE.MeshFaceMaterial();
 
 								}
 
@@ -516,15 +518,11 @@ THREE.SceneLoader.prototype = {
 
 				} else if ( g.type == "bin_mesh" ) {
 
-					binLoader.load( { model: get_url( g.url, data.urlBaseType ),
-									  callback: create_callback( dg )
-									} );
+					binLoader.load( get_url( g.url, data.urlBaseType ), create_callback( dg ) );
 
 				} else if ( g.type == "ascii_mesh" ) {
 
-					jsonLoader.load( { model: get_url( g.url, data.urlBaseType ),
-									   callback: create_callback( dg )
-									} );
+					jsonLoader.load( get_url( g.url, data.urlBaseType ), create_callback( dg ) );
 
 				} else if ( g.type == "embedded_mesh" ) {
 

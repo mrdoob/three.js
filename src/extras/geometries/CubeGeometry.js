@@ -12,6 +12,8 @@ THREE.CubeGeometry = function ( width, height, depth, segmentsWidth, segmentsHei
 	height_half = height / 2,
 	depth_half = depth / 2;
 
+	var mpx, mpy, mpz, mnx, mny, mnz;
+
 	if ( materials !== undefined ) {
 
 		if ( materials instanceof Array ) {
@@ -24,11 +26,13 @@ THREE.CubeGeometry = function ( width, height, depth, segmentsWidth, segmentsHei
 
 			for ( var i = 0; i < 6; i ++ ) {
 
-				this.materials.push( [ materials ] );
+				this.materials.push( materials );
 
 			}
 
 		}
+
+		mpx = 0; mnx = 1; mpy = 2; mny = 3; mpz = 4; mnz = 5;
 
 	} else {
 
@@ -52,12 +56,12 @@ THREE.CubeGeometry = function ( width, height, depth, segmentsWidth, segmentsHei
 
 	}
 
-	this.sides.px && buildPlane( 'z', 'y', - 1, - 1, depth, height, width_half, this.materials[ 0 ] ); // px
-	this.sides.nx && buildPlane( 'z', 'y',   1, - 1, depth, height, - width_half, this.materials[ 1 ] );   // nx
-	this.sides.py && buildPlane( 'x', 'z',   1,   1, width, depth, height_half, this.materials[ 2 ] );   // py
-	this.sides.ny && buildPlane( 'x', 'z',   1, - 1, width, depth, - height_half, this.materials[ 3 ] ); // ny
-	this.sides.pz && buildPlane( 'x', 'y',   1, - 1, width, height, depth_half, this.materials[ 4 ] );   // pz
-	this.sides.nz && buildPlane( 'x', 'y', - 1, - 1, width, height, - depth_half, this.materials[ 5 ] ); // nz
+	this.sides.px && buildPlane( 'z', 'y', - 1, - 1, depth, height, width_half, mpx ); 	 // px
+	this.sides.nx && buildPlane( 'z', 'y',   1, - 1, depth, height, - width_half, mnx ); // nx
+	this.sides.py && buildPlane( 'x', 'z',   1,   1, width, depth, height_half, mpy );   // py
+	this.sides.ny && buildPlane( 'x', 'z',   1, - 1, width, depth, - height_half, mny ); // ny
+	this.sides.pz && buildPlane( 'x', 'y',   1, - 1, width, height, depth_half, mpz );   // pz
+	this.sides.nz && buildPlane( 'x', 'y', - 1, - 1, width, height, - depth_half, mnz ); // nz
 
 	this.mergeVertices();
 
@@ -70,16 +74,16 @@ THREE.CubeGeometry = function ( width, height, depth, segmentsWidth, segmentsHei
 		height_half = height / 2,
 		offset = scope.vertices.length;
 
-		if ( ( u == 'x' && v == 'y' ) || ( u == 'y' && v == 'x' ) ) {
+		if ( ( u === 'x' && v === 'y' ) || ( u === 'y' && v === 'x' ) ) {
 
 			w = 'z';
 
-		} else if ( ( u == 'x' && v == 'z' ) || ( u == 'z' && v == 'x' ) ) {
+		} else if ( ( u === 'x' && v === 'z' ) || ( u === 'z' && v === 'x' ) ) {
 
 			w = 'y';
 			gridY = segmentsDepth || 1;
 
-		} else if ( ( u == 'z' && v == 'y' ) || ( u == 'y' && v == 'z' ) ) {
+		} else if ( ( u === 'z' && v === 'y' ) || ( u === 'y' && v === 'z' ) ) {
 
 			w = 'x';
 			gridX = segmentsDepth || 1;
@@ -91,9 +95,9 @@ THREE.CubeGeometry = function ( width, height, depth, segmentsWidth, segmentsHei
 		segment_width = width / gridX,
 		segment_height = height / gridY;
 
-		for( iy = 0; iy < gridY1; iy++ ) {
+		for( iy = 0; iy < gridY1; iy ++ ) {
 
-			for( ix = 0; ix < gridX1; ix++ ) {
+			for( ix = 0; ix < gridX1; ix ++ ) {
 
 				var vector = new THREE.Vector3();
 				vector[ u ] = ( ix * segment_width - width_half ) * udir;

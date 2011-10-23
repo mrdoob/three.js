@@ -200,7 +200,7 @@
 
 			//
 
-			function onDocumentMouseMove(event) {
+			function onDocumentMouseMove( event ) {
 
 				mouseX = event.clientX - windowHalfX;
 				mouseY = event.clientY - windowHalfY;
@@ -245,11 +245,11 @@
 
 				camera.lookAt( scene.position );
 
-				var time = new Date().getTime() * 0.0005;
+				var time = Date.now() * 0.0005;
 
 				for( var i = 0; i < scene.objects.length; i ++ ) {
 
-					scene.objects[ i ].rotation.y = time * ( i % 2 ? 1 : -1);
+					scene.objects[ i ].rotation.y = time * ( i % 2 ? 1 : -1 );
 
 				}
 

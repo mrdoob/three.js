@@ -791,7 +791,8 @@ THREE.Matrix4.makeInvert3x3 = function ( m1 ) {
 	idet;
 
 	// no inverse
-	if ( det == 0 ) {
+
+	if ( det === 0 ) {
 
 		console.error( 'THREE.Matrix4.makeInvert3x3: Matrix not invertible.' );
 

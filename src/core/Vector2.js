@@ -156,7 +156,7 @@ THREE.Vector2.prototype = {
 
 	equals: function( v ) {
 
-		return ( ( v.x == this.x ) && ( v.y == this.y ) );
+		return ( ( v.x === this.x ) && ( v.y === this.y ) );
 
 	}
 

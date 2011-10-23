@@ -93,7 +93,7 @@
 				scene.add( directionalLight );
 
 				pointLight = new THREE.PointLight( 0xffffff, 4 );
-				pointLight.position.x = 10000;
+				pointLight.position = particleLight.position;
 				scene.add( pointLight );
 
 				renderer = new THREE.WebGLRenderer();
@@ -145,7 +145,7 @@
 
 			function render() {
 
-				var timer = new Date().getTime() * 0.0005;
+				var timer = Date.now() * 0.0005;
 
 				camera.position.x = Math.cos( timer ) * 10;
 				camera.position.y = 2;
@@ -156,10 +156,6 @@
 				particleLight.position.x = Math.sin( timer * 4 ) * 3009;
 				particleLight.position.y = Math.cos( timer * 5 ) * 4000;
 				particleLight.position.z = Math.cos( timer * 4 ) * 3009;
-
-				pointLight.position.x = particleLight.position.x;
-				pointLight.position.y = particleLight.position.y;
-				pointLight.position.z = particleLight.position.z;
 
 				renderer.render( scene, camera );
 

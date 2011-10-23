@@ -61,8 +61,10 @@
 					mesh.position.x = Math.random() * 2000 - 1000;
 					mesh.position.y = Math.random() * 2000 - 1000;
 					mesh.position.z = Math.random() * 2000 - 1000;
+
 					mesh.rotation.x = Math.random() * 360 * ( Math.PI / 180 );
 					mesh.rotation.y = Math.random() * 360 * ( Math.PI / 180 );
+
 					mesh.matrixAutoUpdate = false;
 					mesh.updateMatrix();
 
@@ -106,9 +108,11 @@
 
 			function render() {
 
-				var rx = Math.sin( new Date().getTime() * 0.0007 ) * 0.5,
-				ry = Math.sin( new Date().getTime() * 0.0003 ) * 0.5,
-				rz = Math.sin( new Date().getTime() * 0.0002 ) * 0.5;
+				var time = Date.now() * 0.001;
+
+				var rx = Math.sin( time * 0.7 ) * 0.5,
+					ry = Math.sin( time * 0.3 ) * 0.5,
+					rz = Math.sin( time * 0.2 ) * 0.5;
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;

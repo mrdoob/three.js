@@ -28,7 +28,7 @@ THREE.TexturePass.prototype = {
 
 	render: function ( renderer, writeBuffer, readBuffer, delta ) {
 
-		THREE.EffectComposer.quad.materials[ 0 ] = this.material;
+		THREE.EffectComposer.quad.material = this.material;
 
 		renderer.render( THREE.EffectComposer.scene, THREE.EffectComposer.camera, readBuffer );
 

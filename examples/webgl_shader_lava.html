@@ -121,7 +121,7 @@
 
 			var container, stats;
 
-			var start_time;
+			var clock = new THREE.Clock();
 
 			var camera, scene, renderer, composer;
 
@@ -144,8 +144,6 @@
 				camera.position.z = 4;
 
 				scene = new THREE.Scene();
-
-				start_time = new Date().getTime();
 
 				uniforms = {
 
@@ -172,9 +170,7 @@
 
 				} );
 
-				mesh = new THREE.Mesh( new THREE.TorusGeometry( size, 0.3, 30, 30 ), [ material /*, new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, wireframeLinewidth: 2 } ) */ ] );
-				mesh.position.x = 0;
-				mesh.position.y = 0;
+				mesh = new THREE.Mesh( new THREE.TorusGeometry( size, 0.3, 30, 30 ), material );
 				mesh.rotation.x = 0.3;
 				scene.add( mesh );
 
@@ -240,10 +236,12 @@
 
 			function render() {
 
-				uniforms.time.value += 0.02;
+				var delta = 5 * clock.getDelta();
 
-				mesh.rotation.y += 0.00125;
-				mesh.rotation.x += 0.005;
+				uniforms.time.value += 0.2 * delta;
+
+				mesh.rotation.y += 0.0125 * delta;
+				mesh.rotation.x += 0.05 * delta;
 
 				renderer.clear();
 				composer.render( 0.01 );
