@@ -64,8 +64,7 @@
 				loader = new THREE.JSONLoader();
 				loader.load( 'obj/WaltHeadLo.js', function ( geometry ) {
 
-					mesh = new THREE.Mesh( geometry, new THREE.MeshNormalMaterial() );
-					mesh.overdraw = true;
+					mesh = new THREE.Mesh( geometry, new THREE.MeshNormalMaterial( { overdraw: true } ) );
 					scene.add( mesh );
 
 				} );

@@ -75,12 +75,11 @@
 				// Spheres
 
 				geometry = new THREE.SphereGeometry( 100, 26, 18 );
-				material = new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, opacity: 1 } );
+				material = new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, overdraw: true } );
 
 				for ( var i = 0; i < 20; i ++ ) {
 
 					sphere = new THREE.Mesh( geometry, material );
-					sphere.overdraw = true;
 
 					sphere.position.x = ( i % 5 ) * 200 - 400;
 					sphere.position.z = Math.floor( i / 5 ) * 200 - 400;

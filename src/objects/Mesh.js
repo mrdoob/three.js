@@ -11,8 +11,12 @@ THREE.Mesh = function ( geometry, material ) {
 	this.geometry = geometry;
 	this.material = material;
 
-	this.overdraw = false; // TODO: Move to material?
+	if ( material instanceof Array ) {
 
+		console.warn( 'DEPRECATE: Material array is no longer supported. Using material 0...' );
+		this.material = material[ 0 ];
+
+	}
 
 	if ( this.geometry ) {
 

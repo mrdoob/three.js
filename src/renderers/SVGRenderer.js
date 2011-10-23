@@ -81,7 +81,7 @@ THREE.SVGRenderer = function () {
 
 	this.render = function ( scene, camera ) {
 
-		var e, el, m, ml, fm, fml, element, material;
+		var e, el, element, material;
 
 		this.autoClear && this.clear();
 
@@ -106,6 +106,11 @@ THREE.SVGRenderer = function () {
 
 			element = _elements[ e ];
 
+			material = element.material;
+			material = material instanceof THREE.MeshFaceMaterial ? element.faceMaterial : material;
+
+			if ( material == null || material.opacity == 0 ) continue;
+
 			_bboxRect.empty();
 
 			if ( element instanceof THREE.RenderableParticle ) {
@@ -115,12 +120,7 @@ THREE.SVGRenderer = function () {
 
 				m = 0; ml = element.materials.length;
 
-				while ( m < ml ) {
-
-					material = element.materials[ m ++ ];
-					material && renderParticle( _v1, element, material, scene );
-
-				}
+				renderParticle( _v1, element, material, scene );
 
 			} else if ( element instanceof THREE.RenderableLine ) {
 
@@ -138,14 +138,7 @@ THREE.SVGRenderer = function () {
 
 				}
 
-				m = 0; ml = element.materials.length;
-
-				while ( m < ml ) {
-
-					material = element.materials[ m ++ ];
-					material && material.opacity != 0 && renderLine( _v1, _v2, element, material, scene );
-
-				}
+				renderLine( _v1, _v2, element, material, scene );
 
 			} else if ( element instanceof THREE.RenderableFace3 ) {
 
@@ -165,30 +158,7 @@ THREE.SVGRenderer = function () {
 
 				}
 
-				m = 0; ml = element.meshMaterials.length;
-
-				while ( m < ml ) {
-
-					material = element.meshMaterials[ m ++ ];
-
-					if ( material instanceof THREE.MeshFaceMaterial ) {
-
-						fm = 0; fml = element.faceMaterials.length;
-
-						while ( fm < fml ) {
-
-							material = element.faceMaterials[ fm ++ ];
-							material && material.opacity != 0 && renderFace3( _v1, _v2, _v3, element, material, scene );
-
-						}
-
-						continue;
-
-					}
-
-					material && material.opacity != 0 && renderFace3( _v1, _v2, _v3, element, material, scene );
-
-				}
+				renderFace3( _v1, _v2, _v3, element, material, scene );
 
 			} else if ( element instanceof THREE.RenderableFace4 ) {
 
@@ -210,30 +180,7 @@ THREE.SVGRenderer = function () {
 
 				}
 
-				m = 0; ml = element.meshMaterials.length;
-
-				while ( m < ml ) {
-
-					material = element.meshMaterials[ m ++ ];
-
-					if ( material instanceof THREE.MeshFaceMaterial ) {
-
-						fm = 0; fml = element.faceMaterials.length;
-
-						while ( fm < fml ) {
-
-							material = element.faceMaterials[ fm ++ ];
-							material && material.opacity != 0 && renderFace4( _v1, _v2, _v3, _v4, element, material, scene );
-
-						}
-
-						continue;
-
-					}
-
-					material && material.opacity != 0 && renderFace4( _v1, _v2, _v3, _v4, element, material, scene );
-
-				}
+				renderFace4( _v1, _v2, _v3, _v4, element, material, scene );
 
 			}
 

@@ -173,7 +173,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	this.render = function ( scene, camera ) {
 
-		var e, el, element, m, ml, fm, fml, material;
+		var e, el, element, material;
 
 		this.autoClear ? this.clear() : _context.setTransform( 1, 0, 0, - 1, _canvasWidthHalf, _canvasHeightHalf );
 
@@ -201,6 +201,11 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			element = _elements[ e ];
 
+			material = element.material;
+			material = material instanceof THREE.MeshFaceMaterial ? element.faceMaterial : material;
+
+			if ( material == null || material.opacity == 0 ) continue;
+
 			_bboxRect.empty();
 
 			if ( element instanceof THREE.RenderableParticle ) {
@@ -208,14 +213,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 				_v1 = element;
 				_v1.x *= _canvasWidthHalf; _v1.y *= _canvasHeightHalf;
 
-				m = 0; ml = element.materials.length;
-
-				while( m < ml ) {
-
-					material = element.materials[ m ++ ];
-					material.opacity != 0 && renderParticle( _v1, element, material, scene );
-
-				}
+				renderParticle( _v1, element, material, scene );
 
 			} else if ( element instanceof THREE.RenderableLine ) {
 
@@ -229,14 +227,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				if ( _clipRect.intersects( _bboxRect ) ) {
 
-					m = 0; ml = element.materials.length;
-
-					while ( m < ml ) {
-
-						material = element.materials[ m ++ ];
-						material.opacity != 0 && renderLine( _v1, _v2, element, material, scene );
-
-					}
+					renderLine( _v1, _v2, element, material, scene );
 
 				}
 
@@ -249,7 +240,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 				_v2.positionScreen.x *= _canvasWidthHalf; _v2.positionScreen.y *= _canvasHeightHalf;
 				_v3.positionScreen.x *= _canvasWidthHalf; _v3.positionScreen.y *= _canvasHeightHalf;
 
-				if ( element.overdraw ) {
+				if ( material.overdraw ) {
 
 					expand( _v1.positionScreen, _v2.positionScreen );
 					expand( _v2.positionScreen, _v3.positionScreen );
@@ -263,30 +254,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				if ( _clipRect.intersects( _bboxRect ) ) {
 
-					m = 0; ml = element.meshMaterials.length;
-
-					while ( m < ml ) {
-
-						material = element.meshMaterials[ m ++ ];
-
-						if ( material instanceof THREE.MeshFaceMaterial ) {
-
-							fm = 0; fml = element.faceMaterials.length;
-
-							while ( fm < fml ) {
-
-								material = element.faceMaterials[ fm ++ ];
-								material && material.opacity != 0 && renderFace3( _v1, _v2, _v3, 0, 1, 2, element, material, scene );
-
-							}
-
-							continue;
-
-						}
-
-						material.opacity != 0 && renderFace3( _v1, _v2, _v3, 0, 1, 2, element, material, scene );
-
-					}
+					renderFace3( _v1, _v2, _v3, 0, 1, 2, element, material, scene );
 
 				}
 
@@ -302,7 +270,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 				_v5.positionScreen.copy( _v2.positionScreen );
 				_v6.positionScreen.copy( _v4.positionScreen );
 
-				if ( element.overdraw ) {
+				if ( material.overdraw ) {
 
 					expand( _v1.positionScreen, _v2.positionScreen );
 					expand( _v2.positionScreen, _v4.positionScreen );
@@ -320,30 +288,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				if ( _clipRect.intersects( _bboxRect ) ) {
 
-					m = 0; ml = element.meshMaterials.length;
-
-					while ( m < ml ) {
-
-						material = element.meshMaterials[ m ++ ];
-
-						if ( material instanceof THREE.MeshFaceMaterial ) {
-
-							fm = 0; fml = element.faceMaterials.length;
-
-							while ( fm < fml ) {
-
-								material = element.faceMaterials[ fm ++ ];
-								material && material.opacity != 0 && renderFace4( _v1, _v2, _v3, _v4, _v5, _v6, element, material, scene );
-
-							}
-
-							continue;
-
-						}
-
-						material.opacity != 0 && renderFace4( _v1, _v2, _v3, _v4, _v5, _v6, element, material, scene );
-
-					}
+					material.opacity != 0 && renderFace4( _v1, _v2, _v3, _v4, _v5, _v6, element, material, scene );
 
 				}
 

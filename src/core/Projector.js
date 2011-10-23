@@ -144,8 +144,8 @@ THREE.Projector = function() {
 
 		var near = camera.near, far = camera.far,
 		o, ol, v, vl, f, fl, n, nl, c, cl, u, ul, object,
-		objectMatrixWorld, objectMatrixWorldRotation, objectMaterials, objectOverdraw,
-		geometry, vertices, vertex, vertexPositionScreen,
+		objectMatrixWorld, objectMatrixWorldRotation, objectMaterial,
+		geometry, geometryMaterials, vertices, vertex, vertexPositionScreen,
 		faces, face, faceVertexNormals, normal, faceVertexUvs, uvs,
 		v1, v2, v3, v4;
 
@@ -178,14 +178,14 @@ THREE.Projector = function() {
 			object = _renderData.objects[ o ];
 
 			objectMatrixWorld = object.matrixWorld;
-			objectMaterials = object.materials;
-			objectOverdraw = object.overdraw;
+			objectMaterial = object.material;
 
 			_vertexCount = 0;
 
 			if ( object instanceof THREE.Mesh ) {
 
 				geometry = object.geometry;
+				geometryMaterials = object.geometry.materials;
 				vertices = geometry.vertices;
 				faces = geometry.faces;
 				faceVertexUvs = geometry.faceVertexUvs;
@@ -298,9 +298,8 @@ THREE.Projector = function() {
 
 					}
 
-					_face.meshMaterials = objectMaterials;
-					_face.faceMaterials = face.materials;
-					_face.overdraw = objectOverdraw;
+					_face.material = objectMaterial;
+					_face.faceMaterial = face.materialIndex !== null ? geometryMaterials[ face.materialIndex ] : null;
 
 					_face.z = _face.centroidScreen.z;
 
@@ -317,7 +316,7 @@ THREE.Projector = function() {
 			object = _renderData.lines[ o ];
 
 			objectMatrixWorld = object.matrixWorld;
-			objectMaterials = object.materials;
+			objectMaterial = object.material;
 
 			_vertexCount = 0;
 
@@ -354,7 +353,7 @@ THREE.Projector = function() {
 
 						_line.z = Math.max( _clippedVertex1PositionScreen.z, _clippedVertex2PositionScreen.z );
 
-						_line.materials = objectMaterials;
+						_line.material = objectMaterial;
 
 						_renderData.elements.push( _line );
 
@@ -389,7 +388,7 @@ THREE.Projector = function() {
 					_particle.scale.x = object.scale.x * Math.abs( _particle.x - ( _vector4.x + camera.projectionMatrix.n11 ) / ( _vector4.w + camera.projectionMatrix.n14 ) );
 					_particle.scale.y = object.scale.y * Math.abs( _particle.y - ( _vector4.y + camera.projectionMatrix.n22 ) / ( _vector4.w + camera.projectionMatrix.n24 ) );
 
-					_particle.materials = object.materials;
+					_particle.material = object.material;
 
 					_renderData.elements.push( _particle );
 

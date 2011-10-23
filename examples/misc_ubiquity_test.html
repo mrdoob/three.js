@@ -128,9 +128,11 @@
 				mesh.doubleSided = true;
 				group.add( mesh );
 
+				/*
 				mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, transparent: true, wireframe: true, wireframeLinewidth: 10 } ) );
 				mesh.doubleSided = true;
 				group.add( mesh );
+				*/
 
 				// LIGHTS
 
@@ -194,9 +196,9 @@
 				qrcode.rotation.z += 0.02;
 				*/
 
-				//canvasRenderer.render( scene, camera );
-				//svgRenderer.render( scene, camera );
-				webglRenderer.render( scene, camera );
+				canvasRenderer.render( scene, camera );
+				svgRenderer.render( scene, camera );
+				// webglRenderer.render( scene, camera );
 
 			}
 

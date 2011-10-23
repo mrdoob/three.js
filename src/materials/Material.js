@@ -24,6 +24,8 @@ THREE.Material = function ( parameters ) {
 
 	this.alphaTest = parameters.alphaTest !== undefined ? parameters.alphaTest : 0;
 
+	this.overdraw = parameters.overdraw !== undefined ? parameters.overdraw : false; // Boolean for fixing antialiasing gaps in CanvasRenderer 
+
 }
 
 THREE.MaterialCount = 0;

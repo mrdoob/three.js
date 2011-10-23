@@ -81,12 +81,11 @@
 				// Spheres
 
 				geometry = new THREE.CubeGeometry( 100, 100, 100 );
-				material = new THREE.MeshDepthMaterial( { near: 1, far: 2000 } );
+				material = new THREE.MeshDepthMaterial( { near: 1, far: 2000, overdraw: true } );
 
 				for ( var i = 0; i < 20; i ++ ) {
 
 					cube = new THREE.Mesh( geometry, material );
-					cube.overdraw = true;
 
 					cube.position.x = ( i % 5 ) * 200 - 400;
 					cube.position.z = Math.floor( i / 5 ) * 200 - 350;
