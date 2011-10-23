@@ -11,7 +11,7 @@ THREE.Projector = function() {
 	_line, _lineCount, _linePool = [],
 	_particle, _particleCount, _particlePool = [],
 
-	_renderData = { objects: [], lines: [], sprites: [], lights: [], elements: [] },
+	_renderData = { objects: [], sprites: [], lights: [], elements: [] },
 
 	_vector3 = new THREE.Vector3(),
 	_vector4 = new THREE.Vector4(),
@@ -100,7 +100,6 @@ THREE.Projector = function() {
 	this.projectGraph = function ( object ) {
 
 		_renderData.objects.length = 0;
-		_renderData.lines.length = 0;
 		_renderData.sprites.length = 0;
 		_renderData.lights.length = 0;
 
@@ -114,7 +113,7 @@ THREE.Projector = function() {
 
 			} else if ( object instanceof THREE.Line ) {
 
-				_renderData.lines.push( object );
+				_renderData.objects.push( object );
 
 			} else if ( object instanceof THREE.Sprite || object instanceof THREE.Particle ) {
 
@@ -307,20 +306,7 @@ THREE.Projector = function() {
 
 				}
 
-			}
-
-		}
-
-		for ( o = 0, ol = _renderData.lines.length; o < ol; o++ ) {
-
-			object = _renderData.lines[ o ];
-
-			objectMatrixWorld = object.matrixWorld;
-			objectMaterial = object.material;
-
-			_vertexCount = 0;
-
-			if ( object instanceof THREE.Line ) {
+			} else if ( object instanceof THREE.Line ) {
 
 				_projScreenobjectMatrixWorld.multiply( _projScreenMatrix, objectMatrixWorld );
 
@@ -358,9 +344,11 @@ THREE.Projector = function() {
 						_renderData.elements.push( _line );
 
 					}
+
 				}
 
 			}
+
 		}
 
 		for ( o = 0, ol = _renderData.sprites.length; o < ol; o++ ) {
