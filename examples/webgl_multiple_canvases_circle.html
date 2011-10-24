@@ -152,11 +152,13 @@
 
 			function init() {
 
-        function degToRad(d) {
-          return d * Math.PI / 180;
-        }
+				function degToRad( d ) {
 
-				var rot = degToRad(30);
+					return d * Math.PI / 180;
+
+				}
+
+				var rot = degToRad( 30 );
 
 				var fudge = 0.45; // I don't know why this is needed :-(
 
@@ -165,20 +167,22 @@
 				apps.push( new App( 'container3', rot *  0 * fudge ) );
 				apps.push( new App( 'container4', rot *  1 * fudge ) );
 				apps.push( new App( 'container5', rot *  2 * fudge ) );
+
 			}
 
 			function animate() {
 
-				for ( var i = 0; i < apps.length; ++i ) {
+				for ( var i = 0; i < apps.length; ++ i ) {
 
 					apps[ i ].animate();
 
 				}
 
 				requestAnimationFrame( animate );
+
 			}
 
-			function App( containerId, rotateY) {
+			function App( containerId, rotateY ) {
 
 				var container;
 
@@ -199,19 +203,21 @@
 					container = document.getElementById( containerId );
 
 					camera = new THREE.PerspectiveCamera( 20, container.clientWidth / container.clientHeight, 1, 20000 );
-					camera.rotation.setY(rotateY);
+					camera.rotation.setY( rotateY );
 
 					// Think of the virtual camera as a post with 5 cameras on it (even though those cameras happen to live in difference scenes)
 					// You need to move the post (ie, the virtualCamera) to move all 5 cameras together.
+
 					virtualCamera = new THREE.Camera();
-					virtualCamera.add(camera);
+					virtualCamera.add( camera );
 					virtualCamera.position.z = cameraZ;
 
 					scene = new THREE.Scene();
 
+					scene.add( virtualCamera );
+
 					light = new THREE.DirectionalLight( 0xffffff );
-					light.position.set( 0, 0, 1 );
-					light.position.normalize();
+					light.position.set( 0, 0, 1 ).normalize();
 					scene.add( light );
 
 					var noof_balls = 51;
@@ -223,7 +229,7 @@
 
 						var mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
 						mesh.position.y = - 250;
-						mesh.position.x = - (noof_balls - 1) /2 *400 + i * 400;
+						mesh.position.x = - ( noof_balls - 1 ) / 2 *400 + i * 400;
 						mesh.rotation.x = - 90 * Math.PI / 180;
 						scene.add( mesh );
 
@@ -273,7 +279,7 @@
 
 						var mesh = THREE.SceneUtils.createMultiMaterialObject( geometry1, materials );
 
-						mesh.position.x = - (noof_balls - 1) /2 *400 + i *400;
+						mesh.position.x = - ( noof_balls - 1 ) / 2 *400 + i *400;
 						mesh.rotation.x = i * 0.5;
 						scene.add( mesh );
 
@@ -286,33 +292,51 @@
 
 					document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 					document.addEventListener( 'mousewheel', onDocumentMouseWheel, false );
+
 				}
 
-				function onDocumentMouseMove( event ) {
+				function onDocumentMouseMove ( event ) {
+
 					mouseX = ( event.clientX - windowHalfX );
 					mouseY = ( event.clientY - windowHalfY );
+
 				}
 
-				function onDocumentMouseWheel (event ) {
+				function onDocumentMouseWheel ( event ) {
 
 					var delta = 0;
-					if (event.wheelDelta) {
+
+					if ( event.wheelDelta ) {
+
 						delta = event.wheelDelta / 120;
-						if (window.opera) delta = -delta;
-					} else if (event.detail) {
+						if ( window.opera ) delta = -delta;
+
+					} else if ( event.detail ) {
+
 						delta = -event.detail / 3;
+
 					}
-					if (delta) {
-						if (delta < 0) {
-    							cameraZ -= 200;
+
+					if ( delta ) {
+
+						if ( delta < 0 ) {
+
+							cameraZ -= 200;
+
 						} else {
+
 							cameraZ += 200;
+
 						}
+
 					}
+
 				}
 
 				this.animate = function() {
+
 					render();
+
 				};
 
 				function render() {
@@ -324,7 +348,9 @@
 					virtualCamera.lookAt( scene.position );
 
 					renderer.render( scene, camera );
+
 				}
+
 			}
 
 		</script>
