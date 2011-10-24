@@ -1,11 +1,13 @@
 /**
  * @author mikael emtinger / http://gomo.se/
+ * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.LOD = function() {
+THREE.LOD = function( camera ) {
 
 	THREE.Object3D.call( this );
 
+	this.camera = camera;
 	this.LODs = [];
 
 };
@@ -43,28 +45,17 @@ THREE.LOD.prototype.addLevel = function ( object3D, visibleAtDistance ) {
 
 };
 
+THREE.LOD.prototype.updateMatrixWorld = function ( force ) {
 
-/*
- * Update
- */
+	this.matrixAutoUpdate && this.updateMatrix();
 
-THREE.LOD.prototype.update = function ( parentMatrixWorld, forceUpdate, camera ) {
+	// update matrixWorld
 
-	// update local
+	if ( this.matrixWorldNeedsUpdate || force ) {
 
-	if ( this.matrixAutoUpdate ) {
+		if ( this.parent ) {
 
-		forceUpdate |= this.updateMatrix();
-
-	}
-
-	// update global
-
-	if ( forceUpdate || this.matrixWorldNeedsUpdate ) {
-
-		if ( parentMatrixWorld ) {
-
-			this.matrixWorld.multiply( parentMatrixWorld, this.matrix );
+			this.matrixWorld.multiply( this.parent.matrixWorld, this.matrix );
 
 		} else {
 
@@ -73,15 +64,16 @@ THREE.LOD.prototype.update = function ( parentMatrixWorld, forceUpdate, camera )
 		}
 
 		this.matrixWorldNeedsUpdate = false;
-		forceUpdate = true;
+
+		force = true;
 
 	}
 
-
 	// update LODs
 
-	if ( this.LODs.length > 1 ) {
+	var camera = this.camera;
 
+	if ( this.LODs.length > 1 ) {
 
 		var inverse  = camera.matrixWorldInverse;
 		var radius   = this.boundRadius * this.boundRadiusScale;
@@ -112,13 +104,13 @@ THREE.LOD.prototype.update = function ( parentMatrixWorld, forceUpdate, camera )
 
 	}
 
+
 	// update children
 
-	for ( var c = 0; c < this.children.length; c++ ) {
+	for ( var i = 0, l = this.children.length; i < l; i ++ ) {
 
-		this.children[ c ].update( this.matrixWorld, forceUpdate, camera );
+		this.children[ i ].updateMatrixWorld( force );
 
 	}
-
 
 };
