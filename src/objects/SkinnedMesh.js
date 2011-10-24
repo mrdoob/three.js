@@ -1,5 +1,6 @@
 /**
  * @author mikael emtinger / http://gomo.se/
+ * @author alteredq / http://alteredqualia.com/
  */
 
 THREE.SkinnedMesh = function( geometry, material ) {
@@ -9,6 +10,7 @@ THREE.SkinnedMesh = function( geometry, material ) {
 	// init bones
 
 	this.identityMatrix = new THREE.Matrix4();
+
 	this.bones = [];
 	this.boneMatrices = [];
 
@@ -71,88 +73,6 @@ THREE.SkinnedMesh = function( geometry, material ) {
 THREE.SkinnedMesh.prototype = new THREE.Mesh();
 THREE.SkinnedMesh.prototype.constructor = THREE.SkinnedMesh;
 
-
-/*
- * Update
- */
-
-THREE.SkinnedMesh.prototype.update = function ( parentMatrixWorld, forceUpdate, camera ) {
-
-	// visible?
-
-	if ( this.visible ) {
-
-		// update local
-
-		if ( this.matrixAutoUpdate ) {
-
-			forceUpdate |= this.updateMatrix();
-
-		}
-
-
-		// update global
-
-		if ( forceUpdate || this.matrixWorldNeedsUpdate ) {
-
-			if ( parentMatrixWorld ) {
-
-				this.matrixWorld.multiply( parentMatrixWorld, this.matrix );
-
-			} else {
-
-				this.matrixWorld.copy( this.matrix );
-
-			}
-
-			this.matrixWorldNeedsUpdate = false;
-			forceUpdate = true;
-
-		}
-
-
-		// update children
-
-		var child, i, l = this.children.length;
-
-		for ( i = 0; i < l; i ++ ) {
-
-			child = this.children[ i ];
-
-			if ( child instanceof THREE.Bone ) {
-
-				child.update( this.identityMatrix, false, camera );
-
-			} else {
-
-				child.update( this.matrixWorld, forceUpdate, camera );
-
-			}
-
-		}
-
-
-		// flatten to array
-
-		var b, bl = this.bones.length;
-			ba = this.bones;
-			bm = this.boneMatrices;
-
-		for ( b = 0; b < bl; b ++ ) {
-
-			ba[ b ].skinMatrix.flattenToArrayOffset( bm, b * 16 );
-
-		}
-
-	}
-
-};
-
-
-/*
- * Add
- */
-
 THREE.SkinnedMesh.prototype.addBone = function( bone ) {
 
 	if ( bone === undefined ) {
@@ -167,13 +87,69 @@ THREE.SkinnedMesh.prototype.addBone = function( bone ) {
 
 };
 
+THREE.SkinnedMesh.prototype.updateMatrixWorld = function ( force ) {
+
+	this.matrixAutoUpdate && this.updateMatrix();
+
+	// update matrixWorld
+
+	if ( this.matrixWorldNeedsUpdate || force ) {
+
+		if ( this.parent ) {
+
+			this.matrixWorld.multiply( this.parent.matrixWorld, this.matrix );
+
+		} else {
+
+			this.matrixWorld.copy( this.matrix );
+
+		}
+
+		this.matrixWorldNeedsUpdate = false;
+
+		force = true;
+
+	}
+
+	// update children
+
+	for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+
+		var child = this.children[ i ];
+
+		if ( child instanceof THREE.Bone ) {
+
+			child.update( this.identityMatrix, false );
+
+		} else {
+
+			child.updateMatrixWorld( true );
+
+		}
+
+	}
+
+	// flatten bone matrices to array
+
+	var b, bl = this.bones.length;
+		ba = this.bones;
+		bm = this.boneMatrices;
+
+	for ( b = 0; b < bl; b ++ ) {
+
+		ba[ b ].skinMatrix.flattenToArrayOffset( bm, b * 16 );
+
+	}
+
+};
+
 /*
  * Pose
  */
 
 THREE.SkinnedMesh.prototype.pose = function() {
 
-	this.update( undefined, true );
+	this.updateMatrixWorld( true );
 
 	var bim, bone, boneInverses = [];
 
@@ -181,7 +157,10 @@ THREE.SkinnedMesh.prototype.pose = function() {
 
 		bone = this.bones[ b ];
 
-		boneInverses.push( THREE.Matrix4.makeInvert( bone.skinMatrix ) );
+		var inverseMatrix = new THREE.Matrix4();
+		inverseMatrix.getInverse( bone.skinMatrix );
+
+		boneInverses.push( inverseMatrix );
 
 		bone.skinMatrix.flattenToArrayOffset( this.boneMatrices, b * 16 );
 
@@ -215,7 +194,7 @@ THREE.SkinnedMesh.prototype.pose = function() {
 
 			if ( this.geometry.skinWeights[ i ].x + this.geometry.skinWeights[ i ].y !== 1 ) {
 
-				var len = ( 1.0 - ( this.geometry.skinWeights[ i ].x + this.geometry.skinWeights[ i ].y )) * 0.5;
+				var len = ( 1.0 - ( this.geometry.skinWeights[ i ].x + this.geometry.skinWeights[ i ].y ) ) * 0.5;
 				this.geometry.skinWeights[ i ].x += len;
 				this.geometry.skinWeights[ i ].y += len;
 
