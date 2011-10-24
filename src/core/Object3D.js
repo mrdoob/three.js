@@ -110,6 +110,22 @@ THREE.Object3D.prototype = {
 			object.parent = this;
 			this.children.push( object );
 
+			// add to scene
+
+			var scene = this;
+
+			while ( scene.parent !== undefined ) {
+
+				scene = scene.parent;
+
+			}
+
+			if ( scene !== undefined && scene instanceof THREE.Scene )  {
+
+				scene.addObject( object );
+
+			}
+
 		}
 
 	},
@@ -122,6 +138,22 @@ THREE.Object3D.prototype = {
 
 			object.parent = undefined;
 			this.children.splice( index, 1 );
+
+			// remove from scene
+
+			var scene = this;
+
+			while ( scene.parent !== undefined ) {
+
+				scene = scene.parent;
+
+			}
+
+			if ( scene !== undefined && scene instanceof THREE.Scene ) {
+
+				scene.removeObject( object );
+
+			}
 
 		}
 

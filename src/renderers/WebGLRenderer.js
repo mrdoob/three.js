@@ -3609,9 +3609,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 				_cameraLight.position.copy( light.position );
 				_cameraLight.lookAt( light.target.position );
 
-				_cameraLight.update( undefined, true );
+				if ( _cameraLight.parent == null ) {
 
-				scene.update( undefined, false, _cameraLight );
+					console.warn( "Camera is not on the Scene. Adding it..." );
+					scene.add( _cameraLight );
+
+				}
+
+				scene.updateMatrixWorld();
+
+				_cameraLight.matrixWorldInverse.getInverse( _cameraLight.matrixWorld );
 
 				// compute shadow matrix
 
@@ -3790,23 +3797,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_this.info.render.vertices = 0;
 		_this.info.render.faces = 0;
 
-		// hack: find parent of camera.
+		if ( camera.parent == null ) {
 
-		if ( camera.matrixAutoUpdate ) {
-
-			var parent = camera;
-
-			while ( parent.parent ) {
-
-				parent = parent.parent;
-
-			}
-
-			parent.update( undefined, true );
+			console.warn( "Camera is not on the Scene. Adding it..." );
+			scene.add( camera );
 
 		}
 
-		scene.update( undefined, false, camera );
+		scene.updateMatrixWorld();
+
+		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
 		camera.matrixWorldInverse.flattenToArray( _viewMatrixArray );
 		camera.projectionMatrix.flattenToArray( _projectionMatrixArray );

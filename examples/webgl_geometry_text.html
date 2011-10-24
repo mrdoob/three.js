@@ -527,8 +527,8 @@
 
 				updatePermalink();
 
-				scene.remove( textMesh1 );
-				if ( mirror ) scene.remove( textMesh2 );
+				parent.remove( textMesh1 );
+				if ( mirror ) parent.remove( textMesh2 );
 
 				if ( !text ) return;
 

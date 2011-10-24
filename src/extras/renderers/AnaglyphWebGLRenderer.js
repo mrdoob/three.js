@@ -98,7 +98,7 @@ if ( THREE.WebGLRenderer ) {
 
 		this.render = function ( scene, camera, renderTarget, forceClear ) {
 
-			camera.update( null, true );
+			//camera.update( null, true );
 
 			var hasCameraChanged = aspect !== camera.aspect || near !== camera.near || fov !== camera.fov;
 
@@ -138,14 +138,14 @@ if ( THREE.WebGLRenderer ) {
 			}
 
 			_cameraL.matrix = camera.matrixWorld.clone().multiplySelf( eyeLeft );
-			_cameraL.update( null, true );
+			//_cameraL.update( null, true );
 			_cameraL.position.copy( camera.position );
 			_cameraL.near = near;
 			_cameraL.far = camera.far;
 			_render.call( _this, scene, _cameraL, _renderTargetL, true );
 
 			_cameraR.matrix = camera.matrixWorld.clone().multiplySelf( eyeRight );
-			_cameraR.update( null, true );
+			//_cameraR.update( null, true );
 			_cameraR.position.copy( camera.position );
 			_cameraR.near = near;
 			_cameraR.far = camera.far;
