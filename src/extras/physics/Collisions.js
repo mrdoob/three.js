@@ -162,13 +162,13 @@ THREE.CollisionSystem.prototype.rayMesh = function( r, me ) {
                 me.normal.normalize();
 
             }
-        
+
         }
-        
+
         else if (face instanceof THREE.Face4) {
-            
+
             var nd = this.rayTriangle( rt, p0, p1, p3, d, this.collisionNormal, me.mesh );
-            
+
             if( nd < d ) {
 
                 d = nd;
@@ -177,9 +177,9 @@ THREE.CollisionSystem.prototype.rayMesh = function( r, me ) {
                 me.normal.normalize();
 
             }
-            
+
             nd = this.rayTriangle( rt, p1, p2, p3, d, this.collisionNormal, me.mesh );
-            
+
             if( nd < d ) {
 
                 d = nd;
@@ -188,7 +188,7 @@ THREE.CollisionSystem.prototype.rayMesh = function( r, me ) {
                 me.normal.normalize();
 
             }
-            
+
         }
 
 	}
@@ -201,7 +201,7 @@ THREE.CollisionSystem.prototype.rayTriangle = function( ray, p0, p1, p2, mind, n
 
 	var e1 = THREE.CollisionSystem.__v1,
 		e2 = THREE.CollisionSystem.__v2;
-	
+
 	n.set( 0, 0, 0 );
 
 	// do not crash on quads, fail instead
@@ -212,18 +212,18 @@ THREE.CollisionSystem.prototype.rayTriangle = function( ray, p0, p1, p2, mind, n
 
 	var dot = n.dot( ray.direction );
 	if ( !( dot < 0 ) ) {
-		
+
 		if ( mesh.doubleSided || mesh.flipSided ) {
-		
+
 			n.multiplyScalar (-1.0);
 			dot *= -1.0;
-		
+
 		} else {
-			
+
 			return Number.MAX_VALUE;
-		
+
 		}
-	
+
 	}
 
 	var d = n.dot( p0 );
@@ -316,7 +316,7 @@ THREE.CollisionSystem.prototype.rayTriangle = function( ray, p0, p1, p2, mind, n
 THREE.CollisionSystem.prototype.makeRayLocal = function( ray, m ) {
 
 	var mt = THREE.CollisionSystem.__m;
-	THREE.Matrix4.makeInvert( m.matrixWorld, mt );
+	mt.getInverse( m.matrixWorld );
 
 	var rt = THREE.CollisionSystem.__r;
 	rt.origin.copy( ray.origin );

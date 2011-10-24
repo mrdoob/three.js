@@ -1,6 +1,7 @@
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author marklundin / http://mark-lundin.com/
+ * @author alteredq / http://alteredqualia.com/
  */
 
 if ( THREE.WebGLRenderer ) {
@@ -8,6 +9,8 @@ if ( THREE.WebGLRenderer ) {
 	THREE.ParallaxBarrierWebGLRenderer = function ( parameters ) {
 
 		THREE.WebGLRenderer.call( this, parameters );
+
+		this.autoUpdateScene = false;
 
 		var _this = this, _setSize = this.setSize, _render = this.render;
 
@@ -17,7 +20,7 @@ if ( THREE.WebGLRenderer ) {
 		var eyeRight = new THREE.Matrix4(),
 			eyeLeft = new THREE.Matrix4(),
 			focalLength = 125,
-			aspect, near, fov;
+			_aspect, _near, _far, _fov;
 
 		_cameraL.matrixAutoUpdate = _cameraR.matrixAutoUpdate = false;
 
@@ -80,6 +83,8 @@ if ( THREE.WebGLRenderer ) {
 		var _scene = new THREE.Scene();
 		_scene.add( new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), _material ) );
 
+		_scene.add( _camera );
+
 		this.setSize = function ( width, height ) {
 
 			_setSize.call( _this, width, height );
@@ -100,59 +105,65 @@ if ( THREE.WebGLRenderer ) {
 
 		this.render = function ( scene, camera, renderTarget, forceClear ) {
 
-			//camera.update( null, true );
+			scene.updateMatrixWorld();
 
-			var hasCameraChanged = aspect !== camera.aspect || near !== camera.near || fov !== camera.fov;
+			var hasCameraChanged = ( _aspect !== camera.aspect ) || ( _near !== camera.near ) || ( _far !== camera.far ) || ( _fov !== camera.fov );
 
 			if( hasCameraChanged ) {
 
-				aspect = camera.aspect;
-				near = camera.near;
-				fov = camera.fov;
+				_aspect = camera.aspect;
+				_near = camera.near;
+				_far = camera.far;
+				_fov = camera.fov;
 
 				var projectionMatrix = camera.projectionMatrix.clone(),
 					eyeSep = focalLength / 30 * 0.5,
-					eyeSepOnProjection = eyeSep * near / focalLength,
-					ymax = near * Math.tan( fov * Math.PI / 360 ),
+					eyeSepOnProjection = eyeSep * _near / focalLength,
+					ymax = _near * Math.tan( _fov * Math.PI / 360 ),
 					xmin, xmax;
 
-				//translate xOffset
+				// translate xOffset
 
 				eyeRight.n14 = eyeSep;
 				eyeLeft.n14 = -eyeSep;
 
-				//For left eye
+				// for left eye
 
-				xmin = -ymax * aspect + eyeSepOnProjection;
-				xmax = ymax * aspect + eyeSepOnProjection;
-				projectionMatrix.n11 = 2 * near / ( xmax - xmin );
+				xmin = -ymax * _aspect + eyeSepOnProjection;
+				xmax = ymax * _aspect + eyeSepOnProjection;
+
+				projectionMatrix.n11 = 2 * _near / ( xmax - xmin );
 				projectionMatrix.n13 = ( xmax + xmin ) / ( xmax - xmin );
-				_cameraL.projectionMatrix = projectionMatrix.clone();
 
-				//for right eye
+				_cameraL.projectionMatrix.copy( projectionMatrix );
 
-				xmin = -ymax * aspect - eyeSepOnProjection;
-				xmax = ymax * aspect - eyeSepOnProjection;
-				projectionMatrix.n11 = 2 * near / ( xmax - xmin );
+				// for right eye
+
+				xmin = -ymax * _aspect - eyeSepOnProjection;
+				xmax = ymax * _aspect - eyeSepOnProjection;
+
+				projectionMatrix.n11 = 2 * _near / ( xmax - xmin );
 				projectionMatrix.n13 = ( xmax + xmin ) / ( xmax - xmin );
-				_cameraR.projectionMatrix = projectionMatrix.clone();
+
+				_cameraR.projectionMatrix.copy( projectionMatrix );
 
 			}
 
-			_cameraL.matrix = camera.matrixWorld.clone().multiplySelf( eyeLeft );
-			//_cameraL.update( null, true );
+			_cameraL.matrixWorld.copy( camera.matrixWorld ).multiplySelf( eyeLeft );
 			_cameraL.position.copy( camera.position );
-			_cameraL.near = near;
+			_cameraL.near = camera.near;
 			_cameraL.far = camera.far;
+
 			_render.call( _this, scene, _cameraL, _renderTargetL, true );
 
-			_cameraR.matrix = camera.matrixWorld.clone().multiplySelf( eyeRight );
-			//_cameraR.update( null, true );
+			_cameraR.matrixWorld.copy( camera.matrixWorld ).multiplySelf( eyeRight );
 			_cameraR.position.copy( camera.position );
-			_cameraR.near = near;
+			_cameraR.near = camera.near;
 			_cameraR.far = camera.far;
+
 			_render.call( _this, scene, _cameraR, _renderTargetR, true );
 
+			_scene.updateMatrixWorld();
 			_render.call( _this, _scene, _camera );
 
 		};

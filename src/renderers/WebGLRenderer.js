@@ -106,6 +106,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.sortObjects = true;
 
 	this.autoUpdateObjects = true;
+	this.autoUpdateScene = true;
 
 	// physically based shading
 
@@ -3616,7 +3617,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				scene.updateMatrixWorld();
+				if ( this.autoUpdateScene ) scene.updateMatrixWorld();
 
 				_cameraLight.matrixWorldInverse.getInverse( _cameraLight.matrixWorld );
 
@@ -3804,10 +3805,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		scene.updateMatrixWorld();
+		if ( this.autoUpdateScene )	scene.updateMatrixWorld();
 
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
-
 		camera.matrixWorldInverse.flattenToArray( _viewMatrixArray );
 		camera.projectionMatrix.flattenToArray( _projectionMatrixArray );
 
