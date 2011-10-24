@@ -25,7 +25,6 @@
 		<script src="../src/extras/geometries/CylinderGeometry.js"></script>
 		<script src="../src/extras/geometries/TorusGeometry.js"></script>
 		<script src="../src/extras/modifiers/SubdivisionModifier.js"></script>
-		<script src="../src/extras/modifiers/ScaleModifier.js"></script>
 
 		<script src="fonts/helvetiker_regular.typeface.js"></script>
 
@@ -177,8 +176,7 @@
 				
 				// Scale Geometry
 				if (params.scale) {
-					var scaler = new THREE.ScaleModifier( new THREE.Vector3(params.scale,params.scale,params.scale));
-					scaler.modify(geometry);
+					geometry.applyMatrix( new THREE.Matrix4().setScale( params.scale, params.scale, params.scale ) );
 				}
 
 				// Cloning original geometry for debuging
