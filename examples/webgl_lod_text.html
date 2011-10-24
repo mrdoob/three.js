@@ -129,9 +129,9 @@
 
 				for ( j = 0; j < 1000; j ++ ) {
 
-					lod = new THREE.LOD( camera );
+					lod = new THREE.LOD();
 
-					for ( i = 0; i < geometry.length; i++ ) {
+					for ( i = 0; i < geometry.length; i ++ ) {
 
 						mesh = new THREE.Mesh( geometry[ i ][ 0 ], geometry[ i ][ 2 ][ 1 ] );
 						mesh.scale.set( 1.5, 1.5, 1.5 );
@@ -154,7 +154,9 @@
 
 				renderer = new THREE.WebGLRenderer( { clearColor: 0x000000, clearAlpha: 1 } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+
 				renderer.sortObjects = false;
+				renderer.autoUpdateScene = false;
 
 				container.appendChild( renderer.domElement );
 
@@ -181,14 +183,10 @@
 
 				camera.lookAt( scene.position );
 
+				scene.updateMatrixWorld();
+				THREE.SceneUtils.traverseHierarchy( scene, function ( node ) { if ( node instanceof THREE.LOD ) node.update( camera ) } );
+
 				renderer.render( scene, camera );
-
-			}
-
-			function log( text ) {
-
-				var e = document.getElementById("log");
-				e.innerHTML = text + "<br/>" + e.innerHTML;
 
 			}
 

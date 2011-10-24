@@ -1,13 +1,13 @@
 /**
  * @author mikael emtinger / http://gomo.se/
  * @author alteredq / http://alteredqualia.com/
+ * @author mr.doob / http://mrdoob.com/
  */
 
-THREE.LOD = function( camera ) {
+THREE.LOD = function() {
 
 	THREE.Object3D.call( this );
 
-	this.camera = camera;
 	this.LODs = [];
 
 };
@@ -15,10 +15,6 @@ THREE.LOD = function( camera ) {
 THREE.LOD.prototype = new THREE.Object3D();
 THREE.LOD.prototype.constructor = THREE.LOD;
 THREE.LOD.prototype.supr = THREE.Object3D.prototype;
-
-/*
- * Add
- */
 
 THREE.LOD.prototype.addLevel = function ( object3D, visibleAtDistance ) {
 
@@ -45,35 +41,11 @@ THREE.LOD.prototype.addLevel = function ( object3D, visibleAtDistance ) {
 
 };
 
-THREE.LOD.prototype.updateMatrixWorld = function ( force ) {
-
-	this.matrixAutoUpdate && this.updateMatrix();
-
-	// update matrixWorld
-
-	if ( this.matrixWorldNeedsUpdate || force ) {
-
-		if ( this.parent ) {
-
-			this.matrixWorld.multiply( this.parent.matrixWorld, this.matrix );
-
-		} else {
-
-			this.matrixWorld.copy( this.matrix );
-
-		}
-
-		this.matrixWorldNeedsUpdate = false;
-
-		force = true;
-
-	}
-
-	// update LODs
-
-	var camera = this.camera;
+THREE.LOD.prototype.update = function ( camera ) {
 
 	if ( this.LODs.length > 1 ) {
+
+		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
 		var inverse  = camera.matrixWorldInverse;
 		var radius   = this.boundRadius * this.boundRadiusScale;
@@ -81,7 +53,7 @@ THREE.LOD.prototype.updateMatrixWorld = function ( force ) {
 
 		this.LODs[ 0 ].object3D.visible = true;
 
-		for ( var l = 1; l < this.LODs.length; l++ ) {
+		for ( var l = 1; l < this.LODs.length; l ++ ) {
 
 			if( distance >= this.LODs[ l ].visibleAtDistance ) {
 
@@ -96,20 +68,11 @@ THREE.LOD.prototype.updateMatrixWorld = function ( force ) {
 
 		}
 
-		for( ; l < this.LODs.length; l++ ) {
+		for( ; l < this.LODs.length; l ++ ) {
 
 			this.LODs[ l ].object3D.visible = false;
 
 		}
-
-	}
-
-
-	// update children
-
-	for ( var i = 0, l = this.children.length; i < l; i ++ ) {
-
-		this.children[ i ].updateMatrixWorld( force );
 
 	}
 
