@@ -79,6 +79,7 @@ COMMON_FILES = [
 'renderers/renderables/RenderableVertex.js',
 'renderers/renderables/RenderableFace3.js',
 'renderers/renderables/RenderableFace4.js',
+'renderers/renderables/RenderableObject.js',
 'renderers/renderables/RenderableParticle.js',
 'renderers/renderables/RenderableLine.js'
 ]
@@ -142,6 +143,7 @@ CANVAS_FILES = [
 'core/Vector4.js',
 'core/Ray.js',
 'core/Rectangle.js',
+'core/Math.js',
 'core/Matrix3.js',
 'core/Matrix4.js',
 'core/Object3D.js',
@@ -174,11 +176,13 @@ CANVAS_FILES = [
 'objects/Line.js',
 'objects/Mesh.js',
 'objects/Bone.js',
+'objects/Sprite.js',
 'scenes/Scene.js',
 'renderers/CanvasRenderer.js',
 'renderers/renderables/RenderableVertex.js',
 'renderers/renderables/RenderableFace3.js',
 'renderers/renderables/RenderableFace4.js',
+'renderers/renderables/RenderableObject.js',
 'renderers/renderables/RenderableParticle.js',
 'renderers/renderables/RenderableLine.js'
 ]
@@ -191,6 +195,7 @@ DOM_FILES = [
 'core/Vector4.js',
 'core/Ray.js',
 'core/Rectangle.js',
+'core/Math.js',
 'core/Matrix3.js',
 'core/Matrix4.js',
 'core/Object3D.js',
@@ -206,6 +211,7 @@ DOM_FILES = [
 'materials/ParticleDOMMaterial.js',
 'objects/Particle.js',
 'objects/Bone.js',
+'objects/Sprite.js',
 'scenes/Scene.js',
 'renderers/DOMRenderer.js',
 'renderers/renderables/RenderableParticle.js'
@@ -219,6 +225,7 @@ SVG_FILES = [
 'core/Vector4.js',
 'core/Ray.js',
 'core/Rectangle.js',
+'core/Math.js',
 'core/Matrix3.js',
 'core/Matrix4.js',
 'core/Object3D.js',
@@ -249,11 +256,13 @@ SVG_FILES = [
 'objects/Line.js',
 'objects/Mesh.js',
 'objects/Bone.js',
+'objects/Sprite.js',
 'scenes/Scene.js',
 'renderers/SVGRenderer.js',
 'renderers/renderables/RenderableVertex.js',
 'renderers/renderables/RenderableFace3.js',
 'renderers/renderables/RenderableFace4.js',
+'renderers/renderables/RenderableObject.js',
 'renderers/renderables/RenderableParticle.js',
 'renderers/renderables/RenderableLine.js'
 ]
@@ -266,6 +275,7 @@ WEBGL_FILES = [
 'core/Vector4.js',
 'core/Ray.js',
 'core/Rectangle.js',
+'core/Math.js',
 'core/Matrix3.js',
 'core/Matrix4.js',
 'core/Object3D.js',
@@ -314,7 +324,7 @@ WEBGL_FILES = [
 'renderers/WebGLShaders.js',
 'renderers/WebGLRenderer.js',
 'renderers/WebGLRenderTarget.js',
-'renderers/WebGLRenderTargetCube.js',
+'renderers/WebGLRenderTargetCube.js'
 ]
 
 def merge(files):

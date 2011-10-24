@@ -6,7 +6,8 @@
 
 THREE.Projector = function() {
 
-	var _vertex, _vertexCount, _vertexPool = [],
+	var _object, _objectCount, _objectPool = [],
+	_vertex, _vertexCount, _vertexPool = [],
 	_face, _face3Count, _face3Pool = [], _face4Count, _face4Pool = [],
 	_line, _lineCount, _linePool = [],
 	_particle, _particleCount, _particlePool = [],
@@ -97,7 +98,9 @@ THREE.Projector = function() {
 
 	};
 
-	this.projectGraph = function ( object ) {
+	this.projectGraph = function ( root, sort ) {
+
+		_objectCount = 0;
 
 		_renderData.objects.length = 0;
 		_renderData.sprites.length = 0;
@@ -105,19 +108,28 @@ THREE.Projector = function() {
 
 		var projectObject = function ( object ) {
 
-			if ( object.visible == false ) return;
+			if ( object.visible === false ) return;
 
-			if ( ( object instanceof THREE.Mesh ) && ( object.frustumCulled == false || isInFrustum( object ) ) ) {
+			if ( ( object instanceof THREE.Mesh || object instanceof THREE.Line ) &&
+			( object.frustumCulled === false || isInFrustum( object ) ) ) {
 
-				_renderData.objects.push( object );
+				_projScreenMatrix.multiplyVector3( _vector3.copy( object.position ) );
 
-			} else if ( object instanceof THREE.Line ) {
+				_object = getNextObjectInPool();
+				_object.object = object;
+				_object.z = _vector3.z;
 
-				_renderData.objects.push( object );
+				_renderData.objects.push( _object );
 
 			} else if ( object instanceof THREE.Sprite || object instanceof THREE.Particle ) {
 
-				_renderData.sprites.push( object );
+				_projScreenMatrix.multiplyVector3( _vector3.copy( object.position ) );
+
+				_object = getNextObjectInPool();
+				_object.object = object;
+				_object.z = _vector3.z;
+
+				_renderData.sprites.push( _object );
 
 			} else if ( object instanceof THREE.Light ) {
 
@@ -133,7 +145,9 @@ THREE.Projector = function() {
 
 		};
 
-		projectObject( object );
+		projectObject( root );
+
+		sort && _renderData.objects.sort( painterSort );
 
 		return _renderData;
 
@@ -157,7 +171,7 @@ THREE.Projector = function() {
 
 		if ( camera.parent == null ) {
 
-			console.warn( "Camera is not on the Scene. Adding it..." );
+			console.warn( 'DEPRECATED: Camera hasn\'t been added to the Scene. Adding it...' );
 			scene.add( camera );
 
 		}
@@ -170,11 +184,11 @@ THREE.Projector = function() {
 
 		this.computeFrustum( _projScreenMatrix );
 
-		_renderData = this.projectGraph( scene );
+		_renderData = this.projectGraph( scene, false );
 
 		for ( o = 0, ol = _renderData.objects.length; o < ol; o++ ) {
 
-			object = _renderData.objects[ o ];
+			object = _renderData.objects[ o ].object;
 
 			objectMatrixWorld = object.matrixWorld;
 			objectMaterial = object.material;
@@ -353,7 +367,7 @@ THREE.Projector = function() {
 
 		for ( o = 0, ol = _renderData.sprites.length; o < ol; o++ ) {
 
-			object = _renderData.sprites[ o ];
+			object = _renderData.sprites[ o ].object;
 
 			objectMatrixWorld = object.matrixWorld;
 
@@ -393,6 +407,16 @@ THREE.Projector = function() {
 	};
 
 	// Pools
+
+	function getNextObjectInPool() {
+
+		var object = _objectPool[ _objectCount ] = _objectPool[ _objectCount ] || new THREE.RenderableObject();
+
+		_objectCount ++;
+
+		return object;
+
+	}
 
 	function getNextVertexInPool() {
 

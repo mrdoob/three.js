@@ -13,7 +13,7 @@ THREE.Mesh = function ( geometry, material ) {
 
 	if ( material instanceof Array ) {
 
-		console.warn( 'DEPRECATE: Material array is no longer supported. Using material 0...' );
+		console.warn( 'DEPRECATED: Mesh material can no longer be an Array. Using material at index 0...' );
 		this.material = material[ 0 ];
 
 	}

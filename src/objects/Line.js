@@ -11,6 +11,16 @@ THREE.Line = function ( geometry, material, type ) {
 
 	this.type = ( type != undefined ) ? type : THREE.LineStrip;
 
+	if ( this.geometry ) {
+
+		if ( ! this.geometry.boundingSphere ) {
+
+			this.geometry.computeBoundingSphere();
+
+		}
+
+	}
+
 };
 
 THREE.LineStrip = 0;

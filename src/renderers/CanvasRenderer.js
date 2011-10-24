@@ -288,7 +288,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				if ( _clipRect.intersects( _bboxRect ) ) {
 
-					material.opacity != 0 && renderFace4( _v1, _v2, _v3, _v4, _v5, _v6, element, material, scene );
+					renderFace4( _v1, _v2, _v3, _v4, _v5, _v6, element, material, scene );
 
 				}
 

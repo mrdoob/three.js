@@ -2,7 +2,7 @@
  * @author mikael emtinger / http://gomo.se/
  */
 
-THREE.LOD = function() {
+THREE.LOD = function () {
 
 	THREE.Object3D.call( this );
 
