@@ -56,6 +56,7 @@
 		</div>
 
 		<script src="../build/Three.js"></script>
+
 		<script src="../src/extras/renderers/ParallaxBarrierWebGLRenderer.js"></script>
 
 		<script src="js/Detector.js"></script>
@@ -164,6 +165,8 @@
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
 
 				scene = new THREE.Scene();
+
+				scene.add( camera );
 
 				// LIGHTS
 
