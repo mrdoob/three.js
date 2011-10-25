@@ -779,46 +779,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function initMeshBuffers ( geometryGroup, object ) {
 
-		var f, fl, fi, face,
-		m, ml, size,
-		nvertices = 0, ntris = 0, nlines = 0,
+		var geometry = object.geometry,
+			faces3 = geometryGroup.faces3,
+			faces4 = geometryGroup.faces4,
 
-		uvType,
-		vertexColorType,
-		normalType,
-		material,
-		attribute, property, originalAttribute,
+			nvertices = faces3.length * 3 + faces4.length * 4,
+			ntris     = faces3.length * 1 + faces4.length * 2,
+			nlines    = faces3.length * 3 + faces4.length * 4,
 
-		geometry = object.geometry,
-		obj_faces = geometry.faces,
-		chunk_faces = geometryGroup.faces;
+			material = getBufferMaterial( object, geometryGroup ),
 
-		for ( f = 0, fl = chunk_faces.length; f < fl; f ++ ) {
-
-			fi = chunk_faces[ f ];
-			face = obj_faces[ fi ];
-
-			if ( face instanceof THREE.Face3 ) {
-
-				nvertices += 3;
-				ntris += 1;
-				nlines += 3;
-
-			} else if ( face instanceof THREE.Face4 ) {
-
-				nvertices += 4;
-				ntris += 2;
-				nlines += 4;
-
-			}
-
-		}
-
-		material = getBufferMaterial( object, geometryGroup );
-
-		uvType = bufferGuessUVType( material );
-		normalType = bufferGuessNormalType( material );
-		vertexColorType = bufferGuessVertexColorType( material );
+			uvType = bufferGuessUVType( material ),
+			normalType = bufferGuessNormalType( material ),
+			vertexColorType = bufferGuessVertexColorType( material );
 
 		//console.log( "uvType", uvType, "normalType", normalType, "vertexColorType", vertexColorType, object, geometryGroup, material );
 
@@ -874,7 +847,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			geometryGroup.__morphTargetsArrays = [];
 
-			for ( m = 0, ml = geometryGroup.numMorphTargets; m < ml; m ++ ) {
+			for ( var m = 0, ml = geometryGroup.numMorphTargets; m < ml; m ++ ) {
 
 				geometryGroup.__morphTargetsArrays.push( new Float32Array( nvertices * 3 ) );
 
@@ -907,11 +880,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 				// Do a shallow copy of the attribute object so different geometryGroup chunks use different
 				// attribute buffers which are correctly indexed in the setMeshBuffers function
 
-				originalAttribute = material.attributes[ a ];
+				var originalAttribute = material.attributes[ a ];
 
-				attribute = {};
+				var attribute = {};
 
-				for ( property in originalAttribute ) {
+				for ( var property in originalAttribute ) {
 
 					attribute[ property ] = originalAttribute[ property ];
 
@@ -921,7 +894,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					attribute.__webglInitialized = true;
 
-					size = 1;		// "f" and "i"
+					var size = 1;		// "f" and "i"
 
 					if( attribute.type === "v2" ) size = 2;
 					else if( attribute.type === "v3" ) size = 3;
@@ -1027,7 +1000,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		dirtyMorphTargets = geometry.__dirtyMorphTargets,
 
 		vertices = geometry.vertices,
-		chunk_faces = geometryGroup.faces,
+		chunk_faces3 = geometryGroup.faces3,
+		chunk_faces4 = geometryGroup.faces4,
 		obj_faces = geometry.faces,
 
 		obj_uvs  = geometry.faceVertexUvs[ 0 ],
@@ -1053,10 +1027,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
 
-		for ( f = 0, fl = chunk_faces.length; f < fl; f ++ ) {
-
-			fi = chunk_faces[ f ];
+			fi = chunk_faces3[ f ];
 			face = obj_faces[ fi ];
 
 			if ( obj_uvs ) {
@@ -1079,947 +1052,968 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			vertexTangents = face.vertexTangents;
 
-			if ( face instanceof THREE.Face3 ) {
+			if ( dirtyVertices ) {
 
-				if ( dirtyVertices ) {
+				v1 = vertices[ face.a ].position;
+				v2 = vertices[ face.b ].position;
+				v3 = vertices[ face.c ].position;
 
-					v1 = vertices[ face.a ].position;
-					v2 = vertices[ face.b ].position;
-					v3 = vertices[ face.c ].position;
+				vertexArray[ offset ]     = v1.x;
+				vertexArray[ offset + 1 ] = v1.y;
+				vertexArray[ offset + 2 ] = v1.z;
 
-					vertexArray[ offset ]     = v1.x;
-					vertexArray[ offset + 1 ] = v1.y;
-					vertexArray[ offset + 2 ] = v1.z;
+				vertexArray[ offset + 3 ] = v2.x;
+				vertexArray[ offset + 4 ] = v2.y;
+				vertexArray[ offset + 5 ] = v2.z;
 
-					vertexArray[ offset + 3 ] = v2.x;
-					vertexArray[ offset + 4 ] = v2.y;
-					vertexArray[ offset + 5 ] = v2.z;
+				vertexArray[ offset + 6 ] = v3.x;
+				vertexArray[ offset + 7 ] = v3.y;
+				vertexArray[ offset + 8 ] = v3.z;
 
-					vertexArray[ offset + 6 ] = v3.x;
-					vertexArray[ offset + 7 ] = v3.y;
-					vertexArray[ offset + 8 ] = v3.z;
+				offset += 9;
 
-					offset += 9;
+			}
 
-				}
+			if ( customAttributes ) {
 
-				if ( customAttributes ) {
+				for ( i = 0, il = customAttributes.length; i < il; i ++ ) {
 
-					for ( i = 0, il = customAttributes.length; i < il; i ++ ) {
+					customAttribute = customAttributes[ i ];
 
-						customAttribute = customAttributes[ i ];
+					if ( customAttribute.__original.needsUpdate ) {
 
-						if ( customAttribute.__original.needsUpdate ) {
+						offset_custom = customAttribute.offset;
+						offset_customSrc = customAttribute.offsetSrc;
 
-							offset_custom = customAttribute.offset;
-							offset_customSrc = customAttribute.offsetSrc;
+						if ( customAttribute.size === 1 ) {
 
-							if ( customAttribute.size === 1 ) {
+							if ( customAttribute.boundTo === undefined || customAttribute.boundTo === "vertices" ) {
 
-								if ( customAttribute.boundTo === undefined || customAttribute.boundTo === "vertices" ) {
+								customAttribute.array[ offset_custom ] 	   = customAttribute.value[ face.a ];
+								customAttribute.array[ offset_custom + 1 ] = customAttribute.value[ face.b ];
+								customAttribute.array[ offset_custom + 2 ] = customAttribute.value[ face.c ];
 
-									customAttribute.array[ offset_custom ] 	   = customAttribute.value[ face.a ];
-									customAttribute.array[ offset_custom + 1 ] = customAttribute.value[ face.b ];
-									customAttribute.array[ offset_custom + 2 ] = customAttribute.value[ face.c ];
+							} else if ( customAttribute.boundTo === "faces" ) {
 
-								} else if ( customAttribute.boundTo === "faces" ) {
+								value = customAttribute.value[ offset_customSrc ];
 
-									value = customAttribute.value[ offset_customSrc ];
+								customAttribute.array[ offset_custom ] 	   = value;
+								customAttribute.array[ offset_custom + 1 ] = value;
+								customAttribute.array[ offset_custom + 2 ] = value;
 
-									customAttribute.array[ offset_custom ] 	   = value;
-									customAttribute.array[ offset_custom + 1 ] = value;
-									customAttribute.array[ offset_custom + 2 ] = value;
+								customAttribute.offsetSrc ++;
 
-									customAttribute.offsetSrc ++;
+							} else if ( customAttribute.boundTo === "faceVertices" ) {
 
-								} else if ( customAttribute.boundTo === "faceVertices" ) {
+								customAttribute.array[ offset_custom ] 	   = customAttribute.value[ offset_customSrc ];
+								customAttribute.array[ offset_custom + 1 ] = customAttribute.value[ offset_customSrc + 1 ];
+								customAttribute.array[ offset_custom + 2 ] = customAttribute.value[ offset_customSrc + 2 ];
 
-									customAttribute.array[ offset_custom ] 	   = customAttribute.value[ offset_customSrc ];
-									customAttribute.array[ offset_custom + 1 ] = customAttribute.value[ offset_customSrc + 1 ];
-									customAttribute.array[ offset_custom + 2 ] = customAttribute.value[ offset_customSrc + 2 ];
+								customAttribute.offsetSrc += 3;
 
-									customAttribute.offsetSrc += 3;
+							}
 
-								}
+							customAttribute.offset += 3;
 
-								customAttribute.offset += 3;
+						} else {
 
-							} else {
+							if ( customAttribute.boundTo === undefined || customAttribute.boundTo === "vertices" ) {
 
-								if ( customAttribute.boundTo === undefined || customAttribute.boundTo === "vertices" ) {
+								v1 = customAttribute.value[ face.a ];
+								v2 = customAttribute.value[ face.b ];
+								v3 = customAttribute.value[ face.c ];
 
-									v1 = customAttribute.value[ face.a ];
-									v2 = customAttribute.value[ face.b ];
-									v3 = customAttribute.value[ face.c ];
+							} else if ( customAttribute.boundTo === "faces" ) {
 
-								} else if ( customAttribute.boundTo === "faces" ) {
+								value = customAttribute.value[ offset_customSrc ];
 
-									value = customAttribute.value[ offset_customSrc ];
+								v1 = value;
+								v2 = value;
+								v3 = value;
 
-									v1 = value;
-									v2 = value;
-									v3 = value;
+								customAttribute.offsetSrc ++;
 
-									customAttribute.offsetSrc ++;
+							} else if ( customAttribute.boundTo === "faceVertices" ) {
 
-								} else if ( customAttribute.boundTo === "faceVertices" ) {
+								v1 = customAttribute.value[ offset_customSrc ];
+								v2 = customAttribute.value[ offset_customSrc + 1 ];
+								v3 = customAttribute.value[ offset_customSrc + 2 ];
 
-									v1 = customAttribute.value[ offset_customSrc ];
-									v2 = customAttribute.value[ offset_customSrc + 1 ];
-									v3 = customAttribute.value[ offset_customSrc + 2 ];
+								customAttribute.offsetSrc += 3;
 
-									customAttribute.offsetSrc += 3;
-
-								}
+							}
 
 
-								if ( customAttribute.size === 2 ) {
+							if ( customAttribute.size === 2 ) {
 
-									customAttribute.array[ offset_custom ] 	   = v1.x;
-									customAttribute.array[ offset_custom + 1 ] = v1.y;
+								customAttribute.array[ offset_custom ] 	   = v1.x;
+								customAttribute.array[ offset_custom + 1 ] = v1.y;
 
-									customAttribute.array[ offset_custom + 2 ] = v2.x;
-									customAttribute.array[ offset_custom + 3 ] = v2.y;
+								customAttribute.array[ offset_custom + 2 ] = v2.x;
+								customAttribute.array[ offset_custom + 3 ] = v2.y;
 
-									customAttribute.array[ offset_custom + 4 ] = v3.x;
-									customAttribute.array[ offset_custom + 5 ] = v3.y;
+								customAttribute.array[ offset_custom + 4 ] = v3.x;
+								customAttribute.array[ offset_custom + 5 ] = v3.y;
 
-									customAttribute.offset += 6;
+								customAttribute.offset += 6;
 
-								} else if ( customAttribute.size === 3 ) {
+							} else if ( customAttribute.size === 3 ) {
 
-									if ( customAttribute.type === "c" ) {
+								if ( customAttribute.type === "c" ) {
 
-										customAttribute.array[ offset_custom ] 	   = v1.r;
-										customAttribute.array[ offset_custom + 1 ] = v1.g;
-										customAttribute.array[ offset_custom + 2 ] = v1.b;
+									customAttribute.array[ offset_custom ] 	   = v1.r;
+									customAttribute.array[ offset_custom + 1 ] = v1.g;
+									customAttribute.array[ offset_custom + 2 ] = v1.b;
 
-										customAttribute.array[ offset_custom + 3 ] = v2.r;
-										customAttribute.array[ offset_custom + 4 ] = v2.g;
-										customAttribute.array[ offset_custom + 5 ] = v2.b;
+									customAttribute.array[ offset_custom + 3 ] = v2.r;
+									customAttribute.array[ offset_custom + 4 ] = v2.g;
+									customAttribute.array[ offset_custom + 5 ] = v2.b;
 
-										customAttribute.array[ offset_custom + 6 ] = v3.r;
-										customAttribute.array[ offset_custom + 7 ] = v3.g;
-										customAttribute.array[ offset_custom + 8 ] = v3.b;
-
-									} else {
-
-										customAttribute.array[ offset_custom ] 	   = v1.x;
-										customAttribute.array[ offset_custom + 1 ] = v1.y;
-										customAttribute.array[ offset_custom + 2 ] = v1.z;
-
-										customAttribute.array[ offset_custom + 3 ] = v2.x;
-										customAttribute.array[ offset_custom + 4 ] = v2.y;
-										customAttribute.array[ offset_custom + 5 ] = v2.z;
-
-										customAttribute.array[ offset_custom + 6 ] = v3.x;
-										customAttribute.array[ offset_custom + 7 ] = v3.y;
-										customAttribute.array[ offset_custom + 8 ] = v3.z;
-
-									}
-
-									customAttribute.offset += 9;
+									customAttribute.array[ offset_custom + 6 ] = v3.r;
+									customAttribute.array[ offset_custom + 7 ] = v3.g;
+									customAttribute.array[ offset_custom + 8 ] = v3.b;
 
 								} else {
 
-									customAttribute.array[ offset_custom  ] 	= v1.x;
-									customAttribute.array[ offset_custom + 1  ] = v1.y;
-									customAttribute.array[ offset_custom + 2  ] = v1.z;
-									customAttribute.array[ offset_custom + 3  ] = v1.w;
+									customAttribute.array[ offset_custom ] 	   = v1.x;
+									customAttribute.array[ offset_custom + 1 ] = v1.y;
+									customAttribute.array[ offset_custom + 2 ] = v1.z;
 
-									customAttribute.array[ offset_custom + 4  ] = v2.x;
-									customAttribute.array[ offset_custom + 5  ] = v2.y;
-									customAttribute.array[ offset_custom + 6  ] = v2.z;
-									customAttribute.array[ offset_custom + 7  ] = v2.w;
+									customAttribute.array[ offset_custom + 3 ] = v2.x;
+									customAttribute.array[ offset_custom + 4 ] = v2.y;
+									customAttribute.array[ offset_custom + 5 ] = v2.z;
 
-									customAttribute.array[ offset_custom + 8  ] = v3.x;
-									customAttribute.array[ offset_custom + 9  ] = v3.y;
-									customAttribute.array[ offset_custom + 10 ] = v3.z;
-									customAttribute.array[ offset_custom + 11 ] = v3.w;
-
-									customAttribute.offset += 12;
+									customAttribute.array[ offset_custom + 6 ] = v3.x;
+									customAttribute.array[ offset_custom + 7 ] = v3.y;
+									customAttribute.array[ offset_custom + 8 ] = v3.z;
 
 								}
+
+								customAttribute.offset += 9;
+
+							} else {
+
+								customAttribute.array[ offset_custom  ] 	= v1.x;
+								customAttribute.array[ offset_custom + 1  ] = v1.y;
+								customAttribute.array[ offset_custom + 2  ] = v1.z;
+								customAttribute.array[ offset_custom + 3  ] = v1.w;
+
+								customAttribute.array[ offset_custom + 4  ] = v2.x;
+								customAttribute.array[ offset_custom + 5  ] = v2.y;
+								customAttribute.array[ offset_custom + 6  ] = v2.z;
+								customAttribute.array[ offset_custom + 7  ] = v2.w;
+
+								customAttribute.array[ offset_custom + 8  ] = v3.x;
+								customAttribute.array[ offset_custom + 9  ] = v3.y;
+								customAttribute.array[ offset_custom + 10 ] = v3.z;
+								customAttribute.array[ offset_custom + 11 ] = v3.w;
+
+								customAttribute.offset += 12;
 
 							}
 
 						}
 
 					}
-
-				}
-
-
-				if ( dirtyMorphTargets ) {
-
-					for ( vk = 0, vkl = morphTargets.length; vk < vkl; vk ++ ) {
-
-						v1 = morphTargets[ vk ].vertices[ face.a ].position;
-						v2 = morphTargets[ vk ].vertices[ face.b ].position;
-						v3 = morphTargets[ vk ].vertices[ face.c ].position;
-
-						vka = morphTargetsArrays[ vk ];
-
-						vka[ offset_morphTarget ] 	  = v1.x;
-						vka[ offset_morphTarget + 1 ] = v1.y;
-						vka[ offset_morphTarget + 2 ] = v1.z;
-
-						vka[ offset_morphTarget + 3 ] = v2.x;
-						vka[ offset_morphTarget + 4 ] = v2.y;
-						vka[ offset_morphTarget + 5 ] = v2.z;
-
-						vka[ offset_morphTarget + 6 ] = v3.x;
-						vka[ offset_morphTarget + 7 ] = v3.y;
-						vka[ offset_morphTarget + 8 ] = v3.z;
-
-					}
-
-					offset_morphTarget += 9;
-
-				}
-
-				if ( obj_skinWeights.length ) {
-
-					// weights
-
-					sw1 = obj_skinWeights[ face.a ];
-					sw2 = obj_skinWeights[ face.b ];
-					sw3 = obj_skinWeights[ face.c ];
-
-					skinWeightArray[ offset_skin ]     = sw1.x;
-					skinWeightArray[ offset_skin + 1 ] = sw1.y;
-					skinWeightArray[ offset_skin + 2 ] = sw1.z;
-					skinWeightArray[ offset_skin + 3 ] = sw1.w;
-
-					skinWeightArray[ offset_skin + 4 ] = sw2.x;
-					skinWeightArray[ offset_skin + 5 ] = sw2.y;
-					skinWeightArray[ offset_skin + 6 ] = sw2.z;
-					skinWeightArray[ offset_skin + 7 ] = sw2.w;
-
-					skinWeightArray[ offset_skin + 8 ]  = sw3.x;
-					skinWeightArray[ offset_skin + 9 ]  = sw3.y;
-					skinWeightArray[ offset_skin + 10 ] = sw3.z;
-					skinWeightArray[ offset_skin + 11 ] = sw3.w;
-
-					// indices
-
-					si1 = obj_skinIndices[ face.a ];
-					si2 = obj_skinIndices[ face.b ];
-					si3 = obj_skinIndices[ face.c ];
-
-					skinIndexArray[ offset_skin ]     = si1.x;
-					skinIndexArray[ offset_skin + 1 ] = si1.y;
-					skinIndexArray[ offset_skin + 2 ] = si1.z;
-					skinIndexArray[ offset_skin + 3 ] = si1.w;
-
-					skinIndexArray[ offset_skin + 4 ] = si2.x;
-					skinIndexArray[ offset_skin + 5 ] = si2.y;
-					skinIndexArray[ offset_skin + 6 ] = si2.z;
-					skinIndexArray[ offset_skin + 7 ] = si2.w;
-
-					skinIndexArray[ offset_skin + 8 ]  = si3.x;
-					skinIndexArray[ offset_skin + 9 ]  = si3.y;
-					skinIndexArray[ offset_skin + 10 ] = si3.z;
-					skinIndexArray[ offset_skin + 11 ] = si3.w;
-
-					// vertices A
-
-					sa1 = obj_skinVerticesA[ face.a ];
-					sa2 = obj_skinVerticesA[ face.b ];
-					sa3 = obj_skinVerticesA[ face.c ];
-
-					skinVertexAArray[ offset_skin ]     = sa1.x;
-					skinVertexAArray[ offset_skin + 1 ] = sa1.y;
-					skinVertexAArray[ offset_skin + 2 ] = sa1.z;
-					skinVertexAArray[ offset_skin + 3 ] = 1; // pad for faster vertex shader
-
-					skinVertexAArray[ offset_skin + 4 ] = sa2.x;
-					skinVertexAArray[ offset_skin + 5 ] = sa2.y;
-					skinVertexAArray[ offset_skin + 6 ] = sa2.z;
-					skinVertexAArray[ offset_skin + 7 ] = 1;
-
-					skinVertexAArray[ offset_skin + 8 ]  = sa3.x;
-					skinVertexAArray[ offset_skin + 9 ]  = sa3.y;
-					skinVertexAArray[ offset_skin + 10 ] = sa3.z;
-					skinVertexAArray[ offset_skin + 11 ] = 1;
-
-					// vertices B
-
-					sb1 = obj_skinVerticesB[ face.a ];
-					sb2 = obj_skinVerticesB[ face.b ];
-					sb3 = obj_skinVerticesB[ face.c ];
-
-					skinVertexBArray[ offset_skin ]     = sb1.x;
-					skinVertexBArray[ offset_skin + 1 ] = sb1.y;
-					skinVertexBArray[ offset_skin + 2 ] = sb1.z;
-					skinVertexBArray[ offset_skin + 3 ] = 1; // pad for faster vertex shader
-
-					skinVertexBArray[ offset_skin + 4 ] = sb2.x;
-					skinVertexBArray[ offset_skin + 5 ] = sb2.y;
-					skinVertexBArray[ offset_skin + 6 ] = sb2.z;
-					skinVertexBArray[ offset_skin + 7 ] = 1;
-
-					skinVertexBArray[ offset_skin + 8 ]  = sb3.x;
-					skinVertexBArray[ offset_skin + 9 ]  = sb3.y;
-					skinVertexBArray[ offset_skin + 10 ] = sb3.z;
-					skinVertexBArray[ offset_skin + 11 ] = 1;
-
-					offset_skin += 12;
-
-				}
-
-				if ( dirtyColors && vertexColorType ) {
-
-					if ( vertexColors.length === 3 && vertexColorType === THREE.VertexColors ) {
-
-						c1 = vertexColors[ 0 ];
-						c2 = vertexColors[ 1 ];
-						c3 = vertexColors[ 2 ];
-
-					} else {
-
-						c1 = faceColor;
-						c2 = faceColor;
-						c3 = faceColor;
-
-					}
-
-					colorArray[ offset_color ]     = c1.r;
-					colorArray[ offset_color + 1 ] = c1.g;
-					colorArray[ offset_color + 2 ] = c1.b;
-
-					colorArray[ offset_color + 3 ] = c2.r;
-					colorArray[ offset_color + 4 ] = c2.g;
-					colorArray[ offset_color + 5 ] = c2.b;
-
-					colorArray[ offset_color + 6 ] = c3.r;
-					colorArray[ offset_color + 7 ] = c3.g;
-					colorArray[ offset_color + 8 ] = c3.b;
-
-					offset_color += 9;
-
-				}
-
-				if ( dirtyTangents && geometry.hasTangents ) {
-
-					t1 = vertexTangents[ 0 ];
-					t2 = vertexTangents[ 1 ];
-					t3 = vertexTangents[ 2 ];
-
-					tangentArray[ offset_tangent ]     = t1.x;
-					tangentArray[ offset_tangent + 1 ] = t1.y;
-					tangentArray[ offset_tangent + 2 ] = t1.z;
-					tangentArray[ offset_tangent + 3 ] = t1.w;
-
-					tangentArray[ offset_tangent + 4 ] = t2.x;
-					tangentArray[ offset_tangent + 5 ] = t2.y;
-					tangentArray[ offset_tangent + 6 ] = t2.z;
-					tangentArray[ offset_tangent + 7 ] = t2.w;
-
-					tangentArray[ offset_tangent + 8 ]  = t3.x;
-					tangentArray[ offset_tangent + 9 ]  = t3.y;
-					tangentArray[ offset_tangent + 10 ] = t3.z;
-					tangentArray[ offset_tangent + 11 ] = t3.w;
-
-					offset_tangent += 12;
-
-				}
-
-				if ( dirtyNormals && normalType ) {
-
-					if ( vertexNormals.length === 3 && needsSmoothNormals ) {
-
-						for ( i = 0; i < 3; i ++ ) {
-
-							vn = vertexNormals[ i ];
-
-							normalArray[ offset_normal ]     = vn.x;
-							normalArray[ offset_normal + 1 ] = vn.y;
-							normalArray[ offset_normal + 2 ] = vn.z;
-
-							offset_normal += 3;
-
-						}
-
-					} else {
-
-						for ( i = 0; i < 3; i ++ ) {
-
-							normalArray[ offset_normal ]     = faceNormal.x;
-							normalArray[ offset_normal + 1 ] = faceNormal.y;
-							normalArray[ offset_normal + 2 ] = faceNormal.z;
-
-							offset_normal += 3;
-
-						}
-
-					}
-
-				}
-
-				if ( dirtyUvs && uv !== undefined && uvType ) {
-
-					for ( i = 0; i < 3; i ++ ) {
-
-						uvi = uv[ i ];
-
-						uvArray[ offset_uv ]     = uvi.u;
-						uvArray[ offset_uv + 1 ] = uvi.v;
-
-						offset_uv += 2;
-
-					}
-
-				}
-
-				if ( dirtyUvs && uv2 !== undefined && uvType ) {
-
-					for ( i = 0; i < 3; i ++ ) {
-
-						uv2i = uv2[ i ];
-
-						uv2Array[ offset_uv2 ]     = uv2i.u;
-						uv2Array[ offset_uv2 + 1 ] = uv2i.v;
-
-						offset_uv2 += 2;
-
-					}
-
-				}
-
-				if ( dirtyElements ) {
-
-					faceArray[ offset_face ] 	 = vertexIndex;
-					faceArray[ offset_face + 1 ] = vertexIndex + 1;
-					faceArray[ offset_face + 2 ] = vertexIndex + 2;
-
-					offset_face += 3;
-
-					lineArray[ offset_line ]     = vertexIndex;
-					lineArray[ offset_line + 1 ] = vertexIndex + 1;
-
-					lineArray[ offset_line + 2 ] = vertexIndex;
-					lineArray[ offset_line + 3 ] = vertexIndex + 2;
-
-					lineArray[ offset_line + 4 ] = vertexIndex + 1;
-					lineArray[ offset_line + 5 ] = vertexIndex + 2;
-
-					offset_line += 6;
-
-					vertexIndex += 3;
-
-				}
-
-
-			} else if ( face instanceof THREE.Face4 ) {
-
-				if ( dirtyVertices ) {
-
-					v1 = vertices[ face.a ].position;
-					v2 = vertices[ face.b ].position;
-					v3 = vertices[ face.c ].position;
-					v4 = vertices[ face.d ].position;
-
-					vertexArray[ offset ]     = v1.x;
-					vertexArray[ offset + 1 ] = v1.y;
-					vertexArray[ offset + 2 ] = v1.z;
-
-					vertexArray[ offset + 3 ] = v2.x;
-					vertexArray[ offset + 4 ] = v2.y;
-					vertexArray[ offset + 5 ] = v2.z;
-
-					vertexArray[ offset + 6 ] = v3.x;
-					vertexArray[ offset + 7 ] = v3.y;
-					vertexArray[ offset + 8 ] = v3.z;
-
-					vertexArray[ offset + 9 ]  = v4.x;
-					vertexArray[ offset + 10 ] = v4.y;
-					vertexArray[ offset + 11 ] = v4.z;
-
-					offset += 12;
-
-				}
-
-				if ( customAttributes ) {
-
-					for ( i = 0, il = customAttributes.length; i < il; i ++ ) {
-
-						customAttribute = customAttributes[ i ];
-
-						if ( customAttribute.__original.needsUpdate ) {
-
-							offset_custom = customAttribute.offset;
-							offset_customSrc = customAttribute.offsetSrc;
-
-							if ( customAttribute.size === 1 ) {
-
-								if ( customAttribute.boundTo === undefined || customAttribute.boundTo === "vertices" ) {
-
-									customAttribute.array[ offset_custom ] 	   = customAttribute.value[ face.a ];
-									customAttribute.array[ offset_custom + 1 ] = customAttribute.value[ face.b ];
-									customAttribute.array[ offset_custom + 2 ] = customAttribute.value[ face.c ];
-									customAttribute.array[ offset_custom + 3 ] = customAttribute.value[ face.d ];
-
-								} else if ( customAttribute.boundTo === "faces" ) {
-
-									value = customAttribute.value[ offset_customSrc ];
-
-									customAttribute.array[ offset_custom ] 	   = value;
-									customAttribute.array[ offset_custom + 1 ] = value;
-									customAttribute.array[ offset_custom + 2 ] = value;
-									customAttribute.array[ offset_custom + 3 ] = value;
-
-									customAttribute.offsetSrc ++;
-
-								} else if ( customAttribute.boundTo === "faceVertices" ) {
-
-									customAttribute.array[ offset_custom ] 	   = customAttribute.value[ offset_customSrc ];
-									customAttribute.array[ offset_custom + 1 ] = customAttribute.value[ offset_customSrc + 1 ];
-									customAttribute.array[ offset_custom + 2 ] = customAttribute.value[ offset_customSrc + 2 ];
-									customAttribute.array[ offset_custom + 3 ] = customAttribute.value[ offset_customSrc + 3 ];
-
-									customAttribute.offsetSrc += 4;
-
-								}
-
-								customAttribute.offset += 4;
-
-							} else {
-
-								if ( customAttribute.boundTo === undefined || customAttribute.boundTo === "vertices" ) {
-
-									v1 = customAttribute.value[ face.a ];
-									v2 = customAttribute.value[ face.b ];
-									v3 = customAttribute.value[ face.c ];
-									v4 = customAttribute.value[ face.d ];
-
-								} else if ( customAttribute.boundTo === "faces" ) {
-
-									value = customAttribute.value[ offset_customSrc ];
-
-									v1 = value;
-									v2 = value;
-									v3 = value;
-									v4 = value;
-
-									customAttribute.offsetSrc ++;
-
-								} else if ( customAttribute.boundTo === "faceVertices" ) {
-
-									v1 = customAttribute.value[ offset_customSrc ];
-									v2 = customAttribute.value[ offset_customSrc + 1 ];
-									v3 = customAttribute.value[ offset_customSrc + 2 ];
-									v4 = customAttribute.value[ offset_customSrc + 3 ];
-
-									customAttribute.offsetSrc += 4;
-
-								}
-
-
-								if ( customAttribute.size === 2 ) {
-
-									customAttribute.array[ offset_custom ] 	   = v1.x;
-									customAttribute.array[ offset_custom + 1 ] = v1.y;
-
-									customAttribute.array[ offset_custom + 2 ] = v2.x;
-									customAttribute.array[ offset_custom + 3 ] = v2.y;
-
-									customAttribute.array[ offset_custom + 4 ] = v3.x;
-									customAttribute.array[ offset_custom + 5 ] = v3.y;
-
-									customAttribute.array[ offset_custom + 6 ] = v4.x;
-									customAttribute.array[ offset_custom + 7 ] = v4.y;
-
-									customAttribute.offset += 8;
-
-								} else if ( customAttribute.size === 3 ) {
-
-									if ( customAttribute.type === "c" ) {
-
-										customAttribute.array[ offset_custom  ] 	= v1.r;
-										customAttribute.array[ offset_custom + 1  ] = v1.g;
-										customAttribute.array[ offset_custom + 2  ] = v1.b;
-
-										customAttribute.array[ offset_custom + 3  ] = v2.r;
-										customAttribute.array[ offset_custom + 4  ] = v2.g;
-										customAttribute.array[ offset_custom + 5  ] = v2.b;
-
-										customAttribute.array[ offset_custom + 6  ] = v3.r;
-										customAttribute.array[ offset_custom + 7  ] = v3.g;
-										customAttribute.array[ offset_custom + 8  ] = v3.b;
-
-										customAttribute.array[ offset_custom + 9  ] = v4.r;
-										customAttribute.array[ offset_custom + 10 ] = v4.g;
-										customAttribute.array[ offset_custom + 11 ] = v4.b;
-
-									} else {
-
-										customAttribute.array[ offset_custom  ] 	= v1.x;
-										customAttribute.array[ offset_custom + 1  ] = v1.y;
-										customAttribute.array[ offset_custom + 2  ] = v1.z;
-
-										customAttribute.array[ offset_custom + 3  ] = v2.x;
-										customAttribute.array[ offset_custom + 4  ] = v2.y;
-										customAttribute.array[ offset_custom + 5  ] = v2.z;
-
-										customAttribute.array[ offset_custom + 6  ] = v3.x;
-										customAttribute.array[ offset_custom + 7  ] = v3.y;
-										customAttribute.array[ offset_custom + 8  ] = v3.z;
-
-										customAttribute.array[ offset_custom + 9  ] = v4.x;
-										customAttribute.array[ offset_custom + 10 ] = v4.y;
-										customAttribute.array[ offset_custom + 11 ] = v4.z;
-
-									}
-
-									customAttribute.offset += 12;
-
-								} else {
-
-									customAttribute.array[ offset_custom  ] 	= v1.x;
-									customAttribute.array[ offset_custom + 1  ] = v1.y;
-									customAttribute.array[ offset_custom + 2  ] = v1.z;
-									customAttribute.array[ offset_custom + 3  ] = v1.w;
-
-									customAttribute.array[ offset_custom + 4  ] = v2.x;
-									customAttribute.array[ offset_custom + 5  ] = v2.y;
-									customAttribute.array[ offset_custom + 6  ] = v2.z;
-									customAttribute.array[ offset_custom + 7  ] = v2.w;
-
-									customAttribute.array[ offset_custom + 8  ] = v3.x;
-									customAttribute.array[ offset_custom + 9  ] = v3.y;
-									customAttribute.array[ offset_custom + 10 ] = v3.z;
-									customAttribute.array[ offset_custom + 11 ] = v3.w;
-
-									customAttribute.array[ offset_custom + 12 ] = v4.x;
-									customAttribute.array[ offset_custom + 13 ] = v4.y;
-									customAttribute.array[ offset_custom + 14 ] = v4.z;
-									customAttribute.array[ offset_custom + 15 ] = v4.w;
-
-									customAttribute.offset += 16;
-
-								}
-
-							}
-
-						}
-
-					}
-
-				}
-
-
-				if ( dirtyMorphTargets ) {
-
-					for ( vk = 0, vkl = morphTargets.length; vk < vkl; vk ++ ) {
-
-						v1 = morphTargets[ vk ].vertices[ face.a ].position;
-						v2 = morphTargets[ vk ].vertices[ face.b ].position;
-						v3 = morphTargets[ vk ].vertices[ face.c ].position;
-						v4 = morphTargets[ vk ].vertices[ face.d ].position;
-
-						vka = morphTargetsArrays[ vk ];
-
-						vka[ offset_morphTarget ] 	  = v1.x;
-						vka[ offset_morphTarget + 1 ] = v1.y;
-						vka[ offset_morphTarget + 2 ] = v1.z;
-
-						vka[ offset_morphTarget + 3 ] = v2.x;
-						vka[ offset_morphTarget + 4 ] = v2.y;
-						vka[ offset_morphTarget + 5 ] = v2.z;
-
-						vka[ offset_morphTarget + 6 ] = v3.x;
-						vka[ offset_morphTarget + 7 ] = v3.y;
-						vka[ offset_morphTarget + 8 ] = v3.z;
-
-						vka[ offset_morphTarget + 9 ]  = v4.x;
-						vka[ offset_morphTarget + 10 ] = v4.y;
-						vka[ offset_morphTarget + 11 ] = v4.z;
-
-					}
-
-					offset_morphTarget += 12;
-
-				}
-
-				if ( obj_skinWeights.length ) {
-
-					// weights
-
-					sw1 = obj_skinWeights[ face.a ];
-					sw2 = obj_skinWeights[ face.b ];
-					sw3 = obj_skinWeights[ face.c ];
-					sw4 = obj_skinWeights[ face.d ];
-
-					skinWeightArray[ offset_skin ]     = sw1.x;
-					skinWeightArray[ offset_skin + 1 ] = sw1.y;
-					skinWeightArray[ offset_skin + 2 ] = sw1.z;
-					skinWeightArray[ offset_skin + 3 ] = sw1.w;
-
-					skinWeightArray[ offset_skin + 4 ] = sw2.x;
-					skinWeightArray[ offset_skin + 5 ] = sw2.y;
-					skinWeightArray[ offset_skin + 6 ] = sw2.z;
-					skinWeightArray[ offset_skin + 7 ] = sw2.w;
-
-					skinWeightArray[ offset_skin + 8 ]  = sw3.x;
-					skinWeightArray[ offset_skin + 9 ]  = sw3.y;
-					skinWeightArray[ offset_skin + 10 ] = sw3.z;
-					skinWeightArray[ offset_skin + 11 ] = sw3.w;
-
-					skinWeightArray[ offset_skin + 12 ] = sw4.x;
-					skinWeightArray[ offset_skin + 13 ] = sw4.y;
-					skinWeightArray[ offset_skin + 14 ] = sw4.z;
-					skinWeightArray[ offset_skin + 15 ] = sw4.w;
-
-					// indices
-
-					si1 = obj_skinIndices[ face.a ];
-					si2 = obj_skinIndices[ face.b ];
-					si3 = obj_skinIndices[ face.c ];
-					si4 = obj_skinIndices[ face.d ];
-
-					skinIndexArray[ offset_skin ]     = si1.x;
-					skinIndexArray[ offset_skin + 1 ] = si1.y;
-					skinIndexArray[ offset_skin + 2 ] = si1.z;
-					skinIndexArray[ offset_skin + 3 ] = si1.w;
-
-					skinIndexArray[ offset_skin + 4 ] = si2.x;
-					skinIndexArray[ offset_skin + 5 ] = si2.y;
-					skinIndexArray[ offset_skin + 6 ] = si2.z;
-					skinIndexArray[ offset_skin + 7 ] = si2.w;
-
-					skinIndexArray[ offset_skin + 8 ]  = si3.x;
-					skinIndexArray[ offset_skin + 9 ]  = si3.y;
-					skinIndexArray[ offset_skin + 10 ] = si3.z;
-					skinIndexArray[ offset_skin + 11 ] = si3.w;
-
-					skinIndexArray[ offset_skin + 12 ] = si4.x;
-					skinIndexArray[ offset_skin + 13 ] = si4.y;
-					skinIndexArray[ offset_skin + 14 ] = si4.z;
-					skinIndexArray[ offset_skin + 15 ] = si4.w;
-
-					// vertices A
-
-					sa1 = obj_skinVerticesA[ face.a ];
-					sa2 = obj_skinVerticesA[ face.b ];
-					sa3 = obj_skinVerticesA[ face.c ];
-					sa4 = obj_skinVerticesA[ face.d ];
-
-					skinVertexAArray[ offset_skin ]     = sa1.x;
-					skinVertexAArray[ offset_skin + 1 ] = sa1.y;
-					skinVertexAArray[ offset_skin + 2 ] = sa1.z;
-					skinVertexAArray[ offset_skin + 3 ] = 1; // pad for faster vertex shader
-
-					skinVertexAArray[ offset_skin + 4 ] = sa2.x;
-					skinVertexAArray[ offset_skin + 5 ] = sa2.y;
-					skinVertexAArray[ offset_skin + 6 ] = sa2.z;
-					skinVertexAArray[ offset_skin + 7 ] = 1;
-
-					skinVertexAArray[ offset_skin + 8 ]  = sa3.x;
-					skinVertexAArray[ offset_skin + 9 ]  = sa3.y;
-					skinVertexAArray[ offset_skin + 10 ] = sa3.z;
-					skinVertexAArray[ offset_skin + 11 ] = 1;
-
-					skinVertexAArray[ offset_skin + 12 ] = sa4.x;
-					skinVertexAArray[ offset_skin + 13 ] = sa4.y;
-					skinVertexAArray[ offset_skin + 14 ] = sa4.z;
-					skinVertexAArray[ offset_skin + 15 ] = 1;
-
-					// vertices B
-
-					sb1 = obj_skinVerticesB[ face.a ];
-					sb2 = obj_skinVerticesB[ face.b ];
-					sb3 = obj_skinVerticesB[ face.c ];
-					sb4 = obj_skinVerticesB[ face.d ];
-
-					skinVertexBArray[ offset_skin ]     = sb1.x;
-					skinVertexBArray[ offset_skin + 1 ] = sb1.y;
-					skinVertexBArray[ offset_skin + 2 ] = sb1.z;
-					skinVertexBArray[ offset_skin + 3 ] = 1; // pad for faster vertex shader
-
-					skinVertexBArray[ offset_skin + 4 ] = sb2.x;
-					skinVertexBArray[ offset_skin + 5 ] = sb2.y;
-					skinVertexBArray[ offset_skin + 6 ] = sb2.z;
-					skinVertexBArray[ offset_skin + 7 ] = 1;
-
-					skinVertexBArray[ offset_skin + 8 ]  = sb3.x;
-					skinVertexBArray[ offset_skin + 9 ]  = sb3.y;
-					skinVertexBArray[ offset_skin + 10 ] = sb3.z;
-					skinVertexBArray[ offset_skin + 11 ] = 1;
-
-					skinVertexBArray[ offset_skin + 12 ] = sb4.x;
-					skinVertexBArray[ offset_skin + 13 ] = sb4.y;
-					skinVertexBArray[ offset_skin + 14 ] = sb4.z;
-					skinVertexBArray[ offset_skin + 15 ] = 1;
-
-					offset_skin += 16;
-
-				}
-
-				if ( dirtyColors && vertexColorType ) {
-
-					if ( vertexColors.length === 4 && vertexColorType === THREE.VertexColors ) {
-
-						c1 = vertexColors[ 0 ];
-						c2 = vertexColors[ 1 ];
-						c3 = vertexColors[ 2 ];
-						c4 = vertexColors[ 3 ];
-
-					} else {
-
-						c1 = faceColor;
-						c2 = faceColor;
-						c3 = faceColor;
-						c4 = faceColor;
-
-					}
-
-					colorArray[ offset_color ]     = c1.r;
-					colorArray[ offset_color + 1 ] = c1.g;
-					colorArray[ offset_color + 2 ] = c1.b;
-
-					colorArray[ offset_color + 3 ] = c2.r;
-					colorArray[ offset_color + 4 ] = c2.g;
-					colorArray[ offset_color + 5 ] = c2.b;
-
-					colorArray[ offset_color + 6 ] = c3.r;
-					colorArray[ offset_color + 7 ] = c3.g;
-					colorArray[ offset_color + 8 ] = c3.b;
-
-					colorArray[ offset_color + 9 ]  = c4.r;
-					colorArray[ offset_color + 10 ] = c4.g;
-					colorArray[ offset_color + 11 ] = c4.b;
-
-					offset_color += 12;
-
-				}
-
-				if ( dirtyTangents && geometry.hasTangents ) {
-
-					t1 = vertexTangents[ 0 ];
-					t2 = vertexTangents[ 1 ];
-					t3 = vertexTangents[ 2 ];
-					t4 = vertexTangents[ 3 ];
-
-					tangentArray[ offset_tangent ]     = t1.x;
-					tangentArray[ offset_tangent + 1 ] = t1.y;
-					tangentArray[ offset_tangent + 2 ] = t1.z;
-					tangentArray[ offset_tangent + 3 ] = t1.w;
-
-					tangentArray[ offset_tangent + 4 ] = t2.x;
-					tangentArray[ offset_tangent + 5 ] = t2.y;
-					tangentArray[ offset_tangent + 6 ] = t2.z;
-					tangentArray[ offset_tangent + 7 ] = t2.w;
-
-					tangentArray[ offset_tangent + 8 ]  = t3.x;
-					tangentArray[ offset_tangent + 9 ]  = t3.y;
-					tangentArray[ offset_tangent + 10 ] = t3.z;
-					tangentArray[ offset_tangent + 11 ] = t3.w;
-
-					tangentArray[ offset_tangent + 12 ] = t4.x;
-					tangentArray[ offset_tangent + 13 ] = t4.y;
-					tangentArray[ offset_tangent + 14 ] = t4.z;
-					tangentArray[ offset_tangent + 15 ] = t4.w;
-
-					offset_tangent += 16;
-
-				}
-
-				if ( dirtyNormals && normalType ) {
-
-					if ( vertexNormals.length === 4 && needsSmoothNormals ) {
-
-						for ( i = 0; i < 4; i ++ ) {
-
-							vn = vertexNormals[ i ];
-
-							normalArray[ offset_normal ]     = vn.x;
-							normalArray[ offset_normal + 1 ] = vn.y;
-							normalArray[ offset_normal + 2 ] = vn.z;
-
-							offset_normal += 3;
-
-						}
-
-					} else {
-
-						for ( i = 0; i < 4; i ++ ) {
-
-							normalArray[ offset_normal ]     = faceNormal.x;
-							normalArray[ offset_normal + 1 ] = faceNormal.y;
-							normalArray[ offset_normal + 2 ] = faceNormal.z;
-
-							offset_normal += 3;
-
-						}
-
-					}
-
-				}
-
-				if ( dirtyUvs && uv !== undefined && uvType ) {
-
-					for ( i = 0; i < 4; i ++ ) {
-
-						uvi = uv[ i ];
-
-						uvArray[ offset_uv ]     = uvi.u;
-						uvArray[ offset_uv + 1 ] = uvi.v;
-
-						offset_uv += 2;
-
-					}
-
-				}
-
-				if ( dirtyUvs && uv2 !== undefined && uvType ) {
-
-					for ( i = 0; i < 4; i ++ ) {
-
-						uv2i = uv2[ i ];
-
-						uv2Array[ offset_uv2 ]     = uv2i.u;
-						uv2Array[ offset_uv2 + 1 ] = uv2i.v;
-
-						offset_uv2 += 2;
-
-					}
-
-				}
-
-				if ( dirtyElements ) {
-
-					faceArray[ offset_face ]     = vertexIndex;
-					faceArray[ offset_face + 1 ] = vertexIndex + 1;
-					faceArray[ offset_face + 2 ] = vertexIndex + 3;
-
-					faceArray[ offset_face + 3 ] = vertexIndex + 1;
-					faceArray[ offset_face + 4 ] = vertexIndex + 2;
-					faceArray[ offset_face + 5 ] = vertexIndex + 3;
-
-					offset_face += 6;
-
-					lineArray[ offset_line ]     = vertexIndex;
-					lineArray[ offset_line + 1 ] = vertexIndex + 1;
-
-					lineArray[ offset_line + 2 ] = vertexIndex;
-					lineArray[ offset_line + 3 ] = vertexIndex + 3;
-
-					lineArray[ offset_line + 4 ] = vertexIndex + 1;
-					lineArray[ offset_line + 5 ] = vertexIndex + 2;
-
-					lineArray[ offset_line + 6 ] = vertexIndex + 2;
-					lineArray[ offset_line + 7 ] = vertexIndex + 3;
-
-					offset_line += 8;
-
-					vertexIndex += 4;
 
 				}
 
 			}
 
+
+			if ( dirtyMorphTargets ) {
+
+				for ( vk = 0, vkl = morphTargets.length; vk < vkl; vk ++ ) {
+
+					v1 = morphTargets[ vk ].vertices[ face.a ].position;
+					v2 = morphTargets[ vk ].vertices[ face.b ].position;
+					v3 = morphTargets[ vk ].vertices[ face.c ].position;
+
+					vka = morphTargetsArrays[ vk ];
+
+					vka[ offset_morphTarget ] 	  = v1.x;
+					vka[ offset_morphTarget + 1 ] = v1.y;
+					vka[ offset_morphTarget + 2 ] = v1.z;
+
+					vka[ offset_morphTarget + 3 ] = v2.x;
+					vka[ offset_morphTarget + 4 ] = v2.y;
+					vka[ offset_morphTarget + 5 ] = v2.z;
+
+					vka[ offset_morphTarget + 6 ] = v3.x;
+					vka[ offset_morphTarget + 7 ] = v3.y;
+					vka[ offset_morphTarget + 8 ] = v3.z;
+
+				}
+
+				offset_morphTarget += 9;
+
+			}
+
+			if ( obj_skinWeights.length ) {
+
+				// weights
+
+				sw1 = obj_skinWeights[ face.a ];
+				sw2 = obj_skinWeights[ face.b ];
+				sw3 = obj_skinWeights[ face.c ];
+
+				skinWeightArray[ offset_skin ]     = sw1.x;
+				skinWeightArray[ offset_skin + 1 ] = sw1.y;
+				skinWeightArray[ offset_skin + 2 ] = sw1.z;
+				skinWeightArray[ offset_skin + 3 ] = sw1.w;
+
+				skinWeightArray[ offset_skin + 4 ] = sw2.x;
+				skinWeightArray[ offset_skin + 5 ] = sw2.y;
+				skinWeightArray[ offset_skin + 6 ] = sw2.z;
+				skinWeightArray[ offset_skin + 7 ] = sw2.w;
+
+				skinWeightArray[ offset_skin + 8 ]  = sw3.x;
+				skinWeightArray[ offset_skin + 9 ]  = sw3.y;
+				skinWeightArray[ offset_skin + 10 ] = sw3.z;
+				skinWeightArray[ offset_skin + 11 ] = sw3.w;
+
+				// indices
+
+				si1 = obj_skinIndices[ face.a ];
+				si2 = obj_skinIndices[ face.b ];
+				si3 = obj_skinIndices[ face.c ];
+
+				skinIndexArray[ offset_skin ]     = si1.x;
+				skinIndexArray[ offset_skin + 1 ] = si1.y;
+				skinIndexArray[ offset_skin + 2 ] = si1.z;
+				skinIndexArray[ offset_skin + 3 ] = si1.w;
+
+				skinIndexArray[ offset_skin + 4 ] = si2.x;
+				skinIndexArray[ offset_skin + 5 ] = si2.y;
+				skinIndexArray[ offset_skin + 6 ] = si2.z;
+				skinIndexArray[ offset_skin + 7 ] = si2.w;
+
+				skinIndexArray[ offset_skin + 8 ]  = si3.x;
+				skinIndexArray[ offset_skin + 9 ]  = si3.y;
+				skinIndexArray[ offset_skin + 10 ] = si3.z;
+				skinIndexArray[ offset_skin + 11 ] = si3.w;
+
+				// vertices A
+
+				sa1 = obj_skinVerticesA[ face.a ];
+				sa2 = obj_skinVerticesA[ face.b ];
+				sa3 = obj_skinVerticesA[ face.c ];
+
+				skinVertexAArray[ offset_skin ]     = sa1.x;
+				skinVertexAArray[ offset_skin + 1 ] = sa1.y;
+				skinVertexAArray[ offset_skin + 2 ] = sa1.z;
+				skinVertexAArray[ offset_skin + 3 ] = 1; // pad for faster vertex shader
+
+				skinVertexAArray[ offset_skin + 4 ] = sa2.x;
+				skinVertexAArray[ offset_skin + 5 ] = sa2.y;
+				skinVertexAArray[ offset_skin + 6 ] = sa2.z;
+				skinVertexAArray[ offset_skin + 7 ] = 1;
+
+				skinVertexAArray[ offset_skin + 8 ]  = sa3.x;
+				skinVertexAArray[ offset_skin + 9 ]  = sa3.y;
+				skinVertexAArray[ offset_skin + 10 ] = sa3.z;
+				skinVertexAArray[ offset_skin + 11 ] = 1;
+
+				// vertices B
+
+				sb1 = obj_skinVerticesB[ face.a ];
+				sb2 = obj_skinVerticesB[ face.b ];
+				sb3 = obj_skinVerticesB[ face.c ];
+
+				skinVertexBArray[ offset_skin ]     = sb1.x;
+				skinVertexBArray[ offset_skin + 1 ] = sb1.y;
+				skinVertexBArray[ offset_skin + 2 ] = sb1.z;
+				skinVertexBArray[ offset_skin + 3 ] = 1; // pad for faster vertex shader
+
+				skinVertexBArray[ offset_skin + 4 ] = sb2.x;
+				skinVertexBArray[ offset_skin + 5 ] = sb2.y;
+				skinVertexBArray[ offset_skin + 6 ] = sb2.z;
+				skinVertexBArray[ offset_skin + 7 ] = 1;
+
+				skinVertexBArray[ offset_skin + 8 ]  = sb3.x;
+				skinVertexBArray[ offset_skin + 9 ]  = sb3.y;
+				skinVertexBArray[ offset_skin + 10 ] = sb3.z;
+				skinVertexBArray[ offset_skin + 11 ] = 1;
+
+				offset_skin += 12;
+
+			}
+
+			if ( dirtyColors && vertexColorType ) {
+
+				if ( vertexColors.length === 3 && vertexColorType === THREE.VertexColors ) {
+
+					c1 = vertexColors[ 0 ];
+					c2 = vertexColors[ 1 ];
+					c3 = vertexColors[ 2 ];
+
+				} else {
+
+					c1 = faceColor;
+					c2 = faceColor;
+					c3 = faceColor;
+
+				}
+
+				colorArray[ offset_color ]     = c1.r;
+				colorArray[ offset_color + 1 ] = c1.g;
+				colorArray[ offset_color + 2 ] = c1.b;
+
+				colorArray[ offset_color + 3 ] = c2.r;
+				colorArray[ offset_color + 4 ] = c2.g;
+				colorArray[ offset_color + 5 ] = c2.b;
+
+				colorArray[ offset_color + 6 ] = c3.r;
+				colorArray[ offset_color + 7 ] = c3.g;
+				colorArray[ offset_color + 8 ] = c3.b;
+
+				offset_color += 9;
+
+			}
+
+			if ( dirtyTangents && geometry.hasTangents ) {
+
+				t1 = vertexTangents[ 0 ];
+				t2 = vertexTangents[ 1 ];
+				t3 = vertexTangents[ 2 ];
+
+				tangentArray[ offset_tangent ]     = t1.x;
+				tangentArray[ offset_tangent + 1 ] = t1.y;
+				tangentArray[ offset_tangent + 2 ] = t1.z;
+				tangentArray[ offset_tangent + 3 ] = t1.w;
+
+				tangentArray[ offset_tangent + 4 ] = t2.x;
+				tangentArray[ offset_tangent + 5 ] = t2.y;
+				tangentArray[ offset_tangent + 6 ] = t2.z;
+				tangentArray[ offset_tangent + 7 ] = t2.w;
+
+				tangentArray[ offset_tangent + 8 ]  = t3.x;
+				tangentArray[ offset_tangent + 9 ]  = t3.y;
+				tangentArray[ offset_tangent + 10 ] = t3.z;
+				tangentArray[ offset_tangent + 11 ] = t3.w;
+
+				offset_tangent += 12;
+
+			}
+
+			if ( dirtyNormals && normalType ) {
+
+				if ( vertexNormals.length === 3 && needsSmoothNormals ) {
+
+					for ( i = 0; i < 3; i ++ ) {
+
+						vn = vertexNormals[ i ];
+
+						normalArray[ offset_normal ]     = vn.x;
+						normalArray[ offset_normal + 1 ] = vn.y;
+						normalArray[ offset_normal + 2 ] = vn.z;
+
+						offset_normal += 3;
+
+					}
+
+				} else {
+
+					for ( i = 0; i < 3; i ++ ) {
+
+						normalArray[ offset_normal ]     = faceNormal.x;
+						normalArray[ offset_normal + 1 ] = faceNormal.y;
+						normalArray[ offset_normal + 2 ] = faceNormal.z;
+
+						offset_normal += 3;
+
+					}
+
+				}
+
+			}
+
+			if ( dirtyUvs && uv !== undefined && uvType ) {
+
+				for ( i = 0; i < 3; i ++ ) {
+
+					uvi = uv[ i ];
+
+					uvArray[ offset_uv ]     = uvi.u;
+					uvArray[ offset_uv + 1 ] = uvi.v;
+
+					offset_uv += 2;
+
+				}
+
+			}
+
+			if ( dirtyUvs && uv2 !== undefined && uvType ) {
+
+				for ( i = 0; i < 3; i ++ ) {
+
+					uv2i = uv2[ i ];
+
+					uv2Array[ offset_uv2 ]     = uv2i.u;
+					uv2Array[ offset_uv2 + 1 ] = uv2i.v;
+
+					offset_uv2 += 2;
+
+				}
+
+			}
+
+			if ( dirtyElements ) {
+
+				faceArray[ offset_face ] 	 = vertexIndex;
+				faceArray[ offset_face + 1 ] = vertexIndex + 1;
+				faceArray[ offset_face + 2 ] = vertexIndex + 2;
+
+				offset_face += 3;
+
+				lineArray[ offset_line ]     = vertexIndex;
+				lineArray[ offset_line + 1 ] = vertexIndex + 1;
+
+				lineArray[ offset_line + 2 ] = vertexIndex;
+				lineArray[ offset_line + 3 ] = vertexIndex + 2;
+
+				lineArray[ offset_line + 4 ] = vertexIndex + 1;
+				lineArray[ offset_line + 5 ] = vertexIndex + 2;
+
+				offset_line += 6;
+
+				vertexIndex += 3;
+
+			}
+
 		}
+
+		for ( f = 0, fl = chunk_faces4.length; f < fl; f ++ ) {
+
+			fi = chunk_faces4[ f ];
+			face = obj_faces[ fi ];
+
+			if ( obj_uvs ) {
+
+				uv = obj_uvs[ fi ];
+
+			}
+
+			if ( obj_uvs2 ) {
+
+				uv2 = obj_uvs2[ fi ];
+
+			}
+
+			vertexNormals = face.vertexNormals;
+			faceNormal = face.normal;
+
+			vertexColors = face.vertexColors;
+			faceColor = face.color;
+
+			vertexTangents = face.vertexTangents;
+
+			if ( dirtyVertices ) {
+
+				v1 = vertices[ face.a ].position;
+				v2 = vertices[ face.b ].position;
+				v3 = vertices[ face.c ].position;
+				v4 = vertices[ face.d ].position;
+
+				vertexArray[ offset ]     = v1.x;
+				vertexArray[ offset + 1 ] = v1.y;
+				vertexArray[ offset + 2 ] = v1.z;
+
+				vertexArray[ offset + 3 ] = v2.x;
+				vertexArray[ offset + 4 ] = v2.y;
+				vertexArray[ offset + 5 ] = v2.z;
+
+				vertexArray[ offset + 6 ] = v3.x;
+				vertexArray[ offset + 7 ] = v3.y;
+				vertexArray[ offset + 8 ] = v3.z;
+
+				vertexArray[ offset + 9 ]  = v4.x;
+				vertexArray[ offset + 10 ] = v4.y;
+				vertexArray[ offset + 11 ] = v4.z;
+
+				offset += 12;
+
+			}
+
+			if ( customAttributes ) {
+
+				for ( i = 0, il = customAttributes.length; i < il; i ++ ) {
+
+					customAttribute = customAttributes[ i ];
+
+					if ( customAttribute.__original.needsUpdate ) {
+
+						offset_custom = customAttribute.offset;
+						offset_customSrc = customAttribute.offsetSrc;
+
+						if ( customAttribute.size === 1 ) {
+
+							if ( customAttribute.boundTo === undefined || customAttribute.boundTo === "vertices" ) {
+
+								customAttribute.array[ offset_custom ] 	   = customAttribute.value[ face.a ];
+								customAttribute.array[ offset_custom + 1 ] = customAttribute.value[ face.b ];
+								customAttribute.array[ offset_custom + 2 ] = customAttribute.value[ face.c ];
+								customAttribute.array[ offset_custom + 3 ] = customAttribute.value[ face.d ];
+
+							} else if ( customAttribute.boundTo === "faces" ) {
+
+								value = customAttribute.value[ offset_customSrc ];
+
+								customAttribute.array[ offset_custom ] 	   = value;
+								customAttribute.array[ offset_custom + 1 ] = value;
+								customAttribute.array[ offset_custom + 2 ] = value;
+								customAttribute.array[ offset_custom + 3 ] = value;
+
+								customAttribute.offsetSrc ++;
+
+							} else if ( customAttribute.boundTo === "faceVertices" ) {
+
+								customAttribute.array[ offset_custom ] 	   = customAttribute.value[ offset_customSrc ];
+								customAttribute.array[ offset_custom + 1 ] = customAttribute.value[ offset_customSrc + 1 ];
+								customAttribute.array[ offset_custom + 2 ] = customAttribute.value[ offset_customSrc + 2 ];
+								customAttribute.array[ offset_custom + 3 ] = customAttribute.value[ offset_customSrc + 3 ];
+
+								customAttribute.offsetSrc += 4;
+
+							}
+
+							customAttribute.offset += 4;
+
+						} else {
+
+							if ( customAttribute.boundTo === undefined || customAttribute.boundTo === "vertices" ) {
+
+								v1 = customAttribute.value[ face.a ];
+								v2 = customAttribute.value[ face.b ];
+								v3 = customAttribute.value[ face.c ];
+								v4 = customAttribute.value[ face.d ];
+
+							} else if ( customAttribute.boundTo === "faces" ) {
+
+								value = customAttribute.value[ offset_customSrc ];
+
+								v1 = value;
+								v2 = value;
+								v3 = value;
+								v4 = value;
+
+								customAttribute.offsetSrc ++;
+
+							} else if ( customAttribute.boundTo === "faceVertices" ) {
+
+								v1 = customAttribute.value[ offset_customSrc ];
+								v2 = customAttribute.value[ offset_customSrc + 1 ];
+								v3 = customAttribute.value[ offset_customSrc + 2 ];
+								v4 = customAttribute.value[ offset_customSrc + 3 ];
+
+								customAttribute.offsetSrc += 4;
+
+							}
+
+
+							if ( customAttribute.size === 2 ) {
+
+								customAttribute.array[ offset_custom ] 	   = v1.x;
+								customAttribute.array[ offset_custom + 1 ] = v1.y;
+
+								customAttribute.array[ offset_custom + 2 ] = v2.x;
+								customAttribute.array[ offset_custom + 3 ] = v2.y;
+
+								customAttribute.array[ offset_custom + 4 ] = v3.x;
+								customAttribute.array[ offset_custom + 5 ] = v3.y;
+
+								customAttribute.array[ offset_custom + 6 ] = v4.x;
+								customAttribute.array[ offset_custom + 7 ] = v4.y;
+
+								customAttribute.offset += 8;
+
+							} else if ( customAttribute.size === 3 ) {
+
+								if ( customAttribute.type === "c" ) {
+
+									customAttribute.array[ offset_custom  ] 	= v1.r;
+									customAttribute.array[ offset_custom + 1  ] = v1.g;
+									customAttribute.array[ offset_custom + 2  ] = v1.b;
+
+									customAttribute.array[ offset_custom + 3  ] = v2.r;
+									customAttribute.array[ offset_custom + 4  ] = v2.g;
+									customAttribute.array[ offset_custom + 5  ] = v2.b;
+
+									customAttribute.array[ offset_custom + 6  ] = v3.r;
+									customAttribute.array[ offset_custom + 7  ] = v3.g;
+									customAttribute.array[ offset_custom + 8  ] = v3.b;
+
+									customAttribute.array[ offset_custom + 9  ] = v4.r;
+									customAttribute.array[ offset_custom + 10 ] = v4.g;
+									customAttribute.array[ offset_custom + 11 ] = v4.b;
+
+								} else {
+
+									customAttribute.array[ offset_custom  ] 	= v1.x;
+									customAttribute.array[ offset_custom + 1  ] = v1.y;
+									customAttribute.array[ offset_custom + 2  ] = v1.z;
+
+									customAttribute.array[ offset_custom + 3  ] = v2.x;
+									customAttribute.array[ offset_custom + 4  ] = v2.y;
+									customAttribute.array[ offset_custom + 5  ] = v2.z;
+
+									customAttribute.array[ offset_custom + 6  ] = v3.x;
+									customAttribute.array[ offset_custom + 7  ] = v3.y;
+									customAttribute.array[ offset_custom + 8  ] = v3.z;
+
+									customAttribute.array[ offset_custom + 9  ] = v4.x;
+									customAttribute.array[ offset_custom + 10 ] = v4.y;
+									customAttribute.array[ offset_custom + 11 ] = v4.z;
+
+								}
+
+								customAttribute.offset += 12;
+
+							} else {
+
+								customAttribute.array[ offset_custom  ] 	= v1.x;
+								customAttribute.array[ offset_custom + 1  ] = v1.y;
+								customAttribute.array[ offset_custom + 2  ] = v1.z;
+								customAttribute.array[ offset_custom + 3  ] = v1.w;
+
+								customAttribute.array[ offset_custom + 4  ] = v2.x;
+								customAttribute.array[ offset_custom + 5  ] = v2.y;
+								customAttribute.array[ offset_custom + 6  ] = v2.z;
+								customAttribute.array[ offset_custom + 7  ] = v2.w;
+
+								customAttribute.array[ offset_custom + 8  ] = v3.x;
+								customAttribute.array[ offset_custom + 9  ] = v3.y;
+								customAttribute.array[ offset_custom + 10 ] = v3.z;
+								customAttribute.array[ offset_custom + 11 ] = v3.w;
+
+								customAttribute.array[ offset_custom + 12 ] = v4.x;
+								customAttribute.array[ offset_custom + 13 ] = v4.y;
+								customAttribute.array[ offset_custom + 14 ] = v4.z;
+								customAttribute.array[ offset_custom + 15 ] = v4.w;
+
+								customAttribute.offset += 16;
+
+							}
+
+						}
+
+					}
+
+				}
+
+			}
+
+
+			if ( dirtyMorphTargets ) {
+
+				for ( vk = 0, vkl = morphTargets.length; vk < vkl; vk ++ ) {
+
+					v1 = morphTargets[ vk ].vertices[ face.a ].position;
+					v2 = morphTargets[ vk ].vertices[ face.b ].position;
+					v3 = morphTargets[ vk ].vertices[ face.c ].position;
+					v4 = morphTargets[ vk ].vertices[ face.d ].position;
+
+					vka = morphTargetsArrays[ vk ];
+
+					vka[ offset_morphTarget ] 	  = v1.x;
+					vka[ offset_morphTarget + 1 ] = v1.y;
+					vka[ offset_morphTarget + 2 ] = v1.z;
+
+					vka[ offset_morphTarget + 3 ] = v2.x;
+					vka[ offset_morphTarget + 4 ] = v2.y;
+					vka[ offset_morphTarget + 5 ] = v2.z;
+
+					vka[ offset_morphTarget + 6 ] = v3.x;
+					vka[ offset_morphTarget + 7 ] = v3.y;
+					vka[ offset_morphTarget + 8 ] = v3.z;
+
+					vka[ offset_morphTarget + 9 ]  = v4.x;
+					vka[ offset_morphTarget + 10 ] = v4.y;
+					vka[ offset_morphTarget + 11 ] = v4.z;
+
+				}
+
+				offset_morphTarget += 12;
+
+			}
+
+			if ( obj_skinWeights.length ) {
+
+				// weights
+
+				sw1 = obj_skinWeights[ face.a ];
+				sw2 = obj_skinWeights[ face.b ];
+				sw3 = obj_skinWeights[ face.c ];
+				sw4 = obj_skinWeights[ face.d ];
+
+				skinWeightArray[ offset_skin ]     = sw1.x;
+				skinWeightArray[ offset_skin + 1 ] = sw1.y;
+				skinWeightArray[ offset_skin + 2 ] = sw1.z;
+				skinWeightArray[ offset_skin + 3 ] = sw1.w;
+
+				skinWeightArray[ offset_skin + 4 ] = sw2.x;
+				skinWeightArray[ offset_skin + 5 ] = sw2.y;
+				skinWeightArray[ offset_skin + 6 ] = sw2.z;
+				skinWeightArray[ offset_skin + 7 ] = sw2.w;
+
+				skinWeightArray[ offset_skin + 8 ]  = sw3.x;
+				skinWeightArray[ offset_skin + 9 ]  = sw3.y;
+				skinWeightArray[ offset_skin + 10 ] = sw3.z;
+				skinWeightArray[ offset_skin + 11 ] = sw3.w;
+
+				skinWeightArray[ offset_skin + 12 ] = sw4.x;
+				skinWeightArray[ offset_skin + 13 ] = sw4.y;
+				skinWeightArray[ offset_skin + 14 ] = sw4.z;
+				skinWeightArray[ offset_skin + 15 ] = sw4.w;
+
+				// indices
+
+				si1 = obj_skinIndices[ face.a ];
+				si2 = obj_skinIndices[ face.b ];
+				si3 = obj_skinIndices[ face.c ];
+				si4 = obj_skinIndices[ face.d ];
+
+				skinIndexArray[ offset_skin ]     = si1.x;
+				skinIndexArray[ offset_skin + 1 ] = si1.y;
+				skinIndexArray[ offset_skin + 2 ] = si1.z;
+				skinIndexArray[ offset_skin + 3 ] = si1.w;
+
+				skinIndexArray[ offset_skin + 4 ] = si2.x;
+				skinIndexArray[ offset_skin + 5 ] = si2.y;
+				skinIndexArray[ offset_skin + 6 ] = si2.z;
+				skinIndexArray[ offset_skin + 7 ] = si2.w;
+
+				skinIndexArray[ offset_skin + 8 ]  = si3.x;
+				skinIndexArray[ offset_skin + 9 ]  = si3.y;
+				skinIndexArray[ offset_skin + 10 ] = si3.z;
+				skinIndexArray[ offset_skin + 11 ] = si3.w;
+
+				skinIndexArray[ offset_skin + 12 ] = si4.x;
+				skinIndexArray[ offset_skin + 13 ] = si4.y;
+				skinIndexArray[ offset_skin + 14 ] = si4.z;
+				skinIndexArray[ offset_skin + 15 ] = si4.w;
+
+				// vertices A
+
+				sa1 = obj_skinVerticesA[ face.a ];
+				sa2 = obj_skinVerticesA[ face.b ];
+				sa3 = obj_skinVerticesA[ face.c ];
+				sa4 = obj_skinVerticesA[ face.d ];
+
+				skinVertexAArray[ offset_skin ]     = sa1.x;
+				skinVertexAArray[ offset_skin + 1 ] = sa1.y;
+				skinVertexAArray[ offset_skin + 2 ] = sa1.z;
+				skinVertexAArray[ offset_skin + 3 ] = 1; // pad for faster vertex shader
+
+				skinVertexAArray[ offset_skin + 4 ] = sa2.x;
+				skinVertexAArray[ offset_skin + 5 ] = sa2.y;
+				skinVertexAArray[ offset_skin + 6 ] = sa2.z;
+				skinVertexAArray[ offset_skin + 7 ] = 1;
+
+				skinVertexAArray[ offset_skin + 8 ]  = sa3.x;
+				skinVertexAArray[ offset_skin + 9 ]  = sa3.y;
+				skinVertexAArray[ offset_skin + 10 ] = sa3.z;
+				skinVertexAArray[ offset_skin + 11 ] = 1;
+
+				skinVertexAArray[ offset_skin + 12 ] = sa4.x;
+				skinVertexAArray[ offset_skin + 13 ] = sa4.y;
+				skinVertexAArray[ offset_skin + 14 ] = sa4.z;
+				skinVertexAArray[ offset_skin + 15 ] = 1;
+
+				// vertices B
+
+				sb1 = obj_skinVerticesB[ face.a ];
+				sb2 = obj_skinVerticesB[ face.b ];
+				sb3 = obj_skinVerticesB[ face.c ];
+				sb4 = obj_skinVerticesB[ face.d ];
+
+				skinVertexBArray[ offset_skin ]     = sb1.x;
+				skinVertexBArray[ offset_skin + 1 ] = sb1.y;
+				skinVertexBArray[ offset_skin + 2 ] = sb1.z;
+				skinVertexBArray[ offset_skin + 3 ] = 1; // pad for faster vertex shader
+
+				skinVertexBArray[ offset_skin + 4 ] = sb2.x;
+				skinVertexBArray[ offset_skin + 5 ] = sb2.y;
+				skinVertexBArray[ offset_skin + 6 ] = sb2.z;
+				skinVertexBArray[ offset_skin + 7 ] = 1;
+
+				skinVertexBArray[ offset_skin + 8 ]  = sb3.x;
+				skinVertexBArray[ offset_skin + 9 ]  = sb3.y;
+				skinVertexBArray[ offset_skin + 10 ] = sb3.z;
+				skinVertexBArray[ offset_skin + 11 ] = 1;
+
+				skinVertexBArray[ offset_skin + 12 ] = sb4.x;
+				skinVertexBArray[ offset_skin + 13 ] = sb4.y;
+				skinVertexBArray[ offset_skin + 14 ] = sb4.z;
+				skinVertexBArray[ offset_skin + 15 ] = 1;
+
+				offset_skin += 16;
+
+			}
+
+			if ( dirtyColors && vertexColorType ) {
+
+				if ( vertexColors.length === 4 && vertexColorType === THREE.VertexColors ) {
+
+					c1 = vertexColors[ 0 ];
+					c2 = vertexColors[ 1 ];
+					c3 = vertexColors[ 2 ];
+					c4 = vertexColors[ 3 ];
+
+				} else {
+
+					c1 = faceColor;
+					c2 = faceColor;
+					c3 = faceColor;
+					c4 = faceColor;
+
+				}
+
+				colorArray[ offset_color ]     = c1.r;
+				colorArray[ offset_color + 1 ] = c1.g;
+				colorArray[ offset_color + 2 ] = c1.b;
+
+				colorArray[ offset_color + 3 ] = c2.r;
+				colorArray[ offset_color + 4 ] = c2.g;
+				colorArray[ offset_color + 5 ] = c2.b;
+
+				colorArray[ offset_color + 6 ] = c3.r;
+				colorArray[ offset_color + 7 ] = c3.g;
+				colorArray[ offset_color + 8 ] = c3.b;
+
+				colorArray[ offset_color + 9 ]  = c4.r;
+				colorArray[ offset_color + 10 ] = c4.g;
+				colorArray[ offset_color + 11 ] = c4.b;
+
+				offset_color += 12;
+
+			}
+
+			if ( dirtyTangents && geometry.hasTangents ) {
+
+				t1 = vertexTangents[ 0 ];
+				t2 = vertexTangents[ 1 ];
+				t3 = vertexTangents[ 2 ];
+				t4 = vertexTangents[ 3 ];
+
+				tangentArray[ offset_tangent ]     = t1.x;
+				tangentArray[ offset_tangent + 1 ] = t1.y;
+				tangentArray[ offset_tangent + 2 ] = t1.z;
+				tangentArray[ offset_tangent + 3 ] = t1.w;
+
+				tangentArray[ offset_tangent + 4 ] = t2.x;
+				tangentArray[ offset_tangent + 5 ] = t2.y;
+				tangentArray[ offset_tangent + 6 ] = t2.z;
+				tangentArray[ offset_tangent + 7 ] = t2.w;
+
+				tangentArray[ offset_tangent + 8 ]  = t3.x;
+				tangentArray[ offset_tangent + 9 ]  = t3.y;
+				tangentArray[ offset_tangent + 10 ] = t3.z;
+				tangentArray[ offset_tangent + 11 ] = t3.w;
+
+				tangentArray[ offset_tangent + 12 ] = t4.x;
+				tangentArray[ offset_tangent + 13 ] = t4.y;
+				tangentArray[ offset_tangent + 14 ] = t4.z;
+				tangentArray[ offset_tangent + 15 ] = t4.w;
+
+				offset_tangent += 16;
+
+			}
+
+			if ( dirtyNormals && normalType ) {
+
+				if ( vertexNormals.length === 4 && needsSmoothNormals ) {
+
+					for ( i = 0; i < 4; i ++ ) {
+
+						vn = vertexNormals[ i ];
+
+						normalArray[ offset_normal ]     = vn.x;
+						normalArray[ offset_normal + 1 ] = vn.y;
+						normalArray[ offset_normal + 2 ] = vn.z;
+
+						offset_normal += 3;
+
+					}
+
+				} else {
+
+					for ( i = 0; i < 4; i ++ ) {
+
+						normalArray[ offset_normal ]     = faceNormal.x;
+						normalArray[ offset_normal + 1 ] = faceNormal.y;
+						normalArray[ offset_normal + 2 ] = faceNormal.z;
+
+						offset_normal += 3;
+
+					}
+
+				}
+
+			}
+
+			if ( dirtyUvs && uv !== undefined && uvType ) {
+
+				for ( i = 0; i < 4; i ++ ) {
+
+					uvi = uv[ i ];
+
+					uvArray[ offset_uv ]     = uvi.u;
+					uvArray[ offset_uv + 1 ] = uvi.v;
+
+					offset_uv += 2;
+
+				}
+
+			}
+
+			if ( dirtyUvs && uv2 !== undefined && uvType ) {
+
+				for ( i = 0; i < 4; i ++ ) {
+
+					uv2i = uv2[ i ];
+
+					uv2Array[ offset_uv2 ]     = uv2i.u;
+					uv2Array[ offset_uv2 + 1 ] = uv2i.v;
+
+					offset_uv2 += 2;
+
+				}
+
+			}
+
+			if ( dirtyElements ) {
+
+				faceArray[ offset_face ]     = vertexIndex;
+				faceArray[ offset_face + 1 ] = vertexIndex + 1;
+				faceArray[ offset_face + 2 ] = vertexIndex + 3;
+
+				faceArray[ offset_face + 3 ] = vertexIndex + 1;
+				faceArray[ offset_face + 4 ] = vertexIndex + 2;
+				faceArray[ offset_face + 5 ] = vertexIndex + 3;
+
+				offset_face += 6;
+
+				lineArray[ offset_line ]     = vertexIndex;
+				lineArray[ offset_line + 1 ] = vertexIndex + 1;
+
+				lineArray[ offset_line + 2 ] = vertexIndex;
+				lineArray[ offset_line + 3 ] = vertexIndex + 3;
+
+				lineArray[ offset_line + 4 ] = vertexIndex + 1;
+				lineArray[ offset_line + 5 ] = vertexIndex + 2;
+
+				lineArray[ offset_line + 6 ] = vertexIndex + 2;
+				lineArray[ offset_line + 7 ] = vertexIndex + 3;
+
+				offset_line += 8;
+
+				vertexIndex += 4;
+
+			}
+
+		}
+
 
 		if ( dirtyVertices ) {
 
@@ -4679,7 +4673,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( geometry.geometryGroups[ groupHash ] === undefined ) {
 
-				geometry.geometryGroups[ groupHash ] = { 'faces': [], 'materialIndex': materialIndex, 'vertices': 0, 'numMorphTargets': numMorphTargets };
+				geometry.geometryGroups[ groupHash ] = { 'faces3': [], 'faces4': [], 'materialIndex': materialIndex, 'vertices': 0, 'numMorphTargets': numMorphTargets };
 
 			}
 
@@ -4692,13 +4686,22 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( geometry.geometryGroups[ groupHash ] === undefined ) {
 
-					geometry.geometryGroups[ groupHash ] = { 'faces': [], 'materialIndex': materialIndex, 'vertices': 0, 'numMorphTargets': numMorphTargets };
+					geometry.geometryGroups[ groupHash ] = { 'faces3': [], 'faces4': [], 'materialIndex': materialIndex, 'vertices': 0, 'numMorphTargets': numMorphTargets };
 
 				}
 
 			}
 
-			geometry.geometryGroups[ groupHash ].faces.push( f );
+			if ( face instanceof THREE.Face3 ) {
+
+				geometry.geometryGroups[ groupHash ].faces3.push( f );
+
+			} else {
+
+				geometry.geometryGroups[ groupHash ].faces4.push( f );
+
+			}
+
 			geometry.geometryGroups[ groupHash ].vertices += vertices;
 
 		}
