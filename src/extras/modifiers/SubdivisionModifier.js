@@ -502,10 +502,12 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 			continue;
 			// Do not move vertex if there's 2 connecting sharp edges.
 		}
-		
+
+		/*
 		if (sharpEdgeCount>2) {
 			// TODO
 		}
+		*/
 		
 		F.divideScalar(f);
 		
