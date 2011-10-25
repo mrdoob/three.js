@@ -4858,6 +4858,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			parameters.vertexColors ? "#define USE_COLOR" : "",
 			parameters.skinning ? "#define USE_SKINNING" : "",
 			parameters.morphTargets ? "#define USE_MORPHTARGETS" : "",
+			parameters.perPixel ? "#define PHONG_PER_PIXEL" : "",
 
 			parameters.shadowMapEnabled ? "#define USE_SHADOWMAP" : "",
 			parameters.shadowMapSoft ? "#define SHADOWMAP_SOFT" : "",
