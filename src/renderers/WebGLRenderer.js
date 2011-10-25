@@ -3798,14 +3798,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_this.info.render.vertices = 0;
 		_this.info.render.faces = 0;
 
-		if ( camera.parent == null ) {
+		if ( camera.parent !== scene ) scene.add( camera );
 
-			console.warn( "Camera is not on the Scene. Adding it..." );
-			scene.add( camera );
-
-		}
-
-		if ( this.autoUpdateScene )	scene.updateMatrixWorld();
+		if ( this.autoUpdateScene ) scene.updateMatrixWorld();
 
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 		camera.matrixWorldInverse.flattenToArray( _viewMatrixArray );
