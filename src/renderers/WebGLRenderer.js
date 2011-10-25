@@ -3798,7 +3798,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_this.info.render.vertices = 0;
 		_this.info.render.faces = 0;
 
-		if ( camera.parent !== scene ) scene.add( camera );
+		if ( camera.parent === undefined ) {
+
+			console.warn( 'DEPRECATED: Camera hasn\'t been added to a Scene. Adding it...' );
+			scene.add( camera );
+
+		}
 
 		if ( this.autoUpdateScene ) scene.updateMatrixWorld();
 

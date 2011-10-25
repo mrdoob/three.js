@@ -169,7 +169,12 @@ THREE.Projector = function() {
 
 		_renderData.elements.length = 0;
 
-		if ( camera.parent !== scene ) scene.add( camera );
+		if ( camera.parent === undefined ) {
+
+			console.warn( 'DEPRECATED: Camera hasn\'t been added to a Scene. Adding it...' );
+			scene.add( camera );
+
+		}
 
 		scene.updateMatrixWorld();
 
