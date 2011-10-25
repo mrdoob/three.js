@@ -2340,25 +2340,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		customAttributes = geometry.__webglCustomAttributesList,
 		i, il,
-		a, ca, cal, v1,
-		offset_custom,
+		a, ca, cal, value,
 		customAttribute;
-
-		if ( customAttributes ) {
-
-			for ( i = 0, il = customAttributes.length; i < il; i ++ ) {
-
-				customAttributes[ i ].offset = 0;
-
-			}
-
-		}
 
 		if ( object.sortParticles ) {
 
 			_projScreenMatrix.multiplySelf( object.matrixWorld );
 
-			for ( v = 0; v < vl; v++ ) {
+			for ( v = 0; v < vl; v ++ ) {
 
 				vertex = vertices[ v ].position;
 
@@ -2371,7 +2360,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			sortArray.sort( function( a, b ) { return b[ 0 ] - a[ 0 ]; } );
 
-			for ( v = 0; v < vl; v++ ) {
+			for ( v = 0; v < vl; v ++ ) {
 
 				vertex = vertices[ sortArray[v][1] ].position;
 
@@ -2401,70 +2390,63 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					customAttribute = customAttributes[ i ];
 
+					if ( ! ( customAttribute.boundTo === undefined || customAttribute.boundTo === "vertices" ) ) continue;
+
+					offset = 0;
+
 					cal = customAttribute.value.length;
 
 					for ( ca = 0; ca < cal; ca ++ ) {
 
 						index = sortArray[ ca ][ 1 ];
 
-						offset_custom = customAttribute.offset;
-
 						if ( customAttribute.size === 1 ) {
 
-							if ( customAttribute.boundTo === undefined || customAttribute.boundTo === "vertices" ) {
-
-								customAttribute.array[ offset_custom ] = customAttribute.value[ index ];
-
-							}
+							customAttribute.array[ offset ] = customAttribute.value[ index ];
 
 						} else {
 
-							if ( customAttribute.boundTo === undefined || customAttribute.boundTo === "vertices" ) {
-
-								v1 = customAttribute.value[ index ];
-
-							}
+							value = customAttribute.value[ index ];
 
 							if ( customAttribute.size === 2 ) {
 
-								customAttribute.array[ offset_custom ] 	   = v1.x;
-								customAttribute.array[ offset_custom + 1 ] = v1.y;
+								customAttribute.array[ offset ] 	= value.x;
+								customAttribute.array[ offset + 1 ] = value.y;
 
 							} else if ( customAttribute.size === 3 ) {
 
 								if ( customAttribute.type === "c" ) {
 
-									customAttribute.array[ offset_custom ] 	   = v1.r;
-									customAttribute.array[ offset_custom + 1 ] = v1.g;
-									customAttribute.array[ offset_custom + 2 ] = v1.b;
+									customAttribute.array[ offset ]     = value.r;
+									customAttribute.array[ offset + 1 ] = value.g;
+									customAttribute.array[ offset + 2 ] = value.b;
 
 								} else {
 
-									customAttribute.array[ offset_custom ] 	   = v1.x;
-									customAttribute.array[ offset_custom + 1 ] = v1.y;
-									customAttribute.array[ offset_custom + 2 ] = v1.z;
+									customAttribute.array[ offset ] 	= value.x;
+									customAttribute.array[ offset + 1 ] = value.y;
+									customAttribute.array[ offset + 2 ] = value.z;
 
 								}
 
 							} else {
 
-								customAttribute.array[ offset_custom ] 		= v1.x;
-								customAttribute.array[ offset_custom + 1  ] = v1.y;
-								customAttribute.array[ offset_custom + 2  ] = v1.z;
-								customAttribute.array[ offset_custom + 3  ] = v1.w;
+								customAttribute.array[ offset ]      = value.x;
+								customAttribute.array[ offset + 1  ] = value.y;
+								customAttribute.array[ offset + 2  ] = value.z;
+								customAttribute.array[ offset + 3  ] = value.w;
 
 							}
 
 						}
 
-						customAttribute.offset += customAttribute.size;
+						offset += customAttribute.size;
 
 					}
 
 				}
 
 			}
-
 
 		} else {
 
@@ -2506,9 +2488,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					customAttribute = customAttributes[ i ];
 
-					if ( customAttribute.__original.needsUpdate ) {
+					if ( customAttribute.__original.needsUpdate &&
+					     ( customAttribute.boundTo === undefined ||
+						   customAttribute.boundTo === "vertices") ) {
 
 						cal = customAttribute.value.length;
+
+						offset = 0;
 
 						for ( ca = 0; ca < cal; ca ++ ) {
 
@@ -2516,54 +2502,46 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 							if ( customAttribute.size === 1 ) {
 
-								if ( customAttribute.boundTo === undefined || customAttribute.boundTo === "vertices" ) {
-
-									customAttribute.array[ offset_custom ] = customAttribute.value[ ca ];
-
-								}
+								customAttribute.array[ offset ] = customAttribute.value[ ca ];
 
 							} else {
 
-								if ( customAttribute.boundTo === undefined || customAttribute.boundTo === "vertices" ) {
-
-									v1 = customAttribute.value[ ca ];
-
-								}
+								value = customAttribute.value[ ca ];
 
 								if ( customAttribute.size === 2 ) {
 
-									customAttribute.array[ offset_custom ] 	   = v1.x;
-									customAttribute.array[ offset_custom + 1 ] = v1.y;
+									customAttribute.array[ offset ] 	= value.x;
+									customAttribute.array[ offset + 1 ] = value.y;
 
 								} else if ( customAttribute.size === 3 ) {
 
 									if ( customAttribute.type === "c" ) {
 
-										customAttribute.array[ offset_custom ] 	   = v1.r;
-										customAttribute.array[ offset_custom + 1 ] = v1.g;
-										customAttribute.array[ offset_custom + 2 ] = v1.b;
+										customAttribute.array[ offset ] 	= value.r;
+										customAttribute.array[ offset + 1 ] = value.g;
+										customAttribute.array[ offset + 2 ] = value.b;
 
 
 									} else {
 
-										customAttribute.array[ offset_custom ] 	   = v1.x;
-										customAttribute.array[ offset_custom + 1 ] = v1.y;
-										customAttribute.array[ offset_custom + 2 ] = v1.z;
+										customAttribute.array[ offset ] 	= value.x;
+										customAttribute.array[ offset + 1 ] = value.y;
+										customAttribute.array[ offset + 2 ] = value.z;
 
 									}
 
 								} else {
 
-									customAttribute.array[ offset_custom ] 		= v1.x;
-									customAttribute.array[ offset_custom + 1  ] = v1.y;
-									customAttribute.array[ offset_custom + 2  ] = v1.z;
-									customAttribute.array[ offset_custom + 3  ] = v1.w;
+									customAttribute.array[ offset ]      = value.x;
+									customAttribute.array[ offset + 1  ] = value.y;
+									customAttribute.array[ offset + 2  ] = value.z;
+									customAttribute.array[ offset + 3  ] = value.w;
 
 								}
 
 							}
 
-							customAttribute.offset += customAttribute.size;
+							offset += customAttribute.size;
 
 						}
 
