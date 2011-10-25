@@ -11,6 +11,15 @@
  *	Readings: 
  *		http://en.wikipedia.org/wiki/Catmull%E2%80%93Clark_subdivision_surface
  *		http://www.rorydriscoll.com/2008/08/01/catmull-clark-subdivision-the-basics/
+ *		http://xrt.wikidot.com/blog:31
+ *		"Subdivision Surfaces in Character Animation"
+ *
+ *	Supports:
+ *		Closed and Open geometries.
+ *
+ *	TODO: 
+ *		crease vertex and "semi-sharp" features
+ *		selective subdivision
  */
 
 THREE.SubdivisionModifier = function( subdivisions ) {
@@ -186,6 +195,8 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 		
 	var facePoints = [], edgePoints = {};
 	
+	var sharpEdges = {}, sharpVertices = [], sharpFaces = [];
+	
 	var uvForVertices = [];
 	
 	// Step 1
@@ -253,6 +264,80 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 	var edgeCount = 0;
 	var originalVerticesLength = originalPoints.length;
 	var edgeVertex, edgeVertexA, edgeVertexB;
+	
+	////
+	
+	var vertexEdgeMap = {};
+	var vertexFaceMap = {};
+	
+	var addVertexEdgeMap = function(vertex, edge) {
+		if (vertexEdgeMap[vertex]===undefined) {
+			vertexEdgeMap[vertex] = [];
+		}
+		
+		vertexEdgeMap[vertex].push(edge);
+	};
+	
+	var addVertexFaceMap = function(vertex, face, edge) {
+		if (vertexFaceMap[vertex]===undefined) {
+			vertexFaceMap[vertex] = {};
+		}
+		
+		//vertexFaceMap[vertex][face] = edge;
+		vertexFaceMap[vertex][face] = null;
+	};
+	
+	// Prepares vertexEdgeMap and vertexFaceMap
+	for (i in vfMap) { // This is for every edge
+		edge = vfMap[i];
+		
+		edgeVertex = i.split('_');
+		edgeVertexA = edgeVertex[0];
+		edgeVertexB = edgeVertex[1];
+		
+		// Maps an edgeVertex to connecting edges
+		addVertexEdgeMap(edgeVertexA, [edgeVertexA, edgeVertexB] );
+		addVertexEdgeMap(edgeVertexB, [edgeVertexA, edgeVertexB] );
+		
+		
+		// faceIndexA = edge[0]; // face index a
+		// faceIndexB = edge[1]; // face index b
+		// 
+		// // Add connecting faces for edge
+		// addVertexFaceMap(edgeVertexA, faceIndexA);
+		// addVertexFaceMap(edgeVertexB, faceIndexA);
+		// 
+		// 
+		// if (faceIndexB) {
+		// 	addVertexFaceMap(edgeVertexA, faceIndexB);
+		// 	addVertexFaceMap(edgeVertexB, faceIndexB);
+		// } else {
+		// 	addVertexFaceMap(edgeVertexA, faceIndexA);
+		// 	addVertexFaceMap(edgeVertexB, faceIndexA);
+		// }
+		
+		for (j=0,jl=edge.length;j<jl;j++) {
+			face = edge[j];
+			
+			addVertexFaceMap(edgeVertexA, face, i);
+			addVertexFaceMap(edgeVertexB, face, i);
+		}
+		
+		if (edge.length < 2) {
+			// edge is "sharp";
+			sharpEdges[i] = true;
+			sharpVertices[edgeVertexA] = true;
+			sharpVertices[edgeVertexB] = true;
+			
+		}
+		
+	}
+	
+	
+	
+	//console.log('vertexEdgeMap',vertexEdgeMap, 'vertexFaceMap', vertexFaceMap);
+	
+	
 	for (i in vfMap) {
 		edge = vfMap[i];
 		
@@ -268,13 +353,16 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 		
 		//console.log(i, faceIndexB,facePoints[faceIndexB]);
 		
-		if (edge.length!=2) {
+		if (sharpEdges[i]) {
 			//console.log('warning, ', i, 'edge has only 1 connecting face', edge);
 			
+			// For a sharp edge, average the edge end points.
 			avg.addSelf(originalPoints[edgeVertexA].position);
 			avg.addSelf(originalPoints[edgeVertexB].position);
 			
 			avg.multiplyScalar(0.5);
+			
+			sharpVertices[newPoints.length] = true;
 			
 		} else {
 		
@@ -289,6 +377,7 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 		}
 		
 		edgePoints[i] = originalVerticesLength + originalFaces.length + edgeCount;
+		//console.log(edgePoints[i], newPoints.length);
 		
 		newPoints.push( new THREE.Vertex(avg) );
 	
@@ -318,6 +407,14 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 	
 	var hashAB, hashBC, hashCD, hashDA, hashCA;
 	
+	var abc123 = ['123', '12', '2', '23'];
+	var bca123 = ['123', '23', '3', '31'];
+	var cab123 = ['123', '31', '1', '12'];
+	var abc1234 = ['1234', '12', '2', '23'];
+	var bcd1234 = ['1234', '23', '3', '34'];
+	var cda1234 = ['1234', '34', '4', '41'];
+	var dab1234 = ['1234', '41', '1', '12'];
+	
 	
 	for (i=0, il = facePoints.length; i<il ;i++) { // for every face
 		facePt = facePoints[i];
@@ -332,9 +429,9 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 			hashBC = edge_hash( face.b, face.c );
 			hashCA = edge_hash( face.c, face.a );
 			
-			f4( currentVerticeIndex, edgePoints[hashAB], face.b, edgePoints[hashBC], face, ['123', '12', '2', '23'] );
-			f4( currentVerticeIndex, edgePoints[hashBC], face.c, edgePoints[hashCA], face, ['123', '23', '3', '31'] );
-			f4( currentVerticeIndex, edgePoints[hashCA], face.a, edgePoints[hashAB], face, ['123', '31', '1', '12'] );
+			f4( currentVerticeIndex, edgePoints[hashAB], face.b, edgePoints[hashBC], face, abc123 );
+			f4( currentVerticeIndex, edgePoints[hashBC], face.c, edgePoints[hashCA], face, bca123 );
+			f4( currentVerticeIndex, edgePoints[hashCA], face.a, edgePoints[hashAB], face, cab123 );
 			
 		} else if ( face instanceof THREE.Face4 ) {
 			// create 4 face4s
@@ -344,10 +441,10 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 			hashCD = edge_hash( face.c, face.d );
 			hashDA = edge_hash( face.d, face.a );
 			
-			f4( currentVerticeIndex, edgePoints[hashAB], face.b, edgePoints[hashBC], face, ['1234', '12', '2', '23']  );
-			f4( currentVerticeIndex, edgePoints[hashBC], face.c, edgePoints[hashCD], face, ['1234', '23', '3', '34']  );
-			f4( currentVerticeIndex, edgePoints[hashCD], face.d, edgePoints[hashDA], face, ['1234', '34', '4', '41']  );
-			f4( currentVerticeIndex, edgePoints[hashDA], face.a, edgePoints[hashAB], face, ['1234', '41', '1', '12']  );
+			f4( currentVerticeIndex, edgePoints[hashAB], face.b, edgePoints[hashBC], face, abc1234 );
+			f4( currentVerticeIndex, edgePoints[hashBC], face.c, edgePoints[hashCD], face, bcd1234 );
+			f4( currentVerticeIndex, edgePoints[hashCD], face.d, edgePoints[hashDA], face, cda1234 );
+			f4( currentVerticeIndex, edgePoints[hashDA], face.a, edgePoints[hashAB], face, dab1234  );
 
 				
 		} else {
@@ -367,53 +464,7 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 	//		and take the average R of all n edge midpoints for edges touching P, 
 	//		where each edge midpoint is the average of its two endpoint vertices. 
 	//	Move each original point to the point
-	
-	
-	
-	var vertexEdgeMap = {};
-	var vertexFaceMap = {};
-	
-	var addVertexEdgeMap = function(vertex, edge) {
-		if (vertexEdgeMap[vertex]===undefined) {
-			vertexEdgeMap[vertex] = [];
-		}
-		
-		vertexEdgeMap[vertex].push(edge);
-	};
-	
-	var addVertexFaceMap = function(vertex, face) {
-		if (vertexFaceMap[vertex]===undefined) {
-			vertexFaceMap[vertex] = {};
-		}
-		
-		vertexFaceMap[vertex][face] = null;
-	};
-	
-	// Prepares vertexEdgeMap and vertexFaceMap
-	for (i in vfMap) { // This is for every edge
-		edge = vfMap[i];
-		
-		edgeVertex = i.split('_');
-		edgeVertexA = edgeVertex[0];
-		edgeVertexB = edgeVertex[1];
-		
-		addVertexEdgeMap(edgeVertexA, [edgeVertexA, edgeVertexB] );
-		addVertexEdgeMap(edgeVertexB, [edgeVertexA, edgeVertexB] );
-		
-		faceIndexA = edge[0]; // face index a
-		faceIndexB = edge[1]; // face index b
-		
-		addVertexFaceMap(edgeVertexA, faceIndexA);
-		if (faceIndexB) addVertexFaceMap(edgeVertexA, faceIndexB);
-		else addVertexFaceMap(edgeVertexA, faceIndexA);
-		
-		addVertexFaceMap(edgeVertexB, faceIndexA);
-		if (faceIndexB) addVertexFaceMap(edgeVertexB, faceIndexB);
-		else addVertexFaceMap(edgeVertexB, faceIndexA);
-		
-	}
-	
-	//console.log('vertexEdgeMap',vertexEdgeMap, 'vertexFaceMap', vertexFaceMap);
+
 	
 	var F = new THREE.Vector3();
 	var R = new THREE.Vector3();
@@ -430,14 +481,35 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 		
 		var f =0;
 		for (j in vertexFaceMap[i]) {
-			
 			F.addSelf(facePoints[j]);
 			f++;
 		}
 		
-		F.divideScalar(f);
+		var sharpEdgeCount = 0;
 		
 		n = vertexEdgeMap[i].length;
+		
+		for (j=0;j<n;j++) {
+			if (
+				sharpEdges[
+					edge_hash(vertexEdgeMap[i][j][0],vertexEdgeMap[i][j][1])
+				]) {
+					sharpEdgeCount++;
+				}
+		}
+		
+		if ( sharpEdgeCount==2 ) {
+			continue;
+			// Do not move vertex if there's 2 connecting sharp edges.
+		}
+		
+		if (sharpEdgeCount>2) {
+			// TODO
+		}
+		
+		F.divideScalar(f);
+		
+		
 		
 		for (j=0; j<n;j++) {
 			edge = vertexEdgeMap[i][j];

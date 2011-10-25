@@ -72,14 +72,24 @@
 				materials.push( [ new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, wireframe: false } ) ] );
 
 			}
+			
+			
 
 			var geometriesParams = [
 
 				{type: 'CubeGeometry', args: [ 200, 200, 200, 2, 2, 2, materials ] },
 				{type: 'TorusGeometry', args: [ 100, 60, 4, 8, Math.PI*2 ] },
-				{type: 'SphereGeometry', args: [ 100, 3, 3 ] },
-				{type: 'IcosahedronGeometry', args: [ 1 ], scale: 200 },
+				{type: 'TorusKnotGeometry', args: [  ], scale:0.25, meshScale:4 },
+				{type: 'SphereGeometry', args: [ 100, 3, 3 ], meshScale:2 },
+				{type: 'IcosahedronGeometry', args: [ 1 ], scale: 100, meshScale:2 },
 				{type: 'CylinderGeometry', args: [ 25, 75, 200, 8, 3 ]} ,
+				{type: 'OctahedronGeometry', args: [200, 0], meshScale:2 },
+				{type: 'LatheGeometry', args: [ [
+					new THREE.Vector3(0,0,0), 
+					new THREE.Vector3(0,50,50),
+					new THREE.Vector3(0,0,100), 
+					new THREE.Vector3(0,50,150),
+					new THREE.Vector3(0,0,200) ] ]},
 				{type: 'TextGeometry', args: ['&', {
 										size: 200,
 										height: 50,
@@ -88,8 +98,33 @@
 
 									}]},
 				{type: 'PlaneGeometry', args: [ 200, 200, 4, 4 ] }
-
+				
 			];
+			
+			if (location.protocol !== "file:") {
+				var loader = new THREE.JSONLoader();
+				loader.load( 'obj/WaltHeadLo.js', function ( geometry ) {
+			
+					geometriesParams.push({type: 'WaltHead', args: [ ], meshScale: 6 });
+				
+					THREE.WaltHead = function() {
+						return THREE.GeometryUtils.clone(geometry);
+					};
+			
+				});
+				
+				var loader2 = new THREE.JSONLoader();
+				loader2.load( 'obj/Suzanne.js', function ( geometry ) {
+					
+					geometriesParams.push({type: 'Suzanne', args: [ ], scale: 100, meshScale:2 });
+				
+					THREE.Suzanne = function() {
+						return THREE.GeometryUtils.clone(geometry);
+					};
+			
+				} );
+			
+			}
 
 
 			var info;
@@ -138,6 +173,11 @@
 				var params = geometriesParams[ geometryIndex ];
 
 				geometry = createSomething( THREE[ params.type ], params.args );
+				
+				// Scale Geometry
+				if (params.scale) {
+					geometry.applyMatrix( new THREE.Matrix4().setScale( params.scale, params.scale, params.scale ) );
+				}
 
 				// Cloning original geometry for debuging
 
@@ -257,11 +297,11 @@
 
 				cube = THREE.SceneUtils.createMultiMaterialObject( smooth, meshmaterials );
 
-				var toscale =  params.scale ? params.scale : 1;
-
-				cube.scale.x = toscale;
-				cube.scale.y = toscale;
-				cube.scale.z = toscale;
+				var meshScale =  params.meshScale ? params.meshScale : 1;
+				
+				cube.scale.x = meshScale;
+				cube.scale.y = meshScale;
+				cube.scale.z = meshScale;
 
 				scene.add( cube );
 
@@ -388,7 +428,7 @@
 
 				group.rotation.x = cube.rotation.x += ( targetXRotation - cube.rotation.x ) * 0.05;
 				group.rotation.y = cube.rotation.y += ( targetYRotation - cube.rotation.y ) * 0.05;
-
+				
 				renderer.render( scene, camera );
 
 			}
