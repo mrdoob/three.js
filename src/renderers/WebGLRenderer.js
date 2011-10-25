@@ -658,40 +658,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	//
 
-	function initLineBuffers ( geometry ) {
+	function initCustomAttributes ( geometry, object ) {
 
 		var nvertices = geometry.vertices.length;
-
-		geometry.__vertexArray = new Float32Array( nvertices * 3 );
-		geometry.__colorArray = new Float32Array( nvertices * 3 );
-
-		geometry.__webglLineCount = nvertices;
-
-	};
-
-	function initRibbonBuffers ( geometry ) {
-
-		var nvertices = geometry.vertices.length;
-
-		geometry.__vertexArray = new Float32Array( nvertices * 3 );
-		geometry.__colorArray = new Float32Array( nvertices * 3 );
-
-		geometry.__webglVertexCount = nvertices;
-
-	};
-
-	function initParticleBuffers ( geometry, object ) {
-
-		var nvertices = geometry.vertices.length;
-
-		geometry.__vertexArray = new Float32Array( nvertices * 3 );
-		geometry.__colorArray = new Float32Array( nvertices * 3 );
-
-		geometry.__sortArray = [];
-
-		geometry.__webglParticleCount = nvertices;
-
-		// custom attributes
 
 		var material = object.material;
 
@@ -750,6 +719,49 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 	};
+
+	//
+
+	function initLineBuffers ( geometry, object ) {
+
+		var nvertices = geometry.vertices.length;
+
+		geometry.__vertexArray = new Float32Array( nvertices * 3 );
+		geometry.__colorArray = new Float32Array( nvertices * 3 );
+
+		geometry.__webglLineCount = nvertices;
+
+		initCustomAttributes ( geometry, object );
+
+	};
+
+	function initParticleBuffers ( geometry, object ) {
+
+		var nvertices = geometry.vertices.length;
+
+		geometry.__vertexArray = new Float32Array( nvertices * 3 );
+		geometry.__colorArray = new Float32Array( nvertices * 3 );
+
+		geometry.__sortArray = [];
+
+		geometry.__webglParticleCount = nvertices;
+
+		initCustomAttributes ( geometry, object );
+
+	};
+
+	function initRibbonBuffers ( geometry ) {
+
+		var nvertices = geometry.vertices.length;
+
+		geometry.__vertexArray = new Float32Array( nvertices * 3 );
+		geometry.__colorArray = new Float32Array( nvertices * 3 );
+
+		geometry.__webglVertexCount = nvertices;
+
+	};
+
+	//
 
 	function getBufferMaterial( object, geometryGroup ) {
 
@@ -935,7 +947,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		geometryGroup.__inittedArrays = true;
 
 	};
-
 
 	function setMeshBuffers( geometryGroup, object, hint, dispose ) {
 
@@ -2138,7 +2149,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		colorArray = geometry.__colorArray,
 
 		dirtyVertices = geometry.__dirtyVertices,
-		dirtyColors = geometry.__dirtyColors;
+		dirtyColors = geometry.__dirtyColors,
+
+		customAttributes = geometry.__webglCustomAttributesList,
+		i, il,
+		a, ca, cal, value,
+		customAttribute;
 
 		if ( dirtyVertices ) {
 
@@ -2175,6 +2191,76 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometry.__webglColorBuffer );
 			_gl.bufferData( _gl.ARRAY_BUFFER, colorArray, hint );
+
+		}
+
+		if ( customAttributes ) {
+
+			for ( i = 0, il = customAttributes.length; i < il; i ++ ) {
+
+				customAttribute = customAttributes[ i ];
+
+				if ( customAttribute.__original.needsUpdate &&
+					 ( customAttribute.boundTo === undefined ||
+					   customAttribute.boundTo === "vertices" ) ) {
+
+					offset = 0;
+
+					cal = customAttribute.value.length;
+
+					for ( ca = 0; ca < cal; ca ++ ) {
+
+						if ( customAttribute.size === 1 ) {
+
+							customAttribute.array[ offset ] = customAttribute.value[ ca ];
+
+						} else {
+
+							value = customAttribute.value[ ca ];
+
+							if ( customAttribute.size === 2 ) {
+
+								customAttribute.array[ offset ] 	= value.x;
+								customAttribute.array[ offset + 1 ] = value.y;
+
+							} else if ( customAttribute.size === 3 ) {
+
+								if ( customAttribute.type === "c" ) {
+
+									customAttribute.array[ offset ] 	= value.r;
+									customAttribute.array[ offset + 1 ] = value.g;
+									customAttribute.array[ offset + 2 ] = value.b;
+
+
+								} else {
+
+									customAttribute.array[ offset ] 	= value.x;
+									customAttribute.array[ offset + 1 ] = value.y;
+									customAttribute.array[ offset + 2 ] = value.z;
+
+								}
+
+							} else {
+
+								customAttribute.array[ offset ] 	 = value.x;
+								customAttribute.array[ offset + 1  ] = value.y;
+								customAttribute.array[ offset + 2  ] = value.z;
+								customAttribute.array[ offset + 3  ] = value.w;
+
+							}
+
+						}
+
+						offset += customAttribute.size;
+
+					}
+
+					_gl.bindBuffer( _gl.ARRAY_BUFFER, customAttribute.buffer );
+					_gl.bufferData( _gl.ARRAY_BUFFER, customAttribute.array, hint );
+
+				}
+
+			}
 
 		}
 
@@ -2319,7 +2405,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					for ( ca = 0; ca < cal; ca ++ ) {
 
-						index = sortArray[ca][1];
+						index = sortArray[ ca ][ 1 ];
 
 						offset_custom = customAttribute.offset;
 
@@ -4367,7 +4453,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				if( ! geometry.__webglVertexBuffer ) {
 
 					createLineBuffers( geometry );
-					initLineBuffers( geometry );
+					initLineBuffers( geometry, object );
 
 					geometry.__dirtyVertices = true;
 					geometry.__dirtyColors = true;
@@ -4501,7 +4587,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else if ( object instanceof THREE.Line ) {
 
-			if ( geometry.__dirtyVertices ||  geometry.__dirtyColors ) {
+			material = getBufferMaterial( object, geometryGroup );
+
+			customAttributesDirty = material.attributes && areCustomAttributesDirty( material );
+
+			if ( geometry.__dirtyVertices ||  geometry.__dirtyColors || customAttributesDirty ) {
 
 				setLineBuffers( geometry, _gl.DYNAMIC_DRAW );
 
@@ -4509,6 +4599,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			geometry.__dirtyVertices = false;
 			geometry.__dirtyColors = false;
+
+			material.attributes && clearCustomAttributes( material );
 
 		} else if ( object instanceof THREE.ParticleSystem ) {
 

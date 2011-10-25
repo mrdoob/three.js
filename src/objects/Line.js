@@ -9,7 +9,7 @@ THREE.Line = function ( geometry, material, type ) {
 	this.geometry = geometry;
 	this.material = material;
 
-	this.type = ( type != undefined ) ? type : THREE.LineStrip;
+	this.type = ( type !== undefined ) ? type : THREE.LineStrip;
 
 	if ( this.geometry ) {
 
