@@ -2504,50 +2504,73 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					cal = customAttribute.value.length;
 
-					for ( ca = 0; ca < cal; ca ++ ) {
+					if ( customAttribute.size === 1 ) {
 
-						if ( customAttribute.size === 1 ) {
+						for ( ca = 0; ca < cal; ca ++ ) {
 
-							customAttribute.array[ offset ] = customAttribute.value[ ca ];
+							customAttribute.array[ ca ] = customAttribute.value[ ca ];
 
-						} else {
+						}
+
+					} else if ( customAttribute.size === 2 ) {
+
+						for ( ca = 0; ca < cal; ca ++ ) {
 
 							value = customAttribute.value[ ca ];
 
-							if ( customAttribute.size === 2 ) {
+							customAttribute.array[ offset ] 	= value.x;
+							customAttribute.array[ offset + 1 ] = value.y;
+
+							offset += 2;
+
+						}
+
+					} else if ( customAttribute.size === 3 ) {
+
+						if ( customAttribute.type === "c" ) {
+
+							for ( ca = 0; ca < cal; ca ++ ) {
+
+								value = customAttribute.value[ ca ];
+
+								customAttribute.array[ offset ] 	= value.r;
+								customAttribute.array[ offset + 1 ] = value.g;
+								customAttribute.array[ offset + 2 ] = value.b;
+
+								offset += 3;
+
+							}
+
+						} else {
+
+							for ( ca = 0; ca < cal; ca ++ ) {
+
+								value = customAttribute.value[ ca ];
 
 								customAttribute.array[ offset ] 	= value.x;
 								customAttribute.array[ offset + 1 ] = value.y;
+								customAttribute.array[ offset + 2 ] = value.z;
 
-							} else if ( customAttribute.size === 3 ) {
-
-								if ( customAttribute.type === "c" ) {
-
-									customAttribute.array[ offset ] 	= value.r;
-									customAttribute.array[ offset + 1 ] = value.g;
-									customAttribute.array[ offset + 2 ] = value.b;
-
-
-								} else {
-
-									customAttribute.array[ offset ] 	= value.x;
-									customAttribute.array[ offset + 1 ] = value.y;
-									customAttribute.array[ offset + 2 ] = value.z;
-
-								}
-
-							} else {
-
-								customAttribute.array[ offset ] 	 = value.x;
-								customAttribute.array[ offset + 1  ] = value.y;
-								customAttribute.array[ offset + 2  ] = value.z;
-								customAttribute.array[ offset + 3  ] = value.w;
+								offset += 3;
 
 							}
 
 						}
 
-						offset += customAttribute.size;
+					} else if ( customAttribute.size === 4 ) {
+
+						for ( ca = 0; ca < cal; ca ++ ) {
+
+							value = customAttribute.value[ ca ];
+
+							customAttribute.array[ offset ] 	 = value.x;
+							customAttribute.array[ offset + 1  ] = value.y;
+							customAttribute.array[ offset + 2  ] = value.z;
+							customAttribute.array[ offset + 3  ] = value.w;
+
+							offset += 4;
+
+						}
 
 					}
 
