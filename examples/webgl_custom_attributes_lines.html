@@ -90,11 +90,11 @@
 			size = 50,
 
 			curveSegments = 10,
-			steps = 20,
+			steps = 40,
 
 			bevelThickness = 5,
 			bevelSize = 1.5,
-			bevelSegments = 3,
+			bevelSegments = 10,
 			bevelEnabled = true,
 			bend = false,
 
@@ -159,6 +159,7 @@
 				bevelThickness: bevelThickness,
 				bevelSize: bevelSize,
 				bevelEnabled: bevelEnabled,
+				bevelSegments: bevelSegments,
 
 				bend: bend,
 
@@ -221,15 +222,19 @@
 			uniforms.amplitude.value = 0.5 * Math.sin( 0.5 * time );
 			THREE.ColorUtils.adjustHSV( uniforms.color.value, 0.0005, 0, 0 );
 
-			for( var i = 0; i < attributes.displacement.value.length; i ++ ) {
+			var nx, ny, nz, value;
+
+			for( var i = 0, il = attributes.displacement.value.length; i < il; i ++ ) {
 
 				nx = 0.3 * ( 0.5 - Math.random() );
 				ny = 0.3 * ( 0.5 - Math.random() );
 				nz = 0.3 * ( 0.5 - Math.random() );
 
-				attributes.displacement.value[ i ].x += nx;
-				attributes.displacement.value[ i ].y += ny;
-				attributes.displacement.value[ i ].z += nz;
+				value = attributes.displacement.value[ i ];
+
+				value.x += nx;
+				value.y += ny;
+				value.z += nz;
 
 			}
 
