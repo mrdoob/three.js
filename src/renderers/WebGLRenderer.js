@@ -1804,339 +1804,622 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			for ( i = 0, il = customAttributes.length; i < il; i ++ ) {
 
-				customAttributes[ i ].offset = 0;
-				customAttributes[ i ].offsetSrc = 0;
-
-			}
-
-			for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
-
-				face = obj_faces[ chunk_faces3[ f ]	];
-
-				for ( i = 0, il = customAttributes.length; i < il; i ++ ) {
-
-					customAttribute = customAttributes[ i ];
-
-					if ( customAttribute.__original.needsUpdate ) {
-
-						offset_custom = customAttribute.offset;
-						offset_customSrc = customAttribute.offsetSrc;
-
-						if ( customAttribute.size === 1 ) {
-
-							if ( customAttribute.boundTo === undefined || customAttribute.boundTo === "vertices" ) {
-
-								customAttribute.array[ offset_custom ] 	   = customAttribute.value[ face.a ];
-								customAttribute.array[ offset_custom + 1 ] = customAttribute.value[ face.b ];
-								customAttribute.array[ offset_custom + 2 ] = customAttribute.value[ face.c ];
-
-							} else if ( customAttribute.boundTo === "faces" ) {
-
-								value = customAttribute.value[ offset_customSrc ];
-
-								customAttribute.array[ offset_custom ] 	   = value;
-								customAttribute.array[ offset_custom + 1 ] = value;
-								customAttribute.array[ offset_custom + 2 ] = value;
-
-								customAttribute.offsetSrc ++;
-
-							} else if ( customAttribute.boundTo === "faceVertices" ) {
-
-								customAttribute.array[ offset_custom ] 	   = customAttribute.value[ offset_customSrc ];
-								customAttribute.array[ offset_custom + 1 ] = customAttribute.value[ offset_customSrc + 1 ];
-								customAttribute.array[ offset_custom + 2 ] = customAttribute.value[ offset_customSrc + 2 ];
-
-								customAttribute.offsetSrc += 3;
-
-							}
-
-							customAttribute.offset += 3;
-
-						} else {
-
-							if ( customAttribute.boundTo === undefined || customAttribute.boundTo === "vertices" ) {
-
-								v1 = customAttribute.value[ face.a ];
-								v2 = customAttribute.value[ face.b ];
-								v3 = customAttribute.value[ face.c ];
-
-							} else if ( customAttribute.boundTo === "faces" ) {
-
-								value = customAttribute.value[ offset_customSrc ];
-
-								v1 = value;
-								v2 = value;
-								v3 = value;
-
-								customAttribute.offsetSrc ++;
-
-							} else if ( customAttribute.boundTo === "faceVertices" ) {
-
-								v1 = customAttribute.value[ offset_customSrc ];
-								v2 = customAttribute.value[ offset_customSrc + 1 ];
-								v3 = customAttribute.value[ offset_customSrc + 2 ];
-
-								customAttribute.offsetSrc += 3;
-
-							}
-
-
-							if ( customAttribute.size === 2 ) {
-
-								customAttribute.array[ offset_custom ] 	   = v1.x;
-								customAttribute.array[ offset_custom + 1 ] = v1.y;
-
-								customAttribute.array[ offset_custom + 2 ] = v2.x;
-								customAttribute.array[ offset_custom + 3 ] = v2.y;
-
-								customAttribute.array[ offset_custom + 4 ] = v3.x;
-								customAttribute.array[ offset_custom + 5 ] = v3.y;
-
-								customAttribute.offset += 6;
-
-							} else if ( customAttribute.size === 3 ) {
-
-								if ( customAttribute.type === "c" ) {
-
-									customAttribute.array[ offset_custom ] 	   = v1.r;
-									customAttribute.array[ offset_custom + 1 ] = v1.g;
-									customAttribute.array[ offset_custom + 2 ] = v1.b;
-
-									customAttribute.array[ offset_custom + 3 ] = v2.r;
-									customAttribute.array[ offset_custom + 4 ] = v2.g;
-									customAttribute.array[ offset_custom + 5 ] = v2.b;
-
-									customAttribute.array[ offset_custom + 6 ] = v3.r;
-									customAttribute.array[ offset_custom + 7 ] = v3.g;
-									customAttribute.array[ offset_custom + 8 ] = v3.b;
-
-								} else {
-
-									customAttribute.array[ offset_custom ] 	   = v1.x;
-									customAttribute.array[ offset_custom + 1 ] = v1.y;
-									customAttribute.array[ offset_custom + 2 ] = v1.z;
-
-									customAttribute.array[ offset_custom + 3 ] = v2.x;
-									customAttribute.array[ offset_custom + 4 ] = v2.y;
-									customAttribute.array[ offset_custom + 5 ] = v2.z;
-
-									customAttribute.array[ offset_custom + 6 ] = v3.x;
-									customAttribute.array[ offset_custom + 7 ] = v3.y;
-									customAttribute.array[ offset_custom + 8 ] = v3.z;
-
-								}
-
-								customAttribute.offset += 9;
-
-							} else {
-
-								customAttribute.array[ offset_custom  ] 	= v1.x;
-								customAttribute.array[ offset_custom + 1  ] = v1.y;
-								customAttribute.array[ offset_custom + 2  ] = v1.z;
-								customAttribute.array[ offset_custom + 3  ] = v1.w;
-
-								customAttribute.array[ offset_custom + 4  ] = v2.x;
-								customAttribute.array[ offset_custom + 5  ] = v2.y;
-								customAttribute.array[ offset_custom + 6  ] = v2.z;
-								customAttribute.array[ offset_custom + 7  ] = v2.w;
-
-								customAttribute.array[ offset_custom + 8  ] = v3.x;
-								customAttribute.array[ offset_custom + 9  ] = v3.y;
-								customAttribute.array[ offset_custom + 10 ] = v3.z;
-								customAttribute.array[ offset_custom + 11 ] = v3.w;
-
-								customAttribute.offset += 12;
-
-							}
-
-						}
-
-					}
-
-				}
-
-			}
-
-			for ( f = 0, fl = chunk_faces4.length; f < fl; f ++ ) {
-
-				face = obj_faces[ chunk_faces4[ f ] ];
-
-				for ( i = 0, il = customAttributes.length; i < il; i ++ ) {
-
-					customAttribute = customAttributes[ i ];
-
-					if ( customAttribute.__original.needsUpdate ) {
-
-						offset_custom = customAttribute.offset;
-						offset_customSrc = customAttribute.offsetSrc;
-
-						if ( customAttribute.size === 1 ) {
-
-							if ( customAttribute.boundTo === undefined || customAttribute.boundTo === "vertices" ) {
-
-								customAttribute.array[ offset_custom ] 	   = customAttribute.value[ face.a ];
-								customAttribute.array[ offset_custom + 1 ] = customAttribute.value[ face.b ];
-								customAttribute.array[ offset_custom + 2 ] = customAttribute.value[ face.c ];
-								customAttribute.array[ offset_custom + 3 ] = customAttribute.value[ face.d ];
-
-							} else if ( customAttribute.boundTo === "faces" ) {
-
-								value = customAttribute.value[ offset_customSrc ];
-
-								customAttribute.array[ offset_custom ] 	   = value;
-								customAttribute.array[ offset_custom + 1 ] = value;
-								customAttribute.array[ offset_custom + 2 ] = value;
-								customAttribute.array[ offset_custom + 3 ] = value;
-
-								customAttribute.offsetSrc ++;
-
-							} else if ( customAttribute.boundTo === "faceVertices" ) {
-
-								customAttribute.array[ offset_custom ] 	   = customAttribute.value[ offset_customSrc ];
-								customAttribute.array[ offset_custom + 1 ] = customAttribute.value[ offset_customSrc + 1 ];
-								customAttribute.array[ offset_custom + 2 ] = customAttribute.value[ offset_customSrc + 2 ];
-								customAttribute.array[ offset_custom + 3 ] = customAttribute.value[ offset_customSrc + 3 ];
-
-								customAttribute.offsetSrc += 4;
-
-							}
-
-							customAttribute.offset += 4;
-
-						} else {
-
-							if ( customAttribute.boundTo === undefined || customAttribute.boundTo === "vertices" ) {
-
-								v1 = customAttribute.value[ face.a ];
-								v2 = customAttribute.value[ face.b ];
-								v3 = customAttribute.value[ face.c ];
-								v4 = customAttribute.value[ face.d ];
-
-							} else if ( customAttribute.boundTo === "faces" ) {
-
-								value = customAttribute.value[ offset_customSrc ];
-
-								v1 = value;
-								v2 = value;
-								v3 = value;
-								v4 = value;
-
-								customAttribute.offsetSrc ++;
-
-							} else if ( customAttribute.boundTo === "faceVertices" ) {
-
-								v1 = customAttribute.value[ offset_customSrc ];
-								v2 = customAttribute.value[ offset_customSrc + 1 ];
-								v3 = customAttribute.value[ offset_customSrc + 2 ];
-								v4 = customAttribute.value[ offset_customSrc + 3 ];
-
-								customAttribute.offsetSrc += 4;
-
-							}
-
-
-							if ( customAttribute.size === 2 ) {
-
-								customAttribute.array[ offset_custom ] 	   = v1.x;
-								customAttribute.array[ offset_custom + 1 ] = v1.y;
-
-								customAttribute.array[ offset_custom + 2 ] = v2.x;
-								customAttribute.array[ offset_custom + 3 ] = v2.y;
-
-								customAttribute.array[ offset_custom + 4 ] = v3.x;
-								customAttribute.array[ offset_custom + 5 ] = v3.y;
-
-								customAttribute.array[ offset_custom + 6 ] = v4.x;
-								customAttribute.array[ offset_custom + 7 ] = v4.y;
-
-								customAttribute.offset += 8;
-
-							} else if ( customAttribute.size === 3 ) {
-
-								if ( customAttribute.type === "c" ) {
-
-									customAttribute.array[ offset_custom  ] 	= v1.r;
-									customAttribute.array[ offset_custom + 1  ] = v1.g;
-									customAttribute.array[ offset_custom + 2  ] = v1.b;
-
-									customAttribute.array[ offset_custom + 3  ] = v2.r;
-									customAttribute.array[ offset_custom + 4  ] = v2.g;
-									customAttribute.array[ offset_custom + 5  ] = v2.b;
-
-									customAttribute.array[ offset_custom + 6  ] = v3.r;
-									customAttribute.array[ offset_custom + 7  ] = v3.g;
-									customAttribute.array[ offset_custom + 8  ] = v3.b;
-
-									customAttribute.array[ offset_custom + 9  ] = v4.r;
-									customAttribute.array[ offset_custom + 10 ] = v4.g;
-									customAttribute.array[ offset_custom + 11 ] = v4.b;
-
-								} else {
-
-									customAttribute.array[ offset_custom  ] 	= v1.x;
-									customAttribute.array[ offset_custom + 1  ] = v1.y;
-									customAttribute.array[ offset_custom + 2  ] = v1.z;
-
-									customAttribute.array[ offset_custom + 3  ] = v2.x;
-									customAttribute.array[ offset_custom + 4  ] = v2.y;
-									customAttribute.array[ offset_custom + 5  ] = v2.z;
-
-									customAttribute.array[ offset_custom + 6  ] = v3.x;
-									customAttribute.array[ offset_custom + 7  ] = v3.y;
-									customAttribute.array[ offset_custom + 8  ] = v3.z;
-
-									customAttribute.array[ offset_custom + 9  ] = v4.x;
-									customAttribute.array[ offset_custom + 10 ] = v4.y;
-									customAttribute.array[ offset_custom + 11 ] = v4.z;
-
-								}
-
-								customAttribute.offset += 12;
-
-							} else {
-
-								customAttribute.array[ offset_custom  ] 	= v1.x;
-								customAttribute.array[ offset_custom + 1  ] = v1.y;
-								customAttribute.array[ offset_custom + 2  ] = v1.z;
-								customAttribute.array[ offset_custom + 3  ] = v1.w;
-
-								customAttribute.array[ offset_custom + 4  ] = v2.x;
-								customAttribute.array[ offset_custom + 5  ] = v2.y;
-								customAttribute.array[ offset_custom + 6  ] = v2.z;
-								customAttribute.array[ offset_custom + 7  ] = v2.w;
-
-								customAttribute.array[ offset_custom + 8  ] = v3.x;
-								customAttribute.array[ offset_custom + 9  ] = v3.y;
-								customAttribute.array[ offset_custom + 10 ] = v3.z;
-								customAttribute.array[ offset_custom + 11 ] = v3.w;
-
-								customAttribute.array[ offset_custom + 12 ] = v4.x;
-								customAttribute.array[ offset_custom + 13 ] = v4.y;
-								customAttribute.array[ offset_custom + 14 ] = v4.z;
-								customAttribute.array[ offset_custom + 15 ] = v4.w;
-
-								customAttribute.offset += 16;
-
-							}
-
-						}
-
-					}
-
-				}
-
-			}
-
-			for ( i = 0, il = customAttributes.length; i < il; i ++ ) {
-
 				customAttribute = customAttributes[ i ];
 
-				if ( customAttribute.__original.needsUpdate ) {
+				if ( ! customAttribute.__original.needsUpdate ) continue;
 
-					_gl.bindBuffer( _gl.ARRAY_BUFFER, customAttribute.buffer );
-					_gl.bufferData( _gl.ARRAY_BUFFER, customAttribute.array, hint );
+				offset_custom = 0;
+				offset_customSrc = 0;
+
+				if ( customAttribute.size === 1 ) {
+
+					if ( customAttribute.boundTo === undefined || customAttribute.boundTo === "vertices" ) {
+
+						for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
+
+							face = obj_faces[ chunk_faces3[ f ]	];
+
+							customAttribute.array[ offset_custom ] 	   = customAttribute.value[ face.a ];
+							customAttribute.array[ offset_custom + 1 ] = customAttribute.value[ face.b ];
+							customAttribute.array[ offset_custom + 2 ] = customAttribute.value[ face.c ];
+
+							offset_custom += 3;
+
+						}
+
+						for ( f = 0, fl = chunk_faces4.length; f < fl; f ++ ) {
+
+							face = obj_faces[ chunk_faces4[ f ] ];
+
+							customAttribute.array[ offset_custom ] 	   = customAttribute.value[ face.a ];
+							customAttribute.array[ offset_custom + 1 ] = customAttribute.value[ face.b ];
+							customAttribute.array[ offset_custom + 2 ] = customAttribute.value[ face.c ];
+							customAttribute.array[ offset_custom + 3 ] = customAttribute.value[ face.d ];
+
+							offset_custom += 4;
+
+						}
+
+					} else if ( customAttribute.boundTo === "faces" ) {
+
+						for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
+
+							value = customAttribute.value[ offset_customSrc ];
+
+							customAttribute.array[ offset_custom ] 	   = value;
+							customAttribute.array[ offset_custom + 1 ] = value;
+							customAttribute.array[ offset_custom + 2 ] = value;
+
+							offset_custom += 3;
+							offset_customSrc += 1;
+
+						}
+
+						for ( f = 0, fl = chunk_faces4.length; f < fl; f ++ ) {
+
+							value = customAttribute.value[ offset_customSrc ];
+
+							customAttribute.array[ offset_custom ] 	   = value;
+							customAttribute.array[ offset_custom + 1 ] = value;
+							customAttribute.array[ offset_custom + 2 ] = value;
+							customAttribute.array[ offset_custom + 3 ] = value;
+
+							offset_custom += 4;
+							offset_customSrc += 1;
+
+						}
+
+					} else if ( customAttribute.boundTo === "faceVertices" ) {
+
+						for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
+
+							customAttribute.array[ offset_custom ] 	   = customAttribute.value[ offset_customSrc ];
+							customAttribute.array[ offset_custom + 1 ] = customAttribute.value[ offset_customSrc + 1 ];
+							customAttribute.array[ offset_custom + 2 ] = customAttribute.value[ offset_customSrc + 2 ];
+
+							offset_custom += 3;
+							offset_customSrc += 3;
+
+						}
+
+						for ( f = 0, fl = chunk_faces4.length; f < fl; f ++ ) {
+
+							customAttribute.array[ offset_custom ] 	   = customAttribute.value[ offset_customSrc ];
+							customAttribute.array[ offset_custom + 1 ] = customAttribute.value[ offset_customSrc + 1 ];
+							customAttribute.array[ offset_custom + 2 ] = customAttribute.value[ offset_customSrc + 2 ];
+							customAttribute.array[ offset_custom + 3 ] = customAttribute.value[ offset_customSrc + 3 ];
+
+							offset_custom += 4;
+							offset_customSrc += 4;
+
+						}
+
+					}
+
+				} else if ( customAttribute.size === 2 ) {
+
+					if ( customAttribute.boundTo === undefined || customAttribute.boundTo === "vertices" ) {
+
+						for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
+
+							face = obj_faces[ chunk_faces3[ f ]	];
+
+							v1 = customAttribute.value[ face.a ];
+							v2 = customAttribute.value[ face.b ];
+							v3 = customAttribute.value[ face.c ];
+
+							customAttribute.array[ offset_custom ] 	   = v1.x;
+							customAttribute.array[ offset_custom + 1 ] = v1.y;
+
+							customAttribute.array[ offset_custom + 2 ] = v2.x;
+							customAttribute.array[ offset_custom + 3 ] = v2.y;
+
+							customAttribute.array[ offset_custom + 4 ] = v3.x;
+							customAttribute.array[ offset_custom + 5 ] = v3.y;
+
+							offset_custom += 6;
+
+						}
+
+						for ( f = 0, fl = chunk_faces4.length; f < fl; f ++ ) {
+
+							face = obj_faces[ chunk_faces4[ f ] ];
+
+							v1 = customAttribute.value[ face.a ];
+							v2 = customAttribute.value[ face.b ];
+							v3 = customAttribute.value[ face.c ];
+							v4 = customAttribute.value[ face.d ];
+
+							customAttribute.array[ offset_custom ] 	   = v1.x;
+							customAttribute.array[ offset_custom + 1 ] = v1.y;
+
+							customAttribute.array[ offset_custom + 2 ] = v2.x;
+							customAttribute.array[ offset_custom + 3 ] = v2.y;
+
+							customAttribute.array[ offset_custom + 4 ] = v3.x;
+							customAttribute.array[ offset_custom + 5 ] = v3.y;
+
+							customAttribute.array[ offset_custom + 6 ] = v4.x;
+							customAttribute.array[ offset_custom + 7 ] = v4.y;
+
+							offset_custom += 8;
+
+						}
+
+					} else if ( customAttribute.boundTo === "faces" ) {
+
+						for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
+
+							value = customAttribute.value[ offset_customSrc ];
+
+							v1 = value;
+							v2 = value;
+							v3 = value;
+
+							customAttribute.array[ offset_custom ] 	   = v1.x;
+							customAttribute.array[ offset_custom + 1 ] = v1.y;
+
+							customAttribute.array[ offset_custom + 2 ] = v2.x;
+							customAttribute.array[ offset_custom + 3 ] = v2.y;
+
+							customAttribute.array[ offset_custom + 4 ] = v3.x;
+							customAttribute.array[ offset_custom + 5 ] = v3.y;
+
+							offset_custom += 6;
+							offset_customSrc += 1;
+
+						}
+
+						for ( f = 0, fl = chunk_faces4.length; f < fl; f ++ ) {
+
+							value = customAttribute.value[ offset_customSrc ];
+
+							v1 = value;
+							v2 = value;
+							v3 = value;
+							v4 = value;
+
+							customAttribute.array[ offset_custom ] 	   = v1.x;
+							customAttribute.array[ offset_custom + 1 ] = v1.y;
+
+							customAttribute.array[ offset_custom + 2 ] = v2.x;
+							customAttribute.array[ offset_custom + 3 ] = v2.y;
+
+							customAttribute.array[ offset_custom + 4 ] = v3.x;
+							customAttribute.array[ offset_custom + 5 ] = v3.y;
+
+							customAttribute.array[ offset_custom + 6 ] = v4.x;
+							customAttribute.array[ offset_custom + 7 ] = v4.y;
+
+							offset_custom += 8;
+							offset_customSrc += 1;
+
+						}
+
+					} else if ( customAttribute.boundTo === "faceVertices" ) {
+
+						for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
+
+							v1 = customAttribute.value[ offset_customSrc ];
+							v2 = customAttribute.value[ offset_customSrc + 1 ];
+							v3 = customAttribute.value[ offset_customSrc + 2 ];
+
+							customAttribute.array[ offset_custom ] 	   = v1.x;
+							customAttribute.array[ offset_custom + 1 ] = v1.y;
+
+							customAttribute.array[ offset_custom + 2 ] = v2.x;
+							customAttribute.array[ offset_custom + 3 ] = v2.y;
+
+							customAttribute.array[ offset_custom + 4 ] = v3.x;
+							customAttribute.array[ offset_custom + 5 ] = v3.y;
+
+							offset_custom += 6;
+							offset_customSrc += 3;
+
+						}
+
+						for ( f = 0, fl = chunk_faces4.length; f < fl; f ++ ) {
+
+							v1 = customAttribute.value[ offset_customSrc ];
+							v2 = customAttribute.value[ offset_customSrc + 1 ];
+							v3 = customAttribute.value[ offset_customSrc + 2 ];
+							v4 = customAttribute.value[ offset_customSrc + 3 ];
+
+							customAttribute.array[ offset_custom ] 	   = v1.x;
+							customAttribute.array[ offset_custom + 1 ] = v1.y;
+
+							customAttribute.array[ offset_custom + 2 ] = v2.x;
+							customAttribute.array[ offset_custom + 3 ] = v2.y;
+
+							customAttribute.array[ offset_custom + 4 ] = v3.x;
+							customAttribute.array[ offset_custom + 5 ] = v3.y;
+
+							customAttribute.array[ offset_custom + 6 ] = v4.x;
+							customAttribute.array[ offset_custom + 7 ] = v4.y;
+
+							offset_custom += 8;
+							offset_customSrc += 4;
+
+						}
+
+					}
+
+				} else if ( customAttribute.size === 3 ) {
+
+					var pp;
+
+					if ( customAttribute.type === "c" ) {
+
+						pp = [ "r", "g", "b" ];
+
+					} else {
+
+						pp = [ "x", "y", "z" ];
+
+					}
+
+					if ( customAttribute.boundTo === undefined || customAttribute.boundTo === "vertices" ) {
+
+						for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
+
+							face = obj_faces[ chunk_faces3[ f ]	];
+
+							v1 = customAttribute.value[ face.a ];
+							v2 = customAttribute.value[ face.b ];
+							v3 = customAttribute.value[ face.c ];
+
+							customAttribute.array[ offset_custom ] 	   = v1[ pp[ 0 ] ];
+							customAttribute.array[ offset_custom + 1 ] = v1[ pp[ 1 ] ];
+							customAttribute.array[ offset_custom + 2 ] = v1[ pp[ 2 ] ];
+
+							customAttribute.array[ offset_custom + 3 ] = v2[ pp[ 0 ] ];
+							customAttribute.array[ offset_custom + 4 ] = v2[ pp[ 1 ] ];
+							customAttribute.array[ offset_custom + 5 ] = v2[ pp[ 2 ] ];
+
+							customAttribute.array[ offset_custom + 6 ] = v3[ pp[ 0 ] ];
+							customAttribute.array[ offset_custom + 7 ] = v3[ pp[ 1 ] ];
+							customAttribute.array[ offset_custom + 8 ] = v3[ pp[ 2 ] ];
+
+							offset_custom += 9;
+
+						}
+
+						for ( f = 0, fl = chunk_faces4.length; f < fl; f ++ ) {
+
+							face = obj_faces[ chunk_faces4[ f ] ];
+
+							v1 = customAttribute.value[ face.a ];
+							v2 = customAttribute.value[ face.b ];
+							v3 = customAttribute.value[ face.c ];
+							v4 = customAttribute.value[ face.d ];
+
+							customAttribute.array[ offset_custom  ] 	= v1[ pp[ 0 ] ];
+							customAttribute.array[ offset_custom + 1  ] = v1[ pp[ 1 ] ];
+							customAttribute.array[ offset_custom + 2  ] = v1[ pp[ 2 ] ];
+
+							customAttribute.array[ offset_custom + 3  ] = v2[ pp[ 0 ] ];
+							customAttribute.array[ offset_custom + 4  ] = v2[ pp[ 1 ] ];
+							customAttribute.array[ offset_custom + 5  ] = v2[ pp[ 2 ] ];
+
+							customAttribute.array[ offset_custom + 6  ] = v3[ pp[ 0 ] ];
+							customAttribute.array[ offset_custom + 7  ] = v3[ pp[ 1 ] ];
+							customAttribute.array[ offset_custom + 8  ] = v3[ pp[ 2 ] ];
+
+							customAttribute.array[ offset_custom + 9  ] = v4[ pp[ 0 ] ];
+							customAttribute.array[ offset_custom + 10 ] = v4[ pp[ 1 ] ];
+							customAttribute.array[ offset_custom + 11 ] = v4[ pp[ 2 ] ];
+
+							offset_custom += 12;
+							offset_customSrc += 1;
+
+						}
+
+					} else if ( customAttribute.boundTo === "faces" ) {
+
+						for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
+
+							value = customAttribute.value[ offset_customSrc ];
+
+							v1 = value;
+							v2 = value;
+							v3 = value;
+
+							customAttribute.array[ offset_custom ] 	   = v1[ pp[ 0 ] ];
+							customAttribute.array[ offset_custom + 1 ] = v1[ pp[ 1 ] ];
+							customAttribute.array[ offset_custom + 2 ] = v1[ pp[ 2 ] ];
+
+							customAttribute.array[ offset_custom + 3 ] = v2[ pp[ 0 ] ];
+							customAttribute.array[ offset_custom + 4 ] = v2[ pp[ 1 ] ];
+							customAttribute.array[ offset_custom + 5 ] = v2[ pp[ 2 ] ];
+
+							customAttribute.array[ offset_custom + 6 ] = v3[ pp[ 0 ] ];
+							customAttribute.array[ offset_custom + 7 ] = v3[ pp[ 1 ] ];
+							customAttribute.array[ offset_custom + 8 ] = v3[ pp[ 2 ] ];
+
+							offset_custom += 9;
+							offset_customSrc += 1;
+
+						}
+
+						for ( f = 0, fl = chunk_faces4.length; f < fl; f ++ ) {
+
+							value = customAttribute.value[ offset_customSrc ];
+
+							v1 = value;
+							v2 = value;
+							v3 = value;
+							v4 = value;
+
+							customAttribute.array[ offset_custom  ] 	= v1[ pp[ 0 ] ];
+							customAttribute.array[ offset_custom + 1  ] = v1[ pp[ 1 ] ];
+							customAttribute.array[ offset_custom + 2  ] = v1[ pp[ 2 ] ];
+
+							customAttribute.array[ offset_custom + 3  ] = v2[ pp[ 0 ] ];
+							customAttribute.array[ offset_custom + 4  ] = v2[ pp[ 1 ] ];
+							customAttribute.array[ offset_custom + 5  ] = v2[ pp[ 2 ] ];
+
+							customAttribute.array[ offset_custom + 6  ] = v3[ pp[ 0 ] ];
+							customAttribute.array[ offset_custom + 7  ] = v3[ pp[ 1 ] ];
+							customAttribute.array[ offset_custom + 8  ] = v3[ pp[ 2 ] ];
+
+							customAttribute.array[ offset_custom + 9  ] = v4[ pp[ 0 ] ];
+							customAttribute.array[ offset_custom + 10 ] = v4[ pp[ 1 ] ];
+							customAttribute.array[ offset_custom + 11 ] = v4[ pp[ 2 ] ];
+
+							offset_custom += 12;
+							offset_customSrc += 1;
+
+						}
+
+					} else if ( customAttribute.boundTo === "faceVertices" ) {
+
+						for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
+
+							v1 = customAttribute.value[ offset_customSrc ];
+							v2 = customAttribute.value[ offset_customSrc + 1 ];
+							v3 = customAttribute.value[ offset_customSrc + 2 ];
+
+							customAttribute.array[ offset_custom ] 	   = v1[ pp[ 0 ] ];
+							customAttribute.array[ offset_custom + 1 ] = v1[ pp[ 1 ] ];
+							customAttribute.array[ offset_custom + 2 ] = v1[ pp[ 2 ] ];
+
+							customAttribute.array[ offset_custom + 3 ] = v2[ pp[ 0 ] ];
+							customAttribute.array[ offset_custom + 4 ] = v2[ pp[ 1 ] ];
+							customAttribute.array[ offset_custom + 5 ] = v2[ pp[ 2 ] ];
+
+							customAttribute.array[ offset_custom + 6 ] = v3[ pp[ 0 ] ];
+							customAttribute.array[ offset_custom + 7 ] = v3[ pp[ 1 ] ];
+							customAttribute.array[ offset_custom + 8 ] = v3[ pp[ 2 ] ];
+
+							offset_custom += 9;
+							offset_customSrc += 3;
+
+						}
+
+						for ( f = 0, fl = chunk_faces4.length; f < fl; f ++ ) {
+
+							v1 = customAttribute.value[ offset_customSrc ];
+							v2 = customAttribute.value[ offset_customSrc + 1 ];
+							v3 = customAttribute.value[ offset_customSrc + 2 ];
+							v4 = customAttribute.value[ offset_customSrc + 3 ];
+
+							customAttribute.array[ offset_custom  ] 	= v1[ pp[ 0 ] ];
+							customAttribute.array[ offset_custom + 1  ] = v1[ pp[ 1 ] ];
+							customAttribute.array[ offset_custom + 2  ] = v1[ pp[ 2 ] ];
+
+							customAttribute.array[ offset_custom + 3  ] = v2[ pp[ 0 ] ];
+							customAttribute.array[ offset_custom + 4  ] = v2[ pp[ 1 ] ];
+							customAttribute.array[ offset_custom + 5  ] = v2[ pp[ 2 ] ];
+
+							customAttribute.array[ offset_custom + 6  ] = v3[ pp[ 0 ] ];
+							customAttribute.array[ offset_custom + 7  ] = v3[ pp[ 1 ] ];
+							customAttribute.array[ offset_custom + 8  ] = v3[ pp[ 2 ] ];
+
+							customAttribute.array[ offset_custom + 9  ] = v4[ pp[ 0 ] ];
+							customAttribute.array[ offset_custom + 10 ] = v4[ pp[ 1 ] ];
+							customAttribute.array[ offset_custom + 11 ] = v4[ pp[ 2 ] ];
+
+							offset_custom += 12;
+							offset_customSrc += 4;
+
+						}
+
+					}
+
+				} else if ( customAttribute.size === 4 ) {
+
+					if ( customAttribute.boundTo === undefined || customAttribute.boundTo === "vertices" ) {
+
+						for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
+
+							face = obj_faces[ chunk_faces3[ f ]	];
+
+							v1 = customAttribute.value[ face.a ];
+							v2 = customAttribute.value[ face.b ];
+							v3 = customAttribute.value[ face.c ];
+
+							customAttribute.array[ offset_custom  ] 	= v1.x;
+							customAttribute.array[ offset_custom + 1  ] = v1.y;
+							customAttribute.array[ offset_custom + 2  ] = v1.z;
+							customAttribute.array[ offset_custom + 3  ] = v1.w;
+
+							customAttribute.array[ offset_custom + 4  ] = v2.x;
+							customAttribute.array[ offset_custom + 5  ] = v2.y;
+							customAttribute.array[ offset_custom + 6  ] = v2.z;
+							customAttribute.array[ offset_custom + 7  ] = v2.w;
+
+							customAttribute.array[ offset_custom + 8  ] = v3.x;
+							customAttribute.array[ offset_custom + 9  ] = v3.y;
+							customAttribute.array[ offset_custom + 10 ] = v3.z;
+							customAttribute.array[ offset_custom + 11 ] = v3.w;
+
+							offset_custom += 12;
+
+						}
+
+						for ( f = 0, fl = chunk_faces4.length; f < fl; f ++ ) {
+
+							face = obj_faces[ chunk_faces4[ f ] ];
+
+							v1 = customAttribute.value[ face.a ];
+							v2 = customAttribute.value[ face.b ];
+							v3 = customAttribute.value[ face.c ];
+							v4 = customAttribute.value[ face.d ];
+
+							customAttribute.array[ offset_custom  ] 	= v1.x;
+							customAttribute.array[ offset_custom + 1  ] = v1.y;
+							customAttribute.array[ offset_custom + 2  ] = v1.z;
+							customAttribute.array[ offset_custom + 3  ] = v1.w;
+
+							customAttribute.array[ offset_custom + 4  ] = v2.x;
+							customAttribute.array[ offset_custom + 5  ] = v2.y;
+							customAttribute.array[ offset_custom + 6  ] = v2.z;
+							customAttribute.array[ offset_custom + 7  ] = v2.w;
+
+							customAttribute.array[ offset_custom + 8  ] = v3.x;
+							customAttribute.array[ offset_custom + 9  ] = v3.y;
+							customAttribute.array[ offset_custom + 10 ] = v3.z;
+							customAttribute.array[ offset_custom + 11 ] = v3.w;
+
+							customAttribute.array[ offset_custom + 12 ] = v4.x;
+							customAttribute.array[ offset_custom + 13 ] = v4.y;
+							customAttribute.array[ offset_custom + 14 ] = v4.z;
+							customAttribute.array[ offset_custom + 15 ] = v4.w;
+
+							offset_custom += 16;
+
+						}
+
+					} else if ( customAttribute.boundTo === "faces" ) {
+
+						for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
+
+							value = customAttribute.value[ offset_customSrc ];
+
+							v1 = value;
+							v2 = value;
+							v3 = value;
+
+							customAttribute.array[ offset_custom  ] 	= v1.x;
+							customAttribute.array[ offset_custom + 1  ] = v1.y;
+							customAttribute.array[ offset_custom + 2  ] = v1.z;
+							customAttribute.array[ offset_custom + 3  ] = v1.w;
+
+							customAttribute.array[ offset_custom + 4  ] = v2.x;
+							customAttribute.array[ offset_custom + 5  ] = v2.y;
+							customAttribute.array[ offset_custom + 6  ] = v2.z;
+							customAttribute.array[ offset_custom + 7  ] = v2.w;
+
+							customAttribute.array[ offset_custom + 8  ] = v3.x;
+							customAttribute.array[ offset_custom + 9  ] = v3.y;
+							customAttribute.array[ offset_custom + 10 ] = v3.z;
+							customAttribute.array[ offset_custom + 11 ] = v3.w;
+
+							offset_custom += 12;
+							offset_customSrc += 1;
+
+						}
+
+						for ( f = 0, fl = chunk_faces4.length; f < fl; f ++ ) {
+
+							value = customAttribute.value[ offset_customSrc ];
+
+							v1 = value;
+							v2 = value;
+							v3 = value;
+							v4 = value;
+
+							customAttribute.array[ offset_custom  ] 	= v1.x;
+							customAttribute.array[ offset_custom + 1  ] = v1.y;
+							customAttribute.array[ offset_custom + 2  ] = v1.z;
+							customAttribute.array[ offset_custom + 3  ] = v1.w;
+
+							customAttribute.array[ offset_custom + 4  ] = v2.x;
+							customAttribute.array[ offset_custom + 5  ] = v2.y;
+							customAttribute.array[ offset_custom + 6  ] = v2.z;
+							customAttribute.array[ offset_custom + 7  ] = v2.w;
+
+							customAttribute.array[ offset_custom + 8  ] = v3.x;
+							customAttribute.array[ offset_custom + 9  ] = v3.y;
+							customAttribute.array[ offset_custom + 10 ] = v3.z;
+							customAttribute.array[ offset_custom + 11 ] = v3.w;
+
+							customAttribute.array[ offset_custom + 12 ] = v4.x;
+							customAttribute.array[ offset_custom + 13 ] = v4.y;
+							customAttribute.array[ offset_custom + 14 ] = v4.z;
+							customAttribute.array[ offset_custom + 15 ] = v4.w;
+
+							offset_custom += 16;
+							offset_customSrc += 1;
+
+						}
+
+					} else if ( customAttribute.boundTo === "faceVertices" ) {
+
+						for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
+
+							v1 = customAttribute.value[ offset_customSrc ];
+							v2 = customAttribute.value[ offset_customSrc + 1 ];
+							v3 = customAttribute.value[ offset_customSrc + 2 ];
+
+							customAttribute.array[ offset_custom  ] 	= v1.x;
+							customAttribute.array[ offset_custom + 1  ] = v1.y;
+							customAttribute.array[ offset_custom + 2  ] = v1.z;
+							customAttribute.array[ offset_custom + 3  ] = v1.w;
+
+							customAttribute.array[ offset_custom + 4  ] = v2.x;
+							customAttribute.array[ offset_custom + 5  ] = v2.y;
+							customAttribute.array[ offset_custom + 6  ] = v2.z;
+							customAttribute.array[ offset_custom + 7  ] = v2.w;
+
+							customAttribute.array[ offset_custom + 8  ] = v3.x;
+							customAttribute.array[ offset_custom + 9  ] = v3.y;
+							customAttribute.array[ offset_custom + 10 ] = v3.z;
+							customAttribute.array[ offset_custom + 11 ] = v3.w;
+
+							offset_custom += 12;
+							offset_customSrc += 3;
+
+						}
+
+						for ( f = 0, fl = chunk_faces4.length; f < fl; f ++ ) {
+
+							v1 = customAttribute.value[ offset_customSrc ];
+							v2 = customAttribute.value[ offset_customSrc + 1 ];
+							v3 = customAttribute.value[ offset_customSrc + 2 ];
+							v4 = customAttribute.value[ offset_customSrc + 3 ];
+
+							customAttribute.array[ offset_custom  ] 	= v1.x;
+							customAttribute.array[ offset_custom + 1  ] = v1.y;
+							customAttribute.array[ offset_custom + 2  ] = v1.z;
+							customAttribute.array[ offset_custom + 3  ] = v1.w;
+
+							customAttribute.array[ offset_custom + 4  ] = v2.x;
+							customAttribute.array[ offset_custom + 5  ] = v2.y;
+							customAttribute.array[ offset_custom + 6  ] = v2.z;
+							customAttribute.array[ offset_custom + 7  ] = v2.w;
+
+							customAttribute.array[ offset_custom + 8  ] = v3.x;
+							customAttribute.array[ offset_custom + 9  ] = v3.y;
+							customAttribute.array[ offset_custom + 10 ] = v3.z;
+							customAttribute.array[ offset_custom + 11 ] = v3.w;
+
+							customAttribute.array[ offset_custom + 12 ] = v4.x;
+							customAttribute.array[ offset_custom + 13 ] = v4.y;
+							customAttribute.array[ offset_custom + 14 ] = v4.z;
+							customAttribute.array[ offset_custom + 15 ] = v4.w;
+
+							offset_custom += 16;
+							offset_customSrc += 4;
+
+						}
+
+					}
 
 				}
+
+				_gl.bindBuffer( _gl.ARRAY_BUFFER, customAttribute.buffer );
+				_gl.bufferData( _gl.ARRAY_BUFFER, customAttribute.array, hint );
 
 			}
 
