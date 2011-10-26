@@ -674,22 +674,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			for ( var a in material.attributes ) {
 
-				// Do a shallow copy of the attribute object so different geometryGroup chunks use different
-				// attribute buffers which are correctly indexed in the setMeshBuffers function
-
-				// Not sure how to best translate this into non-indexed arrays
-				// used for particles, as there are no geometry chunks here
-				// Probably could be simplified
-
-				var originalAttribute = material.attributes[ a ];
-
-				var attribute = {};
-
-				for ( var property in originalAttribute ) {
-
-					attribute[ property ] = originalAttribute[ property ];
-
-				}
+				var attribute = material.attributes[ a ];
 
 				if( !attribute.__webglInitialized || attribute.createUniqueBuffers ) {
 
@@ -709,8 +694,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					attribute.buffer = _gl.createBuffer();
 					attribute.buffer.belongsToAttribute = a;
 
-					originalAttribute.needsUpdate = true;
-					attribute.__original = originalAttribute;
+					attribute.needsUpdate = true;
 
 				}
 
@@ -2512,7 +2496,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				customAttribute = customAttributes[ i ];
 
-				if ( customAttribute.__original.needsUpdate &&
+				if ( customAttribute.needsUpdate &&
 					 ( customAttribute.boundTo === undefined ||
 					   customAttribute.boundTo === "vertices" ) ) {
 
@@ -2800,7 +2784,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					customAttribute = customAttributes[ i ];
 
-					if ( customAttribute.__original.needsUpdate &&
+					if ( customAttribute.needsUpdate &&
 					     ( customAttribute.boundTo === undefined ||
 						   customAttribute.boundTo === "vertices") ) {
 
@@ -2885,7 +2869,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				customAttribute = customAttributes[ i ];
 
-				if ( customAttribute.__original.needsUpdate || object.sortParticles ) {
+				if ( customAttribute.needsUpdate || object.sortParticles ) {
 
 					_gl.bindBuffer( _gl.ARRAY_BUFFER, customAttribute.buffer );
 					_gl.bufferData( _gl.ARRAY_BUFFER, customAttribute.array, hint );
