@@ -29,6 +29,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_oldPolygonOffset = null,
 	_oldPolygonOffsetFactor = null,
 	_oldPolygonOffsetUnits = null,
+	_oldLineWidth = null,
 	_cullEnabled = true,
 
 	_viewportX = 0,
@@ -3571,7 +3572,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( material.wireframe ) {
 
-				_gl.lineWidth( material.wireframeLinewidth );
+				setLineWidth( material.wireframeLinewidth );
 
 				if ( updateBuffers ) _gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryGroup.__webglLineBuffer );
 				_gl.drawElements( _gl.LINES, geometryGroup.__webglLineCount, _gl.UNSIGNED_SHORT, 0 );
@@ -3595,7 +3596,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			primitives = ( object.type === THREE.LineStrip ) ? _gl.LINE_STRIP : _gl.LINES;
 
-			_gl.lineWidth( material.linewidth );
+			setLineWidth( material.linewidth );
+
 			_gl.drawArrays( primitives, 0, geometryGroup.__webglLineCount );
 
 			_this.info.render.calls ++;
@@ -3619,7 +3621,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 	};
-
 
 	function setupMorphTargets( material, geometryGroup, object ) {
 
@@ -3781,6 +3782,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_gl.drawArrays( _gl.TRIANGLES, 0, object.count );
 
 		object.count = 0;
+
+	};
+
+	function setLineWidth( width ) {
+
+		if ( width !== _oldLineWidth ) {
+
+			_gl.lineWidth( width );
+
+			_oldLineWidth = width;
+
+		}
 
 	};
 
