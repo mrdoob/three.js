@@ -681,11 +681,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 				// used for particles, as there are no geometry chunks here
 				// Probably could be simplified
 
-				originalAttribute = material.attributes[ a ];
+				var originalAttribute = material.attributes[ a ];
 
-				attribute = {};
+				var attribute = {};
 
-				for ( property in originalAttribute ) {
+				for ( var property in originalAttribute ) {
 
 					attribute[ property ] = originalAttribute[ property ];
 
@@ -695,7 +695,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					attribute.__webglInitialized = true;
 
-					size = 1;		// "f" and "i"
+					var size = 1;		// "f" and "i"
 
 					if ( attribute.type === "v2" ) size = 2;
 					else if ( attribute.type === "v3" ) size = 3;
@@ -703,7 +703,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 					else if ( attribute.type === "c"  ) size = 3;
 
 					attribute.size = size;
+
 					attribute.array = new Float32Array( nvertices * size );
+
 					attribute.buffer = _gl.createBuffer();
 					attribute.buffer.belongsToAttribute = a;
 
@@ -902,7 +904,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 					else if( attribute.type === "c"  ) size = 3;
 
 					attribute.size = size;
+
 					attribute.array = new Float32Array( nvertices * size );
+
 					attribute.buffer = _gl.createBuffer();
 					attribute.buffer.belongsToAttribute = a;
 
