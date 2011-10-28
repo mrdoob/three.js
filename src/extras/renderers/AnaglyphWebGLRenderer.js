@@ -32,7 +32,7 @@ if ( THREE.WebGLRenderer ) {
 		var _camera = new THREE.PerspectiveCamera( 53, 1, 1, 10000 );
 		_camera.position.z = 2;
 
-		_material = new THREE.ShaderMaterial( {
+		var _material = new THREE.ShaderMaterial( {
 
 			uniforms: {
 

@@ -27,7 +27,7 @@ THREE.SceneLoader.prototype = {
 		worker.onmessage = function( event ) {
 
 			var dg, dm, dd, dl, dc, df, dt,
-				g, o, m, l, p, c, t, f, tt, pp,
+				g, o, m, l, d, p, r, q, s, c, t, f, tt, pp,
 				geometry, material, camera, fog,
 				texture, images,
 				materials, light,
@@ -117,6 +117,8 @@ THREE.SceneLoader.prototype = {
 			};
 
 			function handle_objects() {
+
+				var object;
 
 				for( dd in data.objects ) {
 

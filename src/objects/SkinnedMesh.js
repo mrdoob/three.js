@@ -131,8 +131,8 @@ THREE.SkinnedMesh.prototype.updateMatrixWorld = function ( force ) {
 
 	// flatten bone matrices to array
 
-	var b, bl = this.bones.length;
-		ba = this.bones;
+	var b, bl = this.bones.length,
+		ba = this.bones,
 		bm = this.boneMatrices;
 
 	for ( b = 0; b < bl; b ++ ) {

@@ -126,7 +126,7 @@ THREE.TextGeometry.prototype.constructor = THREE.TextGeometry;
 
 	// Complete manner
 
-	var textPath = new TextPath( text, options );
+	var textPath = new THREE.TextPath( text, options );
 	var textShapes = textPath.toShapes();
 	var text3d = new ExtrudeGeometry( textShapes, options );
 
@@ -158,7 +158,7 @@ THREE.FontUtils = {
 
 	getTextShapes: function( text, options ) {
 
-		var textPath = new TextPath( text, options );
+		var textPath = new THREE.TextPath( text, options );
 		var textShapes = textPath.toShapes();
 		return textShapes;
 
@@ -235,12 +235,12 @@ THREE.FontUtils = {
 
 		var pts = [];
 
-		var i, i2,
+		var i, i2, divisions,
 			outline, action, length,
 			scaleX, scaleY,
 			x, y, cpx, cpy, cpx0, cpy0, cpx1, cpy1, cpx2, cpy2,
 			laste,
-			glyph = face.glyphs[ c ] || face.glyphs[ ctxt.options.fallbackCharacter ];
+			glyph = face.glyphs[ c ] || face.glyphs[ '?' ];
 
 		if ( !glyph ) return;
 
@@ -300,7 +300,7 @@ THREE.FontUtils = {
 						cpx0 = laste.x;
 						cpy0 = laste.y;
 
-						for ( i2 = 1, divisions = this.divisions; i2 <= divisions; i2++ ) {
+						for ( i2 = 1, divisions = this.divisions; i2 <= divisions; i2 ++ ) {
 
 							var t = i2 / divisions;
 							var tx = THREE.Shape.Utils.b2( t, cpx0, cpx1, cpx );
@@ -333,7 +333,7 @@ THREE.FontUtils = {
 						cpx0 = laste.x;
 						cpy0 = laste.y;
 
-						for ( i2 = 1, divisions = this.divisions; i2 <= divisions; i2++ ) {
+						for ( i2 = 1, divisions = this.divisions; i2 <= divisions; i2 ++ ) {
 
 							var t = i2 / divisions;
 							var tx = THREE.Shape.Utils.b3( t, cpx0, cpx1, cpx2, cpx );

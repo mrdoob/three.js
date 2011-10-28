@@ -233,8 +233,8 @@ THREE.PathControls = function ( object, domElement ) {
 
 		var lineGeo = createSplineGeometry( spline, 10 ),
 			particleGeo = createSplineGeometry( spline, 10 ),
-			lineMat = new THREE.LineBasicMaterial( { color: 0xff0000, linewidth: 3 } );
-			lineObj = new THREE.Line( lineGeo, lineMat );
+			lineMat = new THREE.LineBasicMaterial( { color: 0xff0000, linewidth: 3 } ),
+			lineObj = new THREE.Line( lineGeo, lineMat ),
 			particleObj = new THREE.ParticleSystem( particleGeo, new THREE.ParticleBasicMaterial( { color: 0xffaa00, size: 3 } ) );
 
 		lineObj.scale.set( 1, 1, 1 );
@@ -247,7 +247,7 @@ THREE.PathControls = function ( object, domElement ) {
 			geo = new THREE.SphereGeometry( 1, 16, 8 ),
 			mat = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 
-		for ( i = 0; i < spline.points.length; i++ ) {
+		for ( var i = 0; i < spline.points.length; i ++ ) {
 
 			waypoint = new THREE.Mesh( geo, mat );
 			waypoint.position.copy( spline.points[ i ] );

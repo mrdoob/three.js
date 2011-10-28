@@ -505,7 +505,7 @@ THREE.MarchingCubes = function ( resolution, materials ) {
 
 	this.addPlaneZ = function( strength, subtract ) {
 
-		var x, y, z, zz, val, zdiv, cz, cyz;
+		var x, y, z, zz, val, zdiv, cz, cyz,
 
 			// cache attribute lookups
 			size = this.size,
@@ -603,7 +603,7 @@ THREE.MarchingCubes = function ( resolution, materials ) {
 		var geo_callback = function( object ) {
 
 			var i, x, y, z, vertex, position, normal,
-				face, a, b, c, na, nb, nc;
+				face, a, b, c, na, nb, nc, nfaces;
 
 
 			for ( i = 0; i < object.count; i++ ) {

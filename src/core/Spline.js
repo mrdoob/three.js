@@ -73,7 +73,7 @@ THREE.Spline = function ( points ) {
 
 	this.getLength = function ( nSubDivisions ) {
 
-		var i, index, nSamples,
+		var i, index, nSamples, position,
 			point = 0, intPoint = 0, oldIntPoint = 0,
 			oldPosition = new THREE.Vector3(),
 			tmpVec = new THREE.Vector3(),
@@ -126,7 +126,7 @@ THREE.Spline = function ( points ) {
 		var i, j,
 			index, indexCurrent, indexNext,
 			linearDistance, realDistance,
-			sampling,
+			sampling, position,
 			newpoints = [],
 			tmpVec = new THREE.Vector3(),
 			sl = this.getLength();

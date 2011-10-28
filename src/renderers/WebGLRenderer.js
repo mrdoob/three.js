@@ -2436,7 +2436,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setLineBuffers ( geometry, hint ) {
 
-		var v, c, vertex, offset,
+		var v, c, vertex, offset, color,
+
 		vertices = geometry.vertices,
 		colors = geometry.colors,
 		vl = vertices.length,
@@ -2449,6 +2450,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		dirtyColors = geometry.__dirtyColors,
 
 		customAttributes = geometry.__webglCustomAttributesList,
+
 		i, il,
 		a, ca, cal, value,
 		customAttribute;
@@ -2588,7 +2590,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setRibbonBuffers ( geometry, hint ) {
 
-		var v, c, vertex, offset,
+		var v, c, vertex, offset, color,
+
 		vertices = geometry.vertices,
 		colors = geometry.colors,
 		vl = vertices.length,
@@ -2642,7 +2645,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setParticleBuffers ( geometry, hint, object ) {
 
-		var v, c, vertex, offset,
+		var v, c, vertex, offset, index, color,
+
 		vertices = geometry.vertices,
 		vl = vertices.length,
 
@@ -4022,6 +4026,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			shadowMap, shadowMatrix,
 			oil,
 			material,
+			program, buffer,
 			o, ol, webglObject, object,
 			lights = scene.lights,
 			fog = null;

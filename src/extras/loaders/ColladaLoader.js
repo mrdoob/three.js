@@ -301,8 +301,8 @@ THREE.ColladaLoader = function () {
 		geometry.skinWeights = [];
 		geometry.skinIndices = [];
 
-		createBones( geometry.bones, skin, hierarchy, skeleton, null, -1 );
-		createWeights( skin, geometry.bones, geometry.skinIndices, geometry.skinWeights );
+		//createBones( geometry.bones, skin, hierarchy, skeleton, null, -1 );
+		//createWeights( skin, geometry.bones, geometry.skinIndices, geometry.skinWeights );
 
 		/*
 		geometry.animation = {
@@ -515,7 +515,7 @@ THREE.ColladaLoader = function () {
 		var skinned = false;
 		var skinController;
 		var morphController;
-		var i;
+		var i, j;
 
 		// FIXME: controllers
 
@@ -764,15 +764,15 @@ THREE.ColladaLoader = function () {
 
 		var minT = 10000000;
 
-		for ( i = 0; i < node.channels.length; i ++ ) {
+		for ( var i = 0; i < node.channels.length; i ++ ) {
 
 			var sampler = node.channels[i].sampler;
 
 			for (var j = 0; j < sampler.input.length - 1; j ++ ) {
 
-				var t0 = sampler.input[j];
-				var t1 = sampler.input[j+1];
-				minT = Math.min(minT, t1 - t0);
+				var t0 = sampler.input[ j ];
+				var t1 = sampler.input[ j + 1 ];
+				minT = Math.min( minT, t1 - t0 );
 
 			}
 		}
@@ -1845,7 +1845,7 @@ THREE.ColladaLoader = function () {
 
 		for ( i = 0; i < this.primitives.length; i ++ ) {
 
-			primitive = this.primitives[ i ];
+			var primitive = this.primitives[ i ];
 			primitive.setVertices( this.vertices );
 			this.handlePrimitive( primitive, this.geometry3js, vertex_store );
 
@@ -1864,6 +1864,7 @@ THREE.ColladaLoader = function () {
 
 		var i = 0, j, k, p = primitive.p, inputs = primitive.inputs;
 		var input, index, idx32;
+		var source, numParams;
 		var vcIndex = 0, vcount = 3;
 		var texture_sets = [];
 
@@ -1954,7 +1955,7 @@ THREE.ColladaLoader = function () {
 				face = new THREE.Face4( vs[0], vs[1], vs[2], vs[3], [ ns[0], ns[1], ns[2], ns[3] ], cs.length ? cs : new THREE.Color() );
 
 			}
-			
+
 			face.daeMaterial = primitive.material;
 			geom.faces.push( face );
 
@@ -2090,8 +2091,8 @@ THREE.ColladaLoader = function () {
 
 			if ( element.childNodes[i].nodeName == 'input' ) {
 
-				input = (new Input()).parse(element.childNodes[i]);
-				this.input[input.semantic] = input;
+				var input = ( new Input() ).parse( element.childNodes[ i ] );
+				this.input[ input.semantic ] = input;
 
 			}
 
