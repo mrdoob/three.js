@@ -411,6 +411,7 @@ def parse_args():
 		parser = argparse.ArgumentParser(description='Build and compress Three.js')
 		parser.add_argument('--includes', help='Build includes.js', action='store_true')
 		parser.add_argument('--common', help='Build Three.js', action='store_const', const=True)
+		parser.add_argument('--commonnoextras', help='Build ThreeNoExtras.js', action='store_const', const=True)
 		parser.add_argument('--extras', help='Build ThreeExtras.js', action='store_const', const=True)
 		parser.add_argument('--canvas', help='Build ThreeCanvas.js', action='store_true')
 		parser.add_argument('--webgl', help='Build ThreeWebGL.js', action='store_true')
@@ -426,6 +427,7 @@ def parse_args():
 		parser = optparse.OptionParser(description='Build and compress Three.js')
 		parser.add_option('--includes', dest='includes', help='Build includes.js', action='store_true')
 		parser.add_option('--common', dest='common', help='Build Three.js', action='store_const', const=True)
+		parser.add_option('--commonnoextras', dest='commonnoextras', help='Build Three.js', action='store_const', const=True)
 		parser.add_option('--extras', dest='extras', help='Build ThreeExtras.js', action='store_const', const=True)
 		parser.add_option('--canvas', dest='canvas', help='Build ThreeCanvas.js', action='store_true')
 		parser.add_option('--webgl', dest='webgl', help='Build ThreeWebGL.js', action='store_true')
@@ -453,6 +455,7 @@ def main(argv=None):
 
 	config = [
 	['Three', 'includes', COMMON_FILES + EXTRAS_FILES, args.common],
+	['ThreeNoExtras', 'includes', COMMON_FILES, args.commonnoextras],
 	['ThreeCanvas', 'includes_canvas', CANVAS_FILES, args.canvas],
 	['ThreeDOM', 'includes_dom', DOM_FILES, args.dom],
 	['ThreeSVG', 'includes_svg', SVG_FILES, args.svg],
