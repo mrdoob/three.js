@@ -357,7 +357,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( object instanceof THREE.Mesh ) {
 
-			for ( g in object.geometry.geometryGroups ) {
+			for ( var g in object.geometry.geometryGroups ) {
 
 				deleteMeshBuffers( object.geometry.geometryGroups[ g ] );
 

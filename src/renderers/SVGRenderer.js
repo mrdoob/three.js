@@ -118,8 +118,6 @@ THREE.SVGRenderer = function () {
 				_v1 = element;
 				_v1.x *= _svgWidthHalf; _v1.y *= -_svgHeightHalf;
 
-				m = 0; ml = element.materials.length;
-
 				renderParticle( _v1, element, material, scene );
 
 			} else if ( element instanceof THREE.RenderableLine ) {
