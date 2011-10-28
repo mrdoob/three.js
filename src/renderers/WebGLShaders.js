@@ -342,7 +342,7 @@ THREE.ShaderChunk = {
 
 			"}",
 
-		"#endif",
+		"#endif"
 
 	].join("\n"),
 
