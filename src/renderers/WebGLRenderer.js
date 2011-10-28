@@ -4827,7 +4827,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function refreshUniformsLights ( uniforms, lights ) {
 
-		uniforms.enableLighting.value = lights.directional.length + lights.point.length;
 		uniforms.ambientLightColor.value = lights.ambient;
 
 		uniforms.directionalLightColor.value = lights.directional.colors;

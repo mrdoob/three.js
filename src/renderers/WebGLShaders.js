@@ -258,7 +258,6 @@ THREE.ShaderChunk = {
 		"uniform vec3 ambient;",
 		"uniform vec3 diffuse;",
 
-		"uniform bool enableLighting;",
 		"uniform vec3 ambientLightColor;",
 
 		"#if MAX_DIR_LIGHTS > 0",
@@ -280,51 +279,43 @@ THREE.ShaderChunk = {
 
 	lights_lambert_vertex: [
 
-		"if ( !enableLighting ) {",
+		"vLightWeighting = vec3( 0.0 );",
 
-			"vLightWeighting = vec3( 1.0 );",
+		"#if MAX_DIR_LIGHTS > 0",
 
-		"} else {",
+		"for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {",
 
-			"vLightWeighting = vec3( 0.0 );",
+			"vec4 lDirection = viewMatrix * vec4( directionalLightDirection[ i ], 0.0 );",
+			"float directionalLightWeighting = max( dot( transformedNormal, normalize( lDirection.xyz ) ), 0.0 );",
+			"vLightWeighting += directionalLightColor[ i ] * directionalLightWeighting;",
 
-			"#if MAX_DIR_LIGHTS > 0",
+		"}",
 
-			"for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {",
+		"#endif",
 
-				"vec4 lDirection = viewMatrix * vec4( directionalLightDirection[ i ], 0.0 );",
-				"float directionalLightWeighting = max( dot( transformedNormal, normalize( lDirection.xyz ) ), 0.0 );",
-				"vLightWeighting += directionalLightColor[ i ] * directionalLightWeighting;",
+		"#if MAX_POINT_LIGHTS > 0",
+
+			"for( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {",
+
+				"vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );",
+
+				"vec3 lVector = lPosition.xyz - mvPosition.xyz;",
+
+				"float lDistance = 1.0;",
+
+				"if ( pointLightDistance[ i ] > 0.0 )",
+					"lDistance = 1.0 - min( ( length( lVector ) / pointLightDistance[ i ] ), 1.0 );",
+
+				"lVector = normalize( lVector );",
+
+				"float pointLightWeighting = max( dot( transformedNormal, lVector ), 0.0 );",
+				"vLightWeighting += pointLightColor[ i ] * pointLightWeighting * lDistance;",
 
 			"}",
 
-			"#endif",
+		"#endif",
 
-			"#if MAX_POINT_LIGHTS > 0",
-
-				"for( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {",
-
-					"vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );",
-
-					"vec3 lVector = lPosition.xyz - mvPosition.xyz;",
-
-					"float lDistance = 1.0;",
-
-					"if ( pointLightDistance[ i ] > 0.0 )",
-						"lDistance = 1.0 - min( ( length( lVector ) / pointLightDistance[ i ] ), 1.0 );",
-
-					"lVector = normalize( lVector );",
-
-					"float pointLightWeighting = max( dot( transformedNormal, lVector ), 0.0 );",
-					"vLightWeighting += pointLightColor[ i ] * pointLightWeighting * lDistance;",
-
-				"}",
-
-			"#endif",
-
-			"vLightWeighting = vLightWeighting * diffuse + ambient * ambientLightColor;",
-
-		"}"
+		"vLightWeighting = vLightWeighting * diffuse + ambient * ambientLightColor;",
 
 	].join("\n"),
 
@@ -937,7 +928,6 @@ THREE.UniformsLib = {
 
 	lights: {
 
-		"enableLighting" : { type: "i", value: 1 },
 		"ambientLightColor" : { type: "fv", value: [] },
 		"directionalLightDirection" : { type: "fv", value: [] },
 		"directionalLightColor" : { type: "fv", value: [] },
