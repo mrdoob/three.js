@@ -48,6 +48,7 @@ THREE.Object3D = function () {
 	this.receiveShadow = false;
 
 	this.frustumCulled = true;
+	this.frustumCullingInheritScale = true;
 
 	this._vector = new THREE.Vector3();
 

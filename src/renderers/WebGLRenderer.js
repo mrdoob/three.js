@@ -3916,11 +3916,23 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 	};
-
+	
 	function isInFrustum( object ) {
+		var 
+			distance,
+			radius,
+			matrix = object.matrixWorld,
+			radiusScale = object.boundRadiusScale,
+			root = object.parent;
+			
+		if ( object.frustumCullingInheritScale ) {
+			while ( root ) {
+				radiusScale *= root.boundRadiusScale;
+				root = root.parent;
+			}
+		}
 
-		var distance, matrix = object.matrixWorld,
-		radius = - object.geometry.boundingSphere.radius * Math.max( object.scale.x, Math.max( object.scale.y, object.scale.z ) );
+		radius = - object.geometry.boundingSphere.radius * radiusScale; 
 
 		for ( var i = 0; i < 6; i ++ ) {
 
