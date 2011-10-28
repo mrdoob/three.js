@@ -345,7 +345,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( object instanceof THREE.Mesh ) {
 
-			for ( g in object.geometry.geometryGroups ) {
+			for ( var g in object.geometry.geometryGroups ) {
 
 				deleteMeshBuffers( object.geometry.geometryGroups[ g ] );
 
@@ -644,7 +644,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// custom attributes
 
-		var m, ml, material;
+		var m, ml, material, originalAttribute, attribute, size;
 
 		for ( m = 0, ml = object.materials.length; m < ml; m ++ ) {
 
@@ -658,7 +658,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				for ( a in material.attributes ) {
+				for ( var a in material.attributes ) {
 
 					// Do a shallow copy of the attribute object so different geometryGroup chunks use different
 					// attribute buffers which are correctly indexed in the setMeshBuffers function
@@ -671,7 +671,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					attribute = {};
 
-					for ( property in originalAttribute ) {
+					for ( var property in originalAttribute ) {
 
 						attribute[ property ] = originalAttribute[ property ];
 
@@ -845,7 +845,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				for ( a in material.attributes ) {
+				for ( var a in material.attributes ) {
 
 					// Do a shallow copy of the attribute object so different geometryGroup chunks use different
 					// attribute buffers which are correctly indexed in the setMeshBuffers function
@@ -2085,7 +2085,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setLineBuffers ( geometry, hint ) {
 
-		var v, c, vertex, offset,
+		var v, c, vertex, offset, color,
 		vertices = geometry.vertices,
 		colors = geometry.colors,
 		vl = vertices.length,
@@ -2139,7 +2139,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setRibbonBuffers ( geometry, hint ) {
 
-		var v, c, vertex, offset,
+		var v, c, vertex, offset, color,
 		vertices = geometry.vertices,
 		colors = geometry.colors,
 		vl = vertices.length,
@@ -2193,7 +2193,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setParticleBuffers ( geometry, hint, object ) {
 
-		var v, c, vertex, offset,
+		var v, c, vertex, offset, index, color,
 		vertices = geometry.vertices,
 		vl = vertices.length,
 
@@ -3482,6 +3482,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			oil,
 			material,
 			o, ol, webglObject, object,
+			program,
+			buffer,
 			lights = scene.lights,
 			fog = null;
 
@@ -5583,7 +5585,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function unrollGroupMaterials( geometryGroup, object ) {
 
-		var m, ml, i, il,
+		var m, ml, i, il, l,
 			material, meshMaterial,
 			materials = [];
 

@@ -78,7 +78,8 @@ THREE.Spline = function ( points ) {
 			oldPosition = new THREE.Vector3(),
 			tmpVec = new THREE.Vector3(),
 			chunkLengths = [],
-			totalLength = 0;
+			totalLength = 0,
+			position;
 
 		// first point has 0 length
 
@@ -126,7 +127,7 @@ THREE.Spline = function ( points ) {
 		var i, j,
 			index, indexCurrent, indexNext,
 			linearDistance, realDistance,
-			sampling,
+			sampling, position,
 			newpoints = [],
 			tmpVec = new THREE.Vector3(),
 			sl = this.getLength();
