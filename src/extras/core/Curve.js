@@ -160,7 +160,7 @@ THREE.Curve.prototype.getUtoTmapping = function ( u, distance ) {
 	// i--;
 	// console.log('o' , i, Date.now()- time);
 
-	time = Date.now();
+	var time = Date.now();
 
 	// binary search for the index with largest value smaller than target u distance
 
@@ -629,7 +629,7 @@ THREE.LineCurve3 = THREE.Curve.create(
 		var r = new THREE.Vector3();
 
 
-		r.sub( v2, v1 ); // diff
+		r.sub( this.v2, this.v1 ); // diff
 		r.multiplyScalar( t );
 		r.addSelf( this.v1 );
 

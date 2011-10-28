@@ -245,7 +245,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 		}
 
-		anglec = ( anglea + angleb ) / 2;
+		var anglec = ( anglea + angleb ) / 2;
 
 
 		//console.log('angle1', anglea * RAD_TO_DEGREES,'angle2', angleb * RAD_TO_DEGREES, 'anglec', anglec *RAD_TO_DEGREES);
@@ -684,7 +684,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 				new THREE.UV( ax / ux, ay / uy ),
 				new THREE.UV( bx / ux, by / uy ),
-				new THREE.UV( cx / ux, cy / uy ),
+				new THREE.UV( cx / ux, cy / uy )
 
 			] );
 		}

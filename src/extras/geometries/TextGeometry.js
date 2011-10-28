@@ -158,7 +158,7 @@ THREE.FontUtils = {
 
 	getTextShapes: function( text, options ) {
 
-		var textPath = new TextPath( text, options );
+		var textPath = new THREE.TextPath( text, options );
 		var textShapes = textPath.toShapes();
 		return textShapes;
 
@@ -235,7 +235,7 @@ THREE.FontUtils = {
 
 		var pts = [];
 
-		var i, i2,
+		var i, i2, divisions,
 			outline, action, length,
 			scaleX, scaleY,
 			x, y, cpx, cpy, cpx0, cpy0, cpx1, cpy1, cpx2, cpy2,

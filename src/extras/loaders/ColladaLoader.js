@@ -616,7 +616,7 @@ THREE.ColladaLoader = function () {
 
 				if ( instance_materials ) {
 
-					for ( j = 0; j < instance_materials.length; j ++ ) {
+					for ( var j = 0; j < instance_materials.length; j ++ ) {
 
 						var inst_material = instance_materials[j];
 						var effect_id = materials[inst_material.target].instance_effect.url;
@@ -764,7 +764,7 @@ THREE.ColladaLoader = function () {
 
 		var minT = 10000000;
 
-		for ( i = 0; i < node.channels.length; i ++ ) {
+		for ( var i = 0; i < node.channels.length; i ++ ) {
 
 			var sampler = node.channels[i].sampler;
 
@@ -1845,7 +1845,7 @@ THREE.ColladaLoader = function () {
 
 		for ( i = 0; i < this.primitives.length; i ++ ) {
 
-			primitive = this.primitives[ i ];
+			var primitive = this.primitives[ i ];
 			primitive.setVertices( this.vertices );
 			this.handlePrimitive( primitive, this.geometry3js, vertex_store );
 
@@ -1864,6 +1864,7 @@ THREE.ColladaLoader = function () {
 
 		var i = 0, j, k, p = primitive.p, inputs = primitive.inputs;
 		var input, index, idx32;
+    var source, numParams;
 		var vcIndex = 0, vcount = 3;
 		var texture_sets = [];
 
@@ -2090,7 +2091,7 @@ THREE.ColladaLoader = function () {
 
 			if ( element.childNodes[i].nodeName == 'input' ) {
 
-				input = (new Input()).parse(element.childNodes[i]);
+				var input = (new Input()).parse(element.childNodes[i]);
 				this.input[input.semantic] = input;
 
 			}
