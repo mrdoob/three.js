@@ -37,6 +37,20 @@
  *		http://www.sakri.net/blog/2009/06/12/an-approach-to-triangulating-polygons-with-holes/
  *
  */
+/*	Usage Examples
+	
+	// TextGeometry wrapper
+
+	var text3d = new TextGeometry( text, options );
+
+	// Complete manner
+
+	var textPath = new THREE.TextPath( text, options );
+	var textShapes = textPath.toShapes();
+	var text3d = new ExtrudeGeometry( textShapes, options );
+	
+*/
+
 
 THREE.TextGeometry = function ( text, parameters ) {
 
@@ -64,78 +78,12 @@ THREE.TextGeometry = function ( text, parameters ) {
 
 	}
 
-	// // Bend Testings.
-	//
-	// var path = new THREE.CurvePath();
-	//
-	// path.add(new THREE.CubicBezierCurve(
-	// 		new THREE.Vector2(0, 0),
-	//   		new THREE.Vector2(10, 100),
-	// 		new THREE.Vector2(200, -10),
-	// 		new THREE.Vector2(300, 0)
-	// 	));
-	//
-	// path.add(new THREE.QuadraticBezierCurve(
-	// 	new THREE.Vector2(300, 0),
-	//   		new THREE.Vector2(450, -10),
-	// 	new THREE.Vector2(500, 100)
-	// ));
-	//
-	// parameters.bendPath = path;
-
-	// var path = new THREE.CurvePath();
-	// 	path.add(new THREE.LineCurve( 0, 50,  250, 150));
-	// 	path.add(new THREE.LineCurve( 250, 150,  400, 50));
-	// path.add(new THREE.LineCurve( 400, 50,  0, 50));
-	// 	parameters.bendPath = path;
-
-	// var path = new THREE.ArcCurve(0, 0, 200, Math.PI * 0, Math.PI * 2, true);
-	// 		parameters.bendPath = path;
-
-	// var path = new THREE.SplineCurve([
-	// 		new THREE.Vector2(0, 0),
-	// 		new THREE.Vector2(100, 40),
-	// 		new THREE.Vector2(200, 0),
-	// 		new THREE.Vector2(400, 20)
-	// 	]);
-	//
-	// console.log(path);
-	//
-	// path = new THREE.LineCurve( new THREE.Vector2(0, 0),  new THREE.Vector2(400, 100));
-
-	// var bend = new THREE.Path();
-	// 	bend.moveTo(0,0);
-	// 	bend.quadraticCurveTo( 500, 100, 1000, 0 );
-	//
-	// 	parameters.bendPath = bend;
-
-
-
 	THREE.ExtrudeGeometry.call( this, textShapes, parameters );
 
 };
 
 THREE.TextGeometry.prototype = new THREE.ExtrudeGeometry();
 THREE.TextGeometry.prototype.constructor = THREE.TextGeometry;
-
-
-/*
-	// TextGeometry wrapper
-
-	var text3d = new TextGeometry( text, options );
-
-	// Complete manner
-
-	var textPath = new THREE.TextPath( text, options );
-	var textShapes = textPath.toShapes();
-	var text3d = new ExtrudeGeometry( textShapes, options );
-
-	// Factory Method
-
-	var textShapes = FontUtils.getTextShapes( text, options );
-	text3d = new ExtrudeGeometry( textShapes, options );
-
-*/
 
 
 THREE.FontUtils = {
@@ -153,14 +101,6 @@ THREE.FontUtils = {
 	getFace : function() {
 
 		return this.faces[ this.face ][ this.weight ][ this.style ];
-
-	},
-
-	getTextShapes: function( text, options ) {
-
-		var textPath = new THREE.TextPath( text, options );
-		var textShapes = textPath.toShapes();
-		return textShapes;
 
 	},
 
