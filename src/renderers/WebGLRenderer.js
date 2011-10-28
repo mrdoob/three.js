@@ -2214,20 +2214,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
 
-							value = customAttribute.value[ offset_customSrc ];
+							value = customAttribute.value[ chunk_faces3[ f ] ];
 
 							customAttribute.array[ offset_custom ] 	   = value;
 							customAttribute.array[ offset_custom + 1 ] = value;
 							customAttribute.array[ offset_custom + 2 ] = value;
 
 							offset_custom += 3;
-							offset_customSrc += 1;
 
 						}
 
 						for ( f = 0, fl = chunk_faces4.length; f < fl; f ++ ) {
 
-							value = customAttribute.value[ offset_customSrc ];
+							value = customAttribute.value[ chunk_faces4[ f ] ];
 
 							customAttribute.array[ offset_custom ] 	   = value;
 							customAttribute.array[ offset_custom + 1 ] = value;
@@ -2235,7 +2234,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 							customAttribute.array[ offset_custom + 3 ] = value;
 
 							offset_custom += 4;
-							offset_customSrc += 1;
 
 						}
 
@@ -2320,7 +2318,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
 
-							value = customAttribute.value[ offset_customSrc ];
+							value = customAttribute.value[ chunk_faces3[ f ] ];
 
 							v1 = value;
 							v2 = value;
@@ -2336,13 +2334,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 							customAttribute.array[ offset_custom + 5 ] = v3.y;
 
 							offset_custom += 6;
-							offset_customSrc += 1;
 
 						}
 
 						for ( f = 0, fl = chunk_faces4.length; f < fl; f ++ ) {
 
-							value = customAttribute.value[ offset_customSrc ];
+							value = customAttribute.value[ chunk_faces4[ f ] ];
 
 							v1 = value;
 							v2 = value;
@@ -2362,7 +2359,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 							customAttribute.array[ offset_custom + 7 ] = v4.y;
 
 							offset_custom += 8;
-							offset_customSrc += 1;
 
 						}
 
@@ -2480,7 +2476,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 							customAttribute.array[ offset_custom + 11 ] = v4[ pp[ 2 ] ];
 
 							offset_custom += 12;
-							offset_customSrc += 1;
 
 						}
 
@@ -2488,7 +2483,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
 
-							value = customAttribute.value[ offset_customSrc ];
+							value = customAttribute.value[ chunk_faces3[ f ] ];
 
 							v1 = value;
 							v2 = value;
@@ -2507,13 +2502,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 							customAttribute.array[ offset_custom + 8 ] = v3[ pp[ 2 ] ];
 
 							offset_custom += 9;
-							offset_customSrc += 1;
 
 						}
 
 						for ( f = 0, fl = chunk_faces4.length; f < fl; f ++ ) {
 
-							value = customAttribute.value[ offset_customSrc ];
+							value = customAttribute.value[ chunk_faces4[ f ] ];
 
 							v1 = value;
 							v2 = value;
@@ -2537,7 +2531,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 							customAttribute.array[ offset_custom + 11 ] = v4[ pp[ 2 ] ];
 
 							offset_custom += 12;
-							offset_customSrc += 1;
 
 						}
 
@@ -2664,7 +2657,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
 
-							value = customAttribute.value[ offset_customSrc ];
+							value = customAttribute.value[ chunk_faces3[ f ] ];
 
 							v1 = value;
 							v2 = value;
@@ -2686,13 +2679,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 							customAttribute.array[ offset_custom + 11 ] = v3.w;
 
 							offset_custom += 12;
-							offset_customSrc += 1;
 
 						}
 
 						for ( f = 0, fl = chunk_faces4.length; f < fl; f ++ ) {
 
-							value = customAttribute.value[ offset_customSrc ];
+							value = customAttribute.value[ chunk_faces4[ f ] ];
 
 							v1 = value;
 							v2 = value;
@@ -2720,7 +2712,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 							customAttribute.array[ offset_custom + 15 ] = v4.w;
 
 							offset_custom += 16;
-							offset_customSrc += 1;
 
 						}
 
