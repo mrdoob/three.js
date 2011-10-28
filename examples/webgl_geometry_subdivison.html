@@ -72,8 +72,8 @@
 				materials.push( [ new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, wireframe: false } ) ] );
 
 			}
-			
-			
+
+
 
 			var geometriesParams = [
 
@@ -87,7 +87,7 @@
 				{type: 'LatheGeometry', args: [ [
 					new THREE.Vector3(0,0,0), 
 					new THREE.Vector3(0,50,50),
-					new THREE.Vector3(0,0,100), 
+					new THREE.Vector3(0,10,100), 
 					new THREE.Vector3(0,50,150),
 					new THREE.Vector3(0,0,200) ] ]},
 				{type: 'TextGeometry', args: ['&', {
@@ -98,32 +98,36 @@
 
 									}]},
 				{type: 'PlaneGeometry', args: [ 200, 200, 4, 4 ] }
-				
+
 			];
-			
+
 			if (location.protocol !== "file:") {
 				var loader = new THREE.JSONLoader();
 				loader.load( 'obj/WaltHeadLo.js', function ( geometry ) {
-			
+
 					geometriesParams.push({type: 'WaltHead', args: [ ], meshScale: 6 });
-				
+
 					THREE.WaltHead = function() {
 						return THREE.GeometryUtils.clone(geometry);
 					};
-			
+					
+					updateInfo() 
+
 				});
-				
+
 				var loader2 = new THREE.JSONLoader();
 				loader2.load( 'obj/Suzanne.js', function ( geometry ) {
-					
+
 					geometriesParams.push({type: 'Suzanne', args: [ ], scale: 100, meshScale:2 });
-				
+
 					THREE.Suzanne = function() {
 						return THREE.GeometryUtils.clone(geometry);
 					};
-			
+					
+					updateInfo() 
+
 				} );
-			
+
 			}
 
 
@@ -157,6 +161,39 @@
 
 			}
 
+			function switchGeometry(i) {
+
+				geometryIndex = i;
+
+				addStuff();
+			}
+			
+			function updateInfo() {
+				
+				var params = geometriesParams[ geometryIndex ];
+				
+				var dropdown = '<select id="dropdown" onchange="switchGeometry(this.value)">';
+				
+				for (  i = 0; i < geometriesParams.length; i ++ ) {
+					dropdown += '<option value="' + i + '"';
+
+					dropdown += (geometryIndex == i)  ? ' selected' : '';
+
+					dropdown += '>' + geometriesParams[i].type + '</option>';
+				}
+
+				dropdown += '</select>';
+
+				info.innerHTML = 'Drag to spin THREE.' + params.type +
+
+				 	'<br/><br/>Subdivisions: '  + subdivisions +
+					' <a href="#" onclick="nextSubdivision(1); return false;">more</a>/<a href="#" onclick="nextSubdivision(-1); return false;">less</a>' +
+					'<br>Geometry: ' + dropdown + ' <a href="#" onclick="nextGeometry();return false;">next</a>' +
+					'<br/><br>Vertices count: before ' + geometry.vertices.length + ' after ' + smooth.vertices.length +
+					'<br>Face count: before ' + geometry.faces.length + ' after ' + smooth.faces.length
+				; //+ params.args;
+			}
+
 			function addStuff() {
 
 				if ( cube ) {
@@ -173,7 +210,7 @@
 				var params = geometriesParams[ geometryIndex ];
 
 				geometry = createSomething( THREE[ params.type ], params.args );
-				
+
 				// Scale Geometry
 				if (params.scale) {
 					geometry.applyMatrix( new THREE.Matrix4().setScale( params.scale, params.scale, params.scale ) );
@@ -187,14 +224,7 @@
 				smooth.mergeVertices();
 				modifier.modify( smooth );
 
-				info.innerHTML = 'Drag to spin THREE.' + params.type +
-
-				 	'<br/><br/>Subdivisions: '  + modifier.subdivisions +
-					' <a href="#" onclick="nextSubdivision(1); return false;">more</a>/<a href="#" onclick="nextSubdivision(-1); return false;">less</a>' +
-					'<br>Geometry: <a href="#" onclick="nextGeometry();return false;">next</a>' +
-					'<br/><br>Vertices count: before ' + geometry.vertices.length + ' after ' + smooth.vertices.length +
-					'<br>Face count: before ' + geometry.faces.length + ' after ' + smooth.faces.length
-				; //+ params.args;
+				updateInfo();
 
 				var faceABCD = "abcd";
 				var color, f, p, n, vertexIndex;
@@ -284,21 +314,14 @@
 
 
 				var meshmaterials = [
-				 	// new THREE.MeshBasicMaterial( { color: 0x000000, shading: THREE.FlatShading, wireframe: true } )
 					new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors } ),
 					new THREE.MeshBasicMaterial( { color: 0x405040, wireframe: true, opacity: 0.8, transparent: true } )
 				];
 
-				// new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors } ),
-				// new THREE.MeshBasicMaterial( { color: 0x000000, shading: THREE.FlatShading, wireframe: true } )
-				// new THREE.MeshFaceMaterial()
-				// new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.FlatShading } );
-				// new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.SmoothShading } );
-
 				cube = THREE.SceneUtils.createMultiMaterialObject( smooth, meshmaterials );
 
 				var meshScale =  params.meshScale ? params.meshScale : 1;
-				
+
 				cube.scale.x = meshScale;
 				cube.scale.y = meshScale;
 				cube.scale.z = meshScale;
@@ -353,7 +376,7 @@
 
 			function onDocumentMouseDown( event ) {
 
-				event.preventDefault();
+				//event.preventDefault();
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.addEventListener( 'mouseup', onDocumentMouseUp, false );
@@ -428,7 +451,7 @@
 
 				group.rotation.x = cube.rotation.x += ( targetXRotation - cube.rotation.x ) * 0.05;
 				group.rotation.y = cube.rotation.y += ( targetYRotation - cube.rotation.y ) * 0.05;
-				
+
 				renderer.render( scene, camera );
 
 			}
@@ -437,3 +460,4 @@
 
 	</body>
 </html>
+
