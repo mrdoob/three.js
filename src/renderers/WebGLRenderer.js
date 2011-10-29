@@ -3279,6 +3279,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			webglObject = renderList[ i ];
 			object = webglObject.object;
 
+			webglObject.render = false;
+
 			if ( object.visible ) {
 
 				if ( ! ( object instanceof THREE.Mesh ) || ! ( object.frustumCulled ) || isInFrustum( object ) ) {
@@ -3308,15 +3310,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					}
 
-				} else {
-
-					webglObject.render = false;
-
 				}
-
-			} else {
-
-				webglObject.render = false;
 
 			}
 
@@ -3401,15 +3395,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function renderShadowMap ( scene, camera ) {
 
-		var i, il, light,
-			j = 0,
-			shadowMap, shadowMatrix,
-			oil,
-			material,
-			program, buffer,
-			o, ol, webglObject, object,
-			lights = scene.lights,
-			fog = null;
+		var i, il, j, jl,
+
+		shadowMap, shadowMatrix,
+		program, buffer, material,
+		webglObject, object, light,
+
+		shadowIndex = 0,
+
+		lights = scene.lights,
+		fog = null;
 
 		if ( ! _cameraLight ) {
 
@@ -3421,25 +3416,21 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			light = lights[ i ];
 
-			if ( light instanceof THREE.SpotLight && light.castShadow ) {
+			if ( light.castShadow && light instanceof THREE.SpotLight ) {
 
 				_currentMaterialId = -1;
 
-				if ( ! _this.shadowMap[ j ] ) {
+				if ( ! _this.shadowMap[ shadowIndex ] ) {
 
 					var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat };
-					_this.shadowMap[ j ] = new THREE.WebGLRenderTarget( _this.shadowMapWidth, _this.shadowMapHeight, pars );
+
+					_this.shadowMap[ shadowIndex ] = new THREE.WebGLRenderTarget( _this.shadowMapWidth, _this.shadowMapHeight, pars );
+					_shadowMatrix[ shadowIndex ] = new THREE.Matrix4();
 
 				}
 
-				if ( ! _shadowMatrix[ j ] ) {
-
-					_shadowMatrix[ j ] = new THREE.Matrix4();
-
-				}
-
-				shadowMap = _this.shadowMap[ j ];
-				shadowMatrix = _shadowMatrix[ j ];
+				shadowMap = _this.shadowMap[ shadowIndex ];
+				shadowMatrix = _shadowMatrix[ shadowIndex ];
 
 				_cameraLight.position.copy( light.position );
 				_cameraLight.lookAt( light.target.position );
@@ -3485,16 +3476,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				_gl.clearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
 
-
 				// set matrices & frustum culling
 
-				ol = scene.__webglObjects.length;
-				oil = scene.__webglObjectsImmediate.length;
+				jl = scene.__webglObjects.length;
 
-				for ( o = 0; o < ol; o ++ ) {
+				for ( j = 0; j < jl; j ++ ) {
 
-					webglObject = scene.__webglObjects[ o ];
+					webglObject = scene.__webglObjects[ j ];
 					object = webglObject.object;
+
+					webglObject.render = false;
 
 					if ( object.visible && object.castShadow ) {
 
@@ -3506,28 +3497,22 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 							webglObject.render = true;
 
-						} else {
-
-							webglObject.render = false;
-
 						}
-
-					} else {
-
-						webglObject.render = false;
 
 					}
 
 				}
+
+				// render regular objects
 
 				setDepthTest( true );
 				setBlending( THREE.NormalBlending ); // maybe blending should be just disabled?
 
 				//_gl.cullFace( _gl.FRONT );
 
-				for ( o = 0; o < ol; o ++ ) {
+				for ( j = 0; j < jl; j ++ ) {
 
-					webglObject = scene.__webglObjects[ o ];
+					webglObject = scene.__webglObjects[ j ];
 
 					if ( webglObject.render ) {
 
@@ -3556,9 +3541,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				for ( o = 0; o < oil; o ++ ) {
+				// set matrices and render immediate objects
 
-					webglObject = scene.__webglObjectsImmediate[ o ];
+				jl = scene.__webglObjectsImmediate.length;
+
+				for ( j = 0; j < jl; j ++ ) {
+
+					webglObject = scene.__webglObjectsImmediate[ j ];
 					object = webglObject.object;
 
 					if ( object.visible && object.castShadow ) {
@@ -3593,7 +3582,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				//_gl.cullFace( _gl.BACK );
 
-				j ++;
+				shadowIndex ++;
 
 			}
 
@@ -5015,7 +5004,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-	}
+	};
 
 	function setupLights ( program, lights ) {
 
