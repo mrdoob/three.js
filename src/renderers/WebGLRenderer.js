@@ -601,6 +601,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		if (geometryGroup.__webglCustomAttributes) {
+			for (objId in geometryGroup.__webglCustomAttributes) {
+				_gl.deleteBuffer(geometryGroup.__webglCustomAttributes[objId].buffer);
+			}
+		}
 		_this.info.memory.geometries --;
 
 	};
