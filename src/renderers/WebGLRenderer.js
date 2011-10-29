@@ -1448,11 +1448,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( dirtyMorphTargets ) {
 
-			for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
+			for ( vk = 0, vkl = morphTargets.length; vk < vkl; vk ++ ) {
 
-				face = obj_faces[ chunk_faces3[ f ]	];
+				offset_morphTarget = 0;
 
-				for ( vk = 0, vkl = morphTargets.length; vk < vkl; vk ++ ) {
+				for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
+
+					face = obj_faces[ chunk_faces3[ f ]	];
 
 					v1 = morphTargets[ vk ].vertices[ face.a ].position;
 					v2 = morphTargets[ vk ].vertices[ face.b ].position;
@@ -1472,17 +1474,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 					vka[ offset_morphTarget + 7 ] = v3.y;
 					vka[ offset_morphTarget + 8 ] = v3.z;
 
+					offset_morphTarget += 9;
+
 				}
 
-				offset_morphTarget += 9;
+				for ( f = 0, fl = chunk_faces4.length; f < fl; f ++ ) {
 
-			}
-
-			for ( f = 0, fl = chunk_faces4.length; f < fl; f ++ ) {
-
-				face = obj_faces[ chunk_faces4[ f ] ];
-
-				for ( vk = 0, vkl = morphTargets.length; vk < vkl; vk ++ ) {
+					face = obj_faces[ chunk_faces4[ f ] ];
 
 					v1 = morphTargets[ vk ].vertices[ face.a ].position;
 					v2 = morphTargets[ vk ].vertices[ face.b ].position;
@@ -1507,13 +1505,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 					vka[ offset_morphTarget + 10 ] = v4.y;
 					vka[ offset_morphTarget + 11 ] = v4.z;
 
+					offset_morphTarget += 12;
+
 				}
-
-				offset_morphTarget += 12;
-
-			}
-
-			for ( vk = 0, vkl = morphTargets.length; vk < vkl; vk ++ ) {
 
 				_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglMorphTargetsBuffers[ vk ] );
 				_gl.bufferData( _gl.ARRAY_BUFFER, morphTargetsArrays[ vk ], hint );
