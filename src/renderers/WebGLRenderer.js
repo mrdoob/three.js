@@ -13,8 +13,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	_canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElement( 'canvas' ),
 
-	_stencil = parameters.stencil !== undefined ? parameters.stencil : true,
+	_precision = parameters.precision !== undefined ? parameters.precision : 'highp',
 	_antialias = parameters.antialias !== undefined ? parameters.antialias : false,
+	_stencil = parameters.stencil !== undefined ? parameters.stencil : true,
 	_preserveDrawingBuffer = parameters.preserveDrawingBuffer !== undefined ? parameters.preserveDrawingBuffer : false,
 
 	_clearColor = parameters.clearColor !== undefined ? new THREE.Color( parameters.clearColor ) : new THREE.Color( 0x000000 ),
@@ -5277,7 +5278,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var prefix_fragment = [
 
 			"#ifdef GL_ES",
-			"precision highp float;",
+			"precision " + _precision + " float;",
 			"#endif",
 
 			"#define MAX_DIR_LIGHTS " + parameters.maxDirLights,
