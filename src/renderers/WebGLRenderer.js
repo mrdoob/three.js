@@ -2237,31 +2237,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						}
 
-					} else if ( customAttribute.boundTo === "faceVertices" ) {
-
-						for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
-
-							customAttribute.array[ offset_custom ] 	   = customAttribute.value[ offset_customSrc ];
-							customAttribute.array[ offset_custom + 1 ] = customAttribute.value[ offset_customSrc + 1 ];
-							customAttribute.array[ offset_custom + 2 ] = customAttribute.value[ offset_customSrc + 2 ];
-
-							offset_custom += 3;
-							offset_customSrc += 3;
-
-						}
-
-						for ( f = 0, fl = chunk_faces4.length; f < fl; f ++ ) {
-
-							customAttribute.array[ offset_custom ] 	   = customAttribute.value[ offset_customSrc ];
-							customAttribute.array[ offset_custom + 1 ] = customAttribute.value[ offset_customSrc + 1 ];
-							customAttribute.array[ offset_custom + 2 ] = customAttribute.value[ offset_customSrc + 2 ];
-							customAttribute.array[ offset_custom + 3 ] = customAttribute.value[ offset_customSrc + 3 ];
-
-							offset_custom += 4;
-							offset_customSrc += 4;
-
-						}
-
 					}
 
 				} else if ( customAttribute.size === 2 ) {
@@ -2359,52 +2334,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 							customAttribute.array[ offset_custom + 7 ] = v4.y;
 
 							offset_custom += 8;
-
-						}
-
-					} else if ( customAttribute.boundTo === "faceVertices" ) {
-
-						for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
-
-							v1 = customAttribute.value[ offset_customSrc ];
-							v2 = customAttribute.value[ offset_customSrc + 1 ];
-							v3 = customAttribute.value[ offset_customSrc + 2 ];
-
-							customAttribute.array[ offset_custom ] 	   = v1.x;
-							customAttribute.array[ offset_custom + 1 ] = v1.y;
-
-							customAttribute.array[ offset_custom + 2 ] = v2.x;
-							customAttribute.array[ offset_custom + 3 ] = v2.y;
-
-							customAttribute.array[ offset_custom + 4 ] = v3.x;
-							customAttribute.array[ offset_custom + 5 ] = v3.y;
-
-							offset_custom += 6;
-							offset_customSrc += 3;
-
-						}
-
-						for ( f = 0, fl = chunk_faces4.length; f < fl; f ++ ) {
-
-							v1 = customAttribute.value[ offset_customSrc ];
-							v2 = customAttribute.value[ offset_customSrc + 1 ];
-							v3 = customAttribute.value[ offset_customSrc + 2 ];
-							v4 = customAttribute.value[ offset_customSrc + 3 ];
-
-							customAttribute.array[ offset_custom ] 	   = v1.x;
-							customAttribute.array[ offset_custom + 1 ] = v1.y;
-
-							customAttribute.array[ offset_custom + 2 ] = v2.x;
-							customAttribute.array[ offset_custom + 3 ] = v2.y;
-
-							customAttribute.array[ offset_custom + 4 ] = v3.x;
-							customAttribute.array[ offset_custom + 5 ] = v3.y;
-
-							customAttribute.array[ offset_custom + 6 ] = v4.x;
-							customAttribute.array[ offset_custom + 7 ] = v4.y;
-
-							offset_custom += 8;
-							offset_customSrc += 4;
 
 						}
 
@@ -2534,59 +2463,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						}
 
-					} else if ( customAttribute.boundTo === "faceVertices" ) {
-
-						for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
-
-							v1 = customAttribute.value[ offset_customSrc ];
-							v2 = customAttribute.value[ offset_customSrc + 1 ];
-							v3 = customAttribute.value[ offset_customSrc + 2 ];
-
-							customAttribute.array[ offset_custom ] 	   = v1[ pp[ 0 ] ];
-							customAttribute.array[ offset_custom + 1 ] = v1[ pp[ 1 ] ];
-							customAttribute.array[ offset_custom + 2 ] = v1[ pp[ 2 ] ];
-
-							customAttribute.array[ offset_custom + 3 ] = v2[ pp[ 0 ] ];
-							customAttribute.array[ offset_custom + 4 ] = v2[ pp[ 1 ] ];
-							customAttribute.array[ offset_custom + 5 ] = v2[ pp[ 2 ] ];
-
-							customAttribute.array[ offset_custom + 6 ] = v3[ pp[ 0 ] ];
-							customAttribute.array[ offset_custom + 7 ] = v3[ pp[ 1 ] ];
-							customAttribute.array[ offset_custom + 8 ] = v3[ pp[ 2 ] ];
-
-							offset_custom += 9;
-							offset_customSrc += 3;
-
-						}
-
-						for ( f = 0, fl = chunk_faces4.length; f < fl; f ++ ) {
-
-							v1 = customAttribute.value[ offset_customSrc ];
-							v2 = customAttribute.value[ offset_customSrc + 1 ];
-							v3 = customAttribute.value[ offset_customSrc + 2 ];
-							v4 = customAttribute.value[ offset_customSrc + 3 ];
-
-							customAttribute.array[ offset_custom  ] 	= v1[ pp[ 0 ] ];
-							customAttribute.array[ offset_custom + 1  ] = v1[ pp[ 1 ] ];
-							customAttribute.array[ offset_custom + 2  ] = v1[ pp[ 2 ] ];
-
-							customAttribute.array[ offset_custom + 3  ] = v2[ pp[ 0 ] ];
-							customAttribute.array[ offset_custom + 4  ] = v2[ pp[ 1 ] ];
-							customAttribute.array[ offset_custom + 5  ] = v2[ pp[ 2 ] ];
-
-							customAttribute.array[ offset_custom + 6  ] = v3[ pp[ 0 ] ];
-							customAttribute.array[ offset_custom + 7  ] = v3[ pp[ 1 ] ];
-							customAttribute.array[ offset_custom + 8  ] = v3[ pp[ 2 ] ];
-
-							customAttribute.array[ offset_custom + 9  ] = v4[ pp[ 0 ] ];
-							customAttribute.array[ offset_custom + 10 ] = v4[ pp[ 1 ] ];
-							customAttribute.array[ offset_custom + 11 ] = v4[ pp[ 2 ] ];
-
-							offset_custom += 12;
-							offset_customSrc += 4;
-
-						}
-
 					}
 
 				} else if ( customAttribute.size === 4 ) {
@@ -2712,66 +2588,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 							customAttribute.array[ offset_custom + 15 ] = v4.w;
 
 							offset_custom += 16;
-
-						}
-
-					} else if ( customAttribute.boundTo === "faceVertices" ) {
-
-						for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
-
-							v1 = customAttribute.value[ offset_customSrc ];
-							v2 = customAttribute.value[ offset_customSrc + 1 ];
-							v3 = customAttribute.value[ offset_customSrc + 2 ];
-
-							customAttribute.array[ offset_custom  ] 	= v1.x;
-							customAttribute.array[ offset_custom + 1  ] = v1.y;
-							customAttribute.array[ offset_custom + 2  ] = v1.z;
-							customAttribute.array[ offset_custom + 3  ] = v1.w;
-
-							customAttribute.array[ offset_custom + 4  ] = v2.x;
-							customAttribute.array[ offset_custom + 5  ] = v2.y;
-							customAttribute.array[ offset_custom + 6  ] = v2.z;
-							customAttribute.array[ offset_custom + 7  ] = v2.w;
-
-							customAttribute.array[ offset_custom + 8  ] = v3.x;
-							customAttribute.array[ offset_custom + 9  ] = v3.y;
-							customAttribute.array[ offset_custom + 10 ] = v3.z;
-							customAttribute.array[ offset_custom + 11 ] = v3.w;
-
-							offset_custom += 12;
-							offset_customSrc += 3;
-
-						}
-
-						for ( f = 0, fl = chunk_faces4.length; f < fl; f ++ ) {
-
-							v1 = customAttribute.value[ offset_customSrc ];
-							v2 = customAttribute.value[ offset_customSrc + 1 ];
-							v3 = customAttribute.value[ offset_customSrc + 2 ];
-							v4 = customAttribute.value[ offset_customSrc + 3 ];
-
-							customAttribute.array[ offset_custom  ] 	= v1.x;
-							customAttribute.array[ offset_custom + 1  ] = v1.y;
-							customAttribute.array[ offset_custom + 2  ] = v1.z;
-							customAttribute.array[ offset_custom + 3  ] = v1.w;
-
-							customAttribute.array[ offset_custom + 4  ] = v2.x;
-							customAttribute.array[ offset_custom + 5  ] = v2.y;
-							customAttribute.array[ offset_custom + 6  ] = v2.z;
-							customAttribute.array[ offset_custom + 7  ] = v2.w;
-
-							customAttribute.array[ offset_custom + 8  ] = v3.x;
-							customAttribute.array[ offset_custom + 9  ] = v3.y;
-							customAttribute.array[ offset_custom + 10 ] = v3.z;
-							customAttribute.array[ offset_custom + 11 ] = v3.w;
-
-							customAttribute.array[ offset_custom + 12 ] = v4.x;
-							customAttribute.array[ offset_custom + 13 ] = v4.y;
-							customAttribute.array[ offset_custom + 14 ] = v4.z;
-							customAttribute.array[ offset_custom + 15 ] = v4.w;
-
-							offset_custom += 16;
-							offset_customSrc += 4;
 
 						}
 
