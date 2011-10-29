@@ -5202,6 +5202,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			setTextureParameters( _gl.TEXTURE_2D, texture, texture.image );
 
 			texture.needsUpdate = false;
+			if (texture.onUpdated) {texture.onUpdated (texture);}
 
 		} else {
 
@@ -5235,6 +5236,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				setTextureParameters( _gl.TEXTURE_CUBE_MAP, texture, texture.image[ 0 ] );
 
+				for ( var i = 0; i < 6; i ++ ) {
+
+					texture.image[ i ] = null; // release DOM image to not double image memmory use
+
+				}
+				
 				texture.needsUpdate = false;
 
 			} else {
