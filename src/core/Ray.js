@@ -7,19 +7,13 @@ THREE.Ray = function ( origin, direction ) {
 	this.origin = origin || new THREE.Vector3();
 	this.direction = direction || new THREE.Vector3();
 
-}
-
-THREE.Ray.prototype = {
-
-	constructor: THREE.Ray,
-
-	intersectScene: function ( scene ) {
+	this.intersectScene = function ( scene ) {
 
 		return this.intersectObjects( scene.children );
 
-	},
+	};
 
-	intersectObjects: function ( objects ) {
+	this.intersectObjects = function ( objects ) {
 
 		var i, l, object,
 		intersects = [];
@@ -34,52 +28,18 @@ THREE.Ray.prototype = {
 
 		return intersects;
 
-	},
+	};
 
-	intersectObject: function ( object ) {
+	var a = new THREE.Vector3();
+	var b = new THREE.Vector3();
+	var c = new THREE.Vector3();
+	var d = new THREE.Vector3();
 
-		function distanceFromIntersection( origin, direction, position ) {
+	var origin = new THREE.Vector3();
+	var direction = new THREE.Vector3();
+	var normal = new THREE.Vector3();
 
-			var vector, dot, intersect, distance;
-
-			vector = position.clone().subSelf( origin );
-			dot = vector.dot( direction );
-
-			if ( dot <= 0 ) return null; // check if position behind origin.
-
-			intersect = origin.clone().addSelf( direction.clone().multiplyScalar( dot ) );
-			distance = position.distanceTo( intersect );
-
-			return distance;
-
-		}
-
-		// http://www.blackpawn.com/texts/pointinpoly/default.html
-
-		var v0 = new THREE.Vector3(), v1 = new THREE.Vector3(), v2 = new THREE.Vector3();
-		var dot00, dot01, dot02, dot11, dot12, invDenom, u, v;
-
-		function pointInFace3( p, a, b, c ) {
-
-			v0.copy( c ).subSelf( a );
-			v1.copy( b ).subSelf( a );
-			v2.copy( p ).subSelf( a );
-
-			dot00 = v0.dot( v0 );
-			dot01 = v0.dot( v1 );
-			dot02 = v0.dot( v2 );
-			dot11 = v1.dot( v1 );
-			dot12 = v1.dot( v2 );
-
-			invDenom = 1 / ( dot00 * dot11 - dot01 * dot01 );
-			u = ( dot11 * dot02 - dot01 * dot12 ) * invDenom;
-			v = ( dot00 * dot12 - dot01 * dot02 ) * invDenom;
-
-			return ( u >= 0 ) && ( v >= 0 ) && ( u + v < 1 );
-
-		}
-
-		//
+	this.intersectObject = function ( object ) {
 
 		var intersect, intersects = [];
 
@@ -125,7 +85,6 @@ THREE.Ray.prototype = {
 			// Checking faces
 
 			var f, fl, face,
-			a, b, c, d, normal,
 			vector, dot, scalar,
 			origin, direction,
 			geometry = object.geometry,
@@ -153,12 +112,12 @@ THREE.Ray.prototype = {
 
 				//
 
-				a = objMatrix.multiplyVector3( vertices[ face.a ].position.clone() );
-				b = objMatrix.multiplyVector3( vertices[ face.b ].position.clone() );
-				c = objMatrix.multiplyVector3( vertices[ face.c ].position.clone() );
-				d = face instanceof THREE.Face4 ? objMatrix.multiplyVector3( vertices[ face.d ].position.clone() ) : null;
+				a = objMatrix.multiplyVector3( a.copy( vertices[ face.a ].position ) );
+				b = objMatrix.multiplyVector3( b.copy( vertices[ face.b ].position ) );
+				c = objMatrix.multiplyVector3( c.copy( vertices[ face.c ].position ) );
+				d = face instanceof THREE.Face4 ? objMatrix.multiplyVector3( d.copy( vertices[ face.d ].position ) ) : null;
 
-				normal = object.matrixRotationWorld.multiplyVector3( face.normal.clone() );
+				normal = object.matrixRotationWorld.multiplyVector3( normal.copy( face.normal ) );
 				dot = direction.dot( normal );
 
 				if ( object.doubleSided || ( object.flipSided ? dot > 0 : dot < 0 ) ) { // Math.abs( dot ) > 0.0001
@@ -209,6 +168,47 @@ THREE.Ray.prototype = {
 		}
 
 		return intersects;
+
+	}
+
+	function distanceFromIntersection( origin, direction, position ) {
+
+		var vector, dot, intersect, distance;
+
+		vector = position.clone().subSelf( origin );
+		dot = vector.dot( direction );
+
+		if ( dot <= 0 ) return null; // check if position behind origin.
+
+		intersect = origin.clone().addSelf( direction.clone().multiplyScalar( dot ) );
+		distance = position.distanceTo( intersect );
+
+		return distance;
+
+	}
+
+	// http://www.blackpawn.com/texts/pointinpoly/default.html
+
+	var v0 = new THREE.Vector3(), v1 = new THREE.Vector3(), v2 = new THREE.Vector3();
+	var dot00, dot01, dot02, dot11, dot12, invDenom, u, v;
+
+	function pointInFace3( p, a, b, c ) {
+
+		v0.copy( c ).subSelf( a );
+		v1.copy( b ).subSelf( a );
+		v2.copy( p ).subSelf( a );
+
+		dot00 = v0.dot( v0 );
+		dot01 = v0.dot( v1 );
+		dot02 = v0.dot( v2 );
+		dot11 = v1.dot( v1 );
+		dot12 = v1.dot( v2 );
+
+		invDenom = 1 / ( dot00 * dot11 - dot01 * dot01 );
+		u = ( dot11 * dot02 - dot01 * dot12 ) * invDenom;
+		v = ( dot00 * dot12 - dot01 * dot02 ) * invDenom;
+
+		return ( u >= 0 ) && ( v >= 0 ) && ( u + v < 1 );
 
 	}
 
