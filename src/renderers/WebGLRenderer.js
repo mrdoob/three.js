@@ -5202,7 +5202,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			setTextureParameters( _gl.TEXTURE_2D, texture, texture.image );
 
 			texture.needsUpdate = false;
-			if (texture.onupdated) {texture.onupdated(texture);}
+			if (texture.onUpdated) {texture.onUpdated (texture);}
 
 		} else {
 
