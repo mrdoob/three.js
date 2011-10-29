@@ -5201,9 +5201,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			setTextureParameters( _gl.TEXTURE_2D, texture, texture.image );
 
-			texture.image = null; // release DOM image to not double image memmory use
-			
 			texture.needsUpdate = false;
+			if (texture.onupdated) {texture.onupdated(texture);}
 
 		} else {
 
