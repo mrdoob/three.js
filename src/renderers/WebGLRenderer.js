@@ -5496,6 +5496,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			texture.needsUpdate = false;
 
+			if ( texture.onUpdated ) texture.onUpdated();
+
 		} else {
 
 			_gl.activeTexture( _gl.TEXTURE0 + slot );

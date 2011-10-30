@@ -37,6 +37,7 @@ THREE.Ray = function ( origin, direction ) {
 
 	var origin = new THREE.Vector3();
 	var direction = new THREE.Vector3();
+	var vector = new THREE.Vector3();
 	var normal = new THREE.Vector3();
 
 	this.intersectObject = function ( object ) {
@@ -84,9 +85,7 @@ THREE.Ray = function ( origin, direction ) {
 
 			// Checking faces
 
-			var f, fl, face,
-			vector, dot, scalar,
-			origin, direction,
+			var f, fl, face, dot, scalar,
 			geometry = object.geometry,
 			vertices = geometry.vertices,
 			objMatrix,
@@ -98,14 +97,14 @@ THREE.Ray = function ( origin, direction ) {
 
 				face = geometry.faces[ f ];
 
-				origin = this.origin.clone();
-				direction = this.direction.clone();
+				origin = origin.copy( this.origin );
+				direction = direction.copy( this.direction );
 
 				objMatrix = object.matrixWorld;
 
 				// check if face.centroid is behind the origin
 
-				vector = objMatrix.multiplyVector3( face.centroid.clone() ).subSelf( origin );
+				vector = objMatrix.multiplyVector3( vector.copy( face.centroid ) ).subSelf( origin );
 				dot = vector.dot( direction );
 
 				if ( dot <= 0 ) continue;
@@ -122,8 +121,8 @@ THREE.Ray = function ( origin, direction ) {
 
 				if ( object.doubleSided || ( object.flipSided ? dot > 0 : dot < 0 ) ) { // Math.abs( dot ) > 0.0001
 
-					scalar = normal.dot( new THREE.Vector3().sub( a, origin ) ) / dot;
-					intersectPoint = origin.addSelf( direction.multiplyScalar( scalar ) );
+					scalar = normal.dot( vector.sub( a, origin ) ) / dot;
+					intersectPoint = origin.clone().addSelf( direction.multiplyScalar( scalar ) );
 
 					if ( face instanceof THREE.Face3 ) {
 
@@ -131,7 +130,7 @@ THREE.Ray = function ( origin, direction ) {
 
 							intersect = {
 
-								distance: this.origin.distanceTo( intersectPoint ),
+								distance: origin.distanceTo( intersectPoint ),
 								point: intersectPoint,
 								face: face,
 								object: object
@@ -148,7 +147,7 @@ THREE.Ray = function ( origin, direction ) {
 
 							intersect = {
 
-								distance: this.origin.distanceTo( intersectPoint ),
+								distance: origin.distanceTo( intersectPoint ),
 								point: intersectPoint,
 								face: face,
 								object: object
@@ -171,16 +170,17 @@ THREE.Ray = function ( origin, direction ) {
 
 	}
 
+	var v0 = new THREE.Vector3(), v1 = new THREE.Vector3(), v2 = new THREE.Vector3();
+	var dot, intersect, distance;
+
 	function distanceFromIntersection( origin, direction, position ) {
 
-		var vector, dot, intersect, distance;
-
-		vector = position.clone().subSelf( origin );
-		dot = vector.dot( direction );
+		v0 = v0.copy( position ).subSelf( origin );
+		dot = v0.dot( direction );
 
 		if ( dot <= 0 ) return null; // check if position behind origin.
 
-		intersect = origin.clone().addSelf( direction.clone().multiplyScalar( dot ) );
+		intersect = v1.copy( origin ).addSelf( v2.copy( direction ).multiplyScalar( dot ) );
 		distance = position.distanceTo( intersect );
 
 		return distance;
@@ -189,8 +189,7 @@ THREE.Ray = function ( origin, direction ) {
 
 	// http://www.blackpawn.com/texts/pointinpoly/default.html
 
-	var v0 = new THREE.Vector3(), v1 = new THREE.Vector3(), v2 = new THREE.Vector3();
-	var dot00, dot01, dot02, dot11, dot12, invDenom, u, v;
+	var dot00, dot01, dot02, dot11, dot12, invDenom, u, v
 
 	function pointInFace3( p, a, b, c ) {
 
