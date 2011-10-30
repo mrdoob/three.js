@@ -38,8 +38,7 @@
 		<script src="js/ShaderExtras.js"></script>
 		<script src="js/Stats.js"></script>
 
-		<link href="js/gui/gui.css" media="screen" rel="stylesheet" type="text/css" />
-		<script src="js/gui/gui.min.js"></script>
+		<script src='js/DAT.GUI.min.js'></script>
 
 		<div id="info">
 			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl depth-of-field with bokeh example -
@@ -194,10 +193,11 @@
 
 				};
 
-				var gui = new GUI();
+				var gui = new DAT.GUI();
 				gui.add( effectController, "focus", 0.0, 3.0, 0.025 ).onChange( matChanger );
 				gui.add( effectController, "aperture", 0.001, 0.2, 0.001 ).onChange( matChanger );
 				gui.add( effectController, "maxblur", 0.0, 3.0, 0.025 ).onChange( matChanger );
+				gui.close();
 
 			}
 

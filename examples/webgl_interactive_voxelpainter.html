@@ -23,8 +23,7 @@
 		<script src="js/RequestAnimationFrame.js"></script>
 		<script src="js/Stats.js"></script>
 
-		<link href="js/gui/gui.css" media="screen" rel="stylesheet" type="text/css" />
-		<script src="js/gui/gui.min.js"></script>
+		<script src='js/DAT.GUI.min.js'></script>
 
 		<script>
 
@@ -119,7 +118,7 @@
 				document.addEventListener( 'keyup', onDocumentKeyUp, false );
 
 				// add GUI
-				gui = new GUI();
+				gui = new DAT.GUI();
 				gui.add(voxelConfig, 'orthographicProjection').onChange(function(){
 
 					if ( voxelConfig.orthographicProjection ) {
@@ -134,6 +133,7 @@
 					}
 
 				});
+				gui.close();
 
 			}
 
