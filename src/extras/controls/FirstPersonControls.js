@@ -143,7 +143,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 			case 82: /*R*/ this.moveUp = true; break;
 			case 70: /*F*/ this.moveDown = true; break;
 
-			case 81: this.freeze = !this.freeze; break;
+			case 81: this.freeze = !this.freeze; break; /*Q*/
 
 		}
 
@@ -177,6 +177,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 		var now = new Date().getTime();
 		this.tdiff = ( now - this.lastUpdate ) / 1000;
 		this.lastUpdate = now;
+		var actualLookSpeed = 0;
 
 		if ( !this.freeze ) {
 
@@ -205,7 +206,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 			if ( this.moveUp ) this.object.translateY( actualMoveSpeed );
 			if ( this.moveDown ) this.object.translateY( - actualMoveSpeed );
 
-			var actualLookSpeed = this.tdiff * this.lookSpeed;
+			actualLookSpeed = this.tdiff * this.lookSpeed;
 
 			if ( !this.activeLook ) {
 
