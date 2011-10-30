@@ -89,7 +89,7 @@ THREE.Ray = function ( origin, direction ) {
 			geometry = object.geometry,
 			vertices = geometry.vertices,
 			objMatrix,
-			intersectPoint;
+			intersectPoint = new THREE.Vector3();
 
 			object.matrixRotationWorld.extractRotation( object.matrixWorld );
 
@@ -122,7 +122,7 @@ THREE.Ray = function ( origin, direction ) {
 				if ( object.doubleSided || ( object.flipSided ? dot > 0 : dot < 0 ) ) { // Math.abs( dot ) > 0.0001
 
 					scalar = normal.dot( vector.sub( a, origin ) ) / dot;
-					intersectPoint = origin.clone().addSelf( direction.multiplyScalar( scalar ) );
+					intersectPoint.add( origin, direction.multiplyScalar( scalar ) );
 
 					if ( face instanceof THREE.Face3 ) {
 
@@ -131,7 +131,7 @@ THREE.Ray = function ( origin, direction ) {
 							intersect = {
 
 								distance: origin.distanceTo( intersectPoint ),
-								point: intersectPoint,
+								point: intersectPoint.clone(),
 								face: face,
 								object: object
 
@@ -148,7 +148,7 @@ THREE.Ray = function ( origin, direction ) {
 							intersect = {
 
 								distance: origin.distanceTo( intersectPoint ),
-								point: intersectPoint,
+								point: intersectPoint.clone(),
 								face: face,
 								object: object
 
