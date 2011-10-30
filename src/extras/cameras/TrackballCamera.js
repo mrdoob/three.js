@@ -15,6 +15,7 @@
  *	zoomSpeed: <float>,
  *	panSpeed: <float>,
 
+ *  noRotate: <bool>,
  *	noZoom: <bool>,
  *	noPan: <bool>,
 
@@ -47,6 +48,7 @@ THREE.TrackballCamera = function ( parameters ) {
 	this.zoomSpeed = parameters.zoomSpeed || 1.2;
 	this.panSpeed = parameters.panSpeed || 0.3;
 
+	this.noRotate = parameters.noRotate || false;
 	this.noZoom = parameters.noZoom || false;
 	this.noPan = parameters.noPan || false;
 
@@ -234,10 +236,14 @@ THREE.TrackballCamera = function ( parameters ) {
 
 	this.update = function( parentMatrixWorld, forceUpdate, camera ) {
 
-		_eye = this.position.clone().subSelf( this.target.position ),
+		_eye = this.position.clone().subSelf( this.target.position );
 
-		this.rotateCamera();
+		if ( !this.noRotate ) {
 
+			this.rotateCamera();
+
+		}
+		
 		if ( !this.noZoom ) {
 
 			this.zoomCamera();
@@ -267,7 +273,7 @@ THREE.TrackballCamera = function ( parameters ) {
 
 			return;
 
-		} else if ( event.keyCode === this.keys[ this.STATE.ROTATE ] ) {
+		} else if ( event.keyCode === this.keys[ this.STATE.ROTATE ] && !this.noRotate ) {
 
 			_state = this.STATE.ROTATE;
 
@@ -308,7 +314,7 @@ THREE.TrackballCamera = function ( parameters ) {
 
 			_state = event.button;
 
-			if ( _state === this.STATE.ROTATE ) {
+			if ( _state === this.STATE.ROTATE && !this.noRotate ) {
 
 				_rotateStart = _rotateEnd = this.getMouseProjectionOnBall( event.clientX, event.clientY );
 
@@ -342,7 +348,7 @@ THREE.TrackballCamera = function ( parameters ) {
 
 			return;
 
-		} else if ( _state === this.STATE.ROTATE ) {
+		} else if ( _state === this.STATE.ROTATE && !this.noRotate ) {
 
 			_rotateEnd = this.getMouseProjectionOnBall( event.clientX, event.clientY );
 
