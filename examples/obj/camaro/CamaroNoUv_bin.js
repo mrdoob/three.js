@@ -1,22 +1,23 @@
-// Converted from: ../../examples/obj/camaro/CamaroNoUv.obj
-//  vertices: 53139
-//  faces: 93251
-//  materials: 9
-//
-//  Generated with OBJ -> Three.js converter
-//  http://github.com/alteredq/three.js/blob/master/utils/exporters/convert_obj_three.py
+{
 
-
-var model = {
-
-    "version" : 1,
+    "metadata" :
+    {
+        "formatVersion" : 3,
+        "sourceFile"    : "CamaroNoUv.obj",
+        "generatedBy"   : "OBJConverter",
+        "vertices"      : 53139,
+        "faces"         : 93251,
+        "normals"       : 46141,
+        "uvs"           : 0,
+        "materials"     : 9
+    },
 
     "materials": [	{
 	"DbgColor" : 15658734,
 	"DbgIndex" : 0,
 	"DbgName" : "Body",
 	"colorAmbient" : [0.0, 0.0, 0.0],
-	"colorDiffuse" : [0.22700000000000001, 0.40799999999999997, 0.46300000000000002],
+	"colorDiffuse" : [0.227, 0.408, 0.463],
 	"colorSpecular" : [2.0, 2.0, 2.0],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
@@ -29,7 +30,7 @@ var model = {
 	"DbgIndex" : 1,
 	"DbgName" : "mirror",
 	"colorAmbient" : [0.0, 0.0, 0.0],
-	"colorDiffuse" : [0.29999999999999999, 0.29999999999999999, 0.29999999999999999],
+	"colorDiffuse" : [0.3, 0.3, 0.3],
 	"colorSpecular" : [2.0, 2.0, 2.0],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
@@ -42,8 +43,8 @@ var model = {
 	"DbgIndex" : 2,
 	"DbgName" : "black",
 	"colorAmbient" : [0.0, 0.0, 0.0],
-	"colorDiffuse" : [0.10199999999999999, 0.10199999999999999, 0.10199999999999999],
-	"colorSpecular" : [0.20000000000000001, 0.20000000000000001, 0.20000000000000001],
+	"colorDiffuse" : [0.102, 0.102, 0.102],
+	"colorSpecular" : [0.2, 0.2, 0.2],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 7.843137,
@@ -68,7 +69,7 @@ var model = {
 	"DbgIndex" : 4,
 	"DbgName" : "glass",
 	"colorAmbient" : [0.0, 0.0, 0.0],
-	"colorDiffuse" : [0.20000000000000001, 0.31, 0.30599999999999999],
+	"colorDiffuse" : [0.2, 0.31, 0.306],
 	"colorSpecular" : [2.0, 2.0, 2.0],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
@@ -81,7 +82,7 @@ var model = {
 	"DbgIndex" : 5,
 	"DbgName" : "Interieur",
 	"colorAmbient" : [0.0, 0.0, 0.0],
-	"colorDiffuse" : [0.10199999999999999, 0.10199999999999999, 0.10199999999999999],
+	"colorDiffuse" : [0.102, 0.102, 0.102],
 	"colorSpecular" : [0.44, 0.44, 0.44],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
@@ -94,8 +95,8 @@ var model = {
 	"DbgIndex" : 6,
 	"DbgName" : "tire",
 	"colorAmbient" : [0.0, 0.0, 0.0],
-	"colorDiffuse" : [0.27100000000000002, 0.27100000000000002, 0.26300000000000001],
-	"colorSpecular" : [0.10000000000000001, 0.10000000000000001, 0.10000000000000001],
+	"colorDiffuse" : [0.271, 0.271, 0.263],
+	"colorSpecular" : [0.1, 0.1, 0.1],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 17.647059,
@@ -108,7 +109,7 @@ var model = {
 	"DbgName" : "tireling",
 	"colorAmbient" : [0.0, 0.0, 0.0],
 	"colorDiffuse" : [0.5, 0.5, 0.5],
-	"colorSpecular" : [0.20000000000000001, 0.20000000000000001, 0.20000000000000001],
+	"colorSpecular" : [0.2, 0.2, 0.2],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 17.647059,
@@ -130,7 +131,4 @@ var model = {
 
     "buffers": "CamaroNoUv_bin.bin"
 
-};
-    
-postMessage( model );
-close();
+}

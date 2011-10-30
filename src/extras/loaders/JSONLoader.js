@@ -29,18 +29,71 @@ THREE.JSONLoader.prototype.load = function ( url, callback, texturePath ) {
 
 	}
 
-	worker = new Worker( url );
 	texturePath = texturePath ? texturePath : this.extractUrlbase( url ),
 
-	worker.onmessage = function ( event ) {
+	this.onLoadStart();
+	this.loadAjaxJSON( this, url, callback, texturePath );
 
-		scope.createModel( event.data, callback, texturePath );
-		scope.onLoadComplete();
+};
+
+THREE.JSONLoader.prototype.loadAjaxJSON = function( context, url, callback, texturePath, callbackProgress ) {
+
+	var xhr = new XMLHttpRequest();
+
+	var length = 0;
+
+	xhr.onreadystatechange = function() {
+
+		if ( xhr.readyState == 4 ) {
+
+			if ( xhr.status == 200 || xhr.status == 0 ) {
+
+				try {
+
+					var jsonObject = JSON.parse( xhr.responseText );
+
+					context.createModel( jsonObject, callback, texturePath );
+					context.onLoadComplete();
+
+				} catch ( error ) {
+
+					console.error( error );
+					console.warn( "DEPRECATED: [" + url + "] seems to be using old model format" );
+
+				}
+
+			} else {
+
+				console.error( "Couldn't load [" + url + "] [" + xhr.status + "]" );
+
+			}
+
+		} else if ( xhr.readyState == 3 ) {
+
+			if ( callbackProgress ) {
+
+				if ( length == 0 ) {
+
+					length = xhr.getResponseHeader( "Content-Length" );
+
+				}
+
+				callbackProgress( { total: length, loaded: xhr.responseText.length } );
+
+			}
+
+		} else if ( xhr.readyState == 2 ) {
+
+			length = xhr.getResponseHeader( "Content-Length" );
+
+		}
 
 	};
 
-	this.onLoadStart();
-	worker.postMessage( Date.now() );
+	xhr.open( "GET", url, true );
+	xhr.overrideMimeType( "text/plain; charset=x-user-defined" );
+	xhr.setRequestHeader( "Content-Type", "text/plain" );
+	xhr.send( null );
 
 };
 
@@ -65,7 +118,7 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texture_path
 
 	function parseModel( scale ) {
 
-		if ( json.version === undefined || json.version != 2 ) {
+		if ( json.metadata === undefined || json.metadata.formatVersion === undefined || json.metadata.formatVersion !== 3 ) {
 
 			console.error( 'Deprecated file format.' );
 			return;
