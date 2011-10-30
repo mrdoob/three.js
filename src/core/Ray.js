@@ -39,6 +39,7 @@ THREE.Ray = function ( origin, direction ) {
 	var direction = new THREE.Vector3();
 	var vector = new THREE.Vector3();
 	var normal = new THREE.Vector3();
+	var intersectPoint = new THREE.Vector3()
 
 	this.intersectObject = function ( object ) {
 
@@ -88,8 +89,7 @@ THREE.Ray = function ( origin, direction ) {
 			var f, fl, face, dot, scalar,
 			geometry = object.geometry,
 			vertices = geometry.vertices,
-			objMatrix,
-			intersectPoint = new THREE.Vector3();
+			objMatrix;
 
 			object.matrixRotationWorld.extractRotation( object.matrixWorld );
 
@@ -97,8 +97,8 @@ THREE.Ray = function ( origin, direction ) {
 
 				face = geometry.faces[ f ];
 
-				origin = origin.copy( this.origin );
-				direction = direction.copy( this.direction );
+				origin.copy( this.origin );
+				direction.copy( this.direction );
 
 				objMatrix = object.matrixWorld;
 
@@ -175,12 +175,12 @@ THREE.Ray = function ( origin, direction ) {
 
 	function distanceFromIntersection( origin, direction, position ) {
 
-		v0 = v0.copy( position ).subSelf( origin );
+		v0.sub( position, origin );
 		dot = v0.dot( direction );
 
 		if ( dot <= 0 ) return null; // check if position behind origin.
 
-		intersect = v1.copy( origin ).addSelf( v2.copy( direction ).multiplyScalar( dot ) );
+		intersect = v1.add( origin, v2.copy( direction ).multiplyScalar( dot ) );
 		distance = position.distanceTo( intersect );
 
 		return distance;
@@ -193,9 +193,9 @@ THREE.Ray = function ( origin, direction ) {
 
 	function pointInFace3( p, a, b, c ) {
 
-		v0.copy( c ).subSelf( a );
-		v1.copy( b ).subSelf( a );
-		v2.copy( p ).subSelf( a );
+		v0.sub( c, a );
+		v1.sub( b, a );
+		v2.sub( p, a );
 
 		dot00 = v0.dot( v0 );
 		dot01 = v0.dot( v1 );
