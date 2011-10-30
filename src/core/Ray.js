@@ -189,7 +189,7 @@ THREE.Ray = function ( origin, direction ) {
 
 	// http://www.blackpawn.com/texts/pointinpoly/default.html
 
-	var dot00, dot01, dot02, dot11, dot12, invDenom, u, v
+	var dot00, dot01, dot02, dot11, dot12, invDenom, u, v;
 
 	function pointInFace3( p, a, b, c ) {
 
