@@ -17,6 +17,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 	this.zoomSpeed = 1.2;
 	this.panSpeed = 0.3;
 
+	this.noRotate = false;
 	this.noZoom = false;
 	this.noPan = false;
 
@@ -205,7 +206,11 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		_eye.copy( this.object.position ).subSelf( this.target );
 
-		this.rotateCamera();
+		if ( !this.noRotate) {
+		
+			this.rotateCamera();
+			
+		}
 
 		if ( !this.noZoom ) {
 
@@ -236,7 +241,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 			return;
 
-		} else if ( event.keyCode === this.keys[ this.STATE.ROTATE ] ) {
+		} else if ( event.keyCode === this.keys[ this.STATE.ROTATE ] && !this.noRotate) {
 
 			_state = this.STATE.ROTATE;
 
@@ -277,7 +282,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 			_state = event.button;
 
-			if ( _state === this.STATE.ROTATE ) {
+			if ( _state === this.STATE.ROTATE && !this.noRotate ) {
 
 				_rotateStart = _rotateEnd = this.getMouseProjectionOnBall( event.clientX, event.clientY );
 
@@ -311,7 +316,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 			return;
 
-		} else if ( _state === this.STATE.ROTATE ) {
+		} else if ( _state === this.STATE.ROTATE && !this.noRotate ) {
 
 			_rotateEnd = this.getMouseProjectionOnBall( event.clientX, event.clientY );
 
