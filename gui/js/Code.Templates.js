@@ -126,7 +126,7 @@ THREE.MeshBasicMaterial.prototype.gui = {
 
 		return 'new THREE.MeshBasicMaterial( { ' + [
 
-				'color: ' + material.color.getHex()
+				'color: 0x' + material.color.getHex().toString(16)
 
 			].join( ', ' ) + ' } )';
 

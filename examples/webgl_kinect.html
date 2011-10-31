@@ -1,0 +1,256 @@
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>three.js - kinect</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				color: #ffffff;
+
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: center;
+				font-weight: bold;
+
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+			}
+
+			a {
+
+				color: #0040ff;
+
+			}
+		</style>
+	</head>
+	<body>
+
+		<script src="../build/Three.js"></script>
+
+		<script src='js/DAT.GUI.min.js'></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/RequestAnimationFrame.js"></script>
+		<script src="js/Stats.js"></script>
+
+		<script id="vs" type="x-shader/x-vertex">
+
+			uniform sampler2D map;
+
+			uniform float width;
+			uniform float height;
+			uniform float nearClipping, farClipping;
+
+			uniform float pointSize;
+			uniform float zOffset;
+
+			varying vec2 vUv;
+
+			const float XtoZ = 1.11146; // tan( 1.0144686 / 2.0 ) * 2.0;
+			const float YtoZ = 0.83359; // tan( 0.7898090 / 2.0 ) * 2.0;
+
+			void main() {
+
+				vUv = vec2( position.x / width, 1.0 - ( position.y / height ) );
+
+				vec4 color = texture2D( map, vUv );
+				float depth = ( color.r + color.g + color.b ) / 3.0;
+
+				// Projection code by @kcmic
+
+				float z = ( 1.0 - depth ) * (farClipping - nearClipping) + nearClipping;
+
+				vec4 pos = vec4(
+					( position.x / width - 0.5 ) * z * XtoZ,
+					( position.y / height - 0.5 ) * z * YtoZ,
+					- z + zOffset,
+					1.0);
+
+				gl_PointSize = pointSize;
+				gl_Position = projectionMatrix * modelViewMatrix * pos;
+
+			}
+
+		</script>
+
+		<script id="fs" type="x-shader/x-fragment">
+
+			uniform sampler2D map;
+
+			varying vec2 vUv;
+
+			void main() {
+
+				vec4 color = texture2D( map, vUv );
+				gl_FragColor = vec4( color.r, color.g, color.b, smoothstep( 8000.0, -8000.0, gl_FragCoord.z / gl_FragCoord.w ) );
+
+			}
+
+		</script>
+
+		<script>
+
+			var container;
+
+			var scene, camera, light, renderer;
+			var geometry, cube, mesh, material;
+			var mouse, center;
+			var stats;
+
+			var video, texture;
+
+			if ( Detector.webgl ) {
+
+				init();
+				animate();
+
+			} else {
+
+				document.body.appendChild( Detector.getWebGLErrorMessage() );
+
+			}
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				var info = document.createElement( 'div' );
+				info.id = 'info';
+				info.innerHTML = '<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - kinect';
+				document.body.appendChild( info );
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				// container.appendChild( stats.domElement );
+
+				scene = new THREE.Scene();
+				center = new THREE.Vector3();
+				center.z = - 1000;
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.set( 0, 0, 500 );
+				scene.add( camera );
+
+				video = document.createElement( 'video' );
+				video.addEventListener( 'loadedmetadata', function ( event ) {
+
+					texture = new THREE.Texture( video );
+
+					var width = 640, height = 480;
+					var nearClipping = 850/*850*/, farClipping = 4000/*4000*/;
+
+					geometry = new THREE.Geometry();
+
+					for ( var i = 0, l = width * height; i < l; i ++ ) {
+ 
+						var position = new THREE.Vector3();
+						position.x = ( i % width );
+						position.y = Math.floor( i / width );
+
+						geometry.vertices.push( new THREE.Vertex( position ) );
+
+					}
+
+					material = new THREE.ShaderMaterial( {
+
+						uniforms: {
+
+							"map": { type: "t", value: 0, texture: texture },
+							"width": { type: "f", value: width },
+							"height": { type: "f", value: height },
+							"nearClipping": { type: "f", value: nearClipping },
+							"farClipping": { type: "f", value: farClipping },
+
+							"pointSize": { type: "f", value: 2 },
+							"zOffset": { type: "f", value: 1000 }
+
+						},
+						vertexShader: document.getElementById( 'vs' ).textContent,
+						fragmentShader: document.getElementById( 'fs' ).textContent,
+						depthWrite: false
+
+					} );
+
+					mesh = new THREE.ParticleSystem( geometry, material );
+					mesh.position.x = 0;
+					mesh.position.y = 0;
+					scene.add( mesh );
+
+					setInterval( function () {
+
+						if ( video.readyState === video.HAVE_ENOUGH_DATA ) {
+
+							texture.needsUpdate = true;
+
+						}
+
+					}, 1000 / 30 );
+
+
+					var gui = new DAT.GUI();
+					gui.add( material.uniforms.nearClipping, 'value' ).name( 'nearClipping' ).min( 1 ).max( 10000 ).step( 1.0 );
+					gui.add( material.uniforms.farClipping, 'value' ).name( 'farClipping' ).min( 1 ).max( 10000 ).step( 1.0 );
+					gui.add( material.uniforms.pointSize, 'value' ).name( 'pointSize' ).min( 1 ).max( 10 ).step( 1.0 );
+					gui.add( material.uniforms.zOffset, 'value' ).name( 'zOffset' ).min( 0 ).max( 4000 ).step( 1.0 );
+					gui.close();
+
+
+				}, false );
+				video.loop = true;
+				video.src = 'textures/kinect.webm';
+				video.play();
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				mouse = new THREE.Vector3( 0, 0, 1 );
+				projector = new THREE.Projector();
+				ray = new THREE.Ray( camera.position );
+
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+			}
+
+			function onDocumentMouseMove( event ) {
+
+				mouse.x = ( event.clientX - window.innerWidth / 2 ) * 8;
+				mouse.y = ( event.clientY - window.innerHeight / 2 ) * 8;
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				camera.position.x += ( mouse.x - camera.position.x ) * 0.05;
+				camera.position.y += ( - mouse.y - camera.position.y ) * 0.05;
+				camera.lookAt( center );
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>

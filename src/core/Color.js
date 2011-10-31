@@ -12,7 +12,7 @@ THREE.Color = function ( hex ) {
 THREE.Color.prototype = {
 
 	constructor: THREE.Color,
-	
+
 	r: 1, g: 1, b: 1,
 
 	copy: function ( color ) {
@@ -20,6 +20,26 @@ THREE.Color.prototype = {
 		this.r = color.r;
 		this.g = color.g;
 		this.b = color.b;
+
+		return this;
+
+	},
+
+	copyGammaToLinear: function ( color ) {
+
+		this.r = color.r * color.r;
+		this.g = color.g * color.g;
+		this.b = color.b * color.b;
+
+		return this;
+
+	},
+
+	copyLinearToGamma: function ( color ) {
+
+		this.r = Math.sqrt( color.r );
+		this.g = Math.sqrt( color.g );
+		this.b = Math.sqrt( color.b );
 
 		return this;
 
@@ -42,7 +62,7 @@ THREE.Color.prototype = {
 
 		var i, f, p, q, t;
 
-		if ( v == 0 ) {
+		if ( v === 0 ) {
 
 			this.r = this.g = this.b = 0;
 

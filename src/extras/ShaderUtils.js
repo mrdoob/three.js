@@ -223,15 +223,13 @@ THREE.ShaderUtils = {
 							"vec3 pointHalfVector = normalize( vPointLight[ i ].xyz + viewPosition );",
 							"float pointDistance = vPointLight[ i ].w;",
 
-							"float pointDotNormalHalf = dot( normal, pointHalfVector );",
+							"float pointDotNormalHalf = max( dot( normal, pointHalfVector ), 0.0 );",
 							"float pointDiffuseWeight = max( dot( normal, pointVector ), 0.0 );",
 
-							"float pointSpecularWeight = 0.0;",
-							"if ( pointDotNormalHalf >= 0.0 )",
-								"pointSpecularWeight = specularTex.r * pow( pointDotNormalHalf, uShininess );",
+							"float pointSpecularWeight = specularTex.r * pow( pointDotNormalHalf, uShininess );",
 
 							"pointDiffuse += pointDistance * pointLightColor[ i ] * uDiffuseColor * pointDiffuseWeight;",
-							"pointSpecular += pointDistance * pointLightColor[ i ] * uSpecularColor * pointSpecularWeight;",
+							"pointSpecular += pointDistance * pointLightColor[ i ] * uSpecularColor * pointSpecularWeight * pointDiffuseWeight;",
 
 						"}",
 
@@ -251,15 +249,13 @@ THREE.ShaderUtils = {
 							"vec3 dirVector = normalize( lDirection.xyz );",
 							"vec3 dirHalfVector = normalize( lDirection.xyz + viewPosition );",
 
-							"float dirDotNormalHalf = dot( normal, dirHalfVector );",
+							"float dirDotNormalHalf = max( dot( normal, dirHalfVector ), 0.0 );",
 							"float dirDiffuseWeight = max( dot( normal, dirVector ), 0.0 );",
 
-							"float dirSpecularWeight = 0.0;",
-							"if ( dirDotNormalHalf >= 0.0 )",
-								"dirSpecularWeight = specularTex.r * pow( dirDotNormalHalf, uShininess );",
+							"float dirSpecularWeight = specularTex.r * pow( dirDotNormalHalf, uShininess );",
 
 							"dirDiffuse += directionalLightColor[ i ] * uDiffuseColor * dirDiffuseWeight;",
-							"dirSpecular += directionalLightColor[ i ] * uSpecularColor * dirSpecularWeight;",
+							"dirSpecular += directionalLightColor[ i ] * uSpecularColor * dirSpecularWeight * dirDiffuseWeight;",
 
 						"}",
 
@@ -284,7 +280,7 @@ THREE.ShaderUtils = {
 
 					"#endif",
 
-					"gl_FragColor.xyz = gl_FragColor.xyz * totalDiffuse + totalSpecular + ambientLightColor * uAmbientColor;",
+					"gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor * uAmbientColor) + totalSpecular;",
 
 					"if ( enableReflection ) {",
 
@@ -404,7 +400,8 @@ THREE.ShaderUtils = {
 
 		'cube': {
 
-			uniforms: { "tCube": { type: "t", value: 1, texture: null } },
+			uniforms: { "tCube": { type: "t", value: 1, texture: null },
+						"tFlip": { type: "f", value: -1 } },
 
 			vertexShader: [
 
@@ -424,13 +421,14 @@ THREE.ShaderUtils = {
 			fragmentShader: [
 
 				"uniform samplerCube tCube;",
+				"uniform float tFlip;",
 
 				"varying vec3 vViewPosition;",
 
 				"void main() {",
 
 					"vec3 wPos = cameraPosition - vViewPosition;",
-					"gl_FragColor = textureCube( tCube, vec3( - wPos.x, wPos.yz ) );",
+					"gl_FragColor = textureCube( tCube, vec3( tFlip * wPos.x, wPos.yz ) );",
 
 				"}"
 

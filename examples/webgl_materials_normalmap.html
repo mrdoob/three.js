@@ -183,7 +183,7 @@
 				loader = new THREE.BinaryLoader( true );
 				document.body.appendChild( loader.statusDomElement );
 
-				loader.load( { model: "obj/ninja/NinjaLo_bin.js", callback: function( geometry ) { createScene( geometry, scale, material1, material2 ) } } );
+				loader.load( "obj/ninja/NinjaLo_bin.js", function( geometry ) { createScene( geometry, scale, material1, material2 ) } );
 
 				//
 
@@ -237,6 +237,8 @@
 				scene.add( mesh2 );
 
 				loader.statusDomElement.style.display = "none";
+
+				console.log( mesh1 );
 
 			}
 

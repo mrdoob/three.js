@@ -2,12 +2,12 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.ParticleSystem = function ( geometry, materials ) {
+THREE.ParticleSystem = function ( geometry, material ) {
 
 	THREE.Object3D.call( this );
 
 	this.geometry = geometry;
-	this.materials = materials instanceof Array ? materials : [ materials ];
+	this.material = material;
 
 	this.sortParticles = false;
 

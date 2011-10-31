@@ -91,11 +91,13 @@
 
 			function loadCube(p) {
 
-				loader.load( { model: "obj/terrain.js", callback: function( geometry ) {
+				loader.load( "obj/terrain.js", function( geometry ) {
+
 					var mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: 0xf3e4b8 } ) );
 					scene.add( mesh );
-					THREE.Collisions.colliders.push( THREE.CollisionUtils.MeshColliderWBox(mesh) );
-				} } );
+					THREE.Collisions.colliders.push( THREE.CollisionUtils.MeshColliderWBox( mesh ) );
+
+				} );
 
 			}
 

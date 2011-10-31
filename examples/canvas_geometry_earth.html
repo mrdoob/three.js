@@ -42,11 +42,8 @@
 		<script>
 
 			var container, stats;
-
 			var camera, scene, renderer;
-
 			var mesh;
-
 			var mouseX = 0, mouseY = 0;
 
 			var windowHalfX = window.innerWidth / 2;
@@ -64,15 +61,13 @@
 
 				scene = new THREE.Scene();
 
-				mesh = new THREE.Mesh( new THREE.PlaneGeometry( 300, 300, 3, 3 ), new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/shadow.png' ) } ) );
-				mesh.overdraw = true;
+				mesh = new THREE.Mesh( new THREE.PlaneGeometry( 300, 300, 3, 3 ), new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/shadow.png' ), overdraw: true } ) );
 				mesh.position.y = - 250;
 				mesh.rotation.x = - 90 * Math.PI / 180;
-				scene.add(mesh);
+				scene.add( mesh );
 
-				mesh = new THREE.Mesh( new THREE.SphereGeometry( 200, 20, 20 ), new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/land_ocean_ice_cloud_2048.jpg' ) } ) );
-				mesh.overdraw = true;
-				scene.add(mesh);
+				mesh = new THREE.Mesh( new THREE.SphereGeometry( 200, 20, 20 ), new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/land_ocean_ice_cloud_2048.jpg' ), overdraw: true } ) );
+				scene.add( mesh );
 
 				renderer = new THREE.CanvasRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );

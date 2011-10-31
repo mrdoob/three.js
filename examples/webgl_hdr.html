@@ -115,7 +115,9 @@
 
 			var materialHDR, quad;
 
-			var delta, current, old = 0, sign = 1, rate = 1;
+			var sign = 1, rate = 1;
+
+			var clock = new THREE.Clock();
 
 			init();
 			animate();
@@ -185,10 +187,7 @@
 
 			function render() {
 
-				if ( ! old ) old = new Date().getTime();
-				current = new Date().getTime();
-				delta = (current  - old ) * 0.005;
-				old = current;
+				delta = clock.getDelta() * 5;
 
 				if ( materialHDR.uniforms.exposure.value > 0 || materialHDR.uniforms.exposure.value < 1 ) {
 

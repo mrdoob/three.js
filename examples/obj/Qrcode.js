@@ -2,9 +2,14 @@ var Qrcode = function () {
 
 	THREE.Geometry.call( this );
 
-	var scope = this,
-	m1 = new THREE.MeshLambertMaterial( { color: 0x000000, shading: THREE.FlatShading } ),
-	m2 = new THREE.MeshLambertMaterial( { color: 0xc0c0c0, shading: THREE.FlatShading } );
+	var scope = this;
+
+	scope.materials = [
+		new THREE.MeshLambertMaterial( { color: 0x000000, ambient: 0x000000, shading: THREE.FlatShading } ),
+		new THREE.MeshLambertMaterial( { color: 0xc0c0c0, ambient: 0xbbbbbb, shading: THREE.FlatShading } )
+	];
+
+	var m1 = 0, m2 = 1;
 
 	v(-54,134,58);
 	v(-54,146,58);

@@ -82,8 +82,6 @@
 
 			var text, plane;
 
-			var oldTime = new Date().getTime() * 0.001;
-			var delta = 1;
 			var speed = 50;
 
 			var pointLight;
@@ -97,6 +95,7 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
+			var delta = 1, clock = new THREE.Clock();
 
 			var heartShape, particleCloud, sparksEmitter, emitterPos;
 			var _rotation = 0;
@@ -164,10 +163,12 @@
 					bevelThickness: 2,
 					bevelSize: 2,
 
-					material: textMaterialFront,
-					extrudeMaterial: textMaterialSide
+					material: 0,
+					extrudeMaterial: 1
 
 				});
+
+				text3d.materials = [ textMaterialFront, textMaterialSide ];
 
 				text3d.computeVertexNormals();
 				text3d.computeBoundingBox();
@@ -187,8 +188,8 @@
                 text.rotation.y = Math.PI * 2;
 
 				parent = new THREE.Object3D();
-                parent.addChild( text );
-				scene.addObject( parent );
+                parent.add( text );
+				scene.add( parent );
 
 				///// Create particle objects for Three.js
 
@@ -354,7 +355,7 @@
 
 				}
 
-				parent.addChild( particleCloud );
+				parent.add( particleCloud );
 				particleCloud.y = 800;
 
 
@@ -624,9 +625,7 @@
 
 			function render() {
 
-				var time = new Date().getTime() * 0.001;
-				delta = speed * ( time - oldTime );
-				oldTime = time;
+				delta = speed * clock.getDelta();
 
 				particleCloud.geometry.__dirtyVertices = true;
 

@@ -62,7 +62,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 3000 );
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.z = 1000;
 
 				scene = new THREE.Scene();
@@ -76,17 +76,21 @@
 				sprite4 = THREE.ImageUtils.loadTexture( "textures/sprites/snowflake4.png" );
 				sprite5 = THREE.ImageUtils.loadTexture( "textures/sprites/snowflake5.png" );
 
-				for ( i = 0; i < 2000; i ++ ) {
+				for ( i = 0; i < 10000; i ++ ) {
 
 					vector = new THREE.Vector3( Math.random() * 2000 - 1000, Math.random() * 2000 - 1000, Math.random() * 2000 - 1000 );
 					geometry.vertices.push( new THREE.Vertex( vector ) );
 
 				}
 
-				parameters = [ [ [1.0, 0.2, 1.0], sprite2, 20 ], [ [0.95, 0.1, 1], sprite3, 15 ], [ [0.90, 0.05, 1], sprite1, 10 ], [ [0.85, 0, 0.8], sprite5, 8 ], [ [0.80, 0, 0.7], sprite4, 5 ],
+				parameters = [ [ [1.0, 0.2, 1.0], sprite2, 20 ],
+							   [ [0.95, 0.1, 1], sprite3, 15 ],
+							   [ [0.90, 0.05, 1], sprite1, 10 ],
+							   [ [0.85, 0, 0.8], sprite5, 8 ],
+							   [ [0.80, 0, 0.7], sprite4, 5 ],
 							   ];
 
-				for ( i = 0; i < parameters.length; i++ ) {
+				for ( i = 0; i < parameters.length; i ++ ) {
 
 					color  = parameters[i][0];
 					sprite = parameters[i][1];
@@ -165,20 +169,20 @@
 
 			function render() {
 
-				var time = new Date().getTime() * 0.00005;
+				var time = Date.now() * 0.00005;
 
 				camera.position.x += ( mouseX - camera.position.x ) * 0.05;
 				camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
 
 				camera.lookAt( scene.position );
 
-				for( i = 0; i < scene.objects.length; i++ ) {
+				for( i = 0; i < scene.objects.length; i ++ ) {
 
 					scene.objects[i].rotation.y = time * ( i < 4 ? i+1 : - (i+1) );
 
 				}
 
-				for( i = 0; i < materials.length; i++ ) {
+				for( i = 0; i < materials.length; i ++ ) {
 
 					color = parameters[i][0];
 

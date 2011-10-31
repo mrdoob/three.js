@@ -126,7 +126,7 @@
 				mesh.position = p;
 
 				scene.add( mesh );
-				var mc = THREE.CollisionUtils.MeshColliderWBox(mesh);
+				var mc = THREE.CollisionUtils.MeshColliderWBox( mesh );
 				THREE.Collisions.colliders.push( mc );
 				meshes.push( mesh );
 
@@ -154,8 +154,10 @@
 
 				var i, l = meshes.length;
 
-				for ( i = 0; i < l; i++ ) {
-					meshes[ i ].materials[ 0 ].color.setHex( 0x003300 );
+				for ( i = 0; i < l; i ++ ) {
+
+					meshes[ i ].material.color.setHex( 0x003300 );
+
 				}
 
 				info.innerHTML = "";
@@ -165,7 +167,7 @@
 
 				if( c ) {
 
-					info.innerHTML += "Found @ normal " + vts(c.normal);
+					info.innerHTML += "Found @ normal " + vts( c.normal );
 
 					var poi = ray.origin.clone().addSelf( ray.direction.clone().multiplyScalar(c.distance) );
 					line.geometry.vertices[0].position = poi;
@@ -173,7 +175,7 @@
 					line.geometry.__dirtyVertices = true;
 					line.geometry.__dirtyElements = true;
 
-					c.mesh.materials[ 0 ].color.setHex( 0xbb0000 );
+					c.mesh.material.color.setHex( 0xbb0000 );
 
 				} else {
 

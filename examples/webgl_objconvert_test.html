@@ -59,7 +59,7 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
-			var render_canvas = 1, render_gl = 1;
+			var render_canvas = 0, render_gl = 1;
 			var has_gl = 0;
 
 			var bcanvas = document.getElementById( "rcanvas" );
@@ -190,11 +190,11 @@
 					callbackMale   = function( geometry ) { createScene( geometry,  90, FLOOR, 50, 105 ) },
 					callbackFemale = function( geometry ) { createScene( geometry, -80, FLOOR, 50, 0 ) };
 
-				loader.load( { model: "obj/male02/Male02_slim.js", callback: callbackMale } );
-				loader.load( { model: "obj/female02/Female02_slim.js", callback: callbackFemale } );
+				loader.load( "obj/male02/Male02_slim.js", callbackMale );
+				loader.load( "obj/female02/Female02_slim.js", callbackFemale );
 
-				//loader.load( { model: "obj/male02/Male02_bin.js", callback: callbackMale } );
-				//loader.load( { model: "obj/female02/Female02_bin.js", callback: callbackFemale } );
+				//loader.load( "obj/male02/Male02_bin.js", callbackMale );
+				//loader.load( "obj/female02/Female02_bin.js", callbackFemale );
 
 			}
 
