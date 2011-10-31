@@ -1,21 +1,6 @@
-/*
- * File generated with Blender 2.58 Exporter
- * https://github.com/mrdoob/three.js/tree/master/utils/exporters/blender/
- *
- * vertices: 1642
- * faces: 3232
- * normals: 0
- * uvs: 0
- * colors: 0
- * materials: 0
- * edges: 0
- * morphTargets: 0
- *
- */
+{
 
-var model = {
-
-    "version" : 2,
+    "metadata": { "formatVersion" : 3, "generatedBy": "Blender 2.58 Exporter" },
 
     "scale" : 100.000000,
 
@@ -36,7 +21,4 @@ var model = {
     "edges" : []
 
 
-};
-
-postMessage( model );
-close();
+}

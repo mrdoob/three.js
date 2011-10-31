@@ -1,15 +1,16 @@
-// Converted from: veyron_body.obj
-//  vertices: 23013
-//  faces: 21390
-//  materials: 8
-//
-//  Generated with OBJ -> Three.js converter
-//  http://github.com/alteredq/three.js/blob/master/utils/exporters/convert_obj_three.py
+{
 
-
-var model = {
-
-    "version" : 1,
+    "metadata" :
+    {
+        "formatVersion" : 3,
+        "sourceFile"    : "veyron_body.obj",
+        "generatedBy"   : "OBJConverter",
+        "vertices"      : 23013,
+        "faces"         : 21390,
+        "normals"       : 21175,
+        "uvs"           : 0,
+        "materials"     : 8
+    },
 
     "materials": [	{
 	"DbgColor" : 15658734,
@@ -117,7 +118,4 @@ var model = {
 
     "buffers": "veyron_body_bin.bin"
 
-};
-
-postMessage( model );
-close();
+}

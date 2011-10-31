@@ -36,56 +36,72 @@ THREE.BinaryLoader.prototype.load = function( url, callback, texturePath, binary
 
 	}
 
-	// #1 load JS part via web worker
-
-	//  This isn't really necessary, JS part is tiny,
-	//  could be done by more ordinary means.
-
 	texturePath = texturePath ? texturePath : this.extractUrlbase( url );
 	binaryPath = binaryPath ? binaryPath : this.extractUrlbase( url );
 
-	var s = Date.now(),
-		worker = new Worker( url ),
-		callbackProgress = this.showProgress ? THREE.Loader.prototype.updateProgress : null;
+	var callbackProgress = this.showProgress ? THREE.Loader.prototype.updateProgress : null;
 
-	worker.onmessage = function( event ) {
+	this.onLoadStart();
 
-		var materials = event.data.materials,
-			buffers = event.data.buffers;
+	// #1 load JS part via web worker
 
-		// #2 load BIN part via Ajax
-
-		//  For some reason it is faster doing loading from here than from within the worker.
-		//  Maybe passing of ginormous string as message between threads is costly?
-		//  Also, worker loading huge data by Ajax still freezes browser. Go figure,
-		//  worker with baked ascii JSON data keeps browser more responsive.
-
-		THREE.BinaryLoader.prototype.loadAjaxBuffers( buffers, materials, callback, binaryPath, texturePath, callbackProgress );
-
-	};
-
-	worker.onerror = function ( event ) {
-
-		alert( "worker.onerror: " + event.message + "\n" + event.data );
-		event.preventDefault();
-
-	};
-
-	worker.postMessage( s );
+	this.loadAjaxJSON( this, url, callback, texturePath, binaryPath, callbackProgress );
 
 };
 
-// Binary AJAX parser based on Magi binary loader
-// https://github.com/kig/magi
+THREE.BinaryLoader.prototype.loadAjaxJSON = function( context, url, callback, texturePath, binaryPath, callbackProgress ) {
 
-// Should look more into HTML5 File API
-// See also other suggestions by Gregg Tavares
-// https://groups.google.com/group/o3d-discuss/browse_thread/thread/a8967bc9ce1e0978
+	var xhr = new XMLHttpRequest();
 
-THREE.BinaryLoader.prototype.loadAjaxBuffers = function( buffers, materials, callback, binaryPath, texturePath, callbackProgress ) {
+	xhr.onreadystatechange = function() {
+
+		if ( xhr.readyState == 4 ) {
+
+			if ( xhr.status == 200 || xhr.status == 0 ) {
+
+				try {
+
+					var json = JSON.parse( xhr.responseText );
+
+					if ( json.metadata === undefined || json.metadata.formatVersion === undefined || json.metadata.formatVersion !== 3 ) {
+
+						console.error( 'Deprecated file format.' );
+						return;
+
+					}
+
+					// #2 load BIN part via Ajax
+
+					context.loadAjaxBuffers( json, callback, binaryPath, texturePath, callbackProgress );
+
+				} catch ( error ) {
+
+					console.error( error );
+					console.warn( "DEPRECATED: [" + url + "] seems to be using old model format" );
+
+				}
+
+			} else {
+
+				console.error( "Couldn't load [" + url + "] [" + xhr.status + "]" );
+
+			}
+
+		}
+
+	};
+
+	xhr.open( "GET", url, true );
+	xhr.overrideMimeType( "text/plain; charset=x-user-defined" );
+	xhr.setRequestHeader( "Content-Type", "text/plain" );
+	xhr.send( null );
+
+};
+
+THREE.BinaryLoader.prototype.loadAjaxBuffers = function( json, callback, binaryPath, texturePath, callbackProgress ) {
 
 	var xhr = new XMLHttpRequest(),
-		url = binaryPath + "/" + buffers;
+		url = binaryPath + "/" + json.buffers;
 
 	var length = 0;
 
@@ -95,11 +111,11 @@ THREE.BinaryLoader.prototype.loadAjaxBuffers = function( buffers, materials, cal
 
 			if ( xhr.status == 200 || xhr.status == 0 ) {
 
-				THREE.BinaryLoader.prototype.createBinModel( xhr.responseText, callback, texturePath, materials );
+				THREE.BinaryLoader.prototype.createBinModel( xhr.responseText, callback, texturePath, json.materials );
 
 			} else {
 
-				alert( "Couldn't load [" + url + "] [" + xhr.status + "]" );
+				console.error( "Couldn't load [" + url + "] [" + xhr.status + "]" );
 
 			}
 
@@ -125,18 +141,23 @@ THREE.BinaryLoader.prototype.loadAjaxBuffers = function( buffers, materials, cal
 
 	};
 
-	xhr.open("GET", url, true);
-	xhr.overrideMimeType("text/plain; charset=x-user-defined");
-	xhr.setRequestHeader("Content-Type", "text/plain");
-	xhr.send(null);
+	xhr.open( "GET", url, true );
+	xhr.overrideMimeType( "text/plain; charset=x-user-defined" );
+	xhr.setRequestHeader( "Content-Type", "text/plain" );
+	xhr.send( null );
 
 };
+
+// Binary AJAX parser based on Magi binary loader
+// https://github.com/kig/magi
+
+// Should look more into HTML5 File API
+// See also other suggestions by Gregg Tavares
+// https://groups.google.com/group/o3d-discuss/browse_thread/thread/a8967bc9ce1e0978
 
 THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texturePath, materials ) {
 
 	var Model = function ( texturePath ) {
-
-		//var s = (new Date).getTime();
 
 		var scope = this,
 			currentOffset = 0,
@@ -237,10 +258,6 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 		this.computeFaceNormals();
 
 		if ( THREE.Loader.prototype.hasNormals( this ) ) this.computeTangents();
-
-		//var e = (new Date).getTime();
-
-		//log( "binary data parse time: " + (e-s) + " ms" );
 
 		function parseMetaData( data, offset ) {
 

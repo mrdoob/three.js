@@ -1,4 +1,4 @@
-"""Convert Wavefront OBJ / MTL files into Three.js (JSON model version, to be used with web worker based ascii / binary loader)
+"""Convert Wavefront OBJ / MTL files into Three.js (JSON model version, to be used with ascii / binary loader)
 
 -------------------------
 How to use this converter
@@ -92,7 +92,7 @@ How to get proper OBJ + MTL files with Blender
 
     2. Select all meshes (Select -> Select All by Type -> Mesh)
 
-    3. Export to OBJ (File -> Export -> Wavefront .obj) [*]
+    3. Export to OBJ (File -> Export -> Wavefront .obj)
         - enable following options in exporter
             Material Groups
             Rotate X90
@@ -114,11 +114,6 @@ How to get proper OBJ + MTL files with Blender
           (OBJ / MTL files use relative paths)
 
         - for WebGL, textures must be power of 2 sized
-
-    [*] If OBJ export fails (Blender 2.54 beta), patch your Blender installation
-        following instructions here:
-
-            http://www.blendernation.com/2010/09/12/blender-2-54-beta-released/
 
 ------
 Author
@@ -160,21 +155,20 @@ COLORS = [0xeeeeee, 0xee0000, 0x00ee00, 0x0000ee, 0xeeee00, 0x00eeee, 0xee00ee]
 # Templates
 # #####################################################
 TEMPLATE_FILE_ASCII = u"""\
-// Converted from: %(fname)s
-//  vertices: %(nvertex)d
-//  faces: %(nface)d
-//  normals: %(nnormal)d
-//  colors: %(ncolor)d
-//  uvs: %(nuv)d
-//  materials: %(nmaterial)d
-//
-//  Generated with OBJ -> Three.js converter
-//  http://github.com/alteredq/three.js/blob/master/utils/exporters/convert_obj_three.py
+{
 
-
-var model = {
-
-    "version" : 2,
+    "metadata" :
+    {
+        "formatVersion" : 3,
+        "sourceFile"    : "%(fname)s",
+        "generatedBy"   : "OBJConverter",
+        "vertices"      : %(nvertex)d,
+        "faces"         : %(nface)d,
+        "normals"       : %(nnormal)d,
+        "colors"        : %(ncolor)d,
+        "uvs"           : %(nuv)d,
+        "materials"     : %(nmaterial)d
+    },
 
     "scale" : %(scale)f,
 
@@ -194,34 +188,29 @@ var model = {
 
     "faces": [%(faces)s]
 
-};
-
-postMessage( model );
-close();
+}
 """
 
 TEMPLATE_FILE_BIN = u"""\
-// Converted from: %(fname)s
-//  vertices: %(nvertex)d
-//  faces: %(nface)d
-//  materials: %(nmaterial)d
-//
-//  Generated with OBJ -> Three.js converter
-//  http://github.com/alteredq/three.js/blob/master/utils/exporters/convert_obj_three.py
+{
 
-
-var model = {
-
-    "version" : 1,
+    "metadata" :
+    {
+        "formatVersion" : 3,
+        "sourceFile"    : "%(fname)s",
+        "generatedBy"   : "OBJConverter",
+        "vertices"      : %(nvertex)d,
+        "faces"         : %(nface)d,
+        "normals"       : %(nnormal)d,
+        "uvs"           : %(nuv)d,
+        "materials"     : %(nmaterial)d
+    },
 
     "materials": [%(materials)s],
 
     "buffers": "%(buffers)s"
 
-};
-
-postMessage( model );
-close();
+}
 """
 
 TEMPLATE_VERTEX = "%f,%f,%f"
@@ -1076,7 +1065,7 @@ def convert_ascii(infile, morphfiles, colorfiles, outfile):
 
     text = TEMPLATE_FILE_ASCII % {
     "name"      : get_name(outfile),
-    "fname"     : infile,
+    "fname"     : os.path.basename(infile),
     "nvertex"   : len(vertices),
     "nface"     : len(faces),
     "nuv"       : len(uvs),
@@ -1132,6 +1121,11 @@ def convert_binary(infile, outfile):
 
     sfaces = sort_faces(faces)
 
+    if SHADING == "smooth":
+        nnormals = len(normals)
+    else:
+        nnormals = 0
+
     # ###################
     # generate JS file
     # ###################
@@ -1142,10 +1136,12 @@ def convert_binary(infile, outfile):
     "materials" : generate_materials_string(materials, mtllib, infile),
     "buffers"   : binfile,
 
-    "fname"     : infile,
+    "fname"     : os.path.basename(infile),
     "nvertex"   : len(vertices),
     "nface"     : len(faces),
-    "nmaterial" : len(materials)
+    "nmaterial" : len(materials),
+    "nnormal"   : nnormals,
+    "nuv"       : len(uvs)
     }
 
     out = open(outfile, "w")
@@ -1155,11 +1151,6 @@ def convert_binary(infile, outfile):
     # ###################
     # generate BIN file
     # ###################
-
-    if SHADING == "smooth":
-        nnormals = len(normals)
-    else:
-        nnormals = 0
 
     buffer = []
 
