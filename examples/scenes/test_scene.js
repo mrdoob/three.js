@@ -1,10 +1,15 @@
-var scene = {
-	
-"type"		  :	"scene",
+{
+
+"metadata":
+{
+	"formatVersion": 3,
+	"type"		   : "scene"
+},
+
 "urlBaseType" : "relativeToHTML",
-	
-"objects": 
-{	
+
+"objects":
+{
 	"cube1" : {
 		"geometry" : "cube",
 		"materials": [ "lambert_red" ],
@@ -95,7 +100,7 @@ var scene = {
 		"scale"	   : [ 5, 5, 5 ],
 		"visible"  : true
 	},
-	
+
 	"veyron" : {
 		"geometry" : "veyron",
 		"materials": [ "face" ],
@@ -122,7 +127,7 @@ var scene = {
 		"scale"	   : [ 20, 20, 20 ],
 		"visible"  : true
 	},
-	
+
 	"ground" : {
 		"geometry" : "plane",
 		"materials": [ "basic_gray" ],
@@ -130,44 +135,44 @@ var scene = {
 		"rotation" : [ 1.57, 0, 0 ],
 		"scale"	   : [ 100, 100, 100 ],
 		"visible"  : true
-	}	
-	
+	}
+
 },
-	
+
 "geometries":
 {
 	"cube": {
 		"type"  : "cube",
-		"width" : 10, 
+		"width" : 10,
 		"height": 10,
-		"depth" : 10, 
-		"segmentsWidth"  : 1, 
+		"depth" : 10,
+		"segmentsWidth"  : 1,
 		"segmentsHeight" : 1,
 		"segmentsDepth"  : 1,
-		"flipped" : false, 
+		"flipped" : false,
 		"sides"   : { "px": true, "nx": true, "py": true, "ny": true, "pz": true, "nz": true }
 	},
 
 	"plane": {
 		"type"   : "plane",
-		"width"  : 10, 
+		"width"  : 10,
 		"height" : 10,
-		"segmentsWidth"  : 50, 
+		"segmentsWidth"  : 50,
 		"segmentsHeight" : 50
-	},	
+	},
 
 	"quad": {
 		"type"   : "plane",
-		"width"  : 10, 
+		"width"  : 10,
 		"height" : 10,
-		"segmentsWidth"  : 1, 
+		"segmentsWidth"  : 1,
 		"segmentsHeight" : 1
-	},	
+	},
 
 	"sphere": {
 		"type"    : "sphere",
-		"radius"  : 5, 
-		"segmentsWidth"  : 32, 
+		"radius"  : 5,
+		"segmentsWidth"  : 32,
 		"segmentsHeight" : 16
 	},
 
@@ -175,33 +180,33 @@ var scene = {
 		"type"    : "icosahedron",
 		"subdivisions"  : 2
 	},
-	
+
 	"torus": {
 		"type"    : "torus",
 		"radius"  : 5,
 		"tube"	  : 2,
-		"segmentsR" : 16, 
+		"segmentsR" : 16,
 		"segmentsT" : 32
 	},
-	
+
 	"cylinder": {
 		"type"    : "cylinder",
-		"topRad"   : 5, 
+		"topRad"   : 5,
 		"botRad"   : 5,
 		"height"   : 50,
-		"radSegs"  : 32, 
+		"radSegs"  : 32,
 		"heightSegs": 1
 	},
 
 	"cone": {
 		"type"    : "cylinder",
-		"topRad"   : 0, 
+		"topRad"   : 0,
 		"botRad"   : 5,
 		"height"   : 50,
-		"radSegs"  : 32, 
+		"radSegs"  : 32,
 		"heightSegs" : 1
 	},
-	
+
 	"WaltHead": {
 		"type": "bin_mesh",
 		"url" : "obj/walt/WaltHead_bin.js"
@@ -211,28 +216,28 @@ var scene = {
 		"type": "bin_mesh",
 		"url" : "obj/veyron/VeyronNoUv_bin.js"
 	},
-	
+
 	"colorcube": {
 		"type": "embedded_mesh",
 		"id"  : "cube_fvc"
 	}
-	
+
 },
-	
+
 "embeds": {
 
 	"cube_fvc": {
 
-    "version" : 2,
-    
-    "scale" : 1.000000,
-    
+    "metadata" : { "formatVersion" : 3 },
+
+    "scale" : 1.0,
+
     "materials": [	{
 	"DbgColor" : 15658734,
 	"DbgIndex" : 0,
 	"DbgName" : "Material",
 	"colorAmbient" : [0.0, 0.0, 0.0],
-	"colorDiffuse" : [0.800000011920929, 0.800000011920929, 0.800000011920929],
+	"colorDiffuse" : [0.8, 0.8, 0.8],
 	"colorSpecular" : [0.5, 0.5, 0.5],
 	"specularCoef" : 50,
 	"transparency" : 1.0,
@@ -259,128 +264,102 @@ var scene = {
 
 "materials":
 {
-	/*
-	"basic_red": {
-		"type": "MeshBasicMaterial",
-		"parameters": { color: 0xff0000, wireframe: true } 
-	},
 
-	"basic_green": {
-		"type": "MeshBasicMaterial",
-		"parameters": { color: 0x007711, wireframe: true } 
-	},
-	
-	"basic_blue": {
-		"type": "MeshBasicMaterial",
-		"parameters": { color: 0x0000ff, wireframe: true } 
-	},
-		
-	"basic_black": {
-		"type": "MeshBasicMaterial",
-		"parameters": { color: 0x000000, wireframe: true } 
-	},
-	
-	"phong_white": {
-		"type": "MeshPhongMaterial",
-		"parameters": { color: 0xaaaaaa } 
-	},
-	*/
-	
 	"basic_gray": {
 		"type": "MeshBasicMaterial",
-		"parameters": { color: 0x666666, wireframe: true } 
+		"parameters": { "color": 6710886, "wireframe": true }
 	},
 
 	"basic_white": {
 		"type": "MeshBasicMaterial",
-		"parameters": { color: 0xffffff, wireframe: true } 
+		"parameters": { "color": 16777215, "wireframe": true }
 	},
 
 	"faceted_white": {
 		"type": "MeshLambertMaterial",
-		"parameters": { color: 0xffffff, shading: "flat" } 
+		"parameters": { "color": 16777215, "shading": "flat" }
 	},
-	
+
 	"lambert_red": {
 		"type": "MeshLambertMaterial",
-		"parameters": { color: 0xff0000 } 
+		"parameters": { "color": 16711680 }
 	},
-	
+
 	"lambert_green": {
 		"type": "MeshLambertMaterial",
-		"parameters": { color: 0x007711, blending: "AdditiveBlending", transparent: true } 
+		"parameters": { "color": 30481, "blending": "AdditiveBlending", "transparent": true }
 	},
 
 	"lambert_blue": {
 		"type": "MeshLambertMaterial",
-		"parameters": { color: 0x0055aa } 
+		"parameters": { "color": 21930 }
 	},
-	
+
 	"phong_orange": {
 		"type": "MeshPhongMaterial",
-		"parameters": { color:0x000000, specular: 0xaa5500 } 
+		"parameters": { "color": 0, "specular": 11162880 }
 	},
-	
+
 	"basic_refraction": {
 		"type": "MeshBasicMaterial",
-		"parameters": { color: 0xffffff, envMap: "cube_refraction", refractionRatio: 0.95 } 
+		"parameters": { "color": 16777215, "envMap": "cube_refraction", "refractionRatio": 0.95 }
 	},
-	
+
 	"lambert_cube": {
 		"type": "MeshLambertMaterial",
-		"parameters": { color: 0xff6600, envMap: "cube_reflection", combine: "MixOperation", reflectivity: 0.3 }
+		"parameters": { "color": 16737792, "envMap": "cube_reflection", "combine": "MixOperation", "reflectivity": 0.3 }
 	},
-	
+
 	"chrome": {
 		"type": "MeshLambertMaterial",
-		"parameters": { color: 0xffffff, envMap: "cube_reflection" }
+		"parameters": { "color": 16777215, "envMap": "cube_reflection" }
 	},
 
 	"darkerchrome": {
 		"type": "MeshLambertMaterial",
-		"parameters": { color: 0x222222, envMap: "cube_reflection" }
+		"parameters": { "color": 2236962, "envMap": "cube_reflection" }
 	},
-	
+
 	"glass": {
 		"type": "MeshLambertMaterial",
-		"parameters": { color: 0x101046, envMap: "cube_reflection", opacity: 0.25, transparent: true }
+		"parameters": { "color": 1052742, "envMap": "cube_reflection", "opacity": 0.25, "transparent": true }
 	},
 
 	"interior": {
 		"type": "MeshLambertMaterial",
-		"parameters": { color: 0x050505 }
+		"parameters": { "color": 328965 }
 	},
-	
-	"backlights": {	
+
+	"backlights": {
 		"type": "MeshLambertMaterial",
-		"parameters": { color: 0xff0000, opacity: 0.5 }
+		"parameters": { "color": 16711680, "opacity": 0.5 }
 	},
-	
+
 	"backsignals": {
 		"type": "MeshLambertMaterial",
-		"parameters": { color: 0xffbb00, opacity: 0.5 }
+		"parameters": { "color": 16759552, "opacity": 0.5 }
 	},
-	
+
 	"textured_bg": {
 		"type": "MeshBasicMaterial",
-		"parameters": { color: 0xffffff, map: "texture_bg" } 
+		"parameters": { "color": 16777215, "map": "texture_bg" }
 	},
 
 	"minecraft": {
 		"type": "MeshBasicMaterial",
-		"parameters": { color: 0xffffff, map: "texture_minecraft" } 
+		"parameters": { "color": 16777215, "map": "texture_minecraft" }
 	},
-	
+
 	"face": {
 		"type": "MeshFaceMaterial",
 		"parameters": {}
 	}
-	
+
 },
 
-"textures": 
+"textures":
 {
-	
+
 	"cube_reflection": {
 		"url": [ "textures/cube/SwedishRoyalCastle/px.jpg",
 				 "textures/cube/SwedishRoyalCastle/nx.jpg",
@@ -411,7 +390,7 @@ var scene = {
 		"magFilter": "NearestFilter",
 		"minFilter": "LinearMipMapLinearFilter"
 	}
-	
+
 },
 
 "cameras":
@@ -445,16 +424,16 @@ var scene = {
 	"light1": {
 		"type"		 : "directional",
 		"direction"	 : [0,1,1],
-		"color" 	 : 0xffffff,
+		"color" 	 : 16777215,
 		"intensity"	 : 0.8
 	},
 
 	"light2": {
 		"type"	  : "point",
 		"position": [0,0,0],
-		"color"   : 0xffffff
+		"color"   : 16777215
 	}
-	
+
 },
 
 "fogs":
@@ -465,21 +444,21 @@ var scene = {
 		"near" : 1,
 		"far"  : 1000
 	},
-	
+
 	"exponential": {
 		"type"    : "exp2",
 		"color"   : [1,1,1],
-		"density" : 0.005,
+		"density" : 0.005
 	},
-	
+
 	"black": {
 		"type"    : "exp2",
 		"color"   : [0,0,0],
-		"density" : 0.005,
+		"density" : 0.005
 	}
 },
-	
-"defaults" : 
+
+"defaults" :
 {
 	"bgcolor" : [0,0,0],
 	"bgalpha" : 1,
@@ -487,7 +466,4 @@ var scene = {
 	"fog"	  : "black"
 }
 
-};
-
-postMessage( scene );
-close();
+}
