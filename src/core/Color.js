@@ -60,7 +60,7 @@ THREE.Color.prototype = {
 		// based on MochiKit implementation by Bob Ippolito
 		// h,s,v ranges are < 0.0 - 1.0 >
 
-		var i, f, p, q, t;
+		var i, f, p, q, t, x;
 
 		if ( v === 0 ) {
 
