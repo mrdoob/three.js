@@ -1,20 +1,17 @@
-/*
- * File generated with Blender 2.59 Exporter
- * https://github.com/mrdoob/three.js/tree/master/utils/exporters/blender/
- *
- * vertices: 8
- * faces: 6
- * normals: 0
- * uvs: 0
- * colors: 22
- * materials: 1
- * morphTargets: 0
- *
- */
+{
 
-var model = {
-
-    "version" : 2,
+    "metadata" :
+    {
+        "formatVersion" : 3,
+        "generatedBy"   : "Blender 2.60 Exporter",
+        "vertices"      : 8,
+        "faces"         : 6,
+        "normals"       : 0,
+        "colors"        : 22,
+        "uvs"           : 0,
+        "materials"     : 1,
+        "morphTargets"  : 0
+    },
 
     "scale" : 1.000000,
 
@@ -31,7 +28,7 @@ var model = {
 	"vertexColors" : true
 	}],
 
-    "vertices": [1.000000,-1.000000,-1.000000,1.000000,-1.000000,1.000000,-1.000000,-1.000000,1.000000,-1.000000,-1.000000,-1.000000,1.000000,1.000000,-1.000000,0.999999,1.000000,1.000000,-1.000000,1.000000,0.999999,-1.000000,1.000000,-1.000000],
+    "vertices": [1.000000,-1.000000,-1.000000,1.000000,-1.000000,1.000000,-1.000000,-1.000000,1.000000,-1.000000,-1.000000,-1.000000,1.000000,1.000000,-1.000000,0.999999,1.000000,1.000001,-1.000000,1.000000,1.000000,-1.000000,1.000000,-1.000000],
 
     "morphTargets": [],
 
@@ -45,7 +42,4 @@ var model = {
 
 
 
-};
-
-postMessage( model );
-close();
+}

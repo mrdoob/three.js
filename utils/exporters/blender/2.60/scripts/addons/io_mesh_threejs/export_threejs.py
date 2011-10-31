@@ -77,18 +77,18 @@ COLORS = [0xeeeeee, 0xee0000, 0x00ee00, 0x0000ee, 0xeeee00, 0x00eeee, 0xee00ee]
 # #####################################################
 
 TEMPLATE_SCENE_ASCII = """\
-/* Converted from: %(fname)s
- *
- * File generated with Blender 2.60 Exporter
- * https://github.com/mrdoob/three.js/tree/master/utils/exporters/blender/
- *
- * objects:    %(nobjects)s
- * geometries: %(ngeometries)s
- * materials:  %(nmaterials)s
- * textures:   %(ntextures)s
- */
+{
 
-var scene = {
+"metadata" :
+{
+    "formatVersion" : 3,
+    "sourceFile"    : "%(fname)s",
+    "generatedBy"   : "Blender 2.60 Exporter",
+    "objects"       : %(nobjects)s,
+    "geometries"    : %(ngeometries)s,
+    "materials"     : %(nmaterials)s,
+    "textures"      : %(ntextures)s
+},
 
 "type" : "scene",
 "urlBaseType" : %(basetype)s,
@@ -110,9 +110,6 @@ var scene = {
 }
 
 }
-
-postMessage( scene );
-close();
 """
 
 TEMPLATE_SECTION = """
@@ -221,33 +218,27 @@ TEMPLATE_HEX = "0x%06x"
 # #####################################################
 
 TEMPLATE_FILE_ASCII = """\
-/*
- * File generated with Blender 2.59 Exporter
- * https://github.com/mrdoob/three.js/tree/master/utils/exporters/blender/
- *
- * vertices: %(nvertex)d
- * faces: %(nface)d
- * normals: %(nnormal)d
- * uvs: %(nuv)d
- * colors: %(ncolor)d
- * materials: %(nmaterial)d
- * morphTargets: %(nmorphTarget)d
- *
- */
+{
 
-var model = {
+    "metadata" :
+    {
+        "formatVersion" : 3,
+        "generatedBy"   : "Blender 2.60 Exporter",
+        "vertices"      : %(nvertex)d,
+        "faces"         : %(nface)d,
+        "normals"       : %(nnormal)d,
+        "colors"        : %(ncolor)d,
+        "uvs"           : %(nuv)d,
+        "materials"     : %(nmaterial)d,
+        "morphTargets"  : %(nmorphTarget)d
+    },
 
 %(model)s
 
-};
-
-postMessage( model );
-close();
+}
 """
 
 TEMPLATE_MODEL_ASCII = """\
-    "version" : 2,
-
     "scale" : %(scale)f,
 
     "materials": [%(materials)s],

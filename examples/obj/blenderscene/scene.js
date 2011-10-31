@@ -1,21 +1,21 @@
-/* Converted from: scene.blend
- *
- * File generated with Blender 2.56 Exporter
- * https://github.com/alteredq/three.js/tree/master/utils/exporters/blender/
- *
- * objects:    27
- * geometries: 3
- * materials:  3
- * textures:   0
- */  
+{
 
-var scene = {
+"metadata" :
+{
+    "formatVersion" : 3,
+    "sourceFile"    : "scene.blend",
+    "generatedBy"   : "Blender 2.60 Exporter",
+    "objects"       : 27,
+    "geometries"    : 3,
+    "materials"     : 3,
+    "textures"      : 0
+},
 
 "type" : "scene",
 "urlBaseType" : "relativeToScene",
 
 
-"objects" : 
+"objects" :
 {
     "Cube.006" : {
         "geometry"  : "geo_Cube",
@@ -24,10 +24,11 @@ var scene = {
         "position"  : [ 10.623673, 0.321692, 3.370784 ],
         "rotation"  : [ 0.005265, 0.056306, 1.566005 ],
         "quaternion": [ 0.708568, -0.017992, 0.021809, 0.705076 ],
-        "scale"     : [ 8.310001, 0.120000, 4.930000 ],
+        "scale"     : [ 8.310000, 0.120000, 4.930000 ],
         "visible"       : true,
         "castsShadow"   : false,
-        "meshCollider"  : false
+        "meshCollider"  : false,
+        "trigger"       : "None"
     },
 
     "Monkey.018" : {
@@ -35,12 +36,13 @@ var scene = {
         "groups"    : [  ],
         "materials" : [ "Material.002" ],
         "position"  : [ 1.702659, -5.860421, 0.680278 ],
-        "rotation"  : [ 1.413516, -0.081378, -3.079003 ],
+        "rotation"  : [ 1.413516, -0.081377, -3.079004 ],
         "quaternion": [ 0.050177, -0.010617, -0.649485, -0.758643 ],
         "scale"     : [ 0.435837, 0.435837, 0.435837 ],
         "visible"       : true,
         "castsShadow"   : false,
-        "meshCollider"  : false
+        "meshCollider"  : false,
+        "trigger"       : "None"
     },
 
     "Monkey.017" : {
@@ -48,12 +50,13 @@ var scene = {
         "groups"    : [  ],
         "materials" : [ "Material.002" ],
         "position"  : [ 0.081295, -5.808783, 0.639505 ],
-        "rotation"  : [ 1.413516, -0.081378, -3.079003 ],
+        "rotation"  : [ 1.413516, -0.081377, -3.079004 ],
         "quaternion": [ 0.050177, -0.010617, -0.649485, -0.758643 ],
         "scale"     : [ 0.435837, 0.435837, 0.435837 ],
         "visible"       : true,
         "castsShadow"   : false,
-        "meshCollider"  : false
+        "meshCollider"  : false,
+        "trigger"       : "None"
     },
 
     "Monkey.016" : {
@@ -61,12 +64,13 @@ var scene = {
         "groups"    : [  ],
         "materials" : [ "Material.002" ],
         "position"  : [ -1.569030, -5.747240, 0.619385 ],
-        "rotation"  : [ 1.413516, -0.081378, -3.079003 ],
+        "rotation"  : [ 1.413516, -0.081377, -3.079004 ],
         "quaternion": [ 0.050177, -0.010617, -0.649485, -0.758643 ],
         "scale"     : [ 0.435837, 0.435837, 0.435837 ],
         "visible"       : true,
         "castsShadow"   : false,
-        "meshCollider"  : false
+        "meshCollider"  : false,
+        "trigger"       : "None"
     },
 
     "Monkey.015" : {
@@ -74,12 +78,13 @@ var scene = {
         "groups"    : [  ],
         "materials" : [ "Material.002" ],
         "position"  : [ -3.129120, -5.709269, 0.552267 ],
-        "rotation"  : [ 1.413516, -0.081378, -3.079003 ],
+        "rotation"  : [ 1.413516, -0.081377, -3.079004 ],
         "quaternion": [ 0.050177, -0.010617, -0.649485, -0.758643 ],
         "scale"     : [ 0.435837, 0.435837, 0.435837 ],
         "visible"       : true,
         "castsShadow"   : false,
-        "meshCollider"  : false
+        "meshCollider"  : false,
+        "trigger"       : "None"
     },
 
     "Monkey.014" : {
@@ -92,7 +97,8 @@ var scene = {
         "scale"     : [ 0.435837, 0.435837, 0.435837 ],
         "visible"       : true,
         "castsShadow"   : false,
-        "meshCollider"  : false
+        "meshCollider"  : false,
+        "trigger"       : "None"
     },
 
     "Monkey.013" : {
@@ -105,7 +111,8 @@ var scene = {
         "scale"     : [ 0.435837, 0.435837, 0.435837 ],
         "visible"       : true,
         "castsShadow"   : false,
-        "meshCollider"  : false
+        "meshCollider"  : false,
+        "trigger"       : "None"
     },
 
     "Monkey.012" : {
@@ -118,7 +125,8 @@ var scene = {
         "scale"     : [ 0.435837, 0.435837, 0.435837 ],
         "visible"       : true,
         "castsShadow"   : false,
-        "meshCollider"  : false
+        "meshCollider"  : false,
+        "trigger"       : "None"
     },
 
     "Monkey.011" : {
@@ -131,7 +139,8 @@ var scene = {
         "scale"     : [ 0.435837, 0.435837, 0.435837 ],
         "visible"       : true,
         "castsShadow"   : false,
-        "meshCollider"  : false
+        "meshCollider"  : false,
+        "trigger"       : "None"
     },
 
     "Monkey.010" : {
@@ -141,10 +150,11 @@ var scene = {
         "position"  : [ -2.010442, -24.343616, 1.387332 ],
         "rotation"  : [ -1.621122, -2.949867, -0.136972 ],
         "quaternion": [ 0.016439, -0.116140, -0.679574, -0.724169 ],
-        "scale"     : [ 9.160008, 9.160007, 9.160007 ],
+        "scale"     : [ 9.160008, 9.160008, 9.160007 ],
         "visible"       : true,
         "castsShadow"   : false,
-        "meshCollider"  : false
+        "meshCollider"  : false,
+        "trigger"       : "None"
     },
 
     "Monkey.009" : {
@@ -157,7 +167,8 @@ var scene = {
         "scale"     : [ 1.000000, 1.000000, 1.000000 ],
         "visible"       : true,
         "castsShadow"   : false,
-        "meshCollider"  : false
+        "meshCollider"  : false,
+        "trigger"       : "None"
     },
 
     "Monkey.008" : {
@@ -170,7 +181,8 @@ var scene = {
         "scale"     : [ 1.000000, 1.000000, 1.000000 ],
         "visible"       : true,
         "castsShadow"   : false,
-        "meshCollider"  : false
+        "meshCollider"  : false,
+        "trigger"       : "None"
     },
 
     "Monkey.007" : {
@@ -183,7 +195,8 @@ var scene = {
         "scale"     : [ 1.000000, 1.000000, 1.000000 ],
         "visible"       : true,
         "castsShadow"   : false,
-        "meshCollider"  : false
+        "meshCollider"  : false,
+        "trigger"       : "None"
     },
 
     "Cube.005" : {
@@ -196,7 +209,8 @@ var scene = {
         "scale"     : [ 6.130000, 0.070000, 1.690000 ],
         "visible"       : true,
         "castsShadow"   : false,
-        "meshCollider"  : false
+        "meshCollider"  : false,
+        "trigger"       : "None"
     },
 
     "Cube.004" : {
@@ -205,11 +219,12 @@ var scene = {
         "materials" : [ "Material" ],
         "position"  : [ 2.484517, -7.486932, 2.724846 ],
         "rotation"  : [ 0.220417, 0.075224, -0.181029 ],
-        "quaternion": [ 0.988790, 0.112836, 0.027288, -0.093898 ],
+        "quaternion": [ 0.988791, 0.112836, 0.027288, -0.093898 ],
         "scale"     : [ 0.350000, 0.890000, 3.309999 ],
         "visible"       : true,
         "castsShadow"   : false,
-        "meshCollider"  : false
+        "meshCollider"  : false,
+        "trigger"       : "None"
     },
 
     "Monkey.006" : {
@@ -222,7 +237,8 @@ var scene = {
         "scale"     : [ 1.000000, 1.000000, 1.000000 ],
         "visible"       : true,
         "castsShadow"   : false,
-        "meshCollider"  : false
+        "meshCollider"  : false,
+        "trigger"       : "None"
     },
 
     "Monkey.005" : {
@@ -235,7 +251,8 @@ var scene = {
         "scale"     : [ 1.000000, 1.000000, 1.000000 ],
         "visible"       : true,
         "castsShadow"   : false,
-        "meshCollider"  : false
+        "meshCollider"  : false,
+        "trigger"       : "None"
     },
 
     "Monkey.004" : {
@@ -248,7 +265,8 @@ var scene = {
         "scale"     : [ 1.000000, 1.000000, 1.000000 ],
         "visible"       : true,
         "castsShadow"   : false,
-        "meshCollider"  : false
+        "meshCollider"  : false,
+        "trigger"       : "None"
     },
 
     "Monkey.003" : {
@@ -261,7 +279,8 @@ var scene = {
         "scale"     : [ 1.000000, 1.000000, 1.000000 ],
         "visible"       : true,
         "castsShadow"   : false,
-        "meshCollider"  : false
+        "meshCollider"  : false,
+        "trigger"       : "None"
     },
 
     "Monkey.002" : {
@@ -274,7 +293,8 @@ var scene = {
         "scale"     : [ 1.000000, 1.000000, 1.000000 ],
         "visible"       : true,
         "castsShadow"   : false,
-        "meshCollider"  : false
+        "meshCollider"  : false,
+        "trigger"       : "None"
     },
 
     "Cube.003" : {
@@ -282,12 +302,13 @@ var scene = {
         "groups"    : [  ],
         "materials" : [ "Material" ],
         "position"  : [ -3.031251, -1.943665, 0.702044 ],
-        "rotation"  : [ 1.840851, 1.811250, -0.141131 ],
+        "rotation"  : [ 1.840852, 1.811250, -0.141131 ],
         "quaternion": [ 0.328619, 0.523567, 0.440581, -0.650981 ],
         "scale"     : [ 1.781142, 0.361142, 0.231142 ],
         "visible"       : true,
         "castsShadow"   : false,
-        "meshCollider"  : false
+        "meshCollider"  : false,
+        "trigger"       : "None"
     },
 
     "Monkey.001" : {
@@ -300,7 +321,8 @@ var scene = {
         "scale"     : [ 1.000000, 1.000000, 1.000000 ],
         "visible"       : true,
         "castsShadow"   : false,
-        "meshCollider"  : false
+        "meshCollider"  : false,
+        "trigger"       : "None"
     },
 
     "Monkey" : {
@@ -313,7 +335,8 @@ var scene = {
         "scale"     : [ 1.000000, 1.000000, 1.000000 ],
         "visible"       : true,
         "castsShadow"   : false,
-        "meshCollider"  : false
+        "meshCollider"  : false,
+        "trigger"       : "None"
     },
 
     "Cube.002" : {
@@ -326,7 +349,8 @@ var scene = {
         "scale"     : [ 1.000000, 1.000000, 1.000000 ],
         "visible"       : true,
         "castsShadow"   : false,
-        "meshCollider"  : false
+        "meshCollider"  : false,
+        "trigger"       : "None"
     },
 
     "Cube.001" : {
@@ -339,7 +363,8 @@ var scene = {
         "scale"     : [ 1.000000, 1.000000, 1.000000 ],
         "visible"       : true,
         "castsShadow"   : false,
-        "meshCollider"  : false
+        "meshCollider"  : false,
+        "trigger"       : "None"
     },
 
     "Plane" : {
@@ -352,7 +377,8 @@ var scene = {
         "scale"     : [ 7.922787, 7.922787, 7.922787 ],
         "visible"       : true,
         "castsShadow"   : false,
-        "meshCollider"  : false
+        "meshCollider"  : false,
+        "trigger"       : "None"
     },
 
     "Cube" : {
@@ -361,16 +387,17 @@ var scene = {
         "materials" : [ "Material" ],
         "position"  : [ 3.651978, -0.000000, 1.071144 ],
         "rotation"  : [ 0.220417, 0.075224, -0.181029 ],
-        "quaternion": [ 0.988790, 0.112836, 0.027288, -0.093898 ],
+        "quaternion": [ 0.988791, 0.112836, 0.027288, -0.093898 ],
         "scale"     : [ 1.000000, 1.000000, 1.000000 ],
         "visible"       : true,
         "castsShadow"   : false,
-        "meshCollider"  : false
+        "meshCollider"  : false,
+        "trigger"       : "None"
     }
 },
 
 
-"geometries" : 
+"geometries" :
 {
     "geo_Cube" : {
         "type" : "ascii_mesh",
@@ -389,26 +416,26 @@ var scene = {
 },
 
 
-"materials" : 
+"materials" :
 {
     "Material" : {
-        "type": "MeshPhongMaterial",
-        "parameters": { color: 10688800, opacity: 1.00, ambient: 0, specular: 8355711, shininess: 50.0 } 
+        "type": "MeshLambertMaterial",
+        "parameters": { "color": 10688800, "opacity": 1 }
     },
 
     "Material.001" : {
-        "type": "MeshPhongMaterial",
-        "parameters": { color: 2401086, opacity: 1.00, ambient: 0, specular: 8355711, shininess: 50.0 } 
+        "type": "MeshLambertMaterial",
+        "parameters": { "color": 2401086, "opacity": 1 }
     },
 
     "Material.002" : {
-        "type": "MeshPhongMaterial",
-        "parameters": { color: 10711076, opacity: 1.00, ambient: 0, specular: 8355711, shininess: 50.0 } 
+        "type": "MeshLambertMaterial",
+        "parameters": { "color": 10711076, "opacity": 1 }
     }
 },
 
 
-"cameras" : 
+"cameras" :
 {
     "default_camera" : {
         "type"  : "perspective",
@@ -422,7 +449,7 @@ var scene = {
 },
 
 
-"lights" : 
+"lights" :
 {
     "default_light": {
         "type"		 : "directional",
@@ -433,14 +460,14 @@ var scene = {
 },
 
 
-"transform" : 
+"transform" :
 {
     "position"  : [ 0.000000, 0.000000, 0.000000 ],
     "rotation"  : [ -1.570796, 0.000000, 0.000000 ],
-    "scale"     : [ 1.000000, 1.000000, 1.000000 ],
+    "scale"     : [ 1.000000, 1.000000, 1.000000 ]
 },
 
-"defaults" : 
+"defaults" :
 {
     "bgcolor" : [ 0.000000, 0.000000, 0.000000 ],
     "bgalpha" : 1.000000,
@@ -448,6 +475,3 @@ var scene = {
 }
 
 }
-
-postMessage( scene );
-close();
