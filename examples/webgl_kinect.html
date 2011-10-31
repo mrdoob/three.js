@@ -13,6 +13,25 @@
 				margin: 0px;
 				overflow: hidden;
 			}
+
+			#info {
+				color: #ffffff;
+
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: center;
+				font-weight: bold;
+
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+			}
+
+			a {
+
+				color: #0040ff;
+
+			}
 		</style>
 	</head>
 	<body>
@@ -21,6 +40,7 @@
 
 		<script src='js/DAT.GUI.min.js'></script>
 
+		<script src="js/Detector.js"></script>
 		<script src="js/RequestAnimationFrame.js"></script>
 		<script src="js/Stats.js"></script>
 
@@ -32,6 +52,7 @@
 			uniform float height;
 			uniform float nearClipping, farClipping;
 
+			uniform float pointSize;
 			uniform float zOffset;
 
 			varying vec2 vUv;
@@ -56,7 +77,7 @@
 					- z + zOffset,
 					1.0);
 
-				gl_PointSize = 2.0;
+				gl_PointSize = pointSize;
 				gl_Position = projectionMatrix * modelViewMatrix * pos;
 
 			}
@@ -89,13 +110,26 @@
 
 			var video, texture;
 
-			init();
-			animate();
+			if ( Detector.webgl ) {
+
+				init();
+				animate();
+
+			} else {
+
+				document.body.appendChild( Detector.getWebGLErrorMessage() );
+
+			}
 
 			function init() {
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
+
+				var info = document.createElement( 'div' );
+				info.id = 'info';
+				info.innerHTML = '<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - kinect';
+				document.body.appendChild( info );
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
@@ -140,6 +174,7 @@
 							"nearClipping": { type: "f", value: nearClipping },
 							"farClipping": { type: "f", value: farClipping },
 
+							"pointSize": { type: "f", value: 2 },
 							"zOffset": { type: "f", value: 1000 }
 
 						},
@@ -166,6 +201,9 @@
 
 
 					var gui = new DAT.GUI();
+					gui.add( material.uniforms.nearClipping, 'value' ).name( 'nearClipping' ).min( 1 ).max( 10000 ).step( 1.0 );
+					gui.add( material.uniforms.farClipping, 'value' ).name( 'farClipping' ).min( 1 ).max( 10000 ).step( 1.0 );
+					gui.add( material.uniforms.pointSize, 'value' ).name( 'pointSize' ).min( 1 ).max( 10 ).step( 1.0 );
 					gui.add( material.uniforms.zOffset, 'value' ).name( 'zOffset' ).min( 0 ).max( 4000 ).step( 1.0 );
 					gui.close();
 
@@ -204,9 +242,6 @@
 			}
 
 			function render() {
-
-				video.width = 256;
-				video.height = 256;
 
 				camera.position.x += ( mouse.x - camera.position.x ) * 0.05;
 				camera.position.y += ( - mouse.y - camera.position.y ) * 0.05;
