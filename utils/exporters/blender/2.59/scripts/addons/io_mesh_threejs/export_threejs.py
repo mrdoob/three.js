@@ -1740,7 +1740,7 @@ def generate_ascii_scene(data):
     "nmaterials"    : nmaterials,
 
     "position"      : generate_vec3(DEFAULTS["position"]),
-    "rotation"      : generate_vec3(DEFAULTS["rotation"]),
+    "rotation"      : generate_vec3(DEFAULTS["rotation"] if data["flipyz"] else [0, 0, 0]),
     "scale"         : generate_vec3(DEFAULTS["scale"])
     }
 
