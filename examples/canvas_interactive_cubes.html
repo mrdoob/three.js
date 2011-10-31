@@ -114,7 +114,7 @@
 
 				if ( intersects.length > 0 ) {
 
-					intersects[ 0 ].object.materials[ 0 ].color.setHex( Math.random() * 0xffffff );
+					intersects[ 0 ].object.material.color.setHex( Math.random() * 0xffffff );
 
 					var particle = new THREE.Particle( particleMaterial );
 					particle.position = intersects[ 0 ].point;

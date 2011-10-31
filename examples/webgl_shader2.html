@@ -199,7 +199,7 @@
 
 				scene = new THREE.Scene();
 
-				start_time = new Date().getTime();
+				start_time = Date.now();
 
 				uniforms1 = {
 					time: { type: "f", value: 1.0 },
@@ -278,9 +278,9 @@
 			function render() {
 
 				uniforms1.time.value += 0.05;
-				uniforms2.time.value = ( new Date().getTime() - start_time ) / 1000;
+				uniforms2.time.value = ( Date.now() - start_time ) / 1000;
 
-				for( var i = 0; i < meshes.length; ++i ) {
+				for( var i = 0; i < meshes.length; ++ i ) {
 
 					meshes[ i ].rotation.y += 0.01 * ( i % 2 ? 1 : -1 );
 					meshes[ i ].rotation.x += 0.01 * ( i % 2 ? -1 : 1 );

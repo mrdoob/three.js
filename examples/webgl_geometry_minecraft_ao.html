@@ -77,6 +77,8 @@
 			worldHalfWidth = worldWidth / 2, worldHalfDepth = worldDepth / 2,
 			data = generateHeight( worldWidth, worldDepth );
 
+			var clock = new THREE.Clock();
+
 			init();
 			animate();
 
@@ -135,22 +137,22 @@
 					// map of UV indices for faces of partially defined cubes
 
 					uv_index_map = {
-					0:	{ px: N, nx: N, py: 0, ny: N, pz: N, nz: N },
-					1:	{ px: N, nx: N, py: 0, ny: N, pz: N, nz: 1 },
-					2:	{ px: N, nx: N, py: 0, ny: N, pz: 1, nz: N },
-					3:	{ px: N, nx: N, py: 0, ny: N, pz: 1, nz: 2 },
-					4:	{ px: N, nx: 0, py: 1, ny: N, pz: N, nz: N },
-					5:	{ px: N, nx: 0, py: 1, ny: N, pz: N, nz: 2 },
-					6:	{ px: N, nx: 0, py: 1, ny: N, pz: 2, nz: N },
-					7:	{ px: N, nx: 0, py: 1, ny: N, pz: 2, nz: 3 },
-					8:	{ px: 0, nx: N, py: 1, ny: N, pz: N, nz: N },
-					9:	{ px: 0, nx: N, py: 1, ny: N, pz: N, nz: 2 },
-					10:	{ px: 0, nx: N, py: 1, ny: N, pz: 2, nz: N },
-					11:	{ px: 0, nx: N, py: 1, ny: N, pz: 2, nz: 3 },
-					12:	{ px: 0, nx: 1, py: 2, ny: N, pz: N, nz: N },
-					13:	{ px: 0, nx: 1, py: 2, ny: N, pz: N, nz: 3 },
-					14:	{ px: 0, nx: 1, py: 2, ny: N, pz: 3, nz: N },
-					15:	{ px: 0, nx: 1, py: 2, ny: N, pz: 3, nz: 4 }
+					0:	{ nx: N, px: N, py: 0, ny: N, pz: N, nz: N },
+					1:	{ nx: N, px: N, py: 0, ny: N, pz: N, nz: 1 },
+					2:	{ nx: N, px: N, py: 0, ny: N, pz: 1, nz: N },
+					3:	{ nx: N, px: N, py: 0, ny: N, pz: 1, nz: 2 },
+					4:	{ nx: N, px: 0, py: 1, ny: N, pz: N, nz: N },
+					5:	{ nx: N, px: 0, py: 1, ny: N, pz: N, nz: 2 },
+					6:	{ nx: N, px: 0, py: 1, ny: N, pz: 2, nz: N },
+					7:	{ nx: N, px: 0, py: 1, ny: N, pz: 2, nz: 3 },
+					8:	{ nx: 0, px: N, py: 1, ny: N, pz: N, nz: N },
+					9:	{ nx: 0, px: N, py: 1, ny: N, pz: N, nz: 2 },
+					10:	{ nx: 0, px: N, py: 1, ny: N, pz: 2, nz: N },
+					11:	{ nx: 0, px: N, py: 1, ny: N, pz: 2, nz: 3 },
+					12:	{ nx: 0, px: 1, py: 2, ny: N, pz: N, nz: N },
+					13:	{ nx: 0, px: 1, py: 2, ny: N, pz: N, nz: 3 },
+					14:	{ nx: 0, px: 1, py: 2, ny: N, pz: 3, nz: N },
+					15:	{ nx: 0, px: 1, py: 2, ny: N, pz: 3, nz: 4 }
 					},
 
 					// all possible combinations of corners and sides
@@ -443,11 +445,8 @@
 				var ambientLight = new THREE.AmbientLight( 0xcccccc );
 				scene.add( ambientLight );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffffff, 1.5 );
-				directionalLight.position.x = 1;
-				directionalLight.position.y = 1;
-				directionalLight.position.z = 0.5;
-				directionalLight.position.normalize();
+				var directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
+				directionalLight.position.set( 1, 1, 0.5 ).normalize();
 				scene.add( directionalLight );
 
 				renderer = new THREE.WebGLRenderer();
@@ -503,7 +502,7 @@
 
 				}
 
-				return new THREE.MeshLambertMaterial( { map: texture } );
+				return new THREE.MeshLambertMaterial( { map: texture, ambient: 0xbbbbbb } );
 
 			}
 
@@ -802,7 +801,7 @@
 
 			function render() {
 
-				controls.update();
+				controls.update( clock.getDelta() );
 				renderer.render( scene, camera );
 
 			}

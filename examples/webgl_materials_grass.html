@@ -47,7 +47,7 @@
 				for ( var i = 0; i < 15; i ++ ) {
 
 					mesh = levels[ i ] = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { map: new THREE.Texture( generateTextureLevel( bitmap ) ), transparent: true, depthTest: false } ) );
-					mesh.materials[0].map.needsUpdate = true;
+					mesh.material.map.needsUpdate = true;
 
 					mesh.rotation.x = - 90 * ( Math.PI / 180 );
 					mesh.position.y = i * 0.25;
@@ -113,7 +113,7 @@
 
 			function render() {
 
-				var time = new Date().getTime() / 6000;
+				var time = Date.now() / 6000;
 
 				camera.position.x = 80 * Math.cos( time );
 				camera.position.z = 80 * Math.sin( time );

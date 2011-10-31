@@ -236,19 +236,19 @@
 
 				var mlib = {
 
-				"Orange": 	new THREE.MeshLambertMaterial( { color: 0xff6600, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.3 } ),
-				"Blue": 	new THREE.MeshLambertMaterial( { color: 0x001133, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.3 } ),
-				"Red": 		new THREE.MeshLambertMaterial( { color: 0x660000, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.25 } ),
-				"Black": 	new THREE.MeshLambertMaterial( { color: 0x000000, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.15 } ),
-				"White":	new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.25 } ),
+				"Orange": 	new THREE.MeshLambertMaterial( { color: 0xff6600, ambient: 0xff2200, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.3 } ),
+				"Blue": 	new THREE.MeshLambertMaterial( { color: 0x001133, ambient: 0x001133, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.3 } ),
+				"Red": 		new THREE.MeshLambertMaterial( { color: 0x660000, ambient: 0x330000, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.25 } ),
+				"Black": 	new THREE.MeshLambertMaterial( { color: 0x000000, ambient: 0x000000, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.15 } ),
+				"White":	new THREE.MeshLambertMaterial( { color: 0xffffff, ambient: 0x666666, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.25 } ),
 
 				"Carmine": 	new THREE.MeshPhongMaterial( { color: 0x770000, specular:0xffaaaa, envMap: textureCube, combine: THREE.MultiplyOperation } ),
 				"Gold": 	new THREE.MeshPhongMaterial( { color: 0xaa9944, specular:0xbbaa99, shininess:50, envMap: textureCube, combine: THREE.MultiplyOperation } ),
 				"Bronze":	new THREE.MeshPhongMaterial( { color: 0x150505, specular:0xee6600, shininess:10, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.25 } ),
 				"Chrome": 	new THREE.MeshPhongMaterial( { color: 0xffffff, specular:0xffffff, envMap: textureCube, combine: THREE.Multiply } ),
 
-				"Orange metal": new THREE.MeshLambertMaterial( { color: 0xff6600, envMap: textureCube, combine: THREE.MultiplyOperation } ),
-				"Blue metal": 	new THREE.MeshLambertMaterial( { color: 0x001133, envMap: textureCube, combine: THREE.MultiplyOperation  } ),
+				"Orange metal": new THREE.MeshLambertMaterial( { color: 0xff6600, ambient: 0xff2200, envMap: textureCube, combine: THREE.MultiplyOperation } ),
+				"Blue metal": 	new THREE.MeshLambertMaterial( { color: 0x001133, ambient: 0x002266, envMap: textureCube, combine: THREE.MultiplyOperation } ),
 				"Red metal": 	new THREE.MeshLambertMaterial( { color: 0x770000, envMap: textureCube, combine: THREE.MultiplyOperation } ),
 				"Green metal": 	new THREE.MeshLambertMaterial( { color: 0x007711, envMap: textureCube, combine: THREE.MultiplyOperation } ),
 				"Black metal":	new THREE.MeshLambertMaterial( { color: 0x222222, envMap: textureCube, combine: THREE.MultiplyOperation } ),
@@ -458,7 +458,7 @@
 
 				}
 
-				loader.load( { model: CARS[ "veyron" ].url, callback: function( geometry ) { createScene( geometry, "veyron" ) } } );
+				loader.load( CARS[ "veyron" ].url, function( geometry ) { createScene( geometry, "veyron" ) } );
 
 				for( var c in CARS ) initCarButton( c );
 
@@ -471,7 +471,7 @@
 					if ( ! CARS[ car ].object ) {
 
 						loader.statusDomElement.style.display = "block";
-						loader.load( { model: CARS[ car ].url, callback: function( geometry ) { createScene( geometry, car ) } } );
+						loader.load( CARS[ car ].url, function( geometry ) { createScene( geometry, car ) } );
 
 					} else {
 
@@ -479,7 +479,7 @@
 
 					}
 
-				}, false);
+				}, false );
 
 			}
 
@@ -510,13 +510,13 @@
 
 				var buttons, i, src = "";
 
-				for( i = 0; i < materials.length; i++ ) {
+				for( i = 0; i < materials.length; i ++ ) {
 
 					src += '<button id="' + button_name( car, i ) + '">' + materials[ i ][ 0 ] + '</button> ';
 
 				}
 
-				buttons = document.createElement("div");
+				buttons = document.createElement( "div" );
 				buttons.innerHTML = src;
 
 				$( "buttons_materials" ).appendChild( buttons );
@@ -527,14 +527,14 @@
 
 			function attachButtonMaterials( materials, geometry, material_indices, car ) {
 
-				for( var i = 0; i < materials.length; i++ ) {
+				for( var i = 0; i < materials.length; i ++ ) {
 
 					$( button_name( car, i ) ).counter = i;
 					$( button_name( car, i ) ).addEventListener( 'click', function() {
 
-						for ( var j = 0; j < material_indices.length; j++ ) {
+						for ( var j = 0; j < material_indices.length; j ++ ) {
 
-							geometry.materials[ material_indices [ j ] ][ 0 ] = materials[ this.counter ][ 1 ];
+							geometry.materials[ material_indices [ j ] ] = materials[ this.counter ][ 1 ];
 
 						}
 
@@ -557,7 +557,7 @@
 
 				for ( var i in CARS[ car ].mmap ) {
 
-					geometry.materials[ i ][ 0 ] = CARS[ car ].mmap[ i ];
+					geometry.materials[ i ] = CARS[ car ].mmap[ i ];
 
 				}
 
@@ -601,7 +601,7 @@
 
 			function render() {
 
-				var timer = - new Date().getTime() * 0.0002;
+				var timer = -0.0002 * Date.now();
 
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 

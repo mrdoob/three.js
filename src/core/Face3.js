@@ -3,9 +3,9 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Face3 = function ( a, b, c, normal, color, materials ) {
+THREE.Face3 = function ( a, b, c, normal, color, materialIndex ) {
 
-	this.a = a; 
+	this.a = a;
 	this.b = b;
 	this.c = c;
 
@@ -17,7 +17,7 @@ THREE.Face3 = function ( a, b, c, normal, color, materials ) {
 
 	this.vertexTangents = [];
 
-	this.materials = materials instanceof Array ? materials : [ materials ];
+	this.materialIndex = materialIndex;
 
 	this.centroid = new THREE.Vector3();
 

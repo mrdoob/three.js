@@ -82,7 +82,7 @@
 				texture.minFilter = THREE.LinearFilter;
 				texture.magFilter = THREE.LinearFilter;
 
-				var material = new THREE.MeshBasicMaterial( { map: texture } );
+				var material = new THREE.MeshBasicMaterial( { map: texture, overdraw: true } );
 
 				imageReflection = document.createElement( 'canvas' );
 				imageReflection.width = 480;
@@ -100,7 +100,7 @@
 				textureReflection.minFilter = THREE.LinearFilter;
 				textureReflection.magFilter = THREE.LinearFilter;
 
-				var materialReflection = new THREE.MeshBasicMaterial( { map: textureReflection } );
+				var materialReflection = new THREE.MeshBasicMaterial( { map: textureReflection, overdraw: true } );
 
 				//
 
@@ -108,7 +108,6 @@
 
 				mesh = new THREE.Mesh( plane, material );
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 1.5;
-				mesh.overdraw = true;
 				scene.add(mesh);
 
 				mesh = new THREE.Mesh( plane, materialReflection );

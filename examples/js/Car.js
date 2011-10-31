@@ -106,8 +106,8 @@ THREE.Car = function () {
 
 		var loader = new THREE.JSONLoader();
 
-		loader.load( { model: bodyURL, callback: function( geometry ) { createBody( geometry ) } } );
-		loader.load( { model: wheelURL, callback: function( geometry ) { createWheels( geometry ) } } );
+		loader.load( bodyURL, function( geometry ) { createBody( geometry ) } );
+		loader.load( wheelURL, function( geometry ) { createWheels( geometry ) } );
 
 	};
 
@@ -115,8 +115,8 @@ THREE.Car = function () {
 
 		var loader = new THREE.BinaryLoader();
 
-		loader.load( { model: bodyURL, callback: function( geometry ) { createBody( geometry ) } } );
-		loader.load( { model: wheelURL, callback: function( geometry ) { createWheels( geometry ) } } );
+		loader.load( bodyURL, function( geometry ) { createBody( geometry ) } );
+		loader.load( wheelURL, function( geometry ) { createWheels( geometry ) } );
 
 	};
 
@@ -126,28 +126,28 @@ THREE.Car = function () {
 
 		if ( controls.moveForward ) {
 
-			this.speed = clamp( this.speed + delta * this.FRONT_ACCELERATION, this.MAX_REVERSE_SPEED, this.MAX_SPEED );
-			this.acceleration = clamp( this.acceleration + delta, -1, 1 );
+			this.speed = THREE.Math.clamp( this.speed + delta * this.FRONT_ACCELERATION, this.MAX_REVERSE_SPEED, this.MAX_SPEED );
+			this.acceleration = THREE.Math.clamp( this.acceleration + delta, -1, 1 );
 
 		}
 
 		if ( controls.moveBackward ) {
 
 
-			this.speed = clamp( this.speed - delta * this.BACK_ACCELERATION, this.MAX_REVERSE_SPEED, this.MAX_SPEED );
-			this.acceleration = clamp( this.acceleration - delta, -1, 1 );
+			this.speed = THREE.Math.clamp( this.speed - delta * this.BACK_ACCELERATION, this.MAX_REVERSE_SPEED, this.MAX_SPEED );
+			this.acceleration = THREE.Math.clamp( this.acceleration - delta, -1, 1 );
 
 		}
 
 		if ( controls.moveLeft ) {
 
-			this.wheelOrientation = clamp( this.wheelOrientation + delta * this.WHEEL_ANGULAR_ACCELERATION, - this.MAX_WHEEL_ROTATION, this.MAX_WHEEL_ROTATION );
+			this.wheelOrientation = THREE.Math.clamp( this.wheelOrientation + delta * this.WHEEL_ANGULAR_ACCELERATION, - this.MAX_WHEEL_ROTATION, this.MAX_WHEEL_ROTATION );
 
 		}
 
 		if ( controls.moveRight ) {
 
-			this.wheelOrientation = clamp( this.wheelOrientation - delta * this.WHEEL_ANGULAR_ACCELERATION, - this.MAX_WHEEL_ROTATION, this.MAX_WHEEL_ROTATION );
+			this.wheelOrientation = THREE.Math.clamp( this.wheelOrientation - delta * this.WHEEL_ANGULAR_ACCELERATION, - this.MAX_WHEEL_ROTATION, this.MAX_WHEEL_ROTATION );
 
 		}
 
@@ -159,15 +159,15 @@ THREE.Car = function () {
 
 				var k = exponentialEaseOut( this.speed / this.MAX_SPEED );
 
-				this.speed = clamp( this.speed - k * delta * this.FRONT_DECCELERATION, 0, this.MAX_SPEED );
-				this.acceleration = clamp( this.acceleration - k * delta, 0, 1 );
+				this.speed = THREE.Math.clamp( this.speed - k * delta * this.FRONT_DECCELERATION, 0, this.MAX_SPEED );
+				this.acceleration = THREE.Math.clamp( this.acceleration - k * delta, 0, 1 );
 
 			} else {
 
 				var k = exponentialEaseOut( this.speed / this.MAX_REVERSE_SPEED );
 
-				this.speed = clamp( this.speed + k * delta * this.BACK_ACCELERATION, this.MAX_REVERSE_SPEED, 0 );
-				this.acceleration = clamp( this.acceleration + k * delta, -1, 0 );
+				this.speed = THREE.Math.clamp( this.speed + k * delta * this.BACK_ACCELERATION, this.MAX_REVERSE_SPEED, 0 );
+				this.acceleration = THREE.Math.clamp( this.acceleration + k * delta, -1, 0 );
 
 			}
 
@@ -180,11 +180,11 @@ THREE.Car = function () {
 
 			if ( this.wheelOrientation > 0 ) {
 
-				this.wheelOrientation = clamp( this.wheelOrientation - delta * this.WHEEL_ANGULAR_DECCELERATION, 0, this.MAX_WHEEL_ROTATION );
+				this.wheelOrientation = THREE.Math.clamp( this.wheelOrientation - delta * this.WHEEL_ANGULAR_DECCELERATION, 0, this.MAX_WHEEL_ROTATION );
 
 			} else {
 
-				this.wheelOrientation = clamp( this.wheelOrientation + delta * this.WHEEL_ANGULAR_DECCELERATION, - this.MAX_WHEEL_ROTATION, 0 );
+				this.wheelOrientation = THREE.Math.clamp( this.wheelOrientation + delta * this.WHEEL_ANGULAR_DECCELERATION, - this.MAX_WHEEL_ROTATION, 0 );
 
 			}
 
@@ -360,12 +360,10 @@ THREE.Car = function () {
 
 	};
 
-	function clamp( x, a, b ) { return x < a ? a : ( x > b ? b : x ); }
-
 	function quadraticEaseOut( k ) { return - k * ( k - 2 ); }
 	function cubicEaseOut( k ) { return --k * k * k + 1; }
 	function circularEaseOut( k ) { return Math.sqrt( 1 - --k * k ); }
 	function sinusoidalEaseOut( k ) { return Math.sin( k * Math.PI / 2 ); }
-	function exponentialEaseOut( k ) { return k == 1 ? 1 : - Math.pow( 2, - 10 * k ) + 1; }
+	function exponentialEaseOut( k ) { return k === 1 ? 1 : - Math.pow( 2, - 10 * k ) + 1; }
 
 };

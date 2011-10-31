@@ -24,6 +24,22 @@ THREE.SceneUtils = {
 
 		}
 
+	},
+
+	createMultiMaterialObject : function ( geometry, materials ) {
+
+		var i, il = materials.length,
+			group = new THREE.Object3D();
+
+		for ( i = 0; i < il; i ++ ) {
+
+			var object = new THREE.Mesh( geometry, materials[ i ] );
+			group.add( object );
+
+		}
+
+		return group;
+
 	}
 
 };

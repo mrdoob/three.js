@@ -34,7 +34,7 @@ THREE.FilmPass.prototype = {
 		this.uniforms[ "tDiffuse" ].texture = readBuffer;
 		this.uniforms[ "time" ].value += delta;
 
-		THREE.EffectComposer.quad.materials[ 0 ] = this.material;
+		THREE.EffectComposer.quad.material = this.material;
 
 		if ( this.renderToScreen ) {
 

@@ -60,6 +60,8 @@
 
 			var sound1, sound2;
 
+			var clock = new THREE.Clock();
+
 			var Sound = function ( sources, radius, volume ) {
 
 				var audio = document.createElement( 'audio' );
@@ -190,12 +192,13 @@
 
 			function render() {
 
-				var time = new Date().getTime() * 0.005;
+				var delta = clock.getDelta(),
+					time = clock.getElapsedTime() * 5;
 
-				controls.update();
+				controls.update( delta );
 
-				material_sphere1.color.setHSV( 0.0, 0.3 + 0.7 * ( 1 + Math.cos(time) ) / 2, 1 );
-				material_sphere2.color.setHSV( 0.1, 0.3 + 0.7 * ( 1 + Math.sin(time) ) / 2, 1 );
+				material_sphere1.color.setHSV( 0.0, 0.3 + 0.7 * ( 1 + Math.cos( time ) ) / 2, 1 );
+				material_sphere2.color.setHSV( 0.1, 0.3 + 0.7 * ( 1 + Math.sin( time ) ) / 2, 1 );
 
 				renderer.clear();
 				renderer.render( scene, camera );

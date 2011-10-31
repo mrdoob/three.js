@@ -4,7 +4,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Object3D = function() {
+THREE.Object3D = function () {
 
 	this.name = '';
 
@@ -101,9 +101,9 @@ THREE.Object3D.prototype = {
 
 		if ( this.children.indexOf( object ) === - 1 ) {
 
-			if( object.parent !== undefined ) {
+			if ( object.parent !== undefined ) {
 
-				object.parent.removeChild( object );
+				object.parent.remove( object );
 
 			}
 
@@ -122,7 +122,7 @@ THREE.Object3D.prototype = {
 
 			if ( scene !== undefined && scene instanceof THREE.Scene )  {
 
-				scene.addChildRecurse( object );
+				scene.addObject( object );
 
 			}
 
@@ -132,16 +132,16 @@ THREE.Object3D.prototype = {
 
 	remove: function ( object ) {
 
-		var scene = this;
+		var index = this.children.indexOf( object );
 
-		var childIndex = this.children.indexOf( object );
-
-		if ( childIndex !== - 1 ) {
+		if ( index !== - 1 ) {
 
 			object.parent = undefined;
-			this.children.splice( childIndex, 1 );
+			this.children.splice( index, 1 );
 
 			// remove from scene
+
+			var scene = this;
 
 			while ( scene.parent !== undefined ) {
 
@@ -151,7 +151,7 @@ THREE.Object3D.prototype = {
 
 			if ( scene !== undefined && scene instanceof THREE.Scene ) {
 
-				scene.removeChildRecurse( object );
+				scene.removeObject( object );
 
 			}
 
@@ -216,17 +216,17 @@ THREE.Object3D.prototype = {
 
 	},
 
-	update: function ( parentMatrixWorld, forceUpdate, camera ) {
+	updateMatrixWorld: function ( force ) {
 
 		this.matrixAutoUpdate && this.updateMatrix();
 
 		// update matrixWorld
 
-		if ( this.matrixWorldNeedsUpdate || forceUpdate ) {
+		if ( this.matrixWorldNeedsUpdate || force ) {
 
-			if ( parentMatrixWorld ) {
+			if ( this.parent ) {
 
-				this.matrixWorld.multiply( parentMatrixWorld, this.matrix );
+				this.matrixWorld.multiply( this.parent.matrixWorld, this.matrix );
 
 			} else {
 
@@ -234,11 +234,9 @@ THREE.Object3D.prototype = {
 
 			}
 
-			this.matrixRotationWorld.extractRotation( this.matrixWorld, this.scale );
-
 			this.matrixWorldNeedsUpdate = false;
 
-			forceUpdate = true;
+			force = true;
 
 		}
 
@@ -246,25 +244,9 @@ THREE.Object3D.prototype = {
 
 		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
 
-			this.children[ i ].update( this.matrixWorld, forceUpdate, camera );
+			this.children[ i ].updateMatrixWorld( force );
 
 		}
-
-	},
-
-	// DEPRECATED
-
-	addChild: function ( child ) {
-
-		console.warn( 'DEPRECATED: Object3D.addChild() is now Object3D.add().' );
-		this.add( child );
-
-	},
-
-	removeChild: function ( child ) {
-
-		console.warn( 'DEPRECATED: Object3D.removeChild() is now Object3D.remove().' );
-		this.remove( child );
 
 	}
 

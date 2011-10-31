@@ -41,8 +41,6 @@
 		<script src="../build/Three.js"></script>
 		<script src="../src/extras/ImageUtils.js"></script>
 
-		<script src="obj/WaltHead.js"></script>
-
 		<script src="js/RequestAnimationFrame.js"></script>
 
 		<script>
@@ -50,7 +48,7 @@
 			var camera, scene, renderer,
 			particle1, particle2, particle2,
 			light1, light2, light3,
-			geometry, mesh;
+			loader, mesh;
 
 			init();
 			animate();
@@ -59,17 +57,21 @@
 
 				var container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 65, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.y = - 6;
 				camera.position.z = 100;
 
 				scene = new THREE.Scene();
 
-				geometry = new WaltHead();
-				geometry.computeVertexNormals();
+				loader = new THREE.JSONLoader();
+				loader.load( 'obj/WaltHeadLo.js', function ( geometry ) {
 
-				mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { envMap: THREE.ImageUtils.loadTexture( 'textures/metal.jpg', new THREE.SphericalReflectionMapping() ) } ) );
-				mesh.overdraw = true;
-				scene.add( mesh );
+					geometry.computeVertexNormals();
+
+					mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { envMap: THREE.ImageUtils.loadTexture( 'textures/metal.jpg', new THREE.SphericalReflectionMapping() ), overdraw: true } ) );
+					scene.add( mesh );
+
+				} );
 
 				renderer = new THREE.CanvasRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -91,7 +93,7 @@
 
 				var time = new Date().getTime() * 0.0005;
 
-				mesh.rotation.y -= 0.01;
+				if ( mesh ) mesh.rotation.y -= 0.01;
 
 				renderer.render( scene, camera );
 
