@@ -453,6 +453,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+
+		if ( geometryGroup.__webglCustomAttributesList ) {
+
+			for ( var id in geometryGroup.__webglCustomAttributesList ) {
+
+				_gl.deleteBuffer( geometryGroup.__webglCustomAttributesList[ id ].buffer );
+
+			}
+
+		}
+
 		_this.info.memory.geometries --;
 
 	};

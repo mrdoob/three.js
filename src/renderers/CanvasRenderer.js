@@ -39,7 +39,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 	_color3 = new THREE.Color(),
 	_color4 = new THREE.Color(),
 
-	_patterns = [],
+	_patterns = [], _imagedatas = [],
 
 	_near, _far,
 
@@ -868,8 +868,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 			var a, b, c, d, e, f, det, idet,
 			offsetX = texture.offset.x / texture.repeat.x,
 			offsetY = texture.offset.y / texture.repeat.y,
-			width = ( texture.image.width - 1 ) * texture.repeat.x,
-			height = ( texture.image.height - 1 ) * texture.repeat.y;
+			width = texture.image.width * texture.repeat.x,
+			height = texture.image.height * texture.repeat.y;
 
 			u0 = ( u0 + offsetX ) * width;
 			v0 = ( v0 + offsetY ) * height;
@@ -887,6 +887,33 @@ THREE.CanvasRenderer = function ( parameters ) {
 			u2 -= u0; v2 -= v0;
 
 			det = u1 * v2 - u2 * v1;
+
+			if ( det == 0 ) {
+
+				if ( _imagedatas[ texture.id ] == undefined ) {
+
+					var canvas = document.createElement( 'canvas' )
+					canvas.width = texture.image.width;
+					canvas.height = texture.image.height;
+
+					var context = canvas.getContext( '2d' );
+					context.drawImage( texture.image, 0, 0 );
+
+					_imagedatas[ texture.id ] = context.getImageData( 0, 0, texture.image.width, texture.image.height ).data;
+
+					delete canvas;
+
+				}
+
+				var data = _imagedatas[ texture.id ];
+				var index = ( Math.floor( u0 ) + Math.floor( v0 ) * texture.image.width ) * 4;
+
+				_color.setRGB( data[ index ] / 255, data[ index + 1 ] / 255, data[ index + 2 ] / 255 );
+				fillPath( _color );
+
+				return;
+
+			}
 
 			idet = 1 / det;
 
@@ -976,11 +1003,6 @@ THREE.CanvasRenderer = function ( parameters ) {
 		}
 
 		function smoothstep( value, min, max ) {
-
-			/*
-			if ( value <= min ) return 0;
-			if ( value >= max ) return 1;
-			*/
 
 			var x = ( value - min ) / ( max - min );
 			return x * x * ( 3 - 2 * x );

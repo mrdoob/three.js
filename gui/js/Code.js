@@ -153,7 +153,7 @@ var Code = function () {
 
 				var string = '';
 				string += '\n\tvar geometry = ' + object.geometry.gui.getCode() + ';';
-				string += '\n\tvar material = ' + object.materials[ 0 ].gui.getCode() + ';';
+				string += '\n\tvar material = ' + object.material.gui.getCode() + ';';
 				string += '\n\tvar mesh = new THREE.Mesh( geometry, material );';
 
 				if ( object.position.x != 0 ) string += '\n\tmesh.position.x = ' + object.position.x + ';';

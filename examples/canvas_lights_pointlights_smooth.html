@@ -101,7 +101,7 @@
 
 					geometry.computeVertexNormals();
 
-					mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: 0xffffff } ) );
+					mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: 0xffffff, overdraw: true } ) );
 					mesh.overdraw = true;
 					scene.add( mesh );
 
