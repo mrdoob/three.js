@@ -42,9 +42,9 @@ THREE.CubeGeometry = function ( width, height, depth, segmentsWidth, segmentsHei
 
 	this.sides = { px: true, nx: true, py: true, ny: true, pz: true, nz: true };
 
-	if( sides != undefined ) {
+	if ( sides != undefined ) {
 
-		for( var s in sides ) {
+		for ( var s in sides ) {
 
 			if ( this.sides[ s ] != undefined ) {
 
@@ -56,14 +56,12 @@ THREE.CubeGeometry = function ( width, height, depth, segmentsWidth, segmentsHei
 
 	}
 
-	this.sides.px && buildPlane( 'z', 'y', - 1, - 1, depth, height, width_half, mpx ); 	 // px
+	this.sides.px && buildPlane( 'z', 'y', - 1, - 1, depth, height, width_half, mpx ); // px
 	this.sides.nx && buildPlane( 'z', 'y',   1, - 1, depth, height, - width_half, mnx ); // nx
-	this.sides.py && buildPlane( 'x', 'z',   1,   1, width, depth, height_half, mpy );   // py
+	this.sides.py && buildPlane( 'x', 'z',   1,   1, width, depth, height_half, mpy ); // py
 	this.sides.ny && buildPlane( 'x', 'z',   1, - 1, width, depth, - height_half, mny ); // ny
-	this.sides.pz && buildPlane( 'x', 'y',   1, - 1, width, height, depth_half, mpz );   // pz
+	this.sides.pz && buildPlane( 'x', 'y',   1, - 1, width, height, depth_half, mpz ); // pz
 	this.sides.nz && buildPlane( 'x', 'y', - 1, - 1, width, height, - depth_half, mnz ); // nz
-
-	this.mergeVertices();
 
 	function buildPlane( u, v, udir, vdir, width, height, depth, material ) {
 
@@ -93,11 +91,14 @@ THREE.CubeGeometry = function ( width, height, depth, segmentsWidth, segmentsHei
 		var gridX1 = gridX + 1,
 		gridY1 = gridY + 1,
 		segment_width = width / gridX,
-		segment_height = height / gridY;
+		segment_height = height / gridY,
+		normal = new THREE.Vector3();
 
-		for( iy = 0; iy < gridY1; iy ++ ) {
+		normal[ w ] = depth > 0 ? 1 : - 1;
 
-			for( ix = 0; ix < gridX1; ix ++ ) {
+		for ( iy = 0; iy < gridY1; iy ++ ) {
+
+			for ( ix = 0; ix < gridX1; ix ++ ) {
 
 				var vector = new THREE.Vector3();
 				vector[ u ] = ( ix * segment_width - width_half ) * udir;
@@ -110,16 +111,21 @@ THREE.CubeGeometry = function ( width, height, depth, segmentsWidth, segmentsHei
 
 		}
 
-		for( iy = 0; iy < gridY; iy++ ) {
+		for ( iy = 0; iy < gridY; iy++ ) {
 
-			for( ix = 0; ix < gridX; ix++ ) {
+			for ( ix = 0; ix < gridX; ix++ ) {
 
 				var a = ix + gridX1 * iy;
 				var b = ix + gridX1 * ( iy + 1 );
 				var c = ( ix + 1 ) + gridX1 * ( iy + 1 );
 				var d = ( ix + 1 ) + gridX1 * iy;
 
-				scope.faces.push( new THREE.Face4( a + offset, b + offset, c + offset, d + offset, null, null, material ) );
+				var face = new THREE.Face4( a + offset, b + offset, c + offset, d + offset );
+				face.normal.copy( normal );
+				face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone(), normal.clone() );
+				face.materialIndex = material;
+
+				scope.faces.push( face );
 				scope.faceVertexUvs[ 0 ].push( [
 							new THREE.UV( ix / gridX, iy / gridY ),
 							new THREE.UV( ix / gridX, ( iy + 1 ) / gridY ),
@@ -133,9 +139,8 @@ THREE.CubeGeometry = function ( width, height, depth, segmentsWidth, segmentsHei
 
 	}
 
-
 	this.computeCentroids();
-	this.computeFaceNormals();
+	this.mergeVertices();
 
 };
 
