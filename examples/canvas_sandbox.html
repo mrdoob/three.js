@@ -90,7 +90,9 @@
 
 				objects = [];
 
-				geometry = new THREE.SphereGeometry( 100, 16, 8 );
+				geometry = new THREE.IcosahedronGeometry( 1 );
+				geometry.applyMatrix( new THREE.Matrix4().setScale( 100, 100, 100 ) );
+
 				material = new THREE.MeshBasicMaterial( { envMap: THREE.ImageUtils.loadTexture( 'textures/metal.jpg', new THREE.SphericalReflectionMapping() ), overdraw: true } );
 
 				for ( var i = 0; i < 10; i ++ ) {
