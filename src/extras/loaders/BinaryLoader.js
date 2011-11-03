@@ -111,7 +111,7 @@ THREE.BinaryLoader.prototype.loadAjaxBuffers = function( json, callback, binaryP
 
 			if ( xhr.status == 200 || xhr.status == 0 ) {
 
-				THREE.BinaryLoader.prototype.createBinModel( xhr.responseText, callback, texturePath, json.materials );
+				THREE.BinaryLoader.prototype.createBinModel( xhr.response, callback, texturePath, json.materials );
 
 			} else {
 
@@ -142,18 +142,12 @@ THREE.BinaryLoader.prototype.loadAjaxBuffers = function( json, callback, binaryP
 	};
 
 	xhr.open( "GET", url, true );
-	xhr.overrideMimeType( "text/plain; charset=x-user-defined" );
-	xhr.setRequestHeader( "Content-Type", "text/plain" );
+	xhr.responseType = "arraybuffer";
 	xhr.send( null );
 
 };
 
-// Binary AJAX parser based on Magi binary loader
-// https://github.com/kig/magi
-
-// Should look more into HTML5 File API
-// See also other suggestions by Gregg Tavares
-// https://groups.google.com/group/o3d-discuss/browse_thread/thread/a8967bc9ce1e0978
+// Binary AJAX parser
 
 THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texturePath, materials ) {
 
@@ -164,9 +158,6 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 			md,
 			normals = [],
 			uvs = [],
-			tri_b, tri_c, tri_m, tri_na, tri_nb, tri_nc,
-			quad_b, quad_c, quad_d, quad_m, quad_na, quad_nb, quad_nc, quad_nd,
-			tri_uvb, tri_uvc, quad_uvb, quad_uvc, quad_uvd,
 			start_tri_flat, start_tri_smooth, start_tri_flat_uv, start_tri_smooth_uv,
 			start_quad_flat, start_quad_smooth, start_quad_flat_uv, start_quad_smooth_uv,
 			tri_size, quad_size,
@@ -179,33 +170,20 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 		THREE.Loader.prototype.initMaterials( scope, materials, texturePath );
 
 		md = parseMetaData( data, currentOffset );
+
+		if ( md.signature !== "Three.js 003" ) {
+
+			console.warn( "DEPRECATED: binary model seems to be using old format" );
+
+		}
+
 		currentOffset += md.header_bytes;
-
-		// cache offsets
-
-		tri_b   = md.vertex_index_bytes,
-		tri_c   = md.vertex_index_bytes*2,
-		tri_m   = md.vertex_index_bytes*3,
-		tri_na  = md.vertex_index_bytes*3 + md.material_index_bytes,
-		tri_nb  = md.vertex_index_bytes*3 + md.material_index_bytes + md.normal_index_bytes,
-		tri_nc  = md.vertex_index_bytes*3 + md.material_index_bytes + md.normal_index_bytes*2,
-
-		quad_b  = md.vertex_index_bytes,
-		quad_c  = md.vertex_index_bytes*2,
-		quad_d  = md.vertex_index_bytes*3,
-		quad_m  = md.vertex_index_bytes*4,
-		quad_na = md.vertex_index_bytes*4 + md.material_index_bytes,
-		quad_nb = md.vertex_index_bytes*4 + md.material_index_bytes + md.normal_index_bytes,
-		quad_nc = md.vertex_index_bytes*4 + md.material_index_bytes + md.normal_index_bytes*2,
-		quad_nd = md.vertex_index_bytes*4 + md.material_index_bytes + md.normal_index_bytes*3,
-
-		tri_uvb = md.uv_index_bytes,
-		tri_uvc = md.uv_index_bytes * 2,
-
-		quad_uvb = md.uv_index_bytes,
-		quad_uvc = md.uv_index_bytes * 2,
-		quad_uvd = md.uv_index_bytes * 3;
-
+/*
+		md.vertex_index_bytes = Uint32Array.BYTES_PER_ELEMENT;
+		md.material_index_bytes = Uint16Array.BYTES_PER_ELEMENT;
+		md.normal_index_bytes = Uint32Array.BYTES_PER_ELEMENT;
+		md.uv_index_bytes = Uint32Array.BYTES_PER_ELEMENT;
+*/
 		// buffers sizes
 
 		tri_size =  md.vertex_index_bytes * 3 + md.material_index_bytes;
@@ -224,18 +202,21 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 		// read buffers
 
 		currentOffset += init_vertices( currentOffset );
+
 		currentOffset += init_normals( currentOffset );
+		currentOffset += handlePadding( md.nnormals * 3 );
+
 		currentOffset += init_uvs( currentOffset );
 
 		start_tri_flat 		= currentOffset;
-		start_tri_smooth    = start_tri_flat    + len_tri_flat;
-		start_tri_flat_uv   = start_tri_smooth  + len_tri_smooth;
-		start_tri_smooth_uv = start_tri_flat_uv + len_tri_flat_uv;
+		start_tri_smooth    = start_tri_flat    + len_tri_flat    + handlePadding( md.ntri_flat * 2 );
+		start_tri_flat_uv   = start_tri_smooth  + len_tri_smooth  + handlePadding( md.ntri_smooth * 2 );
+		start_tri_smooth_uv = start_tri_flat_uv + len_tri_flat_uv + handlePadding( md.ntri_flat_uv * 2 );
 
-		start_quad_flat     = start_tri_smooth_uv + len_tri_smooth_uv;
-		start_quad_smooth   = start_quad_flat     + len_quad_flat;
-		start_quad_flat_uv  = start_quad_smooth   + len_quad_smooth;
-		start_quad_smooth_uv= start_quad_flat_uv  +len_quad_flat_uv;
+		start_quad_flat     = start_tri_smooth_uv + len_tri_smooth_uv  + handlePadding( md.ntri_smooth_uv * 2 );
+		start_quad_smooth   = start_quad_flat     + len_quad_flat	   + handlePadding( md.nquad_flat * 2 );
+		start_quad_flat_uv  = start_quad_smooth   + len_quad_smooth    + handlePadding( md.nquad_smooth * 2 );
+		start_quad_smooth_uv= start_quad_flat_uv  + len_quad_flat_uv   + handlePadding( md.nquad_flat_uv * 2 );
 
 		// have to first process faces with uvs
 		// so that face and uv indices match
@@ -259,64 +240,69 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 
 		if ( THREE.Loader.prototype.hasNormals( this ) ) this.computeTangents();
 
+		function handlePadding( n ) {
+
+			return ( n % 4 ) ? ( 4 - n % 4 ) : 0;
+
+		};
+
 		function parseMetaData( data, offset ) {
 
 			var metaData = {
 
-				'signature'               :parseString( data, offset, 8 ),
-				'header_bytes'            :parseUChar8( data, offset + 8 ),
+				'signature'               :parseString( data, offset,  12 ),
+				'header_bytes'            :parseUChar8( data, offset + 12 ),
 
-				'vertex_coordinate_bytes' :parseUChar8( data, offset + 9 ),
-				'normal_coordinate_bytes' :parseUChar8( data, offset + 10 ),
-				'uv_coordinate_bytes'     :parseUChar8( data, offset + 11 ),
+				'vertex_coordinate_bytes' :parseUChar8( data, offset + 13 ),
+				'normal_coordinate_bytes' :parseUChar8( data, offset + 14 ),
+				'uv_coordinate_bytes'     :parseUChar8( data, offset + 15 ),
 
-				'vertex_index_bytes'      :parseUChar8( data, offset + 12 ),
-				'normal_index_bytes'      :parseUChar8( data, offset + 13 ),
-				'uv_index_bytes'          :parseUChar8( data, offset + 14 ),
-				'material_index_bytes'    :parseUChar8( data, offset + 15 ),
+				'vertex_index_bytes'      :parseUChar8( data, offset + 16 ),
+				'normal_index_bytes'      :parseUChar8( data, offset + 17 ),
+				'uv_index_bytes'          :parseUChar8( data, offset + 18 ),
+				'material_index_bytes'    :parseUChar8( data, offset + 19 ),
 
-				'nvertices'    :parseUInt32( data, offset + 16 ),
-				'nnormals'     :parseUInt32( data, offset + 16 + 4*1 ),
-				'nuvs'         :parseUInt32( data, offset + 16 + 4*2 ),
+				'nvertices'    :parseUInt32( data, offset + 20 ),
+				'nnormals'     :parseUInt32( data, offset + 20 + 4*1 ),
+				'nuvs'         :parseUInt32( data, offset + 20 + 4*2 ),
 
-				'ntri_flat'      :parseUInt32( data, offset + 16 + 4*3 ),
-				'ntri_smooth'    :parseUInt32( data, offset + 16 + 4*4 ),
-				'ntri_flat_uv'   :parseUInt32( data, offset + 16 + 4*5 ),
-				'ntri_smooth_uv' :parseUInt32( data, offset + 16 + 4*6 ),
+				'ntri_flat'      :parseUInt32( data, offset + 20 + 4*3 ),
+				'ntri_smooth'    :parseUInt32( data, offset + 20 + 4*4 ),
+				'ntri_flat_uv'   :parseUInt32( data, offset + 20 + 4*5 ),
+				'ntri_smooth_uv' :parseUInt32( data, offset + 20 + 4*6 ),
 
-				'nquad_flat'      :parseUInt32( data, offset + 16 + 4*7 ),
-				'nquad_smooth'    :parseUInt32( data, offset + 16 + 4*8 ),
-				'nquad_flat_uv'   :parseUInt32( data, offset + 16 + 4*9 ),
-				'nquad_smooth_uv' :parseUInt32( data, offset + 16 + 4*10 )
+				'nquad_flat'      :parseUInt32( data, offset + 20 + 4*7 ),
+				'nquad_smooth'    :parseUInt32( data, offset + 20 + 4*8 ),
+				'nquad_flat_uv'   :parseUInt32( data, offset + 20 + 4*9 ),
+				'nquad_smooth_uv' :parseUInt32( data, offset + 20 + 4*10 )
 
 			};
+/*
+			console.log( "signature: " + metaData.signature );
 
-			/*
-			log( "signature: " + metaData.signature );
+			console.log( "header_bytes: " + metaData.header_bytes );
+			console.log( "vertex_coordinate_bytes: " + metaData.vertex_coordinate_bytes );
+			console.log( "normal_coordinate_bytes: " + metaData.normal_coordinate_bytes );
+			console.log( "uv_coordinate_bytes: " + metaData.uv_coordinate_bytes );
 
-			log( "header_bytes: " + metaData.header_bytes );
-			log( "vertex_coordinate_bytes: " + metaData.vertex_coordinate_bytes );
-			log( "normal_coordinate_bytes: " + metaData.normal_coordinate_bytes );
-			log( "uv_coordinate_bytes: " + metaData.uv_coordinate_bytes );
+			console.log( "vertex_index_bytes: " + metaData.vertex_index_bytes );
+			console.log( "normal_index_bytes: " + metaData.normal_index_bytes );
+			console.log( "uv_index_bytes: " + metaData.uv_index_bytes );
+			console.log( "material_index_bytes: " + metaData.material_index_bytes );
 
-			log( "vertex_index_bytes: " + metaData.vertex_index_bytes );
-			log( "normal_index_bytes: " + metaData.normal_index_bytes );
-			log( "uv_index_bytes: " + metaData.uv_index_bytes );
-			log( "material_index_bytes: " + metaData.material_index_bytes );
+			console.log( "nvertices: " + metaData.nvertices );
+			console.log( "nnormals: " + metaData.nnormals );
+			console.log( "nuvs: " + metaData.nuvs );
 
-			log( "nvertices: " + metaData.nvertices );
-			log( "nnormals: " + metaData.nnormals );
-			log( "nuvs: " + metaData.nuvs );
+			console.log( "ntri_flat: " + metaData.ntri_flat );
+			console.log( "ntri_smooth: " + metaData.ntri_smooth );
+			console.log( "ntri_flat_uv: " + metaData.ntri_flat_uv );
+			console.log( "ntri_smooth_uv: " + metaData.ntri_smooth_uv );
 
-			log( "ntri_flat: " + metaData.ntri_flat );
-			log( "ntri_smooth: " + metaData.ntri_smooth );
-			log( "ntri_flat_uv: " + metaData.ntri_flat_uv );
-			log( "ntri_smooth_uv: " + metaData.ntri_smooth_uv );
-
-			log( "nquad_flat: " + metaData.nquad_flat );
-			log( "nquad_smooth: " + metaData.nquad_smooth );
-			log( "nquad_flat_uv: " + metaData.nquad_flat_uv );
-			log( "nquad_smooth_uv: " + metaData.nquad_smooth_uv );
+			console.log( "nquad_flat: " + metaData.nquad_flat );
+			console.log( "nquad_smooth: " + metaData.nquad_smooth );
+			console.log( "nquad_flat_uv: " + metaData.nquad_flat_uv );
+			console.log( "nquad_smooth_uv: " + metaData.nquad_smooth_uv );
 
 			var total = metaData.header_bytes
 					  + metaData.nvertices * metaData.vertex_coordinate_bytes * 3
@@ -330,8 +316,8 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 					  + metaData.nquad_smooth * ( metaData.vertex_index_bytes*4 + metaData.material_index_bytes + metaData.normal_index_bytes*4 )
 					  + metaData.nquad_flat_uv * ( metaData.vertex_index_bytes*4 + metaData.material_index_bytes + metaData.uv_index_bytes*4 )
 					  + metaData.nquad_smooth_uv * ( metaData.vertex_index_bytes*4 + metaData.material_index_bytes + metaData.normal_index_bytes*4 + metaData.uv_index_bytes*4 );
-			log( "total bytes: " + total );
-			*/
+			console.log( "total bytes: " + total );
+*/
 
 			return metaData;
 
@@ -339,358 +325,385 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 
 		function parseString( data, offset, length ) {
 
-			return data.substr( offset, length );
+			var charArray = new Uint8Array( data, offset, length );
 
-		};
+			var text = "";
 
-		function parseFloat32( data, offset ) {
+			for ( var i = 0; i < length; i ++ ) {
 
-			var b3 = parseUChar8( data, offset ),
-				b2 = parseUChar8( data, offset + 1 ),
-				b1 = parseUChar8( data, offset + 2 ),
-				b0 = parseUChar8( data, offset + 3 ),
+				text += String.fromCharCode( charArray[ offset + i ] );
 
-				sign = 1 - ( 2 * ( b0 >> 7 ) ),
-				exponent = ((( b0 << 1 ) & 0xff) | ( b1 >> 7 )) - 127,
-				mantissa = (( b1 & 0x7f ) << 16) | (b2 << 8) | b3;
+			}
 
-				if (mantissa == 0 && exponent == -127)
-					return 0.0;
-
-				return sign * ( 1 + mantissa * Math.pow( 2, -23 ) ) * Math.pow( 2, exponent );
-
-		};
-
-		function parseUInt32( data, offset ) {
-
-			var b0 = parseUChar8( data, offset ),
-				b1 = parseUChar8( data, offset + 1 ),
-				b2 = parseUChar8( data, offset + 2 ),
-				b3 = parseUChar8( data, offset + 3 );
-
-			return (b3 << 24) + (b2 << 16) + (b1 << 8) + b0;
-
-		};
-
-		function parseUInt16( data, offset ) {
-
-			var b0 = parseUChar8( data, offset ),
-				b1 = parseUChar8( data, offset + 1 );
-
-			return (b1 << 8) + b0;
-
-		};
-
-		function parseSChar8( data, offset ) {
-
-			var b = parseUChar8( data, offset );
-			return b > 127 ? b - 256 : b;
+			return text;
 
 		};
 
 		function parseUChar8( data, offset ) {
 
-			return data.charCodeAt( offset ) & 0xff;
+			var charArray = new Uint8Array( data, offset, 1 );
+
+			return charArray[ 0 ];
+
+		};
+
+		function parseUInt32( data, offset ) {
+
+			var intArray = new Uint32Array( data, offset, 1 );
+
+			return intArray[ 0 ];
 
 		};
 
 		function init_vertices( start ) {
 
-			var i, x, y, z,
-				stride = md.vertex_coordinate_bytes * 3,
-				end = start + md.nvertices * stride;
+			var nElements = md.nvertices;
 
-			for( i = start; i < end; i += stride ) {
+			var coordArray = new Float32Array( data, start, nElements * 3 );
 
-				x = parseFloat32( data, i );
-				y = parseFloat32( data, i + md.vertex_coordinate_bytes );
-				z = parseFloat32( data, i + md.vertex_coordinate_bytes*2 );
+			var i, x, y, z;
+
+			for( i = 0; i < nElements; i ++ ) {
+
+				x = coordArray[ i * 3 ];
+				y = coordArray[ i * 3 + 1 ];
+				z = coordArray[ i * 3 + 2 ];
 
 				vertex( scope, x, y, z );
 
 			}
 
-			return md.nvertices * stride;
+			return nElements * 3 * Float32Array.BYTES_PER_ELEMENT;
 
 		};
 
 		function init_normals( start ) {
 
-			var i, x, y, z,
-				stride = md.normal_coordinate_bytes * 3,
-				end = start + md.nnormals * stride;
+			var nElements = md.nnormals;
 
-			for( i = start; i < end; i += stride ) {
+			if ( nElements ) {
 
-				x = parseSChar8( data, i );
-				y = parseSChar8( data, i + md.normal_coordinate_bytes );
-				z = parseSChar8( data, i + md.normal_coordinate_bytes*2 );
+				var normalArray = new Int8Array( data, start, nElements * 3 );
 
-				normals.push( x/127, y/127, z/127 );
+				var i, x, y, z;
+
+				for( i = 0; i < nElements; i ++ ) {
+
+					x = normalArray[ i * 3 ];
+					y = normalArray[ i * 3 + 1 ];
+					z = normalArray[ i * 3 + 2 ];
+
+					normals.push( x/127, y/127, z/127 );
+
+				}
 
 			}
 
-			return md.nnormals * stride;
+			return nElements * 3 * Int8Array.BYTES_PER_ELEMENT;
 
 		};
 
 		function init_uvs( start ) {
 
-			var i, u, v,
-				stride = md.uv_coordinate_bytes * 2,
-				end = start + md.nuvs * stride;
+			var nElements = md.nuvs;
 
-			for( i = start; i < end; i += stride ) {
+			if ( nElements ) {
 
-				u = parseFloat32( data, i );
-				v = parseFloat32( data, i + md.uv_coordinate_bytes );
+				var uvArray = new Float32Array( data, start, nElements * 2 );
 
-				uvs.push( u, v );
+				var i, u, v;
+
+				for( i = 0; i < nElements; i ++ ) {
+
+					u = uvArray[ i * 2 ];
+					v = uvArray[ i * 2 + 1 ];
+
+					uvs.push( u, v );
+
+				}
 
 			}
 
-			return md.nuvs * stride;
+			return nElements * 2 * Float32Array.BYTES_PER_ELEMENT;
 
 		};
 
-		function add_tri( i ) {
+		function init_uvs3( nElements, offset ) {
 
-			var a, b, c, m;
+			var i, uva, uvb, uvc, u1, u2, u3, v1, v2, v3;
 
-			a = parseUInt32( data, i );
-			b = parseUInt32( data, i + tri_b );
-			c = parseUInt32( data, i + tri_c );
+			var uvIndexBuffer = new Uint32Array( data, offset, 3 * nElements );
 
-			m = parseUInt16( data, i + tri_m );
+			for( i = 0; i < nElements; i ++ ) {
 
-			f3( scope, a, b, c, m );
+				uva = uvIndexBuffer[ i * 3 ];
+				uvb = uvIndexBuffer[ i * 3 + 1 ];
+				uvc = uvIndexBuffer[ i * 3 + 2 ];
 
-		};
+				u1 = uvs[ uva*2 ];
+				v1 = uvs[ uva*2 + 1 ];
 
-		function add_tri_n( i ) {
+				u2 = uvs[ uvb*2 ];
+				v2 = uvs[ uvb*2 + 1 ];
 
-			var a, b, c, m, na, nb, nc;
+				u3 = uvs[ uvc*2 ];
+				v3 = uvs[ uvc*2 + 1 ];
 
-			a  = parseUInt32( data, i );
-			b  = parseUInt32( data, i + tri_b );
-			c  = parseUInt32( data, i + tri_c );
+				uv3( scope.faceVertexUvs[ 0 ], u1, v1, u2, v2, u3, v3 );
 
-			m  = parseUInt16( data, i + tri_m );
-
-			na = parseUInt32( data, i + tri_na );
-			nb = parseUInt32( data, i + tri_nb );
-			nc = parseUInt32( data, i + tri_nc );
-
-			f3n( scope, normals, a, b, c, m, na, nb, nc );
+			}
 
 		};
 
-		function add_quad( i ) {
+		function init_uvs4( nElements, offset ) {
 
-			var a, b, c, d, m;
+			var i, uva, uvb, uvc, uvd, u1, u2, u3, u4, v1, v2, v3, v4;
 
-			a = parseUInt32( data, i );
-			b = parseUInt32( data, i + quad_b );
-			c = parseUInt32( data, i + quad_c );
-			d = parseUInt32( data, i + quad_d );
+			var uvIndexBuffer = new Uint32Array( data, offset, 4 * nElements );
 
-			m = parseUInt16( data, i + quad_m );
+			for( i = 0; i < nElements; i ++ ) {
 
-			f4( scope, a, b, c, d, m );
+				uva = uvIndexBuffer[ i * 4 ];
+				uvb = uvIndexBuffer[ i * 4 + 1 ];
+				uvc = uvIndexBuffer[ i * 4 + 2 ];
+				uvd = uvIndexBuffer[ i * 4 + 3 ];
 
-		};
+				u1 = uvs[ uva*2 ];
+				v1 = uvs[ uva*2 + 1 ];
 
-		function add_quad_n( i ) {
+				u2 = uvs[ uvb*2 ];
+				v2 = uvs[ uvb*2 + 1 ];
 
-			var a, b, c, d, m, na, nb, nc, nd;
+				u3 = uvs[ uvc*2 ];
+				v3 = uvs[ uvc*2 + 1 ];
 
-			a  = parseUInt32( data, i );
-			b  = parseUInt32( data, i + quad_b );
-			c  = parseUInt32( data, i + quad_c );
-			d  = parseUInt32( data, i + quad_d );
+				u4 = uvs[ uvd*2 ];
+				v4 = uvs[ uvd*2 + 1 ];
 
-			m  = parseUInt16( data, i + quad_m );
+				uv4( scope.faceVertexUvs[ 0 ], u1, v1, u2, v2, u3, v3, u4, v4 );
 
-			na = parseUInt32( data, i + quad_na );
-			nb = parseUInt32( data, i + quad_nb );
-			nc = parseUInt32( data, i + quad_nc );
-			nd = parseUInt32( data, i + quad_nd );
-
-			f4n( scope, normals, a, b, c, d, m, na, nb, nc, nd );
+			}
 
 		};
 
-		function add_uv3( i ) {
+		function init_faces3_flat( nElements, offsetVertices, offsetMaterials ) {
 
-			var uva, uvb, uvc, u1, u2, u3, v1, v2, v3;
+			var i, a, b, c, m;
 
-			uva = parseUInt32( data, i );
-			uvb = parseUInt32( data, i + tri_uvb );
-			uvc = parseUInt32( data, i + tri_uvc );
+			var vertexIndexBuffer = new Uint32Array( data, offsetVertices, 3 * nElements );
+			var materialIndexBuffer = new Uint16Array( data, offsetMaterials, nElements );
 
-			u1 = uvs[ uva*2 ];
-			v1 = uvs[ uva*2 + 1 ];
+			for( i = 0; i < nElements; i ++ ) {
 
-			u2 = uvs[ uvb*2 ];
-			v2 = uvs[ uvb*2 + 1 ];
+				a = vertexIndexBuffer[ i * 3 ];
+				b = vertexIndexBuffer[ i * 3 + 1 ];
+				c = vertexIndexBuffer[ i * 3 + 2 ];
 
-			u3 = uvs[ uvc*2 ];
-			v3 = uvs[ uvc*2 + 1 ];
+				m = materialIndexBuffer[ i ];
 
-			uv3( scope.faceVertexUvs[ 0 ], u1, v1, u2, v2, u3, v3 );
+				f3( scope, a, b, c, m );
+
+			}
 
 		};
 
-		function add_uv4( i ) {
+		function init_faces4_flat( nElements, offsetVertices, offsetMaterials ) {
 
-			var uva, uvb, uvc, uvd, u1, u2, u3, u4, v1, v2, v3, v4;
+			var i, a, b, c, d, m;
 
-			uva = parseUInt32( data, i );
-			uvb = parseUInt32( data, i + quad_uvb );
-			uvc = parseUInt32( data, i + quad_uvc );
-			uvd = parseUInt32( data, i + quad_uvd );
+			var vertexIndexBuffer = new Uint32Array( data, offsetVertices, 4 * nElements );
+			var materialIndexBuffer = new Uint16Array( data, offsetMaterials, nElements );
 
-			u1 = uvs[ uva*2 ];
-			v1 = uvs[ uva*2 + 1 ];
+			for( i = 0; i < nElements; i ++ ) {
 
-			u2 = uvs[ uvb*2 ];
-			v2 = uvs[ uvb*2 + 1 ];
+				a = vertexIndexBuffer[ i * 4 ];
+				b = vertexIndexBuffer[ i * 4 + 1 ];
+				c = vertexIndexBuffer[ i * 4 + 2 ];
+				d = vertexIndexBuffer[ i * 4 + 3 ];
 
-			u3 = uvs[ uvc*2 ];
-			v3 = uvs[ uvc*2 + 1 ];
+				m = materialIndexBuffer[ i ];
 
-			u4 = uvs[ uvd*2 ];
-			v4 = uvs[ uvd*2 + 1 ];
+				f4( scope, a, b, c, d, m );
 
-			uv4( scope.faceVertexUvs[ 0 ], u1, v1, u2, v2, u3, v3, u4, v4 );
+			}
+
+		};
+
+		function init_faces3_smooth( nElements, offsetVertices, offsetNormals, offsetMaterials ) {
+
+			var i, a, b, c, m;
+			var na, nb, nc;
+
+			var vertexIndexBuffer = new Uint32Array( data, offsetVertices, 3 * nElements );
+			var normalIndexBuffer = new Uint32Array( data, offsetNormals, 3 * nElements );
+			var materialIndexBuffer = new Uint16Array( data, offsetMaterials, nElements );
+
+			for( i = 0; i < nElements; i ++ ) {
+
+				a = vertexIndexBuffer[ i * 3 ];
+				b = vertexIndexBuffer[ i * 3 + 1 ];
+				c = vertexIndexBuffer[ i * 3 + 2 ];
+
+				na = normalIndexBuffer[ i * 3 ];
+				nb = normalIndexBuffer[ i * 3 + 1 ];
+				nc = normalIndexBuffer[ i * 3 + 2 ];
+
+				m = materialIndexBuffer[ i ];
+
+				f3n( scope, normals, a, b, c, m, na, nb, nc );
+
+			}
+
+		};
+
+		function init_faces4_smooth( nElements, offsetVertices, offsetNormals, offsetMaterials ) {
+
+			var i, a, b, c, d, m;
+			var na, nb, nc, nd;
+
+			var vertexIndexBuffer = new Uint32Array( data, offsetVertices, 4 * nElements );
+			var normalIndexBuffer = new Uint32Array( data, offsetNormals, 4 * nElements );
+			var materialIndexBuffer = new Uint16Array( data, offsetMaterials, nElements );
+
+			for( i = 0; i < nElements; i ++ ) {
+
+				a = vertexIndexBuffer[ i * 4 ];
+				b = vertexIndexBuffer[ i * 4 + 1 ];
+				c = vertexIndexBuffer[ i * 4 + 2 ];
+				d = vertexIndexBuffer[ i * 4 + 3 ];
+
+				na = normalIndexBuffer[ i * 4 ];
+				nb = normalIndexBuffer[ i * 4 + 1 ];
+				nc = normalIndexBuffer[ i * 4 + 2 ];
+				nd = normalIndexBuffer[ i * 4 + 3 ];
+
+				m = materialIndexBuffer[ i ];
+
+				f4n( scope, normals, a, b, c, d, m, na, nb, nc, nd );
+
+			}
 
 		};
 
 		function init_triangles_flat( start ) {
 
-			var i, stride = md.vertex_index_bytes * 3 + md.material_index_bytes,
-				end = start + md.ntri_flat * stride;
+			var nElements = md.ntri_flat;
 
-			for( i = start; i < end; i += stride ) {
+			if ( nElements ) {
 
-				add_tri( i );
+				var offsetMaterials = start + nElements * Uint32Array.BYTES_PER_ELEMENT * 3;
+				init_faces3_flat( nElements, start, offsetMaterials );
 
 			}
 
-			return end - start;
-
-		}
+		};
 
 		function init_triangles_flat_uv( start ) {
 
-			var i, offset = md.vertex_index_bytes * 3 + md.material_index_bytes,
-				stride = offset + md.uv_index_bytes * 3,
-				end = start + md.ntri_flat_uv * stride;
+			var nElements = md.ntri_flat_uv;
 
-			for( i = start; i < end; i += stride ) {
+			if ( nElements ) {
 
-				add_tri( i );
-				add_uv3( i + offset );
+				var offsetUvs = start + nElements * Uint32Array.BYTES_PER_ELEMENT * 3;
+				var offsetMaterials = offsetUvs + nElements * Uint32Array.BYTES_PER_ELEMENT * 3;
+
+				init_faces3_flat( nElements, start, offsetMaterials );
+				init_uvs3( nElements, offsetUvs );
 
 			}
-
-			return end - start;
 
 		};
 
 		function init_triangles_smooth( start ) {
 
-			var i, stride = md.vertex_index_bytes * 3 + md.material_index_bytes + md.normal_index_bytes * 3,
-				end = start + md.ntri_smooth * stride;
+			var nElements = md.ntri_smooth;
 
-			for( i = start; i < end; i += stride ) {
+			if ( nElements ) {
 
-				add_tri_n( i );
+				var offsetNormals = start + nElements * Uint32Array.BYTES_PER_ELEMENT * 3;
+				var offsetMaterials = offsetNormals + nElements * Uint32Array.BYTES_PER_ELEMENT * 3;
+
+				init_faces3_smooth( nElements, start, offsetNormals, offsetMaterials );
 
 			}
-
-			return end - start;
 
 		};
 
 		function init_triangles_smooth_uv( start ) {
 
-			var i, offset = md.vertex_index_bytes * 3 + md.material_index_bytes + md.normal_index_bytes * 3,
-				stride = offset + md.uv_index_bytes * 3,
-				end = start + md.ntri_smooth_uv * stride;
+			var nElements = md.ntri_smooth_uv;
 
-			for( i = start; i < end; i += stride ) {
+			if ( nElements ) {
 
-				add_tri_n( i );
-				add_uv3( i + offset );
+				var offsetNormals = start + nElements * Uint32Array.BYTES_PER_ELEMENT * 3;
+				var offsetUvs = offsetNormals + nElements * Uint32Array.BYTES_PER_ELEMENT * 3;
+				var offsetMaterials = offsetUvs + nElements * Uint32Array.BYTES_PER_ELEMENT * 3;
+
+				init_faces3_smooth( nElements, start, offsetNormals, offsetMaterials );
+				init_uvs3( nElements, offsetUvs );
 
 			}
-
-			return end - start;
 
 		};
 
 		function init_quads_flat( start ) {
 
-			var i, stride = md.vertex_index_bytes * 4 + md.material_index_bytes,
-				end = start + md.nquad_flat * stride;
+			var nElements = md.nquad_flat;
 
-			for( i = start; i < end; i += stride ) {
+			if ( nElements ) {
 
-				add_quad( i );
+				var offsetMaterials = start + nElements * Uint32Array.BYTES_PER_ELEMENT * 4;
+				init_faces4_flat( nElements, start, offsetMaterials );
 
 			}
-
-			return end - start;
 
 		};
 
 		function init_quads_flat_uv( start ) {
 
-			var i, offset = md.vertex_index_bytes * 4 + md.material_index_bytes,
-				stride = offset + md.uv_index_bytes * 4,
-				end = start + md.nquad_flat_uv * stride;
+			var nElements = md.nquad_flat_uv;
 
-			for( i = start; i < end; i += stride ) {
+			if ( nElements ) {
 
-				add_quad( i );
-				add_uv4( i + offset );
+				var offsetUvs = start + nElements * Uint32Array.BYTES_PER_ELEMENT * 4;
+				var offsetMaterials = offsetUvs + nElements * Uint32Array.BYTES_PER_ELEMENT * 4;
+
+				init_faces4_flat( nElements, start, offsetMaterials );
+				init_uvs4( nElements, offsetUvs );
 
 			}
-
-			return end - start;
 
 		};
 
 		function init_quads_smooth( start ) {
 
-			var i, stride = md.vertex_index_bytes * 4 + md.material_index_bytes + md.normal_index_bytes * 4,
-				end = start + md.nquad_smooth * stride;
+			var nElements = md.nquad_smooth;
 
-			for( i = start; i < end; i += stride ) {
+			if ( nElements ) {
 
-				add_quad_n( i );
+				var offsetNormals = start + nElements * Uint32Array.BYTES_PER_ELEMENT * 4;
+				var offsetMaterials = offsetNormals + nElements * Uint32Array.BYTES_PER_ELEMENT * 4;
+
+				init_faces4_smooth( nElements, start, offsetNormals, offsetMaterials );
 
 			}
-
-			return end - start;
 
 		};
 
 		function init_quads_smooth_uv( start ) {
 
-			var i, offset = md.vertex_index_bytes * 4 + md.material_index_bytes + md.normal_index_bytes * 4,
-				stride = offset + md.uv_index_bytes * 4,
-				end = start + md.nquad_smooth_uv * stride;
+			var nElements = md.nquad_smooth_uv;
 
-			for( i = start; i < end; i += stride ) {
+			if ( nElements ) {
 
-				add_quad_n( i );
-				add_uv4( i + offset );
+				var offsetNormals = start + nElements * Uint32Array.BYTES_PER_ELEMENT * 4;
+				var offsetUvs = offsetNormals + nElements * Uint32Array.BYTES_PER_ELEMENT * 4;
+				var offsetMaterials = offsetUvs + nElements * Uint32Array.BYTES_PER_ELEMENT * 4;
+
+				init_faces4_smooth( nElements, start, offsetNormals, offsetMaterials );
+				init_uvs4( nElements, offsetUvs );
 
 			}
-
-			return end - start;
 
 		};
 

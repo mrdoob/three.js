@@ -1098,6 +1098,60 @@ def convert_ascii(infile, morphfiles, colorfiles, outfile):
 # #############################################################################
 # API - Binary converter
 # #############################################################################
+def dump_materials_to_buffer(faces, buffer):
+    for f in faces:
+        data = struct.pack('<H',
+                            f['material'])
+        buffer.append(data)
+
+def dump_vertices3_to_buffer(faces, buffer):
+    for f in faces:
+        vi = f['vertex']
+        data = struct.pack('<III',
+                            vi[0]-1, vi[1]-1, vi[2]-1)
+        buffer.append(data)
+
+def dump_vertices4_to_buffer(faces, buffer):
+    for f in faces:
+        vi = f['vertex']
+        data = struct.pack('<IIII',
+                            vi[0]-1, vi[1]-1, vi[2]-1, vi[3]-1)
+        buffer.append(data)
+
+def dump_normals3_to_buffer(faces, buffer):
+    for f in faces:
+        ni = f['normal']
+        data = struct.pack('<III',
+                            ni[0]-1, ni[1]-1, ni[2]-1)
+        buffer.append(data)
+
+def dump_normals4_to_buffer(faces, buffer):
+    for f in faces:
+        ni = f['normal']
+        data = struct.pack('<IIII',
+                            ni[0]-1, ni[1]-1, ni[2]-1, ni[3]-1)
+        buffer.append(data)
+
+def dump_uvs3_to_buffer(faces, buffer):
+    for f in faces:
+        ui = f['uv']
+        data = struct.pack('<III',
+                            ui[0]-1, ui[1]-1, ui[2]-1)
+        buffer.append(data)
+
+def dump_uvs4_to_buffer(faces, buffer):
+    for f in faces:
+        ui = f['uv']
+        data = struct.pack('<IIII',
+                            ui[0]-1, ui[1]-1, ui[2]-1, ui[3]-1)
+        buffer.append(data)
+
+def add_padding(buffer, n):
+    if n % 4:
+        for i in range(4 - n % 4):
+            data = struct.pack('<B', 0)
+            buffer.append(data)
+
 def convert_binary(infile, outfile):
     """Convert infile.obj to outfile.js + outfile.bin
     """
@@ -1156,12 +1210,12 @@ def convert_binary(infile, outfile):
 
     # header
     # ------
-    header_bytes  = struct.calcsize('<8s')
+    header_bytes  = struct.calcsize('<12s')
     header_bytes += struct.calcsize('<BBBBBBBB')
     header_bytes += struct.calcsize('<IIIIIIIIIII')
 
     # signature
-    signature = struct.pack('<8s', 'Three.js')
+    signature = struct.pack('<12s', 'Three.js 003')
 
     # metadata (all data is little-endian)
     vertex_coordinate_bytes = 4
@@ -1192,6 +1246,16 @@ def convert_binary(infile, outfile):
                                uv_index_bytes,
                                material_index_bytes)
 
+    ntri_flat = len(sfaces['triangles_flat'])
+    ntri_smooth = len(sfaces['triangles_smooth'])
+    ntri_flat_uv = len(sfaces['triangles_flat_uv'])
+    ntri_smooth_uv = len(sfaces['triangles_smooth_uv'])
+
+    nquad_flat = len(sfaces['quads_flat'])
+    nquad_smooth = len(sfaces['quads_smooth'])
+    nquad_flat_uv = len(sfaces['quads_flat_uv'])
+    nquad_smooth_uv = len(sfaces['quads_smooth_uv'])
+
     # nvertices       unsigned int    4
     # nnormals        unsigned int    4
     # nuvs            unsigned int    4
@@ -1208,14 +1272,14 @@ def convert_binary(infile, outfile):
     ndata = struct.pack('<IIIIIIIIIII', len(vertices),
                                nnormals,
                                len(uvs),
-                               len(sfaces['triangles_flat']),
-                               len(sfaces['triangles_smooth']),
-                               len(sfaces['triangles_flat_uv']),
-                               len(sfaces['triangles_smooth_uv']),
-                               len(sfaces['quads_flat']),
-                               len(sfaces['quads_smooth']),
-                               len(sfaces['quads_flat_uv']),
-                               len(sfaces['quads_smooth_uv']))
+                               ntri_flat,
+                               ntri_smooth,
+                               ntri_flat_uv,
+                               ntri_smooth_uv,
+                               nquad_flat,
+                               nquad_smooth,
+                               nquad_flat_uv,
+                               nquad_smooth_uv)
     buffer.append(signature)
     buffer.append(bdata)
     buffer.append(ndata)
@@ -1242,6 +1306,8 @@ def convert_binary(infile, outfile):
                                        math.floor(n[2]*127+0.5))
             buffer.append(data)
 
+        add_padding(buffer, nnormals * 3)
+
     # 3. uvs
     # -----------
     # u float   4
@@ -1250,131 +1316,135 @@ def convert_binary(infile, outfile):
         data = struct.pack('<ff', uv[0], 1.0-uv[1])
         buffer.append(data)
 
-    # 4. flat triangles
+    # padding
+    #data = struct.pack('<BB', 0, 0)
+    #buffer.append(data)
+
+    # 4. flat triangles (vertices + materials)
     # ------------------
     # a unsigned int   4
     # b unsigned int   4
     # c unsigned int   4
+    # ------------------
     # m unsigned short 2
-    for f in sfaces['triangles_flat']:
-        vi = f['vertex']
-        data = struct.pack('<IIIH',
-                            vi[0]-1, vi[1]-1, vi[2]-1,
-                            f['material'])
-        buffer.append(data)
 
-    # 5. smooth triangles
+    dump_vertices3_to_buffer(sfaces['triangles_flat'], buffer)
+
+    dump_materials_to_buffer(sfaces['triangles_flat'], buffer)
+    add_padding(buffer, ntri_flat * 2)
+
+    # 5. smooth triangles (vertices + materials + normals)
     # -------------------
     # a  unsigned int   4
     # b  unsigned int   4
     # c  unsigned int   4
-    # m  unsigned short 2
+    # -------------------
     # na unsigned int   4
     # nb unsigned int   4
     # nc unsigned int   4
-    for f in sfaces['triangles_smooth']:
-        vi = f['vertex']
-        ni = f['normal']
-        data = struct.pack('<IIIHIII',
-                            vi[0]-1, vi[1]-1, vi[2]-1,
-                            f['material'],
-                            ni[0]-1, ni[1]-1, ni[2]-1)
-        buffer.append(data)
+    # -------------------
+    # m  unsigned short 2
 
-    # 6. flat triangles uv
+    dump_vertices3_to_buffer(sfaces['triangles_smooth'], buffer)
+    dump_normals3_to_buffer(sfaces['triangles_smooth'], buffer)
+
+    dump_materials_to_buffer(sfaces['triangles_smooth'], buffer)
+    add_padding(buffer, ntri_smooth * 2)
+
+    # 6. flat triangles uv (vertices + materials + uvs)
     # --------------------
     # a  unsigned int    4
     # b  unsigned int    4
     # c  unsigned int    4
-    # m  unsigned short  2
+    # --------------------
     # ua unsigned int    4
     # ub unsigned int    4
     # uc unsigned int    4
-    for f in sfaces['triangles_flat_uv']:
-        vi = f['vertex']
-        ui = f['uv']
-        data = struct.pack('<IIIHIII',
-                            vi[0]-1, vi[1]-1, vi[2]-1,
-                            f['material'],
-                            ui[0]-1, ui[1]-1, ui[2]-1)
-        buffer.append(data)
+    # --------------------
+    # m  unsigned short  2
 
-    # 7. smooth triangles uv
+    dump_vertices3_to_buffer(sfaces['triangles_flat_uv'], buffer)
+    dump_uvs3_to_buffer(sfaces['triangles_flat_uv'], buffer)
+
+    dump_materials_to_buffer(sfaces['triangles_flat_uv'], buffer)
+    add_padding(buffer, ntri_flat_uv * 2)
+
+    # 7. smooth triangles uv (vertices + materials + normals + uvs)
     # ----------------------
     # a  unsigned int    4
     # b  unsigned int    4
     # c  unsigned int    4
-    # m  unsigned short  2
+    # --------------------
     # na unsigned int    4
     # nb unsigned int    4
     # nc unsigned int    4
+    # --------------------
     # ua unsigned int    4
     # ub unsigned int    4
     # uc unsigned int    4
-    for f in sfaces['triangles_smooth_uv']:
-        vi = f['vertex']
-        ni = f['normal']
-        ui = f['uv']
-        data = struct.pack('<IIIHIIIIII',
-                            vi[0]-1, vi[1]-1, vi[2]-1,
-                            f['material'],
-                            ni[0]-1, ni[1]-1, ni[2]-1,
-                            ui[0]-1, ui[1]-1, ui[2]-1)
-        buffer.append(data)
+    # --------------------
+    # m  unsigned short  2
 
-    # 8. flat quads
+    dump_vertices3_to_buffer(sfaces['triangles_smooth_uv'], buffer)
+    dump_normals3_to_buffer(sfaces['triangles_smooth_uv'], buffer)
+    dump_uvs3_to_buffer(sfaces['triangles_smooth_uv'], buffer)
+
+    dump_materials_to_buffer(sfaces['triangles_smooth_uv'], buffer)
+    add_padding(buffer, ntri_smooth_uv * 2)
+
+    # 8. flat quads (vertices + materials)
     # ------------------
     # a unsigned int   4
     # b unsigned int   4
     # c unsigned int   4
     # d unsigned int   4
+    # --------------------
     # m unsigned short 2
-    for f in sfaces['quads_flat']:
-        vi = f['vertex']
-        data = struct.pack('<IIIIH',
-                            vi[0]-1, vi[1]-1, vi[2]-1, vi[3]-1,
-                            f['material'])
-        buffer.append(data)
 
-    # 9. smooth quads
+    dump_vertices4_to_buffer(sfaces['quads_flat'], buffer)
+
+    dump_materials_to_buffer(sfaces['quads_flat'], buffer)
+    add_padding(buffer, nquad_flat * 2)
+
+    # 9. smooth quads (vertices + materials + normals)
     # -------------------
     # a  unsigned int   4
     # b  unsigned int   4
     # c  unsigned int   4
     # d  unsigned int   4
-    # m  unsigned short 2
+    # --------------------
     # na unsigned int   4
     # nb unsigned int   4
     # nc unsigned int   4
     # nd unsigned int   4
-    for f in sfaces['quads_smooth']:
-        vi = f['vertex']
-        ni = f['normal']
-        data = struct.pack('<IIIIHIIII',
-                            vi[0]-1, vi[1]-1, vi[2]-1, vi[3]-1,
-                            f['material'],
-                            ni[0]-1, ni[1]-1, ni[2]-1, ni[3]-1)
-        buffer.append(data)
+    # --------------------
+    # m  unsigned short 2
 
-    # 10. flat quads uv
+    dump_vertices4_to_buffer(sfaces['quads_smooth'], buffer)
+    dump_normals4_to_buffer(sfaces['quads_smooth'], buffer)
+
+    dump_materials_to_buffer(sfaces['quads_smooth'], buffer)
+    add_padding(buffer, nquad_smooth * 2)
+
+    # 10. flat quads uv (vertices + materials + uvs)
     # ------------------
     # a unsigned int   4
     # b unsigned int   4
     # c unsigned int   4
     # d unsigned int   4
-    # m unsigned short 2
+    # --------------------
     # ua unsigned int  4
     # ub unsigned int  4
     # uc unsigned int  4
     # ud unsigned int  4
-    for f in sfaces['quads_flat_uv']:
-        vi = f['vertex']
-        ui = f['uv']
-        data = struct.pack('<IIIIHIIII',
-                            vi[0]-1, vi[1]-1, vi[2]-1, vi[3]-1,
-                            f['material'],
-                            ui[0]-1, ui[1]-1, ui[2]-1, ui[3]-1)
-        buffer.append(data)
+    # --------------------
+    # m unsigned short 2
+
+    dump_vertices4_to_buffer(sfaces['quads_flat_uv'], buffer)
+    dump_uvs4_to_buffer(sfaces['quads_flat_uv'], buffer)
+
+    dump_materials_to_buffer(sfaces['quads_flat_uv'], buffer)
+    add_padding(buffer, nquad_flat_uv * 2)
 
     # 11. smooth quads uv
     # -------------------
@@ -1382,25 +1452,25 @@ def convert_binary(infile, outfile):
     # b  unsigned int   4
     # c  unsigned int   4
     # d  unsigned int   4
-    # m  unsigned short 2
+    # --------------------
     # na unsigned int   4
     # nb unsigned int   4
     # nc unsigned int   4
     # nd unsigned int   4
+    # --------------------
     # ua unsigned int   4
     # ub unsigned int   4
     # uc unsigned int   4
     # ud unsigned int   4
-    for f in sfaces['quads_smooth_uv']:
-        vi = f['vertex']
-        ni = f['normal']
-        ui = f['uv']
-        data = struct.pack('<IIIIHIIIIIIII',
-                            vi[0]-1, vi[1]-1, vi[2]-1, vi[3]-1,
-                            f['material'],
-                            ni[0]-1, ni[1]-1, ni[2]-1, ni[3]-1,
-                            ui[0]-1, ui[1]-1, ui[2]-1, ui[3]-1)
-        buffer.append(data)
+    # --------------------
+    # m  unsigned short 2
+
+    dump_vertices4_to_buffer(sfaces['quads_smooth_uv'], buffer)
+    dump_normals4_to_buffer(sfaces['quads_smooth_uv'], buffer)
+    dump_uvs4_to_buffer(sfaces['quads_smooth_uv'], buffer)
+
+    dump_materials_to_buffer(sfaces['quads_smooth_uv'], buffer)
+    add_padding(buffer, nquad_smooth_uv * 2)
 
     path = os.path.dirname(outfile)
     fname = os.path.join(path, binfile)
