@@ -5463,7 +5463,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.texParameteri( textureType, _gl.TEXTURE_MAG_FILTER, paramThreeToGL( texture.magFilter ) );
 			_gl.texParameteri( textureType, _gl.TEXTURE_MIN_FILTER, paramThreeToGL( texture.minFilter ) );
 
-			_gl.generateMipmap( textureType );
+			return true;
 
 		} else {
 
@@ -5472,6 +5472,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl.texParameteri( textureType, _gl.TEXTURE_MAG_FILTER, filterFallback( texture.magFilter ) );
 			_gl.texParameteri( textureType, _gl.TEXTURE_MIN_FILTER, filterFallback( texture.minFilter ) );
+
+			return false;
 
 		}
 
@@ -5493,6 +5495,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.activeTexture( _gl.TEXTURE0 + slot );
 			_gl.bindTexture( _gl.TEXTURE_2D, texture.__webglTexture );
 
+			var needsMipMaps = setTextureParameters( _gl.TEXTURE_2D, texture, texture.image );
+
 			if ( texture instanceof THREE.DataTexture ) {
 
 				_gl.texImage2D( _gl.TEXTURE_2D, 0, paramThreeToGL( texture.format ), texture.image.width, texture.image.height, 0, paramThreeToGL( texture.format ), _gl.UNSIGNED_BYTE, texture.image.data );
@@ -5503,7 +5507,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			setTextureParameters( _gl.TEXTURE_2D, texture, texture.image );
+			if ( needsMipMaps ) {
+
+				_gl.generateMipmap( _gl.TEXTURE_2D );
+
+			}
 
 			texture.needsUpdate = false;
 
@@ -5533,13 +5541,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 				_gl.activeTexture( _gl.TEXTURE0 + slot );
 				_gl.bindTexture( _gl.TEXTURE_CUBE_MAP, texture.image.__webglTextureCube );
 
+				var needsMipMaps = setTextureParameters( _gl.TEXTURE_CUBE_MAP, texture, texture.image[ 0 ] );
+
 				for ( var i = 0; i < 6; i ++ ) {
 
 					_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, texture.image[ i ] );
 
 				}
 
-				setTextureParameters( _gl.TEXTURE_CUBE_MAP, texture, texture.image[ 0 ] );
+				if ( needsMipMaps ) {
+
+					_gl.generateMipmap( _gl.TEXTURE_CUBE_MAP );
+
+				}
 
 				texture.needsUpdate = false;
 
