@@ -78,34 +78,40 @@ THREE.IcosahedronGeometry = function ( subdivisions ) {
 			f3(a, b, c, tempFaces);
 		}
 		tempScope.faces = tempFaces.faces;
-		//tempScope.uvs = tempFaces.uvs;
+		tempScope.faceVertexUvs[ 0 ] = tempFaces.faceVertexUvs[ 0 ];
 	}
 
 	scope.faces = tempScope.faces;
-	//scope.uvs = tempScope.uvs;
+	scope.faceVertexUvs[ 0 ] = tempScope.faceVertexUvs[ 0 ];
 
 	this.computeCentroids();
-	this.computeFaceNormals();
-	this.computeVertexNormals();
+	this.computeFaceNormals( true );
 
 	function v( x, y, z ) {
+
 		var length = Math.sqrt(x * x + y * y + z * z);
 		var i = scope.vertices.push( new THREE.Vertex( new THREE.Vector3( x/length, y/length, z/length ) ) );
-
-		//var uv = getUv(x, y, z);
-		//temp_uv.push(uv);
 
 		return i-1;
 	}
 
 	function f3( a, b, c, inscope ) {
-		inscope.faces.push( new THREE.Face3( a, b, c ) );
 
-		/*inscope.uvs.push( [new THREE.UV( temp_uv[a].u, temp_uv[a].v ),
-						   new THREE.UV( temp_uv[b].u, temp_uv[b].v ),
-						   new THREE.UV( temp_uv[c].u, temp_uv[c].v )
-						  ] );
-		*/
+		var v1 = scope.vertices[ a ].position;
+		var v2 = scope.vertices[ b ].position;
+		var v3 = scope.vertices[ c ].position;
+
+		var face = new THREE.Face3( a, b, c );
+		face.vertexNormals.push( v1.clone().normalize(), v2.clone().normalize(), v3.clone().normalize() );
+
+		inscope.faces.push( face );
+
+		inscope.faceVertexUvs[ 0 ].push( [
+			new THREE.UV( Math.atan2( v1.z, v1.x ) / Math.PI, v1.y ),
+			new THREE.UV( Math.atan2( v2.z, v2.x ) / Math.PI, v2.y ),
+			new THREE.UV( Math.atan2( v3.z, v3.x ) / Math.PI, v3.y )
+		] );
+
 	}
 
 	function getMiddlePoint(p1,p2) {
@@ -119,54 +125,6 @@ THREE.IcosahedronGeometry = function ( subdivisions ) {
 		var i = v(x, y, z);
 		return i;
 	}
-
-	/*function getUv(x,y,z) {
-
-		var u,v;
-		var px,py,pz,d;
-
-		d = Math.sqrt( x*x+y*y+z*z );
-
-		px = x/d;
-		py = y/d;
-		pz = z/d;
-
-		var normalisedX = 0;
-		var normalisedZ = -1;
-
-		if (((px * px) + (pz * pz)) > 0) {
-			normalisedX = Math.sqrt((px * px) / ((px * px) + (pz * pz)));
-
-			if (px < 0) {
-				normalisedX = -normalisedX;
-			}
-
-			normalisedZ = Math.sqrt((pz * pz) / ((px * px) + (pz * pz)));
-
-			if (pz < 0)	{
-				normalisedZ = -normalisedZ;
-			}
-		}
-
-		if (normalisedZ == 0) {
-			u = ((normalisedX * Math.PI) / 2);
-		} else {
-			u = Math.atan(normalisedX / normalisedZ);
-
-			if (normalisedZ < 0) {
-				u += Math.PI;
-			}
-		}
-
-		if (u < 0) {
-			u += 2 * Math.PI;
-		}
-
-		u /= 2 * Math.PI;
-		v = (-py + 1) / 2;
-
-		return {u:u,v:v};
-	}*/
 
 }
 
