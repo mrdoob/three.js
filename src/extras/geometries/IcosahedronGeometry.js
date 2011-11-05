@@ -107,9 +107,9 @@ THREE.IcosahedronGeometry = function ( subdivisions ) {
 		inscope.faces.push( face );
 
 		inscope.faceVertexUvs[ 0 ].push( [
-			new THREE.UV( Math.atan2( v1.z, v1.x ) / Math.PI, v1.y ),
-			new THREE.UV( Math.atan2( v2.z, v2.x ) / Math.PI, v2.y ),
-			new THREE.UV( Math.atan2( v3.z, v3.x ) / Math.PI, v3.y )
+			new THREE.UV( 1 - ( ( ( Math.atan2( v1.z, v1.x ) + Math.PI ) % Math.PI ) / Math.PI * 0.5 ), 0.5 - v1.y / 2 ),
+			new THREE.UV( 1 - ( ( ( Math.atan2( v2.z, v2.x ) + Math.PI ) % Math.PI ) / Math.PI * 0.5 ), 0.5 - v2.y / 2 ),
+			new THREE.UV( 1 - ( ( ( Math.atan2( v3.z, v3.x ) + Math.PI ) % Math.PI ) / Math.PI * 0.5 ), 0.5 - v3.y / 2 )
 		] );
 
 	}
