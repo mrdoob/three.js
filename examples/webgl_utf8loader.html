@@ -123,7 +123,7 @@
 
 			function callbackModel( geometry, s, color, x, y, z ) {
 
-				var material = new THREE.MeshLambertMaterial( { color: color, map: THREE.ImageUtils.loadTexture( "textures/UV.jpg" ), envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3 } );
+				var material = new THREE.MeshLambertMaterial( { color: color, map: THREE.ImageUtils.loadTexture( "textures/ash_uvgrid01.jpg" ), envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3 } );
 				//material.shading =  THREE.FlatShading;
 
 				var mesh = new THREE.Mesh( geometry, material );
