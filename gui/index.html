@@ -133,13 +133,8 @@
 
 						case 'js':
 
-							var blob = new BlobBuilder();
-							blob.append( contents );
-
-							var url = URL.createObjectURL( blob.getBlob() );
-
 							var loader = new THREE.JSONLoader();
-							loader.load( url, function ( geometry ) {
+							loader.createModel( JSON.parse( contents ), function ( geometry ) {
 
 								geometry.gui = {
 									paremeters: {
@@ -167,8 +162,6 @@
 
 							var loader = new THREE.ColladaLoader();
 							loader.parse( xml, function ( collada ) {
-
-								// console.log( collada );
 
 								signals.added.dispatch( collada.scene );
 
