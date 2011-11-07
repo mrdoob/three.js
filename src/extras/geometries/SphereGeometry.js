@@ -7,8 +7,8 @@ THREE.SphereGeometry = function ( radius, segmentsWidth, segmentsHeight, phiStar
 	THREE.Geometry.call( this );
 
 	var radius = radius || 50;
-	var segmentsX = segmentsWidth || 8;
-	var segmentsY = segmentsHeight || 6;
+	var segmentsX = Math.max( 3, Math.floor( segmentsWidth ) || 8 );
+	var segmentsY = Math.max( 2, Math.floor( segmentsHeight ) || 6 );
 
 	var phiStart = phiStart != undefined ? phiStart : 0;
 	var phiLength = phiLength != undefined ? phiLength : Math.PI * 2;
