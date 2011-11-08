@@ -89,7 +89,7 @@
 				// Spheres
 
 				var geometry = new THREE.SphereGeometry( 100, 16, 8 );
-				var material = new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading } );
+				var material = new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, overdraw: true } );
 
 				for ( var i = 0; i < 30; i ++ ) {
 
@@ -98,15 +98,13 @@
 					mesh.position.y = 500 * ( Math.random() - 0.5 );
 					mesh.position.z = 500 * ( Math.random() - 0.5 );
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = 0.25 * ( Math.random() + 0.5 );
-					mesh.overdraw = true;
 					scene.add( mesh );
 
 				}
 
 				// Torus
 
-				mesh = new THREE.Mesh( new THREE.TorusGeometry( 100, 25, 15, 30 ), new THREE.MeshLambertMaterial( { color: 0xffffff } ) );
-				mesh.overdraw = true;
+				mesh = new THREE.Mesh( new THREE.TorusGeometry( 100, 25, 15, 30 ), new THREE.MeshLambertMaterial( { color: 0xffffff, overdraw: true } ) );
 				scene.add( mesh );
 
 				// Lights
