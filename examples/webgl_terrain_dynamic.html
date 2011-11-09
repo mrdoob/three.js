@@ -383,6 +383,27 @@
 				var vertexShader = document.getElementById( 'vertexShader' ).textContent;
 				var vertexShaderFlip = document.getElementById( 'vertexShaderFlip' ).textContent;
 
+				// TEXTURES
+
+				var specularMap = new THREE.WebGLRenderTarget( 2048, 2048, pars );
+
+				var diffuseTexture1 = THREE.ImageUtils.loadTexture( "textures/terrain/grasslight-big.jpg", null, function () {
+
+					loadTextures();
+					applyShader( THREE.ShaderExtras[ 'luminosity' ], diffuseTexture1, specularMap );
+
+				} );
+
+				var diffuseTexture2 = THREE.ImageUtils.loadTexture( "textures/terrain/backgrounddetailed6.jpg", null, loadTextures );
+				var detailTexture = THREE.ImageUtils.loadTexture( "textures/terrain/grasslight-big-nm.jpg", null, loadTextures );
+
+				diffuseTexture1.wrapS = diffuseTexture1.wrapT = THREE.RepeatWrapping;
+				diffuseTexture2.wrapS = diffuseTexture2.wrapT = THREE.RepeatWrapping;
+				detailTexture.wrapS = detailTexture.wrapT = THREE.RepeatWrapping;
+				specularMap.wrapS = specularMap.wrapT = THREE.RepeatWrapping;
+
+				// TERRAIN SHADER
+
 				var normalShader = THREE.ShaderTerrain[ "terrain" ];
 
 				uniformsNormalMap = THREE.UniformsUtils.clone( normalShader.uniforms );
@@ -392,10 +413,10 @@
 
 				uniformsNormalMap[ "tDisplacement" ].texture = heightMap;
 
-				uniformsNormalMap[ "tDiffuse1" ].texture = THREE.ImageUtils.loadTexture( "textures/terrain/grasslight-big.jpg", null, loadTextures );
-				uniformsNormalMap[ "tDiffuse2" ].texture = THREE.ImageUtils.loadTexture( "textures/terrain/backgrounddetailed6.jpg", null, loadTextures );
-				uniformsNormalMap[ "tSpecular" ].texture = THREE.ImageUtils.loadTexture( "textures/terrain/grasslight-big-specular.jpg", null, loadTextures );
-				uniformsNormalMap[ "tDetail" ].texture = THREE.ImageUtils.loadTexture( "textures/terrain/grasslight-big-nm.jpg", null, loadTextures );
+				uniformsNormalMap[ "tDiffuse1" ].texture = diffuseTexture1;
+				uniformsNormalMap[ "tDiffuse2" ].texture = diffuseTexture2;
+				uniformsNormalMap[ "tSpecular" ].texture = specularMap;
+				uniformsNormalMap[ "tDetail" ].texture = detailTexture;
 
 				uniformsNormalMap[ "enableDiffuse1" ].value = true;
 				uniformsNormalMap[ "enableDiffuse2" ].value = true;
@@ -409,10 +430,6 @@
 
 				uniformsNormalMap[ "uDisplacementScale" ].value = 375;
 
-				uniformsNormalMap[ "tDiffuse1" ].texture.wrapS = uniformsNormalMap[ "tDiffuse1" ].texture.wrapT = THREE.RepeatWrapping;
-				uniformsNormalMap[ "tDiffuse2" ].texture.wrapS = uniformsNormalMap[ "tDiffuse2" ].texture.wrapT = THREE.RepeatWrapping;
-				uniformsNormalMap[ "tDetail" ].texture.wrapS = uniformsNormalMap[ "tDetail" ].texture.wrapT = THREE.RepeatWrapping;
-				uniformsNormalMap[ "tSpecular" ].texture.wrapS = uniformsNormalMap[ "tDetail" ].texture.wrapT = THREE.RepeatWrapping;
 				uniformsNormalMap[ "uRepeatOverlay" ].value.set( 6, 6 );
 
 				var params = [
@@ -492,7 +509,6 @@
 				window.addEventListener( 'resize', onWindowResize, false );
 
 				document.addEventListener( 'keydown', onKeyDown, false );
-				document.addEventListener( 'keyup', onKeyUp, false );
 
 				// COMPOSER
 
@@ -555,7 +571,6 @@
 					morphs.push( meshAnim );
 
 					renderer.initWebGLObjects( scene );
-					renderer.initMaterial( material, scene.lights, scene.fog, meshAnim );
 
 				}
 
@@ -606,7 +621,6 @@
 				// PRE-INIT
 
 				renderer.initWebGLObjects( scene );
-				renderer.initMaterial( mlib[ "terrain" ], scene.lights, scene.fog, terrain );
 
 			}
 
@@ -638,11 +652,27 @@
 
 			};
 
-			function onKeyUp ( event ) {
+			//
 
-				switch( event.keyCode ) {
+			function applyShader( shader, texture, target ) {
 
-				}
+				var shaderMaterial = new THREE.ShaderMaterial( {
+
+					fragmentShader: shader.fragmentShader,
+					vertexShader: shader.vertexShader,
+					uniforms: THREE.UniformsUtils.clone( shader.uniforms )
+
+				} );
+
+				shaderMaterial.uniforms[ "tDiffuse" ].texture = texture;
+
+				var sceneTmp = new THREE.Scene();
+
+				var meshTmp = new THREE.Mesh( new THREE.PlaneGeometry( SCREEN_WIDTH, SCREEN_HEIGHT ), shaderMaterial );
+				meshTmp.position.z = -500;
+				sceneTmp.add( meshTmp );
+
+				renderer.render( sceneTmp, cameraOrtho, target, true );
 
 			};
 
@@ -652,7 +682,7 @@
 
 				textureCounter += 1;
 
-				if ( textureCounter == 4 )	{
+				if ( textureCounter == 3 )	{
 
 					terrain.visible = true;
 
