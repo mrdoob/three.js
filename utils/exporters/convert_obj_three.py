@@ -152,8 +152,8 @@ FRAMESTEP = 1
 
 BAKE_COLORS = False
 
-DECODE = "ascii" #sys.getdefaultencoding()
-ENCODE = "ascii" #sys.getdefaultencoding()
+DECODE = "cp950" #"ascii" #sys.getdefaultencoding()
+ENCODE = "utf-8" #"ascii" #sys.getdefaultencoding()
 
 # default colors for debugging (each material gets one distinct color):
 # white, red, green, blue, yellow, cyan, magenta
@@ -941,6 +941,7 @@ def create_materials(materials, mtlfilename, basename):
 
         path = os.path.dirname(basename)
         fname = os.path.join(path, mtlfilename)
+        fname = unicode(fname, DECODE)
 
         if file_exists(fname):
 
@@ -1452,7 +1453,9 @@ if __name__ == "__main__":
             sys.exit()
 
         elif o in ("-i", "--input"):
-            infile = a
+            infile = unicode(a, DECODE )
+            outfile = u"%s.js" % os.path.splitext(os.path.basename(infile))[0]
+            print(outfile)
 
         elif o in ("-m", "--morphs"):
             morphfiles = a
@@ -1461,7 +1464,7 @@ if __name__ == "__main__":
             colorfiles = a
 
         elif o in ("-o", "--output"):
-            outfile = a
+            outfile = unicode(a, DECODE )
 
         elif o in ("-a", "--align"):
             if a in ("top", "bottom", "center", "centerxz", "none"):
@@ -1509,4 +1512,3 @@ if __name__ == "__main__":
         convert_ascii(infile, morphfiles, colorfiles, outfile)
     elif TYPE == "binary":
         convert_binary(infile, outfile)
-
