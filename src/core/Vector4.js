@@ -169,6 +169,12 @@ THREE.Vector4.prototype = {
 
 		return this;
 
+	},
+
+	toString: function () {
+
+		return [ this.x, this.y, this.z, this.w ].join(' ; ');
+
 	}
 
 };
