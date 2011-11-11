@@ -128,13 +128,12 @@
 				sceneModel = new THREE.Scene();
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff );
-				directionalLight.position.set( 0, 0, 1 );
-				directionalLight.position.normalize();
+				directionalLight.position.set( 0, 0, 1 ).normalize();
 				sceneModel.add( directionalLight );
 
 				loader = new THREE.JSONLoader( true );
 				document.body.appendChild( loader.statusDomElement );
-				loader.load( { model: "obj/leeperrysmith/LeePerrySmith.js", callback: function( geometry ) { createMesh( geometry, sceneModel, 100 ) } } );
+				loader.load( "obj/leeperrysmith/LeePerrySmith.js", function( geometry ) { createMesh( geometry, sceneModel, 100 ) } );
 
 				//
 
@@ -380,7 +379,7 @@
 
 			function render() {
 
-				var time = new Date().getTime() * 0.0004;
+				var time = Date.now() * 0.0004;
 
 				if ( mesh ) mesh.rotation.y = -time;
 

@@ -67,7 +67,7 @@
 				scene = new THREE.Scene();
 
 				var data = generateHeight( 1024, 1024 );
-				var material = new THREE.MeshBasicMaterial( { map: new THREE.Texture( generateTexture( data, 1024, 1024 ) ) } );
+				var material = new THREE.MeshBasicMaterial( { map: new THREE.Texture( generateTexture( data, 1024, 1024 ) ), overdraw: true } );
 
 				var quality = 16, step = 1024 / quality;
 				var plane = new THREE.PlaneGeometry( 2000, 2000, quality - 1, quality - 1 );
@@ -83,7 +83,6 @@
 
 				mesh = new THREE.Mesh( plane, material );
 				mesh.rotation.x = -90 * Math.PI / 180;
-				mesh.overdraw = true;
 				scene.add( mesh );
 
 				renderer = new THREE.CanvasRenderer();
@@ -104,7 +103,7 @@
 
 			function generateHeight( width, height ) {
 
-				var data = Float32Array ? new Float32Array() : [], perlin = new ImprovedNoise(),
+				var data = Float32Array ? new Float32Array( width * height ) : [], perlin = new ImprovedNoise(),
 				size = width * height, quality = 2, z = Math.random() * 100;
 
 				for ( var i = 0; i < size; i ++ ) {

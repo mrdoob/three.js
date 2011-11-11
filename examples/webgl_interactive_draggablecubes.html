@@ -56,6 +56,8 @@
 
 					var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
 
+					object.material.ambient = object.material.color;
+
 					object.position.x = Math.random() * 1000 - 500;
 					object.position.y = Math.random() * 600 - 300;
 					object.position.z = Math.random() * 800 - 400;
@@ -151,10 +153,10 @@
 
 					if ( INTERSECTED != intersects[ 0 ].object ) {
 
-						if ( INTERSECTED ) INTERSECTED.materials[ 0 ].color.setHex( INTERSECTED.currentHex );
+						if ( INTERSECTED ) INTERSECTED.material.color.setHex( INTERSECTED.currentHex );
 
 						INTERSECTED = intersects[ 0 ].object;
-						INTERSECTED.currentHex = INTERSECTED.materials[ 0 ].color.getHex();
+						INTERSECTED.currentHex = INTERSECTED.material.color.getHex();
 
 						plane.position.copy( INTERSECTED.position );
 
@@ -164,7 +166,7 @@
 
 				} else {
 
-					if ( INTERSECTED ) INTERSECTED.materials[ 0 ].color.setHex( INTERSECTED.currentHex );
+					if ( INTERSECTED ) INTERSECTED.material.color.setHex( INTERSECTED.currentHex );
 
 					INTERSECTED = null;
 

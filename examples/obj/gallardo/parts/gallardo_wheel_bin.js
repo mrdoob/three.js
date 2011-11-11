@@ -1,15 +1,16 @@
-// Converted from: gallardo_wheel.obj
-//  vertices: 4434
-//  faces: 4394
-//  materials: 2
-//
-//  Generated with OBJ -> Three.js converter
-//  http://github.com/alteredq/three.js/blob/master/utils/exporters/convert_obj_three.py
+{
 
-
-var model = {
-
-    "version" : 1,
+    "metadata" :
+    {
+        "formatVersion" : 3,
+        "sourceFile"    : "gallardo_wheel.obj",
+        "generatedBy"   : "OBJConverter",
+        "vertices"      : 4434,
+        "faces"         : 4394,
+        "normals"       : 2654,
+        "uvs"           : 0,
+        "materials"     : 2
+    },
 
     "materials": [	{
 	"DbgColor" : 15658734,
@@ -39,7 +40,4 @@ var model = {
 
     "buffers": "gallardo_wheel_bin.bin"
 
-};
-
-postMessage( model );
-close();
+}

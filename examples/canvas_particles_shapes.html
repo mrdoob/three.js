@@ -94,7 +94,7 @@
 				text3d.computeBoundingBox();
 				var centerOffset = -0.5 * ( text3d.boundingBox.x[ 1 ] - text3d.boundingBox.x[ 0 ] );
 
-				var textMaterial = new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, wireframe: false } );
+				var textMaterial = new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, overdraw: true } );
 
 				text = new THREE.Mesh( text3d, textMaterial );
 

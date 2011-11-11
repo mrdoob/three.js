@@ -137,7 +137,7 @@
 			var radius = 100, inner = 0.6 * radius;
 			var geometry = new THREE.Geometry();
 
-			for ( var i = 0; i < 100000; i++ ) {
+			for ( var i = 0; i < 100000; i ++ ) {
 
 				vector = new THREE.Vector3( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 );
 
@@ -161,8 +161,9 @@
 			function addGeo( geo, x, y, z, ry ) {
 
 				m = new THREE.Mesh( geo, dummyMaterial );
-				m.rotation.y = ry;
 				m.position.set( x, y, z );
+				m.rotation.y = ry;
+
 				THREE.GeometryUtils.merge( geometry, m );
 
 			}
@@ -202,7 +203,7 @@
 			var values_size = attributes.size.value;
 			var values_color = attributes.ca.value;
 
-			for( var v = 0; v < vertices.length; v++ ) {
+			for( var v = 0; v < vertices.length; v ++ ) {
 
 				values_size[ v ] = 10;
 				values_color[ v ] = new THREE.Color( 0xffffff );
@@ -220,7 +221,7 @@
 
 			}
 
-			console.log( vertices.length );
+			//console.log( vertices.length );
 
 			scene.add( object );
 
@@ -237,14 +238,6 @@
 
 		}
 
-		function cap( x, a, b ) {
-
-			return ( x < a ) ? a : ( ( x > b ) ? b : x );
-
-		}
-
-		var i, value;
-
 		function animate() {
 
 			requestAnimationFrame( animate );
@@ -256,12 +249,11 @@
 
 		function render() {
 
-			var time = new Date().getTime() * 0.01;
+			var time = Date.now() * 0.01;
 
-			object.rotation.y = 0.02 * time;
-			object.rotation.z = 0.02 * time;
+			object.rotation.y = object.rotation.z = 0.02 * time;
 
-			for( i = 0; i < attributes.size.value.length; i++ ) {
+			for( var i = 0; i < attributes.size.value.length; i ++ ) {
 
 				if ( i < vc1 )
 					attributes.size.value[ i ] = 26 + 32 * Math.sin( 0.1 * i + 0.6 * time );

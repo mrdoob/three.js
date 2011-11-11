@@ -170,7 +170,9 @@ THREE.Vector3.prototype = {
 
 		} else {
 
-			this.set( 0, 0, 0 );
+			this.x = 0;
+			this.y = 0;
+			this.z = 0;
 
 		}
 
@@ -237,13 +239,13 @@ THREE.Vector3.prototype = {
 
 	crossSelf: function ( v ) {
 
-		return this.set(
+		var x = this.x, y = this.y, z = this.z;
 
-			this.y * v.z - this.z * v.y,
-			this.z * v.x - this.x * v.z,
-			this.x * v.y - this.y * v.x
+		this.x = y * v.z - z * v.y;
+		this.y = z * v.x - x * v.z;
+		this.z = x * v.y - y * v.x;
 
-		);
+		return this;
 
 	},
 

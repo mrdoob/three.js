@@ -26,6 +26,40 @@
 		<script src="js/RequestAnimationFrame.js"></script>
 		<script src="js/Stats.js"></script>
 
+		<div style="position: absolute; top: 10px; width: 100%; text-align: center; ">
+			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - Combo Camera<br>
+			View: <a href="#" onclick="setOrthographic();return false;"> Orthographic</a> | 
+				<a href="#" onclick="setPerspective();return false;">Perspective</a><br>
+			Lens: <a href="#" onclick="setLens(12);return false;">12mm</a> | 
+				<a href="#" onclick="setLens(16);return false;">16mm</a> | 
+				<a href="#" onclick="setLens(24);return false;">24mm</a> | 
+				<a href="#" onclick="setLens(35);return false;">35mm</a> | 
+				<a href="#" onclick="setLens(50);return false;">50mm</a> | 
+				<a href="#" onclick="setLens(60);return false;">60mm</a> | 
+				<a href="#" onclick="setLens(85);return false;">85mm</a> | 
+				<a href="#" onclick="setLens(105);return false;">105mm</a><br>
+			Fov: <a href="#" onclick="setFov(30);return false;">30°</a> | 
+				<a href="#" onclick="setFov(50);return false;">50°</a> | 
+				<a href="#" onclick="setFov(70);return false;">70°</a> | 
+				<a href="#" onclick="setFov(100);return false;">100°</a><br>
+			Zoom: <a href="#" onclick="camera.setZoom(0.5);return false;">0.5x</a> |
+					<a href="#" onclick="camera.setZoom(1);return false;">1x</a> |
+					<a href="#" onclick="camera.setZoom(2);return false;">2x</a> |
+					
+				<br/>
+			Views: <a href="#" onclick="camera.toTopView();return false;">Top view</a> |
+				<a href="#" onclick="camera.toBottomView();return false;">Bottom view</a> |
+				<a href="#" onclick="camera.toLeftView();return false;">Left view</a> |
+				<a href="#" onclick="camera.toRightView();return false;">Right view</a> |
+				<a href="#" onclick="camera.toFrontView();return false;">Front view</a> |
+				<a href="#" onclick="camera.toBackView();return false;">Back view</a> |
+				<a href="#" onclick="camera.rotationAutoUpdate = true;return false;">Look at Scene</a>
+				<br/>
+			<div id="fov"></div>
+		</div>
+			
+
+
 		<script>
 
 			var container, stats;
@@ -64,21 +98,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				var info = document.createElement( 'div' );
-				info.style.position = 'absolute';
-				info.style.top = '10px';
-				info.style.width = '100%';
-				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - Combo Camera' +
-				'<br/>View: <a href="#" onclick="setOrthographic();return false;"> Orthographic</a> | <a href="#" onclick="setPerspective();return false;">Perspective</a>' +
-				'<br/>Lens: <a href="#" onclick="setLens(12);return false;">12mm</a> | <a href="#" onclick="setLens(16);return false;">16mm</a> | <a href="#" onclick="setLens(24);return false;">24mm</a> | ' +
-				'<a href="#" onclick="setLens(35);return false;">35mm</a> | <a href="#" onclick="setLens(50);return false;">50mm</a> | <a href="#" onclick="setLens(60);return false;">60mm</a> |' +
-				' <a href="#" onclick="setLens(85);return false;">85mm</a> | <a href="#" onclick="setLens(105);return false;">105mm</a>' +
-				'<br/>Fov: <a href="#" onclick="setFov(30);return false;">30&deg;</a> | <a href="#" onclick="setFov(50);return false;">50&deg;</a> | <a href="#" onclick="setFov(70);return false;">70&deg;</a> | <a href="#" onclick="setFov(100);return false;">100&deg;</a> <br/><div id="fov"/>';
-				container.appendChild( info );
-
-
-				camera = new THREE.CombinedCamera( window.innerWidth, window.innerHeight, 70, 1, 1000, -1000, 1000, 1000 );
+				camera = new THREE.CombinedCamera( window.innerWidth /2, window.innerHeight/2, 70, 1, 1000, -1000, 1000, 1000 );
 
 				camera.position.x = 200;
 				camera.position.y = 100;
@@ -108,7 +128,7 @@
 				// Cubes
 
 				var geometry = new THREE.CubeGeometry( 50, 50, 50 );
-				var material = new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading } );
+				var material = new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, overdraw: true } );
 
 				for ( var i = 0; i < 100; i ++ ) {
 

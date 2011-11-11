@@ -151,7 +151,7 @@
 				};
 
 
-				loader.load( { model: "obj/suzanne/suzanneHi.js", callback: onGeometry } );
+				loader.load( "obj/suzanne/suzanneHi.js", onGeometry );
 
 			}
 
@@ -164,7 +164,7 @@
 				mesh.position = p;
 
 				scene.add( mesh );
-				var mc = THREE.CollisionUtils.MeshColliderWBox(mesh);
+				var mc = THREE.CollisionUtils.MeshColliderWBox( mesh) ;
 				THREE.Collisions.colliders.push( mc );
 				meshes.push( mesh );
 
@@ -187,9 +187,9 @@
 
 				var i, l = meshes.length;
 
-				for ( i = 0; i < l; i++ ) {
+				for ( i = 0; i < l; i ++ ) {
 
-					meshes[ i ].materials[ 0 ].color.setHex( 0x003300 );
+					meshes[ i ].material.color.setHex( 0x003300 );
 
 				}
 
@@ -203,7 +203,7 @@
 				if( c ) {
 
 					//info.innerHTML += "Found @ distance " + c.distance;
-					c.mesh.materials[ 0 ].color.setHex( 0xbb0000 );
+					c.mesh.material.color.setHex( 0xbb0000 );
 
 				} else {
 

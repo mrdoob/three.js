@@ -142,7 +142,6 @@
 			var vertices = sphere.geometry.vertices;
 			var values = attributes.displacement.value;
 
-
 			for( var v = 0; v < vertices.length; v++ ) {
 
 				values[ v ] = 0;
@@ -165,13 +164,6 @@
 
 		}
 
-		function cap( x, a, b ) {
-
-			return ( x < a ) ? a : ( ( x > b ) ? b : x );
-		}
-
-		var i, value;
-
 		function animate() {
 
 			requestAnimationFrame( animate );
@@ -183,23 +175,24 @@
 
 		function render() {
 
-			var time = new Date().getTime() * 0.01;
+			var time = Date.now() * 0.01;
 
-			sphere.rotation.y = 0.01 * time;
-			sphere.rotation.z = 0.01 * time;
+			sphere.rotation.y = sphere.rotation.z = 0.01 * time;
 
 			uniforms.amplitude.value = 2.5 * Math.sin( sphere.rotation.y * 0.125 );
 			THREE.ColorUtils.adjustHSV( uniforms.color.value, 0.0005, 0, 0 );
 
-			for( i = 0; i < attributes.displacement.value.length; i++ ) {
+			for( var i = 0; i < attributes.displacement.value.length; i ++ ) {
 
-				attributes.displacement.value[ i ] = Math.sin( 0.1*i + time );
+				attributes.displacement.value[ i ] = Math.sin( 0.1 * i + time );
 
 				noise[ i ] += 0.5 * ( 0.5 - Math.random() );
-				noise[ i ] = cap( noise[ i ], -5, 5 );
+				noise[ i ] = THREE.Math.clamp( noise[ i ], -5, 5 );
+
 				attributes.displacement.value[ i ] += noise[ i ];
 
 			}
+
 			attributes.displacement.needsUpdate = true;
 
 			renderer.render( scene, camera );

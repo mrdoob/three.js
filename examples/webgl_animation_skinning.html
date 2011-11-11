@@ -39,7 +39,6 @@
 		click to start animation
 		</div>
 
-
 		<script src="../build/Three.js"></script>
 
 		<script src="js/RequestAnimationFrame.js"></script>
@@ -71,6 +70,8 @@
 
 			var floor, dz = 0, dstep = -10, playback = false;
 
+			var clock = new THREE.Clock();
+
 			function init() {
 
 				container = document.getElementById( 'container' );
@@ -84,8 +85,7 @@
 				scene.fog.color.setHSV( 0.1, 0.10, 1 );
 
 				light = new THREE.DirectionalLight( 0xffffff, 1.5 );
-				light.position.set( 0, 1, 1 );
-				light.position.normalize();
+				light.position.set( 0, 1, 1 ).normalize();
 				scene.add( light );
 
 				var planeSimple = new THREE.PlaneGeometry( 200, 300 );
@@ -121,7 +121,7 @@
 				document.addEventListener( 'click', startAnimation, false );
 
 				var loader = new THREE.JSONLoader();
-				loader.load( { model: "obj/buffalo/buffalo.js", callback: createScene } );
+				loader.load( "obj/buffalo/buffalo.js", createScene );
 
 				loop();
 
@@ -139,7 +139,7 @@
 
 				var material = new THREE.MeshFaceMaterial();
 
-				var originalMaterial = geometry.materials[ 0 ][ 0 ];
+				var originalMaterial = geometry.materials[ 0 ];
 
 				originalMaterial.skinning = true;
 				originalMaterial.transparent = true;
@@ -198,28 +198,26 @@
 
 			}
 
-			var oldTime = new Date().getTime();
-
 			function loop() {
 
 				requestAnimationFrame( loop, renderer.domElement );
 
-				var time = new Date().getTime();
+				var delta = clock.getDelta();
 
-				THREE.AnimationHandler.update( 0.001 * ( time - oldTime ) );
-
-				oldTime = time;
+				THREE.AnimationHandler.update( delta );
 
 				camera.position.x += ( mouseX - camera.position.x ) * 0.05;
 				camera.lookAt( scene.position );
 
 				if ( buffalos && playback ) {
 
-					camera.position.z += 2 * Math.sin( new Date().getTime() * 0.001 );
+					var elapsed = clock.getElapsedTime();
+
+					camera.position.z += 2 * Math.sin( elapsed );
 
 					for( i = 0; i < buffalos.length; i++ ) {
 
-						buffalos[ i ].position.z += 2 * Math.sin( new Date().getTime() * 0.001  + offset[ i ] );
+						buffalos[ i ].position.z += 2 * Math.sin( elapsed + offset[ i ] );
 
 					}
 

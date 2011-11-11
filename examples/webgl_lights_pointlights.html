@@ -78,7 +78,7 @@
 
 				};
 
-				loader.load( { model: "obj/walt/WaltHead_bin.js", callback: callback } );
+				loader.load( "obj/walt/WaltHead_bin.js", callback );
 
 				scene.add( new THREE.AmbientLight( 0x000000 ) );
 
@@ -130,7 +130,7 @@
 
 			function render() {
 
-				var time = new Date().getTime() * 0.0005;
+				var time = Date.now() * 0.0005;
 
 				if( object ) object.rotation.y -= 0.01;
 

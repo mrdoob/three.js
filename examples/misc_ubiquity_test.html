@@ -32,7 +32,7 @@
 			var camera, scene;
 			var canvasRenderer, svgRenderer, webglRenderer;
 
-			var mesh, qrcode;
+			var mesh, group, qrcode;
 
 			var mouseX = 0, mouseY = 0;
 
@@ -97,7 +97,7 @@
 
 				var geometry = new THREE.Geometry();
 
-				for (var i = 0; i < 100; i ++) {
+				for ( var i = 0; i < 100; i ++ ) {
 
 					var v = new THREE.Vector3( Math.random() * 1000 - 500, Math.random() * 1000 - 500, Math.random() * 1000 - 500 );
 
@@ -109,19 +109,30 @@
 					v1.position.addSelf( v );
 					v2.position.addSelf( v );
 
-					var face = new THREE.Face3( geometry.vertices.push( v0 ) - 1, geometry.vertices.push( v1 ) - 1, geometry.vertices.push( v2 ) - 1, null, new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } ) );
+					var face = new THREE.Face3( geometry.vertices.push( v0 ) - 1, geometry.vertices.push( v1 ) - 1, geometry.vertices.push( v2 ) - 1, null, null, geometry.materials.length );
+
+					geometry.materials.push( new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } ) );
 
 					geometry.faces.push( face );
+
 				}
 
 				geometry.computeFaceNormals();
 				geometry.computeCentroids();
 
-				mesh = new THREE.Mesh( geometry, [ new THREE.MeshFaceMaterial(), new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, transparent: true, wireframe: true, wireframeLinewidth: 10 } ) ] );
-				mesh.doubleSided = true;
-				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
-				scene.add( mesh );
+				group = new THREE.Object3D();
+				group.scale.x = group.scale.y = group.scale.z = 2;
+				scene.add( group );
 
+				mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial() );
+				mesh.doubleSided = true;
+				group.add( mesh );
+
+				/*
+				mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, transparent: true, wireframe: true, wireframeLinewidth: 10 } ) );
+				mesh.doubleSided = true;
+				group.add( mesh );
+				*/
 
 				// LIGHTS
 
@@ -178,7 +189,7 @@
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 				camera.lookAt( scene.position );
 
-				mesh.rotation.y += 0.01;
+				group.rotation.y += 0.01;
 
 				/*
 				qrcode.rotation.x += 0.01;

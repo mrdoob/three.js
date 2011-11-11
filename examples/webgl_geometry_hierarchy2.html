@@ -27,7 +27,7 @@
 
 			var camera, scene, renderer;
 
-			var geometry, objects;
+			var geometry, root;
 
 			var mouseX = 0, mouseY = 0;
 
@@ -44,107 +44,89 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 15000 );
 				camera.position.z = 500;
 
 				scene = new THREE.Scene();
-				scene.fog = new THREE.Fog( 0xffffff, 1, 10000 );
 
 				var geometry = new THREE.CubeGeometry( 100, 100, 100 );
 				var material = new THREE.MeshNormalMaterial();
 
-				var mesh = new THREE.Mesh( geometry, material );
-				mesh.position.x = 1000;
+				root = new THREE.Mesh( geometry, material );
+				root.position.x = 1000;
+				scene.add( root );
 
-				objects = [];
-
-				objects.push( mesh );
-
-				var amount = 200, child, object = mesh;
+				var amount = 200, object, parent = root;
 
 				for ( var i = 0; i < amount; i ++ ) {
 
-					child = new THREE.Mesh( geometry, material );
-					child.position.x = 100;
+					object = new THREE.Mesh( geometry, material );
+					object.position.x = 100;
 
-					object.add( child );
-					object = child;
-
-					objects.push( child );
+					parent.add( object );
+					parent = object;
 
 				}
 
-				object = mesh;
+				parent = root;
 
 				for ( var i = 0; i < amount; i ++ ) {
 
-					child = new THREE.Mesh( geometry, material );
-					child.position.x = - 100;
+					object = new THREE.Mesh( geometry, material );
+					object.position.x = - 100;
 
-					object.add( child );
-					object = child;
-
-					objects.push( child );
+					parent.add( object );
+					parent = object;
 
 				}
 
-				object = mesh;
+				parent = root;
 
 				for ( var i = 0; i < amount; i ++ ) {
 
-					child = new THREE.Mesh( geometry, material );
-					child.position.y = - 100;
+					object = new THREE.Mesh( geometry, material );
+					object.position.y = - 100;
 
-					object.add( child );
-					object = child;
-
-					objects.push( child );
+					parent.add( object );
+					parent = object;
 
 				}
 
-				object = mesh;
+				parent = root;
 
 				for ( var i = 0; i < amount; i ++ ) {
 
-					child = new THREE.Mesh( geometry, material );
-					child.position.y = 100;
+					object = new THREE.Mesh( geometry, material );
+					object.position.y = 100;
 
-					object.add( child );
-					object = child;
-
-					objects.push( child );
+					parent.add( object );
+					parent = object;
 
 				}
 
-				object = mesh;
+				parent = root;
 
 				for ( var i = 0; i < amount; i ++ ) {
 
-					child = new THREE.Mesh( geometry, material );
-					child.position.z = - 100;
+					object = new THREE.Mesh( geometry, material );
+					object.position.z = - 100;
 
-					object.add( child );
-					object = child;
-
-					objects.push( child );
+					parent.add( object );
+					parent = object;
 
 				}
 
-				object = mesh;
+				parent = root;
 
 				for ( var i = 0; i < amount; i ++ ) {
 
-					child = new THREE.Mesh( geometry, material );
-					child.position.z = 100;
+					object = new THREE.Mesh( geometry, material );
+					object.position.z = 100;
 
-					object.add( child );
-					object = child;
-
-					objects.push( child );
+					parent.add( object );
+					parent = object;
 
 				}
-
-				scene.add( mesh );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -179,22 +161,24 @@
 
 			function render() {
 
-				var rx = Math.sin( new Date().getTime() * 0.0007 ) * 0.2,
-				ry = Math.sin( new Date().getTime() * 0.0003 ) * 0.1,
-				rz = Math.sin( new Date().getTime() * 0.0002 ) * 0.1;
+				var time = Date.now() * 0.001;
+
+				var rx = Math.sin( time * 0.7 ) * 0.2,
+					ry = Math.sin( time * 0.3 ) * 0.1,
+					rz = Math.sin( time * 0.2 ) * 0.1;
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 
 				camera.lookAt( scene.position );
 
-				for ( var i = 0, l = objects.length; i < l; i ++ ) {
+				THREE.SceneUtils.traverseHierarchy( root, function ( object ) {
 
-					objects[ i ].rotation.x = rx;
-					objects[ i ].rotation.y = ry;
-					objects[ i ].rotation.z = rz;
+					object.rotation.x = rx;
+					object.rotation.y = ry;
+					object.rotation.z = rz;
 
-				}
+				} );
 
 				renderer.render( scene, camera );
 

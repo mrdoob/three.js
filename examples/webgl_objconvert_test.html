@@ -164,7 +164,7 @@
 
 				}
 
-				if( render_canvas ) {
+				if ( render_canvas ) {
 
 					canvasRenderer = new THREE.CanvasRenderer();
 					canvasRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
@@ -190,11 +190,11 @@
 					callbackMale   = function( geometry ) { createScene( geometry,  90, FLOOR, 50, 105 ) },
 					callbackFemale = function( geometry ) { createScene( geometry, -80, FLOOR, 50, 0 ) };
 
-				loader.load( { model: "obj/male02/Male02_slim.js", callback: callbackMale } );
-				loader.load( { model: "obj/female02/Female02_slim.js", callback: callbackFemale } );
+				loader.load( "obj/male02/Male02_slim.js", callbackMale );
+				loader.load( "obj/female02/Female02_slim.js", callbackFemale );
 
-				//loader.load( { model: "obj/male02/Male02_bin.js", callback: callbackMale } );
-				//loader.load( { model: "obj/female02/Female02_bin.js", callback: callbackFemale } );
+				//loader.load( "obj/male02/Male02_bin.js", callbackMale );
+				//loader.load( "obj/female02/Female02_bin.js", callbackFemale );
 
 			}
 

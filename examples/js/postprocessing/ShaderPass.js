@@ -34,7 +34,7 @@ THREE.ShaderPass.prototype = {
 
 		}
 
-		THREE.EffectComposer.quad.materials[ 0 ] = this.material;
+		THREE.EffectComposer.quad.material = this.material;
 
 		if ( this.renderToScreen ) {
 

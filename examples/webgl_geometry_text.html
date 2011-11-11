@@ -343,12 +343,16 @@
 				var renderModel = new THREE.RenderPass( scene, camera );
 				var effectBloom = new THREE.BloomPass( 0.25 );
 				var effectFilm = new THREE.FilmPass( 0.5, 0.125, 2048, false );
+				var effectFXAA = new THREE.ShaderPass( THREE.ShaderExtras[ "fxaa" ] );
+
+				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
 
 				effectFilm.renderToScreen = true;
 
 				composer = new THREE.EffectComposer( renderer );
 
 				composer.addPass( renderModel );
+				composer.addPass( effectFXAA );
 				composer.addPass( effectBloom );
 				composer.addPass( effectFilm );
 
@@ -437,10 +441,12 @@
 
 					bend: bend,
 
-					material: textMaterialFront,
-					extrudeMaterial: textMaterialSide
+					material: 0,
+					extrudeMaterial: 1
 
 				});
+
+				textGeo.materials = [ textMaterialFront, textMaterialSide ];
 
 				textGeo.computeBoundingBox();
 				textGeo.computeVertexNormals();
@@ -456,7 +462,7 @@
 
 						var face = textGeo.faces[ i ];
 
-						if ( face.materials[ 0 ].id == textMaterialSide.id ) {
+						if ( face.materialIndex == 1 ) {
 
 							for ( var j = 0; j < face.vertexNormals.length; j ++ ) {
 
@@ -521,8 +527,8 @@
 
 				updatePermalink();
 
-				scene.remove( textMesh1 );
-				if ( mirror ) scene.remove( textMesh2 );
+				parent.remove( textMesh1 );
+				if ( mirror ) parent.remove( textMesh2 );
 
 				if ( !text ) return;
 
@@ -604,15 +610,7 @@
 
 			}
 
-			var delta, time, oldTime;
-
 			function render() {
-
-				if ( ! oldTime ) oldTime = new Date().getTime();
-
-				time = new Date().getTime();
-				delta = 0.1 * ( time - oldTime );
-				oldTime = time;
 
 				parent.rotation.y += ( targetRotation - parent.rotation.y ) * 0.05;
 

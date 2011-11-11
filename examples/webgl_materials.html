@@ -92,9 +92,20 @@
 				for ( var i = 0, l = geometry_pieces.faces.length; i < l; i ++ ) {
 
 					var face = geometry_pieces.faces[ i ];
-					if ( Math.random() > 0.7 ) face.materials = [ materials[ Math.floor( Math.random() * materials.length )  ] ];
+
+					if ( Math.random() > 0.7 )  {
+
+						face.materialIndex = Math.floor( Math.random() * materials.length );
+
+					} else {
+
+						face.materialIndex = 0;
+
+					}
 
 				}
+
+				geometry_pieces.materials = materials;
 
 				materials.push( new THREE.MeshFaceMaterial() );
 
@@ -201,14 +212,14 @@
 
 			function render() {
 
-				var timer = new Date().getTime() * 0.0001;
+				var timer = 0.0001 * Date.now();
 
 				camera.position.x = Math.cos( timer ) * 1000;
 				camera.position.z = Math.sin( timer ) * 1000;
 
 				camera.lookAt( scene.position );
 
-				for ( var i = 0, l = objects.length; i < l; i++ ) {
+				for ( var i = 0, l = objects.length; i < l; i ++ ) {
 
 					var object = objects[ i ];
 

@@ -63,7 +63,7 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild(renderer.domElement);
+				container.appendChild( renderer.domElement );
 
 				var ambientLight = new THREE.AmbientLight( 0x606060 );
 				scene.add( ambientLight );
@@ -122,12 +122,12 @@
 				if ( c ) {
 
 					info.innerHTML += "Found @ distance " + c.distance.toFixed(2);
-					c.mesh.materials[ 0 ].color.setHex( 0xaa0000 );
+					c.mesh.material.color.setHex( 0xaa0000 );
 
 				} else {
 
 					info.innerHTML += "No intersection";
-					cube.materials[0].color.setHex( 0x003300 );
+					cube.material.color.setHex( 0x003300 );
 
 				}
 

@@ -1,15 +1,16 @@
-// Converted from: veyron_wheels.obj
-//  vertices: 3300
-//  faces: 2907
-//  materials: 2
-//
-//  Generated with OBJ -> Three.js converter
-//  http://github.com/alteredq/three.js/blob/master/utils/exporters/convert_obj_three.py
+{
 
-
-var model = {
-
-    "version" : 1,
+    "metadata" :
+    {
+        "formatVersion" : 3,
+        "sourceFile"    : "veyron_wheel.obj",
+        "generatedBy"   : "OBJConverter",
+        "vertices"      : 3300,
+        "faces"         : 2907,
+        "normals"       : 3163,
+        "uvs"           : 0,
+        "materials"     : 2
+    },
 
     "materials": [	{
 	"DbgColor" : 15658734,
@@ -39,7 +40,4 @@ var model = {
 
     "buffers": "veyron_wheel_bin.bin"
 
-};
-
-postMessage( model );
-close();
+}
