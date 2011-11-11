@@ -635,12 +635,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		geometryGroup.__needsSmoothNormals = ( normalType === THREE.SmoothShading );
-
-		geometryGroup.__uvType = uvType;
-		geometryGroup.__vertexColorType = vertexColorType;
-		geometryGroup.__normalType = normalType;
-
 		geometryGroup.__webglFaceCount = ntris * 3;
 		geometryGroup.__webglLineCount = nlines * 2;
 
@@ -1303,7 +1297,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function setMeshBuffers( geometryGroup, object, hint, dispose ) {
+	function setMeshBuffers( geometryGroup, object, hint, dispose, material ) {
 
 		if ( ! geometryGroup.__inittedArrays ) {
 
@@ -1312,11 +1306,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		var normalType = bufferGuessNormalType( material ),
+		vertexColorType = bufferGuessVertexColorType( material ),
+		uvType = bufferGuessUVType( material ),
+
+		needsSmoothNormals = ( normalType === THREE.SmoothShading );
+
 		var f, fl, fi, face,
 		vertexNormals, faceNormal, normal,
 		vertexColors, faceColor,
 		vertexTangents,
-		uvType, vertexColorType, normalType,
 		uv, uv2, v1, v2, v3, v4, t1, t2, t3, t4,
 		c1, c2, c3, c4,
 		sw1, sw2, sw3, sw4,
@@ -1364,12 +1363,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		faceArray = geometryGroup.__faceArray,
 		lineArray = geometryGroup.__lineArray,
-
-		needsSmoothNormals = geometryGroup.__needsSmoothNormals,
-
-		vertexColorType = geometryGroup.__vertexColorType,
-		uvType = geometryGroup.__uvType,
-		normalType = geometryGroup.__normalType,
 
 		geometry = object.geometry, // this is shared for all chunks
 
@@ -4021,7 +4014,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					 geometry.__dirtyUvs || geometry.__dirtyNormals ||
 					 geometry.__dirtyColors || geometry.__dirtyTangents || customAttributesDirty ) {
 
-					setMeshBuffers( geometryGroup, object, _gl.DYNAMIC_DRAW, !geometry.dynamic );
+					setMeshBuffers( geometryGroup, object, _gl.DYNAMIC_DRAW, !geometry.dynamic, material );
 
 				}
 
