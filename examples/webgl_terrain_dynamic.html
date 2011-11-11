@@ -78,27 +78,6 @@
 		<script src="js/postprocessing/MaskPass.js"></script>
 		<script src="js/postprocessing/SavePass.js"></script>
 
-		<script id="fragmentShaderNormal" type="x-shader/x-fragment">
-
-			uniform float height;
-			uniform vec2 resolution;
-			uniform sampler2D heightMap;
-
-			varying vec2 vUv;
-
-			void main( void ) {
-
-				float val = texture2D( heightMap, vUv ).x;
-
-				float valU = texture2D( heightMap, vUv + vec2( 1.0 / resolution.x, 0.0 ) ).x;
-				float valV = texture2D( heightMap, vUv + vec2( 0.0, 1.0 / resolution.y ) ).x;
-
-				gl_FragColor = vec4( ( 0.5 * normalize( vec3( val - valU, val - valV, height  ) ) + 0.5 ), 1.0 );
-
-			}
-
-		</script>
-
 		<script id="fragmentShaderNoise" type="x-shader/x-fragment">
 
 			//
@@ -242,20 +221,6 @@
 
 		</script>
 
-		<script id="vertexShaderFlip" type="x-shader/x-vertex">
-
-			varying vec2 vUv;
-			uniform vec2 scale;
-
-			void main( void ) {
-
-				vUv = vec2( uv.x, 1.0 - uv.y ) * scale;
-				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-
-			}
-
-		</script>
-
 		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
@@ -357,6 +322,8 @@
 
 				// HEIGHT + NORMAL MAPS
 
+				var normalShader = THREE.ShaderExtras[ 'normalmap' ];
+
 				var rx = 256, ry = 256;
 				var pars = { minFilter: THREE.LinearMipmapLinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
 
@@ -371,17 +338,13 @@
 
 				};
 
-				uniformsNormal = {
+				uniformsNormal = THREE.UniformsUtils.clone( normalShader.uniforms );
 
-					height:  	{ type: "f",  value: 0.05 },
-					resolution: { type: "v2", value: new THREE.Vector2( rx, ry ) },
-					scale: 		{ type: "v2", value: new THREE.Vector2( 1, 1 ) },
-					heightMap:  { type: "t",  value: 1, texture: heightMap }
-
-				};
+				uniformsNormal.height.value = 0.05;
+				uniformsNormal.resolution.value.set( rx, ry );
+				uniformsNormal.heightMap.texture = heightMap;
 
 				var vertexShader = document.getElementById( 'vertexShader' ).textContent;
-				var vertexShaderFlip = document.getElementById( 'vertexShaderFlip' ).textContent;
 
 				// TEXTURES
 
@@ -404,38 +367,38 @@
 
 				// TERRAIN SHADER
 
-				var normalShader = THREE.ShaderTerrain[ "terrain" ];
+				var terrainShader = THREE.ShaderTerrain[ "terrain" ];
 
-				uniformsNormalMap = THREE.UniformsUtils.clone( normalShader.uniforms );
+				uniformsTerrain = THREE.UniformsUtils.clone( terrainShader.uniforms );
 
-				uniformsNormalMap[ "tNormal" ].texture = normalMap;
-				uniformsNormalMap[ "uNormalScale" ].value = 3.5;
+				uniformsTerrain[ "tNormal" ].texture = normalMap;
+				uniformsTerrain[ "uNormalScale" ].value = 3.5;
 
-				uniformsNormalMap[ "tDisplacement" ].texture = heightMap;
+				uniformsTerrain[ "tDisplacement" ].texture = heightMap;
 
-				uniformsNormalMap[ "tDiffuse1" ].texture = diffuseTexture1;
-				uniformsNormalMap[ "tDiffuse2" ].texture = diffuseTexture2;
-				uniformsNormalMap[ "tSpecular" ].texture = specularMap;
-				uniformsNormalMap[ "tDetail" ].texture = detailTexture;
+				uniformsTerrain[ "tDiffuse1" ].texture = diffuseTexture1;
+				uniformsTerrain[ "tDiffuse2" ].texture = diffuseTexture2;
+				uniformsTerrain[ "tSpecular" ].texture = specularMap;
+				uniformsTerrain[ "tDetail" ].texture = detailTexture;
 
-				uniformsNormalMap[ "enableDiffuse1" ].value = true;
-				uniformsNormalMap[ "enableDiffuse2" ].value = true;
-				uniformsNormalMap[ "enableSpecular" ].value = true;
+				uniformsTerrain[ "enableDiffuse1" ].value = true;
+				uniformsTerrain[ "enableDiffuse2" ].value = true;
+				uniformsTerrain[ "enableSpecular" ].value = true;
 
-				uniformsNormalMap[ "uDiffuseColor" ].value.setHex( 0xffffff );
-				uniformsNormalMap[ "uSpecularColor" ].value.setHex( 0xffffff );
-				uniformsNormalMap[ "uAmbientColor" ].value.setHex( 0x111111 );
+				uniformsTerrain[ "uDiffuseColor" ].value.setHex( 0xffffff );
+				uniformsTerrain[ "uSpecularColor" ].value.setHex( 0xffffff );
+				uniformsTerrain[ "uAmbientColor" ].value.setHex( 0x111111 );
 
-				uniformsNormalMap[ "uShininess" ].value = 30;
+				uniformsTerrain[ "uShininess" ].value = 30;
 
-				uniformsNormalMap[ "uDisplacementScale" ].value = 375;
+				uniformsTerrain[ "uDisplacementScale" ].value = 375;
 
-				uniformsNormalMap[ "uRepeatOverlay" ].value.set( 6, 6 );
+				uniformsTerrain[ "uRepeatOverlay" ].value.set( 6, 6 );
 
 				var params = [
 								[ 'heightmap', 	document.getElementById( 'fragmentShaderNoise' ).textContent, 	vertexShader, uniformsNoise, false ],
-								[ 'normal', 	document.getElementById( 'fragmentShaderNormal' ).textContent,  vertexShaderFlip, uniformsNormal, false ],
-								[ 'terrain', 	normalShader.fragmentShader, normalShader.vertexShader, uniformsNormalMap, true ]
+								[ 'normal', 	normalShader.fragmentShader,  normalShader.vertexShader, uniformsNormal, false ],
+								[ 'terrain', 	terrainShader.fragmentShader, terrainShader.vertexShader, uniformsTerrain, true ]
 							 ];
 
 				for( var i = 0; i < params.length; i ++ ) {
@@ -740,16 +703,16 @@
 					spotLight.intensity = THREE.Math.mapLinear( valNorm, 0, 1, 0.1, 1.15 );
 					pointLight.intensity = THREE.Math.mapLinear( valNorm, 0, 1, 0.9, 1.5 );
 
-					uniformsNormalMap[ "uNormalScale" ].value = THREE.Math.mapLinear( valNorm, 0, 1, 0.6, 3.5 );
+					uniformsTerrain[ "uNormalScale" ].value = THREE.Math.mapLinear( valNorm, 0, 1, 0.6, 3.5 );
 
 					if ( updateNoise ) {
 
 						animDelta = THREE.Math.clamp( animDelta + 0.00075 * animDeltaDir, 0, 0.05 );
-						uniformsNoise.time.value += delta * animDelta;
+						uniformsNoise[ "time" ].value += delta * animDelta;
 
-						uniformsNoise.offset.value.x += delta * 0.05;
+						uniformsNoise[ "offset" ].value.x += delta * 0.05;
 
-						uniformsNormalMap.uOffset.value.x = 4 * uniformsNoise.offset.value.x;
+						uniformsTerrain[ "uOffset" ].value.x = 4 * uniformsNoise[ "offset" ].value.x;
 
 						quadTarget.material = mlib[ "heightmap" ];
 						renderer.render( sceneRenderTarget, cameraOrtho, heightMap, true );
