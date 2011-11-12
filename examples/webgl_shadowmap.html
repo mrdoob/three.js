@@ -60,9 +60,11 @@
 
 			var sceneHUD, cameraOrtho, hudMaterial;
 
-			var morphs = [];
+			var morph, morphs = [];
 
 			var light;
+
+			var clock = new THREE.Clock();
 
 			init();
 			animate();
@@ -172,6 +174,7 @@
 				var geometry = new THREE.PlaneGeometry( 100, 100 );
 				var planeMaterial = new THREE.MeshLambertMaterial( { color: 0xffdd99 } );
 				THREE.ColorUtils.adjustHSV( planeMaterial.color, 0, 0, 0.9 );
+				planeMaterial.ambient = planeMaterial.color;
 
 				var ground = new THREE.Mesh( geometry, planeMaterial );
 
@@ -244,9 +247,20 @@
 
 					var material = new THREE.MeshLambertMaterial( { color: 0xffaa55, morphTargets: true, vertexColors: THREE.FaceColors } );
 
-					if ( fudgeColor ) THREE.ColorUtils.adjustHSV( material.color, 0, 0.5 - Math.random(), 0.5 - Math.random() );
+					//geometry.materials[ 0 ] = material;
 
-					var meshAnim = new THREE.Mesh( geometry, material );
+					if ( fudgeColor ) {
+
+						THREE.ColorUtils.adjustHSV( material.color, 0, 0.5 - Math.random(), 0.5 - Math.random() );
+						material.ambient = material.color;
+
+					}
+
+					var meshAnim = new THREE.MorphAnimMesh( geometry, material );
+
+					meshAnim.speed = speed;
+					meshAnim.duration = duration;
+					meshAnim.time = 600 * Math.random();
 
 					meshAnim.position.set( x, y, z );
 					meshAnim.rotation.y = Math.PI/2;
@@ -256,9 +270,7 @@
 
 					scene.add( meshAnim );
 
-					morphs.push( { mesh: meshAnim, lastKeyframe: 0, currentKeyframe: 0,
-								   offset: Math.random() * 6, speed: speed, duration: duration,
-								   oldTime: new Date().getTime() } );
+					morphs.push( meshAnim );
 
 				}
 
@@ -280,114 +292,70 @@
 
 				var loader = new THREE.JSONLoader();
 
-				loader.load( { model: "models/animated/horse.js", callback: function( geometry ) {
+				loader.load( "models/animated/horse.js", function( geometry ) {
 
 					morphColorsToFaceColors( geometry );
 
-					addMorph( geometry, 0.55, 1000, 100 - Math.random() * 1000, FLOOR, 300, true );
-					addMorph( geometry, 0.55, 1000, 100 - Math.random() * 1000, FLOOR, 450, true );
-					addMorph( geometry, 0.55, 1000, 100 - Math.random() * 1000, FLOOR, 600, true );
+					addMorph( geometry, 550, 1000, 100 - Math.random() * 1000, FLOOR, 300, true );
+					addMorph( geometry, 550, 1000, 100 - Math.random() * 1000, FLOOR, 450, true );
+					addMorph( geometry, 550, 1000, 100 - Math.random() * 1000, FLOOR, 600, true );
 
-					addMorph( geometry, 0.55, 1000, 100 - Math.random() * 1000, FLOOR, -300, true );
-					addMorph( geometry, 0.55, 1000, 100 - Math.random() * 1000, FLOOR, -450, true );
-					addMorph( geometry, 0.55, 1000, 100 - Math.random() * 1000, FLOOR, -600, true );
+					addMorph( geometry, 550, 1000, 100 - Math.random() * 1000, FLOOR, -300, true );
+					addMorph( geometry, 550, 1000, 100 - Math.random() * 1000, FLOOR, -450, true );
+					addMorph( geometry, 550, 1000, 100 - Math.random() * 1000, FLOOR, -600, true );
 
-				} } );
+				} );
 
 				/*
-				loader.load( { model: "obj/morphs/fox.js", callback: function( geometry ) {
+				loader.load( "obj/morphs/fox.js", function( geometry ) {
 
 					morphColorsToFaceColors( geometry );
-					addMorph( geometry, 0.2, 1000, 100 - Math.random() * 500, FLOOR - 5, 600 );
+					addMorph( geometry, 200, 1000, 100 - Math.random() * 500, FLOOR - 5, 600 );
 
-				} } );
+				} );
 
-				loader.load( { model: "obj/morphs/shdw3walk.js", callback: function( geometry ) {
-
-					morphColorsToFaceColors( geometry );
-					addMorph( geometry, 0.04, 2000, -500, FLOOR + 60, 245 );
-
-				} } );
-
-				loader.load( { model: "obj/morphs/flamingo.js", callback: function( geometry ) {
+				loader.load( "obj/morphs/shdw3walk.js", function( geometry ) {
 
 					morphColorsToFaceColors( geometry );
-					addMorph( geometry, 0.5, 1000, 500 - Math.random() * 500, FLOOR + 350, 40 );
+					addMorph( geometry, 40, 2000, -500, FLOOR + 60, 245 );
 
-				} } );
+				} );
 
-				loader.load( { model: "obj/morphs/stork.js", callback: function( geometry ) {
-
-					morphColorsToFaceColors( geometry );
-					addMorph( geometry, 0.35, 1000, 500 - Math.random() * 500, FLOOR + 350, 340 );
-
-				} } );
-
-				loader.load( { model: "obj/morphs/mountainlion.js", callback: function( geometry ) {
+				loader.load( "obj/morphs/flamingo.js", function( geometry ) {
 
 					morphColorsToFaceColors( geometry );
-					addMorph( geometry, 0.4, 1000, 500 - Math.random() * 500, FLOOR - 5, 700 );
+					addMorph( geometry, 500, 1000, 500 - Math.random() * 500, FLOOR + 350, 40 );
 
-				} } );
+				} );
 
-				loader.load( { model: "obj/morphs/bearBrown.js", callback: function( geometry ) {
-
-					morphColorsToFaceColors( geometry );
-					addMorph( geometry, 0.3, 2500, -500, FLOOR - 5, -750 );
-
-				} } );
-
-				loader.load( { model: "obj/morphs/parrot.js", callback: function( geometry ) {
+				loader.load( "obj/morphs/stork.js", function( geometry ) {
 
 					morphColorsToFaceColors( geometry );
-					addMorph( geometry, 0.45, 500, 500 - Math.random() * 500, FLOOR + 300, 700 );
+					addMorph( geometry, 350, 1000, 500 - Math.random() * 500, FLOOR + 350, 340 );
 
-				} } );
+				} );
 
+				loader.load( "obj/morphs/mountainlion.js", function( geometry ) {
+
+					morphColorsToFaceColors( geometry );
+					addMorph( geometry, 400, 1000, 500 - Math.random() * 500, FLOOR - 5, 700 );
+
+				} );
+
+				loader.load( "obj/morphs/bearBrown.js", function( geometry ) {
+
+					morphColorsToFaceColors( geometry );
+					addMorph( geometry, 300, 2500, -500, FLOOR - 5, -750 );
+
+				} );
+
+				loader.load( "obj/morphs/parrot.js", function( geometry ) {
+
+					morphColorsToFaceColors( geometry );
+					addMorph( geometry, 450, 500, 500 - Math.random() * 500, FLOOR + 300, 700 );
+
+				} );
 				*/
-
-			}
-
-
-			var t = 0, newTime, delta;
-
-
-			function updateMorph( morph ) {
-
-				// Alternate morph targets
-
-				var interpolation = morph.duration / ( morph.mesh.geometry.morphTargets.length - 1 );
-
-				var time = ( new Date().getTime()  + morph.offset * 100 ) % morph.duration;
-				var keyframe = Math.floor( time / interpolation ) + 1;
-
-				var mesh = morph.mesh;
-
-				if ( keyframe != morph.currentKeyframe ) {
-
-					mesh.morphTargetInfluences[ morph.lastKeyframe ] = 0;
-					mesh.morphTargetInfluences[ morph.currentKeyframe ] = 1;
-					mesh.morphTargetInfluences[ keyframe ] = 0;
-
-					morph.lastKeyframe = morph.currentKeyframe;
-					morph.currentKeyframe = keyframe;
-
-				}
-
-				mesh.morphTargetInfluences[ keyframe ] = ( time % interpolation ) / interpolation;
-				mesh.morphTargetInfluences[ morph.lastKeyframe ] = 1 - mesh.morphTargetInfluences[ keyframe ];
-
-				var newTime = new Date().getTime();
-				delta = newTime - morph.oldTime;
-				morph.oldTime = newTime;
-
-				mesh.position.x += morph.speed * delta;
-
-				if ( mesh.position.x  > 2000 )  {
-
-					mesh.position.x = -1000 - Math.random() * 500;
-
-				}
 
 			}
 
@@ -404,9 +372,25 @@
 
 			function render() {
 
-				for ( var i = 0; i < morphs.length; i++ ) updateMorph( morphs[ i ] );
+				var delta = clock.getDelta();
 
-				controls.update();
+				for ( var i = 0; i < morphs.length; i ++ ) {
+
+					morph = morphs[ i ];
+
+					morph.updateAnimation( 1000 * delta );
+
+					morph.position.x += morph.speed * delta;
+
+					if ( morph.position.x  > 2000 )  {
+
+						morph.position.x = -1000 - Math.random() * 500;
+
+					}
+
+				}
+
+				controls.update( delta );
 
 				renderer.clear();
 				renderer.render( scene, camera );

@@ -5,7 +5,7 @@
 THREE.SVGRenderer = function () {
 
 	var _this = this,
-	_renderList = null,
+	_renderData, _elements, _lights,
 	_projector = new THREE.Projector(),
 	_svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'),
 	_svgWidth, _svgHeight, _svgWidthHalf, _svgHeightHalf,
@@ -16,11 +16,10 @@ THREE.SVGRenderer = function () {
 	_bboxRect = new THREE.Rectangle(),
 
 	_enableLighting = false,
-	_color = new THREE.Color( 0xffffff ),
-	_light = new THREE.Color( 0xffffff ),
-	_ambientLight = new THREE.Color( 0x000000 ),
-	_directionalLights = new THREE.Color( 0x000000 ),
-	_pointLights = new THREE.Color( 0x000000 ),
+	_color = new THREE.Color(),
+	_ambientLight = new THREE.Color(),
+	_directionalLights = new THREE.Color(),
+	_pointLights = new THREE.Color(),
 
 	_w, // z-buffer to w-buffer
 	_vector3 = new THREE.Vector3(), // Needed for PointLight
@@ -80,30 +79,37 @@ THREE.SVGRenderer = function () {
 
 	};
 
-	this.render = function( scene, camera ) {
+	this.render = function ( scene, camera ) {
 
-		var e, el, m, ml, fm, fml, element, material;
+		var e, el, element, material;
 
 		this.autoClear && this.clear();
 
 		_this.info.render.vertices = 0;
 		_this.info.render.faces = 0;
 
-		_renderList = _projector.projectScene( scene, camera, this.sortElements );
+		_renderData = _projector.projectScene( scene, camera, this.sortElements );
+		_elements = _renderData.elements;
+		_lights = _renderData.lights;
 
 		_pathCount = 0; _circleCount = 0; _lineCount = 0;
 
-		_enableLighting = scene.lights.length > 0;
+		_enableLighting = _lights.length > 0;
 
 		if ( _enableLighting ) {
 
-			calculateLights( scene );
+			 calculateLights( _lights );
 
 		}
 
-		for ( e = 0, el = _renderList.length; e < el; e ++ ) {
+		for ( e = 0, el = _elements.length; e < el; e ++ ) {
 
-			element = _renderList[ e ];
+			element = _elements[ e ];
+
+			material = element.material;
+			material = material instanceof THREE.MeshFaceMaterial ? element.faceMaterial : material;
+
+			if ( material == null || material.opacity == 0 ) continue;
 
 			_bboxRect.empty();
 
@@ -112,14 +118,7 @@ THREE.SVGRenderer = function () {
 				_v1 = element;
 				_v1.x *= _svgWidthHalf; _v1.y *= -_svgHeightHalf;
 
-				m = 0; ml = element.materials.length;
-
-				while ( m < ml ) {
-
-					material = element.materials[ m ++ ];
-					material && renderParticle( _v1, element, material, scene );
-
-				}
+				renderParticle( _v1, element, material, scene );
 
 			} else if ( element instanceof THREE.RenderableLine ) {
 
@@ -137,14 +136,7 @@ THREE.SVGRenderer = function () {
 
 				}
 
-				m = 0; ml = element.materials.length;
-
-				while ( m < ml ) {
-
-					material = element.materials[ m ++ ];
-					material && material.opacity != 0 && renderLine( _v1, _v2, element, material, scene );
-
-				}
+				renderLine( _v1, _v2, element, material, scene );
 
 			} else if ( element instanceof THREE.RenderableFace3 ) {
 
@@ -164,30 +156,7 @@ THREE.SVGRenderer = function () {
 
 				}
 
-				m = 0; ml = element.meshMaterials.length;
-
-				while ( m < ml ) {
-
-					material = element.meshMaterials[ m ++ ];
-
-					if ( material instanceof THREE.MeshFaceMaterial ) {
-
-						fm = 0; fml = element.faceMaterials.length;
-
-						while ( fm < fml ) {
-
-							material = element.faceMaterials[ fm ++ ];
-							material && material.opacity != 0 && renderFace3( _v1, _v2, _v3, element, material, scene );
-
-						}
-
-						continue;
-
-					}
-
-					material && material.opacity != 0 && renderFace3( _v1, _v2, _v3, element, material, scene );
-
-				}
+				renderFace3( _v1, _v2, _v3, element, material, scene );
 
 			} else if ( element instanceof THREE.RenderableFace4 ) {
 
@@ -209,30 +178,7 @@ THREE.SVGRenderer = function () {
 
 				}
 
-				m = 0; ml = element.meshMaterials.length;
-
-				while ( m < ml ) {
-
-					material = element.meshMaterials[ m ++ ];
-
-					if ( material instanceof THREE.MeshFaceMaterial ) {
-
-						fm = 0; fml = element.faceMaterials.length;
-
-						while ( fm < fml ) {
-
-							material = element.faceMaterials[ fm ++ ];
-							material && material.opacity != 0 && renderFace4( _v1, _v2, _v3, _v4, element, material, scene );
-
-						}
-
-						continue;
-
-					}
-
-					material && material.opacity != 0 && renderFace4( _v1, _v2, _v3, _v4, element, material, scene );
-
-				}
+				renderFace4( _v1, _v2, _v3, _v4, element, material, scene );
 
 			}
 
@@ -240,10 +186,9 @@ THREE.SVGRenderer = function () {
 
 	};
 
-	function calculateLights( scene ) {
+	function calculateLights( lights ) {
 
-		var l, ll, light, lightColor,
-		lights = scene.lights;
+		var l, ll, light, lightColor;
 
 		_ambientLight.setRGB( 0, 0, 0 );
 		_directionalLights.setRGB( 0, 0, 0 );
@@ -278,40 +223,46 @@ THREE.SVGRenderer = function () {
 
 	}
 
-	function calculateFaceLight( scene, element, color ) {
+	function calculateLight( lights, position, normal, color ) {
 
-		var l, ll, light, amount;
+		var l, ll, light, lightColor, lightPosition, amount;
 
-		for ( l = 0, ll = scene.lights.length; l < ll; l++ ) {
+		for ( l = 0, ll = lights.length; l < ll; l ++ ) {
 
-			light = scene.lights[ l ];
+			light = lights[ l ];
+			lightColor = light.color;
 
 			if ( light instanceof THREE.DirectionalLight ) {
 
-				amount = element.normalWorld.dot( light.position ) * light.intensity;
+				lightPosition = light.matrixWorld.getPosition();
 
-				if ( amount > 0 ) {
+				amount = normal.dot( lightPosition );
 
-					color.r += light.color.r * amount;
-					color.g += light.color.g * amount;
-					color.b += light.color.b * amount;
+				if ( amount <= 0 ) continue;
 
-				}
+				amount *= light.intensity;
+
+				color.r += lightColor.r * amount;
+				color.g += lightColor.g * amount;
+				color.b += lightColor.b * amount;
 
 			} else if ( light instanceof THREE.PointLight ) {
 
-				_vector3.sub( light.position, element.centroidWorld );
-				_vector3.normalize();
+				lightPosition = light.matrixWorld.getPosition();
 
-				amount = element.normalWorld.dot( _vector3 ) * light.intensity;
+				amount = normal.dot( _vector3.sub( lightPosition, position ).normalize() );
 
-				if ( amount > 0 ) {
+				if ( amount <= 0 ) continue;
 
-					color.r += light.color.r * amount;
-					color.g += light.color.g * amount;
-					color.b += light.color.b * amount;
+				amount *= light.distance == 0 ? 1 : 1 - Math.min( position.distanceTo( lightPosition ) / light.distance, 1 );
 
-				}
+				if ( amount == 0 ) continue;
+
+				amount *= light.intensity;
+
+				color.r += lightColor.r * amount;
+				color.g += lightColor.g * amount;
+				color.b += lightColor.b * amount;
 
 			}
 
@@ -331,13 +282,13 @@ THREE.SVGRenderer = function () {
 
 			if ( _enableLighting ) {
 
-				_light.r = _ambientLight.r + _directionalLights.r + _pointLights.r;
-				_light.g = _ambientLight.g + _directionalLights.g + _pointLights.g;
-				_light.b = _ambientLight.b + _directionalLights.b + _pointLights.b;
+				_color.r = _ambientLight.r + _directionalLights.r + _pointLights.r;
+				_color.g = _ambientLight.g + _directionalLights.g + _pointLights.g;
+				_color.b = _ambientLight.b + _directionalLights.b + _pointLights.b;
 
-				_color.r = material.color.r * _light.r;
-				_color.g = material.color.g * _light.g;
-				_color.b = material.color.b * _light.b;
+				_color.r = material.color.r * _color.r;
+				_color.g = material.color.g * _color.g;
+				_color.b = material.color.b * _color.b;
 
 				_color.updateStyleString();
 
@@ -391,15 +342,15 @@ THREE.SVGRenderer = function () {
 
 			if ( _enableLighting ) {
 
-				_light.r = _ambientLight.r;
-				_light.g = _ambientLight.g;
-				_light.b = _ambientLight.b;
+				_color.r = _ambientLight.r;
+				_color.g = _ambientLight.g;
+				_color.b = _ambientLight.b;
 
-				calculateFaceLight( scene, element, _light );
+				calculateLight( _lights, element.centroidWorld, element.normalWorld, _color );
 
-				_color.r = Math.max( 0, Math.min( material.color.r * _light.r, 1 ) );
-				_color.g = Math.max( 0, Math.min( material.color.g * _light.g, 1 ) );
-				_color.b = Math.max( 0, Math.min( material.color.b * _light.b, 1 ) );
+				_color.r = Math.max( 0, Math.min( material.color.r * _color.r, 1 ) );
+				_color.g = Math.max( 0, Math.min( material.color.g * _color.g, 1 ) );
+				_color.b = Math.max( 0, Math.min( material.color.b * _color.b, 1 ) );
 
 			} else {
 
@@ -448,15 +399,15 @@ THREE.SVGRenderer = function () {
 
 			if ( _enableLighting ) {
 
-				_light.r = _ambientLight.r;
-				_light.g = _ambientLight.g;
-				_light.b = _ambientLight.b;
+				_color.r = _ambientLight.r;
+				_color.g = _ambientLight.g;
+				_color.b = _ambientLight.b;
 
-				calculateFaceLight( scene, element, _light );
+				calculateLight( _lights, element.centroidWorld, element.normalWorld, _color );
 
-				_color.r = Math.max( 0, Math.min( material.color.r * _light.r, 1 ) );
-				_color.g = Math.max( 0, Math.min( material.color.g * _light.g, 1 ) );
-				_color.b = Math.max( 0, Math.min( material.color.b * _light.b, 1 ) );
+				_color.r = Math.max( 0, Math.min( material.color.r * _color.r, 1 ) );
+				_color.g = Math.max( 0, Math.min( material.color.g * _color.g, 1 ) );
+				_color.b = Math.max( 0, Math.min( material.color.b * _color.b, 1 ) );
 
 			} else {
 

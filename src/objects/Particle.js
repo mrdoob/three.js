@@ -2,11 +2,11 @@
  * @author mr.doob / http://mrdoob.com/
  */
 
-THREE.Particle = function ( materials ) {
+THREE.Particle = function ( material ) {
 
 	THREE.Object3D.call( this );
 
-	this.materials = materials instanceof Array ? materials : [ materials ];
+	this.material = material;
 
 };
 

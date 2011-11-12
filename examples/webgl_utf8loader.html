@@ -113,19 +113,17 @@
 
 				var loader = new THREE.UTF8Loader();
 
-				loader.load( { model: "utf8/hand.utf8",
-								scale: 0.815141, offsetX: -0.371823, offsetY: -0.011920, offsetZ: -0.416061,
-								callback: function( geometry ) { callbackModel( geometry, 400, 0xffffff, 125, FLOOR, 0 ); } } );
+				loader.load( "utf8/hand.utf8", function( geometry ) { callbackModel( geometry, 400, 0xffffff, 125, FLOOR, 0 ); },
+							 { scale: 0.815141, offsetX: -0.371823, offsetY: -0.011920, offsetZ: -0.416061 } );
 
-				loader.load( { model: "utf8/ben.utf8",
-								scale: 0.707192, offsetX: -0.109362, offsetY: -0.006435, offsetZ: -0.268751,
-								callback: function( geometry ) { callbackModel( geometry, 400, 0xffaa00, -125, FLOOR, 0 ); } } );
+				loader.load( "utf8/ben.utf8", function( geometry ) { callbackModel( geometry, 400, 0xffaa00, -125, FLOOR, 0 ); },
+							  { scale: 0.707192, offsetX: -0.109362, offsetY: -0.006435, offsetZ: -0.268751 } );
 
 			}
 
 			function callbackModel( geometry, s, color, x, y, z ) {
 
-				var material = new THREE.MeshLambertMaterial( { color: color, map: THREE.ImageUtils.loadTexture( "textures/UV.jpg" ), envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3 } );
+				var material = new THREE.MeshLambertMaterial( { color: color, map: THREE.ImageUtils.loadTexture( "textures/ash_uvgrid01.jpg" ), envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3 } );
 				//material.shading =  THREE.FlatShading;
 
 				var mesh = new THREE.Mesh( geometry, material );

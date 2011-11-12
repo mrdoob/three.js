@@ -39,15 +39,14 @@
 			Walt Disney head by <a href="http://www.davidoreilly.com/2009/01/walt-disneys-head-on-a-plate" target="_blank">David OReilly</a>
 		</div>
 
-		<script src="../build/Three.js"></script> 
-		<script src="obj/WaltHead.js"></script>
+		<script src="../build/Three.js"></script>
 
 		<script src="js/RequestAnimationFrame.js"></script>
 
 		<script>
 
 			var camera, scene, renderer,
-			object;
+			loader, mesh;
 
 			init();
 			animate();
@@ -56,15 +55,19 @@
 
 				var container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.z = 1000;
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.y = - 6;
+				camera.position.z = 100;
 
 				scene = new THREE.Scene();
 
-				object = new THREE.Mesh( new WaltHead(), new THREE.MeshNormalMaterial() );
-				object.overdraw = true;
-				object.scale.x = object.scale.y = object.scale.z = 10;
-				scene.add( object );
+				loader = new THREE.JSONLoader();
+				loader.load( 'obj/WaltHeadLo.js', function ( geometry ) {
+
+					mesh = new THREE.Mesh( geometry, new THREE.MeshNormalMaterial( { overdraw: true } ) );
+					scene.add( mesh );
+
+				} );
 
 				renderer = new THREE.CanvasRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -85,8 +88,12 @@
 
 				var time = new Date().getTime() * 0.0005;
 
-				object.rotation.x -= 0.005;
-				object.rotation.y -= 0.01;
+				if ( mesh ) {
+
+					mesh.rotation.x -= 0.005;
+					mesh.rotation.y -= 0.01;
+
+				}
 
 				renderer.render( scene, camera );
 

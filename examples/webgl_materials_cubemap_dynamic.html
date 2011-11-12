@@ -93,7 +93,7 @@
 
 			var cubeCamera;
 
-			var oldTime = new Date().getTime();
+			var clock = new THREE.Clock();
 
 			var controlsGallardo = {
 
@@ -192,7 +192,7 @@
 				renderer.shadowCameraFov = 50;
 
 				renderer.shadowMapBias = 0.003885;
-				renderer.shadowMapDarkness = 0.55;
+				renderer.shadowMapDarkness = 0.5;
 				renderer.shadowMapWidth = SHADOW_MAP_WIDTH;
 				renderer.shadowMapHeight = SHADOW_MAP_HEIGHT;
 
@@ -223,22 +223,22 @@
 
 					body: [],
 
-					"Chrome": 		new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: cubeTarget  } ),
-					"ChromeN": 		new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: cubeTarget, combine: THREE.MixOperation, reflectivity: 0.75  } ),
-					"Dark chrome": 	new THREE.MeshLambertMaterial( { color: 0x444444, envMap: cubeTarget } ),
+					"Chrome": 		new THREE.MeshLambertMaterial( { color: 0xffffff, ambient: 0xffffff, envMap: cubeTarget  } ),
+					"ChromeN": 		new THREE.MeshLambertMaterial( { color: 0xffffff, ambient: 0xffffff, envMap: cubeTarget, combine: THREE.MixOperation, reflectivity: 0.75  } ),
+					"Dark chrome": 	new THREE.MeshLambertMaterial( { color: 0x444444, ambient: 0x444444, envMap: cubeTarget } ),
 
-					"Black rough":	new THREE.MeshLambertMaterial( { color: 0x050505 } ),
+					"Black rough":	new THREE.MeshLambertMaterial( { color: 0x050505, ambient: 0x050505 } ),
 
-					"Dark glass":	new THREE.MeshLambertMaterial( { color: 0x101020, envMap: cubeTarget, opacity: 0.5, transparent: true } ),
-					"Orange glass":	new THREE.MeshLambertMaterial( { color: 0xffbb00, opacity: 0.5, transparent: true } ),
-					"Red glass": 	new THREE.MeshLambertMaterial( { color: 0xff0000, opacity: 0.5, transparent: true } ),
+					"Dark glass":	new THREE.MeshLambertMaterial( { color: 0x101020, ambient: 0x101020, envMap: cubeTarget, opacity: 0.5, transparent: true } ),
+					"Orange glass":	new THREE.MeshLambertMaterial( { color: 0xffbb00, ambient: 0xffbb00, opacity: 0.5, transparent: true } ),
+					"Red glass": 	new THREE.MeshLambertMaterial( { color: 0xff0000, ambient: 0xff0000, opacity: 0.5, transparent: true } ),
 
-					"Black metal":	new THREE.MeshLambertMaterial( { color: 0x222222, envMap: cubeTarget, combine: THREE.MultiplyOperation } ),
-					"Orange metal": new THREE.MeshLambertMaterial( { color: 0xff6600, envMap: cubeTarget, combine: THREE.MultiplyOperation } )
+					"Black metal":	new THREE.MeshLambertMaterial( { color: 0x222222, ambient: 0x222222, envMap: cubeTarget, combine: THREE.MultiplyOperation } ),
+					"Orange metal": new THREE.MeshLambertMaterial( { color: 0xff6600, ambient: 0xff6600, envMap: cubeTarget, combine: THREE.MultiplyOperation } )
 
 				}
 
-				mlib.body.push( [ "Orange", new THREE.MeshLambertMaterial( { color: 0x883300, envMap: cubeTarget, combine: THREE.MixOperation, reflectivity: 0.1 } ) ] );
+				mlib.body.push( [ "Orange", new THREE.MeshLambertMaterial( { color: 0x883300, ambient: 0x883300, envMap: cubeTarget, combine: THREE.MixOperation, reflectivity: 0.1 } ) ] );
 				mlib.body.push( [ "Blue", 	new THREE.MeshLambertMaterial( { color: 0x113355, envMap: cubeTarget, combine: THREE.MixOperation, reflectivity: 0.1 } ) ] );
 				mlib.body.push( [ "Red", 	new THREE.MeshLambertMaterial( { color: 0x660000, envMap: cubeTarget, combine: THREE.MixOperation, reflectivity: 0.1 } ) ] );
 				mlib.body.push( [ "Black", 	new THREE.MeshLambertMaterial( { color: 0x000000, envMap: cubeTarget, combine: THREE.MixOperation, reflectivity: 0.2 } ) ] );
@@ -549,7 +549,7 @@
 
 			function addObject( geometry, color, x, y, z, sy ) {
 
-				var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: color } ) );
+				var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: color, ambient: color } ) );
 				object.position.set( x, y, z );
 				scene.add( object );
 
@@ -817,15 +817,15 @@
 
 				var materials = car.bodyGeometry.materials;
 
-				materials[ 0 ][ 0 ] = mlib.body[ 0 ][ 1 ]; 		// body
-				materials[ 1 ][ 0 ] = mlib[ "Dark chrome" ]; 	// front under lights, back
+				materials[ 0 ] = mlib.body[ 0 ][ 1 ]; 		// body
+				materials[ 1 ] = mlib[ "Dark chrome" ]; 	// front under lights, back
 
 				// WHEELS
 
 				materials = car.wheelGeometry.materials;
 
-				materials[ 0 ][ 0 ] = mlib[ "Chrome" ];			// insides
-				materials[ 1 ][ 0 ] = mlib[ "Black rough" ];	// tire
+				materials[ 0 ] = mlib[ "Chrome" ];			// insides
+				materials[ 1 ] = mlib[ "Black rough" ];	// tire
 
 			}
 
@@ -844,21 +844,21 @@
 
 				var materials = car.bodyGeometry.materials;
 
-				materials[ 0 ][ 0 ] = mlib[ "Black metal" ];	// top, front center, back sides
-				materials[ 1 ][ 0 ] = mlib[ "Chrome" ];			// front sides
-				materials[ 2 ][ 0 ] = mlib[ "Chrome" ];			// engine
-				materials[ 3 ][ 0 ] = mlib[ "Dark chrome" ];	// small chrome things
-				materials[ 4 ][ 0 ] = mlib[ "Red glass" ];		// backlights
-				materials[ 5 ][ 0 ] = mlib[ "Orange glass" ];	// back signals
-				materials[ 6 ][ 0 ] = mlib[ "Black rough" ];	// bottom, interior
-				materials[ 7 ][ 0 ] = mlib[ "Dark glass" ];		// windshield
+				materials[ 0 ] = mlib[ "Black metal" ];	// top, front center, back sides
+				materials[ 1 ] = mlib[ "Chrome" ];			// front sides
+				materials[ 2 ] = mlib[ "Chrome" ];			// engine
+				materials[ 3 ] = mlib[ "Dark chrome" ];	// small chrome things
+				materials[ 4 ] = mlib[ "Red glass" ];		// backlights
+				materials[ 5 ] = mlib[ "Orange glass" ];	// back signals
+				materials[ 6 ] = mlib[ "Black rough" ];	// bottom, interior
+				materials[ 7 ] = mlib[ "Dark glass" ];		// windshield
 
 				// WHEELS
 
 				materials = car.wheelGeometry.materials;
 
-				materials[ 0 ][ 0 ] = mlib[ "Chrome" ];			// insides
-				materials[ 1 ][ 0 ] = mlib[ "Black rough" ];	// tire
+				materials[ 0 ] = mlib[ "Chrome" ];			// insides
+				materials[ 1 ] = mlib[ "Black rough" ];	// tire
 
 			}
 
@@ -873,23 +873,13 @@
 
 			}
 
-			function clamp( x, a, b ) { return x < a ? a : ( x > b ? b : x ); }
-
-			function map_linear( x, sa, sb, ea, eb ) {
-
-				return ( x  - sa ) * ( eb - ea ) / ( sb - sa ) + ea;
-
-			};
-
 			function render() {
 
-				var newTime = new Date().getTime();
-				var delta = 0.001 * ( newTime - oldTime );
-				oldTime = newTime;
+				var delta = clock.getDelta();
 
 				// day / night
 
-				v = clamp( v + 0.5 * delta * vdir, 0.1, 0.9 );
+				v = THREE.Math.clamp( v + 0.5 * delta * vdir, 0.1, 0.9 );
 				scene.fog.color.setHSV( 0.51, 0.5, v );
 
 				renderer.setClearColor( scene.fog.color, 1 );
@@ -910,16 +900,16 @@
 
 					if ( veyron.loaded ) {
 
-						veyron.bodyGeometry.materials[ 1 ][ 0 ] = mlib[ "ChromeN" ];
-						veyron.bodyGeometry.materials[ 2 ][ 0 ] = mlib[ "ChromeN" ];
+						veyron.bodyGeometry.materials[ 1 ] = mlib[ "ChromeN" ];
+						veyron.bodyGeometry.materials[ 2 ] = mlib[ "ChromeN" ];
 
-						veyron.wheelGeometry.materials[ 0 ][ 0 ] = mlib[ "ChromeN" ];
+						veyron.wheelGeometry.materials[ 0 ] = mlib[ "ChromeN" ];
 
 					}
 
 					if ( gallardo.loaded ) {
 
-						gallardo.wheelGeometry.materials[ 0 ][ 0 ] = mlib[ "ChromeN" ];
+						gallardo.wheelGeometry.materials[ 0 ] = mlib[ "ChromeN" ];
 
 					}
 
@@ -927,25 +917,25 @@
 
 					if ( veyron.loaded ) {
 
-						veyron.bodyGeometry.materials[ 1 ][ 0 ] = mlib[ "Chrome" ];
-						veyron.bodyGeometry.materials[ 2 ][ 0 ] = mlib[ "Chrome" ];
+						veyron.bodyGeometry.materials[ 1 ] = mlib[ "Chrome" ];
+						veyron.bodyGeometry.materials[ 2 ] = mlib[ "Chrome" ];
 
-						veyron.wheelGeometry.materials[ 0 ][ 0 ] = mlib[ "Chrome" ];
+						veyron.wheelGeometry.materials[ 0 ] = mlib[ "Chrome" ];
 
 					}
 
 					if ( gallardo.loaded ) {
 
-						gallardo.wheelGeometry.materials[ 0 ][ 0 ] = mlib[ "Chrome" ];
+						gallardo.wheelGeometry.materials[ 0 ] = mlib[ "Chrome" ];
 
 					}
 
 				}
 
-				effectBloom.screenUniforms[ "opacity" ].value = map_linear( vnorm, 0, 1, 1, 0.75 );
+				effectBloom.screenUniforms[ "opacity" ].value = THREE.Math.mapLinear( vnorm, 0, 1, 1, 0.75 );
 
-				ambientLight.color.setHSV( 0, 0, map_linear( vnorm, 0, 1, 0.07, 0.33 ) );
-				groundBasic.color.setHSV( 0.1, 0.45, map_linear( vnorm, 0, 1, 0.725, 0.995 ) );
+				ambientLight.color.setHSV( 0, 0, THREE.Math.mapLinear( vnorm, 0, 1, 0.07, 0.33 ) );
+				groundBasic.color.setHSV( 0.1, 0.45, THREE.Math.mapLinear( vnorm, 0, 1, 0.725, 0.995 ) );
 
 				// blur
 
@@ -997,6 +987,9 @@
 
 					cubeCamera.updatePosition( currentCar.root.position );
 
+					renderer.autoUpdateObjects = false;
+					renderer.initWebGLObjects( scene );
+
 					renderer.autoClear = true;
 					cubeCamera.updateCubeMap( renderer, scene );
 
@@ -1009,10 +1002,11 @@
 
 				renderer.autoClear = false;
 				renderer.shadowMapEnabled = true;
+				renderer.autoUpdateObjects = true;
 
 				camera.lookAt( cameraTarget );
 
-				renderer.clear();
+				renderer.clearTarget( null );
 				composer.render( 0.1 );
 
 				renderer.shadowMapEnabled = false;

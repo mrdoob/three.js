@@ -38,8 +38,7 @@
 		<script src="js/ShaderExtras.js"></script>
 		<script src="js/Stats.js"></script>
 
-		<link href="js/gui/gui.css" media="screen" rel="stylesheet" type="text/css" />
-		<script src="js/gui/gui.min.js"></script>
+		<script src='js/DAT.GUI.min.js'></script>
 
 		<div id="info">
 			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl depth-of-field with bokeh example -
@@ -124,9 +123,9 @@
 				//var s = 0.25;
 				var s = 60;
 
-				for ( i = 0; i < xgrid; i++ )
-				for ( j = 0; j < ygrid; j++ )
-				for ( k = 0; k < zgrid; k++ ) {
+				for ( i = 0; i < xgrid; i ++ )
+				for ( j = 0; j < ygrid; j ++ )
+				for ( k = 0; k < zgrid; k ++ ) {
 
 					if ( singleMaterial ) {
 
@@ -153,7 +152,7 @@
 					scene.add( mesh );
 					objects.push( mesh );
 
-					c++;
+					c ++;
 
 				}
 
@@ -194,10 +193,11 @@
 
 				};
 
-				var gui = new GUI();
+				var gui = new DAT.GUI();
 				gui.add( effectController, "focus", 0.0, 3.0, 0.025 ).onChange( matChanger );
 				gui.add( effectController, "aperture", 0.001, 0.2, 0.001 ).onChange( matChanger );
 				gui.add( effectController, "maxblur", 0.0, 3.0, 0.025 ).onChange( matChanger );
+				gui.close();
 
 			}
 
@@ -278,7 +278,7 @@
 
 			function render() {
 
-				var time = new Date().getTime() * 0.00005;
+				var time = Date.now() * 0.00005;
 
 				camera.position.x += ( mouseX - camera.position.x ) * 0.036;
 				camera.position.y += ( - (mouseY) - camera.position.y ) * 0.036;
@@ -287,10 +287,9 @@
 
 				if ( !singleMaterial ) {
 
-					for( i = 0; i < nobjects; i++ ) {
+					for( i = 0; i < nobjects; i ++ ) {
 
-						h = ( 360 * ( i/nobjects + time ) % 360 ) / 360;
-						//materials[ i ].color.setHSV( h, 0.5 + 0.5 * ( i % 20 / 20 ), 1 );
+						h = ( 360 * ( i / nobjects + time ) % 360 ) / 360;
 						materials[ i ].color.setHSV( h, 1, 1 );
 
 					}

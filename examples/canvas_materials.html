@@ -70,15 +70,15 @@
 
 				var materials = [
 
-					{ material: new THREE.MeshBasicMaterial( { color: 0x00ffff, wireframe: true } ), overdraw: false, doubleSided: true },
-					{ material: new THREE.MeshBasicMaterial( { color: 0xff0000, blending: THREE.AdditiveBlending } ), overdraw: false, doubleSided: true },
-					{ material: new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading } ), overdraw: true, doubleSided: false },
-					{ material: new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.SmoothShading } ), overdraw: true, doubleSided: false },
-					{ material: new THREE.MeshDepthMaterial(), overdraw: true, doubleSided: false },
-					{ material: new THREE.MeshNormalMaterial(), overdraw: true, doubleSided: false },
-					{ material: new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/land_ocean_ice_cloud_2048.jpg' ) } ), overdraw: false, doubleSided: false },
-					{ material: new THREE.MeshLambertMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/land_ocean_ice_cloud_2048.jpg' ) } ), overdraw: false, doubleSided: false },
-					{ material: new THREE.MeshBasicMaterial( { envMap: THREE.ImageUtils.loadTexture( 'textures/envmap.png', new THREE.SphericalReflectionMapping() ) } ), overdraw: false, doubleSided: false }
+					{ material: new THREE.MeshBasicMaterial( { color: 0x00ffff, wireframe: true } ), doubleSided: true },
+					{ material: new THREE.MeshBasicMaterial( { color: 0xff0000, blending: THREE.AdditiveBlending } ), doubleSided: true },
+					{ material: new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, overdraw: true } ), doubleSided: false },
+					{ material: new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.SmoothShading, overdraw: true } ), doubleSided: false },
+					{ material: new THREE.MeshDepthMaterial( { overdraw: true } ), doubleSided: false },
+					{ material: new THREE.MeshNormalMaterial( { overdraw: true } ), doubleSided: false },
+					{ material: new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/land_ocean_ice_cloud_2048.jpg' ) } ), doubleSided: false },
+					{ material: new THREE.MeshLambertMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/land_ocean_ice_cloud_2048.jpg' ) } ), doubleSided: false },
+					{ material: new THREE.MeshBasicMaterial( { envMap: THREE.ImageUtils.loadTexture( 'textures/envmap.png', new THREE.SphericalReflectionMapping() ) } ), doubleSided: false }
 
 				];
 
@@ -96,7 +96,6 @@
 				for ( var i = 0, l = materials.length; i < l; i ++ ) {
 
 					var sphere = new THREE.Mesh( geometry, materials[ i ].material );
-					sphere.overdraw = materials[ i ].overdraw;
 					sphere.doubleSided = materials[ i ].doubleSided;
 
 					sphere.position.x = ( i % 5 ) * 200 - 400;

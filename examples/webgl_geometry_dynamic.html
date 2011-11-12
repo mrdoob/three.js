@@ -59,10 +59,12 @@
 
 			var camera, controls, scene, renderer;
 
-			var mesh, texture,geometry, material;
+			var mesh, texture, geometry, material;
 
 			var worldWidth = 128, worldDepth = 128,
 			worldHalfWidth = worldWidth / 2, worldHalfDepth = worldDepth / 2;
+
+			var clock = new THREE.Clock();
 
 			init();
 			animate();
@@ -137,11 +139,12 @@
 
 			function render() {
 
-				var time = new Date().getTime() * 0.01;
+				var delta = clock.getDelta(),
+					time = clock.getElapsedTime() * 10;
 
 				for ( var i = 0, l = geometry.vertices.length; i < l; i ++ ) {
 
-					geometry.vertices[ i ].position.z = 35 * Math.sin( i/5 + (time + i)/7 );
+					geometry.vertices[ i ].position.z = 35 * Math.sin( i / 5 + ( time + i ) / 7 );
 
 				}
 
@@ -151,7 +154,7 @@
 				mesh.geometry.__dirtyVertices = true;
 				//mesh.geometry.__dirtyNormals = true;
 
-				controls.update();
+				controls.update( delta );
 				renderer.render( scene, camera );
 
 			}

@@ -11,7 +11,7 @@
  * THREE.CubicBezierCurve
  * THREE.SplineCurve
  * THREE.ArcCurve
- * 
+ *
  * -- 3d classes --
  * THREE.LineCurve3
  * THREE.QuadraticBezierCurve3
@@ -147,20 +147,7 @@ THREE.Curve.prototype.getUtoTmapping = function ( u, distance ) {
 
 	}
 
-	// // TODO Should do binary search + sub division + interpolation when needed
-	// time = Date.now();
-	// while ( i < il ) {
-	//
-	// 	i++;
-	//
-	// 	if ( targetArcLength < arcLengths[ i ] ) break;
-	//
-	// }
-	//
-	// i--;
-	// console.log('o' , i, Date.now()- time);
-
-	time = Date.now();
+	//var time = Date.now();
 
 	// binary search for the index with largest value smaller than target u distance
 
@@ -251,9 +238,11 @@ THREE.Curve.prototype.getTangent = function( t ) {
 	var pt1 = this.getPoint( t1 );
 	var pt2 = this.getPoint( t2 );
 
-	var vec = new THREE.Vector2();
-	vec.sub( pt2, pt1 );
-	return vec.unit();
+	// var vec = new THREE.Vector2();
+	// vec.sub( pt2, pt1 );
+	
+	var vec = pt1.clone().subSelf(pt2);
+	return vec.normalize();
 
 };
 
@@ -295,14 +284,6 @@ THREE.LineCurve.prototype.getPoint = function ( t ) {
 	point.multiplyScalar( t ).addSelf( this.v1 );
 
 	return point;
-
-	// 	var dx = this.x2 - this.x1;
-	// 	var dy = this.y2 - this.y1;
-	//
-	// 	var tx = this.x1 + dx * t;
-	// 	var ty = this.y1 + dy * t;
-	//
-	// 	return new THREE.Vector2( tx, ty );
 
 };
 
@@ -370,17 +351,6 @@ THREE.QuadraticBezierCurve.prototype.getTangent = function( t ) {
 	// 	get lengths for sub segments
 	// 	if segment is bezier
 	//		perform subdivisions
-
-	// var x0, y0, x1, y1, x2, y2;
-
-	// x0 = this.actions[ 0 ].args[ 0 ];
-	// y0 = this.actions[ 0 ].args[ 1 ];
-	//
-	// x1 = this.actions[ 1 ].args[ 0 ];
-	// y1 = this.actions[ 1 ].args[ 1 ];
-	//
-	// x2 = this.actions[ 1 ].args[ 2 ];
-	// y2 = this.actions[ 1 ].args[ 3 ];
 
 	var tx, ty;
 
@@ -458,7 +428,7 @@ THREE.CubicBezierCurve.prototype.getTangent = function( t ) {
 
 THREE.SplineCurve = function ( points /* array of Vector2 */ ) {
 
-	this.points = points;
+	this.points = (points == undefined) ? [] : points;
 
 };
 
@@ -629,7 +599,7 @@ THREE.LineCurve3 = THREE.Curve.create(
 		var r = new THREE.Vector3();
 
 
-		r.sub( v2, v1 ); // diff
+		r.sub( this.v2, this.v1 ); // diff
 		r.multiplyScalar( t );
 		r.addSelf( this.v1 );
 
@@ -710,8 +680,8 @@ THREE.SplineCurve3 = THREE.Curve.create(
 
 	function ( points /* array of Vector3 */) {
 
-		this.points = points;
-		
+		this.points = (points == undefined) ? [] : points;
+
 	},
 
 	function ( t ) {

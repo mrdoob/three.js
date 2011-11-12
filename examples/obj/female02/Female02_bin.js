@@ -1,23 +1,24 @@
-// Converted from: ../../examples/obj/female02/female02.obj
-//  vertices: 3274
-//  faces: 6233
-//  materials: 6
-//
-//  Generated with OBJ -> Three.js converter
-//  http://github.com/alteredq/three.js/blob/master/utils/exporters/convert_obj_three.py
+{
 
-
-var model = {
-
-    "version" : 1,
+    "metadata" :
+    {
+        "formatVersion" : 3,
+        "sourceFile"    : "female02.obj",
+        "generatedBy"   : "OBJConverter",
+        "vertices"      : 3274,
+        "faces"         : 6233,
+        "normals"       : 3292,
+        "uvs"           : 4935,
+        "materials"     : 6
+    },
 
     "materials": [	{
 	"DbgColor" : 15658734,
 	"DbgIndex" : 0,
 	"DbgName" : "_03_-_Default1noCulli__03_-_Default1noCulli",
 	"colorAmbient" : [0.0, 0.0, 0.0],
-	"colorDiffuse" : [0.64000000000000001, 0.64000000000000001, 0.64000000000000001],
-	"colorSpecular" : [0.16500000000000001, 0.16500000000000001, 0.16500000000000001],
+	"colorDiffuse" : [0.64, 0.64, 0.64],
+	"colorSpecular" : [0.165, 0.165, 0.165],
 	"illumination" : 2,
 	"mapDiffuse" : "03_-_Default1noCulling.JPG",
 	"opticalDensity" : 1.0,
@@ -30,8 +31,8 @@ var model = {
 	"DbgIndex" : 1,
 	"DbgName" : "_02_-_Default1noCulli__02_-_Default1noCulli",
 	"colorAmbient" : [0.0, 0.0, 0.0],
-	"colorDiffuse" : [0.64000000000000001, 0.64000000000000001, 0.64000000000000001],
-	"colorSpecular" : [0.16500000000000001, 0.16500000000000001, 0.16500000000000001],
+	"colorDiffuse" : [0.64, 0.64, 0.64],
+	"colorSpecular" : [0.165, 0.165, 0.165],
 	"illumination" : 2,
 	"mapDiffuse" : "02_-_Default1noCulling.JPG",
 	"opticalDensity" : 1.0,
@@ -44,8 +45,8 @@ var model = {
 	"DbgIndex" : 2,
 	"DbgName" : "FrontColorNoCullingID__02_-_Default1noCulli",
 	"colorAmbient" : [0.0, 0.0, 0.0],
-	"colorDiffuse" : [0.80000000000000004, 0.80000000000000004, 0.80000000000000004],
-	"colorSpecular" : [0.16500000000000001, 0.16500000000000001, 0.16500000000000001],
+	"colorDiffuse" : [0.8, 0.8, 0.8],
+	"colorSpecular" : [0.165, 0.165, 0.165],
 	"illumination" : 2,
 	"mapDiffuse" : "02_-_Default1noCulling.JPG",
 	"opticalDensity" : 1.0,
@@ -58,8 +59,8 @@ var model = {
 	"DbgIndex" : 3,
 	"DbgName" : "FrontColorNoCullingID__03_-_Default1noCulli",
 	"colorAmbient" : [0.0, 0.0, 0.0],
-	"colorDiffuse" : [0.80000000000000004, 0.80000000000000004, 0.80000000000000004],
-	"colorSpecular" : [0.16500000000000001, 0.16500000000000001, 0.16500000000000001],
+	"colorDiffuse" : [0.8, 0.8, 0.8],
+	"colorSpecular" : [0.165, 0.165, 0.165],
 	"illumination" : 2,
 	"mapDiffuse" : "03_-_Default1noCulling.JPG",
 	"opticalDensity" : 1.0,
@@ -72,8 +73,8 @@ var model = {
 	"DbgIndex" : 4,
 	"DbgName" : "_01_-_Default1noCulli__01_-_Default1noCulli",
 	"colorAmbient" : [0.0, 0.0, 0.0],
-	"colorDiffuse" : [0.64000000000000001, 0.64000000000000001, 0.64000000000000001],
-	"colorSpecular" : [0.16500000000000001, 0.16500000000000001, 0.16500000000000001],
+	"colorDiffuse" : [0.64, 0.64, 0.64],
+	"colorSpecular" : [0.165, 0.165, 0.165],
 	"illumination" : 2,
 	"mapDiffuse" : "01_-_Default1noCulling.JPG",
 	"opticalDensity" : 1.0,
@@ -86,8 +87,8 @@ var model = {
 	"DbgIndex" : 5,
 	"DbgName" : "FrontColorNoCullingID__01_-_Default1noCulli",
 	"colorAmbient" : [0.0, 0.0, 0.0],
-	"colorDiffuse" : [0.80000000000000004, 0.80000000000000004, 0.80000000000000004],
-	"colorSpecular" : [0.16500000000000001, 0.16500000000000001, 0.16500000000000001],
+	"colorDiffuse" : [0.8, 0.8, 0.8],
+	"colorSpecular" : [0.165, 0.165, 0.165],
 	"illumination" : 2,
 	"mapDiffuse" : "01_-_Default1noCulling.JPG",
 	"opticalDensity" : 1.0,
@@ -97,7 +98,4 @@ var model = {
 
     "buffers": "Female02_bin.bin"
 
-};
-    
-postMessage( model );
-close();
+}

@@ -133,7 +133,7 @@
 
 				// find intersections
 
-				camera.update();
+				camera.updateMatrixWorld();
 
 				var vector = new THREE.Vector3( mouse.x, mouse.y, 0.5 );
 				projector.unprojectVector( vector, camera );
@@ -146,16 +146,16 @@
 
 					if ( INTERSECTED != intersects[ 0 ].object ) {
 
-						if ( INTERSECTED ) INTERSECTED.materials[ 0 ].program = programStroke;
+						if ( INTERSECTED ) INTERSECTED.material.program = programStroke;
 
 						INTERSECTED = intersects[ 0 ].object;
-						INTERSECTED.materials[ 0 ].program = programFill;
+						INTERSECTED.material.program = programFill;
 
 					}
 
 				} else {
 
-					if ( INTERSECTED ) INTERSECTED.materials[ 0 ].program = programStroke;
+					if ( INTERSECTED ) INTERSECTED.material.program = programStroke;
 
 					INTERSECTED = null;
 

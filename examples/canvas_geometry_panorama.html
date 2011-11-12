@@ -79,7 +79,6 @@
 
 				mesh = new THREE.Mesh( new THREE.CubeGeometry( 300, 300, 300, 7, 7, 7, materials ), new THREE.MeshFaceMaterial() );
 				mesh.scale.x = - 1;
-				mesh.overdraw = true;
 				scene.add( mesh );
 
 				renderer = new THREE.CanvasRenderer();
@@ -100,7 +99,7 @@
 			function loadTexture( path ) {
 
 				var texture = new THREE.Texture( texture_placeholder );
-				var material = new THREE.MeshBasicMaterial( { map: texture } );
+				var material = new THREE.MeshBasicMaterial( { map: texture, overdraw: true } );
 
 				var image = new Image();
 				image.onload = function () {

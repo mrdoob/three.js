@@ -3,21 +3,21 @@
  */
 
 THREE.ColorUtils = {
-	
+
 	adjustHSV : function ( color, h, s, v ) {
 
 		var hsv = THREE.ColorUtils.__hsv;
-		
+
 		THREE.ColorUtils.rgbToHsv( color, hsv );
 
-		hsv.h = THREE.ColorUtils.clamp( hsv.h + h, 0, 1 );
-		hsv.s = THREE.ColorUtils.clamp( hsv.s + s, 0, 1 );
-		hsv.v = THREE.ColorUtils.clamp( hsv.v + v, 0, 1 );
-		
+		hsv.h = THREE.Math.clamp( hsv.h + h, 0, 1 );
+		hsv.s = THREE.Math.clamp( hsv.s + s, 0, 1 );
+		hsv.v = THREE.Math.clamp( hsv.v + v, 0, 1 );
+
 		color.setHSV( hsv.h, hsv.s, hsv.v );
 
 	},
-	
+
 	// based on MochiKit implementation by Bob Ippolito
 
 	rgbToHsv : function ( color, hsv ) {
@@ -25,7 +25,7 @@ THREE.ColorUtils = {
 		var r = color.r;
 		var g = color.g;
 		var b = color.b;
-		
+
 		var max = Math.max( Math.max( r, g ), b );
 		var min = Math.min( Math.min( r, g ), b );
 
@@ -33,7 +33,7 @@ THREE.ColorUtils = {
 		var saturation;
 		var value = max;
 
-		if ( min == max )	{
+		if ( min === max )	{
 
 			hue = 0;
 			saturation = 0;
@@ -43,11 +43,11 @@ THREE.ColorUtils = {
 			var delta = ( max - min );
 			saturation = delta / max;
 
-			if ( r == max )	{
+			if ( r === max ) {
 
 				hue = ( g - b ) / delta;
 
-			} else if ( g == max ) {
+			} else if ( g === max ) {
 
 				hue = 2 + ( ( b - r ) / delta );
 
@@ -63,7 +63,7 @@ THREE.ColorUtils = {
 				hue += 1;
 
 			}
-			
+
 			if ( hue > 1 ) {
 
 				hue -= 1;
@@ -71,24 +71,18 @@ THREE.ColorUtils = {
 			}
 
 		}
-		
+
 		if ( hsv === undefined ) {
-			
+
 			hsv = { h: 0, s: 0, v: 0 };
 
 		}
-		
+
 		hsv.h = hue;
 		hsv.s = saturation;
 		hsv.v = value;
-		
-		return hsv;
 
-	},
-	
-	clamp: function ( x, a, b ) { 
-		
-		return x < a ? a : ( x > b ? b : x ); 
+		return hsv;
 
 	}
 

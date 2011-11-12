@@ -2,14 +2,24 @@
  * @author mr.doob / http://mrdoob.com/
  */
 
-THREE.Line = function ( geometry, materials, type ) {
+THREE.Line = function ( geometry, material, type ) {
 
 	THREE.Object3D.call( this );
 
 	this.geometry = geometry;
-	this.materials = materials instanceof Array ? materials : [ materials ];
+	this.material = material;
 
-	this.type = ( type != undefined ) ? type : THREE.LineStrip;
+	this.type = ( type !== undefined ) ? type : THREE.LineStrip;
+
+	if ( this.geometry ) {
+
+		if ( ! this.geometry.boundingSphere ) {
+
+			this.geometry.computeBoundingSphere();
+
+		}
+
+	}
 
 };
 

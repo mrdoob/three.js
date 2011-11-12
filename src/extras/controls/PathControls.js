@@ -59,12 +59,12 @@ THREE.PathControls = function ( object, domElement ) {
 
 	// methods
 
-	this.update = function () {
+	this.update = function ( delta ) {
 
 		var srcRange, dstRange;
 
-		if( this.lookHorizontal ) this.lon += this.mouseX * this.lookSpeed;
-		if( this.lookVertical )   this.lat -= this.mouseY * this.lookSpeed;
+		if( this.lookHorizontal ) this.lon += this.mouseX * this.lookSpeed * delta;
+		if( this.lookVertical )   this.lat -= this.mouseY * this.lookSpeed * delta;
 
 		this.lon = Math.max( 0, Math.min( 360, this.lon ) );
 		this.lat = Math.max( - 85, Math.min( 85, this.lat ) );
@@ -79,7 +79,7 @@ THREE.PathControls = function ( object, domElement ) {
 		srcRange = this.verticalAngleMap.srcRange;
 		dstRange = this.verticalAngleMap.dstRange;
 
-		var tmpPhi = map_linear( this.phi, srcRange[ 0 ], srcRange[ 1 ], dstRange[ 0 ], dstRange[ 1 ] );
+		var tmpPhi = THREE.Math.mapLinear( this.phi, srcRange[ 0 ], srcRange[ 1 ], dstRange[ 0 ], dstRange[ 1 ] );
 		var tmpPhiFullRange = dstRange[ 1 ] - dstRange[ 0 ];
 		var tmpPhiNormalized = ( tmpPhi - dstRange[ 0 ] ) / tmpPhiFullRange;
 
@@ -90,7 +90,7 @@ THREE.PathControls = function ( object, domElement ) {
 		srcRange = this.horizontalAngleMap.srcRange;
 		dstRange = this.horizontalAngleMap.dstRange;
 
-		var tmpTheta = map_linear( this.theta, srcRange[ 0 ], srcRange[ 1 ], dstRange[ 0 ], dstRange[ 1 ] );
+		var tmpTheta = THREE.Math.mapLinear( this.theta, srcRange[ 0 ], srcRange[ 1 ], dstRange[ 0 ], dstRange[ 1 ] );
 		var tmpThetaFullRange = dstRange[ 1 ] - dstRange[ 0 ];
 		var tmpThetaNormalized = ( tmpTheta - dstRange[ 0 ] ) / tmpThetaFullRange;
 
@@ -129,18 +129,6 @@ THREE.PathControls = function ( object, domElement ) {
 
 		var b = a % PI2;
 		return b >= 0 ? b : b + PI2;
-
-	};
-
-	function cap( x, a, b ) {
-
-		return ( x < a ) ? a : ( ( x > b ) ? b : x );
-
-	};
-
-	function map_linear( x, sa, sb, ea, eb ) {
-
-		return ( x  - sa ) * ( eb - ea ) / ( sb - sa ) + ea;
 
 	};
 
@@ -245,8 +233,8 @@ THREE.PathControls = function ( object, domElement ) {
 
 		var lineGeo = createSplineGeometry( spline, 10 ),
 			particleGeo = createSplineGeometry( spline, 10 ),
-			lineMat = new THREE.LineBasicMaterial( { color: 0xff0000, linewidth: 3 } );
-			lineObj = new THREE.Line( lineGeo, lineMat );
+			lineMat = new THREE.LineBasicMaterial( { color: 0xff0000, linewidth: 3 } ),
+			lineObj = new THREE.Line( lineGeo, lineMat ),
 			particleObj = new THREE.ParticleSystem( particleGeo, new THREE.ParticleBasicMaterial( { color: 0xffaa00, size: 3 } ) );
 
 		lineObj.scale.set( 1, 1, 1 );
@@ -259,7 +247,7 @@ THREE.PathControls = function ( object, domElement ) {
 			geo = new THREE.SphereGeometry( 1, 16, 8 ),
 			mat = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 
-		for ( i = 0; i < spline.points.length; i++ ) {
+		for ( var i = 0; i < spline.points.length; i ++ ) {
 
 			waypoint = new THREE.Mesh( geo, mat );
 			waypoint.position.copy( spline.points[ i ] );

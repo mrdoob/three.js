@@ -28,9 +28,6 @@
 
 		<script src="fonts/helvetiker_regular.typeface.js"></script>
 
-		<script src="obj/WaltHead.js"></script>
-		<!-- -->
-
 		<script>
 
 			var container, stats;
@@ -76,15 +73,23 @@
 
 			}
 
-			THREE.WaltHead = WaltHead;
+
 
 			var geometriesParams = [
 
 				{type: 'CubeGeometry', args: [ 200, 200, 200, 2, 2, 2, materials ] },
 				{type: 'TorusGeometry', args: [ 100, 60, 4, 8, Math.PI*2 ] },
-				{type: 'SphereGeometry', args: [ 100, 3, 3 ] },
-				{type: 'IcosahedronGeometry', args: [ 1 ], scale: 200 },
+				{type: 'TorusKnotGeometry', args: [  ], scale:0.25, meshScale:4 },
+				{type: 'SphereGeometry', args: [ 100, 3, 3 ], meshScale:2 },
+				{type: 'IcosahedronGeometry', args: [ 1 ], scale: 100, meshScale:2 },
 				{type: 'CylinderGeometry', args: [ 25, 75, 200, 8, 3 ]} ,
+				{type: 'OctahedronGeometry', args: [200, 0], meshScale:2 },
+				{type: 'LatheGeometry', args: [ [
+					new THREE.Vector3(0,0,0), 
+					new THREE.Vector3(0,50,50),
+					new THREE.Vector3(0,10,100), 
+					new THREE.Vector3(0,50,150),
+					new THREE.Vector3(0,0,200) ] ]},
 				{type: 'TextGeometry', args: ['&', {
 										size: 200,
 										height: 50,
@@ -92,11 +97,38 @@
 										font: "helvetiker"
 
 									}]},
-				{type: 'PlaneGeometry', args: [ 200, 200, 4, 4 ] },
-
-				{type: 'WaltHead', args: [ ], scale: 6 }
+				{type: 'PlaneGeometry', args: [ 200, 200, 4, 4 ] }
 
 			];
+
+			if (location.protocol !== "file:") {
+				var loader = new THREE.JSONLoader();
+				loader.load( 'obj/WaltHeadLo.js', function ( geometry ) {
+
+					geometriesParams.push({type: 'WaltHead', args: [ ], meshScale: 6 });
+
+					THREE.WaltHead = function() {
+						return THREE.GeometryUtils.clone(geometry);
+					};
+					
+					updateInfo() 
+
+				});
+
+				var loader2 = new THREE.JSONLoader();
+				loader2.load( 'obj/Suzanne.js', function ( geometry ) {
+
+					geometriesParams.push({type: 'Suzanne', args: [ ], scale: 100, meshScale:2 });
+
+					THREE.Suzanne = function() {
+						return THREE.GeometryUtils.clone(geometry);
+					};
+					
+					updateInfo() 
+
+				} );
+
+			}
 
 
 			var info;
@@ -129,6 +161,39 @@
 
 			}
 
+			function switchGeometry(i) {
+
+				geometryIndex = i;
+
+				addStuff();
+			}
+			
+			function updateInfo() {
+				
+				var params = geometriesParams[ geometryIndex ];
+				
+				var dropdown = '<select id="dropdown" onchange="switchGeometry(this.value)">';
+				
+				for (  i = 0; i < geometriesParams.length; i ++ ) {
+					dropdown += '<option value="' + i + '"';
+
+					dropdown += (geometryIndex == i)  ? ' selected' : '';
+
+					dropdown += '>' + geometriesParams[i].type + '</option>';
+				}
+
+				dropdown += '</select>';
+
+				info.innerHTML = 'Drag to spin THREE.' + params.type +
+
+				 	'<br/><br/>Subdivisions: '  + subdivisions +
+					' <a href="#" onclick="nextSubdivision(1); return false;">more</a>/<a href="#" onclick="nextSubdivision(-1); return false;">less</a>' +
+					'<br>Geometry: ' + dropdown + ' <a href="#" onclick="nextGeometry();return false;">next</a>' +
+					'<br/><br>Vertices count: before ' + geometry.vertices.length + ' after ' + smooth.vertices.length +
+					'<br>Face count: before ' + geometry.faces.length + ' after ' + smooth.faces.length
+				; //+ params.args;
+			}
+
 			function addStuff() {
 
 				if ( cube ) {
@@ -146,6 +211,11 @@
 
 				geometry = createSomething( THREE[ params.type ], params.args );
 
+				// Scale Geometry
+				if (params.scale) {
+					geometry.applyMatrix( new THREE.Matrix4().setScale( params.scale, params.scale, params.scale ) );
+				}
+
 				// Cloning original geometry for debuging
 
 				smooth = THREE.GeometryUtils.clone( geometry );
@@ -154,14 +224,7 @@
 				smooth.mergeVertices();
 				modifier.modify( smooth );
 
-				info.innerHTML = 'Drag to spin THREE.' + params.type +
-
-				 	'<br/><br/>Subdivisions: '  + modifier.subdivisions +
-					' <a href="#" onclick="nextSubdivision(1); return false;">more</a>/<a href="#" onclick="nextSubdivision(-1); return false;">less</a>' +
-					'<br>Geometry: <a href="#" onclick="nextGeometry();return false;">next</a>' +
-					'<br/><br>Vertices count: before ' + geometry.vertices.length + ' after ' + smooth.vertices.length +
-					'<br>Face count: before ' + geometry.faces.length + ' after ' + smooth.faces.length
-				; //+ params.args;
+				updateInfo();
 
 				var faceABCD = "abcd";
 				var color, f, p, n, vertexIndex;
@@ -190,57 +253,57 @@
 
 
 				group = new THREE.Object3D();
-				group.add( new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0xfefefe, wireframe: true, opacity:0.5 } ) ) );
+				group.add( new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0xfefefe, wireframe: true, opacity: 0.5 } ) ) );
 				scene.add( group );
 
 
 				var debugNewPoints = false;
 				var debugOldPoints = false;
-				
+
 				// Debug new Points
-				
+
 				if (debugNewPoints) {
 					var PI2 = Math.PI * 2;
 					var program = function ( context ) {
-			
+
 						context.beginPath();
 						context.arc( 0, 0, 1, 0, PI2, true );
 						context.closePath();
 						context.fill();
-			
+
 					}
-			
+
 					for ( var i = 0; i < smooth.vertices.length; i++ ) {
-			
+
 						particle = new THREE.Particle( new THREE.ParticleCanvasMaterial( { color: Math.random() * 0x808008 + 0x808080, program: program } ) );
 						particle.position = smooth.vertices[i].position;
 						var pos = smooth.vertices.position
 						particle.scale.x = particle.scale.y = 5;
 						group.add( particle );
 					}
-				
+
 				}
-				
-				
+
+
 				//Debug original points
-				
+
 				if (debugOldPoints) {
-					
+
 					var drawText = function(i) {
-					
+
 						return function ( context ) {
-				
+
 							context.beginPath();
 							context.scale(0.1,-0.1);
-				
+
 							context.fillText(i, 0,0);
-						
+
 						};
-										
+
 					}
-					
+
 					for ( var i = 0; i < geometry.vertices.length; i++ ) {
-				
+
 						particle = new THREE.Particle( new THREE.ParticleCanvasMaterial( { color: Math.random() * 0x808008 + 0x808080, program: drawText(i) } ) );
 						particle.position = smooth.vertices[i].position;
 						var pos = geometry.vertices.position
@@ -248,27 +311,20 @@
 						group.add( particle );
 					}
 				}
-				
+
 
 				var meshmaterials = [
-				 	// new THREE.MeshBasicMaterial( { color: 0x000000, shading: THREE.FlatShading, wireframe: true } )
 					new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors } ),
-					new THREE.MeshBasicMaterial( { color: 0x405040, wireframe:true,  opacity:0.8 } )
+					new THREE.MeshBasicMaterial( { color: 0x405040, wireframe: true, opacity: 0.8, transparent: true } )
 				];
 
-				// new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors } ),
-				// new THREE.MeshBasicMaterial( { color: 0x000000, shading: THREE.FlatShading, wireframe: true } )
-				// new THREE.MeshFaceMaterial() 
-				// new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.FlatShading } );
-				// new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.SmoothShading } );
+				cube = THREE.SceneUtils.createMultiMaterialObject( smooth, meshmaterials );
 
-				cube = new THREE.Mesh( smooth, meshmaterials ); 
+				var meshScale =  params.meshScale ? params.meshScale : 1;
 
-				var toscale =  params.scale ? params.scale : 1;
-
-				cube.scale.x = toscale;
-				cube.scale.y = toscale;
-				cube.scale.z = toscale;
+				cube.scale.x = meshScale;
+				cube.scale.y = meshScale;
+				cube.scale.z = meshScale;
 
 				scene.add( cube );
 
@@ -300,7 +356,7 @@
 
 				addStuff();
 
-				renderer = new THREE.WebGLRenderer(); // WebGLRenderer CanvasRenderer
+				renderer = new THREE.WebGLRenderer( { antialias: true } ); // WebGLRenderer CanvasRenderer
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.appendChild( renderer.domElement );
@@ -320,7 +376,7 @@
 
 			function onDocumentMouseDown( event ) {
 
-				event.preventDefault();
+				//event.preventDefault();
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.addEventListener( 'mouseup', onDocumentMouseUp, false );
@@ -404,3 +460,4 @@
 
 	</body>
 </html>
+

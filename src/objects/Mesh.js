@@ -4,15 +4,19 @@
  * @author mikael emtinger / http://gomo.se/
  */
 
-THREE.Mesh = function ( geometry, materials ) {
+THREE.Mesh = function ( geometry, material ) {
 
 	THREE.Object3D.call( this );
 
 	this.geometry = geometry;
-	this.materials = materials && materials.length ? materials : [ materials ];
+	this.material = material;
 
-	this.overdraw = false; // TODO: Move to material?
+	if ( material instanceof Array ) {
 
+		console.warn( 'DEPRECATED: Mesh material can no longer be an Array. Using material at index 0...' );
+		this.material = material[ 0 ];
+
+	}
 
 	if ( this.geometry ) {
 

@@ -24,8 +24,8 @@
 bl_info = {
     "name": "three.js format",
     "author": "mrdoob, kikko, alteredq, remoe, pxf",
-    "version": (1, 1, 0),
-    "blender": (2, 5, 7),
+    "version": (1, 2, 0),
+    "blender": (2, 6, 0),
     "api": 35622,
     "location": "File > Import-Export",
     "description": "Import-Export three.js meshes",
@@ -128,6 +128,7 @@ class ImportTHREEJS(bpy.types.Operator, ImportHelper):
 
     option_flip_yz = BoolProperty(name="Flip YZ", description="Flip YZ", default=True)
     recalculate_normals = BoolProperty(name="Recalculate normals", description="Recalculate vertex normals", default=True)
+    option_worker = BoolProperty(name="Worker", description="Old format using workers", default=False)
 
     def execute(self, context):
         import io_mesh_threejs.import_threejs
@@ -142,6 +143,9 @@ class ImportTHREEJS(bpy.types.Operator, ImportHelper):
 
         row = layout.row()
         row.prop(self.properties, "recalculate_normals")
+
+        row = layout.row()
+        row.prop(self.properties, "option_worker")
 
 
 # ################################################################

@@ -5,7 +5,7 @@
 THREE.CanvasRenderer = function ( parameters ) {
 
 	var _this = this,
-	_renderList = null,
+	_renderData, _elements, _lights,
 	_projector = new THREE.Projector(),
 
 	parameters = parameters || {},
@@ -33,13 +33,13 @@ THREE.CanvasRenderer = function ( parameters ) {
 	_v1x, _v1y, _v2x, _v2y, _v3x, _v3y,
 	_v4x, _v4y, _v5x, _v5y, _v6x, _v6y,
 
-	_color = new THREE.Color( 0x000000 ),
-	_color1 = new THREE.Color( 0x000000 ),
-	_color2 = new THREE.Color( 0x000000 ),
-	_color3 = new THREE.Color( 0x000000 ),
-	_color4 = new THREE.Color( 0x000000 ),
+	_color = new THREE.Color(),
+	_color1 = new THREE.Color(),
+	_color2 = new THREE.Color(),
+	_color3 = new THREE.Color(),
+	_color4 = new THREE.Color(),
 
-	_patterns = [],
+	_patterns = [], _imagedatas = [],
 
 	_near, _far,
 
@@ -51,7 +51,6 @@ THREE.CanvasRenderer = function ( parameters ) {
 	_bboxRect = new THREE.Rectangle(),
 
 	_enableLighting = false,
-	_light = new THREE.Color(),
 	_ambientLight = new THREE.Color(),
 	_directionalLights = new THREE.Color(),
 	_pointLights = new THREE.Color(),
@@ -174,31 +173,38 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	this.render = function ( scene, camera ) {
 
-		var e, el, element, m, ml, fm, fml, material;
+		var e, el, element, material;
 
 		this.autoClear ? this.clear() : _context.setTransform( 1, 0, 0, - 1, _canvasWidthHalf, _canvasHeightHalf );
 
 		_this.info.render.vertices = 0;
 		_this.info.render.faces = 0;
 
-		_renderList = _projector.projectScene( scene, camera, this.sortElements );
+		_renderData = _projector.projectScene( scene, camera, this.sortElements );
+		_elements = _renderData.elements;
+		_lights = _renderData.lights;
 
 		/* DEBUG
 		_context.fillStyle = 'rgba( 0, 255, 255, 0.5 )';
 		_context.fillRect( _clipRect.getX(), _clipRect.getY(), _clipRect.getWidth(), _clipRect.getHeight() );
 		*/
 
-		_enableLighting = scene.lights.length > 0;
+		_enableLighting = _lights.length > 0;
 
 		if ( _enableLighting ) {
 
-			 calculateLights( scene );
+			 calculateLights( _lights );
 
 		}
 
-		for ( e = 0, el = _renderList.length; e < el; e++ ) {
+		for ( e = 0, el = _elements.length; e < el; e++ ) {
 
-			element = _renderList[ e ];
+			element = _elements[ e ];
+
+			material = element.material;
+			material = material instanceof THREE.MeshFaceMaterial ? element.faceMaterial : material;
+
+			if ( material == null || material.opacity == 0 ) continue;
 
 			_bboxRect.empty();
 
@@ -207,14 +213,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 				_v1 = element;
 				_v1.x *= _canvasWidthHalf; _v1.y *= _canvasHeightHalf;
 
-				m = 0; ml = element.materials.length;
-
-				while( m < ml ) {
-
-					material = element.materials[ m ++ ];
-					material.opacity != 0 && renderParticle( _v1, element, material, scene );
-
-				}
+				renderParticle( _v1, element, material, scene );
 
 			} else if ( element instanceof THREE.RenderableLine ) {
 
@@ -228,14 +227,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				if ( _clipRect.intersects( _bboxRect ) ) {
 
-					m = 0; ml = element.materials.length;
-
-					while ( m < ml ) {
-
-						material = element.materials[ m ++ ];
-						material.opacity != 0 && renderLine( _v1, _v2, element, material, scene );
-
-					}
+					renderLine( _v1, _v2, element, material, scene );
 
 				}
 
@@ -248,7 +240,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 				_v2.positionScreen.x *= _canvasWidthHalf; _v2.positionScreen.y *= _canvasHeightHalf;
 				_v3.positionScreen.x *= _canvasWidthHalf; _v3.positionScreen.y *= _canvasHeightHalf;
 
-				if ( element.overdraw ) {
+				if ( material.overdraw ) {
 
 					expand( _v1.positionScreen, _v2.positionScreen );
 					expand( _v2.positionScreen, _v3.positionScreen );
@@ -262,30 +254,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				if ( _clipRect.intersects( _bboxRect ) ) {
 
-					m = 0; ml = element.meshMaterials.length;
-
-					while ( m < ml ) {
-
-						material = element.meshMaterials[ m ++ ];
-
-						if ( material instanceof THREE.MeshFaceMaterial ) {
-
-							fm = 0; fml = element.faceMaterials.length;
-
-							while ( fm < fml ) {
-
-								material = element.faceMaterials[ fm ++ ];
-								material && material.opacity != 0 && renderFace3( _v1, _v2, _v3, 0, 1, 2, element, material, scene );
-
-							}
-
-							continue;
-
-						}
-
-						material.opacity != 0 && renderFace3( _v1, _v2, _v3, 0, 1, 2, element, material, scene );
-
-					}
+					renderFace3( _v1, _v2, _v3, 0, 1, 2, element, material, scene );
 
 				}
 
@@ -301,7 +270,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 				_v5.positionScreen.copy( _v2.positionScreen );
 				_v6.positionScreen.copy( _v4.positionScreen );
 
-				if ( element.overdraw ) {
+				if ( material.overdraw ) {
 
 					expand( _v1.positionScreen, _v2.positionScreen );
 					expand( _v2.positionScreen, _v4.positionScreen );
@@ -319,30 +288,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				if ( _clipRect.intersects( _bboxRect ) ) {
 
-					m = 0; ml = element.meshMaterials.length;
-
-					while ( m < ml ) {
-
-						material = element.meshMaterials[ m ++ ];
-
-						if ( material instanceof THREE.MeshFaceMaterial ) {
-
-							fm = 0; fml = element.faceMaterials.length;
-
-							while ( fm < fml ) {
-
-								material = element.faceMaterials[ fm ++ ];
-								material && material.opacity != 0 && renderFace4( _v1, _v2, _v3, _v4, _v5, _v6, element, material, scene );
-
-							}
-
-							continue;
-
-						}
-
-						material.opacity != 0 && renderFace4( _v1, _v2, _v3, _v4, _v5, _v6, element, material, scene );
-
-					}
+					renderFace4( _v1, _v2, _v3, _v4, _v5, _v6, element, material, scene );
 
 				}
 
@@ -369,10 +315,9 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		//
 
-		function calculateLights( scene ) {
+		function calculateLights( lights ) {
 
-			var l, ll, light, lightColor,
-			lights = scene.lights;
+			var l, ll, light, lightColor;
 
 			_ambientLight.setRGB( 0, 0, 0 );
 			_directionalLights.setRGB( 0, 0, 0 );
@@ -411,10 +356,9 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		}
 
-		function calculateLight( scene, position, normal, color ) {
+		function calculateLight( lights, position, normal, color ) {
 
-			var l, ll, light, lightColor,
-			amount, lights = scene.lights;
+			var l, ll, light, lightColor, lightPosition, amount;
 
 			for ( l = 0, ll = lights.length; l < ll; l ++ ) {
 
@@ -423,7 +367,9 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				if ( light instanceof THREE.DirectionalLight ) {
 
-					amount = normal.dot( light.position );
+					lightPosition = light.matrixWorld.getPosition();
+
+					amount = normal.dot( lightPosition );
 
 					if ( amount <= 0 ) continue;
 
@@ -435,11 +381,13 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				} else if ( light instanceof THREE.PointLight ) {
 
-					amount = normal.dot( _vector3.sub( light.position, position ).normalize() );
+					lightPosition = light.matrixWorld.getPosition();
+
+					amount = normal.dot( _vector3.sub( lightPosition, position ).normalize() );
 
 					if ( amount <= 0 ) continue;
 
-					amount *= light.distance == 0 ? 1 : 1 - Math.min( position.distanceTo( light.position ) / light.distance, 1 );
+					amount *= light.distance == 0 ? 1 : 1 - Math.min( position.distanceTo( lightPosition ) / light.distance, 1 );
 
 					if ( amount == 0 ) continue;
 
@@ -595,15 +543,15 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 						var cameraMatrix = camera.matrixWorldInverse;
 
-						_vector3.copy( element.vertexNormalsWorld[ 0 ] );
+						_vector3.copy( element.vertexNormalsWorld[ uv1 ] );
 						_uv1x = ( _vector3.x * cameraMatrix.n11 + _vector3.y * cameraMatrix.n12 + _vector3.z * cameraMatrix.n13 ) * 0.5 + 0.5;
 						_uv1y = - ( _vector3.x * cameraMatrix.n21 + _vector3.y * cameraMatrix.n22 + _vector3.z * cameraMatrix.n23 ) * 0.5 + 0.5;
 
-						_vector3.copy( element.vertexNormalsWorld[ 1 ] );
+						_vector3.copy( element.vertexNormalsWorld[ uv2 ] );
 						_uv2x = ( _vector3.x * cameraMatrix.n11 + _vector3.y * cameraMatrix.n12 + _vector3.z * cameraMatrix.n13 ) * 0.5 + 0.5;
 						_uv2y = - ( _vector3.x * cameraMatrix.n21 + _vector3.y * cameraMatrix.n22 + _vector3.z * cameraMatrix.n23 ) * 0.5 + 0.5;
 
-						_vector3.copy( element.vertexNormalsWorld[ 2 ] );
+						_vector3.copy( element.vertexNormalsWorld[ uv3 ] );
 						_uv3x = ( _vector3.x * cameraMatrix.n11 + _vector3.y * cameraMatrix.n12 + _vector3.z * cameraMatrix.n13 ) * 0.5 + 0.5;
 						_uv3y = - ( _vector3.x * cameraMatrix.n21 + _vector3.y * cameraMatrix.n22 + _vector3.z * cameraMatrix.n23 ) * 0.5 + 0.5;
 
@@ -645,9 +593,9 @@ THREE.CanvasRenderer = function ( parameters ) {
 						_color1.g = _color2.g = _color3.g = _ambientLight.g;
 						_color1.b = _color2.b = _color3.b = _ambientLight.b;
 
-						calculateLight( scene, element.v1.positionWorld, element.vertexNormalsWorld[ 0 ], _color1 );
-						calculateLight( scene, element.v2.positionWorld, element.vertexNormalsWorld[ 1 ], _color2 );
-						calculateLight( scene, element.v3.positionWorld, element.vertexNormalsWorld[ 2 ], _color3 );
+						calculateLight( _lights, element.v1.positionWorld, element.vertexNormalsWorld[ 0 ], _color1 );
+						calculateLight( _lights, element.v2.positionWorld, element.vertexNormalsWorld[ 1 ], _color2 );
+						calculateLight( _lights, element.v3.positionWorld, element.vertexNormalsWorld[ 2 ], _color3 );
 
 						_color1.r = Math.max( 0, Math.min( material.color.r * _color1.r, 1 ) );
 						_color1.g = Math.max( 0, Math.min( material.color.g * _color1.g, 1 ) );
@@ -671,15 +619,15 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 					} else {
 
-						_light.r = _ambientLight.r;
-						_light.g = _ambientLight.g;
-						_light.b = _ambientLight.b;
+						_color.r = _ambientLight.r;
+						_color.g = _ambientLight.g;
+						_color.b = _ambientLight.b;
 
-						calculateLight( scene, element.centroidWorld, element.normalWorld, _light );
+						calculateLight( _lights, element.centroidWorld, element.normalWorld, _color );
 
-						_color.r = Math.max( 0, Math.min( material.color.r * _light.r, 1 ) );
-						_color.g = Math.max( 0, Math.min( material.color.g * _light.g, 1 ) );
-						_color.b = Math.max( 0, Math.min( material.color.b * _light.b, 1 ) );
+						_color.r = Math.max( 0, Math.min( material.color.r * _color.r, 1 ) );
+						_color.g = Math.max( 0, Math.min( material.color.g * _color.g, 1 ) );
+						_color.b = Math.max( 0, Math.min( material.color.b * _color.b, 1 ) );
 
 						material.wireframe ? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin ) : fillPath( _color );
 
@@ -762,10 +710,10 @@ THREE.CanvasRenderer = function ( parameters ) {
 						_color1.g = _color2.g = _color3.g = _color4.g = _ambientLight.g;
 						_color1.b = _color2.b = _color3.b = _color4.b = _ambientLight.b;
 
-						calculateLight( scene, element.v1.positionWorld, element.vertexNormalsWorld[ 0 ], _color1 );
-						calculateLight( scene, element.v2.positionWorld, element.vertexNormalsWorld[ 1 ], _color2 );
-						calculateLight( scene, element.v4.positionWorld, element.vertexNormalsWorld[ 3 ], _color3 );
-						calculateLight( scene, element.v3.positionWorld, element.vertexNormalsWorld[ 2 ], _color4 );
+						calculateLight( _lights, element.v1.positionWorld, element.vertexNormalsWorld[ 0 ], _color1 );
+						calculateLight( _lights, element.v2.positionWorld, element.vertexNormalsWorld[ 1 ], _color2 );
+						calculateLight( _lights, element.v4.positionWorld, element.vertexNormalsWorld[ 3 ], _color3 );
+						calculateLight( _lights, element.v3.positionWorld, element.vertexNormalsWorld[ 2 ], _color4 );
 
 						_color1.r = Math.max( 0, Math.min( material.color.r * _color1.r, 1 ) );
 						_color1.g = Math.max( 0, Math.min( material.color.g * _color1.g, 1 ) );
@@ -795,15 +743,15 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 					} else {
 
-						_light.r = _ambientLight.r;
-						_light.g = _ambientLight.g;
-						_light.b = _ambientLight.b;
+						_color.r = _ambientLight.r;
+						_color.g = _ambientLight.g;
+						_color.b = _ambientLight.b;
 
-						calculateLight( scene, element.centroidWorld, element.normalWorld, _light );
+						calculateLight( _lights, element.centroidWorld, element.normalWorld, _color );
 
-						_color.r = Math.max( 0, Math.min( material.color.r * _light.r, 1 ) );
-						_color.g = Math.max( 0, Math.min( material.color.g * _light.g, 1 ) );
-						_color.b = Math.max( 0, Math.min( material.color.b * _light.b, 1 ) );
+						_color.r = Math.max( 0, Math.min( material.color.r * _color.r, 1 ) );
+						_color.g = Math.max( 0, Math.min( material.color.g * _color.g, 1 ) );
+						_color.b = Math.max( 0, Math.min( material.color.b * _color.b, 1 ) );
 
 						drawQuad( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _v4x, _v4y );
 
@@ -920,8 +868,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 			var a, b, c, d, e, f, det, idet,
 			offsetX = texture.offset.x / texture.repeat.x,
 			offsetY = texture.offset.y / texture.repeat.y,
-			width = ( texture.image.width - 1 ) * texture.repeat.x,
-			height = ( texture.image.height - 1 ) * texture.repeat.y;
+			width = texture.image.width * texture.repeat.x,
+			height = texture.image.height * texture.repeat.y;
 
 			u0 = ( u0 + offsetX ) * width;
 			v0 = ( v0 + offsetY ) * height;
@@ -939,6 +887,33 @@ THREE.CanvasRenderer = function ( parameters ) {
 			u2 -= u0; v2 -= v0;
 
 			det = u1 * v2 - u2 * v1;
+
+			if ( det == 0 ) {
+
+				if ( _imagedatas[ texture.id ] == undefined ) {
+
+					var canvas = document.createElement( 'canvas' )
+					canvas.width = texture.image.width;
+					canvas.height = texture.image.height;
+
+					var context = canvas.getContext( '2d' );
+					context.drawImage( texture.image, 0, 0 );
+
+					_imagedatas[ texture.id ] = context.getImageData( 0, 0, texture.image.width, texture.image.height ).data;
+
+					delete canvas;
+
+				}
+
+				var data = _imagedatas[ texture.id ];
+				var index = ( Math.floor( u0 ) + Math.floor( v0 ) * texture.image.width ) * 4;
+
+				_color.setRGB( data[ index ] / 255, data[ index + 1 ] / 255, data[ index + 2 ] / 255 );
+				fillPath( _color );
+
+				return;
+
+			}
 
 			idet = 1 / det;
 
@@ -1028,11 +1003,6 @@ THREE.CanvasRenderer = function ( parameters ) {
 		}
 
 		function smoothstep( value, min, max ) {
-
-			/*
-			if ( value <= min ) return 0;
-			if ( value >= max ) return 1;
-			*/
 
 			var x = ( value - min ) / ( max - min );
 			return x * x * ( 3 - 2 * x );
