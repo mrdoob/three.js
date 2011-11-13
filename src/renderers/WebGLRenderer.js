@@ -5634,7 +5634,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 					_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, paramThreeToGL( renderTarget.format ), renderTarget.width, renderTarget.height, 0, paramThreeToGL( renderTarget.format ), paramThreeToGL( renderTarget.type ), null );
 
 					setupFrameBuffer( renderTarget.__webglFramebuffer[ i ], renderTarget, _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i );
-
 					setupRenderBuffer( renderTarget.__webglRenderbuffer[ i ], renderTarget );
 
 				}
@@ -5650,9 +5649,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 				_gl.texImage2D( _gl.TEXTURE_2D, 0, paramThreeToGL( renderTarget.format ), renderTarget.width, renderTarget.height, 0, paramThreeToGL( renderTarget.format ), paramThreeToGL( renderTarget.type ), null );
 
 				setupFrameBuffer( renderTarget.__webglFramebuffer, renderTarget, _gl.TEXTURE_2D );
-
-				_gl.bindRenderbuffer( _gl.RENDERBUFFER, renderTarget.__webglRenderbuffer );
-
 				setupRenderBuffer( renderTarget.__webglRenderbuffer, renderTarget );
 
 			}
