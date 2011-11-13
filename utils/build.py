@@ -129,8 +129,6 @@ EXTRAS_FILES = [
 'extras/loaders/UTF8Loader.js',
 'extras/objects/Axes.js',
 'extras/objects/MarchingCubes.js',
-'extras/physics/Collisions.js',
-'extras/physics/CollisionUtils.js',
 'extras/renderers/AnaglyphWebGLRenderer.js',
 'extras/renderers/CrosseyedWebGLRenderer.js'
 ]
