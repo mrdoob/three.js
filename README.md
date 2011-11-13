@@ -140,6 +140,28 @@ This code creates a camera, then creates a scene, adds a cube on it, creates a &
 
 ### Change Log ###
 
+2011 11 13 - **r46** (341.109 KB, gzip: 86.845 KB)
+
+* Added reflections to Normal Mapping. ([alteredq](http://github.com/alteredq))
+* `Ray` now checks also object children. ([mrdoob](http://github.com/mrdoob))
+* `*Loader.load( parameters )` to `*Loader( url, callback, texturePath )`. ([mrdoob](http://github.com/mrdoob) and [alteredq](http://github.com/alteredq))
+* Reworked scene graph setup. ([mrdoob](http://github.com/mrdoob) and [alteredq](http://github.com/alteredq))
+* Fixed `CanvasRenderer`'s `SphericalReflectionMapping` rendering. ([mrdoob](http://github.com/mrdoob))
+* Improved `SubdivisionModifier`. ([zz85](http://github.com/zz85))
+* Refactored `*Controls` to use externally supplied time delta. ([alteredq](http://github.com/alteredq))
+* Improvements to `CombinedCamera`. ([zz85](http://github.com/zz85))
+* `ColladaLoader` doesn't create extra `Object3D`. ([mrdoob](http://github.com/mrdoob))
+* Improvements to Lambert and Phong materials. ([alteredq](http://github.com/alteredq))
+* Removed multi-materials for simplicity reasons. (Multi-materials will come back with MeshLayerMaterial hopefully soon) ([alteredq](http://github.com/alteredq))
+* Fixed `Ray` not considering edges. ([mrdoob](http://github.com/mrdoob))
+* Massive cleanup to `WebGLRenderer`. ([alteredq](http://github.com/alteredq))
+* `Ray` optimisations. ([mrdoob](http://github.com/mrdoob) and [alteredq](http://github.com/alteredq))
+* JSON file format is now worker-less (this was crashing Chrome/Firefox with dealing with many assets). ([alteredq](http://github.com/alteredq))
+* Improved `CubeGeometry`, `PlaneGeometry`, `IcosahedronGeometry` and `SphereGeometry`. ([mrdoob](http://github.com/mrdoob))
+* Improvements to `Curve`. ([zz85](http://github.com/zz85))
+* Removed `Collisions` code and focusing on `Ray`. ([mrdoob](http://github.com/mrdoob))
+
+
 2011 10 06 - **r45** (340.863 KB, gzip: 86.568 KB)
 
 * `Object/Scene.add*()` and `Object/Scene.remove*()` are now `Object/Scene.add()` and `Object/Scene.remove()`. ([mrdoob](http://github.com/mrdoob))
