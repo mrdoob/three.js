@@ -149,8 +149,6 @@ THREE.GeometryUtils = {
 
 		if ( recursive === true && children2 !== undefined ) {
 
-			// object2.updateMatrixWorld( true );
-
 			for ( i = 0, il = children2.length; i < il; ++ i ) {
 
 				this.merge( geometry1, children2[ i ] );
