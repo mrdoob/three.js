@@ -1,6 +1,12 @@
 /**
  * @author zz85 / http://www.lab4games.net/zz85/blog
  * Extensible curve object
+ * 
+ * Some common of Curve methods
+ * .getPoint(t), getTangent(t)
+ * .getPointAt(u), getTagentAt(u)
+ * .getPoints(), .getSpacedPoints()
+ * .getLength()
  *
  * This file contains following classes:
  *
@@ -237,15 +243,19 @@ THREE.Curve.prototype.getTangent = function( t ) {
 
 	var pt1 = this.getPoint( t1 );
 	var pt2 = this.getPoint( t2 );
-
-	// var vec = new THREE.Vector2();
-	// vec.sub( pt2, pt1 );
 	
 	var vec = pt1.clone().subSelf(pt2);
 	return vec.normalize();
 
 };
 
+
+THREE.Curve.prototype.getTangentAt = function ( u ) {
+
+	var t = this.getUtoTmapping( u );
+	return this.getTangent( t );
+
+};
 
 /**************************************************************
  *	Line
