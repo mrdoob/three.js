@@ -100,21 +100,6 @@
 
 				}
 
-				// Lights
-
-				var ambientLight = new THREE.AmbientLight( Math.random() * 0x202020 );
-				scene.add( ambientLight );
-
-				var directionalLight = new THREE.DirectionalLight( Math.random() * 0xffffff );
-				directionalLight.position.x = Math.random() - 0.5;
-				directionalLight.position.y = Math.random() - 0.5;
-				directionalLight.position.z = Math.random() - 0.5;
-				directionalLight.position.normalize();
-				scene.add( directionalLight );
-
-				var pointLight = new THREE.PointLight( 0xff0000, 1 );
-				scene.add( pointLight );
-
 				renderer = new THREE.CanvasRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
