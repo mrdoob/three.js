@@ -3055,12 +3055,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( this.autoUpdateObjects ) this.initWebGLObjects( scene );
 
-		if ( this.shadowMapEnabled && this.shadowMapAutoUpdate ) renderShadowMap( scene, camera );
-
-		_this.info.render.calls = 0;
-		_this.info.render.vertices = 0;
-		_this.info.render.faces = 0;
-
 		if ( camera.parent === undefined ) {
 
 			console.warn( 'DEPRECATED: Camera hasn\'t been added to a Scene. Adding it...' );
@@ -3069,6 +3063,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		if ( this.autoUpdateScene ) scene.updateMatrixWorld();
+
+		if ( this.shadowMapEnabled && this.shadowMapAutoUpdate ) renderShadowMap( scene, camera );
+
+		_this.info.render.calls = 0;
+		_this.info.render.vertices = 0;
+		_this.info.render.faces = 0;
 
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 		camera.matrixWorldInverse.flattenToArray( _viewMatrixArray );
@@ -3255,9 +3255,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 					console.warn( "Camera is not on the Scene. Adding it..." );
 					scene.add( _cameraLight );
 
-				}
+					if ( this.autoUpdateScene ) scene.updateMatrixWorld();
 
-				if ( this.autoUpdateScene ) scene.updateMatrixWorld();
+				}
 
 				_cameraLight.matrixWorldInverse.getInverse( _cameraLight.matrixWorld );
 
