@@ -114,6 +114,19 @@ rollout ThreeJSExporter "ThreeJSExporter"
 		Format "],\n\n" to:ostream
 
 	)
+	
+	-------------------------------------------------------------------------------------
+	-- Dump morphTargets
+	function DumpMorphTargets src =
+	(
+		Format "\"morphTargets\": [\n" to:ostream
+		Format "\t{ \"name\": \"target\",  " to:ostream
+		DumpVertices src
+		Format "},\n" to:ostream
+		Format "\t{ \"name\": \"origin\",  " to:ostream
+		DumpVertices src
+		Format "}],\n\n" to:ostream
+	)
 
 	-------------------------------------------------------------------------------------
 	-- Dump colors
@@ -442,6 +455,7 @@ rollout ThreeJSExporter "ThreeJSExporter"
 			(
 
 				fname = filenameFromPath bm.filename
+				--fname = bm.filename
 				Format "\"%\"    : \"%\",\n" label fname to:ostream
 
 			)
@@ -469,8 +483,14 @@ rollout ThreeJSExporter "ThreeJSExporter"
 			-- debug
 
 			Format "\"DbgIndex\" : %,\n" (i-1) to:ostream
-
-			if classof mat != BooleanClass then
+			
+			classOfMat = classof mat
+			Format "\"classof\" : \"%\",\n" classOfMat to:ostream
+			
+			if classof mat == DoubleSided then
+			(
+			)
+			else if classof mat != BooleanClass then --Standardmaterial
 			(
 
 				useVertexColors = zcolors[i]
@@ -1014,6 +1034,7 @@ rollout ThreeJSExporter "ThreeJSExporter"
 		-- Dump merged data from all selected geometries
 
 		DumpVertices mergedVertices
+		--DumpMorphTargets mergedVertices
 		DumpNormals mergedNormals
 		DumpColors mergedColors useColors
 		DumpUvs mergedUvs
