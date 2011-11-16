@@ -5,19 +5,19 @@
  * http://webglsamples.googlecode.com/hg/blob/blob.html
  */
 
-// do not crash if somebody includes the file in oldie browser
-
-THREE.MarchingCubes = function ( resolution, materials ) {
+THREE.MarchingCubes = function ( resolution, material ) {
 
 	THREE.Object3D.call( this );
 
-	this.materials = materials instanceof Array ? materials : [ materials ];
+	this.material = material;
 
 	// functions have to be object properties
 	// prototype functions kill performance
 	// (tested and it was 4x slower !!!)
 
 	this.init = function( resolution ) {
+
+		this.resolution = resolution;
 
 		// parameters
 
