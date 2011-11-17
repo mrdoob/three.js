@@ -147,6 +147,9 @@ FRAMESTEP = 1
 
 BAKE_COLORS = False
 
+DECODE = "ascii" #sys.getdefaultencoding()
+ENCODE = "ascii" #sys.getdefaultencoding()
+
 # default colors for debugging (each material gets one distinct color):
 # white, red, green, blue, yellow, cyan, magenta
 COLORS = [0xeeeeee, 0xee0000, 0x00ee00, 0x0000ee, 0xeeee00, 0x00eeee, 0xee00ee]
@@ -409,27 +412,27 @@ def parse_mtl(fname):
             # Diffuse texture
             # map_Kd texture_diffuse.jpg
             if chunks[0] == "map_Kd" and len(chunks) == 2:
-                materials[identifier]["mapDiffuse"] = texture_relative_path(chunks[1])
+                materials[identifier]["mapDiffuse"] = texture_relative_path( unicode(chunks[1], DECODE) )
 
             # Ambient texture
             # map_Ka texture_ambient.jpg
             if chunks[0] == "map_Ka" and len(chunks) == 2:
-                materials[identifier]["mapAmbient"] = texture_relative_path(chunks[1])
+                materials[identifier]["mapAmbient"] = texture_relative_path( unicode(chunks[1], DECODE) )
 
             # Specular texture
             # map_Ks texture_specular.jpg
             if chunks[0] == "map_Ks" and len(chunks) == 2:
-                materials[identifier]["mapSpecular"] = texture_relative_path(chunks[1])
+                materials[identifier]["mapSpecular"] = texture_relative_path( unicode(chunks[1], DECODE) )
 
             # Alpha texture
             # map_d texture_alpha.png
             if chunks[0] == "map_d" and len(chunks) == 2:
-                materials[identifier]["mapAlpha"] = texture_relative_path(chunks[1])
+                materials[identifier]["mapAlpha"] = texture_relative_path( unicode(chunks[1], DECODE) )
 
             # Bump texture
             # map_bump texture_bump.jpg or bump texture_bump.jpg
             if (chunks[0] == "map_bump" or chunks[0] == "bump") and len(chunks) == 2:
-                materials[identifier]["mapBump"] = texture_relative_path(chunks[1])
+                materials[identifier]["mapBump"] = texture_relative_path( unicode(chunks[1], DECODE) )
 
             # Illumination
             # illum 2
@@ -851,6 +854,8 @@ def value2string(v):
         return '"%s"' % v
     elif type(v) == bool:
         return str(v).lower()
+    elif type(v) == unicode:
+        return u'"%s"' % v
     return str(v)
 
 def generate_materials(mtl, materials):
@@ -880,7 +885,7 @@ def generate_materials(mtl, materials):
             mtl_string = "\t{\n%s\n\t}" % mtl_raw
             mtl_array.append([index, mtl_string])
 
-    return ",\n\n".join([m for i,m in sorted(mtl_array)])
+    return u",\n\n".join([m for i,m in sorted(mtl_array)])
 
 def generate_mtl(materials):
     """Generate dummy materials (if there is no MTL file).
@@ -1089,7 +1094,7 @@ def convert_ascii(infile, morphfiles, colorfiles, outfile):
     }
 
     out = open(outfile, "w")
-    out.write(text)
+    out.write(text.encode(ENCODE))
     out.close()
 
     print "%d vertices, %d faces, %d materials" % (len(vertices), len(faces), len(materials))
@@ -1483,7 +1488,7 @@ def convert_binary(infile, outfile):
 # Helpers
 # #############################################################################
 def usage():
-    print "Usage: %s -i filename.obj -o filename.js [-m morphfiles*.obj] [-c morphcolors*.obj] [-a center|top|bottom] [-s flat|smooth] [-t binary|ascii] [-d invert|normal]" % os.path.basename(sys.argv[0])
+    print "Usage: %s -i filename.obj -o filename.js [-m morphfiles*.obj] [-c morphcolors*.obj] [-a center|top|bottom] [-s flat|smooth] [-t binary|ascii] [-d invert|normal] [--decode codec] [--encode codec]" % os.path.basename(sys.argv[0])
 
 # #####################################################
 # Main
@@ -1492,7 +1497,7 @@ if __name__ == "__main__":
 
     # get parameters from the command line
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hbi:m:c:b:o:a:s:t:d:x:f:", ["help", "bakecolors", "input=", "morphs=", "colors=", "output=", "align=", "shading=", "type=", "dissolve=", "truncatescale=", "framestep="])
+        opts, args = getopt.getopt(sys.argv[1:], "hbi:m:c:b:o:a:s:t:d:x:f:", ["help", "bakecolors", "input=", "morphs=", "colors=", "output=", "align=", "shading=", "type=", "dissolve=", "truncatescale=", "framestep=", "decode=", "encode="])
 
     except getopt.GetoptError:
         usage()
@@ -1544,6 +1549,10 @@ if __name__ == "__main__":
 
         elif o in ("-f", "--framestep"):
             FRAMESTEP = int(a)
+        elif o in ("--decode"):
+            DECODE = a
+        elif o in ("--encode"):
+            ENCODE = a
 
     if infile == "" or outfile == "":
         usage()
