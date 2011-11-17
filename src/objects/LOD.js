@@ -26,7 +26,7 @@ THREE.LOD.prototype.addLevel = function ( object3D, visibleAtDistance ) {
 
 	visibleAtDistance = Math.abs( visibleAtDistance );
 
-	for ( var l = 0; l < this.LODs.length; l++ ) {
+	for ( var l = 0; l < this.LODs.length; l ++ ) {
 
 		if ( visibleAtDistance < this.LODs[ l ].visibleAtDistance ) {
 
@@ -48,7 +48,6 @@ THREE.LOD.prototype.update = function ( camera ) {
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
 		var inverse  = camera.matrixWorldInverse;
-		var radius   = this.boundRadius * this.boundRadiusScale;
 		var distance = -( inverse.n31 * this.position.x + inverse.n32 * this.position.y + inverse.n33 * this.position.z + inverse.n34 );
 
 		this.LODs[ 0 ].object3D.visible = true;

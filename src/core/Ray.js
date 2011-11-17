@@ -114,7 +114,7 @@ THREE.Ray = function ( origin, direction ) {
 				a = objMatrix.multiplyVector3( a.copy( vertices[ face.a ].position ) );
 				b = objMatrix.multiplyVector3( b.copy( vertices[ face.b ].position ) );
 				c = objMatrix.multiplyVector3( c.copy( vertices[ face.c ].position ) );
-				d = face instanceof THREE.Face4 ? objMatrix.multiplyVector3( d.copy( vertices[ face.d ].position ) ) : null;
+				if ( face instanceof THREE.Face4 ) d = objMatrix.multiplyVector3( d.copy( vertices[ face.d ].position ) );
 
 				normal = object.matrixRotationWorld.multiplyVector3( normal.copy( face.normal ) );
 				dot = direction.dot( normal );
