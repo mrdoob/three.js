@@ -63,6 +63,10 @@ THREE.SceneUtils = {
 			object.direction = source.direction;
 			object.directionBackwards = source.directionBackwards;
 
+		} else if ( source instanceof THREE.SkinnedMesh ) {
+
+			object = new THREE.SkinnedMesh( source.geometry, source.material );
+
 		} else if ( source instanceof THREE.Mesh ) {
 
 			object = new THREE.Mesh( source.geometry, source.material );
@@ -108,10 +112,6 @@ THREE.SceneUtils = {
 		} else if ( source instanceof THREE.LOD ) {
 
 			object = new THREE.LOD();
-
-		} else if ( source instanceof THREE.SkinnedMesh ) {
-
-			object = new THREE.SkinnedMesh();
 
 		} else if ( source instanceof THREE.MarchingCubes ) {
 
