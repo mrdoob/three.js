@@ -85,7 +85,7 @@ THREE.IcosahedronGeometry = function ( subdivisions ) {
 	scope.faceVertexUvs[ 0 ] = tempScope.faceVertexUvs[ 0 ];
 
 	this.computeCentroids();
-	this.computeFaceNormals( true );
+	this.computeFaceNormals();
 
 	function v( x, y, z ) {
 

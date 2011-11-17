@@ -100,63 +100,30 @@ THREE.Geometry.prototype = {
 
 	},
 
-	computeFaceNormals: function ( useVertexNormals ) {
+	computeFaceNormals: function () {
 
 		var n, nl, v, vl, vertex, f, fl, face, vA, vB, vC,
 		cb = new THREE.Vector3(), ab = new THREE.Vector3();
-
-		/*
-		for ( v = 0, vl = this.vertices.length; v < vl; v ++ ) {
-
-			vertex = this.vertices[ v ];
-			vertex.normal.set( 0, 0, 0 );
-
-		}
-		*/
 
 		for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
 
 			face = this.faces[ f ];
 
-			if ( useVertexNormals && face.vertexNormals.length  ) {
+			vA = this.vertices[ face.a ];
+			vB = this.vertices[ face.b ];
+			vC = this.vertices[ face.c ];
 
-				cb.set( 0, 0, 0 );
+			cb.sub( vC.position, vB.position );
+			ab.sub( vA.position, vB.position );
+			cb.crossSelf( ab );
 
-				for ( n = 0, nl = face.vertexNormals.length; n < nl; n++ ) {
+			if ( !cb.isZero() ) {
 
-					cb.addSelf( face.vertexNormals[n] );
-
-				}
-
-				cb.divideScalar( 3 );
-
-				if ( ! cb.isZero() ) {
-
-					cb.normalize();
-
-				}
-
-				face.normal.copy( cb );
-
-			} else {
-
-				vA = this.vertices[ face.a ];
-				vB = this.vertices[ face.b ];
-				vC = this.vertices[ face.c ];
-
-				cb.sub( vC.position, vB.position );
-				ab.sub( vA.position, vB.position );
-				cb.crossSelf( ab );
-
-				if ( !cb.isZero() ) {
-
-					cb.normalize();
-
-				}
-
-				face.normal.copy( cb );
+				cb.normalize();
 
 			}
+
+			face.normal.copy( cb );
 
 		}
 

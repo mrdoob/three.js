@@ -81,6 +81,7 @@ More? [#three.js on irc.freenode.net](http://webchat.freenode.net/?channels=thre
 ### Usage ###
 
 Download the [minified library](http://mrdoob.github.com/three.js/build/Three.js) and include it in your html.
+Alternatively see [how to build the library yourself](https://github.com/mrdoob/three.js/wiki/build.py,-or-how-to-generate-a-compressed-Three.js-file). 
 
 ```html
 <script src="js/Three.js"></script>
@@ -140,7 +141,7 @@ This code creates a camera, then creates a scene, adds a cube on it, creates a &
 
 ### Change Log ###
 
-2011 11 13 - **r46** (341.109 KB, gzip: 86.845 KB)
+2011 11 17 - **r46** (343.383 KB, gzip: 87.468 KB)
 
 * Added reflections to Normal Mapping. ([alteredq](http://github.com/alteredq))
 * `Ray` now checks also object children. ([mrdoob](http://github.com/mrdoob))
@@ -160,6 +161,7 @@ This code creates a camera, then creates a scene, adds a cube on it, creates a &
 * Improved `CubeGeometry`, `PlaneGeometry`, `IcosahedronGeometry` and `SphereGeometry`. ([mrdoob](http://github.com/mrdoob))
 * Improvements to `Curve`. ([zz85](http://github.com/zz85))
 * Removed `Collisions` code and focusing on `Ray`. ([mrdoob](http://github.com/mrdoob))
+* Added `cloneObject()` method to `SceneUtils`. ([alteredq](http://github.com/alteredq))
 
 
 2011 10 06 - **r45** (340.863 KB, gzip: 86.568 KB)
