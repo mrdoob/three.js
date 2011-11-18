@@ -113,6 +113,10 @@
 
 				container.appendChild( renderer.domElement );
 
+				renderer.addPlugin( new THREE.SpritePlugin() );
+
+				// stats
+
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
