@@ -5830,4 +5830,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	// default plugins (order is important)
+
+	this.addPlugin( new THREE.SpritePlugin() );
+	this.addPlugin( new THREE.LensFlarePlugin() );
+
 };

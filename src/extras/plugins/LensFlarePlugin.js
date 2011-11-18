@@ -105,28 +105,25 @@ THREE.LensFlarePlugin = function ( ) {
 
 	this.render = function ( scene, camera, viewportWidth, viewportHeight ) {
 
-		var _flaresList = scene.__webglFlares;
+		var flares = scene.__webglFlares,
+			nFlares = flares.length;
 
-		var object;
-
-		var o, ol = _flaresList.length;
-		var f, fl, flare;
+		if ( ! nFlares ) return;
 
 		var tempPosition = new THREE.Vector3();
 
-		var invAspect = viewportHeight / viewportWidth;
-		var halfViewportWidth = viewportWidth * 0.5;
-		var halfViewportHeight = viewportHeight * 0.5;
+		var invAspect = viewportHeight / viewportWidth,
+			halfViewportWidth = viewportWidth * 0.5,
+			halfViewportHeight = viewportHeight * 0.5;
 
-		var size = 16 / viewportHeight;
+		var size = 16 / viewportHeight,
+			scale = new THREE.Vector2( size * invAspect, size );
 
-		var scale = new THREE.Vector2( size * invAspect, size );
+		var screenPosition = new THREE.Vector3( 1, 1, 0 ),
+			screenPositionPixels = new THREE.Vector2( 1, 1 );
 
-		var screenPosition = new THREE.Vector3( 1, 1, 0 );
-		var screenPositionPixels = new THREE.Vector2( 1, 1 );
-
-		var uniforms = _lensFlare.uniforms;
-		var attributes = _lensFlare.attributes;
+		var uniforms = _lensFlare.uniforms,
+			attributes = _lensFlare.attributes;
 
 		// set _lensFlare program and reset blending
 
@@ -156,20 +153,21 @@ THREE.LensFlarePlugin = function ( ) {
 		_gl.disable( _gl.CULL_FACE );
 		_gl.depthMask( false );
 
-		for ( o = 0; o < ol; o ++ ) {
+		var i, j, jl, flare, sprite;
+
+		for ( i = 0; i < nFlares; i ++ ) {
 
 			size = 16 / viewportHeight;
 			scale.set( size * invAspect, size );
 
 			// calc object screen position
 
-			object = _flaresList[ o ];
+			flare = flares[ i ];
 
-			tempPosition.set( object.matrixWorld.n14, object.matrixWorld.n24, object.matrixWorld.n34 );
+			tempPosition.set( flare.matrixWorld.n14, flare.matrixWorld.n24, flare.matrixWorld.n34 );
 
 			camera.matrixWorldInverse.multiplyVector3( tempPosition );
 			camera.projectionMatrix.multiplyVector3( tempPosition );
-
 
 			// setup arrays for gl programs
 
@@ -177,7 +175,6 @@ THREE.LensFlarePlugin = function ( ) {
 
 			screenPositionPixels.x = screenPosition.x * halfViewportWidth + halfViewportWidth;
 			screenPositionPixels.y = screenPosition.y * halfViewportHeight + halfViewportHeight;
-
 
 			// screen cull
 
@@ -225,15 +222,15 @@ THREE.LensFlarePlugin = function ( ) {
 
 				// update object positions
 
-				object.positionScreen.copy( screenPosition )
+				flare.positionScreen.copy( screenPosition )
 
-				if ( object.customUpdateCallback ) {
+				if ( flare.customUpdateCallback ) {
 
-					object.customUpdateCallback( object );
+					flare.customUpdateCallback( flare );
 
 				} else {
 
-					object.updateLensFlares();
+					flare.updateLensFlares();
 
 				}
 
@@ -242,30 +239,30 @@ THREE.LensFlarePlugin = function ( ) {
 				_gl.uniform1i( uniforms.renderType, 2 );
 				_gl.enable( _gl.BLEND );
 
-				for ( f = 0, fl = object.lensFlares.length; f < fl; f ++ ) {
+				for ( j = 0, jl = flare.lensFlares.length; j < jl; j ++ ) {
 
-					flare = object.lensFlares[ f ];
+					sprite = flare.lensFlares[ j ];
 
-					if ( flare.opacity > 0.001 && flare.scale > 0.001 ) {
+					if ( sprite.opacity > 0.001 && sprite.scale > 0.001 ) {
 
-						screenPosition.x = flare.x;
-						screenPosition.y = flare.y;
-						screenPosition.z = flare.z;
+						screenPosition.x = sprite.x;
+						screenPosition.y = sprite.y;
+						screenPosition.z = sprite.z;
 
-						size = flare.size * flare.scale / viewportHeight;
+						size = sprite.size * sprite.scale / viewportHeight;
 
 						scale.x = size * invAspect;
 						scale.y = size;
 
 						_gl.uniform3f( uniforms.screenPosition, screenPosition.x, screenPosition.y, screenPosition.z );
 						_gl.uniform2f( uniforms.scale, scale.x, scale.y );
-						_gl.uniform1f( uniforms.rotation, flare.rotation );
+						_gl.uniform1f( uniforms.rotation, sprite.rotation );
 
-						_gl.uniform1f( uniforms.opacity, flare.opacity );
-						_gl.uniform3f( uniforms.color, flare.color.r, flare.color.g, flare.color.b );
+						_gl.uniform1f( uniforms.opacity, sprite.opacity );
+						_gl.uniform3f( uniforms.color, sprite.color.r, sprite.color.g, sprite.color.b );
 
-						_renderer.setBlending( flare.blending );
-						_renderer.setTexture( flare.texture, 1 );
+						_renderer.setBlending( sprite.blending );
+						_renderer.setTexture( sprite.texture, 1 );
 
 						_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
 

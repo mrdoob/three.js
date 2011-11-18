@@ -74,17 +74,18 @@ THREE.SpritePlugin = function ( ) {
 
 	this.render = function ( scene, camera, viewportWidth, viewportHeight, projectionMatrixArray ) {
 
-		var o, ol, object;
+		var sprites = scene.__webglSprites,
+			nSprites = sprites.length;
 
-		var attributes = _sprite.attributes;
-		var uniforms = _sprite.uniforms;
+		if ( ! nSprites ) return;
+
+		var attributes = _sprite.attributes,
+			uniforms = _sprite.uniforms;
 
 		var invAspect = viewportHeight / viewportWidth;
 
-		var size, scale = [];
-		var screenPosition;
-		var halfViewportWidth = viewportWidth * 0.5;
-		var halfViewportHeight = viewportHeight * 0.5;
+		var halfViewportWidth = viewportWidth * 0.5,
+			halfViewportHeight = viewportHeight * 0.5;
 
 		var mergeWith3D = true;
 
@@ -119,81 +120,83 @@ THREE.SpritePlugin = function ( ) {
 
 		// update positions and sort
 
-		for( o = 0, ol = scene.__webglSprites.length; o < ol; o ++ ) {
+		var i, sprite, screenPosition, size, scale = [];
 
-			object = scene.__webglSprites[ o ];
+		for( i = 0; i < nSprites; i ++ ) {
 
-			if ( !object.visible || object.opacity === 0 ) continue;
+			sprite = sprites[ i ];
 
-			if( !object.useScreenCoordinates ) {
+			if ( ! sprite.visible || sprite.opacity === 0 ) continue;
 
-				object._modelViewMatrix.multiplyToArray( camera.matrixWorldInverse, object.matrixWorld, object._modelViewMatrixArray );
-				object.z = -object._modelViewMatrix.n34;
+			if( ! sprite.useScreenCoordinates ) {
+
+				sprite._modelViewMatrix.multiplyToArray( camera.matrixWorldInverse, sprite.matrixWorld, sprite._modelViewMatrixArray );
+				sprite.z = - sprite._modelViewMatrix.n34;
 
 			} else {
 
-				object.z = -object.position.z;
+				sprite.z = - sprite.position.z;
 
 			}
 
 		}
 
-		scene.__webglSprites.sort( painterSort );
+		sprites.sort( painterSort );
 
 		// render all sprites
 
-		for ( o = 0, ol = scene.__webglSprites.length; o < ol; o ++ ) {
+		for( i = 0; i < nSprites; i ++ ) {
 
-			object = scene.__webglSprites[ o ];
+			sprite = sprites[ i ];
 
-			if ( !object.visible || object.opacity === 0 ) continue;
+			if ( ! sprite.visible || sprite.opacity === 0 ) continue;
 
-			if ( object.map && object.map.image && object.map.image.width ) {
+			if ( sprite.map && sprite.map.image && sprite.map.image.width ) {
 
-				if ( object.useScreenCoordinates ) {
+				if ( sprite.useScreenCoordinates ) {
 
 					_gl.uniform1i( uniforms.useScreenCoordinates, 1 );
-					_gl.uniform3f( uniforms.screenPosition, ( object.position.x - halfViewportWidth  ) / halfViewportWidth,
-															( halfViewportHeight - object.position.y ) / halfViewportHeight,
-															  Math.max( 0, Math.min( 1, object.position.z )));
+					_gl.uniform3f( uniforms.screenPosition, ( sprite.position.x - halfViewportWidth  ) / halfViewportWidth,
+															( halfViewportHeight - sprite.position.y ) / halfViewportHeight,
+															  Math.max( 0, Math.min( 1, sprite.position.z ) ) );
 
 				} else {
 
 					_gl.uniform1i( uniforms.useScreenCoordinates, 0 );
-					_gl.uniform1i( uniforms.affectedByDistance, object.affectedByDistance ? 1 : 0 );
-					_gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, object._modelViewMatrixArray );
+					_gl.uniform1i( uniforms.affectedByDistance, sprite.affectedByDistance ? 1 : 0 );
+					_gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, sprite._modelViewMatrixArray );
 
 				}
 
-				size = object.map.image.width / ( object.scaleByViewport ? viewportHeight : 1 );
+				size = sprite.map.image.width / ( sprite.scaleByViewport ? viewportHeight : 1 );
 
-				scale[ 0 ] = size * invAspect * object.scale.x;
-				scale[ 1 ] = size * object.scale.y;
+				scale[ 0 ] = size * invAspect * sprite.scale.x;
+				scale[ 1 ] = size * sprite.scale.y;
 
-				_gl.uniform2f( uniforms.uvScale, object.uvScale.x, object.uvScale.y );
-				_gl.uniform2f( uniforms.uvOffset, object.uvOffset.x, object.uvOffset.y );
-				_gl.uniform2f( uniforms.alignment, object.alignment.x, object.alignment.y );
+				_gl.uniform2f( uniforms.uvScale, sprite.uvScale.x, sprite.uvScale.y );
+				_gl.uniform2f( uniforms.uvOffset, sprite.uvOffset.x, sprite.uvOffset.y );
+				_gl.uniform2f( uniforms.alignment, sprite.alignment.x, sprite.alignment.y );
 
-				_gl.uniform1f( uniforms.opacity, object.opacity );
-				_gl.uniform3f( uniforms.color, object.color.r, object.color.g, object.color.b );
+				_gl.uniform1f( uniforms.opacity, sprite.opacity );
+				_gl.uniform3f( uniforms.color, sprite.color.r, sprite.color.g, sprite.color.b );
 
-				_gl.uniform1f( uniforms.rotation, object.rotation );
+				_gl.uniform1f( uniforms.rotation, sprite.rotation );
 				_gl.uniform2fv( uniforms.scale, scale );
 
-				if ( object.mergeWith3D && !mergeWith3D ) {
+				if ( sprite.mergeWith3D && !mergeWith3D ) {
 
 					_gl.enable( _gl.DEPTH_TEST );
 					mergeWith3D = true;
 
-				} else if ( !object.mergeWith3D && mergeWith3D ) {
+				} else if ( ! sprite.mergeWith3D && mergeWith3D ) {
 
 					_gl.disable( _gl.DEPTH_TEST );
 					mergeWith3D = false;
 
 				}
 
-				_renderer.setBlending( object.blending );
-				_renderer.setTexture( object.map, 0 );
+				_renderer.setBlending( sprite.blending );
+				_renderer.setTexture( sprite.map, 0 );
 
 				_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
 
