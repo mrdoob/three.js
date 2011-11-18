@@ -59,8 +59,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.shadowCameraFar = 5000;
 	this.shadowCameraFov = 50;
 
-	this.shadowMap = [];
-
 	this.shadowMapEnabled = false;
 	this.shadowMapAutoUpdate = true;
 	this.shadowMapSoft = true;
@@ -71,7 +69,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// custom render plugins
 
-	this.renderPlugins = [];
+	this.renderPluginsPre = [];
+	this.renderPluginsPost = [];
 
 	// info
 
@@ -128,22 +127,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_viewportWidth = 0,
 	_viewportHeight = 0,
 
-	// frustum cache
+	// frustum
 
-	_frustum = [
-		new THREE.Vector4(),
-		new THREE.Vector4(),
-		new THREE.Vector4(),
-		new THREE.Vector4(),
-		new THREE.Vector4(),
-		new THREE.Vector4()
-	 ],
+	_frustum = new THREE.Frustum(),
 
 	 // camera matrices cache
 
 	_projScreenMatrix = new THREE.Matrix4(),
-	_projectionMatrixArray = new Float32Array( 16 ),
-	_viewMatrixArray = new Float32Array( 16 ),
 
 	_vector3 = new THREE.Vector4(),
 
@@ -157,18 +147,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	// shadow maps
-
-	var _cameraLight, _shadowMatrix = [];
-	var _depthMaterial, _depthMaterialMorph;
-
 	// initialize
 
 	_gl = initGL();
 
 	setDefaultGLState();
-
-	initShadowmaps();
 
 	this.context = _gl;
 
@@ -267,20 +250,26 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.clearTarget = function ( renderTarget, color, depth, stencil ) {
 
-		setRenderTarget( renderTarget );
+		this.setRenderTarget( renderTarget );
 		this.clear( color, depth, stencil );
 
 	};
 
 	// Plugins
 
-	this.addPlugin = function ( plugin ) {
+	this.addPostPlugin = function ( plugin ) {
 
 		plugin.init( this );
-		this.renderPlugins.push( plugin );
+		this.renderPluginsPost.push( plugin );
 
 	};
 
+	this.addPrePlugin = function ( plugin ) {
+
+		plugin.init( this );
+		this.renderPluginsPre.push( plugin );
+
+	};
 
 	// Deallocation
 
@@ -335,7 +324,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.updateShadowMap = function ( scene, camera ) {
 
-		renderShadowMap( scene, camera );
+		_currentProgram = null;
+		_oldBlending = -1;
+		_oldDepthTest = -1;
+		_oldDepthWrite = -1;
+		_currentGeometryGroupHash = -1;
+		_currentMaterialId = -1;
+
+		this.shadowMapPlugin.update( scene, camera );
 
 	};
 
@@ -2631,7 +2627,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Buffer rendering
 
-	function renderBufferImmediate ( object, program, shading ) {
+	this.renderBufferImmediate = function ( object, program, shading ) {
 
 		if ( ! object.__webglVertexBuffer ) object.__webglVertexBuffer = _gl.createBuffer();
 		if ( ! object.__webglNormalBuffer ) object.__webglNormalBuffer = _gl.createBuffer();
@@ -2704,7 +2700,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function renderBuffer ( camera, lights, fog, material, geometryGroup, object ) {
+	this.renderBuffer = function ( camera, lights, fog, material, geometryGroup, object ) {
 
 		if ( material.opacity === 0 ) return;
 
@@ -2999,44 +2995,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-	}
-
-	// Frustum
-
-	function computeFrustum ( m ) {
-
-		_frustum[ 0 ].set( m.n41 - m.n11, m.n42 - m.n12, m.n43 - m.n13, m.n44 - m.n14 );
-		_frustum[ 1 ].set( m.n41 + m.n11, m.n42 + m.n12, m.n43 + m.n13, m.n44 + m.n14 );
-		_frustum[ 2 ].set( m.n41 + m.n21, m.n42 + m.n22, m.n43 + m.n23, m.n44 + m.n24 );
-		_frustum[ 3 ].set( m.n41 - m.n21, m.n42 - m.n22, m.n43 - m.n23, m.n44 - m.n24 );
-		_frustum[ 4 ].set( m.n41 - m.n31, m.n42 - m.n32, m.n43 - m.n33, m.n44 - m.n34 );
-		_frustum[ 5 ].set( m.n41 + m.n31, m.n42 + m.n32, m.n43 + m.n33, m.n44 + m.n34 );
-
-		var i, plane;
-
-		for ( i = 0; i < 6; i ++ ) {
-
-			plane = _frustum[ i ];
-			plane.divideScalar( Math.sqrt( plane.x * plane.x + plane.y * plane.y + plane.z * plane.z ) );
-
-		}
-
-	};
-
-	function isInFrustum ( object ) {
-
-		var distance, matrix = object.matrixWorld,
-		radius = - object.geometry.boundingSphere.radius * Math.max( object.scale.x, Math.max( object.scale.y, object.scale.z ) );
-
-		for ( var i = 0; i < 6; i ++ ) {
-
-			distance = _frustum[ i ].x * matrix.n14 + _frustum[ i ].y * matrix.n24 + _frustum[ i ].z * matrix.n34 + _frustum[ i ].w;
-			if ( distance <= radius ) return false;
-
-		}
-
-		return true;
-
 	};
 
 
@@ -3072,20 +3030,48 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( this.autoUpdateScene ) scene.updateMatrixWorld();
 
-		if ( this.shadowMapEnabled && this.shadowMapAutoUpdate ) renderShadowMap( scene, camera );
+		// custom render plugins (pre pass)
+
+		if ( this.renderPluginsPre.length ) {
+
+			for ( i = 0, il = this.renderPluginsPre.length; i < il; i ++ ) {
+
+				_currentProgram = null;
+				_oldBlending = -1;
+				_oldDepthTest = -1;
+				_oldDepthWrite = -1;
+				_currentGeometryGroupHash = -1;
+				_currentMaterialId = -1;
+
+				this.renderPluginsPre[ i ].render( scene, camera, _viewportWidth, _viewportHeight );
+
+				_currentProgram = null;
+				_oldBlending = -1;
+				_oldDepthTest = -1;
+				_oldDepthWrite = -1;
+				_currentGeometryGroupHash = -1;
+				_currentMaterialId = -1;
+
+			}
+
+		}
 
 		_this.info.render.calls = 0;
 		_this.info.render.vertices = 0;
 		_this.info.render.faces = 0;
 
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
-		camera.matrixWorldInverse.flattenToArray( _viewMatrixArray );
-		camera.projectionMatrix.flattenToArray( _projectionMatrixArray );
+
+		if ( ! camera._viewMatrixArray ) camera._viewMatrixArray = new Float32Array( 16 );
+		camera.matrixWorldInverse.flattenToArray( camera._viewMatrixArray );
+
+		if ( ! camera._projectionMatrixArray ) camera._projectionMatrixArray = new Float32Array( 16 );
+		camera.projectionMatrix.flattenToArray( camera._projectionMatrixArray );
 
 		_projScreenMatrix.multiply( camera.projectionMatrix, camera.matrixWorldInverse );
-		computeFrustum( _projScreenMatrix );
+		_frustum.setFromMatrix( _projScreenMatrix );
 
-		setRenderTarget( renderTarget );
+		this.setRenderTarget( renderTarget );
 
 		if ( this.autoClear || forceClear ) {
 
@@ -3106,11 +3092,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( object.visible ) {
 
-				if ( ! ( object instanceof THREE.Mesh ) || ! ( object.frustumCulled ) || isInFrustum( object ) ) {
+				if ( ! ( object instanceof THREE.Mesh ) || ! ( object.frustumCulled ) || _frustum.contains( object ) ) {
 
 					object.matrixWorld.flattenToArray( object._objectMatrixArray );
 
-					setupMatrices( object, camera, true );
+					setupMatrices( object, camera );
 
 					unrollBufferMaterial( webglObject );
 
@@ -3162,7 +3148,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				setupMatrices( object, camera, true );
+				setupMatrices( object, camera );
 
 				unrollImmediateBufferMaterial( webglObject );
 
@@ -3173,7 +3159,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( scene.overrideMaterial ) {
 
 			this.setBlending( scene.overrideMaterial.blending );
-			setDepthTest( scene.overrideMaterial.depthTest );
+			this.setDepthTest( scene.overrideMaterial.depthTest );
 			setDepthWrite( scene.overrideMaterial.depthWrite );
 			setPolygonOffset( scene.overrideMaterial.polygonOffset, scene.overrideMaterial.polygonOffsetFactor, scene.overrideMaterial.polygonOffsetUnits );
 
@@ -3196,19 +3182,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		// custom render plugins
+		// custom render plugins (post pass)
 
-		if ( this.renderPlugins.length ) {
+		if ( this.renderPluginsPost.length ) {
 
-			for ( i = 0, il = this.renderPlugins.length; i < il; i ++ ) {
+			for ( i = 0, il = this.renderPluginsPost.length; i < il; i ++ ) {
 
-				this.renderPlugins[ i ].render( scene, camera, _viewportWidth, _viewportHeight, _projectionMatrixArray );
+				this.renderPluginsPost[ i ].render( scene, camera, _viewportWidth, _viewportHeight );
 
 				_currentProgram = null;
 				_oldBlending = -1;
 				_oldDepthTest = -1;
 				_oldDepthWrite = -1;
 				_currentGeometryGroupHash = -1;
+				_currentMaterialId = -1;
 
 			}
 
@@ -3223,203 +3210,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		//_gl.finish();
-
-	};
-
-	function renderShadowMap ( scene, camera ) {
-
-		var i, il, j, jl,
-
-		shadowMap, shadowMatrix,
-		program, buffer, material,
-		webglObject, object, light,
-
-		shadowIndex = 0,
-
-		lights = scene.lights,
-		fog = null;
-
-		if ( ! _cameraLight ) {
-
-			_cameraLight = new THREE.PerspectiveCamera( _this.shadowCameraFov, _this.shadowMapWidth / _this.shadowMapHeight, _this.shadowCameraNear, _this.shadowCameraFar );
-
-		}
-
-		for ( i = 0, il = lights.length; i < il; i ++ ) {
-
-			light = lights[ i ];
-
-			if ( light.castShadow && light instanceof THREE.SpotLight ) {
-
-				_currentMaterialId = -1;
-
-				if ( ! _this.shadowMap[ shadowIndex ] ) {
-
-					var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat };
-
-					_this.shadowMap[ shadowIndex ] = new THREE.WebGLRenderTarget( _this.shadowMapWidth, _this.shadowMapHeight, pars );
-					_shadowMatrix[ shadowIndex ] = new THREE.Matrix4();
-
-				}
-
-				shadowMap = _this.shadowMap[ shadowIndex ];
-				shadowMatrix = _shadowMatrix[ shadowIndex ];
-
-				_cameraLight.position.copy( light.position );
-				_cameraLight.lookAt( light.target.position );
-
-				if ( _cameraLight.parent == null ) {
-
-					console.warn( "Camera is not on the Scene. Adding it..." );
-					scene.add( _cameraLight );
-
-					if ( this.autoUpdateScene ) scene.updateMatrixWorld();
-
-				}
-
-				_cameraLight.matrixWorldInverse.getInverse( _cameraLight.matrixWorld );
-
-				// compute shadow matrix
-
-				shadowMatrix.set( 0.5, 0.0, 0.0, 0.5,
-								  0.0, 0.5, 0.0, 0.5,
-								  0.0, 0.0, 0.5, 0.5,
-								  0.0, 0.0, 0.0, 1.0 );
-
-				shadowMatrix.multiplySelf( _cameraLight.projectionMatrix );
-				shadowMatrix.multiplySelf( _cameraLight.matrixWorldInverse );
-
-				// render shadow map
-
-				_cameraLight.matrixWorldInverse.flattenToArray( _viewMatrixArray );
-				_cameraLight.projectionMatrix.flattenToArray( _projectionMatrixArray );
-
-				_projScreenMatrix.multiply( _cameraLight.projectionMatrix, _cameraLight.matrixWorldInverse );
-				computeFrustum( _projScreenMatrix );
-
-				setRenderTarget( shadowMap );
-
-				// using arbitrary clear color in depth pass
-				// creates variance in shadows
-
-				_gl.clearColor( 1, 1, 1, 1 );
-				//_gl.clearColor( 0, 0, 0, 1 );
-
-				_this.clear();
-
-				_gl.clearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
-
-				// set matrices & frustum culling
-
-				jl = scene.__webglObjects.length;
-
-				for ( j = 0; j < jl; j ++ ) {
-
-					webglObject = scene.__webglObjects[ j ];
-					object = webglObject.object;
-
-					webglObject.render = false;
-
-					if ( object.visible && object.castShadow ) {
-
-						if ( ! ( object instanceof THREE.Mesh ) || ! ( object.frustumCulled ) || isInFrustum( object ) ) {
-
-							object.matrixWorld.flattenToArray( object._objectMatrixArray );
-
-							setupMatrices( object, _cameraLight, false );
-
-							webglObject.render = true;
-
-						}
-
-					}
-
-				}
-
-				// render regular objects
-
-				setDepthTest( true );
-				_this.setBlending( THREE.NormalBlending ); // maybe blending should be just disabled?
-
-				//_gl.cullFace( _gl.FRONT );
-
-				for ( j = 0; j < jl; j ++ ) {
-
-					webglObject = scene.__webglObjects[ j ];
-
-					if ( webglObject.render ) {
-
-						object = webglObject.object;
-						buffer = webglObject.buffer;
-
-						setObjectFaces( object );
-
-						if ( object.customDepthMaterial ) {
-
-							material = object.customDepthMaterial;
-
-						} else if ( object.geometry.morphTargets.length ) {
-
-							material = _depthMaterialMorph;
-
-						} else {
-
-							material = _depthMaterial;
-
-						}
-
-						renderBuffer( _cameraLight, lights, fog, material, buffer, object );
-
-					}
-
-				}
-
-				// set matrices and render immediate objects
-
-				jl = scene.__webglObjectsImmediate.length;
-
-				for ( j = 0; j < jl; j ++ ) {
-
-					webglObject = scene.__webglObjectsImmediate[ j ];
-					object = webglObject.object;
-
-					if ( object.visible && object.castShadow ) {
-
-						if( object.matrixAutoUpdate ) {
-
-							object.matrixWorld.flattenToArray( object._objectMatrixArray );
-
-						}
-
-						_currentGeometryGroupHash = -1;
-
-						setupMatrices( object, _cameraLight, false );
-
-						setObjectFaces( object );
-
-						program = setProgram( _cameraLight, lights, fog, _depthMaterial, object );
-
-						if ( object.immediateRenderCallback ) {
-
-							object.immediateRenderCallback( program, _gl, _frustum );
-
-						} else {
-
-							object.render( function( object ) { renderBufferImmediate( object, program, _depthMaterial.shading ); } );
-
-						}
-
-					}
-
-				}
-
-				//_gl.cullFace( _gl.BACK );
-
-				shadowIndex ++;
-
-			}
-
-		}
 
 	};
 
@@ -3461,15 +3251,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( useBlending ) _this.setBlending( material.blending );
 
-					setDepthTest( material.depthTest );
+					_this.setDepthTest( material.depthTest );
 					setDepthWrite( material.depthWrite );
 					setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
 
 				}
 
-				setObjectFaces( object );
-
-				renderBuffer( camera, lights, fog, material, buffer, object );
+				_this.setObjectFaces( object );
+				_this.renderBuffer( camera, lights, fog, material, buffer, object );
 
 			}
 
@@ -3500,15 +3289,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( ! material ) continue;
 
-					if ( useBlending ) this.setBlending( material.blending );
+					if ( useBlending ) _this.setBlending( material.blending );
 
-					setDepthTest( material.depthTest );
+					_this.setDepthTest( material.depthTest );
 					setDepthWrite( material.depthWrite );
 					setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
 
 				}
 
-				setObjectFaces( object );
+				_this.setObjectFaces( object );
 
 				program = setProgram( camera, lights, fog, material, object );
 
@@ -3518,7 +3307,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				} else {
 
-					object.render( function( object ) { renderBufferImmediate( object, program, material.shading ); } );
+					object.render( function( object ) { _this.renderBufferImmediate( object, program, material.shading ); } );
 
 				}
 
@@ -4236,7 +4025,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( refreshMaterial ) {
 
-			_gl.uniformMatrix4fv( p_uniforms.projectionMatrix, false, _projectionMatrixArray );
+			_gl.uniformMatrix4fv( p_uniforms.projectionMatrix, false, camera._projectionMatrixArray );
 
 			// refresh uniforms common to several materials
 
@@ -4325,7 +4114,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if( p_uniforms.viewMatrix !== null ) {
 
-					_gl.uniformMatrix4fv( p_uniforms.viewMatrix, false, _viewMatrixArray );
+					_gl.uniformMatrix4fv( p_uniforms.viewMatrix, false, camera._viewMatrixArray );
 
 				}
 
@@ -4333,7 +4122,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( material.skinning ) {
 
-				loadUniformsSkinning( p_uniforms, object );
+				loadUniformsSkinning( p_uniforms, object, camera );
 
 			}
 
@@ -4488,10 +4277,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( uniforms.shadowMatrix ) {
 
-			for ( var i = 0; i < _shadowMatrix.length; i ++ ) {
+			for ( var i = 0; i < _this.shadowMapPlugin.shadowMatrix.length; i ++ ) {
 
-				uniforms.shadowMatrix.value[ i ] = _shadowMatrix[ i ];
-				uniforms.shadowMap.texture[ i ] = _this.shadowMap[ i ];
+				uniforms.shadowMatrix.value[ i ] = _this.shadowMapPlugin.shadowMatrix[ i ];
+				uniforms.shadowMap.texture[ i ] = _this.shadowMapPlugin.shadowMap[ i ];
 
 
 			}
@@ -4505,9 +4294,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Uniforms (load to GPU)
 
-	function loadUniformsSkinning ( uniforms, object ) {
+	function loadUniformsSkinning ( uniforms, object, camera ) {
 
-		_gl.uniformMatrix4fv( uniforms.cameraInverseMatrix, false, _viewMatrixArray );
+		_gl.uniformMatrix4fv( uniforms.cameraInverseMatrix, false, camera._viewMatrixArray );
 		_gl.uniformMatrix4fv( uniforms.boneGlobalMatrices, false, object.boneMatrices );
 
 	};
@@ -4699,15 +4488,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function setupMatrices ( object, camera, computeNormalMatrix ) {
+	function setupMatrices ( object, camera ) {
 
 		object._modelViewMatrix.multiplyToArray( camera.matrixWorldInverse, object.matrixWorld, object._modelViewMatrixArray );
 
-		if ( computeNormalMatrix ) {
-
-			THREE.Matrix4.makeInvert3x3( object._modelViewMatrix ).transposeIntoArray( object._normalMatrixArray );
-
-		}
+		THREE.Matrix4.makeInvert3x3( object._modelViewMatrix ).transposeIntoArray( object._normalMatrixArray );
 
 	};
 
@@ -4892,19 +4677,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function setLineWidth ( width ) {
-
-		if ( width !== _oldLineWidth ) {
-
-			_gl.lineWidth( width );
-
-			_oldLineWidth = width;
-
-		}
-
-	};
-
-	function setObjectFaces ( object ) {
+	this.setObjectFaces = function ( object ) {
 
 		if ( _oldDoubleSided !== object.doubleSided ) {
 
@@ -4940,7 +4713,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function setDepthTest ( depthTest ) {
+	this.setDepthTest = function ( depthTest ) {
 
 		if ( _oldDepthTest !== depthTest ) {
 
@@ -4955,6 +4728,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 			_oldDepthTest = depthTest;
+
+		}
+
+	};
+
+	function setLineWidth ( width ) {
+
+		if ( width !== _oldLineWidth ) {
+
+			_gl.lineWidth( width );
+
+			_oldLineWidth = width;
 
 		}
 
@@ -5502,7 +5287,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function setRenderTarget ( renderTarget ) {
+	this.setRenderTarget = function ( renderTarget ) {
 
 		var isCube = ( renderTarget instanceof THREE.WebGLRenderTargetCube );
 
@@ -5766,19 +5551,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Initialization
 
-	function initShadowmaps () {
-
-		var depthShader = THREE.ShaderLib[ "depthRGBA" ];
-		var depthUniforms = THREE.UniformsUtils.clone( depthShader.uniforms );
-
-		_depthMaterial = new THREE.ShaderMaterial( { fragmentShader: depthShader.fragmentShader, vertexShader: depthShader.vertexShader, uniforms: depthUniforms } );
-		_depthMaterialMorph = new THREE.ShaderMaterial( { fragmentShader: depthShader.fragmentShader, vertexShader: depthShader.vertexShader, uniforms: depthUniforms, morphTargets: true } );
-
-		_depthMaterial._shadowPass = true;
-		_depthMaterialMorph._shadowPass = true;
-
-	}
-
 	function initGL () {
 
 		var gl;
@@ -5832,7 +5604,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// default plugins (order is important)
 
-	this.addPlugin( new THREE.SpritePlugin() );
-	this.addPlugin( new THREE.LensFlarePlugin() );
+	this.shadowMapPlugin = new THREE.ShadowMapPlugin();
+	this.addPrePlugin( this.shadowMapPlugin );
+
+	this.addPostPlugin( new THREE.SpritePlugin() );
+	this.addPostPlugin( new THREE.LensFlarePlugin() );
 
 };

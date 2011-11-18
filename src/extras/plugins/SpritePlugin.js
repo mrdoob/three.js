@@ -72,7 +72,7 @@ THREE.SpritePlugin = function ( ) {
 
 	};
 
-	this.render = function ( scene, camera, viewportWidth, viewportHeight, projectionMatrixArray ) {
+	this.render = function ( scene, camera, viewportWidth, viewportHeight ) {
 
 		var sprites = scene.__webglSprites,
 			nSprites = sprites.length;
@@ -113,7 +113,7 @@ THREE.SpritePlugin = function ( ) {
 
 		_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, _sprite.elementBuffer );
 
-		_gl.uniformMatrix4fv( uniforms.projectionMatrix, false, projectionMatrixArray );
+		_gl.uniformMatrix4fv( uniforms.projectionMatrix, false, camera._projectionMatrixArray );
 
 		_gl.activeTexture( _gl.TEXTURE0 );
 		_gl.uniform1i( uniforms.map, 0 );
