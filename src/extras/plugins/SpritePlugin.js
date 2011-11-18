@@ -92,7 +92,6 @@ THREE.SpritePlugin = function ( ) {
 		// setup gl
 
 		_gl.useProgram( _sprite.program );
-		_currentProgram = _sprite.program;
 
 		if ( ! _sprite.attributesEnabled ) {
 

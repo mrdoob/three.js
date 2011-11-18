@@ -3277,8 +3277,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( object.visible ) {
 
-				_currentGeometryGroupHash = -1;
-
 				if ( overrideMaterial ) {
 
 					material = overrideMaterial;
@@ -3297,21 +3295,29 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				_this.setObjectFaces( object );
-
-				program = setProgram( camera, lights, fog, material, object );
-
-				if ( object.immediateRenderCallback ) {
-
-					object.immediateRenderCallback( program, _gl, _frustum );
-
-				} else {
-
-					object.render( function( object ) { _this.renderBufferImmediate( object, program, material.shading ); } );
-
-				}
+				_this.renderImmediateObject( camera, lights, fog, material, object );
 
 			}
+
+		}
+
+	};
+
+	this.renderImmediateObject = function ( camera, lights, fog, material, object ) {
+
+		var program = setProgram( camera, lights, fog, material, object );
+
+		_currentGeometryGroupHash = -1;
+
+		_this.setObjectFaces( object );
+
+		if ( object.immediateRenderCallback ) {
+
+			object.immediateRenderCallback( program, _gl, _frustum );
+
+		} else {
+
+			object.render( function( object ) { _this.renderBufferImmediate( object, program, material.shading ); } );
 
 		}
 

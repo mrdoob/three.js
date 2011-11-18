@@ -203,8 +203,6 @@ THREE.ShadowMapPlugin = function ( ) {
 
 					if ( object.visible && object.castShadow ) {
 
-						_currentGeometryGroupHash = -1;
-
 						if( object.matrixAutoUpdate ) {
 
 							object.matrixWorld.flattenToArray( object._objectMatrixArray );
@@ -213,19 +211,7 @@ THREE.ShadowMapPlugin = function ( ) {
 
 						object._modelViewMatrix.multiplyToArray( _cameraLight.matrixWorldInverse, object.matrixWorld, object._modelViewMatrixArray );
 
-						_renderer.setObjectFaces( object );
-
-						program = _renderer.setProgram( _cameraLight, lights, fog, _depthMaterial, object );
-
-						if ( object.immediateRenderCallback ) {
-
-							object.immediateRenderCallback( program, _gl, _frustum );
-
-						} else {
-
-							object.render( function( object ) { _renderer.renderBufferImmediate( object, program, _depthMaterial.shading ); } );
-
-						}
+						_renderer.renderImmediateObject( _cameraLight, lights, fog, _depthMaterial, object );
 
 					}
 
