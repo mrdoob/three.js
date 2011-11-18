@@ -30,12 +30,6 @@ THREE.ColladaLoader = function () {
 
 		if ( document.implementation && document.implementation.createDocument ) {
 
-			var namespaceURL = "http://www.collada.org/2005/11/COLLADASchema";
-			var rootTagName = "COLLADA";
-
-			var xmldoc = document.implementation.createDocument( namespaceURL, rootTagName, null );
-			var me = this;
-
 			// force reloading
 			// (should be configurable? sometimes caching is desirable)
 
