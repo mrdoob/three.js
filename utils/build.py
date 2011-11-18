@@ -129,8 +129,11 @@ EXTRAS_FILES = [
 'extras/loaders/UTF8Loader.js',
 'extras/objects/Axes.js',
 'extras/objects/MarchingCubes.js',
+'extras/objects/LensFlare.js',
+'extras/plugins/LensFlarePlugin.js',
 'extras/renderers/AnaglyphWebGLRenderer.js',
-'extras/renderers/CrosseyedWebGLRenderer.js'
+'extras/renderers/CrosseyedWebGLRenderer.js',
+'extras/shaders/ShaderFlares.js'
 ]
 
 CANVAS_FILES = [

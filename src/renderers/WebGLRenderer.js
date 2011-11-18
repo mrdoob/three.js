@@ -69,6 +69,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.maxMorphTargets = 8;
 
+	// custom render plugins
+
+	this.renderPlugins = [];
+
 	// info
 
 	this.info = {
@@ -273,6 +277,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 		this.clear( color, depth, stencil );
 
 	};
+
+	// Plugins
+
+	this.addPlugin = function ( plugin ) {
+
+		plugin.init( this );
+		this.renderPlugins.push( plugin );
+
+	};
+
 
 	// Deallocation
 
@@ -3164,7 +3178,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( scene.overrideMaterial ) {
 
-			setBlending( scene.overrideMaterial.blending );
+			this.setBlending( scene.overrideMaterial.blending );
 			setDepthTest( scene.overrideMaterial.depthTest );
 			setDepthWrite( scene.overrideMaterial.depthWrite );
 			setPolygonOffset( scene.overrideMaterial.polygonOffset, scene.overrideMaterial.polygonOffsetFactor, scene.overrideMaterial.polygonOffsetUnits );
@@ -3176,7 +3190,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			// opaque pass (front-to-back order)
 
-			setBlending( THREE.NormalBlending );
+			this.setBlending( THREE.NormalBlending );
 
 			renderObjects( scene.__webglObjects, true, "opaque", camera, lights, fog, false );
 			renderObjectsImmediate( scene.__webglObjectsImmediate, "opaque", camera, lights, fog, false );
@@ -3193,6 +3207,24 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( scene.__webglSprites.length ) {
 
 			renderSprites( scene, camera );
+
+		}
+
+		// custom render plugins
+
+		if ( this.renderPlugins.length ) {
+
+			for ( i = 0, il = this.renderPlugins.length; i < il; i ++ ) {
+
+				this.renderPlugins[ i ].render( scene, camera, _viewportWidth, _viewportHeight );
+
+				_currentProgram = null;
+				_oldBlending = -1;
+				_oldDepthTest = -1;
+				_oldDepthWrite = -1;
+				_currentGeometryGroupHash = -1;
+
+			}
 
 		}
 
@@ -3321,7 +3353,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				// render regular objects
 
 				setDepthTest( true );
-				setBlending( THREE.NormalBlending ); // maybe blending should be just disabled?
+				_this.setBlending( THREE.NormalBlending ); // maybe blending should be just disabled?
 
 				//_gl.cullFace( _gl.FRONT );
 
@@ -3441,7 +3473,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( ! material ) continue;
 
-					if ( useBlending ) setBlending( material.blending );
+					if ( useBlending ) _this.setBlending( material.blending );
 
 					setDepthTest( material.depthTest );
 					setDepthWrite( material.depthWrite );
@@ -3482,7 +3514,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( ! material ) continue;
 
-					if ( useBlending ) setBlending( material.blending );
+					if ( useBlending ) this.setBlending( material.blending );
 
 					setDepthTest( material.depthTest );
 					setDepthWrite( material.depthWrite );
@@ -3702,8 +3734,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				setBlending( object.blending );
-				setTexture( object.map, 0 );
+				_this.setBlending( object.blending );
+				_this.setTexture( object.map, 0 );
 
 				_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
 
@@ -3803,6 +3835,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			scene.__webglObjects = [];
 			scene.__webglObjectsImmediate = [];
 			scene.__webglSprites = [];
+			scene.__webglFlares = [];
 
 		}
 
@@ -3957,6 +3990,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 			} else if ( object instanceof THREE.Sprite ) {
 
 				scene.__webglSprites.push( object );
+
+			} else if ( object instanceof THREE.LensFlare ) {
+
+				scene.__webglFlares.push( object );
 
 			}
 
@@ -4117,6 +4154,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 		} else if ( object instanceof THREE.Sprite ) {
 
 			removeInstancesDirect( scene.__webglSprites, object );
+
+		} else if ( object instanceof THREE.LensFlare ) {
+
+			removeInstancesDirect( scene.__webglFlares, object );
 
 		} else if ( object instanceof THREE.MarchingCubes || object.immediateRenderCallback ) {
 
@@ -4771,7 +4812,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				} else {
 
-					setTexture( texture, value );
+					_this.setTexture( texture, value );
 
 				}
 
@@ -4799,7 +4840,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( !texture ) continue;
 
-					setTexture( texture, uniform._array[ i ] );
+					_this.setTexture( texture, uniform._array[ i ] );
 
 				}
 
@@ -5110,7 +5151,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function setBlending ( blending ) {
+	this.setBlending = function ( blending ) {
 
 		if ( blending !== _oldBlending ) {
 
@@ -5446,6 +5487,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Textures
 
+
+	function isPowerOfTwo ( value ) {
+
+		return ( value & ( value - 1 ) ) === 0;
+
+	};
+
 	function setTextureParameters ( textureType, texture, image ) {
 
 		if ( isPowerOfTwo( image.width ) && isPowerOfTwo( image.height ) ) {
@@ -5472,7 +5520,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function setTexture ( texture, slot ) {
+	this.setTexture = function ( texture, slot ) {
 
 		if ( texture.needsUpdate ) {
 
@@ -5731,7 +5779,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	// fallback filters for non-power-of-2 textures
+	// Fallback filters for non-power-of-2 textures
 
 	function filterFallback ( f ) {
 
@@ -5751,6 +5799,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 	};
+
+	// Map three.js constants to WebGL constants
 
 	function paramThreeToGL ( p ) {
 
@@ -5785,12 +5835,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		return 0;
-
-	};
-
-	function isPowerOfTwo ( value ) {
-
-		return ( value & ( value - 1 ) ) === 0;
 
 	};
 
