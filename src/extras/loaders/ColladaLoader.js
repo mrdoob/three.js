@@ -1809,30 +1809,13 @@ THREE.ColladaLoader = function () {
 
 		}
 
-		var vertex_store = {};
-
-		function get_vertex ( v, index )  {
-
-			var hash = _hash_vector3( v.position );
-
-			if ( vertex_store[ hash ] === undefined ) {
-
-				vertex_store[ hash ] = { v: v, index: index };
-
-			}
-
-			return vertex_store[ hash ];
-
-		}
-
 		this.geometry3js = new THREE.Geometry();
 
 		var vertexData = sources[ this.vertices.input['POSITION'].source ].data;
 
-		for ( i = 0, j = 0; i < vertexData.length; i += 3, j ++ ) {
+		for ( i = 0; i < vertexData.length; i += 3 ) {
 
 			var v = new THREE.Vertex( new THREE.Vector3( vertexData[ i ], vertexData[ i + 1 ], vertexData[ i + 2 ] ) );
-			get_vertex( v, j );
 			this.geometry3js.vertices.push( v );
 
 		}
@@ -1841,7 +1824,7 @@ THREE.ColladaLoader = function () {
 
 			var primitive = this.primitives[ i ];
 			primitive.setVertices( this.vertices );
-			this.handlePrimitive( primitive, this.geometry3js, vertex_store );
+			this.handlePrimitive( primitive, this.geometry3js );
 
 		}
 
@@ -1854,7 +1837,7 @@ THREE.ColladaLoader = function () {
 
 	};
 
-	Mesh.prototype.handlePrimitive = function( primitive, geom, vertex_store ) {
+	Mesh.prototype.handlePrimitive = function( primitive, geom ) {
 
 		var i = 0, j, k, p = primitive.p, inputs = primitive.inputs;
 		var input, index, idx32;
@@ -1904,8 +1887,7 @@ THREE.ColladaLoader = function () {
 
 						case 'VERTEX':
 
-							var hash = _hash_vector3( geom.vertices[ index ].position );
-							vs.push( vertex_store[ hash ].index );
+							vs.push( index );
 
 							break;
 
@@ -1918,7 +1900,8 @@ THREE.ColladaLoader = function () {
 						case 'TEXCOORD':
 
 							if ( ts[ input.set ] === undefined ) ts[ input.set ] = [];
-							ts[ input.set ].push( new THREE.UV( source.data[ idx32 ], source.data[ idx32 + 1 ] ) );
+							// invert the V
+							ts[ input.set ].push( new THREE.UV( source.data[ idx32 ], 1.0 - source.data[ idx32 + 1 ] ) );
 
 							break;
 
@@ -1938,25 +1921,73 @@ THREE.ColladaLoader = function () {
 			}
 
 
-			var face, uv;
+			var face = null, faces = [], uv, uvArr;
 
-			if ( vcount == 3 ) {
+			if ( vcount === 3 ) {
 
-				face = new THREE.Face3( vs[0], vs[1], vs[2], [ ns[0], ns[1], ns[2] ], cs.length ? cs : new THREE.Color() );
+				faces.push( new THREE.Face3( vs[0], vs[1], vs[2], [ ns[0], ns[1], ns[2] ], cs.length ? cs : new THREE.Color() ) );
 
-			} else if ( vcount == 4 ) {
+			} else if ( vcount === 4 ) {
 
-				face = new THREE.Face4( vs[0], vs[1], vs[2], vs[3], [ ns[0], ns[1], ns[2], ns[3] ], cs.length ? cs : new THREE.Color() );
+				faces.push( new THREE.Face4( vs[0], vs[1], vs[2], vs[3], [ ns[0], ns[1], ns[2], ns[3] ], cs.length ? cs : new THREE.Color() ) );
+
+			} else if ( vcount > 4 ) {
+
+				var clr = cs.length ? cs : new THREE.Color(),
+					vec1, vec2, vec3, v1, v2, norm;
+
+				// subdivide into multiple Face3s
+				for ( k = 1; k < vcount-1; ) {
+
+					// FIXME: normals don't seem to be quite right
+					faces.push( new THREE.Face3( vs[0], vs[k], vs[k+1], [ ns[0], ns[k++], ns[k] ],  clr ) );
+
+				}
 
 			}
 
-			face.daeMaterial = primitive.material;
-			geom.faces.push( face );
+			if ( faces.length ) {
 
-			for ( k = 0; k < texture_sets.length; k ++ ) {
+				for (var ndx = 0, len = faces.length; ndx < len; ndx++) {
 
-				uv = ts[ texture_sets[ k ] ];
-				geom.faceVertexUvs[ k ].push( [ uv[0], uv[1], uv[2] ] );
+					face = faces[ndx];
+					face.daeMaterial = primitive.material;
+					geom.faces.push( face );
+
+					for ( k = 0; k < texture_sets.length; k++ ) {
+
+						uv = ts[ texture_sets[k] ];
+
+						if ( vcount > 4 ) {
+
+							// Grab the right UVs for the vertices in this face
+							uvArr = [ uv[0], uv[ndx+1], uv[ndx+2] ];
+
+						} else if ( vcount === 4 ) {
+
+							uvArr = [ uv[0], uv[1], uv[2], uv[3] ];
+
+						} else {
+
+							uvArr = [ uv[0], uv[1], uv[2] ];
+
+						}
+
+						if ( !geom.faceVertexUvs[k] ) {
+
+							geom.faceVertexUvs[k] = [];
+
+						}
+
+						geom.faceVertexUvs[k].push( uvArr );
+
+					}
+
+				}
+
+			} else {
+
+				console.log( 'dropped face with vcount ' + vcount + ' for geometry with id: ' + geom.id );
 
 			}
 
@@ -2273,6 +2304,7 @@ THREE.ColladaLoader = function () {
 
 		this.texture = null;
 		this.texcoord = null;
+		this.texOpts = null;
 
 	};
 
@@ -2309,9 +2341,68 @@ THREE.ColladaLoader = function () {
 
 					this.texture = child.getAttribute('texture');
 					this.texcoord = child.getAttribute('texcoord');
+					// Defaults from:
+					// https://collada.org/mediawiki/index.php/Maya_texture_placement_MAYA_extension
+					this.texOpts = {
+						offsetU: 0,
+						offsetV: 0,
+						repeatU: 1,
+						repeatV: 1,
+						wrapU: 1,
+						wrapV: 1,
+					};
+					this.parseTexture( child );
 					break;
 
 				default:
+					break;
+
+			}
+
+		}
+
+		return this;
+
+	};
+
+	ColorOrTexture.prototype.parseTexture = function ( element ) {
+
+		// This should be supported by Maya, 3dsMax, and MotionBuilder
+
+		if ( element.children[0] && element.children[0].nodeName === 'extra' ) {
+
+			element = element.children[0];
+
+			if ( element.children[0] && element.children[0].nodeName === 'technique' ) {
+
+				element = element.children[0];
+
+			}
+
+		}
+
+		for ( var i = 0; i < element.children.length; i ++ ) {
+
+			var child = element.children[ i ];
+
+			switch ( child.nodeName ) {
+
+				case 'offsetU':
+				case 'offsetV':
+				case 'repeatU':
+				case 'repeatV':
+
+					this.texOpts[ child.nodeName ] = parseFloat( child.textContent );
+					break;
+
+				case 'wrapU':
+				case 'wrapV':
+
+					this.texOpts[ child.nodeName ] = parseInt( child.textContent );
+					break;
+
+				default:
+					this.texOpts[ child.nodeName ] = child.textContent;
 					break;
 
 			}
@@ -2399,11 +2490,14 @@ THREE.ColladaLoader = function () {
 
 									if ( image ) {
 
-										props['map'] = THREE.ImageUtils.loadTexture(baseUrl + image.init_from);
-										props['map'].wrapS = THREE.RepeatWrapping;
-										props['map'].wrapT = THREE.RepeatWrapping;
-										props['map'].repeat.x = 1;
-										props['map'].repeat.y = -1;
+										var texture = THREE.ImageUtils.loadTexture(baseUrl + image.init_from);
+										texture.wrapS = cot.texOpts.wrapU;
+										texture.wrapT = cot.texOpts.wrapV;
+										texture.offset.x = cot.texOpts.offsetU;
+										texture.offset.y = cot.texOpts.offsetV;
+										texture.repeat.x = cot.texOpts.repeatU;
+										texture.repeat.y = cot.texOpts.repeatV;
+										props['map'] = texture;
 
 									}
 
@@ -3124,69 +3218,6 @@ THREE.ColladaLoader = function () {
 		}
 
 		return parts.join( '.' );
-
-	};
-
-	function _hash_vertex ( v, n, t0, t1, precision ) {
-
-		precision = precision || 2;
-
-		var s = v instanceof THREE.Vertex ? _hash_vector3( v.position, precision ) : _hash_vector3( v, precision );
-
-		if ( n === undefined ) {
-
-			s += '_0.00,0.00,0.00';
-
-		} else {
-
-			s += '_' + _hash_vector3( n, precision );
-
-		}
-
-		if ( t0 === undefined ) {
-
-			s += '_0.00,0.00';
-
-		} else {
-
-			s += '_' + _hash_uv( t0, precision );
-
-		}
-
-		if ( t1 === undefined ) {
-
-			s += '_0.00,0.00';
-
-		} else {
-
-			s += '_' + _hash_uv( t1, precision );
-
-		}
-
-		return s;
-
-	};
-
-	function _hash_uv ( uv, num ) {
-
-		var s = '';
-
-		s += _format_float( uv.u, num ) + ',';
-		s += _format_float( uv.v, num );
-
-		return s;
-
-	};
-
-	function _hash_vector3 ( vec, num ) {
-
-		var s = '';
-
-		s += _format_float( vec.x, num ) + ',';
-		s += _format_float( vec.y, num ) + ',';
-		s += _format_float( vec.z, num );
-
-		return s;
 
 	};
 
