@@ -4815,7 +4815,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( computeNormalMatrix ) {
 
-			THREE.Matrix4.makeInvert3x3( object._modelViewMatrix ).transposeIntoArray( object._normalMatrixArray );
+			var inv = THREE.Matrix4.makeInvert3x3( object._modelViewMatrix );
+
+			if ( inv ) {
+
+				inv.transposeIntoArray( object._normalMatrixArray );
+
+			}
 
 		}
 
