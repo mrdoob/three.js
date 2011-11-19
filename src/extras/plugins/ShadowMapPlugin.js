@@ -48,6 +48,7 @@ THREE.ShadowMapPlugin = function ( ) {
 		shadowMap, shadowMatrix,
 		program, buffer, material,
 		webglObject, object, light,
+		renderList,
 
 		shadowIndex = 0,
 
@@ -130,11 +131,11 @@ THREE.ShadowMapPlugin = function ( ) {
 
 				// set matrices & frustum culling
 
-				jl = scene.__webglObjects.length;
+				renderList = scene.__webglObjects;
 
-				for ( j = 0; j < jl; j ++ ) {
+				for ( j = 0, jl = renderList.length; j < jl; j ++ ) {
 
-					webglObject = scene.__webglObjects[ j ];
+					webglObject = renderList[ j ];
 					object = webglObject.object;
 
 					webglObject.render = false;
@@ -161,9 +162,9 @@ THREE.ShadowMapPlugin = function ( ) {
 
 				//_gl.cullFace( _gl.FRONT );
 
-				for ( j = 0; j < jl; j ++ ) {
+				for ( j = 0, jl = renderList.length; j < jl; j ++ ) {
 
-					webglObject = scene.__webglObjects[ j ];
+					webglObject = renderList[ j ];
 
 					if ( webglObject.render ) {
 
@@ -194,11 +195,11 @@ THREE.ShadowMapPlugin = function ( ) {
 
 				// set matrices and render immediate objects
 
-				jl = scene.__webglObjectsImmediate.length;
+				renderList = scene.__webglObjectsImmediate;
 
-				for ( j = 0; j < jl; j ++ ) {
+				for ( j = 0, jl = renderList.length; j < jl; j ++ ) {
 
-					webglObject = scene.__webglObjectsImmediate[ j ];
+					webglObject = renderList[ j ];
 					object = webglObject.object;
 
 					if ( object.visible && object.castShadow ) {

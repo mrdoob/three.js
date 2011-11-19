@@ -3032,29 +3032,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// custom render plugins (pre pass)
 
-		if ( this.renderPluginsPre.length ) {
-
-			for ( i = 0, il = this.renderPluginsPre.length; i < il; i ++ ) {
-
-				_currentProgram = null;
-				_oldBlending = -1;
-				_oldDepthTest = -1;
-				_oldDepthWrite = -1;
-				_currentGeometryGroupHash = -1;
-				_currentMaterialId = -1;
-
-				this.renderPluginsPre[ i ].render( scene, camera, _viewportWidth, _viewportHeight );
-
-				_currentProgram = null;
-				_oldBlending = -1;
-				_oldDepthTest = -1;
-				_oldDepthWrite = -1;
-				_currentGeometryGroupHash = -1;
-				_currentMaterialId = -1;
-
-			}
-
-		}
+		renderPlugins( this.renderPluginsPre, scene, camera );
 
 		_this.info.render.calls = 0;
 		_this.info.render.vertices = 0;
@@ -3184,22 +3162,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// custom render plugins (post pass)
 
-		if ( this.renderPluginsPost.length ) {
+		renderPlugins( this.renderPluginsPost, scene, camera );
 
-			for ( i = 0, il = this.renderPluginsPost.length; i < il; i ++ ) {
-
-				this.renderPluginsPost[ i ].render( scene, camera, _viewportWidth, _viewportHeight );
-
-				_currentProgram = null;
-				_oldBlending = -1;
-				_oldDepthTest = -1;
-				_oldDepthWrite = -1;
-				_currentGeometryGroupHash = -1;
-				_currentMaterialId = -1;
-
-			}
-
-		}
 
 		// Generate mipmap if we're using any kind of mipmap filtering
 
@@ -3210,6 +3174,32 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		//_gl.finish();
+
+	};
+
+	function renderPlugins( plugins, scene, camera ) {
+
+		if ( ! plugins.length ) return;
+
+		for ( var i = 0, il = plugins.length; i < il; i ++ ) {
+
+			_currentProgram = null;
+			_oldBlending = -1;
+			_oldDepthTest = -1;
+			_oldDepthWrite = -1;
+			_currentGeometryGroupHash = -1;
+			_currentMaterialId = -1;
+
+			plugins[ i ].render( scene, camera, _viewportWidth, _viewportHeight );
+
+			_currentProgram = null;
+			_oldBlending = -1;
+			_oldDepthTest = -1;
+			_oldDepthWrite = -1;
+			_currentGeometryGroupHash = -1;
+			_currentMaterialId = -1;
+
+		}
 
 	};
 
