@@ -361,7 +361,7 @@ THREE.Animation.prototype.update = function( deltaTimeMS ) {
 
 		if ( JIThierarchy[ 0 ][ frame ] === undefined ) {
 
-			this.hierarchy[ 0 ].update( null, true );
+			this.hierarchy[ 0 ].updateMatrixWorld( true );
 
 			for ( var h = 0; h < this.hierarchy.length; h++ ) {
 

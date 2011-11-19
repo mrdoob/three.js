@@ -677,7 +677,12 @@ THREE.ColladaLoader = function () {
 		}
 
 		obj.name = node.id || "";
-		node.matrix.decompose( obj.position, obj.rotation, obj.scale );
+		obj.matrix = node.matrix;
+		var props = node.matrix.decompose();
+		obj.position = props[ 0 ];
+		obj.quaternion = props[ 1 ];
+		obj.useQuaternion = true;
+		obj.scale = props[ 2 ];
 
 		for ( i = 0; i < node.nodes.length; i ++ ) {
 
