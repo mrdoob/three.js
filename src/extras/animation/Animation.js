@@ -10,7 +10,7 @@ THREE.Animation = function( root, data, interpolationType, JITCompile ) {
 	this.data = THREE.AnimationHandler.get( data );
 	this.hierarchy = THREE.AnimationHandler.parse( root );
 	this.currentTime = 0;
-	this.timeScale = 1;
+	this.timeScale = 0.001;
 	this.isPlaying = false;
 	this.isPaused = true;
 	this.loop = true;
@@ -19,6 +19,37 @@ THREE.Animation = function( root, data, interpolationType, JITCompile ) {
 
 	this.points = [];
 	this.target = new THREE.Vector3();
+
+	// initialize to first keyframes
+
+	for ( var h = 0, hl = this.hierarchy.length; h < hl; h++ ) {
+
+		var keys = this.data.hierarchy[h].keys,
+			sids = this.data.hierarchy[h].sids,
+			obj = this.hierarchy[h];
+
+		if ( keys.length ) {
+
+			for ( var s = 0; s < sids.length; s++ ) {
+
+				var sid = sids[ s ],
+					next = this.getNextKeyWith( sid, h, 0 );
+
+				if ( next ) {
+
+					next.apply( sid );
+
+				}
+
+			}
+
+			obj.matrixAutoUpdate = false;
+			this.data.hierarchy[h].node.updateMatrix();
+			obj.matrixWorldNeedsUpdate = true;
+
+		}
+
+	}
 
 };
 
@@ -31,16 +62,21 @@ THREE.Animation.prototype.play = function( loop, startTimeMS ) {
 		this.isPlaying = true;
 		this.loop = loop !== undefined ? loop : true;
 		this.currentTime = startTimeMS !== undefined ? startTimeMS : 0;
+		this.startTimeMs = startTimeMS;
+		this.startTime = 10000000;
+		this.endTime = -this.startTime;
 
 
 		// reset key cache
 
 		var h, hl = this.hierarchy.length,
-			object;
+			object,
+			node;
 
 		for ( h = 0; h < hl; h++ ) {
 
 			object = this.hierarchy[ h ];
+			node = this.data.hierarchy[ h ];
 
 			if ( this.interpolationType !== THREE.AnimationHandler.CATMULLROM_FORWARD ) {
 
@@ -48,27 +84,26 @@ THREE.Animation.prototype.play = function( loop, startTimeMS ) {
 
 			}
 
-			object.matrixAutoUpdate = true;
+			if ( node.animationCache === undefined ) {
 
-			if ( object.animationCache === undefined ) {
-
-				object.animationCache = {};
-				object.animationCache.prevKey = { pos: 0, rot: 0, scl: 0 };
-				object.animationCache.nextKey = { pos: 0, rot: 0, scl: 0 };
-				object.animationCache.originalMatrix = object instanceof THREE.Bone ? object.skinMatrix : object.matrix;
+				node.animationCache = {};
+				node.animationCache.prevKey = null;
+				node.animationCache.nextKey = null;
+				node.animationCache.originalMatrix = object instanceof THREE.Bone ? object.skinMatrix : object.matrix;
 
 			}
 
-			var prevKey = object.animationCache.prevKey;
-			var nextKey = object.animationCache.nextKey;
+			var keys = this.data.hierarchy[h].keys;
 
-			prevKey.pos = this.data.hierarchy[ h ].keys[ 0 ];
-			prevKey.rot = this.data.hierarchy[ h ].keys[ 0 ];
-			prevKey.scl = this.data.hierarchy[ h ].keys[ 0 ];
+			if (keys.length) {
 
-			nextKey.pos = this.getNextKeyWith( "pos", h, 1 );
-			nextKey.rot = this.getNextKeyWith( "rot", h, 1 );
-			nextKey.scl = this.getNextKeyWith( "scl", h, 1 );
+				node.animationCache.prevKey = keys[ 0 ];
+				node.animationCache.nextKey = keys[ 1 ];
+
+				this.startTime = Math.min( keys[0].time, this.startTime );
+				this.endTime = Math.max( keys[keys.length - 1].time, this.endTime );
+
+			}
 
 		}
 
@@ -116,20 +151,25 @@ THREE.Animation.prototype.stop = function() {
 
 	for ( var h = 0; h < this.hierarchy.length; h++ ) {
 
-		if ( this.hierarchy[ h ].animationCache !== undefined ) {
+		var obj = this.hierarchy[ h ];
 
-			if( this.hierarchy[ h ] instanceof THREE.Bone ) {
+		if ( obj.animationCache !== undefined ) {
 
-				this.hierarchy[ h ].skinMatrix = this.hierarchy[ h ].animationCache.originalMatrix;
+			var original = obj.animationCache.originalMatrix;
+
+			if( obj instanceof THREE.Bone ) {
+
+				original.copy( obj.skinMatrix );
+				obj.skinMatrix = original;
 
 			} else {
 
-				this.hierarchy[ h ].matrix = this.hierarchy[ h ].animationCache.originalMatrix;
+				original.copy( obj.matrix );
+				obj.matrix = original;
 
 			}
 
-
-			delete this.hierarchy[ h ].animationCache;
+			delete obj.animationCache;
 
 		}
 
@@ -149,18 +189,13 @@ THREE.Animation.prototype.update = function( deltaTimeMS ) {
 
 	// vars
 
-	var types = [ "pos", "rot", "scl" ];
-	var type;
-	var scale;
-	var vector;
-	var prevXYZ, nextXYZ;
 	var prevKey, nextKey;
 	var object;
-	var animationCache;
+	var node;
 	var frame;
 	var JIThierarchy = this.data.JIT.hierarchy;
 	var currentTime, unloopedCurrentTime;
-	var currentPoint, forwardPoint, angle;
+	var looped;
 
 
 	// update
@@ -169,15 +204,70 @@ THREE.Animation.prototype.update = function( deltaTimeMS ) {
 
 	unloopedCurrentTime = this.currentTime;
 	currentTime         = this.currentTime = this.currentTime % this.data.length;
-	frame               = parseInt( Math.min( currentTime * this.data.fps, this.data.length * this.data.fps ), 10 );
 
+	// if looped around, the current time should be based on the startTime
+	if ( currentTime < this.startTimeMs ) {
+
+		currentTime = this.currentTime = this.startTimeMs + currentTime;
+
+	}
+
+	frame               = parseInt( Math.min( currentTime * this.data.fps, this.data.length * this.data.fps ), 10 );
+	looped 				= currentTime < unloopedCurrentTime;
+
+	if ( looped && !this.loop ) {
+
+		// Set the animation to the last keyframes and stop
+		for ( var h = 0, hl = this.hierarchy.length; h < hl; h++ ) {
+
+			var keys = this.data.hierarchy[h].keys,
+				sids = this.data.hierarchy[h].sids,
+				end = keys.length-1,
+				obj = this.hierarchy[h];
+
+			if ( keys.length ) {
+
+				for ( var s = 0; s < sids.length; s++ ) {
+
+					var sid = sids[ s ],
+						prev = this.getPrevKeyWith( sid, h, end );
+
+					if ( prev ) {
+
+						prev.apply( sid );
+
+					}
+
+				}
+
+				this.data.hierarchy[h].node.updateMatrix();
+				obj.matrixWorldNeedsUpdate = true;
+
+			}
+
+		}
+
+		this.stop();
+		return;
+
+	}
+
+	// check pre-infinity
+	if ( currentTime < this.startTime ) {
+
+		return;
+
+	}
 
 	// update
 
 	for ( var h = 0, hl = this.hierarchy.length; h < hl; h++ ) {
 
 		object = this.hierarchy[ h ];
-		animationCache = object.animationCache;
+		node = this.data.hierarchy[ h ];
+
+		var keys = node.keys,
+			animationCache = node.animationCache;
 
 		// use JIT?
 
@@ -186,49 +276,39 @@ THREE.Animation.prototype.update = function( deltaTimeMS ) {
 			if( object instanceof THREE.Bone ) {
 
 				object.skinMatrix = JIThierarchy[ h ][ frame ];
-
-				object.matrixAutoUpdate = false;
 				object.matrixWorldNeedsUpdate = false;
 
 			} else {
 
 				object.matrix = JIThierarchy[ h ][ frame ];
-
-				object.matrixAutoUpdate = false;
 				object.matrixWorldNeedsUpdate = true;
 
 			}
 
 		// use interpolation
 
-		} else {
+		} else if ( keys.length ) {
 
 			// make sure so original matrix and not JIT matrix is set
 
-			if ( this.JITCompile ) {
+			if ( this.JITCompile && animationCache ) {
 
 				if( object instanceof THREE.Bone ) {
 
-					object.skinMatrix = object.animationCache.originalMatrix;
+					object.skinMatrix = animationCache.originalMatrix;
 
 				} else {
 
-					object.matrix = object.animationCache.originalMatrix;
+					object.matrix = animationCache.originalMatrix;
 
 				}
 
 			}
 
+			prevKey = animationCache.prevKey;
+			nextKey = animationCache.nextKey;
 
-			// loop through pos/rot/scl
-
-			for ( var t = 0; t < 3; t++ ) {
-
-				// get keys
-
-				type    = types[ t ];
-				prevKey = animationCache.prevKey[ type ];
-				nextKey = animationCache.nextKey[ type ];
+			if ( prevKey && nextKey ) {
 
 				// switch keys?
 
@@ -236,120 +316,42 @@ THREE.Animation.prototype.update = function( deltaTimeMS ) {
 
 					// did we loop?
 
-					if ( currentTime < unloopedCurrentTime ) {
+					if ( looped && this.loop ) {
 
-						if ( this.loop ) {
+						prevKey = keys[ 0 ];
+						nextKey = keys[ 1 ];
 
-							prevKey = this.data.hierarchy[ h ].keys[ 0 ];
-							nextKey = this.getNextKeyWith( type, h, 1 );
-
-							while( nextKey.time < currentTime ) {
-
-								prevKey = nextKey;
-								nextKey = this.getNextKeyWith( type, h, nextKey.index + 1 );
-
-							}
-
-						} else {
-
-							this.stop();
-							return;
-
-						}
-
-					} else {
-
-						do {
+						while ( nextKey.time < currentTime ) {
 
 							prevKey = nextKey;
-							nextKey = this.getNextKeyWith( type, h, nextKey.index + 1 );
+							nextKey = keys[ prevKey.index + 1 ];
 
-						} while( nextKey.time < currentTime )
+						}
 
-					}
+					} else if ( !looped ) {
 
-					animationCache.prevKey[ type ] = prevKey;
-					animationCache.nextKey[ type ] = nextKey;
+						var lastIndex = keys.length - 1;
 
-				}
+						while ( nextKey.time < currentTime && nextKey.index !== lastIndex ) {
 
-
-				object.matrixAutoUpdate = true;
-				object.matrixWorldNeedsUpdate = true;
-
-				scale = ( currentTime - prevKey.time ) / ( nextKey.time - prevKey.time );
-				prevXYZ = prevKey[ type ];
-				nextXYZ = nextKey[ type ];
-
-
-				// check scale error
-
-				if ( scale < 0 || scale > 1 ) {
-
-					console.log( "THREE.Animation.update: Warning! Scale out of bounds:" + scale + " on bone " + h );
-					scale = scale < 0 ? 0 : 1;
-
-				}
-
-				// interpolate
-
-				if ( type === "pos" ) {
-
-					vector = object.position;
-
-					if( this.interpolationType === THREE.AnimationHandler.LINEAR ) {
-
-						vector.x = prevXYZ[ 0 ] + ( nextXYZ[ 0 ] - prevXYZ[ 0 ] ) * scale;
-						vector.y = prevXYZ[ 1 ] + ( nextXYZ[ 1 ] - prevXYZ[ 1 ] ) * scale;
-						vector.z = prevXYZ[ 2 ] + ( nextXYZ[ 2 ] - prevXYZ[ 2 ] ) * scale;
-
-					} else if ( this.interpolationType === THREE.AnimationHandler.CATMULLROM ||
-							    this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {
-
-						this.points[ 0 ] = this.getPrevKeyWith( "pos", h, prevKey.index - 1 )[ "pos" ];
-						this.points[ 1 ] = prevXYZ;
-						this.points[ 2 ] = nextXYZ;
-						this.points[ 3 ] = this.getNextKeyWith( "pos", h, nextKey.index + 1 )[ "pos" ];
-
-						scale = scale * 0.33 + 0.33;
-
-						currentPoint = this.interpolateCatmullRom( this.points, scale );
-
-						vector.x = currentPoint[ 0 ];
-						vector.y = currentPoint[ 1 ];
-						vector.z = currentPoint[ 2 ];
-
-						if( this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {
-
-							forwardPoint = this.interpolateCatmullRom( this.points, scale * 1.01 );
-
-							this.target.set( forwardPoint[ 0 ], forwardPoint[ 1 ], forwardPoint[ 2 ] );
-							this.target.subSelf( vector );
-							this.target.y = 0;
-							this.target.normalize();
-
-							angle = Math.atan2( this.target.x, this.target.z );
-							object.rotation.set( 0, angle, 0 );
+							prevKey = nextKey;
+							nextKey = keys[ prevKey.index + 1 ];
 
 						}
 
 					}
 
-				} else if ( type === "rot" ) {
-
-					THREE.Quaternion.slerp( prevXYZ, nextXYZ, object.quaternion, scale );
-
-				} else if( type === "scl" ) {
-
-					vector = object.scale;
-
-					vector.x = prevXYZ[ 0 ] + ( nextXYZ[ 0 ] - prevXYZ[ 0 ] ) * scale;
-					vector.y = prevXYZ[ 1 ] + ( nextXYZ[ 1 ] - prevXYZ[ 1 ] ) * scale;
-					vector.z = prevXYZ[ 2 ] + ( nextXYZ[ 2 ] - prevXYZ[ 2 ] ) * scale;
+					animationCache.prevKey = prevKey;
+					animationCache.nextKey = nextKey;
 
 				}
 
+				prevKey.interpolate( nextKey, currentTime );
+
 			}
+
+			this.data.hierarchy[h].node.updateMatrix();
+			object.matrixWorldNeedsUpdate = true;
 
 		}
 
@@ -429,7 +431,7 @@ THREE.Animation.prototype.interpolate = function( p0, p1, p2, p3, t, t2, t3 ) {
 
 // Get next key with
 
-THREE.Animation.prototype.getNextKeyWith = function( type, h, key ) {
+THREE.Animation.prototype.getNextKeyWith = function( sid, h, key ) {
 
 	var keys = this.data.hierarchy[ h ].keys;
 
@@ -446,7 +448,7 @@ THREE.Animation.prototype.getNextKeyWith = function( type, h, key ) {
 
 	for ( ; key < keys.length; key++ ) {
 
-		if ( keys[ key ][ type ] !== undefined ) {
+		if ( keys[ key ].hasTarget( sid ) ) {
 
 			return keys[ key ];
 
@@ -454,13 +456,13 @@ THREE.Animation.prototype.getNextKeyWith = function( type, h, key ) {
 
 	}
 
-	return this.data.hierarchy[ h ].keys[ 0 ];
+	return keys[ 0 ];
 
 };
 
 // Get previous key with
 
-THREE.Animation.prototype.getPrevKeyWith = function( type, h, key ) {
+THREE.Animation.prototype.getPrevKeyWith = function( sid, h, key ) {
 
 	var keys = this.data.hierarchy[ h ].keys;
 
@@ -478,7 +480,7 @@ THREE.Animation.prototype.getPrevKeyWith = function( type, h, key ) {
 
 	for ( ; key >= 0; key-- ) {
 
-		if ( keys[ key ][ type ] !== undefined ) {
+		if ( keys[ key ].hasTarget( sid ) ) {
 
 			return keys[ key ];
 
@@ -486,6 +488,6 @@ THREE.Animation.prototype.getPrevKeyWith = function( type, h, key ) {
 
 	}
 
-	return this.data.hierarchy[ h ].keys[ keys.length - 1 ];
+	return keys[ keys.length - 1 ];
 
 };

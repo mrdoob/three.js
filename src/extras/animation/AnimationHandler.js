@@ -149,7 +149,7 @@ THREE.AnimationHandler = (function() {
 
 			// prepare morph target keys
 
-			if( data.hierarchy[ h ].keys[ 0 ].morphTargets !== undefined ) {
+			if( data.hierarchy[h].keys.length && data.hierarchy[ h ].keys[ 0 ].morphTargets !== undefined ) {
 
 				// get all used
 
@@ -219,7 +219,7 @@ THREE.AnimationHandler = (function() {
 
 			// set index
 
-			for( var k = 1; k < data.hierarchy[ h ].keys.length; k ++ ) {
+			for( var k = 0; k < data.hierarchy[ h ].keys.length; k ++ ) {
 
 				data.hierarchy[ h ].keys[ k ].index = k;
 
