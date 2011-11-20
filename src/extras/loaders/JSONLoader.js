@@ -52,15 +52,14 @@ THREE.JSONLoader.prototype.loadAjaxJSON = function( context, url, callback, text
 
 					var jsonObject = JSON.parse( xhr.responseText );
 
-					context.createModel( jsonObject, callback, texturePath );
-					context.onLoadComplete();
-
 				} catch ( error ) {
 
-					console.error( error );
 					console.warn( "DEPRECATED: [" + url + "] seems to be using old model format" );
 
 				}
+
+				context.createModel( jsonObject, callback, texturePath );
+				context.onLoadComplete();
 
 			} else {
 
@@ -395,6 +394,7 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texture_path
 
 				dstVertices = geometry.morphTargets[ i ].vertices;
 				srcVertices = json.morphTargets [ i ].vertices;
+
 
 				for( v = 0, vl = srcVertices.length; v < vl; v += 3 ) {
 

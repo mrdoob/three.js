@@ -31,13 +31,13 @@
 			var dae, skin;
 
 			var loader = new THREE.ColladaLoader();
+			loader.options.convertUpAxis = true;
 			loader.load( './models/monster.dae', function colladaReady( collada ) {
 
 				dae = collada.scene;
 				skin = collada.skins[ 0 ];
 
 				dae.scale.x = dae.scale.y = dae.scale.z = 0.002;
-				dae.rotation.x = -Math.PI/2;
 				dae.updateMatrix();
 
 				init();

@@ -766,6 +766,185 @@ THREE.Matrix4.prototype = {
 
 		return this;
 
+	},
+
+	rotateByAxis: function ( axis, angle ) {
+
+  		// optimize by checking axis
+		if ( axis.x === 1 && axis.y === 0 && axis.z === 0 ) {
+
+			return this.rotateX( angle );
+
+		} else if ( axis.x === 0 && axis.y === 1 && axis.z === 0 ) {
+
+			return this.rotateY( angle );
+
+		} else if ( axis.x === 0 && axis.y === 0 && axis.z === 1 ) {
+
+			return this.rotateZ( angle );
+
+		}
+
+		var x = axis.x,
+			y = axis.y,
+			z = axis.z,
+			n = Math.sqrt(x * x + y * y + z * z);
+
+		x /= n;
+		y /= n;
+		z /= n;
+
+		var xx = x * x,
+			yy = y * y,
+			zz = z * z,
+			c = Math.cos(angle),
+			s = Math.sin(angle),
+			oneMinusCosine = 1 - c,
+			xy = x * y * oneMinusCosine,
+			xz = x * z * oneMinusCosine,
+			yz = y * z * oneMinusCosine,
+			xs = x * s,
+			ys = y * s,
+			zs = z * s,
+
+			r11 = xx + (1 - xx) * c,
+			r21 = xy + zs,
+			r31 = xz - ys,
+			r12 = xy - zs,
+			r22 = yy + (1 - yy) * c,
+			r32 = yz + xs,
+			r13 = xz + ys,
+			r23 = yz - xs,
+			r33 = zz + (1 - zz) * c,
+
+			m11 = this.n11,
+			m21 = this.n21,
+			m31 = this.n31,
+			m41 = this.n41,
+			m12 = this.n12,
+			m22 = this.n22,
+			m32 = this.n32,
+			m42 = this.n42,
+			m13 = this.n13,
+			m23 = this.n23,
+			m33 = this.n33,
+			m43 = this.n43,
+			m14 = this.n14,
+			m24 = this.n24,
+			m34 = this.n34,
+			m44 = this.n44;
+
+		this.n11 = r11 * m11 + r21 * m12 + r31 * m13;
+		this.n21 = r11 * m21 + r21 * m22 + r31 * m23;
+		this.n31 = r11 * m31 + r21 * m32 + r31 * m33;
+		this.n41 = r11 * m41 + r21 * m42 + r31 * m43;
+
+		this.n12 = r12 * m11 + r22 * m12 + r32 * m13;
+		this.n22 = r12 * m21 + r22 * m22 + r32 * m23;
+		this.n32 = r12 * m31 + r22 * m32 + r32 * m33;
+		this.n42 = r12 * m41 + r22 * m42 + r32 * m43;
+
+		this.n13 = r13 * m11 + r23 * m12 + r33 * m13;
+		this.n23 = r13 * m21 + r23 * m22 + r33 * m23;
+		this.n33 = r13 * m31 + r23 * m32 + r33 * m33;
+		this.n43 = r13 * m41 + r23 * m42 + r33 * m43;
+
+		return this;
+
+	},
+
+	rotateX: function ( angle ) {
+
+		var m12 = this.n12,
+			m22 = this.n22,
+			m32 = this.n32,
+			m42 = this.n42,
+			m13 = this.n13,
+			m23 = this.n23,
+			m33 = this.n33,
+			m43 = this.n43,
+			c = Math.cos(angle),
+			s = Math.sin(angle);
+
+		this.n12 = c * m12 + s * m13;
+		this.n22 = c * m22 + s * m23;
+		this.n32 = c * m32 + s * m33;
+		this.n42 = c * m42 + s * m43;
+
+		this.n13 = c * m13 - s * m12;
+		this.n23 = c * m23 - s * m22;
+		this.n33 = c * m33 - s * m32;
+		this.n43 = c * m43 - s * m42;
+
+		return this;
+
+  	},
+
+	rotateY: function ( angle ) {
+
+		var m11 = this.n11,
+			m21 = this.n21,
+			m31 = this.n31,
+			m41 = this.n41,
+			m13 = this.n13,
+			m23 = this.n23,
+			m33 = this.n33,
+			m43 = this.n43,
+			c = Math.cos(angle),
+			s = Math.sin(angle);
+
+		this.n11 = c * m11 - s * m13;
+		this.n21 = c * m21 - s * m23;
+		this.n31 = c * m31 - s * m33;
+		this.n41 = c * m41 - s * m43;
+
+		this.n13 = c * m13 + s * m11;
+		this.n23 = c * m23 + s * m21;
+		this.n33 = c * m33 + s * m31;
+		this.n43 = c * m43 + s * m41;
+
+		return this;
+
+	},
+
+	rotateZ: function ( angle ) {
+
+		var m11 = this.n11,
+			m21 = this.n21,
+			m31 = this.n31,
+			m41 = this.n41,
+			m12 = this.n12,
+			m22 = this.n22,
+			m32 = this.n32,
+			m42 = this.n42,
+			c = Math.cos(angle),
+			s = Math.sin(angle);
+
+		this.n11 = c * m11 + s * m12;
+		this.n21 = c * m21 + s * m22;
+		this.n31 = c * m31 + s * m32;
+		this.n41 = c * m41 + s * m42;
+
+		this.n12 = c * m12 - s * m11;
+		this.n22 = c * m22 - s * m21;
+		this.n32 = c * m32 - s * m31;
+		this.n42 = c * m42 - s * m41;
+
+		return this;
+
+	},
+
+	translate: function ( v ) {
+
+		var x = v.x, y = v.y, z = v.z;
+
+		this.n14 = this.n11 * x + this.n12 * y + this.n13 * z + this.n14;
+		this.n24 = this.n21 * x + this.n22 * y + this.n23 * z + this.n24;
+		this.n34 = this.n31 * x + this.n32 * y + this.n33 * z + this.n34;
+		this.n44 = this.n41 * x + this.n42 * y + this.n43 * z + this.n44;
+
+		return this;
+
 	}
 
 };
@@ -794,7 +973,7 @@ THREE.Matrix4.makeInvert3x3 = function ( m1 ) {
 
 	if ( det === 0 ) {
 
-		console.error( 'THREE.Matrix4.makeInvert3x3: Matrix not invertible.' );
+		return null;
 
 	}
 

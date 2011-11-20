@@ -4490,7 +4490,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		object._modelViewMatrix.multiplyToArray( camera.matrixWorldInverse, object.matrixWorld, object._modelViewMatrixArray );
 
-		THREE.Matrix4.makeInvert3x3( object._modelViewMatrix ).transposeIntoArray( object._normalMatrixArray );
+		var inverseMatrix = THREE.Matrix4.makeInvert3x3( object._modelViewMatrix );
+
+		if ( inverseMatrix ) {
+
+			inverseMatrix.transposeIntoArray( object._normalMatrixArray );
+
+		}
 
 	};
 

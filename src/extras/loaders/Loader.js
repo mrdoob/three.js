@@ -112,17 +112,16 @@ THREE.Loader.prototype = {
 		function load_image( where, url ) {
 
 			var image = new Image();
-
 			image.onload = function () {
 
 				if ( !is_pow2( this.width ) || !is_pow2( this.height ) ) {
 
-					var w = nearest_pow2( this.width ),
-						h = nearest_pow2( this.height );
+					var width = nearest_pow2( this.width );
+					var height = nearest_pow2( this.height );
 
-					where.image.width = w;
-					where.image.height = h;
-					where.image.getContext("2d").drawImage( this, 0, 0, w, h );
+					where.image.width = width;
+					where.image.height = height;
+					where.image.getContext( '2d' ).drawImage( this, 0, 0, width, height );
 
 				} else {
 
@@ -133,7 +132,7 @@ THREE.Loader.prototype = {
 				where.needsUpdate = true;
 
 			};
-
+			image.crossOrigin = '';
 			image.src = url;
 
 		}

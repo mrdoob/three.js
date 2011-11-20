@@ -18,6 +18,7 @@ THREE.ColladaLoader = function () {
 	var materials = {};
 	var effects = {};
 
+	var animData;
 	var visualScenes;
 	var baseUrl;
 	var morphs;
@@ -26,20 +27,27 @@ THREE.ColladaLoader = function () {
 	var flip_uv = true;
 	var preferredShading = THREE.SmoothShading;
 
+	var options = {
+		// Axis conversion is done for geometries, animations, and controllers.
+		// If we ever pull cameras or lights out of the COLLADA file, they'll
+		// need extra work.
+		convertUpAxis: false,
+
+		subdivideFaces: true,
+
+		upAxis: 'Y'
+	};
+
+	// TODO: support unit conversion as well
+	var colladaUnit = 1.0;
+	var colladaUp = 'Y';
+	var upConversion = null;
+
+	var TO_RADIANS = Math.PI / 180;
+
 	function load ( url, readyCallback ) {
 
 		if ( document.implementation && document.implementation.createDocument ) {
-
-			var namespaceURL = "http://www.collada.org/2005/11/COLLADASchema";
-			var rootTagName = "COLLADA";
-
-			var xmldoc = document.implementation.createDocument( namespaceURL, rootTagName, null );
-			var me = this;
-
-			// force reloading
-			// (should be configurable? sometimes caching is desirable)
-
-			url += "?rnd=" + Math.random();
 
 			var req = new XMLHttpRequest();
 
@@ -57,8 +65,17 @@ THREE.ColladaLoader = function () {
 
 					if( req.status == 0 || req.status == 200 ) {
 
-						readyCallbackFunc = readyCallback;
-						parse( req.responseXML, undefined, url );
+
+						if ( req.responseXML ) {
+
+							readyCallbackFunc = readyCallback;
+							parse( req.responseXML, undefined, url );
+
+						} else {
+
+							console.error( "ColladaLoader: Empty or non-existing file (" + url + ")" );
+
+						}
 
 					}
 
@@ -77,7 +94,7 @@ THREE.ColladaLoader = function () {
 
 	};
 
-	function parse ( doc, callBack, url ) {
+	function parse( doc, callBack, url ) {
 
 		COLLADA = doc;
 		callBack = callBack || readyCallbackFunc;
@@ -90,6 +107,8 @@ THREE.ColladaLoader = function () {
 
 		}
 
+		parseAsset();
+		setUpConversion();
 		images = parseLib( "//dae:library_images/dae:image", _Image, "image" );
 		materials = parseLib( "//dae:library_materials/dae:material", Material, "material") ;
 		effects = parseLib( "//dae:library_effects/dae:effect", Effect, "effect" );
@@ -117,6 +136,7 @@ THREE.ColladaLoader = function () {
 			scene: scene,
 			morphs: morphs,
 			skins: skins,
+			animations: animData,
 			dae: {
 				images: images,
 				materials: materials,
@@ -146,13 +166,48 @@ THREE.ColladaLoader = function () {
 
 	};
 
+	function parseAsset () {
+
+		var elements = COLLADA.evaluate( '//dae:asset', COLLADA, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null );
+
+		var element = elements.iterateNext();
+
+		if ( element && element.children ) {
+
+			for ( var i = 0; i < element.children.length; i ++ ) {
+
+				var child = element.children[ i ];
+
+				switch ( child.nodeName ) {
+
+					case 'unit':
+
+						var meter = child.getAttribute( 'meter' );
+
+						if ( meter ) {
+
+							colladaUnit = parseFloat( meter );
+
+						}
+
+						break;
+
+					case 'up_axis':
+
+						colladaUp = child.textContent.charAt(0);
+						break;
+
+				}
+
+			}
+
+		}
+
+	};
+
 	function parseLib ( q, classSpec, prefix ) {
 
-		var elements = COLLADA.evaluate(q,
-										COLLADA,
-										_nsResolver,
-										XPathResult.ORDERED_NODE_ITERATOR_TYPE,
-										null) ;
+		var elements = COLLADA.evaluate(q, COLLADA, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null) ;
 
 		var lib = {};
 		var element = elements.iterateNext();
@@ -161,8 +216,9 @@ THREE.ColladaLoader = function () {
 		while ( element ) {
 
 			var daeElement = ( new classSpec() ).parse( element );
-			if ( daeElement.id.length == 0 ) daeElement.id = prefix + ( i++ );
+			if ( !daeElement.id || daeElement.id.length == 0 ) daeElement.id = prefix + ( i ++ );
 			lib[ daeElement.id ] = daeElement;
+
 			element = elements.iterateNext();
 
 		}
@@ -173,11 +229,7 @@ THREE.ColladaLoader = function () {
 
 	function parseScene () {
 
-		var sceneElement = COLLADA.evaluate( ".//dae:scene/dae:instance_visual_scene",
-			COLLADA,
-			_nsResolver,
-			XPathResult.ORDERED_NODE_ITERATOR_TYPE,
-			null ).iterateNext();
+		var sceneElement = COLLADA.evaluate( './/dae:scene/dae:instance_visual_scene', COLLADA, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null ).iterateNext();
 
 		if ( sceneElement ) {
 
@@ -194,17 +246,67 @@ THREE.ColladaLoader = function () {
 
 	function createAnimations () {
 
-		calcAnimationBounds();
+		animData = [];
 
-		for ( var animation_id in animations ) {
-
-			createAnimation( animations[ animation_id ] );
-
-		}
+		// fill in the keys
+		recurseHierarchy( scene );
 
 	};
 
-	function createAnimation ( animation ) {
+	function recurseHierarchy ( node ) {
+
+		var n = daeScene.getChildById( node.name, true ),
+			newData = null;
+
+		if ( n && n.keys ) {
+
+			newData = {
+				fps: 60,
+				hierarchy: [ {
+					node: n,
+					keys: n.keys,
+					sids: n.sids
+				} ],
+				node: node,
+				name: 'animation_' + node.name,
+				length: 0
+			};
+
+			animData.push(newData);
+
+			for ( var i = 0, il = n.keys.length; i < il; i++ ) {
+
+				newData.length = Math.max( newData.length, n.keys[i].time );
+
+			}
+
+		} else  {
+
+			newData = {
+				hierarchy: [ {
+					keys: [],
+					sids: []
+				} ]
+			}
+
+		}
+
+		for ( var i = 0, il = node.children.length; i < il; i++ ) {
+
+			var d = recurseHierarchy( node.children[i] );
+
+			for ( var j = 0, jl = d.hierarchy.length; j < jl; j ++ ) {
+
+				newData.hierarchy.push( {
+					keys: [],
+					sids: []
+				} );
+
+			}
+
+		}
+
+		return newData;
 
 	};
 
@@ -594,6 +696,7 @@ THREE.ColladaLoader = function () {
 			var instance_materials = instance_geometry.instance_material;
 			var geometry = geometries[instance_geometry.url];
 			var used_materials = {};
+			var used_materials_array = [];
 			var num_materials = 0;
 			var first_material;
 
@@ -619,7 +722,8 @@ THREE.ColladaLoader = function () {
 						var shader = effects[effect_id].shader;
 
 						shader.material.opacity = !shader.material.opacity ? 1 : shader.material.opacity;
-						used_materials[inst_material.symbol] = shader.material;
+						used_materials[inst_material.symbol] = num_materials;
+						used_materials_array.push(shader.material)
 						first_material = shader.material;
 						num_materials ++;
 
@@ -634,11 +738,12 @@ THREE.ColladaLoader = function () {
 				if ( num_materials > 1 ) {
 
 					material = new THREE.MeshFaceMaterial();
-
+					geom.materials = used_materials_array;
+					
 					for ( j = 0; j < geom.faces.length; j ++ ) {
 
 						var face = geom.faces[ j ];
-						face.materials = [ used_materials[ face.daeMaterial ] ];
+						face.materialIndex = used_materials[ face.daeMaterial ]
 
 					}
 
@@ -683,7 +788,12 @@ THREE.ColladaLoader = function () {
 		}
 
 		obj.name = node.id || "";
-		node.matrix.decompose( obj.position, obj.rotation, obj.scale );
+		obj.matrix = node.matrix;
+		var props = node.matrix.decompose();
+		obj.position = props[ 0 ];
+		obj.quaternion = props[ 1 ];
+		obj.useQuaternion = true;
+		obj.scale = props[ 2 ];
 
 		for ( i = 0; i < node.nodes.length; i ++ ) {
 
@@ -711,11 +821,7 @@ THREE.ColladaLoader = function () {
 
 	function getLibraryNode( id ) {
 
-		return COLLADA.evaluate(".//dae:library_nodes//dae:node[@id='"+id+"']",
-								COLLADA,
-								_nsResolver,
-								XPathResult.ORDERED_NODE_ITERATOR_TYPE,
-								null).iterateNext();
+		return COLLADA.evaluate( './/dae:library_nodes//dae:node[@id=\'' + id + '\']', COLLADA, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null ).iterateNext();
 
 	};
 
@@ -854,28 +960,196 @@ THREE.ColladaLoader = function () {
 
 		if ( node.channels && node.channels.length ) {
 
-			var frameDuration = calcFrameDuration( node );
-			var t, matrix;
-			var keys = [];
+			var keys = [],
+				sids = [];
 
-			for ( t = node.startTime; t < node.endTime; t += frameDuration ) {
+			for ( var i = 0, il = node.channels.length; i < il; i++ ) {
 
-				matrix = calcMatrixAt( node, t );
+				var channel = node.channels[i],
+					fullSid = channel.fullSid,
+					member = getConvertedMember( channel.member ),
+					sampler = channel.sampler,
+					input = sampler.input,
+					transform = node.getTransformBySid( channel.sid );
 
-				//keys.push({time: t, mat: matrix.flatten()})
+				if ( transform ) {
 
-				keys.push({
-					time: t,
-					pos: [matrix.n14, matrix.n24, matrix.n34],
-					rotq: [0, 0, 0, 1],
-					scl: [1,1,1]
-				});
+					if ( sids.indexOf( fullSid ) === -1 ) {
+
+						sids.push( fullSid );
+
+					}
+
+					for ( var j = 0, jl = input.length; j < jl; j++ ) {
+
+						var time = input[j],
+							data = sampler.getData( transform.type, j ),
+							key = findKey( keys, time );
+
+						if ( !key ) {
+
+							key = new Key( time );
+							var timeNdx = findTimeNdx( keys, time );
+							keys.splice( timeNdx == -1 ? keys.length : timeNdx, 0, key );
+
+						}
+
+						key.addTarget( fullSid, transform, member, data );
+
+					}
+
+				} else {
+
+					console.log( 'Could not find transform "' + channel.sid + '" in node ' + node.id );
+
+				}
+
+			}
+
+			// post process
+			for ( var i = 0; i < sids.length; i++ ) {
+
+				var sid = sids[ i ];
+
+				for ( var j = 0; j < keys.length; j++ ) {
+
+					var key = keys[ j ];
+
+					if ( !key.hasTarget( sid ) ) {
+
+						interpolateKeys( keys, key, j, sid );
+
+					}
+
+				}
 
 			}
 
 			node.keys = keys;
+			node.sids = sids;
 
 		}
+
+	};
+
+	function findKey ( keys, time) {
+
+		var retVal = null;
+
+		for ( var i = 0, il = keys.length; i < il && retVal == null; i++ ) {
+
+			var key = keys[i];
+
+			if ( key.time === time ) {
+
+				retVal = key;
+
+			} else if ( key.time > time ) {
+
+				break;
+
+			}
+
+		}
+
+		return retVal;
+
+	};
+
+	function findTimeNdx ( keys, time) {
+
+		var ndx = -1;
+
+		for ( var i = 0, il = keys.length; i < il && ndx == -1; i++ ) {
+
+			var key = keys[i];
+
+			if ( key.time >= time ) {
+
+				ndx = i;
+
+			}
+
+		}
+
+		return ndx;
+
+	};
+
+	function interpolateKeys ( keys, key, ndx, fullSid ) {
+
+		var prevKey = getPrevKeyWith( keys, fullSid, ndx ? ndx-1 : 0 ),
+			nextKey = getNextKeyWith( keys, fullSid, ndx+1 );
+
+		if ( prevKey && nextKey ) {
+
+			var scale = (key.time - prevKey.time) / (nextKey.time - prevKey.time),
+				prevTarget = prevKey.getTarget( fullSid ),
+				nextData = nextKey.getTarget( fullSid ).data,
+				prevData = prevTarget.data,
+				data;
+
+			if ( prevData.length ) {
+
+				data = [];
+
+				for ( var i = 0; i < prevData.length; ++i ) {
+
+					data[ i ] = prevData[ i ] + ( nextData[ i ] - prevData[ i ] ) * scale;
+
+				}
+
+			} else {
+
+				data = prevData + ( nextData - prevData ) * scale;
+
+			}
+
+			key.addTarget( fullSid, prevTarget.transform, prevTarget.member, data );
+
+		}
+
+	};
+
+	// Get next key with given sid
+
+	function getNextKeyWith( keys, fullSid, ndx ) {
+
+		for ( ; ndx < keys.length; ndx++ ) {
+
+			var key = keys[ ndx ];
+
+			if ( key.hasTarget( fullSid ) ) {
+
+				return key;
+
+			}
+
+		}
+
+		return null;
+
+	};
+
+	// Get previous key with given sid
+
+	function getPrevKeyWith( keys, fullSid, ndx ) {
+
+		ndx = ndx >= 0 ? ndx : ndx + keys.length;
+
+		for ( ; ndx >= 0; ndx-- ) {
+
+			var key = keys[ ndx ];
+
+			if ( key.hasTarget( fullSid ) ) {
+
+				return key;
+
+			}
+
+		}
+
+		return null;
 
 	};
 
@@ -1077,13 +1351,7 @@ THREE.ColladaLoader = function () {
 				case 'bind_shape_matrix':
 
 					var f = _floats(child.textContent);
-					this.bindShapeMatrix = new THREE.Matrix4();
-					this.bindShapeMatrix.set(
-						f[0], f[1], f[2], f[3],
-						f[4], f[5], f[6], f[7],
-						f[8], f[9], f[10], f[11],
-						f[12], f[13], f[14], f[15]
-						);
+					this.bindShapeMatrix = getConvertedMat4( f );
 					break;
 
 				case 'source':
@@ -1532,7 +1800,7 @@ THREE.ColladaLoader = function () {
 
 		for ( var i = 0; i < this.transforms.length; i ++ ) {
 
-			this.matrix.multiply( this.matrix, this.transforms[ i ].matrix );
+			this.transforms[ i ].apply( this.matrix );
 
 		}
 
@@ -1543,7 +1811,7 @@ THREE.ColladaLoader = function () {
 		this.sid = "";
 		this.type = "";
 		this.data = [];
-		this.matrix = new THREE.Matrix4();
+		this.obj = null;
 
 	};
 
@@ -1552,53 +1820,149 @@ THREE.ColladaLoader = function () {
 		this.sid = element.getAttribute( 'sid' );
 		this.type = element.nodeName;
 		this.data = _floats( element.textContent );
-
-		this.updateMatrix();
+		this.convert();
 
 		return this;
 
 	};
 
-	Transform.prototype.updateMatrix = function () {
-
-		var angle = 0;
-
-		this.matrix.identity();
+	Transform.prototype.convert = function () {
 
 		switch ( this.type ) {
 
 			case 'matrix':
 
-				this.matrix.set(
-					this.data[0], this.data[1], this.data[2], this.data[3],
-					this.data[4], this.data[5], this.data[6], this.data[7],
-					this.data[8], this.data[9], this.data[10], this.data[11],
-					this.data[12], this.data[13], this.data[14], this.data[15]
-					);
-				break;
-
-			case 'translate':
-
-				this.matrix.setTranslation(this.data[0], this.data[1], this.data[2]);
+				this.obj = getConvertedMat4( this.data );
 				break;
 
 			case 'rotate':
 
-				angle = this.data[3] * (Math.PI / 180.0);
-				this.matrix.setRotationAxis(new THREE.Vector3(this.data[0], this.data[1], this.data[2]), angle);
+				this.angle = this.data[3] * TO_RADIANS;
+
+			case 'translate':
+
+				fixCoords( this.data, -1 );
+				this.obj = new THREE.Vector3( this.data[ 0 ], this.data[ 1 ], this.data[ 2 ] );
 				break;
 
 			case 'scale':
 
-				this.matrix.setScale(this.data[0], this.data[1], this.data[2]);
+				fixCoords( this.data, 1 );
+				this.obj = new THREE.Vector3( this.data[ 0 ], this.data[ 1 ], this.data[ 2 ] );
 				break;
 
 			default:
+				console.log( 'Can not convert Transform of type ' + this.type );
 				break;
 
 		}
 
-		return this.matrix;
+	};
+
+	Transform.prototype.apply = function ( matrix ) {
+
+		switch ( this.type ) {
+
+			case 'matrix':
+
+				matrix.multiplySelf( this.obj );
+				break;
+
+			case 'translate':
+
+				matrix.translate( this.obj );
+				break;
+
+			case 'rotate':
+
+				matrix.rotateByAxis( this.obj, this.angle );
+				break;
+
+			case 'scale':
+
+				matrix.scale( this.obj );
+				break;
+
+		}
+
+	};
+
+	Transform.prototype.update = function ( data, member ) {
+
+		switch ( this.type ) {
+
+			case 'matrix':
+
+				console.log( 'Currently not handling matrix transform updates' );
+				break;
+
+			case 'translate':
+			case 'scale':
+
+				switch ( member ) {
+
+					case 'X':
+
+						this.obj.x = data;
+						break;
+
+					case 'Y':
+
+						this.obj.y = data;
+						break;
+
+					case 'Z':
+
+						this.obj.z = data;
+						break;
+
+					default:
+
+						this.obj.x = data[ 0 ];
+						this.obj.y = data[ 1 ];
+						this.obj.z = data[ 2 ];
+						break;
+
+				}
+
+				break;
+
+			case 'rotate':
+
+				switch ( member ) {
+
+					case 'X':
+
+						this.obj.x = data;
+						break;
+
+					case 'Y':
+
+						this.obj.y = data;
+						break;
+
+					case 'Z':
+
+						this.obj.z = data;
+						break;
+
+					case 'ANGLE':
+
+						this.angle = data * TO_RADIANS;
+						break;
+
+					default:
+
+						this.obj.x = data[ 0 ];
+						this.obj.y = data[ 1 ];
+						this.obj.z = data[ 2 ];
+						this.angle = data[ 3 ] * TO_RADIANS;
+						break;
+
+				}
+				break;
+
+		}
 
 	};
 
@@ -1630,11 +1994,7 @@ THREE.ColladaLoader = function () {
 
 				case 'bind_material':
 
-					var instances = COLLADA.evaluate(".//dae:instance_material",
-														child,
-														_nsResolver,
-														XPathResult.ORDERED_NODE_ITERATOR_TYPE,
-														null);
+					var instances = COLLADA.evaluate( './/dae:instance_material', child, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null );
 
 					if ( instances ) {
 
@@ -1698,11 +2058,7 @@ THREE.ColladaLoader = function () {
 
 			if ( child.nodeName == 'bind_material' ) {
 
-				var instances = COLLADA.evaluate(".//dae:instance_material",
-					child,
-					_nsResolver,
-					XPathResult.ORDERED_NODE_ITERATOR_TYPE,
-					null);
+				var instances = COLLADA.evaluate( './/dae:instance_material', child, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null );
 
 				if ( instances ) {
 
@@ -1815,30 +2171,13 @@ THREE.ColladaLoader = function () {
 
 		}
 
-		var vertex_store = {};
-
-		function get_vertex ( v, index )  {
-
-			var hash = _hash_vector3( v.position );
-
-			if ( vertex_store[ hash ] === undefined ) {
-
-				vertex_store[ hash ] = { v: v, index: index };
-
-			}
-
-			return vertex_store[ hash ];
-
-		}
-
 		this.geometry3js = new THREE.Geometry();
 
 		var vertexData = sources[ this.vertices.input['POSITION'].source ].data;
 
-		for ( i = 0, j = 0; i < vertexData.length; i += 3, j ++ ) {
+		for ( i = 0; i < vertexData.length; i += 3 ) {
 
-			var v = new THREE.Vertex( new THREE.Vector3( vertexData[ i ], vertexData[ i + 1 ], vertexData[ i + 2 ] ) );
-			get_vertex( v, j );
+			var v = new THREE.Vertex( getConvertedVec3( vertexData, i ) );
 			this.geometry3js.vertices.push( v );
 
 		}
@@ -1847,7 +2186,7 @@ THREE.ColladaLoader = function () {
 
 			var primitive = this.primitives[ i ];
 			primitive.setVertices( this.vertices );
-			this.handlePrimitive( primitive, this.geometry3js, vertex_store );
+			this.handlePrimitive( primitive, this.geometry3js );
 
 		}
 
@@ -1860,7 +2199,7 @@ THREE.ColladaLoader = function () {
 
 	};
 
-	Mesh.prototype.handlePrimitive = function( primitive, geom, vertex_store ) {
+	Mesh.prototype.handlePrimitive = function( primitive, geom ) {
 
 		var i = 0, j, k, p = primitive.p, inputs = primitive.inputs;
 		var input, index, idx32;
@@ -1910,21 +2249,21 @@ THREE.ColladaLoader = function () {
 
 						case 'VERTEX':
 
-							var hash = _hash_vector3( geom.vertices[ index ].position );
-							vs.push( vertex_store[ hash ].index );
+							vs.push( index );
 
 							break;
 
 						case 'NORMAL':
 
-							ns.push( new THREE.Vector3( source.data[ idx32 ], source.data[ idx32 + 1 ], source.data[ idx32 + 2 ] ) );
+							ns.push( getConvertedVec3( source.data, idx32 ) );
 
 							break;
 
 						case 'TEXCOORD':
 
 							if ( ts[ input.set ] === undefined ) ts[ input.set ] = [];
-							ts[ input.set ].push( new THREE.UV( source.data[ idx32 ], source.data[ idx32 + 1 ] ) );
+							// invert the V
+							ts[ input.set ].push( new THREE.UV( source.data[ idx32 ], 1.0 - source.data[ idx32 + 1 ] ) );
 
 							break;
 
@@ -1944,25 +2283,73 @@ THREE.ColladaLoader = function () {
 			}
 
 
-			var face, uv;
+			var face = null, faces = [], uv, uvArr;
 
-			if ( vcount == 3 ) {
+			if ( vcount === 3 ) {
 
-				face = new THREE.Face3( vs[0], vs[1], vs[2], [ ns[0], ns[1], ns[2] ], cs.length ? cs : new THREE.Color() );
+				faces.push( new THREE.Face3( vs[0], vs[1], vs[2], [ ns[0], ns[1], ns[2] ], cs.length ? cs : new THREE.Color() ) );
 
-			} else if ( vcount == 4 ) {
+			} else if ( vcount === 4 ) {
 
-				face = new THREE.Face4( vs[0], vs[1], vs[2], vs[3], [ ns[0], ns[1], ns[2], ns[3] ], cs.length ? cs : new THREE.Color() );
+				faces.push( new THREE.Face4( vs[0], vs[1], vs[2], vs[3], [ ns[0], ns[1], ns[2], ns[3] ], cs.length ? cs : new THREE.Color() ) );
+
+			} else if ( vcount > 4 && options.subdivideFaces ) {
+
+				var clr = cs.length ? cs : new THREE.Color(),
+					vec1, vec2, vec3, v1, v2, norm;
+
+				// subdivide into multiple Face3s
+				for ( k = 1; k < vcount-1; ) {
+
+					// FIXME: normals don't seem to be quite right
+					faces.push( new THREE.Face3( vs[0], vs[k], vs[k+1], [ ns[0], ns[k++], ns[k] ],  clr ) );
+
+				}
 
 			}
 
-			face.daeMaterial = primitive.material;
-			geom.faces.push( face );
+			if ( faces.length ) {
 
-			for ( k = 0; k < texture_sets.length; k ++ ) {
+				for (var ndx = 0, len = faces.length; ndx < len; ndx++) {
 
-				uv = ts[ texture_sets[ k ] ];
-				geom.faceVertexUvs[ k ].push( [ uv[0], uv[1], uv[2] ] );
+					face = faces[ndx];
+					face.daeMaterial = primitive.material;
+					geom.faces.push( face );
+
+					for ( k = 0; k < texture_sets.length; k++ ) {
+
+						uv = ts[ texture_sets[k] ];
+
+						if ( vcount > 4 ) {
+
+							// Grab the right UVs for the vertices in this face
+							uvArr = [ uv[0], uv[ndx+1], uv[ndx+2] ];
+
+						} else if ( vcount === 4 ) {
+
+							uvArr = [ uv[0], uv[1], uv[2], uv[3] ];
+
+						} else {
+
+							uvArr = [ uv[0], uv[1], uv[2] ];
+
+						}
+
+						if ( !geom.faceVertexUvs[k] ) {
+
+							geom.faceVertexUvs[k] = [];
+
+						}
+
+						geom.faceVertexUvs[k].push( uvArr );
+
+					}
+
+				}
+
+			} else {
+
+				console.log( 'dropped face with vcount ' + vcount + ' for geometry with id: ' + geom.id );
 
 			}
 
@@ -2218,13 +2605,7 @@ THREE.ColladaLoader = function () {
 					for ( var j = 0; j < this.data.length; j += 16 ) {
 
 						var s = this.data.slice( j, j + 16 );
-						var m = new THREE.Matrix4();
-						m.set(
-							s[0], s[1], s[2], s[3],
-							s[4], s[5], s[6], s[7],
-							s[8], s[9], s[10], s[11],
-							s[12], s[13], s[14], s[15]
-							);
+						var m = getConvertedMat4( s );
 						result.push( m );
 					}
 
@@ -2279,6 +2660,7 @@ THREE.ColladaLoader = function () {
 
 		this.texture = null;
 		this.texcoord = null;
+		this.texOpts = null;
 
 	};
 
@@ -2315,9 +2697,70 @@ THREE.ColladaLoader = function () {
 
 					this.texture = child.getAttribute('texture');
 					this.texcoord = child.getAttribute('texcoord');
+					// Defaults from:
+					// https://collada.org/mediawiki/index.php/Maya_texture_placement_MAYA_extension
+					this.texOpts = {
+						offsetU: 0,
+						offsetV: 0,
+						repeatU: 1,
+						repeatV: 1,
+						wrapU: 1,
+						wrapV: 1,
+					};
+					this.parseTexture( child );
 					break;
 
 				default:
+					break;
+
+			}
+
+		}
+
+		return this;
+
+	};
+
+	ColorOrTexture.prototype.parseTexture = function ( element ) {
+
+		if ( ! element.children ) return this;
+
+		// This should be supported by Maya, 3dsMax, and MotionBuilder
+
+		if ( element.children[0] && element.children[0].nodeName === 'extra' ) {
+
+			element = element.children[0];
+
+			if ( element.children[0] && element.children[0].nodeName === 'technique' ) {
+
+				element = element.children[0];
+
+			}
+
+		}
+
+		for ( var i = 0; i < element.children.length; i ++ ) {
+
+			var child = element.children[ i ];
+
+			switch ( child.nodeName ) {
+
+				case 'offsetU':
+				case 'offsetV':
+				case 'repeatU':
+				case 'repeatV':
+
+					this.texOpts[ child.nodeName ] = parseFloat( child.textContent );
+					break;
+
+				case 'wrapU':
+				case 'wrapV':
+
+					this.texOpts[ child.nodeName ] = parseInt( child.textContent );
+					break;
+
+				default:
+					this.texOpts[ child.nodeName ] = child.textContent;
 					break;
 
 			}
@@ -2358,7 +2801,7 @@ THREE.ColladaLoader = function () {
 				case 'reflectivity':
 				case 'transparency':
 
-					var f = evaluateXPath( child, ".//dae:float" );
+					var f = evaluateXPath( child, './/dae:float' );
 
 					if ( f.length > 0 )
 						this[ child.nodeName ] = parseFloat( f[ 0 ].textContent );
@@ -2405,11 +2848,14 @@ THREE.ColladaLoader = function () {
 
 									if ( image ) {
 
-										props['map'] = THREE.ImageUtils.loadTexture(baseUrl + image.init_from);
-										props['map'].wrapS = THREE.RepeatWrapping;
-										props['map'].wrapT = THREE.RepeatWrapping;
-										props['map'].repeat.x = 1;
-										props['map'].repeat.y = -1;
+										var texture = THREE.ImageUtils.loadTexture(baseUrl + image.init_from);
+										texture.wrapS = cot.texOpts.wrapU;
+										texture.wrapT = cot.texOpts.wrapV;
+										texture.offset.x = cot.texOpts.offsetU;
+										texture.offset.y = cot.texOpts.offsetV;
+										texture.repeat.x = cot.texOpts.repeatU;
+										texture.repeat.y = cot.texOpts.repeatV;
+										props['map'] = texture;
 
 									}
 
@@ -2818,6 +3264,7 @@ THREE.ColladaLoader = function () {
 		this.animation = animation;
 		this.source = "";
 		this.target = "";
+		this.fullSid = null;
 		this.sid = null;
 		this.dotSyntax = null;
 		this.arrSyntax = null;
@@ -2839,19 +3286,16 @@ THREE.ColladaLoader = function () {
 		var dotSyntax = ( sid.indexOf(".") >= 0 );
 		var arrSyntax = ( sid.indexOf("(") >= 0 );
 
-		var arrIndices;
-		var member;
-
 		if ( dotSyntax ) {
 
 			parts = sid.split(".");
-			sid = parts.shift();
-			member = parts.shift();
+			this.sid = parts.shift();
+			this.member = parts.shift();
 
 		} else if ( arrSyntax ) {
 
-			arrIndices = sid.split("(");
-			sid = arrIndices.shift();
+			var arrIndices = sid.split("(");
+			this.sid = arrIndices.shift();
 
 			for (var j = 0; j < arrIndices.length; j ++ ) {
 
@@ -2859,13 +3303,17 @@ THREE.ColladaLoader = function () {
 
 			}
 
+			this.arrIndices = arrIndices;
+
+		} else {
+
+			this.sid = sid;
+
 		}
 
-		this.sid = sid;
+		this.fullSid = sid;
 		this.dotSyntax = dotSyntax;
 		this.arrSyntax = arrSyntax;
-		this.arrIndices = arrIndices;
-		this.member = member;
 
 		return this;
 
@@ -2878,6 +3326,7 @@ THREE.ColladaLoader = function () {
 		this.inputs = [];
 		this.input = null;
 		this.output = null;
+		this.strideOut = null;
 		this.interpolation = null;
 		this.startTime = null;
 		this.endTime = null;
@@ -2930,6 +3379,7 @@ THREE.ColladaLoader = function () {
 				case 'OUTPUT':
 
 					this.output = source.read();
+					this.strideOut = source.accessor.stride;
 					break;
 
 				case 'INTERPOLATION':
@@ -2971,6 +3421,168 @@ THREE.ColladaLoader = function () {
 			}
 
 			this.duration = this.endTime - this.startTime;
+
+		}
+
+	};
+
+	Sampler.prototype.getData = function ( type, ndx ) {
+
+		var data;
+
+		if ( this.strideOut > 1 ) {
+
+			data = [];
+			ndx *= this.strideOut;
+
+			for ( var i = 0; i < this.strideOut; ++i ) {
+
+				data[ i ] = this.output[ ndx + i ];
+
+			}
+
+			if ( this.strideOut === 3 ) {
+
+				switch ( type ) {
+
+					case 'rotate':
+					case 'translate':
+
+						fixCoords( data, -1 );
+						break;
+
+					case 'scale':
+
+						fixCoords( data, 1 );
+						break;
+
+				}
+
+			}
+
+		} else {
+
+			data = this.output[ ndx ];
+
+		}
+
+		return data;
+
+	};
+
+	function Key ( time ) {
+
+		this.targets = [];
+		this.time = time;
+
+	};
+
+	Key.prototype.addTarget = function ( fullSid, transform, member, data ) {
+
+		this.targets.push( {
+			sid: fullSid,
+			member: member,
+			transform: transform,
+			data: data
+		} );
+
+	};
+
+	Key.prototype.apply = function ( opt_sid ) {
+
+		for ( var i = 0; i < this.targets.length; ++i ) {
+
+			var target = this.targets[ i ];
+
+			if ( !opt_sid || target.sid === opt_sid ) {
+
+				target.transform.update( target.data, target.member );
+
+			}
+
+		}
+
+	};
+
+	Key.prototype.getTarget = function ( fullSid ) {
+
+		for ( var i = 0; i < this.targets.length; ++i ) {
+
+			if ( this.targets[ i ].sid === fullSid ) {
+
+				return this.targets[ i ];
+
+			}
+
+		}
+
+		return null;
+
+	};
+
+	Key.prototype.hasTarget = function ( fullSid ) {
+
+		for ( var i = 0; i < this.targets.length; ++i ) {
+
+			if ( this.targets[ i ].sid === fullSid ) {
+
+				return true;
+
+			}
+
+		}
+
+		return false;
+
+	};
+
+	// TODO: Currently only doing linear interpolation. Should support full COLLADA spec.
+	Key.prototype.interpolate = function ( nextKey, time ) {
+
+		for ( var i = 0; i < this.targets.length; ++i ) {
+
+			var target = this.targets[ i ],
+				nextTarget = nextKey.getTarget( target.sid ),
+				data;
+
+			if ( nextTarget ) {
+
+				var scale = ( time - this.time ) / ( nextKey.time - this.time ),
+					nextData = nextTarget.data,
+					prevData = target.data;
+
+				// check scale error
+
+				if ( scale < 0 || scale > 1 ) {
+
+					console.log( "Key.interpolate: Warning! Scale out of bounds:" + scale );
+					scale = scale < 0 ? 0 : 1;
+
+				}
+
+				if ( prevData.length ) {
+
+					data = [];
+
+					for ( var j = 0; j < prevData.length; ++j ) {
+
+						data[ j ] = prevData[ j ] + ( nextData[ j ] - prevData[ j ] ) * scale;
+
+					}
+
+				} else {
+
+					data = prevData + ( nextData - prevData ) * scale;
+
+				}
+
+			} else {
+
+				data = target.data;
+
+			}
+
+			target.transform.update( data, target.member );
 
 		}
 
@@ -3133,76 +3745,9 @@ THREE.ColladaLoader = function () {
 
 	};
 
-	function _hash_vertex ( v, n, t0, t1, precision ) {
-
-		precision = precision || 2;
-
-		var s = v instanceof THREE.Vertex ? _hash_vector3( v.position, precision ) : _hash_vector3( v, precision );
-
-		if ( n === undefined ) {
-
-			s += '_0.00,0.00,0.00';
-
-		} else {
-
-			s += '_' + _hash_vector3( n, precision );
-
-		}
-
-		if ( t0 === undefined ) {
-
-			s += '_0.00,0.00';
-
-		} else {
-
-			s += '_' + _hash_uv( t0, precision );
-
-		}
-
-		if ( t1 === undefined ) {
-
-			s += '_0.00,0.00';
-
-		} else {
-
-			s += '_' + _hash_uv( t1, precision );
-
-		}
-
-		return s;
-
-	};
-
-	function _hash_uv ( uv, num ) {
-
-		var s = '';
-
-		s += _format_float( uv.u, num ) + ',';
-		s += _format_float( uv.v, num );
-
-		return s;
-
-	};
-
-	function _hash_vector3 ( vec, num ) {
-
-		var s = '';
-
-		s += _format_float( vec.x, num ) + ',';
-		s += _format_float( vec.y, num ) + ',';
-		s += _format_float( vec.z, num );
-
-		return s;
-
-	};
-
 	function evaluateXPath ( node, query ) {
 
-		var instances = COLLADA.evaluate(query,
-			node,
-			_nsResolver,
-			XPathResult.ORDERED_NODE_ITERATOR_TYPE,
-			null);
+		var instances = COLLADA.evaluate( query, node, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null );
 
 		var inst = instances.iterateNext();
 		var result = [];
@@ -3218,13 +3763,246 @@ THREE.ColladaLoader = function () {
 
 	};
 
+	// Up axis conversion
+
+	function setUpConversion () {
+
+		if ( !options.convertUpAxis || colladaUp === options.upAxis ) {
+
+			upConversion = null;
+
+		} else {
+
+			switch ( colladaUp ) {
+
+				case 'X':
+
+					upConversion = options.upAxis === 'Y' ? 'XtoY' : 'XtoZ';
+					break;
+
+				case 'Y':
+
+					upConversion = options.upAxis === 'X' ? 'YtoX' : 'YtoZ';
+					break;
+
+				case 'Z':
+
+					upConversion = options.upAxis === 'X' ? 'ZtoX' : 'ZtoY';
+					break;
+
+			}
+
+		}
+
+	};
+
+	function fixCoords ( data, sign ) {
+
+		if ( !options.convertUpAxis || colladaUp === options.upAxis ) {
+
+			return;
+
+		}
+
+		switch ( upConversion ) {
+
+			case 'XtoY':
+
+				var tmp = data[ 0 ];
+				data[ 0 ] = sign * data[ 1 ];
+				data[ 1 ] = tmp;
+				break;
+
+			case 'XtoZ':
+
+				var tmp = data[ 2 ];
+				data[ 2 ] = data[ 1 ];
+				data[ 1 ] = data[ 0 ];
+				data[ 0 ] = tmp;
+				break;
+
+			case 'YtoX':
+
+				var tmp = data[ 0 ];
+				data[ 0 ] = data[ 1 ];
+				data[ 1 ] = sign * tmp;
+				break;
+
+			case 'YtoZ':
+
+				var tmp = data[ 1 ];
+				data[ 1 ] = sign * data[ 2 ];
+				data[ 2 ] = tmp;
+				break;
+
+			case 'ZtoX':
+
+				var tmp = data[ 0 ];
+				data[ 0 ] = data[ 1 ];
+				data[ 1 ] = data[ 2 ];
+				data[ 2 ] = tmp;
+				break;
+
+			case 'ZtoY':
+
+				var tmp = data[ 1 ];
+				data[ 1 ] = data[ 2 ];
+				data[ 2 ] = sign * tmp;
+				break;
+
+		}
+
+	};
+
+	function getConvertedVec3 ( data, offset ) {
+
+		var arr = [ data[ offset ], data[ offset + 1 ], data[ offset + 2 ] ];
+		fixCoords( arr, -1 );
+		return new THREE.Vector3( arr[ 0 ], arr[ 1 ], arr[ 2 ] );
+
+	};
+
+	function getConvertedMat4 ( data ) {
+
+		if ( options.convertUpAxis ) {
+
+			// First fix rotation and scale
+
+			// Columns first
+			var arr = [ data[ 0 ], data[ 4 ], data[ 8 ] ];
+			fixCoords( arr, -1 );
+			data[ 0 ] = arr[ 0 ];
+			data[ 4 ] = arr[ 1 ];
+			data[ 8 ] = arr[ 2 ];
+			arr = [ data[ 1 ], data[ 5 ], data[ 9 ] ];
+			fixCoords( arr, -1 );
+			data[ 1 ] = arr[ 0 ];
+			data[ 5 ] = arr[ 1 ];
+			data[ 9 ] = arr[ 2 ];
+			arr = [ data[ 2 ], data[ 6 ], data[ 10 ] ];
+			fixCoords( arr, -1 );
+			data[ 2 ] = arr[ 0 ];
+			data[ 6 ] = arr[ 1 ];
+			data[ 10 ] = arr[ 2 ];
+			// Rows second
+			arr = [ data[ 0 ], data[ 1 ], data[ 2 ] ];
+			fixCoords( arr, -1 );
+			data[ 0 ] = arr[ 0 ];
+			data[ 1 ] = arr[ 1 ];
+			data[ 2 ] = arr[ 2 ];
+			arr = [ data[ 4 ], data[ 5 ], data[ 6 ] ];
+			fixCoords( arr, -1 );
+			data[ 4 ] = arr[ 0 ];
+			data[ 5 ] = arr[ 1 ];
+			data[ 6 ] = arr[ 2 ];
+			arr = [ data[ 8 ], data[ 9 ], data[ 10 ] ];
+			fixCoords( arr, -1 );
+			data[ 8 ] = arr[ 0 ];
+			data[ 9 ] = arr[ 1 ];
+			data[ 10 ] = arr[ 2 ];
+
+			// Now fix translation
+			arr = [ data[ 3 ], data[ 7 ], data[ 11 ] ];
+			fixCoords( arr, -1 );
+			data[ 3 ] = arr[ 0 ];
+			data[ 7 ] = arr[ 1 ];
+			data[ 11 ] = arr[ 2 ];
+
+		}
+
+		return new THREE.Matrix4(
+			data[0], data[1], data[2], data[3],
+			data[4], data[5], data[6], data[7],
+			data[8], data[9], data[10], data[11],
+			data[12], data[13], data[14], data[15]
+			);
+
+	};
+
+	function getConvertedMember ( member ) {
+
+		if ( options.convertUpAxis ) {
+
+			switch ( member ) {
+
+				case 'X':
+
+					switch ( upConversion ) {
+
+						case 'XtoY':
+						case 'XtoZ':
+						case 'YtoX':
+
+							member = 'Y';
+							break;
+
+						case 'ZtoX':
+
+							member = 'Z';
+							break;
+
+					}
+
+					break;
+
+				case 'Y':
+
+					switch ( upConversion ) {
+
+						case 'XtoY':
+						case 'YtoX':
+						case 'ZtoX':
+
+							member = 'X';
+							break;
+
+						case 'XtoZ':
+						case 'YtoZ':
+						case 'ZtoY':
+
+							member = 'Z';
+							break;
+
+					}
+
+					break;
+
+				case 'Z':
+
+					switch ( upConversion ) {
+
+						case 'XtoZ':
+
+							member = 'X';
+							break;
+
+						case 'YtoZ':
+						case 'ZtoX':
+						case 'ZtoY':
+
+							member = 'Y';
+							break;
+
+					}
+
+					break;
+
+			}
+
+		}
+
+		return member;
+
+	};
+
 	return {
 
 		load: load,
 		parse: parse,
 		setPreferredShading: setPreferredShading,
 		applySkin: applySkin,
-		geometries : geometries
+		geometries : geometries,
+		options: options
 
 	};
 
