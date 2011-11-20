@@ -164,15 +164,11 @@ THREE.ColladaLoader = function () {
 
 	function parseAsset () {
 
-		var elements = COLLADA.evaluate("//dae:asset",
-										COLLADA,
-										_nsResolver,
-										XPathResult.ORDERED_NODE_ITERATOR_TYPE,
-										null) ;
+		var elements = COLLADA.evaluate( '//dae:asset', COLLADA, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null );
 
 		var element = elements.iterateNext();
 
-		if ( element ) {
+		if ( element && element.children ) {
 
 			for ( var i = 0; i < element.children.length; i ++ ) {
 
@@ -2741,6 +2737,8 @@ THREE.ColladaLoader = function () {
 	};
 
 	ColorOrTexture.prototype.parseTexture = function ( element ) {
+
+		if ( ! element.children ) return this;
 
 		// This should be supported by Maya, 3dsMax, and MotionBuilder
 
