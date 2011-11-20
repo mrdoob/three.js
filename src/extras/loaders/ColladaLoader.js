@@ -49,11 +49,6 @@ THREE.ColladaLoader = function () {
 
 		if ( document.implementation && document.implementation.createDocument ) {
 
-			// force reloading
-			// (should be configurable? sometimes caching is desirable)
-
-			url += "?rnd=" + Math.random();
-
 			var req = new XMLHttpRequest();
 
 			if( req.overrideMimeType ) {
@@ -70,8 +65,17 @@ THREE.ColladaLoader = function () {
 
 					if( req.status == 0 || req.status == 200 ) {
 
-						readyCallbackFunc = readyCallback;
-						parse( req.responseXML, undefined, url );
+
+						if ( req.responseXML ) {
+
+							readyCallbackFunc = readyCallback;
+							parse( req.responseXML, undefined, url );
+
+						} else {
+
+							console.error( "ColladaLoader: Empty or non-existing file (" + url + ")" );
+
+						}
 
 					}
 
@@ -90,7 +94,7 @@ THREE.ColladaLoader = function () {
 
 	};
 
-	function parse ( doc, callBack, url ) {
+	function parse( doc, callBack, url ) {
 
 		COLLADA = doc;
 		callBack = callBack || readyCallbackFunc;
