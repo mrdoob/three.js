@@ -703,6 +703,7 @@ THREE.ColladaLoader = function () {
 			var instance_materials = instance_geometry.instance_material;
 			var geometry = geometries[instance_geometry.url];
 			var used_materials = {};
+			var used_materials_array = [];
 			var num_materials = 0;
 			var first_material;
 
@@ -728,7 +729,8 @@ THREE.ColladaLoader = function () {
 						var shader = effects[effect_id].shader;
 
 						shader.material.opacity = !shader.material.opacity ? 1 : shader.material.opacity;
-						used_materials[inst_material.symbol] = shader.material;
+						used_materials[inst_material.symbol] = num_materials;
+						used_materials_array.push(shader.material)
 						first_material = shader.material;
 						num_materials ++;
 
@@ -743,11 +745,12 @@ THREE.ColladaLoader = function () {
 				if ( num_materials > 1 ) {
 
 					material = new THREE.MeshFaceMaterial();
-
+					geom.materials = used_materials_array;
+					
 					for ( j = 0; j < geom.faces.length; j ++ ) {
 
 						var face = geom.faces[ j ];
-						face.materials = [ used_materials[ face.daeMaterial ] ];
+						face.materialIndex = used_materials[ face.daeMaterial ]
 
 					}
 
