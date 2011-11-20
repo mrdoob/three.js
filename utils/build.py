@@ -143,6 +143,7 @@ EXTRAS_FILES = [
 CANVAS_FILES = [
 'Three.js',
 'core/Color.js',
+'core/Frustum.js',
 'core/Vector2.js',
 'core/Vector3.js',
 'core/Vector4.js',
@@ -195,6 +196,7 @@ CANVAS_FILES = [
 DOM_FILES = [
 'Three.js',
 'core/Color.js',
+'core/Frustum.js',
 'core/Vector2.js',
 'core/Vector3.js',
 'core/Vector4.js',
@@ -225,6 +227,7 @@ DOM_FILES = [
 SVG_FILES = [
 'Three.js',
 'core/Color.js',
+'core/Frustum.js',
 'core/Vector2.js',
 'core/Vector3.js',
 'core/Vector4.js',
@@ -275,6 +278,7 @@ SVG_FILES = [
 WEBGL_FILES = [
 'Three.js',
 'core/Color.js',
+'core/Frustum.js',
 'core/Vector2.js',
 'core/Vector3.js',
 'core/Vector4.js',
@@ -329,7 +333,13 @@ WEBGL_FILES = [
 'renderers/WebGLShaders.js',
 'renderers/WebGLRenderer.js',
 'renderers/WebGLRenderTarget.js',
-'renderers/WebGLRenderTargetCube.js'
+'renderers/WebGLRenderTargetCube.js',
+'extras/objects/LensFlare.js',
+'extras/plugins/LensFlarePlugin.js',
+'extras/plugins/ShadowMapPlugin.js',
+'extras/plugins/SpritePlugin.js',
+'extras/shaders/ShaderFlares.js',
+'extras/shaders/ShaderSprite.js'
 ]
 
 def merge(files):

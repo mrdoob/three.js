@@ -126,6 +126,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_viewportY = 0,
 	_viewportWidth = 0,
 	_viewportHeight = 0,
+	_currentWidth = 0,
+	_currentHeight = 0,
 
 	// frustum
 
@@ -3190,7 +3192,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_currentGeometryGroupHash = -1;
 			_currentMaterialId = -1;
 
-			plugins[ i ].render( scene, camera, _viewportWidth, _viewportHeight );
+			plugins[ i ].render( scene, camera, _currentWidth, _currentHeight );
 
 			_currentProgram = null;
 			_oldBlending = -1;
@@ -4518,7 +4520,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			light = lights[ l ];
 			color = light.color;
 
-			position = light.position;
 			intensity = light.intensity;
 			distance = light.distance;
 
@@ -4556,9 +4557,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				dpositions[ doffset ]     = position.x;
-				dpositions[ doffset + 1 ] = position.y;
-				dpositions[ doffset + 2 ] = position.z;
+				position = light.matrixWorld.getPosition();
+
+				n = 1 / position.length();
+
+				dpositions[ doffset ]     = position.x * n;
+				dpositions[ doffset + 1 ] = position.y * n;
+				dpositions[ doffset + 2 ] = position.z * n;
 
 				dlength += 1;
 
@@ -4579,6 +4584,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 					dcolors[ doffset + 2 ] = color.b * intensity;
 
 				}
+
+				position = light.matrixWorld.getPosition();
 
 				n = 1 / position.length();
 
@@ -4605,6 +4612,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 					pcolors[ poffset + 2 ] = color.b * intensity;
 
 				}
+
+				position = light.matrixWorld.getPosition();
 
 				ppositions[ poffset ]     = position.x;
 				ppositions[ poffset + 1 ] = position.y;
@@ -5388,6 +5397,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_currentFramebuffer = framebuffer;
 
 		}
+
+		_currentWidth = width;
+		_currentHeight = height;
 
 	};
 

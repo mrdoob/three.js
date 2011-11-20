@@ -46,7 +46,7 @@ THREE.CubeGeometry = function ( width, height, depth, segmentsWidth, segmentsHei
 
 		for ( var s in sides ) {
 
-			if ( this.sides[ s ] != undefined ) {
+			if ( this.sides[ s ] !== undefined ) {
 
 				this.sides[ s ] = sides[ s ];
 
