@@ -207,11 +207,7 @@ THREE.ColladaLoader = function () {
 
 	function parseLib ( q, classSpec, prefix ) {
 
-		var elements = COLLADA.evaluate(q,
-										COLLADA,
-										_nsResolver,
-										XPathResult.ORDERED_NODE_ITERATOR_TYPE,
-										null) ;
+		var elements = COLLADA.evaluate(q, COLLADA, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null) ;
 
 		var lib = {};
 		var element = elements.iterateNext();
@@ -220,8 +216,9 @@ THREE.ColladaLoader = function () {
 		while ( element ) {
 
 			var daeElement = ( new classSpec() ).parse( element );
-			if ( daeElement.id.length == 0 ) daeElement.id = prefix + ( i++ );
+			if ( !daeElement.id || daeElement.id.length == 0 ) daeElement.id = prefix + ( i ++ );
 			lib[ daeElement.id ] = daeElement;
+
 			element = elements.iterateNext();
 
 		}
@@ -232,11 +229,7 @@ THREE.ColladaLoader = function () {
 
 	function parseScene () {
 
-		var sceneElement = COLLADA.evaluate( ".//dae:scene/dae:instance_visual_scene",
-			COLLADA,
-			_nsResolver,
-			XPathResult.ORDERED_NODE_ITERATOR_TYPE,
-			null ).iterateNext();
+		var sceneElement = COLLADA.evaluate( './/dae:scene/dae:instance_visual_scene', COLLADA, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null ).iterateNext();
 
 		if ( sceneElement ) {
 
@@ -828,11 +821,7 @@ THREE.ColladaLoader = function () {
 
 	function getLibraryNode( id ) {
 
-		return COLLADA.evaluate(".//dae:library_nodes//dae:node[@id='"+id+"']",
-								COLLADA,
-								_nsResolver,
-								XPathResult.ORDERED_NODE_ITERATOR_TYPE,
-								null).iterateNext();
+		return COLLADA.evaluate( './/dae:library_nodes//dae:node[@id=\'' + id + '\']', COLLADA, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null ).iterateNext();
 
 	};
 
@@ -2005,11 +1994,7 @@ THREE.ColladaLoader = function () {
 
 				case 'bind_material':
 
-					var instances = COLLADA.evaluate(".//dae:instance_material",
-														child,
-														_nsResolver,
-														XPathResult.ORDERED_NODE_ITERATOR_TYPE,
-														null);
+					var instances = COLLADA.evaluate( './/dae:instance_material', child, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null );
 
 					if ( instances ) {
 
@@ -2073,11 +2058,7 @@ THREE.ColladaLoader = function () {
 
 			if ( child.nodeName == 'bind_material' ) {
 
-				var instances = COLLADA.evaluate(".//dae:instance_material",
-					child,
-					_nsResolver,
-					XPathResult.ORDERED_NODE_ITERATOR_TYPE,
-					null);
+				var instances = COLLADA.evaluate( './/dae:instance_material', child, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null );
 
 				if ( instances ) {
 
@@ -2820,7 +2801,7 @@ THREE.ColladaLoader = function () {
 				case 'reflectivity':
 				case 'transparency':
 
-					var f = evaluateXPath( child, ".//dae:float" );
+					var f = evaluateXPath( child, './/dae:float' );
 
 					if ( f.length > 0 )
 						this[ child.nodeName ] = parseFloat( f[ 0 ].textContent );
@@ -3766,11 +3747,7 @@ THREE.ColladaLoader = function () {
 
 	function evaluateXPath ( node, query ) {
 
-		var instances = COLLADA.evaluate(query,
-			node,
-			_nsResolver,
-			XPathResult.ORDERED_NODE_ITERATOR_TYPE,
-			null);
+		var instances = COLLADA.evaluate( query, node, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null );
 
 		var inst = instances.iterateNext();
 		var result = [];
