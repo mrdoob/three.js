@@ -172,7 +172,7 @@ THREE.ColladaLoader = function () {
 
 		var element = elements.iterateNext();
 
-		if ( element && element.children ) {
+		if ( element && element.childNodes ) {
 
 			for ( var i = 0; i < element.childNodes.length; i ++ ) {
 
@@ -244,7 +244,7 @@ THREE.ColladaLoader = function () {
 
 	};
 
-	function createAnimations () {
+	function createAnimations() {
 
 		animData = [];
 
@@ -253,7 +253,7 @@ THREE.ColladaLoader = function () {
 
 	};
 
-	function recurseHierarchy ( node ) {
+	function recurseHierarchy( node ) {
 
 		var n = daeScene.getChildById( node.name, true ),
 			newData = null;
@@ -2723,7 +2723,7 @@ THREE.ColladaLoader = function () {
 
 	ColorOrTexture.prototype.parseTexture = function ( element ) {
 
-		if ( ! element.children ) return this;
+		if ( ! element.childNodes ) return this;
 
 		// This should be supported by Maya, 3dsMax, and MotionBuilder
 
