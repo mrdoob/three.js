@@ -172,11 +172,11 @@ THREE.ColladaLoader = function () {
 
 		var element = elements.iterateNext();
 
-		if ( element && element.children ) {
+		if ( element && element.childNodes ) {
 
-			for ( var i = 0; i < element.children.length; i ++ ) {
+			for ( var i = 0; i < element.childNodes.length; i ++ ) {
 
-				var child = element.children[ i ];
+				var child = element.childNodes[ i ];
 
 				switch ( child.nodeName ) {
 
@@ -244,7 +244,7 @@ THREE.ColladaLoader = function () {
 
 	};
 
-	function createAnimations () {
+	function createAnimations() {
 
 		animData = [];
 
@@ -253,7 +253,7 @@ THREE.ColladaLoader = function () {
 
 	};
 
-	function recurseHierarchy ( node ) {
+	function recurseHierarchy( node ) {
 
 		var n = daeScene.getChildById( node.name, true ),
 			newData = null;
@@ -2723,25 +2723,25 @@ THREE.ColladaLoader = function () {
 
 	ColorOrTexture.prototype.parseTexture = function ( element ) {
 
-		if ( ! element.children ) return this;
+		if ( ! element.childNodes ) return this;
 
 		// This should be supported by Maya, 3dsMax, and MotionBuilder
 
-		if ( element.children[0] && element.children[0].nodeName === 'extra' ) {
+		if ( element.childNodes[1] && element.childNodes[1].nodeName === 'extra' ) {
 
-			element = element.children[0];
+			element = element.childNodes[1];
 
-			if ( element.children[0] && element.children[0].nodeName === 'technique' ) {
+			if ( element.childNodes[1] && element.childNodes[1].nodeName === 'technique' ) {
 
-				element = element.children[0];
+				element = element.childNodes[1];
 
 			}
 
 		}
 
-		for ( var i = 0; i < element.children.length; i ++ ) {
+		for ( var i = 0; i < element.childNodes.length; i ++ ) {
 
-			var child = element.children[ i ];
+			var child = element.childNodes[ i ];
 
 			switch ( child.nodeName ) {
 
@@ -2849,8 +2849,8 @@ THREE.ColladaLoader = function () {
 									if ( image ) {
 
 										var texture = THREE.ImageUtils.loadTexture(baseUrl + image.init_from);
-										texture.wrapS = cot.texOpts.wrapU;
-										texture.wrapT = cot.texOpts.wrapV;
+										texture.wrapS = cot.texOpts.wrapU ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
+										texture.wrapT = cot.texOpts.wrapV ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
 										texture.offset.x = cot.texOpts.offsetU;
 										texture.offset.y = cot.texOpts.offsetV;
 										texture.repeat.x = cot.texOpts.repeatU;
