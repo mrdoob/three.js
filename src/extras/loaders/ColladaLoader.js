@@ -174,9 +174,9 @@ THREE.ColladaLoader = function () {
 
 		if ( element ) {
 
-			for ( var i = 0; i < element.children.length; i ++ ) {
+			for ( var i = 0; i < element.childNodes.length; i ++ ) {
 
-				var child = element.children[ i ];
+				var child = element.childNodes[ i ];
 
 				switch ( child.nodeName ) {
 
@@ -2741,21 +2741,21 @@ THREE.ColladaLoader = function () {
 
 		// This should be supported by Maya, 3dsMax, and MotionBuilder
 
-		if ( element.children[0] && element.children[0].nodeName === 'extra' ) {
+		if ( element.childNodes[1] && element.childNodes[1].nodeName === 'extra' ) {
 
-			element = element.children[0];
+			element = element.childNodes[1];
 
-			if ( element.children[0] && element.children[0].nodeName === 'technique' ) {
+			if ( element.childNodes[1] && element.childNodes[1].nodeName === 'technique' ) {
 
-				element = element.children[0];
+				element = element.childNodes[1];
 
 			}
 
 		}
 
-		for ( var i = 0; i < element.children.length; i ++ ) {
+		for ( var i = 0; i < element.childNodes.length; i ++ ) {
 
-			var child = element.children[ i ];
+			var child = element.childNodes[ i ];
 
 			switch ( child.nodeName ) {
 
