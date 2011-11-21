@@ -2849,8 +2849,8 @@ THREE.ColladaLoader = function () {
 									if ( image ) {
 
 										var texture = THREE.ImageUtils.loadTexture(baseUrl + image.init_from);
-										texture.wrapS = cot.texOpts.wrapU;
-										texture.wrapT = cot.texOpts.wrapV;
+										texture.wrapS = cot.texOpts.wrapU ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
+										texture.wrapT = cot.texOpts.wrapV ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
 										texture.offset.x = cot.texOpts.offsetU;
 										texture.offset.y = cot.texOpts.offsetV;
 										texture.repeat.x = cot.texOpts.repeatU;
