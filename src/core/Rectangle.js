@@ -165,8 +165,14 @@ THREE.Rectangle = function () {
 
 	this.intersects = function ( r ) {
 
-		return Math.min( _right, r.getRight() ) - Math.max( _left, r.getLeft() ) >= 0 &&
-		        Math.min( _bottom, r.getBottom() ) - Math.max( _top, r.getTop() ) >= 0;
+		// http://gamemath.com/2011/09/detecting-whether-two-boxes-overlap/
+
+		if ( _right < r.getLeft() ) return false;
+		if ( _left > r.getRight() ) return false;
+		if ( _bottom < r.getTop() ) return false;
+		if ( _top > r.getBottom() ) return false;
+
+		return true;
 
 	};
 
