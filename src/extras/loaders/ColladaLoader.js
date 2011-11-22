@@ -789,11 +789,8 @@ THREE.ColladaLoader = function () {
 
 		obj.name = node.id || "";
 		obj.matrix = node.matrix;
-		var props = node.matrix.decompose();
-		obj.position = props[ 0 ];
-		obj.quaternion = props[ 1 ];
-		obj.useQuaternion = true;
-		obj.scale = props[ 2 ];
+
+		inferNodeProperties( node, obj );
 
 		for ( i = 0; i < node.nodes.length; i ++ ) {
 
@@ -802,6 +799,228 @@ THREE.ColladaLoader = function () {
 		}
 
 		return obj;
+
+	};
+
+	function inferNodeProperties( node, obj ) {
+
+		// See if we can infer position, rotation, scale, and offsets
+		// Rules for valid inference:
+		// Offset translates are sequential translates that cancel each other out
+		// Offset translates can have 0 or more rotates or scales between them, but no other translates
+		// All scales are grouped together and come before any rotates and non-offset translates
+		// All rotates are grouped together and come before any non-offset translates
+		// *Note that we traverse the transform stack in reverse, so "before" means later in the array
+
+
+		var transforms = node.transforms,
+			numTrans = transforms.length,
+			off = null,
+			rOffStart = null,
+			rOffStop = null,
+			rStart = null,
+			rStop = null,
+			sOffStart = null,
+			sOffStop = null,
+			sStart = null,
+			sStop = null,
+			tStart = null,
+			valid = true;
+
+		for ( var i = numTrans - 1; valid && i >= 0; --i ) {
+
+			var tran = transforms[ i ];
+
+			switch ( tran.type ) {
+
+				case 'rotate':
+
+					if ( tStart != null ) {
+
+						valid = false; // Rotate found after non-offset translate
+
+					} else if ( rStart == null ) {
+
+						rStart = rStop = i; // Beginning of rotates
+
+					} else if ( transforms[ i + 1 ].type === 'rotate' ) {
+
+						rStop = i; // Another rotate grouped with previous rotates
+
+					} else {
+
+						valid = false; // Rotate that is not grouped with previous ones
+
+					}
+
+					break;
+
+				case 'scale':
+
+					if ( tStart != null ) {
+
+						valid = false; // Scale found after non-offset translate
+
+					} else if ( sStart == null ) {
+
+						sStart = sStop = i; // Beginning of scales
+
+					} else if ( transforms[ i + 1 ].type === 'scale' ) {
+
+						sStop = i; // Another scale grouped with previous scales
+
+					} else {
+
+						valid = false; // Scale that is not grouped with previous ones
+
+					}
+
+					break;
+
+				case 'translate':
+
+					if ( off == null ) {
+
+						off = i; // Store it, see if the next translate cancels it out (indicating offsets)
+
+					} else if ( tStart == null ) {
+
+						var other = transforms[ off ];
+
+						if ( tran.data[ 0 ] === -1 * other.data[ 0 ]
+							&& tran.data[ 1 ] === -1 * other.data[ 1 ]
+							&& tran.data[ 2 ] === -1 * other.data[ 2 ] ) {
+
+							if ( sOffStart == null ) {
+
+								sOffStart = off; // Let's assume these are scale offsets
+								sOffStop = i;
+
+							} else if ( rOffStart == null ) {
+
+								rOffStart = off; // Already found scale offsets, let's assume these are rotate offsets
+								rOffStop = i;
+
+							} else {
+
+								tStart = off; // Already found both offsets, must be start of non-offset translates
+
+							}
+
+						} else {
+
+							tStart = off; // Translates don't cancel each other out, must be non-offset translates
+
+						}
+
+						off = null;
+
+					}
+
+					break;
+
+			}
+
+		}
+
+		if ( valid && tStart == null && off != null ) {
+
+			tStart = off;
+
+		}
+
+		if ( valid && sStart != null ) {
+
+			// If we have scales, make sure they come before rotates and translates
+			valid = ( rStart == null || rStart < sStart ) && ( tStart == null || tStart < sStart);
+
+		}
+
+		if ( valid && rStart != null ) {
+
+			// If we have rotates, make sure they come before translates
+			valid = ( tStart == null || tStart < rStart);
+
+		}
+
+		if ( valid && sOffStart != null ) {
+
+			if ( sStart != null && sOffStart < sStart ) {
+
+				// Looks like this is a rotate offset instead of a scale offset
+				rOffStart = sOffStart;
+				rOffStop = sOffStop;
+				sOffStart = null;
+				sOffStop = null;
+
+			} else if ( rStop != null && sOffStop < rStop ) {
+
+				// Scale and rotate are grouped together under one offset (which is fine)
+				rOffStart = sOffStart;
+				rOffStop = sOffStop;
+
+			}
+
+		}
+
+		if ( valid && rOffStart != null && rStart != null && rOffStart < rStart ) {
+
+			// Looks like there is no rotate offset, just a strange pair of canceling translates
+			rOffStart = null;
+			rOffStop = null;
+
+		}
+
+		// Finally, lets infer if we can and decompose if we can't
+
+		if ( valid ) {
+
+			obj.rotateOffset = rOffStop == null ? null : transforms[ rOffStop ].obj.clone();
+			obj.scaleOffset = sOffStop == null ? null : transforms[ sOffStop ].obj.clone();
+
+			if ( sStart != null ) {
+
+				for ( var i = sStop; i <= sStart; ++i ) {
+
+					obj.scale.multiplySelf( transforms[ i ].obj );
+
+				}
+
+			}
+
+			if ( rStart != null ) {
+
+				var rMat = new THREE.Matrix4();
+
+				for ( var i = rStop; i <= rStart; ++i ) {
+
+					rMat.rotateByAxis( transforms[ i ].obj, transforms[ i ].angle );
+
+				}
+
+				obj.rotation.setRotationFromMatrix( rMat );
+
+			}
+
+			if ( tStart != null ) {
+
+				for ( var i = 0; i <= tStart; ++i ) {
+
+					obj.position.addSelf( transforms[ i ].obj );
+
+				}
+
+			}
+
+		} else {
+
+			var props = node.matrix.decompose();
+			obj.position = props[ 0 ];
+			obj.quaternion = props[ 1 ];
+			obj.useQuaternion = true;
+			obj.scale = props[ 2 ];
+
+		}
 
 	};
 
