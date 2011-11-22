@@ -12,6 +12,7 @@ Contents:
    :maxdepth: 2
 
    generated/_global_.rst
+   generated/THREE.rst
 
 Indices and tables
 ==================

@@ -53,7 +53,7 @@ _build/jsdoc-for-sphinx:
 	git clone https://github.com/stdbrouw/jsdoc-for-sphinx.git _build/jsdoc-for-sphinx
 
 generated/*.rst: _build/jsdoc_toolkit-2.4.0/jsdoc-toolkit/jsrun.jar _build/jsdoc-for-sphinx ../src/*.js ../src/*/*.js ../src/*/*/*.js ../src/*/*/*/*.js
-	java -jar _build/jsdoc_toolkit-2.4.0/jsdoc-toolkit/jsrun.jar _build/jsdoc_toolkit-2.4.0/jsdoc-toolkit/app/run.js ../src/Three.js --template=_build/jsdoc-for-sphinx --directory=generated
+	java -jar _build/jsdoc_toolkit-2.4.0/jsdoc-toolkit/jsrun.jar _build/jsdoc_toolkit-2.4.0/jsdoc-toolkit/app/run.js -r ../src --template=_build/jsdoc-for-sphinx --directory=generated
 
 build: generated/*.rst
 	echo "test"
