@@ -295,6 +295,12 @@ THREE.Vector3.prototype = {
 
 		return ( this.lengthSq() < 0.0001 /* almostZero */ );
 
+	},
+
+	toString: function () {
+
+		return [ this.x, this.y, this.z ].join(' ; ');
+
 	}
 
 };

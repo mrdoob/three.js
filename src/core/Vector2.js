@@ -158,6 +158,12 @@ THREE.Vector2.prototype = {
 
 		return ( ( v.x === this.x ) && ( v.y === this.y ) );
 
+	},
+
+	toString: function () {
+
+		return [ this.x, this.y ].join(' ; ');
+
 	}
 
 };

@@ -5,133 +5,155 @@
 
 THREE.GeometryUtils = {
 
-	merge: function ( geometry1, object2 /* mesh | geometry */ ) {
+	merge: function ( geometry1, object2 /* object3D | geometry */, recursive ) {
 
-		var matrix, matrixRotation,
-		vertexOffset = geometry1.vertices.length,
-		uvPosition = geometry1.faceVertexUvs[ 0 ].length,
-		geometry2 = object2 instanceof THREE.Mesh ? object2.geometry : object2,
-		vertices1 = geometry1.vertices,
-		vertices2 = geometry2.vertices,
-		faces1 = geometry1.faces,
-		faces2 = geometry2.faces,
-		uvs1 = geometry1.faceVertexUvs[ 0 ],
-		uvs2 = geometry2.faceVertexUvs[ 0 ];
+		var undefined,
+		geometry2 = object2 instanceof THREE.Geometry ? object2 : object2.geometry,
+		children2 = object2 instanceof THREE.Object3D ? object2.children : undefined;
 
-		var geo1MaterialsMap = {};
+		var i, il, j, jl;
 
-		for ( var i = 0; i < geometry1.materials.length; i ++ ) {
+		if ( object2 instanceof THREE.Object3D ) {
 
-			var id = geometry1.materials[ i ].id;
-
-			geo1MaterialsMap[ id ] = i;
+			object2.updateMatrixWorld( true );
 
 		}
 
+		if ( geometry2 !== undefined ) {
 
-		if ( object2 instanceof THREE.Mesh ) {
+			var matrix, matrixRotation,
+			vertexOffset = geometry1.vertices.length,
+			uvPosition = geometry1.faceVertexUvs[ 0 ].length,
+			vertices1 = geometry1.vertices,
+			vertices2 = geometry2.vertices,
+			faces1 = geometry1.faces,
+			faces2 = geometry2.faces,
+			uvs1 = geometry1.faceVertexUvs[ 0 ],
+			uvs2 = geometry2.faceVertexUvs[ 0 ];
 
-			object2.matrixAutoUpdate && object2.updateMatrix();
+			var geo1MaterialsMap = {};
 
-			matrix = object2.matrix;
-			matrixRotation = new THREE.Matrix4();
-			matrixRotation.extractRotation( matrix, object2.scale );
+			for ( i = 0; i < geometry1.materials.length; ++ i ) {
 
-		}
+				var id = geometry1.materials[ i ].id;
 
-		// vertices
-
-		for ( var i = 0, il = vertices2.length; i < il; i ++ ) {
-
-			var vertex = vertices2[ i ];
-
-			var vertexCopy = new THREE.Vertex( vertex.position.clone() );
-
-			if ( matrix ) matrix.multiplyVector3( vertexCopy.position );
-
-			vertices1.push( vertexCopy );
-
-		}
-
-		// faces
-
-		for ( i = 0, il = faces2.length; i < il; i ++ ) {
-
-			var face = faces2[ i ], faceCopy, normal, color,
-			faceVertexNormals = face.vertexNormals,
-			faceVertexColors = face.vertexColors;
-
-			if ( face instanceof THREE.Face3 ) {
-
-				faceCopy = new THREE.Face3( face.a + vertexOffset, face.b + vertexOffset, face.c + vertexOffset );
-
-			} else if ( face instanceof THREE.Face4 ) {
-
-				faceCopy = new THREE.Face4( face.a + vertexOffset, face.b + vertexOffset, face.c + vertexOffset, face.d + vertexOffset );
+				geo1MaterialsMap[ id ] = i;
 
 			}
 
-			faceCopy.normal.copy( face.normal );
+			if ( object2 instanceof THREE.Mesh ) {
 
-			if ( matrixRotation ) matrixRotation.multiplyVector3( faceCopy.normal );
-
-			for ( var j = 0, jl = faceVertexNormals.length; j < jl; j ++ ) {
-
-				normal = faceVertexNormals[ j ].clone();
-
-				if ( matrixRotation ) matrixRotation.multiplyVector3( normal );
-
-				faceCopy.vertexNormals.push( normal );
+				matrix = object2.matrixWorld;
+				matrixRotation = new THREE.Matrix4();
+				matrixRotation.extractRotation( matrix, object2.scale );
 
 			}
 
-			faceCopy.color.copy( face.color );
+			// vertices
 
-			for ( var j = 0, jl = faceVertexColors.length; j < jl; j ++ ) {
+			for ( i = 0, il = vertices2.length; i < il; ++ i ) {
 
-				color = faceVertexColors[ j ];
-				faceCopy.vertexColors.push( color.clone() );
+				var vertex = vertices2[ i ];
+
+				var vertexCopy = new THREE.Vertex( vertex.position.clone() );
+
+				if ( matrix ) matrix.multiplyVector3( vertexCopy.position );
+
+				vertices1.push( vertexCopy );
 
 			}
 
-			if ( face.materialIndex !== undefined ) {
+			// faces
 
-				var material2 = geometry2.materials[ face.materialIndex ];
-				var materialId2 = material2.id;
+			for ( i = 0, il = faces2.length; i < il; ++ i ) {
 
-				var materialIndex = geo1MaterialsMap[ materialId2 ];
+				var face = faces2[ i ], faceCopy, normal, color,
+				faceVertexNormals = face.vertexNormals,
+				faceVertexColors = face.vertexColors;
 
-				if ( materialIndex === undefined ) {
+				if ( face instanceof THREE.Face3 ) {
 
-					materialIndex = geometry1.materials.length;
-					geometry1.materials.push( material2 );
+					faceCopy = new THREE.Face3( face.a + vertexOffset, face.b + vertexOffset, face.c + vertexOffset );
+
+				} else if ( face instanceof THREE.Face4 ) {
+
+					faceCopy = new THREE.Face4( face.a + vertexOffset, face.b + vertexOffset, face.c + vertexOffset, face.d + vertexOffset );
 
 				}
 
-				faceCopy.materialIndex = materialIndex;
+				faceCopy.normal.copy( face.normal );
+
+				if ( matrixRotation ) matrixRotation.multiplyVector3( faceCopy.normal );
+
+				for ( j = 0, jl = faceVertexNormals.length; j < jl; ++ j ) {
+
+					normal = faceVertexNormals[ j ].clone();
+
+					if ( matrixRotation ) matrixRotation.multiplyVector3( normal );
+
+					faceCopy.vertexNormals.push( normal );
+
+				}
+
+				faceCopy.color.copy( face.color );
+
+				for ( j = 0, jl = faceVertexColors.length; j < jl; ++ j ) {
+
+					color = faceVertexColors[ j ];
+					faceCopy.vertexColors.push( color.clone() );
+
+				}
+
+				if ( face.materialIndex !== undefined ) {
+
+					var material2 = geometry2.materials[ face.materialIndex ];
+					var materialId2 = material2.id;
+
+					var materialIndex = geo1MaterialsMap[ materialId2 ];
+
+					if ( materialIndex === undefined ) {
+
+						materialIndex = geometry1.materials.length;
+						geometry1.materials.push( material2 );
+
+					}
+
+					faceCopy.materialIndex = materialIndex;
+
+				}
+
+				faceCopy.centroid.copy( face.centroid );
+				if ( matrix ) matrix.multiplyVector3( faceCopy.centroid );
+
+				faces1.push( faceCopy );
 
 			}
 
-			faceCopy.centroid.copy( face.centroid );
-			if ( matrix ) matrix.multiplyVector3( faceCopy.centroid );
+			// uvs
 
-			faces1.push( faceCopy );
+			for ( i = 0, il = uvs2.length; i < il; ++ i ) {
+
+				var uv = uvs2[ i ], uvCopy = [];
+
+				for ( j = 0, jl = uv.length; j < jl; ++ j ) {
+
+					uvCopy.push( new THREE.UV( uv[ j ].u, uv[ j ].v ) );
+
+				}
+
+				uvs1.push( uvCopy );
+
+			}
 
 		}
 
-		// uvs
+		if ( recursive === true && children2 !== undefined ) {
 
-		for ( i = 0, il = uvs2.length; i < il; i ++ ) {
+			for ( i = 0, il = children2.length; i < il; ++ i ) {
 
-			var uv = uvs2[ i ], uvCopy = [];
-
-			for ( var j = 0, jl = uv.length; j < jl; j ++ ) {
-
-				uvCopy.push( new THREE.UV( uv[ j ].u, uv[ j ].v ) );
+				this.merge( geometry1, children2[ i ] );
 
 			}
-
-			uvs1.push( uvCopy );
 
 		}
 
