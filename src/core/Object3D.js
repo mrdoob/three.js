@@ -193,7 +193,7 @@ THREE.Object3D.prototype = {
 
 	updateMatrix: function () {
 
-		this.matrix.setPosition( this.position );
+		this.matrix.setTranslation( this.position.x, this.position.y, this.position.z );
 
 		if ( this.useQuaternion )  {
 
