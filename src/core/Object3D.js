@@ -20,9 +20,6 @@ THREE.Object3D = function () {
 	this.eulerOrder = 'XYZ';
 	this.scale = new THREE.Vector3( 1, 1, 1 );
 
-	this.rotateOffset = null;
-	this.scaleOffset = null;
-
 	this.dynamic = false; // when true it retains arrays so they can be updated with __dirty*
 
 	this.doubleSided = false;
@@ -198,12 +195,6 @@ THREE.Object3D.prototype = {
 
 		this.matrix.setTranslation( this.position.x, this.position.y, this.position.z );
 
-		if ( this.rotateOffset ) {
-
-			this.matrix.translate( this.rotateOffset );
-
-		}
-
 		if ( this.useQuaternion )  {
 
 			this.matrix.setRotationFromQuaternion( this.quaternion );
@@ -214,28 +205,10 @@ THREE.Object3D.prototype = {
 
 		}
 
-		if ( this.rotateOffset ) {
-
-			this.matrix.translate( this.rotateOffset.clone().negate() );
-
-		}
-
-		if ( this.scaleOffset ) {
-
-			this.matrix.translate( this.scaleOffset );
-
-		}
-
 		if ( this.scale.x !== 1 || this.scale.y !== 1 || this.scale.z !== 1 ) {
 
 			this.matrix.scale( this.scale );
 			this.boundRadiusScale = Math.max( this.scale.x, Math.max( this.scale.y, this.scale.z ) );
-
-		}
-
-		if ( this.scaleOffset ) {
-
-			this.matrix.translate( this.scaleOffset.clone().negate() );
 
 		}
 
