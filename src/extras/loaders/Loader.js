@@ -17,6 +17,8 @@ THREE.Loader.prototype = {
 
 	constructor: THREE.Loader,
 
+	crossOrigin: '',
+
 	addStatusElement: function () {
 
 		var e = document.createElement( "div" );
@@ -95,6 +97,8 @@ THREE.Loader.prototype = {
 
 	createMaterial: function ( m, texture_path ) {
 
+		var _this = this;
+
 		function is_pow2( n ) {
 
 			var l = Math.log( n ) / Math.LN2;
@@ -132,7 +136,7 @@ THREE.Loader.prototype = {
 				where.needsUpdate = true;
 
 			};
-			image.crossOrigin = '';
+			image.crossOrigin = _this.crossOrigin;
 			image.src = url;
 
 		}
@@ -153,17 +157,17 @@ THREE.Loader.prototype = {
 
 			}
 
-			if( offset ) {
+			if ( offset ) {
 
 				where[ name ].offset.set( offset[ 0 ], offset[ 1 ] );
 
 			}
 
-			if( wrap ) {
+			if ( wrap ) {
 
 				var wrapMap = {
-				"repeat" 	: THREE.RepeatWrapping,
-				"mirror"	: THREE.MirroredRepeatWrapping
+					"repeat" 	: THREE.RepeatWrapping,
+					"mirror"	: THREE.MirroredRepeatWrapping
 				}
 
 				if ( wrapMap[ wrap[ 0 ] ] !== undefined ) where[ name ].wrapS = wrapMap[ wrap[ 0 ] ];

@@ -5,12 +5,14 @@
 
 THREE.ImageUtils = {
 
+	crossOrigin: '',
+
 	loadTexture: function ( path, mapping, callback ) {
 
 		var image = new Image(), texture = new THREE.Texture( image, mapping );
 
 		image.onload = function () { texture.needsUpdate = true; if ( callback ) callback( this ); };
-		image.crossOrigin = '';
+		image.crossOrigin = this.crossOrigin;
 		image.src = path;
 
 		return texture;
