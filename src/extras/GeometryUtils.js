@@ -238,7 +238,7 @@ THREE.GeometryUtils = {
 	// 	(uniform distribution)
 	// 	http://www.cgafaq.info/wiki/Random_Point_In_Triangle
 
-	randomPointInTriangle: function( vectorA, vectorB, vectorC ) {
+	randomPointInTriangle: function ( vectorA, vectorB, vectorC ) {
 
 		var a, b, c,
 			point = new THREE.Vector3(),
@@ -276,7 +276,7 @@ THREE.GeometryUtils = {
 	// Get random point in face (triangle / quad)
 	// (uniform distribution)
 
-	randomPointInFace: function( face, geometry, useCachedAreas ) {
+	randomPointInFace: function ( face, geometry, useCachedAreas ) {
 
 		var vA, vB, vC, vD;
 
@@ -343,7 +343,7 @@ THREE.GeometryUtils = {
 	//  - find corresponding place in area array by binary search
 	//	- get random point in face
 
-	randomPointsInGeometry: function( geometry, n ) {
+	randomPointsInGeometry: function ( geometry, n ) {
 
 		var face, i,
 			faces = geometry.faces,
@@ -456,7 +456,7 @@ THREE.GeometryUtils = {
 	// Get triangle area (by Heron's formula)
 	// 	http://en.wikipedia.org/wiki/Heron%27s_formula
 
-	triangleArea: function( vectorA, vectorB, vectorC ) {
+	triangleArea: function ( vectorA, vectorB, vectorC ) {
 
 		var s, a, b, c,
 			tmp = THREE.GeometryUtils.__v1;
@@ -478,21 +478,19 @@ THREE.GeometryUtils = {
 
 	// Center geometry so that 0,0,0 is in center of bounding box
 
-	center: function( geometry ) {
+	center: function ( geometry ) {
 
 		geometry.computeBoundingBox();
 
-		var matrix = new THREE.Matrix4();
+		var offset = new THREE.Vector3();
+		offset.x = - 0.5 * ( geometry.boundingBox.x[ 1 ] + geometry.boundingBox.x[ 0 ] );
+		offset.y = - 0.5 * ( geometry.boundingBox.y[ 1 ] + geometry.boundingBox.y[ 0 ] );
+		offset.z = - 0.5 * ( geometry.boundingBox.z[ 1 ] + geometry.boundingBox.z[ 0 ] );
 
-		var dx = -0.5 * ( geometry.boundingBox.x[ 1 ] + geometry.boundingBox.x[ 0 ] );
-		var dy = -0.5 * ( geometry.boundingBox.y[ 1 ] + geometry.boundingBox.y[ 0 ] );
-		var dz = -0.5 * ( geometry.boundingBox.z[ 1 ] + geometry.boundingBox.z[ 0 ] );
-
-		matrix.setTranslation( dx, dy, dz );
-
-		geometry.applyMatrix( matrix );
-
+		geometry.applyMatrix( new THREE.Matrix4().setTranslation( offset.x, offset.y, offset.z ) );
 		geometry.computeBoundingBox();
+
+		return offset;
 
 	},
 
