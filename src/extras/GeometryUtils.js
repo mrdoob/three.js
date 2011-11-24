@@ -104,6 +104,8 @@ THREE.GeometryUtils = {
 				if ( materialIndex === undefined ) {
 
 					materialIndex = geometry1.materials.length;
+					geo1MaterialsMap[ materialId2 ] = materialIndex;
+
 					geometry1.materials.push( material2 );
 
 				}
