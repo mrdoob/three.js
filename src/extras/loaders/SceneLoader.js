@@ -414,12 +414,17 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 			camera = new THREE.OrthographicCamera( c.left, c.right, c.top, c.bottom, c.near, c.far );
 
 		}
-
+		
 		p = c.position;
 		t = c.target;
+		u = c.up;
 		camera.position.set( p[0], p[1], p[2] );
 		camera.target = new THREE.Vector3( t[0], t[1], t[2] );
-
+		if ( u ) {
+			
+			camera.up.set( u[0], u[1], u[2] );
+		}
+		
 		result.cameras[ dc ] = camera;
 
 	}
