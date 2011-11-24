@@ -28,6 +28,10 @@ THREE.ColladaLoader = function () {
 	var preferredShading = THREE.SmoothShading;
 
 	var options = {
+		// Force Geometry to always be centered at the local origin of the
+		// containing Mesh.
+		centerGeometry: false,
+
 		// Axis conversion is done for geometries, animations, and controllers.
 		// If we ever pull cameras or lights out of the COLLADA file, they'll
 		// need extra work.
@@ -794,6 +798,14 @@ THREE.ColladaLoader = function () {
 		obj.quaternion = props[ 1 ];
 		obj.useQuaternion = true;
 		obj.scale = props[ 2 ];
+
+		if ( options.centerGeometry && obj.geometry ) {
+
+			var delta = THREE.GeometryUtils.center( obj.geometry );
+			obj.quaternion.multiplyVector3( delta.multiplySelf( obj.scale ) );
+			obj.position.subSelf( delta );
+
+		}
 
 		for ( i = 0; i < node.nodes.length; i ++ ) {
 
