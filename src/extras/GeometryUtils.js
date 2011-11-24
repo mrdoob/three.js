@@ -494,6 +494,8 @@ THREE.GeometryUtils = {
 
 		geometry.computeBoundingBox();
 
+		return new THREE.Vector3( dx, dy, dz );
+
 	},
 
 	// Normalize UVs to be from <0,1>
