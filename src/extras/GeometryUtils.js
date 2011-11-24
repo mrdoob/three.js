@@ -490,6 +490,8 @@ THREE.GeometryUtils = {
 
 		geometry.computeBoundingBox();
 
+		return new THREE.Vector3( dx, dy, dz );
+
 	}
 
 
