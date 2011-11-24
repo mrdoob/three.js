@@ -5,6 +5,8 @@
 
 THREE.GeometryUtils = {
 
+	// Merge two geometries or geometry and geometry from object (using object's transform)
+
 	merge: function ( geometry1, object2 /* mesh | geometry */ ) {
 
 		var matrix, matrixRotation,
@@ -474,6 +476,8 @@ THREE.GeometryUtils = {
 
 	},
 
+	// Center geometry so that 0,0,0 is in center of bounding box
+
 	center: function( geometry ) {
 
 		geometry.computeBoundingBox();
@@ -490,10 +494,31 @@ THREE.GeometryUtils = {
 
 		geometry.computeBoundingBox();
 
-		return new THREE.Vector3( dx, dy, dz );
+	},
+
+	// Normalize UVs to be from <0,1>
+	// (for now just the first set of UVs)
+
+	normalizeUVs: function ( geometry ) {
+
+		var uvSet = geometry.faceVertexUvs[ 0 ];
+
+		for ( var i = 0, il = uvSet.length; i < il; i ++ ) {
+
+			var uvs = uvSet[ i ];
+
+			for ( var j = 0, jl = uvs.length; j < jl; j ++ ) {
+
+				// texture repeat
+
+				if( uvs[ j ].u !== 1.0 ) uvs[ j ].u = uvs[ j ].u - Math.floor( uvs[ j ].u );
+				if( uvs[ j ].v !== 1.0 ) uvs[ j ].v = uvs[ j ].v - Math.floor( uvs[ j ].v );
+
+			}
+
+		}
 
 	}
-
 
 };
 
