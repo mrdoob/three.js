@@ -71,7 +71,7 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 	var urlBase = THREE.Loader.prototype.extractUrlbase( url );
 
 	var dg, dm, dd, dl, dc, df, dt,
-		g, o, m, l, d, p, r, q, s, c, t, f, tt, pp,
+		g, o, m, l, d, p, r, q, s, c, t, f, tt, pp, u,
 		geometry, material, camera, fog,
 		texture, images,
 		materials, light,
@@ -418,12 +418,10 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 		p = c.position;
 		t = c.target;
 		u = c.up;
+
 		camera.position.set( p[0], p[1], p[2] );
 		camera.target = new THREE.Vector3( t[0], t[1], t[2] );
-		if ( u ) {
-			
-			camera.up.set( u[0], u[1], u[2] );
-		}
+		if ( u ) camera.up.set( u[0], u[1], u[2] );
 		
 		result.cameras[ dc ] = camera;
 
