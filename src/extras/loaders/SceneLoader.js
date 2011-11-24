@@ -422,7 +422,7 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 		camera.target = new THREE.Vector3( t[0], t[1], t[2] );
 		if ( u ) {
 			
-			camera.up.set( u[0], u[1], [2] );
+			camera.up.set( u[0], u[1], u[2] );
 		}
 		
 		result.cameras[ dc ] = camera;
