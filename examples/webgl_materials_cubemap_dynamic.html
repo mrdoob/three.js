@@ -592,23 +592,26 @@
 
 				var bb = shadowObject.geometry.boundingBox;
 
+				var dimensions = new THREE.Vector3();
+				dimensions.sub( bb.max, bb.min );
+
 				var margin = 0.15,
 
-					width  = bb.z[ 1 ] - bb.z[ 0 ],
-					height = bb.x[ 1 ] - bb.x[ 0 ],
-					depth  = bb.y[ 1 ] - bb.y[ 0 ],
+				width  = dimensions.z,
+				height = dimensions.x,
+				depth  = dimensions.y,
 
-					left   = bb.z[ 0 ] - margin * width,
-					right  = bb.z[ 1 ] + margin * width,
+				left   = bb.min.z - margin * width,
+				right  = bb.max.z + margin * width,
 
-					top    = bb.x[ 1 ] + margin * height,
-					bottom = bb.x[ 0 ] - margin * height,
+				top    = bb.max.x + margin * height,
+				bottom = bb.min.x - margin * height,
 
-					near = bb.y[ 1 ] + margin * depth,
-					far  = bb.y[ 0 ] - margin * depth;
+				near = bb.max.y + margin * depth,
+				far  = bb.min.y - margin * depth;
 
 				var topCamera = new THREE.OrthographicCamera( left, right, top, bottom, near, far );
-				topCamera.position.y = bb.y[ 1 ];
+				topCamera.position.y = bb.max.y;
 				topCamera.lookAt( shadowScene.position );
 
 				var renderShadow = new THREE.RenderPass( shadowScene, topCamera );
@@ -669,8 +672,8 @@
 				var bb = object.bodyMesh.geometry.boundingBox;
 
 				var ss = object.modelScale * 1.0;
-				var shadowWidth  = ss * ( bb.z[ 1 ] - bb.z[ 0 ] );
-				var shadowHeight = 1.25 * ss * ( bb.x[ 1 ] - bb.x[ 0 ] );
+				var shadowWidth  =        ss * ( bb.max.z - bb.min.z );
+				var shadowHeight = 1.25 * ss * ( bb.max.x - bb.min.x );
 
 				var shadowPlane = new THREE.PlaneGeometry( shadowWidth, shadowHeight );
 				var shadowMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff, opacity: 0.5, transparent: true,

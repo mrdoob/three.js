@@ -482,11 +482,12 @@ THREE.GeometryUtils = {
 
 		geometry.computeBoundingBox();
 
+		var bb = geometry.boundingBox;
+
 		var offset = new THREE.Vector3();
 
-		offset.x = - 0.5 * ( geometry.boundingBox.x[ 1 ] + geometry.boundingBox.x[ 0 ] );
-		offset.y = - 0.5 * ( geometry.boundingBox.y[ 1 ] + geometry.boundingBox.y[ 0 ] );
-		offset.z = - 0.5 * ( geometry.boundingBox.z[ 1 ] + geometry.boundingBox.z[ 0 ] );
+		offset.add( bb.min, bb.max );
+		offset.multiplyScalar( -0.5 );
 
 		geometry.applyMatrix( new THREE.Matrix4().setTranslation( offset.x, offset.y, offset.z ) );
 		geometry.computeBoundingBox();

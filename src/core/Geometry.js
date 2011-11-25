@@ -341,45 +341,55 @@ THREE.Geometry.prototype = {
 
 	computeBoundingBox: function () {
 
-		var vertex;
-
 		if ( this.vertices.length > 0 ) {
 
-			this.boundingBox = { 'x': [ this.vertices[ 0 ].position.x, this.vertices[ 0 ].position.x ],
-			'y': [ this.vertices[ 0 ].position.y, this.vertices[ 0 ].position.y ],
-			'z': [ this.vertices[ 0 ].position.z, this.vertices[ 0 ].position.z ] };
+			var position, firstPosition = this.vertices[ 0 ].position;
+
+			if ( ! this.boundingBox ) {
+
+				this.boundingBox = { min: firstPosition.clone(), max: firstPosition.clone() };
+
+			} else {
+
+				this.boundingBox.min.copy( firstPosition );
+				this.boundingBox.max.copy( firstPosition );
+
+			}
+
+			var min = this.boundingBox.min,
+				max = this.boundingBox.max;
 
 			for ( var v = 1, vl = this.vertices.length; v < vl; v ++ ) {
 
-				vertex = this.vertices[ v ];
+				position = this.vertices[ v ].position;
 
-				if ( vertex.position.x < this.boundingBox.x[ 0 ] ) {
+				if ( position.x < min.x ) {
 
-					this.boundingBox.x[ 0 ] = vertex.position.x;
+					min.x = position.x;
 
-				} else if ( vertex.position.x > this.boundingBox.x[ 1 ] ) {
+				} else if ( position.x > max.x ) {
 
-					this.boundingBox.x[ 1 ] = vertex.position.x;
-
-				}
-
-				if ( vertex.position.y < this.boundingBox.y[ 0 ] ) {
-
-					this.boundingBox.y[ 0 ] = vertex.position.y;
-
-				} else if ( vertex.position.y > this.boundingBox.y[ 1 ] ) {
-
-					this.boundingBox.y[ 1 ] = vertex.position.y;
+					max.x = position.x;
 
 				}
 
-				if ( vertex.position.z < this.boundingBox.z[ 0 ] ) {
+				if ( position.y < min.y ) {
 
-					this.boundingBox.z[ 0 ] = vertex.position.z;
+					min.y = position.y;
 
-				} else if ( vertex.position.z > this.boundingBox.z[ 1 ] ) {
+				} else if ( position.y > max.y ) {
 
-					this.boundingBox.z[ 1 ] = vertex.position.z;
+					max.y = position.y;
+
+				}
+
+				if ( position.z < min.z ) {
+
+					min.z = position.z;
+
+				} else if ( position.z > max.z ) {
+
+					max.z = position.z;
 
 				}
 

@@ -173,7 +173,7 @@
 				text3d.computeVertexNormals();
 				text3d.computeBoundingBox();
 
-				var centerOffset = -0.5 * ( text3d.boundingBox.x[ 1 ] - text3d.boundingBox.x[ 0 ] );
+				var centerOffset = -0.5 * ( text3d.boundingBox.max.x - text3d.boundingBox.min.x );
 
 				text = new THREE.Mesh( text3d, new THREE.MeshFaceMaterial() );
 

@@ -493,7 +493,7 @@
 
 				}
 
-				var centerOffset = -0.5 * ( textGeo.boundingBox.x[ 1 ] - textGeo.boundingBox.x[ 0 ] );
+				var centerOffset = -0.5 * ( textGeo.boundingBox.max.x - textGeo.boundingBox.min.x );
 
 				textMesh1 = new THREE.Mesh( textGeo, faceMaterial );
 

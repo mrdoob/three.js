@@ -20,9 +20,7 @@ THREE.Car = function () {
 	//	- other wheels are mirrored against car root
 	//	- if necessary back wheels can be offset manually
 
-	this.wheelOffsetX = 0;
-	this.wheelOffsetY = 0;
-	this.wheelOffsetZ = 0;
+	this.wheelOffset = new THREE.Vector3();
 
 	this.wheelDiameter = 1;
 
@@ -266,15 +264,10 @@ THREE.Car = function () {
 
 				var bb = scope.wheelGeometry.boundingBox;
 
-				var dx = 0.5 * ( bb.x[ 1 ] + bb.x[ 0 ] );
-				var dy = 0.5 * ( bb.y[ 1 ] + bb.y[ 0 ] );
-				var dz = 0.5 * ( bb.z[ 1 ] + bb.z[ 0 ] );
+				scope.wheelOffset.add( bb.min, bb.max );
+				scope.wheelOffset.multiplyScalar( 0.5 );
 
-				scope.wheelOffsetX = dx;
-				scope.wheelOffsetY = dy;
-				scope.wheelOffsetZ = dz;
-
-				scope.wheelDiameter = bb.y[ 1 ] - bb.y[ 0 ];
+				scope.wheelDiameter = bb.max.y - bb.min.y;
 
 				THREE.GeometryUtils.center( scope.wheelGeometry );
 
@@ -282,8 +275,8 @@ THREE.Car = function () {
 
 			// rig the car
 
-			var delta,
-				s = scope.modelScale,
+			var s = scope.modelScale,
+				delta = new THREE.Vector3(),
 				faceMaterial = new THREE.MeshFaceMaterial();
 
 			// body
@@ -295,7 +288,7 @@ THREE.Car = function () {
 
 			// front left wheel
 
-			delta = new THREE.Vector3( s * scope.wheelOffsetX, s * scope.wheelOffsetY, s * scope.wheelOffsetZ );
+			delta.multiply( scope.wheelOffset, new THREE.Vector3( s, s, s ) );
 
 			scope.frontLeftWheelRoot.position.addSelf( delta );
 
@@ -307,7 +300,7 @@ THREE.Car = function () {
 
 			// front right wheel
 
-			delta = new THREE.Vector3( -s * scope.wheelOffsetX, s * scope.wheelOffsetY, s * scope.wheelOffsetZ );
+			delta.multiply( scope.wheelOffset, new THREE.Vector3( -s, s, s ) );
 
 			scope.frontRightWheelRoot.position.addSelf( delta );
 
@@ -321,7 +314,8 @@ THREE.Car = function () {
 
 			// back left wheel
 
-			delta = new THREE.Vector3( s * scope.wheelOffsetX, s * scope.wheelOffsetY, - s * scope.wheelOffsetZ - scope.backWheelOffset );
+			delta.multiply( scope.wheelOffset, new THREE.Vector3( s, s, -s ) );
+			delta.z -= scope.backWheelOffset;
 
 			scope.backLeftWheelMesh = new THREE.Mesh( scope.wheelGeometry, faceMaterial );
 
@@ -332,7 +326,8 @@ THREE.Car = function () {
 
 			// back right wheel
 
-			delta = new THREE.Vector3( -s * scope.wheelOffsetX, s * scope.wheelOffsetY, - s * scope.wheelOffsetZ - scope.backWheelOffset )
+			delta.multiply( scope.wheelOffset, new THREE.Vector3( -s, s, -s ) );
+			delta.z -= scope.backWheelOffset;
 
 			scope.backRightWheelMesh = new THREE.Mesh( scope.wheelGeometry, faceMaterial );
 

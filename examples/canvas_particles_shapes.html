@@ -92,7 +92,7 @@
 				});
 
 				text3d.computeBoundingBox();
-				var centerOffset = -0.5 * ( text3d.boundingBox.x[ 1 ] - text3d.boundingBox.x[ 0 ] );
+				var centerOffset = -0.5 * ( text3d.boundingBox.max.x - text3d.boundingBox.min.x );
 
 				var textMaterial = new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, overdraw: true } );
 
@@ -174,26 +174,26 @@
 					//hearts circleLines
 					var material = new THREE.ParticleCanvasMaterial( {  program: hearts, blending:THREE.AdditiveBlending } );
 
-					material.color.setHSV(hue, 0.5, 1); 
+					material.color.setHSV(hue, 0.5, 1);
 					hue += 0.001;
 					if (hue>1) hue-=1;
 
 					particle = new THREE.Particle( material );
 
 					particle.scale.x = particle.scale.y = Math.random() * 20 +20;
-					particleCloud.add( particle );	
+					particleCloud.add( particle );
 
 					return particle;
 				};
 
 				var onParticleCreated = function(p) {
 					var position = p.position;
-					p.target.position = position;	
+					p.target.position = position;
 				};
 
 				var onParticleDead = function(particle) {
 					particle.target.visible = false;
-					particleCloud.remove(particle.target); 
+					particleCloud.remove(particle.target);
 				};
 
 				sparksEmitter = new SPARKS.Emitter(new SPARKS.SteadyCounter(160));
@@ -210,7 +210,7 @@
 
 				sparksEmitter.addAction(new SPARKS.Age());
 				//sparksEmitter.addAction(new SPARKS.Accelerate(0.2));
-				sparksEmitter.addAction(new SPARKS.Move()); 
+				sparksEmitter.addAction(new SPARKS.Move());
 				sparksEmitter.addAction(new SPARKS.RandomDrift(50,50,2000));
 
 				sparksEmitter.addCallback("created", onParticleCreated);
