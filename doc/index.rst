@@ -11,8 +11,8 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   generated/_global_.rst
    generated/THREE.rst
+   generated/core/THREE.Color.rst
 
 Indices and tables
 ==================
