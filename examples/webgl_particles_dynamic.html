@@ -280,8 +280,7 @@
 					mesh: mesh, vertices: geometry.vertices, vertices_tmp: vertices_tmp, vl: vl,
 					down: 0, up: 0, direction: 0, speed: 35, delay: Math.floor( 200 + 200 * Math.random() ),
 					started: false, start: Math.floor( 100 + 200 * Math.random() ),
-					dynamic: dynamic,
-					bb: geometry.boundingBox
+					dynamic: dynamic
 				} );
 
 			}
@@ -298,7 +297,7 @@
 
 			function render () {
 
-				delta = 10 * clock.getDelta();;
+				delta = 10 * clock.getDelta();
 
 				delta = delta < 2 ? delta : 2;
 

@@ -5,6 +5,8 @@
 
 THREE.GeometryUtils = {
 
+	// Merge two geometries or geometry and geometry from object (using object's transform)
+
 	merge: function ( geometry1, object2 /* mesh | geometry */ ) {
 
 		var matrix, matrixRotation,
@@ -104,6 +106,8 @@ THREE.GeometryUtils = {
 				if ( materialIndex === undefined ) {
 
 					materialIndex = geometry1.materials.length;
+					geo1MaterialsMap[ materialId2 ] = materialIndex;
+
 					geometry1.materials.push( material2 );
 
 				}
@@ -234,7 +238,7 @@ THREE.GeometryUtils = {
 	// 	(uniform distribution)
 	// 	http://www.cgafaq.info/wiki/Random_Point_In_Triangle
 
-	randomPointInTriangle: function( vectorA, vectorB, vectorC ) {
+	randomPointInTriangle: function ( vectorA, vectorB, vectorC ) {
 
 		var a, b, c,
 			point = new THREE.Vector3(),
@@ -272,7 +276,7 @@ THREE.GeometryUtils = {
 	// Get random point in face (triangle / quad)
 	// (uniform distribution)
 
-	randomPointInFace: function( face, geometry, useCachedAreas ) {
+	randomPointInFace: function ( face, geometry, useCachedAreas ) {
 
 		var vA, vB, vC, vD;
 
@@ -339,7 +343,7 @@ THREE.GeometryUtils = {
 	//  - find corresponding place in area array by binary search
 	//	- get random point in face
 
-	randomPointsInGeometry: function( geometry, n ) {
+	randomPointsInGeometry: function ( geometry, n ) {
 
 		var face, i,
 			faces = geometry.faces,
@@ -452,7 +456,7 @@ THREE.GeometryUtils = {
 	// Get triangle area (by Heron's formula)
 	// 	http://en.wikipedia.org/wiki/Heron%27s_formula
 
-	triangleArea: function( vectorA, vectorB, vectorC ) {
+	triangleArea: function ( vectorA, vectorB, vectorC ) {
 
 		var s, a, b, c,
 			tmp = THREE.GeometryUtils.__v1;
@@ -472,24 +476,49 @@ THREE.GeometryUtils = {
 
 	},
 
-	center: function( geometry ) {
+	// Center geometry so that 0,0,0 is in center of bounding box
+
+	center: function ( geometry ) {
 
 		geometry.computeBoundingBox();
 
-		var matrix = new THREE.Matrix4();
+		var bb = geometry.boundingBox;
 
-		var dx = -0.5 * ( geometry.boundingBox.x[ 1 ] + geometry.boundingBox.x[ 0 ] );
-		var dy = -0.5 * ( geometry.boundingBox.y[ 1 ] + geometry.boundingBox.y[ 0 ] );
-		var dz = -0.5 * ( geometry.boundingBox.z[ 1 ] + geometry.boundingBox.z[ 0 ] );
+		var offset = new THREE.Vector3();
 
-		matrix.setTranslation( dx, dy, dz );
+		offset.add( bb.min, bb.max );
+		offset.multiplyScalar( -0.5 );
 
-		geometry.applyMatrix( matrix );
-
+		geometry.applyMatrix( new THREE.Matrix4().setTranslation( offset.x, offset.y, offset.z ) );
 		geometry.computeBoundingBox();
+
+		return offset;
+
+	},
+
+	// Normalize UVs to be from <0,1>
+	// (for now just the first set of UVs)
+
+	normalizeUVs: function ( geometry ) {
+
+		var uvSet = geometry.faceVertexUvs[ 0 ];
+
+		for ( var i = 0, il = uvSet.length; i < il; i ++ ) {
+
+			var uvs = uvSet[ i ];
+
+			for ( var j = 0, jl = uvs.length; j < jl; j ++ ) {
+
+				// texture repeat
+
+				if( uvs[ j ].u !== 1.0 ) uvs[ j ].u = uvs[ j ].u - Math.floor( uvs[ j ].u );
+				if( uvs[ j ].v !== 1.0 ) uvs[ j ].v = uvs[ j ].v - Math.floor( uvs[ j ].v );
+
+			}
+
+		}
 
 	}
-
 
 };
 

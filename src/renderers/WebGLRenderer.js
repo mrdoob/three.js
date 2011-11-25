@@ -88,7 +88,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			calls: 0,
 			vertices: 0,
-			faces: 0
+			faces: 0,
+			points: 0
 
 		}
 
@@ -2897,6 +2898,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.drawArrays( _gl.POINTS, 0, geometryGroup.__webglParticleCount );
 
 			_this.info.render.calls ++;
+			_this.info.render.points += geometryGroup.__webglParticleCount;
 
 		// render ribbon
 
@@ -3039,6 +3041,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_this.info.render.calls = 0;
 		_this.info.render.vertices = 0;
 		_this.info.render.faces = 0;
+		_this.info.render.points = 0;
 
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
@@ -3072,7 +3075,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( object.visible ) {
 
-				if ( ! ( object instanceof THREE.Mesh ) || ! ( object.frustumCulled ) || _frustum.contains( object ) ) {
+				if ( ! ( object instanceof THREE.Mesh || object instanceof THREE.ParticleSystem ) || ! ( object.frustumCulled ) || _frustum.contains( object ) ) {
 
 					object.matrixWorld.flattenToArray( object._objectMatrixArray );
 
