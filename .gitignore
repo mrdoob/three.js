@@ -1,3 +1,5 @@
 .DS_Store
 *.swp
 .project
+doc/_build/*
+doc/generated/*

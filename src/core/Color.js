@@ -2,6 +2,11 @@
  * @author mr.doob / http://mrdoob.com/
  */
 
+/**
+ * Represents a color
+ * @constructor
+ * @param {integer} hex color value in hex
+ */
 THREE.Color = function ( hex ) {
 
 	if ( hex !== undefined ) this.setHex( hex );
@@ -15,6 +20,11 @@ THREE.Color.prototype = {
 
 	r: 1, g: 1, b: 1,
 
+	/**
+	 * Copy a color
+	 * @param {THREE.Color} color source color to copy
+	 * @returns {THREE.Color}
+	 */
 	copy: function ( color ) {
 
 		this.r = color.r;
@@ -25,6 +35,11 @@ THREE.Color.prototype = {
 
 	},
 
+	/**
+	 * Copies a gamma color to a linear color
+	 * @param {THREE.Color} color a gamma color
+	 * @returns {THREE.Color}
+	 */
 	copyGammaToLinear: function ( color ) {
 
 		this.r = color.r * color.r;
@@ -35,6 +50,11 @@ THREE.Color.prototype = {
 
 	},
 
+    /**
+     * Copies a linear color to a gamma color
+     * @param {THREE.Color} color a linear color
+     * @returns {THREE.Color}
+     */
 	copyLinearToGamma: function ( color ) {
 
 		this.r = Math.sqrt( color.r );
@@ -45,6 +65,12 @@ THREE.Color.prototype = {
 
 	},
 
+	/**
+	 * Sets the color value given RGB values
+	 * @param {float} r red channel (between 0 and 1)
+	 * @param {float} g green channel (between 0 and 1)
+	 * @param {float} b blue channel (between 0 and 1)
+	 */
 	setRGB: function ( r, g, b ) {
 
 		this.r = r;
@@ -55,6 +81,13 @@ THREE.Color.prototype = {
 
 	},
 
+	/**
+	 * Sets the color given HSV values.
+	 * Based on MochiKit implementation by Bob Ippolito.
+	 * @param {float} h hue (between 0 and 1)
+	 * @param {float} s saturation (between 0 and 1)
+	 * @param {float} v value (between 0 and 1)
+	 */
 	setHSV: function ( h, s, v ) {
 
 		// based on MochiKit implementation by Bob Ippolito
@@ -92,6 +125,10 @@ THREE.Color.prototype = {
 
 	},
 
+	/**
+	 * Sets this color from a hex value
+	 * @param {integer} hex Hex integer value of color
+	 */
 	setHex: function ( hex ) {
 
 		hex = Math.floor( hex );
@@ -104,18 +141,30 @@ THREE.Color.prototype = {
 
 	},
 
+	/**
+	 * Gets the color value as hex
+	 * @returns {integer} The color as a hex value
+	 */
 	getHex: function () {
 
 		return Math.floor( this.r * 255 ) << 16 ^ Math.floor( this.g * 255 ) << 8 ^ Math.floor( this.b * 255 );
 
 	},
 
+	/**
+	 * Gets the color value in string format for use as CSS for a canvas context.
+	 * @returns {string} The color in the form ``rgb(red,green,blue)``.
+	 */
 	getContextStyle: function () {
 
 		return 'rgb(' + Math.floor( this.r * 255 ) + ',' + Math.floor( this.g * 255 ) + ',' + Math.floor( this.b * 255 ) + ')';
 
 	},
 
+	/**
+	 * Returns a copy of this color
+	 * @returns {THREE.Color}
+	 */
 	clone: function () {
 
 		return new THREE.Color().setRGB( this.r, this.g, this.b );
