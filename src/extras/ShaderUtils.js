@@ -204,7 +204,7 @@ THREE.ShaderUtils = {
 					"if( enableSpecular )",
 						"specularTex = texture2D( tSpecular, vUv ).xyz;",
 
-					"mat3 tsb = mat3( vTangent, vBinormal, vNormal );",
+					"mat3 tsb = mat3( normalize( vTangent ), normalize( vBinormal ), normalize( vNormal ) );",
 					"vec3 finalNormal = tsb * normalTex;",
 
 					"vec3 normal = normalize( finalNormal );",
@@ -287,7 +287,7 @@ THREE.ShaderUtils = {
 						"vec3 wPos = cameraPosition - vViewPosition;",
 						"vec3 vReflect = reflect( normalize( wPos ), normal );",
 						"vec4 cubeColor = textureCube( tCube, vec3( -vReflect.x, vReflect.yz ) );",
-						"gl_FragColor.xyz = mix( gl_FragColor.xyz, cubeColor.xyz, uReflectivity );",
+						"gl_FragColor.xyz = mix( gl_FragColor.xyz, cubeColor.xyz, specularTex.r * uReflectivity );",
 
 					"}",
 
@@ -337,14 +337,11 @@ THREE.ShaderUtils = {
 
 					"vViewPosition = -mvPosition.xyz;",
 
-					"vNormal = normalize( normalMatrix * normal );",
+					// normal, tangent and binormal vectors
 
-					// tangent and binormal vectors
-
-					"vTangent = normalize( normalMatrix * tangent.xyz );",
-
+					"vNormal = normalMatrix * normal;",
+					"vTangent = normalMatrix * tangent.xyz;",
 					"vBinormal = cross( vNormal, vTangent ) * tangent.w;",
-					"vBinormal = normalize( vBinormal );",
 
 					"vUv = uv * uRepeat + uOffset;",
 
@@ -377,7 +374,7 @@ THREE.ShaderUtils = {
 
 						"vec3 dv = texture2D( tDisplacement, uv ).xyz;",
 						"float df = uDisplacementScale * dv.x + uDisplacementBias;",
-						"vec4 displacedPosition = vec4( vNormal.xyz * df, 0.0 ) + mvPosition;",
+						"vec4 displacedPosition = vec4( normalize( vNormal.xyz ) * df, 0.0 ) + mvPosition;",
 						"gl_Position = projectionMatrix * displacedPosition;",
 
 					"#else",
