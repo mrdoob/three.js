@@ -121,7 +121,7 @@ This code creates a camera, then creates a scene, adds a cube on it, creates a &
 
 	function animate() {
 
-		// Include examples/js/RequestAnimationFrame.js for cross-browser compatibility.
+		// note: three.js enables requestAnimationFrame()
 		requestAnimationFrame( animate );
 		render();
 
