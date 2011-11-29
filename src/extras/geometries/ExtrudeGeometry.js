@@ -22,8 +22,8 @@
  *  extrudePath:	<THREE.CurvePath>	// path to extrude shape along
  *  bendPath:		<THREE.CurvePath> 	// path to bend the geometry around
  *
- *  material:		 <THREE.Material>	// material for front and back faces
- *  extrudeMaterial: <THREE.Material>	// material for extrusion and beveled faces
+ *  material:		 <int>	// material index for front and back faces
+ *  extrudeMaterial: <int>	// material index for extrusion and beveled faces
  *
  *  }
   **/
@@ -621,7 +621,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 				f4( a, b, c, d );
 
-				if ( extrudeMaterial ) {
+				if ( extrudeMaterial !== undefined ) {
 
 					var v1 = s / sl;
 					var v2 = ( s + 1 ) / sl;
@@ -664,21 +664,21 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 		scope.faces.push( new THREE.Face3( a, b, c, null, null, material ) );
 		//normal, color, materials
 
-		if ( material ) {
+		if ( material !== undefined ) {
 
 			var mx = shapebb.minX, my = shapebb.minY;
 
 			var uy = shapebb.maxY; // - shapebb.minY;
 			var ux = shapebb.maxX; // - shapebb.minX;
 
-			var ax = scope.vertices[ a ].position.x,
-				ay = scope.vertices[ a ].position.y,
+			var ax = scope.vertices[ a ].position.x - mx,
+				ay = scope.vertices[ a ].position.y - my,
 
-				bx = scope.vertices[ b ].position.x,
-				by = scope.vertices[ b ].position.y,
+				bx = scope.vertices[ b ].position.x - mx,
+				by = scope.vertices[ b ].position.y - my,
 
-				cx = scope.vertices[ c ].position.x,
-				cy = scope.vertices[ c ].position.y;
+				cx = scope.vertices[ c ].position.x - mx,
+				cy = scope.vertices[ c ].position.y - my;
 
 			scope.faceVertexUvs[ 0 ].push( [
 
