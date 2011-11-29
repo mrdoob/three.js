@@ -15,12 +15,12 @@ THREE.PlaneGeometry = function ( width, height, segmentsWidth, segmentsHeight ) 
 	gridX1 = gridX + 1,
 	gridY1 = gridY + 1,
 	segment_width = width / gridX,
-	segment_height = height / gridY;
+	segment_height = height / gridY,
+	normal = new THREE.Vector3( 0, 0, 1 );
 
+	for ( iy = 0; iy < gridY1; iy++ ) {
 
-	for( iy = 0; iy < gridY1; iy++ ) {
-
-		for( ix = 0; ix < gridX1; ix++ ) {
+		for ( ix = 0; ix < gridX1; ix++ ) {
 
 			var x = ix * segment_width - width_half;
 			var y = iy * segment_height - height_half;
@@ -31,16 +31,20 @@ THREE.PlaneGeometry = function ( width, height, segmentsWidth, segmentsHeight ) 
 
 	}
 
-	for( iy = 0; iy < gridY; iy++ ) {
+	for ( iy = 0; iy < gridY; iy++ ) {
 
-		for( ix = 0; ix < gridX; ix++ ) {
+		for ( ix = 0; ix < gridX; ix++ ) {
 
 			var a = ix + gridX1 * iy;
 			var b = ix + gridX1 * ( iy + 1 );
 			var c = ( ix + 1 ) + gridX1 * ( iy + 1 );
 			var d = ( ix + 1 ) + gridX1 * iy;
 
-			this.faces.push( new THREE.Face4( a, b, c, d ) );
+			var face = new THREE.Face4( a, b, c, d );
+			face.normal.copy( normal );
+			face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone(), normal.clone() );
+
+			this.faces.push( face );
 			this.faceVertexUvs[ 0 ].push( [
 						new THREE.UV( ix / gridX, iy / gridY ),
 						new THREE.UV( ix / gridX, ( iy + 1 ) / gridY ),
@@ -53,7 +57,6 @@ THREE.PlaneGeometry = function ( width, height, segmentsWidth, segmentsHeight ) 
 	}
 
 	this.computeCentroids();
-	this.computeFaceNormals();
 
 };
 

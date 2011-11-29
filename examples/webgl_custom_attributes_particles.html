@@ -181,14 +181,6 @@
 
 		}
 
-		function cap( x, a, b ) {
-
-			return ( x < a ) ? a : ( ( x > b ) ? b : x );
-
-		}
-
-		var i, value;
-
 		function animate() {
 
 			requestAnimationFrame( animate );
@@ -200,11 +192,11 @@
 
 		function render() {
 
-			var time = new Date().getTime() * 0.005;
+			var time = Date.now() * 0.005;
 
 			sphere.rotation.z = 0.01 * time;
 
-			for( i = 0; i < attributes.size.value.length; i++ ) {
+			for( var i = 0; i < attributes.size.value.length; i++ ) {
 
 				attributes.size.value[ i ] = 14 + 13 * Math.sin( 0.1 * i + time );
 

@@ -53,6 +53,8 @@
 
 			var cross;
 
+			var clock = new THREE.Clock();
+
 			init();
 			animate();
 
@@ -140,7 +142,7 @@
 
 			function render() {
 
-				controls.update();
+				controls.update( clock.getDelta() );
 				renderer.render( scene, camera );
 
 			}

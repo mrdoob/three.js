@@ -69,7 +69,7 @@
 
 				geometry = new THREE.Geometry();
 
-				for ( i = 0; i < 4000; i++ ) {
+				for ( i = 0; i < 20000; i ++ ) {
 
 					vector = new THREE.Vector3( Math.random() * 2000 - 1000, Math.random() * 2000 - 1000, Math.random() * 2000 - 1000 );
 					geometry.vertices.push( new THREE.Vertex( vector ) );
@@ -80,7 +80,7 @@
 				//parameters = [ [ 0xff0000, 5 ], [ 0xff3300, 4 ], [ 0xff6600, 3 ], [ 0xff9900, 2 ], [ 0xffaa00, 1 ] ];
 				//parameters = [ [ 0xffffff, 5 ], [ 0xdddddd, 4 ], [ 0xaaaaaa, 3 ], [ 0x999999, 2 ], [ 0x777777, 1 ] ];
 
-				for ( i = 0; i < parameters.length; i++ ) {
+				for ( i = 0; i < parameters.length; i ++ ) {
 
 					size  = parameters[i][1];
 					color = parameters[i][0];
@@ -160,20 +160,20 @@
 
 			function render() {
 
-				var time = new Date().getTime() * 0.00005;
+				var time = Date.now() * 0.00005;
 
 				camera.position.x += ( mouseX - camera.position.x ) * 0.05;
 				camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
 
 				camera.lookAt( scene.position );
 
-				for( i = 0; i < scene.objects.length; i++ ) {
+				for( i = 0; i < scene.objects.length; i ++ ) {
 
 					scene.objects[i].rotation.y = time * ( i < 4 ? i+1 : - (i+1) );
 
 				}
 
-				for( i = 0; i < materials.length; i++ ) {
+				for( i = 0; i < materials.length; i ++ ) {
 
 					color = parameters[i][0];
 

@@ -2,12 +2,12 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Ribbon = function ( geometry, materials ) {
+THREE.Ribbon = function ( geometry, material ) {
 
 	THREE.Object3D.call( this );
 
 	this.geometry = geometry;
-	this.materials = materials instanceof Array ? materials : [ materials ];
+	this.material = material;
 
 };
 

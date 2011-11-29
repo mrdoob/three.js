@@ -1,27 +1,28 @@
-// Converted from: ../../examples/obj/gallardo/GallardoNoUv.obj
-//  vertices: 77815
-//  faces: 75573
-//  materials: 7
-//
-//  Generated with OBJ -> Three.js converter
-//  http://github.com/alteredq/three.js/blob/master/utils/exporters/convert_obj_three.py
+{
 
-
-var model = {
-
-    "version" : 1,
+    "metadata" :
+    {
+        "formatVersion" : 3,
+        "sourceFile"    : "GallardoNoUv.obj",
+        "generatedBy"   : "OBJConverter",
+        "vertices"      : 77815,
+        "faces"         : 75573,
+        "normals"       : 55191,
+        "uvs"           : 0,
+        "materials"     : 7
+    },
 
     "materials": [	{
 	"DbgColor" : 15658734,
 	"DbgIndex" : 0,
 	"DbgName" : "wire_255255255",
 	"colorAmbient" : [0.0, 0.0, 0.0],
-	"colorDiffuse" : [0.80000000000000004, 0.80000000000000004, 0.80000000000000004],
-	"colorSpecular" : [0.17499999999999999, 0.17499999999999999, 0.17499999999999999],
+	"colorDiffuse" : [0.8, 0.8, 0.8],
+	"colorSpecular" : [0.175, 0.175, 0.175],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 29.411765,
-	"transparency" : 1.0
+	"transparency" : 0.0
 	},
 
 	{
@@ -29,12 +30,12 @@ var model = {
 	"DbgIndex" : 1,
 	"DbgName" : "wire_115115115",
 	"colorAmbient" : [0.0, 0.0, 0.0],
-	"colorDiffuse" : [0.36080000000000001, 0.36080000000000001, 0.36080000000000001],
-	"colorSpecular" : [0.17499999999999999, 0.17499999999999999, 0.17499999999999999],
+	"colorDiffuse" : [0.3608, 0.3608, 0.3608],
+	"colorSpecular" : [0.175, 0.175, 0.175],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 29.411765,
-	"transparency" : 1.0
+	"transparency" : 0.0
 	},
 
 	{
@@ -42,12 +43,12 @@ var model = {
 	"DbgIndex" : 2,
 	"DbgName" : "03___Default",
 	"colorAmbient" : [0.0, 0.0, 0.0],
-	"colorDiffuse" : [0.13175999999999999, 0.13175999999999999, 0.13175999999999999],
+	"colorDiffuse" : [0.13176, 0.13176, 0.13176],
 	"colorSpecular" : [0.0, 0.0, 0.0],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 7.843137,
-	"transparency" : 1.0
+	"transparency" : 0.0
 	},
 
 	{
@@ -55,12 +56,12 @@ var model = {
 	"DbgIndex" : 3,
 	"DbgName" : "02___Default",
 	"colorAmbient" : [0.0, 0.0, 0.0],
-	"colorDiffuse" : [0.80000000000000004, 0.0, 0.0],
-	"colorSpecular" : [0.65249999999999997, 0.65249999999999997, 0.65249999999999997],
+	"colorDiffuse" : [0.8, 0.0, 0.0],
+	"colorSpecular" : [0.6525, 0.6525, 0.6525],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 25.490196,
-	"transparency" : 1.0
+	"transparency" : 0.0
 	},
 
 	{
@@ -68,12 +69,12 @@ var model = {
 	"DbgIndex" : 4,
 	"DbgName" : "wire_255000000",
 	"colorAmbient" : [0.0, 0.0, 0.0],
-	"colorDiffuse" : [0.80000000000000004, 0.0, 0.0],
-	"colorSpecular" : [0.17499999999999999, 0.17499999999999999, 0.17499999999999999],
+	"colorDiffuse" : [0.8, 0.0, 0.0],
+	"colorSpecular" : [0.175, 0.175, 0.175],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 29.411765,
-	"transparency" : 1.0
+	"transparency" : 0.0
 	},
 
 	{
@@ -81,12 +82,12 @@ var model = {
 	"DbgIndex" : 5,
 	"DbgName" : "wire_252252000",
 	"colorAmbient" : [0.0, 0.0, 0.0],
-	"colorDiffuse" : [0.79056000000000004, 0.79056000000000004, 0.0],
-	"colorSpecular" : [0.17499999999999999, 0.17499999999999999, 0.17499999999999999],
+	"colorDiffuse" : [0.79056, 0.79056, 0.0],
+	"colorSpecular" : [0.175, 0.175, 0.175],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 29.411765,
-	"transparency" : 1.0
+	"transparency" : 0.0
 	},
 
 	{
@@ -95,16 +96,13 @@ var model = {
 	"DbgName" : "wire_132132132",
 	"colorAmbient" : [0.0, 0.0, 0.0],
 	"colorDiffuse" : [0.41408, 0.41408, 0.41408],
-	"colorSpecular" : [0.17499999999999999, 0.17499999999999999, 0.17499999999999999],
+	"colorSpecular" : [0.175, 0.175, 0.175],
 	"illumination" : 2,
 	"opticalDensity" : 1.0,
 	"specularCoef" : 29.411765,
-	"transparency" : 1.0
+	"transparency" : 0.0
 	}],
 
     "buffers": "GallardoNoUv_bin.bin"
 
-};
-    
-postMessage( model );
-close();
+}

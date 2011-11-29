@@ -89,7 +89,7 @@
 				// Spheres
 
 				var geometry = new THREE.SphereGeometry( 100, 16, 8 );
-				var material = new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading } );
+				var material = new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, overdraw: true } );
 
 				for ( var i = 0; i < 30; i ++ ) {
 
@@ -98,15 +98,13 @@
 					mesh.position.y = 500 * ( Math.random() - 0.5 );
 					mesh.position.z = 500 * ( Math.random() - 0.5 );
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = 0.25 * ( Math.random() + 0.5 );
-					mesh.overdraw = true;
 					scene.add( mesh );
 
 				}
 
 				// Torus
 
-				mesh = new THREE.Mesh( new THREE.TorusGeometry( 100, 25, 15, 30 ), new THREE.MeshLambertMaterial( { color: 0xffffff } ) );
-				mesh.overdraw = true;
+				mesh = new THREE.Mesh( new THREE.TorusGeometry( 100, 25, 15, 30 ), new THREE.MeshLambertMaterial( { color: 0xffffff, overdraw: true } ) );
 				scene.add( mesh );
 
 				// Lights
@@ -115,22 +113,17 @@
 				scene.add( ambient );
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff );
-				directionalLight.position.y = -70;
-				directionalLight.position.z = 100;
-				directionalLight.position.normalize();
+				directionalLight.position.set( 0, -70, 100 ).normalize();
 				scene.add( directionalLight );
 
 				pointLight = new THREE.PointLight( 0xffaa00 );
-				pointLight.position.x = 0;
-				pointLight.position.y = 0;
-				pointLight.position.z = 0;
 				scene.add( pointLight );
 
 				lightMesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) );
 				lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
 				lightMesh.position = pointLight.position;
 				lightMesh.overdraw = true;
-				scene.add(lightMesh);
+				scene.add( lightMesh );
 
 
 				if ( render_canvas ) {

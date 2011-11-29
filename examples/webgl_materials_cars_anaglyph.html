@@ -164,6 +164,8 @@
 
 				scene = new THREE.Scene();
 
+				scene.add( camera );
+
 				// LIGHTS
 
 				var ambient = new THREE.AmbientLight( 0x555555 );
@@ -451,7 +453,7 @@
 
 				}
 
-				loader.load( { model: CARS[ "veyron" ].url, callback: function( geometry ) { createScene( geometry, "veyron" ) } } );
+				loader.load( CARS[ "veyron" ].url, function( geometry ) { createScene( geometry, "veyron" ) } );
 
 				for( var c in CARS ) initCarButton( c );
 
@@ -464,7 +466,7 @@
 					if ( ! CARS[ car ].object ) {
 
 						loader.statusDomElement.style.display = "block";
-						loader.load( { model: CARS[ car ].url, callback: function( geometry ) { createScene( geometry, car ) } } );
+						loader.load( CARS[ car ].url, function( geometry ) { createScene( geometry, car ) } );
 
 					} else {
 
@@ -503,7 +505,7 @@
 
 				var buttons, i, src = "";
 
-				for( i = 0; i < materials.length; i++ ) {
+				for( i = 0; i < materials.length; i ++ ) {
 
 					src += '<button id="' + button_name( car, i ) + '">' + materials[ i ][ 0 ] + '</button> ';
 
@@ -520,14 +522,14 @@
 
 			function attachButtonMaterials( materials, geometry, material_indices, car ) {
 
-				for( var i = 0; i < materials.length; i++ ) {
+				for( var i = 0; i < materials.length; i ++ ) {
 
 					$( button_name( car, i ) ).counter = i;
 					$( button_name( car, i ) ).addEventListener( 'click', function() {
 
-						for ( var j = 0; j < material_indices.length; j++ ) {
+						for ( var j = 0; j < material_indices.length; j ++ ) {
 
-							geometry.materials[ material_indices [ j ] ][ 0 ] = materials[ this.counter ][ 1 ];
+							geometry.materials[ material_indices [ j ] ] = materials[ this.counter ][ 1 ];
 
 						}
 
@@ -550,15 +552,18 @@
 
 				for( var i in CARS[ car ].mmap ) {
 
-					geometry.materials[ i ][ 0 ] = CARS[ car ].mmap[ i ];
+					geometry.materials[ i ] = CARS[ car ].mmap[ i ];
 
 				}
 
 				var mesh = new THREE.Mesh( geometry, m );
+
 				mesh.rotation.x = r[ 0 ];
 				mesh.rotation.y = r[ 1 ];
 				mesh.rotation.z = r[ 2 ];
+
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = s;
+
 				scene.add( mesh );
 
 				CARS[ car ].object = mesh;
@@ -591,7 +596,7 @@
 
 			function render() {
 
-				var timer = - new Date().getTime() * 0.0002;
+				var timer = -0.0002 * Date.now();
 
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 

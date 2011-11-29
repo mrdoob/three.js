@@ -96,19 +96,28 @@
 
 				// SPHERES
 
+				var m1 = new THREE.MeshLambertMaterial( { color: 0xffffff } );
+				var m2 = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, wireframeLinewidth: 1.5, transparent: true } );
+
 				sphere = new THREE.SphereGeometry( 100, 16, 8 );
 
 				for ( var i = 0; i < 10; i ++ ) {
 
-					mesh = new THREE.Mesh( sphere, [ new THREE.MeshLambertMaterial( { color: 0xffffff } ), new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true,  wireframeLinewidth: 1.5 } ) ] );
+					var group = new THREE.Object3D();
 
-					mesh.position.x = 500 * ( Math.random() - 0.5 );
-					mesh.position.y = 500 * ( Math.random() - 0.5 );
-					mesh.position.z = 500 * ( Math.random() - 0.5 );
+					group.position.x = 500 * ( Math.random() - 0.5 );
+					group.position.y = 500 * ( Math.random() - 0.5 );
+					group.position.z = 500 * ( Math.random() - 0.5 );
 
-					mesh.scale.x = mesh.scale.y = mesh.scale.z = 0.25 * ( Math.random() + 0.5 );
+					group.scale.x = group.scale.y = group.scale.z = 0.25 * ( Math.random() + 0.5 );
 
-					scene.add( mesh );
+					scene.add( group );
+
+					var mesh1 = new THREE.Mesh( sphere, m1 );
+					var mesh2 = new THREE.Mesh( sphere, m2 );
+
+					group.add( mesh1 );
+					group.add( mesh2 );
 
 				}
 
@@ -119,8 +128,7 @@
 				scene.add( ambient );
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff );
-				directionalLight.position.set( 0, -70, 100 );
-				directionalLight.position.normalize();
+				directionalLight.position.set( 0, -70, 100 ).normalize();
 				scene.add( directionalLight );
 
 				mesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xff0000 } ) );
@@ -129,15 +137,19 @@
 				scene.add( mesh );
 
 				if ( render_gl ) {
+
 					try {
+
 						webglRenderer = new THREE.WebGLRenderer();
 						webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 						webglRenderer.domElement.style.position = "relative";
 						container.appendChild( webglRenderer.domElement );
 						has_gl = 1;
+
 					}
 					catch (e) {
 					}
+
 				}
 
 				if ( render_canvas ) {
@@ -160,10 +172,10 @@
 
 				//var loader = new THREE.BinaryLoader(),
 				var loader = new THREE.JSONLoader(),
-					callback = function( geometry ) { createScene( geometry) };
+					callback = function( geometry ) { createScene( geometry ) };
 
-				loader.load( { model: "obj/female02/Female02_slim.js", callback: callback } );
-				//loader.load( { model: "obj/female02/Female02_bin.js", callback: callback } );
+				loader.load( "obj/female02/Female02_slim.js", callback );
+				//loader.load( "obj/female02/Female02_bin.js", callback );
 
 			}
 
@@ -208,26 +220,16 @@
 				xm1.map.needsUpdate = true;
 				xm2.map.needsUpdate = true;
 
-				geometry.materials[0].push( xm1 ); // goes to faces with material 0
-				geometry.materials[1].push( xm2 ); // goes to faces with material 1
+				geometry.materials[ 0 ] = xm1; // goes to faces with material 0
+				geometry.materials[ 1 ] = xm2; // goes to faces with material 1
 
-				geometry.materials[4].push( new THREE.MeshLambertMaterial( { color: 0xff0000, opacity: 0.5, transparent: true } ) );
+				geometry.materials[ 4 ] = new THREE.MeshLambertMaterial( { color: 0xff0000, opacity: 0.5, transparent: true } );
 
-				var materials = [ new THREE.MeshFaceMaterial() ];
-
-				// full-mesh wireframe overlay
-				//materials.push( new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true, wireframeLinewidth: 1.5 } ) );
-
-				// full-mesh color overlay
-				//materials.push( new THREE.MeshBasicMaterial { color: 0xff0000, opacity: 0.5 } ) );
-
-				zmesh = new THREE.Mesh( geometry, materials );
-				zmesh.position.x = -80;
-				zmesh.position.z = 50;
-				zmesh.position.y = FLOOR;
+				zmesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial() );
+				zmesh.position.set( -80, FLOOR, 50 );
 				zmesh.scale.x = zmesh.scale.y = zmesh.scale.z = 3;
 				zmesh.overdraw = true;
-				scene.add(zmesh);
+				scene.add( zmesh );
 
 				// PLANES with all materials from the model
 
@@ -246,7 +248,7 @@
 					mesh.position.z = -100;
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = 1;
 					mesh.doubleSided = true;
-					scene.add(mesh);
+					scene.add( mesh );
 
 					// number
 					var x = document.createElement( "canvas" );
@@ -256,7 +258,7 @@
 					xc.shadowBlur = 7;
 					xc.fillStyle = "orange";
 					xc.font = "50pt arial bold";
-					xc.fillText(i, 10, 64);
+					xc.fillText( i, 10, 64 );
 
 					var xm = new THREE.MeshBasicMaterial( { map: new THREE.Texture( x ), transparent: true  } );
 					xm.map.needsUpdate = true;
@@ -267,12 +269,12 @@
 					mesh.position.z = - 99;
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = 1;
 					mesh.doubleSided = true;
-					scene.add(mesh);
+					scene.add( mesh );
 				}
 
 			}
 
-			function onDocumentMouseMove(event) {
+			function onDocumentMouseMove( event ) {
 
 				mouseX = ( event.clientX - windowHalfX );
 				mouseY = ( event.clientY - windowHalfY );
@@ -294,6 +296,7 @@
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+
 				camera.lookAt( target );
 
 				if ( render_canvas ) canvasRenderer.render( scene, camera );

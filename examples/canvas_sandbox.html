@@ -38,15 +38,15 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
-			var moveForward = false, moveBackwards = false,
-			moveUp = false, moveDown = false,
-			moveLeft = false, moveRight = false,
+			var moveForward = false;
+			var moveBackwards = false;
+			var moveLeft = false;
+			var moveRight = false;
+			var moveUp = false;
+			var moveDown = false;
 
-			yawLeft = false, yawRight = false,
-			pitchUp = false, pitchDown = false,
-			rollLeft = false, rollRight = false;
-
-			var target = new THREE.Vector3( 0, 150, 0 );
+			var targetMoveLeft = false;
+			var targetMoveRight = false;
 
 			var debugContext;
 
@@ -61,6 +61,7 @@
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.y = 150;
 				camera.position.z = 400;
+				camera.target = new THREE.Vector3( 0, 150, 0 );
 
 				scene = new THREE.Scene();
 
@@ -89,13 +90,14 @@
 
 				objects = [];
 
-				geometry = new THREE.SphereGeometry( 100, 16, 8 );
-				material = new THREE.MeshBasicMaterial( { envMap: THREE.ImageUtils.loadTexture( 'textures/metal.jpg', new THREE.SphericalReflectionMapping() ) } );
+				geometry = new THREE.IcosahedronGeometry( 1 );
+				geometry.applyMatrix( new THREE.Matrix4().setScale( 100, 100, 100 ) );
+
+				material = new THREE.MeshBasicMaterial( { envMap: THREE.ImageUtils.loadTexture( 'textures/metal.jpg', new THREE.SphericalReflectionMapping() ), overdraw: true } );
 
 				for ( var i = 0; i < 10; i ++ ) {
 
 					sphere = new THREE.Mesh( geometry, material );
-					sphere.overdraw = true;
 
 					sphere.position.x = Math.random() * 1000 - 500;
 					sphere.position.y = Math.random() * 1000 - 500;
@@ -157,18 +159,16 @@
 
 			function onDocumentKeyDown( event ) {
 
-				switch( event.keyCode ) {
+				switch ( event.keyCode ) {
 
 					case 38: moveForward = true; break; // up
 					case 40: moveBackwards = true; break; // down
 					case 37: moveLeft = true; break; // left
 					case 39: moveRight = true; break; // right
-					case 65: yawLeft = true; break; // a
-					case 68: yawRight = true; break; // d
-					case 87: moveUp/*pitchUp*/ = true; break; // w
-					case 83: moveDown/*pitchDown*/ = true; break; // s
-					case 90: rollLeft = true; break; // z
-					case 67: rollRight = true; break; // c
+					case 87: moveUp = true; break; // w
+					case 83: moveDown = true; break; // s
+					case 65: targetMoveLeft = true; break; // a
+					case 68: targetMoveRight = true; break; // d
 
 				}
 
@@ -176,18 +176,16 @@
 
 			function onDocumentKeyUp( event ) {
 
-				switch( event.keyCode ) {
+				switch ( event.keyCode ) {
 
 					case 38: moveForward = false; break; // up
 					case 40: moveBackwards = false; break; // down
 					case 37: moveLeft = false; break; // left
 					case 39: moveRight = false; break; // right
-					case 65: yawLeft = false; break; // a
-					case 68: yawRight = false; break; // d
-					case 87: moveUp/*pitchUp*/ = false; break; // w
-					case 83: moveDown/*pitchDown*/ = false; break; // s
-					case 90: rollLeft = false; break; // z
-					case 67: rollRight = false; break; // c
+					case 87: moveUp = false; break; // w
+					case 83: moveDown = false; break; // s
+					case 65: targetMoveLeft = false; break; // a
+					case 68: targetMoveRight = false; break; // d
 
 				}
 
@@ -206,25 +204,19 @@
 
 			function render() {
 
-				if ( moveForward ) camera.position.z -= 5;
-				if ( moveBackwards ) camera.position.z += 5;
+				if ( moveForward ) camera.position.z -= 10;
+				if ( moveBackwards ) camera.position.z += 10;
 
-				if ( moveUp ) camera.position.y += 5;
-				if ( moveDown ) camera.position.y -= 5;
+				if ( moveLeft ) camera.position.x -= 10;
+				if ( moveRight ) camera.position.x += 10;
 
-				if ( moveLeft ) camera.position.x -= 5;
-				if ( moveRight ) camera.position.x += 5;
+				if ( moveUp ) camera.position.y += 10;
+				if ( moveDown ) camera.position.y -= 10;
 
-				if ( pitchUp ) camera.rotation.x += 0.01;
-				if ( pitchDown ) camera.rotation.x -= 0.01;
+				if ( targetMoveLeft ) camera.target.x -= 10;
+				if ( targetMoveRight ) camera.target.x += 10;
 
-				if ( yawLeft ) target.x -= 5;
-				if ( yawRight ) target.x += 5;
-
-				if ( rollLeft ) camera.rotation.z += 0.01;
-				if ( rollRight ) camera.rotation.z -= 0.01;
-
-				camera.lookAt( target );
+				camera.lookAt( camera.target );
 
 				debugContext.clearRect( -256, -256, 512, 512 );
 
@@ -239,9 +231,9 @@
 				// camera
 
 				debugContext.moveTo( camera.position.x * 0.1, camera.position.z * 0.1 );
-				debugContext.lineTo( target.x * 0.1, target.z * 0.1 );
+				debugContext.lineTo( camera.target.x * 0.1, camera.target.z * 0.1 );
 				debugContext.rect( camera.position.x * 0.1 - 5, camera.position.z * 0.1 - 5, 10, 10 );
-				debugContext.rect( target.x * 0.1 - 5, target.z * 0.1 - 5, 10, 10 );
+				debugContext.rect( camera.target.x * 0.1 - 5, camera.target.z * 0.1 - 5, 10, 10 );
 				debugContext.rect( - 50, - 50, 100, 100 );
 
 				for ( var i = 0, l = objects.length; i < l; i++ ) {

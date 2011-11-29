@@ -420,7 +420,7 @@
 
 					bird = birds[ i ];
 
-					color = bird.materials[ 0 ].color;
+					color = bird.material.color;
 					color.r = color.g = color.b = ( 500 - bird.position.z ) / 1000;
 
 					bird.rotation.y = Math.atan2( - boid.velocity.z, boid.velocity.x );

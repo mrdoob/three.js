@@ -13,6 +13,8 @@ THREE.Geometry = function () {
 	this.vertices = [];
 	this.colors = []; // one-to-one vertex colors, used in ParticleSystem, Line and Ribbon
 
+	this.materials = [];
+
 	this.faces = [];
 
 	this.faceUvs = [[]];
@@ -98,63 +100,30 @@ THREE.Geometry.prototype = {
 
 	},
 
-	computeFaceNormals: function ( useVertexNormals ) {
+	computeFaceNormals: function () {
 
 		var n, nl, v, vl, vertex, f, fl, face, vA, vB, vC,
 		cb = new THREE.Vector3(), ab = new THREE.Vector3();
-
-		/*
-		for ( v = 0, vl = this.vertices.length; v < vl; v ++ ) {
-
-			vertex = this.vertices[ v ];
-			vertex.normal.set( 0, 0, 0 );
-
-		}
-		*/
 
 		for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
 
 			face = this.faces[ f ];
 
-			if ( useVertexNormals && face.vertexNormals.length  ) {
+			vA = this.vertices[ face.a ];
+			vB = this.vertices[ face.b ];
+			vC = this.vertices[ face.c ];
 
-				cb.set( 0, 0, 0 );
+			cb.sub( vC.position, vB.position );
+			ab.sub( vA.position, vB.position );
+			cb.crossSelf( ab );
 
-				for ( n = 0, nl = face.vertexNormals.length; n < nl; n++ ) {
+			if ( !cb.isZero() ) {
 
-					cb.addSelf( face.vertexNormals[n] );
-
-				}
-
-				cb.divideScalar( 3 );
-
-				if ( ! cb.isZero() ) {
-
-					cb.normalize();
-
-				}
-
-				face.normal.copy( cb );
-
-			} else {
-
-				vA = this.vertices[ face.a ];
-				vB = this.vertices[ face.b ];
-				vC = this.vertices[ face.c ];
-
-				cb.sub( vC.position, vB.position );
-				ab.sub( vA.position, vB.position );
-				cb.crossSelf( ab );
-
-				if ( !cb.isZero() ) {
-
-					cb.normalize();
-
-				}
-
-				face.normal.copy( cb );
+				cb.normalize();
 
 			}
+
+			face.normal.copy( cb );
 
 		}
 
@@ -167,7 +136,7 @@ THREE.Geometry.prototype = {
 		// create internal buffers for reuse when calling this method repeatedly
 		// (otherwise memory allocation / deallocation every frame is big resource hog)
 
-		if ( this.__tmpVertices == undefined ) {
+		if ( this.__tmpVertices === undefined ) {
 
 			this.__tmpVertices = new Array( this.vertices.length );
 			vertices = this.__tmpVertices;
@@ -435,62 +404,71 @@ THREE.Geometry.prototype = {
 		this.boundingSphere = { radius: radius };
 
 	},
-	
-	/* 
-	 * Checks for duplicate vertices with hashmap. 
+
+	/*
+	 * Checks for duplicate vertices with hashmap.
 	 * Duplicated vertices are removed
-	 * and faces' vertices are updated. 
+	 * and faces' vertices are updated.
 	 */
+
 	mergeVertices: function() {
-		
+
 		var verticesMap = {}; // Hashmap for looking up vertice by position coordinates (and making sure they are unique)
 		var unique = [], changes = [];
-		
+
 		var v, key;
-		var precisionPoints = 4; // number of decimal points, eg. 4 for epsilon of 0.0001 
-		var precision = Math.pow(10, precisionPoints)
+		var precisionPoints = 4; // number of decimal points, eg. 4 for epsilon of 0.0001
+		var precision = Math.pow( 10, precisionPoints );
 		var i,il, face;
-		
-		for (i=0,il=this.vertices.length;i<il;i++) {
-			
-			v = this.vertices[i].position;
-			key = [Math.round(v.x * precision), Math.round(v.y* precision), Math.round(v.z* precision)].join('_');
-			
-			if (verticesMap[key]===undefined) {
-				verticesMap[key] = i;
-				unique.push(this.vertices[i]);
-				changes[i] = unique.length - 1;
+
+		for ( i = 0, il = this.vertices.length; i < il; i ++ ) {
+
+			v = this.vertices[ i ].position;
+			key = [ Math.round( v.x * precision ), Math.round( v.y * precision ), Math.round( v.z * precision ) ].join( '_' );
+
+			if ( verticesMap[ key ] === undefined ) {
+
+				verticesMap[ key ] = i;
+				unique.push( this.vertices[ i ] );
+				changes[ i ] = unique.length - 1;
+
 			} else {
+
 				//console.log('Duplicate vertex found. ', i, ' could be using ', verticesMap[key]);
-				changes[i] = changes[verticesMap[key]];
+				changes[ i ] = changes[ verticesMap[ key ] ];
+
 			}
-			
+
 		};
-		
-		
-		// Start to patch face indices.
+
+
+		// Start to patch face indices
+
 		for( i = 0, il = this.faces.length; i < il; i ++ ) {
 
 			face = this.faces[ i ];
 
 			if ( face instanceof THREE.Face3 ) {
-				face.a = changes[face.a];
-				face.b = changes[face.b];
-				face.c = changes[face.c];
-			
-			} if ( face instanceof THREE.Face4 ) {
 
-				face.a = changes[face.a];
-				face.b = changes[face.b];
-				face.c = changes[face.c];
-				face.d = changes[face.d];
-			
+				face.a = changes[ face.a ];
+				face.b = changes[ face.b ];
+				face.c = changes[ face.c ];
+
+			} else if ( face instanceof THREE.Face4 ) {
+
+				face.a = changes[ face.a ];
+				face.b = changes[ face.b ];
+				face.c = changes[ face.c ];
+				face.d = changes[ face.d ];
+
 			}
+
 		}
-		
+
 		// Use unique set of vertices
+
 		this.vertices = unique;
-		
+
 	}
 
 };

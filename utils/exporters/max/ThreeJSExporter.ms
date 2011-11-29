@@ -1,6 +1,6 @@
 -------------------------------------------------------------------------------------
 -- ThreeJSExporter.ms
--- Exports geometry from 3ds max to Three.js models in ASCII JSON format v2
+-- Exports geometry from 3ds max to Three.js models in ASCII JSON format v3
 -- By alteredq / http://alteredqualia.com
 -------------------------------------------------------------------------------------
 
@@ -10,17 +10,17 @@ rollout ThreeJSExporter "ThreeJSExporter"
 
 	local ostream,
 
-	headerFormat = "// Converted from: %
-//  vertices: %
-//  normals: %
-//  colors: %
-//  uvs: %
-//  triangles: %
-//  materials: %
-//
-//  Generated with 3ds max ThreeJSExporter
-//  http://github.com/alteredq/three.js/blob/master/utils/exporters/max/ThreeJSExporter.ms
-
+	headerFormat = "\"metadata\":
+{
+\"sourceFile\": \"%\",
+\"generatedBy\": \"3ds max ThreeJSExporter\",
+\"vertices\": %,
+\"normals\": %,
+\"colors\": %,
+\"uvs\": %,
+\"triangles\": %,
+\"materials\": %
+},
 
 ",
 
@@ -34,13 +34,13 @@ rollout ThreeJSExporter "ThreeJSExporter"
 	triNFormat = "%,%,%,%,%,%,%",
 	triUVNFormat = "%,%,%,%,%,%,%,%,%,%",
 
-	footerFormat = "}\n\npostMessage( model );\nclose();"
+	footerFormat = "}"
 
 	-------------------------------------------------------------------------------------
 	-- User interface
 
 
-	group "ThreeJSExporter  v0.7"
+	group "ThreeJSExporter  v0.8"
 	(
 
 		label msg "Exports selected meshes in Three.js ascii JSON format" align:#left
@@ -983,29 +983,28 @@ rollout ThreeJSExporter "ThreeJSExporter"
 		)
 
 
-		-- Dump header
-
-		Format headerFormat maxFileName totalVertices totalNormals totalColors totalUvs totalFaces totalMaterials to:ostream
-
 		-- Dump objects (debug)
 
-		Format "// Source objects:\n\n" to:ostream
+		-- Format "// Source objects:\n\n" to:ostream
 
-		i = 0
+		-- i = 0
 
-		for obj in meshObjects do
-		(
+		-- for obj in meshObjects do
+		-- (
 
-			meshName = obj[2]
-			Format "// %: %\n" i meshName to:ostream
-			i += 1
+		-- 	meshName = obj[2]
+		-- 	Format "// %: %\n" i meshName to:ostream
+		-- 	i += 1
 
-		)
+		-- )
 
 		-- Dump model
 
-		Format "\n\nvar model = {\n\n" to:ostream
-		Format "\"version\" :2,\n\n" to:ostream
+		Format "{\n\n" to:ostream
+
+		-- Dump header
+
+		Format headerFormat maxFileName totalVertices totalNormals totalColors totalUvs totalFaces totalMaterials to:ostream
 
 		-- Dump all materials in the scene
 

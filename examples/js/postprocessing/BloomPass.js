@@ -65,7 +65,7 @@ THREE.BloomPass.prototype = {
 
 		// Render quad with blured scene into texture (convolution pass 1)
 
-		THREE.EffectComposer.quad.materials[ 0 ] = this.materialConvolution;
+		THREE.EffectComposer.quad.material = this.materialConvolution;
 
 		this.convolutionUniforms[ "tDiffuse" ].texture = readBuffer;
 		this.convolutionUniforms[ "uImageIncrement" ].value = THREE.BloomPass.blurX;
@@ -82,7 +82,7 @@ THREE.BloomPass.prototype = {
 
 		// Render original scene with superimposed blur to texture
 
-		THREE.EffectComposer.quad.materials[ 0 ] = this.materialScreen;
+		THREE.EffectComposer.quad.material = this.materialScreen;
 
 		this.screenUniforms[ "tDiffuse" ].texture = this.renderTargetY;
 

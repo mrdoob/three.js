@@ -22,6 +22,7 @@ THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter ) 
 	this.repeat = new THREE.Vector2( 1, 1 );
 
 	this.needsUpdate = false;
+	this.onUpdate = null;
 
 };
 
