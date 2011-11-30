@@ -49,7 +49,7 @@
 
         var texture  = new THREE.Texture( image, new THREE.UVMapping(), THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping, THREE.NearestFilter, THREE.LinearMipMapLinearFilter );
 
-        return new THREE.MeshBasicMaterial( { map: texture } );
+        return new THREE.MeshPhongMaterial( { map: texture, color: 0x00aaff, shininess: 100 } );
 
       }
 
@@ -58,7 +58,7 @@
         container = document.createElement( 'div' );
         document.body.appendChild( container );
 
-        var grass = loadTexture( 'textures/minecraft/grass.png' );
+        var texturedMaterial = loadTexture( 'textures/water.jpg' );
 
         var info = document.createElement( 'div' );
         info.style.position = 'absolute';
@@ -68,46 +68,60 @@
         info.innerHTML = 'Procedurally generated 3D shapes with different materials on extrusions<br/>Drag to spin';
         container.appendChild( info );
 
-        camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 1000 );
-        camera.position.y = 150;
-        camera.position.z = 500;
+        camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 1000 );
+        camera.position.set( 0, 0, 300 );
 
         scene = new THREE.Scene();
         scene.add( camera );
 
+		var light = new THREE.PointLight( 0xffffff );
+		light.position.set( 0, 0, 100 );
+		scene.add( light );
+
         parent = new THREE.Object3D();
-        parent.position.y = 150;
+        parent.position.y = 0;
         scene.add( parent );
 
-        var extrudeSettings = { amount: 20, bevelEnabled: true, bevelSegments: 2, steps: 2, material: 0, extrudeMaterial: 1 };
+        var extrudeSettings = { amount: 10, bevelEnabled: true, bevelSegments: 3, steps: 4, bevelThickness: 8, material: 0, extrudeMaterial: 1 };
 
-        var colorMaterials = [ new THREE.MeshBasicMaterial({ color: 0x006ed5 }), new THREE.MeshBasicMaterial({ color: 0x6ed500 }) ];
+        var colorMaterials = [ new THREE.MeshPhongMaterial( { color: 0xff5500, shininess: 100 } ), new THREE.MeshPhongMaterial( { color: 0xff0000, shininess: 100 } ) ];
+        var imageAndColorMaterials = [ texturedMaterial, new THREE.MeshPhongMaterial( { color: 0x00aaff, shininess: 100 } ) ];
 
-        var imageAndColorMaterials = [ grass, new THREE.MeshBasicMaterial({ color: 0x6ed500 }) ];
-        
         var pillShape1 = new THREE.Shape();
-        pillShape1.moveTo(  30, 10 );
-        pillShape1.lineTo(  100, 10 );
-        pillShape1.quadraticCurveTo( 120, 20, 100, 30 );
-        pillShape1.lineTo( 30, 30 );
-        pillShape1.quadraticCurveTo( 10, 20, 30, 10 );
+        pillShape1.moveTo(  30, 80 );
+        pillShape1.lineTo(  100, 80 );
+        pillShape1.quadraticCurveTo( 130, 90, 100, 100 );
+        pillShape1.lineTo( 30, 100 );
+        pillShape1.quadraticCurveTo( 0, 90, 30, 80 );
 
         var pillGeometry1 = pillShape1.extrude( extrudeSettings );
         pillGeometry1.materials = colorMaterials;
+		pillGeometry1.computeVertexNormals();
+
+		THREE.GeometryUtils.center( pillGeometry1 );
+
         var pillMesh1 = new THREE.Mesh( pillGeometry1, new THREE.MeshFaceMaterial() );
+		pillMesh1.position.y = -25;
+		pillMesh1.scale.x = 0.5;
 
         parent.add ( pillMesh1 );
 
         var pillShape2 = new THREE.Shape();
         pillShape2.moveTo(  30, 80 );
         pillShape2.lineTo(  100, 80 );
-        pillShape2.quadraticCurveTo( 120, 90, 100, 100 );
+        pillShape2.quadraticCurveTo( 130, 90, 100, 100 );
         pillShape2.lineTo( 30, 100 );
-        pillShape2.quadraticCurveTo( 10, 90, 30, 80 );
+        pillShape2.quadraticCurveTo( 0, 90, 30, 80 );
 
         var pillGeometry2 = pillShape2.extrude( extrudeSettings );
         pillGeometry2.materials = imageAndColorMaterials;
+		pillGeometry2.computeVertexNormals();
+
+		THREE.GeometryUtils.center( pillGeometry2 );
+
         var pillMesh2 = new THREE.Mesh( pillGeometry2, new THREE.MeshFaceMaterial() );
+		pillMesh2.position.y = 25;
+		pillMesh2.scale.x = 0.5;
 
         parent.add ( pillMesh2 );
 
