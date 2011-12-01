@@ -13,7 +13,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	_canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElement( 'canvas' ),
 
-	_precision = parameters.precision !== undefined ? parameters.precision : 'highp',
+	_precision = parameters.precision !== undefined ? parameters.precision : 'mediump',
 	_antialias = parameters.antialias !== undefined ? parameters.antialias : false,
 	_stencil = parameters.stencil !== undefined ? parameters.stencil : true,
 	_preserveDrawingBuffer = parameters.preserveDrawingBuffer !== undefined ? parameters.preserveDrawingBuffer : false,
@@ -4970,9 +4970,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var prefix_fragment = [
 
-			"#ifdef GL_ES",
 			"precision " + _precision + " float;",
-			"#endif",
 
 			"#define MAX_DIR_LIGHTS " + parameters.maxDirLights,
 			"#define MAX_POINT_LIGHTS " + parameters.maxPointLights,
