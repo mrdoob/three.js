@@ -179,15 +179,17 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 					if ( geometry ) {
 
 						var hasNormals = false;
+						var materials = [];
 
 						// not anymore support for multiple materials
 						// shouldn't really be array
 
 						for( i = 0; i < o.materials.length; i ++ ) {
 
-							materials = result.materials[ o.materials[ i ] ];
+							var material = result.materials[ o.materials[ i ] ];
+							materials.push( material );
 
-							hasNormals = materials instanceof THREE.ShaderMaterial;
+							hasNormals = material instanceof THREE.ShaderMaterial;
 
 						}
 
