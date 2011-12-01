@@ -141,6 +141,11 @@ THREE.TrackballControls = function ( object, domElement ) {
 		var factor = 1.0 + ( _zoomEnd.y - _zoomStart.y ) * _this.zoomSpeed;
 
 		if ( factor !== 1.0 && factor > 0.0 ) {
+			// This stops it from looping
+			if ( _zoomStart.y == _zoomStart.y + ( _zoomEnd.y - _zoomStart.y ) * this.dynamicDampingFactor ) {
+				_zoomStart = _zoomEnd;
+				return;
+			}
 
 			_eye.multiplyScalar( factor );
 
