@@ -147,7 +147,7 @@ THREE.ShaderChunk = {
 
 		"#ifdef USE_MAP",
 
-			"gl_FragColor = gl_FragColor * texture2D( map, gl_PointCoord );",
+			"gl_FragColor = gl_FragColor * texture2DClampToBorderColor( map, gl_PointCoord );",
 
 		"#endif"
 
@@ -193,14 +193,14 @@ THREE.ShaderChunk = {
 
 			"#ifdef GAMMA_INPUT",
 
-				"vec4 texelColor = texture2D( map, vUv );",
+				"vec4 texelColor = texture2DClampToBorderColor( map, vUv );",
 				"texelColor.xyz *= texelColor.xyz;",
 
 				"gl_FragColor = gl_FragColor * texelColor;",
 
 			"#else",
 
-				"gl_FragColor = gl_FragColor * texture2D( map, vUv );",
+				"gl_FragColor = gl_FragColor * texture2DClampToBorderColor( map, vUv );",
 
 			"#endif",
 
@@ -235,7 +235,7 @@ THREE.ShaderChunk = {
 
 		"#ifdef USE_LIGHTMAP",
 
-			"gl_FragColor = gl_FragColor * texture2D( lightMap, vUv2 );",
+			"gl_FragColor = gl_FragColor * texture2DClampToBorderColor( lightMap, vUv2 );",
 
 		"#endif"
 
@@ -828,7 +828,65 @@ THREE.ShaderChunk = {
 
 	].join("\n"),
 
+	border_clamp_color_pars_fragment: [
 
+		"#ifdef USE_BORDER_CLAMP_COLOR",
+
+			"uniform vec3 borderClampColor;",
+
+		"#endif"
+
+	].join("\n"),
+
+	border_clamp_color_fragment: [
+
+		"#ifdef USE_BORDER_CLAMP_COLOR",
+
+			"#extension GL_OES_standard_derivatives : enable",
+
+			"vec4 texture2DClampToBorderColor( sampler2D texture, vec2 uv ) {",
+				"vec4 borderColor = vec4(borderClampColor, 1.0);",
+				"vec2 fw = fwidth( uv );",
+				"vec2 marginTL = -fw;",
+				"vec2 marginBR = 1.0 + fw;",
+				// Completely outside the texture margins, use borderColor
+				"if ( uv.s <= marginTL.s || uv.s >= marginBR.s || uv.t <= marginTL.t || uv.t >= marginBR.t )",
+					"return borderColor;",
+				// Completely inside the texture, use texture
+				"else if ( uv.s >= 0.0 && uv.s <= 1.0 && uv.t >= 0.0 && uv.t <= 1.0 )",
+					"return texture2D( texture, uv );",
+				// Inside a pixel margin - mix borderColor and texture to antialias
+				"else {",
+					// Amount of mix - 0.0 is all borderColor, 1.0 is all texture
+					"float p = 0.0;",
+					"int c = 0;",
+					"if ( uv.s < 0.0 ) {",
+						"p += smoothstep( marginTL.s, 0.0, uv.s );",
+						"c++;",
+					"}",
+					"else if ( uv.s > 1.0 ) {",
+						"p += 1.0 - smoothstep( 1.0, marginBR.s, uv.s );",
+						"c++;",
+					"}",
+					"if ( uv.t < 0.0 ) {",
+						"p += smoothstep( marginTL.t, 0.0, uv.t );",
+						"c++;",
+					"}",
+					"else if ( uv.t > 1.0 ) {",
+						"p += 1.0 - smoothstep( 1.0, marginBR.t, uv.t );",
+						"c++;",
+					"}",
+					"return mix( borderColor, texture2D( texture, uv ), p / float( c ) );",
+				"}",
+			"}",
+
+		"#else",
+
+			"#define texture2DClampToBorderColor texture2D",
+
+		"#endif"
+
+	].join("\n"),
 };
 
 THREE.UniformsUtils = {
@@ -905,6 +963,8 @@ THREE.UniformsLib = {
 		"offsetRepeat" : { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) },
 
 		"lightMap" : { type: "t", value: 2, texture: null },
+
+		"borderClampColor" : { type: "c", value: new THREE.Color( 0x000000 ) },
 
 		"envMap" : { type: "t", value: 1, texture: null },
 		"flipEnvMap" : { type: "f", value: -1 },
@@ -1090,6 +1150,9 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "envmap_pars_fragment" ],
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
+			THREE.ShaderChunk[ "border_clamp_color_pars_fragment" ],
+
+			THREE.ShaderChunk[ "border_clamp_color_fragment" ],
 
 			"void main() {",
 
@@ -1174,6 +1237,9 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "envmap_pars_fragment" ],
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
+			THREE.ShaderChunk[ "border_clamp_color_pars_fragment" ],
+
+			THREE.ShaderChunk[ "border_clamp_color_fragment" ],
 
 			"void main() {",
 
@@ -1276,6 +1342,9 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
 			THREE.ShaderChunk[ "lights_phong_pars_fragment" ],
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
+			THREE.ShaderChunk[ "border_clamp_color_pars_fragment" ],
+
+			THREE.ShaderChunk[ "border_clamp_color_fragment" ],
 
 			"void main() {",
 
@@ -1347,6 +1416,9 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "map_particle_pars_fragment" ],
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
+			THREE.ShaderChunk[ "border_clamp_color_pars_fragment" ],
+
+			THREE.ShaderChunk[ "border_clamp_color_fragment" ],
 
 			"void main() {",
 

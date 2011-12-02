@@ -13,6 +13,8 @@
  *
  *  lightMap: new THREE.Texture( <Image> ),
  *
+ *  borderClampColor: <hex>,
+ *
  *  envMap: new THREE.TextureCube( [posx, negx, posy, negy, posz, negz] ),
  *  combine: THREE.Multiply,
  *  reflectivity: <float>,
@@ -49,6 +51,8 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 	this.map = parameters.map !== undefined ? parameters.map : null;
 
 	this.lightMap = parameters.lightMap !== undefined ? parameters.lightMap : null;
+
+	this.borderClampColor = parameters.borderClampColor !== undefined ? new THREE.Color( parameters.borderClampColor ) : null;
 
 	this.envMap = parameters.envMap !== undefined ? parameters.envMap : null;
 	this.combine = parameters.combine !== undefined ? parameters.combine : THREE.MultiplyOperation;
