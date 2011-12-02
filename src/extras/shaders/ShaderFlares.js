@@ -58,9 +58,7 @@ THREE.ShaderFlares = {
 
 		fragmentShader: [
 
-			"#ifdef GL_ES",
-				"precision highp float;",
-			"#endif",
+			"precision mediump float;",
 
 			"uniform sampler2D map;",
 			"uniform float opacity;",
@@ -136,9 +134,7 @@ THREE.ShaderFlares = {
 
 		fragmentShader: [
 
-			"#ifdef GL_ES",
-				"precision highp float;",
-			"#endif",
+			"precision mediump float;",
 
 			"uniform sampler2D map;",
 			"uniform sampler2D occlusionMap;",

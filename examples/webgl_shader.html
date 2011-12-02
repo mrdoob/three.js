@@ -42,22 +42,22 @@
 		<script src="js/Stats.js"></script>
 
 		<script id="vertexShader" type="x-shader/x-vertex">
-			void main()
-			{
+
+			void main()	{
+
 				gl_Position = vec4( position, 1.0 );
+
 			}
+
 		</script>
 
 		<script id="fragmentShader" type="x-shader/x-fragment">
-			#ifdef GL_ES
-			precision highp float;
-			#endif
 
 			uniform vec2 resolution;
 			uniform float time;
 
-			void main(void)
-			{
+			void main()	{
+
 				vec2 p = -1.0 + 2.0 * gl_FragCoord.xy / resolution.xy;
 				float a = time*40.0;
 				float d,e,f,g=1.0/40.0,h,i,r,q;
@@ -81,7 +81,9 @@
 				d+=sin(d*d*8.0)*0.52;
 				f=(sin(a*g)+1.0)/2.0;
 				gl_FragColor=vec4(vec3(f*i/1.6,i/2.0+d/13.0,i)*d*p.x+vec3(i/1.3+d/8.0,i/2.0+d/18.0,i)*d*(1.0-p.x),1.0);
+
 			}
+
 		</script>
 
 		<script>
