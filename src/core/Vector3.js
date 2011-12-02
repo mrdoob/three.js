@@ -271,25 +271,37 @@ THREE.Vector3.prototype = {
 
 	},
 
-	setRotationFromMatrix: function ( m ) {
-
-		var cosY = Math.cos( this.y );
-
-		this.y = Math.asin( m.n13 );
-
-		if ( Math.abs( cosY ) > 0.00001 ) {
-
-			this.x = Math.atan2( - m.n23 / cosY, m.n33 / cosY );
-			this.z = Math.atan2( - m.n12 / cosY, m.n11 / cosY );
-
-		} else {
-
-			this.x = 0;
-			this.z = Math.atan2( m.n21, m.n22 );
-
-		}
-
-	},
+	setRotationFromMatrix: function(m, order) {
+                    if(order == 'XYZ'){
+                        if (Math.abs(m.n13) != 1) {
+                            this.y = Math.asin(m.n13);
+                            var cosY = Math.cos(this.y);
+                            if (cosY >= 0) {
+                                this.x = Math.atan2(-m.n23, m.n33);
+                                this.z = Math.atan2(-m.n12, m.n11);
+                            }
+                            else {
+                                this.x = Math.atan2(m.n23, -m.n33);
+                                this.z = Math.atan2(m.n12, -m.n11);
+                            }
+                
+                        }
+                        else {
+                            this.z = 0;
+                            if (m.n13 == -1) {
+                                this.y = -Math.PI / 2;
+                                this.x = -Math.atan2(m.n21, m.n22);
+                            }
+                            else {
+                                this.y = Math.PI / 2;
+                                this.x = Math.atan2(m.n21, m.n22);
+                            }
+                        }
+                    }
+                    else{
+                        throw 'Unsupported Euler order';
+                    }
+        },
 
 	isZero: function () {
 
