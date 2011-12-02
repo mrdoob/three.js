@@ -369,6 +369,8 @@ THREE.Loader.prototype = {
 
 		}
 
+		if ( m.DbgName !== undefined ) material.name = m.DbgName;
+
 		return material;
 
 	}
