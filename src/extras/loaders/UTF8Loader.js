@@ -313,9 +313,7 @@ THREE.UTF8Loader.prototype.createModel = function ( data, callback, scale, offse
 
 	function f3n ( scope, normals, a, b, c, mi, na, nb, nc ) {
 
-		var material = scope.materials[ mi ],
-
-			nax = normals[ na * 3     ],
+		var nax = normals[ na * 3     ],
 			nay = normals[ na * 3 + 1 ],
 			naz = normals[ na * 3 + 2 ],
 
@@ -331,7 +329,7 @@ THREE.UTF8Loader.prototype.createModel = function ( data, callback, scale, offse
 			nb = new THREE.Vector3( nbx, nby, nbz ),
 			nc = new THREE.Vector3( ncx, ncy, ncz );
 
-		scope.faces.push( new THREE.Face3( a, b, c, [ na, nb, nc ], null, material ) );
+		scope.faces.push( new THREE.Face3( a, b, c, [ na, nb, nc ], null, mi ) );
 
 	};
 
