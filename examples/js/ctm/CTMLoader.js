@@ -21,7 +21,7 @@ THREE.CTMLoader.prototype.constructor = THREE.CTMLoader;
 //		- url (required)
 //		- callback (required)
 
-THREE.CTMLoader.prototype.load = function( url, callback ) {
+THREE.CTMLoader.prototype.load = function( url, callback, useWorker ) {
 
 	var xhr = new XMLHttpRequest(),
 		callbackProgress = null;
@@ -34,11 +34,39 @@ THREE.CTMLoader.prototype.load = function( url, callback ) {
 
 			if ( xhr.status == 200 || xhr.status == 0 ) {
 
-				THREE.CTMLoader.prototype.createModel( xhr.responseText, callback );
+				var binaryData = xhr.responseText;
+
+				var s = Date.now();
+
+				if ( useWorker ) {
+
+					var worker = new Worker( "js/ctm/CTMWorker.js" );
+
+					worker.onmessage = function( event ) {
+
+						var ctmFile = event.data;
+						THREE.CTMLoader.prototype.createModel( ctmFile, callback );
+
+						var e = Date.now();
+						console.log( "CTM data parse time [worker]: " + (e-s) + " ms" );
+
+					};
+
+					worker.postMessage( binaryData );
+
+				} else {
+
+					var ctmFile = new CTM.File( new CTM.Stream( binaryData ) );
+					THREE.CTMLoader.prototype.createModel( ctmFile, callback );
+
+					var e = Date.now();
+					console.log( "CTM data parse time [inline]: " + (e-s) + " ms" );
+
+				}
 
 			} else {
 
-				alert( "Couldn't load [" + url + "] [" + xhr.status + "]" );
+				console.error( "Couldn't load [" + url + "] [" + xhr.status + "]" );
 
 			}
 
@@ -71,21 +99,15 @@ THREE.CTMLoader.prototype.load = function( url, callback ) {
 };
 
 
-THREE.CTMLoader.prototype.createModel = function ( data, callback ) {
+THREE.CTMLoader.prototype.createModel = function ( file, callback ) {
 
 	var Model = function ( texture_path ) {
-
-		var s = (new Date).getTime();
 
 		var scope = this;
 
 		scope.materials = [];
 
 		THREE.Geometry.call( this );
-
-		var file = new CTM.File( new CTM.Stream( data ) );
-
-		console.log( file );
 
 		var normals = [],
 			uvs = [],
@@ -111,10 +133,6 @@ THREE.CTMLoader.prototype.createModel = function ( data, callback ) {
 		this.computeCentroids();
 		this.computeFaceNormals();
 		//this.computeTangents();
-
-		var e = (new Date).getTime();
-
-		console.log( "CTM data parse time: " + (e-s) + " ms" );
 
 		function init_vertices( buffer ) {
 

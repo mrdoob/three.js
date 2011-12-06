@@ -126,14 +126,32 @@
 
 				// LOADER
 
+				var c = 0, s = Date.now();
+
+				function checkTime() {
+
+					c ++;
+
+					if ( c === 3 ) {
+
+						var e = Date.now();
+						console.log( "Total parse time: " + (e-s) + " ms" );
+
+					}
+
+				}
+
+				var useWorker = true;
+
 				var loader = new THREE.CTMLoader();
 
 				loader.load( "ctm/ben.ctm",   function( geometry ) {
 
 					var material = new THREE.MeshLambertMaterial( { color: 0xffaa00, map: THREE.ImageUtils.loadTexture( "textures/ash_uvgrid01.jpg" ), envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3 } );
 					callbackModel( geometry, 450, material, 0, -200, 0, 0, 0 );
+					checkTime();
 
-				} );
+				}, useWorker );
 
 				loader.load( "ctm/WaltHead.ctm",  function( geometry ) {
 
@@ -141,15 +159,17 @@
 
 					var material = new THREE.MeshLambertMaterial( { color: 0xffffff, envMaps: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3 } );
 					callbackModel( geometry, 5, material, -200, 0, 0, 0, 0 );
+					checkTime();
 
-				});
+				}, useWorker );
 
 				loader.load( "ctm/LeePerry.ctm",  function( geometry ) {
 
 					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x444444, shininess: 30, map: THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" ), envMaps: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3 } );
 					callbackModel( geometry, 1300, material, 200, 50, 0, 0, 0 );
+					checkTime();
 
-				});
+				}, useWorker );
 
 			}
 
