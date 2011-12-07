@@ -111,6 +111,7 @@ EXTRAS_FILES = [
 'extras/controls/FlyControls.js',
 'extras/controls/RollControls.js',
 'extras/controls/TrackballControls.js',
+'extras/geometries/ArrowGeometry.js',
 'extras/geometries/CubeGeometry.js',
 'extras/geometries/CylinderGeometry.js',
 'extras/geometries/ExtrudeGeometry.js',
