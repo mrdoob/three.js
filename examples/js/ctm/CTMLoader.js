@@ -131,7 +131,8 @@ THREE.CTMLoader.prototype.createModelBuffers = function ( file, callback ) {
 
 		var dynamic = false,
 		computeNormals = true,
-		normalizeNormals = true;
+		normalizeNormals = true,
+		reorderVertices = true;
 
 		scope.materials = [];
 
@@ -144,6 +145,18 @@ THREE.CTMLoader.prototype.createModelBuffers = function ( file, callback ) {
 		vertexNormalArray = file.body.normals;
 
 		var vertexUvArray, vertexColorArray;
+
+		if ( file.body.uvMaps !== undefined && file.body.uvMaps.length > 0 ) {
+
+			vertexUvArray = file.body.uvMaps[ 0 ].uv;
+
+		}
+
+		if ( file.body.attrMaps !== undefined && file.body.attrMaps.length > 0 && file.body.attrMaps[ 0 ].name === "Color" ) {
+
+			vertexColorArray = file.body.attrMaps[ 0 ].attr;
+
+		}
 
 		//console.log( "vertices", vertexPositionArray.length/3 );
 		//console.log( "triangles", vertexIndexArray.length/3 );
@@ -225,14 +238,105 @@ THREE.CTMLoader.prototype.createModelBuffers = function ( file, callback ) {
 
 		}
 
+		// reorder vertices
+		// (needed for buffer splitting, to keep together face vertices)
+
+		if ( reorderVertices ) {
+
+			var newFaces = new Uint32Array( vertexIndexArray.length ),
+				newVertices = new Float32Array( vertexPositionArray.length );
+
+			var newNormals, newUvs, newColors;
+
+			if ( vertexNormalArray ) newNormals = new Float32Array( vertexNormalArray.length );
+			if ( vertexUvArray ) newUvs = new Float32Array( vertexUvArray.length );
+			if ( vertexColorArray ) newColors = new Float32Array( vertexColorArray.length );
+
+			var indexMap = {}, vertexCounter = 0;
+
+			function handleVertex( v ) {
+
+				if ( indexMap[ v ] === undefined ) {
+
+					indexMap[ v ] = vertexCounter;
+
+					var sx = v * 3,
+						sy = v * 3 + 1,
+						sz = v * 3 + 2,
+
+						dx = vertexCounter * 3,
+						dy = vertexCounter * 3 + 1,
+						dz = vertexCounter * 3 + 2;
+
+					newVertices[ dx ] = vertexPositionArray[ sx ];
+					newVertices[ dy ] = vertexPositionArray[ sy ];
+					newVertices[ dz ] = vertexPositionArray[ sz ];
+
+					if ( vertexNormalArray ) {
+
+						newNormals[ dx ] = vertexNormalArray[ sx ];
+						newNormals[ dy ] = vertexNormalArray[ sy ];
+						newNormals[ dz ] = vertexNormalArray[ sz ];
+
+					}
+
+					if ( vertexUvArray ) {
+
+						newUvs[ vertexCounter * 2 ] 	= vertexUvArray[ v * 2 ];
+						newUvs[ vertexCounter * 2 + 1 ] = vertexUvArray[ v * 2 + 1 ];
+
+					}
+
+					if ( vertexColorArray ) {
+
+						newColors[ vertexCounter * 4 ] 	   = vertexNormalArray[ v * 4 ];
+						newColors[ vertexCounter * 4 + 1 ] = vertexNormalArray[ v * 4 + 1 ];
+						newColors[ vertexCounter * 4 + 2 ] = vertexNormalArray[ v * 4 + 2 ];
+						newColors[ vertexCounter * 4 + 3 ] = vertexNormalArray[ v * 4 + 3 ];
+
+					}
+
+					vertexCounter += 1;
+
+				}
+
+			}
+
+			var a, b, c;
+
+			for ( var i = 0; i < vertexIndexArray.length; i += 3 ) {
+
+				a = vertexIndexArray[ i ];
+				b = vertexIndexArray[ i + 1 ];
+				c = vertexIndexArray[ i + 2 ];
+
+				handleVertex( a );
+				handleVertex( b );
+				handleVertex( c );
+
+				newFaces[ i ] 	  = indexMap[ a ];
+				newFaces[ i + 1 ] = indexMap[ b ];
+				newFaces[ i + 2 ] = indexMap[ c ];
+
+			}
+
+			vertexIndexArray = newFaces;
+			vertexPositionArray = newVertices;
+
+			if ( vertexNormalArray ) vertexNormalArray = newNormals;
+			if ( vertexUvArray ) vertexUvArray = newUvs;
+			if ( vertexColorArray ) vertexColorArray = newColors;
+
+		}
+
 		// compute offsets
 
 		scope.offsets = [];
 
-		var indices = file.body.indices;
+		var indices = vertexIndexArray;
 
 		var start = 0,
-			min = file.body.vertices.length,
+			min = vertexPositionArray.length,
 			max = 0,
 			minPrev = min;
 
@@ -260,7 +364,7 @@ THREE.CTMLoader.prototype.createModelBuffers = function ( file, callback ) {
 				scope.offsets.push( { start: start, count: i - start, index: minPrev } );
 
 				start = i;
-				min = file.body.vertices.length;
+				min = vertexPositionArray.length;
 				max = 0;
 
 			}
@@ -311,9 +415,7 @@ THREE.CTMLoader.prototype.createModelBuffers = function ( file, callback ) {
 
 		// uvs
 
-		if ( file.body.uvMaps !== undefined && file.body.uvMaps.length > 0 ) {
-
-			vertexUvArray = file.body.uvMaps[ 0 ].uv;
+		if ( vertexUvArray !== undefined ) {
 
 			// "fix" flipping
 
@@ -334,9 +436,7 @@ THREE.CTMLoader.prototype.createModelBuffers = function ( file, callback ) {
 
 		// colors
 
-		if ( file.body.attrMaps !== undefined && file.body.attrMaps.length > 0 && file.body.attrMaps[ 0 ].name === "Color" ) {
-
-			vertexColorArray = file.body.attrMaps[ 0 ].attr;
+		if ( vertexColorArray !== undefined ) {
 
 			scope.vertexColorBuffer = gl.createBuffer();
 			gl.bindBuffer( gl.ARRAY_BUFFER, scope.vertexColorBuffer );
