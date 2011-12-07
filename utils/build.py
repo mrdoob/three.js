@@ -91,6 +91,7 @@ EXTRAS_FILES = [
 'extras/ImageUtils.js',
 'extras/SceneUtils.js',
 'extras/ShaderUtils.js',
+'extras/core/BufferGeometry.js',
 'extras/core/Curve.js',
 'extras/core/CurvePath.js',
 'extras/core/Path.js',
@@ -335,6 +336,7 @@ WEBGL_FILES = [
 'renderers/WebGLRenderer.js',
 'renderers/WebGLRenderTarget.js',
 'renderers/WebGLRenderTargetCube.js',
+'extras/core/BufferGeometry.js',
 'extras/objects/LensFlare.js',
 'extras/plugins/LensFlarePlugin.js',
 'extras/plugins/ShadowMapPlugin.js',
@@ -425,7 +427,7 @@ def buildLib(files, debug, minified, filename):
 
 def buildIncludes(files, filename):
 
-	template = '\t\t<script type="text/javascript" src="../src/%s"></script>'
+	template = '\t\t<script src="../src/%s"></script>'
 	text = "\n".join(template % f for f in files)
 
 	output(text, filename + '.js')

@@ -141,9 +141,10 @@
 
 				}
 
-				var useWorker = true;
+				var useWorker = true
+					useBuffers = true;
 
-				var loader = new THREE.CTMLoader();
+				var loader = new THREE.CTMLoader( renderer.context );
 
 				loader.load( "ctm/ben.ctm",   function( geometry ) {
 
@@ -151,7 +152,7 @@
 					callbackModel( geometry, 450, material, 0, -200, 0, 0, 0 );
 					checkTime();
 
-				}, useWorker );
+				}, useWorker, useBuffers );
 
 				loader.load( "ctm/WaltHead.ctm",  function( geometry ) {
 
@@ -161,7 +162,7 @@
 					callbackModel( geometry, 5, material, -200, 0, 0, 0, 0 );
 					checkTime();
 
-				}, useWorker );
+				}, useWorker, useBuffers );
 
 				loader.load( "ctm/LeePerry.ctm",  function( geometry ) {
 
@@ -169,7 +170,7 @@
 					callbackModel( geometry, 1300, material, 200, 50, 0, 0, 0 );
 					checkTime();
 
-				}, useWorker );
+				}, useWorker, useBuffers );
 
 			}
 
