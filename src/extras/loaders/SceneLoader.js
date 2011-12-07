@@ -577,6 +577,9 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 
 			var modelJson = data.embeds[ g.id ],
 				texture_path = "";
+			
+			// Pass metadata along to jsonLoader so it knows the format version.
+			modelJson.metadata = data.metadata;
 
 			if ( modelJson ) {
 
