@@ -8,15 +8,88 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.CTMLoader = function ( context ) {
+THREE.CTMLoader = function ( context, showStatus ) {
 
 	this.context = context;
 
+	THREE.Loader.call( this, showStatus );
+
 };
 
-THREE.CTMLoader.prototype = new THREE.CTMLoader();
+THREE.CTMLoader.prototype = new THREE.Loader();
 THREE.CTMLoader.prototype.constructor = THREE.CTMLoader;
 
+
+// Load multiple CTM parts defined in JSON
+
+THREE.CTMLoader.prototype.loadParts = function( url, callback, useWorker, useBuffers, basePath ) {
+
+	var scope = this;
+
+	var xhr = new XMLHttpRequest();
+
+	basePath = basePath ? basePath : this.extractUrlbase( url );
+
+	console.log( basePath );
+
+	xhr.onreadystatechange = function() {
+
+		if ( xhr.readyState == 4 ) {
+
+			if ( xhr.status == 200 || xhr.status == 0 ) {
+
+				var jsonObject = JSON.parse( xhr.responseText );
+
+				var geometries = [], materials = [];
+				var partCounter = 0;
+
+				function generateCallback( index ) {
+
+					return function ( geometry ) {
+
+						geometries[ index ] = geometry;
+
+						partCounter += 1;
+
+						if ( partCounter === jsonObject.geometries.length ) {
+
+							callback( geometries, materials );
+
+						}
+
+					}
+
+				}
+
+				// init materials
+
+				for ( var i = 0; i < jsonObject.materials.length; i ++ ) {
+
+					materials[ i ] = THREE.Loader.prototype.createMaterial( jsonObject.materials[ i ], basePath );
+
+				}
+
+				// load individual CTM files
+
+				for ( var i = 0; i < jsonObject.geometries.length; i ++ ) {
+
+					var partUrl = basePath + jsonObject.geometries[ i ];
+					scope.load( partUrl, generateCallback( i ), useWorker, useBuffers );
+
+				}
+
+			}
+
+		}
+
+	}
+
+	xhr.open( "GET", url, true );
+	xhr.overrideMimeType( "text/plain; charset=x-user-defined" );
+	xhr.setRequestHeader( "Content-Type", "text/plain" );
+	xhr.send( null );
+
+};
 
 // Load CTMLoader compressed models
 //  - parameters
@@ -40,7 +113,7 @@ THREE.CTMLoader.prototype.load = function( url, callback, useWorker, useBuffers 
 
 				var binaryData = xhr.responseText;
 
-				var s = Date.now();
+				//var s = Date.now();
 
 				if ( useWorker ) {
 
@@ -60,8 +133,8 @@ THREE.CTMLoader.prototype.load = function( url, callback, useWorker, useBuffers 
 
 						}
 
-						var e = Date.now();
-						console.log( "CTM data parse time [worker]: " + (e-s) + " ms" );
+						//var e = Date.now();
+						//console.log( "CTM data parse time [worker]: " + (e-s) + " ms" );
 
 					};
 
