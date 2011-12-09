@@ -1,8 +1,8 @@
 """Split single OBJ model into mutliple OBJ files by materials
 
--------------------------
-How to use this converter
--------------------------
+-------------------------------------
+How to use
+-------------------------------------
 
 python split_obj.py -i infile.obj -o outfile
 

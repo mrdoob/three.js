@@ -30,8 +30,6 @@ THREE.CTMLoader.prototype.loadParts = function( url, callback, useWorker, useBuf
 
 	basePath = basePath ? basePath : this.extractUrlbase( url );
 
-	console.log( basePath );
-
 	xhr.onreadystatechange = function() {
 
 		if ( xhr.readyState == 4 ) {
@@ -40,26 +38,22 @@ THREE.CTMLoader.prototype.loadParts = function( url, callback, useWorker, useBuf
 
 				var jsonObject = JSON.parse( xhr.responseText );
 
-				var geometries = [], materials = [];
-				var partCounter = 0;
+				var materials = [], geometries = [], counter = 0;
 
-				function generateCallback( index ) {
+				function callbackFinal( geometry ) {
 
-					return function ( geometry ) {
+					counter += 1;
 
-						geometries[ index ] = geometry;
+					geometries.push( geometry );
 
-						partCounter += 1;
+					if ( counter === jsonObject.offsets.length ) {
 
-						if ( partCounter === jsonObject.geometries.length ) {
-
-							callback( geometries, materials );
-
-						}
+						callback( geometries, materials );
 
 					}
 
 				}
+
 
 				// init materials
 
@@ -69,14 +63,10 @@ THREE.CTMLoader.prototype.loadParts = function( url, callback, useWorker, useBuf
 
 				}
 
-				// load individual CTM files
+				// load joined CTM file
 
-				for ( var i = 0; i < jsonObject.geometries.length; i ++ ) {
-
-					var partUrl = basePath + jsonObject.geometries[ i ];
-					scope.load( partUrl, generateCallback( i ), useWorker, useBuffers );
-
-				}
+				var partUrl = basePath + jsonObject.data;
+				scope.load( partUrl, callbackFinal, useWorker, useBuffers, jsonObject.offsets );
 
 			}
 
@@ -96,9 +86,11 @@ THREE.CTMLoader.prototype.loadParts = function( url, callback, useWorker, useBuf
 //		- url (required)
 //		- callback (required)
 
-THREE.CTMLoader.prototype.load = function( url, callback, useWorker, useBuffers ) {
+THREE.CTMLoader.prototype.load = function( url, callback, useWorker, useBuffers, offsets ) {
 
 	var scope = this;
+
+	offsets = offsets !== undefined ? offsets : [ 0 ];
 
 	var xhr = new XMLHttpRequest(),
 		callbackProgress = null;
@@ -121,7 +113,40 @@ THREE.CTMLoader.prototype.load = function( url, callback, useWorker, useBuffers 
 
 					worker.onmessage = function( event ) {
 
-						var ctmFile = event.data;
+						var files = event.data;
+
+						for ( var i = 0; i < files.length; i ++ ) {
+
+							var ctmFile = files[ i ];
+
+							if ( useBuffers ) {
+
+								scope.createModelBuffers( ctmFile, callback );
+
+							} else {
+
+								scope.createModelClassic( ctmFile, callback );
+
+							}
+
+						}
+
+						//var e = Date.now();
+						//console.log( "CTM data parse time [worker]: " + (e-s) + " ms" );
+
+					};
+
+					worker.postMessage( { "data": binaryData, "offsets": offsets } );
+
+				} else {
+
+
+					for ( var i = 0; i < offsets.length; i ++ ) {
+
+						var stream = new CTM.Stream( binaryData );
+						stream.offset = offsets[ i ];
+
+						var ctmFile = new CTM.File( stream );
 
 						if ( useBuffers ) {
 
@@ -133,29 +158,10 @@ THREE.CTMLoader.prototype.load = function( url, callback, useWorker, useBuffers 
 
 						}
 
-						//var e = Date.now();
-						//console.log( "CTM data parse time [worker]: " + (e-s) + " ms" );
-
-					};
-
-					worker.postMessage( binaryData );
-
-				} else {
-
-					var ctmFile = new CTM.File( new CTM.Stream( binaryData ) );
-
-					if ( useBuffers ) {
-
-						scope.createModelBuffers( ctmFile, callback );
-
-					} else {
-
-						scope.createModelClassic( ctmFile, callback );
-
 					}
 
-					var e = Date.now();
-					console.log( "CTM data parse time [inline]: " + (e-s) + " ms" );
+					//var e = Date.now();
+					//console.log( "CTM data parse time [inline]: " + (e-s) + " ms" );
 
 				}
 

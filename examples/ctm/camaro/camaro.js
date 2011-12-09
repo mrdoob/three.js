@@ -1,15 +1,7 @@
 {
-"geometries" :
-	[
-	"camaro_000.ctm",
-	"camaro_001.ctm",
-	"camaro_002.ctm",
-	"camaro_003.ctm",
-	"camaro_004.ctm",
-	"camaro_005.ctm",
-	"camaro_006.ctm",
-	"camaro_007.ctm"
-	],
+"data" : "camaro.ctm",
+
+"offsets": [ 0, 39262, 79223, 83542, 94677, 95890, 144902, 470461 ],
 
 "materials" :
 	[
