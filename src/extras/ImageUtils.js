@@ -25,7 +25,7 @@ THREE.ImageUtils = {
 
 		images.loadCount = 0;
 
-		for ( i = 0, l = array.length; i < l; ++i ) {
+		for ( i = 0, l = array.length; i < l; ++ i ) {
 
 			images[ i ] = new Image();
 			images[ i ].onload = function () {

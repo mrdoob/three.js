@@ -5316,15 +5316,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.activeTexture( _gl.TEXTURE0 + slot );
 			_gl.bindTexture( _gl.TEXTURE_2D, texture.__webglTexture );
 
-			var needsMipMaps = setTextureParameters( _gl.TEXTURE_2D, texture, texture.image );
+			var needsMipMaps = setTextureParameters( _gl.TEXTURE_2D, texture, texture.image ),
+			glFormat = paramThreeToGL( texture.format ),
+			glType = paramThreeToGL( texture.type );
 
 			if ( texture instanceof THREE.DataTexture ) {
 
-				_gl.texImage2D( _gl.TEXTURE_2D, 0, paramThreeToGL( texture.format ), texture.image.width, texture.image.height, 0, paramThreeToGL( texture.format ), _gl.UNSIGNED_BYTE, texture.image.data );
+				_gl.texImage2D( _gl.TEXTURE_2D, 0, glFormat, texture.image.width, texture.image.height, 0, glFormat, glType, texture.image.data );
 
 			} else {
 
-				_gl.texImage2D( _gl.TEXTURE_2D, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, texture.image );
+				_gl.texImage2D( _gl.TEXTURE_2D, 0, glFormat, glFormat, glType, texture.image );
 
 			}
 
@@ -5362,11 +5364,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 				_gl.activeTexture( _gl.TEXTURE0 + slot );
 				_gl.bindTexture( _gl.TEXTURE_CUBE_MAP, texture.image.__webglTextureCube );
 
-				var needsMipMaps = setTextureParameters( _gl.TEXTURE_CUBE_MAP, texture, texture.image[ 0 ] );
+				var needsMipMaps = setTextureParameters( _gl.TEXTURE_CUBE_MAP, texture, texture.image[ 0 ] ),
+				glFormat = paramThreeToGL( texture.format ),
+				glType = paramThreeToGL( texture.type );
 
 				for ( var i = 0; i < 6; i ++ ) {
 
-					_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, texture.image[ i ] );
+					_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, glFormat, glFormat, glType, texture.image[ i ] );
 
 				}
 
@@ -5446,6 +5450,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			// Setup texture, create render and frame buffers
 
+			var glFormat = paramThreeToGL( renderTarget.format ),
+				glType = paramThreeToGL( renderTarget.type );
+
 			if ( isCube ) {
 
 				renderTarget.__webglFramebuffer = [];
@@ -5459,7 +5466,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					renderTarget.__webglFramebuffer[ i ] = _gl.createFramebuffer();
 					renderTarget.__webglRenderbuffer[ i ] = _gl.createRenderbuffer();
 
-					_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, paramThreeToGL( renderTarget.format ), renderTarget.width, renderTarget.height, 0, paramThreeToGL( renderTarget.format ), paramThreeToGL( renderTarget.type ), null );
+					_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, glFormat, renderTarget.width, renderTarget.height, 0, glFormat, glType, null );
 
 					setupFrameBuffer( renderTarget.__webglFramebuffer[ i ], renderTarget, _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i );
 					setupRenderBuffer( renderTarget.__webglRenderbuffer[ i ], renderTarget );
@@ -5474,7 +5481,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				_gl.bindTexture( _gl.TEXTURE_2D, renderTarget.__webglTexture );
 				setTextureParameters( _gl.TEXTURE_2D, renderTarget, renderTarget );
 
-				_gl.texImage2D( _gl.TEXTURE_2D, 0, paramThreeToGL( renderTarget.format ), renderTarget.width, renderTarget.height, 0, paramThreeToGL( renderTarget.format ), paramThreeToGL( renderTarget.type ), null );
+				_gl.texImage2D( _gl.TEXTURE_2D, 0, glFormat, renderTarget.width, renderTarget.height, 0, glFormat, glType, null );
 
 				setupFrameBuffer( renderTarget.__webglFramebuffer, renderTarget, _gl.TEXTURE_2D );
 				setupRenderBuffer( renderTarget.__webglRenderbuffer, renderTarget );

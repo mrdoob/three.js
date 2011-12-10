@@ -113,10 +113,12 @@
 				var texture = THREE.ImageUtils.loadTexture( "textures/disturb.jpg" );
 				texture.repeat.set( 20, 10 );
 				texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+				texture.format = THREE.RGBFormat;
 
 				var texture2 = THREE.ImageUtils.loadTexture( "textures/planets/moon_1024.jpg" );
 				texture2.repeat.set( 2, 1 );
 				texture2.wrapS = texture2.wrapT = THREE.RepeatWrapping;
+				texture2.format = THREE.RGBFormat;
 
 				// MATERIALS
 
