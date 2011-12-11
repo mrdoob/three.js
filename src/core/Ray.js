@@ -78,7 +78,7 @@ THREE.Ray = function ( origin, direction ) {
 
 			var distance = distanceFromIntersection( this.origin, this.direction, object.matrixWorld.getPosition() );
 
-			if ( distance === null || distance > object.geometry.boundingSphere.radius * Math.max( object.scale.x, Math.max( object.scale.y, object.scale.z ) ) ) {
+			if ( distance === null || distance > object.geometry.boundingSphere.radius * object.boundRadiusScale ) {
 
 				return intersects;
 

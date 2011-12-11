@@ -192,6 +192,13 @@ THREE.Object3D.prototype = {
 	},
 
 	updateMatrix: function () {
+	    var getScale = function (object) {
+	        if (object.parent && object.parent.scale && object.parent.scale.x) {
+	            return object.scale.clone().multiplySelf(getScale(object.parent));
+	        }
+	        return object.scale;
+	    };
+	    var s;
 
 		this.matrix.setPosition( this.position );
 
@@ -211,6 +218,9 @@ THREE.Object3D.prototype = {
 			this.boundRadiusScale = Math.max( this.scale.x, Math.max( this.scale.y, this.scale.z ) );
 
 		}
+
+        s = getScale(this);
+        this.boundRadiusScale = Math.max( s.x, Math.max( s.y, s.z ) );
 
 		this.matrixWorldNeedsUpdate = true;
 
