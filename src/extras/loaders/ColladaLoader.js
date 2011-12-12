@@ -759,7 +759,7 @@ THREE.ColladaLoader = function () {
 
 					material = new THREE.MeshFaceMaterial();
 					geom.materials = used_materials_array;
-					
+
 					for ( j = 0; j < geom.faces.length; j ++ ) {
 
 						var face = geom.faces[ j ];
@@ -3207,6 +3207,7 @@ THREE.ColladaLoader = function () {
 
 			switch ( child.nodeName ) {
 
+				case 'constant':
 				case 'lambert':
 				case 'blinn':
 				case 'phong':
