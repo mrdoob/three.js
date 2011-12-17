@@ -273,7 +273,13 @@ THREE.ShaderChunk = {
 			"uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];",
 			"uniform float pointLightDistance[ MAX_POINT_LIGHTS ];",
 
-		"#endif"
+		"#endif",
+
+		"#ifdef WRAP_AROUND",
+
+			"uniform vec3 wrapRGB;",
+
+		"#endif",
 
 	].join("\n"),
 
@@ -286,7 +292,20 @@ THREE.ShaderChunk = {
 		"for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {",
 
 			"vec4 lDirection = viewMatrix * vec4( directionalLightDirection[ i ], 0.0 );",
-			"float directionalLightWeighting = max( dot( transformedNormal, normalize( lDirection.xyz ) ), 0.0 );",
+
+			"#ifdef WRAP_AROUND",
+
+				"float directionalLightWeightingFull = max( dot( transformedNormal, normalize( lDirection.xyz ) ), 0.0 );",
+				"float directionalLightWeightingHalf = max( 0.5 * dot( transformedNormal, normalize( lDirection.xyz ) ) + 0.5, 0.0 );",
+
+				"vec3 directionalLightWeighting = mix( vec3( directionalLightWeightingFull ), vec3( directionalLightWeightingHalf ), wrapRGB );",
+
+			"#else",
+
+				"float directionalLightWeighting = max( dot( transformedNormal, normalize( lDirection.xyz ) ), 0.0 );",
+
+			"#endif",
+
 			"vLightWeighting += directionalLightColor[ i ] * directionalLightWeighting;",
 
 		"}",
@@ -308,7 +327,20 @@ THREE.ShaderChunk = {
 
 				"lVector = normalize( lVector );",
 
-				"float pointLightWeighting = max( dot( transformedNormal, lVector ), 0.0 );",
+				"#ifdef WRAP_AROUND",
+
+					"float pointLightWeightingFull = max( dot( transformedNormal, lVector ), 0.0 );",
+					"float pointLightWeightingHalf = max( 0.5 * dot( transformedNormal, lVector ) + 0.5, 0.0 );",
+
+					"vec3 pointLightWeighting = mix( vec3 ( pointLightWeightingFull ), vec3( pointLightWeightingHalf ), wrapRGB );",
+
+				"#else",
+
+					"float pointLightWeighting = max( dot( transformedNormal, lVector ), 0.0 );",
+
+				"#endif",
+
+
 				"vLightWeighting += pointLightColor[ i ] * pointLightWeighting * lDistance;",
 
 			"}",
@@ -392,6 +424,12 @@ THREE.ShaderChunk = {
 
 		"#endif",
 
+		"#ifdef WRAP_AROUND",
+
+			"uniform vec3 wrapRGB;",
+
+		"#endif",
+
 		"varying vec3 vViewPosition;",
 		"varying vec3 vNormal;"
 
@@ -433,7 +471,19 @@ THREE.ShaderChunk = {
 				"float pointDistance = lDistance;",
 
 				"float pointDotNormalHalf = max( dot( normal, pointHalfVector ), 0.0 );",
-				"float pointDiffuseWeight = max( dot( normal, lVector ), 0.0 );",
+
+				"#ifdef WRAP_AROUND",
+
+					"float pointDiffuseWeightFull = max( dot( normal, lVector ), 0.0 );",
+					"float pointDiffuseWeightHalf = max( 0.5 * dot( normal, lVector ) + 0.5, 0.0 );",
+
+					"vec3 pointDiffuseWeight = mix( vec3 ( pointDiffuseWeightFull ), vec3( pointDiffuseWeightHalf ), wrapRGB );",
+
+				"#else",
+
+					"float pointDiffuseWeight = max( dot( normal, lVector ), 0.0 );",
+
+				"#endif",
 
 				"float pointSpecularWeight = pow( pointDotNormalHalf, shininess );",
 
@@ -467,7 +517,19 @@ THREE.ShaderChunk = {
 				"vec3 dirHalfVector = normalize( lDirection.xyz + viewPosition );",
 
 				"float dirDotNormalHalf = max( dot( normal, dirHalfVector ), 0.0 );",
-				"float dirDiffuseWeight = max( dot( normal, dirVector ), 0.0 );",
+
+				"#ifdef WRAP_AROUND",
+
+					"float dirDiffuseWeightFull = max( dot( normal, dirVector ), 0.0 );",
+					"float dirDiffuseWeightHalf = max( 0.5 * dot( normal, dirVector ) + 0.5, 0.0 );",
+
+					"vec3 dirDiffuseWeight = mix( vec3( dirDiffuseWeightFull ), vec3( dirDiffuseWeightHalf ), wrapRGB );",
+
+				"#else",
+
+					"float dirDiffuseWeight = max( dot( normal, dirVector ), 0.0 );",
+
+				"#endif",
 
 				"float dirSpecularWeight = pow( dirDotNormalHalf, shininess );",
 
@@ -1122,7 +1184,8 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ "shadowmap" ],
 
 			{
-				"ambient"  : { type: "c", value: new THREE.Color( 0x050505 ) }
+				"ambient"  : { type: "c", value: new THREE.Color( 0x050505 ) },
+				"wrapRGB"  : { type: "v3", value: new THREE.Vector3( 1, 1, 1 ) }
 			}
 
 		] ),
@@ -1211,7 +1274,8 @@ THREE.ShaderLib = {
 			{
 				"ambient"  : { type: "c", value: new THREE.Color( 0x050505 ) },
 				"specular" : { type: "c", value: new THREE.Color( 0x111111 ) },
-				"shininess": { type: "f", value: 30 }
+				"shininess": { type: "f", value: 30 },
+				"wrapRGB"  : { type: "v3", value: new THREE.Vector3( 1, 1, 1 ) }
 			}
 
 		] ),

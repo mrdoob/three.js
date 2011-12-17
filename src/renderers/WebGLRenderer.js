@@ -4039,7 +4039,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			maxShadows: maxShadows,
 			alphaTest: material.alphaTest,
 			metal: material.metal,
-			perPixel: material.perPixel
+			perPixel: material.perPixel,
+			wrapAround: material.wrapAround
 
 		};
 
@@ -4379,6 +4380,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		if ( material.wrapAround ) {
+
+			uniforms.wrapRGB.value.copy( material.wrapRGB );
+
+		}
+
 	};
 
 	function refreshUniformsLambert ( uniforms, material ) {
@@ -4390,6 +4397,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		} else {
 
 			uniforms.ambient.value = material.ambient;
+
+		}
+
+		if ( material.wrapAround ) {
+
+			uniforms.wrapRGB.value.copy( material.wrapRGB );
 
 		}
 
@@ -5050,6 +5063,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			parameters.skinning ? "#define USE_SKINNING" : "",
 			parameters.morphTargets ? "#define USE_MORPHTARGETS" : "",
 			parameters.perPixel ? "#define PHONG_PER_PIXEL" : "",
+			parameters.wrapAround ? "#define WRAP_AROUND" : "",
 
 			parameters.shadowMapEnabled ? "#define USE_SHADOWMAP" : "",
 			parameters.shadowMapSoft ? "#define SHADOWMAP_SOFT" : "",
@@ -5127,6 +5141,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			parameters.metal ? "#define METAL" : "",
 			parameters.perPixel ? "#define PHONG_PER_PIXEL" : "",
+			parameters.wrapAround ? "#define WRAP_AROUND" : "",
 
 			parameters.shadowMapEnabled ? "#define USE_SHADOWMAP" : "",
 			parameters.shadowMapSoft ? "#define SHADOWMAP_SOFT" : "",
