@@ -167,6 +167,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	_gl = initGL();
 
+	_maxTextureSize = _gl.getParameter(_gl.TEXTURE_SIZE);
+	_maxCubemapSize = _gl.getParameter(_gl.MAX_CUBE_MAP_TEXTURE_SIZE);
+
 	setDefaultGLState();
 
 	initSprites();
@@ -5519,6 +5522,29 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	function clampToMaxSize ( image, maxSize ) {
+
+		if ( image.width <= maxSize && image.height <= maxSize ) {
+
+			return image;
+
+		}
+
+		// Warning: Scaling through the canvas will only work with images that use
+		// premultiplied alpha.
+		var maxDimension = Math.max( image.width, image.height );
+		var newWidth = Math.floor( image.width * maxSize / maxDimension );
+		var newHeight = Math.floor( image.height * maxSize / maxDimension );
+
+		var canvas = document.createElement( 'canvas' );
+		canvas.width = newWidth;
+		canvas.height = newHeight;
+		var ctx = canvas.getContext( "2d" );
+		ctx.drawImage( image,	0, 0, image.width, image.height, 0, 0, newWidth, newHeight );
+		return canvas;
+
+	}
+
 	function setCubeTexture ( texture, slot ) {
 
 		if ( texture.image.length === 6 ) {
@@ -5538,7 +5564,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				for ( var i = 0; i < 6; i ++ ) {
 
-					_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, texture.image[ i ] );
+					_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, clampToMaxSize( texture.image[ i ], _maxCubemapSize ) );
 
 				}
 
