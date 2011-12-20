@@ -21,6 +21,7 @@
  *  blend
  *  fxaa
  *  luminosity
+ *  colorCorrection
  *  normalmap
  */
 
@@ -1275,6 +1276,53 @@ THREE.ShaderExtras = {
 				"float v = dot( texel.xyz, luma );",
 
 				"gl_FragColor = vec4( v, v, v, texel.w );",
+
+			"}"
+
+		].join("\n")
+
+	},
+
+	/* -------------------------------------------------------------------------
+	//	Color correction
+	 ------------------------------------------------------------------------- */
+
+	'colorCorrection': {
+
+		uniforms: {
+
+			"tDiffuse" : 	{ type: "t", value: 0, texture: null },
+			"powRGB" :		{ type: "v3", value: new THREE.Vector3( 2, 2, 2 ) },
+			"mulRGB" :		{ type: "v3", value: new THREE.Vector3( 1, 1, 1 ) }
+
+		},
+
+		vertexShader: [
+
+			"varying vec2 vUv;",
+
+			"void main() {",
+
+				"vUv = vec2( uv.x, 1.0 - uv.y );",
+
+				"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+
+			"}"
+
+		].join("\n"),
+
+		fragmentShader: [
+
+			"uniform sampler2D tDiffuse;",
+			"uniform vec3 powRGB;",
+			"uniform vec3 mulRGB;",
+
+			"varying vec2 vUv;",
+
+			"void main() {",
+
+				"gl_FragColor = texture2D( tDiffuse, vUv );",
+				"gl_FragColor.rgb = mulRGB * pow( gl_FragColor.rgb, powRGB );",
 
 			"}"
 
