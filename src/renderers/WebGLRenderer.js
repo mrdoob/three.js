@@ -4723,7 +4723,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				dlength += 1;
 
-			} else if ( light instanceof THREE.SpotLight ) { // hack, not a proper spotlight
+			} else if ( light instanceof THREE.SpotLight && ! light.onlyShadow ) { // hack, not a proper spotlight
 
 				doffset = dlength * 3;
 
@@ -5676,7 +5676,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			light = lights[ l ];
 
-			if ( light instanceof THREE.SpotLight ) dirLights ++; // hack, not a proper spotlight
+			if ( light instanceof THREE.SpotLight && ! light.onlyShadow ) dirLights ++; // hack, not a proper spotlight
 			if ( light instanceof THREE.DirectionalLight ) dirLights ++;
 			if ( light instanceof THREE.PointLight ) pointLights ++;
 
