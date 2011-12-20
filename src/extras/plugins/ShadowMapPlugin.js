@@ -187,7 +187,15 @@ THREE.ShadowMapPlugin = function ( ) {
 
 						}
 
-						_renderer.renderBuffer( _cameraLight, lights, fog, material, buffer, object );
+						if ( buffer instanceof THREE.BufferGeometry ) {
+
+							_renderer.renderBufferDirect( _cameraLight, lights, fog, material, buffer, object );
+
+						} else {
+
+							_renderer.renderBuffer( _cameraLight, lights, fog, material, buffer, object );
+
+						}
 
 					}
 
