@@ -775,7 +775,9 @@ THREE.ShaderChunk = {
 				"vec3 shadowCoord = vShadowCoord[ i ].xyz / vShadowCoord[ i ].w;",
 				"shadowCoord.z += shadowBias;",
 
-				"if ( shadowCoord.x >= 0.0 && shadowCoord.x <= 1.0 && shadowCoord.y >= 0.0 && shadowCoord.y <= 1.0 ) {",
+				"bvec4 shadowTest = bvec4 ( shadowCoord.x >= 0.0, shadowCoord.x <= 1.0, shadowCoord.y >= 0.0, shadowCoord.y <= 1.0 );",
+
+				"if ( all( shadowTest ) ) {",
 
 					"#ifdef SHADOWMAP_SOFT",
 
