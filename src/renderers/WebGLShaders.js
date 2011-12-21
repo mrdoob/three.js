@@ -769,11 +769,15 @@ THREE.ShaderChunk = {
 			"#endif",
 
 			"vec3 shadowColor = vec3( 1.0 );",
+			"float fDepth;",
 
 			"for( int i = 0; i < MAX_SHADOWS; i ++ ) {",
 
 				"vec3 shadowCoord = vShadowCoord[ i ].xyz / vShadowCoord[ i ].w;",
 				"shadowCoord.z += shadowBias;",
+
+				// using "if ( all )" for ATI OpenGL shader compiler
+				// "if ( something && something )" breaks it
 
 				"bvec4 shadowTest = bvec4 ( shadowCoord.x >= 0.0, shadowCoord.x <= 1.0, shadowCoord.y >= 0.0, shadowCoord.y <= 1.0 );",
 
@@ -786,6 +790,10 @@ THREE.ShaderChunk = {
 						// http://fabiensanglard.net/shadowmappingPCF/
 
 						"float shadow = 0.0;",
+
+						/*
+						// this breaks shader compiler / validator on some ATI cards when using OpenGL
+						// must enroll loop manually
 
 						"for ( float y = -1.25; y <= 1.25; y += 1.25 )",
 							"for ( float x = -1.25; x <= 1.25; x += 1.25 ) {",
@@ -803,6 +811,42 @@ THREE.ShaderChunk = {
 						"}",
 
 						"shadow /= 9.0;",
+
+						*/
+
+						"const float shadowDelta = 1.0 / 9.0;",
+						"const float dx0 = -1.25 * xPixelOffset;",
+						"const float dy0 = -1.25 * yPixelOffset;",
+						"const float dx1 = 1.25 * xPixelOffset;",
+						"const float dy1 = 1.25 * yPixelOffset;",
+
+						"fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy0 ) ) );",
+						"if ( fDepth < shadowCoord.z ) shadow += shadowDelta;",
+
+						"fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy0 ) ) );",
+						"if ( fDepth < shadowCoord.z ) shadow += shadowDelta;",
+
+						"fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy0 ) ) );",
+						"if ( fDepth < shadowCoord.z ) shadow += shadowDelta;",
+
+						"fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, 0.0 ) ) );",
+						"if ( fDepth < shadowCoord.z ) shadow += shadowDelta;",
+
+						"fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy ) );",
+						"if ( fDepth < shadowCoord.z ) shadow += shadowDelta;",
+
+						"fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, 0.0 ) ) );",
+						"if ( fDepth < shadowCoord.z ) shadow += shadowDelta;",
+
+						"fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy1 ) ) );",
+						"if ( fDepth < shadowCoord.z ) shadow += shadowDelta;",
+
+						"fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy1 ) ) );",
+						"if ( fDepth < shadowCoord.z ) shadow += shadowDelta;",
+
+						"fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy1 ) ) );",
+						"if ( fDepth < shadowCoord.z ) shadow += shadowDelta;",
+
 						"shadowColor = shadowColor * vec3( ( 1.0 - shadowDarkness * shadow ) );",
 
 					"#else",
