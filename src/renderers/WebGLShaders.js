@@ -812,7 +812,7 @@ THREE.ShaderChunk = {
 
 							// spot with multiple shadows is darker
 
-							"shadowColor = shadowColor * vec3( shadowDarkness );",
+							"shadowColor = shadowColor * vec3( 1.0 - shadowDarkness );",
 
 							// spot with multiple shadows has the same color as single shadow spot
 
