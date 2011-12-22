@@ -67,6 +67,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.maxMorphTargets = 8;
 
+	// flags
+
+	this.autoScaleCubemaps = true;
+
 	// custom render plugins
 
 	this.renderPluginsPre = [];
@@ -158,7 +162,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.context = _gl;
 
-	var _supportsVertexTextures = ( maxVertexTextures() > 0 );
+	// GPU capabilities
+
+	var _maxVertexTextures = _gl.getParameter( _gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS ),
+	_maxTextureSize = _gl.getParameter( _gl.TEXTURE_SIZE ),
+	_maxCubemapSize = _gl.getParameter( _gl.MAX_CUBE_MAP_TEXTURE_SIZE );
 
 	// API
 
@@ -170,7 +178,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.supportsVertexTextures = function () {
 
-		return _supportsVertexTextures;
+		return _maxVertexTextures > 0;
 
 	};
 
@@ -4723,7 +4731,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				dlength += 1;
 
-			} else if ( light instanceof THREE.SpotLight ) { // hack, not a proper spotlight
+			} else if ( light instanceof THREE.SpotLight && ! light.onlyShadow ) { // hack, not a proper spotlight
 
 				doffset = dlength * 3;
 
@@ -5043,7 +5051,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var prefix_vertex = [
 
-			_supportsVertexTextures ? "#define VERTEX_TEXTURES" : "",
+			( _maxVertexTextures > 0 ) ? "#define VERTEX_TEXTURES" : "",
 
 			_this.gammaInput ? "#define GAMMA_INPUT" : "",
 			_this.gammaOutput ? "#define GAMMA_OUTPUT" : "",
@@ -5364,6 +5372,32 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	function clampToMaxSize ( image, maxSize ) {
+
+		if ( image.width <= maxSize && image.height <= maxSize ) {
+
+			return image;
+
+		}
+
+		// Warning: Scaling through the canvas will only work with images that use
+		// premultiplied alpha.
+
+		var maxDimension = Math.max( image.width, image.height );
+		var newWidth = Math.floor( image.width * maxSize / maxDimension );
+		var newHeight = Math.floor( image.height * maxSize / maxDimension );
+
+		var canvas = document.createElement( 'canvas' );
+		canvas.width = newWidth;
+		canvas.height = newHeight;
+
+		var ctx = canvas.getContext( "2d" );
+		ctx.drawImage( image, 0, 0, image.width, image.height, 0, 0, newWidth, newHeight );
+
+		return canvas;
+
+	}
+
 	function setCubeTexture ( texture, slot ) {
 
 		if ( texture.image.length === 6 ) {
@@ -5379,13 +5413,29 @@ THREE.WebGLRenderer = function ( parameters ) {
 				_gl.activeTexture( _gl.TEXTURE0 + slot );
 				_gl.bindTexture( _gl.TEXTURE_CUBE_MAP, texture.image.__webglTextureCube );
 
-				var needsMipMaps = setTextureParameters( _gl.TEXTURE_CUBE_MAP, texture, texture.image[ 0 ] ),
+				var cubeImage = [];
+
+				for ( var i = 0; i < 6; i ++ ) {
+
+					if ( _this.autoScaleCubemaps ) {
+
+						cubeImage[ i ] = clampToMaxSize( texture.image[ i ], _maxCubemapSize );
+
+					} else {
+
+						cubeImage[ i ] = texture.image[ i ];
+
+					}
+
+				}
+
+				var needsMipMaps = setTextureParameters( _gl.TEXTURE_CUBE_MAP, texture, cubeImage[ 0 ] ),
 				glFormat = paramThreeToGL( texture.format ),
 				glType = paramThreeToGL( texture.type );
 
 				for ( var i = 0; i < 6; i ++ ) {
 
-					_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, glFormat, glFormat, glType, texture.image[ i ] );
+					_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, glFormat, glFormat, glType, cubeImage[ i ] );
 
 				}
 
@@ -5676,7 +5726,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			light = lights[ l ];
 
-			if ( light instanceof THREE.SpotLight ) dirLights ++; // hack, not a proper spotlight
+			if ( light instanceof THREE.SpotLight && ! light.onlyShadow ) dirLights ++; // hack, not a proper spotlight
 			if ( light instanceof THREE.DirectionalLight ) dirLights ++;
 			if ( light instanceof THREE.PointLight ) pointLights ++;
 
@@ -5711,12 +5761,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		return maxShadows;
-
-	};
-
-	function maxVertexTextures () {
-
-		return _gl.getParameter( _gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS );
 
 	};
 

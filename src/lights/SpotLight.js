@@ -13,6 +13,7 @@ THREE.SpotLight = function ( hex, intensity, distance, castShadow ) {
 	this.distance = ( distance !== undefined ) ? distance : 0;
 
 	this.castShadow = ( castShadow !== undefined ) ? castShadow : false;
+	this.onlyShadow = false;
 
 };
 
