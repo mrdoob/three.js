@@ -44,7 +44,20 @@ THREE.Frustum.prototype.contains = function ( object ) {
 	var distance,
 	planes = this.planes,
 	matrix = object.matrixWorld,
-	radius = - object.geometry.boundingSphere.radius * Math.max( object.scale.x, Math.max( object.scale.y, object.scale.z ) );
+	parent = object,
+	scaleX, scaleY, scaleZ;
+	
+	// accumulate the scaling factors of the object's ancestors 
+	scaleX = scaleY = scaleZ = 1;
+	while ( parent ) {
+		scaleX *= parent.scale.x;
+		scaleY *= parent.scale.y;
+		scaleZ *= parent.scale.z;
+		
+		parent = parent.parent; 
+	}
+	
+	var radius = - object.geometry.boundingSphere.radius * Math.max( scaleX, Math.max( scaleY, scaleZ ) );
 
 	for ( var i = 0; i < 6; i ++ ) {
 
@@ -56,4 +69,3 @@ THREE.Frustum.prototype.contains = function ( object ) {
 	return true;
 
 };
-
