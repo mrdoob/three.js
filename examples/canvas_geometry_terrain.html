@@ -31,8 +31,8 @@
 	</head>
 	<body>
 
-		<div id="container"><br /><br /><br /><br /><br />Generating...</div> 
-		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - terrain demo. <a href="canvas_geometry_terrain.html">generate another</a></div> 
+		<div id="container"><br /><br /><br /><br /><br />Generating...</div>
+		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - terrain demo. <a href="canvas_geometry_terrain.html">generate another</a></div>
 
 		<script src="../build/Three.js"></script>
 
@@ -63,6 +63,8 @@
 				camera.position.z = 500;
 
 				scene = new THREE.Scene();
+
+				scene.add( camera );
 
 				var data = generateHeight( 1024, 1024 );
 				var material = new THREE.MeshBasicMaterial( { map: new THREE.Texture( generateTexture( data, 1024, 1024 ) ), overdraw: true } );

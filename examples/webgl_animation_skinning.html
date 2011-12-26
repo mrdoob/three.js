@@ -80,8 +80,9 @@
 
 				scene = new THREE.Scene();
 				scene.fog = new THREE.FogExp2( 0xffffff, 0.0003 );
-				//scene.fog.color.setHSV( 0.1, 0.5, 1 );
 				scene.fog.color.setHSV( 0.1, 0.10, 1 );
+
+				scene.add( camera );
 
 				light = new THREE.DirectionalLight( 0xffffff, 1.5 );
 				light.position.set( 0, 1, 1 ).normalize();
@@ -104,7 +105,7 @@
 				floor.scale.set( 25, 25, 25 );
 				scene.add( floor );
 
-				renderer = new THREE.WebGLRenderer( { clearColor: 0xffffff, clearAlpha: 1 } );
+				renderer = new THREE.WebGLRenderer( { clearColor: 0xffffff, clearAlpha: 1, antialias: true } );
 				renderer.setSize( window.innerWidth, height );
 				renderer.setClearColor( scene.fog.color, 1 );
 				renderer.sortObjects = false;

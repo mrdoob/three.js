@@ -66,12 +66,12 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
+				scene = new THREE.Scene();
+				scene.fog = new THREE.Fog( 0x000000, 800, 2000 );
+
 				camera = new THREE.PerspectiveCamera( 20, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 2000 );
 				camera.position.z = 800;
-
-				scene = new THREE.Scene();
-				scene.fog = new THREE.Fog( 0x000000, 800, camera.far );
-
+				scene.add( camera );
 
 				var path = "textures/cube/SwedishRoyalCastle/";
 				var format = '.jpg';

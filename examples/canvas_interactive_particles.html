@@ -64,10 +64,11 @@
 				container.appendChild( info );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.y = 300;
-				camera.position.z = 500;
+				camera.position.set( 0, 300, 500 );
 
 				scene = new THREE.Scene();
+
+				scene.add( camera );
 
 				for ( var i = 0; i < 100; i ++ ) {
 

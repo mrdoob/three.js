@@ -192,7 +192,8 @@ CANVAS_FILES = [
 'renderers/renderables/RenderableFace4.js',
 'renderers/renderables/RenderableObject.js',
 'renderers/renderables/RenderableParticle.js',
-'renderers/renderables/RenderableLine.js'
+'renderers/renderables/RenderableLine.js',
+'extras/ImageUtils.js'
 ]
 
 DOM_FILES = [
@@ -217,13 +218,25 @@ DOM_FILES = [
 'cameras/Camera.js',
 'cameras/OrthographicCamera.js',
 'cameras/PerspectiveCamera.js',
+'lights/Light.js',
+'materials/Material.js',
 'materials/ParticleDOMMaterial.js',
+'textures/Texture.js',
 'objects/Particle.js',
+'objects/Mesh.js',
+'objects/Line.js',
 'objects/Bone.js',
 'objects/Sprite.js',
 'scenes/Scene.js',
 'renderers/DOMRenderer.js',
-'renderers/renderables/RenderableParticle.js'
+'renderers/renderables/RenderableParticle.js',
+'renderers/renderables/RenderableVertex.js',
+'renderers/renderables/RenderableFace3.js',
+'renderers/renderables/RenderableFace4.js',
+'renderers/renderables/RenderableObject.js',
+'renderers/renderables/RenderableParticle.js',
+'renderers/renderables/RenderableLine.js',
+'extras/ImageUtils.js'
 ]
 
 SVG_FILES = [
@@ -262,6 +275,7 @@ SVG_FILES = [
 'materials/MeshNormalMaterial.js',
 'materials/MeshFaceMaterial.js',
 'materials/ParticleBasicMaterial.js',
+'textures/Texture.js',
 'objects/Particle.js',
 'objects/Line.js',
 'objects/Mesh.js',
@@ -274,7 +288,8 @@ SVG_FILES = [
 'renderers/renderables/RenderableFace4.js',
 'renderers/renderables/RenderableObject.js',
 'renderers/renderables/RenderableParticle.js',
-'renderers/renderables/RenderableLine.js'
+'renderers/renderables/RenderableLine.js',
+'extras/ImageUtils.js'
 ]
 
 WEBGL_FILES = [
@@ -290,7 +305,6 @@ WEBGL_FILES = [
 'core/Matrix3.js',
 'core/Matrix4.js',
 'core/Object3D.js',
-'core/Projector.js',
 'core/Quaternion.js',
 'core/Vertex.js',
 'core/Face3.js',
@@ -338,11 +352,13 @@ WEBGL_FILES = [
 'renderers/WebGLRenderTargetCube.js',
 'extras/core/BufferGeometry.js',
 'extras/objects/LensFlare.js',
+'extras/objects/MarchingCubes.js',
 'extras/plugins/LensFlarePlugin.js',
 'extras/plugins/ShadowMapPlugin.js',
 'extras/plugins/SpritePlugin.js',
 'extras/shaders/ShaderFlares.js',
-'extras/shaders/ShaderSprite.js'
+'extras/shaders/ShaderSprite.js',
+'extras/ImageUtils.js'
 ]
 
 def merge(files):
@@ -362,7 +378,11 @@ def output(text, filename):
 		f.write(text)
 
 
-def compress(text):
+def compress(text, fname_externs):
+
+	externs = ""
+	if fname_externs:
+		externs = "--externs %s.js" % fname_externs
 
 	in_tuple = tempfile.mkstemp()
 	with os.fdopen(in_tuple[0], 'w') as handle:
@@ -370,7 +390,7 @@ def compress(text):
 
 	out_tuple = tempfile.mkstemp()
 
-	os.system("java -jar compiler/compiler.jar --language_in=ECMASCRIPT5_STRICT --js %s --js_output_file %s" % (in_tuple[1], out_tuple[1]))
+	os.system("java -jar compiler/compiler.jar --warning_level=VERBOSE --jscomp_off=globalThis --jscomp_off=checkTypes --externs externs_common.js %s --language_in=ECMASCRIPT5_STRICT --js %s --js_output_file %s" % (externs, in_tuple[1], out_tuple[1]))
 
 	with os.fdopen(out_tuple[0], 'r') as handle:
 		compressed = handle.read()
@@ -400,7 +420,7 @@ def makeDebug(text):
 	return text
 
 
-def buildLib(files, debug, minified, filename):
+def buildLib(files, debug, minified, filename, fname_externs):
 
 	text = merge(files)
 
@@ -420,7 +440,7 @@ def buildLib(files, debug, minified, filename):
 	print "=" * 40
 
 	if minified:
-		text = compress(text)
+		text = compress(text, fname_externs)
 
 	output(addHeader(text, filename), folder + filename)
 
@@ -480,17 +500,17 @@ def main(argv=None):
 	minified = args.minified
 
 	config = [
-	['Three', 'includes', COMMON_FILES + EXTRAS_FILES, args.common],
-	['ThreeCanvas', 'includes_canvas', CANVAS_FILES, args.canvas],
-	['ThreeDOM', 'includes_dom', DOM_FILES, args.dom],
-	['ThreeSVG', 'includes_svg', SVG_FILES, args.svg],
-	['ThreeWebGL', 'includes_webgl', WEBGL_FILES, args.webgl],
-	['ThreeExtras', 'includes_extras', EXTRAS_FILES, args.extras]
+	['Three', 'includes', '', COMMON_FILES + EXTRAS_FILES, args.common],
+	['ThreeCanvas', 'includes_canvas', '', CANVAS_FILES, args.canvas],
+	['ThreeDOM', 'includes_dom', '', DOM_FILES, args.dom],
+	['ThreeSVG', 'includes_svg', '', SVG_FILES, args.svg],
+	['ThreeWebGL', 'includes_webgl', '', WEBGL_FILES, args.webgl],
+	['ThreeExtras', 'includes_extras', 'externs_extras', EXTRAS_FILES, args.extras]
 	]
 
-	for fname_lib, fname_inc, files, enabled in config:
+	for fname_lib, fname_inc, fname_externs, files, enabled in config:
 		if enabled or args.all:
-			buildLib(files, debug, minified, fname_lib)
+			buildLib(files, debug, minified, fname_lib, fname_externs)
 			if args.includes:
 				buildIncludes(files, fname_inc)
 

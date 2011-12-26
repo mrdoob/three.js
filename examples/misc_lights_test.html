@@ -47,7 +47,7 @@
 
 			var container, stats;
 
-			var camera, scene, target, canvasRenderer, webglRenderer;
+			var camera, scene, canvasRenderer, webglRenderer;
 
 			var mesh, zmesh, lightMesh, geometry;
 
@@ -78,12 +78,12 @@
 				container = document.createElement('div');
 				document.body.appendChild(container);
 
+				scene = new THREE.Scene();
+
 				camera = new THREE.PerspectiveCamera( 75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
 				camera.position.z = 500;
 
-				target = new THREE.Vector3( 0, 0, 0 );
-
-				scene = new THREE.Scene();
+				scene.add( camera );
 
 				// Spheres
 
@@ -188,7 +188,7 @@
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 
-				camera.lookAt( target );
+				camera.lookAt( scene.position );
 
 				for ( var i = 0, l = scene.objects.length; i < l; i ++ ) {
 

@@ -76,27 +76,27 @@
 
 			var geometriesParams = [
 
-				{type: 'CubeGeometry', args: [ 200, 200, 200, 2, 2, 2, materials ] },
-				{type: 'TorusGeometry', args: [ 100, 60, 4, 8, Math.PI*2 ] },
-				{type: 'TorusKnotGeometry', args: [  ], scale:0.25, meshScale:4 },
-				{type: 'SphereGeometry', args: [ 100, 3, 3 ], meshScale:2 },
-				{type: 'IcosahedronGeometry', args: [ 1 ], scale: 100, meshScale:2 },
-				{type: 'CylinderGeometry', args: [ 25, 75, 200, 8, 3 ]} ,
-				{type: 'OctahedronGeometry', args: [200, 0], meshScale:2 },
-				{type: 'LatheGeometry', args: [ [
-					new THREE.Vector3(0,0,0), 
+				{ type: 'CubeGeometry', args: [ 200, 200, 200, 2, 2, 2, materials ] },
+				{ type: 'TorusGeometry', args: [ 100, 60, 4, 8, Math.PI*2 ] },
+				{ type: 'TorusKnotGeometry', args: [  ], scale:0.25, meshScale:4 },
+				{ type: 'SphereGeometry', args: [ 100, 3, 3 ], meshScale:2 },
+				{ type: 'IcosahedronGeometry', args: [ 1 ], scale: 100, meshScale:2 },
+				{ type: 'CylinderGeometry', args: [ 25, 75, 200, 8, 3 ]} ,
+				{ type: 'OctahedronGeometry', args: [200, 0], meshScale:2 },
+				{ type: 'LatheGeometry', args: [ [
+					new THREE.Vector3(0,0,0),
 					new THREE.Vector3(0,50,50),
-					new THREE.Vector3(0,10,100), 
+					new THREE.Vector3(0,10,100),
 					new THREE.Vector3(0,50,150),
 					new THREE.Vector3(0,0,200) ] ]},
-				{type: 'TextGeometry', args: ['&', {
+				{ type: 'TextGeometry', args: ['&', {
 										size: 200,
 										height: 50,
 										curveSegments: 1,
 										font: "helvetiker"
 
 									}]},
-				{type: 'PlaneGeometry', args: [ 200, 200, 4, 4 ] }
+				{ type: 'PlaneGeometry', args: [ 200, 200, 4, 4 ] }
 
 			];
 
@@ -109,8 +109,8 @@
 					THREE.WaltHead = function() {
 						return THREE.GeometryUtils.clone(geometry);
 					};
-					
-					updateInfo() 
+
+					updateInfo()
 
 				});
 
@@ -122,8 +122,8 @@
 					THREE.Suzanne = function() {
 						return THREE.GeometryUtils.clone(geometry);
 					};
-					
-					updateInfo() 
+
+					updateInfo()
 
 				} );
 
@@ -166,13 +166,13 @@
 
 				addStuff();
 			}
-			
+
 			function updateInfo() {
-				
+
 				var params = geometriesParams[ geometryIndex ];
-				
+
 				var dropdown = '<select id="dropdown" onchange="switchGeometry(this.value)">';
-				
+
 				for (  i = 0; i < geometriesParams.length; i ++ ) {
 					dropdown += '<option value="' + i + '"';
 
@@ -211,8 +211,11 @@
 				geometry = createSomething( THREE[ params.type ], params.args );
 
 				// Scale Geometry
-				if (params.scale) {
+
+				if ( params.scale ) {
+
 					geometry.applyMatrix( new THREE.Matrix4().setScale( params.scale, params.scale, params.scale ) );
+
 				}
 
 				// Cloning original geometry for debuging
@@ -344,10 +347,11 @@
 				info.innerHTML = 'Drag to spin the geometry ';
 				container.appendChild( info );
 
+				scene = new THREE.Scene();
+
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.z = 500;
-
-				scene = new THREE.Scene();
+				scene.add( camera );
 
 				var light = new THREE.PointLight( 0xffffff, 1.5 );
 				light.position.set( 1000, 1000, 2000 );

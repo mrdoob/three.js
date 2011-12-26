@@ -9,9 +9,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// constructor parameters
 
-	var parameters = parameters || {},
+	parameters = parameters || {};
 
-	_canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElement( 'canvas' ),
+	var _canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElement( 'canvas' ),
 
 	_precision = parameters.precision !== undefined ? parameters.precision : 'mediump',
 	_antialias = parameters.antialias !== undefined ? parameters.antialias : false,
@@ -2715,7 +2715,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material.opacity === 0 ) return;
 
-		var program, attributes, linewidth, primitives, a, attribute, i, il;
+		var program, attributes, linewidth, primitives, a, attribute;
 
 		program = setProgram( camera, lights, fog, material, object );
 
@@ -2738,7 +2738,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var offsets = geometryGroup.offsets;
 
-			for ( var i = 0; i < offsets.length; ++ i ) {
+			for ( var i = 0, il = offsets.length; i < il; ++ i ) {
 
 				if ( updateBuffers ) {
 
@@ -3799,6 +3799,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( geometry instanceof THREE.BufferGeometry ) {
 
+				/*
 				if ( geometry.__dirtyVertices || geometry.__dirtyElements ||
 					 geometry.__dirtyUvs || geometry.__dirtyNormals ||
 					 geometry.__dirtyColors  ) {
@@ -3807,6 +3808,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					// set buffers from typed arrays
 
 				}
+				*/
 
 				geometry.__dirtyVertices = false;
 				geometry.__dirtyElements = false;

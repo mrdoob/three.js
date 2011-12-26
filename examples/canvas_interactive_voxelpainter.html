@@ -50,6 +50,8 @@
 
 				scene = new THREE.Scene();
 
+				scene.add( camera );
+
 				// Grid
 
 				var geometry = new THREE.Geometry();
@@ -145,7 +147,7 @@
 
 						var position = new THREE.Vector3().add( intersects[ 0 ].point, intersects[ 0 ].object.matrixRotationWorld.multiplyVector3( intersects[ 0 ].face.normal.clone() ) );
 
-						var voxel = new THREE.Mesh( new THREE.CubeGeometry( 50, 50, 50 ), [ new THREE.MeshLambertMaterial( { color: 0x00ff80, opacity: 1, shading: THREE.FlatShading } ), new THREE.MeshFaceMaterial() ] );
+						var voxel = new THREE.Mesh( new THREE.CubeGeometry( 50, 50, 50 ), new THREE.MeshLambertMaterial( { color: 0x00ff80, opacity: 1, shading: THREE.FlatShading } ) );
 						voxel.position.x = Math.floor( position.x / 50 ) * 50 + 25;
 						voxel.position.y = Math.floor( position.y / 50 ) * 50 + 25;
 						voxel.position.z = Math.floor( position.z / 50 ) * 50 + 25;

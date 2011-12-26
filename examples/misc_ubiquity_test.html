@@ -51,6 +51,8 @@
 
 				scene = new THREE.Scene();
 
+				scene.add( camera );
+
 				// QRCODE
 
 				qrcode = mesh = new THREE.Mesh( new Qrcode(), new THREE.MeshFaceMaterial() );
@@ -150,7 +152,7 @@
 				svgRenderer.setQuality( 'low' );
 				container.appendChild( svgRenderer.domElement );
 
-				webglRenderer = new THREE.WebGLRenderer();
+				webglRenderer = new THREE.WebGLRenderer( { antialias: true } );
 				webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				// webglRenderer.setFaceCulling( 0 );
 				container.appendChild( webglRenderer.domElement );

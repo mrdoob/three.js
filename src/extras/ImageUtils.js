@@ -68,7 +68,8 @@ THREE.ImageUtils = {
 
 		}
 
-		var depth = depth | 1;
+		depth = depth | 1;
+
 		var width = image.width;
 		var height = image.height;
 

@@ -30,7 +30,7 @@
 
 THREE.ExtrudeGeometry = function( shapes, options ) {
 
-	if( typeof( shapes ) === "undefined" ) {
+	if ( typeof( shapes ) === "undefined" ) {
 
 		shapes = [];
 		return;
@@ -41,7 +41,7 @@ THREE.ExtrudeGeometry = function( shapes, options ) {
 
 	shapes = shapes instanceof Array ? shapes : [ shapes ];
 
-	var s, sl = shapes.length, shape;
+	var shape, s, sl = shapes.length;
 
 	this.shapebb = shapes[ sl - 1 ].getBoundingBox();
 
@@ -110,7 +110,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	// Safeguards if bevels are not enabled
 
-	if ( !bevelEnabled ) {
+	if ( ! bevelEnabled ) {
 
 		bevelSegments = 0;
 		bevelThickness = 0;
@@ -129,7 +129,6 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	var shapesOffset = this.vertices.length;
 
-
 	if ( bendPath ) {
 
 		shape.addWrapPath( bendPath );
@@ -138,7 +137,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	var shapePoints;
 
-	if ( !useSpacedPoints ) {
+	if ( ! useSpacedPoints ) {
 
 	  	shapePoints = shape.extractAllPoints( curveSegments ); //
 
@@ -202,8 +201,6 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	}
 
-
-	var i, il;
 
 	function scalePt2 ( pt, vec, size ) {
 
@@ -346,7 +343,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	var contourMovements = [];
 
-	for ( i = 0, il = contour.length, j = il-1, k = i + 1; i < il; i++, j++, k++ ) {
+	for ( var i = 0, il = contour.length, j = il - 1, k = i + 1; i < il; i ++, j ++, k ++ ) {
 
 		if ( j === il ) j = 0;
 		if ( k === il ) k = 0;
@@ -364,13 +361,13 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	var holesMovements = [], oneHoleMovements, verticesMovements = contourMovements.concat();
 
-	for ( h = 0, hl = holes.length; h < hl; h++ ) {
+	for ( h = 0, hl = holes.length; h < hl; h ++ ) {
 
 		ahole = holes[ h ];
 
 		oneHoleMovements = [];
 
-		for ( i = 0, il = ahole.length, j = il - 1, k = i + 1; i < il; i++, j++, k++ ) {
+		for ( i = 0, il = ahole.length, j = il - 1, k = i + 1; i < il; i ++, j ++, k ++ ) {
 
 			if ( j === il ) j = 0;
 			if ( k === il ) k = 0;

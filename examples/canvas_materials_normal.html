@@ -54,10 +54,11 @@
 				var container = document.getElementById( 'container' );
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.y = - 6;
-				camera.position.z = 100;
+				camera.position.set( 0, - 6, 100 );
 
 				scene = new THREE.Scene();
+
+				scene.add( camera );
 
 				loader = new THREE.JSONLoader();
 				loader.load( 'obj/WaltHeadLo.js', function ( geometry ) {

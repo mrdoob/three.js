@@ -84,7 +84,7 @@ THREE.ShadowMapPlugin = function ( ) {
 
 				if ( _cameraLight.parent == null ) {
 
-					console.warn( "Camera is not on the Scene. Adding it..." );
+					//console.warn( "Camera is not on the Scene. Adding it..." );
 					scene.add( _cameraLight );
 
 					if ( _renderer.autoUpdateScene ) scene.updateMatrixWorld();

@@ -49,10 +49,11 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
+				scene = new THREE.Scene();
+
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.set( 2, 2, 3 );
-
-				scene = new THREE.Scene();
+				scene.add( camera );
 
 				// Grid
 

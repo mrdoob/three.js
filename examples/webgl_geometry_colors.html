@@ -61,14 +61,14 @@
 
 				container = document.getElementById( 'container' );
 
+				scene = new THREE.Scene();
+
 				camera = new THREE.PerspectiveCamera( 20, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 1800;
-
-				scene = new THREE.Scene();
+				scene.add( camera );
 
 				light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0, 0, 1 );
-				light.position.normalize();
 				scene.add( light );
 
 				var shadowMaterial = new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/shadow.png' ) } );

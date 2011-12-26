@@ -57,12 +57,12 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.x = 1000;
-				camera.position.y = 1000;
-				camera.position.z = 1000;
+				camera.position.set( 1000, 1000, 1000 );
 				camera.target = new THREE.Vector3( 0, 150, 0 );
 
 				scene = new THREE.Scene();
+
+				scene.add( camera );
 
 				// Plane
 

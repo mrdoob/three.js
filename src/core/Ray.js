@@ -35,8 +35,9 @@ THREE.Ray = function ( origin, direction ) {
 	var c = new THREE.Vector3();
 	var d = new THREE.Vector3();
 
-	var origin = new THREE.Vector3();
-	var direction = new THREE.Vector3();
+	var originCopy = new THREE.Vector3();
+	var directionCopy = new THREE.Vector3();
+
 	var vector = new THREE.Vector3();
 	var normal = new THREE.Vector3();
 	var intersectPoint = new THREE.Vector3()
@@ -97,15 +98,15 @@ THREE.Ray = function ( origin, direction ) {
 
 				face = geometry.faces[ f ];
 
-				origin.copy( this.origin );
-				direction.copy( this.direction );
+				originCopy.copy( this.origin );
+				directionCopy.copy( this.direction );
 
 				objMatrix = object.matrixWorld;
 
 				// check if face.centroid is behind the origin
 
-				vector = objMatrix.multiplyVector3( vector.copy( face.centroid ) ).subSelf( origin );
-				dot = vector.dot( direction );
+				vector = objMatrix.multiplyVector3( vector.copy( face.centroid ) ).subSelf( originCopy );
+				dot = vector.dot( directionCopy );
 
 				if ( dot <= 0 ) continue;
 
@@ -117,12 +118,12 @@ THREE.Ray = function ( origin, direction ) {
 				if ( face instanceof THREE.Face4 ) d = objMatrix.multiplyVector3( d.copy( vertices[ face.d ].position ) );
 
 				normal = object.matrixRotationWorld.multiplyVector3( normal.copy( face.normal ) );
-				dot = direction.dot( normal );
+				dot = directionCopy.dot( normal );
 
 				if ( object.doubleSided || ( object.flipSided ? dot > 0 : dot < 0 ) ) { // Math.abs( dot ) > 0.0001
 
-					scalar = normal.dot( vector.sub( a, origin ) ) / dot;
-					intersectPoint.add( origin, direction.multiplyScalar( scalar ) );
+					scalar = normal.dot( vector.sub( a, originCopy ) ) / dot;
+					intersectPoint.add( originCopy, directionCopy.multiplyScalar( scalar ) );
 
 					if ( face instanceof THREE.Face3 ) {
 
@@ -130,7 +131,7 @@ THREE.Ray = function ( origin, direction ) {
 
 							intersect = {
 
-								distance: origin.distanceTo( intersectPoint ),
+								distance: originCopy.distanceTo( intersectPoint ),
 								point: intersectPoint.clone(),
 								face: face,
 								object: object
@@ -147,7 +148,7 @@ THREE.Ray = function ( origin, direction ) {
 
 							intersect = {
 
-								distance: origin.distanceTo( intersectPoint ),
+								distance: originCopy.distanceTo( intersectPoint ),
 								point: intersectPoint.clone(),
 								face: face,
 								object: object

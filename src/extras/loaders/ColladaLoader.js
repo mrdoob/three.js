@@ -902,7 +902,7 @@ THREE.ColladaLoader = function () {
 
 			var sampler = node.channels[i].sampler;
 
-			for (var j = 0; j < sampler.input.length - 1; j ++ ) {
+			for ( var j = 0; j < sampler.input.length - 1; j ++ ) {
 
 				var t0 = sampler.input[ j ];
 				var t1 = sampler.input[ j + 1 ];
@@ -932,19 +932,19 @@ THREE.ColladaLoader = function () {
 
 		for ( i = 0; i < node.transforms.length; i ++ ) {
 
-			var transform = node.transforms[i];
-			var channel = animated[transform.sid];
+			var transform = node.transforms[ i ];
+			var channel = animated[ transform.sid ];
 
 			if ( channel !== undefined ) {
 
 				var sampler = channel.sampler;
 				var value;
 
-				for ( var j = 0; j < sampler.input.length - 1; j ++ ) {
+				for ( j = 0; j < sampler.input.length - 1; j ++ ) {
 
-					if ( sampler.input[j+1] > t ) {
+					if ( sampler.input[ j + 1 ] > t ) {
 
-						value = sampler.output[j];
+						value = sampler.output[ j ];
 						//console.log(value.flatten)
 						break;
 

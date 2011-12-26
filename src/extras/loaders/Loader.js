@@ -185,17 +185,10 @@ THREE.Loader.prototype = {
 
 		}
 
-		var material, mtype, mpars,
-			color, specular, ambient,
-			vertexColors;
-
 		// defaults
 
-		mtype = "MeshLambertMaterial";
-
-		// vertexColors
-
-		mpars = { color: 0xeeeeee, opacity: 1.0, map: null, lightMap: null, normalMap: null, wireframe: m.wireframe };
+		var mtype = "MeshLambertMaterial";
+		var mpars = { color: 0xeeeeee, opacity: 1.0, map: null, lightMap: null, normalMap: null, wireframe: m.wireframe };
 
 		// parameters from model file
 
@@ -311,11 +304,6 @@ THREE.Loader.prototype = {
 			var shader = THREE.ShaderUtils.lib[ "normal" ];
 			var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
-			var diffuse = mpars.color;
-			var specular = mpars.specular;
-			var ambient = mpars.ambient;
-			var shininess = mpars.shininess;
-
 			uniforms[ "tNormal" ].texture = mpars.normalMap;
 
 			if ( m.mapNormalFactor ) {
@@ -347,25 +335,24 @@ THREE.Loader.prototype = {
 
 			// for the moment don't handle displacement texture
 
-			uniforms[ "uDiffuseColor" ].value.setHex( diffuse );
-			uniforms[ "uSpecularColor" ].value.setHex( specular );
-			uniforms[ "uAmbientColor" ].value.setHex( ambient );
+			uniforms[ "uDiffuseColor" ].value.setHex( mpars.color );
+			uniforms[ "uSpecularColor" ].value.setHex( mpars.specular );
+			uniforms[ "uAmbientColor" ].value.setHex( mpars.ambient );
 
-			uniforms[ "uShininess" ].value = shininess;
+			uniforms[ "uShininess" ].value = mpars.shininess;
 
-			if ( mpars.opacity ) {
+			if ( mpars.opacity !== undefined ) {
 
 				uniforms[ "uOpacity" ].value = mpars.opacity;
 
 			}
 
 			var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true, fog: true };
-
-			material = new THREE.ShaderMaterial( parameters );
+			var material = new THREE.ShaderMaterial( parameters );
 
 		} else {
 
-			material = new THREE[ mtype ]( mpars );
+			var material = new THREE[ mtype ]( mpars );
 
 		}
 

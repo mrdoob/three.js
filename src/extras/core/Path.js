@@ -42,9 +42,7 @@ THREE.Path.prototype.fromPoints = function ( vectors ) {
 
 	this.moveTo( vectors[ 0 ].x, vectors[ 0 ].y );
 
-	var v, vlen = vectors.length;
-
-	for ( v = 1; v < vlen; v++ ) {
+	for ( var v = 1, vlen = vectors.length; v < vlen; v ++ ) {
 
 		this.lineTo( vectors[ v ].x, vectors[ v ].y );
 
@@ -123,7 +121,9 @@ THREE.Path.prototype.splineThru = function( pts /*Array of Vector*/ ) {
 
 	var x0 = lastargs[ lastargs.length - 2 ];
 	var y0 = lastargs[ lastargs.length - 1 ];
-//---
+
+	// ---
+
 	var npts = [ new THREE.Vector2( x0, y0 ) ];
 	Array.prototype.push.apply( npts, pts );
 
@@ -155,7 +155,7 @@ THREE.Path.prototype.arc = function ( aX, aY, aRadius,
 
 THREE.Path.prototype.getSpacedPoints = function ( divisions, closedPath ) {
 
-	if ( !divisions ) divisions = 40;
+	if ( ! divisions ) divisions = 40;
 
 	var points = [];
 
@@ -332,13 +332,12 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 			var deltaAngle = aEndAngle - aStartAngle;
 			var angle;
 			var tdivisions = divisions * 2;
-			var t;
 
 			for ( j = 1; j <= tdivisions; j ++ ) {
 
 				t = j / tdivisions;
 
-				if ( !aClockwise ) {
+				if ( ! aClockwise ) {
 
 					t = 1 - t;
 
