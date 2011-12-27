@@ -98,17 +98,17 @@
 				scene.add( ambientLight );
 
 				pointLight = new THREE.PointLight( 0xffffff );
-				pointLight.position.z = 600;
+				pointLight.position.set( 0, 0, 600 );
 
 				scene.add( pointLight );
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff );
-				directionalLight.position.set( 1, 1, -1 ).normalize();
+				directionalLight.position.set( 1, -0.5, -1 );
 				scene.add( directionalLight );
 
 				// material parameters
 
-				var ambient = 0x111111, diffuse = 0xaaaaaa, specular = 0x080810, shininess = 2;
+				var ambient = 0x331111, diffuse = 0xbbbbbb, specular = 0x080808, shininess = 30;
 
 				var shader = THREE.ShaderUtils.lib[ "normal" ];
 				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
@@ -136,9 +136,16 @@
 
 				loader.load( "obj/leeperrysmith/LeePerrySmith.js", function( geometry ) { createScene( geometry, 100, material ) } );
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
+
+				//
+
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+
+				//
 
 				if ( statsEnabled ) {
 

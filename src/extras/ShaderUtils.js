@@ -195,11 +195,39 @@ THREE.ShaderUtils = {
 					"normalTex.xy *= uNormalScale;",
 					"normalTex = normalize( normalTex );",
 
-					"if( enableDiffuse )",
-						"gl_FragColor = gl_FragColor * texture2D( tDiffuse, vUv );",
+					"if( enableDiffuse ) {",
 
-					"if( enableAO )",
-						"gl_FragColor.xyz = gl_FragColor.xyz * texture2D( tAO, vUv ).xyz;",
+						"#ifdef GAMMA_INPUT",
+
+							"vec4 texelColor = texture2D( tDiffuse, vUv );",
+							"texelColor.xyz *= texelColor.xyz;",
+
+							"gl_FragColor = gl_FragColor * texelColor;",
+
+						"#else",
+
+							"gl_FragColor = gl_FragColor * texture2D( tDiffuse, vUv );",
+
+						"#endif",
+
+					"}",
+
+					"if( enableAO ) {",
+
+						"#ifdef GAMMA_INPUT",
+
+							"vec4 aoColor = texture2D( tAO, vUv );",
+							"aoColor.xyz *= aoColor.xyz;",
+
+							"gl_FragColor.xyz = gl_FragColor.xyz * aoColor.xyz;",
+
+						"#else",
+
+							"gl_FragColor.xyz = gl_FragColor.xyz * texture2D( tAO, vUv ).xyz;",
+
+						"#endif",
+
+					"}",
 
 					"if( enableSpecular )",
 						"specularTex = texture2D( tSpecular, vUv ).xyz;",
@@ -286,12 +314,21 @@ THREE.ShaderUtils = {
 
 						"vec3 wPos = cameraPosition - vViewPosition;",
 						"vec3 vReflect = reflect( normalize( wPos ), normal );",
+
 						"vec4 cubeColor = textureCube( tCube, vec3( -vReflect.x, vReflect.yz ) );",
+
+						"#ifdef GAMMA_INPUT",
+
+							"cubeColor.xyz *= cubeColor.xyz;",
+
+						"#endif",
+
 						"gl_FragColor.xyz = mix( gl_FragColor.xyz, cubeColor.xyz, specularTex.r * uReflectivity );",
 
 					"}",
 
 					THREE.ShaderChunk[ "shadowmap_fragment" ],
+					THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
 					THREE.ShaderChunk[ "fog_fragment" ],
 
 				"}"

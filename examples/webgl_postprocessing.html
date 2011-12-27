@@ -135,7 +135,7 @@
 				//
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff );
-				directionalLight.position.set( 0, 0, 1 ).normalize();
+				directionalLight.position.set( 0, -0.1, 1 ).normalize();
 				sceneModel.add( directionalLight );
 
 				loader = new THREE.JSONLoader( true );
@@ -178,6 +178,13 @@
 				renderer.setClearColorHex( 0x000000, 1 );
 				renderer.autoClear = false;
 
+				//
+
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+
+				//
+
 				container.appendChild( renderer.domElement );
 
 				//
@@ -207,7 +214,7 @@
 				effectVignette.uniforms[ "darkness" ].value = 1.6;
 
 				var effectBloom = new THREE.BloomPass( 0.5 );
-				var effectFilm = new THREE.FilmPass( 0.5, 0.025, 648, false );
+				var effectFilm = new THREE.FilmPass( 0.35, 0.025, 648, false );
 				var effectFilmBW = new THREE.FilmPass( 0.35, 0.5, 2048, true );
 				var effectFilmBW2 = new THREE.FilmPass( 0.05, 0.5, 2048, true );
 				var effectDotScreen = new THREE.DotScreenPass( new THREE.Vector2( 0, 0 ), 0.5, 0.6 );
@@ -339,7 +346,7 @@
 
 				geometry.computeTangents();
 
-				var ambient = 0x444444, diffuse = 0x888888, specular = 0x080810, shininess = 2;
+				var ambient = 0x444444, diffuse = 0x999999, specular = 0x080808, shininess = 20;
 
 				var shader = THREE.ShaderUtils.lib[ "normal" ];
 				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
@@ -357,6 +364,10 @@
 				uniforms[ "uAmbientColor" ].value.setHex( ambient );
 
 				uniforms[ "uShininess" ].value = shininess;
+
+				uniforms[ "uDiffuseColor" ].value.convertGammaToLinear();
+				uniforms[ "uSpecularColor" ].value.convertGammaToLinear();
+				uniforms[ "uAmbientColor" ].value.convertGammaToLinear();
 
 				var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true };
 				var mat2 = new THREE.ShaderMaterial( parameters );

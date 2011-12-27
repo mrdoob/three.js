@@ -175,6 +175,11 @@
 				uniforms[ "tCube" ].texture = reflectionCube;
 				uniforms[ "uReflectivity" ].value = 0.1;
 
+				uniforms[ "uDiffuseColor" ].value.convertGammaToLinear();
+				uniforms[ "uSpecularColor" ].value.convertGammaToLinear();
+				uniforms[ "uAmbientColor" ].value.convertGammaToLinear();
+
+
 				var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true, fog: false };
 				var material1 = new THREE.ShaderMaterial( parameters );
 
@@ -192,6 +197,11 @@
 				renderer = new THREE.WebGLRenderer( { maxLights: 8 } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
+
+				//
+
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
 
 				//
 

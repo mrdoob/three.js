@@ -85,10 +85,17 @@
 
 				scene = new THREE.Scene();
 
-				renderer = new THREE.WebGLRenderer( { clearAlpha: 1, clearColor: 0x000000 } );
+				renderer = new THREE.WebGLRenderer( { clearAlpha: 1, clearColor: 0x000000, antialias: true } );
 				renderer.setSize( width, height );
 				renderer.sortObjects = false;
 				renderer.autoClear = false;
+
+				//
+
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+
+				//
 
 				container.appendChild( renderer.domElement );
 
@@ -137,10 +144,14 @@
 				uniforms[ "enableSpecular" ].value = true;
 
 				uniforms[ "uDiffuseColor" ].value.setHex( 0xffffff );
-				uniforms[ "uSpecularColor" ].value.setHex( 0x333333 );
+				uniforms[ "uSpecularColor" ].value.setHex( 0x666666 );
 				uniforms[ "uAmbientColor" ].value.setHex( 0x000000 );
 
-				uniforms[ "uShininess" ].value = 15;
+				uniforms[ "uShininess" ].value = 20;
+
+				uniforms[ "uDiffuseColor" ].value.convertGammaToLinear();
+				uniforms[ "uSpecularColor" ].value.convertGammaToLinear();
+				uniforms[ "uAmbientColor" ].value.convertGammaToLinear();
 
 				var materialNormalMap = new THREE.ShaderMaterial({
 					fragmentShader: shader.fragmentShader,
