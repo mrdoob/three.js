@@ -71,15 +71,17 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
+				scene = new THREE.Scene();
+				sceneCube = new THREE.Scene();
+
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 5000 );
 				camera.position.z = 2000;
 
 				cameraCube = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 100 );
-
 				cubeTarget = new THREE.Vector3( 0, 0, 0 );
 
-				scene = new THREE.Scene();
-				sceneCube = new THREE.Scene();
+				scene.add( camera );
+				sceneCube.add( cameraCube );
 
 				// LIGHTS
 

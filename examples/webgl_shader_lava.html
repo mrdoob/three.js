@@ -139,10 +139,11 @@
 
 				container = document.getElementById( 'container' );
 
+				scene = new THREE.Scene();
+
 				camera = new THREE.PerspectiveCamera( 35, windowHalfX / windowHalfY, 1, 3000 );
 				camera.position.z = 4;
-
-				scene = new THREE.Scene();
+				scene.add( camera );
 
 				uniforms = {
 

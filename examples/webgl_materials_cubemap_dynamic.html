@@ -139,13 +139,6 @@
 
 				container = document.getElementById( 'container' );
 
-				// SCENE CAMERA
-
-				camera = new THREE.PerspectiveCamera( 18, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
-				camera.position.set( 2000, 0, 2000 );
-
-				cameraTarget = new THREE.Vector3( 0, 0, 0 );
-
 				// SCENE
 
 				scene = new THREE.Scene();
@@ -154,6 +147,16 @@
 				scene.fog.color.setHSV( 0.51, 0.5, 0.9 );
 
 				createScene();
+
+				// SCENE CAMERA
+
+				camera = new THREE.PerspectiveCamera( 18, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
+				camera.position.set( 2000, 0, 2000 );
+
+				cameraTarget = new THREE.Vector3( 0, 0, 0 );
+
+				scene.add( camera );
+
 
 				// LIGHTS
 
@@ -612,6 +615,8 @@
 				var topCamera = new THREE.OrthographicCamera( left, right, top, bottom, near, far );
 				topCamera.position.y = bb.max.y;
 				topCamera.lookAt( shadowScene.position );
+
+				shadowScene.add( topCamera );
 
 				var renderShadow = new THREE.RenderPass( shadowScene, topCamera );
 

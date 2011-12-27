@@ -65,11 +65,11 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 100000 );
-				camera.position.z = 3200;
-
 				scene = new THREE.Scene();
 
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 100000 );
+				camera.position.z = 3200;
+				scene.add( camera );
 
 				var r = "textures/cube/Escher/";
 

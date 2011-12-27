@@ -84,10 +84,13 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
+				scene = new THREE.Scene();
+
+				// CAMERA
+
 				camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
 				camera.position.z = 1500;
-
-				scene = new THREE.Scene();
+				scene.add( camera );
 
 				// LIGHTS
 
@@ -236,8 +239,6 @@
 				scene.add( mesh2 );
 
 				loader.statusDomElement.style.display = "none";
-
-				console.log( mesh1 );
 
 			}
 

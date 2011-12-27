@@ -45,15 +45,16 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
+				scene = new THREE.Scene();
+
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 3200;
-
-				scene = new THREE.Scene();
+				scene.add( camera );
 
 				var material = new THREE.MeshNormalMaterial( { shading: THREE.SmoothShading } );
 
 				var loader = new THREE.JSONLoader();
-				loader.load( { model: 'obj/Suzanne.js', callback: function ( geometry ) {
+				loader.load( 'obj/Suzanne.js', function ( geometry ) {
 
 					geometry.computeVertexNormals();
 
@@ -74,7 +75,7 @@
 
 					}
 
-				} } );
+				} );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );

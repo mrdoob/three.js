@@ -109,10 +109,11 @@
 
 				container = document.getElementById( 'container' );
 
+				scene = new THREE.Scene();
+
 				camera = new THREE.Camera();
 				camera.position.z = 1;
-
-				scene = new THREE.Scene();
+				scene.add( camera );
 
 				uniforms = {
 					time: { type: "f", value: 1.0 },
