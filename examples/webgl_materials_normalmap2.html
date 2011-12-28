@@ -55,6 +55,18 @@
 		<script src="js/Detector.js"></script>
 		<script src="js/Stats.js"></script>
 
+		<script src="js/ShaderExtras.js"></script>
+
+		<script src="js/postprocessing/EffectComposer.js"></script>
+		<script src="js/postprocessing/RenderPass.js"></script>
+		<script src="js/postprocessing/BloomPass.js"></script>
+		<script src="js/postprocessing/FilmPass.js"></script>
+		<script src="js/postprocessing/DotScreenPass.js"></script>
+		<script src="js/postprocessing/TexturePass.js"></script>
+		<script src="js/postprocessing/ShaderPass.js"></script>
+		<script src="js/postprocessing/MaskPass.js"></script>
+
+
 		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
@@ -75,6 +87,8 @@
 
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
+
+			var composer, effectFXAA;
 
 			init();
 			animate();
@@ -140,7 +154,7 @@
 
 				loader.load( "obj/leeperrysmith/LeePerrySmith.js", function( geometry ) { createScene( geometry, 100, material ) } );
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: false, clearColor: 0x111111, clearAlpha: 1 } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
@@ -161,7 +175,37 @@
 
 				}
 
+				// COMPOSER
+
+				renderer.autoClear = false;
+
+				var renderModel = new THREE.RenderPass( scene, camera );
+
+				var effectBleach = new THREE.ShaderPass( THREE.ShaderExtras[ "bleachbypass" ] );
+				var effectColor = new THREE.ShaderPass( THREE.ShaderExtras[ "colorCorrection" ] );
+				effectFXAA = new THREE.ShaderPass( THREE.ShaderExtras[ "fxaa" ] );
+
+				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
+
+				effectBleach.uniforms[ 'opacity' ].value = 0.45;
+
+				effectColor.uniforms[ 'powRGB' ].value.set( 1.4, 1.45, 1.45 );
+				effectColor.uniforms[ 'mulRGB' ].value.set( 1.1, 1.1, 1.1 );
+
+				effectFXAA.renderToScreen = true;
+
+				composer = new THREE.EffectComposer( renderer );
+
+				composer.addPass( renderModel );
+
+				composer.addPass( effectBleach );
+				composer.addPass( effectColor );
+				composer.addPass( effectFXAA );
+
+				// EVENTS
+
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
 
@@ -177,6 +221,24 @@
 				scene.add( mesh1 );
 
 				loader.statusDomElement.style.display = "none";
+
+			}
+
+			//
+
+			function onWindowResize( event ) {
+
+				SCREEN_WIDTH = window.innerWidth;
+				SCREEN_HEIGHT = window.innerHeight;
+
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+
+				camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
+				camera.updateProjectionMatrix();
+
+				composer.reset();
+
+				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / SCREEN_WIDTH, 1 / SCREEN_HEIGHT );
 
 			}
 
@@ -209,7 +271,8 @@
 
 				}
 
-				renderer.render( scene, camera );
+				//renderer.render( scene, camera );
+				composer.render();
 
 			}
 
