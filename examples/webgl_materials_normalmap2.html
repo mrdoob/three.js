@@ -122,13 +122,13 @@
 
 				// material parameters
 
-				var ambient = 0x111111, diffuse = 0xbbbbbb, specular = 0x222222, shininess = 30;
+				var ambient = 0x111111, diffuse = 0xbbbbbb, specular = 0x171717, shininess = 50;
 
 				var shader = THREE.ShaderUtils.lib[ "normal" ];
 				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
 				uniforms[ "tNormal" ].texture = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
-				uniforms[ "uNormalScale" ].value = - 0.85;
+				uniforms[ "uNormalScale" ].value = - 0.8;
 
 				uniforms[ "tDiffuse" ].texture = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" );
 				uniforms[ "tSpecular" ].texture = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-SPEC.jpg" );
