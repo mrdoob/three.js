@@ -450,9 +450,7 @@ THREE.ShaderChunk = {
 				"#ifdef PHONG_PER_PIXEL",
 
 					"vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );",
-
 					"vec3 lVector = lPosition.xyz + vViewPosition.xyz;",
-
 					"float lDistance = 1.0;",
 
 					"if ( pointLightDistance[ i ] > 0.0 )",
@@ -467,10 +465,7 @@ THREE.ShaderChunk = {
 
 				"#endif",
 
-				"vec3 pointHalfVector = normalize( lVector + viewPosition );",
-				"float pointDistance = lDistance;",
-
-				"float pointDotNormalHalf = max( dot( normal, pointHalfVector ), 0.0 );",
+				// diffuse
 
 				"#ifdef WRAP_AROUND",
 
@@ -485,20 +480,24 @@ THREE.ShaderChunk = {
 
 				"#endif",
 
+				"pointDiffuse  += diffuse * pointLightColor[ i ] * pointDiffuseWeight * lDistance;",
+
+				// specular
+
+				"vec3 pointHalfVector = normalize( lVector + viewPosition );",
+				"float pointDotNormalHalf = max( dot( normal, pointHalfVector ), 0.0 );",
 				"float pointSpecularWeight = pow( pointDotNormalHalf, shininess );",
 
 				"#ifdef PHYSICALLY_BASED_SHADING",
 
 					"vec3 schlick = specular + vec3( 1.0 - specular ) * pow( dot( lVector, pointHalfVector ), 5.0 );",
-					"pointSpecular += schlick * pointLightColor[ i ] * pointSpecularWeight * pointDiffuseWeight * pointDistance;",
+					"pointSpecular += schlick * pointLightColor[ i ] * pointSpecularWeight * pointDiffuseWeight * lDistance;",
 
 				"#else",
 
-					"pointSpecular += specular * pointLightColor[ i ] * pointSpecularWeight * pointDiffuseWeight * pointDistance;",
+					"pointSpecular += specular * pointLightColor[ i ] * pointSpecularWeight * pointDiffuseWeight * lDistance;",
 
 				"#endif",
-
-				"pointDiffuse  += diffuse * pointLightColor[ i ] * pointDiffuseWeight * pointDistance;",
 
 			"}",
 
@@ -512,11 +511,9 @@ THREE.ShaderChunk = {
 			"for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {",
 
 				"vec4 lDirection = viewMatrix * vec4( directionalLightDirection[ i ], 0.0 );",
-
 				"vec3 dirVector = normalize( lDirection.xyz );",
-				"vec3 dirHalfVector = normalize( lDirection.xyz + viewPosition );",
 
-				"float dirDotNormalHalf = max( dot( normal, dirHalfVector ), 0.0 );",
+				// diffuse
 
 				"#ifdef WRAP_AROUND",
 
@@ -531,6 +528,12 @@ THREE.ShaderChunk = {
 
 				"#endif",
 
+				"dirDiffuse  += diffuse * directionalLightColor[ i ] * dirDiffuseWeight;",
+
+				// specular
+
+				"vec3 dirHalfVector = normalize( lDirection.xyz + viewPosition );",
+				"float dirDotNormalHalf = max( dot( normal, dirHalfVector ), 0.0 );",
 				"float dirSpecularWeight = pow( dirDotNormalHalf, shininess );",
 
 				"#ifdef PHYSICALLY_BASED_SHADING",
@@ -567,8 +570,6 @@ THREE.ShaderChunk = {
 					"dirSpecular += specular * directionalLightColor[ i ] * dirSpecularWeight * dirDiffuseWeight;",
 
 				"#endif",
-
-				"dirDiffuse  += diffuse * directionalLightColor[ i ] * dirDiffuseWeight;",
 
 			"}",
 

@@ -88,7 +88,7 @@
 
 				// CAMERA
 
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 900;
 				scene.add( camera );
 
@@ -97,7 +97,7 @@
 				ambientLight = new THREE.AmbientLight( 0x444444 );
 				scene.add( ambientLight );
 
-				pointLight = new THREE.PointLight( 0xffffff );
+				pointLight = new THREE.PointLight( 0xffffff, 1.25, 1000 );
 				pointLight.position.set( 0, 0, 600 );
 
 				scene.add( pointLight );
@@ -108,13 +108,13 @@
 
 				// material parameters
 
-				var ambient = 0x331111, diffuse = 0xbbbbbb, specular = 0x080808, shininess = 30;
+				var ambient = 0x111111, diffuse = 0xbbbbbb, specular = 0x090909, shininess = 30;
 
 				var shader = THREE.ShaderUtils.lib[ "normal" ];
 				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
 				uniforms[ "tNormal" ].texture = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
-				uniforms[ "uNormalScale" ].value = - 0.75;
+				uniforms[ "uNormalScale" ].value = - 0.85;
 
 				uniforms[ "tDiffuse" ].texture = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" );
 
@@ -128,8 +128,12 @@
 
 				uniforms[ "uShininess" ].value = shininess;
 
+				uniforms[ "wrapRGB" ].value.set( 0.575, 0.5, 0.5 );
+
 				var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true };
 				var material = new THREE.ShaderMaterial( parameters );
+
+				material.wrapAround = true;
 
 				loader = new THREE.JSONLoader( true );
 				document.body.appendChild( loader.statusDomElement );

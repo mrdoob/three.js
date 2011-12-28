@@ -134,7 +134,9 @@ THREE.ShaderUtils = {
 				"uReflectivity": { type: "f", value: 0.5 },
 
 				"uOffset" : { type: "v2", value: new THREE.Vector2( 0, 0 ) },
-				"uRepeat" : { type: "v2", value: new THREE.Vector2( 1, 1 ) }
+				"uRepeat" : { type: "v2", value: new THREE.Vector2( 1, 1 ) },
+
+				"wrapRGB"  : { type: "v3", value: new THREE.Vector3( 1, 1, 1 ) }
 
 				}
 
@@ -178,6 +180,10 @@ THREE.ShaderUtils = {
 				"#if MAX_POINT_LIGHTS > 0",
 					"uniform vec3 pointLightColor[ MAX_POINT_LIGHTS ];",
 					"varying vec4 vPointLight[ MAX_POINT_LIGHTS ];",
+				"#endif",
+
+				"#ifdef WRAP_AROUND",
+					"uniform vec3 wrapRGB;",
 				"#endif",
 
 				"varying vec3 vViewPosition;",
@@ -248,15 +254,31 @@ THREE.ShaderUtils = {
 						"for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {",
 
 							"vec3 pointVector = normalize( vPointLight[ i ].xyz );",
-							"vec3 pointHalfVector = normalize( vPointLight[ i ].xyz + viewPosition );",
 							"float pointDistance = vPointLight[ i ].w;",
 
-							"float pointDotNormalHalf = max( dot( normal, pointHalfVector ), 0.0 );",
-							"float pointDiffuseWeight = max( dot( normal, pointVector ), 0.0 );",
+							// diffuse
 
-							"float pointSpecularWeight = specularTex.r * pow( pointDotNormalHalf, uShininess );",
+							"#ifdef WRAP_AROUND",
+
+								"float pointDiffuseWeightFull = max( dot( normal, pointVector ), 0.0 );",
+								"float pointDiffuseWeightHalf = max( 0.5 * dot( normal, pointVector ) + 0.5, 0.0 );",
+
+								"vec3 pointDiffuseWeight = mix( vec3 ( pointDiffuseWeightFull ), vec3( pointDiffuseWeightHalf ), wrapRGB );",
+
+							"#else",
+
+								"float pointDiffuseWeight = max( dot( normal, pointVector ), 0.0 );",
+
+							"#endif",
 
 							"pointDiffuse += pointDistance * pointLightColor[ i ] * uDiffuseColor * pointDiffuseWeight;",
+
+							// specular
+
+							"vec3 pointHalfVector = normalize( vPointLight[ i ].xyz + viewPosition );",
+							"float pointDotNormalHalf = max( dot( normal, pointHalfVector ), 0.0 );",
+							"float pointSpecularWeight = specularTex.r * pow( pointDotNormalHalf, uShininess );",
+
 							"pointSpecular += pointDistance * pointLightColor[ i ] * uSpecularColor * pointSpecularWeight * pointDiffuseWeight;",
 
 						"}",
@@ -273,16 +295,31 @@ THREE.ShaderUtils = {
 						"for( int i = 0; i < MAX_DIR_LIGHTS; i++ ) {",
 
 							"vec4 lDirection = viewMatrix * vec4( directionalLightDirection[ i ], 0.0 );",
-
 							"vec3 dirVector = normalize( lDirection.xyz );",
-							"vec3 dirHalfVector = normalize( lDirection.xyz + viewPosition );",
 
-							"float dirDotNormalHalf = max( dot( normal, dirHalfVector ), 0.0 );",
-							"float dirDiffuseWeight = max( dot( normal, dirVector ), 0.0 );",
+							// diffuse
 
-							"float dirSpecularWeight = specularTex.r * pow( dirDotNormalHalf, uShininess );",
+							"#ifdef WRAP_AROUND",
+
+								"float directionalLightWeightingFull = max( dot( normal, dirVector ), 0.0 );",
+								"float directionalLightWeightingHalf = max( 0.5 * dot( normal, dirVector ) + 0.5, 0.0 );",
+
+								"vec3 dirDiffuseWeight = mix( vec3( directionalLightWeightingFull ), vec3( directionalLightWeightingHalf ), wrapRGB );",
+
+							"#else",
+
+								"float dirDiffuseWeight = max( dot( normal, dirVector ), 0.0 );",
+
+							"#endif",
 
 							"dirDiffuse += directionalLightColor[ i ] * uDiffuseColor * dirDiffuseWeight;",
+
+							// specular
+
+							"vec3 dirHalfVector = normalize( lDirection.xyz + viewPosition );",
+							"float dirDotNormalHalf = max( dot( normal, dirHalfVector ), 0.0 );",
+							"float dirSpecularWeight = specularTex.r * pow( dirDotNormalHalf, uShininess );",
+
 							"dirSpecular += directionalLightColor[ i ] * uSpecularColor * dirSpecularWeight * dirDiffuseWeight;",
 
 						"}",
