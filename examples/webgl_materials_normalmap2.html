@@ -122,7 +122,7 @@
 
 				// material parameters
 
-				var ambient = 0x111111, diffuse = 0xbbbbbb, specular = 0x090909, shininess = 30;
+				var ambient = 0x111111, diffuse = 0xbbbbbb, specular = 0x222222, shininess = 30;
 
 				var shader = THREE.ShaderUtils.lib[ "normal" ];
 				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
@@ -131,10 +131,11 @@
 				uniforms[ "uNormalScale" ].value = - 0.85;
 
 				uniforms[ "tDiffuse" ].texture = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" );
+				uniforms[ "tSpecular" ].texture = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-SPEC.jpg" );
 
 				uniforms[ "enableAO" ].value = false;
 				uniforms[ "enableDiffuse" ].value = true;
-				uniforms[ "enableSpecular" ].value = false;
+				uniforms[ "enableSpecular" ].value = true;
 
 				uniforms[ "uDiffuseColor" ].value.setHex( diffuse );
 				uniforms[ "uSpecularColor" ].value.setHex( specular );
@@ -187,7 +188,7 @@
 
 				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
 
-				effectBleach.uniforms[ 'opacity' ].value = 0.45;
+				effectBleach.uniforms[ 'opacity' ].value = 0.4;
 
 				effectColor.uniforms[ 'powRGB' ].value.set( 1.4, 1.45, 1.45 );
 				effectColor.uniforms[ 'mulRGB' ].value.set( 1.1, 1.1, 1.1 );
