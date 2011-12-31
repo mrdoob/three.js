@@ -1,9 +1,5 @@
 /**
  * @author oosmoxiecode
-
- * uvs are messed up in this one, and commented away for now. There is an ugly "seam" by the shared vertices
- * when it "wraps" around, that needs to be fixed. It´s because they share the first and the last vertices
- * so it draws the entire texture on the seam-faces, I think...
  */
 
 THREE.IcosahedronGeometry = function ( subdivisions ) {
@@ -12,8 +8,6 @@ THREE.IcosahedronGeometry = function ( subdivisions ) {
 	var tempScope = new THREE.Geometry();
 	var tempFaces;
 	this.subdivisions = subdivisions || 0;
-
-	//var temp_uv = [];
 
 	THREE.Geometry.call(this);
 
@@ -84,6 +78,7 @@ THREE.IcosahedronGeometry = function ( subdivisions ) {
 	scope.faces = tempScope.faces;
 	scope.faceVertexUvs[ 0 ] = tempScope.faceVertexUvs[ 0 ];
 
+	this.mergeVertices();
 	this.computeCentroids();
 	this.computeFaceNormals();
 

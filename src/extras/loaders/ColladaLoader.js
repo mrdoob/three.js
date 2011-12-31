@@ -57,13 +57,7 @@ THREE.ColladaLoader = function () {
 
 			var req = new XMLHttpRequest();
 
-			if( req.overrideMimeType ) {
-
-				// need this? yes... if extension is other then *.xml :-S
-
-				req.overrideMimeType( "text/xml" );
-
-			}
+			if ( req.overrideMimeType ) req.overrideMimeType( "text/xml" );
 
 			req.onreadystatechange = function() {
 
