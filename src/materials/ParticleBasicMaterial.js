@@ -7,6 +7,8 @@
  *  opacity: <float>,
  *  map: new THREE.Texture( <Image> ),
  *
+ *  borderClampColor: <hex>,
+ *
  *  size: <float>,
  *
  *  blending: THREE.NormalBlending,
@@ -27,6 +29,8 @@ THREE.ParticleBasicMaterial = function ( parameters ) {
 	this.color = parameters.color !== undefined ? new THREE.Color( parameters.color ) : new THREE.Color( 0xffffff );
 
 	this.map = parameters.map !== undefined ? parameters.map : null;
+
+	this.borderClampColor = parameters.borderClampColor !== undefined ? new THREE.Color( parameters.borderClampColor ) : null;
 
 	this.size = parameters.size !== undefined ? parameters.size : 1;
 	this.sizeAttenuation = parameters.sizeAttenuation !== undefined ? parameters.sizeAttenuation : true;

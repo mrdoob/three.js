@@ -4034,6 +4034,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		parameters = {
 
 			map: !!material.map, envMap: !!material.envMap, lightMap: !!material.lightMap,
+			borderClampColor: !!material.borderClampColor,
 			vertexColors: material.vertexColors,
 			fog: fog, useFog: material.fog,
 			sizeAttenuation: material.sizeAttenuation,
@@ -4318,6 +4319,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		uniforms.lightMap.texture = material.lightMap;
+		if ( material.borderClampColor )
+			uniforms.borderClampColor.value = material.borderClampColor;
 
 		uniforms.envMap.texture = material.envMap;
 		uniforms.flipEnvMap.value = ( material.envMap instanceof THREE.WebGLRenderTargetCube ) ? 1 : -1;
@@ -5051,6 +5054,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		program = _gl.createProgram();
 
+		if (parameters.borderClampColor && !_gl.getExtension("OES_standard_derivatives")) {
+			parameters.borderClampColor = false;
+			console.warn("Disabling borderClampColor, not supported");
+		}
+
 		var prefix_vertex = [
 
 			( _maxVertexTextures > 0 ) ? "#define VERTEX_TEXTURES" : "",
@@ -5147,6 +5155,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			parameters.map ? "#define USE_MAP" : "",
 			parameters.envMap ? "#define USE_ENVMAP" : "",
 			parameters.lightMap ? "#define USE_LIGHTMAP" : "",
+			parameters.borderClampColor ? "#define USE_BORDER_CLAMP_COLOR" : "",
 			parameters.vertexColors ? "#define USE_COLOR" : "",
 
 			parameters.metal ? "#define METAL" : "",
