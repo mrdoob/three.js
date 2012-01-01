@@ -24,6 +24,8 @@ THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, f
 	this.offset = new THREE.Vector2( 0, 0 );
 	this.repeat = new THREE.Vector2( 1, 1 );
 
+	this.generateMipmaps = true;
+
 	this.needsUpdate = false;
 	this.onUpdate = null;
 
