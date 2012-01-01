@@ -56,7 +56,7 @@ THREE.Ray = function ( origin, direction ) {
 
 			var distance = distanceFromIntersection( this.origin, this.direction, object.matrixWorld.getPosition() );
 
-			if ( distance === null || distance > object.scale.x ) {
+			if ( distance > object.scale.x ) {
 
 				return [];
 
@@ -79,7 +79,7 @@ THREE.Ray = function ( origin, direction ) {
 
 			var distance = distanceFromIntersection( this.origin, this.direction, object.matrixWorld.getPosition() );
 
-			if ( distance === null || distance > object.geometry.boundingSphere.radius * Math.max( object.scale.x, Math.max( object.scale.y, object.scale.z ) ) ) {
+			if ( distance > object.geometry.boundingSphere.radius * Math.max( object.scale.x, Math.max( object.scale.y, object.scale.z ) ) ) {
 
 				return intersects;
 
@@ -178,8 +178,6 @@ THREE.Ray = function ( origin, direction ) {
 
 		v0.sub( position, origin );
 		dot = v0.dot( direction );
-
-		if ( dot <= 0 ) return null; // check if position behind origin.
 
 		intersect = v1.add( origin, v2.copy( direction ).multiplyScalar( dot ) );
 		distance = position.distanceTo( intersect );
