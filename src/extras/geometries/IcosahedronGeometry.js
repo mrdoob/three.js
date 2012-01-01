@@ -1,5 +1,9 @@
 /**
  * @author oosmoxiecode
+ *
+ * uvs are messed up in this one, and commented away for now. There is an ugly "seam" by the shared vertices
+ * when it "wraps" around, that needs to be fixed. It's because they share the first and the last vertices
+ * so it draws the entire texture on the seam-faces, I think...
  */
 
 THREE.IcosahedronGeometry = function ( subdivisions ) {
@@ -9,10 +13,11 @@ THREE.IcosahedronGeometry = function ( subdivisions ) {
 	var tempFaces;
 	this.subdivisions = subdivisions || 0;
 
-	THREE.Geometry.call(this);
+	THREE.Geometry.call( this );
 
 	// create 12 vertices of a Icosahedron
-	var t = (1 + Math.sqrt(5)) / 2;
+
+	var t = ( 1 + Math.sqrt( 5 ) ) / 2;
 
 	v(-1,  t,  0);
 	v( 1,  t,  0);
@@ -30,6 +35,7 @@ THREE.IcosahedronGeometry = function ( subdivisions ) {
 	v(-t,  0,  1);
 
 	// 5 faces around point 0
+
 	f3(0, 11, 5, tempScope);
 	f3(0, 5, 1, tempScope);
 	f3(0, 1, 7, tempScope);
@@ -37,6 +43,7 @@ THREE.IcosahedronGeometry = function ( subdivisions ) {
 	f3(0, 10, 11, tempScope);
 
 	// 5 adjacent faces
+
 	f3(1, 5, 9, tempScope);
 	f3(5, 11, 4, tempScope);
 	f3(11, 10, 2, tempScope);
@@ -44,6 +51,7 @@ THREE.IcosahedronGeometry = function ( subdivisions ) {
 	f3(7, 1, 8, tempScope);
 
 	// 5 faces around point 3
+
 	f3(3, 9, 4, tempScope);
 	f3(3, 4, 2, tempScope);
 	f3(3, 2, 6, tempScope);
@@ -51,6 +59,7 @@ THREE.IcosahedronGeometry = function ( subdivisions ) {
 	f3(3, 8, 9, tempScope);
 
 	// 5 adjacent faces
+
 	f3(4, 9, 5, tempScope);
 	f3(2, 4, 11, tempScope);
 	f3(6, 2, 10, tempScope);
@@ -58,21 +67,31 @@ THREE.IcosahedronGeometry = function ( subdivisions ) {
 	f3(9, 8, 1, tempScope);
 
 	// subdivide faces to refine the triangles
-	for (var i=0; i < this.subdivisions; i++) {
-		tempFaces = new THREE.Geometry();
-		for (var tri in tempScope.faces) {
-			// replace each triangle by 4 triangles
-			var a = getMiddlePoint(tempScope.faces[tri].a, tempScope.faces[tri].b);
-			var b = getMiddlePoint(tempScope.faces[tri].b, tempScope.faces[tri].c);
-			var c = getMiddlePoint(tempScope.faces[tri].c, tempScope.faces[tri].a);
 
-			f3(tempScope.faces[tri].a, a, c, tempFaces);
-			f3(tempScope.faces[tri].b, b, a, tempFaces);
-			f3(tempScope.faces[tri].c, c, b, tempFaces);
-			f3(a, b, c, tempFaces);
+	for ( var i = 0; i < this.subdivisions; i ++ ) {
+
+		tempFaces = new THREE.Geometry();
+
+		for ( var tri = 0; tri < tempScope.faces.length; tri ++ ) {
+
+			// replace each triangle by 4 triangles
+
+			var face = tempScope.faces[ tri ];
+
+			var a = getMiddlePoint( face.a, face.b );
+			var b = getMiddlePoint( face.b, face.c );
+			var c = getMiddlePoint( face.c, face.a );
+
+			f3( face.a, a, c, tempFaces );
+			f3( face.b, b, a, tempFaces );
+			f3( face.c, c, b, tempFaces );
+			f3( a, b, c, tempFaces );
+
 		}
+
 		tempScope.faces = tempFaces.faces;
 		tempScope.faceVertexUvs[ 0 ] = tempFaces.faceVertexUvs[ 0 ];
+
 	}
 
 	scope.faces = tempScope.faces;
@@ -84,7 +103,7 @@ THREE.IcosahedronGeometry = function ( subdivisions ) {
 
 	function v( x, y, z ) {
 
-		var length = Math.sqrt(x * x + y * y + z * z);
+		var length = Math.sqrt( x * x + y * y + z * z );
 		var i = scope.vertices.push( new THREE.Vertex( new THREE.Vector3( x/length, y/length, z/length ) ) );
 
 		return i-1;
@@ -109,16 +128,18 @@ THREE.IcosahedronGeometry = function ( subdivisions ) {
 
 	}
 
-	function getMiddlePoint(p1,p2) {
-		var pos1 = scope.vertices[p1].position;
-		var pos2 = scope.vertices[p2].position;
+	function getMiddlePoint( p1, p2 ) {
 
-		var x = (pos1.x + pos2.x) / 2;
-		var y = (pos1.y + pos2.y) / 2;
-		var z = (pos1.z + pos2.z) / 2;
+		var pos1 = scope.vertices[ p1 ].position;
+		var pos2 = scope.vertices[ p2 ].position;
+
+		var x = ( pos1.x + pos2.x ) / 2;
+		var y = ( pos1.y + pos2.y ) / 2;
+		var z = ( pos1.z + pos2.z ) / 2;
 
 		var i = v(x, y, z);
 		return i;
+
 	}
 
 }
