@@ -486,7 +486,7 @@ THREE.ShaderChunk = {
 
 				"vec3 pointHalfVector = normalize( lVector + viewPosition );",
 				"float pointDotNormalHalf = max( dot( normal, pointHalfVector ), 0.0 );",
-				"float pointSpecularWeight = pow( pointDotNormalHalf, shininess );",
+				"float pointSpecularWeight = max( pow( pointDotNormalHalf, shininess ), 0.0 );",
 
 				"#ifdef PHYSICALLY_BASED_SHADING",
 
@@ -534,7 +534,7 @@ THREE.ShaderChunk = {
 
 				"vec3 dirHalfVector = normalize( lDirection.xyz + viewPosition );",
 				"float dirDotNormalHalf = max( dot( normal, dirHalfVector ), 0.0 );",
-				"float dirSpecularWeight = pow( dirDotNormalHalf, shininess );",
+				"float dirSpecularWeight = max( pow( dirDotNormalHalf, shininess ), 0.0 );",
 
 				"#ifdef PHYSICALLY_BASED_SHADING",
 
