@@ -557,8 +557,7 @@ def parse_obj(fname):
                         if vertex['n'] < 0:
                             vertex['n'] += normlen
                         normal_index.append(vertex['n'])
-
-                d = {
+                faces.append({
                     'vertex':vertex_index,
                     'uv':uv_index,
                     'normal':normal_index,
@@ -567,8 +566,7 @@ def parse_obj(fname):
                     'group':group,
                     'object':object,
                     'smooth':smooth,
-                    }
-                faces.append(d)
+                    })
 
             # Group
             if chunks[0] == "g" and len(chunks) == 2:
