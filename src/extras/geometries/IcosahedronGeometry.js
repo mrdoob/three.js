@@ -72,11 +72,11 @@ THREE.IcosahedronGeometry = function ( subdivisions ) {
 
 		tempFaces = new THREE.Geometry();
 
-		for ( var tri = 0; tri < tempScope.faces.length; tri ++ ) {
+		for ( var i = 0, l = tempScope.faces.length; i < l; i ++ ) {
 
 			// replace each triangle by 4 triangles
 
-			var face = tempScope.faces[ tri ];
+			var face = tempScope.faces[ i ];
 
 			var a = getMiddlePoint( face.a, face.b );
 			var b = getMiddlePoint( face.b, face.c );
