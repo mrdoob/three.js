@@ -5239,7 +5239,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var i, l, id;
 
-		for( i = 0, l = identifiers.length; i < l; i++ ) {
+		for( i = 0, l = identifiers.length; i < l; i ++ ) {
 
 			id = identifiers[ i ];
 			program.uniforms[ id ] = _gl.getUniformLocation( program, id );
@@ -5252,7 +5252,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var i, l, id;
 
-		for( i = 0, l = identifiers.length; i < l; i++ ) {
+		for( i = 0, l = identifiers.length; i < l; i ++ ) {
 
 			id = identifiers[ i ];
 			program.attributes[ id ] = _gl.getAttribLocation( program, id );

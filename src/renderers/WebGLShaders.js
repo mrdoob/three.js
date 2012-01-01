@@ -292,17 +292,18 @@ THREE.ShaderChunk = {
 		"for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {",
 
 			"vec4 lDirection = viewMatrix * vec4( directionalLightDirection[ i ], 0.0 );",
+			"vec3 dirVector = normalize( lDirection.xyz );",
 
 			"#ifdef WRAP_AROUND",
 
-				"float directionalLightWeightingFull = max( dot( transformedNormal, normalize( lDirection.xyz ) ), 0.0 );",
-				"float directionalLightWeightingHalf = max( 0.5 * dot( transformedNormal, normalize( lDirection.xyz ) ) + 0.5, 0.0 );",
+				"float directionalLightWeightingFull = max( dot( transformedNormal, dirVector ), 0.0 );",
+				"float directionalLightWeightingHalf = max( 0.5 * dot( transformedNormal, dirVector ) + 0.5, 0.0 );",
 
 				"vec3 directionalLightWeighting = mix( vec3( directionalLightWeightingFull ), vec3( directionalLightWeightingHalf ), wrapRGB );",
 
 			"#else",
 
-				"float directionalLightWeighting = max( dot( transformedNormal, normalize( lDirection.xyz ) ), 0.0 );",
+				"float directionalLightWeighting = max( dot( transformedNormal, dirVector ), 0.0 );",
 
 			"#endif",
 
@@ -317,11 +318,9 @@ THREE.ShaderChunk = {
 			"for( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {",
 
 				"vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );",
-
 				"vec3 lVector = lPosition.xyz - mvPosition.xyz;",
 
 				"float lDistance = 1.0;",
-
 				"if ( pointLightDistance[ i ] > 0.0 )",
 					"lDistance = 1.0 - min( ( length( lVector ) / pointLightDistance[ i ] ), 1.0 );",
 
@@ -339,7 +338,6 @@ THREE.ShaderChunk = {
 					"float pointLightWeighting = max( dot( transformedNormal, lVector ), 0.0 );",
 
 				"#endif",
-
 
 				"vLightWeighting += pointLightColor[ i ] * pointLightWeighting * lDistance;",
 
@@ -377,15 +375,11 @@ THREE.ShaderChunk = {
 			"for( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {",
 
 				"vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );",
-
 				"vec3 lVector = lPosition.xyz - mvPosition.xyz;",
 
 				"float lDistance = 1.0;",
-
 				"if ( pointLightDistance[ i ] > 0.0 )",
 					"lDistance = 1.0 - min( ( length( lVector ) / pointLightDistance[ i ] ), 1.0 );",
-
-				"lVector = normalize( lVector );",
 
 				"vPointLight[ i ] = vec4( lVector, lDistance );",
 
@@ -451,8 +445,8 @@ THREE.ShaderChunk = {
 
 					"vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );",
 					"vec3 lVector = lPosition.xyz + vViewPosition.xyz;",
-					"float lDistance = 1.0;",
 
+					"float lDistance = 1.0;",
 					"if ( pointLightDistance[ i ] > 0.0 )",
 						"lDistance = 1.0 - min( ( length( lVector ) / pointLightDistance[ i ] ), 1.0 );",
 
@@ -532,7 +526,7 @@ THREE.ShaderChunk = {
 
 				// specular
 
-				"vec3 dirHalfVector = normalize( lDirection.xyz + viewPosition );",
+				"vec3 dirHalfVector = normalize( dirVector + viewPosition );",
 				"float dirDotNormalHalf = max( dot( normal, dirHalfVector ), 0.0 );",
 				"float dirSpecularWeight = max( pow( dirDotNormalHalf, shininess ), 0.0 );",
 
