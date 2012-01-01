@@ -2,7 +2,7 @@
  * @author oosmoxiecode
 
  * uvs are messed up in this one, and commented away for now. There is an ugly "seam" by the shared vertices
- * when it "wraps" around, that needs to be fixed. It´s because they share the first and the last vertices
+ * when it "wraps" around, that needs to be fixed. Itï¿½s because they share the first and the last vertices
  * so it draws the entire texture on the seam-faces, I think...
  */
 
@@ -66,7 +66,7 @@ THREE.IcosahedronGeometry = function ( subdivisions ) {
 	// subdivide faces to refine the triangles
 	for (var i=0; i < this.subdivisions; i++) {
 		tempFaces = new THREE.Geometry();
-		for (var tri in tempScope.faces) {
+		for (var tri=0; tri < tempScope.faces.length; tri++) {
 			// replace each triangle by 4 triangles
 			var a = getMiddlePoint(tempScope.faces[tri].a, tempScope.faces[tri].b);
 			var b = getMiddlePoint(tempScope.faces[tri].b, tempScope.faces[tri].c);
