@@ -536,16 +536,29 @@ def parse_obj(fname):
                 uv_index = []
                 normal_index = []
 
+                
+                # Precompute vert / normal / uv lists
+                # for negative index lookup
+                vertlen = len(vertices) + 1
+                normlen = len(normals) + 1
+                uvlen = len(uvs) + 1
+
                 for v in chunks[1:]:
                     vertex = parse_vertex(v)
                     if vertex['v']:
+                        if vertex['v'] < 0:
+                            vertex['v'] += vertlen
                         vertex_index.append(vertex['v'])
                     if vertex['t']:
+                        if vertex['t'] < 0:
+                            vertex['t'] += uvlen
                         uv_index.append(vertex['t'])
                     if vertex['n']:
+                        if vertex['n'] < 0:
+                            vertex['n'] += normlen
                         normal_index.append(vertex['n'])
 
-                faces.append({
+                d = {
                     'vertex':vertex_index,
                     'uv':uv_index,
                     'normal':normal_index,
@@ -554,7 +567,8 @@ def parse_obj(fname):
                     'group':group,
                     'object':object,
                     'smooth':smooth,
-                    })
+                    }
+                faces.append(d)
 
             # Group
             if chunks[0] == "g" and len(chunks) == 2:
