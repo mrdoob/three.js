@@ -899,7 +899,11 @@ THREE.ShaderChunk = {
 
 			"for( int i = 0; i < MAX_SHADOWS; i ++ ) {",
 
-				"vShadowCoord[ i ] = shadowMatrix[ i ] * objectMatrix * vec4( position, 1.0 );",
+				"#ifdef USE_MORPHTARGETS",
+					"vShadowCoord[ i ] = shadowMatrix[ i ] * objectMatrix * vec4( morphed, 1.0 );",
+				"#else",
+					"vShadowCoord[ i ] = shadowMatrix[ i ] * objectMatrix * vec4( position, 1.0 );",
+				"#endif",
 
 			"}",
 
