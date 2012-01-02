@@ -123,11 +123,11 @@
 				renderer.setClearColor( scene.fog.color, 1 );
 				renderer.autoClear = false;
 
-				renderer.shadowCameraNear = 3;
+				renderer.shadowCameraNear = 100;
 				renderer.shadowCameraFar = camera.far;
 				renderer.shadowCameraFov = 50;
 
-				renderer.shadowMapBias = 0.0039;
+				renderer.shadowMapBias = 0.0001;
 				renderer.shadowMapDarkness = 0.5;
 				renderer.shadowMapWidth = SHADOW_MAP_WIDTH;
 				renderer.shadowMapHeight = SHADOW_MAP_HEIGHT;

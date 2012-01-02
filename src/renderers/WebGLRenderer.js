@@ -62,6 +62,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.shadowMapEnabled = false;
 	this.shadowMapAutoUpdate = true;
 	this.shadowMapSoft = true;
+	this.shadowMapCullFrontFaces = true;
 
 	// morphs
 

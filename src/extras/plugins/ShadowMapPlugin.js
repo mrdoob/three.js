@@ -4,14 +4,12 @@
 
 THREE.ShadowMapPlugin = function ( ) {
 
-	var _gl, _renderer,
-
+	var _gl,
+	_renderer,
+	_cameraLight,
 	_depthMaterial, _depthMaterialMorph,
 
-	_cameraLight,
-
 	_frustum = new THREE.Frustum(),
-
 	_projScreenMatrix = new THREE.Matrix4();
 
 	this.shadowMatrix = [];
@@ -61,6 +59,16 @@ THREE.ShadowMapPlugin = function ( ) {
 
 		}
 
+		// set GL state for depth map
+
+		_gl.clearColor( 1, 1, 1, 1 );
+		_gl.disable( _gl.BLEND );
+		if ( _renderer.shadowMapCullFrontFaces ) _gl.cullFace( _gl.FRONT );
+
+		_renderer.setDepthTest( true );
+
+		// render depth map
+
 		for ( i = 0, il = lights.length; i < il; i ++ ) {
 
 			light = lights[ i ];
@@ -84,7 +92,6 @@ THREE.ShadowMapPlugin = function ( ) {
 
 				if ( _cameraLight.parent == null ) {
 
-					//console.warn( "Camera is not on the Scene. Adding it..." );
 					scene.add( _cameraLight );
 
 					if ( _renderer.autoUpdateScene ) scene.updateMatrixWorld();
@@ -115,19 +122,7 @@ THREE.ShadowMapPlugin = function ( ) {
 				_frustum.setFromMatrix( _projScreenMatrix );
 
 				_renderer.setRenderTarget( shadowMap );
-
-				// using arbitrary clear color in depth pass
-				// creates variance in shadows
-
-				_gl.clearColor( 1, 0, 1, 1 );
-				//_gl.clearColor( 0, 0, 0, 1 );
-
 				_renderer.clear();
-
-				var clearColor = _renderer.getClearColor(),
-					clearAlpha = _renderer.getClearAlpha();
-
-				_gl.clearColor( clearColor.r, clearColor.g, clearColor.b, clearAlpha );
 
 				// set matrices & frustum culling
 
@@ -156,11 +151,6 @@ THREE.ShadowMapPlugin = function ( ) {
 				}
 
 				// render regular objects
-
-				_renderer.setDepthTest( true );
-				_renderer.setBlending( THREE.NormalBlending ); // maybe blending should be just disabled?
-
-				//_gl.cullFace( _gl.FRONT );
 
 				for ( j = 0, jl = renderList.length; j < jl; j ++ ) {
 
@@ -226,13 +216,20 @@ THREE.ShadowMapPlugin = function ( ) {
 
 				}
 
-				//_gl.cullFace( _gl.BACK );
-
 				shadowIndex ++;
 
 			}
 
 		}
+
+		// restore GL state
+
+		var clearColor = _renderer.getClearColor(),
+		clearAlpha = _renderer.getClearAlpha();
+
+		_gl.clearColor( clearColor.r, clearColor.g, clearColor.b, clearAlpha );
+		_gl.enable( _gl.BLEND );
+		if ( _renderer.shadowMapCullFrontFaces ) _gl.cullFace( _gl.BACK );
 
 	};
 
