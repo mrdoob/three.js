@@ -3279,6 +3279,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		// Ensure depth buffer writing is enabled so it can be cleared on next render
+
+		this.setDepthTest( true );
+		setDepthWrite( true );
+
 		//_gl.finish();
 
 	};
