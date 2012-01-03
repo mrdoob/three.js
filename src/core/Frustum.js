@@ -44,7 +44,7 @@ THREE.Frustum.prototype.contains = function ( object ) {
 	var distance,
 	planes = this.planes,
 	matrix = object.matrixWorld,
-	scale = new THREE.Vector3( matrix.getColumnX().length(), matrix.getColumnY().length(), matrix.getColumnZ().length() ),
+	scale = THREE.Frustum.__v1.set( matrix.getColumnX().length(), matrix.getColumnY().length(), matrix.getColumnZ().length() ),
 	radius = - object.geometry.boundingSphere.radius * Math.max( scale.x, Math.max( scale.y, scale.z ) );
 
 	for ( var i = 0; i < 6; i ++ ) {
@@ -58,3 +58,4 @@ THREE.Frustum.prototype.contains = function ( object ) {
 
 };
 
+THREE.Frustum.__v1 = new THREE.Vector3();
