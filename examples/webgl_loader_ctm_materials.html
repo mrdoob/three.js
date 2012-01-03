@@ -62,7 +62,7 @@
 			var mesh;
 
 			var textureCube;
-			var cameraCube, sceneCube, cubeTarget;
+			var cameraCube, sceneCube;
 
 			var loader;
 
@@ -95,7 +95,6 @@
 
 				// SKYBOX
 
-				cubeTarget = new THREE.Vector3( 0, 0, 0 );
 				sceneCube = new THREE.Scene();
 				cameraCube = new THREE.PerspectiveCamera( 25, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
 				sceneCube.add( cameraCube );
@@ -348,11 +347,7 @@
 
 				controls.update();
 
-				cubeTarget.x = - camera.position.x;
-				cubeTarget.y = - camera.position.y;
-				cubeTarget.z = - camera.position.z;
-
-				cameraCube.lookAt( cubeTarget );
+				cameraCube.rotation.copy( camera.rotation );
 
 				renderer.clear();
 				renderer.render( sceneCube, cameraCube );
