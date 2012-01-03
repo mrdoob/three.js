@@ -205,8 +205,11 @@
 
 				//
 
+				renderer.shadowCameraNear = 500;
 				renderer.shadowCameraFov = 70;
-				renderer.shadowMapBias = 0.0039;
+				renderer.shadowMapBias = 0.001;
+				renderer.shadowMapWidth = 1024;
+				renderer.shadowMapHeight = 1024;
 
 				renderer.shadowMapEnabled = true;
 				renderer.shadowMapSoft = true;

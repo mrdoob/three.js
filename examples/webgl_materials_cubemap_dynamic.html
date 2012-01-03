@@ -189,17 +189,17 @@
 
 				// SHADOW
 
-				renderer.shadowCameraNear = 2;
+				renderer.shadowCameraNear = 100;
 				renderer.shadowCameraFar = camera.far;
 				renderer.shadowCameraFov = 50;
 
-				renderer.shadowMapBias = 0.003885;
+				renderer.shadowMapBias = -0.00125;
 				renderer.shadowMapDarkness = 0.5;
 				renderer.shadowMapWidth = SHADOW_MAP_WIDTH;
 				renderer.shadowMapHeight = SHADOW_MAP_HEIGHT;
+				renderer.shadowMapCullFrontFaces = false;
 
 				renderer.shadowMapEnabled = true;
-				//renderer.shadowMapSoft = false;
 
 				// STATS
 
