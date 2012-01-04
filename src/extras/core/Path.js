@@ -121,9 +121,7 @@ THREE.Path.prototype.splineThru = function( pts /*Array of Vector*/ ) {
 
 	var x0 = lastargs[ lastargs.length - 2 ];
 	var y0 = lastargs[ lastargs.length - 1 ];
-
-	// ---
-
+//---
 	var npts = [ new THREE.Vector2( x0, y0 ) ];
 	Array.prototype.push.apply( npts, pts );
 
@@ -332,6 +330,7 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 			var deltaAngle = aEndAngle - aStartAngle;
 			var angle;
 			var tdivisions = divisions * 2;
+			var t;
 
 			for ( j = 1; j <= tdivisions; j ++ ) {
 
@@ -506,17 +505,6 @@ THREE.Path.prototype.debug = function( canvas ) {
 
 	var p, points = this.getPoints();
 
-	//var theta = -90 /180 * Math.PI;
-	//var p, points = this.transform( 0.866, - 0.866,0, 0.500 , 0.50,-50 );
-
-	//0.866, - 0.866,0, 0.500 , 0.50,-50
-
-	// Math.cos(theta),Math.sin(theta),100,
-	// Math.cos(theta),-Math.sin(theta),-50
-
-	// translate, scale, rotation
-
-
 	for ( i = 0, il = points.length; i < il; i ++ ) {
 
 		p = points[ i ];
@@ -566,15 +554,24 @@ THREE.Path.prototype.toShapes = function() {
 
 	}
 
-	//console.log(subPaths);
+	// console.log(subPaths);
 
 	if ( subPaths.length == 0 ) return [];
 
 	var holesFirst = !THREE.Shape.Utils.isClockWise( subPaths[ 0 ].getPoints() );
+	if ( subPaths.length == 1) {
+		tmpPath = subPaths[0];
+		tmpShape = new THREE.Shape();
+		tmpShape.actions = tmpPath.actions;
+		tmpShape.curves = tmpPath.curves;
+		return tmpShape;
+	};
 
 	var tmpPath, tmpShape, shapes = [];
 
-	//console.log("Holes first", holesFirst);
+	// console.log("Holes first", holesFirst);
+	
+	
 
 	if ( holesFirst ) {
 
