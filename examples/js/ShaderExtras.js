@@ -24,6 +24,7 @@
  *  colorCorrection
  *  normalmap
  *  ssao
+ *  colorify
  */
 
 THREE.ShaderExtras = {
@@ -1636,6 +1637,53 @@ THREE.ShaderExtras = {
 
 	},
 
+	/* -------------------------------------------------------------------------
+	//	Colorify shader
+	 ------------------------------------------------------------------------- */
+
+	'colorify': {
+
+		uniforms: {
+
+			tDiffuse: { type: "t", value: 0, texture: null },
+			color:    { type: "c", value: new THREE.Color( 0xffffff ) }
+
+		},
+
+		vertexShader: [
+
+			"varying vec2 vUv;",
+
+			"void main() {",
+
+				"vUv = vec2( uv.x, 1.0 - uv.y );",
+				"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+
+			"}"
+
+		].join("\n"),
+
+		fragmentShader: [
+
+			"uniform vec3 color;",
+			"uniform sampler2D tDiffuse;",
+
+			"varying vec2 vUv;",
+
+			"void main() {",
+
+				"vec4 texel = texture2D( tDiffuse, vUv );",
+
+				"vec3 luma = vec3( 0.299, 0.587, 0.114 );",
+				"float v = dot( texel.xyz, luma );",
+
+				"gl_FragColor = vec4( v * color, texel.w );",
+
+			"}"
+
+		].join("\n")
+
+	},
 	// METHODS
 
 	buildKernel: function( sigma ) {

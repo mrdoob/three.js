@@ -57,39 +57,6 @@
 		<script src="js/Detector.js"></script>
 		<script src="js/Stats.js"></script>
 
-		<!-- Time modulated procedural color fragment shader -->
-
-		<script id="fs-colors" type="x-shader/x-fragment">
-
-			varying vec2 vUv;
-			uniform float time;
-
-			void main() {
-
-				//gl_FragColor = vec4( time, vUv.x, vUv.y, 1.0 );
-				//gl_FragColor = vec4( 0.4, 0.4, 0.4, 1.0 );
-				gl_FragColor = vec4( 0.2, 0.4, 0.5, 1.0 );
-
-			}
-
-		</script>
-
-		<!-- Generic vertex shader -->
-
-		<script id="vs-generic" type="x-shader/x-vertex">
-
-			varying vec2 vUv;
-
-			void main() {
-
-				vUv = vec2( uv.x, 1.0 - uv.y );
-				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-
-			}
-
-		</script>
-
-
 		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
@@ -144,15 +111,7 @@
 
 				//
 
-				materialColor = new THREE.ShaderMaterial( {
-
-					uniforms: { time: { type: "f", value: 0.0 } },
-					vertexShader: getText( 'vs-generic' ),
-					fragmentShader: getText( 'fs-colors' ),
-					depthTest: false
-
-				} );
-
+				var materialColor = new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( "textures/cube/SwedishRoyalCastle/pz.jpg" ), depthTest: false } );
 				var plane = new THREE.PlaneGeometry( 1, 1 );
 
 				quadBG = new THREE.Mesh( plane, materialColor );
@@ -216,12 +175,23 @@
 				var effectBloom = new THREE.BloomPass( 0.5 );
 				var effectFilm = new THREE.FilmPass( 0.35, 0.025, 648, false );
 				var effectFilmBW = new THREE.FilmPass( 0.35, 0.5, 2048, true );
-				var effectFilmBW2 = new THREE.FilmPass( 0.05, 0.5, 2048, true );
-				var effectDotScreen = new THREE.DotScreenPass( new THREE.Vector2( 0, 0 ), 0.5, 0.6 );
+				var effectDotScreen = new THREE.DotScreenPass( new THREE.Vector2( 0, 0 ), 0.5, 0.8 );
 
-				//var renderMask = new THREE.MaskPass( sceneMask, cameraOrtho );
-				var renderMask = new THREE.MaskPass( sceneModel, cameraPerspective );
+				var effectHBlur = new THREE.ShaderPass( THREE.ShaderExtras[ "horizontalBlur" ] );
+				var effectVBlur = new THREE.ShaderPass( THREE.ShaderExtras[ "verticalBlur" ] );
+				effectHBlur.uniforms[ 'h' ].value = 2 / ( window.innerWidth/2 );
+				effectVBlur.uniforms[ 'v' ].value = 2 / ( window.innerHeight/2 );
+
+				var effectColorify1 = new THREE.ShaderPass( THREE.ShaderExtras[ "colorify" ] );
+				var effectColorify2 = new THREE.ShaderPass( THREE.ShaderExtras[ "colorify" ] );
+				effectColorify1.uniforms[ 'color' ].value.setRGB( 1, 0.8, 0.8 );
+				effectColorify2.uniforms[ 'color' ].value.setRGB( 1, 0.75, 0.5 );
+
 				var clearMask = new THREE.ClearMaskPass();
+				var renderMask = new THREE.MaskPass( sceneModel, cameraPerspective );
+				var renderMaskInverse = new THREE.MaskPass( sceneModel, cameraPerspective );
+
+				renderMaskInverse.inverse = true;
 
 				//effectFilm.renderToScreen = true;
 				//effectFilmBW.renderToScreen = true;
@@ -241,6 +211,10 @@
 
 				composerScene.addPass( renderBackground );
 				composerScene.addPass( renderModel );
+				composerScene.addPass( renderMaskInverse );
+				composerScene.addPass( effectHBlur );
+				composerScene.addPass( effectVBlur );
+				composerScene.addPass( clearMask );
 
 				//
 
@@ -266,10 +240,13 @@
 				composer2 = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth, rtHeight, rtParameters ) );
 
 				composer2.addPass( renderScene );
-				composer2.addPass( renderMask );
 				composer2.addPass( effectDotScreen );
+				composer2.addPass( renderMask );
+				composer2.addPass( effectColorify1 );
 				composer2.addPass( clearMask );
-				composer2.addPass( effectFilmBW2 );
+				composer2.addPass( renderMaskInverse );
+				composer2.addPass( effectColorify2 );
+				composer2.addPass( clearMask );
 				composer2.addPass( effectVignette );
 
 				//
@@ -398,14 +375,6 @@
 				var time = Date.now() * 0.0004;
 
 				if ( mesh ) mesh.rotation.y = -time;
-
-				if ( materialColor.uniforms.time.value > 1 || materialColor.uniforms.time.value < 0 ) {
-
-					delta *= -1;
-
-				}
-
-				materialColor.uniforms.time.value += delta / 2;
 
 				renderer.setViewport( 0, 0, 2 * halfWidth, 2 * halfHeight );
 
