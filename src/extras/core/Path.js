@@ -330,7 +330,6 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 			var deltaAngle = aEndAngle - aStartAngle;
 			var angle;
 			var tdivisions = divisions * 2;
-			var t;
 
 			for ( j = 1; j <= tdivisions; j ++ ) {
 
@@ -558,20 +557,19 @@ THREE.Path.prototype.toShapes = function() {
 
 	if ( subPaths.length == 0 ) return [];
 
+	var tmpPath, tmpShape, shapes = [];
+
 	var holesFirst = !THREE.Shape.Utils.isClockWise( subPaths[ 0 ].getPoints() );
+	// console.log("Holes first", holesFirst);
+
 	if ( subPaths.length == 1) {
 		tmpPath = subPaths[0];
 		tmpShape = new THREE.Shape();
 		tmpShape.actions = tmpPath.actions;
 		tmpShape.curves = tmpPath.curves;
-		return tmpShape;
+		shapes.push( tmpShape );
+		return shapes;
 	};
-
-	var tmpPath, tmpShape, shapes = [];
-
-	// console.log("Holes first", holesFirst);
-	
-	
 
 	if ( holesFirst ) {
 
