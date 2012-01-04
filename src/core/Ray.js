@@ -103,29 +103,34 @@ THREE.Ray = function ( origin, direction ) {
 
 				objMatrix = object.matrixWorld;
 
-				// check if face.centroid is behind the origin
+				// determine if ray intersects the plane of the face
+				// note: this works regardless of the direction of the face normal
 
 				vector = objMatrix.multiplyVector3( vector.copy( face.centroid ) ).subSelf( originCopy );
-				dot = vector.dot( directionCopy );
-
-				if ( dot <= 0 ) continue;
-
-				//
-
-				a = objMatrix.multiplyVector3( a.copy( vertices[ face.a ].position ) );
-				b = objMatrix.multiplyVector3( b.copy( vertices[ face.b ].position ) );
-				c = objMatrix.multiplyVector3( c.copy( vertices[ face.c ].position ) );
-				if ( face instanceof THREE.Face4 ) d = objMatrix.multiplyVector3( d.copy( vertices[ face.d ].position ) );
-
 				normal = object.matrixRotationWorld.multiplyVector3( normal.copy( face.normal ) );
 				dot = directionCopy.dot( normal );
 
-				if ( object.doubleSided || ( object.flipSided ? dot > 0 : dot < 0 ) ) { // Math.abs( dot ) > 0.0001
+				// bail if ray and plane are parallel
 
-					scalar = normal.dot( vector.sub( a, originCopy ) ) / dot;
+				if ( Math.abs( dot ) < 0.0001 ) continue;
+
+				// calc distance to plane
+
+				scalar = normal.dot( vector ) / dot;
+
+				// if negative distance, then plane is behind ray
+
+				if ( scalar < 0 ) continue;
+
+				if ( object.doubleSided || ( object.flipSided ? dot > 0 : dot < 0 ) ) {
+
 					intersectPoint.add( originCopy, directionCopy.multiplyScalar( scalar ) );
 
 					if ( face instanceof THREE.Face3 ) {
+
+						a = objMatrix.multiplyVector3( a.copy( vertices[ face.a ].position ) );
+						b = objMatrix.multiplyVector3( b.copy( vertices[ face.b ].position ) );
+						c = objMatrix.multiplyVector3( c.copy( vertices[ face.c ].position ) );
 
 						if ( pointInFace3( intersectPoint, a, b, c ) ) {
 
@@ -143,6 +148,11 @@ THREE.Ray = function ( origin, direction ) {
 						}
 
 					} else if ( face instanceof THREE.Face4 ) {
+
+						a = objMatrix.multiplyVector3( a.copy( vertices[ face.a ].position ) );
+						b = objMatrix.multiplyVector3( b.copy( vertices[ face.b ].position ) );
+						c = objMatrix.multiplyVector3( c.copy( vertices[ face.c ].position ) );
+						d = objMatrix.multiplyVector3( d.copy( vertices[ face.d ].position ) );
 
 						if ( pointInFace3( intersectPoint, a, b, d ) || pointInFace3( intersectPoint, b, c, d ) ) {
 

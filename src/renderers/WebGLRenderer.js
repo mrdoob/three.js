@@ -3244,7 +3244,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			this.setBlending( scene.overrideMaterial.blending );
 			this.setDepthTest( scene.overrideMaterial.depthTest );
-			setDepthWrite( scene.overrideMaterial.depthWrite );
+			this.setDepthWrite( scene.overrideMaterial.depthWrite );
 			setPolygonOffset( scene.overrideMaterial.polygonOffset, scene.overrideMaterial.polygonOffsetFactor, scene.overrideMaterial.polygonOffsetUnits );
 
 			renderObjects( scene.__webglObjects, false, "", camera, lights, fog, true, scene.overrideMaterial );
@@ -3279,7 +3279,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		//_gl.finish();
+		// Ensure depth buffer writing is enabled so it can be cleared on next render
+
+		this.setDepthTest( true );
+		this.setDepthWrite( true );
+
+		// _gl.finish();
 
 	};
 
@@ -3348,7 +3353,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					if ( useBlending ) _this.setBlending( material.blending );
 
 					_this.setDepthTest( material.depthTest );
-					setDepthWrite( material.depthWrite );
+					_this.setDepthWrite( material.depthWrite );
 					setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
 
 				}
@@ -3395,7 +3400,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					if ( useBlending ) _this.setBlending( material.blending );
 
 					_this.setDepthTest( material.depthTest );
-					setDepthWrite( material.depthWrite );
+					_this.setDepthWrite( material.depthWrite );
 					setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
 
 				}
@@ -4889,7 +4894,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( _oldDepthTest !== depthTest ) {
 
-			if( depthTest ) {
+			if ( depthTest ) {
 
 				_gl.enable( _gl.DEPTH_TEST );
 
@@ -4905,6 +4910,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	this.setDepthWrite = function ( depthWrite ) {
+
+		if ( _oldDepthWrite !== depthWrite ) {
+
+			_gl.depthMask( depthWrite );
+			_oldDepthWrite = depthWrite;
+
+		}
+
+	};
+
 	function setLineWidth ( width ) {
 
 		if ( width !== _oldLineWidth ) {
@@ -4912,17 +4928,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.lineWidth( width );
 
 			_oldLineWidth = width;
-
-		}
-
-	};
-
-	function setDepthWrite ( depthWrite ) {
-
-		if ( _oldDepthWrite !== depthWrite ) {
-
-			_gl.depthMask( depthWrite );
-			_oldDepthWrite = depthWrite;
 
 		}
 
