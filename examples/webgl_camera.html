@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - camera</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #808080;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+
+				background-color: #000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+				z-index: 100;
+			}
+
+			a {
+
+				color: #0080ff;
+			}
+
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - camera</div>
+
+		<script src="../build/Three.js"></script>
+		<script src="js/Stats.js"></script>
+
+		<script>
+
+			var SCREEN_WIDTH = window.innerWidth;
+			var SCREEN_HEIGHT = window.innerHeight;
+
+			var container, stats;
+			var camera, scene, renderer, mesh;
+
+			var r = 0;
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				scene = new THREE.Scene();
+
+				camera = new THREE.PerspectiveCamera( 50, 0.5 * SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
+				camera.position.z = 2500;
+				scene.add( camera );
+
+				camera2 = new THREE.PerspectiveCamera( 50, 0.5 * SCREEN_WIDTH / SCREEN_HEIGHT, 150, 1000 );
+				scene.add( camera2 );
+
+				var visibleCamera = new THREE.VisibleCamera( camera2 );
+				camera2.add( visibleCamera );
+
+				//
+
+				mesh = new THREE.Mesh( new THREE.SphereGeometry( 100, 16, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } ) );
+				scene.add( mesh );
+
+				var mesh2 = new THREE.Mesh( new THREE.SphereGeometry( 50, 16, 8 ), new THREE.MeshBasicMaterial( { color: 0x00ff00, wireframe: true } ) );
+				mesh2.position.y = 150;
+				mesh.add( mesh2 );
+
+				//
+
+				var x, y, z, geo = new THREE.Geometry();
+
+				for ( var i = 0; i < 10000; i ++ ) {
+
+					x = THREE.Math.randFloatSpread( 2000 );
+					y = THREE.Math.randFloatSpread( 2000 );
+					z = THREE.Math.randFloatSpread( 2000 );
+
+					var p = new THREE.Vector3( x, y, z );
+					geo.vertices.push( new THREE.Vertex( p ) );
+
+				}
+
+				var particles = new THREE.ParticleSystem( geo, new THREE.ParticleBasicMaterial( { color: 0x888888 } ) );
+				scene.add( particles );
+
+				//
+
+
+				renderer = new THREE.WebGLRenderer( { antialias: true, clearColor: 0x000000, clearAlpha: 1 } );
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				renderer.domElement.style.position = "relative";
+				container.appendChild( renderer.domElement );
+
+				renderer.autoClear = false;
+
+				//
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				stats.domElement.style.zIndex = 100;
+
+				stats.domElement.children[ 0 ].children[ 0 ].style.color = "#666";
+				stats.domElement.children[ 0 ].style.background = "transparent";
+				stats.domElement.children[ 0 ].children[ 1 ].style.display = "none";
+
+				container.appendChild( stats.domElement );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize( event ) {
+
+				SCREEN_WIDTH = window.innerWidth;
+				SCREEN_HEIGHT = window.innerHeight;
+
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+
+				camera.aspect = 0.5 * SCREEN_WIDTH / SCREEN_HEIGHT;
+				camera.updateProjectionMatrix();
+
+				camera2.aspect = 0.5 * SCREEN_WIDTH / SCREEN_HEIGHT;
+				camera2.updateProjectionMatrix();
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+
+			function render() {
+
+				mesh.position.x = 700 * Math.cos( r );
+				mesh.position.z = 700 * Math.sin( r );
+				mesh.position.y = 700 * Math.sin( r );
+
+				mesh.children[ 0 ].position.x = 70 * Math.cos( 2 * r );
+				mesh.children[ 0 ].position.z = 70 * Math.sin( r );
+
+				camera2.fov = 35 + 30 * Math.sin( 0.5 * r );
+				camera2.far = mesh.position.length();
+				camera2.updateProjectionMatrix();
+				camera2.children[ 0 ].update( camera2 );
+
+				camera2.lookAt( mesh.position );
+
+				renderer.clear();
+
+				renderer.setViewport( 0, 0, SCREEN_WIDTH/2, SCREEN_HEIGHT );
+				renderer.render( scene, camera2 );
+
+				renderer.setViewport( SCREEN_WIDTH/2, 0, SCREEN_WIDTH/2, SCREEN_HEIGHT );
+				renderer.render( scene, camera );
+
+				r += 0.01;
+
+			}
+
+
+		</script>
+
+	</body>
+</html>

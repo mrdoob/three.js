@@ -133,6 +133,7 @@ EXTRAS_FILES = [
 'extras/objects/Axes.js',
 'extras/objects/MarchingCubes.js',
 'extras/objects/LensFlare.js',
+'extras/objects/VisibleCamera.js',
 'extras/plugins/LensFlarePlugin.js',
 'extras/plugins/ShadowMapPlugin.js',
 'extras/plugins/SpritePlugin.js',
