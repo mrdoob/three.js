@@ -12,7 +12,8 @@ THREE.CurvePath = function () {
 
 	this.curves = [];
 	this.bends = [];
-
+	
+	this.autoClose = false; // Automatically closes the path
 };
 
 THREE.CurvePath.prototype = new THREE.Curve();
@@ -25,13 +26,22 @@ THREE.CurvePath.prototype.add = function ( curve ) {
 };
 
 THREE.CurvePath.prototype.checkConnection = function() {
-
+	// TODO
+	// If the ending of curve is not connected to the starting
+	// or the next curve, then, this is not a real path
 };
 
-// Add a line curve  if start and end of lines are not connected
-
 THREE.CurvePath.prototype.closePath = function() {
-
+	// TODO Test
+	// and verify for vector3 (needs to implement equals)
+	// Add a line curve if start and end of lines are not connected
+	var startPoint = this.curves[0].getPoint(0);
+	var endPoint = this.curves[this.curves.length-1].getPoint(1);
+	
+	if (!startPoint.equals(endPoint)) {
+		this.curves.push( new THREE.LineCurve(endPoint, startPoint) );
+	}
+	
 };
 
 // To get accurate point with reference to
