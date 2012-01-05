@@ -106,7 +106,19 @@
 				light = new THREE.SpotLight( 0xffffff );
 				light.position.set( 0, 1500, 1000 );
 				light.target.position.set( 0, 0, 0 );
+
 				light.castShadow = true;
+
+				light.shadowCameraNear = 100;
+				light.shadowCameraFar = camera.far;
+				light.shadowCameraFov = 50;
+
+				light.shadowBias = 0.0001;
+				light.shadowDarkness = 0.5;
+
+				light.shadowMapWidth = SHADOW_MAP_WIDTH;
+				light.shadowMapHeight = SHADOW_MAP_HEIGHT;
+
 				scene.add( light );
 
 				createHUD();
@@ -123,14 +135,7 @@
 				renderer.setClearColor( scene.fog.color, 1 );
 				renderer.autoClear = false;
 
-				renderer.shadowCameraNear = 100;
-				renderer.shadowCameraFar = camera.far;
-				renderer.shadowCameraFov = 50;
-
-				renderer.shadowMapBias = 0.0001;
-				renderer.shadowMapDarkness = 0.5;
-				renderer.shadowMapWidth = SHADOW_MAP_WIDTH;
-				renderer.shadowMapHeight = SHADOW_MAP_HEIGHT;
+				//
 
 				renderer.shadowMapEnabled = true;
 				renderer.shadowMapSoft = true;

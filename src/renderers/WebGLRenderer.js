@@ -50,15 +50,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// shadow map
 
-	this.shadowMapBias = 0.0039;
-	this.shadowMapDarkness = 0.5;
-	this.shadowMapWidth = 512;
-	this.shadowMapHeight = 512;
-
-	this.shadowCameraNear = 1;
-	this.shadowCameraFar = 5000;
-	this.shadowCameraFov = 50;
-
 	this.shadowMapEnabled = false;
 	this.shadowMapAutoUpdate = true;
 	this.shadowMapSoft = true;
@@ -4050,8 +4041,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			maxBones: maxBones,
 			shadowMapEnabled: this.shadowMapEnabled && object.receiveShadow,
 			shadowMapSoft: this.shadowMapSoft,
-			shadowMapWidth: this.shadowMapWidth,
-			shadowMapHeight: this.shadowMapHeight,
 			maxShadows: maxShadows,
 			alphaTest: material.alphaTest,
 			metal: material.metal,
@@ -4236,7 +4225,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( object.receiveShadow && ! material._shadowPass ) {
 
-				refreshUniformsShadow( m_uniforms, material );
+				refreshUniformsShadow( m_uniforms, lights );
 
 			}
 
@@ -4437,20 +4426,31 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function refreshUniformsShadow ( uniforms, material ) {
+	function refreshUniformsShadow ( uniforms, lights ) {
 
 		if ( uniforms.shadowMatrix ) {
 
-			for ( var i = 0; i < _this.shadowMapPlugin.shadowMatrix.length; i ++ ) {
+			var j = 0;
 
-				uniforms.shadowMatrix.value[ i ] = _this.shadowMapPlugin.shadowMatrix[ i ];
-				uniforms.shadowMap.texture[ i ] = _this.shadowMapPlugin.shadowMap[ i ];
+			for ( var i = 0, il = lights.length; i < il; i ++ ) {
 
+				var light = lights[ i ];
+
+				if ( light.castShadow && light instanceof THREE.SpotLight ) {
+
+					uniforms.shadowMap.texture[ j ] = light.shadowMap;
+					uniforms.shadowMapSize.value[ j ] = light.shadowMapSize;
+
+					uniforms.shadowMatrix.value[ j ] = light.shadowMatrix;
+
+					uniforms.shadowDarkness.value[ j ] = light.shadowDarkness;
+					uniforms.shadowBias.value[ j ] = light.shadowBias;
+
+					j ++;
+
+				}
 
 			}
-
-			uniforms.shadowDarkness.value = _this.shadowMapDarkness;
-			uniforms.shadowBias.value = _this.shadowMapBias;
 
 		}
 
@@ -4539,6 +4539,27 @@ THREE.WebGLRenderer = function ( parameters ) {
 			} else if( type === "fv" ) {
 
 				_gl.uniform3fv( location, value );
+
+			// array of THREE.Vector2
+
+			} else if( type === "v2v" ) {
+
+				if ( ! uniform._array ) {
+
+					uniform._array = new Float32Array( 2 * value.length );
+
+				}
+
+				for ( i = 0, il = value.length; i < il; i ++ ) {
+
+					offset = i * 2;
+
+					uniform._array[ offset ] 	 = value[ i ].x;
+					uniform._array[ offset + 1 ] = value[ i ].y;
+
+				}
+
+				_gl.uniform2fv( location, uniform._array );
 
 			// array of THREE.Vector3
 
@@ -5161,8 +5182,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			parameters.shadowMapEnabled ? "#define USE_SHADOWMAP" : "",
 			parameters.shadowMapSoft ? "#define SHADOWMAP_SOFT" : "",
-			parameters.shadowMapSoft ? "#define SHADOWMAP_WIDTH " + parameters.shadowMapWidth.toFixed( 1 ) : "",
-			parameters.shadowMapSoft ? "#define SHADOWMAP_HEIGHT " + parameters.shadowMapHeight.toFixed( 1 ) : "",
 
 			"uniform mat4 viewMatrix;",
 			"uniform vec3 cameraPosition;",

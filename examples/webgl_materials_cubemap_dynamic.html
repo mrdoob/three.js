@@ -167,6 +167,16 @@
 				spotLight.position.set( 0, 1800, 1500 );
 				spotLight.target.position.set( 0, 0, 0 );
 				spotLight.castShadow = true;
+
+				spotLight.shadowCameraNear = 100;
+				spotLight.shadowCameraFar = camera.far;
+				spotLight.shadowCameraFov = 50;
+
+				spotLight.shadowBias = -0.00125;
+				spotLight.shadowDarkness = 0.5;
+				spotLight.shadowMapWidth = SHADOW_MAP_WIDTH;
+				spotLight.shadowMapHeight = SHADOW_MAP_HEIGHT;
+
 				scene.add( spotLight );
 
 				directionalLight2 = new THREE.PointLight( 0xff9900, 0.25 );
@@ -189,16 +199,7 @@
 
 				// SHADOW
 
-				renderer.shadowCameraNear = 100;
-				renderer.shadowCameraFar = camera.far;
-				renderer.shadowCameraFov = 50;
-
-				renderer.shadowMapBias = -0.00125;
-				renderer.shadowMapDarkness = 0.5;
-				renderer.shadowMapWidth = SHADOW_MAP_WIDTH;
-				renderer.shadowMapHeight = SHADOW_MAP_HEIGHT;
 				renderer.shadowMapCullFrontFaces = false;
-
 				renderer.shadowMapEnabled = true;
 
 				// STATS

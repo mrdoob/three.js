@@ -734,9 +734,10 @@ THREE.ShaderChunk = {
 		"#ifdef USE_SHADOWMAP",
 
 			"uniform sampler2D shadowMap[ MAX_SHADOWS ];",
+			"uniform vec2 shadowMapSize[ MAX_SHADOWS ];",
 
-			"uniform float shadowDarkness;",
-			"uniform float shadowBias;",
+			"uniform float shadowDarkness[ MAX_SHADOWS ];",
+			"uniform float shadowBias[ MAX_SHADOWS ];",
 
 			"varying vec4 vShadowCoord[ MAX_SHADOWS ];",
 
@@ -756,20 +757,13 @@ THREE.ShaderChunk = {
 
 		"#ifdef USE_SHADOWMAP",
 
-			"#ifdef SHADOWMAP_SOFT",
-
-				"const float xPixelOffset = 1.0 / SHADOWMAP_WIDTH;",
-				"const float yPixelOffset = 1.0 / SHADOWMAP_HEIGHT;",
-
-			"#endif",
-
 			"vec3 shadowColor = vec3( 1.0 );",
 			"float fDepth;",
 
 			"for( int i = 0; i < MAX_SHADOWS; i ++ ) {",
 
 				"vec3 shadowCoord = vShadowCoord[ i ].xyz / vShadowCoord[ i ].w;",
-				"shadowCoord.z += shadowBias;",
+				"shadowCoord.z += shadowBias[ i ];",
 
 				// using "if ( all )" for ATI OpenGL shader compiler
 				// "if ( something && something )" breaks it
@@ -810,10 +804,14 @@ THREE.ShaderChunk = {
 						*/
 
 						"const float shadowDelta = 1.0 / 9.0;",
-						"const float dx0 = -1.25 * xPixelOffset;",
-						"const float dy0 = -1.25 * yPixelOffset;",
-						"const float dx1 = 1.25 * xPixelOffset;",
-						"const float dy1 = 1.25 * yPixelOffset;",
+
+						"float xPixelOffset = 1.0 / shadowMapSize[ i ].x;",
+						"float yPixelOffset = 1.0 / shadowMapSize[ i ].y;",
+
+						"float dx0 = -1.25 * xPixelOffset;",
+						"float dy0 = -1.25 * yPixelOffset;",
+						"float dx1 = 1.25 * xPixelOffset;",
+						"float dy1 = 1.25 * yPixelOffset;",
 
 						"fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy0 ) ) );",
 						"if ( fDepth < shadowCoord.z ) shadow += shadowDelta;",
@@ -842,7 +840,7 @@ THREE.ShaderChunk = {
 						"fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy1 ) ) );",
 						"if ( fDepth < shadowCoord.z ) shadow += shadowDelta;",
 
-						"shadowColor = shadowColor * vec3( ( 1.0 - shadowDarkness * shadow ) );",
+						"shadowColor = shadowColor * vec3( ( 1.0 - shadowDarkness[ i ] * shadow ) );",
 
 					"#else",
 
@@ -853,11 +851,11 @@ THREE.ShaderChunk = {
 
 							// spot with multiple shadows is darker
 
-							"shadowColor = shadowColor * vec3( 1.0 - shadowDarkness );",
+							"shadowColor = shadowColor * vec3( 1.0 - shadowDarkness[ i ] );",
 
 							// spot with multiple shadows has the same color as single shadow spot
 
-							//"shadowColor = min( shadowColor, vec3( shadowDarkness ) );",
+							//"shadowColor = min( shadowColor, vec3( shadowDarkness[ i ] ) );",
 
 					"#endif",
 
@@ -900,9 +898,13 @@ THREE.ShaderChunk = {
 			"for( int i = 0; i < MAX_SHADOWS; i ++ ) {",
 
 				"#ifdef USE_MORPHTARGETS",
+
 					"vShadowCoord[ i ] = shadowMatrix[ i ] * objectMatrix * vec4( morphed, 1.0 );",
+
 				"#else",
+
 					"vShadowCoord[ i ] = shadowMatrix[ i ] * objectMatrix * vec4( position, 1.0 );",
+
 				"#endif",
 
 			"}",
@@ -1062,10 +1064,12 @@ THREE.UniformsLib = {
 	shadowmap: {
 
 		"shadowMap": { type: "tv", value: 6, texture: [] },
-		"shadowMatrix" : { type: "m4v", value: [] },
+		"shadowMapSize": { type: "v2v", value: [] },
 
-		"shadowBias" : { type: "f", value: 0.0039 },
-		"shadowDarkness": { type: "f", value: 0.2 }
+		"shadowBias" : { type: "fv1", value: [] },
+		"shadowDarkness": { type: "fv1", value: [] },
+
+		"shadowMatrix" : { type: "m4v", value: [] },
 
 	}
 

@@ -15,6 +15,25 @@ THREE.SpotLight = function ( hex, intensity, distance, castShadow ) {
 	this.castShadow = ( castShadow !== undefined ) ? castShadow : false;
 	this.onlyShadow = false;
 
+	//
+
+	this.shadowCameraNear = 50;
+	this.shadowCameraFar = 5000;
+	this.shadowCameraFov = 50;
+
+	this.shadowBias = 0;
+	this.shadowDarkness = 0.5;
+
+	this.shadowMapWidth = 512;
+	this.shadowMapHeight = 512;
+
+	//
+
+	this.shadowMap = null;
+	this.shadowMapSize = null;
+	this.shadowCamera = null;
+	this.shadowMatrix = null;
+
 };
 
 THREE.SpotLight.prototype = new THREE.Light();

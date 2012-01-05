@@ -316,7 +316,13 @@
 
 				sunLight = new THREE.SpotLight( 0xffffff, sunIntensity );
 				sunLight.position.set( 1000, 2000, 1000 );
+
 				sunLight.castShadow = true;
+
+				sunLight.shadowDarkness = 0.5 * sunIntensity;
+				sunLight.shadowBias = 0;
+				sunLight.shadowCameraNear = 50;
+
 				scene.add( sunLight );
 
 				// RENDERER
@@ -333,14 +339,10 @@
 
 				container.appendChild( renderer.domElement );
 
-
 				//
 
 				renderer.shadowMapAutoUpdate = false;
 				renderer.shadowMapEnabled = true;
-				renderer.shadowMapDarkness = 0.5 * sunIntensity;
-				renderer.shadowMapBias = 0.0;
-				renderer.shadowCameraNear = 50;
 
 				//
 
@@ -498,7 +500,7 @@
 
 				pointLight.color.setHSV( 0.1, THREE.Math.mapLinear( parameters.control, 0, 100, 0.99, 0 ), 0.9 );
 
-				renderer.shadowMapDarkness = 0.5 * sunLight.intensity;
+				sunLight.shadowDarkness = 0.4 * sunLight.intensity;
 
 				// render shadow map
 

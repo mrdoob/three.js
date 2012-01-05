@@ -6,14 +6,10 @@ THREE.ShadowMapPlugin = function ( ) {
 
 	var _gl,
 	_renderer,
-	_cameraLight,
 	_depthMaterial, _depthMaterialMorph,
 
 	_frustum = new THREE.Frustum(),
 	_projScreenMatrix = new THREE.Matrix4();
-
-	this.shadowMatrix = [];
-	this.shadowMap = [];
 
 	this.init = function ( renderer ) {
 
@@ -43,21 +39,13 @@ THREE.ShadowMapPlugin = function ( ) {
 
 		var i, il, j, jl,
 
-		shadowMap, shadowMatrix,
+		shadowMap, shadowMatrix, shadowCamera,
 		program, buffer, material,
 		webglObject, object, light,
 		renderList,
 
-		shadowIndex = 0,
-
 		lights = scene.lights,
 		fog = null;
-
-		if ( ! _cameraLight ) {
-
-			_cameraLight = new THREE.PerspectiveCamera( _renderer.shadowCameraFov, _renderer.shadowMapWidth / _renderer.shadowMapHeight, _renderer.shadowCameraNear, _renderer.shadowCameraFar );
-
-		}
 
 		// set GL state for depth map
 
@@ -75,30 +63,34 @@ THREE.ShadowMapPlugin = function ( ) {
 
 			if ( light.castShadow && light instanceof THREE.SpotLight ) {
 
-				if ( ! this.shadowMap[ shadowIndex ] ) {
+				if ( ! light.shadowMap ) {
 
 					var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat };
 
-					this.shadowMap[ shadowIndex ] = new THREE.WebGLRenderTarget( _renderer.shadowMapWidth, _renderer.shadowMapHeight, pars );
-					this.shadowMatrix[ shadowIndex ] = new THREE.Matrix4();
+					light.shadowMap = new THREE.WebGLRenderTarget( light.shadowMapWidth, light.shadowMapHeight, pars );
+					light.shadowMapSize = new THREE.Vector2( light.shadowMapWidth, light.shadowMapHeight );
+
+					light.shadowCamera = new THREE.PerspectiveCamera( light.shadowCameraFov, light.shadowMapWidth / light.shadowMapHeight, light.shadowCameraNear, light.shadowCameraFar );
+					light.shadowMatrix = new THREE.Matrix4();
 
 				}
 
-				shadowMap = this.shadowMap[ shadowIndex ];
-				shadowMatrix = this.shadowMatrix[ shadowIndex ];
+				shadowMap = light.shadowMap;
+				shadowMatrix = light.shadowMatrix;
+				shadowCamera = light.shadowCamera;
 
-				_cameraLight.position.copy( light.position );
-				_cameraLight.lookAt( light.target.position );
+				shadowCamera.position.copy( light.position );
+				shadowCamera.lookAt( light.target.position );
 
-				if ( _cameraLight.parent == null ) {
+				if ( shadowCamera.parent == null ) {
 
-					scene.add( _cameraLight );
+					scene.add( shadowCamera );
 
 					if ( _renderer.autoUpdateScene ) scene.updateMatrixWorld();
 
 				}
 
-				_cameraLight.matrixWorldInverse.getInverse( _cameraLight.matrixWorld );
+				shadowCamera.matrixWorldInverse.getInverse( shadowCamera.matrixWorld );
 
 				// compute shadow matrix
 
@@ -107,18 +99,18 @@ THREE.ShadowMapPlugin = function ( ) {
 								  0.0, 0.0, 0.5, 0.5,
 								  0.0, 0.0, 0.0, 1.0 );
 
-				shadowMatrix.multiplySelf( _cameraLight.projectionMatrix );
-				shadowMatrix.multiplySelf( _cameraLight.matrixWorldInverse );
+				shadowMatrix.multiplySelf( shadowCamera.projectionMatrix );
+				shadowMatrix.multiplySelf( shadowCamera.matrixWorldInverse );
 
 				// render shadow map
 
-				if ( ! _cameraLight._viewMatrixArray ) _cameraLight._viewMatrixArray = new Float32Array( 16 );
-				_cameraLight.matrixWorldInverse.flattenToArray( _cameraLight._viewMatrixArray );
+				if ( ! shadowCamera._viewMatrixArray ) shadowCamera._viewMatrixArray = new Float32Array( 16 );
+				shadowCamera.matrixWorldInverse.flattenToArray( shadowCamera._viewMatrixArray );
 
-				if ( ! _cameraLight._projectionMatrixArray ) _cameraLight._projectionMatrixArray = new Float32Array( 16 );
-				_cameraLight.projectionMatrix.flattenToArray( _cameraLight._projectionMatrixArray );
+				if ( ! shadowCamera._projectionMatrixArray ) shadowCamera._projectionMatrixArray = new Float32Array( 16 );
+				shadowCamera.projectionMatrix.flattenToArray( shadowCamera._projectionMatrixArray );
 
-				_projScreenMatrix.multiply( _cameraLight.projectionMatrix, _cameraLight.matrixWorldInverse );
+				_projScreenMatrix.multiply( shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse );
 				_frustum.setFromMatrix( _projScreenMatrix );
 
 				_renderer.setRenderTarget( shadowMap );
@@ -140,7 +132,7 @@ THREE.ShadowMapPlugin = function ( ) {
 						if ( ! ( object instanceof THREE.Mesh ) || ! ( object.frustumCulled ) || _frustum.contains( object ) ) {
 
 							object.matrixWorld.flattenToArray( object._objectMatrixArray );
-							object._modelViewMatrix.multiplyToArray( _cameraLight.matrixWorldInverse, object.matrixWorld, object._modelViewMatrixArray );
+							object._modelViewMatrix.multiplyToArray( shadowCamera.matrixWorldInverse, object.matrixWorld, object._modelViewMatrixArray );
 
 							webglObject.render = true;
 
@@ -179,11 +171,11 @@ THREE.ShadowMapPlugin = function ( ) {
 
 						if ( buffer instanceof THREE.BufferGeometry ) {
 
-							_renderer.renderBufferDirect( _cameraLight, lights, fog, material, buffer, object );
+							_renderer.renderBufferDirect( shadowCamera, lights, fog, material, buffer, object );
 
 						} else {
 
-							_renderer.renderBuffer( _cameraLight, lights, fog, material, buffer, object );
+							_renderer.renderBuffer( shadowCamera, lights, fog, material, buffer, object );
 
 						}
 
@@ -208,15 +200,13 @@ THREE.ShadowMapPlugin = function ( ) {
 
 						}
 
-						object._modelViewMatrix.multiplyToArray( _cameraLight.matrixWorldInverse, object.matrixWorld, object._modelViewMatrixArray );
+						object._modelViewMatrix.multiplyToArray( shadowCamera.matrixWorldInverse, object.matrixWorld, object._modelViewMatrixArray );
 
-						_renderer.renderImmediateObject( _cameraLight, lights, fog, _depthMaterial, object );
+						_renderer.renderImmediateObject( shadowCamera, lights, fog, _depthMaterial, object );
 
 					}
 
 				}
-
-				shadowIndex ++;
 
 			}
 
