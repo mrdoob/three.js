@@ -90,10 +90,9 @@ THREE.SceneUtils = {
 
 		} else if ( source instanceof THREE.Sprite ) {
 
-			object = new THREE.Sprite( {} );
+			object = new THREE.Sprite( { map: source.map } );
 
 			object.color.copy( source.color );
-			object.map = source.map;
 			object.blending = source.blending;
 
 			object.useScreenCoordinates = source.useScreenCoordinates;
