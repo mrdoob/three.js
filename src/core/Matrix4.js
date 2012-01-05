@@ -275,7 +275,7 @@ THREE.Matrix4.prototype = {
 
 		tmp = this.n41; this.n41 = this.n14; this.n14 = tmp;
 		tmp = this.n42; this.n42 = this.n24; this.n24 = tmp;
-		tmp = this.n43; this.n43 = this.n34; this.n43 = tmp;
+		tmp = this.n43; this.n43 = this.n34; this.n34 = tmp;
 
 		return this;
 
