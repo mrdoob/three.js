@@ -114,15 +114,15 @@ THREE.VisibleCamera.prototype.update = function ( camera ) {
 
 	// center / target
 
-	setPoint( "c", 0, 0, 0 );
-	setPoint( "t", 0, 0, 1 );
+	setPoint( "c", 0, 0, -1 );
+	setPoint( "t", 0, 0,  1 );
 
 	// near
 
-	setPoint( "n1", -w, -h, 0 );
-	setPoint( "n2",  w, -h, 0 );
-	setPoint( "n3", -w,  h, 0 );
-	setPoint( "n4",  w,  h, 0 );
+	setPoint( "n1", -w, -h, -1 );
+	setPoint( "n2",  w, -h, -1 );
+	setPoint( "n3", -w,  h, -1 );
+	setPoint( "n4",  w,  h, -1 );
 
 	// far
 
@@ -133,9 +133,9 @@ THREE.VisibleCamera.prototype.update = function ( camera ) {
 
 	// up
 
-	setPoint( "u1",  w * 0.7, h * 1.1, 0 );
-	setPoint( "u2", -w * 0.7, h * 1.1, 0 );
-	setPoint( "u3",        0, h * 2,   0 );
+	setPoint( "u1",  w * 0.7, h * 1.1, -1 );
+	setPoint( "u2", -w * 0.7, h * 1.1, -1 );
+	setPoint( "u3",        0, h * 2,   -1 );
 
 	// cross
 
@@ -144,10 +144,10 @@ THREE.VisibleCamera.prototype.update = function ( camera ) {
 	setPoint( "cf3",  0, -h, 1 );
 	setPoint( "cf4",  0,  h, 1 );
 
-	setPoint( "cn1", -w,  0, 0 );
-	setPoint( "cn2",  w,  0, 0 );
-	setPoint( "cn3",  0, -h, 0 );
-	setPoint( "cn4",  0,  h, 0 );
+	setPoint( "cn1", -w,  0, -1 );
+	setPoint( "cn2",  w,  0, -1 );
+	setPoint( "cn3",  0, -h, -1 );
+	setPoint( "cn4",  0,  h, -1 );
 
 	function setPoint( point, x, y, z ) {
 

@@ -77,6 +77,10 @@
 				mesh2.position.y = 150;
 				mesh.add( mesh2 );
 
+				var mesh3 = new THREE.Mesh( new THREE.SphereGeometry( 5, 16, 8 ), new THREE.MeshBasicMaterial( { color: 0x0000ff, wireframe: true } ) );
+				mesh3.position.z = -150;
+				camera2.add( mesh3 );
+
 				//
 
 				var x, y, z, geo = new THREE.Geometry();

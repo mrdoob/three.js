@@ -446,14 +446,14 @@
 
 				});
 
-				gui.add( shadowConfig, 'shadowCameraNear', 1, 1000 ).onChange( function() {
+				gui.add( shadowConfig, 'shadowCameraNear', 1, 1500 ).onChange( function() {
 
 					sunLight.shadowCamera.near = shadowConfig.shadowCameraNear;
 					sunLight.shadowCamera.updateProjectionMatrix();
 
 				});
 
-				gui.add( shadowConfig, 'shadowCameraFar', 1001, 5000 ).onChange( function() {
+				gui.add( shadowConfig, 'shadowCameraFar', 1501, 5000 ).onChange( function() {
 
 					sunLight.shadowCamera.far = shadowConfig.shadowCameraFar;
 					sunLight.shadowCamera.updateProjectionMatrix();
