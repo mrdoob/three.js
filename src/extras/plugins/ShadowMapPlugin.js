@@ -73,6 +73,17 @@ THREE.ShadowMapPlugin = function ( ) {
 					light.shadowCamera = new THREE.PerspectiveCamera( light.shadowCameraFov, light.shadowMapWidth / light.shadowMapHeight, light.shadowCameraNear, light.shadowCameraFar );
 					light.shadowMatrix = new THREE.Matrix4();
 
+					scene.add( light.shadowCamera );
+
+					if ( _renderer.autoUpdateScene ) scene.updateMatrixWorld();
+
+				}
+
+				if ( light.shadowCameraVisible && ! light.visibleCamera ) {
+
+					light.visibleCamera = new THREE.VisibleCamera( light.shadowCamera );
+					light.shadowCamera.add( light.visibleCamera );
+
 				}
 
 				shadowMap = light.shadowMap;
@@ -82,15 +93,11 @@ THREE.ShadowMapPlugin = function ( ) {
 				shadowCamera.position.copy( light.position );
 				shadowCamera.lookAt( light.target.position );
 
-				if ( shadowCamera.parent == null ) {
-
-					scene.add( shadowCamera );
-
-					if ( _renderer.autoUpdateScene ) scene.updateMatrixWorld();
-
-				}
-
 				shadowCamera.matrixWorldInverse.getInverse( shadowCamera.matrixWorld );
+
+				if ( light.visibleCamera ) light.visibleCamera.lines.visible = light.shadowCameraVisible;
+				if ( light.shadowCameraVisible ) light.visibleCamera.update( light.shadowCamera );
+
 
 				// compute shadow matrix
 

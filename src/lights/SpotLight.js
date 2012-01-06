@@ -21,6 +21,8 @@ THREE.SpotLight = function ( hex, intensity, distance, castShadow ) {
 	this.shadowCameraFar = 5000;
 	this.shadowCameraFov = 50;
 
+	this.shadowCameraVisible = false;
+
 	this.shadowBias = 0;
 	this.shadowDarkness = 0.5;
 

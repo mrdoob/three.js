@@ -92,8 +92,8 @@ THREE.VisibleCamera = function ( camera ) {
 
 	this.update( camera );
 
-	var lines = new THREE.Line( this.lineGeometry, this.lineMaterial, THREE.LinePieces );
-	this.add( lines );
+	this.lines = new THREE.Line( this.lineGeometry, this.lineMaterial, THREE.LinePieces );
+	this.add( this.lines );
 
 };
 
