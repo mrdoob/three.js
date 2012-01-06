@@ -90,8 +90,8 @@ THREE.ShadowMapPlugin = function ( ) {
 				shadowMatrix = light.shadowMatrix;
 				shadowCamera = light.shadowCamera;
 
-				shadowCamera.position.copy( light.position );
-				shadowCamera.lookAt( light.target.position );
+				shadowCamera.position.copy( light.matrixWorld.getPosition() );
+				shadowCamera.lookAt( light.target.matrixWorld.getPosition() );
 
 				shadowCamera.matrixWorldInverse.getInverse( shadowCamera.matrixWorld );
 
