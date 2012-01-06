@@ -52,6 +52,9 @@
 		<script src="js/Stats.js"></script>
 		<script src="js/Tween.js"></script>
 
+		<script src='js/DAT.GUI.min.js'></script>
+
+
 		<script>
 
 			var MARGIN = 0;
@@ -78,6 +81,17 @@
 			var parameters, tweenDirection, tweenDay, tweenNight;
 
 			var clock = new THREE.Clock();
+
+			var gui, shadowConfig = {
+
+				shadowCameraVisible: false,
+				shadowCameraNear: 750,
+				shadowCameraFar: 4000,
+				shadowCameraFov: 30,
+				shadowBias: -0.0002,
+				shadowDarkness: 0.3
+
+			};
 
 			init();
 			animate();
@@ -319,9 +333,14 @@
 
 				sunLight.castShadow = true;
 
-				sunLight.shadowDarkness = 0.5 * sunIntensity;
-				sunLight.shadowBias = 0;
-				sunLight.shadowCameraNear = 50;
+				sunLight.shadowDarkness = 0.3 * sunIntensity;
+				sunLight.shadowBias = -0.0002;
+
+				sunLight.shadowCameraNear = 750;
+				sunLight.shadowCameraFar = 4000;
+				sunLight.shadowCameraFov = 30;
+
+				sunLight.shadowCameraVisible = false;
 
 				scene.add( sunLight );
 
@@ -417,6 +436,49 @@
 				tweenDay = new TWEEN.Tween( parameters ).to( { control: 100 }, 1000 ).easing( TWEEN.Easing.Exponential.EaseOut );
 				tweenNight = new TWEEN.Tween( parameters ).to( { control: 0 }, 1000 ).easing( TWEEN.Easing.Exponential.EaseOut );
 
+				// GUI
+
+				gui = new DAT.GUI();
+
+				gui.add( shadowConfig, 'shadowCameraVisible' ).onChange( function() {
+
+					sunLight.shadowCameraVisible = shadowConfig.shadowCameraVisible;
+
+				});
+
+				gui.add( shadowConfig, 'shadowCameraNear', 1, 1000 ).onChange( function() {
+
+					sunLight.shadowCamera.near = shadowConfig.shadowCameraNear;
+					sunLight.shadowCamera.updateProjectionMatrix();
+
+				});
+
+				gui.add( shadowConfig, 'shadowCameraFar', 1001, 5000 ).onChange( function() {
+
+					sunLight.shadowCamera.far = shadowConfig.shadowCameraFar;
+					sunLight.shadowCamera.updateProjectionMatrix();
+
+				});
+
+				gui.add( shadowConfig, 'shadowCameraFov', 1, 120 ).onChange( function() {
+
+					sunLight.shadowCamera.fov = shadowConfig.shadowCameraFov;
+					sunLight.shadowCamera.updateProjectionMatrix();
+
+				});
+
+				gui.add( shadowConfig, 'shadowBias', -0.01, 0.01 ).onChange( function() {
+
+					sunLight.shadowBias = shadowConfig.shadowBias;
+
+				});
+
+				gui.add( shadowConfig, 'shadowDarkness', 0, 1 ).onChange( function() {
+
+				});
+
+				gui.close();
+
 			}
 
 			//
@@ -500,7 +562,7 @@
 
 				pointLight.color.setHSV( 0.1, THREE.Math.mapLinear( parameters.control, 0, 100, 0.99, 0 ), 0.9 );
 
-				sunLight.shadowDarkness = 0.4 * sunLight.intensity;
+				sunLight.shadowDarkness = shadowConfig.shadowDarkness * sunLight.intensity;
 
 				// render shadow map
 
