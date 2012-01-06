@@ -296,5 +296,16 @@ THREE.Vector3.prototype = {
 		return ( this.lengthSq() < 0.0001 /* almostZero */ );
 
 	}
-
+	
+	
+	fromObjectSpace: function (obj){
+		return object.matrixWorld.multiplyVector3(this.clone());
+	}
+	
+	
+	toObjectSpace: function (obj){
+		var mat = new THREE.Matrix4();
+		mat.getInverse(obj.matrix);	
+		return mat.multiplyVector3(this.clone());
+	}
 };
