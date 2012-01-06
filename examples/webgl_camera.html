@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - camera</title>
+		<title>three.js webgl - cameras</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -28,12 +28,16 @@
 				color: #0080ff;
 			}
 
+			b { color: lightgreen }
+
 		</style>
 	</head>
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - camera</div>
+		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - cameras<br/>
+		<b>O</b> orthographic <b>P</b> perspective
+		</div>
 
 		<script src="../build/Three.js"></script>
 		<script src="js/Stats.js"></script>
@@ -45,6 +49,7 @@
 
 			var container, stats;
 			var camera, scene, renderer, mesh;
+			var cameraRig, activeCamera, cameraPerspective, cameraOrtho;
 
 			var r = 0;
 
@@ -62,11 +67,30 @@
 				camera.position.z = 2500;
 				scene.add( camera );
 
-				camera2 = new THREE.PerspectiveCamera( 50, 0.5 * SCREEN_WIDTH / SCREEN_HEIGHT, 150, 1000 );
-				scene.add( camera2 );
+				cameraPerspective = new THREE.PerspectiveCamera( 50, 0.5 * SCREEN_WIDTH / SCREEN_HEIGHT, 150, 1000 );
 
-				var visibleCamera = new THREE.VisibleCamera( camera2 );
-				camera2.add( visibleCamera );
+				var visibleCameraPerspective = new THREE.VisibleCamera( cameraPerspective );
+				cameraPerspective.add( visibleCameraPerspective );
+
+				cameraOrtho = new THREE.OrthographicCamera( 0.5 * SCREEN_WIDTH / - 2, 0.5 * SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_HEIGHT / - 2, 150, 1000 );
+
+				var visibleCameraOrtho = new THREE.VisibleCamera( cameraOrtho );
+				cameraOrtho.add( visibleCameraOrtho );
+
+				activeCamera = cameraPerspective;
+
+
+				// counteract different front orientation of cameras vs rig
+
+				cameraOrtho.rotation.y = Math.PI;
+				cameraPerspective.rotation.y = Math.PI;
+
+				cameraRig = new THREE.Object3D();
+
+				cameraRig.add( cameraPerspective );
+				cameraRig.add( cameraOrtho );
+
+				scene.add( cameraRig );
 
 				//
 
@@ -78,8 +102,8 @@
 				mesh.add( mesh2 );
 
 				var mesh3 = new THREE.Mesh( new THREE.SphereGeometry( 5, 16, 8 ), new THREE.MeshBasicMaterial( { color: 0x0000ff, wireframe: true } ) );
-				mesh3.position.z = -150;
-				camera2.add( mesh3 );
+				mesh3.position.z = 150;
+				cameraRig.add( mesh3 );
 
 				//
 
@@ -125,8 +149,24 @@
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
+				document.addEventListener( 'keydown', onKeyDown, false );
 
 			}
+
+			//
+
+			function onKeyDown ( event ) {
+
+				switch( event.keyCode ) {
+
+					case 79: /*O*/	activeCamera = cameraOrtho; break;
+					case 80: /*P*/ 	activeCamera = cameraPerspective; break;
+
+				}
+
+			};
+
+			//
 
 			function onWindowResize( event ) {
 
@@ -138,8 +178,14 @@
 				camera.aspect = 0.5 * SCREEN_WIDTH / SCREEN_HEIGHT;
 				camera.updateProjectionMatrix();
 
-				camera2.aspect = 0.5 * SCREEN_WIDTH / SCREEN_HEIGHT;
-				camera2.updateProjectionMatrix();
+				cameraPerspective.aspect = 0.5 * SCREEN_WIDTH / SCREEN_HEIGHT;
+				cameraPerspective.updateProjectionMatrix();
+
+				cameraOrtho.left   = - 0.5 * SCREEN_WIDTH / 2;
+				cameraOrtho.right  =   0.5 * SCREEN_WIDTH / 2;
+				cameraOrtho.top    =   SCREEN_HEIGHT / 2;
+				cameraOrtho.bottom = - SCREEN_HEIGHT / 2;
+				cameraOrtho.updateProjectionMatrix();
 
 			}
 
@@ -164,17 +210,33 @@
 				mesh.children[ 0 ].position.x = 70 * Math.cos( 2 * r );
 				mesh.children[ 0 ].position.z = 70 * Math.sin( r );
 
-				camera2.fov = 35 + 30 * Math.sin( 0.5 * r );
-				camera2.far = mesh.position.length();
-				camera2.updateProjectionMatrix();
-				camera2.children[ 0 ].update( camera2 );
+				if ( activeCamera === cameraPerspective ) {
 
-				camera2.lookAt( mesh.position );
+					cameraPerspective.fov = 35 + 30 * Math.sin( 0.5 * r );
+					cameraPerspective.far = mesh.position.length();
+					cameraPerspective.updateProjectionMatrix();
+					cameraPerspective.children[ 0 ].update( cameraPerspective );
+
+					cameraPerspective.children[ 0 ].lines.visible = true;
+					cameraOrtho.children[ 0 ].lines.visible = false;
+
+				} else {
+
+					cameraOrtho.far = mesh.position.length();
+					cameraOrtho.updateProjectionMatrix();
+					cameraOrtho.children[ 0 ].update( cameraOrtho );
+
+					cameraPerspective.children[ 0 ].lines.visible = false;
+					cameraOrtho.children[ 0 ].lines.visible = true;
+
+				}
+
+				cameraRig.lookAt( mesh.position );
 
 				renderer.clear();
 
 				renderer.setViewport( 0, 0, SCREEN_WIDTH/2, SCREEN_HEIGHT );
-				renderer.render( scene, camera2 );
+				renderer.render( scene, activeCamera );
 
 				renderer.setViewport( SCREEN_WIDTH/2, 0, SCREEN_WIDTH/2, SCREEN_HEIGHT );
 				renderer.render( scene, camera );
