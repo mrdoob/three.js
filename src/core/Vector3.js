@@ -296,5 +296,40 @@ THREE.Vector3.prototype = {
 		return ( this.lengthSq() < 0.0001 /* almostZero */ );
 
 	}
-
+	toObject: function(object) {
+      		var mat, worldMatrix;
+      		worldMatrix = function(object, matO) {
+		        var mat, matP;
+		        if (object.parent != null) {
+          			mat = new THREE.Matrix4();
+          			matP = new THREE.Matrix4();
+          			if (matO == null) {
+            				matO = new THREE.Matrix4();
+            				mat.multiply(matO.getInverse(object.matrix), matP.getInverse(object.parent.matrix));
+          			} else {
+            				mat.multiply(matO, matP.getInverse(object.parent.matrix));
+          			}
+          			if (!(object.parent instanceof THREE.Scene)) {
+            				return worldMatrix(object.parent, mat);
+          			} else {
+            				return mat;
+          			}
+        		} else {
+          			mat = new THREE.Matrix4();
+          			return mat.getInverse(object.matrix);
+        		}
+      		};
+      		if (object.matrix != null) {
+        		object.updateMatrix();
+        		mat = worldMatrix(object);
+        		return mat.multiplyVector3(this.clone());
+      		}
+    	};
+    	
+	fromObject: function(object) {
+      		if (object.matrix != null) {
+        		object.updateMatrix();
+        		return object.matrixWorld.multiplyVector3(this.clone());
+      		}
+    	};
 };
