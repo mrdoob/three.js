@@ -31,8 +31,8 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
-				//camera = new THREE.PerspectiveCamera( 70, 640/480, 1, 10000 );
+				//camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 70, 640/480, 1, 10000 );
 				camera.position.z = 1000;
 
 				scene = new THREE.Scene();
@@ -69,12 +69,12 @@
 				//Example drag on the Z plane, but any plane (except YZ or XZ since they are 
 				//parallel to the default camera position) should work
 				var dragPlane = new Plane3D(0, 0, 1, 0);
-				var dragControl = new ObjectDragControls(dragPlane, camera, container);
+				var dragControl = new ObjectDragControls(dragPlane, camera, container, 640, 480);
 				dragControl.attach(renderer);
 				dragControl.addObject(object)
 				renderer.sortObjects = false;
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				//renderer.setSize(640, 480);
+				//renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setSize(640, 480);
 
 				renderer.shadowMapEnabled = true;
 				renderer.shadowMapSoft = true;

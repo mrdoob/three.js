@@ -3,10 +3,12 @@
 
   this.ObjectDragControls = (function() {
 
-    function ObjectDragControls(dragPlane, camera, container) {
+    function ObjectDragControls(dragPlane, camera, container, width, height) {
       this.dragPlane = dragPlane;
       this.camera = camera;
       this.container = container;
+      this.width = width;
+      this.height = height;
       this.onDocumentMouseUp = __bind(this.onDocumentMouseUp, this);
       this.onDocumentMouseDown = __bind(this.onDocumentMouseDown, this);
       this.onDocumentMouseMove = __bind(this.onDocumentMouseMove, this);
@@ -34,8 +36,8 @@
     ObjectDragControls.prototype.onDocumentMouseMove = function(event) {
       var intersectionPt, intersects, ray, vector;
       event.preventDefault();
-      this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-      this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+      this.mouse.x = (event.clientX / this.width) * 2 - 1;
+      this.mouse.y = -(event.clientY / this.height) * 2 + 1;
       vector = new THREE.Vector3(this.mouse.x, this.mouse.y, 0.5);
       this.projector.unprojectVector(vector, this.camera);
       ray = new THREE.Ray(this.camera.position, vector.subSelf(this.camera.position).normalize());
