@@ -15,67 +15,67 @@ More? [#three.js on irc.freenode.net](http://webchat.freenode.net/?channels=thre
 
 #### WebGL (Context 3D) ####
 
-<a href="http://mrdoob.github.com/three.js/examples/webgl_panorama_equirectangular.html"><img src="http://mrdoob.github.com/three.js/assets/examples/44_equirectangular.png" width="109" height="82" alt="equirectangular"></a>
-<a href="http://mrdoob.github.com/three.js/examples/webgl_materials_texture_filters.html"><img src="http://mrdoob.github.com/three.js/assets/examples/42_scissors.png" width="109" height="82" alt="scissors"></a>
-<a href="http://mrdoob.github.com/three.js/examples/misc_lookat.html"><img src="http://mrdoob.github.com/three.js/assets/examples/41_lookat.png" width="109" height="82" alt="lookat"></a>
-<a href="http://mrdoob.github.com/three.js/examples/webgl_materials_video.html"><img src="http://mrdoob.github.com/three.js/assets/examples/40_video.png" width="109" height="82" alt="video"></a>
-<a href="http://mrdoob.github.com/three.js/examples/webgl_postprocessing_dof.html"><img src="http://mrdoob.github.com/three.js/assets/examples/39_dof.png" width="109" height="82" alt="dof"></a>
-<a href="http://mrdoob.github.com/three.js/examples/webgl_ribbons.html"><img src="http://mrdoob.github.com/three.js/assets/examples/38_ribbon.png" width="109" height="82" alt="ribbon"></a>
-<a href="http://mrdoob.github.com/three.js/examples/webgl_geometry_colors.html"><img src="http://mrdoob.github.com/three.js/assets/examples/37_vertexcolors.png" width="109" height="82" alt="vertexcolors"></a>
-<a href="http://mrdoob.github.com/three.js/examples/webgl_particles_billboards_colors.html"><img src="http://mrdoob.github.com/three.js/assets/examples/36_particles.png" width="109" height="82" alt="particles"></a>
-<a href="http://mrdoob.github.com/three.js/examples/webgl_lines_colors.html"><img src="http://mrdoob.github.com/three.js/assets/examples/35_lines.png" width="109" height="82" alt="lines"></a>
-<a href="http://mrdoob.github.com/three.js/examples/webgl_shader.html"><img src="http://mrdoob.github.com/three.js/assets/examples/34_shader.png" width="109" height="82" alt="shader"></a>
-<a href="http://mrdoob.github.com/three.js/examples/webgl_materials_normalmap2.html"><img src="http://mrdoob.github.com/three.js/assets/examples/33_materials_normalmap2.png" width="109" height="82" alt="materials_normalmap2"></a>
-<a href="http://mrdoob.github.com/three.js/examples/webgl_materials_grass.html"><img src="http://mrdoob.github.com/three.js/assets/examples/32_materials_grass.png" width="109" height="82" alt="materials_grass"></a>
-<a href="http://mrdoob.github.com/three.js/examples/webgl_materials_normalmap.html"><img src="http://mrdoob.github.com/three.js/assets/examples/31_materials_normalmap.png" width="109" height="82" alt="materials_normalmap"></a>
-<a href="http://mrdoob.github.com/three.js/examples/webgl_geometry_terrain.html"><img src="http://mrdoob.github.com/three.js/assets/examples/30_geometry_terrain_gl.png" width="109" height="82" alt="geometry_terrain_gl"></a>
-<a href="http://mrdoob.github.com/three.js/examples/webgl_geometry_minecraft_ao.html"><img src="http://mrdoob.github.com/three.js/assets/examples/29_geometry_minecraft.png" width="109" height="82" alt="geometry_minecraft"></a>
-<a href="http://mrdoob.github.com/three.js/examples/webgl_materials_shaders_fresnel.html"><img src="http://mrdoob.github.com/three.js/assets/examples/28_materials_shaders_fresnel.png" width="109" height="82" alt="materials_shader_fresnel"></a>
-<a href="http://mrdoob.github.com/three.js/examples/webgl_materials_cars.html"><img src="http://mrdoob.github.com/three.js/assets/examples/25_materials_cars.png" width="109" height="82" alt="materials_cars"></a>
-<a href="http://mrdoob.github.com/three.js/examples/webgl_materials_cubemap_refraction.html"><img src="http://mrdoob.github.com/three.js/assets/examples/18_materials_cubemap_refraction.png" width="109" height="82" alt="materials_cubemap_refraction"></a>
-<a href="http://mrdoob.github.com/three.js/examples/webgl_materials_cubemap_balls_reflection.html"><img src="http://mrdoob.github.com/three.js/assets/examples/15_materials_cubemap_balls_reflection.png" width="109" height="82" alt="materials_cubemap_balls_reflection"></a>
-<a href="http://mrdoob.github.com/three.js/examples/webgl_materials_cubemap_balls_refraction.html"><img src="http://mrdoob.github.com/three.js/assets/examples/16_materials_cubemap_balls_refraction.png" width="109" height="82" alt="materials_cubemap_balls_refraction"></a>
-<a href="http://mrdoob.github.com/three.js/examples/webgl_materials_cubemap_escher.html"><img src="http://mrdoob.github.com/three.js/assets/examples/17_materials_cubemap_escher.png" width="109" height="82" alt="materials_cubemap_escher"></a>
-<a href="http://mrdoob.github.com/three.js/examples/webgl_materials_cubemap.html"><img src="http://mrdoob.github.com/three.js/assets/examples/14_materials_cubemap.png" width="109" height="82" alt="materials_cubemap"></a>
-<a href="http://mrdoob.github.com/three.js/examples/webgl_materials.html"><img src="http://mrdoob.github.com/three.js/assets/examples/20_materials_gl.png" width="109" height="82" alt="materials_gl"></a>
-<a href="http://mrdoob.github.com/three.js/examples/webgl_geometry_large_mesh.html"><img src="http://mrdoob.github.com/three.js/assets/examples/12_large_mesh.png" width="109" height="82" alt="large_mesh"></a>
+<a href="http://mrdoob.github.com/three.js/examples/webgl_panorama_equirectangular.html"><img src="http://mrdoob.github.com/three.js/assets/examples/44_equirectangular.png" width="104" height="78" alt="equirectangular"></a>
+<a href="http://mrdoob.github.com/three.js/examples/webgl_materials_texture_filters.html"><img src="http://mrdoob.github.com/three.js/assets/examples/42_scissors.png" width="104" height="78" alt="scissors"></a>
+<a href="http://mrdoob.github.com/three.js/examples/misc_lookat.html"><img src="http://mrdoob.github.com/three.js/assets/examples/41_lookat.png" width="104" height="78" alt="lookat"></a>
+<a href="http://mrdoob.github.com/three.js/examples/webgl_materials_video.html"><img src="http://mrdoob.github.com/three.js/assets/examples/40_video.png" width="104" height="78" alt="video"></a>
+<a href="http://mrdoob.github.com/three.js/examples/webgl_postprocessing_dof.html"><img src="http://mrdoob.github.com/three.js/assets/examples/39_dof.png" width="104" height="78" alt="dof"></a>
+<a href="http://mrdoob.github.com/three.js/examples/webgl_ribbons.html"><img src="http://mrdoob.github.com/three.js/assets/examples/38_ribbon.png" width="104" height="78" alt="ribbon"></a>
+<a href="http://mrdoob.github.com/three.js/examples/webgl_geometry_colors.html"><img src="http://mrdoob.github.com/three.js/assets/examples/37_vertexcolors.png" width="104" height="78" alt="vertexcolors"></a>
+<a href="http://mrdoob.github.com/three.js/examples/webgl_particles_billboards_colors.html"><img src="http://mrdoob.github.com/three.js/assets/examples/36_particles.png" width="104" height="78" alt="particles"></a>
+<a href="http://mrdoob.github.com/three.js/examples/webgl_lines_colors.html"><img src="http://mrdoob.github.com/three.js/assets/examples/35_lines.png" width="104" height="78" alt="lines"></a>
+<a href="http://mrdoob.github.com/three.js/examples/webgl_shader.html"><img src="http://mrdoob.github.com/three.js/assets/examples/34_shader.png" width="104" height="78" alt="shader"></a>
+<a href="http://mrdoob.github.com/three.js/examples/webgl_materials_normalmap2.html"><img src="http://mrdoob.github.com/three.js/assets/examples/33_materials_normalmap2.png" width="104" height="78" alt="materials_normalmap2"></a>
+<a href="http://mrdoob.github.com/three.js/examples/webgl_materials_grass.html"><img src="http://mrdoob.github.com/three.js/assets/examples/32_materials_grass.png" width="104" height="78" alt="materials_grass"></a>
+<a href="http://mrdoob.github.com/three.js/examples/webgl_materials_normalmap.html"><img src="http://mrdoob.github.com/three.js/assets/examples/31_materials_normalmap.png" width="104" height="78" alt="materials_normalmap"></a>
+<a href="http://mrdoob.github.com/three.js/examples/webgl_geometry_terrain.html"><img src="http://mrdoob.github.com/three.js/assets/examples/30_geometry_terrain_gl.png" width="104" height="78" alt="geometry_terrain_gl"></a>
+<a href="http://mrdoob.github.com/three.js/examples/webgl_geometry_minecraft_ao.html"><img src="http://mrdoob.github.com/three.js/assets/examples/29_geometry_minecraft.png" width="104" height="78" alt="geometry_minecraft"></a>
+<a href="http://mrdoob.github.com/three.js/examples/webgl_materials_shaders_fresnel.html"><img src="http://mrdoob.github.com/three.js/assets/examples/28_materials_shaders_fresnel.png" width="104" height="78" alt="materials_shader_fresnel"></a>
+<a href="http://mrdoob.github.com/three.js/examples/webgl_materials_cars.html"><img src="http://mrdoob.github.com/three.js/assets/examples/25_materials_cars.png" width="104" height="78" alt="materials_cars"></a>
+<a href="http://mrdoob.github.com/three.js/examples/webgl_materials_cubemap_refraction.html"><img src="http://mrdoob.github.com/three.js/assets/examples/18_materials_cubemap_refraction.png" width="104" height="78" alt="materials_cubemap_refraction"></a>
+<a href="http://mrdoob.github.com/three.js/examples/webgl_materials_cubemap_balls_reflection.html"><img src="http://mrdoob.github.com/three.js/assets/examples/15_materials_cubemap_balls_reflection.png" width="104" height="78" alt="materials_cubemap_balls_reflection"></a>
+<a href="http://mrdoob.github.com/three.js/examples/webgl_materials_cubemap_balls_refraction.html"><img src="http://mrdoob.github.com/three.js/assets/examples/16_materials_cubemap_balls_refraction.png" width="104" height="78" alt="materials_cubemap_balls_refraction"></a>
+<a href="http://mrdoob.github.com/three.js/examples/webgl_materials_cubemap_escher.html"><img src="http://mrdoob.github.com/three.js/assets/examples/17_materials_cubemap_escher.png" width="104" height="78" alt="materials_cubemap_escher"></a>
+<a href="http://mrdoob.github.com/three.js/examples/webgl_materials_cubemap.html"><img src="http://mrdoob.github.com/three.js/assets/examples/14_materials_cubemap.png" width="104" height="78" alt="materials_cubemap"></a>
+<a href="http://mrdoob.github.com/three.js/examples/webgl_materials.html"><img src="http://mrdoob.github.com/three.js/assets/examples/20_materials_gl.png" width="104" height="78" alt="materials_gl"></a>
+<a href="http://mrdoob.github.com/three.js/examples/webgl_geometry_large_mesh.html"><img src="http://mrdoob.github.com/three.js/assets/examples/12_large_mesh.png" width="104" height="78" alt="large_mesh"></a>
 
 
 #### Canvas (Context 2D) ####
 
-<a href="http://mrdoob.github.com/three.js/examples/canvas_materials_reflection.html"><img src="http://mrdoob.github.com/three.js/assets/examples/27_materials_reflection.png" width="109" height="82" alt="materials_reflection"></a>
-<a href="http://mrdoob.github.com/three.js/examples/canvas_materials.html"><img src="http://mrdoob.github.com/three.js/assets/examples/13_materials.png" width="109" height="82" alt="materials"></a>
-<a href="http://mrdoob.github.com/three.js/examples/canvas_materials_depth.html"><img src="http://mrdoob.github.com/three.js/assets/examples/19_materials_depth.png" width="109" height="82" alt="materials_depth"></a>
-<a href="http://mrdoob.github.com/three.js/examples/canvas_materials_normal.html"><img src="http://mrdoob.github.com/three.js/assets/examples/22_materials_normal.png" width="109" height="82" alt="materials_normal"></a>
-<a href="http://mrdoob.github.com/three.js/examples/canvas_lights_pointlights.html"><img src="http://mrdoob.github.com/three.js/assets/examples/09_walthead.png" width="109" height="82" alt="lights_pointlights"></a>
-<a href="http://mrdoob.github.com/three.js/examples/canvas_interactive_cubes.html"><img src="http://mrdoob.github.com/three.js/assets/examples/11_interactive.png" width="109" height="82" alt="interactive_cubes"></a>
-<a href="http://mrdoob.github.com/three.js/examples/canvas_camera_orthographic.html"><img src="http://mrdoob.github.com/three.js/assets/examples/10_orthographic.png" width="109" height="82" alt="camera_ortographic"></a>
-<a href="http://mrdoob.github.com/three.js/examples/canvas_geometry_birds.html"><img src="http://mrdoob.github.com/three.js/assets/examples/08_birds.png" width="109" height="82" alt="geometry_birds"></a>
-<a href="http://mrdoob.github.com/three.js/examples/canvas_geometry_earth.html"><img src="http://mrdoob.github.com/three.js/assets/examples/07_earth.png" width="109" height="82" alt="geometry_earth"></a>
-<a href="http://mrdoob.github.com/three.js/examples/canvas_geometry_terrain.html"><img src="http://mrdoob.github.com/three.js/assets/examples/06_terrain.png" width="109" height="82" alt="geometry_terrain"></a>
-<a href="http://mrdoob.github.com/three.js/examples/canvas_materials_video.html"><img src="http://mrdoob.github.com/three.js/assets/examples/24_materials_video.png" width="109" height="82" alt="materials_video"></a>
-<a href="http://mrdoob.github.com/three.js/examples/canvas_geometry_panorama.html"><img src="http://mrdoob.github.com/three.js/assets/examples/04_vr.png" width="109" height="82" alt="geometry_panorama"></a>
-<a href="http://mrdoob.github.com/three.js/examples/canvas_geometry_cube.html"><img src="http://mrdoob.github.com/three.js/assets/examples/03_cube.png" width="109" height="82" alt="geometry_cube"></a>
-<a href="http://mrdoob.github.com/three.js/examples/canvas_particles_sprites.html"><img src="http://mrdoob.github.com/three.js/assets/examples/26_particles_sprites.png" width="109" height="82" alt="particles_sprites"></a>
-<a href="http://mrdoob.github.com/three.js/examples/canvas_particles_random.html"><img src="http://mrdoob.github.com/three.js/assets/examples/02_random.png" width="109" height="82" alt="particles_random"></a>
-<a href="http://mrdoob.github.com/three.js/examples/canvas_particles_waves.html"><img src="http://mrdoob.github.com/three.js/assets/examples/01_waves.png" width="109" height="82" alt="particles_wave"></a>
+<a href="http://mrdoob.github.com/three.js/examples/canvas_materials_reflection.html"><img src="http://mrdoob.github.com/three.js/assets/examples/27_materials_reflection.png" width="104" height="78" alt="materials_reflection"></a>
+<a href="http://mrdoob.github.com/three.js/examples/canvas_materials.html"><img src="http://mrdoob.github.com/three.js/assets/examples/13_materials.png" width="104" height="78" alt="materials"></a>
+<a href="http://mrdoob.github.com/three.js/examples/canvas_materials_depth.html"><img src="http://mrdoob.github.com/three.js/assets/examples/19_materials_depth.png" width="104" height="78" alt="materials_depth"></a>
+<a href="http://mrdoob.github.com/three.js/examples/canvas_materials_normal.html"><img src="http://mrdoob.github.com/three.js/assets/examples/22_materials_normal.png" width="104" height="78" alt="materials_normal"></a>
+<a href="http://mrdoob.github.com/three.js/examples/canvas_lights_pointlights.html"><img src="http://mrdoob.github.com/three.js/assets/examples/09_walthead.png" width="104" height="78" alt="lights_pointlights"></a>
+<a href="http://mrdoob.github.com/three.js/examples/canvas_interactive_cubes.html"><img src="http://mrdoob.github.com/three.js/assets/examples/11_interactive.png" width="104" height="78" alt="interactive_cubes"></a>
+<a href="http://mrdoob.github.com/three.js/examples/canvas_camera_orthographic.html"><img src="http://mrdoob.github.com/three.js/assets/examples/10_orthographic.png" width="104" height="78" alt="camera_ortographic"></a>
+<a href="http://mrdoob.github.com/three.js/examples/canvas_geometry_birds.html"><img src="http://mrdoob.github.com/three.js/assets/examples/08_birds.png" width="104" height="78" alt="geometry_birds"></a>
+<a href="http://mrdoob.github.com/three.js/examples/canvas_geometry_earth.html"><img src="http://mrdoob.github.com/three.js/assets/examples/07_earth.png" width="104" height="78" alt="geometry_earth"></a>
+<a href="http://mrdoob.github.com/three.js/examples/canvas_geometry_terrain.html"><img src="http://mrdoob.github.com/three.js/assets/examples/06_terrain.png" width="104" height="78" alt="geometry_terrain"></a>
+<a href="http://mrdoob.github.com/three.js/examples/canvas_materials_video.html"><img src="http://mrdoob.github.com/three.js/assets/examples/24_materials_video.png" width="104" height="78" alt="materials_video"></a>
+<a href="http://mrdoob.github.com/three.js/examples/canvas_geometry_panorama.html"><img src="http://mrdoob.github.com/three.js/assets/examples/04_vr.png" width="104" height="78" alt="geometry_panorama"></a>
+<a href="http://mrdoob.github.com/three.js/examples/canvas_geometry_cube.html"><img src="http://mrdoob.github.com/three.js/assets/examples/03_cube.png" width="104" height="78" alt="geometry_cube"></a>
+<a href="http://mrdoob.github.com/three.js/examples/canvas_particles_sprites.html"><img src="http://mrdoob.github.com/three.js/assets/examples/26_particles_sprites.png" width="104" height="78" alt="particles_sprites"></a>
+<a href="http://mrdoob.github.com/three.js/examples/canvas_particles_random.html"><img src="http://mrdoob.github.com/three.js/assets/examples/02_random.png" width="104" height="78" alt="particles_random"></a>
+<a href="http://mrdoob.github.com/three.js/examples/canvas_particles_waves.html"><img src="http://mrdoob.github.com/three.js/assets/examples/01_waves.png" width="104" height="78" alt="particles_wave"></a>
 
 
 ### Featured projects ###
 
-<a href="http://lights.elliegoulding.com/"><img src="http://mrdoob.github.com/three.js/assets/projects/20_lights.png" width="109" height="82" alt="Lights"></a>
-<a href="http://inear.se/beanstalk/"><img src="http://mrdoob.github.com/three.js/assets/projects/19_beanstalk.png" width="109" height="82" alt="Infinite beanstalk"></a>
-<a href="http://superfad.com/missioncontrol/"><img src="http://mrdoob.github.com/three.js/assets/projects/18_missioncontrol.png" width="109" height="82" alt="Mission Control"></a>
-<a href="http://ro.me/"><img src="http://mrdoob.github.com/three.js/assets/projects/17_rome.png" width="109" height="82" alt="ROME"></a>
-<a href="http://data-arts.appspot.com/globe"><img src="http://mrdoob.github.com/three.js/assets/projects/16_globe.png" width="109" height="82" alt="Globe"></a>
-<a href="http://lab.aerotwist.com/webgl/photoparticles/"><img src="http://mrdoob.github.com/three.js/assets/projects/15_photoparticles.png" width="109" height="82" alt="Photoparticles"></a>
-<a href="http://plumegraph.org/"><img src="http://mrdoob.github.com/three.js/assets/projects/14_plumegraph.png" width="109" height="82" alt="Plumegraph"></a>
-<a href="http://helloracer.com/webgl/"><img src="http://mrdoob.github.com/three.js/assets/projects/13_helloracer.png" width="109" height="82" alt="HelloRacer"></a>
-<a href="http://www.omiod.com/games/fastkat.php"><img src="http://mrdoob.github.com/three.js/assets/projects/12_fastkat.png" width="109" height="82" alt="FastKat"></a>
-<a href="http://antimatter15.com/wp/2010/11/digital-sculpting-with-three-js/"><img src="http://mrdoob.github.com/three.js/assets/projects/11_sculpt.png" width="109" height="82" alt="Sculpt"></a>
-<a href="http://mrdoob.com/projects/voxels/"><img src="http://mrdoob.github.com/three.js/assets/projects/10_voxels.png" width="109" height="82" alt="Voxels"></a>
-<a href="http://thewildernessdowntown.com/"><img src="http://mrdoob.github.com/three.js/assets/projects/09_arcadefire.png" width="109" height="82" alt="The Wilderness Downtown"></a>
-<a href="http://xplsv.com/prods/demos/xplsv_orsotheysay/"><img src="http://mrdoob.github.com/three.js/assets/projects/07_orsotheysay.png" width="109" height="82" alt="Or so they say..."></a>
+<a href="http://lights.elliegoulding.com/"><img src="http://mrdoob.github.com/three.js/assets/projects/20_lights.png" width="104" height="78" alt="Lights"></a>
+<a href="http://inear.se/beanstalk/"><img src="http://mrdoob.github.com/three.js/assets/projects/19_beanstalk.png" width="104" height="78" alt="Infinite beanstalk"></a>
+<a href="http://superfad.com/missioncontrol/"><img src="http://mrdoob.github.com/three.js/assets/projects/18_missioncontrol.png" width="104" height="78" alt="Mission Control"></a>
+<a href="http://ro.me/"><img src="http://mrdoob.github.com/three.js/assets/projects/17_rome.png" width="104" height="78" alt="ROME"></a>
+<a href="http://data-arts.appspot.com/globe"><img src="http://mrdoob.github.com/three.js/assets/projects/16_globe.png" width="104" height="78" alt="Globe"></a>
+<a href="http://lab.aerotwist.com/webgl/photoparticles/"><img src="http://mrdoob.github.com/three.js/assets/projects/15_photoparticles.png" width="104" height="78" alt="Photoparticles"></a>
+<a href="http://plumegraph.org/"><img src="http://mrdoob.github.com/three.js/assets/projects/14_plumegraph.png" width="104" height="78" alt="Plumegraph"></a>
+<a href="http://helloracer.com/webgl/"><img src="http://mrdoob.github.com/three.js/assets/projects/13_helloracer.png" width="104" height="78" alt="HelloRacer"></a>
+<a href="http://www.omiod.com/games/fastkat.php"><img src="http://mrdoob.github.com/three.js/assets/projects/12_fastkat.png" width="104" height="78" alt="FastKat"></a>
+<a href="http://antimatter15.com/wp/2010/11/digital-sculpting-with-three-js/"><img src="http://mrdoob.github.com/three.js/assets/projects/11_sculpt.png" width="104" height="78" alt="Sculpt"></a>
+<a href="http://mrdoob.com/projects/voxels/"><img src="http://mrdoob.github.com/three.js/assets/projects/10_voxels.png" width="104" height="78" alt="Voxels"></a>
+<a href="http://thewildernessdowntown.com/"><img src="http://mrdoob.github.com/three.js/assets/projects/09_arcadefire.png" width="104" height="78" alt="The Wilderness Downtown"></a>
+<a href="http://xplsv.com/prods/demos/xplsv_orsotheysay/"><img src="http://mrdoob.github.com/three.js/assets/projects/07_orsotheysay.png" width="104" height="78" alt="Or so they say..."></a>
 
 
 ### Usage ###
