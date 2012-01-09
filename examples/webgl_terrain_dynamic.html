@@ -238,7 +238,7 @@
 				heightMap, normalMap,
 				quadTarget;
 
-			var spotLight, pointLight;
+			var directionalLight, pointLight;
 
 			var terrain;
 
@@ -309,10 +309,9 @@
 
 				scene.add( new THREE.AmbientLight( 0x111111 ) );
 
-				spotLight = new THREE.SpotLight( 0xffffff, 1.15 );
-				spotLight.position.set( 500, 2000, 0 );
-				spotLight.castShadow = true;
-				scene.add( spotLight );
+				directionalLight = new THREE.DirectionalLight( 0xffffff, 1.15 );
+				directionalLight.position.set( 500, 2000, 0 );
+				scene.add( directionalLight );
 
 				pointLight = new THREE.PointLight( 0xff4400, 1.5 );
 				pointLight.position.set( 0, 0, 0 );
@@ -699,7 +698,7 @@
 
 					renderer.setClearColor( scene.fog.color, 1 );
 
-					spotLight.intensity = THREE.Math.mapLinear( valNorm, 0, 1, 0.1, 1.15 );
+					directionalLight.intensity = THREE.Math.mapLinear( valNorm, 0, 1, 0.1, 1.15 );
 					pointLight.intensity = THREE.Math.mapLinear( valNorm, 0, 1, 0.9, 1.5 );
 
 					uniformsTerrain[ "uNormalScale" ].value = THREE.Math.mapLinear( valNorm, 0, 1, 0.6, 3.5 );
