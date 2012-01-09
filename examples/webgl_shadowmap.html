@@ -179,7 +179,7 @@
 				// GROUND
 
 				var geometry = new THREE.PlaneGeometry( 100, 100 );
-				var planeMaterial = new THREE.MeshLambertMaterial( { color: 0xffdd99 } );
+				var planeMaterial = new THREE.MeshPhongMaterial( { color: 0xffdd99 } );
 				THREE.ColorUtils.adjustHSV( planeMaterial.color, 0, 0, 0.9 );
 				planeMaterial.ambient = planeMaterial.color;
 

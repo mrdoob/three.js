@@ -4764,35 +4764,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				dlength += 1;
 
-			} else if ( light instanceof THREE.SpotLight ) { // hack, not a proper spotlight
-
-				doffset = dlength * 3;
-
-				if ( _this.gammaInput ) {
-
-					dcolors[ doffset ]     = color.r * color.r * intensity * intensity;
-					dcolors[ doffset + 1 ] = color.g * color.g * intensity * intensity;
-					dcolors[ doffset + 2 ] = color.b * color.b * intensity * intensity;
-
-				} else {
-
-					dcolors[ doffset ]     = color.r * intensity;
-					dcolors[ doffset + 1 ] = color.g * intensity;
-					dcolors[ doffset + 2 ] = color.b * intensity;
-
-				}
-
-				position = light.matrixWorld.getPosition();
-
-				n = 1 / position.length();
-
-				dpositions[ doffset ]     = position.x * n;
-				dpositions[ doffset + 1 ] = position.y * n;
-				dpositions[ doffset + 2 ] = position.z * n;
-
-				dlength += 1;
-
-			} else if( light instanceof THREE.PointLight ) {
+			} else if( light instanceof THREE.PointLight || light instanceof THREE.SpotLight ) {
 
 				poffset = plength * 3;
 
@@ -5756,9 +5728,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( light.onlyShadow ) continue;
 
-			if ( light instanceof THREE.SpotLight ) dirLights ++; // hack, not a proper spotlight
 			if ( light instanceof THREE.DirectionalLight ) dirLights ++;
 			if ( light instanceof THREE.PointLight ) pointLights ++;
+			if ( light instanceof THREE.SpotLight ) pointLights ++;
 
 		}
 
