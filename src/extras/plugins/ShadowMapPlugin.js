@@ -61,157 +61,173 @@ THREE.ShadowMapPlugin = function ( ) {
 
 			light = lights[ i ];
 
-			if ( light.castShadow && light instanceof THREE.SpotLight ) {
+			if ( ! light.castShadow ) continue;
 
-				if ( ! light.shadowMap ) {
+			if ( ! light.shadowMap ) {
 
-					var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat };
+				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat };
 
-					light.shadowMap = new THREE.WebGLRenderTarget( light.shadowMapWidth, light.shadowMapHeight, pars );
-					light.shadowMapSize = new THREE.Vector2( light.shadowMapWidth, light.shadowMapHeight );
+				light.shadowMap = new THREE.WebGLRenderTarget( light.shadowMapWidth, light.shadowMapHeight, pars );
+				light.shadowMapSize = new THREE.Vector2( light.shadowMapWidth, light.shadowMapHeight );
+
+				light.shadowMatrix = new THREE.Matrix4();
+
+			}
+
+			if ( ! light.shadowCamera ) {
+
+				if ( light instanceof THREE.SpotLight ) {
 
 					light.shadowCamera = new THREE.PerspectiveCamera( light.shadowCameraFov, light.shadowMapWidth / light.shadowMapHeight, light.shadowCameraNear, light.shadowCameraFar );
-					light.shadowMatrix = new THREE.Matrix4();
 
-					scene.add( light.shadowCamera );
+				} else if ( light instanceof THREE.DirectionalLight ) {
 
-					if ( _renderer.autoUpdateScene ) scene.updateMatrixWorld();
+					light.shadowCamera = new THREE.OrthographicCamera( light.shadowCameraLeft, light.shadowCameraRight, light.shadowCameraTop, light.shadowCameraBottom, light.shadowCameraNear, light.shadowCameraFar );
 
-				}
+				} else {
 
-				if ( light.shadowCameraVisible && ! light.cameraHelper ) {
-
-					light.cameraHelper = new THREE.CameraHelper( light.shadowCamera );
-					light.shadowCamera.add( light.cameraHelper );
+					console.error( "Unsupported light type for shadow" );
+					continue;
 
 				}
 
-				shadowMap = light.shadowMap;
-				shadowMatrix = light.shadowMatrix;
-				shadowCamera = light.shadowCamera;
+				scene.add( light.shadowCamera );
 
-				shadowCamera.position.copy( light.matrixWorld.getPosition() );
-				shadowCamera.lookAt( light.target.matrixWorld.getPosition() );
+				if ( _renderer.autoUpdateScene ) scene.updateMatrixWorld();
 
-				shadowCamera.matrixWorldInverse.getInverse( shadowCamera.matrixWorld );
-
-				if ( light.cameraHelper ) light.cameraHelper.lines.visible = light.shadowCameraVisible;
-				if ( light.shadowCameraVisible ) light.cameraHelper.update( light.shadowCamera );
+			}
 
 
-				// compute shadow matrix
+			if ( light.shadowCameraVisible && ! light.cameraHelper ) {
 
-				shadowMatrix.set( 0.5, 0.0, 0.0, 0.5,
-								  0.0, 0.5, 0.0, 0.5,
-								  0.0, 0.0, 0.5, 0.5,
-								  0.0, 0.0, 0.0, 1.0 );
+				light.cameraHelper = new THREE.CameraHelper( light.shadowCamera );
+				light.shadowCamera.add( light.cameraHelper );
 
-				shadowMatrix.multiplySelf( shadowCamera.projectionMatrix );
-				shadowMatrix.multiplySelf( shadowCamera.matrixWorldInverse );
+			}
 
-				// render shadow map
+			shadowMap = light.shadowMap;
+			shadowMatrix = light.shadowMatrix;
+			shadowCamera = light.shadowCamera;
 
-				if ( ! shadowCamera._viewMatrixArray ) shadowCamera._viewMatrixArray = new Float32Array( 16 );
-				shadowCamera.matrixWorldInverse.flattenToArray( shadowCamera._viewMatrixArray );
+			shadowCamera.position.copy( light.matrixWorld.getPosition() );
+			shadowCamera.lookAt( light.target.matrixWorld.getPosition() );
 
-				if ( ! shadowCamera._projectionMatrixArray ) shadowCamera._projectionMatrixArray = new Float32Array( 16 );
-				shadowCamera.projectionMatrix.flattenToArray( shadowCamera._projectionMatrixArray );
+			shadowCamera.matrixWorldInverse.getInverse( shadowCamera.matrixWorld );
 
-				_projScreenMatrix.multiply( shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse );
-				_frustum.setFromMatrix( _projScreenMatrix );
+			if ( light.cameraHelper ) light.cameraHelper.lines.visible = light.shadowCameraVisible;
+			if ( light.shadowCameraVisible ) light.cameraHelper.update( light.shadowCamera );
 
-				_renderer.setRenderTarget( shadowMap );
-				_renderer.clear();
+			// compute shadow matrix
 
-				// set matrices & frustum culling
+			shadowMatrix.set( 0.5, 0.0, 0.0, 0.5,
+							  0.0, 0.5, 0.0, 0.5,
+							  0.0, 0.0, 0.5, 0.5,
+							  0.0, 0.0, 0.0, 1.0 );
 
-				renderList = scene.__webglObjects;
+			shadowMatrix.multiplySelf( shadowCamera.projectionMatrix );
+			shadowMatrix.multiplySelf( shadowCamera.matrixWorldInverse );
 
-				for ( j = 0, jl = renderList.length; j < jl; j ++ ) {
+			// render shadow map
 
-					webglObject = renderList[ j ];
-					object = webglObject.object;
+			if ( ! shadowCamera._viewMatrixArray ) shadowCamera._viewMatrixArray = new Float32Array( 16 );
+			shadowCamera.matrixWorldInverse.flattenToArray( shadowCamera._viewMatrixArray );
 
-					webglObject.render = false;
+			if ( ! shadowCamera._projectionMatrixArray ) shadowCamera._projectionMatrixArray = new Float32Array( 16 );
+			shadowCamera.projectionMatrix.flattenToArray( shadowCamera._projectionMatrixArray );
 
-					if ( object.visible && object.castShadow ) {
+			_projScreenMatrix.multiply( shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse );
+			_frustum.setFromMatrix( _projScreenMatrix );
 
-						if ( ! ( object instanceof THREE.Mesh ) || ! ( object.frustumCulled ) || _frustum.contains( object ) ) {
+			_renderer.setRenderTarget( shadowMap );
+			_renderer.clear();
 
-							object.matrixWorld.flattenToArray( object._objectMatrixArray );
-							object._modelViewMatrix.multiplyToArray( shadowCamera.matrixWorldInverse, object.matrixWorld, object._modelViewMatrixArray );
+			// set matrices & frustum culling
 
-							webglObject.render = true;
+			renderList = scene.__webglObjects;
 
-						}
+			for ( j = 0, jl = renderList.length; j < jl; j ++ ) {
 
-					}
+				webglObject = renderList[ j ];
+				object = webglObject.object;
 
-				}
+				webglObject.render = false;
 
-				// render regular objects
+				if ( object.visible && object.castShadow ) {
 
-				for ( j = 0, jl = renderList.length; j < jl; j ++ ) {
+					if ( ! ( object instanceof THREE.Mesh ) || ! ( object.frustumCulled ) || _frustum.contains( object ) ) {
 
-					webglObject = renderList[ j ];
-
-					if ( webglObject.render ) {
-
-						object = webglObject.object;
-						buffer = webglObject.buffer;
-
-						_renderer.setObjectFaces( object );
-
-						if ( object.customDepthMaterial ) {
-
-							material = object.customDepthMaterial;
-
-						} else if ( object.geometry.morphTargets.length ) {
-
-							material = _depthMaterialMorph;
-
-						} else {
-
-							material = _depthMaterial;
-
-						}
-
-						if ( buffer instanceof THREE.BufferGeometry ) {
-
-							_renderer.renderBufferDirect( shadowCamera, lights, fog, material, buffer, object );
-
-						} else {
-
-							_renderer.renderBuffer( shadowCamera, lights, fog, material, buffer, object );
-
-						}
-
-					}
-
-				}
-
-				// set matrices and render immediate objects
-
-				renderList = scene.__webglObjectsImmediate;
-
-				for ( j = 0, jl = renderList.length; j < jl; j ++ ) {
-
-					webglObject = renderList[ j ];
-					object = webglObject.object;
-
-					if ( object.visible && object.castShadow ) {
-
-						if( object.matrixAutoUpdate ) {
-
-							object.matrixWorld.flattenToArray( object._objectMatrixArray );
-
-						}
-
+						object.matrixWorld.flattenToArray( object._objectMatrixArray );
 						object._modelViewMatrix.multiplyToArray( shadowCamera.matrixWorldInverse, object.matrixWorld, object._modelViewMatrixArray );
 
-						_renderer.renderImmediateObject( shadowCamera, lights, fog, _depthMaterial, object );
+						webglObject.render = true;
 
 					}
+
+				}
+
+			}
+
+			// render regular objects
+
+			for ( j = 0, jl = renderList.length; j < jl; j ++ ) {
+
+				webglObject = renderList[ j ];
+
+				if ( webglObject.render ) {
+
+					object = webglObject.object;
+					buffer = webglObject.buffer;
+
+					_renderer.setObjectFaces( object );
+
+					if ( object.customDepthMaterial ) {
+
+						material = object.customDepthMaterial;
+
+					} else if ( object.geometry.morphTargets.length ) {
+
+						material = _depthMaterialMorph;
+
+					} else {
+
+						material = _depthMaterial;
+
+					}
+
+					if ( buffer instanceof THREE.BufferGeometry ) {
+
+						_renderer.renderBufferDirect( shadowCamera, lights, fog, material, buffer, object );
+
+					} else {
+
+						_renderer.renderBuffer( shadowCamera, lights, fog, material, buffer, object );
+
+					}
+
+				}
+
+			}
+
+			// set matrices and render immediate objects
+
+			renderList = scene.__webglObjectsImmediate;
+
+			for ( j = 0, jl = renderList.length; j < jl; j ++ ) {
+
+				webglObject = renderList[ j ];
+				object = webglObject.object;
+
+				if ( object.visible && object.castShadow ) {
+
+					if( object.matrixAutoUpdate ) {
+
+						object.matrixWorld.flattenToArray( object._objectMatrixArray );
+
+					}
+
+					object._modelViewMatrix.multiplyToArray( shadowCamera.matrixWorldInverse, object.matrixWorld, object._modelViewMatrixArray );
+
+					_renderer.renderImmediateObject( shadowCamera, lights, fog, _depthMaterial, object );
 
 				}
 

@@ -4436,7 +4436,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				var light = lights[ i ];
 
-				if ( light.castShadow && light instanceof THREE.SpotLight ) {
+				if ( ! light.castShadow ) continue;
+
+				if ( light instanceof THREE.SpotLight || light instanceof THREE.DirectionalLight ) {
 
 					uniforms.shadowMap.texture[ j ] = light.shadowMap;
 					uniforms.shadowMapSize.value[ j ] = light.shadowMapSize;
@@ -4711,8 +4713,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 		for ( l = 0, ll = lights.length; l < ll; l ++ ) {
 
 			light = lights[ l ];
-			color = light.color;
 
+			if ( light.onlyShadow ) continue;
+
+			color = light.color;
 			intensity = light.intensity;
 			distance = light.distance;
 
@@ -4760,7 +4764,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				dlength += 1;
 
-			} else if ( light instanceof THREE.SpotLight && ! light.onlyShadow ) { // hack, not a proper spotlight
+			} else if ( light instanceof THREE.SpotLight ) { // hack, not a proper spotlight
 
 				doffset = dlength * 3;
 
@@ -5750,7 +5754,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			light = lights[ l ];
 
-			if ( light instanceof THREE.SpotLight && ! light.onlyShadow ) dirLights ++; // hack, not a proper spotlight
+			if ( light.onlyShadow ) continue;
+
+			if ( light instanceof THREE.SpotLight ) dirLights ++; // hack, not a proper spotlight
 			if ( light instanceof THREE.DirectionalLight ) dirLights ++;
 			if ( light instanceof THREE.PointLight ) pointLights ++;
 
@@ -5780,7 +5786,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			light = lights[ l ];
 
-			if ( light instanceof THREE.SpotLight && light.castShadow ) maxShadows ++;
+			if ( ! light.castShadow ) continue;
+
+			if ( light instanceof THREE.SpotLight || light instanceof THREE.DirectionalLight ) maxShadows ++;
 
 		}
 
