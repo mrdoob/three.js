@@ -49,7 +49,9 @@
 
 			var container, stats;
 			var camera, scene, renderer, mesh;
-			var cameraRig, activeCamera, cameraPerspective, cameraOrtho;
+			var cameraRig, activeCamera;
+			var cameraPerspective, cameraOrtho;
+			var cameraPerspectiveHelper, cameraOrthoHelper;
 
 			var r = 0;
 
@@ -63,19 +65,25 @@
 
 				scene = new THREE.Scene();
 
+				//
+
 				camera = new THREE.PerspectiveCamera( 50, 0.5 * SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
 				camera.position.z = 2500;
 				scene.add( camera );
 
 				cameraPerspective = new THREE.PerspectiveCamera( 50, 0.5 * SCREEN_WIDTH / SCREEN_HEIGHT, 150, 1000 );
 
-				var visibleCameraPerspective = new THREE.VisibleCamera( cameraPerspective );
-				cameraPerspective.add( visibleCameraPerspective );
+				cameraPerspectiveHelper = new THREE.CameraHelper( cameraPerspective );
+				cameraPerspective.add( cameraPerspectiveHelper );
+
+				//
 
 				cameraOrtho = new THREE.OrthographicCamera( 0.5 * SCREEN_WIDTH / - 2, 0.5 * SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_HEIGHT / - 2, 150, 1000 );
 
-				var visibleCameraOrtho = new THREE.VisibleCamera( cameraOrtho );
-				cameraOrtho.add( visibleCameraOrtho );
+				cameraOrthoHelper = new THREE.CameraHelper( cameraOrtho );
+				cameraOrtho.add( cameraOrthoHelper );
+
+				//
 
 				activeCamera = cameraPerspective;
 
@@ -215,19 +223,21 @@
 					cameraPerspective.fov = 35 + 30 * Math.sin( 0.5 * r );
 					cameraPerspective.far = mesh.position.length();
 					cameraPerspective.updateProjectionMatrix();
-					cameraPerspective.children[ 0 ].update( cameraPerspective );
 
-					cameraPerspective.children[ 0 ].lines.visible = true;
-					cameraOrtho.children[ 0 ].lines.visible = false;
+					cameraPerspectiveHelper.update( cameraPerspective );
+					cameraPerspectiveHelper.lines.visible = true;
+
+					cameraOrthoHelper.lines.visible = false;
 
 				} else {
 
 					cameraOrtho.far = mesh.position.length();
 					cameraOrtho.updateProjectionMatrix();
-					cameraOrtho.children[ 0 ].update( cameraOrtho );
 
-					cameraPerspective.children[ 0 ].lines.visible = false;
-					cameraOrtho.children[ 0 ].lines.visible = true;
+					cameraOrthoHelper.update( cameraOrtho );
+					cameraOrthoHelper.lines.visible = true;
+
+					cameraPerspectiveHelper.lines.visible = false;
 
 				}
 

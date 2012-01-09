@@ -7,7 +7,7 @@
  *		http://evanw.github.com/lightgl.js/tests/shadowmap.html
  */
 
-THREE.VisibleCamera = function ( camera ) {
+THREE.CameraHelper = function ( camera ) {
 
 	THREE.Object3D.call( this );
 
@@ -97,10 +97,10 @@ THREE.VisibleCamera = function ( camera ) {
 
 };
 
-THREE.VisibleCamera.prototype = new THREE.Object3D();
-THREE.VisibleCamera.prototype.constructor = THREE.VisibleCamera;
+THREE.CameraHelper.prototype = new THREE.Object3D();
+THREE.CameraHelper.prototype.constructor = THREE.CameraHelper;
 
-THREE.VisibleCamera.prototype.update = function ( camera ) {
+THREE.CameraHelper.prototype.update = function ( camera ) {
 
 	var w = 1;
 	var h = 1;
@@ -110,7 +110,7 @@ THREE.VisibleCamera.prototype.update = function ( camera ) {
 	// we need just camera projection matrix
 	// world matrix must be identity
 
-	THREE.VisibleCamera.__c.projectionMatrix.copy( camera.projectionMatrix );
+	THREE.CameraHelper.__c.projectionMatrix.copy( camera.projectionMatrix );
 
 	// center / target
 
@@ -151,8 +151,8 @@ THREE.VisibleCamera.prototype.update = function ( camera ) {
 
 	function setPoint( point, x, y, z ) {
 
-		THREE.VisibleCamera.__v.set( x, y, z );
-		THREE.VisibleCamera.__projector.unprojectVector( THREE.VisibleCamera.__v, THREE.VisibleCamera.__c );
+		THREE.CameraHelper.__v.set( x, y, z );
+		THREE.CameraHelper.__projector.unprojectVector( THREE.CameraHelper.__v, THREE.CameraHelper.__c );
 
 		var points = _this.pointMap[ point ];
 
@@ -161,7 +161,7 @@ THREE.VisibleCamera.prototype.update = function ( camera ) {
 			for ( var i = 0, il = points.length; i < il; i ++ ) {
 
 				var j = points[ i ];
-				_this.lineGeometry.vertices[ j ].position.copy( THREE.VisibleCamera.__v );
+				_this.lineGeometry.vertices[ j ].position.copy( THREE.CameraHelper.__v );
 
 			}
 
@@ -173,7 +173,7 @@ THREE.VisibleCamera.prototype.update = function ( camera ) {
 
 };
 
-THREE.VisibleCamera.__projector = new THREE.Projector();
-THREE.VisibleCamera.__v = new THREE.Vector3();
-THREE.VisibleCamera.__c = new THREE.Camera();
+THREE.CameraHelper.__projector = new THREE.Projector();
+THREE.CameraHelper.__v = new THREE.Vector3();
+THREE.CameraHelper.__c = new THREE.Camera();
 
