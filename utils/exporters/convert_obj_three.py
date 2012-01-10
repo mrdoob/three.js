@@ -407,29 +407,29 @@ def parse_mtl(fname):
                 materials[identifier]["opticalDensity"] = float(chunks[1])
 
             # Diffuse texture
-            # map_Kd texture_diffuse.jpg
-            if chunks[0] == "map_Kd" and len(chunks) == 2:
-                materials[identifier]["mapDiffuse"] = texture_relative_path(chunks[1])
+            # map_Kd [parameters] texture_diffuse.jpg
+            if chunks[0] == "map_Kd" and len(chunks) >= 2:
+                materials[identifier]["mapDiffuse"] = texture_relative_path(chunks[-1])
 
             # Ambient texture
-            # map_Ka texture_ambient.jpg
-            if chunks[0] == "map_Ka" and len(chunks) == 2:
-                materials[identifier]["mapAmbient"] = texture_relative_path(chunks[1])
+            # map_Ka [parameters] texture_ambient.jpg
+            if chunks[0] == "map_Ka" and len(chunks) >= 2:
+                materials[identifier]["mapAmbient"] = texture_relative_path(chunks[-1])
 
             # Specular texture
-            # map_Ks texture_specular.jpg
-            if chunks[0] == "map_Ks" and len(chunks) == 2:
-                materials[identifier]["mapSpecular"] = texture_relative_path(chunks[1])
+            # map_Ks [parameters] texture_specular.jpg
+            if chunks[0] == "map_Ks" and len(chunks) >= 2:
+                materials[identifier]["mapSpecular"] = texture_relative_path(chunks[-1])
 
             # Alpha texture
-            # map_d texture_alpha.png
-            if chunks[0] == "map_d" and len(chunks) == 2:
-                materials[identifier]["mapAlpha"] = texture_relative_path(chunks[1])
+            # map_d [parameters] texture_alpha.png
+            if chunks[0] == "map_d" and len(chunks) >= 2:
+                materials[identifier]["mapAlpha"] = texture_relative_path(chunks[-1])
 
             # Bump texture
-            # map_bump texture_bump.jpg or bump texture_bump.jpg
-            if (chunks[0] == "map_bump" or chunks[0] == "bump") and len(chunks) == 2:
-                materials[identifier]["mapBump"] = texture_relative_path(chunks[1])
+            # map_bump [parameters] texture_bump.jpg or bump [parameters] texture_bump.jpg
+            if (chunks[0] == "map_bump" or chunks[0] == "bump") and len(chunks) >= 2:
+                materials[identifier]["mapNormal"] = texture_relative_path(chunks[-1])
 
             # Illumination
             # illum 2
