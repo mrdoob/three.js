@@ -94,6 +94,7 @@ EXTRAS_FILES = [
 'extras/core/BufferGeometry.js',
 'extras/core/Curve.js',
 'extras/core/CurvePath.js',
+'extras/core/Gyroscope.js',
 'extras/core/Path.js',
 'extras/core/Shape.js',
 'extras/core/TextPath.js',
