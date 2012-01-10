@@ -138,6 +138,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// light arrays cache
 
+	_direction = new THREE.Vector3(),
+
 	_lights = {
 
 		ambient: [ 0, 0, 0 ],
@@ -4754,13 +4756,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				position = light.matrixWorld.getPosition();
+				_direction.copy( light.matrixWorld.getPosition() );
+				_direction.subSelf( light.target.matrixWorld.getPosition() );
+				_direction.normalize();
 
-				n = 1 / position.length();
-
-				dpositions[ doffset ]     = position.x * n;
-				dpositions[ doffset + 1 ] = position.y * n;
-				dpositions[ doffset + 2 ] = position.z * n;
+				dpositions[ doffset ]     = _direction.x;
+				dpositions[ doffset + 1 ] = _direction.y;
+				dpositions[ doffset + 2 ] = _direction.z;
 
 				dlength += 1;
 
