@@ -14,6 +14,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var _canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElement( 'canvas' ),
 
 	_precision = parameters.precision !== undefined ? parameters.precision : 'mediump',
+
+	_alpha = parameters.alpha !== undefined ? parameters.alpha : true,
+	_premultipliedAlpha = parameters.premultipliedAlpha !== undefined ? parameters.premultipliedAlpha : true,
 	_antialias = parameters.antialias !== undefined ? parameters.antialias : false,
 	_stencil = parameters.stencil !== undefined ? parameters.stencil : true,
 	_preserveDrawingBuffer = parameters.preserveDrawingBuffer !== undefined ? parameters.preserveDrawingBuffer : false,
@@ -5778,7 +5781,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		try {
 
-			if ( ! ( gl = _canvas.getContext( 'experimental-webgl', { antialias: _antialias, stencil: _stencil, preserveDrawingBuffer: _preserveDrawingBuffer } ) ) ) {
+			if ( ! ( gl = _canvas.getContext( 'experimental-webgl', { alpha: _alpha, premultipliedAlpha: _premultipliedAlpha, antialias: _antialias, stencil: _stencil, preserveDrawingBuffer: _preserveDrawingBuffer } ) ) ) {
 
 				throw 'Error creating WebGL context.';
 
