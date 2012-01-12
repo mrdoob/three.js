@@ -162,7 +162,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	// GPU capabilities
 
 	var _maxVertexTextures = _gl.getParameter( _gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS ),
-	_maxTextureSize = _gl.getParameter( _gl.TEXTURE_SIZE ),
+	_maxTextureSize = _gl.getParameter( _gl.MAX_TEXTURE_SIZE ),
 	_maxCubemapSize = _gl.getParameter( _gl.MAX_CUBE_MAP_TEXTURE_SIZE );
 
 	// API
@@ -4589,7 +4589,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 				_gl.uniform3fv( location, uniform._array );
-				
+
 			// array of THREE.Vector4
 
 			} else if( type == "v4v" ) {
