@@ -4589,6 +4589,29 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 				_gl.uniform3fv( location, uniform._array );
+				
+			// array of THREE.Vector4
+
+			} else if( type == "v4v" ) {
+
+				if ( ! uniform._array ) {
+
+					uniform._array = new Float32Array( 4 * value.length );
+
+				}
+
+				for ( i = 0, il = value.length; i < il; i ++ ) {
+
+					offset = i * 4;
+
+					uniform._array[ offset ] 	 = value[ i ].x;
+					uniform._array[ offset + 1 ] = value[ i ].y;
+					uniform._array[ offset + 2 ] = value[ i ].z;
+					uniform._array[ offset + 3 ] = value[ i ].w;
+
+				}
+
+				_gl.uniform4fv( location, uniform._array );
 
 			// single THREE.Matrix4
 
