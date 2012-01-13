@@ -82,6 +82,7 @@ More? [#three.js on irc.freenode.net](http://webchat.freenode.net/?channels=thre
 
 Download the [minified library](http://mrdoob.github.com/three.js/build/Three.js) and include it in your html.
 Alternatively see [how to build the library yourself](https://github.com/mrdoob/three.js/wiki/build.py,-or-how-to-generate-a-compressed-Three.js-file). 
+For development and debugging you may wish to use non-merged direct Javascript inclusion - example can be found in [webgl_sandbox.html](https://github.com/mrdoob/three.js/blob/master/examples/webgl_sandbox.html).
 
 ```html
 <script src="js/Three.js"></script>
