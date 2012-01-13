@@ -108,6 +108,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_currentFramebuffer = null,
 	_currentMaterialId = -1,
 	_currentGeometryGroupHash = null,
+	_currentCamera = null,
 	_geometryGroupCounter = 0,
 
 	// GL state cache
@@ -3291,6 +3292,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		for ( var i = 0, il = plugins.length; i < il; i ++ ) {
 
 			_currentProgram = null;
+			_currentCamera = null;
 			_oldBlending = -1;
 			_oldDepthTest = -1;
 			_oldDepthWrite = -1;
@@ -3300,6 +3302,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			plugins[ i ].render( scene, camera, _currentWidth, _currentHeight );
 
 			_currentProgram = null;
+			_currentCamera = null;
 			_oldBlending = -1;
 			_oldDepthTest = -1;
 			_oldDepthWrite = -1;
@@ -4169,9 +4172,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		if ( refreshMaterial ) {
+		if ( refreshMaterial || camera !== _currentCamera ) {
 
 			_gl.uniformMatrix4fv( p_uniforms.projectionMatrix, false, camera._projectionMatrixArray );
+
+			if ( camera !== _currentCamera ) _currentCamera = camera;
+
+		}
+
+		if ( refreshMaterial ) {
 
 			// refresh uniforms common to several materials
 
@@ -4245,7 +4254,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				 material instanceof THREE.MeshPhongMaterial ||
 				 material.envMap ) {
 
-				if( p_uniforms.cameraPosition !== null ) {
+				if ( p_uniforms.cameraPosition !== null ) {
 
 					_gl.uniform3f( p_uniforms.cameraPosition, camera.position.x, camera.position.y, camera.position.z );
 
@@ -4258,7 +4267,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				 material instanceof THREE.ShaderMaterial ||
 				 material.skinning ) {
 
-				if( p_uniforms.viewMatrix !== null ) {
+				if ( p_uniforms.viewMatrix !== null ) {
 
 					_gl.uniformMatrix4fv( p_uniforms.viewMatrix, false, camera._viewMatrixArray );
 
