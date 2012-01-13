@@ -109,7 +109,7 @@
 
 				light.castShadow = true;
 
-				light.shadowCameraNear = 100;
+				light.shadowCameraNear = 700;
 				light.shadowCameraFar = camera.far;
 				light.shadowCameraFov = 50;
 
@@ -157,7 +157,7 @@
 				cameraOrtho = new THREE.OrthographicCamera( SCREEN_WIDTH / - 2, SCREEN_WIDTH / 2,  SCREEN_HEIGHT / 2, SCREEN_HEIGHT / - 2, -10, 1000 );
 				cameraOrtho.position.z = 10;
 
-				var shader = THREE.ShaderExtras[ "screen" ];
+				var shader = THREE.ShaderExtras[ "unpackDepthRGBA" ];
 				var uniforms = new THREE.UniformsUtils.clone( shader.uniforms );
 
 				hudMaterial = new THREE.ShaderMaterial( { vertexShader: shader.vertexShader, fragmentShader: shader.fragmentShader, uniforms: uniforms } );
@@ -404,7 +404,7 @@
 
 				// Render debug HUD with shadow map
 
-				//hudMaterial.uniforms.tDiffuse.texture = renderer.shadowMap[ 0 ];
+				//hudMaterial.uniforms.tDiffuse.texture = light.shadowMap;
 				//renderer.render( sceneHUD, cameraOrtho );
 
 			}
