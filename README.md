@@ -63,6 +63,9 @@ More? [#three.js on irc.freenode.net](http://webchat.freenode.net/?channels=thre
 
 ### Featured projects ###
 
+<a href="http://dl.dropbox.com/u/6213850/WebGL/nyanCat/nyan.html"><img src="http://mrdoob.github.com/three.js/assets/projects/23_nyan.png" width="104" height="78" alt="Nyan Cat"></a>
+<a href="http://idflood.github.com/ThreeNodes.js/public/index.html"><img src="http://mrdoob.github.com/three.js/assets/projects/22_threenodes.png" width="104" height="78" alt="ThreeNodes"></a>
+<a href="http://www.adidas.com/football/uk/pages/f50/"><img src="http://mrdoob.github.com/three.js/assets/projects/21_f50.png" width="104" height="78" alt="f60"></a>
 <a href="http://lights.elliegoulding.com/"><img src="http://mrdoob.github.com/three.js/assets/projects/20_lights.png" width="104" height="78" alt="Lights"></a>
 <a href="http://inear.se/beanstalk/"><img src="http://mrdoob.github.com/three.js/assets/projects/19_beanstalk.png" width="104" height="78" alt="Infinite beanstalk"></a>
 <a href="http://superfad.com/missioncontrol/"><img src="http://mrdoob.github.com/three.js/assets/projects/18_missioncontrol.png" width="104" height="78" alt="Mission Control"></a>
@@ -72,7 +75,6 @@ More? [#three.js on irc.freenode.net](http://webchat.freenode.net/?channels=thre
 <a href="http://plumegraph.org/"><img src="http://mrdoob.github.com/three.js/assets/projects/14_plumegraph.png" width="104" height="78" alt="Plumegraph"></a>
 <a href="http://helloracer.com/webgl/"><img src="http://mrdoob.github.com/three.js/assets/projects/13_helloracer.png" width="104" height="78" alt="HelloRacer"></a>
 <a href="http://www.omiod.com/games/fastkat.php"><img src="http://mrdoob.github.com/three.js/assets/projects/12_fastkat.png" width="104" height="78" alt="FastKat"></a>
-<a href="http://antimatter15.com/wp/2010/11/digital-sculpting-with-three-js/"><img src="http://mrdoob.github.com/three.js/assets/projects/11_sculpt.png" width="104" height="78" alt="Sculpt"></a>
 <a href="http://mrdoob.com/projects/voxels/"><img src="http://mrdoob.github.com/three.js/assets/projects/10_voxels.png" width="104" height="78" alt="Voxels"></a>
 <a href="http://thewildernessdowntown.com/"><img src="http://mrdoob.github.com/three.js/assets/projects/09_arcadefire.png" width="104" height="78" alt="The Wilderness Downtown"></a>
 <a href="http://xplsv.com/prods/demos/xplsv_orsotheysay/"><img src="http://mrdoob.github.com/three.js/assets/projects/07_orsotheysay.png" width="104" height="78" alt="Or so they say..."></a>
@@ -121,7 +123,7 @@ This code creates a camera, then creates a scene, adds a cube on it, creates a &
 
 	function animate() {
 
-		// note: three.js enables requestAnimationFrame()
+		// note: three.js includes requestAnimationFrame shim
 		requestAnimationFrame( animate );
 		render();
 
@@ -140,6 +142,39 @@ This code creates a camera, then creates a scene, adds a cube on it, creates a &
 ```
 
 ### Change Log ###
+
+
+2012 01 14 - **r47** (378,169 KB, gzip: 96,015 KB)
+
+* Resurrected lens flares as custom `WebGLRenderer` plugin. ([alteredq](http://github.com/alteredq))
+* Fixed typos in `Matrix4`'s `transpose()` and `getInverse()`. ([ekitson](http://github.com/ekitson))
+* "Pluginized" Sprites and ShadowMaps. ([alteredq](http://github.com/alteredq))
+* Added `Frustrum` class. ([alteredq](http://github.com/alteredq))
+* `ColladaLoader` improvements. ([ekitson](http://github.com/ekitson), [jterrace](http://github.com/jterrace), [mrdoob](http://github.com/mrdoob) and [alteredq](http://github.com/alteredq))
+* Lights in a hierarchy are now supported when using `WebGLRenderer`. ([alteredq](http://github.com/alteredq))
+* Included requestAnimationFrame shim in the lib. ([mrdoob](http://github.com/mrdoob))
+* Started documentation effort in `/doc` (using sphinx). ([jterrace](http://github.com/jterrace))
+* Changed default shader precission to `mediump`. ([mrdoob](http://github.com/mrdoob))
+* Added support for the format [OpenCTM](http://openctm.sourceforge.net/). ([alteredq](http://github.com/alteredq))
+* Added `BufferGeometry` for direct rendering from typed arrays. ([alteredq](http://github.com/alteredq))
+* Extended `Texture` class with `format` and `type` parameters. ([alteredq](http://github.com/alteredq))
+* Autoscale texture to max size of WebGL hardware. ([greggman](http://github.com/greggman) and [alteredq](http://github.com/alteredq))
+* Improved `WebGLRenderer`'s Shadow Map code. ([alteredq](http://github.com/alteredq))
+* Checking for `xhr.overrideMimeType` before using it (fixing IE support). ([mrdoob](http://github.com/mrdoob) and [alteredq](http://github.com/alteredq))
+* Improved ATI and ANGLE support in across `WebGLRenderer` shaders. ([alteredq](http://github.com/alteredq))
+* Added `generateMipmaps` property to `Texture` and `RenderTarget`. ([alteredq](http://github.com/alteredq))
+* `Frustum` properly handling children with scaled parents. ([avinoamr](http://github.com/avinoamr))
+* Fixed `Ray` when dealing with big polygons. ([WestLangley](http://github.com/WestLangley))
+* Fixed `WebGLRenderer` bug where depth buffer was not cleared. ([ekitson](http://github.com/ekitson))
+* Added `CameraHelper` objects for visualising both Perspective and Orthographic cameras. ([alteredq](http://github.com/alteredq))
+* Improvements to `Path`. ([zz85](http://github.com/zz85))
+* Improvements to Postprocessing stack. ([alteredq](http://github.com/alteredq))
+* Added shadows for `DirectionalLight`s. ([alteredq](http://github.com/alteredq))
+* Added `Gyroscope` object. ([alteredq](http://github.com/alteredq))
+* Added `alpha` and `premultipliedAlpha` parameters to `WebGLRenderer`. ([mrdoob](http://github.com/mrdoob))
+* `Ray` properly handling children with scaled parents. ([mrdoob](http://github.com/mrdoob))
+* Renamed `Axes` object to `AxisHelper`. ([mrdoob](http://github.com/mrdoob))
+
 
 2011 11 17 - **r46** (343.383 KB, gzip: 87.468 KB)
 

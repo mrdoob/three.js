@@ -78,8 +78,9 @@ THREE.Ray = function ( origin, direction ) {
 			// Checking boundingSphere
 
 			var distance = distanceFromIntersection( this.origin, this.direction, object.matrixWorld.getPosition() );
+			var scale = THREE.Frustum.__v1.set( object.matrixWorld.getColumnX().length(), object.matrixWorld.getColumnY().length(), object.matrixWorld.getColumnZ().length() );
 
-			if ( distance > object.geometry.boundingSphere.radius * Math.max( object.scale.x, Math.max( object.scale.y, object.scale.z ) ) ) {
+			if ( distance > object.geometry.boundingSphere.radius * Math.max( scale.x, Math.max( scale.y, scale.z ) ) ) {
 
 				return intersects;
 

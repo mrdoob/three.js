@@ -3,7 +3,7 @@
  * @author mr.doob / http://mrdoob.com/
  */
 
-THREE.Axes = function () {
+THREE.AxisHelper = function () {
 
 	THREE.Object3D.call( this );
 
@@ -48,5 +48,5 @@ THREE.Axes = function () {
 
 };
 
-THREE.Axes.prototype = new THREE.Object3D();
-THREE.Axes.prototype.constructor = THREE.Axes;
+THREE.AxisHelper.prototype = new THREE.Object3D();
+THREE.AxisHelper.prototype.constructor = THREE.AxisHelper;
