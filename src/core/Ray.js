@@ -140,10 +140,12 @@ THREE.Ray = function ( origin, direction ) {
 								distance: originCopy.distanceTo( intersectPoint ),
 								point: intersectPoint.clone(),
 								face: face,
+								
 								object: object
 
 							};
-
+							intersect.nearestVertex= nearestVertex(intersect);
+							intersect.nearestEdge= nearestEdge(intersect);
 							intersects.push( intersect );
 
 						}
@@ -165,7 +167,8 @@ THREE.Ray = function ( origin, direction ) {
 								object: object
 
 							};
-
+							intersect.nearestVertex= nearestVertex(intersect);
+							intersect.nearestEdge= nearestEdge(intersect);
 							intersects.push( intersect );
 
 						}
@@ -219,6 +222,89 @@ THREE.Ray = function ( origin, direction ) {
 
 		return ( u >= 0 ) && ( v >= 0 ) && ( u + v < 1 );
 
+	}
+	
+	function nearestVertex(contact){
+		var face, object, point, vertex, distance, checkDistance,a,b,c,d,verts,result;
+		face = contact.face;
+        object = contact.object;
+        point = contact.point;
+
+        
+        a = object.geometry.vertices[face.a].position;
+        b = object.geometry.vertices[face.b].position;
+        c = object.geometry.vertices[face.c].position;
+		verts = [a,b,c];
+        if (face.d != null) {
+          d = object.geometry.vertices[face.d].position;
+          verts.push(d);
+        }
+
+        for (var i = verts.length - 1; i >= 0; i--) {
+        	checkDistance = verts[i].fromLocalToGlobal(object).distanceTo(contact.point);
+			if (checkDistance < distance || !distance){
+		      	distance = checkDistance;
+		      	result = {
+			      	distance: distance,
+			      	vertex: verts[i];
+			     };
+	      	}
+        };
+        return result;
+		
+	}
+
+	function nearestEdge(contact){
+		var a, b, c, check, d, face, object, point, edge, edges, _i, _len, distance, result,
+          _this = this;
+        //http://paulbourke.net/geometry/pointline/
+        check = function(point, lineStart, lineEnd) {
+	          var U, intersection, lineMag;
+	          
+	          lineMag = lineStart.distanceTo(lineEnd);
+	          U = (((point.x - lineStart.x) * (lineEnd.x - lineStart.x)) + ((point.y - lineStart.y) * (lineEnd.y - lineStart.y)) + ((point.z - lineStart.z) * (lineEnd.z - lineStart.z))) / (lineMag * lineMag);
+	          
+	          if (U < 0.0 || U > 1.0) return 0;
+	          
+	          intersection = new THREE.Vector3();
+
+	          intersection.x = lineStart.x + U * (lineEnd.x - lineStart.x);
+	          intersection.y = lineStart.y + U * (lineEnd.y - lineStart.y);
+	          intersection.z = lineStart.z + U * (lineEnd.z - lineStart.z);
+	          
+	          return point.distanceTo(intersection);
+        };
+        face = contact.face;
+        object = contact.object;
+        point = contact.point;
+
+        a = object.geometry.vertices[face.a].position.fromLocalToGlobal(object);
+        b = object.geometry.vertices[face.b].position.fromLocalToGlobal(object);
+        c = object.geometry.vertices[face.c].position.fromLocalToGlobal(object);
+
+        if (face.d != null) {
+          d = object.geometry.vertices[face.d].position.fromLocalToGlobal(object);
+        }
+        if (face instanceof THREE.Face3) {
+          edges = [[a, b], [b, c], [c, a]];
+        } else {
+          edges = [[a, b], [b, c], [c, d], [d, a]];
+        }
+        result = {}
+        for (_i = 0, _len = edges.length; _i < _len; _i++) {
+          edge = edges[_i];
+          var checkDistance = check(point, edge[0], edge[1]);
+          if (checkDistance < distance || !distance){
+          	var nearestEdge = [edge[0].fromGlobalToLocal(),edge[1].fromGlobalToLocal()]
+          	distance = checkDistance;
+          	result = {
+          		distance: distance,
+          		vertices: nearestEdge
+          	};
+          }
+
+        }
+        return result;
 	}
 
 };
