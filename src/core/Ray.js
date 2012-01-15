@@ -246,7 +246,7 @@ THREE.Ray = function ( origin, direction ) {
 		      	distance = checkDistance;
 		      	result = {
 			      	distance: distance,
-			      	vertex: verts[i];
+			      	vertex: verts[i]
 			     };
 	      	}
         };
@@ -295,7 +295,7 @@ THREE.Ray = function ( origin, direction ) {
           edge = edges[_i];
           var checkDistance = check(point, edge[0], edge[1]);
           if (checkDistance < distance || !distance){
-          	var nearestEdge = [edge[0].fromGlobalToLocal(),edge[1].fromGlobalToLocal()]
+          	var nearestEdge = [edge[0].fromGlobalToLocal(object),edge[1].fromGlobalToLocal(object)]
           	distance = checkDistance;
           	result = {
           		distance: distance,
