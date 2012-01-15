@@ -1,4 +1,4 @@
-// ThreeCanvas.js r47 - http://github.com/mrdoob/three.js
+// ThreeCanvas.js r48dev - http://github.com/mrdoob/three.js
 'use strict';var THREE=THREE||{};if(!self.Int32Array)self.Int32Array=Array,self.Float32Array=Array;
 (function(){for(var a=0,b=["ms","moz","webkit","o"],c=0;c<b.length&&!window.requestAnimationFrame;++c)window.requestAnimationFrame=window[b[c]+"RequestAnimationFrame"],window.cancelAnimationFrame=window[b[c]+"CancelAnimationFrame"]||window[b[c]+"RequestCancelAnimationFrame"];if(!window.requestAnimationFrame)window.requestAnimationFrame=function(b){var c=(new Date).getTime(),f=Math.max(0,16-(c-a)),g=window.setTimeout(function(){b(c+f)},f);a=c+f;return g};if(!window.cancelAnimationFrame)window.cancelAnimationFrame=
 function(a){clearTimeout(a)}})();THREE.Color=function(a){void 0!==a&&this.setHex(a);return this};

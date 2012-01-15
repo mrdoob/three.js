@@ -3623,7 +3623,9 @@ THREE.ColladaLoader = function () {
 
 		}
 
-	function Camera () {
+	};
+
+	function Camera() {
 
 		this.id = "";
 		this.name = "";
@@ -3675,6 +3677,7 @@ THREE.ColladaLoader = function () {
 						for ( var k = 0; k < perspective.childNodes.length; k ++ ) {
 
 							var param = perspective.childNodes[ k ];
+
 							switch ( param.nodeName ) {
 
 								case 'xfov':
@@ -3705,6 +3708,7 @@ THREE.ColladaLoader = function () {
 		return this;
 
 	};
+
 	function InstanceCamera() {
 
 		this.url = "";
