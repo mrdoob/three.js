@@ -17,6 +17,7 @@ THREE.ColladaLoader = function () {
 	var geometries = {};
 	var materials = {};
 	var effects = {};
+	var cameras = {};
 
 	var animData;
 	var visualScenes;
@@ -127,6 +128,7 @@ THREE.ColladaLoader = function () {
 		materials = parseLib( "//dae:library_materials/dae:material", Material, "material") ;
 		effects = parseLib( "//dae:library_effects/dae:effect", Effect, "effect" );
 		geometries = parseLib( "//dae:library_geometries/dae:geometry", Geometry, "geometry" );
+		cameras = parseLib( ".//dae:library_cameras/dae:camera", Camera, "camera" );
 		controllers = parseLib( "//dae:library_controllers/dae:controller", Controller, "controller" );
 		animations = parseLib( "//dae:library_animations/dae:animation", Animation, "animation" );
 		visualScenes = parseLib( ".//dae:library_visual_scenes/dae:visual_scene", VisualScene, "visual_scene" );
@@ -154,6 +156,7 @@ THREE.ColladaLoader = function () {
 			dae: {
 				images: images,
 				materials: materials,
+				cameras: cameras,
 				effects: effects,
 				geometries: geometries,
 				controllers: controllers,
@@ -798,6 +801,15 @@ THREE.ColladaLoader = function () {
 				node.geometries.length > 1 ? obj.add( mesh ) : obj = mesh;
 
 			}
+
+		}
+
+		for ( i = 0; i < node.cameras.length; i ++ ) {
+
+			var instance_camera = node.cameras[i];
+			var cparams = cameras[instance_camera.url];
+
+			obj = new THREE.PerspectiveCamera(cparams.fov, cparams.aspect_ratio, cparams.znear, cparams.zfar);
 
 		}
 
@@ -1739,6 +1751,7 @@ THREE.ColladaLoader = function () {
 		this.nodes = [];
 		this.transforms = [];
 		this.geometries = [];
+		this.cameras = [];
 		this.controllers = [];
 		this.matrix = new THREE.Matrix4();
 
@@ -1756,6 +1769,7 @@ THREE.ColladaLoader = function () {
 
 				case 'instance_camera':
 
+					this.cameras.push( ( new InstanceCamera() ).parse( child ) );
 					break;
 
 				case 'instance_controller':
@@ -3608,6 +3622,100 @@ THREE.ColladaLoader = function () {
 			target.transform.update( data, target.member );
 
 		}
+
+	function Camera () {
+
+		this.id = "";
+		this.name = "";
+
+	};
+
+	Camera.prototype.parse = function ( element ) {
+
+		this.id = element.getAttribute( 'id' );
+		this.name = element.getAttribute( 'name' );
+
+		for ( var i = 0; i < element.childNodes.length; i ++ ) {
+
+			var child = element.childNodes[ i ];
+			if ( child.nodeType != 1 ) continue;
+
+			switch ( child.nodeName ) {
+
+				case 'optics':
+
+					this.parseOptics( child );
+					break;
+
+				default:
+					break;
+
+			}
+
+		}
+
+		return this;
+
+	};
+
+	Camera.prototype.parseOptics = function ( element ) {
+
+		for ( var i = 0; i < element.childNodes.length; i ++ ) {
+
+			if ( element.childNodes[ i ].nodeName == 'technique_common' ) {
+
+				var technique = element.childNodes[ i ];
+
+				for ( var j = 0; j < technique.childNodes.length; j ++ ) {
+
+					if ( technique.childNodes[ j ].nodeName == 'perspective' ) {
+
+						var perspective = technique.childNodes[ j ];
+
+						for ( var k = 0; k < perspective.childNodes.length; k ++ ) {
+
+							var param = perspective.childNodes[ k ];
+							switch ( param.nodeName ) {
+
+								case 'xfov':
+									this.fov = param.textContent;
+									break;
+								case 'znear':
+									this.znear = .4;//param.textContent;
+									break;
+								case 'zfar':
+									this.zfar = 1e15;//param.textContent;
+									break;
+								case 'aspect_ratio':
+									this.aspect_ratio = param.textContent;
+									break;
+
+							}
+
+						}
+
+					}
+
+				}
+				
+			}
+
+		}
+		
+		return this;
+
+	};
+	function InstanceCamera() {
+
+		this.url = "";
+
+	};
+
+	InstanceCamera.prototype.parse = function ( element ) {
+
+		this.url = element.getAttribute('url').replace(/^#/, '');
+
+		return this;
 
 	};
 
