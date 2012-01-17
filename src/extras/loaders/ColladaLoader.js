@@ -3723,7 +3723,7 @@ THREE.ColladaLoader = function () {
 
 	};
 
-	function _source ( element ) {
+	function _source( element ) {
 
 		var id = element.getAttribute( 'id' );
 
@@ -3738,7 +3738,7 @@ THREE.ColladaLoader = function () {
 
 	};
 
-	function _nsResolver ( nsPrefix ) {
+	function _nsResolver( nsPrefix ) {
 
 		if ( nsPrefix == "dae" ) {
 
@@ -3750,12 +3750,12 @@ THREE.ColladaLoader = function () {
 
 	};
 
-	function _bools ( str ) {
+	function _bools( str ) {
 
 		var raw = _strings( str );
 		var data = [];
 
-		for ( var i = 0; i < raw.length; i ++ ) {
+		for ( var i = 0, l = raw.length; i < l; i ++ ) {
 
 			data.push( (raw[i] == 'true' || raw[i] == '1') ? true : false );
 
@@ -3765,12 +3765,12 @@ THREE.ColladaLoader = function () {
 
 	};
 
-	function _floats ( str ) {
+	function _floats( str ) {
 
 		var raw = _strings(str);
 		var data = [];
 
-		for ( var i = 0; i < raw.length; i ++ ) {
+		for ( var i = 0, l = raw.length; i < l; i ++ ) {
 
 			data.push( parseFloat( raw[ i ] ) );
 
@@ -3780,12 +3780,12 @@ THREE.ColladaLoader = function () {
 
 	};
 
-	function _ints ( str ) {
+	function _ints( str ) {
 
 		var raw = _strings( str );
 		var data = [];
 
-		for ( var i = 0; i < raw.length; i ++ ) {
+		for ( var i = 0, l = raw.length; i < l; i ++ ) {
 
 			data.push( parseInt( raw[ i ], 10 ) );
 
@@ -3795,19 +3795,19 @@ THREE.ColladaLoader = function () {
 
 	};
 
-	function _strings ( str ) {
+	function _strings( str ) {
 
-		return _trimString( str ).split( /\s+/ );
+		return ( str.length > 0 ) ? _trimString( str ).split( /\s+/ ) : [];
 
 	};
 
-	function _trimString ( str ) {
+	function _trimString( str ) {
 
 		return str.replace( /^\s+/, "" ).replace( /\s+$/, "" );
 
 	};
 
-	function _attr_as_float ( element, name, defaultValue ) {
+	function _attr_as_float( element, name, defaultValue ) {
 
 		if ( element.hasAttribute( name ) ) {
 
@@ -3821,7 +3821,7 @@ THREE.ColladaLoader = function () {
 
 	};
 
-	function _attr_as_int ( element, name, defaultValue ) {
+	function _attr_as_int( element, name, defaultValue ) {
 
 		if ( element.hasAttribute( name ) ) {
 
@@ -3835,7 +3835,7 @@ THREE.ColladaLoader = function () {
 
 	};
 
-	function _attr_as_string ( element, name, defaultValue ) {
+	function _attr_as_string( element, name, defaultValue ) {
 
 		if ( element.hasAttribute( name ) ) {
 
@@ -3849,7 +3849,7 @@ THREE.ColladaLoader = function () {
 
 	};
 
-	function _format_float ( f, num ) {
+	function _format_float( f, num ) {
 
 		if ( f === undefined ) {
 
@@ -3880,7 +3880,7 @@ THREE.ColladaLoader = function () {
 
 	};
 
-	function evaluateXPath ( node, query ) {
+	function evaluateXPath( node, query ) {
 
 		var instances = COLLADA.evaluate( query, node, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null );
 
@@ -3900,7 +3900,7 @@ THREE.ColladaLoader = function () {
 
 	// Up axis conversion
 
-	function setUpConversion () {
+	function setUpConversion() {
 
 		if ( !options.convertUpAxis || colladaUp === options.upAxis ) {
 
@@ -3931,7 +3931,7 @@ THREE.ColladaLoader = function () {
 
 	};
 
-	function fixCoords ( data, sign ) {
+	function fixCoords( data, sign ) {
 
 		if ( !options.convertUpAxis || colladaUp === options.upAxis ) {
 
@@ -3989,7 +3989,7 @@ THREE.ColladaLoader = function () {
 
 	};
 
-	function getConvertedVec3 ( data, offset ) {
+	function getConvertedVec3( data, offset ) {
 
 		var arr = [ data[ offset ], data[ offset + 1 ], data[ offset + 2 ] ];
 		fixCoords( arr, -1 );
@@ -3997,7 +3997,7 @@ THREE.ColladaLoader = function () {
 
 	};
 
-	function getConvertedMat4 ( data ) {
+	function getConvertedMat4( data ) {
 
 		if ( options.convertUpAxis ) {
 
@@ -4054,7 +4054,7 @@ THREE.ColladaLoader = function () {
 
 	};
 
-	function getConvertedMember ( member ) {
+	function getConvertedMember( member ) {
 
 		if ( options.convertUpAxis ) {
 

@@ -6,9 +6,9 @@ THREE.Material = function ( parameters ) {
 
 	parameters = parameters || {};
 
-	this.name = '';
-
 	this.id = THREE.MaterialCount ++;
+
+	this.name = '';
 
 	this.opacity = parameters.opacity !== undefined ? parameters.opacity : 1;
 	this.transparent = parameters.transparent !== undefined ? parameters.transparent : false;
