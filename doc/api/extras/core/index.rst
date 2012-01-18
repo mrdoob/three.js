@@ -1,4 +1,4 @@
-Core Classes
+Core Extras
 ============
 
 .. toctree::
