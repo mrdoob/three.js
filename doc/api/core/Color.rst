@@ -3,133 +3,98 @@ Color - Represents a color
 
 .. rubric:: Constructor
 
-**class**:: Color(*hex*)
+.. class:: Color(hex)
 
-+------------+------------+------------------------------------+ 
-| Parameter  | Type       | Description                        | 
-+============+============+====================================+ 
-| *hex*      | integer    | Hex value to intialize the color   | 
-+------------+------------+------------------------------------+ 
+    Represents a color
+    
+    :param integer hex: Hex value to intialize the color
 
 .. rubric:: Attributes
 
-+------------+------------+------------------------------------+ 
-| Attribute  | Type       | Description                        | 
-+============+============+====================================+ 
-| Color.r    | float      | Red channel (between 0 and 1)      | 
-+------------+------------+------------------------------------+ 
-| Color.g    | float      | Green channel (between 0 and 1)    | 
-+------------+------------+------------------------------------+ 
-| Color.b    | float      | Blue channel (between 0 and 1)     | 
-+------------+------------+------------------------------------+ 
+.. attribute:: Color.r
+
+    Red channel (float between 0 and 1)
+    
+.. attribute:: Color.g
+
+    Green channel (float between 0 and 1)
+
+.. attribute:: Color.b
+
+    Blue channel (float between 0 and 1)
 
 .. rubric:: Methods
 
-**function**:: Color.copy(*color*)
+.. function:: Color.copy(color)
 
-Copies the given color into this color
-
-+------------+------------+----------------+ 
-| Parameter  | Type       | Description    | 
-+============+============+================+ 
-| *color*    | THREE.Color| Color to copy  | 
-+------------+------------+----------------+  
-
-**function**:: Color.copyGammaToLinear(*color*)
-
-Creates a gamma color from a linear color
+    Copies the given color into this color
     
-+------------+------------+----------------+ 
-| Parameter  | Type       | Description    | 
-+============+============+================+ 
-| *color*    | THREE.Color| Color to copy  | 
-+------------+------------+----------------+  
-| returns    | THREE.Color| Linear color   | 
-+------------+------------+----------------+  
+    :param Color color: Color to copy
     
-**function**:: Color.copyLinearToGamma(*color*)
+.. function:: Color.copyGammaToLinear(color)
 
-Creates a linear color from a gamma color
+    Creates a gamma color from a linear color
     
-+------------+------------+----------------+ 
-| Parameter  | Type       | Description    | 
-+============+============+================+ 
-| *color*    | THREE.Color| Color to copy  | 
-+------------+------------+----------------+  
-| returns    | THREE.Color| Gamma color    | 
-+------------+------------+----------------+  
+    :param Color color: Color to copy
+    :returns: Linear color
+    :rtype: Color
     
-**function**:: Color.setRGB(*r*, *g*, *b*)
+.. function:: Color.copyLinearToGamma(color)
 
-Sets the RGB value of this color
+    Creates a linear color from a gamma color
     
-+-----------+-------+--------------------------------------+ 
-| Parameter | Type  | Description                          | 
-+===========+=======+======================================+ 
-| *r*       | float | Red channel value (between 0 and 1)  | 
-+-----------+-------+--------------------------------------+  
-| *g*       | float | Green channel value (between 0 and 1)| 
-+-----------+-------+--------------------------------------+ 
-| *b*       | float | Blue channel value (between 0 and 1) | 
-+-----------+-------+--------------------------------------+ 
-
-**function**:: Color.setHSV(*h*, *s*, *v*)
-
-Sets the HSV value of this color. Based on MochiKit implementation by
-Bob Ippolito.
+    :param Color color: Color to copy
+    :returns: Gamma color
+    :rtype: Color
     
-+-----------+-------+--------------------------------------+ 
-| Parameter | Type  | Description                          | 
-+===========+=======+======================================+ 
-| *h*       | float | Hue channel  (between 0 and 1)       | 
-+-----------+-------+--------------------------------------+  
-| *s*       | float | Saturation channel  (between 0 and 1)| 
-+-----------+-------+--------------------------------------+ 
-| *v*       | float | Value channel (between 0 and 1)      | 
-+-----------+-------+--------------------------------------+ 
+.. function:: Color.setRGB(r, g, b)
+
+    Sets the RGB value of this color
     
-**function**:: Color.setHex(*hex*)
+    :param float r: Red channel value (between 0 and 1)
+    :param float g: Green channel value (between 0 and 1)
+    :param float b: Blue channel value (between 0 and 1)
 
-Sets the value of this color from a hex value
-   
-+-----------+---------+---------------------------+ 
-| Parameter | Type    | Description               |
-+===========+=========+===========================+ 
-| *hex*     | integer | Value of the color in hex | 
-+-----------+---------+---------------------------+  
+.. function:: Color.setHSV(h, s, v)
 
-**function**:: Color.getHex()
-
-Gets the value of this color in hex
+    Sets the HSV value of this color. Based on MochiKit implementation by
+    Bob Ippolito.
     
-+-----------+---------+------------------------+ 
-| Parameter | Type    | Description            |
-+===========+=========+========================+ 
-| returns   | integer | The color value in hex | 
-+-----------+---------+------------------------+  
-
-**function**:: Color.getContextStyle()
-
-Returns the value of this color in CSS context style.
+    :param float h: Hue channel (between 0 and 1)
+    :param float s: Saturation channel (between 0 and 1)
+    :param float v: Value channel (between 0 and 1)
     
-+-----------+--------+-----------------------------+--------------+
-| Parameter | Type   | Description                 | Example      |
-+===========+========+=============================+==============+ 
-| returns   | string | A CSS-formatted color value | "rgb(r,g,b)" |
-+-----------+--------+-----------------------------+--------------+ 
-    
-**function**:: Color.clone()
+.. function:: Color.setHex(hex)
 
-Clones this color
+    Sets the value of this color from a hex value
     
-+-----------+-------------+--------------------------------------+ 
-| Parameter | Type        | Description                          |
-+===========+=============+======================================+ 
-| returns   | THREE.Color | New instance identical to this color | 
-+-----------+-------------+--------------------------------------+  
+    :param integer hex: Value of the color in hex
 
-.. rubric:: Example 
- 
+.. function:: Color.getHex()
+
+    Gets the value of this color in hex
+    
+    :returns: The color value in hex
+    :rtype: integer
+    
+.. function:: Color.getContextStyle()
+
+    Returns the value of this color in CSS context style.
+    
+    Example: ``rgb(r,g,b)``
+    
+    :returns: A CSS-formatted color value
+    :rtype: string
+    
+.. function:: Color.clone()
+
+    Clones this color
+    
+    :returns: New instance identical to this color
+    :rtype: Color
+
+.. rubric:: Example
+
 ::
 
     var colors = [];

@@ -3,22 +3,17 @@ Edge - Edge between two vertices
 
 .. rubric:: Constructor
 
-**class**:: Edge(*v1*, *v2*, *vi1*, *vi2*)
+.. class:: Edge(v1, v2, vi1, vi2)
 
-+-----------+---------+------------------------------------+ 
-| Parameter | Type    | Description                        | 
-+===========+=========+====================================+ 
-| *v1*      | ?       |                                    | 
-+-----------+---------+------------------------------------+ 
-| *v2*      | ?       |                                    | 
-+-----------+---------+------------------------------------+ 
-| *vi1*     | integer | index of vertex 1(i am guessing)   | 
-+-----------+---------+------------------------------------+ 
-| *vi2*     | integer | index of vertex 2(i am guessing)   | 
-+-----------+---------+------------------------------------+ 
+    //todo:description
+
+    :param ? v1: //todo
+    :param ? v2: //todo
+    :param integer vi1: //todo
+    :param integer vi2: //todo
 
 .. rubric:: Attributes
-//todo
+    //todo
 
 
 

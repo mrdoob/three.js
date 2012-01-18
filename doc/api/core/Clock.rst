@@ -3,53 +3,53 @@ Clock - Keeps track of time
 
 .. rubric:: Constructor
 
-**class**:: Clock([*autoStart*])
+.. class:: Clock(autoStart)
+
+//todo:description
 
 .. rubric:: Attributes
 
-+-------------------+----------------+-------------+
-| Attribute         | Type           | Description |
-+===================+================+=============+
-| Clock.autoStart   | boolean        | dont know   |
-+-------------------+----------------+-------------+
-| Clock.startTime   | long/int/float | dont know   |
-+-------------------+----------------+-------------+
-| Clock.oldTime     | long/int/float | dont know   |
-+-------------------+----------------+-------------+
-| Clock.elapsedTime | long/int/float | dont know   |
-+-------------------+----------------+-------------+
-| Clock.running     | boolean        | dont know   |
-+-------------------+----------------+-------------+
+.. attribute:: Clock.autoStart
+
+//todo:description
+
+.. attribute:: Clock.startTime
+
+//todo:description
+
+.. attribute:: Clock.oldTime
+
+//todo:description
+
+.. attribute:: Clock.elapsedTime
+
+//todo:description
+
+.. attribute:: Clock.running
+
+//todo:description
 
 .. rubric:: Methods
 
-**function**::Clock.start()
+.. function:: Clock.start()
 
-what does it do
+//todo:description
 
-**function**::Clock.stop()
+.. function:: Clock.stop()
 
-what does it do
+//todo:description
 
-**function**::Clock.getElapsedTime()
+.. function:: Clock.getElapsedTime()
 
-what does it do
+//todo:description
+    :returns: //todo
+    :rtype: //todo
 
-+------------+----------+-------------+
-| Attributes | Type     | Description |
-+============+==========+=============+
-| returns    | ?        | dont know   |
-+------------+----------+-------------+
+.. function:: Clock.getDelta()
 
-**function**::Clock.getDelta()
-
-what does it do
-
-+------------+----------+-------------+
-| Attributes | Type     | Description |
-+============+==========+=============+
-| returns    | ?        | dont know   |
-+------------+----------+-------------+
+//todo:description
+    :returns: //todo
+    :rtype: //todo
 
 .. rubric:: Example
 

@@ -5,6 +5,7 @@ THREE - Main three.js namespace
     cameras/index.rst
     core/index.rst
     lights/index.rst
+    extras/index.rst
 
 .. js:data:: THREE
 

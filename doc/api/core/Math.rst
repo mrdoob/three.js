@@ -1,69 +1,50 @@
 Math - Math utility functions
 -----------------------------
-    
-**function**::THREE.Math.clamp(*x*, *a*, *b*)
 
-Clamps the *x* to be between *a* and *b*
+.. rubric:: Methods
 
-+-----------+-------+----------------------+
-| Parameter | Type  | Description          |
-+===========+=======+======================+
-| *x*       | float | value to be clamped  |
-+-----------+-------+----------------------+
-| *a*       | float | minimum value        |
-+-----------+-------+----------------------+
-| *b*       | float | maximum value        |
-+-----------+-------+----------------------+
-| returns   | float | value after clamping |
-+-----------+-------+----------------------+
+.. function:: Math.clamp(x, a, b)
 
-**function**::THREE.Math.clampBottom(*x*, *a*)
+    Clamps the x to be between a and b
 
-Clamps the *x* to be larger than *a*
+    :param float x: value to be clamped
+    :param float a: minimum value  
+    :param float b: maximum value
+    :returns: Clamped value
+    :rtype: float
 
-+-----------+-------+----------------------+
-| Parameter | Type  | Description          |
-+===========+=======+======================+
-| *x*       | float | value to be clamped  |
-+-----------+-------+----------------------+
-| *a*       | float | minimum value        |
-+-----------+-------+----------------------+
-| returns   | float | value after clamping |
-+-----------+-------+----------------------+
+.. function:: Math.clampBottom(x, a)
 
-**function**::THREE.Math.mapLinear(*x*, *a1*, *a2*, *b1*, *b2*)
+    Clamps the x to be larger than a
 
-//todo
+    :param float x: value to be clamped
+    :param float a: minimum value  
+    :returns: Clamped value
+    :rtype: float
+
+.. function:: Math.mapLinear(x, a1, a2, b1, b2)
+
+//todo:description
  
-**function**::THREE.Math.random16() 
+.. function:: Math.random16() 
 
-+-----------+-------+-----------------------------------------------------+
-| Parameter | Type  | Description                                         |
-+===========+=======+=====================================================+
-| returns   | float | Random float from <0, 1> with 16 bits of randomness |
-+-----------+-------+-----------------------------------------------------+
-(standard Math.random() creates repetitive patterns when applied over larger space)
+    Random float from <0, 1> with 16 bits of randomness
+    (standard Math.random() creates repetitive patterns when applied over larger space)
 
-**function**::THREE.Math.randInt(*low*, *high*)
+    :returns: Random float from <0, 1> with 16 bits of randomness
+    :rtype: float
 
-+-----------+---------+----------------------------------------------+
-| Parameter | Type    | Description                                  |
-+===========+=========+==============================================+
-| returns   | integer | Random integer from *low* to *high* interval |
-+-----------+---------+----------------------------------------------+
+.. function:: Math.randInt(low, high)
 
-**function**::THREE.Math.randFloat(*low*, *high*)
+    :returns: Random integer from *low* to *high* interval
+    :rtype: integer
 
-+-----------+-------+--------------------------------------------+
-| Parameter | Type  | Description                                |
-+===========+=======+============================================+
-| returns   | float | Random float from *low* to *high* interval |
-+-----------+-------+--------------------------------------------+
+.. function:: Math.randFloat(low, high)
 
-**function**::THREE.Math.randFloatSpread(*range*)
+    :returns: Random float from *low* to *high* interval
+    :rtype: float
 
-+-----------+-------+---------------------------------------------------+
-| Parameter | Type  | Description                                       |
-+===========+=======+===================================================+
-| returns   | float | Random float from -*range*/2 to *range*/2 interval|
-+-----------+-------+---------------------------------------------------+
+.. function:: Math.randFloatSpread(range)
+
+    :returns: Random float from -range/2 to range/2 interval
+    :rtype: float
