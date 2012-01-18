@@ -39,7 +39,7 @@
 				scene = new THREE.Scene();
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.y = 200;
+				camera.position.y = 400;
 				scene.add( camera );
 
 				var light, object, materials;
@@ -56,16 +56,24 @@
 				];
 
 				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.CubeGeometry( 100, 100, 100, 4, 4, 4 ), materials );
-				object.position.set( -200, 0, 200 );
+				object.position.set( -200, 0, 400 );
 				scene.add( object );
 
 				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.CylinderGeometry( 25, 75, 100, 40, 5 ), materials );
+				object.position.set( 0, 0, 400 );
+				scene.add( object );
+
+				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.IcosahedronGeometry( 75, 1 ), materials );
+				object.position.set( -200, 0, 200 );
+				scene.add( object );
+
+				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.OctahedronGeometry( 75, 0 ), materials );
 				object.position.set( 0, 0, 200 );
 				scene.add( object );
 
-				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.IcosahedronGeometry( 2 ), materials );
+
+				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.TetrahedronGeometry( 75, 0 ), materials );
 				object.position.set( 200, 0, 200 );
-				object.scale.x = object.scale.y = object.scale.z = 75;
 				scene.add( object );
 
 				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.PlaneGeometry( 100, 100, 4, 4 ), materials );
