@@ -3,7 +3,7 @@ Edge - Edge between two vertices
 
 .. rubric:: Constructor
 
-**class**:: Edge(*v1*,*v2*,*vi1*,*vi2*)
+**class**:: Edge(*v1*, *v2*, *vi1*, *vi2*)
 
 +-----------+---------+------------------------------------+ 
 | Parameter | Type    | Description                        | 
