@@ -372,6 +372,8 @@ def parse_mtl(fname):
                 identifier = chunks[1]
                 if not identifier in materials:
                     materials[identifier] = {}
+            else:
+                continue
 
             # Diffuse color
             # Kd 1.000 1.000 1.000
