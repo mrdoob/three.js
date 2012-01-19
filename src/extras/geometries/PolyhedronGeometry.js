@@ -28,13 +28,20 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 
 	this.mergeVertices();
 
+	// Apply radius
+
+	for ( var i = 0, l = this.vertices.length; i < l; i ++ ) {
+
+		this.vertices[ i ].position.multiplyScalar( radius );
+
+	}
+
 	/**
 	 * Project vector onto sphere's surface
 	 */
 	function prepare( vector ) {
 
-		var normal = vector.clone().normalize();
-		var vertex = new THREE.Vertex( normal.clone().multiplyScalar( radius ) );
+		var vertex = new THREE.Vertex( vector.normalize() );
 		vertex.index = that.vertices.push( vertex ) - 1;
 
 		// Texture coords are equivalent to map coords, calculate angle and convert to fraction of a circle.
@@ -53,7 +60,7 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 
 		if ( detail < 1 ) {
 
-			var face = new THREE.Face3( v1.index, v2.index, v3.index, [ v1.position, v2.position, v3.position ] );
+			var face = new THREE.Face3( v1.index, v2.index, v3.index, [ v1.position.clone(), v2.position.clone(), v3.position.clone() ] );
 			face.centroid.addSelf( v1.position ).addSelf( v2.position ).addSelf( v3.position ).divideScalar( 3 );
 			face.normal = face.centroid.clone().normalize();
 			that.faces.push( face );
@@ -87,7 +94,7 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 		if ( mid === undefined ) {
 			// generate mean point and project to surface with prepare()
 			midpoints[ v1.index ][ v2.index ] = midpoints[ v2.index ][ v1.index ] = mid = prepare( 
-				new THREE.Vector3().add( v1.position, v2.position ).divideScalar( 2 ) 
+				new THREE.Vector3().add( v1.position, v2.position ).divideScalar( 2 )
 			);
 		}
 		return mid;

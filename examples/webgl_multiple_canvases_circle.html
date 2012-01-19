@@ -239,7 +239,7 @@
 
 					var color, f1, p, n, vertexIndex,
 
-					geometry1 = new THREE.IcosahedronGeometry( 1 );
+					geometry1 = new THREE.IcosahedronGeometry( 200, 1 );
 
 					for ( var i = 0; i < geometry1.faces.length; i ++ ) {
 
@@ -271,9 +271,6 @@
 						new THREE.MeshBasicMaterial( { color: 0x000000, shading: THREE.FlatShading, wireframe: true } )
 
 					];
-
-					var scaleMatrix = new THREE.Matrix4().setScale( 200, 200, 200 );
-					geometry1.applyMatrix( scaleMatrix );
 
 					for ( var i = 0; i < noof_balls; i ++ ) { // create balls
 
