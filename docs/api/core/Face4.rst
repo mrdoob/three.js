@@ -1,7 +1,13 @@
 Face4 - Four-sided face
 -----------------------
 
-.. js:class:: Face4()
+.. rubric:: Constructor
+.. class:: Face4()
 
     Four-sided face
     
+.. rubric:: Attributes
+
+.. rubric:: Method
+
+.. rubric:: Example(s)

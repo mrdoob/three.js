@@ -1,7 +1,14 @@
 Face3 - Three-sided face
 ------------------------
 
-.. js:class:: Face3()
+.. rubric:: Constructor
+
+.. class:: Face3()
 
     Three-sided face
     
+.. rubric:: Attributes
+
+.. rubric:: Method
+
+.. rubric:: Example(s)

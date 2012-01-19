@@ -1,7 +1,14 @@
 Vector3 - 3D vector
 -------------------
 
-.. js:class:: Vector3()
+.. rubric:: Constructor
+
+.. class:: Vector3()
 
     3D vector
     
+.. rubric:: Attributes
+
+.. rubric:: Method
+
+.. rubric:: Example(s)

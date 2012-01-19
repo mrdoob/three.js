@@ -1,7 +1,14 @@
 UV - Represents a texture coordinate
 ------------------------------------
 
-.. js:class:: UV()
+.. rubric:: Constructor
+
+.. class:: UV()
 
     Represents a texture coordinate
     
+.. rubric:: Attributes
+
+.. rubric:: Method
+
+.. rubric:: Example(s)

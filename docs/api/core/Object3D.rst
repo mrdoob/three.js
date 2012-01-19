@@ -1,7 +1,14 @@
 Object3D - Base class for scene graph objects
 ---------------------------------------------
 
-.. js:class:: Object3D()
+.. rubric:: Constructor
+
+.. class:: Object3D()
 
     Base class for scene graph objects
     
+.. rubric:: Attributes
+
+.. rubric:: Method
+
+.. rubric:: Example(s)

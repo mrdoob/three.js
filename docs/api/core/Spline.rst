@@ -1,7 +1,14 @@
 Spline - Represents a spline
 ----------------------------
 
-.. js:class:: Spline()
+.. rubric:: Constructor
+
+.. class:: Spline()
 
     Represents a spline
-    
+   
+.. rubric:: Attributes
+
+.. rubric:: Method
+
+.. rubric:: Example(s)

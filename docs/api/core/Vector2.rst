@@ -1,7 +1,14 @@
 Vector2 - 2D vector
 -------------------
 
-.. js:class:: Vector2()
+.. rubric:: Constructor
+
+.. class:: Vector2()
 
     2D vector
     
+.. rubric:: Attributes
+
+.. rubric:: Method
+
+.. rubric:: Example(s)

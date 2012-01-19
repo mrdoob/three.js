@@ -1,7 +1,14 @@
 Matrix3 - A 3x3 matrix
 ----------------------
 
-.. js:class:: Matrix3()
+.. rubric:: Constructor
+
+.. class:: Matrix3()
 
     A 3x3 matrix
     
+.. rubric:: Attributes
+
+.. rubric:: Method
+
+.. rubric:: Example(s)

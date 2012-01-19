@@ -1,7 +1,14 @@
 CurvePath - Path with connected curves
-------------------------
+-------------------------------------------
 
-.. js:class:: CurvePath()
+.. rubric:: Constructor
+
+.. class:: CurvePath()
 
     A Path made with connected set of curves
     
+.. rubric:: Attributes
+
+.. rubric:: Method
+
+.. rubric:: Example(s)

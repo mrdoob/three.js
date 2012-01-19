@@ -16,7 +16,7 @@ Contents
     :maxdepth: 1
 
     changelog.rst
-    tutorial.rst
+    tutorials/index.rst
 
 API
 ---
