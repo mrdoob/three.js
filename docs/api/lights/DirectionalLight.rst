@@ -7,13 +7,16 @@ DirectionalLight - A directional light
 
     A directional light
 
-    Affects :class:`MeshLambertMaterial` and :class:`MeshPhongMaterial`
-
     Part of scene graph
+
+    Inherits from :class:`Light` :class:`Object3D`
+
+    Affects :class:`MeshLambertMaterial` and :class:`MeshPhongMaterial`
 
     :param integer hex: light color
     :param float intensity: light intensity
     :param float distance: distance affected by light
+
 
 .. rubric:: Attributes
 

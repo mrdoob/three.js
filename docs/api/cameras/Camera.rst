@@ -1,14 +1,33 @@
-Camera - Base class for camera types
-------------------------------------
+Camera - Abstract base class for cameras
+----------------------------------------
 
 .. rubric:: Constructor
 
 .. class:: Camera()
 
-    Base class for camera types
-    
+    Abstract base class for cameras
+
+    Inherits from :class:`Object3D`
+
+
 .. rubric:: Attributes
 
-.. rubric:: Method
+.. attribute:: Camera.matrixWorldInverse
 
-.. rubric:: Example(s)
+    :class:`Matrix4`
+
+.. attribute:: Camera.projectionMatrix
+
+    :class:`Matrix4`
+
+.. attribute:: Camera.projectionMatrixInverse
+
+    :class:`Matrix4`
+
+
+
+.. rubric:: Methods
+
+.. function:: Camera.lookAt( vector )
+
+    Orient camera to look at :class:`Vector3`

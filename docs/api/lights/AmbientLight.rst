@@ -7,9 +7,12 @@ AmbientLight - An ambient light
 
     An ambient light
 
+    Inherits from :class:`Light` :class:`Object3D`
+
     Affects :class:`MeshLambertMaterial` and :class:`MeshPhongMaterial`
 
     :param integer hex: light color
+
 
 .. rubric:: Attributes
 
@@ -18,6 +21,7 @@ AmbientLight - An ambient light
     Light :class:`Color`
 
     Material's ambient color gets multiplied by this color.
+
 
 .. rubric:: Example
 

@@ -17,6 +17,7 @@ Face4 - Quad face
     :param varying color: face color or array of vertex colors
     :param integer materialIndex: material index
 
+
 .. rubric:: Attributes
 
 .. attribute:: Face4.a
@@ -66,6 +67,7 @@ Face4 - Quad face
 .. attribute:: Face4.materialIndex
 
     Material index (points to ``geometry.materials`` array)
+
 
 .. rubric:: Example
 

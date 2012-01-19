@@ -7,9 +7,11 @@ SpotLight - A spotlight
 
     A point light that can cast shadow in one direction
 
-    Affects :class:`MeshLambertMaterial` and :class:`MeshPhongMaterial`
-
     Part of scene graph
+
+    Inherits from :class:`Light` :class:`Object3D`
+
+    Affects :class:`MeshLambertMaterial` and :class:`MeshPhongMaterial`
 
     :param integer hex: light color
     :param float intensity: light intensity

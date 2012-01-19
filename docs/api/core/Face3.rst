@@ -16,6 +16,7 @@ Face3 - Triangle face
     :param varying color: face color or array of vertex colors
     :param integer materialIndex: material index
 
+
 .. rubric:: Attributes
 
 .. attribute:: Face3.a
@@ -61,6 +62,7 @@ Face3 - Triangle face
 .. attribute:: Face3.materialIndex
 
     Material index (points to ``geometry.materials`` array)
+
 
 .. rubric:: Example
 

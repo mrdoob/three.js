@@ -7,7 +7,10 @@ Light - Abstract base class for lights
 
     Abstract base class for lights
 
+    Inherits from :class:`Object3D`
+
     :param integer hex: light color
+
 
 .. rubric:: Attributes
 
