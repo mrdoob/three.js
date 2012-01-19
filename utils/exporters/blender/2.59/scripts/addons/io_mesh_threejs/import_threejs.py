@@ -335,13 +335,13 @@ def extract_faces(data):
         type = faces[ offset ]
         offset += 1
 
-        isQuad          	= isBitSet( type, 0 )
+        isQuad              = isBitSet( type, 0 )
         hasMaterial         = isBitSet( type, 1 )
         hasFaceUv           = isBitSet( type, 2 )
         hasFaceVertexUv     = isBitSet( type, 3 )
         hasFaceNormal       = isBitSet( type, 4 )
         hasFaceVertexNormal = isBitSet( type, 5 )
-        hasFaceColor	    = isBitSet( type, 6 )
+        hasFaceColor        = isBitSet( type, 6 )
         hasFaceVertexColor  = isBitSet( type, 7 )
 
         #print("type", type, "bits", isQuad, hasMaterial, hasFaceUv, hasFaceVertexUv, hasFaceNormal, hasFaceVertexNormal, hasFaceColor, hasFaceVertexColor)
@@ -422,12 +422,12 @@ def extract_faces(data):
 
             result["faceUVs"][i].append(faceUv)
 
+            vertexUvs = []
 
             if hasFaceVertexUv:
 
                 uvLayer = data["uvs"][ i ]
 
-                vertexUvs = []
 
                 for j in range(nVertices):
 
