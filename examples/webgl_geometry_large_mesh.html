@@ -132,7 +132,7 @@
 				if ( render_gl ) {
 					try {
 
-						webglRenderer = new THREE.WebGLRenderer( { antialias: true } );
+						webglRenderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
 						webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 						webglRenderer.domElement.style.position = "relative";
 						container.appendChild( webglRenderer.domElement );

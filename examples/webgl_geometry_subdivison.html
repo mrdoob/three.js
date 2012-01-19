@@ -359,7 +359,7 @@
 
 				addStuff();
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } ); // WebGLRenderer CanvasRenderer
+				renderer = new THREE.WebGLRenderer( { antialias: true, clearColor: 0xf0f0f0 } ); // WebGLRenderer CanvasRenderer
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.appendChild( renderer.domElement );

@@ -1,68 +1,74 @@
-Face4 - Four-sided face
------------------------
+Face4 - Quad face
+------------------------
 
 .. rubric:: Constructor
 
 .. class:: Face4( a, b, c, d, normal, color, materialIndex )
 
-    Four-sided face
+    Quad face
 
-    :param ? a: //todo
-    :param ? b: //todo
-    :param ? c: //todo
-    :param ? d: //todo
-    :param Vector3 normal: //todo
-    :param Color color: //todo
-    :param ? materialIndex: //todo
+    (indices start from zero)
+
+    :param integer a: vertex index
+    :param integer b: vertex index
+    :param integer c: vertex index
+    :param integer d: vertex index
+    :param varying normal: face normal or array of vertex normals
+    :param varying color: face color or array of vertex colors
+    :param integer materialIndex: material index
 
 .. rubric:: Attributes
 
 .. attribute:: Face4.a
 
-    //todo:description
+    Vertex A index
 
 .. attribute:: Face4.b
 
-    //todo:description
+    Vertex B index
 
 .. attribute:: Face4.c
 
-    //todo:description
+    Vertex C index
 
 .. attribute:: Face4.d
 
-    //todo:description
+    Vertex D index
 
 .. attribute:: Face4.normal
 
-    //todo:description
+    Face normal
 
-.. attribute:: Face4.vertexNormals
-
-    //todo:description
+    ``default (0,0,0)``
 
 .. attribute:: Face4.color
 
-    //todo:description
+    Face color
 
-.. attribute:: Face4.vertexColors
-
-    //todo:description
-
-.. attribute:: Face4.vertexTangents
-
-    //todo:description
-
-.. attribute:: Face4.materialIndex
-
-    //todo:description
+    ``default white``
 
 .. attribute:: Face4.centroid
 
-    //todo:description
+    Face centroid
+
+.. attribute:: Face4.vertexNormals
+
+    Array of vertex normals
+
+.. attribute:: Face4.vertexColors
+
+    Array of vertex colors
+
+.. attribute:: Face4.vertexTangents
+
+    Array of vertex tangents
+
+.. attribute:: Face4.materialIndex
+
+    Material index (points to ``geometry.materials`` array)
 
 .. rubric:: Example
 
 ::
 
-//todo::example
+    var face = new THREE.Face4( 0, 1, 2, 3, new THREE.Vector3( 0, 1, 0 ), new THREE.Color( 0xffaa00 ), 0 );
