@@ -53,10 +53,13 @@ PerspectiveCamera - Camera with perspective projection
 
 .. function:: PerspectiveCamera.setLens ( focalLength, frameSize )
 
-    Uses Focal Length (in mm) to estimate and set FOV
-    35mm (fullframe) camera is used if frame size is not specified;
+    Uses focal length (in mm) to estimate and set FOV
+    35mm (fullframe) camera is used if frame size is not specified.
 
     Formula based on http://www.bobatkins.com/photography/technical/field_of_view.html
+
+    :param float focalLength: focal length
+    :param float frameSize: frame size
 
 .. function:: PerspectiveCamera.setViewOffset ( fullWidth, fullHeight, x, y, width, height )
 
@@ -95,6 +98,13 @@ PerspectiveCamera - Camera with perspective projection
         camera.setOffset( fullWidth, fullHeight, w * 2, h * 1, w, h );
 
     Note there is no reason monitors have to be the same size or in a grid.
+
+    :param float fullWidth: full width of multi-view setup
+    :param float fullHeight: full height of multi-view setup
+    :param float x: x-offset of subcamera
+    :param float y: y-offset of subcamera
+    :param float width: width of subcamera
+    :param float height: height of subcamera
 
 
 .. rubric:: Example
