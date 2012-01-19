@@ -2240,12 +2240,14 @@ THREE.ColladaLoader = function () {
 		var i = 0, j, k, p = primitive.p, inputs = primitive.inputs;
 		var input, index, idx32;
 		var source, numParams;
-		var vcIndex = 0, vcount = 3;
+		var vcIndex = 0, vcount = 3, maxOffset = 0;
 		var texture_sets = [];
 
 		for ( j = 0; j < inputs.length; j ++ ) {
 
 			input = inputs[ j ];
+			var offset = input.offset + 1;
+			maxOffset = (maxOffset < offset)? offset : maxOffset;
 
 			switch ( input.semantic ) {
 
@@ -2277,7 +2279,7 @@ THREE.ColladaLoader = function () {
 					input = inputs[ k ];
 					source = sources[ input.source ];
 
-					index = p[ i + ( j * inputs.length ) + input.offset ];
+					index = p[ i + ( j * maxOffset ) + input.offset ];
 					numParams = source.accessor.params.length;
 					idx32 = index * numParams;
 
@@ -2389,7 +2391,7 @@ THREE.ColladaLoader = function () {
 
 			}
 
-			i += inputs.length * vcount;
+			i += maxOffset * vcount;
 
 		}
 
