@@ -171,9 +171,9 @@
 
 					var color, f1, f2, f3, p, n, vertexIndex,
 
-						geometry1 = new THREE.IcosahedronGeometry( 1 ),
-						geometry2 = new THREE.IcosahedronGeometry( 1 ),
-						geometry3 = new THREE.IcosahedronGeometry( 1 );
+						geometry1 = new THREE.IcosahedronGeometry( 200, 1 ),
+						geometry2 = new THREE.IcosahedronGeometry( 200, 1 ),
+						geometry3 = new THREE.IcosahedronGeometry( 200, 1 );
 
 					for ( var i = 0; i < geometry1.faces.length; i ++ ) {
 
@@ -215,11 +215,6 @@
 						new THREE.MeshBasicMaterial( { color: 0x000000, shading: THREE.FlatShading, wireframe: true, transparent: true } )
 
 					];
-
-					var scaleMatrix = new THREE.Matrix4().setScale( 200, 200, 200 );
-					geometry1.applyMatrix( scaleMatrix );
-					geometry2.applyMatrix( scaleMatrix );
-					geometry3.applyMatrix( scaleMatrix );
 
 					group1 = THREE.SceneUtils.createMultiMaterialObject( geometry1, materials );
 					group1.position.x = -400;

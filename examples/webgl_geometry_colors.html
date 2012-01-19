@@ -95,9 +95,9 @@
 
 				var color, f, f2, f3, p, n, vertexIndex,
 
-					geometry  = new THREE.IcosahedronGeometry( 1 ),
-					geometry2 = new THREE.IcosahedronGeometry( 1 ),
-					geometry3 = new THREE.IcosahedronGeometry( 1 );
+					geometry  = new THREE.IcosahedronGeometry( 200, 1 ),
+					geometry2 = new THREE.IcosahedronGeometry( 200, 1 ),
+					geometry3 = new THREE.IcosahedronGeometry( 200, 1 );
 
 				for ( var i = 0; i < geometry.faces.length; i ++ ) {
 
@@ -143,19 +143,16 @@
 				group1 = THREE.SceneUtils.createMultiMaterialObject( geometry, materials );
 				group1.position.x = -400;
 				group1.rotation.x = -1.87;
-				group1.scale.set( 200, 200, 200 );
 				scene.add( group1 );
 
 				group2 = THREE.SceneUtils.createMultiMaterialObject( geometry2, materials );
 				group2.position.x = 400;
 				group2.rotation.x = 0;
-				group2.scale = group1.scale;
 				scene.add( group2 );
 
 				group3 = THREE.SceneUtils.createMultiMaterialObject( geometry3, materials );
 				group3.position.x = 0;
 				group3.rotation.x = 0;
-				group3.scale = group1.scale;
 				scene.add( group3 );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
