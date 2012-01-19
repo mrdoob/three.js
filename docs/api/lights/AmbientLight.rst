@@ -3,13 +3,25 @@ AmbientLight - An ambient light
 
 .. rubric:: Constructor
 
-.. class:: AmbientLight()
+.. class:: AmbientLight( hex )
 
     An ambient light
 
+    Affects :class:`MeshLambertMaterial` and :class:`MeshPhongMaterial`
+
+    :param integer hex: light color
+
 .. rubric:: Attributes
 
-.. rubric:: Method
+.. attribute:: AmbientLight.color
 
-.. rubric:: Example(s)
-    
+    Light :class:`Color`
+
+    Material's ambient color gets multiplied by this color.
+
+.. rubric:: Example
+
+::
+
+    var ambientLight = new THREE.AmbientLight( 0x333333 );
+    scene.add( ambientLight );

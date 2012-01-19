@@ -395,3 +395,12 @@ table.field-list {
 dd {
 	margin: 1em 0 0 0.25em;
 }
+
+/* cross-reference link style */
+
+tt.xref {
+	font-family: arial;
+	font-weight: normal;
+	font-size: 1em;
+	color: #005B81;
+}

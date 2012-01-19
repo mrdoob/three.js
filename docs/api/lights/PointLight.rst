@@ -3,12 +3,45 @@ PointLight - A point light
 
 .. rubric:: Constructor
 
-.. class:: PointLight()
+.. class:: PointLight( hex, intensity, distance )
 
     A point light
-    
+
+    Affects :class:`MeshLambertMaterial` and :class:`MeshPhongMaterial`
+
+    Part of scene graph
+
+    :param integer hex: light color
+    :param float intensity: light intensity
+    :param float distance: distance affected by light
+
 .. rubric:: Attributes
 
-.. rubric:: Method
+.. attribute:: PointLight.color
 
-.. rubric:: Example(s)
+    Light :class:`Color`
+
+.. attribute:: PointLight.intensity
+
+    Light intensity
+
+    ``default 1.0``
+
+.. attribute:: PointLight.position
+
+    Position of the light
+
+.. attribute:: PointLight.distance
+
+    If non-zero, light will attenuate linearly from maximum intensity at light ``position`` down to zero at ``distance``
+
+
+.. rubric:: Example
+
+::
+
+    // red point light shining from the front
+
+    var pointLight = new THREE.PointLight( 0xff0000 );
+    pointLight.position.set( 0, 0, 10 );
+    scene.add( pointLight );

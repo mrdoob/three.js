@@ -1,14 +1,16 @@
-Light - Base class for light types
-----------------------------------
+Light - Abstract base class for lights
+--------------------------------------
 
 .. rubric:: Constructor
 
-.. class:: Light()
+.. class:: Light( hex )
 
-    Base class for light types
-    
+    Abstract base class for lights
+
+    :param integer hex: light color
+
 .. rubric:: Attributes
 
-.. rubric:: Method
+.. attribute:: Light.color
 
-.. rubric:: Example(s)
+    Light :class:`Color`
