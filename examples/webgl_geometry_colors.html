@@ -95,9 +95,11 @@
 
 				var color, f, f2, f3, p, n, vertexIndex,
 
-					geometry  = new THREE.IcosahedronGeometry( 200, 1 ),
-					geometry2 = new THREE.IcosahedronGeometry( 200, 1 ),
-					geometry3 = new THREE.IcosahedronGeometry( 200, 1 );
+					radius = 200,
+
+					geometry  = new THREE.IcosahedronGeometry( radius, 1 ),
+					geometry2 = new THREE.IcosahedronGeometry( radius, 1 ),
+					geometry3 = new THREE.IcosahedronGeometry( radius, 1 );
 
 				for ( var i = 0; i < geometry.faces.length; i ++ ) {
 
@@ -114,12 +116,12 @@
 						p = geometry.vertices[ vertexIndex ].position;
 
 						color = new THREE.Color( 0xffffff );
-						color.setHSV( ( p.y + 1 ) / 2, 1.0, 1.0 );
+						color.setHSV( ( p.y / radius + 1 ) / 2, 1.0, 1.0 );
 
 						f.vertexColors[ j ] = color;
 
 						color = new THREE.Color( 0xffffff );
-						color.setHSV( 0.0, ( p.y + 1 ) / 2, 1.0 );
+						color.setHSV( 0.0, ( p.y / radius + 1 ) / 2, 1.0 );
 
 						f2.vertexColors[ j ] = color;
 
@@ -155,7 +157,7 @@
 				group3.rotation.x = 0;
 				scene.add( group3 );
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true, clearColor: 0xffffff } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.appendChild( renderer.domElement );
