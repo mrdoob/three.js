@@ -56,6 +56,8 @@ Face3 - Three-sided face
 
     //todo:description
 
-.. rubric:: Example(s)
+.. rubric:: Example
 
-    //todo
+::
+
+//todo::example
