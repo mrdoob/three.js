@@ -562,7 +562,7 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 
 		} else if ( g.type == "icosahedron" ) {
 
-			geometry = new THREE.IcosahedronGeometry( g.subdivisions );
+			geometry = new THREE.IcosahedronGeometry( g.radius, g.subdivisions );
 			result.geometries[ dg ] = geometry;
 
 		} else if ( g.type == "bin_mesh" ) {

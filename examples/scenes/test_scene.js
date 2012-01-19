@@ -60,7 +60,7 @@
 		"materials": [ "faceted_white" ],
 		"position" : [ 20, 10, -60 ],
 		"rotation" : [ 0, 0, 0 ],
-		"scale"	   : [ 20, 20, 20 ],
+		"scale"	   : [ 1, 1, 1 ],
 		"visible"  : true
 	},
 
@@ -178,6 +178,7 @@
 
 	"icosahedron": {
 		"type"    : "icosahedron",
+		"radius"  : 20,
 		"subdivisions"  : 2
 	},
 
