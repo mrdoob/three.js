@@ -1,5 +1,5 @@
 Core Extras
-============
+=============
 
 .. toctree::
     Curve

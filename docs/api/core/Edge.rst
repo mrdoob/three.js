@@ -9,13 +9,23 @@ Edge - Edge between two vertices
 
     :param ? v1: //todo
     :param ? v2: //todo
-    :param integer vi1: //todo
-    :param integer vi2: //todo
+    :param ? vi1: //todo
+    :param ? vi2: //todo
 
 .. rubric:: Attributes
-    //todo
+  
+.. attribute:: Edge.vertices
 
+    //todo:description
 
+.. attribute:: Edge.vertexIndices
 
+    //todo:description
 
-    
+.. attribute:: Edge.faces
+
+    //todo:description
+
+.. attribute:: Edge.faceIndices
+
+    //todo:description

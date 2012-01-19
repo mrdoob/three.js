@@ -1,7 +1,14 @@
 Vector4 - 4D vector
 -------------------
 
-.. js:class:: Vector4()
+.. rubric:: Constructor
+
+.. class:: Vector4()
 
     4D vector
     
+.. rubric:: Attributes
+
+.. rubric:: Method
+
+.. rubric:: Example(s)

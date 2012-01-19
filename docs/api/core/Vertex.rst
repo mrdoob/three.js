@@ -1,7 +1,14 @@
 Vertex - Represents a vertex in space
 -------------------------------------
 
-.. js:class:: Vertex()
+.. rubric:: Constructor
+
+.. class:: Vertex()
 
     Represents a vertex in space
     
+.. rubric:: Attributes
+
+.. rubric:: Method
+
+.. rubric:: Example(s)

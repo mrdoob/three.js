@@ -1,7 +1,14 @@
 Rectangle - Represents a 2D rectangle
 -------------------------------------
 
-.. js:class:: Rectangle()
+.. rubric:: Constructor
+
+.. class:: Rectangle()
 
     Represents a 2D rectangle
     
+.. rubric:: Attributes
+
+.. rubric:: Method
+
+.. rubric:: Example(s)

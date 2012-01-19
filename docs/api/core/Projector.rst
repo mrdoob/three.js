@@ -1,7 +1,14 @@
 Projector - Utilities for projecting primitives between spaces
 --------------------------------------------------------------
 
-.. js:class:: Projector()
+.. rubric:: Constructor
+
+.. class:: Projector()
 
     Utilities for projecting primitives between spaces
     
+.. rubric:: Attributes
+
+.. rubric:: Method
+
+.. rubric:: Example(s)

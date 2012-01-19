@@ -1,7 +1,15 @@
 Curve - Extensible curve object
-------------------------
+--------------------------------------
 
-.. js:class:: Curve()
+.. rubric:: Constructor
+
+.. class:: Curve()
 
     Extensible curve object
+
+.. rubric:: Attributes
+
+.. rubric:: Method
+
+.. rubric:: Example(s)
     

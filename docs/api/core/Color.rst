@@ -25,6 +25,14 @@ Color - Represents a color
 
 .. rubric:: Methods
 
+.. function:: Color.convertGammaToLinear()
+
+    Converts this color from gamma color to linear color
+
+.. function:: Color.convertLinearToGamma()
+
+    Converts this color from linear color to gamma color
+
 .. function:: Color.copy(color)
 
     Copies the given color into this color
