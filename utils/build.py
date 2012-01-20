@@ -414,10 +414,8 @@ def compress(text, fname_externs):
 
 
 def addHeader(text, endFilename):
-	with open(os.path.join('..', 'REVISION'), 'r') as handle:
-		revision = handle.read().rstrip()
 
-	return ("// %s r%s - http://github.com/mrdoob/three.js\n" % (endFilename, revision)) + text
+	return ("// %s - http://github.com/mrdoob/three.js\n" % endFilename) + text
 
 
 def makeDebug(text):

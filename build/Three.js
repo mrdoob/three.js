@@ -1,5 +1,5 @@
-// Three.js r48dev - http://github.com/mrdoob/three.js
-'use strict';var THREE=THREE||{};if(!self.Int32Array)self.Int32Array=Array,self.Float32Array=Array;
+// Three.js - http://github.com/mrdoob/three.js
+'use strict';var THREE=THREE||{VERSION:"48dev"};if(!self.Int32Array)self.Int32Array=Array,self.Float32Array=Array;
 (function(){for(var a=0,b=["ms","moz","webkit","o"],c=0;c<b.length&&!window.requestAnimationFrame;++c)window.requestAnimationFrame=window[b[c]+"RequestAnimationFrame"],window.cancelAnimationFrame=window[b[c]+"CancelAnimationFrame"]||window[b[c]+"RequestCancelAnimationFrame"];if(!window.requestAnimationFrame)window.requestAnimationFrame=function(b){var c=(new Date).getTime(),g=Math.max(0,16-(c-a)),e=window.setTimeout(function(){b(c+g)},g);a=c+g;return e};if(!window.cancelAnimationFrame)window.cancelAnimationFrame=
 function(a){clearTimeout(a)}})();THREE.Clock=function(a){this.autoStart=void 0!==a?a:!0;this.elapsedTime=this.oldTime=this.startTime=0;this.running=!1};THREE.Clock.prototype.start=function(){this.oldTime=this.startTime=Date.now();this.running=!0};THREE.Clock.prototype.stop=function(){this.getElapsedTime();this.running=!1};THREE.Clock.prototype.getElapsedTime=function(){return this.elapsedTime+=this.getDelta()};
 THREE.Clock.prototype.getDelta=function(){var a=0;this.autoStart&&!this.running&&this.start();if(this.running){var b=Date.now(),a=0.001*(b-this.oldTime);this.oldTime=b;this.elapsedTime+=a}return a};THREE.Color=function(a){void 0!==a&&this.setHex(a);return this};

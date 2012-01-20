@@ -1,4 +1,4 @@
-// ThreeExtras.js r48dev - http://github.com/mrdoob/three.js
+// ThreeExtras.js - http://github.com/mrdoob/three.js
 'use strict';THREE.ColorUtils={adjustHSV:function(a,b,c,d){var f=THREE.ColorUtils.__hsv;THREE.ColorUtils.rgbToHsv(a,f);f.h=THREE.Math.clamp(f.h+b,0,1);f.s=THREE.Math.clamp(f.s+c,0,1);f.v=THREE.Math.clamp(f.v+d,0,1);a.setHSV(f.h,f.s,f.v)},rgbToHsv:function(a,b){var c=a.r,d=a.g,f=a.b,g=Math.max(Math.max(c,d),f),e=Math.min(Math.min(c,d),f);if(e===g)e=c=0;else{var h=g-e,e=h/g,c=(c===g?(d-f)/h:d===g?2+(f-c)/h:4+(c-d)/h)/6;0>c&&(c+=1);1<c&&(c-=1)}void 0===b&&(b={h:0,s:0,v:0});b.h=c;b.s=e;b.v=g;return b}};
 THREE.ColorUtils.__hsv={h:0,s:0,v:0};
 THREE.GeometryUtils={merge:function(a,b){for(var c,d,f=a.vertices.length,g=b instanceof THREE.Mesh?b.geometry:b,e=a.vertices,h=g.vertices,i=a.faces,k=g.faces,j=a.faceVertexUvs[0],m=g.faceVertexUvs[0],p={},n=0;n<a.materials.length;n++)p[a.materials[n].id]=n;if(b instanceof THREE.Mesh)b.matrixAutoUpdate&&b.updateMatrix(),c=b.matrix,d=new THREE.Matrix4,d.extractRotation(c,b.scale);for(var n=0,l=h.length;n<l;n++){var o=new THREE.Vertex(h[n].position.clone());c&&c.multiplyVector3(o.position);e.push(o)}for(n=
