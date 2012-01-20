@@ -133,27 +133,27 @@ Geometry - Base class for geometries
 
 .. function:: Geometry.applyMatrix( matrix )
 
-    Bake matrix transform directly into vertex coordinates
+    Bakes matrix transform directly into vertex coordinates
 
     :param Matrix4 matrix: matrix transform
 
 .. function:: Geometry.computeCentroids()
 
-    Compute centroids for all faces
+    Computes centroids for all faces
 
 .. function:: Geometry.computeFaceNormals()
 
-    Compute face normals
+    Computes face normals
 
 .. function:: Geometry.computeVertexNormals()
 
-    Compute vertex normals by averaging face normals.
+    Computes vertex normals by averaging face normals.
 
     Face normals must be existing / computed beforehand.
 
 .. function:: Geometry.computeTangents()
 
-    Compute vertex tangents
+    Computes vertex tangents
 
     Based on http://www.terathon.com/code/tangent.html
 
@@ -161,11 +161,11 @@ Geometry - Base class for geometries
 
 .. function:: Geometry.computeBoundingBox()
 
-    Compute bounding box of the geometry, updating :attr:`Geometry.boundingBox` attribute.
+    Computes bounding box of the geometry, updating :attr:`Geometry.boundingBox` attribute.
 
 .. function:: Geometry.computeBoundingSphere()
 
-    Compute bounding sphere of the geometry, updating :attr:`Geometry.boundingSphere` attribute.
+    Computes bounding sphere of the geometry, updating :attr:`Geometry.boundingSphere` attribute.
 
 .. function:: Geometry.mergeVertices()
 

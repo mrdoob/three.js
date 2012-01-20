@@ -44,17 +44,17 @@ Math - Math utility functions
     :returns: Random float from <0, 1> with 16 bits of randomness
     :rtype: float
 
-.. function:: Math.randInt(low, high)
+.. function:: Math.randInt( low, high )
 
     :returns: Random integer from *low* to *high* interval
     :rtype: integer
 
-.. function:: Math.randFloat(low, high)
+.. function:: Math.randFloat( low, high )
 
     :returns: Random float from *low* to *high* interval
     :rtype: float
 
-.. function:: Math.randFloatSpread(range)
+.. function:: Math.randFloatSpread( range )
 
     :returns: Random float from -range/2 to range/2 interval
     :rtype: float

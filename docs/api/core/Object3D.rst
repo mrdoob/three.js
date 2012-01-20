@@ -175,50 +175,50 @@ Object3D - Base class for scene graph objects
 
 .. function:: Object3D.translate ( distance, axis )
 
-    Translate object along arbitrary axis by distance
+    Translates object along arbitrary axis by distance
 
     :param float distance: distance
     :param Vector3 axis: translation direction
 
 .. function:: Object3D.translateX ( distance )
 
-    Translate object along X-axis by distance
+    Translates object along X-axis by distance
 
     :param float distance: distance
 
 .. function:: Object3D.translateY ( distance )
 
-    Translate object along Y-axis by distance
+    Translates object along Y-axis by distance
 
     :param float distance: distance
 
 .. function:: Object3D.translateZ ( distance )
 
-    Translate object along Z-axis by distance
+    Translates object along Z-axis by distance
 
     :param float distance: distance
 
 .. function:: Object3D.lookAt ( vector )
 
-    Rotate object to face point in space
+    Rotates object to face point in space
 
     :param Vector3 vector: vector
 
 .. function:: Object3D.add ( object )
 
-    Add child object to this object
+    Adds child object to this object
 
     :param Object3D object: child
 
 .. function:: Object3D.remove ( object )
 
-    Remove child object from this object
+    Removes child object from this object
 
     :param Object3D object: child
 
 .. function:: Object3D.getChildByName ( name, doRecurse )
 
-    Get first child with name matching the argument, search whole subgraph recursively if flag is set.
+    Gets first child with name matching the argument (searches whole subgraph recursively if flag is set).
 
     :param string name: child name
     :param boolean doRecurse: recurse flag
@@ -227,11 +227,11 @@ Object3D - Base class for scene graph objects
 
 .. function:: Object3D.updateMatrix ( )
 
-    Update local transform
+    Updates local transform
 
 .. function:: Object3D.updateMatrixWorld ( force )
 
-    Update global transform of the object and its children
+    Updates global transform of the object and its children
 
 
 .. ...............................................................................

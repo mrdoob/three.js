@@ -57,7 +57,7 @@ PerspectiveCamera - Camera with perspective projection
 
 .. function:: PerspectiveCamera.updateProjectionMatrix()
 
-    Updated camera's projection matrix. Must be called after change of parameters.
+    Updates camera's projection matrix. Must be called after change of parameters.
 
 .. function:: PerspectiveCamera.setLens ( focalLength, frameSize )
 

@@ -158,6 +158,12 @@ THREE.Vector2.prototype = {
 
 		return ( ( v.x === this.x ) && ( v.y === this.y ) );
 
+	},
+
+	isZero: function () {
+
+		return ( this.lengthSq() < 0.0001 /* almostZero */ );
+
 	}
 
 };
