@@ -35,34 +35,43 @@ Face3 - Triangle face
 
     Face normal
 
-    ``default (0,0,0)``
+    :class:`Vector3` - default ``(0,0,0)``
 
 .. attribute:: Face3.color
 
     Face color
 
-    ``default white``
+    :class:`Color` - default ``white``
 
 .. attribute:: Face3.centroid
 
     Face centroid
 
+    :class:`Vector3` - default ``(0,0,0)``
+
 .. attribute:: Face3.vertexNormals
 
-    Array of vertex normals
+    Array of 3 vertex normals
+
+    default ``[]``
 
 .. attribute:: Face3.vertexColors
 
-    Array of vertex colors
+    Array of 3 vertex colors
+
+    default ``[]``
 
 .. attribute:: Face3.vertexTangents
 
-    Array of vertex tangents
+    Array of 3 vertex tangents
+
+    default ``[]``
 
 .. attribute:: Face3.materialIndex
 
-    Material index (points to ``geometry.materials`` array)
+    Material index (points to :attr:`Geometry.materials` array)
 
+    default ``0``
 
 .. rubric:: Example
 

@@ -40,33 +40,41 @@ Face4 - Quad face
 
     Face normal
 
-    ``default (0,0,0)``
+    :class:`Vector3` - default ``(0,0,0)``
 
 .. attribute:: Face4.color
 
     Face color
 
-    ``default white``
+    :class:`Color` - default ``white``
 
 .. attribute:: Face4.centroid
 
-    Face centroid
+    :class:`Vector3` - default ``(0,0,0)``
 
 .. attribute:: Face4.vertexNormals
 
-    Array of vertex normals
+    Array of 4 vertex normals
+
+    default ``[]``
 
 .. attribute:: Face4.vertexColors
 
-    Array of vertex colors
+    Array of 4 vertex colors
+
+    default ``[]``
 
 .. attribute:: Face4.vertexTangents
 
-    Array of vertex tangents
+    Array of 4 vertex tangents
+
+    default ``[]``
 
 .. attribute:: Face4.materialIndex
 
-    Material index (points to ``geometry.materials`` array)
+    Material index (points to :attr:`Geometry.materials` array)
+
+    default ``0``
 
 
 .. rubric:: Example
