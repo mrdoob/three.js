@@ -1,7 +1,9 @@
 PointLight - A point light
 --------------------------
 
+.. ...............................................................................
 .. rubric:: Constructor
+.. ...............................................................................
 
 .. class:: PointLight( hex, intensity, distance )
 
@@ -18,7 +20,9 @@ PointLight - A point light
     :param float distance: distance affected by light
 
 
+.. ...............................................................................
 .. rubric:: Attributes
+.. ...............................................................................
 
 .. attribute:: PointLight.color
 
@@ -39,7 +43,9 @@ PointLight - A point light
     If non-zero, light will attenuate linearly from maximum intensity at light ``position`` down to zero at ``distance``
 
 
+.. ...............................................................................
 .. rubric:: Example
+.. ...............................................................................
 
 ::
 

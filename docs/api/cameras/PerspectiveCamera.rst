@@ -1,7 +1,9 @@
 PerspectiveCamera - Camera with perspective projection
 ---------------------------------------------------------
 
+.. ...............................................................................
 .. rubric:: Constructor
+.. ...............................................................................
 
 .. class:: PerspectiveCamera( fov, aspect, near, far )
 
@@ -12,12 +14,14 @@ PerspectiveCamera - Camera with perspective projection
     Inherits from :class:`Object3D` :class:`Camera`
 
     :param float fov: field of view
-    :param float aspect: aspect
+    :param float aspect: aspect ratio
     :param float near: near
     :param float far: far
 
 
+.. ...............................................................................
 .. rubric:: Attributes
+.. ...............................................................................
 
 .. attribute:: PerspectiveCamera.fov
 
@@ -25,7 +29,7 @@ PerspectiveCamera - Camera with perspective projection
 
 .. attribute:: PerspectiveCamera.aspect
 
-    Camera frustum aspect
+    Camera frustum aspect ratio
 
 .. attribute:: PerspectiveCamera.near
 
@@ -35,7 +39,9 @@ PerspectiveCamera - Camera with perspective projection
 
     Camera frustum far plane
 
+.. ...............................................................................
 .. rubric:: Multi-view attributes
+.. ...............................................................................
 
 .. attribute:: PerspectiveCamera.fullWidth
 .. attribute:: PerspectiveCamera.fullHeight
@@ -45,7 +51,9 @@ PerspectiveCamera - Camera with perspective projection
 .. attribute:: PerspectiveCamera.height
 
 
+.. ...............................................................................
 .. rubric:: Methods
+.. ...............................................................................
 
 .. function:: PerspectiveCamera.updateProjectionMatrix()
 
@@ -107,7 +115,9 @@ PerspectiveCamera - Camera with perspective projection
     :param float height: height of subcamera
 
 
+.. ...............................................................................
 .. rubric:: Example
+.. ...............................................................................
 
 ::
 

@@ -1,7 +1,9 @@
 Geometry - Base class for geometries
 ----------------------------------------
 
+.. ...............................................................................
 .. rubric:: Constructor
+.. ...............................................................................
 
 .. class:: Geometry()
 
@@ -10,7 +12,9 @@ Geometry - Base class for geometries
     Encapsulates unique instances of vertex buffer objects in :class:`WebGLRenderer`
 
 
+.. ...............................................................................
 .. rubric:: Attributes
+.. ...............................................................................
 
 .. attribute:: Geometry.id
 
@@ -41,7 +45,9 @@ Geometry - Base class for geometries
     Face indices index into this array.
 
 
+.. ...............................................................................
 .. rubric:: Attribute buffers
+.. ...............................................................................
 
 .. attribute:: Geometry.faces
 
@@ -102,7 +108,9 @@ Geometry - Base class for geometries
     Array of skinning indices (:class:`Vector4`), matching number and order of vertices.
 
 
+.. ...............................................................................
 .. rubric:: Flags
+.. ...............................................................................
 
 .. attribute:: Geometry.hasTangents
 
@@ -119,7 +127,9 @@ Geometry - Base class for geometries
     ``default false``
 
 
+.. ...............................................................................
 .. rubric:: Methods
+.. ...............................................................................
 
 .. function:: Geometry.applyMatrix( matrix )
 
@@ -162,7 +172,9 @@ Geometry - Base class for geometries
     Checks for duplicate vertices using hashmap.
     Duplicated vertices are removed and faces' vertices are updated.
 
+.. ...............................................................................
 .. rubric:: Example
+.. ...............................................................................
 
 ::
 

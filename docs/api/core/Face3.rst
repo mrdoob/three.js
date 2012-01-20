@@ -1,7 +1,9 @@
 Face3 - Triangle face
 ------------------------
 
+.. ...............................................................................
 .. rubric:: Constructor
+.. ...............................................................................
 
 .. class:: Face3( a, b, c, normal, color, materialIndex )
 
@@ -17,7 +19,9 @@ Face3 - Triangle face
     :param integer materialIndex: material index
 
 
+.. ...............................................................................
 .. rubric:: Attributes
+.. ...............................................................................
 
 .. attribute:: Face3.a
 
@@ -35,7 +39,7 @@ Face3 - Triangle face
 
     Face normal
 
-    :class:`Vector3` - default ``(0,0,0)``
+    :class:`Vector3` - default ``( 0, 0, 0 )``
 
 .. attribute:: Face3.color
 
@@ -47,7 +51,7 @@ Face3 - Triangle face
 
     Face centroid
 
-    :class:`Vector3` - default ``(0,0,0)``
+    :class:`Vector3` - default ``( 0, 0, 0 )``
 
 .. attribute:: Face3.vertexNormals
 
@@ -73,7 +77,9 @@ Face3 - Triangle face
 
     default ``0``
 
+.. ...............................................................................
 .. rubric:: Example
+.. ...............................................................................
 
 ::
 

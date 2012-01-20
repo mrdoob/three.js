@@ -1,7 +1,9 @@
 DirectionalLight - A directional light
 --------------------------------------
 
+.. ...............................................................................
 .. rubric:: Constructor
+.. ...............................................................................
 
 .. class:: DirectionalLight( hex, intensity, distance )
 
@@ -18,7 +20,9 @@ DirectionalLight - A directional light
     :param float distance: distance affected by light
 
 
+.. ...............................................................................
 .. rubric:: Attributes
+.. ...............................................................................
 
 .. attribute:: DirectionalLight.color
 
@@ -39,7 +43,9 @@ DirectionalLight - A directional light
     Modulating directional light by distance not implemented in :class:`WebGLRenderer`
 
 
+.. ...............................................................................
 .. rubric:: Shadow attributes
+.. ...............................................................................
 
 .. attribute:: DirectionalLight.castShadow
 
@@ -126,7 +132,9 @@ DirectionalLight - A directional light
     ``default 512``
 
 
+.. ...............................................................................
 .. rubric:: Example
+.. ...............................................................................
 
 ::
 

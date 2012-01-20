@@ -1,13 +1,17 @@
 Matrix4 - A 4x4 Matrix
 ----------------------
 
+.. ...............................................................................
 .. rubric:: Constructor
+.. ...............................................................................
 
-.. class:: Matrix4([ n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43,n44] )
+.. class:: Matrix4( [ n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43,n44 ] )
 
     A 4x4 Matrix
-    
+
+.. ...............................................................................
 .. rubric:: Attributes
+.. ...............................................................................
 
 .. attribute:: Matrix4.n11
 .. attribute:: Matrix4.n12
@@ -27,10 +31,12 @@ Matrix4 - A 4x4 Matrix
 .. attribute:: Matrix4.n44
 
 
+.. ...............................................................................
 .. rubric:: Methods
+.. ...............................................................................
 
 .. function:: Matrix4.set(n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43,n44)
-    
+
     Sets all fields of this matrix
 
 .. function:: Matrix4.identity()
@@ -50,7 +56,7 @@ Matrix4 - A 4x4 Matrix
     :param Vector3 eye: //todo
     :param Vector3 center: //todo
     :param Vector3 up: //todo
-    
+
 .. function:: Matrix4.multiply(a,b)
 
     //todo:description
@@ -65,15 +71,15 @@ Matrix4 - A 4x4 Matrix
     :param Matrix4 a: //todo
 
 .. function:: Matrix4.multiplyToArray(a,b,r)
-     
+
     //todo:description
-    
+
     :param Matrix4 a: //todo
     :param Matrix4 b: //todo
     :param array r: //todo
 
 .. function:: Matrix4.multiplyScalar(s)
-    
+
     //todo:description
 
     :param float  a: //todo
@@ -95,7 +101,7 @@ Matrix4 - A 4x4 Matrix
 .. function:: Matrix4.rotateAxis(v)
 
     //todo:description
-    
+
     :param Vector3 v: //todo
 
 .. function:: Matrix4.crossVector(a)
@@ -115,7 +121,7 @@ Matrix4 - A 4x4 Matrix
 .. function:: Matrix4.clone()
 
     Clones this matrix
-    
+
     :returns: New instance of this matrix
     :rtype: Matrix4
 
@@ -129,7 +135,7 @@ Matrix4 - A 4x4 Matrix
 
     :param array flat: //todo
     :rtype: array
-     
+
 .. function:: Matrix4.flattenToArrayOffset(flat,offset)
 
     //todo:description
@@ -202,13 +208,13 @@ Matrix4 - A 4x4 Matrix
 
     //todo:description
 
-    :param Matrix4 m: //todo   
+    :param Matrix4 m: //todo
 
 .. function:: Matrix4.setRotationFromEuler(v,order)
 
     //todo:description
 
-    :param Vector3 v: Vector3 with all the rotations  
+    :param Vector3 v: Vector3 with all the rotations
     :param string order: The order of rotations eg. 'XYZ'
 
 .. function:: Matrix4.setRotationFromQuaternion(q)
@@ -226,15 +232,15 @@ Matrix4 - A 4x4 Matrix
 .. function:: Matrix4.compose(translation, rotation, scale)
 
     //todo:description
-    
+
     :param Vector3 translation: //todo
     :param Quaternion rotation: //todo
     :param Vector3 scale: //todo
 
 .. function:: Matrix4.decompose(translation, rotation, scale)
-    
+
     //todo:description
-    
+
     :param Vector3 translation: //todo
     :param Quaternion rotation: //todo
     :param Vector3 scale: //todo
@@ -242,38 +248,38 @@ Matrix4 - A 4x4 Matrix
     :rtype: //todo
 
 .. function:: Matrix4.extractPosition(m)
-    
+
     //todo:description
 
     :param Matrix4 m:
 
 .. function:: Matrix4.extractRotation(m)
-  
+
     //todo:description
 
     :param Matrix4 m:
 
 .. function:: Matrix4.rotateByAxis(axis,angle)
-    
+
     //todo:description
 
     :param Vector3 axis: //todo:description
     :param float angle: //todo:description
 
 .. function:: Matrix4.rotateX(angle)
-    
+
     //todo:description
 
     :param float angle: //todo:description
 
 .. function:: Matrix4.rotateY(angle)
-    
+
     //todo:description
 
     :param float angle: //todo:description
 
 .. function:: Matrix4.rotateZ(angle)
-    
+
     //todo:description
 
     :param float angle: //todo:description
@@ -311,7 +317,9 @@ Matrix4 - A 4x4 Matrix
     :returns: //todo
     :rtype: Matrix4
 
-.. rubric:: Example(s)
+.. ...............................................................................
+.. rubric:: Example
+.. ...............................................................................
 
 ::
 

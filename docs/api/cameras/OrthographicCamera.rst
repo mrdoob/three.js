@@ -1,7 +1,9 @@
 OrthographicCamera - Camera with orthographic projection
 ------------------------------------------------------------
 
+.. ...............................................................................
 .. rubric:: Constructor
+.. ...............................................................................
 
 .. class:: OrthographicCamera( left, right, top, bottom, near, far )
 
@@ -19,7 +21,9 @@ OrthographicCamera - Camera with orthographic projection
     :param float far: far
 
 
+.. ...............................................................................
 .. rubric:: Attributes
+.. ...............................................................................
 
 .. attribute:: OrthographicCamera.left
 
@@ -46,14 +50,18 @@ OrthographicCamera - Camera with orthographic projection
     Camera frustum far plane
 
 
+.. ...............................................................................
 .. rubric:: Method
+.. ...............................................................................
 
 .. function:: OrthographicCamera.updateProjectionMatrix()
 
     Updated camera's projection matrix. Must be called after change of parameters.
 
 
+.. ...............................................................................
 .. rubric:: Example
+.. ...............................................................................
 
 ::
 
