@@ -56,7 +56,7 @@ OrthographicCamera - Camera with orthographic projection
 
 .. function:: OrthographicCamera.updateProjectionMatrix()
 
-    Updated camera's projection matrix. Must be called after change of parameters.
+    Updates camera's projection matrix. Must be called after change of parameters.
 
 
 .. ...............................................................................
