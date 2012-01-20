@@ -160,6 +160,13 @@ Vector2 - 2D vector
     :returns: true if this vector equals ``v``
     :rtype: boolean
 
+.. function:: Vector2.isZero( )
+
+    Checks if length of this vector is within small epsilon (``0.0001``)
+
+    :returns: true if this vector is zero
+    :rtype: boolean
+
 .. ...............................................................................
 .. rubric:: Example
 .. ...............................................................................
