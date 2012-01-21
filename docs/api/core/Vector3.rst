@@ -18,8 +18,16 @@ Vector3 - 3D vector
 .. ...............................................................................
 
 .. attribute:: Vector3.x
+
+    float - default ``0``
+
 .. attribute:: Vector3.y
+
+    float - default ``0``
+
 .. attribute:: Vector3.z
+
+    float - default ``0``
 
 .. ...............................................................................
 .. rubric:: Methods
@@ -112,7 +120,7 @@ Vector3 - 3D vector
 
     :param float s: scalar
     :returns: This vector
-    :rtype: :class:`Vector2`
+    :rtype: :class:`Vector3`
 
 .. function:: Vector3.divideScalar( s )
 
