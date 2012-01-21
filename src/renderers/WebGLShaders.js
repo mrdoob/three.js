@@ -177,6 +177,16 @@ THREE.ShaderChunk = {
 
 	].join("\n"),
 
+	map_alpha_pars_fragment: [
+
+		"#ifdef USE_MAP_ALPHA",
+
+			"uniform sampler2D mapAlpha;",
+
+		"#endif"
+
+	].join("\n"),
+
 	map_vertex: [
 
 		"#ifdef USE_MAP",
@@ -203,6 +213,18 @@ THREE.ShaderChunk = {
 				"gl_FragColor = gl_FragColor * texture2D( map, vUv );",
 
 			"#endif",
+
+		"#endif"
+
+	].join("\n"),
+
+
+	map_alpha_fragment: [
+
+		"#ifdef USE_MAP_ALPHA",
+
+			"vec4 mask = texture2D( mapAlpha, vUv );",
+			"gl_FragColor = vec4(gl_FragColor.rgb, mask.r);",
 
 		"#endif"
 
@@ -1020,11 +1042,12 @@ THREE.UniformsLib = {
 		"opacity" : { type: "f", value: 1.0 },
 
 		"map" : { type: "t", value: 0, texture: null },
+		"mapAlpha" : { type: "ta", value: 1, texture: null },
 		"offsetRepeat" : { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) },
 
-		"lightMap" : { type: "t", value: 2, texture: null },
+		"lightMap" : { type: "t", value: 3, texture: null },
 
-		"envMap" : { type: "t", value: 1, texture: null },
+		"envMap" : { type: "t", value: 2, texture: null },
 		"flipEnvMap" : { type: "f", value: -1 },
 		"useRefract" : { type: "i", value: 0 },
 		"reflectivity" : { type: "f", value: 1.0 },
@@ -1206,6 +1229,7 @@ THREE.ShaderLib = {
 
 			THREE.ShaderChunk[ "color_pars_fragment" ],
 			THREE.ShaderChunk[ "map_pars_fragment" ],
+			THREE.ShaderChunk[ "map_alpha_pars_fragment" ],
 			THREE.ShaderChunk[ "lightmap_pars_fragment" ],
 			THREE.ShaderChunk[ "envmap_pars_fragment" ],
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
@@ -1216,6 +1240,7 @@ THREE.ShaderLib = {
 				"gl_FragColor = vec4( diffuse, opacity );",
 
 				THREE.ShaderChunk[ "map_fragment" ],
+				THREE.ShaderChunk[ "map_alpha_fragment" ],
 				THREE.ShaderChunk[ "alphatest_fragment" ],
 				THREE.ShaderChunk[ "lightmap_fragment" ],
 				THREE.ShaderChunk[ "color_fragment" ],
