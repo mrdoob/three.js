@@ -5,7 +5,7 @@ Matrix4 - A 4x4 Matrix
 .. rubric:: Constructor
 .. ...............................................................................
 
-.. class:: Matrix4( [ n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43,n44 ] )
+.. class:: Matrix4( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43, n44  )
 
     A 4x4 Matrix
 
@@ -35,287 +35,420 @@ Matrix4 - A 4x4 Matrix
 .. rubric:: Methods
 .. ...............................................................................
 
-.. function:: Matrix4.set(n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43,n44)
-
-    Sets all fields of this matrix
-
-.. function:: Matrix4.identity()
-
-    //todo:description
-
-.. function:: Matrix4.copy(m)
-
-    Copies a matrix into this matrix
-
-    :param Matrix4 m: Matrix to be copied
-
-.. function:: Matrix4.lookAt(eye,center,up)
-
-    //todo:description
-
-    :param Vector3 eye: //todo
-    :param Vector3 center: //todo
-    :param Vector3 up: //todo
-
-.. function:: Matrix4.multiply(a,b)
-
-    //todo:description
-
-    :param Matrix4 a: //todo
-    :param Matrix4 b: //todo
-
-.. function:: Matrix4.multiplySelf(a)
-
-    //todo:description
-
-    :param Matrix4 a: //todo
-
-.. function:: Matrix4.multiplyToArray(a,b,r)
-
-    //todo:description
-
-    :param Matrix4 a: //todo
-    :param Matrix4 b: //todo
-    :param array r: //todo
-
-.. function:: Matrix4.multiplyScalar(s)
-
-    //todo:description
-
-    :param float  a: //todo
-
-.. function:: Matrix4.multiplyVector3(v)
-
-    Applys this matrix to a :class:`Vector3`
-
-    :param Vector3 v: //todo
-    :rtype: Vector3
-
-.. function:: Matrix4.multiplyVector4(v)
-
-    Applys this matrix to a :class:`Vector4`
-
-    :param Vector4 v: //todo
-    :rtype: Vector4
-
-.. function:: Matrix4.rotateAxis(v)
-
-    //todo:description
-
-    :param Vector3 v: //todo
-
-.. function:: Matrix4.crossVector(a)
-
-    //todo:description
-
-    :param Vector4 a: //todo
-
-.. function:: Matrix4.determinant()
-
-    //todo:description
-
-.. function:: Matrix4.transpose()
-
-    //todo:description
-
-.. function:: Matrix4.clone()
+.. function:: Matrix4.clone( )
 
     Clones this matrix
 
-    :returns: New instance of this matrix
-    :rtype: Matrix4
+    :returns: New instance identical to this matrix
+    :rtype: :class:`Matrix4`
+
+.. function:: Matrix4.set( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43, n44 )
+
+    Sets all fields of this matrix
+
+    :returns: This matrix
+    :rtype: :class:`Matrix4`
+
+.. function:: Matrix4.identity()
+
+    Resets this matrix to identity
+
+    :returns: This matrix
+    :rtype: :class:`Matrix4`
+
+.. function:: Matrix4.copy( m )
+
+    Copies a matrix ``m`` into this matrix
+
+    :param Matrix4 m: Matrix to be copied
+    :returns: This matrix
+    :rtype: :class:`Matrix4`
+
+.. function:: Matrix4.lookAt( eye, center, up )
+
+    Constructs rotation matrix, looking from ``eye`` towards ``center`` with defined ``up`` vector
+
+    :param Vector3 eye: vector
+    :param Vector3 center: vector
+    :param Vector3 up: vector
+    :returns: This matrix
+    :rtype: :class:`Matrix4`
+
+.. function:: Matrix4.multiply( a, b )
+
+    Sets this matrix to ``a * b``
+
+    :param Matrix4 a: source matrix A
+    :param Matrix4 b: source matrix B
+    :returns: This matrix
+    :rtype: :class:`Matrix4`
+
+.. function:: Matrix4.multiplyToArray( a, b, r )
+
+    Sets this matrix to ``a * b`` and sets result into flat array ``r``
+
+    Destination array can be regular JS array or Typed Array
+
+    :param Matrix4 a: source matrix A
+    :param Matrix4 b: source matrix B
+    :param array r: destination array
+    :returns: This matrix
+    :rtype: :class:`Matrix4`
+
+.. function:: Matrix4.multiplySelf( a )
+
+    Multiplies this matrix by ``a``
+
+    :param Matrix4 a: matrix
+    :returns: This matrix
+    :rtype: :class:`Matrix4`
+
+.. function:: Matrix4.multiplyScalar( s )
+
+    Multiplies this matrix by ``s``
+
+    :param float  a: number
+    :returns: This matrix
+    :rtype: :class:`Matrix4`
+
+.. function:: Matrix4.multiplyVector3( v )
+
+    Applies this matrix to a :class:`Vector3`
+
+    :param Vector3 v: vector
+    :returns: Multiplied vector
+    :rtype: :class:`Vector3`
+
+.. function:: Matrix4.multiplyVector4( v )
+
+    Applies this matrix to a :class:`Vector4`
+
+    :param Vector4 v: vector
+    :returns: Multiplied vector
+    :rtype: :class:`Vector4`
+
+.. function:: Matrix4.rotateAxis( v )
+
+    Applies rotation submatrix of this matrix to vector ``v`` and then normalizes it
+
+    :param Vector3 v: vector
+    :returns: Rotated vector
+    :rtype: :class:`Vector3`
+
+.. function:: Matrix4.crossVector( a )
+
+    //todo:description
+
+    :param Vector4 a: vector
+    :rtype: :class:`Vector4`
+
+.. function:: Matrix4.determinant()
+
+    Computes determinant of this matrix
+
+    Based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
+
+    :returns: Determinant
+    :rtype: float
+
+.. function:: Matrix4.transpose()
+
+    Transposes this matrix
+
+    :returns: This matrix
+    :rtype: :class:`Matrix4`
 
 .. function:: Matrix4.flatten()
 
-    //todo:description
+    Flattens this matrix into internal :attr:`Matrix4.flat` array
 
-.. function:: Matrix4.flattenToArray(flat)
-
-    //todo:description
-
-    :param array flat: //todo
+    :returns: Flat array with this matrix values
     :rtype: array
 
-.. function:: Matrix4.flattenToArrayOffset(flat,offset)
+.. function:: Matrix4.flattenToArray( flat )
 
-    //todo:description
+    Flattens this matrix into supplied ``flat`` array
 
-    :param array flat: //todo
-    :param integer offset: //todo
+    :param array flat: array
+    :returns: Flat array with this matrix values
     :rtype: array
 
-.. function:: Matrix4.setTranslation(x,y,z)
+.. function:: Matrix4.flattenToArrayOffset( flat, offset )
 
-    //todo:description
+    Flattens this matrix into supplied ``flat`` array starting from ``offset`` position in the array
 
-    :param float x: //todo
-    :param float y: //todo
-    :param float z: //todo
+    :param array flat: array
+    :param integer offset: offset
+    :returns: Flat array with this matrix values
+    :rtype: array
 
-.. function:: Matrix4.setScale(x,y,z)
+.. function:: Matrix4.setTranslation( x, y, z )
 
-    //todo:description
+    Sets this matrix as translation transform
 
-    :param float x: //todo
-    :param float y: //todo
-    :param float z: //todo
+    :param float x: x-translation
+    :param float y: y-translation
+    :param float z: z-translation
+    :returns: This matrix
+    :rtype: :class:`Matrix4`
 
-.. function:: Matrix4.setRotationX(theta)
+.. function:: Matrix4.setScale( x, y, z )
 
-    //todo:description
+    Sets this matrix as scale transform
+
+    :param float x: x-scale
+    :param float y: y-scale
+    :param float z: z-scale
+    :returns: This matrix
+    :rtype: :class:`Matrix4`
+
+.. function:: Matrix4.setRotationX( theta )
+
+    Sets this matrix as rotation transform around x-axis by ``theta`` radians
+
     :param float theta: Rotation angle in radians
+    :returns: This matrix
+    :rtype: :class:`Matrix4`
 
-.. function:: Matrix4.setRotationY(theta)
+.. function:: Matrix4.setRotationY( theta )
 
-    //todo:description
+    Sets this matrix as rotation transform around y-axis by ``theta`` radians
+
     :param float theta: Rotation angle in radians
+    :returns: This matrix
+    :rtype: :class:`Matrix4`
 
-.. function:: Matrix4.setRotationZ(theta)
+.. function:: Matrix4.setRotationZ( theta )
 
-    //todo:description
+    Sets this matrix as rotation transform around z-axis by ``theta`` radians
+
     :param float theta: Rotation angle in radians
+    :returns: This matrix
+    :rtype: :class:`Matrix4`
 
-.. function:: Matrix4.setRotationAxis(axis,angle)
+.. function:: Matrix4.setRotationAxis( axis, angle )
 
-    //todo:description
+    Sets this matrix as rotation transform around ``axis`` by ``angle`` radians
 
-    :param Vector3 axis: //todo:description
-    :param float angle: //todo:description
+    Based on http://www.gamedev.net/reference/articles/article1199.asp
 
-.. function:: Matrix4.setPosition(v)
+    :param Vector3 axis: Rotation axis
+    :param float angle: Rotation angle in radians
+    :returns: This matrix
+    :rtype: :class:`Matrix4`
 
-    //todo:description
+.. function:: Matrix4.setPosition( v )
 
-    :param Vector3 v: //todo
+    Sets just position component for this matrix from vector ``v``
+
+    :param Vector3 v: position vector
+    :returns: This matrix
+    :rtype: :class:`Matrix4`
 
 .. function:: Matrix4.getPosition()
 
-    //todo:description
+    Returns position component from this matrix
+
+    Note: this method returns a reference to internal class vector, make copy or clone if you don't use it right away.
+
+    :returns: Vector with position
+    :rtype: :class:`Vector3`
 
 .. function:: Matrix4.getColumnX()
 
-    //todo:description
+    Returns x-column component from this matrix
+
+    Note: this method returns a reference to internal class vector, make copy or clone if you don't use it right away.
+
+    :returns: Vector with x-column
+    :rtype: :class:`Vector3`
 
 .. function:: Matrix4.getColumnY()
 
-    //todo:description
+    Returns y-column component from this matrix
+
+    Note: this method returns a reference to internal class vector, make copy or clone if you don't use it right away.
+
+    :returns: Vector with y-column
+    :rtype: :class:`Vector3`
 
 .. function:: Matrix4.getColumnZ()
 
-    //todo:description
+    Returns z-column component from this matrix
 
-.. function:: Matrix4.getInverse(m)
+    Note: this method returns a reference to internal class vector, make copy or clone if you don't use it right away.
 
-    //todo:description
+    :returns: Vector with z-column
+    :rtype: :class:`Vector3`
 
-    :param Matrix4 m: //todo
+.. function:: Matrix4.getInverse( m )
 
-.. function:: Matrix4.setRotationFromEuler(v,order)
+    Sets this matrix to inverse of matrix ``m``
 
-    //todo:description
+    Based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
+
+    :param Matrix4 m: source matrix
+    :returns: This matrix
+    :rtype: :class:`Matrix4`
+
+.. function:: Matrix4.setRotationFromEuler( v, order )
+
+    Sets rotation submatrix of this matrix to rotation specified by Euler angles
+
+    Default order ``XYZ``
 
     :param Vector3 v: Vector3 with all the rotations
     :param string order: The order of rotations eg. 'XYZ'
+    :returns: This matrix
+    :rtype: :class:`Matrix4`
 
-.. function:: Matrix4.setRotationFromQuaternion(q)
+.. function:: Matrix4.setRotationFromQuaternion( q )
 
-    //todo:description
+    Sets rotation submatrix of this matrix to rotation specified by quaternion
 
-    :param Quaternion q: //todo
+    :param Quaternion q: rotation
+    :returns: This matrix
+    :rtype: :class:`Matrix4`
 
-.. function:: Matrix4.scale(v)
+.. function:: Matrix4.scale( v )
 
-    //todo:description
+    Multiplies columns of this matrix by vector ``v``
 
-    :param Vector3 v: //todo
+    :param Vector3 v: scale vector
+    :returns: This matrix
+    :rtype: :class:`Matrix4`
 
-.. function:: Matrix4.compose(translation, rotation, scale)
+.. function:: Matrix4.compose( translation, rotation, scale )
 
-    //todo:description
+    Sets this matrix to transform composed of ``translation``, ``rotation`` and ``scale``
 
-    :param Vector3 translation: //todo
-    :param Quaternion rotation: //todo
-    :param Vector3 scale: //todo
+    :param Vector3 translation: vector
+    :param Quaternion rotation: quaternion
+    :param Vector3 scale: vector
+    :returns: This matrix
+    :rtype: :class:`Matrix4`
 
-.. function:: Matrix4.decompose(translation, rotation, scale)
+.. function:: Matrix4.decompose( translation, rotation, scale )
 
-    //todo:description
+    Decomposes this matrix into `translation``, ``rotation`` and ``scale`` components
 
-    :param Vector3 translation: //todo
-    :param Quaternion rotation: //todo
-    :param Vector3 scale: //todo
-    :returns: //todo
-    :rtype: //todo
+    If parameters are not supplied, new instances will be created
 
-.. function:: Matrix4.extractPosition(m)
+    :param Vector3 translation: destination translation vector
+    :param Quaternion rotation: destination rotation quaternion
+    :param Vector3 scale: destination scale vector
+    :returns: Array [ translation, rotation, scale ]
+    :rtype: Array
 
-    //todo:description
+.. function:: Matrix4.extractPosition( m )
 
-    :param Matrix4 m:
+    Copies translation component of supplied matrix ``m`` into this matrix translation
 
-.. function:: Matrix4.extractRotation(m)
+    :param Matrix4 m: source matrix
+    :returns: This matrix
+    :rtype: :class:`Matrix4`
 
-    //todo:description
+.. function:: Matrix4.extractRotation( m )
 
-    :param Matrix4 m:
+    Copies rotation component of supplied matrix ``m`` into this matrix rotation
 
-.. function:: Matrix4.rotateByAxis(axis,angle)
+    :param Matrix4 m: source matrix
+    :returns: This matrix
+    :rtype: :class:`Matrix4`
 
-    //todo:description
+.. function:: Matrix4.rotateByAxis( axis, angle )
 
-    :param Vector3 axis: //todo:description
-    :param float angle: //todo:description
+    Rotates this matrix around supplied ``axis`` by ``angle``
 
-.. function:: Matrix4.rotateX(angle)
+    :param Vector3 axis: rotation axis
+    :param float angle: rotation angle in radians
+    :returns: This matrix
+    :rtype: :class:`Matrix4`
 
-    //todo:description
+.. function:: Matrix4.rotateX( angle )
 
-    :param float angle: //todo:description
+    Rotates this matrix around x-axis by ``angle``
 
-.. function:: Matrix4.rotateY(angle)
+    :param float angle: rotation angle in radians
+    :returns: This matrix
+    :rtype: :class:`Matrix4`
 
-    //todo:description
+.. function:: Matrix4.rotateY( angle )
 
-    :param float angle: //todo:description
+    Rotates this matrix around y-axis by ``angle``
 
-.. function:: Matrix4.rotateZ(angle)
+    :param float angle: rotation angle in radians
+    :returns: This matrix
+    :rtype: :class:`Matrix4`
 
-    //todo:description
+.. function:: Matrix4.rotateZ( angle )
 
-    :param float angle: //todo:description
+    Rotates this matrix around z-axis by ``angle``
 
-.. function:: Matrix4.translate(v)
+    :param float angle: rotation angle in radians
+    :returns: This matrix
+    :rtype: :class:`Matrix4`
 
-    :param Vector3 v: //todo:description
+.. function:: Matrix4.translate( v )
 
-.. function:: Matrix4.makeInvert3x3(m)(static)
+    Translates this matrix by vector ``v``
 
-    //todo:description
+    :param Vector3 v: translation vector
+    :returns: This matrix
+    :rtype: :class:`Matrix4`
 
-    :param Matrix4 v:
-    :returns: A 3x3 Matrix
-    :rtype: Matrix3
+.. ...............................................................................
+.. rubric:: Static methods
+.. ...............................................................................
 
-.. function:: Matrix4.makeFrustum( left, right, bottom, top, near, far )(static)
+.. function:: Matrix4.makeInvert3x3( m )
 
-    //todo:description and parameters
+    Inverts just rotation submatrix of matrix ``m``
 
-    :returns: //todo
-    :rtype: Matrix4
+    Note: this method returns a reference to internal 3x3 matrix, make copy or clone if you don't use it right away.
 
-.. function:: Matrix4.makePerspective( fov, aspect, near, far )(static)
+    Based on http://code.google.com/p/webgl-mjs/
 
-    //todo:description and parameters
+    :param Matrix4 m: source matrix
+    :returns: inverted submatrix
+    :rtype: :class:`Matrix3`
 
-    :returns: //todo
-    :rtype: Matrix4
+.. function:: Matrix4.makeFrustum( left, right, bottom, top, near, far )
 
-.. function:: Matrix4.makeOrtho( left, right, top, bottom, near, far )(static)
+    Creates frustum matrix
 
-    //todo:description and parameters
+    :param float left: left
+    :param float right: right
+    :param float bottom: bottom
+    :param float top: top
+    :param float near: near
+    :param float far: far
+    :returns: New instance of frustum matrix
+    :rtype: :class:`Matrix4`
 
-    :returns: //todo
-    :rtype: Matrix4
+.. function:: Matrix4.makePerspective( fov, aspect, near, far )
+
+    Creates perspective projection matrix
+
+    :param float fov: vertical field of view in degrees
+    :param float aspect: aspect ratio
+    :param float near: near plane
+    :param float far: far plane
+    :returns: New instance of projection matrix
+    :rtype: :class:`Matrix4`
+
+.. function:: Matrix4.makeOrtho( left, right, top, bottom, near, far )
+
+    Creates orthographic projection matrix
+
+    :param float left: left
+    :param float right: right
+    :param float top: top
+    :param float bottom: bottom
+    :param float near: near plane
+    :param float far: far plane
+    :returns: New instance of projection matrix
+    :rtype: :class:`Matrix4`
 
 .. ...............................................................................
 .. rubric:: Example
@@ -323,4 +456,21 @@ Matrix4 - A 4x4 Matrix
 
 ::
 
-//todo::example
+    // simple rig for rotation around 3 axes
+
+    var m = new THREE.Matrix4();
+
+    var m1 = new THREE.Matrix4();
+    var m2 = new THREE.Matrix4();
+    var m3 = new THREE.Matrix4();
+
+    var alpha = 0;
+    var beta = Math.PI;
+    var gamma = Math.PI/2;
+
+    m1.setRotationX( alpha );
+    m2.setRotationY( beta );
+    m3.setRotationZ( gamma );
+
+    m.multiply( m1, m2 );
+    m.multiplySelf( m3 );
