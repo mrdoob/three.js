@@ -4038,7 +4038,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		parameters = {
 
-			map: !!material.map, envMap: !!material.envMap, lightMap: !!material.lightMap,
+			map: !!material.map, mapAlpha: !!material.mapAlpha, envMap: !!material.envMap, lightMap: !!material.lightMap,
 			vertexColors: material.vertexColors,
 			fog: fog, useFog: material.fog,
 			sizeAttenuation: material.sizeAttenuation,
@@ -4323,6 +4323,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( material.map ) {
 
 			uniforms.offsetRepeat.value.set( material.map.offset.x, material.map.offset.y, material.map.repeat.x, material.map.repeat.y );
+
+		}
+
+		uniforms.mapAlpha.texture = material.mapAlpha;
+
+		if ( material.mapAlpha ) {
+
+			uniforms.offsetRepeat.value.set( material.mapAlpha.offset.x, material.mapAlpha.offset.y, material.mapAlpha.repeat.x, material.mapAlpha.repeat.y );
 
 		}
 
@@ -4677,6 +4685,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 					_this.setTexture( texture, value );
 
 				}
+
+			// single THREE.Texture where 1st channel is used for alpha
+
+			} else if( type === "ta" ) {
+
+				_gl.uniform1i( location, value );
+
+				texture = uniform.texture;
+
+				if ( !texture ) continue;
+
+				_this.setTexture( texture, value );
 
 			// array of THREE.Texture (2d)
 
@@ -5185,6 +5205,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			( parameters.useFog && parameters.fog instanceof THREE.FogExp2 ) ? "#define FOG_EXP2" : "",
 
 			parameters.map ? "#define USE_MAP" : "",
+			parameters.mapAlpha ? "#define USE_MAP_ALPHA" : "",
 			parameters.envMap ? "#define USE_ENVMAP" : "",
 			parameters.lightMap ? "#define USE_LIGHTMAP" : "",
 			parameters.vertexColors ? "#define USE_COLOR" : "",

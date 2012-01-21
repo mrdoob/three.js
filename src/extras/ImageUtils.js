@@ -7,9 +7,12 @@ THREE.ImageUtils = {
 
 	crossOrigin: '',
 
-	loadTexture: function ( path, mapping, callback ) {
+	loadTexture: function ( path, mapping, callback, format ) {
 
-		var image = new Image(), texture = new THREE.Texture( image, mapping );
+		format = format !== undefined ? format : THREE.RGBAFormat;
+
+		var image = new Image(), texture = new THREE.Texture( image, mapping,
+			undefined, undefined, undefined, undefined, format );
 
 		image.onload = function () { texture.needsUpdate = true; if ( callback ) callback( this ); };
 		image.crossOrigin = this.crossOrigin;

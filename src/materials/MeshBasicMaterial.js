@@ -37,6 +37,7 @@ THREE.MeshBasicMaterial = function ( parameters ) {
 	this.color = parameters.color !== undefined ? new THREE.Color( parameters.color ) : new THREE.Color( 0xffffff );
 
 	this.map = parameters.map !== undefined ? parameters.map : null;
+	this.mapAlpha = parameters.mapAlpha !== undefined ? parameters.mapAlpha : null;
 
 	this.lightMap = parameters.lightMap !== undefined ? parameters.lightMap : null;
 
