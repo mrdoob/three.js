@@ -770,7 +770,8 @@ THREE.Matrix4.prototype = {
 
 	rotateByAxis: function ( axis, angle ) {
 
-  		// optimize by checking axis
+		// optimize by checking axis
+
 		if ( axis.x === 1 && axis.y === 0 && axis.z === 0 ) {
 
 			return this.rotateX( angle );
@@ -797,8 +798,8 @@ THREE.Matrix4.prototype = {
 		var xx = x * x,
 			yy = y * y,
 			zz = z * z,
-			c = Math.cos(angle),
-			s = Math.sin(angle),
+			c = Math.cos( angle ),
+			s = Math.sin( angle ),
 			oneMinusCosine = 1 - c,
 			xy = x * y * oneMinusCosine,
 			xz = x * z * oneMinusCosine,
@@ -863,8 +864,8 @@ THREE.Matrix4.prototype = {
 			m23 = this.n23,
 			m33 = this.n33,
 			m43 = this.n43,
-			c = Math.cos(angle),
-			s = Math.sin(angle);
+			c = Math.cos( angle ),
+			s = Math.sin( angle );
 
 		this.n12 = c * m12 + s * m13;
 		this.n22 = c * m22 + s * m23;
