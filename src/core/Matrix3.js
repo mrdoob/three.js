@@ -1,3 +1,7 @@
+/**
+ * @author alteredq / http://alteredqualia.com/
+ */
+
 THREE.Matrix3 = function () {
 
 	this.m = [];
