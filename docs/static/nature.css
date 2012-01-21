@@ -365,7 +365,7 @@ th.field-name {
 dl.function {
 	border-left: 0px solid #aaa;
 	border-top: 0px solid #aaa;
-	padding: 1em 0;
+	padding: 0.25em 0 1em;
 }
 
 dl.function dt {
