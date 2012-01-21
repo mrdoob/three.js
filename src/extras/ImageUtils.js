@@ -5,7 +5,7 @@
 
 THREE.ImageUtils = {
 
-	crossOrigin: '',
+	crossOrigin: 'anonymous',
 
 	loadTexture: function ( path, mapping, callback ) {
 
@@ -36,7 +36,7 @@ THREE.ImageUtils = {
 
 			};
 
-			images[ i ].crossOrigin = '';
+			images[ i ].crossOrigin = this.crossOrigin;
 			images[ i ].src = array[ i ];
 
 		}

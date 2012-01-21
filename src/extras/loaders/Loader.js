@@ -17,7 +17,7 @@ THREE.Loader.prototype = {
 
 	constructor: THREE.Loader,
 
-	crossOrigin: '',
+	crossOrigin: 'anonymous',
 
 	addStatusElement: function () {
 
