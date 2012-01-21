@@ -2,6 +2,7 @@ Cameras
 =======
 
 .. toctree::
-    Camera
-    OrthographicCamera
-    PerspectiveCamera
+
+   Camera
+   OrthographicCamera
+   PerspectiveCamera

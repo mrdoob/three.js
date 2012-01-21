@@ -2,9 +2,9 @@ Lights
 ======
 
 .. toctree::
-    Light
 
-    AmbientLight
-    DirectionalLight
-    PointLight
-    SpotLight
+   Light
+   AmbientLight
+   DirectionalLight
+   PointLight
+   SpotLight
