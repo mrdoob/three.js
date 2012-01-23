@@ -353,7 +353,7 @@ def veckey3(v):
 # MTL parser
 # #####################################################
 def texture_relative_path(fullpath):
-    texture_file = os.path.basename(fullpath)
+    texture_file = os.path.basename(fullpath.replace("\\", "/"))
     return texture_file
 
 def parse_mtl(fname):
