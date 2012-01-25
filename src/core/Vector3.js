@@ -272,9 +272,9 @@ THREE.Vector3.prototype = {
 
 	setRotationFromMatrix: function ( m ) {
 
-		var cosY = Math.cos( this.y );
-
 		this.y = Math.asin( m.n13 );
+
+		var cosY = Math.cos( this.y );
 
 		if ( Math.abs( cosY ) > 0.00001 ) {
 
