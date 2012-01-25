@@ -6,9 +6,9 @@
 
 THREE.Object3D = function () {
 
-	this.name = '';
-
 	this.id = THREE.Object3DCount ++;
+
+	this.name = '';
 
 	this.parent = undefined;
 	this.children = [];
@@ -19,8 +19,6 @@ THREE.Object3D = function () {
 	this.rotation = new THREE.Vector3();
 	this.eulerOrder = 'XYZ';
 	this.scale = new THREE.Vector3( 1, 1, 1 );
-
-	this.dynamic = false; // when true it retains arrays so they can be updated with __dirty*
 
 	this.doubleSided = false;
 	this.flipSided = false;
@@ -98,6 +96,13 @@ THREE.Object3D.prototype = {
 	},
 
 	add: function ( object ) {
+
+		if ( object === this ) {
+
+			console.warn( 'THREE: Object3D.add(): An object can\'t be added as a child of itself.' );
+			return;
+
+		}
 
 		if ( this.children.indexOf( object ) === - 1 ) {
 

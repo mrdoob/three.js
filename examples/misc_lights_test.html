@@ -17,7 +17,7 @@
 			a { color:skyblue }
 			canvas { pointer-events:none; z-index:10; }
 
-			#d { text-align:center; margin:1em 0 -15.7em 0; z-index:0; position:relative; display:block }
+			#d { text-align:center; margin:1em 0 -11.4em 0; z-index:0; position:relative; display:block }
 			.button { background:#000; color:#fff; padding:0.2em 0.5em; cursor:pointer }
 			.inactive { background:#999; color:#eee }
 		</style>
@@ -47,7 +47,7 @@
 
 			var container, stats;
 
-			var camera, scene, target, canvasRenderer, webglRenderer;
+			var camera, scene, canvasRenderer, webglRenderer;
 
 			var mesh, zmesh, lightMesh, geometry;
 
@@ -78,12 +78,12 @@
 				container = document.createElement('div');
 				document.body.appendChild(container);
 
+				scene = new THREE.Scene();
+
 				camera = new THREE.PerspectiveCamera( 75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
 				camera.position.z = 500;
 
-				target = new THREE.Vector3( 0, 0, 0 );
-
-				scene = new THREE.Scene();
+				scene.add( camera );
 
 				// Spheres
 
@@ -137,7 +137,7 @@
 
 					try {
 
-						webglRenderer = new THREE.WebGLRenderer();
+						webglRenderer = new THREE.WebGLRenderer( { alpha: true } );
 						webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 						webglRenderer.domElement.style.position = "relative";
 						container.appendChild( webglRenderer.domElement );
@@ -188,7 +188,7 @@
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 
-				camera.lookAt( target );
+				camera.lookAt( scene.position );
 
 				for ( var i = 0, l = scene.objects.length; i < l; i ++ ) {
 

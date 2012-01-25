@@ -4,11 +4,11 @@
 
 THREE.Material = function ( parameters ) {
 
-	this.name = '';
+	parameters = parameters || {};
 
 	this.id = THREE.MaterialCount ++;
 
-	parameters = parameters || {};
+	this.name = '';
 
 	this.opacity = parameters.opacity !== undefined ? parameters.opacity : 1;
 	this.transparent = parameters.transparent !== undefined ? parameters.transparent : false;
@@ -24,7 +24,7 @@ THREE.Material = function ( parameters ) {
 
 	this.alphaTest = parameters.alphaTest !== undefined ? parameters.alphaTest : 0;
 
-	this.overdraw = parameters.overdraw !== undefined ? parameters.overdraw : false; // Boolean for fixing antialiasing gaps in CanvasRenderer 
+	this.overdraw = parameters.overdraw !== undefined ? parameters.overdraw : false; // Boolean for fixing antialiasing gaps in CanvasRenderer
 
 }
 

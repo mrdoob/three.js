@@ -207,10 +207,7 @@ THREE.Vector3.prototype = {
 
 	lengthManhattan: function () {
 
-		// correct version
-		// return Math.abs( this.x ) + Math.abs( this.y ) + Math.abs( this.z );
-
-		return this.x + this.y + this.z;
+		return Math.abs( this.x ) + Math.abs( this.y ) + Math.abs( this.z );
 
 	},
 
@@ -269,6 +266,8 @@ THREE.Vector3.prototype = {
 		this.y = m.n24;
 		this.z = m.n34;
 
+		return this;
+
 	},
 
 	setRotationFromMatrix: function ( m ) {
@@ -288,6 +287,14 @@ THREE.Vector3.prototype = {
 			this.z = Math.atan2( m.n21, m.n22 );
 
 		}
+
+		return this;
+
+	},
+
+	equals: function( v ) {
+
+		return ( ( v.x === this.x ) && ( v.y === this.y ) && ( v.z === this.z ) );
 
 	},
 

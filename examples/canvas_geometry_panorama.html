@@ -29,7 +29,7 @@
 	</head>
 	<body>
 
-		<div id="container"></div> 
+		<div id="container"></div>
 		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - panorama demo. cubemap by <a href="http://www.zfight.com/" target="_blank">Jochum Skoglund</a>.</div>
 
 		<script src="../build/Three.js"></script>
@@ -57,6 +57,8 @@
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1100 );
 
 				scene = new THREE.Scene();
+
+				scene.add( camera );
 
 				texture_placeholder = document.createElement( 'canvas' );
 				texture_placeholder.width = 128;

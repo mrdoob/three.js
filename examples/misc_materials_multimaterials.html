@@ -52,7 +52,7 @@
 			var container;
 			var stats;
 
-			var camera, target;
+			var camera;
 			var scene;
 			var canvasRenderer, webglRenderer;
 
@@ -86,12 +86,12 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
+				scene = new THREE.Scene();
+
 				camera = new THREE.PerspectiveCamera( 75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
 				camera.position.z = 500;
 
-				target = new THREE.Vector3( 0, 0, 0 );
-
-				scene = new THREE.Scene();
+				scene.add( camera );
 
 				// SPHERES
 
@@ -296,7 +296,7 @@
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 
-				camera.lookAt( target );
+				camera.lookAt( scene.position );
 
 				if ( render_canvas ) canvasRenderer.render( scene, camera );
 				if ( render_gl && has_gl ) webglRenderer.render( scene, camera );

@@ -157,11 +157,9 @@ THREE.ShaderTerrain = {
 					"for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {",
 
 						"vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );",
-
 						"vec3 lVector = lPosition.xyz + vViewPosition.xyz;",
 
 						"float lDistance = 1.0;",
-
 						"if ( pointLightDistance[ i ] > 0.0 )",
 							"lDistance = 1.0 - min( ( length( lVector ) / pointLightDistance[ i ] ), 1.0 );",
 
@@ -173,7 +171,7 @@ THREE.ShaderTerrain = {
 						"float pointDotNormalHalf = max( dot( normal, pointHalfVector ), 0.0 );",
 						"float pointDiffuseWeight = max( dot( normal, lVector ), 0.0 );",
 
-						"float pointSpecularWeight = specularTex.r * pow( pointDotNormalHalf, uShininess );",
+						"float pointSpecularWeight = specularTex.r * max( pow( pointDotNormalHalf, uShininess ), 0.0 );",
 
 						"pointDiffuse += pointDistance * pointLightColor[ i ] * uDiffuseColor * pointDiffuseWeight;",
 						"pointSpecular += pointDistance * pointLightColor[ i ] * uSpecularColor * pointSpecularWeight * pointDiffuseWeight;",
@@ -194,12 +192,12 @@ THREE.ShaderTerrain = {
 						"vec4 lDirection = viewMatrix * vec4( directionalLightDirection[ i ], 0.0 );",
 
 						"vec3 dirVector = normalize( lDirection.xyz );",
-						"vec3 dirHalfVector = normalize( lDirection.xyz + viewPosition );",
+						"vec3 dirHalfVector = normalize( dirVector + viewPosition );",
 
 						"float dirDotNormalHalf = max( dot( normal, dirHalfVector ), 0.0 );",
 						"float dirDiffuseWeight = max( dot( normal, dirVector ), 0.0 );",
 
-						"float dirSpecularWeight = specularTex.r * pow( dirDotNormalHalf, uShininess );",
+						"float dirSpecularWeight = specularTex.r * max( pow( dirDotNormalHalf, uShininess ), 0.0 );",
 
 						"dirDiffuse += directionalLightColor[ i ] * uDiffuseColor * dirDiffuseWeight;",
 						"dirSpecular += directionalLightColor[ i ] * uSpecularColor * dirSpecularWeight * dirDiffuseWeight;",

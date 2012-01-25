@@ -139,13 +139,6 @@
 
 				container = document.getElementById( 'container' );
 
-				// SCENE CAMERA
-
-				camera = new THREE.PerspectiveCamera( 18, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
-				camera.position.set( 2000, 0, 2000 );
-
-				cameraTarget = new THREE.Vector3( 0, 0, 0 );
-
 				// SCENE
 
 				scene = new THREE.Scene();
@@ -154,6 +147,16 @@
 				scene.fog.color.setHSV( 0.51, 0.5, 0.9 );
 
 				createScene();
+
+				// SCENE CAMERA
+
+				camera = new THREE.PerspectiveCamera( 18, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
+				camera.position.set( 2000, 0, 2000 );
+
+				cameraTarget = new THREE.Vector3( 0, 0, 0 );
+
+				scene.add( camera );
+
 
 				// LIGHTS
 
@@ -164,7 +167,18 @@
 				spotLight.position.set( 0, 1800, 1500 );
 				spotLight.target.position.set( 0, 0, 0 );
 				spotLight.castShadow = true;
+
+				spotLight.shadowCameraNear = 100;
+				spotLight.shadowCameraFar = camera.far;
+				spotLight.shadowCameraFov = 50;
+
+				spotLight.shadowBias = -0.00125;
+				spotLight.shadowDarkness = 0.5;
+				spotLight.shadowMapWidth = SHADOW_MAP_WIDTH;
+				spotLight.shadowMapHeight = SHADOW_MAP_HEIGHT;
+
 				scene.add( spotLight );
+				scene.add( spotLight.target );
 
 				directionalLight2 = new THREE.PointLight( 0xff9900, 0.25 );
 				directionalLight2.position.set( 0.5, -1, 0.5 );
@@ -186,17 +200,8 @@
 
 				// SHADOW
 
-				renderer.shadowCameraNear = 2;
-				renderer.shadowCameraFar = camera.far;
-				renderer.shadowCameraFov = 50;
-
-				renderer.shadowMapBias = 0.003885;
-				renderer.shadowMapDarkness = 0.5;
-				renderer.shadowMapWidth = SHADOW_MAP_WIDTH;
-				renderer.shadowMapHeight = SHADOW_MAP_HEIGHT;
-
+				renderer.shadowMapCullFrontFaces = false;
 				renderer.shadowMapEnabled = true;
-				//renderer.shadowMapSoft = false;
 
 				// STATS
 
@@ -612,6 +617,8 @@
 				var topCamera = new THREE.OrthographicCamera( left, right, top, bottom, near, far );
 				topCamera.position.y = bb.max.y;
 				topCamera.lookAt( shadowScene.position );
+
+				shadowScene.add( topCamera );
 
 				var renderShadow = new THREE.RenderPass( shadowScene, topCamera );
 

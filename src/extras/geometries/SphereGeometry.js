@@ -6,15 +6,16 @@ THREE.SphereGeometry = function ( radius, segmentsWidth, segmentsHeight, phiStar
 
 	THREE.Geometry.call( this );
 
-	var radius = radius || 50;
+	radius = radius || 50;
+
+	phiStart = phiStart !== undefined ? phiStart : 0;
+	phiLength = phiLength !== undefined ? phiLength : Math.PI * 2;
+
+	thetaStart = thetaStart !== undefined ? thetaStart : 0;
+	thetaLength = thetaLength !== undefined ? thetaLength : Math.PI;
+
 	var segmentsX = Math.max( 3, Math.floor( segmentsWidth ) || 8 );
 	var segmentsY = Math.max( 2, Math.floor( segmentsHeight ) || 6 );
-
-	var phiStart = phiStart != undefined ? phiStart : 0;
-	var phiLength = phiLength != undefined ? phiLength : Math.PI * 2;
-
-	var thetaStart = thetaStart != undefined ? thetaStart : 0;
-	var thetaLength = thetaLength != undefined ? thetaLength : Math.PI;
 
 	var x, y, vertices = [], uvs = [];
 

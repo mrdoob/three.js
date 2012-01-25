@@ -75,15 +75,16 @@
 
 				container = document.getElementById( 'container' );
 
+				scene = new THREE.Scene();
+
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
+				scene.add( camera );
 
 				controls = new THREE.FirstPersonControls( camera );
 
 				controls.movementSpeed = 1000;
 				controls.lookSpeed = 0.125;
 				controls.lookVertical = true;
-
-				scene = new THREE.Scene();
 
 				var grass_dirt = loadTexture( 'textures/minecraft/grass_dirt.png' ),
 				grass = loadTexture( 'textures/minecraft/grass.png' ),
@@ -158,7 +159,7 @@
 				directionalLight.position.set( 1, 1, 0.5 ).normalize();
 				scene.add( directionalLight );
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { clearColor: 0xbfd1e5 } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.innerHTML = "";

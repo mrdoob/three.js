@@ -6,9 +6,10 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, segmentsRad
 
 	THREE.Geometry.call( this );
 
-	var radiusTop = radiusTop != null ? radiusTop : 20;
-	var radiusBottom = radiusBottom != null ? radiusBottom : 20;
-	var height = height || 100;
+	radiusTop = radiusTop !== undefined ? radiusTop : 20;
+	radiusBottom = radiusBottom !== undefined ? radiusBottom : 20;
+	height = height !== undefined ? height : 100;
+
 	var heightHalf = height / 2;
 	var segmentsX = segmentsRadius || 8;
 	var segmentsY = segmentsHeight || 1;

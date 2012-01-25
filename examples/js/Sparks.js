@@ -17,7 +17,6 @@ var SPARKS = {};
 *   Creates and Manages Particles
 *********************************/
 
-
 SPARKS.Emitter = function (counter) {
     
     this._counter = counter ? counter : new SPARKS.SteadyCounter(10); // provides number of particles to produce
@@ -41,6 +40,7 @@ SPARKS.Emitter.prototype = {
 	_timer: null,
 	_lastTime: null,
 	_timerStep: 10,
+	_velocityVerlet: true,
 	
 	// run its built in timer / stepping
 	start: function() {
@@ -66,12 +66,29 @@ SPARKS.Emitter.prototype = {
 		var time = Date.now();
 		var elapsed = time - emitter._lastTime;
 	   	
-		while(elapsed >= emitter._TIMESTEP) {
-			emitter.update(emitter._TIMESTEP / 1000);
-			elapsed -= emitter._TIMESTEP;
+		if (!this._velocityVerlet) {
+			// if elapsed is way higher than time step, (usually after switching tabs, or excution cached in ff)
+			// we will drop cycles. perhaps set to a limit of 10 or something?
+			var maxBlock = emitter._TIMESTEP * 20;
+			
+			if (elapsed >= maxBlock) {
+				//console.log('warning: sparks.js is fast fowarding engine, skipping steps', elapsed / emitter._TIMESTEP);
+				//emitter.update( (elapsed - maxBlock) / 1000);
+				elapsed = maxBlock;
+			}
+		
+			while(elapsed >= emitter._TIMESTEP) {
+				emitter.update(emitter._TIMESTEP / 1000);
+				elapsed -= emitter._TIMESTEP;
+			}
+			emitter._lastTime = time - elapsed;
+			
+		} else {
+			emitter.update(elapsed/1000);
+			emitter._lastTime = time;
 		}
 		
-		emitter._lastTime = time - elapsed;
+		
 		
 		if (emitter._isRunning)
 		setTimeout(emitter.step, emitter._timerStep, emitter);
@@ -129,6 +146,8 @@ SPARKS.Emitter.prototype = {
             }
         }
         
+		this.dispatchEvent("loopUpdated");
+		
     },
     
     createParticle: function() {
@@ -154,6 +173,21 @@ SPARKS.Emitter.prototype = {
     addAction: function (action) {
         this._actions.push(action);
     },
+
+    removeInitializer: function (initializer) {
+		var index = this._initializers.indexOf(initializer);
+		if (index > -1) {
+			this._initializers.splice( index, 1 );
+		}
+    },
+
+    removeAction: function (action) {
+		var index = this._actions.indexOf(action);
+		if (index > -1) {
+			this._actions.splice( index, 1 );
+		}
+		//console.log('removeAction', index, this._actions);
+    },
     
     addCallback: function(name, callback) {
         this.callbacks[name] = callback;
@@ -171,18 +205,63 @@ SPARKS.Emitter.prototype = {
 };
 
 
+/*
+ * Constant Names for
+ * Events called by emitter.dispatchEvent()
+ * 
+ */
+SPARKS.EVENT_PARTICLE_CREATED = "created"
+SPARKS.EVENT_PARTICLE_UPDATED = "updated"
+SPARKS.EVENT_PARTICLE_DEAD = "dead";
+SPARKS.EVENT_LOOP_UPDATED = "loopUpdated";
+
+
+
+/*
+ * Steady Counter attempts to produces a particle rate steadily
+ *
+ */
+
 // Number of particles per seconds
 SPARKS.SteadyCounter = function(rate) {
     this.rate = rate;
     
+	// we use a shortfall counter to make up for slow emitters 
+	this.leftover = 0;
+	
 };
 
 SPARKS.SteadyCounter.prototype.updateEmitter = function(emitter, time) {
-    
-    return Math.floor(time * this.rate);
+
+	var targetRelease = time * this.rate + this.leftover;
+	var actualRelease = Math.floor(targetRelease);
+	
+	this.leftover = targetRelease - actualRelease;
+	
+	return actualRelease;
 };
 
 
+/*
+ * Shot Counter produces specified particles 
+ * on a single impluse or burst
+ */
+
+SPARKS.ShotCounter = function(particles) {
+	this.particles = particles;
+	this.used = false;
+};
+
+SPARKS.ShotCounter.prototype.updateEmitter = function(emitter, time) {
+
+	if (this.used) {
+		return 0;
+	} else {
+		this.used = true;
+	}
+	
+	return this.particles;
+};
 
 
 /********************************
@@ -220,6 +299,7 @@ SPARKS.Particle = function() {
      
      this.position = SPARKS.VectorPool.get().set(0,0,0); //new THREE.Vector3( 0, 0, 0 );
      this.velocity = SPARKS.VectorPool.get().set(0,0,0); //new THREE.Vector3( 0, 0, 0 );
+	this._oldvelocity = SPARKS.VectorPool.get().set(0,0,0);
      // rotation vec3
      // angVelocity vec3
      // faceAxis vec3
@@ -276,17 +356,61 @@ SPARKS.Move = function() {
 };
 
 SPARKS.Move.prototype.update = function(emitter, particle, time) {
-    
+    // attempt verlet velocity updating.
     var p = particle.position;
-    var v = particle.velocity;
-    
-    p.x += v.x * time;
-    p.y += v.y * time;
-    p.z += v.z * time;
+	var v = particle.velocity;
+    var old = particle._oldvelocity;
+	
+	if (this._velocityVerlet) {	
+		p.x += (v.x + old.x) * 0.5 * time;
+		p.y += (v.y + old.y) * 0.5 * time;
+		p.z += (v.z + old.z) * 0.5 * time;
+	} else {
+		p.x += v.x * time;
+		p.y += v.y * time;
+		p.z += v.z * time;
+	}
+
+    //  OldVel = Vel;
+    // Vel = Vel + Accel * dt;
+    // Pos = Pos + (vel + Vel + Accel * dt) * 0.5 * dt;
+	
+
 
 };
 
+/* Marks particles found in specified zone dead */
+SPARKS.DeathZone = function(zone) {
+    this.zone = zone;
+};
 
+SPARKS.DeathZone.prototype.update = function(emitter, particle, time) {
+    
+    if (this.zone.contains(particle.position)) {
+		particle.isDead = true;
+	}
+
+};
+
+/*
+ * SPARKS.ActionZone applies an action when particle is found in zone
+ */
+SPARKS.ActionZone = function(action, zone) {
+	this.action = action;
+    this.zone = zone;
+};
+
+SPARKS.ActionZone.prototype.update = function(emitter, particle, time) {
+
+    if (this.zone.contains(particle.position)) {
+		this.action.update( emitter, particle, time );
+	}
+
+};
+
+/*
+ * Accelerate action affects velocity in specified 3d direction 
+ */
 SPARKS.Accelerate = function(x,y,z) {
 	
 	if (x instanceof THREE.Vector3) {
@@ -303,11 +427,62 @@ SPARKS.Accelerate.prototype.update = function(emitter, particle, time) {
     
     var v = particle.velocity;
     
+	particle._oldvelocity.set(v.x, v.y, v.z);
+	
     v.x += acc.x * time;
     v.y += acc.y * time;
     v.z += acc.z * time; 
 
 };
+
+/*
+ * Accelerate Factor accelerate based on a factor of particle's velocity.
+ */
+SPARKS.AccelerateFactor = function(factor) {
+    this.factor = factor;
+};
+
+SPARKS.AccelerateFactor.prototype.update = function(emitter, particle, time) {
+    var factor = this.factor;
+    
+    var v = particle.velocity;
+	var len = v.length();
+	var adjFactor;
+    if (len>0) {
+
+		adjFactor = factor * time / len;
+		adjFactor += 1;
+		
+		v.multiplyScalar(adjFactor);
+		// v.x *= adjFactor;
+		// 	    v.y *= adjFactor;
+		// 	    v.z *= adjFactor; 
+	}
+
+};
+
+/*
+AccelerateNormal
+ * AccelerateVelocity affects velocity based on its velocity direction
+ */
+SPARKS.AccelerateVelocity = function(factor) {
+
+	this.factor = factor;
+
+};
+
+SPARKS.AccelerateVelocity.prototype.update = function(emitter, particle, time) {
+    var factor = this.factor;
+
+    var v = particle.velocity;
+
+
+    v.z += - v.x * factor;
+    v.y += v.z * factor;
+    v.x +=  v.y * factor;
+
+};
+
 
 /* Set the max ammount of x,y,z drift movements in a second */
 SPARKS.RandomDrift = function(x,y,z) {
@@ -373,8 +548,6 @@ SPARKS.LineZone.prototype.getLocation = function() {
 };
 
 // Basically a RectangleZone
-
-
 SPARKS.ParallelogramZone = function(corner, side1, side2) {
     this.corner = corner;
 	this.side1 = side1;
@@ -389,6 +562,65 @@ SPARKS.ParallelogramZone.prototype.getLocation = function() {
 	return d1.addSelf( this.corner );
 	
 };
+
+SPARKS.CubeZone = function(position, x, y, z) {
+    this.position = position;
+	this.x = x;
+	this.y = y;
+	this.z = z;
+};
+
+SPARKS.CubeZone.prototype.getLocation = function() {
+    //TODO use pool?
+
+	var location = this.position.clone();
+	location.x += Math.random() * this.x;
+	location.y += Math.random() * this.y;
+	location.z += Math.random() * this.z;
+	
+	return location;
+	
+};
+
+
+SPARKS.CubeZone.prototype.contains = function(position) {
+
+	var startX = this.position.x;
+	var startY = this.position.y;
+	var startZ = this.position.z;
+	var x = this.x; // width
+	var y = this.y; // depth
+	var z = this.z; // height
+	
+	if (x<0) {
+		startX += x;
+		x = Math.abs(x);
+	}
+	
+	if (y<0) {
+		startY += y;
+		y = Math.abs(y);
+	}
+	
+	if (z<0) {
+		startZ += z;
+		z = Math.abs(z);
+	}
+	
+	var diffX = position.x - startX;
+	var diffY = position.y - startY;
+	var diffZ = position.z - startZ;
+	
+	if ( (diffX > 0) && (diffX < x) && 
+			(diffY > 0) && (diffY < y) && 
+			(diffZ > 0) && (diffZ < z) ) {
+		return true;
+	}
+	
+	return false;
+	
+};
+
 
 
 /**
@@ -513,7 +745,7 @@ SPARKS.Target = function(target, callback) {
     this.callback = callback;
 };
 
-SPARKS.Target.prototype.initialize = function( emitter, particle) {
+SPARKS.Target.prototype.initialize = function( emitter, particle ) {
 
     if (this.callback) {
         particle.target = this.callback();

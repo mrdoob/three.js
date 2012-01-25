@@ -74,10 +74,17 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
+				// SCENE
+
+				scene = new THREE.Scene();
+				scene.fog = new THREE.Fog( 0xffaa55, 1000, FAR );
+				THREE.ColorUtils.adjustHSV( scene.fog.color, 0.02, -0.15, -0.65 );
+
 				// SCENE CAMERA
 
 				camera = new THREE.PerspectiveCamera( 23, SCREEN_WIDTH / SCREEN_HEIGHT, NEAR, FAR );
 				camera.position.set( 700, 50, 1900 );
+				scene.add( camera );
 
 				controls = new THREE.FirstPersonControls( camera );
 
@@ -91,12 +98,6 @@
 
 				controls.lon = -110;
 
-				// SCENE
-
-				scene = new THREE.Scene();
-				scene.fog = new THREE.Fog( 0xffaa55, 1000, FAR );
-				THREE.ColorUtils.adjustHSV( scene.fog.color, 0.02, -0.15, -0.65 );
-
 				// LIGHTS
 
 				var ambient = new THREE.AmbientLight( 0x444444 );
@@ -105,7 +106,21 @@
 				light = new THREE.SpotLight( 0xffffff );
 				light.position.set( 0, 1500, 1000 );
 				light.target.position.set( 0, 0, 0 );
+
 				light.castShadow = true;
+
+				light.shadowCameraNear = 700;
+				light.shadowCameraFar = camera.far;
+				light.shadowCameraFov = 50;
+
+				//light.shadowCameraVisible = true;
+
+				light.shadowBias = 0.0001;
+				light.shadowDarkness = 0.5;
+
+				light.shadowMapWidth = SHADOW_MAP_WIDTH;
+				light.shadowMapHeight = SHADOW_MAP_HEIGHT;
+
 				scene.add( light );
 
 				createHUD();
@@ -122,14 +137,7 @@
 				renderer.setClearColor( scene.fog.color, 1 );
 				renderer.autoClear = false;
 
-				renderer.shadowCameraNear = 3;
-				renderer.shadowCameraFar = camera.far;
-				renderer.shadowCameraFov = 50;
-
-				renderer.shadowMapBias = 0.0039;
-				renderer.shadowMapDarkness = 0.5;
-				renderer.shadowMapWidth = SHADOW_MAP_WIDTH;
-				renderer.shadowMapHeight = SHADOW_MAP_HEIGHT;
+				//
 
 				renderer.shadowMapEnabled = true;
 				renderer.shadowMapSoft = true;
@@ -149,7 +157,7 @@
 				cameraOrtho = new THREE.OrthographicCamera( SCREEN_WIDTH / - 2, SCREEN_WIDTH / 2,  SCREEN_HEIGHT / 2, SCREEN_HEIGHT / - 2, -10, 1000 );
 				cameraOrtho.position.z = 10;
 
-				var shader = THREE.ShaderExtras[ "screen" ];
+				var shader = THREE.ShaderExtras[ "unpackDepthRGBA" ];
 				var uniforms = new THREE.UniformsUtils.clone( shader.uniforms );
 
 				hudMaterial = new THREE.ShaderMaterial( { vertexShader: shader.vertexShader, fragmentShader: shader.fragmentShader, uniforms: uniforms } );
@@ -171,7 +179,7 @@
 				// GROUND
 
 				var geometry = new THREE.PlaneGeometry( 100, 100 );
-				var planeMaterial = new THREE.MeshLambertMaterial( { color: 0xffdd99 } );
+				var planeMaterial = new THREE.MeshPhongMaterial( { color: 0xffdd99 } );
 				THREE.ColorUtils.adjustHSV( planeMaterial.color, 0, 0, 0.9 );
 				planeMaterial.ambient = planeMaterial.color;
 
@@ -265,7 +273,7 @@
 					meshAnim.rotation.y = Math.PI/2;
 
 					meshAnim.castShadow = true;
-					meshAnim.receiveShadow = false;
+					meshAnim.receiveShadow = true;
 
 					scene.add( meshAnim );
 
@@ -396,7 +404,7 @@
 
 				// Render debug HUD with shadow map
 
-				//hudMaterial.uniforms.tDiffuse.texture = renderer.shadowMap[ 0 ];
+				//hudMaterial.uniforms.tDiffuse.texture = light.shadowMap;
 				//renderer.render( sceneHUD, cameraOrtho );
 
 			}

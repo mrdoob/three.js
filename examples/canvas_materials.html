@@ -35,10 +35,11 @@
 				document.body.appendChild(container);
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.y = 200;
-				camera.position.z = 800;
+				camera.position.set( 0, 200, 800 );
 
 				scene = new THREE.Scene();
+
+				scene.add( camera );
 
 				// Grid
 

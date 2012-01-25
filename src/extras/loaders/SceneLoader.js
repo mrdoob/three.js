@@ -58,7 +58,7 @@ THREE.SceneLoader.prototype.load = function( url, callbackFinished ) {
 	};
 
 	xhr.open( "GET", url, true );
-	xhr.overrideMimeType( "text/plain; charset=x-user-defined" );
+	if ( xhr.overrideMimeType ) xhr.overrideMimeType( "text/plain; charset=x-user-defined" );
 	xhr.setRequestHeader( "Content-Type", "text/plain" );
 	xhr.send( null );
 
@@ -564,7 +564,7 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 
 		} else if ( g.type == "icosahedron" ) {
 
-			geometry = new THREE.IcosahedronGeometry( g.subdivisions );
+			geometry = new THREE.IcosahedronGeometry( g.radius, g.subdivisions );
 			result.geometries[ dg ] = geometry;
 
 		} else if ( g.type == "bin_mesh" ) {

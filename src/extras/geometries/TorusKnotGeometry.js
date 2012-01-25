@@ -30,12 +30,13 @@ THREE.TorusKnotGeometry = function ( radius, tube, segmentsR, segmentsT, p, q, h
 
 			var u = i / this.segmentsR * 2 * this.p * Math.PI;
 			var v = j / this.segmentsT * 2 * Math.PI;
-			var p = getPos( u, v, this.q, this.p, this.radius, this.heightScale );
+			var p1 = getPos( u, v, this.q, this.p, this.radius, this.heightScale );
 			var p2 = getPos( u + 0.01, v, this.q, this.p, this.radius, this.heightScale );
 			var cx, cy;
 
-			tang.x = p2.x - p.x; tang.y = p2.y - p.y; tang.z = p2.z - p.z;
-			n.x = p2.x + p.x; n.y = p2.y + p.y; n.z = p2.z + p.z; 
+			tang.sub( p2, p1 );
+			n.add( p2, p1 );
+
 			bitan.cross( tang, n );
 			n.cross( bitan, tang );
 			bitan.normalize();
@@ -44,11 +45,11 @@ THREE.TorusKnotGeometry = function ( radius, tube, segmentsR, segmentsT, p, q, h
 			cx = - this.tube * Math.cos( v ); // TODO: Hack: Negating it so it faces outside.
 			cy = this.tube * Math.sin( v );
 
-			p.x += cx * n.x + cy * bitan.x;
-			p.y += cx * n.y + cy * bitan.y;
-			p.z += cx * n.z + cy * bitan.z;
+			p1.x += cx * n.x + cy * bitan.x;
+			p1.y += cx * n.y + cy * bitan.y;
+			p1.z += cx * n.z + cy * bitan.z;
 
-			this.grid[ i ][ j ] = vert( p.x, p.y, p.z );
+			this.grid[ i ][ j ] = vert( p1.x, p1.y, p1.z );
 
 		}
 
@@ -60,10 +61,11 @@ THREE.TorusKnotGeometry = function ( radius, tube, segmentsR, segmentsT, p, q, h
 
 			var ip = ( i + 1 ) % this.segmentsR;
 			var jp = ( j + 1 ) % this.segmentsT;
-			var a = this.grid[ i ][ j ]; 
+
+			var a = this.grid[ i ][ j ];
 			var b = this.grid[ ip ][ j ];
 			var c = this.grid[ ip ][ jp ];
-			var d = this.grid[ i ][ jp ]; 
+			var d = this.grid[ i ][ jp ];
 
 			var uva = new THREE.UV( i / this.segmentsR, j / this.segmentsT );
 			var uvb = new THREE.UV( ( i + 1 ) / this.segmentsR, j / this.segmentsT );

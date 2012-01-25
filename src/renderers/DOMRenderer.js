@@ -4,8 +4,6 @@
 
 THREE.DOMRenderer = function () {
 
-	THREE.Renderer.call( this );
-
 	var _renderList = null,
 	_projector = new THREE.Projector(),
 	_div = document.createElement( 'div' ),

@@ -353,7 +353,7 @@ def veckey3(v):
 # MTL parser
 # #####################################################
 def texture_relative_path(fullpath):
-    texture_file = os.path.basename(fullpath)
+    texture_file = os.path.basename(fullpath.replace("\\", "/"))
     return texture_file
 
 def parse_mtl(fname):
@@ -368,8 +368,11 @@ def parse_mtl(fname):
 
             # Material start
             # newmtl identifier
-            if chunks[0] == "newmtl" and len(chunks) == 2:
-                identifier = chunks[1]
+            if chunks[0] == "newmtl":
+                if len(chunks) > 1:
+                    identifier = chunks[1]
+                else:
+                    identifier = ""
                 if not identifier in materials:
                     materials[identifier] = {}
 
@@ -490,6 +493,7 @@ def parse_obj(fname):
     faces = []
 
     materials = {}
+    material = ""
     mcounter = 0
     mcurrent = 0
 
@@ -536,15 +540,27 @@ def parse_obj(fname):
                 uv_index = []
                 normal_index = []
 
+
+                # Precompute vert / normal / uv lists
+                # for negative index lookup
+                vertlen = len(vertices) + 1
+                normlen = len(normals) + 1
+                uvlen = len(uvs) + 1
+
                 for v in chunks[1:]:
                     vertex = parse_vertex(v)
                     if vertex['v']:
+                        if vertex['v'] < 0:
+                            vertex['v'] += vertlen
                         vertex_index.append(vertex['v'])
                     if vertex['t']:
+                        if vertex['t'] < 0:
+                            vertex['t'] += uvlen
                         uv_index.append(vertex['t'])
                     if vertex['n']:
+                        if vertex['n'] < 0:
+                            vertex['n'] += normlen
                         normal_index.append(vertex['n'])
-
                 faces.append({
                     'vertex':vertex_index,
                     'uv':uv_index,
@@ -569,8 +585,11 @@ def parse_obj(fname):
                 mtllib = chunks[1]
 
             # Material
-            if chunks[0] == "usemtl" and len(chunks) == 2:
-                material = chunks[1]
+            if chunks[0] == "usemtl":
+                if len(chunks) > 1:
+                    material = chunks[1]
+                else:
+                    material = ""
                 if not material in materials:
                     mcurrent = mcounter
                     materials[material] = mcounter

@@ -134,7 +134,9 @@ THREE.ShaderUtils = {
 				"uReflectivity": { type: "f", value: 0.5 },
 
 				"uOffset" : { type: "v2", value: new THREE.Vector2( 0, 0 ) },
-				"uRepeat" : { type: "v2", value: new THREE.Vector2( 1, 1 ) }
+				"uRepeat" : { type: "v2", value: new THREE.Vector2( 1, 1 ) },
+
+				"wrapRGB"  : { type: "v3", value: new THREE.Vector3( 1, 1, 1 ) }
 
 				}
 
@@ -180,6 +182,10 @@ THREE.ShaderUtils = {
 					"varying vec4 vPointLight[ MAX_POINT_LIGHTS ];",
 				"#endif",
 
+				"#ifdef WRAP_AROUND",
+					"uniform vec3 wrapRGB;",
+				"#endif",
+
 				"varying vec3 vViewPosition;",
 
 				THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
@@ -195,11 +201,39 @@ THREE.ShaderUtils = {
 					"normalTex.xy *= uNormalScale;",
 					"normalTex = normalize( normalTex );",
 
-					"if( enableDiffuse )",
-						"gl_FragColor = gl_FragColor * texture2D( tDiffuse, vUv );",
+					"if( enableDiffuse ) {",
 
-					"if( enableAO )",
-						"gl_FragColor.xyz = gl_FragColor.xyz * texture2D( tAO, vUv ).xyz;",
+						"#ifdef GAMMA_INPUT",
+
+							"vec4 texelColor = texture2D( tDiffuse, vUv );",
+							"texelColor.xyz *= texelColor.xyz;",
+
+							"gl_FragColor = gl_FragColor * texelColor;",
+
+						"#else",
+
+							"gl_FragColor = gl_FragColor * texture2D( tDiffuse, vUv );",
+
+						"#endif",
+
+					"}",
+
+					"if( enableAO ) {",
+
+						"#ifdef GAMMA_INPUT",
+
+							"vec4 aoColor = texture2D( tAO, vUv );",
+							"aoColor.xyz *= aoColor.xyz;",
+
+							"gl_FragColor.xyz = gl_FragColor.xyz * aoColor.xyz;",
+
+						"#else",
+
+							"gl_FragColor.xyz = gl_FragColor.xyz * texture2D( tAO, vUv ).xyz;",
+
+						"#endif",
+
+					"}",
 
 					"if( enableSpecular )",
 						"specularTex = texture2D( tSpecular, vUv ).xyz;",
@@ -220,15 +254,31 @@ THREE.ShaderUtils = {
 						"for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {",
 
 							"vec3 pointVector = normalize( vPointLight[ i ].xyz );",
-							"vec3 pointHalfVector = normalize( vPointLight[ i ].xyz + viewPosition );",
 							"float pointDistance = vPointLight[ i ].w;",
 
-							"float pointDotNormalHalf = max( dot( normal, pointHalfVector ), 0.0 );",
-							"float pointDiffuseWeight = max( dot( normal, pointVector ), 0.0 );",
+							// diffuse
 
-							"float pointSpecularWeight = specularTex.r * pow( pointDotNormalHalf, uShininess );",
+							"#ifdef WRAP_AROUND",
+
+								"float pointDiffuseWeightFull = max( dot( normal, pointVector ), 0.0 );",
+								"float pointDiffuseWeightHalf = max( 0.5 * dot( normal, pointVector ) + 0.5, 0.0 );",
+
+								"vec3 pointDiffuseWeight = mix( vec3 ( pointDiffuseWeightFull ), vec3( pointDiffuseWeightHalf ), wrapRGB );",
+
+							"#else",
+
+								"float pointDiffuseWeight = max( dot( normal, pointVector ), 0.0 );",
+
+							"#endif",
 
 							"pointDiffuse += pointDistance * pointLightColor[ i ] * uDiffuseColor * pointDiffuseWeight;",
+
+							// specular
+
+							"vec3 pointHalfVector = normalize( pointVector + viewPosition );",
+							"float pointDotNormalHalf = max( dot( normal, pointHalfVector ), 0.0 );",
+							"float pointSpecularWeight = specularTex.r * max( pow( pointDotNormalHalf, uShininess ), 0.0 );",
+
 							"pointSpecular += pointDistance * pointLightColor[ i ] * uSpecularColor * pointSpecularWeight * pointDiffuseWeight;",
 
 						"}",
@@ -245,16 +295,31 @@ THREE.ShaderUtils = {
 						"for( int i = 0; i < MAX_DIR_LIGHTS; i++ ) {",
 
 							"vec4 lDirection = viewMatrix * vec4( directionalLightDirection[ i ], 0.0 );",
-
 							"vec3 dirVector = normalize( lDirection.xyz );",
-							"vec3 dirHalfVector = normalize( lDirection.xyz + viewPosition );",
 
-							"float dirDotNormalHalf = max( dot( normal, dirHalfVector ), 0.0 );",
-							"float dirDiffuseWeight = max( dot( normal, dirVector ), 0.0 );",
+							// diffuse
 
-							"float dirSpecularWeight = specularTex.r * pow( dirDotNormalHalf, uShininess );",
+							"#ifdef WRAP_AROUND",
+
+								"float directionalLightWeightingFull = max( dot( normal, dirVector ), 0.0 );",
+								"float directionalLightWeightingHalf = max( 0.5 * dot( normal, dirVector ) + 0.5, 0.0 );",
+
+								"vec3 dirDiffuseWeight = mix( vec3( directionalLightWeightingFull ), vec3( directionalLightWeightingHalf ), wrapRGB );",
+
+							"#else",
+
+								"float dirDiffuseWeight = max( dot( normal, dirVector ), 0.0 );",
+
+							"#endif",
 
 							"dirDiffuse += directionalLightColor[ i ] * uDiffuseColor * dirDiffuseWeight;",
+
+							// specular
+
+							"vec3 dirHalfVector = normalize( dirVector + viewPosition );",
+							"float dirDotNormalHalf = max( dot( normal, dirHalfVector ), 0.0 );",
+							"float dirSpecularWeight = specularTex.r * max( pow( dirDotNormalHalf, uShininess ), 0.0 );",
+
 							"dirSpecular += directionalLightColor[ i ] * uSpecularColor * dirSpecularWeight * dirDiffuseWeight;",
 
 						"}",
@@ -286,12 +351,21 @@ THREE.ShaderUtils = {
 
 						"vec3 wPos = cameraPosition - vViewPosition;",
 						"vec3 vReflect = reflect( normalize( wPos ), normal );",
+
 						"vec4 cubeColor = textureCube( tCube, vec3( -vReflect.x, vReflect.yz ) );",
+
+						"#ifdef GAMMA_INPUT",
+
+							"cubeColor.xyz *= cubeColor.xyz;",
+
+						"#endif",
+
 						"gl_FragColor.xyz = mix( gl_FragColor.xyz, cubeColor.xyz, specularTex.r * uReflectivity );",
 
 					"}",
 
 					THREE.ShaderChunk[ "shadowmap_fragment" ],
+					THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
 					THREE.ShaderChunk[ "fog_fragment" ],
 
 				"}"
@@ -352,11 +426,9 @@ THREE.ShaderUtils = {
 						"for( int i = 0; i < MAX_POINT_LIGHTS; i++ ) {",
 
 							"vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );",
-
 							"vec3 lVector = lPosition.xyz - mvPosition.xyz;",
 
 							"float lDistance = 1.0;",
-
 							"if ( pointLightDistance[ i ] > 0.0 )",
 								"lDistance = 1.0 - min( ( length( lVector ) / pointLightDistance[ i ] ), 1.0 );",
 

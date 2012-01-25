@@ -37,16 +37,28 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
+				scene = new THREE.Scene();
+
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 1000;
-
-				scene = new THREE.Scene();
+				scene.add( camera );
 
 				scene.add( new THREE.AmbientLight( 0x505050 ) );
 
 				var light = new THREE.SpotLight( 0xffffff, 1.5 );
 				light.position.set( 0, 500, 2000 );
 				light.castShadow = true;
+
+				light.shadowCameraNear = 200;
+				light.shadowCameraFar = camera.far;
+				light.shadowCameraFov = 50;
+
+				light.shadowBias = -0.00022;
+				light.shadowDarkness = 0.5;
+
+				light.shadowMapWidth = 1024;
+				light.shadowMapHeight = 1024;
+
 				scene.add( light );
 
 				var geometry = new THREE.CubeGeometry( 40, 40, 40 );
@@ -91,15 +103,6 @@
 
 				renderer.shadowMapEnabled = true;
 				renderer.shadowMapSoft = true;
-
-				renderer.shadowCameraNear = 3;
-				renderer.shadowCameraFar = camera.far;
-				renderer.shadowCameraFov = 50;
-
-				renderer.shadowMapBias = 0.0039;
-				renderer.shadowMapDarkness = 0.5;
-				renderer.shadowMapWidth = 1024;
-				renderer.shadowMapHeight = 1024;
 
 				container.appendChild( renderer.domElement );
 

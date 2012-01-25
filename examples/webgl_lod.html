@@ -66,11 +66,12 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 15000 );
-				camera.position.z = 1000;
-
 				scene = new THREE.Scene();
 				scene.fog = new THREE.Fog( 0x000000, 1, 15000 );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 15000 );
+				camera.position.z = 1000;
+				scene.add( camera );
 
 				var light = new THREE.PointLight( 0xff2200 );
 				light.position.set( 0, 0, 0 );

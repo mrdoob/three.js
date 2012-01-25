@@ -127,6 +127,8 @@ THREE.SceneUtils = {
 
 		// base class properties
 
+		object.name = source.name;
+
 		object.parent = source.parent;
 
 		object.up.copy( source.up );

@@ -27,24 +27,24 @@
 
 		<div style="position: absolute; top: 10px; width: 100%; text-align: center; ">
 			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - Combo Camera<br>
-			View: <a href="#" onclick="setOrthographic();return false;"> Orthographic</a> | 
+			View: <a href="#" onclick="setOrthographic();return false;"> Orthographic</a> |
 				<a href="#" onclick="setPerspective();return false;">Perspective</a><br>
-			Lens: <a href="#" onclick="setLens(12);return false;">12mm</a> | 
-				<a href="#" onclick="setLens(16);return false;">16mm</a> | 
-				<a href="#" onclick="setLens(24);return false;">24mm</a> | 
-				<a href="#" onclick="setLens(35);return false;">35mm</a> | 
-				<a href="#" onclick="setLens(50);return false;">50mm</a> | 
-				<a href="#" onclick="setLens(60);return false;">60mm</a> | 
-				<a href="#" onclick="setLens(85);return false;">85mm</a> | 
+			Lens: <a href="#" onclick="setLens(12);return false;">12mm</a> |
+				<a href="#" onclick="setLens(16);return false;">16mm</a> |
+				<a href="#" onclick="setLens(24);return false;">24mm</a> |
+				<a href="#" onclick="setLens(35);return false;">35mm</a> |
+				<a href="#" onclick="setLens(50);return false;">50mm</a> |
+				<a href="#" onclick="setLens(60);return false;">60mm</a> |
+				<a href="#" onclick="setLens(85);return false;">85mm</a> |
 				<a href="#" onclick="setLens(105);return false;">105mm</a><br>
-			Fov: <a href="#" onclick="setFov(30);return false;">30°</a> | 
-				<a href="#" onclick="setFov(50);return false;">50°</a> | 
-				<a href="#" onclick="setFov(70);return false;">70°</a> | 
+			Fov: <a href="#" onclick="setFov(30);return false;">30°</a> |
+				<a href="#" onclick="setFov(50);return false;">50°</a> |
+				<a href="#" onclick="setFov(70);return false;">70°</a> |
 				<a href="#" onclick="setFov(100);return false;">100°</a><br>
 			Zoom: <a href="#" onclick="camera.setZoom(0.5);return false;">0.5x</a> |
 					<a href="#" onclick="camera.setZoom(1);return false;">1x</a> |
 					<a href="#" onclick="camera.setZoom(2);return false;">2x</a> |
-					
+
 				<br/>
 			Views: <a href="#" onclick="camera.toTopView();return false;">Top view</a> |
 				<a href="#" onclick="camera.toBottomView();return false;">Bottom view</a> |
@@ -56,7 +56,7 @@
 				<br/>
 			<div id="fov"></div>
 		</div>
-			
+
 
 
 		<script>
@@ -67,29 +67,38 @@
 			init();
 			animate();
 
-			function setFov(fov) {
-				camera.setFov(fov);
+			function setFov( fov ) {
+
+				camera.setFov( fov );
 
 				document.getElementById('fov').innerHTML = 'FOV '+ fov.toFixed(2) +'&deg;' ;
+
 			}
 
-			function setLens(lens) {
+			function setLens( lens ) {
+
 				// try adding a tween effect while changing focal length, and it'd be even cooler!
-				var fov = camera.setLens(lens);
+
+				var fov = camera.setLens( lens );
 
 				document.getElementById('fov').innerHTML = 'Converted ' + lens + 'mm lens to FOV '+ fov.toFixed(2) +'&deg;' ;
+
 			}
 
 			function setOrthographic() {
+
 				camera.toOrthographic();
 
 				document.getElementById('fov').innerHTML = 'Orthographic mode' ;
+
 			}
 
 			function setPerspective() {
+
 				camera.toPerspective();
 
 				document.getElementById('fov').innerHTML = 'Perspective mode' ;
+
 			}
 
 			function init() {
@@ -104,6 +113,8 @@
 				camera.position.z = 200;
 
 				scene = new THREE.Scene();
+
+				scene.add( camera );
 
 				// Grid
 

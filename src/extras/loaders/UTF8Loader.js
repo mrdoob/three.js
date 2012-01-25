@@ -311,27 +311,25 @@ THREE.UTF8Loader.prototype.createModel = function ( data, callback, scale, offse
 
 	};
 
-	function f3n ( scope, normals, a, b, c, mi, na, nb, nc ) {
+	function f3n ( scope, normals, a, b, c, mi, nai, nbi, nci ) {
 
-		var material = scope.materials[ mi ],
+		var nax = normals[ nai * 3     ],
+			nay = normals[ nai * 3 + 1 ],
+			naz = normals[ nai * 3 + 2 ],
 
-			nax = normals[ na * 3     ],
-			nay = normals[ na * 3 + 1 ],
-			naz = normals[ na * 3 + 2 ],
+			nbx = normals[ nbi * 3     ],
+			nby = normals[ nbi * 3 + 1 ],
+			nbz = normals[ nbi * 3 + 2 ],
 
-			nbx = normals[ nb * 3     ],
-			nby = normals[ nb * 3 + 1 ],
-			nbz = normals[ nb * 3 + 2 ],
-
-			ncx = normals[ nc * 3     ],
-			ncy = normals[ nc * 3 + 1 ],
-			ncz = normals[ nc * 3 + 2 ];
+			ncx = normals[ nci * 3     ],
+			ncy = normals[ nci * 3 + 1 ],
+			ncz = normals[ nci * 3 + 2 ];
 
 		var na = new THREE.Vector3( nax, nay, naz ),
 			nb = new THREE.Vector3( nbx, nby, nbz ),
 			nc = new THREE.Vector3( ncx, ncy, ncz );
 
-		scope.faces.push( new THREE.Face3( a, b, c, [ na, nb, nc ], null, material ) );
+		scope.faces.push( new THREE.Face3( a, b, c, [ na, nb, nc ], null, mi ) );
 
 	};
 

@@ -48,7 +48,7 @@ THREE.LOD.prototype.update = function ( camera ) {
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
 		var inverse  = camera.matrixWorldInverse;
-		var distance = -( inverse.n31 * this.position.x + inverse.n32 * this.position.y + inverse.n33 * this.position.z + inverse.n34 );
+		var distance = -( inverse.n31 * this.matrixWorld.n14 + inverse.n32 * this.matrixWorld.n24 + inverse.n33 * this.matrixWorld.n34 + inverse.n34 );
 
 		this.LODs[ 0 ].object3D.visible = true;
 
