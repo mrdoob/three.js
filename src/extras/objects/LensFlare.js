@@ -35,7 +35,7 @@ THREE.LensFlare.prototype.add = function ( texture, size, distance, blending, co
 	if( distance === undefined ) distance = 0;
 	if( opacity === undefined ) opacity = 1;
 	if( color === undefined ) color = new THREE.Color( 0xffffff );
-	if( blending === undefined ) blending = THREE.BillboardBlending;
+	if( blending === undefined ) blending = THREE.NormalBlending;
 
 	distance = Math.min( distance, Math.max( 0, distance ) );
 

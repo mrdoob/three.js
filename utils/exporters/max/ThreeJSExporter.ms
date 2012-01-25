@@ -14,6 +14,7 @@ rollout ThreeJSExporter "ThreeJSExporter"
 {
 \"sourceFile\": \"%\",
 \"generatedBy\": \"3ds max ThreeJSExporter\",
+\"formatVersion\": 3,
 \"vertices\": %,
 \"normals\": %,
 \"colors\": %,

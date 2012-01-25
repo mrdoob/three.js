@@ -33,20 +33,21 @@
 
 			function init() {
 
-				container = document.createElement('div');
-				document.body.appendChild(container);
-
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.y = 200;
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
 
 				scene = new THREE.Scene();
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.y = 400;
+				scene.add( camera );
 
 				var light, object, materials;
 
 				scene.add( new THREE.AmbientLight( 0x404040 ) );
 
 				light = new THREE.DirectionalLight( 0xffffff );
-				light.position.z = 1;
+				light.position.set( 0, 0, 1 );
 				scene.add( light );
 
 				materials = [
@@ -55,19 +56,28 @@
 				];
 
 				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.CubeGeometry( 100, 100, 100, 4, 4, 4 ), materials );
-				object.position.set( -200, 0, 200 );
+				object.position.set( -200, 0, 400 );
 				scene.add( object );
 
 				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.CylinderGeometry( 25, 75, 100, 40, 5 ), materials );
+				object.position.set( 0, 0, 400 );
+				scene.add( object );
+
+				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.IcosahedronGeometry( 75, 1 ), materials );
+				object.position.set( -200, 0, 200 );
+				scene.add( object );
+
+				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.OctahedronGeometry( 75, 2 ), materials );
 				object.position.set( 0, 0, 200 );
 				scene.add( object );
 
-				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.IcosahedronGeometry( 2 ), materials );
+
+				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.TetrahedronGeometry( 75, 0 ), materials );
 				object.position.set( 200, 0, 200 );
-				object.scale.x = object.scale.y = object.scale.z = 75;
 				scene.add( object );
 
 				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.PlaneGeometry( 100, 100, 4, 4 ), materials );
+				object.children[ 0 ].doubleSided = true;
 				object.position.set( -200, 0, 0 );
 				scene.add( object );
 
@@ -84,6 +94,7 @@
 				}
 
 				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.LatheGeometry( points, 20 ), materials );
+				object.children[ 0 ].doubleSided = true;
 				object.position.set( 200, 0, 0 );
 				scene.add( object );
 
@@ -95,12 +106,12 @@
 				object.position.set( 0, 0, -200 );
 				scene.add( object );
 
-				object = new THREE.Axes();
+				object = new THREE.AxisHelper();
 				object.position.set( 200, 0, -200 );
 				object.scale.x = object.scale.y = object.scale.z = 0.5;
 				scene.add( object );
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.appendChild( renderer.domElement );

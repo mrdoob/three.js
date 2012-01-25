@@ -44,10 +44,11 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
+				scene = new THREE.Scene();
+
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 5000 );
 				camera.position.z = 1500;
-
-				scene = new THREE.Scene();
+				scene.add( camera );
 
 				// create sprites
 

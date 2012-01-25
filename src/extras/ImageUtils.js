@@ -5,7 +5,7 @@
 
 THREE.ImageUtils = {
 
-	crossOrigin: '',
+	crossOrigin: 'anonymous',
 
 	loadTexture: function ( path, mapping, callback ) {
 
@@ -25,7 +25,7 @@ THREE.ImageUtils = {
 
 		images.loadCount = 0;
 
-		for ( i = 0, l = array.length; i < l; ++i ) {
+		for ( i = 0, l = array.length; i < l; ++ i ) {
 
 			images[ i ] = new Image();
 			images[ i ].onload = function () {
@@ -36,7 +36,7 @@ THREE.ImageUtils = {
 
 			};
 
-			images[ i ].crossOrigin = '';
+			images[ i ].crossOrigin = this.crossOrigin;
 			images[ i ].src = array[ i ];
 
 		}
@@ -68,7 +68,8 @@ THREE.ImageUtils = {
 
 		}
 
-		var depth = depth | 1;
+		depth = depth | 1;
+
 		var width = image.width;
 		var height = image.height;
 

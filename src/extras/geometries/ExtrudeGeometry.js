@@ -22,15 +22,15 @@
  *  extrudePath:	<THREE.CurvePath>	// path to extrude shape along
  *  bendPath:		<THREE.CurvePath> 	// path to bend the geometry around
  *
- *  material:		 <THREE.Material>	// material for front and back faces
- *  extrudeMaterial: <THREE.Material>	// material for extrusion and beveled faces
+ *  material:		 <int>	// material index for front and back faces
+ *  extrudeMaterial: <int>	// material index for extrusion and beveled faces
  *
  *  }
   **/
 
 THREE.ExtrudeGeometry = function( shapes, options ) {
 
-	if( typeof( shapes ) === "undefined" ) {
+	if ( typeof( shapes ) === "undefined" ) {
 
 		shapes = [];
 		return;
@@ -41,7 +41,7 @@ THREE.ExtrudeGeometry = function( shapes, options ) {
 
 	shapes = shapes instanceof Array ? shapes : [ shapes ];
 
-	var s, sl = shapes.length, shape;
+	var shape, s, sl = shapes.length;
 
 	this.shapebb = shapes[ sl - 1 ].getBoundingBox();
 
@@ -110,7 +110,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	// Safeguards if bevels are not enabled
 
-	if ( !bevelEnabled ) {
+	if ( ! bevelEnabled ) {
 
 		bevelSegments = 0;
 		bevelThickness = 0;
@@ -129,7 +129,6 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	var shapesOffset = this.vertices.length;
 
-
 	if ( bendPath ) {
 
 		shape.addWrapPath( bendPath );
@@ -138,7 +137,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	var shapePoints;
 
-	if ( !useSpacedPoints ) {
+	if ( ! useSpacedPoints ) {
 
 	  	shapePoints = shape.extractAllPoints( curveSegments ); //
 
@@ -202,8 +201,6 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	}
 
-
-	var i, il;
 
 	function scalePt2 ( pt, vec, size ) {
 
@@ -346,7 +343,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	var contourMovements = [];
 
-	for ( i = 0, il = contour.length, j = il-1, k = i + 1; i < il; i++, j++, k++ ) {
+	for ( var i = 0, il = contour.length, j = il - 1, k = i + 1; i < il; i ++, j ++, k ++ ) {
 
 		if ( j === il ) j = 0;
 		if ( k === il ) k = 0;
@@ -364,13 +361,13 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	var holesMovements = [], oneHoleMovements, verticesMovements = contourMovements.concat();
 
-	for ( h = 0, hl = holes.length; h < hl; h++ ) {
+	for ( h = 0, hl = holes.length; h < hl; h ++ ) {
 
 		ahole = holes[ h ];
 
 		oneHoleMovements = [];
 
-		for ( i = 0, il = ahole.length, j = il - 1, k = i + 1; i < il; i++, j++, k++ ) {
+		for ( i = 0, il = ahole.length, j = il - 1, k = i + 1; i < il; i ++, j ++, k ++ ) {
 
 			if ( j === il ) j = 0;
 			if ( k === il ) k = 0;
@@ -621,7 +618,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 				f4( a, b, c, d );
 
-				if ( extrudeMaterial ) {
+				if ( extrudeMaterial !== undefined ) {
 
 					var v1 = s / sl;
 					var v2 = ( s + 1 ) / sl;
@@ -664,21 +661,21 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 		scope.faces.push( new THREE.Face3( a, b, c, null, null, material ) );
 		//normal, color, materials
 
-		if ( material ) {
+		if ( material !== undefined ) {
 
 			var mx = shapebb.minX, my = shapebb.minY;
 
 			var uy = shapebb.maxY; // - shapebb.minY;
 			var ux = shapebb.maxX; // - shapebb.minX;
 
-			var ax = scope.vertices[ a ].position.x,
-				ay = scope.vertices[ a ].position.y,
+			var ax = scope.vertices[ a ].position.x - mx,
+				ay = scope.vertices[ a ].position.y - my,
 
-				bx = scope.vertices[ b ].position.x,
-				by = scope.vertices[ b ].position.y,
+				bx = scope.vertices[ b ].position.x - mx,
+				by = scope.vertices[ b ].position.y - my,
 
-				cx = scope.vertices[ c ].position.x,
-				cy = scope.vertices[ c ].position.y;
+				cx = scope.vertices[ c ].position.x - mx,
+				cy = scope.vertices[ c ].position.y - my;
 
 			scope.faceVertexUvs[ 0 ].push( [
 

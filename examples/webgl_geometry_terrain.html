@@ -67,14 +67,14 @@
 
 				container = document.getElementById( 'container' );
 
+				scene = new THREE.Scene();
+
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
+				scene.add( camera );
 
 				controls = new THREE.FirstPersonControls( camera );
-
 				controls.movementSpeed = 1000;
 				controls.lookSpeed = 0.1;
-
-				scene = new THREE.Scene();
 
 				data = generateHeight( worldWidth, worldDepth );
 

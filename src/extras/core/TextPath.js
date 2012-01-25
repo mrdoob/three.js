@@ -17,9 +17,9 @@ THREE.TextPath = function ( text, parameters ) {
 
 THREE.TextPath.prototype.set = function ( text, parameters ) {
 
-	this.text = text;
+	parameters = parameters || this.parameters;
 
-	var parameters = parameters || this.parameters;
+	this.text = text;
 
 	var size = parameters.size !== undefined ? parameters.size : 100;
 	var curveSegments = parameters.curveSegments !== undefined ? parameters.curveSegments: 4;

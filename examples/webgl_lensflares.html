@@ -167,7 +167,7 @@
 
 				// renderer
 
-				renderer = new THREE.WebGLRenderer( { antialias: true, maxLights: 8 } );
+				renderer = new THREE.WebGLRenderer( { antialias: true, maxLights: 8, alpha: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setClearColor( scene.fog.color, 1 );
 

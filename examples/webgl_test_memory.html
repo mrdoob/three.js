@@ -33,10 +33,11 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
+				scene = new THREE.Scene();
+
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 200;
-
-				scene = new THREE.Scene();
+				scene.add( camera );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );

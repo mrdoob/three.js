@@ -401,17 +401,16 @@ THREE.Geometry.prototype = {
 
 	computeBoundingSphere: function () {
 
-		// var radius = this.boundingSphere === null ? 0 : this.boundingSphere.radius;
-
-		var radius = 0;
+		var radius, maxRadius = 0;
 
 		for ( var v = 0, vl = this.vertices.length; v < vl; v ++ ) {
 
-			radius = Math.max( radius, this.vertices[ v ].position.length() );
+			radius = this.vertices[ v ].position.length();
+			if ( radius > maxRadius ) maxRadius = radius;
 
 		}
 
-		this.boundingSphere = { radius: radius };
+		this.boundingSphere = { radius: maxRadius };
 
 	},
 

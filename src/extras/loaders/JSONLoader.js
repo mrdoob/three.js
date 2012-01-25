@@ -29,7 +29,7 @@ THREE.JSONLoader.prototype.load = function ( url, callback, texturePath ) {
 
 	}
 
-	texturePath = texturePath ? texturePath : this.extractUrlbase( url ),
+	texturePath = texturePath ? texturePath : this.extractUrlbase( url );
 
 	this.onLoadStart();
 	this.loadAjaxJSON( this, url, callback, texturePath );
@@ -90,7 +90,7 @@ THREE.JSONLoader.prototype.loadAjaxJSON = function( context, url, callback, text
 	};
 
 	xhr.open( "GET", url, true );
-	xhr.overrideMimeType( "text/plain; charset=x-user-defined" );
+	if ( xhr.overrideMimeType ) xhr.overrideMimeType( "text/plain; charset=x-user-defined" );
 	xhr.setRequestHeader( "Content-Type", "text/plain" );
 	xhr.send( null );
 

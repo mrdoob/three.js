@@ -7,7 +7,7 @@ THREE.Sprite = function ( parameters ) {
 	THREE.Object3D.call( this );
 
 	this.color = ( parameters.color !== undefined ) ? new THREE.Color( parameters.color ) : new THREE.Color( 0xffffff );
-	this.map = ( parameters.map instanceof THREE.Texture ) ? parameters.map : THREE.ImageUtils.loadTexture( parameters.map );
+	this.map = ( parameters.map !== undefined ) ? parameters.map : new THREE.Texture();
 	this.blending = ( parameters.blending !== undefined ) ? parameters.blending : THREE.NormalBlending;
 
 	this.useScreenCoordinates = ( parameters.useScreenCoordinates !== undefined ) ? parameters.useScreenCoordinates : true;

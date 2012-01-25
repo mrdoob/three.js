@@ -4,7 +4,7 @@
  * @author szimek / https://github.com/szimek/
  */
 
-THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter ) {
+THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type ) {
 
 	this.id = THREE.TextureCount ++;
 
@@ -18,8 +18,13 @@ THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter ) 
 	this.magFilter = magFilter !== undefined ? magFilter : THREE.LinearFilter;
 	this.minFilter = minFilter !== undefined ? minFilter : THREE.LinearMipMapLinearFilter;
 
+	this.format = format !== undefined ? format : THREE.RGBAFormat;
+	this.type = type !== undefined ? type : THREE.UnsignedByteType;
+
 	this.offset = new THREE.Vector2( 0, 0 );
 	this.repeat = new THREE.Vector2( 1, 1 );
+
+	this.generateMipmaps = true;
 
 	this.needsUpdate = false;
 	this.onUpdate = null;
@@ -32,7 +37,7 @@ THREE.Texture.prototype = {
 
 	clone: function () {
 
-		var clonedTexture = new THREE.Texture( this.image, this.mapping, this.wrapS, this.wrapT, this.magFilter, this.minFilter );
+		var clonedTexture = new THREE.Texture( this.image, this.mapping, this.wrapS, this.wrapT, this.magFilter, this.minFilter, this.format, this.type );
 
 		clonedTexture.offset.copy( this.offset );
 		clonedTexture.repeat.copy( this.repeat );

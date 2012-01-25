@@ -42,9 +42,7 @@ THREE.Path.prototype.fromPoints = function ( vectors ) {
 
 	this.moveTo( vectors[ 0 ].x, vectors[ 0 ].y );
 
-	var v, vlen = vectors.length;
-
-	for ( v = 1; v < vlen; v++ ) {
+	for ( var v = 1, vlen = vectors.length; v < vlen; v ++ ) {
 
 		this.lineTo( vectors[ v ].x, vectors[ v ].y );
 
@@ -155,7 +153,7 @@ THREE.Path.prototype.arc = function ( aX, aY, aRadius,
 
 THREE.Path.prototype.getSpacedPoints = function ( divisions, closedPath ) {
 
-	if ( !divisions ) divisions = 40;
+	if ( ! divisions ) divisions = 40;
 
 	var points = [];
 
@@ -332,13 +330,12 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 			var deltaAngle = aEndAngle - aStartAngle;
 			var angle;
 			var tdivisions = divisions * 2;
-			var t;
 
 			for ( j = 1; j <= tdivisions; j ++ ) {
 
 				t = j / tdivisions;
 
-				if ( !aClockwise ) {
+				if ( ! aClockwise ) {
 
 					t = 1 - t;
 
@@ -507,17 +504,6 @@ THREE.Path.prototype.debug = function( canvas ) {
 
 	var p, points = this.getPoints();
 
-	//var theta = -90 /180 * Math.PI;
-	//var p, points = this.transform( 0.866, - 0.866,0, 0.500 , 0.50,-50 );
-
-	//0.866, - 0.866,0, 0.500 , 0.50,-50
-
-	// Math.cos(theta),Math.sin(theta),100,
-	// Math.cos(theta),-Math.sin(theta),-50
-
-	// translate, scale, rotation
-
-
 	for ( i = 0, il = points.length; i < il; i ++ ) {
 
 		p = points[ i ];
@@ -567,15 +553,23 @@ THREE.Path.prototype.toShapes = function() {
 
 	}
 
-	//console.log(subPaths);
+	// console.log(subPaths);
 
 	if ( subPaths.length == 0 ) return [];
 
-	var holesFirst = !THREE.Shape.Utils.isClockWise( subPaths[ 0 ].getPoints() );
-
 	var tmpPath, tmpShape, shapes = [];
 
-	//console.log("Holes first", holesFirst);
+	var holesFirst = !THREE.Shape.Utils.isClockWise( subPaths[ 0 ].getPoints() );
+	// console.log("Holes first", holesFirst);
+
+	if ( subPaths.length == 1) {
+		tmpPath = subPaths[0];
+		tmpShape = new THREE.Shape();
+		tmpShape.actions = tmpPath.actions;
+		tmpShape.curves = tmpPath.curves;
+		shapes.push( tmpShape );
+		return shapes;
+	};
 
 	if ( holesFirst ) {
 

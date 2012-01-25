@@ -326,6 +326,8 @@
 				scene = loaded.scene;
 				camera = loaded.currentCamera;
 
+				scene.add( camera );
+
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
@@ -350,6 +352,7 @@
 				};
 
 				result.camera.position.z = 100;
+				result.scene.add( result.camera );
 
 				var object, geometry, material, light, count = 500, range = 200;
 

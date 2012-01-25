@@ -47,11 +47,13 @@
 
 				scene = new THREE.Scene();
 
+				scene.add( camera );
+
 				var geometry = new THREE.CubeGeometry( 100, 100, 100 );
 
 				for ( var i = 0; i < 20; i ++ ) {
 
-					var object = new THREE.Mesh( geometry, [ new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, opacity: 0.5 } ), new THREE.MeshBasicMaterial( { color: 0xffffff, opacity: 0.5, wireframe: true } ) ] );
+					var object = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, opacity: 0.5 } ) );
 					object.position.x = Math.random() * 800 - 400;
 					object.position.y = Math.random() * 800 - 400;
 					object.position.z = Math.random() * 800 - 400;

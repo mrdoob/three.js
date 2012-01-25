@@ -39,6 +39,9 @@ THREE.MeshLambertMaterial = function ( parameters ) {
 	this.color = parameters.color !== undefined ? new THREE.Color( parameters.color ) : new THREE.Color( 0xffffff );
 	this.ambient = parameters.ambient !== undefined ? new THREE.Color( parameters.ambient ) : new THREE.Color( 0x050505 );
 
+	this.wrapAround = parameters.wrapAround !== undefined ? parameters.wrapAround: false;
+	this.wrapRGB = new THREE.Vector3( 1, 1, 1 );
+
 	this.map = parameters.map !== undefined ? parameters.map : null;
 
 	this.lightMap = parameters.lightMap !== undefined ? parameters.lightMap : null;

@@ -5,14 +5,10 @@
 
 THREE.Quaternion = function( x, y, z, w ) {
 
-	this.set(
-
-		x || 0,
-		y || 0,
-		z || 0,
-		w !== undefined ? w : 1
-
-	);
+	this.x = x || 0;
+	this.y = y || 0;
+	this.z = z || 0;
+	this.w = ( w !== undefined ) ? w : 1;
 
 };
 
@@ -39,6 +35,12 @@ THREE.Quaternion.prototype = {
 		this.w = q.w;
 
 		return this;
+
+	},
+
+	clone: function () {
+
+		return new THREE.Quaternion( this.x, this.y, this.z, this.w );
 
 	},
 
@@ -86,11 +88,16 @@ THREE.Quaternion.prototype = {
 	},
 
 	setFromRotationMatrix: function ( m ) {
+
 		// Adapted from: http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
-		function copySign(a, b) {
-			return b < 0 ? -Math.abs(a) : Math.abs(a);
+
+		function copySign( a, b ) {
+
+			return b < 0 ? -Math.abs( a ) : Math.abs( a );
+
 		}
-		var absQ = Math.pow(m.determinant(), 1.0 / 3.0);
+
+		var absQ = Math.pow( m.determinant(), 1.0 / 3.0 );
 		this.w = Math.sqrt( Math.max( 0, absQ + m.n11 + m.n22 + m.n33 ) ) / 2;
 		this.x = Math.sqrt( Math.max( 0, absQ + m.n11 - m.n22 - m.n33 ) ) / 2;
 		this.y = Math.sqrt( Math.max( 0, absQ - m.n11 + m.n22 - m.n33 ) ) / 2;
@@ -99,7 +106,9 @@ THREE.Quaternion.prototype = {
 		this.y = copySign( this.y, ( m.n13 - m.n31 ) );
 		this.z = copySign( this.z, ( m.n21 - m.n12 ) );
 		this.normalize();
+
 		return this;
+
 	},
 
 	calculateW : function () {
@@ -181,7 +190,7 @@ THREE.Quaternion.prototype = {
 
 	multiplyVector3: function ( vec, dest ) {
 
-		if( !dest ) { dest = vec; }
+		if ( !dest ) { dest = vec; }
 
 		var x    = vec.x,  y  = vec.y,  z  = vec.z,
 			qx   = this.x, qy = this.y, qz = this.z, qw = this.w;

@@ -4,11 +4,11 @@
 
 THREE.CanvasRenderer = function ( parameters ) {
 
+	parameters = parameters || {};
+
 	var _this = this,
 	_renderData, _elements, _lights,
 	_projector = new THREE.Projector(),
-
-	parameters = parameters || {},
 
 	_canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElement( 'canvas' ),
 
@@ -559,7 +559,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 					}/* else if ( material.envMap.mapping == THREE.SphericalRefractionMapping ) {
 
-						
+
 
 					}*/
 
@@ -890,7 +890,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			if ( det == 0 ) {
 
-				if ( _imagedatas[ texture.id ] == undefined ) {
+				if ( _imagedatas[ texture.id ] === undefined ) {
 
 					var canvas = document.createElement( 'canvas' )
 					canvas.width = texture.image.width;
@@ -901,7 +901,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 					_imagedatas[ texture.id ] = context.getImageData( 0, 0, texture.image.width, texture.image.height ).data;
 
-					delete canvas;
+					// variables cannot be deleted in ES5 strict mode
+					//delete canvas;
 
 				}
 

@@ -46,6 +46,9 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 	this.metal = parameters.metal !== undefined ? parameters.metal : false;
 	this.perPixel = parameters.perPixel !== undefined ? parameters.perPixel : false;
 
+	this.wrapAround = parameters.wrapAround !== undefined ? parameters.wrapAround: false;
+	this.wrapRGB = new THREE.Vector3( 1, 1, 1 );
+
 	this.map = parameters.map !== undefined ? parameters.map : null;
 
 	this.lightMap = parameters.lightMap !== undefined ? parameters.lightMap : null;
