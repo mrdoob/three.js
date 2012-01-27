@@ -669,9 +669,6 @@ THREE.ShaderChunk = {
 			"gl_Position  = ( boneGlobalMatrices[ int( skinIndex.x ) ] * skinVertexA ) * skinWeight.x;",
 			"gl_Position += ( boneGlobalMatrices[ int( skinIndex.y ) ] * skinVertexB ) * skinWeight.y;",
 
-			// this doesn't work, no idea why
-			//"gl_Position  = projectionMatrix * cameraInverseMatrix * objectMatrix * gl_Position;",
-
 			"gl_Position  = projectionMatrix * viewMatrix * objectMatrix * gl_Position;",
 
 		"#endif"

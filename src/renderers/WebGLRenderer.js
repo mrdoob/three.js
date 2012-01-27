@@ -4278,7 +4278,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( material.skinning ) {
 
-				loadUniformsSkinning( p_uniforms, object, camera );
+				_gl.uniformMatrix4fv( p_uniforms.boneGlobalMatrices, false, object.boneMatrices );
 
 			}
 
@@ -4474,14 +4474,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 	};
 
 	// Uniforms (load to GPU)
-
-	function loadUniformsSkinning ( uniforms, object, camera ) {
-
-		_gl.uniformMatrix4fv( uniforms.cameraInverseMatrix, false, camera._viewMatrixArray );
-		_gl.uniformMatrix4fv( uniforms.boneGlobalMatrices, false, object.boneMatrices );
-
-	};
-
 
 	function loadUniformsMatrices ( uniforms, object ) {
 
@@ -5128,8 +5120,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			"uniform mat3 normalMatrix;",
 			"uniform vec3 cameraPosition;",
 
-			"uniform mat4 cameraInverseMatrix;",
-
 			"attribute vec3 position;",
 			"attribute vec3 normal;",
 			"attribute vec2 uv;",
@@ -5227,7 +5217,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		identifiers = [
 
 			'viewMatrix', 'modelViewMatrix', 'projectionMatrix', 'normalMatrix', 'objectMatrix', 'cameraPosition',
-			'cameraInverseMatrix', 'boneGlobalMatrices', 'morphTargetInfluences'
+			'boneGlobalMatrices', 'morphTargetInfluences'
 
 		];
 
