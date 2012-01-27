@@ -341,20 +341,18 @@ THREE.Geometry.prototype = {
 
 	computeBoundingBox: function () {
 
+		if ( ! this.boundingBox ) {
+
+			this.boundingBox = { min: new THREE.Vector3(), max: new THREE.Vector3() };
+
+		}
+
 		if ( this.vertices.length > 0 ) {
 
 			var position, firstPosition = this.vertices[ 0 ].position;
 
-			if ( ! this.boundingBox ) {
-
-				this.boundingBox = { min: firstPosition.clone(), max: firstPosition.clone() };
-
-			} else {
-
-				this.boundingBox.min.copy( firstPosition );
-				this.boundingBox.max.copy( firstPosition );
-
-			}
+			this.boundingBox.min.copy( firstPosition );
+			this.boundingBox.max.copy( firstPosition );
 
 			var min = this.boundingBox.min,
 				max = this.boundingBox.max;
@@ -395,11 +393,18 @@ THREE.Geometry.prototype = {
 
 			}
 
+		} else {
+
+			this.boundingBox.min.set( 0, 0, 0 );
+			this.boundingBox.max.set( 0, 0, 0 );
+
 		}
 
 	},
 
 	computeBoundingSphere: function () {
+
+		if ( ! this.boundingSphere ) this.boundingSphere = { radius: 0 };
 
 		var radius, maxRadius = 0;
 
@@ -410,7 +415,7 @@ THREE.Geometry.prototype = {
 
 		}
 
-		this.boundingSphere = { radius: maxRadius };
+		this.boundingSphere.radius = maxRadius;
 
 	},
 
