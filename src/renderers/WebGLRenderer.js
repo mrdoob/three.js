@@ -4256,7 +4256,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( p_uniforms.cameraPosition !== null ) {
 
-					_gl.uniform3f( p_uniforms.cameraPosition, camera.position.x, camera.position.y, camera.position.z );
+					var position = camera.matrixWorld.getPosition();
+					_gl.uniform3f( p_uniforms.cameraPosition, position.x, position.y, position.z );
 
 				}
 
