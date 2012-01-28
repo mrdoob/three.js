@@ -4453,7 +4453,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( ! light.castShadow ) continue;
 
-				if ( light instanceof THREE.SpotLight || light instanceof THREE.DirectionalLight ) {
+				if ( light instanceof THREE.SpotLight || ( light instanceof THREE.DirectionalLight && ! light.shadowCascade ) ) {
 
 					uniforms.shadowMap.texture[ j ] = light.shadowMap;
 					uniforms.shadowMapSize.value[ j ] = light.shadowMapSize;
@@ -5774,6 +5774,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		console.log( "maxDirLights", maxDirLights );
+
 		return { 'directional' : maxDirLights, 'point' : maxPointLights };
 
 	};
@@ -5788,9 +5790,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( ! light.castShadow ) continue;
 
-			if ( light instanceof THREE.SpotLight || light instanceof THREE.DirectionalLight ) maxShadows ++;
+			if ( light instanceof THREE.SpotLight ) maxShadows ++;
+			if ( light instanceof THREE.DirectionalLight && ! light.shadowCascade ) maxShadows ++;
 
 		}
+
+		console.log( "maxShadows", maxShadows );
 
 		return maxShadows;
 

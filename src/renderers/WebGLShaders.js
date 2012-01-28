@@ -757,13 +757,26 @@ THREE.ShaderChunk = {
 			"vec3 shadowColor = vec3( 1.0 );",
 			"float fDepth;",
 
+			"vec3 colors[3];",
+			"colors[0] = vec3( 1.0, 0.5, 0.0 );",
+			"colors[1] = vec3( 0.0, 1.0, 0.8 );",
+			"colors[2] = vec3( 0.0, 0.5, 1.0 );",
+
+			"float inShadowFrustum = 0.0;",
+
 			"for( int i = 0; i < MAX_SHADOWS; i ++ ) {",
 
 				"vec3 shadowCoord = vShadowCoord[ i ].xyz / vShadowCoord[ i ].w;",
 
+				"if ( ( shadowCoord.x >= 0.0 && shadowCoord.x <= 1.0 && shadowCoord.y >= 0.0 && shadowCoord.y <= 1.0 ) ) {",
+
+					"inShadowFrustum += 1.0;",
+
+				"}",
+
 				// don't shadow pixels behind far plane of light frustum
 
-				"if ( shadowCoord.z <= 1.0 ) {",
+				"if ( shadowCoord.z <= 1.0  && inShadowFrustum == 1.0 ) {",
 
 					"shadowCoord.z += shadowBias[ i ];",
 
@@ -871,6 +884,12 @@ THREE.ShaderChunk = {
 				// uncomment to see light frustum boundaries
 				//"if ( !( shadowCoord.x >= 0.0 && shadowCoord.x <= 1.0 && shadowCoord.y >= 0.0 && shadowCoord.y <= 1.0 ) )",
 				//	"gl_FragColor.xyz =  gl_FragColor.xyz * vec3( 1.0, 0.0, 0.0 );",
+
+				"if ( inShadowFrustum == 1.0 && ( shadowCoord.x >= 0.0 && shadowCoord.x <= 1.0 && shadowCoord.y >= 0.0 && shadowCoord.y <= 1.0 ) ) {",
+
+					"gl_FragColor.xyz *= colors[ i ];",
+
+				"}",
 
 			"}",
 
