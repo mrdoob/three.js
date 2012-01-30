@@ -21,7 +21,7 @@ THREE.SceneLoader.prototype.load = function( url, callbackFinished ) {
 
 	var xhr = new XMLHttpRequest();
 
-	xhr.onreadystatechange = function() {
+	xhr.onreadystatechange = function () {
 
 		if ( xhr.readyState == 4 ) {
 
@@ -31,21 +31,13 @@ THREE.SceneLoader.prototype.load = function( url, callbackFinished ) {
 
 					var json = JSON.parse( xhr.responseText );
 
-					if ( json.metadata === undefined || json.metadata.formatVersion === undefined || json.metadata.formatVersion !== 3 ) {
-
-						console.error( 'Deprecated file format.' );
-						return;
-
-					}
-
-					context.createScene( json, callbackFinished, url );
-
 				} catch ( error ) {
 
-					console.error( error );
 					console.warn( "DEPRECATED: [" + url + "] seems to be using old model format" );
 
 				}
+
+				context.createScene( json, callbackFinished, url );
 
 			} else {
 
