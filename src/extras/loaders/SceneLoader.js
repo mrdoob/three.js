@@ -66,7 +66,7 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 		g, o, m, l, d, p, r, q, s, c, t, f, tt, pp, u,
 		geometry, material, camera, fog,
 		texture, images,
-		materials, light,
+		light,
 		data, binLoader, jsonLoader,
 		counter_models, counter_textures,
 		total_models, total_textures,
@@ -175,13 +175,8 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 						// not anymore support for multiple materials
 						// shouldn't really be array
 
-						for( i = 0; i < o.materials.length; i ++ ) {
-
-							materials = result.materials[ o.materials[ i ] ];
-
-							hasNormals = materials instanceof THREE.ShaderMaterial;
-
-						}
+						material = result.materials[ o.materials[ 0 ] ];
+						hasNormals = material instanceof THREE.ShaderMaterial;
 
 						if ( hasNormals ) {
 
@@ -198,22 +193,22 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 
 						q = 0;
 
-						if ( materials.length == 0 ) {
+						if ( o.materials.length == 0 ) {
 
-							materials = new THREE.MeshFaceMaterial();
+							material = new THREE.MeshFaceMaterial();
 
 						}
 
 						// dirty hack to handle meshes with multiple materials
 						// just use face materials defined in model
 
-						if ( materials.length > 1 ) {
+						if ( o.materials.length > 1 ) {
 
-							materials = new THREE.MeshFaceMaterial();
+							material = new THREE.MeshFaceMaterial();
 
 						}
 
-						object = new THREE.Mesh( geometry, materials );
+						object = new THREE.Mesh( geometry, material );
 						object.name = dd;
 						object.position.set( p[0], p[1], p[2] );
 
@@ -406,7 +401,7 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 			camera = new THREE.OrthographicCamera( c.left, c.right, c.top, c.bottom, c.near, c.far );
 
 		}
-		
+
 		p = c.position;
 		t = c.target;
 		u = c.up;
@@ -414,7 +409,7 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 		camera.position.set( p[0], p[1], p[2] );
 		camera.target = new THREE.Vector3( t[0], t[1], t[2] );
 		if ( u ) camera.up.set( u[0], u[1], u[2] );
-		
+
 		result.cameras[ dc ] = camera;
 
 	}

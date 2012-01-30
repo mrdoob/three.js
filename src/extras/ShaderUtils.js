@@ -125,9 +125,9 @@ THREE.ShaderUtils = {
 				"uDisplacementBias": { type: "f", value: 0.0 },
 				"uDisplacementScale": { type: "f", value: 1.0 },
 
-				"uDiffuseColor": { type: "c", value: new THREE.Color( 0xeeeeee ) },
+				"uDiffuseColor": { type: "c", value: new THREE.Color( 0xffffff ) },
 				"uSpecularColor": { type: "c", value: new THREE.Color( 0x111111 ) },
-				"uAmbientColor": { type: "c", value: new THREE.Color( 0x050505 ) },
+				"uAmbientColor": { type: "c", value: new THREE.Color( 0xffffff ) },
 				"uShininess": { type: "f", value: 30 },
 				"uOpacity": { type: "f", value: 1 },
 
