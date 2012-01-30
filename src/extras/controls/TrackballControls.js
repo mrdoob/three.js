@@ -33,6 +33,8 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	this.keys = [ 65 /*A*/, 83 /*S*/, 68 /*D*/ ];
 
+	this.onModification = 0;
+
 	// internals
 
 	this.target = new THREE.Vector3( 0, 0, 0 );
@@ -341,6 +343,9 @@ THREE.TrackballControls = function ( object, domElement ) {
 			_panEnd = _this.getMouseOnScreen( event.clientX, event.clientY );
 
 		}
+
+		if (_this.onModification!=0)
+			_this.onModification();
 
 	};
 
