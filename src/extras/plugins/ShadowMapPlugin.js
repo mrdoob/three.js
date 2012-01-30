@@ -9,7 +9,7 @@ THREE.ShadowMapPlugin = function ( ) {
 	_depthMaterial, _depthMaterialMorph,
 
 	_frustum = new THREE.Frustum(),
-	_projScreenMatrix = new THREE.Matrix4();
+	_projScreenMatrix = new THREE.Matrix4(),
 
 	_min = new THREE.Vector3(),
 	_max = new THREE.Vector3();

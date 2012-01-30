@@ -57,6 +57,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.shadowMapAutoUpdate = true;
 	this.shadowMapSoft = true;
 	this.shadowMapCullFrontFaces = true;
+	this.shadowMapDebug = false;
+	this.shadowMapCascade = false;
 
 	// morphs
 
@@ -4049,6 +4051,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			maxBones: maxBones,
 			shadowMapEnabled: this.shadowMapEnabled && object.receiveShadow,
 			shadowMapSoft: this.shadowMapSoft,
+			shadowMapDebug: this.shadowMapDebug,
+			shadowMapCascade: this.shadowMapCascade,
 			maxShadows: maxShadows,
 			alphaTest: material.alphaTest,
 			metal: material.metal,
@@ -5110,6 +5114,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			parameters.shadowMapEnabled ? "#define USE_SHADOWMAP" : "",
 			parameters.shadowMapSoft ? "#define SHADOWMAP_SOFT" : "",
+			parameters.shadowMapDebug ? "#define SHADOWMAP_DEBUG" : "",
+			parameters.shadowMapCascade ? "#define SHADOWMAP_CASCADE" : "",
 
 			parameters.sizeAttenuation ? "#define USE_SIZEATTENUATION" : "",
 
@@ -5186,6 +5192,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			parameters.shadowMapEnabled ? "#define USE_SHADOWMAP" : "",
 			parameters.shadowMapSoft ? "#define SHADOWMAP_SOFT" : "",
+			parameters.shadowMapDebug ? "#define SHADOWMAP_DEBUG" : "",
+			parameters.shadowMapCascade ? "#define SHADOWMAP_CASCADE" : "",
 
 			"uniform mat4 viewMatrix;",
 			"uniform vec3 cameraPosition;",
