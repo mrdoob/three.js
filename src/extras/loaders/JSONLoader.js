@@ -50,7 +50,7 @@ THREE.JSONLoader.prototype.loadAjaxJSON = function( context, url, callback, text
 
 				try {
 
-					var jsonObject = JSON.parse( xhr.responseText );
+					var json = JSON.parse( xhr.responseText );
 
 				} catch ( error ) {
 
@@ -58,7 +58,7 @@ THREE.JSONLoader.prototype.loadAjaxJSON = function( context, url, callback, text
 
 				}
 
-				context.createModel( jsonObject, callback, texturePath );
+				context.createModel( json, callback, texturePath );
 				context.onLoadComplete();
 
 			} else {
