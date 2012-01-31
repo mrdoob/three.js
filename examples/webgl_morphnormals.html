@@ -87,7 +87,7 @@
 				loader.load( "models/animated/flamingo.js", function( geometry ) {
 
 					morphColorsToFaceColors( geometry );
-					geometry.computeVertexNormals();
+					geometry.computeMorphNormals();
 
 					var material = new THREE.MeshLambertMaterial( { color: 0xffffff, morphTargets: true, morphNormals: true, vertexColors: THREE.FaceColors, shading: THREE.FlatShading } );
 					var meshAnim = new THREE.MorphAnimMesh( geometry, material );
@@ -105,7 +105,7 @@
 				loader.load( "models/animated/flamingo.js", function( geometry ) {
 
 					morphColorsToFaceColors( geometry );
-					geometry.computeVertexNormals();
+					geometry.computeMorphNormals();
 
 					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 20, morphTargets: true, morphNormals: true, vertexColors: THREE.FaceColors, shading: THREE.SmoothShading, perPixel: false } );
 					var meshAnim = new THREE.MorphAnimMesh( geometry, material );

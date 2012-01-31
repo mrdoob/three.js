@@ -230,16 +230,37 @@ THREE.Geometry.prototype = {
 
 		var i, il, f, fl, face;
 
-		// save original vertex normals
+		// save original normals
+		// - create temp variables on first access
+		//   otherwise just copy (for faster repeated calls)
 
 		for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
 
 			face = this.faces[ f ];
-			face.__originalVertexNormals = [];
+
+			if ( ! face.__originalFaceNormal ) {
+
+				face.__originalFaceNormal = face.normal.clone();
+
+			} else {
+
+				face.__originalFaceNormal.copy( face.normal );
+
+			}
+
+			if ( ! face.__originalVertexNormals ) face.__originalVertexNormals = [];
 
 			for ( i = 0, il = face.vertexNormals.length; i < il; i ++ ) {
 
-				face.__originalVertexNormals[ i ] = face.vertexNormals[ i ].clone();
+				if ( ! face.__originalVertexNormals[ i ] ) {
+
+					face.__originalVertexNormals[ i ] = face.vertexNormals[ i ].clone();
+
+				} else {
+
+					face.__originalVertexNormals[ i ].copy( face.vertexNormals[ i ] );
+
+				}
 
 			}
 
@@ -251,6 +272,42 @@ THREE.Geometry.prototype = {
 		tmpGeo.faces = this.faces;
 
 		for ( i = 0, il = this.morphTargets.length; i < il; i ++ ) {
+
+			// create on first access
+
+			if ( ! this.morphNormals[ i ] ) {
+
+				this.morphNormals[ i ] = {};
+				this.morphNormals[ i ].faceNormals = [];
+				this.morphNormals[ i ].vertexNormals = [];
+
+				var dstNormalsFace = this.morphNormals[ i ].faceNormals;
+				var dstNormalsVertex = this.morphNormals[ i ].vertexNormals;
+
+				var faceNormal, vertexNormals;
+
+				for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
+
+					face = this.faces[ f ];
+
+					faceNormal = new THREE.Vector3();
+
+					if ( face instanceof THREE.Face3 ) {
+
+						vertexNormals = { a: new THREE.Vector3(), b: new THREE.Vector3(), c: new THREE.Vector3() };
+
+					} else {
+
+						vertexNormals = { a: new THREE.Vector3(), b: new THREE.Vector3(), c: new THREE.Vector3(), d: new THREE.Vector3() };
+
+					}
+
+					dstNormalsFace.push( faceNormal );
+					dstNormalsVertex.push( vertexNormals );
+
+				}
+
+			}
 
 			var morphNormals = this.morphNormals[ i ];
 
@@ -295,11 +352,13 @@ THREE.Geometry.prototype = {
 
 		}
 
-		// restore original vertex normals
+		// restore original normals
 
 		for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
 
 			face = this.faces[ f ];
+
+			face.normal = face.__originalFaceNormal;
 			face.vertexNormals = face.__originalVertexNormals;
 
 		}
