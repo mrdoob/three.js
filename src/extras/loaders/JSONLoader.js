@@ -110,9 +110,7 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texture_path
 	parseMorphing( scale );
 
 	geometry.computeCentroids();
-
-	computeMorphNormals();
-
+	geometry.computeMorphNormals();
 	geometry.computeFaceNormals();
 
 	if ( this.hasNormals( geometry ) ) geometry.computeTangents();
@@ -464,87 +462,6 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texture_path
 				}
 
 			}
-
-		}
-
-	};
-
-	function computeMorphNormals() {
-
-		var i, il, f, fl, face;
-
-		// save original vertex normals
-
-		for ( f = 0, fl = geometry.faces.length; f < fl; f ++ ) {
-
-			face = geometry.faces[ f ];
-
-			face.__originalVertexNormals = [];
-
-			for ( i = 0, il = face.vertexNormals.length; i < il; i ++ ) {
-
-				face.__originalVertexNormals[ i ] = face.vertexNormals[ i ].clone();
-
-			}
-
-		}
-
-		// use temp geometry to compute face and vertex normals for each morph
-
-		var tmpGeo = new THREE.Geometry();
-		tmpGeo.faces = geometry.faces;
-
-		for ( i = 0, il = geometry.morphTargets.length; i < il; i ++ ) {
-
-			var morphNormals = geometry.morphNormals[ i ];
-
-			// set vertices to morph target
-
-			tmpGeo.vertices = geometry.morphTargets[ i ].vertices;
-
-			// compute morph normals
-
-			tmpGeo.computeFaceNormals();
-			tmpGeo.computeVertexNormals();
-
-			// store morph normals
-
-			var faceNormal, vertexNormals;
-
-			for ( f = 0, fl = geometry.faces.length; f < fl; f ++ ) {
-
-				face = geometry.faces[ f ];
-
-				faceNormal = morphNormals.faceNormals[ f ];
-				vertexNormals = morphNormals.vertexNormals[ f ];
-
-				faceNormal.copy( face.normal );
-
-				if ( face instanceof THREE.Face3 ) {
-
-					vertexNormals.a.copy( face.vertexNormals[ 0 ] );
-					vertexNormals.b.copy( face.vertexNormals[ 1 ] );
-					vertexNormals.c.copy( face.vertexNormals[ 2 ] );
-
-				} else {
-
-					vertexNormals.a.copy( face.vertexNormals[ 0 ] );
-					vertexNormals.b.copy( face.vertexNormals[ 1 ] );
-					vertexNormals.c.copy( face.vertexNormals[ 2 ] );
-					vertexNormals.d.copy( face.vertexNormals[ 3 ] );
-
-				}
-
-			}
-
-		}
-
-		// restore original vertex normals
-
-		for ( f = 0, fl = geometry.faces.length; f < fl; f ++ ) {
-
-			face = geometry.faces[ f ];
-			face.vertexNormals = face.__originalVertexNormals;
 
 		}
 

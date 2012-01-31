@@ -226,6 +226,86 @@ THREE.Geometry.prototype = {
 
 	},
 
+	computeMorphNormals: function () {
+
+		var i, il, f, fl, face;
+
+		// save original vertex normals
+
+		for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
+
+			face = this.faces[ f ];
+			face.__originalVertexNormals = [];
+
+			for ( i = 0, il = face.vertexNormals.length; i < il; i ++ ) {
+
+				face.__originalVertexNormals[ i ] = face.vertexNormals[ i ].clone();
+
+			}
+
+		}
+
+		// use temp geometry to compute face and vertex normals for each morph
+
+		var tmpGeo = new THREE.Geometry();
+		tmpGeo.faces = this.faces;
+
+		for ( i = 0, il = this.morphTargets.length; i < il; i ++ ) {
+
+			var morphNormals = this.morphNormals[ i ];
+
+			// set vertices to morph target
+
+			tmpGeo.vertices = this.morphTargets[ i ].vertices;
+
+			// compute morph normals
+
+			tmpGeo.computeFaceNormals();
+			tmpGeo.computeVertexNormals();
+
+			// store morph normals
+
+			var faceNormal, vertexNormals;
+
+			for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
+
+				face = this.faces[ f ];
+
+				faceNormal = morphNormals.faceNormals[ f ];
+				vertexNormals = morphNormals.vertexNormals[ f ];
+
+				faceNormal.copy( face.normal );
+
+				if ( face instanceof THREE.Face3 ) {
+
+					vertexNormals.a.copy( face.vertexNormals[ 0 ] );
+					vertexNormals.b.copy( face.vertexNormals[ 1 ] );
+					vertexNormals.c.copy( face.vertexNormals[ 2 ] );
+
+				} else {
+
+					vertexNormals.a.copy( face.vertexNormals[ 0 ] );
+					vertexNormals.b.copy( face.vertexNormals[ 1 ] );
+					vertexNormals.c.copy( face.vertexNormals[ 2 ] );
+					vertexNormals.d.copy( face.vertexNormals[ 3 ] );
+
+				}
+
+			}
+
+		}
+
+		// restore original vertex normals
+
+		for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
+
+			face = this.faces[ f ];
+			face.vertexNormals = face.__originalVertexNormals;
+
+		}
+
+	},
+
 	computeTangents: function () {
 
 		// based on http://www.terathon.com/code/tangent.html
