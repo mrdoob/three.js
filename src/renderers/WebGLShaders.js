@@ -681,7 +681,15 @@ THREE.ShaderChunk = {
 
 		"#ifdef USE_MORPHTARGETS",
 
+			"#ifndef USE_MORPHNORMALS",
+
 			"uniform float morphTargetInfluences[ 8 ];",
+
+			"#else",
+
+			"uniform float morphTargetInfluences[ 4 ];",
+
+			"#endif",
 
 		"#endif"
 
@@ -691,15 +699,21 @@ THREE.ShaderChunk = {
 
 		"#ifdef USE_MORPHTARGETS",
 
-			"vec3 morphed = vec3( 0.0, 0.0, 0.0 );",
+			"vec3 morphed = vec3( 0.0 );",
 			"morphed += ( morphTarget0 - position ) * morphTargetInfluences[ 0 ];",
 			"morphed += ( morphTarget1 - position ) * morphTargetInfluences[ 1 ];",
 			"morphed += ( morphTarget2 - position ) * morphTargetInfluences[ 2 ];",
 			"morphed += ( morphTarget3 - position ) * morphTargetInfluences[ 3 ];",
+
+			"#ifndef USE_MORPHNORMALS",
+
 			"morphed += ( morphTarget4 - position ) * morphTargetInfluences[ 4 ];",
 			"morphed += ( morphTarget5 - position ) * morphTargetInfluences[ 5 ];",
 			"morphed += ( morphTarget6 - position ) * morphTargetInfluences[ 6 ];",
 			"morphed += ( morphTarget7 - position ) * morphTargetInfluences[ 7 ];",
+
+			"#endif",
+
 			"morphed += position;",
 
 			"gl_Position = projectionMatrix * modelViewMatrix * vec4( morphed, 1.0 );",
@@ -716,6 +730,29 @@ THREE.ShaderChunk = {
 			"gl_Position = projectionMatrix * mvPosition;",
 
 		"#endif",
+		"#endif"
+
+	].join("\n"),
+
+	morphnormal_vertex: [
+
+		"#ifdef USE_MORPHNORMALS",
+
+			"vec3 morphedNormal = vec3( 0.0 );",
+
+			"morphedNormal +=  ( morphNormal0 - normal ) * morphTargetInfluences[ 0 ];",
+			"morphedNormal +=  ( morphNormal1 - normal ) * morphTargetInfluences[ 1 ];",
+			"morphedNormal +=  ( morphNormal2 - normal ) * morphTargetInfluences[ 2 ];",
+			"morphedNormal +=  ( morphNormal3 - normal ) * morphTargetInfluences[ 3 ];",
+
+			"morphedNormal += normal;",
+
+			"vec3 transformedNormal = normalize( normalMatrix * morphedNormal );",
+
+		"#else",
+
+			"vec3 transformedNormal = normalize( normalMatrix * normal );",
+
 		"#endif"
 
 	].join("\n"),
@@ -1302,7 +1339,7 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "envmap_vertex" ],
 				THREE.ShaderChunk[ "color_vertex" ],
 
-				"vec3 transformedNormal = normalize( normalMatrix * normal );",
+				THREE.ShaderChunk[ "morphnormal_vertex" ],
 
 				THREE.ShaderChunk[ "lights_lambert_vertex" ],
 				THREE.ShaderChunk[ "skinning_vertex" ],

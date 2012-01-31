@@ -22,6 +22,7 @@ THREE.Geometry = function () {
 
 	this.morphTargets = [];
 	this.morphColors = [];
+	this.morphNormals = [];
 
 	this.skinWeights = [];
 	this.skinIndices = [];
