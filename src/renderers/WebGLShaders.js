@@ -289,6 +289,8 @@ THREE.ShaderChunk = {
 
 		"#if MAX_DIR_LIGHTS > 0",
 
+		"transformedNormal = normalize( transformedNormal );",
+
 		"for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {",
 
 			"vec4 lDirection = viewMatrix * vec4( directionalLightDirection[ i ], 0.0 );",
@@ -747,11 +749,11 @@ THREE.ShaderChunk = {
 
 			"morphedNormal += normal;",
 
-			"vec3 transformedNormal = normalize( normalMatrix * morphedNormal );",
+			"vec3 transformedNormal = normalMatrix * morphedNormal;",
 
 		"#else",
 
-			"vec3 transformedNormal = normalize( normalMatrix * normal );",
+			"vec3 transformedNormal = normalMatrix * normal;",
 
 		"#endif"
 
@@ -1438,7 +1440,8 @@ THREE.ShaderLib = {
 
 				"vViewPosition = -mvPosition.xyz;",
 
-				"vec3 transformedNormal = normalMatrix * normal;",
+				THREE.ShaderChunk[ "morphnormal_vertex" ],
+
 				"vNormal = transformedNormal;",
 
 				THREE.ShaderChunk[ "lights_phong_vertex" ],

@@ -71,6 +71,7 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 
 	this.skinning = parameters.skinning !== undefined ? parameters.skinning : false;
 	this.morphTargets = parameters.morphTargets !== undefined ? parameters.morphTargets : false;
+	this.morphNormals = parameters.morphNormals !== undefined ? parameters.morphNormals : false;
 
 };
 
