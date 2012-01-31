@@ -50,7 +50,7 @@ THREE.JSONLoader.prototype.loadAjaxJSON = function( context, url, callback, text
 
 				try {
 
-					var jsonObject = JSON.parse( xhr.responseText );
+					var json = JSON.parse( xhr.responseText );
 
 				} catch ( error ) {
 
@@ -58,7 +58,7 @@ THREE.JSONLoader.prototype.loadAjaxJSON = function( context, url, callback, text
 
 				}
 
-				context.createModel( jsonObject, callback, texturePath );
+				context.createModel( json, callback, texturePath );
 				context.onLoadComplete();
 
 			} else {
@@ -110,6 +110,7 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texture_path
 	parseMorphing( scale );
 
 	geometry.computeCentroids();
+	geometry.computeMorphNormals();
 	geometry.computeFaceNormals();
 
 	if ( this.hasNormals( geometry ) ) geometry.computeTangents();
@@ -384,17 +385,25 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texture_path
 
 		if ( json.morphTargets !== undefined ) {
 
-			var i, l, v, vl, x, y, z, dstVertices, srcVertices;
+			var i, l, v, vl, x, y, z, dstVertices, srcVertices,
+				f, fl, face, dstNormalsFace, dstNormalsVertex,
+				faceNormal, vertexNormals;
 
-			for ( i = 0, l = json.morphTargets.length; i < l; i++ ) {
+			for ( i = 0, l = json.morphTargets.length; i < l; i ++ ) {
 
 				geometry.morphTargets[ i ] = {};
 				geometry.morphTargets[ i ].name = json.morphTargets[ i ].name;
 				geometry.morphTargets[ i ].vertices = [];
 
+				geometry.morphNormals[ i ] = {};
+				geometry.morphNormals[ i ].faceNormals = [];
+				geometry.morphNormals[ i ].vertexNormals = [];
+
 				dstVertices = geometry.morphTargets[ i ].vertices;
 				srcVertices = json.morphTargets [ i ].vertices;
 
+				dstNormalsFace = geometry.morphNormals[ i ].faceNormals;
+				dstNormalsVertex = geometry.morphNormals[ i ].vertexNormals;
 
 				for( v = 0, vl = srcVertices.length; v < vl; v += 3 ) {
 
@@ -403,6 +412,27 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texture_path
 					z = srcVertices[ v + 2 ] * scale;
 
 					dstVertices.push( new THREE.Vertex( new THREE.Vector3( x, y, z ) ) );
+
+				}
+
+				for ( f = 0, fl = geometry.faces.length; f < fl; f ++ ) {
+
+					face = geometry.faces[ f ];
+
+					faceNormal = new THREE.Vector3();
+
+					if ( face instanceof THREE.Face3 ) {
+
+						vertexNormals = { a: new THREE.Vector3(), b: new THREE.Vector3(), c: new THREE.Vector3() };
+
+					} else {
+
+						vertexNormals = { a: new THREE.Vector3(), b: new THREE.Vector3(), c: new THREE.Vector3(), d: new THREE.Vector3() };
+
+					}
+
+					dstNormalsFace.push( faceNormal );
+					dstNormalsVertex.push( vertexNormals );
 
 				}
 

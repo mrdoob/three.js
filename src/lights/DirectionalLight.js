@@ -36,6 +36,22 @@ THREE.DirectionalLight = function ( hex, intensity, distance ) {
 
 	//
 
+	this.shadowCascade = false;
+
+	this.shadowCascadeOffset = new THREE.Vector3( 0, 0, -1000 );
+	this.shadowCascadeCount = 2;
+
+	this.shadowCascadeBias = [];
+	this.shadowCascadeWidth = [];
+	this.shadowCascadeHeight = [];
+
+	this.shadowCascadeNearZ = [ -1.000, 0.990, 0.998 ];
+	this.shadowCascadeFarZ  = [  0.990, 0.998, 1.000 ];
+
+	this.shadowCascadeArray = [];
+
+	//
+
 	this.shadowMap = null;
 	this.shadowMapSize = null;
 	this.shadowCamera = null;

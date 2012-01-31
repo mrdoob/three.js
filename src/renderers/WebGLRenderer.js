@@ -57,10 +57,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.shadowMapAutoUpdate = true;
 	this.shadowMapSoft = true;
 	this.shadowMapCullFrontFaces = true;
+	this.shadowMapDebug = false;
+	this.shadowMapCascade = false;
 
 	// morphs
 
 	this.maxMorphTargets = 8;
+	this.maxMorphNormals = 4;
 
 	// flags
 
@@ -397,10 +400,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 			var m, ml;
 
 			geometryGroup.__webglMorphTargetsBuffers = [];
+			geometryGroup.__webglMorphNormalsBuffers = [];
 
 			for ( m = 0, ml = geometryGroup.numMorphTargets; m < ml; m ++ ) {
 
 				geometryGroup.__webglMorphTargetsBuffers.push( _gl.createBuffer() );
+				geometryGroup.__webglMorphNormalsBuffers.push( _gl.createBuffer() );
 
 			}
 
@@ -461,6 +466,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			for ( var m = 0, ml = geometryGroup.numMorphTargets; m < ml; m ++ ) {
 
 				_gl.deleteBuffer( geometryGroup.__webglMorphTargetsBuffers[ m ] );
+				_gl.deleteBuffer( geometryGroup.__webglMorphNormalsBuffers[ m ] );
 
 			}
 
@@ -639,10 +645,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( geometryGroup.numMorphTargets ) {
 
 			geometryGroup.__morphTargetsArrays = [];
+			geometryGroup.__morphNormalsArrays = [];
 
 			for ( var m = 0, ml = geometryGroup.numMorphTargets; m < ml; m ++ ) {
 
 				geometryGroup.__morphTargetsArrays.push( new Float32Array( nvertices * 3 ) );
+				geometryGroup.__morphNormalsArrays.push( new Float32Array( nvertices * 3 ) );
 
 			}
 
@@ -1329,7 +1337,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		vertexNormals, faceNormal, normal,
 		vertexColors, faceColor,
 		vertexTangents,
-		uv, uv2, v1, v2, v3, v4, t1, t2, t3, t4,
+		uv, uv2, v1, v2, v3, v4, t1, t2, t3, t4, n1, n2, n3, n4,
 		c1, c2, c3, c4,
 		sw1, sw2, sw3, sw4,
 		si1, si2, si3, si4,
@@ -1338,6 +1346,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		m, ml, i, il,
 		vn, uvi, uv2i,
 		vk, vkl, vka,
+		nka, chf, faceVertexNormals,
 		a,
 
 		vertexIndex = 0,
@@ -1370,6 +1379,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		skinWeightArray = geometryGroup.__skinWeightArray,
 
 		morphTargetsArrays = geometryGroup.__morphTargetsArrays,
+		morphNormalsArrays = geometryGroup.__morphNormalsArrays,
 
 		customAttributes = geometryGroup.__webglCustomAttributesList,
 		customAttribute,
@@ -1402,7 +1412,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		obj_skinIndices = geometry.skinIndices,
 		obj_skinWeights = geometry.skinWeights,
 
-		morphTargets = geometry.morphTargets;
+		morphTargets = geometry.morphTargets,
+		morphNormals = geometry.morphNormals;
 
 		if ( dirtyVertices ) {
 
@@ -1472,7 +1483,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
 
-					face = obj_faces[ chunk_faces3[ f ]	];
+					chf = chunk_faces3[ f ];
+					face = obj_faces[ chf ];
+
+					// morph positions
 
 					v1 = morphTargets[ vk ].vertices[ face.a ].position;
 					v2 = morphTargets[ vk ].vertices[ face.b ].position;
@@ -1492,13 +1506,54 @@ THREE.WebGLRenderer = function ( parameters ) {
 					vka[ offset_morphTarget + 7 ] = v3.y;
 					vka[ offset_morphTarget + 8 ] = v3.z;
 
+					// morph normals
+
+					if ( material.morphNormals ) {
+
+						if ( needsSmoothNormals ) {
+
+							faceVertexNormals = morphNormals[ vk ].vertexNormals[ chf ];
+
+							n1 = faceVertexNormals.a;
+							n2 = faceVertexNormals.b;
+							n3 = faceVertexNormals.c;
+
+						} else {
+
+							n1 = morphNormals[ vk ].faceNormals[ chf ];
+							n2 = n1;
+							n3 = n1;
+
+						}
+
+						nka = morphNormalsArrays[ vk ];
+
+						nka[ offset_morphTarget ] 	  = n1.x;
+						nka[ offset_morphTarget + 1 ] = n1.y;
+						nka[ offset_morphTarget + 2 ] = n1.z;
+
+						nka[ offset_morphTarget + 3 ] = n2.x;
+						nka[ offset_morphTarget + 4 ] = n2.y;
+						nka[ offset_morphTarget + 5 ] = n2.z;
+
+						nka[ offset_morphTarget + 6 ] = n3.x;
+						nka[ offset_morphTarget + 7 ] = n3.y;
+						nka[ offset_morphTarget + 8 ] = n3.z;
+
+					}
+
+					//
+
 					offset_morphTarget += 9;
 
 				}
 
 				for ( f = 0, fl = chunk_faces4.length; f < fl; f ++ ) {
 
-					face = obj_faces[ chunk_faces4[ f ] ];
+					chf = chunk_faces4[ f ];
+					face = obj_faces[ chf ];
+
+					// morph positions
 
 					v1 = morphTargets[ vk ].vertices[ face.a ].position;
 					v2 = morphTargets[ vk ].vertices[ face.b ].position;
@@ -1523,12 +1578,63 @@ THREE.WebGLRenderer = function ( parameters ) {
 					vka[ offset_morphTarget + 10 ] = v4.y;
 					vka[ offset_morphTarget + 11 ] = v4.z;
 
+					// morph normals
+
+					if ( material.morphNormals ) {
+
+						if ( needsSmoothNormals ) {
+
+							faceVertexNormals = morphNormals[ vk ].vertexNormals[ chf ];
+
+							n1 = faceVertexNormals.a;
+							n2 = faceVertexNormals.b;
+							n3 = faceVertexNormals.c;
+							n4 = faceVertexNormals.d;
+
+						} else {
+
+							n1 = morphNormals[ vk ].faceNormals[ chf ];
+							n2 = n1;
+							n3 = n1;
+							n4 = n1;
+
+						}
+
+						nka = morphNormalsArrays[ vk ];
+
+						nka[ offset_morphTarget ] 	  = n1.x;
+						nka[ offset_morphTarget + 1 ] = n1.y;
+						nka[ offset_morphTarget + 2 ] = n1.z;
+
+						nka[ offset_morphTarget + 3 ] = n2.x;
+						nka[ offset_morphTarget + 4 ] = n2.y;
+						nka[ offset_morphTarget + 5 ] = n2.z;
+
+						nka[ offset_morphTarget + 6 ] = n3.x;
+						nka[ offset_morphTarget + 7 ] = n3.y;
+						nka[ offset_morphTarget + 8 ] = n3.z;
+
+						nka[ offset_morphTarget + 9 ]  = n4.x;
+						nka[ offset_morphTarget + 10 ] = n4.y;
+						nka[ offset_morphTarget + 11 ] = n4.z;
+
+					}
+
+					//
+
 					offset_morphTarget += 12;
 
 				}
 
 				_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglMorphTargetsBuffers[ vk ] );
 				_gl.bufferData( _gl.ARRAY_BUFFER, morphTargetsArrays[ vk ], hint );
+
+				if ( material.morphNormals ) {
+
+					_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglMorphNormalsBuffers[ vk ] );
+					_gl.bufferData( _gl.ARRAY_BUFFER, morphNormalsArrays[ vk ], hint );
+
+				}
 
 			}
 
@@ -3041,6 +3147,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 				_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglMorphTargetsBuffers[ order[ m ] ] );
 				_gl.vertexAttribPointer( attributes[ "morphTarget" + m ], 3, _gl.FLOAT, false, 0, 0 );
 
+				if ( material.morphNormals ) {
+
+					_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglMorphNormalsBuffers[ order[ m ] ] );
+					_gl.vertexAttribPointer( attributes[ "morphNormal" + m ], 3, _gl.FLOAT, false, 0, 0 );
+
+				}
+
 				object.__webglMorphTargetInfluences[ m ] = influences[ order[ m ] ];
 
 				m ++;
@@ -3078,6 +3191,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglMorphTargetsBuffers[ candidate ] );
 				_gl.vertexAttribPointer( attributes[ "morphTarget" + m ], 3, _gl.FLOAT, false, 0, 0 );
+
+				if ( material.morphNormals ) {
+
+					_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglMorphNormalsBuffers[ candidate ] );
+					_gl.vertexAttribPointer( attributes[ "morphNormal" + m ], 3, _gl.FLOAT, false, 0, 0 );
+
+				}
 
 				object.__webglMorphTargetInfluences[ m ] = candidateInfluence;
 
@@ -4044,11 +4164,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 			sizeAttenuation: material.sizeAttenuation,
 			skinning: material.skinning,
 			morphTargets: material.morphTargets,
+			morphNormals: material.morphNormals,
 			maxMorphTargets: this.maxMorphTargets,
+			maxMorphNormals: this.maxMorphNormals,
 			maxDirLights: maxLightCount.directional, maxPointLights: maxLightCount.point,
 			maxBones: maxBones,
 			shadowMapEnabled: this.shadowMapEnabled && object.receiveShadow,
 			shadowMapSoft: this.shadowMapSoft,
+			shadowMapDebug: this.shadowMapDebug,
+			shadowMapCascade: this.shadowMapCascade,
 			maxShadows: maxShadows,
 			alphaTest: material.alphaTest,
 			metal: material.metal,
@@ -4101,6 +4225,27 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					_gl.enableVertexAttribArray( attributes[ id ] );
 					material.numSupportedMorphTargets ++;
+
+				}
+
+			}
+
+		}
+
+		if ( material.morphNormals ) {
+
+			material.numSupportedMorphNormals = 0;
+
+			var id, base = "morphNormal";
+
+			for ( i = 0; i < this.maxMorphNormals; i ++ ) {
+
+				id = base + i;
+
+				if ( attributes[ id ] >= 0 ) {
+
+					_gl.enableVertexAttribArray( attributes[ id ] );
+					material.numSupportedMorphNormals ++;
 
 				}
 
@@ -4453,7 +4598,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( ! light.castShadow ) continue;
 
-				if ( light instanceof THREE.SpotLight || light instanceof THREE.DirectionalLight ) {
+				if ( light instanceof THREE.SpotLight || ( light instanceof THREE.DirectionalLight && ! light.shadowCascade ) ) {
 
 					uniforms.shadowMap.texture[ j ] = light.shadowMap;
 					uniforms.shadowMapSize.value[ j ] = light.shadowMapSize;
@@ -5105,11 +5250,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 			parameters.vertexColors ? "#define USE_COLOR" : "",
 			parameters.skinning ? "#define USE_SKINNING" : "",
 			parameters.morphTargets ? "#define USE_MORPHTARGETS" : "",
+			parameters.morphNormals ? "#define USE_MORPHNORMALS" : "",
 			parameters.perPixel ? "#define PHONG_PER_PIXEL" : "",
 			parameters.wrapAround ? "#define WRAP_AROUND" : "",
 
 			parameters.shadowMapEnabled ? "#define USE_SHADOWMAP" : "",
 			parameters.shadowMapSoft ? "#define SHADOWMAP_SOFT" : "",
+			parameters.shadowMapDebug ? "#define SHADOWMAP_DEBUG" : "",
+			parameters.shadowMapCascade ? "#define SHADOWMAP_CASCADE" : "",
 
 			parameters.sizeAttenuation ? "#define USE_SIZEATTENUATION" : "",
 
@@ -5137,10 +5285,22 @@ THREE.WebGLRenderer = function ( parameters ) {
 				"attribute vec3 morphTarget1;",
 				"attribute vec3 morphTarget2;",
 				"attribute vec3 morphTarget3;",
-				"attribute vec3 morphTarget4;",
-				"attribute vec3 morphTarget5;",
-				"attribute vec3 morphTarget6;",
-				"attribute vec3 morphTarget7;",
+
+				"#ifdef USE_MORPHNORMALS",
+
+					"attribute vec3 morphNormal0;",
+					"attribute vec3 morphNormal1;",
+					"attribute vec3 morphNormal2;",
+					"attribute vec3 morphNormal3;",
+
+				"#else",
+
+					"attribute vec3 morphTarget4;",
+					"attribute vec3 morphTarget5;",
+					"attribute vec3 morphTarget6;",
+					"attribute vec3 morphTarget7;",
+
+				"#endif",
 
 			"#endif",
 
@@ -5186,6 +5346,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			parameters.shadowMapEnabled ? "#define USE_SHADOWMAP" : "",
 			parameters.shadowMapSoft ? "#define SHADOWMAP_SOFT" : "",
+			parameters.shadowMapDebug ? "#define SHADOWMAP_DEBUG" : "",
+			parameters.shadowMapCascade ? "#define SHADOWMAP_CASCADE" : "",
 
 			"uniform mat4 viewMatrix;",
 			"uniform vec3 cameraPosition;",
@@ -5241,6 +5403,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		for ( i = 0; i < parameters.maxMorphTargets; i ++ ) {
 
 			identifiers.push( "morphTarget" + i );
+
+		}
+
+		for ( i = 0; i < parameters.maxMorphNormals; i ++ ) {
+
+			identifiers.push( "morphNormal" + i );
 
 		}
 
@@ -5788,7 +5956,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( ! light.castShadow ) continue;
 
-			if ( light instanceof THREE.SpotLight || light instanceof THREE.DirectionalLight ) maxShadows ++;
+			if ( light instanceof THREE.SpotLight ) maxShadows ++;
+			if ( light instanceof THREE.DirectionalLight && ! light.shadowCascade ) maxShadows ++;
 
 		}
 

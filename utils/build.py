@@ -362,6 +362,7 @@ WEBGL_FILES = [
 'renderers/renderables/RenderableParticle.js',
 'renderers/renderables/RenderableLine.js',
 'extras/core/BufferGeometry.js',
+'extras/core/Gyroscope.js',
 'extras/helpers/CameraHelper.js',
 'extras/objects/LensFlare.js',
 'extras/objects/MarchingCubes.js',
