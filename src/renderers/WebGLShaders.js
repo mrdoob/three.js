@@ -287,9 +287,9 @@ THREE.ShaderChunk = {
 
 		"vLightWeighting = vec3( 0.0 );",
 
-		"#if MAX_DIR_LIGHTS > 0",
-
 		"transformedNormal = normalize( transformedNormal );",
+
+		"#if MAX_DIR_LIGHTS > 0",
 
 		"for( int i = 0; i < MAX_DIR_LIGHTS; i ++ ) {",
 
