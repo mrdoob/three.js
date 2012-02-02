@@ -2262,8 +2262,13 @@ THREE.ColladaLoader = function () {
 
 					input = inputs[ k ];
 					source = sources[ input.source ];
-
-					index = p[ i + ( j * inputs.length ) + input.offset ];
+					
+					if ( primitive.vcount ){
+						index = p[ i + j ];
+					} else {
+						index = p[ i + ( j * inputs.length ) + input.offset ];
+					}
+					
 					numParams = source.accessor.params.length;
 					idx32 = index * numParams;
 
@@ -2375,7 +2380,11 @@ THREE.ColladaLoader = function () {
 
 			}
 
-			i += inputs.length * vcount;
+			if ( primitive.vcount ){
+				i += vcount;
+			} else {
+				i += inputs.length * vcount;
+			}
 
 		}
 
@@ -2400,15 +2409,19 @@ THREE.ColladaLoader = function () {
 	};
 
 	Triangles.prototype.setVertices = function ( vertices ) {
-
+		
 		for ( var i = 0; i < this.inputs.length; i ++ ) {
 
 			if ( this.inputs[ i ].source == vertices.id ) {
-
 				this.inputs[ i ].source = vertices.input[ 'POSITION' ].source;
 
+				for(var key in vertices.input){
+					if(key != 'POSITION'){
+						var input = vertices.input[key];
+						this.inputs.push(input);
+					}
+				}
 			}
-
 		}
 
 	};
