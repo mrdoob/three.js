@@ -36,6 +36,56 @@ THREE.MorphAnimMesh.prototype.setFrameRange = function ( start, end ) {
 
 };
 
+THREE.MorphAnimMesh.prototype.parseAnimations = function () {
+
+	var geometry = this.geometry;
+
+	var firstAnimation, animations = {};
+
+	var pattern = /([a-z]+)(\d+)/;
+
+	for ( var i = 0, il = geometry.morphTargets.length; i < il; i ++ ) {
+
+		var morph = geometry.morphTargets[ i ];
+		var parts = morph.name.match( pattern );
+
+		if ( parts && parts.length > 1 ) {
+
+			var label = parts[ 1 ];
+			var num = parts[ 2 ];
+
+			if ( ! animations[ label ] ) {
+
+				animations[ label ] = { frames: [], min: Infinity, max: -Infinity };
+
+			}
+
+			animations[ label ].frames.push( i );
+
+			if ( i < animations[ label ].min ) animations[ label ].min = i;
+			if ( i > animations[ label ].max ) animations[ label ].max = i;
+
+			if ( ! firstAnimation ) firstAnimation = label;
+
+		}
+
+	}
+
+	geometry.animations = animations;
+	geometry.firstAnimation = firstAnimation;
+
+};
+
+THREE.MorphAnimMesh.prototype.playAnimation = function ( label, fps ) {
+
+	var animation = this.geometry.animations[ label ];
+
+	this.setFrameRange( animation.min, animation.max );
+	this.duration = 1000 * ( ( animation.max - animation.min ) / fps );
+	this.time = 0;
+
+};
+
 THREE.MorphAnimMesh.prototype.updateAnimation = function ( delta ) {
 
 	var frameTime = this.duration / this.length;
