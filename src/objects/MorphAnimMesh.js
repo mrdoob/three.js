@@ -20,14 +20,25 @@ THREE.MorphAnimMesh = function( geometry, material ) {
 	this.direction = 1;
 	this.directionBackwards = false;
 
+	this.setFrameRange( 0, this.geometry.morphTargets.length - 1 );
+
 };
 
 THREE.MorphAnimMesh.prototype = new THREE.Mesh();
 THREE.MorphAnimMesh.prototype.constructor = THREE.MorphAnimMesh;
 
+THREE.MorphAnimMesh.prototype.setFrameRange = function ( start, end ) {
+
+	this.start = start;
+	this.end = end;
+
+	this.length = this.end - this.start;
+
+};
+
 THREE.MorphAnimMesh.prototype.updateAnimation = function ( delta ) {
 
-	var frameTime = this.duration / ( this.geometry.morphTargets.length - 1 );
+	var frameTime = this.duration / this.length;
 
 	this.time += this.direction * delta;
 
@@ -59,9 +70,9 @@ THREE.MorphAnimMesh.prototype.updateAnimation = function ( delta ) {
 
 	}
 
-	var keyframe = THREE.Math.clamp( Math.floor( this.time / frameTime ), 0, this.geometry.morphTargets.length - 1 );
+	var keyframe = this.start + THREE.Math.clamp( Math.floor( this.time / frameTime ), 0, this.length );
 
-	if ( keyframe != this.currentKeyframe ) {
+	if ( keyframe !== this.currentKeyframe ) {
 
 		this.morphTargetInfluences[ this.lastKeyframe ] = 0;
 		this.morphTargetInfluences[ this.currentKeyframe ] = 1;

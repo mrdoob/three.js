@@ -44,21 +44,36 @@ THREE.JSONLoader.prototype.loadAjaxJSON = function( context, url, callback, text
 
 	xhr.onreadystatechange = function() {
 
-		if ( xhr.readyState == 4 ) {
+		if ( xhr.readyState === xhr.DONE ) {
 
-			if ( xhr.status == 200 || xhr.status == 0 ) {
+			if ( xhr.status === 200 || xhr.status === 0 ) {
+
+				var json;
 
 				try {
 
-					var json = JSON.parse( xhr.responseText );
+					if ( xhr.responseText ) {
+
+						json = JSON.parse( xhr.responseText );
+
+					} else {
+
+						console.warn( "EMPTY: [" + url + "] seems to be unreachable or file there is empty" );
+
+					}
 
 				} catch ( error ) {
 
-					console.warn( "DEPRECATED: [" + url + "] seems to be using old model format" );
+					console.warn( "DEPRECATED: [" + url + "] seems to be using old model format or JSON is invalid" );
 
 				}
 
-				context.createModel( json, callback, texturePath );
+				if ( json )	context.createModel( json, callback, texturePath );
+
+				// in context of more complex asset initialization
+				// do not block on single failed file
+				// maybe should go even one more level up
+
 				context.onLoadComplete();
 
 			} else {
@@ -67,11 +82,11 @@ THREE.JSONLoader.prototype.loadAjaxJSON = function( context, url, callback, text
 
 			}
 
-		} else if ( xhr.readyState == 3 ) {
+		} else if ( xhr.readyState === xhr.LOADING ) {
 
 			if ( callbackProgress ) {
 
-				if ( length == 0 ) {
+				if ( length === 0 ) {
 
 					length = xhr.getResponseHeader( "Content-Length" );
 
@@ -81,7 +96,7 @@ THREE.JSONLoader.prototype.loadAjaxJSON = function( context, url, callback, text
 
 			}
 
-		} else if ( xhr.readyState == 2 ) {
+		} else if ( xhr.readyState === xhr.HEADERS_RECEIVED ) {
 
 			length = xhr.getResponseHeader( "Content-Length" );
 
