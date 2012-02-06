@@ -68,7 +68,7 @@ THREE.IcosahedronGeometry = function ( subdivisions ) {
 
 	// subdivide faces to refine the triangles
 
-	for ( var i = 0; i < this.subdivisions; i ++ ) {
+	for ( var s = 0; s < this.subdivisions; s ++ ) {
 
 		tempFaces = new THREE.Geometry();
 
