@@ -7,12 +7,6 @@ THREE.Ray = function ( origin, direction ) {
 	this.origin = origin || new THREE.Vector3();
 	this.direction = direction || new THREE.Vector3();
 
-	this.intersectScene = function ( scene ) {
-
-		return this.intersectObjects( scene.children );
-
-	};
-
 	this.intersectObjects = function ( objects ) {
 
 		var i, l, object,
@@ -45,12 +39,6 @@ THREE.Ray = function ( origin, direction ) {
 	this.intersectObject = function ( object ) {
 
 		var intersect, intersects = [];
-
-		for ( var i = 0, l = object.children.length; i < l; i ++ ) {
-
-			Array.prototype.push.apply( intersects, this.intersectObject( object.children[ i ] ) );
-
-		}
 
 		if ( object instanceof THREE.Particle ) {
 
