@@ -29,10 +29,10 @@ THREE.MorphAnimMesh.prototype.constructor = THREE.MorphAnimMesh;
 
 THREE.MorphAnimMesh.prototype.setFrameRange = function ( start, end ) {
 
-	this.start = start;
-	this.end = end;
+	this.startKeyframe = start;
+	this.endKeyframe = end;
 
-	this.length = this.end - this.start;
+	this.length = this.endKeyframe - this.startKeyframe;
 
 };
 
@@ -40,7 +40,9 @@ THREE.MorphAnimMesh.prototype.parseAnimations = function () {
 
 	var geometry = this.geometry;
 
-	var firstAnimation, animations = {};
+	if ( ! geometry.animations ) geometry.animations = {};
+
+	var firstAnimation, animations = geometry.animations;
 
 	var pattern = /([a-z]+)(\d+)/;
 
@@ -54,16 +56,12 @@ THREE.MorphAnimMesh.prototype.parseAnimations = function () {
 			var label = parts[ 1 ];
 			var num = parts[ 2 ];
 
-			if ( ! animations[ label ] ) {
+			if ( ! animations[ label ] ) animations[ label ] = { start: Infinity, end: -Infinity };
 
-				animations[ label ] = { frames: [], min: Infinity, max: -Infinity };
+			var animation = animations[ label ];
 
-			}
-
-			animations[ label ].frames.push( i );
-
-			if ( i < animations[ label ].min ) animations[ label ].min = i;
-			if ( i > animations[ label ].max ) animations[ label ].max = i;
+			if ( i < animation.start ) animation.start = i;
+			if ( i > animation.end ) animation.end = i;
 
 			if ( ! firstAnimation ) firstAnimation = label;
 
@@ -71,8 +69,15 @@ THREE.MorphAnimMesh.prototype.parseAnimations = function () {
 
 	}
 
-	geometry.animations = animations;
 	geometry.firstAnimation = firstAnimation;
+
+};
+
+THREE.MorphAnimMesh.prototype.setAnimationLabel = function ( label, start, end ) {
+
+	if ( ! this.geometry.animations ) this.geometry.animations = {};
+
+	this.geometry.animations[ label ] = { start: start, end: end };
 
 };
 
@@ -80,8 +85,8 @@ THREE.MorphAnimMesh.prototype.playAnimation = function ( label, fps ) {
 
 	var animation = this.geometry.animations[ label ];
 
-	this.setFrameRange( animation.min, animation.max );
-	this.duration = 1000 * ( ( animation.max - animation.min ) / fps );
+	this.setFrameRange( animation.start, animation.end );
+	this.duration = 1000 * ( ( animation.end - animation.start ) / fps );
 	this.time = 0;
 
 };
@@ -120,7 +125,7 @@ THREE.MorphAnimMesh.prototype.updateAnimation = function ( delta ) {
 
 	}
 
-	var keyframe = this.start + THREE.Math.clamp( Math.floor( this.time / frameTime ), 0, this.length );
+	var keyframe = this.startKeyframe + THREE.Math.clamp( Math.floor( this.time / frameTime ), 0, this.length );
 
 	if ( keyframe !== this.currentKeyframe ) {
 
