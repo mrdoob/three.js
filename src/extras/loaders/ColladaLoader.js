@@ -735,13 +735,15 @@ THREE.ColladaLoader = function () {
 					for ( j = 0; j < instance_materials.length; j ++ ) {
 
 						var inst_material = instance_materials[j];
-						var effect_id = materials[inst_material.target].instance_effect.url;
+						var mat = materials[instance_material.target];
+						var effect_id = mat.instance_effect.url;
 						var shader = effects[effect_id].shader;
 
 						shader.material.opacity = !shader.material.opacity ? 1 : shader.material.opacity;
 						used_materials[inst_material.symbol] = num_materials;
 						used_materials_array.push(shader.material)
 						first_material = shader.material;
+						first_material.name = mat.name == null || mat.name === '' ? mat.id : mat.name;
 						num_materials ++;
 
 					}
