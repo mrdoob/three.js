@@ -36,6 +36,20 @@ THREE.MorphAnimMesh.prototype.setFrameRange = function ( start, end ) {
 
 };
 
+THREE.MorphAnimMesh.prototype.setDirectionForward = function () {
+
+	this.direction = 1;
+	this.directionBackwards = false;
+
+};
+
+THREE.MorphAnimMesh.prototype.setDirectionBackward = function () {
+
+	this.direction = -1;
+	this.directionBackwards = true;
+
+};
+
 THREE.MorphAnimMesh.prototype.parseAnimations = function () {
 
 	var geometry = this.geometry;
@@ -122,6 +136,8 @@ THREE.MorphAnimMesh.prototype.updateAnimation = function ( delta ) {
 	} else {
 
 		this.time = this.time % this.duration;
+
+		if ( this.time < 0 ) this.time += this.duration;
 
 	}
 
