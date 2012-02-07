@@ -2230,7 +2230,13 @@ THREE.ColladaLoader = function () {
 
 		this.geometry3js.computeCentroids();
 		this.geometry3js.computeFaceNormals();
-		this.geometry3js.computeVertexNormals();
+		
+		if ( geom.calcNormals ) {
+			
+			this.geometry3js.computeVertexNormals();
+			
+		}
+		
 		this.geometry3js.computeBoundingBox();
 
 		return this;
@@ -2325,13 +2331,38 @@ THREE.ColladaLoader = function () {
 
 			var face = null, faces = [], uv, uvArr;
 
+			if ( ns.length == 0 ) {
+				
+				// check the vertices source
+				input = this.vertices.input.NORMAL;
+
+				if ( input ) {
+
+					source = sources[ input.source ];
+					numParams = source.accessor.params.length;
+
+					for ( var ndx = 0, len = vs.length; ndx < len; ndx++ ) {
+
+						ns.push( getConvertedVec3( source.data, vs[ ndx ] * numParams ) );
+
+					}
+
+				}
+				else {
+					
+					geom.calcNormals = true;
+					
+				}
+
+			}
+
 			if ( vcount === 3 ) {
 
-				faces.push( new THREE.Face3( vs[0], vs[1], vs[2], [ ns[0], ns[1], ns[2] ], cs.length ? cs : new THREE.Color() ) );
+				faces.push( new THREE.Face3( vs[0], vs[1], vs[2], ns, cs.length ? cs : new THREE.Color() ) );
 
 			} else if ( vcount === 4 ) {
-
-				faces.push( new THREE.Face4( vs[0], vs[1], vs[2], vs[3], [ ns[0], ns[1], ns[2], ns[3] ], cs.length ? cs : new THREE.Color() ) );
+				
+				faces.push( new THREE.Face4( vs[0], vs[1], vs[2], vs[3], ns, cs.length ? cs : new THREE.Color() ) );
 
 			} else if ( vcount > 4 && options.subdivideFaces ) {
 
