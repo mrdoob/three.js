@@ -41,9 +41,9 @@ THREE.DirectionalLight = function ( hex, intensity, distance ) {
 	this.shadowCascadeOffset = new THREE.Vector3( 0, 0, -1000 );
 	this.shadowCascadeCount = 2;
 
-	this.shadowCascadeBias = [];
-	this.shadowCascadeWidth = [];
-	this.shadowCascadeHeight = [];
+	this.shadowCascadeBias = [ 0, 0, 0 ];
+	this.shadowCascadeWidth = [ 512, 512, 512 ];
+	this.shadowCascadeHeight = [ 512, 512, 512 ];
 
 	this.shadowCascadeNearZ = [ -1.000, 0.990, 0.998 ];
 	this.shadowCascadeFarZ  = [  0.990, 0.998, 1.000 ];
