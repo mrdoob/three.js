@@ -4382,7 +4382,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				 material instanceof THREE.MeshLambertMaterial ||
 				 material instanceof THREE.MeshPhongMaterial ) {
 
-				refreshUniformsCommon( m_uniforms, material );
+				refreshUniformsCommon( m_uniforms, material, object );
 
 			}
 
@@ -4390,7 +4390,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( material instanceof THREE.LineBasicMaterial ) {
 
-				refreshUniformsLine( m_uniforms, material );
+				refreshUniformsLine( m_uniforms, material, object );
 
 			} else if ( material instanceof THREE.ParticleBasicMaterial ) {
 
@@ -4408,11 +4408,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				m_uniforms.mNear.value = camera.near;
 				m_uniforms.mFar.value = camera.far;
-				m_uniforms.opacity.value = material.opacity;
+				m_uniforms.opacity.value = object.opacity != null ? object.opacity : material.opacity;
 
 			} else if ( material instanceof THREE.MeshNormalMaterial ) {
 
-				m_uniforms.opacity.value = material.opacity;
+				m_uniforms.opacity.value = object.opacity != null ? object.opacity : material.opacity;
 
 			}
 
@@ -4486,7 +4486,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function refreshUniformsCommon ( uniforms, material ) {
 
-		uniforms.opacity.value = material.opacity;
+		uniforms.opacity.value = object.opacity != null ? object.opacity : material.opacity;
 
 		if ( _this.gammaInput ) {
 
@@ -4531,7 +4531,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	function refreshUniformsLine ( uniforms, material ) {
 
 		uniforms.diffuse.value = material.color;
-		uniforms.opacity.value = material.opacity;
+		uniforms.opacity.value = object.opacity != null ? object.opacity : material.opacity;
 
 	};
 
