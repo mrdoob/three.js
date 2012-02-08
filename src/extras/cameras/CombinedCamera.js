@@ -112,13 +112,13 @@ THREE.CombinedCamera.prototype.setFov = function(fov) {
 * 35mm (fullframe) camera is used if frame size is not specified;
 * Formula based on http://www.bobatkins.com/photography/technical/field_of_view.html
 */
-THREE.CombinedCamera.prototype.setLens = function(focalLength, framesize) {
+THREE.CombinedCamera.prototype.setLens = function ( focalLength, frameHeight ) {
 
-	if (!framesize) framesize = 43.25; // 36x24mm
+	frameHeight = frameHeight !== undefined ? frameHeight : 24;
 
-	var fov = 2 * Math.atan( framesize / (focalLength * 2));
-	fov = 180 / Math.PI * fov;
-	this.setFov(fov);
+	var fov = 2 * Math.atan( frameHeight / ( focalLength * 2 ) ) * ( 180 / Math.PI );
+
+	this.setFov( fov );
 
 	return fov;
 };

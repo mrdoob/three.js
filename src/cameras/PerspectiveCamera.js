@@ -27,13 +27,11 @@ THREE.PerspectiveCamera.prototype.constructor = THREE.PerspectiveCamera;
  * Formula based on http://www.bobatkins.com/photography/technical/field_of_view.html
  */
 
-THREE.PerspectiveCamera.prototype.setLens = function ( focalLength, frameSize ) {
+THREE.PerspectiveCamera.prototype.setLens = function ( focalLength, frameHeight ) {
 
-	frameSize = frameSize !== undefined ? frameSize : 43.25; // 36x24mm
+	frameHeight = frameHeight !== undefined ? frameHeight : 24;
 
-	this.fov = 2 * Math.atan( frameSize / ( focalLength * 2 ) );
-	this.fov = 180 / Math.PI * this.fov;
-
+	this.fov = 2 * Math.atan( frameHeight / ( focalLength * 2 ) ) * ( 180 / Math.PI );
 	this.updateProjectionMatrix();
 
 }
