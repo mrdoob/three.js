@@ -32,7 +32,7 @@ THREE.MorphAnimMesh.prototype.setFrameRange = function ( start, end ) {
 	this.startKeyframe = start;
 	this.endKeyframe = end;
 
-	this.length = this.endKeyframe - this.startKeyframe;
+	this.length = this.endKeyframe - this.startKeyframe + 1;
 
 };
 
@@ -141,7 +141,7 @@ THREE.MorphAnimMesh.prototype.updateAnimation = function ( delta ) {
 
 	}
 
-	var keyframe = this.startKeyframe + THREE.Math.clamp( Math.floor( this.time / frameTime ), 0, this.length );
+	var keyframe = this.startKeyframe + THREE.Math.clamp( Math.floor( this.time / frameTime ), 0, this.length - 1 );
 
 	if ( keyframe !== this.currentKeyframe ) {
 
