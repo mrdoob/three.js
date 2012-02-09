@@ -103,7 +103,7 @@
 			var theta = 0;
 
 			var duration = 1000;
-			var keyframes = 15 /*16*/, interpolation = duration / keyframes;
+			var keyframes = 15, interpolation = duration / keyframes;
 			var lastKeyframe = 0, currentKeyframe = 0;
 
 			function render() {
@@ -121,7 +121,7 @@
 
 					var time = Date.now() % duration;
 
-					var keyframe = Math.floor( time / interpolation ) + 1;
+					var keyframe = Math.floor( time / interpolation );
 
 					if ( keyframe != currentKeyframe ) {
 
