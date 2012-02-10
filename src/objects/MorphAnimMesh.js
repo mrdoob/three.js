@@ -99,9 +99,17 @@ THREE.MorphAnimMesh.prototype.playAnimation = function ( label, fps ) {
 
 	var animation = this.geometry.animations[ label ];
 
-	this.setFrameRange( animation.start, animation.end );
-	this.duration = 1000 * ( ( animation.end - animation.start ) / fps );
-	this.time = 0;
+	if ( animation ) {
+
+		this.setFrameRange( animation.start, animation.end );
+		this.duration = 1000 * ( ( animation.end - animation.start ) / fps );
+		this.time = 0;
+
+	} else {
+
+		console.warn( "animation[" + label + "] undefined" );
+
+	}
 
 };
 
