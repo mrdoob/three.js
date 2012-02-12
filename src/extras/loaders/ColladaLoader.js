@@ -244,14 +244,14 @@ THREE.ColladaLoader = function () {
 
 	};
 
-	function parseScene () {
+	function parseScene() {
 
 		var sceneElement = COLLADA.evaluate( './/dae:scene/dae:instance_visual_scene', COLLADA, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null ).iterateNext();
 
 		if ( sceneElement ) {
 
 			var url = sceneElement.getAttribute( 'url' ).replace( /^#/, '' );
-			return visualScenes[ url ];
+			return visualScenes[ url.length > 0 ? url : 'visual_scene0' ];
 
 		} else {
 
