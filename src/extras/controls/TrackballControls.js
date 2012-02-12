@@ -4,6 +4,8 @@
 
 THREE.TrackballControls = function ( object, domElement ) {
 
+	THREE.EventTarget.call( this );
+
 	var _this = this,
 	STATE = { NONE : -1, ROTATE : 0, ZOOM : 1, PAN : 2 };
 
@@ -206,37 +208,6 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	};
 
-	this.update = function() {
-
-		_eye.copy( _this.object.position ).subSelf( this.target );
-
-		if ( !_this.noRotate ) {
-
-			_this.rotateCamera();
-
-		}
-		
-		if ( !_this.noZoom ) {
-
-			_this.zoomCamera();
-
-		}
-
-		if ( !_this.noPan ) {
-
-			_this.panCamera();
-
-		}
-
-		_this.object.position.add( _this.target, _eye );
-
-		_this.checkDistances();
-
-		_this.object.lookAt( _this.target );
-
-	};
-
-
 	// listeners
 
 	function keydown( event ) {
@@ -342,6 +313,8 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		}
 
+		update();
+
 	};
 
 	function mouseup( event ) {
@@ -355,6 +328,40 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	};
 
+	//
+
+	function update() {
+
+		_eye.copy( _this.object.position ).subSelf( _this.target );
+
+		if ( !_this.noRotate ) {
+
+			_this.rotateCamera();
+
+		}
+		
+		if ( !_this.noZoom ) {
+
+			_this.zoomCamera();
+
+		}
+
+		if ( !_this.noPan ) {
+
+			_this.panCamera();
+
+		}
+
+		_this.object.position.add( _this.target, _eye );
+
+		_this.checkDistances();
+
+		_this.object.lookAt( _this.target );
+
+		_this.dispatchEvent( { type: 'update' } );
+
+	};
+
 	this.domElement.addEventListener( 'contextmenu', function ( event ) { event.preventDefault(); }, false );
 
 	this.domElement.addEventListener( 'mousemove', mousemove, false );
@@ -363,5 +370,8 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	window.addEventListener( 'keydown', keydown, false );
 	window.addEventListener( 'keyup', keyup, false );
+
+	// TODO: Clean up the code so this isn't needed.
+	update();
 
 };

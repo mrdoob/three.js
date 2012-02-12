@@ -44,8 +44,7 @@
 		<script src="js/ctm/CTMLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/Stats.js"></script>
-
+		
 		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
@@ -54,7 +53,7 @@
 			var SCREEN_HEIGHT = window.innerHeight;
 			var FLOOR = -250;
 
-			var container, stats;
+			var container;
 
 			var camera, scene, controls;
 			var renderer;
@@ -72,7 +71,6 @@
 			var windowHalfY = window.innerHeight / 2;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -91,7 +89,7 @@
 
 				controls = new THREE.TrackballControls( camera );
 				controls.dynamicDampingFactor = 0.25;
-
+				controls.addEventListener( 'update', render );
 
 				// SKYBOX
 
@@ -105,7 +103,7 @@
 							 r + "pz.png", r + "nz.png" ];
 
 
-				textureCube = THREE.ImageUtils.loadTextureCube( urls );
+				textureCube = THREE.ImageUtils.loadTextureCube( urls, new THREE.UVMapping(), render );
 
 				var shader = THREE.ShaderUtils.lib[ "cube" ];
 				shader.uniforms[ "tCube" ].texture = textureCube;
@@ -156,18 +154,6 @@
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
 				renderer.physicallyBasedShading = true;
-
-				// STATS
-
-				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '5px';
-				stats.domElement.style.zIndex = 100;
-				container.appendChild( stats.domElement );
-
-				stats.domElement.children[ 0 ].children[ 0 ].style.color = "#aaa";
-				stats.domElement.children[ 0 ].style.background = "transparent";
-				stats.domElement.children[ 0 ].children[ 1 ].style.display = "none";
 
 				// EVENTS
 
@@ -304,6 +290,8 @@
 				mesh.scale.set( s, s, s );
 				mesh.doubleSided = true;
 				scene.add( mesh );
+	
+				render();
 
 			}
 
@@ -322,6 +310,8 @@
 				cameraCube.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
 				cameraCube.updateProjectionMatrix();
 
+				render();
+
 			}
 
 
@@ -334,18 +324,7 @@
 
 			//
 
-			function animate() {
-
-				requestAnimationFrame( animate );
-
-				render();
-				stats.update();
-
-			}
-
 			function render() {
-
-				controls.update();
 
 				cameraCube.rotation.copy( camera.rotation );
 

@@ -40,20 +40,19 @@
 		<script src="../build/Three.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/Stats.js"></script>
 
 		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var container, stats;
+			var container;
 
 			var camera, controls, scene, renderer;
 
 			var cross;
 
 			init();
-			animate();
+			render();
 
 			function init() {
 
@@ -80,6 +79,8 @@
 				controls.dynamicDampingFactor = 0.3;
 
 				controls.keys = [ 65, 83, 68 ];
+
+				controls.addEventListener( 'update', render );
 
 				// world
 
@@ -129,28 +130,11 @@
 				container = document.getElementById( 'container' );
 				container.appendChild( renderer.domElement );
 
-				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				stats.domElement.style.zIndex = 100;
-				container.appendChild( stats.domElement );
-
-
-			}
-
-
-			function animate() {
-
-				requestAnimationFrame( animate );
-
-				render();
-				stats.update();
 
 			}
 
 			function render() {
 
-				controls.update();
 				renderer.render( scene, camera );
 
 			}
