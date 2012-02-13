@@ -79,20 +79,35 @@
 
 				// CONTROLS
 
-				controls = new THREE.TrackballControls( camera );
-				controls.target.set( 0, 0, 0 );
+				if ( 1 ) {
 
-				controls.rotateSpeed = 1.0;
-				controls.zoomSpeed = 1.2;
-				controls.panSpeed = 0.8;
+					controls = new THREE.TrackballControls( camera );
+					controls.target.set( 0, 0, 0 );
 
-				controls.noZoom = false;
-				controls.noPan = false;
+					controls.rotateSpeed = 1.0;
+					controls.zoomSpeed = 1.2;
+					controls.panSpeed = 0.8;
 
-				controls.staticMoving = false;
-				controls.dynamicDampingFactor = 0.15;
+					controls.noZoom = false;
+					controls.noPan = false;
 
-				controls.keys = [ 65, 83, 68 ];
+					controls.staticMoving = false;
+					controls.dynamicDampingFactor = 0.15;
+
+					controls.keys = [ 65, 83, 68 ];
+
+				} else {
+
+					controls = new THREE.FirstPersonControls( camera );
+
+					controls.movementSpeed = 25;
+					controls.lookSpeed = 0.05;
+					controls.lookVertical = true;
+
+					controls.lon = -90;
+
+				}
+
 
 				// TEXTURES
 
@@ -239,6 +254,8 @@
 			}
 
 			function render() {
+
+				controls.update( clock.getDelta() );
 
 				var time = Date.now() * 0.00025;
 				var z = 20, d = 150;

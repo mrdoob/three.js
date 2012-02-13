@@ -37,7 +37,9 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	// internals
 
-	this.target = new THREE.Vector3( 0, 0, 0 );
+	this.target = new THREE.Vector3();
+
+	var lastPosition = new THREE.Vector3();
 
 	var _keyPressed = false,
 	_state = STATE.NONE,
@@ -208,6 +210,44 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	};
 
+	this.update = function() {
+
+		_eye.copy( _this.object.position ).subSelf( _this.target );
+
+		if ( !_this.noRotate ) {
+
+			_this.rotateCamera();
+
+		}
+		
+		if ( !_this.noZoom ) {
+
+			_this.zoomCamera();
+
+		}
+
+		if ( !_this.noPan ) {
+
+			_this.panCamera();
+
+		}
+
+		_this.object.position.add( _this.target, _eye );
+
+		_this.checkDistances();
+
+		_this.object.lookAt( _this.target );
+
+		if ( lastPosition.distanceTo( _this.object.position ) > 0 ) {
+			
+			_this.dispatchEvent( { type: 'change' } );
+
+			lastPosition.copy( _this.object.position );
+
+		}
+
+	};
+
 	// listeners
 
 	function keydown( event ) {
@@ -313,8 +353,6 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		}
 
-		update();
-
 	};
 
 	function mouseup( event ) {
@@ -328,40 +366,6 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	};
 
-	//
-
-	function update() {
-
-		_eye.copy( _this.object.position ).subSelf( _this.target );
-
-		if ( !_this.noRotate ) {
-
-			_this.rotateCamera();
-
-		}
-		
-		if ( !_this.noZoom ) {
-
-			_this.zoomCamera();
-
-		}
-
-		if ( !_this.noPan ) {
-
-			_this.panCamera();
-
-		}
-
-		_this.object.position.add( _this.target, _eye );
-
-		_this.checkDistances();
-
-		_this.object.lookAt( _this.target );
-
-		_this.dispatchEvent( { type: 'update' } );
-
-	};
-
 	this.domElement.addEventListener( 'contextmenu', function ( event ) { event.preventDefault(); }, false );
 
 	this.domElement.addEventListener( 'mousemove', mousemove, false );
@@ -370,8 +374,5 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	window.addEventListener( 'keydown', keydown, false );
 	window.addEventListener( 'keyup', keyup, false );
-
-	// TODO: Clean up the code so this isn't needed.
-	update();
 
 };

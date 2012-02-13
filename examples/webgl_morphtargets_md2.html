@@ -381,9 +381,9 @@
 
 			function render() {
 
-				var delta = clock.getDelta();
+				controls.update();
 
-				character.update( delta );
+				character.update( clock.getDelta() );
 
 				renderer.render( scene, camera );
 
