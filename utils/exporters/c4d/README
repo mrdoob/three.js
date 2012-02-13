@@ -1,0 +1,7 @@
+Save script to your MAXON scripts directory - on OSX it's
+
+   /Applications/MAXON/CINEMA 4D R12/library/scripts
+
+Once you do that the script will magically show up in your Python/User Scripts menu. Select the object you want to export and then export using the script. Exported Three.js file is in the same directory as your C4D model.
+
+Really just supports exporting objects with UV mapped textures at this point. As far as I can tell the C4D API doesn't expose any of the animation info..
