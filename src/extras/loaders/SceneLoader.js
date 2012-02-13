@@ -95,29 +95,6 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 
 	};
 
-	// find out if there are some colliders
-
-	var hasColliders = false;
-
-	for( dd in data.objects ) {
-
-		o = data.objects[ dd ];
-
-		if ( o.meshCollider )  {
-
-			hasColliders = true;
-			break;
-
-		}
-
-	}
-
-	if ( hasColliders ) {
-
-		result.scene.collisions = new THREE.CollisionSystem();
-
-	}
-
 	if ( data.transform ) {
 
 		var position = data.transform.position,
@@ -229,13 +206,6 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 						result.scene.add( object );
 
 						result.objects[ dd ] = object;
-
-						if ( o.meshCollider ) {
-
-							var meshCollider = THREE.CollisionUtils.MeshColliderWBox( object );
-							result.scene.collisions.colliders.push( meshCollider );
-
-						}
 
 						if ( o.castsShadow ) {
 
