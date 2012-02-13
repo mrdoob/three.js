@@ -383,6 +383,7 @@
 
 				var delta = clock.getDelta();
 
+				controls.update();
 				character.update( delta );
 
 				renderer.render( scene, camera );

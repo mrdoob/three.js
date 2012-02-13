@@ -261,6 +261,8 @@
 				light6.position.x = Math.cos( time * 0.7 ) * d;
 				light6.position.z = Math.cos( time * 0.5 ) * d;
 
+				controls.update();
+
 				renderer.render( scene, camera );
 
 			}
