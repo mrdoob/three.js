@@ -47,7 +47,7 @@ THREE.GeometryUtils = {
 
 			var vertex = vertices2[ i ];
 
-			var vertexCopy = new THREE.Vertex( vertex.position.clone() );
+			var vertexCopy = vertex.clone();
 
 			if ( matrix ) matrix.multiplyVector3( vertexCopy.position );
 
@@ -601,6 +601,67 @@ THREE.GeometryUtils = {
 		geometry.computeVertexNormals();
 
 		if ( geometry.hasTangents ) geometry.computeTangents();
+
+	},
+
+	// Make all faces use unique vertices
+	// so that each face can be separated from others
+
+	explode: function( geometry ) {
+
+		var vertices = [];
+
+		for ( var i = geometry.faces.length - 1; i >= 0; i -- ) {
+
+			var n = vertices.length;
+
+			var face = geometry.faces[ i ];
+
+			if ( face instanceof THREE.Face4 ) {
+
+				var a = face.a;
+				var b = face.b;
+				var c = face.c;
+				var d = face.d;
+
+				var va = geometry.vertices[ a ];
+				var vb = geometry.vertices[ b ];
+				var vc = geometry.vertices[ c ];
+				var vd = geometry.vertices[ d ];
+
+				vertices.push( va.clone() );
+				vertices.push( vb.clone() );
+				vertices.push( vc.clone() );
+				vertices.push( vd.clone() );
+
+				face.a = n;
+				face.b = n + 1;
+				face.c = n + 2;
+				face.d = n + 3;
+
+			} else {
+
+				var a = face.a;
+				var b = face.b;
+				var c = face.c;
+
+				var va = geometry.vertices[ a ];
+				var vb = geometry.vertices[ b ];
+				var vc = geometry.vertices[ c ];
+
+				vertices.push( va.clone() );
+				vertices.push( vb.clone() );
+				vertices.push( vc.clone() );
+
+				face.a = n;
+				face.b = n + 1;
+				face.c = n + 2;
+
+			}
+
+		}
+
+		geometry.vertices = vertices;
 
 	}
 
