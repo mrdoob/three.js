@@ -4,6 +4,8 @@
 
 THREE.TrackballControls = function ( object, domElement ) {
 
+	THREE.EventTarget.call( this );
+
 	var _this = this,
 	STATE = { NONE : -1, ROTATE : 0, ZOOM : 1, PAN : 2 };
 
@@ -35,7 +37,9 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	// internals
 
-	this.target = new THREE.Vector3( 0, 0, 0 );
+	this.target = new THREE.Vector3();
+
+	var lastPosition = new THREE.Vector3();
 
 	var _keyPressed = false,
 	_state = STATE.NONE,
@@ -208,14 +212,14 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	this.update = function() {
 
-		_eye.copy( _this.object.position ).subSelf( this.target );
+		_eye.copy( _this.object.position ).subSelf( _this.target );
 
 		if ( !_this.noRotate ) {
 
 			_this.rotateCamera();
 
 		}
-
+		
 		if ( !_this.noZoom ) {
 
 			_this.zoomCamera();
@@ -234,8 +238,15 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		_this.object.lookAt( _this.target );
 
-	};
+		if ( lastPosition.distanceTo( _this.object.position ) > 0 ) {
+			
+			_this.dispatchEvent( { type: 'change' } );
 
+			lastPosition.copy( _this.object.position );
+
+		}
+
+	};
 
 	// listeners
 

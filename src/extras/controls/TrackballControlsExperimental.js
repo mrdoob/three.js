@@ -358,7 +358,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		_this.object.lookAt( _this.target );
 
-		_this.dispatchEvent( { type: 'update' } );
+		_this.dispatchEvent( { type: 'change' } );
 
 	};
 
