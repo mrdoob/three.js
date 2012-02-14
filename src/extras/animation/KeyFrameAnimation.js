@@ -142,13 +142,14 @@ THREE.KeyFrameAnimation.prototype.stop = function() {
 
 	// reset JIT matrix and remove cache
 
-	for ( var h = 0; h < this.hierarchy.length; h++ ) {
+	for ( var h = 0; h < this.data.hierarchy.length; h++ ) {
+        
+        var obj = this.hierarchy[ h ];
+		var node = this.data.hierarchy[ h ];
 
-		var obj = this.hierarchy[ h ];
+		if ( node.animationCache !== undefined ) {
 
-		if ( obj.animationCache !== undefined ) {
-
-			var original = obj.animationCache.originalMatrix;
+			var original = node.animationCache.originalMatrix;
 
 			if( obj instanceof THREE.Bone ) {
 
@@ -162,7 +163,7 @@ THREE.KeyFrameAnimation.prototype.stop = function() {
 
 			}
 
-			delete obj.animationCache;
+			delete node.animationCache;
 
 		}
 
@@ -226,7 +227,6 @@ THREE.KeyFrameAnimation.prototype.update = function( deltaTimeMS ) {
 						prev = this.getPrevKeyWith( sid, h, end );
 
 					if ( prev ) {
-
 						prev.apply( sid );
 
 					}
@@ -338,8 +338,10 @@ THREE.KeyFrameAnimation.prototype.update = function( deltaTimeMS ) {
 					animationCache.nextKey = nextKey;
 
 				}
-
-				prevKey.interpolate( nextKey, currentTime );
+                if(nextKey.time >= currentTime)
+                    prevKey.interpolate( nextKey, currentTime );
+                else
+                    prevKey.interpolate( nextKey, nextKey.time);
 
 			}
 
