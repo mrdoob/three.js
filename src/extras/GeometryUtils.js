@@ -30,7 +30,6 @@ THREE.GeometryUtils = {
 
 		}
 
-
 		if ( object2 instanceof THREE.Mesh ) {
 
 			object2.matrixAutoUpdate && object2.updateMatrix();
@@ -164,9 +163,8 @@ THREE.GeometryUtils = {
 		for ( i = 0, il = vertices.length; i < il; i ++ ) {
 
 			var vertex = vertices[ i ];
-			var vertexCopy = new THREE.Vertex( vertex.position.clone() );
 
-			cloneGeo.vertices.push( vertexCopy );
+			cloneGeo.vertices.push( vertex.clone() );
 
 		}
 
@@ -174,43 +172,9 @@ THREE.GeometryUtils = {
 
 		for ( i = 0, il = faces.length; i < il; i ++ ) {
 
-			var face = faces[ i ], faceCopy, normal, color,
-			faceVertexNormals = face.vertexNormals,
-			faceVertexColors = face.vertexColors;
+			var face = faces[ i ];
 
-			if ( face instanceof THREE.Face3 ) {
-
-				faceCopy = new THREE.Face3( face.a, face.b, face.c );
-
-			} else if ( face instanceof THREE.Face4 ) {
-
-				faceCopy = new THREE.Face4( face.a, face.b, face.c, face.d );
-
-			}
-
-			faceCopy.normal.copy( face.normal );
-
-			for ( var j = 0, jl = faceVertexNormals.length; j < jl; j ++ ) {
-
-				normal = faceVertexNormals[ j ];
-				faceCopy.vertexNormals.push( normal.clone() );
-
-			}
-
-			faceCopy.color.copy( face.color );
-
-			for ( var j = 0, jl = faceVertexColors.length; j < jl; j ++ ) {
-
-				color = faceVertexColors[ j ];
-				faceCopy.vertexColors.push( color.clone() );
-
-			}
-
-			faceCopy.materialIndex = face.materialIndex;
-
-			faceCopy.centroid.copy( face.centroid );
-
-			cloneGeo.faces.push( faceCopy );
+			cloneGeo.faces.push( face.clone() );
 
 		}
 
@@ -533,30 +497,16 @@ THREE.GeometryUtils = {
 				var c = face.c;
 				var d = face.d;
 
-				var triA = new THREE.Face3( a, b, d );
-				var triB = new THREE.Face3( b, c, d );
+				var triA = face.clone();
+				var triB = face.clone();
 
-				triA.materialIndex = triB.materialIndex = face.materialIndex;
+				triA.a = a;
+				triA.b = b;
+				triA.c = d;
 
-				triA.color.copy( face.color );
-				triB.color.copy( face.color );
-
-				if ( face.vertexColors.length === 4 ) {
-
-					var cA = face.vertexColors[ 0 ];
-					var cB = face.vertexColors[ 1 ];
-					var cC = face.vertexColors[ 2 ];
-					var cD = face.vertexColors[ 3 ];
-
-					triA.vertexColors[ 0 ] = cA.clone();
-					triA.vertexColors[ 1 ] = cB.clone();
-					triA.vertexColors[ 2 ] = cD.clone();
-
-					triB.vertexColors[ 0 ] = cB.clone();
-					triB.vertexColors[ 1 ] = cC.clone();
-					triB.vertexColors[ 2 ] = cD.clone();
-
-				}
+				triB.a = b;
+				triB.b = c;
+				triB.c = d;
 
 				geometry.faces.splice( i, 1, triA, triB );
 
@@ -611,7 +561,7 @@ THREE.GeometryUtils = {
 
 		var vertices = [];
 
-		for ( var i = geometry.faces.length - 1; i >= 0; i -- ) {
+		for ( var i = 0, il = geometry.faces.length; i < il; i ++ ) {
 
 			var n = vertices.length;
 
@@ -662,6 +612,174 @@ THREE.GeometryUtils = {
 		}
 
 		geometry.vertices = vertices;
+
+	},
+
+	// Break faces with edges longer than maxEdgeLength
+	// - not recursive
+	// - doesn't handle yet UVs
+
+	tessellate: function ( geometry, maxEdgeLength ) {
+
+		var i, face,
+		a, b, c, d,
+		va, vb, vc, vd,
+		dab, dbc, dac, dcd, dad,
+		m, m1, m2,
+		vm, vm1, vm2,
+		triA, triB,
+		quadA, quadB;
+
+		for ( i = geometry.faces.length - 1; i >= 0; i -- ) {
+
+			face = geometry.faces[ i ];
+
+			if ( face instanceof THREE.Face3 ) {
+
+				a = face.a;
+				b = face.b;
+				c = face.c;
+
+				va = geometry.vertices[ a ];
+				vb = geometry.vertices[ b ];
+				vc = geometry.vertices[ c ];
+
+				dab = va.position.distanceTo( vb.position );
+				dbc = vb.position.distanceTo( vc.position );
+				dac = va.position.distanceTo( vc.position );
+
+				if ( dab > maxEdgeLength || dbc > maxEdgeLength || dac > maxEdgeLength ) {
+
+					m = geometry.vertices.length;
+
+					triA = face.clone();
+					triB = face.clone();
+
+					if ( dab >= dbc && dab >= dac ) {
+
+						vm = va.clone();
+						vm.position.addSelf( vb.position );
+						vm.position.multiplyScalar( 0.5 );
+
+						triA.a = a;
+						triA.b = m;
+						triA.c = c;
+
+						triB.a = m;
+						triB.b = b;
+						triB.c = c;
+
+					} else if ( dbc >= dab && dbc >= dac ) {
+
+						vm = vb.clone();
+						vm.position.addSelf( vc.position );
+						vm.position.multiplyScalar( 0.5 );
+
+						triA.a = a;
+						triA.b = b;
+						triA.c = m;
+
+						triB.a = m;
+						triB.b = c;
+						triB.c = a;
+
+					} else {
+
+						vm = va.clone();
+						vm.position.addSelf( vc.position );
+						vm.position.multiplyScalar( 0.5 );
+
+						triA.a = a;
+						triA.b = b;
+						triA.c = m;
+
+						triB.a = m;
+						triB.b = b;
+						triB.c = c;
+
+					}
+
+					geometry.faces.splice( i, 1, triA, triB );
+					geometry.vertices.push( vm );
+
+				}
+
+			} else {
+
+				a = face.a;
+				b = face.b;
+				c = face.c;
+				d = face.d;
+
+				va = geometry.vertices[ a ];
+				vb = geometry.vertices[ b ];
+				vc = geometry.vertices[ c ];
+				vd = geometry.vertices[ d ];
+
+				dab = va.position.distanceTo( vb.position );
+				dbc = vb.position.distanceTo( vc.position );
+				dcd = vc.position.distanceTo( vd.position );
+				dad = va.position.distanceTo( vd.position );
+
+				if ( dab > maxEdgeLength || dbc > maxEdgeLength || dcd > maxEdgeLength || dad > maxEdgeLength ) {
+
+					m1 = geometry.vertices.length;
+					m2 = geometry.vertices.length + 1;
+
+					quadA = face.clone();
+					quadB = face.clone();
+
+					if ( ( dab >= dbc && dab >= dcd && dab >= dad ) || ( dcd >= dbc && dcd >= dab && dcd >= dad ) ) {
+
+						vm1 = va.clone();
+						vm1.position.addSelf( vb.position );
+						vm1.position.multiplyScalar( 0.5 );
+
+						vm2 = vc.clone();
+						vm2.position.addSelf( vd.position );
+						vm2.position.multiplyScalar( 0.5 );
+
+						quadA.a = a;
+						quadA.b = m1;
+						quadA.c = m2;
+						quadA.d = d;
+
+						quadB.a = m1;
+						quadB.b = b;
+						quadB.c = c;
+						quadB.d = m2;
+
+					} else {
+
+						vm1 = vb.clone();
+						vm1.position.addSelf( vc.position );
+						vm1.position.multiplyScalar( 0.5 );
+
+						vm2 = vd.clone();
+						vm2.position.addSelf( va.position );
+						vm2.position.multiplyScalar( 0.5 );
+
+						quadA.a = a;
+						quadA.b = b;
+						quadA.c = m1;
+						quadA.d = m2;
+
+						quadB.a = m2;
+						quadB.b = m1;
+						quadB.c = c;
+						quadB.d = d;
+
+					}
+
+					geometry.faces.splice( i, 1, quadA, quadB );
+					geometry.vertices.push( vm1 );
+					geometry.vertices.push( vm2 );
+
+				}
+
+			}
+
+		}
 
 	}
 
