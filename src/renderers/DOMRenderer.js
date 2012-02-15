@@ -4,12 +4,11 @@
 
 THREE.DOMRenderer = function () {
 
-	var _renderList = null,
+	var _renderData, _elements,
 	_projector = new THREE.Projector(),
-	_div = document.createElement( 'div' ),
 	_width, _height, _widthHalf, _heightHalf;
 
-	this.domElement = _div;
+	this.domElement = document.createElement( 'div' );
 
 	this.setSize = function ( width, height ) {
 
@@ -22,11 +21,12 @@ THREE.DOMRenderer = function () {
 
 		var e, el, m, ml, element, material, dom, v1x, v1y;
 
-		_renderList = _projector.projectScene( scene, camera ).elements;
+		_renderData = _projector.projectScene( scene, camera );
+		_elements = _renderData.elements;
 
-		for ( e = 0, el = _renderList.length; e < el; e++ ) {
+		for ( e = 0, el = _elements.length; e < el; e ++ ) {
 
-			element = _renderList[ e ];
+			element = _elements[ e ];
 
 			if ( element instanceof THREE.RenderableParticle ) {
 
