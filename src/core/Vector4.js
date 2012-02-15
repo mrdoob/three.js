@@ -161,7 +161,6 @@ THREE.Vector4.prototype = {
 
 	},
 
-
 	lerpSelf: function ( v, alpha ) {
 
 		this.x += ( v.x - this.x ) * alpha;
