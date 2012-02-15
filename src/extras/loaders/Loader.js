@@ -63,17 +63,17 @@ THREE.Loader.prototype = {
 
 		var parts = url.split( '/' );
 		parts.pop();
-		return parts.length < 1 ? '' : parts.join( '/' ) + '/';
+		return parts.length < 1 ? '.' : parts.join( '/' ) + '/';
 
 	},
 
-	initMaterials: function ( scope, materials, texture_path ) {
+	initMaterials: function ( scope, materials, texturePath ) {
 
 		scope.materials = [];
 
 		for ( var i = 0; i < materials.length; ++ i ) {
 
-			scope.materials[ i ] = THREE.Loader.prototype.createMaterial( materials[ i ], texture_path );
+			scope.materials[ i ] = THREE.Loader.prototype.createMaterial( materials[ i ], texturePath );
 
 		}
 
@@ -95,7 +95,7 @@ THREE.Loader.prototype = {
 
 	},
 
-	createMaterial: function ( m, texture_path ) {
+	createMaterial: function ( m, texturePath ) {
 
 		var _this = this;
 
@@ -175,7 +175,7 @@ THREE.Loader.prototype = {
 
 			}
 
-			load_image( where[ name ], texture_path + "/" + sourceFile );
+			load_image( where[ name ], texturePath + "/" + sourceFile );
 
 		}
 
@@ -273,25 +273,25 @@ THREE.Loader.prototype = {
 
 		// textures
 
-		if ( m.mapDiffuse && texture_path ) {
+		if ( m.mapDiffuse && texturePath ) {
 
 			create_texture( mpars, "map", m.mapDiffuse, m.mapDiffuseRepeat, m.mapDiffuseOffset, m.mapDiffuseWrap );
 
 		}
 
-		if ( m.mapLight && texture_path ) {
+		if ( m.mapLight && texturePath ) {
 
 			create_texture( mpars, "lightMap", m.mapLight, m.mapLightRepeat, m.mapLightOffset, m.mapLightWrap );
 
 		}
 
-		if ( m.mapNormal && texture_path ) {
+		if ( m.mapNormal && texturePath ) {
 
 			create_texture( mpars, "normalMap", m.mapNormal, m.mapNormalRepeat, m.mapNormalOffset, m.mapNormalWrap );
 
 		}
 
-		if ( m.mapSpecular && texture_path ) {
+		if ( m.mapSpecular && texturePath ) {
 
 			create_texture( mpars, "specularMap", m.mapSpecular, m.mapSpecularRepeat, m.mapSpecularOffset, m.mapSpecularWrap );
 

@@ -118,7 +118,7 @@ THREE.ColladaLoader = function () {
 
 			var parts = url.split( '/' );
 			parts.pop();
-			baseUrl = parts.length < 1 ? '' : parts.join( '/' ) + '/';
+			baseUrl = parts.length < 1 ? '.' : parts.join( '/' ) + '/';
 
 		}
 

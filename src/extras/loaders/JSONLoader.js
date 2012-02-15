@@ -17,18 +17,6 @@ THREE.JSONLoader.prototype.load = function ( url, callback, texturePath ) {
 
 	var worker, scope = this;
 
-	if ( url instanceof Object ) {
-
-		console.warn( 'DEPRECATED: JSONLoader( parameters ) is now JSONLoader( url, callback, texturePath ).' );
-
-		var parameters = url;
-
-		url = parameters.model;
-		callback = parameters.callback;
-		texturePath = parameters.texture_path;
-
-	}
-
 	texturePath = texturePath ? texturePath : this.extractUrlbase( url );
 
 	this.onLoadStart();
@@ -36,13 +24,13 @@ THREE.JSONLoader.prototype.load = function ( url, callback, texturePath ) {
 
 };
 
-THREE.JSONLoader.prototype.loadAjaxJSON = function( context, url, callback, texturePath, callbackProgress ) {
+THREE.JSONLoader.prototype.loadAjaxJSON = function ( context, url, callback, texturePath, callbackProgress ) {
 
 	var xhr = new XMLHttpRequest();
 
 	var length = 0;
 
-	xhr.onreadystatechange = function() {
+	xhr.onreadystatechange = function () {
 
 		if ( xhr.readyState === xhr.DONE ) {
 
@@ -68,7 +56,7 @@ THREE.JSONLoader.prototype.loadAjaxJSON = function( context, url, callback, text
 
 				}
 
-				if ( json )	context.createModel( json, callback, texturePath );
+				if ( json ) context.createModel( json, callback, texturePath );
 
 				// in context of more complex asset initialization
 				// do not block on single failed file
@@ -111,13 +99,13 @@ THREE.JSONLoader.prototype.loadAjaxJSON = function( context, url, callback, text
 
 };
 
-THREE.JSONLoader.prototype.createModel = function ( json, callback, texture_path ) {
+THREE.JSONLoader.prototype.createModel = function ( json, callback, texturePath ) {
 
 	var scope = this,
 	geometry = new THREE.Geometry(),
 	scale = ( json.scale !== undefined ) ? 1.0 / json.scale : 1.0;
 
-	this.initMaterials( geometry, json.materials, texture_path );
+	this.initMaterials( geometry, json.materials, texturePath );
 
 	parseModel( scale );
 
