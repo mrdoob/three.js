@@ -29,20 +29,20 @@ THREE.Face3.prototype = {
 
 	clone: function () {
 
-		var tmp = new THREE.Face3( this.a, this.b, this.c );
+		var face = new THREE.Face3( this.a, this.b, this.c );
 
-		tmp.normal.copy( this.normal );
-		tmp.color.copy( this.color );
-		tmp.centroid.copy( this.centroid );
+		face.normal.copy( this.normal );
+		face.color.copy( this.color );
+		face.centroid.copy( this.centroid );
 
-		tmp.materialIndex = this.materialIndex;
+		face.materialIndex = this.materialIndex;
 
 		var i, il;
-		for ( i = 0, il = this.vertexNormals.length; i < il; i ++ ) tmp.vertexNormals[ i ] = this.vertexNormals[ i ].clone();
-		for ( i = 0, il = this.vertexColors.length; i < il; i ++ ) tmp.vertexColors[ i ] = this.vertexColors[ i ].clone();
-		for ( i = 0, il = this.vertexTangents.length; i < il; i ++ ) tmp.vertexTangents[ i ] = this.vertexTangents[ i ].clone();
+		for ( i = 0, il = this.vertexNormals.length; i < il; i ++ ) face.vertexNormals[ i ] = this.vertexNormals[ i ].clone();
+		for ( i = 0, il = this.vertexColors.length; i < il; i ++ ) face.vertexColors[ i ] = this.vertexColors[ i ].clone();
+		for ( i = 0, il = this.vertexTangents.length; i < il; i ++ ) face.vertexTangents[ i ] = this.vertexTangents[ i ].clone();
 
-		return tmp;
+		return face;
 
 	}
 
