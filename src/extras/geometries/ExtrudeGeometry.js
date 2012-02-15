@@ -663,25 +663,23 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 												   // normal, color, material
 		scope.faces.push( new THREE.Face3( a, b, c, null, null, material ) );
 
-		if ( material !== undefined ) {
+		var ax = scope.vertices[ a ].position.x,
+			ay = scope.vertices[ a ].position.y,
 
-			var ax = scope.vertices[ a ].position.x,
-				ay = scope.vertices[ a ].position.y,
+			bx = scope.vertices[ b ].position.x,
+			by = scope.vertices[ b ].position.y,
 
-				bx = scope.vertices[ b ].position.x,
-				by = scope.vertices[ b ].position.y,
+			cx = scope.vertices[ c ].position.x,
+			cy = scope.vertices[ c ].position.y;
 
-				cx = scope.vertices[ c ].position.x,
-				cy = scope.vertices[ c ].position.y;
+		scope.faceVertexUvs[ 0 ].push( [
 
-			scope.faceVertexUvs[ 0 ].push( [
+			new THREE.UV( ax, 1 - ay ),
+			new THREE.UV( bx, 1 - by ),
+			new THREE.UV( cx, 1 - cy )
 
-				new THREE.UV( ax, 1 - ay ),
-				new THREE.UV( bx, 1 - by ),
-				new THREE.UV( cx, 1 - cy )
+		] );
 
-			] );
-		}
 
 	}
 
