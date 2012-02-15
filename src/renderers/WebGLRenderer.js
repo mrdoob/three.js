@@ -5908,7 +5908,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			case THREE.ShortType: return _gl.SHORT; break;
 			case THREE.UnsignedShortType: return _gl.UNSIGNED_SHORT; break;
 			case THREE.IntType: return _gl.INT; break;
-			case THREE.UnsignedShortType: return _gl.UNSIGNED_INT; break;
+			case THREE.UnsignedIntType: return _gl.UNSIGNED_INT; break;
 			case THREE.FloatType: return _gl.FLOAT; break;
 
 			case THREE.AlphaFormat: return _gl.ALPHA; break;
