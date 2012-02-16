@@ -24,6 +24,14 @@ THREE.Ray = function ( origin, direction ) {
 
 	};
 
+	var precision = 0.0001;
+
+	this.setPrecision = function ( value ) {
+
+		precision = value;
+
+	};
+
 	var a = new THREE.Vector3();
 	var b = new THREE.Vector3();
 	var c = new THREE.Vector3();
@@ -101,7 +109,7 @@ THREE.Ray = function ( origin, direction ) {
 
 				// bail if ray and plane are parallel
 
-				if ( Math.abs( dot ) < 0.0001 ) continue;
+				if ( Math.abs( dot ) < precision ) continue;
 
 				// calc distance to plane
 
