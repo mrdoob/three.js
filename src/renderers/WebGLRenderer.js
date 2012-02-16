@@ -4212,7 +4212,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			metal: material.metal,
 			perPixel: material.perPixel,
 			wrapAround: material.wrapAround,
-			doubleSided: object.doubleSided
+			doubleSided: object && object.doubleSided
 
 		};
 

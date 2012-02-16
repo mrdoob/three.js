@@ -285,7 +285,13 @@ THREE.ShaderChunk = {
 
 	lights_lambert_vertex: [
 
-		"vLightWeighting = vec3( 0.0 );",
+		"vLightFront = vec3( 0.0 );",
+
+		"#ifdef DOUBLE_SIDED",
+
+			"vLightBack = vec3( 0.0 );",
+
+		"#endif",
 
 		"transformedNormal = normalize( transformedNormal );",
 
@@ -296,20 +302,41 @@ THREE.ShaderChunk = {
 			"vec4 lDirection = viewMatrix * vec4( directionalLightDirection[ i ], 0.0 );",
 			"vec3 dirVector = normalize( lDirection.xyz );",
 
-			"#ifdef WRAP_AROUND",
+			"float dotProduct = dot( transformedNormal, dirVector );",
+			"vec3 directionalLightWeighting = vec3( max( dotProduct, 0.0 ) );",
 
-				"float directionalLightWeightingFull = max( dot( transformedNormal, dirVector ), 0.0 );",
-				"float directionalLightWeightingHalf = max( 0.5 * dot( transformedNormal, dirVector ) + 0.5, 0.0 );",
+			"#ifdef DOUBLE_SIDED",
 
-				"vec3 directionalLightWeighting = mix( vec3( directionalLightWeightingFull ), vec3( directionalLightWeightingHalf ), wrapRGB );",
+				"vec3 directionalLightWeightingBack = vec3( max( -dotProduct, 0.0 ) );",
 
-			"#else",
+				"#ifdef WRAP_AROUND",
 
-				"float directionalLightWeighting = max( dot( transformedNormal, dirVector ), 0.0 );",
+					"vec3 directionalLightWeightingHalfBack = vec3( max( -0.5 * dotProduct + 0.5, 0.0 ) );",
+
+				"#endif",
 
 			"#endif",
 
-			"vLightWeighting += directionalLightColor[ i ] * directionalLightWeighting;",
+			"#ifdef WRAP_AROUND",
+
+				"vec3 directionalLightWeightingHalf = vec3( max( 0.5 * dotProduct + 0.5, 0.0 ) );",
+				"directionalLightWeighting = mix( directionalLightWeighting, directionalLightWeightingHalf, wrapRGB );",
+
+				"#ifdef DOUBLE_SIDED",
+
+					"directionalLightWeightingBack = mix( directionalLightWeightingBack, directionalLightWeightingHalfBack, wrapRGB );",
+
+				"#endif",
+
+			"#endif",
+
+			"vLightFront += directionalLightColor[ i ] * directionalLightWeighting;",
+
+			"#ifdef DOUBLE_SIDED",
+
+				"vLightBack += directionalLightColor[ i ] * directionalLightWeightingBack;",
+
+			"#endif",
 
 		"}",
 
@@ -327,27 +354,54 @@ THREE.ShaderChunk = {
 					"lDistance = 1.0 - min( ( length( lVector ) / pointLightDistance[ i ] ), 1.0 );",
 
 				"lVector = normalize( lVector );",
+				"float dotProduct = dot( transformedNormal, lVector );",
 
-				"#ifdef WRAP_AROUND",
+				"vec3 pointLightWeighting = vec3( max( dotProduct, 0.0 ) );",
 
-					"float pointLightWeightingFull = max( dot( transformedNormal, lVector ), 0.0 );",
-					"float pointLightWeightingHalf = max( 0.5 * dot( transformedNormal, lVector ) + 0.5, 0.0 );",
+				"#ifdef DOUBLE_SIDED",
 
-					"vec3 pointLightWeighting = mix( vec3 ( pointLightWeightingFull ), vec3( pointLightWeightingHalf ), wrapRGB );",
+					"vec3 pointLightWeightingBack = vec3( max( -dotProduct, 0.0 ) );",
 
-				"#else",
+					"#ifdef WRAP_AROUND",
 
-					"float pointLightWeighting = max( dot( transformedNormal, lVector ), 0.0 );",
+						"vec3 pointLightWeightingHalfBack = vec3( max( -0.5 * dotProduct + 0.5, 0.0 ) );",
+
+					"#endif",
 
 				"#endif",
 
-				"vLightWeighting += pointLightColor[ i ] * pointLightWeighting * lDistance;",
+				"#ifdef WRAP_AROUND",
+
+					"vec3 pointLightWeightingHalf = vec3( max( 0.5 * dotProduct + 0.5, 0.0 ) );",
+					"pointLightWeighting = mix( pointLightWeighting, pointLightWeightingHalf, wrapRGB );",
+
+					"#ifdef DOUBLE_SIDED",
+
+						"pointLightWeightingBack = mix( pointLightWeightingBack, pointLightWeightingHalfBack, wrapRGB );",
+
+					"#endif",
+
+				"#endif",
+
+				"vLightFront += pointLightColor[ i ] * pointLightWeighting * lDistance;",
+
+				"#ifdef DOUBLE_SIDED",
+
+					"vLightBack += pointLightColor[ i ] * pointLightWeightingBack * lDistance;",
+
+				"#endif",
 
 			"}",
 
 		"#endif",
 
-		"vLightWeighting = vLightWeighting * diffuse + ambient * ambientLightColor;",
+		"vLightFront = vLightFront * diffuse + ambient * ambientLightColor;",
+
+		"#ifdef DOUBLE_SIDED",
+
+			"vLightBack = vLightBack * diffuse + ambient * ambientLightColor;",
+
+		"#endif",
 
 	].join("\n"),
 
@@ -469,16 +523,18 @@ THREE.ShaderChunk = {
 
 				// diffuse
 
+				"float dotProduct = dot( normal, lVector );",
+
 				"#ifdef WRAP_AROUND",
 
-					"float pointDiffuseWeightFull = max( dot( normal, lVector ), 0.0 );",
-					"float pointDiffuseWeightHalf = max( 0.5 * dot( normal, lVector ) + 0.5, 0.0 );",
+					"float pointDiffuseWeightFull = max( dotProduct, 0.0 );",
+					"float pointDiffuseWeightHalf = max( 0.5 * dotProduct + 0.5, 0.0 );",
 
 					"vec3 pointDiffuseWeight = mix( vec3 ( pointDiffuseWeightFull ), vec3( pointDiffuseWeightHalf ), wrapRGB );",
 
 				"#else",
 
-					"float pointDiffuseWeight = max( dot( normal, lVector ), 0.0 );",
+					"float pointDiffuseWeight = max( dotProduct, 0.0 );",
 
 				"#endif",
 
@@ -517,16 +573,18 @@ THREE.ShaderChunk = {
 
 				// diffuse
 
+				"float dotProduct = dot( normal, dirVector );",
+
 				"#ifdef WRAP_AROUND",
 
-					"float dirDiffuseWeightFull = max( dot( normal, dirVector ), 0.0 );",
-					"float dirDiffuseWeightHalf = max( 0.5 * dot( normal, dirVector ) + 0.5, 0.0 );",
+					"float dirDiffuseWeightFull = max( dotProduct, 0.0 );",
+					"float dirDiffuseWeightHalf = max( 0.5 * dotProduct + 0.5, 0.0 );",
 
 					"vec3 dirDiffuseWeight = mix( vec3( dirDiffuseWeightFull ), vec3( dirDiffuseWeightHalf ), wrapRGB );",
 
 				"#else",
 
-					"float dirDiffuseWeight = max( dot( normal, dirVector ), 0.0 );",
+					"float dirDiffuseWeight = max( dotProduct, 0.0 );",
 
 				"#endif",
 
@@ -1327,7 +1385,13 @@ THREE.ShaderLib = {
 
 		vertexShader: [
 
-			"varying vec3 vLightWeighting;",
+			"varying vec3 vLightFront;",
+
+			"#ifdef DOUBLE_SIDED",
+
+				"varying vec3 vLightBack;",
+
+			"#endif",
 
 			THREE.ShaderChunk[ "map_pars_vertex" ],
 			THREE.ShaderChunk[ "lightmap_pars_vertex" ],
@@ -1364,7 +1428,13 @@ THREE.ShaderLib = {
 
 			"uniform float opacity;",
 
-			"varying vec3 vLightWeighting;",
+			"varying vec3 vLightFront;",
+
+			"#ifdef DOUBLE_SIDED",
+
+				"varying vec3 vLightBack;",
+
+			"#endif",
 
 			THREE.ShaderChunk[ "color_pars_fragment" ],
 			THREE.ShaderChunk[ "map_pars_fragment" ],
@@ -1380,7 +1450,21 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "map_fragment" ],
 				THREE.ShaderChunk[ "alphatest_fragment" ],
 
-				"gl_FragColor.xyz = gl_FragColor.xyz * vLightWeighting;",
+				"#ifdef DOUBLE_SIDED",
+
+					//"float isFront = float( gl_FrontFacing );",
+					//"gl_FragColor.xyz *= isFront * vLightFront + ( 1.0 - isFront ) * vLightBack;",
+
+					"if ( gl_FrontFacing )",
+						"gl_FragColor.xyz *= vLightFront;",
+					"else",
+						"gl_FragColor.xyz *= vLightBack;",
+
+				"#else",
+
+					"gl_FragColor.xyz *= vLightFront;",
+
+				"#endif",
 
 				THREE.ShaderChunk[ "lightmap_fragment" ],
 				THREE.ShaderChunk[ "color_fragment" ],
