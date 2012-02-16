@@ -18,22 +18,28 @@
 
 		<script src="../build/Three.js"></script>
 
+		<script src="js/Detector.js"></script>
 		<script src="js/Stats.js"></script>
 
 		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var container, stats;
 
 			var camera, scene, renderer;
 
-			var mesh, zmesh, lightMesh, geometry;
+			var mesh, geometry;
 
 			var mouseX = 0, mouseY = 0;
 
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
+			var SCREEN_WIDTH = window.innerWidth,
+				SCREEN_HEIGHT = window.innerHeight;
 
-			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+			var windowHalfX = SCREEN_WIDTH / 2;
+			var windowHalfY = SCREEN_HEIGHT / 2;
+
+			var FANCY = true;
 
 			init();
 			animate();
@@ -44,21 +50,46 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 20000 );
+				camera = new THREE.PerspectiveCamera( 50, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 20000 );
 				camera.position.z = 3200;
 
 				scene = new THREE.Scene();
 				scene.add( camera );
 
-				var light = new THREE.PointLight( 0x0011ff, 1, 5000 );
+				var light = new THREE.PointLight( 0x0011ff, 1, 5500 );
 				light.position.set( 4000, 0, 0 );
 				scene.add( light );
 
-				var light = new THREE.PointLight( 0xff1100, 1, 5000 );
+				var light = new THREE.PointLight( 0xff1100, 1, 5500 );
 				light.position.set( -4000, 0, 0 );
 				scene.add( light );
 
-				var material = new THREE.MeshPhongMaterial( { specular: 0xffffff, shading: THREE.SmoothShading, perPixel: true } );
+				if ( FANCY ) {
+
+					var light = new THREE.PointLight( 0xffaa00, 2, 3000 );
+					light.position.set( 0, 0, 0 );
+					scene.add( light );
+
+					var path = "textures/cube/SwedishRoyalCastle/";
+					var format = '.jpg';
+					var urls = [
+							path + 'px' + format, path + 'nx' + format,
+							path + 'py' + format, path + 'ny' + format,
+							path + 'pz' + format, path + 'nz' + format
+						];
+
+					var reflectionCube = THREE.ImageUtils.loadTextureCube( urls );
+					reflectionCube.format = THREE.RGBFormat;
+
+					var material = new THREE.MeshPhongMaterial( { specular: 0xffffff, shininess: 100, envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.1, perPixel: true } );
+					material.wrapAround = true;
+					material.wrapRGB.set( 0.5, 0.5, 0.5 );
+
+				} else {
+
+					var material = new THREE.MeshPhongMaterial( { specular: 0xffffff, shading: THREE.SmoothShading, perPixel: true } );
+
+				}
 
 				var geometry = new THREE.SphereGeometry( 1, 32, 16, 0, Math.PI );
 
@@ -83,12 +114,13 @@
 
 				}
 
-				renderer = new THREE.WebGLRenderer( { clearColor: 0x050505, clearAlpha: 1, antialias: false } );
-				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer = new THREE.WebGLRenderer( { clearColor: 0x050505, clearAlpha: 1, antialias: FANCY } );
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.sortObjects = false;
 
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
+				renderer.physicallyBasedShading = FANCY;
 
 				container.appendChild( renderer.domElement );
 
@@ -102,6 +134,26 @@
 				stats.domElement.children[ 0 ].children[ 1 ].style.display = "none";
 
 				container.appendChild( stats.domElement );
+
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			//
+
+			function onWindowResize( event ) {
+
+				SCREEN_WIDTH = window.innerWidth;
+				SCREEN_HEIGHT = window.innerHeight;
+
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+
+				camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
+				camera.updateProjectionMatrix();
+
+				windowHalfX = SCREEN_WIDTH / 2;
+				windowHalfY = SCREEN_HEIGHT / 2;
 
 			}
 
