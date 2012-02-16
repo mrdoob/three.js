@@ -436,6 +436,12 @@ THREE.ShaderChunk = {
 		"vec3 normal = normalize( vNormal );",
 		"vec3 viewPosition = normalize( vViewPosition );",
 
+		"#ifdef DOUBLE_SIDED",
+
+			"normal = normal * ( -1.0 + 2.0 * float( gl_FrontFacing ) );",
+
+		"#endif",
+
 		"#if MAX_POINT_LIGHTS > 0",
 
 			"vec3 pointDiffuse  = vec3( 0.0 );",

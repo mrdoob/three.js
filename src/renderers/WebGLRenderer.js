@@ -4211,7 +4211,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			alphaTest: material.alphaTest,
 			metal: material.metal,
 			perPixel: material.perPixel,
-			wrapAround: material.wrapAround
+			wrapAround: material.wrapAround,
+			doubleSided: object.doubleSided
 
 		};
 
@@ -5287,6 +5288,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			parameters.morphNormals ? "#define USE_MORPHNORMALS" : "",
 			parameters.perPixel ? "#define PHONG_PER_PIXEL" : "",
 			parameters.wrapAround ? "#define WRAP_AROUND" : "",
+			parameters.doubleSided ? "#define DOUBLE_SIDED" : "",
 
 			parameters.shadowMapEnabled ? "#define USE_SHADOWMAP" : "",
 			parameters.shadowMapSoft ? "#define SHADOWMAP_SOFT" : "",
@@ -5377,6 +5379,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			parameters.metal ? "#define METAL" : "",
 			parameters.perPixel ? "#define PHONG_PER_PIXEL" : "",
 			parameters.wrapAround ? "#define WRAP_AROUND" : "",
+			parameters.doubleSided ? "#define DOUBLE_SIDED" : "",
 
 			parameters.shadowMapEnabled ? "#define USE_SHADOWMAP" : "",
 			parameters.shadowMapSoft ? "#define SHADOWMAP_SOFT" : "",
