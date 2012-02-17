@@ -253,8 +253,6 @@ def create_mesh_object(name, vertices, materials, face_data, flipYZ, recalculate
                     active_texture = materials[faceMaterials[fi]].active_texture
 
                     if active_texture:
-                        # this property doesn't exist anymore in Blender 2.60
-                        #uv_face.use_image = True
                         uv_face.image = active_texture.image
 
 

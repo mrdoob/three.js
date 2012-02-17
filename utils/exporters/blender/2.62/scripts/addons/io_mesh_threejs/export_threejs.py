@@ -83,7 +83,7 @@ TEMPLATE_SCENE_ASCII = """\
 {
     "formatVersion" : 3,
     "sourceFile"    : "%(fname)s",
-    "generatedBy"   : "Blender 2.60 Exporter",
+    "generatedBy"   : "Blender 2.62 Exporter",
     "objects"       : %(nobjects)s,
     "geometries"    : %(ngeometries)s,
     "materials"     : %(nmaterials)s,
@@ -223,7 +223,7 @@ TEMPLATE_FILE_ASCII = """\
     "metadata" :
     {
         "formatVersion" : 3,
-        "generatedBy"   : "Blender 2.60 Exporter",
+        "generatedBy"   : "Blender 2.62 Exporter",
         "vertices"      : %(nvertex)d,
         "faces"         : %(nface)d,
         "normals"       : %(nnormal)d,
