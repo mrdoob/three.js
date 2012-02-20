@@ -5592,7 +5592,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			texture.needsUpdate = false;
 
-			if ( texture.onUpdated ) texture.onUpdated();
+			if ( texture.onUpdate ) texture.onUpdate();
 
 		} else {
 
@@ -5677,7 +5677,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				texture.needsUpdate = false;
 
-				if ( texture.onUpdated ) texture.onUpdated();
+				if ( texture.onUpdate ) texture.onUpdate();
 
 			} else {
 
