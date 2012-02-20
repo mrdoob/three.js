@@ -454,7 +454,7 @@ def setBit(value, position, on):
         mask = ~(1 << position)
         return (value & mask)
 
-def generate_faces(normals, uvs, colors, meshes, option_normals, option_colors, option_uv_coords, option_materials, flipyz, option_faces):
+def generate_faces(normals, uvs, colors, meshes, option_normals, option_colors, option_uv_coords, option_materials, option_faces):
 
     if not option_faces:
         return "", 0
@@ -483,7 +483,7 @@ def generate_faces(normals, uvs, colors, meshes, option_normals, option_colors, 
                 mesh_extract_colors = False
 
         for i, f in enumerate(mesh.faces):
-            face = generate_face(f, i, normals, uvs, colors, mesh, option_normals, mesh_colors, mesh_uvs, option_materials, flipyz, vertex_offset, material_offset)
+            face = generate_face(f, i, normals, uvs, colors, mesh, option_normals, mesh_colors, mesh_uvs, option_materials, vertex_offset, material_offset)
             chunks.append(face)
 
         vertex_offset += len(mesh.vertices)
@@ -496,7 +496,7 @@ def generate_faces(normals, uvs, colors, meshes, option_normals, option_colors, 
 
     return ",".join(chunks), len(chunks)
 
-def generate_face(f, faceIndex, normals, uvs, colors, mesh, option_normals, option_colors, option_uv_coords, option_materials, flipyz, vertex_offset, material_offset):
+def generate_face(f, faceIndex, normals, uvs, colors, mesh, option_normals, option_colors, option_uv_coords, option_materials, vertex_offset, material_offset):
     isTriangle = ( len(f.vertices) == 3 )
 
     if isTriangle:
@@ -938,7 +938,7 @@ def generate_ascii_model(meshes, morphs,
     elif align_model == 3:
         top(vertices)
 
-    faces_string, nfaces = generate_faces(normals, uvs, colors, meshes, option_normals, option_colors, option_uv_coords, option_materials, flipyz, option_faces)
+    faces_string, nfaces = generate_faces(normals, uvs, colors, meshes, option_normals, option_colors, option_uv_coords, option_materials, option_faces)
 
     materials_string = ",\n\n".join(materials)
 
@@ -978,7 +978,7 @@ def generate_ascii_model(meshes, morphs,
 # Model exporter - export single mesh
 # #####################################################
 
-def extract_meshes(objects, scene, export_single_model, option_scale):
+def extract_meshes(objects, scene, export_single_model, option_scale, flipyz):
 
     meshes = []
 
@@ -993,12 +993,14 @@ def extract_meshes(objects, scene, export_single_model, option_scale):
             if not mesh:
                 raise Exception("Error, could not get mesh data from object [%s]" % object.name)
 
-            # that's what Blender's native export_obj.py does
-            # to flip YZ
-
             if export_single_model:
-                X_ROT = mathutils.Matrix.Rotation(-math.pi/2, 4, 'X')
-                mesh.transform(X_ROT * object.matrix_world)
+                if flipyz:
+                    # that's what Blender's native export_obj.py does
+                    # to flip YZ
+                    X_ROT = mathutils.Matrix.Rotation(-math.pi/2, 4, 'X')
+                    mesh.transform(X_ROT * object.matrix_world)
+                else:
+                    mesh.transform(object.matrix_world)
 
             mesh.calc_normals()
             mesh.transform(mathutils.Matrix.Scale(option_scale, 4))
@@ -1023,7 +1025,7 @@ def generate_mesh_string(objects, scene,
                 option_animation,
                 option_frame_step):
 
-    meshes = extract_meshes(objects, scene, export_single_model, option_scale)
+    meshes = extract_meshes(objects, scene, export_single_model, option_scale, flipyz)
 
     morphs = []
 
@@ -1036,7 +1038,7 @@ def generate_mesh_string(objects, scene,
         for frame in scene_frames:
             scene.frame_set(frame, 0.0)
 
-            anim_meshes = extract_meshes(objects, scene, export_single_model, option_scale)
+            anim_meshes = extract_meshes(objects, scene, export_single_model, option_scale, flipyz)
 
             frame_vertices = []
 
