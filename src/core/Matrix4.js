@@ -70,11 +70,11 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	lookAt: function ( eye, center, up ) {
+	lookAt: function ( eye, target, up ) {
 
 		var x = THREE.Matrix4.__v1, y = THREE.Matrix4.__v2, z = THREE.Matrix4.__v3;
 
-		z.sub( eye, center ).normalize();
+		z.sub( eye, target ).normalize();
 
 		if ( z.length() === 0 ) {
 

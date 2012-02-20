@@ -41,7 +41,7 @@
 
 			var camera, scene, renderer;
 
-			var mesh, zmesh, lightMesh, geometry, sphere;
+			var mesh, geometry, sphere;
 
 			var mouseX = 0, mouseY = 0;
 
@@ -125,9 +125,9 @@
 				sphere.position.y = Math.cos( time * 0.5 ) * 2000;
 				sphere.position.z = Math.cos( time * 0.3 ) * 2000;
 
-				for ( var i = 0, l = scene.objects.length; i < l; i ++ ) {
+				for ( var i = 1, l = scene.children.length; i < l; i ++ ) {
 
-					scene.objects[ i ].lookAt( sphere.position );
+					scene.children[ i ].lookAt( sphere.position );
 
 				}
 
