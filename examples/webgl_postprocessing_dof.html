@@ -108,7 +108,7 @@
 
 				var start = new Date().getTime();
 
-				renderer.initMaterial( cubeMaterial, scene.lights, scene.fog );
+				renderer.initMaterial( cubeMaterial, scene.__lights, scene.fog );
 
 				var xgrid = 14,
 					ygrid = 9,
@@ -133,7 +133,7 @@
 
 						materials[ c ] = new THREE.MeshBasicMaterial( parameters );
 						mesh = new THREE.Mesh( geo, materials[ c ] );
-						renderer.initMaterial( materials[ c ], scene.lights, scene.fog, mesh );
+						renderer.initMaterial( materials[ c ], scene.__lights, scene.fog, mesh );
 
 					}
 

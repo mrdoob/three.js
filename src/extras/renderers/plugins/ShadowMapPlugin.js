@@ -64,9 +64,9 @@ THREE.ShadowMapPlugin = function ( ) {
 		// 	- skip lights that are not casting shadows
 		//	- create virtual lights for cascaded shadow maps
 
-		for ( i = 0, il = scene.lights.length; i < il; i ++ ) {
+		for ( i = 0, il = scene.__lights.length; i < il; i ++ ) {
 
-			light = scene.lights[ i ];
+			light = scene.__lights[ i ];
 
 			if ( ! light.castShadow ) continue;
 
@@ -260,11 +260,11 @@ THREE.ShadowMapPlugin = function ( ) {
 
 					if ( buffer instanceof THREE.BufferGeometry ) {
 
-						_renderer.renderBufferDirect( shadowCamera, scene.lights, fog, material, buffer, object );
+						_renderer.renderBufferDirect( shadowCamera, scene.__lights, fog, material, buffer, object );
 
 					} else {
 
-						_renderer.renderBuffer( shadowCamera, scene.lights, fog, material, buffer, object );
+						_renderer.renderBuffer( shadowCamera, scene.__lights, fog, material, buffer, object );
 
 					}
 
@@ -291,7 +291,7 @@ THREE.ShadowMapPlugin = function ( ) {
 
 					object._modelViewMatrix.multiplyToArray( shadowCamera.matrixWorldInverse, object.matrixWorld, object._modelViewMatrixArray );
 
-					_renderer.renderImmediateObject( shadowCamera, scene.lights, fog, _depthMaterial, object );
+					_renderer.renderImmediateObject( shadowCamera, scene.__lights, fog, _depthMaterial, object );
 
 				}
 

@@ -197,7 +197,7 @@
 						if( !material.program ) {
 
 							console.log(m);
-							renderer.initMaterial( material, result.scene.lights, result.scene.fog );
+							renderer.initMaterial( material, result.scene.__lights, result.scene.fog );
 
 							count += 1;
 							if( count > pieces ) {

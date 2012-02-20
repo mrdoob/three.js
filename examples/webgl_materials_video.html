@@ -125,7 +125,7 @@
 				var parameters = { color: 0xffffff, map: texture },
 					material_base = new THREE.MeshLambertMaterial( parameters );
 
-				renderer.initMaterial( material_base, scene.lights, scene.fog );
+				renderer.initMaterial( material_base, scene.__lights, scene.fog );
 
 				cube_count = 0;
 
