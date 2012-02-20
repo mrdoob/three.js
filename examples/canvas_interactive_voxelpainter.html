@@ -131,7 +131,7 @@
 
 				event.preventDefault();
 
-				var intersects = ray.intersectScene( scene );
+				var intersects = ray.intersectObjects( scene.children );
 
 				if ( intersects.length > 0 ) {
 
@@ -214,7 +214,7 @@
 				mouse3D = projector.unprojectVector( mouse2D.clone(), camera );
 				ray.direction = mouse3D.subSelf( camera.position ).normalize();
 
-				var intersects = ray.intersectScene( scene );
+				var intersects = ray.intersectObjects( scene.children );
 
 				if ( intersects.length > 0 ) {
 

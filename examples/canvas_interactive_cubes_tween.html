@@ -92,7 +92,7 @@
 
 				var ray = new THREE.Ray( camera.position, vector.subSelf( camera.position ).normalize() );
 
-				var intersects = ray.intersectScene( scene );
+				var intersects = ray.intersectObjects( scene.children );
 
 				if ( intersects.length > 0 ) {
 
