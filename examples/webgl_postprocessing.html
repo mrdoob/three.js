@@ -202,12 +202,19 @@
 
 				//
 
+				rtParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: true };
+
+				var rtWidth  = window.innerWidth / 2;
+				var rtHeight = window.innerHeight / 2;
+
+				//
+
 				var renderBackground = new THREE.RenderPass( sceneBG, cameraOrtho );
 				var renderModel = new THREE.RenderPass( sceneModel, cameraPerspective );
 
 				renderModel.clear = false;
 
-				composerScene = new THREE.EffectComposer( renderer );
+				composerScene = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth * 2, rtHeight * 2, rtParameters ) );
 
 				composerScene.addPass( renderBackground );
 				composerScene.addPass( renderModel );
@@ -219,11 +226,6 @@
 				//
 
 				renderScene = new THREE.TexturePass( composerScene.renderTarget2 );
-
-				rtParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: true };
-
-				var rtWidth  = window.innerWidth / 2;
-				var rtHeight = window.innerHeight / 2;
 
 				//
 
@@ -299,7 +301,7 @@
 
 				cameraOrtho.updateProjectionMatrix();
 
-				composerScene.reset();
+				composerScene.reset( new THREE.WebGLRenderTarget( halfWidth * 2, halfHeight * 2, rtParameters ) );
 
 				composer1.reset( new THREE.WebGLRenderTarget( halfWidth, halfHeight, rtParameters ) );
 				composer2.reset( new THREE.WebGLRenderTarget( halfWidth, halfHeight, rtParameters ) );
