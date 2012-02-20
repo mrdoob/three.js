@@ -13,7 +13,7 @@
  * @author won3d / http://twitter.com/won3d
  */
 
-THREE.UTF8Loader = function ( ) {
+THREE.UTF8Loader = function () {
 
 };
 
@@ -27,19 +27,7 @@ THREE.UTF8Loader.prototype.constructor = THREE.UTF8Loader;
 //		- callback (required)
 //		- metaData (optional)
 
-THREE.UTF8Loader.prototype.load = function( url, callback, metaData ) {
-
-	if ( url instanceof Object ) {
-
-		console.warn( 'DEPRECATED: UTF8Loader( parameters ) is now UTF8Loader( url, callback, metaData ).' );
-
-		var parameters = url;
-
-		url = parameters.model;
-		callback = parameters.callback;
-		metaData = { scale: parameters.scale, offsetX: parameters.offsetX, offsetY: parameters.offsetY, offsetZ: parameters.offsetZ };
-
-	}
+THREE.UTF8Loader.prototype.load = function ( url, callback, metaData ) {
 
 	var xhr = new XMLHttpRequest(),
 		callbackProgress = null,
@@ -61,7 +49,7 @@ THREE.UTF8Loader.prototype.load = function( url, callback, metaData ) {
 
 			} else {
 
-				alert( "Couldn't load [" + url + "] [" + xhr.status + "]" );
+				console.error( "THREE.UTF8Loader: Couldn't load [" + url + "] [" + xhr.status + "]" );
 
 			}
 

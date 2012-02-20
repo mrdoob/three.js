@@ -5,20 +5,12 @@
 
 THREE.Camera = function () {
 
-	if ( arguments.length ) {
-
-		console.warn( 'DEPRECATED: Camera() is now PerspectiveCamera() or OrthographicCamera().' );
-		return new THREE.PerspectiveCamera( arguments[ 0 ], arguments[ 1 ], arguments[ 2 ], arguments[ 3 ] );
-
-	}
-
 	THREE.Object3D.call( this );
 
 	this.matrixWorldInverse = new THREE.Matrix4();
 
 	this.projectionMatrix = new THREE.Matrix4();
 	this.projectionMatrixInverse = new THREE.Matrix4();
-
 
 };
 

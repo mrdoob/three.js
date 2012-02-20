@@ -36,27 +36,16 @@ THREE.JSONLoader.prototype.loadAjaxJSON = function ( context, url, callback, tex
 
 			if ( xhr.status === 200 || xhr.status === 0 ) {
 
-				var json;
+				if ( xhr.responseText ) {
 
-				try {
+					var json = JSON.parse( xhr.responseText );
+					context.createModel( json, callback, texturePath );
 
-					if ( xhr.responseText ) {
+				} else {
 
-						json = JSON.parse( xhr.responseText );
-
-					} else {
-
-						console.warn( "EMPTY: [" + url + "] seems to be unreachable or file there is empty" );
-
-					}
-
-				} catch ( error ) {
-
-					console.warn( "DEPRECATED: [" + url + "] seems to be using old model format or JSON is invalid" );
+					console.warn( "THREE.JSONLoader: [" + url + "] seems to be unreachable or file there is empty" );
 
 				}
-
-				if ( json ) context.createModel( json, callback, texturePath );
 
 				// in context of more complex asset initialization
 				// do not block on single failed file
@@ -66,7 +55,7 @@ THREE.JSONLoader.prototype.loadAjaxJSON = function ( context, url, callback, tex
 
 			} else {
 
-				console.error( "Couldn't load [" + url + "] [" + xhr.status + "]" );
+				console.error( "THREE.JSONLoader: Couldn't load [" + url + "] [" + xhr.status + "]" );
 
 			}
 
@@ -120,18 +109,11 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texturePath 
 
 	function parseModel( scale ) {
 
-		if ( json.metadata === undefined || json.metadata.formatVersion === undefined || json.metadata.formatVersion !== 3 ) {
-
-			console.error( 'Deprecated file format.' );
-			return;
-
-		}
-
 		function isBitSet( value, position ) {
 
 			return value & ( 1 << position );
 
-		};
+		}
 
 		var i, j, fi,
 

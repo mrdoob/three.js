@@ -23,19 +23,6 @@ THREE.BinaryLoader.prototype.supr = THREE.Loader.prototype;
 
 THREE.BinaryLoader.prototype.load = function( url, callback, texturePath, binaryPath ) {
 
-	if ( url instanceof Object ) {
-
-		console.warn( 'DEPRECATED: BinaryLoader( parameters ) is now BinaryLoader( url, callback, texturePath, binaryPath ).' );
-
-		var parameters = url;
-
-		url = parameters.model;
-		callback = parameters.callback;
-		texturePath = parameters.texture_path;
-		binaryPath = parameters.bin_path;
-
-	}
-
 	texturePath = texturePath ? texturePath : this.extractUrlbase( url );
 	binaryPath = binaryPath ? binaryPath : this.extractUrlbase( url );
 
@@ -49,41 +36,22 @@ THREE.BinaryLoader.prototype.load = function( url, callback, texturePath, binary
 
 };
 
-THREE.BinaryLoader.prototype.loadAjaxJSON = function( context, url, callback, texturePath, binaryPath, callbackProgress ) {
+THREE.BinaryLoader.prototype.loadAjaxJSON = function ( context, url, callback, texturePath, binaryPath, callbackProgress ) {
 
 	var xhr = new XMLHttpRequest();
 
-	xhr.onreadystatechange = function() {
+	xhr.onreadystatechange = function () {
 
 		if ( xhr.readyState == 4 ) {
 
 			if ( xhr.status == 200 || xhr.status == 0 ) {
 
-				try {
-
-					var json = JSON.parse( xhr.responseText );
-
-					if ( json.metadata === undefined || json.metadata.formatVersion === undefined || json.metadata.formatVersion !== 3 ) {
-
-						console.error( 'Deprecated file format.' );
-						return;
-
-					}
-
-					// #2 load BIN part via Ajax
-
-					context.loadAjaxBuffers( json, callback, binaryPath, texturePath, callbackProgress );
-
-				} catch ( error ) {
-
-					console.error( error );
-					console.warn( "DEPRECATED: [" + url + "] seems to be using old model format" );
-
-				}
+				var json = JSON.parse( xhr.responseText );
+				context.loadAjaxBuffers( json, callback, binaryPath, texturePath, callbackProgress );
 
 			} else {
 
-				console.error( "Couldn't load [" + url + "] [" + xhr.status + "]" );
+				console.error( "THREE.BinaryLoader: Couldn't load [" + url + "] [" + xhr.status + "]" );
 
 			}
 
@@ -98,14 +66,14 @@ THREE.BinaryLoader.prototype.loadAjaxJSON = function( context, url, callback, te
 
 };
 
-THREE.BinaryLoader.prototype.loadAjaxBuffers = function( json, callback, binaryPath, texturePath, callbackProgress ) {
+THREE.BinaryLoader.prototype.loadAjaxBuffers = function ( json, callback, binaryPath, texturePath, callbackProgress ) {
 
 	var xhr = new XMLHttpRequest(),
 		url = binaryPath + "/" + json.buffers;
 
 	var length = 0;
 
-	xhr.onreadystatechange = function() {
+	xhr.onreadystatechange = function () {
 
 		if ( xhr.readyState == 4 ) {
 
@@ -115,7 +83,7 @@ THREE.BinaryLoader.prototype.loadAjaxBuffers = function( json, callback, binaryP
 
 			} else {
 
-				console.error( "Couldn't load [" + url + "] [" + xhr.status + "]" );
+				console.error( "THREE.BinaryLoader: Couldn't load [" + url + "] [" + xhr.status + "]" );
 
 			}
 
@@ -170,12 +138,6 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 		THREE.Loader.prototype.initMaterials( scope, materials, texturePath );
 
 		md = parseMetaData( data, currentOffset );
-
-		if ( md.signature !== "Three.js 003" ) {
-
-			console.warn( "DEPRECATED: binary model seems to be using old format" );
-
-		}
 
 		currentOffset += md.header_bytes;
 /*

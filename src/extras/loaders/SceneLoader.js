@@ -27,21 +27,12 @@ THREE.SceneLoader.prototype.load = function( url, callbackFinished ) {
 
 			if ( xhr.status == 200 || xhr.status == 0 ) {
 
-				try {
-
-					var json = JSON.parse( xhr.responseText );
-
-				} catch ( error ) {
-
-					console.warn( "DEPRECATED: [" + url + "] seems to be using old model format" );
-
-				}
-
+				var json = JSON.parse( xhr.responseText );
 				context.createScene( json, callbackFinished, url );
 
 			} else {
 
-				console.error( "Couldn't load [" + url + "] [" + xhr.status + "]" );
+				console.error( "THREE.SceneLoader: Couldn't load [" + url + "] [" + xhr.status + "]" );
 
 			}
 

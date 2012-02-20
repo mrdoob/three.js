@@ -11,13 +11,6 @@ THREE.Mesh = function ( geometry, material ) {
 	this.geometry = geometry;
 	this.material = material;
 
-	if ( material instanceof Array ) {
-
-		console.warn( 'DEPRECATED: Mesh material can no longer be an Array. Using material at index 0...' );
-		this.material = material[ 0 ];
-
-	}
-
 	if ( this.geometry ) {
 
 		// calc bound radius
