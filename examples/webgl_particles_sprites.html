@@ -176,13 +176,19 @@
 
 				camera.lookAt( scene.position );
 
-				for( i = 0; i < scene.objects.length; i ++ ) {
+				for ( i = 0; i < scene.children.length; i ++ ) {
 
-					scene.objects[i].rotation.y = time * ( i < 4 ? i+1 : - (i+1) );
+					var object = scene.children[ i ];
+
+					if ( object instanceof THREE.ParticleSystem ) {
+
+						object.rotation.y = time * ( i < 4 ? i + 1 : - ( i + 1 ) );
+
+					}
 
 				}
 
-				for( i = 0; i < materials.length; i ++ ) {
+				for ( i = 0; i < materials.length; i ++ ) {
 
 					color = parameters[i][0];
 

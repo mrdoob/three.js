@@ -247,9 +247,15 @@
 
 				var time = Date.now() * 0.0005;
 
-				for( var i = 0; i < scene.objects.length; i ++ ) {
+				for ( var i = 0; i < scene.children.length; i ++ ) {
 
-					scene.objects[ i ].rotation.y = time * ( i % 2 ? 1 : -1 );
+					var object = scene.children[ i ];
+
+					if ( object instanceof THREE.Line ) {
+
+						object.rotation.y = time * ( i % 2 ? 1 : -1 );
+
+					}
 
 				}
 

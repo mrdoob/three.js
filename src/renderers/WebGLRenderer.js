@@ -3269,7 +3269,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		webglObject, object,
 		renderList,
 
-		lights = scene.lights,
+		lights = scene.__lights,
 		fog = scene.fog;
 
 		_currentMaterialId = -1;
@@ -4298,7 +4298,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function setMaterialShaders ( material, shaders ) {
+	function setMaterialShaders( material, shaders ) {
 
 		material.uniforms = THREE.UniformsUtils.clone( shaders.uniforms );
 		material.vertexShader = shaders.vertexShader;
@@ -4306,7 +4306,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function setProgram ( camera, lights, fog, material, object ) {
+	function setProgram( camera, lights, fog, material, object ) {
 
 		if ( ! material.program ) {
 

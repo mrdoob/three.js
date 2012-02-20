@@ -176,11 +176,17 @@
 
 				var time = Date.now() * 0.0001;
 
-				for( var i = 0; i < scene.objects.length; i ++ ) {
+				for ( var i = 0; i < scene.children.length; i ++ ) {
 
-					scene.objects[ i ].rotation.y = time * ( i < 4 ? ( i + 1 ) : - ( i + 1 ) );
+					var object = scene.children[ i ];
 
-					if ( i < 5 ) scene.objects[i].scale.x = scene.objects[i].scale.y = scene.objects[i].scale.z = scene.objects[i].originalScale * (i/5+1) * (1 + 0.5 * Math.sin( 7*time ) );
+					if ( object instanceof THREE.Line ) {
+
+						object.rotation.y = time * ( i < 4 ? ( i + 1 ) : - ( i + 1 ) );
+
+						if ( i < 5 ) object.scale.x = object.scale.y = object.scale.z = object.originalScale * (i/5+1) * (1 + 0.5 * Math.sin( 7*time ) );
+
+					}
 
 				}
 

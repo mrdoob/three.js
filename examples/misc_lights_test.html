@@ -190,19 +190,25 @@
 
 				camera.lookAt( scene.position );
 
-				for ( var i = 0, l = scene.objects.length; i < l; i ++ ) {
+				for ( var i = 0, l = scene.children.length; i < l; i ++ ) {
 
-					if ( i%3 == 1 )
+					var object = scene.children[ i ];
 
-						scene.objects[i].rotation.z += 0.05;
+					if ( object instanceof THREE.Mesh ) {
 
-					else if ( i%3 == 2 )
+						if ( i % 3 == 1 )
 
-						scene.objects[i].rotation.y += 0.05;
+							object.rotation.z += 0.05;
 
-					else if ( i%3 == 0 )
+						else if ( i % 3 == 2 )
 
-						scene.objects[i].rotation.x += 0.05;
+							object.rotation.y += 0.05;
+
+						else if ( i % 3 == 0 )
+
+							object.rotation.x += 0.05;
+
+					}
 
 				}
 
