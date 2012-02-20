@@ -5174,8 +5174,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			switch ( blending ) {
 
+				case THREE.NoBlending:
+                    _gl.disable( _gl.BLEND );
+                    break;
+                    
 				case THREE.AdditiveBlending:
 
+                    _gl.enable( _gl.BLEND );
 					_gl.blendEquation( _gl.FUNC_ADD );
 					_gl.blendFunc( _gl.SRC_ALPHA, _gl.ONE );
 
@@ -5184,7 +5189,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				case THREE.SubtractiveBlending:
 
 					// TODO: Find blendFuncSeparate() combination
-
+                    _gl.enable( _gl.BLEND );
 					_gl.blendEquation( _gl.FUNC_ADD );
 					_gl.blendFunc( _gl.ZERO, _gl.ONE_MINUS_SRC_COLOR );
 
@@ -5193,7 +5198,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				case THREE.MultiplyBlending:
 
 					// TODO: Find blendFuncSeparate() combination
-
+                    _gl.enable( _gl.BLEND );
 					_gl.blendEquation( _gl.FUNC_ADD );
 					_gl.blendFunc( _gl.ZERO, _gl.SRC_COLOR );
 
@@ -5201,6 +5206,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				default:
 
+                    _gl.enable( _gl.BLEND );
 					_gl.blendEquationSeparate( _gl.FUNC_ADD, _gl.FUNC_ADD );
 					_gl.blendFuncSeparate( _gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA, _gl.ONE, _gl.ONE_MINUS_SRC_ALPHA );
 
