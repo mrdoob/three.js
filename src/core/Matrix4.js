@@ -91,7 +91,7 @@ THREE.Matrix4.prototype = {
 
 		}
 
-		y.cross( z, x ).normalize();
+		y.cross( z, x );
 
 
 		this.n11 = x.x; this.n12 = y.x; this.n13 = z.x;
