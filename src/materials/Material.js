@@ -38,9 +38,9 @@ THREE.NoColors = 0;
 THREE.FaceColors = 1;
 THREE.VertexColors = 2;
 
-THREE.NormalBlending = 0;
-THREE.AdditiveBlending = 1;
-THREE.SubtractiveBlending = 2;
-THREE.MultiplyBlending = 3;
-THREE.AdditiveAlphaBlending = 4;
-THREE.NoBlending = 5;
+THREE.NoBlending = 0;
+THREE.NormalBlending = 1;
+THREE.AdditiveBlending = 2;
+THREE.SubtractiveBlending = 3;
+THREE.MultiplyBlending = 4;
+THREE.AdditiveAlphaBlending = 5;
