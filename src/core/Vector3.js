@@ -255,6 +255,17 @@ THREE.Vector3.prototype = {
 
 	},
 
+	relativeToAbsolute: function ( object ) {
+
+		return object.matrixWorld.multiplyVector3( this.clone() );
+
+	},
+
+	absoluteToRelative: function ( object ) {
+
+		return new THREE.Matrix4().getInverse( object.matrixWorld ).multiplyVector3( this.clone() );
+
+	},
 
 	distanceTo: function ( v ) {
 
@@ -267,7 +278,6 @@ THREE.Vector3.prototype = {
 		return new THREE.Vector3().sub( this, v ).lengthSq();
 
 	},
-
 
 	setPositionFromMatrix: function ( m ) {
 
