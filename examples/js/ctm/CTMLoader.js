@@ -28,7 +28,7 @@ THREE.CTMLoader.prototype.loadParts = function( url, callback, useWorker, useBuf
 
 	var xhr = new XMLHttpRequest();
 
-	basePath = basePath ? basePath : this.extractUrlbase( url );
+	basePath = basePath ? basePath : this.extractUrlBase( url );
 
 	xhr.onreadystatechange = function() {
 
