@@ -17,7 +17,7 @@ THREE.JSONLoader.prototype.load = function ( url, callback, texturePath ) {
 
 	var worker, scope = this;
 
-	texturePath = texturePath ? texturePath : this.extractUrlbase( url );
+	texturePath = texturePath ? texturePath : this.extractUrlBase( url );
 
 	this.onLoadStart();
 	this.loadAjaxJSON( this, url, callback, texturePath );

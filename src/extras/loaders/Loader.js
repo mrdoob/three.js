@@ -59,7 +59,7 @@ THREE.Loader.prototype = {
 
 	},
 
-	extractUrlbase: function ( url ) {
+	extractUrlBase: function ( url ) {
 
 		var parts = url.split( '/' );
 		parts.pop();

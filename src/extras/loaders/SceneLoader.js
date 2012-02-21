@@ -51,7 +51,7 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 
 	var scope = this;
 
-	var urlBase = THREE.Loader.prototype.extractUrlbase( url );
+	var urlBase = THREE.Loader.prototype.extractUrlBase( url );
 
 	var dg, dm, dd, dl, dc, df, dt,
 		g, o, m, l, d, p, r, q, s, c, t, f, tt, pp, u,

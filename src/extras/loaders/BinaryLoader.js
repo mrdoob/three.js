@@ -23,8 +23,8 @@ THREE.BinaryLoader.prototype.supr = THREE.Loader.prototype;
 
 THREE.BinaryLoader.prototype.load = function( url, callback, texturePath, binaryPath ) {
 
-	texturePath = texturePath ? texturePath : this.extractUrlbase( url );
-	binaryPath = binaryPath ? binaryPath : this.extractUrlbase( url );
+	texturePath = texturePath ? texturePath : this.extractUrlBase( url );
+	binaryPath = binaryPath ? binaryPath : this.extractUrlBase( url );
 
 	var callbackProgress = this.showProgress ? THREE.Loader.prototype.updateProgress : null;
 
