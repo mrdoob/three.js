@@ -257,13 +257,20 @@ THREE.Vector3.prototype = {
 
 	relativeToAbsolute: function ( object ) {
 
-		return object.matrixWorld.multiplyVector3( this.clone() );
+		var result = THREE.Vector3.__v1;
+		result.copy( this );
+
+		return object.matrixWorld.multiplyVector3( result );
 
 	},
 
 	absoluteToRelative: function ( object ) {
 
-		return new THREE.Matrix4().getInverse( object.matrixWorld ).multiplyVector3( this.clone() );
+		var mInverse = THREE.Matrix4.__m3;
+		var result = THREE.Vector3.__v1;
+		result.copy( this );
+
+		return mInverse.getInverse( object.matrixWorld ).multiplyVector3( result );
 
 	},
 
@@ -324,3 +331,5 @@ THREE.Vector3.prototype = {
 	}
 
 };
+
+THREE.Vector3.__v1 = new THREE.Vector3();

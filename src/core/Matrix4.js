@@ -1053,3 +1053,4 @@ THREE.Matrix4.__v3 = new THREE.Vector3();
 
 THREE.Matrix4.__m1 = new THREE.Matrix4();
 THREE.Matrix4.__m2 = new THREE.Matrix4();
+THREE.Matrix4.__m3 = new THREE.Matrix4();
