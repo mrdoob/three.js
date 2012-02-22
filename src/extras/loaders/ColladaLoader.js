@@ -800,7 +800,51 @@ THREE.ColladaLoader = function () {
 
 				}
 
-				node.geometries.length > 1 ? obj.add( mesh ) : obj = mesh;
+				var offset = geometry.mesh.offset;
+
+				if ( node.geometries.length > 1 ) {
+
+					obj.add( mesh );
+
+					if ( offset ) {
+
+						// need to compensate for the shifted vertices
+						mesh.position.copy( offset ).multiplyScalar( -1 );
+						mesh.updateMatrix();
+
+					}
+
+				} else {
+
+					obj = mesh;
+
+					if ( offset ) {
+
+						// add the inverse offset to the bottom of the node's transform stack
+						// this updates any key-framed animations for the node as well
+						var offsetTransform = new Transform();
+						offsetTransform.sid = node.id + " offsetTransform";
+						offsetTransform.type = 'translate';
+						offsetTransform.obj = offset.clone().multiplyScalar( -1 );
+						node.transforms.push(offsetTransform);
+						node.updateMatrix();
+
+						// add the offset to the top of the transform stack of any child nodes
+						var parentOffsetTransform = new Transform();
+						parentOffsetTransform.sid = node.id + " parentOffsetTransform";
+						parentOffsetTransform.type = 'translate';
+						parentOffsetTransform.obj = offset.clone();
+
+						for ( j = 0; j < node.nodes.length; j ++ ) {
+
+							node.nodes[ j ].transforms.unshift( parentOffsetTransform );
+							node.nodes[ j ].updateMatrix();
+
+						}
+
+					}
+
+				}
 
 			}
 
@@ -815,21 +859,13 @@ THREE.ColladaLoader = function () {
 
 		}
 
+		// Wait until now to bake the animations, in case the geometry and transform stack were updated above
+		bakeAnimations( node );
+
 		obj.name = node.id || "";
 		obj.matrix = node.matrix;
-		var props = node.matrix.decompose();
-		obj.position = props[ 0 ];
-		obj.quaternion = props[ 1 ];
+		node.matrix.decompose( obj.position, obj.quaternion, obj.scale );
 		obj.useQuaternion = true;
-		obj.scale = props[ 2 ];
-
-		if ( options.centerGeometry && obj.geometry ) {
-
-			var delta = THREE.GeometryUtils.center( obj.geometry );
-			obj.quaternion.multiplyVector3( delta.multiplySelf( obj.scale ) );
-			obj.position.subSelf( delta );
-
-		}
 
 		for ( i = 0; i < node.nodes.length; i ++ ) {
 
@@ -1824,8 +1860,6 @@ THREE.ColladaLoader = function () {
 		}
 
 		this.channels = getChannelsForNode( this );
-		bakeAnimations( this );
-
 		this.updateMatrix();
 
 		return this;
@@ -2163,6 +2197,7 @@ THREE.ColladaLoader = function () {
 		this.primitives = [];
 		this.vertices = null;
 		this.geometry3js = null;
+		this.offset = null;
 
 	};
 
@@ -2238,7 +2273,16 @@ THREE.ColladaLoader = function () {
 			
 		}
 		
-		this.geometry3js.computeBoundingBox();
+		if ( options.centerGeometry ) {
+
+			// this will call computeBoundingBox() for us
+			this.offset = THREE.GeometryUtils.center( this.geometry3js );
+
+		} else {
+
+			this.geometry3js.computeBoundingBox();
+
+		}
 
 		return this;
 
