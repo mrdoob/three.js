@@ -36,78 +36,150 @@
 
 			}
 
-			ul {
-				list-style-type: none;
-				padding: 0px;
-				margin: 0px;
+				#panel ul {
+					list-style-type: none;
+					padding: 0px;
+					margin: 0px;
+				}
+
+			#viewer {
+				overflow: auto;
 			}
 
-			iframe {
+				#viewer h1 {
+					color: #444;
+					font-size: 25px;
+				}
 
-				border: 0;
+				#viewer h2 {
+					color: #999;
+					font-size: 18px;
+					margin-top: 40px;
+				}
 
-			}
+				#viewer h3 {
+					font-size: 15px;
+					margin-top: 30px;
+				}
+
+				#viewer div {
+					padding-left: 30px;
+				}
+
+				#viewer code {
+					display: block;
+					margin: 0px;
+					width: 90%;
+					padding: 20px;
+					white-space: pre;
+					background-color: #f9f9f9;
+					overflow: auto;
+				}
 		</style>
 	</head>
 	<body>
-		<div id="panel">
-
-			<h1>Core</h1>
-
-			<ul>
-				<li><a href="api/core/Clock.html" target="page">Clock</a></li>
-				<li><a href="api/core/Color.html" target="page">Color</a></li>
-				<li><a href="api/core/Edge.html" target="page">Edge</a></li>
-				<li><a href="api/core/Face3.html" target="page">Face3</a></li>
-				<li><a href="api/core/Face4.html" target="page">Face4</a></li>
-				<li><a href="api/core/Geometry.html" target="page">Geometry</a></li>
-				<li><a href="api/core/Math.html" target="page">Math</a></li>
-				<li><a href="api/core/Matrix3.html" target="page">Matrix3</a></li>
-				<li><a href="api/core/Matrix4.html" target="page">Matrix4</a></li>
-				<li><a href="api/core/Object3D.html" target="page">Object3D</a></li>
-				<li><a href="api/core/Projector.html" target="page">Projector</a></li>
-				<li><a href="api/core/Quaternion.html" target="page">Quaternion</a></li>
-				<li><a href="api/core/Ray.html" target="page">Ray</a></li>
-				<li><a href="api/core/Rectangle.html" target="page">Rectangle</a></li>
-				<li><a href="api/core/Spline.html" target="page">Spline</a></li>
-				<li><a href="api/core/UV.html" target="page">UV</a></li>
-				<li><a href="api/core/Vector2.html" target="page">Vector2</a></li>
-				<li><a href="api/core/Vector3.html" target="page">Vector3</a></li>
-				<li><a href="api/core/Vector4.html" target="page">Vector4</a></li>
-				<li><a href="api/core/Vertex.html" target="page">Vertex</a></li>
-			</ul>
-
-			<h1>Cameras</h1>
-
-			<ul>
-				<li><a href="api/cameras/PerspectiveCamera.html" target="page">PerspectiveCamera</a></li>
-				<li><a href="api/cameras/OrtographicCamera.html" target="page">OrtographicCamera</a></li>
-			</ul>
-
-			<h1>Lights</h1>
-
-			<ul>
-				<li><a href="api/cameras/Camera.html" target="page">Camera</a></li>
-				<li><a href="api/cameras/PerspectiveCamera.html" target="page">PerspectiveCamera</a></li>
-				<li><a href="api/cameras/OrtographicCamera.html" target="page">OrtographicCamera</a></li>
-			</ul>
-		</div>
-
-		<iframe id="page" src="api/cameras/Camera.html"></iframe>
+		<div id="panel"></div>
+		<div id="viewer"></div>
 
 		<script>
 
-			var margin = 220;
 			var panel = document.getElementById( 'panel' );
-			var page = document.getElementById( 'page' );
+			var viewer = document.getElementById( 'viewer' );
+
+			var pages = {
+
+				"Core": [
+					{ name: "Clock", path: "core/Clock" },
+					{ name: "Color", path: "core/Color" },
+					{ name: "Edge", path: "core/Edge" },
+					{ name: "Face3", path: "core/Face3" },
+					{ name: "Face4", path: "core/Face4" },
+					{ name: "Frustum", path: "core/Frustum" },
+					{ name: "Geometry", path: "core/Geometry" },
+					{ name: "Math", path: "core/Math" },
+					{ name: "Matrix3", path: "core/Matrix3" },
+					{ name: "Matrix4", path: "core/Matrix4" },
+					{ name: "Object3D", path: "core/Object3D" },
+					{ name: "Projector", path: "core/Projector" },
+					{ name: "Quaternion", path: "core/Quaternion" },
+					{ name: "Ray", path: "core/Ray" },
+					{ name: "Rectangle", path: "core/Rectangle" },
+					{ name: "Spline", path: "core/Spline" },
+					{ name: "UV", path: "core/UV" },
+					{ name: "Vector2", path: "core/Vector2" },
+					{ name: "Vector3", path: "core/Vector3" },
+					{ name: "Vector4", path: "core/Vector4" },
+					{ name: "Vertex", path: "core/Vertex" }
+				],
+
+				"Cameras": [
+					{ name: "PerspectiveCamera", path: "cameras/PerspectiveCamera" },
+					{ name: "OrtographicCamera", path: "cameras/OrtographicCamera" }
+				],
+
+				"Lights": [
+					{ name: "AmbientLight", path: "lights/AmbientLight" },
+					{ name: "DirectionalLight", path: "lights/DirectionalLight" },
+					{ name: "PointLight", path: "lights/PointLight" },
+					{ name: "SpotLight", path: "lights/SpotLight" },
+				]
+
+			};
+
+			var html = '';
+
+			for ( var category in pages ) {
+
+				html += '<h1>' + category + '</h1>';
+
+				for ( var i = 0; i < pages[ category ].length; i ++ ) {
+
+					var page = pages[ category ][ i ];
+					html += '<li><a href="javascript:goTo(\'' + page.path + '\')">' + page.name + '</a></li>';
+
+				}
+
+			}
+
+			panel.innerHTML += '<ul>' + html + '</ul>';
+
+			// Page loading
+
+			function goTo( path ) {
+
+				viewer.innerHTML = '';
+
+				window.location.hash = path
+
+				var xhr = new XMLHttpRequest();
+				xhr.open( 'GET', 'api/' + path + '.html', true );
+				xhr.onreadystatechange = function () {
+
+					if ( xhr.readyState == 4 && ( xhr.status == 200 || xhr.status == 0 ) ) {
+
+						viewer.innerHTML = xhr.responseText + '<br>';
+
+					}
+
+				};
+
+				xhr.send( null );
+
+			}
+
+			goTo( window.location.hash.substring(1) );
+
+			// Layout
+
+			var margin = 200;
 
 			function updateLayout() {
 
 				panel.style.height = window.innerHeight + 'px';
 
-				page.style.marginLeft = margin + 'px';
-				page.style.width = ( window.innerWidth - margin ) + 'px';
-				page.style.height = window.innerHeight + 'px';
+				viewer.style.marginLeft = margin + 'px';
+				viewer.style.width = ( window.innerWidth - margin ) + 'px';
+				viewer.style.height = window.innerHeight + 'px';
 
 			}
 
