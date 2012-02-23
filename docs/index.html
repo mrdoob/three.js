@@ -9,6 +9,12 @@
 				font-family: Arial, sans-serif;
 			}
 
+			h1 {
+				color: #999;
+				font-size: 18px;
+				margin-top: 20px;
+			}
+
 			#panel	{
 
 				position: fixed;
@@ -19,10 +25,18 @@
 				width: 200px;
 				height: 100%;
 
-				padding: 20px 0px 0px 20px;
+				padding-left: 20px;
 
 				font-size: 15px;
 
+				overflow: auto;
+
+			}
+
+			ul {
+				list-style-type: none;
+				padding: 0px;
+				margin: 0px;
 			}
 
 			iframe {
@@ -35,21 +49,41 @@
 	<body>
 		<div id="panel">
 
-			Core
+			<h1>Core</h1>
+
+			<ul>
+				<li><a href="api/core/Clock.html" target="page">Clock</a></li>
+				<li><a href="api/core/Color.html" target="page">Color</a></li>
+				<li><a href="api/core/Edge.html" target="page">Edge</a></li>
+				<li><a href="api/core/Face3.html" target="page">Face3</a></li>
+				<li><a href="api/core/Face4.html" target="page">Face4</a></li>
+				<li><a href="api/core/Geometry.html" target="page">Geometry</a></li>
+				<li><a href="api/core/Math.html" target="page">Math</a></li>
+				<li><a href="api/core/Matrix3.html" target="page">Matrix3</a></li>
+				<li><a href="api/core/Matrix4.html" target="page">Matrix4</a></li>
+				<li><a href="api/core/Object3D.html" target="page">Object3D</a></li>
+				<li><a href="api/core/Projector.html" target="page">Projector</a></li>
+				<li><a href="api/core/Quaternion.html" target="page">Quaternion</a></li>
+				<li><a href="api/core/Ray.html" target="page">Ray</a></li>
+				<li><a href="api/core/Rectangle.html" target="page">Rectangle</a></li>
+				<li><a href="api/core/Spline.html" target="page">Spline</a></li>
+				<li><a href="api/core/UV.html" target="page">UV</a></li>
+				<li><a href="api/core/Vector2.html" target="page">Vector2</a></li>
+				<li><a href="api/core/Vector3.html" target="page">Vector3</a></li>
+				<li><a href="api/core/Vector4.html" target="page">Vector4</a></li>
+				<li><a href="api/core/Vertex.html" target="page">Vertex</a></li>
+			</ul>
+
+			<h1>Cameras</h1>
+
 			<ul>
 				<li><a href="api/cameras/Camera.html" target="page">Camera</a></li>
 				<li><a href="api/cameras/PerspectiveCamera.html" target="page">PerspectiveCamera</a></li>
 				<li><a href="api/cameras/OrtographicCamera.html" target="page">OrtographicCamera</a></li>
 			</ul>
 
-			Cameras
-			<ul>
-				<li><a href="api/cameras/Camera.html" target="page">Camera</a></li>
-				<li><a href="api/cameras/PerspectiveCamera.html" target="page">PerspectiveCamera</a></li>
-				<li><a href="api/cameras/OrtographicCamera.html" target="page">OrtographicCamera</a></li>
-			</ul>
+			<h1>Lights</h1>
 
-			Lights
 			<ul>
 				<li><a href="api/cameras/Camera.html" target="page">Camera</a></li>
 				<li><a href="api/cameras/PerspectiveCamera.html" target="page">PerspectiveCamera</a></li>
@@ -61,9 +95,13 @@
 
 		<script>
 
-			var margin = 220, page = document.getElementById( 'page' );
+			var margin = 220;
+			var panel = document.getElementById( 'panel' );
+			var page = document.getElementById( 'page' );
 
 			function updateLayout() {
+
+				panel.style.height = window.innerHeight + 'px';
 
 				page.style.marginLeft = margin + 'px';
 				page.style.width = ( window.innerWidth - margin ) + 'px';

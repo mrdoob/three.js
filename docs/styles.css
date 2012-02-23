@@ -1,6 +1,6 @@
 body {
 	margin: 0;
-	padding: 0;
+	padding: 20;
 	color: #555;
 	font-family: Arial, sans-serif;
 	font-size: 15px;
@@ -9,7 +9,6 @@ body {
 h1 {
 	color: #ff0000;
 	font-size: 25px;
-	margin-top: 20px;
 }
 
 h2 {
