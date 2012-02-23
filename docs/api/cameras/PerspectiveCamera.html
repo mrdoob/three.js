@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>PerspectiveCamera</title>
+		<link rel="stylesheet" type="text/css" href="../../styles.css" />
+	</head>
+	<body>
+		<h1>PerspectiveCamera &larr; <a href="../cameras/Camera.html">Camera</a> &larr; <a href="../core/Object3D.html">Object3D</a></h1>
+
+		<div>Camera with perspective projection.</div>
+
+
+		<h2>Constructor</h2>
+
+		<h3>PerspectiveCamera( fov <a href="../core/Number.html">Number</a>, aspect <a href="../core/Number.html">Number</a>, near <a href="../core/Number.html">Number</a>, far <a href="../core/Number.html">Number</a> )</h3>
+
+
+		<h2>Properties</h2>
+
+		<h3>fov <a href="../core/Number.html">Number</a></h3>
+		<div>Camera frustum vertical field of view.</div>
+
+		<h3>aspect <a href="../core/Number.html">Number</a></h3>
+		<div>Camera frustum aspect ratio.</div>
+
+		<h3>near <a href="../core/Number.html">Number</a></h3>
+		<div>Camera frustum near plane.</div>
+
+		<h3>far <a href="../core/Number.html">Number</a></h3>
+		<div>Camera frustum far plane.</div>
+
+
+		<h2>Methods</h2>
+
+		<h3>updateProjectionMatrix()</h3>
+		<div>Updates camera's projection matrix. Must be called after change of parameters.</div>
+
+		<h3>setLens( focalLength <a href="../core/Number.html">Number</a>, frameSize <a href="../core/Number.html">Number</a> )</h3>
+		<div>
+			Uses focal length (in mm) to estimate and set FOV 35mm (fullframe) camera is used if frame size is not specified.<br />
+			Formula based on <a href="http://www.bobatkins.com/photography/technical/field_of_view.html" target="_blank">http://www.bobatkins.com/photography/technical/field_of_view.html</a>
+		</div>
+		
+
+		<h2>Source</h2>
+
+		<div><a href="https://github.com/mrdoob/three.js/blob/master/src/cameras/PerspectiveCamera.js" target="_blank">src/cameras/PerspectiveCamera.js</a></div>
+	</body>
+</html>
