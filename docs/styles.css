@@ -1,3 +1,24 @@
+body {
+	margin: 0;
+	padding: 0;
+	color: #555;
+	font-family: Arial, sans-serif;
+	font-size: 15px;
+}
+
 h1 {
 	color: #ff0000;
+	font-size: 25px;
+	margin-top: 20px;
+}
+
+h2 {
+	color: #999;
+	font-size: 18px;
+	margin-top: 40px;
+}
+
+h3 {
+	font-size: 15px;
+	margin-top: 30px;
 }
