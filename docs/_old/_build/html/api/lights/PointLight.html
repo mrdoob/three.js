@@ -1,0 +1,168 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>PointLight - A point light &mdash; three.js v48dev documentation</title>
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '48dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="three.js v48dev documentation" href="../../index.html" />
+    <link rel="up" title="Lights" href="index.html" />
+    <link rel="next" title="SpotLight - A spotlight" href="SpotLight.html" />
+    <link rel="prev" title="DirectionalLight - A directional light" href="DirectionalLight.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="SpotLight.html" title="SpotLight - A spotlight"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="DirectionalLight.html" title="DirectionalLight - A directional light"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">three.js v48dev documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Lights</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="pointlight-a-point-light">
+<h1>PointLight - A point light<a class="headerlink" href="#pointlight-a-point-light" title="Permalink to this headline">¶</a></h1>
+<p class="rubric">Constructor</p>
+<dl class="class">
+<dt id="PointLight">
+<em class="property">class </em><tt class="descname">PointLight</tt><big>(</big><em>hex</em>, <em>intensity</em>, <em>distance</em><big>)</big><a class="headerlink" href="#PointLight" title="Permalink to this definition">¶</a></dt>
+<dd><p>A point light</p>
+<p>Part of scene graph</p>
+<p>Inherits from <a class="reference internal" href="Light.html#Light" title="Light"><tt class="xref js js-class docutils literal"><span class="pre">Light()</span></tt></a> <a class="reference internal" href="../core/Object3D.html#Object3D" title="Object3D"><tt class="xref js js-class docutils literal"><span class="pre">Object3D()</span></tt></a></p>
+<p>Affects <tt class="xref js js-class docutils literal"><span class="pre">MeshLambertMaterial()</span></tt> and <tt class="xref js js-class docutils literal"><span class="pre">MeshPhongMaterial()</span></tt></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>hex</strong> (<em>integer</em>) &#8211; light color</li>
+<li><strong>intensity</strong> (<em>float</em>) &#8211; light intensity</li>
+<li><strong>distance</strong> (<em>float</em>) &#8211; distance affected by light</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<p class="rubric">Attributes</p>
+<dl class="attribute">
+<dt id="PointLight.color">
+<tt class="descclassname">PointLight.</tt><tt class="descname">color</tt><a class="headerlink" href="#PointLight.color" title="Permalink to this definition">¶</a></dt>
+<dd><p>Light <a class="reference internal" href="../core/Color.html#Color" title="Color"><tt class="xref js js-class docutils literal"><span class="pre">Color()</span></tt></a></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="PointLight.intensity">
+<tt class="descclassname">PointLight.</tt><tt class="descname">intensity</tt><a class="headerlink" href="#PointLight.intensity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Light intensity</p>
+<p><tt class="docutils literal"><span class="pre">default</span> <span class="pre">1.0</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="PointLight.position">
+<tt class="descclassname">PointLight.</tt><tt class="descname">position</tt><a class="headerlink" href="#PointLight.position" title="Permalink to this definition">¶</a></dt>
+<dd><p>Position of the light</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="PointLight.distance">
+<tt class="descclassname">PointLight.</tt><tt class="descname">distance</tt><a class="headerlink" href="#PointLight.distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>If non-zero, light will attenuate linearly from maximum intensity at light <tt class="docutils literal"><span class="pre">position</span></tt> down to zero at <tt class="docutils literal"><span class="pre">distance</span></tt></p>
+</dd></dl>
+
+<p class="rubric">Example</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="c1">// red point light shining from the front</span>
+
+<span class="kd">var</span> <span class="nx">pointLight</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">THREE</span><span class="p">.</span><span class="nx">PointLight</span><span class="p">(</span> <span class="mh">0xff0000</span> <span class="p">);</span>
+<span class="nx">pointLight</span><span class="p">.</span><span class="nx">position</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span> <span class="p">);</span>
+<span class="nx">scene</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span> <span class="nx">pointLight</span> <span class="p">);</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="DirectionalLight.html"
+                        title="previous chapter">DirectionalLight - A directional light</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="SpotLight.html"
+                        title="next chapter">SpotLight - A spotlight</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/api/lights/PointLight.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="SpotLight.html" title="SpotLight - A spotlight"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="DirectionalLight.html" title="DirectionalLight - A directional light"
+             >previous</a> |</li>
+        <li><a href="../../index.html">three.js v48dev documentation</a> &raquo;</li>
+          <li><a href="index.html" >Lights</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010-2012, three.js Authors.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

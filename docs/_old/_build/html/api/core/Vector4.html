@@ -1,0 +1,490 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Vector4 - 4D vector &mdash; three.js v48dev documentation</title>
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '48dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="three.js v48dev documentation" href="../../index.html" />
+    <link rel="up" title="Core" href="index.html" />
+    <link rel="next" title="Vertex - Represents a vertex in space" href="Vertex.html" />
+    <link rel="prev" title="Vector3 - 3D vector" href="Vector3.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Vertex.html" title="Vertex - Represents a vertex in space"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Vector3.html" title="Vector3 - 3D vector"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">three.js v48dev documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Core</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="vector4-4d-vector">
+<h1>Vector4 - 4D vector<a class="headerlink" href="#vector4-4d-vector" title="Permalink to this headline">¶</a></h1>
+<p class="rubric">Constructor</p>
+<dl class="class">
+<dt id="Vector4">
+<em class="property">class </em><tt class="descname">Vector4</tt><big>(</big><em>x</em>, <em>y</em>, <em>z</em>, <em>w</em><big>)</big><a class="headerlink" href="#Vector4" title="Permalink to this definition">¶</a></dt>
+<dd><p>4D vector</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>x</strong> (<em>float</em>) &#8211; x-coordinate</li>
+<li><strong>y</strong> (<em>float</em>) &#8211; y-coordinate</li>
+<li><strong>z</strong> (<em>float</em>) &#8211; z-coordinate</li>
+<li><strong>w</strong> (<em>float</em>) &#8211; w-coordinate</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<p class="rubric">Attributes</p>
+<dl class="attribute">
+<dt id="Vector4.x">
+<tt class="descclassname">Vector4.</tt><tt class="descname">x</tt><a class="headerlink" href="#Vector4.x" title="Permalink to this definition">¶</a></dt>
+<dd><p>float - default <tt class="docutils literal"><span class="pre">0</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Vector4.y">
+<tt class="descclassname">Vector4.</tt><tt class="descname">y</tt><a class="headerlink" href="#Vector4.y" title="Permalink to this definition">¶</a></dt>
+<dd><p>float - default <tt class="docutils literal"><span class="pre">0</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Vector4.z">
+<tt class="descclassname">Vector4.</tt><tt class="descname">z</tt><a class="headerlink" href="#Vector4.z" title="Permalink to this definition">¶</a></dt>
+<dd><p>float - default <tt class="docutils literal"><span class="pre">0</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Vector4.w">
+<tt class="descclassname">Vector4.</tt><tt class="descname">w</tt><a class="headerlink" href="#Vector4.w" title="Permalink to this definition">¶</a></dt>
+<dd><p>float - default <tt class="docutils literal"><span class="pre">1</span></tt></p>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<dl class="function">
+<dt id="Vector4.clone">
+<tt class="descclassname">Vector4.</tt><tt class="descname">clone</tt><big>(</big><big>)</big><a class="headerlink" href="#Vector4.clone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clones this vector</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">New instance identical to this vector</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><a class="reference internal" href="#Vector4" title="Vector4"><tt class="xref js js-class docutils literal"><span class="pre">Vector4()</span></tt></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Vector4.set">
+<tt class="descclassname">Vector4.</tt><tt class="descname">set</tt><big>(</big><em>x</em>, <em>y</em>, <em>z</em>, <em>w</em><big>)</big><a class="headerlink" href="#Vector4.set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets value of this vector</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>x</strong> (<em>float</em>) &#8211; x-coordinate</li>
+<li><strong>y</strong> (<em>float</em>) &#8211; y-coordinate</li>
+<li><strong>z</strong> (<em>float</em>) &#8211; z-coordinate</li>
+<li><strong>w</strong> (<em>float</em>) &#8211; w-coordinate</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">This vector</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Vector4" title="Vector4"><tt class="xref js js-class docutils literal"><span class="pre">Vector4()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Vector4.copy">
+<tt class="descclassname">Vector4.</tt><tt class="descname">copy</tt><big>(</big><em>v</em><big>)</big><a class="headerlink" href="#Vector4.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copies value of <tt class="docutils literal"><span class="pre">v</span></tt> to this vector</p>
+<p>Sets <tt class="docutils literal"><span class="pre">w</span></tt> to 1 if <tt class="docutils literal"><span class="pre">v.w</span></tt> is undefined</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>v</strong> (<a class="reference internal" href="#Vector4" title="Vector4"><em>Vector4</em></a>) &#8211; source vector</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">This vector</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Vector4" title="Vector4"><tt class="xref js js-class docutils literal"><span class="pre">Vector4()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Vector4.add">
+<tt class="descclassname">Vector4.</tt><tt class="descname">add</tt><big>(</big><em>v1</em>, <em>v2</em><big>)</big><a class="headerlink" href="#Vector4.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets this vector to <tt class="docutils literal"><span class="pre">v1</span> <span class="pre">+</span> <span class="pre">v2</span></tt></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>v1</strong> (<a class="reference internal" href="#Vector4" title="Vector4"><em>Vector4</em></a>) &#8211; source vector 1</li>
+<li><strong>v2</strong> (<a class="reference internal" href="#Vector4" title="Vector4"><em>Vector4</em></a>) &#8211; source vector 2</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">This vector</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Vector4" title="Vector4"><tt class="xref js js-class docutils literal"><span class="pre">Vector4()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Vector4.addSelf">
+<tt class="descclassname">Vector4.</tt><tt class="descname">addSelf</tt><big>(</big><em>v</em><big>)</big><a class="headerlink" href="#Vector4.addSelf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds <tt class="docutils literal"><span class="pre">v</span></tt> to this vector</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>v</strong> (<a class="reference internal" href="#Vector4" title="Vector4"><em>Vector4</em></a>) &#8211; source vector</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">This vector</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Vector4" title="Vector4"><tt class="xref js js-class docutils literal"><span class="pre">Vector4()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Vector4.sub">
+<tt class="descclassname">Vector4.</tt><tt class="descname">sub</tt><big>(</big><em>v1</em>, <em>v2</em><big>)</big><a class="headerlink" href="#Vector4.sub" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets this vector to <tt class="docutils literal"><span class="pre">v1</span> <span class="pre">-</span> <span class="pre">v2</span></tt></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>v1</strong> (<a class="reference internal" href="#Vector4" title="Vector4"><em>Vector4</em></a>) &#8211; source vector 1</li>
+<li><strong>v2</strong> (<a class="reference internal" href="#Vector4" title="Vector4"><em>Vector4</em></a>) &#8211; source vector 2</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Vector4.subSelf">
+<tt class="descclassname">Vector4.</tt><tt class="descname">subSelf</tt><big>(</big><em>v</em><big>)</big><a class="headerlink" href="#Vector4.subSelf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Subtracts <tt class="docutils literal"><span class="pre">v</span></tt> from this vector</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>v</strong> (<a class="reference internal" href="#Vector4" title="Vector4"><em>Vector4</em></a>) &#8211; source vector</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">This vector</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Vector4" title="Vector4"><tt class="xref js js-class docutils literal"><span class="pre">Vector4()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Vector4.multiplyScalar">
+<tt class="descclassname">Vector4.</tt><tt class="descname">multiplyScalar</tt><big>(</big><em>s</em><big>)</big><a class="headerlink" href="#Vector4.multiplyScalar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Multiplies this vector by scalar <tt class="docutils literal"><span class="pre">s</span></tt></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>s</strong> (<em>float</em>) &#8211; scalar</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">This vector</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Vector4" title="Vector4"><tt class="xref js js-class docutils literal"><span class="pre">Vector4()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Vector4.divideScalar">
+<tt class="descclassname">Vector4.</tt><tt class="descname">divideScalar</tt><big>(</big><em>s</em><big>)</big><a class="headerlink" href="#Vector4.divideScalar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Divides this vector by scalar <tt class="docutils literal"><span class="pre">s</span></tt></p>
+<p>Set vector to <tt class="docutils literal"><span class="pre">(</span> <span class="pre">0,</span> <span class="pre">0,</span> <span class="pre">0,</span> <span class="pre">1</span> <span class="pre">)</span></tt> if <tt class="docutils literal"><span class="pre">s</span> <span class="pre">==</span> <span class="pre">0</span></tt></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>s</strong> (<em>float</em>) &#8211; scalar</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">This vector</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Vector4" title="Vector4"><tt class="xref js js-class docutils literal"><span class="pre">Vector4()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Vector4.negate">
+<tt class="descclassname">Vector4.</tt><tt class="descname">negate</tt><big>(</big><big>)</big><a class="headerlink" href="#Vector4.negate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inverts this vector</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">This vector</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><a class="reference internal" href="#Vector4" title="Vector4"><tt class="xref js js-class docutils literal"><span class="pre">Vector4()</span></tt></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Vector4.dot">
+<tt class="descclassname">Vector4.</tt><tt class="descname">dot</tt><big>(</big><em>v</em><big>)</big><a class="headerlink" href="#Vector4.dot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes dot product of this vector and <tt class="docutils literal"><span class="pre">v</span></tt></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>v</strong> (<a class="reference internal" href="#Vector4" title="Vector4"><em>Vector4</em></a>) &#8211; vector</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dot product</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last">float</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Vector4.lengthSq">
+<tt class="descclassname">Vector4.</tt><tt class="descname">lengthSq</tt><big>(</big><big>)</big><a class="headerlink" href="#Vector4.lengthSq" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes squared length of this vector</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">squared length</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Vector4.length">
+<tt class="descclassname">Vector4.</tt><tt class="descname">length</tt><big>(</big><big>)</big><a class="headerlink" href="#Vector4.length" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes length of this vector</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">length</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Vector4.normalize">
+<tt class="descclassname">Vector4.</tt><tt class="descname">normalize</tt><big>(</big><big>)</big><a class="headerlink" href="#Vector4.normalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normalizes this vector</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">This vector</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><a class="reference internal" href="#Vector4" title="Vector4"><tt class="xref js js-class docutils literal"><span class="pre">Vector4()</span></tt></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Vector4.setLength">
+<tt class="descclassname">Vector4.</tt><tt class="descname">setLength</tt><big>(</big><em>l</em><big>)</big><a class="headerlink" href="#Vector4.setLength" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normalizes this vector and multiplies it by <tt class="docutils literal"><span class="pre">l</span></tt></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">This vector</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><a class="reference internal" href="#Vector4" title="Vector4"><tt class="xref js js-class docutils literal"><span class="pre">Vector4()</span></tt></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Vector4.lerpSelf">
+<tt class="descclassname">Vector4.</tt><tt class="descname">lerpSelf</tt><big>(</big><em>v</em>, <em>alpha</em><big>)</big><a class="headerlink" href="#Vector4.lerpSelf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Linearly interpolate between this vector and <tt class="docutils literal"><span class="pre">v</span></tt> with <tt class="docutils literal"><span class="pre">alpha</span></tt> factor</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>v</strong> (<a class="reference internal" href="#Vector4" title="Vector4"><em>Vector4</em></a>) &#8211; vector</li>
+<li><strong>alpha</strong> (<em>float</em>) &#8211; interpolation factor</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">This vector</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Vector4" title="Vector4"><tt class="xref js js-class docutils literal"><span class="pre">Vector4()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<p class="rubric">Example</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">THREE</span><span class="p">.</span><span class="nx">Vector4</span><span class="p">(</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span> <span class="p">);</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Vector3.html"
+                        title="previous chapter">Vector3 - 3D vector</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="Vertex.html"
+                        title="next chapter">Vertex - Represents a vertex in space</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/api/core/Vector4.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="Vertex.html" title="Vertex - Represents a vertex in space"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Vector3.html" title="Vector3 - 3D vector"
+             >previous</a> |</li>
+        <li><a href="../../index.html">three.js v48dev documentation</a> &raquo;</li>
+          <li><a href="index.html" >Core</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010-2012, three.js Authors.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,213 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Face4 - Quad face &mdash; three.js v48dev documentation</title>
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '48dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="three.js v48dev documentation" href="../../index.html" />
+    <link rel="up" title="Core" href="index.html" />
+    <link rel="next" title="Geometry - Base class for geometries" href="Geometry.html" />
+    <link rel="prev" title="Face3 - Triangle face" href="Face3.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Geometry.html" title="Geometry - Base class for geometries"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Face3.html" title="Face3 - Triangle face"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">three.js v48dev documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Core</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="face4-quad-face">
+<h1>Face4 - Quad face<a class="headerlink" href="#face4-quad-face" title="Permalink to this headline">¶</a></h1>
+<p class="rubric">Constructor</p>
+<dl class="class">
+<dt id="Face4">
+<em class="property">class </em><tt class="descname">Face4</tt><big>(</big><em>a</em>, <em>b</em>, <em>c</em>, <em>d</em>, <em>normal</em>, <em>color</em>, <em>materialIndex</em><big>)</big><a class="headerlink" href="#Face4" title="Permalink to this definition">¶</a></dt>
+<dd><p>Quad face</p>
+<p>(indices start from zero)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>a</strong> (<em>integer</em>) &#8211; vertex index</li>
+<li><strong>b</strong> (<em>integer</em>) &#8211; vertex index</li>
+<li><strong>c</strong> (<em>integer</em>) &#8211; vertex index</li>
+<li><strong>d</strong> (<em>integer</em>) &#8211; vertex index</li>
+<li><strong>normal</strong> (<em>varying</em>) &#8211; face normal or array of vertex normals</li>
+<li><strong>color</strong> (<em>varying</em>) &#8211; face color or array of vertex colors</li>
+<li><strong>materialIndex</strong> (<em>integer</em>) &#8211; material index</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<p class="rubric">Attributes</p>
+<dl class="attribute">
+<dt id="Face4.a">
+<tt class="descclassname">Face4.</tt><tt class="descname">a</tt><a class="headerlink" href="#Face4.a" title="Permalink to this definition">¶</a></dt>
+<dd><p>Vertex A index</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Face4.b">
+<tt class="descclassname">Face4.</tt><tt class="descname">b</tt><a class="headerlink" href="#Face4.b" title="Permalink to this definition">¶</a></dt>
+<dd><p>Vertex B index</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Face4.c">
+<tt class="descclassname">Face4.</tt><tt class="descname">c</tt><a class="headerlink" href="#Face4.c" title="Permalink to this definition">¶</a></dt>
+<dd><p>Vertex C index</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Face4.d">
+<tt class="descclassname">Face4.</tt><tt class="descname">d</tt><a class="headerlink" href="#Face4.d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Vertex D index</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Face4.normal">
+<tt class="descclassname">Face4.</tt><tt class="descname">normal</tt><a class="headerlink" href="#Face4.normal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Face normal</p>
+<p><a class="reference internal" href="Vector3.html#Vector3" title="Vector3"><tt class="xref js js-class docutils literal"><span class="pre">Vector3()</span></tt></a> - default <tt class="docutils literal"><span class="pre">(0,0,0)</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Face4.color">
+<tt class="descclassname">Face4.</tt><tt class="descname">color</tt><a class="headerlink" href="#Face4.color" title="Permalink to this definition">¶</a></dt>
+<dd><p>Face color</p>
+<p><a class="reference internal" href="Color.html#Color" title="Color"><tt class="xref js js-class docutils literal"><span class="pre">Color()</span></tt></a> - default <tt class="docutils literal"><span class="pre">white</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Face4.centroid">
+<tt class="descclassname">Face4.</tt><tt class="descname">centroid</tt><a class="headerlink" href="#Face4.centroid" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="Vector3.html#Vector3" title="Vector3"><tt class="xref js js-class docutils literal"><span class="pre">Vector3()</span></tt></a> - default <tt class="docutils literal"><span class="pre">(0,0,0)</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Face4.vertexNormals">
+<tt class="descclassname">Face4.</tt><tt class="descname">vertexNormals</tt><a class="headerlink" href="#Face4.vertexNormals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Array of 4 vertex normals</p>
+<p>default <tt class="docutils literal"><span class="pre">[]</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Face4.vertexColors">
+<tt class="descclassname">Face4.</tt><tt class="descname">vertexColors</tt><a class="headerlink" href="#Face4.vertexColors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Array of 4 vertex colors</p>
+<p>default <tt class="docutils literal"><span class="pre">[]</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Face4.vertexTangents">
+<tt class="descclassname">Face4.</tt><tt class="descname">vertexTangents</tt><a class="headerlink" href="#Face4.vertexTangents" title="Permalink to this definition">¶</a></dt>
+<dd><p>Array of 4 vertex tangents</p>
+<p>default <tt class="docutils literal"><span class="pre">[]</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Face4.materialIndex">
+<tt class="descclassname">Face4.</tt><tt class="descname">materialIndex</tt><a class="headerlink" href="#Face4.materialIndex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Material index (points to <a class="reference internal" href="Geometry.html#Geometry.materials" title="Geometry.materials"><tt class="xref js js-attr docutils literal"><span class="pre">Geometry.materials</span></tt></a> array)</p>
+<p>default <tt class="docutils literal"><span class="pre">0</span></tt></p>
+</dd></dl>
+
+<p class="rubric">Example</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">face</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">THREE</span><span class="p">.</span><span class="nx">Face4</span><span class="p">(</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="k">new</span> <span class="nx">THREE</span><span class="p">.</span><span class="nx">Vector3</span><span class="p">(</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span> <span class="p">),</span> <span class="k">new</span> <span class="nx">THREE</span><span class="p">.</span><span class="nx">Color</span><span class="p">(</span> <span class="mh">0xffaa00</span> <span class="p">),</span> <span class="mi">0</span> <span class="p">);</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Face3.html"
+                        title="previous chapter">Face3 - Triangle face</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="Geometry.html"
+                        title="next chapter">Geometry - Base class for geometries</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/api/core/Face4.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="Geometry.html" title="Geometry - Base class for geometries"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Face3.html" title="Face3 - Triangle face"
+             >previous</a> |</li>
+        <li><a href="../../index.html">three.js v48dev documentation</a> &raquo;</li>
+          <li><a href="index.html" >Core</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010-2012, three.js Authors.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

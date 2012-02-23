@@ -1,0 +1,454 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Object3D - Base class for scene graph objects &mdash; three.js v48dev documentation</title>
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '48dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="three.js v48dev documentation" href="../../index.html" />
+    <link rel="up" title="Core" href="index.html" />
+    <link rel="next" title="Projector - Utilities for projecting primitives between spaces" href="Projector.html" />
+    <link rel="prev" title="Matrix4 - A 4x4 Matrix" href="Matrix4.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Projector.html" title="Projector - Utilities for projecting primitives between spaces"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Matrix4.html" title="Matrix4 - A 4x4 Matrix"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">three.js v48dev documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Core</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="object3d-base-class-for-scene-graph-objects">
+<h1>Object3D - Base class for scene graph objects<a class="headerlink" href="#object3d-base-class-for-scene-graph-objects" title="Permalink to this headline">¶</a></h1>
+<p class="rubric">Constructor</p>
+<dl class="class">
+<dt id="Object3D">
+<em class="property">class </em><tt class="descname">Object3D</tt><big>(</big><big>)</big><a class="headerlink" href="#Object3D" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class for scene graph objects</p>
+</dd></dl>
+
+<p class="rubric">Attributes</p>
+<dl class="attribute">
+<dt id="Object3D.id">
+<tt class="descclassname">Object3D.</tt><tt class="descname">id</tt><a class="headerlink" href="#Object3D.id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unique number of this object instance</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Object3D.name">
+<tt class="descclassname">Object3D.</tt><tt class="descname">name</tt><a class="headerlink" href="#Object3D.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Optional name of the object (doesn&#8217;t have to be unique)</p>
+</dd></dl>
+
+<p class="rubric">Scene graph attributes</p>
+<dl class="attribute">
+<dt id="Object3D.parent">
+<tt class="descclassname">Object3D.</tt><tt class="descname">parent</tt><a class="headerlink" href="#Object3D.parent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Object&#8217;s parent in scene graph</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Object3D.children">
+<tt class="descclassname">Object3D.</tt><tt class="descname">children</tt><a class="headerlink" href="#Object3D.children" title="Permalink to this definition">¶</a></dt>
+<dd><p>Array with object&#8217;s children</p>
+</dd></dl>
+
+<p class="rubric">Transform attributes</p>
+<dl class="attribute">
+<dt id="Object3D.position">
+<tt class="descclassname">Object3D.</tt><tt class="descname">position</tt><a class="headerlink" href="#Object3D.position" title="Permalink to this definition">¶</a></dt>
+<dd><p>Object&#8217;s local position</p>
+<p><a class="reference internal" href="Vector3.html#Vector3" title="Vector3"><tt class="xref js js-class docutils literal"><span class="pre">Vector3()</span></tt></a> - default  <tt class="docutils literal"><span class="pre">(</span> <span class="pre">0,</span> <span class="pre">0,</span> <span class="pre">0</span> <span class="pre">)</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Object3D.rotation">
+<tt class="descclassname">Object3D.</tt><tt class="descname">rotation</tt><a class="headerlink" href="#Object3D.rotation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Object&#8217;s local rotation (Euler angles)</p>
+<p><a class="reference internal" href="Vector3.html#Vector3" title="Vector3"><tt class="xref js js-class docutils literal"><span class="pre">Vector3()</span></tt></a> - default  <tt class="docutils literal"><span class="pre">(</span> <span class="pre">0,</span> <span class="pre">0,</span> <span class="pre">0</span> <span class="pre">)</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Object3D.eulerOrder">
+<tt class="descclassname">Object3D.</tt><tt class="descname">eulerOrder</tt><a class="headerlink" href="#Object3D.eulerOrder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Order of axis for Euler angles</p>
+<p><tt class="docutils literal"><span class="pre">string</span></tt> - default <tt class="docutils literal"><span class="pre">XYZ</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Object3D.scale">
+<tt class="descclassname">Object3D.</tt><tt class="descname">scale</tt><a class="headerlink" href="#Object3D.scale" title="Permalink to this definition">¶</a></dt>
+<dd><p>Object&#8217;s local scale</p>
+<p><a class="reference internal" href="Vector3.html#Vector3" title="Vector3"><tt class="xref js js-class docutils literal"><span class="pre">Vector3()</span></tt></a> - default  <tt class="docutils literal"><span class="pre">(</span> <span class="pre">1,</span> <span class="pre">1,</span> <span class="pre">1</span> <span class="pre">)</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Object3D.up">
+<tt class="descclassname">Object3D.</tt><tt class="descname">up</tt><a class="headerlink" href="#Object3D.up" title="Permalink to this definition">¶</a></dt>
+<dd><p>Up direction</p>
+<p><a class="reference internal" href="Vector3.html#Vector3" title="Vector3"><tt class="xref js js-class docutils literal"><span class="pre">Vector3()</span></tt></a> - default  <tt class="docutils literal"><span class="pre">(</span> <span class="pre">0,</span> <span class="pre">1,</span> <span class="pre">0</span> <span class="pre">)</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Object3D.matrix">
+<tt class="descclassname">Object3D.</tt><tt class="descname">matrix</tt><a class="headerlink" href="#Object3D.matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Local transform</p>
+<p><a class="reference internal" href="Matrix4.html#Matrix4" title="Matrix4"><tt class="xref js js-class docutils literal"><span class="pre">Matrix4()</span></tt></a></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Object3D.matrixWorld">
+<tt class="descclassname">Object3D.</tt><tt class="descname">matrixWorld</tt><a class="headerlink" href="#Object3D.matrixWorld" title="Permalink to this definition">¶</a></dt>
+<dd><p>Global transform</p>
+<p><a class="reference internal" href="Matrix4.html#Matrix4" title="Matrix4"><tt class="xref js js-class docutils literal"><span class="pre">Matrix4()</span></tt></a></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Object3D.matrixRotationWorld">
+<tt class="descclassname">Object3D.</tt><tt class="descname">matrixRotationWorld</tt><a class="headerlink" href="#Object3D.matrixRotationWorld" title="Permalink to this definition">¶</a></dt>
+<dd><p>Global rotation</p>
+<p><a class="reference internal" href="Matrix4.html#Matrix4" title="Matrix4"><tt class="xref js js-class docutils literal"><span class="pre">Matrix4()</span></tt></a></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Object3D.quaternion">
+<tt class="descclassname">Object3D.</tt><tt class="descname">quaternion</tt><a class="headerlink" href="#Object3D.quaternion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rotation quaternion</p>
+<p><a class="reference internal" href="Quaternion.html#Quaternion" title="Quaternion"><tt class="xref js js-class docutils literal"><span class="pre">Quaternion()</span></tt></a></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Object3D.useQuaternion">
+<tt class="descclassname">Object3D.</tt><tt class="descname">useQuaternion</tt><a class="headerlink" href="#Object3D.useQuaternion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use quaternion instead of Euler angles for specifying local rotation</p>
+<p>boolean - default <tt class="docutils literal"><span class="pre">false</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Object3D.boundRadius">
+<tt class="descclassname">Object3D.</tt><tt class="descname">boundRadius</tt><a class="headerlink" href="#Object3D.boundRadius" title="Permalink to this definition">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">float</span></tt> - default <tt class="docutils literal"><span class="pre">0.0</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Object3D.boundRadiusScale">
+<tt class="descclassname">Object3D.</tt><tt class="descname">boundRadiusScale</tt><a class="headerlink" href="#Object3D.boundRadiusScale" title="Permalink to this definition">¶</a></dt>
+<dd><p>Maximum scale from X, Y, Z scale components</p>
+<p><tt class="docutils literal"><span class="pre">float</span></tt> - default <tt class="docutils literal"><span class="pre">1.0</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Object3D.renderDepth">
+<tt class="descclassname">Object3D.</tt><tt class="descname">renderDepth</tt><a class="headerlink" href="#Object3D.renderDepth" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override depth-sorting order if non <tt class="docutils literal"><span class="pre">null</span></tt></p>
+<p><tt class="docutils literal"><span class="pre">float</span></tt> - default <tt class="docutils literal"><span class="pre">null</span></tt></p>
+</dd></dl>
+
+<p class="rubric">Appearance flags</p>
+<dl class="attribute">
+<dt id="Object3D.visible">
+<tt class="descclassname">Object3D.</tt><tt class="descname">visible</tt><a class="headerlink" href="#Object3D.visible" title="Permalink to this definition">¶</a></dt>
+<dd><p>Object gets rendered if <tt class="docutils literal"><span class="pre">true</span></tt></p>
+<p><tt class="docutils literal"><span class="pre">boolean</span></tt> - default <tt class="docutils literal"><span class="pre">true</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Object3D.doubleSided">
+<tt class="descclassname">Object3D.</tt><tt class="descname">doubleSided</tt><a class="headerlink" href="#Object3D.doubleSided" title="Permalink to this definition">¶</a></dt>
+<dd><p>Both sides of faces visible if <tt class="docutils literal"><span class="pre">true</span></tt></p>
+<p>default <tt class="docutils literal"><span class="pre">false</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Object3D.flipSided">
+<tt class="descclassname">Object3D.</tt><tt class="descname">flipSided</tt><a class="headerlink" href="#Object3D.flipSided" title="Permalink to this definition">¶</a></dt>
+<dd><p>Backside of face visible</p>
+<p>default <tt class="docutils literal"><span class="pre">false</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Object3D.castShadow">
+<tt class="descclassname">Object3D.</tt><tt class="descname">castShadow</tt><a class="headerlink" href="#Object3D.castShadow" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets rendered into shadow map</p>
+<p><tt class="docutils literal"><span class="pre">boolean</span></tt> - default <tt class="docutils literal"><span class="pre">false</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Object3D.receiveShadow">
+<tt class="descclassname">Object3D.</tt><tt class="descname">receiveShadow</tt><a class="headerlink" href="#Object3D.receiveShadow" title="Permalink to this definition">¶</a></dt>
+<dd><p>Material gets baked in shadow receiving</p>
+<p><tt class="docutils literal"><span class="pre">boolean</span></tt> - default <tt class="docutils literal"><span class="pre">false</span></tt></p>
+</dd></dl>
+
+<p class="rubric">Scene graph flags</p>
+<dl class="attribute">
+<dt id="Object3D.frustumCulled">
+<tt class="descclassname">Object3D.</tt><tt class="descname">frustumCulled</tt><a class="headerlink" href="#Object3D.frustumCulled" title="Permalink to this definition">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">boolean</span></tt> - default <tt class="docutils literal"><span class="pre">true</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Object3D.matrixAutoUpdate">
+<tt class="descclassname">Object3D.</tt><tt class="descname">matrixAutoUpdate</tt><a class="headerlink" href="#Object3D.matrixAutoUpdate" title="Permalink to this definition">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">boolean</span></tt> - default <tt class="docutils literal"><span class="pre">true</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Object3D.matrixWorldNeedsUpdate">
+<tt class="descclassname">Object3D.</tt><tt class="descname">matrixWorldNeedsUpdate</tt><a class="headerlink" href="#Object3D.matrixWorldNeedsUpdate" title="Permalink to this definition">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">boolean</span></tt> - default <tt class="docutils literal"><span class="pre">true</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Object3D.rotationAutoUpdate">
+<tt class="descclassname">Object3D.</tt><tt class="descname">rotationAutoUpdate</tt><a class="headerlink" href="#Object3D.rotationAutoUpdate" title="Permalink to this definition">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">boolean</span></tt> - default <tt class="docutils literal"><span class="pre">true</span></tt></p>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<dl class="function">
+<dt id="Object3D.translate ">
+<tt class="descclassname">Object3D.</tt><tt class="descname">translate </tt><big>(</big><em>distance</em>, <em>axis</em><big>)</big><a class="headerlink" href="#Object3D.translate " title="Permalink to this definition">¶</a></dt>
+<dd><p>Translates object along arbitrary axis by distance</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>distance</strong> (<em>float</em>) &#8211; distance</li>
+<li><strong>axis</strong> (<a class="reference internal" href="Vector3.html#Vector3" title="Vector3"><em>Vector3</em></a>) &#8211; translation direction</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Object3D.translateX ">
+<tt class="descclassname">Object3D.</tt><tt class="descname">translateX </tt><big>(</big><em>distance</em><big>)</big><a class="headerlink" href="#Object3D.translateX " title="Permalink to this definition">¶</a></dt>
+<dd><p>Translates object along X-axis by distance</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>distance</strong> (<em>float</em>) &#8211; distance</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Object3D.translateY ">
+<tt class="descclassname">Object3D.</tt><tt class="descname">translateY </tt><big>(</big><em>distance</em><big>)</big><a class="headerlink" href="#Object3D.translateY " title="Permalink to this definition">¶</a></dt>
+<dd><p>Translates object along Y-axis by distance</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>distance</strong> (<em>float</em>) &#8211; distance</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Object3D.translateZ ">
+<tt class="descclassname">Object3D.</tt><tt class="descname">translateZ </tt><big>(</big><em>distance</em><big>)</big><a class="headerlink" href="#Object3D.translateZ " title="Permalink to this definition">¶</a></dt>
+<dd><p>Translates object along Z-axis by distance</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>distance</strong> (<em>float</em>) &#8211; distance</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Object3D.lookAt ">
+<tt class="descclassname">Object3D.</tt><tt class="descname">lookAt </tt><big>(</big><em>vector</em><big>)</big><a class="headerlink" href="#Object3D.lookAt " title="Permalink to this definition">¶</a></dt>
+<dd><p>Rotates object to face point in space</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>vector</strong> (<a class="reference internal" href="Vector3.html#Vector3" title="Vector3"><em>Vector3</em></a>) &#8211; vector</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Object3D.add ">
+<tt class="descclassname">Object3D.</tt><tt class="descname">add </tt><big>(</big><em>object</em><big>)</big><a class="headerlink" href="#Object3D.add " title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds child object to this object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>object</strong> (<a class="reference internal" href="#Object3D" title="Object3D"><em>Object3D</em></a>) &#8211; child</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Object3D.remove ">
+<tt class="descclassname">Object3D.</tt><tt class="descname">remove </tt><big>(</big><em>object</em><big>)</big><a class="headerlink" href="#Object3D.remove " title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes child object from this object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>object</strong> (<a class="reference internal" href="#Object3D" title="Object3D"><em>Object3D</em></a>) &#8211; child</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Object3D.getChildByName ">
+<tt class="descclassname">Object3D.</tt><tt class="descname">getChildByName </tt><big>(</big><em>name</em>, <em>doRecurse</em><big>)</big><a class="headerlink" href="#Object3D.getChildByName " title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets first child with name matching the argument (searches whole subgraph recursively if flag is set).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>name</strong> (<em>string</em>) &#8211; child name</li>
+<li><strong>doRecurse</strong> (<em>boolean</em>) &#8211; recurse flag</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">child with matching name or <tt class="docutils literal"><span class="pre">undefined</span></tt></p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Object3D" title="Object3D"><tt class="xref js js-class docutils literal"><span class="pre">Object3D()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Object3D.updateMatrix ">
+<tt class="descclassname">Object3D.</tt><tt class="descname">updateMatrix </tt><big>(</big><big>)</big><a class="headerlink" href="#Object3D.updateMatrix " title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates local transform</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="Object3D.updateMatrixWorld ">
+<tt class="descclassname">Object3D.</tt><tt class="descname">updateMatrixWorld </tt><big>(</big><em>force</em><big>)</big><a class="headerlink" href="#Object3D.updateMatrixWorld " title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates global transform of the object and its children</p>
+</dd></dl>
+
+<p class="rubric">Example</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Matrix4.html"
+                        title="previous chapter">Matrix4 - A 4x4 Matrix</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="Projector.html"
+                        title="next chapter">Projector - Utilities for projecting primitives between spaces</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/api/core/Object3D.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="Projector.html" title="Projector - Utilities for projecting primitives between spaces"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Matrix4.html" title="Matrix4 - A 4x4 Matrix"
+             >previous</a> |</li>
+        <li><a href="../../index.html">three.js v48dev documentation</a> &raquo;</li>
+          <li><a href="index.html" >Core</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010-2012, three.js Authors.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

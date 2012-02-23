@@ -1,0 +1,807 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Changelog &mdash; three.js v48dev documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '48dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="three.js v48dev documentation" href="index.html" />
+    <link rel="next" title="Tutorials" href="tutorials/index.html" />
+    <link rel="prev" title="three.js - JavaScript 3D library" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="tutorials/index.html" title="Tutorials"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="three.js - JavaScript 3D library"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">three.js v48dev documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="changelog">
+<h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="r46-343-383-kb-gzip-87-468-kb">
+<h2>2011 11 17 - <strong>r46</strong> (343.383 KB, gzip: 87.468 KB)<a class="headerlink" href="#r46-343-383-kb-gzip-87-468-kb" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Added reflections to Normal Mapping.
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li><tt class="docutils literal"><span class="pre">Ray</span></tt> now checks also object children.
+(<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+<li><tt class="docutils literal"><span class="pre">*Loader.load(</span> <span class="pre">parameters</span> <span class="pre">)</span></tt> to
+<tt class="docutils literal"><span class="pre">*Loader(</span> <span class="pre">url,</span> <span class="pre">callback,</span> <span class="pre">texturePath</span> <span class="pre">)</span></tt>.
+(<a class="reference external" href="http://github.com/mrdoob">mrdoob</a> and
+<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Reworked scene graph setup. (<a class="reference external" href="http://github.com/mrdoob">mrdoob</a> and
+<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Fixed <tt class="docutils literal"><span class="pre">CanvasRenderer</span></tt>&#8216;s <tt class="docutils literal"><span class="pre">SphericalReflectionMapping</span></tt> rendering.
+(<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+<li>Improved <tt class="docutils literal"><span class="pre">SubdivisionModifier</span></tt>. (<a class="reference external" href="http://github.com/zz85">zz85</a>)</li>
+<li>Refactored <tt class="docutils literal"><span class="pre">*Controls</span></tt> to use externally supplied time delta.
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Improvements to <tt class="docutils literal"><span class="pre">CombinedCamera</span></tt>.
+(<a class="reference external" href="http://github.com/zz85">zz85</a>)</li>
+<li><tt class="docutils literal"><span class="pre">ColladaLoader</span></tt> doesn&#8217;t create extra <tt class="docutils literal"><span class="pre">Object3D</span></tt>.
+(<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+<li>Improvements to Lambert and Phong materials.
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Removed multi-materials for simplicity reasons. (Multi-materials will
+come back with MeshLayerMaterial hopefully soon)
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Fixed <tt class="docutils literal"><span class="pre">Ray</span></tt> not considering edges.
+(<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+<li>Massive cleanup to <tt class="docutils literal"><span class="pre">WebGLRenderer</span></tt>.
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li><tt class="docutils literal"><span class="pre">Ray</span></tt> optimisations. (<a class="reference external" href="http://github.com/mrdoob">mrdoob</a> and
+<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>JSON file format is now worker-less (this was crashing Chrome/Firefox
+with dealing with many assets).
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Improved <tt class="docutils literal"><span class="pre">CubeGeometry</span></tt>, <tt class="docutils literal"><span class="pre">PlaneGeometry</span></tt>, <tt class="docutils literal"><span class="pre">IcosahedronGeometry</span></tt>
+and <tt class="docutils literal"><span class="pre">SphereGeometry</span></tt>. (<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+<li>Improvements to <tt class="docutils literal"><span class="pre">Curve</span></tt>. (<a class="reference external" href="http://github.com/zz85">zz85</a>)</li>
+<li>Removed <tt class="docutils literal"><span class="pre">Collisions</span></tt> code and focusing on <tt class="docutils literal"><span class="pre">Ray</span></tt>.
+(<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+<li>Added <tt class="docutils literal"><span class="pre">cloneObject()</span></tt> method to <tt class="docutils literal"><span class="pre">SceneUtils</span></tt>.
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+</ul>
+</div>
+<div class="section" id="r45-340-863-kb-gzip-86-568-kb">
+<h2>2011 10 06 - <strong>r45</strong> (340.863 KB, gzip: 86.568 KB)<a class="headerlink" href="#r45-340-863-kb-gzip-86-568-kb" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">Object/Scene.add*()</span></tt> and <tt class="docutils literal"><span class="pre">Object/Scene.remove*()</span></tt> are now
+<tt class="docutils literal"><span class="pre">Object/Scene.add()</span></tt> and <tt class="docutils literal"><span class="pre">Object/Scene.remove()</span></tt>.
+(<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+<li><tt class="docutils literal"><span class="pre">LOD.add()</span></tt> is now <tt class="docutils literal"><span class="pre">LOD.addLevel()</span></tt>.
+(<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+<li>Reworked <tt class="docutils literal"><span class="pre">CylinderGeometry</span></tt>. (<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+<li>Added <tt class="docutils literal"><span class="pre">.depthWrite</span></tt> and <tt class="docutils literal"><span class="pre">.fog</span></tt> to <tt class="docutils literal"><span class="pre">Material</span></tt>.
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Added <tt class="docutils literal"><span class="pre">.applyMatrix</span></tt> to <tt class="docutils literal"><span class="pre">Geometry</span></tt>.
+(<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+<li>Improved postprocessing stack in <tt class="docutils literal"><span class="pre">/examples/js/postprocessing</span></tt>.
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Added a realistic skin shading example.
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Started of a GUI for composing scenes and autogenerate code.
+(<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+<li>Added <tt class="docutils literal"><span class="pre">.center()</span></tt> to <tt class="docutils literal"><span class="pre">GeometryUtils</span></tt>.
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Fixed buggy scenegraph manipulation (adding/removing objects).
+(<a class="reference external" href="http://github.com/jsermeno">jsermeno</a>,
+<a class="reference external" href="http://github.com/alteredq">alteredq</a> and
+<a class="reference external" href="http://github.com/skython">skython</a>)</li>
+<li>Renamed <tt class="docutils literal"><span class="pre">MeshShaderMaterial</span></tt> to <tt class="docutils literal"><span class="pre">ShaderMaterial</span></tt>.
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Fixed <tt class="docutils literal"><span class="pre">CanvasRenderer</span></tt> ignoring color of <tt class="docutils literal"><span class="pre">SmoothShading``ed</span>
+<span class="pre">``MeshLambertMaterial</span></tt>. (<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+<li>Renamed <tt class="docutils literal"><span class="pre">renderer.data</span></tt> to <tt class="docutils literal"><span class="pre">renderer.info</span></tt>.
+(<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+<li>Fixed ShadowMap aspect ratio. (<a class="reference external" href="http://github.com/kig">kig</a> and
+<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Fixed <tt class="docutils literal"><span class="pre">Loader</span></tt>&#8216;s <tt class="docutils literal"><span class="pre">extractUrlbase()</span></tt> incorrect output for short
+urls. (<a class="reference external" href="http://github.com/rectalogic">rectalogic</a> and
+<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Added <tt class="docutils literal"><span class="pre">.color</span></tt> and <tt class="docutils literal"><span class="pre">.visible</span></tt> support to <tt class="docutils literal"><span class="pre">Sprite</span></tt>.
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Added <tt class="docutils literal"><span class="pre">Face4</span></tt>, Vertex Colors and Maya support to <tt class="docutils literal"><span class="pre">ColladaLoader</span></tt>.
+(<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+<li>Rewrite of lighting shader code.
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Improved internal array concatenation approach.
+(<a class="reference external" href="http://github.com/pyrotechnick">pyrotechnick</a>)</li>
+<li><tt class="docutils literal"><span class="pre">WebGLRenderer</span></tt> performance improvements.
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Added lower level immediate rendering support to <tt class="docutils literal"><span class="pre">WebGLRenderer</span></tt>.
+(<a class="reference external" href="http://github.com/NINE78">NINE78</a> and
+<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Added <tt class="docutils literal"><span class="pre">CubeCamera</span></tt> for rendering cubemaps.
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Improved <tt class="docutils literal"><span class="pre">GeometryUtils</span></tt>&#8216;s <tt class="docutils literal"><span class="pre">.mergeVertices()</span></tt> performance.
+(<a class="reference external" href="http://github.com/zz85">zz85</a>)</li>
+<li>Removed <tt class="docutils literal"><span class="pre">Camera</span></tt>&#8216;s <tt class="docutils literal"><span class="pre">.target</span></tt>.
+(<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+<li><tt class="docutils literal"><span class="pre">WebGLRenderer</span></tt>&#8216;s <tt class="docutils literal"><span class="pre">.clear()</span></tt> is now
+<tt class="docutils literal"><span class="pre">.clear(</span> <span class="pre">color,</span> <span class="pre">depth,</span> <span class="pre">stencil</span> <span class="pre">)</span></tt>.
+(<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+<li>Added <tt class="docutils literal"><span class="pre">.autoClearColor</span></tt>, <tt class="docutils literal"><span class="pre">.autoClearDepth</span></tt> and
+<tt class="docutils literal"><span class="pre">.autoClearStencil</span></tt> to <tt class="docutils literal"><span class="pre">WebGLRenderer</span></tt>.
+(<a class="reference external" href="http://github.com/mrdoob">mrdoob</a> and
+<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Added <tt class="docutils literal"><span class="pre">OctahedronGeometry</span></tt>.
+(<a class="reference external" href="http://github.com/clockworkgeek">clockworkgeek</a>)</li>
+<li>Splitted <tt class="docutils literal"><span class="pre">Camera</span></tt> into <tt class="docutils literal"><span class="pre">PerspectiveCamera</span></tt> and
+<tt class="docutils literal"><span class="pre">OrthographicCamera</span></tt>. (<a class="reference external" href="http://github.com/mrdoob">mrdoob</a> and
+<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Special cameras are now <tt class="docutils literal"><span class="pre">*Controls</span></tt>.
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a> and
+<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+<li>Added <tt class="docutils literal"><span class="pre">SubdivisionModifier</span></tt>. (<a class="reference external" href="http://github.com/zz85">zz85</a>)</li>
+<li><tt class="docutils literal"><span class="pre">Projector</span></tt>&#8216;s <tt class="docutils literal"><span class="pre">unprojectVector()</span></tt> now also works with
+<tt class="docutils literal"><span class="pre">OrthographicCamera</span></tt>. (<a class="reference external" href="http://github.com/jsermeno">jsermeno</a>)</li>
+<li>Added <tt class="docutils literal"><span class="pre">.setLens()</span></tt> method to <tt class="docutils literal"><span class="pre">PerspectiveCamera</span></tt>.
+(<a class="reference external" href="http://github.com/zz85">zz85</a>)</li>
+<li>Added Shadow Maps, <tt class="docutils literal"><span class="pre">Texture</span></tt>&#8216;s <tt class="docutils literal"><span class="pre">.offset</span></tt> and <tt class="docutils literal"><span class="pre">.repeat</span></tt> and
+reflections support to Normal Map shader.
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+</ul>
+</div>
+<div class="section" id="r44-330-356-kb-gzip-84-039-kb">
+<h2>2011 09 04 - <strong>r44</strong> (330.356 KB, gzip: 84.039 KB)<a class="headerlink" href="#r44-330-356-kb-gzip-84-039-kb" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Added <tt class="docutils literal"><span class="pre">ColladaLoader</span></tt>. (<a class="reference external" href="https://github.com/timknip2">timknip2</a>)</li>
+<li>Improved <tt class="docutils literal"><span class="pre">ExtrudeGeometry</span></tt>. (<a class="reference external" href="http://github.com/zz85">zz85</a>)</li>
+<li>Fixed <tt class="docutils literal"><span class="pre">CylinderGeometry</span></tt> normals.
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Fixed issue with <tt class="docutils literal"><span class="pre">WebGLRenderer.setTexture</span></tt>
+(<a class="reference external" href="http://github.com/rectalogic">rectalogic</a>)</li>
+<li>Fixed <tt class="docutils literal"><span class="pre">TorusGeometry</span></tt> normals.
+(<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+<li>Fixed <tt class="docutils literal"><span class="pre">Ray</span></tt> behind-ray intersects.
+(<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+<li>Added <tt class="docutils literal"><span class="pre">OrthoCamera</span></tt>. (<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Refactored postprocessing effects used in some examples.
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Added <tt class="docutils literal"><span class="pre">.deallocateObject()</span></tt> and <tt class="docutils literal"><span class="pre">.deallocateTexture()</span></tt> methods to
+<tt class="docutils literal"><span class="pre">WebGLRenderer</span></tt>. (<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+<li>Fixed a glitch in normal and phong shader.
+(<a class="reference external" href="http://github.com/evanw">evanw</a> and
+<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Added <tt class="docutils literal"><span class="pre">.frustumCulled</span></tt> property to <tt class="docutils literal"><span class="pre">Object3D</span></tt>.
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a> and
+<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+</ul>
+</div>
+<div class="section" id="r43-298-199-kb-gzip-74-805-kb">
+<h2>2011 08 14 - <strong>r43</strong> (298.199 KB, gzip: 74.805 KB)<a class="headerlink" href="#r43-298-199-kb-gzip-74-805-kb" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Improved Blender exporter - 2.58 (and 2.59) support, normals maps,
+specular, ao maps... (<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Added <a class="reference external" href="http://www.w3.org/TR/cors/">CORS</a> to <tt class="docutils literal"><span class="pre">ImageUtils</span></tt>.
+(<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+<li>Refactored <tt class="docutils literal"><span class="pre">TextGeometry</span></tt> and added <tt class="docutils literal"><span class="pre">Shape</span></tt>, <tt class="docutils literal"><span class="pre">Curve</span></tt>, <tt class="docutils literal"><span class="pre">Path</span></tt>,
+<tt class="docutils literal"><span class="pre">ExtrudeGeometry</span></tt>, <tt class="docutils literal"><span class="pre">TextPath</span></tt>. (<a class="reference external" href="http://github.com/zz85">zz85</a>
+and <a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Added handling of custom attributes for <tt class="docutils literal"><span class="pre">ParticleSystems</span></tt>.
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Fixed <tt class="docutils literal"><span class="pre">CanvasRenderer.setClearColor</span></tt>.
+(<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>,
+<a class="reference external" href="http://github.com/StephenHopkins">StephenHopkins</a> and
+<a class="reference external" href="http://github.com/sebleedelisle">sebleedelisle</a>)</li>
+<li>Improved uniform handling in <tt class="docutils literal"><span class="pre">WebGLRenderer</span></tt>.
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Implemented Shadow Mapping in <tt class="docutils literal"><span class="pre">WebGLRenderer</span></tt>.
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Added <tt class="docutils literal"><span class="pre">Spotlight</span></tt> light type.
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Fixed constructor-less prototypes.
+(<a class="reference external" href="http://github.com/pushmatrix">pushmatrix</a>)</li>
+<li>Added <tt class="docutils literal"><span class="pre">DataTexture</span></tt>. (<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li><tt class="docutils literal"><span class="pre">WebGLRenderer</span></tt> opaque pass now renders from front to back.
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Simplified <tt class="docutils literal"><span class="pre">Color</span></tt>. (<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+<li>Added <tt class="docutils literal"><span class="pre">preserveDrawingBuffer</span></tt> option to <tt class="docutils literal"><span class="pre">WebGLRenderer</span></tt>.
+(<a class="reference external" href="http://github.com/jeromeetienne">jeromeetienne</a>)</li>
+<li>Added <tt class="docutils literal"><span class="pre">UTF8Loader</span></tt> for loading the new, uber compressed, <a class="reference external" href="http://code.google.com/p/webgl-loader/">UTF8
+format</a>.
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li><tt class="docutils literal"><span class="pre">CanvasRenderer</span></tt> now supports <tt class="docutils literal"><span class="pre">RepeatWrapping</span></tt>,
+<tt class="docutils literal"><span class="pre">texture.offset</span></tt> and <tt class="docutils literal"><span class="pre">texture.repeat</span></tt>.
+(<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+<li>Removed Stencil Shadows and Lensflare code.
+(<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+</ul>
+</div>
+<div class="section" id="r42-277-852-kb-gzip-69-469-kb">
+<h2>2011 07 06 - <strong>r42</strong> (277.852 KB, gzip: 69.469 KB)<a class="headerlink" href="#r42-277-852-kb-gzip-69-469-kb" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Added <tt class="docutils literal"><span class="pre">AnaglypWebGLRenderer</span></tt> and <tt class="docutils literal"><span class="pre">CrosseyedWebGLRenderer</span></tt>.
+(<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>,
+<a class="reference external" href="http://github.com/alteredq">alteredq</a> and
+<a class="reference external" href="http://github.com/marklundin">marklundin</a>)</li>
+<li>Added <tt class="docutils literal"><span class="pre">TextGeometry</span></tt>. (<a class="reference external" href="http://github.com/zz85">zz85</a> and
+<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Added <tt class="docutils literal"><span class="pre">setViewOffset</span></tt> method to <tt class="docutils literal"><span class="pre">Camera</span></tt>.
+(<a class="reference external" href="http://github.com/greggman">greggman</a>)</li>
+<li>Renamed geometries to <tt class="docutils literal"><span class="pre">*Geometry</span></tt>.
+(<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+<li>Improved Blender exporter. (<a class="reference external" href="http://github.com/alteredq">alteredq</a>,
+<a class="reference external" href="http://github.com/sweetfish">sweetfish</a> and
+<a class="reference external" href="http://github.com/Jhonnyg">Jhonnyg</a>)</li>
+<li>Added Blender 2.58 exporter. (<a class="reference external" href="http://github.com/georgik">georgik</a>)</li>
+<li>Fixed <tt class="docutils literal"><span class="pre">Matrix4.multiply()</span></tt>. (thanks
+<a class="reference external" href="http://github.com/lukem1">lukem1</a>)</li>
+<li>Added support for additional Euler rotation orders in <tt class="docutils literal"><span class="pre">Matrix4</span></tt>.
+(<a class="reference external" href="http://github.com/rectalogic">rectalogic</a>)</li>
+<li>Renamed <tt class="docutils literal"><span class="pre">QuakeCamera</span></tt> to <tt class="docutils literal"><span class="pre">FirstPersonCamera</span></tt>.
+(<a class="reference external" href="http://github.com/chriskillpack">chriskillpack</a>)</li>
+<li>Improved Normal Map Shader.
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li><tt class="docutils literal"><span class="pre">Collision</span></tt> now supports <tt class="docutils literal"><span class="pre">Object3D.flipSided</span></tt> and
+<tt class="docutils literal"><span class="pre">Object3D.doubleSided</span></tt>. (<a class="reference external" href="http://github.com/NINE78">NINE78</a>)</li>
+<li>Removed most of <tt class="docutils literal"><span class="pre">SceneUtils</span></tt> methods.
+(<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+<li>Removed <tt class="docutils literal"><span class="pre">Sound</span></tt> object and <tt class="docutils literal"><span class="pre">SoundRenderer</span></tt>.
+(<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+</ul>
+</div>
+<div class="section" id="r41-rome-265-317-kb-gzip-64-849-kb">
+<h2>2011 05 31 - <strong>r41/ROME</strong> (265.317 KB, gzip: 64.849 KB)<a class="headerlink" href="#r41-rome-265-317-kb-gzip-64-849-kb" title="Permalink to this headline">¶</a></h2>
+<p>(Up to this point, some <a class="reference external" href="http://ro.me">RO.ME</a> specific features
+managed to get in the lib. The aim is to clean this up in next
+revisions.)</p>
+<ul class="simple">
+<li>Improved Blender Object and Scene exporters.
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Fixes on WebGL attributes. (<a class="reference external" href="http://github.com/alteredq">alteredq</a>
+and <a class="reference external" href="http://github.com/empaempa">empaempa</a>)</li>
+<li>Reduced overall memory footprint.
+(<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+<li>Added <tt class="docutils literal"><span class="pre">Face4</span></tt> support to <tt class="docutils literal"><span class="pre">CollisionSystem</span></tt>.
+(<a class="reference external" href="http://github.com/NINE78">NINE78</a>)</li>
+<li>Added Blender 2.57 exporter. (<a class="reference external" href="http://github.com/remoe">remoe</a>)</li>
+<li>Added <tt class="docutils literal"><span class="pre">Particle</span></tt> support to <tt class="docutils literal"><span class="pre">Ray</span></tt>.
+(<a class="reference external" href="http://github.com/mrdoob">mrdoob</a> and
+<a class="reference external" href="http://github.com/jaycrossler">jaycrossler</a>)</li>
+<li>Improved <tt class="docutils literal"><span class="pre">Ray.intersectObject</span></tt> performance by checking
+boundingSphere first. (<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+<li>Added <tt class="docutils literal"><span class="pre">TrackballCamera</span></tt>.
+(<a class="reference external" href="http://github.com/egraether">egraether</a>)</li>
+<li>Added <tt class="docutils literal"><span class="pre">repeat</span></tt> and <tt class="docutils literal"><span class="pre">offset</span></tt> properties to <tt class="docutils literal"><span class="pre">Texture</span></tt>.
+(<a class="reference external" href="http://github.com/mrdoob">mrdoob</a> and
+<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Cleaned up <tt class="docutils literal"><span class="pre">Vector2</span></tt>, <tt class="docutils literal"><span class="pre">Vector3</span></tt> and <tt class="docutils literal"><span class="pre">Vector4</span></tt>.
+(<a class="reference external" href="http://github.com/egraether">egraether</a>)</li>
+</ul>
+</div>
+<div class="section" id="r40-263-774-kb-gzip-64-320-kb">
+<h2>2011 04 24 - <strong>r40</strong> (263.774 KB, gzip: 64.320 KB)<a class="headerlink" href="#r40-263-774-kb-gzip-64-320-kb" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Fixed <tt class="docutils literal"><span class="pre">Object3D.lookAt</span></tt>. (<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+<li>More and more Blender exporter goodness.
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a> and
+<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+<li>Improved <tt class="docutils literal"><span class="pre">CollisionSystem</span></tt>.
+(<a class="reference external" href="http://github.com/drojdjou">drojdjou</a> and
+<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Fixes on WebGLRenderer. (<a class="reference external" href="http://github.com/empaempa">empaempa</a>)</li>
+<li>Added <tt class="docutils literal"><span class="pre">Trident</span></tt> object.
+(<a class="reference external" href="http://github.com/sroucheray">sroucheray</a>)</li>
+<li>Added <tt class="docutils literal"><span class="pre">data</span></tt> object to Renderers for getting number of
+vertices/faces/callDraws from last render.
+(<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+<li>Fixed <tt class="docutils literal"><span class="pre">Projector</span></tt> handling Particles with hierarchies.
+(<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+</ul>
+</div>
+<div class="section" id="r39-249-048-kb-gzip-61-020-kb">
+<h2>2011 04 09 - <strong>r39</strong> (249.048 KB, gzip: 61.020 KB)<a class="headerlink" href="#r39-249-048-kb-gzip-61-020-kb" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Improved WebGLRenderer program cache.
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Added support for pre-computed edges in loaders and exporters.
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Added <tt class="docutils literal"><span class="pre">Collisions</span></tt> classes.
+(<a class="reference external" href="http://github.com/drojdjou">drojdjou</a>)</li>
+<li>Added <tt class="docutils literal"><span class="pre">Sprite</span></tt> object. (<a class="reference external" href="http://github.com/empaempa">empaempa</a>)</li>
+<li>Fixed <tt class="docutils literal"><span class="pre">*Loader</span></tt> issue where Workers were kept alive and next loads
+were delayed. (<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Added <tt class="docutils literal"><span class="pre">THREE</span></tt> namespace to all the classes that missed it.
+(<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+</ul>
+</div>
+<div class="section" id="r38-225-442-kb-gzip-55-908-kb">
+<h2>2011 03 31 - <strong>r38</strong> (225.442 KB, gzip: 55.908 KB)<a class="headerlink" href="#r38-225-442-kb-gzip-55-908-kb" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Added <tt class="docutils literal"><span class="pre">LensFlare</span></tt> light. (<a class="reference external" href="http://github.com/empaempa">empaempa</a>)</li>
+<li>Added <tt class="docutils literal"><span class="pre">ShadowVolume</span></tt> object (stencil shadows).
+(<a class="reference external" href="http://github.com/empaempa">empaempa</a>)</li>
+<li>Improved Blender Exporter plus added Scene support.
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Blender Importer for loading JSON files.
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Added load/complete callbacks to <tt class="docutils literal"><span class="pre">Loader</span></tt>
+(<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+<li>Minor WebGL blend mode clean up.
+(<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+<li>*Materials now extend Material
+(<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+<li><tt class="docutils literal"><span class="pre">material.transparent</span></tt> define whether material is transparent or
+not (before we were guessing). (<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+<li>Added internal program cache to WebGLRenderer (reuse already
+available programs). (<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+</ul>
+</div>
+<div class="section" id="r37-208-495-kb-gzip-51-376-kb">
+<h2>2011 03 22 - <strong>r37</strong> (208.495 KB, gzip: 51.376 KB)<a class="headerlink" href="#r37-208-495-kb-gzip-51-376-kb" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Changed JSON file format. (<strong>Re-exporting of models required</strong>)
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a> and
+<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+<li>Updated Blender and 3DSMAX exporters for new format.
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Vertex colors are now per-face
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li><tt class="docutils literal"><span class="pre">Geometry.uvs</span></tt> is now a multidimensional array (allowing infinite
+uv sets) (<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li><tt class="docutils literal"><span class="pre">CanvasRenderer</span></tt> renders <tt class="docutils literal"><span class="pre">Face4</span></tt> again (without spliting to 2
+<tt class="docutils literal"><span class="pre">Face3</span></tt>) (<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+<li><tt class="docutils literal"><span class="pre">ParticleCircleMaterial</span></tt> &gt; <tt class="docutils literal"><span class="pre">ParticleCanvasMaterial</span></tt>. Allowing
+injecting any <tt class="docutils literal"><span class="pre">canvas.context</span></tt> code!
+(<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+</ul>
+</div>
+<div class="section" id="r36-194-547-kb-gzip-48-608-kb">
+<h2>2011 03 14 - <strong>r36</strong> (194.547 KB, gzip: 48.608 KB)<a class="headerlink" href="#r36-194-547-kb-gzip-48-608-kb" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Added 3DSMAX exporter. (<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Fixed <tt class="docutils literal"><span class="pre">WebGLRenderer</span></tt> aspect ratio bug when scene had only one
+material. (<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+<li>Added <tt class="docutils literal"><span class="pre">sizeAttenuation</span></tt> property to <tt class="docutils literal"><span class="pre">ParticleBasicMaterial</span></tt>.
+(<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+<li>Added <tt class="docutils literal"><span class="pre">PathCamera</span></tt>. (<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Fixed <tt class="docutils literal"><span class="pre">WebGLRenderer</span></tt> bug when Camera has a parent.
+Camera``Camera.updateMatrix`` method.
+(<a class="reference external" href="http://github.com/empaempa">empaempa</a>)</li>
+<li>Fixed <tt class="docutils literal"><span class="pre">Camera.updateMatrix</span></tt> method and <tt class="docutils literal"><span class="pre">Object3D.updateMatrix</span></tt>.
+(<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+</ul>
+</div>
+<div class="section" id="r35-187-875-kb-gzip-46-433-kb">
+<h2>2011 03 06 - <strong>r35</strong> (187.875 KB, gzip: 46.433 KB)<a class="headerlink" href="#r35-187-875-kb-gzip-46-433-kb" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Added methods <tt class="docutils literal"><span class="pre">translate</span></tt>, <tt class="docutils literal"><span class="pre">translateX</span></tt>, <tt class="docutils literal"><span class="pre">translateY</span></tt>,
+<tt class="docutils literal"><span class="pre">translateZ</span></tt> and <tt class="docutils literal"><span class="pre">lookAt</span></tt> methods to <tt class="docutils literal"><span class="pre">Object3D</span></tt>.
+(<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+<li>Added methods <tt class="docutils literal"><span class="pre">setViewport</span></tt> and <tt class="docutils literal"><span class="pre">setScissor</span></tt> to
+<tt class="docutils literal"><span class="pre">WebGLRenderer</span></tt>. (<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Added support for non-po2 textures.
+(<a class="reference external" href="http://github.com/mrdoob">mrdoob</a> and
+<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Minor API clean up. (<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+</ul>
+</div>
+<div class="section" id="r34-186-045-kb-gzip-45-953-kb">
+<h2>2011 03 02 - <strong>r34</strong> (186.045 KB, gzip: 45.953 KB)<a class="headerlink" href="#r34-186-045-kb-gzip-45-953-kb" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Now using camera.matrixWorldInverse instead of camera.matrixWorld for
+projecting. (<a class="reference external" href="http://github.com/empaempa">empaempa</a> and
+<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+<li>Camel cased properties and object json format (<strong>Re-exporting of
+models required</strong>) (<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Added <tt class="docutils literal"><span class="pre">QuakeCamera</span></tt> for easy fly-bys
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Added <tt class="docutils literal"><span class="pre">LOD</span></tt> example (<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+</ul>
+</div>
+<div class="section" id="r33-184-483-kb-gzip-45-580-kb">
+<h2>2011 02 26 - <strong>r33</strong> (184.483 KB, gzip: 45.580 KB)<a class="headerlink" href="#r33-184-483-kb-gzip-45-580-kb" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Changed build setup (<strong>build/Three.js now also include extras</strong>)
+(<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+<li>Added <tt class="docutils literal"><span class="pre">ParticleSystem</span></tt> object to <tt class="docutils literal"><span class="pre">WebGLRenderer</span></tt>
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Added <tt class="docutils literal"><span class="pre">Line</span></tt> support to <tt class="docutils literal"><span class="pre">WebGLRenderer</span></tt>
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Added vertex colors support to <tt class="docutils literal"><span class="pre">WebGLRenderer</span></tt>
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Added <tt class="docutils literal"><span class="pre">Ribbon</span></tt> object. (<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Added updateable textures support to <tt class="docutils literal"><span class="pre">WebGLRenderer</span></tt>
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Added <tt class="docutils literal"><span class="pre">Sound</span></tt> object and <tt class="docutils literal"><span class="pre">SoundRenderer</span></tt>.
+(<a class="reference external" href="http://github.com/empaempa">empaempa</a>)</li>
+<li><tt class="docutils literal"><span class="pre">LOD</span></tt>, <tt class="docutils literal"><span class="pre">Bone</span></tt>, <tt class="docutils literal"><span class="pre">SkinnedMesh</span></tt> objects and hierarchy being
+developed. (<a class="reference external" href="http://github.com/empaempa">empaempa</a>)</li>
+<li>Added hierarchies examples (<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+</ul>
+</div>
+<div class="section" id="r32-89-301-kb-gzip-21-351-kb">
+<h2>2010 12 31 - <strong>r32</strong> (89.301 KB, gzip: 21.351 KB)<a class="headerlink" href="#r32-89-301-kb-gzip-21-351-kb" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">Scene</span></tt> now supports <tt class="docutils literal"><span class="pre">Fog</span></tt> and <tt class="docutils literal"><span class="pre">FogExp2</span></tt>. <tt class="docutils literal"><span class="pre">WebGLRenderer</span></tt>
+only right now. (<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Added <tt class="docutils literal"><span class="pre">setClearColor(</span> <span class="pre">hex,</span> <span class="pre">opacity</span> <span class="pre">)</span></tt> to <tt class="docutils literal"><span class="pre">WebGLRenderer</span></tt> and
+<tt class="docutils literal"><span class="pre">CanvasRenderer</span></tt> (<a class="reference external" href="http://github.com/alteredq">alteredq</a> &amp;
+<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+<li><tt class="docutils literal"><span class="pre">WebGLRenderer</span></tt> shader system refactored improving performance.
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li><tt class="docutils literal"><span class="pre">Projector</span></tt> now does frustum culling of all the objects using their
+sphereBoundingBox. (thx <a class="reference external" href="http://github.com/errynp">errynp</a>)</li>
+<li><tt class="docutils literal"><span class="pre">material</span></tt> property changed to <tt class="docutils literal"><span class="pre">materials</span></tt> globaly.</li>
+</ul>
+</div>
+<div class="section" id="r31-79-479-kb-gzip-18-788-kb">
+<h2>2010 12 06 - <strong>r31</strong> (79.479 KB, gzip: 18.788 KB)<a class="headerlink" href="#r31-79-479-kb-gzip-18-788-kb" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Minor Materials API change (mappings).
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a> &amp;
+<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+<li>Added Filters to <tt class="docutils literal"><span class="pre">WebGLRenderer</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">python</span> <span class="pre">build.py</span> <span class="pre">--includes</span></tt> generates includes string</li>
+</ul>
+</div>
+<div class="section" id="r30-77-809-kb-gzip-18-336-kb">
+<h2>2010 11 30 - <strong>r30</strong> (77.809 KB, gzip: 18.336 KB)<a class="headerlink" href="#r30-77-809-kb-gzip-18-336-kb" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Reflection and Refraction materials support in <tt class="docutils literal"><span class="pre">WebGLRenderer</span></tt>
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li><tt class="docutils literal"><span class="pre">SmoothShading</span></tt> support on
+<tt class="docutils literal"><span class="pre">CanvasRenderer</span></tt>/<tt class="docutils literal"><span class="pre">MeshLambertMaterial</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">MeshShaderMaterial</span></tt> for <tt class="docutils literal"><span class="pre">WebGLRenderer</span></tt>
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Removed <tt class="docutils literal"><span class="pre">RenderableFace4</span></tt> from <tt class="docutils literal"><span class="pre">Projector</span></tt>/<tt class="docutils literal"><span class="pre">CanvasRenderer</span></tt>
+(maybe just temporary).</li>
+<li>Added extras folder with <tt class="docutils literal"><span class="pre">GeometryUtils</span></tt>, <tt class="docutils literal"><span class="pre">ImageUtils</span></tt>,
+<tt class="docutils literal"><span class="pre">SceneUtils</span></tt> and <tt class="docutils literal"><span class="pre">ShaderUtils</span></tt>
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a> &amp;
+<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+<li>Blender 2.5x Slim now the default exporter (old exporter removed).</li>
+</ul>
+</div>
+<div class="section" id="r29-69-563-kb">
+<h2>2010 11 17 - <strong>r29</strong> (69.563 KB)<a class="headerlink" href="#r29-69-563-kb" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><strong>New materials API</strong> Still work in progress, but mostly there.
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a> &amp;
+<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+<li>Line clipping in <tt class="docutils literal"><span class="pre">CanvasRenderer</span></tt>
+(<a class="reference external" href="http://github.com/julianwa">julianwa</a>)</li>
+<li>Refactored <tt class="docutils literal"><span class="pre">CanvasRenderer</span></tt> and <tt class="docutils literal"><span class="pre">SVGRenderer</span></tt>.
+(<a class="reference external" href="http://github.com/mrdoob">mrdoob</a>)</li>
+<li>Switched to Closure compiler.</li>
+</ul>
+</div>
+<div class="section" id="r28-62-802-kb">
+<h2>2010 11 04 - <strong>r28</strong> (62.802 KB)<a class="headerlink" href="#r28-62-802-kb" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">Loader</span></tt> class allows load geometry asynchronously at runtime.
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li><tt class="docutils literal"><span class="pre">MeshPhongMaterial</span></tt> working with <tt class="docutils literal"><span class="pre">WebGLRenderer</span></tt>.
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Support for <em>huge</em> objects. Max 500k polys and counting.
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li><tt class="docutils literal"><span class="pre">Projector.unprojectVector</span></tt> and <tt class="docutils literal"><span class="pre">Ray</span></tt> class to check
+intersections with faces (based on
+<a class="reference external" href="http://github.com/mindlapse">mindlapse</a> work)</li>
+<li>Fixed <tt class="docutils literal"><span class="pre">Projector</span></tt> z-sorting (not as jumpy anymore).</li>
+<li>Fixed Orthographic projection (was y-inverted).</li>
+<li>Hmmm.. lib file size starting to get too big...</li>
+</ul>
+</div>
+<div class="section" id="r25-54-480-kb">
+<h2>2010 10 28 - <strong>r25</strong> (54.480 KB)<a class="headerlink" href="#r25-54-480-kb" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">WebGLRenderer</span></tt> now up to date with other renderers!
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>.obj to .js python converter
+(<a class="reference external" href="http://github.com/alteredq">alteredq</a>)</li>
+<li>Blender 2.54 exporter</li>
+<li>Added <tt class="docutils literal"><span class="pre">MeshFaceMaterial</span></tt> (multipass per face)</li>
+<li>Reworked <tt class="docutils literal"><span class="pre">CanvasRenderer</span></tt> and <tt class="docutils literal"><span class="pre">SVGRenderer</span></tt> material handling</li>
+</ul>
+</div>
+<div class="section" id="r18-44-420-kb">
+<h2>2010 10 06 - <strong>r18</strong> (44.420 KB)<a class="headerlink" href="#r18-44-420-kb" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Added <tt class="docutils literal"><span class="pre">PointLight</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">CanvasRenderer</span></tt> and <tt class="docutils literal"><span class="pre">SVGRenderer</span></tt> basic lighting support
+(ColorStroke/ColorFill only)</li>
+<li><tt class="docutils literal"><span class="pre">Renderer</span></tt> &gt; <tt class="docutils literal"><span class="pre">Projector</span></tt>. <tt class="docutils literal"><span class="pre">CanvasRenderer</span></tt>, <tt class="docutils literal"><span class="pre">SVGRenderer</span></tt> and
+<tt class="docutils literal"><span class="pre">DOMRenderer</span></tt> do not extend anymore</li>
+<li>Added <tt class="docutils literal"><span class="pre">computeCentroids</span></tt> method to <tt class="docutils literal"><span class="pre">Geometry</span></tt></li>
+</ul>
+</div>
+<div class="section" id="r17-39-487-kb">
+<h2>2010 09 17 - <strong>r17</strong> (39.487 KB)<a class="headerlink" href="#r17-39-487-kb" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Added <tt class="docutils literal"><span class="pre">Light</span></tt>, <tt class="docutils literal"><span class="pre">AmbientLight</span></tt> and <tt class="docutils literal"><span class="pre">DirectionalLight</span></tt>
+(<a class="reference external" href="http://github.com/philogb">philogb</a>)</li>
+<li><tt class="docutils literal"><span class="pre">WebGLRenderer</span></tt> basic lighting support
+(<a class="reference external" href="http://github.com/philogb">philogb</a>)</li>
+<li>Memory optimisations</li>
+</ul>
+</div>
+<div class="section" id="r16-35-592-kb">
+<h2>2010 08 21 - <strong>r16</strong> (35.592 KB)<a class="headerlink" href="#r16-35-592-kb" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Workaround for Opera bug (clearRect not working with context with
+negative scale)</li>
+<li>Additional <tt class="docutils literal"><span class="pre">Matrix4</span></tt> and <tt class="docutils literal"><span class="pre">Vector3</span></tt> methods</li>
+</ul>
+</div>
+<div class="section" id="r15-32-440-kb">
+<h2>2010 07 23 - <strong>r15</strong> (32.440 KB)<a class="headerlink" href="#r15-32-440-kb" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Using new object <tt class="docutils literal"><span class="pre">UV</span></tt> instead of <tt class="docutils literal"><span class="pre">Vector2</span></tt> where it should be
+used</li>
+<li>Added <tt class="docutils literal"><span class="pre">Mesh.flipSided</span></tt> boolean (false by default)</li>
+<li><tt class="docutils literal"><span class="pre">CanvasRenderer</span></tt> was handling UVs at 1,1 as bitmapWidth,
+bitmapHeight (instead of bitmapWidth - 1, bitmapHeight - 1)</li>
+<li><tt class="docutils literal"><span class="pre">ParticleBitmapMaterial.offset</span></tt> added</li>
+<li>Fixed gap when rendering <tt class="docutils literal"><span class="pre">Face4</span></tt> with
+<tt class="docutils literal"><span class="pre">MeshBitmapUVMappingMaterial</span></tt></li>
+</ul>
+</div>
+<div class="section" id="r14-32-144-kb">
+<h2>2010 07 17 - <strong>r14</strong> (32.144 KB)<a class="headerlink" href="#r14-32-144-kb" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Refactored <tt class="docutils literal"><span class="pre">CanvasRenderer</span></tt> (more duplicated code, but easier to
+handle)</li>
+<li><tt class="docutils literal"><span class="pre">Face4</span></tt> now supports <tt class="docutils literal"><span class="pre">MeshBitmapUVMappingMaterial</span></tt></li>
+<li>Changed order of <tt class="docutils literal"><span class="pre">*StrokeMaterial</span></tt> parameters. Now it&#8217;s <tt class="docutils literal"><span class="pre">color</span></tt>,
+<tt class="docutils literal"><span class="pre">opacity</span></tt>, <tt class="docutils literal"><span class="pre">lineWidth</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">BitmapUVMappingMaterial</span></tt> &gt; <tt class="docutils literal"><span class="pre">MeshBitmapUVMappingMaterial</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">ColorFillMaterial</span></tt> &gt; <tt class="docutils literal"><span class="pre">MeshColorFillMaterial</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">ColorStrokeMaterial</span></tt> &gt; <tt class="docutils literal"><span class="pre">MeshColorStrokeMaterial</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">FaceColorFillMaterial</span></tt> &gt; <tt class="docutils literal"><span class="pre">MeshFaceColorFillMaterial</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">FaceColorStrokeMaterial</span></tt> &gt; <tt class="docutils literal"><span class="pre">MeshFaceColorStrokeMaterial</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">ColorStrokeMaterial</span></tt> &gt; <tt class="docutils literal"><span class="pre">LineColorMaterial</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Rectangle.instersects</span></tt> returned false with rectangles with 0px
+witdh or height</li>
+</ul>
+</div>
+<div class="section" id="r13-29-492-kb">
+<h2>2010 07 12 - <strong>r13</strong> (29.492 KB)<a class="headerlink" href="#r13-29-492-kb" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Added <tt class="docutils literal"><span class="pre">ParticleCircleMaterial</span></tt> and <tt class="docutils literal"><span class="pre">ParticleBitmapMaterial</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Particle</span></tt> now use <tt class="docutils literal"><span class="pre">ParticleCircleMaterial</span></tt> instead of
+<tt class="docutils literal"><span class="pre">ColorFillMaterial</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Particle.size</span></tt> &gt; <tt class="docutils literal"><span class="pre">Particle.scale.x</span></tt> and <tt class="docutils literal"><span class="pre">Particle.scale.y</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Particle.rotation.z</span></tt> for rotating the particle</li>
+<li><tt class="docutils literal"><span class="pre">SVGRenderer</span></tt> currently out of sync</li>
+</ul>
+</div>
+<div class="section" id="r12-28-494-kb">
+<h2>2010 07 07 - <strong>r12</strong> (28.494 KB)<a class="headerlink" href="#r12-28-494-kb" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>First version of the <tt class="docutils literal"><span class="pre">WebGLRenderer</span></tt> (<tt class="docutils literal"><span class="pre">ColorFillMaterial</span></tt> and
+<tt class="docutils literal"><span class="pre">FaceColorFillMaterial</span></tt> by now)</li>
+<li><tt class="docutils literal"><span class="pre">Matrix4.lookAt</span></tt> fix (<tt class="docutils literal"><span class="pre">CanvasRenderer</span></tt> and <tt class="docutils literal"><span class="pre">SVGRenderer</span></tt> now
+handle the -Y)</li>
+<li><tt class="docutils literal"><span class="pre">Color</span></tt> now using 0-1 floats instead of 0-255 integers</li>
+</ul>
+</div>
+<div class="section" id="r11-23-541-kb">
+<h2>2010 07 03 - <strong>r11</strong> (23.541 KB)<a class="headerlink" href="#r11-23-541-kb" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Blender 2.5 exporter (utils/export_threejs.py) now exports UV and
+normals (Thx <a class="reference external" href="http://github.com/kikko">kikko</a>)</li>
+<li><tt class="docutils literal"><span class="pre">Scene.add</span></tt> &gt; <tt class="docutils literal"><span class="pre">Scene.addObject</span></tt></li>
+<li>Enabled <tt class="docutils literal"><span class="pre">Scene.removeObject</span></tt></li>
+</ul>
+</div>
+<div class="section" id="r10-23-959-kb">
+<h2>2010 06 22 - <strong>r10</strong> (23.959 KB)<a class="headerlink" href="#r10-23-959-kb" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Changed Camera system. (Thx <a class="reference external" href="http://github.com/supereggbert">Paul
+Brunt</a>)</li>
+<li><tt class="docutils literal"><span class="pre">Object3D.overdraw</span> <span class="pre">=</span> <span class="pre">true</span></tt> to enable CanvasRenderer screen space
+point expansion hack.</li>
+</ul>
+</div>
+<div class="section" id="r9-23-753-kb">
+<h2>2010 06 20 - <strong>r9</strong> (23.753 KB)<a class="headerlink" href="#r9-23-753-kb" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>JSLinted.</li>
+<li><tt class="docutils literal"><span class="pre">autoClear</span></tt> property for renderers.</li>
+<li>Removed SVG rgba() workaround for WebKit. (WebKit now supports it)</li>
+<li>Fixed matrix bug. (transformed objects outside the x axis would get
+infinitely tall :S)</li>
+</ul>
+</div>
+<div class="section" id="r8-23-496-kb">
+<h2>2010 06 06 - <strong>r8</strong> (23.496 KB)<a class="headerlink" href="#r8-23-496-kb" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Moved UVs to <tt class="docutils literal"><span class="pre">Geometry</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">CanvasRenderer</span></tt> expands screen space points (workaround for
+antialias gaps).</li>
+<li><tt class="docutils literal"><span class="pre">CanvasRenderer</span></tt> supports <tt class="docutils literal"><span class="pre">BitmapUVMappingMaterial</span></tt>.</li>
+</ul>
+</div>
+<div class="section" id="r7-22-387-kb">
+<h2>2010 06 05 - <strong>r7</strong> (22.387 KB)<a class="headerlink" href="#r7-22-387-kb" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Added Line Object.</li>
+<li>Workaround for WebKit not supporting rgba() in SVG yet.</li>
+<li>No need to call updateMatrix(). Use .autoUpdateMatrix = false if
+needed. (Thx <a class="reference external" href="http://github.com/gregmax17">Gregory Athons</a>).</li>
+</ul>
+</div>
+<div class="section" id="r6-21-003-kb">
+<h2>2010 05 17 - <strong>r6</strong> (21.003 KB)<a class="headerlink" href="#r6-21-003-kb" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>2d clipping on <tt class="docutils literal"><span class="pre">CanvasRenderer</span></tt> and <tt class="docutils literal"><span class="pre">SVGRenderer</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">clearRect</span></tt> optimisations on <tt class="docutils literal"><span class="pre">CanvasRenderer</span></tt></li>
+</ul>
+</div>
+<div class="section" id="r5-19-026-kb">
+<h2>2010 05 16 - <strong>r5</strong> (19.026 KB)<a class="headerlink" href="#r5-19-026-kb" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Removed Class.js dependency</li>
+<li>Added <tt class="docutils literal"><span class="pre">THREE</span></tt> namespace</li>
+<li><tt class="docutils literal"><span class="pre">Camera.x</span></tt> -&gt; <tt class="docutils literal"><span class="pre">Camera.position.x</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Camera.target.x</span></tt> &gt; <tt class="docutils literal"><span class="pre">Camera.target.position.x</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">ColorMaterial</span></tt> &gt; <tt class="docutils literal"><span class="pre">ColorFillMaterial</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">FaceColorMaterial</span></tt> &gt; <tt class="docutils literal"><span class="pre">FaceColorFillMaterial</span></tt></li>
+<li>Materials are now multipass (use array)</li>
+<li>Added <tt class="docutils literal"><span class="pre">ColorStrokeMaterial</span></tt> and <tt class="docutils literal"><span class="pre">FaceColorStrokeMaterial</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">geometry.faces.a</span></tt> are now indexes instead of references</li>
+</ul>
+</div>
+<div class="section" id="r4-16-274-kb">
+<h2>2010 04 26 - <strong>r4</strong> (16.274 KB)<a class="headerlink" href="#r4-16-274-kb" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">SVGRenderer</span></tt> Particle rendering</li>
+<li><tt class="docutils literal"><span class="pre">CanvasRenderer</span></tt> uses <tt class="docutils literal"><span class="pre">context.setTransform</span></tt> to avoid extra
+calculations</li>
+</ul>
+</div>
+<div class="section" id="r3-16-392-kb">
+<h2>2010 04 24 - <strong>r3</strong> (16.392 KB)<a class="headerlink" href="#r3-16-392-kb" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Fixed incorrect rotation matrix transforms</li>
+<li>Added <tt class="docutils literal"><span class="pre">Plane</span></tt> and <tt class="docutils literal"><span class="pre">Cube</span></tt> primitives</li>
+</ul>
+</div>
+<div class="section" id="r2-15-724-kb">
+<h2>2010 04 24 - <strong>r2</strong> (15.724 KB)<a class="headerlink" href="#r2-15-724-kb" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Improved <tt class="docutils literal"><span class="pre">Color</span></tt> handling</li>
+</ul>
+</div>
+<div class="section" id="r1-15-25-kb">
+<h2>2010 04 24 - <strong>r1</strong> (15.25 KB)<a class="headerlink" href="#r1-15-25-kb" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>First alpha release</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Changelog</a><ul>
+<li><a class="reference internal" href="#r46-343-383-kb-gzip-87-468-kb">2011 11 17 - <strong>r46</strong> (343.383 KB, gzip: 87.468 KB)</a></li>
+<li><a class="reference internal" href="#r45-340-863-kb-gzip-86-568-kb">2011 10 06 - <strong>r45</strong> (340.863 KB, gzip: 86.568 KB)</a></li>
+<li><a class="reference internal" href="#r44-330-356-kb-gzip-84-039-kb">2011 09 04 - <strong>r44</strong> (330.356 KB, gzip: 84.039 KB)</a></li>
+<li><a class="reference internal" href="#r43-298-199-kb-gzip-74-805-kb">2011 08 14 - <strong>r43</strong> (298.199 KB, gzip: 74.805 KB)</a></li>
+<li><a class="reference internal" href="#r42-277-852-kb-gzip-69-469-kb">2011 07 06 - <strong>r42</strong> (277.852 KB, gzip: 69.469 KB)</a></li>
+<li><a class="reference internal" href="#r41-rome-265-317-kb-gzip-64-849-kb">2011 05 31 - <strong>r41/ROME</strong> (265.317 KB, gzip: 64.849 KB)</a></li>
+<li><a class="reference internal" href="#r40-263-774-kb-gzip-64-320-kb">2011 04 24 - <strong>r40</strong> (263.774 KB, gzip: 64.320 KB)</a></li>
+<li><a class="reference internal" href="#r39-249-048-kb-gzip-61-020-kb">2011 04 09 - <strong>r39</strong> (249.048 KB, gzip: 61.020 KB)</a></li>
+<li><a class="reference internal" href="#r38-225-442-kb-gzip-55-908-kb">2011 03 31 - <strong>r38</strong> (225.442 KB, gzip: 55.908 KB)</a></li>
+<li><a class="reference internal" href="#r37-208-495-kb-gzip-51-376-kb">2011 03 22 - <strong>r37</strong> (208.495 KB, gzip: 51.376 KB)</a></li>
+<li><a class="reference internal" href="#r36-194-547-kb-gzip-48-608-kb">2011 03 14 - <strong>r36</strong> (194.547 KB, gzip: 48.608 KB)</a></li>
+<li><a class="reference internal" href="#r35-187-875-kb-gzip-46-433-kb">2011 03 06 - <strong>r35</strong> (187.875 KB, gzip: 46.433 KB)</a></li>
+<li><a class="reference internal" href="#r34-186-045-kb-gzip-45-953-kb">2011 03 02 - <strong>r34</strong> (186.045 KB, gzip: 45.953 KB)</a></li>
+<li><a class="reference internal" href="#r33-184-483-kb-gzip-45-580-kb">2011 02 26 - <strong>r33</strong> (184.483 KB, gzip: 45.580 KB)</a></li>
+<li><a class="reference internal" href="#r32-89-301-kb-gzip-21-351-kb">2010 12 31 - <strong>r32</strong> (89.301 KB, gzip: 21.351 KB)</a></li>
+<li><a class="reference internal" href="#r31-79-479-kb-gzip-18-788-kb">2010 12 06 - <strong>r31</strong> (79.479 KB, gzip: 18.788 KB)</a></li>
+<li><a class="reference internal" href="#r30-77-809-kb-gzip-18-336-kb">2010 11 30 - <strong>r30</strong> (77.809 KB, gzip: 18.336 KB)</a></li>
+<li><a class="reference internal" href="#r29-69-563-kb">2010 11 17 - <strong>r29</strong> (69.563 KB)</a></li>
+<li><a class="reference internal" href="#r28-62-802-kb">2010 11 04 - <strong>r28</strong> (62.802 KB)</a></li>
+<li><a class="reference internal" href="#r25-54-480-kb">2010 10 28 - <strong>r25</strong> (54.480 KB)</a></li>
+<li><a class="reference internal" href="#r18-44-420-kb">2010 10 06 - <strong>r18</strong> (44.420 KB)</a></li>
+<li><a class="reference internal" href="#r17-39-487-kb">2010 09 17 - <strong>r17</strong> (39.487 KB)</a></li>
+<li><a class="reference internal" href="#r16-35-592-kb">2010 08 21 - <strong>r16</strong> (35.592 KB)</a></li>
+<li><a class="reference internal" href="#r15-32-440-kb">2010 07 23 - <strong>r15</strong> (32.440 KB)</a></li>
+<li><a class="reference internal" href="#r14-32-144-kb">2010 07 17 - <strong>r14</strong> (32.144 KB)</a></li>
+<li><a class="reference internal" href="#r13-29-492-kb">2010 07 12 - <strong>r13</strong> (29.492 KB)</a></li>
+<li><a class="reference internal" href="#r12-28-494-kb">2010 07 07 - <strong>r12</strong> (28.494 KB)</a></li>
+<li><a class="reference internal" href="#r11-23-541-kb">2010 07 03 - <strong>r11</strong> (23.541 KB)</a></li>
+<li><a class="reference internal" href="#r10-23-959-kb">2010 06 22 - <strong>r10</strong> (23.959 KB)</a></li>
+<li><a class="reference internal" href="#r9-23-753-kb">2010 06 20 - <strong>r9</strong> (23.753 KB)</a></li>
+<li><a class="reference internal" href="#r8-23-496-kb">2010 06 06 - <strong>r8</strong> (23.496 KB)</a></li>
+<li><a class="reference internal" href="#r7-22-387-kb">2010 06 05 - <strong>r7</strong> (22.387 KB)</a></li>
+<li><a class="reference internal" href="#r6-21-003-kb">2010 05 17 - <strong>r6</strong> (21.003 KB)</a></li>
+<li><a class="reference internal" href="#r5-19-026-kb">2010 05 16 - <strong>r5</strong> (19.026 KB)</a></li>
+<li><a class="reference internal" href="#r4-16-274-kb">2010 04 26 - <strong>r4</strong> (16.274 KB)</a></li>
+<li><a class="reference internal" href="#r3-16-392-kb">2010 04 24 - <strong>r3</strong> (16.392 KB)</a></li>
+<li><a class="reference internal" href="#r2-15-724-kb">2010 04 24 - <strong>r2</strong> (15.724 KB)</a></li>
+<li><a class="reference internal" href="#r1-15-25-kb">2010 04 24 - <strong>r1</strong> (15.25 KB)</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">three.js - JavaScript 3D library</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="tutorials/index.html"
+                        title="next chapter">Tutorials</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/changelog.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="tutorials/index.html" title="Tutorials"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="three.js - JavaScript 3D library"
+             >previous</a> |</li>
+        <li><a href="index.html">three.js v48dev documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010-2012, three.js Authors.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,250 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Math - Math utility functions &mdash; three.js v48dev documentation</title>
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '48dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="three.js v48dev documentation" href="../../index.html" />
+    <link rel="up" title="Core" href="index.html" />
+    <link rel="next" title="Matrix3 - A 3x3 matrix" href="Matrix3.html" />
+    <link rel="prev" title="Geometry - Base class for geometries" href="Geometry.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Matrix3.html" title="Matrix3 - A 3x3 matrix"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Geometry.html" title="Geometry - Base class for geometries"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">three.js v48dev documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Core</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="math-math-utility-functions">
+<h1>Math - Math utility functions<a class="headerlink" href="#math-math-utility-functions" title="Permalink to this headline">¶</a></h1>
+<p class="rubric">Methods</p>
+<dl class="function">
+<dt id="Math.clamp">
+<tt class="descclassname">Math.</tt><tt class="descname">clamp</tt><big>(</big><em>x</em>, <em>a</em>, <em>b</em><big>)</big><a class="headerlink" href="#Math.clamp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clamps the x to be between a and b</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>x</strong> (<em>float</em>) &#8211; value to be clamped</li>
+<li><strong>a</strong> (<em>float</em>) &#8211; minimum value</li>
+<li><strong>b</strong> (<em>float</em>) &#8211; maximum value</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Clamped value</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last">float</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Math.clampBottom">
+<tt class="descclassname">Math.</tt><tt class="descname">clampBottom</tt><big>(</big><em>x</em>, <em>a</em><big>)</big><a class="headerlink" href="#Math.clampBottom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clamps the x to be larger than a</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>x</strong> (<em>float</em>) &#8211; value to be clamped</li>
+<li><strong>a</strong> (<em>float</em>) &#8211; minimum value</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Clamped value</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last">float</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Math.mapLinear">
+<tt class="descclassname">Math.</tt><tt class="descname">mapLinear</tt><big>(</big><em>x</em>, <em>a1</em>, <em>a2</em>, <em>b1</em>, <em>b2</em><big>)</big><a class="headerlink" href="#Math.mapLinear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Linear mapping of x from range &lt;a1, a2&gt; to range &lt;b1, b2&gt;</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>x</strong> (<em>float</em>) &#8211; value to be mapped</li>
+<li><strong>a1</strong> (<em>float</em>) &#8211; minimum value for range A</li>
+<li><strong>a2</strong> (<em>float</em>) &#8211; maximum value for range A</li>
+<li><strong>b1</strong> (<em>float</em>) &#8211; minimum value for range B</li>
+<li><strong>b2</strong> (<em>float</em>) &#8211; maximum value for range B</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">mapped value</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last">float</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Math.random16">
+<tt class="descclassname">Math.</tt><tt class="descname">random16</tt><big>(</big><big>)</big><a class="headerlink" href="#Math.random16" title="Permalink to this definition">¶</a></dt>
+<dd><p>Random float from &lt;0, 1&gt; with 16 bits of randomness
+(standard Math.random() creates repetitive patterns when applied over larger space)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">Random float from &lt;0, 1&gt; with 16 bits of randomness</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Math.randInt">
+<tt class="descclassname">Math.</tt><tt class="descname">randInt</tt><big>(</big><em>low</em>, <em>high</em><big>)</big><a class="headerlink" href="#Math.randInt" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">Random integer from <em>low</em> to <em>high</em> interval</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body">integer</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Math.randFloat">
+<tt class="descclassname">Math.</tt><tt class="descname">randFloat</tt><big>(</big><em>low</em>, <em>high</em><big>)</big><a class="headerlink" href="#Math.randFloat" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">Random float from <em>low</em> to <em>high</em> interval</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Math.randFloatSpread">
+<tt class="descclassname">Math.</tt><tt class="descname">randFloatSpread</tt><big>(</big><em>range</em><big>)</big><a class="headerlink" href="#Math.randFloatSpread" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">Random float from -range/2 to range/2 interval</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Geometry.html"
+                        title="previous chapter">Geometry - Base class for geometries</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="Matrix3.html"
+                        title="next chapter">Matrix3 - A 3x3 matrix</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/api/core/Math.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="Matrix3.html" title="Matrix3 - A 3x3 matrix"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Geometry.html" title="Geometry - Base class for geometries"
+             >previous</a> |</li>
+        <li><a href="../../index.html">three.js v48dev documentation</a> &raquo;</li>
+          <li><a href="index.html" >Core</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010-2012, three.js Authors.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

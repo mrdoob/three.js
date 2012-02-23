@@ -1,0 +1,185 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>OrthographicCamera - Camera with orthographic projection &mdash; three.js v48dev documentation</title>
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '48dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="three.js v48dev documentation" href="../../index.html" />
+    <link rel="up" title="Cameras" href="index.html" />
+    <link rel="next" title="PerspectiveCamera - Camera with perspective projection" href="PerspectiveCamera.html" />
+    <link rel="prev" title="Camera - Abstract base class for cameras" href="Camera.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="PerspectiveCamera.html" title="PerspectiveCamera - Camera with perspective projection"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Camera.html" title="Camera - Abstract base class for cameras"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">three.js v48dev documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Cameras</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="orthographiccamera-camera-with-orthographic-projection">
+<h1>OrthographicCamera - Camera with orthographic projection<a class="headerlink" href="#orthographiccamera-camera-with-orthographic-projection" title="Permalink to this headline">¶</a></h1>
+<p class="rubric">Constructor</p>
+<dl class="class">
+<dt id="OrthographicCamera">
+<em class="property">class </em><tt class="descname">OrthographicCamera</tt><big>(</big><em>left</em>, <em>right</em>, <em>top</em>, <em>bottom</em>, <em>near</em>, <em>far</em><big>)</big><a class="headerlink" href="#OrthographicCamera" title="Permalink to this definition">¶</a></dt>
+<dd><p>Camera with orthographic projection</p>
+<p>Part of scene graph</p>
+<p>Inherits from <a class="reference internal" href="../core/Object3D.html#Object3D" title="Object3D"><tt class="xref js js-class docutils literal"><span class="pre">Object3D()</span></tt></a> <a class="reference internal" href="Camera.html#Camera" title="Camera"><tt class="xref js js-class docutils literal"><span class="pre">Camera()</span></tt></a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>left</strong> (<em>float</em>) &#8211; left</li>
+<li><strong>right</strong> (<em>float</em>) &#8211; right</li>
+<li><strong>top</strong> (<em>float</em>) &#8211; top</li>
+<li><strong>bottom</strong> (<em>float</em>) &#8211; bottom</li>
+<li><strong>near</strong> (<em>float</em>) &#8211; near</li>
+<li><strong>far</strong> (<em>float</em>) &#8211; far</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<p class="rubric">Attributes</p>
+<dl class="attribute">
+<dt id="OrthographicCamera.left">
+<tt class="descclassname">OrthographicCamera.</tt><tt class="descname">left</tt><a class="headerlink" href="#OrthographicCamera.left" title="Permalink to this definition">¶</a></dt>
+<dd><p>Camera frustum left plane</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="OrthographicCamera.right">
+<tt class="descclassname">OrthographicCamera.</tt><tt class="descname">right</tt><a class="headerlink" href="#OrthographicCamera.right" title="Permalink to this definition">¶</a></dt>
+<dd><p>Camera frustum right plane</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="OrthographicCamera.top">
+<tt class="descclassname">OrthographicCamera.</tt><tt class="descname">top</tt><a class="headerlink" href="#OrthographicCamera.top" title="Permalink to this definition">¶</a></dt>
+<dd><p>Camera frustum top plane</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="OrthographicCamera.bottom">
+<tt class="descclassname">OrthographicCamera.</tt><tt class="descname">bottom</tt><a class="headerlink" href="#OrthographicCamera.bottom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Camera frustum bottom plane</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="OrthographicCamera.near">
+<tt class="descclassname">OrthographicCamera.</tt><tt class="descname">near</tt><a class="headerlink" href="#OrthographicCamera.near" title="Permalink to this definition">¶</a></dt>
+<dd><p>Camera frustum near plane</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="OrthographicCamera.far">
+<tt class="descclassname">OrthographicCamera.</tt><tt class="descname">far</tt><a class="headerlink" href="#OrthographicCamera.far" title="Permalink to this definition">¶</a></dt>
+<dd><p>Camera frustum far plane</p>
+</dd></dl>
+
+<p class="rubric">Method</p>
+<dl class="function">
+<dt id="OrthographicCamera.updateProjectionMatrix">
+<tt class="descclassname">OrthographicCamera.</tt><tt class="descname">updateProjectionMatrix</tt><big>(</big><big>)</big><a class="headerlink" href="#OrthographicCamera.updateProjectionMatrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates camera&#8217;s projection matrix. Must be called after change of parameters.</p>
+</dd></dl>
+
+<p class="rubric">Example</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">camera</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">THREE</span><span class="p">.</span><span class="nx">OrthographicCamera</span><span class="p">(</span>  <span class="nb">window</span><span class="p">.</span><span class="nx">innerWidth</span> <span class="o">/</span> <span class="o">-</span> <span class="mi">2</span><span class="p">,</span> <span class="nb">window</span><span class="p">.</span><span class="nx">innerWidth</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="nb">window</span><span class="p">.</span><span class="nx">innerHeight</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="nb">window</span><span class="p">.</span><span class="nx">innerHeight</span> <span class="o">/</span> <span class="o">-</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1000</span> <span class="p">);</span>
+<span class="nx">scene</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span> <span class="nx">camera</span> <span class="p">);</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Camera.html"
+                        title="previous chapter">Camera - Abstract base class for cameras</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="PerspectiveCamera.html"
+                        title="next chapter">PerspectiveCamera - Camera with perspective projection</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/api/cameras/OrthographicCamera.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="PerspectiveCamera.html" title="PerspectiveCamera - Camera with perspective projection"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Camera.html" title="Camera - Abstract base class for cameras"
+             >previous</a> |</li>
+        <li><a href="../../index.html">three.js v48dev documentation</a> &raquo;</li>
+          <li><a href="index.html" >Cameras</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010-2012, three.js Authors.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

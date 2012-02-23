@@ -1,0 +1,64 @@
+<html>
+	<head>
+		<title>three.js - documentation</title>
+		<style>
+			body {
+				margin: 0;
+			}
+
+			#panel	{
+
+				position: fixed;
+
+				left: 0px;
+				top: 0px;
+
+				width: 200px;
+				height: 100%;
+
+				padding: 20px 0px 0px 20px;
+
+				font-size: 18px;
+
+			}
+
+			iframe {
+
+				border: 0;
+
+			}
+		</style>
+	</head>
+	<body>
+		<div id="panel">
+
+			Cameras
+			<ul>
+				<li><a href="api/cameras/Camera.html">Camera</a></li>
+				<li><a href="api/cameras/PerspectiveCamera.html">PerspectiveCamera</a></li>
+				<li><a href="api/cameras/OrtographicCamera.html">OrtographicCamera</a></li>
+			</ul>
+
+		</div>
+
+		<iframe id="page" src="api/cameras/Camera.html"></iframe>
+
+		<script>
+
+			var margin = 220, page = document.getElementById( 'page' );
+
+			function updateLayout() {
+
+				page.style.marginLeft = margin + 'px';
+				page.style.width = ( window.innerWidth - margin ) + 'px';
+				page.style.height = window.innerHeight + 'px';
+
+			}
+
+			window.addEventListener( 'resize', updateLayout, false );
+
+			updateLayout();
+
+		</script>
+	</body>
+</html>

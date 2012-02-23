@@ -1,0 +1,386 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Color - Represents a color &mdash; three.js v48dev documentation</title>
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '48dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="three.js v48dev documentation" href="../../index.html" />
+    <link rel="up" title="Core" href="index.html" />
+    <link rel="next" title="Edge - Edge between two vertices" href="Edge.html" />
+    <link rel="prev" title="Clock - Keeps track of time" href="Clock.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Edge.html" title="Edge - Edge between two vertices"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Clock.html" title="Clock - Keeps track of time"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">three.js v48dev documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Core</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="color-represents-a-color">
+<h1>Color - Represents a color<a class="headerlink" href="#color-represents-a-color" title="Permalink to this headline">¶</a></h1>
+<p class="rubric">Constructor</p>
+<dl class="class">
+<dt id="Color">
+<em class="property">class </em><tt class="descname">Color</tt><big>(</big><em>hex</em><big>)</big><a class="headerlink" href="#Color" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents a color</p>
+<p>See also <tt class="xref js js-class docutils literal"><span class="pre">ColorUtils()</span></tt></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>hex</strong> (<em>integer</em>) &#8211; Hex value to intialize the color</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<p class="rubric">Attributes</p>
+<dl class="attribute">
+<dt id="Color.r">
+<tt class="descclassname">Color.</tt><tt class="descname">r</tt><a class="headerlink" href="#Color.r" title="Permalink to this definition">¶</a></dt>
+<dd><p>Red channel (float between 0 and 1) (default <tt class="docutils literal"><span class="pre">1</span></tt>)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Color.g">
+<tt class="descclassname">Color.</tt><tt class="descname">g</tt><a class="headerlink" href="#Color.g" title="Permalink to this definition">¶</a></dt>
+<dd><p>Green channel (float between 0 and 1) (default <tt class="docutils literal"><span class="pre">1</span></tt>)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Color.b">
+<tt class="descclassname">Color.</tt><tt class="descname">b</tt><a class="headerlink" href="#Color.b" title="Permalink to this definition">¶</a></dt>
+<dd><p>Blue channel (float between 0 and 1) (default <tt class="docutils literal"><span class="pre">1</span></tt>)</p>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<dl class="function">
+<dt id="Color.clone">
+<tt class="descclassname">Color.</tt><tt class="descname">clone</tt><big>(</big><big>)</big><a class="headerlink" href="#Color.clone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clones this color</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">New instance identical to this color</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><a class="reference internal" href="#Color" title="Color"><tt class="xref js js-class docutils literal"><span class="pre">Color()</span></tt></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Color.copy">
+<tt class="descclassname">Color.</tt><tt class="descname">copy</tt><big>(</big><em>color</em><big>)</big><a class="headerlink" href="#Color.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copies given <tt class="docutils literal"><span class="pre">color</span></tt> into this color</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>color</strong> (<a class="reference internal" href="#Color" title="Color"><em>Color</em></a>) &#8211; Color to copy</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">This color</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Color" title="Color"><tt class="xref js js-class docutils literal"><span class="pre">Color()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Color.copyGammaToLinear">
+<tt class="descclassname">Color.</tt><tt class="descname">copyGammaToLinear</tt><big>(</big><em>color</em><big>)</big><a class="headerlink" href="#Color.copyGammaToLinear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copies given <tt class="docutils literal"><span class="pre">color</span></tt> into this color, making conversion from gamma to linear color space</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>color</strong> (<a class="reference internal" href="#Color" title="Color"><em>Color</em></a>) &#8211; Color to copy</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">This color</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Color" title="Color"><tt class="xref js js-class docutils literal"><span class="pre">Color()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Color.copyLinearToGamma">
+<tt class="descclassname">Color.</tt><tt class="descname">copyLinearToGamma</tt><big>(</big><em>color</em><big>)</big><a class="headerlink" href="#Color.copyLinearToGamma" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copies given <tt class="docutils literal"><span class="pre">color</span></tt> into this color, making conversion from linear to gamma color space</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>color</strong> (<a class="reference internal" href="#Color" title="Color"><em>Color</em></a>) &#8211; Color to copy</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">This color</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Color" title="Color"><tt class="xref js js-class docutils literal"><span class="pre">Color()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Color.convertGammaToLinear">
+<tt class="descclassname">Color.</tt><tt class="descname">convertGammaToLinear</tt><big>(</big><big>)</big><a class="headerlink" href="#Color.convertGammaToLinear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts this color from gamma to linear color space</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">This color</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><a class="reference internal" href="#Color" title="Color"><tt class="xref js js-class docutils literal"><span class="pre">Color()</span></tt></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Color.convertLinearToGamma">
+<tt class="descclassname">Color.</tt><tt class="descname">convertLinearToGamma</tt><big>(</big><big>)</big><a class="headerlink" href="#Color.convertLinearToGamma" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts this color from linear to gamma color space</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">This color</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><a class="reference internal" href="#Color" title="Color"><tt class="xref js js-class docutils literal"><span class="pre">Color()</span></tt></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Color.setRGB">
+<tt class="descclassname">Color.</tt><tt class="descname">setRGB</tt><big>(</big><em>r</em>, <em>g</em>, <em>b</em><big>)</big><a class="headerlink" href="#Color.setRGB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets this color from RGB values</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>r</strong> (<em>float</em>) &#8211; Red channel value (between 0 and 1)</li>
+<li><strong>g</strong> (<em>float</em>) &#8211; Green channel value (between 0 and 1)</li>
+<li><strong>b</strong> (<em>float</em>) &#8211; Blue channel value (between 0 and 1)</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">This color</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Color" title="Color"><tt class="xref js js-class docutils literal"><span class="pre">Color()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Color.setHSV">
+<tt class="descclassname">Color.</tt><tt class="descname">setHSV</tt><big>(</big><em>h</em>, <em>s</em>, <em>v</em><big>)</big><a class="headerlink" href="#Color.setHSV" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets this color from HSV values.</p>
+<p>Based on MochiKit implementation by Bob Ippolito.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>h</strong> (<em>float</em>) &#8211; Hue channel (between 0 and 1)</li>
+<li><strong>s</strong> (<em>float</em>) &#8211; Saturation channel (between 0 and 1)</li>
+<li><strong>v</strong> (<em>float</em>) &#8211; Value channel (between 0 and 1)</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">This color</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Color" title="Color"><tt class="xref js js-class docutils literal"><span class="pre">Color()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Color.setHex">
+<tt class="descclassname">Color.</tt><tt class="descname">setHex</tt><big>(</big><em>hex</em><big>)</big><a class="headerlink" href="#Color.setHex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets this color from a hex value</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>hex</strong> (<em>integer</em>) &#8211; Value of the color in hex (between <tt class="docutils literal"><span class="pre">0x000000</span></tt> and <tt class="docutils literal"><span class="pre">0xffffff</span></tt>)</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">This color</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Color" title="Color"><tt class="xref js js-class docutils literal"><span class="pre">Color()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Color.getHex">
+<tt class="descclassname">Color.</tt><tt class="descname">getHex</tt><big>(</big><big>)</big><a class="headerlink" href="#Color.getHex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the value of this color in hex</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">Color value in hex</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body">integer</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Color.getContextStyle">
+<tt class="descclassname">Color.</tt><tt class="descname">getContextStyle</tt><big>(</big><big>)</big><a class="headerlink" href="#Color.getContextStyle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the value of this color in CSS context style.</p>
+<p>Example: <tt class="docutils literal"><span class="pre">rgb(</span> <span class="pre">r,</span> <span class="pre">g,</span> <span class="pre">b</span> <span class="pre">)</span></tt></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">CSS-formatted color value</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body">string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<p class="rubric">Example</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">colors</span> <span class="o">=</span> <span class="p">[];</span>
+
+<span class="k">for</span> <span class="p">(</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="mi">5000</span><span class="p">;</span> <span class="nx">i</span> <span class="o">++</span> <span class="p">)</span> <span class="p">{</span>
+
+    <span class="nx">x</span> <span class="o">=</span> <span class="mi">2000</span> <span class="o">*</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1000</span><span class="p">;</span>
+    <span class="nx">colors</span><span class="p">[</span> <span class="nx">i</span> <span class="p">]</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">THREE</span><span class="p">.</span><span class="nx">Color</span><span class="p">(</span> <span class="mh">0xffffff</span> <span class="p">);</span>
+    <span class="nx">colors</span><span class="p">[</span> <span class="nx">i</span> <span class="p">].</span><span class="nx">setHSV</span><span class="p">(</span> <span class="p">(</span> <span class="nx">x</span> <span class="o">+</span> <span class="mi">1000</span> <span class="p">)</span> <span class="o">/</span> <span class="mi">2000</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span> <span class="p">);</span>
+
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Clock.html"
+                        title="previous chapter">Clock - Keeps track of time</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="Edge.html"
+                        title="next chapter">Edge - Edge between two vertices</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/api/core/Color.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="Edge.html" title="Edge - Edge between two vertices"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Clock.html" title="Clock - Keeps track of time"
+             >previous</a> |</li>
+        <li><a href="../../index.html">three.js v48dev documentation</a> &raquo;</li>
+          <li><a href="index.html" >Core</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010-2012, three.js Authors.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

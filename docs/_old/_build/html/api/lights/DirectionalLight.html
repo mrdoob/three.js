@@ -1,0 +1,267 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>DirectionalLight - A directional light &mdash; three.js v48dev documentation</title>
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '48dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="three.js v48dev documentation" href="../../index.html" />
+    <link rel="up" title="Lights" href="index.html" />
+    <link rel="next" title="PointLight - A point light" href="PointLight.html" />
+    <link rel="prev" title="AmbientLight - An ambient light" href="AmbientLight.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="PointLight.html" title="PointLight - A point light"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="AmbientLight.html" title="AmbientLight - An ambient light"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">three.js v48dev documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Lights</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="directionallight-a-directional-light">
+<h1>DirectionalLight - A directional light<a class="headerlink" href="#directionallight-a-directional-light" title="Permalink to this headline">¶</a></h1>
+<p class="rubric">Constructor</p>
+<dl class="class">
+<dt id="DirectionalLight">
+<em class="property">class </em><tt class="descname">DirectionalLight</tt><big>(</big><em>hex</em>, <em>intensity</em>, <em>distance</em><big>)</big><a class="headerlink" href="#DirectionalLight" title="Permalink to this definition">¶</a></dt>
+<dd><p>A directional light</p>
+<p>Part of scene graph</p>
+<p>Inherits from <a class="reference internal" href="Light.html#Light" title="Light"><tt class="xref js js-class docutils literal"><span class="pre">Light()</span></tt></a> <a class="reference internal" href="../core/Object3D.html#Object3D" title="Object3D"><tt class="xref js js-class docutils literal"><span class="pre">Object3D()</span></tt></a></p>
+<p>Affects <tt class="xref js js-class docutils literal"><span class="pre">MeshLambertMaterial()</span></tt> and <tt class="xref js js-class docutils literal"><span class="pre">MeshPhongMaterial()</span></tt></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>hex</strong> (<em>integer</em>) &#8211; light color</li>
+<li><strong>intensity</strong> (<em>float</em>) &#8211; light intensity</li>
+<li><strong>distance</strong> (<em>float</em>) &#8211; distance affected by light</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<p class="rubric">Attributes</p>
+<dl class="attribute">
+<dt id="DirectionalLight.color">
+<tt class="descclassname">DirectionalLight.</tt><tt class="descname">color</tt><a class="headerlink" href="#DirectionalLight.color" title="Permalink to this definition">¶</a></dt>
+<dd><p>Light <a class="reference internal" href="../core/Color.html#Color" title="Color"><tt class="xref js js-class docutils literal"><span class="pre">Color()</span></tt></a></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="DirectionalLight.intensity">
+<tt class="descclassname">DirectionalLight.</tt><tt class="descname">intensity</tt><a class="headerlink" href="#DirectionalLight.intensity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Light intensity</p>
+<p><tt class="docutils literal"><span class="pre">default</span> <span class="pre">1.0</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="DirectionalLight.position">
+<tt class="descclassname">DirectionalLight.</tt><tt class="descname">position</tt><a class="headerlink" href="#DirectionalLight.position" title="Permalink to this definition">¶</a></dt>
+<dd><p>Direction of the light is normalized vector from <tt class="docutils literal"><span class="pre">position</span></tt> to <tt class="docutils literal"><span class="pre">(0,0,0)</span></tt>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="DirectionalLight.distance">
+<tt class="descclassname">DirectionalLight.</tt><tt class="descname">distance</tt><a class="headerlink" href="#DirectionalLight.distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Modulating directional light by distance not implemented in <tt class="xref js js-class docutils literal"><span class="pre">WebGLRenderer()</span></tt></p>
+</dd></dl>
+
+<p class="rubric">Shadow attributes</p>
+<dl class="attribute">
+<dt id="DirectionalLight.castShadow">
+<tt class="descclassname">DirectionalLight.</tt><tt class="descname">castShadow</tt><a class="headerlink" href="#DirectionalLight.castShadow" title="Permalink to this definition">¶</a></dt>
+<dd><p>If set to <cite>true</cite> light will cast dynamic shadows</p>
+<p>Warning: this is expensive and requires tweaking to get shadows looking right.</p>
+<p><tt class="docutils literal"><span class="pre">default</span> <span class="pre">false</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="DirectionalLight.onlyShadow">
+<tt class="descclassname">DirectionalLight.</tt><tt class="descname">onlyShadow</tt><a class="headerlink" href="#DirectionalLight.onlyShadow" title="Permalink to this definition">¶</a></dt>
+<dd><p>If set to <cite>true</cite> light will only cast shadow but not contribute any lighting (as if intensity was 0 but cheaper to compute)</p>
+<p><tt class="docutils literal"><span class="pre">default</span> <span class="pre">false</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="DirectionalLight.target">
+<tt class="descclassname">DirectionalLight.</tt><tt class="descname">target</tt><a class="headerlink" href="#DirectionalLight.target" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="../core/Object3D.html#Object3D" title="Object3D"><tt class="xref js js-class docutils literal"><span class="pre">Object3D()</span></tt></a> target used for shadow camera orientation</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="DirectionalLight.shadowCameraNear">
+<tt class="descclassname">DirectionalLight.</tt><tt class="descname">shadowCameraNear</tt><a class="headerlink" href="#DirectionalLight.shadowCameraNear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Orthographic shadow camera frustum parameter</p>
+<p><tt class="docutils literal"><span class="pre">default</span> <span class="pre">50</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="DirectionalLight.shadowCameraFar">
+<tt class="descclassname">DirectionalLight.</tt><tt class="descname">shadowCameraFar</tt><a class="headerlink" href="#DirectionalLight.shadowCameraFar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Orthographic shadow camera frustum parameter</p>
+<p><tt class="docutils literal"><span class="pre">default</span> <span class="pre">5000</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="DirectionalLight.shadowCameraLeft">
+<tt class="descclassname">DirectionalLight.</tt><tt class="descname">shadowCameraLeft</tt><a class="headerlink" href="#DirectionalLight.shadowCameraLeft" title="Permalink to this definition">¶</a></dt>
+<dd><p>Orthographic shadow camera frustum parameter</p>
+<p><tt class="docutils literal"><span class="pre">default</span> <span class="pre">-500</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="DirectionalLight.shadowCameraRight">
+<tt class="descclassname">DirectionalLight.</tt><tt class="descname">shadowCameraRight</tt><a class="headerlink" href="#DirectionalLight.shadowCameraRight" title="Permalink to this definition">¶</a></dt>
+<dd><p>Orthographic shadow camera frustum parameter</p>
+<p><tt class="docutils literal"><span class="pre">default</span> <span class="pre">500</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="DirectionalLight.shadowCameraTop">
+<tt class="descclassname">DirectionalLight.</tt><tt class="descname">shadowCameraTop</tt><a class="headerlink" href="#DirectionalLight.shadowCameraTop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Orthographic shadow camera frustum parameter</p>
+<p><tt class="docutils literal"><span class="pre">default</span> <span class="pre">500</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="DirectionalLight.shadowCameraBottom">
+<tt class="descclassname">DirectionalLight.</tt><tt class="descname">shadowCameraBottom</tt><a class="headerlink" href="#DirectionalLight.shadowCameraBottom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Orthographic shadow camera frustum parameter</p>
+<p><tt class="docutils literal"><span class="pre">default</span> <span class="pre">-500</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="DirectionalLight.shadowCameraVisible">
+<tt class="descclassname">DirectionalLight.</tt><tt class="descname">shadowCameraVisible</tt><a class="headerlink" href="#DirectionalLight.shadowCameraVisible" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show debug shadow camera frustum</p>
+<p><tt class="docutils literal"><span class="pre">default</span> <span class="pre">false</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="DirectionalLight.shadowBias">
+<tt class="descclassname">DirectionalLight.</tt><tt class="descname">shadowBias</tt><a class="headerlink" href="#DirectionalLight.shadowBias" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shadow map bias</p>
+<p><tt class="docutils literal"><span class="pre">default</span> <span class="pre">0</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="DirectionalLight.shadowDarkness">
+<tt class="descclassname">DirectionalLight.</tt><tt class="descname">shadowDarkness</tt><a class="headerlink" href="#DirectionalLight.shadowDarkness" title="Permalink to this definition">¶</a></dt>
+<dd><p>Darkness of shadow casted by this light (<tt class="docutils literal"><span class="pre">float</span></tt> from 0 to 1)</p>
+<p><tt class="docutils literal"><span class="pre">default</span> <span class="pre">0.5</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="DirectionalLight.shadowMapWidth">
+<tt class="descclassname">DirectionalLight.</tt><tt class="descname">shadowMapWidth</tt><a class="headerlink" href="#DirectionalLight.shadowMapWidth" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shadow map texture width in pixels</p>
+<p><tt class="docutils literal"><span class="pre">default</span> <span class="pre">512</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="DirectionalLight.shadowMapHeight">
+<tt class="descclassname">DirectionalLight.</tt><tt class="descname">shadowMapHeight</tt><a class="headerlink" href="#DirectionalLight.shadowMapHeight" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shadow map texture height in pixels</p>
+<p><tt class="docutils literal"><span class="pre">default</span> <span class="pre">512</span></tt></p>
+</dd></dl>
+
+<p class="rubric">Example</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="c1">// white directional light at half intensity shining from the top</span>
+
+<span class="kd">var</span> <span class="nx">directionalLight</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">THREE</span><span class="p">.</span><span class="nx">DirectionalLight</span><span class="p">(</span> <span class="mh">0xffffff</span><span class="p">,</span> <span class="mf">0.5</span> <span class="p">);</span>
+<span class="nx">directionalLight</span><span class="p">.</span><span class="nx">position</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span> <span class="p">);</span>
+<span class="nx">scene</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span> <span class="nx">directionalLight</span> <span class="p">);</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="AmbientLight.html"
+                        title="previous chapter">AmbientLight - An ambient light</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="PointLight.html"
+                        title="next chapter">PointLight - A point light</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/api/lights/DirectionalLight.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="PointLight.html" title="PointLight - A point light"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="AmbientLight.html" title="AmbientLight - An ambient light"
+             >previous</a> |</li>
+        <li><a href="../../index.html">three.js v48dev documentation</a> &raquo;</li>
+          <li><a href="index.html" >Lights</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010-2012, three.js Authors.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>
