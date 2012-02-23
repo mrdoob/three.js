@@ -1659,7 +1659,7 @@ def generate_embeds(data):
 
         for e in data["embeds"]:
 
-            embed = '"emb_%s": {%s}' % (e, data["embeds"][e])
+            embed = '"emb_%s": %s' % (e, data["embeds"][e])
             chunks.append(embed)
 
         return ",\n\n".join(chunks)
@@ -1840,7 +1840,7 @@ def save(operator, context, filepath = "",
                                                         option_animation,
                                                         option_frame_step)
 
-                        embeds[name] = model_string
+                        embeds[name] = text
 
                     else:
 
