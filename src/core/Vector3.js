@@ -255,25 +255,6 @@ THREE.Vector3.prototype = {
 
 	},
 
-	relativeToAbsolute: function ( object ) {
-
-		var result = THREE.Vector3.__v1;
-		result.copy( this );
-
-		return object.matrixWorld.multiplyVector3( result );
-
-	},
-
-	absoluteToRelative: function ( object ) {
-
-		var mInverse = THREE.Matrix4.__m3;
-		var result = THREE.Vector3.__v1;
-		result.copy( this );
-
-		return mInverse.getInverse( object.matrixWorld ).multiplyVector3( result );
-
-	},
-
 	distanceTo: function ( v ) {
 
 		return Math.sqrt( this.distanceToSquared( v ) );
@@ -320,6 +301,44 @@ THREE.Vector3.prototype = {
 
 	},
 
+	// from http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/index.htm
+	// assuming heading == y, attitude == z, bank == x
+
+	getRotationFromQuaternion: function ( q ) {
+
+		var sqw = q.w * q.w;
+		var sqx = q.x * q.x;
+		var sqy = q.y * q.y;
+		var sqz = q.z * q.z;
+		var unit = sqx + sqy + sqz + sqw; // if normalised is one, otherwise is correction factor
+		var test = q.x * q.y + q.z * q.w;
+
+		if ( test > 0.499 * unit ) { // singularity at north pole
+
+			this.y = 2 * Math.atan2( q.x, q.w );
+			this.z = Math.PI / 2;
+			this.x = 0;
+
+			return;
+
+		}
+
+		if ( test < -0.499 * unit ) { // singularity at south pole
+
+			this.y = -2 * Math.atan2( q.x, q.w );
+			this.z = -Math.PI / 2;
+			this.x = 0;
+
+			return;
+
+		}
+
+		this.y = Math.atan2( 2 * q.y * q.w - 2 * q.x * q.z, sqx - sqy - sqz + sqw );
+		this.z = Math.asin( 2 * test / unit );
+		this.x = Math.atan2( 2 * q.x * q.w - 2 * q.y * q.z, -sqx + sqy - sqz + sqw );
+
+	},
+
 	getScaleFromMatrix: function ( m ) {
 
 		var x = this.set( m.n11, m.n21, m.n31 ).length();
@@ -346,4 +365,3 @@ THREE.Vector3.prototype = {
 
 };
 
-THREE.Vector3.__v1 = new THREE.Vector3();

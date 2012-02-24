@@ -43,7 +43,7 @@ THREE.Geometry.prototype = {
 	applyMatrix: function ( matrix ) {
 
 		var matrixRotation = new THREE.Matrix4();
-		matrixRotation.extractRotation( matrix, new THREE.Vector3( 1, 1, 1 ) );
+		matrixRotation.extractRotation( matrix );
 
 		for ( var i = 0, il = this.vertices.length; i < il; i ++ ) {
 
