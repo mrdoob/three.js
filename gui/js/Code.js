@@ -138,9 +138,9 @@ var Code = function () {
 
 		_list.length = 0;
 
-		for ( var i = 0, l = scene.objects.length; i < l; i ++ ) {
+		for ( var i = 0, l = scene.children.length; i < l; i ++ ) {
 
-			var object = scene.objects[ i ];
+			var object = scene.children[ i ];
 
 			if ( object.geometry == undefined || object.geometry.gui == undefined ) {
 
@@ -168,7 +168,7 @@ var Code = function () {
 				if ( object.scale.y != 1 ) string += '\n\tmesh.scale.y = ' + object.scale.y + ';';
 				if ( object.scale.z != 1 ) string += '\n\tmesh.scale.z = ' + object.scale.z + ';';
 
-				string += '\n\tscene.addObject( mesh );'; // string += '\n\tscene.add( mesh );';
+				string += '\n\tscene.add( mesh );';
 
 				_list.push( string );
 
