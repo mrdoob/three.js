@@ -17,23 +17,23 @@
 
 				position: fixed;
 
-				width: 160px;
-
-				padding-left: 20px;
+				width: 260px;
 
 				overflow: auto;
 
 			}
+
 				#panel h1 {
 					color: #999;
 					font-size: 18px;
 					margin-top: 30px;
+					margin-left: 20px;
 				}
 
 				#panel ul {
 					list-style-type: none;
 					padding: 0px;
-					margin: 0px;
+					margin-left: 20px;
 				}
 
 			#viewer {
@@ -84,12 +84,17 @@
 			var viewer = document.getElementById( 'viewer' );
 
 			var pages = {
-				"Arrya": "Array",
-				"Number": "Number",
-				"Camera": "cameras/Camera"
+				"Array": "Array",
+				"Number": "Number"
 			};
 
 			var list = {
+
+				"Cameras": [
+					{ name: "Camera", path: "cameras/Camera" },
+					{ name: "PerspectiveCamera", path: "cameras/PerspectiveCamera" },
+					{ name: "OrtographicCamera", path: "cameras/OrtographicCamera" }
+				],
 
 				"Core": [
 					{ name: "Clock", path: "core/Clock" },
@@ -115,17 +120,168 @@
 					{ name: "Vertex", path: "core/Vertex" }
 				],
 
-				"Cameras": [
-					{ name: "PerspectiveCamera", path: "cameras/PerspectiveCamera" },
-					{ name: "OrtographicCamera", path: "cameras/OrtographicCamera" }
-				],
-
 				"Lights": [
 					{ name: "AmbientLight", path: "lights/AmbientLight" },
 					{ name: "DirectionalLight", path: "lights/DirectionalLight" },
+					{ name: "Light", path: "lights/Light" },
 					{ name: "PointLight", path: "lights/PointLight" },
-					{ name: "SpotLight", path: "lights/SpotLight" },
-				]
+					{ name: "SpotLight", path: "lights/SpotLight" }
+				],
+
+				"Materials": [
+					{ name: "Material", path: "materials/Material" },
+					{ name: "LineBasicMaterial", path: "materials/LineBasicMaterial" },
+					{ name: "MeshBasicMaterial", path: "materials/MeshBasicMaterial" },
+					{ name: "MeshDepthMaterial", path: "materials/MeshDepthMaterial" },
+					{ name: "MeshFaceMaterial", path: "materials/MeshFaceMaterial" },
+					{ name: "MeshLambertMaterial", path: "materials/MeshLambertMaterial" },
+					{ name: "MeshNormalMaterial", path: "materials/MeshNormalMaterial" },
+					{ name: "MeshPhongMaterial", path: "materials/MeshPhongMaterial" },
+					{ name: "ParticleBasicMaterial", path: "materials/ParticleBasicMaterial" },
+					{ name: "ParticleCanvasMaterial", path: "materials/ParticleCanvasMaterial" },
+					{ name: "ParticleDOMMaterial", path: "materials/ParticleDOMMaterial" },
+					{ name: "ShaderMaterial", path: "materials/ShaderMaterial" }
+
+				],
+
+				"Objects": [
+					{ name: "Bone", path: "objects/Bone" },
+					{ name: "Line", path: "objects/Line" },
+					{ name: "LOD", path: "objects/LOD" },
+					{ name: "Mesh", path: "objects/Mesh" },
+					{ name: "MorphAnimMesh", path: "objects/MorphAnimMesh" },
+					{ name: "Particle", path: "objects/Particle" },
+					{ name: "ParticleSystem", path: "objects/ParticleSystem" },
+					{ name: "Ribbon", path: "objects/Ribbon" },
+					{ name: "SkinnedMesh", path: "objects/SkinnedMesh" },
+					{ name: "Sprite", path: "objects/Sprite" }
+
+				],
+
+				"Renderers": [
+					{ name: "CanvasRenderer", path: "renderers/CanvasRenderer" },
+					{ name: "DOMRenderer", path: "renderers/DOMRenderer" },
+					{ name: "SVGRenderer", path: "renderers/SVGRenderer" },
+					{ name: "WebGLRenderer", path: "renderers/WebGLRenderer" },
+					{ name: "WebGLRenderTarget", path: "renderers/WebGLRenderTarget" },
+					{ name: "WebGLRenderTargetCube", path: "renderers/WebGLRenderTargetCube" },
+					{ name: "WebGLShaders", path: "renderers/WebGLShaders" }
+				],
+
+				"Renderers / Renderables": [
+					{ name: "RenderableFace3", path: "renderers/renderables/RenderableFace3" },
+					{ name: "RenderableFace4", path: "renderers/renderables/RenderableFace4" },
+					{ name: "RenderableLine", path: "renderers/renderables/RenderableLine" },
+					{ name: "RenderableObject", path: "renderers/renderables/RenderableObject" },
+					{ name: "RenderableParticle", path: "renderers/renderables/RenderableParticle" },
+					{ name: "RenderableVertex", path: "renderers/renderables/RenderableVertex" }
+				],
+
+				"Scenes": [
+					{ name: "Fog", path: "scenes/Fog" },
+					{ name: "FogExp2", path: "scenes/FogExp2" },
+					{ name: "Scene", path: "scenes/Scene" }
+				],
+
+				"Textures": [
+					{ name: "DataTexture", path: "textures/DataTexture" },
+					{ name: "Texture", path: "textures/Texture" }
+				],
+
+				"Extras": [
+					{ name: "ColorUtils", path: "extras/ColorUtils" },
+					{ name: "GeometryUtils", path: "extras/GeometryUtils" },
+					{ name: "ImageUtils", path: "extras/ImageUtils" },
+					{ name: "SceneUtils", path: "extras/SceneUtils" },
+					{ name: "ShaderUtils", path: "extras/ShaderUtils" }
+				],
+
+				"Extras / Animation": [
+					{ name: "Animation", path: "extras/animation/Animation" },
+					{ name: "AnimationHandler", path: "extras/animation/AnimationHandler" },
+					{ name: "AnimationMorphTarget", path: "extras/animation/AnimationMorphTarget" },
+					{ name: "KeyFrameAnimation", path: "extras/animation/KeyFrameAnimation" }
+				],
+
+				"Extras / Cameras": [
+					{ name: "CombinedCamera", path: "extras/cameras/CombinedCamera" },
+					{ name: "CubeCamera", path: "extras/cameras/CubeCamera" }
+				],
+
+				"Extras / Controls": [
+					{ name: "FirstPersonControls", path: "extras/controls/FirstPersonControls" },
+					{ name: "FlyControls", path: "extras/controls/FlyControls" },
+					{ name: "PathControls", path: "extras/controls/PathControls" },
+					{ name: "RollControls", path: "extras/controls/RollControls" },
+					{ name: "TrackballControls", path: "extras/controls/TrackballControls" }
+				],
+
+				"Extras / Core": [
+					{ name: "BufferGeometry", path: "extras/core/BufferGeometry" },
+					{ name: "Curve", path: "extras/core/Curve" },
+					{ name: "CurvePath", path: "extras/core/CurvePath" },
+					{ name: "EventTarget", path: "extras/core/EventTarget" },
+					{ name: "Gyroscope", path: "extras/core/Gyroscope" },
+					{ name: "Path", path: "extras/core/Path" },
+					{ name: "Shape", path: "extras/core/Shape" },
+					{ name: "TextPath", path: "extras/core/TextPath" }
+				],
+
+				"Extras / Geometries": [
+					{ name: "CubeGeometry", path: "extras/geometries/CubeGeometry" },
+					{ name: "CylinderGeometry", path: "extras/geometries/CylinderGeometry" },
+					{ name: "ExtrudeGeometry", path: "extras/geometries/ExtrudeGeometry" },
+					{ name: "IcosahedronGeometry", path: "extras/geometries/IcosahedronGeometry" },
+					{ name: "LatheGeometry", path: "extras/geometries/LatheGeometry" },
+					{ name: "OctahedronGeometry", path: "extras/geometries/OctahedronGeometry" },
+					{ name: "PlaneGeometry", path: "extras/geometries/PlaneGeometry" },
+					{ name: "PolyhedronGeometry", path: "extras/geometries/PolyhedronGeometry" },
+					{ name: "SphereGeometry", path: "extras/geometries/SphereGeometry" },
+					{ name: "TetrahedronGeometry", path: "extras/geometries/TetrahedronGeometry" },
+					{ name: "TextGeometry", path: "extras/geometries/TextGeometry" },
+					{ name: "TorusGeometry", path: "extras/geometries/TorusGeometry" },
+					{ name: "TorusKnotGeometry", path: "extras/geometries/TorusKnotGeometry" }
+				],
+
+				"Extras / Helpers": [
+					{ name: "AxisHelper", path: "extras/helpers/AxisHelper" },
+					{ name: "CameraHelper", path: "extras/helpers/CameraHelper" }
+				],
+
+				"Extras / Loaders": [
+					{ name: "BinaryLoader", path: "extras/loaders/BinaryLoader" },
+					{ name: "ColladaLoader", path: "extras/loaders/ColladaLoader" },
+					{ name: "JSONLoader", path: "extras/loaders/JSONLoader" },
+					{ name: "Loader", path: "extras/loaders/Loader" },
+					{ name: "SceneLoader", path: "extras/loaders/SceneLoader" },
+					{ name: "UTF8Loader", path: "extras/loaders/UTF8Loader" }
+				],
+
+				"Extras / Modifiers": [
+					{ name: "SubdivisionModifier", path: "extras/modifiers/SubdivisionModifier" }
+				],
+
+				"Extras / Objects": [
+					{ name: "LensFlare", path: "extras/objects/LensFlare" },
+					{ name: "MarchingCubes", path: "extras/objects/MarchingCubes" }
+				],
+
+				"Extras / Renderers": [
+					{ name: "AnaglyphWebGLRenderer", path: "extras/renderers/AnaglyphWebGLRenderer" },
+					{ name: "CrosseyedWebGLRenderer", path: "extras/renderers/CrosseyedWebGLRenderer" },
+					{ name: "ParallaxBarrierWebGLRenderer", path: "extras/renderers/ParallaxBarrierWebGLRenderer" }
+				],
+
+				"Extras / Renderers / Plugins": [
+					{ name: "LensFlarePlugin", path: "extras/renderers/plugins/LensFlarePlugin" },
+					{ name: "ShadowMapPlugin", path: "extras/renderers/plugins/ShadowMapPlugin" },
+					{ name: "SpritePlugin", path: "extras/renderers/plugins/SpritePlugin" }
+				],
+
+				"Extras / Shaders": [
+					{ name: "ShaderFlares", path: "extras/shaders/ShaderFlares" },
+					{ name: "ShaderSprite", path: "extras/shaders/ShaderSprite" }
+				],
 
 			};
 
@@ -135,6 +291,8 @@
 
 				html += '<h1>' + category + '</h1>';
 
+				html += '<ul>';
+
 				for ( var i = 0; i < list[ category ].length; i ++ ) {
 
 					var page = list[ category ][ i ];
@@ -143,9 +301,11 @@
 
 				}
 
+				html += '</ul>';
+
 			}
 
-			panel.innerHTML += '<ul>' + html + '</ul>';
+			panel.innerHTML += html;
 
 			// Page loading
 
@@ -184,7 +344,7 @@
 
 			// Layout
 
-			var margin = 200;
+			var margin = 280;
 
 			function updateLayout() {
 
