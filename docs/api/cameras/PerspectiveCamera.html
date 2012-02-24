@@ -12,7 +12,7 @@ scene.add( camera );
 
 <h2>Constructor</h2>
 
-<h3>[name]( fov [page:Number], aspect [page:Number], near [page:Number], far [page:Number] )</h3>
+<h3>[name]( [page:Number fov], [page:Number aspect], [page:Number near], [page:Number far] )</h3>
 <div>
 fov — camera frustum vertical field of view.<br />
 aspect — camera frustum aspect ratio.<br />
@@ -23,22 +23,22 @@ far — camera frustum far plane.
 
 <h2>Properties</h2>
 
-<h3>.fov [page:Number]</h3>
+<h3>.[page:Number fov]</h3>
 <div>Camera frustum vertical field of view.</div>
 
-<h3>.aspect [page:Number]</h3>
+<h3>.[page:Number aspect]</h3>
 <div>Camera frustum aspect ratio.</div>
 
-<h3>.near [page:Number]</h3>
+<h3>.[page:Number near]</h3>
 <div>Camera frustum near plane.</div>
 
-<h3>.far [page:Number]</h3>
+<h3>.[page:Number far]</h3>
 <div>Camera frustum far plane.</div>
 
 
 <h2>Methods</h2>
 
-<h3>.setLens( focalLength [page:Number], frameSize [page:Number] )</h3>
+<h3>.setLens( [page:Number focalLength], [page:Number frameSize] )</h3>
 <div>
 focalLength — focal length<br />
 frameSize — frame size
@@ -49,7 +49,7 @@ Uses focal length (in mm) to estimate and set FOV 35mm (fullframe) camera is use
 Formula based on <a href="http://www.bobatkins.com/photography/technical/field_of_view.html" target="_blank">http://www.bobatkins.com/photography/technical/field_of_view.html</a>
 </div>
 
-<h3>.setViewOffset( fullWidth [page:Number], fullHeight [page:Number], x [page:Number], y [page:Number], width [page:Number], height [page:Number] )</h3>
+<h3>.setViewOffset( [page:Number fullWidth], [page:Number fullHeight], [page:Number x], [page:Number y], [page:Number width], [page:Number height] )</h3>
 <div>
 fullWidth — full width of multiview setup<br />
 fullHeight — full height of multiview setup<br />

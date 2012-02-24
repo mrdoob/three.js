@@ -335,7 +335,8 @@
 						
 						text = text.replace(/\[name\]/gi, name);
 						text = text.replace(/\[path\]/gi, path);
-						text = text.replace(/\[page:(\w+)\]/gi, "<a href=\"javascript:goTo('$1')\">$1</a>" );
+						text = text.replace(/\[page:(\w+)\]/gi, "<a href=\"javascript:goTo('$1')\" title=\"$1\">$1</a>" );
+						text = text.replace(/\[page:(\w+) (\w+)\]/gi, "<a href=\"javascript:goTo('$1')\" title=\"$1\">$2</a>" );
 
 						viewer.innerHTML = text + '<br>';
 
