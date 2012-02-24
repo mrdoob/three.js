@@ -47,18 +47,27 @@
 				}
 
 				#viewer h2 {
-					color: #999;
+					color: #8B2;
 					font-size: 18px;
 					margin-top: 40px;
 				}
 
 				#viewer h3 {
+					color: #000;
 					font-size: 16px;
 					margin-top: 30px;
+					font-weight: normal;
 				}
 
 				#viewer div {
 					padding-left: 30px;
+					margin-bottom: 20px;
+				}
+
+				#viewer div.desc {
+
+					padding-left: 0px;
+
 				}
 
 				#viewer pre, code {
@@ -297,7 +306,7 @@
 
 					var page = list[ category ][ i ];
 					pages[ page.name ] = page.path;
-					html += '<li><a href="javascript:goTo(\'' + page.path + '\')">' + page.name + '</a></li>';
+					html += '<li><a href="javascript:goTo(\'' + page.name + '\')">' + page.name + '</a></li>';
 
 				}
 
@@ -309,11 +318,12 @@
 
 			// Page loading
 
-			function goTo( path ) {
+			function goTo( name ) {
 
+				var path = pages[ name ];
+
+				window.location.hash = name;
 				viewer.innerHTML = '';
-
-				window.location.hash = path
 
 				var xhr = new XMLHttpRequest();
 				xhr.open( 'GET', 'api/' + path + '.html', true );
@@ -323,12 +333,9 @@
 
 						var text = xhr.responseText;
 						
+						text = text.replace(/\[name\]/gi, name);
 						text = text.replace(/\[path\]/gi, path);
-						text = text.replace(/\[page:(\w+)\]/gi, function ( str, p1 ) {
-
-							return "<a href=\"javascript:goTo('" + pages[ p1 ] + "')\">" + p1 + "</a>";
-
-						} );
+						text = text.replace(/\[page:(\w+)\]/gi, "<a href=\"javascript:goTo('$1')\">$1</a>" );
 
 						viewer.innerHTML = text + '<br>';
 
