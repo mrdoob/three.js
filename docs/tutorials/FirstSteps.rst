@@ -8,7 +8,7 @@ The first step in rendering a three.js scene is creating the WebGL renderer obje
 ::
 
 	var renderer = new THREE.WebGLRenderer();
-	renderer.setSize( 800, 640 );
+	renderer.setSize( window.innerWidth, window.innerHeight );
 	document.body.appendChild( renderer.domElement );
 	
 	var scene = new THREE.Scene();
@@ -17,9 +17,9 @@ The second step is to define a camera which the renderer object will use in rend
 
 ::
 
-	var camera = new THREE.Camera(
-		35,			// Field of view
-		800 / 640,	// Aspect ratio
+	var camera = new THREE.PerspectiveCamera(
+		45,			// Field of view
+		window.innerWidth / window.innerHeight,	// Aspect ratio
 		.1,			// Near
 		10000		// Far
 	);
@@ -35,7 +35,7 @@ Step three creates a white cube that is 5 units wide, tall and deep, adds the La
 		new THREE.CubeGeometry( 5, 5, 5 ),
 		new THREE.MeshLambertMaterial( { color: 0xFF0000 } )
 	);
-	scene.addChild( cube );
+	scene.add( cube );
 
 For the last step in setting up a scene we create a yellow light source and add it to the scene.
 
@@ -43,7 +43,7 @@ For the last step in setting up a scene we create a yellow light source and add 
 
 	var light = new THREE.PointLight( 0xFFFF00 );
 	light.position.set( 10, 0, 10 );
-	scene.addLight( light );
+	scene.add( light );
 
 Finally we render the scene which displays our scene through the camera's eye.
 
@@ -67,14 +67,14 @@ Everything together in a working example with a minimal HTML template:
 		window.onload = function() {
 			
 				var renderer = new THREE.WebGLRenderer();
-				renderer.setSize( 800, 400 );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 				
 				var scene = new THREE.Scene();
 				
 				var camera = new THREE.Camera(
 					35,		// Field of view
-					800 / 400,	// Aspect ratio
+					window.innerWidth / window.innerHeight,	// Aspect ratio
 					.1,		// Near
 					10000		// Far
 				);
@@ -84,11 +84,11 @@ Everything together in a working example with a minimal HTML template:
 					new THREE.CubeGeometry( 5, 5, 5 ),
 					new THREE.MeshLambertMaterial( { color: 0xFF0000 } )
 				);
-				scene.addChild( cube );
+				scene.add( cube );
 				
 				var light = new THREE.PointLight( 0xFFFF00 );
 				light.position.set( 10, 0, 10 );
-				scene.addLight( light );
+				scene.add( light );
 				
 				renderer.render(scene, camera);
 				
