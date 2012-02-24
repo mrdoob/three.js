@@ -31,8 +31,8 @@
 
 				#panel h1 {
 					color: #999;
-					font-size: 18px;
-					margin-top: 30px;
+					font-size: 16px;
+					margin-top: 16px;
 					margin-left: 20px;
 				}
 
@@ -49,7 +49,7 @@
 				#viewer h1 {
 					color: #444;
 					font-size: 25px;
-					margin-top: 25px;
+					margin-top: 10px;
 				}
 
 				#viewer h2 {
@@ -344,7 +344,7 @@
 						text = text.replace(/\[page:(\w+)\]/gi, "<a href=\"javascript:goTo('$1')\" title=\"$1\">$1</a>" );
 						text = text.replace(/\[page:(\w+) (\w+)\]/gi, "<a href=\"javascript:goTo('$1')\" title=\"$1\">$2</a>" );
 
-						viewer.innerHTML = text + '<br>';
+						viewer.innerHTML = '<br>' + text + '<br>';
 
 					}
 
