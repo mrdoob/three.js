@@ -56,6 +56,15 @@ THREE.Object3D.prototype = {
 
 	constructor: THREE.Object3D,
 
+	applyMatrix: function ( matrix ) {
+
+		this.matrix.multiply( matrix, this.matrix );
+		this.position.getPositionFromMatrix( this.matrix );
+		this.rotation.getRotationFromMatrix( this.matrix );
+		this.scale.getScaleFromMatrix( this.matrix );
+
+	},
+
 	translate: function ( distance, axis ) {
 
 		this.matrix.rotateAxis( axis );
@@ -89,7 +98,7 @@ THREE.Object3D.prototype = {
 
 		if ( this.rotationAutoUpdate ) {
 
-			this.rotation.setRotationFromMatrix( this.matrix );
+			this.rotation.getRotationFromMatrix( this.matrix );
 
 		}
 

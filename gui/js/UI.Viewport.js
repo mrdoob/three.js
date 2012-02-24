@@ -70,7 +70,7 @@ UI.Viewport = function () {
 		_projector.unprojectVector( vector, _camera );
 
 		var ray = new THREE.Ray( _camera.position, vector.subSelf( _camera.position ).normalize() );
-		var intersects = ray.intersectScene( _scene );
+		var intersects = ray.intersectObjects( _scene.children );
 
 		if ( intersects.length ) {
 
@@ -92,7 +92,7 @@ UI.Viewport = function () {
 		_projector.unprojectVector( vector, _camera );
 
 		var ray = new THREE.Ray( _camera.position, vector.subSelf( _camera.position ).normalize() );
-		var intersects = ray.intersectScene( _scene );
+		var intersects = ray.intersectObjects( _scene.children );
 
 		if ( _SELECTED ) {
 
