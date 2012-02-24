@@ -279,7 +279,7 @@ THREE.Vector3.prototype = {
 
 	},
 
-	setPositionFromMatrix: function ( m ) {
+	getPositionFromMatrix: function ( m ) {
 
 		this.x = m.n14;
 		this.y = m.n24;
@@ -289,7 +289,9 @@ THREE.Vector3.prototype = {
 
 	},
 
-	setRotationFromMatrix: function ( m ) {
+	getRotationFromMatrix: function ( m ) {
+
+		// TODO: This one doesn't return 100% correct results
 
 		this.y = Math.asin( m.n13 );
 
@@ -311,7 +313,19 @@ THREE.Vector3.prototype = {
 
 	},
 
-	equals: function( v ) {
+	getScaleFromMatrix: function ( m ) {
+
+		var x = this.set( m.n11, m.n21, m.n31 ).length();
+		var y = this.set( m.n12, m.n22, m.n32 ).length();
+		var z = this.set( m.n13, m.n23, m.n33 ).length();
+
+		this.x = x;
+		this.y = y;
+		this.z = z;
+
+	},
+
+	equals: function ( v ) {
 
 		return ( ( v.x === this.x ) && ( v.y === this.y ) && ( v.z === this.z ) );
 
