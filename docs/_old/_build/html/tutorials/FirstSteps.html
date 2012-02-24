@@ -1,0 +1,173 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>First Steps &mdash; three.js v48dev documentation</title>
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '48dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="three.js v48dev documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">three.js v48dev documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="first-steps">
+<h1>First Steps<a class="headerlink" href="#first-steps" title="Permalink to this headline">¶</a></h1>
+<p>Three.js scenes are very easy to setup and only require a few lines of code to initialize. Scenes are constructed using a few different types of objects: cameras, lights, and meshes.</p>
+<p>The first step in rendering a three.js scene is creating the WebGL renderer object. The following code creates an HTML canvas object 800x400 pixels, adds it to the document&#8217;s body, and initializes a three.js scene.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">renderer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">THREE</span><span class="p">.</span><span class="nx">WebGLRenderer</span><span class="p">();</span>
+<span class="nx">renderer</span><span class="p">.</span><span class="nx">setSize</span><span class="p">(</span> <span class="mi">800</span><span class="p">,</span> <span class="mi">640</span> <span class="p">);</span>
+<span class="nb">document</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span> <span class="nx">renderer</span><span class="p">.</span><span class="nx">domElement</span> <span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">scene</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">THREE</span><span class="p">.</span><span class="nx">Scene</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>The second step is to define a camera which the renderer object will use in rendering.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">camera</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">THREE</span><span class="p">.</span><span class="nx">Camera</span><span class="p">(</span>
+        <span class="mi">35</span><span class="p">,</span>                     <span class="c1">// Field of view</span>
+        <span class="mi">800</span> <span class="o">/</span> <span class="mi">640</span><span class="p">,</span>      <span class="c1">// Aspect ratio</span>
+        <span class="p">.</span><span class="mi">1</span><span class="p">,</span>                     <span class="c1">// Near</span>
+        <span class="mi">10000</span>           <span class="c1">// Far</span>
+<span class="p">);</span>
+<span class="nx">camera</span><span class="p">.</span><span class="nx">position</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span> <span class="o">-</span><span class="mi">15</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">15</span> <span class="p">);</span>
+</pre></div>
+</div>
+<p>The first parameter passed determines how wide the field of view is. The second parameter is the aspect ratio which is calculated by dividing the viewing area&#8217;s width by its height. The third and fourth parameters specify cut-off points for objects in the camera&#8217;s view. If an object&#8217;s distance from the camera does not fall in the range between NEAR and FAR then that object is not rendered. The last line sets the camera&#8217;s XYZ coordinates to -15, 10, and 15 respectively.</p>
+<p>Step three creates a white cube that is 5 units wide, tall and deep, adds the Lambert material, and adds it to the scene.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">cube</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">THREE</span><span class="p">.</span><span class="nx">Mesh</span><span class="p">(</span>
+        <span class="k">new</span> <span class="nx">THREE</span><span class="p">.</span><span class="nx">CubeGeometry</span><span class="p">(</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span> <span class="p">),</span>
+        <span class="k">new</span> <span class="nx">THREE</span><span class="p">.</span><span class="nx">MeshLambertMaterial</span><span class="p">(</span> <span class="p">{</span> <span class="nx">color</span><span class="o">:</span> <span class="mh">0xFF0000</span> <span class="p">}</span> <span class="p">)</span>
+<span class="p">);</span>
+<span class="nx">scene</span><span class="p">.</span><span class="nx">addChild</span><span class="p">(</span> <span class="nx">cube</span> <span class="p">);</span>
+</pre></div>
+</div>
+<p>For the last step in setting up a scene we create a yellow light source and add it to the scene.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">light</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">THREE</span><span class="p">.</span><span class="nx">PointLight</span><span class="p">(</span> <span class="mh">0xFFFF00</span> <span class="p">);</span>
+<span class="nx">light</span><span class="p">.</span><span class="nx">position</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span> <span class="p">);</span>
+<span class="nx">scene</span><span class="p">.</span><span class="nx">addLight</span><span class="p">(</span> <span class="nx">light</span> <span class="p">);</span>
+</pre></div>
+</div>
+<p>Finally we render the scene which displays our scene through the camera&#8217;s eye.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">renderer</span><span class="p">.</span><span class="nx">render</span><span class="p">(</span><span class="nx">scene</span><span class="p">,</span> <span class="nx">camera</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Everything together in a working example with a minimal HTML template:</p>
+<div class="highlight-javascript"><pre>&lt;!DOCTYPE html&gt;
+
+&lt;html&gt;
+
+&lt;head&gt;
+        &lt;title&gt;Getting Started with Three.js&lt;/title&gt;
+
+        &lt;script type="text/javascript" src="Three.js"&gt;&lt;/script&gt;
+        &lt;script type="text/javascript"&gt;
+        window.onload = function() {
+
+                        var renderer = new THREE.WebGLRenderer();
+                        renderer.setSize( 800, 400 );
+                        document.body.appendChild( renderer.domElement );
+
+                        var scene = new THREE.Scene();
+
+                        var camera = new THREE.Camera(
+                                35,             // Field of view
+                                800 / 400,      // Aspect ratio
+                                .1,             // Near
+                                10000           // Far
+                        );
+                        camera.position.set( -15, 10, 15 );
+
+                        var cube = new THREE.Mesh(
+                                new THREE.CubeGeometry( 5, 5, 5 ),
+                                new THREE.MeshLambertMaterial( { color: 0xFF0000 } )
+                        );
+                        scene.addChild( cube );
+
+                        var light = new THREE.PointLight( 0xFFFF00 );
+                        light.position.set( 10, 0, 10 );
+                        scene.addLight( light );
+
+                        renderer.render(scene, camera);
+
+        };
+        &lt;/script&gt;
+&lt;/head&gt;
+
+&lt;body&gt;&lt;/body&gt;
+
+&lt;/html&gt;</pre>
+</div>
+<p>That&#8217;s how simple and easy three.js makes WebGL. Only 20 lines of Javascript to initialize and render a scene.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/tutorials/FirstSteps.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">three.js v48dev documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010-2012, three.js Authors.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

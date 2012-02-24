@@ -1,0 +1,1249 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Matrix4 - A 4x4 Matrix &mdash; three.js v48dev documentation</title>
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '48dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="three.js v48dev documentation" href="../../index.html" />
+    <link rel="up" title="Core" href="index.html" />
+    <link rel="next" title="Object3D - Base class for scene graph objects" href="Object3D.html" />
+    <link rel="prev" title="Matrix3 - A 3x3 matrix" href="Matrix3.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Object3D.html" title="Object3D - Base class for scene graph objects"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Matrix3.html" title="Matrix3 - A 3x3 matrix"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">three.js v48dev documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Core</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="matrix4-a-4x4-matrix">
+<h1>Matrix4 - A 4x4 Matrix<a class="headerlink" href="#matrix4-a-4x4-matrix" title="Permalink to this headline">¶</a></h1>
+<p class="rubric">Constructor</p>
+<dl class="class">
+<dt id="Matrix4">
+<em class="property">class </em><tt class="descname">Matrix4</tt><big>(</big><em>n11</em>, <em>n12</em>, <em>n13</em>, <em>n14</em>, <em>n21</em>, <em>n22</em>, <em>n23</em>, <em>n24</em>, <em>n31</em>, <em>n32</em>, <em>n33</em>, <em>n34</em>, <em>n41</em>, <em>n42</em>, <em>n43</em>, <em>n44</em><big>)</big><a class="headerlink" href="#Matrix4" title="Permalink to this definition">¶</a></dt>
+<dd><p>A 4x4 Matrix</p>
+</dd></dl>
+
+<p class="rubric">Attributes</p>
+<dl class="attribute">
+<dt id="Matrix4.n11">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">n11</tt><a class="headerlink" href="#Matrix4.n11" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Matrix4.n12">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">n12</tt><a class="headerlink" href="#Matrix4.n12" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Matrix4.n13">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">n13</tt><a class="headerlink" href="#Matrix4.n13" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Matrix4.n14">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">n14</tt><a class="headerlink" href="#Matrix4.n14" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Matrix4.n21">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">n21</tt><a class="headerlink" href="#Matrix4.n21" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Matrix4.n22">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">n22</tt><a class="headerlink" href="#Matrix4.n22" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Matrix4.n23">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">n23</tt><a class="headerlink" href="#Matrix4.n23" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Matrix4.n24">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">n24</tt><a class="headerlink" href="#Matrix4.n24" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Matrix4.n31">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">n31</tt><a class="headerlink" href="#Matrix4.n31" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Matrix4.n32">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">n32</tt><a class="headerlink" href="#Matrix4.n32" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Matrix4.n33">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">n33</tt><a class="headerlink" href="#Matrix4.n33" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Matrix4.n34">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">n34</tt><a class="headerlink" href="#Matrix4.n34" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Matrix4.n41">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">n41</tt><a class="headerlink" href="#Matrix4.n41" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Matrix4.n42">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">n42</tt><a class="headerlink" href="#Matrix4.n42" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Matrix4.n43">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">n43</tt><a class="headerlink" href="#Matrix4.n43" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Matrix4.n44">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">n44</tt><a class="headerlink" href="#Matrix4.n44" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Methods</p>
+<dl class="function">
+<dt id="Matrix4.clone">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">clone</tt><big>(</big><big>)</big><a class="headerlink" href="#Matrix4.clone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clones this matrix</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">New instance identical to this matrix</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><a class="reference internal" href="#Matrix4" title="Matrix4"><tt class="xref js js-class docutils literal"><span class="pre">Matrix4()</span></tt></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Matrix4.set">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">set</tt><big>(</big><em>n11</em>, <em>n12</em>, <em>n13</em>, <em>n14</em>, <em>n21</em>, <em>n22</em>, <em>n23</em>, <em>n24</em>, <em>n31</em>, <em>n32</em>, <em>n33</em>, <em>n34</em>, <em>n41</em>, <em>n42</em>, <em>n43</em>, <em>n44</em><big>)</big><a class="headerlink" href="#Matrix4.set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets all fields of this matrix</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">This matrix</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><a class="reference internal" href="#Matrix4" title="Matrix4"><tt class="xref js js-class docutils literal"><span class="pre">Matrix4()</span></tt></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Matrix4.identity">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">identity</tt><big>(</big><big>)</big><a class="headerlink" href="#Matrix4.identity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resets this matrix to identity</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">This matrix</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><a class="reference internal" href="#Matrix4" title="Matrix4"><tt class="xref js js-class docutils literal"><span class="pre">Matrix4()</span></tt></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Matrix4.copy">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">copy</tt><big>(</big><em>m</em><big>)</big><a class="headerlink" href="#Matrix4.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copies a matrix <tt class="docutils literal"><span class="pre">m</span></tt> into this matrix</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>m</strong> (<a class="reference internal" href="#Matrix4" title="Matrix4"><em>Matrix4</em></a>) &#8211; Matrix to be copied</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">This matrix</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Matrix4" title="Matrix4"><tt class="xref js js-class docutils literal"><span class="pre">Matrix4()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Matrix4.lookAt">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">lookAt</tt><big>(</big><em>eye</em>, <em>center</em>, <em>up</em><big>)</big><a class="headerlink" href="#Matrix4.lookAt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructs rotation matrix, looking from <tt class="docutils literal"><span class="pre">eye</span></tt> towards <tt class="docutils literal"><span class="pre">center</span></tt> with defined <tt class="docutils literal"><span class="pre">up</span></tt> vector</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>eye</strong> (<a class="reference internal" href="Vector3.html#Vector3" title="Vector3"><em>Vector3</em></a>) &#8211; vector</li>
+<li><strong>center</strong> (<a class="reference internal" href="Vector3.html#Vector3" title="Vector3"><em>Vector3</em></a>) &#8211; vector</li>
+<li><strong>up</strong> (<a class="reference internal" href="Vector3.html#Vector3" title="Vector3"><em>Vector3</em></a>) &#8211; vector</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">This matrix</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Matrix4" title="Matrix4"><tt class="xref js js-class docutils literal"><span class="pre">Matrix4()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Matrix4.multiply">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">multiply</tt><big>(</big><em>a</em>, <em>b</em><big>)</big><a class="headerlink" href="#Matrix4.multiply" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets this matrix to <tt class="docutils literal"><span class="pre">a</span> <span class="pre">*</span> <span class="pre">b</span></tt></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>a</strong> (<a class="reference internal" href="#Matrix4" title="Matrix4"><em>Matrix4</em></a>) &#8211; source matrix A</li>
+<li><strong>b</strong> (<a class="reference internal" href="#Matrix4" title="Matrix4"><em>Matrix4</em></a>) &#8211; source matrix B</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">This matrix</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Matrix4" title="Matrix4"><tt class="xref js js-class docutils literal"><span class="pre">Matrix4()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Matrix4.multiplyToArray">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">multiplyToArray</tt><big>(</big><em>a</em>, <em>b</em>, <em>r</em><big>)</big><a class="headerlink" href="#Matrix4.multiplyToArray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets this matrix to <tt class="docutils literal"><span class="pre">a</span> <span class="pre">*</span> <span class="pre">b</span></tt> and sets result into flat array <tt class="docutils literal"><span class="pre">r</span></tt></p>
+<p>Destination array can be regular JS array or Typed Array</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>a</strong> (<a class="reference internal" href="#Matrix4" title="Matrix4"><em>Matrix4</em></a>) &#8211; source matrix A</li>
+<li><strong>b</strong> (<a class="reference internal" href="#Matrix4" title="Matrix4"><em>Matrix4</em></a>) &#8211; source matrix B</li>
+<li><strong>r</strong> (<em>array</em>) &#8211; destination array</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">This matrix</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Matrix4" title="Matrix4"><tt class="xref js js-class docutils literal"><span class="pre">Matrix4()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Matrix4.multiplySelf">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">multiplySelf</tt><big>(</big><em>a</em><big>)</big><a class="headerlink" href="#Matrix4.multiplySelf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Multiplies this matrix by <tt class="docutils literal"><span class="pre">a</span></tt></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>a</strong> (<a class="reference internal" href="#Matrix4" title="Matrix4"><em>Matrix4</em></a>) &#8211; matrix</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">This matrix</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Matrix4" title="Matrix4"><tt class="xref js js-class docutils literal"><span class="pre">Matrix4()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Matrix4.multiplyScalar">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">multiplyScalar</tt><big>(</big><em>s</em><big>)</big><a class="headerlink" href="#Matrix4.multiplyScalar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Multiplies this matrix by <tt class="docutils literal"><span class="pre">s</span></tt></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>a</strong> (<em>float</em>) &#8211; number</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">This matrix</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Matrix4" title="Matrix4"><tt class="xref js js-class docutils literal"><span class="pre">Matrix4()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Matrix4.multiplyVector3">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">multiplyVector3</tt><big>(</big><em>v</em><big>)</big><a class="headerlink" href="#Matrix4.multiplyVector3" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies this matrix to a <a class="reference internal" href="Vector3.html#Vector3" title="Vector3"><tt class="xref js js-class docutils literal"><span class="pre">Vector3()</span></tt></a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>v</strong> (<a class="reference internal" href="Vector3.html#Vector3" title="Vector3"><em>Vector3</em></a>) &#8211; vector</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Multiplied vector</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="Vector3.html#Vector3" title="Vector3"><tt class="xref js js-class docutils literal"><span class="pre">Vector3()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Matrix4.multiplyVector4">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">multiplyVector4</tt><big>(</big><em>v</em><big>)</big><a class="headerlink" href="#Matrix4.multiplyVector4" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies this matrix to a <a class="reference internal" href="Vector4.html#Vector4" title="Vector4"><tt class="xref js js-class docutils literal"><span class="pre">Vector4()</span></tt></a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>v</strong> (<a class="reference internal" href="Vector4.html#Vector4" title="Vector4"><em>Vector4</em></a>) &#8211; vector</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Multiplied vector</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="Vector4.html#Vector4" title="Vector4"><tt class="xref js js-class docutils literal"><span class="pre">Vector4()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Matrix4.rotateAxis">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">rotateAxis</tt><big>(</big><em>v</em><big>)</big><a class="headerlink" href="#Matrix4.rotateAxis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies rotation submatrix of this matrix to vector <tt class="docutils literal"><span class="pre">v</span></tt> and then normalizes it</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>v</strong> (<a class="reference internal" href="Vector3.html#Vector3" title="Vector3"><em>Vector3</em></a>) &#8211; vector</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Rotated vector</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="Vector3.html#Vector3" title="Vector3"><tt class="xref js js-class docutils literal"><span class="pre">Vector3()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Matrix4.crossVector">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">crossVector</tt><big>(</big><em>a</em><big>)</big><a class="headerlink" href="#Matrix4.crossVector" title="Permalink to this definition">¶</a></dt>
+<dd><p>//todo:description</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>a</strong> (<a class="reference internal" href="Vector4.html#Vector4" title="Vector4"><em>Vector4</em></a>) &#8211; vector</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="Vector4.html#Vector4" title="Vector4"><tt class="xref js js-class docutils literal"><span class="pre">Vector4()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Matrix4.determinant">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">determinant</tt><big>(</big><big>)</big><a class="headerlink" href="#Matrix4.determinant" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes determinant of this matrix</p>
+<p>Based on <a class="reference external" href="http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm">http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm</a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">Determinant</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Matrix4.transpose">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">transpose</tt><big>(</big><big>)</big><a class="headerlink" href="#Matrix4.transpose" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transposes this matrix</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">This matrix</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><a class="reference internal" href="#Matrix4" title="Matrix4"><tt class="xref js js-class docutils literal"><span class="pre">Matrix4()</span></tt></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Matrix4.flatten">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">flatten</tt><big>(</big><big>)</big><a class="headerlink" href="#Matrix4.flatten" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flattens this matrix into internal <tt class="xref js js-attr docutils literal"><span class="pre">Matrix4.flat</span></tt> array</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">Flat array with this matrix values</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body">array</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Matrix4.flattenToArray">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">flattenToArray</tt><big>(</big><em>flat</em><big>)</big><a class="headerlink" href="#Matrix4.flattenToArray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flattens this matrix into supplied <tt class="docutils literal"><span class="pre">flat</span></tt> array</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>flat</strong> (<em>array</em>) &#8211; array</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Flat array with this matrix values</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last">array</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Matrix4.flattenToArrayOffset">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">flattenToArrayOffset</tt><big>(</big><em>flat</em>, <em>offset</em><big>)</big><a class="headerlink" href="#Matrix4.flattenToArrayOffset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flattens this matrix into supplied <tt class="docutils literal"><span class="pre">flat</span></tt> array starting from <tt class="docutils literal"><span class="pre">offset</span></tt> position in the array</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>flat</strong> (<em>array</em>) &#8211; array</li>
+<li><strong>offset</strong> (<em>integer</em>) &#8211; offset</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Flat array with this matrix values</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last">array</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Matrix4.setTranslation">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">setTranslation</tt><big>(</big><em>x</em>, <em>y</em>, <em>z</em><big>)</big><a class="headerlink" href="#Matrix4.setTranslation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets this matrix as translation transform</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>x</strong> (<em>float</em>) &#8211; x-translation</li>
+<li><strong>y</strong> (<em>float</em>) &#8211; y-translation</li>
+<li><strong>z</strong> (<em>float</em>) &#8211; z-translation</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">This matrix</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Matrix4" title="Matrix4"><tt class="xref js js-class docutils literal"><span class="pre">Matrix4()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Matrix4.setScale">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">setScale</tt><big>(</big><em>x</em>, <em>y</em>, <em>z</em><big>)</big><a class="headerlink" href="#Matrix4.setScale" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets this matrix as scale transform</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>x</strong> (<em>float</em>) &#8211; x-scale</li>
+<li><strong>y</strong> (<em>float</em>) &#8211; y-scale</li>
+<li><strong>z</strong> (<em>float</em>) &#8211; z-scale</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">This matrix</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Matrix4" title="Matrix4"><tt class="xref js js-class docutils literal"><span class="pre">Matrix4()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Matrix4.setRotationX">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">setRotationX</tt><big>(</big><em>theta</em><big>)</big><a class="headerlink" href="#Matrix4.setRotationX" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets this matrix as rotation transform around x-axis by <tt class="docutils literal"><span class="pre">theta</span></tt> radians</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>theta</strong> (<em>float</em>) &#8211; Rotation angle in radians</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">This matrix</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Matrix4" title="Matrix4"><tt class="xref js js-class docutils literal"><span class="pre">Matrix4()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Matrix4.setRotationY">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">setRotationY</tt><big>(</big><em>theta</em><big>)</big><a class="headerlink" href="#Matrix4.setRotationY" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets this matrix as rotation transform around y-axis by <tt class="docutils literal"><span class="pre">theta</span></tt> radians</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>theta</strong> (<em>float</em>) &#8211; Rotation angle in radians</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">This matrix</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Matrix4" title="Matrix4"><tt class="xref js js-class docutils literal"><span class="pre">Matrix4()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Matrix4.setRotationZ">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">setRotationZ</tt><big>(</big><em>theta</em><big>)</big><a class="headerlink" href="#Matrix4.setRotationZ" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets this matrix as rotation transform around z-axis by <tt class="docutils literal"><span class="pre">theta</span></tt> radians</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>theta</strong> (<em>float</em>) &#8211; Rotation angle in radians</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">This matrix</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Matrix4" title="Matrix4"><tt class="xref js js-class docutils literal"><span class="pre">Matrix4()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Matrix4.setRotationAxis">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">setRotationAxis</tt><big>(</big><em>axis</em>, <em>angle</em><big>)</big><a class="headerlink" href="#Matrix4.setRotationAxis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets this matrix as rotation transform around <tt class="docutils literal"><span class="pre">axis</span></tt> by <tt class="docutils literal"><span class="pre">angle</span></tt> radians</p>
+<p>Based on <a class="reference external" href="http://www.gamedev.net/reference/articles/article1199.asp">http://www.gamedev.net/reference/articles/article1199.asp</a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>axis</strong> (<a class="reference internal" href="Vector3.html#Vector3" title="Vector3"><em>Vector3</em></a>) &#8211; Rotation axis</li>
+<li><strong>angle</strong> (<em>float</em>) &#8211; Rotation angle in radians</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">This matrix</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Matrix4" title="Matrix4"><tt class="xref js js-class docutils literal"><span class="pre">Matrix4()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Matrix4.setPosition">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">setPosition</tt><big>(</big><em>v</em><big>)</big><a class="headerlink" href="#Matrix4.setPosition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets just position component for this matrix from vector <tt class="docutils literal"><span class="pre">v</span></tt></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>v</strong> (<a class="reference internal" href="Vector3.html#Vector3" title="Vector3"><em>Vector3</em></a>) &#8211; position vector</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">This matrix</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Matrix4" title="Matrix4"><tt class="xref js js-class docutils literal"><span class="pre">Matrix4()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Matrix4.getPosition">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">getPosition</tt><big>(</big><big>)</big><a class="headerlink" href="#Matrix4.getPosition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns position component from this matrix</p>
+<p>Note: this method returns a reference to internal class vector, make copy or clone if you don&#8217;t use it right away.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">Vector with position</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><a class="reference internal" href="Vector3.html#Vector3" title="Vector3"><tt class="xref js js-class docutils literal"><span class="pre">Vector3()</span></tt></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Matrix4.getColumnX">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">getColumnX</tt><big>(</big><big>)</big><a class="headerlink" href="#Matrix4.getColumnX" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns x-column component from this matrix</p>
+<p>Note: this method returns a reference to internal class vector, make copy or clone if you don&#8217;t use it right away.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">Vector with x-column</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><a class="reference internal" href="Vector3.html#Vector3" title="Vector3"><tt class="xref js js-class docutils literal"><span class="pre">Vector3()</span></tt></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Matrix4.getColumnY">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">getColumnY</tt><big>(</big><big>)</big><a class="headerlink" href="#Matrix4.getColumnY" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns y-column component from this matrix</p>
+<p>Note: this method returns a reference to internal class vector, make copy or clone if you don&#8217;t use it right away.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">Vector with y-column</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><a class="reference internal" href="Vector3.html#Vector3" title="Vector3"><tt class="xref js js-class docutils literal"><span class="pre">Vector3()</span></tt></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Matrix4.getColumnZ">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">getColumnZ</tt><big>(</big><big>)</big><a class="headerlink" href="#Matrix4.getColumnZ" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns z-column component from this matrix</p>
+<p>Note: this method returns a reference to internal class vector, make copy or clone if you don&#8217;t use it right away.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">Vector with z-column</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><a class="reference internal" href="Vector3.html#Vector3" title="Vector3"><tt class="xref js js-class docutils literal"><span class="pre">Vector3()</span></tt></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Matrix4.getInverse">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">getInverse</tt><big>(</big><em>m</em><big>)</big><a class="headerlink" href="#Matrix4.getInverse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets this matrix to inverse of matrix <tt class="docutils literal"><span class="pre">m</span></tt></p>
+<p>Based on <a class="reference external" href="http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm">http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm</a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>m</strong> (<a class="reference internal" href="#Matrix4" title="Matrix4"><em>Matrix4</em></a>) &#8211; source matrix</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">This matrix</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Matrix4" title="Matrix4"><tt class="xref js js-class docutils literal"><span class="pre">Matrix4()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Matrix4.setRotationFromEuler">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">setRotationFromEuler</tt><big>(</big><em>v</em>, <em>order</em><big>)</big><a class="headerlink" href="#Matrix4.setRotationFromEuler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets rotation submatrix of this matrix to rotation specified by Euler angles</p>
+<p>Default order <tt class="docutils literal"><span class="pre">XYZ</span></tt></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>v</strong> (<a class="reference internal" href="Vector3.html#Vector3" title="Vector3"><em>Vector3</em></a>) &#8211; Vector3 with all the rotations</li>
+<li><strong>order</strong> (<em>string</em>) &#8211; The order of rotations eg. &#8216;XYZ&#8217;</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">This matrix</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Matrix4" title="Matrix4"><tt class="xref js js-class docutils literal"><span class="pre">Matrix4()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Matrix4.setRotationFromQuaternion">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">setRotationFromQuaternion</tt><big>(</big><em>q</em><big>)</big><a class="headerlink" href="#Matrix4.setRotationFromQuaternion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets rotation submatrix of this matrix to rotation specified by quaternion</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>q</strong> (<a class="reference internal" href="Quaternion.html#Quaternion" title="Quaternion"><em>Quaternion</em></a>) &#8211; rotation</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">This matrix</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Matrix4" title="Matrix4"><tt class="xref js js-class docutils literal"><span class="pre">Matrix4()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Matrix4.scale">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">scale</tt><big>(</big><em>v</em><big>)</big><a class="headerlink" href="#Matrix4.scale" title="Permalink to this definition">¶</a></dt>
+<dd><p>Multiplies columns of this matrix by vector <tt class="docutils literal"><span class="pre">v</span></tt></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>v</strong> (<a class="reference internal" href="Vector3.html#Vector3" title="Vector3"><em>Vector3</em></a>) &#8211; scale vector</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">This matrix</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Matrix4" title="Matrix4"><tt class="xref js js-class docutils literal"><span class="pre">Matrix4()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Matrix4.compose">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">compose</tt><big>(</big><em>translation</em>, <em>rotation</em>, <em>scale</em><big>)</big><a class="headerlink" href="#Matrix4.compose" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets this matrix to transform composed of <tt class="docutils literal"><span class="pre">translation</span></tt>, <tt class="docutils literal"><span class="pre">rotation</span></tt> and <tt class="docutils literal"><span class="pre">scale</span></tt></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>translation</strong> (<a class="reference internal" href="Vector3.html#Vector3" title="Vector3"><em>Vector3</em></a>) &#8211; vector</li>
+<li><strong>rotation</strong> (<a class="reference internal" href="Quaternion.html#Quaternion" title="Quaternion"><em>Quaternion</em></a>) &#8211; quaternion</li>
+<li><strong>scale</strong> (<a class="reference internal" href="Vector3.html#Vector3" title="Vector3"><em>Vector3</em></a>) &#8211; vector</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">This matrix</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Matrix4" title="Matrix4"><tt class="xref js js-class docutils literal"><span class="pre">Matrix4()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Matrix4.decompose">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">decompose</tt><big>(</big><em>translation</em>, <em>rotation</em>, <em>scale</em><big>)</big><a class="headerlink" href="#Matrix4.decompose" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decomposes this matrix into <cite>translation`</cite>, <tt class="docutils literal"><span class="pre">rotation</span></tt> and <tt class="docutils literal"><span class="pre">scale</span></tt> components</p>
+<p>If parameters are not supplied, new instances will be created</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>translation</strong> (<a class="reference internal" href="Vector3.html#Vector3" title="Vector3"><em>Vector3</em></a>) &#8211; destination translation vector</li>
+<li><strong>rotation</strong> (<a class="reference internal" href="Quaternion.html#Quaternion" title="Quaternion"><em>Quaternion</em></a>) &#8211; destination rotation quaternion</li>
+<li><strong>scale</strong> (<a class="reference internal" href="Vector3.html#Vector3" title="Vector3"><em>Vector3</em></a>) &#8211; destination scale vector</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Array [ translation, rotation, scale ]</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last">Array</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Matrix4.extractPosition">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">extractPosition</tt><big>(</big><em>m</em><big>)</big><a class="headerlink" href="#Matrix4.extractPosition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copies translation component of supplied matrix <tt class="docutils literal"><span class="pre">m</span></tt> into this matrix translation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>m</strong> (<a class="reference internal" href="#Matrix4" title="Matrix4"><em>Matrix4</em></a>) &#8211; source matrix</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">This matrix</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Matrix4" title="Matrix4"><tt class="xref js js-class docutils literal"><span class="pre">Matrix4()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Matrix4.extractRotation">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">extractRotation</tt><big>(</big><em>m</em><big>)</big><a class="headerlink" href="#Matrix4.extractRotation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copies rotation component of supplied matrix <tt class="docutils literal"><span class="pre">m</span></tt> into this matrix rotation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>m</strong> (<a class="reference internal" href="#Matrix4" title="Matrix4"><em>Matrix4</em></a>) &#8211; source matrix</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">This matrix</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Matrix4" title="Matrix4"><tt class="xref js js-class docutils literal"><span class="pre">Matrix4()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Matrix4.rotateByAxis">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">rotateByAxis</tt><big>(</big><em>axis</em>, <em>angle</em><big>)</big><a class="headerlink" href="#Matrix4.rotateByAxis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rotates this matrix around supplied <tt class="docutils literal"><span class="pre">axis</span></tt> by <tt class="docutils literal"><span class="pre">angle</span></tt></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>axis</strong> (<a class="reference internal" href="Vector3.html#Vector3" title="Vector3"><em>Vector3</em></a>) &#8211; rotation axis</li>
+<li><strong>angle</strong> (<em>float</em>) &#8211; rotation angle in radians</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">This matrix</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Matrix4" title="Matrix4"><tt class="xref js js-class docutils literal"><span class="pre">Matrix4()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Matrix4.rotateX">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">rotateX</tt><big>(</big><em>angle</em><big>)</big><a class="headerlink" href="#Matrix4.rotateX" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rotates this matrix around x-axis by <tt class="docutils literal"><span class="pre">angle</span></tt></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>angle</strong> (<em>float</em>) &#8211; rotation angle in radians</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">This matrix</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Matrix4" title="Matrix4"><tt class="xref js js-class docutils literal"><span class="pre">Matrix4()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Matrix4.rotateY">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">rotateY</tt><big>(</big><em>angle</em><big>)</big><a class="headerlink" href="#Matrix4.rotateY" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rotates this matrix around y-axis by <tt class="docutils literal"><span class="pre">angle</span></tt></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>angle</strong> (<em>float</em>) &#8211; rotation angle in radians</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">This matrix</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Matrix4" title="Matrix4"><tt class="xref js js-class docutils literal"><span class="pre">Matrix4()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Matrix4.rotateZ">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">rotateZ</tt><big>(</big><em>angle</em><big>)</big><a class="headerlink" href="#Matrix4.rotateZ" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rotates this matrix around z-axis by <tt class="docutils literal"><span class="pre">angle</span></tt></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>angle</strong> (<em>float</em>) &#8211; rotation angle in radians</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">This matrix</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Matrix4" title="Matrix4"><tt class="xref js js-class docutils literal"><span class="pre">Matrix4()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Matrix4.translate">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">translate</tt><big>(</big><em>v</em><big>)</big><a class="headerlink" href="#Matrix4.translate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Translates this matrix by vector <tt class="docutils literal"><span class="pre">v</span></tt></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>v</strong> (<a class="reference internal" href="Vector3.html#Vector3" title="Vector3"><em>Vector3</em></a>) &#8211; translation vector</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">This matrix</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Matrix4" title="Matrix4"><tt class="xref js js-class docutils literal"><span class="pre">Matrix4()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<p class="rubric">Static methods</p>
+<dl class="function">
+<dt id="Matrix4.makeInvert3x3">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">makeInvert3x3</tt><big>(</big><em>m</em><big>)</big><a class="headerlink" href="#Matrix4.makeInvert3x3" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inverts just rotation submatrix of matrix <tt class="docutils literal"><span class="pre">m</span></tt></p>
+<p>Note: this method returns a reference to internal 3x3 matrix, make copy or clone if you don&#8217;t use it right away.</p>
+<p>Based on <a class="reference external" href="http://code.google.com/p/webgl-mjs/">http://code.google.com/p/webgl-mjs/</a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>m</strong> (<a class="reference internal" href="#Matrix4" title="Matrix4"><em>Matrix4</em></a>) &#8211; source matrix</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">inverted submatrix</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="Matrix3.html#Matrix3" title="Matrix3"><tt class="xref js js-class docutils literal"><span class="pre">Matrix3()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Matrix4.makeFrustum">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">makeFrustum</tt><big>(</big><em>left</em>, <em>right</em>, <em>bottom</em>, <em>top</em>, <em>near</em>, <em>far</em><big>)</big><a class="headerlink" href="#Matrix4.makeFrustum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates frustum matrix</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>left</strong> (<em>float</em>) &#8211; left</li>
+<li><strong>right</strong> (<em>float</em>) &#8211; right</li>
+<li><strong>bottom</strong> (<em>float</em>) &#8211; bottom</li>
+<li><strong>top</strong> (<em>float</em>) &#8211; top</li>
+<li><strong>near</strong> (<em>float</em>) &#8211; near</li>
+<li><strong>far</strong> (<em>float</em>) &#8211; far</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">New instance of frustum matrix</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Matrix4" title="Matrix4"><tt class="xref js js-class docutils literal"><span class="pre">Matrix4()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Matrix4.makePerspective">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">makePerspective</tt><big>(</big><em>fov</em>, <em>aspect</em>, <em>near</em>, <em>far</em><big>)</big><a class="headerlink" href="#Matrix4.makePerspective" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates perspective projection matrix</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>fov</strong> (<em>float</em>) &#8211; vertical field of view in degrees</li>
+<li><strong>aspect</strong> (<em>float</em>) &#8211; aspect ratio</li>
+<li><strong>near</strong> (<em>float</em>) &#8211; near plane</li>
+<li><strong>far</strong> (<em>float</em>) &#8211; far plane</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">New instance of projection matrix</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Matrix4" title="Matrix4"><tt class="xref js js-class docutils literal"><span class="pre">Matrix4()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Matrix4.makeOrtho">
+<tt class="descclassname">Matrix4.</tt><tt class="descname">makeOrtho</tt><big>(</big><em>left</em>, <em>right</em>, <em>top</em>, <em>bottom</em>, <em>near</em>, <em>far</em><big>)</big><a class="headerlink" href="#Matrix4.makeOrtho" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates orthographic projection matrix</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>left</strong> (<em>float</em>) &#8211; left</li>
+<li><strong>right</strong> (<em>float</em>) &#8211; right</li>
+<li><strong>top</strong> (<em>float</em>) &#8211; top</li>
+<li><strong>bottom</strong> (<em>float</em>) &#8211; bottom</li>
+<li><strong>near</strong> (<em>float</em>) &#8211; near plane</li>
+<li><strong>far</strong> (<em>float</em>) &#8211; far plane</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">New instance of projection matrix</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Matrix4" title="Matrix4"><tt class="xref js js-class docutils literal"><span class="pre">Matrix4()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<p class="rubric">Example</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="c1">// simple rig for rotation around 3 axes</span>
+
+<span class="kd">var</span> <span class="nx">m</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">THREE</span><span class="p">.</span><span class="nx">Matrix4</span><span class="p">();</span>
+
+<span class="kd">var</span> <span class="nx">m1</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">THREE</span><span class="p">.</span><span class="nx">Matrix4</span><span class="p">();</span>
+<span class="kd">var</span> <span class="nx">m2</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">THREE</span><span class="p">.</span><span class="nx">Matrix4</span><span class="p">();</span>
+<span class="kd">var</span> <span class="nx">m3</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">THREE</span><span class="p">.</span><span class="nx">Matrix4</span><span class="p">();</span>
+
+<span class="kd">var</span> <span class="nx">alpha</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="kd">var</span> <span class="nx">beta</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span><span class="p">;</span>
+<span class="kd">var</span> <span class="nx">gamma</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span><span class="o">/</span><span class="mi">2</span><span class="p">;</span>
+
+<span class="nx">m1</span><span class="p">.</span><span class="nx">setRotationX</span><span class="p">(</span> <span class="nx">alpha</span> <span class="p">);</span>
+<span class="nx">m2</span><span class="p">.</span><span class="nx">setRotationY</span><span class="p">(</span> <span class="nx">beta</span> <span class="p">);</span>
+<span class="nx">m3</span><span class="p">.</span><span class="nx">setRotationZ</span><span class="p">(</span> <span class="nx">gamma</span> <span class="p">);</span>
+
+<span class="nx">m</span><span class="p">.</span><span class="nx">multiply</span><span class="p">(</span> <span class="nx">m1</span><span class="p">,</span> <span class="nx">m2</span> <span class="p">);</span>
+<span class="nx">m</span><span class="p">.</span><span class="nx">multiplySelf</span><span class="p">(</span> <span class="nx">m3</span> <span class="p">);</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Matrix3.html"
+                        title="previous chapter">Matrix3 - A 3x3 matrix</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="Object3D.html"
+                        title="next chapter">Object3D - Base class for scene graph objects</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/api/core/Matrix4.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="Object3D.html" title="Object3D - Base class for scene graph objects"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Matrix3.html" title="Matrix3 - A 3x3 matrix"
+             >previous</a> |</li>
+        <li><a href="../../index.html">three.js v48dev documentation</a> &raquo;</li>
+          <li><a href="index.html" >Core</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010-2012, three.js Authors.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

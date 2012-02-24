@@ -1,0 +1,285 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>PerspectiveCamera - Camera with perspective projection &mdash; three.js v48dev documentation</title>
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '48dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="three.js v48dev documentation" href="../../index.html" />
+    <link rel="up" title="Cameras" href="index.html" />
+    <link rel="next" title="Core" href="../core/index.html" />
+    <link rel="prev" title="OrthographicCamera - Camera with orthographic projection" href="OrthographicCamera.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../core/index.html" title="Core"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="OrthographicCamera.html" title="OrthographicCamera - Camera with orthographic projection"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">three.js v48dev documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Cameras</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="perspectivecamera-camera-with-perspective-projection">
+<h1>PerspectiveCamera - Camera with perspective projection<a class="headerlink" href="#perspectivecamera-camera-with-perspective-projection" title="Permalink to this headline">¶</a></h1>
+<p class="rubric">Constructor</p>
+<dl class="class">
+<dt id="PerspectiveCamera">
+<em class="property">class </em><tt class="descname">PerspectiveCamera</tt><big>(</big><em>fov</em>, <em>aspect</em>, <em>near</em>, <em>far</em><big>)</big><a class="headerlink" href="#PerspectiveCamera" title="Permalink to this definition">¶</a></dt>
+<dd><p>Camera with perspective projection</p>
+<p>Part of scene graph</p>
+<p>Inherits from <a class="reference internal" href="../core/Object3D.html#Object3D" title="Object3D"><tt class="xref js js-class docutils literal"><span class="pre">Object3D()</span></tt></a> <a class="reference internal" href="Camera.html#Camera" title="Camera"><tt class="xref js js-class docutils literal"><span class="pre">Camera()</span></tt></a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>fov</strong> (<em>float</em>) &#8211; field of view</li>
+<li><strong>aspect</strong> (<em>float</em>) &#8211; aspect ratio</li>
+<li><strong>near</strong> (<em>float</em>) &#8211; near</li>
+<li><strong>far</strong> (<em>float</em>) &#8211; far</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<p class="rubric">Attributes</p>
+<dl class="attribute">
+<dt id="PerspectiveCamera.fov">
+<tt class="descclassname">PerspectiveCamera.</tt><tt class="descname">fov</tt><a class="headerlink" href="#PerspectiveCamera.fov" title="Permalink to this definition">¶</a></dt>
+<dd><p>Camera frustum vertical field of view</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="PerspectiveCamera.aspect">
+<tt class="descclassname">PerspectiveCamera.</tt><tt class="descname">aspect</tt><a class="headerlink" href="#PerspectiveCamera.aspect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Camera frustum aspect ratio</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="PerspectiveCamera.near">
+<tt class="descclassname">PerspectiveCamera.</tt><tt class="descname">near</tt><a class="headerlink" href="#PerspectiveCamera.near" title="Permalink to this definition">¶</a></dt>
+<dd><p>Camera frustum near plane</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="PerspectiveCamera.far">
+<tt class="descclassname">PerspectiveCamera.</tt><tt class="descname">far</tt><a class="headerlink" href="#PerspectiveCamera.far" title="Permalink to this definition">¶</a></dt>
+<dd><p>Camera frustum far plane</p>
+</dd></dl>
+
+<p class="rubric">Multi-view attributes</p>
+<dl class="attribute">
+<dt id="PerspectiveCamera.fullWidth">
+<tt class="descclassname">PerspectiveCamera.</tt><tt class="descname">fullWidth</tt><a class="headerlink" href="#PerspectiveCamera.fullWidth" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="PerspectiveCamera.fullHeight">
+<tt class="descclassname">PerspectiveCamera.</tt><tt class="descname">fullHeight</tt><a class="headerlink" href="#PerspectiveCamera.fullHeight" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="PerspectiveCamera.x">
+<tt class="descclassname">PerspectiveCamera.</tt><tt class="descname">x</tt><a class="headerlink" href="#PerspectiveCamera.x" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="PerspectiveCamera.y">
+<tt class="descclassname">PerspectiveCamera.</tt><tt class="descname">y</tt><a class="headerlink" href="#PerspectiveCamera.y" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="PerspectiveCamera.width">
+<tt class="descclassname">PerspectiveCamera.</tt><tt class="descname">width</tt><a class="headerlink" href="#PerspectiveCamera.width" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="PerspectiveCamera.height">
+<tt class="descclassname">PerspectiveCamera.</tt><tt class="descname">height</tt><a class="headerlink" href="#PerspectiveCamera.height" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Methods</p>
+<dl class="function">
+<dt id="PerspectiveCamera.updateProjectionMatrix">
+<tt class="descclassname">PerspectiveCamera.</tt><tt class="descname">updateProjectionMatrix</tt><big>(</big><big>)</big><a class="headerlink" href="#PerspectiveCamera.updateProjectionMatrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates camera&#8217;s projection matrix. Must be called after change of parameters.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PerspectiveCamera.setLens ">
+<tt class="descclassname">PerspectiveCamera.</tt><tt class="descname">setLens </tt><big>(</big><em>focalLength</em>, <em>frameSize</em><big>)</big><a class="headerlink" href="#PerspectiveCamera.setLens " title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses focal length (in mm) to estimate and set FOV
+35mm (fullframe) camera is used if frame size is not specified.</p>
+<p>Formula based on <a class="reference external" href="http://www.bobatkins.com/photography/technical/field_of_view.html">http://www.bobatkins.com/photography/technical/field_of_view.html</a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>focalLength</strong> (<em>float</em>) &#8211; focal length</li>
+<li><strong>frameSize</strong> (<em>float</em>) &#8211; frame size</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="PerspectiveCamera.setViewOffset ">
+<tt class="descclassname">PerspectiveCamera.</tt><tt class="descname">setViewOffset </tt><big>(</big><em>fullWidth</em>, <em>fullHeight</em>, <em>x</em>, <em>y</em>, <em>width</em>, <em>height</em><big>)</big><a class="headerlink" href="#PerspectiveCamera.setViewOffset " title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets an offset in a larger frustum. This is useful for multi-window or
+multi-monitor/multi-machine setups.</p>
+<p>For example, if you have 3x2 monitors and each monitor is 1920x1080 and
+the monitors are in grid like this:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<tbody valign="top">
+<tr><td>A</td>
+<td>B</td>
+<td>C</td>
+</tr>
+<tr><td>D</td>
+<td>E</td>
+<td>F</td>
+</tr>
+</tbody>
+</table>
+<p>then for each monitor you would call it like this:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">w</span> <span class="o">=</span> <span class="mi">1920</span><span class="p">;</span>
+<span class="kd">var</span> <span class="nx">h</span> <span class="o">=</span> <span class="mi">1080</span><span class="p">;</span>
+<span class="kd">var</span> <span class="nx">fullWidth</span> <span class="o">=</span> <span class="nx">w</span> <span class="o">*</span> <span class="mi">3</span><span class="p">;</span>
+<span class="kd">var</span> <span class="nx">fullHeight</span> <span class="o">=</span> <span class="nx">h</span> <span class="o">*</span> <span class="mi">2</span><span class="p">;</span>
+
+<span class="c1">// --A--</span>
+<span class="nx">camera</span><span class="p">.</span><span class="nx">setOffset</span><span class="p">(</span> <span class="nx">fullWidth</span><span class="p">,</span> <span class="nx">fullHeight</span><span class="p">,</span> <span class="nx">w</span> <span class="o">*</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">h</span> <span class="o">*</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">w</span><span class="p">,</span> <span class="nx">h</span> <span class="p">);</span>
+<span class="c1">//--B--</span>
+<span class="nx">camera</span><span class="p">.</span><span class="nx">setOffset</span><span class="p">(</span> <span class="nx">fullWidth</span><span class="p">,</span> <span class="nx">fullHeight</span><span class="p">,</span> <span class="nx">w</span> <span class="o">*</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">h</span> <span class="o">*</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">w</span><span class="p">,</span> <span class="nx">h</span> <span class="p">);</span>
+<span class="c1">//--C--</span>
+<span class="nx">camera</span><span class="p">.</span><span class="nx">setOffset</span><span class="p">(</span> <span class="nx">fullWidth</span><span class="p">,</span> <span class="nx">fullHeight</span><span class="p">,</span> <span class="nx">w</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="nx">h</span> <span class="o">*</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">w</span><span class="p">,</span> <span class="nx">h</span> <span class="p">);</span>
+<span class="c1">//--D--</span>
+<span class="nx">camera</span><span class="p">.</span><span class="nx">setOffset</span><span class="p">(</span> <span class="nx">fullWidth</span><span class="p">,</span> <span class="nx">fullHeight</span><span class="p">,</span> <span class="nx">w</span> <span class="o">*</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">h</span> <span class="o">*</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">w</span><span class="p">,</span> <span class="nx">h</span> <span class="p">);</span>
+<span class="c1">//--E--</span>
+<span class="nx">camera</span><span class="p">.</span><span class="nx">setOffset</span><span class="p">(</span> <span class="nx">fullWidth</span><span class="p">,</span> <span class="nx">fullHeight</span><span class="p">,</span> <span class="nx">w</span> <span class="o">*</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">h</span> <span class="o">*</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">w</span><span class="p">,</span> <span class="nx">h</span> <span class="p">);</span>
+<span class="c1">//--F--</span>
+<span class="nx">camera</span><span class="p">.</span><span class="nx">setOffset</span><span class="p">(</span> <span class="nx">fullWidth</span><span class="p">,</span> <span class="nx">fullHeight</span><span class="p">,</span> <span class="nx">w</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="nx">h</span> <span class="o">*</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">w</span><span class="p">,</span> <span class="nx">h</span> <span class="p">);</span>
+</pre></div>
+</div>
+<p>Note there is no reason monitors have to be the same size or in a grid.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>fullWidth</strong> (<em>float</em>) &#8211; full width of multi-view setup</li>
+<li><strong>fullHeight</strong> (<em>float</em>) &#8211; full height of multi-view setup</li>
+<li><strong>x</strong> (<em>float</em>) &#8211; x-offset of subcamera</li>
+<li><strong>y</strong> (<em>float</em>) &#8211; y-offset of subcamera</li>
+<li><strong>width</strong> (<em>float</em>) &#8211; width of subcamera</li>
+<li><strong>height</strong> (<em>float</em>) &#8211; height of subcamera</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<p class="rubric">Example</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">camera</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">THREE</span><span class="p">.</span><span class="nx">PerspectiveCamera</span><span class="p">(</span> <span class="mi">45</span><span class="p">,</span> <span class="nb">window</span><span class="p">.</span><span class="nx">innerWidth</span> <span class="o">/</span> <span class="nb">window</span><span class="p">.</span><span class="nx">innerHeight</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1000</span> <span class="p">);</span>
+<span class="nx">scene</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span> <span class="nx">camera</span> <span class="p">);</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="OrthographicCamera.html"
+                        title="previous chapter">OrthographicCamera - Camera with orthographic projection</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../core/index.html"
+                        title="next chapter">Core</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/api/cameras/PerspectiveCamera.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../core/index.html" title="Core"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="OrthographicCamera.html" title="OrthographicCamera - Camera with orthographic projection"
+             >previous</a> |</li>
+        <li><a href="../../index.html">three.js v48dev documentation</a> &raquo;</li>
+          <li><a href="index.html" >Cameras</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010-2012, three.js Authors.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

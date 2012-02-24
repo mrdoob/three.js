@@ -1,0 +1,323 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Geometry - Base class for geometries &mdash; three.js v48dev documentation</title>
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '48dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="three.js v48dev documentation" href="../../index.html" />
+    <link rel="up" title="Core" href="index.html" />
+    <link rel="next" title="Math - Math utility functions" href="Math.html" />
+    <link rel="prev" title="Face4 - Quad face" href="Face4.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Math.html" title="Math - Math utility functions"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Face4.html" title="Face4 - Quad face"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">three.js v48dev documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Core</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="geometry-base-class-for-geometries">
+<h1>Geometry - Base class for geometries<a class="headerlink" href="#geometry-base-class-for-geometries" title="Permalink to this headline">¶</a></h1>
+<p class="rubric">Constructor</p>
+<dl class="class">
+<dt id="Geometry">
+<em class="property">class </em><tt class="descname">Geometry</tt><big>(</big><big>)</big><a class="headerlink" href="#Geometry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class for geometries</p>
+<p>Encapsulates unique instances of vertex buffer objects in <tt class="xref js js-class docutils literal"><span class="pre">WebGLRenderer()</span></tt></p>
+</dd></dl>
+
+<p class="rubric">Attributes</p>
+<dl class="attribute">
+<dt id="Geometry.id">
+<tt class="descclassname">Geometry.</tt><tt class="descname">id</tt><a class="headerlink" href="#Geometry.id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unique number of this geometry instance</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Geometry.boundingBox">
+<tt class="descclassname">Geometry.</tt><tt class="descname">boundingBox</tt><a class="headerlink" href="#Geometry.boundingBox" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bounding box</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">boundingBox</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">min</span><span class="o">:</span> <span class="k">new</span> <span class="nx">THREE</span><span class="p">.</span><span class="nx">Vector3</span><span class="p">(),</span> <span class="nx">max</span><span class="o">:</span> <span class="k">new</span> <span class="nx">THREE</span><span class="p">.</span><span class="nx">Vector3</span><span class="p">()</span> <span class="p">}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Geometry.boundingSphere">
+<tt class="descclassname">Geometry.</tt><tt class="descname">boundingSphere</tt><a class="headerlink" href="#Geometry.boundingSphere" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bounding sphere</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">boundingSphere</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">radius</span><span class="o">:</span> <span class="kr">float</span> <span class="p">}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Geometry.materials">
+<tt class="descclassname">Geometry.</tt><tt class="descname">materials</tt><a class="headerlink" href="#Geometry.materials" title="Permalink to this definition">¶</a></dt>
+<dd><p>Array of <tt class="xref js js-class docutils literal"><span class="pre">materials</span></tt></p>
+<p>Used with models containing multiple materials in a single geometry (with pass-through <tt class="xref js js-class docutils literal"><span class="pre">MeshFaceMaterial()</span></tt>)</p>
+<p>Face indices index into this array.</p>
+</dd></dl>
+
+<p class="rubric">Attribute buffers</p>
+<dl class="attribute">
+<dt id="Geometry.faces">
+<tt class="descclassname">Geometry.</tt><tt class="descname">faces</tt><a class="headerlink" href="#Geometry.faces" title="Permalink to this definition">¶</a></dt>
+<dd><p>Array of faces (<a class="reference internal" href="Face3.html#Face3" title="Face3"><tt class="xref js js-class docutils literal"><span class="pre">Face3()</span></tt></a>, <a class="reference internal" href="Face4.html#Face4" title="Face4"><tt class="xref js js-class docutils literal"><span class="pre">Face4()</span></tt></a>)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Geometry.vertices">
+<tt class="descclassname">Geometry.</tt><tt class="descname">vertices</tt><a class="headerlink" href="#Geometry.vertices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Array of <a class="reference internal" href="Vertex.html#Vertex" title="Vertex"><tt class="xref js js-class docutils literal"><span class="pre">vertices</span></tt></a></p>
+<p>Face indices index into this array.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Geometry.colors">
+<tt class="descclassname">Geometry.</tt><tt class="descname">colors</tt><a class="headerlink" href="#Geometry.colors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Array of vertex <a class="reference internal" href="Color.html#Color" title="Color"><tt class="xref js js-class docutils literal"><span class="pre">colors</span></tt></a>, matching number and order of vertices.</p>
+<p>Used in <tt class="xref js js-class docutils literal"><span class="pre">ParticleSystem()</span></tt>, <tt class="xref js js-class docutils literal"><span class="pre">Line()</span></tt> and <tt class="xref js js-class docutils literal"><span class="pre">Ribbon()</span></tt>.</p>
+<p><tt class="xref js js-class docutils literal"><span class="pre">Meshes</span></tt> use per-face-use-of-vertex colors embedded directly in faces.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Geometry.faceUvs">
+<tt class="descclassname">Geometry.</tt><tt class="descname">faceUvs</tt><a class="headerlink" href="#Geometry.faceUvs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Array of face UV layers.
+Each UV layer is an array of <a class="reference internal" href="UV.html#UV" title="UV"><tt class="xref js js-class docutils literal"><span class="pre">UV()</span></tt></a> matching order and number of faces.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Geometry.faceVertexUvs">
+<tt class="descclassname">Geometry.</tt><tt class="descname">faceVertexUvs</tt><a class="headerlink" href="#Geometry.faceVertexUvs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Array of vertex UV layers.
+Each UV layer is an array of <a class="reference internal" href="UV.html#UV" title="UV"><tt class="xref js js-class docutils literal"><span class="pre">UV()</span></tt></a> matching order and number of vertices in faces.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Geometry.morphTargets">
+<tt class="descclassname">Geometry.</tt><tt class="descname">morphTargets</tt><a class="headerlink" href="#Geometry.morphTargets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Array of morph targets.
+Each morph target is JS object:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">morphTarget</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;targetName&quot;</span><span class="p">,</span> <span class="nx">vertices</span><span class="o">:</span> <span class="p">[</span> <span class="k">new</span> <span class="nx">THREE</span><span class="p">.</span><span class="nx">Vertex</span><span class="p">(),</span> <span class="p">...</span> <span class="p">]</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>Morph vertices match number and order of primary vertices.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Geometry.morphColors">
+<tt class="descclassname">Geometry.</tt><tt class="descname">morphColors</tt><a class="headerlink" href="#Geometry.morphColors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Array of morph colors.
+Morph colors have similar structure as morph targets, each color set is JS object:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">morphColor</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;colorName&quot;</span><span class="p">,</span> <span class="nx">colors</span><span class="o">:</span> <span class="p">[</span> <span class="k">new</span> <span class="nx">THREE</span><span class="p">.</span><span class="nx">Color</span><span class="p">(),</span> <span class="p">...</span> <span class="p">]</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>Morph colors can match either number and order of faces (face colors) or number of vertices (vertex colors).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Geometry.skinWeights">
+<tt class="descclassname">Geometry.</tt><tt class="descname">skinWeights</tt><a class="headerlink" href="#Geometry.skinWeights" title="Permalink to this definition">¶</a></dt>
+<dd><p>Array of skinning weights (<a class="reference internal" href="Vector4.html#Vector4" title="Vector4"><tt class="xref js js-class docutils literal"><span class="pre">Vector4()</span></tt></a>), matching number and order of vertices.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Geometry.skinIndices">
+<tt class="descclassname">Geometry.</tt><tt class="descname">skinIndices</tt><a class="headerlink" href="#Geometry.skinIndices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Array of skinning indices (<a class="reference internal" href="Vector4.html#Vector4" title="Vector4"><tt class="xref js js-class docutils literal"><span class="pre">Vector4()</span></tt></a>), matching number and order of vertices.</p>
+</dd></dl>
+
+<p class="rubric">Flags</p>
+<dl class="attribute">
+<dt id="Geometry.hasTangents">
+<tt class="descclassname">Geometry.</tt><tt class="descname">hasTangents</tt><a class="headerlink" href="#Geometry.hasTangents" title="Permalink to this definition">¶</a></dt>
+<dd><p>True if geometry has tangents. Set in <a class="reference internal" href="#Geometry.computeTangents" title="Geometry.computeTangents"><tt class="xref js js-func docutils literal"><span class="pre">Geometry.computeTangents()</span></tt></a></p>
+<p><tt class="docutils literal"><span class="pre">default</span> <span class="pre">false</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Geometry.dynamic">
+<tt class="descclassname">Geometry.</tt><tt class="descname">dynamic</tt><a class="headerlink" href="#Geometry.dynamic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set to <cite>true</cite> if attribute buffers will need to change in runtime (using <tt class="docutils literal"><span class="pre">dirty</span></tt> flags).</p>
+<p>Unless set to true internal typed arrays corresponding to buffers will be deleted once sent to GPU.</p>
+<p><tt class="docutils literal"><span class="pre">default</span> <span class="pre">false</span></tt></p>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<dl class="function">
+<dt id="Geometry.applyMatrix">
+<tt class="descclassname">Geometry.</tt><tt class="descname">applyMatrix</tt><big>(</big><em>matrix</em><big>)</big><a class="headerlink" href="#Geometry.applyMatrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bakes matrix transform directly into vertex coordinates</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>matrix</strong> (<a class="reference internal" href="Matrix4.html#Matrix4" title="Matrix4"><em>Matrix4</em></a>) &#8211; matrix transform</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Geometry.computeCentroids">
+<tt class="descclassname">Geometry.</tt><tt class="descname">computeCentroids</tt><big>(</big><big>)</big><a class="headerlink" href="#Geometry.computeCentroids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes centroids for all faces</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="Geometry.computeFaceNormals">
+<tt class="descclassname">Geometry.</tt><tt class="descname">computeFaceNormals</tt><big>(</big><big>)</big><a class="headerlink" href="#Geometry.computeFaceNormals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes face normals</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="Geometry.computeVertexNormals">
+<tt class="descclassname">Geometry.</tt><tt class="descname">computeVertexNormals</tt><big>(</big><big>)</big><a class="headerlink" href="#Geometry.computeVertexNormals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes vertex normals by averaging face normals.</p>
+<p>Face normals must be existing / computed beforehand.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="Geometry.computeTangents">
+<tt class="descclassname">Geometry.</tt><tt class="descname">computeTangents</tt><big>(</big><big>)</big><a class="headerlink" href="#Geometry.computeTangents" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes vertex tangents</p>
+<p>Based on <a class="reference external" href="http://www.terathon.com/code/tangent.html">http://www.terathon.com/code/tangent.html</a></p>
+<p>Geometry must have vertex UVs (layer 0 will be used).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="Geometry.computeBoundingBox">
+<tt class="descclassname">Geometry.</tt><tt class="descname">computeBoundingBox</tt><big>(</big><big>)</big><a class="headerlink" href="#Geometry.computeBoundingBox" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes bounding box of the geometry, updating <a class="reference internal" href="#Geometry.boundingBox" title="Geometry.boundingBox"><tt class="xref js js-attr docutils literal"><span class="pre">Geometry.boundingBox</span></tt></a> attribute.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="Geometry.computeBoundingSphere">
+<tt class="descclassname">Geometry.</tt><tt class="descname">computeBoundingSphere</tt><big>(</big><big>)</big><a class="headerlink" href="#Geometry.computeBoundingSphere" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes bounding sphere of the geometry, updating <a class="reference internal" href="#Geometry.boundingSphere" title="Geometry.boundingSphere"><tt class="xref js js-attr docutils literal"><span class="pre">Geometry.boundingSphere</span></tt></a> attribute.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="Geometry.mergeVertices">
+<tt class="descclassname">Geometry.</tt><tt class="descname">mergeVertices</tt><big>(</big><big>)</big><a class="headerlink" href="#Geometry.mergeVertices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks for duplicate vertices using hashmap.
+Duplicated vertices are removed and faces&#8217; vertices are updated.</p>
+</dd></dl>
+
+<p class="rubric">Example</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="c1">// geometry with random points</span>
+<span class="c1">// (useful for example with ParticleSystem)</span>
+
+<span class="kd">var</span> <span class="nx">n</span> <span class="o">=</span> <span class="mi">10000</span><span class="p">;</span>
+<span class="kd">var</span> <span class="nx">geometry</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">THREE</span><span class="p">.</span><span class="nx">Geometry</span><span class="p">()</span>
+<span class="k">for</span> <span class="p">(</span> <span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">n</span><span class="p">;</span> <span class="nx">i</span> <span class="o">++</span> <span class="p">)</span> <span class="p">{</span>
+
+    <span class="kd">var</span> <span class="nx">x</span> <span class="o">=</span> <span class="nx">THREE</span><span class="p">.</span><span class="nx">MathUtils</span><span class="p">.</span><span class="nx">randFloatSpread</span><span class="p">(</span> <span class="mi">1000</span> <span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">y</span> <span class="o">=</span> <span class="nx">THREE</span><span class="p">.</span><span class="nx">MathUtils</span><span class="p">.</span><span class="nx">randFloatSpread</span><span class="p">(</span> <span class="mi">1000</span> <span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">z</span> <span class="o">=</span> <span class="nx">THREE</span><span class="p">.</span><span class="nx">MathUtils</span><span class="p">.</span><span class="nx">randFloatSpread</span><span class="p">(</span> <span class="mi">1000</span> <span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">position</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">THREE</span><span class="p">.</span><span class="nx">Vector3</span><span class="p">(</span> <span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">,</span> <span class="nx">z</span> <span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">vertex</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">THREE</span><span class="p">.</span><span class="nx">Vertex</span><span class="p">(</span> <span class="nx">position</span> <span class="p">);</span>
+
+    <span class="nx">geometry</span><span class="p">.</span><span class="nx">vertices</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span> <span class="nx">vertex</span> <span class="p">);</span>
+
+<span class="p">}</span>
+
+<span class="nx">geometry</span><span class="p">.</span><span class="nx">computeBoundingSphere</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Face4.html"
+                        title="previous chapter">Face4 - Quad face</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="Math.html"
+                        title="next chapter">Math - Math utility functions</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/api/core/Geometry.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="Math.html" title="Math - Math utility functions"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Face4.html" title="Face4 - Quad face"
+             >previous</a> |</li>
+        <li><a href="../../index.html">three.js v48dev documentation</a> &raquo;</li>
+          <li><a href="index.html" >Core</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010-2012, three.js Authors.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

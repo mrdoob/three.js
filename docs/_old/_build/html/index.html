@@ -1,0 +1,180 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>three.js - JavaScript 3D library &mdash; three.js v48dev documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '48dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="three.js v48dev documentation" href="#" />
+    <link rel="next" title="Changelog" href="changelog.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="changelog.html" title="Changelog"
+             accesskey="N">next</a> |</li>
+        <li><a href="#">three.js v48dev documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="three-js-javascript-3d-library">
+<h1>three.js - JavaScript 3D library<a class="headerlink" href="#three-js-javascript-3d-library" title="Permalink to this headline">¶</a></h1>
+<p>The aim of the project is to create a lightweight 3D library with a very low
+level of complexity — in other words, for dummies. The library provides
+&lt;canvas&gt;, &lt;svg&gt; and WebGL renderers.</p>
+<ul class="simple">
+<li><a class="reference external" href="https://github.com/mrdoob/three.js">Clone on GitGub</a></li>
+<li><a class="reference external" href="https://github.com/mrdoob/three.js/issues">Report an Issue</a></li>
+<li>IRC: <tt class="docutils literal"><span class="pre">#three.js</span></tt> on <tt class="docutils literal"><span class="pre">irc.freenode.net</span></tt></li>
+</ul>
+<div class="section" id="contents">
+<h2>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/index.html">Tutorials</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="api">
+<h2>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/cameras/index.html">Cameras</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/cameras/Camera.html">Camera - Abstract base class for cameras</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/cameras/OrthographicCamera.html">OrthographicCamera - Camera with orthographic projection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/cameras/PerspectiveCamera.html">PerspectiveCamera - Camera with perspective projection</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/core/index.html">Core</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/core/Clock.html">Clock - Keeps track of time</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/core/Color.html">Color - Represents a color</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/core/Edge.html">Edge - Edge between two vertices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/core/Face3.html">Face3 - Triangle face</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/core/Face4.html">Face4 - Quad face</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/core/Geometry.html">Geometry - Base class for geometries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/core/Math.html">Math - Math utility functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/core/Matrix3.html">Matrix3 - A 3x3 matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/core/Matrix4.html">Matrix4 - A 4x4 Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/core/Object3D.html">Object3D - Base class for scene graph objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/core/Projector.html">Projector - Utilities for projecting primitives between spaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/core/Quaternion.html">Quaternion - Implementation of a quaternion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/core/Ray.html">Ray - Representation of a ray in space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/core/Rectangle.html">Rectangle - Represents a 2D rectangle</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/core/Spline.html">Spline - Represents a spline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/core/UV.html">UV - A texture coordinate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/core/Vector2.html">Vector2 - 2D vector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/core/Vector3.html">Vector3 - 3D vector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/core/Vector4.html">Vector4 - 4D vector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/core/Vertex.html">Vertex - Represents a vertex in space</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/lights/index.html">Lights</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/lights/Light.html">Light - Abstract base class for lights</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/lights/AmbientLight.html">AmbientLight - An ambient light</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/lights/DirectionalLight.html">DirectionalLight - A directional light</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/lights/PointLight.html">PointLight - A point light</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/lights/SpotLight.html">SpotLight - A spotlight</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><em>Index</em></a></li>
+<li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">three.js - JavaScript 3D library</a><ul>
+<li><a class="reference internal" href="#contents">Contents</a><ul>
+</ul>
+</li>
+<li><a class="reference internal" href="#api">API</a><ul>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+  <h4>Next topic</h4>
+  <p class="topless"><a href="changelog.html"
+                        title="next chapter">Changelog</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="changelog.html" title="Changelog"
+             >next</a> |</li>
+        <li><a href="#">three.js v48dev documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010-2012, three.js Authors.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

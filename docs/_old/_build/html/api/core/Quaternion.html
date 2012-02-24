@@ -1,0 +1,442 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Quaternion - Implementation of a quaternion &mdash; three.js v48dev documentation</title>
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '48dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="three.js v48dev documentation" href="../../index.html" />
+    <link rel="up" title="Core" href="index.html" />
+    <link rel="next" title="Ray - Representation of a ray in space" href="Ray.html" />
+    <link rel="prev" title="Projector - Utilities for projecting primitives between spaces" href="Projector.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Ray.html" title="Ray - Representation of a ray in space"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Projector.html" title="Projector - Utilities for projecting primitives between spaces"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">three.js v48dev documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Core</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="quaternion-implementation-of-a-quaternion">
+<h1>Quaternion - Implementation of a quaternion<a class="headerlink" href="#quaternion-implementation-of-a-quaternion" title="Permalink to this headline">¶</a></h1>
+<p class="rubric">Constructor</p>
+<dl class="class">
+<dt id="Quaternion">
+<em class="property">class </em><tt class="descname">Quaternion</tt><big>(</big><em>x</em>, <em>y</em>, <em>z</em>, <em>w</em><big>)</big><a class="headerlink" href="#Quaternion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implementation of a quaternion</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>x</strong> (<em>float</em>) &#8211; x-coordinate</li>
+<li><strong>y</strong> (<em>float</em>) &#8211; y-coordinate</li>
+<li><strong>z</strong> (<em>float</em>) &#8211; z-coordinate</li>
+<li><strong>w</strong> (<em>float</em>) &#8211; w-coordinate</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<p class="rubric">Attributes</p>
+<dl class="attribute">
+<dt id="Quaternion.x">
+<tt class="descclassname">Quaternion.</tt><tt class="descname">x</tt><a class="headerlink" href="#Quaternion.x" title="Permalink to this definition">¶</a></dt>
+<dd><p>float - default <tt class="docutils literal"><span class="pre">0</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Quaternion.y">
+<tt class="descclassname">Quaternion.</tt><tt class="descname">y</tt><a class="headerlink" href="#Quaternion.y" title="Permalink to this definition">¶</a></dt>
+<dd><p>float - default <tt class="docutils literal"><span class="pre">0</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Quaternion.z">
+<tt class="descclassname">Quaternion.</tt><tt class="descname">z</tt><a class="headerlink" href="#Quaternion.z" title="Permalink to this definition">¶</a></dt>
+<dd><p>float - default <tt class="docutils literal"><span class="pre">0</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Quaternion.w">
+<tt class="descclassname">Quaternion.</tt><tt class="descname">w</tt><a class="headerlink" href="#Quaternion.w" title="Permalink to this definition">¶</a></dt>
+<dd><p>float - default <tt class="docutils literal"><span class="pre">1</span></tt></p>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<dl class="function">
+<dt id="Quaternion.clone">
+<tt class="descclassname">Quaternion.</tt><tt class="descname">clone</tt><big>(</big><big>)</big><a class="headerlink" href="#Quaternion.clone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clones this quaternion</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">New instance identical to this quaternion</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><a class="reference internal" href="#Quaternion" title="Quaternion"><tt class="xref js js-class docutils literal"><span class="pre">Quaternion()</span></tt></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Quaternion.set">
+<tt class="descclassname">Quaternion.</tt><tt class="descname">set</tt><big>(</big><em>x</em>, <em>y</em>, <em>z</em>, <em>w</em><big>)</big><a class="headerlink" href="#Quaternion.set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets value of this vector</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>x</strong> (<em>float</em>) &#8211; x-coordinate</li>
+<li><strong>y</strong> (<em>float</em>) &#8211; y-coordinate</li>
+<li><strong>z</strong> (<em>float</em>) &#8211; z-coordinate</li>
+<li><strong>w</strong> (<em>float</em>) &#8211; w-coordinate</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">This quaternion</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Quaternion" title="Quaternion"><tt class="xref js js-class docutils literal"><span class="pre">Quaternion()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Quaternion.copy">
+<tt class="descclassname">Quaternion.</tt><tt class="descname">copy</tt><big>(</big><em>q</em><big>)</big><a class="headerlink" href="#Quaternion.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copies value of <tt class="docutils literal"><span class="pre">q</span></tt> to this quaternion</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>v</strong> (<a class="reference internal" href="#Quaternion" title="Quaternion"><em>Quaternion</em></a>) &#8211; source quaternion</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">This quaternion</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Quaternion" title="Quaternion"><tt class="xref js js-class docutils literal"><span class="pre">Quaternion()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Quaternion.setFromEuler ">
+<tt class="descclassname">Quaternion.</tt><tt class="descname">setFromEuler </tt><big>(</big><em>vec3</em><big>)</big><a class="headerlink" href="#Quaternion.setFromEuler " title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets this quaternion from rotation specified by Euler angles</p>
+<p>Angles are in degrees</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>vec3</strong> (<a class="reference internal" href="Vector3.html#Vector3" title="Vector3"><em>Vector3</em></a>) &#8211; Euler angles vector</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">This quaternion</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Quaternion" title="Quaternion"><tt class="xref js js-class docutils literal"><span class="pre">Quaternion()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Quaternion.setFromAxisAngle ">
+<tt class="descclassname">Quaternion.</tt><tt class="descname">setFromAxisAngle </tt><big>(</big><em>axis</em>, <em>angle</em><big>)</big><a class="headerlink" href="#Quaternion.setFromAxisAngle " title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets this quaternion from rotation specified by axis and angle</p>
+<p>Adapted from: <a class="reference external" href="http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToQuaternion/index.htm">http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToQuaternion/index.htm</a></p>
+<p>Axis have to be normalized, angle is in radians</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>axis</strong> (<a class="reference internal" href="Vector3.html#Vector3" title="Vector3"><em>Vector3</em></a>) &#8211; axis vector</li>
+<li><strong>angle</strong> (<em>float</em>) &#8211; angle</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">This quaternion</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Quaternion" title="Quaternion"><tt class="xref js js-class docutils literal"><span class="pre">Quaternion()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Quaternion.setFromRotationMatrix ">
+<tt class="descclassname">Quaternion.</tt><tt class="descname">setFromRotationMatrix </tt><big>(</big><em>m</em><big>)</big><a class="headerlink" href="#Quaternion.setFromRotationMatrix " title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets this quaternion from rotation specified by matrix</p>
+<p>Adapted from: <a class="reference external" href="http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm">http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm</a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>m</strong> (<a class="reference internal" href="Matrix4.html#Matrix4" title="Matrix4"><em>Matrix4</em></a>) &#8211; rotation matrix</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">This quaternion</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Quaternion" title="Quaternion"><tt class="xref js js-class docutils literal"><span class="pre">Quaternion()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Quaternion.calculateW">
+<tt class="descclassname">Quaternion.</tt><tt class="descname">calculateW</tt><big>(</big><big>)</big><a class="headerlink" href="#Quaternion.calculateW" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates <tt class="docutils literal"><span class="pre">w</span></tt> component of this quaternion</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">This quaternion</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><a class="reference internal" href="#Quaternion" title="Quaternion"><tt class="xref js js-class docutils literal"><span class="pre">Quaternion()</span></tt></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Quaternion.inverse">
+<tt class="descclassname">Quaternion.</tt><tt class="descname">inverse</tt><big>(</big><big>)</big><a class="headerlink" href="#Quaternion.inverse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inverts this quaternion</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">This quaternion</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><a class="reference internal" href="#Quaternion" title="Quaternion"><tt class="xref js js-class docutils literal"><span class="pre">Quaternion()</span></tt></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Quaternion.length">
+<tt class="descclassname">Quaternion.</tt><tt class="descname">length</tt><big>(</big><big>)</big><a class="headerlink" href="#Quaternion.length" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes length of this quaternion</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">length</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Quaternion.normalize">
+<tt class="descclassname">Quaternion.</tt><tt class="descname">normalize</tt><big>(</big><big>)</big><a class="headerlink" href="#Quaternion.normalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normalizes this quaternion</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">This vector</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><a class="reference internal" href="#Quaternion" title="Quaternion"><tt class="xref js js-class docutils literal"><span class="pre">Quaternion()</span></tt></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Quaternion.multiplySelf">
+<tt class="descclassname">Quaternion.</tt><tt class="descname">multiplySelf</tt><big>(</big><em>quat2</em><big>)</big><a class="headerlink" href="#Quaternion.multiplySelf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Multiplies this quaternion by <tt class="docutils literal"><span class="pre">quat2</span></tt></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>quat2</strong> (<a class="reference internal" href="#Quaternion" title="Quaternion"><em>Quaternion</em></a>) &#8211; quaternion</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">This quaternion</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Quaternion" title="Quaternion"><tt class="xref js js-class docutils literal"><span class="pre">Quaternion()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Quaternion.multiply">
+<tt class="descclassname">Quaternion.</tt><tt class="descname">multiply</tt><big>(</big><em>q1</em>, <em>q2</em><big>)</big><a class="headerlink" href="#Quaternion.multiply" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets this quaternion to <tt class="docutils literal"><span class="pre">q1</span> <span class="pre">*</span> <span class="pre">q2</span></tt></p>
+<p>Adapted from: <a class="reference external" href="http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/code/index.htm">http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/code/index.htm</a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>q1</strong> (<a class="reference internal" href="#Quaternion" title="Quaternion"><em>Quaternion</em></a>) &#8211; quaternion 1</li>
+<li><strong>q2</strong> (<a class="reference internal" href="#Quaternion" title="Quaternion"><em>Quaternion</em></a>) &#8211; quaternion 2</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">This quaternion</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Quaternion" title="Quaternion"><tt class="xref js js-class docutils literal"><span class="pre">Quaternion()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="Quaternion.multiplyVector3">
+<tt class="descclassname">Quaternion.</tt><tt class="descname">multiplyVector3</tt><big>(</big><em>vec</em>, <em>dest</em><big>)</big><a class="headerlink" href="#Quaternion.multiplyVector3" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rotates <tt class="docutils literal"><span class="pre">vec</span></tt> by this quaternion into <tt class="docutils literal"><span class="pre">dest</span></tt></p>
+<p>If <tt class="docutils literal"><span class="pre">dest</span></tt> is not specified, result goes to <tt class="docutils literal"><span class="pre">vec</span></tt></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>vec</strong> (<a class="reference internal" href="Vector3.html#Vector3" title="Vector3"><em>Vector3</em></a>) &#8211; source vector</li>
+<li><strong>dest</strong> (<a class="reference internal" href="Vector3.html#Vector3" title="Vector3"><em>Vector3</em></a>) &#8211; destination vector</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Rotated vector</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Rtype :</th><td class="field-body"><p class="first last"><a class="reference internal" href="Vector3.html#Vector3" title="Vector3"><tt class="xref js js-class docutils literal"><span class="pre">Vector3()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<p class="rubric">Example</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">q</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">THREE</span><span class="p">.</span><span class="nx">Quaternion</span><span class="p">();</span>
+<span class="nx">q</span><span class="p">.</span><span class="nx">setFromAxisAngle</span><span class="p">(</span> <span class="k">new</span> <span class="nx">THREE</span><span class="p">.</span><span class="nx">Vector3</span><span class="p">(</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span> <span class="p">),</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span> <span class="o">/</span> <span class="mi">2</span> <span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">v</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">THREE</span><span class="p">.</span><span class="nx">Vector3</span><span class="p">(</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span> <span class="p">);</span>
+<span class="nx">q</span><span class="p">.</span><span class="nx">multiplyVector3</span><span class="p">(</span> <span class="nx">v</span> <span class="p">);</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Projector.html"
+                        title="previous chapter">Projector - Utilities for projecting primitives between spaces</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="Ray.html"
+                        title="next chapter">Ray - Representation of a ray in space</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/api/core/Quaternion.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="Ray.html" title="Ray - Representation of a ray in space"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Projector.html" title="Projector - Utilities for projecting primitives between spaces"
+             >previous</a> |</li>
+        <li><a href="../../index.html">three.js v48dev documentation</a> &raquo;</li>
+          <li><a href="index.html" >Core</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010-2012, three.js Authors.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>
