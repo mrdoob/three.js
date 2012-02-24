@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title></title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+    <body>
+        <h3>Drawing Lines</h3>
+        Lets say you want to draw a line or a circle, not a wireframe geometry.<br/>
+        First we need to setup Renderer,Scene and camera (<a href="FirstSteps.html">see First Steps</a>)<br/>
+        Here is the code that we will use for that in this tutorial.
+        
+        <pre>
+        renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+        camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 500);
+        camera.position.set(0, 0, 100);
+        camera.lookAt(new THREE.Vector3(0, 0, 0));
+        scene = new THREE.Scene();
+        </pre>      
+        
+        Next thing we will do is define material.
+        For lines we have to use LineBasicMaterial.
+        
+        <pre>
+        var material = new THREE.LineBasicMaterial({
+            color: 0x0000ff,
+        });
+        </pre>
+        
+        After material we will need a geometry.<br/>
+        Lines are drawn:<br/>
+        from geometry.vertices[0] to geometry.vertices[1],<br/>
+        from geometry.vertices[1] to geometry.vertices[2],<br/>
+        from geometry.vertices[2] to geometry.vertices[3],and so on.<br/>
+        But not from the last to the first.
+        
+        
+        <pre>
+        var geometry = new THREE.Geometry();
+        geometry.vertices.push(new THREE.Vertex(new THREE.Vector3(-10, 0, 0)));
+        geometry.vertices.push(new THREE.Vertex(new THREE.Vector3(0, 10, 0)));
+        geometry.vertices.push(new THREE.Vertex(new THREE.Vector3(10, 0, 0)));
+        
+        </pre>
+        
+        Now that we have points for two lines, and a material. We can put them together to form a line.
+        
+        <pre>
+        var line = new THREE.Line(geometry, material);
+        </pre>
+        
+        All thats left is to add it to the scene and call a render.
+        
+        <pre>
+        scene.add(line);
+        renderer.render(scene,camera);
+        </pre>
+        
+        If everything is ok you shoud be seing a blue arrow(pointing up) made out of two lines.
+    </body>
+</html>

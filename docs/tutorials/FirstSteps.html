@@ -1,14 +1,20 @@
-<h3>First Steps</h3>
+<html>
+    <head>
+        <title></title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+    <body>
+        <h3>First Steps</h3>
 
-Three.js scenes are very easy to setup and only require a few lines of code to initialize.<br/>
-Scenes are constructed using a few different types of objects: cameras, lights, and meshes.
+        Three.js scenes are very easy to setup and only require a few lines of code to initialize.<br/>
+        Scenes are constructed using a few different types of objects: cameras, lights, and meshes.
 
-The first step in rendering a three.js scene is creating the WebGL renderer object.<br/>
-The following code creates an HTML canvas object 800x400 pixels,
-adds it to the document's body,and initializes a three.js scene.<br/>
-The second step is to define a camera which the renderer object will use in rendering.
+        The first step in rendering a three.js scene is creating the WebGL renderer object.<br/>
+        The following code creates an HTML canvas object 800x400 pixels,
+        adds it to the document's body,and initializes a three.js scene.<br/>
+        The second step is to define a camera which the renderer object will use in rendering.
 
-<pre>
+        <pre>
 
 	var camera = new THREE.PerspectiveCamera(
 		35,			// Field of view
@@ -18,20 +24,20 @@ The second step is to define a camera which the renderer object will use in rend
 	);
 	camera.position.set( -15, 10, 15 );
 
-</pre>
+        </pre>
 
-The first parameter passed determines how wide the field of view is.<br/>
-The second parameter is the aspect ratio which is calculated by dividing<br/>
-the viewing area's width by its height. The third and fourth parameters specify 
-cut-off points for objects in the camera's view.<br/>
-If an object's distance from the camera does not fall in the range between NEAR and FAR
-then that object is not rendered.<br/>
-The last line sets the camera's XYZ coordinates to -15, 10, and 15 respectively.<br/>
+        The first parameter passed determines how wide the field of view is.<br/>
+        The second parameter is the aspect ratio which is calculated by dividing<br/>
+        the viewing area's width by its height. The third and fourth parameters specify 
+        cut-off points for objects in the camera's view.<br/>
+        If an object's distance from the camera does not fall in the range between NEAR and FAR
+        then that object is not rendered.<br/>
+        The last line sets the camera's XYZ coordinates to -15, 10, and 15 respectively.<br/>
 
-Step three creates a white cube that is 5 units wide, tall and deep,
-adds the Lambert material, and adds it to the scene.<br/>
+        Step three creates a white cube that is 5 units wide, tall and deep,
+        adds the Lambert material, and adds it to the scene.<br/>
 
-<pre>
+        <pre>
 
 	var cube = new THREE.Mesh(
 		new THREE.CubeGeometry( 5, 5, 5 ),
@@ -39,29 +45,29 @@ adds the Lambert material, and adds it to the scene.<br/>
 	);
 	scene.addC( cube );
 
-</pre>
+        </pre>
 
-For the last step in setting up a scene we create a yellow light source and add it to the scene.
+        For the last step in setting up a scene we create a yellow light source and add it to the scene.
 
-<pre>
+        <pre>
 
 	var light = new THREE.PointLight( 0xFFFF00 );
 	light.position.set( 10, 0, 10 );
 	scene.add( light );
 
-</pre>
+        </pre>
 
-Finally we render the scene which displays our scene through the camera's eye.
+        Finally we render the scene which displays our scene through the camera's eye.
 
-<pre>
+        <pre>
 
 	renderer.render(scene, camera);
 
-</pre>
+        </pre>
 
-Everything together in a working example:
+        Everything together in a working example:
 
-<pre>
+        <pre>
 	
 	window.onload = function() {
 			
@@ -92,7 +98,9 @@ Everything together in a working example:
 		renderer.render(scene, camera);
 				
 	};
-</pre>
+        </pre>
 
-That's how simple and easy three.js makes WebGL.
-Only 20 lines of Javascript to initialize and render a scene.
+        That's how simple and easy three.js makes WebGL.
+        Only 20 lines of Javascript to initialize and render a scene.
+    </body>
+</html>
