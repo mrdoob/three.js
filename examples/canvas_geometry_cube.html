@@ -71,14 +71,12 @@
 
 				cube = new THREE.Mesh( new THREE.CubeGeometry( 200, 200, 200, 1, 1, 1, materials ), new THREE.MeshFaceMaterial() );
 				cube.position.y = 150;
-				cube.overdraw = true;
 				scene.add( cube );
 
 				// Plane
 
 				plane = new THREE.Mesh( new THREE.PlaneGeometry( 200, 200 ), new THREE.MeshBasicMaterial( { color: 0xe0e0e0 } ) );
 				plane.rotation.x = - 90 * ( Math.PI / 180 );
-				plane.overdraw = true;
 				scene.add( plane );
 
 				renderer = new THREE.CanvasRenderer();

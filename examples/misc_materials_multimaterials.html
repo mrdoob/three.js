@@ -226,8 +226,7 @@
 
 				zmesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial() );
 				zmesh.position.set( -80, FLOOR, 50 );
-				zmesh.scale.x = zmesh.scale.y = zmesh.scale.z = 3;
-				zmesh.overdraw = true;
+				zmesh.scale.set( 3, 3, 3 );
 				scene.add( zmesh );
 
 				// PLANES with all materials from the model

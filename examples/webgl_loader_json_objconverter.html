@@ -127,8 +127,6 @@
 
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = 0.25 * ( Math.random() + 0.5 );
 
-					mesh.overdraw = true;
-
 					scene.add( mesh );
 
 				}
@@ -202,7 +200,6 @@
 				zmesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial() );
 				zmesh.position.set( x, y, z );
 				zmesh.scale.set( 3, 3, 3 );
-				zmesh.overdraw = true;
 				scene.add( zmesh );
 
 				createMaterialsPalette( geometry.materials, 100, b );
