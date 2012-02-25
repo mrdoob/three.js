@@ -265,6 +265,7 @@ THREE.Matrix4.prototype = {
 
 	},
 
+	/*
 	transpose: function () {
 
 		var tmp;
@@ -280,6 +281,7 @@ THREE.Matrix4.prototype = {
 		return this;
 
 	},
+	*/
 
 	clone: function () {
 
@@ -294,6 +296,7 @@ THREE.Matrix4.prototype = {
 
 	},
 
+	/*
 	flatten: function () {
 
 		this.flat[ 0 ] = this.n11; this.flat[ 1 ] = this.n21; this.flat[ 2 ] = this.n31; this.flat[ 3 ] = this.n41;
@@ -304,6 +307,7 @@ THREE.Matrix4.prototype = {
 		return this.flat;
 
 	},
+	*/
 
 	flattenToArray: function ( flat ) {
 
