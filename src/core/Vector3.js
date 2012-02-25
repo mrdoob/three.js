@@ -279,9 +279,13 @@ THREE.Vector3.prototype = {
 
 	getRotationFromMatrix: function ( m, scale ) {
 
-		var m11 = m.n11 / scale.x, m12 = m.n12 / scale.y, m13 = m.n13 / scale.z;
-		var m21 = m.n21 / scale.x, m22 = m.n22 / scale.y, m23 = m.n23 / scale.z;
-		var m33 = m.n33 / scale.z;
+		var sx = scale ? scale.x : 1;
+		var sy = scale ? scale.y : 1;
+		var sz = scale ? scale.z : 1;
+
+		var m11 = m.n11 / sx, m12 = m.n12 / sy, m13 = m.n13 / sz;
+		var m21 = m.n21 / sx, m22 = m.n22 / sy, m23 = m.n23 / sz;
+		var m33 = m.n33 / sz;
 
 		this.y = Math.asin( m13 );
 

@@ -104,7 +104,7 @@ THREE.Object3D.prototype = {
 
 		if ( this.rotationAutoUpdate ) {
 
-			this.rotation.getRotationFromMatrix( this.matrix, this.scale );
+			this.rotation.getRotationFromMatrix( this.matrix );
 
 		}
 
