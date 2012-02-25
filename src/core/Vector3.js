@@ -308,10 +308,22 @@ THREE.Vector3.prototype = {
 	},
 
 	/*
-	// from http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/index.htm
-	// assuming heading == y, attitude == z, bank == x
 
-	getRotationFromQuaternion: function ( q ) {
+	// from http://www.mathworks.com/matlabcentral/fileexchange/20696-function-to-convert-between-dcm-euler-angles-quaternions-and-euler-vectors/content/SpinCalc.m
+	// order XYZ
+
+	getEulerXYZFromQuaternion: function ( q ) {
+
+		this.x = Math.atan2( 2 * ( q.x * q.w - q.y * q.z ), ( q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z ) );
+		this.y = Math.asin( 2 *  ( q.x * q.z + q.y * q.w ) );
+		this.z = Math.atan2( 2 * ( q.z * q.w - q.x * q.y ), ( q.w * q.w + q.x * q.x - q.y * q.y - q.z * q.z ) );
+
+	},
+
+	// from http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/index.htm
+	// order YZX (assuming heading == y, attitude == z, bank == x)
+
+	getEulerYZXFromQuaternion: function ( q ) {
 
 		var sqw = q.w * q.w;
 		var sqx = q.x * q.x;
@@ -345,6 +357,7 @@ THREE.Vector3.prototype = {
 		this.x = Math.atan2( 2 * q.x * q.w - 2 * q.y * q.z, -sqx + sqy - sqz + sqw );
 
 	},
+
 	*/
 
 	getScaleFromMatrix: function ( m ) {
