@@ -143,6 +143,13 @@ This code creates a camera, then creates a scene, adds a cube on it, creates a &
 
 ### Change Log ###
 
+2012 02 25 - **r48** (393,602 KB, gzip: 99,416 KB)
+
+* Added camera support to `ColladaLoader`. ([jbaicoianu](http://github.com/jbaicoianu))
+* More `ColladaLoader` improvements. ([mrdoob](http://github.com/mrdoob), [AddictArts](http://github.com/AddictArts), )
+* Updated `IcosahedronGeometry` and `OctahedronGeometry` with @timothypratley's `PolyhedronGeometry` code which also brings `TetrahedronGeometry`. ([mrdoob](http://github.com/mrdoob))
+* `LOD` should now behave as expected from anywhere in the scene graph. ([mrdoob](http://github.com/mrdoob))
+
 
 2012 01 14 - **r47** (378,169 KB, gzip: 96,015 KB)
 
@@ -158,7 +165,7 @@ This code creates a camera, then creates a scene, adds a cube on it, creates a &
 * Added support for the format [OpenCTM](http://openctm.sourceforge.net/). ([alteredq](http://github.com/alteredq))
 * Added `BufferGeometry` for direct rendering from typed arrays. ([alteredq](http://github.com/alteredq))
 * Extended `Texture` class with `format` and `type` parameters. ([alteredq](http://github.com/alteredq))
-* Autoscale texture to max size of WebGL hardware. ([greggman](http://github.com/greggman) and [alteredq](http://github.com/alteredq))
+* Automatically reducing texture to max size of WebGL hardware. ([greggman](http://github.com/greggman) and [alteredq](http://github.com/alteredq))
 * Improved `WebGLRenderer`'s Shadow Map code. ([alteredq](http://github.com/alteredq))
 * Checking for `xhr.overrideMimeType` before using it (fixing IE support). ([mrdoob](http://github.com/mrdoob) and [alteredq](http://github.com/alteredq))
 * Improved ATI and ANGLE support in across `WebGLRenderer` shaders. ([alteredq](http://github.com/alteredq))

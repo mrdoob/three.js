@@ -60,14 +60,9 @@ THREE.Object3D.prototype = {
 
 		this.matrix.multiply( matrix, this.matrix );
 
-		this.position.getPositionFromMatrix( this.matrix );
 		this.scale.getScaleFromMatrix( this.matrix );
 		this.rotation.getRotationFromMatrix( this.matrix, this.scale );
-
-		/*
-		this.matrix.decompose( this.position, this.quaternion, this.scale );
-		this.rotation.getRotationFromQuaternion( this.quaternion );
-		*/
+		this.position.getPositionFromMatrix( this.matrix );
 
 	},
 
