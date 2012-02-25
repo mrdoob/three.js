@@ -20,7 +20,6 @@ THREE.Matrix4 = function ( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33
 
 	);
 
-	this.flat = new Array( 16 );
 	this.m33 = new THREE.Matrix3();
 
 };
@@ -265,7 +264,6 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	/*
 	transpose: function () {
 
 		var tmp;
@@ -281,7 +279,6 @@ THREE.Matrix4.prototype = {
 		return this;
 
 	},
-	*/
 
 	clone: function () {
 
@@ -295,19 +292,6 @@ THREE.Matrix4.prototype = {
 		return m;
 
 	},
-
-	/*
-	flatten: function () {
-
-		this.flat[ 0 ] = this.n11; this.flat[ 1 ] = this.n21; this.flat[ 2 ] = this.n31; this.flat[ 3 ] = this.n41;
-		this.flat[ 4 ] = this.n12; this.flat[ 5 ] = this.n22; this.flat[ 6 ] = this.n32; this.flat[ 7 ] = this.n42;
-		this.flat[ 8 ]  = this.n13; this.flat[ 9 ]  = this.n23; this.flat[ 10 ] = this.n33; this.flat[ 11 ] = this.n43;
-		this.flat[ 12 ] = this.n14; this.flat[ 13 ] = this.n24; this.flat[ 14 ] = this.n34; this.flat[ 15 ] = this.n44;
-
-		return this.flat;
-
-	},
-	*/
 
 	flattenToArray: function ( flat ) {
 
