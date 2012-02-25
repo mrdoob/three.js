@@ -25,7 +25,7 @@ THREE.Camera.prototype.lookAt = function ( vector ) {
 
 	if ( this.rotationAutoUpdate ) {
 
-		this.rotation.getRotationFromMatrix( this.matrix, this.scale );
+		this.rotation.getRotationFromMatrix( this.matrix );
 
 	}
 
