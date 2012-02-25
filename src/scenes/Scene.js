@@ -22,7 +22,7 @@ THREE.Scene = function () {
 THREE.Scene.prototype = new THREE.Object3D();
 THREE.Scene.prototype.constructor = THREE.Scene;
 
-THREE.Scene.prototype.addObject = function ( object ) {
+THREE.Scene.prototype.__addObject = function ( object ) {
 
 	if ( object instanceof THREE.Light ) {
 
@@ -55,13 +55,13 @@ THREE.Scene.prototype.addObject = function ( object ) {
 
 	for ( var c = 0; c < object.children.length; c ++ ) {
 
-		this.addObject( object.children[ c ] );
+		this.__addObject( object.children[ c ] );
 
 	}
 
 };
 
-THREE.Scene.prototype.removeObject = function ( object ) {
+THREE.Scene.prototype.__removeObject = function ( object ) {
 
 	if ( object instanceof THREE.Light ) {
 
@@ -98,7 +98,7 @@ THREE.Scene.prototype.removeObject = function ( object ) {
 
 	for ( var c = 0; c < object.children.length; c ++ ) {
 
-		this.removeObject( object.children[ c ] );
+		this.__removeObject( object.children[ c ] );
 
 	}
 
