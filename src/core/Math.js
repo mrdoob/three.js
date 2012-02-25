@@ -59,6 +59,12 @@ THREE.Math = {
 
 		return range * ( 0.5 - Math.random() );
 
+	},
+
+	sign: function ( x ) {
+
+		return ( x < 0 ) ? -1 : ( ( x > 0 ) ? 1 : 0 );
+
 	}
 
 };
