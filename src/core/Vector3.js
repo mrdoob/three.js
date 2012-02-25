@@ -277,23 +277,25 @@ THREE.Vector3.prototype = {
 
 	},
 
-	getRotationFromMatrix: function ( m ) {
+	getRotationFromMatrix: function ( m, scale ) {
 
-		// TODO: This one doesn't return 100% correct results
+		var m11 = m.n11 / scale.x, m12 = m.n12 / scale.y, m13 = m.n13 / scale.z;
+		var m21 = m.n21 / scale.x, m22 = m.n22 / scale.y, m23 = m.n23 / scale.z;
+		var m33 = m.n33 / scale.z;
 
-		this.y = Math.asin( m.n13 );
+		this.y = Math.asin( m13 );
 
 		var cosY = Math.cos( this.y );
 
 		if ( Math.abs( cosY ) > 0.00001 ) {
 
-			this.x = Math.atan2( - m.n23 / cosY, m.n33 / cosY );
-			this.z = Math.atan2( - m.n12 / cosY, m.n11 / cosY );
+			this.x = Math.atan2( - m23 / cosY, m33 / cosY );
+			this.z = Math.atan2( - m12 / cosY, m11 / cosY );
 
 		} else {
 
 			this.x = 0;
-			this.z = Math.atan2( m.n21, m.n22 );
+			this.z = Math.atan2( m21, m22 );
 
 		}
 
@@ -301,6 +303,7 @@ THREE.Vector3.prototype = {
 
 	},
 
+	/*
 	// from http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/index.htm
 	// assuming heading == y, attitude == z, bank == x
 
@@ -338,16 +341,17 @@ THREE.Vector3.prototype = {
 		this.x = Math.atan2( 2 * q.x * q.w - 2 * q.y * q.z, -sqx + sqy - sqz + sqw );
 
 	},
+	*/
 
 	getScaleFromMatrix: function ( m ) {
 
-		var x = this.set( m.n11, m.n21, m.n31 ).length();
-		var y = this.set( m.n12, m.n22, m.n32 ).length();
-		var z = this.set( m.n13, m.n23, m.n33 ).length();
+		var sx = this.set( m.n11, m.n21, m.n31 ).length();
+		var sy = this.set( m.n12, m.n22, m.n32 ).length();
+		var sz = this.set( m.n13, m.n23, m.n33 ).length();
 
-		this.x = x;
-		this.y = y;
-		this.z = z;
+		this.x = sx;
+		this.y = sy;
+		this.z = sz;
 
 	},
 
