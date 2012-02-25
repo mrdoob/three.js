@@ -142,7 +142,7 @@ THREE.Object3D.prototype = {
 
 			if ( scene !== undefined && scene instanceof THREE.Scene )  {
 
-				scene.addObject( object );
+				scene.__addObject( object );
 
 			}
 
@@ -171,7 +171,7 @@ THREE.Object3D.prototype = {
 
 			if ( scene !== undefined && scene instanceof THREE.Scene ) {
 
-				scene.removeObject( object );
+				scene.__removeObject( object );
 
 			}
 
