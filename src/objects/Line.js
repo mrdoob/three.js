@@ -7,8 +7,7 @@ THREE.Line = function ( geometry, material, type ) {
 	THREE.Object3D.call( this );
 
 	this.geometry = geometry;
-	this.material = material;
-
+	this.material = ( material !== undefined ) ? material : new THREE.LineBasicMaterial( { color: Math.random() * 0xffffff } );
 	this.type = ( type !== undefined ) ? type : THREE.LineStrip;
 
 	if ( this.geometry ) {

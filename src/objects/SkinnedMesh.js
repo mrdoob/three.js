@@ -3,7 +3,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.SkinnedMesh = function( geometry, material ) {
+THREE.SkinnedMesh = function ( geometry, material ) {
 
 	THREE.Mesh.call( this, geometry, material );
 

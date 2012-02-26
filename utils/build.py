@@ -191,8 +191,7 @@ CANVAS_FILES = [
 'renderers/renderables/RenderableFace4.js',
 'renderers/renderables/RenderableObject.js',
 'renderers/renderables/RenderableParticle.js',
-'renderers/renderables/RenderableLine.js',
-'extras/ImageUtils.js'
+'renderers/renderables/RenderableLine.js'
 ]
 
 DOM_FILES = [
@@ -219,6 +218,9 @@ DOM_FILES = [
 'cameras/PerspectiveCamera.js',
 'lights/Light.js',
 'materials/Material.js',
+'materials/LineBasicMaterial.js',
+'materials/MeshBasicMaterial.js',
+'materials/ParticleBasicMaterial.js',
 'materials/ParticleDOMMaterial.js',
 'textures/Texture.js',
 'textures/DataTexture.js',
@@ -235,8 +237,7 @@ DOM_FILES = [
 'renderers/renderables/RenderableFace4.js',
 'renderers/renderables/RenderableObject.js',
 'renderers/renderables/RenderableParticle.js',
-'renderers/renderables/RenderableLine.js',
-'extras/ImageUtils.js'
+'renderers/renderables/RenderableLine.js'
 ]
 
 SVG_FILES = [
@@ -289,8 +290,7 @@ SVG_FILES = [
 'renderers/renderables/RenderableFace4.js',
 'renderers/renderables/RenderableObject.js',
 'renderers/renderables/RenderableParticle.js',
-'renderers/renderables/RenderableLine.js',
-'extras/ImageUtils.js'
+'renderers/renderables/RenderableLine.js'
 ]
 
 WEBGL_FILES = [
@@ -365,8 +365,7 @@ WEBGL_FILES = [
 'extras/renderers/plugins/ShadowMapPlugin.js',
 'extras/renderers/plugins/SpritePlugin.js',
 'extras/shaders/ShaderFlares.js',
-'extras/shaders/ShaderSprite.js',
-'extras/ImageUtils.js'
+'extras/shaders/ShaderSprite.js'
 ]
 
 def merge(files):
