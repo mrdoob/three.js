@@ -30,9 +30,16 @@
 			}
 
 				#panel h1 {
+					color: #444;
+					font-size: 25px;
+					margin-top: 25px;
+					margin-left: 20px;
+				}
+
+				#panel h2 {
 					color: #999;
 					font-size: 16px;
-					margin-top: 16px;
+					margin-top: 20px;
 					margin-left: 20px;
 				}
 
@@ -95,6 +102,8 @@
 		<div id="viewer"></div>
 
 		<script>
+			var REVISION = '48dev';
+
 			var panel = document.getElementById( 'panel' );
 			var viewer = document.getElementById( 'viewer' );
 
@@ -300,11 +309,11 @@
 
 			};
 
-			var html = '';
+			var html = '<h1>three.js <span style="font-size: 50%; vertical-align: super;">r' + REVISION + '</span></h1>';
 
 			for ( var category in list ) {
 
-				html += '<h1>' + category + '</h1>';
+				html += '<h2>' + category + '</h2>';
 
 				html += '<ul>';
 
