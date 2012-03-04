@@ -74,8 +74,6 @@ More? [#three.js on irc.freenode.net](http://webchat.freenode.net/?channels=thre
 <a href="http://superfad.com/missioncontrol/"><img src="http://mrdoob.github.com/three.js/assets/projects/18_missioncontrol.png" width="102" height="77" alt="Mission Control"></a>
 <a href="http://ro.me/"><img src="http://mrdoob.github.com/three.js/assets/projects/17_rome.png" width="102" height="77" alt="ROME"></a>
 <a href="http://data-arts.appspot.com/globe"><img src="http://mrdoob.github.com/three.js/assets/projects/16_globe.png" width="102" height="77" alt="Globe"></a>
-<a href="http://lab.aerotwist.com/webgl/photoparticles/"><img src="http://mrdoob.github.com/three.js/assets/projects/15_photoparticles.png" width="102" height="77" alt="Photoparticles"></a>
-<a href="http://plumegraph.org/"><img src="http://mrdoob.github.com/three.js/assets/projects/14_plumegraph.png" width="102" height="77" alt="Plumegraph"></a>
 <a href="http://helloracer.com/webgl/"><img src="http://mrdoob.github.com/three.js/assets/projects/13_helloracer.png" width="102" height="77" alt="HelloRacer"></a>
 <a href="http://www.omiod.com/games/fastkat.php"><img src="http://mrdoob.github.com/three.js/assets/projects/12_fastkat.png" width="102" height="77" alt="FastKat"></a>
 <a href="http://mrdoob.com/projects/voxels/"><img src="http://mrdoob.github.com/three.js/assets/projects/10_voxels.png" width="102" height="77" alt="Voxels"></a>
