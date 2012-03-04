@@ -2935,17 +2935,9 @@ THREE.ColladaLoader = function () {
 
 							}
 
-						} else {
+						} else if ( prop == 'diffuse' || !transparent ) {
 
-							if ( prop == 'diffuse' ) {
-
-								props[ 'color' ] = cot.color.getHex();
-
-							} else if ( !transparent ) {
-
-								props[ prop ] = cot.color.getHex();
-
-							}
+							props[ prop ] = cot.color.getHex();
 
 						}
 
@@ -2979,27 +2971,27 @@ THREE.ColladaLoader = function () {
 		}
 
 		props[ 'shading' ] = preferredShading;
-		this.material = new THREE.MeshLambertMaterial( props );
 
 		switch ( this.type ) {
 
 			case 'constant':
-			case 'lambert':
+
+				props.color = props.emission;
+				this.material = new THREE.MeshBasicMaterial( props );
 				break;
 
 			case 'phong':
 			case 'blinn':
 
+				props.color = props.diffuse;
+				this.material = new THREE.MeshPhongMaterial( props );
+				break;
+
+			case 'lambert':
 			default:
 
-				/*
-				if ( !transparent ) {
-
-				//	this.material = new THREE.MeshPhongMaterial(props);
-
-				}
-				*/
-
+				props.color = props.diffuse;
+				this.material = new THREE.MeshLambertMaterial( props );
 				break;
 
 		}
