@@ -350,8 +350,9 @@
 						
 						text = text.replace(/\[name\]/gi, name);
 						text = text.replace(/\[path\]/gi, path);
-						text = text.replace(/\[page:(\w+)\]/gi, "<a href=\"javascript:goTo('$1')\" title=\"$1\">$1</a>" );
-						text = text.replace(/\[page:(\w+) ([\w|\.]+)\]/gi, "<a href=\"javascript:goTo('$1')\" title=\"$1\">$2</a>" );
+						text = text.replace(/\[page:(\w+)\]/gi, "<a href=\"javascript:goTo('$1')\" title=\"$1\">$1</a>" ); // [page:name]
+						text = text.replace(/\[page:(\w+) ([\w|\.]+)\]/gi, "<a href=\"javascript:goTo('$1')\" title=\"$1\">$2</a>" ); // [page:name title]
+						text = text.replace(/\*([\w|\ |\-|\/]+)\*/gi, "<strong>$1</strong>" ); // *
 
 						viewer.innerHTML = '<br>' + text + '<br><br>';
 
