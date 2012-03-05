@@ -3226,6 +3226,12 @@ THREE.ColladaLoader = function () {
 					this.parseNewparam( child );
 					break;
 
+				case 'image':
+
+					var _image = ( new _Image() ).parse( child );
+					images[ _image.id ] = _image;
+					break;
+
 				case 'extra':
 					break;
 
