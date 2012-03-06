@@ -2269,7 +2269,8 @@ THREE.ColladaLoader = function () {
 
 		}
 
-		for (var pCount = 0; pCount < pList.length; ++pCount) {
+		for ( var pCount = 0; pCount < pList.length; ++pCount ) {
+
 			var p = pList[pCount], i = 0;
 
 			while ( i < p.length ) {
@@ -2281,11 +2282,12 @@ THREE.ColladaLoader = function () {
 
 				if ( primitive.vcount ) {
 
-					vcount = primitive.vcount[ vcIndex ++ ];
+					vcount = primitive.vcount.length ? primitive.vcount[ vcIndex ++ ] : primitive.vcount;
 
-				}
-				else {
+				} else {
+
 					vcount = p.length / maxOffset;
+
 				}
 
 
@@ -2432,18 +2434,11 @@ THREE.ColladaLoader = function () {
 				i += maxOffset * vcount;
 
 			}
-	}
+		}
 
 	};
 
-
-	function Polylist () {
-	};
-
-	Polylist.prototype = new Triangles();
-	Polylist.prototype.constructor = Polylist;
-
-	function Triangles( flip_uv ) {
+	function Polygons () {
 
 		this.material = "";
 		this.count = 0;
@@ -2454,7 +2449,7 @@ THREE.ColladaLoader = function () {
 
 	};
 
-	Triangles.prototype.setVertices = function ( vertices ) {
+	Polygons.prototype.setVertices = function ( vertices ) {
 
 		for ( var i = 0; i < this.inputs.length; i ++ ) {
 
@@ -2468,10 +2463,8 @@ THREE.ColladaLoader = function () {
 
 	};
 
-	Triangles.prototype.parse = function ( element ) {
+	Polygons.prototype.parse = function ( element ) {
 
-		this.inputs = [];
-		this.p = [];
 		this.material = element.getAttribute( 'material' );
 		this.count = _attr_as_int( element, 'count', 0 );
 
@@ -2493,7 +2486,12 @@ THREE.ColladaLoader = function () {
 
 				case 'p':
 
-					this.p.push(_ints( child.textContent ));
+					this.p.push( _ints( child.textContent ) );
+					break;
+
+				case 'ph':
+
+					console.warn( 'polygon holes not yet supported!' );
 					break;
 
 				default:
@@ -2507,11 +2505,27 @@ THREE.ColladaLoader = function () {
 
 	};
 
-	function Polygons () {
+	function Polylist () {
+
+		Polygons.call( this );
+
+		this.vcount = [];
+
 	};
 
-	Polygons.prototype = new Triangles();
-	Polygons.prototype.constructor = Polygons;
+	Polylist.prototype = new Polygons();
+	Polylist.prototype.constructor = Polylist;
+
+	function Triangles () {
+
+		Polygons.call( this );
+
+		this.vcount = 3;
+
+	};
+
+	Triangles.prototype = new Polygons();
+	Triangles.prototype.constructor = Triangles;
 
 	function Accessor() {
 
