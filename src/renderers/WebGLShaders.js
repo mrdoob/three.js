@@ -295,11 +295,11 @@ THREE.ShaderChunk = {
 
 	lights_lambert_vertex: [
 
-		"vLightFront = vec3( emissive );",
+		"vLightFront = vec3( 0.0 );",
 
 		"#ifdef DOUBLE_SIDED",
 
-			"vLightBack = vec3( emissive );",
+			"vLightBack = vec3( 0.0 );",
 
 		"#endif",
 
@@ -405,11 +405,11 @@ THREE.ShaderChunk = {
 
 		"#endif",
 
-		"vLightFront = vLightFront * diffuse + ambient * ambientLightColor;",
+		"vLightFront = vLightFront * diffuse + ambient * ambientLightColor + emissive;",
 
 		"#ifdef DOUBLE_SIDED",
 
-			"vLightBack = vLightBack * diffuse + ambient * ambientLightColor;",
+			"vLightBack = vLightBack * diffuse + ambient * ambientLightColor + emissive;",
 
 		"#endif",
 
@@ -1387,8 +1387,8 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ "shadowmap" ],
 
 			{
-				"ambient"  : { type: "c", value: new THREE.Color( 0x050505 ) },
-				"emissive"  : { type: "c", value: new THREE.Color( 0x000000 ) },
+				"ambient"  : { type: "c", value: new THREE.Color( 0xffffff ) },
+				"emissive" : { type: "c", value: new THREE.Color( 0x000000 ) },
 				"wrapRGB"  : { type: "v3", value: new THREE.Vector3( 1, 1, 1 ) }
 			}
 
@@ -1502,7 +1502,7 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ "shadowmap" ],
 
 			{
-				"ambient"  : { type: "c", value: new THREE.Color( 0x050505 ) },
+				"ambient"  : { type: "c", value: new THREE.Color( 0xffffff ) },
 				"emissive" : { type: "c", value: new THREE.Color( 0x000000 ) },
 				"specular" : { type: "c", value: new THREE.Color( 0x111111 ) },
 				"shininess": { type: "f", value: 30 },
