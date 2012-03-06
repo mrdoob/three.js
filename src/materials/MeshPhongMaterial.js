@@ -5,6 +5,7 @@
  * parameters = {
  *  color: <hex>,
  *  ambient: <hex>,
+ *  emissive: <hex>,
  *  specular: <hex>,
  *  shininess: <float>,
  *  opacity: <float>,
@@ -38,8 +39,10 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 
 	parameters = parameters || {};
 
+	// color property represents diffuse for MeshPhongMaterial
 	this.color = parameters.color !== undefined ? new THREE.Color( parameters.color ) : new THREE.Color( 0xffffff );
 	this.ambient = parameters.ambient !== undefined ? new THREE.Color( parameters.ambient ) : new THREE.Color( 0xffffff );
+	this.emissive = parameters.emissive !== undefined ? new THREE.Color( parameters.emissive ) : new THREE.Color( 0x000000 );
 	this.specular = parameters.specular !== undefined ? new THREE.Color( parameters.specular ) : new THREE.Color( 0x111111 );
 	this.shininess = parameters.shininess !== undefined ? parameters.shininess : 30;
 
