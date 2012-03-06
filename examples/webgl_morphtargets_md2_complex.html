@@ -1,0 +1,1095 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - morphtargets - MD2</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+		    body {
+			color: #fff;
+			font-family:Monospace;
+			font-size:13px;
+			text-align:center;
+			font-weight: bold;
+
+			background-color: #000;
+			margin: 0px;
+			overflow: hidden;
+		    }
+
+		    #info {
+			position: relative;
+			margin: 0 auto -2.1em;
+			top: 0px;
+
+			padding: 5px;
+			z-index:100;
+		    }
+
+		    a { color: skyblue; }
+		</style>
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - morphtargets -
+			MD2 character by <a href="http://planetquake.gamespy.com/View.php?view=Quake2.Detail&id=368">Brian Collins</a> -
+			converted by <a href="https://twitter.com/#!/oosmoxiecode">@oosmoxiecode</a>'s <a href="http://oos.moxiecode.com/blog/2012/01/md2-to-json-converter/">MD2 converter<a>
+		</div>
+
+		<script src="../src/Three.js"></script>
+		<script src="../src/core/Clock.js"></script>
+		<script src="../src/core/Color.js"></script>
+		<script src="../src/core/Vector2.js"></script>
+		<script src="../src/core/Vector3.js"></script>
+		<script src="../src/core/Vector4.js"></script>
+		<script src="../src/core/Frustum.js"></script>
+		<script src="../src/core/Ray.js"></script>
+		<script src="../src/core/Rectangle.js"></script>
+		<script src="../src/core/Math.js"></script>
+		<script src="../src/core/Matrix3.js"></script>
+		<script src="../src/core/Matrix4.js"></script>
+		<script src="../src/core/Object3D.js"></script>
+		<script src="../src/core/Projector.js"></script>
+		<script src="../src/core/Quaternion.js"></script>
+		<script src="../src/core/Vertex.js"></script>
+		<script src="../src/core/Face3.js"></script>
+		<script src="../src/core/Face4.js"></script>
+		<script src="../src/core/UV.js"></script>
+		<script src="../src/core/Geometry.js"></script>
+		<script src="../src/core/Spline.js"></script>
+		<script src="../src/core/Edge.js"></script>
+		<script src="../src/cameras/Camera.js"></script>
+		<script src="../src/cameras/OrthographicCamera.js"></script>
+		<script src="../src/cameras/PerspectiveCamera.js"></script>
+		<script src="../src/lights/Light.js"></script>
+		<script src="../src/lights/AmbientLight.js"></script>
+		<script src="../src/lights/DirectionalLight.js"></script>
+		<script src="../src/lights/PointLight.js"></script>
+		<script src="../src/lights/SpotLight.js"></script>
+		<script src="../src/materials/Material.js"></script>
+		<script src="../src/materials/LineBasicMaterial.js"></script>
+		<script src="../src/materials/MeshBasicMaterial.js"></script>
+		<script src="../src/materials/MeshLambertMaterial.js"></script>
+		<script src="../src/materials/MeshPhongMaterial.js"></script>
+		<script src="../src/materials/MeshDepthMaterial.js"></script>
+		<script src="../src/materials/MeshNormalMaterial.js"></script>
+		<script src="../src/materials/MeshFaceMaterial.js"></script>
+		<script src="../src/materials/MeshShaderMaterial.js"></script>
+		<script src="../src/materials/ParticleBasicMaterial.js"></script>
+		<script src="../src/materials/ParticleCanvasMaterial.js"></script>
+		<script src="../src/materials/ParticleDOMMaterial.js"></script>
+		<script src="../src/materials/ShaderMaterial.js"></script>
+		<script src="../src/textures/Texture.js"></script>
+		<script src="../src/textures/DataTexture.js"></script>
+		<script src="../src/objects/Particle.js"></script>
+		<script src="../src/objects/ParticleSystem.js"></script>
+		<script src="../src/objects/Line.js"></script>
+		<script src="../src/objects/Mesh.js"></script>
+		<script src="../src/objects/Bone.js"></script>
+		<script src="../src/objects/SkinnedMesh.js"></script>
+		<script src="../src/objects/MorphAnimMesh.js"></script>
+		<script src="../src/objects/Ribbon.js"></script>
+		<script src="../src/objects/LOD.js"></script>
+		<script src="../src/objects/Sprite.js"></script>
+		<script src="../src/scenes/Scene.js"></script>
+		<script src="../src/scenes/Fog.js"></script>
+		<script src="../src/scenes/FogExp2.js"></script>
+		<script src="../src/renderers/DOMRenderer.js"></script>
+		<script src="../src/renderers/CanvasRenderer.js"></script>
+		<script src="../src/renderers/SVGRenderer.js"></script>
+		<script src="../src/renderers/WebGLShaders.js"></script>
+		<script src="../src/renderers/WebGLRenderer.js"></script>
+		<script src="../src/renderers/WebGLRenderTarget.js"></script>
+		<script src="../src/renderers/WebGLRenderTargetCube.js"></script>
+		<script src="../src/renderers/renderables/RenderableVertex.js"></script>
+		<script src="../src/renderers/renderables/RenderableFace3.js"></script>
+		<script src="../src/renderers/renderables/RenderableFace4.js"></script>
+		<script src="../src/renderers/renderables/RenderableObject.js"></script>
+		<script src="../src/renderers/renderables/RenderableParticle.js"></script>
+		<script src="../src/renderers/renderables/RenderableLine.js"></script>
+		<script src="../src/extras/ColorUtils.js"></script>
+		<script src="../src/extras/GeometryUtils.js"></script>
+		<script src="../src/extras/ImageUtils.js"></script>
+		<script src="../src/extras/SceneUtils.js"></script>
+		<script src="../src/extras/ShaderUtils.js"></script>
+		<script src="../src/extras/core/BufferGeometry.js"></script>
+		<script src="../src/extras/core/Curve.js"></script>
+		<script src="../src/extras/core/CurvePath.js"></script>
+		<script src="../src/extras/core/EventTarget.js"></script>
+		<script src="../src/extras/core/Gyroscope.js"></script>
+		<script src="../src/extras/core/Path.js"></script>
+		<script src="../src/extras/core/Shape.js"></script>
+		<script src="../src/extras/core/TextPath.js"></script>
+		<script src="../src/extras/animation/AnimationHandler.js"></script>
+		<script src="../src/extras/animation/Animation.js"></script>
+		<script src="../src/extras/animation/KeyFrameAnimation.js"></script>
+		<script src="../src/extras/cameras/CubeCamera.js"></script>
+		<script src="../src/extras/cameras/CombinedCamera.js"></script>
+		<script src="../src/extras/controls/FirstPersonControls.js"></script>
+		<script src="../src/extras/controls/PathControls.js"></script>
+		<script src="../src/extras/controls/FlyControls.js"></script>
+		<script src="../src/extras/controls/RollControls.js"></script>
+		<script src="../src/extras/controls/TrackballControls.js"></script>
+		<script src="../src/extras/geometries/CubeGeometry.js"></script>
+		<script src="../src/extras/geometries/CylinderGeometry.js"></script>
+		<script src="../src/extras/geometries/ExtrudeGeometry.js"></script>
+		<script src="../src/extras/geometries/LatheGeometry.js"></script>
+		<script src="../src/extras/geometries/PlaneGeometry.js"></script>
+		<script src="../src/extras/geometries/SphereGeometry.js"></script>
+		<script src="../src/extras/geometries/TextGeometry.js"></script>
+		<script src="../src/extras/geometries/TorusGeometry.js"></script>
+		<script src="../src/extras/geometries/TorusKnotGeometry.js"></script>
+		<script src="../src/extras/geometries/PolyhedronGeometry.js"></script>
+		<script src="../src/extras/geometries/IcosahedronGeometry.js"></script>
+		<script src="../src/extras/geometries/OctahedronGeometry.js"></script>
+		<script src="../src/extras/geometries/TetrahedronGeometry.js"></script>
+		<script src="../src/extras/helpers/AxisHelper.js"></script>
+		<script src="../src/extras/helpers/CameraHelper.js"></script>
+		<script src="../src/extras/modifiers/SubdivisionModifier.js"></script>
+		<script src="../src/extras/loaders/Loader.js"></script>
+		<script src="../src/extras/loaders/BinaryLoader.js"></script>
+		<script src="../src/extras/loaders/ColladaLoader.js"></script>
+		<script src="../src/extras/loaders/JSONLoader.js"></script>
+		<script src="../src/extras/loaders/SceneLoader.js"></script>
+		<script src="../src/extras/loaders/UTF8Loader.js"></script>
+		<script src="../src/extras/objects/MarchingCubes.js"></script>
+		<script src="../src/extras/objects/LensFlare.js"></script>
+		<script src="../src/extras/renderers/plugins/LensFlarePlugin.js"></script>
+		<script src="../src/extras/renderers/plugins/ShadowMapPlugin.js"></script>
+		<script src="../src/extras/renderers/plugins/SpritePlugin.js"></script>
+		<script src="../src/extras/renderers/AnaglyphWebGLRenderer.js"></script>
+		<script src="../src/extras/renderers/CrosseyedWebGLRenderer.js"></script>
+		<script src="../src/extras/shaders/ShaderFlares.js"></script>
+		<script src="../src/extras/shaders/ShaderSprite.js"></script>
+
+		<script src="../src/objects/MorphBlendMesh.js"></script>
+		<script src='js/MD2CharacterComplex.js'></script>
+
+		<script src='js/ShaderExtras.js'></script>
+
+		<script src="js/postprocessing/EffectComposer.js"></script>
+		<script src="js/postprocessing/RenderPass.js"></script>
+		<script src="js/postprocessing/BloomPass.js"></script>
+		<script src="js/postprocessing/ShaderPass.js"></script>
+		<script src="js/postprocessing/MaskPass.js"></script>
+		<script src="js/postprocessing/SavePass.js"></script>
+
+		<script src='js/Detector.js'></script>
+		<script src='js/Stats.js'></script>
+		<script src='js/DAT.GUI.min.js'></script>
+
+		<script src="fonts/helvetiker_bold.typeface.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var MARGIN = 100;
+			var SCREEN_WIDTH = window.innerWidth;
+			var SCREEN_HEIGHT = window.innerHeight - 2 * MARGIN;
+
+			var SHADOW_MAP_WIDTH = 2048, SHADOW_MAP_HEIGHT = 2048;
+
+			var container, camera, scene, renderer;
+
+			var character;
+
+			var cameraControls;
+
+			var morphs = [];
+
+			var gui, playbackConfig = {
+
+				speed: 1.0,
+				wireframe: false
+
+			};
+
+			var controls = {
+
+				moveForward: false,
+				moveBackward: false,
+				moveLeft: false,
+				moveRight: false
+
+			};
+
+			var clock = new THREE.Clock();
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				// SCENE
+
+				scene = new THREE.Scene();
+				scene.fog = new THREE.Fog( 0xffffff, 1000, 8000 );
+				scene.fog.color.setHSV( 0.6, 0.2, 0.99 );
+
+				// CAMERA
+
+				camera = new THREE.PerspectiveCamera( 40, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 8000 );
+				camera.position.set( 0, 150, 800 );
+				scene.add( camera );
+
+				// LIGHTS
+
+				scene.add( new THREE.AmbientLight( 0x222222 ) );
+
+				light1 = new THREE.DirectionalLight( 0xffffff, 1.2 );
+				light1.position.set( 200, 650, 500 );
+
+				light1.castShadow = true;
+				light1.shadowMapWidth = 1024;
+				light1.shadowMapHeight = 1024;
+				light1.shadowDarkness = 0.4;
+				//light1.shadowCameraVisible = true;
+
+				light1.shadowCascade = true;
+				light1.shadowCascadeCount = 3;
+				light1.shadowCascadeBias   = [ 0.001, 0, 0.0007 ];
+				light1.shadowCascadeNearZ = [ -1.000, 0.9975, 0.9995 ];
+				light1.shadowCascadeFarZ  = [  0.9975, 0.9995, 1.000 ];
+				light1.shadowCascadeWidth  = [ SHADOW_MAP_WIDTH, SHADOW_MAP_WIDTH, SHADOW_MAP_WIDTH ];
+				light1.shadowCascadeHeight = [ SHADOW_MAP_HEIGHT, SHADOW_MAP_HEIGHT, SHADOW_MAP_HEIGHT ];
+
+				scene.add( light1 );
+
+				//  GROUND
+
+				var gt = THREE.ImageUtils.loadTexture( "textures/terrain/grasslight-big.jpg" );
+				var gt = THREE.ImageUtils.loadTexture( "textures/patterns/bright_squares256.png" );
+				var gg = new THREE.PlaneGeometry( 32000, 32000 );
+				var gm = new THREE.MeshPhongMaterial( { color: 0xffffff, map: gt, perPixel: true } );
+
+				var ground = new THREE.Mesh( gg, gm );
+				ground.material.map.repeat.set( 32, 32);
+				ground.material.map.wrapS = ground.material.map.wrapT = THREE.RepeatWrapping;
+				ground.rotation.x = - Math.PI/2;
+				ground.receiveShadow = true;
+
+				scene.add( ground );
+
+				// OBJECTS
+
+				var objMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, maps: gt, perPixel: true } );
+				var geo = new THREE.CubeGeometry( 10, 10, 10, 1, 1, 1, objMaterial, { ny: false } );
+
+				var mergedGeo = new THREE.Geometry();
+
+
+				for ( var i = 0; i < 100; i ++ ) {
+
+					var s = THREE.Math.randFloat( 1, 30 );
+					var ss = THREE.Math.randFloat( 1, 75 );
+
+					var mesh = new THREE.Mesh( geo, objMaterial );
+					mesh.position.x = THREE.Math.randFloatSpread( 20000 );
+					mesh.position.z = THREE.Math.randFloatSpread( 20000 );
+					mesh.position.y = 0.5 * 10 * s;
+					mesh.scale.y = s;
+					mesh.scale.x = ss;
+					mesh.scale.z = ss;
+
+					mesh.matrixAutoUpdate = false;
+					mesh.updateMatrix();
+
+					THREE.GeometryUtils.merge( mergedGeo, mesh );
+
+				}
+
+				var mesh = new THREE.Mesh( mergedGeo, objMaterial );
+				mesh.castShadow = true;
+				mesh.receiveShadow = true;
+				scene.add( mesh );
+
+				// TEXT
+
+				var textGeo = new THREE.TextGeometry( "THREE.JS", {
+
+					size: 200,
+					height: 50,
+					curveSegments: 12,
+
+					font: "helvetiker",
+					weight: "bold",
+					style: "normal",
+
+					bevelThickness: 2,
+					bevelSize: 5,
+					bevelEnabled: true
+
+				});
+
+				textGeo.computeBoundingBox();
+				var centerOffset = -0.5 * ( textGeo.boundingBox.max.x - textGeo.boundingBox.min.x );
+
+				var textMaterial = new THREE.MeshPhongMaterial( { color: 0x00aaff, specular: 0x00aaff, ambient: 0x00aaff, perPixel: true } );
+
+				var mesh = new THREE.Mesh( textGeo, textMaterial );
+				mesh.position.x = centerOffset;
+				mesh.position.y = 67;
+
+				mesh.castShadow = true;
+				mesh.receiveShadow = true;
+
+				scene.add( mesh );
+
+				// CUBES
+
+				var mesh = new THREE.Mesh( new THREE.CubeGeometry( 1500, 220, 150 ), objMaterial );
+
+				mesh.position.y = -50;
+				mesh.position.z = 20;
+
+				mesh.castShadow = true;
+				mesh.receiveShadow = true;
+
+				scene.add( mesh );
+
+				var mesh = new THREE.Mesh( new THREE.CubeGeometry( 1600, 170, 250 ), objMaterial );
+
+				mesh.position.y = -50;
+				mesh.position.z = 20;
+
+				mesh.castShadow = true;
+				mesh.receiveShadow = true;
+
+				scene.add( mesh );
+
+				// MORPHS
+
+				function addMorph( geometry, speed, duration, x, y, z, fudgeColor ) {
+
+					var s = 1;
+
+					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 10, morphTargets: true, morphNormals: true, vertexColors: THREE.FaceColors, shading: THREE.FlatShading, perPixel: true } );
+
+					if ( 1 || fudgeColor ) {
+
+						THREE.ColorUtils.adjustHSV( material.color, 0, 0.5 - Math.random(), 0.5 - Math.random() );
+						material.ambient = material.color;
+
+					}
+
+					var meshAnim = new THREE.MorphAnimMesh( geometry, material );
+
+					meshAnim.speed = speed;
+					meshAnim.duration = duration;
+					meshAnim.time = 600 * Math.random();
+
+					meshAnim.position.set( x, y, z );
+					meshAnim.rotation.y = Math.PI/2;
+
+					meshAnim.scale.set( s, s, s );
+
+					meshAnim.castShadow = true;
+					meshAnim.receiveShadow = true;
+
+					scene.add( meshAnim );
+
+					morphs.push( meshAnim );
+
+				}
+
+				function morphColorsToFaceColors( geometry ) {
+
+					if ( geometry.morphColors && geometry.morphColors.length ) {
+
+						var colorMap = geometry.morphColors[ 0 ];
+
+						for ( var i = 0; i < colorMap.colors.length; i ++ ) {
+
+							geometry.faces[ i ].color = colorMap.colors[ i ];
+
+						}
+
+					}
+
+				}
+
+				var loader = new THREE.JSONLoader();
+
+				loader.load( "obj/morphs/shdw3walk.js", function( geometry ) {
+
+					geometry.computeMorphNormals();
+					morphColorsToFaceColors( geometry );
+
+					for ( var i = 0; i < 50; i ++ ) {
+
+						addMorph( geometry, 40, 2000, -3000 + Math.random() * 6000, 0 + 60, -3000 + Math.random() * 6000 );
+
+					}
+
+
+
+				} );
+
+
+				loader.load( "models/animated/horse.js", function( geometry ) {
+
+					geometry.computeMorphNormals();
+					morphColorsToFaceColors( geometry );
+
+					for ( var i = 0; i < 50; i ++ ) {
+
+						addMorph( geometry, 550, 1000, -5000 + Math.random() * 10000, 0, -5000 + Math.random() * 10000 );
+
+					}
+
+
+				} );
+
+				loader.load( "obj/morphs/flamingo.js", function( geometry ) {
+
+					geometry.computeMorphNormals();
+					morphColorsToFaceColors( geometry );
+
+					for ( var i = 0; i < 50; i ++ ) {
+
+						addMorph( geometry, 850, 750, -5000 + Math.random() * 10000, 0 + 500 + 500 * Math.random(), -5000 + Math.random() * 10000 );
+
+					}
+
+
+
+				} );
+
+				// RENDERER
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				renderer.domElement.style.position = "relative";
+				renderer.domElement.style.top = MARGIN + 'px';
+				renderer.setClearColor( scene.fog.color, 1 );
+
+				container.appendChild( renderer.domElement );
+
+				// CONTROLS
+
+				cameraControls = new THREE.TrackballControls( camera, renderer.domElement );
+				cameraControls.target.set( 0, 0, 0 );
+
+				//
+
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+				//renderer.physicallyBasedShading = true;
+
+				renderer.shadowMapEnabled = true;
+				//renderer.shadowMapSoft = false;
+				//renderer.shadowMapCullFrontFaces = false;
+
+				renderer.shadowMapCascade = true;
+				//renderer.shadowMapDebug = true;
+
+				renderer.autoClear = false;
+
+				// STATS
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				stats.domElement.style.zIndex = 100;
+				container.appendChild( stats.domElement );
+
+				stats.domElement.children[ 0 ].children[ 0 ].style.color = "#aaa";
+				stats.domElement.children[ 0 ].style.background = "transparent";
+				stats.domElement.children[ 0 ].children[ 1 ].style.display = "none";
+
+				// EVENTS
+
+				window.addEventListener( 'resize', onWindowResize, false );
+				document.addEventListener( 'keydown', onKeyDown, false );
+				document.addEventListener( 'keyup', onKeyUp, false );
+
+				// GUI
+
+				gui = new DAT.GUI();
+
+				gui.add( playbackConfig, 'speed', 0, 2 ).onChange( function() {
+
+					character.setPlaybackRate( playbackConfig.speed );
+
+				} );
+
+				gui.add( playbackConfig, 'wireframe', false ).onChange( function() {
+
+					character.setWireframe( playbackConfig.wireframe );
+
+				} );
+
+				// CHARACTER
+
+				var configOgro = {
+
+					baseUrl: "models/animated/ogro/",
+
+					body: "ogro.js",
+					skins: [ "ogro.jpg", "igdosh.jpg" ],
+					weapons:  [ [ "weapon.js", "weapon.jpg" ]
+								],
+					animations: {
+						move: "run",
+						idle: "stand",
+						jump: "jump",
+						attack: "attack",
+						crouchMove: "cwalk",
+						crouchIdle: "cstand",
+						crouchAttach: "crattack"
+					},
+
+					walkSpeed: 350,
+					crouchSpeed: 175
+
+				};
+
+				var configSoldier = {
+
+					baseUrl: "models/animated/ss-soldier/",
+
+					body: "ss-soldier.js",
+					skins: [ "ss-soldier.jpg" ],
+					weapons:  [ [ "ss-weapon.js", "ss-weapon.jpg" ]
+								],
+					animations: {
+						move: "run",
+						idle: "stand",
+						jump: "jump",
+						attack: "attack",
+						crouchMove: "cwalk",
+						crouchIdle: "cstand",
+						crouchAttach: "crattack"
+					},
+
+					walkSpeed: 275,
+					crouchSpeed: 175
+
+				};
+
+				var configArchvile = {
+
+					baseUrl: "models/animated/archvile/",
+
+					body: "archvile.js",
+					skins: [ "archvile.jpg" ],
+					weapons:  [
+								],
+					animations: {
+						move: "run",
+						idle: "stand",
+						jump: "jump",
+						attack: "attack",
+						crouchMove: "cwalk",
+						crouchIdle: "cstand",
+						crouchAttach: "crattack"
+					},
+
+					walkSpeed: 275,
+					crouchSpeed: 175
+
+				};
+
+				var configRevenant = {
+
+					baseUrl: "models/animated/revenant/",
+
+					body: "revenant.js",
+					skins: [ "revenant.jpg", "revenant2.jpg", "revenant3.jpg", "revenant4.jpg", "revenantfire.jpg", "revenantfire2.jpg", "revenantfire3.jpg", "revenantfire4.jpg" ],
+					weapons:  [ [ "revenant_mf.js", "revenant_mf1.png" ],
+								//[ "revenant_mf.js", "revenant_mf2.png" ]
+								],
+					animations: {
+						move: "walk",
+						idle: "stand",
+						jump: "jump",
+						attack: "attack",
+						crouchMove: "cwalk",
+						crouchIdle: "cstand",
+						crouchAttach: "crattack"
+					},
+
+					walkSpeed: 275,
+					crouchSpeed: 175
+
+				};
+
+				var configKnight = {
+
+					baseUrl: "models/animated/knight/",
+
+					body: "knight.js",
+					skins: [ "skin.jpg" ],
+					weapons:  [
+								],
+					animations: {
+						move: "run",
+						idle: "stand",
+						jump: "jump",
+						attack: "attack",
+						crouchMove: "crwalk",
+						crouchIdle: "crstnd",
+						crouchAttach: "crattk"
+					},
+
+					walkSpeed: 275,
+					crouchSpeed: 175
+
+				};
+
+				var configGoblin = {
+
+					baseUrl: "models/animated/goblin/",
+
+					body: "goblin.js",
+					skins: [ "skin.jpg" ],
+					weapons:  [
+								],
+					animations: {
+						move: "run",
+						idle: "stand",
+						jump: "jump",
+						attack: "attack",
+						crouchMove: "crwalk",
+						crouchIdle: "crstnd",
+						crouchAttach: "crattk"
+					},
+
+					walkSpeed: 275,
+					crouchSpeed: 175
+
+				};
+
+				var configBauul = {
+
+					baseUrl: "models/animated/bauul/",
+
+					body: "bauul.js",
+					skins: [ "skin.jpg", "ctf_r.png", "ctf_b.png" ],
+					weapons:  [ [ "weapon.js", "weapon.png" ]
+								],
+					animations: {
+						move: "run",
+						idle: "stand",
+						jump: "jump",
+						attack: "attack",
+						crouchMove: "crwalk",
+						crouchIdle: "crstnd",
+						crouchAttach: "crattak"
+					},
+
+					walkSpeed: 275,
+					crouchSpeed: 175
+
+				};
+
+				var configRata = {
+
+					baseUrl: "models/animated/ratamahatta/",
+
+					body: "ratamahatta.js",
+					skins: [ "ratamahatta.png", "ctf_b.png", "ctf_r.png", "dead.png", "gearwhore.png" ],
+					weapons:  [  [ "weapon.js", "weapon.png" ],
+								 [ "w_bfg.js", "w_bfg.png" ],
+								 [ "w_blaster.js", "w_blaster.png" ],
+								 [ "w_chaingun.js", "w_chaingun.png" ],
+								 [ "w_glauncher.js", "w_glauncher.png" ],
+								 [ "w_hyperblaster.js", "w_hyperblaster.png" ],
+								 [ "w_machinegun.js", "w_machinegun.png" ],
+								 [ "w_railgun.js", "w_railgun.png" ],
+								 [ "w_rlauncher.js", "w_rlauncher.png" ],
+								 [ "w_shotgun.js", "w_shotgun.png" ],
+								 [ "w_sshotgun.js", "w_sshotgun.png" ]
+								],
+					animations: {
+						move: "run",
+						idle: "stand",
+						jump: "jump",
+						attack: "attack",
+						crouchMove: "crwalk",
+						crouchIdle: "crstand",
+						crouchAttach: "crattack"
+					},
+
+					walkSpeed: 400,
+					crouchSpeed: 175
+
+				};
+
+				character = new THREE.MD2CharacterComplex();
+				character.scale = 3.5;
+				character.controls = controls;
+				//character.animationFPS = 1;
+
+				character.onLoadComplete = function() {
+
+					setupSkinsGUI( character );
+					setupWeaponsGUI( character );
+					setupGUIAnimations( character );
+
+					//console.log( character );
+
+					scene.add( character.root );
+
+					var gyro = new THREE.Gyroscope();
+					gyro.add( camera );
+					character.root.add( gyro );
+
+				}
+
+				character.loadParts( configOgro );
+
+				//createOverlay();
+
+				// COMPOSER
+
+				renderer.autoClear = false;
+
+				renderTargetParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
+				renderTarget = new THREE.WebGLRenderTarget( SCREEN_WIDTH, SCREEN_HEIGHT, renderTargetParameters );
+
+				effectFXAA = new THREE.ShaderPass( THREE.ShaderExtras[ "fxaa" ] );
+				var effectVignette = new THREE.ShaderPass( THREE.ShaderExtras[ "vignette" ] );
+
+				hblur = new THREE.ShaderPass( THREE.ShaderExtras[ "horizontalTiltShift" ] );
+				vblur = new THREE.ShaderPass( THREE.ShaderExtras[ "verticalTiltShift" ] );
+
+				var bluriness = 4;
+
+				hblur.uniforms[ 'h' ].value = bluriness / SCREEN_WIDTH;
+				vblur.uniforms[ 'v' ].value = bluriness / SCREEN_HEIGHT;
+
+				hblur.uniforms[ 'r' ].value = vblur.uniforms[ 'r' ].value = 0.5;
+
+				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / SCREEN_WIDTH, 1 / SCREEN_HEIGHT );
+
+				composer = new THREE.EffectComposer( renderer, renderTarget );
+
+				var renderModel = new THREE.RenderPass( scene, camera );
+
+				effectVignette.renderToScreen = true;
+				vblur.renderToScreen = true;
+
+				composer = new THREE.EffectComposer( renderer, renderTarget );
+
+				composer.addPass( renderModel );
+
+				composer.addPass( effectFXAA );
+
+				composer.addPass( hblur );
+				composer.addPass( vblur );
+
+			}
+
+			// OVERLAY
+
+			function createOverlay() {
+
+				cameraOrtho = new THREE.OrthographicCamera( SCREEN_WIDTH / - 2, SCREEN_WIDTH / 2,  SCREEN_HEIGHT / 2, SCREEN_HEIGHT / - 2, -10, 1000 );
+				cameraOrtho.position.z = 10;
+
+				var shader = THREE.ShaderExtras[ "screen" ];
+				var uniforms = new THREE.UniformsUtils.clone( shader.uniforms );
+
+				hudMaterial = new THREE.ShaderMaterial( { vertexShader: shader.vertexShader, fragmentShader: shader.fragmentShader, uniforms: uniforms } );
+
+				var hudGeo = new THREE.PlaneGeometry( SCREEN_WIDTH, SCREEN_HEIGHT );
+				var hudMesh = new THREE.Mesh( hudGeo, hudMaterial );
+
+				sceneHUD = new THREE.Scene();
+				sceneHUD.add( hudMesh );
+
+				sceneHUD.add( cameraOrtho );
+
+				hudMaterial.uniforms.tDiffuse.texture = THREE.ImageUtils.loadTexture( "textures/vignette.png" );
+				hudMaterial.uniforms.opacity.value = 0.5;
+
+			}
+
+
+			// EVENT HANDLERS
+
+			function onWindowResize( event ) {
+
+				SCREEN_WIDTH = window.innerWidth;
+				SCREEN_HEIGHT = window.innerHeight - 2 * MARGIN;
+
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+
+				camera.aspect = SCREEN_WIDTH/ SCREEN_HEIGHT;
+				camera.updateProjectionMatrix();
+
+			}
+
+			function onKeyDown ( event ) {
+
+				switch( event.keyCode ) {
+
+					case 38: /*up*/
+					case 87: /*W*/ 	controls.moveForward = true; break;
+
+					case 40: /*down*/
+					case 83: /*S*/ 	 controls.moveBackward = true; break;
+
+					case 37: /*left*/
+					case 65: /*A*/   controls.moveLeft = true; break;
+
+					case 39: /*right*/
+					case 68: /*D*/    controls.moveRight = true; break;
+
+					case 67: /*C*/     controls.crouch = true; break;
+					case 32: /*space*/ controls.jump = true; break;
+					case 17: /*ctrl*/  controls.attack = true; break;
+
+					case 49: /*1*/	setWeapon( 0 ); break;
+					case 50: /*2*/	setWeapon( 1 ); break;
+					case 51: /*3*/	setWeapon( 2 ); break;
+					case 52: /*4*/	setWeapon( 3 ); break;
+					case 53: /*5*/	setWeapon( 4 ); break;
+					case 54: /*6*/	setWeapon( 5 ); break;
+					case 55: /*7*/	setWeapon( 6 ); break;
+					case 56: /*8*/	setWeapon( 7 ); break;
+					case 57: /*9*/	setWeapon( 8 ); break;
+					case 48: /*0*/	setWeapon( 10 ); break;
+
+				}
+
+			};
+
+			function onKeyUp ( event ) {
+
+				switch( event.keyCode ) {
+
+					case 38: /*up*/
+					case 87: /*W*/ controls.moveForward = false; break;
+
+					case 40: /*down*/
+					case 83: /*S*/ 	 controls.moveBackward = false; break;
+
+					case 37: /*left*/
+					case 65: /*A*/ 	 controls.moveLeft = false; break;
+
+					case 39: /*right*/
+					case 68: /*D*/ 	  controls.moveRight = false; break;
+
+					case 67: /*C*/     controls.crouch = false; break;
+					case 32: /*space*/ controls.jump = false; break;
+					case 17: /*ctrl*/  controls.attack = false; break;
+
+				}
+
+			};
+
+			//
+
+			function setWeapon( index ) {
+
+				character.setWeapon( index );
+
+			};
+
+			// GUI
+
+			function addGuiHeader( label, h, s, v ) {
+
+				// add dummy item
+
+				playbackConfig[ label ] = function() {};
+
+				// hack GUI item styling
+
+				var dummy = gui.add( playbackConfig, label, label );
+				setGuiHeaderStyle( dummy, h, s, v );
+
+			}
+
+			function setGuiHeaderStyle( g, h, s, v ) {
+
+				var color = "hsl(" + h + "," + s + "%, " + v + "%)";
+
+				g.domElement.style.borderLeft = "solid 5px " + color;
+				g.domElement.style.background = color;
+				g.domElement.style.fontWeight = "bold";
+
+			}
+
+			function setGuiElementStyle( a, h, s, v, display ) {
+
+				var i, s, color = "hsl(" + h + "," + s + "%, " + v + "%)";
+
+				for( i = 0; i < a.length; i ++ ) {
+
+					s = a[ i ].domElement.style;
+					s.borderLeft = "solid 5px " + color;
+					s.display = display ? display : "none";
+
+				}
+
+			}
+
+			function labelize( text ) {
+
+				var parts = text.split( "." );
+
+				if ( parts.length > 1 ) {
+
+					parts.length -= 1;
+					return parts.join( "." );
+
+				}
+
+				return text;
+
+			}
+
+			//
+
+			function setupWeaponsGUI( character ) {
+
+				addGuiHeader( "Weapons", 20, 90, 30 );
+
+				var generateCallback = function( index ) {
+
+					return function () { character.setWeapon( index ); };
+
+				}
+
+				var guiItems = [];
+
+				for ( var i = 0; i < character.weapons.length; i ++ ) {
+
+					var name = character.weapons[ i ].name;
+
+					playbackConfig[ name ] = generateCallback( i );
+					guiItems[ i ] = gui.add( playbackConfig, name ).name( labelize( name ) );
+
+				}
+
+				setGuiElementStyle( guiItems, 20, 90, 30, "block" );
+
+			}
+
+			//
+
+			function setupSkinsGUI( character ) {
+
+				addGuiHeader( "Skins", 0, 90, 30 );
+
+				var generateCallback = function( index ) {
+
+					return function () { character.setSkin( index ); };
+
+				}
+
+				var guiItems = [];
+
+				for ( var i = 0; i < character.skinsBody.length; i ++ ) {
+
+					var name = character.skinsBody[ i ].name;
+
+					playbackConfig[ name ] = generateCallback( i );
+					guiItems[ i ] = gui.add( playbackConfig, name ).name( labelize( name ) );
+
+				}
+
+				setGuiElementStyle( guiItems, 0, 90, 30, "block" );
+
+			}
+
+			//
+
+			function setupGUIAnimations( character ) {
+
+				addGuiHeader( "Animations", 100, 90, 30 );
+
+				var generateCallback = function( animationName ) {
+
+					return function () { character.setAnimation( animationName ); };
+
+				}
+
+				var i = 0, guiItems = [];
+				var animations = character.meshBody.geometry.animations;
+
+				for ( var a in animations ) {
+
+					playbackConfig[ a ] = generateCallback( a );
+					guiItems[ i ] = gui.add( playbackConfig, a, a );
+
+					i ++;
+
+				}
+
+				setGuiElementStyle( guiItems, 100, 90, 30, "block" );
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				render();
+
+				stats.update();
+
+			}
+
+			function render() {
+
+				var delta = clock.getDelta();
+
+				for ( var i = 0; i < morphs.length; i ++ ) {
+
+					morph = morphs[ i ];
+
+					morph.updateAnimation( 1000 * delta );
+
+					morph.position.x += morph.speed * delta;
+
+					if ( morph.position.x  > 4000 )  {
+
+						morph.position.x = -4000 - Math.random() * 500;
+
+					}
+
+				}
+
+				cameraControls.update( delta );
+				character.update( delta );
+
+				//if (  character.meshBody )
+				//console.log( character.meshBody.length, character.meshBody.lastKeyframe,  character.meshBody.currentKeyframe, character.meshBody.morphTargetInfluences );
+
+				//renderer.clear();
+				//renderer.render( scene, camera );
+
+				//renderer.render( sceneHUD, cameraOrtho );
+
+				// render shadow map
+
+				renderer.autoUpdateObjects = false;
+
+				renderer.initWebGLObjects( scene );
+				renderer.updateShadowMap( scene, camera );
+
+				// render scene
+
+				renderer.autoUpdateObjects = true;
+
+				//renderer.render( scene, camera );
+				//renderer.clearTarget( null, 1, 1, 1 );
+				composer.render( 0.1 );
+
+
+			}
+
+		</script>
+
+	</body>
+</html>

@@ -131,6 +131,7 @@ EXTRAS_FILES = [
 'extras/loaders/UTF8Loader.js',
 'extras/objects/MarchingCubes.js',
 'extras/objects/LensFlare.js',
+'extras/objects/MorphBlendMesh.js',
 'extras/renderers/plugins/LensFlarePlugin.js',
 'extras/renderers/plugins/ShadowMapPlugin.js',
 'extras/renderers/plugins/SpritePlugin.js',
