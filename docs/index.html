@@ -30,9 +30,16 @@
 			}
 
 				#panel h1 {
+					color: #444;
+					font-size: 25px;
+					margin-top: 25px;
+					margin-left: 20px;
+				}
+
+				#panel h2 {
 					color: #999;
 					font-size: 16px;
-					margin-top: 16px;
+					margin-top: 20px;
 					margin-left: 20px;
 				}
 
@@ -95,12 +102,15 @@
 		<div id="viewer"></div>
 
 		<script>
+			var REVISION = '49dev';
+
 			var panel = document.getElementById( 'panel' );
 			var viewer = document.getElementById( 'viewer' );
 
 			var pages = {
-				"Array": "Array",
-				"Number": "Number"
+				"Integer": "Integer",
+				"Float": "Float",
+				"Array": "Array"
 			};
 
 			var list = {
@@ -135,9 +145,9 @@
 				],
 
 				"Lights": [
+					{ name: "Light", path: "lights/Light" },
 					{ name: "AmbientLight", path: "lights/AmbientLight" },
 					{ name: "DirectionalLight", path: "lights/DirectionalLight" },
-					{ name: "Light", path: "lights/Light" },
 					{ name: "PointLight", path: "lights/PointLight" },
 					{ name: "SpotLight", path: "lights/SpotLight" }
 				],
@@ -263,10 +273,10 @@
 				],
 
 				"Extras / Loaders": [
+					{ name: "Loader", path: "extras/loaders/Loader" },
 					{ name: "BinaryLoader", path: "extras/loaders/BinaryLoader" },
 					{ name: "ColladaLoader", path: "extras/loaders/ColladaLoader" },
 					{ name: "JSONLoader", path: "extras/loaders/JSONLoader" },
-					{ name: "Loader", path: "extras/loaders/Loader" },
 					{ name: "SceneLoader", path: "extras/loaders/SceneLoader" },
 					{ name: "UTF8Loader", path: "extras/loaders/UTF8Loader" }
 				],
@@ -299,11 +309,11 @@
 
 			};
 
-			var html = '';
+			var html = '<h1>three.js <span style="font-size: 50%; vertical-align: super;">r' + REVISION + '</span></h1>';
 
 			for ( var category in list ) {
 
-				html += '<h1>' + category + '</h1>';
+				html += '<h2>' + category + '</h2>';
 
 				html += '<ul>';
 
@@ -341,7 +351,7 @@
 						text = text.replace(/\[name\]/gi, name);
 						text = text.replace(/\[path\]/gi, path);
 						text = text.replace(/\[page:(\w+)\]/gi, "<a href=\"javascript:goTo('$1')\" title=\"$1\">$1</a>" );
-						text = text.replace(/\[page:(\w+) (\w+)\]/gi, "<a href=\"javascript:goTo('$1')\" title=\"$1\">$2</a>" );
+						text = text.replace(/\[page:(\w+) ([\w|\.]+)\]/gi, "<a href=\"javascript:goTo('$1')\" title=\"$1\">$2</a>" );
 
 						viewer.innerHTML = '<br>' + text + '<br><br>';
 

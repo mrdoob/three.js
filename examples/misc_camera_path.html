@@ -85,24 +85,15 @@
 
 				// world
 
-				var cube = new THREE.CubeGeometry( 20, 60, 20 );
-
-				cube.vertices[ 0 ].position.multiplyScalar( 0.01 );
-				cube.vertices[ 1 ].position.multiplyScalar( 0.01 );
-				cube.vertices[ 4 ].position.multiplyScalar( 0.01 );
-				cube.vertices[ 5 ].position.multiplyScalar( 0.01 );
-
-				var material =  new THREE.MeshLambertMaterial( { color:0xffffff } );
+				var geometry = new THREE.CylinderGeometry( 0, 10, 30, 4, 1 );
+				var material =  new THREE.MeshLambertMaterial( { color:0xffffff, shading: THREE.FlatShading } );
 
 				for ( var i = 0; i < 500; i ++ ) {
 
-					var mesh = new THREE.Mesh( cube, material );
-					mesh.position.set(
-						( Math.random() - 0.5 ) * 1000,
-						( Math.random() - 0.5 ) * 1000,
-						( Math.random() - 0.5 ) * 1000
-					);
-
+					var mesh = new THREE.Mesh( geometry, material );
+					mesh.position.x = ( Math.random() - 0.5 ) * 1000;
+					mesh.position.y = ( Math.random() - 0.5 ) * 1000;
+					mesh.position.z = ( Math.random() - 0.5 ) * 1000;
 					mesh.updateMatrix();
 					mesh.matrixAutoUpdate = false;
 					scene.add( mesh );

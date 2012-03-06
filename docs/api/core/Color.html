@@ -12,24 +12,24 @@ Represents a color. See also [page:ColorUtils].
 
 <h2>Constructor</h2>
 
-<h3>[name]( [page:Number hex])</h3>
+<h3>[name]( [page:Integer hex])</h3>
 <div>
 hex — initial color in hexadecimal<br />
 </div>
 
 <h2>Properties</h2>
 
-<h3>.[page:Number r]</h3>
+<h3>.[page:Float r]</h3>
 <div>
 Red channel value between 0 and 1. Default is 1.
 </div>
 
-<h3>.[page:Number g]</h3>
+<h3>.[page:Float g]</h3>
 <div>
 Green channel value between 0 and 1. Default is 1.
 </div>
 
-<h3>.[page:Number b]</h3>
+<h3>.[page:Float b]</h3>
 <div>
 Blue channel value between 0 and 1. Default is 1.
 </div>
@@ -70,7 +70,7 @@ Converts this color from gamma to linear space.
 Converts this color from linear to gamma space.
 </div>
 
-<h3>.setRGB( [page:Number r], [page:Number g], [page:Number b] ) [page:this]</h3>
+<h3>.setRGB( [page:Float r], [page:Float g], [page:Float b] ) [page:this]</h3>
 <div>
 r — Red channel value between 0 and 1.<br />
 g — Green channel value between 0 and 1.<br />
@@ -80,7 +80,7 @@ b — Blue channel value between 0 and 1.
 Sets this color from RGB values.
 </div>
 
-<h3>.setHSV( [page:Number h], [page:Number s], [page:Number v] ) [page:this]</h3>
+<h3>.setHSV( [page:Float h], [page:Float s], [page:Float v] ) [page:this]</h3>
 <div>
 h — Hue channel value between 0 and 1.<br />
 s — Saturation value channel between 0 and 1.<br />
@@ -91,7 +91,7 @@ Sets this color from HSV values.<br />
 Based on MochiKit implementation by Bob Ippolito.
 </div>
 
-<h3>.setHex( [page:Number hex] ) [page:this]</h3>
+<h3>.setHex( [page:Integer hex] ) [page:this]</h3>
 <div>
 hex — Color in hexadecimal.<br />
 </div>
@@ -99,7 +99,7 @@ hex — Color in hexadecimal.<br />
 Sets this color from a hexadecimal value.
 </div>
 
-<h3>.getHex() [page:Number]</h3>
+<h3>.getHex() [page:Integer]</h3>
 <div>
 Returns the value of this color in hexadecimal.
 </div>
