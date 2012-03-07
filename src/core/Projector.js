@@ -49,12 +49,6 @@ THREE.Projector = function() {
 
 	};
 
-	/**
-	 * Translates a 2D point from NDC to a THREE.Ray
-	 * that can be used for picking.
-	 * @vector - THREE.Vector3 that represents 2D point
-	 * @camera - THREE.Camera
-	 */
 	this.pickingRay = function ( vector, camera ) {
 
 		var end, ray, t;

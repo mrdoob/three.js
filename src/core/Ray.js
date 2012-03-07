@@ -7,23 +7,6 @@ THREE.Ray = function ( origin, direction ) {
 	this.origin = origin || new THREE.Vector3();
 	this.direction = direction || new THREE.Vector3();
 
-	this.intersectObjects = function ( objects ) {
-
-		var i, l, object,
-		intersects = [];
-
-		for ( i = 0, l = objects.length; i < l; i ++ ) {
-
-			Array.prototype.push.apply( intersects, this.intersectObject( objects[ i ] ) );
-
-		}
-
-		intersects.sort( function ( a, b ) { return a.distance - b.distance; } );
-
-		return intersects;
-
-	};
-
 	var precision = 0.0001;
 
 	this.setPrecision = function ( value ) {
@@ -177,6 +160,22 @@ THREE.Ray = function ( origin, direction ) {
 		return intersects;
 
 	}
+
+	this.intersectObjects = function ( objects ) {
+
+		var intersects = [];
+
+		for ( var i = 0, l = objects.length; i < l; i ++ ) {
+
+			Array.prototype.push.apply( intersects, this.intersectObject( objects[ i ] ) );
+
+		}
+
+		intersects.sort( function ( a, b ) { return a.distance - b.distance; } );
+
+		return intersects;
+
+	};
 
 	var v0 = new THREE.Vector3(), v1 = new THREE.Vector3(), v2 = new THREE.Vector3();
 	var dot, intersect, distance;
