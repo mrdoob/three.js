@@ -49,6 +49,9 @@ THREE.MD2CharacterComplex = function () {
 
 	// internals
 
+	this.meshes = [];
+	this.animations = {};
+
 	this.loadCounter = 0;
 
 	// internal movement control variables
@@ -56,12 +59,80 @@ THREE.MD2CharacterComplex = function () {
 	this.speed = 0;
 	this.bodyOrientation = 0;
 
+	this.walkSpeed = this.maxSpeed;
+	this.crouchSpeed = this.maxSpeed * 0.5;
+
 	// internal animation parameters
 
 	this.activeAnimation = null;
 	this.oldAnimation = null;
 
 	// API
+
+	this.enableShadows = function ( enable ) {
+
+		for ( var i = 0; i < this.meshes.length; i ++ ) {
+
+			this.meshes[ i ].castShadow = enable;
+			this.meshes[ i ].receiveShadow = enable;
+
+		}
+
+	};
+
+	this.setVisible = function ( enable ) {
+
+		for ( var i = 0; i < this.meshes.length; i ++ ) {
+
+			this.meshes[ i ].visible = enable;
+			this.meshes[ i ].visible = enable;
+
+		}
+
+	};
+
+
+	this.shareParts = function ( original ) {
+
+		this.animations = original.animations;
+		this.walkSpeed = original.walkSpeed;
+		this.crouchSpeed = original.crouchSpeed;
+
+		this.skinsBody = original.skinsBody;
+		this.skinsWeapon = original.skinsWeapon;
+
+		// BODY
+
+		var mesh = createPart( original.meshBody.geometry, this.skinsBody[ 0 ] );
+		mesh.scale.set( this.scale, this.scale, this.scale );
+
+		this.root.position.y = original.root.position.y;
+		this.root.add( mesh );
+
+		this.meshBody = mesh;
+
+		this.meshes.push( mesh );
+
+		// WEAPONS
+
+		for ( var i = 0; i < original.weapons.length; i ++ ) {
+
+			var mesh = createPart( original.weapons[ i ].geometry, this.skinsWeapon[ i ] );
+			mesh.scale.set( this.scale, this.scale, this.scale );
+			mesh.visible = false;
+
+			mesh.name = name;
+
+			this.root.add( mesh );
+
+			this.weapons[ i ] = mesh;
+			this.meshWeapon = mesh;
+
+			this.meshes.push( mesh );
+
+		}
+
+	};
 
 	this.loadParts = function ( config ) {
 
@@ -94,6 +165,7 @@ THREE.MD2CharacterComplex = function () {
 			scope.root.add( mesh );
 
 			scope.meshBody = mesh;
+			scope.meshes.push( mesh );
 
 			checkLoadingComplete();
 
@@ -115,6 +187,7 @@ THREE.MD2CharacterComplex = function () {
 
 				scope.weapons[ index ] = mesh;
 				scope.meshWeapon = mesh;
+				scope.meshes.push( mesh );
 
 				checkLoadingComplete();
 
@@ -213,8 +286,12 @@ THREE.MD2CharacterComplex = function () {
 
 		if ( this.controls ) this.updateMovementModel( delta );
 
-		this.updateBehaviors( delta );
-		this.updateAnimations( delta );
+		if ( this.animations ) {
+
+			this.updateBehaviors( delta );
+			this.updateAnimations( delta );
+
+		}
 
 	};
 
@@ -454,9 +531,6 @@ THREE.MD2CharacterComplex = function () {
 
 		var mesh = new THREE.MorphBlendMesh( geometry, materialTexture );
 		mesh.rotation.y = -Math.PI/2;
-
-		mesh.castShadow = true;
-		mesh.receiveShadow = true;
 
 		//
 

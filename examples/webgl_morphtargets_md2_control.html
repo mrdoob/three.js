@@ -168,7 +168,6 @@
 				cameraControls = new THREE.TrackballControls( camera, renderer.domElement );
 				cameraControls.target.set( 0, 50, 0 );
 
-
 				// CHARACTER
 
 				var configOgro = {
@@ -195,20 +194,10 @@
 
 				};
 
-				function generateCallback( character, i ) {
+				var nRows = 1;
+				var nSkins = configOgro.skins.length;
 
-					return function() {
-
-						character.setWeapon( 0 );
-						character.setSkin( i );
-
-						character.root.position.x = ( i - nCharacters/2 ) * 150;
-
-					};
-
-				};
-
-				nCharacters = configOgro.skins.length;
+				nCharacters = nSkins * nRows;
 
 				for ( var i = 0; i < nCharacters; i ++ ) {
 
@@ -216,19 +205,50 @@
 					character.scale = 3;
 					character.controls = controls;
 
-					character.onLoadComplete = generateCallback( character, i );
+					characters.push( character );
 
-					character.loadParts( configOgro );
-
-					scene.add( character.root );
-
-					characters[ i ] = character;
 
 				}
 
-				var gyro = new THREE.Gyroscope();
-				gyro.add( camera );
-				characters[ Math.floor( nCharacters/2 ) ].root.add( gyro );
+				var baseCharacter = new THREE.MD2CharacterComplex();
+				baseCharacter.scale = 3;
+
+				baseCharacter.onLoadComplete = function () {
+
+					var k = 0;
+
+					for ( var j = 0; j < nRows; j ++ ) {
+
+						for ( var i = 0; i < nSkins; i ++ ) {
+
+							var cloneCharacter = characters[ k ];
+
+							cloneCharacter.shareParts( baseCharacter );
+
+							cloneCharacter.enableShadows( true );
+
+							cloneCharacter.setWeapon( 0 );
+							cloneCharacter.setSkin( i );
+
+							cloneCharacter.root.position.x = ( i - nSkins/2 ) * 150;
+							cloneCharacter.root.position.z = j * 250;
+
+							scene.add( cloneCharacter.root );
+
+							k ++;
+
+						}
+
+					}
+
+					var gyro = new THREE.Gyroscope();
+					gyro.add( camera );
+
+					characters[ Math.floor( nSkins/2 ) ].root.add( gyro );
+
+				};
+
+				baseCharacter.loadParts( configOgro );
 
 			}
 
