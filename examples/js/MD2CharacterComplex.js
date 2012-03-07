@@ -248,9 +248,12 @@ THREE.MD2CharacterComplex = function () {
 			activeWeapon.visible = true;
 			this.meshWeapon = activeWeapon;
 
-			activeWeapon.playAnimation( this.activeAnimation );
-			this.meshWeapon.setAnimationTime( this.activeAnimation, this.meshBody.getAnimationTime( this.activeAnimation ) );
+			if ( this.activeAnimation ) {
 
+				activeWeapon.playAnimation( this.activeAnimation );
+				this.meshWeapon.setAnimationTime( this.activeAnimation, this.meshBody.getAnimationTime( this.activeAnimation ) );
+
+			}
 
 		}
 
@@ -258,7 +261,7 @@ THREE.MD2CharacterComplex = function () {
 
 	this.setAnimation = function ( animationName ) {
 
-		if ( animationName === this.activeAnimation ) return;
+		if ( animationName === this.activeAnimation || !animationName ) return;
 
 		if ( this.meshBody ) {
 
