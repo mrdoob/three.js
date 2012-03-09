@@ -280,19 +280,6 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	clone: function () {
-
-		var m = new THREE.Matrix4();
-
-		m.n11 = this.n11; m.n12 = this.n12; m.n13 = this.n13; m.n14 = this.n14;
-		m.n21 = this.n21; m.n22 = this.n22; m.n23 = this.n23; m.n24 = this.n24;
-		m.n31 = this.n31; m.n32 = this.n32; m.n33 = this.n33; m.n34 = this.n34;
-		m.n41 = this.n41; m.n42 = this.n42; m.n43 = this.n43; m.n44 = this.n44;
-
-		return m;
-
-	},
-
 	flattenToArray: function ( flat ) {
 
 		flat[ 0 ] = this.n11; flat[ 1 ] = this.n21; flat[ 2 ] = this.n31; flat[ 3 ] = this.n41;
@@ -933,6 +920,17 @@ THREE.Matrix4.prototype = {
 		this.n44 = this.n41 * x + this.n42 * y + this.n43 * z + this.n44;
 
 		return this;
+
+	},
+
+	clone: function () {
+
+		return new THREE.Matrix4(
+			this.n11, this.n12, this.n13, this.n14,
+			this.n21, this.n22, this.n23, this.n24,
+			this.n31, this.n32, this.n33, this.n34,
+			this.n41, this.n42, this.n43, this.n44
+		);
 
 	}
 
