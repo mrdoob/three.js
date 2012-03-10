@@ -8,6 +8,7 @@
  *			arguments: Object // Containing all the relevant arguments for the THREE.*Geometry functiion
  *			material:MaterialObj,
  *			position: { x:Number, y:Number, z:Number },
+ *			rotation: Object // The rotation we want the object to have.
  *			type: String // Must match the name given to the Geometry Object.
  *		}
  */
@@ -16,7 +17,8 @@ THREE.AddMultipleMeshObjects = function(scene, objects) {
 		var obj = objects[i];
 		var args = obj.arguments,
 			material = obj.material || false,
-			pos = obj.position,			
+			pos = obj.position,
+			rot = obj.rotation,
 			type = obj.type;
 
 		switch (type) {
@@ -142,6 +144,7 @@ THREE.AddMultipleMeshObjects = function(scene, objects) {
 		}
 	
 		if (pos) obj.position = pos;
+		if (rot) obj.rotation = rot;
 		
 		scene.add(obj);
 	}
