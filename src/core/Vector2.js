@@ -34,17 +34,10 @@ THREE.Vector2.prototype = {
 
 	},
 
-	clone: function () {
+	add: function ( a, b ) {
 
-		return new THREE.Vector2( this.x, this.y );
-
-	},
-
-
-	add: function ( v1, v2 ) {
-
-		this.x = v1.x + v2.x;
-		this.y = v1.y + v2.y;
+		this.x = a.x + b.x;
+		this.y = a.y + b.y;
 
 		return this;
 
@@ -59,10 +52,10 @@ THREE.Vector2.prototype = {
 
 	},
 
-	sub: function ( v1, v2 ) {
+	sub: function ( a, b ) {
 
-		this.x = v1.x - v2.x;
-		this.y = v1.y - v2.y;
+		this.x = a.x - b.x;
+		this.y = a.y - b.y;
 
 		return this;
 
@@ -105,7 +98,7 @@ THREE.Vector2.prototype = {
 
 	negate: function() {
 
-		return this.multiplyScalar( -1 );
+		return this.multiplyScalar( - 1 );
 
 	},
 
@@ -170,6 +163,12 @@ THREE.Vector2.prototype = {
 	isZero: function () {
 
 		return ( this.lengthSq() < 0.0001 /* almostZero */ );
+
+	},
+
+	clone: function () {
+
+		return new THREE.Vector2( this.x, this.y );
 
 	}
 
