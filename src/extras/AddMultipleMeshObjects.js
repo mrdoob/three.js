@@ -2,6 +2,7 @@
  *	A useful function that will add multiple objects (of the various types available) to a given scene.
  *	@param scene The scene to add these objects to.
  *	@param objects An array of objects that detail what we want to add.
+ *	@returns three_objects An array containing the THREE.Mesh objects that were added to the scene (in the order that they were passed in).
  *
  *	Each object takes the following form:
  *		{
@@ -13,6 +14,8 @@
  *		}
  */
 THREE.AddMultipleMeshObjects = function(scene, objects) {
+	var three_objects = [];
+
 	for (i=0; i<objects.length; i++) {
 		var obj = objects[i];
 		var args = obj.arguments,
@@ -146,6 +149,9 @@ THREE.AddMultipleMeshObjects = function(scene, objects) {
 		if (pos) obj.position = pos;
 		if (rot) obj.rotation = rot;
 		
+		three_objects.push(obj);
 		scene.add(obj);
 	}
+
+	return three_objects;
 };
