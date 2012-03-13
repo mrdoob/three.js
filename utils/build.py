@@ -135,6 +135,7 @@ EXTRAS_FILES = [
 'extras/renderers/plugins/LensFlarePlugin.js',
 'extras/renderers/plugins/ShadowMapPlugin.js',
 'extras/renderers/plugins/SpritePlugin.js',
+'extras/renderers/plugins/DepthPassPlugin.js',
 'extras/renderers/AnaglyphWebGLRenderer.js',
 'extras/renderers/CrosseyedWebGLRenderer.js',
 'extras/shaders/ShaderFlares.js',
