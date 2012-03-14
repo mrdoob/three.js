@@ -3344,7 +3344,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						} else {
 
-							_vector3.copy( object.position );
+							_vector3.copy( object.matrixWorld.getPosition() );
 							_projScreenMatrix.multiplyVector3( _vector3 );
 
 							webglObject.z = _vector3.z;
@@ -5182,7 +5182,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				case THREE.NoBlending:
                     _gl.disable( _gl.BLEND );
                     break;
-                    
+
 				case THREE.AdditiveBlending:
 
                     _gl.enable( _gl.BLEND );
