@@ -140,6 +140,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	 // camera matrices cache
 
 	_projScreenMatrix = new THREE.Matrix4(),
+	_projScreenMatrixPS = new THREE.Matrix4(),
 
 	_vector3 = new THREE.Vector4(),
 
@@ -847,14 +848,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( object.sortParticles ) {
 
-			_projScreenMatrix.multiplySelf( object.matrixWorld );
+			_projScreenMatrixPS.copy( _projScreenMatrix );
+			_projScreenMatrixPS.multiplySelf( object.matrixWorld );
 
 			for ( v = 0; v < vl; v ++ ) {
 
 				vertex = vertices[ v ].position;
 
 				_vector3.copy( vertex );
-				_projScreenMatrix.multiplyVector3( _vector3 );
+				_projScreenMatrixPS.multiplyVector3( _vector3 );
 
 				sortArray[ v ] = [ _vector3.z, v ];
 
@@ -3274,7 +3276,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_currentMaterialId = -1;
 
-		if ( this.autoUpdateObjects ) this.initWebGLObjects( scene );
+		// update scene graph
 
 		if ( camera.parent === undefined ) {
 
@@ -3285,25 +3287,33 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( this.autoUpdateScene ) scene.updateMatrixWorld();
 
+		// update camera matrices and frustum
+
+		if ( ! camera._viewMatrixArray ) camera._viewMatrixArray = new Float32Array( 16 );
+		if ( ! camera._projectionMatrixArray ) camera._projectionMatrixArray = new Float32Array( 16 );
+
+		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
+
+		camera.matrixWorldInverse.flattenToArray( camera._viewMatrixArray );
+		camera.projectionMatrix.flattenToArray( camera._projectionMatrixArray );
+
+		_projScreenMatrix.multiply( camera.projectionMatrix, camera.matrixWorldInverse );
+		_frustum.setFromMatrix( _projScreenMatrix );
+
+		// update WebGL objects
+
+		if ( this.autoUpdateObjects ) this.initWebGLObjects( scene );
+
 		// custom render plugins (pre pass)
 
 		renderPlugins( this.renderPluginsPre, scene, camera );
+
+		//
 
 		_this.info.render.calls = 0;
 		_this.info.render.vertices = 0;
 		_this.info.render.faces = 0;
 		_this.info.render.points = 0;
-
-		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
-
-		if ( ! camera._viewMatrixArray ) camera._viewMatrixArray = new Float32Array( 16 );
-		camera.matrixWorldInverse.flattenToArray( camera._viewMatrixArray );
-
-		if ( ! camera._projectionMatrixArray ) camera._projectionMatrixArray = new Float32Array( 16 );
-		camera.projectionMatrix.flattenToArray( camera._projectionMatrixArray );
-
-		_projScreenMatrix.multiply( camera.projectionMatrix, camera.matrixWorldInverse );
-		_frustum.setFromMatrix( _projScreenMatrix );
 
 		this.setRenderTarget( renderTarget );
 

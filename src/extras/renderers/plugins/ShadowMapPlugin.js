@@ -191,21 +191,23 @@ THREE.ShadowMapPlugin = function ( ) {
 			shadowMatrix.multiplySelf( shadowCamera.projectionMatrix );
 			shadowMatrix.multiplySelf( shadowCamera.matrixWorldInverse );
 
-			// render shadow map
+			// update camera matrices and frustum
 
 			if ( ! shadowCamera._viewMatrixArray ) shadowCamera._viewMatrixArray = new Float32Array( 16 );
-			shadowCamera.matrixWorldInverse.flattenToArray( shadowCamera._viewMatrixArray );
-
 			if ( ! shadowCamera._projectionMatrixArray ) shadowCamera._projectionMatrixArray = new Float32Array( 16 );
+
+			shadowCamera.matrixWorldInverse.flattenToArray( shadowCamera._viewMatrixArray );
 			shadowCamera.projectionMatrix.flattenToArray( shadowCamera._projectionMatrixArray );
 
 			_projScreenMatrix.multiply( shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse );
 			_frustum.setFromMatrix( _projScreenMatrix );
 
+			// render shadow map
+
 			_renderer.setRenderTarget( shadowMap );
 			_renderer.clear();
 
-			// set matrices & frustum culling
+			// set object matrices & frustum culling
 
 			renderList = scene.__webglObjects;
 

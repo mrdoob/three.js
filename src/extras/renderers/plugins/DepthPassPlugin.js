@@ -55,25 +55,29 @@ THREE.DepthPassPlugin = function ( ) {
 
 		_renderer.setDepthTest( true );
 
-		// render depth map
+		// update scene
 
 		if ( _renderer.autoUpdateScene ) scene.updateMatrixWorld();
 
-		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
+		// update camera matrices and frustum
 
 		if ( ! camera._viewMatrixArray ) camera._viewMatrixArray = new Float32Array( 16 );
-		camera.matrixWorldInverse.flattenToArray( camera._viewMatrixArray );
-
 		if ( ! camera._projectionMatrixArray ) camera._projectionMatrixArray = new Float32Array( 16 );
+
+		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
+
+		camera.matrixWorldInverse.flattenToArray( camera._viewMatrixArray );
 		camera.projectionMatrix.flattenToArray( camera._projectionMatrixArray );
 
 		_projScreenMatrix.multiply( camera.projectionMatrix, camera.matrixWorldInverse );
 		_frustum.setFromMatrix( _projScreenMatrix );
 
+		// render depth map
+
 		_renderer.setRenderTarget( this.renderTarget );
 		_renderer.clear();
 
-		// set matrices & frustum culling
+		// set object matrices & frustum culling
 
 		renderList = scene.__webglObjects;
 
