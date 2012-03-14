@@ -266,6 +266,7 @@ THREE.ShaderChunk = {
 
 		"uniform vec3 ambient;",
 		"uniform vec3 diffuse;",
+		"uniform vec3 emissive;",
 
 		"uniform vec3 ambientLightColor;",
 
@@ -404,11 +405,11 @@ THREE.ShaderChunk = {
 
 		"#endif",
 
-		"vLightFront = vLightFront * diffuse + ambient * ambientLightColor;",
+		"vLightFront = vLightFront * diffuse + ambient * ambientLightColor + emissive;",
 
 		"#ifdef DOUBLE_SIDED",
 
-			"vLightBack = vLightBack * diffuse + ambient * ambientLightColor;",
+			"vLightBack = vLightBack * diffuse + ambient * ambientLightColor + emissive;",
 
 		"#endif",
 
@@ -663,11 +664,11 @@ THREE.ShaderChunk = {
 
 		"#ifdef METAL",
 
-			"gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor * ambient + totalSpecular );",
+			"gl_FragColor.xyz = gl_FragColor.xyz * ( emissive + totalDiffuse + ambientLightColor * ambient + totalSpecular );",
 
 		"#else",
 
-			"gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor * ambient ) + totalSpecular;",
+			"gl_FragColor.xyz = gl_FragColor.xyz * ( emissive + totalDiffuse + ambientLightColor * ambient ) + totalSpecular;",
 
 		"#endif"
 
@@ -1386,7 +1387,8 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ "shadowmap" ],
 
 			{
-				"ambient"  : { type: "c", value: new THREE.Color( 0x050505 ) },
+				"ambient"  : { type: "c", value: new THREE.Color( 0xffffff ) },
+				"emissive" : { type: "c", value: new THREE.Color( 0x000000 ) },
 				"wrapRGB"  : { type: "v3", value: new THREE.Vector3( 1, 1, 1 ) }
 			}
 
@@ -1500,7 +1502,8 @@ THREE.ShaderLib = {
 			THREE.UniformsLib[ "shadowmap" ],
 
 			{
-				"ambient"  : { type: "c", value: new THREE.Color( 0x050505 ) },
+				"ambient"  : { type: "c", value: new THREE.Color( 0xffffff ) },
+				"emissive" : { type: "c", value: new THREE.Color( 0x000000 ) },
 				"specular" : { type: "c", value: new THREE.Color( 0x111111 ) },
 				"shininess": { type: "f", value: 30 },
 				"wrapRGB"  : { type: "v3", value: new THREE.Vector3( 1, 1, 1 ) }
@@ -1559,6 +1562,7 @@ THREE.ShaderLib = {
 			"uniform float opacity;",
 
 			"uniform vec3 ambient;",
+			"uniform vec3 emissive;",
 			"uniform vec3 specular;",
 			"uniform float shininess;",
 

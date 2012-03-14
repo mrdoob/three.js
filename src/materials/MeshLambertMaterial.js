@@ -5,6 +5,7 @@
  * parameters = {
  *  color: <hex>,
  *  ambient: <hex>,
+ *  emissive: <hex>,
  *  opacity: <float>,
  *
  *  map: new THREE.Texture( <Image> ),
@@ -36,8 +37,11 @@ THREE.MeshLambertMaterial = function ( parameters ) {
 
 	parameters = parameters || {};
 
+	// color property represents diffuse for MeshLambertMaterial
+
 	this.color = parameters.color !== undefined ? new THREE.Color( parameters.color ) : new THREE.Color( 0xffffff );
 	this.ambient = parameters.ambient !== undefined ? new THREE.Color( parameters.ambient ) : new THREE.Color( 0xffffff );
+	this.emissive = parameters.emissive !== undefined ? new THREE.Color( parameters.emissive ) : new THREE.Color( 0x000000 );
 
 	this.wrapAround = parameters.wrapAround !== undefined ? parameters.wrapAround: false;
 	this.wrapRGB = new THREE.Vector3( 1, 1, 1 );

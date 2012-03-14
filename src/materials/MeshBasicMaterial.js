@@ -34,6 +34,8 @@ THREE.MeshBasicMaterial = function ( parameters ) {
 
 	parameters = parameters || {};
 
+	// color property represents emissive for MeshBasicMaterial
+
 	this.color = parameters.color !== undefined ? new THREE.Color( parameters.color ) : new THREE.Color( 0xffffff );
 
 	this.map = parameters.map !== undefined ? parameters.map : null;
