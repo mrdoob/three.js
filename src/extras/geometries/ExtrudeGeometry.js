@@ -8,25 +8,24 @@
  *  size: 			<float>, 	// size of the text
  *  height: 		<float>, 	// thickness to extrude text
  *  curveSegments: 	<int>,		// number of points on the curves
- *  steps: 			<int>,		// number of points for z-side extrusions
+ *  steps: 			<int>,		// number of points for z-side extrusions / used for subdivding extrude spline too
  *
- *  font: 			<string>,		// font name
- *  weight: 		<string>,		// font weight (normal, bold)
- *  style: 			<string>,		// font style  (normal, italics)
+ *	useSpacedPoints: <boolean>,	// Use equal space distances for triangulation shapes
  *
  *  bevelEnabled:	<bool>,			// turn on bevel
  *  bevelThickness: <float>, 		// how deep into text bevel goes
  *  bevelSize:		<float>, 		// how far from text outline is bevel
  *  bevelSegments:	<int>, 			// number of bevel layers
  *
- *  extrudePath:	<THREE.CurvePath>	// path to extrude shape along
- *  bendPath:		<THREE.CurvePath> 	// path to bend the geometry around
+ *  extrudePath:	<THREE.CurvePath>	// 2d/3d spline path to extrude shape orthoganly to
+ *  bendPath:		<THREE.CurvePath> 	// 2d path for bend the shape around x/y plane
  *
  *  material:		 <int>	// material index for front and back faces
  *  extrudeMaterial: <int>	// material index for extrusion and beveled faces
  *
  *  }
   **/
+
 
 THREE.ExtrudeGeometry = function( shapes, options ) {
 
@@ -98,7 +97,8 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	if ( extrudePath ) {
 
-		extrudePts = extrudePath.getPoints( curveSegments );
+		extrudePts = extrudePath.getPoints( steps );
+
 		steps = extrudePts.length;
 		extrudeByPath = true;
 		bevelEnabled = false; // bevels not supported for path extrusion
@@ -114,9 +114,6 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 		bevelSize = 0;
 
 	}
-
-
-	// TODO, extrude by path's tangents? also via 3d path?
 
 	// Variables initalization
 
@@ -424,6 +421,13 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	bs = bevelSize;
 
+	// SETUP TNB variables 
+    var tangent;
+    var binormal = new THREE.Vector3();
+    var normal = new THREE.Vector3();
+    var position2 = new THREE.Vector3();
+    var lastBinormal = new THREE.Vector3(1, 0, 0);
+
 	// Back facing vertices
 
 	for ( i = 0; i < vlen; i ++ ) {
@@ -436,7 +440,24 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 		} else {
 
-			v( vert.x, vert.y + extrudePts[ 0 ].y, extrudePts[ 0 ].x );
+			// v( vert.x, vert.y + extrudePts[ 0 ].y, extrudePts[ 0 ].x );
+
+			var splinePt = extrudePts[ 0 ];
+
+			tangent = extrudePath.getTangentAt(0);
+
+            normal.cross(lastBinormal, tangent).normalize();
+            binormal.cross(tangent, normal).normalize();
+            lastBinormal = binormal;
+
+            var cx = vert.x;
+            var cy = vert.y;
+
+            position2.copy(splinePt);
+            position2.x += cx * normal.x + cy * binormal.x;
+            position2.y += cx * normal.y + cy * binormal.y;
+            position2.z += cx * normal.z + cy * binormal.z;
+            v( position2.x, position2.y, position2.z );
 
 		}
 
@@ -459,7 +480,23 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 			} else {
 
-				v( vert.x, vert.y + extrudePts[ s - 1 ].y, extrudePts[ s - 1 ].x );
+				// v( vert.x, vert.y + extrudePts[ s - 1 ].y, extrudePts[ s - 1 ].x );
+				var splinePt = extrudePts[ (s - 1) ];
+
+				tangent = extrudePath.getTangentAt((s - 1)/steps );
+
+	            normal.cross(lastBinormal, tangent).normalize();
+	            binormal.cross(tangent, normal).normalize();
+	            lastBinormal = binormal;
+
+	            var cx = vert.x;
+	            var cy = vert.y;
+
+	            position2.copy(splinePt);
+	            position2.x += cx * normal.x + cy * binormal.x;
+	            position2.y += cx * normal.y + cy * binormal.y;
+	            position2.z += cx * normal.z + cy * binormal.z;
+            	v( position2.x, position2.y, position2.z );
 
 			}
 
