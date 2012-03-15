@@ -1,11 +1,27 @@
 /**
  * @author WestLangley / https://github.com/WestLangley
  * @author zz85 / https://github.com/zz85
+ *
+ * Creates an arrow for visualizing directions
+ *
+ * Parameters:
+ *  dir - Vector3
+ *  origin - Vector3
+ *  length - Number
+ *  hex - color in hex value
  */
  
-THREE.ArrowHelper = function ( origin, dir, length, hex ) {
+THREE.ArrowHelper = function ( dir, origin, length, hex ) {
 
     THREE.Object3D.call( this );
+
+    if (hex ===undefined) {
+        hex = 0xffff00;
+    }
+
+    if (length === undefined) {
+        length = 20;
+    }
 
     var lineGeometry = new THREE.Geometry();
     lineGeometry.vertices.push( new THREE.Vertex() );
@@ -20,7 +36,9 @@ THREE.ArrowHelper = function ( origin, dir, length, hex ) {
     this.cone.position.set( 0, 1, 0 );
     this.add( this.cone );
     
-    this.position = origin;
+    if (origin instanceof THREE.Vector3) {
+        this.position = origin;
+    }
     
     this.setDirection( dir );
     
