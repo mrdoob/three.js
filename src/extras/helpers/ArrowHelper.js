@@ -11,14 +11,14 @@ THREE.ArrowHelper = function ( origin, dir, length, hex ) {
     lineGeometry.vertices.push( new THREE.Vertex() );
     lineGeometry.vertices.push( new THREE.Vertex( new THREE.Vector3( 0, 1, 0 ) ) );
     
-    line = new THREE.Line( lineGeometry, new THREE.LineBasicMaterial( { color : hex } ) );
-    this.add( line );
+    this.line = new THREE.Line( lineGeometry, new THREE.LineBasicMaterial( { color : hex } ) );
+    this.add( this.line );
     
     var coneGeometry = new THREE.CylinderGeometry( 0, 0.05, 0.25, 5, 1 );
     
-    cone = new THREE.Mesh( coneGeometry, new THREE.MeshBasicMaterial( { color : hex } ) );
-    cone.position.set( 0, 1, 0 );
-    this.add( cone );
+    this.cone = new THREE.Mesh( coneGeometry, new THREE.MeshBasicMaterial( { color : hex } ) );
+    this.cone.position.set( 0, 1, 0 );
+    this.add( this.cone );
     
     this.position = origin;
     
@@ -51,7 +51,7 @@ THREE.ArrowHelper.prototype.setLength = function( length ) {
 
 THREE.ArrowHelper.prototype.setColor = function( hex ) {
 
-    this.children[0].material.color.setHex( hex );
-    this.children[1].material.color.setHex( hex );
+    this.line.material.color.setHex( hex );
+    this.cone.material.color.setHex( hex );
 
 };
