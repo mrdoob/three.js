@@ -557,8 +557,11 @@ THREE.ShaderChunk = {
 
 				"#ifdef PHYSICALLY_BASED_SHADING",
 
-					"vec3 schlick = specular + vec3( 1.0 - specular ) * pow( dot( lVector, pointHalfVector ), 5.0 );",
-					"pointSpecular += schlick * pointLightColor[ i ] * pointSpecularWeight * pointDiffuseWeight * lDistance;",
+					// normalization factor
+					"float specularNormalization = ( shininess + 2.0 ) / 8.0;",
+
+					"vec3 schlick = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( lVector, pointHalfVector ), 5.0 );",
+					"pointSpecular += schlick * pointLightColor[ i ] * pointSpecularWeight * pointDiffuseWeight * lDistance * specularNormalization;",
 
 				"#else",
 
@@ -627,12 +630,12 @@ THREE.ShaderChunk = {
 					*/
 
 					// normalization factor
-					//float specularNormalization = ( shininess + 2.0 ) / 8.0;
+					"float specularNormalization = ( shininess + 2.0 ) / 8.0;",
 
 					//"dirSpecular += specular * directionalLightColor[ i ] * dirSpecularWeight * dirDiffuseWeight * specularNormalization * fresnel;",
 
-					"vec3 schlick = specular + vec3( 1.0 - specular ) * pow( dot( dirVector, dirHalfVector ), 5.0 );",
-					"dirSpecular += schlick * directionalLightColor[ i ] * dirSpecularWeight * dirDiffuseWeight;",
+					"vec3 schlick = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( dirVector, dirHalfVector ), 5.0 );",
+					"dirSpecular += schlick * directionalLightColor[ i ] * dirSpecularWeight * dirDiffuseWeight * specularNormalization;",
 
 				"#else",
 
