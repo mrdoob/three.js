@@ -10,8 +10,6 @@
  *  curveSegments: 	<int>,		// number of points on the curves
  *  steps: 			<int>,		// number of points for z-side extrusions / used for subdivding extrude spline too
  *
- *	useSpacedPoints: <boolean>,	// Use equal space distances for triangulation shapes
- *
  *  bevelEnabled:	<bool>,			// turn on bevel
  *  bevelThickness: <float>, 		// how deep into text bevel goes
  *  bevelSize:		<float>, 		// how far from text outline is bevel
@@ -86,8 +84,6 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 	var extrudePath = options.extrudePath;
 	var extrudePts, extrudeByPath = false;
 
-	var useSpacedPoints = options.useSpacedPoints !== undefined ? options.useSpacedPoints : false;
-
 	var material = options.material;
 	var extrudeMaterial = options.extrudeMaterial;
 
@@ -129,19 +125,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	}
 
-	var shapePoints;
-
-	if ( ! useSpacedPoints ) {
-
-	  	shapePoints = shape.extractAllPoints( curveSegments ); //
-
-	} else {
-
-		// QN - Would it be better to pass useSpacePoints parameter to shape, just like bendpath ?
-
-		shapePoints = shape.extractAllSpacedPoints( curveSegments ) // for points with equal divisions
-
-	}
+	var shapePoints = shape.extractPoints();
 
     var vertices = shapePoints.shape;
 	var holes = shapePoints.holes;
