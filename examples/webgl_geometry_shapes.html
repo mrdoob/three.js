@@ -341,6 +341,7 @@
 
 				//splineShape.debug( document.getElementById("debug") );
 
+				// TODO 3d path?
 				var extrudePath = new THREE.Path();
 
 				extrudePath.moveTo( 0, 0 );
@@ -348,8 +349,19 @@
 				extrudePath.quadraticCurveTo( 80, 60, 160, 10 );
 				extrudePath.quadraticCurveTo( 240, -40, 320, 10 );
 
-				extrudeSettings.extrudePath = extrudePath;
+				// QUICK HACK, conversion from 2d to 3d spline
+				// Still broken and need fixes.
+				var apath = new THREE.SplineCurve3();
+				var tmpPoints = extrudePath.getPoints();
+				for (t in tmpPoints) {
+					var tmpPt = tmpPoints[t];
+					apath.points.push(new THREE.Vector3(tmpPt.x, tmpPt.y,0 ));
+				}
+
+
+				extrudeSettings.extrudePath = apath;
 				extrudeSettings.bevelEnabled = false;
+				extrudeSettings.steps = 20;
 
 				var splineShape3d = splineShape.extrude( extrudeSettings );
 				var splinePoints = splineShape.createPointsGeometry( );

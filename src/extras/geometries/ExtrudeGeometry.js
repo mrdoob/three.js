@@ -411,6 +411,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
     var normal = new THREE.Vector3();
     var position2 = new THREE.Vector3();
     var lastBinormal = new THREE.Vector3(1, 0, 0);
+    var cx, cy;
 
 	// Back facing vertices
 
@@ -434,8 +435,8 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
             binormal.cross(tangent, normal).normalize();
             lastBinormal = binormal;
 
-            var cx = vert.x;
-            var cy = vert.y;
+            cx = vert.x;
+            cy = vert.y;
 
             position2.copy(splinePt);
             position2.x += cx * normal.x + cy * binormal.x;
@@ -469,18 +470,18 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 				tangent = extrudePath.getTangentAt((s - 1)/steps );
 
-	            normal.cross(lastBinormal, tangent).normalize();
-	            binormal.cross(tangent, normal).normalize();
-	            lastBinormal = binormal;
+				normal.cross(lastBinormal, tangent).normalize();
+				binormal.cross(tangent, normal).normalize();
+				lastBinormal = binormal;
 
-	            var cx = vert.x;
-	            var cy = vert.y;
+				cx = vert.x;
+				cy = vert.y;
 
-	            position2.copy(splinePt);
-	            position2.x += cx * normal.x + cy * binormal.x;
-	            position2.y += cx * normal.y + cy * binormal.y;
-	            position2.z += cx * normal.z + cy * binormal.z;
-            	v( position2.x, position2.y, position2.z );
+				position2.copy(splinePt);
+				position2.x += cx * normal.x + cy * binormal.x;
+				position2.y += cx * normal.y + cy * binormal.y;
+				position2.z += cx * normal.z + cy * binormal.z;
+				v( position2.x, position2.y, position2.z );
 
 			}
 
