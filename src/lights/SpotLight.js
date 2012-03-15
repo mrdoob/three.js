@@ -2,7 +2,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.SpotLight = function ( hex, intensity, distance, castShadow ) {
+THREE.SpotLight = function ( hex, intensity, distance ) {
 
 	THREE.Light.call( this, hex );
 
@@ -12,7 +12,7 @@ THREE.SpotLight = function ( hex, intensity, distance, castShadow ) {
 	this.intensity = ( intensity !== undefined ) ? intensity : 1;
 	this.distance = ( distance !== undefined ) ? distance : 0;
 
-	this.castShadow = ( castShadow !== undefined ) ? castShadow : false;
+	this.castShadow = false;
 	this.onlyShadow = false;
 
 	//
