@@ -2,43 +2,56 @@
  * @author WestLangley / https://github.com/WestLangley
  * @author zz85 / https://github.com/zz85
  */
-THREE.ArrowHelper = function (origin, dir, scale, color) {
+ 
+THREE.ArrowHelper = function ( origin, dir, length, hex ) {
 
     THREE.Object3D.call( this );
 
-    // line
     var lineGeometry = new THREE.Geometry();
     lineGeometry.vertices.push( new THREE.Vertex() );
     lineGeometry.vertices.push( new THREE.Vertex( new THREE.Vector3( 0, 1, 0 ) ) );
-    line = new THREE.Line( lineGeometry, new THREE.LineBasicMaterial( { color : color } ) );
+    
+    line = new THREE.Line( lineGeometry, new THREE.LineBasicMaterial( { color : hex } ) );
     this.add( line );
     
-    // tip
     var coneGeometry = new THREE.CylinderGeometry( 0, 0.05, 0.25, 5, 1 );
-    cone = new THREE.Mesh( coneGeometry, new THREE.MeshBasicMaterial( { color : color } ) );
+    
+    cone = new THREE.Mesh( coneGeometry, new THREE.MeshBasicMaterial( { color : hex } ) );
     cone.position.set( 0, 1, 0 );
     this.add( cone );
     
-    // position
     this.position = origin;
     
-    this.orientate(dir);
+    this.setDirection( dir );
     
-    this.scale.set( scale, scale, scale );
+    this.setLength( length );
 
 };
 
 THREE.ArrowHelper.prototype = new THREE.Object3D();
 THREE.ArrowHelper.prototype.constructor = THREE.ArrowHelper;
 
-THREE.ArrowHelper.prototype.orientate = function(dir) {
-      // orientation - object matrix
+THREE.ArrowHelper.prototype.setDirection = function( dir ) {
+
     var axis = new THREE.Vector3( 0, 1, 0 ).crossSelf( dir );
-    var radians = Math.acos( new THREE.Vector3( 0, 1, 0 ).dot( dir.normalize() ) );
-    var rotationMatrix = new THREE.Matrix4();
-    rotationMatrix.setRotationAxis( axis.normalize(), radians );
-    this.matrix.multiplySelf( rotationMatrix );
     
-    // orientation - euler rotation vector
+    var radians = Math.acos( new THREE.Vector3( 0, 1, 0 ).dot( dir.clone().normalize() ) );
+    
+    this.matrix = new THREE.Matrix4().setRotationAxis( axis.normalize(), radians );
+            
     this.rotation.getRotationFromMatrix( this.matrix, this.scale );
+    
+};
+
+THREE.ArrowHelper.prototype.setLength = function( length ) {
+
+    this.scale.set( length, length, length );
+
+};
+
+THREE.ArrowHelper.prototype.setColor = function( hex ) {
+
+    this.children[0].material.color.setHex( hex );
+    this.children[1].material.color.setHex( hex );
+
 };
