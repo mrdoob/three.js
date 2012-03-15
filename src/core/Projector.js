@@ -82,7 +82,8 @@ THREE.Projector = function() {
 			if ( ( object instanceof THREE.Mesh || object instanceof THREE.Line ) &&
 			( object.frustumCulled === false || _frustum.contains( object ) ) ) {
 
-				_projScreenMatrix.multiplyVector3( _vector3.copy( object.position ) );
+				_vector3.copy( object.matrixWorld.getPosition() );
+				_projScreenMatrix.multiplyVector3( _vector3 );
 
 				_object = getNextObjectInPool();
 				_object.object = object;
@@ -92,7 +93,8 @@ THREE.Projector = function() {
 
 			} else if ( object instanceof THREE.Sprite || object instanceof THREE.Particle ) {
 
-				_projScreenMatrix.multiplyVector3( _vector3.copy( object.position ) );
+				_vector3.copy( object.matrixWorld.getPosition() );
+				_projScreenMatrix.multiplyVector3( _vector3 );
 
 				_object = getNextObjectInPool();
 				_object.object = object;
