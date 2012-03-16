@@ -558,8 +558,9 @@ THREE.ShaderChunk = {
 
 				"#ifdef PHYSICALLY_BASED_SHADING",
 
-					// normalization factor
-					"float specularNormalization = ( shininess + 2.0 ) / 8.0;",
+					// 2.0 => 2.0001 is hack to work around ANGLE bug
+
+					"float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
 
 					"vec3 schlick = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( lVector, pointHalfVector ), 5.0 );",
 					"pointSpecular += schlick * pointLightColor[ i ] * pointSpecularWeight * pointDiffuseWeight * lDistance * specularNormalization;",
@@ -630,8 +631,9 @@ THREE.ShaderChunk = {
 					"float fresnel = mFresnelBias + mFresnelScale * pow( 1.0 + dot( normalize( -viewPosition ), normal ), mFresnelPower );",
 					*/
 
-					// normalization factor
-					"float specularNormalization = ( shininess + 2.0 ) / 8.0;",
+					// 2.0 => 2.0001 is hack to work around ANGLE bug
+
+					"float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
 
 					//"dirSpecular += specular * directionalLightColor[ i ] * dirSpecularWeight * dirDiffuseWeight * specularNormalization * fresnel;",
 
