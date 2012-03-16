@@ -24,8 +24,11 @@
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>,
  *
- *  vertexColors: false / THREE.VertexColors / THREE.FaceColors,
+ *  vertexColors: THREE.NoColors / THREE.VertexColors / THREE.FaceColors,
+ *
  *  skinning: <bool>,
+ *  morphTargets: <bool>,
+ *  morphNormals: <bool>,
  *
  *	fog: <bool>
  * }
@@ -64,7 +67,7 @@ THREE.MeshLambertMaterial = function ( parameters ) {
 	this.wireframeLinecap = parameters.wireframeLinecap !== undefined ? parameters.wireframeLinecap : 'round';
 	this.wireframeLinejoin = parameters.wireframeLinejoin !== undefined ? parameters.wireframeLinejoin : 'round';
 
-	this.vertexColors = parameters.vertexColors !== undefined ? parameters.vertexColors : false;
+	this.vertexColors = parameters.vertexColors !== undefined ? parameters.vertexColors : THREE.NoColors;
 
 	this.skinning = parameters.skinning !== undefined ? parameters.skinning : false;
 	this.morphTargets = parameters.morphTargets !== undefined ? parameters.morphTargets : false;
