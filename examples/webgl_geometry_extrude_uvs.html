@@ -72,11 +72,13 @@
 			s.lineTo(  4, 4 );
 			s.lineTo( -4, 4 );
 
-			var ho = new THREE.Shape();
-			ho.moveTo( 0,0 );
-			ho.lineTo( 0, 2 );
-			ho.lineTo( 2, 0 );
-			ho.lineTo( -2,-2 );
+            var ho = new THREE.Shape();
+            ho.moveTo( 1+ 0,0 );
+            ho.lineTo( 1+ -2, -2 );
+            ho.lineTo( 0.5+  2, -2 );
+            ho.lineTo( 1+  2.5, 0 );
+            ho.lineTo( 0.5+  2, 2 );
+            ho.lineTo( 1+ -2, 2 );
 
 			s.holes.push(ho);
 
