@@ -121,6 +121,7 @@ EXTRAS_FILES = [
 'extras/geometries/OctahedronGeometry.js',
 'extras/geometries/TetrahedronGeometry.js',
 'extras/helpers/AxisHelper.js',
+'extras/helpers/ArrowHelper.js',
 'extras/helpers/CameraHelper.js',
 'extras/modifiers/SubdivisionModifier.js',
 'extras/loaders/Loader.js',

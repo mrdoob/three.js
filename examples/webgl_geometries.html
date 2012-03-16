@@ -111,6 +111,10 @@
 				object.scale.x = object.scale.y = object.scale.z = 0.5;
 				scene.add( object );
 
+				object = new THREE.ArrowHelper( new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 0, 0 ), 50 );
+				object.position.set( 200, 0, 400 );
+				scene.add( object );
+
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
