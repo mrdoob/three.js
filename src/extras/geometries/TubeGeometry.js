@@ -7,7 +7,7 @@
  * Creates a tube which extrudes along a 3d spline
  */
 
-THREE.TubeGeometry = function(radius, segments, segmentsRadius, path) {
+THREE.TubeGeometry = function(radius, segments, segmentsRadius, path, debug) {
 
 	THREE.Geometry.call(this);
 
@@ -18,6 +18,8 @@ THREE.TubeGeometry = function(radius, segments, segmentsRadius, path) {
 	this.segmentsRadius = segmentsRadius || 8;
 	this.grid = new Array(this.segments);
 	this.path = path;
+	if (debug) this.debug = new THREE.Object3D();
+
 
 	var tang = new THREE.Vector3();
 
@@ -46,9 +48,26 @@ THREE.TubeGeometry = function(radius, segments, segmentsRadius, path) {
 		tang = this.path.getTangentAt(u);
 
 		if (oldB === undefined) {
-			//arbitrary vector
+			//arbitrary vector method 1
 			//oldB = new THREE.Vector3(Math.random(), Math.random(), Math.random()).normalize();
+
+			// Method 2
 			//oldB = new THREE.Vector3( 0, -1, 0 ); // test to see what happens to a known binormal vector
+
+			// Method 3
+			// t1 = u - epsilon;
+			// if (t1 < 0) t1 = 0;
+			// t1 = this.path.getTangentAt(t1);
+			// t2 = u + epsilon;
+			// if (t2 > 1) t2 = 1;
+			// t2 = this.path.getTangentAt(t2);
+
+			// normal.sub(t2, t1).normalize();
+
+			// binormal.cross(tang, normal);
+			// oldB = binormal;
+
+			// Method 4
 
 			// Find the smallest componenet of the tangent vector (x, y, or z) and set the binormal
 			// equal to the unit vector in that direction ((1, 0, 0), (0, 1, 0), or (0, 0, 1))
@@ -88,13 +107,16 @@ THREE.TubeGeometry = function(radius, segments, segmentsRadius, path) {
 		oldB = binormal;
 
 
-		addArrow(parent, pos, normal, radius * 2, 0xffff00);
+		if (this.debug) {
+			this.debug.add(new THREE.ArrowHelper(normal, pos, radius * 2, 0xff0000));
+		}
+		
 
 		for (var j = 0; j < this.segmentsRadius; ++j) {
 
 			v = j / this.segmentsRadius * 2 * Math.PI;
 
-			cx = this.radius * Math.cos(v); // TODO: Hack: Negating it so it faces outside.
+			cx = -this.radius * Math.cos(v); // TODO: Hack: Negating it so it faces outside.
 			cy = this.radius * Math.sin(v);
 
             var pos2 = new THREE.Vector3().copy(pos);
@@ -107,7 +129,7 @@ THREE.TubeGeometry = function(radius, segments, segmentsRadius, path) {
 		}
 	}
 
-	for (var i = 0; i < this.segments - 1; ++i) {
+	for (var i = 0; i < this.segments; ++i) { // segments -1 for non-closed loops, segment - 0 for closed ?
 
 		for (var j = 0; j < this.segmentsRadius; ++j) {
 
