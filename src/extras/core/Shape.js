@@ -77,7 +77,7 @@ THREE.Shape.prototype.extractAllPoints = function ( divisions ) {
 THREE.Shape.prototype.extractPoints = function ( divisions ) {
 
 	if (this.useSpacedPoints) {
-		return this.getSpacedPointsHoles(divisions);
+		return this.extractAllSpacedPoints(divisions);
 	}
 
 	return this.extractAllPoints(divisions);
