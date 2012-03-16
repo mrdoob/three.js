@@ -116,6 +116,7 @@ EXTRAS_FILES = [
 'extras/geometries/TextGeometry.js',
 'extras/geometries/TorusGeometry.js',
 'extras/geometries/TorusKnotGeometry.js',
+'extras/geometries/TubeGeometry.js',
 'extras/geometries/PolyhedronGeometry.js',
 'extras/geometries/IcosahedronGeometry.js',
 'extras/geometries/OctahedronGeometry.js',
