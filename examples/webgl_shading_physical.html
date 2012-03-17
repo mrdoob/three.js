@@ -287,10 +287,10 @@
 
 				loader.load( "models/animated/sittingBox.js", function( geometry ) {
 
-					var morphMaterial = new THREE.MeshPhongMaterial( { ambient: 0x222222, color: 0x000000, specular: 0xff9900, shininess: 50, morphTargets: true } );
+					var morphMaterial = new THREE.MeshPhongMaterial( { ambient: 0x000000, color: 0x000000, specular: 0xff9900, shininess: 50, morphTargets: true, morphNormals: true  } );
 					morphMaterial.shading = THREE.FlatShading;
 
-					//geometry.computeVertexNormals();
+					geometry.computeMorphNormals();
 					morph = new THREE.MorphAnimMesh( geometry, morphMaterial );
 
 					var s = 200;
@@ -301,6 +301,8 @@
 
 					morph.castShadow = true;
 					morph.receiveShadow = true;
+
+					morph.doubleSided = true;
 
 					scene.add( morph );
 
@@ -415,6 +417,7 @@
 
 				effectVignette.renderToScreen = true;
 				vblur.renderToScreen = true;
+				effectFXAA.renderToScreen = true;
 
 				composer = new THREE.EffectComposer( renderer, renderTarget );
 
@@ -422,8 +425,8 @@
 
 				composer.addPass( effectFXAA );
 
-				composer.addPass( hblur );
-				composer.addPass( vblur );
+				//composer.addPass( hblur );
+				//composer.addPass( vblur );
 
 				//composer.addPass( effectVignette );
 
