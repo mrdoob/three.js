@@ -4318,9 +4318,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setProgram( camera, lights, fog, material, object ) {
 
-		if ( ! material.program ) {
+		if ( ! material.program || material.needsUpdate ) {
 
 			_this.initMaterial( material, lights, fog, object );
+			material.needsUpdate = false;
 
 		}
 
