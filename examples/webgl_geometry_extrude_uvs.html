@@ -31,11 +31,6 @@
 			camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
 			scene.add( camera );
 
-			var light = new THREE.DirectionalLight( 0xffffff );
-			light.position.set( 0, 1, 2 ).normalize();
-			scene.add( light );
-
-
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			document.body.appendChild( renderer.domElement );
@@ -63,6 +58,7 @@
 			img.onload = function() { texture.needsUpdate = true; }
 			img.src = TEXDATA;
 			var texture = new THREE.Texture( img );
+			texture.minFilter = THREE.LinearFilter;
 
 			var s = new THREE.Shape();
 			s.moveTo( 0,0 );
@@ -101,13 +97,11 @@
 			var geom = s.extrude( exoption );
 			mesh = createMesh( geom, texture );
 			mesh.position.set( -7, 0, -45 );
-			mesh.doubleSided = true;
 			scene.add( mesh );
 
 			var geom2 = new THREE.ExtrudeGeometry( [s,s2], exoption );
 			mesh2 = createMesh( geom2, texture );
 			mesh2.position.set( 7, 0, -45 );
-			mesh2.doubleSided = true;
 			scene.add( mesh2 );
 
 		}
