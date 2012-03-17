@@ -40,73 +40,77 @@ THREE.TubeGeometry = function( radius, segments, segmentsRadius, path, debug ) {
 
 		this.grid[ i ] = new Array( this.segmentsRadius );
 
-		u = i / this.segments;
+		u = i / ( this.segments - 1 );
 
 		pos = this.path.getPointAt( u );
 		tang = this.path.getTangentAt( u );
 
 		if ( oldB === undefined ) {
 
-			//arbitrary vector method 1
-			//oldB = new THREE.Vector3(Math.random(), Math.random(), Math.random()).normalize();
+			// Method 1, random arbitrary vector
+			// oldB = new THREE.Vector3(Math.random(), Math.random(), Math.random()).normalize();
 
-			// Method 2
-			//oldB = new THREE.Vector3( 0, -1, 0 ); // test to see what happens to a known binormal vector
+			// Method 2, use a fixed start binormal. Has dangers of 0 vectors too.
+			// oldB = new THREE.Vector3( 0, -1, 0 );
 
-			// Method 3
-			// t1 = u - epsilon;
-			// if (t1 < 0) t1 = 0;
-			// t1 = this.path.getTangentAt(t1);
-			// t2 = u + epsilon;
-			// if (t2 > 1) t2 = 1;
-			// t2 = this.path.getTangentAt(t2);
+			// Method 3 - This uses the Frenet-Serret formula for deriving binormal
 
-			// normal.sub(t2, t1).normalize();
+			var t1, t2;
 
-			// binormal.cross(tang, normal);
-			// oldB = binormal;
+			t1 = u - epsilon;
+			if (t1 < 0) t1 = 0;
+			t1 = this.path.getTangentAt( t1 );
 
-			// Method 4
+			t2 = u + epsilon;
+			if (t2 > 1) t2 = 1;
+			t2 = this.path.getTangentAt( t2 );
 
-			// Find the smallest componenet of the tangent vector (x, y, or z) and set the binormal
-			// equal to the unit vector in that direction ((1, 0, 0), (0, 1, 0), or (0, 0, 1))
+			normal.sub( t2, t1 ).normalize();
 
-			var smallest = Number.MAX_VALUE;
-			var x, y, z;
+			binormal.cross( tang, normal );
+			oldB = binormal;
 
-			var tx = Math.abs( tang.x );
-			var ty = Math.abs( tang.y );
-			var tz = Math.abs( tang.z );
+			if ( oldB.length() == 0 ) {
 
-			if ( tx <= smallest ) {
+				// When binormal is a zero vector, we could brute force another vector ?
+				// oldB.set( 1, 0, 0 );
+				// if (normal.cross(oldB, tang).normalize().length()==0) {
+				// 	oldB.set( 0, 1, 0 );
+				// 	if (normal.cross(oldB, tang).normalize().length()==0) {
+				// 		oldB.set( 0, 0, 1 );
+				// 	}
+				// }
 
-				smallest = tx;
+				// Method 4 - Sets binormal direction in the smallest tangent xyz component
 
-				x = 1;
-				y = 0;
-				z = 0;
+				var smallest = Number.MAX_VALUE;
+				var x, y, z;
+
+				var tx = Math.abs( tang.x );
+				var ty = Math.abs( tang.y );
+				var tz = Math.abs( tang.z );
+
+				if ( tx <= smallest ) {
+
+					smallest = tx;
+					oldB.set( 1, 0, 0 );
+
+				}
+
+				if ( ty <= smallest ) {
+
+					smallest = ty;
+					oldB.set( 0, 1, 0 );
+
+				}
+
+				if ( tz <= smallest ) {
+
+					oldB.set( 0, 0, 1 );
+
+				}
 
 			}
-
-			if ( ty <= smallest ) {
-
-				smallest = ty;
-
-				x = 0;
-				y = 1;
-				z = 0;
-
-			}
-
-			if ( tz <= smallest ) {
-
-				x = 0;
-				y = 0;
-				z = 1;
-
-			}
-
-			oldB = new THREE.Vector3( x, y, z );
 
 		}
 
@@ -117,9 +121,10 @@ THREE.TubeGeometry = function( radius, segments, segmentsRadius, path, debug ) {
 		if ( this.debug ) {
 
 			this.debug.add( new THREE.ArrowHelper( normal, pos, radius * 2, 0xff0000 ) );
+			// this.debug.add(new THREE.ArrowHelper(binormal, pos, radius * 2, 0x00ff00));
+			// this.debug.add(new THREE.ArrowHelper(tang, pos, radius * 2, 0x0000ff));
 
 		}
-
 
 		for ( var j = 0; j < this.segmentsRadius; ++ j ) {
 
@@ -139,7 +144,7 @@ THREE.TubeGeometry = function( radius, segments, segmentsRadius, path, debug ) {
 
 	}
 
-	for ( var i = 0; i < this.segments; ++ i ) { // segments -1 for non-closed loops, segment - 0 for closed ?
+	for ( var i = 0; i < this.segments -1; ++ i ) {
 
 		for ( var j = 0; j < this.segmentsRadius; ++ j ) {
 
@@ -160,6 +165,7 @@ THREE.TubeGeometry = function( radius, segments, segmentsRadius, path, debug ) {
 			this.faceVertexUvs[ 0 ].push( [ uva, uvb, uvc, uvd ] );
 
 		}
+
 	}
 
 	this.computeCentroids();
@@ -169,12 +175,6 @@ THREE.TubeGeometry = function( radius, segments, segmentsRadius, path, debug ) {
 	function vert( x, y, z ) {
 
 		return scope.vertices.push( new THREE.Vertex( new THREE.Vector3( x, y, z ) ) ) - 1;
-
-	}
-
-	function getPathPos( u, path ) {
-
-		return path.getPoint( u );
 
 	}
 
