@@ -115,6 +115,202 @@
 
     );
 
+    // Replacement for TorusKnotGeometry?
+    THREE.TrefoilKnot = THREE.Curve.create(
+
+    function(s) {
+      this.scale = (s === undefined) ? 10 : s ;
+    },
+
+    function(t) {
+        t *= Math.PI * 2;
+        var tx = (2 + Math.cos(3 * t)) * Math.cos(2 * t),
+        ty = (2 + Math.cos(3* t)) * Math.sin(2 * t),
+        tz = Math.sin(3 * t);
+
+        return new THREE.Vector3(tx, ty, tz).multiplyScalar(this.scale);
+
+    }
+
+    );
+
+    // Formulas from http://mathdl.maa.org/images/upload_library/23/stemkoski/knots/page6.html
+    THREE.TorusKnot = THREE.Curve.create(
+
+    function(s) {
+      this.scale = (s === undefined) ? 10 : s ;
+    },
+
+    function(t) {
+      var p = 3, q = 4;
+        t *= Math.PI * 2;
+        var tx = (2 + Math.cos(q * t)) * Math.cos(p * t),
+        ty = (2 + Math.cos(q* t)) * Math.sin(p * t),
+        tz = Math.sin(q * t);
+
+        return new THREE.Vector3(tx, ty, tz).multiplyScalar(this.scale);
+
+    }
+
+    );
+
+
+    THREE.CinquefoilKnot = THREE.Curve.create(
+
+    function(s) {
+      this.scale = (s === undefined) ? 10 : s ;
+    },
+
+    function(t) {
+      var p = 2, q = 5;
+        t *= Math.PI * 2;
+        var tx = (2 + Math.cos(q * t)) * Math.cos(p * t),
+        ty = (2 + Math.cos(q* t)) * Math.sin(p * t),
+        tz = Math.sin(q * t);
+
+        return new THREE.Vector3(tx, ty, tz).multiplyScalar(this.scale);
+
+    }
+
+    );
+
+
+    THREE.TrefoilPolynomialKnot = THREE.Curve.create(
+
+    function(s) {
+      this.scale = (s === undefined) ? 10 : s ;
+    },
+
+    function(t) {
+ 
+        t = t * 4 - 2;
+        var tx = Math.pow(t, 3) - 3 * t,
+        ty = Math.pow(t, 4) - 4 * t * t,
+        tz = 1/ 5 * Math.pow(t, 5) - 2 * t;
+
+        return new THREE.Vector3(tx, ty, tz).multiplyScalar(this.scale);
+
+    }
+
+    );
+
+    var sin = Math.sin, pow = Math.pow, cos = Math.cos;
+    // var scaleTo = function(x, y) {
+    //   var r = y - x;
+    //   return function(t) {
+    //     t * r + x;
+    //   };
+    // }
+
+    var scale = function(x, y, t) {
+      var r = y - x;
+      return t * r + x;
+    }
+
+    THREE.FigureEightPolynomialKnot = THREE.Curve.create(
+
+    function(s) {
+      this.scale = (s === undefined) ? 1 : s ;
+    },
+
+    function(t) {
+  
+        t = scale(-4,4, t);
+        var tx = 2 / 5 * t * (t * t - 7) * (t * t - 10),
+        ty = pow(t, 4) - 13 * t * t,
+        tz = 1/10 * t * (t * t - 4) * (t * t - 9) * (t * t - 12);
+
+        return new THREE.Vector3(tx, ty, tz).multiplyScalar(this.scale);
+
+    }
+
+    );
+
+    // When there's time, try more formulas at http://mathdl.maa.org/images/upload_library/23/stemkoski/knots/page4.html
+
+
+    //http://www.mi.sanu.ac.rs/vismath/taylorapril2011/Taylor.pdf
+    THREE.DecoratedTorusKnot4a = THREE.Curve.create(
+
+    function(s) {
+      this.scale = (s === undefined) ? 40 : s ;
+    },
+
+    function(t) {
+        t *= Math.PI * 2;
+        var
+        x = cos(2*t) * (1+0.6*(cos(5*t) + 0.75*cos(10*t))),
+         y = sin(2*t) * (1+0.6*(cos(5*t) + 0.75*cos(10*t))),
+          z = 0.35*sin(5*t);
+
+        return new THREE.Vector3(x, y, z).multiplyScalar(this.scale);
+
+    }
+
+    );
+
+
+    THREE.DecoratedTorusKnot4b = THREE.Curve.create(
+
+    function(s) {
+      this.scale = (s === undefined) ? 40 : s ;
+    },
+
+    function(t) {
+        var θ = t  * Math.PI * 2;
+        var
+        x = cos(2*θ) * (1 + 0.45*cos(3*θ) + 0.4*cos(9*θ)),
+         y = sin(2*θ) * (1 + 0.45*cos(3*θ) + 0.4*cos(9*θ)),
+          z = 0.2*sin(9*θ);
+
+        return new THREE.Vector3(x, y, z).multiplyScalar(this.scale);
+
+    }
+
+    );
+
+
+    THREE.DecoratedTorusKnot5a = THREE.Curve.create(
+
+    function(s) {
+      this.scale = (s === undefined) ? 40 : s ;
+    },
+
+    function(t) {
+        var θ = t  * Math.PI * 2;
+        var
+        x = cos(3*θ) * (1 + 0.3*cos(5*θ) + 0.5*cos(10*θ)),
+         y = sin(3*θ) * (1 + 0.3*cos(5*θ) + 0.5*cos(10*θ)),
+          z = 0.2*sin(20*θ)
+
+        return new THREE.Vector3(x, y, z).multiplyScalar(this.scale);
+
+    }
+
+    );
+
+    THREE.DecoratedTorusKnot5c = THREE.Curve.create(
+
+    function(s) {
+      this.scale = (s === undefined) ? 40 : s ;
+    },
+
+    function(t) {
+        var θ = t  * Math.PI * 2;
+        var
+        x = cos(4*θ) * (1 + 0.5*(cos(5*θ) + 0.4*cos(20*θ))),
+         y = sin(4*θ) * (1 + 0.5*(cos(5* θ) + 0.4*cos(20*θ))),
+          z = 0.35*sin(15*θ);
+
+        return new THREE.Vector3(x, y, z).multiplyScalar(this.scale);
+
+    }
+
+    );
+
+    
+
+
     var container, stats;
 
     var camera, scene, renderer;
@@ -163,9 +359,11 @@
       function addGeometry(geometry, color, x, y, z, rx, ry, rz, s) {
 
           // 3d shape
-          var mesh = THREE.SceneUtils.createMultiMaterialObject(geometry, [new THREE.MeshLambertMaterial({
-              color: color
-          }), new THREE.MeshBasicMaterial({
+          var mesh = THREE.SceneUtils.createMultiMaterialObject(geometry, [
+            new THREE.MeshLambertMaterial({
+                color: color
+            }),
+           new THREE.MeshBasicMaterial({
               color: 0x000000,
               wireframe: true,
               transparent: true
@@ -186,7 +384,7 @@
 
       //     new THREE.Vector3(0, 30, 10), new THREE.Vector3(-10, 20, 10), new THREE.Vector3(-10, 10, 10), new THREE.Vector3(0, 0, 10), new THREE.Vector3(10, -10, 10), new THREE.Vector3(20, -15, 10), new THREE.Vector3(30, -15, 10), new THREE.Vector3(40, -15, 10), new THREE.Vector3(50, -15, 10), new THREE.Vector3(60, 0, 10), new THREE.Vector3(70, 0, 0), new THREE.Vector3(80, 0, 0), new THREE.Vector3(90, 0, 0), new THREE.Vector3(100, 0, 0)]);
 
-      var extrudePath = new THREE.HeartCurve(3.5);
+      // var extrudePath = new THREE.HeartCurve(3.5);
       // var extrudePath = new THREE.VivianiCurve(70);
       // var extrudePath = new THREE.KnotCurve();
       // extrudePath = new THREE.HelixCurve();
@@ -198,9 +396,19 @@
       //   new THREE.Vector3(0, 40, 40),
       //   new THREE.Vector3(0, -40, 40),
       // ]);
-      
 
-      var tube = new THREE.TubeGeometry(5, 100, 10, extrudePath, true);
+      // extrudePath = new THREE.TrefoilKnot();
+      // extrudePath = new THREE.TorusKnot(20
+      // extrudePath = new THREE.CinquefoilKnot(20);
+      // extrudePath = new THREE.TrefoilPolynomialKnot(14);
+      // extrudePath = new THREE.FigureEightPolynomialKnot();
+      // extrudePath = new THREE.DecoratedTorusKnot4a();
+      // extrudePath = new THREE.DecoratedTorusKnot4b();
+      // extrudePath = new THREE.DecoratedTorusKnot5a();
+      extrudePath = new THREE.DecoratedTorusKnot5c()
+      
+      // var tube = new THREE.TubeGeometry(5, 100, 10, extrudePath, true);
+      var tube = new THREE.TubeGeometry(2, 400, 2, extrudePath, true);
       
 
       addGeometry(tube, 0xff00ff, 0, -80, 0, 0, 0, 0, 3);
