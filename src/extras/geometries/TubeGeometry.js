@@ -42,7 +42,7 @@ THREE.TubeGeometry = function(radius, segments, segmentsRadius, path, debug) {
 
 		this.grid[i] = new Array(this.segmentsRadius);
 
-		u = i / this.segments;
+		u = i / ( this.segments - 1 );
 
 		var pos = this.path.getPointAt(u);
 		tang = this.path.getTangentAt(u);
@@ -69,35 +69,35 @@ THREE.TubeGeometry = function(radius, segments, segmentsRadius, path, debug) {
 			oldB = binormal;
 
 			if (oldB.length()==0) {
+				// When binormal is a zero vector, we could brute force another vector ?
+				// oldB.set( 1, 0, 0 );
+				// if (normal.cross(oldB, tang).normalize().length()==0) {
+				// 	oldB.set( 0, 1, 0 );
+				// 	if (normal.cross(oldB, tang).normalize().length()==0) {
+				// 		oldB.set( 0, 0, 1 );
+				// 	}
+				// }
 
-			// When binormal is a zero vector, we could brute force another vector ?
-			// oldB.set( 1, 0, 0 );
-			// if (normal.cross(oldB, tang).normalize().length()==0) {
-			// 	oldB.set( 0, 1, 0 );
-			// 	if (normal.cross(oldB, tang).normalize().length()==0) {
-			// 		oldB.set( 0, 0, 1 );
-			// 	}
-			// }
+				// Method 4 - Sets binormal direction in the smallest tangent xyz component
+				var smallest = Number.MAX_VALUE;
+				var x, y, z;
+				var tx = Math.abs(tang.x);
+				var ty = Math.abs(tang.y);
+				var tz = Math.abs(tang.z);
 
-			// Method 4 - Sets binormal direction in the smallest tangent xyz component
-			var smallest = Number.MAX_VALUE;
-			var x, y, z;
-			var tx = Math.abs(tang.x);
-			var ty = Math.abs(tang.y);
-			var tz = Math.abs(tang.z);
+				if (tx <= smallest) {
+					smallest = tx;
+					oldB.set(1,0,0);
+				}
 
-			if (tx <= smallest) {
-				smallest = tx;
-				oldB.set(1,0,0);
-			}
- 
-			if (ty <= smallest) {
-				smallest = ty;
-				oldB.set(0,1,0);
-			}
- 
-			if (tz <= smallest) {
-				oldB.set(0,0,1);
+				if (ty <= smallest) {
+					smallest = ty;
+					oldB.set(0,1,0);
+				}
+
+				if (tz <= smallest) {
+					oldB.set(0,0,1);
+				}
 			}
  
 		}
@@ -131,7 +131,7 @@ THREE.TubeGeometry = function(radius, segments, segmentsRadius, path, debug) {
 		}
 	}
 
-	for (var i = 0; i < this.segments; ++i) { // segments -1 for non-closed loops, segment - 0 for closed ?
+	for (var i = 0; i < this.segments -1; ++i) {
 
 		for (var j = 0; j < this.segmentsRadius; ++j) {
 
