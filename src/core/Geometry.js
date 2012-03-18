@@ -544,7 +544,9 @@ THREE.Geometry.prototype = {
 
 	computeBoundingSphere: function () {
 
-		if ( ! this.boundingSphere ) this.boundingSphere = { radius: 0 };
+		if ( ! this.boundingBox ) this.computeBoundingBox();
+
+		if ( ! this.boundingSphere ) this.boundingSphere = { radius: 0, position: new THREE.Vector3() };
 
 		var radius, maxRadius = 0;
 
@@ -555,7 +557,9 @@ THREE.Geometry.prototype = {
 
 		}
 
-		this.boundingSphere.radius = maxRadius;
+		this.boundingSphere.position.add( this.boundingBox.min, this.boundingBox.max ).multiplyScalar( 0.5 );
+		radius = this.boundingSphere.position.length();
+		this.boundingSphere.radius = maxRadius - radius;
 
 	},
 

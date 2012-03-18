@@ -43,13 +43,11 @@ THREE.Frustum.prototype.contains = function ( object ) {
 
 	var distance,
 	planes = this.planes,
-	matrix = object.matrixWorld,
-	scale = THREE.Frustum.__v1.set( matrix.getColumnX().length(), matrix.getColumnY().length(), matrix.getColumnZ().length() ),
-	radius = - object.geometry.boundingSphere.radius * Math.max( scale.x, Math.max( scale.y, scale.z ) );
+	radius = - object.geometry.boundingSphere.radius * object.boundRadiusScale;
 
 	for ( var i = 0; i < 6; i ++ ) {
 
-		distance = planes[ i ].x * matrix.n14 + planes[ i ].y * matrix.n24 + planes[ i ].z * matrix.n34 + planes[ i ].w;
+		distance = planes[ i ].x * object.cog.x + planes[ i ].y * object.cog.y + planes[ i ].z * object.cog.z + planes[ i ].w;
 		if ( distance <= radius ) return false;
 
 	}

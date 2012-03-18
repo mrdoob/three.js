@@ -10,6 +10,7 @@ THREE.Mesh = function ( geometry, material ) {
 
 	this.geometry = geometry;
 	this.material = ( material !== undefined ) ? material : new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, wireframe: true } );
+	this.cog = new THREE.Vector3();
 
 	if ( this.geometry ) {
 
@@ -64,5 +65,13 @@ THREE.Mesh.prototype.getMorphTargetIndexByName = function( name ) {
 
 	console.log( "THREE.Mesh.getMorphTargetIndexByName: morph target " + name + " does not exist. Returning 0." );
 	return 0;
+
+}
+
+THREE.Mesh.prototype.updateMatrixWorld = function( force ) {
+
+	THREE.Object3D.prototype.updateMatrixWorld.call( this, force );
+
+	this.matrixWorld.multiplyVector3( this.cog.copy( this.geometry.boundingSphere.position ) );
 
 }
