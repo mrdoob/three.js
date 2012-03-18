@@ -130,7 +130,7 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 
 	}
 
-	this.boundingSphere = { radius: radius };
+	this.boundingSphere = { radius: radius, position: new THREE.Vector3() };
 
 };
 

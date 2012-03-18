@@ -3344,7 +3344,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						} else {
 
-							_vector3.copy( object.position );
+							_vector3.copy( object.cog );
 							_projScreenMatrix.multiplyVector3( _vector3 );
 
 							webglObject.z = _vector3.z;
