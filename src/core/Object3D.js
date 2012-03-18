@@ -224,6 +224,7 @@ THREE.Object3D.prototype = {
 
 			this.matrix.scale( this.scale );
 			this.boundRadiusScale = Math.max( this.scale.x, Math.max( this.scale.y, this.scale.z ) );
+			if ( this.parent ) this.boundRadiusScale *= this.parent.boundRadiusScale;
 
 		}
 
