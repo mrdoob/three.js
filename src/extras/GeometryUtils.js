@@ -497,8 +497,14 @@ THREE.GeometryUtils = {
 				var c = face.c;
 				var d = face.d;
 
-				var triA = face.clone();
-				var triB = face.clone();
+				var triA = new THREE.Face3();
+				var triB = new THREE.Face3();
+
+				triA.color.copy( face.color );
+				triB.color.copy( face.color );
+
+				triA.materialIndex = face.materialIndex;
+				triB.materialIndex = face.materialIndex;
 
 				triA.a = a;
 				triA.b = b;
@@ -507,6 +513,18 @@ THREE.GeometryUtils = {
 				triB.a = b;
 				triB.b = c;
 				triB.c = d;
+
+				if ( face.vertexColors.length === 4 ) {
+
+					triA.vertexColors[ 0 ] = face.vertexColors[ 0 ].clone();
+					triA.vertexColors[ 1 ] = face.vertexColors[ 1 ].clone();
+					triA.vertexColors[ 2 ] = face.vertexColors[ 3 ].clone();
+
+					triB.vertexColors[ 0 ] = face.vertexColors[ 1 ].clone();
+					triB.vertexColors[ 1 ] = face.vertexColors[ 2 ].clone();
+					triB.vertexColors[ 2 ] = face.vertexColors[ 3 ].clone();
+
+				}
 
 				geometry.faces.splice( i, 1, triA, triB );
 
@@ -612,6 +630,7 @@ THREE.GeometryUtils = {
 		}
 
 		geometry.vertices = vertices;
+		delete geometry.__tmpVertices;
 
 	},
 
