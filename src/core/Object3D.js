@@ -19,6 +19,7 @@ THREE.Object3D = function () {
 	this.rotation = new THREE.Vector3();
 	this.eulerOrder = 'XYZ';
 	this.scale = new THREE.Vector3( 1, 1, 1 );
+	this.scaleWorld = new THREE.Vector3( 1, 1, 1 );
 
 	this.doubleSided = false;
 	this.flipSided = false;
@@ -223,11 +224,20 @@ THREE.Object3D.prototype = {
 		if ( this.scale.x !== 1 || this.scale.y !== 1 || this.scale.z !== 1 ) {
 
 			this.matrix.scale( this.scale );
-			this.boundRadiusScale = Math.max( this.scale.x, Math.max( this.scale.y, this.scale.z ) );
-			if ( this.parent ) this.boundRadiusScale *= this.parent.boundRadiusScale;
 
 		}
 
+		if ( this.parent ) {
+
+			this.scaleWorld.multiply( this.scale, this.parent.scale );
+
+		} else {
+
+			this.scaleWorld.copy( this.scale );
+
+		}
+
+		this.boundRadiusScale = Math.max( this.scaleWorld.x, Math.max( this.scaleWorld.y, this.scaleWorld.z ) );
 		this.matrixWorldNeedsUpdate = true;
 
 	},
