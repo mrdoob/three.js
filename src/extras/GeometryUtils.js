@@ -645,6 +645,7 @@ THREE.GeometryUtils = {
 		dab, dbc, dac, dcd, dad,
 		m, m1, m2,
 		vm, vm1, vm2,
+		vnm, vnm1, vnm2,
 		triA, triB,
 		quadA, quadB,
 		edge;
@@ -687,6 +688,16 @@ THREE.GeometryUtils = {
 						triB.b = b;
 						triB.c = c;
 
+						if ( face.vertexNormals.length === 3 ) {
+
+							vnm = face.vertexNormals[ 0 ].clone();
+							vnm.lerpSelf( face.vertexNormals[ 1 ], 0.5 );
+
+							triA.vertexNormals[ 1 ].copy( vnm );
+							triB.vertexNormals[ 0 ].copy( vnm );
+
+						}
+
 						edge = 0;
 
 					} else if ( dbc >= dab && dbc >= dac ) {
@@ -702,6 +713,19 @@ THREE.GeometryUtils = {
 						triB.b = c;
 						triB.c = a;
 
+						if ( face.vertexNormals.length === 3 ) {
+
+							vnm = face.vertexNormals[ 1 ].clone();
+							vnm.lerpSelf( face.vertexNormals[ 2 ], 0.5 );
+
+							triA.vertexNormals[ 2 ].copy( vnm );
+
+							triB.vertexNormals[ 0 ].copy( vnm );
+							triB.vertexNormals[ 1 ].copy( face.vertexNormals[ 2 ] );
+							triB.vertexNormals[ 2 ].copy( face.vertexNormals[ 0 ] );
+
+						}
+
 						edge = 1;
 
 					} else {
@@ -716,6 +740,16 @@ THREE.GeometryUtils = {
 						triB.a = m;
 						triB.b = b;
 						triB.c = c;
+
+						if ( face.vertexNormals.length === 3 ) {
+
+							vnm = face.vertexNormals[ 0 ].clone();
+							vnm.lerpSelf( face.vertexNormals[ 2 ], 0.5 );
+
+							triA.vertexNormals[ 2 ].copy( vnm );
+							triB.vertexNormals[ 0 ].copy( vnm );
+
+						}
 
 						edge = 2;
 
@@ -819,6 +853,22 @@ THREE.GeometryUtils = {
 						quadB.c = c;
 						quadB.d = m2;
 
+						if ( face.vertexNormals.length === 4 ) {
+
+							vnm1 = face.vertexNormals[ 0 ].clone();
+							vnm1.lerpSelf( face.vertexNormals[ 1 ], 0.5 );
+
+							vnm2 = face.vertexNormals[ 2 ].clone();
+							vnm2.lerpSelf( face.vertexNormals[ 3 ], 0.5 );
+
+							quadA.vertexNormals[ 1 ].copy( vnm1 );
+							quadA.vertexNormals[ 2 ].copy( vnm2 );
+
+							quadB.vertexNormals[ 0 ].copy( vnm1 );
+							quadB.vertexNormals[ 3 ].copy( vnm2 );
+
+						}
+
 						edge = 0;
 
 					} else {
@@ -838,6 +888,22 @@ THREE.GeometryUtils = {
 						quadB.b = m1;
 						quadB.c = c;
 						quadB.d = d;
+
+						if ( face.vertexNormals.length === 4 ) {
+
+							vnm1 = face.vertexNormals[ 1 ].clone();
+							vnm1.lerpSelf( face.vertexNormals[ 2 ], 0.5 );
+
+							vnm2 = face.vertexNormals[ 3 ].clone();
+							vnm2.lerpSelf( face.vertexNormals[ 0 ], 0.5 );
+
+							quadA.vertexNormals[ 2 ].copy( vnm1 );
+							quadA.vertexNormals[ 3 ].copy( vnm2 );
+
+							quadB.vertexNormals[ 0 ].copy( vnm2 );
+							quadB.vertexNormals[ 1 ].copy( vnm1 );
+
+						}
 
 						edge = 1;
 
