@@ -646,6 +646,7 @@ THREE.GeometryUtils = {
 		m, m1, m2,
 		vm, vm1, vm2,
 		vnm, vnm1, vnm2,
+		vcm, vcm1, vcm2,
 		triA, triB,
 		quadA, quadB,
 		edge;
@@ -698,6 +699,16 @@ THREE.GeometryUtils = {
 
 						}
 
+						if ( face.vertexColors.length === 3 ) {
+
+							vcm = face.vertexColors[ 0 ].clone();
+							vcm.lerpSelf( face.vertexColors[ 1 ], 0.5 );
+
+							triA.vertexColors[ 1 ].copy( vcm );
+							triB.vertexColors[ 0 ].copy( vcm );
+
+						}
+
 						edge = 0;
 
 					} else if ( dbc >= dab && dbc >= dac ) {
@@ -726,6 +737,19 @@ THREE.GeometryUtils = {
 
 						}
 
+						if ( face.vertexColors.length === 3 ) {
+
+							vcm = face.vertexColors[ 1 ].clone();
+							vcm.lerpSelf( face.vertexColors[ 2 ], 0.5 );
+
+							triA.vertexColors[ 2 ].copy( vcm );
+
+							triB.vertexColors[ 0 ].copy( vcm );
+							triB.vertexColors[ 1 ].copy( face.vertexColors[ 2 ] );
+							triB.vertexColors[ 2 ].copy( face.vertexColors[ 0 ] );
+
+						}
+
 						edge = 1;
 
 					} else {
@@ -748,6 +772,16 @@ THREE.GeometryUtils = {
 
 							triA.vertexNormals[ 2 ].copy( vnm );
 							triB.vertexNormals[ 0 ].copy( vnm );
+
+						}
+
+						if ( face.vertexColors.length === 3 ) {
+
+							vcm = face.vertexColors[ 0 ].clone();
+							vcm.lerpSelf( face.vertexColors[ 2 ], 0.5 );
+
+							triA.vertexColors[ 2 ].copy( vcm );
+							triB.vertexColors[ 0 ].copy( vcm );
 
 						}
 
@@ -869,6 +903,22 @@ THREE.GeometryUtils = {
 
 						}
 
+						if ( face.vertexColors.length === 4 ) {
+
+							vcm1 = face.vertexColors[ 0 ].clone();
+							vcm1.lerpSelf( face.vertexColors[ 1 ], 0.5 );
+
+							vcm2 = face.vertexColors[ 2 ].clone();
+							vcm2.lerpSelf( face.vertexColors[ 3 ], 0.5 );
+
+							quadA.vertexColors[ 1 ].copy( vcm1 );
+							quadA.vertexColors[ 2 ].copy( vcm2 );
+
+							quadB.vertexColors[ 0 ].copy( vcm1 );
+							quadB.vertexColors[ 3 ].copy( vcm2 );
+
+						}
+
 						edge = 0;
 
 					} else {
@@ -902,6 +952,22 @@ THREE.GeometryUtils = {
 
 							quadB.vertexNormals[ 0 ].copy( vnm2 );
 							quadB.vertexNormals[ 1 ].copy( vnm1 );
+
+						}
+
+						if ( face.vertexColors.length === 4 ) {
+
+							vcm1 = face.vertexColors[ 1 ].clone();
+							vcm1.lerpSelf( face.vertexColors[ 2 ], 0.5 );
+
+							vcm2 = face.vertexColors[ 3 ].clone();
+							vcm2.lerpSelf( face.vertexColors[ 0 ], 0.5 );
+
+							quadA.vertexColors[ 2 ].copy( vcm1 );
+							quadA.vertexColors[ 3 ].copy( vcm2 );
+
+							quadB.vertexColors[ 0 ].copy( vcm2 );
+							quadB.vertexColors[ 1 ].copy( vcm1 );
 
 						}
 
