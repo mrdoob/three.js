@@ -10,7 +10,7 @@ THREE.Mesh = function ( geometry, material ) {
 
 	this.geometry = geometry;
 	this.material = ( material !== undefined ) ? material : new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, wireframe: true } );
-	this.cog = new THREE.Vector3();
+	this.center = new THREE.Vector3();
 
 	if ( this.geometry ) {
 
@@ -72,6 +72,6 @@ THREE.Mesh.prototype.updateMatrixWorld = function( force ) {
 
 	THREE.Object3D.prototype.updateMatrixWorld.call( this, force );
 
-	this.matrixWorld.multiplyVector3( this.cog.copy( this.geometry.boundingSphere.position ) );
+	this.matrixWorld.multiplyVector3( this.center.copy( this.geometry.boundingSphere.position ) );
 
 }

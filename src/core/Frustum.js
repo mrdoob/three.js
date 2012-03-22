@@ -47,7 +47,7 @@ THREE.Frustum.prototype.contains = function ( object ) {
 
 	for ( var i = 0; i < 6; i ++ ) {
 
-		distance = planes[ i ].x * object.cog.x + planes[ i ].y * object.cog.y + planes[ i ].z * object.cog.z + planes[ i ].w;
+		distance = planes[ i ].x * object.center.x + planes[ i ].y * object.center.y + planes[ i ].z * object.center.z + planes[ i ].w;
 		if ( distance <= radius ) return false;
 
 	}

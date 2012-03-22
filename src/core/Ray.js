@@ -73,7 +73,7 @@ THREE.Ray = function ( origin, direction ) {
 
 			// Checking boundingSphere
 
-			var distance = distanceFromIntersection( this.origin, this.direction, object.cog );
+			var distance = distanceFromIntersection( this.origin, this.direction, object.center );
 
 			if ( distance > object.geometry.boundingSphere.radius * object.boundRadiusScale ) {
 
