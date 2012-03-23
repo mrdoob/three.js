@@ -396,7 +396,8 @@
           // 3d shape
           var mesh = THREE.SceneUtils.createMultiMaterialObject(geometry, [
             new THREE.MeshLambertMaterial({
-                color: color
+                color: color,
+                opacity: 0.2
             }),
            new THREE.MeshBasicMaterial({
               color: 0x000000,
@@ -433,7 +434,7 @@
       //   new THREE.Vector3(0, -40, 40),
       // ]);
 
-      // extrudePath = new THREE.TrefoilKnot();
+      extrudePath = new THREE.TrefoilKnot();
       // extrudePath = new THREE.TorusKnot(20);
       // extrudePath = new THREE.CinquefoilKnot(20);
       // extrudePath = new THREE.TrefoilPolynomialKnot(14);
@@ -441,13 +442,13 @@
       // extrudePath = new THREE.DecoratedTorusKnot4a();
 	  // extrudePath = new THREE.DecoratedTorusKnot4b();
       // extrudePath = new THREE.DecoratedTorusKnot5a();
-      extrudePath = new THREE.DecoratedTorusKnot5c();
+      // extrudePath = new THREE.DecoratedTorusKnot5c();
 
-       //var tube = new THREE.TubeGeometry(5, 100, 20, extrudePath, true);
-      var tube = new THREE.TubeGeometry(2, 400, 2, extrudePath, true);
+      var closed = true;
+      var debug = true;
+	  var tube = new THREE.TubeGeometry(extrudePath, 100, 2, 3, closed, debug);
 
-
-      addGeometry(tube, 0xff00ff, 0, -80, 0, 0, 0, 0, 3);
+      addGeometry(tube, 0xff00ff, 0, -80, 0, 0, 0, 0, 6);
 
 
       //
