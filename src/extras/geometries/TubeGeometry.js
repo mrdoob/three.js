@@ -2,7 +2,8 @@
  * @author WestLangley / https://github.com/WestLangley
  * @author zz85 / https://github.com/zz85
  * @author miningold / https://github.com/miningold
- *	modified from the TorusKnotGeometry by @oosmoxiecode
+ *
+ * Modified from the TorusKnotGeometry by @oosmoxiecode
  *
  * Creates a tube which extrudes along a 3d spline
  *
