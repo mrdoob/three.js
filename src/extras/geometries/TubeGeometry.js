@@ -2,138 +2,182 @@
  * @author WestLangley / https://github.com/WestLangley
  * @author zz85 / https://github.com/zz85
  * @author miningold / https://github.com/miningold
- *
- * Modified from the TorusKnotGeometry by @oosmoxiecode
+ *	modified from the TorusKnotGeometry by @oosmoxiecode
  *
  * Creates a tube which extrudes along a 3d spline
+ *
+ * Uses parallel transport frames as described in
+ * http://www.cs.indiana.edu/pub/techreports/TR425.pdf
  */
 
-THREE.TubeGeometry = function( radius, segments, segmentsRadius, path, debug ) {
+THREE.TubeGeometry = function( path, segments, radius, segmentsRadius, closed, debug ) {
 
 	THREE.Geometry.call( this );
 
-	var scope = this;
-
-	this.radius = radius || 40;
-	this.segments = segments || 64;
-	this.segmentsRadius = segmentsRadius || 8;
-	this.grid = new Array( this.segments );
 	this.path = path;
-
+	this.segments = segments || 64;
+	this.radius = radius || 1;
+	this.segmentsRadius = segmentsRadius || 8;
+	this.closed = closed || false;
 	if ( debug ) this.debug = new THREE.Object3D();
 
-	var tang = new THREE.Vector3();
-	var binormal = new THREE.Vector3();
-	var normal = new THREE.Vector3();
-	var pos = new THREE.Vector3();
+	this.grid = [];
 
-	var epsilon = 0.001;
+	var scope = this,
+		tangent = new THREE.Vector3(),
+		normal = new THREE.Vector3(),
+		binormal = new THREE.Vector3(),
 
-	var u, v;
+		vec = new THREE.Vector3(),
+		mat = new THREE.Matrix4(),
 
-	var p1, p2;
-	var cx, cy;
+		tangents = [],
+		normals = [],
+		binormals = [],
 
-	var oldB;
+		numpoints = this.segments + 1,
+		theta,
+		epsilon = 0.0001,
+		smallest,
+		x, y, z,
+		tx, ty, tz,
+		u, v,
+		p1, p2,
+		cx, cy,
+		pos, pos2,
+		i, j,
+		ip, jp,
+		a, b, c, d,
+		uva, uvb, uvc, uvd;
 
-	for ( var i = 0; i < this.segments; ++ i ) {
 
-		this.grid[ i ] = new Array( this.segmentsRadius );
+	function vert( x, y, z ) {
 
-		u = i / ( this.segments - 1 );
+		return scope.vertices.push( new THREE.Vertex( new THREE.Vector3( x, y, z ) ) ) - 1;
 
-		pos = this.path.getPointAt( u );
-		tang = this.path.getTangentAt( u );
+	}
 
-		if ( oldB === undefined ) {
+	// compute the tangent vectors for each segment on the path
 
-			// Method 1, random arbitrary vector
-			// oldB = new THREE.Vector3(Math.random(), Math.random(), Math.random()).normalize();
+	for ( i = 0; i < numpoints; i++ ) {
 
-			// Method 2, use a fixed start binormal. Has dangers of 0 vectors too.
-			// oldB = new THREE.Vector3( 0, -1, 0 );
+		u = i / ( numpoints - 1 );
 
-			// Method 3 - This uses the Frenet-Serret formula for deriving binormal
+		tangents[ i ] = this.path.getTangentAt( u );
+		tangents[ i ].normalize();
 
-			var t1, t2;
+	}
 
-			t1 = u - epsilon;
-			if (t1 < 0) t1 = 0;
-			t1 = this.path.getTangentAt( t1 );
 
-			t2 = u + epsilon;
-			if (t2 > 1) t2 = 1;
-			t2 = this.path.getTangentAt( t2 );
+	// select an initial normal vector perpenicular to the first tangent vector,
+	// and in the direction of the smallest tangent xyz component
 
-			normal.sub( t2, t1 ).normalize();
+	normals[ 0 ] = new THREE.Vector3();
+	binormals[ 0 ] = new THREE.Vector3();
+	smallest = Number.MAX_VALUE;
+	tx = Math.abs( tangents[ 0 ].x );
+	ty = Math.abs( tangents[ 0 ].y );
+	tz = Math.abs( tangents[ 0 ].z );
 
-			binormal.cross( tang, normal );
-			oldB = binormal;
+	if ( tx <= smallest ) {
+		smallest = tx;
+		normal.set( 1, 0, 0 );
+	}
 
-			if ( oldB.length() == 0 ) {
+	if ( ty <= smallest ) {
+		smallest = ty;
+		normal.set( 0, 1, 0 );
+	}
 
-				// When binormal is a zero vector, we could brute force another vector ?
-				// oldB.set( 1, 0, 0 );
-				// if (normal.cross(oldB, tang).normalize().length()==0) {
-				// 	oldB.set( 0, 1, 0 );
-				// 	if (normal.cross(oldB, tang).normalize().length()==0) {
-				// 		oldB.set( 0, 0, 1 );
-				// 	}
-				// }
+	if ( tz <= smallest ) {
+		normal.set( 0, 0, 1 );
+	}
 
-				// Method 4 - Sets binormal direction in the smallest tangent xyz component
+	vec.cross( tangents[ 0 ], normal ).normalize();
 
-				var smallest = Number.MAX_VALUE;
-				var x, y, z;
+	normals[ 0 ].cross( tangents[ 0 ], vec );
+	binormals[ 0 ].cross( tangents[ 0 ], normals[ 0 ] );
 
-				var tx = Math.abs( tang.x );
-				var ty = Math.abs( tang.y );
-				var tz = Math.abs( tang.z );
 
-				if ( tx <= smallest ) {
+	// compute the slowly-varying normal and binormal vectors for each segment on the path
 
-					smallest = tx;
-					oldB.set( 1, 0, 0 );
+	for ( i = 1; i < numpoints; i++ ) {
 
-				}
+		normals[ i ] = normals[ i-1 ].clone();
 
-				if ( ty <= smallest ) {
+		binormals[ i ] = binormals[ i-1 ].clone();
 
-					smallest = ty;
-					oldB.set( 0, 1, 0 );
+		vec.cross( tangents[ i-1 ], tangents[ i ] );
 
-				}
+		if ( vec.length() > epsilon ) {
 
-				if ( tz <= smallest ) {
+			vec.normalize();
 
-					oldB.set( 0, 0, 1 );
+			theta = Math.acos( tangents[ i-1 ].dot( tangents[ i ] ) );
 
-				}
-
-			}
+			mat.setRotationAxis( vec, theta ).multiplyVector3( normals[ i ] );
 
 		}
 
-		normal.cross( oldB, tang ).normalize();
-		binormal.cross( tang, normal ).normalize();
-		oldB = binormal;
+		binormals[ i ].cross( tangents[ i ], normals[ i ] );
+
+	}
+
+
+	// if the curve is closed, postprocess the vectors so the first and last normal vectors are the same
+
+	if ( this.closed ) {
+
+		theta = Math.acos( normals[ 0 ].dot( normals[ numpoints-1 ] ) );
+		theta /= ( numpoints - 1 );
+
+		if ( tangents[ 0 ].dot( vec.cross( normals[ 0 ], normals[ numpoints-1 ] ) ) > 0 ) {
+
+			theta = -theta;
+
+		}
+
+		for ( i = 1; i < numpoints; i++ ) {
+
+			// twist a little...
+			mat.setRotationAxis( tangents[ i ], theta * i ).multiplyVector3( normals[ i ] );
+			binormals[ i ].cross( tangents[ i ], normals[ i ] );
+
+		}
+
+	}
+
+
+	// consruct the grid
+
+	for ( i = 0; i < numpoints; i++ ) {
+
+		this.grid[ i ] = [];
+
+		u = i / ( numpoints - 1 );
+
+		pos = this.path.getPointAt( u );
+
+		tangent = tangents[ i ];
+		normal = normals[ i ];
+		binormal = binormals[ i ];
 
 		if ( this.debug ) {
 
-			this.debug.add( new THREE.ArrowHelper( normal, pos, radius * 2, 0xff0000 ) );
-			// this.debug.add(new THREE.ArrowHelper(binormal, pos, radius * 2, 0x00ff00));
-			// this.debug.add(new THREE.ArrowHelper(tang, pos, radius * 2, 0x0000ff));
+			this.debug.add(new THREE.ArrowHelper(tangent, pos, radius, 0x0000ff));	
+			this.debug.add(new THREE.ArrowHelper(normal, pos, radius, 0xff0000));
+			this.debug.add(new THREE.ArrowHelper(binormal, pos, radius, 0x00ff00));
 
 		}
 
-		for ( var j = 0; j < this.segmentsRadius; ++ j ) {
+		for ( j = 0; j < this.segmentsRadius; j++ ) {
 
 			v = j / this.segmentsRadius * 2 * Math.PI;
 
 			cx = -this.radius * Math.cos( v ); // TODO: Hack: Negating it so it faces outside.
 			cy = this.radius * Math.sin( v );
 
-            var pos2 = pos.clone();
+            pos2 = new THREE.Vector3().copy( pos );
             pos2.x += cx * normal.x + cy * binormal.x;
             pos2.y += cx * normal.y + cy * binormal.y;
             pos2.z += cx * normal.z + cy * binormal.z;
@@ -141,42 +185,37 @@ THREE.TubeGeometry = function( radius, segments, segmentsRadius, path, debug ) {
             this.grid[ i ][ j ] = vert( pos2.x, pos2.y, pos2.z );
 
 		}
-
 	}
 
-	for ( var i = 0; i < this.segments -1; ++ i ) {
 
-		for ( var j = 0; j < this.segmentsRadius; ++ j ) {
+	// construct the mesh
 
-			var ip = ( i + 1 ) % this.segments;
-			var jp = ( j + 1 ) % this.segmentsRadius;
+	for ( i = 0; i < this.segments; i++ ) {
 
-			var a = this.grid[ i  ][ j ];
-			var b = this.grid[ ip ][ j ];
-			var c = this.grid[ ip ][ jp ];
-			var d = this.grid[ i  ][ jp ];
+		for ( j = 0; j < this.segmentsRadius; j++ ) {
 
-			var uva = new THREE.UV( i / this.segments, j / this.segmentsRadius );
-			var uvb = new THREE.UV( ( i + 1 ) / this.segments, j / this.segmentsRadius );
-			var uvc = new THREE.UV( ( i + 1 ) / this.segments, ( j + 1 ) / this.segmentsRadius );
-			var uvd = new THREE.UV( i / this.segments, ( j + 1 ) / this.segmentsRadius );
+			ip = ( closed ) ? (i + 1) % this.segments : i + 1;
+			jp = (j + 1) % this.segmentsRadius;
+
+			a = this.grid[ i ][ j ];		// *** NOT NECESSARILY PLANAR ! ***
+			b = this.grid[ ip ][ j ];
+			c = this.grid[ ip ][ jp ];
+			d = this.grid[ i ][ jp ];
+
+			uva = new THREE.UV( i / this.segments, j / this.segmentsRadius );
+			uvb = new THREE.UV( ( i + 1 ) / this.segments, j / this.segmentsRadius );
+			uvc = new THREE.UV( ( i + 1 ) / this.segments, ( j + 1 ) / this.segmentsRadius );
+			uvd = new THREE.UV( i / this.segments, ( j + 1 ) / this.segmentsRadius );
 
 			this.faces.push( new THREE.Face4( a, b, c, d ) );
 			this.faceVertexUvs[ 0 ].push( [ uva, uvb, uvc, uvd ] );
 
 		}
-
 	}
 
 	this.computeCentroids();
 	this.computeFaceNormals();
 	this.computeVertexNormals();
-
-	function vert( x, y, z ) {
-
-		return scope.vertices.push( new THREE.Vertex( new THREE.Vector3( x, y, z ) ) ) - 1;
-
-	}
 
 };
 
