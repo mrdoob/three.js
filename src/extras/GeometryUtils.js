@@ -639,7 +639,7 @@ THREE.GeometryUtils = {
 
 	tessellate: function ( geometry, maxEdgeLength ) {
 
-		var i, face,
+		var i, il, face,
 		a, b, c, d,
 		va, vb, vc, vd,
 		dab, dbc, dac, dcd, dad,
@@ -651,7 +651,16 @@ THREE.GeometryUtils = {
 		quadA, quadB,
 		edge;
 
-		for ( i = geometry.faces.length - 1; i >= 0; i -- ) {
+		var faces = [];
+		var faceVertexUvs = [];
+
+		for ( i = 0, il = geometry.faceVertexUvs.length; i < il; i ++ ) {
+
+			faceVertexUvs[ i ] = [];
+
+		}
+
+		for ( i = 0, il = geometry.faces.length; i < il; i ++ ) {
 
 			face = geometry.faces[ i ];
 
@@ -789,20 +798,20 @@ THREE.GeometryUtils = {
 
 					}
 
-					geometry.faces.splice( i, 1, triA, triB );
+					faces.push( triA, triB );
 					geometry.vertices.push( vm );
 
-					var faceVertexUvs, uvA, uvB, uvC, uvM, uvsTriA, uvsTriB;
+					var j, jl, uvs, uvA, uvB, uvC, uvM, uvsTriA, uvsTriB;
 
-					for ( var j = 0; j < geometry.faceVertexUvs.length; j ++ ) {
+					for ( j = 0, jl = geometry.faceVertexUvs.length; j < jl; j ++ ) {
 
 						if ( geometry.faceVertexUvs[ j ].length ) {
 
-							faceVertexUvs = geometry.faceVertexUvs[ j ][ i ];
+							uvs = geometry.faceVertexUvs[ j ][ i ];
 
-							uvA = faceVertexUvs[ 0 ];
-							uvB = faceVertexUvs[ 1 ];
-							uvC = faceVertexUvs[ 2 ];
+							uvA = uvs[ 0 ];
+							uvB = uvs[ 1 ];
+							uvC = uvs[ 2 ];
 
 							// AB
 
@@ -836,9 +845,19 @@ THREE.GeometryUtils = {
 
 							}
 
-							geometry.faceVertexUvs[ j ].splice( i, 1, uvsTriA, uvsTriB );
+							faceVertexUvs[ j ].push( uvsTriA, uvsTriB );
 
 						}
+
+					}
+
+				} else {
+
+					faces.push( face );
+
+					for ( j = 0, jl = geometry.faceVertexUvs.length; j < jl; j ++ ) {
+
+						faceVertexUvs[ j ].push( geometry.faceVertexUvs[ j ] );
 
 					}
 
@@ -975,22 +994,21 @@ THREE.GeometryUtils = {
 
 					}
 
-					geometry.faces.splice( i, 1, quadA, quadB );
-					geometry.vertices.push( vm1 );
-					geometry.vertices.push( vm2 );
+					faces.push( quadA, quadB );
+					geometry.vertices.push( vm1, vm2 );
 
-					var faceVertexUvs, uvA, uvB, uvC, uvD, uvM1, uvM2, uvsQuadA, uvsQuadB;
+					var j, jl, uvs, uvA, uvB, uvC, uvD, uvM1, uvM2, uvsQuadA, uvsQuadB;
 
-					for ( var j = 0; j < geometry.faceVertexUvs.length; j ++ ) {
+					for ( j = 0, jl = geometry.faceVertexUvs.length; j < jl; j ++ ) {
 
 						if ( geometry.faceVertexUvs[ j ].length ) {
 
-							faceVertexUvs = geometry.faceVertexUvs[ j ][ i ];
+							uvs = geometry.faceVertexUvs[ j ][ i ];
 
-							uvA = faceVertexUvs[ 0 ];
-							uvB = faceVertexUvs[ 1 ];
-							uvC = faceVertexUvs[ 2 ];
-							uvD = faceVertexUvs[ 3 ];
+							uvA = uvs[ 0 ];
+							uvB = uvs[ 1 ];
+							uvC = uvs[ 2 ];
+							uvD = uvs[ 3 ];
 
 							// AB + CD
 
@@ -1020,9 +1038,19 @@ THREE.GeometryUtils = {
 
 							}
 
-							geometry.faceVertexUvs[ j ].splice( i, 1, uvsQuadA, uvsQuadB );
+							faceVertexUvs[ j ].push( uvsQuadA, uvsQuadB );
 
 						}
+
+					}
+
+				} else {
+
+					faces.push( face );
+
+					for ( j = 0, jl = geometry.faceVertexUvs.length; j < jl; j ++ ) {
+
+						faceVertexUvs[ j ].push( geometry.faceVertexUvs[ j ] );
 
 					}
 
@@ -1031,6 +1059,9 @@ THREE.GeometryUtils = {
 			}
 
 		}
+
+		geometry.faces = faces;
+		geometry.faceVertexUvs = faceVertexUvs;
 
 	}
 
