@@ -420,10 +420,10 @@
       var value = document.getElementById('dropdown').value;
       scale = parseInt(document.getElementById('scale').value);
       var segments = parseInt(document.getElementById('segments').value);
-      var closedv = document.getElementById('closed').value;
-      var debugv = document.getElementById('debug').value;
+      closed = document.getElementById('closed').checked;
+      debug = document.getElementById('debug').checked;
 
-      console.log('adding tube', value, closedv, debugv);
+      console.log('adding tube', value, closed, debug);
       if (tubeMesh) parent.remove(tubeMesh);
 
       extrudePath = splines[value];
@@ -456,7 +456,11 @@
         //mesh.children[0].doubleSided = true;
         parent.add(tubeMesh);
 
-    }    
+    }
+
+    function animateCamera() {
+      animation = document.getElementById('animation').checked;
+    }
 
 
     init();
@@ -476,9 +480,10 @@
 
       info.innerHTML += dropdown;
 
-      info.innerHTML += '<br/>Scale: <select id="scale" onchange="addTube()"><option>1</option><option>2</option><option selected>4</option><option>6</option></select>';
+      info.innerHTML += '<br/>Scale: <select id="scale" onchange="addTube()"><option>1</option><option>2</option><option selected>4</option><option>6</option><option>10</option></select>';
       info.innerHTML += '<br/>Extrusion Segments: <select onchange="addTube()" id="segments"><option>50</option><option selected>100</option><option>200</option><option>400</option></select>';
-      info.innerHTML += '<br/>Debug: <input id="debug" type="checkbox" onchange="addTube()"/> Closed:<input id="closed" onchange="addTube()" type="checkbox"/>';
+      info.innerHTML += '<br/>Debug: <input id="debug" type="checkbox" onchange="addTube()" checked/> Closed:<input id="closed" onchange="addTube()" type="checkbox" checked/>';
+      info.innerHTML += '<br/>Camera Spline Animation: <input id="animation" type="checkbox" onchange="animateCamera()" />';
       // tube segments
 
       container.appendChild(info);
@@ -498,9 +503,7 @@
       parent.position.y = 100;
       scene.add(parent);
 
-      addTube()
-
-
+      addTube();
 
       //
       renderer = new THREE.WebGLRenderer({
