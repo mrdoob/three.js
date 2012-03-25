@@ -51,6 +51,11 @@ THREE.TubeGeometry = function( path, segments, radius, segmentsRadius, closed, d
 		a, b, c, d,
 		uva, uvb, uvc, uvd;
 
+	// expose internals
+	this.tangents = tangents;
+	this.normals = normals;
+	this.binormals = binormals;
+
 
 	function vert( x, y, z ) {
 

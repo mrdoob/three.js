@@ -411,12 +411,14 @@
     var closed = true;
     var debug = true;
     var parent;
-    var tubeMesh;
+    var tube, tubeMesh;
+    var animation = false;
+    var scale;
 
     function addTube() {
 
       var value = document.getElementById('dropdown').value;
-      var scale = parseInt(document.getElementById('scale').value);
+      scale = parseInt(document.getElementById('scale').value);
       var segments = parseInt(document.getElementById('segments').value);
       var closedv = document.getElementById('closed').value;
       var debugv = document.getElementById('debug').value;
@@ -426,10 +428,10 @@
 
       extrudePath = splines[value];
       
-      var tube = new THREE.TubeGeometry(extrudePath, segments, 2, 3, closed, debug);
+      tube = new THREE.TubeGeometry(extrudePath, segments, 2, 3, closed, debug);
 
       
-      addGeometry(tube, 0xff00ff, 0, -80, 0, 0, 0, 0, scale);
+      addGeometry(tube, 0xff00ff, 0, 0, 0, 0, 0, 0, scale);
     }
 
     function addGeometry(geometry, color, x, y, z, rx, ry, rz, s) {
@@ -483,7 +485,8 @@
 
       scene = new THREE.Scene();
 
-      camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 1000);
+      // 50
+      camera = new THREE.PerspectiveCamera(79, window.innerWidth / window.innerHeight, 0.01, 1000);
       camera.position.set(0, 50, 500);
       scene.add(camera);
 
@@ -595,6 +598,62 @@
     }
 
     function render() {
+
+      if (animation) {
+        // Try Animate Camera Along Spline
+        var time = Date.now();
+        var looptime = 20 * 1000;
+        var t = (time % looptime) / looptime;
+        
+        var pos = tube.path.getPointAt(t);
+        pos.multiplyScalar(scale);
+
+        var lookAt = tube.path.getPointAt(t + 0.001);
+        lookAt.multiplyScalar(scale);
+
+
+        // interpolation
+        var segments = tube.tangents.length;
+        var pickt = t * segments;
+        var pick = Math.floor(pickt);
+        var pickNext = (pick + 1) % segments;
+
+        var diff = new THREE.Vector3();
+        diff.sub(tube.binormals[pickNext], tube.binormals[pick]);
+        diff.multiplyScalar(pickt-pick).addSelf(tube.binormals[pick]);
+        var offset = 50;
+        var v = diff.multiplyScalar(offset);
+
+        
+        pos.addSelf(v);
+        // console.log(t, pos);
+        camera.position = pos;
+        // camera.lookAt(pos);
+        camera.lookAt(lookAt);
+
+
+        // var offset = 50;
+        
+        // var segments = tube.tangents.length;
+        // var pickt = t * segments;
+        // var pick = Math.floor(pickt);
+        // var pickNext = (pick + 1) % segments;
+        // var tangent = tube.tangents[pick]; //.clone().addSelf(tube.tangents[pick]).multiplyScalar(0.5);
+        // var normal = tube.normals[pick].clone().addSelf(tube.normals[pick]).multiplyScalar(0.5 * offset);
+
+        // pos.addSelf(normal);
+        // // console.log(t, pos);
+        // camera.position = pos;
+        // // camera.lookAt(pos);
+
+        // var lookAt = tube.path.getPointAt(t + 0.001);
+        // lookAt.multiplyScalar(scale);
+
+
+        // camera.lookAt(lookAt);
+
+      }
+
 
       parent.rotation.y += (targetRotation - parent.rotation.y) * 0.05;
       renderer.render(scene, camera);
