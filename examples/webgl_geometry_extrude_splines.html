@@ -608,9 +608,7 @@
         var pos = tube.path.getPointAt(t);
         pos.multiplyScalar(scale);
 
-        var lookAt = tube.path.getPointAt(t + 0.001);
-        lookAt.multiplyScalar(scale);
-
+ 
 
         // interpolation
         var segments = tube.tangents.length;
@@ -618,39 +616,31 @@
         var pick = Math.floor(pickt);
         var pickNext = (pick + 1) % segments;
 
-        var diff = new THREE.Vector3();
-        diff.sub(tube.binormals[pickNext], tube.binormals[pick]);
-        diff.multiplyScalar(pickt-pick).addSelf(tube.binormals[pick]);
-        var offset = 50;
-        var v = diff.multiplyScalar(offset);
+        var binormal = new THREE.Vector3();
+        binormal.sub(tube.binormals[pickNext], tube.binormals[pick]);
+        binormal.multiplyScalar(pickt-pick).addSelf(tube.binormals[pick]);
 
-        
-        pos.addSelf(v);
+ 
+        var dir = tube.path.getTangentAt(t);
+  
+        var offset = 50;
+
+        // pos.addSelf(binormal.clone().multiplyScalar(offset));
         // console.log(t, pos);
         camera.position = pos;
-        // camera.lookAt(pos);
-        camera.lookAt(lookAt);
 
-
-        // var offset = 50;
-        
-        // var segments = tube.tangents.length;
-        // var pickt = t * segments;
-        // var pick = Math.floor(pickt);
-        // var pickNext = (pick + 1) % segments;
-        // var tangent = tube.tangents[pick]; //.clone().addSelf(tube.tangents[pick]).multiplyScalar(0.5);
-        // var normal = tube.normals[pick].clone().addSelf(tube.normals[pick]).multiplyScalar(0.5 * offset);
-
-        // pos.addSelf(normal);
-        // // console.log(t, pos);
-        // camera.position = pos;
-        // // camera.lookAt(pos);
-
-        // var lookAt = tube.path.getPointAt(t + 0.001);
+        var lookAt = tube.path.getPointAt(t + 0.001);
         // lookAt.multiplyScalar(scale);
-
-
         // camera.lookAt(lookAt);
+
+
+        camera.matrix.lookAt( camera.position, lookAt, binormal ); //camera.position.clone().addSelf(dir)
+        camera.rotation.getRotationFromMatrix( camera.matrix );
+        
+        // var axis = new THREE.Vector3( 0, 1, 0 ).crossSelf( dir );
+        // var radians = Math.acos( new THREE.Vector3( 0, 1, 0 ).dot( dir.clone().normalize() ) );
+        // var matrix = new THREE.Matrix4().setRotationAxis( axis.normalize(), radians );
+        // camera.rotation.getRotationFromMatrix( matrix, camera.scale );
 
       }
 
