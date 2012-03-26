@@ -408,7 +408,7 @@
 
 
 
-    var closed = true;
+    var closed2 = true;
     var debug = true;
     var parent;
     var tube, tubeMesh;
@@ -420,15 +420,15 @@
       var value = document.getElementById('dropdown').value;
       scale = parseInt(document.getElementById('scale').value);
       var segments = parseInt(document.getElementById('segments').value);
-      closed = document.getElementById('closed').checked;
+      closed2 = document.getElementById('closed').checked;
       debug = document.getElementById('debug').checked;
 
-      console.log('adding tube', value, closed, debug);
+      console.log('adding tube', value, closed2, debug);
       if (tubeMesh) parent.remove(tubeMesh);
 
       extrudePath = splines[value];
       
-      tube = new THREE.TubeGeometry(extrudePath, segments, 2, 3, closed, debug);
+      tube = new THREE.TubeGeometry(extrudePath, segments, 2, 3, closed2, debug);
 
       
       addGeometry(tube, 0xff00ff, 0, 0, 0, 0, 0, 0, scale);
@@ -482,7 +482,7 @@
 
       info.innerHTML += '<br/>Scale: <select id="scale" onchange="addTube()"><option>1</option><option>2</option><option selected>4</option><option>6</option><option>10</option></select>';
       info.innerHTML += '<br/>Extrusion Segments: <select onchange="addTube()" id="segments"><option>50</option><option selected>100</option><option>200</option><option>400</option></select>';
-      info.innerHTML += '<br/>Debug: <input id="debug" type="checkbox" onchange="addTube()" checked/> Closed:<input id="closed" onchange="addTube()" type="checkbox" checked/>';
+      info.innerHTML += '<br/>Debug: <input id="debug" type="checkbox" onchange="addTube()" checked /> Closed:<input id="closed" onchange="addTube()" type="checkbox" checked />';
       info.innerHTML += '<br/>Camera Spline Animation: <input id="animation" type="checkbox" onchange="animateCamera()" />';
       // tube segments
 
