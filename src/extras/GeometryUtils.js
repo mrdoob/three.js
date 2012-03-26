@@ -486,7 +486,25 @@ THREE.GeometryUtils = {
 
 	triangulateQuads: function ( geometry ) {
 
-		for ( var i = geometry.faces.length - 1; i >= 0; i -- ) {
+		var i, il, j, jl;
+
+		var faces = [];
+		var faceUvs = [];
+		var faceVertexUvs = [];
+
+		for ( i = 0, il = geometry.faceUvs.length; i < il; i ++ ) {
+
+			faceUvs[ i ] = [];
+
+		}
+
+		for ( i = 0, il = geometry.faceVertexUvs.length; i < il; i ++ ) {
+
+			faceVertexUvs[ i ] = [];
+
+		}
+
+		for ( i = 0, il = geometry.faces.length; i < il; i ++ ) {
 
 			var face = geometry.faces[ i ];
 
@@ -526,43 +544,63 @@ THREE.GeometryUtils = {
 
 				}
 
-				geometry.faces.splice( i, 1, triA, triB );
+				faces.push( triA, triB );
 
-				for ( var j = 0; j < geometry.faceVertexUvs.length; j ++ ) {
+				for ( j = 0, jl = geometry.faceVertexUvs.length; j < jl; j ++ ) {
 
 					if ( geometry.faceVertexUvs[ j ].length ) {
 
-						var faceVertexUvs = geometry.faceVertexUvs[ j ][ i ];
+						var uvs = geometry.faceVertexUvs[ j ][ i ];
 
-						var uvA = faceVertexUvs[ 0 ];
-						var uvB = faceVertexUvs[ 1 ];
-						var uvC = faceVertexUvs[ 2 ];
-						var uvD = faceVertexUvs[ 3 ];
+						var uvA = uvs[ 0 ];
+						var uvB = uvs[ 1 ];
+						var uvC = uvs[ 2 ];
+						var uvD = uvs[ 3 ];
 
 						var uvsTriA = [ uvA.clone(), uvB.clone(), uvD.clone() ];
 						var uvsTriB = [ uvB.clone(), uvC.clone(), uvD.clone() ];
 
-						geometry.faceVertexUvs[ j ].splice( i, 1, uvsTriA, uvsTriB );
+						faceVertexUvs[ j ].push( uvsTriA, uvsTriB );
 
 					}
 
 				}
 
-				for ( var j = 0; j < geometry.faceUvs.length; j ++ ) {
+				for ( j = 0, jl = geometry.faceUvs.length; j < jl; j ++ ) {
 
 					if ( geometry.faceUvs[ j ].length ) {
 
 						var faceUv = geometry.faceUvs[ j ][ i ];
 
-						geometry.faceUvs[ j ].splice( i, 1, faceUv, faceUv );
+						faceUvs[ j ].push( faceUv, faceUv );
 
 					}
+
+				}
+
+			} else {
+
+				faces.push( face );
+
+				for ( j = 0, jl = geometry.faceUvs.length; j < jl; j ++ ) {
+
+					faceUvs[ j ].push( geometry.faceUvs[ j ] );
+
+				}
+
+				for ( j = 0, jl = geometry.faceVertexUvs.length; j < jl; j ++ ) {
+
+					faceVertexUvs[ j ].push( geometry.faceVertexUvs[ j ] );
 
 				}
 
 			}
 
 		}
+
+		geometry.faces = faces;
+		geometry.faceUvs = faceUvs;
+		geometry.faceVertexUvs = faceVertexUvs;
 
 		geometry.computeCentroids();
 		geometry.computeFaceNormals();
