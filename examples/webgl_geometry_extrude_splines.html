@@ -224,7 +224,7 @@
     //   };
     // }
 
-    var scale = function(x, y, t) {
+    var scaleTo = function(x, y, t) {
 
       var r = y - x;
       return t * r + x;
@@ -241,7 +241,7 @@
 
     function(t) {
 
-        t = scale(-4,4, t);
+        t = scaleTo(-4,4, t);
         var tx = 2 / 5 * t * (t * t - 7) * (t * t - 10),
         ty = pow(t, 4) - 13 * t * t,
         tz = 1/10 * t * (t * t - 4) * (t * t - 9) * (t * t - 12);
@@ -418,23 +418,34 @@
     function addTube() {
 
       var value = document.getElementById('dropdown').value;
-      scale = parseInt(document.getElementById('scale').value);
+      
       var segments = parseInt(document.getElementById('segments').value);
       closed2 = document.getElementById('closed').checked;
       debug = document.getElementById('debug').checked;
 
-      console.log('adding tube', value, closed2, debug);
+      var radiusSegments = parseInt(document.getElementById('radiusSegments').value);
+
+      console.log('adding tube', value, closed2, debug, radiusSegments);
       if (tubeMesh) parent.remove(tubeMesh);
 
       extrudePath = splines[value];
       
-      tube = new THREE.TubeGeometry(extrudePath, segments, 2, 3, closed2, debug);
+      tube = new THREE.TubeGeometry(extrudePath, segments, 2, radiusSegments, closed2, debug);
 
-      
-      addGeometry(tube, 0xff00ff, 0, 0, 0, 0, 0, 0, scale);
+      addGeometry(tube, 0xff00ff);
+      setScale();
+    
     }
 
-    function addGeometry(geometry, color, x, y, z, rx, ry, rz, s) {
+    function setScale() {
+
+      scale = parseInt(document.getElementById('scale').value);
+      tubeMesh.scale.set(scale, scale, scale);
+
+    }
+
+
+    function addGeometry(geometry, color) {
 
         // 3d shape
         tubeMesh = THREE.SceneUtils.createMultiMaterialObject(geometry, [
@@ -450,9 +461,8 @@
 
         if (geometry.debug) tubeMesh.add(geometry.debug);
 
-        tubeMesh.position.set(x, y, z - 75);
-        tubeMesh.rotation.set(rx, ry, rz);
-        tubeMesh.scale.set(s, s, s);
+        // tubeMesh.position.set(x, y, z);
+        // tubeMesh.rotation.set(rx, ry, rz);
         //mesh.children[0].doubleSided = true;
         parent.add(tubeMesh);
 
@@ -480,11 +490,13 @@
 
       info.innerHTML += dropdown;
 
-      info.innerHTML += '<br/>Scale: <select id="scale" onchange="addTube()"><option>1</option><option>2</option><option selected>4</option><option>6</option><option>10</option></select>';
+      info.innerHTML += '<br/>Scale: <select id="scale" onchange="setScale()"><option>1</option><option>2</option><option selected>4</option><option>6</option><option>10</option></select>';
       info.innerHTML += '<br/>Extrusion Segments: <select onchange="addTube()" id="segments"><option>50</option><option selected>100</option><option>200</option><option>400</option></select>';
       info.innerHTML += '<br/>Debug: <input id="debug" type="checkbox" onchange="addTube()" checked /> Closed:<input id="closed" onchange="addTube()" type="checkbox" checked />';
+
+      info.innerHTML += '<br/>Radius Segments: <select id="radiusSegments" onchange="addTube()"><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option></select>';
+
       info.innerHTML += '<br/>Camera Spline Animation: <input id="animation" type="checkbox" onchange="animateCamera()" />';
-      // tube segments
 
       container.appendChild(info);
 
