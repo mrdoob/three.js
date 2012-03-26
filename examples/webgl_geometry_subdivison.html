@@ -224,6 +224,9 @@
 
 				// mergeVertices(); is run in case of duplicated vertices
 				smooth.mergeVertices();
+				smooth.computeCentroids();
+				// smooth.computeFaceNormals();
+				// smooth.computeVertexNormals();
 				modifier.modify( smooth );
 
 				updateInfo();
