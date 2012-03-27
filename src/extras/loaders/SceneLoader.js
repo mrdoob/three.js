@@ -81,7 +81,6 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 		cameras: {},
 		lights: {},
 		fogs: {},
-		triggers: {},
 		empties: {}
 
 	};
@@ -101,8 +100,12 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 		if ( scale )
 			result.scene.scale.set( scale[ 0 ], scale[ 1 ], scale [ 2 ] );
 
-		if ( position || rotation || scale )
+		if ( position || rotation || scale ) {
+
 			result.scene.updateMatrix();
+			result.scene.updateMatrixWorld();
+
+		}
 
 	}
 
@@ -192,36 +195,15 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 						}
 
 						object.scale.set( s[0], s[1], s[2] );
+
 						object.visible = o.visible;
+						object.doubleSided = o.doubleSided;
+						object.castShadow = o.castShadow;
+						object.receiveShadow = o.receiveShadow;
 
 						result.scene.add( object );
 
 						result.objects[ dd ] = object;
-
-						if ( o.castsShadow ) {
-
-							//object.visible = true;
-							//object.materials = [ new THREE.MeshBasicMaterial( { color: 0xff0000 } ) ];
-
-							var shadow = new THREE.ShadowVolume( geometry )
-							result.scene.add( shadow );
-
-							shadow.position = object.position;
-							shadow.rotation = object.rotation;
-							shadow.scale = object.scale;
-
-						}
-
-						if ( o.trigger && o.trigger.toLowerCase() != "none" ) {
-
-							var trigger = {
-							"type" 		: o.trigger,
-							"object"	: o
-							};
-
-							result.triggers[ object.name ] = trigger;
-
-						}
 
 					}
 
@@ -260,17 +242,6 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 
 					result.objects[ dd ] = object;
 					result.empties[ dd ] = object;
-
-					if ( o.trigger && o.trigger.toLowerCase() != "none" ) {
-
-						var trigger = {
-						"type" 		: o.trigger,
-						"object"	: o
-						};
-
-						result.triggers[ object.name ] = trigger;
-
-					}
 
 				}
 
@@ -525,7 +496,7 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 
 			var modelJson = data.embeds[ g.id ],
 				texture_path = "";
-			
+
 			// Pass metadata along to jsonLoader so it knows the format version.
 			modelJson.metadata = data.metadata;
 

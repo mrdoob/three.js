@@ -194,16 +194,16 @@ THREE.Loader.prototype = {
 
 		if ( m.shading ) {
 
-			if ( m.shading == "Phong" ) mtype = "MeshPhongMaterial";
-			else if ( m.shading == "Basic" ) mtype = "MeshBasicMaterial";
+			var shading = m.shading.toLowerCase();
+
+			if ( shading === "phong" ) mtype = "MeshPhongMaterial";
+			else if ( shading === "basic" ) mtype = "MeshBasicMaterial";
 
 		}
 
-		if ( m.blending ) {
+		if ( m.blending !== undefined && THREE[ m.blending ] !== undefined ) {
 
-			if ( m.blending == "Additive" ) mpars.blending = THREE.AdditiveBlending;
-			else if ( m.blending == "Subtractive" ) mpars.blending = THREE.SubtractiveBlending;
-			else if ( m.blending == "Multiply" ) mpars.blending = THREE.MultiplyBlending;
+			mpars.blending = THREE[ m.blending ];
 
 		}
 
@@ -216,6 +216,12 @@ THREE.Loader.prototype = {
 		if ( m.depthTest !== undefined ) {
 
 			mpars.depthTest = m.depthTest;
+
+		}
+
+		if ( m.depthWrite !== undefined ) {
+
+			mpars.depthWrite = m.depthWrite;
 
 		}
 
