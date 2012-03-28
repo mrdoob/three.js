@@ -108,13 +108,14 @@
 				var plane = new THREE.PlaneGeometry( 480, 204, 4, 4 );
 
 				mesh = new THREE.Mesh( plane, material );
+				mesh.rotation.x = Math.PI / 2;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 1.5;
 				scene.add(mesh);
 
 				mesh = new THREE.Mesh( plane, materialReflection );
 				mesh.position.y = -306;
+				mesh.rotation.x = - Math.PI / 2;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 1.5;
-				mesh.rotation.x = 180 * Math.PI / 180;
 				mesh.doubleSided = true;
 				scene.add( mesh );
 

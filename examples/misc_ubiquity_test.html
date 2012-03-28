@@ -82,6 +82,7 @@
 
 				mesh = new THREE.Mesh( new THREE.PlaneGeometry( 100, 100 ), new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } ) );
 				mesh.position.y = -500;
+				mesh.rotation.x = Math.PI / 2;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
 				mesh.doubleSided = true;
 				scene.add( mesh );

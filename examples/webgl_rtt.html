@@ -156,12 +156,14 @@
 
 				quad = new THREE.Mesh( plane, material );
 				quad.position.z = -100;
+				quad.rotation.x = Math.PI / 2;
 				sceneRTT.add( quad );
 
 				createMesh( new THREE.TorusGeometry( 100, 25, 15, 30 ), sceneRTT );
 
 				quad = new THREE.Mesh( plane, materialScreen );
 				quad.position.z = -100;
+				quad.rotation.x = Math.PI / 2;
 				sceneScreen.add( quad );
 
 				var n = 5,

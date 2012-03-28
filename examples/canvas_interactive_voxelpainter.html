@@ -75,8 +75,7 @@
 
 				projector = new THREE.Projector();
 
-				plane = new THREE.Mesh( new THREE.PlaneGeometry( 1000, 1000, 20, 20 ), new THREE.MeshFaceMaterial() );
-				plane.rotation.x = - 90 * Math.PI / 180;
+				plane = new THREE.Mesh( new THREE.PlaneGeometry( 1000, 1000 ), new THREE.MeshFaceMaterial() );
 				scene.add( plane );
 
 				mouse2D = new THREE.Vector3( 0, 10000, 0.5 );

@@ -107,11 +107,7 @@
 
 			var container, stats;
 
-			var camera, scene, renderer, mesh, directionalLight;
-
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
-
+			var camera, scene, renderer;
 			var materialHDR, quad;
 
 			var sign = 1, rate = 1;
@@ -131,10 +127,6 @@
 				camera.position.z = 900;
 				scene.add( camera );
 
-
-				directionalLight = new THREE.DirectionalLight( 0xffffff );
-				directionalLight.position.set( 0, 0, 1 ).normalize();
-				scene.add( directionalLight );
 
 				var texture = THREE.ImageUtils.loadTexture( "textures/memorial.png" );
 				texture.minFilter = THREE.LinearFilter;
@@ -156,6 +148,7 @@
 
 				quad = new THREE.Mesh( plane, materialHDR );
 				quad.position.z = -100;
+				quad.rotation.x = Math.PI / 2;
 				scene.add( quad );
 
 				renderer = new THREE.WebGLRenderer();

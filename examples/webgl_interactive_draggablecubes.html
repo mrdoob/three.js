@@ -91,6 +91,7 @@
 				}
 
 				plane = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 2000, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 0.25, transparent: true, wireframe: true } ) );
+				plane.geometry.applyMatrix( new THREE.Matrix4().setRotationX( Math.PI / 2 ) );
 				plane.lookAt( camera.position );
 				plane.visible = false;
 				scene.add( plane );

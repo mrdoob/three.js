@@ -522,7 +522,6 @@
 				groundBasic.color.setHSV( 0.1, 0.45, 0.995 );
 
 				ground = new THREE.Mesh( new THREE.PlaneGeometry( 50000, 50000 ), groundBasic );
-				ground.rotation.x = - Math.PI / 2;
 				ground.position.y = - 215;
 				scene.add( ground );
 
@@ -563,15 +562,14 @@
 				var shadowTexture = THREE.ImageUtils.loadTexture( "textures/shadowAlpha.png" );
 
 				var shadowPlane = new THREE.PlaneGeometry( 400, 400 );
-				var shadowMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.35, transparent: true,
-														  map: shadowTexture,
-														  polygonOffset: false, polygonOffsetFactor: -0.5, polygonOffsetUnits: 1 } );
+				var shadowMaterial = new THREE.MeshBasicMaterial( {
+					color: 0xff0000, opacity: 0.35, transparent: true, map: shadowTexture,
+					polygonOffset: false, polygonOffsetFactor: -0.5, polygonOffsetUnits: 1
+				} );
 
 				var shadow = new THREE.Mesh( shadowPlane, shadowMaterial );
-				shadow.rotation.x = -Math.PI/2;
-				shadow.rotation.z = Math.PI/2;
-
 				shadow.position.y = sy;
+				shadow.rotation.y = Math.PI / 2;
 
 				object.add( shadow );
 
@@ -682,13 +680,13 @@
 				var shadowHeight = 1.25 * ss * ( bb.max.x - bb.min.x );
 
 				var shadowPlane = new THREE.PlaneGeometry( shadowWidth, shadowHeight );
-				var shadowMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff, opacity: 0.5, transparent: true,
-														  map: shadowTexture,
-														  polygonOffset: false, polygonOffsetFactor: -0.5, polygonOffsetUnits: 1 } );
+				var shadowMaterial = new THREE.MeshBasicMaterial( {
+					color: 0xffffff, opacity: 0.5, transparent: true, map: shadowTexture,
+					polygonOffset: false, polygonOffsetFactor: -0.5, polygonOffsetUnits: 1
+				} );
 
 				var shadow = new THREE.Mesh( shadowPlane, shadowMaterial );
-				shadow.rotation.x = -Math.PI/2;
-				shadow.rotation.z = Math.PI/2;
+				shadow.rotation.y = Math.PI / 2;
 				shadow.position.y = s + 10;
 
 				object.root.add( shadow );
