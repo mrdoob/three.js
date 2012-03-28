@@ -5392,8 +5392,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			parameters.shadowMapDebug ? "#define SHADOWMAP_DEBUG" : "",
 			parameters.shadowMapCascade ? "#define SHADOWMAP_CASCADE" : "",
 
-			"uniform mat4 viewMatrix;",
-			"uniform vec3 cameraPosition;",
+			"uniform highp mat4 viewMatrix;",
+			"uniform highp vec3 cameraPosition;",
 			""
 
 		].join("\n");
