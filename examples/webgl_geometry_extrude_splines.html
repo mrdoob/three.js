@@ -15,8 +15,7 @@
     </style>
   </head>
   <body>
-    <canvas id="debug" style="position:absolute; left:100px"></canvas>
-
+  
     <script src="../build/Three.js"></script>
     <script src="../src/extras/core/Curve.js"></script>
     <script src="../src/extras/geometries/TubeGeometry.js"></script>
@@ -26,10 +25,11 @@
     <script>
 
     // Lets define some curves
+    THREE.Curves = {};
 
     // Formula from http://mathworld.wolfram.com/HeartCurve.html
 
-    THREE.HeartCurve = THREE.Curve.create(
+    THREE.Curves.HeartCurve = THREE.Curve.create(
 
       function ( s ) {
 
@@ -59,7 +59,7 @@
     // Viviani's Curve
     // http://en.wikipedia.org/wiki/Viviani%27s_curve
 
-    THREE.VivianiCurve = THREE.Curve.create(
+    THREE.Curves.VivianiCurve = THREE.Curve.create(
 
       function( radius ) {
 
@@ -81,7 +81,7 @@
     );
 
 
-    THREE.KnotCurve = THREE.Curve.create(
+    THREE.Curves.KnotCurve = THREE.Curve.create(
 
     function() {
 
@@ -103,7 +103,7 @@
 
     );
 
-    THREE.HelixCurve = THREE.Curve.create(
+    THREE.Curves.HelixCurve = THREE.Curve.create(
 
     function() {
 
@@ -126,7 +126,7 @@
 
     // Replacement for TorusKnotGeometry?
 
-    THREE.TrefoilKnot = THREE.Curve.create(
+    THREE.Curves.TrefoilKnot = THREE.Curve.create(
 
     function(s) {
 
@@ -149,7 +149,7 @@
 
     // Formulas from http://mathdl.maa.org/images/upload_library/23/stemkoski/knots/page6.html
 
-    THREE.TorusKnot = THREE.Curve.create(
+    THREE.Curves.TorusKnot = THREE.Curve.create(
 
     function(s) {
 
@@ -172,7 +172,7 @@
     );
 
 
-    THREE.CinquefoilKnot = THREE.Curve.create(
+    THREE.Curves.CinquefoilKnot = THREE.Curve.create(
 
     function(s) {
 
@@ -195,7 +195,7 @@
     );
 
 
-    THREE.TrefoilPolynomialKnot = THREE.Curve.create(
+    THREE.Curves.TrefoilPolynomialKnot = THREE.Curve.create(
 
     function(s) {
 
@@ -224,14 +224,14 @@
     //   };
     // }
 
-    var scale = function(x, y, t) {
+    var scaleTo = function(x, y, t) {
 
       var r = y - x;
       return t * r + x;
 
     }
 
-    THREE.FigureEightPolynomialKnot = THREE.Curve.create(
+    THREE.Curves.FigureEightPolynomialKnot = THREE.Curve.create(
 
     function(s) {
 
@@ -241,7 +241,7 @@
 
     function(t) {
 
-        t = scale(-4,4, t);
+        t = scaleTo(-4,4, t);
         var tx = 2 / 5 * t * (t * t - 7) * (t * t - 10),
         ty = pow(t, 4) - 13 * t * t,
         tz = 1/10 * t * (t * t - 4) * (t * t - 9) * (t * t - 12);
@@ -257,7 +257,7 @@
 
     //http://www.mi.sanu.ac.rs/vismath/taylorapril2011/Taylor.pdf
 
-    THREE.DecoratedTorusKnot4a = THREE.Curve.create(
+    THREE.Curves.DecoratedTorusKnot4a = THREE.Curve.create(
 
     function(s) {
 
@@ -280,7 +280,7 @@
     );
 
 
-    THREE.DecoratedTorusKnot4b = THREE.Curve.create(
+    THREE.Curves.DecoratedTorusKnot4b = THREE.Curve.create(
 
     function(s) {
 
@@ -301,7 +301,7 @@
     );
 
 
-    THREE.DecoratedTorusKnot5a = THREE.Curve.create(
+    THREE.Curves.DecoratedTorusKnot5a = THREE.Curve.create(
 
     function(s) {
 
@@ -322,7 +322,7 @@
 
     );
 
-    THREE.DecoratedTorusKnot5c = THREE.Curve.create(
+    THREE.Curves.DecoratedTorusKnot5c = THREE.Curve.create(
 
     function(s) {
 
@@ -361,6 +361,118 @@
     var windowHalfX = window.innerWidth / 2;
     var windowHalfY = window.innerHeight / 2;
 
+    var PipeSpline = new THREE.SplineCurve3([
+        new THREE.Vector3(0, 10, -10), new THREE.Vector3(10, 0, -10), new THREE.Vector3(20, 0, 0), new THREE.Vector3(30, 0, 10), new THREE.Vector3(30, 0, 20), new THREE.Vector3(20, 0, 30), new THREE.Vector3(10, 0, 30), new THREE.Vector3(0, 0, 30), new THREE.Vector3(-10, 10, 30), new THREE.Vector3(-10, 20, 30), new THREE.Vector3(0, 30, 30), new THREE.Vector3(10, 30, 30), new THREE.Vector3(20, 30, 15), new THREE.Vector3(10, 30, 10), new THREE.Vector3(0, 30, 10), new THREE.Vector3(-10, 20, 10), new THREE.Vector3(-10, 10, 10), new THREE.Vector3(0, 0, 10), new THREE.Vector3(10, -10, 10), new THREE.Vector3(20, -15, 10), new THREE.Vector3(30, -15, 10), new THREE.Vector3(40, -15, 10), new THREE.Vector3(50, -15, 10), new THREE.Vector3(60, 0, 10), new THREE.Vector3(70, 0, 0), new THREE.Vector3(80, 0, 0), new THREE.Vector3(90, 0, 0), new THREE.Vector3(100, 0, 0)]);
+
+    var sampleClosedSpline = new THREE.ClosedSplineCurve3([
+      new THREE.Vector3(0, -40, -40),
+      new THREE.Vector3(0, 40, -40),
+      new THREE.Vector3(0, 140, -40),
+      new THREE.Vector3(0, 40, 40),
+      new THREE.Vector3(0, -40, 40),
+    ]);
+
+    var splines = {
+      HeartCurve: new THREE.Curves.HeartCurve(3.5),
+      VivianiCurve: new THREE.Curves.VivianiCurve(70),
+      KnotCurve: new THREE.Curves.KnotCurve(),
+      HelixCurve: new THREE.Curves.HelixCurve(),
+      TrefoilKnot: new THREE.Curves.TrefoilKnot(),
+      TorusKnot: new THREE.Curves.TorusKnot(20),
+      CinquefoilKnot: new THREE.Curves.CinquefoilKnot(20),
+      TrefoilPolynomialKnot: new THREE.Curves.TrefoilPolynomialKnot(14),
+      FigureEightPolynomialKnot: new THREE.Curves.FigureEightPolynomialKnot(),
+      DecoratedTorusKnot4a: new THREE.Curves.DecoratedTorusKnot4a(),
+      DecoratedTorusKnot4b: new THREE.Curves.DecoratedTorusKnot4b(),
+      DecoratedTorusKnot5a: new THREE.Curves.DecoratedTorusKnot5a(),
+      DecoratedTorusKnot5c: new THREE.Curves.DecoratedTorusKnot5c()
+    };
+
+
+
+
+    extrudePath = new THREE.Curves.TrefoilKnot();
+
+    var dropdown = '<select id="dropdown" onchange="addTube(this.value)">';
+
+    var s;
+    for ( s in splines ) {
+      dropdown += '<option value="' + s + '"';
+
+      // dropdown += (geometryIndex == i)  ? ' selected' : '';
+
+      dropdown += '>' + s + '</option>';
+    }
+
+    dropdown += '</select>';
+
+
+
+    var closed2 = true;
+    var debug = true;
+    var parent;
+    var tube, tubeMesh;
+    var animation = false;
+    var scale;
+
+    function addTube() {
+
+      var value = document.getElementById('dropdown').value;
+      
+      var segments = parseInt(document.getElementById('segments').value);
+      closed2 = document.getElementById('closed').checked;
+      debug = document.getElementById('debug').checked;
+
+      var radiusSegments = parseInt(document.getElementById('radiusSegments').value);
+
+      console.log('adding tube', value, closed2, debug, radiusSegments);
+      if (tubeMesh) parent.remove(tubeMesh);
+
+      extrudePath = splines[value];
+      
+      tube = new THREE.TubeGeometry(extrudePath, segments, 2, radiusSegments, closed2, debug);
+
+      addGeometry(tube, 0xff00ff);
+      setScale();
+    
+    }
+
+    function setScale() {
+
+      scale = parseInt(document.getElementById('scale').value);
+      tubeMesh.scale.set(scale, scale, scale);
+
+    }
+
+
+    function addGeometry(geometry, color) {
+
+        // 3d shape
+        tubeMesh = THREE.SceneUtils.createMultiMaterialObject(geometry, [
+          new THREE.MeshLambertMaterial({
+              color: color,
+              opacity: 0.2
+          }),
+         new THREE.MeshBasicMaterial({
+            color: 0x000000,
+            wireframe: true,
+            transparent: true
+        })]);
+
+        if (geometry.debug) tubeMesh.add(geometry.debug);
+
+        // tubeMesh.position.set(x, y, z);
+        // tubeMesh.rotation.set(rx, ry, rz);
+        //mesh.children[0].doubleSided = true;
+        parent.add(tubeMesh);
+
+    }
+
+    function animateCamera() {
+      animation = document.getElementById('animation').checked;
+    }
+
+
     init();
     animate();
 
@@ -374,12 +486,24 @@
       info.style.top = '10px';
       info.style.width = '100%';
       info.style.textAlign = 'center';
-      info.innerHTML = 'Simple procedurally generated 3D shapes example by <a href="http://www.lab4games.net/zz85/blog">zz85</a><br/>Drag to spin';
+      info.innerHTML = 'Spline Extrusion Examples by <a href="http://www.lab4games.net/zz85/blog">zz85</a><br/>Select spline:';
+
+      info.innerHTML += dropdown;
+
+      info.innerHTML += '<br/>Scale: <select id="scale" onchange="setScale()"><option>1</option><option>2</option><option selected>4</option><option>6</option><option>10</option></select>';
+      info.innerHTML += '<br/>Extrusion Segments: <select onchange="addTube()" id="segments"><option>50</option><option selected>100</option><option>200</option><option>400</option></select>';
+      info.innerHTML += '<br/>Debug: <input id="debug" type="checkbox" onchange="addTube()" checked /> Closed:<input id="closed" onchange="addTube()" type="checkbox" checked />';
+
+      info.innerHTML += '<br/>Radius Segments: <select id="radiusSegments" onchange="addTube()"><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option></select>';
+
+      info.innerHTML += '<br/>Camera Spline Animation: <input id="animation" type="checkbox" onchange="animateCamera()" />';
+
       container.appendChild(info);
 
       scene = new THREE.Scene();
 
-      camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 1000);
+      // 50
+      camera = new THREE.PerspectiveCamera(79, window.innerWidth / window.innerHeight, 0.01, 1000);
       camera.position.set(0, 50, 500);
       scene.add(camera);
 
@@ -391,65 +515,7 @@
       parent.position.y = 100;
       scene.add(parent);
 
-      function addGeometry(geometry, color, x, y, z, rx, ry, rz, s) {
-
-          // 3d shape
-          var mesh = THREE.SceneUtils.createMultiMaterialObject(geometry, [
-            new THREE.MeshLambertMaterial({
-                color: color,
-                opacity: 0.2
-            }),
-           new THREE.MeshBasicMaterial({
-              color: 0x000000,
-              wireframe: true,
-              transparent: true
-          })]);
-
-          if (geometry.debug) mesh.add(geometry.debug);
-
-          mesh.position.set(x, y, z - 75);
-          mesh.rotation.set(rx, ry, rz);
-          mesh.scale.set(s, s, s);
-		  //mesh.children[0].doubleSided = true;
-          parent.add(mesh);
-
-      }
-
-
-      // var extrudePath = new THREE.SplineCurve3([
-      //     new THREE.Vector3(0, 10, -10), new THREE.Vector3(10, 0, -10), new THREE.Vector3(20, 0, 0), new THREE.Vector3(30, 0, 10), new THREE.Vector3(30, 0, 20), new THREE.Vector3(20, 0, 30), new THREE.Vector3(10, 0, 30), new THREE.Vector3(0, 0, 30), new THREE.Vector3(-10, 10, 30), new THREE.Vector3(-10, 20, 30), new THREE.Vector3(0, 30, 30), new THREE.Vector3(10, 30, 30), new THREE.Vector3(20, 30, 15), new THREE.Vector3(10, 30, 10),
-
-      //     new THREE.Vector3(0, 30, 10), new THREE.Vector3(-10, 20, 10), new THREE.Vector3(-10, 10, 10), new THREE.Vector3(0, 0, 10), new THREE.Vector3(10, -10, 10), new THREE.Vector3(20, -15, 10), new THREE.Vector3(30, -15, 10), new THREE.Vector3(40, -15, 10), new THREE.Vector3(50, -15, 10), new THREE.Vector3(60, 0, 10), new THREE.Vector3(70, 0, 0), new THREE.Vector3(80, 0, 0), new THREE.Vector3(90, 0, 0), new THREE.Vector3(100, 0, 0)]);
-
-      // var extrudePath = new THREE.HeartCurve(3.5);
-      // var extrudePath = new THREE.VivianiCurve(70);
-      // var extrudePath = new THREE.KnotCurve();
-	  //extrudePath = new THREE.HelixCurve();
-
-      // var extrudePath = new THREE.ClosedSplineCurve3([
-      //   new THREE.Vector3(0, -40, -40),
-      //   new THREE.Vector3(0, 40, -40),
-      //   new THREE.Vector3(0, 140, -40),
-      //   new THREE.Vector3(0, 40, 40),
-      //   new THREE.Vector3(0, -40, 40),
-      // ]);
-
-      extrudePath = new THREE.TrefoilKnot();
-      // extrudePath = new THREE.TorusKnot(20);
-      // extrudePath = new THREE.CinquefoilKnot(20);
-      // extrudePath = new THREE.TrefoilPolynomialKnot(14);
-      // extrudePath = new THREE.FigureEightPolynomialKnot();
-      // extrudePath = new THREE.DecoratedTorusKnot4a();
-	  // extrudePath = new THREE.DecoratedTorusKnot4b();
-      // extrudePath = new THREE.DecoratedTorusKnot5a();
-      // extrudePath = new THREE.DecoratedTorusKnot5c();
-
-      var closed = true;
-      var debug = true;
-	  var tube = new THREE.TubeGeometry(extrudePath, 100, 2, 3, closed, debug);
-
-      addGeometry(tube, 0xff00ff, 0, -80, 0, 0, 0, 0, 6);
-
+      addTube();
 
       //
       renderer = new THREE.WebGLRenderer({
@@ -464,9 +530,9 @@
       stats.domElement.style.top = '0px';
       container.appendChild(stats.domElement);
 
-      document.addEventListener('mousedown', onDocumentMouseDown, false);
-      document.addEventListener('touchstart', onDocumentTouchStart, false);
-      document.addEventListener('touchmove', onDocumentTouchMove, false);
+      renderer.domElement.addEventListener('mousedown', onDocumentMouseDown, false);
+      renderer.domElement.addEventListener('touchstart', onDocumentTouchStart, false);
+      renderer.domElement.addEventListener('touchmove', onDocumentTouchMove, false);
 
     }
 
@@ -476,9 +542,9 @@
 
       event.preventDefault();
 
-      document.addEventListener('mousemove', onDocumentMouseMove, false);
-      document.addEventListener('mouseup', onDocumentMouseUp, false);
-      document.addEventListener('mouseout', onDocumentMouseOut, false);
+      renderer.domElement.addEventListener('mousemove', onDocumentMouseMove, false);
+      renderer.domElement.addEventListener('mouseup', onDocumentMouseUp, false);
+      renderer.domElement.addEventListener('mouseout', onDocumentMouseOut, false);
 
       mouseXOnMouseDown = event.clientX - windowHalfX;
       targetRotationOnMouseDown = targetRotation;
@@ -495,17 +561,17 @@
 
     function onDocumentMouseUp(event) {
 
-      document.removeEventListener('mousemove', onDocumentMouseMove, false);
-      document.removeEventListener('mouseup', onDocumentMouseUp, false);
-      document.removeEventListener('mouseout', onDocumentMouseOut, false);
+      renderer.domElement.removeEventListener('mousemove', onDocumentMouseMove, false);
+      renderer.domElement.removeEventListener('mouseup', onDocumentMouseUp, false);
+      renderer.domElement.removeEventListener('mouseout', onDocumentMouseOut, false);
 
     }
 
     function onDocumentMouseOut(event) {
 
-      document.removeEventListener('mousemove', onDocumentMouseMove, false);
-      document.removeEventListener('mouseup', onDocumentMouseUp, false);
-      document.removeEventListener('mouseout', onDocumentMouseOut, false);
+      renderer.domElement.removeEventListener('mousemove', onDocumentMouseMove, false);
+      renderer.domElement.removeEventListener('mouseup', onDocumentMouseUp, false);
+      renderer.domElement.removeEventListener('mouseout', onDocumentMouseOut, false);
 
     }
 
@@ -547,6 +613,52 @@
     }
 
     function render() {
+
+      if (animation) {
+        // Try Animate Camera Along Spline
+        var time = Date.now();
+        var looptime = 20 * 1000;
+        var t = (time % looptime) / looptime;
+        
+        var pos = tube.path.getPointAt(t);
+        pos.multiplyScalar(scale);
+
+ 
+
+        // interpolation
+        var segments = tube.tangents.length;
+        var pickt = t * segments;
+        var pick = Math.floor(pickt);
+        var pickNext = (pick + 1) % segments;
+
+        var binormal = new THREE.Vector3();
+        binormal.sub(tube.binormals[pickNext], tube.binormals[pick]);
+        binormal.multiplyScalar(pickt-pick).addSelf(tube.binormals[pick]);
+
+ 
+        var dir = tube.path.getTangentAt(t);
+  
+        var offset = 50;
+
+        // pos.addSelf(binormal.clone().multiplyScalar(offset));
+        // console.log(t, pos);
+        camera.position = pos;
+
+        var lookAt = tube.path.getPointAt(t + 0.001);
+        // lookAt.multiplyScalar(scale);
+        // camera.lookAt(lookAt);
+
+
+        camera.matrix.lookAt( camera.position, lookAt, binormal ); //camera.position.clone().addSelf(dir)
+        camera.rotation.getRotationFromMatrix( camera.matrix );
+        
+        // var axis = new THREE.Vector3( 0, 1, 0 ).crossSelf( dir );
+        // var radians = Math.acos( new THREE.Vector3( 0, 1, 0 ).dot( dir.clone().normalize() ) );
+        // var matrix = new THREE.Matrix4().setRotationAxis( axis.normalize(), radians );
+        // camera.rotation.getRotationFromMatrix( matrix, camera.scale );
+
+      }
+
 
       parent.rotation.y += (targetRotation - parent.rotation.y) * 0.05;
       renderer.render(scene, camera);
