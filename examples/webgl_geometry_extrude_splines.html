@@ -451,12 +451,13 @@
         tubeMesh = THREE.SceneUtils.createMultiMaterialObject(geometry, [
           new THREE.MeshLambertMaterial({
               color: color,
-              opacity: 0.2
+              opacity: 0.2,
+              transparent: true
           }),
          new THREE.MeshBasicMaterial({
             color: 0x000000,
-            wireframe: true,
-            transparent: true
+            opacity: 0.3,
+            wireframe: true
         })]);
 
         if (geometry.debug) tubeMesh.add(geometry.debug);
