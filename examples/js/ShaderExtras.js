@@ -114,7 +114,7 @@ THREE.ShaderExtras = {
 			"uniform float cKernel[ KERNEL_SIZE ];",
 
 			"uniform sampler2D tDiffuse;",
-			"uniform vec2 uImageIncrement;",
+			"uniform highp vec2 uImageIncrement;",
 
 			"varying vec2 vUv;",
 
