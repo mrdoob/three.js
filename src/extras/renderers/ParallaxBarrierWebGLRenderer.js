@@ -81,7 +81,11 @@ if ( THREE.WebGLRenderer ) {
 		} );
 
 		var _scene = new THREE.Scene();
-		_scene.add( new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), _material ) );
+
+		var mesh = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), _material );
+		mesh.rotation.x = Math.PI / 2;
+
+		_scene.add( mesh );
 
 		_scene.add( _camera );
 
