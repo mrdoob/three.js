@@ -104,7 +104,7 @@ THREE.CameraHelper.prototype.constructor = THREE.CameraHelper;
 
 THREE.CameraHelper.prototype.update = function ( camera ) {
 
-	if (camera !== undefined) {
+	if (camera === undefined) {
 		camera = this.camera;
 	}
 

@@ -19,6 +19,7 @@
     <script src="../build/Three.js"></script>
     <script src="../src/extras/core/Curve.js"></script>
     <script src="../src/extras/geometries/TubeGeometry.js"></script>
+    <script src="../src/extras/helpers/CameraHelper.js"></script>
     <script src="js/Stats.js"></script>
 
 
@@ -524,9 +525,10 @@
       addTube();
 
       // Debug point
-      cameraPos = new THREE.Mesh(new THREE.SphereGeometry(20), new THREE.MeshBasicMaterial({
+      cameraPos = new THREE.Mesh(new THREE.SphereGeometry(10), new THREE.MeshBasicMaterial({
             color: 0xdddddd
         }));
+      cameraPos.visible = false;
       parent.add(cameraPos);
 
       cameraHelper.scale.multiplyScalar(0.1);
@@ -669,7 +671,7 @@
 
         splineCamera.matrix.lookAt( splineCamera.position, lookAt, binormal ); //camera.position.clone().addSelf(dir)
         splineCamera.rotation.getRotationFromMatrix( splineCamera.matrix );
-        cameraHelper.update(splineCamera);
+        cameraHelper.update();
         
         // var axis = new THREE.Vector3( 0, 1, 0 ).crossSelf( dir );
         // var radians = Math.acos( new THREE.Vector3( 0, 1, 0 ).dot( dir.clone().normalize() ) );
