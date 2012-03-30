@@ -348,7 +348,7 @@
 
     var container, stats;
 
-    var camera, scene, renderer;
+    var camera, scene, renderer, splineCamera, cameraHelper, cameraPos;
 
     var text, plane;
 
@@ -495,7 +495,7 @@
       info.innerHTML += '<br/>Extrusion Segments: <select onchange="addTube()" id="segments"><option>50</option><option selected>100</option><option>200</option><option>400</option></select>';
       info.innerHTML += '<br/>Debug: <input id="debug" type="checkbox" onchange="addTube()" checked /> Closed:<input id="closed" onchange="addTube()" type="checkbox" checked />';
 
-      info.innerHTML += '<br/>Radius Segments: <select id="radiusSegments" onchange="addTube()"><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option></select>';
+      info.innerHTML += '<br/>Radius Segments: <select id="radiusSegments" onchange="addTube()"><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option><option>6</option><option>8</option><option>12</option></select>';
 
       info.innerHTML += '<br/>Camera Spline Animation: <input id="animation" type="checkbox" onchange="animateCamera()" />';
 
@@ -503,11 +503,16 @@
 
       scene = new THREE.Scene();
 
-      // 50
-      camera = new THREE.PerspectiveCamera(79, window.innerWidth / window.innerHeight, 0.01, 1000);
+      // 
+      camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.01, 1000);
+      splineCamera = new THREE.PerspectiveCamera(84, window.innerWidth / window.innerHeight, 0.01, 1000);
+      cameraHelper = new THREE.CameraHelper(splineCamera);
+
       camera.position.set(0, 50, 500);
+      
       scene.add(camera);
 
+      
       var light = new THREE.DirectionalLight(0xffffff);
       light.position.set(0, 0, 1);
       scene.add(light);
@@ -517,6 +522,16 @@
       scene.add(parent);
 
       addTube();
+
+      // Debug point
+      cameraPos = new THREE.Mesh(new THREE.SphereGeometry(20), new THREE.MeshBasicMaterial({
+            color: 0xdddddd
+        }));
+      parent.add(cameraPos);
+
+      cameraHelper.scale.multiplyScalar(0.1);
+      splineCamera.add(cameraHelper);
+      parent.add(splineCamera);
 
       //
       renderer = new THREE.WebGLRenderer({
@@ -643,15 +658,18 @@
 
         // pos.addSelf(binormal.clone().multiplyScalar(offset));
         // console.log(t, pos);
-        camera.position = pos;
+        splineCamera.position = pos;
 
         var lookAt = tube.path.getPointAt(t + 0.001);
         // lookAt.multiplyScalar(scale);
         // camera.lookAt(lookAt);
 
+        cameraPos.position = pos;
 
-        camera.matrix.lookAt( camera.position, lookAt, binormal ); //camera.position.clone().addSelf(dir)
-        camera.rotation.getRotationFromMatrix( camera.matrix );
+
+        splineCamera.matrix.lookAt( splineCamera.position, lookAt, binormal ); //camera.position.clone().addSelf(dir)
+        splineCamera.rotation.getRotationFromMatrix( splineCamera.matrix );
+        cameraHelper.update(splineCamera);
         
         // var axis = new THREE.Vector3( 0, 1, 0 ).crossSelf( dir );
         // var radians = Math.acos( new THREE.Vector3( 0, 1, 0 ).dot( dir.clone().normalize() ) );
