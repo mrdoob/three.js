@@ -13,7 +13,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	var _canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElement( 'canvas' ),
 
-	_precision = parameters.precision !== undefined ? parameters.precision : 'mediump',
+	_precision = parameters.precision !== undefined ? parameters.precision : 'highp',
 
 	_alpha = parameters.alpha !== undefined ? parameters.alpha : true,
 	_premultipliedAlpha = parameters.premultipliedAlpha !== undefined ? parameters.premultipliedAlpha : true,
@@ -5286,6 +5286,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		program = _gl.createProgram();
 
 		var prefix_vertex = [
+
+			"precision " + _precision + " float;",
 
 			( _maxVertexTextures > 0 ) ? "#define VERTEX_TEXTURES" : "",
 
