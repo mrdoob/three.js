@@ -632,58 +632,65 @@
 
     function render() {
 
+      // Try Animate Camera Along Spline
+      var time = Date.now();
+      var looptime = 20 * 1000;
+      var t = (time % looptime) / looptime;
+
+      var pos = tube.path.getPointAt(t);
+      pos.multiplyScalar(scale);
+
+
+
+      // interpolation
+      var segments = tube.tangents.length;
+      var pickt = t * segments;
+      var pick = Math.floor(pickt);
+      var pickNext = (pick + 1) % segments;
+
+      var binormal = new THREE.Vector3();
+      binormal.sub(tube.binormals[pickNext], tube.binormals[pick]);
+      binormal.multiplyScalar(pickt - pick).addSelf(tube.binormals[pick]);
+
+
+      var dir = tube.path.getTangentAt(t);
+
+      var offset = -15;
+
+      // We move on a offset on its binormal
+      pos.addSelf(binormal.clone().multiplyScalar(offset));
+      // console.log(t, pos);
+      splineCamera.position = pos;
+
+      var lookAt = tube.path.getPointAt((t + 0.101) % 1);
+      lookAt.multiplyScalar(scale);
+
+      splineCamera.lookAt(lookAt);
+
+      cameraPos.position = pos;
+
+      // splineCamera.matrix.lookAt(splineCamera.position, lookAt, binormal); //camera.position.clone().addSelf(dir)
+      // splineCamera.rotation.getRotationFromMatrix(splineCamera.matrix);
+      // cameraHelper.update();
+
+      // var axis = new THREE.Vector3( 0, 1, 0 ).crossSelf( dir );
+      // var radians = Math.acos( new THREE.Vector3( 0, 1, 0 ).dot( dir.clone().normalize() ) );
+      // var matrix = new THREE.Matrix4().setRotationAxis( axis.normalize(), radians );
+      // camera.rotation.getRotationFromMatrix( matrix, camera.scale );
+      parent.rotation.y += (targetRotation - parent.rotation.y) * 0.05;
+
       if (animation) {
-        // Try Animate Camera Along Spline
-        var time = Date.now();
-        var looptime = 20 * 1000;
-        var t = (time % looptime) / looptime;
-        
-        var pos = tube.path.getPointAt(t);
-        pos.multiplyScalar(scale);
 
- 
+        renderer.render(scene, splineCamera);
 
-        // interpolation
-        var segments = tube.tangents.length;
-        var pickt = t * segments;
-        var pick = Math.floor(pickt);
-        var pickNext = (pick + 1) % segments;
+      } else {
 
-        var binormal = new THREE.Vector3();
-        binormal.sub(tube.binormals[pickNext], tube.binormals[pick]);
-        binormal.multiplyScalar(pickt-pick).addSelf(tube.binormals[pick]);
-
- 
-        var dir = tube.path.getTangentAt(t);
-  
-        var offset = 50;
-
-        // pos.addSelf(binormal.clone().multiplyScalar(offset));
-        // console.log(t, pos);
-        splineCamera.position = pos;
-
-        var lookAt = tube.path.getPointAt(t + 0.001);
-        // lookAt.multiplyScalar(scale);
-        // camera.lookAt(lookAt);
-
-        cameraPos.position = pos;
-
-
-        splineCamera.matrix.lookAt( splineCamera.position, lookAt, binormal ); //camera.position.clone().addSelf(dir)
-        splineCamera.rotation.getRotationFromMatrix( splineCamera.matrix );
-        cameraHelper.update();
-        
-        // var axis = new THREE.Vector3( 0, 1, 0 ).crossSelf( dir );
-        // var radians = Math.acos( new THREE.Vector3( 0, 1, 0 ).dot( dir.clone().normalize() ) );
-        // var matrix = new THREE.Matrix4().setRotationAxis( axis.normalize(), radians );
-        // camera.rotation.getRotationFromMatrix( matrix, camera.scale );
+        renderer.render(scene, camera);
 
       }
 
-
-      parent.rotation.y += (targetRotation - parent.rotation.y) * 0.05;
-      renderer.render(scene, camera);
-
+      
+      
     }
 	</script>
 
