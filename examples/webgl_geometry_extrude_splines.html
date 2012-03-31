@@ -413,7 +413,7 @@
     var debug = true;
     var parent;
     var tube, tubeMesh;
-    var animation = false;
+    var animation = false, lookAhead = false;
     var scale;
 
     function addTube() {
@@ -472,6 +472,7 @@
 
     function animateCamera() {
       animation = document.getElementById('animation').checked;
+      lookAhead = document.getElementById('lookAhead').checked;
     }
 
 
@@ -498,7 +499,7 @@
 
       info.innerHTML += '<br/>Radius Segments: <select id="radiusSegments" onchange="addTube()"><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option><option>6</option><option>8</option><option>12</option></select>';
 
-      info.innerHTML += '<br/>Camera Spline Animation: <input id="animation" type="checkbox" onchange="animateCamera()" />';
+      info.innerHTML += '<br/>Camera Spline Animation: <input id="animation" type="checkbox" onchange="animateCamera()" /> Look Ahead <input id="lookAhead" type="checkbox" onchange="animateCamera()" />'; //checkbox button
 
       container.appendChild(info);
 
@@ -672,17 +673,11 @@
       var lookAt = tube.path.getPointAt((t + 0.101) % 1).multiplyScalar(scale);
       // splineCamera.lookAt(lookAt);
 
-
       // Camera Orientation 2 - up orientation via normal
+      if (!lookAhead)
       lookAt.copy(pos).addSelf(dir);
       splineCamera.matrix.lookAt(splineCamera.position, lookAt, normal);
       splineCamera.rotation.getRotationFromMatrix(splineCamera.matrix);
-
-      // Camera Orientation 3 - using rotation from matrix - Doesn't work too well because of spin.
-      // var axis = new THREE.Vector3( 0, 0, -1 ).crossSelf( dir );
-      // var radians = Math.acos( new THREE.Vector3( 0, 0, -1 ).dot( dir.clone().normalize() ) );
-      // var matrix = new THREE.Matrix4().setRotationAxis( axis.normalize(), radians );
-      // splineCamera.rotation.getRotationFromMatrix( matrix, splineCamera.scale );
 
       cameraHelper.update();
 
