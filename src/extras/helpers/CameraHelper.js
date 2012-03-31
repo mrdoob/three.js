@@ -73,6 +73,8 @@ THREE.CameraHelper = function ( camera ) {
 	addLine( "cf1", "cf2", hexCross );
 	addLine( "cf3", "cf4", hexCross );
 
+	this.camera = camera;
+
 	function addLine( a, b, hex ) {
 
 		addPoint( a, hex );
@@ -100,7 +102,9 @@ THREE.CameraHelper = function ( camera ) {
 THREE.CameraHelper.prototype = new THREE.Object3D();
 THREE.CameraHelper.prototype.constructor = THREE.CameraHelper;
 
-THREE.CameraHelper.prototype.update = function ( camera ) {
+THREE.CameraHelper.prototype.update = function () {
+
+	var camera = this.camera;
 
 	var w = 1;
 	var h = 1;
