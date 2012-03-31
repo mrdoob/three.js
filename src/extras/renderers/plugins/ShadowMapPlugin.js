@@ -179,7 +179,7 @@ THREE.ShadowMapPlugin = function ( ) {
 			shadowCamera.matrixWorldInverse.getInverse( shadowCamera.matrixWorld );
 
 			if ( light.cameraHelper ) light.cameraHelper.lines.visible = light.shadowCameraVisible;
-			if ( light.shadowCameraVisible ) light.cameraHelper.update( light.shadowCamera );
+			if ( light.shadowCameraVisible ) light.cameraHelper.update();
 
 			// compute shadow matrix
 

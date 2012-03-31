@@ -102,11 +102,9 @@ THREE.CameraHelper = function ( camera ) {
 THREE.CameraHelper.prototype = new THREE.Object3D();
 THREE.CameraHelper.prototype.constructor = THREE.CameraHelper;
 
-THREE.CameraHelper.prototype.update = function ( camera ) {
+THREE.CameraHelper.prototype.update = function () {
 
-	if (camera === undefined) {
-		camera = this.camera;
-	}
+	var camera = this.camera;
 
 	var w = 1;
 	var h = 1;

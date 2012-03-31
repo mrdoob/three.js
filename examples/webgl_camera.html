@@ -224,7 +224,7 @@
 					cameraPerspective.far = mesh.position.length();
 					cameraPerspective.updateProjectionMatrix();
 
-					cameraPerspectiveHelper.update( cameraPerspective );
+					cameraPerspectiveHelper.update();
 					cameraPerspectiveHelper.lines.visible = true;
 
 					cameraOrthoHelper.lines.visible = false;
@@ -234,7 +234,7 @@
 					cameraOrtho.far = mesh.position.length();
 					cameraOrtho.updateProjectionMatrix();
 
-					cameraOrthoHelper.update( cameraOrtho );
+					cameraOrthoHelper.update();
 					cameraOrthoHelper.lines.visible = true;
 
 					cameraPerspectiveHelper.lines.visible = false;
