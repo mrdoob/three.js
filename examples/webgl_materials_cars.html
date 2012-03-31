@@ -138,7 +138,7 @@
 			var container, stats;
 
 			var camera, scene, renderer;
-			var cameraCube, sceneCube, cubeTarget;
+			var cameraCube, sceneCube;
 
 			var m, mi;
 
@@ -168,10 +168,9 @@
 				// CAMERAS
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
-				cameraCube = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
-				cubeTarget = new THREE.Vector3( 0, 0, 0 );
-
 				scene.add( camera );
+
+				cameraCube = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
 				sceneCube.add( cameraCube );
 
 				// LIGHTS
@@ -609,20 +608,13 @@
 
 				var timer = -0.0002 * Date.now();
 
-				camera.position.y += ( - mouseY - camera.position.y ) * .05;
-
 				camera.position.x = 1000 * Math.cos( timer );
+				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 				camera.position.z = 1000 * Math.sin( timer );
 
 				camera.lookAt( scene.position );
+				cameraCube.rotation.copy( camera.rotation );
 
-				cubeTarget.x = - camera.position.x;
-				cubeTarget.y = - camera.position.y;
-				cubeTarget.z = - camera.position.z;
-
-				cameraCube.lookAt( cubeTarget );
-
-				renderer.clear();
 				renderer.render( sceneCube, cameraCube );
 				renderer.render( scene, camera );
 

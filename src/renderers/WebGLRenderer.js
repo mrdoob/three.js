@@ -13,7 +13,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	var _canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElement( 'canvas' ),
 
-	_precision = parameters.precision !== undefined ? parameters.precision : 'mediump',
+	_precision = parameters.precision !== undefined ? parameters.precision : 'highp',
 
 	_alpha = parameters.alpha !== undefined ? parameters.alpha : true,
 	_premultipliedAlpha = parameters.premultipliedAlpha !== undefined ? parameters.premultipliedAlpha : true,
@@ -330,6 +330,30 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_gl.deleteTexture( texture.__webglTexture );
 
 		_this.info.memory.textures --;
+
+	};
+
+	this.deallocateRenderTarget = function ( renderTarget ) {
+
+		if ( !renderTarget || ! renderTarget.__webglTexture ) return;
+
+		_gl.deleteTexture( renderTarget.__webglTexture );
+
+		if ( renderTarget instanceof THREE.WebGLRenderTargetCube ) {
+
+			for ( var i = 0; i < 6; i ++ ) {
+
+				_gl.deleteFramebuffer( renderTarget.__webglFramebuffer[ i ] );
+				_gl.deleteRenderbuffer( renderTarget.__webglRenderbuffer[ i ] );
+
+			}
+
+		} else {
+
+			_gl.deleteFramebuffer( renderTarget.__webglFramebuffer );
+			_gl.deleteRenderbuffer( renderTarget.__webglRenderbuffer );
+
+		}
 
 	};
 
@@ -5286,6 +5310,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		program = _gl.createProgram();
 
 		var prefix_vertex = [
+
+			"precision " + _precision + " float;",
 
 			( _maxVertexTextures > 0 ) ? "#define VERTEX_TEXTURES" : "",
 

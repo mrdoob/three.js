@@ -46,9 +46,9 @@
 			var container;
 
 			var camera, scene, renderer;
-			var cameraCube, sceneCube, cubeTarget;
+			var cameraCube, sceneCube;
 
-			var mesh, zmesh, lightMesh, geometry;
+			var mesh, lightMesh, geometry;
 			var spheres = [];
 
 			var directionalLight, pointLight;
@@ -73,11 +73,9 @@
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
 				camera.position.z = 3200;
+				scene.add( camera );
 
 				cameraCube = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
-				cubeTarget = new THREE.Vector3( 0, 0, 0 );
-
-				scene.add( camera );
 				sceneCube.add( cameraCube );
 
 				var geometry = new THREE.SphereGeometry( 100, 32, 16 );
@@ -157,17 +155,6 @@
 
 				var timer = 0.0001 * Date.now();
 
-				camera.position.x += ( mouseX - camera.position.x ) * .05;
-				camera.position.y += ( - mouseY - camera.position.y ) * .05;
-
-				camera.lookAt( scene.position );
-
-				cubeTarget.x = - camera.position.x;
-				cubeTarget.y = - camera.position.y;
-				cubeTarget.z = - camera.position.z;
-
-				cameraCube.lookAt( cubeTarget );
-
 				for ( var i = 0, il = spheres.length; i < il; i ++ ) {
 
 					var sphere = spheres[ i ];
@@ -177,7 +164,12 @@
 
 				}
 
-				renderer.clear();
+				camera.position.x += ( mouseX - camera.position.x ) * .05;
+				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+
+				camera.lookAt( scene.position );
+				cameraCube.rotation.copy( camera.rotation );
+
 				renderer.render( sceneCube, cameraCube );
 				renderer.render( scene, camera );
 
