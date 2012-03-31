@@ -362,6 +362,10 @@
     var windowHalfX = window.innerWidth / 2;
     var windowHalfY = window.innerHeight / 2;
 
+    var binormal = new THREE.Vector3();
+    var normal = new THREE.Vector3();
+
+
     var PipeSpline = new THREE.SplineCurve3([
         new THREE.Vector3(0, 10, -10), new THREE.Vector3(10, 0, -10), new THREE.Vector3(20, 0, 0), new THREE.Vector3(30, 0, 10), new THREE.Vector3(30, 0, 20), new THREE.Vector3(20, 0, 30), new THREE.Vector3(10, 0, 30), new THREE.Vector3(0, 0, 30), new THREE.Vector3(-10, 10, 30), new THREE.Vector3(-10, 20, 30), new THREE.Vector3(0, 30, 30), new THREE.Vector3(10, 30, 30), new THREE.Vector3(20, 30, 15), new THREE.Vector3(10, 30, 10), new THREE.Vector3(0, 30, 10), new THREE.Vector3(-10, 20, 10), new THREE.Vector3(-10, 10, 10), new THREE.Vector3(0, 0, 10), new THREE.Vector3(10, -10, 10), new THREE.Vector3(20, -15, 10), new THREE.Vector3(30, -15, 10), new THREE.Vector3(40, -15, 10), new THREE.Vector3(50, -15, 10), new THREE.Vector3(60, 0, 10), new THREE.Vector3(70, 0, 0), new THREE.Vector3(80, 0, 0), new THREE.Vector3(90, 0, 0), new THREE.Vector3(100, 0, 0)]);
 
@@ -649,7 +653,6 @@
       var pick = Math.floor(pickt);
       var pickNext = (pick + 1) % segments;
 
-      var binormal = new THREE.Vector3();
       binormal.sub(tube.binormals[pickNext], tube.binormals[pick]);
       binormal.multiplyScalar(pickt - pick).addSelf(tube.binormals[pick]);
 
@@ -658,12 +661,10 @@
 
       var offset = 15;
 
-      var normal = new THREE.Vector3();
       normal.copy(binormal).crossSelf(dir);
 
       // We move on a offset on its binormal
       pos.addSelf(normal.clone().multiplyScalar(offset));
-      // console.log(t, pos);
 
       splineCamera.position = pos;
       cameraPos.position = pos;
