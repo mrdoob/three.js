@@ -309,8 +309,8 @@
 
 				renderScene.uniforms[ "tDiffuse" ].texture = composerScene.renderTarget2;
 
-				quadBG.scale.set( window.innerWidth, window.innerHeight, 1 );
-				quadMask.scale.set( window.innerWidth / 2, window.innerHeight / 2, 1 );
+				quadBG.scale.set( window.innerWidth, 1, window.innerHeight );
+				quadMask.scale.set( window.innerWidth / 2, 1, window.innerHeight / 2 );
 
 			}
 
