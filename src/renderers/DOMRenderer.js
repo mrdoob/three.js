@@ -6,8 +6,20 @@ THREE.DOMRenderer = function () {
 
 	var _renderData, _elements,
 	_projector = new THREE.Projector(),
-	_width, _height, _widthHalf, _heightHalf;
+	_width, _height, _widthHalf, _heightHalf, _transformProp;
 
+	var getSupportedProp = function (proparray) {
+		var root = document.documentElement
+		for ( var i = 0; i < proparray.length; i++ ) { 
+			if (typeof root.style[proparray[i]]=="string") { 
+				return proparray[i]
+			}
+		}
+		return null;
+	};
+	
+	_transformProp = getSupportedProp(['transform', 'MozTransform', 'WebkitTransform', 'msTransform', 'OTransform']);
+	
 	this.domElement = document.createElement( 'div' );
 
 	this.setSize = function ( width, height ) {
@@ -28,20 +40,24 @@ THREE.DOMRenderer = function () {
 
 			element = _elements[ e ];
 
-			if ( element instanceof THREE.RenderableParticle ) {
+			if ( element instanceof THREE.RenderableParticle && element.material instanceof THREE.ParticleDOMMaterial ) {
 
-				v1x = element.x * _widthHalf + _widthHalf; v1y = element.y * _heightHalf + _heightHalf;
+				dom = element.material.domElement;
+				
+				v1x = element.x * _widthHalf + _widthHalf - (dom.offsetWidth >> 1); 
+				v1y = element.y * _heightHalf + _heightHalf - (dom.offsetHeight >> 1);
+				
+				dom.style.left = v1x + 'px';
+				dom.style.top = v1y + 'px';
+				dom.style.zIndex = Math.abs(Math.floor((1 - element.z) * camera.far / camera.near))
 
-				material = element.material;
-
-				if ( material instanceof THREE.ParticleDOMMaterial ) {
-
-					dom = material.domElement;
-					dom.style.left = v1x + 'px';
-					dom.style.top = v1y + 'px';
-
+				if(_transformProp) {
+					scaleX = element.scale.x * _widthHalf;
+					scaleY = element.scale.y * _heightHalf;
+					scaleVal = "scale(" + scaleX + "," + scaleY + ")";
+					dom.style[_transformProp] = scaleVal;
 				}
-
+				
 			}
 
 		}
