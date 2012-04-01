@@ -71,57 +71,25 @@
         parent.position.y = 50;
         scene.add( parent );
 
-        function addGeometry( geometry, points, spacedPoints, color, x, y, z, rx, ry, rz, s ) {
+        function addGeometry( geometry, color, x, y, z, rx, ry, rz, s ) {
 
           // 3d shape
 
-          var mesh = THREE.SceneUtils.createMultiMaterialObject( geometry, [ new THREE.MeshLambertMaterial( { color: color } ), new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, transparent: true } ) ] );
+          var mesh = THREE.SceneUtils.createMultiMaterialObject( geometry, [ new THREE.MeshLambertMaterial( { color: color, opacity: 0.2, transparent: true } ), new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true,  opacity: 0.3 } ) ] );
+
+
+       
+
           mesh.position.set( x, y, z - 75 );
-          mesh.rotation.set( rx, ry, rz );
+          // mesh.rotation.set( rx, ry, rz );
           mesh.scale.set( s, s, s );
+
+          if (geometry.debug) mesh.add(geometry.debug);
+
           parent.add( mesh );
 
-          // solid line
 
-          var line = new THREE.Line( points, new THREE.LineBasicMaterial( { color: color, linewidth: 2 } ) );
-          line.position.set( x, y, z + 25 );
-          line.rotation.set( rx, ry, rz );
-          line.scale.set( s, s, s );
-          parent.add( line );
 
-          // transparent line from real points
-
-          var line = new THREE.Line( points, new THREE.LineBasicMaterial( { color: color, opacity: 0.5 } ) );
-          line.position.set( x, y, z + 75 );
-          line.rotation.set( rx, ry, rz );
-          line.scale.set( s, s, s );
-          parent.add( line );
-
-          // vertices from real points
-
-          var pgeo = THREE.GeometryUtils.clone( points );
-          var particles = new THREE.ParticleSystem( pgeo, new THREE.ParticleBasicMaterial( { color: color, size: 2, opacity: 0.75 } ) );
-          particles.position.set( x, y, z + 75 );
-          particles.rotation.set( rx, ry, rz );
-          particles.scale.set( s, s, s );
-          parent.add( particles );
-
-          // transparent line from equidistance sampled points
-
-          var line = new THREE.Line( spacedPoints, new THREE.LineBasicMaterial( { color: color, opacity: 0.2 } ) );
-          line.position.set( x, y, z + 100 );
-          line.rotation.set( rx, ry, rz );
-          line.scale.set( s, s, s );
-          parent.add( line );
-
-          // equidistance sampled points
-
-          var pgeo = THREE.GeometryUtils.clone( spacedPoints );
-          var particles2 = new THREE.ParticleSystem( pgeo, new THREE.ParticleBasicMaterial( { color: color, size: 2, opacity: 0.5 } ) );
-          particles2.position.set( x, y, z + 100 );
-          particles2.rotation.set( rx, ry, rz );
-          particles2.scale.set( s, s, s );
-          parent.add( particles2 );
 
         }
 
@@ -180,7 +148,7 @@
 
         var randomSpline =  new THREE.SplineCurve3(randomPoints);
 
-        extrudeSettings.extrudePath = randomSpline; // extrudeBend sampleClosedSpline pipeSpline
+        extrudeSettings.extrudePath = randomSpline; // extrudeBend sampleClosedSpline pipeSpline randomSpline
 
         // Circle
 
@@ -246,14 +214,13 @@
         var circle3d = rectShape.extrude( extrudeSettings ); //circleShape rectShape smileyShape
         // var circle3d = new THREE.ExtrudeGeometry(circleShape, extrudeBend, extrudeSettings );
         
-        var circlePoints = circleShape.createPointsGeometry();
-        var circleSpacedPoints = circleShape.createSpacedPointsGeometry();
+        var tube = new THREE.TubeGeometry(extrudeSettings.extrudePath, 150, 4, 5, false, true);
+        // new THREE.TubeGeometry(extrudePath, segments, 2, radiusSegments, closed2, debug);
+      
 
-
-        addGeometry( circle3d, circlePoints, circleSpacedPoints,        0x00ff11,  0,  0, 0,     0, 0, 0, 1 );
-
-
-  
+        addGeometry( circle3d, 0xff1111,  -100,  0, 0,     0, 0, 0, 1 );
+        addGeometry( tube, 0x00ff11,  0,  0, 0,     0, 0, 0, 1 );  
+        console.log(tube);
 
         //
 
@@ -359,4 +326,4 @@
     </script>
 
   </body>
-</html>
+</html> 

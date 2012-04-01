@@ -94,9 +94,9 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	if ( extrudePath ) {
 
-		extrudePts = extrudePath.getPoints( steps );
+		extrudePts = extrudePath.getSpacedPoints( steps );
 
-		steps = extrudePts.length;
+		// steps = extrudePts.length;
 		extrudeByPath = true;
 		bevelEnabled = false; // bevels not supported for path extrusion
 
@@ -411,9 +411,9 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 	// Reuse TNB from TubeGeomtry for now.
 	// TODO1 - have a .isClosed in spline?
 	// TODO2 - have have TNBs calculation refactored from TubeGeometry?
-	var splineTube = new THREE.TubeGeometry(extrudePath, steps, 1, 1, true, false);
+	var splineTube = new THREE.TubeGeometry(extrudePath, steps, 1, 1, false, false);
 	
-	console.log(splineTube);
+	console.log(splineTube, 'splineTube', splineTube.normals.length, 'steps', steps, 'extrudePts', extrudePts.length);
 
     var tangent;
     var binormal = new THREE.Vector3();
@@ -479,10 +479,10 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 			} else {
 
 				// v( vert.x, vert.y + extrudePts[ s - 1 ].y, extrudePts[ s - 1 ].x );
-				var splinePt = extrudePts[ (s-1) ];
+				var splinePt = extrudePts[ s ];
 
-				normal.copy(splineTube.normals[s-1]);
-				binormal.copy(splineTube.binormals[s-1]);
+				normal.copy(splineTube.normals[s]);
+				binormal.copy(splineTube.binormals[s]);
 
 				// normal.copy(binormal).crossSelf(splineTube.tangents[s - 1]);
 
