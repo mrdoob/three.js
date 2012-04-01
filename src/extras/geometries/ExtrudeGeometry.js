@@ -92,13 +92,27 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 	//shapebb = shape.getBoundingBox();
 
 
+
+	var splineTube, binormal, normal, position2;
 	if ( extrudePath ) {
 
 		extrudePts = extrudePath.getSpacedPoints( steps );
 
-		// steps = extrudePts.length;
 		extrudeByPath = true;
 		bevelEnabled = false; // bevels not supported for path extrusion
+
+		// SETUP TNB variables
+
+		// Reuse TNB from TubeGeomtry for now.
+		// TODO1 - have a .isClosed in spline?
+		// TODO2 - have have TNBs calculation refactored from TubeGeometry?
+		splineTube = new THREE.TubeGeometry(extrudePath, steps, 1, 1, false, false);
+		
+		// console.log(splineTube, 'splineTube', splineTube.normals.length, 'steps', steps, 'extrudePts', extrudePts.length);
+
+		binormal = new THREE.Vector3();
+		normal = new THREE.Vector3();
+		position2 = new THREE.Vector3();
 
 	}
 
@@ -406,22 +420,6 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	bs = bevelSize;
 
-	// SETUP TNB variables
-
-	// Reuse TNB from TubeGeomtry for now.
-	// TODO1 - have a .isClosed in spline?
-	// TODO2 - have have TNBs calculation refactored from TubeGeometry?
-	var splineTube = new THREE.TubeGeometry(extrudePath, steps, 1, 1, false, false);
-	
-	console.log(splineTube, 'splineTube', splineTube.normals.length, 'steps', steps, 'extrudePts', extrudePts.length);
-
-    var tangent;
-    var binormal = new THREE.Vector3();
-    var normal = new THREE.Vector3();
-    var position2 = new THREE.Vector3();
-
-    var cx, cy;
-
 	// Back facing vertices
 
 	for ( i = 0; i < vlen; i ++ ) {
@@ -436,26 +434,12 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 			// v( vert.x, vert.y + extrudePts[ 0 ].y, extrudePts[ 0 ].x );
 
-			var splinePt = extrudePts[ 0 ];
+			normal.copy(splineTube.normals[0]).multiplyScalar(vert.x);
+			binormal.copy(splineTube.binormals[0]).multiplyScalar(vert.y);
 
-
-			normal.copy(splineTube.normals[0]);
-			binormal.copy(splineTube.binormals[0]);
-
-			// normal.copy(binormal).crossSelf(splineTube.tangents[0]);
-
-			cx = vert.x;
-			cy = vert.y;
-			normal.multiplyScalar(vert.x);
-			binormal.multiplyScalar(vert.y);
-
-			position2.copy(splinePt);
-            position2.addSelf(normal);
-            position2.addSelf(binormal);
-
-            
-
-            v( position2.x, position2.y, position2.z );
+			position2.copy(extrudePts[0]).addSelf(normal).addSelf(binormal);
+			
+			v(position2.x, position2.y, position2.z);
 
 		}
 
@@ -479,22 +463,13 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 			} else {
 
 				// v( vert.x, vert.y + extrudePts[ s - 1 ].y, extrudePts[ s - 1 ].x );
-				var splinePt = extrudePts[ s ];
 
-				normal.copy(splineTube.normals[s]);
-				binormal.copy(splineTube.binormals[s]);
+				normal.copy(splineTube.normals[s]).multiplyScalar(vert.x);
+				binormal.copy(splineTube.binormals[s]).multiplyScalar(vert.y);
 
-				// normal.copy(binormal).crossSelf(splineTube.tangents[s - 1]);
+				position2.copy(extrudePts[s]).addSelf(normal).addSelf(binormal);
 
-				normal.multiplyScalar(vert.x);
-				binormal.multiplyScalar(vert.y);
-
-				position2.copy(splinePt);
-	            position2.addSelf(normal);
-	            position2.addSelf(binormal);
-
-
-				v( position2.x, position2.y, position2.z );
+				v(position2.x, position2.y, position2.z );
 
 			}
 
