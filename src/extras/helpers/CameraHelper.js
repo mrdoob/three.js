@@ -169,7 +169,7 @@ THREE.CameraHelper.prototype.update = function ( camera ) {
 
 	}
 
-	this.lineGeometry.__dirtyVertices = true;
+	this.lineGeometry.verticesNeedUpdate = true;
 
 };
 
