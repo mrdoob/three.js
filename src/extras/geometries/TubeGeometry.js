@@ -74,35 +74,60 @@ THREE.TubeGeometry = function( path, segments, radius, segmentsRadius, closed, d
 
 	}
 
+	initialNormal3();
 
-	// select an initial normal vector perpenicular to the first tangent vector,
-	// and in the direction of the smallest tangent xyz component
-
-	normals[ 0 ] = new THREE.Vector3();
-	binormals[ 0 ] = new THREE.Vector3();
-	smallest = Number.MAX_VALUE;
-	tx = Math.abs( tangents[ 0 ].x );
-	ty = Math.abs( tangents[ 0 ].y );
-	tz = Math.abs( tangents[ 0 ].z );
-
-	if ( tx <= smallest ) {
-		smallest = tx;
-		normal.set( 1, 0, 0 );
+	function initialNormal1() {
+		// fixed start binormal. Has dangers of 0 vectors
+		normals[ 0 ] = new THREE.Vector3();
+		binormals[ 0 ] = new THREE.Vector3();
+		var lastBinormal = new THREE.Vector3( 0, 0, 1 );
+		normals[ 0 ].cross( lastBinormal, tangents[ 0 ] ).normalize();
+		binormals[ 0 ].cross( tangents[ 0 ], normals[ 0 ] ).normalize();
 	}
 
-	if ( ty <= smallest ) {
-		smallest = ty;
-		normal.set( 0, 1, 0 );
+	function initialNormal2() {
+
+		// This uses the Frenet-Serret formula for deriving binormal
+		var t2 = path.getTangentAt( epsilon );
+
+		normals[ 0 ] = new THREE.Vector3().sub( t2, tangents[ 0 ] ).normalize()
+		binormals[ 0 ] = new THREE.Vector3().cross( tangents[ 0 ], normals[ 0 ] );
+
+		normals[ 0 ].cross( binormals[ 0 ], tangents[ 0 ] ).normalize(); // last binormal x tangent
+		binormals[ 0 ].cross( tangents[ 0 ], normals[ 0 ] ).normalize();
+
 	}
 
-	if ( tz <= smallest ) {
-		normal.set( 0, 0, 1 );
+	function initialNormal3() {
+		// select an initial normal vector perpenicular to the first tangent vector,
+		// and in the direction of the smallest tangent xyz component
+
+		normals[ 0 ] = new THREE.Vector3();
+		binormals[ 0 ] = new THREE.Vector3();
+		smallest = Number.MAX_VALUE;
+		tx = Math.abs( tangents[ 0 ].x );
+		ty = Math.abs( tangents[ 0 ].y );
+		tz = Math.abs( tangents[ 0 ].z );
+
+		if ( tx <= smallest ) {
+			smallest = tx;
+			vec.set( 1, 0, 0 );
+		}
+
+		if ( ty <= smallest ) {
+			smallest = ty;
+			vec.set( 0, 1, 0 );
+		}
+
+		if ( tz <= smallest ) {
+			vec.set( 0, 0, 1 );
+		}
+
+		// vec.cross( tangents[ 0 ], normal ).normalize();
+
+		normals[ 0 ].cross( tangents[ 0 ], vec );
+		binormals[ 0 ].cross( tangents[ 0 ], normals[ 0 ] );
 	}
-
-	vec.cross( tangents[ 0 ], normal ).normalize();
-
-	normals[ 0 ].cross( tangents[ 0 ], vec );
-	binormals[ 0 ].cross( tangents[ 0 ], normals[ 0 ] );
 
 
 	// compute the slowly-varying normal and binormal vectors for each segment on the path

@@ -8,25 +8,23 @@
  *  size: 			<float>, 	// size of the text
  *  height: 		<float>, 	// thickness to extrude text
  *  curveSegments: 	<int>,		// number of points on the curves
- *  steps: 			<int>,		// number of points for z-side extrusions
- *
- *  font: 			<string>,		// font name
- *  weight: 		<string>,		// font weight (normal, bold)
- *  style: 			<string>,		// font style  (normal, italics)
+ *  steps: 			<int>,		// number of points for z-side extrusions / used for subdividing segements of extrude spline too
+ 	amount: <int>,	// Amount 
  *
  *  bevelEnabled:	<bool>,			// turn on bevel
  *  bevelThickness: <float>, 		// how deep into text bevel goes
  *  bevelSize:		<float>, 		// how far from text outline is bevel
  *  bevelSegments:	<int>, 			// number of bevel layers
  *
- *  extrudePath:	<THREE.CurvePath>	// path to extrude shape along
- *  bendPath:		<THREE.CurvePath> 	// path to bend the geometry around
+ *  extrudePath:	<THREE.CurvePath>	// 2d/3d spline path to extrude shape orthogonality to
+ *  bendPath:		<THREE.CurvePath> 	// 2d path for bend the shape around x/y plane
  *
  *  material:		 <int>	// material index for front and back faces
  *  extrudeMaterial: <int>	// material index for extrusion and beveled faces
  *
  *  }
   **/
+
 
 THREE.ExtrudeGeometry = function( shapes, options ) {
 
@@ -87,8 +85,6 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 	var extrudePath = options.extrudePath;
 	var extrudePts, extrudeByPath = false;
 
-	var useSpacedPoints = options.useSpacedPoints !== undefined ? options.useSpacedPoints : false;
-
 	var material = options.material;
 	var extrudeMaterial = options.extrudeMaterial;
 
@@ -96,12 +92,27 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 	//shapebb = shape.getBoundingBox();
 
 
+
+	var splineTube, binormal, normal, position2;
 	if ( extrudePath ) {
 
-		extrudePts = extrudePath.getPoints( curveSegments );
-		steps = extrudePts.length;
+		extrudePts = extrudePath.getSpacedPoints( steps );
+
 		extrudeByPath = true;
 		bevelEnabled = false; // bevels not supported for path extrusion
+
+		// SETUP TNB variables
+
+		// Reuse TNB from TubeGeomtry for now.
+		// TODO1 - have a .isClosed in spline?
+		// TODO2 - have have TNBs calculation refactored from TubeGeometry?
+		splineTube = new THREE.TubeGeometry(extrudePath, steps, 1, 1, false, false);
+		
+		// console.log(splineTube, 'splineTube', splineTube.normals.length, 'steps', steps, 'extrudePts', extrudePts.length);
+
+		binormal = new THREE.Vector3();
+		normal = new THREE.Vector3();
+		position2 = new THREE.Vector3();
 
 	}
 
@@ -114,9 +125,6 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 		bevelSize = 0;
 
 	}
-
-
-	// TODO, extrude by path's tangents? also via 3d path?
 
 	// Variables initalization
 
@@ -132,19 +140,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	}
 
-	var shapePoints;
-
-	if ( ! useSpacedPoints ) {
-
-	  	shapePoints = shape.extractAllPoints( curveSegments ); //
-
-	} else {
-
-		// QN - Would it be better to pass useSpacePoints parameter to shape, just like bendpath ?
-
-		shapePoints = shape.extractAllSpacedPoints( curveSegments ) // for points with equal divisions
-
-	}
+	var shapePoints = shape.extractPoints();
 
     var vertices = shapePoints.shape;
 	var holes = shapePoints.holes;
@@ -436,7 +432,14 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 		} else {
 
-			v( vert.x, vert.y + extrudePts[ 0 ].y, extrudePts[ 0 ].x );
+			// v( vert.x, vert.y + extrudePts[ 0 ].y, extrudePts[ 0 ].x );
+
+			normal.copy(splineTube.normals[0]).multiplyScalar(vert.x);
+			binormal.copy(splineTube.binormals[0]).multiplyScalar(vert.y);
+
+			position2.copy(extrudePts[0]).addSelf(normal).addSelf(binormal);
+			
+			v(position2.x, position2.y, position2.z);
 
 		}
 
@@ -459,7 +462,14 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 			} else {
 
-				v( vert.x, vert.y + extrudePts[ s - 1 ].y, extrudePts[ s - 1 ].x );
+				// v( vert.x, vert.y + extrudePts[ s - 1 ].y, extrudePts[ s - 1 ].x );
+
+				normal.copy(splineTube.normals[s]).multiplyScalar(vert.x);
+				binormal.copy(splineTube.binormals[s]).multiplyScalar(vert.y);
+
+				position2.copy(extrudePts[s]).addSelf(normal).addSelf(binormal);
+
+				v(position2.x, position2.y, position2.z );
 
 			}
 
