@@ -629,7 +629,7 @@
 
 				delta = speed * clock.getDelta();
 
-				particleCloud.geometry.__dirtyVertices = true;
+				particleCloud.geometry.verticesNeedUpdate = true;
 
 				attributes.size.needsUpdate = true;
 				attributes.pcolor.needsUpdate = true;
