@@ -257,7 +257,7 @@ THREE.ShaderExtras = {
 				focus:    { type: "f", value: 1.0 },
 				aspect:   { type: "f", value: 1.0 },
 				aperture: { type: "f", value: 0.025 },
-				maxblur:  { type: "f", value: 1.0 },
+				maxblur:  { type: "f", value: 1.0 }
 			  },
 
 	vertexShader: [
@@ -1763,7 +1763,7 @@ THREE.ShaderExtras = {
 		var i, values, sum, halfWidth, kMaxKernelSize = 25, kernelSize = 2 * Math.ceil( sigma * 3.0 ) + 1;
 
 		if ( kernelSize > kMaxKernelSize ) kernelSize = kMaxKernelSize;
-		halfWidth = ( kernelSize - 1 ) * 0.5
+		halfWidth = ( kernelSize - 1 ) * 0.5;
 
 		values = new Array( kernelSize );
 		sum = 0.0;
