@@ -3936,7 +3936,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				geometry = object.geometry;
 				addBuffer( scene.__webglObjects, geometry, object );
 
-			} else if ( THREE.MarchingCubes !== undefined && object instanceof THREE.MarchingCubes || object.immediateRenderCallback ) {
+			} else if ( object instanceof THREE.ImmediateRenderObject || object.immediateRenderCallback ) {
 
 				addBufferImmediate( scene.__webglObjectsImmediate, object );
 
@@ -4135,7 +4135,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			removeInstancesDirect( scene.__webglFlares, object );
 
-		} else if ( object instanceof THREE.MarchingCubes || object.immediateRenderCallback ) {
+		} else if ( object instanceof THREE.ImmediateRenderObject || object.immediateRenderCallback ) {
 
 			removeInstances( scene.__webglObjectsImmediate, object );
 

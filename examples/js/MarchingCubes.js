@@ -7,7 +7,7 @@
 
 THREE.MarchingCubes = function ( resolution, material ) {
 
-	THREE.Object3D.call( this );
+	THREE.ImmediateRenderObject.call( this );
 
 	this.material = material;
 
@@ -130,7 +130,7 @@ THREE.MarchingCubes = function ( resolution, material ) {
 	// Returns total number of triangles. Fills triangles.
 	// (this is where most of time is spent - it's inner work of O(n3) loop )
 
-	this.polygonize = function( fx, fy, fz, q, isol, render_callback ) {
+	this.polygonize = function( fx, fy, fz, q, isol, renderCallback ) {
 
 		// cache indices
 		var q1 = q + 1,
@@ -288,7 +288,7 @@ THREE.MarchingCubes = function ( resolution, material ) {
 							  3 * THREE.triTable[ o1 ],
 							  3 * THREE.triTable[ o2 ],
 							  3 * THREE.triTable[ o3 ],
-							  render_callback );
+							  renderCallback );
 
 			i += 3;
 			numtris ++;
@@ -303,7 +303,7 @@ THREE.MarchingCubes = function ( resolution, material ) {
 	// Immediate render mode simulator
 	/////////////////////////////////////
 
-	this.posnormtriv = function( pos, norm, o1, o2, o3, render_callback ) {
+	this.posnormtriv = function( pos, norm, o1, o2, o3, renderCallback ) {
 
 		var c = this.count * 3;
 
@@ -338,7 +338,7 @@ THREE.MarchingCubes = function ( resolution, material ) {
 
 		if ( this.count >= this.maxCount - 3 ) {
 
-			render_callback( this );
+			renderCallback( this );
 
 		}
 
@@ -352,15 +352,15 @@ THREE.MarchingCubes = function ( resolution, material ) {
 
 	};
 
-	this.end = function( render_callback ) {
+	this.end = function( renderCallback ) {
 
 		if ( this.count === 0 )
 			return;
 
-		for ( var i = this.count * 3; i < this.positionArray.length; i++ )
+		for ( var i = this.count * 3; i < this.positionArray.length; i ++ )
 			this.positionArray[ i ] = 0.0;
 
-		render_callback( this );
+		renderCallback( this );
 
 	};
 
@@ -551,7 +551,7 @@ THREE.MarchingCubes = function ( resolution, material ) {
 
 		// wipe the normal cache
 
-		for ( i = 0; i < this.size3; i++ ) {
+		for ( i = 0; i < this.size3; i ++ ) {
 
 			this.normal_cache[ i * 3 ] = 0.0;
 			this.field[ i ] = 0.0;
@@ -560,7 +560,7 @@ THREE.MarchingCubes = function ( resolution, material ) {
 
 	};
 
-	this.render = function( render_callback ) {
+	this.render = function( renderCallback ) {
 
 		this.begin();
 
@@ -568,22 +568,22 @@ THREE.MarchingCubes = function ( resolution, material ) {
 
 		var q, x, y, z, fx, fy, fz, y_offset, z_offset, smin2 = this.size - 2;
 
-		for ( z = 1; z < smin2; z++ ) {
+		for ( z = 1; z < smin2; z ++ ) {
 
 			z_offset = this.size2 * z;
 			fz = ( z - this.halfsize ) / this.halfsize; //+ 1
 
-			for ( y = 1; y < smin2; y++ ) {
+			for ( y = 1; y < smin2; y ++ ) {
 
 				y_offset = z_offset + this.size * y;
 				fy = ( y - this.halfsize ) / this.halfsize; //+ 1
 
-				for ( x = 1; x < smin2; x++ ) {
+				for ( x = 1; x < smin2; x ++ ) {
 
 					fx = ( x - this.halfsize ) / this.halfsize; //+ 1
 					q = y_offset + x;
 
-					this.polygonize( fx, fy, fz, q, this.isolation, render_callback );
+					this.polygonize( fx, fy, fz, q, this.isolation, renderCallback );
 
 				}
 
@@ -591,7 +591,7 @@ THREE.MarchingCubes = function ( resolution, material ) {
 
 		}
 
-		this.end( render_callback );
+		this.end( renderCallback );
 
 	};
 
@@ -665,7 +665,7 @@ THREE.MarchingCubes = function ( resolution, material ) {
 
 };
 
-THREE.MarchingCubes.prototype = new THREE.Object3D();
+THREE.MarchingCubes.prototype = new THREE.ImmediateRenderObject();
 THREE.MarchingCubes.prototype.constructor = THREE.MarchingCubes;
 
 
