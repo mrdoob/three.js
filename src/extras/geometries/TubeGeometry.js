@@ -215,19 +215,19 @@ THREE.TubeGeometry.FrenetFrames = function(path, segments, closed) {
 
 		if ( tx <= smallest ) {
 			smallest = tx;
-			vec.set( 1, 0, 0 );
+			normal.set( 1, 0, 0 );
 		}
 
 		if ( ty <= smallest ) {
 			smallest = ty;
-			vec.set( 0, 1, 0 );
+			normal.set( 0, 1, 0 );
 		}
 
 		if ( tz <= smallest ) {
-			vec.set( 0, 0, 1 );
+			normal.set( 0, 0, 1 );
 		}
 
-		// vec.cross( tangents[ 0 ], normal ).normalize();
+		vec.cross( tangents[ 0 ], normal ).normalize();
 
 		normals[ 0 ].cross( tangents[ 0 ], vec );
 		binormals[ 0 ].cross( tangents[ 0 ], normals[ 0 ] );
