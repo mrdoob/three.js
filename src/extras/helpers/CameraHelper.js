@@ -173,7 +173,7 @@ THREE.CameraHelper.prototype.update = function () {
 
 	}
 
-	this.lineGeometry.__dirtyVertices = true;
+	this.lineGeometry.verticesNeedUpdate = true;
 
 };
 
