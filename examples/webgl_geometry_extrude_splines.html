@@ -23,14 +23,14 @@
 
     <!-- where curves formulas are defined -->
     <script src="js/CurveExtras.js"></script>
-    
+
     <script src="js/Stats.js"></script>
 
 
     <script>
     var container, stats;
 
-    var camera, scene, renderer, splineCamera, cameraHelper, cameraPos;
+    var camera, scene, renderer, splineCamera, cameraHelper, cameraEye;
 
     var text, plane;
 
@@ -58,6 +58,7 @@
       new THREE.Vector3(0, -40, 40),
     ]);
 
+    // Keep a diction of Curve instances
     var splines = {
       HeartCurve: new THREE.Curves.HeartCurve(3.5),
       VivianiCurve: new THREE.Curves.VivianiCurve(70),
@@ -91,14 +92,13 @@
 
     dropdown += '</select>';
 
-
-
     var closed2 = true;
     var debug = true;
     var parent;
     var tube, tubeMesh;
     var animation = false, lookAhead = false;
     var scale;
+    var showCameraHelper = true;
 
     function addTube() {
 
@@ -147,16 +147,24 @@
 
         if (geometry.debug) tubeMesh.add(geometry.debug);
 
-        // tubeMesh.position.set(x, y, z);
-        // tubeMesh.rotation.set(rx, ry, rz);
         //mesh.children[0].doubleSided = true;
         parent.add(tubeMesh);
 
     }
 
-    function animateCamera() {
-      animation = document.getElementById('animation').checked;
+    function animateCamera(toggle) {
+
+      if (toggle) {
+        animation = !animation;
+        document.getElementById('animation').value = 'Camera Spline Animation View: ' + (animation? 'ON': 'OFF');
+      }
+      
       lookAhead = document.getElementById('lookAhead').checked;
+
+      showCameraHelper = document.getElementById('cameraHelper').checked;
+
+      cameraHelper.children[0].visible = showCameraHelper;
+      cameraEye.visible = showCameraHelper;
     }
 
 
@@ -179,11 +187,10 @@
 
       info.innerHTML += '<br/>Scale: <select id="scale" onchange="setScale()"><option>1</option><option>2</option><option selected>4</option><option>6</option><option>10</option></select>';
       info.innerHTML += '<br/>Extrusion Segments: <select onchange="addTube()" id="segments"><option>50</option><option selected>100</option><option>200</option><option>400</option></select>';
-      info.innerHTML += '<br/>Debug: <input id="debug" type="checkbox" onchange="addTube()" checked /> Closed:<input id="closed" onchange="addTube()" type="checkbox" checked />';
-
       info.innerHTML += '<br/>Radius Segments: <select id="radiusSegments" onchange="addTube()"><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option><option>6</option><option>8</option><option>12</option></select>';
+      info.innerHTML += '<br/>Debug normals: <input id="debug" type="checkbox" onchange="addTube()" checked /> Closed:<input id="closed" onchange="addTube()" type="checkbox" checked />';
 
-      info.innerHTML += '<br/>Camera Spline Animation: <input id="animation" type="checkbox" onchange="animateCamera()" /> Look Ahead <input id="lookAhead" type="checkbox" onchange="animateCamera()" />'; //checkbox button
+      info.innerHTML += '<br/><br/><input id="animation" type="button" onclick="animateCamera(true)" value="Camera Spline Animation View: OFF"/><br/> Look Ahead <input id="lookAhead" type="checkbox" onchange="animateCamera()" /> Camera Helper <input id="cameraHelper" type="checkbox" onchange="animateCamera()" checked />';
 
       container.appendChild(info);
 
@@ -210,11 +217,14 @@
       addTube();
 
       // Debug point
-      cameraPos = new THREE.Mesh(new THREE.SphereGeometry(5), new THREE.MeshBasicMaterial({
-            color: 0xdddddd
-        }));
+      cameraEye = new THREE.Mesh(new THREE.SphereGeometry(5), new THREE.MeshBasicMaterial({
+          color: 0xdddddd
+      }));
 
-      parent.add(cameraPos);
+      cameraHelper.children[0].visible = showCameraHelper;
+      cameraEye.visible = showCameraHelper;
+
+      parent.add(cameraEye);
 
       cameraHelper.scale.multiplyScalar(0.1);
       splineCamera.add(cameraHelper);
@@ -325,8 +335,6 @@
       var pos = tube.path.getPointAt(t);
       pos.multiplyScalar(scale);
 
-
-
       // interpolation
       var segments = tube.tangents.length;
       var pickt = t * segments;
@@ -347,7 +355,7 @@
       pos.addSelf(normal.clone().multiplyScalar(offset));
 
       splineCamera.position = pos;
-      cameraPos.position = pos;
+      cameraEye.position = pos;
 
 
       // Camera Orientation 1 - default look at
