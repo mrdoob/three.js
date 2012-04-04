@@ -95,6 +95,10 @@ THREE.CubeCamera = function ( near, far, heightOffset, cubeResolution ) {
 
 		var cubeTarget = this.renderTarget;
 
+		var oldGenerateMipmaps = cubeTarget.generateMipmaps;
+
+		cubeTarget.generateMipmaps = false;
+
 		cubeTarget.activeCubeFace = 0;
 		renderer.render( scene, this.cameraPX, cubeTarget );
 
@@ -109,6 +113,8 @@ THREE.CubeCamera = function ( near, far, heightOffset, cubeResolution ) {
 
 		cubeTarget.activeCubeFace = 4;
 		renderer.render( scene, this.cameraPZ, cubeTarget );
+
+		cubeTarget.generateMipmaps = oldGenerateMipmaps;
 
 		cubeTarget.activeCubeFace = 5;
 		renderer.render( scene, this.cameraNZ, cubeTarget );
