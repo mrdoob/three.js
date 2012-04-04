@@ -194,7 +194,7 @@ THREE.SpritePlugin = function ( ) {
 
 				}
 
-				_renderer.setBlending( sprite.blending );
+				_renderer.setBlending( sprite.blending, sprite.blendEquation, sprite.blendSrc, sprite.blendDst );
 				_renderer.setTexture( sprite.map, 0 );
 
 				_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );

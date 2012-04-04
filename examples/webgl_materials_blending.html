@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - materials - blending</title>
+		<meta charset="utf-8">
+		<style>
+			body {
+				margin: 0px;
+				background-color: #000000;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+	<body>
+
+		<script src="../build/Three.js"></script>
+		<script src="js/Detector.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var camera, scene, renderer;
+			var mesh;
+
+			init();
+			animate();
+
+			function init() {
+
+				// SCENE
+
+				scene = new THREE.Scene();
+
+				// CAMERA
+
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.z = 600;
+				scene.add( camera );
+
+				// BACKGROUND
+
+				var x = document.createElement( "canvas" );
+				var xc = x.getContext( "2d" );
+				x.width = x.height = 128;
+				xc.fillStyle = "#ddd";
+				xc.fillRect( 0, 0, 128, 128 );
+				xc.fillStyle = "#555";
+				xc.fillRect( 0, 0, 64, 64 );
+				xc.fillStyle = "#999";
+				xc.fillRect( 32, 32, 32, 32 );
+				xc.fillStyle = "#555";
+				xc.fillRect( 64, 64, 64, 64 );
+				xc.fillStyle = "#777";
+				xc.fillRect( 96, 96, 32, 32 );
+
+				var mapBg = new THREE.Texture( x );
+				mapBg.wrapS = mapBg.wrapT = THREE.RepeatWrapping;
+				mapBg.repeat.set( 128, 64 );
+				mapBg.needsUpdate = true;
+
+				/*
+				var mapBg = THREE.ImageUtils.loadTexture( "textures/disturb.jpg" );
+				mapBg.wrapS = mapBg.wrapT = THREE.RepeatWrapping;
+				mapBg.repeat.set( 8, 4 );
+				*/
+
+				var materialBg = new THREE.MeshBasicMaterial( { map: mapBg } );
+
+				var meshBg = new THREE.Mesh( new THREE.PlaneGeometry( 4000, 2000 ), materialBg );
+				meshBg.position.set( 0, 0, -1 );
+				meshBg.rotation.x = Math.PI / 2;
+				scene.add( meshBg );
+
+				// OBJECTS
+
+				var blendings = [ "NoBlending", "NormalBlending", "AdditiveBlending", "SubtractiveBlending", "MultiplyBlending", "AdditiveAlphaBlending" ];
+
+				var map0 = THREE.ImageUtils.loadTexture( 'textures/ash_uvgrid01.jpg' );
+				var map1 = THREE.ImageUtils.loadTexture( 'textures/sprite0.jpg' );
+				var map2 = THREE.ImageUtils.loadTexture( 'textures/sprite0.png' );
+				var map3 = THREE.ImageUtils.loadTexture( 'textures/lensflare/lensflare0.png' );
+				var map4 = THREE.ImageUtils.loadTexture( 'textures/lensflare/lensflare0_alpha.png' );
+
+				var geo1 = new THREE.PlaneGeometry( 100, 100 );
+				var geo2 = new THREE.PlaneGeometry( 100, 25 );
+
+				addImageRow( map0, 300 );
+				addImageRow( map1, 150 );
+				addImageRow( map2, 0 );
+				addImageRow( map3, -150 );
+				addImageRow( map4, -300 );
+
+				function addImageRow( map, y ) {
+
+					for ( var i = 0; i < blendings.length; i ++ ) {
+
+						var blending = blendings[ i ];
+
+						var material = new THREE.MeshBasicMaterial( { map: map } );
+						material.transparent = true;
+						material.blending = THREE[ blending ];
+
+						var x = ( i - blendings.length / 2 ) * 110;
+						var z = 0;
+
+						var mesh = new THREE.Mesh( geo1, material );
+						mesh.position.set( x, y, z );
+						mesh.rotation.x = Math.PI / 2;
+						scene.add( mesh );
+
+
+						var mesh = new THREE.Mesh( geo2, generateLabelMaterial( blending.replace( "Blending", "" ) ) );
+						mesh.position.set( x, y - 75, z );
+						mesh.rotation.x = Math.PI / 2;
+						scene.add( mesh );
+
+					}
+
+				}
+
+				// RENDERER
+
+				renderer = new THREE.WebGLRenderer( { clearColor: 0x000000, clearAlpha: 1 } );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				// EVENTS
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			//
+
+			function onWindowResize( event ) {
+
+				var SCREEN_WIDTH = window.innerWidth;
+				var SCREEN_HEIGHT = window.innerHeight;
+
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+
+				camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
+				camera.updateProjectionMatrix();
+
+			}
+
+
+			function generateLabelMaterial( text ) {
+
+				var x = document.createElement( "canvas" );
+				var xc = x.getContext( "2d" );
+				x.width = 128;
+				x.height = 32;
+
+				xc.fillStyle = "rgba( 0, 0, 0, 0.95 )";
+				xc.fillRect( 0, 0, 128, 32 );
+
+				xc.fillStyle = "white";
+				xc.font = "12pt arial bold";
+				xc.fillText( text, 10, 22 );
+
+				var map = new THREE.Texture( x );
+				map.needsUpdate = true;
+
+				var material = new THREE.MeshBasicMaterial( { map: map, transparent: true } );
+				return material;
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>
