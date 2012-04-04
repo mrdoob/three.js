@@ -56,16 +56,13 @@ THREE.MixOperation = 1;
 
 // Mapping modes
 
+THREE.UVMapping = function () {};
+
 THREE.CubeReflectionMapping = function () {};
 THREE.CubeRefractionMapping = function () {};
 
-THREE.LatitudeReflectionMapping = function () {};
-THREE.LatitudeRefractionMapping = function () {};
-
 THREE.SphericalReflectionMapping = function () {};
 THREE.SphericalRefractionMapping = function () {};
-
-THREE.UVMapping = function () {};
 
 // Wrapping modes
 
