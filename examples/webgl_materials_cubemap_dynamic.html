@@ -81,8 +81,6 @@
 
 			var SHADOW_MAP_WIDTH = 1024, SHADOW_MAP_HEIGHT = 1024;
 
-			var CUBE_HEIGHT = 0;
-
 			var container, stats;
 
 			var camera, cameraTarget, scene, renderer;
@@ -217,7 +215,7 @@
 
 				// CUBE CAMERA
 
-				cubeCamera = new THREE.CubeCamera( 1, 100000, CUBE_HEIGHT, 128 );
+				cubeCamera = new THREE.CubeCamera( 1, 100000, 128 );
 
 				// MATERIALS
 

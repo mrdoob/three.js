@@ -5,10 +5,9 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.CubeCamera = function ( near, far, heightOffset, cubeResolution ) {
+THREE.CubeCamera = function ( near, far, cubeResolution ) {
 
-	this.heightOffset = heightOffset;
-	this.position = new THREE.Vector3( 0, heightOffset, 0 );
+	this.position = new THREE.Vector3( 0, 0, 0 );
 
 	// cameras
 
@@ -59,8 +58,6 @@ THREE.CubeCamera = function ( near, far, heightOffset, cubeResolution ) {
 	this.updatePosition = function ( position ) {
 
 		this.position.copy( position );
-
-		this.position.y += this.heightOffset;
 
 		this.targetPX.copy( this.position );
 		this.targetNX.copy( this.position );
