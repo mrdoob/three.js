@@ -1,8 +1,10 @@
 /*
  *	@author zz85 / http://twitter.com/blurspline / http://www.lab4games.net/zz85/blog 
  * 
- *	A handy general perpose camera, for setting FOV, Lens Focal Length,  
+ *	A general perpose camera, for setting FOV, Lens Focal Length,  
  *		and switching between perspective and orthographic views easily.
+ *		Use this only if you do not wish to manage 
+ *		both a Orthographic and Perspective Camera
  *
  */
 
@@ -35,9 +37,10 @@ THREE.CombinedCamera = function ( width, height, fov, near, far, orthonear, orth
 };
 
 THREE.CombinedCamera.prototype = new THREE.Camera();
-THREE.CombinedCamera.prototype.constructor = THREE.CoolCamera;
+THREE.CombinedCamera.prototype.constructor = THREE.CombinedCamera;
 
 THREE.CombinedCamera.prototype.toPerspective = function () {
+	// Switches to the Perspective Camera
 
 	this.near = this.cameraP.near;
 	this.far = this.cameraP.far;
@@ -52,14 +55,14 @@ THREE.CombinedCamera.prototype.toPerspective = function () {
 
 THREE.CombinedCamera.prototype.toOrthographic = function () {
 
-	// Orthographic from Perspective
+	// Switches to the Orthographic camera estimating viewport from Perspective
 	var fov = this.fov;
 	var aspect = this.cameraP.aspect;
 	var near = this.cameraP.near;
 	var far = this.cameraP.far;
 	
 	
-	// Just pretend we want the mid plane of the viewing frustum
+	// The size that we set is the mid plane of the viewing frustum
 	var hyperfocus = ( near + far ) / 2; 
 	
 	var halfHeight = Math.tan( fov / 2 ) * hyperfocus;
@@ -96,6 +99,18 @@ THREE.CombinedCamera.prototype.toOrthographic = function () {
 
 };
 
+	
+THREE.CombinedCamera.prototype.setSize = function(width, height) {
+
+	this.cameraP.aspect = width / height;
+	this.left = -width / 2;
+	this.right = width / 2
+	this.top = height / 2;
+	this.bottom = -height / 2;
+
+}
+
+
 THREE.CombinedCamera.prototype.setFov = function(fov) {	
 	this.fov = fov;
 	
@@ -105,6 +120,16 @@ THREE.CombinedCamera.prototype.setFov = function(fov) {
 		this.toOrthographic();
 	}
 
+};
+
+// For mantaining similar API with PerspectiveCamera
+THREE.CombinedCamera.prototype.updateProjectionMatrix = function() {
+	if (this.inPersepectiveMode) {
+		this.toPerspective();
+	} else {
+		this.toPerspective();
+		this.toOrthographic();
+	}
 };
 
 /*
@@ -141,8 +166,7 @@ THREE.CombinedCamera.prototype.toFrontView = function() {
 	this.rotation.x = 0;
 	this.rotation.y = 0;
 	this.rotation.z = 0;
-	
-	//TODO: Better way to disable camera.lookAt()?
+	// should we be modifing the matrix instead?
 	this.rotationAutoUpdate = false;
 };
 
