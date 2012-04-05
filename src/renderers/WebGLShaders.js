@@ -883,7 +883,24 @@ THREE.ShaderChunk = {
 
 			"float fDepth;",
 			"vec3 shadowColor = vec3( 1.0 );",
+        "vec3 shadowCoord;",
+        "bvec4 inFrustumVec;",
+        "bool inFrustum;",
 
+        "#ifdef SHADOWMAP_CASCADE",
+
+            "bvec3 frustumTestVec;",
+
+        "#else",
+
+            "bvec2 frustumTestVec;",
+
+        "#endif",
+
+        "bool frustumTest;",
+
+        "SHADOWMAP_STRING",
+/*
 			"for( int i = 0; i < MAX_SHADOWS; i ++ ) {",
 
 				"vec3 shadowCoord = vShadowCoord[ i ].xyz / vShadowCoord[ i ].w;",
@@ -945,7 +962,7 @@ THREE.ShaderChunk = {
 						"shadow /= 9.0;",
 
 						*/
-
+/*
 						"const float shadowDelta = 1.0 / 9.0;",
 
 						"float xPixelOffset = 1.0 / shadowMapSize[ i ].x;",
@@ -986,7 +1003,7 @@ THREE.ShaderChunk = {
 						"shadowColor = shadowColor * vec3( ( 1.0 - shadowDarkness[ i ] * shadow ) );",
 
 					"#else",
-
+/*
 						"vec4 rgbaDepth = texture2D( shadowMap[ i ], shadowCoord.xy );",
 						"float fDepth = unpackDepth( rgbaDepth );",
 
@@ -1020,7 +1037,7 @@ THREE.ShaderChunk = {
 				"#endif",
 
 			"}",
-
+*/
 			"#ifdef GAMMA_OUTPUT",
 
 				"shadowColor *= shadowColor;",
