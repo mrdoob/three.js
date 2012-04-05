@@ -15,7 +15,7 @@ color — An instance of [page:Color Color]. Default is white.<br />
 linewidth — Line thickness. Default is 1.<br />
 linecap — Define appearance of line ends. Default is 'round'.<br />
 linejoin — Define appearance of line joints. Default is 'round'.<br />
-vertexColors — Define whether the material specifies a color per vertex, or not. Default is false.<br />
+vertexColors — Define whether the material uses vertex colors, or not. Default is false.<br />
 fog — Define whether the material color is affected by global fog settings. Default is false.
 </div>
 
@@ -36,7 +36,8 @@ fog — Define whether the material color is affected by global fog settings. De
 <div>This setting might not have any effect when used with certain renderers. For example, it is ignored with the [page:WebGLRenderer WebGL] renderer, but does work with the [page:CanvasRenderer Canvas] renderer.</div>
 
 <h3>.[page:Boolean vertexColors]</h3>
-<div>Define whether the material specifies a color per vertex, or not.</div>
+<div>Define whether the material uses vertex colors, or not. Default is false.</div>
+<div>This setting might not have any effect when used with certain renderers. For example, it is ignored with the [page:CanvasRenderer Canvas] renderer, but does work with the [page:WebGLRenderer WebGL] renderer.</div>
 
 <h3>.[page:Boolean fog]</h3>
 <div>Define whether the material color is affected by global fog settings.</div>
