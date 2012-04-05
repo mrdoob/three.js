@@ -2195,7 +2195,8 @@ THREE.ColladaLoader = function () {
 
 				case 'polygons':
 
-					console.warn( 'polygon holes not yet supported!' );
+					this.primitives.push( ( new Polygons().parse( child ) ) );
+					break;
 
 				case 'polylist':
 
@@ -2246,7 +2247,7 @@ THREE.ColladaLoader = function () {
 
 	Mesh.prototype.handlePrimitive = function( primitive, geom ) {
 
-		var i = 0, j, k, p = primitive.p, inputs = primitive.inputs;
+		var j, k, pList = primitive.p, inputs = primitive.inputs;
 		var input, index, idx32;
 		var source, numParams;
 		var vcIndex = 0, vcount = 3, maxOffset = 0;
@@ -2268,177 +2269,176 @@ THREE.ColladaLoader = function () {
 
 		}
 
-		while ( i < p.length ) {
+		for ( var pCount = 0; pCount < pList.length; ++pCount ) {
 
-			var vs = [];
-			var ns = [];
-			var ts = {};
-			var cs = [];
+			var p = pList[pCount], i = 0;
 
-			if ( primitive.vcount ) {
+			while ( i < p.length ) {
 
-				vcount = primitive.vcount[ vcIndex ++ ];
+				var vs = [];
+				var ns = [];
+				var ts = {};
+				var cs = [];
 
-			}
+				if ( primitive.vcount ) {
 
-			for ( j = 0; j < vcount; j ++ ) {
+					vcount = primitive.vcount.length ? primitive.vcount[ vcIndex ++ ] : primitive.vcount;
 
-				for ( k = 0; k < inputs.length; k ++ ) {
+				} else {
 
-					input = inputs[ k ];
-					source = sources[ input.source ];
-
-					index = p[ i + ( j * maxOffset ) + input.offset ];
-					numParams = source.accessor.params.length;
-					idx32 = index * numParams;
-
-					switch ( input.semantic ) {
-
-						case 'VERTEX':
-
-							vs.push( index );
-
-							break;
-
-						case 'NORMAL':
-
-							ns.push( getConvertedVec3( source.data, idx32 ) );
-
-							break;
-
-						case 'TEXCOORD':
-
-							if ( ts[ input.set ] === undefined ) ts[ input.set ] = [];
-							// invert the V
-							ts[ input.set ].push( new THREE.UV( source.data[ idx32 ], 1.0 - source.data[ idx32 + 1 ] ) );
-
-							break;
-
-						case 'COLOR':
-
-							cs.push( new THREE.Color().setRGB( source.data[ idx32 ], source.data[ idx32 + 1 ], source.data[ idx32 + 2 ] ) );
-
-							break;
-
-						default:
-							break;
-
-					}
+					vcount = p.length / maxOffset;
 
 				}
 
-			}
 
+				for ( j = 0; j < vcount; j ++ ) {
 
-			var face = null, faces = [], uv, uvArr;
+					for ( k = 0; k < inputs.length; k ++ ) {
 
-			if ( ns.length == 0 ) {
-				
-				// check the vertices source
-				input = this.vertices.input.NORMAL;
+						input = inputs[ k ];
+						source = sources[ input.source ];
 
-				if ( input ) {
+						index = p[ i + ( j * maxOffset ) + input.offset ];
+						numParams = source.accessor.params.length;
+						idx32 = index * numParams;
 
-					source = sources[ input.source ];
-					numParams = source.accessor.params.length;
+						switch ( input.semantic ) {
 
-					for ( var ndx = 0, len = vs.length; ndx < len; ndx++ ) {
+							case 'VERTEX':
 
-						ns.push( getConvertedVec3( source.data, vs[ ndx ] * numParams ) );
+								vs.push( index );
 
-					}
+								break;
 
-				}
-				else {
-					
-					geom.calcNormals = true;
-					
-				}
+							case 'NORMAL':
 
-			}
+								ns.push( getConvertedVec3( source.data, idx32 ) );
 
-			if ( vcount === 3 ) {
+								break;
 
-				faces.push( new THREE.Face3( vs[0], vs[1], vs[2], ns, cs.length ? cs : new THREE.Color() ) );
+							case 'TEXCOORD':
 
-			} else if ( vcount === 4 ) {
-				
-				faces.push( new THREE.Face4( vs[0], vs[1], vs[2], vs[3], ns, cs.length ? cs : new THREE.Color() ) );
+								if ( ts[ input.set ] === undefined ) ts[ input.set ] = [];
+								// invert the V
+								ts[ input.set ].push( new THREE.UV( source.data[ idx32 ], 1.0 - source.data[ idx32 + 1 ] ) );
 
-			} else if ( vcount > 4 && options.subdivideFaces ) {
+								break;
 
-				var clr = cs.length ? cs : new THREE.Color(),
-					vec1, vec2, vec3, v1, v2, norm;
+							case 'COLOR':
 
-				// subdivide into multiple Face3s
-				for ( k = 1; k < vcount-1; ) {
+								cs.push( new THREE.Color().setRGB( source.data[ idx32 ], source.data[ idx32 + 1 ], source.data[ idx32 + 2 ] ) );
 
-					// FIXME: normals don't seem to be quite right
-					faces.push( new THREE.Face3( vs[0], vs[k], vs[k+1], [ ns[0], ns[k++], ns[k] ],  clr ) );
+								break;
 
-				}
-
-			}
-
-			if ( faces.length ) {
-
-				for (var ndx = 0, len = faces.length; ndx < len; ndx++) {
-
-					face = faces[ndx];
-					face.daeMaterial = primitive.material;
-					geom.faces.push( face );
-
-					for ( k = 0; k < texture_sets.length; k++ ) {
-
-						uv = ts[ texture_sets[k] ];
-
-						if ( vcount > 4 ) {
-
-							// Grab the right UVs for the vertices in this face
-							uvArr = [ uv[0], uv[ndx+1], uv[ndx+2] ];
-
-						} else if ( vcount === 4 ) {
-
-							uvArr = [ uv[0], uv[1], uv[2], uv[3] ];
-
-						} else {
-
-							uvArr = [ uv[0], uv[1], uv[2] ];
+							default:
+								break;
 
 						}
 
-						if ( !geom.faceVertexUvs[k] ) {
+					}
 
-							geom.faceVertexUvs[k] = [];
+				}
+
+
+				var face = null, faces = [], uv, uvArr;
+
+				if ( ns.length == 0 ) {
+					// check the vertices source
+					input = this.vertices.input.NORMAL;
+
+					if ( input ) {
+
+						source = sources[ input.source ];
+						numParams = source.accessor.params.length;
+
+						for ( var ndx = 0, len = vs.length; ndx < len; ndx++ ) {
+
+							ns.push( getConvertedVec3( source.data, vs[ ndx ] * numParams ) );
 
 						}
 
-						geom.faceVertexUvs[k].push( uvArr );
+					}
+					else {
+						geom.calcNormals = true;
+					}
+
+				}
+
+				if ( vcount === 3 ) {
+
+					faces.push( new THREE.Face3( vs[0], vs[1], vs[2], ns, cs.length ? cs : new THREE.Color() ) );
+
+				} else if ( vcount === 4 ) {
+					faces.push( new THREE.Face4( vs[0], vs[1], vs[2], vs[3], ns, cs.length ? cs : new THREE.Color() ) );
+
+				} else if ( vcount > 4 && options.subdivideFaces ) {
+
+					var clr = cs.length ? cs : new THREE.Color(),
+						vec1, vec2, vec3, v1, v2, norm;
+
+					// subdivide into multiple Face3s
+					for ( k = 1; k < vcount-1; ) {
+
+						// FIXME: normals don't seem to be quite right
+						faces.push( new THREE.Face3( vs[0], vs[k], vs[k+1], [ ns[0], ns[k++], ns[k] ],  clr ) );
 
 					}
 
 				}
 
-			} else {
+				if ( faces.length ) {
 
-				console.log( 'dropped face with vcount ' + vcount + ' for geometry with id: ' + geom.id );
+					for (var ndx = 0, len = faces.length; ndx < len; ndx++) {
+
+						face = faces[ndx];
+						face.daeMaterial = primitive.material;
+						geom.faces.push( face );
+
+						for ( k = 0; k < texture_sets.length; k++ ) {
+
+							uv = ts[ texture_sets[k] ];
+
+							if ( vcount > 4 ) {
+
+								// Grab the right UVs for the vertices in this face
+								uvArr = [ uv[0], uv[ndx+1], uv[ndx+2] ];
+
+							} else if ( vcount === 4 ) {
+
+								uvArr = [ uv[0], uv[1], uv[2], uv[3] ];
+
+							} else {
+
+								uvArr = [ uv[0], uv[1], uv[2] ];
+
+							}
+
+							if ( !geom.faceVertexUvs[k] ) {
+
+								geom.faceVertexUvs[k] = [];
+
+							}
+
+							geom.faceVertexUvs[k].push( uvArr );
+
+						}
+
+					}
+
+				} else {
+
+					console.log( 'dropped face with vcount ' + vcount + ' for geometry with id: ' + geom.id );
+
+				}
+
+				i += maxOffset * vcount;
 
 			}
-
-			i += maxOffset * vcount;
-
 		}
 
 	};
 
-
-	function Polylist () {
-	};
-
-	Polylist.prototype = new Triangles();
-	Polylist.prototype.constructor = Polylist;
-
-	function Triangles( flip_uv ) {
+	function Polygons () {
 
 		this.material = "";
 		this.count = 0;
@@ -2449,7 +2449,7 @@ THREE.ColladaLoader = function () {
 
 	};
 
-	Triangles.prototype.setVertices = function ( vertices ) {
+	Polygons.prototype.setVertices = function ( vertices ) {
 
 		for ( var i = 0; i < this.inputs.length; i ++ ) {
 
@@ -2463,9 +2463,8 @@ THREE.ColladaLoader = function () {
 
 	};
 
-	Triangles.prototype.parse = function ( element ) {
+	Polygons.prototype.parse = function ( element ) {
 
-		this.inputs = [];
 		this.material = element.getAttribute( 'material' );
 		this.count = _attr_as_int( element, 'count', 0 );
 
@@ -2487,7 +2486,12 @@ THREE.ColladaLoader = function () {
 
 				case 'p':
 
-					this.p = _ints( child.textContent );
+					this.p.push( _ints( child.textContent ) );
+					break;
+
+				case 'ph':
+
+					console.warn( 'polygon holes not yet supported!' );
 					break;
 
 				default:
@@ -2500,6 +2504,28 @@ THREE.ColladaLoader = function () {
 		return this;
 
 	};
+
+	function Polylist () {
+
+		Polygons.call( this );
+
+		this.vcount = [];
+
+	};
+
+	Polylist.prototype = new Polygons();
+	Polylist.prototype.constructor = Polylist;
+
+	function Triangles () {
+
+		Polygons.call( this );
+
+		this.vcount = 3;
+
+	};
+
+	Triangles.prototype = new Polygons();
+	Triangles.prototype.constructor = Triangles;
 
 	function Accessor() {
 
