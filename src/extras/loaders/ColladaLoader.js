@@ -3689,6 +3689,7 @@ THREE.ColladaLoader = function () {
 
 		this.id = "";
 		this.name = "";
+		this.technique = "";
 
 	};
 
@@ -3730,7 +3731,9 @@ THREE.ColladaLoader = function () {
 
 				for ( var j = 0; j < technique.childNodes.length; j ++ ) {
 
-					if ( technique.childNodes[ j ].nodeName == 'perspective' ) {
+					this.technique = technique.childNodes[ j ].nodeName;
+
+					if ( this.technique == 'perspective' ) {
 
 						var perspective = technique.childNodes[ j ];
 
@@ -3740,14 +3743,47 @@ THREE.ColladaLoader = function () {
 
 							switch ( param.nodeName ) {
 
+								case 'yfov':
+									this.yfov = param.textContent;
+									break;
 								case 'xfov':
-									this.fov = param.textContent;
+									this.xfov = param.textContent;
 									break;
 								case 'znear':
-									this.znear = .4;//param.textContent;
+									this.znear = param.textContent;
 									break;
 								case 'zfar':
-									this.zfar = 1e15;//param.textContent;
+									this.zfar = param.textContent;
+									break;
+								case 'aspect_ratio':
+									this.aspect_ratio = param.textContent;
+									break;
+
+							}
+
+						}
+
+					} else if ( this.technique == 'orthographic' ) {
+
+						var orthographic = technique.childNodes[ j ];
+
+						for ( var k = 0; k < orthographic.childNodes.length; k ++ ) {
+
+							var param = orthographic.childNodes[ k ];
+
+							switch ( param.nodeName ) {
+
+								case 'xmag':
+									this.xmag = param.textContent;
+									break;
+								case 'ymag':
+									this.ymag = param.textContent;
+									break;
+								case 'znear':
+									this.znear = param.textContent;
+									break;
+								case 'zfar':
+									this.zfar = param.textContent;
 									break;
 								case 'aspect_ratio':
 									this.aspect_ratio = param.textContent;
