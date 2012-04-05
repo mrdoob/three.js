@@ -120,19 +120,19 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	};
 
-	this.setClearColor = function( color, opacity ) {
+	this.setClearColor = function ( color, opacity ) {
 
 		_clearColor.copy( color );
-		_clearOpacity = opacity;
+		_clearOpacity = opacity !== undefined ? opacity : 1;
 
 		_clearRect.set( - _canvasWidthHalf, - _canvasHeightHalf, _canvasWidthHalf, _canvasHeightHalf );
 
 	};
 
-	this.setClearColorHex = function( hex, opacity ) {
+	this.setClearColorHex = function ( hex, opacity ) {
 
 		_clearColor.setHex( hex );
-		_clearOpacity = opacity;
+		_clearOpacity = opacity !== undefined ? opacity : 1;
 
 		_clearRect.set( - _canvasWidthHalf, - _canvasHeightHalf, _canvasWidthHalf, _canvasHeightHalf );
 
