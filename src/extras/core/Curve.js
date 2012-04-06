@@ -7,6 +7,7 @@
  * .getPointAt(u), getTagentAt(u)
  * .getPoints(), .getSpacedPoints()
  * .getLength()
+ * .updateArcLengths()
  *
  * This file contains following classes:
  *
@@ -24,6 +25,8 @@
  * THREE.CubicBezierCurve3
  * THREE.SplineCurve3
  * THREE.ClosedSplineCurve3
+ *
+ * A series of curves can be represented as a THREE.CurvePath
  *
  **/
 
@@ -221,7 +224,7 @@ THREE.Curve.prototype.getUtoTmapping = function ( u, distance ) {
 
     // add that fractional amount to t
 
-    t = ( i + segmentFraction ) / ( il -1 );
+    var t = ( i + segmentFraction ) / ( il -1 );
 
 	return t;
 
