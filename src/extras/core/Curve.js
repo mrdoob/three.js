@@ -67,7 +67,7 @@ THREE.Curve.prototype.getPoints = function ( divisions ) {
 
 		pts.push( this.getPoint( d / divisions ) );
 
-	};
+	}
 
 	return pts;
 
@@ -85,13 +85,13 @@ THREE.Curve.prototype.getSpacedPoints = function ( divisions ) {
 
 		pts.push( this.getPointAt( d / divisions ) );
 
-	};
+	}
 
 	return pts;
 
 };
 
-// Get total curve length
+// Get total curve arc length
 
 THREE.Curve.prototype.getLength = function () {
 
@@ -174,9 +174,9 @@ THREE.Curve.prototype.getUtoTmapping = function ( u, distance ) {
 
 		i = Math.floor( low + ( high - low ) / 2 ); // less likely to overflow, though probably not issue here, JS doesn't really have integers, all numbers are floats
 
-	  	comparison = arcLengths[ i ] - targetArcLength;
+		comparison = arcLengths[ i ] - targetArcLength;
 
-	  	if ( comparison < 0 ) {
+		if ( comparison < 0 ) {
 
 			low = i + 1;
 			continue;
@@ -227,10 +227,10 @@ THREE.Curve.prototype.getUtoTmapping = function ( u, distance ) {
 
 };
 
-// In case any sub curve does not implement its tangent / normal finding,
-// we get 2 points with a small delta and find a gradient of the 2 points
-// which seems to make a reasonable approximation
 
+// In 2D space, there are actually 2 normal vectors,
+// and in 3D space, infinte
+// TODO this should be depreciated.
 THREE.Curve.prototype.getNormalVector = function( t ) {
 
 	var vec = this.getTangent( t );
@@ -240,6 +240,9 @@ THREE.Curve.prototype.getNormalVector = function( t ) {
 };
 
 // Returns a unit vector tangent at t
+// In case any sub curve does not implement its tangent / normal finding,
+// we get 2 points with a small delta and find a gradient of the 2 points
+// which seems to make a reasonable approximation
 
 THREE.Curve.prototype.getTangent = function( t ) {
 
@@ -274,23 +277,8 @@ THREE.Curve.prototype.getTangentAt = function ( u ) {
 
 THREE.LineCurve = function ( v1, v2 ) {
 
-	if ( ! ( v1 instanceof THREE.Vector2 ) ) {
-
-		// Fall back for old constuctor signature - should be removed over time
-
-		THREE.LineCurve.oldConstructor.apply( this, arguments );
-		return;
-
-	}
-
 	this.v1 = v1;
 	this.v2 = v2;
-
-};
-
-THREE.LineCurve.oldConstructor = function ( x1, y1, x2, y2 ) {
-
-	this.constructor( new THREE.Vector2( x1, y1 ), new THREE.Vector2( x2, y2 ) );
 
 };
 
@@ -299,9 +287,7 @@ THREE.LineCurve.prototype.constructor = THREE.LineCurve;
 
 THREE.LineCurve.prototype.getPoint = function ( t ) {
 
-	var point = new THREE.Vector2();
-
-	point.sub( this.v2, this.v1 );
+	var point = this.v2.clone().subSelf(this.v1);
 	point.multiplyScalar( t ).addSelf( this.v1 );
 
 	return point;
@@ -318,12 +304,9 @@ THREE.LineCurve.prototype.getPointAt = function ( u ) {
 
 THREE.LineCurve.prototype.getTangent = function( t ) {
 
-	var tangent = new THREE.Vector2();
+	var tangent = this.v2.clone().subSelf(this.v1);
 
-	tangent.sub( this.v2, this.v1 );
-	tangent.normalize();
-
-	return tangent;
+	return tangent.normalize();
 
 };
 
@@ -333,16 +316,6 @@ THREE.LineCurve.prototype.getTangent = function( t ) {
 
 
 THREE.QuadraticBezierCurve = function ( v0, v1, v2 ) {
-
-	if ( !( v1 instanceof THREE.Vector2 ) ) {
-
-		var args = Array.prototype.slice.call( arguments );
-
-		v0 = new THREE.Vector2( args[ 0 ], args[ 1 ] );
-		v1 = new THREE.Vector2( args[ 2 ], args[ 3 ] );
-		v2 = new THREE.Vector2( args[ 4 ], args[ 5 ] );
-
-	}
 
 	this.v0 = v0;
 	this.v1 = v1;
@@ -368,11 +341,6 @@ THREE.QuadraticBezierCurve.prototype.getPoint = function ( t ) {
 
 THREE.QuadraticBezierCurve.prototype.getTangent = function( t ) {
 
-	// iterate sub segments
-	// 	get lengths for sub segments
-	// 	if segment is bezier
-	//		perform subdivisions
-
 	var tx, ty;
 
 	tx = THREE.Curve.Utils.tangentQuadraticBezier( t, this.v0.x, this.v1.x, this.v2.x );
@@ -393,17 +361,6 @@ THREE.QuadraticBezierCurve.prototype.getTangent = function( t ) {
  **************************************************************/
 
 THREE.CubicBezierCurve = function ( v0, v1, v2, v3 ) {
-
-	if ( ! ( v1 instanceof THREE.Vector2 ) ) {
-
-		var args = Array.prototype.slice.call( arguments );
-
-		v0 = new THREE.Vector2( args[ 0 ], args[ 1 ] );
-		v1 = new THREE.Vector2( args[ 2 ], args[ 3 ] );
-		v2 = new THREE.Vector2( args[ 4 ], args[ 5 ] );
-		v3 = new THREE.Vector2( args[ 6 ], args[ 7 ] );
-
-	}
 
 	this.v0 = v0;
 	this.v1 = v1;
@@ -432,8 +389,6 @@ THREE.CubicBezierCurve.prototype.getTangent = function( t ) {
 
 	tx = THREE.Curve.Utils.tangentCubicBezier( t, this.v0.x, this.v1.x, this.v2.x, this.v3.x );
 	ty = THREE.Curve.Utils.tangentCubicBezier( t, this.v0.y, this.v1.y, this.v2.y, this.v3.y );
-
-	// return normal unit vector
 
 	var tangent = new THREE.Vector2( tx, ty );
 	tangent.normalize();
@@ -571,16 +526,7 @@ THREE.Curve.Utils = {
 };
 
 
-/*
-getPoint DONE
-getLength DONE
-getLengths DONE
-
-curve.getPoints(); DONE
-curve.getPointAtArcLength(t); DONE
-curve.transform(params);
-curve.getTangentAt(t); DONE
-*/
+// TODO: Transformation for Curves?
 
 /**************************************************************
  *	3D Curves
