@@ -5864,6 +5864,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
+				if ( isTargetPowerOfTwo ) _gl.generateMipmap( _gl.TEXTURE_CUBE_MAP );
+
 			} else {
 
 				renderTarget.__webglFramebuffer = _gl.createFramebuffer();
@@ -5876,6 +5878,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				setupFrameBuffer( renderTarget.__webglFramebuffer, renderTarget, _gl.TEXTURE_2D );
 				setupRenderBuffer( renderTarget.__webglRenderbuffer, renderTarget );
+
+				if ( isTargetPowerOfTwo ) _gl.generateMipmap( _gl.TEXTURE_2D );
 
 			}
 
