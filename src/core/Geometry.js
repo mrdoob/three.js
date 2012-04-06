@@ -437,8 +437,8 @@ THREE.Geometry.prototype = {
 
 			} else if ( face instanceof THREE.Face4 ) {
 
-				handleTriangle( this, face.a, face.b, face.c, 0, 1, 2 );
 				handleTriangle( this, face.a, face.b, face.d, 0, 1, 3 );
+				handleTriangle( this, face.b, face.c, face.d, 1, 2, 3 );
 
 			}
 
