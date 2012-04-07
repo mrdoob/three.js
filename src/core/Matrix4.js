@@ -7,6 +7,7 @@
  * @author alteredq / http://alteredqualia.com/
  * @author mikael emtinger / http://gomo.se/
  * @author timknip / http://www.floorplanner.com/
+ * @author WestLangley / https://github.com/WestLangley
  */
 
 THREE.Matrix4 = function ( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43, n44 ) {
@@ -398,9 +399,11 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	setRotationAxis: function( axis, angle ) {
+	setRotationFromAxisAngle: function( axis, angle ) {
 
 		// Based on http://www.gamedev.net/reference/articles/article1199.asp
+
+		// axis is assumed to be normalized
 
 		var c = Math.cos( angle ),
 		s = Math.sin( angle ),
@@ -605,6 +608,8 @@ THREE.Matrix4.prototype = {
 
 
 	setRotationFromQuaternion: function( q ) {
+
+		// q is assumed to be normalized
 
 		var x = q.x, y = q.y, z = q.z, w = q.w,
 		x2 = x + x, y2 = y + y, z2 = z + z,

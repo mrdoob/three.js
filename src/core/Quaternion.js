@@ -1,6 +1,7 @@
 /**
  * @author mikael emtinger / http://gomo.se/
  * @author alteredq / http://alteredqualia.com/
+ * @author WestLangley / https://github.com/WestLangley
  */
 
 THREE.Quaternion = function( x, y, z, w ) {
@@ -38,28 +39,79 @@ THREE.Quaternion.prototype = {
 
 	},
 
-	setFromEuler: function ( vector ) {
+	setFromEuler: function ( v, order ) {
 
-		var c = Math.PI / 360, // 0.5 * Math.PI / 360, // 0.5 is an optimization
-		x = vector.x * c,
-		y = vector.y * c,
-		z = vector.z * c,
-
-		c1 = Math.cos( y  ),
-		s1 = Math.sin( y  ),
-		c2 = Math.cos( -z ),
-		s2 = Math.sin( -z ),
-		c3 = Math.cos( x  ),
-		s3 = Math.sin( x  ),
-
-		c1c2 = c1 * c2,
-		s1s2 = s1 * s2;
-
-		this.w = c1c2 * c3  - s1s2 * s3;
-	  	this.x = c1c2 * s3  + s1s2 * c3;
-		this.y = s1 * c2 * c3 + c1 * s2 * s3;
-		this.z = c1 * s2 * c3 - s1 * c2 * s3;
-
+		// http://www.mathworks.com/matlabcentral/fileexchange/
+		// 	20696-function-to-convert-between-dcm-euler-angles-quaternions-and-euler-vectors/
+		//	content/SpinCalc.m
+	
+		var order = order || 'XYZ',
+		
+			c1 = Math.cos( v.x / 2 ),
+			c2 = Math.cos( v.y / 2 ),
+			c3 = Math.cos( v.z / 2 ),
+			s1 = Math.sin( v.x / 2 ),
+			s2 = Math.sin( v.y / 2 ),
+			s3 = Math.sin( v.z / 2 );
+				
+		switch ( order ) {
+	
+			case 'YXZ':
+	
+				this.x = s1 * c2 * c3 + c1 * s2 * s3;
+				this.y = c1 * s2 * c3 - s1 * c2 * s3;
+				this.z = c1 * c2 * s3 - s1 * s2 * c3;
+				this.w = c1 * c2 * c3 + s1 * s2 * s3;
+	
+				break;
+				
+			case 'ZXY':
+	
+				this.x = s1 * c2 * c3 - c1 * s2 * s3;
+				this.y = c1 * s2 * c3 + s1 * c2 * s3;
+				this.z = c1 * c2 * s3 + s1 * s2 * c3;
+				this.w = c1 * c2 * c3 - s1 * s2 * s3;
+	
+				break;
+				
+			case 'ZYX':
+	
+				this.x = s1 * c2 * c3 - c1 * s2 * s3;
+				this.y = c1 * s2 * c3 + s1 * c2 * s3;
+				this.z = c1 * c2 * s3 - s1 * s2 * c3;
+				this.w = c1 * c2 * c3 + s1 * s2 * s3;
+	
+				break;
+				
+			case 'YZX':
+			
+				this.x = s1 * c2 * c3 + c1 * s2 * s3;
+				this.y = c1 * s2 * c3 + s1 * c2 * s3;
+				this.z = c1 * c2 * s3 - s1 * s2 * c3;
+				this.w = c1 * c2 * c3 - s1 * s2 * s3;
+	
+				break;
+				
+			case 'XZY':
+			
+				this.x = s1 * c2 * c3 - c1 * s2 * s3;
+				this.y = c1 * s2 * c3 - s1 * c2 * s3;
+				this.z = c1 * c2 * s3 + s1 * s2 * c3;
+				this.w = c1 * c2 * c3 + s1 * s2 * s3;
+	
+				break;
+				
+			default: // 'XYZ'
+	
+				this.x = s1 * c2 * c3 + c1 * s2 * s3;
+				this.y = c1 * s2 * c3 - s1 * c2 * s3;
+				this.z = c1 * c2 * s3 + s1 * s2 * c3;
+				this.w = c1 * c2 * c3 - s1 * s2 * s3;
+		
+				break;
+				
+		}
+		
 		return this;
 
 	},
@@ -83,24 +135,51 @@ THREE.Quaternion.prototype = {
 
 	setFromRotationMatrix: function ( m ) {
 
-		// Adapted from: http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
-
-		function copySign( a, b ) {
-
-			return b < 0 ? -Math.abs( a ) : Math.abs( a );
-
+		// http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
+		
+		// assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
+		
+		var trace = m.n11 + m.n22 + m.n33,
+			s;
+		
+		if( trace > 0 ) {
+		
+			s = 0.5 / Math.sqrt( trace + 1.0 );
+			
+			this.w = 0.25 / s;
+			this.x = ( m.n32 - m.n23 ) * s;
+			this.y = ( m.n13 - m.n31 ) * s;
+			this.z = ( m.n21 - m.n12 ) * s;
+		
+		} else if ( m.n11 > m.n22 && m.n11 > m.n33 ) {
+		
+			s = 2.0 * Math.sqrt( 1.0 + m.n11 - m.n22 - m.n33 );
+			
+			this.w = (m.n32 - m.n23 ) / s;
+			this.x = 0.25 * s;
+			this.y = (m.n12 + m.n21 ) / s;
+			this.z = (m.n13 + m.n31 ) / s;
+		
+		} else if (m.n22 > m.n33) {
+		
+			s = 2.0 * Math.sqrt( 1.0 + m.n22 - m.n11 - m.n33 );
+			
+			this.w = (m.n13 - m.n31 ) / s;
+			this.x = (m.n12 + m.n21 ) / s;
+			this.y = 0.25 * s;
+			this.z = (m.n23 + m.n32 ) / s;
+		
+		} else {
+		
+			s = 2.0 * Math.sqrt( 1.0 + m.n33 - m.n11 - m.n22 );
+			
+			this.w = ( m.n21 - m.n12 ) / s;
+			this.x = ( m.n13 + m.n31 ) / s;
+			this.y = ( m.n23 + m.n32 ) / s;
+			this.z = 0.25 * s;
+		
 		}
-
-		var absQ = Math.pow( m.determinant(), 1.0 / 3.0 );
-		this.w = Math.sqrt( Math.max( 0, absQ + m.n11 + m.n22 + m.n33 ) ) / 2;
-		this.x = Math.sqrt( Math.max( 0, absQ + m.n11 - m.n22 - m.n33 ) ) / 2;
-		this.y = Math.sqrt( Math.max( 0, absQ - m.n11 + m.n22 - m.n33 ) ) / 2;
-		this.z = Math.sqrt( Math.max( 0, absQ - m.n11 - m.n22 + m.n33 ) ) / 2;
-		this.x = copySign( this.x, ( m.n32 - m.n23 ) );
-		this.y = copySign( this.y, ( m.n13 - m.n31 ) );
-		this.z = copySign( this.z, ( m.n21 - m.n12 ) );
-		this.normalize();
-
+	
 		return this;
 
 	},
