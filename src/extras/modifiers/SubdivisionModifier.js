@@ -111,8 +111,8 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 			else if (!aUv[1]) console.log('b :( ', b+':'+facei);
 			else if (!aUv[2]) console.log('c :( ', c+':'+facei);
 			else if (!aUv[3]) console.log('d :( ', d+':'+facei);
-				else 
-					newUVs.push( aUv );
+			else 
+				newUVs.push( aUv );
 
 		}
 	}
@@ -241,7 +241,14 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 		var theUV = uvForVertices[key];
 
 		if (!theUV) {
+			if (vertexNo>=originalVerticesLength && vertexNo < (originalVerticesLength + originalFaces.length)) {
+				console.log('face pt');
+			}
+
 			console.log('warning, UV not found for', key);
+
+
+
 			return null;
 		}
 
@@ -254,14 +261,6 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 		// edge Points
 
 	}
-
-	// meow = function() {
-	// 	var moo = [];
-	// 	for (var h in hitKey) {
-	// 		moo.push(h);
-	// 	}
-	// 	console.log('meow', moo);	
-	// }
 
 	function addUV(vertexNo, oldFaceNo, value) {
 
@@ -278,13 +277,13 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 	// Step 1
 	//	For each face, add a face point
 	//	Set each face point to be the centroid of all original points for the respective face.
-	console.log(oldGeometry);
+	// console.log(oldGeometry);
 	var i, il, j, jl, face;
 	
 	// For Uvs
 	var uvs = oldGeometry.faceVertexUvs[0];
 	var abcd = 'abcd', vertice;
-	
+
 	console.log('originalFaces, uvs, originalVerticesLength', originalFaces.length, uvs.length, originalVerticesLength);
 	for (i=0, il = uvs.length; i<il; i++ ) {
 		for (j=0,jl=uvs[i].length;j<jl;j++) {
@@ -294,6 +293,8 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 			
 		}
 	}
+
+	if (uvs.length == 0) scope.supportUVs = false;
 
 	// var uvCount = 0;
 	// for (var u in uvForVertices) {
@@ -305,7 +306,7 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 	// 	console.log('no uvs');
 	// }
 
-	console.log('--- Original Faces + Vertices UVs completed', uvForVertices, 'vs', uvs.length);
+	console.log('-- Original Faces + Vertices UVs completed', uvForVertices, 'vs', uvs.length);
 			
 	var avgUv ;
 	for (i=0, il = originalFaces.length; i<il ;i++) {
@@ -483,8 +484,6 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 		avgUv.v = getUV(edgeVertexA, faceIndexA).v + getUV(edgeVertexB, faceIndexA).v;
 		avgUv.u /= 2;
 		avgUv.v /= 2;
-	
-		// addUV(edgePoints[i], '', avgUv);
 
 		addUV(edgePoints[i], faceIndexA, avgUv);
 
@@ -501,8 +500,8 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 		
 	}
 
-	console.log('--- step 2 done');
-	console.log('abcdef', originalVerticesLength, originalFaces.length );
+	console.log('-- Step 2 done');
+
 	// Step 3
 	//	For each face point, add an edge for every edge of the face, 
 	//	connecting the face point to each edge point for the face.
@@ -626,7 +625,7 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 			// R.addSelf(originalPoints[edge[1]].position);
 		}
 		
-		R.divideScalar(n)
+		R.divideScalar(n);
 		
 		newPos.addSelf(originalPoints[i].position);
 		newPos.multiplyScalar(n - 3);
