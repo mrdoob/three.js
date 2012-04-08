@@ -578,7 +578,7 @@
 				mesh.visible = false;
 
 				renderer.autoClear = true;
-				cubeCamera.updatePosition( mesh.position );
+				cubeCamera.position.copy( mesh.position );
 				cubeCamera.updateCubeMap( renderer, scene );
 				renderer.autoClear = false;
 

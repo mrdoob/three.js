@@ -990,7 +990,7 @@
 					veyron.setVisible( false );
 					gallardo.setVisible( false );
 
-					cubeCamera.updatePosition( currentCar.root.position );
+					cubeCamera.position.copy( currentCar.root.position );
 
 					renderer.autoUpdateObjects = false;
 					renderer.initWebGLObjects( scene );
