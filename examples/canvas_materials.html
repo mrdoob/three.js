@@ -190,7 +190,7 @@
 
 			function render() {
 
-				var timer = new Date().getTime() * 0.0001;
+				var timer = Date.now() * 0.0001;
 
 				camera.position.x = Math.cos( timer ) * 1000;
 				camera.position.z = Math.sin( timer ) * 1000;

@@ -11,9 +11,27 @@
 				margin: 0px;
 				overflow: hidden;
 			}
+
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				z-index: 100;
+				display:block;
+
+			}
+
+			a { color: skyblue }
 		</style>
 	</head>
 	<body>
+		<div id="info">
+			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> -
+			monster by <a href="http://www.3drt.com/downloads.htm" target="_blank">3drt</a>
+		</div>
+
 		<script src="../build/Three.js"></script>
 
 		<script src="js/Detector.js"></script>

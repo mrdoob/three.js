@@ -118,12 +118,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	_oldDoubleSided = null,
 	_oldFlipSided = null,
+
 	_oldBlending = null,
+
+	_oldBlendEquation = null,
+	_oldBlendSrc = null,
+	_oldBlendDst = null,
+
 	_oldDepthTest = null,
 	_oldDepthWrite = null,
+
 	_oldPolygonOffset = null,
 	_oldPolygonOffsetFactor = null,
 	_oldPolygonOffsetUnits = null,
+
 	_oldLineWidth = null,
 
 	_viewportX = 0,
@@ -293,6 +301,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		object.__webglInit = false;
 
 		delete object._modelViewMatrix;
+		delete object._normalMatrix;
 
 		delete object._normalMatrixArray;
 		delete object._modelViewMatrixArray;
@@ -1049,7 +1058,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					customAttribute = customAttributes[ i ];
 
 					if ( customAttribute.needsUpdate &&
-					     ( customAttribute.boundTo === undefined ||
+						 ( customAttribute.boundTo === undefined ||
 						   customAttribute.boundTo === "vertices") ) {
 
 						cal = customAttribute.value.length;
@@ -3291,7 +3300,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var i, il,
 
-		program, material,
 		webglObject, object,
 		renderList,
 
@@ -3426,13 +3434,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( scene.overrideMaterial ) {
 
-			this.setBlending( scene.overrideMaterial.blending );
-			this.setDepthTest( scene.overrideMaterial.depthTest );
-			this.setDepthWrite( scene.overrideMaterial.depthWrite );
-			setPolygonOffset( scene.overrideMaterial.polygonOffset, scene.overrideMaterial.polygonOffsetFactor, scene.overrideMaterial.polygonOffsetUnits );
+			var material = scene.overrideMaterial;
 
-			renderObjects( scene.__webglObjects, false, "", camera, lights, fog, true, scene.overrideMaterial );
-			renderObjectsImmediate( scene.__webglObjectsImmediate, "", camera, lights, fog, false, scene.overrideMaterial );
+			this.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst );
+			this.setDepthTest( material.depthTest );
+			this.setDepthWrite( material.depthWrite );
+			setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
+
+			renderObjects( scene.__webglObjects, false, "", camera, lights, fog, true, material );
+			renderObjectsImmediate( scene.__webglObjectsImmediate, "", camera, lights, fog, false, material );
 
 		} else {
 
@@ -3536,7 +3546,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( ! material ) continue;
 
-					if ( useBlending ) _this.setBlending( material.blending );
+					if ( useBlending ) _this.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst );
 
 					_this.setDepthTest( material.depthTest );
 					_this.setDepthWrite( material.depthWrite );
@@ -3583,7 +3593,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( ! material ) continue;
 
-					if ( useBlending ) _this.setBlending( material.blending );
+					if ( useBlending ) _this.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst );
 
 					_this.setDepthTest( material.depthTest );
 					_this.setDepthWrite( material.depthWrite );
@@ -3815,6 +3825,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			object.__webglInit = true;
 
 			object._modelViewMatrix = new THREE.Matrix4();
+			object._normalMatrix = new THREE.Matrix3();
 
 			object._normalMatrixArray = new Float32Array( 9 );
 			object._modelViewMatrixArray = new Float32Array( 16 );
@@ -4928,13 +4939,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		object._modelViewMatrix.multiplyToArray( camera.matrixWorldInverse, object.matrixWorld, object._modelViewMatrixArray );
 
-		var inverseMatrix = THREE.Matrix4.makeInvert3x3( object._modelViewMatrix );
-
-		if ( inverseMatrix ) {
-
-			inverseMatrix.transposeIntoArray( object._normalMatrixArray );
-
-		}
+		object._normalMatrix.getInverse( object._modelViewMatrix );
+		object._normalMatrix.transposeIntoArray( object._normalMatrixArray );
 
 	};
 
@@ -5208,19 +5214,21 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	this.setBlending = function ( blending ) {
+	this.setBlending = function ( blending, blendEquation, blendSrc, blendDst ) {
 
 		if ( blending !== _oldBlending ) {
 
 			switch ( blending ) {
 
 				case THREE.NoBlending:
-                    _gl.disable( _gl.BLEND );
-                    break;
+
+					_gl.disable( _gl.BLEND );
+
+					break;
 
 				case THREE.AdditiveBlending:
 
-                    _gl.enable( _gl.BLEND );
+					_gl.enable( _gl.BLEND );
 					_gl.blendEquation( _gl.FUNC_ADD );
 					_gl.blendFunc( _gl.SRC_ALPHA, _gl.ONE );
 
@@ -5229,7 +5237,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				case THREE.SubtractiveBlending:
 
 					// TODO: Find blendFuncSeparate() combination
-                    _gl.enable( _gl.BLEND );
+					_gl.enable( _gl.BLEND );
 					_gl.blendEquation( _gl.FUNC_ADD );
 					_gl.blendFunc( _gl.ZERO, _gl.ONE_MINUS_SRC_COLOR );
 
@@ -5238,15 +5246,21 @@ THREE.WebGLRenderer = function ( parameters ) {
 				case THREE.MultiplyBlending:
 
 					// TODO: Find blendFuncSeparate() combination
-                    _gl.enable( _gl.BLEND );
+					_gl.enable( _gl.BLEND );
 					_gl.blendEquation( _gl.FUNC_ADD );
 					_gl.blendFunc( _gl.ZERO, _gl.SRC_COLOR );
 
 					break;
 
+				case THREE.CustomBlending:
+
+					_gl.enable( _gl.BLEND );
+
+					break;
+
 				default:
 
-                    _gl.enable( _gl.BLEND );
+					_gl.enable( _gl.BLEND );
 					_gl.blendEquationSeparate( _gl.FUNC_ADD, _gl.FUNC_ADD );
 					_gl.blendFuncSeparate( _gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA, _gl.ONE, _gl.ONE_MINUS_SRC_ALPHA );
 
@@ -5255,6 +5269,33 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 			_oldBlending = blending;
+
+		}
+
+		if ( blending === THREE.CustomBlending ) {
+
+			if ( blendEquation !== _oldBlendEquation ) {
+
+				_gl.blendEquation( paramThreeToGL( blendEquation ) );
+
+				_oldBlendEquation = blendEquation;
+
+			}
+
+			if ( blendSrc !== _oldBlendSrc || blendDst !== _oldBlendDst ) {
+
+				_gl.blendFunc( paramThreeToGL( blendSrc ), paramThreeToGL( blendDst ) );
+
+				_oldBlendSrc = blendSrc;
+				_oldBlendDst = blendDst;
+
+			}
+
+		} else {
+
+			_oldBlendEquation = null;
+			_oldBlendSrc = null;
+			_oldBlendDst = null;
 
 		}
 
@@ -5618,6 +5659,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.activeTexture( _gl.TEXTURE0 + slot );
 			_gl.bindTexture( _gl.TEXTURE_2D, texture.__webglTexture );
 
+			_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
+
 			var image = texture.image,
 			isImagePowerOfTwo = isPowerOfTwo( image.width ) && isPowerOfTwo( image.height ),
 			glFormat = paramThreeToGL( texture.format ),
@@ -5818,6 +5861,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
+				if ( isTargetPowerOfTwo ) _gl.generateMipmap( _gl.TEXTURE_CUBE_MAP );
+
 			} else {
 
 				renderTarget.__webglFramebuffer = _gl.createFramebuffer();
@@ -5830,6 +5875,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				setupFrameBuffer( renderTarget.__webglFramebuffer, renderTarget, _gl.TEXTURE_2D );
 				setupRenderBuffer( renderTarget.__webglRenderbuffer, renderTarget );
+
+				if ( isTargetPowerOfTwo ) _gl.generateMipmap( _gl.TEXTURE_2D );
 
 			}
 
@@ -5966,6 +6013,23 @@ THREE.WebGLRenderer = function ( parameters ) {
 			case THREE.RGBAFormat: return _gl.RGBA; break;
 			case THREE.LuminanceFormat: return _gl.LUMINANCE; break;
 			case THREE.LuminanceAlphaFormat: return _gl.LUMINANCE_ALPHA; break;
+
+			case THREE.AddEquation: return _gl.FUNC_ADD; break;
+			case THREE.SubtractEquation: return _gl.FUNC_SUBTRACT; break;
+			case THREE.ReverseSubtractEquation: return _gl.FUNC_REVERSE_SUBTRACT; break;
+
+			case THREE.ZeroFactor: return _gl.ZERO; break;
+			case THREE.OneFactor: return _gl.ONE; break;
+			case THREE.SrcColorFactor: return _gl.SRC_COLOR; break;
+			case THREE.OneMinusSrcColorFactor: return _gl.ONE_MINUS_SRC_COLOR; break;
+			case THREE.SrcAlphaFactor: return _gl.SRC_ALPHA; break;
+			case THREE.OneMinusSrcAlphaFactor: return _gl.ONE_MINUS_SRC_ALPHA; break;
+			case THREE.DstAlphaFactor: return _gl.DST_ALPHA; break;
+			case THREE.OneMinusDstAlphaFactor: return _gl.ONE_MINUS_DST_ALPHA; break;
+
+			case THREE.DstColorFactor: return _gl.DST_COLOR; break;
+			case THREE.OneMinusDstColorFactor: return _gl.ONE_MINUS_DST_COLOR; break;
+			case THREE.SrcAlphaSaturateFactor: return _gl.SRC_ALPHA_SATURATE; break;
 
 		}
 

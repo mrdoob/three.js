@@ -261,7 +261,7 @@ THREE.LensFlarePlugin = function ( ) {
 						_gl.uniform1f( uniforms.opacity, sprite.opacity );
 						_gl.uniform3f( uniforms.color, sprite.color.r, sprite.color.g, sprite.color.b );
 
-						_renderer.setBlending( sprite.blending );
+						_renderer.setBlending( sprite.blending, sprite.blendEquation, sprite.blendSrc, sprite.blendDst );
 						_renderer.setTexture( sprite.texture, 1 );
 
 						_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );

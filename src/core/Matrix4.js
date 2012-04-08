@@ -20,8 +20,6 @@ THREE.Matrix4 = function ( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33
 
 	);
 
-	this.m33 = new THREE.Matrix3();
-
 };
 
 THREE.Matrix4.prototype = {
@@ -71,7 +69,9 @@ THREE.Matrix4.prototype = {
 
 	lookAt: function ( eye, target, up ) {
 
-		var x = THREE.Matrix4.__v1, y = THREE.Matrix4.__v2, z = THREE.Matrix4.__v3;
+		var x = THREE.Matrix4.__v1;
+		var y = THREE.Matrix4.__v2;
+		var z = THREE.Matrix4.__v3;
 
 		z.sub( eye, target ).normalize();
 
@@ -103,15 +103,15 @@ THREE.Matrix4.prototype = {
 
 	multiply: function ( a, b ) {
 
-		var a11 = a.n11, a12 = a.n12, a13 = a.n13, a14 = a.n14,
-		a21 = a.n21, a22 = a.n22, a23 = a.n23, a24 = a.n24,
-		a31 = a.n31, a32 = a.n32, a33 = a.n33, a34 = a.n34,
-		a41 = a.n41, a42 = a.n42, a43 = a.n43, a44 = a.n44,
+		var a11 = a.n11, a12 = a.n12, a13 = a.n13, a14 = a.n14;
+		var a21 = a.n21, a22 = a.n22, a23 = a.n23, a24 = a.n24;
+		var a31 = a.n31, a32 = a.n32, a33 = a.n33, a34 = a.n34;
+		var a41 = a.n41, a42 = a.n42, a43 = a.n43, a44 = a.n44;
 
-		b11 = b.n11, b12 = b.n12, b13 = b.n13, b14 = b.n14,
-		b21 = b.n21, b22 = b.n22, b23 = b.n23, b24 = b.n24,
-		b31 = b.n31, b32 = b.n32, b33 = b.n33, b34 = b.n34,
-		b41 = b.n41, b42 = b.n42, b43 = b.n43, b44 = b.n44;
+		var b11 = b.n11, b12 = b.n12, b13 = b.n13, b14 = b.n14;
+		var b21 = b.n21, b22 = b.n22, b23 = b.n23, b24 = b.n24;
+		var b31 = b.n31, b32 = b.n32, b33 = b.n33, b34 = b.n34;
+		var b41 = b.n41, b42 = b.n42, b43 = b.n43, b44 = b.n44;
 
 		this.n11 = a11 * b11 + a12 * b21 + a13 * b31 + a14 * b41;
 		this.n12 = a11 * b12 + a12 * b22 + a13 * b32 + a14 * b42;
@@ -169,8 +169,8 @@ THREE.Matrix4.prototype = {
 
 	multiplyVector3: function ( v ) {
 
-		var vx = v.x, vy = v.y, vz = v.z,
-		d = 1 / ( this.n41 * vx + this.n42 * vy + this.n43 * vz + this.n44 );
+		var vx = v.x, vy = v.y, vz = v.z;
+		var d = 1 / ( this.n41 * vx + this.n42 * vy + this.n43 * vz + this.n44 );
 
 		v.x = ( this.n11 * vx + this.n12 * vy + this.n13 * vz + this.n14 ) * d;
 		v.y = ( this.n21 * vx + this.n22 * vy + this.n23 * vz + this.n24 ) * d;
@@ -223,13 +223,14 @@ THREE.Matrix4.prototype = {
 
 	determinant: function () {
 
-		var n11 = this.n11, n12 = this.n12, n13 = this.n13, n14 = this.n14,
-		n21 = this.n21, n22 = this.n22, n23 = this.n23, n24 = this.n24,
-		n31 = this.n31, n32 = this.n32, n33 = this.n33, n34 = this.n34,
-		n41 = this.n41, n42 = this.n42, n43 = this.n43, n44 = this.n44;
+		var n11 = this.n11, n12 = this.n12, n13 = this.n13, n14 = this.n14;
+		var n21 = this.n21, n22 = this.n22, n23 = this.n23, n24 = this.n24;
+		var n31 = this.n31, n32 = this.n32, n33 = this.n33, n34 = this.n34;
+		var n41 = this.n41, n42 = this.n42, n43 = this.n43, n44 = this.n44;
 
 		//TODO: make this more efficient
 		//( based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm )
+
 		return (
 			n14 * n23 * n32 * n41-
 			n13 * n24 * n32 * n41-
@@ -317,107 +318,9 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	setTranslation: function( x, y, z ) {
+	getPosition: function () {
 
-		this.set(
-
-			1, 0, 0, x,
-			0, 1, 0, y,
-			0, 0, 1, z,
-			0, 0, 0, 1
-
-		);
-
-		return this;
-
-	},
-
-	setScale: function ( x, y, z ) {
-
-		this.set(
-
-			x, 0, 0, 0,
-			0, y, 0, 0,
-			0, 0, z, 0,
-			0, 0, 0, 1
-
-		);
-
-		return this;
-
-	},
-
-	setRotationX: function ( theta ) {
-
-		var c = Math.cos( theta ), s = Math.sin( theta );
-
-		this.set(
-
-			1, 0,  0, 0,
-			0, c, -s, 0,
-			0, s,  c, 0,
-			0, 0,  0, 1
-
-		);
-
-		return this;
-
-	},
-
-	setRotationY: function( theta ) {
-
-		var c = Math.cos( theta ), s = Math.sin( theta );
-
-		this.set(
-
-			 c, 0, s, 0,
-			 0, 1, 0, 0,
-			-s, 0, c, 0,
-			 0, 0, 0, 1
-
-		);
-
-		return this;
-
-	},
-
-	setRotationZ: function( theta ) {
-
-		var c = Math.cos( theta ), s = Math.sin( theta );
-
-		this.set(
-
-			c, -s, 0, 0,
-			s,  c, 0, 0,
-			0,  0, 1, 0,
-			0,  0, 0, 1
-
-		);
-
-		return this;
-
-	},
-
-	setRotationAxis: function( axis, angle ) {
-
-		// Based on http://www.gamedev.net/reference/articles/article1199.asp
-
-		var c = Math.cos( angle ),
-		s = Math.sin( angle ),
-		t = 1 - c,
-		x = axis.x, y = axis.y, z = axis.z,
-		tx = t * x, ty = t * y;
-
-		this.set(
-
-		 	tx * x + c, tx * y - s * z, tx * z + s * y, 0,
-			tx * y + s * z, ty * y + c, ty * z - s * x, 0,
-			tx * z - s * y, ty * z + s * x, t * z * z + c, 0,
-			0, 0, 0, 1
-
-		);
-
-		 return this;
+		return THREE.Matrix4.__v1.set( this.n14, this.n24, this.n34 );
 
 	},
 
@@ -428,12 +331,6 @@ THREE.Matrix4.prototype = {
 		this.n34 = v.z;
 
 		return this;
-
-	},
-
-	getPosition: function () {
-
-		return THREE.Matrix4.__v1.set( this.n14, this.n24, this.n34 );
 
 	},
 
@@ -459,10 +356,10 @@ THREE.Matrix4.prototype = {
 
 		// based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
 
-		var n11 = m.n11, n12 = m.n12, n13 = m.n13, n14 = m.n14,
-		n21 = m.n21, n22 = m.n22, n23 = m.n23, n24 = m.n24,
-		n31 = m.n31, n32 = m.n32, n33 = m.n33, n34 = m.n34,
-		n41 = m.n41, n42 = m.n42, n43 = m.n43, n44 = m.n44;
+		var n11 = m.n11, n12 = m.n12, n13 = m.n13, n14 = m.n14;
+		var n21 = m.n21, n22 = m.n22, n23 = m.n23, n24 = m.n24;
+		var n31 = m.n31, n32 = m.n32, n33 = m.n33, n34 = m.n34;
+		var n41 = m.n41, n42 = m.n42, n43 = m.n43, n44 = m.n44;
 
 		this.n11 = n23*n34*n42 - n24*n33*n42 + n24*n32*n43 - n22*n34*n43 - n23*n32*n44 + n22*n33*n44;
 		this.n12 = n14*n33*n42 - n13*n34*n42 - n14*n32*n43 + n12*n34*n43 + n13*n32*n44 - n12*n33*n44;
@@ -488,10 +385,10 @@ THREE.Matrix4.prototype = {
 
 	setRotationFromEuler: function( v, order ) {
 
-		var x = v.x, y = v.y, z = v.z,
-		a = Math.cos( x ), b = Math.sin( x ),
-		c = Math.cos( y ), d = Math.sin( y ),
-		e = Math.cos( z ), f = Math.sin( z );
+		var x = v.x, y = v.y, z = v.z;
+		var a = Math.cos( x ), b = Math.sin( x );
+		var c = Math.cos( y ), d = Math.sin( y );
+		var e = Math.cos( z ), f = Math.sin( z );
 
 		switch ( order ) {
 
@@ -606,11 +503,11 @@ THREE.Matrix4.prototype = {
 
 	setRotationFromQuaternion: function( q ) {
 
-		var x = q.x, y = q.y, z = q.z, w = q.w,
-		x2 = x + x, y2 = y + y, z2 = z + z,
-		xx = x * x2, xy = x * y2, xz = x * z2,
-		yy = y * y2, yz = y * z2, zz = z * z2,
-		wx = w * x2, wy = w * y2, wz = w * z2;
+		var x = q.x, y = q.y, z = q.z, w = q.w;
+		var x2 = x + x, y2 = y + y, z2 = z + z;
+		var xx = x * x2, xy = x * y2, xz = x * z2;
+		var yy = y * y2, yz = y * z2, zz = z * z2;
+		var wx = w * x2, wy = w * y2, wz = w * z2;
 
 		this.n11 = 1 - ( yy + zz );
 		this.n12 = xy - wz;
@@ -628,19 +525,6 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	scale: function ( v ) {
-
-		var x = v.x, y = v.y, z = v.z;
-
-		this.n11 *= x; this.n12 *= y; this.n13 *= z;
-		this.n21 *= x; this.n22 *= y; this.n23 *= z;
-		this.n31 *= x; this.n32 *= y; this.n33 *= z;
-		this.n41 *= x; this.n42 *= y; this.n43 *= z;
-
-		return this;
-
-	},
-
 	compose: function ( translation, rotation, scale ) {
 
 		var mRotation = THREE.Matrix4.__m1;
@@ -649,7 +533,7 @@ THREE.Matrix4.prototype = {
 		mRotation.identity();
 		mRotation.setRotationFromQuaternion( rotation );
 
-		mScale.setScale( scale.x, scale.y, scale.z );
+		mScale.makeScale( scale.x, scale.y, scale.z );
 
 		this.multiply( mRotation, mScale );
 
@@ -743,6 +627,102 @@ THREE.Matrix4.prototype = {
 
 	},
 
+	//
+
+	translate: function ( v ) {
+
+		var x = v.x, y = v.y, z = v.z;
+
+		this.n14 = this.n11 * x + this.n12 * y + this.n13 * z + this.n14;
+		this.n24 = this.n21 * x + this.n22 * y + this.n23 * z + this.n24;
+		this.n34 = this.n31 * x + this.n32 * y + this.n33 * z + this.n34;
+		this.n44 = this.n41 * x + this.n42 * y + this.n43 * z + this.n44;
+
+		return this;
+
+	},
+
+	rotateX: function ( angle ) {
+
+		var m12 = this.n12;
+		var m22 = this.n22;
+		var m32 = this.n32;
+		var m42 = this.n42;
+		var m13 = this.n13;
+		var m23 = this.n23;
+		var m33 = this.n33;
+		var m43 = this.n43;
+		var c = Math.cos( angle );
+		var s = Math.sin( angle );
+
+		this.n12 = c * m12 + s * m13;
+		this.n22 = c * m22 + s * m23;
+		this.n32 = c * m32 + s * m33;
+		this.n42 = c * m42 + s * m43;
+
+		this.n13 = c * m13 - s * m12;
+		this.n23 = c * m23 - s * m22;
+		this.n33 = c * m33 - s * m32;
+		this.n43 = c * m43 - s * m42;
+
+		return this;
+
+  	},
+
+	rotateY: function ( angle ) {
+
+		var m11 = this.n11;
+		var m21 = this.n21;
+		var m31 = this.n31;
+		var m41 = this.n41;
+		var m13 = this.n13;
+		var m23 = this.n23;
+		var m33 = this.n33;
+		var m43 = this.n43;
+		var c = Math.cos( angle );
+		var s = Math.sin( angle );
+
+		this.n11 = c * m11 - s * m13;
+		this.n21 = c * m21 - s * m23;
+		this.n31 = c * m31 - s * m33;
+		this.n41 = c * m41 - s * m43;
+
+		this.n13 = c * m13 + s * m11;
+		this.n23 = c * m23 + s * m21;
+		this.n33 = c * m33 + s * m31;
+		this.n43 = c * m43 + s * m41;
+
+		return this;
+
+	},
+
+	rotateZ: function ( angle ) {
+
+		var m11 = this.n11;
+		var m21 = this.n21;
+		var m31 = this.n31;
+		var m41 = this.n41;
+		var m12 = this.n12;
+		var m22 = this.n22;
+		var m32 = this.n32;
+		var m42 = this.n42;
+		var c = Math.cos( angle );
+		var s = Math.sin( angle );
+
+		this.n11 = c * m11 + s * m12;
+		this.n21 = c * m21 + s * m22;
+		this.n31 = c * m31 + s * m32;
+		this.n41 = c * m41 + s * m42;
+
+		this.n12 = c * m12 - s * m11;
+		this.n22 = c * m22 - s * m21;
+		this.n32 = c * m32 - s * m31;
+		this.n42 = c * m42 - s * m41;
+
+		return this;
+
+	},
+
 	rotateByAxis: function ( axis, angle ) {
 
 		// optimize by checking axis
@@ -761,54 +741,38 @@ THREE.Matrix4.prototype = {
 
 		}
 
-		var x = axis.x,
-			y = axis.y,
-			z = axis.z,
-			n = Math.sqrt(x * x + y * y + z * z);
+		var x = axis.x, y = axis.y, z = axis.z;
+		var n = Math.sqrt(x * x + y * y + z * z);
 
 		x /= n;
 		y /= n;
 		z /= n;
 
-		var xx = x * x,
-			yy = y * y,
-			zz = z * z,
-			c = Math.cos( angle ),
-			s = Math.sin( angle ),
-			oneMinusCosine = 1 - c,
-			xy = x * y * oneMinusCosine,
-			xz = x * z * oneMinusCosine,
-			yz = y * z * oneMinusCosine,
-			xs = x * s,
-			ys = y * s,
-			zs = z * s,
+		var xx = x * x, yy = y * y, zz = z * z;
+		var c = Math.cos( angle );
+		var s = Math.sin( angle );
+		var oneMinusCosine = 1 - c;
+		var xy = x * y * oneMinusCosine;
+		var xz = x * z * oneMinusCosine;
+		var yz = y * z * oneMinusCosine;
+		var xs = x * s;
+		var ys = y * s;
+		var zs = z * s;
 
-			r11 = xx + (1 - xx) * c,
-			r21 = xy + zs,
-			r31 = xz - ys,
-			r12 = xy - zs,
-			r22 = yy + (1 - yy) * c,
-			r32 = yz + xs,
-			r13 = xz + ys,
-			r23 = yz - xs,
-			r33 = zz + (1 - zz) * c,
+		var r11 = xx + (1 - xx) * c;
+		var r21 = xy + zs;
+		var r31 = xz - ys;
+		var r12 = xy - zs;
+		var r22 = yy + (1 - yy) * c;
+		var r32 = yz + xs;
+		var r13 = xz + ys;
+		var r23 = yz - xs;
+		var r33 = zz + (1 - zz) * c;
 
-			m11 = this.n11,
-			m21 = this.n21,
-			m31 = this.n31,
-			m41 = this.n41,
-			m12 = this.n12,
-			m22 = this.n22,
-			m32 = this.n32,
-			m42 = this.n42,
-			m13 = this.n13,
-			m23 = this.n23,
-			m33 = this.n33,
-			m43 = this.n43,
-			m14 = this.n14,
-			m24 = this.n24,
-			m34 = this.n34,
-			m44 = this.n44;
+		var m11 = this.n11, m21 = this.n21, m31 = this.n31, m41 = this.n41;
+		var m12 = this.n12, m22 = this.n22, m32 = this.n32, m42 = this.n42;
+		var m13 = this.n13, m23 = this.n23, m33 = this.n33, m43 = this.n43;
+		var m14 = this.n14, m24 = this.n24, m34 = this.n34, m44 = this.n44;
 
 		this.n11 = r11 * m11 + r21 * m12 + r31 * m13;
 		this.n21 = r11 * m21 + r21 * m22 + r31 * m23;
@@ -829,207 +793,187 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	rotateX: function ( angle ) {
-
-		var m12 = this.n12,
-			m22 = this.n22,
-			m32 = this.n32,
-			m42 = this.n42,
-			m13 = this.n13,
-			m23 = this.n23,
-			m33 = this.n33,
-			m43 = this.n43,
-			c = Math.cos( angle ),
-			s = Math.sin( angle );
-
-		this.n12 = c * m12 + s * m13;
-		this.n22 = c * m22 + s * m23;
-		this.n32 = c * m32 + s * m33;
-		this.n42 = c * m42 + s * m43;
-
-		this.n13 = c * m13 - s * m12;
-		this.n23 = c * m23 - s * m22;
-		this.n33 = c * m33 - s * m32;
-		this.n43 = c * m43 - s * m42;
-
-		return this;
-
-  	},
-
-	rotateY: function ( angle ) {
-
-		var m11 = this.n11,
-			m21 = this.n21,
-			m31 = this.n31,
-			m41 = this.n41,
-			m13 = this.n13,
-			m23 = this.n23,
-			m33 = this.n33,
-			m43 = this.n43,
-			c = Math.cos(angle),
-			s = Math.sin(angle);
-
-		this.n11 = c * m11 - s * m13;
-		this.n21 = c * m21 - s * m23;
-		this.n31 = c * m31 - s * m33;
-		this.n41 = c * m41 - s * m43;
-
-		this.n13 = c * m13 + s * m11;
-		this.n23 = c * m23 + s * m21;
-		this.n33 = c * m33 + s * m31;
-		this.n43 = c * m43 + s * m41;
-
-		return this;
-
-	},
-
-	rotateZ: function ( angle ) {
-
-		var m11 = this.n11,
-			m21 = this.n21,
-			m31 = this.n31,
-			m41 = this.n41,
-			m12 = this.n12,
-			m22 = this.n22,
-			m32 = this.n32,
-			m42 = this.n42,
-			c = Math.cos(angle),
-			s = Math.sin(angle);
-
-		this.n11 = c * m11 + s * m12;
-		this.n21 = c * m21 + s * m22;
-		this.n31 = c * m31 + s * m32;
-		this.n41 = c * m41 + s * m42;
-
-		this.n12 = c * m12 - s * m11;
-		this.n22 = c * m22 - s * m21;
-		this.n32 = c * m32 - s * m31;
-		this.n42 = c * m42 - s * m41;
-
-		return this;
-
-	},
-
-	translate: function ( v ) {
+	scale: function ( v ) {
 
 		var x = v.x, y = v.y, z = v.z;
 
-		this.n14 = this.n11 * x + this.n12 * y + this.n13 * z + this.n14;
-		this.n24 = this.n21 * x + this.n22 * y + this.n23 * z + this.n24;
-		this.n34 = this.n31 * x + this.n32 * y + this.n33 * z + this.n34;
-		this.n44 = this.n41 * x + this.n42 * y + this.n43 * z + this.n44;
+		this.n11 *= x; this.n12 *= y; this.n13 *= z;
+		this.n21 *= x; this.n22 *= y; this.n23 *= z;
+		this.n31 *= x; this.n32 *= y; this.n33 *= z;
+		this.n41 *= x; this.n42 *= y; this.n43 *= z;
 
 		return this;
 
 	},
+
+	//
+
+	makeTranslation: function ( x, y, z ) {
+
+		this.set(
+
+			1, 0, 0, x,
+			0, 1, 0, y,
+			0, 0, 1, z,
+			0, 0, 0, 1
+
+		);
+
+		return this;
+
+	},
+
+	makeRotationX: function ( theta ) {
+
+		var c = Math.cos( theta ), s = Math.sin( theta );
+
+		this.set(
+
+			1, 0,  0, 0,
+			0, c, -s, 0,
+			0, s,  c, 0,
+			0, 0,  0, 1
+
+		);
+
+		return this;
+
+	},
+
+	makeRotationY: function ( theta ) {
+
+		var c = Math.cos( theta ), s = Math.sin( theta );
+
+		this.set(
+
+			 c, 0, s, 0,
+			 0, 1, 0, 0,
+			-s, 0, c, 0,
+			 0, 0, 0, 1
+
+		);
+
+		return this;
+
+	},
+
+	makeRotationZ: function ( theta ) {
+
+		var c = Math.cos( theta ), s = Math.sin( theta );
+
+		this.set(
+
+			c, -s, 0, 0,
+			s,  c, 0, 0,
+			0,  0, 1, 0,
+			0,  0, 0, 1
+
+		);
+
+		return this;
+
+	},
+
+	makeRotationAxis: function ( axis, angle ) {
+
+		// Based on http://www.gamedev.net/reference/articles/article1199.asp
+
+		var c = Math.cos( angle );
+		var s = Math.sin( angle );
+		var t = 1 - c;
+		var x = axis.x, y = axis.y, z = axis.z;
+		var tx = t * x, ty = t * y;
+
+		this.set(
+
+		 	tx * x + c, tx * y - s * z, tx * z + s * y, 0,
+			tx * y + s * z, ty * y + c, ty * z - s * x, 0,
+			tx * z - s * y, ty * z + s * x, t * z * z + c, 0,
+			0, 0, 0, 1
+
+		);
+
+		 return this;
+
+	},
+
+	makeScale: function ( x, y, z ) {
+
+		this.set(
+
+			x, 0, 0, 0,
+			0, y, 0, 0,
+			0, 0, z, 0,
+			0, 0, 0, 1
+
+		);
+
+		return this;
+
+	},
+
+	makeFrustum: function ( left, right, bottom, top, near, far ) {
+
+		var x = 2 * near / ( right - left );
+		var y = 2 * near / ( top - bottom );
+
+		var a = ( right + left ) / ( right - left );
+		var b = ( top + bottom ) / ( top - bottom );
+		var c = - ( far + near ) / ( far - near );
+		var d = - 2 * far * near / ( far - near );
+
+		this.n11 = x;  this.n12 = 0;  this.n13 = a;   this.n14 = 0;
+		this.n21 = 0;  this.n22 = y;  this.n23 = b;   this.n24 = 0;
+		this.n31 = 0;  this.n32 = 0;  this.n33 = c;   this.n34 = d;
+		this.n41 = 0;  this.n42 = 0;  this.n43 = - 1; this.n44 = 0;
+
+		return this;
+
+	},
+
+	makePerspective: function ( fov, aspect, near, far ) {
+
+		var ymax = near * Math.tan( fov * Math.PI / 360 );
+		var ymin = - ymax;
+		var xmin = ymin * aspect;
+		var xmax = ymax * aspect;
+
+		return this.makeFrustum( xmin, xmax, ymin, ymax, near, far );
+
+	},
+
+	makeOrthographic: function ( left, right, top, bottom, near, far ) {
+
+		var w = right - left;
+		var h = top - bottom;
+		var p = far - near;
+
+		var x = ( right + left ) / w;
+		var y = ( top + bottom ) / h;
+		var z = ( far + near ) / p;
+
+		this.n11 = 2 / w; this.n12 = 0;     this.n13 = 0;      this.n14 = -x;
+		this.n21 = 0;     this.n22 = 2 / h; this.n23 = 0;      this.n24 = -y;
+		this.n31 = 0;     this.n32 = 0;     this.n33 = -2 / p; this.n34 = -z;
+		this.n41 = 0;     this.n42 = 0;     this.n43 = 0;      this.n44 = 1;
+
+		return this;
+
+	},
+
 
 	clone: function () {
 
 		return new THREE.Matrix4(
+
 			this.n11, this.n12, this.n13, this.n14,
 			this.n21, this.n22, this.n23, this.n24,
 			this.n31, this.n32, this.n33, this.n34,
 			this.n41, this.n42, this.n43, this.n44
+
 		);
 
 	}
-
-};
-
-THREE.Matrix4.makeInvert3x3 = function ( m1 ) {
-
-	// input:  THREE.Matrix4, output: THREE.Matrix3
-	// ( based on http://code.google.com/p/webgl-mjs/ )
-
-	var m33 = m1.m33, m33m = m33.m,
-	a11 =   m1.n33 * m1.n22 - m1.n32 * m1.n23,
-	a21 = - m1.n33 * m1.n21 + m1.n31 * m1.n23,
-	a31 =   m1.n32 * m1.n21 - m1.n31 * m1.n22,
-	a12 = - m1.n33 * m1.n12 + m1.n32 * m1.n13,
-	a22 =   m1.n33 * m1.n11 - m1.n31 * m1.n13,
-	a32 = - m1.n32 * m1.n11 + m1.n31 * m1.n12,
-	a13 =   m1.n23 * m1.n12 - m1.n22 * m1.n13,
-	a23 = - m1.n23 * m1.n11 + m1.n21 * m1.n13,
-	a33 =   m1.n22 * m1.n11 - m1.n21 * m1.n12,
-
-	det = m1.n11 * a11 + m1.n21 * a12 + m1.n31 * a13,
-
-	idet;
-
-	// no inverse
-
-	if ( det === 0 ) {
-
-		return null;
-
-	}
-
-	idet = 1.0 / det;
-
-	m33m[ 0 ] = idet * a11; m33m[ 1 ] = idet * a21; m33m[ 2 ] = idet * a31;
-	m33m[ 3 ] = idet * a12; m33m[ 4 ] = idet * a22; m33m[ 5 ] = idet * a32;
-	m33m[ 6 ] = idet * a13; m33m[ 7 ] = idet * a23; m33m[ 8 ] = idet * a33;
-
-	return m33;
-
-}
-
-THREE.Matrix4.makeFrustum = function ( left, right, bottom, top, near, far ) {
-
-	var m, x, y, a, b, c, d;
-
-	m = new THREE.Matrix4();
-
-	x = 2 * near / ( right - left );
-	y = 2 * near / ( top - bottom );
-
-	a = ( right + left ) / ( right - left );
-	b = ( top + bottom ) / ( top - bottom );
-	c = - ( far + near ) / ( far - near );
-	d = - 2 * far * near / ( far - near );
-
-	m.n11 = x;  m.n12 = 0;  m.n13 = a;   m.n14 = 0;
-	m.n21 = 0;  m.n22 = y;  m.n23 = b;   m.n24 = 0;
-	m.n31 = 0;  m.n32 = 0;  m.n33 = c;   m.n34 = d;
-	m.n41 = 0;  m.n42 = 0;  m.n43 = - 1; m.n44 = 0;
-
-	return m;
-
-};
-
-THREE.Matrix4.makePerspective = function ( fov, aspect, near, far ) {
-
-	var ymax, ymin, xmin, xmax;
-
-	ymax = near * Math.tan( fov * Math.PI / 360 );
-	ymin = - ymax;
-	xmin = ymin * aspect;
-	xmax = ymax * aspect;
-
-	return THREE.Matrix4.makeFrustum( xmin, xmax, ymin, ymax, near, far );
-
-};
-
-THREE.Matrix4.makeOrtho = function ( left, right, top, bottom, near, far ) {
-
-	var m, x, y, z, w, h, p;
-
-	m = new THREE.Matrix4();
-
-	w = right - left;
-	h = top - bottom;
-	p = far - near;
-
-	x = ( right + left ) / w;
-	y = ( top + bottom ) / h;
-	z = ( far + near ) / p;
-
-	m.n11 = 2 / w; m.n12 = 0;     m.n13 = 0;      m.n14 = -x;
-	m.n21 = 0;     m.n22 = 2 / h; m.n23 = 0;      m.n24 = -y;
-	m.n31 = 0;     m.n32 = 0;     m.n33 = -2 / p; m.n34 = -z;
-	m.n41 = 0;     m.n42 = 0;     m.n43 = 0;      m.n44 = 1;
-
-	return m;
 
 };
 

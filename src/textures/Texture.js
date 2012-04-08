@@ -25,6 +25,7 @@ THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, f
 	this.repeat = new THREE.Vector2( 1, 1 );
 
 	this.generateMipmaps = true;
+	this.premultiplyAlpha = false;
 
 	this.needsUpdate = false;
 	this.onUpdate = null;
@@ -55,16 +56,13 @@ THREE.MixOperation = 1;
 
 // Mapping modes
 
+THREE.UVMapping = function () {};
+
 THREE.CubeReflectionMapping = function () {};
 THREE.CubeRefractionMapping = function () {};
 
-THREE.LatitudeReflectionMapping = function () {};
-THREE.LatitudeRefractionMapping = function () {};
-
 THREE.SphericalReflectionMapping = function () {};
 THREE.SphericalRefractionMapping = function () {};
-
-THREE.UVMapping = function () {};
 
 // Wrapping modes
 
