@@ -317,7 +317,7 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	setTranslation: function( x, y, z ) {
+	makeTranslation: function ( x, y, z ) {
 
 		this.set(
 
@@ -332,22 +332,7 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	setScale: function ( x, y, z ) {
-
-		this.set(
-
-			x, 0, 0, 0,
-			0, y, 0, 0,
-			0, 0, z, 0,
-			0, 0, 0, 1
-
-		);
-
-		return this;
-
-	},
-
-	setRotationX: function ( theta ) {
+	makeRotationX: function ( theta ) {
 
 		var c = Math.cos( theta ), s = Math.sin( theta );
 
@@ -364,7 +349,7 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	setRotationY: function( theta ) {
+	makeRotationY: function ( theta ) {
 
 		var c = Math.cos( theta ), s = Math.sin( theta );
 
@@ -381,7 +366,7 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	setRotationZ: function( theta ) {
+	makeRotationZ: function ( theta ) {
 
 		var c = Math.cos( theta ), s = Math.sin( theta );
 
@@ -398,7 +383,7 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	setRotationAxis: function( axis, angle ) {
+	makeRotationAxis: function ( axis, angle ) {
 
 		// Based on http://www.gamedev.net/reference/articles/article1199.asp
 
@@ -418,6 +403,21 @@ THREE.Matrix4.prototype = {
 		);
 
 		 return this;
+
+	},
+
+	makeScale: function ( x, y, z ) {
+
+		this.set(
+
+			x, 0, 0, 0,
+			0, y, 0, 0,
+			0, 0, z, 0,
+			0, 0, 0, 1
+
+		);
+
+		return this;
 
 	},
 
@@ -649,7 +649,7 @@ THREE.Matrix4.prototype = {
 		mRotation.identity();
 		mRotation.setRotationFromQuaternion( rotation );
 
-		mScale.setScale( scale.x, scale.y, scale.z );
+		mScale.makeScale( scale.x, scale.y, scale.z );
 
 		this.multiply( mRotation, mScale );
 

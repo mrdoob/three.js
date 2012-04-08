@@ -11,7 +11,7 @@ THREE.LatheGeometry = function ( points, steps, angle ) {
 
 	var stepSize = this.angle / this.steps,
 	newV = [], oldInds = [], newInds = [], startInds = [],
-	matrix = new THREE.Matrix4().setRotationZ( stepSize );
+	matrix = new THREE.Matrix4().makeRotationZ( stepSize );
 
 	for ( var j = 0; j < points.length; j ++ ) {
 

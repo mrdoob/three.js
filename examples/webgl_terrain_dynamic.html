@@ -425,7 +425,7 @@
 				// TERRAIN MESH
 
 				var geometryTerrain = new THREE.PlaneGeometry( 6000, 6000, 256, 256 );
-				geometryTerrain.applyMatrix( new THREE.Matrix4().setRotationX( Math.PI / 2 ) );
+				geometryTerrain.applyMatrix( new THREE.Matrix4().makeRotationX( Math.PI / 2 ) );
 
 				geometryTerrain.computeFaceNormals();
 				geometryTerrain.computeVertexNormals();

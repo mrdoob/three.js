@@ -51,7 +51,7 @@ THREE.ArrowHelper.prototype.setDirection = function( dir ) {
 
     var radians = Math.acos( new THREE.Vector3( 0, 1, 0 ).dot( dir.clone().normalize() ) );
 
-    this.matrix = new THREE.Matrix4().setRotationAxis( axis.normalize(), radians );
+    this.matrix = new THREE.Matrix4().makeRotationAxis( axis.normalize(), radians );
 
     this.rotation.getRotationFromMatrix( this.matrix, this.scale );
 

@@ -185,10 +185,10 @@
 
 				info.innerHTML = 'Drag to spin THREE.' + params.type +
 
-				 	'<br/><br/>Subdivisions: '  + subdivisions +
+				 	'<br><br>Subdivisions: '  + subdivisions +
 					' <a href="#" onclick="nextSubdivision(1); return false;">more</a>/<a href="#" onclick="nextSubdivision(-1); return false;">less</a>' +
 					'<br>Geometry: ' + dropdown + ' <a href="#" onclick="nextGeometry();return false;">next</a>' +
-					'<br/><br>Vertices count: before ' + geometry.vertices.length + ' after ' + smooth.vertices.length +
+					'<br><br>Vertices count: before ' + geometry.vertices.length + ' after ' + smooth.vertices.length +
 					'<br>Face count: before ' + geometry.faces.length + ' after ' + smooth.faces.length
 				; //+ params.args;
 			}
@@ -214,7 +214,7 @@
 
 				if ( params.scale ) {
 
-					geometry.applyMatrix( new THREE.Matrix4().setScale( params.scale, params.scale, params.scale ) );
+					geometry.applyMatrix( new THREE.Matrix4().makeScale( params.scale, params.scale, params.scale ) );
 
 				}
 
@@ -362,7 +362,7 @@
 
 				addStuff();
 
-				renderer = new THREE.WebGLRenderer( { antialias: true, clearColor: 0xf0f0f0 } ); // WebGLRenderer CanvasRenderer
+				renderer = new THREE.WebGLRenderer( { antialias: true } ); // WebGLRenderer CanvasRenderer
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.appendChild( renderer.domElement );
