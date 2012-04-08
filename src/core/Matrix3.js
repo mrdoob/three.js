@@ -12,22 +12,22 @@ THREE.Matrix3.prototype = {
 
 	constructor: THREE.Matrix3,
 
-	getInverse: function ( m ) {
+	getInverse: function ( matrix ) {
 
 		// input: THREE.Matrix4
 		// ( based on http://code.google.com/p/webgl-mjs/ )
 
-		var a11 =   m.n33 * m.n22 - m.n32 * m.n23,
-			a21 = - m.n33 * m.n21 + m.n31 * m.n23,
-			a31 =   m.n32 * m.n21 - m.n31 * m.n22,
-			a12 = - m.n33 * m.n12 + m.n32 * m.n13,
-			a22 =   m.n33 * m.n11 - m.n31 * m.n13,
-			a32 = - m.n32 * m.n11 + m.n31 * m.n12,
-			a13 =   m.n23 * m.n12 - m.n22 * m.n13,
-			a23 = - m.n23 * m.n11 + m.n21 * m.n13,
-			a33 =   m.n22 * m.n11 - m.n21 * m.n12;
+		var a11 =   matrix.n33 * matrix.n22 - matrix.n32 * matrix.n23;
+		var a21 = - matrix.n33 * matrix.n21 + matrix.n31 * matrix.n23;
+		var a31 =   matrix.n32 * matrix.n21 - matrix.n31 * matrix.n22;
+		var a12 = - matrix.n33 * matrix.n12 + matrix.n32 * matrix.n13;
+		var a22 =   matrix.n33 * matrix.n11 - matrix.n31 * matrix.n13;
+		var a32 = - matrix.n32 * matrix.n11 + matrix.n31 * matrix.n12;
+		var a13 =   matrix.n23 * matrix.n12 - matrix.n22 * matrix.n13;
+		var a23 = - matrix.n23 * matrix.n11 + matrix.n21 * matrix.n13;
+		var a33 =   matrix.n22 * matrix.n11 - matrix.n21 * matrix.n12;
 
-		var det = m.n11 * a11 + m.n21 * a12 + m.n31 * a13;
+		var det = matrix.n11 * a11 + matrix.n21 * a12 + matrix.n31 * a13;
 
 		// no inverse
 
