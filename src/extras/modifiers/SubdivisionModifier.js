@@ -29,7 +29,7 @@ THREE.SubdivisionModifier = function( subdivisions ) {
 	// Settings
 	this.useOldVertexColors = false;
 	this.supportUVs = true;
-	this.debug = !true;
+	this.debug = false;
 	
 };
 
@@ -266,6 +266,7 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 	var abcd = 'abcd', vertice;
 
 	debug('originalFaces, uvs, originalVerticesLength', originalFaces.length, uvs.length, originalVerticesLength);
+	if (scope.supportUVs)
 	for (i=0, il = uvs.length; i<il; i++ ) {
 		for (j=0,jl=uvs[i].length;j<jl;j++) {
 			vertice = originalFaces[i][abcd.charAt(j)];
