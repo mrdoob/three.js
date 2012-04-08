@@ -301,6 +301,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		object.__webglInit = false;
 
 		delete object._modelViewMatrix;
+		delete object._normalMatrix;
 
 		delete object._normalMatrixArray;
 		delete object._modelViewMatrixArray;
@@ -3824,6 +3825,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			object.__webglInit = true;
 
 			object._modelViewMatrix = new THREE.Matrix4();
+			object._normalMatrix = new THREE.Matrix3();
 
 			object._normalMatrixArray = new Float32Array( 9 );
 			object._modelViewMatrixArray = new Float32Array( 16 );
@@ -4937,13 +4939,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		object._modelViewMatrix.multiplyToArray( camera.matrixWorldInverse, object.matrixWorld, object._modelViewMatrixArray );
 
-		var inverseMatrix = THREE.Matrix4.makeInvert3x3( object._modelViewMatrix );
-
-		if ( inverseMatrix ) {
-
-			inverseMatrix.transposeIntoArray( object._normalMatrixArray );
-
-		}
+		object._normalMatrix.getInverse( object._modelViewMatrix );
+		object._normalMatrix.transposeIntoArray( object._normalMatrixArray );
 
 	};
 

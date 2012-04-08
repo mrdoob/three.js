@@ -20,8 +20,6 @@ THREE.Matrix4 = function ( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33
 
 	);
 
-	this.m33 = new THREE.Matrix3();
-
 };
 
 THREE.Matrix4.prototype = {
@@ -232,6 +230,7 @@ THREE.Matrix4.prototype = {
 
 		//TODO: make this more efficient
 		//( based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm )
+
 		return (
 			n14 * n23 * n32 * n41-
 			n13 * n24 * n32 * n41-
@@ -962,6 +961,7 @@ THREE.Matrix4.prototype = {
 
 	},
 
+
 	clone: function () {
 
 		return new THREE.Matrix4(
@@ -976,44 +976,6 @@ THREE.Matrix4.prototype = {
 	}
 
 };
-
-THREE.Matrix4.makeInvert3x3 = function ( m1 ) {
-
-	// input:  THREE.Matrix4, output: THREE.Matrix3
-	// ( based on http://code.google.com/p/webgl-mjs/ )
-
-	var m33 = m1.m33, m33m = m33.m,
-	a11 =   m1.n33 * m1.n22 - m1.n32 * m1.n23,
-	a21 = - m1.n33 * m1.n21 + m1.n31 * m1.n23,
-	a31 =   m1.n32 * m1.n21 - m1.n31 * m1.n22,
-	a12 = - m1.n33 * m1.n12 + m1.n32 * m1.n13,
-	a22 =   m1.n33 * m1.n11 - m1.n31 * m1.n13,
-	a32 = - m1.n32 * m1.n11 + m1.n31 * m1.n12,
-	a13 =   m1.n23 * m1.n12 - m1.n22 * m1.n13,
-	a23 = - m1.n23 * m1.n11 + m1.n21 * m1.n13,
-	a33 =   m1.n22 * m1.n11 - m1.n21 * m1.n12,
-
-	det = m1.n11 * a11 + m1.n21 * a12 + m1.n31 * a13,
-
-	idet;
-
-	// no inverse
-
-	if ( det === 0 ) {
-
-		return null;
-
-	}
-
-	idet = 1.0 / det;
-
-	m33m[ 0 ] = idet * a11; m33m[ 1 ] = idet * a21; m33m[ 2 ] = idet * a31;
-	m33m[ 3 ] = idet * a12; m33m[ 4 ] = idet * a22; m33m[ 5 ] = idet * a32;
-	m33m[ 6 ] = idet * a13; m33m[ 7 ] = idet * a23; m33m[ 8 ] = idet * a33;
-
-	return m33;
-
-}
 
 THREE.Matrix4.__v1 = new THREE.Vector3();
 THREE.Matrix4.__v2 = new THREE.Vector3();
