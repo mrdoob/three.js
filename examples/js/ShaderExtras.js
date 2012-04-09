@@ -1189,6 +1189,7 @@ THREE.ShaderExtras = {
 				"vec3 rgbSW = texture2D( tDiffuse, ( gl_FragCoord.xy + vec2( -1.0, 1.0 ) ) * resolution ).xyz;",
 				"vec3 rgbSE = texture2D( tDiffuse, ( gl_FragCoord.xy + vec2( 1.0, 1.0 ) ) * resolution ).xyz;",
 				"vec3 rgbM  = texture2D( tDiffuse,  gl_FragCoord.xy  * resolution ).xyz;",
+				"float opacity  = texture2D( tDiffuse,  gl_FragCoord.xy  * resolution ).w;",
 
 				"vec3 luma = vec3( 0.299, 0.587, 0.114 );",
 
@@ -1223,11 +1224,11 @@ THREE.ShaderExtras = {
 
 				"if ( ( lumaB < lumaMin ) || ( lumaB > lumaMax ) ) {",
 
-					"gl_FragColor = vec4( rgbA, 1.0 );",
+					"gl_FragColor = vec4( rgbA, opacity );",
 
 				"} else {",
 
-					"gl_FragColor = vec4( rgbB, 1.0 );",
+					"gl_FragColor = vec4( rgbB, opacity );",
 
 				"}",
 
