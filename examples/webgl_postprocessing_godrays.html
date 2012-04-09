@@ -40,7 +40,7 @@
 		<script src='js/DAT.GUI.min.js'></script>
 
 		<div id="info">
-			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl god-rays example - tree from turbosquid</a>
+			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl god-rays example - tree by <a href="http://www.turbosquid.com/3d-models/free-tree-3d-model/592617" target="_blank">stanloshka</a>
 		</div>
 
 
@@ -50,10 +50,8 @@
 
 			var container, stats;
 			var camera, scene, renderer,
-				materials = [], objects = [],
-				singleMaterial, zmaterial = [],
-				parameters, i, j, k, h, color, x, y, z, s, n, nobjects,
-				material_depth, cubeMaterial;
+				parameters, material_depth;
+			
             var tree_mesh, sphere_mesh;
             
     		var proj = new THREE.Projector();
@@ -88,46 +86,14 @@
 
 				renderer.sortObjects = false;
 
-
                 // todo - try with fog?
 				//scene.fog = new THREE.Fog( 0xffaa55, 1000, FAR );
 				//THREE.ColorUtils.adjustHSV( scene.fog.color, 0.02, -0.15, -0.65 );
                 
 				material_depth = new THREE.MeshDepthMaterial();
 
-				var path = "textures/cube/SwedishRoyalCastle/";
-				var format = '.jpg';
-				var urls = [
-						path + 'px' + format, path + 'nx' + format,
-						path + 'py' + format, path + 'ny' + format,
-						path + 'pz' + format, path + 'nz' + format
-					];
-
-				var textureCube = THREE.ImageUtils.loadTextureCube( urls );
-
-                // was 0x003300
-                // then 0x050500
-				parameters = { color: 0x000000, /*envMap: textureCube,*/ shading: THREE.FlatShading };
-				cubeMaterial = new THREE.MeshBasicMaterial( parameters );
-
-				singleMaterial = false;
-
-				if( singleMaterial ) zmaterial = [ cubeMaterial ];
-
-				var start = new Date().getTime();
-
-				renderer.initMaterial( cubeMaterial, scene.__lights, scene.fog );
-
-				var xgrid = 1, //14,
-					ygrid = 1, //9,
-					zgrid = 1; //14;
-
-				nobjects = xgrid * ygrid * zgrid;
-
-				c = 0;
-
+				parameters = { color: 0x000000, shading: THREE.FlatShading };
                 var zmat = new THREE.MeshBasicMaterial( parameters );
-				//renderer.initMaterial( materials[ c ], scene.__lights, scene.fog, mesh );
         		
         		// tree mesh	
                 var jsonLoader = new THREE.JSONLoader();
@@ -140,27 +106,9 @@
 				        m.matrixAutoUpdate = false;
 				        m.updateMatrix();
 				        scene.add( m );
-				        objects.push( m );
 				        tree_mesh = m;
                     }
                     );
-                /*
-        		// cog mesh	
-                var jsonLoader = new THREE.JSONLoader();
-                jsonLoader.load( "obj/cog/cog1.js",
-                    function( geometry ) {
-                        var m = new THREE.Mesh( geometry, zmat );
-				        m.position.set( -150, -150, -150 );
-				        var sc = 400;
-				        m.scale.set( sc, sc, sc );
-				        m.matrixAutoUpdate = false;
-				        m.updateMatrix();
-				        scene.add( m );
-				        objects.push( m );
-				        //tree_mesh = m;
-                    }
-                    );
-                */
 
 				var geo = new THREE.SphereGeometry( 1, 20, 10 );
 				mesh = new THREE.Mesh( geo, zmat );
@@ -172,7 +120,6 @@
 				mesh.updateMatrix();
 
 				scene.add( mesh );
-				objects.push( mesh );
 				sphere_mesh = mesh;
 				
 				scene.matrixAutoUpdate = false;
@@ -264,8 +211,7 @@
 				// targets but the aliasing causes some temporal flickering
 				postprocessing.rtTextureDepth = new THREE.WebGLRenderTarget( window.innerWidth, height, pars );
 				
-				// Aggressive downsizing to minimize cost of postprocessing passes. God rays
-				// are low frequency so aliasing is less noticeable.
+				// Aggressive downsize god-ray ping-pong render targets to minimize cost 
 				var w = window.innerWidth / 4.0;
 				var h = height / 4.0;
 				postprocessing.rtTextureGodRays1 = new THREE.WebGLRenderTarget( w, h, pars );
@@ -306,13 +252,6 @@
 
 				requestAnimationFrame( animate, renderer.domElement );
 				
-                if( sphere_mesh ) {
-                    var radius = 100;
-                    sphere_mesh.position.x = 200*Math.cos(Date.now()/4000);
-                    sphere_mesh.position.z = 200*Math.sin(Date.now()/4000)-100;
-                    sphere_mesh.updateMatrix();
-                }
-                
 				render();
 				stats.update();
 
@@ -320,63 +259,69 @@
 
 			function render() {
 
-				var time = Date.now() * 0.00005;
-
+                if( sphere_mesh ) {
+                    var radius = 100;
+                    sphere_mesh.position.x = 200*Math.cos(Date.now()/4000);
+                    sphere_mesh.position.z = 200*Math.sin(Date.now()/4000)-100;
+                    sphere_mesh.updateMatrix();
+                }
+                
 				camera.position.x += ( mouseX - camera.position.x ) * 0.036;
 				camera.position.y += ( - (mouseY) - camera.position.y ) * 0.036;
 
 				camera.lookAt( scene.position );
 				
 				if (  postprocessing.enabled ) {
-
-		            var sspos = new THREE.Vector3( sunPos.x, sunPos.y, sunPos.z); //new THREE.Vector3();
-		            //var sspos = new THREE.Vector3( sphere_mesh.position.x, sphere_mesh.position.y, sphere_mesh.position.z); //new THREE.Vector3();
+                    
+                    // Find the screenspace position of the sun
+		            var sspos = new THREE.Vector3( sunPos.x, sunPos.y, sunPos.z);
     				proj.projectVector(sspos,camera);
     				sspos.x = (sspos.x+1)/2;
     				sspos.y = (sspos.y+1)/2;
+    				
+    				// Give it to the god-ray and sun shaders
 					postprocessing.godray_gen_uniforms[ "vSunPositionScreenSpace" ].value = 
 					    new THREE.Vector2(sspos.x,sspos.y);
 					postprocessing.godrays_fake_sun_uniforms[ "vSunPositionScreenSpace" ].value = 
 					    new THREE.Vector2(sspos.x,sspos.y);
 					
-					// Draw sun and sky ----------------------------------
+					// Draw sky and sun ----------------------------------
 					
 					// Clear colors and depths, will clear to sky color
 					renderer.clearTarget(postprocessing.rtTextureColors,true,true,false);
 					
-					// My poor excuse for rendering a sun. Runs a shader that gives
-					// a brightness based on the screen space distance to the sun. Not very
-					// efficient, so i make a scissor rect around the suns position to
-					// avoid rendering surrounding pixels
+					// Sun render. Runs a shader that gives a brightness based on the screen
+					// space distance to the sun. Not very efficient, so i make a scissor
+					// rect around the suns position to avoid rendering surrounding pixels.
 					var sunsqH = 0.74 * height; // .74 depends on extent of sun from shader
 					var sunsqW = 0.74 * height; // both dep on height because sun is aspect-corrected
 					sspos.x *= window.innerWidth;
 					sspos.y *= height;
 					renderer.setScissor( sspos.x-sunsqW/2,sspos.y-sunsqH/2,sunsqW,sunsqH );
 					renderer.enableScissorTest ( true );
-					
 					postprocessing.godrays_fake_sun_uniforms[ "fAspect" ].value = window.innerWidth / height;
-					    
 					postprocessing.scene.overrideMaterial = postprocessing.materialGodraysFakeSun;
 					renderer.render( postprocessing.scene, postprocessing.camera, postprocessing.rtTextureColors );
-					
 					renderer.enableScissorTest ( false );
 					
-					// draw scene objects (e.g. tree)
+					// Draw scene objects ----------------------------------
+					
+					// Colors
 					scene.overrideMaterial = null;
 					renderer.render( scene, camera, postprocessing.rtTextureColors );
 					
-					// Render scene objects depth into texture
+					// Depth
 					scene.overrideMaterial = material_depth;
 					renderer.render( scene, camera, postprocessing.rtTextureDepth, true );
                     
+					// Render god-rays ----------------------------------
                     
-					// Render godray composite
-                    
+                    // Maximum length of god-rays (in texture space [0,1]X[0,1])
     				var filterLen = 1.0;
+    				// Samples taken by filter
     				var TAPS_PER_PASS = 6.0;
     				
-    				// pass order could equivalently be 3,2,1 (instead of 1,2,3), which
+    				// Pass order could equivalently be 3,2,1 (instead of 1,2,3), which
     				// would start with a small filter support and grow to large. however
     				// the large-to-small order produces less objectionable aliasing artifacts that
     				// appear as a glimmer along the length of the beams
@@ -387,46 +332,32 @@
     				postprocessing.godray_gen_uniforms[ "fStepSize" ].value = stepLen;
     				postprocessing.godray_gen_uniforms[ "tInput" ].texture = postprocessing.rtTextureDepth;
 					postprocessing.scene.overrideMaterial = postprocessing.materialGodraysGenerate;
-
-                    var onepass = 0;
-                    
-    				if( onepass ) {
-					    renderer.render( postprocessing.scene, postprocessing.camera );
-    				} else {
-					    renderer.render( postprocessing.scene, postprocessing.camera, postprocessing.rtTextureGodRays2 );
-    					
-					    // pass 2 - render into second ping-pong target
-        				pass = 2.0;
-        				stepLen = filterLen*Math.pow(TAPS_PER_PASS, -pass);
-    				    postprocessing.godray_gen_uniforms[ "fStepSize" ].value = stepLen;
-    				    postprocessing.godray_gen_uniforms[ "tInput" ].texture = postprocessing.rtTextureGodRays2;
-				        renderer.render( postprocessing.scene, postprocessing.camera , postprocessing.rtTextureGodRays1  );
-					    
-				        // pass 3 - RT
-				        pass = 3.0;
-    				    stepLen = filterLen*Math.pow(TAPS_PER_PASS, -pass);
-				        postprocessing.godray_gen_uniforms[ "fStepSize" ].value = stepLen;
-				        postprocessing.godray_gen_uniforms[ "tInput" ].texture = postprocessing.rtTextureGodRays1;
-				        renderer.render( postprocessing.scene, postprocessing.camera , postprocessing.rtTextureGodRays2  );
-				        
-				        postprocessing.godray_combine_uniforms["tColors"].texture = postprocessing.rtTextureColors;
-				        postprocessing.godray_combine_uniforms["tGodRays"].texture = postprocessing.rtTextureGodRays2;
-    					postprocessing.scene.overrideMaterial = postprocessing.materialGodraysCombine;
-   				        renderer.render( postprocessing.scene, postprocessing.camera );
-	    				postprocessing.scene.overrideMaterial = null;
-				        
-				    }
-
+				    renderer.render( postprocessing.scene, postprocessing.camera, postprocessing.rtTextureGodRays2 );
+					
+				    // pass 2 - render into second ping-pong target
+    				pass = 2.0;
+    				stepLen = filterLen*Math.pow(TAPS_PER_PASS, -pass);
+				    postprocessing.godray_gen_uniforms[ "fStepSize" ].value = stepLen;
+				    postprocessing.godray_gen_uniforms[ "tInput" ].texture = postprocessing.rtTextureGodRays2;
+			        renderer.render( postprocessing.scene, postprocessing.camera , postprocessing.rtTextureGodRays1  );
+				    
+			        // pass 3 - RT
+			        pass = 3.0;
+				    stepLen = filterLen*Math.pow(TAPS_PER_PASS, -pass);
+			        postprocessing.godray_gen_uniforms[ "fStepSize" ].value = stepLen;
+			        postprocessing.godray_gen_uniforms[ "tInput" ].texture = postprocessing.rtTextureGodRays1;
+			        renderer.render( postprocessing.scene, postprocessing.camera , postprocessing.rtTextureGodRays2  );
+			        
+			        postprocessing.godray_combine_uniforms["tColors"].texture = postprocessing.rtTextureColors;
+			        postprocessing.godray_combine_uniforms["tGodRays"].texture = postprocessing.rtTextureGodRays2;
+					postprocessing.scene.overrideMaterial = postprocessing.materialGodraysCombine;
+			        renderer.render( postprocessing.scene, postprocessing.camera );
+    				postprocessing.scene.overrideMaterial = null;
 				} else {
-
 					renderer.clear();
 					renderer.render( scene, camera );
-
 				}
-
 			}
-
-
 		</script>
 	</body>
 </html>
