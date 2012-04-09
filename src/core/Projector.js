@@ -328,7 +328,7 @@ THREE.Projector = function() {
 					v1.positionScreen.copy( vertices[ v ].position );
 					_projScreenobjectMatrixWorld.multiplyVector4( v1.positionScreen );
 
-					if ( v % step !== 0 ) continue;
+					if ( ( v + 1 ) % step > 0 ) continue;
 
 					v2 = _vertexPool[ _vertexCount - 2 ];
 
