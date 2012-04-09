@@ -314,16 +314,21 @@ THREE.Projector = function() {
 				_projScreenobjectMatrixWorld.multiply( _projScreenMatrix, objectMatrixWorld );
 
 				vertices = object.geometry.vertices;
-
+				
 				v1 = getNextVertexInPool();
 				v1.positionScreen.copy( vertices[ 0 ].position );
 				_projScreenobjectMatrixWorld.multiplyVector4( v1.positionScreen );
 
-				for ( v = 1, vl = vertices.length; v < vl; v++ ) {
+				// Handle LineStrip and LinePieces
+				var step = object.type === THREE.LinePieces ? 2 : 1;
+
+				for ( v = 1, vl = vertices.length; v < vl; v ++ ) {
 
 					v1 = getNextVertexInPool();
 					v1.positionScreen.copy( vertices[ v ].position );
 					_projScreenobjectMatrixWorld.multiplyVector4( v1.positionScreen );
+
+					if ( v % step !== 0 ) continue;
 
 					v2 = _vertexPool[ _vertexCount - 2 ];
 
