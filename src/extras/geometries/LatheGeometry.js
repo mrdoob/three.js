@@ -1,5 +1,6 @@
 /**
  * @author astrodud / http://astrodud.isgreat.org/
+ * @author zz85 / https://github.com/zz85
  */
 
 THREE.LatheGeometry = function ( points, steps, angle ) {
@@ -10,7 +11,7 @@ THREE.LatheGeometry = function ( points, steps, angle ) {
 	this.angle = angle || 2 * Math.PI;
 
 	var stepSize = this.angle / this.steps,
-	newV = [], oldInds = [], newInds = [], startInds = [],
+	newV = [],
 	matrix = new THREE.Matrix4().makeRotationZ( stepSize );
 
 	for ( var j = 0; j < points.length; j ++ ) {
@@ -18,46 +19,42 @@ THREE.LatheGeometry = function ( points, steps, angle ) {
 		this.vertices.push( new THREE.Vertex( points[ j ] ) );
 
 		newV[ j ] = points[ j ].clone();
-		oldInds[ j ] = this.vertices.length - 1;
 
 	}
 
-	for ( var r = 0; r <= this.angle + 0.001; r += stepSize ) { // need the +0.001 for it go up to angle
+	for ( var i = 0; i < this.steps; i ++ ) {
 
 		for ( var j = 0; j < newV.length; j ++ ) {
 
-			if ( r < this.angle ) {
-
 				newV[ j ] = matrix.multiplyVector3( newV[ j ].clone() );
 				this.vertices.push( new THREE.Vertex( newV[ j ] ) );
-				newInds[ j ] = this.vertices.length - 1;
-
-			} else {
-
-				newInds = startInds; // wrap it up!
-
-			}
 
 		}
 
-		if ( r == 0 ) startInds = oldInds;
+		var a, b, c, d;
+		var steps = this.steps;
+		for ( var k = 0, kl = points.length; k < kl-1; k++) {
 
-		for ( var j = 0; j < oldInds.length - 1; j ++ ) {
+			a = i * kl + k;
+			b = ((i + 1) % steps) * kl + k;
+			c = ((i + 1) % steps) * kl + (k + 1) % kl;
+			d = i * kl + (k + 1) % kl;
+			
 
-			this.faces.push( new THREE.Face4( newInds[ j ], newInds[ j + 1 ], oldInds[ j + 1 ], oldInds[ j ] ) );
+			this.faces.push( new THREE.Face4( a, b, c, d ) );
+
 			this.faceVertexUvs[ 0 ].push( [
 
-				new THREE.UV( 1 - r / this.angle, j / points.length ),
-				new THREE.UV( 1 - r / this.angle, ( j + 1 ) / points.length ),
-				new THREE.UV( 1 - ( r - stepSize ) / this.angle, ( j + 1 ) / points.length ),
-				new THREE.UV( 1 - ( r - stepSize ) / this.angle, j / points.length )
-
+				// UV mappings which wraps around
+				new THREE.UV( 1 - i / steps, k / kl ),
+				new THREE.UV( 1 - (i + 1) / steps, k / kl ),
+				new THREE.UV( 1 - (i + 1) / steps, ( k+ 1 ) / kl ),
+				new THREE.UV( 1 - i / steps, ( k + 1 ) / kl ),
+				
 			] );
 
 		}
 
-		oldInds = newInds;
-		newInds = [];
 
 	}
 

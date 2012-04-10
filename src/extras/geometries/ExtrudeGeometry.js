@@ -105,9 +105,8 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 		// Reuse TNB from TubeGeomtry for now.
 		// TODO1 - have a .isClosed in spline?
-		// TODO2 - have have TNBs calculation refactored from TubeGeometry?
-		splineTube = new THREE.TubeGeometry(extrudePath, steps, 1, 1, false, false);
-		
+		splineTube = new THREE.TubeGeometry.FrenetFrames(extrudePath, steps, false);
+
 		// console.log(splineTube, 'splineTube', splineTube.normals.length, 'steps', steps, 'extrudePts', extrudePts.length);
 
 		binormal = new THREE.Vector3();

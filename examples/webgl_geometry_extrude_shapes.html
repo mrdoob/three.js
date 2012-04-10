@@ -114,21 +114,11 @@
           new THREE.Vector3( 10, 60, 49),
           new THREE.Vector3( 25, 80, 40)
 
-          // new THREE.Vector3( 0, 12, 83),
-          // new THREE.Vector3( 0, 20, 67),
-          // new THREE.Vector3( 0, 40, 99),
-          // new THREE.Vector3( 0, 60, 49),
-          // new THREE.Vector3( 0, 80, 40)
+        ]);
 
-          // new THREE.Vector3( 12, 83, 0 ),
-          // new THREE.Vector3( 20, 67, 0 ),
-          // new THREE.Vector3( 40, 99, 0 ),
-          // new THREE.Vector3( 60, 49, 0 ),
-          // new THREE.Vector3( 80, 40, 0 )
-          ]);
-
-            var pipeSpline = new THREE.SplineCurve3([
-        new THREE.Vector3(0, 10, -10), new THREE.Vector3(10, 0, -10), new THREE.Vector3(20, 0, 0), new THREE.Vector3(30, 0, 10), new THREE.Vector3(30, 0, 20), new THREE.Vector3(20, 0, 30), new THREE.Vector3(10, 0, 30), new THREE.Vector3(0, 0, 30), new THREE.Vector3(-10, 10, 30), new THREE.Vector3(-10, 20, 30), new THREE.Vector3(0, 30, 30), new THREE.Vector3(10, 30, 30), new THREE.Vector3(20, 30, 15), new THREE.Vector3(10, 30, 10), new THREE.Vector3(0, 30, 10), new THREE.Vector3(-10, 20, 10), new THREE.Vector3(-10, 10, 10), new THREE.Vector3(0, 0, 10), new THREE.Vector3(10, -10, 10), new THREE.Vector3(20, -15, 10), new THREE.Vector3(30, -15, 10), new THREE.Vector3(40, -15, 10), new THREE.Vector3(50, -15, 10), new THREE.Vector3(60, 0, 10), new THREE.Vector3(70, 0, 0), new THREE.Vector3(80, 0, 0), new THREE.Vector3(90, 0, 0), new THREE.Vector3(100, 0, 0)]);
+        var pipeSpline = new THREE.SplineCurve3([
+        
+          new THREE.Vector3(0, 10, -10), new THREE.Vector3(10, 0, -10), new THREE.Vector3(20, 0, 0), new THREE.Vector3(30, 0, 10), new THREE.Vector3(30, 0, 20), new THREE.Vector3(20, 0, 30), new THREE.Vector3(10, 0, 30), new THREE.Vector3(0, 0, 30), new THREE.Vector3(-10, 10, 30), new THREE.Vector3(-10, 20, 30), new THREE.Vector3(0, 30, 30), new THREE.Vector3(10, 30, 30), new THREE.Vector3(20, 30, 15), new THREE.Vector3(10, 30, 10), new THREE.Vector3(0, 30, 10), new THREE.Vector3(-10, 20, 10), new THREE.Vector3(-10, 10, 10), new THREE.Vector3(0, 0, 10), new THREE.Vector3(10, -10, 10), new THREE.Vector3(20, -15, 10), new THREE.Vector3(30, -15, 10), new THREE.Vector3(40, -15, 10), new THREE.Vector3(50, -15, 10), new THREE.Vector3(60, 0, 10), new THREE.Vector3(70, 0, 0), new THREE.Vector3(80, 0, 0), new THREE.Vector3(90, 0, 0), new THREE.Vector3(100, 0, 0)]);
 
         var sampleClosedSpline = new THREE.ClosedSplineCurve3([
           new THREE.Vector3(0, -40, -40),
@@ -163,11 +153,6 @@
         var rectLength = 12, rectWidth = 4;
 
         var rectShape = new THREE.Shape();
-        // rectShape.moveTo( 0,0 );
-        // rectShape.lineTo( 0, rectWidth );
-        // rectShape.lineTo( rectLength, rectWidth );
-        // rectShape.lineTo( rectLength, 0 );
-        // rectShape.lineTo( 0, 0 );
 
         rectShape.moveTo( -rectLength/2, -rectWidth/2 );
         rectShape.lineTo( -rectLength/2, rectWidth/2 );
@@ -175,6 +160,21 @@
         rectShape.lineTo( rectLength/2, -rectLength/2 );
         rectShape.lineTo( -rectLength/2, -rectLength/2 );
 
+
+       
+        
+        var pts = [], starPoints = 5, l;
+        for (i=0; i<starPoints*2;i++) {
+          if (i%2==1) {
+            l = 5;
+          } else {
+            l = 10;
+          }
+
+          var a = i / starPoints * Math.PI;
+          pts.push(new THREE.Vector2(Math.cos(a) * l,Math.sin(a) * l ));
+        }
+      var starShape = new THREE.Shape(pts);
 
         // Smiley
 
@@ -193,12 +193,6 @@
         smileyShape.holes.push( smileyEye2Path );
 
         var smileyMouthPath = new THREE.Path();
-        // ugly box mouth
-        // smileyMouthPath.moveTo( 20, 40 );
-        // smileyMouthPath.lineTo( 60, 40 );
-        // smileyMouthPath.lineTo( 60, 60 );
-        // smileyMouthPath.lineTo( 20, 60 );
-        // smileyMouthPath.lineTo( 20, 40 );
 
         smileyMouthPath.moveTo( 20, 40 );
         smileyMouthPath.quadraticCurveTo( 40, 60, 60, 40 );
@@ -208,10 +202,7 @@
 
         smileyShape.holes.push( smileyMouthPath );
 
-
-
-
-        var circle3d = rectShape.extrude( extrudeSettings ); //circleShape rectShape smileyShape
+        var circle3d = starShape.extrude( extrudeSettings ); //circleShape rectShape smileyShape starShape
         // var circle3d = new THREE.ExtrudeGeometry(circleShape, extrudeBend, extrudeSettings );
         
         var tube = new THREE.TubeGeometry(extrudeSettings.extrudePath, 150, 4, 5, false, true);
