@@ -86,7 +86,7 @@
 
 				renderer.sortObjects = false;
 
-                // todo - try with fog?
+                // todo - try with fog
 				//scene.fog = new THREE.Fog( 0xffaa55, 1000, FAR );
 				//THREE.ColorUtils.adjustHSV( scene.fog.color, 0.02, -0.15, -0.65 );
                 
@@ -341,7 +341,7 @@
 				    postprocessing.godray_gen_uniforms[ "tInput" ].texture = postprocessing.rtTextureGodRays2;
 			        renderer.render( postprocessing.scene, postprocessing.camera , postprocessing.rtTextureGodRays1  );
 				    
-			        // pass 3 - RT
+			        // pass 3 - 1st RT
 			        pass = 3.0;
 				    stepLen = filterLen*Math.pow(TAPS_PER_PASS, -pass);
 			        postprocessing.godray_gen_uniforms[ "fStepSize" ].value = stepLen;
