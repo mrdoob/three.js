@@ -23,12 +23,12 @@ THREE.Frustum.prototype.setFromMatrix = function ( m ) {
 	var i, plane,
 	planes = this.planes;
 
-	planes[ 0 ].set( m.n41 - m.n11, m.n42 - m.n12, m.n43 - m.n13, m.n44 - m.n14 );
-	planes[ 1 ].set( m.n41 + m.n11, m.n42 + m.n12, m.n43 + m.n13, m.n44 + m.n14 );
-	planes[ 2 ].set( m.n41 + m.n21, m.n42 + m.n22, m.n43 + m.n23, m.n44 + m.n24 );
-	planes[ 3 ].set( m.n41 - m.n21, m.n42 - m.n22, m.n43 - m.n23, m.n44 - m.n24 );
-	planes[ 4 ].set( m.n41 - m.n31, m.n42 - m.n32, m.n43 - m.n33, m.n44 - m.n34 );
-	planes[ 5 ].set( m.n41 + m.n31, m.n42 + m.n32, m.n43 + m.n33, m.n44 + m.n34 );
+	planes[ 0 ].set( m.elements[3] - m.elements[0], m.elements[7] - m.elements[4], m.elements[11] - m.elements[8], m.elements[15] - m.elements[12] );
+	planes[ 1 ].set( m.elements[3] + m.elements[0], m.elements[7] + m.elements[4], m.elements[11] + m.elements[8], m.elements[15] + m.elements[12] );
+	planes[ 2 ].set( m.elements[3] + m.elements[1], m.elements[7] + m.elements[5], m.elements[11] + m.elements[9], m.elements[15] + m.elements[13] );
+	planes[ 3 ].set( m.elements[3] - m.elements[1], m.elements[7] - m.elements[5], m.elements[11] - m.elements[9], m.elements[15] - m.elements[13] );
+	planes[ 4 ].set( m.elements[3] - m.elements[2], m.elements[7] - m.elements[6], m.elements[11] - m.elements[10], m.elements[15] - m.elements[14] );
+	planes[ 5 ].set( m.elements[3] + m.elements[2], m.elements[7] + m.elements[6], m.elements[11] + m.elements[10], m.elements[15] + m.elements[14] );
 
 	for ( i = 0; i < 6; i ++ ) {
 
@@ -49,7 +49,7 @@ THREE.Frustum.prototype.contains = function ( object ) {
 
 	for ( var i = 0; i < 6; i ++ ) {
 
-		distance = planes[ i ].x * matrix.n14 + planes[ i ].y * matrix.n24 + planes[ i ].z * matrix.n34 + planes[ i ].w;
+		distance = planes[ i ].x * matrix.elements[12] + planes[ i ].y * matrix.elements[13] + planes[ i ].z * matrix.elements[14] + planes[ i ].w;
 		if ( distance <= radius ) return false;
 
 	}

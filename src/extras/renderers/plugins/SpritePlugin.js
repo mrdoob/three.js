@@ -130,7 +130,7 @@ THREE.SpritePlugin = function ( ) {
 			if( ! sprite.useScreenCoordinates ) {
 
 				sprite._modelViewMatrix.multiplyToArray( camera.matrixWorldInverse, sprite.matrixWorld, sprite._modelViewMatrixArray );
-				sprite.z = - sprite._modelViewMatrix.n34;
+				sprite.z = - sprite._modelViewMatrix.elements[14];
 
 			} else {
 

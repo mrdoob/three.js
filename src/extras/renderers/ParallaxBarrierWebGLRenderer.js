@@ -128,16 +128,16 @@ if ( THREE.WebGLRenderer ) {
 
 				// translate xOffset
 
-				eyeRight.n14 = eyeSep;
-				eyeLeft.n14 = -eyeSep;
+				eyeRight.elements[12] = eyeSep;
+				eyeLeft.elements[12] = -eyeSep;
 
 				// for left eye
 
 				xmin = -ymax * _aspect + eyeSepOnProjection;
 				xmax = ymax * _aspect + eyeSepOnProjection;
 
-				projectionMatrix.n11 = 2 * _near / ( xmax - xmin );
-				projectionMatrix.n13 = ( xmax + xmin ) / ( xmax - xmin );
+				projectionMatrix.elements[0] = 2 * _near / ( xmax - xmin );
+				projectionMatrix.elements[8] = ( xmax + xmin ) / ( xmax - xmin );
 
 				_cameraL.projectionMatrix.copy( projectionMatrix );
 
@@ -146,8 +146,8 @@ if ( THREE.WebGLRenderer ) {
 				xmin = -ymax * _aspect - eyeSepOnProjection;
 				xmax = ymax * _aspect - eyeSepOnProjection;
 
-				projectionMatrix.n11 = 2 * _near / ( xmax - xmin );
-				projectionMatrix.n13 = ( xmax + xmin ) / ( xmax - xmin );
+				projectionMatrix.elements[0] = 2 * _near / ( xmax - xmin );
+				projectionMatrix.elements[8] = ( xmax + xmin ) / ( xmax - xmin );
 
 				_cameraR.projectionMatrix.copy( projectionMatrix );
 

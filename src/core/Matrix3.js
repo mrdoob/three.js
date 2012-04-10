@@ -17,17 +17,17 @@ THREE.Matrix3.prototype = {
 		// input: THREE.Matrix4
 		// ( based on http://code.google.com/p/webgl-mjs/ )
 
-		var a11 =   matrix.n33 * matrix.n22 - matrix.n32 * matrix.n23;
-		var a21 = - matrix.n33 * matrix.n21 + matrix.n31 * matrix.n23;
-		var a31 =   matrix.n32 * matrix.n21 - matrix.n31 * matrix.n22;
-		var a12 = - matrix.n33 * matrix.n12 + matrix.n32 * matrix.n13;
-		var a22 =   matrix.n33 * matrix.n11 - matrix.n31 * matrix.n13;
-		var a32 = - matrix.n32 * matrix.n11 + matrix.n31 * matrix.n12;
-		var a13 =   matrix.n23 * matrix.n12 - matrix.n22 * matrix.n13;
-		var a23 = - matrix.n23 * matrix.n11 + matrix.n21 * matrix.n13;
-		var a33 =   matrix.n22 * matrix.n11 - matrix.n21 * matrix.n12;
+		var a11 =   matrix.elements[10] * matrix.elements[5] - matrix.elements[6] * matrix.elements[9];
+		var a21 = - matrix.elements[10] * matrix.elements[1] + matrix.elements[2] * matrix.elements[9];
+		var a31 =   matrix.elements[6] * matrix.elements[1] - matrix.elements[2] * matrix.elements[5];
+		var a12 = - matrix.elements[10] * matrix.elements[4] + matrix.elements[6] * matrix.elements[8];
+		var a22 =   matrix.elements[10] * matrix.elements[0] - matrix.elements[2] * matrix.elements[8];
+		var a32 = - matrix.elements[6] * matrix.elements[0] + matrix.elements[2] * matrix.elements[4];
+		var a13 =   matrix.elements[9] * matrix.elements[4] - matrix.elements[5] * matrix.elements[8];
+		var a23 = - matrix.elements[9] * matrix.elements[0] + matrix.elements[1] * matrix.elements[8];
+		var a33 =   matrix.elements[5] * matrix.elements[0] - matrix.elements[1] * matrix.elements[4];
 
-		var det = matrix.n11 * a11 + matrix.n21 * a12 + matrix.n31 * a13;
+		var det = matrix.elements[0] * a11 + matrix.elements[1] * a12 + matrix.elements[2] * a13;
 
 		// no inverse
 

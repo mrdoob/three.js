@@ -28,10 +28,10 @@ THREE.Matrix4.prototype = {
 
 	set: function ( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43, n44 ) {
 
-		this.n11 = n11; this.n12 = n12; this.n13 = n13; this.n14 = n14;
-		this.n21 = n21; this.n22 = n22; this.n23 = n23; this.n24 = n24;
-		this.n31 = n31; this.n32 = n32; this.n33 = n33; this.n34 = n34;
-		this.n41 = n41; this.n42 = n42; this.n43 = n43; this.n44 = n44;
+		this.elements[0] = n11; this.elements[4] = n12; this.elements[8] = n13; this.elements[12] = n14;
+		this.elements[1] = n21; this.elements[5] = n22; this.elements[9] = n23; this.elements[13] = n24;
+		this.elements[2] = n31; this.elements[6] = n32; this.elements[10] = n33; this.elements[14] = n34;
+		this.elements[3] = n41; this.elements[7] = n42; this.elements[11] = n43; this.elements[15] = n44;
 
 		return this;
 
@@ -56,10 +56,10 @@ THREE.Matrix4.prototype = {
 
 		this.set(
 
-			m.n11, m.n12, m.n13, m.n14,
-			m.n21, m.n22, m.n23, m.n24,
-			m.n31, m.n32, m.n33, m.n34,
-			m.n41, m.n42, m.n43, m.n44
+			m.elements[0], m.elements[4], m.elements[8], m.elements[12],
+			m.elements[1], m.elements[5], m.elements[9], m.elements[13],
+			m.elements[2], m.elements[6], m.elements[10], m.elements[14],
+			m.elements[3], m.elements[7], m.elements[11], m.elements[15]
 
 		);
 
@@ -93,9 +93,9 @@ THREE.Matrix4.prototype = {
 		y.cross( z, x );
 
 
-		this.n11 = x.x; this.n12 = y.x; this.n13 = z.x;
-		this.n21 = x.y; this.n22 = y.y; this.n23 = z.y;
-		this.n31 = x.z; this.n32 = y.z; this.n33 = z.z;
+		this.elements[0] = x.x; this.elements[4] = y.x; this.elements[8] = z.x;
+		this.elements[1] = x.y; this.elements[5] = y.y; this.elements[9] = z.y;
+		this.elements[2] = x.z; this.elements[6] = y.z; this.elements[10] = z.z;
 
 		return this;
 
@@ -103,35 +103,35 @@ THREE.Matrix4.prototype = {
 
 	multiply: function ( a, b ) {
 
-		var a11 = a.n11, a12 = a.n12, a13 = a.n13, a14 = a.n14;
-		var a21 = a.n21, a22 = a.n22, a23 = a.n23, a24 = a.n24;
-		var a31 = a.n31, a32 = a.n32, a33 = a.n33, a34 = a.n34;
-		var a41 = a.n41, a42 = a.n42, a43 = a.n43, a44 = a.n44;
+		var a11 = a.elements[0], a12 = a.elements[4], a13 = a.elements[8], a14 = a.elements[12];
+		var a21 = a.elements[1], a22 = a.elements[5], a23 = a.elements[9], a24 = a.elements[13];
+		var a31 = a.elements[2], a32 = a.elements[6], a33 = a.elements[10], a34 = a.elements[14];
+		var a41 = a.elements[3], a42 = a.elements[7], a43 = a.elements[11], a44 = a.elements[15];
 
-		var b11 = b.n11, b12 = b.n12, b13 = b.n13, b14 = b.n14;
-		var b21 = b.n21, b22 = b.n22, b23 = b.n23, b24 = b.n24;
-		var b31 = b.n31, b32 = b.n32, b33 = b.n33, b34 = b.n34;
-		var b41 = b.n41, b42 = b.n42, b43 = b.n43, b44 = b.n44;
+		var b11 = b.elements[0], b12 = b.elements[4], b13 = b.elements[8], b14 = b.elements[12];
+		var b21 = b.elements[1], b22 = b.elements[5], b23 = b.elements[9], b24 = b.elements[13];
+		var b31 = b.elements[2], b32 = b.elements[6], b33 = b.elements[10], b34 = b.elements[14];
+		var b41 = b.elements[3], b42 = b.elements[7], b43 = b.elements[11], b44 = b.elements[15];
 
-		this.n11 = a11 * b11 + a12 * b21 + a13 * b31 + a14 * b41;
-		this.n12 = a11 * b12 + a12 * b22 + a13 * b32 + a14 * b42;
-		this.n13 = a11 * b13 + a12 * b23 + a13 * b33 + a14 * b43;
-		this.n14 = a11 * b14 + a12 * b24 + a13 * b34 + a14 * b44;
+		this.elements[0] = a11 * b11 + a12 * b21 + a13 * b31 + a14 * b41;
+		this.elements[4] = a11 * b12 + a12 * b22 + a13 * b32 + a14 * b42;
+		this.elements[8] = a11 * b13 + a12 * b23 + a13 * b33 + a14 * b43;
+		this.elements[12] = a11 * b14 + a12 * b24 + a13 * b34 + a14 * b44;
 
-		this.n21 = a21 * b11 + a22 * b21 + a23 * b31 + a24 * b41;
-		this.n22 = a21 * b12 + a22 * b22 + a23 * b32 + a24 * b42;
-		this.n23 = a21 * b13 + a22 * b23 + a23 * b33 + a24 * b43;
-		this.n24 = a21 * b14 + a22 * b24 + a23 * b34 + a24 * b44;
+		this.elements[1] = a21 * b11 + a22 * b21 + a23 * b31 + a24 * b41;
+		this.elements[5] = a21 * b12 + a22 * b22 + a23 * b32 + a24 * b42;
+		this.elements[9] = a21 * b13 + a22 * b23 + a23 * b33 + a24 * b43;
+		this.elements[13] = a21 * b14 + a22 * b24 + a23 * b34 + a24 * b44;
 
-		this.n31 = a31 * b11 + a32 * b21 + a33 * b31 + a34 * b41;
-		this.n32 = a31 * b12 + a32 * b22 + a33 * b32 + a34 * b42;
-		this.n33 = a31 * b13 + a32 * b23 + a33 * b33 + a34 * b43;
-		this.n34 = a31 * b14 + a32 * b24 + a33 * b34 + a34 * b44;
+		this.elements[2] = a31 * b11 + a32 * b21 + a33 * b31 + a34 * b41;
+		this.elements[6] = a31 * b12 + a32 * b22 + a33 * b32 + a34 * b42;
+		this.elements[10] = a31 * b13 + a32 * b23 + a33 * b33 + a34 * b43;
+		this.elements[14] = a31 * b14 + a32 * b24 + a33 * b34 + a34 * b44;
 
-		this.n41 = a41 * b11 + a42 * b21 + a43 * b31 + a44 * b41;
-		this.n42 = a41 * b12 + a42 * b22 + a43 * b32 + a44 * b42;
-		this.n43 = a41 * b13 + a42 * b23 + a43 * b33 + a44 * b43;
-		this.n44 = a41 * b14 + a42 * b24 + a43 * b34 + a44 * b44;
+		this.elements[3] = a41 * b11 + a42 * b21 + a43 * b31 + a44 * b41;
+		this.elements[7] = a41 * b12 + a42 * b22 + a43 * b32 + a44 * b42;
+		this.elements[11] = a41 * b13 + a42 * b23 + a43 * b33 + a44 * b43;
+		this.elements[15] = a41 * b14 + a42 * b24 + a43 * b34 + a44 * b44;
 
 		return this;
 
@@ -147,10 +147,10 @@ THREE.Matrix4.prototype = {
 
 		this.multiply( a, b );
 
-		r[ 0 ] = this.n11; r[ 1 ] = this.n21; r[ 2 ] = this.n31; r[ 3 ] = this.n41;
-		r[ 4 ] = this.n12; r[ 5 ] = this.n22; r[ 6 ] = this.n32; r[ 7 ] = this.n42;
-		r[ 8 ]  = this.n13; r[ 9 ]  = this.n23; r[ 10 ] = this.n33; r[ 11 ] = this.n43;
-		r[ 12 ] = this.n14; r[ 13 ] = this.n24; r[ 14 ] = this.n34; r[ 15 ] = this.n44;
+		r[ 0 ] = this.elements[0]; r[ 1 ] = this.elements[1]; r[ 2 ] = this.elements[2]; r[ 3 ] = this.elements[3];
+		r[ 4 ] = this.elements[4]; r[ 5 ] = this.elements[5]; r[ 6 ] = this.elements[6]; r[ 7 ] = this.elements[7];
+		r[ 8 ]  = this.elements[8]; r[ 9 ]  = this.elements[9]; r[ 10 ] = this.elements[10]; r[ 11 ] = this.elements[11];
+		r[ 12 ] = this.elements[12]; r[ 13 ] = this.elements[13]; r[ 14 ] = this.elements[14]; r[ 15 ] = this.elements[15];
 
 		return this;
 
@@ -158,10 +158,10 @@ THREE.Matrix4.prototype = {
 
 	multiplyScalar: function ( s ) {
 
-		this.n11 *= s; this.n12 *= s; this.n13 *= s; this.n14 *= s;
-		this.n21 *= s; this.n22 *= s; this.n23 *= s; this.n24 *= s;
-		this.n31 *= s; this.n32 *= s; this.n33 *= s; this.n34 *= s;
-		this.n41 *= s; this.n42 *= s; this.n43 *= s; this.n44 *= s;
+		this.elements[0] *= s; this.elements[4] *= s; this.elements[8] *= s; this.elements[12] *= s;
+		this.elements[1] *= s; this.elements[5] *= s; this.elements[9] *= s; this.elements[13] *= s;
+		this.elements[2] *= s; this.elements[6] *= s; this.elements[10] *= s; this.elements[14] *= s;
+		this.elements[3] *= s; this.elements[7] *= s; this.elements[11] *= s; this.elements[15] *= s;
 
 		return this;
 
@@ -170,11 +170,11 @@ THREE.Matrix4.prototype = {
 	multiplyVector3: function ( v ) {
 
 		var vx = v.x, vy = v.y, vz = v.z;
-		var d = 1 / ( this.n41 * vx + this.n42 * vy + this.n43 * vz + this.n44 );
+		var d = 1 / ( this.elements[3] * vx + this.elements[7] * vy + this.elements[11] * vz + this.elements[15] );
 
-		v.x = ( this.n11 * vx + this.n12 * vy + this.n13 * vz + this.n14 ) * d;
-		v.y = ( this.n21 * vx + this.n22 * vy + this.n23 * vz + this.n24 ) * d;
-		v.z = ( this.n31 * vx + this.n32 * vy + this.n33 * vz + this.n34 ) * d;
+		v.x = ( this.elements[0] * vx + this.elements[4] * vy + this.elements[8] * vz + this.elements[12] ) * d;
+		v.y = ( this.elements[1] * vx + this.elements[5] * vy + this.elements[9] * vz + this.elements[13] ) * d;
+		v.z = ( this.elements[2] * vx + this.elements[6] * vy + this.elements[10] * vz + this.elements[14] ) * d;
 
 		return v;
 
@@ -184,10 +184,10 @@ THREE.Matrix4.prototype = {
 
 		var vx = v.x, vy = v.y, vz = v.z, vw = v.w;
 
-		v.x = this.n11 * vx + this.n12 * vy + this.n13 * vz + this.n14 * vw;
-		v.y = this.n21 * vx + this.n22 * vy + this.n23 * vz + this.n24 * vw;
-		v.z = this.n31 * vx + this.n32 * vy + this.n33 * vz + this.n34 * vw;
-		v.w = this.n41 * vx + this.n42 * vy + this.n43 * vz + this.n44 * vw;
+		v.x = this.elements[0] * vx + this.elements[4] * vy + this.elements[8] * vz + this.elements[12] * vw;
+		v.y = this.elements[1] * vx + this.elements[5] * vy + this.elements[9] * vz + this.elements[13] * vw;
+		v.z = this.elements[2] * vx + this.elements[6] * vy + this.elements[10] * vz + this.elements[14] * vw;
+		v.w = this.elements[3] * vx + this.elements[7] * vy + this.elements[11] * vz + this.elements[15] * vw;
 
 		return v;
 
@@ -197,9 +197,9 @@ THREE.Matrix4.prototype = {
 
 		var vx = v.x, vy = v.y, vz = v.z;
 
-		v.x = vx * this.n11 + vy * this.n12 + vz * this.n13;
-		v.y = vx * this.n21 + vy * this.n22 + vz * this.n23;
-		v.z = vx * this.n31 + vy * this.n32 + vz * this.n33;
+		v.x = vx * this.elements[0] + vy * this.elements[4] + vz * this.elements[8];
+		v.y = vx * this.elements[1] + vy * this.elements[5] + vz * this.elements[9];
+		v.z = vx * this.elements[2] + vy * this.elements[6] + vz * this.elements[10];
 
 		v.normalize();
 
@@ -211,11 +211,11 @@ THREE.Matrix4.prototype = {
 
 		var v = new THREE.Vector4();
 
-		v.x = this.n11 * a.x + this.n12 * a.y + this.n13 * a.z + this.n14 * a.w;
-		v.y = this.n21 * a.x + this.n22 * a.y + this.n23 * a.z + this.n24 * a.w;
-		v.z = this.n31 * a.x + this.n32 * a.y + this.n33 * a.z + this.n34 * a.w;
+		v.x = this.elements[0] * a.x + this.elements[4] * a.y + this.elements[8] * a.z + this.elements[12] * a.w;
+		v.y = this.elements[1] * a.x + this.elements[5] * a.y + this.elements[9] * a.z + this.elements[13] * a.w;
+		v.z = this.elements[2] * a.x + this.elements[6] * a.y + this.elements[10] * a.z + this.elements[14] * a.w;
 
-		v.w = ( a.w ) ? this.n41 * a.x + this.n42 * a.y + this.n43 * a.z + this.n44 * a.w : 1;
+		v.w = ( a.w ) ? this.elements[3] * a.x + this.elements[7] * a.y + this.elements[11] * a.z + this.elements[15] * a.w : 1;
 
 		return v;
 
@@ -223,10 +223,10 @@ THREE.Matrix4.prototype = {
 
 	determinant: function () {
 
-		var n11 = this.n11, n12 = this.n12, n13 = this.n13, n14 = this.n14;
-		var n21 = this.n21, n22 = this.n22, n23 = this.n23, n24 = this.n24;
-		var n31 = this.n31, n32 = this.n32, n33 = this.n33, n34 = this.n34;
-		var n41 = this.n41, n42 = this.n42, n43 = this.n43, n44 = this.n44;
+		var n11 = this.elements[0], n12 = this.elements[4], n13 = this.elements[8], n14 = this.elements[12];
+		var n21 = this.elements[1], n22 = this.elements[5], n23 = this.elements[9], n24 = this.elements[13];
+		var n31 = this.elements[2], n32 = this.elements[6], n33 = this.elements[10], n34 = this.elements[14];
+		var n41 = this.elements[3], n42 = this.elements[7], n43 = this.elements[11], n44 = this.elements[15];
 
 		//TODO: make this more efficient
 		//( based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm )
@@ -269,13 +269,13 @@ THREE.Matrix4.prototype = {
 
 		var tmp;
 
-		tmp = this.n21; this.n21 = this.n12; this.n12 = tmp;
-		tmp = this.n31; this.n31 = this.n13; this.n13 = tmp;
-		tmp = this.n32; this.n32 = this.n23; this.n23 = tmp;
+		tmp = this.elements[1]; this.elements[1] = this.elements[4]; this.elements[4] = tmp;
+		tmp = this.elements[2]; this.elements[2] = this.elements[8]; this.elements[8] = tmp;
+		tmp = this.elements[6]; this.elements[6] = this.elements[9]; this.elements[9] = tmp;
 
-		tmp = this.n41; this.n41 = this.n14; this.n14 = tmp;
-		tmp = this.n42; this.n42 = this.n24; this.n24 = tmp;
-		tmp = this.n43; this.n43 = this.n34; this.n34 = tmp;
+		tmp = this.elements[3]; this.elements[3] = this.elements[12]; this.elements[12] = tmp;
+		tmp = this.elements[7]; this.elements[7] = this.elements[13]; this.elements[13] = tmp;
+		tmp = this.elements[11]; this.elements[11] = this.elements[14]; this.elements[14] = tmp;
 
 		return this;
 
@@ -283,10 +283,10 @@ THREE.Matrix4.prototype = {
 
 	flattenToArray: function ( flat ) {
 
-		flat[ 0 ] = this.n11; flat[ 1 ] = this.n21; flat[ 2 ] = this.n31; flat[ 3 ] = this.n41;
-		flat[ 4 ] = this.n12; flat[ 5 ] = this.n22; flat[ 6 ] = this.n32; flat[ 7 ] = this.n42;
-		flat[ 8 ]  = this.n13; flat[ 9 ]  = this.n23; flat[ 10 ] = this.n33; flat[ 11 ] = this.n43;
-		flat[ 12 ] = this.n14; flat[ 13 ] = this.n24; flat[ 14 ] = this.n34; flat[ 15 ] = this.n44;
+		flat[ 0 ] = this.elements[0]; flat[ 1 ] = this.elements[1]; flat[ 2 ] = this.elements[2]; flat[ 3 ] = this.elements[3];
+		flat[ 4 ] = this.elements[4]; flat[ 5 ] = this.elements[5]; flat[ 6 ] = this.elements[6]; flat[ 7 ] = this.elements[7];
+		flat[ 8 ]  = this.elements[8]; flat[ 9 ]  = this.elements[9]; flat[ 10 ] = this.elements[10]; flat[ 11 ] = this.elements[11];
+		flat[ 12 ] = this.elements[12]; flat[ 13 ] = this.elements[13]; flat[ 14 ] = this.elements[14]; flat[ 15 ] = this.elements[15];
 
 		return flat;
 
@@ -294,25 +294,25 @@ THREE.Matrix4.prototype = {
 
 	flattenToArrayOffset: function( flat, offset ) {
 
-		flat[ offset ] = this.n11;
-		flat[ offset + 1 ] = this.n21;
-		flat[ offset + 2 ] = this.n31;
-		flat[ offset + 3 ] = this.n41;
+		flat[ offset ] = this.elements[0];
+		flat[ offset + 1 ] = this.elements[1];
+		flat[ offset + 2 ] = this.elements[2];
+		flat[ offset + 3 ] = this.elements[3];
 
-		flat[ offset + 4 ] = this.n12;
-		flat[ offset + 5 ] = this.n22;
-		flat[ offset + 6 ] = this.n32;
-		flat[ offset + 7 ] = this.n42;
+		flat[ offset + 4 ] = this.elements[4];
+		flat[ offset + 5 ] = this.elements[5];
+		flat[ offset + 6 ] = this.elements[6];
+		flat[ offset + 7 ] = this.elements[7];
 
-		flat[ offset + 8 ]  = this.n13;
-		flat[ offset + 9 ]  = this.n23;
-		flat[ offset + 10 ] = this.n33;
-		flat[ offset + 11 ] = this.n43;
+		flat[ offset + 8 ]  = this.elements[8];
+		flat[ offset + 9 ]  = this.elements[9];
+		flat[ offset + 10 ] = this.elements[10];
+		flat[ offset + 11 ] = this.elements[11];
 
-		flat[ offset + 12 ] = this.n14;
-		flat[ offset + 13 ] = this.n24;
-		flat[ offset + 14 ] = this.n34;
-		flat[ offset + 15 ] = this.n44;
+		flat[ offset + 12 ] = this.elements[12];
+		flat[ offset + 13 ] = this.elements[13];
+		flat[ offset + 14 ] = this.elements[14];
+		flat[ offset + 15 ] = this.elements[15];
 
 		return flat;
 
@@ -320,15 +320,15 @@ THREE.Matrix4.prototype = {
 
 	getPosition: function () {
 
-		return THREE.Matrix4.__v1.set( this.n14, this.n24, this.n34 );
+		return THREE.Matrix4.__v1.set( this.elements[12], this.elements[13], this.elements[14] );
 
 	},
 
 	setPosition: function ( v ) {
 
-		this.n14 = v.x;
-		this.n24 = v.y;
-		this.n34 = v.z;
+		this.elements[12] = v.x;
+		this.elements[13] = v.y;
+		this.elements[14] = v.z;
 
 		return this;
 
@@ -336,19 +336,19 @@ THREE.Matrix4.prototype = {
 
 	getColumnX: function () {
 
-		return THREE.Matrix4.__v1.set( this.n11, this.n21, this.n31 );
+		return THREE.Matrix4.__v1.set( this.elements[0], this.elements[1], this.elements[2] );
 
 	},
 
 	getColumnY: function () {
 
-		return THREE.Matrix4.__v1.set( this.n12, this.n22, this.n32 );
+		return THREE.Matrix4.__v1.set( this.elements[4], this.elements[5], this.elements[6] );
 
 	},
 
 	getColumnZ: function() {
 
-		return THREE.Matrix4.__v1.set( this.n13, this.n23, this.n33 );
+		return THREE.Matrix4.__v1.set( this.elements[8], this.elements[9], this.elements[10] );
 
 	},
 
@@ -356,27 +356,27 @@ THREE.Matrix4.prototype = {
 
 		// based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
 
-		var n11 = m.n11, n12 = m.n12, n13 = m.n13, n14 = m.n14;
-		var n21 = m.n21, n22 = m.n22, n23 = m.n23, n24 = m.n24;
-		var n31 = m.n31, n32 = m.n32, n33 = m.n33, n34 = m.n34;
-		var n41 = m.n41, n42 = m.n42, n43 = m.n43, n44 = m.n44;
+		var n11 = m.elements[0], n12 = m.elements[4], n13 = m.elements[8], n14 = m.elements[12];
+		var n21 = m.elements[1], n22 = m.elements[5], n23 = m.elements[9], n24 = m.elements[13];
+		var n31 = m.elements[2], n32 = m.elements[6], n33 = m.elements[10], n34 = m.elements[14];
+		var n41 = m.elements[3], n42 = m.elements[7], n43 = m.elements[11], n44 = m.elements[15];
 
-		this.n11 = n23*n34*n42 - n24*n33*n42 + n24*n32*n43 - n22*n34*n43 - n23*n32*n44 + n22*n33*n44;
-		this.n12 = n14*n33*n42 - n13*n34*n42 - n14*n32*n43 + n12*n34*n43 + n13*n32*n44 - n12*n33*n44;
-		this.n13 = n13*n24*n42 - n14*n23*n42 + n14*n22*n43 - n12*n24*n43 - n13*n22*n44 + n12*n23*n44;
-		this.n14 = n14*n23*n32 - n13*n24*n32 - n14*n22*n33 + n12*n24*n33 + n13*n22*n34 - n12*n23*n34;
-		this.n21 = n24*n33*n41 - n23*n34*n41 - n24*n31*n43 + n21*n34*n43 + n23*n31*n44 - n21*n33*n44;
-		this.n22 = n13*n34*n41 - n14*n33*n41 + n14*n31*n43 - n11*n34*n43 - n13*n31*n44 + n11*n33*n44;
-		this.n23 = n14*n23*n41 - n13*n24*n41 - n14*n21*n43 + n11*n24*n43 + n13*n21*n44 - n11*n23*n44;
-		this.n24 = n13*n24*n31 - n14*n23*n31 + n14*n21*n33 - n11*n24*n33 - n13*n21*n34 + n11*n23*n34;
-		this.n31 = n22*n34*n41 - n24*n32*n41 + n24*n31*n42 - n21*n34*n42 - n22*n31*n44 + n21*n32*n44;
-		this.n32 = n14*n32*n41 - n12*n34*n41 - n14*n31*n42 + n11*n34*n42 + n12*n31*n44 - n11*n32*n44;
-		this.n33 = n12*n24*n41 - n14*n22*n41 + n14*n21*n42 - n11*n24*n42 - n12*n21*n44 + n11*n22*n44;
-		this.n34 = n14*n22*n31 - n12*n24*n31 - n14*n21*n32 + n11*n24*n32 + n12*n21*n34 - n11*n22*n34;
-		this.n41 = n23*n32*n41 - n22*n33*n41 - n23*n31*n42 + n21*n33*n42 + n22*n31*n43 - n21*n32*n43;
-		this.n42 = n12*n33*n41 - n13*n32*n41 + n13*n31*n42 - n11*n33*n42 - n12*n31*n43 + n11*n32*n43;
-		this.n43 = n13*n22*n41 - n12*n23*n41 - n13*n21*n42 + n11*n23*n42 + n12*n21*n43 - n11*n22*n43;
-		this.n44 = n12*n23*n31 - n13*n22*n31 + n13*n21*n32 - n11*n23*n32 - n12*n21*n33 + n11*n22*n33;
+		this.elements[0] = n23*n34*n42 - n24*n33*n42 + n24*n32*n43 - n22*n34*n43 - n23*n32*n44 + n22*n33*n44;
+		this.elements[4] = n14*n33*n42 - n13*n34*n42 - n14*n32*n43 + n12*n34*n43 + n13*n32*n44 - n12*n33*n44;
+		this.elements[8] = n13*n24*n42 - n14*n23*n42 + n14*n22*n43 - n12*n24*n43 - n13*n22*n44 + n12*n23*n44;
+		this.elements[12] = n14*n23*n32 - n13*n24*n32 - n14*n22*n33 + n12*n24*n33 + n13*n22*n34 - n12*n23*n34;
+		this.elements[1] = n24*n33*n41 - n23*n34*n41 - n24*n31*n43 + n21*n34*n43 + n23*n31*n44 - n21*n33*n44;
+		this.elements[5] = n13*n34*n41 - n14*n33*n41 + n14*n31*n43 - n11*n34*n43 - n13*n31*n44 + n11*n33*n44;
+		this.elements[9] = n14*n23*n41 - n13*n24*n41 - n14*n21*n43 + n11*n24*n43 + n13*n21*n44 - n11*n23*n44;
+		this.elements[13] = n13*n24*n31 - n14*n23*n31 + n14*n21*n33 - n11*n24*n33 - n13*n21*n34 + n11*n23*n34;
+		this.elements[2] = n22*n34*n41 - n24*n32*n41 + n24*n31*n42 - n21*n34*n42 - n22*n31*n44 + n21*n32*n44;
+		this.elements[6] = n14*n32*n41 - n12*n34*n41 - n14*n31*n42 + n11*n34*n42 + n12*n31*n44 - n11*n32*n44;
+		this.elements[10] = n12*n24*n41 - n14*n22*n41 + n14*n21*n42 - n11*n24*n42 - n12*n21*n44 + n11*n22*n44;
+		this.elements[14] = n14*n22*n31 - n12*n24*n31 - n14*n21*n32 + n11*n24*n32 + n12*n21*n34 - n11*n22*n34;
+		this.elements[3] = n23*n32*n41 - n22*n33*n41 - n23*n31*n42 + n21*n33*n42 + n22*n31*n43 - n21*n32*n43;
+		this.elements[7] = n12*n33*n41 - n13*n32*n41 + n13*n31*n42 - n11*n33*n42 - n12*n31*n43 + n11*n32*n43;
+		this.elements[11] = n13*n22*n41 - n12*n23*n41 - n13*n21*n42 + n11*n23*n42 + n12*n21*n43 - n11*n22*n43;
+		this.elements[15] = n12*n23*n31 - n13*n22*n31 + n13*n21*n32 - n11*n23*n32 - n12*n21*n33 + n11*n22*n33;
 		this.multiplyScalar( 1 / m.determinant() );
 
 		return this;
@@ -396,102 +396,102 @@ THREE.Matrix4.prototype = {
 
 				var ce = c * e, cf = c * f, de = d * e, df = d * f;
 
-				this.n11 = ce + df * b;
-				this.n12 = de * b - cf;
-				this.n13 = a * d;
+				this.elements[0] = ce + df * b;
+				this.elements[4] = de * b - cf;
+				this.elements[8] = a * d;
 
-				this.n21 = a * f;
-				this.n22 = a * e;
-				this.n23 = - b;
+				this.elements[1] = a * f;
+				this.elements[5] = a * e;
+				this.elements[9] = - b;
 
-				this.n31 = cf * b - de;
-				this.n32 = df + ce * b;
-				this.n33 = a * c;
+				this.elements[2] = cf * b - de;
+				this.elements[6] = df + ce * b;
+				this.elements[10] = a * c;
 				break;
 
 			case 'ZXY':
 
 				var ce = c * e, cf = c * f, de = d * e, df = d * f;
 
-				this.n11 = ce - df * b;
-				this.n12 = - a * f;
-				this.n13 = de + cf * b;
+				this.elements[0] = ce - df * b;
+				this.elements[4] = - a * f;
+				this.elements[8] = de + cf * b;
 
-				this.n21 = cf + de * b;
-				this.n22 = a * e;
-				this.n23 = df - ce * b;
+				this.elements[1] = cf + de * b;
+				this.elements[5] = a * e;
+				this.elements[9] = df - ce * b;
 
-				this.n31 = - a * d;
-				this.n32 = b;
-				this.n33 = a * c;
+				this.elements[2] = - a * d;
+				this.elements[6] = b;
+				this.elements[10] = a * c;
 				break;
 
 			case 'ZYX':
 
 				var ae = a * e, af = a * f, be = b * e, bf = b * f;
 
-				this.n11 = c * e;
-				this.n12 = be * d - af;
-				this.n13 = ae * d + bf;
+				this.elements[0] = c * e;
+				this.elements[4] = be * d - af;
+				this.elements[8] = ae * d + bf;
 
-				this.n21 = c * f;
-				this.n22 = bf * d + ae;
-				this.n23 = af * d - be;
+				this.elements[1] = c * f;
+				this.elements[5] = bf * d + ae;
+				this.elements[9] = af * d - be;
 
-				this.n31 = - d;
-				this.n32 = b * c;
-				this.n33 = a * c;
+				this.elements[2] = - d;
+				this.elements[6] = b * c;
+				this.elements[10] = a * c;
 				break;
 
 			case 'YZX':
 
 				var ac = a * c, ad = a * d, bc = b * c, bd = b * d;
 
-				this.n11 = c * e;
-				this.n12 = bd - ac * f;
-				this.n13 = bc * f + ad;
+				this.elements[0] = c * e;
+				this.elements[4] = bd - ac * f;
+				this.elements[8] = bc * f + ad;
 
-				this.n21 = f;
-				this.n22 = a * e;
-				this.n23 = - b * e;
+				this.elements[1] = f;
+				this.elements[5] = a * e;
+				this.elements[9] = - b * e;
 
-				this.n31 = - d * e;
-				this.n32 = ad * f + bc;
-				this.n33 = ac - bd * f;
+				this.elements[2] = - d * e;
+				this.elements[6] = ad * f + bc;
+				this.elements[10] = ac - bd * f;
 				break;
 
 			case 'XZY':
 
 				var ac = a * c, ad = a * d, bc = b * c, bd = b * d;
 
-				this.n11 = c * e;
-				this.n12 = - f;
-				this.n13 = d * e;
+				this.elements[0] = c * e;
+				this.elements[4] = - f;
+				this.elements[8] = d * e;
 
-				this.n21 = ac * f + bd;
-				this.n22 = a * e;
-				this.n23 = ad * f - bc;
+				this.elements[1] = ac * f + bd;
+				this.elements[5] = a * e;
+				this.elements[9] = ad * f - bc;
 
-				this.n31 = bc * f - ad;
-				this.n32 = b * e;
-				this.n33 = bd * f + ac;
+				this.elements[2] = bc * f - ad;
+				this.elements[6] = b * e;
+				this.elements[10] = bd * f + ac;
 				break;
 
 			default: // 'XYZ'
 
 				var ae = a * e, af = a * f, be = b * e, bf = b * f;
 
-				this.n11 = c * e;
-				this.n12 = - c * f;
-				this.n13 = d;
+				this.elements[0] = c * e;
+				this.elements[4] = - c * f;
+				this.elements[8] = d;
 
-				this.n21 = af + be * d;
-				this.n22 = ae - bf * d;
-				this.n23 = - b * c;
+				this.elements[1] = af + be * d;
+				this.elements[5] = ae - bf * d;
+				this.elements[9] = - b * c;
 
-				this.n31 = bf - ae * d;
-				this.n32 = be + af * d;
-				this.n33 = a * c;
+				this.elements[2] = bf - ae * d;
+				this.elements[6] = be + af * d;
+				this.elements[10] = a * c;
 				break;
 
 		}
@@ -509,17 +509,17 @@ THREE.Matrix4.prototype = {
 		var yy = y * y2, yz = y * z2, zz = z * z2;
 		var wx = w * x2, wy = w * y2, wz = w * z2;
 
-		this.n11 = 1 - ( yy + zz );
-		this.n12 = xy - wz;
-		this.n13 = xz + wy;
+		this.elements[0] = 1 - ( yy + zz );
+		this.elements[4] = xy - wz;
+		this.elements[8] = xz + wy;
 
-		this.n21 = xy + wz;
-		this.n22 = 1 - ( xx + zz );
-		this.n23 = yz - wx;
+		this.elements[1] = xy + wz;
+		this.elements[5] = 1 - ( xx + zz );
+		this.elements[9] = yz - wx;
 
-		this.n31 = xz - wy;
-		this.n32 = yz + wx;
-		this.n33 = 1 - ( xx + yy );
+		this.elements[2] = xz - wy;
+		this.elements[6] = yz + wx;
+		this.elements[10] = 1 - ( xx + yy );
 
 		return this;
 
@@ -537,9 +537,9 @@ THREE.Matrix4.prototype = {
 
 		this.multiply( mRotation, mScale );
 
-		this.n14 = translation.x;
-		this.n24 = translation.y;
-		this.n34 = translation.z;
+		this.elements[12] = translation.x;
+		this.elements[13] = translation.y;
+		this.elements[14] = translation.z;
 
 		return this;
 
@@ -553,9 +553,9 @@ THREE.Matrix4.prototype = {
 		var y = THREE.Matrix4.__v2;
 		var z = THREE.Matrix4.__v3;
 
-		x.set( this.n11, this.n21, this.n31 );
-		y.set( this.n12, this.n22, this.n32 );
-		z.set( this.n13, this.n23, this.n33 );
+		x.set( this.elements[0], this.elements[1], this.elements[2] );
+		y.set( this.elements[4], this.elements[5], this.elements[6] );
+		z.set( this.elements[8], this.elements[9], this.elements[10] );
 
 		translation = ( translation instanceof THREE.Vector3 ) ? translation : new THREE.Vector3();
 		rotation = ( rotation instanceof THREE.Quaternion ) ? rotation : new THREE.Quaternion();
@@ -565,9 +565,9 @@ THREE.Matrix4.prototype = {
 		scale.y = y.length();
 		scale.z = z.length();
 
-		translation.x = this.n14;
-		translation.y = this.n24;
-		translation.z = this.n34;
+		translation.x = this.elements[12];
+		translation.y = this.elements[13];
+		translation.z = this.elements[14];
 
 		// scale the rotation part
 
@@ -575,17 +575,17 @@ THREE.Matrix4.prototype = {
 
 		matrix.copy( this );
 
-		matrix.n11 /= scale.x;
-		matrix.n21 /= scale.x;
-		matrix.n31 /= scale.x;
+		matrix.elements[0] /= scale.x;
+		matrix.elements[1] /= scale.x;
+		matrix.elements[2] /= scale.x;
 
-		matrix.n12 /= scale.y;
-		matrix.n22 /= scale.y;
-		matrix.n32 /= scale.y;
+		matrix.elements[4] /= scale.y;
+		matrix.elements[5] /= scale.y;
+		matrix.elements[6] /= scale.y;
 
-		matrix.n13 /= scale.z;
-		matrix.n23 /= scale.z;
-		matrix.n33 /= scale.z;
+		matrix.elements[8] /= scale.z;
+		matrix.elements[9] /= scale.z;
+		matrix.elements[10] /= scale.z;
 
 		rotation.setFromRotationMatrix( matrix );
 
@@ -595,9 +595,9 @@ THREE.Matrix4.prototype = {
 
 	extractPosition: function ( m ) {
 
-		this.n14 = m.n14;
-		this.n24 = m.n24;
-		this.n34 = m.n34;
+		this.elements[12] = m.elements[12];
+		this.elements[13] = m.elements[13];
+		this.elements[14] = m.elements[14];
 
 		return this;
 
@@ -607,21 +607,21 @@ THREE.Matrix4.prototype = {
 
 		var vector = THREE.Matrix4.__v1;
 
-		var scaleX = 1 / vector.set( m.n11, m.n21, m.n31 ).length();
-		var scaleY = 1 / vector.set( m.n12, m.n22, m.n32 ).length();
-		var scaleZ = 1 / vector.set( m.n13, m.n23, m.n33 ).length();
+		var scaleX = 1 / vector.set( m.elements[0], m.elements[1], m.elements[2] ).length();
+		var scaleY = 1 / vector.set( m.elements[4], m.elements[5], m.elements[6] ).length();
+		var scaleZ = 1 / vector.set( m.elements[8], m.elements[9], m.elements[10] ).length();
 
-		this.n11 = m.n11 * scaleX;
-		this.n21 = m.n21 * scaleX;
-		this.n31 = m.n31 * scaleX;
+		this.elements[0] = m.elements[0] * scaleX;
+		this.elements[1] = m.elements[1] * scaleX;
+		this.elements[2] = m.elements[2] * scaleX;
 
-		this.n12 = m.n12 * scaleY;
-		this.n22 = m.n22 * scaleY;
-		this.n32 = m.n32 * scaleY;
+		this.elements[4] = m.elements[4] * scaleY;
+		this.elements[5] = m.elements[5] * scaleY;
+		this.elements[6] = m.elements[6] * scaleY;
 
-		this.n13 = m.n13 * scaleZ;
-		this.n23 = m.n23 * scaleZ;
-		this.n33 = m.n33 * scaleZ;
+		this.elements[8] = m.elements[8] * scaleZ;
+		this.elements[9] = m.elements[9] * scaleZ;
+		this.elements[10] = m.elements[10] * scaleZ;
 
 		return this;
 
@@ -633,10 +633,10 @@ THREE.Matrix4.prototype = {
 
 		var x = v.x, y = v.y, z = v.z;
 
-		this.n14 = this.n11 * x + this.n12 * y + this.n13 * z + this.n14;
-		this.n24 = this.n21 * x + this.n22 * y + this.n23 * z + this.n24;
-		this.n34 = this.n31 * x + this.n32 * y + this.n33 * z + this.n34;
-		this.n44 = this.n41 * x + this.n42 * y + this.n43 * z + this.n44;
+		this.elements[12] = this.elements[0] * x + this.elements[4] * y + this.elements[8] * z + this.elements[12];
+		this.elements[13] = this.elements[1] * x + this.elements[5] * y + this.elements[9] * z + this.elements[13];
+		this.elements[14] = this.elements[2] * x + this.elements[6] * y + this.elements[10] * z + this.elements[14];
+		this.elements[15] = this.elements[3] * x + this.elements[7] * y + this.elements[11] * z + this.elements[15];
 
 		return this;
 
@@ -644,26 +644,26 @@ THREE.Matrix4.prototype = {
 
 	rotateX: function ( angle ) {
 
-		var m12 = this.n12;
-		var m22 = this.n22;
-		var m32 = this.n32;
-		var m42 = this.n42;
-		var m13 = this.n13;
-		var m23 = this.n23;
-		var m33 = this.n33;
-		var m43 = this.n43;
+		var m12 = this.elements[4];
+		var m22 = this.elements[5];
+		var m32 = this.elements[6];
+		var m42 = this.elements[7];
+		var m13 = this.elements[8];
+		var m23 = this.elements[9];
+		var m33 = this.elements[10];
+		var m43 = this.elements[11];
 		var c = Math.cos( angle );
 		var s = Math.sin( angle );
 
-		this.n12 = c * m12 + s * m13;
-		this.n22 = c * m22 + s * m23;
-		this.n32 = c * m32 + s * m33;
-		this.n42 = c * m42 + s * m43;
+		this.elements[4] = c * m12 + s * m13;
+		this.elements[5] = c * m22 + s * m23;
+		this.elements[6] = c * m32 + s * m33;
+		this.elements[7] = c * m42 + s * m43;
 
-		this.n13 = c * m13 - s * m12;
-		this.n23 = c * m23 - s * m22;
-		this.n33 = c * m33 - s * m32;
-		this.n43 = c * m43 - s * m42;
+		this.elements[8] = c * m13 - s * m12;
+		this.elements[9] = c * m23 - s * m22;
+		this.elements[10] = c * m33 - s * m32;
+		this.elements[11] = c * m43 - s * m42;
 
 		return this;
 
@@ -671,26 +671,26 @@ THREE.Matrix4.prototype = {
 
 	rotateY: function ( angle ) {
 
-		var m11 = this.n11;
-		var m21 = this.n21;
-		var m31 = this.n31;
-		var m41 = this.n41;
-		var m13 = this.n13;
-		var m23 = this.n23;
-		var m33 = this.n33;
-		var m43 = this.n43;
+		var m11 = this.elements[0];
+		var m21 = this.elements[1];
+		var m31 = this.elements[2];
+		var m41 = this.elements[3];
+		var m13 = this.elements[8];
+		var m23 = this.elements[9];
+		var m33 = this.elements[10];
+		var m43 = this.elements[11];
 		var c = Math.cos( angle );
 		var s = Math.sin( angle );
 
-		this.n11 = c * m11 - s * m13;
-		this.n21 = c * m21 - s * m23;
-		this.n31 = c * m31 - s * m33;
-		this.n41 = c * m41 - s * m43;
+		this.elements[0] = c * m11 - s * m13;
+		this.elements[1] = c * m21 - s * m23;
+		this.elements[2] = c * m31 - s * m33;
+		this.elements[3] = c * m41 - s * m43;
 
-		this.n13 = c * m13 + s * m11;
-		this.n23 = c * m23 + s * m21;
-		this.n33 = c * m33 + s * m31;
-		this.n43 = c * m43 + s * m41;
+		this.elements[8] = c * m13 + s * m11;
+		this.elements[9] = c * m23 + s * m21;
+		this.elements[10] = c * m33 + s * m31;
+		this.elements[11] = c * m43 + s * m41;
 
 		return this;
 
@@ -698,26 +698,26 @@ THREE.Matrix4.prototype = {
 
 	rotateZ: function ( angle ) {
 
-		var m11 = this.n11;
-		var m21 = this.n21;
-		var m31 = this.n31;
-		var m41 = this.n41;
-		var m12 = this.n12;
-		var m22 = this.n22;
-		var m32 = this.n32;
-		var m42 = this.n42;
+		var m11 = this.elements[0];
+		var m21 = this.elements[1];
+		var m31 = this.elements[2];
+		var m41 = this.elements[3];
+		var m12 = this.elements[4];
+		var m22 = this.elements[5];
+		var m32 = this.elements[6];
+		var m42 = this.elements[7];
 		var c = Math.cos( angle );
 		var s = Math.sin( angle );
 
-		this.n11 = c * m11 + s * m12;
-		this.n21 = c * m21 + s * m22;
-		this.n31 = c * m31 + s * m32;
-		this.n41 = c * m41 + s * m42;
+		this.elements[0] = c * m11 + s * m12;
+		this.elements[1] = c * m21 + s * m22;
+		this.elements[2] = c * m31 + s * m32;
+		this.elements[3] = c * m41 + s * m42;
 
-		this.n12 = c * m12 - s * m11;
-		this.n22 = c * m22 - s * m21;
-		this.n32 = c * m32 - s * m31;
-		this.n42 = c * m42 - s * m41;
+		this.elements[4] = c * m12 - s * m11;
+		this.elements[5] = c * m22 - s * m21;
+		this.elements[6] = c * m32 - s * m31;
+		this.elements[7] = c * m42 - s * m41;
 
 		return this;
 
@@ -769,25 +769,25 @@ THREE.Matrix4.prototype = {
 		var r23 = yz - xs;
 		var r33 = zz + (1 - zz) * c;
 
-		var m11 = this.n11, m21 = this.n21, m31 = this.n31, m41 = this.n41;
-		var m12 = this.n12, m22 = this.n22, m32 = this.n32, m42 = this.n42;
-		var m13 = this.n13, m23 = this.n23, m33 = this.n33, m43 = this.n43;
-		var m14 = this.n14, m24 = this.n24, m34 = this.n34, m44 = this.n44;
+		var m11 = this.elements[0], m21 = this.elements[1], m31 = this.elements[2], m41 = this.elements[3];
+		var m12 = this.elements[4], m22 = this.elements[5], m32 = this.elements[6], m42 = this.elements[7];
+		var m13 = this.elements[8], m23 = this.elements[9], m33 = this.elements[10], m43 = this.elements[11];
+		var m14 = this.elements[12], m24 = this.elements[13], m34 = this.elements[14], m44 = this.elements[15];
 
-		this.n11 = r11 * m11 + r21 * m12 + r31 * m13;
-		this.n21 = r11 * m21 + r21 * m22 + r31 * m23;
-		this.n31 = r11 * m31 + r21 * m32 + r31 * m33;
-		this.n41 = r11 * m41 + r21 * m42 + r31 * m43;
+		this.elements[0] = r11 * m11 + r21 * m12 + r31 * m13;
+		this.elements[1] = r11 * m21 + r21 * m22 + r31 * m23;
+		this.elements[2] = r11 * m31 + r21 * m32 + r31 * m33;
+		this.elements[3] = r11 * m41 + r21 * m42 + r31 * m43;
 
-		this.n12 = r12 * m11 + r22 * m12 + r32 * m13;
-		this.n22 = r12 * m21 + r22 * m22 + r32 * m23;
-		this.n32 = r12 * m31 + r22 * m32 + r32 * m33;
-		this.n42 = r12 * m41 + r22 * m42 + r32 * m43;
+		this.elements[4] = r12 * m11 + r22 * m12 + r32 * m13;
+		this.elements[5] = r12 * m21 + r22 * m22 + r32 * m23;
+		this.elements[6] = r12 * m31 + r22 * m32 + r32 * m33;
+		this.elements[7] = r12 * m41 + r22 * m42 + r32 * m43;
 
-		this.n13 = r13 * m11 + r23 * m12 + r33 * m13;
-		this.n23 = r13 * m21 + r23 * m22 + r33 * m23;
-		this.n33 = r13 * m31 + r23 * m32 + r33 * m33;
-		this.n43 = r13 * m41 + r23 * m42 + r33 * m43;
+		this.elements[8] = r13 * m11 + r23 * m12 + r33 * m13;
+		this.elements[9] = r13 * m21 + r23 * m22 + r33 * m23;
+		this.elements[10] = r13 * m31 + r23 * m32 + r33 * m33;
+		this.elements[11] = r13 * m41 + r23 * m42 + r33 * m43;
 
 		return this;
 
@@ -797,10 +797,10 @@ THREE.Matrix4.prototype = {
 
 		var x = v.x, y = v.y, z = v.z;
 
-		this.n11 *= x; this.n12 *= y; this.n13 *= z;
-		this.n21 *= x; this.n22 *= y; this.n23 *= z;
-		this.n31 *= x; this.n32 *= y; this.n33 *= z;
-		this.n41 *= x; this.n42 *= y; this.n43 *= z;
+		this.elements[0] *= x; this.elements[4] *= y; this.elements[8] *= z;
+		this.elements[1] *= x; this.elements[5] *= y; this.elements[9] *= z;
+		this.elements[2] *= x; this.elements[6] *= y; this.elements[10] *= z;
+		this.elements[3] *= x; this.elements[7] *= y; this.elements[11] *= z;
 
 		return this;
 
@@ -922,10 +922,10 @@ THREE.Matrix4.prototype = {
 		var c = - ( far + near ) / ( far - near );
 		var d = - 2 * far * near / ( far - near );
 
-		this.n11 = x;  this.n12 = 0;  this.n13 = a;   this.n14 = 0;
-		this.n21 = 0;  this.n22 = y;  this.n23 = b;   this.n24 = 0;
-		this.n31 = 0;  this.n32 = 0;  this.n33 = c;   this.n34 = d;
-		this.n41 = 0;  this.n42 = 0;  this.n43 = - 1; this.n44 = 0;
+		this.elements[0] = x;  this.elements[4] = 0;  this.elements[8] = a;   this.elements[12] = 0;
+		this.elements[1] = 0;  this.elements[5] = y;  this.elements[9] = b;   this.elements[13] = 0;
+		this.elements[2] = 0;  this.elements[6] = 0;  this.elements[10] = c;   this.elements[14] = d;
+		this.elements[3] = 0;  this.elements[7] = 0;  this.elements[11] = - 1; this.elements[15] = 0;
 
 		return this;
 
@@ -952,10 +952,10 @@ THREE.Matrix4.prototype = {
 		var y = ( top + bottom ) / h;
 		var z = ( far + near ) / p;
 
-		this.n11 = 2 / w; this.n12 = 0;     this.n13 = 0;      this.n14 = -x;
-		this.n21 = 0;     this.n22 = 2 / h; this.n23 = 0;      this.n24 = -y;
-		this.n31 = 0;     this.n32 = 0;     this.n33 = -2 / p; this.n34 = -z;
-		this.n41 = 0;     this.n42 = 0;     this.n43 = 0;      this.n44 = 1;
+		this.elements[0] = 2 / w; this.elements[4] = 0;     this.elements[8] = 0;      this.elements[12] = -x;
+		this.elements[1] = 0;     this.elements[5] = 2 / h; this.elements[9] = 0;      this.elements[13] = -y;
+		this.elements[2] = 0;     this.elements[6] = 0;     this.elements[10] = -2 / p; this.elements[14] = -z;
+		this.elements[3] = 0;     this.elements[7] = 0;     this.elements[11] = 0;      this.elements[15] = 1;
 
 		return this;
 
@@ -966,10 +966,10 @@ THREE.Matrix4.prototype = {
 
 		return new THREE.Matrix4(
 
-			this.n11, this.n12, this.n13, this.n14,
-			this.n21, this.n22, this.n23, this.n24,
-			this.n31, this.n32, this.n33, this.n34,
-			this.n41, this.n42, this.n43, this.n44
+			this.elements[0], this.elements[4], this.elements[8], this.elements[12],
+			this.elements[1], this.elements[5], this.elements[9], this.elements[13],
+			this.elements[2], this.elements[6], this.elements[10], this.elements[14],
+			this.elements[3], this.elements[7], this.elements[11], this.elements[15]
 
 		);
 
