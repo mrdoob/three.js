@@ -7,54 +7,47 @@ THREE.LatheGeometry = function ( points, steps, angle ) {
 
 	THREE.Geometry.call( this );
 
-	this.steps = steps || 12;
-	this.angle = angle || 2 * Math.PI;
+	var _steps = steps || 12;
+	var _angle = angle || 2 * Math.PI;
 
-	var stepSize = this.angle / this.steps,
-	newV = [],
-	matrix = new THREE.Matrix4().makeRotationZ( stepSize );
+	var _newV = [];
+	var _matrix = new THREE.Matrix4().makeRotationZ( _angle / _steps );
 
 	for ( var j = 0; j < points.length; j ++ ) {
 
-		this.vertices.push( new THREE.Vertex( points[ j ] ) );
-
-		newV[ j ] = points[ j ].clone();
+		_newV[ j ] = points[ j ].clone();
+		this.vertices.push( new THREE.Vertex( _newV[ j ] ) );
 
 	}
 
-	for ( var i = 0; i < this.steps; i ++ ) {
+	for ( var i = 0; i < _steps; i ++ ) {
 
-		for ( var j = 0; j < newV.length; j ++ ) {
+		for ( var j = 0; j < _newV.length; j ++ ) {
 
-				newV[ j ] = matrix.multiplyVector3( newV[ j ].clone() );
-				this.vertices.push( new THREE.Vertex( newV[ j ] ) );
+			_newV[ j ] = _matrix.multiplyVector3( _newV[ j ].clone() );
+			this.vertices.push( new THREE.Vertex( _newV[ j ] ) );
 
 		}
 
-		var a, b, c, d;
-		var steps = this.steps;
-		for ( var k = 0, kl = points.length; k < kl-1; k++) {
+		for ( var k = 0, kl = points.length; k < kl - 1; k ++ ) {
 
-			a = i * kl + k;
-			b = ((i + 1) % steps) * kl + k;
-			c = ((i + 1) % steps) * kl + (k + 1) % kl;
-			d = i * kl + (k + 1) % kl;
-			
+			var a = i * kl + k;
+			var b = ( ( i + 1 ) % _steps ) * kl + k;
+			var c = ( ( i + 1 ) % _steps ) * kl + ( k + 1 ) % kl;
+			var d = i * kl + ( k + 1 ) % kl;
 
 			this.faces.push( new THREE.Face4( a, b, c, d ) );
 
 			this.faceVertexUvs[ 0 ].push( [
 
-				// UV mappings which wraps around
-				new THREE.UV( 1 - i / steps, k / kl ),
-				new THREE.UV( 1 - (i + 1) / steps, k / kl ),
-				new THREE.UV( 1 - (i + 1) / steps, ( k+ 1 ) / kl ),
-				new THREE.UV( 1 - i / steps, ( k + 1 ) / kl ),
+				new THREE.UV( 1 - i / _steps, k / kl ),
+				new THREE.UV( 1 - ( i + 1 ) / _steps, k / kl ),
+				new THREE.UV( 1 - ( i + 1 ) / _steps, ( k + 1 ) / kl ),
+				new THREE.UV( 1 - i / _steps, ( k + 1 ) / kl )
 				
 			] );
 
 		}
-
 
 	}
 
