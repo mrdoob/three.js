@@ -81,7 +81,9 @@
     		        
 		            // The check for uv.y<1 would not be necessary with "border" UV wrap
 		            // mode, with a black border colour. I don't think this is currently
-		            // exposed by three.js.
+		            // exposed by three.js. As a result there might be artifacts when the
+		            // sun is to the left, right or bottom of screen as these cases are
+		            // not specifically handled.
 		            "col += (i <= iters && uv.y<1. ? texture2D( tInput, uv ).r : .0) ;",
 		            "uv += stepv;",
 		        "}",

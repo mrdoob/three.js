@@ -217,7 +217,7 @@
 				postprocessing.rtTextureGodRays1 = new THREE.WebGLRenderTarget( w, h, pars );
 				postprocessing.rtTextureGodRays2 = new THREE.WebGLRenderTarget( w, h, pars );
 				
-                // GOD RAY POST PROC
+                // god-ray shaders
 
 				var godray_gen_shader = THREE.ShaderGodRays[ "godrays_generate" ];
 				postprocessing.godray_gen_uniforms = THREE.UniformsUtils.clone( godray_gen_shader.uniforms );
@@ -348,6 +348,7 @@
 			        postprocessing.godray_gen_uniforms[ "tInput" ].texture = postprocessing.rtTextureGodRays1;
 			        renderer.render( postprocessing.scene, postprocessing.camera , postprocessing.rtTextureGodRays2  );
 			        
+			        // final pass - composite god-rays onto colors
 			        postprocessing.godray_combine_uniforms["tColors"].texture = postprocessing.rtTextureColors;
 			        postprocessing.godray_combine_uniforms["tGodRays"].texture = postprocessing.rtTextureGodRays2;
 					postprocessing.scene.overrideMaterial = postprocessing.materialGodraysCombine;
