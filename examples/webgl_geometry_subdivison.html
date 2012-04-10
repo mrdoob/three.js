@@ -23,6 +23,7 @@
 		<script src="../src/extras/geometries/CubeGeometry.js"></script>
 		<script src="../src/extras/geometries/CylinderGeometry.js"></script>
 		<script src="../src/extras/geometries/TorusGeometry.js"></script>
+		<script src="../src/extras/geometries/LatheGeometry.js"></script>
 		<script src="../src/extras/modifiers/SubdivisionModifier.js"></script>
 
 		<script src="fonts/helvetiker_regular.typeface.js"></script>
@@ -223,8 +224,11 @@
 				smooth = THREE.GeometryUtils.clone( geometry );
 
 				// mergeVertices(); is run in case of duplicated vertices
-				smooth.mergeVertices();
-				smooth.computeCentroids();
+				if (! (geometry instanceof THREE.LatheGeometry) ) {
+					smooth.mergeVertices();
+				}
+				
+				// smooth.computeCentroids();
 				// smooth.computeFaceNormals();
 				// smooth.computeVertexNormals();
 				modifier.modify( smooth );
