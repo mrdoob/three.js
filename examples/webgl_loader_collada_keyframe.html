@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - collada</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+
+			body {
+				font-family: Monospace;
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				z-index: 100;
+				display:block;
+
+			}
+
+			a { color: skyblue }
+
+		</style>
+	</head>
+	<body>
+		<div id="info">
+			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> -
+			pump by <a href="http://code.google.com/p/kuda" target="_blank">Kuda</a>
+		</div>
+
+		<script src="../build/Three.js"></script>
+
+		<script src="js/Detector.js"></script>
+
+		<script src="js/Stats.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container,
+				stats,
+				camera,
+				scene,
+				renderer,
+				pointLight,
+				model,
+				animations,
+				kfAnimations = [ ],
+				loader = new THREE.ColladaLoader(),
+				lastTimestamp,
+				startTime,
+				progress = 0;
+
+			loader.load( './models/collada/pump/pump.dae', function ( collada ) {
+
+				model = collada.scene;
+				animations = collada.animations;
+
+				model.scale.x = model.scale.y = model.scale.z = 0.125;
+				model.updateMatrix();
+
+				init();
+				start();
+				animate( lastTimestamp );
+
+			} );
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				model.getChildByName( 'camEye_camera', true ).visible = false;
+				model.getChildByName( 'camTarget_camera', true ).visible = false;
+
+				scene = new THREE.Scene();
+
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.01, 1000 );
+				camera.position.set( -5.00181875, 3.42631375, 11.3102925 );
+				camera.lookAt( new THREE.Vector3( -1.224774125, 2.18410625, 4.57969125 ) );
+
+				scene.add( camera );
+
+				// KeyFrame Animations
+
+				var animHandler = THREE.AnimationHandler,
+					toConvert = { };
+
+				for ( var i = 0, il = animations.length; i < il; ++i ) {
+					var node = animations[ i ].node;
+					toConvert[ node.id ] = node;
+				}
+
+				for ( var i = 0, il = animations.length; i < il; ++i ) {
+					var animation = animations[ i ];
+					animHandler.add( animation );
+
+					var kfAnimation = new THREE.KeyFrameAnimation( toConvert[ animation.node.id ], animation.name );
+					kfAnimation.timeScale = 1;
+					kfAnimations.push( kfAnimation );
+				}
+
+				// Grid
+
+				var material = new THREE.LineBasicMaterial( { color: 0xcccccc, opacity: 0.2 } );
+				var geometry = new THREE.Geometry();
+				var floor = -0.04, step = 1, size = 14;
+
+				for ( var i = 0; i <= size / step * 2; i ++ ) {
+
+					geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( - size, floor, i * step - size ) ) );
+					geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(   size, floor, i * step - size ) ) );
+					geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( i * step - size, floor, -size ) ) );
+					geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( i * step - size, floor,  size ) ) );
+
+				}
+
+				var line = new THREE.Line( geometry, material, THREE.LinePieces );
+				scene.add( line );
+
+				// Add the COLLADA
+
+				scene.add( model );
+
+				// Lights
+
+				pointLight = new THREE.PointLight( 0xffffff, 1.5 );
+				pointLight.position = camera.position;
+				pointLight.rotation = camera.rotation;
+				pointLight.scale = camera.scale;
+				scene.add( pointLight );
+
+				// Renderer
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				// Stats
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild( stats.domElement );
+
+			}
+
+			function start() {
+
+				for ( var i = 0, il = kfAnimations.length; i < il; ++i ) {
+
+					var animation = kfAnimations[i];
+
+					for ( var h = 0, hl = animation.hierarchy.length; h < hl; h++ ) {
+
+						var keys = animation.data.hierarchy[ h ].keys,
+						sids = animation.data.hierarchy[ h ].sids,
+						obj = animation.hierarchy[ h ];
+
+						if ( keys.length && sids ) {
+
+							for ( var s = 0; s < sids.length; s++ ) {
+
+								var sid = sids[ s ],
+								next = animation.getNextKeyWith( sid, h, 0 );
+
+								if ( next ) next.apply( sid );
+
+							}
+
+							obj.matrixAutoUpdate = false;
+							animation.data.hierarchy[ h ].node.updateMatrix();
+							obj.matrixWorldNeedsUpdate = true;
+
+						}
+
+					}
+
+					animation.play( false, 0 );
+					lastTimestamp = Date.now();
+
+				}
+
+			}
+
+			function animate( timestamp ) {
+
+				var frameTime = ( timestamp - lastTimestamp ) * 0.001; // seconds
+
+				if ( progress >= 0 && progress < 48 ) {
+
+					for ( var i = 0, il = kfAnimations.length; i < il; ++i ) {
+
+						kfAnimations[ i ].update( frameTime );
+
+					}
+
+				} else if ( progress >= 48 ) {
+
+					for ( var i = 0, il = kfAnimations.length; i < il; ++i ) {
+
+						kfAnimations[ i ].stop();
+
+					}
+
+					progress = 0;
+					start();
+
+				}
+
+				progress += frameTime;
+				lastTimestamp = timestamp;
+				renderer.render( scene, camera );
+				stats.update();
+				requestAnimationFrame( animate );
+
+			}
+
+		</script>
+	</body>
+</html>
