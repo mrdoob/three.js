@@ -222,8 +222,8 @@ THREE.ShadowMapPlugin = function ( ) {
 
 					if ( ! ( object instanceof THREE.Mesh ) || ! ( object.frustumCulled ) || _frustum.contains( object ) ) {
 
-						object.matrixWorld.flattenToArray( object._objectMatrixArray );
-						object._modelViewMatrix.multiplyToArray( shadowCamera.matrixWorldInverse, object.matrixWorld, object._modelViewMatrixArray );
+						//object.matrixWorld.flattenToArray( object._objectMatrixArray );
+						object._modelViewMatrix.multiply( shadowCamera.matrixWorldInverse, object.matrixWorld);
 
 						webglObject.render = true;
 
@@ -287,11 +287,11 @@ THREE.ShadowMapPlugin = function ( ) {
 
 					if( object.matrixAutoUpdate ) {
 
-						object.matrixWorld.flattenToArray( object._objectMatrixArray );
+						//object.matrixWorld.flattenToArray( object._objectMatrixArray );
 
 					}
 
-					object._modelViewMatrix.multiplyToArray( shadowCamera.matrixWorldInverse, object.matrixWorld, object._modelViewMatrixArray );
+					object._modelViewMatrix.multiply( shadowCamera.matrixWorldInverse, object.matrixWorld);
 
 					_renderer.renderImmediateObject( shadowCamera, scene.__lights, fog, _depthMaterial, object );
 

@@ -14563,7 +14563,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( p_uniforms.objectMatrix !== null ) {
 
-				_gl.uniformMatrix4fv( p_uniforms.objectMatrix, false, object._objectMatrixArray );
+				_gl.uniformMatrix4fv( p_uniforms.objectMatrix, false, object.matrixWorld.elements );
 
 			}
 
@@ -14751,7 +14751,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function loadUniformsMatrices ( uniforms, object ) {
 
-		_gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, object._modelViewMatrixArray );
+		_gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, object._modelViewMatrix.elements );
 
 		if ( uniforms.normalMatrix ) {
 
@@ -14981,7 +14981,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setupMatrices ( object, camera ) {
 
-		object._modelViewMatrix.multiplyToArray( camera.matrixWorldInverse, object.matrixWorld, object._modelViewMatrixArray );
+		object._modelViewMatrix.multiply( camera.matrixWorldInverse, object.matrixWorld);
 
 		object._normalMatrix.getInverse( object._modelViewMatrix );
 		object._normalMatrix.transposeIntoArray( object._normalMatrixArray );
@@ -35054,7 +35054,7 @@ THREE.ShadowMapPlugin = function ( ) {
 					if ( ! ( object instanceof THREE.Mesh ) || ! ( object.frustumCulled ) || _frustum.contains( object ) ) {
 
 						object.matrixWorld.flattenToArray( object._objectMatrixArray );
-						object._modelViewMatrix.multiplyToArray( shadowCamera.matrixWorldInverse, object.matrixWorld, object._modelViewMatrixArray );
+						object._modelViewMatrix.multiply( shadowCamera.matrixWorldInverse, object.matrixWorld);
 
 						webglObject.render = true;
 
@@ -35122,7 +35122,7 @@ THREE.ShadowMapPlugin = function ( ) {
 
 					}
 
-					object._modelViewMatrix.multiplyToArray( shadowCamera.matrixWorldInverse, object.matrixWorld, object._modelViewMatrixArray );
+					object._modelViewMatrix.multiply( shadowCamera.matrixWorldInverse, object.matrixWorld);
 
 					_renderer.renderImmediateObject( shadowCamera, scene.__lights, fog, _depthMaterial, object );
 
@@ -35408,7 +35408,7 @@ THREE.SpritePlugin = function ( ) {
 
 			if( ! sprite.useScreenCoordinates ) {
 
-				sprite._modelViewMatrix.multiplyToArray( camera.matrixWorldInverse, sprite.matrixWorld, sprite._modelViewMatrixArray );
+				sprite._modelViewMatrix.multiply( camera.matrixWorldInverse, sprite.matrixWorld);
 				sprite.z = - sprite._modelViewMatrix.elements[14];
 
 			} else {
@@ -35442,7 +35442,7 @@ THREE.SpritePlugin = function ( ) {
 
 					_gl.uniform1i( uniforms.useScreenCoordinates, 0 );
 					_gl.uniform1i( uniforms.affectedByDistance, sprite.affectedByDistance ? 1 : 0 );
-					_gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, sprite._modelViewMatrixArray );
+					_gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, sprite._modelViewMatrix.elements);
 
 				}
 
@@ -35613,7 +35613,7 @@ THREE.DepthPassPlugin = function ( ) {
 				if ( ! ( object instanceof THREE.Mesh ) || ! ( object.frustumCulled ) || _frustum.contains( object ) ) {
 
 					object.matrixWorld.flattenToArray( object._objectMatrixArray );
-					object._modelViewMatrix.multiplyToArray( camera.matrixWorldInverse, object.matrixWorld, object._modelViewMatrixArray );
+					object._modelViewMatrix.multiply( camera.matrixWorldInverse, object.matrixWorld);
 
 					webglObject.render = true;
 
@@ -35681,7 +35681,7 @@ THREE.DepthPassPlugin = function ( ) {
 
 				}
 
-				object._modelViewMatrix.multiplyToArray( camera.matrixWorldInverse, object.matrixWorld, object._modelViewMatrixArray );
+				object._modelViewMatrix.multiply( camera.matrixWorldInverse, object.matrixWorld);
 
 				_renderer.renderImmediateObject( camera, scene.__lights, fog, _depthMaterial, object );
 

@@ -129,7 +129,7 @@ THREE.SpritePlugin = function ( ) {
 
 			if( ! sprite.useScreenCoordinates ) {
 
-				sprite._modelViewMatrix.multiplyToArray( camera.matrixWorldInverse, sprite.matrixWorld, sprite._modelViewMatrixArray );
+				sprite._modelViewMatrix.multiply( camera.matrixWorldInverse, sprite.matrixWorld);
 				sprite.z = - sprite._modelViewMatrix.elements[14];
 
 			} else {
@@ -163,7 +163,7 @@ THREE.SpritePlugin = function ( ) {
 
 					_gl.uniform1i( uniforms.useScreenCoordinates, 0 );
 					_gl.uniform1i( uniforms.affectedByDistance, sprite.affectedByDistance ? 1 : 0 );
-					_gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, sprite._modelViewMatrixArray );
+					_gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, sprite._modelViewMatrix.elements);
 
 				}
 
