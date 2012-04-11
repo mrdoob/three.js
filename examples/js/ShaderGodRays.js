@@ -6,7 +6,7 @@
  * Similar implementation to the one used by Crytek for CryEngine 2 [Sousa2008].
  * Blurs a mask generated from the depth map along radial lines emanating from the light
  * source. The blur repeatedly applies a blur filter of increasing support but constant
- * sample count, to produce a blur filter with large support.
+ * sample count to produce a blur filter with large support.
  *
  * My implementation performs 3 passes, similar to the implementation from Sousa. I found
  * just 6 samples per pass produced acceptible results. The blur is applied three times,
@@ -42,30 +42,41 @@ THREE.ShaderGodRays = {
 	'godrays_generate': {
 
 		uniforms: {
+
 			tInput: {
 				type: "t",
 				value: 0,
 				texture: null
 			},
+
 			fStepSize: {
 				type: "f",
 				value: 1.0
 			},
+
 			vSunPositionScreenSpace: {
 				type: "v2",
 				value: new THREE.Vector2( 0.5, 0.5 )
 			}
+
 		},
 
 		vertexShader: [
+
 			"varying vec2 vUv;",
+
 			"void main() {",
+
 				"vUv = vec2( uv.x, 1.0 - uv.y );",
 				"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+
 			"}"
+
 		].join("\n"),
 
 		fragmentShader: [
+
+			"#define TAPS_PER_PASS 6.0",
 
 			"varying vec2 vUv;",
 
@@ -74,15 +85,19 @@ THREE.ShaderGodRays = {
 			"uniform vec2 vSunPositionScreenSpace;",
 			"uniform float fStepSize;", // filter step size
 
-			"#define TAPS_PER_PASS 6.0",
-
 			"void main() {",
+
 				// delta from current pixel to "sun" position
-				"vec2 delta = (vSunPositionScreenSpace - vUv);",
-				"float dist = length(delta);",
+
+				"vec2 delta = vSunPositionScreenSpace - vUv;",
+				"float dist = length( delta );",
+
 				// Step vector (uv space)
-				"vec2 stepv = fStepSize*delta/dist;",
+
+				"vec2 stepv = fStepSize * delta / dist;",
+
 				// Number of iterations between pixel and sun
+
 				"float iters = dist/fStepSize;",
 
 				"vec2 uv = vUv.xy;",
@@ -90,16 +105,20 @@ THREE.ShaderGodRays = {
 
 				// Unrolling didnt do much on my hardware (ATI Mobility Radeon 3450),
 				// so i've just left the loop
-				"for (float i = 0.0; i < TAPS_PER_PASS; i+=1.0 ) {",
+
+				"for ( float i = 0.0; i < TAPS_PER_PASS; i += 1.0 ) {",
+
 					// Accumulate samples, making sure we dont walk past the light source.
 
-					// The check for uv.y<1 would not be necessary with "border" UV wrap
+					// The check for uv.y < 1 would not be necessary with "border" UV wrap
 					// mode, with a black border colour. I don't think this is currently
 					// exposed by three.js. As a result there might be artifacts when the
 					// sun is to the left, right or bottom of screen as these cases are
 					// not specifically handled.
-					"col += (i <= iters && uv.y<1. ? texture2D( tInput, uv ).r : .0) ;",
+
+					"col += ( i <= iters && uv.y < 1.0 ? texture2D( tInput, uv ).r : 0.0 );",
 					"uv += stepv;",
+
 				"}",
 
 				// Should technically be dividing by 'iters', but 'TAPS_PER_PASS' smooths out
@@ -108,8 +127,10 @@ THREE.ShaderGodRays = {
 				// TAPS_PER_PASS is greater than the number of samples actually accumulated.
 				// When the result is inverted (in the shader 'godrays_combine', this produces
 				// a slight bright spot at the position of the sun, even when it is occluded.
+
 				"gl_FragColor = vec4( col/TAPS_PER_PASS );",
-				"gl_FragColor.a = 1.;",
+				"gl_FragColor.a = 1.0;",
+
 			"}"
 
 		].join("\n")
@@ -120,35 +141,46 @@ THREE.ShaderGodRays = {
 	 * Additively applies god rays from texture tGodRays to a background (tColors).
 	 * fGodRayIntensity attenuates the god rays.
 	 */
+
 	'godrays_combine': {
 
 		uniforms: {
+
 			tColors: {
 				type: "t",
 				value: 0,
 				texture: null
 			},
+
 			tGodRays: {
 				type: "t",
 				value: 1,
 				texture: null
 			},
+
 			fGodRayIntensity: {
 				type: "f",
 				value: 0.69
 			},
+
 			vSunPositionScreenSpace: {
 				type: "v2",
 				value: new THREE.Vector2( 0.5, 0.5 )
-			},
+			}
+
 		},
 
 		vertexShader: [
+
 			"varying vec2 vUv;",
+
 			"void main() {",
+
 				"vUv = vec2( uv.x, 1.0 - uv.y );",
 				"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+
 			"}"
+
 			].join("\n"),
 
 		fragmentShader: [
@@ -162,41 +194,63 @@ THREE.ShaderGodRays = {
 			"uniform float fGodRayIntensity;",
 
 			"void main() {",
+
 				// Since THREE.MeshDepthMaterial renders foreground objects white and background
 				// objects black, the god-rays will be white streaks. Therefore value is inverted
 				// before being combined with tColors
-				"gl_FragColor = texture2D( tColors, vUv ) + fGodRayIntensity*vec4( 1.-texture2D( tGodRays, vUv ).r );",
-				"gl_FragColor.a = 1.;",
+
+				"gl_FragColor = texture2D( tColors, vUv ) + fGodRayIntensity * vec4( 1.0 - texture2D( tGodRays, vUv ).r );",
+				"gl_FragColor.a = 1.0;",
+
 			"}"
 
 		].join("\n")
 
 	},
-	
-	
+
+
 	/**
 	 * A dodgy sun/sky shader. Makes a bright spot at the sun location. Would be
 	 * cheaper/faster/simpler to implement this as a simple sun sprite.
 	 */
+
 	'godrays_fake_sun': {
 
 		uniforms: {
+
 			vSunPositionScreenSpace: {
 				type: "v2",
 				value: new THREE.Vector2( 0.5, 0.5 )
 			},
+
 			fAspect: {
 				type: "f",
 				value: 1.0
 			},
+
+			sunColor: {
+				type: "c",
+				value: new THREE.Color( 0xffee00 )
+			},
+
+			bgColor: {
+				type: "c",
+				value: new THREE.Color( 0x000000 )
+			}
+
 		},
 
 		vertexShader: [
+
 			"varying vec2 vUv;",
+
 			"void main() {",
+
 				"vUv = vec2( uv.x, 1.0 - uv.y );",
 				"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+
 			"}"
+
 		].join("\n"),
 
 		fragmentShader: [
@@ -206,13 +260,23 @@ THREE.ShaderGodRays = {
 			"uniform vec2 vSunPositionScreenSpace;",
 			"uniform float fAspect;",
 
+			"uniform vec3 sunColor;",
+			"uniform vec3 bgColor;",
+
 			"void main() {",
-				"vec2 diff = vUv-vSunPositionScreenSpace;",
+
+				"vec2 diff = vUv - vSunPositionScreenSpace;",
+
 				// Correct for aspect ratio
+
 				"diff.x *= fAspect;",
-				"float prop = clamp(length(diff)/.5,0.,1.);",
-				"prop = .35*pow( 1.0 - prop, 3. ) ;",
-				"gl_FragColor = vec4(prop,prop,0.2,1.);",
+
+				"float prop = clamp( length( diff ) / 0.5, 0.0, 1.0 );",
+				"prop = 0.35 * pow( 1.0 - prop, 3.0 );",
+
+				"gl_FragColor.xyz = mix( sunColor, bgColor, 1.0 - prop );",
+				"gl_FragColor.w = 1.0;",
+
 			"}"
 
 		].join("\n")
