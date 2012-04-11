@@ -18660,7 +18660,7 @@ THREE.ShadowMapPlugin = function ( ) {
 
 					if ( ! ( object instanceof THREE.Mesh ) || ! ( object.frustumCulled ) || _frustum.contains( object ) ) {
 
-						object.matrixWorld.flattenToArray( object._objectMatrixArray );
+						//object.matrixWorld.flattenToArray( object._objectMatrixArray );
 						object._modelViewMatrix.multiply( shadowCamera.matrixWorldInverse, object.matrixWorld);
 
 						webglObject.render = true;
@@ -18725,7 +18725,7 @@ THREE.ShadowMapPlugin = function ( ) {
 
 					if( object.matrixAutoUpdate ) {
 
-						object.matrixWorld.flattenToArray( object._objectMatrixArray );
+						//object.matrixWorld.flattenToArray( object._objectMatrixArray );
 
 					}
 
@@ -19219,7 +19219,7 @@ THREE.DepthPassPlugin = function ( ) {
 
 				if ( ! ( object instanceof THREE.Mesh ) || ! ( object.frustumCulled ) || _frustum.contains( object ) ) {
 
-					object.matrixWorld.flattenToArray( object._objectMatrixArray );
+					//object.matrixWorld.flattenToArray( object._objectMatrixArray );
 					object._modelViewMatrix.multiply( camera.matrixWorldInverse, object.matrixWorld);
 
 					webglObject.render = true;
@@ -19284,7 +19284,7 @@ THREE.DepthPassPlugin = function ( ) {
 
 				if( object.matrixAutoUpdate ) {
 
-					object.matrixWorld.flattenToArray( object._objectMatrixArray );
+					//object.matrixWorld.flattenToArray( object._objectMatrixArray );
 
 				}
 
