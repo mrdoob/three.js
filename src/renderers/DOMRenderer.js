@@ -4,6 +4,8 @@
 
 THREE.DOMRenderer = function () {
 
+	console.log( 'THREE.DOMRenderer', THREE.REVISION );
+
 	var _renderData, _elements,
 	_width, _height, _widthHalf, _heightHalf, _transformProp,
 	_projector = new THREE.Projector();

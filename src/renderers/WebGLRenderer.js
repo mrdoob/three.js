@@ -7,7 +7,7 @@
 
 THREE.WebGLRenderer = function ( parameters ) {
 
-	// constructor parameters
+	console.log( 'THREE.WebGLRenderer', THREE.REVISION );
 
 	parameters = parameters || {};
 
@@ -6127,6 +6127,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
+			/*
 			console.log(
 				navigator.userAgent + " | " +
 				gl.getParameter( gl.VERSION ) + " | " +
@@ -6134,6 +6135,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				gl.getParameter( gl.RENDERER ) + " | " +
 				gl.getParameter( gl.SHADING_LANGUAGE_VERSION )
 			);
+			*/
 
 		} catch ( error ) {
 
