@@ -58,7 +58,7 @@
 				startTime,
 				progress = 0;
 
-			loader.load( './models/pump.dae', function( collada ) {
+			loader.load( './models/collada/pump/pump.dae', function ( collada ) {
 
 				model = collada.scene;
 				animations = collada.animations;
@@ -109,9 +109,9 @@
 
 				// Grid
 
-				var line_material = new THREE.LineBasicMaterial( { color: 0xcccccc, opacity: 0.2 } ),
-					geometry = new THREE.Geometry(),
-					floor = -0.04, step = 1, size = 14;
+				var material = new THREE.LineBasicMaterial( { color: 0xcccccc, opacity: 0.2 } );
+				var geometry = new THREE.Geometry();
+				var floor = -0.04, step = 1, size = 14;
 
 				for ( var i = 0; i <= size / step * 2; i ++ ) {
 
@@ -122,7 +122,7 @@
 
 				}
 
-				var line = new THREE.Line( geometry, line_material, THREE.LinePieces );
+				var line = new THREE.Line( geometry, material, THREE.LinePieces );
 				scene.add( line );
 
 				// Add the COLLADA
@@ -139,7 +139,7 @@
 
 				// Renderer
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
@@ -154,40 +154,40 @@
 
 			function start() {
 
-                for ( var i = 0, il = kfAnimations.length; i < il; ++i ) {
+				for ( var i = 0, il = kfAnimations.length; i < il; ++i ) {
 
-                    var animation = kfAnimations[i];
+					var animation = kfAnimations[i];
 
-                    for ( var h = 0, hl = animation.hierarchy.length; h < hl; h++ ) {
+					for ( var h = 0, hl = animation.hierarchy.length; h < hl; h++ ) {
 
-                        var keys = animation.data.hierarchy[ h ].keys,
-                            sids = animation.data.hierarchy[ h ].sids,
-                            obj = animation.hierarchy[ h ];
+						var keys = animation.data.hierarchy[ h ].keys,
+						sids = animation.data.hierarchy[ h ].sids,
+						obj = animation.hierarchy[ h ];
 
-                        if ( keys.length && sids ) {
+						if ( keys.length && sids ) {
 
-                            for ( var s = 0; s < sids.length; s++ ) {
+							for ( var s = 0; s < sids.length; s++ ) {
 
-                                var sid = sids[ s ],
-                                    next = animation.getNextKeyWith( sid, h, 0 );
+								var sid = sids[ s ],
+								next = animation.getNextKeyWith( sid, h, 0 );
 
-                                if ( next ) {
-                                    next.apply( sid );
-                                }
-                            }
+								if ( next ) next.apply( sid );
 
-                            obj.matrixAutoUpdate = false;
-                            animation.data.hierarchy[ h ].node.updateMatrix();
-                            obj.matrixWorldNeedsUpdate = true;
+							}
 
-                        }
+							obj.matrixAutoUpdate = false;
+							animation.data.hierarchy[ h ].node.updateMatrix();
+							obj.matrixWorldNeedsUpdate = true;
 
-                    }
+						}
 
-                    animation.play( false, 0 );
+					}
+
+					animation.play( false, 0 );
 					lastTimestamp = Date.now();
 
-                }
+				}
+
 			}
 
 			function animate( timestamp ) {
@@ -196,23 +196,24 @@
 
 				if ( progress >= 0 && progress < 48 ) {
 
-			            for ( var i = 0, il = kfAnimations.length; i < il; ++i ) {
+					for ( var i = 0, il = kfAnimations.length; i < il; ++i ) {
 
-			                kfAnimations[ i ].update( frameTime );
+						kfAnimations[ i ].update( frameTime );
 
-			            }
+					}
 
-                } else if ( progress >= 48 ) {
+				} else if ( progress >= 48 ) {
 
-	                for ( var i = 0, il = kfAnimations.length; i < il; ++i ) {
+					for ( var i = 0, il = kfAnimations.length; i < il; ++i ) {
 
-	                    kfAnimations[ i ].stop();
+						kfAnimations[ i ].stop();
 
-	                }
+					}
 
-	                progress = 0;
-	                start();
-                }
+					progress = 0;
+					start();
+
+				}
 
 				progress += frameTime;
 				lastTimestamp = timestamp;
