@@ -20,9 +20,10 @@ THREE.LatheGeometry = function ( points, steps, angle ) {
 
 	}
 
+	var i;
 	var il = _steps + 1;
 
-	for ( var i = 0; i < il; i ++ ) {
+	for ( i = 0; i < il; i ++ ) {
 
 		for ( var j = 0; j < _newV.length; j ++ ) {
 
@@ -30,6 +31,10 @@ THREE.LatheGeometry = function ( points, steps, angle ) {
 			this.vertices.push( new THREE.Vertex( _newV[ j ] ) );
 
 		}
+
+	}
+
+	for ( i = 0; i < _steps; i ++ ) {
 
 		for ( var k = 0, kl = points.length; k < kl - 1; k ++ ) {
 
