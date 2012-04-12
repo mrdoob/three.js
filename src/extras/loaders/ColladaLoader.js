@@ -3045,6 +3045,9 @@ THREE.ColladaLoader = function () {
 										texture.repeat.y = cot.texOpts.repeatV;
 										props['map'] = texture;
 
+										// Texture with baked lighting?
+										if ( prop == 'emission' ) props[ 'emissive' ] = 0xffffff;
+
 									}
 
 								}
@@ -3053,7 +3056,15 @@ THREE.ColladaLoader = function () {
 
 						} else if ( prop == 'diffuse' || !transparent ) {
 
-							props[ prop ] = cot.color.getHex();
+							if ( prop == 'emission' ) {
+
+								props[ 'emissive' ] = cot.color.getHex();
+
+							} else {
+
+								props[ prop ] = cot.color.getHex();
+
+							}
 
 						}
 
