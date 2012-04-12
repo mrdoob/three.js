@@ -68,13 +68,14 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				cubeCamera = new THREE.CubeCamera( 1, 1000, 256 );
-				cubeCamera.renderTarget.minFilter = THREE.LinearMipMapLinearFilter;
+				cubeCamera.getRenderTarget().minFilter = THREE.LinearMipMapLinearFilter;
+				scene.add( cubeCamera );
 
 				document.body.appendChild( renderer.domElement );
 
 				//
 
-				var material = new THREE.MeshBasicMaterial( { envMap: cubeCamera.renderTarget } );
+				var material = new THREE.MeshBasicMaterial( { envMap: cubeCamera.getRenderTarget() } );
 				
 				sphere = new THREE.Mesh( new THREE.SphereGeometry( 20, 60, 40 ), material );
 				scene.add( sphere );
