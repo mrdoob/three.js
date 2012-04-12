@@ -20,7 +20,9 @@ THREE.LatheGeometry = function ( points, steps, angle ) {
 
 	}
 
-	for ( var i = 0; i < _steps; i ++ ) {
+	var il = _steps + 1;
+
+	for ( var i = 0; i < il; i ++ ) {
 
 		for ( var j = 0; j < _newV.length; j ++ ) {
 
@@ -32,8 +34,8 @@ THREE.LatheGeometry = function ( points, steps, angle ) {
 		for ( var k = 0, kl = points.length; k < kl - 1; k ++ ) {
 
 			var a = i * kl + k;
-			var b = ( ( i + 1 ) % _steps ) * kl + k;
-			var c = ( ( i + 1 ) % _steps ) * kl + ( k + 1 ) % kl;
+			var b = ( ( i + 1 ) % il ) * kl + k;
+			var c = ( ( i + 1 ) % il ) * kl + ( k + 1 ) % kl;
 			var d = i * kl + ( k + 1 ) % kl;
 
 			this.faces.push( new THREE.Face4( a, b, c, d ) );
