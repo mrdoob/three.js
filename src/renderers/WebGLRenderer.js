@@ -6127,16 +6127,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			/*
-			console.log(
-				navigator.userAgent + " | " +
-				gl.getParameter( gl.VERSION ) + " | " +
-				gl.getParameter( gl.VENDOR ) + " | " +
-				gl.getParameter( gl.RENDERER ) + " | " +
-				gl.getParameter( gl.SHADING_LANGUAGE_VERSION )
-			);
-			*/
-
 		} catch ( error ) {
 
 			console.error( error );
