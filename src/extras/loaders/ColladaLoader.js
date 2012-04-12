@@ -1003,10 +1003,26 @@ THREE.ColladaLoader = function () {
 
 				var channel = node.channels[i],
 					fullSid = channel.fullSid,
-					member = getConvertedMember( channel.member ),
 					sampler = channel.sampler,
 					input = sampler.input,
-					transform = node.getTransformBySid( channel.sid );
+					transform = node.getTransformBySid( channel.sid ),
+					member;
+
+				if ( channel.arrIndices ) {
+
+					member = [];
+
+					for ( var j = 0, jl = channel.arrIndices.length; j < jl; j++ ) {
+
+						member[ j ] = getConvertedIndex( channel.arrIndices[ j ] );
+
+					}
+
+				} else {
+
+					member = getConvertedMember( channel.member );
+
+				}
 
 				if ( transform ) {
 
@@ -1125,7 +1141,11 @@ THREE.ColladaLoader = function () {
 				prevData = prevTarget.data,
 				data;
 
-			if ( prevData.length ) {
+			if ( prevTarget.type === 'matrix' ) {
+
+				data = prevData;
+
+			} else if ( prevData.length ) {
 
 				data = [];
 
@@ -1927,15 +1947,79 @@ THREE.ColladaLoader = function () {
 
 	Transform.prototype.update = function ( data, member ) {
 
+		var members = [ 'X', 'Y', 'Z', 'ANGLE' ];
+
 		switch ( this.type ) {
 
 			case 'matrix':
 
-				console.log( 'Currently not handling matrix transform updates' );
+				if ( ! member ) {
+
+					this.obj.copy( data );
+
+				} else if ( member.length === 1 ) {
+
+					switch ( member[ 0 ] ) {
+
+						case 0:
+
+							this.obj.n11 = data[ 0 ];
+							this.obj.n21 = data[ 1 ];
+							this.obj.n31 = data[ 2 ];
+							this.obj.n41 = data[ 3 ];
+
+							break;
+
+						case 1:
+
+							this.obj.n12 = data[ 0 ];
+							this.obj.n22 = data[ 1 ];
+							this.obj.n32 = data[ 2 ];
+							this.obj.n42 = data[ 3 ];
+
+							break;
+
+						case 2:
+
+							this.obj.n13 = data[ 0 ];
+							this.obj.n23 = data[ 1 ];
+							this.obj.n33 = data[ 2 ];
+							this.obj.n43 = data[ 3 ];
+
+							break;
+
+						case 3:
+
+							this.obj.n14 = data[ 0 ];
+							this.obj.n24 = data[ 1 ];
+							this.obj.n34 = data[ 2 ];
+							this.obj.n44 = data[ 3 ];
+
+							break;
+
+					}
+
+				} else if ( member.length === 2 ) {
+
+					var propName = 'n' + ( member[ 0 ] + 1 ) + ( member[ 1 ] + 1 );
+					this.obj[ propName ] = data;
+					
+				} else {
+
+					console.log('Incorrect addressing of matrix in transform.');
+
+				}
+
 				break;
 
 			case 'translate':
 			case 'scale':
+
+				if ( Object.prototype.toString.call( member ) === '[object Array]' ) {
+
+					member = members[ member[ 0 ] ];
+
+				}
 
 				switch ( member ) {
 
@@ -1966,6 +2050,12 @@ THREE.ColladaLoader = function () {
 				break;
 
 			case 'rotate':
+
+				if ( Object.prototype.toString.call( member ) === '[object Array]' ) {
+
+					member = members[ member[ 0 ] ];
+
+				}
 
 				switch ( member ) {
 
@@ -3329,6 +3419,25 @@ THREE.ColladaLoader = function () {
 
 			switch ( child.nodeName ) {
 
+				case 'animation':
+
+					var anim = ( new Animation() ).parse( child );
+
+					for ( var src in anim.source ) {
+
+						this.source[ src ] = anim.source[ src ];
+
+					}
+
+					for ( var j = 0; j < anim.channel.length; j ++ ) {
+
+						this.channel.push( anim.channel[ j ] );
+						this.sampler.push( anim.sampler[ j ] );
+
+					}
+
+					break;
+
 				case 'source':
 
 					var src = ( new Source() ).parse( child );
@@ -3527,7 +3636,11 @@ THREE.ColladaLoader = function () {
 
 		var data;
 
-		if ( this.strideOut > 1 ) {
+		if ( type === 'matrix' && this.strideOut === 16 ) {
+
+			data = this.output[ ndx ];
+
+		} else if ( this.strideOut > 1 ) {
 
 			data = [];
 			ndx *= this.strideOut;
@@ -3554,6 +3667,10 @@ THREE.ColladaLoader = function () {
 						break;
 
 				}
+
+			} else if ( this.strideOut === 4 && type === 'matrix' ) {
+
+				fixCoords( data, -1 );
 
 			}
 
@@ -3642,7 +3759,7 @@ THREE.ColladaLoader = function () {
 				nextTarget = nextKey.getTarget( target.sid ),
 				data;
 
-			if ( nextTarget ) {
+			if ( target.transform.type !== 'matrix' && nextTarget ) {
 
 				var scale = ( time - this.time ) / ( nextKey.time - this.time ),
 					nextData = nextTarget.data,
@@ -4148,6 +4265,22 @@ THREE.ColladaLoader = function () {
 			data[12], data[13], data[14], data[15]
 			);
 
+	};
+
+	function getConvertedIndex( index ) {
+
+		if ( index > -1 && index < 3 ) {
+
+			var members = ['X', 'Y', 'Z'],
+				indices = { X: 0, Y: 1, Z: 2 };
+
+			index = getConvertedMember( members[ index ] );
+			index = indices[ index ];
+
+		}
+
+		return index;
+		
 	};
 
 	function getConvertedMember( member ) {
