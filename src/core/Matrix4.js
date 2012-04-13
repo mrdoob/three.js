@@ -805,6 +805,16 @@ THREE.Matrix4.prototype = {
 		return this;
 
 	},
+    
+    getMaxScaleOnAxis : function () {
+
+        var scaleXSq =  this.n11 * this.n11 + this.n21 * this.n21 + this.n31 * this.n31;
+        var scaleYSq =  this.n12 * this.n12 + this.n22 * this.n22 + this.n32 * this.n32;
+        var scaleZSq =  this.n13 * this.n13 + this.n23 * this.n23 + this.n33 * this.n33;
+        
+        return Math.sqrt(Math.max( scaleXSq , Math.max( scaleYSq , scaleZSq )));
+
+    },
 
 	//
 
