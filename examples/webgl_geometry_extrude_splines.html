@@ -60,6 +60,7 @@
 
     // Keep a diction of Curve instances
     var splines = {
+      GrannyKnot: new THREE.Curves.GrannyKnot(),
       HeartCurve: new THREE.Curves.HeartCurve(3.5),
       VivianiCurve: new THREE.Curves.VivianiCurve(70),
       KnotCurve: new THREE.Curves.KnotCurve(),
@@ -98,7 +99,7 @@
     var tube, tubeMesh;
     var animation = false, lookAhead = false;
     var scale;
-    var showCameraHelper = true;
+    var showCameraHelper = false;
 
     function addTube() {
 
@@ -136,12 +137,12 @@
         tubeMesh = THREE.SceneUtils.createMultiMaterialObject(geometry, [
           new THREE.MeshLambertMaterial({
               color: color,
-              opacity: 0.2,
+              opacity: (geometry.debug) ? 0.2 : 0.8,
               transparent: true
           }),
          new THREE.MeshBasicMaterial({
             color: 0x000000,
-            opacity: 0.3,
+            opacity: 0.5,
             wireframe: true
         })]);
 
@@ -188,9 +189,9 @@
       info.innerHTML += '<br/>Scale: <select id="scale" onchange="setScale()"><option>1</option><option>2</option><option selected>4</option><option>6</option><option>10</option></select>';
       info.innerHTML += '<br/>Extrusion Segments: <select onchange="addTube()" id="segments"><option>50</option><option selected>100</option><option>200</option><option>400</option></select>';
       info.innerHTML += '<br/>Radius Segments: <select id="radiusSegments" onchange="addTube()"><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option><option>6</option><option>8</option><option>12</option></select>';
-      info.innerHTML += '<br/>Debug normals: <input id="debug" type="checkbox" onchange="addTube()" checked /> Closed:<input id="closed" onchange="addTube()" type="checkbox" checked />';
+      info.innerHTML += '<br/>Debug normals: <input id="debug" type="checkbox" onchange="addTube()"  /> Closed:<input id="closed" onchange="addTube()" type="checkbox" checked />';
 
-      info.innerHTML += '<br/><br/><input id="animation" type="button" onclick="animateCamera(true)" value="Camera Spline Animation View: OFF"/><br/> Look Ahead <input id="lookAhead" type="checkbox" onchange="animateCamera()" /> Camera Helper <input id="cameraHelper" type="checkbox" onchange="animateCamera()" checked />';
+      info.innerHTML += '<br/><br/><input id="animation" type="button" onclick="animateCamera(true)" value="Camera Spline Animation View: OFF"/><br/> Look Ahead <input id="lookAhead" type="checkbox" onchange="animateCamera()" /> Camera Helper <input id="cameraHelper" type="checkbox" onchange="animateCamera()" />';
 
       container.appendChild(info);
 
@@ -359,9 +360,11 @@
 
 
       // Camera Orientation 1 - default look at
-      var lookAt = tube.path.getPointAt((t + 0.101) % 1).multiplyScalar(scale);
       // splineCamera.lookAt(lookAt);
 
+      // Using arclength for stablization in look ahead.
+      var lookAt = tube.path.getPointAt((t + 30/tube.path.getLength()) % 1).multiplyScalar(scale);
+      
       // Camera Orientation 2 - up orientation via normal
       if (!lookAhead)
       lookAt.copy(pos).addSelf(dir);
