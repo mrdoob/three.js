@@ -49,7 +49,7 @@ THREE.Geometry.prototype = {
 
 			var vertex = this.vertices[ i ];
 
-			matrix.multiplyVector3( vertex.position );
+			matrix.multiplyVector3( vertex );
 
 		}
 
@@ -82,17 +82,17 @@ THREE.Geometry.prototype = {
 
 			if ( face instanceof THREE.Face3 ) {
 
-				face.centroid.addSelf( this.vertices[ face.a ].position );
-				face.centroid.addSelf( this.vertices[ face.b ].position );
-				face.centroid.addSelf( this.vertices[ face.c ].position );
+				face.centroid.addSelf( this.vertices[ face.a ] );
+				face.centroid.addSelf( this.vertices[ face.b ] );
+				face.centroid.addSelf( this.vertices[ face.c ] );
 				face.centroid.divideScalar( 3 );
 
 			} else if ( face instanceof THREE.Face4 ) {
 
-				face.centroid.addSelf( this.vertices[ face.a ].position );
-				face.centroid.addSelf( this.vertices[ face.b ].position );
-				face.centroid.addSelf( this.vertices[ face.c ].position );
-				face.centroid.addSelf( this.vertices[ face.d ].position );
+				face.centroid.addSelf( this.vertices[ face.a ] );
+				face.centroid.addSelf( this.vertices[ face.b ] );
+				face.centroid.addSelf( this.vertices[ face.c ] );
+				face.centroid.addSelf( this.vertices[ face.d ] );
 				face.centroid.divideScalar( 4 );
 
 			}
@@ -114,8 +114,8 @@ THREE.Geometry.prototype = {
 			vB = this.vertices[ face.b ];
 			vC = this.vertices[ face.c ];
 
-			cb.sub( vC.position, vB.position );
-			ab.sub( vA.position, vB.position );
+			cb.sub( vC, vB );
+			ab.sub( vA, vB );
 			cb.crossSelf( ab );
 
 			if ( !cb.isZero() ) {
@@ -388,9 +388,9 @@ THREE.Geometry.prototype = {
 
 		function handleTriangle( context, a, b, c, ua, ub, uc ) {
 
-			vA = context.vertices[ a ].position;
-			vB = context.vertices[ b ].position;
-			vC = context.vertices[ c ].position;
+			vA = context.vertices[ a ];
+			vB = context.vertices[ b ];
+			vC = context.vertices[ c ];
 
 			uvA = uv[ ua ];
 			uvB = uv[ ub ];
@@ -489,7 +489,7 @@ THREE.Geometry.prototype = {
 
 		if ( this.vertices.length > 0 ) {
 
-			var position, firstPosition = this.vertices[ 0 ].position;
+			var position, firstPosition = this.vertices[ 0 ];
 
 			this.boundingBox.min.copy( firstPosition );
 			this.boundingBox.max.copy( firstPosition );
@@ -499,7 +499,7 @@ THREE.Geometry.prototype = {
 
 			for ( var v = 1, vl = this.vertices.length; v < vl; v ++ ) {
 
-				position = this.vertices[ v ].position;
+				position = this.vertices[ v ];
 
 				if ( position.x < min.x ) {
 
@@ -550,7 +550,7 @@ THREE.Geometry.prototype = {
 
 		for ( var v = 0, vl = this.vertices.length; v < vl; v ++ ) {
 
-			radius = this.vertices[ v ].position.length();
+			radius = this.vertices[ v ].length();
 			if ( radius > maxRadius ) maxRadius = radius;
 
 		}
@@ -577,7 +577,7 @@ THREE.Geometry.prototype = {
 
 		for ( i = 0, il = this.vertices.length; i < il; i ++ ) {
 
-			v = this.vertices[ i ].position;
+			v = this.vertices[ i ];
 			key = [ Math.round( v.x * precision ), Math.round( v.y * precision ), Math.round( v.z * precision ) ].join( '_' );
 
 			if ( verticesMap[ key ] === undefined ) {

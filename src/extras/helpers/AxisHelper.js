@@ -9,7 +9,7 @@ THREE.AxisHelper = function () {
 
 	var lineGeometry = new THREE.Geometry();
 	lineGeometry.vertices.push( new THREE.Vertex() );
-	lineGeometry.vertices.push( new THREE.Vertex( new THREE.Vector3( 0, 100, 0 ) ) );
+	lineGeometry.vertices.push( new THREE.Vertex( 0, 100, 0 ) );
 
 	var coneGeometry = new THREE.CylinderGeometry( 0, 5, 25, 5, 1 );
 

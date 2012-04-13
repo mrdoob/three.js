@@ -673,7 +673,7 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 
 	function vertex ( scope, x, y, z ) {
 
-		scope.vertices.push( new THREE.Vertex( new THREE.Vector3( x, y, z ) ) );
+		scope.vertices.push( new THREE.Vertex( x, y, z ) );
 
 	};
 

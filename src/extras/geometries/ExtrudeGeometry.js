@@ -105,9 +105,8 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 		// Reuse TNB from TubeGeomtry for now.
 		// TODO1 - have a .isClosed in spline?
-		// TODO2 - have have TNBs calculation refactored from TubeGeometry?
-		splineTube = new THREE.TubeGeometry(extrudePath, steps, 1, 1, false, false);
-		
+		splineTube = new THREE.TubeGeometry.FrenetFrames(extrudePath, steps, false);
+
 		// console.log(splineTube, 'splineTube', splineTube.normals.length, 'steps', steps, 'extrudePts', extrudePts.length);
 
 		binormal = new THREE.Vector3();
@@ -626,7 +625,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 
 	function v( x, y, z ) {
-		scope.vertices.push( new THREE.Vertex( new THREE.Vector3( x, y, z ) ) );
+		scope.vertices.push( new THREE.Vertex( x, y, z ) );
 	}
 
 	function f3( a, b, c, isBottom ) {
@@ -661,14 +660,14 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 THREE.ExtrudeGeometry.WorldUVGenerator = {
 	generateTopUV: function( geometry, extrudedShape, extrudeOptions, indexA, indexB, indexC) {
-		var ax = geometry.vertices[ indexA ].position.x,
-			ay = geometry.vertices[ indexA ].position.y,
+		var ax = geometry.vertices[ indexA ].x,
+			ay = geometry.vertices[ indexA ].y,
 
-			bx = geometry.vertices[ indexB ].position.x,
-			by = geometry.vertices[ indexB ].position.y,
+			bx = geometry.vertices[ indexB ].x,
+			by = geometry.vertices[ indexB ].y,
 
-			cx = geometry.vertices[ indexC ].position.x,
-			cy = geometry.vertices[ indexC ].position.y;
+			cx = geometry.vertices[ indexC ].x,
+			cy = geometry.vertices[ indexC ].y;
 			
 		return [
 			new THREE.UV( ax, 1 - ay ),
@@ -683,21 +682,21 @@ THREE.ExtrudeGeometry.WorldUVGenerator = {
 
 	generateSideWallUV: function( geometry, extrudedShape, wallContour, extrudeOptions,
 	                              indexA, indexB, indexC, indexD, stepIndex, stepsLength) {
-		var ax = geometry.vertices[ indexA ].position.x,
-			ay = geometry.vertices[ indexA ].position.y,
-			az = geometry.vertices[ indexA ].position.z,
+		var ax = geometry.vertices[ indexA ].x,
+			ay = geometry.vertices[ indexA ].y,
+			az = geometry.vertices[ indexA ].z,
 
-			bx = geometry.vertices[ indexB ].position.x,
-			by = geometry.vertices[ indexB ].position.y,
-			bz = geometry.vertices[ indexB ].position.z,
+			bx = geometry.vertices[ indexB ].x,
+			by = geometry.vertices[ indexB ].y,
+			bz = geometry.vertices[ indexB ].z,
 
-			cx = geometry.vertices[ indexC ].position.x,
-			cy = geometry.vertices[ indexC ].position.y,
-			cz = geometry.vertices[ indexC ].position.z,
+			cx = geometry.vertices[ indexC ].x,
+			cy = geometry.vertices[ indexC ].y,
+			cz = geometry.vertices[ indexC ].z,
 
-			dx = geometry.vertices[ indexD ].position.x,
-			dy = geometry.vertices[ indexD ].position.y,
-			dz = geometry.vertices[ indexD ].position.z;
+			dx = geometry.vertices[ indexD ].x,
+			dy = geometry.vertices[ indexD ].y,
+			dz = geometry.vertices[ indexD ].z;
 		
 		if ( Math.abs( ay - by ) < 0.01 ) {
 			return [

@@ -178,7 +178,7 @@ THREE.Projector = function() {
 				for ( v = 0, vl = vertices.length; v < vl; v ++ ) {
 
 					_vertex = getNextVertexInPool();
-					_vertex.positionWorld.copy( vertices[ v ].position );
+					_vertex.positionWorld.copy( vertices[ v ] );
 
 					objectMatrixWorld.multiplyVector3( _vertex.positionWorld );
 
@@ -316,7 +316,7 @@ THREE.Projector = function() {
 				vertices = object.geometry.vertices;
 				
 				v1 = getNextVertexInPool();
-				v1.positionScreen.copy( vertices[ 0 ].position );
+				v1.positionScreen.copy( vertices[ 0 ] );
 				_projScreenobjectMatrixWorld.multiplyVector4( v1.positionScreen );
 
 				// Handle LineStrip and LinePieces
@@ -325,7 +325,7 @@ THREE.Projector = function() {
 				for ( v = 1, vl = vertices.length; v < vl; v ++ ) {
 
 					v1 = getNextVertexInPool();
-					v1.positionScreen.copy( vertices[ v ].position );
+					v1.positionScreen.copy( vertices[ v ] );
 					_projScreenobjectMatrixWorld.multiplyVector4( v1.positionScreen );
 
 					if ( ( v + 1 ) % step > 0 ) continue;

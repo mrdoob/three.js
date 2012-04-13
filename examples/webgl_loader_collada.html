@@ -49,7 +49,7 @@
 
 			var loader = new THREE.ColladaLoader();
 			loader.options.convertUpAxis = true;
-			loader.load( './models/monster.dae', function colladaReady( collada ) {
+			loader.load( './models/collada/monster/monster.dae', function colladaReady( collada ) {
 
 				dae = collada.scene;
 				skin = collada.skins[ 0 ];
@@ -81,11 +81,11 @@
 
 				for ( var i = 0; i <= size / step * 2; i ++ ) {
 
-					geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( - size, floor, i * step - size ) ) );
-					geometry.vertices.push( new THREE.Vertex( new THREE.Vector3(   size, floor, i * step - size ) ) );
+					geometry.vertices.push( new THREE.Vertex( - size, floor, i * step - size ) );
+					geometry.vertices.push( new THREE.Vertex(   size, floor, i * step - size ) );
 
-					geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( i * step - size, floor, -size ) ) );
-					geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( i * step - size, floor,  size ) ) );
+					geometry.vertices.push( new THREE.Vertex( i * step - size, floor, -size ) );
+					geometry.vertices.push( new THREE.Vertex( i * step - size, floor,  size ) );
 
 				}
 

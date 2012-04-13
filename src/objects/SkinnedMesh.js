@@ -177,7 +177,7 @@ THREE.SkinnedMesh.prototype.pose = function() {
 
 		for ( var i = 0; i < this.geometry.skinIndices.length; i ++ ) {
 
-			orgVertex = this.geometry.vertices[ i ].position;
+			orgVertex = this.geometry.vertices[ i ];
 
 			var indexA = this.geometry.skinIndices[ i ].x;
 			var indexB = this.geometry.skinIndices[ i ].y;

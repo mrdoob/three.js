@@ -1,6 +1,7 @@
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author zz85 / http://www.lab4games.net/zz85/blog
+ * @author davidedc / http://www.sketchpatch.net/
  *
  * ShaderExtras currently contains:
  *
@@ -1188,7 +1189,9 @@ THREE.ShaderExtras = {
 				"vec3 rgbNE = texture2D( tDiffuse, ( gl_FragCoord.xy + vec2( 1.0, -1.0 ) ) * resolution ).xyz;",
 				"vec3 rgbSW = texture2D( tDiffuse, ( gl_FragCoord.xy + vec2( -1.0, 1.0 ) ) * resolution ).xyz;",
 				"vec3 rgbSE = texture2D( tDiffuse, ( gl_FragCoord.xy + vec2( 1.0, 1.0 ) ) * resolution ).xyz;",
-				"vec3 rgbM  = texture2D( tDiffuse,  gl_FragCoord.xy  * resolution ).xyz;",
+				"vec4 rgbaM  = texture2D( tDiffuse,  gl_FragCoord.xy  * resolution );",
+				"vec3 rgbM  = rgbaM.xyz;",
+				"float opacity  = rgbaM.w;",
 
 				"vec3 luma = vec3( 0.299, 0.587, 0.114 );",
 
@@ -1223,17 +1226,17 @@ THREE.ShaderExtras = {
 
 				"if ( ( lumaB < lumaMin ) || ( lumaB > lumaMax ) ) {",
 
-					"gl_FragColor = vec4( rgbA, 1.0 );",
+					"gl_FragColor = vec4( rgbA, opacity );",
 
 				"} else {",
 
-					"gl_FragColor = vec4( rgbB, 1.0 );",
+					"gl_FragColor = vec4( rgbB, opacity );",
 
 				"}",
 
 			"}",
 
-		].join("\n"),
+		].join("\n")
 
 	},
 

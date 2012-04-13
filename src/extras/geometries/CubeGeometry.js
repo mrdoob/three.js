@@ -100,12 +100,12 @@ THREE.CubeGeometry = function ( width, height, depth, segmentsWidth, segmentsHei
 
 			for ( ix = 0; ix < gridX1; ix ++ ) {
 
-				var vector = new THREE.Vector3();
+				var vector = new THREE.Vertex();
 				vector[ u ] = ( ix * segment_width - width_half ) * udir;
 				vector[ v ] = ( iy * segment_height - height_half ) * vdir;
 				vector[ w ] = depth;
 
-				scope.vertices.push( new THREE.Vertex( vector ) );
+				scope.vertices.push( vector );
 
 			}
 

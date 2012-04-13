@@ -7,7 +7,7 @@
 
 THREE.WebGLRenderer = function ( parameters ) {
 
-	// constructor parameters
+	console.log( 'THREE.WebGLRenderer', THREE.REVISION );
 
 	parameters = parameters || {};
 
@@ -886,7 +886,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			for ( v = 0; v < vl; v ++ ) {
 
-				vertex = vertices[ v ].position;
+				vertex = vertices[ v ];
 
 				_vector3.copy( vertex );
 				_projScreenMatrixPS.multiplyVector3( _vector3 );
@@ -899,7 +899,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			for ( v = 0; v < vl; v ++ ) {
 
-				vertex = vertices[ sortArray[v][1] ].position;
+				vertex = vertices[ sortArray[v][1] ];
 
 				offset = v * 3;
 
@@ -1023,7 +1023,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				for ( v = 0; v < vl; v ++ ) {
 
-					vertex = vertices[ v ].position;
+					vertex = vertices[ v ];
 
 					offset = v * 3;
 
@@ -1202,7 +1202,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			for ( v = 0; v < vl; v ++ ) {
 
-				vertex = vertices[ v ].position;
+				vertex = vertices[ v ];
 
 				offset = v * 3;
 
@@ -1350,7 +1350,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			for ( v = 0; v < vl; v ++ ) {
 
-				vertex = vertices[ v ].position;
+				vertex = vertices[ v ];
 
 				offset = v * 3;
 
@@ -1489,9 +1489,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				face = obj_faces[ chunk_faces3[ f ] ];
 
-				v1 = vertices[ face.a ].position;
-				v2 = vertices[ face.b ].position;
-				v3 = vertices[ face.c ].position;
+				v1 = vertices[ face.a ];
+				v2 = vertices[ face.b ];
+				v3 = vertices[ face.c ];
 
 				vertexArray[ offset ]     = v1.x;
 				vertexArray[ offset + 1 ] = v1.y;
@@ -1513,10 +1513,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				face = obj_faces[ chunk_faces4[ f ] ];
 
-				v1 = vertices[ face.a ].position;
-				v2 = vertices[ face.b ].position;
-				v3 = vertices[ face.c ].position;
-				v4 = vertices[ face.d ].position;
+				v1 = vertices[ face.a ];
+				v2 = vertices[ face.b ];
+				v3 = vertices[ face.c ];
+				v4 = vertices[ face.d ];
 
 				vertexArray[ offset ]     = v1.x;
 				vertexArray[ offset + 1 ] = v1.y;
@@ -1556,9 +1556,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					// morph positions
 
-					v1 = morphTargets[ vk ].vertices[ face.a ].position;
-					v2 = morphTargets[ vk ].vertices[ face.b ].position;
-					v3 = morphTargets[ vk ].vertices[ face.c ].position;
+					v1 = morphTargets[ vk ].vertices[ face.a ];
+					v2 = morphTargets[ vk ].vertices[ face.b ];
+					v3 = morphTargets[ vk ].vertices[ face.c ];
 
 					vka = morphTargetsArrays[ vk ];
 
@@ -1623,10 +1623,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					// morph positions
 
-					v1 = morphTargets[ vk ].vertices[ face.a ].position;
-					v2 = morphTargets[ vk ].vertices[ face.b ].position;
-					v3 = morphTargets[ vk ].vertices[ face.c ].position;
-					v4 = morphTargets[ vk ].vertices[ face.d ].position;
+					v1 = morphTargets[ vk ].vertices[ face.a ];
+					v2 = morphTargets[ vk ].vertices[ face.b ];
+					v3 = morphTargets[ vk ].vertices[ face.c ];
+					v4 = morphTargets[ vk ].vertices[ face.d ];
 
 					vka = morphTargetsArrays[ vk ];
 
@@ -6126,14 +6126,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 				throw 'Error creating WebGL context.';
 
 			}
-
-			console.log(
-				navigator.userAgent + " | " +
-				gl.getParameter( gl.VERSION ) + " | " +
-				gl.getParameter( gl.VENDOR ) + " | " +
-				gl.getParameter( gl.RENDERER ) + " | " +
-				gl.getParameter( gl.SHADING_LANGUAGE_VERSION )
-			);
 
 		} catch ( error ) {
 
