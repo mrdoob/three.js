@@ -160,7 +160,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		ambient: [ 0, 0, 0 ],
 		directional: { length: 0, colors: new Array(), positions: new Array() },
-		point: { length: 0, colors: new Array(), positions: new Array(), distances: new Array() }
+		point: { length: 0, colors: new Array(), positions: new Array(), distances: new Array() },
+		spot: { length: 0, colors: new Array(), positions: new Array(), distances: new Array(), directions: new Array(), angles: new Array(), exponents: new Array() }
 
 	};
 
@@ -4237,22 +4238,35 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		parameters = {
 
-			map: !!material.map, envMap: !!material.envMap, lightMap: !!material.lightMap,
+			map: !!material.map,
+			envMap: !!material.envMap,
+			lightMap: !!material.lightMap,
+
 			vertexColors: material.vertexColors,
-			fog: fog, useFog: material.fog,
+
+			fog: fog,
+			useFog: material.fog,
+
 			sizeAttenuation: material.sizeAttenuation,
+
 			skinning: material.skinning,
+			maxBones: maxBones,
+
 			morphTargets: material.morphTargets,
 			morphNormals: material.morphNormals,
 			maxMorphTargets: this.maxMorphTargets,
 			maxMorphNormals: this.maxMorphNormals,
-			maxDirLights: maxLightCount.directional, maxPointLights: maxLightCount.point,
-			maxBones: maxBones,
+
+			maxDirLights: maxLightCount.directional,
+			maxPointLights: maxLightCount.point,
+			maxSpotLights: maxLightCount.spot,
+
+			maxShadows: maxShadows,
 			shadowMapEnabled: this.shadowMapEnabled && object.receiveShadow,
 			shadowMapSoft: this.shadowMapSoft,
 			shadowMapDebug: this.shadowMapDebug,
 			shadowMapCascade: this.shadowMapCascade,
-			maxShadows: maxShadows,
+
 			alphaTest: material.alphaTest,
 			metal: material.metal,
 			perPixel: material.perPixel,
@@ -4669,6 +4683,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 		uniforms.pointLightPosition.value = lights.point.positions;
 		uniforms.pointLightDistance.value = lights.point.distances;
 
+		uniforms.spotLightColor.value = lights.spot.colors;
+		uniforms.spotLightPosition.value = lights.spot.positions;
+		uniforms.spotLightDistance.value = lights.spot.distances;
+		uniforms.spotLightDirection.value = lights.spot.directions;
+		uniforms.spotLightAngle.value = lights.spot.angles;
+		uniforms.spotLightExponent.value = lights.spot.exponents;
+
 	};
 
 	function refreshUniformsShadow ( uniforms, lights ) {
@@ -4959,11 +4980,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 		ppositions = zlights.point.positions,
 		pdistances = zlights.point.distances,
 
+		scolors = zlights.spot.colors,
+		spositions = zlights.spot.positions,
+		sdistances = zlights.spot.distances,
+		sdirections = zlights.spot.directions,
+		sangles = zlights.spot.angles,
+		sexponents = zlights.spot.exponents,
+
 		dlength = 0,
 		plength = 0,
+		slength = 0,
 
 		doffset = 0,
-		poffset = 0;
+		poffset = 0,
+		soffset = 0;
 
 		for ( l = 0, ll = lights.length; l < ll; l ++ ) {
 
@@ -5019,7 +5049,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				dlength += 1;
 
-			} else if( light instanceof THREE.PointLight || light instanceof THREE.SpotLight ) {
+			} else if( light instanceof THREE.PointLight ) {
 
 				poffset = plength * 3;
 
@@ -5047,6 +5077,45 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				plength += 1;
 
+			} else if( light instanceof THREE.SpotLight ) {
+
+				soffset = slength * 3;
+
+				if ( _this.gammaInput ) {
+
+					scolors[ soffset ]     = color.r * color.r * intensity * intensity;
+					scolors[ soffset + 1 ] = color.g * color.g * intensity * intensity;
+					scolors[ soffset + 2 ] = color.b * color.b * intensity * intensity;
+
+				} else {
+
+					scolors[ soffset ]     = color.r * intensity;
+					scolors[ soffset + 1 ] = color.g * intensity;
+					scolors[ soffset + 2 ] = color.b * intensity;
+
+				}
+
+				position = light.matrixWorld.getPosition();
+
+				spositions[ soffset ]     = position.x;
+				spositions[ soffset + 1 ] = position.y;
+				spositions[ soffset + 2 ] = position.z;
+
+				sdistances[ slength ] = distance;
+
+				_direction.copy( position );
+				_direction.subSelf( light.target.matrixWorld.getPosition() );
+				_direction.normalize();
+
+				sdirections[ soffset ]     = _direction.x;
+				sdirections[ soffset + 1 ] = _direction.y;
+				sdirections[ soffset + 2 ] = _direction.z;
+
+				sangles[ slength ] = Math.cos( light.angle );
+				sexponents[ slength ] = light.exponent;
+
+				slength += 1;
+
 			}
 
 		}
@@ -5056,9 +5125,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		for ( l = dlength * 3, ll = dcolors.length; l < ll; l ++ ) dcolors[ l ] = 0.0;
 		for ( l = plength * 3, ll = pcolors.length; l < ll; l ++ ) pcolors[ l ] = 0.0;
+		for ( l = slength * 3, ll = scolors.length; l < ll; l ++ ) scolors[ l ] = 0.0;
 
-		zlights.point.length = plength;
 		zlights.directional.length = dlength;
+		zlights.point.length = plength;
+		zlights.spot.length = slength;
 
 		zlights.ambient[ 0 ] = r;
 		zlights.ambient[ 1 ] = g;
@@ -5362,6 +5433,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			"#define MAX_DIR_LIGHTS " + parameters.maxDirLights,
 			"#define MAX_POINT_LIGHTS " + parameters.maxPointLights,
+			"#define MAX_SPOT_LIGHTS " + parameters.maxSpotLights,
 
 			"#define MAX_SHADOWS " + parameters.maxShadows,
 
@@ -5447,6 +5519,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			"#define MAX_DIR_LIGHTS " + parameters.maxDirLights,
 			"#define MAX_POINT_LIGHTS " + parameters.maxPointLights,
+			"#define MAX_SPOT_LIGHTS " + parameters.maxSpotLights,
 
 			"#define MAX_SHADOWS " + parameters.maxShadows,
 
@@ -6063,10 +6136,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function allocateLights ( lights ) {
 
-		var l, ll, light, dirLights, pointLights, maxDirLights, maxPointLights;
-		dirLights = pointLights = maxDirLights = maxPointLights = 0;
+		var l, ll, light, dirLights, pointLights, spotLights, maxDirLights, maxPointLights, maxSpotLights;
 
-		for ( l = 0, ll = lights.length; l < ll; l++ ) {
+		dirLights = pointLights = spotLights = maxDirLights = maxPointLights = maxSpotLights = 0;
+
+		for ( l = 0, ll = lights.length; l < ll; l ++ ) {
 
 			light = lights[ l ];
 
@@ -6074,23 +6148,25 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( light instanceof THREE.DirectionalLight ) dirLights ++;
 			if ( light instanceof THREE.PointLight ) pointLights ++;
-			if ( light instanceof THREE.SpotLight ) pointLights ++;
+			if ( light instanceof THREE.SpotLight ) spotLights ++;
 
 		}
 
-		if ( ( pointLights + dirLights ) <= _maxLights ) {
+		if ( ( pointLights + spotLights + dirLights ) <= _maxLights ) {
 
 			maxDirLights = dirLights;
 			maxPointLights = pointLights;
+			maxSpotLights = spotLights;
 
 		} else {
 
 			maxDirLights = Math.ceil( _maxLights * dirLights / ( pointLights + dirLights ) );
 			maxPointLights = _maxLights - maxDirLights;
+			maxSpotLights = maxPointLights; // this is not really correct
 
 		}
 
-		return { 'directional' : maxDirLights, 'point' : maxPointLights };
+		return { 'directional' : maxDirLights, 'point' : maxPointLights, 'spot': maxSpotLights };
 
 	};
 

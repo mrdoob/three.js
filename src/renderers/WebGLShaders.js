@@ -285,11 +285,22 @@ THREE.ShaderChunk = {
 
 		"#endif",
 
+		"#if MAX_SPOT_LIGHTS > 0",
+
+			"uniform vec3 spotLightColor[ MAX_SPOT_LIGHTS ];",
+			"uniform vec3 spotLightPosition[ MAX_SPOT_LIGHTS ];",
+			"uniform vec3 spotLightDirection[ MAX_SPOT_LIGHTS ];",
+			"uniform float spotLightDistance[ MAX_SPOT_LIGHTS ];",
+			"uniform float spotLightAngle[ MAX_SPOT_LIGHTS ];",
+			"uniform float spotLightExponent[ MAX_SPOT_LIGHTS ];",
+
+		"#endif",
+
 		"#ifdef WRAP_AROUND",
 
 			"uniform vec3 wrapRGB;",
 
-		"#endif",
+		"#endif"
 
 	].join("\n"),
 
@@ -405,13 +416,74 @@ THREE.ShaderChunk = {
 
 		"#endif",
 
+		"#if MAX_SPOT_LIGHTS > 0",
+
+			"for( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {",
+
+				"vec4 lPosition = viewMatrix * vec4( spotLightPosition[ i ], 1.0 );",
+				"vec3 lVector = lPosition.xyz - mvPosition.xyz;",
+
+				"lVector = normalize( lVector );",
+
+				"float spotEffect = dot( spotLightDirection[ i ], normalize( spotLightPosition[ i ] - mPosition.xyz ) );",
+
+				"if ( spotEffect > spotLightAngle[ i ] ) {",
+
+					"spotEffect = pow( spotEffect, spotLightExponent[ i ] );",
+
+					"float lDistance = 1.0;",
+					"if ( spotLightDistance[ i ] > 0.0 )",
+						"lDistance = 1.0 - min( ( length( lVector ) / spotLightDistance[ i ] ), 1.0 );",
+
+					"float dotProduct = dot( transformedNormal, lVector );",
+					"vec3 spotLightWeighting = vec3( max( dotProduct, 0.0 ) );",
+
+					"#ifdef DOUBLE_SIDED",
+
+						"vec3 spotLightWeightingBack = vec3( max( -dotProduct, 0.0 ) );",
+
+						"#ifdef WRAP_AROUND",
+
+							"vec3 spotLightWeightingHalfBack = vec3( max( -0.5 * dotProduct + 0.5, 0.0 ) );",
+
+						"#endif",
+
+					"#endif",
+
+					"#ifdef WRAP_AROUND",
+
+						"vec3 spotLightWeightingHalf = vec3( max( 0.5 * dotProduct + 0.5, 0.0 ) );",
+						"spotLightWeighting = mix( spotLightWeighting, spotLightWeightingHalf, wrapRGB );",
+
+						"#ifdef DOUBLE_SIDED",
+
+							"spotLightWeightingBack = mix( spotLightWeightingBack, spotLightWeightingHalfBack, wrapRGB );",
+
+						"#endif",
+
+					"#endif",
+
+					"vLightFront += spotLightColor[ i ] * spotLightWeighting * lDistance * spotEffect;",
+
+					"#ifdef DOUBLE_SIDED",
+
+						"vLightBack += spotLightColor[ i ] * spotLightWeightingBack * lDistance * spotEffect;",
+
+					"#endif",
+
+				"}",
+
+			"}",
+
+		"#endif",
+
 		"vLightFront = vLightFront * diffuse + ambient * ambientLightColor + emissive;",
 
 		"#ifdef DOUBLE_SIDED",
 
 			"vLightBack = vLightBack * diffuse + ambient * ambientLightColor + emissive;",
 
-		"#endif",
+		"#endif"
 
 	].join("\n"),
 
@@ -419,8 +491,9 @@ THREE.ShaderChunk = {
 
 	lights_phong_pars_vertex: [
 
-		"#if MAX_POINT_LIGHTS > 0",
 		"#ifndef PHONG_PER_PIXEL",
+
+		"#if MAX_POINT_LIGHTS > 0",
 
 			"uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];",
 			"uniform float pointLightDistance[ MAX_POINT_LIGHTS ];",
@@ -428,6 +501,22 @@ THREE.ShaderChunk = {
 			"varying vec4 vPointLight[ MAX_POINT_LIGHTS ];",
 
 		"#endif",
+
+		"#if MAX_SPOT_LIGHTS > 0",
+
+			"uniform vec3 spotLightPosition[ MAX_SPOT_LIGHTS ];",
+			"uniform float spotLightDistance[ MAX_SPOT_LIGHTS ];",
+
+			"varying vec4 vSpotLight[ MAX_SPOT_LIGHTS ];",
+
+		"#endif",
+
+		"#endif",
+
+		"#if MAX_SPOT_LIGHTS > 0",
+
+			"varying vec3 vWorldPosition;",
+
 		"#endif"
 
 	].join("\n"),
@@ -435,8 +524,9 @@ THREE.ShaderChunk = {
 
 	lights_phong_vertex: [
 
-		"#if MAX_POINT_LIGHTS > 0",
 		"#ifndef PHONG_PER_PIXEL",
+
+		"#if MAX_POINT_LIGHTS > 0",
 
 			"for( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {",
 
@@ -452,6 +542,30 @@ THREE.ShaderChunk = {
 			"}",
 
 		"#endif",
+
+		"#if MAX_SPOT_LIGHTS > 0",
+
+			"for( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {",
+
+				"vec4 lPosition = viewMatrix * vec4( spotLightPosition[ i ], 1.0 );",
+				"vec3 lVector = lPosition.xyz - mvPosition.xyz;",
+
+				"float lDistance = 1.0;",
+				"if ( spotLightDistance[ i ] > 0.0 )",
+					"lDistance = 1.0 - min( ( length( lVector ) / spotLightDistance[ i ] ), 1.0 );",
+
+				"vSpotLight[ i ] = vec4( lVector, lDistance );",
+
+			"}",
+
+		"#endif",
+
+		"#endif",
+
+		"#if MAX_SPOT_LIGHTS > 0",
+
+			"vWorldPosition = mPosition.xyz;",
+
 		"#endif"
 
 	].join("\n"),
@@ -481,6 +595,28 @@ THREE.ShaderChunk = {
 				"varying vec4 vPointLight[ MAX_POINT_LIGHTS ];",
 
 			"#endif",
+
+		"#endif",
+
+		"#if MAX_SPOT_LIGHTS > 0",
+
+			"uniform vec3 spotLightColor[ MAX_SPOT_LIGHTS ];",
+			"uniform vec3 spotLightPosition[ MAX_SPOT_LIGHTS ];",
+			"uniform vec3 spotLightDirection[ MAX_SPOT_LIGHTS ];",
+			"uniform float spotLightAngle[ MAX_SPOT_LIGHTS ];",
+			"uniform float spotLightExponent[ MAX_SPOT_LIGHTS ];",
+
+			"#ifdef PHONG_PER_PIXEL",
+
+				"uniform float spotLightDistance[ MAX_SPOT_LIGHTS ];",
+
+			"#else",
+
+				"varying vec4 vSpotLight[ MAX_SPOT_LIGHTS ];",
+
+			"#endif",
+
+			"varying vec3 vWorldPosition;",
 
 		"#endif",
 
@@ -575,6 +711,83 @@ THREE.ShaderChunk = {
 
 		"#endif",
 
+		"#if MAX_SPOT_LIGHTS > 0",
+
+			"vec3 spotDiffuse  = vec3( 0.0 );",
+			"vec3 spotSpecular = vec3( 0.0 );",
+
+			"for ( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {",
+
+				"#ifdef PHONG_PER_PIXEL",
+
+					"vec4 lPosition = viewMatrix * vec4( spotLightPosition[ i ], 1.0 );",
+					"vec3 lVector = lPosition.xyz + vViewPosition.xyz;",
+
+					"float lDistance = 1.0;",
+					"if ( spotLightDistance[ i ] > 0.0 )",
+						"lDistance = 1.0 - min( ( length( lVector ) / spotLightDistance[ i ] ), 1.0 );",
+
+					"lVector = normalize( lVector );",
+
+				"#else",
+
+					"vec3 lVector = normalize( vSpotLight[ i ].xyz );",
+					"float lDistance = vSpotLight[ i ].w;",
+
+				"#endif",
+
+				"float spotEffect = dot( spotLightDirection[ i ], normalize( spotLightPosition[ i ] - vWorldPosition ) );",
+
+				"if ( spotEffect > spotLightAngle[ i ] ) {",
+
+					"spotEffect = pow( spotEffect, spotLightExponent[ i ] );",
+
+					// diffuse
+
+					"float dotProduct = dot( normal, lVector );",
+
+					"#ifdef WRAP_AROUND",
+
+						"float spotDiffuseWeightFull = max( dotProduct, 0.0 );",
+						"float spotDiffuseWeightHalf = max( 0.5 * dotProduct + 0.5, 0.0 );",
+
+						"vec3 spotDiffuseWeight = mix( vec3 ( spotDiffuseWeightFull ), vec3( spotDiffuseWeightHalf ), wrapRGB );",
+
+					"#else",
+
+						"float spotDiffuseWeight = max( dotProduct, 0.0 );",
+
+					"#endif",
+
+					"spotDiffuse += diffuse * spotLightColor[ i ] * spotDiffuseWeight * lDistance * spotEffect;",
+
+					// specular
+
+					"vec3 spotHalfVector = normalize( lVector + viewPosition );",
+					"float spotDotNormalHalf = max( dot( normal, spotHalfVector ), 0.0 );",
+					"float spotSpecularWeight = max( pow( spotDotNormalHalf, shininess ), 0.0 );",
+
+					"#ifdef PHYSICALLY_BASED_SHADING",
+
+						// 2.0 => 2.0001 is hack to work around ANGLE bug
+
+						"float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
+
+						"vec3 schlick = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( lVector, spotHalfVector ), 5.0 );",
+						"spotSpecular += schlick * spotLightColor[ i ] * spotSpecularWeight * spotDiffuseWeight * lDistance * specularNormalization * spotEffect;",
+
+					"#else",
+
+						"spotSpecular += specular * spotLightColor[ i ] * spotSpecularWeight * spotDiffuseWeight * lDistance * spotEffect;",
+
+					"#endif",
+
+				"}",
+
+			"}",
+
+		"#endif",
+
 		"#if MAX_DIR_LIGHTS > 0",
 
 			"vec3 dirDiffuse  = vec3( 0.0 );",
@@ -664,6 +877,13 @@ THREE.ShaderChunk = {
 
 			"totalDiffuse += pointDiffuse;",
 			"totalSpecular += pointSpecular;",
+
+		"#endif",
+
+		"#if MAX_SPOT_LIGHTS > 0",
+
+			"totalDiffuse += spotDiffuse;",
+			"totalSpecular += spotSpecular;",
 
 		"#endif",
 
@@ -1197,11 +1417,20 @@ THREE.UniformsLib = {
 	lights: {
 
 		"ambientLightColor" : { type: "fv", value: [] },
+
 		"directionalLightDirection" : { type: "fv", value: [] },
 		"directionalLightColor" : { type: "fv", value: [] },
+
 		"pointLightColor" : { type: "fv", value: [] },
 		"pointLightPosition" : { type: "fv", value: [] },
-		"pointLightDistance" : { type: "fv1", value: [] }
+		"pointLightDistance" : { type: "fv1", value: [] },
+
+		"spotLightColor" : { type: "fv", value: [] },
+		"spotLightPosition" : { type: "fv", value: [] },
+		"spotLightDirection" : { type: "fv", value: [] },
+		"spotLightDistance" : { type: "fv1", value: [] },
+		"spotLightAngle" : { type: "fv1", value: [] },
+		"spotLightExponent" : { type: "fv1", value: [] }
 
 	},
 
@@ -1428,6 +1657,12 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "color_vertex" ],
 
 				THREE.ShaderChunk[ "morphnormal_vertex" ],
+
+				"#ifndef USE_ENVMAP",
+
+					"vec4 mPosition = objectMatrix * vec4( position, 1.0 );",
+
+				"#endif",
 
 				THREE.ShaderChunk[ "lights_lambert_vertex" ],
 				THREE.ShaderChunk[ "skinning_vertex" ],
