@@ -3827,9 +3827,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 			object._modelViewMatrix = new THREE.Matrix4();
 			object._normalMatrix = new THREE.Matrix3();
 
-			object._normalMatrixArray = new Float32Array( 9 );
-			object._modelViewMatrixArray = new Float32Array( 16 );
-			object._objectMatrixArray = new Float32Array( 16 );
+			//object._normalMatrixArray = new Float32Array( 9 );
+			//object._modelViewMatrixArray = new Float32Array( 16 );
+			//object._objectMatrixArray = new Float32Array( 16 );
 
 			//object.matrixWorld.flattenToArray( object._objectMatrixArray );
 
@@ -4711,7 +4711,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( uniforms.normalMatrix ) {
 
-			_gl.uniformMatrix3fv( uniforms.normalMatrix, false, object._normalMatrixArray );
+			_gl.uniformMatrix3fv( uniforms.normalMatrix, false, object._normalMatrix.elements );
 
 		}
 
@@ -4940,7 +4940,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		object._modelViewMatrix.multiply( camera.matrixWorldInverse, object.matrixWorld);
 
 		object._normalMatrix.getInverse( object._modelViewMatrix );
-		object._normalMatrix.transposeIntoArray( object._normalMatrixArray );
+		object._normalMatrix.transpose();
 
 	};
 

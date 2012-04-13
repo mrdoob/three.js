@@ -4,7 +4,7 @@
 
 THREE.Matrix3 = function () {
 
-	this.m = [];
+	this.elements = new Float32Array(9);
 
 };
 
@@ -17,17 +17,19 @@ THREE.Matrix3.prototype = {
 		// input: THREE.Matrix4
 		// ( based on http://code.google.com/p/webgl-mjs/ )
 
-		var a11 =   matrix.elements[10] * matrix.elements[5] - matrix.elements[6] * matrix.elements[9];
-		var a21 = - matrix.elements[10] * matrix.elements[1] + matrix.elements[2] * matrix.elements[9];
-		var a31 =   matrix.elements[6] * matrix.elements[1] - matrix.elements[2] * matrix.elements[5];
-		var a12 = - matrix.elements[10] * matrix.elements[4] + matrix.elements[6] * matrix.elements[8];
-		var a22 =   matrix.elements[10] * matrix.elements[0] - matrix.elements[2] * matrix.elements[8];
-		var a32 = - matrix.elements[6] * matrix.elements[0] + matrix.elements[2] * matrix.elements[4];
-		var a13 =   matrix.elements[9] * matrix.elements[4] - matrix.elements[5] * matrix.elements[8];
-		var a23 = - matrix.elements[9] * matrix.elements[0] + matrix.elements[1] * matrix.elements[8];
-		var a33 =   matrix.elements[5] * matrix.elements[0] - matrix.elements[1] * matrix.elements[4];
+        var me = matrix.elements;
+        
+		var a11 =   me[10] * me[5] - me[6] * me[9];
+		var a21 = - me[10] * me[1] + me[2] * me[9];
+		var a31 =   me[6] * me[1] - me[2] * me[5];
+		var a12 = - me[10] * me[4] + me[6] * me[8];
+		var a22 =   me[10] * me[0] - me[2] * me[8];
+		var a32 = - me[6] * me[0] + me[2] * me[4];
+		var a13 =   me[9] * me[4] - me[5] * me[8];
+		var a23 = - me[9] * me[0] + me[1] * me[8];
+		var a33 =   me[5] * me[0] - me[1] * me[4];
 
-		var det = matrix.elements[0] * a11 + matrix.elements[1] * a12 + matrix.elements[2] * a13;
+		var det = me[0] * a11 + me[1] * a12 + me[2] * a13;
 
 		// no inverse
 
@@ -39,7 +41,7 @@ THREE.Matrix3.prototype = {
 
 		var idet = 1.0 / det;
 
-		var m = this.m;
+		var m = this.elements;
 
 		m[ 0 ] = idet * a11; m[ 1 ] = idet * a21; m[ 2 ] = idet * a31;
 		m[ 3 ] = idet * a12; m[ 4 ] = idet * a22; m[ 5 ] = idet * a32;
@@ -49,10 +51,10 @@ THREE.Matrix3.prototype = {
 
 	},
 
-	/*
+	
 	transpose: function () {
 
-		var tmp, m = this.m;
+		var tmp, m = this.elements;
 
 		tmp = m[1]; m[1] = m[3]; m[3] = tmp;
 		tmp = m[2]; m[2] = m[6]; m[6] = tmp;
@@ -61,7 +63,7 @@ THREE.Matrix3.prototype = {
 		return this;
 
 	},
-	*/
+	
 
 	transposeIntoArray: function ( r ) {
 
