@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 /**
  * @author mr.doob / http://mrdoob.com/
  */
@@ -18,30 +17,39 @@ if ( ! self.Int32Array ) {
 // requestAnimationFrame polyfill by Erik Möller
 // fixes from Paul Irish and Tino Zijdel
 
-(function() {
-    var lastTime = 0;
-    var vendors = ['ms', 'moz', 'webkit', 'o'];
-    for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
-        window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
-        window.cancelAnimationFrame = window[vendors[x]+'CancelAnimationFrame'] 
-                                   || window[vendors[x]+'CancelRequestAnimationFrame'];
-    }
- 
-    if (!window.requestAnimationFrame)
-        window.requestAnimationFrame = function(callback, element) {
-            var currTime = new Date().getTime();
-            var timeToCall = Math.max(0, 16 - (currTime - lastTime));
-            var id = window.setTimeout(function() { callback(currTime + timeToCall); }, 
-              timeToCall);
-            lastTime = currTime + timeToCall;
-            return id;
-        };
- 
-    if (!window.cancelAnimationFrame)
-        window.cancelAnimationFrame = function(id) {
-            clearTimeout(id);
-        };
-}());
+( function () {
+
+	var lastTime = 0;
+	var vendors = [ 'ms', 'moz', 'webkit', 'o' ];
+
+	for ( var x = 0; x < vendors.length && !window.requestAnimationFrame; ++ x ) {
+
+		window.requestAnimationFrame = window[ vendors[ x ] + 'RequestAnimationFrame' ];
+		window.cancelAnimationFrame = window[ vendors[ x ] + 'CancelAnimationFrame' ] || window[ vendors[ x ] + 'CancelRequestAnimationFrame' ];
+
+	}
+
+	if ( !window.requestAnimationFrame ) {
+
+		window.requestAnimationFrame = function ( callback, element ) {
+
+			var currTime = Date.now(), timeToCall = Math.max( 0, 16 - ( currTime - lastTime ) );
+			var id = window.setTimeout( function() { callback( currTime + timeToCall ); }, timeToCall );
+			lastTime = currTime + timeToCall;
+			return id;
+
+		};
+
+	}
+
+
+	if ( !window.cancelAnimationFrame ) {
+
+		window.cancelAnimationFrame = function ( id ) { clearTimeout( id ); };
+
+	}
+
+}() );
 /**
  * @author mr.doob / http://mrdoob.com/
  */
@@ -1112,9 +1120,9 @@ THREE.Ray = function ( origin, direction ) {
 
 					if ( face instanceof THREE.Face3 ) {
 
-						a = objMatrix.multiplyVector3( a.copy( vertices[ face.a ].position ) );
-						b = objMatrix.multiplyVector3( b.copy( vertices[ face.b ].position ) );
-						c = objMatrix.multiplyVector3( c.copy( vertices[ face.c ].position ) );
+						a = objMatrix.multiplyVector3( a.copy( vertices[ face.a ] ) );
+						b = objMatrix.multiplyVector3( b.copy( vertices[ face.b ] ) );
+						c = objMatrix.multiplyVector3( c.copy( vertices[ face.c ] ) );
 
 						if ( pointInFace3( intersectPoint, a, b, c ) ) {
 
@@ -1133,10 +1141,10 @@ THREE.Ray = function ( origin, direction ) {
 
 					} else if ( face instanceof THREE.Face4 ) {
 
-						a = objMatrix.multiplyVector3( a.copy( vertices[ face.a ].position ) );
-						b = objMatrix.multiplyVector3( b.copy( vertices[ face.b ].position ) );
-						c = objMatrix.multiplyVector3( c.copy( vertices[ face.c ].position ) );
-						d = objMatrix.multiplyVector3( d.copy( vertices[ face.d ].position ) );
+						a = objMatrix.multiplyVector3( a.copy( vertices[ face.a ] ) );
+						b = objMatrix.multiplyVector3( b.copy( vertices[ face.b ] ) );
+						c = objMatrix.multiplyVector3( c.copy( vertices[ face.c ] ) );
+						d = objMatrix.multiplyVector3( d.copy( vertices[ face.d ] ) );
 
 						if ( pointInFace3( intersectPoint, a, b, d ) || pointInFace3( intersectPoint, b, c, d ) ) {
 
@@ -1220,7 +1228,8 @@ THREE.Ray = function ( origin, direction ) {
 
 	}
 
-};/**
+};
+/**
  * @author mr.doob / http://mrdoob.com/
  */
 
@@ -1580,6 +1589,7 @@ THREE.Matrix3.prototype = {
  * @author mikael emtinger / http://gomo.se/
  * @author timknip / http://www.floorplanner.com/
  */
+
 
 THREE.Matrix4 = function ( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43, n44 ) {
 
@@ -2702,7 +2712,7 @@ THREE.Object3D.prototype = {
 
 		}
 
-		if ( this.children.indexOf( object ) === - 1 ) {
+		if ( object instanceof THREE.Object3D ) { // && this.children.indexOf( object ) === - 1
 
 			if ( object.parent !== undefined ) {
 
@@ -3036,7 +3046,7 @@ THREE.Projector = function() {
 				for ( v = 0, vl = vertices.length; v < vl; v ++ ) {
 
 					_vertex = getNextVertexInPool();
-					_vertex.positionWorld.copy( vertices[ v ].position );
+					_vertex.positionWorld.copy( vertices[ v ] );
 
 					objectMatrixWorld.multiplyVector3( _vertex.positionWorld );
 
@@ -3174,7 +3184,7 @@ THREE.Projector = function() {
 				vertices = object.geometry.vertices;
 				
 				v1 = getNextVertexInPool();
-				v1.positionScreen.copy( vertices[ 0 ].position );
+				v1.positionScreen.copy( vertices[ 0 ] );
 				_projScreenobjectMatrixWorld.multiplyVector4( v1.positionScreen );
 
 				// Handle LineStrip and LinePieces
@@ -3183,7 +3193,7 @@ THREE.Projector = function() {
 				for ( v = 1, vl = vertices.length; v < vl; v ++ ) {
 
 					v1 = getNextVertexInPool();
-					v1.positionScreen.copy( vertices[ v ].position );
+					v1.positionScreen.copy( vertices[ v ] );
 					_projScreenobjectMatrixWorld.multiplyVector4( v1.positionScreen );
 
 					if ( ( v + 1 ) % step > 0 ) continue;
@@ -3662,23 +3672,7 @@ THREE.Quaternion.slerp = function ( qa, qb, qm, t ) {
  * @author mr.doob / http://mrdoob.com/
  */
 
-THREE.Vertex = function ( position ) {
-
-	this.position = position || new THREE.Vector3();
-
-};
-
-THREE.Vertex.prototype = {
-
-	constructor: THREE.Vertex,
-
-	clone: function () {
-
-		return new THREE.Vertex( this.position.clone() );
-
-	}
-
-};
+THREE.Vertex = THREE.Vector3;
 /**
  * @author mr.doob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
@@ -4751,6 +4745,8 @@ THREE.Scene.prototype.__removeObject = function ( object ) {
 
 THREE.DOMRenderer = function () {
 
+	console.log( 'THREE.DOMRenderer', THREE.REVISION );
+
 	var _renderData, _elements,
 	_width, _height, _widthHalf, _heightHalf, _transformProp,
 	_projector = new THREE.Projector();
@@ -4948,131 +4944,3 @@ THREE.RenderableLine = function () {
 	this.material = null;
 
 };
-=======
-// ThreeDOM.js - http://github.com/mrdoob/three.js
-'use strict';var THREE=THREE||{REVISION:"49dev"};self.Int32Array||(self.Int32Array=Array,self.Float32Array=Array);
-(function(){for(var a=0,b=["ms","moz","webkit","o"],c=0;c<b.length&&!window.requestAnimationFrame;++c){window.requestAnimationFrame=window[b[c]+"RequestAnimationFrame"];window.cancelAnimationFrame=window[b[c]+"CancelAnimationFrame"]||window[b[c]+"CancelRequestAnimationFrame"]}if(!window.requestAnimationFrame)window.requestAnimationFrame=function(b){var c=Date.now(),f=Math.max(0,16-(c-a)),g=window.setTimeout(function(){b(c+f)},f);a=c+f;return g};if(!window.cancelAnimationFrame)window.cancelAnimationFrame=
-function(a){clearTimeout(a)}})();THREE.Color=function(a){a!==void 0&&this.setHex(a);return this};
-THREE.Color.prototype={constructor:THREE.Color,r:1,g:1,b:1,copy:function(a){this.r=a.r;this.g=a.g;this.b=a.b;return this},copyGammaToLinear:function(a){this.r=a.r*a.r;this.g=a.g*a.g;this.b=a.b*a.b;return this},copyLinearToGamma:function(a){this.r=Math.sqrt(a.r);this.g=Math.sqrt(a.g);this.b=Math.sqrt(a.b);return this},convertGammaToLinear:function(){var a=this.r,b=this.g,c=this.b;this.r=a*a;this.g=b*b;this.b=c*c;return this},convertLinearToGamma:function(){this.r=Math.sqrt(this.r);this.g=Math.sqrt(this.g);
-this.b=Math.sqrt(this.b);return this},setRGB:function(a,b,c){this.r=a;this.g=b;this.b=c;return this},setHSV:function(a,b,c){var d,e,f;if(c===0)this.r=this.g=this.b=0;else{d=Math.floor(a*6);e=a*6-d;a=c*(1-b);f=c*(1-b*e);b=c*(1-b*(1-e));switch(d){case 1:this.r=f;this.g=c;this.b=a;break;case 2:this.r=a;this.g=c;this.b=b;break;case 3:this.r=a;this.g=f;this.b=c;break;case 4:this.r=b;this.g=a;this.b=c;break;case 5:this.r=c;this.g=a;this.b=f;break;case 6:case 0:this.r=c;this.g=b;this.b=a}}return this},setHex:function(a){a=
-Math.floor(a);this.r=(a>>16&255)/255;this.g=(a>>8&255)/255;this.b=(a&255)/255;return this},lerpSelf:function(a,b){this.r=this.r+(a.r-this.r)*b;this.g=this.g+(a.g-this.g)*b;this.b=this.b+(a.b-this.b)*b;return this},getHex:function(){return Math.floor(this.r*255)<<16^Math.floor(this.g*255)<<8^Math.floor(this.b*255)},getContextStyle:function(){return"rgb("+Math.floor(this.r*255)+","+Math.floor(this.g*255)+","+Math.floor(this.b*255)+")"},clone:function(){return(new THREE.Color).setRGB(this.r,this.g,this.b)}};
-THREE.Vector2=function(a,b){this.x=a||0;this.y=b||0};
-THREE.Vector2.prototype={constructor:THREE.Vector2,set:function(a,b){this.x=a;this.y=b;return this},copy:function(a){this.x=a.x;this.y=a.y;return this},add:function(a,b){this.x=a.x+b.x;this.y=a.y+b.y;return this},addSelf:function(a){this.x=this.x+a.x;this.y=this.y+a.y;return this},sub:function(a,b){this.x=a.x-b.x;this.y=a.y-b.y;return this},subSelf:function(a){this.x=this.x-a.x;this.y=this.y-a.y;return this},multiplyScalar:function(a){this.x=this.x*a;this.y=this.y*a;return this},divideScalar:function(a){if(a){this.x=
-this.x/a;this.y=this.y/a}else this.set(0,0);return this},negate:function(){return this.multiplyScalar(-1)},dot:function(a){return this.x*a.x+this.y*a.y},lengthSq:function(){return this.x*this.x+this.y*this.y},length:function(){return Math.sqrt(this.lengthSq())},normalize:function(){return this.divideScalar(this.length())},distanceTo:function(a){return Math.sqrt(this.distanceToSquared(a))},distanceToSquared:function(a){var b=this.x-a.x,a=this.y-a.y;return b*b+a*a},setLength:function(a){return this.normalize().multiplyScalar(a)},
-lerpSelf:function(a,b){this.x=this.x+(a.x-this.x)*b;this.y=this.y+(a.y-this.y)*b;return this},equals:function(a){return a.x===this.x&&a.y===this.y},isZero:function(){return this.lengthSq()<1.0E-4},clone:function(){return new THREE.Vector2(this.x,this.y)}};THREE.Vector3=function(a,b,c){this.x=a||0;this.y=b||0;this.z=c||0};
-THREE.Vector3.prototype={constructor:THREE.Vector3,set:function(a,b,c){this.x=a;this.y=b;this.z=c;return this},setX:function(a){this.x=a;return this},setY:function(a){this.y=a;return this},setZ:function(a){this.z=a;return this},copy:function(a){this.x=a.x;this.y=a.y;this.z=a.z;return this},add:function(a,b){this.x=a.x+b.x;this.y=a.y+b.y;this.z=a.z+b.z;return this},addSelf:function(a){this.x=this.x+a.x;this.y=this.y+a.y;this.z=this.z+a.z;return this},addScalar:function(a){this.x=this.x+a;this.y=this.y+
-a;this.z=this.z+a;return this},sub:function(a,b){this.x=a.x-b.x;this.y=a.y-b.y;this.z=a.z-b.z;return this},subSelf:function(a){this.x=this.x-a.x;this.y=this.y-a.y;this.z=this.z-a.z;return this},multiply:function(a,b){this.x=a.x*b.x;this.y=a.y*b.y;this.z=a.z*b.z;return this},multiplySelf:function(a){this.x=this.x*a.x;this.y=this.y*a.y;this.z=this.z*a.z;return this},multiplyScalar:function(a){this.x=this.x*a;this.y=this.y*a;this.z=this.z*a;return this},divideSelf:function(a){this.x=this.x/a.x;this.y=
-this.y/a.y;this.z=this.z/a.z;return this},divideScalar:function(a){if(a){this.x=this.x/a;this.y=this.y/a;this.z=this.z/a}else this.z=this.y=this.x=0;return this},negate:function(){return this.multiplyScalar(-1)},dot:function(a){return this.x*a.x+this.y*a.y+this.z*a.z},lengthSq:function(){return this.x*this.x+this.y*this.y+this.z*this.z},length:function(){return Math.sqrt(this.lengthSq())},lengthManhattan:function(){return Math.abs(this.x)+Math.abs(this.y)+Math.abs(this.z)},normalize:function(){return this.divideScalar(this.length())},
-setLength:function(a){return this.normalize().multiplyScalar(a)},lerpSelf:function(a,b){this.x=this.x+(a.x-this.x)*b;this.y=this.y+(a.y-this.y)*b;this.z=this.z+(a.z-this.z)*b;return this},cross:function(a,b){this.x=a.y*b.z-a.z*b.y;this.y=a.z*b.x-a.x*b.z;this.z=a.x*b.y-a.y*b.x;return this},crossSelf:function(a){var b=this.x,c=this.y,d=this.z;this.x=c*a.z-d*a.y;this.y=d*a.x-b*a.z;this.z=b*a.y-c*a.x;return this},distanceTo:function(a){return Math.sqrt(this.distanceToSquared(a))},distanceToSquared:function(a){return(new THREE.Vector3).sub(this,
-a).lengthSq()},getPositionFromMatrix:function(a){this.x=a.n14;this.y=a.n24;this.z=a.n34;return this},getRotationFromMatrix:function(a,b){var c=b?b.x:1,d=b?b.y:1,e=b?b.z:1,f=a.n11/c,g=a.n12/d,c=a.n21/c,d=a.n22/d,i=a.n23/e,k=a.n33/e;this.y=Math.asin(a.n13/e);e=Math.cos(this.y);if(Math.abs(e)>1.0E-5){this.x=Math.atan2(-i/e,k/e);this.z=Math.atan2(-g/e,f/e)}else{this.x=0;this.z=Math.atan2(c,d)}return this},getScaleFromMatrix:function(a){var b=this.set(a.n11,a.n21,a.n31).length(),c=this.set(a.n12,a.n22,
-a.n32).length(),a=this.set(a.n13,a.n23,a.n33).length();this.x=b;this.y=c;this.z=a},equals:function(a){return a.x===this.x&&a.y===this.y&&a.z===this.z},isZero:function(){return this.lengthSq()<1.0E-4},clone:function(){return new THREE.Vector3(this.x,this.y,this.z)}};THREE.Vector4=function(a,b,c,d){this.x=a||0;this.y=b||0;this.z=c||0;this.w=d!==void 0?d:1};
-THREE.Vector4.prototype={constructor:THREE.Vector4,set:function(a,b,c,d){this.x=a;this.y=b;this.z=c;this.w=d;return this},copy:function(a){this.x=a.x;this.y=a.y;this.z=a.z;this.w=a.w!==void 0?a.w:1;return this},add:function(a,b){this.x=a.x+b.x;this.y=a.y+b.y;this.z=a.z+b.z;this.w=a.w+b.w;return this},addSelf:function(a){this.x=this.x+a.x;this.y=this.y+a.y;this.z=this.z+a.z;this.w=this.w+a.w;return this},sub:function(a,b){this.x=a.x-b.x;this.y=a.y-b.y;this.z=a.z-b.z;this.w=a.w-b.w;return this},subSelf:function(a){this.x=
-this.x-a.x;this.y=this.y-a.y;this.z=this.z-a.z;this.w=this.w-a.w;return this},multiplyScalar:function(a){this.x=this.x*a;this.y=this.y*a;this.z=this.z*a;this.w=this.w*a;return this},divideScalar:function(a){if(a){this.x=this.x/a;this.y=this.y/a;this.z=this.z/a;this.w=this.w/a}else{this.z=this.y=this.x=0;this.w=1}return this},negate:function(){return this.multiplyScalar(-1)},dot:function(a){return this.x*a.x+this.y*a.y+this.z*a.z+this.w*a.w},lengthSq:function(){return this.dot(this)},length:function(){return Math.sqrt(this.lengthSq())},
-normalize:function(){return this.divideScalar(this.length())},setLength:function(a){return this.normalize().multiplyScalar(a)},lerpSelf:function(a,b){this.x=this.x+(a.x-this.x)*b;this.y=this.y+(a.y-this.y)*b;this.z=this.z+(a.z-this.z)*b;this.w=this.w+(a.w-this.w)*b;return this},clone:function(){return new THREE.Vector4(this.x,this.y,this.z,this.w)}};THREE.Frustum=function(){this.planes=[new THREE.Vector4,new THREE.Vector4,new THREE.Vector4,new THREE.Vector4,new THREE.Vector4,new THREE.Vector4]};
-THREE.Frustum.prototype.setFromMatrix=function(a){var b,c=this.planes;c[0].set(a.n41-a.n11,a.n42-a.n12,a.n43-a.n13,a.n44-a.n14);c[1].set(a.n41+a.n11,a.n42+a.n12,a.n43+a.n13,a.n44+a.n14);c[2].set(a.n41+a.n21,a.n42+a.n22,a.n43+a.n23,a.n44+a.n24);c[3].set(a.n41-a.n21,a.n42-a.n22,a.n43-a.n23,a.n44-a.n24);c[4].set(a.n41-a.n31,a.n42-a.n32,a.n43-a.n33,a.n44-a.n34);c[5].set(a.n41+a.n31,a.n42+a.n32,a.n43+a.n33,a.n44+a.n34);for(a=0;a<6;a++){b=c[a];b.divideScalar(Math.sqrt(b.x*b.x+b.y*b.y+b.z*b.z))}};
-THREE.Frustum.prototype.contains=function(a){for(var b=this.planes,c=a.matrixWorld,d=THREE.Frustum.__v1.set(c.getColumnX().length(),c.getColumnY().length(),c.getColumnZ().length()),d=-a.geometry.boundingSphere.radius*Math.max(d.x,Math.max(d.y,d.z)),e=0;e<6;e++){a=b[e].x*c.n14+b[e].y*c.n24+b[e].z*c.n34+b[e].w;if(a<=d)return false}return true};THREE.Frustum.__v1=new THREE.Vector3;
-THREE.Ray=function(a,b){function c(a,b,c){p.sub(c,a);G=p.dot(b);w=o.add(a,q.copy(b).multiplyScalar(G));return C=c.distanceTo(w)}function d(a,b,c,d){p.sub(d,b);o.sub(c,b);q.sub(a,b);D=p.dot(p);r=p.dot(o);x=p.dot(q);t=o.dot(o);y=o.dot(q);H=1/(D*t-r*r);K=(t*x-r*y)*H;E=(D*y-r*x)*H;return K>=0&&E>=0&&K+E<1}this.origin=a||new THREE.Vector3;this.direction=b||new THREE.Vector3;var e=1.0E-4;this.setPrecision=function(a){e=a};var f=new THREE.Vector3,g=new THREE.Vector3,i=new THREE.Vector3,k=new THREE.Vector3,
-h=new THREE.Vector3,j=new THREE.Vector3,l=new THREE.Vector3,n=new THREE.Vector3,m=new THREE.Vector3;this.intersectObject=function(a){var b,o=[];if(a instanceof THREE.Particle){var p=c(this.origin,this.direction,a.matrixWorld.getPosition());if(p>a.scale.x)return[];b={distance:p,point:a.position,face:null,object:a};o.push(b)}else if(a instanceof THREE.Mesh){var p=c(this.origin,this.direction,a.matrixWorld.getPosition()),M=THREE.Frustum.__v1.set(a.matrixWorld.getColumnX().length(),a.matrixWorld.getColumnY().length(),
-a.matrixWorld.getColumnZ().length());if(p>a.geometry.boundingSphere.radius*Math.max(M.x,Math.max(M.y,M.z)))return o;var q,r,t=a.geometry,A=t.vertices,u;a.matrixRotationWorld.extractRotation(a.matrixWorld);p=0;for(M=t.faces.length;p<M;p++){b=t.faces[p];h.copy(this.origin);j.copy(this.direction);u=a.matrixWorld;l=u.multiplyVector3(l.copy(b.centroid)).subSelf(h);n=a.matrixRotationWorld.multiplyVector3(n.copy(b.normal));q=j.dot(n);if(!(Math.abs(q)<e)){r=n.dot(l)/q;if(!(r<0)&&(a.doubleSided||(a.flipSided?
-q>0:q<0))){m.add(h,j.multiplyScalar(r));if(b instanceof THREE.Face3){f=u.multiplyVector3(f.copy(A[b.a]));g=u.multiplyVector3(g.copy(A[b.b]));i=u.multiplyVector3(i.copy(A[b.c]));if(d(m,f,g,i)){b={distance:h.distanceTo(m),point:m.clone(),face:b,object:a};o.push(b)}}else if(b instanceof THREE.Face4){f=u.multiplyVector3(f.copy(A[b.a]));g=u.multiplyVector3(g.copy(A[b.b]));i=u.multiplyVector3(i.copy(A[b.c]));k=u.multiplyVector3(k.copy(A[b.d]));if(d(m,f,g,k)||d(m,g,i,k)){b={distance:h.distanceTo(m),point:m.clone(),
-face:b,object:a};o.push(b)}}}}}}return o};this.intersectObjects=function(a){for(var b=[],c=0,d=a.length;c<d;c++)Array.prototype.push.apply(b,this.intersectObject(a[c]));b.sort(function(a,b){return a.distance-b.distance});return b};var p=new THREE.Vector3,o=new THREE.Vector3,q=new THREE.Vector3,G,w,C,D,r,x,t,y,H,K,E};
-THREE.Rectangle=function(){function a(){f=d-b;g=e-c}var b,c,d,e,f,g,i=true;this.getX=function(){return b};this.getY=function(){return c};this.getWidth=function(){return f};this.getHeight=function(){return g};this.getLeft=function(){return b};this.getTop=function(){return c};this.getRight=function(){return d};this.getBottom=function(){return e};this.set=function(f,h,g,l){i=false;b=f;c=h;d=g;e=l;a()};this.addPoint=function(f,h){if(i){i=false;b=f;c=h;d=f;e=h}else{b=b<f?b:f;c=c<h?c:h;d=d>f?d:f;e=e>h?
-e:h}a()};this.add3Points=function(f,h,g,l,n,m){if(i){i=false;b=f<g?f<n?f:n:g<n?g:n;c=h<l?h<m?h:m:l<m?l:m;d=f>g?f>n?f:n:g>n?g:n;e=h>l?h>m?h:m:l>m?l:m}else{b=f<g?f<n?f<b?f:b:n<b?n:b:g<n?g<b?g:b:n<b?n:b;c=h<l?h<m?h<c?h:c:m<c?m:c:l<m?l<c?l:c:m<c?m:c;d=f>g?f>n?f>d?f:d:n>d?n:d:g>n?g>d?g:d:n>d?n:d;e=h>l?h>m?h>e?h:e:m>e?m:e:l>m?l>e?l:e:m>e?m:e}a()};this.addRectangle=function(f){if(i){i=false;b=f.getLeft();c=f.getTop();d=f.getRight();e=f.getBottom()}else{b=b<f.getLeft()?b:f.getLeft();c=c<f.getTop()?c:f.getTop();
-d=d>f.getRight()?d:f.getRight();e=e>f.getBottom()?e:f.getBottom()}a()};this.inflate=function(f){b=b-f;c=c-f;d=d+f;e=e+f;a()};this.minSelf=function(f){b=b>f.getLeft()?b:f.getLeft();c=c>f.getTop()?c:f.getTop();d=d<f.getRight()?d:f.getRight();e=e<f.getBottom()?e:f.getBottom();a()};this.intersects=function(a){return d<a.getLeft()||b>a.getRight()||e<a.getTop()||c>a.getBottom()?false:true};this.empty=function(){i=true;e=d=c=b=0;a()};this.isEmpty=function(){return i}};
-THREE.Math={clamp:function(a,b,c){return a<b?b:a>c?c:a},clampBottom:function(a,b){return a<b?b:a},mapLinear:function(a,b,c,d,e){return d+(a-b)*(e-d)/(c-b)},random16:function(){return(65280*Math.random()+255*Math.random())/65535},randInt:function(a,b){return a+Math.floor(Math.random()*(b-a+1))},randFloat:function(a,b){return a+Math.random()*(b-a)},randFloatSpread:function(a){return a*(0.5-Math.random())},sign:function(a){return a<0?-1:a>0?1:0}};THREE.Matrix3=function(){this.m=[]};
-THREE.Matrix3.prototype={constructor:THREE.Matrix3,getInverse:function(a){var b=a.n33*a.n22-a.n32*a.n23,c=-a.n33*a.n21+a.n31*a.n23,d=a.n32*a.n21-a.n31*a.n22,e=-a.n33*a.n12+a.n32*a.n13,f=a.n33*a.n11-a.n31*a.n13,g=-a.n32*a.n11+a.n31*a.n12,i=a.n23*a.n12-a.n22*a.n13,k=-a.n23*a.n11+a.n21*a.n13,h=a.n22*a.n11-a.n21*a.n12,a=a.n11*b+a.n21*e+a.n31*i;a===0&&console.warn("Matrix3.getInverse(): determinant == 0");var a=1/a,j=this.m;j[0]=a*b;j[1]=a*c;j[2]=a*d;j[3]=a*e;j[4]=a*f;j[5]=a*g;j[6]=a*i;j[7]=a*k;j[8]=a*
-h;return this},transposeIntoArray:function(a){var b=this.m;a[0]=b[0];a[1]=b[3];a[2]=b[6];a[3]=b[1];a[4]=b[4];a[5]=b[7];a[6]=b[2];a[7]=b[5];a[8]=b[8];return this}};THREE.Matrix4=function(a,b,c,d,e,f,g,i,k,h,j,l,n,m,p,o){this.set(a!==void 0?a:1,b||0,c||0,d||0,e||0,f!==void 0?f:1,g||0,i||0,k||0,h||0,j!==void 0?j:1,l||0,n||0,m||0,p||0,o!==void 0?o:1)};
-THREE.Matrix4.prototype={constructor:THREE.Matrix4,set:function(a,b,c,d,e,f,g,i,k,h,j,l,n,m,p,o){this.n11=a;this.n12=b;this.n13=c;this.n14=d;this.n21=e;this.n22=f;this.n23=g;this.n24=i;this.n31=k;this.n32=h;this.n33=j;this.n34=l;this.n41=n;this.n42=m;this.n43=p;this.n44=o;return this},identity:function(){this.set(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);return this},copy:function(a){this.set(a.n11,a.n12,a.n13,a.n14,a.n21,a.n22,a.n23,a.n24,a.n31,a.n32,a.n33,a.n34,a.n41,a.n42,a.n43,a.n44);return this},lookAt:function(a,
-b,c){var d=THREE.Matrix4.__v1,e=THREE.Matrix4.__v2,f=THREE.Matrix4.__v3;f.sub(a,b).normalize();if(f.length()===0)f.z=1;d.cross(c,f).normalize();if(d.length()===0){f.x=f.x+1.0E-4;d.cross(c,f).normalize()}e.cross(f,d);this.n11=d.x;this.n12=e.x;this.n13=f.x;this.n21=d.y;this.n22=e.y;this.n23=f.y;this.n31=d.z;this.n32=e.z;this.n33=f.z;return this},multiply:function(a,b){var c=a.n11,d=a.n12,e=a.n13,f=a.n14,g=a.n21,i=a.n22,k=a.n23,h=a.n24,j=a.n31,l=a.n32,n=a.n33,m=a.n34,p=a.n41,o=a.n42,q=a.n43,G=a.n44,
-w=b.n11,C=b.n12,D=b.n13,r=b.n14,x=b.n21,t=b.n22,y=b.n23,H=b.n24,K=b.n31,E=b.n32,J=b.n33,Q=b.n34,R=b.n41,S=b.n42,M=b.n43,T=b.n44;this.n11=c*w+d*x+e*K+f*R;this.n12=c*C+d*t+e*E+f*S;this.n13=c*D+d*y+e*J+f*M;this.n14=c*r+d*H+e*Q+f*T;this.n21=g*w+i*x+k*K+h*R;this.n22=g*C+i*t+k*E+h*S;this.n23=g*D+i*y+k*J+h*M;this.n24=g*r+i*H+k*Q+h*T;this.n31=j*w+l*x+n*K+m*R;this.n32=j*C+l*t+n*E+m*S;this.n33=j*D+l*y+n*J+m*M;this.n34=j*r+l*H+n*Q+m*T;this.n41=p*w+o*x+q*K+G*R;this.n42=p*C+o*t+q*E+G*S;this.n43=p*D+o*y+q*J+G*
-M;this.n44=p*r+o*H+q*Q+G*T;return this},multiplySelf:function(a){return this.multiply(this,a)},multiplyToArray:function(a,b,c){this.multiply(a,b);c[0]=this.n11;c[1]=this.n21;c[2]=this.n31;c[3]=this.n41;c[4]=this.n12;c[5]=this.n22;c[6]=this.n32;c[7]=this.n42;c[8]=this.n13;c[9]=this.n23;c[10]=this.n33;c[11]=this.n43;c[12]=this.n14;c[13]=this.n24;c[14]=this.n34;c[15]=this.n44;return this},multiplyScalar:function(a){this.n11=this.n11*a;this.n12=this.n12*a;this.n13=this.n13*a;this.n14=this.n14*a;this.n21=
-this.n21*a;this.n22=this.n22*a;this.n23=this.n23*a;this.n24=this.n24*a;this.n31=this.n31*a;this.n32=this.n32*a;this.n33=this.n33*a;this.n34=this.n34*a;this.n41=this.n41*a;this.n42=this.n42*a;this.n43=this.n43*a;this.n44=this.n44*a;return this},multiplyVector3:function(a){var b=a.x,c=a.y,d=a.z,e=1/(this.n41*b+this.n42*c+this.n43*d+this.n44);a.x=(this.n11*b+this.n12*c+this.n13*d+this.n14)*e;a.y=(this.n21*b+this.n22*c+this.n23*d+this.n24)*e;a.z=(this.n31*b+this.n32*c+this.n33*d+this.n34)*e;return a},
-multiplyVector4:function(a){var b=a.x,c=a.y,d=a.z,e=a.w;a.x=this.n11*b+this.n12*c+this.n13*d+this.n14*e;a.y=this.n21*b+this.n22*c+this.n23*d+this.n24*e;a.z=this.n31*b+this.n32*c+this.n33*d+this.n34*e;a.w=this.n41*b+this.n42*c+this.n43*d+this.n44*e;return a},rotateAxis:function(a){var b=a.x,c=a.y,d=a.z;a.x=b*this.n11+c*this.n12+d*this.n13;a.y=b*this.n21+c*this.n22+d*this.n23;a.z=b*this.n31+c*this.n32+d*this.n33;a.normalize();return a},crossVector:function(a){var b=new THREE.Vector4;b.x=this.n11*a.x+
-this.n12*a.y+this.n13*a.z+this.n14*a.w;b.y=this.n21*a.x+this.n22*a.y+this.n23*a.z+this.n24*a.w;b.z=this.n31*a.x+this.n32*a.y+this.n33*a.z+this.n34*a.w;b.w=a.w?this.n41*a.x+this.n42*a.y+this.n43*a.z+this.n44*a.w:1;return b},determinant:function(){var a=this.n11,b=this.n12,c=this.n13,d=this.n14,e=this.n21,f=this.n22,g=this.n23,i=this.n24,k=this.n31,h=this.n32,j=this.n33,l=this.n34,n=this.n41,m=this.n42,p=this.n43,o=this.n44;return d*g*h*n-c*i*h*n-d*f*j*n+b*i*j*n+c*f*l*n-b*g*l*n-d*g*k*m+c*i*k*m+d*e*
-j*m-a*i*j*m-c*e*l*m+a*g*l*m+d*f*k*p-b*i*k*p-d*e*h*p+a*i*h*p+b*e*l*p-a*f*l*p-c*f*k*o+b*g*k*o+c*e*h*o-a*g*h*o-b*e*j*o+a*f*j*o},transpose:function(){var a;a=this.n21;this.n21=this.n12;this.n12=a;a=this.n31;this.n31=this.n13;this.n13=a;a=this.n32;this.n32=this.n23;this.n23=a;a=this.n41;this.n41=this.n14;this.n14=a;a=this.n42;this.n42=this.n24;this.n24=a;a=this.n43;this.n43=this.n34;this.n34=a;return this},flattenToArray:function(a){a[0]=this.n11;a[1]=this.n21;a[2]=this.n31;a[3]=this.n41;a[4]=this.n12;
-a[5]=this.n22;a[6]=this.n32;a[7]=this.n42;a[8]=this.n13;a[9]=this.n23;a[10]=this.n33;a[11]=this.n43;a[12]=this.n14;a[13]=this.n24;a[14]=this.n34;a[15]=this.n44;return a},flattenToArrayOffset:function(a,b){a[b]=this.n11;a[b+1]=this.n21;a[b+2]=this.n31;a[b+3]=this.n41;a[b+4]=this.n12;a[b+5]=this.n22;a[b+6]=this.n32;a[b+7]=this.n42;a[b+8]=this.n13;a[b+9]=this.n23;a[b+10]=this.n33;a[b+11]=this.n43;a[b+12]=this.n14;a[b+13]=this.n24;a[b+14]=this.n34;a[b+15]=this.n44;return a},getPosition:function(){return THREE.Matrix4.__v1.set(this.n14,
-this.n24,this.n34)},setPosition:function(a){this.n14=a.x;this.n24=a.y;this.n34=a.z;return this},getColumnX:function(){return THREE.Matrix4.__v1.set(this.n11,this.n21,this.n31)},getColumnY:function(){return THREE.Matrix4.__v1.set(this.n12,this.n22,this.n32)},getColumnZ:function(){return THREE.Matrix4.__v1.set(this.n13,this.n23,this.n33)},getInverse:function(a){var b=a.n11,c=a.n12,d=a.n13,e=a.n14,f=a.n21,g=a.n22,i=a.n23,k=a.n24,h=a.n31,j=a.n32,l=a.n33,n=a.n34,m=a.n41,p=a.n42,o=a.n43,q=a.n44;this.n11=
-i*n*p-k*l*p+k*j*o-g*n*o-i*j*q+g*l*q;this.n12=e*l*p-d*n*p-e*j*o+c*n*o+d*j*q-c*l*q;this.n13=d*k*p-e*i*p+e*g*o-c*k*o-d*g*q+c*i*q;this.n14=e*i*j-d*k*j-e*g*l+c*k*l+d*g*n-c*i*n;this.n21=k*l*m-i*n*m-k*h*o+f*n*o+i*h*q-f*l*q;this.n22=d*n*m-e*l*m+e*h*o-b*n*o-d*h*q+b*l*q;this.n23=e*i*m-d*k*m-e*f*o+b*k*o+d*f*q-b*i*q;this.n24=d*k*h-e*i*h+e*f*l-b*k*l-d*f*n+b*i*n;this.n31=g*n*m-k*j*m+k*h*p-f*n*p-g*h*q+f*j*q;this.n32=e*j*m-c*n*m-e*h*p+b*n*p+c*h*q-b*j*q;this.n33=c*k*m-e*g*m+e*f*p-b*k*p-c*f*q+b*g*q;this.n34=e*g*h-
-c*k*h-e*f*j+b*k*j+c*f*n-b*g*n;this.n41=i*j*m-g*l*m-i*h*p+f*l*p+g*h*o-f*j*o;this.n42=c*l*m-d*j*m+d*h*p-b*l*p-c*h*o+b*j*o;this.n43=d*g*m-c*i*m-d*f*p+b*i*p+c*f*o-b*g*o;this.n44=c*i*h-d*g*h+d*f*j-b*i*j-c*f*l+b*g*l;this.multiplyScalar(1/a.determinant());return this},setRotationFromEuler:function(a,b){var c=a.x,d=a.y,e=a.z,f=Math.cos(c),c=Math.sin(c),g=Math.cos(d),d=Math.sin(d),i=Math.cos(e),e=Math.sin(e);switch(b){case "YXZ":var k=g*i,h=g*e,j=d*i,l=d*e;this.n11=k+l*c;this.n12=j*c-h;this.n13=f*d;this.n21=
-f*e;this.n22=f*i;this.n23=-c;this.n31=h*c-j;this.n32=l+k*c;this.n33=f*g;break;case "ZXY":k=g*i;h=g*e;j=d*i;l=d*e;this.n11=k-l*c;this.n12=-f*e;this.n13=j+h*c;this.n21=h+j*c;this.n22=f*i;this.n23=l-k*c;this.n31=-f*d;this.n32=c;this.n33=f*g;break;case "ZYX":k=f*i;h=f*e;j=c*i;l=c*e;this.n11=g*i;this.n12=j*d-h;this.n13=k*d+l;this.n21=g*e;this.n22=l*d+k;this.n23=h*d-j;this.n31=-d;this.n32=c*g;this.n33=f*g;break;case "YZX":k=f*g;h=f*d;j=c*g;l=c*d;this.n11=g*i;this.n12=l-k*e;this.n13=j*e+h;this.n21=e;this.n22=
-f*i;this.n23=-c*i;this.n31=-d*i;this.n32=h*e+j;this.n33=k-l*e;break;case "XZY":k=f*g;h=f*d;j=c*g;l=c*d;this.n11=g*i;this.n12=-e;this.n13=d*i;this.n21=k*e+l;this.n22=f*i;this.n23=h*e-j;this.n31=j*e-h;this.n32=c*i;this.n33=l*e+k;break;default:k=f*i;h=f*e;j=c*i;l=c*e;this.n11=g*i;this.n12=-g*e;this.n13=d;this.n21=h+j*d;this.n22=k-l*d;this.n23=-c*g;this.n31=l-k*d;this.n32=j+h*d;this.n33=f*g}return this},setRotationFromQuaternion:function(a){var b=a.x,c=a.y,d=a.z,e=a.w,f=b+b,g=c+c,i=d+d,a=b*f,k=b*g,b=
-b*i,h=c*g,c=c*i,d=d*i,f=e*f,g=e*g,e=e*i;this.n11=1-(h+d);this.n12=k-e;this.n13=b+g;this.n21=k+e;this.n22=1-(a+d);this.n23=c-f;this.n31=b-g;this.n32=c+f;this.n33=1-(a+h);return this},compose:function(a,b,c){var d=THREE.Matrix4.__m1,e=THREE.Matrix4.__m2;d.identity();d.setRotationFromQuaternion(b);e.makeScale(c.x,c.y,c.z);this.multiply(d,e);this.n14=a.x;this.n24=a.y;this.n34=a.z;return this},decompose:function(a,b,c){var d=THREE.Matrix4.__v1,e=THREE.Matrix4.__v2,f=THREE.Matrix4.__v3;d.set(this.n11,this.n21,
-this.n31);e.set(this.n12,this.n22,this.n32);f.set(this.n13,this.n23,this.n33);a=a instanceof THREE.Vector3?a:new THREE.Vector3;b=b instanceof THREE.Quaternion?b:new THREE.Quaternion;c=c instanceof THREE.Vector3?c:new THREE.Vector3;c.x=d.length();c.y=e.length();c.z=f.length();a.x=this.n14;a.y=this.n24;a.z=this.n34;d=THREE.Matrix4.__m1;d.copy(this);d.n11=d.n11/c.x;d.n21=d.n21/c.x;d.n31=d.n31/c.x;d.n12=d.n12/c.y;d.n22=d.n22/c.y;d.n32=d.n32/c.y;d.n13=d.n13/c.z;d.n23=d.n23/c.z;d.n33=d.n33/c.z;b.setFromRotationMatrix(d);
-return[a,b,c]},extractPosition:function(a){this.n14=a.n14;this.n24=a.n24;this.n34=a.n34;return this},extractRotation:function(a){var b=THREE.Matrix4.__v1,c=1/b.set(a.n11,a.n21,a.n31).length(),d=1/b.set(a.n12,a.n22,a.n32).length(),b=1/b.set(a.n13,a.n23,a.n33).length();this.n11=a.n11*c;this.n21=a.n21*c;this.n31=a.n31*c;this.n12=a.n12*d;this.n22=a.n22*d;this.n32=a.n32*d;this.n13=a.n13*b;this.n23=a.n23*b;this.n33=a.n33*b;return this},translate:function(a){var b=a.x,c=a.y,a=a.z;this.n14=this.n11*b+this.n12*
-c+this.n13*a+this.n14;this.n24=this.n21*b+this.n22*c+this.n23*a+this.n24;this.n34=this.n31*b+this.n32*c+this.n33*a+this.n34;this.n44=this.n41*b+this.n42*c+this.n43*a+this.n44;return this},rotateX:function(a){var b=this.n12,c=this.n22,d=this.n32,e=this.n42,f=this.n13,g=this.n23,i=this.n33,k=this.n43,h=Math.cos(a),a=Math.sin(a);this.n12=h*b+a*f;this.n22=h*c+a*g;this.n32=h*d+a*i;this.n42=h*e+a*k;this.n13=h*f-a*b;this.n23=h*g-a*c;this.n33=h*i-a*d;this.n43=h*k-a*e;return this},rotateY:function(a){var b=
-this.n11,c=this.n21,d=this.n31,e=this.n41,f=this.n13,g=this.n23,i=this.n33,k=this.n43,h=Math.cos(a),a=Math.sin(a);this.n11=h*b-a*f;this.n21=h*c-a*g;this.n31=h*d-a*i;this.n41=h*e-a*k;this.n13=h*f+a*b;this.n23=h*g+a*c;this.n33=h*i+a*d;this.n43=h*k+a*e;return this},rotateZ:function(a){var b=this.n11,c=this.n21,d=this.n31,e=this.n41,f=this.n12,g=this.n22,i=this.n32,k=this.n42,h=Math.cos(a),a=Math.sin(a);this.n11=h*b+a*f;this.n21=h*c+a*g;this.n31=h*d+a*i;this.n41=h*e+a*k;this.n12=h*f-a*b;this.n22=h*g-
-a*c;this.n32=h*i-a*d;this.n42=h*k-a*e;return this},rotateByAxis:function(a,b){if(a.x===1&&a.y===0&&a.z===0)return this.rotateX(b);if(a.x===0&&a.y===1&&a.z===0)return this.rotateY(b);if(a.x===0&&a.y===0&&a.z===1)return this.rotateZ(b);var c=a.x,d=a.y,e=a.z,f=Math.sqrt(c*c+d*d+e*e),c=c/f,d=d/f,e=e/f,f=c*c,g=d*d,i=e*e,k=Math.cos(b),h=Math.sin(b),j=1-k,l=c*d*j,n=c*e*j,j=d*e*j,c=c*h,m=d*h,h=e*h,e=f+(1-f)*k,f=l+h,d=n-m,l=l-h,g=g+(1-g)*k,h=j+c,n=n+m,j=j-c,i=i+(1-i)*k,k=this.n11,c=this.n21,m=this.n31,p=this.n41,
-o=this.n12,q=this.n22,G=this.n32,w=this.n42,C=this.n13,D=this.n23,r=this.n33,x=this.n43;this.n11=e*k+f*o+d*C;this.n21=e*c+f*q+d*D;this.n31=e*m+f*G+d*r;this.n41=e*p+f*w+d*x;this.n12=l*k+g*o+h*C;this.n22=l*c+g*q+h*D;this.n32=l*m+g*G+h*r;this.n42=l*p+g*w+h*x;this.n13=n*k+j*o+i*C;this.n23=n*c+j*q+i*D;this.n33=n*m+j*G+i*r;this.n43=n*p+j*w+i*x;return this},scale:function(a){var b=a.x,c=a.y,a=a.z;this.n11=this.n11*b;this.n12=this.n12*c;this.n13=this.n13*a;this.n21=this.n21*b;this.n22=this.n22*c;this.n23=
-this.n23*a;this.n31=this.n31*b;this.n32=this.n32*c;this.n33=this.n33*a;this.n41=this.n41*b;this.n42=this.n42*c;this.n43=this.n43*a;return this},makeTranslation:function(a,b,c){this.set(1,0,0,a,0,1,0,b,0,0,1,c,0,0,0,1);return this},makeRotationX:function(a){var b=Math.cos(a),a=Math.sin(a);this.set(1,0,0,0,0,b,-a,0,0,a,b,0,0,0,0,1);return this},makeRotationY:function(a){var b=Math.cos(a),a=Math.sin(a);this.set(b,0,a,0,0,1,0,0,-a,0,b,0,0,0,0,1);return this},makeRotationZ:function(a){var b=Math.cos(a),
-a=Math.sin(a);this.set(b,-a,0,0,a,b,0,0,0,0,1,0,0,0,0,1);return this},makeRotationAxis:function(a,b){var c=Math.cos(b),d=Math.sin(b),e=1-c,f=a.x,g=a.y,i=a.z,k=e*f,h=e*g;this.set(k*f+c,k*g-d*i,k*i+d*g,0,k*g+d*i,h*g+c,h*i-d*f,0,k*i-d*g,h*i+d*f,e*i*i+c,0,0,0,0,1);return this},makeScale:function(a,b,c){this.set(a,0,0,0,0,b,0,0,0,0,c,0,0,0,0,1);return this},makeFrustum:function(a,b,c,d,e,f){this.n11=2*e/(b-a);this.n12=0;this.n13=(b+a)/(b-a);this.n21=this.n14=0;this.n22=2*e/(d-c);this.n23=(d+c)/(d-c);this.n32=
-this.n31=this.n24=0;this.n33=-(f+e)/(f-e);this.n34=-2*f*e/(f-e);this.n42=this.n41=0;this.n43=-1;this.n44=0;return this},makePerspective:function(a,b,c,d){var a=c*Math.tan(a*Math.PI/360),e=-a;return this.makeFrustum(e*b,a*b,e,a,c,d)},makeOrthographic:function(a,b,c,d,e,f){var g=b-a,i=c-d,k=f-e;this.n11=2/g;this.n13=this.n12=0;this.n14=-((b+a)/g);this.n21=0;this.n22=2/i;this.n23=0;this.n24=-((c+d)/i);this.n32=this.n31=0;this.n33=-2/k;this.n34=-((f+e)/k);this.n43=this.n42=this.n41=0;this.n44=1;return this},
-clone:function(){return new THREE.Matrix4(this.n11,this.n12,this.n13,this.n14,this.n21,this.n22,this.n23,this.n24,this.n31,this.n32,this.n33,this.n34,this.n41,this.n42,this.n43,this.n44)}};THREE.Matrix4.__v1=new THREE.Vector3;THREE.Matrix4.__v2=new THREE.Vector3;THREE.Matrix4.__v3=new THREE.Vector3;THREE.Matrix4.__m1=new THREE.Matrix4;THREE.Matrix4.__m2=new THREE.Matrix4;
-THREE.Object3D=function(){this.id=THREE.Object3DCount++;this.name="";this.parent=void 0;this.children=[];this.up=new THREE.Vector3(0,1,0);this.position=new THREE.Vector3;this.rotation=new THREE.Vector3;this.eulerOrder="XYZ";this.scale=new THREE.Vector3(1,1,1);this.flipSided=this.doubleSided=false;this.renderDepth=null;this.rotationAutoUpdate=true;this.matrix=new THREE.Matrix4;this.matrixWorld=new THREE.Matrix4;this.matrixRotationWorld=new THREE.Matrix4;this.matrixWorldNeedsUpdate=this.matrixAutoUpdate=
-true;this.quaternion=new THREE.Quaternion;this.useQuaternion=false;this.boundRadius=0;this.boundRadiusScale=1;this.visible=true;this.receiveShadow=this.castShadow=false;this.frustumCulled=true;this._vector=new THREE.Vector3};
-THREE.Object3D.prototype={constructor:THREE.Object3D,applyMatrix:function(a){this.matrix.multiply(a,this.matrix);this.scale.getScaleFromMatrix(this.matrix);this.rotation.getRotationFromMatrix(this.matrix,this.scale);this.position.getPositionFromMatrix(this.matrix)},translate:function(a,b){this.matrix.rotateAxis(b);this.position.addSelf(b.multiplyScalar(a))},translateX:function(a){this.translate(a,this._vector.set(1,0,0))},translateY:function(a){this.translate(a,this._vector.set(0,1,0))},translateZ:function(a){this.translate(a,
-this._vector.set(0,0,1))},lookAt:function(a){this.matrix.lookAt(a,this.position,this.up);this.rotationAutoUpdate&&this.rotation.getRotationFromMatrix(this.matrix)},add:function(a){if(a===this)console.warn("THREE.Object3D.add: An object can't be added as a child of itself.");else if(a instanceof THREE.Object3D){a.parent!==void 0&&a.parent.remove(a);a.parent=this;this.children.push(a);for(var b=this;b.parent!==void 0;)b=b.parent;b!==void 0&&b instanceof THREE.Scene&&b.__addObject(a)}},remove:function(a){var b=
-this.children.indexOf(a);if(b!==-1){a.parent=void 0;this.children.splice(b,1);for(b=this;b.parent!==void 0;)b=b.parent;b!==void 0&&b instanceof THREE.Scene&&b.__removeObject(a)}},getChildByName:function(a,b){var c,d,e;c=0;for(d=this.children.length;c<d;c++){e=this.children[c];if(e.name===a)return e;if(b){e=e.getChildByName(a,b);if(e!==void 0)return e}}},updateMatrix:function(){this.matrix.setPosition(this.position);this.useQuaternion?this.matrix.setRotationFromQuaternion(this.quaternion):this.matrix.setRotationFromEuler(this.rotation,
-this.eulerOrder);if(this.scale.x!==1||this.scale.y!==1||this.scale.z!==1){this.matrix.scale(this.scale);this.boundRadiusScale=Math.max(this.scale.x,Math.max(this.scale.y,this.scale.z))}this.matrixWorldNeedsUpdate=true},updateMatrixWorld:function(a){this.matrixAutoUpdate&&this.updateMatrix();if(this.matrixWorldNeedsUpdate||a){this.parent?this.matrixWorld.multiply(this.parent.matrixWorld,this.matrix):this.matrixWorld.copy(this.matrix);this.matrixWorldNeedsUpdate=false;a=true}for(var b=0,c=this.children.length;b<
-c;b++)this.children[b].updateMatrixWorld(a)}};THREE.Object3DCount=0;
-THREE.Projector=function(){function a(){var a=g[f]=g[f]||new THREE.RenderableObject;f++;return a}function b(){var a=h[k]=h[k]||new THREE.RenderableVertex;k++;return a}function c(a,b){return b.z-a.z}function d(a,b){var c=0,d=1,e=a.z+a.w,f=b.z+b.w,h=-a.z+a.w,g=-b.z+b.w;if(e>=0&&f>=0&&h>=0&&g>=0)return true;if(e<0&&f<0||h<0&&g<0)return false;e<0?c=Math.max(c,e/(e-f)):f<0&&(d=Math.min(d,e/(e-f)));h<0?c=Math.max(c,h/(h-g)):g<0&&(d=Math.min(d,h/(h-g)));if(d<c)return false;a.lerpSelf(b,c);b.lerpSelf(a,1-
-d);return true}var e,f,g=[],i,k,h=[],j,l,n=[],m,p=[],o,q,G=[],w,C,D=[],r={objects:[],sprites:[],lights:[],elements:[]},x=new THREE.Vector3,t=new THREE.Vector4,y=new THREE.Matrix4,H=new THREE.Matrix4,K=new THREE.Frustum,E=new THREE.Vector4,J=new THREE.Vector4;this.projectVector=function(a,b){b.matrixWorldInverse.getInverse(b.matrixWorld);y.multiply(b.projectionMatrix,b.matrixWorldInverse);y.multiplyVector3(a);return a};this.unprojectVector=function(a,b){b.projectionMatrixInverse.getInverse(b.projectionMatrix);
-y.multiply(b.matrixWorld,b.projectionMatrixInverse);y.multiplyVector3(a);return a};this.pickingRay=function(a,b){var c;a.z=-1;c=new THREE.Vector3(a.x,a.y,1);this.unprojectVector(a,b);this.unprojectVector(c,b);c.subSelf(a).normalize();return new THREE.Ray(a,c)};this.projectGraph=function(b,d){f=0;r.objects.length=0;r.sprites.length=0;r.lights.length=0;var h=function(b){if(b.visible!==false){if((b instanceof THREE.Mesh||b instanceof THREE.Line)&&(b.frustumCulled===false||K.contains(b))){x.copy(b.matrixWorld.getPosition());
-y.multiplyVector3(x);e=a();e.object=b;e.z=x.z;r.objects.push(e)}else if(b instanceof THREE.Sprite||b instanceof THREE.Particle){x.copy(b.matrixWorld.getPosition());y.multiplyVector3(x);e=a();e.object=b;e.z=x.z;r.sprites.push(e)}else b instanceof THREE.Light&&r.lights.push(b);for(var c=0,d=b.children.length;c<d;c++)h(b.children[c])}};h(b);d&&r.objects.sort(c);return r};this.projectScene=function(a,e,f){var g=e.near,x=e.far,O=false,U,A,u,I,s,B,z,F,v,L,N,V,W,X,P;C=q=m=l=0;r.elements.length=0;if(e.parent===
-void 0){console.warn("DEPRECATED: Camera hasn't been added to a Scene. Adding it...");a.add(e)}a.updateMatrixWorld();e.matrixWorldInverse.getInverse(e.matrixWorld);y.multiply(e.projectionMatrix,e.matrixWorldInverse);K.setFromMatrix(y);r=this.projectGraph(a,false);a=0;for(U=r.objects.length;a<U;a++){v=r.objects[a].object;L=v.matrixWorld;k=0;if(v instanceof THREE.Mesh){N=v.geometry;V=v.geometry.materials;I=N.vertices;W=N.faces;X=N.faceVertexUvs;N=v.matrixRotationWorld.extractRotation(L);A=0;for(u=I.length;A<
-u;A++){i=b();i.positionWorld.copy(I[A]);L.multiplyVector3(i.positionWorld);i.positionScreen.copy(i.positionWorld);y.multiplyVector4(i.positionScreen);i.positionScreen.x=i.positionScreen.x/i.positionScreen.w;i.positionScreen.y=i.positionScreen.y/i.positionScreen.w;i.visible=i.positionScreen.z>g&&i.positionScreen.z<x}I=0;for(A=W.length;I<A;I++){u=W[I];if(u instanceof THREE.Face3){s=h[u.a];B=h[u.b];z=h[u.c];if(s.visible&&B.visible&&z.visible){O=(z.positionScreen.x-s.positionScreen.x)*(B.positionScreen.y-
-s.positionScreen.y)-(z.positionScreen.y-s.positionScreen.y)*(B.positionScreen.x-s.positionScreen.x)<0;if(v.doubleSided||O!=v.flipSided){F=n[l]=n[l]||new THREE.RenderableFace3;l++;j=F;j.v1.copy(s);j.v2.copy(B);j.v3.copy(z)}else continue}else continue}else if(u instanceof THREE.Face4){s=h[u.a];B=h[u.b];z=h[u.c];F=h[u.d];if(s.visible&&B.visible&&z.visible&&F.visible){O=(F.positionScreen.x-s.positionScreen.x)*(B.positionScreen.y-s.positionScreen.y)-(F.positionScreen.y-s.positionScreen.y)*(B.positionScreen.x-
-s.positionScreen.x)<0||(B.positionScreen.x-z.positionScreen.x)*(F.positionScreen.y-z.positionScreen.y)-(B.positionScreen.y-z.positionScreen.y)*(F.positionScreen.x-z.positionScreen.x)<0;if(v.doubleSided||O!=v.flipSided){P=p[m]=p[m]||new THREE.RenderableFace4;m++;j=P;j.v1.copy(s);j.v2.copy(B);j.v3.copy(z);j.v4.copy(F)}else continue}else continue}j.normalWorld.copy(u.normal);!O&&(v.flipSided||v.doubleSided)&&j.normalWorld.negate();N.multiplyVector3(j.normalWorld);j.centroidWorld.copy(u.centroid);L.multiplyVector3(j.centroidWorld);
-j.centroidScreen.copy(j.centroidWorld);y.multiplyVector3(j.centroidScreen);z=u.vertexNormals;s=0;for(B=z.length;s<B;s++){F=j.vertexNormalsWorld[s];F.copy(z[s]);!O&&(v.flipSided||v.doubleSided)&&F.negate();N.multiplyVector3(F)}s=0;for(B=X.length;s<B;s++)if(P=X[s][I]){z=0;for(F=P.length;z<F;z++)j.uvs[s][z]=P[z]}j.material=v.material;j.faceMaterial=u.materialIndex!==null?V[u.materialIndex]:null;j.z=j.centroidScreen.z;r.elements.push(j)}}else if(v instanceof THREE.Line){H.multiply(y,L);I=v.geometry.vertices;
-s=b();s.positionScreen.copy(I[0]);H.multiplyVector4(s.positionScreen);L=v.type===THREE.LinePieces?2:1;A=1;for(u=I.length;A<u;A++){s=b();s.positionScreen.copy(I[A]);H.multiplyVector4(s.positionScreen);if(!((A+1)%L>0)){B=h[k-2];E.copy(s.positionScreen);J.copy(B.positionScreen);if(d(E,J)){E.multiplyScalar(1/E.w);J.multiplyScalar(1/J.w);V=G[q]=G[q]||new THREE.RenderableLine;q++;o=V;o.v1.positionScreen.copy(E);o.v2.positionScreen.copy(J);o.z=Math.max(E.z,J.z);o.material=v.material;r.elements.push(o)}}}}}a=
-0;for(U=r.sprites.length;a<U;a++){v=r.sprites[a].object;L=v.matrixWorld;if(v instanceof THREE.Particle){t.set(L.n14,L.n24,L.n34,1);y.multiplyVector4(t);t.z=t.z/t.w;if(t.z>0&&t.z<1){g=D[C]=D[C]||new THREE.RenderableParticle;C++;w=g;w.x=t.x/t.w;w.y=t.y/t.w;w.z=t.z;w.rotation=v.rotation.z;w.scale.x=v.scale.x*Math.abs(w.x-(t.x+e.projectionMatrix.n11)/(t.w+e.projectionMatrix.n14));w.scale.y=v.scale.y*Math.abs(w.y-(t.y+e.projectionMatrix.n22)/(t.w+e.projectionMatrix.n24));w.material=v.material;r.elements.push(w)}}}f&&
-r.elements.sort(c);return r}};THREE.Quaternion=function(a,b,c,d){this.x=a||0;this.y=b||0;this.z=c||0;this.w=d!==void 0?d:1};
-THREE.Quaternion.prototype={constructor:THREE.Quaternion,set:function(a,b,c,d){this.x=a;this.y=b;this.z=c;this.w=d;return this},copy:function(a){this.x=a.x;this.y=a.y;this.z=a.z;this.w=a.w;return this},setFromEuler:function(a){var b=Math.PI/360,c=a.x*b,d=a.y*b,e=a.z*b,a=Math.cos(d),d=Math.sin(d),b=Math.cos(-e),e=Math.sin(-e),f=Math.cos(c),c=Math.sin(c),g=a*b,i=d*e;this.w=g*f-i*c;this.x=g*c+i*f;this.y=d*b*f+a*e*c;this.z=a*e*f-d*b*c;return this},setFromAxisAngle:function(a,b){var c=b/2,d=Math.sin(c);
-this.x=a.x*d;this.y=a.y*d;this.z=a.z*d;this.w=Math.cos(c);return this},setFromRotationMatrix:function(a){var b=Math.pow(a.determinant(),1/3);this.w=Math.sqrt(Math.max(0,b+a.n11+a.n22+a.n33))/2;this.x=Math.sqrt(Math.max(0,b+a.n11-a.n22-a.n33))/2;this.y=Math.sqrt(Math.max(0,b-a.n11+a.n22-a.n33))/2;this.z=Math.sqrt(Math.max(0,b-a.n11-a.n22+a.n33))/2;this.x=a.n32-a.n23<0?-Math.abs(this.x):Math.abs(this.x);this.y=a.n13-a.n31<0?-Math.abs(this.y):Math.abs(this.y);this.z=a.n21-a.n12<0?-Math.abs(this.z):Math.abs(this.z);
-this.normalize();return this},calculateW:function(){this.w=-Math.sqrt(Math.abs(1-this.x*this.x-this.y*this.y-this.z*this.z));return this},inverse:function(){this.x=this.x*-1;this.y=this.y*-1;this.z=this.z*-1;return this},length:function(){return Math.sqrt(this.x*this.x+this.y*this.y+this.z*this.z+this.w*this.w)},normalize:function(){var a=Math.sqrt(this.x*this.x+this.y*this.y+this.z*this.z+this.w*this.w);if(a===0)this.w=this.z=this.y=this.x=0;else{a=1/a;this.x=this.x*a;this.y=this.y*a;this.z=this.z*
-a;this.w=this.w*a}return this},multiply:function(a,b){this.x=a.x*b.w+a.y*b.z-a.z*b.y+a.w*b.x;this.y=-a.x*b.z+a.y*b.w+a.z*b.x+a.w*b.y;this.z=a.x*b.y-a.y*b.x+a.z*b.w+a.w*b.z;this.w=-a.x*b.x-a.y*b.y-a.z*b.z+a.w*b.w;return this},multiplySelf:function(a){var b=this.x,c=this.y,d=this.z,e=this.w,f=a.x,g=a.y,i=a.z,a=a.w;this.x=b*a+e*f+c*i-d*g;this.y=c*a+e*g+d*f-b*i;this.z=d*a+e*i+b*g-c*f;this.w=e*a-b*f-c*g-d*i;return this},multiplyVector3:function(a,b){b||(b=a);var c=a.x,d=a.y,e=a.z,f=this.x,g=this.y,i=this.z,
-k=this.w,h=k*c+g*e-i*d,j=k*d+i*c-f*e,l=k*e+f*d-g*c,c=-f*c-g*d-i*e;b.x=h*k+c*-f+j*-i-l*-g;b.y=j*k+c*-g+l*-f-h*-i;b.z=l*k+c*-i+h*-g-j*-f;return b},clone:function(){return new THREE.Quaternion(this.x,this.y,this.z,this.w)}};
-THREE.Quaternion.slerp=function(a,b,c,d){var e=a.w*b.w+a.x*b.x+a.y*b.y+a.z*b.z;if(e<0){c.w=-b.w;c.x=-b.x;c.y=-b.y;c.z=-b.z;e=-e}else c.copy(b);if(Math.abs(e)>=1){c.w=a.w;c.x=a.x;c.y=a.y;c.z=a.z;return c}var f=Math.acos(e),e=Math.sqrt(1-e*e);if(Math.abs(e)<0.001){c.w=0.5*(a.w+b.w);c.x=0.5*(a.x+b.x);c.y=0.5*(a.y+b.y);c.z=0.5*(a.z+b.z);return c}b=Math.sin((1-d)*f)/e;d=Math.sin(d*f)/e;c.w=a.w*b+c.w*d;c.x=a.x*b+c.x*d;c.y=a.y*b+c.y*d;c.z=a.z*b+c.z*d;return c};THREE.Vertex=THREE.Vector3;
-THREE.Face3=function(a,b,c,d,e,f){this.a=a;this.b=b;this.c=c;this.normal=d instanceof THREE.Vector3?d:new THREE.Vector3;this.vertexNormals=d instanceof Array?d:[];this.color=e instanceof THREE.Color?e:new THREE.Color;this.vertexColors=e instanceof Array?e:[];this.vertexTangents=[];this.materialIndex=f;this.centroid=new THREE.Vector3};
-THREE.Face3.prototype={constructor:THREE.Face3,clone:function(){var a=new THREE.Face3(this.a,this.b,this.c);a.normal.copy(this.normal);a.color.copy(this.color);a.centroid.copy(this.centroid);a.materialIndex=this.materialIndex;var b,c;b=0;for(c=this.vertexNormals.length;b<c;b++)a.vertexNormals[b]=this.vertexNormals[b].clone();b=0;for(c=this.vertexColors.length;b<c;b++)a.vertexColors[b]=this.vertexColors[b].clone();b=0;for(c=this.vertexTangents.length;b<c;b++)a.vertexTangents[b]=this.vertexTangents[b].clone();
-return a}};THREE.Face4=function(a,b,c,d,e,f,g){this.a=a;this.b=b;this.c=c;this.d=d;this.normal=e instanceof THREE.Vector3?e:new THREE.Vector3;this.vertexNormals=e instanceof Array?e:[];this.color=f instanceof THREE.Color?f:new THREE.Color;this.vertexColors=f instanceof Array?f:[];this.vertexTangents=[];this.materialIndex=g;this.centroid=new THREE.Vector3};
-THREE.Face4.prototype={constructor:THREE.Face4,clone:function(){var a=new THREE.Face4(this.a,this.b,this.c,this.d);a.normal.copy(this.normal);a.color.copy(this.color);a.centroid.copy(this.centroid);a.materialIndex=this.materialIndex;var b,c;b=0;for(c=this.vertexNormals.length;b<c;b++)a.vertexNormals[b]=this.vertexNormals[b].clone();b=0;for(c=this.vertexColors.length;b<c;b++)a.vertexColors[b]=this.vertexColors[b].clone();b=0;for(c=this.vertexTangents.length;b<c;b++)a.vertexTangents[b]=this.vertexTangents[b].clone();
-return a}};THREE.UV=function(a,b){this.u=a||0;this.v=b||0};THREE.UV.prototype={constructor:THREE.UV,set:function(a,b){this.u=a;this.v=b;return this},copy:function(a){this.u=a.u;this.v=a.v;return this},lerpSelf:function(a,b){this.u=this.u+(a.u-this.u)*b;this.v=this.v+(a.v-this.v)*b;return this},clone:function(){return new THREE.UV(this.u,this.v)}};
-THREE.Camera=function(){THREE.Object3D.call(this);this.matrixWorldInverse=new THREE.Matrix4;this.projectionMatrix=new THREE.Matrix4;this.projectionMatrixInverse=new THREE.Matrix4};THREE.Camera.prototype=new THREE.Object3D;THREE.Camera.prototype.constructor=THREE.Camera;THREE.Camera.prototype.lookAt=function(a){this.matrix.lookAt(this.position,a,this.up);this.rotationAutoUpdate&&this.rotation.getRotationFromMatrix(this.matrix)};
-THREE.OrthographicCamera=function(a,b,c,d,e,f){THREE.Camera.call(this);this.left=a;this.right=b;this.top=c;this.bottom=d;this.near=e!==void 0?e:0.1;this.far=f!==void 0?f:2E3;this.updateProjectionMatrix()};THREE.OrthographicCamera.prototype=new THREE.Camera;THREE.OrthographicCamera.prototype.constructor=THREE.OrthographicCamera;THREE.OrthographicCamera.prototype.updateProjectionMatrix=function(){this.projectionMatrix.makeOrthographic(this.left,this.right,this.top,this.bottom,this.near,this.far)};
-THREE.PerspectiveCamera=function(a,b,c,d){THREE.Camera.call(this);this.fov=a!==void 0?a:50;this.aspect=b!==void 0?b:1;this.near=c!==void 0?c:0.1;this.far=d!==void 0?d:2E3;this.updateProjectionMatrix()};THREE.PerspectiveCamera.prototype=new THREE.Camera;THREE.PerspectiveCamera.prototype.constructor=THREE.PerspectiveCamera;THREE.PerspectiveCamera.prototype.setLens=function(a,b){this.fov=2*Math.atan((b!==void 0?b:24)/(a*2))*(180/Math.PI);this.updateProjectionMatrix()};
-THREE.PerspectiveCamera.prototype.setViewOffset=function(a,b,c,d,e,f){this.fullWidth=a;this.fullHeight=b;this.x=c;this.y=d;this.width=e;this.height=f;this.updateProjectionMatrix()};
-THREE.PerspectiveCamera.prototype.updateProjectionMatrix=function(){if(this.fullWidth){var a=this.fullWidth/this.fullHeight,b=Math.tan(this.fov*Math.PI/360)*this.near,c=-b,d=a*c,a=Math.abs(a*b-d),c=Math.abs(b-c);this.projectionMatrix.makeFrustum(d+this.x*a/this.fullWidth,d+(this.x+this.width)*a/this.fullWidth,b-(this.y+this.height)*c/this.fullHeight,b-this.y*c/this.fullHeight,this.near,this.far)}else this.projectionMatrix.makePerspective(this.fov,this.aspect,this.near,this.far)};
-THREE.Light=function(a){THREE.Object3D.call(this);this.color=new THREE.Color(a)};THREE.Light.prototype=new THREE.Object3D;THREE.Light.prototype.constructor=THREE.Light;THREE.Light.prototype.supr=THREE.Object3D.prototype;
-THREE.Material=function(a){a=a||{};this.id=THREE.MaterialCount++;this.name="";this.opacity=a.opacity!==void 0?a.opacity:1;this.transparent=a.transparent!==void 0?a.transparent:false;this.blending=a.blending!==void 0?a.blending:THREE.NormalBlending;this.blendSrc=a.blendSrc!==void 0?a.blendSrc:THREE.SrcAlphaFactor;this.blendDst=a.blendDst!==void 0?a.blendDst:THREE.OneMinusSrcAlphaFactor;this.blendEquation=a.blendEquation!==void 0?a.blendEquation:THREE.AddEquation;this.depthTest=a.depthTest!==void 0?
-a.depthTest:true;this.depthWrite=a.depthWrite!==void 0?a.depthWrite:true;this.polygonOffset=a.polygonOffset!==void 0?a.polygonOffset:false;this.polygonOffsetFactor=a.polygonOffsetFactor!==void 0?a.polygonOffsetFactor:0;this.polygonOffsetUnits=a.polygonOffsetUnits!==void 0?a.polygonOffsetUnits:0;this.alphaTest=a.alphaTest!==void 0?a.alphaTest:0;this.overdraw=a.overdraw!==void 0?a.overdraw:false;this.needsUpdate=true};THREE.MaterialCount=0;THREE.NoShading=0;THREE.FlatShading=1;THREE.SmoothShading=2;
-THREE.NoColors=0;THREE.FaceColors=1;THREE.VertexColors=2;THREE.NoBlending=0;THREE.NormalBlending=1;THREE.AdditiveBlending=2;THREE.SubtractiveBlending=3;THREE.MultiplyBlending=4;THREE.AdditiveAlphaBlending=5;THREE.CustomBlending=6;THREE.AddEquation=100;THREE.SubtractEquation=101;THREE.ReverseSubtractEquation=102;THREE.ZeroFactor=200;THREE.OneFactor=201;THREE.SrcColorFactor=202;THREE.OneMinusSrcColorFactor=203;THREE.SrcAlphaFactor=204;THREE.OneMinusSrcAlphaFactor=205;THREE.DstAlphaFactor=206;
-THREE.OneMinusDstAlphaFactor=207;THREE.DstColorFactor=208;THREE.OneMinusDstColorFactor=209;THREE.SrcAlphaSaturateFactor=210;
-THREE.LineBasicMaterial=function(a){THREE.Material.call(this,a);a=a||{};this.color=a.color!==void 0?new THREE.Color(a.color):new THREE.Color(16777215);this.linewidth=a.linewidth!==void 0?a.linewidth:1;this.linecap=a.linecap!==void 0?a.linecap:"round";this.linejoin=a.linejoin!==void 0?a.linejoin:"round";this.vertexColors=a.vertexColors?a.vertexColors:false;this.fog=a.fog!==void 0?a.fog:true};THREE.LineBasicMaterial.prototype=new THREE.Material;THREE.LineBasicMaterial.prototype.constructor=THREE.LineBasicMaterial;
-THREE.MeshBasicMaterial=function(a){THREE.Material.call(this,a);a=a||{};this.color=a.color!==void 0?new THREE.Color(a.color):new THREE.Color(16777215);this.map=a.map!==void 0?a.map:null;this.lightMap=a.lightMap!==void 0?a.lightMap:null;this.envMap=a.envMap!==void 0?a.envMap:null;this.combine=a.combine!==void 0?a.combine:THREE.MultiplyOperation;this.reflectivity=a.reflectivity!==void 0?a.reflectivity:1;this.refractionRatio=a.refractionRatio!==void 0?a.refractionRatio:0.98;this.fog=a.fog!==void 0?a.fog:
-true;this.shading=a.shading!==void 0?a.shading:THREE.SmoothShading;this.wireframe=a.wireframe!==void 0?a.wireframe:false;this.wireframeLinewidth=a.wireframeLinewidth!==void 0?a.wireframeLinewidth:1;this.wireframeLinecap=a.wireframeLinecap!==void 0?a.wireframeLinecap:"round";this.wireframeLinejoin=a.wireframeLinejoin!==void 0?a.wireframeLinejoin:"round";this.vertexColors=a.vertexColors!==void 0?a.vertexColors:THREE.NoColors;this.skinning=a.skinning!==void 0?a.skinning:false;this.morphTargets=a.morphTargets!==
-void 0?a.morphTargets:false};THREE.MeshBasicMaterial.prototype=new THREE.Material;THREE.MeshBasicMaterial.prototype.constructor=THREE.MeshBasicMaterial;
-THREE.ParticleBasicMaterial=function(a){THREE.Material.call(this,a);a=a||{};this.color=a.color!==void 0?new THREE.Color(a.color):new THREE.Color(16777215);this.map=a.map!==void 0?a.map:null;this.size=a.size!==void 0?a.size:1;this.sizeAttenuation=a.sizeAttenuation!==void 0?a.sizeAttenuation:true;this.vertexColors=a.vertexColors!==void 0?a.vertexColors:false;this.fog=a.fog!==void 0?a.fog:true};THREE.ParticleBasicMaterial.prototype=new THREE.Material;
-THREE.ParticleBasicMaterial.prototype.constructor=THREE.ParticleBasicMaterial;THREE.ParticleDOMMaterial=function(a){THREE.Material.call(this);this.domElement=a};
-THREE.Texture=function(a,b,c,d,e,f,g,i){this.id=THREE.TextureCount++;this.image=a;this.mapping=b!==void 0?b:new THREE.UVMapping;this.wrapS=c!==void 0?c:THREE.ClampToEdgeWrapping;this.wrapT=d!==void 0?d:THREE.ClampToEdgeWrapping;this.magFilter=e!==void 0?e:THREE.LinearFilter;this.minFilter=f!==void 0?f:THREE.LinearMipMapLinearFilter;this.format=g!==void 0?g:THREE.RGBAFormat;this.type=i!==void 0?i:THREE.UnsignedByteType;this.offset=new THREE.Vector2(0,0);this.repeat=new THREE.Vector2(1,1);this.generateMipmaps=
-true;this.needsUpdate=this.premultiplyAlpha=false;this.onUpdate=null};THREE.Texture.prototype={constructor:THREE.Texture,clone:function(){var a=new THREE.Texture(this.image,this.mapping,this.wrapS,this.wrapT,this.magFilter,this.minFilter,this.format,this.type);a.offset.copy(this.offset);a.repeat.copy(this.repeat);return a}};THREE.TextureCount=0;THREE.MultiplyOperation=0;THREE.MixOperation=1;THREE.UVMapping=function(){};THREE.CubeReflectionMapping=function(){};THREE.CubeRefractionMapping=function(){};
-THREE.SphericalReflectionMapping=function(){};THREE.SphericalRefractionMapping=function(){};THREE.RepeatWrapping=0;THREE.ClampToEdgeWrapping=1;THREE.MirroredRepeatWrapping=2;THREE.NearestFilter=3;THREE.NearestMipMapNearestFilter=4;THREE.NearestMipMapLinearFilter=5;THREE.LinearFilter=6;THREE.LinearMipMapNearestFilter=7;THREE.LinearMipMapLinearFilter=8;THREE.ByteType=9;THREE.UnsignedByteType=10;THREE.ShortType=11;THREE.UnsignedShortType=12;THREE.IntType=13;THREE.UnsignedIntType=14;THREE.FloatType=15;
-THREE.AlphaFormat=16;THREE.RGBFormat=17;THREE.RGBAFormat=18;THREE.LuminanceFormat=19;THREE.LuminanceAlphaFormat=20;THREE.DataTexture=function(a,b,c,d,e,f,g,i,k,h){THREE.Texture.call(this,null,f,g,i,k,h,d,e);this.image={data:a,width:b,height:c}};THREE.DataTexture.prototype=new THREE.Texture;THREE.DataTexture.prototype.constructor=THREE.DataTexture;
-THREE.DataTexture.prototype.clone=function(){var a=new THREE.DataTexture(this.image.data,this.image.width,this.image.height,this.format,this.type,this.mapping,this.wrapS,this.wrapT,this.magFilter,this.minFilter);a.offset.copy(this.offset);a.repeat.copy(this.repeat);return a};THREE.Particle=function(a){THREE.Object3D.call(this);this.material=a};THREE.Particle.prototype=new THREE.Object3D;THREE.Particle.prototype.constructor=THREE.Particle;
-THREE.Mesh=function(a,b){THREE.Object3D.call(this);this.geometry=a;this.material=b!==void 0?b:new THREE.MeshBasicMaterial({color:Math.random()*16777215,wireframe:true});if(this.geometry){this.geometry.boundingSphere||this.geometry.computeBoundingSphere();this.boundRadius=a.boundingSphere.radius;if(this.geometry.morphTargets.length){this.morphTargetBase=-1;this.morphTargetForcedOrder=[];this.morphTargetInfluences=[];this.morphTargetDictionary={};for(var c=0;c<this.geometry.morphTargets.length;c++){this.morphTargetInfluences.push(0);
-this.morphTargetDictionary[this.geometry.morphTargets[c].name]=c}}}};THREE.Mesh.prototype=new THREE.Object3D;THREE.Mesh.prototype.constructor=THREE.Mesh;THREE.Mesh.prototype.supr=THREE.Object3D.prototype;THREE.Mesh.prototype.getMorphTargetIndexByName=function(a){if(this.morphTargetDictionary[a]!==void 0)return this.morphTargetDictionary[a];console.log("THREE.Mesh.getMorphTargetIndexByName: morph target "+a+" does not exist. Returning 0.");return 0};
-THREE.Line=function(a,b,c){THREE.Object3D.call(this);this.geometry=a;this.material=b!==void 0?b:new THREE.LineBasicMaterial({color:Math.random()*16777215});this.type=c!==void 0?c:THREE.LineStrip;this.geometry&&(this.geometry.boundingSphere||this.geometry.computeBoundingSphere())};THREE.LineStrip=0;THREE.LinePieces=1;THREE.Line.prototype=new THREE.Object3D;THREE.Line.prototype.constructor=THREE.Line;THREE.Bone=function(a){THREE.Object3D.call(this);this.skin=a;this.skinMatrix=new THREE.Matrix4};
-THREE.Bone.prototype=new THREE.Object3D;THREE.Bone.prototype.constructor=THREE.Bone;THREE.Bone.prototype.supr=THREE.Object3D.prototype;THREE.Bone.prototype.update=function(a,b){this.matrixAutoUpdate&&(b=b|this.updateMatrix());if(b||this.matrixWorldNeedsUpdate){a?this.skinMatrix.multiply(a,this.matrix):this.skinMatrix.copy(this.matrix);this.matrixWorldNeedsUpdate=false;b=true}var c,d=this.children.length;for(c=0;c<d;c++)this.children[c].update(this.skinMatrix,b)};
-THREE.Sprite=function(a){THREE.Object3D.call(this);this.color=a.color!==void 0?new THREE.Color(a.color):new THREE.Color(16777215);this.map=a.map!==void 0?a.map:new THREE.Texture;this.blending=a.blending!==void 0?a.blending:THREE.NormalBlending;this.blendSrc=a.blendSrc!==void 0?a.blendSrc:THREE.SrcAlphaFactor;this.blendDst=a.blendDst!==void 0?a.blendDst:THREE.OneMinusSrcAlphaFactor;this.blendEquation=a.blendEquation!==void 0?a.blendEquation:THREE.AddEquation;this.useScreenCoordinates=a.useScreenCoordinates!==
-void 0?a.useScreenCoordinates:true;this.mergeWith3D=a.mergeWith3D!==void 0?a.mergeWith3D:!this.useScreenCoordinates;this.affectedByDistance=a.affectedByDistance!==void 0?a.affectedByDistance:!this.useScreenCoordinates;this.scaleByViewport=a.scaleByViewport!==void 0?a.scaleByViewport:!this.affectedByDistance;this.alignment=a.alignment instanceof THREE.Vector2?a.alignment:THREE.SpriteAlignment.center;this.rotation3d=this.rotation;this.rotation=0;this.opacity=1;this.uvOffset=new THREE.Vector2(0,0);this.uvScale=
-new THREE.Vector2(1,1)};THREE.Sprite.prototype=new THREE.Object3D;THREE.Sprite.prototype.constructor=THREE.Sprite;THREE.Sprite.prototype.updateMatrix=function(){this.matrix.setPosition(this.position);this.rotation3d.set(0,0,this.rotation);this.matrix.setRotationFromEuler(this.rotation3d);if(this.scale.x!==1||this.scale.y!==1){this.matrix.scale(this.scale);this.boundRadiusScale=Math.max(this.scale.x,this.scale.y)}this.matrixWorldNeedsUpdate=true};THREE.SpriteAlignment={};
-THREE.SpriteAlignment.topLeft=new THREE.Vector2(1,-1);THREE.SpriteAlignment.topCenter=new THREE.Vector2(0,-1);THREE.SpriteAlignment.topRight=new THREE.Vector2(-1,-1);THREE.SpriteAlignment.centerLeft=new THREE.Vector2(1,0);THREE.SpriteAlignment.center=new THREE.Vector2(0,0);THREE.SpriteAlignment.centerRight=new THREE.Vector2(-1,0);THREE.SpriteAlignment.bottomLeft=new THREE.Vector2(1,1);THREE.SpriteAlignment.bottomCenter=new THREE.Vector2(0,1);
-THREE.SpriteAlignment.bottomRight=new THREE.Vector2(-1,1);THREE.Scene=function(){THREE.Object3D.call(this);this.overrideMaterial=this.fog=null;this.matrixAutoUpdate=false;this.__objects=[];this.__lights=[];this.__objectsAdded=[];this.__objectsRemoved=[]};THREE.Scene.prototype=new THREE.Object3D;THREE.Scene.prototype.constructor=THREE.Scene;
-THREE.Scene.prototype.__addObject=function(a){if(a instanceof THREE.Light)this.__lights.indexOf(a)===-1&&this.__lights.push(a);else if(!(a instanceof THREE.Camera||a instanceof THREE.Bone)&&this.__objects.indexOf(a)===-1){this.__objects.push(a);this.__objectsAdded.push(a);var b=this.__objectsRemoved.indexOf(a);b!==-1&&this.__objectsRemoved.splice(b,1)}for(b=0;b<a.children.length;b++)this.__addObject(a.children[b])};
-THREE.Scene.prototype.__removeObject=function(a){if(a instanceof THREE.Light){var b=this.__lights.indexOf(a);b!==-1&&this.__lights.splice(b,1)}else if(!(a instanceof THREE.Camera)){b=this.__objects.indexOf(a);if(b!==-1){this.__objects.splice(b,1);this.__objectsRemoved.push(a);b=this.__objectsAdded.indexOf(a);b!==-1&&this.__objectsAdded.splice(b,1)}}for(b=0;b<a.children.length;b++)this.__removeObject(a.children[b])};
-THREE.DOMRenderer=function(){console.log("THREE.DOMRenderer",THREE.REVISION);var a,b,c,d,e,f,g,i=new THREE.Projector;g=function(a){for(var b=document.documentElement,c=0;c<a.length;c++)if(typeof b.style[a[c]]==="string")return a[c];return null}(["transform","MozTransform","WebkitTransform","msTransform","OTransform"]);this.domElement=document.createElement("div");this.setSize=function(a,b){c=a;d=b;e=c/2;f=d/2};this.render=function(c,d){var j,l,n,m,p,o;a=i.projectScene(c,d);b=a.elements;j=0;for(l=
-b.length;j<l;j++){n=b[j];if(n instanceof THREE.RenderableParticle&&n.material instanceof THREE.ParticleDOMMaterial){m=n.material.domElement;p=n.x*e+e-(m.offsetWidth>>1);o=n.y*f+f-(m.offsetHeight>>1);m.style.left=p+"px";m.style.top=o+"px";m.style.zIndex=Math.abs(Math.floor((1-n.z)*d.far/d.near));g&&(m.style[g]="scale("+n.scale.x*e+","+n.scale.y*f+")")}}}};THREE.RenderableParticle=function(){this.rotation=this.z=this.y=this.x=null;this.scale=new THREE.Vector2;this.material=null};
-THREE.RenderableVertex=function(){this.positionWorld=new THREE.Vector3;this.positionScreen=new THREE.Vector4;this.visible=true};THREE.RenderableVertex.prototype.copy=function(a){this.positionWorld.copy(a.positionWorld);this.positionScreen.copy(a.positionScreen)};
-THREE.RenderableFace3=function(){this.v1=new THREE.RenderableVertex;this.v2=new THREE.RenderableVertex;this.v3=new THREE.RenderableVertex;this.centroidWorld=new THREE.Vector3;this.centroidScreen=new THREE.Vector3;this.normalWorld=new THREE.Vector3;this.vertexNormalsWorld=[new THREE.Vector3,new THREE.Vector3,new THREE.Vector3];this.faceMaterial=this.material=null;this.uvs=[[]];this.z=null};
-THREE.RenderableFace4=function(){this.v1=new THREE.RenderableVertex;this.v2=new THREE.RenderableVertex;this.v3=new THREE.RenderableVertex;this.v4=new THREE.RenderableVertex;this.centroidWorld=new THREE.Vector3;this.centroidScreen=new THREE.Vector3;this.normalWorld=new THREE.Vector3;this.vertexNormalsWorld=[new THREE.Vector3,new THREE.Vector3,new THREE.Vector3,new THREE.Vector3];this.faceMaterial=this.material=null;this.uvs=[[]];this.z=null};THREE.RenderableObject=function(){this.z=this.object=null};
-THREE.RenderableParticle=function(){this.rotation=this.z=this.y=this.x=null;this.scale=new THREE.Vector2;this.material=null};THREE.RenderableLine=function(){this.z=null;this.v1=new THREE.RenderableVertex;this.v2=new THREE.RenderableVertex;this.material=null};
->>>>>>> mrdoob/dev
