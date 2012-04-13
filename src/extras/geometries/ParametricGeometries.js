@@ -29,15 +29,16 @@ THREE.TubeGeometry2 = function(path, segments, radius, segmentsRadius, closed, d
         normals = frames.normals,
         binormals = frames.binormals;
 
-    // proxy internals
-    this.tangents = tangents;
-    this.normals = normals;
-    this.binormals = binormals;
+        // proxy internals
+        this.tangents = tangents;
+        this.normals = normals;
+        this.binormals = binormals;
 
    
 
     var ParametricTube = function(u, v) {
-        u /= Math.PI;
+        v *= 2 * pi;
+        
         i = u * (numpoints - 1);
         i = Math.floor(i);
 
@@ -125,6 +126,9 @@ THREE.TorusKnotGeometry2.prototype.constructor = THREE.TorusKnotGeometry2;
 
 
 function klein(u, v) {
+    u *= pi;
+    v *= 2 * pi;
+
     u = u * 2;
     var x, y, z;
     if (u < pi) {
@@ -145,7 +149,9 @@ function klein(u, v) {
 THREE.SphereGeometry2 = function(size, x, y) {
 
     function sphere(u, v) {
-
+        u *= pi;
+        v *= 2 * pi;
+        
         var x = sin(u) * cos(v);
         var y = cos(u);
         var z = -sin(u) * sin(v);
@@ -159,3 +165,23 @@ THREE.SphereGeometry2 = function(size, x, y) {
 
 THREE.SphereGeometry2.prototype = new THREE.Geometry();
 THREE.SphereGeometry2.prototype.constructor = THREE.SphereGeometry2;
+
+
+THREE.PlaneGeometry2 = function(width, depth, segmentsWidth, segmentsDepth) {
+
+    function plane(u, v) {
+        
+        console.log('u, v', u, v);
+        var x = u * width;
+        var y = 0; 
+        var z = v * depth;
+
+        return new THREE.Vector3(x, y, z);
+    }
+  
+    THREE.ParametricGeometry.call(this, segmentsWidth, segmentsDepth, plane);
+
+};
+
+THREE.PlaneGeometry2.prototype = new THREE.Geometry();
+THREE.PlaneGeometry2.prototype.constructor = THREE.PlaneGeometry2;

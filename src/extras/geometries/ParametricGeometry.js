@@ -11,15 +11,14 @@ THREE.ParametricGeometry = function(slices, stacks, func) {
     var verts = this.vertices,
         faces = this.faces,
         uvs = this.faceVertexUvs[0];
-    var pi = Math.PI;
 
     var i, il, theta, j, phi, p;
 
     for (i = 0; i <= slices; i++) {
-        theta = i * pi / slices;
+        theta = i / slices;
 
         for (j = 0; j < stacks; j++) {
-            phi = j * 2 * pi / stacks;
+            phi = j / stacks;
 
             p = func(theta, phi);
             verts.push(new THREE.Vertex(p));
