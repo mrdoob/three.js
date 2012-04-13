@@ -207,7 +207,7 @@
 				// MATERIALS
 
 				var shader = THREE.ShaderUtils.lib[ "cube" ];
-				shader.uniforms[ "tCube" ].texture = cubeCamera.getRenderTarget();
+				shader.uniforms[ "tCube" ].texture = cubeCamera.renderTarget;
 				shader.uniforms[ "tFlip" ].value = 1;
 
 				var materialCube = new THREE.ShaderMaterial( {
@@ -220,7 +220,7 @@
 
 				var materialLambert = new THREE.MeshPhongMaterial( { shininess: 50, ambient: 0x444444, color: 0xffffff, map: textureNoiseColor } );
 				var materialPhong = new THREE.MeshPhongMaterial( { shininess: 50, ambient: 0x444444, color: 0xffffff, specular: 0x999999, map: textureLava } );
-				var materialPhongCube = new THREE.MeshPhongMaterial( { shininess: 50, ambient: 0x444444, color: 0xffffff, specular: 0x999999, envMap: cubeCamera.getRenderTarget() } );
+				var materialPhongCube = new THREE.MeshPhongMaterial( { shininess: 50, ambient: 0x444444, color: 0xffffff, specular: 0x999999, envMap: cubeCamera.renderTarget } );
 
 				// OBJECTS
 

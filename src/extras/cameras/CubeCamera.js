@@ -41,16 +41,11 @@ THREE.CubeCamera = function ( near, far, cubeResolution ) {
 	cameraNZ.lookAt( new THREE.Vector3( 0, 0, -1 ) );
 	this.add( cameraNZ );
 
-	var renderTarget = new THREE.WebGLRenderTargetCube( cubeResolution, cubeResolution, { format: THREE.RGBFormat, magFilter: THREE.LinearFilter, minFilter: THREE.LinearFilter } );
-
-	this.getRenderTarget = function () {
-
-		return renderTarget;
-
-	};
+	this.renderTarget = new THREE.WebGLRenderTargetCube( cubeResolution, cubeResolution, { format: THREE.RGBFormat, magFilter: THREE.LinearFilter, minFilter: THREE.LinearFilter } );
 
 	this.updateCubeMap = function ( renderer, scene ) {
 
+		var renderTarget = this.renderTarget;
 		var generateMipmaps = renderTarget.generateMipmaps;
 
 		renderTarget.generateMipmaps = false;
