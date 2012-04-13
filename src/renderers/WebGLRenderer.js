@@ -3370,7 +3370,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( ! ( object instanceof THREE.Mesh || object instanceof THREE.ParticleSystem ) || ! ( object.frustumCulled ) || _frustum.contains( object ) ) {
 
-					object.matrixWorld.flattenToArray( object._objectMatrixArray );
+					//object.matrixWorld.flattenToArray( object._objectMatrixArray );
 
 					setupMatrices( object, camera );
 
@@ -3420,7 +3420,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if( object.matrixAutoUpdate ) {
 
-					object.matrixWorld.flattenToArray( object._objectMatrixArray );
+					//object.matrixWorld.flattenToArray( object._objectMatrixArray );
 
 				}
 
@@ -3827,11 +3827,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 			object._modelViewMatrix = new THREE.Matrix4();
 			object._normalMatrix = new THREE.Matrix3();
 
-			object._normalMatrixArray = new Float32Array( 9 );
-			object._modelViewMatrixArray = new Float32Array( 16 );
-			object._objectMatrixArray = new Float32Array( 16 );
+			//object._normalMatrixArray = new Float32Array( 9 );
+			//object._modelViewMatrixArray = new Float32Array( 16 );
+			//object._objectMatrixArray = new Float32Array( 16 );
 
-			object.matrixWorld.flattenToArray( object._objectMatrixArray );
+			//object.matrixWorld.flattenToArray( object._objectMatrixArray );
 
 			if ( object instanceof THREE.Mesh ) {
 
@@ -4519,7 +4519,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( p_uniforms.objectMatrix !== null ) {
 
-				_gl.uniformMatrix4fv( p_uniforms.objectMatrix, false, object._objectMatrixArray );
+				_gl.uniformMatrix4fv( p_uniforms.objectMatrix, false, object.matrixWorld.elements );
 
 			}
 
@@ -4707,11 +4707,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function loadUniformsMatrices ( uniforms, object ) {
 
-		_gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, object._modelViewMatrixArray );
+		_gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, object._modelViewMatrix.elements );
 
 		if ( uniforms.normalMatrix ) {
 
-			_gl.uniformMatrix3fv( uniforms.normalMatrix, false, object._normalMatrixArray );
+			_gl.uniformMatrix3fv( uniforms.normalMatrix, false, object._normalMatrix.elements );
 
 		}
 
@@ -4937,10 +4937,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setupMatrices ( object, camera ) {
 
-		object._modelViewMatrix.multiplyToArray( camera.matrixWorldInverse, object.matrixWorld, object._modelViewMatrixArray );
+		object._modelViewMatrix.multiply( camera.matrixWorldInverse, object.matrixWorld);
 
 		object._normalMatrix.getInverse( object._modelViewMatrix );
-		object._normalMatrix.transposeIntoArray( object._normalMatrixArray );
+		object._normalMatrix.transpose();
 
 	};
 
