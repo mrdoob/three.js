@@ -56,7 +56,7 @@ THREE.TubeGeometry = function( path, segments, radius, segmentsRadius, closed, d
 	
 	function vert( x, y, z ) {
 
-		return scope.vertices.push( new THREE.Vertex( new THREE.Vector3( x, y, z ) ) ) - 1;
+		return scope.vertices.push( new THREE.Vertex( x, y, z ) ) - 1;
 
 	}
 

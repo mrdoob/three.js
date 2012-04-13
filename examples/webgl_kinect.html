@@ -155,11 +155,11 @@
 
 					for ( var i = 0, l = width * height; i < l; i ++ ) {
  
-						var position = new THREE.Vector3();
-						position.x = ( i % width );
-						position.y = Math.floor( i / width );
+						var vertex = new THREE.Vertex();
+						vertex.x = ( i % width );
+						vertex.y = Math.floor( i / width );
 
-						geometry.vertices.push( new THREE.Vertex( position ) );
+						geometry.vertices.push( vertex );
 
 					}
 

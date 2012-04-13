@@ -437,7 +437,7 @@ THREE.ColladaLoader = function () {
 
 			for ( var i = 0; i < geometry.vertices.length; i ++ ) {
 
-				skin.bindShapeMatrix.multiplyVector3( geometry.vertices[ i ].position );
+				skin.bindShapeMatrix.multiplyVector3( geometry.vertices[ i ] );
 
 			}
 
@@ -568,7 +568,7 @@ THREE.ColladaLoader = function () {
 
 		for ( i = 0; i < geometry.vertices.length; i ++ ) {
 
-			skinController.skin.bindShapeMatrix.multiplyVector3( geometry.vertices[i].position );
+			skinController.skin.bindShapeMatrix.multiplyVector3( geometry.vertices[i] );
 
 		}
 
@@ -583,7 +583,7 @@ THREE.ColladaLoader = function () {
 
 			for ( i = 0; i < geometry.vertices.length; i++ ) {
 
-				skinned.push( new THREE.Vertex( new THREE.Vector3() ) );
+				skinned.push( new THREE.Vertex() );
 
 			}
 
@@ -608,15 +608,15 @@ THREE.ColladaLoader = function () {
 					o = geometry.vertices[vidx];
 					s = skinned[vidx];
 
-					v.x = o.position.x;
-					v.y = o.position.y;
-					v.z = o.position.z;
+					v.x = o.x;
+					v.y = o.y;
+					v.z = o.z;
 
 					bones[i].skinningMatrix.multiplyVector3(v);
 
-					s.position.x += (v.x * weight);
-					s.position.y += (v.y * weight);
-					s.position.z += (v.z * weight);
+					s.x += (v.x * weight);
+					s.y += (v.y * weight);
+					s.z += (v.z * weight);
 
 				}
 
@@ -2306,7 +2306,7 @@ THREE.ColladaLoader = function () {
 
 		for ( i = 0; i < vertexData.length; i += 3 ) {
 
-			var v = new THREE.Vertex( getConvertedVec3( vertexData, i ) );
+			var v = new THREE.Vertex().copy( getConvertedVec3( vertexData, i ) );
 			this.geometry3js.vertices.push( v );
 
 		}

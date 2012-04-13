@@ -57,7 +57,7 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 	var newVertices = [], newFaces = [], newUVs = [];
 	
 	function v( x, y, z ) {
-		newVertices.push( new THREE.Vertex( new THREE.Vector3( x, y, z ) ) );
+		newVertices.push( new THREE.Vertex( x, y, z ) );
 	}
 	
 	var scope = this;
@@ -292,9 +292,9 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 			
 	var avgUv ;
 	for (i=0, il = originalFaces.length; i<il ;i++) {
-		face = originalFaces[i];
-		facePoints.push(face.centroid);
-		newPoints.push( new THREE.Vertex(face.centroid) );
+		face = originalFaces[ i ];
+		facePoints.push( face.centroid );
+		newPoints.push( new THREE.Vertex().copy( face.centroid ) );
 		
 		
 		if (!scope.supportUVs) continue;
@@ -304,14 +304,14 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 		avgUv = new THREE.UV();
 		
 		if ( face instanceof THREE.Face3 ) {
-			avgUv.u = getUV(face.a, i).u + getUV(face.b, i).u + getUV(face.c, i).u;
-			avgUv.v = getUV(face.a, i).v + getUV(face.b, i).v + getUV(face.c, i).v;
+			avgUv.u = getUV( face.a, i ).u + getUV( face.b, i ).u + getUV( face.c, i ).u;
+			avgUv.v = getUV( face.a, i ).v + getUV( face.b, i ).v + getUV( face.c, i ).v;
 			avgUv.u /= 3;
 			avgUv.v /= 3;
 			
 		} else if ( face instanceof THREE.Face4 ) {
-			avgUv.u = getUV(face.a,i).u + getUV(face.b, i).u + getUV(face.c, i).u + getUV(face.d, i).u;
-			avgUv.v = getUV(face.a,i).v + getUV(face.b, i).v + getUV(face.c, i).v + getUV(face.d, i).v;
+			avgUv.u = getUV( face.a, i ).u + getUV( face.b, i ).u + getUV( face.c, i ).u + getUV( face.d, i ).u;
+			avgUv.v = getUV( face.a, i ).v + getUV( face.b, i ).v + getUV( face.c, i ).v + getUV( face.d, i ).v;
 			avgUv.u /= 4;
 			avgUv.v /= 4;
 		}
@@ -409,8 +409,8 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 			//debug('warning, ', i, 'edge has only 1 connecting face', edge);
 			
 			// For a sharp edge, average the edge end points.
-			avg.addSelf(originalPoints[edgeVertexA].position);
-			avg.addSelf(originalPoints[edgeVertexB].position);
+			avg.addSelf(originalPoints[edgeVertexA]);
+			avg.addSelf(originalPoints[edgeVertexB]);
 			
 			avg.multiplyScalar(0.5);
 			
@@ -421,8 +421,8 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 			avg.addSelf(facePoints[faceIndexA]);
 			avg.addSelf(facePoints[faceIndexB]);
 		
-			avg.addSelf(originalPoints[edgeVertexA].position);
-			avg.addSelf(originalPoints[edgeVertexB].position);
+			avg.addSelf(originalPoints[edgeVertexA]);
+			avg.addSelf(originalPoints[edgeVertexB]);
 		
 			avg.multiplyScalar(0.25);
 		
@@ -430,7 +430,7 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 		
 		edgePoints[i] = originalVerticesLength + originalFaces.length + edgeCount;
 		
-		newPoints.push( new THREE.Vertex(avg) );
+		newPoints.push( new THREE.Vertex().copy( avg ) );
 	
 		edgeCount ++;
 		
@@ -583,22 +583,22 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 		
 		for (j=0; j<n;j++) {
 			edge = vertexEdgeMap[i][j];
-			var midPt = originalPoints[edge[0]].position.clone().addSelf(originalPoints[edge[1]].position).divideScalar(2);
+			var midPt = originalPoints[edge[0]].clone().addSelf(originalPoints[edge[1]]).divideScalar(2);
 			R.addSelf(midPt);
-			// R.addSelf(originalPoints[edge[0]].position);
-			// R.addSelf(originalPoints[edge[1]].position);
+			// R.addSelf(originalPoints[edge[0]]);
+			// R.addSelf(originalPoints[edge[1]]);
 		}
 		
 		R.divideScalar(n);
 		
-		newPos.addSelf(originalPoints[i].position);
+		newPos.addSelf(originalPoints[i]);
 		newPos.multiplyScalar(n - 3);
 		
 		newPos.addSelf(F);
 		newPos.addSelf(R.multiplyScalar(2));
 		newPos.divideScalar(n);
 		
-		newVertices[i].position = newPos;
+		newVertices[i] = newPos;
 		
 		
 	}

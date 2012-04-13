@@ -48,7 +48,7 @@ THREE.GeometryUtils = {
 
 			var vertexCopy = vertex.clone();
 
-			if ( matrix ) matrix.multiplyVector3( vertexCopy.position );
+			if ( matrix ) matrix.multiplyVector3( vertexCopy );
 
 			vertices1.push( vertexCopy );
 
@@ -246,18 +246,18 @@ THREE.GeometryUtils = {
 
 		if ( face instanceof THREE.Face3 ) {
 
-			vA = geometry.vertices[ face.a ].position;
-			vB = geometry.vertices[ face.b ].position;
-			vC = geometry.vertices[ face.c ].position;
+			vA = geometry.vertices[ face.a ];
+			vB = geometry.vertices[ face.b ];
+			vC = geometry.vertices[ face.c ];
 
 			return THREE.GeometryUtils.randomPointInTriangle( vA, vB, vC );
 
 		} else if ( face instanceof THREE.Face4 ) {
 
-			vA = geometry.vertices[ face.a ].position;
-			vB = geometry.vertices[ face.b ].position;
-			vC = geometry.vertices[ face.c ].position;
-			vD = geometry.vertices[ face.d ].position;
+			vA = geometry.vertices[ face.a ];
+			vB = geometry.vertices[ face.b ];
+			vC = geometry.vertices[ face.c ];
+			vD = geometry.vertices[ face.d ];
 
 			var area1, area2;
 
@@ -325,18 +325,18 @@ THREE.GeometryUtils = {
 
 			if ( face instanceof THREE.Face3 ) {
 
-				vA = vertices[ face.a ].position;
-				vB = vertices[ face.b ].position;
-				vC = vertices[ face.c ].position;
+				vA = vertices[ face.a ];
+				vB = vertices[ face.b ];
+				vC = vertices[ face.c ];
 
 				face._area = THREE.GeometryUtils.triangleArea( vA, vB, vC );
 
 			} else if ( face instanceof THREE.Face4 ) {
 
-				vA = vertices[ face.a ].position;
-				vB = vertices[ face.b ].position;
-				vC = vertices[ face.c ].position;
-				vD = vertices[ face.d ].position;
+				vA = vertices[ face.a ];
+				vB = vertices[ face.b ];
+				vC = vertices[ face.c ];
+				vD = vertices[ face.d ];
 
 				face._area1 = THREE.GeometryUtils.triangleArea( vA, vB, vD );
 				face._area2 = THREE.GeometryUtils.triangleArea( vB, vC, vD );
@@ -712,9 +712,9 @@ THREE.GeometryUtils = {
 				vb = geometry.vertices[ b ];
 				vc = geometry.vertices[ c ];
 
-				dab = va.position.distanceTo( vb.position );
-				dbc = vb.position.distanceTo( vc.position );
-				dac = va.position.distanceTo( vc.position );
+				dab = va.distanceTo( vb );
+				dbc = vb.distanceTo( vc );
+				dac = va.distanceTo( vc );
 
 				if ( dab > maxEdgeLength || dbc > maxEdgeLength || dac > maxEdgeLength ) {
 
@@ -726,7 +726,7 @@ THREE.GeometryUtils = {
 					if ( dab >= dbc && dab >= dac ) {
 
 						vm = va.clone();
-						vm.position.lerpSelf( vb.position, 0.5 );
+						vm.lerpSelf( vb, 0.5 );
 
 						triA.a = a;
 						triA.b = m;
@@ -761,7 +761,7 @@ THREE.GeometryUtils = {
 					} else if ( dbc >= dab && dbc >= dac ) {
 
 						vm = vb.clone();
-						vm.position.lerpSelf( vc.position, 0.5 );
+						vm.lerpSelf( vc, 0.5 );
 
 						triA.a = a;
 						triA.b = b;
@@ -802,7 +802,7 @@ THREE.GeometryUtils = {
 					} else {
 
 						vm = va.clone();
-						vm.position.lerpSelf( vc.position, 0.5 );
+						vm.lerpSelf( vc, 0.5 );
 
 						triA.a = a;
 						triA.b = b;
@@ -913,10 +913,10 @@ THREE.GeometryUtils = {
 				vc = geometry.vertices[ c ];
 				vd = geometry.vertices[ d ];
 
-				dab = va.position.distanceTo( vb.position );
-				dbc = vb.position.distanceTo( vc.position );
-				dcd = vc.position.distanceTo( vd.position );
-				dad = va.position.distanceTo( vd.position );
+				dab = va.distanceTo( vb );
+				dbc = vb.distanceTo( vc );
+				dcd = vc.distanceTo( vd );
+				dad = va.distanceTo( vd );
 
 				if ( dab > maxEdgeLength || dbc > maxEdgeLength || dcd > maxEdgeLength || dad > maxEdgeLength ) {
 
@@ -929,10 +929,10 @@ THREE.GeometryUtils = {
 					if ( ( dab >= dbc && dab >= dcd && dab >= dad ) || ( dcd >= dbc && dcd >= dab && dcd >= dad ) ) {
 
 						vm1 = va.clone();
-						vm1.position.lerpSelf( vb.position, 0.5 );
+						vm1.lerpSelf( vb, 0.5 );
 
 						vm2 = vc.clone();
-						vm2.position.lerpSelf( vd.position, 0.5 );
+						vm2.lerpSelf( vd, 0.5 );
 
 						quadA.a = a;
 						quadA.b = m1;
@@ -981,10 +981,10 @@ THREE.GeometryUtils = {
 					} else {
 
 						vm1 = vb.clone();
-						vm1.position.lerpSelf( vc.position, 0.5 );
+						vm1.lerpSelf( vc, 0.5 );
 
 						vm2 = vd.clone();
-						vm2.position.lerpSelf( va.position, 0.5 );
+						vm2.lerpSelf( va, 0.5 );
 
 						quadA.a = a;
 						quadA.b = b;

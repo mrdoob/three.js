@@ -101,11 +101,8 @@
 
 					}
 
-					vector = new THREE.Vector3( x, y, z );
-					geometry.vertices.push( new THREE.Vertex( vector ) );
-
-					vector = new THREE.Vector3( x, y, z );
-					geometry2.vertices.push( new THREE.Vertex( vector ) );
+					geometry.vertices.push( new THREE.Vertex( x, y, z ) );
+					geometry2.vertices.push( new THREE.Vertex( x, y, z ) );
 
 					h = i2 % 2 ? 1 : 0.15;
 					if( i2 % 4 <= 2 ) h -= 0.15;
@@ -118,7 +115,7 @@
 				}
 
 				var tmpRot = new THREE.Matrix4();
-				tmpRot.setRotationAxis( new THREE.Vector3( 1, 0, 0 ), Math.PI/2 );
+				tmpRot.makeRotationAxis( new THREE.Vector3( 1, 0, 0 ), Math.PI/2 );
 
 				xgrid = 34;
 				ygrid = 15;
@@ -273,8 +270,8 @@
 					z  =  10 * Math.sin( i2 * 0.1 + time*30 );
 					z2 =  20 * Math.cos( Math.sin( i2 * 0.1 + time * 20 ) );
 
-					geometry.vertices[ i2 ].position.z = z;
-					geometry2.vertices[ i2 ].position.z = z2;
+					geometry.vertices[ i2 ].z = z;
+					geometry2.vertices[ i2 ].z = z2;
 
 				}
 

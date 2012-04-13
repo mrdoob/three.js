@@ -108,9 +108,9 @@ THREE.Ray = function ( origin, direction ) {
 
 					if ( face instanceof THREE.Face3 ) {
 
-						a = objMatrix.multiplyVector3( a.copy( vertices[ face.a ].position ) );
-						b = objMatrix.multiplyVector3( b.copy( vertices[ face.b ].position ) );
-						c = objMatrix.multiplyVector3( c.copy( vertices[ face.c ].position ) );
+						a = objMatrix.multiplyVector3( a.copy( vertices[ face.a ] ) );
+						b = objMatrix.multiplyVector3( b.copy( vertices[ face.b ] ) );
+						c = objMatrix.multiplyVector3( c.copy( vertices[ face.c ] ) );
 
 						if ( pointInFace3( intersectPoint, a, b, c ) ) {
 
@@ -129,10 +129,10 @@ THREE.Ray = function ( origin, direction ) {
 
 					} else if ( face instanceof THREE.Face4 ) {
 
-						a = objMatrix.multiplyVector3( a.copy( vertices[ face.a ].position ) );
-						b = objMatrix.multiplyVector3( b.copy( vertices[ face.b ].position ) );
-						c = objMatrix.multiplyVector3( c.copy( vertices[ face.c ].position ) );
-						d = objMatrix.multiplyVector3( d.copy( vertices[ face.d ].position ) );
+						a = objMatrix.multiplyVector3( a.copy( vertices[ face.a ] ) );
+						b = objMatrix.multiplyVector3( b.copy( vertices[ face.b ] ) );
+						c = objMatrix.multiplyVector3( c.copy( vertices[ face.c ] ) );
+						d = objMatrix.multiplyVector3( d.copy( vertices[ face.d ] ) );
 
 						if ( pointInFace3( intersectPoint, a, b, d ) || pointInFace3( intersectPoint, b, c, d ) ) {
 

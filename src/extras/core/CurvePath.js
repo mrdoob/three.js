@@ -205,7 +205,7 @@ THREE.CurvePath.prototype.createGeometry = function( points ) {
 
     for( var i = 0; i < points.length; i ++ ) {
 
-        geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( points[ i ].x, points[ i ].y, 0 ) ) );
+        geometry.vertices.push( new THREE.Vertex( points[ i ].x, points[ i ].y, 0 ) );
 
     }
 
