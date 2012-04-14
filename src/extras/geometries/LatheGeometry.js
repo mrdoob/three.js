@@ -15,8 +15,7 @@ THREE.LatheGeometry = function ( points, steps, angle ) {
 
 	for ( var j = 0; j < points.length; j ++ ) {
 
-		_newV[ j ] = points[ j ].clone();
-		this.vertices.push( new THREE.Vertex().copy( _newV[ j ] ) );
+		this.vertices.push( points[ j ].clone() );
 
 	}
 
@@ -27,8 +26,7 @@ THREE.LatheGeometry = function ( points, steps, angle ) {
 
 		for ( var j = 0; j < _newV.length; j ++ ) {
 
-			_newV[ j ] = _matrix.multiplyVector3( _newV[ j ].clone() );
-			this.vertices.push( new THREE.Vertex().copy( _newV[ j ] ) );
+			this.vertices.push( _matrix.multiplyVector3( _newV[ j ].clone() ) );
 
 		}
 

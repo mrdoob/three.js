@@ -198,7 +198,10 @@
 
 				for ( var i = 0; i < 1500; i ++ ) {
 
-					var vertex = new THREE.Vertex( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 );
+					var vertex = new THREE.Vector3();
+					vertex.x = Math.random() * 2 - 1;
+					vertex.y = Math.random() * 2 - 1;
+					vertex.z = Math.random() * 2 - 1;
 					vertex.multiplyScalar( radius );
 
 					starsGeometry.vertices.push( vertex );

@@ -54,11 +54,11 @@
 
 				for ( var i = 0; i <= 40; i ++ ) {
 
-					geometry.vertices.push( new THREE.Vertex( - 500, floor, i * step - 500 ) );
-					geometry.vertices.push( new THREE.Vertex(   500, floor, i * step - 500 ) );
+					geometry.vertices.push( new THREE.Vector3( - 500, floor, i * step - 500 ) );
+					geometry.vertices.push( new THREE.Vector3(   500, floor, i * step - 500 ) );
 
-					geometry.vertices.push( new THREE.Vertex( i * step - 500, floor, -500 ) );
-					geometry.vertices.push( new THREE.Vertex( i * step - 500, floor,  500 ) );
+					geometry.vertices.push( new THREE.Vector3( i * step - 500, floor, -500 ) );
+					geometry.vertices.push( new THREE.Vector3( i * step - 500, floor,  500 ) );
 
 				}
 

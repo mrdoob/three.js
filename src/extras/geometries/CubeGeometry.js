@@ -100,7 +100,7 @@ THREE.CubeGeometry = function ( width, height, depth, segmentsWidth, segmentsHei
 
 			for ( ix = 0; ix < gridX1; ix ++ ) {
 
-				var vector = new THREE.Vertex();
+				var vector = new THREE.Vector3();
 				vector[ u ] = ( ix * segment_width - width_half ) * udir;
 				vector[ v ] = ( iy * segment_height - height_half ) * vdir;
 				vector[ w ] = depth;

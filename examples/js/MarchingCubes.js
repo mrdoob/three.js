@@ -602,7 +602,7 @@ THREE.MarchingCubes = function ( resolution, material ) {
 
 		var geo_callback = function( object ) {
 
-			var i, x, y, z, vertex, position, normal,
+			var i, x, y, z, vertex, normal,
 				face, a, b, c, na, nb, nc, nfaces;
 
 
@@ -615,15 +615,13 @@ THREE.MarchingCubes = function ( resolution, material ) {
 				x = object.positionArray[ a ];
 				y = object.positionArray[ b ];
 				z = object.positionArray[ c ];
-				position = new THREE.Vector3( x, y, z );
+				vertex = new THREE.Vector3( x, y, z );
 
 				x = object.normalArray[ a ];
 				y = object.normalArray[ b ];
 				z = object.normalArray[ c ];
 				normal = new THREE.Vector3( x, y, z );
 				normal.normalize();
-
-				vertex = new THREE.Vertex( position );
 
 				geo.vertices.push( vertex );
 				normals.push( normal );

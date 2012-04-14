@@ -159,7 +159,7 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texturePath 
 
 		while ( offset < zLength ) {
 
-			vertex = new THREE.Vertex();
+			vertex = new THREE.Vector3();
 
 			vertex.x = vertices[ offset ++ ] * scale;
 			vertex.y = vertices[ offset ++ ] * scale;
@@ -369,7 +369,7 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texturePath 
 
 		if ( json.morphTargets !== undefined ) {
 
-			var i, l, v, vl, x, y, z, dstVertices, srcVertices;
+			var i, l, v, vl, dstVertices, srcVertices;
 
 			for ( i = 0, l = json.morphTargets.length; i < l; i ++ ) {
 
@@ -382,11 +382,12 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texturePath 
 
 				for( v = 0, vl = srcVertices.length; v < vl; v += 3 ) {
 
-					x = srcVertices[ v ] * scale;
-					y = srcVertices[ v + 1 ] * scale;
-					z = srcVertices[ v + 2 ] * scale;
+					var vertex = new THREE.Vector3();
+					vertex.x = srcVertices[ v ] * scale;
+					vertex.y = srcVertices[ v + 1 ] * scale;
+					vertex.z = srcVertices[ v + 2 ] * scale;
 
-					dstVertices.push( new THREE.Vertex( x, y, z ) );
+					dstVertices.push( vertex );
 
 				}
 

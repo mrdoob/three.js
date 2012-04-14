@@ -625,7 +625,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 
 	function v( x, y, z ) {
-		scope.vertices.push( new THREE.Vertex( x, y, z ) );
+		scope.vertices.push( new THREE.Vector3( x, y, z ) );
 	}
 
 	function f3( a, b, c, isBottom ) {
@@ -633,7 +633,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 		b += shapesOffset;
 		c += shapesOffset;
 
-												   // normal, color, material
+		// normal, color, material
 		scope.faces.push( new THREE.Face3( a, b, c, null, null, material ) );
 
 		var uvs = isBottom ? uvgen.generateBottomUV( scope, shape, options, a, b, c)

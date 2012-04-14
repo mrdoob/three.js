@@ -763,7 +763,7 @@ THREE.CTMLoader.prototype.createModelClassic = function ( file, callback ) {
 
 	function vertex ( scope, x, y, z ) {
 
-		scope.vertices.push( new THREE.Vertex( x, y, z ) );
+		scope.vertices.push( new THREE.Vector3( x, y, z ) );
 
 	};
 
