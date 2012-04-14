@@ -159,6 +159,7 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 						r = o.rotation;
 						q = o.quaternion;
 						s = o.scale;
+						m = o.matrix;
 
 						// turn off quaternions, for the moment
 
@@ -181,20 +182,33 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 
 						object = new THREE.Mesh( geometry, material );
 						object.name = dd;
-						object.position.set( p[0], p[1], p[2] );
-
-						if ( q ) {
-
-							object.quaternion.set( q[0], q[1], q[2], q[3] );
-							object.useQuaternion = true;
-
+						
+						if ( m ) {
+							
+							object.matrixAutoUpdate = false;
+							object.matrix.set( m[0], m[1], m[2], m[3],
+											   m[4], m[5], m[6], m[7],
+											   m[8], m[9], m[10], m[11],
+											   m[12], m[13], m[14], m[15]);
+							
 						} else {
-
-							object.rotation.set( r[0], r[1], r[2] );
-
+							
+							object.position.set( p[0], p[1], p[2] );
+	
+							if ( q ) {
+	
+								object.quaternion.set( q[0], q[1], q[2], q[3] );
+								object.useQuaternion = true;
+	
+							} else {
+	
+								object.rotation.set( r[0], r[1], r[2] );
+	
+							}
+	
+							object.scale.set( s[0], s[1], s[2] );
+							
 						}
-
-						object.scale.set( s[0], s[1], s[2] );
 
 						object.visible = o.visible;
 						object.doubleSided = o.doubleSided;
