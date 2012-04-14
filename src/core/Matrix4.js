@@ -826,7 +826,8 @@ THREE.Matrix4.prototype = {
 	},
 
 	scale: function ( v ) {
-        var te = this.elements;
+
+		var te = this.elements;
 		var x = v.x, y = v.y, z = v.z;
 
 		te[0] *= x; te[4] *= y; te[8] *= z;
@@ -837,16 +838,18 @@ THREE.Matrix4.prototype = {
 		return this;
 
 	},
-    
-    getMaxScaleOnAxis : function () {
 
-        var scaleXSq =  this.n11 * this.n11 + this.n21 * this.n21 + this.n31 * this.n31;
-        var scaleYSq =  this.n12 * this.n12 + this.n22 * this.n22 + this.n32 * this.n32;
-        var scaleZSq =  this.n13 * this.n13 + this.n23 * this.n23 + this.n33 * this.n33;
-        
-        return Math.sqrt(Math.max( scaleXSq , Math.max( scaleYSq , scaleZSq )));
+	getMaxScaleOnAxis: function () {
 
-    },
+		var te = this.elements;
+
+		var scaleXSq =  te[0] * te[0] + te[1] * te[1] + te[2] * te[2];
+		var scaleYSq =  te[4] * te[4] + te[5] * te[5] + te[6] * te[6];
+		var scaleZSq =  te[8] * te[8] + te[9] * te[9] + te[10] * te[10];
+
+		return Math.sqrt( Math.max( scaleXSq, Math.max( scaleYSq, scaleZSq ) ) );
+
+	},
 
 	//
 
