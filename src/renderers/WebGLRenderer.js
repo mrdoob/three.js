@@ -871,7 +871,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		sortArray = geometry.__sortArray,
 
-		dirtyVertices = geometry.__dirtyVertices,
+		dirtyVertices = geometry.verticesNeedUpdate,
 		dirtyElements = geometry.__dirtyElements,
 		dirtyColors = geometry.__dirtyColors,
 
@@ -1190,7 +1190,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		vertexArray = geometry.__vertexArray,
 		colorArray = geometry.__colorArray,
 
-		dirtyVertices = geometry.__dirtyVertices,
+		dirtyVertices = geometry.verticesNeedUpdate,
 		dirtyColors = geometry.__dirtyColors,
 
 		customAttributes = geometry.__webglCustomAttributesList,
@@ -1344,7 +1344,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		vertexArray = geometry.__vertexArray,
 		colorArray = geometry.__colorArray,
 
-		dirtyVertices = geometry.__dirtyVertices,
+		dirtyVertices = geometry.verticesNeedUpdate,
 		dirtyColors = geometry.__dirtyColors;
 
 		if ( dirtyVertices ) {
@@ -1458,7 +1458,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		geometry = object.geometry, // this is shared for all chunks
 
-		dirtyVertices = geometry.__dirtyVertices,
+		dirtyVertices = geometry.verticesNeedUpdate,
 		dirtyElements = geometry.__dirtyElements,
 		dirtyUvs = geometry.__dirtyUvs,
 		dirtyNormals = geometry.__dirtyNormals,
@@ -3861,7 +3861,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 							createMeshBuffers( geometryGroup );
 							initMeshBuffers( geometryGroup, object );
 
-							geometry.__dirtyVertices = true;
+							geometry.verticesNeedUpdate = true;
 							geometry.__dirtyMorphTargets = true;
 							geometry.__dirtyElements = true;
 							geometry.__dirtyUvs = true;
@@ -3884,7 +3884,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					createRibbonBuffers( geometry );
 					initRibbonBuffers( geometry );
 
-					geometry.__dirtyVertices = true;
+					geometry.verticesNeedUpdate = true;
 					geometry.__dirtyColors = true;
 
 				}
@@ -3898,7 +3898,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					createLineBuffers( geometry );
 					initLineBuffers( geometry, object );
 
-					geometry.__dirtyVertices = true;
+					geometry.verticesNeedUpdate = true;
 					geometry.__dirtyColors = true;
 
 				}
@@ -3912,7 +3912,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					createParticleBuffers( geometry );
 					initParticleBuffers( geometry, object );
 
-					geometry.__dirtyVertices = true;
+					geometry.verticesNeedUpdate = true;
 					geometry.__dirtyColors = true;
 
 				}
@@ -4007,7 +4007,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			if ( geometry instanceof THREE.BufferGeometry ) {
 
 				/*
-				if ( geometry.__dirtyVertices || geometry.__dirtyElements ||
+				if ( geometry.verticesNeedUpdate || geometry.__dirtyElements ||
 					 geometry.__dirtyUvs || geometry.__dirtyNormals ||
 					 geometry.__dirtyColors  ) {
 
@@ -4017,7 +4017,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 				*/
 
-				geometry.__dirtyVertices = false;
+				geometry.verticesNeedUpdate = false;
 				geometry.__dirtyElements = false;
 				geometry.__dirtyUvs = false;
 				geometry.__dirtyNormals = false;
@@ -4035,7 +4035,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					customAttributesDirty = material.attributes && areCustomAttributesDirty( material );
 
-					if ( geometry.__dirtyVertices || geometry.__dirtyMorphTargets || geometry.__dirtyElements ||
+					if ( geometry.verticesNeedUpdate || geometry.__dirtyMorphTargets || geometry.__dirtyElements ||
 						 geometry.__dirtyUvs || geometry.__dirtyNormals ||
 						 geometry.__dirtyColors || geometry.__dirtyTangents || customAttributesDirty ) {
 
@@ -4045,7 +4045,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				geometry.__dirtyVertices = false;
+				geometry.verticesNeedUpdate = false;
 				geometry.__dirtyMorphTargets = false;
 				geometry.__dirtyElements = false;
 				geometry.__dirtyUvs = false;
@@ -4059,13 +4059,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else if ( object instanceof THREE.Ribbon ) {
 
-			if ( geometry.__dirtyVertices || geometry.__dirtyColors ) {
+			if ( geometry.verticesNeedUpdate || geometry.__dirtyColors ) {
 
 				setRibbonBuffers( geometry, _gl.DYNAMIC_DRAW );
 
 			}
 
-			geometry.__dirtyVertices = false;
+			geometry.verticesNeedUpdate = false;
 			geometry.__dirtyColors = false;
 
 		} else if ( object instanceof THREE.Line ) {
@@ -4074,13 +4074,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			customAttributesDirty = material.attributes && areCustomAttributesDirty( material );
 
-			if ( geometry.__dirtyVertices ||  geometry.__dirtyColors || customAttributesDirty ) {
+			if ( geometry.verticesNeedUpdate ||  geometry.__dirtyColors || customAttributesDirty ) {
 
 				setLineBuffers( geometry, _gl.DYNAMIC_DRAW );
 
 			}
 
-			geometry.__dirtyVertices = false;
+			geometry.verticesNeedUpdate = false;
 			geometry.__dirtyColors = false;
 
 			material.attributes && clearCustomAttributes( material );
@@ -4091,13 +4091,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			customAttributesDirty = material.attributes && areCustomAttributesDirty( material );
 
-			if ( geometry.__dirtyVertices || geometry.__dirtyColors || object.sortParticles || customAttributesDirty ) {
+			if ( geometry.verticesNeedUpdate || geometry.__dirtyColors || object.sortParticles || customAttributesDirty ) {
 
 				setParticleBuffers( geometry, _gl.DYNAMIC_DRAW, object );
 
 			}
 
-			geometry.__dirtyVertices = false;
+			geometry.verticesNeedUpdate = false;
 			geometry.__dirtyColors = false;
 
 			material.attributes && clearCustomAttributes( material );
