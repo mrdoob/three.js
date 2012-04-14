@@ -1462,7 +1462,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		dirtyElements = geometry.elementsNeedUpdate,
 		dirtyUvs = geometry.uvsNeedUpdate,
 		dirtyNormals = geometry.normalsNeedUpdate,
-		dirtyTangents = geometry.__dirtyTangents,
+		dirtyTangents = geometry.tangetsNeedUpdate,
 		dirtyColors = geometry.colorsNeedUpdate,
 		dirtyMorphTargets = geometry.__dirtyMorphTargets,
 
@@ -3866,7 +3866,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 							geometry.elementsNeedUpdate = true;
 							geometry.uvsNeedUpdate = true;
 							geometry.normalsNeedUpdate = true;
-							geometry.__dirtyTangents = true;
+							geometry.tangetsNeedUpdate = true;
 							geometry.colorsNeedUpdate = true;
 
 						}
@@ -4037,7 +4037,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( geometry.verticesNeedUpdate || geometry.__dirtyMorphTargets || geometry.elementsNeedUpdate ||
 						 geometry.uvsNeedUpdate || geometry.normalsNeedUpdate ||
-						 geometry.colorsNeedUpdate || geometry.__dirtyTangents || customAttributesDirty ) {
+						 geometry.colorsNeedUpdate || geometry.tangetsNeedUpdate || customAttributesDirty ) {
 
 						setMeshBuffers( geometryGroup, object, _gl.DYNAMIC_DRAW, !geometry.dynamic, material );
 
@@ -4051,7 +4051,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				geometry.uvsNeedUpdate = false;
 				geometry.normalsNeedUpdate = false;
 				geometry.colorsNeedUpdate = false;
-				geometry.__dirtyTangents = false;
+				geometry.tangetsNeedUpdate = false;
 
 				material.attributes && clearCustomAttributes( material );
 
