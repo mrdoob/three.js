@@ -1464,7 +1464,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		dirtyNormals = geometry.normalsNeedUpdate,
 		dirtyTangents = geometry.tangetsNeedUpdate,
 		dirtyColors = geometry.colorsNeedUpdate,
-		dirtyMorphTargets = geometry.__dirtyMorphTargets,
+		dirtyMorphTargets = geometry.morphTargetsNeedUpdate,
 
 		vertices = geometry.vertices,
 		chunk_faces3 = geometryGroup.faces3,
@@ -3862,7 +3862,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 							initMeshBuffers( geometryGroup, object );
 
 							geometry.verticesNeedUpdate = true;
-							geometry.__dirtyMorphTargets = true;
+							geometry.morphTargetsNeedUpdate = true;
 							geometry.elementsNeedUpdate = true;
 							geometry.uvsNeedUpdate = true;
 							geometry.normalsNeedUpdate = true;
@@ -4035,7 +4035,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					customAttributesDirty = material.attributes && areCustomAttributesDirty( material );
 
-					if ( geometry.verticesNeedUpdate || geometry.__dirtyMorphTargets || geometry.elementsNeedUpdate ||
+					if ( geometry.verticesNeedUpdate || geometry.morphTargetsNeedUpdate || geometry.elementsNeedUpdate ||
 						 geometry.uvsNeedUpdate || geometry.normalsNeedUpdate ||
 						 geometry.colorsNeedUpdate || geometry.tangetsNeedUpdate || customAttributesDirty ) {
 
@@ -4046,7 +4046,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 				geometry.verticesNeedUpdate = false;
-				geometry.__dirtyMorphTargets = false;
+				geometry.morphTargetsNeedUpdate = false;
 				geometry.elementsNeedUpdate = false;
 				geometry.uvsNeedUpdate = false;
 				geometry.normalsNeedUpdate = false;
