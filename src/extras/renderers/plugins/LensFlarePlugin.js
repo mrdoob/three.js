@@ -164,7 +164,7 @@ THREE.LensFlarePlugin = function ( ) {
 
 			flare = flares[ i ];
 
-			tempPosition.set( flare.matrixWorld.n14, flare.matrixWorld.n24, flare.matrixWorld.n34 );
+			tempPosition.set( flare.matrixWorld.elements[12], flare.matrixWorld.elements[13], flare.matrixWorld.elements[14] );
 
 			camera.matrixWorldInverse.multiplyVector3( tempPosition );
 			camera.projectionMatrix.multiplyVector3( tempPosition );
