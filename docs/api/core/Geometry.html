@@ -11,11 +11,10 @@ var geometry = new THREE.Geometry()
 
 for ( var i = 0; i < 10000; i ++ ) {
 
-	var vertex = new THREE.Vertex();
-	vertex.position.x = Math.random() * 1000 - 500;
-	vertex.position.y = Math.random() * 1000 - 500;
-	vertex.position.z = Math.random() * 1000 - 500;
-
+	var vertex = new THREE.Vector3();
+	vertex.x = Math.random() * 1000 - 500;
+	vertex.y = Math.random() * 1000 - 500;
+	vertex.z = Math.random() * 1000 - 500;
 	geometry.vertices.push( vertex );
 
 }
@@ -37,7 +36,7 @@ Unique number of this geometry instance
 
 <h3>.[page:Array vertices]</h3>
 <div>
-Array of [page:Vertex vertices].
+Array of [page:Vector3 vertices].
 </div>
 
 <h3>.[page:Array colors]</h3>
