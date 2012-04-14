@@ -21,7 +21,7 @@ THREE.ParametricGeometry = function(slices, stacks, func) {
             phi = j / stacks;
 
             p = func(theta, phi);
-            verts.push(new THREE.Vertex(p));
+            verts.push(p);
 
         }
     }
