@@ -1460,7 +1460,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		dirtyVertices = geometry.verticesNeedUpdate,
 		dirtyElements = geometry.elementsNeedUpdate,
-		dirtyUvs = geometry.__dirtyUvs,
+		dirtyUvs = geometry.uvsNeedUpdate,
 		dirtyNormals = geometry.__dirtyNormals,
 		dirtyTangents = geometry.__dirtyTangents,
 		dirtyColors = geometry.colorsNeedUpdate,
@@ -3864,7 +3864,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 							geometry.verticesNeedUpdate = true;
 							geometry.__dirtyMorphTargets = true;
 							geometry.elementsNeedUpdate = true;
-							geometry.__dirtyUvs = true;
+							geometry.uvsNeedUpdate = true;
 							geometry.__dirtyNormals = true;
 							geometry.__dirtyTangents = true;
 							geometry.colorsNeedUpdate = true;
@@ -4008,7 +4008,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				/*
 				if ( geometry.verticesNeedUpdate || geometry.elementsNeedUpdate ||
-					 geometry.__dirtyUvs || geometry.__dirtyNormals ||
+					 geometry.uvsNeedUpdate || geometry.__dirtyNormals ||
 					 geometry.colorsNeedUpdate  ) {
 
 					// TODO
@@ -4019,7 +4019,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				geometry.verticesNeedUpdate = false;
 				geometry.elementsNeedUpdate = false;
-				geometry.__dirtyUvs = false;
+				geometry.uvsNeedUpdate = false;
 				geometry.__dirtyNormals = false;
 				geometry.colorsNeedUpdate = false;
 
@@ -4036,7 +4036,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					customAttributesDirty = material.attributes && areCustomAttributesDirty( material );
 
 					if ( geometry.verticesNeedUpdate || geometry.__dirtyMorphTargets || geometry.elementsNeedUpdate ||
-						 geometry.__dirtyUvs || geometry.__dirtyNormals ||
+						 geometry.uvsNeedUpdate || geometry.__dirtyNormals ||
 						 geometry.colorsNeedUpdate || geometry.__dirtyTangents || customAttributesDirty ) {
 
 						setMeshBuffers( geometryGroup, object, _gl.DYNAMIC_DRAW, !geometry.dynamic, material );
@@ -4048,7 +4048,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				geometry.verticesNeedUpdate = false;
 				geometry.__dirtyMorphTargets = false;
 				geometry.elementsNeedUpdate = false;
-				geometry.__dirtyUvs = false;
+				geometry.uvsNeedUpdate = false;
 				geometry.__dirtyNormals = false;
 				geometry.colorsNeedUpdate = false;
 				geometry.__dirtyTangents = false;
