@@ -1236,7 +1236,7 @@ THREE.ShaderExtras = {
 
 			"}",
 
-		].join("\n"),
+		].join("\n")
 
 	},
 

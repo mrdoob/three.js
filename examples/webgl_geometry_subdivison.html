@@ -249,7 +249,7 @@
 
 						vertexIndex = f[ faceABCD.charAt( j ) ];
 
-						p = smooth.vertices[ vertexIndex ].position;
+						p = smooth.vertices[ vertexIndex ];
 
 						color = new THREE.Color( 0xffffff );
 						color.setHSV( ( p.y ) / 200 + 0.5, 1.0, 1.0 );
@@ -285,7 +285,7 @@
 					for ( var i = 0; i < smooth.vertices.length; i++ ) {
 
 						particle = new THREE.Particle( new THREE.ParticleCanvasMaterial( { color: Math.random() * 0x808008 + 0x808080, program: program } ) );
-						particle.position = smooth.vertices[i].position;
+						particle.position = smooth.vertices[ i ];
 						var pos = smooth.vertices.position
 						particle.scale.x = particle.scale.y = 5;
 						group.add( particle );
@@ -314,7 +314,7 @@
 					for ( var i = 0; i < geometry.vertices.length; i++ ) {
 
 						particle = new THREE.Particle( new THREE.ParticleCanvasMaterial( { color: Math.random() * 0x808008 + 0x808080, program: drawText(i) } ) );
-						particle.position = smooth.vertices[i].position;
+						particle.position = smooth.vertices[ i ];
 						var pos = geometry.vertices.position
 						particle.scale.x = particle.scale.y = 30;
 						group.add( particle );

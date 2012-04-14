@@ -119,8 +119,8 @@
 				// Grid
 
 				var geometry = new THREE.Geometry();
-				geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( - 500, 0, 0 ) ) );
-				geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( 500, 0, 0 ) ) );
+				geometry.vertices.push( new THREE.Vertex( - 500, 0, 0 ) );
+				geometry.vertices.push( new THREE.Vertex( 500, 0, 0 ) );
 
 				for ( var i = 0; i <= 20; i ++ ) {
 
@@ -187,10 +187,10 @@
 
 				function onWindowResize(){
 
-				    camera.setSize( window.innerWidth, window.innerHeight );
-				    camera.updateProjectionMatrix();
+					camera.setSize( window.innerWidth, window.innerHeight );
+					camera.updateProjectionMatrix();
 
-				    renderer.setSize( window.innerWidth, window.innerHeight );
+					renderer.setSize( window.innerWidth, window.innerHeight );
 
 				}
 

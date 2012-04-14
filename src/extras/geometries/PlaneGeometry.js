@@ -25,7 +25,7 @@ THREE.PlaneGeometry = function ( width, depth, segmentsWidth, segmentsDepth ) {
 			var x = ix * segment_width - width_half;
 			var z = iz * segment_depth - depth_half;
 
-			this.vertices.push( new THREE.Vertex( new THREE.Vector3( x, 0, z ) ) );
+			this.vertices.push( new THREE.Vertex( x, 0, z ) );
 
 		}
 

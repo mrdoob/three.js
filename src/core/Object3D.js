@@ -114,7 +114,7 @@ THREE.Object3D.prototype = {
 
 		}
 
-		if ( this.children.indexOf( object ) === - 1 ) {
+		if ( object instanceof THREE.Object3D ) { // && this.children.indexOf( object ) === - 1
 
 			if ( object.parent !== undefined ) {
 

@@ -35,7 +35,6 @@ UI.Viewport = function () {
 	var _sceneHelpers = new THREE.Scene();
 
 	var _grid = new THREE.Mesh( new THREE.PlaneGeometry( 1000, 1000, 20, 20 ), new THREE.MeshBasicMaterial( { color: 0x606060, wireframe: true, transparent: true } ) );
-	_grid.rotation.x = Math.PI / 2;
 	_sceneHelpers.add( _grid );
 
 	//

@@ -212,9 +212,9 @@
 
 				for ( i = 0; i < vl; i ++ ) {
 
-					p = vertices[ i ].position;
+					p = vertices[ i ];
 
-					geometry.vertices[ i ] = new THREE.Vertex( p.clone() );
+					geometry.vertices[ i ] = new THREE.Vertex().copy( p );
 					vertices_tmp[ i ] = [ p.x, p.y, p.z, 0, 0 ];
 
 				}
@@ -334,7 +334,7 @@
 
 					for ( i = 0; i < vl; i ++ ) {
 
-						p = vertices[ i ].position;
+						p = vertices[ i ];
 						vt = vertices_tmp[ i ];
 
 						// falling down

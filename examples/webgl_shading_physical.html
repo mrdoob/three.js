@@ -72,6 +72,8 @@
 
 			var mesh, geometry;
 
+			var cubeCamera;
+
 			var sunLight, pointLight, ambientLight;
 
 			var morph;
@@ -136,7 +138,7 @@
 				// CUBE CAMERA
 
 				cubeCamera = new THREE.CubeCamera( 1, FAR, 128 );
-				var cubeTarget = cubeCamera.renderTarget;
+				scene.add( cubeCamera );
 
 				// TEXTURES
 
@@ -205,7 +207,7 @@
 				// MATERIALS
 
 				var shader = THREE.ShaderUtils.lib[ "cube" ];
-				shader.uniforms[ "tCube" ].texture = cubeTarget;
+				shader.uniforms[ "tCube" ].texture = cubeCamera.renderTarget;
 				shader.uniforms[ "tFlip" ].value = 1;
 
 				var materialCube = new THREE.ShaderMaterial( {
@@ -218,7 +220,7 @@
 
 				var materialLambert = new THREE.MeshPhongMaterial( { shininess: 50, ambient: 0x444444, color: 0xffffff, map: textureNoiseColor } );
 				var materialPhong = new THREE.MeshPhongMaterial( { shininess: 50, ambient: 0x444444, color: 0xffffff, specular: 0x999999, map: textureLava } );
-				var materialPhongCube = new THREE.MeshPhongMaterial( { shininess: 50, ambient: 0x444444, color: 0xffffff, specular: 0x999999, envMap: cubeTarget } );
+				var materialPhongCube = new THREE.MeshPhongMaterial( { shininess: 50, ambient: 0x444444, color: 0xffffff, specular: 0x999999, envMap: cubeCamera.renderTarget } );
 
 				// OBJECTS
 
@@ -511,23 +513,26 @@
 
 			function onKeyDown ( event ) {
 
-				switch( event.keyCode ) {
+				switch ( event.keyCode ) {
 
-					case 78: /*N*/   if ( tweenDirection == 1 ) {
+					case 78: /*N*/
 
-										tweenDay.stop();
-										tweenNight.start();
+						if ( tweenDirection == 1 ) {
 
-										tweenDirection = -1;
+							tweenDay.stop();
+							tweenNight.start();
 
-									} else {
+							tweenDirection = -1;
 
-										tweenNight.stop();
-										tweenDay.start();
+						} else {
 
-										tweenDirection = 1;
+							tweenNight.stop();
+							tweenDay.start();
 
-									}
+							tweenDirection = 1;
+
+						}
+
 					break;
 
 				}

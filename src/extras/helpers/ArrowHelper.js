@@ -19,8 +19,8 @@ THREE.ArrowHelper = function ( dir, origin, length, hex ) {
     if ( length === undefined ) length = 20;
 
     var lineGeometry = new THREE.Geometry();
-    lineGeometry.vertices.push( new THREE.Vertex( new THREE.Vector3( 0, 0, 0 ) ) );
-    lineGeometry.vertices.push( new THREE.Vertex( new THREE.Vector3( 0, 1, 0 ) ) );
+    lineGeometry.vertices.push( new THREE.Vertex( 0, 0, 0 ) );
+    lineGeometry.vertices.push( new THREE.Vertex( 0, 1, 0 ) );
 
     this.line = new THREE.Line( lineGeometry, new THREE.LineBasicMaterial( { color : hex } ) );
     this.add( this.line );

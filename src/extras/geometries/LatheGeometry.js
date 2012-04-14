@@ -16,24 +16,31 @@ THREE.LatheGeometry = function ( points, steps, angle ) {
 	for ( var j = 0; j < points.length; j ++ ) {
 
 		_newV[ j ] = points[ j ].clone();
-		this.vertices.push( new THREE.Vertex( _newV[ j ] ) );
+		this.vertices.push( new THREE.Vertex().copy( _newV[ j ] ) );
 
 	}
 
-	for ( var i = 0; i < _steps; i ++ ) {
+	var i;
+	var il = _steps + 1;
+
+	for ( i = 0; i < il; i ++ ) {
 
 		for ( var j = 0; j < _newV.length; j ++ ) {
 
 			_newV[ j ] = _matrix.multiplyVector3( _newV[ j ].clone() );
-			this.vertices.push( new THREE.Vertex( _newV[ j ] ) );
+			this.vertices.push( new THREE.Vertex().copy( _newV[ j ] ) );
 
 		}
+
+	}
+
+	for ( i = 0; i < _steps; i ++ ) {
 
 		for ( var k = 0, kl = points.length; k < kl - 1; k ++ ) {
 
 			var a = i * kl + k;
-			var b = ( ( i + 1 ) % _steps ) * kl + k;
-			var c = ( ( i + 1 ) % _steps ) * kl + ( k + 1 ) % kl;
+			var b = ( ( i + 1 ) % il ) * kl + k;
+			var c = ( ( i + 1 ) % il ) * kl + ( k + 1 ) % kl;
 			var d = i * kl + ( k + 1 ) % kl;
 
 			this.faces.push( new THREE.Face4( a, b, c, d ) );
