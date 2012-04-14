@@ -262,9 +262,9 @@ THREE.Vector3.prototype = {
 
 	getPositionFromMatrix: function ( m ) {
 
-		this.x = m.n14;
-		this.y = m.n24;
-		this.z = m.n34;
+		this.x = m.elements[12];
+		this.y = m.elements[13];
+		this.z = m.elements[14];
 
 		return this;
 
@@ -276,9 +276,9 @@ THREE.Vector3.prototype = {
 		var sy = scale ? scale.y : 1;
 		var sz = scale ? scale.z : 1;
 
-		var m11 = m.n11 / sx, m12 = m.n12 / sy, m13 = m.n13 / sz;
-		var m21 = m.n21 / sx, m22 = m.n22 / sy, m23 = m.n23 / sz;
-		var m33 = m.n33 / sz;
+		var m11 = m.elements[0] / sx, m12 = m.elements[4] / sy, m13 = m.elements[8] / sz;
+		var m21 = m.elements[1] / sx, m22 = m.elements[5] / sy, m23 = m.elements[9] / sz;
+		var m33 = m.elements[10] / sz;
 
 		this.y = Math.asin( m13 );
 
@@ -355,9 +355,9 @@ THREE.Vector3.prototype = {
 
 	getScaleFromMatrix: function ( m ) {
 
-		var sx = this.set( m.n11, m.n21, m.n31 ).length();
-		var sy = this.set( m.n12, m.n22, m.n32 ).length();
-		var sz = this.set( m.n13, m.n23, m.n33 ).length();
+		var sx = this.set( m.elements[0], m.elements[1], m.elements[2] ).length();
+		var sy = this.set( m.elements[4], m.elements[5], m.elements[6] ).length();
+		var sz = this.set( m.elements[8], m.elements[9], m.elements[10] ).length();
 
 		this.x = sx;
 		this.y = sy;
