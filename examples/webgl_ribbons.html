@@ -147,17 +147,17 @@
 					ribbon.matrix.setPosition( ribbon.position );
 					ribbon.matrixRotationWorld.setRotationFromEuler( ribbon.rotation );
 
-					ribbon.matrix.n11 = ribbon.matrixRotationWorld.n11;
-					ribbon.matrix.n12 = ribbon.matrixRotationWorld.n12;
-					ribbon.matrix.n13 = ribbon.matrixRotationWorld.n13;
+					ribbon.matrix.elements[ 0 ] = ribbon.matrixRotationWorld.elements[ 0 ];
+					ribbon.matrix.elements[ 4 ] = ribbon.matrixRotationWorld.elements[ 4 ];
+					ribbon.matrix.elements[ 8 ] = ribbon.matrixRotationWorld.elements[ 8 ];
 
-					ribbon.matrix.n21 = ribbon.matrixRotationWorld.n21;
-					ribbon.matrix.n22 = ribbon.matrixRotationWorld.n22;
-					ribbon.matrix.n23 = ribbon.matrixRotationWorld.n23;
+					ribbon.matrix.elements[ 1 ] = ribbon.matrixRotationWorld.elements[ 1 ];
+					ribbon.matrix.elements[ 5 ] = ribbon.matrixRotationWorld.elements[ 5 ];
+					ribbon.matrix.elements[ 9 ] = ribbon.matrixRotationWorld.elements[ 9 ];
 
-					ribbon.matrix.n31 = ribbon.matrixRotationWorld.n31;
-					ribbon.matrix.n32 = ribbon.matrixRotationWorld.n32;
-					ribbon.matrix.n33 = ribbon.matrixRotationWorld.n33;
+					ribbon.matrix.elements[ 2 ] = ribbon.matrixRotationWorld.elements[ 2 ];
+					ribbon.matrix.elements[ 6 ] = ribbon.matrixRotationWorld.elements[ 6 ];
+					ribbon.matrix.elements[ 10 ] = ribbon.matrixRotationWorld.elements[ 10 ];
 
 					ribbon.matrix.multiplySelf( tmpRot );
 
