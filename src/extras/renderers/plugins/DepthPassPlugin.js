@@ -155,11 +155,13 @@ THREE.DepthPassPlugin = function ( ) {
 
 			if ( object.visible && object.castShadow ) {
 
-				if( object.matrixAutoUpdate ) {
+				/*
+				if ( object.matrixAutoUpdate ) {
 
-					//object.matrixWorld.flattenToArray( object._objectMatrixArray );
+					object.matrixWorld.flattenToArray( object._objectMatrixArray );
 
 				}
+				*/
 
 				object._modelViewMatrix.multiply( camera.matrixWorldInverse, object.matrixWorld);
 

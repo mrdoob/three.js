@@ -3418,11 +3418,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( object.visible ) {
 
-				if( object.matrixAutoUpdate ) {
+				/*
+				if ( object.matrixAutoUpdate ) {
 
-					//object.matrixWorld.flattenToArray( object._objectMatrixArray );
+					object.matrixWorld.flattenToArray( object._objectMatrixArray );
 
 				}
+				*/
 
 				setupMatrices( object, camera );
 
