@@ -294,7 +294,7 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 	for (i=0, il = originalFaces.length; i<il ;i++) {
 		face = originalFaces[ i ];
 		facePoints.push( face.centroid );
-		newPoints.push( face.centroid.clone() );
+		newPoints.push( face.centroid );
 		
 		
 		if (!scope.supportUVs) continue;
