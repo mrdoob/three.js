@@ -872,7 +872,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		sortArray = geometry.__sortArray,
 
 		dirtyVertices = geometry.verticesNeedUpdate,
-		dirtyElements = geometry.__dirtyElements,
+		dirtyElements = geometry.elementsNeedUpdate,
 		dirtyColors = geometry.colorsNeedUpdate,
 
 		customAttributes = geometry.__webglCustomAttributesList,
@@ -1459,7 +1459,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		geometry = object.geometry, // this is shared for all chunks
 
 		dirtyVertices = geometry.verticesNeedUpdate,
-		dirtyElements = geometry.__dirtyElements,
+		dirtyElements = geometry.elementsNeedUpdate,
 		dirtyUvs = geometry.__dirtyUvs,
 		dirtyNormals = geometry.__dirtyNormals,
 		dirtyTangents = geometry.__dirtyTangents,
@@ -3863,7 +3863,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 							geometry.verticesNeedUpdate = true;
 							geometry.__dirtyMorphTargets = true;
-							geometry.__dirtyElements = true;
+							geometry.elementsNeedUpdate = true;
 							geometry.__dirtyUvs = true;
 							geometry.__dirtyNormals = true;
 							geometry.__dirtyTangents = true;
@@ -4007,7 +4007,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			if ( geometry instanceof THREE.BufferGeometry ) {
 
 				/*
-				if ( geometry.verticesNeedUpdate || geometry.__dirtyElements ||
+				if ( geometry.verticesNeedUpdate || geometry.elementsNeedUpdate ||
 					 geometry.__dirtyUvs || geometry.__dirtyNormals ||
 					 geometry.colorsNeedUpdate  ) {
 
@@ -4018,7 +4018,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				*/
 
 				geometry.verticesNeedUpdate = false;
-				geometry.__dirtyElements = false;
+				geometry.elementsNeedUpdate = false;
 				geometry.__dirtyUvs = false;
 				geometry.__dirtyNormals = false;
 				geometry.colorsNeedUpdate = false;
@@ -4035,7 +4035,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					customAttributesDirty = material.attributes && areCustomAttributesDirty( material );
 
-					if ( geometry.verticesNeedUpdate || geometry.__dirtyMorphTargets || geometry.__dirtyElements ||
+					if ( geometry.verticesNeedUpdate || geometry.__dirtyMorphTargets || geometry.elementsNeedUpdate ||
 						 geometry.__dirtyUvs || geometry.__dirtyNormals ||
 						 geometry.colorsNeedUpdate || geometry.__dirtyTangents || customAttributesDirty ) {
 
@@ -4047,7 +4047,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				geometry.verticesNeedUpdate = false;
 				geometry.__dirtyMorphTargets = false;
-				geometry.__dirtyElements = false;
+				geometry.elementsNeedUpdate = false;
 				geometry.__dirtyUvs = false;
 				geometry.__dirtyNormals = false;
 				geometry.colorsNeedUpdate = false;
