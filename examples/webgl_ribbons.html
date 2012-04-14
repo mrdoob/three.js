@@ -101,8 +101,8 @@
 
 					}
 
-					geometry.vertices.push( new THREE.Vertex( x, y, z ) );
-					geometry2.vertices.push( new THREE.Vertex( x, y, z ) );
+					geometry.vertices.push( new THREE.Vector3( x, y, z ) );
+					geometry2.vertices.push( new THREE.Vector3( x, y, z ) );
 
 					h = i2 % 2 ? 1 : 0.15;
 					if( i2 % 4 <= 2 ) h -= 0.15;

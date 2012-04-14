@@ -41,7 +41,7 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 	 */
 	function prepare( vector ) {
 
-		var vertex = new THREE.Vertex().copy( vector.normalize() );
+		var vertex = vector.normalize().clone();
 		vertex.index = that.vertices.push( vertex ) - 1;
 
 		// Texture coords are equivalent to map coords, calculate angle and convert to fraction of a circle.

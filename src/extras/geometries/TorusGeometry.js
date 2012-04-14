@@ -28,7 +28,7 @@ THREE.TorusGeometry = function ( radius, tube, segmentsR, segmentsT, arc ) {
 			center.x = this.radius * Math.cos( u );
 			center.y = this.radius * Math.sin( u );
 
-			var vertex = new THREE.Vertex();
+			var vertex = new THREE.Vector3();
 			vertex.x = ( this.radius + this.tube * Math.cos( v ) ) * Math.cos( u );
 			vertex.y = ( this.radius + this.tube * Math.cos( v ) ) * Math.sin( u );
 			vertex.z = this.tube * Math.sin( v );

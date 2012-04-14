@@ -583,7 +583,7 @@ THREE.ColladaLoader = function () {
 
 			for ( i = 0; i < geometry.vertices.length; i++ ) {
 
-				skinned.push( new THREE.Vertex() );
+				skinned.push( new THREE.Vector3() );
 
 			}
 
@@ -2306,8 +2306,7 @@ THREE.ColladaLoader = function () {
 
 		for ( i = 0; i < vertexData.length; i += 3 ) {
 
-			var v = new THREE.Vertex().copy( getConvertedVec3( vertexData, i ) );
-			this.geometry3js.vertices.push( v );
+			this.geometry3js.vertices.push( getConvertedVec3( vertexData, i ).clone() );
 
 		}
 

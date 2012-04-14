@@ -57,7 +57,7 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 	var newVertices = [], newFaces = [], newUVs = [];
 	
 	function v( x, y, z ) {
-		newVertices.push( new THREE.Vertex( x, y, z ) );
+		newVertices.push( new THREE.Vector3( x, y, z ) );
 	}
 	
 	var scope = this;
@@ -294,7 +294,7 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 	for (i=0, il = originalFaces.length; i<il ;i++) {
 		face = originalFaces[ i ];
 		facePoints.push( face.centroid );
-		newPoints.push( new THREE.Vertex().copy( face.centroid ) );
+		newPoints.push( face.centroid.clone() );
 		
 		
 		if (!scope.supportUVs) continue;
@@ -430,7 +430,7 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 		
 		edgePoints[i] = originalVerticesLength + originalFaces.length + edgeCount;
 		
-		newPoints.push( new THREE.Vertex().copy( avg ) );
+		newPoints.push( avg );
 	
 		edgeCount ++;
 		

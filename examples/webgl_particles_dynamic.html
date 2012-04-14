@@ -214,7 +214,7 @@
 
 					p = vertices[ i ];
 
-					geometry.vertices[ i ] = new THREE.Vertex().copy( p );
+					geometry.vertices[ i ] = p.clone();
 					vertices_tmp[ i ] = [ p.x, p.y, p.z, 0, 0 ];
 
 				}

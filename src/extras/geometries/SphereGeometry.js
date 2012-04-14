@@ -29,11 +29,12 @@ THREE.SphereGeometry = function ( radius, segmentsWidth, segmentsHeight, phiStar
 			var u = x / segmentsX;
 			var v = y / segmentsY;
 
-			var xpos = - radius * Math.cos( phiStart + u * phiLength ) * Math.sin( thetaStart + v * thetaLength );
-			var ypos = radius * Math.cos( thetaStart + v * thetaLength );
-			var zpos = radius * Math.sin( phiStart + u * phiLength ) * Math.sin( thetaStart + v * thetaLength );
+			var vertex = new THREE.Vector3();
+			vertex.x = - radius * Math.cos( phiStart + u * phiLength ) * Math.sin( thetaStart + v * thetaLength );
+			vertex.y = radius * Math.cos( thetaStart + v * thetaLength );
+			vertex.z = radius * Math.sin( phiStart + u * phiLength ) * Math.sin( thetaStart + v * thetaLength );
 
-			this.vertices.push( new THREE.Vertex( xpos, ypos, zpos ) );
+			this.vertices.push( vertex );
 
 			verticesRow.push( this.vertices.length - 1 );
 			uvsRow.push( new THREE.UV( u, v ) );

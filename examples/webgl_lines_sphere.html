@@ -89,7 +89,10 @@
 
 				for ( i = 0; i < 1500; i ++ ) {
 
-					var vertex1 = new THREE.Vertex( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 );
+					var vertex1 = new THREE.Vector3();
+					vertex1.x = Math.random() * 2 - 1;
+					vertex1.y = Math.random() * 2 - 1;
+					vertex1.z = Math.random() * 2 - 1;
 					vertex1.normalize();
 					vertex1.multiplyScalar( r );
 

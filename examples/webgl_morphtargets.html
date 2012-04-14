@@ -119,7 +119,7 @@
 
 					for ( var v = 0; v < geometry.vertices.length; v ++ ) {
 
-						vertices.push( new THREE.Vertex().copy( geometry.vertices[ v ] ) );
+						vertices.push( geometry.vertices[ v ].clone() );
 
 						if ( v === i ) {
 

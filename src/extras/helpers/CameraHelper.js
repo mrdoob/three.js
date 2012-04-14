@@ -84,7 +84,7 @@ THREE.CameraHelper = function ( camera ) {
 
 	function addPoint( id, hex ) {
 
-		_this.lineGeometry.vertices.push( new THREE.Vertex() );
+		_this.lineGeometry.vertices.push( new THREE.Vector3() );
 		_this.lineGeometry.colors.push( new THREE.Color( hex ) );
 
 		if ( _this.pointMap[ id ] === undefined ) _this.pointMap[ id ] = [];

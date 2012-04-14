@@ -115,19 +115,20 @@
 
 				//
 
-				var x, y, z, geo = new THREE.Geometry();
+				var geometry = new THREE.Geometry();
 
 				for ( var i = 0; i < 10000; i ++ ) {
 
-					x = THREE.Math.randFloatSpread( 2000 );
-					y = THREE.Math.randFloatSpread( 2000 );
-					z = THREE.Math.randFloatSpread( 2000 );
+					var vertex = new THREE.Vector3();
+					vertex.x = THREE.Math.randFloatSpread( 2000 );
+					vertex.y = THREE.Math.randFloatSpread( 2000 );
+					vertex.z = THREE.Math.randFloatSpread( 2000 );
 
-					geo.vertices.push( new THREE.Vertex( x, y, z ) );
+					geometry.vertices.push( vertex );
 
 				}
 
-				var particles = new THREE.ParticleSystem( geo, new THREE.ParticleBasicMaterial( { color: 0x888888 } ) );
+				var particles = new THREE.ParticleSystem( geometry, new THREE.ParticleBasicMaterial( { color: 0x888888 } ) );
 				scene.add( particles );
 
 				//
