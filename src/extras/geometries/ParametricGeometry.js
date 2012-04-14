@@ -1,60 +1,61 @@
-/*
+/**
  * @author zz85 / https://github.com/zz85
  * Parametric Surfaces Geometry
  * based on the brilliant article by @prideout http://prideout.net/blog/?p=44
  */
 
-THREE.ParametricGeometry = function(slices, stacks, func) {
+THREE.ParametricGeometry = function ( slices, stacks, func ) {
 
-    THREE.Geometry.call(this);
+	THREE.Geometry.call( this );
 
-    var verts = this.vertices,
-        faces = this.faces,
-        uvs = this.faceVertexUvs[0];
+	var verts = this.vertices;
+	var faces = this.faces;
+	var uvs = this.faceVertexUvs[ 0 ];
 
-    var i, il, theta, j, phi, p;
+	var i, il, theta, j, phi, p;
 
-    for (i = 0; i <= slices; i++) {
-        theta = i / slices;
+	for ( i = 0; i <= slices; i ++ ) {
 
-        for (j = 0; j < stacks; j++) {
-            phi = j / stacks;
+		theta = i / slices;
 
-            p = func(theta, phi);
-            verts.push(p);
+		for ( j = 0; j < stacks; j ++ ) {
 
-        }
-    }
+			phi = j / stacks;
 
-    var v = 0,
-        next;
+			p = func( theta, phi );
+			verts.push( p );
 
-    // Some UV / Face orientation work needs to be done here...
-    for (i = 0; i < slices; i++) {
-        for (j = 0; j < stacks; j++) {
-            next = (j + 1) % stacks;
+		}
+	}
 
-            faces.push(new THREE.Face3(v + j, v + next, v + j + stacks));
-            faces.push(new THREE.Face3(v + next, v + next + stacks, v + j + stacks));
+	var v = 0, next;
 
-            uvs.push([
-                new THREE.UV(i / slices, j / stacks),
-                new THREE.UV(i / slices, (j + 1) / stacks),
-                new THREE.UV((i + 1) / slices, j / stacks)
-                ]);
-            uvs.push([
-                new THREE.UV(i / slices, (j + 1) / stacks),
-                new THREE.UV((i + 1) / slices, (j + 1) / stacks),
-                new THREE.UV((i + 1) / slices, j / stacks)
-                ]);
-        }
-        v += stacks;
-    }
+	// Some UV / Face orientation work needs to be done here...
+	for ( i = 0; i < slices; i ++ ) {
+		for ( j = 0; j < stacks; j ++ ) {
+			next = ( j + 1 ) % stacks;
+
+			faces.push( new THREE.Face3( v + j, v + next, v + j + stacks ) );
+			faces.push( new THREE.Face3( v + next, v + next + stacks, v + j + stacks ) );
+
+			uvs.push( [
+				new THREE.UV( i / slices, j / stacks ),
+				new THREE.UV( i / slices, ( j + 1 ) / stacks ),
+				new THREE.UV( ( i + 1 ) / slices, j / stacks )
+			] );
+			uvs.push( [
+				new THREE.UV( i / slices, ( j + 1 ) / stacks ),
+				new THREE.UV( ( i + 1 ) / slices, ( j + 1 ) / stacks ),
+				new THREE.UV( ( i + 1 ) / slices, j / stacks )
+			] );
+		}
+		v += stacks;
+	}
 
 
-    this.computeCentroids();
-    this.computeFaceNormals();
-    this.computeVertexNormals();
+	this.computeCentroids();
+	this.computeFaceNormals();
+	this.computeVertexNormals();
 
 };
 
