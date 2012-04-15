@@ -574,6 +574,7 @@ THREE.Geometry.prototype = {
 		var precisionPoints = 4; // number of decimal points, eg. 4 for epsilon of 0.0001
 		var precision = Math.pow( 10, precisionPoints );
 		var i,il, face;
+		var abcd = 'abcd', o, k;
 
 		for ( i = 0, il = this.vertices.length; i < il; i ++ ) {
 
@@ -614,6 +615,19 @@ THREE.Geometry.prototype = {
 				face.b = changes[ face.b ];
 				face.c = changes[ face.c ];
 				face.d = changes[ face.d ];
+
+				// check dups in (a, b, c, d) and convert to -> face3
+				o = [face.a, face.b, face.c, face.d];
+				for (k=3;k>0;k--) {
+					if ( o.indexOf(face[abcd[k]]) != k ) {
+						// console.log('faces', face.a, face.b, face.c, face.d, 'dup at', k);
+						o.splice(k, 1);
+						this.faces[ i ] = new THREE.Face3(o[0], o[1], o[2]);
+						this.faceVertexUvs[0][i].splice(k, 1);
+						
+					}
+				}
+
 
 			}
 

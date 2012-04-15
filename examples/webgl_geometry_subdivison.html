@@ -224,13 +224,12 @@
 				smooth = THREE.GeometryUtils.clone( geometry );
 
 				// mergeVertices(); is run in case of duplicated vertices
-				if (! (geometry instanceof THREE.LatheGeometry) ) {
-					smooth.mergeVertices();
-				}
+				smooth.mergeVertices();
 				
-				// smooth.computeCentroids();
-				// smooth.computeFaceNormals();
-				// smooth.computeVertexNormals();
+				smooth.computeCentroids();
+				smooth.computeFaceNormals();
+				smooth.computeVertexNormals();
+				
 				modifier.modify( smooth );
 
 				updateInfo();
