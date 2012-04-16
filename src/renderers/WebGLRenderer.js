@@ -3244,10 +3244,27 @@ THREE.WebGLRenderer = function ( parameters ) {
 				used[ object.morphTargetBase ] = true;
 
 			}
+            
+            var gonnaUse = [];
+            
+            for ( i = 0; i < il; i ++ ) {
+                var candidateInfluence = influences[ i ]
+				if ( candidateInfluence > 0 ) {
+                    gonnaUse.push(i);
+				}
+			}
+            
+            if ( gonnaUse.length >  material.numSupportedMorphTargets){
+                for (var j = gonnaUse.length;j>material.numSupportedMorphTargets;j--){
+                    //TODO
+                    
+                    console.warn("@TODO");
+                };
+            }
 
 			while ( m < material.numSupportedMorphTargets ) {
 
-				for ( i = 0; i < il; i ++ ) {
+			/*	for ( i = 0; i < il; i ++ ) {
 
 					if ( !used[ i ] && influences[ i ] > candidateInfluence ) {
 
@@ -3257,21 +3274,26 @@ THREE.WebGLRenderer = function ( parameters ) {
 					}
 
 				}
+*/
 
-				_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglMorphTargetsBuffers[ candidate ] );
-				_gl.vertexAttribPointer( attributes[ "morphTarget" + m ], 3, _gl.FLOAT, false, 0, 0 );
-
-				if ( material.morphNormals ) {
-
-					_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglMorphNormalsBuffers[ candidate ] );
-					_gl.vertexAttribPointer( attributes[ "morphNormal" + m ], 3, _gl.FLOAT, false, 0, 0 );
-
-				}
-
-				object.__webglMorphTargetInfluences[ m ] = candidateInfluence;
-
-				used[ candidate ] = 1;
-				candidateInfluence = -1;
+                if (gonnaUse[m] !== undefined || m === 0){
+    				_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglMorphTargetsBuffers[ gonnaUse[m] ] );
+    				_gl.vertexAttribPointer( attributes[ "morphTarget" + m ], 3, _gl.FLOAT, false, 0, 0 );
+    
+    				if ( material.morphNormals ) {
+    
+    					_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglMorphNormalsBuffers[ gonnaUse[m] ] );
+    					_gl.vertexAttribPointer( attributes[ "morphNormal" + m ], 3, _gl.FLOAT, false, 0, 0 );
+    
+    				}
+    
+    				object.__webglMorphTargetInfluences[ m ] = influences[ gonnaUse[m]];
+                } else {
+                    _gl.vertexAttribPointer( attributes[ "morphTarget" + m ], 3, _gl.FLOAT, false, 0, 0 );
+                    object.__webglMorphTargetInfluences[ m ] = 0;
+                }
+				//used[ candidate ] = 1;
+				//candidateInfluence = -1;
 				m ++;
 
 			}
