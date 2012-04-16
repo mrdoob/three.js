@@ -33,35 +33,27 @@ THREE.OBJLoader.prototype.parse = function ( data, callback ) {
 
 	var geometry = new THREE.Geometry();
 
-	var objects = data.split( '\no ');
+	var pattern, result;
 
-	for ( var i = 0, il = objects.length; i < il; i ++ ) {
+	// vertices
 
-		var object = objects[ i ];
+	pattern = /v ([\-|\d|.]+) ([\-|\d|.]+) ([\-|\d|.]+)/g;
 
-		var pattern, result;
+	while ( ( result = pattern.exec( data ) ) != null ) {
 
-		// vertices
+		var vertex = new THREE.Vector3( parseFloat( result[ 1 ] ), parseFloat( result[ 2 ] ), parseFloat( result[ 3 ] ) );
+		geometry.vertices.push( vertex );
 
-		pattern = /v ([\-|\d|.]+) ([\-|\d|.]+) ([\-|\d|.]+)/g;
+	}
 
-		while ( ( result = pattern.exec( object ) ) != null ) {
+	// faces
 
-			var vertex = new THREE.Vector3( parseFloat( result[ 1 ] ), parseFloat( result[ 2 ] ), parseFloat( result[ 3 ] ) );
-			geometry.vertices.push( vertex );
+	pattern = /f ([\d]+)\/([\d]+)\/([\d]+) ([\d]+)\/([\d]+)\/([\d]+) ([\d]+)\/([\d]+)\/([\d]+)/g;
 
-		}
+	while ( ( result = pattern.exec( data ) ) != null ) {
 
-		// faces
-
-		pattern = /f ([\d]+)\/([\d]+)\/([\d]+) ([\d]+)\/([\d]+)\/([\d]+) ([\d]+)\/([\d]+)\/([\d]+)/g;
-
-		while ( ( result = pattern.exec( object ) ) != null ) {
-
-			var face = new THREE.Face3( parseInt( result[ 1 ] ) - 1, parseInt( result[ 4 ] ) - 1, parseInt( result[ 7 ] ) - 1 );
-			geometry.faces.push( face );
-
-		}
+		var face = new THREE.Face3( parseInt( result[ 1 ] ) - 1, parseInt( result[ 4 ] ) - 1, parseInt( result[ 7 ] ) - 1 );
+		geometry.faces.push( face );
 
 	}
 
