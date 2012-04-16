@@ -27,7 +27,6 @@ var Code = function () {
 			temp.innerHTML = _codegen( true );
 			temp = temp.firstChild.nodeValue;
 			temp = temp.replace("js/Three.js", "../build/Three.js");
-			temp = temp.replace("js/RequestAnimationFrame.js", "../examples/js/RequestAnimationFrame.js");
 
 			console.log('test', temp);
 
@@ -119,7 +118,7 @@ var Code = function () {
 
 		if ( html ) {
 
-			string = '&lt;!doctype html&gt;\n&lt;html&gt;\n\t&lt;body&gt;\n\t\t&lt;script src=\"js/Three.js\"&gt;&lt;/script&gt;\n\t\t&lt;script src=\"js/RequestAnimationFrame.js\"&gt;&lt;/script&gt;\n\t\t&lt;script&gt;\n' + ( '\n' + string ).replace( /\n/gi, '\n\t\t\t' ) + '\n\n\t\t&lt;/script&gt;\n\t&lt;/body&gt;\n&lt;/html&gt;';
+			string = '&lt;!doctype html&gt;\n&lt;html&gt;\n\t&lt;body&gt;\n\t\t&lt;script src=\"js/Three.js\"&gt;&lt;/script&gt;\n\t\t&lt;script&gt;\n' + ( '\n' + string ).replace( /\n/gi, '\n\t\t\t' ) + '\n\n\t\t&lt;/script&gt;\n\t&lt;/body&gt;\n&lt;/html&gt;';
 
 		}
 
