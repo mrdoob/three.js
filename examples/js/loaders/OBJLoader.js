@@ -53,10 +53,10 @@ THREE.OBJLoader.prototype.parse = function ( data, callback ) {
 
 	var pattern, result;
 
-	// v float float float ...
-	// ["v 1.0 2.0 3.0", "1.0", "2.0", "3.0", undefined]
+	// v float float float
+	// ["v 1.0 2.0 3.0", "1.0", "2.0", "3.0"]
 
-	pattern = /v( [\-|\d|.]+)( [\-|\d|.]+)( [\-|\d|.]+)( [\-|\d|.]+)?/g;
+	pattern = /v ([\-|\d|.]+) ([\-|\d|.]+) ([\-|\d|.]+)/g;
 
 	while ( ( result = pattern.exec( data ) ) != null ) {
 
