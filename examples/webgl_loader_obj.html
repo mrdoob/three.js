@@ -64,9 +64,10 @@
 				scene.add( camera );
 
 				var loader = new THREE.OBJLoader();
-				loader.load( "obj/female02/female02.obj", function ( geometry ) {
+				loader.load( "obj/male02/male02.obj", function ( geometry ) {
 
 					var mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { wireframe: true } ) );
+					mesh.position.y = - 80;
 					scene.add( mesh );
 
 				} );
@@ -83,8 +84,8 @@
 
 			function onDocumentMouseMove( event ) {
 
-				mouseX = ( event.clientX - windowHalfX );
-				mouseY = ( event.clientY - windowHalfY );
+				mouseX = ( event.clientX - windowHalfX ) / 2;
+				mouseY = ( event.clientY - windowHalfY ) / 2;
 
 			}
 

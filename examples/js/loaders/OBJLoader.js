@@ -46,13 +46,24 @@ THREE.OBJLoader.prototype.parse = function ( data, callback ) {
 
 	}
 
-	// faces
+	// faces: vertex/uv/normal
 
 	pattern = /f ([\d]+)\/([\d]+)\/([\d]+) ([\d]+)\/([\d]+)\/([\d]+) ([\d]+)\/([\d]+)\/([\d]+)/g;
 
 	while ( ( result = pattern.exec( data ) ) != null ) {
 
 		var face = new THREE.Face3( parseInt( result[ 1 ] ) - 1, parseInt( result[ 4 ] ) - 1, parseInt( result[ 7 ] ) - 1 );
+		geometry.faces.push( face );
+
+	}
+
+	// faces: vertex/normal
+
+	pattern = /f ([\d]+)\/\/([\d]+) ([\d]+)\/\/([\d]+) ([\d]+)\/\/([\d]+)/g;
+
+	while ( ( result = pattern.exec( data ) ) != null ) {
+
+		var face = new THREE.Face3( parseInt( result[ 1 ] ) - 1, parseInt( result[ 3 ] ) - 1, parseInt( result[ 5 ] ) - 1 );
 		geometry.faces.push( face );
 
 	}
