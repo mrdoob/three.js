@@ -41,6 +41,8 @@ UI.Viewport = function () {
 
 	var _scene = new THREE.Scene();
 
+	_scene.add(_camera);
+
 	/*
 	var light = new THREE.AmbientLight( 0x404040 );
 	_scene.add( light );
