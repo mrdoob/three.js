@@ -5555,6 +5555,66 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		].join("\n");
 
+    var shadowString = "";
+    for ( var shadowIndex = 0; shadowIndex < parameters.maxShadows; shadowIndex++ ) {
+        shadowString +=
+        "shadowCoord = vShadowCoord[ "+shadowIndex+" ].xyz / vShadowCoord[ "+shadowIndex+" ].w;\n\
+        inFrustumVec = bvec4 ( shadowCoord.x >= 0.0, shadowCoord.x <= 1.0, shadowCoord.y >= 0.0, shadowCoord.y <= 1.0 );\n\
+        inFrustum = all( inFrustumVec );\n\
+        #ifdef SHADOWMAP_CASCADE\n\
+        inFrustumCount += int( inFrustum );\n\
+        frustumTestVec = bvec3( inFrustum, inFrustumCount == 1, shadowCoord.z <= 1.0 );\n\
+        #else\n\
+        frustumTestVec = bvec2( inFrustum, shadowCoord.z <= 1.0 );\n\
+        #endif\n\
+        frustumTest = all( frustumTestVec );\n\
+        if ( frustumTest ) {\n\
+        shadowCoord.z += shadowBias[ "+shadowIndex+" ];\n\
+        #ifdef SHADOWMAP_SOFT\n\
+        float shadow = 0.0;\n\
+        const float shadowDelta = 1.0 / 9.0;\n\
+        float xPixelOffset = 1.0 / shadowMapSize[ "+shadowIndex+" ].x;\n\
+        float yPixelOffset = 1.0 / shadowMapSize[ "+shadowIndex+" ].y;\n\
+        float dx0 = -1.25 * xPixelOffset;\n\
+        float dy0 = -1.25 * yPixelOffset;\n\
+        float dx1 = 1.25 * xPixelOffset;\n\
+        float dy1 = 1.25 * yPixelOffset;\n\
+        fDepth = unpackDepth( texture2D( shadowMap[ "+shadowIndex+" ], shadowCoord.xy + vec2( dx0, dy0 ) ) );\n\
+        if ( fDepth < shadowCoord.z ) shadow += shadowDelta;\n\
+        fDepth = unpackDepth( texture2D( shadowMap[ "+shadowIndex+" ], shadowCoord.xy + vec2( 0.0, dy0 ) ) );\n\
+        if ( fDepth < shadowCoord.z ) shadow += shadowDelta;\n\
+        fDepth = unpackDepth( texture2D( shadowMap[ "+shadowIndex+" ], shadowCoord.xy + vec2( dx1, dy0 ) ) );\n\
+        if ( fDepth < shadowCoord.z ) shadow += shadowDelta;\n\
+        fDepth = unpackDepth( texture2D( shadowMap[ "+shadowIndex+" ], shadowCoord.xy + vec2( dx0, 0.0 ) ) );\n\
+        if ( fDepth < shadowCoord.z ) shadow += shadowDelta;\n\
+        fDepth = unpackDepth( texture2D( shadowMap[ "+shadowIndex+" ], shadowCoord.xy ) );\n\
+        if ( fDepth < shadowCoord.z ) shadow += shadowDelta;\n\
+        fDepth = unpackDepth( texture2D( shadowMap[ "+shadowIndex+" ], shadowCoord.xy + vec2( dx1, 0.0 ) ) );\n\
+        if ( fDepth < shadowCoord.z ) shadow += shadowDelta;\n\
+        fDepth = unpackDepth( texture2D( shadowMap[ "+shadowIndex+" ], shadowCoord.xy + vec2( dx0, dy1 ) ) );\n\
+        if ( fDepth < shadowCoord.z ) shadow += shadowDelta;\n\
+        fDepth = unpackDepth( texture2D( shadowMap[ "+shadowIndex+" ], shadowCoord.xy + vec2( 0.0, dy1 ) ) );\n\
+        if ( fDepth < shadowCoord.z ) shadow += shadowDelta;\n\
+        fDepth = unpackDepth( texture2D( shadowMap[ "+shadowIndex+" ], shadowCoord.xy + vec2( dx1, dy1 ) ) );\n\
+        if ( fDepth < shadowCoord.z ) shadow += shadowDelta;\n\
+        shadowColor = shadowColor * vec3( ( 1.0 - shadowDarkness[ "+shadowIndex+" ] * shadow ) );\n\
+        #else\n\
+        vec4 rgbaDepth;\n\
+        rgbaDepth = texture2D( shadowMap[ "+shadowIndex+" ], shadowCoord.xy );\n\
+        float fDepth = unpackDepth( rgbaDepth );\n\
+        if ( fDepth < shadowCoord.z )\n\
+           shadowColor = shadowColor * vec3( 1.0 - shadowDarkness[ "+shadowIndex+" ] );\n\
+        #endif\n\
+        }\n\
+        #ifdef SHADOWMAP_DEBUG\n\
+        #ifdef SHADOWMAP_CASCADE\n\
+        if ( inFrustum && inFrustumCount == 1 ) gl_FragColor.xyz *= frustumColors[ "+shadowIndex+" ];\n\
+        #else\n\
+        if ( inFrustum ) gl_FragColor.xyz *= frustumColors[ "+shadowIndex+" ];\n\
+        #endif\n\
+        #endif\n";
+    }
+    fragmentShader = fragmentShader.replace( "SHADOWMAP_STRING", shadowString );
 		_gl.attachShader( program, getShader( "fragment", prefix_fragment + fragmentShader ) );
 		_gl.attachShader( program, getShader( "vertex", prefix_vertex + vertexShader ) );
 
