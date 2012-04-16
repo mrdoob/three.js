@@ -131,7 +131,6 @@ EXTRAS_FILES = [
 'extras/loaders/ColladaLoader.js',
 'extras/loaders/JSONLoader.js',
 'extras/loaders/SceneLoader.js',
-'extras/loaders/UTF8Loader.js',
 'extras/objects/ImmediateRenderObject.js',
 'extras/objects/LensFlare.js',
 'extras/objects/MorphBlendMesh.js',

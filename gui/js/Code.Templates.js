@@ -30,10 +30,11 @@ THREE.CubeGeometry = function ( width, height, depth, segmentsWidth, segmentsHei
 					geometry.gui.parameters.depth,
 					geometry.gui.parameters.segmentsWidth,
 					geometry.gui.parameters.segmentsHeight,
-					geometry.gui.parameters.segmentsDepth,
-					geometry.gui.parameters.materials,
-					geometry.gui.parameters.flipped,
-					geometry.gui.parameters.sides
+					geometry.gui.parameters.segmentsDepth
+					// ,
+					// geometry.gui.parameters.materials,
+					// geometry.gui.parameters.flipped,
+					// geometry.gui.parameters.sides
 
 				].join( ', ' ) + ' )';
 

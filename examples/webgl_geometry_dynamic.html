@@ -150,8 +150,8 @@
 				//geometry.computeFaceNormals();
 				//geometry.computeVertexNormals();
 
-				mesh.geometry.__dirtyVertices = true;
-				//mesh.geometry.__dirtyNormals = true;
+				mesh.geometry.verticesNeedUpdate = true;
+				//mesh.geometry.normalsNeedUpdate = true;
 
 				controls.update( delta );
 				renderer.render( scene, camera );

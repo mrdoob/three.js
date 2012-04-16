@@ -41,6 +41,8 @@ UI.Viewport = function () {
 
 	var _scene = new THREE.Scene();
 
+	_scene.add(_camera);
+
 	/*
 	var light = new THREE.AmbientLight( 0x404040 );
 	_scene.add( light );
@@ -53,6 +55,8 @@ UI.Viewport = function () {
 
 	var _plane = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 2000, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 0.25, transparent: true, wireframe: true } ) );
 	_plane.visible = false;
+	_plane.geometry.applyMatrix( new THREE.Matrix4().makeRotationX( Math.PI / 2 ) );
+
 	_sceneHelpers.add( _plane );
 
 	var _projector = new THREE.Projector();
