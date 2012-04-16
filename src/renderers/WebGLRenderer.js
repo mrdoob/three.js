@@ -4755,56 +4755,56 @@ THREE.WebGLRenderer = function ( parameters ) {
 			value = uniform.value;
 
 			// single integer
-
-			if( type === "i" ) {
+            switch(type){
+			case "i":
 
 				_gl.uniform1i( location, value );
-
+                break;
 			// single float
 
-			} else if( type === "f" ) {
+			case "f":
 
 				_gl.uniform1f( location, value );
-
+                break;
 			// single THREE.Vector2
 
-			} else if( type === "v2" ) {
+			case "v2":
 
 				_gl.uniform2f( location, value.x, value.y );
-
+                break;
 			// single THREE.Vector3
 
-			} else if( type === "v3" ) {
+		   case "v3":
 
 				_gl.uniform3f( location, value.x, value.y, value.z );
-
+                break;
 			// single THREE.Vector4
 
-			} else if( type === "v4" ) {
+			case "v4" :
 
 				_gl.uniform4f( location, value.x, value.y, value.z, value.w );
-
+                break;
 			// single THREE.Color
 
-			} else if( type === "c" ) {
+			case "c":
 
 				_gl.uniform3f( location, value.r, value.g, value.b );
-
+                break;
 			// flat array of floats (JS or typed array)
 
-			} else if( type === "fv1" ) {
+		    case "fv1":
 
 				_gl.uniform1fv( location, value );
-
+                break;
 			// flat array of floats with 3 x N size (JS or typed array)
 
-			} else if( type === "fv" ) {
-
+			case "fv":
+                
 				_gl.uniform3fv( location, value );
-
+                break;
 			// array of THREE.Vector2
 
-			} else if( type === "v2v" ) {
+			case "v2v":
 
 				if ( ! uniform._array ) {
 
@@ -4822,10 +4822,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 				_gl.uniform2fv( location, uniform._array );
-
+                break;
 			// array of THREE.Vector3
 
-			} else if( type === "v3v" ) {
+			case "v3v":
 
 				if ( ! uniform._array ) {
 
@@ -4844,10 +4844,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 				_gl.uniform3fv( location, uniform._array );
-
+                break;
 			// array of THREE.Vector4
 
-			} else if( type == "v4v" ) {
+			case "v4v":
 
 				if ( ! uniform._array ) {
 
@@ -4867,10 +4867,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 				_gl.uniform4fv( location, uniform._array );
-
+                break;
 			// single THREE.Matrix4
 
-			} else if( type === "m4" ) {
+			case "m4":
 
 				if ( ! uniform._array ) {
 
@@ -4880,10 +4880,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				value.flattenToArray( uniform._array );
 				_gl.uniformMatrix4fv( location, false, uniform._array );
-
+                break;
 			// array of THREE.Matrix4
 
-			} else if( type === "m4v" ) {
+		    case "m4v":
 
 				if ( ! uniform._array ) {
 
@@ -4899,10 +4899,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				_gl.uniformMatrix4fv( location, false, uniform._array );
 
-
+                break;
 			// single THREE.Texture (2d or cube)
 
-			} else if( type === "t" ) {
+			case "t":
 
 				_gl.uniform1i( location, value );
 
@@ -4923,10 +4923,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 					_this.setTexture( texture, value );
 
 				}
-
+                break;
 			// array of THREE.Texture (2d)
 
-			} else if( type === "tv" ) {
+			case "tv" :
 
 				if ( ! uniform._array ) {
 
