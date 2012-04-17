@@ -33,6 +33,8 @@ THREE.OBJLoader.prototype.parse = function ( data, callback ) {
 
 	var geometry = new THREE.Geometry();
 
+	console.time( 'THREE.OBJLoader.parse()' );
+
 	function vertex( a, b, c ) {
 
 		return new THREE.Vector3( parseFloat( a ), parseFloat( b ), parseFloat( c ) );
@@ -56,7 +58,7 @@ THREE.OBJLoader.prototype.parse = function ( data, callback ) {
 	// v float float float
 	// ["v 1.0 2.0 3.0", "1.0", "2.0", "3.0"]
 
-	pattern = /v ([\-|\d|.]+) ([\-|\d|.]+) ([\-|\d|.]+)/g;
+	pattern = /v( [\-|\d|.]+)( [\-|\d|.]+)( [\-|\d|.]+)/g;
 
 	while ( ( result = pattern.exec( data ) ) != null ) {
 
@@ -82,7 +84,7 @@ THREE.OBJLoader.prototype.parse = function ( data, callback ) {
 	// f vertex/uv vertex/uv vertex/uv ...
 	// ["f 1/1 2/2 3/3", " 1/1", "1", "1", " 2/2", "2", "2", " 3/3", "3", "3", undefined, undefined, undefined]
 
-	pattern = /f ([\d]+)\/([\d]+) ([\d]+)\/([\d]+) ([\d]+)\/([\d]+)/g;
+	pattern = /f( ([\d]+)\/([\d]+))( ([\d]+)\/([\d]+))( ([\d]+)\/([\d]+))( ([\d]+)\/([\d]+))?/g;
 
 	while ( ( result = pattern.exec( data ) ) != null ) {
 
@@ -112,7 +114,7 @@ THREE.OBJLoader.prototype.parse = function ( data, callback ) {
 	// f vertex//normal vertex//normal vertex//normal ...
 	// ["f 1//1 2//2 3//3", " 1//1", "1", "1", " 2//2", "2", "2", " 3//3", "3", "3", undefined, undefined, undefined]
 
-	pattern = /f ([\d]+)\/\/([\d]+) ([\d]+)\/\/([\d]+) ([\d]+)\/\/([\d]+)/g;
+	pattern = /f( ([\d]+)\/\/([\d]+))( ([\d]+)\/\/([\d]+))( ([\d]+)\/\/([\d]+))( ([\d]+)\/\/([\d]+))?/g;
 
 	while ( ( result = pattern.exec( data ) ) != null ) {
 
@@ -123,6 +125,8 @@ THREE.OBJLoader.prototype.parse = function ( data, callback ) {
 		);
 
 	}
+
+	console.timeEnd( 'THREE.OBJLoader.parse()' );
 
 	geometry.computeCentroids();
 
