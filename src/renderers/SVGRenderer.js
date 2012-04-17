@@ -4,7 +4,7 @@
 
 THREE.SVGRenderer = function () {
 
-	console.log( 'THREE.SVGRenderer', THREE.REVISION );
+	console.log( 'THREE.SVGRenderer' );
 
 	var _this = this,
 	_renderData, _elements, _lights,
