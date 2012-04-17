@@ -121,7 +121,6 @@
 				var ground = new THREE.Mesh( gg, gm );
 				ground.material.map.repeat.set( 8, 8 );
 				ground.material.map.wrapS = ground.material.map.wrapT = THREE.RepeatWrapping;
-				ground.rotation.x = - Math.PI/2;
 				ground.receiveShadow = true;
 
 				scene.add( ground );

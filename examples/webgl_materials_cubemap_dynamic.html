@@ -81,8 +81,6 @@
 
 			var SHADOW_MAP_WIDTH = 1024, SHADOW_MAP_HEIGHT = 1024;
 
-			var CUBE_HEIGHT = 0;
-
 			var container, stats;
 
 			var camera, cameraTarget, scene, renderer;
@@ -163,7 +161,7 @@
 				ambientLight = new THREE.AmbientLight( 0x555555 );
 				scene.add( ambientLight );
 
-				spotLight = new THREE.SpotLight( 0xffffff );
+				spotLight = new THREE.SpotLight( 0xffffff, 1, 0, Math.PI, 1 );
 				spotLight.position.set( 0, 1800, 1500 );
 				spotLight.target.position.set( 0, 0, 0 );
 				spotLight.castShadow = true;
@@ -217,7 +215,8 @@
 
 				// CUBE CAMERA
 
-				cubeCamera = new THREE.CubeCamera( 1, 100000, CUBE_HEIGHT, 128 );
+				cubeCamera = new THREE.CubeCamera( 1, 100000, 128 );
+				scene.add( cubeCamera );
 
 				// MATERIALS
 
@@ -227,31 +226,31 @@
 
 					body: [],
 
-					"Chrome": 		new THREE.MeshLambertMaterial( { color: 0xffffff, ambient: 0xffffff, envMap: cubeTarget  } ),
-					"ChromeN": 		new THREE.MeshLambertMaterial( { color: 0xffffff, ambient: 0xffffff, envMap: cubeTarget, combine: THREE.MixOperation, reflectivity: 0.75  } ),
-					"Dark chrome": 	new THREE.MeshLambertMaterial( { color: 0x444444, ambient: 0x444444, envMap: cubeTarget } ),
+					"Chrome": new THREE.MeshLambertMaterial( { color: 0xffffff, ambient: 0xffffff, envMap: cubeTarget  } ),
+					"ChromeN": new THREE.MeshLambertMaterial( { color: 0xffffff, ambient: 0xffffff, envMap: cubeTarget, combine: THREE.MixOperation, reflectivity: 0.75  } ),
+					"Dark chrome": new THREE.MeshLambertMaterial( { color: 0x444444, ambient: 0x444444, envMap: cubeTarget } ),
 
-					"Black rough":	new THREE.MeshLambertMaterial( { color: 0x050505, ambient: 0x050505 } ),
+					"Black rough": new THREE.MeshLambertMaterial( { color: 0x050505, ambient: 0x050505 } ),
 
-					"Dark glass":	new THREE.MeshLambertMaterial( { color: 0x101020, ambient: 0x101020, envMap: cubeTarget, opacity: 0.5, transparent: true } ),
-					"Orange glass":	new THREE.MeshLambertMaterial( { color: 0xffbb00, ambient: 0xffbb00, opacity: 0.5, transparent: true } ),
-					"Red glass": 	new THREE.MeshLambertMaterial( { color: 0xff0000, ambient: 0xff0000, opacity: 0.5, transparent: true } ),
+					"Dark glass": new THREE.MeshLambertMaterial( { color: 0x101020, ambient: 0x101020, envMap: cubeTarget, opacity: 0.5, transparent: true } ),
+					"Orange glass": new THREE.MeshLambertMaterial( { color: 0xffbb00, ambient: 0xffbb00, opacity: 0.5, transparent: true } ),
+					"Red glass": new THREE.MeshLambertMaterial( { color: 0xff0000, ambient: 0xff0000, opacity: 0.5, transparent: true } ),
 
-					"Black metal":	new THREE.MeshLambertMaterial( { color: 0x222222, ambient: 0x222222, envMap: cubeTarget, combine: THREE.MultiplyOperation } ),
+					"Black metal": new THREE.MeshLambertMaterial( { color: 0x222222, ambient: 0x222222, envMap: cubeTarget, combine: THREE.MultiplyOperation } ),
 					"Orange metal": new THREE.MeshLambertMaterial( { color: 0xff6600, ambient: 0xff6600, envMap: cubeTarget, combine: THREE.MultiplyOperation } )
 
 				}
 
 				mlib.body.push( [ "Orange", new THREE.MeshLambertMaterial( { color: 0x883300, ambient: 0x883300, envMap: cubeTarget, combine: THREE.MixOperation, reflectivity: 0.1 } ) ] );
-				mlib.body.push( [ "Blue", 	new THREE.MeshLambertMaterial( { color: 0x113355, envMap: cubeTarget, combine: THREE.MixOperation, reflectivity: 0.1 } ) ] );
-				mlib.body.push( [ "Red", 	new THREE.MeshLambertMaterial( { color: 0x660000, envMap: cubeTarget, combine: THREE.MixOperation, reflectivity: 0.1 } ) ] );
-				mlib.body.push( [ "Black", 	new THREE.MeshLambertMaterial( { color: 0x000000, envMap: cubeTarget, combine: THREE.MixOperation, reflectivity: 0.2 } ) ] );
-				mlib.body.push( [ "White", 	new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: cubeTarget, combine: THREE.MixOperation, reflectivity: 0.2 } ) ] );
+				mlib.body.push( [ "Blue", new THREE.MeshLambertMaterial( { color: 0x113355, envMap: cubeTarget, combine: THREE.MixOperation, reflectivity: 0.1 } ) ] );
+				mlib.body.push( [ "Red", new THREE.MeshLambertMaterial( { color: 0x660000, envMap: cubeTarget, combine: THREE.MixOperation, reflectivity: 0.1 } ) ] );
+				mlib.body.push( [ "Black", new THREE.MeshLambertMaterial( { color: 0x000000, envMap: cubeTarget, combine: THREE.MixOperation, reflectivity: 0.2 } ) ] );
+				mlib.body.push( [ "White", new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: cubeTarget, combine: THREE.MixOperation, reflectivity: 0.2 } ) ] );
 
 				mlib.body.push( [ "Carmine", new THREE.MeshPhongMaterial( { color: 0x770000, specular: 0xffaaaa, envMap: cubeTarget, combine: THREE.MultiplyOperation } ) ] );
-				mlib.body.push( [ "Gold", 	 new THREE.MeshPhongMaterial( { color: 0xaa9944, specular: 0xbbaa99, shininess: 50, envMap: cubeTarget, combine: THREE.MultiplyOperation } ) ] );
-				mlib.body.push( [ "Bronze",  new THREE.MeshPhongMaterial( { color: 0x150505, specular: 0xee6600, shininess: 10, envMap: cubeTarget, combine: THREE.MixOperation, reflectivity: 0.2 } ) ] );
-				mlib.body.push( [ "Chrome",  new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, envMap: cubeTarget, combine: THREE.MultiplyOperation } ) ] );
+				mlib.body.push( [ "Gold", new THREE.MeshPhongMaterial( { color: 0xaa9944, specular: 0xbbaa99, shininess: 50, envMap: cubeTarget, combine: THREE.MultiplyOperation } ) ] );
+				mlib.body.push( [ "Bronze", new THREE.MeshPhongMaterial( { color: 0x150505, specular: 0xee6600, shininess: 10, envMap: cubeTarget, combine: THREE.MixOperation, reflectivity: 0.2 } ) ] );
+				mlib.body.push( [ "Chrome", new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, envMap: cubeTarget, combine: THREE.MultiplyOperation } ) ] );
 
 				// FLARES
 
@@ -282,21 +281,18 @@
 
 					};
 
-					var flares = [ // front
-								   [ "a", sa, [ 47, 38, 120 ] ], [ "a", sa, [ 40, 38, 120 ] ], [ "a", sa, [ 32, 38, 122 ] ],
-								   [ "b", sb, [ 47, 38, 120 ] ], [ "b", sb, [ 40, 38, 120 ] ], [ "b", sb, [ 32, 38, 122 ] ],
-
-								   [ "a", sa, [ -47, 38, 120 ] ], [ "a", sa, [ -40, 38, 120 ] ], [ "a", sa, [ -32, 38, 122 ] ],
-								   [ "b", sb, [ -47, 38, 120 ] ], [ "b", sb, [ -40, 38, 120 ] ], [ "b", sb, [ -32, 38, 122 ] ],
-
-								   // back
-								   [ "ar", sa, [ 22, 50, -123 ] ], [ "ar", sa, [ 32, 49, -123 ] ],
-								   [ "br", sb, [ 22, 50, -123 ] ], [ "br", sb, [ 32, 49, -123 ] ],
-
-								   [ "ar", sa, [ -22, 50, -123 ] ], [ "ar", sa, [ -32, 49, -123 ] ],
-								   [ "br", sb, [ -22, 50, -123 ] ], [ "br", sb, [ -32, 49, -123 ] ],
-
-								 ];
+					var flares = [
+						// front
+						[ "a", sa, [ 47, 38, 120 ] ], [ "a", sa, [ 40, 38, 120 ] ], [ "a", sa, [ 32, 38, 122 ] ],
+						[ "b", sb, [ 47, 38, 120 ] ], [ "b", sb, [ 40, 38, 120 ] ], [ "b", sb, [ 32, 38, 122 ] ],
+						[ "a", sa, [ -47, 38, 120 ] ], [ "a", sa, [ -40, 38, 120 ] ], [ "a", sa, [ -32, 38, 122 ] ],
+						[ "b", sb, [ -47, 38, 120 ] ], [ "b", sb, [ -40, 38, 120 ] ], [ "b", sb, [ -32, 38, 122 ] ],
+						// back
+						[ "ar", sa, [ 22, 50, -123 ] ], [ "ar", sa, [ 32, 49, -123 ] ],
+						[ "br", sb, [ 22, 50, -123 ] ], [ "br", sb, [ 32, 49, -123 ] ],
+						[ "ar", sa, [ -22, 50, -123 ] ], [ "ar", sa, [ -32, 49, -123 ] ],
+						[ "br", sb, [ -22, 50, -123 ] ], [ "br", sb, [ -32, 49, -123 ] ],
+					];
 
 					for ( var i = 0; i < flares.length; i ++ ) {
 
@@ -349,20 +345,18 @@
 
 					};
 
-					var flares = [ // front
-								   [ "a", sa, [ 70, 10, 160 ] ], [ "a", sa, [ 66, -1, 175 ] ], [ "a", sa, [ 66, -1, 165 ] ],
-								   [ "b", sb, [ 70, 10, 160 ] ], [ "b", sb, [ 66, -1, 175 ] ], [ "b", sb, [ 66, -1, 165 ] ],
-
-								   [ "a", sa, [ -70, 10, 160 ] ], [ "a", sa, [ -66, -1, 175 ] ], [ "a", sa, [ -66, -1, 165 ] ],
-								   [ "b", sb, [ -70, 10, 160 ] ], [ "b", sb, [ -66, -1, 175 ] ], [ "b", sb, [ -66, -1, 165 ] ],
-
-								   // back
-								   [ "ar", sa, [ 61, 19, -185 ] ], [ "ar", sa, [ 55, 19, -185 ] ],
-								   [ "br", sb, [ 61, 19, -185 ] ], [ "br", sb, [ 55, 19, -185 ] ],
-
-								   [ "ar", sa, [ -61, 19, -185 ] ], [ "ar", sa, [ -55, 19, -185 ] ],
-								   [ "br", sb, [ -61, 19, -185 ] ], [ "br", sb, [ -55, 19, -185 ] ],
-								 ];
+					var flares = [
+						// front
+						[ "a", sa, [ 70, 10, 160 ] ], [ "a", sa, [ 66, -1, 175 ] ], [ "a", sa, [ 66, -1, 165 ] ],
+						[ "b", sb, [ 70, 10, 160 ] ], [ "b", sb, [ 66, -1, 175 ] ], [ "b", sb, [ 66, -1, 165 ] ],
+						[ "a", sa, [ -70, 10, 160 ] ], [ "a", sa, [ -66, -1, 175 ] ], [ "a", sa, [ -66, -1, 165 ] ],
+						[ "b", sb, [ -70, 10, 160 ] ], [ "b", sb, [ -66, -1, 175 ] ], [ "b", sb, [ -66, -1, 165 ] ],
+						// back
+						[ "ar", sa, [ 61, 19, -185 ] ], [ "ar", sa, [ 55, 19, -185 ] ],
+						[ "br", sb, [ 61, 19, -185 ] ], [ "br", sb, [ 55, 19, -185 ] ],
+						[ "ar", sa, [ -61, 19, -185 ] ], [ "ar", sa, [ -55, 19, -185 ] ],
+						[ "br", sb, [ -61, 19, -185 ] ], [ "br", sb, [ -55, 19, -185 ] ],
+					];
 
 
 					for ( var i = 0; i < flares.length; i ++ ) {
@@ -522,7 +516,6 @@
 				groundBasic.color.setHSV( 0.1, 0.45, 0.995 );
 
 				ground = new THREE.Mesh( new THREE.PlaneGeometry( 50000, 50000 ), groundBasic );
-				ground.rotation.x = - Math.PI / 2;
 				ground.position.y = - 215;
 				scene.add( ground );
 
@@ -563,15 +556,16 @@
 				var shadowTexture = THREE.ImageUtils.loadTexture( "textures/shadowAlpha.png" );
 
 				var shadowPlane = new THREE.PlaneGeometry( 400, 400 );
-				var shadowMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.35, transparent: true,
-														  map: shadowTexture,
-														  polygonOffset: false, polygonOffsetFactor: -0.5, polygonOffsetUnits: 1 } );
+				var shadowMaterial = new THREE.MeshBasicMaterial( {
+
+					color: 0xff0000, opacity: 0.35, transparent: true, map: shadowTexture,
+					polygonOffset: false, polygonOffsetFactor: -0.5, polygonOffsetUnits: 1
+
+				} );
 
 				var shadow = new THREE.Mesh( shadowPlane, shadowMaterial );
-				shadow.rotation.x = -Math.PI/2;
-				shadow.rotation.z = Math.PI/2;
-
 				shadow.position.y = sy;
+				shadow.rotation.y = Math.PI / 2;
 
 				object.add( shadow );
 
@@ -682,13 +676,13 @@
 				var shadowHeight = 1.25 * ss * ( bb.max.x - bb.min.x );
 
 				var shadowPlane = new THREE.PlaneGeometry( shadowWidth, shadowHeight );
-				var shadowMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff, opacity: 0.5, transparent: true,
-														  map: shadowTexture,
-														  polygonOffset: false, polygonOffsetFactor: -0.5, polygonOffsetUnits: 1 } );
+				var shadowMaterial = new THREE.MeshBasicMaterial( {
+					color: 0xffffff, opacity: 0.5, transparent: true, map: shadowTexture,
+					polygonOffset: false, polygonOffsetFactor: -0.5, polygonOffsetUnits: 1
+				} );
 
 				var shadow = new THREE.Mesh( shadowPlane, shadowMaterial );
-				shadow.rotation.x = -Math.PI/2;
-				shadow.rotation.z = Math.PI/2;
+				shadow.rotation.y = Math.PI / 2;
 				shadow.position.y = s + 10;
 
 				object.root.add( shadow );
@@ -994,7 +988,7 @@
 					veyron.setVisible( false );
 					gallardo.setVisible( false );
 
-					cubeCamera.updatePosition( currentCar.root.position );
+					cubeCamera.position.copy( currentCar.root.position );
 
 					renderer.autoUpdateObjects = false;
 					renderer.initWebGLObjects( scene );

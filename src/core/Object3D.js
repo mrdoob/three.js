@@ -114,7 +114,7 @@ THREE.Object3D.prototype = {
 
 		}
 
-		if ( this.children.indexOf( object ) === - 1 ) {
+		if ( object instanceof THREE.Object3D ) { // && this.children.indexOf( object ) === - 1
 
 			if ( object.parent !== undefined ) {
 
@@ -174,9 +174,9 @@ THREE.Object3D.prototype = {
 
 	},
 
-	getChildByName: function ( name, doRecurse ) {
+	getChildByName: function ( name, recursive ) {
 
-		var c, cl, child, recurseResult;
+		var c, cl, child;
 
 		for ( c = 0, cl = this.children.length; c < cl; c ++ ) {
 
@@ -188,13 +188,13 @@ THREE.Object3D.prototype = {
 
 			}
 
-			if ( doRecurse ) {
+			if ( recursive ) {
 
-				recurseResult = child.getChildByName( name, doRecurse );
+				child = child.getChildByName( name, recursive );
 
-				if ( recurseResult !== undefined ) {
+				if ( child !== undefined ) {
 
-					return recurseResult;
+					return child;
 
 				}
 

@@ -221,7 +221,7 @@ THREE.PathControls = function ( object, domElement ) {
 			index = i / ( spline.points.length * n_sub );
 			position = spline.getPoint( index );
 
-			geometry.vertices[ i ] = new THREE.Vertex( new THREE.Vector3( position.x, position.y, position.z ) );
+			geometry.vertices[ i ] = new THREE.Vector3( position.x, position.y, position.z );
 
 		}
 

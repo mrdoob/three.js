@@ -140,15 +140,17 @@
 
 			for ( var i = 0; i < 100000; i ++ ) {
 
-				vector = new THREE.Vector3( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 );
+				var vertex = new THREE.Vector3();
+				vertex.x = Math.random() * 2 - 1;
+				vertex.y = Math.random() * 2 - 1;
+				vertex.z = Math.random() * 2 - 1;
+				vertex.multiplyScalar( radius );
 
-				vector.multiplyScalar( radius );
+				if ( ( vertex.x > inner || vertex.x < -inner ) ||
+				     ( vertex.y > inner || vertex.y < -inner ) ||
+				     ( vertex.z > inner || vertex.z < -inner )  )
 
-				if ( ( vector.x > inner || vector.x < -inner ) ||
-				     ( vector.y > inner || vector.y < -inner ) ||
-				     ( vector.z > inner || vector.z < -inner )  )
-
-				geometry.vertices.push( new THREE.Vertex( vector ) );
+				geometry.vertices.push( vertex );
 
 			}
 

@@ -24,7 +24,7 @@
 bl_info = {
     "name": "three.js format",
     "author": "mrdoob, kikko, alteredq, remoe, pxf",
-    "version": (1, 2, 0),
+    "version": (1, 3, 0),
     "blender": (2, 6, 0),
     "api": 35622,
     "location": "File > Import-Export",
@@ -53,17 +53,22 @@ from bpy_extras.io_utils import ExportHelper, ImportHelper
 # Custom properties
 # ################################################################
 
-bpy.types.Object.THREE_castsShadow = bpy.props.BoolProperty()
-bpy.types.Object.THREE_meshCollider = bpy.props.BoolProperty()
+bpy.types.Object.THREE_castShadow = bpy.props.BoolProperty()
+bpy.types.Object.THREE_receiveShadow = bpy.props.BoolProperty()
+bpy.types.Object.THREE_doubleSided = bpy.props.BoolProperty()
 bpy.types.Object.THREE_exportGeometry = bpy.props.BoolProperty(default = True)
 
-THREE_trigger_types = [("None", "None", "None"), ("Small", "Small", "Small"), ("Large", "Large", "Large")]
-bpy.types.Object.THREE_triggerType = EnumProperty(name = "Trigger type", description = "Trigger type", items = THREE_trigger_types, default = "None")
-
 bpy.types.Material.THREE_useVertexColors = bpy.props.BoolProperty()
+bpy.types.Material.THREE_depthWrite = bpy.props.BoolProperty(default = True)
+bpy.types.Material.THREE_depthTest = bpy.props.BoolProperty(default = True)
 
 THREE_material_types = [("Basic", "Basic", "Basic"), ("Phong", "Phong", "Phong"), ("Lambert", "Lambert", "Lambert")]
 bpy.types.Material.THREE_materialType = EnumProperty(name = "Material type", description = "Material type", items = THREE_material_types, default = "Lambert")
+
+THREE_blending_types = [("NoBlending", "NoBlending", "NoBlending"), ("NormalBlending", "NormalBlending", "NormalBlending"),
+                        ("AdditiveBlending", "AdditiveBlending", "AdditiveBlending"), ("SubtractiveBlending", "SubtractiveBlending", "SubtractiveBlending"),
+                        ("MultiplyBlending", "MultiplyBlending", "MultiplyBlending"), ("AdditiveAlphaBlending", "AdditiveAlphaBlending", "AdditiveAlphaBlending")]
+bpy.types.Material.THREE_blendingType = EnumProperty(name = "Blending type", description = "Blending type", items = THREE_blending_types, default = "NormalBlending")
 
 class OBJECT_PT_hello( bpy.types.Panel ):
 
@@ -83,14 +88,13 @@ class OBJECT_PT_hello( bpy.types.Panel ):
         row.prop( obj, "THREE_exportGeometry", text="Export geometry" )
 
         row = layout.row()
-        row.prop( obj, "THREE_castsShadow", text="Casts shadow" )
+        row.prop( obj, "THREE_castShadow", text="Casts shadow" )
 
         row = layout.row()
-        row.prop( obj, "THREE_meshCollider", text="Mesh collider" )
+        row.prop( obj, "THREE_receiveShadow", text="Receives shadow" )
 
         row = layout.row()
-        row.prop( obj, "THREE_triggerType", text="Trigger type" )
-
+        row.prop( obj, "THREE_doubleSided", text="Double sided" )
 
 class MATERIAL_PT_hello( bpy.types.Panel ):
 
@@ -110,7 +114,16 @@ class MATERIAL_PT_hello( bpy.types.Panel ):
         row.prop( mat, "THREE_materialType", text="Material type" )
 
         row = layout.row()
+        row.prop( mat, "THREE_blendingType", text="Blending type" )
+
+        row = layout.row()
         row.prop( mat, "THREE_useVertexColors", text="Use vertex colors" )
+
+        row = layout.row()
+        row.prop( mat, "THREE_depthWrite", text="Enable depth writing" )
+
+        row = layout.row()
+        row.prop( mat, "THREE_depthTest", text="Enable depth testing" )
 
 
 # ################################################################

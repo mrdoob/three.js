@@ -119,13 +119,13 @@
 
 					for ( var v = 0; v < geometry.vertices.length; v ++ ) {
 
-						vertices.push( new THREE.Vertex( geometry.vertices[ v ].position.clone() ) )
+						vertices.push( geometry.vertices[ v ].clone() );
 
 						if ( v === i ) {
 
-							vertices[ vertices.length - 1 ].position.x *= 2;
-							vertices[ vertices.length - 1 ].position.y *= 2;
-							vertices[ vertices.length - 1 ].position.z *= 2;
+							vertices[ vertices.length - 1 ].x *= 2;
+							vertices[ vertices.length - 1 ].y *= 2;
+							vertices[ vertices.length - 1 ].z *= 2;
 
 						}
 

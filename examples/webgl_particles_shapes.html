@@ -113,7 +113,7 @@
 				info.style.top = '10px';
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
-				info.innerHTML = 'Three.js - simple particle systems with shapes by <a href="http://www.lab4games.net/zz85/blog">zz85</a><br/>Move your mouse. Click to pause/resume.';
+				info.innerHTML = 'Three.js - simple particle systems with shapes by <a href="http://www.lab4games.net/zz85/blog">zz85</a><br>Move your mouse. Click to pause/resume.';
 				container.appendChild( info );
 
 				// SCENE
@@ -151,8 +151,8 @@
 
 				}
 
-                var textMaterialFront = new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, opacity: 0.95 } );
-                var textMaterialSide = new THREE.MeshLambertMaterial( { color: 0xffffff } );
+				var textMaterialFront = new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, opacity: 0.95 } );
+				var textMaterialSide = new THREE.MeshLambertMaterial( { color: 0xffffff } );
 
 				var text3d = new THREE.TextGeometry( theText, {
 
@@ -182,15 +182,15 @@
 				// Potentially, we can extract the vertices or faces of the text to generate particles too.
 				// Geo > Vertices > Position
 
-                text.position.x = centerOffset;
-                text.position.y = 130;
-                text.position.z = -50;
+				text.position.x = centerOffset;
+				text.position.y = 130;
+				text.position.z = -50;
 
-                text.rotation.x = 0;
-                text.rotation.y = Math.PI * 2;
+				text.rotation.x = 0;
+				text.rotation.y = Math.PI * 2;
 
-				parent = new THREE.Object3D();
-                parent.add( text );
+						parent = new THREE.Object3D();
+				parent.add( text );
 				scene.add( parent );
 
 				///// Create particle objects for Three.js
@@ -201,7 +201,7 @@
 
 				function newpos( x, y, z ) {
 
-					return new THREE.Vertex( new THREE.Vector3( x, y, z ) );
+					return new THREE.Vector3( x, y, z );
 
 				}
 
@@ -353,7 +353,7 @@
 					values_color[ v ] = new THREE.Color( 0xffffff );
 					values_color[ v ].setHSV( 0, 0, 0 );
 
-					particles.vertices[ v ].position.set( Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY );
+					particles.vertices[ v ].set( Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY );
 
 				}
 
@@ -422,7 +422,7 @@
 						pointLight.position.y = emitterpos.y;
 						pointLight.position.z = 100;
 
-						particles.vertices[ target ].position = p.position;
+						particles.vertices[ target ] = p.position;
 
 						values_color[ target ].setHSV( hue, 0.8, 0.15 );
 
@@ -442,7 +442,7 @@
 						// Hide the particle
 
 						values_color[ target ].setHSV( 0, 0, 0 );
-						particles.vertices[ target ].position.set( Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY );
+						particles.vertices[ target ].set( Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY );
 
 						// Mark particle system as available by returning to pool
 
@@ -493,7 +493,7 @@
 
 
 				renderer = new THREE.WebGLRenderer();
-                renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setClearColorHex( 0x000000, 1 );
 
 				container.appendChild( renderer.domElement );
@@ -629,7 +629,7 @@
 
 				delta = speed * clock.getDelta();
 
-				particleCloud.geometry.__dirtyVertices = true;
+				particleCloud.geometry.verticesNeedUpdate = true;
 
 				attributes.size.needsUpdate = true;
 				attributes.pcolor.needsUpdate = true;

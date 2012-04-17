@@ -142,7 +142,7 @@ This code creates a camera, then creates a scene, adds a cube on it, creates a &
 </script>
 ```
 
-### Change Log ###
+### Change log ###
 
 2012 03 04 - **r48** (393,626 KB, gzip: 99,395 KB)
 

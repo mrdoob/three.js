@@ -81,7 +81,6 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 		cameras: {},
 		lights: {},
 		fogs: {},
-		triggers: {},
 		empties: {}
 
 	};
@@ -101,8 +100,12 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 		if ( scale )
 			result.scene.scale.set( scale[ 0 ], scale[ 1 ], scale [ 2 ] );
 
-		if ( position || rotation || scale )
+		if ( position || rotation || scale ) {
+
 			result.scene.updateMatrix();
+			result.scene.updateMatrixWorld();
+
+		}
 
 	}
 
@@ -156,6 +159,7 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 						r = o.rotation;
 						q = o.quaternion;
 						s = o.scale;
+						m = o.matrix;
 
 						// turn off quaternions, for the moment
 
@@ -178,50 +182,42 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 
 						object = new THREE.Mesh( geometry, material );
 						object.name = dd;
-						object.position.set( p[0], p[1], p[2] );
-
-						if ( q ) {
-
-							object.quaternion.set( q[0], q[1], q[2], q[3] );
-							object.useQuaternion = true;
-
+						
+						if ( m ) {
+							
+							object.matrixAutoUpdate = false;
+							object.matrix.set( m[0], m[1], m[2], m[3],
+											   m[4], m[5], m[6], m[7],
+											   m[8], m[9], m[10], m[11],
+											   m[12], m[13], m[14], m[15]);
+							
 						} else {
-
-							object.rotation.set( r[0], r[1], r[2] );
-
+							
+							object.position.set( p[0], p[1], p[2] );
+	
+							if ( q ) {
+	
+								object.quaternion.set( q[0], q[1], q[2], q[3] );
+								object.useQuaternion = true;
+	
+							} else {
+	
+								object.rotation.set( r[0], r[1], r[2] );
+	
+							}
+	
+							object.scale.set( s[0], s[1], s[2] );
+							
 						}
 
-						object.scale.set( s[0], s[1], s[2] );
 						object.visible = o.visible;
+						object.doubleSided = o.doubleSided;
+						object.castShadow = o.castShadow;
+						object.receiveShadow = o.receiveShadow;
 
 						result.scene.add( object );
 
 						result.objects[ dd ] = object;
-
-						if ( o.castsShadow ) {
-
-							//object.visible = true;
-							//object.materials = [ new THREE.MeshBasicMaterial( { color: 0xff0000 } ) ];
-
-							var shadow = new THREE.ShadowVolume( geometry )
-							result.scene.add( shadow );
-
-							shadow.position = object.position;
-							shadow.rotation = object.rotation;
-							shadow.scale = object.scale;
-
-						}
-
-						if ( o.trigger && o.trigger.toLowerCase() != "none" ) {
-
-							var trigger = {
-							"type" 		: o.trigger,
-							"object"	: o
-							};
-
-							result.triggers[ object.name ] = trigger;
-
-						}
 
 					}
 
@@ -260,17 +256,6 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 
 					result.objects[ dd ] = object;
 					result.empties[ dd ] = object;
-
-					if ( o.trigger && o.trigger.toLowerCase() != "none" ) {
-
-						var trigger = {
-						"type" 		: o.trigger,
-						"object"	: o
-						};
-
-						result.triggers[ object.name ] = trigger;
-
-					}
 
 				}
 
@@ -525,7 +510,7 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 
 			var modelJson = data.embeds[ g.id ],
 				texture_path = "";
-			
+
 			// Pass metadata along to jsonLoader so it knows the format version.
 			modelJson.metadata = data.metadata;
 

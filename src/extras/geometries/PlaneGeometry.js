@@ -3,42 +3,42 @@
  * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Plane.as
  */
 
-THREE.PlaneGeometry = function ( width, height, segmentsWidth, segmentsHeight ) {
+THREE.PlaneGeometry = function ( width, depth, segmentsWidth, segmentsDepth ) {
 
 	THREE.Geometry.call( this );
 
-	var ix, iy,
+	var ix, iz,
 	width_half = width / 2,
-	height_half = height / 2,
+	depth_half = depth / 2,
 	gridX = segmentsWidth || 1,
-	gridY = segmentsHeight || 1,
+	gridZ = segmentsDepth || 1,
 	gridX1 = gridX + 1,
-	gridY1 = gridY + 1,
+	gridZ1 = gridZ + 1,
 	segment_width = width / gridX,
-	segment_height = height / gridY,
-	normal = new THREE.Vector3( 0, 0, 1 );
+	segment_depth = depth / gridZ,
+	normal = new THREE.Vector3( 0, 1, 0 );
 
-	for ( iy = 0; iy < gridY1; iy++ ) {
+	for ( iz = 0; iz < gridZ1; iz ++ ) {
 
-		for ( ix = 0; ix < gridX1; ix++ ) {
+		for ( ix = 0; ix < gridX1; ix ++ ) {
 
 			var x = ix * segment_width - width_half;
-			var y = iy * segment_height - height_half;
+			var z = iz * segment_depth - depth_half;
 
-			this.vertices.push( new THREE.Vertex( new THREE.Vector3( x, - y, 0 ) ) );
+			this.vertices.push( new THREE.Vector3( x, 0, z ) );
 
 		}
 
 	}
 
-	for ( iy = 0; iy < gridY; iy++ ) {
+	for ( iz = 0; iz < gridZ; iz ++ ) {
 
-		for ( ix = 0; ix < gridX; ix++ ) {
+		for ( ix = 0; ix < gridX; ix ++ ) {
 
-			var a = ix + gridX1 * iy;
-			var b = ix + gridX1 * ( iy + 1 );
-			var c = ( ix + 1 ) + gridX1 * ( iy + 1 );
-			var d = ( ix + 1 ) + gridX1 * iy;
+			var a = ix + gridX1 * iz;
+			var b = ix + gridX1 * ( iz + 1 );
+			var c = ( ix + 1 ) + gridX1 * ( iz + 1 );
+			var d = ( ix + 1 ) + gridX1 * iz;
 
 			var face = new THREE.Face4( a, b, c, d );
 			face.normal.copy( normal );
@@ -46,11 +46,11 @@ THREE.PlaneGeometry = function ( width, height, segmentsWidth, segmentsHeight ) 
 
 			this.faces.push( face );
 			this.faceVertexUvs[ 0 ].push( [
-						new THREE.UV( ix / gridX, iy / gridY ),
-						new THREE.UV( ix / gridX, ( iy + 1 ) / gridY ),
-						new THREE.UV( ( ix + 1 ) / gridX, ( iy + 1 ) / gridY ),
-						new THREE.UV( ( ix + 1 ) / gridX, iy / gridY )
-					] );
+				new THREE.UV( ix / gridX, iz / gridZ ),
+				new THREE.UV( ix / gridX, ( iz + 1 ) / gridZ ),
+				new THREE.UV( ( ix + 1 ) / gridX, ( iz + 1 ) / gridZ ),
+				new THREE.UV( ( ix + 1 ) / gridX, iz / gridZ )
+			] );
 
 		}
 

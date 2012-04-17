@@ -7,23 +7,6 @@ THREE.Ray = function ( origin, direction ) {
 	this.origin = origin || new THREE.Vector3();
 	this.direction = direction || new THREE.Vector3();
 
-	this.intersectObjects = function ( objects ) {
-
-		var i, l, object,
-		intersects = [];
-
-		for ( i = 0, l = objects.length; i < l; i ++ ) {
-
-			Array.prototype.push.apply( intersects, this.intersectObject( objects[ i ] ) );
-
-		}
-
-		intersects.sort( function ( a, b ) { return a.distance - b.distance; } );
-
-		return intersects;
-
-	};
-
 	var precision = 0.0001;
 
 	this.setPrecision = function ( value ) {
@@ -125,9 +108,9 @@ THREE.Ray = function ( origin, direction ) {
 
 					if ( face instanceof THREE.Face3 ) {
 
-						a = objMatrix.multiplyVector3( a.copy( vertices[ face.a ].position ) );
-						b = objMatrix.multiplyVector3( b.copy( vertices[ face.b ].position ) );
-						c = objMatrix.multiplyVector3( c.copy( vertices[ face.c ].position ) );
+						a = objMatrix.multiplyVector3( a.copy( vertices[ face.a ] ) );
+						b = objMatrix.multiplyVector3( b.copy( vertices[ face.b ] ) );
+						c = objMatrix.multiplyVector3( c.copy( vertices[ face.c ] ) );
 
 						if ( pointInFace3( intersectPoint, a, b, c ) ) {
 
@@ -146,10 +129,10 @@ THREE.Ray = function ( origin, direction ) {
 
 					} else if ( face instanceof THREE.Face4 ) {
 
-						a = objMatrix.multiplyVector3( a.copy( vertices[ face.a ].position ) );
-						b = objMatrix.multiplyVector3( b.copy( vertices[ face.b ].position ) );
-						c = objMatrix.multiplyVector3( c.copy( vertices[ face.c ].position ) );
-						d = objMatrix.multiplyVector3( d.copy( vertices[ face.d ].position ) );
+						a = objMatrix.multiplyVector3( a.copy( vertices[ face.a ] ) );
+						b = objMatrix.multiplyVector3( b.copy( vertices[ face.b ] ) );
+						c = objMatrix.multiplyVector3( c.copy( vertices[ face.c ] ) );
+						d = objMatrix.multiplyVector3( d.copy( vertices[ face.d ] ) );
 
 						if ( pointInFace3( intersectPoint, a, b, d ) || pointInFace3( intersectPoint, b, c, d ) ) {
 
@@ -177,6 +160,22 @@ THREE.Ray = function ( origin, direction ) {
 		return intersects;
 
 	}
+
+	this.intersectObjects = function ( objects ) {
+
+		var intersects = [];
+
+		for ( var i = 0, l = objects.length; i < l; i ++ ) {
+
+			Array.prototype.push.apply( intersects, this.intersectObject( objects[ i ] ) );
+
+		}
+
+		intersects.sort( function ( a, b ) { return a.distance - b.distance; } );
+
+		return intersects;
+
+	};
 
 	var v0 = new THREE.Vector3(), v1 = new THREE.Vector3(), v2 = new THREE.Vector3();
 	var dot, intersect, distance;

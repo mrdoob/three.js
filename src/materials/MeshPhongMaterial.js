@@ -5,6 +5,7 @@
  * parameters = {
  *  color: <hex>,
  *  ambient: <hex>,
+ *  emissive: <hex>,
  *  specular: <hex>,
  *  shininess: <float>,
  *  opacity: <float>,
@@ -25,8 +26,11 @@
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>,
  *
- *  vertexColors: false / THREE.VertexColors / THREE.FaceColors,
+ *  vertexColors: THREE.NoColors / THREE.VertexColors / THREE.FaceColors,
+ *
  *  skinning: <bool>,
+ *  morphTargets: <bool>,
+ *  morphNormals: <bool>,
  *
  *	fog: <bool>
  * }
@@ -38,8 +42,11 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 
 	parameters = parameters || {};
 
+	// color property represents diffuse for MeshPhongMaterial
+
 	this.color = parameters.color !== undefined ? new THREE.Color( parameters.color ) : new THREE.Color( 0xffffff );
 	this.ambient = parameters.ambient !== undefined ? new THREE.Color( parameters.ambient ) : new THREE.Color( 0xffffff );
+	this.emissive = parameters.emissive !== undefined ? new THREE.Color( parameters.emissive ) : new THREE.Color( 0x000000 );
 	this.specular = parameters.specular !== undefined ? new THREE.Color( parameters.specular ) : new THREE.Color( 0x111111 );
 	this.shininess = parameters.shininess !== undefined ? parameters.shininess : 30;
 
@@ -67,7 +74,7 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 	this.wireframeLinecap = parameters.wireframeLinecap !== undefined ? parameters.wireframeLinecap : 'round';
 	this.wireframeLinejoin = parameters.wireframeLinejoin !== undefined ? parameters.wireframeLinejoin : 'round';
 
-	this.vertexColors = parameters.vertexColors !== undefined ? parameters.vertexColors : false;
+	this.vertexColors = parameters.vertexColors !== undefined ? parameters.vertexColors : THREE.NoColors;
 
 	this.skinning = parameters.skinning !== undefined ? parameters.skinning : false;
 	this.morphTargets = parameters.morphTargets !== undefined ? parameters.morphTargets : false;

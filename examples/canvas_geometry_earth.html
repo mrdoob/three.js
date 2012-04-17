@@ -62,7 +62,6 @@
 
 				mesh = new THREE.Mesh( new THREE.PlaneGeometry( 300, 300, 3, 3 ), new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/shadow.png' ), overdraw: true } ) );
 				mesh.position.y = - 250;
-				mesh.rotation.x = - 90 * Math.PI / 180;
 				scene.add( mesh );
 
 				mesh = new THREE.Mesh( new THREE.SphereGeometry( 200, 20, 20 ), new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/land_ocean_ice_cloud_2048.jpg' ), overdraw: true } ) );

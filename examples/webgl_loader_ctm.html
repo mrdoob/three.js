@@ -37,9 +37,9 @@
 
 		<script src="../build/Three.js"></script>
 
-		<script src="js/ctm/lzma.js"></script>
-		<script src="js/ctm/ctm.js"></script>
-		<script src="js/ctm/CTMLoader.js"></script>
+		<script src="js/loaders/ctm/lzma.js"></script>
+		<script src="js/loaders/ctm/ctm.js"></script>
+		<script src="js/loaders/ctm/CTMLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/Stats.js"></script>
@@ -146,7 +146,7 @@
 
 				var loader = new THREE.CTMLoader( renderer.context );
 
-				loader.load( "ctm/ben.ctm",   function( geometry ) {
+				loader.load( "models/ctm/ben.ctm",   function( geometry ) {
 
 					var material = new THREE.MeshLambertMaterial( { color: 0xffaa00, map: THREE.ImageUtils.loadTexture( "textures/ash_uvgrid01.jpg" ), envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3 } );
 					callbackModel( geometry, 450, material, 0, -200, 0, 0, 0 );
@@ -154,7 +154,7 @@
 
 				}, useWorker, useBuffers );
 
-				loader.load( "ctm/WaltHead.ctm",  function( geometry ) {
+				loader.load( "models/ctm/WaltHead.ctm",  function( geometry ) {
 
 					//geometry.computeVertexNormals();
 
@@ -164,7 +164,7 @@
 
 				}, useWorker, useBuffers );
 
-				loader.load( "ctm/LeePerry.ctm",  function( geometry ) {
+				loader.load( "models/ctm/LeePerry.ctm",  function( geometry ) {
 
 					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x444444, shininess: 30, map: THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" ), envMaps: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3 } );
 					callbackModel( geometry, 1300, material, 200, 50, 0, 0, 0 );

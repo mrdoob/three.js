@@ -82,6 +82,7 @@
 
 				mesh = new THREE.Mesh( new THREE.PlaneGeometry( 100, 100 ), new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } ) );
 				mesh.position.y = -500;
+				mesh.rotation.x = Math.PI / 2;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
 				mesh.doubleSided = true;
 				scene.add( mesh );
@@ -102,13 +103,13 @@
 
 					var v = new THREE.Vector3( Math.random() * 1000 - 500, Math.random() * 1000 - 500, Math.random() * 1000 - 500 );
 
-					var v0 = new THREE.Vertex( new THREE.Vector3( Math.random() * 100 - 50, Math.random() * 100 - 50, Math.random() * 100 - 50 ) );
-					var v1 = new THREE.Vertex( new THREE.Vector3( Math.random() * 100 - 50, Math.random() * 100 - 50, Math.random() * 100 - 50 ) );
-					var v2 = new THREE.Vertex( new THREE.Vector3( Math.random() * 100 - 50, Math.random() * 100 - 50, Math.random() * 100 - 50 ) );
+					var v0 = new THREE.Vector3( Math.random() * 100 - 50, Math.random() * 100 - 50, Math.random() * 100 - 50 );
+					var v1 = new THREE.Vector3( Math.random() * 100 - 50, Math.random() * 100 - 50, Math.random() * 100 - 50 );
+					var v2 = new THREE.Vector3( Math.random() * 100 - 50, Math.random() * 100 - 50, Math.random() * 100 - 50 );
 
-					v0.position.addSelf( v );
-					v1.position.addSelf( v );
-					v2.position.addSelf( v );
+					v0.addSelf( v );
+					v1.addSelf( v );
+					v2.addSelf( v );
 
 					var face = new THREE.Face3( geometry.vertices.push( v0 ) - 1, geometry.vertices.push( v1 ) - 1, geometry.vertices.push( v2 ) - 1, null, null, geometry.materials.length );
 

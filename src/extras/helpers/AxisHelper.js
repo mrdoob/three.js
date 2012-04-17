@@ -8,8 +8,8 @@ THREE.AxisHelper = function () {
 	THREE.Object3D.call( this );
 
 	var lineGeometry = new THREE.Geometry();
-	lineGeometry.vertices.push( new THREE.Vertex() );
-	lineGeometry.vertices.push( new THREE.Vertex( new THREE.Vector3( 0, 100, 0 ) ) );
+	lineGeometry.vertices.push( new THREE.Vector3() );
+	lineGeometry.vertices.push( new THREE.Vector3( 0, 100, 0 ) );
 
 	var coneGeometry = new THREE.CylinderGeometry( 0, 5, 25, 5, 1 );
 

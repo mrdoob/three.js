@@ -233,7 +233,6 @@
 				createText();
 
 				var plane = new THREE.Mesh( new THREE.PlaneGeometry( 10000, 10000 ), new THREE.MeshBasicMaterial( { color: 0xffffff, opacity: 0.5, transparent: true } ) );
-				plane.rotation.x = -Math.PI/2;
 				plane.position.y = 100;
 				scene.add( plane );
 
@@ -472,9 +471,9 @@
 
 							}
 
-							var va = textGeo.vertices[ face.a ].position;
-							var vb = textGeo.vertices[ face.b ].position;
-							var vc = textGeo.vertices[ face.c ].position;
+							var va = textGeo.vertices[ face.a ];
+							var vb = textGeo.vertices[ face.b ];
+							var vc = textGeo.vertices[ face.c ];
 
 							var s = THREE.GeometryUtils.triangleArea( va, vb, vc );
 

@@ -76,7 +76,6 @@
 				// Plane
 
 				plane = new THREE.Mesh( new THREE.PlaneGeometry( 200, 200 ), new THREE.MeshBasicMaterial( { color: 0xe0e0e0 } ) );
-				plane.rotation.x = - 90 * ( Math.PI / 180 );
 				scene.add( plane );
 
 				renderer = new THREE.CanvasRenderer();
@@ -166,7 +165,7 @@
 
 			function render() {
 
-				plane.rotation.z = cube.rotation.y += ( targetRotation - cube.rotation.y ) * 0.05;
+				plane.rotation.y = cube.rotation.y += ( targetRotation - cube.rotation.y ) * 0.05;
 				renderer.render( scene, camera );
 
 			}

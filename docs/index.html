@@ -102,7 +102,7 @@
 		<div id="viewer"></div>
 
 		<script>
-			var REVISION = '48';
+			var REVISION = '49dev';
 
 			var panel = document.getElementById( 'panel' );
 			var viewer = document.getElementById( 'viewer' );
@@ -140,8 +140,7 @@
 					{ name: "UV", path: "core/UV" },
 					{ name: "Vector2", path: "core/Vector2" },
 					{ name: "Vector3", path: "core/Vector3" },
-					{ name: "Vector4", path: "core/Vector4" },
-					{ name: "Vertex", path: "core/Vertex" }
+					{ name: "Vector4", path: "core/Vector4" }
 				],
 
 				"Lights": [
@@ -346,12 +345,17 @@
 
 					if ( xhr.readyState == 4 && ( xhr.status == 200 || xhr.status == 0 ) ) {
 
+						// TODO: Set title.
+
 						var text = xhr.responseText;
 						
 						text = text.replace(/\[name\]/gi, name);
 						text = text.replace(/\[path\]/gi, path);
-						text = text.replace(/\[page:(\w+)\]/gi, "<a href=\"javascript:goTo('$1')\" title=\"$1\">$1</a>" );
-						text = text.replace(/\[page:(\w+) ([\w|\.]+)\]/gi, "<a href=\"javascript:goTo('$1')\" title=\"$1\">$2</a>" );
+						text = text.replace(/\[page:(\w+)\]/gi, "[page:$1 $1]" ); // [page:name] to [page:name title]
+						text = text.replace(/\[page:(\w+) ([\w|\.]+)\]/gi, "<a href=\"javascript:goTo('$1')\" title=\"$1\">$2</a>" ); // [page:name title]
+						text = text.replace(/\[link:([\w|\:|\/|\.|\-|\_]+)\]/gi, "[link:$1 $1]" ); // [link:url] to [link:url title]
+						text = text.replace(/\[link:([\w|\:|\/|\.|\-|\_]+) ([\w|\:|\/|\.|\-|\_]+)\]/gi, "<a href=\"$1\"  target=\"_blank\">$2</a>" ); // [link:url title]
+						text = text.replace(/\*([\w|\ |\-|\/|\+|\-|\(|\)|\=|\,|\.]+)\*/gi, "<strong>$1</strong>" ); // *
 
 						viewer.innerHTML = '<br>' + text + '<br><br>';
 

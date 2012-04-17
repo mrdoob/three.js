@@ -98,7 +98,7 @@
 
 				for ( i = 0; i < points.length; i ++ ) {
 
-					geometry.vertices.push( new THREE.Vertex( points[ i ] ) );
+					geometry.vertices.push( points[ i ] );
 
 					colors[ i ] = new THREE.Color( 0xffffff );
 					colors[ i ].setHSV( 0.6, ( 200 + points[ i ].x ) / 400, 1.0 );

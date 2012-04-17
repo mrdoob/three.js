@@ -103,7 +103,7 @@
 				var ambient = new THREE.AmbientLight( 0x444444 );
 				scene.add( ambient );
 
-				light = new THREE.SpotLight( 0xffffff );
+				light = new THREE.SpotLight( 0xffffff, 1, 0, Math.PI, 1 );
 				light.position.set( 0, 1500, 1000 );
 				light.target.position.set( 0, 0, 0 );
 
@@ -166,6 +166,7 @@
 				var hudMesh = new THREE.Mesh( hudGeo, hudMaterial );
 				hudMesh.position.x = ( SCREEN_WIDTH - SHADOW_MAP_WIDTH / 2 ) * -0.5;
 				hudMesh.position.y = ( SCREEN_HEIGHT - SHADOW_MAP_HEIGHT / 2 ) * -0.5;
+				hudMesh.rotation.x = Math.PI / 2;
 
 				sceneHUD = new THREE.Scene();
 				sceneHUD.add( hudMesh );
@@ -186,7 +187,6 @@
 				var ground = new THREE.Mesh( geometry, planeMaterial );
 
 				ground.position.set( 0, FLOOR, 0 );
-				ground.rotation.x = -Math.PI/2;
 				ground.scale.set( 100, 100, 100 );
 
 				ground.castShadow = false;

@@ -99,17 +99,18 @@ THREE.PerspectiveCamera.prototype.updateProjectionMatrix = function () {
 		var width = Math.abs( right - left );
 		var height = Math.abs( top - bottom );
 
-		this.projectionMatrix = THREE.Matrix4.makeFrustum(
+		this.projectionMatrix.makeFrustum(
 			left + this.x * width / this.fullWidth,
 			left + ( this.x + this.width ) * width / this.fullWidth,
 			top - ( this.y + this.height ) * height / this.fullHeight,
 			top - this.y * height / this.fullHeight,
 			this.near,
-			this.far );
+			this.far
+		);
 
 	} else {
 
-		this.projectionMatrix = THREE.Matrix4.makePerspective( this.fov, this.aspect, this.near, this.far );
+		this.projectionMatrix.makePerspective( this.fov, this.aspect, this.near, this.far );
 
 	}
 

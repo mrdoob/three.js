@@ -28,15 +28,15 @@ THREE.TorusGeometry = function ( radius, tube, segmentsR, segmentsT, arc ) {
 			center.x = this.radius * Math.cos( u );
 			center.y = this.radius * Math.sin( u );
 
-			var vector = new THREE.Vector3();
-			vector.x = ( this.radius + this.tube * Math.cos( v ) ) * Math.cos( u );
-			vector.y = ( this.radius + this.tube * Math.cos( v ) ) * Math.sin( u );
-			vector.z = this.tube * Math.sin( v );
+			var vertex = new THREE.Vector3();
+			vertex.x = ( this.radius + this.tube * Math.cos( v ) ) * Math.cos( u );
+			vertex.y = ( this.radius + this.tube * Math.cos( v ) ) * Math.sin( u );
+			vertex.z = this.tube * Math.sin( v );
 
-			this.vertices.push( new THREE.Vertex( vector ) );
+			this.vertices.push( vertex );
 
 			uvs.push( new THREE.UV( i / this.segmentsT, 1 - j / this.segmentsR ) );
-			normals.push( vector.clone().subSelf( center ).normalize() );
+			normals.push( vertex.clone().subSelf( center ).normalize() );
 
 		}
 	}

@@ -277,11 +277,11 @@
 				// Arc circle
 
 				var arcShape = new THREE.Shape();
-				arcShape.moveTo( 0, 0 );
+				arcShape.moveTo( 50, 10 );
 				arcShape.arc( 10, 10, 40, 0, Math.PI*2, false );
 
 				var holePath = new THREE.Path();
-				holePath.moveTo( 0, 0 );
+				holePath.moveTo( 20, 10 );
 				holePath.arc( 10, 10, 10, 0, Math.PI*2, true );
 				arcShape.holes.push( holePath );
 
@@ -293,16 +293,16 @@
 				// Smiley
 
 				var smileyShape = new THREE.Shape();
-				smileyShape.moveTo( 0, 0 );
+				smileyShape.moveTo( 80, 40 );
 				smileyShape.arc( 40, 40, 40, 0, Math.PI*2, false );
 
 				var smileyEye1Path = new THREE.Path();
-				smileyEye1Path.moveTo( 0, 0 );
+				smileyEye1Path.moveTo( 35, 20 );
 				smileyEye1Path.arc( 25, 20, 10, 0, Math.PI*2, true );
 				smileyShape.holes.push( smileyEye1Path );
 
 				var smileyEye2Path = new THREE.Path();
-				smileyEye2Path.moveTo( 0, 0 );
+				smileyEye2Path.moveTo( 65, 20 );
 				smileyEye2Path.arc( 55, 20, 10, 0, Math.PI*2, true );
 				smileyShape.holes.push( smileyEye2Path );
 
@@ -341,15 +341,17 @@
 
 				//splineShape.debug( document.getElementById("debug") );
 
-				var extrudePath = new THREE.Path();
+				// TODO 3d path?
+				
+				var apath = new THREE.SplineCurve3();
+				apath.points.push(new THREE.Vector3(-50, 150, 10));
+				apath.points.push(new THREE.Vector3(-20, 180, 20));
+				apath.points.push(new THREE.Vector3(40, 220, 50));
+				apath.points.push(new THREE.Vector3(200, 290, 100));
 
-				extrudePath.moveTo( 0, 0 );
-				extrudePath.lineTo( 10, 10 );
-				extrudePath.quadraticCurveTo( 80, 60, 160, 10 );
-				extrudePath.quadraticCurveTo( 240, -40, 320, 10 );
-
-				extrudeSettings.extrudePath = extrudePath;
+				extrudeSettings.extrudePath = apath;
 				extrudeSettings.bevelEnabled = false;
+				extrudeSettings.steps = 20;
 
 				var splineShape3d = splineShape.extrude( extrudeSettings );
 				var splinePoints = splineShape.createPointsGeometry( );

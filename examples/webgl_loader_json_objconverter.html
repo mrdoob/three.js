@@ -107,9 +107,7 @@
 
 				mesh = new THREE.Mesh( geometry, xm );
 				mesh.position.set( 0, FLOOR, 0 );
-				mesh.rotation.x = Math.PI/2;
 				mesh.scale.set( 10, 10, 10 );
-				mesh.doubleSided = true;
 				scene.add( mesh );
 
 				// SPHERES
@@ -216,6 +214,7 @@
 					mesh.position.x = i * (size + 5) - ( ( materials.length - 1 )* ( size + 5 )/2);
 					mesh.position.y = FLOOR + size/2 + bottom;
 					mesh.position.z = -100;
+					mesh.rotation.x = Math.PI / 2;
 					mesh.doubleSided = true;
 					scene.add( mesh );
 
@@ -237,6 +236,7 @@
 					mesh.position.x = i * ( size + 5 ) - ( ( materials.length - 1 )* ( size + 5 )/2);
 					mesh.position.y = FLOOR + size/2 + bottom;
 					mesh.position.z = -99;
+					mesh.rotation.x = Math.PI / 2;
 					mesh.doubleSided = true;
 					scene.add( mesh );
 

@@ -152,19 +152,16 @@
 
 					mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
 					mesh.position.y = - 250;
-					mesh.rotation.x = - 90 * Math.PI / 180;
 					scene.add( mesh );
 
 					mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
 					mesh.position.y = - 250;
 					mesh.position.x = - 400;
-					mesh.rotation.x = - 90 * Math.PI / 180;
 					scene.add( mesh );
 
 					mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
 					mesh.position.y = - 250;
 					mesh.position.x = 400;
-					mesh.rotation.x = - 90 * Math.PI / 180;
 					scene.add( mesh );
 
 					var faceIndices = [ 'a', 'b', 'c', 'd' ];
@@ -189,7 +186,7 @@
 
 							vertexIndex = f1[ faceIndices[ j ] ];
 
-							p = geometry1.vertices[ vertexIndex ].position;
+							p = geometry1.vertices[ vertexIndex ];
 
 							color = new THREE.Color( 0xffffff );
 							color.setHSV( ( p.y / radius + 1 ) / 2, 1.0, 1.0 );
@@ -233,7 +230,7 @@
 					group3.rotation.x = 0;
 					scene.add( group3 );
 
-					renderer = new THREE.WebGLRenderer( { antialias: true, clearColor: 0xffffff } );
+					renderer = new THREE.WebGLRenderer( { antialias: true } );
 					renderer.setSize( container.clientWidth, container.clientHeight );
 
 					container.appendChild( renderer.domElement );

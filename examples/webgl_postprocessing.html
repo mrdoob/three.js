@@ -112,22 +112,21 @@
 				//
 
 				var materialColor = new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( "textures/cube/SwedishRoyalCastle/pz.jpg" ), depthTest: false } );
-				var plane = new THREE.PlaneGeometry( 1, 1 );
 
-				quadBG = new THREE.Mesh( plane, materialColor );
+				quadBG = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), materialColor );
 				quadBG.position.z = -500;
-				quadBG.scale.set( window.innerWidth, window.innerHeight, 1 );
+				quadBG.rotation.x = Math.PI / 2;
+				quadBG.scale.set( window.innerWidth, 1, window.innerHeight );
 				sceneBG.add( quadBG );
 
 				//
 
 				var sceneMask = new THREE.Scene();
 
-				var plane = new THREE.PlaneGeometry( 1, 1 );
-
-				quadMask = new THREE.Mesh( plane, new THREE.MeshBasicMaterial( { color: 0xffaa00 } )  );
+				quadMask = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), new THREE.MeshBasicMaterial( { color: 0xffaa00 } )  );
 				quadMask.position.z = -300;
-				quadMask.scale.set( window.innerWidth / 2, window.innerHeight/2, 1 );
+				quadMask.rotation.x = Math.PI / 2;
+				quadMask.scale.set( window.innerWidth / 2, 1, window.innerHeight / 2 );
 				sceneMask.add( quadMask );
 
 				//
@@ -310,8 +309,8 @@
 
 				renderScene.uniforms[ "tDiffuse" ].texture = composerScene.renderTarget2;
 
-				quadBG.scale.set( window.innerWidth, window.innerHeight, 1 );
-				quadMask.scale.set( window.innerWidth / 2, window.innerHeight / 2, 1 );
+				quadBG.scale.set( window.innerWidth, 1, window.innerHeight );
+				quadMask.scale.set( window.innerWidth / 2, 1, window.innerHeight / 2 );
 
 			}
 

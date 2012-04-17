@@ -102,8 +102,8 @@
 
 				// CAMERA
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.z = 900;
+				camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.z = 1200;
 				scene.add( camera );
 
 				// LIGHTS
@@ -122,7 +122,7 @@
 
 				// material parameters
 
-				var ambient = 0x111111, diffuse = 0xbbbbbb, specular = 0x171717, shininess = 50;
+				var ambient = 0x111111, diffuse = 0xbbbbbb, specular = 0x060606, shininess = 35;
 
 				var shader = THREE.ShaderUtils.lib[ "normal" ];
 				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
@@ -163,6 +163,7 @@
 
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
+				renderer.physicallyBasedShading = true;
 
 				//
 

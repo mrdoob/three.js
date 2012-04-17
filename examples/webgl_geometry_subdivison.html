@@ -23,6 +23,7 @@
 		<script src="../src/extras/geometries/CubeGeometry.js"></script>
 		<script src="../src/extras/geometries/CylinderGeometry.js"></script>
 		<script src="../src/extras/geometries/TorusGeometry.js"></script>
+		<script src="../src/extras/geometries/LatheGeometry.js"></script>
 		<script src="../src/extras/modifiers/SubdivisionModifier.js"></script>
 
 		<script src="fonts/helvetiker_regular.typeface.js"></script>
@@ -185,10 +186,10 @@
 
 				info.innerHTML = 'Drag to spin THREE.' + params.type +
 
-				 	'<br/><br/>Subdivisions: '  + subdivisions +
+				 	'<br><br>Subdivisions: '  + subdivisions +
 					' <a href="#" onclick="nextSubdivision(1); return false;">more</a>/<a href="#" onclick="nextSubdivision(-1); return false;">less</a>' +
 					'<br>Geometry: ' + dropdown + ' <a href="#" onclick="nextGeometry();return false;">next</a>' +
-					'<br/><br>Vertices count: before ' + geometry.vertices.length + ' after ' + smooth.vertices.length +
+					'<br><br>Vertices count: before ' + geometry.vertices.length + ' after ' + smooth.vertices.length +
 					'<br>Face count: before ' + geometry.faces.length + ' after ' + smooth.faces.length
 				; //+ params.args;
 			}
@@ -214,7 +215,7 @@
 
 				if ( params.scale ) {
 
-					geometry.applyMatrix( new THREE.Matrix4().setScale( params.scale, params.scale, params.scale ) );
+					geometry.applyMatrix( new THREE.Matrix4().makeScale( params.scale, params.scale, params.scale ) );
 
 				}
 
@@ -224,6 +225,11 @@
 
 				// mergeVertices(); is run in case of duplicated vertices
 				smooth.mergeVertices();
+				
+				smooth.computeCentroids();
+				smooth.computeFaceNormals();
+				smooth.computeVertexNormals();
+				
 				modifier.modify( smooth );
 
 				updateInfo();
@@ -242,7 +248,7 @@
 
 						vertexIndex = f[ faceABCD.charAt( j ) ];
 
-						p = smooth.vertices[ vertexIndex ].position;
+						p = smooth.vertices[ vertexIndex ];
 
 						color = new THREE.Color( 0xffffff );
 						color.setHSV( ( p.y ) / 200 + 0.5, 1.0, 1.0 );
@@ -278,7 +284,7 @@
 					for ( var i = 0; i < smooth.vertices.length; i++ ) {
 
 						particle = new THREE.Particle( new THREE.ParticleCanvasMaterial( { color: Math.random() * 0x808008 + 0x808080, program: program } ) );
-						particle.position = smooth.vertices[i].position;
+						particle.position = smooth.vertices[ i ];
 						var pos = smooth.vertices.position
 						particle.scale.x = particle.scale.y = 5;
 						group.add( particle );
@@ -307,7 +313,7 @@
 					for ( var i = 0; i < geometry.vertices.length; i++ ) {
 
 						particle = new THREE.Particle( new THREE.ParticleCanvasMaterial( { color: Math.random() * 0x808008 + 0x808080, program: drawText(i) } ) );
-						particle.position = smooth.vertices[i].position;
+						particle.position = smooth.vertices[ i ];
 						var pos = geometry.vertices.position
 						particle.scale.x = particle.scale.y = 30;
 						group.add( particle );
@@ -359,7 +365,7 @@
 
 				addStuff();
 
-				renderer = new THREE.WebGLRenderer( { antialias: true, clearColor: 0xf0f0f0 } ); // WebGLRenderer CanvasRenderer
+				renderer = new THREE.WebGLRenderer( { antialias: true } ); // WebGLRenderer CanvasRenderer
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.appendChild( renderer.domElement );

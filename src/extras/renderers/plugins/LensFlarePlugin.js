@@ -164,7 +164,7 @@ THREE.LensFlarePlugin = function ( ) {
 
 			flare = flares[ i ];
 
-			tempPosition.set( flare.matrixWorld.n14, flare.matrixWorld.n24, flare.matrixWorld.n34 );
+			tempPosition.set( flare.matrixWorld.elements[12], flare.matrixWorld.elements[13], flare.matrixWorld.elements[14] );
 
 			camera.matrixWorldInverse.multiplyVector3( tempPosition );
 			camera.projectionMatrix.multiplyVector3( tempPosition );
@@ -261,7 +261,7 @@ THREE.LensFlarePlugin = function ( ) {
 						_gl.uniform1f( uniforms.opacity, sprite.opacity );
 						_gl.uniform3f( uniforms.color, sprite.color.r, sprite.color.g, sprite.color.b );
 
-						_renderer.setBlending( sprite.blending );
+						_renderer.setBlending( sprite.blending, sprite.blendEquation, sprite.blendSrc, sprite.blendDst );
 						_renderer.setTexture( sprite.texture, 1 );
 
 						_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );

@@ -32,7 +32,7 @@
 	</head>
 	<body>
 
-        <div id="info">
+		<div id="info">
 			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl particles example
 		</div>
 
@@ -71,8 +71,12 @@
 
 				for ( i = 0; i < 20000; i ++ ) {
 
-					vector = new THREE.Vector3( Math.random() * 2000 - 1000, Math.random() * 2000 - 1000, Math.random() * 2000 - 1000 );
-					geometry.vertices.push( new THREE.Vertex( vector ) );
+					var vertex = new THREE.Vector3();
+					vertex.x = Math.random() * 2000 - 1000;
+					vertex.y = Math.random() * 2000 - 1000;
+					vertex.z = Math.random() * 2000 - 1000;
+
+					geometry.vertices.push( vertex );
 
 				}
 

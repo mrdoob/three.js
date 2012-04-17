@@ -21,7 +21,7 @@
 				top: 0px; width: 100%;
 				padding: 5px;
 			}
-                </style>
+		</style>
 	</head>
 	<body>
 
@@ -428,7 +428,7 @@
 					bird.rotation.z = Math.asin( boid.velocity.y / boid.velocity.length() );
 
 					bird.phase = ( bird.phase + ( Math.max( 0, bird.rotation.z ) + 0.1 )  ) % 62.83;
-					bird.geometry.vertices[ 5 ].position.y = bird.geometry.vertices[ 4 ].position.y = Math.sin( bird.phase ) * 5;
+					bird.geometry.vertices[ 5 ].y = bird.geometry.vertices[ 4 ].y = Math.sin( bird.phase ) * 5;
 
 				}
 

@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - materials - shaders [Monjori]</title>
+		<title>three.js webgl - shader [Monjori]</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -126,9 +126,10 @@
 					vertexShader: document.getElementById( 'vertexShader' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentShader' ).textContent
 
-					} );
+				} );
 
 				mesh = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), material );
+				mesh.geometry.applyMatrix( new THREE.Matrix4().makeRotationX( Math.PI / 2 ) );
 				scene.add( mesh );
 
 				renderer = new THREE.WebGLRenderer();

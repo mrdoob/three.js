@@ -596,9 +596,8 @@
 
 				var timer = -0.0002 * Date.now();
 
-				camera.position.y += ( - mouseY - camera.position.y ) * .05;
-
 				camera.position.x = 1000 * Math.cos( timer );
+				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 				camera.position.z = 1000 * Math.sin( timer );
 
 				camera.lookAt( scene.position );

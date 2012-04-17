@@ -437,7 +437,7 @@ THREE.ColladaLoader = function () {
 
 			for ( var i = 0; i < geometry.vertices.length; i ++ ) {
 
-				skin.bindShapeMatrix.multiplyVector3( geometry.vertices[ i ].position );
+				skin.bindShapeMatrix.multiplyVector3( geometry.vertices[ i ] );
 
 			}
 
@@ -568,7 +568,7 @@ THREE.ColladaLoader = function () {
 
 		for ( i = 0; i < geometry.vertices.length; i ++ ) {
 
-			skinController.skin.bindShapeMatrix.multiplyVector3( geometry.vertices[i].position );
+			skinController.skin.bindShapeMatrix.multiplyVector3( geometry.vertices[i] );
 
 		}
 
@@ -583,7 +583,7 @@ THREE.ColladaLoader = function () {
 
 			for ( i = 0; i < geometry.vertices.length; i++ ) {
 
-				skinned.push( new THREE.Vertex( new THREE.Vector3() ) );
+				skinned.push( new THREE.Vector3() );
 
 			}
 
@@ -608,15 +608,15 @@ THREE.ColladaLoader = function () {
 					o = geometry.vertices[vidx];
 					s = skinned[vidx];
 
-					v.x = o.position.x;
-					v.y = o.position.y;
-					v.z = o.position.z;
+					v.x = o.x;
+					v.y = o.y;
+					v.z = o.z;
 
 					bones[i].skinningMatrix.multiplyVector3(v);
 
-					s.position.x += (v.x * weight);
-					s.position.y += (v.y * weight);
-					s.position.z += (v.z * weight);
+					s.x += (v.x * weight);
+					s.y += (v.y * weight);
+					s.z += (v.z * weight);
 
 				}
 
@@ -1003,10 +1003,26 @@ THREE.ColladaLoader = function () {
 
 				var channel = node.channels[i],
 					fullSid = channel.fullSid,
-					member = getConvertedMember( channel.member ),
 					sampler = channel.sampler,
 					input = sampler.input,
-					transform = node.getTransformBySid( channel.sid );
+					transform = node.getTransformBySid( channel.sid ),
+					member;
+
+				if ( channel.arrIndices ) {
+
+					member = [];
+
+					for ( var j = 0, jl = channel.arrIndices.length; j < jl; j++ ) {
+
+						member[ j ] = getConvertedIndex( channel.arrIndices[ j ] );
+
+					}
+
+				} else {
+
+					member = getConvertedMember( channel.member );
+
+				}
 
 				if ( transform ) {
 
@@ -1125,7 +1141,11 @@ THREE.ColladaLoader = function () {
 				prevData = prevTarget.data,
 				data;
 
-			if ( prevData.length ) {
+			if ( prevTarget.type === 'matrix' ) {
+
+				data = prevData;
+
+			} else if ( prevData.length ) {
 
 				data = [];
 
@@ -1927,15 +1947,79 @@ THREE.ColladaLoader = function () {
 
 	Transform.prototype.update = function ( data, member ) {
 
+		var members = [ 'X', 'Y', 'Z', 'ANGLE' ];
+
 		switch ( this.type ) {
 
 			case 'matrix':
 
-				console.log( 'Currently not handling matrix transform updates' );
+				if ( ! member ) {
+
+					this.obj.copy( data );
+
+				} else if ( member.length === 1 ) {
+
+					switch ( member[ 0 ] ) {
+
+						case 0:
+
+							this.obj.n11 = data[ 0 ];
+							this.obj.n21 = data[ 1 ];
+							this.obj.n31 = data[ 2 ];
+							this.obj.n41 = data[ 3 ];
+
+							break;
+
+						case 1:
+
+							this.obj.n12 = data[ 0 ];
+							this.obj.n22 = data[ 1 ];
+							this.obj.n32 = data[ 2 ];
+							this.obj.n42 = data[ 3 ];
+
+							break;
+
+						case 2:
+
+							this.obj.n13 = data[ 0 ];
+							this.obj.n23 = data[ 1 ];
+							this.obj.n33 = data[ 2 ];
+							this.obj.n43 = data[ 3 ];
+
+							break;
+
+						case 3:
+
+							this.obj.n14 = data[ 0 ];
+							this.obj.n24 = data[ 1 ];
+							this.obj.n34 = data[ 2 ];
+							this.obj.n44 = data[ 3 ];
+
+							break;
+
+					}
+
+				} else if ( member.length === 2 ) {
+
+					var propName = 'n' + ( member[ 0 ] + 1 ) + ( member[ 1 ] + 1 );
+					this.obj[ propName ] = data;
+					
+				} else {
+
+					console.log('Incorrect addressing of matrix in transform.');
+
+				}
+
 				break;
 
 			case 'translate':
 			case 'scale':
+
+				if ( Object.prototype.toString.call( member ) === '[object Array]' ) {
+
+					member = members[ member[ 0 ] ];
+
+				}
 
 				switch ( member ) {
 
@@ -1966,6 +2050,12 @@ THREE.ColladaLoader = function () {
 				break;
 
 			case 'rotate':
+
+				if ( Object.prototype.toString.call( member ) === '[object Array]' ) {
+
+					member = members[ member[ 0 ] ];
+
+				}
 
 				switch ( member ) {
 
@@ -2195,7 +2285,8 @@ THREE.ColladaLoader = function () {
 
 				case 'polygons':
 
-					console.warn( 'polygon holes not yet supported!' );
+					this.primitives.push( ( new Polygons().parse( child ) ) );
+					break;
 
 				case 'polylist':
 
@@ -2215,8 +2306,7 @@ THREE.ColladaLoader = function () {
 
 		for ( i = 0; i < vertexData.length; i += 3 ) {
 
-			var v = new THREE.Vertex( getConvertedVec3( vertexData, i ) );
-			this.geometry3js.vertices.push( v );
+			this.geometry3js.vertices.push( getConvertedVec3( vertexData, i ).clone() );
 
 		}
 
@@ -2246,7 +2336,7 @@ THREE.ColladaLoader = function () {
 
 	Mesh.prototype.handlePrimitive = function( primitive, geom ) {
 
-		var i = 0, j, k, p = primitive.p, inputs = primitive.inputs;
+		var j, k, pList = primitive.p, inputs = primitive.inputs;
 		var input, index, idx32;
 		var source, numParams;
 		var vcIndex = 0, vcount = 3, maxOffset = 0;
@@ -2268,177 +2358,176 @@ THREE.ColladaLoader = function () {
 
 		}
 
-		while ( i < p.length ) {
+		for ( var pCount = 0; pCount < pList.length; ++pCount ) {
 
-			var vs = [];
-			var ns = [];
-			var ts = {};
-			var cs = [];
+			var p = pList[pCount], i = 0;
 
-			if ( primitive.vcount ) {
+			while ( i < p.length ) {
 
-				vcount = primitive.vcount[ vcIndex ++ ];
+				var vs = [];
+				var ns = [];
+				var ts = {};
+				var cs = [];
 
-			}
+				if ( primitive.vcount ) {
 
-			for ( j = 0; j < vcount; j ++ ) {
+					vcount = primitive.vcount.length ? primitive.vcount[ vcIndex ++ ] : primitive.vcount;
 
-				for ( k = 0; k < inputs.length; k ++ ) {
+				} else {
 
-					input = inputs[ k ];
-					source = sources[ input.source ];
-
-					index = p[ i + ( j * maxOffset ) + input.offset ];
-					numParams = source.accessor.params.length;
-					idx32 = index * numParams;
-
-					switch ( input.semantic ) {
-
-						case 'VERTEX':
-
-							vs.push( index );
-
-							break;
-
-						case 'NORMAL':
-
-							ns.push( getConvertedVec3( source.data, idx32 ) );
-
-							break;
-
-						case 'TEXCOORD':
-
-							if ( ts[ input.set ] === undefined ) ts[ input.set ] = [];
-							// invert the V
-							ts[ input.set ].push( new THREE.UV( source.data[ idx32 ], 1.0 - source.data[ idx32 + 1 ] ) );
-
-							break;
-
-						case 'COLOR':
-
-							cs.push( new THREE.Color().setRGB( source.data[ idx32 ], source.data[ idx32 + 1 ], source.data[ idx32 + 2 ] ) );
-
-							break;
-
-						default:
-							break;
-
-					}
+					vcount = p.length / maxOffset;
 
 				}
 
-			}
 
+				for ( j = 0; j < vcount; j ++ ) {
 
-			var face = null, faces = [], uv, uvArr;
+					for ( k = 0; k < inputs.length; k ++ ) {
 
-			if ( ns.length == 0 ) {
-				
-				// check the vertices source
-				input = this.vertices.input.NORMAL;
+						input = inputs[ k ];
+						source = sources[ input.source ];
 
-				if ( input ) {
+						index = p[ i + ( j * maxOffset ) + input.offset ];
+						numParams = source.accessor.params.length;
+						idx32 = index * numParams;
 
-					source = sources[ input.source ];
-					numParams = source.accessor.params.length;
+						switch ( input.semantic ) {
 
-					for ( var ndx = 0, len = vs.length; ndx < len; ndx++ ) {
+							case 'VERTEX':
 
-						ns.push( getConvertedVec3( source.data, vs[ ndx ] * numParams ) );
+								vs.push( index );
 
-					}
+								break;
 
-				}
-				else {
-					
-					geom.calcNormals = true;
-					
-				}
+							case 'NORMAL':
 
-			}
+								ns.push( getConvertedVec3( source.data, idx32 ) );
 
-			if ( vcount === 3 ) {
+								break;
 
-				faces.push( new THREE.Face3( vs[0], vs[1], vs[2], ns, cs.length ? cs : new THREE.Color() ) );
+							case 'TEXCOORD':
 
-			} else if ( vcount === 4 ) {
-				
-				faces.push( new THREE.Face4( vs[0], vs[1], vs[2], vs[3], ns, cs.length ? cs : new THREE.Color() ) );
+								if ( ts[ input.set ] === undefined ) ts[ input.set ] = [];
+								// invert the V
+								ts[ input.set ].push( new THREE.UV( source.data[ idx32 ], 1.0 - source.data[ idx32 + 1 ] ) );
 
-			} else if ( vcount > 4 && options.subdivideFaces ) {
+								break;
 
-				var clr = cs.length ? cs : new THREE.Color(),
-					vec1, vec2, vec3, v1, v2, norm;
+							case 'COLOR':
 
-				// subdivide into multiple Face3s
-				for ( k = 1; k < vcount-1; ) {
+								cs.push( new THREE.Color().setRGB( source.data[ idx32 ], source.data[ idx32 + 1 ], source.data[ idx32 + 2 ] ) );
 
-					// FIXME: normals don't seem to be quite right
-					faces.push( new THREE.Face3( vs[0], vs[k], vs[k+1], [ ns[0], ns[k++], ns[k] ],  clr ) );
+								break;
 
-				}
-
-			}
-
-			if ( faces.length ) {
-
-				for (var ndx = 0, len = faces.length; ndx < len; ndx++) {
-
-					face = faces[ndx];
-					face.daeMaterial = primitive.material;
-					geom.faces.push( face );
-
-					for ( k = 0; k < texture_sets.length; k++ ) {
-
-						uv = ts[ texture_sets[k] ];
-
-						if ( vcount > 4 ) {
-
-							// Grab the right UVs for the vertices in this face
-							uvArr = [ uv[0], uv[ndx+1], uv[ndx+2] ];
-
-						} else if ( vcount === 4 ) {
-
-							uvArr = [ uv[0], uv[1], uv[2], uv[3] ];
-
-						} else {
-
-							uvArr = [ uv[0], uv[1], uv[2] ];
+							default:
+								break;
 
 						}
 
-						if ( !geom.faceVertexUvs[k] ) {
+					}
 
-							geom.faceVertexUvs[k] = [];
+				}
+
+
+				var face = null, faces = [], uv, uvArr;
+
+				if ( ns.length == 0 ) {
+					// check the vertices source
+					input = this.vertices.input.NORMAL;
+
+					if ( input ) {
+
+						source = sources[ input.source ];
+						numParams = source.accessor.params.length;
+
+						for ( var ndx = 0, len = vs.length; ndx < len; ndx++ ) {
+
+							ns.push( getConvertedVec3( source.data, vs[ ndx ] * numParams ) );
 
 						}
 
-						geom.faceVertexUvs[k].push( uvArr );
+					}
+					else {
+						geom.calcNormals = true;
+					}
+
+				}
+
+				if ( vcount === 3 ) {
+
+					faces.push( new THREE.Face3( vs[0], vs[1], vs[2], ns, cs.length ? cs : new THREE.Color() ) );
+
+				} else if ( vcount === 4 ) {
+					faces.push( new THREE.Face4( vs[0], vs[1], vs[2], vs[3], ns, cs.length ? cs : new THREE.Color() ) );
+
+				} else if ( vcount > 4 && options.subdivideFaces ) {
+
+					var clr = cs.length ? cs : new THREE.Color(),
+						vec1, vec2, vec3, v1, v2, norm;
+
+					// subdivide into multiple Face3s
+					for ( k = 1; k < vcount-1; ) {
+
+						// FIXME: normals don't seem to be quite right
+						faces.push( new THREE.Face3( vs[0], vs[k], vs[k+1], [ ns[0], ns[k++], ns[k] ],  clr ) );
 
 					}
 
 				}
 
-			} else {
+				if ( faces.length ) {
 
-				console.log( 'dropped face with vcount ' + vcount + ' for geometry with id: ' + geom.id );
+					for (var ndx = 0, len = faces.length; ndx < len; ndx++) {
+
+						face = faces[ndx];
+						face.daeMaterial = primitive.material;
+						geom.faces.push( face );
+
+						for ( k = 0; k < texture_sets.length; k++ ) {
+
+							uv = ts[ texture_sets[k] ];
+
+							if ( vcount > 4 ) {
+
+								// Grab the right UVs for the vertices in this face
+								uvArr = [ uv[0], uv[ndx+1], uv[ndx+2] ];
+
+							} else if ( vcount === 4 ) {
+
+								uvArr = [ uv[0], uv[1], uv[2], uv[3] ];
+
+							} else {
+
+								uvArr = [ uv[0], uv[1], uv[2] ];
+
+							}
+
+							if ( !geom.faceVertexUvs[k] ) {
+
+								geom.faceVertexUvs[k] = [];
+
+							}
+
+							geom.faceVertexUvs[k].push( uvArr );
+
+						}
+
+					}
+
+				} else {
+
+					console.log( 'dropped face with vcount ' + vcount + ' for geometry with id: ' + geom.id );
+
+				}
+
+				i += maxOffset * vcount;
 
 			}
-
-			i += maxOffset * vcount;
-
 		}
 
 	};
 
-
-	function Polylist () {
-	};
-
-	Polylist.prototype = new Triangles();
-	Polylist.prototype.constructor = Polylist;
-
-	function Triangles( flip_uv ) {
+	function Polygons () {
 
 		this.material = "";
 		this.count = 0;
@@ -2449,7 +2538,7 @@ THREE.ColladaLoader = function () {
 
 	};
 
-	Triangles.prototype.setVertices = function ( vertices ) {
+	Polygons.prototype.setVertices = function ( vertices ) {
 
 		for ( var i = 0; i < this.inputs.length; i ++ ) {
 
@@ -2463,9 +2552,8 @@ THREE.ColladaLoader = function () {
 
 	};
 
-	Triangles.prototype.parse = function ( element ) {
+	Polygons.prototype.parse = function ( element ) {
 
-		this.inputs = [];
 		this.material = element.getAttribute( 'material' );
 		this.count = _attr_as_int( element, 'count', 0 );
 
@@ -2487,7 +2575,12 @@ THREE.ColladaLoader = function () {
 
 				case 'p':
 
-					this.p = _ints( child.textContent );
+					this.p.push( _ints( child.textContent ) );
+					break;
+
+				case 'ph':
+
+					console.warn( 'polygon holes not yet supported!' );
 					break;
 
 				default:
@@ -2500,6 +2593,28 @@ THREE.ColladaLoader = function () {
 		return this;
 
 	};
+
+	function Polylist () {
+
+		Polygons.call( this );
+
+		this.vcount = [];
+
+	};
+
+	Polylist.prototype = new Polygons();
+	Polylist.prototype.constructor = Polylist;
+
+	function Triangles () {
+
+		Polygons.call( this );
+
+		this.vcount = 3;
+
+	};
+
+	Triangles.prototype = new Polygons();
+	Triangles.prototype.constructor = Triangles;
 
 	function Accessor() {
 
@@ -2929,19 +3044,22 @@ THREE.ColladaLoader = function () {
 										texture.repeat.y = cot.texOpts.repeatV;
 										props['map'] = texture;
 
+										// Texture with baked lighting?
+										if ( prop == 'emission' ) props[ 'emissive' ] = 0xffffff;
+
 									}
 
 								}
 
 							}
 
-						} else {
+						} else if ( prop == 'diffuse' || !transparent ) {
 
-							if ( prop == 'diffuse' ) {
+							if ( prop == 'emission' ) {
 
-								props[ 'color' ] = cot.color.getHex();
+								props[ 'emissive' ] = cot.color.getHex();
 
-							} else if ( !transparent ) {
+							} else {
 
 								props[ prop ] = cot.color.getHex();
 
@@ -2979,27 +3097,27 @@ THREE.ColladaLoader = function () {
 		}
 
 		props[ 'shading' ] = preferredShading;
-		this.material = new THREE.MeshLambertMaterial( props );
 
 		switch ( this.type ) {
 
 			case 'constant':
-			case 'lambert':
+
+				props.color = props.emission;
+				this.material = new THREE.MeshBasicMaterial( props );
 				break;
 
 			case 'phong':
 			case 'blinn':
 
+				props.color = props.diffuse;
+				this.material = new THREE.MeshPhongMaterial( props );
+				break;
+
+			case 'lambert':
 			default:
 
-				/*
-				if ( !transparent ) {
-
-				//	this.material = new THREE.MeshPhongMaterial(props);
-
-				}
-				*/
-
+				props.color = props.diffuse;
+				this.material = new THREE.MeshLambertMaterial( props );
 				break;
 
 		}
@@ -3226,6 +3344,12 @@ THREE.ColladaLoader = function () {
 					this.parseNewparam( child );
 					break;
 
+				case 'image':
+
+					var _image = ( new _Image() ).parse( child );
+					images[ _image.id ] = _image;
+					break;
+
 				case 'extra':
 					break;
 
@@ -3304,6 +3428,25 @@ THREE.ColladaLoader = function () {
 			if ( child.nodeType != 1 ) continue;
 
 			switch ( child.nodeName ) {
+
+				case 'animation':
+
+					var anim = ( new Animation() ).parse( child );
+
+					for ( var src in anim.source ) {
+
+						this.source[ src ] = anim.source[ src ];
+
+					}
+
+					for ( var j = 0; j < anim.channel.length; j ++ ) {
+
+						this.channel.push( anim.channel[ j ] );
+						this.sampler.push( anim.sampler[ j ] );
+
+					}
+
+					break;
 
 				case 'source':
 
@@ -3503,7 +3646,11 @@ THREE.ColladaLoader = function () {
 
 		var data;
 
-		if ( this.strideOut > 1 ) {
+		if ( type === 'matrix' && this.strideOut === 16 ) {
+
+			data = this.output[ ndx ];
+
+		} else if ( this.strideOut > 1 ) {
 
 			data = [];
 			ndx *= this.strideOut;
@@ -3530,6 +3677,10 @@ THREE.ColladaLoader = function () {
 						break;
 
 				}
+
+			} else if ( this.strideOut === 4 && type === 'matrix' ) {
+
+				fixCoords( data, -1 );
 
 			}
 
@@ -3618,7 +3769,7 @@ THREE.ColladaLoader = function () {
 				nextTarget = nextKey.getTarget( target.sid ),
 				data;
 
-			if ( nextTarget ) {
+			if ( target.transform.type !== 'matrix' && nextTarget ) {
 
 				var scale = ( time - this.time ) / ( nextKey.time - this.time ),
 					nextData = nextTarget.data,
@@ -3665,6 +3816,7 @@ THREE.ColladaLoader = function () {
 
 		this.id = "";
 		this.name = "";
+		this.technique = "";
 
 	};
 
@@ -3706,7 +3858,9 @@ THREE.ColladaLoader = function () {
 
 				for ( var j = 0; j < technique.childNodes.length; j ++ ) {
 
-					if ( technique.childNodes[ j ].nodeName == 'perspective' ) {
+					this.technique = technique.childNodes[ j ].nodeName;
+
+					if ( this.technique == 'perspective' ) {
 
 						var perspective = technique.childNodes[ j ];
 
@@ -3716,14 +3870,47 @@ THREE.ColladaLoader = function () {
 
 							switch ( param.nodeName ) {
 
+								case 'yfov':
+									this.yfov = param.textContent;
+									break;
 								case 'xfov':
-									this.fov = param.textContent;
+									this.xfov = param.textContent;
 									break;
 								case 'znear':
-									this.znear = .4;//param.textContent;
+									this.znear = param.textContent;
 									break;
 								case 'zfar':
-									this.zfar = 1e15;//param.textContent;
+									this.zfar = param.textContent;
+									break;
+								case 'aspect_ratio':
+									this.aspect_ratio = param.textContent;
+									break;
+
+							}
+
+						}
+
+					} else if ( this.technique == 'orthographic' ) {
+
+						var orthographic = technique.childNodes[ j ];
+
+						for ( var k = 0; k < orthographic.childNodes.length; k ++ ) {
+
+							var param = orthographic.childNodes[ k ];
+
+							switch ( param.nodeName ) {
+
+								case 'xmag':
+									this.xmag = param.textContent;
+									break;
+								case 'ymag':
+									this.ymag = param.textContent;
+									break;
+								case 'znear':
+									this.znear = param.textContent;
+									break;
+								case 'zfar':
+									this.zfar = param.textContent;
 									break;
 								case 'aspect_ratio':
 									this.aspect_ratio = param.textContent;
@@ -4088,6 +4275,22 @@ THREE.ColladaLoader = function () {
 			data[12], data[13], data[14], data[15]
 			);
 
+	};
+
+	function getConvertedIndex( index ) {
+
+		if ( index > -1 && index < 3 ) {
+
+			var members = ['X', 'Y', 'Z'],
+				indices = { X: 0, Y: 1, Z: 2 };
+
+			index = getConvertedMember( members[ index ] );
+			index = indices[ index ];
+
+		}
+
+		return index;
+		
 	};
 
 	function getConvertedMember( member ) {

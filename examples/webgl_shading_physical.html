@@ -72,6 +72,8 @@
 
 			var mesh, geometry;
 
+			var cubeCamera;
+
 			var sunLight, pointLight, ambientLight;
 
 			var morph;
@@ -135,8 +137,8 @@
 
 				// CUBE CAMERA
 
-				cubeCamera = new THREE.CubeCamera( 1, FAR, 0, 128 );
-				var cubeTarget = cubeCamera.renderTarget;
+				cubeCamera = new THREE.CubeCamera( 1, FAR, 128 );
+				scene.add( cubeCamera );
 
 				// TEXTURES
 
@@ -196,7 +198,6 @@
 
 				var ground = new THREE.Mesh( planeGeometry, groundMaterial );
 				ground.position.set( 0, 0, 0 );
-				ground.rotation.x = -Math.PI/2;
 				ground.scale.set( 1000, 1000, 1000 );
 
 				ground.receiveShadow = true;
@@ -206,7 +207,7 @@
 				// MATERIALS
 
 				var shader = THREE.ShaderUtils.lib[ "cube" ];
-				shader.uniforms[ "tCube" ].texture = cubeTarget;
+				shader.uniforms[ "tCube" ].texture = cubeCamera.renderTarget;
 				shader.uniforms[ "tFlip" ].value = 1;
 
 				var materialCube = new THREE.ShaderMaterial( {
@@ -219,7 +220,7 @@
 
 				var materialLambert = new THREE.MeshPhongMaterial( { shininess: 50, ambient: 0x444444, color: 0xffffff, map: textureNoiseColor } );
 				var materialPhong = new THREE.MeshPhongMaterial( { shininess: 50, ambient: 0x444444, color: 0xffffff, specular: 0x999999, map: textureLava } );
-				var materialPhongCube = new THREE.MeshPhongMaterial( { shininess: 50, ambient: 0x444444, color: 0xffffff, specular: 0x999999, envMap: cubeTarget } );
+				var materialPhongCube = new THREE.MeshPhongMaterial( { shininess: 50, ambient: 0x444444, color: 0xffffff, specular: 0x999999, envMap: cubeCamera.renderTarget } );
 
 				// OBJECTS
 
@@ -287,10 +288,10 @@
 
 				loader.load( "models/animated/sittingBox.js", function( geometry ) {
 
-					var morphMaterial = new THREE.MeshPhongMaterial( { ambient: 0x222222, color: 0x000000, specular: 0xff9900, shininess: 50, morphTargets: true } );
+					var morphMaterial = new THREE.MeshPhongMaterial( { ambient: 0x000000, color: 0x000000, specular: 0xff9900, shininess: 50, morphTargets: true, morphNormals: true  } );
 					morphMaterial.shading = THREE.FlatShading;
 
-					//geometry.computeVertexNormals();
+					geometry.computeMorphNormals();
 					morph = new THREE.MorphAnimMesh( geometry, morphMaterial );
 
 					var s = 200;
@@ -301,6 +302,8 @@
 
 					morph.castShadow = true;
 					morph.receiveShadow = true;
+
+					morph.doubleSided = true;
 
 					scene.add( morph );
 
@@ -328,7 +331,7 @@
 				pointLight.position.set( 0, 0, 0 );
 				scene.add( pointLight );
 
-				sunLight = new THREE.SpotLight( 0xffffff, sunIntensity );
+				sunLight = new THREE.SpotLight( 0xffffff, sunIntensity, 0, Math.PI, 1 );
 				sunLight.position.set( 1000, 2000, 1000 );
 
 				sunLight.castShadow = true;
@@ -415,6 +418,7 @@
 
 				effectVignette.renderToScreen = true;
 				vblur.renderToScreen = true;
+				effectFXAA.renderToScreen = true;
 
 				composer = new THREE.EffectComposer( renderer, renderTarget );
 
@@ -422,8 +426,8 @@
 
 				composer.addPass( effectFXAA );
 
-				composer.addPass( hblur );
-				composer.addPass( vblur );
+				//composer.addPass( hblur );
+				//composer.addPass( vblur );
 
 				//composer.addPass( effectVignette );
 
@@ -509,23 +513,26 @@
 
 			function onKeyDown ( event ) {
 
-				switch( event.keyCode ) {
+				switch ( event.keyCode ) {
 
-					case 78: /*N*/   if ( tweenDirection == 1 ) {
+					case 78: /*N*/
 
-										tweenDay.stop();
-										tweenNight.start();
+						if ( tweenDirection == 1 ) {
 
-										tweenDirection = -1;
+							tweenDay.stop();
+							tweenNight.start();
 
-									} else {
+							tweenDirection = -1;
 
-										tweenNight.stop();
-										tweenDay.start();
+						} else {
 
-										tweenDirection = 1;
+							tweenNight.stop();
+							tweenDay.start();
 
-									}
+							tweenDirection = 1;
+
+						}
+
 					break;
 
 				}
@@ -576,7 +583,7 @@
 				mesh.visible = false;
 
 				renderer.autoClear = true;
-				cubeCamera.updatePosition( mesh.position );
+				cubeCamera.position.copy( mesh.position );
 				cubeCamera.updateCubeMap( renderer, scene );
 				renderer.autoClear = false;
 
