@@ -28,11 +28,12 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, segmentsRad
 
 			var u = x / segmentsX;
 
-			var xpos = radius * Math.sin( u * Math.PI * 2 );
-			var ypos = - v * height + heightHalf;
-			var zpos = radius * Math.cos( u * Math.PI * 2 );
+			var vertex = new THREE.Vector3();
+			vertex.x = radius * Math.sin( u * Math.PI * 2 );
+			vertex.y = - v * height + heightHalf;
+			vertex.z = radius * Math.cos( u * Math.PI * 2 );
 
-			this.vertices.push( new THREE.Vertex( new THREE.Vector3( xpos, ypos, zpos ) ) );
+			this.vertices.push( vertex );
 
 			verticesRow.push( this.vertices.length - 1 );
 			uvsRow.push( new THREE.UV( u, v ) );
@@ -55,10 +56,10 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, segmentsRad
 
 			// FIXME: These normals aren't right for cones.
 
-			var n1 = this.vertices[ v1 ].position.clone().setY( 0 ).normalize();
-			var n2 = this.vertices[ v2 ].position.clone().setY( 0 ).normalize();
-			var n3 = this.vertices[ v3 ].position.clone().setY( 0 ).normalize();
-			var n4 = this.vertices[ v4 ].position.clone().setY( 0 ).normalize();
+			var n1 = this.vertices[ v1 ].clone().setY( 0 ).normalize();
+			var n2 = this.vertices[ v2 ].clone().setY( 0 ).normalize();
+			var n3 = this.vertices[ v3 ].clone().setY( 0 ).normalize();
+			var n4 = this.vertices[ v4 ].clone().setY( 0 ).normalize();
 
 			var uv1 = uvs[ y ][ x ].clone();
 			var uv2 = uvs[ y + 1 ][ x ].clone();
@@ -76,7 +77,7 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, segmentsRad
 
 	if ( !openEnded && radiusTop > 0 ) {
 
-		this.vertices.push( new THREE.Vertex( new THREE.Vector3( 0, heightHalf, 0 ) ) );
+		this.vertices.push( new THREE.Vector3( 0, heightHalf, 0 ) );
 
 		for ( x = 0; x < segmentsX; x ++ ) {
 
@@ -103,7 +104,7 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, segmentsRad
 
 	if ( !openEnded && radiusBottom > 0 ) {
 
-		this.vertices.push( new THREE.Vertex( new THREE.Vector3( 0, - heightHalf, 0 ) ) );
+		this.vertices.push( new THREE.Vector3( 0, - heightHalf, 0 ) );
 
 		for ( x = 0; x < segmentsX; x ++ ) {
 

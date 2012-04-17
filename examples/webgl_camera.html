@@ -115,20 +115,20 @@
 
 				//
 
-				var x, y, z, geo = new THREE.Geometry();
+				var geometry = new THREE.Geometry();
 
 				for ( var i = 0; i < 10000; i ++ ) {
 
-					x = THREE.Math.randFloatSpread( 2000 );
-					y = THREE.Math.randFloatSpread( 2000 );
-					z = THREE.Math.randFloatSpread( 2000 );
+					var vertex = new THREE.Vector3();
+					vertex.x = THREE.Math.randFloatSpread( 2000 );
+					vertex.y = THREE.Math.randFloatSpread( 2000 );
+					vertex.z = THREE.Math.randFloatSpread( 2000 );
 
-					var p = new THREE.Vector3( x, y, z );
-					geo.vertices.push( new THREE.Vertex( p ) );
+					geometry.vertices.push( vertex );
 
 				}
 
-				var particles = new THREE.ParticleSystem( geo, new THREE.ParticleBasicMaterial( { color: 0x888888 } ) );
+				var particles = new THREE.ParticleSystem( geometry, new THREE.ParticleBasicMaterial( { color: 0x888888 } ) );
 				scene.add( particles );
 
 				//
@@ -224,7 +224,7 @@
 					cameraPerspective.far = mesh.position.length();
 					cameraPerspective.updateProjectionMatrix();
 
-					cameraPerspectiveHelper.update( cameraPerspective );
+					cameraPerspectiveHelper.update();
 					cameraPerspectiveHelper.lines.visible = true;
 
 					cameraOrthoHelper.lines.visible = false;
@@ -234,7 +234,7 @@
 					cameraOrtho.far = mesh.position.length();
 					cameraOrtho.updateProjectionMatrix();
 
-					cameraOrthoHelper.update( cameraOrtho );
+					cameraOrthoHelper.update();
 					cameraOrthoHelper.lines.visible = true;
 
 					cameraPerspectiveHelper.lines.visible = false;

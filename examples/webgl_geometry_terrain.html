@@ -84,7 +84,7 @@
 
 				for ( var i = 0, l = geometry.vertices.length; i < l; i ++ ) {
 
-					geometry.vertices[ i ].position.z = data[ i ] * 10;
+					geometry.vertices[ i ].y = data[ i ] * 10;
 
 				}
 
@@ -92,7 +92,6 @@
 				texture.needsUpdate = true;
 
 				mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { map: texture } ) );
-				mesh.rotation.x = - 90 * Math.PI / 180;
 				scene.add( mesh );
 
 				renderer = new THREE.WebGLRenderer();

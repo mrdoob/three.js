@@ -93,16 +93,16 @@
 
 					var geometry = new THREE.Geometry();
 
-					var vector = new THREE.Vector3( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 );
-					vector.normalize();
-					vector.multiplyScalar( 450 );
+					var vertex = new THREE.Vector3( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 );
+					vertex.normalize();
+					vertex.multiplyScalar( 450 );
 
-					geometry.vertices.push( new THREE.Vertex( vector ) );
+					geometry.vertices.push( vertex );
 
-					var vector2 = vector.clone();
-					vector2.multiplyScalar( Math.random() * 0.3 + 1 );
+					var vertex2 = vertex.clone();
+					vertex2.multiplyScalar( Math.random() * 0.3 + 1 );
 
-					geometry.vertices.push( new THREE.Vertex( vector2 ) );
+					geometry.vertices.push( vertex2 );
 
 					var line = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0xffffff, opacity: Math.random() } ) );
 					scene.add( line );

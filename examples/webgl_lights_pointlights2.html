@@ -131,7 +131,6 @@
 				// GROUND
 
 				var mesh = new THREE.Mesh( new THREE.PlaneGeometry( 800, 400, 2, 2 ), groundMaterial );
-				mesh.rotation.x = -1.57;
 				mesh.position.y = -5;
 				scene.add( mesh );
 
@@ -226,8 +225,6 @@
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
 				renderer.physicallyBasedShading = true;
-
-				renderer.sortObjects = false;
 
 				// STATS
 

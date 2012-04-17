@@ -73,6 +73,8 @@ THREE.CameraHelper = function ( camera ) {
 	addLine( "cf1", "cf2", hexCross );
 	addLine( "cf3", "cf4", hexCross );
 
+	this.camera = camera;
+
 	function addLine( a, b, hex ) {
 
 		addPoint( a, hex );
@@ -82,7 +84,7 @@ THREE.CameraHelper = function ( camera ) {
 
 	function addPoint( id, hex ) {
 
-		_this.lineGeometry.vertices.push( new THREE.Vertex( new THREE.Vector3() ) );
+		_this.lineGeometry.vertices.push( new THREE.Vector3() );
 		_this.lineGeometry.colors.push( new THREE.Color( hex ) );
 
 		if ( _this.pointMap[ id ] === undefined ) _this.pointMap[ id ] = [];
@@ -100,7 +102,9 @@ THREE.CameraHelper = function ( camera ) {
 THREE.CameraHelper.prototype = new THREE.Object3D();
 THREE.CameraHelper.prototype.constructor = THREE.CameraHelper;
 
-THREE.CameraHelper.prototype.update = function ( camera ) {
+THREE.CameraHelper.prototype.update = function () {
+
+	var camera = this.camera;
 
 	var w = 1;
 	var h = 1;
@@ -161,7 +165,7 @@ THREE.CameraHelper.prototype.update = function ( camera ) {
 			for ( var i = 0, il = points.length; i < il; i ++ ) {
 
 				var j = points[ i ];
-				_this.lineGeometry.vertices[ j ].position.copy( THREE.CameraHelper.__v );
+				_this.lineGeometry.vertices[ j ].copy( THREE.CameraHelper.__v );
 
 			}
 
@@ -169,7 +173,7 @@ THREE.CameraHelper.prototype.update = function ( camera ) {
 
 	}
 
-	this.lineGeometry.__dirtyVertices = true;
+	this.lineGeometry.verticesNeedUpdate = true;
 
 };
 

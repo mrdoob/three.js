@@ -185,7 +185,7 @@ THREE.CurvePath.prototype.getBoundingBox = function () {
 
 THREE.CurvePath.prototype.createPointsGeometry = function( divisions ) {
 
-    var pts = this.getPoints( divisions, true );
+	var pts = this.getPoints( divisions, true );
 	return this.createGeometry( pts );
 
 };
@@ -194,7 +194,7 @@ THREE.CurvePath.prototype.createPointsGeometry = function( divisions ) {
 
 THREE.CurvePath.prototype.createSpacedPointsGeometry = function( divisions ) {
 
-    var pts = this.getSpacedPoints( divisions, true );
+	var pts = this.getSpacedPoints( divisions, true );
 	return this.createGeometry( pts );
 
 };
@@ -203,13 +203,13 @@ THREE.CurvePath.prototype.createGeometry = function( points ) {
 
 	var geometry = new THREE.Geometry();
 
-    for( var i = 0; i < points.length; i ++ ) {
+	for ( var i = 0; i < points.length; i ++ ) {
 
-        geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( points[ i ].x, points[ i ].y, 0 ) ) );
+		geometry.vertices.push( new THREE.Vector3( points[ i ].x, points[ i ].y, 0 ) );
 
-    }
+	}
 
-    return geometry;
+	return geometry;
 
 };
 

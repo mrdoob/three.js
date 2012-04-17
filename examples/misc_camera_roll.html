@@ -62,7 +62,7 @@
 				// scene and camera
 
 				scene = new THREE.Scene();
-				scene.fog = new THREE.FogExp2( 0xffffff, 0.002 );
+				scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
 
@@ -102,14 +102,14 @@
 				light.position.set( -1, -1, -1 );
 				scene.add( light );
 
-				light = new THREE.AmbientLight( 0x222222 );
+				light = new THREE.AmbientLight( 0x555555 );
 				scene.add( light );
 
 
 				// renderer
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
-				renderer.setClearColorHex( 0xffffff, 1 );
+				renderer.setClearColor( scene.fog.color, 1 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container = document.getElementById( 'container' );

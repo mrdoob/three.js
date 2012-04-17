@@ -29,6 +29,7 @@ THREE.SubdivisionModifier = function( subdivisions ) {
 	// Settings
 	this.useOldVertexColors = false;
 	this.supportUVs = true;
+	this.debug = false;
 	
 };
 
@@ -50,18 +51,27 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 // Performs an iteration of Catmull-Clark Subdivision
 THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 	
-	//console.log( 'running smooth' );
+	//debug( 'running smooth' );
 	
 	// New set of vertices, faces and uvs
 	var newVertices = [], newFaces = [], newUVs = [];
 	
 	function v( x, y, z ) {
-		newVertices.push( new THREE.Vertex( new THREE.Vector3( x, y, z ) ) );
+		newVertices.push( new THREE.Vector3( x, y, z ) );
 	}
 	
 	var scope = this;
 
-	function f4( a, b, c, d, oldFace, orders ) {
+	function debug() {
+		if (scope.debug) console.log.apply(console, arguments);
+	}
+
+	function warn() {
+		if (console)
+		console.log.apply(console, arguments);
+	}
+
+	function f4( a, b, c, d, oldFace, orders, facei ) {
 		
 		// TODO move vertex selection over here!
 		
@@ -96,15 +106,23 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 		}
 		
 		newFaces.push( newFace );
-		
-		if (!scope.supportUVs || uvForVertices.length!=0) {
-			newUVs.push( [
-				uvForVertices[a],
-				uvForVertices[b],
-				uvForVertices[c],
-				uvForVertices[d]
-			] );
+
+		if (scope.supportUVs) {
+
+			var aUv = [
+				getUV(a, ''),
+				getUV(b, facei),
+				getUV(c, facei),
+				getUV(d, facei)
+			];
 			
+			if (!aUv[0]) debug('a :( ', a+':'+facei);
+			else if (!aUv[1]) debug('b :( ', b+':'+facei);
+			else if (!aUv[2]) debug('c :( ', c+':'+facei);
+			else if (!aUv[3]) debug('d :( ', d+':'+facei);
+			else 
+				newUVs.push( aUv );
+
 		}
 	}
 	
@@ -112,27 +130,27 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 
 		return Math.min( a, b ) + "_" + Math.max( a, b );
 
-	};
+	}
 	
 	function computeEdgeFaces( geometry ) {
-
-		function addToMap( map, hash, i ) {
-
-			if ( map[ hash ] === undefined ) {
-
-				map[ hash ] = [];
-				
-			} 
-			
-			map[ hash ].push( i );
-
-		};
 
 		var i, il, v1, v2, j, k,
 			face, faceIndices, faceIndex,
 			edge,
 			hash,
-			vfMap = {};
+			edgeFaceMap = {};
+
+		function mapEdgeHash( hash, i ) {
+			
+			if ( edgeFaceMap[ hash ] === undefined ) {
+
+				edgeFaceMap[ hash ] = [];
+				
+			}
+			
+			edgeFaceMap[ hash ].push( i );
+		}
+
 
 		// construct vertex -> face map
 
@@ -143,27 +161,27 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 			if ( face instanceof THREE.Face3 ) {
 
 				hash = edge_hash( face.a, face.b );
-				addToMap( vfMap, hash, i );
+				mapEdgeHash( hash, i );
 
 				hash = edge_hash( face.b, face.c );
-				addToMap( vfMap, hash, i );
+				mapEdgeHash( hash, i );
 
 				hash = edge_hash( face.c, face.a );
-				addToMap( vfMap, hash, i );
+				mapEdgeHash( hash, i );
 
 			} else if ( face instanceof THREE.Face4 ) {
 
 				hash = edge_hash( face.a, face.b );
-				addToMap( vfMap, hash, i );
+				mapEdgeHash( hash, i );
 
 				hash = edge_hash( face.b, face.c );
-				addToMap( vfMap, hash, i );
+				mapEdgeHash( hash, i );
 
 				hash = edge_hash( face.c, face.d );
-				addToMap( vfMap, hash, i );
+				mapEdgeHash( hash, i );
 				
 				hash = edge_hash( face.d, face.a );
-				addToMap( vfMap, hash, i );
+				mapEdgeHash( hash, i );
 
 			}
 
@@ -174,19 +192,19 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 		// var edges = [];
 		// 
 		// var numOfEdges = 0;
-		// for (i in vfMap) {
+		// for (i in edgeFaceMap) {
 		// 	numOfEdges++;
 		// 	
-		// 	edge = vfMap[i];
+		// 	edge = edgeFaceMap[i];
 		// 	edges.push(edge);
 		// 	
 		// }
 		
-		//console.log('vfMap', vfMap, 'geometry.edges',geometry.edges, 'numOfEdges', numOfEdges);
+		//debug('edgeFaceMap', edgeFaceMap, 'geometry.edges',geometry.edges, 'numOfEdges', numOfEdges);
 
-		return vfMap;
+		return edgeFaceMap;
 
-	};
+	}
 	
 	var originalPoints = oldGeometry.vertices;
 	var originalFaces = oldGeometry.faces;
@@ -197,99 +215,151 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 	
 	var sharpEdges = {}, sharpVertices = [], sharpFaces = [];
 	
-	var uvForVertices = [];
+	var uvForVertices = {}; // Stored in {vertex}:{old face} format
+
+	var originalVerticesLength = originalPoints.length;
+
+	function getUV(vertexNo, oldFaceNo) {
+		var j,jl;
+
+		var key = vertexNo+':'+oldFaceNo;
+		var theUV = uvForVertices[key];
+
+		if (!theUV) {
+			if (vertexNo>=originalVerticesLength && vertexNo < (originalVerticesLength + originalFaces.length)) {
+				debug('face pt');
+			} else {
+				debug('edge pt');
+			}
+
+			warn('warning, UV not found for', key);
+
+			return null;
+		}
+
+		return theUV;
+ 
+		// Original faces -> Vertex Nos. 
+		// new Facepoint -> Vertex Nos.
+		// edge Points
+
+	}
+
+	function addUV(vertexNo, oldFaceNo, value) {
+
+		var key = vertexNo+':'+oldFaceNo;
+		if (!(key in uvForVertices)) {
+			uvForVertices[key] = value;
+		} else {
+			warn('dup vertexNo', vertexNo, 'oldFaceNo', oldFaceNo, 'value', value, 'key', key, uvForVertices[key]);
+		}
+	}
 	
 	// Step 1
 	//	For each face, add a face point
 	//	Set each face point to be the centroid of all original points for the respective face.
-	
+	// debug(oldGeometry);
 	var i, il, j, jl, face;
 	
 	// For Uvs
 	var uvs = oldGeometry.faceVertexUvs[0];
 	var abcd = 'abcd', vertice;
-	
+
+	debug('originalFaces, uvs, originalVerticesLength', originalFaces.length, uvs.length, originalVerticesLength);
+	if (scope.supportUVs)
 	for (i=0, il = uvs.length; i<il; i++ ) {
 		for (j=0,jl=uvs[i].length;j<jl;j++) {
 			vertice = originalFaces[i][abcd.charAt(j)];
 			
-			if (!uvForVertices[vertice]) {
-				uvForVertices[vertice] = uvs[i][j];
-			} else {
-				//console.log('dup', 	uvForVertices[vertice]);
-			}
-			
+			addUV(vertice, i, uvs[i][j]);
 			
 		}
 	}
+
+	if (uvs.length == 0) scope.supportUVs = false;
+
+	// Additional UVs check, if we index original 
+	var uvCount = 0;
+	for (var u in uvForVertices) {
+		uvCount++;
+	}
+	if (!uvCount) {
+		scope.supportUVs = false;
+		debug('no uvs');
+	}
+
+	debug('-- Original Faces + Vertices UVs completed', uvForVertices, 'vs', uvs.length);
 			
 	var avgUv ;
 	for (i=0, il = originalFaces.length; i<il ;i++) {
-		face = originalFaces[i];
-		facePoints.push(face.centroid);
-		newPoints.push( new THREE.Vertex(face.centroid) );
+		face = originalFaces[ i ];
+		facePoints.push( face.centroid );
+		newPoints.push( face.centroid );
 		
 		
-		if (!scope.supportUVs || uvForVertices.length==0) continue;
+		if (!scope.supportUVs) continue;
 		
 		// Prepare subdivided uv
 		
 		avgUv = new THREE.UV();
 		
 		if ( face instanceof THREE.Face3 ) {
-			avgUv.u = uvForVertices[face.a].u + uvForVertices[face.b].u + uvForVertices[face.c].u;
-			avgUv.v = uvForVertices[face.a].v + uvForVertices[face.b].v + uvForVertices[face.c].v;
+			avgUv.u = getUV( face.a, i ).u + getUV( face.b, i ).u + getUV( face.c, i ).u;
+			avgUv.v = getUV( face.a, i ).v + getUV( face.b, i ).v + getUV( face.c, i ).v;
 			avgUv.u /= 3;
 			avgUv.v /= 3;
 			
 		} else if ( face instanceof THREE.Face4 ) {
-			avgUv.u = uvForVertices[face.a].u + uvForVertices[face.b].u + uvForVertices[face.c].u + uvForVertices[face.d].u;
-			avgUv.v = uvForVertices[face.a].v + uvForVertices[face.b].v + uvForVertices[face.c].v + uvForVertices[face.d].v;
+			avgUv.u = getUV( face.a, i ).u + getUV( face.b, i ).u + getUV( face.c, i ).u + getUV( face.d, i ).u;
+			avgUv.v = getUV( face.a, i ).v + getUV( face.b, i ).v + getUV( face.c, i ).v + getUV( face.d, i ).v;
 			avgUv.u /= 4;
 			avgUv.v /= 4;
 		}
-	
-		uvForVertices.push(avgUv);
+
+		addUV(originalVerticesLength + i, '', avgUv);
+
 	}
+
+	debug('-- added UVs for new Faces', uvForVertices);
 
 	// Step 2
 	//	For each edge, add an edge point.
 	//	Set each edge point to be the average of the two neighbouring face points and its two original endpoints.
 	
-	var vfMap = computeEdgeFaces ( oldGeometry );
+	var edgeFaceMap = computeEdgeFaces ( oldGeometry ); // Edge Hash -> Faces Index
 	var edge, faceIndexA, faceIndexB, avg;
 	
-	//console.log('vfMap', vfMap);
+	// debug('edgeFaceMap', edgeFaceMap);
 
 	var edgeCount = 0;
-	var originalVerticesLength = originalPoints.length;
+
 	var edgeVertex, edgeVertexA, edgeVertexB;
 	
 	////
 	
-	var vertexEdgeMap = {};
-	var vertexFaceMap = {};
+	var vertexEdgeMap = {}; // Gives edges connecting from each vertex
+	var vertexFaceMap = {}; // Gives faces connecting from each vertex
 	
-	var addVertexEdgeMap = function(vertex, edge) {
+	function addVertexEdgeMap(vertex, edge) {
 		if (vertexEdgeMap[vertex]===undefined) {
 			vertexEdgeMap[vertex] = [];
 		}
 		
 		vertexEdgeMap[vertex].push(edge);
-	};
+	}
 	
-	var addVertexFaceMap = function(vertex, face, edge) {
+	function addVertexFaceMap(vertex, face, edge) {
 		if (vertexFaceMap[vertex]===undefined) {
 			vertexFaceMap[vertex] = {};
 		}
 		
-		//vertexFaceMap[vertex][face] = edge;
-		vertexFaceMap[vertex][face] = null;
-	};
+		vertexFaceMap[vertex][face] = edge;
+		// vertexFaceMap[vertex][face] = null;
+	}
 	
 	// Prepares vertexEdgeMap and vertexFaceMap
-	for (i in vfMap) { // This is for every edge
-		edge = vfMap[i];
+	for (i in edgeFaceMap) { // This is for every edge
+		edge = edgeFaceMap[i];
 		
 		edgeVertex = i.split('_');
 		edgeVertexA = edgeVertex[0];
@@ -299,22 +369,6 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 		addVertexEdgeMap(edgeVertexA, [edgeVertexA, edgeVertexB] );
 		addVertexEdgeMap(edgeVertexB, [edgeVertexA, edgeVertexB] );
 		
-		
-		// faceIndexA = edge[0]; // face index a
-		// faceIndexB = edge[1]; // face index b
-		// 
-		// // Add connecting faces for edge
-		// addVertexFaceMap(edgeVertexA, faceIndexA);
-		// addVertexFaceMap(edgeVertexB, faceIndexA);
-		// 
-		// 
-		// if (faceIndexB) {
-		// 	addVertexFaceMap(edgeVertexA, faceIndexB);
-		// 	addVertexFaceMap(edgeVertexB, faceIndexB);
-		// } else {
-		// 	addVertexFaceMap(edgeVertexA, faceIndexA);
-		// 	addVertexFaceMap(edgeVertexB, faceIndexA);
-		// }
 		
 		for (j=0,jl=edge.length;j<jl;j++) {
 			face = edge[j];
@@ -333,13 +387,11 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 		
 	}
 	
+	debug('vertexEdgeMap',vertexEdgeMap, 'vertexFaceMap', vertexFaceMap);
 	
 	
-	//console.log('vertexEdgeMap',vertexEdgeMap, 'vertexFaceMap', vertexFaceMap);
-	
-	
-	for (i in vfMap) {
-		edge = vfMap[i];
+	for (i in edgeFaceMap) {
+		edge = edgeFaceMap[i];
 		
 		faceIndexA = edge[0]; // face index a
 		faceIndexB = edge[1]; // face index b
@@ -351,14 +403,14 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 		
 		avg = new THREE.Vector3();
 		
-		//console.log(i, faceIndexB,facePoints[faceIndexB]);
+		//debug(i, faceIndexB,facePoints[faceIndexB]);
 		
 		if (sharpEdges[i]) {
-			//console.log('warning, ', i, 'edge has only 1 connecting face', edge);
+			//debug('warning, ', i, 'edge has only 1 connecting face', edge);
 			
 			// For a sharp edge, average the edge end points.
-			avg.addSelf(originalPoints[edgeVertexA].position);
-			avg.addSelf(originalPoints[edgeVertexB].position);
+			avg.addSelf(originalPoints[edgeVertexA]);
+			avg.addSelf(originalPoints[edgeVertexB]);
 			
 			avg.multiplyScalar(0.5);
 			
@@ -369,35 +421,51 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 			avg.addSelf(facePoints[faceIndexA]);
 			avg.addSelf(facePoints[faceIndexB]);
 		
-			avg.addSelf(originalPoints[edgeVertexA].position);
-			avg.addSelf(originalPoints[edgeVertexB].position);
+			avg.addSelf(originalPoints[edgeVertexA]);
+			avg.addSelf(originalPoints[edgeVertexB]);
 		
 			avg.multiplyScalar(0.25);
 		
 		}
 		
 		edgePoints[i] = originalVerticesLength + originalFaces.length + edgeCount;
-		//console.log(edgePoints[i], newPoints.length);
 		
-		newPoints.push( new THREE.Vertex(avg) );
+		newPoints.push( avg );
 	
 		edgeCount ++;
 		
-		if (!scope.supportUVs || uvForVertices.length==0) continue;
-		
+		if (!scope.supportUVs) {
+			continue;
+		}
+
+		// debug('faceIndexAB', faceIndexA, faceIndexB, sharpEdges[i]);
+
 		// Prepare subdivided uv
 		
 		avgUv = new THREE.UV();
 		
-		avgUv.u = uvForVertices[edgeVertexA].u + uvForVertices[edgeVertexB].u;
-		avgUv.v = uvForVertices[edgeVertexA].v + uvForVertices[edgeVertexB].v;
+		avgUv.u = getUV(edgeVertexA, faceIndexA).u + getUV(edgeVertexB, faceIndexA).u;
+		avgUv.v = getUV(edgeVertexA, faceIndexA).v + getUV(edgeVertexB, faceIndexA).v;
 		avgUv.u /= 2;
 		avgUv.v /= 2;
-	
-		uvForVertices.push(avgUv);
+
+		addUV(edgePoints[i], faceIndexA, avgUv);
+
+		if (!sharpEdges[i]) {
+		avgUv = new THREE.UV();
+		
+		avgUv.u = getUV(edgeVertexA, faceIndexB).u + getUV(edgeVertexB, faceIndexB).u;
+		avgUv.v = getUV(edgeVertexA, faceIndexB).v + getUV(edgeVertexB, faceIndexB).v;
+		avgUv.u /= 2;
+		avgUv.v /= 2;
+		
+		addUV(edgePoints[i], faceIndexB, avgUv);
+		}
 		
 	}
-	
+
+	debug('-- Step 2 done');
+
 	// Step 3
 	//	For each face point, add an edge for every edge of the face, 
 	//	connecting the face point to each edge point for the face.
@@ -429,9 +497,9 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 			hashBC = edge_hash( face.b, face.c );
 			hashCA = edge_hash( face.c, face.a );
 			
-			f4( currentVerticeIndex, edgePoints[hashAB], face.b, edgePoints[hashBC], face, abc123 );
-			f4( currentVerticeIndex, edgePoints[hashBC], face.c, edgePoints[hashCA], face, bca123 );
-			f4( currentVerticeIndex, edgePoints[hashCA], face.a, edgePoints[hashAB], face, cab123 );
+			f4( currentVerticeIndex, edgePoints[hashAB], face.b, edgePoints[hashBC], face, abc123, i );
+			f4( currentVerticeIndex, edgePoints[hashBC], face.c, edgePoints[hashCA], face, bca123, i );
+			f4( currentVerticeIndex, edgePoints[hashCA], face.a, edgePoints[hashAB], face, cab123, i );
 			
 		} else if ( face instanceof THREE.Face4 ) {
 			// create 4 face4s
@@ -441,21 +509,21 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 			hashCD = edge_hash( face.c, face.d );
 			hashDA = edge_hash( face.d, face.a );
 			
-			f4( currentVerticeIndex, edgePoints[hashAB], face.b, edgePoints[hashBC], face, abc1234 );
-			f4( currentVerticeIndex, edgePoints[hashBC], face.c, edgePoints[hashCD], face, bcd1234 );
-			f4( currentVerticeIndex, edgePoints[hashCD], face.d, edgePoints[hashDA], face, cda1234 );
-			f4( currentVerticeIndex, edgePoints[hashDA], face.a, edgePoints[hashAB], face, dab1234  );
+			f4( currentVerticeIndex, edgePoints[hashAB], face.b, edgePoints[hashBC], face, abc1234, i );
+			f4( currentVerticeIndex, edgePoints[hashBC], face.c, edgePoints[hashCD], face, bcd1234, i );
+			f4( currentVerticeIndex, edgePoints[hashCD], face.d, edgePoints[hashDA], face, cda1234, i );
+			f4( currentVerticeIndex, edgePoints[hashDA], face.a, edgePoints[hashAB], face, dab1234, i );
 
 				
 		} else {
-			console.log('face should be a face!', face);
+			debug('face should be a face!', face);
 		}
 	}
 	
 	newVertices = newPoints;
 	
-	// console.log('original ', oldGeometry.vertices.length, oldGeometry.faces.length );
-	// console.log('new points', newPoints.length, 'faces', newFaces.length );
+	// debug('original ', oldGeometry.vertices.length, oldGeometry.faces.length );
+	// debug('new points', newPoints.length, 'faces', newFaces.length );
 	
 	// Step 4
 	
@@ -515,22 +583,22 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 		
 		for (j=0; j<n;j++) {
 			edge = vertexEdgeMap[i][j];
-			var midPt = originalPoints[edge[0]].position.clone().addSelf(originalPoints[edge[1]].position).divideScalar(2);
+			var midPt = originalPoints[edge[0]].clone().addSelf(originalPoints[edge[1]]).divideScalar(2);
 			R.addSelf(midPt);
-			// R.addSelf(originalPoints[edge[0]].position);
-			// R.addSelf(originalPoints[edge[1]].position);
+			// R.addSelf(originalPoints[edge[0]]);
+			// R.addSelf(originalPoints[edge[1]]);
 		}
 		
-		R.divideScalar(n)
+		R.divideScalar(n);
 		
-		newPos.addSelf(originalPoints[i].position);
+		newPos.addSelf(originalPoints[i]);
 		newPos.multiplyScalar(n - 3);
 		
 		newPos.addSelf(F);
 		newPos.addSelf(R.multiplyScalar(2));
 		newPos.divideScalar(n);
 		
-		newVertices[i].position = newPos;
+		newVertices[i] = newPos;
 		
 		
 	}

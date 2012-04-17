@@ -11,10 +11,30 @@
 				margin: 0px;
 				overflow: hidden;
 			}
+
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				z-index: 100;
+				display:block;
+
+			}
+
+			a { color: red }
 		</style>
 	</head>
 	<body>
+		<div id="info">
+			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> -
+			monster by <a href="http://www.3drt.com/downloads.htm" target="_blank">3drt</a>
+		</div>
+
 		<script src="../build/Three.js"></script>
+
+		<script src="js/loaders/ColladaLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/Stats.js"></script>
@@ -36,7 +56,7 @@
 
 			var loader = new THREE.ColladaLoader();
 			loader.options.convertUpAxis = true;
-			loader.load( 'models/monster.dae', function colladaReady( collada ) {
+			loader.load( 'models/collada/monster/monster.dae', function colladaReady( collada ) {
 
 				dae = collada.scene;
 				skin = collada.skins[ 0 ];

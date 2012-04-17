@@ -101,11 +101,8 @@
 
 					}
 
-					vector = new THREE.Vector3( x, y, z );
-					geometry.vertices.push( new THREE.Vertex( vector ) );
-
-					vector = new THREE.Vector3( x, y, z );
-					geometry2.vertices.push( new THREE.Vertex( vector ) );
+					geometry.vertices.push( new THREE.Vector3( x, y, z ) );
+					geometry2.vertices.push( new THREE.Vector3( x, y, z ) );
 
 					h = i2 % 2 ? 1 : 0.15;
 					if( i2 % 4 <= 2 ) h -= 0.15;
@@ -118,7 +115,7 @@
 				}
 
 				var tmpRot = new THREE.Matrix4();
-				tmpRot.setRotationAxis( new THREE.Vector3( 1, 0, 0 ), Math.PI/2 );
+				tmpRot.makeRotationAxis( new THREE.Vector3( 1, 0, 0 ), Math.PI/2 );
 
 				xgrid = 34;
 				ygrid = 15;
@@ -150,17 +147,17 @@
 					ribbon.matrix.setPosition( ribbon.position );
 					ribbon.matrixRotationWorld.setRotationFromEuler( ribbon.rotation );
 
-					ribbon.matrix.n11 = ribbon.matrixRotationWorld.n11;
-					ribbon.matrix.n12 = ribbon.matrixRotationWorld.n12;
-					ribbon.matrix.n13 = ribbon.matrixRotationWorld.n13;
+					ribbon.matrix.elements[ 0 ] = ribbon.matrixRotationWorld.elements[ 0 ];
+					ribbon.matrix.elements[ 4 ] = ribbon.matrixRotationWorld.elements[ 4 ];
+					ribbon.matrix.elements[ 8 ] = ribbon.matrixRotationWorld.elements[ 8 ];
 
-					ribbon.matrix.n21 = ribbon.matrixRotationWorld.n21;
-					ribbon.matrix.n22 = ribbon.matrixRotationWorld.n22;
-					ribbon.matrix.n23 = ribbon.matrixRotationWorld.n23;
+					ribbon.matrix.elements[ 1 ] = ribbon.matrixRotationWorld.elements[ 1 ];
+					ribbon.matrix.elements[ 5 ] = ribbon.matrixRotationWorld.elements[ 5 ];
+					ribbon.matrix.elements[ 9 ] = ribbon.matrixRotationWorld.elements[ 9 ];
 
-					ribbon.matrix.n31 = ribbon.matrixRotationWorld.n31;
-					ribbon.matrix.n32 = ribbon.matrixRotationWorld.n32;
-					ribbon.matrix.n33 = ribbon.matrixRotationWorld.n33;
+					ribbon.matrix.elements[ 2 ] = ribbon.matrixRotationWorld.elements[ 2 ];
+					ribbon.matrix.elements[ 6 ] = ribbon.matrixRotationWorld.elements[ 6 ];
+					ribbon.matrix.elements[ 10 ] = ribbon.matrixRotationWorld.elements[ 10 ];
 
 					ribbon.matrix.multiplySelf( tmpRot );
 
@@ -273,13 +270,13 @@
 					z  =  10 * Math.sin( i2 * 0.1 + time*30 );
 					z2 =  20 * Math.cos( Math.sin( i2 * 0.1 + time * 20 ) );
 
-					geometry.vertices[ i2 ].position.z = z;
-					geometry2.vertices[ i2 ].position.z = z2;
+					geometry.vertices[ i2 ].z = z;
+					geometry2.vertices[ i2 ].z = z2;
 
 				}
 
-				geometry.__dirtyVertices = true;
-				geometry2.__dirtyVertices = true;
+				geometry.verticesNeedUpdate = true;
+				geometry2.verticesNeedUpdate = true;
 
 				for( i = 0; i < nribbons; i++ ) {
 

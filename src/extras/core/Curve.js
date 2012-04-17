@@ -7,6 +7,7 @@
  * .getPointAt(u), getTagentAt(u)
  * .getPoints(), .getSpacedPoints()
  * .getLength()
+ * .updateArcLengths()
  *
  * This file contains following classes:
  *
@@ -23,6 +24,9 @@
  * THREE.QuadraticBezierCurve3
  * THREE.CubicBezierCurve3
  * THREE.SplineCurve3
+ * THREE.ClosedSplineCurve3
+ *
+ * A series of curves can be represented as a THREE.CurvePath
  *
  **/
 
@@ -66,7 +70,7 @@ THREE.Curve.prototype.getPoints = function ( divisions ) {
 
 		pts.push( this.getPoint( d / divisions ) );
 
-	};
+	}
 
 	return pts;
 
@@ -84,13 +88,13 @@ THREE.Curve.prototype.getSpacedPoints = function ( divisions ) {
 
 		pts.push( this.getPointAt( d / divisions ) );
 
-	};
+	}
 
 	return pts;
 
 };
 
-// Get total curve length
+// Get total curve arc length
 
 THREE.Curve.prototype.getLength = function () {
 
@@ -103,14 +107,18 @@ THREE.Curve.prototype.getLength = function () {
 
 THREE.Curve.prototype.getLengths = function ( divisions ) {
 
-	if ( !divisions ) divisions = 200;
+	if ( !divisions ) divisions = (this.__arcLengthDivisions) ? (this.__arcLengthDivisions): 200;
 
-	if ( this.cacheArcLengths && ( this.cacheArcLengths.length == divisions + 1 ) ) {
+	if ( this.cacheArcLengths 
+		&& ( this.cacheArcLengths.length == divisions + 1 ) 
+		&& !this.needsUpdate) {
 
 		//console.log( "cached", this.cacheArcLengths );
 		return this.cacheArcLengths;
 
 	}
+
+	this.needsUpdate = false;
 
 	var cache = [];
 	var current, last = this.getPoint( 0 );
@@ -131,6 +139,12 @@ THREE.Curve.prototype.getLengths = function ( divisions ) {
 
 	return cache; // { sums: cache, sum:sum }; Sum is in the last element.
 
+};
+
+
+THREE.Curve.prototype.updateArcLengths = function() {
+	this.needsUpdate = true;
+	this.getLengths();
 };
 
 // Given u ( 0 .. 1 ), get a t to find p. This gives you points which are equi distance
@@ -163,9 +177,9 @@ THREE.Curve.prototype.getUtoTmapping = function ( u, distance ) {
 
 		i = Math.floor( low + ( high - low ) / 2 ); // less likely to overflow, though probably not issue here, JS doesn't really have integers, all numbers are floats
 
-	  	comparison = arcLengths[ i ] - targetArcLength;
+		comparison = arcLengths[ i ] - targetArcLength;
 
-	  	if ( comparison < 0 ) {
+		if ( comparison < 0 ) {
 
 			low = i + 1;
 			continue;
@@ -210,16 +224,16 @@ THREE.Curve.prototype.getUtoTmapping = function ( u, distance ) {
 
     // add that fractional amount to t
 
-    t = ( i + segmentFraction ) / ( il -1 );
+    var t = ( i + segmentFraction ) / ( il -1 );
 
 	return t;
 
 };
 
-// In case any sub curve does not implement its tangent / normal finding,
-// we get 2 points with a small delta and find a gradient of the 2 points
-// which seems to make a reasonable approximation
 
+// In 2D space, there are actually 2 normal vectors,
+// and in 3D space, infinte
+// TODO this should be depreciated.
 THREE.Curve.prototype.getNormalVector = function( t ) {
 
 	var vec = this.getTangent( t );
@@ -229,6 +243,9 @@ THREE.Curve.prototype.getNormalVector = function( t ) {
 };
 
 // Returns a unit vector tangent at t
+// In case any sub curve does not implement its tangent / normal finding,
+// we get 2 points with a small delta and find a gradient of the 2 points
+// which seems to make a reasonable approximation
 
 THREE.Curve.prototype.getTangent = function( t ) {
 
@@ -244,7 +261,7 @@ THREE.Curve.prototype.getTangent = function( t ) {
 	var pt1 = this.getPoint( t1 );
 	var pt2 = this.getPoint( t2 );
 	
-	var vec = pt1.clone().subSelf(pt2);
+	var vec = pt2.clone().subSelf(pt1);
 	return vec.normalize();
 
 };
@@ -263,23 +280,8 @@ THREE.Curve.prototype.getTangentAt = function ( u ) {
 
 THREE.LineCurve = function ( v1, v2 ) {
 
-	if ( ! ( v1 instanceof THREE.Vector2 ) ) {
-
-		// Fall back for old constuctor signature - should be removed over time
-
-		THREE.LineCurve.oldConstructor.apply( this, arguments );
-		return;
-
-	}
-
 	this.v1 = v1;
 	this.v2 = v2;
-
-};
-
-THREE.LineCurve.oldConstructor = function ( x1, y1, x2, y2 ) {
-
-	this.constructor( new THREE.Vector2( x1, y1 ), new THREE.Vector2( x2, y2 ) );
 
 };
 
@@ -288,9 +290,7 @@ THREE.LineCurve.prototype.constructor = THREE.LineCurve;
 
 THREE.LineCurve.prototype.getPoint = function ( t ) {
 
-	var point = new THREE.Vector2();
-
-	point.sub( this.v2, this.v1 );
+	var point = this.v2.clone().subSelf(this.v1);
 	point.multiplyScalar( t ).addSelf( this.v1 );
 
 	return point;
@@ -307,12 +307,9 @@ THREE.LineCurve.prototype.getPointAt = function ( u ) {
 
 THREE.LineCurve.prototype.getTangent = function( t ) {
 
-	var tangent = new THREE.Vector2();
+	var tangent = this.v2.clone().subSelf(this.v1);
 
-	tangent.sub( this.v2, this.v1 );
-	tangent.normalize();
-
-	return tangent;
+	return tangent.normalize();
 
 };
 
@@ -322,16 +319,6 @@ THREE.LineCurve.prototype.getTangent = function( t ) {
 
 
 THREE.QuadraticBezierCurve = function ( v0, v1, v2 ) {
-
-	if ( !( v1 instanceof THREE.Vector2 ) ) {
-
-		var args = Array.prototype.slice.call( arguments );
-
-		v0 = new THREE.Vector2( args[ 0 ], args[ 1 ] );
-		v1 = new THREE.Vector2( args[ 2 ], args[ 3 ] );
-		v2 = new THREE.Vector2( args[ 4 ], args[ 5 ] );
-
-	}
 
 	this.v0 = v0;
 	this.v1 = v1;
@@ -357,11 +344,6 @@ THREE.QuadraticBezierCurve.prototype.getPoint = function ( t ) {
 
 THREE.QuadraticBezierCurve.prototype.getTangent = function( t ) {
 
-	// iterate sub segments
-	// 	get lengths for sub segments
-	// 	if segment is bezier
-	//		perform subdivisions
-
 	var tx, ty;
 
 	tx = THREE.Curve.Utils.tangentQuadraticBezier( t, this.v0.x, this.v1.x, this.v2.x );
@@ -382,17 +364,6 @@ THREE.QuadraticBezierCurve.prototype.getTangent = function( t ) {
  **************************************************************/
 
 THREE.CubicBezierCurve = function ( v0, v1, v2, v3 ) {
-
-	if ( ! ( v1 instanceof THREE.Vector2 ) ) {
-
-		var args = Array.prototype.slice.call( arguments );
-
-		v0 = new THREE.Vector2( args[ 0 ], args[ 1 ] );
-		v1 = new THREE.Vector2( args[ 2 ], args[ 3 ] );
-		v2 = new THREE.Vector2( args[ 4 ], args[ 5 ] );
-		v3 = new THREE.Vector2( args[ 6 ], args[ 7 ] );
-
-	}
 
 	this.v0 = v0;
 	this.v1 = v1;
@@ -421,8 +392,6 @@ THREE.CubicBezierCurve.prototype.getTangent = function( t ) {
 
 	tx = THREE.Curve.Utils.tangentCubicBezier( t, this.v0.x, this.v1.x, this.v2.x, this.v3.x );
 	ty = THREE.Curve.Utils.tangentCubicBezier( t, this.v0.y, this.v1.y, this.v2.y, this.v3.y );
-
-	// return normal unit vector
 
 	var tangent = new THREE.Vector2( tx, ty );
 	tangent.normalize();
@@ -457,8 +426,8 @@ THREE.SplineCurve.prototype.getPoint = function ( t ) {
 
 	c[ 0 ] = intPoint == 0 ? intPoint : intPoint - 1;
 	c[ 1 ] = intPoint;
-	c[ 2 ] = intPoint > points.length - 2 ? intPoint : intPoint + 1;
-	c[ 3 ] = intPoint > points.length - 3 ? intPoint : intPoint + 2;
+	c[ 2 ] = intPoint  > points.length - 2 ? points.length -1 : intPoint + 1;
+	c[ 3 ] = intPoint  > points.length - 3 ? points.length -1 : intPoint + 2;
 
 	v.x = THREE.Curve.Utils.interpolate( points[ c[ 0 ] ].x, points[ c[ 1 ] ].x, points[ c[ 2 ] ].x, points[ c[ 3 ] ].x, weight );
 	v.y = THREE.Curve.Utils.interpolate( points[ c[ 0 ] ].y, points[ c[ 1 ] ].y, points[ c[ 2 ] ].y, points[ c[ 3 ] ].y, weight );
@@ -560,16 +529,7 @@ THREE.Curve.Utils = {
 };
 
 
-/*
-getPoint DONE
-getLength DONE
-getLengths DONE
-
-curve.getPoints(); DONE
-curve.getPointAtArcLength(t); DONE
-curve.transform(params);
-curve.getTangentAt(t); DONE
-*/
+// TODO: Transformation for Curves?
 
 /**************************************************************
  *	3D Curves
@@ -706,15 +666,89 @@ THREE.SplineCurve3 = THREE.Curve.create(
 
 		c[ 0 ] = intPoint == 0 ? intPoint : intPoint - 1;
 		c[ 1 ] = intPoint;
-		c[ 2 ] = intPoint > points.length - 2 ? intPoint : intPoint + 1;
-		c[ 3 ] = intPoint > points.length - 3 ? intPoint : intPoint + 2;
+		c[ 2 ] = intPoint  > points.length - 2 ? points.length - 1 : intPoint + 1;
+		c[ 3 ] = intPoint  > points.length - 3 ? points.length - 1 : intPoint + 2;
 
-		v.x = THREE.Curve.Utils.interpolate( points[ c[ 0 ] ].x, points[ c[ 1 ] ].x, points[ c[ 2 ] ].x, points[ c[ 3 ] ].x, weight );
-		v.y = THREE.Curve.Utils.interpolate( points[ c[ 0 ] ].y, points[ c[ 1 ] ].y, points[ c[ 2 ] ].y, points[ c[ 3 ] ].y, weight );
-		v.z = THREE.Curve.Utils.interpolate( points[ c[ 0 ] ].z, points[ c[ 1 ] ].z, points[ c[ 2 ] ].z, points[ c[ 3 ] ].z, weight );
+		var pt0 = points[ c[0] ],
+			pt1 = points[ c[1] ],
+			pt2 = points[ c[2] ],
+			pt3 = points[ c[3] ];
+
+		v.x = THREE.Curve.Utils.interpolate(pt0.x, pt1.x, pt2.x, pt3.x, weight);
+		v.y = THREE.Curve.Utils.interpolate(pt0.y, pt1.y, pt2.y, pt3.y, weight);
+		v.z = THREE.Curve.Utils.interpolate(pt0.z, pt1.z, pt2.z, pt3.z, weight);
 
 		return v;
 
 	}
+
+);
+
+
+// THREE.SplineCurve3.prototype.getTangent = function(t) {
+// 		var v = new THREE.Vector3();
+// 		var c = [];
+// 		var points = this.points, point, intPoint, weight;
+// 		point = ( points.length - 1 ) * t;
+
+// 		intPoint = Math.floor( point );
+// 		weight = point - intPoint;
+
+// 		c[ 0 ] = intPoint == 0 ? intPoint : intPoint - 1;
+// 		c[ 1 ] = intPoint;
+// 		c[ 2 ] = intPoint  > points.length - 2 ? points.length - 1 : intPoint + 1;
+// 		c[ 3 ] = intPoint  > points.length - 3 ? points.length - 1 : intPoint + 2;
+
+// 		var pt0 = points[ c[0] ],
+// 			pt1 = points[ c[1] ],
+// 			pt2 = points[ c[2] ],
+// 			pt3 = points[ c[3] ];
+
+// 	// t = weight;
+// 	v.x = THREE.Curve.Utils.tangentSpline( t, pt0.x, pt1.x, pt2.x, pt3.x );
+// 	v.y = THREE.Curve.Utils.tangentSpline( t, pt0.y, pt1.y, pt2.y, pt3.y );
+// 	v.z = THREE.Curve.Utils.tangentSpline( t, pt0.z, pt1.z, pt2.z, pt3.z );
+
+// 	return v;
+		
+// }
+
+/**************************************************************
+ *	Closed Spline 3D curve
+ **************************************************************/
+
+
+THREE.ClosedSplineCurve3 = THREE.Curve.create(
+
+	function ( points /* array of Vector3 */) {
+
+		this.points = (points == undefined) ? [] : points;
+
+	},
+
+    function ( t ) {
+
+        var v = new THREE.Vector3();
+        var c = [];
+        var points = this.points, point, intPoint, weight;
+        point = ( points.length - 0 ) * t;
+            // This needs to be from 0-length +1
+
+        intPoint = Math.floor( point );
+        weight = point - intPoint;
+            
+        intPoint += intPoint > 0 ? 0 : ( Math.floor( Math.abs( intPoint ) / points.length ) + 1 ) * points.length;
+        c[ 0 ] = ( intPoint - 1 ) % points.length;
+        c[ 1 ] = ( intPoint ) % points.length;
+        c[ 2 ] = ( intPoint + 1 ) % points.length;
+        c[ 3 ] = ( intPoint + 2 ) % points.length;
+
+        v.x = THREE.Curve.Utils.interpolate( points[ c[ 0 ] ].x, points[ c[ 1 ] ].x, points[ c[ 2 ] ].x, points[ c[ 3 ] ].x, weight );
+        v.y = THREE.Curve.Utils.interpolate( points[ c[ 0 ] ].y, points[ c[ 1 ] ].y, points[ c[ 2 ] ].y, points[ c[ 3 ] ].y, weight );
+        v.z = THREE.Curve.Utils.interpolate( points[ c[ 0 ] ].z, points[ c[ 1 ] ].z, points[ c[ 2 ] ].z, points[ c[ 3 ] ].z, weight );
+        
+        return v;
+
+    }
 
 );

@@ -49,12 +49,6 @@ THREE.Projector = function() {
 
 	};
 
-	/**
-	 * Translates a 2D point from NDC to a THREE.Ray
-	 * that can be used for picking.
-	 * @vector - THREE.Vector3 that represents 2D point
-	 * @camera - THREE.Camera
-	 */
 	this.pickingRay = function ( vector, camera ) {
 
 		var end, ray, t;
@@ -88,7 +82,8 @@ THREE.Projector = function() {
 			if ( ( object instanceof THREE.Mesh || object instanceof THREE.Line ) &&
 			( object.frustumCulled === false || _frustum.contains( object ) ) ) {
 
-				_projScreenMatrix.multiplyVector3( _vector3.copy( object.position ) );
+				_vector3.copy( object.matrixWorld.getPosition() );
+				_projScreenMatrix.multiplyVector3( _vector3 );
 
 				_object = getNextObjectInPool();
 				_object.object = object;
@@ -98,7 +93,8 @@ THREE.Projector = function() {
 
 			} else if ( object instanceof THREE.Sprite || object instanceof THREE.Particle ) {
 
-				_projScreenMatrix.multiplyVector3( _vector3.copy( object.position ) );
+				_vector3.copy( object.matrixWorld.getPosition() );
+				_projScreenMatrix.multiplyVector3( _vector3 );
 
 				_object = getNextObjectInPool();
 				_object.object = object;
@@ -182,7 +178,7 @@ THREE.Projector = function() {
 				for ( v = 0, vl = vertices.length; v < vl; v ++ ) {
 
 					_vertex = getNextVertexInPool();
-					_vertex.positionWorld.copy( vertices[ v ].position );
+					_vertex.positionWorld.copy( vertices[ v ] );
 
 					objectMatrixWorld.multiplyVector3( _vertex.positionWorld );
 
@@ -318,16 +314,21 @@ THREE.Projector = function() {
 				_projScreenobjectMatrixWorld.multiply( _projScreenMatrix, objectMatrixWorld );
 
 				vertices = object.geometry.vertices;
-
+				
 				v1 = getNextVertexInPool();
-				v1.positionScreen.copy( vertices[ 0 ].position );
+				v1.positionScreen.copy( vertices[ 0 ] );
 				_projScreenobjectMatrixWorld.multiplyVector4( v1.positionScreen );
 
-				for ( v = 1, vl = vertices.length; v < vl; v++ ) {
+				// Handle LineStrip and LinePieces
+				var step = object.type === THREE.LinePieces ? 2 : 1;
+
+				for ( v = 1, vl = vertices.length; v < vl; v ++ ) {
 
 					v1 = getNextVertexInPool();
-					v1.positionScreen.copy( vertices[ v ].position );
+					v1.positionScreen.copy( vertices[ v ] );
 					_projScreenobjectMatrixWorld.multiplyVector4( v1.positionScreen );
+
+					if ( ( v + 1 ) % step > 0 ) continue;
 
 					v2 = _vertexPool[ _vertexCount - 2 ];
 
@@ -366,7 +367,7 @@ THREE.Projector = function() {
 
 			if ( object instanceof THREE.Particle ) {
 
-				_vector4.set( objectMatrixWorld.n14, objectMatrixWorld.n24, objectMatrixWorld.n34, 1 );
+				_vector4.set( objectMatrixWorld.elements[12], objectMatrixWorld.elements[13], objectMatrixWorld.elements[14], 1 );
 				_projScreenMatrix.multiplyVector4( _vector4 );
 
 				_vector4.z /= _vector4.w;
@@ -380,8 +381,8 @@ THREE.Projector = function() {
 
 					_particle.rotation = object.rotation.z;
 
-					_particle.scale.x = object.scale.x * Math.abs( _particle.x - ( _vector4.x + camera.projectionMatrix.n11 ) / ( _vector4.w + camera.projectionMatrix.n14 ) );
-					_particle.scale.y = object.scale.y * Math.abs( _particle.y - ( _vector4.y + camera.projectionMatrix.n22 ) / ( _vector4.w + camera.projectionMatrix.n24 ) );
+					_particle.scale.x = object.scale.x * Math.abs( _particle.x - ( _vector4.x + camera.projectionMatrix.elements[0] ) / ( _vector4.w + camera.projectionMatrix.elements[12] ) );
+					_particle.scale.y = object.scale.y * Math.abs( _particle.y - ( _vector4.y + camera.projectionMatrix.elements[5] ) / ( _vector4.w + camera.projectionMatrix.elements[13] ) );
 
 					_particle.material = object.material;
 

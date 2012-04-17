@@ -1,0 +1,723 @@
+﻿<!DOCTYPE HTML>
+<html lang="en">
+<head>
+	<title>three.js webgl - marching cubes</title>
+	<meta charset="utf-8">
+	<style>
+		body {
+		  color: #fff;
+		  font-family: Monospace;
+		  font-size: 13px;
+		  text-align: center;
+
+		  background-color: #000;
+		  margin: 0px;
+		  overflow: hidden;
+		}
+
+		#info {
+		  color: #ffffff;
+		  position: absolute;
+		  top: 0px;
+		  width: 100%;
+		  padding: 5px;
+		}
+
+		a {
+		  color: gold;
+		}
+
+		#oldie {
+		  font-family: monospace;
+		  font-size: 13px;
+
+		  text-align: center;
+		  background: rgb(0, 0, 50);
+		  color: #fff;
+		  padding: 1em;
+
+		  width: 475px;
+		  margin: 5em auto 0;
+
+		  display: none;
+		}
+
+	</style>
+</head>
+
+<body>
+
+	<div id="container"></div>
+	<div id="info">
+		<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> -
+		marching cubes -
+		[based on greggman's <a href="http://webglsamples.googlecode.com/hg/blob/blob.html">blob</a>, original code by Henrik Rydgård]
+	</div>
+
+	<script src="../build/Three.js"></script>
+
+	<script src="js/MarchingCubes.js"></script>
+
+	<script src="js/ShaderExtras.js"></script>
+	<script src="js/ShaderToon.js"></script>
+
+	<script src="js/ShaderExtras.js"></script>
+
+	<script src="js/postprocessing/EffectComposer.js"></script>
+	<script src="js/postprocessing/RenderPass.js"></script>
+	<script src="js/postprocessing/BloomPass.js"></script>
+	<script src="js/postprocessing/ShaderPass.js"></script>
+	<script src="js/postprocessing/MaskPass.js"></script>
+	<script src="js/postprocessing/SavePass.js"></script>
+
+
+	<script src="js/Detector.js"></script>
+	<script src="js/Stats.js"></script>
+	<script src="js/DAT.GUI.min.js"></script>
+
+
+	<script>
+		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+		var MARGIN = 0;
+
+		var SCREEN_WIDTH = window.innerWidth;
+		var SCREEN_HEIGHT = window.innerHeight - 2 * MARGIN;
+
+		var container, stats;
+
+		var camera, scene, renderer;
+
+		var mesh, texture, geometry, materials, material, current_material;
+
+		var light, pointLight, ambientLight;
+
+		var effect, resolution, numBlobs;
+
+		var composer, effectFXAA, hblur, vblur;
+
+		var effectController;
+
+		var time = 0;
+		var clock = new THREE.Clock();
+
+		init();
+		animate();
+
+		function init() {
+
+			container = document.getElementById( 'container' );
+
+			// SCENE
+
+			scene = new THREE.Scene();
+
+			// CAMERA
+
+			camera = new THREE.PerspectiveCamera( 45, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
+			camera.position.set( -500, 500, 1500 );
+
+			scene.add( camera );
+
+			// CONTROLS
+
+			controls = new THREE.TrackballControls( camera );
+
+			// LIGHTS
+
+			light = new THREE.DirectionalLight( 0xffffff );
+			light.position.set( 0.5, 0.5, 1 );
+			scene.add( light );
+
+			pointLight = new THREE.PointLight( 0xff3300 );
+			pointLight.position.set( 0, 0, 100 );
+			scene.add( pointLight );
+
+			ambientLight = new THREE.AmbientLight( 0x080808 );
+			scene.add( ambientLight );
+
+			// MATERIALS
+
+			materials = generateMaterials();
+			current_material = "shiny";
+
+			// MARCHING CUBES
+
+			resolution = 28;
+			numBlobs = 10;
+
+			effect = new THREE.MarchingCubes( resolution, materials[ current_material ].m );
+			effect.position.set( 0, 0, 0 );
+			effect.scale.set( 700, 700, 700 );
+			scene.add( effect );
+
+			// RENDERER
+
+			renderer = new THREE.WebGLRenderer( { clearColor: 0x050505, clearAlpha: 1, alpha: false } );
+			renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+
+			renderer.domElement.style.position = "absolute";
+			renderer.domElement.style.top = MARGIN + "px";
+			renderer.domElement.style.left = "0px";
+
+			container.appendChild( renderer.domElement );
+			//
+
+			renderer.gammaInput = true;
+			renderer.gammaOutput = true;
+			renderer.physicallyBasedShading = true;
+
+			// STATS
+
+			stats = new Stats();
+			stats.domElement.style.position = 'absolute';
+			stats.domElement.style.top = '0px';
+			container.appendChild( stats.domElement );
+
+			stats.domElement.children[ 0 ].children[ 0 ].style.color = "#888";
+			stats.domElement.children[ 0 ].style.background = "transparent";
+			stats.domElement.children[ 0 ].children[ 1 ].style.display = "none";
+
+			// COMPOSER
+
+			renderer.autoClear = false;
+
+			renderTargetParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
+			renderTarget = new THREE.WebGLRenderTarget( SCREEN_WIDTH, SCREEN_HEIGHT, renderTargetParameters );
+
+			effectFXAA = new THREE.ShaderPass( THREE.ShaderExtras[ "fxaa" ] );
+
+			hblur = new THREE.ShaderPass( THREE.ShaderExtras[ "horizontalTiltShift" ] );
+			vblur = new THREE.ShaderPass( THREE.ShaderExtras[ "verticalTiltShift" ] );
+
+			var bluriness = 8;
+
+			hblur.uniforms[ 'h' ].value = bluriness / SCREEN_WIDTH;
+			vblur.uniforms[ 'v' ].value = bluriness / SCREEN_HEIGHT;
+
+			hblur.uniforms[ 'r' ].value = vblur.uniforms[ 'r' ].value = 0.5;
+
+			effectFXAA.uniforms[ 'resolution' ].value.set( 1 / SCREEN_WIDTH, 1 / SCREEN_HEIGHT );
+
+			composer = new THREE.EffectComposer( renderer, renderTarget );
+
+			var renderModel = new THREE.RenderPass( scene, camera );
+
+			vblur.renderToScreen = true;
+			//effectFXAA.renderToScreen = true;
+
+			composer = new THREE.EffectComposer( renderer, renderTarget );
+
+			composer.addPass( renderModel );
+
+			composer.addPass( effectFXAA );
+
+			composer.addPass( hblur );
+			composer.addPass( vblur );
+
+			// GUI
+
+			setupGui();
+
+			// EVENTS
+
+			window.addEventListener( 'resize', onWindowResize, false );
+
+		}
+
+		//
+
+		function onWindowResize( event ) {
+
+			SCREEN_WIDTH = window.innerWidth;
+			SCREEN_HEIGHT = window.innerHeight - 2 * MARGIN;
+
+			renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+
+			camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
+			camera.updateProjectionMatrix();
+
+			renderTarget = new THREE.WebGLRenderTarget( SCREEN_WIDTH, SCREEN_HEIGHT, renderTargetParameters );
+
+			composer.reset( renderTarget );
+
+			hblur.uniforms[ 'h' ].value = 4 / SCREEN_WIDTH;
+			vblur.uniforms[ 'v' ].value = 4 / SCREEN_HEIGHT;
+
+			effectFXAA.uniforms[ 'resolution' ].value.set( 1 / SCREEN_WIDTH, 1 / SCREEN_HEIGHT );
+
+		}
+
+		function generateMaterials() {
+
+			// environment map
+
+			var path = "textures/cube/SwedishRoyalCastle/";
+			var format = '.jpg';
+			var urls = [
+				path + 'px' + format, path + 'nx' + format,
+				path + 'py' + format, path + 'ny' + format,
+				path + 'pz' + format, path + 'nz' + format
+			];
+
+			var reflectionCube = THREE.ImageUtils.loadTextureCube( urls );
+			reflectionCube.format = THREE.RGBFormat;
+
+			var refractionCube = new THREE.Texture( reflectionCube.image, new THREE.CubeRefractionMapping() );
+			reflectionCube.format = THREE.RGBFormat;
+
+			// toons
+
+			var toonMaterial1 = createShaderMaterial( "toon1", light, ambientLight ),
+			toonMaterial2 = createShaderMaterial( "toon2", light, ambientLight ),
+			hatchingMaterial = createShaderMaterial( "hatching", light, ambientLight ),
+			hatchingMaterial2 = createShaderMaterial( "hatching", light, ambientLight ),
+			dottedMaterial = createShaderMaterial( "dotted", light, ambientLight ),
+			dottedMaterial2 = createShaderMaterial( "dotted", light, ambientLight );
+
+			hatchingMaterial2.uniforms.uBaseColor.value.setRGB( 0, 0, 0 );
+			hatchingMaterial2.uniforms.uLineColor1.value.setHSV( 0, 0.9, 0.9 );
+			hatchingMaterial2.uniforms.uLineColor2.value.setHSV( 0, 0.9, 0.9 );
+			hatchingMaterial2.uniforms.uLineColor3.value.setHSV( 0, 0.9, 0.9 );
+			hatchingMaterial2.uniforms.uLineColor4.value.setHSV( 0.1, 0.9, 0.9 );
+
+			dottedMaterial2.uniforms.uBaseColor.value.setRGB( 0, 0, 0 );
+			dottedMaterial2.uniforms.uLineColor1.value.setHSV( 0.05, 1.0, 1.0 );
+
+			var materials = {
+
+			"chrome" :
+			{
+				m: new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: reflectionCube } ),
+				h: 0, s: 0, v: 1
+			},
+
+			"liquid" :
+			{
+				m: new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: refractionCube, refractionRatio: 0.85 } ),
+				h: 0, s: 0, v: 1
+			},
+
+			"shiny"  :
+			{
+				m: new THREE.MeshPhongMaterial( { color: 0x550000, specular: 0x440000, envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3, perPixel: true, metal: true } ),
+				h: 0, s: 0.9, v: 0.3
+			},
+
+			"matte" :
+			{
+				m: new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x111111, shininess: 1, perPixel: true } ),
+				h: 0, s: 0, v: 1
+			},
+
+			"plastic" :
+			{
+				m: new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x888888, ambient: 0x000000, shininess: 250, perPixel: true } ),
+				h: 0.6, s: 0.9, v: 0.2
+			},
+
+			"toon1"  :
+			{
+				m: toonMaterial1,
+				h: 0.2, s: 0.5, v: 1
+			},
+
+			"toon2" :
+			{
+				m: toonMaterial2,
+				h: 0.4, s: 0.5, v: 1
+			},
+
+			"hatching" :
+			{
+				m: hatchingMaterial,
+				h: 0.2, s: 0.2, v: 1
+			},
+
+			"hatching2" :
+			{
+				m: hatchingMaterial2,
+				h: 0.0, s: 0.9, v: 0.9
+			},
+
+			"dotted" :
+			{
+				m: dottedMaterial,
+				h: 0.2, s: 0.2, v: 1
+			},
+
+			"dotted2" :
+			{
+				m: dottedMaterial2,
+				h: 0.1, s: 1.0, v: 1
+			}
+
+			};
+
+			return materials;
+
+		}
+
+		function createShaderMaterial( id, light, ambientLight ) {
+
+			var shader = THREE.ShaderToon[ id ];
+
+			var u = THREE.UniformsUtils.clone( shader.uniforms );
+
+			var vs = shader.vertexShader;
+			var fs = shader.fragmentShader;
+
+			var material = new THREE.ShaderMaterial( { uniforms: u, vertexShader: vs, fragmentShader: fs } );
+
+			material.uniforms.uDirLightPos.value = light.position;
+			material.uniforms.uDirLightColor.value = light.color;
+
+			material.uniforms.uAmbientLightColor.value = ambientLight.color;
+
+			return material;
+
+		}
+
+		//
+
+		function setupGui() {
+
+			var createHandler = function( id ) {
+
+				return function() {
+
+					var mat_old = materials[ current_material ];
+					mat_old.h = m_h.getValue();
+					mat_old.s = m_s.getValue();
+					mat_old.v = m_v.getValue();
+
+					current_material = id;
+
+					var mat = materials[ id ];
+					effect.material = mat.m;
+
+					m_h.setValue( mat.h );
+					m_s.setValue( mat.s );
+					m_v.setValue( mat.v );
+
+					mm.setValue( current_material );
+
+				};
+
+			};
+
+			function toggle( e ) {
+
+				if ( e.style.display === "block" )
+					e.style.display = "none";
+				else
+					e.style.display = "block";
+
+			}
+
+			effectController = {
+
+			material:   "shiny",
+
+			speed :   1.0,
+			numBlobs:   10,
+			resolution: 28,
+			isolation:  80,
+
+			floor: true,
+			wallx: false,
+			wallz: false,
+
+			hue:    0.0,
+			saturation: 0.9,
+			value:    0.3,
+
+			lhue:     0.04,
+			lsaturation: 1.0,
+			lvalue:     1.0,
+
+			lx: 0.5,
+			ly: 0.5,
+			lz: 1.0,
+
+			postprocessing: false,
+
+			h_m:  function() {
+			  for (var i = 0; i < g_m.length; i++)  toggle(g_m[ i ].domElement);
+			},
+			h_c:  function() {
+			  for (var i = 0; i < g_c.length; i++)  toggle(g_c[ i ].domElement);
+			},
+			h_pc: function() {
+			  for (var i = 0; i < g_pc.length; i++) toggle(g_pc[ i ].domElement);
+			},
+			h_do: function() {
+			  for (var i = 0; i < g_do.length; i++) toggle(g_do[ i ].domElement);
+			},
+			h_s:  function() {
+			  for (var i = 0; i < g_s.length; i++)  toggle(g_s[ i ].domElement);
+			},
+			h_r:  function() {
+			  for (var i = 0; i < g_r.length; i++)  toggle(g_r[ i ].domElement);
+			},
+
+			dummy: function() {
+			}
+
+			};
+
+			var e1, e2, e3, e4, e5, e6, h, m_h, m_s, m_v,
+			g_m = [], g_c, g_pc, g_do, g_s, g_r, mm,
+			gui = new DAT.GUI();
+
+			// material (type)
+
+			mm = gui.add( effectController, "material" );
+			mm.domElement.style.display = "none";
+
+			h = gui.add( effectController, "h_m" ).name( "Materials" );
+			setGuiHeaderStyle(h, 0, 65, 50);
+
+			for ( var m in materials ) {
+
+				effectController[ m ] = createHandler( m );
+
+				e1 = gui.add( effectController, m ).name( m );
+				setGuiElementStyle( [ e1 ], 0, 65, 50, "block" );
+				g_m.push( e1 );
+
+			}
+
+			// material (color)
+
+			h = gui.add( effectController, "h_c" ).name( "Material color" );
+
+			m_h = gui.add( effectController, "hue", 0.0, 1.0, 0.025 );
+			m_s = gui.add( effectController, "saturation", 0.0, 1.0, 0.025 );
+			m_v = gui.add( effectController, "value", 0.0, 1.0, 0.025 );
+
+			g_c = [ m_h, m_s, m_v ];
+
+			setGuiHeaderStyle( h, 20, 65, 50 );
+			setGuiElementStyle( g_c, 20, 65, 50, "block" );
+
+			// light (point)
+
+			h = gui.add(effectController, "h_pc").name("Point light color");
+
+			e1 = gui.add(effectController, "lhue", 0.0, 1.0, 0.025).name("hue");
+			e2 = gui.add(effectController, "lsaturation", 0.0, 1.0, 0.025).name("saturation");
+			e3 = gui.add(effectController, "lvalue", 0.0, 1.0, 0.025).name("value");
+
+			g_pc = [ e1, e2, e3 ];
+
+			setGuiHeaderStyle(h, 50, 65, 50);
+			setGuiElementStyle(g_pc, 50, 65, 50);
+
+			// light (directional)
+
+			h = gui.add(effectController, "h_do").name("Directional light orientation");
+
+			e1 = gui.add(effectController, "lx", -1.0, 1.0, 0.025).name("x");
+			e2 = gui.add(effectController, "ly", -1.0, 1.0, 0.025).name("y");
+			e3 = gui.add(effectController, "lz", -1.0, 1.0, 0.025).name("z");
+
+			g_do = [ e1, e2, e3 ];
+
+			setGuiHeaderStyle(h, 80, 65, 50);
+			setGuiElementStyle(g_do, 80, 65, 50);
+
+			// simulation
+
+			h = gui.add(effectController, "h_s").name("Simulation");
+
+			e1 = gui.add(effectController, "speed", 0.1, 8.0, 0.05);
+			e2 = gui.add(effectController, "numBlobs", 1, 50, 1);
+			e3 = gui.add(effectController, "resolution", 14, 40, 1);
+			e4 = gui.add(effectController, "isolation", 10, 300, 1);
+
+			e5 = gui.add(effectController, "floor");
+			e6 = gui.add(effectController, "wallx");
+			e7 = gui.add(effectController, "wallz");
+
+			e5.updateDisplay();
+			e6.updateDisplay();
+			e7.updateDisplay();
+
+			g_s = [ e1, e2, e3, e4, e5, e6, e7 ];
+
+			setGuiHeaderStyle(h, 200, 65, 50);
+			setGuiElementStyle(g_s, 200, 65, 50, "block");
+
+			// rendering
+
+			h = gui.add(effectController, "h_r").name("Rendering");
+			e1 = gui.add(effectController, "postprocessing");
+
+			g_r = [ e1 ];
+
+			setGuiHeaderStyle(h, 225, 65, 50);
+			setGuiElementStyle(g_r, 225, 65, 50, "block");
+
+			// save
+
+			//e1 = gui.add(GUI, "saveURL").name("Save to URL");
+			//setGuiHeaderStyle(e1, 250, 65, 50, "block");
+
+			gui.domElement.style.backgroundColor = "#222";
+
+			// restore material from URL
+
+			id = mm.getValue()
+			current_material = id;
+			var mat = materials[ id ];
+			effect.material = mat.m;
+
+		}
+
+
+		function setGuiHeaderStyle( g, h, s, v ) {
+
+			var color = "hsl(" + h + "," + s + "%, " + v + "%)";
+
+			g.domElement.style.borderLeft = "solid 5px " + color;
+			g.domElement.style.background = color;
+			g.domElement.style.fontWeight = "bold";
+
+		}
+
+		function setGuiElementStyle( a, h, s, v, display ) {
+
+			var s, color = "hsl(" + h + "," + s + "%, " + v + "%)";
+
+			for ( i = 0; i < a.length; i ++ ) {
+
+				s = a[ i ].domElement.style;
+				s.borderLeft = "solid 5px " + color;
+				s.display = display ? display : "none";
+
+			}
+
+		}
+
+		// this controls content of marching cubes voxel field
+
+		function updateCubes( object, time, numblobs, floor, wallx, wallz ) {
+
+			object.reset();
+
+			// fill the field with some metaballs
+
+			var i, ballx, bally, ballz, subtract, strength;
+
+			subtract = 12;
+			strength = 1.2 / ( ( Math.sqrt( numblobs ) - 1 ) / 4 + 1 );
+
+			for ( i = 0; i < numblobs; i ++ ) {
+
+				ballx = Math.sin( i + 1.26 * time * ( 1.03 + 0.5 * Math.cos( 0.21 * i ) ) ) * 0.27 + 0.5;
+				bally = Math.abs( Math.cos( i + 1.12 * time * Math.cos( 1.22 + 0.1424 * i ) ) ) * 0.77; // dip into the floor
+				ballz = Math.cos( i + 1.32 * time * 0.1 * Math.sin( ( 0.92 + 0.53 * i ) ) ) * 0.27 + 0.5;
+
+				object.addBall(ballx, bally, ballz, strength, subtract);
+
+			}
+
+			if ( floor ) object.addPlaneY( 2, 12 );
+			if ( wallz ) object.addPlaneZ( 2, 12 );
+			if ( wallx ) object.addPlaneX( 2, 12 );
+
+		}
+
+		//
+
+
+		function animate() {
+
+			requestAnimationFrame( animate );
+
+			render();
+			stats.update();
+
+		}
+
+		function render() {
+
+			var delta = clock.getDelta();
+
+			time += delta * effectController.speed * 0.5;
+
+			controls.update( delta );
+
+			// marching cubes
+
+			if ( effectController.resolution !== resolution ) {
+
+				resolution = effectController.resolution;
+				effect.init( resolution );
+
+			}
+
+			if ( effectController.isolation !== effect.isolation ) {
+
+				effect.isolation = effectController.isolation;
+
+			}
+
+			updateCubes( effect, time, effectController.numBlobs, effectController.floor, effectController.wallx, effectController.wallz );
+
+			// materials
+
+			if ( effect.material instanceof THREE.ShaderMaterial ) {
+
+				if ( current_material === "dotted2" ) {
+
+					effect.material.uniforms.uLineColor1.value.setHSV( effectController.hue, effectController.saturation, effectController.value );
+
+				} else if ( current_material === "hatching2" ) {
+
+					u = effect.material.uniforms;
+
+					u.uLineColor1.value.setHSV( effectController.hue, effectController.saturation, effectController.value );
+					u.uLineColor2.value.setHSV( effectController.hue, effectController.saturation, effectController.value );
+					u.uLineColor3.value.setHSV( effectController.hue, effectController.saturation, effectController.value );
+					u.uLineColor4.value.setHSV( ( effectController.hue + 0.2 % 1.0 ), effectController.saturation, effectController.value );
+
+				} else {
+
+					effect.material.uniforms.uBaseColor.value.setHSV( effectController.hue, effectController.saturation, effectController.value );
+
+				}
+
+			} else {
+
+				effect.material.color.setHSV( effectController.hue, effectController.saturation, effectController.value );
+
+			}
+
+			// lights
+
+			light.position.set( effectController.lx, effectController.ly, effectController.lz );
+			light.position.normalize();
+
+			pointLight.color.setHSV( effectController.lhue, effectController.lsaturation, effectController.lvalue );
+
+			// render
+
+			if ( effectController.postprocessing ) {
+
+				composer.render( delta );
+
+			} else {
+
+				renderer.clear();
+				renderer.render( scene, camera );
+
+			}
+
+		}
+
+</script>
+
+</body>
+</html>

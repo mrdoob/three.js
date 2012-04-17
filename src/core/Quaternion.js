@@ -38,18 +38,12 @@ THREE.Quaternion.prototype = {
 
 	},
 
-	clone: function () {
-
-		return new THREE.Quaternion( this.x, this.y, this.z, this.w );
-
-	},
-
-	setFromEuler: function ( vec3 ) {
+	setFromEuler: function ( vector ) {
 
 		var c = Math.PI / 360, // 0.5 * Math.PI / 360, // 0.5 is an optimization
-		x = vec3.x * c,
-		y = vec3.y * c,
-		z = vec3.z * c,
+		x = vector.x * c,
+		y = vector.y * c,
+		z = vector.z * c,
 
 		c1 = Math.cos( y  ),
 		s1 = Math.sin( y  ),
@@ -98,13 +92,13 @@ THREE.Quaternion.prototype = {
 		}
 
 		var absQ = Math.pow( m.determinant(), 1.0 / 3.0 );
-		this.w = Math.sqrt( Math.max( 0, absQ + m.n11 + m.n22 + m.n33 ) ) / 2;
-		this.x = Math.sqrt( Math.max( 0, absQ + m.n11 - m.n22 - m.n33 ) ) / 2;
-		this.y = Math.sqrt( Math.max( 0, absQ - m.n11 + m.n22 - m.n33 ) ) / 2;
-		this.z = Math.sqrt( Math.max( 0, absQ - m.n11 - m.n22 + m.n33 ) ) / 2;
-		this.x = copySign( this.x, ( m.n32 - m.n23 ) );
-		this.y = copySign( this.y, ( m.n13 - m.n31 ) );
-		this.z = copySign( this.z, ( m.n21 - m.n12 ) );
+		this.w = Math.sqrt( Math.max( 0, absQ + m.elements[0] + m.elements[5] + m.elements[10] ) ) / 2;
+		this.x = Math.sqrt( Math.max( 0, absQ + m.elements[0] - m.elements[5] - m.elements[10] ) ) / 2;
+		this.y = Math.sqrt( Math.max( 0, absQ - m.elements[0] + m.elements[5] - m.elements[10] ) ) / 2;
+		this.z = Math.sqrt( Math.max( 0, absQ - m.elements[0] - m.elements[5] + m.elements[10] ) ) / 2;
+		this.x = copySign( this.x, ( m.elements[6] - m.elements[9] ) );
+		this.y = copySign( this.y, ( m.elements[8] - m.elements[2] ) );
+		this.z = copySign( this.z, ( m.elements[1] - m.elements[4] ) );
 		this.normalize();
 
 		return this;
@@ -161,10 +155,23 @@ THREE.Quaternion.prototype = {
 
 	},
 
-	multiplySelf: function ( quat2 ) {
+	multiply: function ( a, b ) {
 
-		var qax = this.x,  qay = this.y,  qaz = this.z,  qaw = this.w,
-		qbx = quat2.x, qby = quat2.y, qbz = quat2.z, qbw = quat2.w;
+		// from http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/code/index.htm
+
+		this.x =  a.x * b.w + a.y * b.z - a.z * b.y + a.w * b.x;
+		this.y = -a.x * b.z + a.y * b.w + a.z * b.x + a.w * b.y;
+		this.z =  a.x * b.y - a.y * b.x + a.z * b.w + a.w * b.z;
+		this.w = -a.x * b.x - a.y * b.y - a.z * b.z + a.w * b.w;
+
+		return this;
+
+	},
+
+	multiplySelf: function ( b ) {
+
+		var qax = this.x, qay = this.y, qaz = this.z, qaw = this.w,
+		qbx = b.x, qby = b.y, qbz = b.z, qbw = b.w;
 
 		this.x = qax * qbw + qaw * qbx + qay * qbz - qaz * qby;
 		this.y = qay * qbw + qaw * qby + qaz * qbx - qax * qbz;
@@ -175,27 +182,14 @@ THREE.Quaternion.prototype = {
 
 	},
 
-	multiply: function ( q1, q2 ) {
+	multiplyVector3: function ( vector, dest ) {
 
-		// from http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/code/index.htm
+		if ( !dest ) { dest = vector; }
 
-		this.x =  q1.x * q2.w + q1.y * q2.z - q1.z * q2.y + q1.w * q2.x;
-		this.y = -q1.x * q2.z + q1.y * q2.w + q1.z * q2.x + q1.w * q2.y;
-		this.z =  q1.x * q2.y - q1.y * q2.x + q1.z * q2.w + q1.w * q2.z;
-		this.w = -q1.x * q2.x - q1.y * q2.y - q1.z * q2.z + q1.w * q2.w;
-
-		return this;
-
-	},
-
-	multiplyVector3: function ( vec, dest ) {
-
-		if ( !dest ) { dest = vec; }
-
-		var x    = vec.x,  y  = vec.y,  z  = vec.z,
+		var x    = vector.x,  y  = vector.y,  z  = vector.z,
 			qx   = this.x, qy = this.y, qz = this.z, qw = this.w;
 
-		// calculate quat * vec
+		// calculate quat * vector
 
 		var ix =  qw * x + qy * z - qz * y,
 			iy =  qw * y + qz * x - qx * z,
@@ -209,6 +203,12 @@ THREE.Quaternion.prototype = {
 		dest.z = iz * qw + iw * -qz + ix * -qy - iy * -qx;
 
 		return dest;
+
+	},
+
+	clone: function () {
+
+		return new THREE.Quaternion( this.x, this.y, this.z, this.w );
 
 	}
 

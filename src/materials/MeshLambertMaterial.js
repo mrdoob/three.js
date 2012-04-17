@@ -5,6 +5,7 @@
  * parameters = {
  *  color: <hex>,
  *  ambient: <hex>,
+ *  emissive: <hex>,
  *  opacity: <float>,
  *
  *  map: new THREE.Texture( <Image> ),
@@ -23,8 +24,11 @@
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>,
  *
- *  vertexColors: false / THREE.VertexColors / THREE.FaceColors,
+ *  vertexColors: THREE.NoColors / THREE.VertexColors / THREE.FaceColors,
+ *
  *  skinning: <bool>,
+ *  morphTargets: <bool>,
+ *  morphNormals: <bool>,
  *
  *	fog: <bool>
  * }
@@ -36,8 +40,11 @@ THREE.MeshLambertMaterial = function ( parameters ) {
 
 	parameters = parameters || {};
 
+	// color property represents diffuse for MeshLambertMaterial
+
 	this.color = parameters.color !== undefined ? new THREE.Color( parameters.color ) : new THREE.Color( 0xffffff );
 	this.ambient = parameters.ambient !== undefined ? new THREE.Color( parameters.ambient ) : new THREE.Color( 0xffffff );
+	this.emissive = parameters.emissive !== undefined ? new THREE.Color( parameters.emissive ) : new THREE.Color( 0x000000 );
 
 	this.wrapAround = parameters.wrapAround !== undefined ? parameters.wrapAround: false;
 	this.wrapRGB = new THREE.Vector3( 1, 1, 1 );
@@ -60,7 +67,7 @@ THREE.MeshLambertMaterial = function ( parameters ) {
 	this.wireframeLinecap = parameters.wireframeLinecap !== undefined ? parameters.wireframeLinecap : 'round';
 	this.wireframeLinejoin = parameters.wireframeLinejoin !== undefined ? parameters.wireframeLinejoin : 'round';
 
-	this.vertexColors = parameters.vertexColors !== undefined ? parameters.vertexColors : false;
+	this.vertexColors = parameters.vertexColors !== undefined ? parameters.vertexColors : THREE.NoColors;
 
 	this.skinning = parameters.skinning !== undefined ? parameters.skinning : false;
 	this.morphTargets = parameters.morphTargets !== undefined ? parameters.morphTargets : false;

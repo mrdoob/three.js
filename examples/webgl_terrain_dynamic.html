@@ -417,20 +417,23 @@
 
 				var plane = new THREE.PlaneGeometry( SCREEN_WIDTH, SCREEN_HEIGHT );
 
-				quadTarget = new THREE.Mesh( plane, new THREE.MeshBasicMaterial( { color: 0xff0000 } ) );
+				quadTarget = new THREE.Mesh( plane, new THREE.MeshBasicMaterial( { color: 0x000000 } ) );
 				quadTarget.position.z = -500;
+				quadTarget.rotation.x = Math.PI / 2;
 				sceneRenderTarget.add( quadTarget );
 
 				// TERRAIN MESH
 
 				var geometryTerrain = new THREE.PlaneGeometry( 6000, 6000, 256, 256 );
+				geometryTerrain.applyMatrix( new THREE.Matrix4().makeRotationX( Math.PI / 2 ) );
+
 				geometryTerrain.computeFaceNormals();
 				geometryTerrain.computeVertexNormals();
 				geometryTerrain.computeTangents();
 
 				terrain = new THREE.Mesh( geometryTerrain, mlib[ "terrain" ] );
-				terrain.rotation.set( -Math.PI/2, 0, 0 );
 				terrain.position.set( 0, -125, 0 );
+				terrain.rotation.x = -Math.PI / 2;
 				terrain.visible = false;
 				scene.add( terrain );
 
@@ -631,6 +634,7 @@
 
 				var meshTmp = new THREE.Mesh( new THREE.PlaneGeometry( SCREEN_WIDTH, SCREEN_HEIGHT ), shaderMaterial );
 				meshTmp.position.z = -500;
+				 meshTmp.rotation.x = Math.PI / 2;
 				sceneTmp.add( meshTmp );
 
 				renderer.render( sceneTmp, cameraOrtho, target, true );

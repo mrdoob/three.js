@@ -75,14 +75,13 @@
 				for ( var i = 0, l = plane.vertices.length; i < l; i ++ ) {
 
 					var x = i % quality, y = ~~ ( i / quality );
-					plane.vertices[ i ].position.z = data[ ( x * step ) + ( y * step ) * 1024 ] * 2 - 128;
+					plane.vertices[ i ].y = data[ ( x * step ) + ( y * step ) * 1024 ] * 2 - 128;
 
 				}
 
 				plane.computeCentroids();
 
 				mesh = new THREE.Mesh( plane, material );
-				mesh.rotation.x = -90 * Math.PI / 180;
 				scene.add( mesh );
 
 				renderer = new THREE.CanvasRenderer();

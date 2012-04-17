@@ -39,9 +39,9 @@
 
 		<script src="../build/Three.js"></script>
 
-		<script src="js/ctm/lzma.js"></script>
-		<script src="js/ctm/ctm.js"></script>
-		<script src="js/ctm/CTMLoader.js"></script>
+		<script src="js/loaders/ctm/lzma.js"></script>
+		<script src="js/loaders/ctm/ctm.js"></script>
+		<script src="js/loaders/ctm/CTMLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/Stats.js"></script>
@@ -207,7 +207,7 @@
 				var position = new THREE.Vector3( -105, -78, -40 );
 				var scale = new THREE.Vector3( 30, 30, 30 );
 
-				loaderCTM.loadParts( "ctm/camaro/camaro.js", function( geometries, materials ) {
+				loaderCTM.loadParts( "models/ctm/camaro/camaro.js", function( geometries, materials ) {
 
 					hackMaterials( materials );
 

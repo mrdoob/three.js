@@ -105,7 +105,7 @@ THREE.CubeGeometry = function ( width, height, depth, segmentsWidth, segmentsHei
 				vector[ v ] = ( iy * segment_height - height_half ) * vdir;
 				vector[ w ] = depth;
 
-				scope.vertices.push( new THREE.Vertex( vector ) );
+				scope.vertices.push( vector );
 
 			}
 

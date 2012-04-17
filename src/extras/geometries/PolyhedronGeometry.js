@@ -32,7 +32,7 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 
 	for ( var i = 0, l = this.vertices.length; i < l; i ++ ) {
 
-		this.vertices[ i ].position.multiplyScalar( radius );
+		this.vertices[ i ].multiplyScalar( radius );
 
 	}
 
@@ -41,7 +41,7 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 	 */
 	function prepare( vector ) {
 
-		var vertex = new THREE.Vertex( vector.normalize() );
+		var vertex = vector.normalize().clone();
 		vertex.index = that.vertices.push( vertex ) - 1;
 
 		// Texture coords are equivalent to map coords, calculate angle and convert to fraction of a circle.
@@ -60,16 +60,16 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 
 		if ( detail < 1 ) {
 
-			var face = new THREE.Face3( v1.index, v2.index, v3.index, [ v1.position.clone(), v2.position.clone(), v3.position.clone() ] );
-			face.centroid.addSelf( v1.position ).addSelf( v2.position ).addSelf( v3.position ).divideScalar( 3 );
+			var face = new THREE.Face3( v1.index, v2.index, v3.index, [ v1.clone(), v2.clone(), v3.clone() ] );
+			face.centroid.addSelf( v1 ).addSelf( v2 ).addSelf( v3 ).divideScalar( 3 );
 			face.normal = face.centroid.clone().normalize();
 			that.faces.push( face );
 
 			var azi = azimuth( face.centroid );
 			that.faceVertexUvs[ 0 ].push( [ 
-				correctUV( v1.uv, v1.position, azi ),
-				correctUV( v2.uv, v2.position, azi ),
-				correctUV( v3.uv, v3.position, azi )
+				correctUV( v1.uv, v1, azi ),
+				correctUV( v2.uv, v2, azi ),
+				correctUV( v3.uv, v3, azi )
 			] );
 
 		}
@@ -94,7 +94,7 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 		if ( mid === undefined ) {
 			// generate mean point and project to surface with prepare()
 			midpoints[ v1.index ][ v2.index ] = midpoints[ v2.index ][ v1.index ] = mid = prepare( 
-				new THREE.Vector3().add( v1.position, v2.position ).divideScalar( 2 )
+				new THREE.Vector3().add( v1, v2 ).divideScalar( 2 )
 			);
 		}
 		return mid;
@@ -129,6 +129,8 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 		return uv;
 
 	}
+
+	this.computeCentroids();
 
 	this.boundingSphere = { radius: radius };
 

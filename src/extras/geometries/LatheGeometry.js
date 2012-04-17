@@ -1,63 +1,59 @@
 /**
  * @author astrodud / http://astrodud.isgreat.org/
+ * @author zz85 / https://github.com/zz85
  */
 
 THREE.LatheGeometry = function ( points, steps, angle ) {
 
 	THREE.Geometry.call( this );
 
-	this.steps = steps || 12;
-	this.angle = angle || 2 * Math.PI;
+	var _steps = steps || 12;
+	var _angle = angle || 2 * Math.PI;
 
-	var stepSize = this.angle / this.steps,
-	newV = [], oldInds = [], newInds = [], startInds = [],
-	matrix = new THREE.Matrix4().setRotationZ( stepSize );
+	var _newV = [];
+	var _matrix = new THREE.Matrix4().makeRotationZ( _angle / _steps );
 
 	for ( var j = 0; j < points.length; j ++ ) {
 
-		this.vertices.push( new THREE.Vertex( points[ j ] ) );
-
-		newV[ j ] = points[ j ].clone();
-		oldInds[ j ] = this.vertices.length - 1;
+		_newV[ j ] = points[ j ].clone();
+		this.vertices.push( _newV[ j ] );
 
 	}
 
-	for ( var r = 0; r <= this.angle + 0.001; r += stepSize ) { // need the +0.001 for it go up to angle
+	var i, il = _steps + 1;
 
-		for ( var j = 0; j < newV.length; j ++ ) {
+	for ( i = 0; i < il; i ++ ) {
 
-			if ( r < this.angle ) {
+		for ( var j = 0; j < _newV.length; j ++ ) {
 
-				newV[ j ] = matrix.multiplyVector3( newV[ j ].clone() );
-				this.vertices.push( new THREE.Vertex( newV[ j ] ) );
-				newInds[ j ] = this.vertices.length - 1;
-
-			} else {
-
-				newInds = startInds; // wrap it up!
-
-			}
+			_newV[ j ] = _matrix.multiplyVector3( _newV[ j ].clone() );
+			this.vertices.push( _newV[ j ] );
 
 		}
 
-		if ( r == 0 ) startInds = oldInds;
+	}
 
-		for ( var j = 0; j < oldInds.length - 1; j ++ ) {
+	for ( i = 0; i < _steps; i ++ ) {
 
-			this.faces.push( new THREE.Face4( newInds[ j ], newInds[ j + 1 ], oldInds[ j + 1 ], oldInds[ j ] ) );
+		for ( var k = 0, kl = points.length; k < kl - 1; k ++ ) {
+
+			var a = i * kl + k;
+			var b = ( ( i + 1 ) % il ) * kl + k;
+			var c = ( ( i + 1 ) % il ) * kl + ( k + 1 ) % kl;
+			var d = i * kl + ( k + 1 ) % kl;
+
+			this.faces.push( new THREE.Face4( a, b, c, d ) );
+
 			this.faceVertexUvs[ 0 ].push( [
 
-				new THREE.UV( 1 - r / this.angle, j / points.length ),
-				new THREE.UV( 1 - r / this.angle, ( j + 1 ) / points.length ),
-				new THREE.UV( 1 - ( r - stepSize ) / this.angle, ( j + 1 ) / points.length ),
-				new THREE.UV( 1 - ( r - stepSize ) / this.angle, j / points.length )
-
+				new THREE.UV( 1 - i / _steps, k / kl ),
+				new THREE.UV( 1 - ( i + 1 ) / _steps, k / kl ),
+				new THREE.UV( 1 - ( i + 1 ) / _steps, ( k + 1 ) / kl ),
+				new THREE.UV( 1 - i / _steps, ( k + 1 ) / kl )
+				
 			] );
 
 		}
-
-		oldInds = newInds;
-		newInds = [];
 
 	}
 

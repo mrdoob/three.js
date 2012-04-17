@@ -133,19 +133,16 @@
 
 				mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
 				mesh.position.y = - 250;
-				mesh.rotation.x = - 90 * Math.PI / 180;
 				scene.add( mesh );
 
 				mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
 				mesh.position.y = - 250;
 				mesh.position.x = - 400;
-				mesh.rotation.x = - 90 * Math.PI / 180;
 				scene.add( mesh );
 
 				mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
 				mesh.position.y = - 250;
 				mesh.position.x = 400;
-				mesh.rotation.x = - 90 * Math.PI / 180;
 				scene.add( mesh );
 
 				var faceIndices = [ 'a', 'b', 'c', 'd' ];
@@ -170,7 +167,7 @@
 
 						vertexIndex = f[ faceIndices[ j ] ];
 
-						p = geometry.vertices[ vertexIndex ].position;
+						p = geometry.vertices[ vertexIndex ];
 
 						color = new THREE.Color( 0xffffff );
 						color.setHSV( ( p.y / radius + 1 ) / 2, 1.0, 1.0 );

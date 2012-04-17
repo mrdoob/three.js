@@ -129,8 +129,8 @@ THREE.SpritePlugin = function ( ) {
 
 			if( ! sprite.useScreenCoordinates ) {
 
-				sprite._modelViewMatrix.multiplyToArray( camera.matrixWorldInverse, sprite.matrixWorld, sprite._modelViewMatrixArray );
-				sprite.z = - sprite._modelViewMatrix.n34;
+				sprite._modelViewMatrix.multiply( camera.matrixWorldInverse, sprite.matrixWorld);
+				sprite.z = - sprite._modelViewMatrix.elements[14];
 
 			} else {
 
@@ -163,7 +163,7 @@ THREE.SpritePlugin = function ( ) {
 
 					_gl.uniform1i( uniforms.useScreenCoordinates, 0 );
 					_gl.uniform1i( uniforms.affectedByDistance, sprite.affectedByDistance ? 1 : 0 );
-					_gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, sprite._modelViewMatrixArray );
+					_gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, sprite._modelViewMatrix.elements);
 
 				}
 
@@ -194,7 +194,7 @@ THREE.SpritePlugin = function ( ) {
 
 				}
 
-				_renderer.setBlending( sprite.blending );
+				_renderer.setBlending( sprite.blending, sprite.blendEquation, sprite.blendSrc, sprite.blendDst );
 				_renderer.setTexture( sprite.map, 0 );
 
 				_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );

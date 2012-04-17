@@ -17,6 +17,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 	this.noFly = false;
 	this.lookVertical = true;
 	this.autoForward = false;
+	// this.invertVertical = false;
 
 	this.activeLook = true;
 
@@ -211,7 +212,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 			}
 
 			this.lon += this.mouseX * actualLookSpeed;
-			if( this.lookVertical ) this.lat -= this.mouseY * actualLookSpeed;
+			if( this.lookVertical ) this.lat -= this.mouseY * actualLookSpeed; // * this.invertVertical?-1:1;
 
 			this.lat = Math.max( - 85, Math.min( 85, this.lat ) );
 			this.phi = ( 90 - this.lat ) * Math.PI / 180;

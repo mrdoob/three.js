@@ -84,7 +84,7 @@ THREE.TorusKnotGeometry = function ( radius, tube, segmentsR, segmentsT, p, q, h
 
 	function vert( x, y, z ) {
 
-		return scope.vertices.push( new THREE.Vertex( new THREE.Vector3( x, y, z ) ) ) - 1;
+		return scope.vertices.push( new THREE.Vector3( x, y, z ) ) - 1;
 
 	}
 

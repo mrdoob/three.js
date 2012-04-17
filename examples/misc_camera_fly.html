@@ -181,19 +181,25 @@
 
 				for ( i = 0; i < 250; i ++ ) {
 
-					vector1 = new THREE.Vector3( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 );
-					vector1.multiplyScalar( r );
+					var vertex = new THREE.Vector3();
+					vertex.x = Math.random() * 2 - 1;
+					vertex.y = Math.random() * 2 - 1;
+					vertex.z = Math.random() * 2 - 1;
+					vertex.multiplyScalar( r );
 
-					starsGeometry[ 0 ].vertices.push( new THREE.Vertex( vector1 ) );
+					starsGeometry[ 0 ].vertices.push( vertex );
 
 				}
 
 				for ( i = 0; i < 1500; i ++ ) {
 
-					vector1 = new THREE.Vector3( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 );
-					vector1.multiplyScalar( r );
+					var vertex = new THREE.Vector3();
+					vertex.x = Math.random() * 2 - 1;
+					vertex.y = Math.random() * 2 - 1;
+					vertex.z = Math.random() * 2 - 1;
+					vertex.multiplyScalar( r );
 
-					starsGeometry[ 1 ].vertices.push( new THREE.Vertex( vector1 ) );
+					starsGeometry[ 1 ].vertices.push( vertex );
 
 				}
 

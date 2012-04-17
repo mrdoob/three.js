@@ -106,7 +106,7 @@
 
 				var geo = new THREE.SphereGeometry( 1, 20, 10 );
 
-				var start = new Date().getTime();
+				var start = Date.now();
 
 				renderer.initMaterial( cubeMaterial, scene.__lights, scene.fog );
 
@@ -154,7 +154,7 @@
 
 				}
 
-				//console.log("init time: ", new Date().getTime() - start );
+				//console.log("init time: ", Date.now() - start );
 
 				scene.matrixAutoUpdate = false;
 
@@ -263,6 +263,7 @@
 
 				postprocessing.quad = new THREE.Mesh( new THREE.PlaneGeometry( window.innerWidth, window.innerHeight ), postprocessing.materialBokeh );
 				postprocessing.quad.position.z = - 500;
+				postprocessing.quad.rotation.x = Math.PI / 2;
 				postprocessing.scene.add( postprocessing.quad );
 
 			}
