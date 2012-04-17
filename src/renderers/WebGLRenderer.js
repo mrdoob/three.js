@@ -4528,16 +4528,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		loadUniformsMatrices( p_uniforms, object );
 
-		if ( material instanceof THREE.ShaderMaterial ||
-			 material.envMap ||
-			 material.skinning ||
-			 object.receiveShadow ) {
+		if ( p_uniforms.objectMatrix !== null ) {
 
-			if ( p_uniforms.objectMatrix !== null ) {
-
-				_gl.uniformMatrix4fv( p_uniforms.objectMatrix, false, object.matrixWorld.elements );
-
-			}
+			_gl.uniformMatrix4fv( p_uniforms.objectMatrix, false, object.matrixWorld.elements );
 
 		}
 
