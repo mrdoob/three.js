@@ -4,8 +4,12 @@
 
 THREE.OBJLoader = function () {};
 
+THREE.OBJLoader.prototype = new THREE.Loader();
+THREE.OBJLoader.prototype.constructor = THREE.OBJLoader;
+
 THREE.OBJLoader.prototype.load = function ( url, callback ) {
 
+	var that = this;
 	var xhr = new XMLHttpRequest();
 
 	xhr.onreadystatechange = function () {
@@ -14,7 +18,9 @@ THREE.OBJLoader.prototype.load = function ( url, callback ) {
 
 			if ( xhr.status == 200 || xhr.status == 0 ) {
 
-				callback( THREE.OBJLoader.prototype.parse( xhr.responseText ) );
+				callback( that.parse( xhr.responseText ) );
+
+				that.onLoadComplete();
 
 			} else {
 
@@ -29,13 +35,13 @@ THREE.OBJLoader.prototype.load = function ( url, callback ) {
 	xhr.open( "GET", url, true );
 	xhr.send( null );
 
+	that.onLoadStart();
+
 };
 
 THREE.OBJLoader.prototype.parse = function ( data ) {
 
 	var geometry = new THREE.Geometry();
-
-	console.time( 'THREE.OBJLoader.parse()' );
 
 	function vertex( a, b, c ) {
 
@@ -127,8 +133,6 @@ THREE.OBJLoader.prototype.parse = function ( data ) {
 		);
 
 	}
-
-	console.timeEnd( 'THREE.OBJLoader.parse()' );
 
 	geometry.computeCentroids();
 
