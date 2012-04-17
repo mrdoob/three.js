@@ -14,7 +14,7 @@ THREE.OBJLoader.prototype.load = function ( url, callback ) {
 
 			if ( xhr.status == 200 || xhr.status == 0 ) {
 
-				THREE.OBJLoader.prototype.parse( xhr.responseText, callback );
+				callback( THREE.OBJLoader.prototype.parse( xhr.responseText ) );
 
 			} else {
 
@@ -31,7 +31,7 @@ THREE.OBJLoader.prototype.load = function ( url, callback ) {
 
 };
 
-THREE.OBJLoader.prototype.parse = function ( data, callback ) {
+THREE.OBJLoader.prototype.parse = function ( data ) {
 
 	var geometry = new THREE.Geometry();
 
@@ -132,6 +132,6 @@ THREE.OBJLoader.prototype.parse = function ( data, callback ) {
 
 	geometry.computeCentroids();
 
-	callback( geometry );
+	return geometry;
 
 }
