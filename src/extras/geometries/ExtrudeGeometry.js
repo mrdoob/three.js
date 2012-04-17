@@ -21,6 +21,7 @@
  *
  *  material:		 <int>	// material index for front and back faces
  *  extrudeMaterial: <int>	// material index for extrusion and beveled faces
+ *  uvGenerator:	 <Object> // object that provides UV generator functions
  *
  *  }
   **/
@@ -87,6 +88,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	var material = options.material;
 	var extrudeMaterial = options.extrudeMaterial;
+	var uvGenerator = options.uvGenerator || null;
 
 	var shapebb = this.shapebb;
 	//shapebb = shape.getBoundingBox();
@@ -523,8 +525,9 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	}
 
-	// set UV generator
-	var uvgen = THREE.ExtrudeGeometry.WorldUVGenerator;
+	// choose UV generator
+	var uvgen = uvGenerator /* specified */ ||
+	            THREE.ExtrudeGeometry.WorldUVGenerator; /* default */
 
 	////
 	///   Handle Faces
@@ -618,7 +621,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 					c = layeroffset + k + slen2,
 					d = layeroffset + j + slen2;
 
-				f4( a, b, c, d, contour, s, sl );
+				f4( a, b, c, d, contour, s, sl, j, k );
 			}
 		}
 	}
@@ -642,7 +645,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
  		scope.faceVertexUvs[ 0 ].push(uvs);
 	}
 
-	function f4( a, b, c, d, wallContour, stepIndex, stepsLength ) {
+	function f4( a, b, c, d, wallContour, stepIndex, stepsLength, contourIndex1, contourIndex2 ) {
 		a += shapesOffset;
 		b += shapesOffset;
 		c += shapesOffset;
@@ -650,7 +653,8 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
  		scope.faces.push( new THREE.Face4( a, b, c, d, null, null, extrudeMaterial ) );
  
- 		var uvs = uvgen.generateSideWallUV( scope, shape, wallContour, options, a, b, c, d, stepIndex, stepsLength);
+ 		var uvs = uvgen.generateSideWallUV( scope, shape, wallContour, options, a, b, c, d,
+ 		                                    stepIndex, stepsLength, contourIndex1, contourIndex2 );
  		scope.faceVertexUvs[ 0 ].push(uvs);
 	}
 
@@ -681,7 +685,8 @@ THREE.ExtrudeGeometry.WorldUVGenerator = {
 	},
 
 	generateSideWallUV: function( geometry, extrudedShape, wallContour, extrudeOptions,
-	                              indexA, indexB, indexC, indexD, stepIndex, stepsLength) {
+	                              indexA, indexB, indexC, indexD, stepIndex, stepsLength,
+	                              contourIndex1, contourIndex2 ) {
 		var ax = geometry.vertices[ indexA ].x,
 			ay = geometry.vertices[ indexA ].y,
 			az = geometry.vertices[ indexA ].z,
