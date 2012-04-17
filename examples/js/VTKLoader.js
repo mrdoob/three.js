@@ -22,7 +22,7 @@ THREE.VTKLoader.prototype.load = function( url, callback) {
 
 		function v( x, y, z ) {
 
-			geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( x, y, z ) ) );
+			geometry.vertices.push( new THREE.Vector3( x, y, z ) );
 
 		}
 
