@@ -4,7 +4,7 @@
 
 THREE.CanvasRenderer = function ( parameters ) {
 
-	console.log( 'THREE.CanvasRenderer' );
+	console.log( 'THREE.CanvasRenderer', THREE.REVISION );
 
 	parameters = parameters || {};
 

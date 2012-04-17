@@ -4,8 +4,6 @@
 
 var THREE = THREE || { REVISION: '49dev' };
 
-console.log( 'THREE', THREE.REVISION );
-
 if ( ! self.Int32Array ) {
 
 	self.Int32Array = Array;
