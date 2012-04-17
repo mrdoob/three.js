@@ -3,9 +3,11 @@
  */
 
 THREE.OBJLoader = function () {};
+
 THREE.OBJLoader.prototype.load = function ( url, callback ) {
 
 	var xhr = new XMLHttpRequest();
+
 	xhr.onreadystatechange = function () {
 
 		if ( xhr.readyState == 4 ) {
