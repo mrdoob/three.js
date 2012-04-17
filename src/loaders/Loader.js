@@ -8,7 +8,7 @@ THREE.Loader = function ( showStatus ) {
 	this.statusDomElement = showStatus ? THREE.Loader.prototype.addStatusElement() : null;
 
 	this.onLoadStart = function () {};
-	this.onLoadProgress = function() {};
+	this.onLoadProgress = function () {};
 	this.onLoadComplete = function () {};
 
 };
