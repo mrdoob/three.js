@@ -3343,6 +3343,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_this.info.render.vertices = 0;
 		_this.info.render.faces = 0;
 		_this.info.render.points = 0;
+		
+		LightsAreCalculated = true;
 
 		this.setRenderTarget( renderTarget );
 
@@ -4956,9 +4958,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 		object._normalMatrix.transpose();
 
 	};
-
+    var LightsAreCalculated = false;
 	function setupLights ( program, lights ) {
-
+        if (LightsAreCalculated){ 
 		var l, ll, light, n,
 		r = 0, g = 0, b = 0,
 		color, position, intensity, distance,
@@ -5126,7 +5128,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		zlights.ambient[ 0 ] = r;
 		zlights.ambient[ 1 ] = g;
 		zlights.ambient[ 2 ] = b;
-
+		LightsAreCalculated = false;
+		};
 	};
 
 	// GL state setting
