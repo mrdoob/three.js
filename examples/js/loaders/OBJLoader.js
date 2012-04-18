@@ -41,8 +41,6 @@ THREE.OBJLoader.prototype.load = function ( url, callback ) {
 
 THREE.OBJLoader.prototype.parse = function ( data ) {
 
-	var geometry = new THREE.Geometry();
-
 	function vertex( a, b, c ) {
 
 		return new THREE.Vector3( parseFloat( a ), parseFloat( b ), parseFloat( c ) );
@@ -61,81 +59,103 @@ THREE.OBJLoader.prototype.parse = function ( data ) {
 
 	}
 
+	var objects = [];
+	var vertices = [];
+
 	var pattern, result;
 
 	// v float float float
-	// ["v 1.0 2.0 3.0", "1.0", "2.0", "3.0"]
 
 	pattern = /v( [\d|\.|\+|\-|e]+)( [\d|\.|\+|\-|e]+)( [\d|\.|\+|\-|e]+)/g;
 
 	while ( ( result = pattern.exec( data ) ) != null ) {
 
-		geometry.vertices.push( vertex( result[ 1 ], result[ 2 ], result[ 3 ] ) );
+		// ["v 1.0 2.0 3.0", "1.0", "2.0", "3.0"]
+
+		vertices.push( vertex( result[ 1 ], result[ 2 ], result[ 3 ] ) );
 
 	}
 
-	// f vertex vertex vertex ...
-	// ["f 1 2 3", "1", "2", "3", undefined]
+	var data = data.split( '\no ');
 
-	pattern = /f( [\d]+)( [\d]+)( [\d]+)( [\d]+)?/g;
+	for ( var i = 0, l = data.length; i < l; i ++ ) {
 
-	while ( ( result = pattern.exec( data ) ) != null ) {
+		var object = data[ i ];
 
-		geometry.faces.push(
-			result[ 4 ] === undefined ?
-			face3( result[ 1 ], result[ 2 ], result[ 3 ] ) :
-			face4( result[ 1 ], result[ 2 ], result[ 3 ], result[ 4 ] )
-		);
+		var geometry = new THREE.Geometry();
+
+		geometry.vertices = vertices;
+
+		// f vertex vertex vertex ...
+
+		pattern = /f( [\d]+)( [\d]+)( [\d]+)( [\d]+)?/g;
+
+		while ( ( result = pattern.exec( object ) ) != null ) {
+
+			// ["f 1 2 3", "1", "2", "3", undefined]
+
+			geometry.faces.push(
+				result[ 4 ] === undefined ?
+				face3( result[ 1 ], result[ 2 ], result[ 3 ] ) :
+				face4( result[ 1 ], result[ 2 ], result[ 3 ], result[ 4 ] )
+			);
+
+		}
+
+		// f vertex/uv vertex/uv vertex/uv ...
+
+		pattern = /f( ([\d]+)\/([\d]+))( ([\d]+)\/([\d]+))( ([\d]+)\/([\d]+))( ([\d]+)\/([\d]+))?/g;
+
+		while ( ( result = pattern.exec( object ) ) != null ) {
+
+			// ["f 1/1 2/2 3/3", " 1/1", "1", "1", " 2/2", "2", "2", " 3/3", "3", "3", undefined, undefined, undefined]
+
+			geometry.faces.push(
+				result[ 10 ] === undefined ?
+				face3( result[ 2 ], result[ 5 ], result[ 8 ] ) :
+				face4( result[ 2 ], result[ 5 ], result[ 8 ], result[ 11 ] )
+			);
+
+		}
+
+		// f vertex/uv/normal vertex/uv/normal vertex/uv/normal ...
+
+		pattern = /f( ([\d]+)\/([\d]+)\/([\d]+))( ([\d]+)\/([\d]+)\/([\d]+))( ([\d]+)\/([\d]+)\/([\d]+))( ([\d]+)\/([\d]+)\/([\d]+))?/g;
+
+		while ( ( result = pattern.exec( object ) ) != null ) {
+
+			// ["f 1/1/1 2/2/2 3/3/3", " 1/1/1", "1", "1", "1", " 2/2/2", "2", "2", "2", " 3/3/3", "3", "3", "3", undefined, undefined, undefined, undefined]
+
+			geometry.faces.push(
+				result[ 13 ] === undefined ?
+				face3( result[ 2 ], result[ 6 ], result[ 10 ] ) :
+				face4( result[ 2 ], result[ 6 ], result[ 10 ], result[ 14 ] )
+			);
+
+		}
+
+		// f vertex//normal vertex//normal vertex//normal ...
+
+		pattern = /f( ([\d]+)\/\/([\d]+))( ([\d]+)\/\/([\d]+))( ([\d]+)\/\/([\d]+))( ([\d]+)\/\/([\d]+))?/g;
+
+		while ( ( result = pattern.exec( object ) ) != null ) {
+
+			// ["f 1//1 2//2 3//3", " 1//1", "1", "1", " 2//2", "2", "2", " 3//3", "3", "3", undefined, undefined, undefined]
+
+			geometry.faces.push(
+				result[ 10 ] === undefined ?
+				face3( result[ 2 ], result[ 5 ], result[ 8 ] ) :
+				face4( result[ 2 ], result[ 5 ], result[ 8 ], result[ 11 ] )
+			);
+
+		}
+
+		geometry.computeCentroids();
+
+		objects.push( new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } ) ) );
 
 	}
 
-	// f vertex/uv vertex/uv vertex/uv ...
-	// ["f 1/1 2/2 3/3", " 1/1", "1", "1", " 2/2", "2", "2", " 3/3", "3", "3", undefined, undefined, undefined]
-
-	pattern = /f( ([\d]+)\/([\d]+))( ([\d]+)\/([\d]+))( ([\d]+)\/([\d]+))( ([\d]+)\/([\d]+))?/g;
-
-	while ( ( result = pattern.exec( data ) ) != null ) {
-
-		geometry.faces.push(
-			result[ 10 ] === undefined ?
-			face3( result[ 2 ], result[ 5 ], result[ 8 ] ) :
-			face4( result[ 2 ], result[ 5 ], result[ 8 ], result[ 11 ] )
-		);
-
-	}
-
-	// f vertex/uv/normal vertex/uv/normal vertex/uv/normal ...
-	// ["f 1/1/1 2/2/2 3/3/3", " 1/1/1", "1", "1", "1", " 2/2/2", "2", "2", "2", " 3/3/3", "3", "3", "3", undefined, undefined, undefined, undefined]
-
-	pattern = /f( ([\d]+)\/([\d]+)\/([\d]+))( ([\d]+)\/([\d]+)\/([\d]+))( ([\d]+)\/([\d]+)\/([\d]+))( ([\d]+)\/([\d]+)\/([\d]+))?/g;
-
-	while ( ( result = pattern.exec( data ) ) != null ) {
-
-		geometry.faces.push(
-			result[ 13 ] === undefined ?
-			face3( result[ 2 ], result[ 6 ], result[ 10 ] ) :
-			face4( result[ 2 ], result[ 6 ], result[ 10 ], result[ 14 ] )
-		);
-
-	}
-
-	// f vertex//normal vertex//normal vertex//normal ...
-	// ["f 1//1 2//2 3//3", " 1//1", "1", "1", " 2//2", "2", "2", " 3//3", "3", "3", undefined, undefined, undefined]
-
-	pattern = /f( ([\d]+)\/\/([\d]+))( ([\d]+)\/\/([\d]+))( ([\d]+)\/\/([\d]+))( ([\d]+)\/\/([\d]+))?/g;
-
-	while ( ( result = pattern.exec( data ) ) != null ) {
-
-		geometry.faces.push(
-			result[ 10 ] === undefined ?
-			face3( result[ 2 ], result[ 5 ], result[ 8 ] ) :
-			face4( result[ 2 ], result[ 5 ], result[ 8 ], result[ 11 ] )
-		);
-
-	}
-
-	geometry.computeCentroids();
-
-	return geometry;
+	return objects;
 
 }

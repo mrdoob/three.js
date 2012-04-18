@@ -64,11 +64,15 @@
 				scene.add( camera );
 
 				var loader = new THREE.OBJLoader();
-				loader.load( "obj/male02/male02.obj", function ( geometry ) {
+				loader.load( "obj/male02/male02.obj", function ( objects ) {
 
-					var mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { wireframe: true } ) );
-					mesh.position.y = - 80;
-					scene.add( mesh );
+					for ( var i = 0; i < objects.length; i ++ ) {
+
+						var object = objects[ i ];
+						object.position.y = - 80;
+						scene.add( object );
+
+					}
 
 				} );
 
