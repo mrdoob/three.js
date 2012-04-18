@@ -33,7 +33,7 @@
 		</div>
 
 		<script src="../build/Three.js"></script>
-		<script src="js/VTKLoader.js"></script>
+		<script src="js/loaders/VTKLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/Stats.js"></script>
@@ -97,7 +97,7 @@
 			var material =  new THREE.MeshLambertMaterial( { color:0xffffff} );
 
 			var loader=new THREE.VTKLoader();
-			loader.load ("models/bunny.vtk", function(geom){
+			loader.load ("models/vtk/bunny.vtk", function(geom){
 				var mesh = new THREE.Mesh(geom, material );
 				mesh.doubleSided=true;
 				mesh.position.setY(-0.09);
