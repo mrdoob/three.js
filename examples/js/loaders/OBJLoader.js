@@ -20,8 +20,6 @@ THREE.OBJLoader.prototype.load = function ( url, callback ) {
 
 				callback( that.parse( xhr.responseText ) );
 
-				that.onLoadComplete();
-
 			} else {
 
 				console.error( 'THREE.OBJLoader: Couldn\'t load ' + url + ' (' + xhr.status + ')' );
@@ -34,8 +32,6 @@ THREE.OBJLoader.prototype.load = function ( url, callback ) {
 
 	xhr.open( "GET", url, true );
 	xhr.send( null );
-
-	that.onLoadStart();
 
 };
 
