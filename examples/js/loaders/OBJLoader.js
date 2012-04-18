@@ -41,26 +41,27 @@ THREE.OBJLoader.prototype.load = function ( url, callback ) {
 
 THREE.OBJLoader.prototype.parse = function ( data ) {
 
-	function vertex( a, b, c ) {
+	function vector( x, y, z ) {
 
-		return new THREE.Vector3( parseFloat( a ), parseFloat( b ), parseFloat( c ) );
-
-	}
-
-	function face3( a, b, c ) {
-
-		return new THREE.Face3( parseInt( a ) - 1, parseInt( b ) - 1, parseInt( c ) - 1 );
+		return new THREE.Vector3( x, y, z );
 
 	}
 
-	function face4( a, b, c, d ) {
+	function face3( a, b, c, normals ) {
 
-		return new THREE.Face4( parseInt( a ) - 1, parseInt( b ) - 1, parseInt( c ) - 1, parseInt( d ) - 1 );
+		return new THREE.Face3( a, b, c, normals );
+
+	}
+
+	function face4( a, b, c, d, normals ) {
+
+		return new THREE.Face4( a, b, c, d, normals );
 
 	}
 
 	var objects = [];
 	var vertices = [];
+	var normals = [];
 
 	var pattern, result;
 
@@ -72,7 +73,28 @@ THREE.OBJLoader.prototype.parse = function ( data ) {
 
 		// ["v 1.0 2.0 3.0", "1.0", "2.0", "3.0"]
 
-		vertices.push( vertex( result[ 1 ], result[ 2 ], result[ 3 ] ) );
+		vertices.push( vector(
+			parseFloat( result[ 1 ] ),
+			parseFloat( result[ 2 ] ),
+			parseFloat( result[ 3 ] )
+		) );
+
+	}
+
+
+	// vn float float float
+
+	pattern = /vn( [\d|\.|\+|\-|e]+)( [\d|\.|\+|\-|e]+)( [\d|\.|\+|\-|e]+)/g;
+
+	while ( ( result = pattern.exec( data ) ) != null ) {
+
+		// ["v 1.0 2.0 3.0", "1.0", "2.0", "3.0"]
+
+		normals.push( vector(
+			parseFloat( result[ 1 ] ),
+			parseFloat( result[ 2 ] ),
+			parseFloat( result[ 3 ] )
+		) );
 
 	}
 
@@ -94,11 +116,24 @@ THREE.OBJLoader.prototype.parse = function ( data ) {
 
 			// ["f 1 2 3", "1", "2", "3", undefined]
 
-			geometry.faces.push(
-				result[ 4 ] === undefined ?
-				face3( result[ 1 ], result[ 2 ], result[ 3 ] ) :
-				face4( result[ 1 ], result[ 2 ], result[ 3 ], result[ 4 ] )
-			);
+			if ( result[ 4 ] === undefined ) {
+			
+				geometry.faces.push( face3(
+					parseInt( result[ 1 ] ) - 1,
+					parseInt( result[ 2 ] ) - 1,
+					parseInt( result[ 3 ] ) - 1
+				) );
+
+			} else {
+
+				geometry.faces.push( face4(
+					parseInt( result[ 1 ] ) - 1,
+					parseInt( result[ 2 ] ) - 1,
+					parseInt( result[ 3 ] ) - 1,
+					parseInt( result[ 4 ] ) - 1
+				) );
+
+			}
 
 		}
 
@@ -110,11 +145,24 @@ THREE.OBJLoader.prototype.parse = function ( data ) {
 
 			// ["f 1/1 2/2 3/3", " 1/1", "1", "1", " 2/2", "2", "2", " 3/3", "3", "3", undefined, undefined, undefined]
 
-			geometry.faces.push(
-				result[ 10 ] === undefined ?
-				face3( result[ 2 ], result[ 5 ], result[ 8 ] ) :
-				face4( result[ 2 ], result[ 5 ], result[ 8 ], result[ 11 ] )
-			);
+			if ( result[ 10 ] === undefined ) {
+			
+				geometry.faces.push( face3(
+					parseInt( result[ 2 ] ) - 1,
+					parseInt( result[ 5 ] ) - 1,
+					parseInt( result[ 8 ] ) - 1
+				) );
+
+			} else {
+
+				geometry.faces.push( face4(
+					parseInt( result[ 2 ] ) - 1,
+					parseInt( result[ 5 ] ) - 1,
+					parseInt( result[ 8 ] ) - 1,
+					parseInt( result[ 11 ] ) - 1
+				) );
+
+			}
 
 		}
 
@@ -126,11 +174,36 @@ THREE.OBJLoader.prototype.parse = function ( data ) {
 
 			// ["f 1/1/1 2/2/2 3/3/3", " 1/1/1", "1", "1", "1", " 2/2/2", "2", "2", "2", " 3/3/3", "3", "3", "3", undefined, undefined, undefined, undefined]
 
-			geometry.faces.push(
-				result[ 13 ] === undefined ?
-				face3( result[ 2 ], result[ 6 ], result[ 10 ] ) :
-				face4( result[ 2 ], result[ 6 ], result[ 10 ], result[ 14 ] )
-			);
+			if ( result[ 13 ] === undefined ) {
+			
+				geometry.faces.push( face3(
+					parseInt( result[ 2 ] ) - 1,
+					parseInt( result[ 6 ] ) - 1,
+					parseInt( result[ 10 ] ) - 1,
+					[
+						normals[ parseInt( result[ 4 ] ) - 1 ],
+						normals[ parseInt( result[ 8 ] ) - 1 ],
+						normals[ parseInt( result[ 12 ] ) - 1 ]
+					]
+				) );
+
+			} else {
+
+				geometry.faces.push( face4(
+					parseInt( result[ 2 ] ) - 1,
+					parseInt( result[ 6 ] ) - 1,
+					parseInt( result[ 10 ] ) - 1,
+					parseInt( result[ 14 ] ) - 1,
+					[
+						normals[ parseInt( result[ 4 ] ) - 1 ],
+						normals[ parseInt( result[ 8 ] ) - 1 ],
+						normals[ parseInt( result[ 12 ] ) - 1 ],
+						normals[ parseInt( result[ 16 ] ) - 1 ]
+					]
+				) );
+
+			}
+
 
 		}
 
@@ -142,17 +215,41 @@ THREE.OBJLoader.prototype.parse = function ( data ) {
 
 			// ["f 1//1 2//2 3//3", " 1//1", "1", "1", " 2//2", "2", "2", " 3//3", "3", "3", undefined, undefined, undefined]
 
-			geometry.faces.push(
-				result[ 10 ] === undefined ?
-				face3( result[ 2 ], result[ 5 ], result[ 8 ] ) :
-				face4( result[ 2 ], result[ 5 ], result[ 8 ], result[ 11 ] )
-			);
+			if ( result[ 10 ] === undefined ) {
+			
+				geometry.faces.push( face3(
+					parseInt( result[ 2 ] ) - 1,
+					parseInt( result[ 5 ] ) - 1,
+					parseInt( result[ 8 ] ) - 1,
+					[
+						normals[ parseInt( result[ 3 ] ) - 1 ],
+						normals[ parseInt( result[ 6 ] ) - 1 ],
+						normals[ parseInt( result[ 9 ] ) - 1 ]
+					]
+				) );
+
+			} else {
+
+				geometry.faces.push( face4(
+					parseInt( result[ 2 ] ) - 1,
+					parseInt( result[ 5 ] ) - 1,
+					parseInt( result[ 8 ] ) - 1,
+					parseInt( result[ 11 ] ) - 1,
+					[
+						normals[ parseInt( result[ 3 ] ) - 1 ],
+						normals[ parseInt( result[ 6 ] ) - 1 ],
+						normals[ parseInt( result[ 9 ] ) - 1 ],
+						normals[ parseInt( result[ 12 ] ) - 1 ]
+					]
+				) );
+
+			}
 
 		}
 
 		geometry.computeCentroids();
 
-		objects.push( new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } ) ) );
+		objects.push( new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) ) );
 
 	}
 
