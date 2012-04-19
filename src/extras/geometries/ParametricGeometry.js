@@ -34,7 +34,6 @@ THREE.ParametricGeometry = function ( slices, stacks, func ) {
 		}
 	}
 
-	var v = 0, next;
 	var a, b, c, d;
 	var uva, uvb, uvc, uvd;
 
