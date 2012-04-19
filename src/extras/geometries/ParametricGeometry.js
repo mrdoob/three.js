@@ -12,46 +12,55 @@ THREE.ParametricGeometry = function ( slices, stacks, func ) {
 	var faces = this.faces;
 	var uvs = this.faceVertexUvs[ 0 ];
 
-	var i, il, theta, j, phi, p;
+	var face3 = true;
 
-	for ( i = 0; i <= slices; i ++ ) {
+	var i, il, j, p;
+	var u, v;
 
-		theta = i / slices;
+	for ( i = 0; i <= stacks; i ++ ) {
 
-		for ( j = 0; j < stacks; j ++ ) {
+		v = i / stacks;
 
-			phi = j / stacks;
+		for ( j = 0; j <= slices; j ++ ) {
 
-			p = func( theta, phi );
+			u = j / slices;
+
+			p = func( u, v );
 			verts.push( p );
 
 		}
 	}
 
 	var v = 0, next;
+	var a, b, c, d;
+	var uva, uvb, ubc, uvd;
 
 	// Some UV / Face orientation work needs to be done here...
-	for ( i = 0; i < slices; i ++ ) {
-		for ( j = 0; j < stacks; j ++ ) {
-			next = ( j + 1 ) % stacks;
+	for ( i = 0; i < stacks; i ++ ) {
+		for ( j = 0; j < slices; j ++ ) {
 
-			faces.push( new THREE.Face3( v + j, v + next, v + j + stacks ) );
-			faces.push( new THREE.Face3( v + next, v + next + stacks, v + j + stacks ) );
+			a = i * stacks + j;
+			b = i * stacks + j + 1;
+			c = (i + 1) * stacks + j;
+			d = (i + 1) * stacks + j + 1;
 
-			uvs.push( [
-				new THREE.UV( i / slices, j / stacks ),
-				new THREE.UV( i / slices, ( j + 1 ) / stacks ),
-				new THREE.UV( ( i + 1 ) / slices, j / stacks )
-			] );
-			uvs.push( [
-				new THREE.UV( i / slices, ( j + 1 ) / stacks ),
-				new THREE.UV( ( i + 1 ) / slices, ( j + 1 ) / stacks ),
-				new THREE.UV( ( i + 1 ) / slices, j / stacks )
-			] );
+			uva = new THREE.UV( i / slices, j / stacks );
+			uvb = new THREE.UV( i / slices, ( j + 1 ) / stacks );
+			uvc = new THREE.UV( ( i + 1 ) / slices, j / stacks );
+			uvd = new THREE.UV( ( i + 1 ) / slices, ( j + 1 ) / stacks );
+
+
+			faces.push( new THREE.Face3( a, b, c ) );
+			faces.push( new THREE.Face3( b, d, c ) );
+
+			uvs.push( [ uva, ubc, uvc ] );
+			uvs.push( [ uvb, uvd, uvc ] );
 		}
-		v += stacks;
+		
 	}
 
+	// magic bullet
+	// this.mergeVertices();
 
 	this.computeCentroids();
 	this.computeFaceNormals();
