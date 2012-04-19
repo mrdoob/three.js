@@ -156,6 +156,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	_direction = new THREE.Vector3(),
 
+	_lightsNeedUpdate = true,
+
 	_lights = {
 
 		ambient: [ 0, 0, 0 ],
@@ -3307,7 +3309,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 		lights = scene.__lights,
 		fog = scene.fog;
 
+		// reset caching for this frame
+
 		_currentMaterialId = -1;
+		_lightsNeedUpdate = true;
 
 		// update scene graph
 
@@ -3491,6 +3496,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		for ( var i = 0, il = plugins.length; i < il; i ++ ) {
 
+			// reset state for plugin (to start from clean slate)
+
 			_currentProgram = null;
 			_currentCamera = null;
 			_oldBlending = -1;
@@ -3498,9 +3505,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_oldDepthWrite = -1;
 			_currentGeometryGroupHash = -1;
 			_currentMaterialId = -1;
+			_lightsNeedUpdate = true;
 
 			plugins[ i ].render( scene, camera, _currentWidth, _currentHeight );
 
+			// reset state after plugin (anything could have changed)
+
 			_currentProgram = null;
 			_currentCamera = null;
 			_oldBlending = -1;
@@ -3508,6 +3518,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_oldDepthWrite = -1;
 			_currentGeometryGroupHash = -1;
 			_currentMaterialId = -1;
+			_lightsNeedUpdate = true;
 
 		}
 
@@ -4436,7 +4447,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 				 material instanceof THREE.MeshLambertMaterial ||
 				 material.lights ) {
 
-				setupLights( program, lights );
+				if ( _lightsNeedUpdate ) {
+
+					setupLights( program, lights );
+					_lightsNeedUpdate = false;
+
+				}
+
 				refreshUniformsLights( m_uniforms, _lights );
 
 			}
