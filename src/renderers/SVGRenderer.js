@@ -111,7 +111,7 @@ THREE.SVGRenderer = function () {
 			material = element.material;
 			material = material instanceof THREE.MeshFaceMaterial ? element.faceMaterial : material;
 
-			if ( material == null || material.opacity == 0 ) continue;
+			if ( material === null || material.visible === false ) continue;
 
 			_bboxRect.empty();
 

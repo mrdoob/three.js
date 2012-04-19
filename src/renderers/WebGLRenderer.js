@@ -2886,6 +2886,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.renderBufferDirect = function ( camera, lights, fog, material, geometryGroup, object ) {
 
+		if ( material.visible === false ) return;
+
 		var program, attributes, linewidth, primitives, a, attribute;
 
 		program = setProgram( camera, lights, fog, material, object );
@@ -2975,6 +2977,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 	};
 
 	this.renderBuffer = function ( camera, lights, fog, material, geometryGroup, object ) {
+
+		if ( material.visible === false ) return;
 
 		var program, attributes, linewidth, primitives, a, attribute, i, il;
 
