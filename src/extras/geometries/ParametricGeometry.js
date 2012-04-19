@@ -12,47 +12,60 @@ THREE.ParametricGeometry = function ( slices, stacks, func ) {
 	var faces = this.faces;
 	var uvs = this.faceVertexUvs[ 0 ];
 
-	var i, il, theta, j, phi, p;
+	var face3 = true;
 
-	for ( i = 0; i <= slices; i ++ ) {
+	var i, il, j, p;
+	var u, v;
 
-		theta = i / slices;
+	var stackCount = stacks + 1;
+	var sliceCount = slices + 1;
+	
+	for ( i = 0; i <= stacks; i ++ ) {
 
-		for ( j = 0; j < stacks; j ++ ) {
+		v = i / stacks;
 
-			phi = j / stacks;
+		for ( j = 0; j <= slices; j ++ ) {
 
-			p = func( theta, phi );
+			u = j / slices;
+
+			p = func( u, v );
 			verts.push( p );
 
 		}
 	}
 
 	var v = 0, next;
+	var a, b, c, d;
+	var uva, uvb, uvc, uvd;
 
-	// Some UV / Face orientation work needs to be done here...
-	for ( i = 0; i < slices; i ++ ) {
-		for ( j = 0; j < stacks; j ++ ) {
-			next = ( j + 1 ) % stacks;
+	for ( i = 0; i < stacks; i ++ ) {
+		for ( j = 0; j < slices; j ++ ) {
 
-			faces.push( new THREE.Face3( v + j, v + next, v + j + stacks ) );
-			faces.push( new THREE.Face3( v + next, v + next + stacks, v + j + stacks ) );
+			a = i * stackCount + j;
+			b = i * stackCount + j + 1;
+			c = (i + 1) * stackCount + j;
+			d = (i + 1) * stackCount + j + 1;
 
-			uvs.push( [
-				new THREE.UV( i / slices, j / stacks ),
-				new THREE.UV( i / slices, ( j + 1 ) / stacks ),
-				new THREE.UV( ( i + 1 ) / slices, j / stacks )
-			] );
-			uvs.push( [
-				new THREE.UV( i / slices, ( j + 1 ) / stacks ),
-				new THREE.UV( ( i + 1 ) / slices, ( j + 1 ) / stacks ),
-				new THREE.UV( ( i + 1 ) / slices, j / stacks )
-			] );
+			uva = new THREE.UV( i / slices, j / stacks );
+			uvb = new THREE.UV( i / slices, ( j + 1 ) / stacks );
+			uvc = new THREE.UV( ( i + 1 ) / slices, j / stacks );
+			uvd = new THREE.UV( ( i + 1 ) / slices, ( j + 1 ) / stacks );
+
+			faces.push( new THREE.Face3( a, b, c ) );
+			faces.push( new THREE.Face3( b, d, c ) );
+
+			uvs.push( [ uva, uvb, uvc ] );
+			uvs.push( [ uvb, uvd, uvc ] );
 		}
-		v += stacks;
+		
 	}
 
+	console.log(this);
 
+	// magic bullet
+	var diff = this.mergeVertices();
+	console.log('removed ', diff, ' vertices by merging')
+	
 	this.computeCentroids();
 	this.computeFaceNormals();
 	this.computeVertexNormals();
