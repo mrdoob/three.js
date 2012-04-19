@@ -206,7 +206,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 			material = element.material;
 			material = material instanceof THREE.MeshFaceMaterial ? element.faceMaterial : material;
 
-			if ( material === null || material.visible === false ) continue;
+			if ( material === undefined || material.visible === false ) continue;
 
 			_bboxRect.empty();
 
