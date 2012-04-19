@@ -2360,13 +2360,13 @@ THREE.ColladaLoader = function () {
 
 		for ( var pCount = 0; pCount < pList.length; ++pCount ) {
 
-			var p = pList[pCount], i = 0;
+			var p = pList[ pCount ], i = 0;
 
 			while ( i < p.length ) {
 
 				var vs = [];
 				var ns = [];
-				var ts = {};
+				var ts = null;
 				var cs = [];
 
 				if ( primitive.vcount ) {
@@ -2407,6 +2407,7 @@ THREE.ColladaLoader = function () {
 
 							case 'TEXCOORD':
 
+								ts = ts || { };
 								if ( ts[ input.set ] === undefined ) ts[ input.set ] = [];
 								// invert the V
 								ts[ input.set ].push( new THREE.UV( source.data[ idx32 ], 1.0 - source.data[ idx32 + 1 ] ) );
@@ -2420,6 +2421,7 @@ THREE.ColladaLoader = function () {
 								break;
 
 							default:
+							
 								break;
 
 						}
@@ -2428,11 +2430,9 @@ THREE.ColladaLoader = function () {
 
 				}
 
-
-				var face = null, faces = [], uv, uvArr;
-
 				if ( ns.length == 0 ) {
-					// check the vertices source
+
+					// check the vertices inputs
 					input = this.vertices.input.NORMAL;
 
 					if ( input ) {
@@ -2446,12 +2446,61 @@ THREE.ColladaLoader = function () {
 
 						}
 
-					}
-					else {
+					} else {
+
 						geom.calcNormals = true;
+
 					}
 
 				}
+
+				if ( !ts ) {
+
+					ts = { };
+					// check the vertices inputs
+					input = this.vertices.input.TEXCOORD;
+
+					if ( input ) {
+
+						texture_sets.push( input.set );
+						source = sources[ input.source ];
+						numParams = source.accessor.params.length;
+
+						for ( var ndx = 0, len = vs.length; ndx < len; ndx++ ) {
+
+							idx32 = vs[ ndx ] * numParams;
+							if ( ts[ input.set ] === undefined ) ts[ input.set ] = [ ];
+							// invert the V
+							ts[ input.set ].push( new THREE.UV( source.data[ idx32 ], 1.0 - source.data[ idx32 + 1 ] ) );
+
+						}
+
+					}
+
+				}
+
+				if ( cs.length == 0 ) {
+
+					// check the vertices inputs
+					input = this.vertices.input.COLOR;
+
+					if ( input ) {
+
+						source = sources[ input.source ];
+						numParams = source.accessor.params.length;
+
+						for ( var ndx = 0, len = vs.length; ndx < len; ndx++ ) {
+
+							idx32 = vs[ ndx ] * numParams;
+							cs.push( new THREE.Color().setRGB( source.data[ idx32 ], source.data[ idx32 + 1 ], source.data[ idx32 + 2 ] ) );
+
+						}
+
+					}
+
+				}
+
+				var face = null, faces = [], uv, uvArr;
 
 				if ( vcount === 3 ) {
 
