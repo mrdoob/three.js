@@ -17,6 +17,9 @@ THREE.ParametricGeometry = function ( slices, stacks, func ) {
 	var i, il, j, p;
 	var u, v;
 
+	var stackCount = stacks + 1;
+	var sliceCount = slices + 1;
+	
 	for ( i = 0; i <= stacks; i ++ ) {
 
 		v = i / stacks;
@@ -33,34 +36,34 @@ THREE.ParametricGeometry = function ( slices, stacks, func ) {
 
 	var v = 0, next;
 	var a, b, c, d;
-	var uva, uvb, ubc, uvd;
+	var uva, uvb, uvc, uvd;
 
-	// Some UV / Face orientation work needs to be done here...
 	for ( i = 0; i < stacks; i ++ ) {
 		for ( j = 0; j < slices; j ++ ) {
 
-			a = i * stacks + j;
-			b = i * stacks + j + 1;
-			c = (i + 1) * stacks + j;
-			d = (i + 1) * stacks + j + 1;
+			a = i * stackCount + j;
+			b = i * stackCount + j + 1;
+			c = (i + 1) * stackCount + j;
+			d = (i + 1) * stackCount + j + 1;
 
 			uva = new THREE.UV( i / slices, j / stacks );
 			uvb = new THREE.UV( i / slices, ( j + 1 ) / stacks );
 			uvc = new THREE.UV( ( i + 1 ) / slices, j / stacks );
 			uvd = new THREE.UV( ( i + 1 ) / slices, ( j + 1 ) / stacks );
 
-
 			faces.push( new THREE.Face3( a, b, c ) );
 			faces.push( new THREE.Face3( b, d, c ) );
 
-			uvs.push( [ uva, ubc, uvc ] );
+			uvs.push( [ uva, uvb, uvc ] );
 			uvs.push( [ uvb, uvd, uvc ] );
 		}
 		
 	}
 
+	console.log(this);
+
 	// magic bullet
-	// this.mergeVertices();
+	this.mergeVertices();
 
 	this.computeCentroids();
 	this.computeFaceNormals();
