@@ -88,11 +88,22 @@
 				// }
 
 				console.log(THREE.ParametricGeometries);
-				var geo = new THREE.ParametricGeometry(20, 20, THREE.ParametricGeometries.klein);
+				var geo;
+
+
+				geo = new THREE.ParametricGeometry(20, 20, THREE.ParametricGeometries.klein);
 				object = THREE.SceneUtils.createMultiMaterialObject( geo, materials );
 				object.children[ 0 ].doubleSided = true;
 				object.position.set( 0, 0, 0 );
 				object.scale.multiplyScalar(10);
+				scene.add( object );
+
+
+				geo = new THREE.ParametricGeometry(20, 20, THREE.ParametricGeometries.mobius);
+				object = THREE.SceneUtils.createMultiMaterialObject( geo, materials );
+				// object.children[ 0 ].doubleSided = true;
+				object.position.set( 10, 0, 0 );
+				object.scale.multiplyScalar(100);
 				scene.add( object );
 
 				// var geo = new THREE.ParametricGeometry(10, 10, THREE.ParametricGeometries.plane(200, 200));

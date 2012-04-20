@@ -154,7 +154,38 @@ THREE.ParametricGeometries = {
 
             return new THREE.Vector3(x, y, z);
         };
+    },
+
+    mobius: function(u, t) {
+
+        // flat mobius strip
+        // http://www.wolframalpha.com/input/?i=M%C3%B6bius+strip+parametric+equations&lk=1&a=ClashPrefs_*Surface.MoebiusStrip.SurfaceProperty.ParametricEquations-
+        // u = u - 0.5;
+        // var v = 2 * pi * t;
+
+        // var x, y, z;
+
+        // var a = 2;
+        // x = cos(v) * (a + u * cos(v/2));
+        // y = sin(v) * (a + u * cos(v/2));
+        // z = u * sin(v/2);
+        // return new THREE.Vector3(x, y, z);
+
+        // volumetric mobius strip
+        u *= pi;
+        t *= 2 * pi;
+
+        u = u * 2
+        var phi = u / 2
+        var major = 2.25, a = 0.125, b = 0.65;
+        var x, y, z;
+        x = a * cos(t) * cos(phi) - b * sin(t) * sin(phi);
+        z = a * cos(t) * sin(phi) + b * sin(t) * cos(phi);
+        y = (major + x) * sin(u);
+        x = (major + x) * cos(u);
+        return new THREE.Vector3(x, y, z);
     }
+
 };
 
 
