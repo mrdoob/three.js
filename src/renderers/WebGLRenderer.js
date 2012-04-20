@@ -3266,7 +3266,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				gonnaUse.length = material.numSupportedMorphTargets 
             } else if (gonnaUse.length >  material.numSupportedMorphNormals){
             	gonnaUse.sort(sortNumerical);
-            } else if (gonnaUse.length = 0){
+            } else if (gonnaUse.length === 0){
 				gonnaUse.push(0);
             };
 
