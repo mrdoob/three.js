@@ -2,9 +2,12 @@
  * @author zz85 / https://github.com/zz85
  * Parametric Surfaces Geometry
  * based on the brilliant article by @prideout http://prideout.net/blog/?p=44
+ *
+ * new THREE.ParametricGeometry( parametricFunction, uSements, ySegements, useTris );
+ *
  */
 
-THREE.ParametricGeometry = function ( func, slices, stacks, face4 ) {
+THREE.ParametricGeometry = function ( func, slices, stacks, useTris ) {
 
 	THREE.Geometry.call( this );
 
@@ -12,7 +15,7 @@ THREE.ParametricGeometry = function ( func, slices, stacks, face4 ) {
 	var faces = this.faces;
 	var uvs = this.faceVertexUvs[ 0 ];
 
-	var useFace3 = (face4 === undefined) ? true : !face4;
+	useTris = (useTris === undefined) ? false : useTris;
 
 	var i, il, j, p;
 	var u, v;
@@ -50,7 +53,7 @@ THREE.ParametricGeometry = function ( func, slices, stacks, face4 ) {
 			uvc = new THREE.UV( ( i + 1 ) / slices, j / stacks );
 			uvd = new THREE.UV( ( i + 1 ) / slices, ( j + 1 ) / stacks );
 
-			if ( useFace3 ) {
+			if ( useTris ) {
 
 				faces.push( new THREE.Face3( a, b, c ) );
 				faces.push( new THREE.Face3( b, d, c ) );
@@ -72,8 +75,8 @@ THREE.ParametricGeometry = function ( func, slices, stacks, face4 ) {
 	// console.log(this);
 
 	// magic bullet
-	var diff = this.mergeVertices();
-	console.log('removed ', diff, ' vertices by merging');
+	// var diff = this.mergeVertices();
+	// console.log('removed ', diff, ' vertices by merging');
 	
 	this.computeCentroids();
 	this.computeFaceNormals();

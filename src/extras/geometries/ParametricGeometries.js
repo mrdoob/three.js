@@ -3,6 +3,80 @@
  * 
  * Experimenting of primitive geometry creation using Surface Parametric equations
  */
+
+
+var sin = Math.sin, cos = Math.cos, pi = Math.PI;
+
+THREE.ParametricGeometries = {
+	
+	klein: function (v, u) {
+		u *= pi;
+		v *= 2 * pi;
+
+		u = u * 2;
+		var x, y, z;
+		if (u < pi) {
+			x = 3 * cos(u) * (1 + sin(u)) + (2 * (1 - cos(u) / 2)) * cos(u) * cos(v);
+			z = -8 * sin(u) - 2 * (1 - cos(u) / 2) * sin(u) * cos(v);
+		} else {
+			x = 3 * cos(u) * (1 + sin(u)) + (2 * (1 - cos(u) / 2)) * cos(v + pi);
+			z = -8 * sin(u);
+		}
+	  
+		y = -2 * (1 - cos(u) / 2) * sin(v);
+		
+		return new THREE.Vector3(x, y, z);
+	},
+
+	plane: function (width, height) {
+		
+		return function(u, v) {
+			var x = u * width;
+			var y = 0; 
+			var z = v * height;
+
+			console.log(x, y, z);
+
+			return new THREE.Vector3(x, y, z);
+		};
+	},
+
+	mobius: function(u, t) {
+
+		// flat mobius strip
+		// http://www.wolframalpha.com/input/?i=M%C3%B6bius+strip+parametric+equations&lk=1&a=ClashPrefs_*Surface.MoebiusStrip.SurfaceProperty.ParametricEquations-
+		u = u - 0.5;
+		var v = 2 * pi * t;
+
+		var x, y, z;
+
+		var a = 2;
+		x = cos(v) * (a + u * cos(v/2));
+		y = sin(v) * (a + u * cos(v/2));
+		z = u * sin(v/2);
+		return new THREE.Vector3(x, y, z);
+
+	},
+
+	mobius3d: function(u, t) {
+
+		// volumetric mobius strip
+		u *= pi;
+		t *= 2 * pi;
+
+		u = u * 2
+		var phi = u / 2
+		var major = 2.25, a = 0.125, b = 0.65;
+		var x, y, z;
+		x = a * cos(t) * cos(phi) - b * sin(t) * sin(phi);
+		z = a * cos(t) * sin(phi) + b * sin(t) * cos(phi);
+		y = (major + x) * sin(u);
+		x = (major + x) * cos(u);
+		return new THREE.Vector3(x, y, z);
+	}
+
+};
+
 THREE.TubeGeometry2 = function(path, segments, radius, segmentsRadius, closed, debug) {
 
 	this.path = path;
@@ -120,73 +194,6 @@ THREE.TubeGeometry2.prototype.constructor = THREE.TubeGeometry2;
 
 THREE.TorusKnotGeometry2.prototype = new THREE.Geometry();
 THREE.TorusKnotGeometry2.prototype.constructor = THREE.TorusKnotGeometry2;
-
- var sin = Math.sin, cos = Math.cos, pi = Math.PI;
-
-THREE.ParametricGeometries = {
-	klein: function (v, u) {
-		u *= pi;
-		v *= 2 * pi;
-
-		u = u * 2;
-		var x, y, z;
-		if (u < pi) {
-			x = 3 * cos(u) * (1 + sin(u)) + (2 * (1 - cos(u) / 2)) * cos(u) * cos(v);
-			z = -8 * sin(u) - 2 * (1 - cos(u) / 2) * sin(u) * cos(v);
-		} else {
-			x = 3 * cos(u) * (1 + sin(u)) + (2 * (1 - cos(u) / 2)) * cos(v + pi);
-			z = -8 * sin(u);
-		}
-	  
-		y = -2 * (1 - cos(u) / 2) * sin(v);
-		
-		return new THREE.Vector3(x, y, z);
-	},
-
-	plane: function (width, height) {
-		
-		return function(u, v) {
-			var x = u * width;
-			var y = 0; 
-			var z = v * height;
-
-			console.log(x, y, z);
-
-			return new THREE.Vector3(x, y, z);
-		};
-	},
-
-	mobius: function(u, t) {
-
-		// flat mobius strip
-		// http://www.wolframalpha.com/input/?i=M%C3%B6bius+strip+parametric+equations&lk=1&a=ClashPrefs_*Surface.MoebiusStrip.SurfaceProperty.ParametricEquations-
-		// u = u - 0.5;
-		// var v = 2 * pi * t;
-
-		// var x, y, z;
-
-		// var a = 2;
-		// x = cos(v) * (a + u * cos(v/2));
-		// y = sin(v) * (a + u * cos(v/2));
-		// z = u * sin(v/2);
-		// return new THREE.Vector3(x, y, z);
-
-		// volumetric mobius strip
-		u *= pi;
-		t *= 2 * pi;
-
-		u = u * 2
-		var phi = u / 2
-		var major = 2.25, a = 0.125, b = 0.65;
-		var x, y, z;
-		x = a * cos(t) * cos(phi) - b * sin(t) * sin(phi);
-		z = a * cos(t) * sin(phi) + b * sin(t) * cos(phi);
-		y = (major + x) * sin(u);
-		x = (major + x) * cos(u);
-		return new THREE.Vector3(x, y, z);
-	}
-
-};
 
 
 THREE.SphereGeometry2 = function(size, x, y) {
