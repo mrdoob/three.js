@@ -116,17 +116,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// GL state cache
 
-	_oldDoubleSided = null,
-	_oldFlipSided = null,
+	_oldDoubleSided = -1,
+	_oldFlipSided = -1,
 
-	_oldBlending = null,
+	_oldBlending = -1,
 
-	_oldBlendEquation = null,
-	_oldBlendSrc = null,
-	_oldBlendDst = null,
+	_oldBlendEquation = -1,
+	_oldBlendSrc = -1,
+	_oldBlendDst = -1,
 
-	_oldDepthTest = null,
-	_oldDepthWrite = null,
+	_oldDepthTest = -1,
+	_oldDepthWrite = -1,
 
 	_oldPolygonOffset = null,
 	_oldPolygonOffsetFactor = null,
@@ -379,6 +379,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_oldDepthWrite = -1;
 		_currentGeometryGroupHash = -1;
 		_currentMaterialId = -1;
+		_lightsNeedUpdate = true;
+		_oldDoubleSided = -1;
+		_oldFlipSided = -1;
 
 		this.shadowMapPlugin.update( scene, camera );
 
@@ -3500,11 +3503,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_currentProgram = null;
 			_currentCamera = null;
+
 			_oldBlending = -1;
 			_oldDepthTest = -1;
 			_oldDepthWrite = -1;
+			_oldDoubleSided = -1;
+			_oldFlipSided = -1;
 			_currentGeometryGroupHash = -1;
 			_currentMaterialId = -1;
+
 			_lightsNeedUpdate = true;
 
 			plugins[ i ].render( scene, camera, _currentWidth, _currentHeight );
@@ -3513,11 +3520,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_currentProgram = null;
 			_currentCamera = null;
+
 			_oldBlending = -1;
 			_oldDepthTest = -1;
 			_oldDepthWrite = -1;
+			_oldDoubleSided = -1;
+			_oldFlipSided = -1;
 			_currentGeometryGroupHash = -1;
 			_currentMaterialId = -1;
+
 			_lightsNeedUpdate = true;
 
 		}
