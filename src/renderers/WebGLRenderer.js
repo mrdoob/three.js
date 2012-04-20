@@ -3255,7 +3255,7 @@ THREE.WebGLRenderer = function ( parameters ) {
             var gonnaUse = [];
             
             for ( i = 0; i < il; i ++ ) {
-                var candidateInfluence = influences[ i ]
+                candidateInfluence = influences[ i ]
 				if ( candidateInfluence > 0 ) {
                     gonnaUse.push(i);
 				}
