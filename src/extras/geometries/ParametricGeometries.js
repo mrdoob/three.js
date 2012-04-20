@@ -67,7 +67,7 @@ THREE.TubeGeometry2 = function(path, segments, radius, segmentsRadius, closed, d
         return pos2.clone();
     };
 
-    THREE.ParametricGeometry.call(this, segments, segmentsRadius, ParametricTube);
+    THREE.ParametricGeometry.call(this, ParametricTube, segments, segmentsRadius);
 
 };
 
@@ -202,7 +202,7 @@ THREE.SphereGeometry2 = function(size, x, y) {
         return new THREE.Vector3(x, y, z).multiplyScalar(size);
     }
   
-    THREE.ParametricGeometry.call(this, y, x, sphere);
+    THREE.ParametricGeometry.call(this, sphere, y, x);
 
 };
 
@@ -221,7 +221,7 @@ THREE.PlaneGeometry2 = function(width, depth, segmentsWidth, segmentsDepth) {
         return new THREE.Vector3(x, y, z);
     }
   
-    THREE.ParametricGeometry.call(this, segmentsWidth, segmentsDepth, plane);
+    THREE.ParametricGeometry.call(this, plane, segmentsWidth, segmentsDepth);
 
 };
 

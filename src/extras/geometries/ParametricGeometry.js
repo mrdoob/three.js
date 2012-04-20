@@ -4,7 +4,7 @@
  * based on the brilliant article by @prideout http://prideout.net/blog/?p=44
  */
 
-THREE.ParametricGeometry = function ( slices, stacks, func, face4 ) {
+THREE.ParametricGeometry = function ( func, slices, stacks, face4 ) {
 
 	THREE.Geometry.call( this );
 
