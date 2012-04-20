@@ -224,6 +224,7 @@ DOM_FILES = [
 'cameras/OrthographicCamera.js',
 'cameras/PerspectiveCamera.js',
 'lights/Light.js',
+'loaders/Loader.js',
 'materials/Material.js',
 'materials/LineBasicMaterial.js',
 'materials/MeshBasicMaterial.js',
