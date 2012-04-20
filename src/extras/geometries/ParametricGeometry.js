@@ -4,7 +4,7 @@
  * based on the brilliant article by @prideout http://prideout.net/blog/?p=44
  */
 
-THREE.ParametricGeometry = function ( slices, stacks, func ) {
+THREE.ParametricGeometry = function ( slices, stacks, func, face4 ) {
 
 	THREE.Geometry.call( this );
 
@@ -12,7 +12,7 @@ THREE.ParametricGeometry = function ( slices, stacks, func ) {
 	var faces = this.faces;
 	var uvs = this.faceVertexUvs[ 0 ];
 
-	var face3 = !true;
+	var useFace3 = (face4 === undefined) ? true : !face4;
 
 	var i, il, j, p;
 	var u, v;
@@ -50,7 +50,7 @@ THREE.ParametricGeometry = function ( slices, stacks, func ) {
 			uvc = new THREE.UV( ( i + 1 ) / slices, j / stacks );
 			uvd = new THREE.UV( ( i + 1 ) / slices, ( j + 1 ) / stacks );
 
-			if ( face3 ) {
+			if ( useFace3 ) {
 
 				faces.push( new THREE.Face3( a, b, c ) );
 				faces.push( new THREE.Face3( b, d, c ) );
