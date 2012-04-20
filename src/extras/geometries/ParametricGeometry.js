@@ -40,10 +40,10 @@ THREE.ParametricGeometry = function ( slices, stacks, func ) {
 	for ( i = 0; i < stacks; i ++ ) {
 		for ( j = 0; j < slices; j ++ ) {
 
-			a = i * stackCount + j;
-			b = i * stackCount + j + 1;
-			c = (i + 1) * stackCount + j;
-			d = (i + 1) * stackCount + j + 1;
+			a = i * sliceCount + j;
+			b = i * sliceCount + j + 1;
+			c = (i + 1) * sliceCount + j;
+			d = (i + 1) * sliceCount + j + 1;
 
 			uva = new THREE.UV( i / slices, j / stacks );
 			uvb = new THREE.UV( i / slices, ( j + 1 ) / stacks );
