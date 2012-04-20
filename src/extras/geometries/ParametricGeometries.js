@@ -121,29 +121,41 @@ THREE.TubeGeometry2.prototype.constructor = THREE.TubeGeometry2;
 THREE.TorusKnotGeometry2.prototype = new THREE.Geometry();
 THREE.TorusKnotGeometry2.prototype.constructor = THREE.TorusKnotGeometry2;
 
-
  var sin = Math.sin, cos = Math.cos, pi = Math.PI;
 
+THREE.ParametricGeometries = {
+    klein: function (v, u) {
+        u *= pi;
+        v *= 2 * pi;
 
-function klein(u, v) {
-    u *= pi;
-    v *= 2 * pi;
+        u = u * 2;
+        var x, y, z;
+        if (u < pi) {
+            x = 3 * cos(u) * (1 + sin(u)) + (2 * (1 - cos(u) / 2)) * cos(u) * cos(v);
+            z = -8 * sin(u) - 2 * (1 - cos(u) / 2) * sin(u) * cos(v);
+        } else {
+            x = 3 * cos(u) * (1 + sin(u)) + (2 * (1 - cos(u) / 2)) * cos(v + pi);
+            z = -8 * sin(u);
+        }
+      
+        y = -2 * (1 - cos(u) / 2) * sin(v);
+        
+        return new THREE.Vector3(x, y, z);
+    },
 
-    u = u * 2;
-    var x, y, z;
-    if (u < pi) {
-        x = 3 * cos(u) * (1 + sin(u)) + (2 * (1 - cos(u) / 2)) * cos(u) * cos(v);
-        z = -8 * sin(u) - 2 * (1 - cos(u) / 2) * sin(u) * cos(v);
-    } else {
-        x = 3 * cos(u) * (1 + sin(u)) + (2 * (1 - cos(u) / 2)) * cos(v + pi);
-        z = -8 * sin(u);
+    plane: function (width, height) {
+        
+        return function(u, v) {
+            var x = u * width;
+            var y = 0; 
+            var z = v * height;
+
+            console.log(x, y, z);
+
+            return new THREE.Vector3(x, y, z);
+        };
     }
-  
-    y = -2 * (1 - cos(u) / 2) * sin(v);
-    
-    return new THREE.Vector3(x, y, z);
-}
-
+};
 
 
 THREE.SphereGeometry2 = function(size, x, y) {
@@ -171,7 +183,6 @@ THREE.PlaneGeometry2 = function(width, depth, segmentsWidth, segmentsDepth) {
 
     function plane(u, v) {
         
-        console.log('u, v', u, v);
         var x = u * width;
         var y = 0; 
         var z = v * depth;

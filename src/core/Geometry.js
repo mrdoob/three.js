@@ -574,7 +574,7 @@ THREE.Geometry.prototype = {
 		var precisionPoints = 4; // number of decimal points, eg. 4 for epsilon of 0.0001
 		var precision = Math.pow( 10, precisionPoints );
 		var i,il, face;
-		var abcd = 'abcd', o, k;
+		var abcd = 'abcd', o, k, j, jl, u;
 
 		for ( i = 0, il = this.vertices.length; i < il; i ++ ) {
 
@@ -623,8 +623,12 @@ THREE.Geometry.prototype = {
 						// console.log('faces', face.a, face.b, face.c, face.d, 'dup at', k);
 						o.splice(k, 1);
 						this.faces[ i ] = new THREE.Face3(o[0], o[1], o[2]);
-						this.faceVertexUvs[0][i].splice(k, 1);
+						for (j=0,jl=this.faceVertexUvs.length;j<jl;j++) {
+							u = this.faceVertexUvs[j][i];
+							if (u) u.splice(k, 1);
+						}
 						
+						break;
 					}
 				}
 
@@ -634,8 +638,9 @@ THREE.Geometry.prototype = {
 		}
 
 		// Use unique set of vertices
-
+		var diff = this.vertices.length - unique.length;
 		this.vertices = unique;
+		return diff;
 
 	}
 
