@@ -3296,6 +3296,9 @@ THREE.WebGLRenderer = function ( parameters ) {
     				object.__webglMorphTargetInfluences[ m ] = influences[ gonnaUse[m]];
                 } else {
                     _gl.vertexAttribPointer( attributes[ "morphTarget" + m ], 3, _gl.FLOAT, false, 0, 0 );
+                    if ( material.morphNormals ) {
+                    	_gl.vertexAttribPointer( attributes[ "morphNormal" + m ], 3, _gl.FLOAT, false, 0, 0 );
+                    }
                     object.__webglMorphTargetInfluences[ m ] = 0;
                 }
 				//used[ candidate ] = 1;
