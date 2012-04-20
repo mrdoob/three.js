@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - performance</title>
+		<title>three.js webgl - performance [static]</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -17,7 +17,6 @@
 	<body>
 
 		<script src="../build/Three.js"></script>
-
 		<script src="js/Stats.js"></script>
 
 		<script>
@@ -26,7 +25,7 @@
 
 			var camera, scene, renderer;
 
-			var objects;
+			var mesh, zmesh, lightMesh, geometry;
 
 			var mouseX = 0, mouseY = 0;
 
@@ -36,7 +35,6 @@
 			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
 			init();
-			// render();
 			animate();
 
 
@@ -45,13 +43,12 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				scene = new THREE.Scene();
-
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 3200;
-				scene.add( camera );
 
-				objects = [];
+				scene = new THREE.Scene();
+
+				scene.add( camera );
 
 				var material = new THREE.MeshNormalMaterial( { shading: THREE.SmoothShading } );
 
@@ -60,18 +57,18 @@
 
 					geometry.computeVertexNormals();
 
-					for ( var i = 0; i < 5000; i ++ ) {
+					for ( var i = 0; i < 7700; i ++ ) {
 
 						var mesh = new THREE.Mesh( geometry, material );
 
-						mesh.position.x = Math.random() * 8000 - 4000;
-						mesh.position.y = Math.random() * 8000 - 4000;
-						mesh.position.z = Math.random() * 8000 - 4000;
+						mesh.position.x = Math.random() * 10000 - 5000;
+						mesh.position.y = Math.random() * 10000 - 5000;
+						mesh.position.z = Math.random() * 10000 - 5000;
 						mesh.rotation.x = Math.random() * 360 * ( Math.PI / 180 );
 						mesh.rotation.y = Math.random() * 360 * ( Math.PI / 180 );
 						mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 50 + 100;
-
-						objects.push( mesh );
+						mesh.matrixAutoUpdate = false;
+						mesh.updateMatrix();
 
 						scene.add( mesh );
 
@@ -79,8 +76,10 @@
 
 				} );
 
-				renderer = new THREE.WebGLRenderer( { clearColor: 0xffffff } );
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.sortObjects = false;
+
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -113,15 +112,8 @@
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+
 				camera.lookAt( scene.position );
-
-				for ( var i = 0; i < 5000; i ++ ) {
-
-					objects[ i ].rotation.x += 0.01;
-					objects[ i ].rotation.y += 0.02;
-
-				}
-
 
 				renderer.render( scene, camera );
 

@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - loaders - vtk loader</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #000;
+				color: #fff;
+				margin: 0px;
+				overflow: hidden;
+			}
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				z-index: 100;
+				display:block;
+			}
+			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
+		</style>
+	</head>
+
+	<body>
+		<div id="info">
+		<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> -
+		vtk format loader test -
+		model from <a href="http://www.cc.gatech.edu/projects/large_models/" target="_blank">The GeorgiaTech Lagre Geometric Model Archive</a>,
+		</div>
+
+		<script src="../build/Three.js"></script>
+		<script src="js/loaders/VTKLoader.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/Stats.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, stats;
+
+			var camera, controls, scene, renderer;
+
+			var cross;
+
+
+			// scene and camera
+
+			scene = new THREE.Scene();
+
+			camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.01, 1e10 );
+			camera.position.z = 0.2;
+
+
+			scene.add( camera );
+
+			controls = new THREE.TrackballControls( camera );
+
+			controls.rotateSpeed = 5.0;
+			controls.zoomSpeed = 5;
+			controls.panSpeed = 2;
+
+			controls.noZoom = false;
+			controls.noPan = false;
+
+			controls.staticMoving = true;
+			controls.dynamicDampingFactor = 0.3;
+
+			// light
+
+			var dirLight = new THREE.DirectionalLight( 0xffffff );
+			dirLight.position.set( 200, 200, 1000 ).normalize();
+			camera.add( dirLight );
+			camera.add( dirLight.target );
+
+			// renderer
+
+			renderer = new THREE.WebGLRenderer( { antialias: false } );
+			renderer.setClearColorHex( 0x000000, 1 );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+
+			container = document.createElement( 'div' );
+			document.body.appendChild( container );
+			container.appendChild( renderer.domElement );
+
+			stats = new Stats();
+			stats.domElement.style.position = 'absolute';
+			stats.domElement.style.top = '0px';
+			container.appendChild( stats.domElement );
+
+
+			var material =  new THREE.MeshLambertMaterial( { color:0xffffff} );
+
+			var loader=new THREE.VTKLoader();
+			loader.load ("models/vtk/bunny.vtk", function(geom){
+				var mesh = new THREE.Mesh(geom, material );
+				mesh.doubleSided=true;
+				mesh.position.setY(-0.09);
+				scene.add( mesh );
+				animate();
+				});
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				controls.update();
+				renderer.render( scene, camera );
+				stats.update();
+
+			}
+		</script>
+
+	</body>
+</html>

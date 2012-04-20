@@ -206,7 +206,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 			material = element.material;
 			material = material instanceof THREE.MeshFaceMaterial ? element.faceMaterial : material;
 
-			if ( material == null || material.opacity == 0 ) continue;
+			if ( material === undefined || material.visible === false ) continue;
 
 			_bboxRect.empty();
 
@@ -529,7 +529,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			if ( material instanceof THREE.MeshBasicMaterial ) {
 
-				if ( material.map/* && !material.wireframe*/ ) {
+				if ( material.map ) {
 
 					if ( material.map.mapping instanceof THREE.UVMapping ) {
 
@@ -573,19 +573,6 @@ THREE.CanvasRenderer = function ( parameters ) {
 				}
 
 			} else if ( material instanceof THREE.MeshLambertMaterial ) {
-
-				if ( material.map && !material.wireframe ) {
-
-					if ( material.map.mapping instanceof THREE.UVMapping ) {
-
-						_uvs = element.uvs[ 0 ];
-						patternPath( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _uvs[ uv1 ].u, _uvs[ uv1 ].v, _uvs[ uv2 ].u, _uvs[ uv2 ].v, _uvs[ uv3 ].u, _uvs[ uv3 ].v, material.map );
-
-					}
-
-					setBlending( THREE.SubtractiveBlending );
-
-				}
 
 				if ( _enableLighting ) {
 
@@ -1065,12 +1052,6 @@ THREE.CanvasRenderer = function ( parameters ) {
 				case THREE.AdditiveBlending:
 
 					_context.globalCompositeOperation = 'lighter';
-
-					break;
-
-				case THREE.SubtractiveBlending:
-
-					_context.globalCompositeOperation = 'darker';
 
 					break;
 

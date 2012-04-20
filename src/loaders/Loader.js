@@ -8,7 +8,7 @@ THREE.Loader = function ( showStatus ) {
 	this.statusDomElement = showStatus ? THREE.Loader.prototype.addStatusElement() : null;
 
 	this.onLoadStart = function () {};
-	this.onLoadProgress = function() {};
+	this.onLoadProgress = function () {};
 	this.onLoadComplete = function () {};
 
 };
@@ -166,8 +166,8 @@ THREE.Loader.prototype = {
 			if ( wrap ) {
 
 				var wrapMap = {
-					"repeat" 	: THREE.RepeatWrapping,
-					"mirror"	: THREE.MirroredRepeatWrapping
+					"repeat": THREE.RepeatWrapping,
+					"mirror": THREE.MirroredRepeatWrapping
 				}
 
 				if ( wrapMap[ wrap[ 0 ] ] !== undefined ) where[ name ].wrapS = wrapMap[ wrap[ 0 ] ];

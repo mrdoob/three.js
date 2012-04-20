@@ -27,9 +27,6 @@ var Code = function () {
 			temp.innerHTML = _codegen( true );
 			temp = temp.firstChild.nodeValue;
 			temp = temp.replace("js/Three.js", "../build/Three.js");
-			temp = temp.replace("js/RequestAnimationFrame.js", "../examples/js/RequestAnimationFrame.js");
-
-			console.log('test', temp);
 
 			var opener = window.open('','myconsole',
 			  'width=800,height=400'
@@ -70,6 +67,7 @@ var Code = function () {
 	var _codegen = function (html) {
 		var string = '';
 
+		console.log(_list);
 		string += [
 
 			'var camera, scene, renderer;',
@@ -119,8 +117,12 @@ var Code = function () {
 
 		if ( html ) {
 
-			string = '&lt;!doctype html&gt;\n&lt;html&gt;\n\t&lt;body&gt;\n\t\t&lt;script src=\"js/Three.js\"&gt;&lt;/script&gt;\n\t\t&lt;script src=\"js/RequestAnimationFrame.js\"&gt;&lt;/script&gt;\n\t\t&lt;script&gt;\n' + ( '\n' + string ).replace( /\n/gi, '\n\t\t\t' ) + '\n\n\t\t&lt;/script&gt;\n\t&lt;/body&gt;\n&lt;/html&gt;';
-
+			string = '&lt;!doctype html&gt;\n&lt;html&gt;\n\t&lt;body&gt;\
+			\n\t\t&lt;style&gt; body {background-color: #f0f0f0;} &lt;/style&gt;\
+			\n\t\t&lt;script src=\"js/Three.js\"&gt;&lt;/script&gt;\
+			\n\t\t&lt;script&gt;\n' 
+			+ ( '\n' + string ).replace( /\n/gi, '\n\t\t\t' ) + 
+			'\n\n\t\t&lt;/script&gt;\n\t&lt;/body&gt;\n&lt;/html&gt;';
 		}
 
 		return string;
@@ -130,6 +132,16 @@ var Code = function () {
 
 		_code.innerHTML = _codegen( _html );
 
+	}
+
+	var _strfor = function(str) {
+	    for (var i=1; i<arguments.length; i++) {
+	    	if (arguments[i].toFixed) {
+	    		arguments[i] = arguments[i].toFixed(2);
+	    	}
+	        str = str.replace('{'+(i-1)+'}', arguments[i]);
+	    }
+	    return str;
 	}
 
 	// signals
@@ -144,7 +156,16 @@ var Code = function () {
 
 			if ( object.geometry == undefined || object.geometry.gui == undefined ) {
 
-				_list.push( 'TODO' );
+				if (object instanceof THREE.Camera) {
+					var string = '';
+					string += _strfor( '\n\tcamera.position.set({0},{1},{2});', object.position.x, object.position.y, object.position.z);
+					string += _strfor( '\n\tcamera.rotation.set({0},{1},{2});', object.rotation.x, object.rotation.y, object.rotation.z);
+
+					_list.push( string );
+
+				} else {
+					_list.push( 'TODO' );
+				}
 				continue;
 
 			}

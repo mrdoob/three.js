@@ -56,7 +56,18 @@ THREE.ShadowMapPlugin = function ( ) {
 
 		_gl.clearColor( 1, 1, 1, 1 );
 		_gl.disable( _gl.BLEND );
-		if ( _renderer.shadowMapCullFrontFaces ) _gl.cullFace( _gl.FRONT );
+
+		_gl.enable( _gl.CULL_FACE );
+
+		if ( _renderer.shadowMapCullFrontFaces ) {
+
+			_gl.cullFace( _gl.FRONT );
+
+		} else {
+
+			_gl.cullFace( _gl.BACK );
+
+		}
 
 		_renderer.setDepthTest( true );
 
@@ -222,7 +233,6 @@ THREE.ShadowMapPlugin = function ( ) {
 
 					if ( ! ( object instanceof THREE.Mesh ) || ! ( object.frustumCulled ) || _frustum.contains( object ) ) {
 
-						//object.matrixWorld.flattenToArray( object._objectMatrixArray );
 						object._modelViewMatrix.multiply( shadowCamera.matrixWorldInverse, object.matrixWorld);
 
 						webglObject.render = true;
@@ -244,7 +254,10 @@ THREE.ShadowMapPlugin = function ( ) {
 					object = webglObject.object;
 					buffer = webglObject.buffer;
 
-					_renderer.setObjectFaces( object );
+					// culling is overriden globally for all objects
+					// while rendering depth map
+
+					//_renderer.setObjectFaces( object );
 
 					if ( object.customDepthMaterial ) {
 
@@ -285,14 +298,6 @@ THREE.ShadowMapPlugin = function ( ) {
 
 				if ( object.visible && object.castShadow ) {
 
-					/*
-					if ( object.matrixAutoUpdate ) {
-
-						object.matrixWorld.flattenToArray( object._objectMatrixArray );
-
-					}
-					*/
-
 					object._modelViewMatrix.multiply( shadowCamera.matrixWorldInverse, object.matrixWorld);
 
 					_renderer.renderImmediateObject( shadowCamera, scene.__lights, fog, _depthMaterial, object );
@@ -310,7 +315,12 @@ THREE.ShadowMapPlugin = function ( ) {
 
 		_gl.clearColor( clearColor.r, clearColor.g, clearColor.b, clearAlpha );
 		_gl.enable( _gl.BLEND );
-		if ( _renderer.shadowMapCullFrontFaces ) _gl.cullFace( _gl.BACK );
+
+		if ( _renderer.shadowMapCullFrontFaces ) {
+
+			_gl.cullFace( _gl.BACK );
+
+		}
 
 	};
 

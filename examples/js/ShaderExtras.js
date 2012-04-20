@@ -708,7 +708,7 @@ THREE.ShaderExtras = {
 				"vec2 vin;",
 				"vec2 uv = vUv;",
 
-				"add += color = org = texture2D( tDiffuse, uv );",
+				"add = color = org = texture2D( tDiffuse, uv );",
 
 				"vin = ( uv - vec2( 0.5 ) ) * vec2( 1.4 );",
 				"sample_dist = dot( vin, vin ) * 2.0;",
