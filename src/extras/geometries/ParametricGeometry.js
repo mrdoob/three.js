@@ -12,7 +12,7 @@ THREE.ParametricGeometry = function ( slices, stacks, func ) {
 	var faces = this.faces;
 	var uvs = this.faceVertexUvs[ 0 ];
 
-	var face3 = true;
+	var face3 = !true;
 
 	var i, il, j, p;
 	var u, v;
@@ -50,20 +50,30 @@ THREE.ParametricGeometry = function ( slices, stacks, func ) {
 			uvc = new THREE.UV( ( i + 1 ) / slices, j / stacks );
 			uvd = new THREE.UV( ( i + 1 ) / slices, ( j + 1 ) / stacks );
 
-			faces.push( new THREE.Face3( a, b, c ) );
-			faces.push( new THREE.Face3( b, d, c ) );
+			if ( face3 ) {
 
-			uvs.push( [ uva, uvb, uvc ] );
-			uvs.push( [ uvb, uvd, uvc ] );
+				faces.push( new THREE.Face3( a, b, c ) );
+				faces.push( new THREE.Face3( b, d, c ) );
+
+				uvs.push( [ uva, uvb, uvc ] );
+				uvs.push( [ uvb, uvd, uvc ] );
+
+			} else {
+
+				faces.push( new THREE.Face4( a, b, d, c ) );
+				uvs.push( [ uva, uvb, uvc, uvd ] );
+
+			}
+
 		}
 		
 	}
 
-	console.log(this);
+	// console.log(this);
 
 	// magic bullet
 	var diff = this.mergeVertices();
-	console.log('removed ', diff, ' vertices by merging')
+	console.log('removed ', diff, ' vertices by merging');
 	
 	this.computeCentroids();
 	this.computeFaceNormals();
