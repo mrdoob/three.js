@@ -51,6 +51,12 @@ THREE.VTKLoader2.prototype.parse = function ( data ) {
 
 	}
 
+	function face4( a, b, c, d ) {
+
+		geometry.faces.push( new THREE.Face4( a, b, c, d ) );
+
+	}
+
 	var pattern, result;
 
 	// float float float
@@ -67,13 +73,25 @@ THREE.VTKLoader2.prototype.parse = function ( data ) {
 
 	// 3 int int int
 
-	pattern = /3 ([\d]+) ([\d]+) ([\d]+) /g;
+	pattern = /3 ([\d]+) ([\d]+) ([\d]+)/g;
 
 	while ( ( result = pattern.exec( data ) ) != null ) {
 
 		// ["3 1 2 3", "1", "2", "3"]
 
 		face3( parseInt( result[ 1 ] ), parseInt( result[ 2 ] ), parseInt( result[ 3 ] ) );
+
+	}
+
+	// 4 int int int int
+
+	pattern = /4 ([\d]+) ([\d]+) ([\d]+) ([\d]+)/g;
+
+	while ( ( result = pattern.exec( data ) ) != null ) {
+
+		// ["4 1 2 3 4", "1", "2", "3", "4"]
+
+		face4( parseInt( result[ 1 ] ), parseInt( result[ 2 ] ), parseInt( result[ 3 ] ), parseInt( result[ 4 ] ) );
 
 	}
 
