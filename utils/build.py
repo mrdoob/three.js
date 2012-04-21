@@ -136,6 +136,7 @@ EXTRAS_FILES = [
 'extras/renderers/effects/AnaglyphEffect.js',
 'extras/renderers/effects/CrosseyedEffect.js',
 'extras/renderers/effects/ParallaxBarrierEffect.js',
+'extras/renderers/effects/StereoEffect.js',
 'extras/renderers/plugins/LensFlarePlugin.js',
 'extras/renderers/plugins/ShadowMapPlugin.js',
 'extras/renderers/plugins/SpritePlugin.js',

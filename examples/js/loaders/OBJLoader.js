@@ -294,7 +294,7 @@ THREE.OBJLoader.prototype.parse = function ( data ) {
 
 		geometry.computeCentroids();
 
-		group.add( new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) ) );
+		group.add( new THREE.Mesh( geometry, new THREE.MeshLambertMaterial() ) );
 
 	}
 
