@@ -33,6 +33,8 @@ THREE.CrosseyedEffect = function ( renderer ) {
 
 	this.render = function ( scene, camera ) {
 
+		// left
+
 		_cameraL.fov = camera.fov;
 		_cameraL.aspect = 0.5 * camera.aspect;
 		_cameraL.near = camera.near;
@@ -44,12 +46,19 @@ THREE.CrosseyedEffect = function ( renderer ) {
 		_cameraL.translateX( this.separation );
 		_cameraL.lookAt( _cameraL.target );
 
+		// right
+
+		_cameraR.near = camera.near;
+		_cameraR.far = camera.far;
+
 		_cameraR.projectionMatrix = _cameraL.projectionMatrix;
 
 		_cameraR.position.copy( camera.position );
 		_cameraR.target.copy( camera.target );
 		_cameraR.translateX( - this.separation );
 		_cameraR.lookAt( _cameraR.target );
+
+		//
 
 		renderer.clear();
 
