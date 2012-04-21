@@ -392,7 +392,13 @@
 
 			}
 
-			goTo( window.location.hash.substring(1) );
+			function goToHash() {
+				goTo( window.location.hash.substring(1) );
+			}
+			
+			window.addEventListener( 'hashchange', goToHash, false );
+
+			goToHash();
 
 			// Layout
 
