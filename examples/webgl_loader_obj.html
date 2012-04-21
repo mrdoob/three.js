@@ -70,16 +70,19 @@
 				directionalLight.position.set( 0, 0, 1 ).normalize();
 				scene.add( directionalLight );
 
+				var texture = THREE.ImageUtils.loadTexture( 'textures/ash_uvgrid01.jpg' );
+
 				var loader = new THREE.OBJLoader();
-				loader.load( "obj/male02/male02.obj", function ( objects ) {
+				loader.load( "obj/male02/male02.obj", function ( object ) {
 
-					for ( var i = 0; i < objects.length; i ++ ) {
+					for ( var i = 0, l = object.children.length; i < l; i ++ ) {
 
-						var object = objects[ i ];
-						object.position.y = - 80;
-						scene.add( object );
+						object.children[ i ].material.map = texture;
 
 					}
+
+					object.position.y = - 80;
+					scene.add( object );
 
 				} );
 
