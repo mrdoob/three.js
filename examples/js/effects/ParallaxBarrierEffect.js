@@ -4,7 +4,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.StereoEffect = function ( renderer, fragmentShader ) {
+THREE.ParallaxBarrierEffect = function ( renderer ) {
 
 	var eyeRight = new THREE.Matrix4();
 	var eyeLeft = new THREE.Matrix4();
@@ -50,7 +50,29 @@ THREE.StereoEffect = function ( renderer, fragmentShader ) {
 
 		].join("\n"),
 
-		fragmentShader: fragmentShader
+		fragmentShader: [
+
+			"uniform sampler2D mapLeft;",
+			"uniform sampler2D mapRight;",
+			"varying vec2 vUv;",
+
+			"void main() {",
+
+			"	vec2 uv = vUv;",
+
+			"	if ( ( mod( gl_FragCoord.x, 2.0 ) ) > 1.00 ) {",
+
+			"		gl_FragColor = texture2D( mapLeft, uv );",
+
+			"	} else {",
+
+			"		gl_FragColor = texture2D( mapRight, uv );",
+
+			"	}",
+
+			"}"
+
+		].join("\n")
 
 	} );
 
