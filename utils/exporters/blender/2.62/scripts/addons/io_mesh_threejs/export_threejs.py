@@ -1754,11 +1754,24 @@ def generate_ascii_scene(data):
 def export_scene(scene, filepath, flipyz, option_colors, option_lights, option_cameras, option_embed_meshes, embeds, option_url_base_html, option_copy_textures):
 
     source_file = os.path.basename(bpy.data.filepath)
-
+    
+    # objects are contained in scene and linked groups
+    objects = []
+    
+    # get scene objects
+    sceneobjects = scene.objects
+    for obj in sceneobjects:
+      objects.append(obj)
+      
+    # get linked group objcts  
+    for group in bpy.data.groups:
+       for object in group.objects:
+          objects.append(object)
+          
     scene_text = ""
     data = {
     "scene"        : scene,
-    "objects"      : scene.objects,
+    "objects"      : objects,
     "embeds"       : embeds,
     "source_file"  : source_file,
     "filepath"     : filepath,
@@ -1809,9 +1822,21 @@ def save(operator, context, filepath = "",
         bpy.ops.object.mode_set(mode='OBJECT')
 
     if option_all_meshes:
-        objects = scene.objects
+        sceneobjects = scene.objects
     else:
-        objects = context.selected_objects
+        sceneobjects = context.selected_objects
+
+    # objects are contained in scene and linked groups
+    objects = []
+    
+    # get scene objects
+    for obj in sceneobjects:
+      objects.append(obj)
+      
+    # get objects in linked groups  
+    for group in bpy.data.groups:
+       for object in group.objects:
+          objects.append(object) 
 
     if option_export_scene:
 
