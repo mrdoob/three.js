@@ -22,7 +22,7 @@ THREE.ParametricGeometries = {
 			x = 3 * cos(u) * (1 + sin(u)) + (2 * (1 - cos(u) / 2)) * cos(v + pi);
 			z = -8 * sin(u);
 		}
-	  
+
 		y = -2 * (1 - cos(u) / 2) * sin(v);
 		
 		return new THREE.Vector3(x, y, z);
@@ -32,7 +32,7 @@ THREE.ParametricGeometries = {
 		
 		return function(u, v) {
 			var x = u * width;
-			var y = 0; 
+			var y = 0;
 			var z = v * height;
 
 			console.log(x, y, z);
@@ -64,8 +64,8 @@ THREE.ParametricGeometries = {
 		u *= pi;
 		t *= 2 * pi;
 
-		u = u * 2
-		var phi = u / 2
+		u = u * 2;
+		var phi = u / 2;
 		var major = 2.25, a = 0.125, b = 0.65;
 		var x, y, z;
 		x = a * cos(t) * cos(phi) - b * sin(t) * sin(phi);
@@ -173,7 +173,7 @@ THREE.TubeGeometry2.prototype.constructor = THREE.TubeGeometry2;
 			t *= Math.PI * 2;
 
 			var r = 0.5;
-		  
+
 			var tx = (1 + r * Math.cos(q * t)) * Math.cos(p * t),
 				ty = (1 + r * Math.cos(q * t)) * Math.sin(p * t),
 				tz = r * Math.sin(q * t);
@@ -187,7 +187,7 @@ THREE.TubeGeometry2.prototype.constructor = THREE.TubeGeometry2;
 	var radiusSegments = segmentsT;
 	var extrudePath = new TorusKnotCurve();
 
-	 THREE.TubeGeometry2.call( this, extrudePath, segments, tube, radiusSegments, true, false );
+	THREE.TubeGeometry2.call( this, extrudePath, segments, tube, radiusSegments, true, false );
 
 
 };
@@ -222,7 +222,7 @@ THREE.PlaneGeometry2 = function(width, depth, segmentsWidth, segmentsDepth) {
 	function plane(u, v) {
 		
 		var x = u * width;
-		var y = 0; 
+		var y = 0;
 		var z = v * depth;
 
 		return new THREE.Vector3(x, y, z);
