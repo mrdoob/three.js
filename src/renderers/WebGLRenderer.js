@@ -6233,6 +6233,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		if ( ! gl.getExtension( 'OES_texture_float' ) ) {
+
+			console.log( 'THREE.WebGLRenderer: Float textures not supported.' );
+
+		}
+
 		return gl;
 
 	};
