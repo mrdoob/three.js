@@ -57,8 +57,6 @@
 
 		<script src="../build/Three.js"></script>
 
-		<script src="../src/extras/renderers/ParallaxBarrierWebGLRenderer.js"></script>
-
 		<script src="js/Detector.js"></script>
 		<script src="js/Stats.js"></script>
 
@@ -139,7 +137,7 @@
 
 			var container, stats;
 
-			var camera, scene, renderer;
+			var camera, scene, renderer, effect;
 
 			var m, mi;
 
@@ -203,11 +201,12 @@
 
 				//
 
-				renderer = new THREE.ParallaxBarrierWebGLRenderer();
-				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer = new THREE.WebGLRenderer();
 				renderer.setFaceCulling( 0 );
-
 				container.appendChild( renderer.domElement );
+
+				effect = new THREE.ParallaxBarrierEffect( renderer );
+				effect.setSize( window.innerWidth, window.innerHeight );				
 
 				if ( STATS_ENABLED ) {
 
@@ -603,7 +602,7 @@
 
 				camera.lookAt( scene.position );
 
-				renderer.render( scene, camera );
+				effect.render( scene, camera );
 
 				if ( STATS_ENABLED ) stats.update();
 

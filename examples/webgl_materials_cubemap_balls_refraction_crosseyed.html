@@ -48,7 +48,7 @@
 
 			var container;
 
-			var camera, scene, renderer;
+			var camera, scene, renderer, effect;
 
 			var mesh, lightMesh, geometry;
 			var spheres = [];
@@ -122,10 +122,13 @@
 
 				//
 
-				renderer = new THREE.CrosseyedWebGLRenderer( { separation: 90 } );
-				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer = new THREE.WebGLRenderer();
 				container.appendChild( renderer.domElement );
 
+				effect = new THREE.CrosseyedEffect( renderer );
+				effect.setSize( window.innerWidth, window.innerHeight );
+				effect.separation = 90;
+				
 				document.addEventListener( 'keydown', onKeyDown, false );
 
 			}
@@ -142,14 +145,14 @@
 				switch( event.keyCode ) {
 
 					/* O */
-					case 79: renderer.separation -= 0.5; break;
+					case 79: effect.separation -= 0.5; break;
 
 					/* P */
-					case 80: renderer.separation += 0.5; break;
+					case 80: effect.separation += 0.5; break;
 
 				}
 
-				console.log( renderer.separation );
+				console.log( effect.separation );
 
 			};
 
@@ -179,7 +182,7 @@
 
 				}
 
-				renderer.render( scene, camera );
+				effect.render( scene, camera );
 
 			}
 

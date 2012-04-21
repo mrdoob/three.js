@@ -133,12 +133,13 @@ EXTRAS_FILES = [
 'extras/objects/ImmediateRenderObject.js',
 'extras/objects/LensFlare.js',
 'extras/objects/MorphBlendMesh.js',
+'extras/renderers/effects/AnaglyphEffect.js',
+'extras/renderers/effects/CrosseyedEffect.js',
+'extras/renderers/effects/ParallaxBarrierEffect.js',
 'extras/renderers/plugins/LensFlarePlugin.js',
 'extras/renderers/plugins/ShadowMapPlugin.js',
 'extras/renderers/plugins/SpritePlugin.js',
 'extras/renderers/plugins/DepthPassPlugin.js',
-'extras/renderers/AnaglyphWebGLRenderer.js',
-'extras/renderers/CrosseyedWebGLRenderer.js',
 'extras/shaders/ShaderFlares.js',
 'extras/shaders/ShaderSprite.js'
 ]
