@@ -4,6 +4,12 @@
 
 THREE.CrosseyedEffect = function ( renderer ) {
 
+	// API
+
+	this.separation = 10;
+
+	// internals
+
 	var _width, _height;
 
 	var _cameraL = new THREE.PerspectiveCamera();
@@ -12,11 +18,7 @@ THREE.CrosseyedEffect = function ( renderer ) {
 	var _cameraR = new THREE.PerspectiveCamera();
 	_cameraR.target = new THREE.Vector3();
 
-	var SCREEN_WIDTH  = window.innerWidth;
-	var SCREEN_HEIGHT = window.innerHeight;
-	var HALF_WIDTH = SCREEN_WIDTH / 2;
-
-	this.separation = 10;
+	// initialization
 
 	renderer.autoClear = false;
 
