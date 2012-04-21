@@ -1,5 +1,5 @@
 /**
- * @author Sebastien Valette sebastien.valette@creatis.insa-lyon.fr
+ * @author mrdoob / http://mrdoob.com/
  */
 
 THREE.VTKLoader = function () {};
@@ -38,206 +38,60 @@ THREE.VTKLoader.prototype.load = function ( url, callback ) {
 THREE.VTKLoader.prototype.parse = function ( data ) {
 
 	var geometry = new THREE.Geometry();
-	var lines = data.split("\n");
 
-	function v( x, y, z ) {
+	function vertex( x, y, z ) {
 
 		geometry.vertices.push( new THREE.Vector3( x, y, z ) );
 
 	}
 
-	function f3( a, b, c ) {
+	function face3( a, b, c ) {
 
 		geometry.faces.push( new THREE.Face3( a, b, c ) );
 
 	}
 
-	var lineIndex = 0;
+	function face4( a, b, c, d ) {
 
-	var line = lines[ 0 ].split( ' ' );
-	var lineLength = line.length;
-	var columnIndex = -1;
-
-	function readNextString() {
-
-		while ( 1 ) {
-
-			var nextWord = line[ columnIndex ];
-			columnIndex ++;
-
-			if ( columnIndex == lineLength ) {
-
-				lineIndex ++;
-				columnIndex = 0;
-
-				if ( lineIndex > lines.length ) {
-
-					return '';
-
-				}
-
-				line = lines[ lineIndex ].split( ' ' );
-				lineLength = line.length;
-
-			}
-
-			if ( nextWord != null ) {
-
-				if ( nextWord.length > 0 ) {
-
-					return nextWord;
-
-				}
-
-			}
-
-		}
+		geometry.faces.push( new THREE.Face4( a, b, c, d ) );
 
 	}
 
-	// read point data
-	var found = false;
-	while ( !found ) {
+	var pattern, result;
 
-		var readString = readNextString();
+	// float float float
 
-		switch ( readString.toUpperCase() ) {
+	pattern = /([\d|\.|\+|\-|e]+)[ ]+([\d|\.|\+|\-|e]+)[ ]+([\d|\.|\+|\-|e]+)/g;
 
-			case 'POINTS':
-				found = true;
-				break;
+	while ( ( result = pattern.exec( data ) ) != null ) {
 
-			case '':
-				alert ( 'error while reading ' + url + ' : \n' );
-				return;
+		// ["1.0 2.0 3.0", "1.0", "2.0", "3.0"]
 
-		}
+		vertex( parseFloat( result[ 1 ] ), parseFloat( result[ 2 ] ), parseFloat( result[ 3 ] ) );
 
 	}
 
-	var newIndex;
-	var new2old;
+	// 3 int int int
 
-	var numberOfPoints = parseInt( readNextString() );
+	pattern = /3[ ]+([\d]+)[ ]+([\d]+)[ ]+([\d]+)/g;
 
-	if ( numberOfPoints > 5000000 ) {
+	while ( ( result = pattern.exec( data ) ) != null ) {
 
-		alert ( 'mesh is too big : ' + numberOfPoints + ' vertices' );
-		return;
+		// ["3 1 2 3", "1", "2", "3"]
 
-	}
-
-	var coord = [ 0, 0, 0 ];
-	var index2 = 0;
-
-	var number;
-	var coordIndex;
-
-	for ( var j = 0; j != numberOfPoints; j ++ ) {
-
-		for ( coordIndex = 0; coordIndex < 3; coordIndex ++ ) {
-
-			do {
-
-				number = parseFloat( line[ columnIndex ] );
-
-				columnIndex ++;
-
-				if ( columnIndex == lineLength ) {
-
-					lineIndex ++;
-					columnIndex = 0;
-
-					if ( lineIndex > lines.length ) {
-
-						alert ( 'error while reading ' + url + ' : \n' );
-						return;
-					}
-
-					line = lines[ lineIndex ].split( ' ' );
-					lineLength = line.length;
-				}
-			} while ( isNaN( number ) )
-
-			coord[ coordIndex ] = number;
-		}
-
-		v( coord[ 0 ], coord[ 1 ], coord[ 2 ] );
+		face3( parseInt( result[ 1 ] ), parseInt( result[ 2 ] ), parseInt( result[ 3 ] ) );
 
 	}
 
-	found = false;
+	// 4 int int int int
 
-	while ( !found ) {
+	pattern = /4[ ]+([\d]+)[ ]+([\d]+)[ ]+([\d]+)[ ]+([\d]+)/g;
 
-		var readString = readNextString();
+	while ( ( result = pattern.exec( data ) ) != null ) {
 
-		switch ( readString ) {
+		// ["4 1 2 3 4", "1", "2", "3", "4"]
 
-			case 'POLYGONS':
-				found = true;
-				break;
-
-			case '':
-				alert ( 'error while reading ' + url + ' : \n' );
-				return;
-
-		}
-
-	}
-
-	var numberOfPolygons = parseInt( readNextString() );
-	var numberOfpolygonElements = parseInt( readNextString() );
-
-	index2 = 0;
-	var connectivity = [];
-
-	for ( var p = 0; p != numberOfpolygonElements; p ++ ) {
-
-		do {
-
-			number = parseInt( line[ columnIndex ] );
-
-			columnIndex ++;
-
-			if ( columnIndex == lineLength ) {
-
-				lineIndex ++;
-				columnIndex = 0;
-
-				if ( lineIndex > lines.length ) {
-
-					alert ( 'error while reading ' + url + ' : \n' );
-					return;
-
-				}
-
-				line = lines[ lineIndex ].split( ' ' );
-				lineLength = line.length;
-			}
-		} while ( isNaN( number ) )
-
-		connectivity[ index2 ] = number;
-		index2 ++;
-
-		if ( index2 == connectivity[ 0 ] + 1 ) {
-
-			var triangle = [ 0, 0, 0 ];
-			index2 = 0;
-
-			var numberOfTrianglesInCell = connectivity[ 0 ] - 2;
-			var vertex1 = triangle[ 0 ] = connectivity[ 1 ];
-
-			for ( var i = 0; i < numberOfTrianglesInCell; i ++ ) {
-
-				var vertex2 = connectivity[ i + 2 ];
-				var vertex3 = triangle[ 2 ] = connectivity[ i + 3 ];
-
-				f3( vertex1, vertex2, vertex3 );
-
-			}
-
-		}
+		face4( parseInt( result[ 1 ] ), parseInt( result[ 2 ] ), parseInt( result[ 3 ] ), parseInt( result[ 4 ] ) );
 
 	}
 
