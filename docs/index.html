@@ -151,6 +151,14 @@
 					{ name: "SpotLight", path: "lights/SpotLight" }
 				],
 
+
+				"Loaders": [
+					{ name: "Loader", path: "loaders/Loader" },
+					{ name: "BinaryLoader", path: "loaders/BinaryLoader" },
+					{ name: "JSONLoader", path: "loaders/JSONLoader" },
+					{ name: "SceneLoader", path: "loaders/SceneLoader" },
+				],
+
 				"Materials": [
 					{ name: "Material", path: "materials/Material" },
 					{ name: "LineBasicMaterial", path: "materials/LineBasicMaterial" },
@@ -271,15 +279,6 @@
 					{ name: "CameraHelper", path: "extras/helpers/CameraHelper" }
 				],
 
-				"Extras / Loaders": [
-					{ name: "Loader", path: "extras/loaders/Loader" },
-					{ name: "BinaryLoader", path: "extras/loaders/BinaryLoader" },
-					{ name: "ColladaLoader", path: "extras/loaders/ColladaLoader" },
-					{ name: "JSONLoader", path: "extras/loaders/JSONLoader" },
-					{ name: "SceneLoader", path: "extras/loaders/SceneLoader" },
-					{ name: "UTF8Loader", path: "extras/loaders/UTF8Loader" }
-				],
-
 				"Extras / Modifiers": [
 					{ name: "SubdivisionModifier", path: "extras/modifiers/SubdivisionModifier" }
 				],
@@ -289,10 +288,10 @@
 					{ name: "MarchingCubes", path: "extras/objects/MarchingCubes" }
 				],
 
-				"Extras / Renderers": [
-					{ name: "AnaglyphWebGLRenderer", path: "extras/renderers/AnaglyphWebGLRenderer" },
-					{ name: "CrosseyedWebGLRenderer", path: "extras/renderers/CrosseyedWebGLRenderer" },
-					{ name: "ParallaxBarrierWebGLRenderer", path: "extras/renderers/ParallaxBarrierWebGLRenderer" }
+				"Extras / Renderers / Effects": [
+					{ name: "AnaglyphEffect", path: "extras/renderers/effects/AnaglyphEffect" },
+					{ name: "CrosseyedEffect", path: "extras/renderers/effects/CrosseyedEffect" },
+					{ name: "ParallaxBarrierEffect", path: "extras/renderers/effects/ParallaxBarrierEffect" }
 				],
 
 				"Extras / Renderers / Plugins": [
@@ -355,7 +354,7 @@
 						text = text.replace(/\[page:(\w+) ([\w|\.]+)\]/gi, "<a href=\"javascript:goTo('$1')\" title=\"$1\">$2</a>" ); // [page:name title]
 						text = text.replace(/\[link:([\w|\:|\/|\.|\-|\_]+)\]/gi, "[link:$1 $1]" ); // [link:url] to [link:url title]
 						text = text.replace(/\[link:([\w|\:|\/|\.|\-|\_]+) ([\w|\:|\/|\.|\-|\_]+)\]/gi, "<a href=\"$1\"  target=\"_blank\">$2</a>" ); // [link:url title]
-						text = text.replace(/\*([\w|\ |\-|\/|\+|\-|\(|\)|\=|\,|\.]+)\*/gi, "<strong>$1</strong>" ); // *
+						text = text.replace(/\*([\w|\ |\-|\/|\+|\-|\(|\)|\=|\,|\.\"]+)\*/gi, "<strong>$1</strong>" ); // *
 
 						viewer.innerHTML = '<br>' + text + '<br><br>';
 
