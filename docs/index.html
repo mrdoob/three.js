@@ -95,17 +95,42 @@
 					background-color: #f9f9f9;
 					overflow: auto;
 				}
+
+			#button {
+				position: fixed;
+				top: 20px;
+				right: 30px;
+				padding: 8px;
+				color: #fff;
+				background-color: #555;
+				opacity: 0.5;
+			}
+
+				#button:hover {
+					cursor: pointer;
+					opacity: 1;
+				}
 		</style>
 	</head>
 	<body>
 		<div id="panel"></div>
 		<div id="viewer"></div>
+		<div id="button">Edit this page</div>
 
 		<script>
 			var REVISION = '49dev';
 
+			var path = null;
+
 			var panel = document.getElementById( 'panel' );
 			var viewer = document.getElementById( 'viewer' );
+			var button = document.getElementById( 'button' );
+
+			button.addEventListener( 'click', function ( event ) {
+
+				window.open( 'https://github.com/mrdoob/three.js/edit/dev/docs/api/' + path + '.html' );
+
+			} );
 
 			var pages = {
 				"Integer": "Integer",
@@ -333,7 +358,7 @@
 
 			function goTo( name ) {
 
-				var path = pages[ name ];
+				path = pages[ name ];
 
 				window.location.hash = name;
 				viewer.innerHTML = '';
