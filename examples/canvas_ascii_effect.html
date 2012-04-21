@@ -20,7 +20,7 @@
 		<script src="js/Stats.js"></script>
 		<script src="js/renderers/AsciiRenderer.js"></script>
 		<script>
-		// Just swap out the default CanvasRenderer -> AsciiRenderer and things should work
+		// Just swap out the default CanvasRenderer -> AsciiEffect and things should work
 		// Let's start with the class spinning cube example from three.js
 
 		var container, stats;
@@ -82,7 +82,7 @@
 			plane = new THREE.Mesh( new THREE.PlaneGeometry( 400, 400 ), new THREE.MeshBasicMaterial( { color: 0xe0e0e0 } ) );
 			scene.add( plane );
 
-			renderer = new THREE.ASCIIRenderer(); //THREE.CanvasRenderer
+			renderer = new THREE.AsciiEffect(); //THREE.CanvasRenderer
 			renderer.setSize( window.innerWidth, window.innerHeight );
 		  
 
