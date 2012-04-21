@@ -9,8 +9,7 @@
  * 16 April 2012 - @blurspline
  */
   
-THREE.AsciiEffect = function( renderer, charSet, options ) {
-
+THREE.AsciiEffect = function ( renderer, charSet, options ) {
 
 	// its fun to create one your own!
 	charSet = (charSet === undefined) ? ' .:-=+*#%@' : charSet; 
@@ -30,30 +29,34 @@ THREE.AsciiEffect = function( renderer, charSet, options ) {
 	
 	var strResolution = 'low';
 
-	renderer = (renderer === undefined) ? THREE.CanvasRenderer : renderer; //THREE.WebGLRenderer 
-	var canvasRenderer = new renderer();
 	var width, height;
 
 	var domElement = document.createElement('div');
+	domElement.style.cursor = 'default';
+
 	var oAscii = document.createElement("table");
 	domElement.appendChild(oAscii);
 
 	var iWidth, iHeight;
 	var oImg;
 
-	this.setSize = function(w, h) {
+	this.setSize = function ( w, h ) {
+
 		width = w;
 		height = h;
-		canvasRenderer.setSize( w, h );
+
+		renderer.setSize( w, h );
 
 		initAsciiSize();
 
 	};
 
 
-	this.render = function() {
-		canvasRenderer.render.apply(canvasRenderer, arguments);
-		asciifyImage(canvasRenderer, oAscii);
+	this.render = function ( scene, camera ) {
+
+		renderer.render( scene, camera );
+		asciifyImage( renderer, oAscii );
+
 	};
 
 	this.domElement = domElement;
@@ -76,7 +79,7 @@ THREE.AsciiEffect = function( renderer, charSet, options ) {
 		// oCanvas.style.width = iWidth;
 		// oCanvas.style.height = iHeight;
 
-		oImg = canvasRenderer.domElement;
+		oImg = renderer.domElement;
 		if (oImg.style.backgroundColor) {
 			oAscii.rows[0].cells[0].style.backgroundColor = oImg.style.backgroundColor;
 			oAscii.rows[0].cells[0].style.color = oImg.style.color;
@@ -105,7 +108,7 @@ THREE.AsciiEffect = function( renderer, charSet, options ) {
 	var aDefaultColorCharList = (" CGO08@").split("");
 	var strFont = "courier new, monospace";
 
-	var oCanvasImg = canvasRenderer.domElement;
+	var oCanvasImg = renderer.domElement;
 
 	var oCanvas = document.createElement("canvas");
 	if (!oCanvas.getContext) {
@@ -168,8 +171,7 @@ THREE.AsciiEffect = function( renderer, charSet, options ) {
 
 
 	// convert img element to ascii
-	function asciifyImage(canvasRenderer, oAscii) 
-	{
+	function asciifyImage(canvasRenderer, oAscii) {
 
 		oCtx.clearRect(0, 0, iWidth, iHeight);
 		oCtx.drawImage(oCanvasImg, 0, 0, iWidth, iHeight);
@@ -191,12 +193,12 @@ THREE.AsciiEffect = function( renderer, charSet, options ) {
 				var iCharIdx;
 
 				var fBrightness;
-			  
+
 				fBrightness = (0.3*iRed + 0.59*iGreen + 0.11*iBlue) / 255;
 				// fBrightness = (0.3*iRed + 0.5*iGreen + 0.3*iBlue) / 255;
 				
 				if (iAlpha == 0) {
-  					// should calculate alpha instead, but quick hack :)
+					// should calculate alpha instead, but quick hack :)
 					//fBrightness *= (iAlpha / 255); 
 					fBrightness = 1;
 					
@@ -207,16 +209,16 @@ THREE.AsciiEffect = function( renderer, charSet, options ) {
 				if (bInvert) {
 					iCharIdx = aCharList.length - iCharIdx - 1;
 				}
-			  
+
 				// good for debugging
 				//fBrightness = Math.floor(fBrightness * 10);
 				//strThisChar = fBrightness;
-			  
+
 				var strThisChar = aCharList[iCharIdx];		
-			  
-				if (strThisChar===undefined || strThisChar == " ") 
+
+				if (strThisChar===undefined || strThisChar == " ")
 					strThisChar = "&nbsp;";
-			  
+
 				if (bColor) {
 					strChars += "<span style='"
 						+ "color:rgb("+iRed+","+iGreen+","+iBlue+");"
