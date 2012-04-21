@@ -61,7 +61,7 @@ THREE.VTKLoader2.prototype.parse = function ( data ) {
 
 	// float float float
 
-	pattern = /([\d|\.|\+|\-|e]+) ([\d|\.|\+|\-|e]+) ([\d|\.|\+|\-|e]+)/g;
+	pattern = /([\d|\.|\+|\-|e]+)[ ]+([\d|\.|\+|\-|e]+)[ ]+([\d|\.|\+|\-|e]+)/g;
 
 	while ( ( result = pattern.exec( data ) ) != null ) {
 
@@ -73,7 +73,7 @@ THREE.VTKLoader2.prototype.parse = function ( data ) {
 
 	// 3 int int int
 
-	pattern = /3 ([\d]+) ([\d]+) ([\d]+)/g;
+	pattern = /3[ ]+([\d]+)[ ]+([\d]+)[ ]+([\d]+)/g;
 
 	while ( ( result = pattern.exec( data ) ) != null ) {
 
@@ -85,7 +85,7 @@ THREE.VTKLoader2.prototype.parse = function ( data ) {
 
 	// 4 int int int int
 
-	pattern = /4 ([\d]+) ([\d]+) ([\d]+) ([\d]+)/g;
+	pattern = /4[ ]+([\d]+)[ ]+([\d]+)[ ]+([\d]+)[ ]+([\d]+)/g;
 
 	while ( ( result = pattern.exec( data ) ) != null ) {
 
