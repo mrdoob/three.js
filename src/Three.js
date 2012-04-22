@@ -2,7 +2,7 @@
  * @author mr.doob / http://mrdoob.com/
  */
 
-var THREE = THREE || { REVISION: '49dev' };
+var THREE = THREE || { REVISION: '49' };
 
 if ( ! self.Int32Array ) {
 

@@ -118,7 +118,7 @@
 		<div id="button">Edit this page</div>
 
 		<script>
-			var REVISION = '49dev';
+			var REVISION = '49';
 
 			var path = null;
 
@@ -393,7 +393,9 @@
 			}
 
 			function goToHash() {
-				goTo( window.location.hash.substring(1) );
+
+				goTo( window.location.hash.substring( 1 ) );
+
 			}
 			
 			window.addEventListener( 'hashchange', goToHash, false );

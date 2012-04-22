@@ -5,7 +5,7 @@ three.js
 
 The aim of the project is to create a lightweight 3D library with a very low level of complexity — in other words, for dummies. The library provides &lt;canvas&gt;, &lt;svg&gt; and WebGL renderers.
 
-[Contributors](http://github.com/mrdoob/three.js/contributors) — [Getting Started](http://www.aerotwist.com/lab/getting-started-with-three-js/) — [API Reference](http://github.com/mrdoob/three.js/wiki/API-Reference)
+[Contributors](http://github.com/mrdoob/three.js/contributors) — [Documentation](http://mrdoob.github.com/three.js/docs/latest/) — [Getting Started](http://www.aerotwist.com/lab/getting-started-with-three-js/)
 
 More? [#three.js on irc.freenode.net](http://webchat.freenode.net/?channels=three.js)
 
@@ -144,6 +144,62 @@ This code creates a camera, then creates a scene, adds a cube on it, creates a &
 
 ### Change log ###
 
+2012 04 22 - **r49** (364,242 KB, gzip: 89,057 KB)
+
+* Yet more `ColladaLoader` improvements. ([ekitspn](http://github.com/ekitson), [AddictArts](http://github.com/AddictArts), [pblasco](http://github.com/pblasco))
+* Created documentation system. ([mrdoob](http://github.com/mrdoob), [sole](http://github.com/sole))
+* Added some documentation. ([mrdoob](http://github.com/mrdoob))
+* Added `MorphBlendMesh`. ([alteredq](http://github.com/alteredq))
+* Added `emissive` component to WebGL Materials. ([alteredq](http://github.com/alteredq))
+* Added `DepthPassPlugin`. ([alteredq](http://github.com/alteredq))
+* Improvements to `Path`. ([asutherland](http://github.com/asutherland))
+* Improvements to `Curve`. ([zz85](http://github.com/zz85))
+* Added `ArrowHelper`. ([zz85](http://github.com/zz85) and [WestLangley](http://github.com/WestLangley))
+* Changed depth sorting in `WebGLRenderer` to use world positions. ([alteredq](http://github.com/alteredq))
+* Improved physically based shading in `WebGLRenderer`. ([WestLangley](http://github.com/WestLangley))
+* Changed depth sorting in `Projector` to use world positions. ([mrdoob](http://github.com/mrdoob))
+* Added physical specular term also to normal map shader. ([alteredq](http://github.com/alteredq))
+* Added `TubeGeometry`. ([zz85](http://github.com/zz85) and [WestLangley](http://github.com/WestLangley))
+* Added `needsUpdate` flag to `Material`. ([alteredq](http://github.com/alteredq))
+* Fixed `GeometryUtils.triangulateQuads`. ([alteredq](http://github.com/alteredq))
+* Improvements to `GeometryUtils.tessellate`. ([alteredq](http://github.com/alteredq))
+* Change `PlaneGeometry` from XY to XZ. ([mrdoob](http://github.com/mrdoob))
+* `WebGLRenderer` back to `highp` shader precision. ([mrdoob](http://github.com/mrdoob))
+* Added `deallocateRenderTarget` to `WebGLRenderer. ([kovleouf](http://github.com/kovleouf))
+* Support zIndex and scale into `DomRenderer`. ([ajorkowski](http://github.com/ajorkowski))
+* Improvements to `CameraHelper`. ([zz85](http://github.com/zz85))
+* Added 3D spline path extrusion support to `ExtrudeGeometry`. ([zz85](http://github.com/zz85))
+* `MarchingCubes` moved out of the lib into `/examples/js` folder. ([alteredq](http://github.com/alteredq))
+* Added `ImmediateRenderObject`. ([alteredq](http://github.com/alteredq))
+* Renamed `__dirty*` to `*NeedUpdate`. ([valette](http://github.com/valette) and [mrdoob](http://github.com/mrdoob))
+* Added `CustomBlending` to `Material` and `premultiplyAlpha` to `Texture`.  ([alteredq](http://github.com/alteredq))
+* Improvements to `CubeCamera`. ([alteredq](http://github.com/alteredq) and [mrdoob](http://github.com/mrdoob))
+* `CanvasRenderer.setClearColor()` and `.setClearColorHex()` now sets `opacity` to 1 when null. ([mrdoob](http://github.com/mrdoob))
+* Fixed broken UVs in `SubdivisionModifier`. ([zz85](http://github.com/zz85))
+* Renamed `Matrix4`'s `setTranslation`, `setRotationX`, `setRotationY`, `setRotationZ`, `setRotationAxis` and `setScale` to `makeTranslation`, `makeRotationX`, `makeRotationY`, `makeRotationZ`, `makeRotationAxis` and `makeScale`. ([mrdoob](http://github.com/mrdoob))
+* `Matrix4`'s static methods `makeFrustum`, `makePerspective`, `makeOrtho` to normal public methods. ([mrdoob](http://github.com/mrdoob))
+* Refactore handling of `Matrix4` to `Matrix3` inversion. ([alteredq](http://github.com/alteredq))
+* Added `GodRays` postprocessing. ([huwb](http://github.com/huwb))
+* Added `LinePieces` support to `Projector`. ([mrdoob](http://github.com/mrdoob))
+* Fixed UVs handling bug in `GeometryUtils.tessellate`. ([alteredq](http://github.com/alteredq))
+* Serious performance improvements to `Matrix4`, `Matrix3` and `Frustrum`. ([gero3](http://github.com/gero3))
+* Fixes to `LatheGeometry`. ([zz85](http://github.com/zz85))
+* Removed `Vertex`. Use `Vector3` instead. ([mrdoob](http://github.com/mrdoob))
+* Implemented real `Spotlight`s. ([alteredq](http://github.com/alteredq))
+* Added `ParametricGeometry`. ([zz85](http://github.com/zz85))
+* Added basic `OBJLoader` in `/examples/js/loaders` folder. ([mrdoob](http://github.com/mrdoob))
+* Moved `ColladaLoader` and `UTF8Loader` to `/examples/js/loaders` folder. ([mrdoob](http://github.com/mrdoob))
+* Added `VTKLoader` and `UTF8Loader` to `/examples/js/loaders` folder. ([valette](http://github.com/valette) and [mrdoob](http://github.com/mrdoob))
+* Blender exporter now supports linked groups. ([Druidhawk](http://github.com/Druidhawk))
+* Added `visible` property to `Material`. ([mrdoob](http://github.com/mrdoob))
+* Removed Lamber+Texture support in `CanvasRenderer`. ([mrdoob](http://github.com/mrdoob))
+* Fixed normals in `CylinderGeometry`. ([qiao](http://github.com/qiao))
+* Added floating point textures support to `WebGLRenderer`. ([mrdoob](http://github.com/mrdoob))
+* Renamed `AnaglyphWebGLRenderer` and co. to `AnaglyphEffect` & co. and moved to `/examples/js/effects`. ([mrdoob](http://github.com/mrdoob))
+* Improvements to documentation system. ([mrdoob](http://github.com/mrdoob) and [codler](http://github.com/codler))
+* Added `AsciiEffect`. ([zz85](http://github.com/zz85))
+
+
 2012 03 04 - **r48** (393,626 KB, gzip: 99,395 KB)
 
 * Added camera support to `ColladaLoader`. ([jbaicoianu](http://github.com/jbaicoianu))
@@ -277,10 +333,10 @@ This code creates a camera, then creates a scene, adds a cube on it, creates a &
 
 2011 09 04 - **r44** (330.356 KB, gzip: 84.039 KB)
 
-* Added `ColladaLoader`. ([timknip2](https://github.com/timknip2))
+* Added `ColladaLoader`. ([timknip2](http://github.com/timknip2))
 * Improved `ExtrudeGeometry`. ([zz85](http://github.com/zz85))
 * Fixed `CylinderGeometry` normals. ([alteredq](http://github.com/alteredq))
-* Fixed issue with `WebGLRenderer.setTexture` ([rectalogic](https://github.com/rectalogic))
+* Fixed issue with `WebGLRenderer.setTexture` ([rectalogic](http://github.com/rectalogic))
 * Fixed `TorusGeometry` normals. ([mrdoob](http://github.com/mrdoob))
 * Fixed `Ray` behind-ray intersects. ([mrdoob](http://github.com/mrdoob))
 * Added `OrthoCamera`. ([alteredq](http://github.com/alteredq))
