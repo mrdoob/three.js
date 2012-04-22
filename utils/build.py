@@ -454,9 +454,9 @@ def buildLib(files, debug, minified, filename, fname_externs):
 
 	filename = filename + '.js'
 
-	print "=" * 40
-	print "Compiling", filename
-	print "=" * 40
+	print("=" * 40)
+	print("Compiling", filename)
+	print("=" * 40)
 
 	if minified:
 		text = compress(text, fname_externs)
