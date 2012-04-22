@@ -405,7 +405,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		}
 
-		function renderParticle ( v1, element, material, scene ) {
+		function renderParticle( v1, element, material, scene ) {
 
 			setOpacity( material.opacity );
 			setBlending( material.blending );
@@ -799,7 +799,6 @@ THREE.CanvasRenderer = function ( parameters ) {
 			_context.lineTo( x1, y1 );
 			_context.lineTo( x2, y2 );
 			_context.lineTo( x0, y0 );
-			_context.closePath();
 
 		}
 
@@ -811,7 +810,6 @@ THREE.CanvasRenderer = function ( parameters ) {
 			_context.lineTo( x2, y2 );
 			_context.lineTo( x3, y3 );
 			_context.lineTo( x0, y0 );
-			_context.closePath();
 
 		}
 
