@@ -146,7 +146,7 @@ This code creates a camera, then creates a scene, adds a cube on it, creates a &
 
 2012 04 22 - **r49** (364,242 KB, gzip: 89,057 KB)
 
-* Yet more `ColladaLoader` improvements. ([ekitspn](http://github.com/ekitson), [AddictArts](http://github.com/AddictArts) and [pblasco](http://github.com/pblasco))
+* Yet more `ColladaLoader` improvements. ([ekitson](http://github.com/ekitson), [AddictArts](http://github.com/AddictArts) and [pblasco](http://github.com/pblasco))
 * Created documentation system. ([mrdoob](http://github.com/mrdoob))
 * Added some documentation. ([mrdoob](http://github.com/mrdoob) and [sole](http://github.com/sole))
 * Added `MorphBlendMesh`. ([alteredq](http://github.com/alteredq))
