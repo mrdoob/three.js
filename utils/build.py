@@ -72,9 +72,7 @@ COMMON_FILES = [
 'scenes/Scene.js',
 'scenes/Fog.js',
 'scenes/FogExp2.js',
-'renderers/DOMRenderer.js',
 'renderers/CanvasRenderer.js',
-'renderers/SVGRenderer.js',
 'renderers/WebGLShaders.js',
 'renderers/WebGLRenderer.js',
 'renderers/WebGLRenderTarget.js',
@@ -191,110 +189,6 @@ CANVAS_FILES = [
 'objects/Sprite.js',
 'scenes/Scene.js',
 'renderers/CanvasRenderer.js',
-'renderers/renderables/RenderableVertex.js',
-'renderers/renderables/RenderableFace3.js',
-'renderers/renderables/RenderableFace4.js',
-'renderers/renderables/RenderableObject.js',
-'renderers/renderables/RenderableParticle.js',
-'renderers/renderables/RenderableLine.js'
-]
-
-DOM_FILES = [
-'Three.js',
-'core/Color.js',
-'core/Vector2.js',
-'core/Vector3.js',
-'core/Vector4.js',
-'core/Frustum.js',
-'core/Ray.js',
-'core/Rectangle.js',
-'core/Math.js',
-'core/Matrix3.js',
-'core/Matrix4.js',
-'core/Object3D.js',
-'core/Projector.js',
-'core/Quaternion.js',
-'core/Vertex.js',
-'core/Face3.js',
-'core/Face4.js',
-'core/UV.js',
-'cameras/Camera.js',
-'cameras/OrthographicCamera.js',
-'cameras/PerspectiveCamera.js',
-'lights/Light.js',
-'loaders/Loader.js',
-'materials/Material.js',
-'materials/LineBasicMaterial.js',
-'materials/MeshBasicMaterial.js',
-'materials/ParticleBasicMaterial.js',
-'materials/ParticleDOMMaterial.js',
-'textures/Texture.js',
-'textures/DataTexture.js',
-'objects/Particle.js',
-'objects/Mesh.js',
-'objects/Line.js',
-'objects/Bone.js',
-'objects/Sprite.js',
-'scenes/Scene.js',
-'renderers/DOMRenderer.js',
-'renderers/renderables/RenderableParticle.js',
-'renderers/renderables/RenderableVertex.js',
-'renderers/renderables/RenderableFace3.js',
-'renderers/renderables/RenderableFace4.js',
-'renderers/renderables/RenderableObject.js',
-'renderers/renderables/RenderableParticle.js',
-'renderers/renderables/RenderableLine.js'
-]
-
-SVG_FILES = [
-'Three.js',
-'core/Color.js',
-'core/Vector2.js',
-'core/Vector3.js',
-'core/Vector4.js',
-'core/Frustum.js',
-'core/Ray.js',
-'core/Rectangle.js',
-'core/Math.js',
-'core/Matrix3.js',
-'core/Matrix4.js',
-'core/Object3D.js',
-'core/Projector.js',
-'core/Quaternion.js',
-'core/Vertex.js',
-'core/Face3.js',
-'core/Face4.js',
-'core/UV.js',
-'core/Geometry.js',
-'cameras/Camera.js',
-'cameras/OrthographicCamera.js',
-'cameras/PerspectiveCamera.js',
-'lights/Light.js',
-'lights/AmbientLight.js',
-'lights/DirectionalLight.js',
-'lights/PointLight.js',
-'loaders/Loader.js',
-'loaders/BinaryLoader.js',
-'loaders/JSONLoader.js',
-'loaders/SceneLoader.js',
-'materials/Material.js',
-'materials/LineBasicMaterial.js',
-'materials/MeshBasicMaterial.js',
-'materials/MeshLambertMaterial.js',
-'materials/MeshPhongMaterial.js',
-'materials/MeshDepthMaterial.js',
-'materials/MeshNormalMaterial.js',
-'materials/MeshFaceMaterial.js',
-'materials/ParticleBasicMaterial.js',
-'textures/Texture.js',
-'textures/DataTexture.js',
-'objects/Particle.js',
-'objects/Line.js',
-'objects/Mesh.js',
-'objects/Bone.js',
-'objects/Sprite.js',
-'scenes/Scene.js',
-'renderers/SVGRenderer.js',
 'renderers/renderables/RenderableVertex.js',
 'renderers/renderables/RenderableFace3.js',
 'renderers/renderables/RenderableFace4.js',
@@ -455,7 +349,7 @@ def buildLib(files, debug, minified, filename, fname_externs):
 	filename = filename + '.js'
 
 	print("=" * 40)
-	print("Compiling", filename)
+	print("Compiling " + filename)
 	print("=" * 40)
 
 	if minified:
@@ -481,8 +375,6 @@ def parse_args():
 		parser.add_argument('--extras', help='Build ThreeExtras.js', action='store_const', const=True)
 		parser.add_argument('--canvas', help='Build ThreeCanvas.js', action='store_true')
 		parser.add_argument('--webgl', help='Build ThreeWebGL.js', action='store_true')
-		parser.add_argument('--svg', help='Build ThreeSVG.js', action='store_true')
-		parser.add_argument('--dom', help='Build ThreeDOM.js', action='store_true')
 		parser.add_argument('--debug', help='Generate debug versions', action='store_const', const=True, default=False)
 		parser.add_argument('--minified', help='Generate minified versions', action='store_const', const=True, default=False)
 		parser.add_argument('--all', help='Build all Three.js versions', action='store_true')
@@ -496,8 +388,6 @@ def parse_args():
 		parser.add_option('--extras', dest='extras', help='Build ThreeExtras.js', action='store_const', const=True)
 		parser.add_option('--canvas', dest='canvas', help='Build ThreeCanvas.js', action='store_true')
 		parser.add_option('--webgl', dest='webgl', help='Build ThreeWebGL.js', action='store_true')
-		parser.add_option('--svg', dest='svg', help='Build ThreeSVG.js', action='store_true')
-		parser.add_option('--dom', dest='dom', help='Build ThreeDOM.js', action='store_true')
 		parser.add_option('--debug', dest='debug', help='Generate debug versions', action='store_const', const=True, default=False)
 		parser.add_option('--minified', help='Generate minified versions', action='store_const', const=True, default=False)
 		parser.add_option('--all', dest='all', help='Build all Three.js versions', action='store_true')
@@ -521,8 +411,6 @@ def main(argv=None):
 	config = [
 	['Three', 'includes', '', COMMON_FILES + EXTRAS_FILES, args.common],
 	['ThreeCanvas', 'includes_canvas', '', CANVAS_FILES, args.canvas],
-	['ThreeDOM', 'includes_dom', '', DOM_FILES, args.dom],
-	['ThreeSVG', 'includes_svg', '', SVG_FILES, args.svg],
 	['ThreeWebGL', 'includes_webgl', '', WEBGL_FILES, args.webgl],
 	['ThreeExtras', 'includes_extras', 'externs_extras', EXTRAS_FILES, args.extras]
 	]
