@@ -148,10 +148,10 @@ THREE.SoftwareRenderer = function () {
 		var g = color >> 8 & 255;
 		var b = color & 255;
 
-		var xmin = Math.min( x1 >> 0, x2 >> 0 );
-		var xmax = Math.max( x1 >> 0, x2 >> 0 );
-		var ymin = Math.min( y1 >> 0, y2 >> 0 );
-		var ymax = Math.max( y1 >> 0, y2 >> 0 );
+		var xmin = Math.min( x1, x2 ) >> 0;
+		var xmax = Math.max( x1, x2 ) >> 0;
+		var ymin = Math.min( y1, y2 ) >> 0;
+		var ymax = Math.max( y1, y2 ) >> 0;
 
 		for ( var y = ymin; y < ymax; y ++ ) {
 

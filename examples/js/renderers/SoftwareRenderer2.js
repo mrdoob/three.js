@@ -164,6 +164,16 @@ THREE.SoftwareRenderer2 = function () {
 
 		// http://devmaster.net/forums/topic/1145-advanced-rasterization/
 
+		// 28.4 fixed-point coordinates
+
+		var x1 = ( 16 * x1 ) >> 0;
+		var x2 = ( 16 * x2 ) >> 0;
+		var x3 = ( 16 * x3 ) >> 0;
+
+		var y1 = ( 16 * y1 ) >> 0;
+		var y2 = ( 16 * y2 ) >> 0;
+		var y3 = ( 16 * y3 ) >> 0;
+
 		// Deltas
 
 		var dx12 = x1 - x2;
@@ -174,12 +184,22 @@ THREE.SoftwareRenderer2 = function () {
 		var dy23 = y2 - y3;
 		var dy31 = y3 - y1;
 
+		// Fixed-point deltas
+
+		var fdx12 = dx12 << 4;
+		var fdx23 = dx23 << 4;
+		var fdx31 = dx31 << 4;
+
+		var fdy12 = dy12 << 4;
+		var fdy23 = dy23 << 4;
+		var fdy31 = dy31 << 4;
+
 		// Bounding rectangle
 
-		var minx = Math.max( Math.min( x1, x2, x3 ) >> 0, 0 );
-		var maxx = Math.min( Math.max( x1, x2, x3 ) >> 0, canvasWidth );
-		var miny = Math.max( Math.min( y1, y2, y3 ) >> 0, 0 );
-		var maxy = Math.min( Math.max( y1, y2, y3 ) >> 0, canvasHeight );
+		var minx = Math.max( ( Math.min( x1, x2, x3 ) + 0xf ) >> 4, 0 );
+		var maxx = Math.min( ( Math.max( x1, x2, x3 ) + 0xf ) >> 4, canvasWidth );
+		var miny = Math.max( ( Math.min( y1, y2, y3 ) + 0xf ) >> 4, 0 );
+		var maxy = Math.min( ( Math.max( y1, y2, y3 ) + 0xf ) >> 4, canvasHeight );
 
 		// Constant part of half-edge functions
 
@@ -187,9 +207,15 @@ THREE.SoftwareRenderer2 = function () {
 		var c2 = dy23 * x2 - dx23 * y2;
 		var c3 = dy31 * x3 - dx31 * y3;
 
-		var cy1 = c1 + dx12 * miny - dy12 * minx;
-		var cy2 = c2 + dx23 * miny - dy23 * minx;
-		var cy3 = c3 + dx31 * miny - dy31 * minx;
+		// Correct for fill convention
+
+		if ( dy12 < 0 || ( dy12 == 0 && dx12 > 0 ) ) c1 ++;
+		if ( dy23 < 0 || ( dy23 == 0 && dx23 > 0 ) ) c2 ++;
+		if ( dy31 < 0 || ( dy31 == 0 && dx31 > 0 ) ) c3++;
+
+		var cy1 = c1 + dx12 * ( miny << 4 ) - dy12 * ( minx << 4 );
+		var cy2 = c2 + dx23 * ( miny << 4 ) - dy23 * ( minx << 4 );
+		var cy3 = c3 + dx31 * ( miny << 4 ) - dy31 * ( minx << 4 );
 
 		// Scan through bounding rectangle
 
@@ -209,15 +235,15 @@ THREE.SoftwareRenderer2 = function () {
 
 				}
 
-				cx1 -= dy12;
-				cx2 -= dy23;
-				cx3 -= dy31;
+				cx1 -= fdy12;
+				cx2 -= fdy23;
+				cx3 -= fdy31;
 
 			}
 
-			cy1 += dx12;
-			cy2 += dx23;
-			cy3 += dx31;
+			cy1 += fdx12;
+			cy2 += fdx23;
+			cy3 += fdx31;
 
 		}
 
