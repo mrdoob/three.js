@@ -183,6 +183,8 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
+			var clock = new THREE.Clock();
+
 			init();
 			animate();
 
@@ -274,13 +276,15 @@
 
 			function render() {
 
-				uniforms1.time.value += 0.05;
-				uniforms2.time.value = ( Date.now() - start_time ) / 1000;
+				var delta = clock.getDelta();
+
+				uniforms1.time.value += delta * 5;
+				uniforms2.time.value = clock.elapsedTime;
 
 				for( var i = 0; i < meshes.length; ++ i ) {
 
-					meshes[ i ].rotation.y += 0.01 * ( i % 2 ? 1 : -1 );
-					meshes[ i ].rotation.x += 0.01 * ( i % 2 ? -1 : 1 );
+					meshes[ i ].rotation.y += delta * 0.5 * ( i % 2 ? 1 : -1 );
+					meshes[ i ].rotation.x += delta * 0.5 * ( i % 2 ? -1 : 1 );
 
 				}
 

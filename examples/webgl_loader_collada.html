@@ -131,11 +131,15 @@
 			//
 
 			var t = 0;
+			var clock = new THREE.Clock();
+
 			function animate() {
+
+				var delta = clock.getDelta();
 
 				requestAnimationFrame( animate );
 
-				if ( t > 30 ) t = 0;
+				if ( t > 1 ) t = 0;
 
 				if ( skin ) {
 
@@ -152,9 +156,9 @@
 
 					}
 
-					skin.morphTargetInfluences[ Math.floor( t ) ] = 1;
+					skin.morphTargetInfluences[ Math.floor( t * 30 ) ] = 1;
 
-					t += 0.5;
+					t += delta;
 
 				}
 
