@@ -14,10 +14,11 @@ THREE.ImageLoader.prototype.load = function ( url, callback ) {
 
 	image.onload = function () {
 
+
 		callback( image );
 
 		that.onLoadComplete();
-
+    	THREE.Notifier.notify(this);
 	};
 
 	image.crossOrigin = this.crossOrigin;
