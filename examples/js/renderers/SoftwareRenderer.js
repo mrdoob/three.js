@@ -62,6 +62,8 @@ THREE.SoftwareRenderer = function () {
 		var renderData = projector.projectScene( scene, camera );
 		var elements = renderData.elements;
 
+		elements.sort( function painterSort( a, b ) { return a.z - b.z; } );
+
 		for ( var e = 0, el = elements.length; e < el; e ++ ) {
 
 			var element = elements[ e ];
