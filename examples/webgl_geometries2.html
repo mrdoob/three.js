@@ -9,7 +9,7 @@
 				font-family: Monospace;
 				background-color: #000;
 				margin: 0px;
-				overflow: hidden;
+				
 			}
 		</style>
 	</head>
@@ -19,6 +19,7 @@
 
 		<script src="js/Detector.js"></script>
 		<script src="js/Stats.js"></script>
+		
 		<!--
 		<script src="../src/core/Geometry.js"></script>
 		<script src="../src/extras/geometries/ParametricGeometry.js"></script>
@@ -73,11 +74,11 @@
 
 				var GrannyKnot =  new THREE.Curves.GrannyKnot();
 				// var torus = new THREE.TorusKnotGeometry( radius, tube, segmentsR, segmentsT, p , q, heightScale );
-				var torus2 = new THREE.TorusKnotGeometry2( radius, tube, segmentsR, segmentsT, p , q, heightScale );
+				var torus2 = new THREE.ParametricGeometries.TorusKnotGeometry( radius, tube, segmentsR, segmentsT, p , q, heightScale );
 				// var sphere = new THREE.SphereGeometry( 75, 20, 10 );
-				var sphere2 = new THREE.SphereGeometry2( 75, 20, 10 );
+				var sphere2 = new THREE.ParametricGeometries.SphereGeometry( 75, 20, 10 );
 				// var tube = new THREE.TubeGeometry(GrannyKnot, 150, 2, 8, true, false);
-				var tube2 = new THREE.TubeGeometry2(GrannyKnot, 150, 2, 8, true, false);
+				var tube2 = new THREE.ParametricGeometries.TubeGeometry(GrannyKnot, 150, 2, 8, true, false);
 
 
 				// var benchmarkCopies = 1000;
@@ -108,11 +109,11 @@
 				object.scale.multiplyScalar(100);
 				scene.add( object );
 
-				// var geo = new THREE.ParametricGeometry(THREE.ParametricGeometries.plane(200, 200), 10, 10);
-				// THREE.UVsDebug( geo );
+				var geo = new THREE.ParametricGeometry(THREE.ParametricGeometries.plane(200, 200), 10, 20);
 				// document.body.appendChild( THREE.UVsDebug( geo ));
-				// object = THREE.SceneUtils.createMultiMaterialObject( geo, materials );
-
+				object = THREE.SceneUtils.createMultiMaterialObject( geo, materials );
+				object.position.set( 0, 0, 0 );
+				scene.add( object );
 
 				// object = THREE.SceneUtils.createMultiMaterialObject( torus, materials );
 				// object.position.set( 0, 0, 0 );
@@ -130,6 +131,7 @@
 				//  scene.add( object );
 
 				object = THREE.SceneUtils.createMultiMaterialObject( sphere2, materials );
+				// document.body.appendChild( THREE.UVsDebug( sphere2 ));
 				object.position.set( 200, 0, 0 );
 				scene.add( object );
 
