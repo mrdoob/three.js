@@ -49,7 +49,7 @@
 
 			var container, stats;
 			var camera, scene, renderer, mesh;
-			var cameraRig, activeCamera;
+			var cameraRig, activeCamera, activeHelper;
 			var cameraPerspective, cameraOrtho;
 			var cameraPerspectiveHelper, cameraOrthoHelper;
 
@@ -84,6 +84,7 @@
 				//
 
 				activeCamera = cameraPerspective;
+				activeHelper = cameraPerspectiveHelper;
 
 
 				// counteract different front orientation of cameras vs rig
@@ -165,8 +166,8 @@
 
 				switch( event.keyCode ) {
 
-					case 79: /*O*/	activeCamera = cameraOrtho; break;
-					case 80: /*P*/ 	activeCamera = cameraPerspective; break;
+					case 79: /*O*/	activeCamera = cameraOrtho; activeHelper = cameraOrthoHelper; break;
+					case 80: /*P*/ 	activeCamera = cameraPerspective; activeHelper = cameraPerspectiveHelper; break;
 
 				}
 
@@ -245,8 +246,12 @@
 
 				renderer.clear();
 
+				activeHelper.lines.visible = false;
+
 				renderer.setViewport( 0, 0, SCREEN_WIDTH/2, SCREEN_HEIGHT );
 				renderer.render( scene, activeCamera );
+
+				activeHelper.lines.visible = true;
 
 				renderer.setViewport( SCREEN_WIDTH/2, 0, SCREEN_WIDTH/2, SCREEN_HEIGHT );
 				renderer.render( scene, camera );
