@@ -369,7 +369,7 @@
       if (!lookAhead)
       lookAt.copy(pos).addSelf(dir);
       splineCamera.matrix.lookAt(splineCamera.position, lookAt, normal);
-      splineCamera.rotation.getRotationFromMatrix(splineCamera.matrix);
+      splineCamera.rotation.setEulerFromRotationMatrix(splineCamera.matrix, splineCamera.eulerOrder);
 
       cameraHelper.update();
 
