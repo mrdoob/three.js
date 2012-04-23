@@ -141,6 +141,7 @@ THREE.SoftwareRenderer = function () {
 
 	}
 
+	/*
 	function drawRectangle( x1, y1, x2, y2, color ) {
 
 		var r = color >> 16 & 255;
@@ -163,6 +164,7 @@ THREE.SoftwareRenderer = function () {
 		}
 
 	}
+	*/
 
 	function drawTriangle( x1, y1, color1, x2, y2, color2, x3, y3, color3 ) {
 
