@@ -53,8 +53,6 @@
 			var cameraPerspective, cameraOrtho;
 			var cameraPerspectiveHelper, cameraOrthoHelper;
 
-			var r = 0;
-
 			init();
 			animate();
 
@@ -211,6 +209,8 @@
 
 			function render() {
 
+				var r = Date.now() * 0.0005;
+
 				mesh.position.x = 700 * Math.cos( r );
 				mesh.position.z = 700 * Math.sin( r );
 				mesh.position.y = 700 * Math.sin( r );
@@ -250,8 +250,6 @@
 
 				renderer.setViewport( SCREEN_WIDTH/2, 0, SCREEN_WIDTH/2, SCREEN_HEIGHT );
 				renderer.render( scene, camera );
-
-				r += 0.01;
 
 			}
 
