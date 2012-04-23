@@ -126,9 +126,6 @@ THREE.SoftwareRenderer2 = function () {
 
 		var offset = ( x + y * canvasWidth ) * 4;
 
-		if ( x < 0 || y < 0 ) return;
-		if ( x > canvasWidth || y > canvasHeight ) return;
-
 		if ( data[ offset + 3 ] ) return;
 
 		data[ offset ] = r;
@@ -179,10 +176,10 @@ THREE.SoftwareRenderer2 = function () {
 
 		// Bounding rectangle
 
-		var minx = Math.min( x1, x2, x3 ) >> 0;
-		var maxx = Math.max( x1, x2, x3 ) >> 0;
-		var miny = Math.min( y1, y2, y3 ) >> 0;
-		var maxy = Math.max( y1, y2, y3 ) >> 0;
+		var minx = Math.max( Math.min( x1, x2, x3 ) >> 0, 0 );
+		var maxx = Math.min( Math.max( x1, x2, x3 ) >> 0, canvasWidth );
+		var miny = Math.max( Math.min( y1, y2, y3 ) >> 0, 0 );
+		var maxy = Math.min( Math.max( y1, y2, y3 ) >> 0, canvasHeight );
 
 		// Constant part of half-edge functions
 
