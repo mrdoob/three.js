@@ -3247,7 +3247,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( influence > 0 ) {
 
-					activeInfluenceIndices.push( i );
+					activeInfluenceIndices.push( [ i, influence ] );
 
 				}
 
@@ -3264,7 +3264,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else if ( activeInfluenceIndices.length === 0 ) {
 
-				activeInfluenceIndices.push( 0 );
+				activeInfluenceIndices.push( [ 0, 0 ] );
 
 			};
 
@@ -3272,7 +3272,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			while ( m < material.numSupportedMorphTargets ) {
 
-				influenceIndex = activeInfluenceIndices[ m ];
+				if ( m < activeInfluenceIndices.length ) {
+
+					influenceIndex = activeInfluenceIndices[ m ][ 0 ];
+
+				} else {
+
+					influenceIndex = undefined;
+
+				}
 
 				if ( influenceIndex !== undefined || m === 0 ) {
 
@@ -3296,6 +3304,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					if ( material.morphNormals ) {
 
 						_gl.vertexAttribPointer( attributes[ "morphNormal" + m ], 3, _gl.FLOAT, false, 0, 0 );
+
 					}
 
 					object.__webglMorphTargetInfluences[ m ] = 0;
@@ -3326,9 +3335,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function numericalSort( a, b ) {
+	function numericalSort ( a, b ) {
 
-		return a - b;
+		return b[ 1 ] - a[ 1 ];
 
 	};
 
