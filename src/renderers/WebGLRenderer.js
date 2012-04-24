@@ -3272,17 +3272,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			while ( m < material.numSupportedMorphTargets ) {
 
-				if ( m < activeInfluenceIndices.length ) {
+				if ( activeInfluenceIndices[ m ] ) {
 
 					influenceIndex = activeInfluenceIndices[ m ][ 0 ];
-
-				} else {
-
-					influenceIndex = undefined;
-
-				}
-
-				if ( influenceIndex !== undefined || m === 0 ) {
 
 					_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglMorphTargetsBuffers[ influenceIndex ] );
 
