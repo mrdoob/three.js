@@ -64,7 +64,7 @@ THREE.SoftwareRenderer2 = function () {
 		var renderData = projector.projectScene( scene, camera );
 		var elements = renderData.elements;
 
-		elements.sort( function painterSort( a, b ) { return a.z - b.z; } );
+		elements.sort( painterSort );
 
 		for ( var e = 0, el = elements.length; e < el; e ++ ) {
 
@@ -134,6 +134,12 @@ THREE.SoftwareRenderer2 = function () {
 		prevrectx2 = rectx2; prevrecty2 = recty2;
 
 	};
+
+	function painterSort( a, b ) {
+
+		return a.z - b.z;
+
+	}
 
 	function drawPixel( x, y, r, g, b ) {
 
@@ -260,6 +266,137 @@ THREE.SoftwareRenderer2 = function () {
 		}
 
 	}
+
+	/*
+	function drawTriangleColor3( x1, y1, x2, y2, x3, y3, color1, color2, color3 ) {
+
+		// http://devmaster.net/forums/topic/1145-advanced-rasterization/
+
+		var r1 = color1 >> 16 & 255;
+		var r2 = color2 >> 16 & 255;
+		var r3 = color3 >> 16 & 255;
+
+		var g1 = color1 >> 8 & 255;
+		var g2 = color2 >> 8 & 255;
+		var g3 = color3 >> 8 & 255;
+
+		var b1 = color1 & 255;
+		var b2 = color2 & 255;
+		var b3 = color3 & 255;
+
+		var deltasr = computeDelta( x1, y1, r1, x2, y2, r2, x3, y3, r3 );
+		var deltasg = computeDelta( x1, y1, g1, x2, y2, g2, x3, y3, g3 );
+		var deltasb = computeDelta( x1, y1, b1, x2, y2, b2, x3, y3, b3 );
+
+		// 28.4 fixed-point coordinates
+
+		var X1 = Math.round( 16 * x1 );
+		var X2 = Math.round( 16 * x2 );
+		var X3 = Math.round( 16 * x3 );
+
+		var Y1 = Math.round( 16 * y1 );
+		var Y2 = Math.round( 16 * y2 );
+		var Y3 = Math.round( 16 * y3 );
+
+		// Deltas
+
+		var dx12 = X1 - X2;
+		var dx23 = X2 - X3;
+		var dx31 = X3 - X1;
+
+		var dy12 = Y1 - Y2;
+		var dy23 = Y2 - Y3;
+		var dy31 = Y3 - Y1;
+
+		// Fixed-point deltas
+
+		var fdx = [ dx12 << 4, dx23 << 4, dx31 << 4 ];
+		var fdy = [ dy12 << 4, dy23 << 4, dy31 << 4 ];
+
+		// Bounding rectangle
+
+		var minx = Math.max( ( Math.min( X1, X2, X3 ) + 0xf ) >> 4, 0 );
+		var maxx = Math.min( ( Math.max( X1, X2, X3 ) + 0xf ) >> 4, canvasWidth );
+		var miny = Math.max( ( Math.min( Y1, Y2, Y3 ) + 0xf ) >> 4, 0 );
+		var maxy = Math.min( ( Math.max( Y1, Y2, Y3 ) + 0xf ) >> 4, canvasHeight );
+
+		// Constant part of half-edge functions
+
+		var c1 = dy12 * X1 - dx12 * Y1;
+		var c2 = dy23 * X2 - dx23 * Y2;
+		var c3 = dy31 * X3 - dx31 * Y3;
+
+		// Correct for fill convention
+
+		if ( dy12 < 0 || ( dy12 == 0 && dx12 > 0 ) ) c1 ++;
+		if ( dy23 < 0 || ( dy23 == 0 && dx23 > 0 ) ) c2 ++;
+		if ( dy31 < 0 || ( dy31 == 0 && dx31 > 0 ) ) c3 ++;
+
+		var cy1 = c1 + dx12 * ( miny << 4 ) - dy12 * ( minx << 4 );
+		var cy2 = c2 + dx23 * ( miny << 4 ) - dy23 * ( minx << 4 );
+		var cy3 = c3 + dx31 * ( miny << 4 ) - dy31 * ( minx << 4 );
+
+		// Scan through bounding rectangle
+
+		var minyx1 = ( minx - x1 );
+		var minyy1 = ( miny - y1 );
+
+		var ry = deltasr[ 1 ] * minyy1;
+		var gy = deltasg[ 1 ] * minyy1;
+		var by = deltasb[ 1 ] * minyy1;
+
+		for ( var y = miny; y < maxy; y ++ ) {
+
+			// Start value for horizontal scan
+
+			var cx1 = cy1;
+			var cx2 = cy2;
+			var cx3 = cy3;
+
+			var rx = deltasr[ 0 ] * minyx1 + ry;
+			var gx = deltasg[ 0 ] * minyx1 + gy;
+			var bx = deltasb[ 0 ] * minyx1 + by;
+
+			for ( var x = minx; x < maxx; x ++ ) {
+
+				if ( cx1 > 0 && cx2 > 0 && cx3 > 0 ) {
+
+					drawPixel( x, y, r1 + rx, g1 + gx, b1 + bx );
+
+				}
+
+				cx1 -= fdy[ 0 ];
+				cx2 -= fdy[ 1 ];
+				cx3 -= fdy[ 2 ];
+
+				rx += deltasr[ 0 ];
+				gx += deltasg[ 0 ];
+				bx += deltasb[ 0 ];
+
+			}
+
+			cy1 += fdx[ 0 ];
+			cy2 += fdx[ 1 ];
+			cy3 += fdx[ 2 ];
+
+			ry += deltasr[ 1 ];
+			gy += deltasg[ 1 ];
+			by += deltasb[ 1 ];
+
+		}
+
+	}
+
+	function computeDelta( x1, y1, z1, x2, y2, z2, x3, y3, z3 ) {
+
+		var A = (z3 - z1) * (y2 - y1) - (z2 - z1) * (y3 - y1);
+		var B = (x3 - x1) * (z2 - z1) - (x2 - x1) * (z3 - z1);
+		var C = (x2 - x1) * (y3 - y1) - (x3 - x1) * (y2 - y1);
+
+		return [ - A / C, - B / C ];
+
+	}
+	*/
 
 	function normalToComponent( normal ) {
 
