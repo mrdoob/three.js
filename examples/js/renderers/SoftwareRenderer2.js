@@ -267,7 +267,6 @@ THREE.SoftwareRenderer2 = function () {
 
 	}
 
-	/*
 	function drawTriangleColor3( x1, y1, x2, y2, x3, y3, color1, color2, color3 ) {
 
 		// http://devmaster.net/forums/topic/1145-advanced-rasterization/
@@ -396,7 +395,6 @@ THREE.SoftwareRenderer2 = function () {
 		return [ - A / C, - B / C ];
 
 	}
-	*/
 
 	function normalToComponent( normal ) {
 
