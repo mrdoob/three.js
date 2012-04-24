@@ -3189,8 +3189,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 	};
-	
-	function sortNumerical(a,b){return a - b};
 
 	function setupMorphTargets ( material, geometryGroup, object ) {
 
@@ -3198,7 +3196,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var attributes = material.program.attributes;
 
-		if ( object.morphTargetBase !== - 1 ) {
+		if ( object.morphTargetBase !== -1 ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglMorphTargetsBuffers[ object.morphTargetBase ] );
 			_gl.vertexAttribPointer( attributes.position, 3, _gl.FLOAT, false, 0, 0 );
@@ -3237,74 +3235,73 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else {
 
-			// find most influencing
+			// find the most influencing
 
-			var used = [];
-			var candidateInfluence = - 1;
-			var candidate = 0;
+			var influence, activeInfluenceIndices = [];
 			var influences = object.morphTargetInfluences;
 			var i, il = influences.length;
-			var m = 0;
 
-			if ( object.morphTargetBase !== - 1 ) {
+			for ( i = 0; i < il; i ++ ) {
 
-				used[ object.morphTargetBase ] = true;
+				influence = influences[ i ];
 
-			}
-            
-            var gonnaUse = [];
-            
-            for ( i = 0; i < il; i ++ ) {
-                candidateInfluence = influences[ i ]
-				if ( candidateInfluence > 0 ) {
-                    gonnaUse.push(i);
+				if ( influence > 0 ) {
+
+					activeInfluenceIndices.push( i );
+
 				}
+
 			}
-            
-            if ( gonnaUse.length >  material.numSupportedMorphTargets){
-				gonnaUse.sort(sortNumerical);
-				gonnaUse.length = material.numSupportedMorphTargets 
-            } else if (gonnaUse.length >  material.numSupportedMorphNormals){
-            	gonnaUse.sort(sortNumerical);
-            } else if (gonnaUse.length === 0){
-				gonnaUse.push(0);
-            };
+
+			if ( activeInfluenceIndices.length > material.numSupportedMorphTargets ) {
+
+				activeInfluenceIndices.sort( numericalSort );
+				activeInfluenceIndices.length = material.numSupportedMorphTargets;
+
+			} else if ( activeInfluenceIndices.length > material.numSupportedMorphNormals ) {
+
+				activeInfluenceIndices.sort( numericalSort );
+
+			} else if ( activeInfluenceIndices.length === 0 ) {
+
+				activeInfluenceIndices.push( 0 );
+
+			};
+
+			var influenceIndex, m = 0;
 
 			while ( m < material.numSupportedMorphTargets ) {
 
-			/*	for ( i = 0; i < il; i ++ ) {
+				influenceIndex = activeInfluenceIndices[ m ];
 
-					if ( !used[ i ] && influences[ i ] > candidateInfluence ) {
+				if ( influenceIndex !== undefined || m === 0 ) {
 
-						candidate = i;
-						candidateInfluence = influences[ candidate ];
+					_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglMorphTargetsBuffers[ influenceIndex ] );
+
+					_gl.vertexAttribPointer( attributes[ "morphTarget" + m ], 3, _gl.FLOAT, false, 0, 0 );
+
+					if ( material.morphNormals ) {
+
+						_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglMorphNormalsBuffers[ influenceIndex ] );
+						_gl.vertexAttribPointer( attributes[ "morphNormal" + m ], 3, _gl.FLOAT, false, 0, 0 );
 
 					}
 
-				}
-*/
+					object.__webglMorphTargetInfluences[ m ] = influences[ influenceIndex ];
 
-                if (gonnaUse[m] !== undefined || m === 0){
-    				_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglMorphTargetsBuffers[ gonnaUse[m] ] );
-    				_gl.vertexAttribPointer( attributes[ "morphTarget" + m ], 3, _gl.FLOAT, false, 0, 0 );
-    
-    				if ( material.morphNormals ) {
-    
-    					_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglMorphNormalsBuffers[ gonnaUse[m] ] );
-    					_gl.vertexAttribPointer( attributes[ "morphNormal" + m ], 3, _gl.FLOAT, false, 0, 0 );
-    
-    				}
-    
-    				object.__webglMorphTargetInfluences[ m ] = influences[ gonnaUse[m]];
-                } else {
-                    _gl.vertexAttribPointer( attributes[ "morphTarget" + m ], 3, _gl.FLOAT, false, 0, 0 );
-                    if ( material.morphNormals ) {
-                    	_gl.vertexAttribPointer( attributes[ "morphNormal" + m ], 3, _gl.FLOAT, false, 0, 0 );
-                    }
-                    object.__webglMorphTargetInfluences[ m ] = 0;
-                }
-				//used[ candidate ] = 1;
-				//candidateInfluence = -1;
+				} else {
+
+					_gl.vertexAttribPointer( attributes[ "morphTarget" + m ], 3, _gl.FLOAT, false, 0, 0 );
+
+					if ( material.morphNormals ) {
+
+						_gl.vertexAttribPointer( attributes[ "morphNormal" + m ], 3, _gl.FLOAT, false, 0, 0 );
+					}
+
+					object.__webglMorphTargetInfluences[ m ] = 0;
+
+				}
+
 				m ++;
 
 			}
@@ -3321,12 +3318,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	// Sorting
 
 	function painterSort ( a, b ) {
 
 		return b.z - a.z;
 
 	};
+
+	function numericalSort( a, b ) {
+
+		return a - b;
+
+	};
+
 
 	// Rendering
 
