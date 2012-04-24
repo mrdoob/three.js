@@ -18,6 +18,12 @@ THREE.SoftwareRenderer2 = function () {
 	var canvasWidthHalf = canvasWidth / 2;
 	var canvasHeightHalf = canvasHeight / 2;
 
+	var rectx1 = 0, recty1 = 0;
+	var rectx2 = 0, recty2 = 0;
+
+	var prevrectx1 = 0, prevrecty1 = 0;
+	var prevrectx2 = 0, prevrecty2 = 0;
+
 	var projector = new THREE.Projector();
 
 	this.domElement = canvas;
@@ -42,17 +48,16 @@ THREE.SoftwareRenderer2 = function () {
 
 	this.clear = function () {
 
-		for ( var i = 3, l = data.length; i < l; i += 4 ) {
-
-			data[ i ] = 0;
-
-		}
+		clearRectangle( prevrectx1, prevrecty1, prevrectx2, prevrecty2 );
 
 	};
 
 	this.render = function ( scene, camera ) {
 
-		var m, ml, element, material, dom, v1x, v1y;
+		rectx1 = canvasWidth;
+		recty1 = canvasHeight;
+		rectx2 = 0;
+		recty2 = 0;
 
 		if ( this.autoClear ) this.clear();
 
@@ -74,13 +79,13 @@ THREE.SoftwareRenderer2 = function () {
 				drawTriangle(
 					v1.x * canvasWidthHalf + canvasWidthHalf,
 					- v1.y * canvasHeightHalf + canvasHeightHalf,
-					0xff0000,
 					v2.x * canvasWidthHalf + canvasWidthHalf,
 					- v2.y * canvasHeightHalf + canvasHeightHalf,
-					0x00ff00,
 					v3.x * canvasWidthHalf + canvasWidthHalf,
 					- v3.y * canvasHeightHalf + canvasHeightHalf,
-					0x0000ff
+					normalToComponent( element.normalWorld.x ),
+					normalToComponent( element.normalWorld.y ),
+					normalToComponent( element.normalWorld.z )
 				)
 
 			} else if ( element instanceof THREE.RenderableFace4 ) {
@@ -93,32 +98,40 @@ THREE.SoftwareRenderer2 = function () {
 				drawTriangle(
 					v1.x * canvasWidthHalf + canvasWidthHalf,
 					- v1.y * canvasHeightHalf + canvasHeightHalf,
-					0xff0000,
 					v2.x * canvasWidthHalf + canvasWidthHalf,
 					- v2.y * canvasHeightHalf + canvasHeightHalf,
-					0x00ff00,
 					v3.x * canvasWidthHalf + canvasWidthHalf,
 					- v3.y * canvasHeightHalf + canvasHeightHalf,
-					0x0000ff
+					normalToComponent( element.normalWorld.x ),
+					normalToComponent( element.normalWorld.y ),
+					normalToComponent( element.normalWorld.z )
 				);
 
 				drawTriangle(
 					v3.x * canvasWidthHalf + canvasWidthHalf,
 					- v3.y * canvasHeightHalf + canvasHeightHalf,
-					0x0000ff,
 					v4.x * canvasWidthHalf + canvasWidthHalf,
 					- v4.y * canvasHeightHalf + canvasHeightHalf,
-					0xff00ff,
 					v1.x * canvasWidthHalf + canvasWidthHalf,
 					- v1.y * canvasHeightHalf + canvasHeightHalf,
-					0xff0000
+					normalToComponent( element.normalWorld.x ),
+					normalToComponent( element.normalWorld.y ),
+					normalToComponent( element.normalWorld.z )
 				);
 
 			}
 
 		}
 
-		context.putImageData( imagedata, 0, 0 );
+		var x = Math.min( rectx1, prevrectx1 );
+		var y = Math.min( recty1, prevrecty1 );
+		var width = Math.max( rectx2, prevrectx2 ) - x;
+		var height = Math.max( recty2, prevrecty2 ) - y;
+
+		context.putImageData( imagedata, 0, 0, x, y, width, height );
+
+		prevrectx1 = rectx1; prevrecty1 = recty1;
+		prevrectx2 = rectx2; prevrecty2 = recty2;
 
 	};
 
@@ -135,34 +148,38 @@ THREE.SoftwareRenderer2 = function () {
 
 	}
 
-	/*
-	function drawRectangle( x1, y1, x2, y2, color ) {
+	function clearRectangle( x1, y1, x2, y2 ) {
 
-		var r = color >> 16 & 255;
-		var g = color >> 8 & 255;
-		var b = color & 255;
-
-		var xmin = Math.min( x1, x2 ) >> 0;
-		var xmax = Math.max( x1, x2 ) >> 0;
-		var ymin = Math.min( y1, y2 ) >> 0;
-		var ymax = Math.max( y1, y2 ) >> 0;
+		var xmin = Math.min( x1, x2 );
+		var xmax = Math.max( x1, x2 );
+		var ymin = Math.min( y1, y2 );
+		var ymax = Math.max( y1, y2 );
 
 		for ( var y = ymin; y < ymax; y ++ ) {
 
 			for ( var x = xmin; x < xmax; x ++ ) {
 
-				drawPixel( x, y, r, g, b );
+				data[ ( ( x + y * canvasWidth ) * 4 ) + 3 ] = 0;
 
 			}
 
 		}
 
 	}
-	*/
 
-	function drawTriangle( x1, y1, color1, x2, y2, color2, x3, y3, color3 ) {
+	function drawTriangle( x1, y1, x2, y2, x3, y3, r, g, b ) {
 
 		// http://devmaster.net/forums/topic/1145-advanced-rasterization/
+
+		// 28.4 fixed-point coordinates
+
+		var x1 = Math.round( 16 * x1 );
+		var x2 = Math.round( 16 * x2 );
+		var x3 = Math.round( 16 * x3 );
+
+		var y1 = Math.round( 16 * y1 );
+		var y2 = Math.round( 16 * y2 );
+		var y3 = Math.round( 16 * y3 );
 
 		// Deltas
 
@@ -174,12 +191,27 @@ THREE.SoftwareRenderer2 = function () {
 		var dy23 = y2 - y3;
 		var dy31 = y3 - y1;
 
+		// Fixed-point deltas
+
+		var fdx12 = dx12 << 4;
+		var fdx23 = dx23 << 4;
+		var fdx31 = dx31 << 4;
+
+		var fdy12 = dy12 << 4;
+		var fdy23 = dy23 << 4;
+		var fdy31 = dy31 << 4;
+
 		// Bounding rectangle
 
-		var minx = Math.max( Math.min( x1, x2, x3 ) >> 0, 0 );
-		var maxx = Math.min( Math.max( x1, x2, x3 ) >> 0, canvasWidth );
-		var miny = Math.max( Math.min( y1, y2, y3 ) >> 0, 0 );
-		var maxy = Math.min( Math.max( y1, y2, y3 ) >> 0, canvasHeight );
+		var xmin = Math.max( ( Math.min( x1, x2, x3 ) + 0xf ) >> 4, 0 );
+		var xmax = Math.min( ( Math.max( x1, x2, x3 ) + 0xf ) >> 4, canvasWidth );
+		var ymin = Math.max( ( Math.min( y1, y2, y3 ) + 0xf ) >> 4, 0 );
+		var ymax = Math.min( ( Math.max( y1, y2, y3 ) + 0xf ) >> 4, canvasHeight );
+
+		rectx1 = Math.min( xmin, rectx1 );
+		rectx2 = Math.max( xmax, rectx2 );
+		recty1 = Math.min( ymin, recty1 );
+		recty2 = Math.max( ymax, recty2 );
 
 		// Constant part of half-edge functions
 
@@ -187,13 +219,19 @@ THREE.SoftwareRenderer2 = function () {
 		var c2 = dy23 * x2 - dx23 * y2;
 		var c3 = dy31 * x3 - dx31 * y3;
 
-		var cy1 = c1 + dx12 * miny - dy12 * minx;
-		var cy2 = c2 + dx23 * miny - dy23 * minx;
-		var cy3 = c3 + dx31 * miny - dy31 * minx;
+		// Correct for fill convention
+
+		if ( dy12 < 0 || ( dy12 == 0 && dx12 > 0 ) ) c1 ++;
+		if ( dy23 < 0 || ( dy23 == 0 && dx23 > 0 ) ) c2 ++;
+		if ( dy31 < 0 || ( dy31 == 0 && dx31 > 0 ) ) c3++;
+
+		var cy1 = c1 + dx12 * ( ymin << 4 ) - dy12 * ( xmin << 4 );
+		var cy2 = c2 + dx23 * ( ymin << 4 ) - dy23 * ( xmin << 4 );
+		var cy3 = c3 + dx31 * ( ymin << 4 ) - dy31 * ( xmin << 4 );
 
 		// Scan through bounding rectangle
 
-		for ( var y = miny; y < maxy; y ++ ) {
+		for ( var y = ymin; y < ymax; y ++ ) {
 
 			// Start value for horizontal scan
 
@@ -201,25 +239,32 @@ THREE.SoftwareRenderer2 = function () {
 			var cx2 = cy2;
 			var cx3 = cy3;
 
-			for ( var x = minx; x < maxx; x ++ ) {
+			for ( var x = xmin; x < xmax; x ++ ) {
 
 				if ( cx1 > 0 && cx2 > 0 && cx3 > 0 ) {
 
-					drawPixel( x, y, 255, 0, 0 );
+					drawPixel( x, y, r, g, b );
 
 				}
 
-				cx1 -= dy12;
-				cx2 -= dy23;
-				cx3 -= dy31;
+				cx1 -= fdy12;
+				cx2 -= fdy23;
+				cx3 -= fdy31;
 
 			}
 
-			cy1 += dx12;
-			cy2 += dx23;
-			cy3 += dx31;
+			cy1 += fdx12;
+			cy2 += fdx23;
+			cy3 += fdx31;
 
 		}
+
+	}
+
+	function normalToComponent( normal ) {
+
+		var component = ( normal + 1 ) * 127;
+		return component < 0 ? 0 : ( component > 255 ? 255 : component );
 
 	}
 
