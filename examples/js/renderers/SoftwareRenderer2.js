@@ -156,16 +156,21 @@ THREE.SoftwareRenderer2 = function () {
 
 	function clearRectangle( x1, y1, x2, y2 ) {
 
-		var xmin = Math.min( x1, x2 );
-		var xmax = Math.max( x1, x2 );
-		var ymin = Math.min( y1, y2 );
-		var ymax = Math.max( y1, y2 );
+		var offset = 0;
+
+		var xmin = Math.max( Math.min( x1, x2 ), 0 );
+		var xmax = Math.min( Math.max( x1, x2 ), canvasWidth );
+		var ymin = Math.max( Math.min( y1, y2 ), 0 );
+		var ymax = Math.min( Math.max( y1, y2 ), canvasHeight );
 
 		for ( var y = ymin; y < ymax; y ++ ) {
 
+			offset = ( xmin + y * canvasWidth ) * 4 + 3;
+
 			for ( var x = xmin; x < xmax; x ++ ) {
 
-				data[ ( ( x + y * canvasWidth ) * 4 ) + 3 ] = 0;
+				data[ offset ] = 0;
+				offset += 4;
 
 			}
 
