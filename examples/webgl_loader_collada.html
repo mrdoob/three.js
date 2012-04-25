@@ -77,21 +77,22 @@
 
 				// Grid
 
-				var line_material = new THREE.LineBasicMaterial( { color: 0xcccccc, opacity: 0.2 } ),
-					geometry = new THREE.Geometry(),
-					floor = -0.04, step = 1, size = 14;
+				var size = 14, step = 1;
 
-				for ( var i = 0; i <= size / step * 2; i ++ ) {
+				var geometry = new THREE.Geometry();
+				var material = new THREE.LineBasicMaterial( { color: 0xcccccc, opacity: 0.2 } );
 
-					geometry.vertices.push( new THREE.Vector3( - size, floor, i * step - size ) );
-					geometry.vertices.push( new THREE.Vector3(   size, floor, i * step - size ) );
+				for ( var i = - size; i <= size; i += step ) {
 
-					geometry.vertices.push( new THREE.Vector3( i * step - size, floor, -size ) );
-					geometry.vertices.push( new THREE.Vector3( i * step - size, floor,  size ) );
+					geometry.vertices.push( new THREE.Vector3( - size, - 0.04, i ) );
+					geometry.vertices.push( new THREE.Vector3(   size, - 0.04, i ) );
+
+					geometry.vertices.push( new THREE.Vector3( i, - 0.04, - size ) );
+					geometry.vertices.push( new THREE.Vector3( i, - 0.04,   size ) );
 
 				}
 
-				var line = new THREE.Line( geometry, line_material, THREE.LinePieces );
+				var line = new THREE.Line( geometry, material, THREE.LinePieces );
 				scene.add( line );
 
 				// Add the COLLADA
