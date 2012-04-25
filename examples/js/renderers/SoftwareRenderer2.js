@@ -18,10 +18,10 @@ THREE.SoftwareRenderer2 = function () {
 	var canvasWidthHalf = canvasWidth / 2;
 	var canvasHeightHalf = canvasHeight / 2;
 
-	var rectx1 = 0, recty1 = 0;
+	var rectx1 = Infinity, recty1 = Infinity;
 	var rectx2 = 0, recty2 = 0;
 
-	var prevrectx1 = 0, prevrecty1 = 0;
+	var prevrectx1 = Infinity, prevrecty1 = Infinity;
 	var prevrectx2 = 0, prevrecty2 = 0;
 
 	var projector = new THREE.Projector();
@@ -54,8 +54,8 @@ THREE.SoftwareRenderer2 = function () {
 
 	this.render = function ( scene, camera ) {
 
-		rectx1 = canvasWidth;
-		recty1 = canvasHeight;
+		rectx1 = Infinity;
+		recty1 = Infinity;
 		rectx2 = 0;
 		recty2 = 0;
 
@@ -64,7 +64,7 @@ THREE.SoftwareRenderer2 = function () {
 		var renderData = projector.projectScene( scene, camera );
 		var elements = renderData.elements;
 
-		elements.sort( painterSort );
+		elements.sort( numericalSort );
 
 		for ( var e = 0, el = elements.length; e < el; e ++ ) {
 
@@ -128,6 +128,13 @@ THREE.SoftwareRenderer2 = function () {
 		var width = Math.max( rectx2, prevrectx2 ) - x;
 		var height = Math.max( recty2, prevrecty2 ) - y;
 
+		/*
+		console.log( rectx1, recty1, rectx2, recty2 );
+		console.log( prevrectx1, prevrecty1, prevrectx2, prevrecty2 );
+		console.log( x, y, width, height );
+		console.log( canvasWidth, canvasHeight );
+		*/
+
 		context.putImageData( imagedata, 0, 0, x, y, width, height );
 
 		prevrectx1 = rectx1; prevrecty1 = recty1;
@@ -135,7 +142,7 @@ THREE.SoftwareRenderer2 = function () {
 
 	};
 
-	function painterSort( a, b ) {
+	function numericalSort( a, b ) {
 
 		return a.z - b.z;
 
@@ -156,23 +163,23 @@ THREE.SoftwareRenderer2 = function () {
 
 	function clearRectangle( x1, y1, x2, y2 ) {
 
-		var offset = 0;
-
 		var xmin = Math.max( Math.min( x1, x2 ), 0 );
 		var xmax = Math.min( Math.max( x1, x2 ), canvasWidth );
 		var ymin = Math.max( Math.min( y1, y2 ), 0 );
 		var ymax = Math.min( Math.max( y1, y2 ), canvasHeight );
 
-		for ( var y = ymin; y < ymax; y ++ ) {
+		var offset = ( xmin + ymin * canvasWidth - 1 ) * 4 + 3;
+		var linestep = ( canvasWidth - ( xmax - xmin ) ) * 4;
 
-			offset = ( xmin + y * canvasWidth ) * 4 + 3;
+		for ( var y = ymin; y < ymax; y ++ ) {
 
 			for ( var x = xmin; x < xmax; x ++ ) {
 
-				data[ offset ] = 0;
-				offset += 4;
+				data[ offset += 4 ] = 0;
 
 			}
+
+			offset += linestep;
 
 		}
 
@@ -388,16 +395,6 @@ THREE.SoftwareRenderer2 = function () {
 			by += deltasb[ 1 ];
 
 		}
-
-	}
-
-	function computeDelta( x1, y1, z1, x2, y2, z2, x3, y3, z3 ) {
-
-		var A = (z3 - z1) * (y2 - y1) - (z2 - z1) * (y3 - y1);
-		var B = (x3 - x1) * (z2 - z1) - (x2 - x1) * (z3 - z1);
-		var C = (x2 - x1) * (y3 - y1) - (x3 - x1) * (y2 - y1);
-
-		return [ - A / C, - B / C ];
 
 	}
 
