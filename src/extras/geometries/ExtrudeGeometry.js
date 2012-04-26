@@ -88,7 +88,9 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	var material = options.material;
 	var extrudeMaterial = options.extrudeMaterial;
-	var uvGenerator = options.uvGenerator || null;
+
+	// Use default WorldUVGenerator if no UV generators are specified.
+	var uvgen = options.UVGenerator !== undefined ? options.UVGenerator : THREE.ExtrudeGeometry.WorldUVGenerator;
 
 	var shapebb = this.shapebb;
 	//shapebb = shape.getBoundingBox();
@@ -525,9 +527,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	}
 
-	// choose UV generator
-	var uvgen = uvGenerator /* specified */ ||
-	            THREE.ExtrudeGeometry.WorldUVGenerator; /* default */
+
 
 	////
 	///   Handle Faces
