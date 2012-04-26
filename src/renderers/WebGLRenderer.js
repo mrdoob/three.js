@@ -5679,8 +5679,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		].join("\n");
 
-		_gl.attachShader( program, getShader( "fragment", prefix_fragment + fragmentShader ) );
-		_gl.attachShader( program, getShader( "vertex", prefix_vertex + vertexShader ) );
+		var glFragmentShader = getShader( "fragment", prefix_fragment + fragmentShader );
+		var glVertexShader = getShader( "vertex", prefix_vertex + vertexShader );
+
+		_gl.attachShader( program, glVertexShader );
+		_gl.attachShader( program, glFragmentShader );
 
 		_gl.linkProgram( program );
 
@@ -5689,6 +5692,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 			console.error( "Could not initialise shader\n" + "VALIDATE_STATUS: " + _gl.getProgramParameter( program, _gl.VALIDATE_STATUS ) + ", gl error [" + _gl.getError() + "]" );
 
 		}
+
+		// clean up
+
+		_gl.deleteShader( glFragmentShader );
+		_gl.deleteShader( glVertexShader );
 
 		//console.log( prefix_fragment + fragmentShader );
 		//console.log( prefix_vertex + vertexShader );
