@@ -3375,7 +3375,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// load updated influences uniform
 
-		if( material.program.uniforms.morphTargetInfluences !== null ) {
+		if ( material.program.uniforms.morphTargetInfluences !== null ) {
 
 			_gl.uniform1fv( material.program.uniforms.morphTargetInfluences, object.__webglMorphTargetInfluences );
 
