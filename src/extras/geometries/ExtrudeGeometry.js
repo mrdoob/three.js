@@ -16,11 +16,13 @@
  *  bevelSize:		<float>, 		// how far from text outline is bevel
  *  bevelSegments:	<int>, 			// number of bevel layers
  *
- *  extrudePath:	<THREE.CurvePath>	// 2d/3d spline path to extrude shape orthogonality to
+ *  extrudePath:	<THREE.CurvePath>	// 3d spline path to extrude shape along. (creates Frames if .frames aren't defined)
+ *  frames:			<THREE.TubeGeometry.FrenetFrames> // containing arrays of tangents, normals, binormals
  *  bendPath:		<THREE.CurvePath> 	// 2d path for bend the shape around x/y plane
  *
  *  material:		 <int>	// material index for front and back faces
  *  extrudeMaterial: <int>	// material index for extrusion and beveled faces
+ *  uvGenerator:	 <Object> // object that provides UV generator functions
  *
  *  }
   **/
@@ -88,6 +90,9 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 	var material = options.material;
 	var extrudeMaterial = options.extrudeMaterial;
 
+	// Use default WorldUVGenerator if no UV generators are specified.
+	var uvgen = options.UVGenerator !== undefined ? options.UVGenerator : THREE.ExtrudeGeometry.WorldUVGenerator;
+
 	var shapebb = this.shapebb;
 	//shapebb = shape.getBoundingBox();
 
@@ -105,7 +110,10 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 		// Reuse TNB from TubeGeomtry for now.
 		// TODO1 - have a .isClosed in spline?
-		splineTube = new THREE.TubeGeometry.FrenetFrames(extrudePath, steps, false);
+
+		splineTube = options.frames !== undefined ?
+			options.frames :
+			new THREE.TubeGeometry.FrenetFrames(extrudePath, steps, false);
 
 		// console.log(splineTube, 'splineTube', splineTube.normals.length, 'steps', steps, 'extrudePts', extrudePts.length);
 
@@ -523,8 +531,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	}
 
-	// set UV generator
-	var uvgen = THREE.ExtrudeGeometry.WorldUVGenerator;
+
 
 	////
 	///   Handle Faces
@@ -618,7 +625,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 					c = layeroffset + k + slen2,
 					d = layeroffset + j + slen2;
 
-				f4( a, b, c, d, contour, s, sl );
+				f4( a, b, c, d, contour, s, sl, j, k );
 			}
 		}
 	}
@@ -642,7 +649,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
  		scope.faceVertexUvs[ 0 ].push(uvs);
 	}
 
-	function f4( a, b, c, d, wallContour, stepIndex, stepsLength ) {
+	function f4( a, b, c, d, wallContour, stepIndex, stepsLength, contourIndex1, contourIndex2 ) {
 		a += shapesOffset;
 		b += shapesOffset;
 		c += shapesOffset;
@@ -650,7 +657,8 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
  		scope.faces.push( new THREE.Face4( a, b, c, d, null, null, extrudeMaterial ) );
  
- 		var uvs = uvgen.generateSideWallUV( scope, shape, wallContour, options, a, b, c, d, stepIndex, stepsLength);
+ 		var uvs = uvgen.generateSideWallUV( scope, shape, wallContour, options, a, b, c, d,
+ 		                                    stepIndex, stepsLength, contourIndex1, contourIndex2 );
  		scope.faceVertexUvs[ 0 ].push(uvs);
 	}
 
@@ -681,7 +689,8 @@ THREE.ExtrudeGeometry.WorldUVGenerator = {
 	},
 
 	generateSideWallUV: function( geometry, extrudedShape, wallContour, extrudeOptions,
-	                              indexA, indexB, indexC, indexD, stepIndex, stepsLength) {
+	                              indexA, indexB, indexC, indexD, stepIndex, stepsLength,
+	                              contourIndex1, contourIndex2 ) {
 		var ax = geometry.vertices[ indexA ].x,
 			ay = geometry.vertices[ indexA ].y,
 			az = geometry.vertices[ indexA ].z,

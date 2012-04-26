@@ -54,6 +54,8 @@ THREE.SoftwareRenderer3 = function () {
 		canvasWBlocks = Math.floor( ( canvasWidth + blocksize - 1 ) / blocksize );
 		canvasHBlocks = Math.floor( ( canvasHeight + blocksize - 1 ) / blocksize );
 
+		console.log( canvasWBlocks, canvasHBlocks );
+
 		block_full = new Uint8Array( canvasWBlocks * canvasHBlocks )
 
 	};
@@ -174,22 +176,23 @@ THREE.SoftwareRenderer3 = function () {
 
 	function clearRectangle( x1, y1, x2, y2 ) {
 
-		var offset = 0;
-
 		var xmin = Math.max( Math.min( x1, x2 ), 0 );
 		var xmax = Math.min( Math.max( x1, x2 ), canvasWidth );
 		var ymin = Math.max( Math.min( y1, y2 ), 0 );
 		var ymax = Math.min( Math.max( y1, y2 ), canvasHeight );
 
-		for ( var y = ymin; y < ymax; y ++ ) {
+		var offset = ( xmin + ymin * canvasWidth - 1 ) * 4 + 3;
+		var linestep = ( canvasWidth - ( xmax - xmin ) ) * 4;
 
-			offset = ( xmin + y * canvasWidth ) * 4 + 3;
+		for ( var y = ymin; y < ymax; y ++ ) {
 
 			for ( var x = xmin; x < xmax; x ++ ) {
 
 				data[ offset += 4 ] = 0;
 
 			}
+
+			offset += linestep;
 
 		}
 
