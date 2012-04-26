@@ -104,6 +104,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_gl,
 
 	_programs = [],
+	_programs_counter = 0,
 
 	// internal state cache
 
@@ -364,6 +365,69 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl.deleteFramebuffer( renderTarget.__webglFramebuffer );
 			_gl.deleteRenderbuffer( renderTarget.__webglRenderbuffer );
+
+		}
+
+	};
+
+	this.deallocateMaterial = function ( material ) {
+
+		var program = material.program;
+
+		if ( ! program ) return;
+
+		material.program = undefined;
+
+		// only deallocate GL program if this was the last use of shared program
+		// assumed there is only single copy of any program in the _programs list
+		// (that's how it's constructed)
+
+		var i, il, programInfo;
+		var deleteProgram = false;
+
+		for ( i = 0, il = _programs.length; i < il; i ++ ) {
+
+			programInfo = _programs[ i ];
+
+			if ( programInfo.program === program ) {
+
+				programInfo.usedTimes --;
+
+				if ( programInfo.usedTimes === 0 ) {
+
+					deleteProgram = true;
+
+				}
+
+				break;
+
+			}
+
+		}
+
+		if ( deleteProgram ) {
+
+			// avoid using array.splice, this is costlier than creating new array from scratch
+
+			var newPrograms = [];
+
+			for ( i = 0, il = _programs.length; i < il; i ++ ) {
+
+				programInfo = _programs[ i ];
+
+				if ( programInfo.program !== program ) {
+
+					newPrograms.push( programInfo );
+
+				}
+
+			}
+
+			_programs = newPrograms;
+
+			_gl.deleteProgram( program );
+
+			_this.info.memory.programs --;
 
 		}
 
@@ -5463,11 +5527,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		for ( p = 0, pl = _programs.length; p < pl; p ++ ) {
 
-			if ( _programs[ p ].code === code ) {
+			var programInfo = _programs[ p ];
+
+			if ( programInfo.code === code ) {
 
 				// console.log( "Code already compiled." /*: \n\n" + code*/ );
 
-				return _programs[ p ].program;
+				programInfo.usedTimes ++;
+
+				return programInfo.program;
 
 			}
 
@@ -5676,9 +5744,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		cacheAttributeLocations( program, identifiers );
 
-		program.id = _programs.length;
+		program.id = _programs_counter ++;
 
-		_programs.push( { program: program, code: code } );
+		_programs.push( { program: program, code: code, usedTimes: 1 } );
 
 		_this.info.memory.programs = _programs.length;
 
