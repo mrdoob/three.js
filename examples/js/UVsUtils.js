@@ -1,5 +1,87 @@
+/*
+ * @author gyuque / https://github.com/gyuque
+ *
+ * Cylinder Mapping for ExtrudeGeometry
+ *
+ */
+
+THREE.UVsUtils = {
+
+};
+
+THREE.UVsUtils.CylinderUVGenerator = function() {
+    this.uRepeat = 1;
+    this.targetGeometry = null;
+    this.lengthCache = null;
+};
+
+THREE.UVsUtils.CylinderUVGenerator.prototype = {
+    generateTopUV: THREE.ExtrudeGeometry.WorldUVGenerator.generateTopUV,
+    generateBottomUV: THREE.ExtrudeGeometry.WorldUVGenerator.generateBottomUV,
+    
+    generateSideWallUV: function( geometry, extrudedShape, wallContour, extrudeOptions,
+                                  indexA, indexB, indexC, indexD, stepIndex, stepsLength,
+                                  contourIndex1, contourIndex2 ) {
+        // first call
+        if (this.targetGeometry !== geometry) {
+            this.prepare(geometry, wallContour);
+        }
+
+        // generate uv
+        var u_list = this.lengthCache;
+        var v1 = stepIndex / stepsLength;
+        var v2 = ( stepIndex + 1 ) / stepsLength;
+        
+        var u1 = u_list[contourIndex1];
+        var u2 = u_list[contourIndex2];
+        if (u1 < u2) {u1 += 1.0;}
+        
+        u1 *= this.uRepeat;
+        u2 *= this.uRepeat;
+        return [
+            new THREE.UV( u1, v1 ),
+            new THREE.UV( u2, v1 ),
+            new THREE.UV( u2, v2 ),
+            new THREE.UV( u1, v2 )
+        ];
+    },
+    
+    prepare: function(geometry, wallContour) {
+        var p1, p2;
+        var u_list = [];
+        var lengthSum = 0;
+        var len = wallContour.length;
+        for (var i = 0;i < len;i++) {
+            p1 = wallContour[ i ];
+            p2 = wallContour[ (i+1) % len ];
+
+            var dx = p1.x - p2.x;
+            var dy = p1.y - p2.y;
+            var segmentLength = Math.sqrt(dx*dx + dy*dy);
+            
+            u_list.push(lengthSum);
+            lengthSum += segmentLength;
+        }
+        
+        this.normalizeArray(u_list, lengthSum);
+        this.targetGeometry = geometry;
+        this.lengthCache = u_list;
+    },
+    
+    normalizeArray: function(ls, v) {
+        var len = ls.length;
+        for (var i = 0;i < len;i++) {
+            ls[i] /= v;
+        }
+        
+        return ls;
+    }
+};
+
+
+
 /* 
- * @author https://github.com/zz85 | @blurspline
+ * @author zz85 / https://github.com/zz85
  *
  * tool for "unwrapping" and debugging three.js 
  * geometries UV mapping
