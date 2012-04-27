@@ -4489,7 +4489,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setProgram( camera, lights, fog, material, object ) {
 
-		if ( ! material.program || material.needsUpdate ) {
+		if ( material.needsUpdate ) {
 
 			if ( material.program ) _this.deallocateMaterial( material );
 
