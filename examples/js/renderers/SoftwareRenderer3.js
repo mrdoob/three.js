@@ -205,13 +205,19 @@ THREE.SoftwareRenderer3 = function () {
 
 		// 28.4 fixed-point coordinates
 
-		x1 = Math.round( 16 * x1 );
-		x2 = Math.round( 16 * x2 );
-		x3 = Math.round( 16 * x3 );
+		var x1 = Math.round( 16 * x1 );
+		var x2 = Math.round( 16 * x2 );
+		var x3 = Math.round( 16 * x3 );
 
-		y1 = Math.round( 16 * y1 );
-		y2 = Math.round( 16 * y2 );
-		y3 = Math.round( 16 * y3 );
+		var y1 = Math.round( 16 * y1 );
+		var y2 = Math.round( 16 * y2 );
+		var y3 = Math.round( 16 * y3 );
+
+		// Deltas
+
+		var dx12 = x1 - x2, dy12 = y2 - y1;
+		var dx23 = x2 - x3, dy23 = y3 - y2;
+		var dx31 = x3 - x1, dy31 = y1 - y3;
 
 		// Bounding rectangle
 
@@ -225,12 +231,6 @@ THREE.SoftwareRenderer3 = function () {
 		recty1 = Math.min( miny, recty1 );
 		recty2 = Math.max( maxy, recty2 );
 
-		// Deltas
-
-		var dx12 = x1 - x2, dy12 = y2 - y1;
-		var dx23 = x2 - x3, dy23 = y3 - y2;
-		var dx31 = x3 - x1, dy31 = y1 - y3;
-
 		// Block size, standard 8x8 (must be power of two)
 
 		var q = blocksize;
@@ -242,9 +242,9 @@ THREE.SoftwareRenderer3 = function () {
 
 		// Constant part of half-edge functions
 
-		var c1 = -dy12 * x1 - dx12 * y1;
-		var c2 = -dy23 * x2 - dx23 * y2;
-		var c3 = -dy31 * x3 - dx31 * y3;
+		var c1 = dy12 * ((minx << 4) - x1) + dx12 * ((miny << 4) - y1);
+		var c2 = dy23 * ((minx << 4) - x2) + dx23 * ((miny << 4) - y2);
+		var c3 = dy31 * ((minx << 4) - x3) + dx31 * ((miny << 4) - y3);
 
 		// Correct for fill convention
 
@@ -274,30 +274,63 @@ THREE.SoftwareRenderer3 = function () {
 		var linestep = (canvasWidth - q) * 4;
 		var scale = 255.0 / (c1 + c2 + c3);
 
-		for ( var y0 = miny; y0 < maxy; y0 += q ) {
+		var cb1 = c1;
+		var cb2 = c2;
+		var cb3 = c3;
+		var qstep = -q;
+		var e1x = qstep * dy12;
+		var e2x = qstep * dy23;
+		var e3x = qstep * dy31;
+		var x0 = minx;
 
-			for ( var x0 = minx; x0 < maxx; x0 += q ) {
+		for (var y0 = miny; y0 < maxy; y0 += q) {
 
-				// Edge functions at top-left corner
-				var cy1 = c1 + dx12 * y0 + dy12 * x0;
-				var cy2 = c2 + dx23 * y0 + dy23 * x0;
-				var cy3 = c3 + dx31 * y0 + dy31 * x0;
+			// New block line - keep hunting for tri outer edge in old block line dir
+			while (x0 >= minx && x0 < maxx && cb1 >= nmax1 && cb2 >= nmax2 && cb3 >= nmax3) {
 
-				// Skip block when at least one edge completely out
-				if (cy1 < nmax1 || cy2 < nmax2 || cy3 < nmax3) continue;
+				x0 += qstep;
+				cb1 += e1x;
+				cb2 += e2x;
+				cb3 += e3x;
 
-				// Skip writing full block if it's already fully covered
+			}
+
+			// Okay, we're now in a block we know is outside. Reverse direction and go into main loop.
+			qstep = -qstep;
+			e1x = -e1x;
+			e2x = -e2x;
+			e3x = -e3x;
+
+			while (1) {
+
+				// Step everything
+				x0 += qstep;
+				cb1 += e1x;
+				cb2 += e2x;
+				cb3 += e3x;
+
+				// We're done with this block line when at least one edge completely out
+				// If an edge function is too small and decreasing in the current traversal
+				// dir, we're done with this line.
+				if (x0 < minx || x0 >= maxx) break;
+				if (cb1 < nmax1) if (e1x < 0) break; else continue;
+				if (cb2 < nmax2) if (e2x < 0) break; else continue;
+				if (cb3 < nmax3) if (e3x < 0) break; else continue;
+
+				// We can skip this block if it's already fully covered
 				var blockX = (x0 / q) | 0;
 				var blockY = (y0 / q) | 0;
 				var blockInd = blockX + blockY * canvasWBlocks;
-
 				if (block_full[blockInd]) continue;
 
 				// Offset at top-left corner
 				var offset = (x0 + y0 * canvasWidth) * 4;
 
 				// Accept whole block when fully covered
-				if (cy1 >= nmin1 && cy2 >= nmin2 && cy3 >= nmin3) {
+				if (cb1 >= nmin1 && cb2 >= nmin2 && cb3 >= nmin3) {
+
+					var cy1 = cb1;
+					var cy2 = cb2;
 
 					for ( var iy = 0; iy < q; iy ++ ) {
 
@@ -306,7 +339,6 @@ THREE.SoftwareRenderer3 = function () {
 
 						for ( var ix = 0; ix < q; ix ++ ) {
 
-							/*
 							if (!data[offset + 3]) {
 
 								var u = cx1 * scale; // 0-255!
@@ -316,14 +348,7 @@ THREE.SoftwareRenderer3 = function () {
 								data[offset + 2] = 0;
 								data[offset + 3] = 255;
 
-								data[offset] = r;
-								data[offset + 1] = g;
-								data[offset + 2] = b;
-								data[offset + 3] = 255;
-
 							}
-							*/
-							drawPixel( x0 + ix, y0 + iy, r, g, b );
 
 							cx1 += dy12;
 							cx2 += dy23;
@@ -341,6 +366,10 @@ THREE.SoftwareRenderer3 = function () {
 
 				} else { // Partially covered block
 
+					var cy1 = cb1;
+					var cy2 = cb2;
+					var cy3 = cb3;
+
 					for ( var iy = 0; iy < q; iy ++ ) {
 
 						var cx1 = cy1;
@@ -349,25 +378,14 @@ THREE.SoftwareRenderer3 = function () {
 
 						for ( var ix = 0; ix < q; ix ++ ) {
 
-							if ( (cx1 | cx2 | cx3) >= 0/* && !data[offset+3]*/) {
+							if ( (cx1 | cx2 | cx3) >= 0 && !data[offset+3]) {
 
-								/*
 								var u = cx1 * scale; // 0-255!
 								var v = cx2 * scale; // 0-255!
 								data[offset] = u;
 								data[offset + 1] = v; 
 								data[offset + 2] = 0;
 								data[offset + 3] = 255;
-								*/
-
-								/*
-								data[offset] = r;
-								data[offset + 1] = g;
-								data[offset + 2] = b;
-								data[offset + 3] = 255;
-								*/
-
-								drawPixel( x0 + ix, y0 + iy, r, g, b );
 
 							}
 
@@ -388,6 +406,11 @@ THREE.SoftwareRenderer3 = function () {
 				}
 
 			}
+
+			// Advance to next row of blocks
+			cb1 += q*dx12;
+			cb2 += q*dx23;
+			cb3 += q*dx31;
 
 		}
 
