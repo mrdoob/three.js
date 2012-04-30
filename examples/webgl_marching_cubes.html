@@ -150,6 +150,8 @@
 			effect.position.set( 0, 0, 0 );
 			effect.scale.set( 700, 700, 700 );
 
+			effect.enableUvs = false;
+
 			scene.add( effect );
 
 			// RENDERER
@@ -411,6 +413,16 @@
 					m_v.setValue( mat.v );
 
 					mm.setValue( current_material );
+
+					if ( current_material !== "textured" ) {
+
+						effect.enableUvs = false;
+
+					} else {
+
+						effect.enableUvs = true;
+
+					}
 
 				};
 
