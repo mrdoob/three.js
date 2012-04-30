@@ -316,6 +316,12 @@
 				h: 0, s: 0, v: 1
 			},
 
+			"flat" :
+			{
+				m: new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x111111, shininess: 1, shading: THREE.FlatShading, perPixel: true } ),
+				h: 0, s: 0, v: 1
+			},
+
 			"textured" :
 			{
 				m: new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, shininess: 1, map: texture, perPixel: true } ),
