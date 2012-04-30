@@ -6219,8 +6219,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 			case THREE.LinearMipMapNearestFilter: return _gl.LINEAR_MIPMAP_NEAREST; break;
 			case THREE.LinearMipMapLinearFilter: return _gl.LINEAR_MIPMAP_LINEAR; break;
 
-			case THREE.ByteType: return _gl.BYTE; break;
 			case THREE.UnsignedByteType: return _gl.UNSIGNED_BYTE; break;
+			case THREE.UnsignedShort4444Type: return _gl.UNSIGNED_SHORT_4_4_4_4; break;
+			case THREE.UnsignedShort5551Type: return _gl.UNSIGNED_SHORT_5_5_5_1; break;
+			case THREE.UnsignedShort565Type: return _gl.UNSIGNED_SHORT_5_6_5; break;
+
+			case THREE.ByteType: return _gl.BYTE; break;
 			case THREE.ShortType: return _gl.SHORT; break;
 			case THREE.UnsignedShortType: return _gl.UNSIGNED_SHORT; break;
 			case THREE.IntType: return _gl.INT; break;
