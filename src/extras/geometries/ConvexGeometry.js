@@ -159,6 +159,17 @@ THREE.ConvexGeometry = function( vertices ) {
 
 	}
 
+
+	/**
+	 * XXX: Not sure if this is the correct approach. Need someone to review.
+	 */
+	function vertexUv( vertex ) {
+
+		var mag = vertex.length();
+		return new THREE.UV( vertex.x / mag, vertex.y / mag );
+
+	}
+
 	// Push vertices into `this.vertices`, skipping those inside the hull
 	var id = 0;
 	var newId = new Array( vertices.length ); // map from old vertex id to new id
@@ -190,6 +201,19 @@ THREE.ConvexGeometry = function( vertices ) {
 				faces[ i ][ 1 ],
 				faces[ i ][ 2 ]
 		) );
+
+	}
+
+	// Compute UVs
+	for ( var i = 0; i < this.faces.length; i++ ) {
+		
+		var face = this.faces[ i ];
+
+		this.faceVertexUvs[ 0 ].push( [
+			vertexUv( this.vertices[ face.a ] ),
+			vertexUv( this.vertices[ face.b ] ),
+			vertexUv( this.vertices[ face.c ])
+		] );
 
 	}
 	
