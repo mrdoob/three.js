@@ -4514,12 +4514,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				object.__webglMorphTargetInfluences = new Float32Array( _this.maxMorphTargets );
 
-				for ( var i = 0, il = _this.maxMorphTargets; i < il; i ++ ) {
-
-					object.__webglMorphTargetInfluences[ i ] = 0;
-
-				}
-
 			}
 
 		}
