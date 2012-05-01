@@ -192,7 +192,7 @@ TEMPLATE_CAMERA_ORTHO = """\
 
 TEMPLATE_LIGHT_DIRECTIONAL = """\
     %(light_id)s: {
-        "type"		 : "directional",
+        "type"    	 : "directional",
         "direction"	 : %(direction)s,
         "color" 	 : %(color)d,
         "intensity"	 : %(intensity).2f
@@ -275,6 +275,12 @@ def veckey3d(v):
 
 def veckey2d(v):
     return round(v[0], 6), round(v[1], 6)
+
+def get_faces(obj):
+    if hasattr(obj, "tessfaces"):
+        return obj.tessfaces
+    else:
+        return obj.faces
 
 def get_normal_indices(v, normals, mesh):
     n = []
@@ -481,7 +487,7 @@ def generate_faces(normals, uvs, colors, meshes, option_normals, option_colors, 
             if not active_col_layer:
                 mesh_extract_colors = False
 
-        for i, f in enumerate(mesh.faces):
+        for i, f in enumerate(get_faces(mesh)):
             face = generate_face(f, i, normals, uvs, colors, mesh, option_normals, mesh_colors, mesh_uvs, option_materials, vertex_offset, material_offset)
             chunks.append(face)
 
@@ -574,7 +580,7 @@ def generate_face(f, faceIndex, normals, uvs, colors, mesh, option_normals, opti
 # #####################################################
 
 def extract_vertex_normals(mesh, normals, count):
-    for f in mesh.faces:
+    for f in get_faces(mesh):
         for v in f.vertices:
 
             normal = mesh.vertices[v].normal
@@ -603,7 +609,7 @@ def generate_normals(normals, option_normals):
 def extract_vertex_colors(mesh, colors, count):
     color_layer = mesh.vertex_colors.active.data
 
-    for face_index, face in enumerate(mesh.faces):
+    for face_index, face in enumerate(get_faces(mesh)):
 
         face_colors = color_layer[face_index]
         face_colors = face_colors.color1, face_colors.color2, face_colors.color3, face_colors.color4
@@ -633,7 +639,7 @@ def generate_vertex_colors(colors, option_colors):
 def extract_uvs(mesh, uvs, count):
     uv_layer = mesh.uv_textures.active.data
 
-    for face_index, face in enumerate(mesh.faces):
+    for face_index, face in enumerate(get_faces(mesh)):
 
         for uv_index, uv in enumerate(uv_layer[face_index].uv):
 
