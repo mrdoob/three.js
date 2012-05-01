@@ -5,11 +5,13 @@
  * http://webglsamples.googlecode.com/hg/blob/blob.html
  */
 
-THREE.MarchingCubes = function ( resolution, material ) {
+THREE.MarchingCubes = function ( resolution, material, enableUvs ) {
 
 	THREE.ImmediateRenderObject.call( this );
 
 	this.material = material;
+
+	this.enableUvs = enableUvs !== undefined ? enableUvs : false;
 
 	// functions have to be object properties
 	// prototype functions kill performance
@@ -50,11 +52,19 @@ THREE.MarchingCubes = function ( resolution, material ) {
 
 		this.maxCount = 4096; // TODO: find the fastest size for this buffer
 		this.count = 0;
+
 		this.hasPos = false;
 		this.hasNormal = false;
+		this.hasUv = false;
 
 		this.positionArray = new Float32Array( this.maxCount * 3 );
 		this.normalArray   = new Float32Array( this.maxCount * 3 );
+
+		if ( this.enableUvs ) {
+
+			this.uvArray = new Float32Array( this.maxCount * 2 );
+
+		}
 
 	};
 
@@ -117,7 +127,7 @@ THREE.MarchingCubes = function ( resolution, material ) {
 
 		var q3 = q * 3;
 
-		if ( this.normal_cache [ q3 ] === 0.0 ) {
+		if ( this.normal_cache[ q3 ] === 0.0 ) {
 
 			this.normal_cache[ q3     ] = this.field[ q - 1  ] 	    - this.field[ q + 1 ];
 			this.normal_cache[ q3 + 1 ] = this.field[ q - this.yd ] - this.field[ q + this.yd ];
@@ -307,7 +317,7 @@ THREE.MarchingCubes = function ( resolution, material ) {
 
 		var c = this.count * 3;
 
-		this.positionArray[ c ] = pos[ o1 ];
+		this.positionArray[ c ] 	= pos[ o1 ];
 		this.positionArray[ c + 1 ] = pos[ o1 + 1 ];
 		this.positionArray[ c + 2 ] = pos[ o1 + 2 ];
 
@@ -319,7 +329,9 @@ THREE.MarchingCubes = function ( resolution, material ) {
 		this.positionArray[ c + 7 ] = pos[ o3 + 1 ];
 		this.positionArray[ c + 8 ] = pos[ o3 + 2 ];
 
-		this.normalArray[ c ] = norm[ o1 ];
+		//
+
+		this.normalArray[ c ] 	  = norm[ o1 ];
 		this.normalArray[ c + 1 ] = norm[ o1 + 1 ];
 		this.normalArray[ c + 2 ] = norm[ o1 + 2 ];
 
@@ -331,12 +343,33 @@ THREE.MarchingCubes = function ( resolution, material ) {
 		this.normalArray[ c + 7 ] = norm[ o3 + 1 ];
 		this.normalArray[ c + 8 ] = norm[ o3 + 2 ];
 
-		this.hasPos = true;
-		this.hasNormal = true;
+		if ( this.enableUvs ) {
+
+			var d = this.count * 2;
+
+			this.uvArray[ d ] 	  = pos[ o1 ];
+			this.uvArray[ d + 1 ] = pos[ o1 + 2 ];
+
+			this.uvArray[ d + 2 ] = pos[ o2 ];
+			this.uvArray[ d + 3 ] = pos[ o2 + 2 ];
+
+			this.uvArray[ d + 4 ] = pos[ o3 ];
+			this.uvArray[ d + 5 ] = pos[ o3 + 2 ];
+
+		}
 
 		this.count += 3;
 
 		if ( this.count >= this.maxCount - 3 ) {
+
+			this.hasPos = true;
+			this.hasNormal = true;
+
+			if ( this.enableUvs ) {
+
+				this.hasUv = true;
+
+			}
 
 			renderCallback( this );
 
@@ -347,8 +380,10 @@ THREE.MarchingCubes = function ( resolution, material ) {
 	this.begin = function( ) {
 
 		this.count = 0;
+
 		this.hasPos = false;
 		this.hasNormal = false;
+		this.hasUv = false;
 
 	};
 
@@ -359,6 +394,15 @@ THREE.MarchingCubes = function ( resolution, material ) {
 
 		for ( var i = this.count * 3; i < this.positionArray.length; i ++ )
 			this.positionArray[ i ] = 0.0;
+
+		this.hasPos = true;
+		this.hasNormal = true;
+
+		if ( this.enableUvs ) {
+
+			this.hasUv = true;
+
+		}
 
 		renderCallback( this );
 
@@ -438,7 +482,7 @@ THREE.MarchingCubes = function ( resolution, material ) {
 
 		if ( dist > size ) dist = size;
 
-		for ( x = 0; x < dist; x++ ) {
+		for ( x = 0; x < dist; x ++ ) {
 
 			xdiv = x / size;
 			xx = xdiv * xdiv;
@@ -446,11 +490,11 @@ THREE.MarchingCubes = function ( resolution, material ) {
 
 			if ( val > 0.0 ) {
 
-				for ( y = 0; y < size; y++ ) {
+				for ( y = 0; y < size; y ++ ) {
 
 					cxy = x + y * yd;
 
-					for ( z = 0; z < size; z++ ) {
+					for ( z = 0; z < size; z ++ ) {
 
 						field[ zd * z + cxy ] += val;
 
@@ -478,7 +522,7 @@ THREE.MarchingCubes = function ( resolution, material ) {
 
 		if ( dist > size ) dist = size;
 
-		for ( y = 0; y < dist; y++ ) {
+		for ( y = 0; y < dist; y ++ ) {
 
 			ydiv = y / size;
 			yy = ydiv * ydiv;
@@ -488,11 +532,11 @@ THREE.MarchingCubes = function ( resolution, material ) {
 
 				cy = y * yd;
 
-				for ( x = 0; x < size; x++ ) {
+				for ( x = 0; x < size; x ++ ) {
 
 					cxy = cy + x;
 
-					for ( z = 0; z < size; z++ )
+					for ( z = 0; z < size; z ++ )
 						field[ zd * z + cxy ] += val;
 
 				}
@@ -517,7 +561,7 @@ THREE.MarchingCubes = function ( resolution, material ) {
 
 		if ( dist > size ) dist = size;
 
-		for ( z = 0; z < dist; z++ ) {
+		for ( z = 0; z < dist; z ++ ) {
 
 			zdiv = z / size;
 			zz = zdiv * zdiv;
@@ -526,12 +570,12 @@ THREE.MarchingCubes = function ( resolution, material ) {
 
 				cz = zd * z;
 
-				for ( y = 0; y < size; y++ ) {
+				for ( y = 0; y < size; y ++ ) {
 
-						cyz = cz + y * yd;
+					cyz = cz + y * yd;
 
-						for ( x = 0; x < size; x++ )
-							field[ cyz + x ] += val;
+					for ( x = 0; x < size; x ++ )
+						field[ cyz + x ] += val;
 
 				}
 
@@ -606,7 +650,7 @@ THREE.MarchingCubes = function ( resolution, material ) {
 				face, a, b, c, na, nb, nc, nfaces;
 
 
-			for ( i = 0; i < object.count; i++ ) {
+			for ( i = 0; i < object.count; i ++ ) {
 
 				a = i * 3;
 				b = a + 1;
@@ -630,7 +674,7 @@ THREE.MarchingCubes = function ( resolution, material ) {
 
 			nfaces = object.count / 3;
 
-			for ( i = 0; i < nfaces; i++ ) {
+			for ( i = 0; i < nfaces; i ++ ) {
 
 				a = ( start + i ) * 3;
 				b = a + 1;

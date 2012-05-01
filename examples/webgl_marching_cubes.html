@@ -146,9 +146,12 @@
 			resolution = 28;
 			numBlobs = 10;
 
-			effect = new THREE.MarchingCubes( resolution, materials[ current_material ].m );
+			effect = new THREE.MarchingCubes( resolution, materials[ current_material ].m, true );
 			effect.position.set( 0, 0, 0 );
 			effect.scale.set( 700, 700, 700 );
+
+			effect.enableUvs = false;
+
 			scene.add( effect );
 
 			// RENDERER
@@ -284,6 +287,9 @@
 			dottedMaterial2.uniforms.uBaseColor.value.setRGB( 0, 0, 0 );
 			dottedMaterial2.uniforms.uLineColor1.value.setHSV( 0.05, 1.0, 1.0 );
 
+			var texture = THREE.ImageUtils.loadTexture( "textures/ash_uvgrid01.jpg" );
+			texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+
 			var materials = {
 
 			"chrome" :
@@ -307,6 +313,18 @@
 			"matte" :
 			{
 				m: new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x111111, shininess: 1, perPixel: true } ),
+				h: 0, s: 0, v: 1
+			},
+
+			"flat" :
+			{
+				m: new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x111111, shininess: 1, shading: THREE.FlatShading, perPixel: true } ),
+				h: 0, s: 0, v: 1
+			},
+
+			"textured" :
+			{
+				m: new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, shininess: 1, map: texture, perPixel: true } ),
 				h: 0, s: 0, v: 1
 			},
 
@@ -401,6 +419,16 @@
 					m_v.setValue( mat.v );
 
 					mm.setValue( current_material );
+
+					if ( current_material !== "textured" ) {
+
+						effect.enableUvs = false;
+
+					} else {
+
+						effect.enableUvs = true;
+
+					}
 
 				};
 
