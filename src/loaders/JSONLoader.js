@@ -422,5 +422,6 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texturePath 
 	};
 
 	callback( geometry );
-
+	
+    THREE.Notifier.notify(this);
 };

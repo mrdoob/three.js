@@ -764,5 +764,7 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 	Model.prototype.constructor = Model;
 
 	callback( new Model( texturePath ) );
+	
+	THREE.Notifier.notify(this);
 
 };
