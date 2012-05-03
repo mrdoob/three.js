@@ -1,6 +1,8 @@
 var fs = require("fs");
 var path = require("path");
 var argsparser =  require( "argsparser" );
+var uglify = require("uglify-js");
+
 
 
 var COMMON_FILES = [
@@ -309,8 +311,8 @@ function compress(text, fname_externs){
 	os.unlink(out_tuple[1])
 
 	return compressed*/
-	"use strict";
-	return text;
+	"use strict";	
+	return uglify(text);
 }
 
 function addHeader(text, endFilename){
@@ -401,7 +403,6 @@ function parse_args(){
 }
 
 function main(){
-	try {
 	"use strict";
 	var args = parse_args();
 	var debug = args.debug;
@@ -428,9 +429,6 @@ function main(){
 				buildIncludes(files, fname_inc);
 			}
 		}
-	}
-	}catch(e){
-		console.dir(e);
 	}
 }
 main();
