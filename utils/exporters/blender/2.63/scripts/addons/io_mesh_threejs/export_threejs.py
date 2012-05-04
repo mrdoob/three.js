@@ -296,7 +296,7 @@ def get_normal_indices(v, normals, mesh):
 
 def get_uv_indices(face_index, uvs, mesh):
     uv = []
-    uv_layer = mesh.uv_textures.active.data
+    uv_layer = mesh.tessface_uv_textures.active.data
     for i in uv_layer[face_index].uv:
         uv.append( uvs[veckey2d(i)] )
     return uv
@@ -637,7 +637,7 @@ def generate_vertex_colors(colors, option_colors):
 # #####################################################
 
 def extract_uvs(mesh, uvs, count):
-    uv_layer = mesh.uv_textures.active.data
+    uv_layer = mesh.tessface_uv_textures.active.data
 
     for face_index, face in enumerate(get_faces(mesh)):
 
@@ -1760,20 +1760,20 @@ def generate_ascii_scene(data):
 def export_scene(scene, filepath, flipyz, option_colors, option_lights, option_cameras, option_embed_meshes, embeds, option_url_base_html, option_copy_textures):
 
     source_file = os.path.basename(bpy.data.filepath)
-    
+
     # objects are contained in scene and linked groups
     objects = []
-    
+
     # get scene objects
     sceneobjects = scene.objects
     for obj in sceneobjects:
       objects.append(obj)
-      
-    # get linked group objcts  
+
+    # get linked group objcts
     for group in bpy.data.groups:
        for object in group.objects:
           objects.append(object)
-          
+
     scene_text = ""
     data = {
     "scene"        : scene,
@@ -1834,15 +1834,15 @@ def save(operator, context, filepath = "",
 
     # objects are contained in scene and linked groups
     objects = []
-    
+
     # get scene objects
     for obj in sceneobjects:
       objects.append(obj)
-      
-    # get objects in linked groups  
+
+    # get objects in linked groups
     for group in bpy.data.groups:
        for object in group.objects:
-          objects.append(object) 
+          objects.append(object)
 
     if option_export_scene:
 
