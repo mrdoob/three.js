@@ -1,7 +1,8 @@
 /**
  * @author zz85 / http://www.lab4games.net/zz85/blog
  *
- * TextPath
+ * TextPath - not sure if there's much use for this class.
+ only thing it has it .toShapes() which can be removed by refactoring.
  *
  **/
 
@@ -55,14 +56,5 @@ THREE.TextPath.prototype.toShapes = function () {
 	}
 
 	return shapes;
-
-	//console.log(path);
-	//console.log(fontShapes);
-
-	// Either find actions or curves.
-
-	//var text3d = new THREE.ExtrudeGeometry( shapes , { amount: 20, bevelEnabled:true, bevelThickness:3	} );
-
-	//return text3d;
 
 };
