@@ -1053,6 +1053,12 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 					break;
 
+				case THREE.SubtractiveBlending:
+
+					_context.globalCompositeOperation = 'darker';
+
+					break;
+
 			}
 
 			_contextGlobalCompositeOperation = value;
