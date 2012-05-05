@@ -146,11 +146,12 @@
 			resolution = 28;
 			numBlobs = 10;
 
-			effect = new THREE.MarchingCubes( resolution, materials[ current_material ].m, true );
+			effect = new THREE.MarchingCubes( resolution, materials[ current_material ].m, true, true );
 			effect.position.set( 0, 0, 0 );
 			effect.scale.set( 700, 700, 700 );
 
 			effect.enableUvs = false;
+			effect.enableColors = false;
 
 			scene.add( effect );
 
@@ -328,6 +329,12 @@
 				h: 0, s: 0, v: 1
 			},
 
+			"colors" :
+			{
+				m: new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 2, vertexColors: THREE.VertexColors, perPixel: true } ),
+				h: 0, s: 0, v: 1
+			},
+
 			"plastic" :
 			{
 				m: new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x888888, ambient: 0x000000, shininess: 250, perPixel: true } ),
@@ -420,13 +427,23 @@
 
 					mm.setValue( current_material );
 
-					if ( current_material !== "textured" ) {
+					if ( current_material === "textured" ) {
 
-						effect.enableUvs = false;
+						effect.enableUvs = true;
 
 					} else {
 
-						effect.enableUvs = true;
+						effect.enableUvs = false;
+
+					}
+
+					if ( current_material === "colors" ) {
+
+						effect.enableColors = true;
+
+					} else {
+
+						effect.enableColors = false;
 
 					}
 
@@ -436,10 +453,15 @@
 
 			function toggle( e ) {
 
-				if ( e.style.display === "block" )
+				if ( e.style.display === "block" ) {
+
 					e.style.display = "none";
-				else
+
+				} else {
+
 					e.style.display = "block";
+
+				}
 
 			}
 

@@ -5,13 +5,14 @@
  * http://webglsamples.googlecode.com/hg/blob/blob.html
  */
 
-THREE.MarchingCubes = function ( resolution, material, enableUvs ) {
+THREE.MarchingCubes = function ( resolution, material, enableUvs, enableColors ) {
 
 	THREE.ImmediateRenderObject.call( this );
 
 	this.material = material;
 
 	this.enableUvs = enableUvs !== undefined ? enableUvs : false;
+	this.enableColors = enableColors !== undefined ? enableColors : false;
 
 	// functions have to be object properties
 	// prototype functions kill performance
@@ -55,6 +56,7 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs ) {
 
 		this.hasPositions = false;
 		this.hasNormals = false;
+		this.hasColors = false;
 		this.hasUvs = false;
 
 		this.positionArray = new Float32Array( this.maxCount * 3 );
@@ -63,6 +65,12 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs ) {
 		if ( this.enableUvs ) {
 
 			this.uvArray = new Float32Array( this.maxCount * 2 );
+
+		}
+
+		if ( this.enableColors ) {
+
+			this.colorArray   = new Float32Array( this.maxCount * 3 );
 
 		}
 
@@ -317,6 +325,8 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs ) {
 
 		var c = this.count * 3;
 
+		// positions
+
 		this.positionArray[ c ] 	= pos[ o1 ];
 		this.positionArray[ c + 1 ] = pos[ o1 + 1 ];
 		this.positionArray[ c + 2 ] = pos[ o1 + 2 ];
@@ -329,7 +339,7 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs ) {
 		this.positionArray[ c + 7 ] = pos[ o3 + 1 ];
 		this.positionArray[ c + 8 ] = pos[ o3 + 2 ];
 
-		//
+		// normals
 
 		this.normalArray[ c ] 	  = norm[ o1 ];
 		this.normalArray[ c + 1 ] = norm[ o1 + 1 ];
@@ -342,6 +352,8 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs ) {
 		this.normalArray[ c + 6 ] = norm[ o3 ];
 		this.normalArray[ c + 7 ] = norm[ o3 + 1 ];
 		this.normalArray[ c + 8 ] = norm[ o3 + 2 ];
+
+		// uvs
 
 		if ( this.enableUvs ) {
 
@@ -358,6 +370,24 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs ) {
 
 		}
 
+		// colors
+
+		if ( this.enableColors ) {
+
+			this.colorArray[ c ] 	 = pos[ o1 ];
+			this.colorArray[ c + 1 ] = pos[ o1 + 1 ];
+			this.colorArray[ c + 2 ] = pos[ o1 + 2 ];
+
+			this.colorArray[ c + 3 ] = pos[ o2 ];
+			this.colorArray[ c + 4 ] = pos[ o2 + 1 ];
+			this.colorArray[ c + 5 ] = pos[ o2 + 2 ];
+
+			this.colorArray[ c + 6 ] = pos[ o3 ];
+			this.colorArray[ c + 7 ] = pos[ o3 + 1 ];
+			this.colorArray[ c + 8 ] = pos[ o3 + 2 ];
+
+		}
+
 		this.count += 3;
 
 		if ( this.count >= this.maxCount - 3 ) {
@@ -368,6 +398,12 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs ) {
 			if ( this.enableUvs ) {
 
 				this.hasUvs = true;
+
+			}
+
+			if ( this.enableColors ) {
+
+				this.hasColors = true;
 
 			}
 
@@ -384,6 +420,7 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs ) {
 		this.hasPositions = false;
 		this.hasNormals = false;
 		this.hasUvs = false;
+		this.hasColors = false;
 
 	};
 
@@ -401,6 +438,12 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs ) {
 		if ( this.enableUvs ) {
 
 			this.hasUvs = true;
+
+		}
+
+		if ( this.enableColors ) {
+
+			this.hasColors = true;
 
 		}
 
