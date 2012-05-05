@@ -75,7 +75,7 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 		
 		// TODO move vertex selection over here!
 		
-		var newFace = new THREE.Face4( a, b, c, d, null, oldFace.color, oldFace.material );
+		var newFace = new THREE.Face4( a, b, c, d, null, oldFace.color, oldFace.materialIndex );
 		
 		if (scope.useOldVertexColors) {
 			

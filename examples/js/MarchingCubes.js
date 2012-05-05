@@ -53,9 +53,9 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs ) {
 		this.maxCount = 4096; // TODO: find the fastest size for this buffer
 		this.count = 0;
 
-		this.hasPos = false;
-		this.hasNormal = false;
-		this.hasUv = false;
+		this.hasPositions = false;
+		this.hasNormals = false;
+		this.hasUvs = false;
 
 		this.positionArray = new Float32Array( this.maxCount * 3 );
 		this.normalArray   = new Float32Array( this.maxCount * 3 );
@@ -362,12 +362,12 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs ) {
 
 		if ( this.count >= this.maxCount - 3 ) {
 
-			this.hasPos = true;
-			this.hasNormal = true;
+			this.hasPositions = true;
+			this.hasNormals = true;
 
 			if ( this.enableUvs ) {
 
-				this.hasUv = true;
+				this.hasUvs = true;
 
 			}
 
@@ -381,9 +381,9 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs ) {
 
 		this.count = 0;
 
-		this.hasPos = false;
-		this.hasNormal = false;
-		this.hasUv = false;
+		this.hasPositions = false;
+		this.hasNormals = false;
+		this.hasUvs = false;
 
 	};
 
@@ -395,12 +395,12 @@ THREE.MarchingCubes = function ( resolution, material, enableUvs ) {
 		for ( var i = this.count * 3; i < this.positionArray.length; i ++ )
 			this.positionArray[ i ] = 0.0;
 
-		this.hasPos = true;
-		this.hasNormal = true;
+		this.hasPositions = true;
+		this.hasNormals = true;
 
 		if ( this.enableUvs ) {
 
-			this.hasUv = true;
+			this.hasUvs = true;
 
 		}
 
