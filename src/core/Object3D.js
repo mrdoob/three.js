@@ -267,9 +267,7 @@ THREE.Object3D.prototype = {
 
 	worldToLocal: function ( vector ) {
 
-		if ( !this.__inverseMatrixWorld ) this.__inverseMatrixWorld = new THREE.Matrix4();
-
-		return this.__inverseMatrixWorld.getInverse( this.matrixWorld ).multiplyVector3( vector );
+		return THREE.Object3D.__m1.getInverse( this.matrixWorld ).multiplyVector3( vector );
 
 	},
 
@@ -280,5 +278,7 @@ THREE.Object3D.prototype = {
 	}
 
 };
+
+THREE.Object3D.__m1 = new THREE.Matrix4();
 
 THREE.Object3DCount = 0;
