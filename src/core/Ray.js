@@ -26,6 +26,12 @@ THREE.Ray = function ( origin, direction ) {
 	var vector = new THREE.Vector3();
 	var normal = new THREE.Vector3();
 	var intersectPoint = new THREE.Vector3()
+	
+	var descSort = function ( a, b ) {
+	
+			return a.distance - b.distance;
+			
+	};
 
 	this.intersectObject = function ( object ) {
 
@@ -157,6 +163,8 @@ THREE.Ray = function ( origin, direction ) {
 
 		}
 
+		intersects.sort( descSort );
+
 		return intersects;
 
 	}
@@ -171,7 +179,7 @@ THREE.Ray = function ( origin, direction ) {
 
 		}
 
-		intersects.sort( function ( a, b ) { return a.distance - b.distance; } );
+		intersects.sort( descSort );
 
 		return intersects;
 
