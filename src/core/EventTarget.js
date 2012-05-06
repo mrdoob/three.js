@@ -8,7 +8,7 @@ THREE.EventTarget = function () {
 
 	this.addEventListener = function ( type, listener ) {
 
-		if ( listeners[ type ] == undefined ) {
+		if ( listeners[ type ] === undefined ) {
 
 			listeners[ type ] = [];
 

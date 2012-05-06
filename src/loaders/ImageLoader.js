@@ -2,27 +2,30 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.ImageLoader = function () {};
+THREE.ImageLoader = function () {
 
-THREE.ImageLoader.prototype = new THREE.Loader();
-THREE.ImageLoader.prototype.constructor = THREE.ImageLoader;
+	THREE.EventTarget.call( this );
 
-THREE.ImageLoader.prototype.load = function ( url, callback ) {
+	var _this = this;
 
-	var that = this;
-	var image = new Image();
+	this.crossOrigin = 'anonymous';
 
-	image.onload = function () {
+	this.load = function ( url ) {
 
-		callback( image );
+		var image = new Image();
+		image.addEventListener( 'load', function () {
 
-		that.onLoadComplete();
+			_this.dispatchEvent( { type: 'complete', image: image } );
+
+		}, false );
+		image.addEventListener( 'error', function () {
+		
+			_this.dispatchEvent( { type: 'error', image: image } ); 
+		
+		}, false );
+		image.crossOrigin = this.crossOrigin;
+		image.src = url;
 
 	};
-
-	image.crossOrigin = this.crossOrigin;
-	image.src = path;
-
-	that.onLoadStart();
 
 };
