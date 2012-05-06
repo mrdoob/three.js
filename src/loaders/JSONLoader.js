@@ -14,7 +14,7 @@ THREE.JSONLoader.prototype.constructor = THREE.JSONLoader;
 
 THREE.JSONLoader.prototype.load = function ( url, callback, texturePath ) {
 
-	var worker, scope = this;
+	var scope = this;
 
 	texturePath = texturePath ? texturePath : this.extractUrlBase( url );
 

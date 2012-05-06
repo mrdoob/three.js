@@ -7,13 +7,21 @@ THREE.ImageUtils = {
 
 	crossOrigin: 'anonymous',
 
-	loadTexture: function ( path, mapping, callback ) {
+	loadTexture: function ( url, mapping, callback ) {
 
-		var image = new Image(), texture = new THREE.Texture( image, mapping );
+		var texture = new THREE.Texture( undefined, mapping );
 
-		image.onload = function () { texture.needsUpdate = true; if ( callback ) callback( this ); };
-		image.crossOrigin = this.crossOrigin;
-		image.src = path;
+		var loader = new THREE.ImageLoader();
+		loader.crossOrigin = this.crossOrigin;
+		loader.addEventListener( 'complete', function ( event ) {
+
+			texture.image = event.image;
+			texture.needsUpdate = true;
+			
+			if ( callback ) callback( this );
+
+		} );
+		loader.load( url );
 
 		return texture;
 
