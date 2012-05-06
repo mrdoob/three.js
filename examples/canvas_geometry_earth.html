@@ -63,39 +63,41 @@
 				// earth
 				
 				var earthTexture = new THREE.Texture();
-
 				var loader = new THREE.ImageLoader();
+
 				loader.addEventListener( 'complete', function ( event ) {
 
 					earthTexture.image = event.image;
 					earthTexture.needsUpdate = true;
 
 				} );
+
 				loader.load( 'textures/land_ocean_ice_cloud_2048.jpg' );
 
-				mesh = new THREE.Mesh(
-					new THREE.SphereGeometry( 200, 20, 20 ),
-					new THREE.MeshBasicMaterial( { map: earthTexture, overdraw: true } )
-				);
+				var geometry = new THREE.SphereGeometry( 200, 20, 20 );
+				var material = new THREE.MeshBasicMaterial( { map: earthTexture, overdraw: true } );
+
+				mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
 				// shadow
 				
 				var shadowTexture = new THREE.Texture();
-				
 				var loader = new THREE.ImageLoader();
+
 				loader.addEventListener( 'complete', function ( event ) {
 				
 					shadowTexture.image = event.image;
 					shadowTexture.needsUpdate = true;
 
 				} );
+
 				loader.load( 'textures/shadow.png' );
 
-				mesh = new THREE.Mesh(
-					new THREE.PlaneGeometry( 300, 300, 3, 3 ),
-					new THREE.MeshBasicMaterial( { map: shadowTexture, overdraw: true } )
-				);
+				var geometry = new THREE.PlaneGeometry( 300, 300, 3, 3 );
+				var material = new THREE.MeshBasicMaterial( { map: shadowTexture, overdraw: true } );
+
+				mesh = new THREE.Mesh( geometry, material );
 				mesh.position.y = - 250;
 				scene.add( mesh );
 
