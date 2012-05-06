@@ -835,9 +835,9 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		function patternPath( x0, y0, x1, y1, x2, y2, u0, v0, u1, v1, u2, v2, texture ) {
 
-			if ( texture.image.width == 0 ) return;
+			if ( texture.image === undefined || texture.image.width === 0 ) return;
 
-			if ( texture.needsUpdate == true || _patterns[ texture.id ] == undefined ) {
+			if ( texture.needsUpdate === true || _patterns[ texture.id ] === undefined ) {
 
 				var repeatX = texture.wrapS == THREE.RepeatWrapping;
 				var repeatY = texture.wrapT == THREE.RepeatWrapping;
