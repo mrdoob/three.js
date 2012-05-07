@@ -6,29 +6,34 @@ THREE.ImageLoader = function () {
 
 	THREE.EventTarget.call( this );
 
-	var _this = this;
+};
 
-	this.crossOrigin = 'anonymous';
+THREE.ImageLoader.prototype = {
 
-	this.load = function ( url ) {
+	constructor: THREE.ImageLoader,
 
+	crossOrigin: 'anonymous',
+
+	load: function ( url ) {
+
+		var scope = this;
 		var image = new Image();
 		
 		image.addEventListener( 'load', function () {
 
-			_this.dispatchEvent( { type: 'complete', image: image } );
+			scope.dispatchEvent( { type: 'complete', image: image } );
 
 		}, false );
 
 		image.addEventListener( 'error', function () {
 		
-			_this.dispatchEvent( { type: 'error', image: image } ); 
+			scope.dispatchEvent( { type: 'error', image: image } );
 		
 		}, false );
 
 		image.crossOrigin = this.crossOrigin;
 		image.src = url;
 
-	};
+	}
 
-};
+}
