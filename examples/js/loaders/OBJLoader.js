@@ -23,7 +23,7 @@ THREE.OBJLoader.prototype = {
 
 				if ( xhr.status == 200 || xhr.status == 0 ) {
 
-					scope.dispatchEvent( { type: 'complete', object: scope.parse( xhr.responseText ) } );
+					scope.dispatchEvent( { type: 'complete', content: scope.parse( xhr.responseText ) } );
 
 				} else {
 

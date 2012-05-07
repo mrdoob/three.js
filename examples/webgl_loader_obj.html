@@ -79,7 +79,7 @@
 				var loader = new THREE.ImageLoader();
 				loader.addEventListener( 'complete', function ( event ) {
 
-					texture.image = event.image;
+					texture.image = event.content;
 					texture.needsUpdate = true;
 
 				} );
@@ -90,7 +90,7 @@
 				var loader = new THREE.OBJLoader();
 				loader.addEventListener( 'complete', function ( event ) {
 
-					var object = event.object;
+					var object = event.content;
 
 					for ( var i = 0, l = object.children.length; i < l; i ++ ) {
 

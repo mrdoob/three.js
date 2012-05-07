@@ -21,7 +21,7 @@ THREE.ImageLoader.prototype = {
 		
 		image.addEventListener( 'load', function () {
 
-			scope.dispatchEvent( { type: 'complete', image: image } );
+			scope.dispatchEvent( { type: 'complete', content: image } );
 
 		}, false );
 

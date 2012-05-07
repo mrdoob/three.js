@@ -15,7 +15,7 @@ THREE.ImageUtils = {
 		loader.crossOrigin = this.crossOrigin;
 		loader.addEventListener( 'complete', function ( event ) {
 
-			texture.image = event.image;
+			texture.image = event.content;
 			texture.needsUpdate = true;
 			
 			if ( callback ) callback( this );

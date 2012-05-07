@@ -67,7 +67,7 @@
 
 				loader.addEventListener( 'complete', function ( event ) {
 
-					earthTexture.image = event.image;
+					earthTexture.image = event.content;
 					earthTexture.needsUpdate = true;
 
 				} );
@@ -87,7 +87,7 @@
 
 				loader.addEventListener( 'complete', function ( event ) {
 				
-					shadowTexture.image = event.image;
+					shadowTexture.image = event.content;
 					shadowTexture.needsUpdate = true;
 
 				} );
