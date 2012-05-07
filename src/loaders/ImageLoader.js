@@ -27,7 +27,7 @@ THREE.ImageLoader.prototype = {
 
 		image.addEventListener( 'error', function () {
 		
-			scope.dispatchEvent( { type: 'error', image: image } );
+			scope.dispatchEvent( { type: 'error' } );
 		
 		}, false );
 
