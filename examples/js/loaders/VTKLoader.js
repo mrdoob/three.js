@@ -17,23 +17,23 @@ THREE.VTKLoader.prototype = {
 		var scope = this;
 		var xhr = new XMLHttpRequest();
 
-		xhr.onreadystatechange = function () {
+		xhr.addEventListener( 'load', function ( event ) {
 
-			if ( xhr.readyState == 4 ) {
+			scope.dispatchEvent( { type: 'load', content: scope.parse( event.target.responseText ) } );
 
-				if ( xhr.status == 200 || xhr.status == 0 ) {
+		}, false );
 
-					scope.dispatchEvent( { type: 'complete', content: scope.parse( xhr.responseText ) } );
+		xhr.addEventListener( 'progress', function ( event ) {
 
-				} else {
+			scope.dispatchEvent( { type: 'progress', loaded: event.loaded, total: event.total } );
 
-					scope.dispatchEvent( { type: 'error', status: xhr.status } );
+		}, false );
 
-				}
+		xhr.addEventListener( 'error', function () {
 
-			}
+			scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']' } );
 
-		};
+		}, false );
 
 		xhr.open( 'GET', url, true );
 		xhr.send( null );

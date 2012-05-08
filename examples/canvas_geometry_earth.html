@@ -65,7 +65,7 @@
 				var earthTexture = new THREE.Texture();
 				var loader = new THREE.ImageLoader();
 
-				loader.addEventListener( 'complete', function ( event ) {
+				loader.addEventListener( 'load', function ( event ) {
 
 					earthTexture.image = event.content;
 					earthTexture.needsUpdate = true;
@@ -85,7 +85,7 @@
 				var shadowTexture = new THREE.Texture();
 				var loader = new THREE.ImageLoader();
 
-				loader.addEventListener( 'complete', function ( event ) {
+				loader.addEventListener( 'load', function ( event ) {
 				
 					shadowTexture.image = event.content;
 					shadowTexture.needsUpdate = true;

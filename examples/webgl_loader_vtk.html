@@ -83,7 +83,7 @@
 				var material = new THREE.MeshLambertMaterial( { color:0xffffff} );
 
 				var loader = new THREE.VTKLoader();
-				loader.addEventListener( 'complete', function ( event ) {
+				loader.addEventListener( 'load', function ( event ) {
 
 					var geometry = event.content;
 

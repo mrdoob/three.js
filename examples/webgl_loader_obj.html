@@ -77,7 +77,7 @@
 				var texture = new THREE.Texture();
 
 				var loader = new THREE.ImageLoader();
-				loader.addEventListener( 'complete', function ( event ) {
+				loader.addEventListener( 'load', function ( event ) {
 
 					texture.image = event.content;
 					texture.needsUpdate = true;
@@ -88,7 +88,7 @@
 				// model
 
 				var loader = new THREE.OBJLoader();
-				loader.addEventListener( 'complete', function ( event ) {
+				loader.addEventListener( 'load', function ( event ) {
 
 					var object = event.content;
 

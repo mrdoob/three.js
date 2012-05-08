@@ -12,8 +12,7 @@ THREE.ImageUtils = {
 		var texture = new THREE.Texture( undefined, mapping );
 
 		var loader = new THREE.ImageLoader();
-		loader.crossOrigin = this.crossOrigin;
-		loader.addEventListener( 'complete', function ( event ) {
+		loader.addEventListener( 'load', function ( event ) {
 
 			texture.image = event.content;
 			texture.needsUpdate = true;
@@ -21,6 +20,7 @@ THREE.ImageUtils = {
 			if ( callback ) callback( this );
 
 		} );
+		loader.crossOrigin = this.crossOrigin;
 		loader.load( url );
 
 		return texture;

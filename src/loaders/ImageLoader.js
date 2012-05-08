@@ -21,13 +21,13 @@ THREE.ImageLoader.prototype = {
 		
 		image.addEventListener( 'load', function () {
 
-			scope.dispatchEvent( { type: 'complete', content: image } );
+			scope.dispatchEvent( { type: 'load', content: image } );
 
 		}, false );
 
 		image.addEventListener( 'error', function () {
 		
-			scope.dispatchEvent( { type: 'error' } );
+			scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']' } );
 		
 		}, false );
 
