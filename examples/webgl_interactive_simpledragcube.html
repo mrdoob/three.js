@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - draggable cubes</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #f0f0f0;
+				margin: 0px;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+	<body>
+
+		<script src="../build/Three.js"></script>
+		<script src="../src/extras/controls/ObjectDragControls.js"></script>
+		<script src="js/Stats.js"></script>
+
+		<script>
+
+			var container, stats;
+			var camera, scene, renderer;
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				//camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 70, 640/480, 1, 10000 );
+				camera.position.z = 1000;
+
+				scene = new THREE.Scene();
+
+				scene.add( new THREE.AmbientLight( 0x505050 ) );
+
+				var light = new THREE.SpotLight( 0xffffff, 1.5 );
+				light.position.set( 0, 500, 2000 );
+				light.castShadow = true;
+				scene.add( light );
+
+				var geometry = new THREE.CubeGeometry( 40, 40, 40 );
+				var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
+				object.material.ambient = object.material.color;
+
+				object.position.x = Math.random() * 1000 - 500;
+				object.position.y = Math.random() * 600 - 300;
+				object.position.z = Math.random() * 800 - 400;
+
+				object.rotation.x = ( Math.random() * 360 ) * Math.PI / 180;
+				object.rotation.y = ( Math.random() * 360 ) * Math.PI / 180;
+				object.rotation.z = ( Math.random() * 360 ) * Math.PI / 180;
+
+				object.scale.x = Math.random() * 2 + 1;
+				object.scale.y = Math.random() * 2 + 1;
+				object.scale.z = Math.random() * 2 + 1;
+
+				object.castShadow = true;
+				object.receiveShadow = true;
+
+				scene.add( object );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				//Example drag on the Z plane, but any plane (except YZ or XZ since they are 
+				//parallel to the default camera position) should work
+				var dragPlane = new Plane3D(0, 0, 1, 0);
+				var dragControl = new ObjectDragControls(dragPlane, camera, container, 640, 480);
+				dragControl.attach(renderer);
+				dragControl.addObject(object)
+				renderer.sortObjects = false;
+				//renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setSize(640, 480);
+
+				renderer.shadowMapEnabled = true;
+				renderer.shadowMapSoft = true;
+
+				renderer.shadowCameraNear = 3;
+				renderer.shadowCameraFar = camera.far;
+				renderer.shadowCameraFov = 50;
+
+				renderer.shadowMapBias = 0.0039;
+				renderer.shadowMapDarkness = 0.5;
+				renderer.shadowMapWidth = 1024;
+				renderer.shadowMapHeight = 1024;
+
+				container.appendChild( renderer.domElement );
+
+				var info = document.createElement( 'div' );
+				info.style.position = 'absolute';
+				info.style.top = '10px';
+				info.style.width = '100%';
+				info.style.textAlign = 'center';
+				info.innerHTML = '<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> webgl - draggable cubes';
+				container.appendChild( info );
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild( stats.domElement );
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>
