@@ -48,71 +48,81 @@
 
 			var cross;
 
+			init();
+			animate();
 
-			// scene and camera
+			function init() {
 
-			scene = new THREE.Scene();
+				// scene and camera
 
-			camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.01, 1e10 );
-			camera.position.z = 0.2;
+				scene = new THREE.Scene();
 
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.01, 1e10 );
+				camera.position.z = 0.2;
+				scene.add( camera );
 
-			scene.add( camera );
+				controls = new THREE.TrackballControls( camera );
 
-			controls = new THREE.TrackballControls( camera );
+				controls.rotateSpeed = 5.0;
+				controls.zoomSpeed = 5;
+				controls.panSpeed = 2;
 
-			controls.rotateSpeed = 5.0;
-			controls.zoomSpeed = 5;
-			controls.panSpeed = 2;
+				controls.noZoom = false;
+				controls.noPan = false;
 
-			controls.noZoom = false;
-			controls.noPan = false;
+				controls.staticMoving = true;
+				controls.dynamicDampingFactor = 0.3;
 
-			controls.staticMoving = true;
-			controls.dynamicDampingFactor = 0.3;
+				// light
 
-			// light
+				var dirLight = new THREE.DirectionalLight( 0xffffff );
+				dirLight.position.set( 200, 200, 1000 ).normalize();
+				camera.add( dirLight );
+				camera.add( dirLight.target );
 
-			var dirLight = new THREE.DirectionalLight( 0xffffff );
-			dirLight.position.set( 200, 200, 1000 ).normalize();
-			camera.add( dirLight );
-			camera.add( dirLight.target );
+				var material = new THREE.MeshLambertMaterial( { color:0xffffff} );
 
-			// renderer
+				var loader = new THREE.VTKLoader();
+				loader.addEventListener( 'complete', function ( event ) {
 
-			renderer = new THREE.WebGLRenderer( { antialias: false } );
-			renderer.setClearColorHex( 0x000000, 1 );
-			renderer.setSize( window.innerWidth, window.innerHeight );
+					var geometry = event.content;
 
-			container = document.createElement( 'div' );
-			document.body.appendChild( container );
-			container.appendChild( renderer.domElement );
+					var mesh = new THREE.Mesh( geometry, material );
+					mesh.doubleSided = true;
+					mesh.position.setY( - 0.09 );
+					scene.add( mesh );
 
-			stats = new Stats();
-			stats.domElement.style.position = 'absolute';
-			stats.domElement.style.top = '0px';
-			container.appendChild( stats.domElement );
+				} );
+				loader.load ( "models/vtk/bunny.vtk" );
 
+				// renderer
 
-			var material =  new THREE.MeshLambertMaterial( { color:0xffffff} );
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer.setClearColorHex( 0x000000, 1 );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
-			var loader=new THREE.VTKLoader();
-			loader.load ("models/vtk/bunny.vtk", function(geom){
-				var mesh = new THREE.Mesh(geom, material );
-				mesh.doubleSided=true;
-				mesh.position.setY(-0.09);
-				scene.add( mesh );
-				animate();
-				});
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild( stats.domElement );
+
+			}
 
 			function animate() {
 
 				requestAnimationFrame( animate );
+
 				controls.update();
 				renderer.render( scene, camera );
+
 				stats.update();
 
 			}
+
 		</script>
 
 	</body>
