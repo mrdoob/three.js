@@ -41,7 +41,7 @@
 
 			var container, stats;
 			var camera, scene, renderer;
-			var mesh;
+			var group;
 			var mouseX = 0, mouseY = 0;
 
 			var windowHalfX = window.innerWidth / 2;
@@ -60,6 +60,9 @@
 				camera.position.z = 500;
 				scene.add( camera );
 
+				group = new THREE.Object3D();
+				scene.add( group );
+
 				// earth
 				
 				var earthTexture = new THREE.Texture();
@@ -77,8 +80,8 @@
 				var geometry = new THREE.SphereGeometry( 200, 20, 20 );
 				var material = new THREE.MeshBasicMaterial( { map: earthTexture, overdraw: true } );
 
-				mesh = new THREE.Mesh( geometry, material );
-				scene.add( mesh );
+				var mesh = new THREE.Mesh( geometry, material );
+				group.add( mesh );
 
 				// shadow
 				
@@ -97,9 +100,9 @@
 				var geometry = new THREE.PlaneGeometry( 300, 300, 3, 3 );
 				var material = new THREE.MeshBasicMaterial( { map: shadowTexture, overdraw: true } );
 
-				mesh = new THREE.Mesh( geometry, material );
+				var mesh = new THREE.Mesh( geometry, material );
 				mesh.position.y = - 250;
-				scene.add( mesh );
+				group.add( mesh );
 
 				renderer = new THREE.CanvasRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -139,7 +142,7 @@
 				camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
 				camera.lookAt( scene.position );
 
-				mesh.rotation.y -= 0.005;
+				group.rotation.y -= 0.005;
 
 				renderer.render( scene, camera );
 

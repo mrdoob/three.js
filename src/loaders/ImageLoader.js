@@ -12,7 +12,7 @@ THREE.ImageLoader.prototype = {
 
 	constructor: THREE.ImageLoader,
 
-	crossOrigin: 'anonymous',
+	crossOrigin: null,
 
 	load: function ( url ) {
 
@@ -31,7 +31,7 @@ THREE.ImageLoader.prototype = {
 		
 		}, false );
 
-		image.crossOrigin = this.crossOrigin;
+		if ( scope.crossOrigin ) image.crossOrigin = scope.crossOrigin;
 		image.src = url;
 
 	}
