@@ -7,19 +7,20 @@ THREE.GeometryLoader = function () {
 
 	THREE.EventTarget.call( this );
 
+	this.crossOrigin = null;
+	this.path = null;
+
+
 };
 
 THREE.GeometryLoader.prototype = {
 
 	constructor: THREE.GeometryLoader,
 
-	crossOrigin: null,
-
-	path: null,
-
 	load: function ( url ) {
 
 		var scope = this;
+		var geometry = null;
 
 		if ( scope.path === null ) {
 
@@ -28,25 +29,21 @@ THREE.GeometryLoader.prototype = {
 
 		}
 
+		//
+
 		var xhr = new XMLHttpRequest();
 
 		xhr.addEventListener( 'load', function ( event ) {
 
 			if ( event.target.responseText ) {
 
-				scope.dispatchEvent( { type: 'load', content: scope.parse( JSON.parse( event.target.responseText ) ) } );
-
+				geometry = scope.parse( JSON.parse( event.target.responseText ), monitor );
+				
 			} else {
 
-				scope.dispatchEvent( { type: 'error', message: 'URL unreachable or empty file [' + url + ']' } );
+				scope.dispatchEvent( { type: 'error', message: 'Invalid file [' + url + ']' } );
 
 			}
-
-		}, false );
-
-		xhr.addEventListener( 'progress', function ( event ) {
-
-			scope.dispatchEvent( { type: 'progress', loaded: event.loaded, total: event.total } );
 
 		}, false );
 
@@ -59,9 +56,21 @@ THREE.GeometryLoader.prototype = {
 		xhr.open( 'GET', url, true );
 		xhr.send( null );
 
+		//
+
+		var monitor = new THREE.LoadingMonitor();
+
+		monitor.addEventListener( 'load', function ( event ) {
+
+			scope.dispatchEvent( { type: 'load', content: geometry } );
+
+		} );
+
+		monitor.add( xhr );
+
 	},
 
-	parse: function ( data ) {
+	parse: function ( data, monitor ) {
 
 		var scope = this;
 		var geometry = new THREE.Geometry();
@@ -154,6 +163,8 @@ THREE.GeometryLoader.prototype = {
 				} );
 				loader.crossOrigin = scope.crossOrigin;
 				loader.load( scope.path + '/' + sourceFile );
+
+				if ( monitor ) monitor.add( loader );
 
 			}
 
