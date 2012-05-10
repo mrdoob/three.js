@@ -4,6 +4,20 @@
 
 var THREE = THREE || { REVISION: '50dev' };
 
+if ( ! self.console ) {
+
+	self.console = {
+
+		info: function () {},
+		log: function () {},
+		debug: function () {},
+		warn: function () {},
+		error: function () {}
+
+	};
+
+}
+
 if ( ! self.Int32Array ) {
 
 	self.Int32Array = Array;
