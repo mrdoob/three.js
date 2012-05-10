@@ -83,7 +83,7 @@ TEMPLATE_SCENE_ASCII = """\
 {
     "formatVersion" : 3,
     "sourceFile"    : "%(fname)s",
-    "generatedBy"   : "Blender 2.62 Exporter",
+    "generatedBy"   : "Blender 2.63 Exporter",
     "objects"       : %(nobjects)s,
     "geometries"    : %(ngeometries)s,
     "materials"     : %(nmaterials)s,
@@ -192,18 +192,18 @@ TEMPLATE_CAMERA_ORTHO = """\
 
 TEMPLATE_LIGHT_DIRECTIONAL = """\
     %(light_id)s: {
-        "type"		 : "directional",
-        "direction"	 : %(direction)s,
-        "color" 	 : %(color)d,
-        "intensity"	 : %(intensity).2f
+        "type"         : "directional",
+        "direction"     : %(direction)s,
+        "color"      : %(color)d,
+        "intensity"     : %(intensity).2f
     }"""
 
 TEMPLATE_LIGHT_POINT = """\
     %(light_id)s: {
-        "type"	     : "point",
+        "type"         : "point",
         "position"   : %(position)s,
         "color"      : %(color)d,
-        "intensity"	 : %(intensity).3f
+        "intensity"     : %(intensity).3f
     }"""
 
 TEMPLATE_VEC4 = '[ %f, %f, %f, %f ]'
@@ -222,7 +222,7 @@ TEMPLATE_FILE_ASCII = """\
     "metadata" :
     {
         "formatVersion" : 3,
-        "generatedBy"   : "Blender 2.62 Exporter",
+        "generatedBy"   : "Blender 2.63 Exporter",
         "vertices"      : %(nvertex)d,
         "faces"         : %(nface)d,
         "normals"       : %(nnormal)d,
@@ -246,6 +246,8 @@ TEMPLATE_MODEL_ASCII = """\
 
     "morphTargets": [%(morphTargets)s],
 
+    "moveTargets": [%(moveTargets)s],
+
     "normals": [%(normals)s],
 
     "colors": [%(colors)s],
@@ -256,6 +258,8 @@ TEMPLATE_MODEL_ASCII = """\
 
 """
 
+TEMPLATE_VERTEX_STRING = "%s,%s,%s"
+TEMPLATE_VERTEX_STRING_TRUNCATE = "%s,%s,%s"
 TEMPLATE_VERTEX = "%f,%f,%f"
 TEMPLATE_VERTEX_TRUNCATE = "%d,%d,%d"
 
@@ -276,6 +280,12 @@ def veckey3d(v):
 def veckey2d(v):
     return round(v[0], 6), round(v[1], 6)
 
+def get_faces(obj):
+    if hasattr(obj, "tessfaces"):
+        return obj.tessfaces
+    else:
+        return obj.faces
+
 def get_normal_indices(v, normals, mesh):
     n = []
     mv = mesh.vertices
@@ -290,7 +300,7 @@ def get_normal_indices(v, normals, mesh):
 
 def get_uv_indices(face_index, uvs, mesh):
     uv = []
-    uv_layer = mesh.uv_textures.active.data
+    uv_layer = mesh.tessface_uv_textures.active.data
     for i in uv_layer[face_index].uv:
         uv.append( uvs[veckey2d(i)] )
     return uv
@@ -432,6 +442,20 @@ def generate_vertex(v, option_vertices_truncate):
     else:
         return TEMPLATE_VERTEX_TRUNCATE % (v.co.x, v.co.y, v.co.z)
 
+def generate_locations(vertices, option_vertices_truncate, option_vertices):
+    if not option_vertices:
+        return ""
+
+    fred =generate_location(vertices, option_vertices_truncate)  
+    barney = ",".join(fred  )
+    return barney
+
+def generate_location(v, option_vertices_truncate):
+    if not option_vertices_truncate:
+        return TEMPLATE_VERTEX_STRING % (v[0], v[1], v[2])
+    else:
+        return TEMPLATE_VERTEX_STRING_TRUNCATE % (v[0], v[1], v[2])
+
 def generate_normal(n):
     return TEMPLATE_N % (n[0], n[1], n[2])
 
@@ -481,7 +505,7 @@ def generate_faces(normals, uvs, colors, meshes, option_normals, option_colors, 
             if not active_col_layer:
                 mesh_extract_colors = False
 
-        for i, f in enumerate(mesh.faces):
+        for i, f in enumerate(get_faces(mesh)):
             face = generate_face(f, i, normals, uvs, colors, mesh, option_normals, mesh_colors, mesh_uvs, option_materials, vertex_offset, material_offset)
             chunks.append(face)
 
@@ -574,7 +598,7 @@ def generate_face(f, faceIndex, normals, uvs, colors, mesh, option_normals, opti
 # #####################################################
 
 def extract_vertex_normals(mesh, normals, count):
-    for f in mesh.faces:
+    for f in get_faces(mesh):
         for v in f.vertices:
 
             normal = mesh.vertices[v].normal
@@ -603,7 +627,7 @@ def generate_normals(normals, option_normals):
 def extract_vertex_colors(mesh, colors, count):
     color_layer = mesh.vertex_colors.active.data
 
-    for face_index, face in enumerate(mesh.faces):
+    for face_index, face in enumerate(get_faces(mesh)):
 
         face_colors = color_layer[face_index]
         face_colors = face_colors.color1, face_colors.color2, face_colors.color3, face_colors.color4
@@ -631,9 +655,9 @@ def generate_vertex_colors(colors, option_colors):
 # #####################################################
 
 def extract_uvs(mesh, uvs, count):
-    uv_layer = mesh.uv_textures.active.data
+    uv_layer = mesh.tessface_uv_textures.active.data
 
-    for face_index, face in enumerate(mesh.faces):
+    for face_index, face in enumerate(get_faces(mesh)):
 
         for uv_index, uv in enumerate(uv_layer[face_index].uv):
 
@@ -851,7 +875,7 @@ def handle_texture(id, textures, material, filepath, option_copy_textures):
 # ASCII model generator
 # #####################################################
 
-def generate_ascii_model(meshes, morphs,
+def generate_ascii_model(meshes, morphs, moves,
                          scene,
                          option_vertices,
                          option_vertices_truncate,
@@ -925,6 +949,8 @@ def generate_ascii_model(meshes, morphs,
 
     morphTargets_string = ""
     nmorphTarget = 0
+    moveTargets_string = ""
+    nmoveTarget = 0
 
     if option_animation:
         chunks = []
@@ -934,6 +960,13 @@ def generate_ascii_model(meshes, morphs,
 
         morphTargets_string = ",\n\t".join(chunks)
         nmorphTarget = len(morphs)
+        movechunks = []
+        for i, moveVertices in enumerate(moves):
+            moveTarget = '{ "name": "%s_%06d", "locations": [%s] }' % ("move", i, moveVertices)
+            movechunks.append(moveTarget)
+
+        moveTargets_string = ",\n\t".join(movechunks)
+        nmoveTarget = len(moves)
 
     if align_model == 1:
         center(vertices)
@@ -959,7 +992,9 @@ def generate_ascii_model(meshes, morphs,
 
     "faces"    : faces_string,
 
-    "morphTargets" : morphTargets_string
+    "morphTargets" : morphTargets_string,
+
+    "moveTargets" : moveTargets_string
     }
 
     text = TEMPLATE_FILE_ASCII % {
@@ -970,6 +1005,7 @@ def generate_ascii_model(meshes, morphs,
     "ncolor"    : ncolor,
     "nmaterial" : nmaterial,
     "nmorphTarget": nmorphTarget,
+    "nmoveTarget": nmoveTarget,
 
     "model"     : model_string
     }
@@ -1032,6 +1068,7 @@ def generate_mesh_string(objects, scene,
     meshes = extract_meshes(objects, scene, export_single_model, option_scale, flipyz)
 
     morphs = []
+    moves = []
 
     if option_animation:
 
@@ -1044,13 +1081,21 @@ def generate_mesh_string(objects, scene,
 
             anim_meshes = extract_meshes(objects, scene, export_single_model, option_scale, flipyz)
 
-            frame_vertices = []
+            frame_vertices = [] 
+            myPosition = ""
 
             for mesh, object in anim_meshes:
                 frame_vertices.extend(mesh.vertices[:])
+                matrix = object.matrix_world.copy()
+                #dx, dy, dz = matrix_direction_neg_z(matrix) 
+                position, quaternion, scale =  matrix.decompose()
+                myPosition=TEMPLATE_VERTEX_STRING % (position[0], position[1], position[2])
+ 
+                moves.append(myPosition)
 
             morphVertices = generate_vertices(frame_vertices, option_vertices_truncate, option_vertices)
             morphs.append(morphVertices)
+              
 
             # remove temp meshes
 
@@ -1060,7 +1105,7 @@ def generate_mesh_string(objects, scene,
         scene.frame_set(original_frame, 0.0) # restore animation state
 
 
-    text, model_string = generate_ascii_model(meshes, morphs,
+    text, model_string = generate_ascii_model(meshes, morphs,moves,
                                 scene,
                                 option_vertices,
                                 option_vertices_truncate,
@@ -1754,20 +1799,20 @@ def generate_ascii_scene(data):
 def export_scene(scene, filepath, flipyz, option_colors, option_lights, option_cameras, option_embed_meshes, embeds, option_url_base_html, option_copy_textures):
 
     source_file = os.path.basename(bpy.data.filepath)
-    
+
     # objects are contained in scene and linked groups
     objects = []
-    
+
     # get scene objects
     sceneobjects = scene.objects
     for obj in sceneobjects:
       objects.append(obj)
-      
-    # get linked group objcts  
+
+    # get linked group objcts
     for group in bpy.data.groups:
        for object in group.objects:
           objects.append(object)
-          
+
     scene_text = ""
     data = {
     "scene"        : scene,
@@ -1828,15 +1873,15 @@ def save(operator, context, filepath = "",
 
     # objects are contained in scene and linked groups
     objects = []
-    
+
     # get scene objects
     for obj in sceneobjects:
       objects.append(obj)
-      
-    # get objects in linked groups  
+
+    # get objects in linked groups
     for group in bpy.data.groups:
        for object in group.objects:
-          objects.append(object) 
+          objects.append(object)
 
     if option_export_scene:
 
