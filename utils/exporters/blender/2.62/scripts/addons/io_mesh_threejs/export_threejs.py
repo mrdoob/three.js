@@ -442,20 +442,6 @@ def generate_vertex(v, option_vertices_truncate):
     else:
         return TEMPLATE_VERTEX_TRUNCATE % (v.co.x, v.co.y, v.co.z)
 
-def generate_locations(vertices, option_vertices_truncate, option_vertices):
-    if not option_vertices:
-        return ""
-
-    fred =generate_location(vertices, option_vertices_truncate)  
-    barney = ",".join(fred  )
-    return barney
-
-def generate_location(v, option_vertices_truncate):
-    if not option_vertices_truncate:
-        return TEMPLATE_VERTEX_STRING % (v[0], v[1], v[2])
-    else:
-        return TEMPLATE_VERTEX_STRING_TRUNCATE % (v[0], v[1], v[2])
-
 def generate_normal(n):
     return TEMPLATE_N % (n[0], n[1], n[2])
 
