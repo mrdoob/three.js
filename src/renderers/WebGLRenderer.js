@@ -105,6 +105,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	_programs = [],
 	_programs_counter = 0,
+	
+	_caster16 = new Float32Array(16),
+	_caster9 = new Float32Array(16),
 
 	// internal state cache
 
@@ -4551,7 +4554,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		if ( refreshMaterial || camera !== _currentCamera ) {
-
+			
 			_gl.uniformMatrix4fv( p_uniforms.projectionMatrix, false, camera._projectionMatrixArray );
 
 			if ( camera !== _currentCamera ) _currentCamera = camera;
@@ -4672,7 +4675,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( p_uniforms.objectMatrix !== null ) {
 
-			_gl.uniformMatrix4fv( p_uniforms.objectMatrix, false, object.matrixWorld.elements );
+			_gl.uniformMatrix4fv( p_uniforms.objectMatrix, false, _caster16.set(object.matrixWorld.elements) );
 
 		}
 
@@ -4865,11 +4868,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function loadUniformsMatrices ( uniforms, object ) {
 
-		_gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, object._modelViewMatrix.elements );
+		_gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, _caster16.set(object._modelViewMatrix.elements) );
 
 		if ( uniforms.normalMatrix ) {
 
-			_gl.uniformMatrix3fv( uniforms.normalMatrix, false, object._normalMatrix.elements );
+			_gl.uniformMatrix3fv( uniforms.normalMatrix, false, _caster9.set(object._normalMatrix.elements) );
 
 		}
 

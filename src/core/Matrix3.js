@@ -4,7 +4,7 @@
 
 THREE.Matrix3 = function () {
 
-	this.elements = new Float32Array(9);
+	this.elements = new Float64Array(9);
 
 };
 
