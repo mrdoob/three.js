@@ -61,7 +61,10 @@ THREE.Object3D.prototype = {
 		this.matrix.multiply( matrix, this.matrix );
 
 		this.scale.getScaleFromMatrix( this.matrix );
-		this.rotation.getRotationFromMatrix( this.matrix, this.scale );
+		
+		var mat = new THREE.Matrix4().extractRotation( this.matrix );
+		this.rotation.setEulerFromRotationMatrix( mat, this.eulerOrder );
+		
 		this.position.getPositionFromMatrix( this.matrix );
 
 	},
@@ -99,7 +102,7 @@ THREE.Object3D.prototype = {
 
 		if ( this.rotationAutoUpdate ) {
 
-			this.rotation.getRotationFromMatrix( this.matrix );
+			this.rotation.setEulerFromRotationMatrix( this.matrix, this.eulerOrder );
 
 		}
 
