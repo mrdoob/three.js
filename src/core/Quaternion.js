@@ -206,6 +206,66 @@ THREE.Quaternion.prototype = {
 
 	},
 
+	slerpSelf: function ( qb, t ) {
+
+		var x = this.x, y = this.y, z = this.z, w = this.w;
+
+		// http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/slerp/
+
+		var cosHalfTheta = w * qb.w + x * qb.x + y * qb.y + z * qb.z;
+
+		if ( cosHalfTheta < 0 ) {
+
+			this.w = -qb.w;
+			this.x = -qb.x;
+			this.y = -qb.y;
+			this.z = -qb.z;
+
+			cosHalfTheta = -cosHalfTheta;
+
+		} else {
+
+			this.copy( qb );
+
+		}
+
+		if ( cosHalfTheta >= 1.0 ) {
+
+			this.w = w;
+			this.x = x;
+			this.y = y;
+			this.z = z;
+
+			return this;
+
+		}
+
+		var halfTheta = Math.acos( cosHalfTheta );
+		var sinHalfTheta = Math.sqrt( 1.0 - cosHalfTheta * cosHalfTheta );
+
+		if ( Math.abs( sinHalfTheta ) < 0.001 ) {
+
+			this.w = 0.5 * ( w + this.w );
+			this.x = 0.5 * ( x + this.x );
+			this.y = 0.5 * ( y + this.y );
+			this.z = 0.5 * ( z + this.z );
+
+			return this;
+
+		}
+
+		var ratioA = Math.sin( ( 1 - t ) * halfTheta ) / sinHalfTheta,
+		ratioB = Math.sin( t * halfTheta ) / sinHalfTheta;
+
+		this.w = ( w * ratioA + this.w * ratioB );
+		this.x = ( x * ratioA + this.x * ratioB );
+		this.y = ( y * ratioA + this.y * ratioB );
+		this.z = ( z * ratioA + this.z * ratioB );
+
+		return this;
+
+	},
+
 	clone: function () {
 
 		return new THREE.Quaternion( this.x, this.y, this.z, this.w );
@@ -220,36 +280,48 @@ THREE.Quaternion.slerp = function ( qa, qb, qm, t ) {
 
 	var cosHalfTheta = qa.w * qb.w + qa.x * qb.x + qa.y * qb.y + qa.z * qb.z;
 
-	if (cosHalfTheta < 0) {
-		qm.w = -qb.w; qm.x = -qb.x; qm.y = -qb.y; qm.z = -qb.z;
+	if ( cosHalfTheta < 0 ) {
+
+		qm.w = -qb.w;
+		qm.x = -qb.x;
+		qm.y = -qb.y;
+		qm.z = -qb.z;
+
 		cosHalfTheta = -cosHalfTheta;
+
 	} else {
-		qm.copy(qb);
+
+		qm.copy( qb );
+
 	}
 
 	if ( Math.abs( cosHalfTheta ) >= 1.0 ) {
 
-		qm.w = qa.w; qm.x = qa.x; qm.y = qa.y; qm.z = qa.z;
+		qm.w = qa.w;
+		qm.x = qa.x;
+		qm.y = qa.y;
+		qm.z = qa.z;
+
 		return qm;
 
 	}
 
-	var halfTheta = Math.acos( cosHalfTheta ),
-	sinHalfTheta = Math.sqrt( 1.0 - cosHalfTheta * cosHalfTheta );
+	var halfTheta = Math.acos( cosHalfTheta );
+	var sinHalfTheta = Math.sqrt( 1.0 - cosHalfTheta * cosHalfTheta );
 
 	if ( Math.abs( sinHalfTheta ) < 0.001 ) {
 
-		qm.w = 0.5 * ( qa.w + qb.w );
-		qm.x = 0.5 * ( qa.x + qb.x );
-		qm.y = 0.5 * ( qa.y + qb.y );
-		qm.z = 0.5 * ( qa.z + qb.z );
+		qm.w = 0.5 * ( qa.w + qm.w );
+		qm.x = 0.5 * ( qa.x + qm.x );
+		qm.y = 0.5 * ( qa.y + qm.y );
+		qm.z = 0.5 * ( qa.z + qm.z );
 
 		return qm;
 
 	}
 
-	var ratioA = Math.sin( ( 1 - t ) * halfTheta ) / sinHalfTheta,
-	ratioB = Math.sin( t * halfTheta ) / sinHalfTheta;
+	var ratioA = Math.sin( ( 1 - t ) * halfTheta ) / sinHalfTheta;
+	var ratioB = Math.sin( t * halfTheta ) / sinHalfTheta;
 
 	qm.w = ( qa.w * ratioA + qm.w * ratioB );
 	qm.x = ( qa.x * ratioA + qm.x * ratioB );

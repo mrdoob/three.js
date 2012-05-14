@@ -79,20 +79,27 @@ THREE.LinearFilter = 6;
 THREE.LinearMipMapNearestFilter = 7;
 THREE.LinearMipMapLinearFilter = 8;
 
-// Types
+// Data types
 
-THREE.ByteType = 9;
-THREE.UnsignedByteType = 10;
+THREE.UnsignedByteType = 9;
+THREE.ByteType = 10;
 THREE.ShortType = 11;
 THREE.UnsignedShortType = 12;
 THREE.IntType = 13;
 THREE.UnsignedIntType = 14;
 THREE.FloatType = 15;
 
-// Formats
+// Pixel types
 
-THREE.AlphaFormat = 16;
-THREE.RGBFormat = 17;
-THREE.RGBAFormat = 18;
-THREE.LuminanceFormat = 19;
-THREE.LuminanceAlphaFormat = 20;
+//THREE.UnsignedByteType = 9;
+THREE.UnsignedShort4444Type = 16;
+THREE.UnsignedShort5551Type = 17;
+THREE.UnsignedShort565Type = 18;
+
+// Pixel formats
+
+THREE.AlphaFormat = 19;
+THREE.RGBFormat = 20;
+THREE.RGBAFormat = 21;
+THREE.LuminanceFormat = 22;
+THREE.LuminanceAlphaFormat = 23;

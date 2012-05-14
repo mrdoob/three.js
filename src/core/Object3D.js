@@ -263,8 +263,22 @@ THREE.Object3D.prototype = {
 
 		}
 
+	},
+
+	worldToLocal: function ( vector ) {
+
+		return THREE.Object3D.__m1.getInverse( this.matrixWorld ).multiplyVector3( vector );
+
+	},
+
+	localToWorld: function ( vector ) {
+
+		return this.matrixWorld.multiplyVector3( vector );
+
 	}
 
 };
+
+THREE.Object3D.__m1 = new THREE.Matrix4();
 
 THREE.Object3DCount = 0;
