@@ -4,7 +4,7 @@
 
 THREE.Matrix3 = function () {
 
-	this.elements = new Float32Array(9);
+	this.elements = new Float64Array(9);
 
 };
 
@@ -67,7 +67,7 @@ THREE.Matrix3.prototype = {
 
 	transposeIntoArray: function ( r ) {
 
-		var m = this.m;
+		var m = this.elements;
 
 		r[ 0 ] = m[ 0 ];
 		r[ 1 ] = m[ 3 ];
