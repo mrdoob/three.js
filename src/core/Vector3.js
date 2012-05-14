@@ -276,7 +276,12 @@ THREE.Vector3.prototype = {
 		// assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
 	
 		// clamp, to handle numerical problems
-		function clamp( x ) { return Math.min( Math.max( x, -1 ), 1 ) };
+
+		function clamp( x ) {
+
+			return Math.min( Math.max( x, -1 ), 1 );
+
+		}
 		
 		var _order = order || 'XYZ',
 		
@@ -404,19 +409,22 @@ THREE.Vector3.prototype = {
 
 	setEulerFromQuaternion: function ( q, order ) {
 
-		// http://www.mathworks.com/matlabcentral/fileexchange/
-		// 	20696-function-to-convert-between-dcm-euler-angles-quaternions-and-euler-vectors/
-		//	content/SpinCalc.m
-	
 		// q is assumed to be normalized
-	
+
 		// clamp, to handle numerical problems
-		function clamp( x ) { return Math.min( Math.max( x, -1 ), 1 ) };
+
+		function clamp( x ) {
+
+			return Math.min( Math.max( x, -1 ), 1 );
+
+		}
+
+		// http://www.mathworks.com/matlabcentral/fileexchange/20696-function-to-convert-between-dcm-euler-angles-quaternions-and-euler-vectors/content/SpinCalc.m
 	
-		var sqx = q.x * q.x,
-			sqy = q.y * q.y,
-			sqz = q.z * q.z,
-			sqw = q.w * q.w;
+		var sqx = q.x * q.x;
+		var sqy = q.y * q.y;
+		var sqz = q.z * q.z;
+		var sqw = q.w * q.w;
 	
 		switch ( order ) {
 	
