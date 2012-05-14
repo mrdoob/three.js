@@ -7,19 +7,27 @@ THREE.ImageUtils = {
 
 	crossOrigin: 'anonymous',
 
-	loadTexture: function ( url, mapping, callback ) {
+	loadTexture: function ( url, mapping, onLoad, onError ) {
 
 		var texture = new THREE.Texture( undefined, mapping );
 
 		var loader = new THREE.ImageLoader();
+
 		loader.addEventListener( 'load', function ( event ) {
 
 			texture.image = event.content;
 			texture.needsUpdate = true;
 			
-			if ( callback ) callback( this );
+			if ( onLoad ) onLoad();
 
 		} );
+
+		loader.addEventListener( 'error', function ( event ) {
+
+			if ( onError ) onError( event.message );
+
+		} );
+
 		loader.crossOrigin = this.crossOrigin;
 		loader.load( url );
 
@@ -27,7 +35,7 @@ THREE.ImageUtils = {
 
 	},
 
-	loadTextureCube: function ( array, mapping, callback ) {
+	loadTextureCube: function ( array, mapping, onLoad ) {
 
 		var i, l, images = [], texture = new THREE.Texture( images, mapping );
 
@@ -39,8 +47,13 @@ THREE.ImageUtils = {
 			images[ i ].onload = function () {
 
 				images.loadCount += 1;
-				if ( images.loadCount === 6 ) texture.needsUpdate = true;
-				if ( callback ) callback( this );
+
+				if ( images.loadCount === 6 ) {
+
+					texture.needsUpdate = true;
+					if ( onLoad ) onLoad();
+
+				}
 
 			};
 
