@@ -192,18 +192,18 @@ TEMPLATE_CAMERA_ORTHO = """\
 
 TEMPLATE_LIGHT_DIRECTIONAL = """\
     %(light_id)s: {
-        "type"         : "directional",
-        "direction"     : %(direction)s,
-        "color"      : %(color)d,
-        "intensity"     : %(intensity).2f
+        "type"    	 : "directional",
+        "direction"	 : %(direction)s,
+        "color" 	 : %(color)d,
+        "intensity"	 : %(intensity).2f
     }"""
 
 TEMPLATE_LIGHT_POINT = """\
     %(light_id)s: {
-        "type"         : "point",
+        "type"	     : "point",
         "position"   : %(position)s,
         "color"      : %(color)d,
-        "intensity"     : %(intensity).3f
+        "intensity"	 : %(intensity).3f
     }"""
 
 TEMPLATE_VEC4 = '[ %f, %f, %f, %f ]'
@@ -236,7 +236,7 @@ TEMPLATE_FILE_ASCII = """\
 
 }
 """
-
+ 
 TEMPLATE_MODEL_ASCII = """\
     "scale" : %(scale)f,
 
