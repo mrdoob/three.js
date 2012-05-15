@@ -15,10 +15,10 @@ THREE.OrbitControls = function( object, domElement ) {
 	this.userZoomSpeed = 1.0;
 
 	this.userRotate = true;
-	this.userRotateSpeed = 2.0;
+	this.userRotateSpeed = 1.0;
 
 	this.autoRotate = false;
-	this.autoRotateSpeed = 3.0; // 20 seconds per round when fps is 60
+	this.autoRotateSpeed = 2.0; // 30 seconds per round when fps is 60
 
 	// internals
 	
