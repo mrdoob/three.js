@@ -2,10 +2,12 @@
  * @author mr.doob / http://mrdoob.com/
  */
 
-THREE.Ray = function ( origin, direction ) {
+THREE.Ray = function ( origin, direction, near, far ) {
 
 	this.origin = origin || new THREE.Vector3();
 	this.direction = direction || new THREE.Vector3();
+	this.near = near || 0;
+	this.far = far || Infinity;
 
 	var precision = 0.0001;
 
@@ -39,7 +41,19 @@ THREE.Ray = function ( origin, direction ) {
 
 		if ( object instanceof THREE.Particle ) {
 
-			var distance = distanceFromIntersection( this.origin, this.direction, object.matrixWorld.getPosition() );
+
+			var distance; 
+			
+			// Checking range, note that distance may be actually greater then this.range,
+			// because we also consider object.scale.x
+			
+			if ( this.far < Infinity || this.near > 0 ) {
+				distance = vector.sub(this.origin, object.matrixWorld.getPosition()).length();
+				if ( distance > object.scale.x + this.far ) return [];
+				if ( distance < -object.scale.x + this.near ) return [];
+			}
+			
+			distance = distanceFromIntersection( this.origin, this.direction, object.matrixWorld.getPosition() );
 
 			if ( distance > object.scale.x ) {
 
@@ -60,12 +74,27 @@ THREE.Ray = function ( origin, direction ) {
 
 		} else if ( object instanceof THREE.Mesh ) {
 
+
 			// Checking boundingSphere
-
-			var distance = distanceFromIntersection( this.origin, this.direction, object.matrixWorld.getPosition() );
 			var scale = THREE.Frustum.__v1.set( object.matrixWorld.getColumnX().length(), object.matrixWorld.getColumnY().length(), object.matrixWorld.getColumnZ().length() );
+			var scaledRadius = object.geometry.boundingSphere.radius * Math.max( scale.x, Math.max( scale.y, scale.z ) ); 
+			var distance;
 
-			if ( distance > object.geometry.boundingSphere.radius * Math.max( scale.x, Math.max( scale.y, scale.z ) ) ) {
+			// Checking distance to origin
+			if ( this.far < Infinity || this.near > 0 ) {
+			
+				distance = vector.sub( object.matrixWorld.getPosition(), this.origin ).length();
+				if ( distance > scaledRadius + this.far ) return intersects;
+				if ( distance < -scaledRadius + this.near ) return intersects;
+				
+			}
+			
+
+			// Checking distance to ray
+			
+			distance = distanceFromIntersection( this.origin, this.direction, object.matrixWorld.getPosition() );
+
+			if ( distance > scaledRadius) {
 
 				return intersects;
 
@@ -74,6 +103,7 @@ THREE.Ray = function ( origin, direction ) {
 			// Checking faces
 
 			var f, fl, face, dot, scalar,
+			rangeSq = this.range*this.range,
 			geometry = object.geometry,
 			vertices = geometry.vertices,
 			objMatrix;
@@ -112,6 +142,11 @@ THREE.Ray = function ( origin, direction ) {
 
 					intersectPoint.add( originCopy, directionCopy.multiplyScalar( scalar ) );
 
+					// Checking distance to origin (would be calculated anyway)
+					distance = originCopy.distanceTo( intersectPoint );
+					if ( distance > this.far ) continue;
+					if ( distance < this.near ) continue;
+
 					if ( face instanceof THREE.Face3 ) {
 
 						a = objMatrix.multiplyVector3( a.copy( vertices[ face.a ] ) );
@@ -122,7 +157,7 @@ THREE.Ray = function ( origin, direction ) {
 
 							intersect = {
 
-								distance: originCopy.distanceTo( intersectPoint ),
+								distance: distance,
 								point: intersectPoint.clone(),
 								face: face,
 								object: object
@@ -144,7 +179,7 @@ THREE.Ray = function ( origin, direction ) {
 
 							intersect = {
 
-								distance: originCopy.distanceTo( intersectPoint ),
+								distance: distance,
 								point: intersectPoint.clone(),
 								face: face,
 								object: object
