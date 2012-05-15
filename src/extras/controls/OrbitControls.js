@@ -2,7 +2,7 @@
  * @author qiao / https://github.com/qiao
  */
 
-THREE.OrbitalControls = function( object, domElement ) {
+THREE.OrbitControls = function( object, domElement ) {
   
 	this.object = object;
 	this.domElement = ( domElement !== undefined ? domElement : document );
