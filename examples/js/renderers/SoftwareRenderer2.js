@@ -168,14 +168,15 @@ THREE.SoftwareRenderer2 = function () {
 		var ymin = Math.max( Math.min( y1, y2 ), 0 );
 		var ymax = Math.min( Math.max( y1, y2 ), canvasHeight );
 
-		var offset = ( xmin + ymin * canvasWidth - 1 ) * 4 + 3;
+		var offset = ( xmin + ymin * canvasWidth ) * 4 + 3;
 		var linestep = ( canvasWidth - ( xmax - xmin ) ) * 4;
 
 		for ( var y = ymin; y < ymax; y ++ ) {
 
 			for ( var x = xmin; x < xmax; x ++ ) {
 
-				data[ offset += 4 ] = 0;
+				data[ offset ] = 0;
+				offset += 4;
 
 			}
 
