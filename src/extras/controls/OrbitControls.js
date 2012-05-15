@@ -1,15 +1,18 @@
 /**
  * @author qiao / https://github.com/qiao
+ * @author mrdoob / http://mrdoob.com
  */
 
-THREE.OrbitControls = function( object, domElement ) {
-	
+THREE.OrbitControls = function ( object, domElement ) {
+
+	THREE.EventTarget.call( this );
+
 	this.object = object;
-	this.domElement = ( domElement !== undefined ? domElement : document );
+	this.domElement = ( domElement !== undefined ) ? domElement : document;
 
 	// API
 	
-	this.center = new THREE.Vector3( 0, 0, 0 );
+	this.center = new THREE.Vector3();
 	
 	this.userZoom = true;
 	this.userZoomSpeed = 1.0;
@@ -22,7 +25,7 @@ THREE.OrbitControls = function( object, domElement ) {
 
 	// internals
 	
-	var self = this;
+	var scope = this;
 
 	var EPS = 0.000001;
 	var PIXELS_PER_ROUND = 1800;
@@ -30,10 +33,17 @@ THREE.OrbitControls = function( object, domElement ) {
 	var rotateStart = new THREE.Vector2();
 	var rotateEnd = new THREE.Vector2();
 	var rotateDelta = new THREE.Vector2();
-	var rotating = false;
+
 	var phiDelta = 0;
 	var thetaDelta = 0;
 	var scale = 1;
+
+	var lastPosition = new THREE.Vector3();
+
+	// events
+
+	var changeEvent = { type: 'change' };
+
 
 	this.rotateLeft = function ( angle ) {
 
@@ -142,72 +152,84 @@ THREE.OrbitControls = function( object, domElement ) {
 		thetaDelta = 0;
 		phiDelta = 0;
 		scale = 1;
+
+		if ( lastPosition.distanceTo( this.object.position ) > 0 ) {
+			
+			this.dispatchEvent( changeEvent );
+
+			lastPosition.copy( this.object.position );
+
+		}
+
 	};
 
 
 	function getAutoRotationAngle() {
 
-		return 2 * Math.PI / 60 / 60 * self.autoRotateSpeed;
+		return 2 * Math.PI / 60 / 60 * scope.autoRotateSpeed;
 
 	}
 
 	function getZoomScale() {
 	
-		return Math.pow( 0.95, self.userZoomSpeed );
+		return Math.pow( 0.95, scope.userZoomSpeed );
 	
+	}
+
+	function onMouseDown( event ) {
+
+		if ( !scope.userRotate ) return;
+
+		event.preventDefault();
+
+		rotateStart.set( event.clientX, event.clientY );
+
+		document.addEventListener( 'mousemove', onMouseMove, false );
+		document.addEventListener( 'mouseup', onMouseUp, false );
+
 	}
 
 	function onMouseMove( event ) {
 
-		if ( !rotating ) return;
+		event.preventDefault();
 
 		rotateEnd.set( event.clientX, event.clientY );
 		rotateDelta.sub( rotateEnd, rotateStart );
 
-		self.rotateLeft( 2 * Math.PI * rotateDelta.x / PIXELS_PER_ROUND * self.userRotateSpeed );
-		self.rotateUp( 2 * Math.PI * rotateDelta.y / PIXELS_PER_ROUND * self.userRotateSpeed );
+		scope.rotateLeft( 2 * Math.PI * rotateDelta.x / PIXELS_PER_ROUND * scope.userRotateSpeed );
+		scope.rotateUp( 2 * Math.PI * rotateDelta.y / PIXELS_PER_ROUND * scope.userRotateSpeed );
 
 		rotateStart.copy( rotateEnd );
 
 	}
 
-	function onMouseDown( event ) {
-
-		if ( !self.userRotate ) return;
-
-		rotateStart.set( event.clientX, event.clientY );
-		rotating = true;
-
-	}
-
 	function onMouseUp( event ) {
 
-		if ( !self.userRotate ) return;
+		if ( ! scope.userRotate ) return;
 
-		rotating = false;
+		document.removeEventListener( 'mousemove', onMouseMove, false );
+		document.removeEventListener( 'mouseup', onMouseUp, false );
 
 	}
 
 	function onMouseWheel( event ) {
 
-		if ( !self.userZoom ) return;
+		if ( ! scope.userZoom ) return;
 
 		if ( event.wheelDelta > 0 ) {
 		
-			self.zoomOut();
+			scope.zoomOut();
 		
 		} else {
 		
-			self.zoomIn();
+			scope.zoomIn();
 		
 		}
 	
 	}
 
 	this.domElement.addEventListener( 'contextmenu', function ( event ) { event.preventDefault(); }, false );
-	this.domElement.addEventListener( 'mousemove', onMouseMove, false );
 	this.domElement.addEventListener( 'mousedown', onMouseDown, false );
-	this.domElement.addEventListener( 'mouseup', onMouseUp, false );
 	this.domElement.addEventListener( 'mousewheel', onMouseWheel, false );
 
 };

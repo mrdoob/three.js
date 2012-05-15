@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - trackball camera</title>
+		<title>three.js webgl - orbit camera</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -34,8 +34,7 @@
 	<body>
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - trackball camera example</br>
-			MOVE mouse &amp; press LEFT/A: rotate, MIDDLE/S: zoom, RIGHT/D: pan
+			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - orbit camera example
 		</div>
 
 		<script src="../build/Three.js"></script>
@@ -68,20 +67,7 @@
 
 				scene.add( camera );
 
-				controls = new THREE.TrackballControls( camera );
-
-				controls.rotateSpeed = 1.0;
-				controls.zoomSpeed = 1.2;
-				controls.panSpeed = 0.8;
-
-				controls.noZoom = false;
-				controls.noPan = false;
-
-				controls.staticMoving = true;
-				controls.dynamicDampingFactor = 0.3;
-
-				controls.keys = [ 65, 83, 68 ];
-
+				controls = new THREE.OrbitControls( camera );
 				controls.addEventListener( 'change', render );
 
 				// world
