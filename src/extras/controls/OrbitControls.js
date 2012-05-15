@@ -36,15 +36,12 @@ THREE.OrbitControls = function( object, domElement ) {
 	this.update = function () {
 
 		var position = this.object.position;
+		var offset = position.clone().subSelf( this.center )
 
 		// angle from z-axis around y-axis
-		var theta = Math.atan2( position.x, position.z ); 
-
+		var theta = Math.atan2( offset.x, offset.z ); 
 		// angle from y-axis
-		var phi = Math.atan2( 
-			Math.sqrt( position.x * position.x + position.z * position.z ),
-			position.y
-		);
+		var phi = Math.atan2( Math.sqrt( offset.x * offset.x + offset.z * offset.z ), offset.y );
 		
 		if ( this.autoRotate ) {
 
@@ -65,8 +62,7 @@ THREE.OrbitControls = function( object, domElement ) {
 
 		}
 
-		var radius = position.clone().subSelf( this.center ).length();
-		var offset = new THREE.Vector3();
+		var radius = offset.length();
 		offset.x = radius * Math.sin( phi ) * Math.sin( theta );
 		offset.y = radius * Math.cos( phi );
 		offset.z = radius * Math.sin( phi ) * Math.cos( theta );
