@@ -224,7 +224,7 @@ THREE.Ray = function ( origin, direction, near, far ) {
 
 		return intersects;
 
-	}
+	};
 
 	this.intersectObjects = function ( objects ) {
 
