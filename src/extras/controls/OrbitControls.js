@@ -45,7 +45,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	var lastPosition = new THREE.Vector3();
 
-	var STATE = { NONE : -1, ROTATE : 0, ZOOM : 1, PAN : 2 };
+	var STATE = { NONE : -1, ROTATE : 0, ZOOM : 1 };
 	var state = STATE.NONE;
 
 	// events
@@ -194,7 +194,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		event.preventDefault();
 
-		if ( event.button === 0 ) {
+		if ( event.button === 0 || event.button === 2 ) {
 
 			state = STATE.ROTATE;
 
@@ -255,7 +255,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 		document.removeEventListener( 'mousemove', onMouseMove, false );
 		document.removeEventListener( 'mouseup', onMouseUp, false );
 
-		state = 0;
+		state = STATE.NONE;
 
 	}
 
