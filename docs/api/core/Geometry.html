@@ -5,19 +5,13 @@
 
 <h2>Example</h2>
 
-<code>// geometry with random points
+<code>var geometry = new THREE.Geometry()
 
-var geometry = new THREE.Geometry()
+geometry.vertices.push( new THREE.Vector3( -10,  10, 0 ) );
+geometry.vertices.push( new THREE.Vector3( -10, -10, 0 ) );
+geometry.vertices.push( new THREE.Vector3(  10, -10, 0 ) );
 
-for ( var i = 0; i < 10000; i ++ ) {
-
-	var vertex = new THREE.Vector3();
-	vertex.x = Math.random() * 1000 - 500;
-	vertex.y = Math.random() * 1000 - 500;
-	vertex.z = Math.random() * 1000 - 500;
-	geometry.vertices.push( vertex );
-
-}
+geometry.faces.push( new THREE.Face3( 0, 1, 2 ) );
 
 geometry.computeBoundingSphere();
 </code>
