@@ -160,9 +160,14 @@ UI.Panel = function ( position ) {
 UI.Panel.prototype = new UI.Element();
 UI.Panel.prototype.constructor = UI.Panel;
 
-UI.Panel.prototype.add = function ( node ) {
+UI.Panel.prototype.add = function () {
 
-	this.dom.appendChild( node.dom );
+	for ( var i = 0; i < arguments.length; i ++ ) {
+
+		this.dom.appendChild( arguments[ i ].dom );
+
+	}
+
 	return this;
 
 };

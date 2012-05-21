@@ -29,6 +29,10 @@ var Viewport = function ( signals ) {
 	var grid = new THREE.Line( geometry, material, THREE.LinePieces );
 	sceneHelpers.add( grid );
 
+	var selectionBox = new THREE.Mesh( new THREE.CubeGeometry( 1, 1, 1 ), new THREE.MeshBasicMaterial( { color: 0xffff00, wireframe: true } ) );
+	selectionBox.visible = false;
+	sceneHelpers.add( selectionBox );
+
 	//
 
 	var scene = new THREE.Scene();
@@ -48,11 +52,87 @@ var Viewport = function ( signals ) {
 	controls.dynamicDampingFactor = 0.3;
 	controls.addEventListener( 'change', render );
 
+	// object picking
+
+	var projector = new THREE.Projector();
+
+	container.dom.addEventListener( 'mousedown', function ( event ) {
+
+		event.preventDefault();
+
+		var vector = new THREE.Vector3( ( event.clientX / container.dom.offsetWidth ) * 2 - 1, - ( event.clientY / container.dom.offsetHeght ) * 2 + 1, 0.5 );
+		projector.unprojectVector( vector, camera );
+
+		var ray = new THREE.Ray( camera.position, vector.subSelf( camera.position ).normalize() );
+		var intersects = ray.intersectObjects( scene.children );
+
+		if ( intersects.length ) {
+
+			signals.objectSelected.dispatch( intersects[ 0 ].object );
+
+			// controls.enabled = false;
+
+		} else {
+
+			signals.objectSelected.dispatch( null );
+
+		}
+
+	}, false );
+
+	// events
+
+	signals.objectAdded.add( function ( object ) {
+
+		scene.add( object );
+		render();
+
+	} );
+
+	signals.objectSelected.add( function ( object ) {
+
+		if ( object === null ) {
+
+			selectionBox.visible = false;
+
+		} else {
+
+			var geometry = object.geometry;
+
+			if ( geometry.boundingBox === null ) {
+
+				geometry.computeBoundingBox();
+
+			}
+
+			selectionBox.scale.x = geometry.boundingBox.max.x - geometry.boundingBox.min.x;
+			selectionBox.scale.y = geometry.boundingBox.max.y - geometry.boundingBox.min.y;
+			selectionBox.scale.z = geometry.boundingBox.max.z - geometry.boundingBox.min.z;
+
+			selectionBox.visible = true;
+
+		}
+
+		render();
+
+	} );
+
+	signals.windowResize.add( function () {
+
+		camera.aspect = container.dom.offsetWidth / container.dom.offsetHeight;
+		camera.updateProjectionMatrix();
+
+		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
+
+		render();
+
+	} );
+
+	//
+
 	var renderer = new THREE.WebGLRenderer( { antialias: true } );
 	renderer.autoClear = false;
 	container.dom.appendChild( renderer.domElement );
-
-	signals.windowResize.add( update );
 
 	animate();
 
@@ -70,17 +150,6 @@ var Viewport = function ( signals ) {
 		renderer.clear();
 		renderer.render( sceneHelpers, camera );
 		renderer.render( scene, camera );
-
-	}
-
-	function update() {
-
-		camera.aspect = container.dom.offsetWidth / container.dom.offsetHeight;
-		camera.updateProjectionMatrix();
-
-		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
-
-		render();
 
 	}
 

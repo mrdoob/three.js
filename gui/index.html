@@ -29,32 +29,44 @@
 
 		<script>
 
-			var events = {
+			var SIGNALS = signals;
 
-				windowResize: new signals.Signal()
+			var signals = {
+
+				objectAdded: new SIGNALS.Signal(),
+				objectSelected: new SIGNALS.Signal(),
+				windowResize: new SIGNALS.Signal()
 
 			};
 
 			//
 
-			var viewport = new Viewport( events );
+			var viewport = new Viewport( signals );
 			viewport.setWidth( '-webkit-calc(100% - 300px)' );
 			viewport.setWidth( '-moz-calc(100% - 300px)' );
 			viewport.setWidth( 'calc(100% - 300px)' );
 			viewport.setHeight( '100%' );
 			document.body.appendChild( viewport.dom );
 
-			var panel = new Panel( events );
+			var panel = new Panel( signals );
 			panel.setX( '-webkit-calc(100% - 300px)' );
 			panel.setX( '-moz-calc(100% - 300px)' );
 			panel.setX( 'calc(100% - 300px)' );
 			document.body.appendChild( panel.dom );
 
-			//			
+			//
+
+			var geometry = new THREE.SphereGeometry( 75, 25, 15 );
+			var material = new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } );
+			var mesh = new THREE.Mesh( geometry, material );
+
+			signals.objectAdded.dispatch( mesh );
+
+			//
 
 			var onWindowResize = function ( event ) {
 
-				events.windowResize.dispatch();
+				signals.windowResize.dispatch();
 
 			};
 
