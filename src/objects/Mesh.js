@@ -15,7 +15,7 @@ THREE.Mesh = function ( geometry, material ) {
 
 		// calc bound radius
 
-		if( ! this.geometry.boundingSphere ) {
+		if ( ! this.geometry.boundingSphere ) {
 
 			this.geometry.computeBoundingSphere();
 
