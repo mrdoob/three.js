@@ -130,7 +130,7 @@ var Viewport = function ( signals ) {
 
 	//
 
-	var renderer = new THREE.WebGLRenderer( { antialias: true } );
+	var renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false, clearColor: 0xaaaaaa, clearAlpha: 1 } );
 	renderer.autoClear = false;
 	container.dom.appendChild( renderer.domElement );
 
