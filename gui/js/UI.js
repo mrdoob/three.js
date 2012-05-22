@@ -134,6 +134,8 @@ UI.Element.prototype = {
 
 	},
 
+	//
+
 	setColor: function () {
 
 		this.setStyle( 'color', arguments );
@@ -144,6 +146,13 @@ UI.Element.prototype = {
 	setBackgroundColor: function () {
 
 		this.setStyle( 'backgroundColor', arguments );
+		return this;
+
+	},
+
+	setDisplay: function () {
+
+		this.setStyle( 'display', arguments );
 		return this;
 
 	}

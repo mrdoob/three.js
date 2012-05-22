@@ -3,6 +3,7 @@ var Properties = function ( signals ) {
 	var selected = null;
 
 	var container = new UI.Panel();
+	container.setDisplay( 'none' );
 	container.setPadding( '8px' );
 	container.setBorderTop( '1px solid #ccc' );
 
@@ -85,6 +86,8 @@ var Properties = function ( signals ) {
 
 		if ( object ) {
 
+			container.setDisplay( 'block' );
+
 			positionX.setValue( object.position.x );
 			positionY.setValue( object.position.y );
 			positionZ.setValue( object.position.z );
@@ -96,6 +99,10 @@ var Properties = function ( signals ) {
 			scaleX.setValue( object.scale.x );
 			scaleY.setValue( object.scale.y );
 			scaleZ.setValue( object.scale.z );
+
+		} else {
+
+			container.setDisplay( 'none' );
 
 		}
 
