@@ -25,7 +25,8 @@
 
 		<script type="text/javascript" src="js/UI.js"></script>
 		<script type="text/javascript" src="js/ui/Viewport.js"></script>
-		<script type="text/javascript" src="js/ui/Panel.js"></script>
+		<script type="text/javascript" src="js/ui/SideBar.js"></script>
+		<script type="text/javascript" src="js/ui/SideBar.Properties.js"></script>
 		<script type="text/javascript" src="js/ui/MenuBar.js"></script>
 
 		<script>
@@ -49,11 +50,11 @@
 			viewport.setHeight( '-webkit-calc(100% - 32px)', '-moz-calc(100% - 32px)', 'calc(100% - 32px)' );
 			document.body.appendChild( viewport.dom );
 
-			var panel = new Panel( signals );
-			panel.setLeft( '-webkit-calc(100% - 300px)', '-moz-calc(100% - 300px)', 'calc(100% - 300px)' );
-			panel.setTop( '32px' );
-			panel.setHeight( '-webkit-calc(100% - 32px)', '-moz-calc(100% - 32px)', 'calc(100% - 32px)' );
-			document.body.appendChild( panel.dom );
+			var sidebar = new SideBar( signals );
+			sidebar.setLeft( '-webkit-calc(100% - 300px)', '-moz-calc(100% - 300px)', 'calc(100% - 300px)' );
+			sidebar.setTop( '32px' );
+			sidebar.setHeight( '-webkit-calc(100% - 32px)', '-moz-calc(100% - 32px)', 'calc(100% - 32px)' );
+			document.body.appendChild( sidebar.dom );
 
 			var menubar = new MenuBar( signals );
 			menubar.setWidth( '100%' );

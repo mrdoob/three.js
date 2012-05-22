@@ -1,80 +1,58 @@
-var Panel = function ( signals ) {
-
-	var container = new UI.Panel( 'absolute' );
-	container.setWidth( '300px' ).setHeight( '100%' );
-	container.setBackgroundColor( '#eee' );
+var Properties = function ( signals ) {
 
 	var selected = null;
 
-	// Properties
+	var container = new UI.Panel();
+	container.setPadding( '8px' );
+	container.setBorderTop( '1px solid #ccc' );
 
-	var properties = new UI.Panel();
-	properties.setPadding( '8px' );
-	properties.setBorderTop( '1px solid #ccc' );
+	container.add( new UI.Text().setText( 'PROPERTIES' ).setColor( '#666' ) );
 
-	properties.add( new UI.Text().setText( 'PROPERTIES' ).setColor( '#666' ) );
+	container.add( new UI.Break() );
+	container.add( new UI.Break() );
 
-	properties.add( new UI.Break() );
-	properties.add( new UI.Break() );
-
-	properties.add( new UI.Text().setText( 'position' ).setColor( '#666' ) );
+	container.add( new UI.Text().setText( 'position' ).setColor( '#666' ) );
 
 	var positionX = new UI.FloatNumber( 'absolute' ).setLeft( '90px' ).onChanged( update );
 	var positionY = new UI.FloatNumber( 'absolute' ).setLeft( '160px' ).onChanged( update );
 	var positionZ = new UI.FloatNumber( 'absolute' ).setLeft( '230px' ).onChanged( update );
 
-	properties.add( positionX, positionY, positionZ );
+	container.add( positionX, positionY, positionZ );
 
-	properties.add( new UI.HorizontalRule() );
+	container.add( new UI.HorizontalRule() );
 
-	properties.add( new UI.Text().setText( 'rotation' ).setColor( '#666' ) );
+	container.add( new UI.Text().setText( 'rotation' ).setColor( '#666' ) );
 
 	var rotationX = new UI.FloatNumber( 'absolute' ).setLeft( '90px' ).onChanged( update );
 	var rotationY = new UI.FloatNumber( 'absolute' ).setLeft( '160px' ).onChanged( update );
 	var rotationZ = new UI.FloatNumber( 'absolute' ).setLeft( '230px' ).onChanged( update );
 
-	properties.add( rotationX, rotationY, rotationZ );
+	container.add( rotationX, rotationY, rotationZ );
 
-	properties.add( new UI.HorizontalRule() );
+	container.add( new UI.HorizontalRule() );
 
-	properties.add( new UI.Text().setText( 'scale' ).setColor( '#666' ) );
+	container.add( new UI.Text().setText( 'scale' ).setColor( '#666' ) );
 
 	var scaleX = new UI.FloatNumber( 'absolute' ).setValue( 1 ).setLeft( '90px' ).onChanged( update );
 	var scaleY = new UI.FloatNumber( 'absolute' ).setValue( 1 ).setLeft( '160px' ).onChanged( update );
 	var scaleZ = new UI.FloatNumber( 'absolute' ).setValue( 1 ).setLeft( '230px' ).onChanged( update );
 
-	properties.add( scaleX, scaleY, scaleZ );
+	container.add( scaleX, scaleY, scaleZ );
 
-	properties.add( new UI.Break() );
-	properties.add( new UI.Break() );
-
-	container.add( properties );
+	container.add( new UI.Break(), new UI.Break(), new UI.Break() );
 
 
 	// Geometry
 
-	var properties = new UI.Panel();
-	properties.setMargin( '8px' );
+	container.add( new UI.Text().setText( 'GEOMETRY' ).setColor( '#666' ) );
 
-	properties.add( new UI.Text().setText( 'GEOMETRY' ).setColor( '#666' ) );
-
-	properties.add( new UI.Break() );
-	properties.add( new UI.Break() );
-
-	container.add( properties );
-
+	container.add( new UI.Break(), new UI.Break(), new UI.Break() );
 
 	// Material
 
-	var properties = new UI.Panel();
-	properties.setMargin( '8px' );
+	container.add( new UI.Text().setText( 'MATERIAL' ).setColor( '#666' ) );
 
-	properties.add( new UI.Text().setText( 'MATERIAL' ).setColor( '#666' ) );
-
-	properties.add( new UI.Break() );
-	properties.add( new UI.Break() );
-
-	container.add( properties );
+	container.add( new UI.Break(), new UI.Break(), new UI.Break() );
 
 
 	// Events
