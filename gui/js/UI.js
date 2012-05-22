@@ -4,138 +4,146 @@ UI.Element = function () {};
 
 UI.Element.prototype = {
 
-	setX: function ( value ) {
+	setStyle: function ( style, array ) {
 
-		this.dom.style.left = value;
+		for ( var i = 0; i < array.length; i ++ ) {
 
+			this.dom.style[ style ] = array[ i ];
+
+		}
+
+	},
+
+	setLeft: function () {
+
+		this.setStyle( 'left', arguments );
 		return this;
 
 	},
 
-	setY: function ( value ) {
+	setTop: function () {
 
-		this.dom.style.top = value;
-
+		this.setStyle( 'top', arguments );
 		return this;		
 
 	},
 
-	setWidth: function ( value ) {
+	setWidth: function () {
 
-		this.dom.style.width = value;
+		this.setStyle( 'width', arguments );
 		return this;
 
 	},
 
-	setHeight: function ( value ) {
+	setHeight: function () {
 
-		this.dom.style.height = value;
+		this.setStyle( 'height', arguments );
 		return this;
 
 	},
 
 	// border
 
-	setBorder: function ( value ) {
+	setBorder: function () {
 
-		this.dom.style.border = value;
+		this.setStyle( 'border', arguments );
 		return this;
 
 	},
 
-	setBorderTop: function ( value ) {
+	setBorderTop: function () {
 
-		this.dom.style.borderTop = value;
+		this.setStyle( 'borderTop', arguments );
 		return this;
 
 	},
 
-	setBorderBottom: function ( value ) {
+	setBorderBottom: function () {
 
-		this.dom.style.borderBottom = value;
+		this.setStyle( 'borderBottom', arguments );
 		return this;
 
 	},
 
-	setBorderLeft: function ( value ) {
+	setBorderLeft: function () {
 
-		this.dom.style.borderLeft = value;
+		this.setStyle( 'borderLeft', arguments );
 		return this;
 
 	},
 
-	setBorderRight: function ( value ) {
+	setBorderRight: function () {
 
-		this.dom.style.borderRight = value;
+		this.setStyle( 'borderRight', arguments );
 		return this;
 
 	},
 
 	// margin
 
-	setMargin: function ( value ) {
+	setMargin: function () {
 
-		this.dom.style.margin = value;
+		this.setStyle( 'margin', arguments );
 		return this;
 
 	},
 
-	setMarginTop: function ( value ) {
+	setMarginTop: function () {
 
-		this.dom.style.marginTop = value;
+		this.setStyle( 'marginTop', arguments );
 		return this;
 
 	},
 
-	setMarginBottom: function ( value ) {
+	setMarginBottom: function () {
 
-		this.dom.style.marginBottom = value;
+		this.setStyle( 'marginBottom', arguments );
 		return this;
 
 	},
 
-	setMarginLeft: function ( value ) {
+	setMarginLeft: function () {
 
-		this.dom.style.marginLeft = value;
+		this.setStyle( 'marginLeft', arguments );
 		return this;
 
 	},
 
-	setMarginRight: function ( value ) {
+	setMarginRight: function () {
 
-		this.dom.style.marginRight = value;
+		this.setStyle( 'marginRight', arguments );
 		return this;
 
 	},
 
 	// padding
 
-	setPadding: function ( value ) {
+	setPadding: function () {
 
-		this.dom.style.padding = value;
+		this.setStyle( 'padding', arguments );
 		return this;
 
 	},
 
 	//
 
-	setFontWeight: function ( value ) {
+	setFontWeight: function () {
 
-		this.dom.style.fontWeight = value;
+		this.setStyle( 'fontWeight', arguments );
 		return this;
 
 	},
 
-	setColor: function ( value ) {
+	setColor: function () {
 
-		this.dom.style.color = value;
+		this.setStyle( 'color', arguments );
 		return this;
 
 	},
 
-	setBackgroundColor: function ( value ) {
+	setBackgroundColor: function () {
 
-		this.dom.style.backgroundColor = value;
+		this.setStyle( 'backgroundColor', arguments );
 		return this;
 
 	}

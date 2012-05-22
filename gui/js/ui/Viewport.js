@@ -61,7 +61,11 @@ var Viewport = function ( signals ) {
 
 		event.preventDefault();
 
-		var vector = new THREE.Vector3( ( event.clientX / container.dom.offsetWidth ) * 2 - 1, - ( event.clientY / container.dom.offsetHeght ) * 2 + 1, 0.5 );
+		var vector = new THREE.Vector3(
+			( ( event.clientX - container.dom.offsetLeft ) / container.dom.offsetWidth ) * 2 - 1,
+			- ( ( event.clientY - container.dom.offsetTop ) / container.dom.offsetHeight ) * 2 + 1,
+			0.5
+		);
 		projector.unprojectVector( vector, camera );
 
 		var ray = new THREE.Ray( camera.position, vector.subSelf( camera.position ).normalize() );
