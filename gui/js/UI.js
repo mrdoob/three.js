@@ -215,7 +215,7 @@ UI.Text.prototype.constructor = UI.Text;
 
 UI.Text.prototype.setText = function ( value ) {
 
-	this.dom.innerText = value;
+	this.dom.textContent = value;
 	return this;
 
 };
@@ -229,7 +229,7 @@ UI.IntNumber = function ( position ) {
 
 	this.dom = document.createElement( 'span' );
 	this.dom.style.position = position || 'relative';
-	this.dom.innerText = '0.00';
+	this.dom.textContent = '0.00';
 	this.dom.style.marginTop = '2px';
 	this.dom.style.color = '#0080f0';
 	this.dom.style.fontSize = '12px';
@@ -244,7 +244,7 @@ UI.IntNumber = function ( position ) {
 
 		event.preventDefault();
 
-		onMouseDownValue = parseInt( scope.dom.innerText );
+		onMouseDownValue = parseInt( scope.dom.textContent );
 		onMouseDownScreenX = event.screenX;
 		onMouseDownScreenY = event.screenY;
 
@@ -258,7 +258,7 @@ UI.IntNumber = function ( position ) {
 		var dx = event.screenX - onMouseDownScreenX;
 		var dy = event.screenY - onMouseDownScreenY;
 
-		scope.dom.innerText = ( onMouseDownValue + ( dx - dy ) / ( event.shiftKey ? 10 : 100 ) ).toFixed( 0 );
+		scope.dom.textContent = ( onMouseDownValue + ( dx - dy ) / ( event.shiftKey ? 10 : 100 ) ).toFixed( 0 );
 		scope.onChangedCallback();
 
 	}
@@ -281,13 +281,13 @@ UI.IntNumber.prototype.constructor = UI.IntNumber;
 
 UI.IntNumber.prototype.getValue = function () {
 
-	return parseInt( this.dom.innerText );
+	return parseInt( this.dom.textContent );
 
 };
 
 UI.IntNumber.prototype.setValue = function ( value ) {
 
-	this.dom.innerText = value.toFixed( 0 );
+	this.dom.textContent = value.toFixed( 0 );
 	return this;
 
 };
@@ -309,7 +309,7 @@ UI.FloatNumber = function ( position ) {
 
 	this.dom = document.createElement( 'span' );
 	this.dom.style.position = position || 'relative';
-	this.dom.innerText = '0.00';
+	this.dom.textContent = '0.00';
 	this.dom.style.marginTop = '2px';
 	this.dom.style.color = '#0080f0';
 	this.dom.style.fontSize = '12px';
@@ -324,7 +324,7 @@ UI.FloatNumber = function ( position ) {
 
 		event.preventDefault();
 
-		onMouseDownValue = parseFloat( scope.dom.innerText );
+		onMouseDownValue = parseFloat( scope.dom.textContent );
 		onMouseDownScreenX = event.screenX;
 		onMouseDownScreenY = event.screenY;
 
@@ -338,7 +338,7 @@ UI.FloatNumber = function ( position ) {
 		var dx = event.screenX - onMouseDownScreenX;
 		var dy = event.screenY - onMouseDownScreenY;
 
-		scope.dom.innerText = ( onMouseDownValue + ( dx - dy ) / ( event.shiftKey ? 10 : 100 ) ).toFixed( 2 );
+		scope.dom.textContent = ( onMouseDownValue + ( dx - dy ) / ( event.shiftKey ? 10 : 100 ) ).toFixed( 2 );
 		scope.onChangedCallback();
 
 	}
@@ -361,13 +361,13 @@ UI.FloatNumber.prototype.constructor = UI.FloatNumber;
 
 UI.FloatNumber.prototype.getValue = function () {
 
-	return parseFloat( this.dom.innerText );
+	return parseFloat( this.dom.textContent );
 
 };
 
 UI.FloatNumber.prototype.setValue = function ( value ) {
 
-	this.dom.innerText = value.toFixed( 2 );
+	this.dom.textContent = value.toFixed( 2 );
 	return this;
 
 };
@@ -430,7 +430,7 @@ UI.Button.prototype.constructor = UI.Button;
 
 UI.Button.prototype.setText = function ( value ) {
 
-	this.dom.innerText = value;
+	this.dom.textContent = value;
 	return this;
 
 };
