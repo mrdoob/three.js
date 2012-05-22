@@ -211,6 +211,8 @@ UI.IntNumber = function ( position ) {
 	this.dom.style.fontSize = '12px';
 	this.dom.style.textDecoration = 'underline';
 
+	this.onChangedCallback = null;
+
 	var scope = this;
 	var onMouseDownValue, onMouseDownScreenX, onMouseDownScreenY;
 
@@ -218,7 +220,7 @@ UI.IntNumber = function ( position ) {
 
 		event.preventDefault();
 
-		onMouseDownValue = parseFloat( scope.dom.innerText );
+		onMouseDownValue = parseInt( scope.dom.innerText );
 		onMouseDownScreenX = event.screenX;
 		onMouseDownScreenY = event.screenY;
 
@@ -233,6 +235,7 @@ UI.IntNumber = function ( position ) {
 		var dy = event.screenY - onMouseDownScreenY;
 
 		scope.dom.innerText = ( onMouseDownValue - ( dx - dy ) ).toFixed( 0 ); 
+		scope.onChangedCallback();
 
 	}
 
@@ -252,12 +255,26 @@ UI.IntNumber = function ( position ) {
 UI.IntNumber.prototype = new UI.Element();
 UI.IntNumber.prototype.constructor = UI.IntNumber;
 
-UI.IntNumber.prototype.setNumber = function ( value ) {
+UI.IntNumber.prototype.getValue = function () {
+
+	return parseInt( this.dom.innerText );
+
+};
+
+UI.IntNumber.prototype.setValue = function ( value ) {
 
 	this.dom.innerText = value.toFixed( 0 );
 	return this;
 
 };
+
+UI.IntNumber.prototype.onChanged = function ( callback ) {
+
+	this.onChangedCallback = callback;
+	return this;
+
+};
+
 
 
 // FloatNumber
@@ -273,6 +290,8 @@ UI.FloatNumber = function ( position ) {
 	this.dom.style.color = '#0080f0';
 	this.dom.style.fontSize = '12px';
 	this.dom.style.textDecoration = 'underline';
+
+	this.onChangedCallback = null;
 
 	var scope = this;
 	var onMouseDownValue, onMouseDownScreenX, onMouseDownScreenY;
@@ -296,6 +315,7 @@ UI.FloatNumber = function ( position ) {
 		var dy = event.screenY - onMouseDownScreenY;
 
 		scope.dom.innerText = ( onMouseDownValue + ( dx - dy ) / 100 ).toFixed( 2 ); 
+		scope.onChangedCallback();
 
 	}
 
@@ -315,9 +335,22 @@ UI.FloatNumber = function ( position ) {
 UI.FloatNumber.prototype = new UI.Element();
 UI.FloatNumber.prototype.constructor = UI.FloatNumber;
 
-UI.FloatNumber.prototype.setNumber = function ( value ) {
+UI.FloatNumber.prototype.getValue = function () {
+
+	return parseFloat( this.dom.innerText );
+
+};
+
+UI.FloatNumber.prototype.setValue = function ( value ) {
 
 	this.dom.innerText = value.toFixed( 2 );
+	return this;
+
+};
+
+UI.FloatNumber.prototype.onChanged = function ( callback ) {
+
+	this.onChangedCallback = callback;
 	return this;
 
 };

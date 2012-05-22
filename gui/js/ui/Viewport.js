@@ -89,6 +89,16 @@ var Viewport = function ( signals ) {
 
 	} );
 
+	signals.objectChanged.add( function ( object ) {
+
+		selectionBox.position.copy( object.position );
+		selectionBox.rotation.copy( object.rotation );
+		// selectionBox.scale.copy( object.scale );
+
+		render();
+
+	} );
+
 	signals.objectSelected.add( function ( object ) {
 
 		if ( object === null ) {
