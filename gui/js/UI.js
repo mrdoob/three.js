@@ -127,6 +127,13 @@ UI.Element.prototype = {
 
 	//
 
+	setFontSize: function () {
+
+		this.setStyle( 'fontSize', arguments );
+		return this;
+
+	},
+
 	setFontWeight: function () {
 
 		this.setStyle( 'fontWeight', arguments );

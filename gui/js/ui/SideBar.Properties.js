@@ -9,8 +9,7 @@ var Properties = function ( signals ) {
 
 	container.add( new UI.Text().setText( 'PROPERTIES' ).setColor( '#666' ) );
 
-	container.add( new UI.Break() );
-	container.add( new UI.Break() );
+	container.add( new UI.Break(), new UI.Break() );
 
 	container.add( new UI.Text().setText( 'position' ).setColor( '#666' ) );
 
@@ -46,6 +45,35 @@ var Properties = function ( signals ) {
 	// Geometry
 
 	container.add( new UI.Text().setText( 'GEOMETRY' ).setColor( '#666' ) );
+
+	container.add( new UI.Break(), new UI.Break() );
+
+	container.add( new UI.Text().setText( 'class' ).setColor( '#666' ) );
+
+	var geometryClass = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' ).setFontSize( '12px' );
+	container.add( geometryClass );
+
+	container.add( new UI.HorizontalRule() );
+
+	container.add( new UI.Text().setText( 'vertices' ).setColor( '#666' ) );
+
+	var verticesCount = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' ).setFontSize( '12px' );
+	container.add( verticesCount );
+
+	container.add( new UI.HorizontalRule() );
+
+	container.add( new UI.Text().setText( 'faces' ).setColor( '#666' ) );
+
+	var facesCount = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' ).setFontSize( '12px' );
+	container.add( facesCount );
+
+	container.add( new UI.HorizontalRule() );
+
+	container.add( new UI.Text().setText( 'colors' ).setColor( '#666' ) );
+
+	var colorsCount = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' ).setFontSize( '12px' );
+	container.add( colorsCount );
+
 
 	container.add( new UI.Break(), new UI.Break(), new UI.Break() );
 
@@ -100,6 +128,11 @@ var Properties = function ( signals ) {
 			scaleY.setValue( object.scale.y );
 			scaleZ.setValue( object.scale.z );
 
+			geometryClass.setText( getGeometryInstanceName( object.geometry ) );
+			verticesCount.setText( object.geometry.vertices.length );
+			facesCount.setText( object.geometry.faces.length );
+			colorsCount.setText( object.geometry.colors.length );
+
 		} else {
 
 			container.setDisplay( 'none' );
@@ -107,6 +140,31 @@ var Properties = function ( signals ) {
 		}
 
 	} );
+
+	function getGeometryInstanceName( object ) {
+
+		// TODO: Is there a way of doing this automatically?
+
+		if ( object instanceof THREE.ConvexGeometry ) return "ConvexGeometry";
+		if ( object instanceof THREE.CubeGeometry ) return "CubeGeometry";
+		if ( object instanceof THREE.CylinderGeometry ) return "CylinderGeometry";
+		if ( object instanceof THREE.ExtrudeGeometry ) return "ExtrudeGeometry";
+		if ( object instanceof THREE.IcosahedronGeometry ) return "IcosahedronGeometry";
+		if ( object instanceof THREE.LatheGeometry ) return "LatheGeometry";
+		if ( object instanceof THREE.OctahedronGeometry ) return "OctahedronGeometry";
+		if ( object instanceof THREE.ParametricGeometry ) return "ParametricGeometry";
+		if ( object instanceof THREE.PlaneGeometry ) return "PlaneGeometry";
+		if ( object instanceof THREE.PolyhedronGeometry ) return "PolyhedronGeometry";
+		if ( object instanceof THREE.SphereGeometry ) return "SphereGeometry";
+		if ( object instanceof THREE.TetrahedronGeometry ) return "TetrahedronGeometry";
+		if ( object instanceof THREE.TextGeometry ) return "TextGeometry";
+		if ( object instanceof THREE.TorusGeometry ) return "TorusGeometry";
+		if ( object instanceof THREE.TorusKnotGeometry ) return "TorusKnotGeometry";
+		if ( object instanceof THREE.TubeGeometry ) return "TubeGeometry";
+
+		if ( object instanceof THREE.Geometry ) return "Geometry";
+
+	}
 
 	return container;
 
