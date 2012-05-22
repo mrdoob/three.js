@@ -30,6 +30,7 @@ var Viewport = function ( signals ) {
 	sceneHelpers.add( grid );
 
 	var selectionBox = new THREE.Mesh( new THREE.CubeGeometry( 1, 1, 1 ), new THREE.MeshBasicMaterial( { color: 0xffff00, wireframe: true } ) );
+	selectionBox.geometry.dynamic = true;
 	selectionBox.visible = false;
 	sceneHelpers.add( selectionBox );
 
@@ -93,7 +94,7 @@ var Viewport = function ( signals ) {
 
 		selectionBox.position.copy( object.position );
 		selectionBox.rotation.copy( object.rotation );
-		// selectionBox.scale.copy( object.scale );
+		selectionBox.scale.copy( object.scale );
 
 		render();
 
@@ -115,9 +116,43 @@ var Viewport = function ( signals ) {
 
 			}
 
-			selectionBox.scale.x = geometry.boundingBox.max.x - geometry.boundingBox.min.x;
-			selectionBox.scale.y = geometry.boundingBox.max.y - geometry.boundingBox.min.y;
-			selectionBox.scale.z = geometry.boundingBox.max.z - geometry.boundingBox.min.z;
+			selectionBox.geometry.vertices[ 0 ].x = geometry.boundingBox.max.x;
+			selectionBox.geometry.vertices[ 0 ].y = geometry.boundingBox.max.y;
+			selectionBox.geometry.vertices[ 0 ].z = geometry.boundingBox.max.z;
+
+			selectionBox.geometry.vertices[ 1 ].x = geometry.boundingBox.max.x;
+			selectionBox.geometry.vertices[ 1 ].y = geometry.boundingBox.max.y;
+			selectionBox.geometry.vertices[ 1 ].z = geometry.boundingBox.min.z;
+
+			selectionBox.geometry.vertices[ 2 ].x = geometry.boundingBox.max.x;
+			selectionBox.geometry.vertices[ 2 ].y = geometry.boundingBox.min.y;
+			selectionBox.geometry.vertices[ 2 ].z = geometry.boundingBox.max.z;
+
+			selectionBox.geometry.vertices[ 3 ].x = geometry.boundingBox.max.x;
+			selectionBox.geometry.vertices[ 3 ].y = geometry.boundingBox.min.y;
+			selectionBox.geometry.vertices[ 3 ].z = geometry.boundingBox.min.z;
+
+			selectionBox.geometry.vertices[ 4 ].x = geometry.boundingBox.min.x;
+			selectionBox.geometry.vertices[ 4 ].y = geometry.boundingBox.max.y;
+			selectionBox.geometry.vertices[ 4 ].z = geometry.boundingBox.min.z;
+
+			selectionBox.geometry.vertices[ 5 ].x = geometry.boundingBox.min.x;
+			selectionBox.geometry.vertices[ 5 ].y = geometry.boundingBox.max.y;
+			selectionBox.geometry.vertices[ 5 ].z = geometry.boundingBox.max.z;
+
+			selectionBox.geometry.vertices[ 6 ].x = geometry.boundingBox.min.x;
+			selectionBox.geometry.vertices[ 6 ].y = geometry.boundingBox.min.y;
+			selectionBox.geometry.vertices[ 6 ].z = geometry.boundingBox.min.z;
+
+			selectionBox.geometry.vertices[ 7 ].x = geometry.boundingBox.min.x;
+			selectionBox.geometry.vertices[ 7 ].y = geometry.boundingBox.min.y;
+			selectionBox.geometry.vertices[ 7 ].z = geometry.boundingBox.max.z;
+
+			selectionBox.geometry.verticesNeedUpdate = true;
+
+			selectionBox.position.copy( object.position );
+			selectionBox.rotation.copy( object.rotation );
+			selectionBox.scale.copy( object.scale );
 
 			selectionBox.visible = true;
 
