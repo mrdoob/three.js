@@ -234,7 +234,7 @@ UI.IntNumber = function ( position ) {
 		var dx = event.screenX - onMouseDownScreenX;
 		var dy = event.screenY - onMouseDownScreenY;
 
-		scope.dom.innerText = ( onMouseDownValue - ( dx - dy ) ).toFixed( 0 ); 
+		scope.dom.innerText = ( onMouseDownValue + ( dx - dy ) / ( event.shiftKey ? 10 : 100 ) ).toFixed( 0 );
 		scope.onChangedCallback();
 
 	}
@@ -314,7 +314,7 @@ UI.FloatNumber = function ( position ) {
 		var dx = event.screenX - onMouseDownScreenX;
 		var dy = event.screenY - onMouseDownScreenY;
 
-		scope.dom.innerText = ( onMouseDownValue + ( dx - dy ) / 100 ).toFixed( 2 ); 
+		scope.dom.innerText = ( onMouseDownValue + ( dx - dy ) / ( event.shiftKey ? 10 : 100 ) ).toFixed( 2 );
 		scope.onChangedCallback();
 
 	}

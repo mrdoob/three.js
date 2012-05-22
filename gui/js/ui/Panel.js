@@ -83,8 +83,8 @@ var Panel = function ( signals ) {
 		if ( selected ) {
 
 			selected.position.x = positionX.getValue();
-			selected.position.y = positionX.getValue();
-			selected.position.z = positionX.getValue();
+			selected.position.y = positionY.getValue();
+			selected.position.z = positionZ.getValue();
 
 			selected.rotation.x = rotationX.getValue();
 			selected.rotation.y = rotationY.getValue();
