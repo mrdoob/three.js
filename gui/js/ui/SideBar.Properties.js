@@ -83,6 +83,11 @@ var Properties = function ( signals ) {
 
 	container.add( new UI.Break(), new UI.Break(), new UI.Break() );
 
+	container.add( new UI.Text().setText( 'class' ).setColor( '#666' ) );
+
+	var materialClass = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' ).setFontSize( '12px' );
+	container.add( materialClass );
+
 
 	// Events
 
@@ -133,6 +138,8 @@ var Properties = function ( signals ) {
 			facesCount.setText( object.geometry.faces.length );
 			colorsCount.setText( object.geometry.colors.length );
 
+			materialClass.setText( getMaterialInstanceName( object.material ) );
+
 		} else {
 
 			container.setDisplay( 'none' );
@@ -141,30 +148,49 @@ var Properties = function ( signals ) {
 
 	} );
 
-	function getGeometryInstanceName( object ) {
+	function getGeometryInstanceName( geometry ) {
 
 		// TODO: Is there a way of doing this automatically?
 
-		if ( object instanceof THREE.ConvexGeometry ) return "ConvexGeometry";
-		if ( object instanceof THREE.CubeGeometry ) return "CubeGeometry";
-		if ( object instanceof THREE.CylinderGeometry ) return "CylinderGeometry";
-		if ( object instanceof THREE.ExtrudeGeometry ) return "ExtrudeGeometry";
-		if ( object instanceof THREE.IcosahedronGeometry ) return "IcosahedronGeometry";
-		if ( object instanceof THREE.LatheGeometry ) return "LatheGeometry";
-		if ( object instanceof THREE.OctahedronGeometry ) return "OctahedronGeometry";
-		if ( object instanceof THREE.ParametricGeometry ) return "ParametricGeometry";
-		if ( object instanceof THREE.PlaneGeometry ) return "PlaneGeometry";
-		if ( object instanceof THREE.PolyhedronGeometry ) return "PolyhedronGeometry";
-		if ( object instanceof THREE.SphereGeometry ) return "SphereGeometry";
-		if ( object instanceof THREE.TetrahedronGeometry ) return "TetrahedronGeometry";
-		if ( object instanceof THREE.TextGeometry ) return "TextGeometry";
-		if ( object instanceof THREE.TorusGeometry ) return "TorusGeometry";
-		if ( object instanceof THREE.TorusKnotGeometry ) return "TorusKnotGeometry";
-		if ( object instanceof THREE.TubeGeometry ) return "TubeGeometry";
-
-		if ( object instanceof THREE.Geometry ) return "Geometry";
+		if ( geometry instanceof THREE.ConvexGeometry ) return "ConvexGeometry";
+		if ( geometry instanceof THREE.CubeGeometry ) return "CubeGeometry";
+		if ( geometry instanceof THREE.CylinderGeometry ) return "CylinderGeometry";
+		if ( geometry instanceof THREE.ExtrudeGeometry ) return "ExtrudeGeometry";
+		if ( geometry instanceof THREE.IcosahedronGeometry ) return "IcosahedronGeometry";
+		if ( geometry instanceof THREE.LatheGeometry ) return "LatheGeometry";
+		if ( geometry instanceof THREE.OctahedronGeometry ) return "OctahedronGeometry";
+		if ( geometry instanceof THREE.ParametricGeometry ) return "ParametricGeometry";
+		if ( geometry instanceof THREE.PlaneGeometry ) return "PlaneGeometry";
+		if ( geometry instanceof THREE.PolyhedronGeometry ) return "PolyhedronGeometry";
+		if ( geometry instanceof THREE.SphereGeometry ) return "SphereGeometry";
+		if ( geometry instanceof THREE.TetrahedronGeometry ) return "TetrahedronGeometry";
+		if ( geometry instanceof THREE.TextGeometry ) return "TextGeometry";
+		if ( geometry instanceof THREE.TorusGeometry ) return "TorusGeometry";
+		if ( geometry instanceof THREE.TorusKnotGeometry ) return "TorusKnotGeometry";
+		if ( geometry instanceof THREE.TubeGeometry ) return "TubeGeometry";
+		if ( geometry instanceof THREE.Geometry ) return "Geometry";
 
 	}
+
+	function getMaterialInstanceName( material ) {
+
+		// TODO: Is there a way of doing this automatically?
+
+		if ( material instanceof THREE.LineBasicMaterial ) return "LineBasicMaterial";
+		if ( material instanceof THREE.MeshBasicMaterial ) return "MeshBasicMaterial";
+		if ( material instanceof THREE.MeshDepthMaterial ) return "MeshDepthMaterial";
+		if ( material instanceof THREE.MeshFaceMaterial ) return "MeshFaceMaterial";
+		if ( material instanceof THREE.MeshLambertMaterial ) return "MeshLambertMaterial";
+		if ( material instanceof THREE.MeshNormalMaterial ) return "MeshNormalMaterial";
+		if ( material instanceof THREE.MeshPhongMaterial ) return "MeshPhongMaterial";
+		if ( material instanceof THREE.ParticleBasicMaterial ) return "ParticleBasicMaterial";
+		if ( material instanceof THREE.ParticleCanvasMaterial ) return "ParticleCanvasMaterial";
+		if ( material instanceof THREE.ParticleDOMMaterial ) return "ParticleDOMMaterial";
+		if ( material instanceof THREE.ShaderMaterial ) return "ShaderMaterial";
+		if ( material instanceof THREE.Material ) return "Material";
+
+	}
+
 
 	return container;
 
