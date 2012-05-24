@@ -113,11 +113,13 @@ THREE.SceneUtils = {
 
 			object = new THREE.LOD();
 
+		/*
 		} else if ( source instanceof THREE.MarchingCubes ) {
 
 			object = new THREE.MarchingCubes( source.resolution, source.material );
 			object.field.set( source.field );
 			object.isolation = source.isolation;
+		*/
 
 		} else if ( source instanceof THREE.Object3D ) {
 
