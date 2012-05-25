@@ -20,6 +20,10 @@
 	<body>
 
 		<script type="text/javascript" src="../build/Three.js"></script>
+		<script type="text/javascript" src="../examples/js/loaders/ColladaLoader.js"></script>
+		<script type="text/javascript" src="../examples/js/loaders/OBJLoader.js"></script>
+		<script type="text/javascript" src="../examples/js/loaders/UTF8Loader.js"></script>
+		<script type="text/javascript" src="../examples/js/loaders/VTKLoader.js"></script>
 
 		<script type="text/javascript" src="js/libs/signals.min.js"></script>
 
@@ -60,6 +64,88 @@
 			menubar.setWidth( '100%' );
 			menubar.setHeight( '32px' );
 			document.body.appendChild( menubar.dom );
+
+			document.addEventListener( 'drop', function ( event ) {
+
+				event.preventDefault();
+
+				var file = event.dataTransfer.files[ 0 ];
+				var extension = file.name.split( '.' )[1].toLowerCase();
+				var reader = new FileReader();
+
+				reader.onload = function ( event ) {
+
+					var contents = event.target.result;
+
+					switch ( extension ) {
+
+						case 'dae':
+
+							var parser = new DOMParser();
+							var xml = parser.parseFromString( contents, 'text/xml' );
+
+							// TODO: Update ColladaLoader
+
+							var loader = new THREE.ColladaLoader();
+							loader.parse( xml, function ( collada ) {
+
+								signals.objectAdded.dispatch( collada.scene );
+
+							} );
+
+							break;
+
+						case 'js':
+
+							var loader = new THREE.GeometryLoader();
+
+							var geometry = loader.parse( JSON.parse( contents ) );
+							var material = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
+							var mesh = new THREE.Mesh( geometry, material );
+
+							signals.objectAdded.dispatch( mesh );
+
+							break;
+
+						case 'obj':
+
+							var loader = new THREE.OBJLoader();
+
+							var object = loader.parse( contents );
+
+							signals.objectAdded.dispatch( object );
+
+							break;
+
+						case 'utf8':
+
+							// TODO
+
+							break;
+
+						case 'vtk':
+
+							var loader = new THREE.VTKLoader();
+
+							console.log( loader );
+
+							var geometry = loader.parse( contents );
+							var material = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
+							var mesh = new THREE.Mesh( geometry, material );
+
+							console.log( mesh );
+
+							signals.objectAdded.dispatch( mesh );
+
+							break;
+
+					}
+
+				};
+
+				reader.readAsText( file );
+
+			}, false );
 
 
 			//

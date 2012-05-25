@@ -5,6 +5,8 @@ var Viewport = function ( signals ) {
 
 	//
 
+	var objects = [];
+
 	var sceneHelpers = new THREE.Scene();
 
 	var size = 500, step = 25;
@@ -69,7 +71,7 @@ var Viewport = function ( signals ) {
 		projector.unprojectVector( vector, camera );
 
 		var ray = new THREE.Ray( camera.position, vector.subSelf( camera.position ).normalize() );
-		var intersects = ray.intersectObjects( scene.children );
+		var intersects = ray.intersectObjects( objects );
 
 		if ( intersects.length ) {
 
@@ -88,6 +90,14 @@ var Viewport = function ( signals ) {
 	// events
 
 	signals.objectAdded.add( function ( object ) {
+
+		THREE.SceneUtils.traverseHierarchy( object, function ( child ) {
+
+			objects.push( child );
+
+		} );
+
+		objects.push( object );
 
 		scene.add( object );
 		render();
@@ -151,6 +161,8 @@ var Viewport = function ( signals ) {
 			selectionBox.geometry.vertices[ 7 ].x = geometry.boundingBox.min.x;
 			selectionBox.geometry.vertices[ 7 ].y = geometry.boundingBox.min.y;
 			selectionBox.geometry.vertices[ 7 ].z = geometry.boundingBox.max.z;
+
+			selectionBox.geometry.computeBoundingSphere();
 
 			selectionBox.geometry.verticesNeedUpdate = true;
 
