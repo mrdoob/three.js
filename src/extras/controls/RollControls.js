@@ -164,7 +164,9 @@ THREE.RollControls = function ( object, domElement ) {
 
 	function onKeyDown( event ) {
 
-		switch( event.keyCode ) {
+		event.preventDefault();
+
+		switch ( event.keyCode ) {
 
 			case 38: /*up*/
 			case 87: /*W*/ forwardSpeed = 1; break;
