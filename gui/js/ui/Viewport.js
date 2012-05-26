@@ -56,6 +56,15 @@ var Viewport = function ( signals ) {
 	controls.dynamicDampingFactor = 0.3;
 	controls.addEventListener( 'change', render );
 
+	var light = new THREE.DirectionalLight( 0xffffff );
+	light.position.set( 1, 0.5, 0 ).normalize();
+	scene.add( light );
+
+	var light = new THREE.DirectionalLight( 0xffffff, 0.5 );
+	light.position.set( - 1, - 0.5, 0 ).normalize();
+	scene.add( light );
+
+
 	// object picking
 
 	var projector = new THREE.Projector();

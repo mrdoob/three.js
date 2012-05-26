@@ -102,7 +102,7 @@
 							var loader = new THREE.GeometryLoader();
 
 							var geometry = loader.parse( JSON.parse( contents ) );
-							var material = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
+							var material = new THREE.MeshLambertMaterial( { color: 0xffffff } );
 							var mesh = new THREE.Mesh( geometry, material );
 
 							signals.objectAdded.dispatch( mesh );
@@ -132,7 +132,7 @@
 							var loader = new THREE.VTKLoader();
 
 							var geometry = loader.parse( contents );
-							var material = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
+							var material = new THREE.MeshLambertMaterial( { color: 0xffffff } );
 							var mesh = new THREE.Mesh( geometry, material );
 
 							signals.objectAdded.dispatch( mesh );
@@ -152,7 +152,7 @@
 			//
 
 			var geometry = new THREE.SphereGeometry( 75, 25, 15 );
-			var material = new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } );
+			var material = new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } );
 			var mesh = new THREE.Mesh( geometry, material );
 
 			signals.objectAdded.dispatch( mesh );
