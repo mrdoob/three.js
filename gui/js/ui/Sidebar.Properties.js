@@ -83,13 +83,6 @@ Sidebar.Properties = function ( signals ) {
 	var facesCount = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' ).setFontSize( '12px' );
 	container.add( facesCount );
 
-	container.add( new UI.HorizontalRule() );
-
-	container.add( new UI.Text().setText( 'Colors' ).setColor( '#666' ) );
-
-	var colorsCount = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' ).setFontSize( '12px' );
-	container.add( colorsCount );
-
 
 	container.add( new UI.Break(), new UI.Break(), new UI.Break() );
 
@@ -174,7 +167,6 @@ Sidebar.Properties = function ( signals ) {
 				geometryClass.setText( getGeometryInstanceName( object.geometry ) );
 				verticesCount.setText( object.geometry.vertices.length );
 				facesCount.setText( object.geometry.faces.length );
-				colorsCount.setText( object.geometry.colors.length );
 
 			}
 
