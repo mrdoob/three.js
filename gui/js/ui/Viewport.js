@@ -209,7 +209,8 @@ var Viewport = function ( signals ) {
 
 	function render() {
 
-		scene.updateMatrixWorld()
+		sceneHelpers.updateMatrixWorld();
+		scene.updateMatrixWorld();
 
 		renderer.clear();
 		renderer.render( sceneHelpers, camera );
