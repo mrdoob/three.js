@@ -7,7 +7,7 @@ Sidebar.Properties = function ( signals ) {
 	container.setPadding( '8px' );
 	container.setBorderTop( '1px solid #ccc' );
 
-	container.add( new UI.Text().setText( 'PROPERTIES' ).setColor( '#666' ) );
+	container.add( new UI.Text().setText( 'OBJECT' ).setColor( '#666' ) );
 
 	container.add( new UI.Break(), new UI.Break() );
 
