@@ -22,7 +22,6 @@ THREE.LensFlare = function ( texture, size, distance, blending, color ) {
 
 THREE.LensFlare.prototype = new THREE.Object3D();
 THREE.LensFlare.prototype.constructor = THREE.LensFlare;
-THREE.LensFlare.prototype.supr = THREE.Object3D.prototype;
 
 
 /*

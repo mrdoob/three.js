@@ -2,18 +2,14 @@
  * @author mr.doob / http://mrdoob.com/
  */
 
-THREE.Ray = function ( origin, direction ) {
+THREE.Ray = function ( origin, direction, near, far ) {
 
 	this.origin = origin || new THREE.Vector3();
 	this.direction = direction || new THREE.Vector3();
+	this.near = near || 0;
+	this.far = far || Infinity;
 
-	var precision = 0.0001;
-
-	this.setPrecision = function ( value ) {
-
-		precision = value;
-
-	};
+	//
 
 	var a = new THREE.Vector3();
 	var b = new THREE.Vector3();
@@ -25,7 +21,64 @@ THREE.Ray = function ( origin, direction ) {
 
 	var vector = new THREE.Vector3();
 	var normal = new THREE.Vector3();
-	var intersectPoint = new THREE.Vector3()
+	var intersectPoint = new THREE.Vector3();
+	
+	var descSort = function ( a, b ) {
+	
+			return a.distance - b.distance;
+			
+	};
+
+	//
+
+	var v0 = new THREE.Vector3(), v1 = new THREE.Vector3(), v2 = new THREE.Vector3();
+	var dot, intersect, distance;
+
+	var distanceFromIntersection = function ( origin, direction, position ) {
+
+		v0.sub( position, origin );
+		dot = v0.dot( direction );
+
+		intersect = v1.add( origin, v2.copy( direction ).multiplyScalar( dot ) );
+		distance = position.distanceTo( intersect );
+
+		return distance;
+
+	}
+
+	// http://www.blackpawn.com/texts/pointinpoly/default.html
+
+	var dot00, dot01, dot02, dot11, dot12, invDenom, u, v;
+
+	var pointInFace3 = function ( p, a, b, c ) {
+
+		v0.sub( c, a );
+		v1.sub( b, a );
+		v2.sub( p, a );
+
+		dot00 = v0.dot( v0 );
+		dot01 = v0.dot( v1 );
+		dot02 = v0.dot( v2 );
+		dot11 = v1.dot( v1 );
+		dot12 = v1.dot( v2 );
+
+		invDenom = 1 / ( dot00 * dot11 - dot01 * dot01 );
+		u = ( dot11 * dot02 - dot01 * dot12 ) * invDenom;
+		v = ( dot00 * dot12 - dot01 * dot02 ) * invDenom;
+
+		return ( u >= 0 ) && ( v >= 0 ) && ( u + v < 1 );
+
+	}
+
+	//
+
+	var precision = 0.0001;
+
+	this.setPrecision = function ( value ) {
+
+		precision = value;
+
+	};
 
 	this.intersectObject = function ( object ) {
 
@@ -33,7 +86,7 @@ THREE.Ray = function ( origin, direction ) {
 
 		if ( object instanceof THREE.Particle ) {
 
-			var distance = distanceFromIntersection( this.origin, this.direction, object.matrixWorld.getPosition() );
+			distance = distanceFromIntersection( this.origin, this.direction, object.matrixWorld.getPosition() );
 
 			if ( distance > object.scale.x ) {
 
@@ -56,10 +109,14 @@ THREE.Ray = function ( origin, direction ) {
 
 			// Checking boundingSphere
 
-			var distance = distanceFromIntersection( this.origin, this.direction, object.matrixWorld.getPosition() );
 			var scale = THREE.Frustum.__v1.set( object.matrixWorld.getColumnX().length(), object.matrixWorld.getColumnY().length(), object.matrixWorld.getColumnZ().length() );
+			var scaledRadius = object.geometry.boundingSphere.radius * Math.max( scale.x, Math.max( scale.y, scale.z ) ); 
 
-			if ( distance > object.geometry.boundingSphere.radius * Math.max( scale.x, Math.max( scale.y, scale.z ) ) ) {
+			// Checking distance to ray
+		
+			distance = distanceFromIntersection( this.origin, this.direction, object.matrixWorld.getPosition() );
+
+			if ( distance > scaledRadius) {
 
 				return intersects;
 
@@ -68,6 +125,7 @@ THREE.Ray = function ( origin, direction ) {
 			// Checking faces
 
 			var f, fl, face, dot, scalar,
+			rangeSq = this.range*this.range,
 			geometry = object.geometry,
 			vertices = geometry.vertices,
 			objMatrix;
@@ -106,6 +164,11 @@ THREE.Ray = function ( origin, direction ) {
 
 					intersectPoint.add( originCopy, directionCopy.multiplyScalar( scalar ) );
 
+					distance = originCopy.distanceTo( intersectPoint );
+
+					if ( distance < this.near ) continue;
+					if ( distance > this.far ) continue;
+
 					if ( face instanceof THREE.Face3 ) {
 
 						a = objMatrix.multiplyVector3( a.copy( vertices[ face.a ] ) );
@@ -116,7 +179,7 @@ THREE.Ray = function ( origin, direction ) {
 
 							intersect = {
 
-								distance: originCopy.distanceTo( intersectPoint ),
+								distance: distance,
 								point: intersectPoint.clone(),
 								face: face,
 								object: object
@@ -138,7 +201,7 @@ THREE.Ray = function ( origin, direction ) {
 
 							intersect = {
 
-								distance: originCopy.distanceTo( intersectPoint ),
+								distance: distance,
 								point: intersectPoint.clone(),
 								face: face,
 								object: object
@@ -157,9 +220,11 @@ THREE.Ray = function ( origin, direction ) {
 
 		}
 
+		intersects.sort( descSort );
+
 		return intersects;
 
-	}
+	};
 
 	this.intersectObjects = function ( objects ) {
 
@@ -171,49 +236,10 @@ THREE.Ray = function ( origin, direction ) {
 
 		}
 
-		intersects.sort( function ( a, b ) { return a.distance - b.distance; } );
+		intersects.sort( descSort );
 
 		return intersects;
 
 	};
-
-	var v0 = new THREE.Vector3(), v1 = new THREE.Vector3(), v2 = new THREE.Vector3();
-	var dot, intersect, distance;
-
-	function distanceFromIntersection( origin, direction, position ) {
-
-		v0.sub( position, origin );
-		dot = v0.dot( direction );
-
-		intersect = v1.add( origin, v2.copy( direction ).multiplyScalar( dot ) );
-		distance = position.distanceTo( intersect );
-
-		return distance;
-
-	}
-
-	// http://www.blackpawn.com/texts/pointinpoly/default.html
-
-	var dot00, dot01, dot02, dot11, dot12, invDenom, u, v;
-
-	function pointInFace3( p, a, b, c ) {
-
-		v0.sub( c, a );
-		v1.sub( b, a );
-		v2.sub( p, a );
-
-		dot00 = v0.dot( v0 );
-		dot01 = v0.dot( v1 );
-		dot02 = v0.dot( v2 );
-		dot11 = v1.dot( v1 );
-		dot12 = v1.dot( v2 );
-
-		invDenom = 1 / ( dot00 * dot11 - dot01 * dot01 );
-		u = ( dot11 * dot02 - dot01 * dot12 ) * invDenom;
-		v = ( dot00 * dot12 - dot01 * dot02 ) * invDenom;
-
-		return ( u >= 0 ) && ( v >= 0 ) && ( u + v < 1 );
-
-	}
 
 };

@@ -15,7 +15,7 @@ THREE.Mesh = function ( geometry, material ) {
 
 		// calc bound radius
 
-		if( ! this.geometry.boundingSphere ) {
+		if ( ! this.geometry.boundingSphere ) {
 
 			this.geometry.computeBoundingSphere();
 
@@ -48,7 +48,6 @@ THREE.Mesh = function ( geometry, material ) {
 
 THREE.Mesh.prototype = new THREE.Object3D();
 THREE.Mesh.prototype.constructor = THREE.Mesh;
-THREE.Mesh.prototype.supr = THREE.Object3D.prototype;
 
 
 /*

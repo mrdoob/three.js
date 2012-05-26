@@ -2,6 +2,7 @@
  * @author zz85
  * 
  * Experimenting of primitive geometry creation using Surface Parametric equations
+ *
  */
 
 
@@ -34,8 +35,6 @@ THREE.ParametricGeometries = {
 			var x = u * width;
 			var y = 0;
 			var z = v * height;
-
-			console.log(x, y, z);
 
 			return new THREE.Vector3(x, y, z);
 		};
@@ -77,7 +76,14 @@ THREE.ParametricGeometries = {
 
 };
 
-THREE.TubeGeometry2 = function(path, segments, radius, segmentsRadius, closed, debug) {
+
+/*********************************************
+ *
+ * Parametric Replacement for TubeGeometry
+ *
+ *********************************************/
+
+THREE.ParametricGeometries.TubeGeometry = function(path, segments, radius, segmentsRadius, closed, debug) {
 
 	this.path = path;
 	this.segments = segments || 64;
@@ -145,12 +151,17 @@ THREE.TubeGeometry2 = function(path, segments, radius, segmentsRadius, closed, d
 
 };
 
-THREE.TubeGeometry2.prototype = new THREE.Geometry();
-THREE.TubeGeometry2.prototype.constructor = THREE.TubeGeometry2;
+THREE.ParametricGeometries.TubeGeometry.prototype = new THREE.Geometry();
+THREE.ParametricGeometries.TubeGeometry.prototype.constructor = THREE.ParametricGeometries.TubeGeometry;
 
 
-// Replacement for TorusKnotGeometry?
- THREE.TorusKnotGeometry2 = function ( radius, tube, segmentsR, segmentsT, p, q, heightScale ) {
+
+ /*********************************************
+  *
+  * Parametric Replacement for TorusKnotGeometry
+  *
+  *********************************************/
+THREE.ParametricGeometries.TorusKnotGeometry = function ( radius, tube, segmentsR, segmentsT, p, q, heightScale ) {
 
 	var scope = this;
 
@@ -187,37 +198,49 @@ THREE.TubeGeometry2.prototype.constructor = THREE.TubeGeometry2;
 	var radiusSegments = segmentsT;
 	var extrudePath = new TorusKnotCurve();
 
-	THREE.TubeGeometry2.call( this, extrudePath, segments, tube, radiusSegments, true, false );
+	THREE.ParametricGeometries.TubeGeometry.call( this, extrudePath, segments, tube, radiusSegments, true, false );
 
 
 };
 
-THREE.TorusKnotGeometry2.prototype = new THREE.Geometry();
-THREE.TorusKnotGeometry2.prototype.constructor = THREE.TorusKnotGeometry2;
+THREE.ParametricGeometries.TorusKnotGeometry.prototype = new THREE.Geometry();
+THREE.ParametricGeometries.TorusKnotGeometry.prototype.constructor = THREE.ParametricGeometries.TorusKnotGeometry;
 
 
-THREE.SphereGeometry2 = function(size, x, y) {
+ /*********************************************
+  *
+  * Parametric Replacement for SphereGeometry
+  *
+  *********************************************/
+THREE.ParametricGeometries.SphereGeometry = function(size, u, v) {
 
 	function sphere(u, v) {
 		u *= pi;
 		v *= 2 * pi;
 		
-		var x = sin(u) * cos(v);
-		var y = cos(u);
-		var z = -sin(u) * sin(v);
+		var x = size * sin(u) * cos(v);
+		var y = size * sin(u) * sin(v);
+		var z = size * cos(u);
+		
 
-		return new THREE.Vector3(x, y, z).multiplyScalar(size);
+		return new THREE.Vector3(x, y, z);
 	}
   
-	THREE.ParametricGeometry.call(this, sphere, y, x);
+	THREE.ParametricGeometry.call(this, sphere, u, v, !true);
 
 };
 
-THREE.SphereGeometry2.prototype = new THREE.Geometry();
-THREE.SphereGeometry2.prototype.constructor = THREE.SphereGeometry2;
+THREE.ParametricGeometries.SphereGeometry.prototype = new THREE.Geometry();
+THREE.ParametricGeometries.SphereGeometry.prototype.constructor = THREE.ParametricGeometries.SphereGeometry;
 
 
-THREE.PlaneGeometry2 = function(width, depth, segmentsWidth, segmentsDepth) {
+ /*********************************************
+  *
+  * Parametric Replacement for PlaneGeometry
+  *
+  *********************************************/
+
+THREE.ParametricGeometries.PlaneGeometry = function(width, depth, segmentsWidth, segmentsDepth) {
 
 	function plane(u, v) {
 		
@@ -232,5 +255,5 @@ THREE.PlaneGeometry2 = function(width, depth, segmentsWidth, segmentsDepth) {
 
 };
 
-THREE.PlaneGeometry2.prototype = new THREE.Geometry();
-THREE.PlaneGeometry2.prototype.constructor = THREE.PlaneGeometry2;
+THREE.ParametricGeometries.PlaneGeometry.prototype = new THREE.Geometry();
+THREE.ParametricGeometries.PlaneGeometry.prototype.constructor = THREE.ParametricGeometries.PlaneGeometry;

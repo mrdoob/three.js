@@ -119,14 +119,14 @@
 
 				// lines
 
-				material = new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 1, linewidth: 3 } );
+				material = new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 1, linewidth: 3, vertexColors: THREE.VertexColors } );
 
-				var line, p, scale = 0.3, d = 225,
-					parameters =  [ [ material, scale*1.5, [-d,0,0],  geometry ],
-									[ material, scale*1.5, [0,0,0],  geometry2 ],
-									[ material, scale*1.5, [d,0,0],  geometry3 ] ];
-
-				material.vertexColors = true;
+				var line, p, scale = 0.3, d = 225;
+				var parameters =  [
+					[ material, scale*1.5, [-d,0,0],  geometry ],
+					[ material, scale*1.5, [0,0,0],  geometry2 ],
+					[ material, scale*1.5, [d,0,0],  geometry3 ]
+				];
 
 				for ( i = 0; i < parameters.length; ++i ) {
 

@@ -140,7 +140,9 @@
 
 				// PAINTING
 
-				var callbackPainting = function( image ) {
+				var callbackPainting = function() {
+
+					var image = texturePainting.image;
 
 					texturePainting2.image = image;
 					texturePainting2.needsUpdate = true;
