@@ -56,6 +56,14 @@ Sidebar.Properties = function ( signals ) {
 
 	container.add( new UI.Break(), new UI.Break() );
 
+	container.add( new UI.Text().setText( 'Name' ).setColor( '#666' ) );
+
+	var geometryName = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' ).setFontSize( '12px' );
+
+	container.add( geometryName );
+
+	container.add( new UI.HorizontalRule() );
+
 	container.add( new UI.Text().setText( 'Class' ).setColor( '#666' ) );
 
 	var geometryClass = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' ).setFontSize( '12px' );
@@ -64,7 +72,7 @@ Sidebar.Properties = function ( signals ) {
 	container.add( new UI.HorizontalRule() );
 
 	container.add( new UI.Text().setText( 'Vertices' ).setColor( '#666' ) );
-
+	
 	var verticesCount = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' ).setFontSize( '12px' );
 	container.add( verticesCount );
 
@@ -102,7 +110,16 @@ Sidebar.Properties = function ( signals ) {
 	container.add( new UI.Text().setText( 'Class' ).setColor( '#666' ) );
 
 	var materialClass = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' ).setFontSize( '12px' );
+
 	container.add( materialClass );
+
+	container.add( new UI.HorizontalRule() );
+
+	container.add( new UI.Text().setText( 'Color' ).setColor( '#666' ) );
+
+	var materialColor = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' ).setFontSize( '12px' );
+
+	container.add( materialColor );
 
 
 	// Events
@@ -153,6 +170,7 @@ Sidebar.Properties = function ( signals ) {
 
 			if ( object.geometry ) {
 
+				geometryName.setText( object.geometry.name );
 				geometryClass.setText( getGeometryInstanceName( object.geometry ) );
 				verticesCount.setText( object.geometry.vertices.length );
 				facesCount.setText( object.geometry.faces.length );
@@ -164,6 +182,7 @@ Sidebar.Properties = function ( signals ) {
 
 				materialName.setText( object.material.name );
 				materialClass.setText( getMaterialInstanceName( object.material ) );
+				materialColor.setText( '#' + object.material.color.getHex().toString(16) );
 
 			}
 
