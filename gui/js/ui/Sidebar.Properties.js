@@ -1,4 +1,4 @@
-var Properties = function ( signals ) {
+Sidebar.Properties = function ( signals ) {
 
 	var selected = null;
 

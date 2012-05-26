@@ -193,6 +193,7 @@ var Viewport = function ( signals ) {
 
 	var renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false, clearColor: 0xaaaaaa, clearAlpha: 1 } );
 	renderer.autoClear = false;
+	renderer.autoUpdateScene = false;
 	container.dom.appendChild( renderer.domElement );
 
 	animate();
@@ -207,6 +208,8 @@ var Viewport = function ( signals ) {
 	}
 
 	function render() {
+
+		scene.updateMatrixWorld()
 
 		renderer.clear();
 		renderer.render( sceneHelpers, camera );

@@ -29,8 +29,9 @@
 
 		<script type="text/javascript" src="js/UI.js"></script>
 		<script type="text/javascript" src="js/ui/Viewport.js"></script>
-		<script type="text/javascript" src="js/ui/SideBar.js"></script>
-		<script type="text/javascript" src="js/ui/SideBar.Properties.js"></script>
+		<script type="text/javascript" src="js/ui/Sidebar.js"></script>
+		<script type="text/javascript" src="js/ui/Sidebar.Outliner.js"></script>
+		<script type="text/javascript" src="js/ui/Sidebar.Properties.js"></script>
 		<script type="text/javascript" src="js/ui/MenuBar.js"></script>
 
 		<script>
@@ -54,7 +55,7 @@
 			viewport.setHeight( '-webkit-calc(100% - 32px)', '-moz-calc(100% - 32px)', 'calc(100% - 32px)' );
 			document.body.appendChild( viewport.dom );
 
-			var sidebar = new SideBar( signals );
+			var sidebar = new Sidebar( signals );
 			sidebar.setLeft( '-webkit-calc(100% - 300px)', '-moz-calc(100% - 300px)', 'calc(100% - 300px)' );
 			sidebar.setTop( '32px' );
 			sidebar.setHeight( '-webkit-calc(100% - 32px)', '-moz-calc(100% - 32px)', 'calc(100% - 32px)' );
@@ -90,6 +91,7 @@
 							loader.parse( xml, function ( collada ) {
 
 								signals.objectAdded.dispatch( collada.scene );
+								signals.objectSelected.dispatch( collada.scene );
 
 							} );
 
@@ -104,6 +106,7 @@
 							var mesh = new THREE.Mesh( geometry, material );
 
 							signals.objectAdded.dispatch( mesh );
+							signals.objectSelected.dispatch( mesh );
 
 							break;
 
@@ -114,6 +117,7 @@
 							var object = loader.parse( contents );
 
 							signals.objectAdded.dispatch( object );
+							signals.objectSelected.dispatch( object );
 
 							break;
 
@@ -127,15 +131,12 @@
 
 							var loader = new THREE.VTKLoader();
 
-							console.log( loader );
-
 							var geometry = loader.parse( contents );
 							var material = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
 							var mesh = new THREE.Mesh( geometry, material );
 
-							console.log( mesh );
-
 							signals.objectAdded.dispatch( mesh );
+							signals.objectSelected.dispatch( mesh );
 
 							break;
 
@@ -155,6 +156,7 @@
 			var mesh = new THREE.Mesh( geometry, material );
 
 			signals.objectAdded.dispatch( mesh );
+			signals.objectSelected.dispatch( mesh );
 
 			//
 
