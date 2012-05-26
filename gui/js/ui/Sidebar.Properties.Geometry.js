@@ -5,6 +5,8 @@ Sidebar.Properties.Geometry = function ( signals ) {
 
 	container.add( new UI.Text().setText( 'GEOMETRY' ).setColor( '#666' ) );
 
+	container.add( new UI.Button( 'absolute' ).setRight( '0px' ).setText( 'Export' ).onClick( exportGeometry ) );
+
 	container.add( new UI.Break(), new UI.Break() );
 
 	container.add( new UI.Text().setText( 'Name' ).setColor( '#666' ) );
@@ -38,9 +40,13 @@ Sidebar.Properties.Geometry = function ( signals ) {
 
 	//
 
+	var selected = null;
+
 	signals.objectSelected.add( function ( object ) {
 
 		if ( object && object.geometry ) {
+
+			selected = object.geometry;
 
 			container.setDisplay( 'block' );
 
@@ -50,6 +56,8 @@ Sidebar.Properties.Geometry = function ( signals ) {
 			facesCount.setText( object.geometry.faces.length );
 
 		} else {
+
+			selected = null;
 
 			container.setDisplay( 'none' );
 
@@ -78,6 +86,12 @@ Sidebar.Properties.Geometry = function ( signals ) {
 		if ( geometry instanceof THREE.TorusKnotGeometry ) return "TorusKnotGeometry";
 		if ( geometry instanceof THREE.TubeGeometry ) return "TubeGeometry";
 		if ( geometry instanceof THREE.Geometry ) return "Geometry";
+
+	}
+
+	function exportGeometry() {
+
+		console.log( selected );
 
 	}
 

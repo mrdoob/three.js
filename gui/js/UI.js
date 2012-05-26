@@ -24,7 +24,21 @@ UI.Element.prototype = {
 	setTop: function () {
 
 		this.setStyle( 'top', arguments );
-		return this;		
+		return this;
+
+	},
+
+	setRight: function () {
+
+		this.setStyle( 'right', arguments );
+		return this;
+
+	},
+
+	setBottom: function () {
+
+		this.setStyle( 'bottom', arguments );
+		return this;
 
 	},
 
@@ -235,7 +249,7 @@ UI.IntNumber = function ( position ) {
 	this.dom.style.fontSize = '12px';
 	this.dom.style.textDecoration = 'underline';
 
-	this.onChangedCallback = null;
+	this.onChangeCallback = null;
 
 	var scope = this;
 	var onMouseDownValue, onMouseDownScreenX, onMouseDownScreenY;
@@ -259,7 +273,7 @@ UI.IntNumber = function ( position ) {
 		var dy = event.screenY - onMouseDownScreenY;
 
 		scope.dom.textContent = ( onMouseDownValue + ( dx - dy ) / ( event.shiftKey ? 10 : 100 ) ).toFixed( 0 );
-		scope.onChangedCallback();
+		scope.onChangeCallback();
 
 	}
 
@@ -292,9 +306,9 @@ UI.IntNumber.prototype.setValue = function ( value ) {
 
 };
 
-UI.IntNumber.prototype.onChanged = function ( callback ) {
+UI.IntNumber.prototype.onChange = function ( callback ) {
 
-	this.onChangedCallback = callback;
+	this.onChangeCallback = callback;
 	return this;
 
 };
@@ -315,7 +329,7 @@ UI.FloatNumber = function ( position ) {
 	this.dom.style.fontSize = '12px';
 	this.dom.style.textDecoration = 'underline';
 
-	this.onChangedCallback = null;
+	this.onChangeCallback = null;
 
 	var scope = this;
 	var onMouseDownValue, onMouseDownScreenX, onMouseDownScreenY;
@@ -339,7 +353,7 @@ UI.FloatNumber = function ( position ) {
 		var dy = event.screenY - onMouseDownScreenY;
 
 		scope.dom.textContent = ( onMouseDownValue + ( dx - dy ) / ( event.shiftKey ? 10 : 100 ) ).toFixed( 2 );
-		scope.onChangedCallback();
+		scope.onChangeCallback();
 
 	}
 
@@ -372,9 +386,9 @@ UI.FloatNumber.prototype.setValue = function ( value ) {
 
 };
 
-UI.FloatNumber.prototype.onChanged = function ( callback ) {
+UI.FloatNumber.prototype.onChange = function ( callback ) {
 
-	this.onChangedCallback = callback;
+	this.onChangeCallback = callback;
 	return this;
 
 };
@@ -421,6 +435,16 @@ UI.Button = function ( position ) {
 	this.dom = document.createElement( 'button' );
 	this.dom.style.position = position || 'relative';
 
+	this.onClickCallback = null;
+
+	var scope = this;
+
+	this.dom.addEventListener( 'click', function ( event ) {
+
+		scope.onClickCallback();
+
+	}, false );
+
 	return this;
 
 };
@@ -431,6 +455,13 @@ UI.Button.prototype.constructor = UI.Button;
 UI.Button.prototype.setText = function ( value ) {
 
 	this.dom.textContent = value;
+	return this;
+
+};
+
+UI.Button.prototype.onClick = function ( callback ) {
+
+	this.onClickCallback = callback;
 	return this;
 
 };
