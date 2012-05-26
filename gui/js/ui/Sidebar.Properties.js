@@ -11,7 +11,15 @@ Sidebar.Properties = function ( signals ) {
 
 	container.add( new UI.Break(), new UI.Break() );
 
-	container.add( new UI.Text().setText( 'position' ).setColor( '#666' ) );
+	container.add( new UI.Text().setText( 'Name' ).setColor( '#666' ) );
+
+	var objectName = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' ).setFontSize( '12px' );
+
+	container.add( objectName );
+
+	container.add( new UI.HorizontalRule() );
+
+	container.add( new UI.Text().setText( 'Position' ).setColor( '#666' ) );
 
 	var positionX = new UI.FloatNumber( 'absolute' ).setLeft( '90px' ).onChanged( update );
 	var positionY = new UI.FloatNumber( 'absolute' ).setLeft( '160px' ).onChanged( update );
@@ -21,7 +29,7 @@ Sidebar.Properties = function ( signals ) {
 
 	container.add( new UI.HorizontalRule() );
 
-	container.add( new UI.Text().setText( 'rotation' ).setColor( '#666' ) );
+	container.add( new UI.Text().setText( 'Rotation' ).setColor( '#666' ) );
 
 	var rotationX = new UI.FloatNumber( 'absolute' ).setLeft( '90px' ).onChanged( update );
 	var rotationY = new UI.FloatNumber( 'absolute' ).setLeft( '160px' ).onChanged( update );
@@ -31,7 +39,7 @@ Sidebar.Properties = function ( signals ) {
 
 	container.add( new UI.HorizontalRule() );
 
-	container.add( new UI.Text().setText( 'scale' ).setColor( '#666' ) );
+	container.add( new UI.Text().setText( 'Scale' ).setColor( '#666' ) );
 
 	var scaleX = new UI.FloatNumber( 'absolute' ).setValue( 1 ).setLeft( '90px' ).onChanged( update );
 	var scaleY = new UI.FloatNumber( 'absolute' ).setValue( 1 ).setLeft( '160px' ).onChanged( update );
@@ -48,28 +56,28 @@ Sidebar.Properties = function ( signals ) {
 
 	container.add( new UI.Break(), new UI.Break() );
 
-	container.add( new UI.Text().setText( 'class' ).setColor( '#666' ) );
+	container.add( new UI.Text().setText( 'Class' ).setColor( '#666' ) );
 
 	var geometryClass = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' ).setFontSize( '12px' );
 	container.add( geometryClass );
 
 	container.add( new UI.HorizontalRule() );
 
-	container.add( new UI.Text().setText( 'vertices' ).setColor( '#666' ) );
+	container.add( new UI.Text().setText( 'Vertices' ).setColor( '#666' ) );
 
 	var verticesCount = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' ).setFontSize( '12px' );
 	container.add( verticesCount );
 
 	container.add( new UI.HorizontalRule() );
 
-	container.add( new UI.Text().setText( 'faces' ).setColor( '#666' ) );
+	container.add( new UI.Text().setText( 'Faces' ).setColor( '#666' ) );
 
 	var facesCount = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' ).setFontSize( '12px' );
 	container.add( facesCount );
 
 	container.add( new UI.HorizontalRule() );
 
-	container.add( new UI.Text().setText( 'colors' ).setColor( '#666' ) );
+	container.add( new UI.Text().setText( 'Colors' ).setColor( '#666' ) );
 
 	var colorsCount = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' ).setFontSize( '12px' );
 	container.add( colorsCount );
@@ -81,9 +89,17 @@ Sidebar.Properties = function ( signals ) {
 
 	container.add( new UI.Text().setText( 'MATERIAL' ).setColor( '#666' ) );
 
-	container.add( new UI.Break(), new UI.Break(), new UI.Break() );
+	container.add( new UI.Break(), new UI.Break() );
 
-	container.add( new UI.Text().setText( 'class' ).setColor( '#666' ) );
+	container.add( new UI.Text().setText( 'Name' ).setColor( '#666' ) );
+
+	var materialName = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' ).setFontSize( '12px' );
+
+	container.add( materialName );
+
+	container.add( new UI.HorizontalRule() );
+
+	container.add( new UI.Text().setText( 'Class' ).setColor( '#666' ) );
 
 	var materialClass = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' ).setFontSize( '12px' );
 	container.add( materialClass );
@@ -121,6 +137,8 @@ Sidebar.Properties = function ( signals ) {
 
 			container.setDisplay( 'block' );
 
+			objectName.setText( object.name );
+
 			positionX.setValue( object.position.x );
 			positionY.setValue( object.position.y );
 			positionZ.setValue( object.position.z );
@@ -133,12 +151,21 @@ Sidebar.Properties = function ( signals ) {
 			scaleY.setValue( object.scale.y );
 			scaleZ.setValue( object.scale.z );
 
-			geometryClass.setText( getGeometryInstanceName( object.geometry ) );
-			verticesCount.setText( object.geometry.vertices.length );
-			facesCount.setText( object.geometry.faces.length );
-			colorsCount.setText( object.geometry.colors.length );
+			if ( object.geometry ) {
 
-			materialClass.setText( getMaterialInstanceName( object.material ) );
+				geometryClass.setText( getGeometryInstanceName( object.geometry ) );
+				verticesCount.setText( object.geometry.vertices.length );
+				facesCount.setText( object.geometry.faces.length );
+				colorsCount.setText( object.geometry.colors.length );
+
+			}
+
+			if ( object.material ) {
+
+				materialName.setText( object.material.name );
+				materialClass.setText( getMaterialInstanceName( object.material ) );
+
+			}
 
 		} else {
 

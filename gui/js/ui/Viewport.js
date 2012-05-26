@@ -33,6 +33,7 @@ var Viewport = function ( signals ) {
 
 	var selectionBox = new THREE.Mesh( new THREE.CubeGeometry( 1, 1, 1 ), new THREE.MeshBasicMaterial( { color: 0xffff00, wireframe: true } ) );
 	selectionBox.geometry.dynamic = true;
+	selectionBox.matrixAutoUpdate = false;
 	selectionBox.visible = false;
 	sceneHelpers.add( selectionBox );
 
@@ -106,9 +107,7 @@ var Viewport = function ( signals ) {
 
 	signals.objectChanged.add( function ( object ) {
 
-		selectionBox.position.copy( object.position );
-		selectionBox.rotation.copy( object.rotation );
-		selectionBox.scale.copy( object.scale );
+		selectionBox.matrixWorld.copy( object.matrixWorld );
 
 		render();
 
@@ -120,7 +119,7 @@ var Viewport = function ( signals ) {
 
 			selectionBox.visible = false;
 
-		} else {
+		} else if ( object.geometry ) {
 
 			var geometry = object.geometry;
 
@@ -166,9 +165,7 @@ var Viewport = function ( signals ) {
 
 			selectionBox.geometry.verticesNeedUpdate = true;
 
-			selectionBox.position.copy( object.position );
-			selectionBox.rotation.copy( object.rotation );
-			selectionBox.scale.copy( object.scale );
+			selectionBox.matrixWorld.copy( object.matrixWorld );
 
 			selectionBox.visible = true;
 
