@@ -95,18 +95,18 @@ Sidebar.Properties.Geometry = function ( signals ) {
 
 		var geometry = selected;
 
-		var json = { "metadata": { "formatVersion" : 3 } };
-
-		json.vertices = [];
+		var vertices = [];
 
 		for ( var i = 0; i < geometry.vertices.length; i ++ ) {
 
 			var vertex = geometry.vertices[ i ];
-			json.vertices.push( vertex.x, vertex.y, vertex.z );
+			vertices.push( vertex.x, vertex.y, vertex.z );
 
 		}
 
-		json.faces = [];
+		var faces = [];
+		var uvs = [[]];
+		var normals = [];
 
 		for ( var i = 0; i < geometry.faces.length; i ++ ) {
 
@@ -133,31 +133,29 @@ Sidebar.Properties.Geometry = function ( signals ) {
 			faceType = setBit( faceType, 7, hasFaceVertexColor );
 			*/
 
-			json.faces.push( faceType );
+			faces.push( faceType );
 
 			if ( isTriangle ) {
 
-				json.faces.push( face.a, face.b, face.c );
+				faces.push( face.a, face.b, face.c );
 
 			} else {
 
-				json.faces.push( face.a, face.b, face.c, face.d );
+				faces.push( face.a, face.b, face.c, face.d );
 
 			}
 
 			if ( hasMaterial ) {
 
-				json.faces.push( face.materialIndex );
+				faces.push( face.materialIndex );
 
 			}
-
-			if ( hasFaceUv || hasFaceVertexUv ) json.uvs = [ [] ];
 
 			if ( hasFaceUv ) {
 
 				/*
 				var uv = geometry.faceUvs[ 0 ][ i ];
-				json.uvs[ 0 ].push( uv.u, uv.v );
+				uvs[ 0 ].push( uv.u, uv.v );
 				*/
 
 			}
@@ -169,7 +167,7 @@ Sidebar.Properties.Geometry = function ( signals ) {
 
 				if ( isTriangle ) {
 
-					json.faces.push(
+					faces.push(
 						uvs[ 0 ].u, uvs[ 0 ].v,
 						uvs[ 1 ].u, uvs[ 1 ].v,
 						uvs[ 2 ].u, uvs[ 2 ].v
@@ -177,7 +175,7 @@ Sidebar.Properties.Geometry = function ( signals ) {
 
 				} else {
 
-					json.faces.push(
+					faces.push(
 						uvs[ 0 ].u, uvs[ 0 ].v,
 						uvs[ 1 ].u, uvs[ 1 ].v,
 						uvs[ 2 ].u, uvs[ 2 ].v,
@@ -189,13 +187,11 @@ Sidebar.Properties.Geometry = function ( signals ) {
 
 			}
 
-			if ( hasFaceNormal || hasFaceVertexNormal ) json.normals = [];
-
 			if ( hasFaceNormal ) {
 
 				/*
 				var normal = face.normal;
-				json.faces.push( normal.x, normal.y, normal.z );
+				faces.push( normal.x, normal.y, normal.z );
 				*/
 
 			}
@@ -207,7 +203,7 @@ Sidebar.Properties.Geometry = function ( signals ) {
 
 				if ( isTriangle ) {
 
-					json.faces.push(
+					faces.push(
 						normals[ 0 ].u, normals[ 0 ].y, normals[ 0 ].z,
 						normals[ 1 ].u, normals[ 1 ].y, normals[ 1 ].z,
 						normals[ 2 ].u, normals[ 2 ].y, normals[ 2 ].z
@@ -215,7 +211,7 @@ Sidebar.Properties.Geometry = function ( signals ) {
 
 				} else {
 
-					json.faces.push(
+					faces.push(
 						normals[ 0 ].x, normals[ 0 ].y, normals[ 0 ].z,
 						normals[ 1 ].x, normals[ 1 ].y, normals[ 1 ].z,
 						normals[ 2 ].x, normals[ 2 ].y, normals[ 2 ].z,
@@ -237,8 +233,20 @@ Sidebar.Properties.Geometry = function ( signals ) {
 
 		//
 
+		var output = [
+			'{',
+			'	"metadata": {',
+			'		"formatVersion" : 3',
+			'	},',
+			'	"vertices": ' + JSON.stringify( vertices ) + ',',
+			'	"normals": ' + JSON.stringify( normals ) + ',',
+			'	"uvs": ' + JSON.stringify( uvs ) + ',',
+			'	"faces": ' + JSON.stringify( faces ),
+			'}'
+		].join( '\n' );
+
 		var file = new BlobBuilder();
-		file.append( JSON.stringify( json ) );
+		file.append( output );
 
 		var objectURL = URL.createObjectURL( file.getBlob( 'text/json' ) );
 
