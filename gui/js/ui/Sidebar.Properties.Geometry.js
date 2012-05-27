@@ -5,7 +5,9 @@ Sidebar.Properties.Geometry = function ( signals ) {
 
 	container.add( new UI.Text().setText( 'GEOMETRY' ).setColor( '#666' ) );
 
-	container.add( new UI.Button( 'absolute' ).setRight( '0px' ).setText( 'Export' ).onClick( exportGeometry ) );
+	var button = new UI.Button( 'absolute' ).setRight( '0px' ).setText( 'Export' ).onClick( exportGeometry );
+	button.download = 'test.js';
+	container.add( button );
 
 	container.add( new UI.Break(), new UI.Break() );
 
@@ -91,7 +93,33 @@ Sidebar.Properties.Geometry = function ( signals ) {
 
 	function exportGeometry() {
 
-		console.log( selected );
+		var geometry = selected;
+
+		var json = { "metadata": { "formatVersion" : 3 } };
+
+		json.vertices = [];
+
+		for ( var i = 0; i < geometry.vertices.length; i ++ ) {
+
+			var vertex = geometry.vertices[ i ];
+			json.vertices.push( vertex.x, vertex.y, vertex.z );
+
+		}
+
+		var file = new BlobBuilder();
+		file.append( JSON.stringify( json ) );
+
+		var objectURL = URL.createObjectURL( file.getBlob( 'text/json' ) );
+
+		var clickEvent = document.createEvent( 'MouseEvent' );
+		clickEvent.initMouseEvent( 'click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null );
+
+		var download = document.createElement( 'a' );
+		download.href = objectURL;
+		download.download = 'geometry.js';
+		download.dispatchEvent( clickEvent );
+
+		URL.revokeObjectURL( objectURL );
 
 	}
 
