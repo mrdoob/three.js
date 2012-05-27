@@ -112,18 +112,118 @@ Sidebar.Properties.Geometry = function ( signals ) {
 
 			var face = geometry.faces[ i ];
 
+			var isTriangle = face instanceof THREE.Face3;
+			var hasMaterial = face.materialIndex !== undefined;
+			var hasFaceUv = geometry.faceUvs[ 0 ][ i ] !== undefined;
+			var hasFaceVertexUv = geometry.faceVertexUvs[ 0 ][ i ] !== undefined;
+			var hasFaceNormal = face.normal.length() > 0;
+			var hasFaceVertexNormal = face.vertexNormals[ 0 ] !== undefined;
+			var hasFaceColor = face.color;
+			var hasFaceVertexColor = face.vertexColors[ 0 ] !== undefined;
+
 			var faceType = 0
-			faceType = setBit( faceType, 0, face instanceof THREE.Face4 );
+			faceType = setBit( faceType, 0, ! isTriangle );
+			/*
+			faceType = setBit( faceType, 1, hasMaterial );
+			faceType = setBit( faceType, 2, hasFaceUv );
+			faceType = setBit( faceType, 3, hasFaceVertexUv );
+			faceType = setBit( faceType, 4, hasFaceNormal );
+			faceType = setBit( faceType, 5, hasFaceVertexNormal );
+			faceType = setBit( faceType, 6, hasFaceColor );
+			faceType = setBit( faceType, 7, hasFaceVertexColor );
+			*/
 
 			json.faces.push( faceType );
 
-			if ( face instanceof THREE.Face3 ) {
+			if ( isTriangle ) {
 
 				json.faces.push( face.a, face.b, face.c );
 
-			} else if ( face instanceof THREE.Face4 ) {
+			} else {
 
 				json.faces.push( face.a, face.b, face.c, face.d );
+
+			}
+
+			if ( hasMaterial ) {
+
+				json.faces.push( face.materialIndex );
+
+			}
+
+			if ( hasFaceUv || hasFaceVertexUv ) json.uvs = [ [] ];
+
+			if ( hasFaceUv ) {
+
+				/*
+				var uv = geometry.faceUvs[ 0 ][ i ];
+				json.uvs[ 0 ].push( uv.u, uv.v );
+				*/
+
+			}
+
+			if ( hasFaceVertexUv ) {
+
+				/*
+				var uvs = geometry.faceVertexUvs[ 0 ][ i ];
+
+				if ( isTriangle ) {
+
+					json.faces.push(
+						uvs[ 0 ].u, uvs[ 0 ].v,
+						uvs[ 1 ].u, uvs[ 1 ].v,
+						uvs[ 2 ].u, uvs[ 2 ].v
+					);
+
+				} else {
+
+					json.faces.push(
+						uvs[ 0 ].u, uvs[ 0 ].v,
+						uvs[ 1 ].u, uvs[ 1 ].v,
+						uvs[ 2 ].u, uvs[ 2 ].v,
+						uvs[ 3 ].u, uvs[ 3 ].v
+					);
+
+				}
+				*/
+
+			}
+
+			if ( hasFaceNormal || hasFaceVertexNormal ) json.normals = [];
+
+			if ( hasFaceNormal ) {
+
+				/*
+				var normal = face.normal;
+				json.faces.push( normal.x, normal.y, normal.z );
+				*/
+
+			}
+
+			if ( hasFaceVertexNormal ) {
+
+				/*
+				var normals = face.vertexNormals;
+
+				if ( isTriangle ) {
+
+					json.faces.push(
+						normals[ 0 ].u, normals[ 0 ].y, normals[ 0 ].z,
+						normals[ 1 ].u, normals[ 1 ].y, normals[ 1 ].z,
+						normals[ 2 ].u, normals[ 2 ].y, normals[ 2 ].z
+					);
+
+				} else {
+
+					json.faces.push(
+						normals[ 0 ].x, normals[ 0 ].y, normals[ 0 ].z,
+						normals[ 1 ].x, normals[ 1 ].y, normals[ 1 ].z,
+						normals[ 2 ].x, normals[ 2 ].y, normals[ 2 ].z,
+						normals[ 3 ].x, normals[ 3 ].y, normals[ 3 ].z
+					);
+
+				}
+				*/
 
 			}
 
