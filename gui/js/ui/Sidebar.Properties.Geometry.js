@@ -106,6 +106,37 @@ Sidebar.Properties.Geometry = function ( signals ) {
 
 		}
 
+		json.faces = [];
+
+		for ( var i = 0; i < geometry.faces.length; i ++ ) {
+
+			var face = geometry.faces[ i ];
+
+			var faceType = 0
+			faceType = setBit( faceType, 0, face instanceof THREE.Face4 );
+
+			json.faces.push( faceType );
+
+			if ( face instanceof THREE.Face3 ) {
+
+				json.faces.push( face.a, face.b, face.c );
+
+			} else if ( face instanceof THREE.Face4 ) {
+
+				json.faces.push( face.a, face.b, face.c, face.d );
+
+			}
+
+		}
+
+		function setBit( value, position, enabled ) {
+
+			return enabled ? value | ( 1 << position ) : value & ( ~ ( 1 << position) );
+
+		}
+
+		//
+
 		var file = new BlobBuilder();
 		file.append( JSON.stringify( json ) );
 
