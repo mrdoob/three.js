@@ -154,10 +154,10 @@ def main(argv=None):
 	files = getFileNames()
 
 	config = [
-	['Three', 'includes', '', files["COMMON_FILES"] + files["EXTRAS_FILES"], args.common],
-	['ThreeCanvas', 'includes_canvas', '', files["CANVAS_FILES"], args.canvas],
-	['ThreeWebGL', 'includes_webgl', '', files["WEBGL_FILES"], args.webgl],
-	['ThreeExtras', 'includes_extras', 'externs_extras', files["EXTRAS_FILES"], args.extras]
+	['Three', 'includes', '', files["COMMON"] + files["EXTRAS"], args.common],
+	['ThreeCanvas', 'includes_canvas', '', files["CANVAS"], args.canvas],
+	['ThreeWebGL', 'includes_webgl', '', files["WEBGL"], args.webgl],
+	['ThreeExtras', 'includes_extras', 'externs_extras', files["EXTRAS"], args.extras]
 	]
 
 	for fname_lib, fname_inc, fname_externs, files, enabled in config:

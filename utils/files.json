@@ -1,5 +1,5 @@
 {
-	"COMMON_FILES" : [
+	"COMMON" : [
 		"Three.js",
 		"core/Clock.js",
 		"core/Color.js",
@@ -77,7 +77,7 @@
 		"renderers/renderables/RenderableLine.js"
 	],
 
-	"EXTRAS_FILES" : [
+	"EXTRAS" : [
 		"extras/ColorUtils.js",
 		"extras/GeometryUtils.js",
 		"extras/ImageUtils.js",
@@ -132,7 +132,7 @@
 		"extras/shaders/ShaderSprite.js"
 	],
 
-	"CANVAS_FILES" : [
+	"CANVAS" : [
 		"Three.js",
 		"core/Color.js",
 		"core/Vector2.js",
@@ -194,7 +194,7 @@
 		"renderers/renderables/RenderableLine.js"
 	],
 
-	"WEBGL_FILES" : [
+	"WEBGL" : [
 		"Three.js",
 		"core/Color.js",
 		"core/Vector2.js",
