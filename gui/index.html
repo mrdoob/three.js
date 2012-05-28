@@ -28,6 +28,7 @@
 		<script type="text/javascript" src="js/libs/signals.min.js"></script>
 
 		<script type="text/javascript" src="js/UI.js"></script>
+		<script type="text/javascript" src="js/ui/Menubar.js"></script>
 		<script type="text/javascript" src="js/ui/Viewport.js"></script>
 		<script type="text/javascript" src="js/ui/Sidebar.js"></script>
 		<script type="text/javascript" src="js/ui/Sidebar.Outliner.js"></script>
@@ -35,7 +36,6 @@
 		<script type="text/javascript" src="js/ui/Sidebar.Properties.Object3D.js"></script>
 		<script type="text/javascript" src="js/ui/Sidebar.Properties.Geometry.js"></script>
 		<script type="text/javascript" src="js/ui/Sidebar.Properties.Material.js"></script>
-		<script type="text/javascript" src="js/ui/MenuBar.js"></script>
 
 		<script>
 
@@ -55,7 +55,7 @@
 
 			//
 
-			var menubar = new MenuBar( signals );
+			var menubar = new Menubar( signals );
 			menubar.setWidth( '100%' );
 			menubar.setHeight( '32px' );
 			document.body.appendChild( menubar.dom );
