@@ -114,6 +114,12 @@ function buildIncludes(files, filename){
 	output(text.join("\n"), filename + '.js');
 }
 
+function getFileNames(){
+	"use strict";
+	var fileName = "utils/files.json";
+	var data = JSON.parse(fs.readFileSync(fileName,'utf8'));	
+	return data;
+}
 
 function parse_args(){
 	"use strict";
@@ -141,12 +147,13 @@ function main(){
 	var args = parse_args();
 	var debug = args.debug;
 	var minified = args.minified;
+	var files = getFileNames();
 
 	var config = [
-	['Three', 'includes', '', COMMON_FILES.concat(EXTRAS_FILES), args.common],
-	['ThreeCanvas', 'includes_canvas', '', CANVAS_FILES, args.canvas],
-	['ThreeWebGL', 'includes_webgl', '', WEBGL_FILES, args.webgl],
-	['ThreeExtras', 'includes_extras', 'externs_extras', EXTRAS_FILES, args.extras]
+	['Three', 'includes', '', files["COMMON"].concat(files["EXTRAS"]), args.common],
+	['ThreeCanvas', 'includes_canvas', '', files["CANVAS"], args.canvas],
+	['ThreeWebGL', 'includes_webgl', '', files["WEBGL"], args.webgl],
+	['ThreeExtras', 'includes_extras', 'externs_extras', files["EXTRAS"], args.extras]
 	];
 
 
