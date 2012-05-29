@@ -61,7 +61,10 @@ THREE.Object3D.prototype = {
 		this.matrix.multiply( matrix, this.matrix );
 
 		this.scale.getScaleFromMatrix( this.matrix );
-		this.rotation.getRotationFromMatrix( this.matrix, this.scale );
+		
+		var mat = new THREE.Matrix4().extractRotation( this.matrix );
+		this.rotation.setEulerFromRotationMatrix( mat, this.eulerOrder );
+		
 		this.position.getPositionFromMatrix( this.matrix );
 
 	},
@@ -99,7 +102,7 @@ THREE.Object3D.prototype = {
 
 		if ( this.rotationAutoUpdate ) {
 
-			this.rotation.getRotationFromMatrix( this.matrix );
+			this.rotation.setEulerFromRotationMatrix( this.matrix, this.eulerOrder );
 
 		}
 
@@ -263,8 +266,22 @@ THREE.Object3D.prototype = {
 
 		}
 
+	},
+
+	worldToLocal: function ( vector ) {
+
+		return THREE.Object3D.__m1.getInverse( this.matrixWorld ).multiplyVector3( vector );
+
+	},
+
+	localToWorld: function ( vector ) {
+
+		return this.matrixWorld.multiplyVector3( vector );
+
 	}
 
 };
+
+THREE.Object3D.__m1 = new THREE.Matrix4();
 
 THREE.Object3DCount = 0;

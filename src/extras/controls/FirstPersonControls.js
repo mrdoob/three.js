@@ -124,7 +124,9 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 	this.onKeyDown = function ( event ) {
 
-		switch( event.keyCode ) {
+		event.preventDefault();
+
+		switch ( event.keyCode ) {
 
 			case 38: /*up*/
 			case 87: /*W*/ this.moveForward = true; break;

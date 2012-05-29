@@ -13,4 +13,3 @@ THREE.Light = function ( hex ) {
 
 THREE.Light.prototype = new THREE.Object3D();
 THREE.Light.prototype.constructor = THREE.Light;
-THREE.Light.prototype.supr = THREE.Object3D.prototype;

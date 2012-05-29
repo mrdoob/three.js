@@ -2,7 +2,21 @@
  * @author mr.doob / http://mrdoob.com/
  */
 
-var THREE = THREE || { REVISION: '49' };
+var THREE = THREE || { REVISION: '50dev' };
+
+if ( ! self.console ) {
+
+	self.console = {
+
+		info: function () {},
+		log: function () {},
+		debug: function () {},
+		warn: function () {},
+		error: function () {}
+
+	};
+
+}
 
 if ( ! self.Int32Array ) {
 

@@ -57,6 +57,8 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
+				// scene
+
 				scene = new THREE.Scene();
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
@@ -70,10 +72,25 @@
 				directionalLight.position.set( 0, 0, 1 ).normalize();
 				scene.add( directionalLight );
 
-				var texture = THREE.ImageUtils.loadTexture( 'textures/ash_uvgrid01.jpg' );
+				// texture
+
+				var texture = new THREE.Texture();
+
+				var loader = new THREE.ImageLoader();
+				loader.addEventListener( 'load', function ( event ) {
+
+					texture.image = event.content;
+					texture.needsUpdate = true;
+
+				} );
+				loader.load( 'textures/ash_uvgrid01.jpg' );
+
+				// model
 
 				var loader = new THREE.OBJLoader();
-				loader.load( "obj/male02/male02.obj", function ( object ) {
+				loader.addEventListener( 'load', function ( event ) {
+
+					var object = event.content;
 
 					for ( var i = 0, l = object.children.length; i < l; i ++ ) {
 
@@ -84,9 +101,10 @@
 					object.position.y = - 80;
 					scene.add( object );
 
-				} );
+				});
+				loader.load( 'obj/male02/male02.obj' );
 
-				// RENDERER
+				// 
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );

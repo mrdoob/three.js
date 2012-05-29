@@ -34,6 +34,9 @@
 
 		<script src="../build/Three.js"></script>
 
+		<script src="../src/loaders/LoadingMonitor.js"></script>
+		<script src="../src/loaders/GeometryLoader.js"></script>
+
 		<script src="js/loaders/ColladaLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
@@ -85,8 +88,10 @@
 
 				// Add Blender exported Collada model
 
-				var loader = new THREE.JSONLoader();
-				loader.load( "models/animated/monster/monster.js", function ( geometry ) {
+				var loader = new THREE.GeometryLoader();
+				loader.addEventListener( 'load', function ( event ) {
+
+					var geometry = event.content;
 
 					// adjust color a bit
 
@@ -134,6 +139,7 @@
 					}
 
 				} );
+				loader.load( 'models/animated/monster/monster.js' );
 
 
 				// Add the COLLADA

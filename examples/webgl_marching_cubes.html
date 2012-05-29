@@ -146,9 +146,13 @@
 			resolution = 28;
 			numBlobs = 10;
 
-			effect = new THREE.MarchingCubes( resolution, materials[ current_material ].m );
+			effect = new THREE.MarchingCubes( resolution, materials[ current_material ].m, true, true );
 			effect.position.set( 0, 0, 0 );
 			effect.scale.set( 700, 700, 700 );
+
+			effect.enableUvs = false;
+			effect.enableColors = false;
+
 			scene.add( effect );
 
 			// RENDERER
@@ -284,6 +288,9 @@
 			dottedMaterial2.uniforms.uBaseColor.value.setRGB( 0, 0, 0 );
 			dottedMaterial2.uniforms.uLineColor1.value.setHSV( 0.05, 1.0, 1.0 );
 
+			var texture = THREE.ImageUtils.loadTexture( "textures/ash_uvgrid01.jpg" );
+			texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+
 			var materials = {
 
 			"chrome" :
@@ -307,6 +314,24 @@
 			"matte" :
 			{
 				m: new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x111111, shininess: 1, perPixel: true } ),
+				h: 0, s: 0, v: 1
+			},
+
+			"flat" :
+			{
+				m: new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x111111, shininess: 1, shading: THREE.FlatShading, perPixel: true } ),
+				h: 0, s: 0, v: 1
+			},
+
+			"textured" :
+			{
+				m: new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, shininess: 1, map: texture, perPixel: true } ),
+				h: 0, s: 0, v: 1
+			},
+
+			"colors" :
+			{
+				m: new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 2, vertexColors: THREE.VertexColors, perPixel: true } ),
 				h: 0, s: 0, v: 1
 			},
 
@@ -402,16 +427,41 @@
 
 					mm.setValue( current_material );
 
+					if ( current_material === "textured" ) {
+
+						effect.enableUvs = true;
+
+					} else {
+
+						effect.enableUvs = false;
+
+					}
+
+					if ( current_material === "colors" ) {
+
+						effect.enableColors = true;
+
+					} else {
+
+						effect.enableColors = false;
+
+					}
+
 				};
 
 			};
 
 			function toggle( e ) {
 
-				if ( e.style.display === "block" )
+				if ( e.style.display === "block" ) {
+
 					e.style.display = "none";
-				else
+
+				} else {
+
 					e.style.display = "block";
+
+				}
 
 			}
 

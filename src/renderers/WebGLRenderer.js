@@ -104,6 +104,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_gl,
 
 	_programs = [],
+	_programs_counter = 0,
 
 	// internal state cache
 
@@ -364,6 +365,69 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl.deleteFramebuffer( renderTarget.__webglFramebuffer );
 			_gl.deleteRenderbuffer( renderTarget.__webglRenderbuffer );
+
+		}
+
+	};
+
+	this.deallocateMaterial = function ( material ) {
+
+		var program = material.program;
+
+		if ( ! program ) return;
+
+		material.program = undefined;
+
+		// only deallocate GL program if this was the last use of shared program
+		// assumed there is only single copy of any program in the _programs list
+		// (that's how it's constructed)
+
+		var i, il, programInfo;
+		var deleteProgram = false;
+
+		for ( i = 0, il = _programs.length; i < il; i ++ ) {
+
+			programInfo = _programs[ i ];
+
+			if ( programInfo.program === program ) {
+
+				programInfo.usedTimes --;
+
+				if ( programInfo.usedTimes === 0 ) {
+
+					deleteProgram = true;
+
+				}
+
+				break;
+
+			}
+
+		}
+
+		if ( deleteProgram ) {
+
+			// avoid using array.splice, this is costlier than creating new array from scratch
+
+			var newPrograms = [];
+
+			for ( i = 0, il = _programs.length; i < il; i ++ ) {
+
+				programInfo = _programs[ i ];
+
+				if ( programInfo.program !== program ) {
+
+					newPrograms.push( programInfo );
+
+				}
+
+			}
+
+			_programs = newPrograms;
+
+			_gl.deleteProgram( program );
+
+			_this.info.memory.programs --;
 
 		}
 
@@ -2816,12 +2880,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Buffer rendering
 
-	this.renderBufferImmediate = function ( object, program, shading ) {
+	this.renderBufferImmediate = function ( object, program, material ) {
 
-		if ( ! object.__webglVertexBuffer ) object.__webglVertexBuffer = _gl.createBuffer();
-		if ( ! object.__webglNormalBuffer ) object.__webglNormalBuffer = _gl.createBuffer();
+		if ( object.hasPositions && ! object.__webglVertexBuffer ) object.__webglVertexBuffer = _gl.createBuffer();
+		if ( object.hasNormals && ! object.__webglNormalBuffer ) object.__webglNormalBuffer = _gl.createBuffer();
+		if ( object.hasUvs && ! object.__webglUvBuffer ) object.__webglUvBuffer = _gl.createBuffer();
+		if ( object.hasColors && ! object.__webglColorBuffer ) object.__webglColorBuffer = _gl.createBuffer();
 
-		if ( object.hasPos ) {
+		if ( object.hasPositions ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, object.__webglVertexBuffer );
 			_gl.bufferData( _gl.ARRAY_BUFFER, object.positionArray, _gl.DYNAMIC_DRAW );
@@ -2830,11 +2896,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		if ( object.hasNormal ) {
+		if ( object.hasNormals ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, object.__webglNormalBuffer );
 
-			if ( shading === THREE.FlatShading ) {
+			if ( material.shading === THREE.FlatShading ) {
 
 				var nx, ny, nz,
 					nax, nbx, ncx, nay, nby, ncy, naz, nbz, ncz,
@@ -2880,6 +2946,24 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.bufferData( _gl.ARRAY_BUFFER, object.normalArray, _gl.DYNAMIC_DRAW );
 			_gl.enableVertexAttribArray( program.attributes.normal );
 			_gl.vertexAttribPointer( program.attributes.normal, 3, _gl.FLOAT, false, 0, 0 );
+
+		}
+
+		if ( object.hasUvs && material.map ) {
+
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, object.__webglUvBuffer );
+			_gl.bufferData( _gl.ARRAY_BUFFER, object.uvArray, _gl.DYNAMIC_DRAW );
+			_gl.enableVertexAttribArray( program.attributes.uv );
+			_gl.vertexAttribPointer( program.attributes.uv, 2, _gl.FLOAT, false, 0, 0 );
+
+		}
+
+		if ( object.hasColors && material.vertexColors !== THREE.NoColors ) {
+
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, object.__webglColorBuffer );
+			_gl.bufferData( _gl.ARRAY_BUFFER, object.colorArray, _gl.DYNAMIC_DRAW );
+			_gl.enableVertexAttribArray( program.attributes.color );
+			_gl.vertexAttribPointer( program.attributes.color, 3, _gl.FLOAT, false, 0, 0 );
 
 		}
 
@@ -3311,7 +3395,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// load updated influences uniform
 
-		if( material.program.uniforms.morphTargetInfluences !== null ) {
+		if ( material.program.uniforms.morphTargetInfluences !== null ) {
 
 			_gl.uniform1fv( material.program.uniforms.morphTargetInfluences, object.__webglMorphTargetInfluences );
 
@@ -3682,7 +3766,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else {
 
-			object.render( function( object ) { _this.renderBufferImmediate( object, program, material.shading ); } );
+			object.render( function( object ) { _this.renderBufferImmediate( object, program, material ); } );
 
 		}
 
@@ -4425,7 +4509,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setProgram( camera, lights, fog, material, object ) {
 
-		if ( ! material.program || material.needsUpdate ) {
+		if ( material.needsUpdate ) {
+
+			if ( material.program ) _this.deallocateMaterial( material );
 
 			_this.initMaterial( material, lights, fog, object );
 			material.needsUpdate = false;
@@ -4437,12 +4523,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			if ( ! object.__webglMorphTargetInfluences ) {
 
 				object.__webglMorphTargetInfluences = new Float32Array( _this.maxMorphTargets );
-
-				for ( var i = 0, il = _this.maxMorphTargets; i < il; i ++ ) {
-
-					object.__webglMorphTargetInfluences[ i ] = 0;
-
-				}
 
 			}
 
@@ -5057,7 +5137,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			light = lights[ l ];
 
-			if ( light.onlyShadow ) continue;
+			if ( light.onlyShadow || ! light.visible ) continue;
 
 			color = light.color;
 			intensity = light.intensity;
@@ -5463,11 +5543,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		for ( p = 0, pl = _programs.length; p < pl; p ++ ) {
 
-			if ( _programs[ p ].code === code ) {
+			var programInfo = _programs[ p ];
+
+			if ( programInfo.code === code ) {
 
 				// console.log( "Code already compiled." /*: \n\n" + code*/ );
 
-				return _programs[ p ].program;
+				programInfo.usedTimes ++;
+
+				return programInfo.program;
 
 			}
 
@@ -5611,8 +5695,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		].join("\n");
 
-		_gl.attachShader( program, getShader( "fragment", prefix_fragment + fragmentShader ) );
-		_gl.attachShader( program, getShader( "vertex", prefix_vertex + vertexShader ) );
+		var glFragmentShader = getShader( "fragment", prefix_fragment + fragmentShader );
+		var glVertexShader = getShader( "vertex", prefix_vertex + vertexShader );
+
+		_gl.attachShader( program, glVertexShader );
+		_gl.attachShader( program, glFragmentShader );
 
 		_gl.linkProgram( program );
 
@@ -5621,6 +5708,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 			console.error( "Could not initialise shader\n" + "VALIDATE_STATUS: " + _gl.getProgramParameter( program, _gl.VALIDATE_STATUS ) + ", gl error [" + _gl.getError() + "]" );
 
 		}
+
+		// clean up
+
+		_gl.deleteShader( glFragmentShader );
+		_gl.deleteShader( glVertexShader );
 
 		//console.log( prefix_fragment + fragmentShader );
 		//console.log( prefix_vertex + vertexShader );
@@ -5676,9 +5768,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		cacheAttributeLocations( program, identifiers );
 
-		program.id = _programs.length;
+		program.id = _programs_counter ++;
 
-		_programs.push( { program: program, code: code } );
+		_programs.push( { program: program, code: code, usedTimes: 1 } );
 
 		_this.info.memory.programs = _programs.length;
 
@@ -6131,8 +6223,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 			case THREE.LinearMipMapNearestFilter: return _gl.LINEAR_MIPMAP_NEAREST; break;
 			case THREE.LinearMipMapLinearFilter: return _gl.LINEAR_MIPMAP_LINEAR; break;
 
-			case THREE.ByteType: return _gl.BYTE; break;
 			case THREE.UnsignedByteType: return _gl.UNSIGNED_BYTE; break;
+			case THREE.UnsignedShort4444Type: return _gl.UNSIGNED_SHORT_4_4_4_4; break;
+			case THREE.UnsignedShort5551Type: return _gl.UNSIGNED_SHORT_5_5_5_1; break;
+			case THREE.UnsignedShort565Type: return _gl.UNSIGNED_SHORT_5_6_5; break;
+
+			case THREE.ByteType: return _gl.BYTE; break;
 			case THREE.ShortType: return _gl.SHORT; break;
 			case THREE.UnsignedShortType: return _gl.UNSIGNED_SHORT; break;
 			case THREE.IntType: return _gl.INT; break;
