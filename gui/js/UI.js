@@ -4,138 +4,176 @@ UI.Element = function () {};
 
 UI.Element.prototype = {
 
-	setX: function ( value ) {
+	setStyle: function ( style, array ) {
 
-		this.dom.style.left = value;
+		for ( var i = 0; i < array.length; i ++ ) {
 
+			this.dom.style[ style ] = array[ i ];
+
+		}
+
+	},
+
+	setLeft: function () {
+
+		this.setStyle( 'left', arguments );
 		return this;
 
 	},
 
-	setY: function ( value ) {
+	setTop: function () {
 
-		this.dom.style.top = value;
-
-		return this;		
-
-	},
-
-	setWidth: function ( value ) {
-
-		this.dom.style.width = value;
+		this.setStyle( 'top', arguments );
 		return this;
 
 	},
 
-	setHeight: function ( value ) {
+	setRight: function () {
 
-		this.dom.style.height = value;
+		this.setStyle( 'right', arguments );
+		return this;
+
+	},
+
+	setBottom: function () {
+
+		this.setStyle( 'bottom', arguments );
+		return this;
+
+	},
+
+	setWidth: function () {
+
+		this.setStyle( 'width', arguments );
+		return this;
+
+	},
+
+	setHeight: function () {
+
+		this.setStyle( 'height', arguments );
 		return this;
 
 	},
 
 	// border
 
-	setBorder: function ( value ) {
+	setBorder: function () {
 
-		this.dom.style.border = value;
+		this.setStyle( 'border', arguments );
 		return this;
 
 	},
 
-	setBorderTop: function ( value ) {
+	setBorderTop: function () {
 
-		this.dom.style.borderTop = value;
+		this.setStyle( 'borderTop', arguments );
 		return this;
 
 	},
 
-	setBorderBottom: function ( value ) {
+	setBorderBottom: function () {
 
-		this.dom.style.borderBottom = value;
+		this.setStyle( 'borderBottom', arguments );
 		return this;
 
 	},
 
-	setBorderLeft: function ( value ) {
+	setBorderLeft: function () {
 
-		this.dom.style.borderLeft = value;
+		this.setStyle( 'borderLeft', arguments );
 		return this;
 
 	},
 
-	setBorderRight: function ( value ) {
+	setBorderRight: function () {
 
-		this.dom.style.borderRight = value;
+		this.setStyle( 'borderRight', arguments );
 		return this;
 
 	},
 
 	// margin
 
-	setMargin: function ( value ) {
+	setMargin: function () {
 
-		this.dom.style.margin = value;
+		this.setStyle( 'margin', arguments );
 		return this;
 
 	},
 
-	setMarginTop: function ( value ) {
+	setMarginTop: function () {
 
-		this.dom.style.marginTop = value;
+		this.setStyle( 'marginTop', arguments );
 		return this;
 
 	},
 
-	setMarginBottom: function ( value ) {
+	setMarginBottom: function () {
 
-		this.dom.style.marginBottom = value;
+		this.setStyle( 'marginBottom', arguments );
 		return this;
 
 	},
 
-	setMarginLeft: function ( value ) {
+	setMarginLeft: function () {
 
-		this.dom.style.marginLeft = value;
+		this.setStyle( 'marginLeft', arguments );
 		return this;
 
 	},
 
-	setMarginRight: function ( value ) {
+	setMarginRight: function () {
 
-		this.dom.style.marginRight = value;
+		this.setStyle( 'marginRight', arguments );
 		return this;
 
 	},
 
 	// padding
 
-	setPadding: function ( value ) {
+	setPadding: function () {
 
-		this.dom.style.padding = value;
+		this.setStyle( 'padding', arguments );
 		return this;
 
 	},
 
 	//
 
-	setFontWeight: function ( value ) {
+	setFontSize: function () {
 
-		this.dom.style.fontWeight = value;
+		this.setStyle( 'fontSize', arguments );
 		return this;
 
 	},
 
-	setColor: function ( value ) {
+	setFontWeight: function () {
 
-		this.dom.style.color = value;
+		this.setStyle( 'fontWeight', arguments );
 		return this;
 
 	},
 
-	setBackgroundColor: function ( value ) {
+	//
 
-		this.dom.style.backgroundColor = value;
+	setColor: function () {
+
+		this.setStyle( 'color', arguments );
+		return this;
+
+	},
+
+	setBackgroundColor: function () {
+
+		this.setStyle( 'backgroundColor', arguments );
+		return this;
+
+	},
+
+	setDisplay: function () {
+
+		this.setStyle( 'display', arguments );
 		return this;
 
 	}
@@ -191,7 +229,7 @@ UI.Text.prototype.constructor = UI.Text;
 
 UI.Text.prototype.setText = function ( value ) {
 
-	this.dom.innerText = value;
+	this.dom.textContent = value;
 	return this;
 
 };
@@ -205,11 +243,13 @@ UI.IntNumber = function ( position ) {
 
 	this.dom = document.createElement( 'span' );
 	this.dom.style.position = position || 'relative';
-	this.dom.innerText = '0.00';
+	this.dom.textContent = '0.00';
 	this.dom.style.marginTop = '2px';
 	this.dom.style.color = '#0080f0';
 	this.dom.style.fontSize = '12px';
 	this.dom.style.textDecoration = 'underline';
+
+	this.onChangeCallback = null;
 
 	var scope = this;
 	var onMouseDownValue, onMouseDownScreenX, onMouseDownScreenY;
@@ -218,7 +258,7 @@ UI.IntNumber = function ( position ) {
 
 		event.preventDefault();
 
-		onMouseDownValue = parseFloat( scope.dom.innerText );
+		onMouseDownValue = parseInt( scope.dom.textContent );
 		onMouseDownScreenX = event.screenX;
 		onMouseDownScreenY = event.screenY;
 
@@ -232,7 +272,8 @@ UI.IntNumber = function ( position ) {
 		var dx = event.screenX - onMouseDownScreenX;
 		var dy = event.screenY - onMouseDownScreenY;
 
-		scope.dom.innerText = ( onMouseDownValue - ( dx - dy ) ).toFixed( 0 ); 
+		scope.dom.textContent = ( onMouseDownValue + ( dx - dy ) / ( event.shiftKey ? 10 : 100 ) ).toFixed( 0 );
+		scope.onChangeCallback();
 
 	}
 
@@ -252,12 +293,26 @@ UI.IntNumber = function ( position ) {
 UI.IntNumber.prototype = new UI.Element();
 UI.IntNumber.prototype.constructor = UI.IntNumber;
 
-UI.IntNumber.prototype.setNumber = function ( value ) {
+UI.IntNumber.prototype.getValue = function () {
 
-	this.dom.innerText = value.toFixed( 0 );
+	return parseInt( this.dom.textContent );
+
+};
+
+UI.IntNumber.prototype.setValue = function ( value ) {
+
+	this.dom.textContent = value.toFixed( 0 );
 	return this;
 
 };
+
+UI.IntNumber.prototype.onChange = function ( callback ) {
+
+	this.onChangeCallback = callback;
+	return this;
+
+};
+
 
 
 // FloatNumber
@@ -268,11 +323,13 @@ UI.FloatNumber = function ( position ) {
 
 	this.dom = document.createElement( 'span' );
 	this.dom.style.position = position || 'relative';
-	this.dom.innerText = '0.00';
+	this.dom.textContent = '0.00';
 	this.dom.style.marginTop = '2px';
 	this.dom.style.color = '#0080f0';
 	this.dom.style.fontSize = '12px';
 	this.dom.style.textDecoration = 'underline';
+
+	this.onChangeCallback = null;
 
 	var scope = this;
 	var onMouseDownValue, onMouseDownScreenX, onMouseDownScreenY;
@@ -281,7 +338,7 @@ UI.FloatNumber = function ( position ) {
 
 		event.preventDefault();
 
-		onMouseDownValue = parseFloat( scope.dom.innerText );
+		onMouseDownValue = parseFloat( scope.dom.textContent );
 		onMouseDownScreenX = event.screenX;
 		onMouseDownScreenY = event.screenY;
 
@@ -295,7 +352,8 @@ UI.FloatNumber = function ( position ) {
 		var dx = event.screenX - onMouseDownScreenX;
 		var dy = event.screenY - onMouseDownScreenY;
 
-		scope.dom.innerText = ( onMouseDownValue + ( dx - dy ) / 100 ).toFixed( 2 ); 
+		scope.dom.textContent = ( onMouseDownValue + ( dx - dy ) / ( event.shiftKey ? 10 : 100 ) ).toFixed( 2 );
+		scope.onChangeCallback();
 
 	}
 
@@ -315,9 +373,22 @@ UI.FloatNumber = function ( position ) {
 UI.FloatNumber.prototype = new UI.Element();
 UI.FloatNumber.prototype.constructor = UI.FloatNumber;
 
-UI.FloatNumber.prototype.setNumber = function ( value ) {
+UI.FloatNumber.prototype.getValue = function () {
 
-	this.dom.innerText = value.toFixed( 2 );
+	return parseFloat( this.dom.textContent );
+
+};
+
+UI.FloatNumber.prototype.setValue = function ( value ) {
+
+	this.dom.textContent = value.toFixed( 2 );
+	return this;
+
+};
+
+UI.FloatNumber.prototype.onChange = function ( callback ) {
+
+	this.onChangeCallback = callback;
 	return this;
 
 };
@@ -364,6 +435,16 @@ UI.Button = function ( position ) {
 	this.dom = document.createElement( 'button' );
 	this.dom.style.position = position || 'relative';
 
+	this.onClickCallback = null;
+
+	var scope = this;
+
+	this.dom.addEventListener( 'click', function ( event ) {
+
+		scope.onClickCallback();
+
+	}, false );
+
 	return this;
 
 };
@@ -373,7 +454,14 @@ UI.Button.prototype.constructor = UI.Button;
 
 UI.Button.prototype.setText = function ( value ) {
 
-	this.dom.innerText = value;
+	this.dom.textContent = value;
+	return this;
+
+};
+
+UI.Button.prototype.onClick = function ( callback ) {
+
+	this.onClickCallback = callback;
 	return this;
 
 };

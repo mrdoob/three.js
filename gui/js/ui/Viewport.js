@@ -5,6 +5,8 @@ var Viewport = function ( signals ) {
 
 	//
 
+	var objects = [];
+
 	var sceneHelpers = new THREE.Scene();
 
 	var size = 500, step = 25;
@@ -30,6 +32,8 @@ var Viewport = function ( signals ) {
 	sceneHelpers.add( grid );
 
 	var selectionBox = new THREE.Mesh( new THREE.CubeGeometry( 1, 1, 1 ), new THREE.MeshBasicMaterial( { color: 0xffff00, wireframe: true } ) );
+	selectionBox.geometry.dynamic = true;
+	selectionBox.matrixAutoUpdate = false;
 	selectionBox.visible = false;
 	sceneHelpers.add( selectionBox );
 
@@ -52,6 +56,15 @@ var Viewport = function ( signals ) {
 	controls.dynamicDampingFactor = 0.3;
 	controls.addEventListener( 'change', render );
 
+	var light = new THREE.DirectionalLight( 0xffffff );
+	light.position.set( 1, 0.5, 0 ).normalize();
+	scene.add( light );
+
+	var light = new THREE.DirectionalLight( 0xffffff, 0.5 );
+	light.position.set( - 1, - 0.5, 0 ).normalize();
+	scene.add( light );
+
+
 	// object picking
 
 	var projector = new THREE.Projector();
@@ -60,11 +73,15 @@ var Viewport = function ( signals ) {
 
 		event.preventDefault();
 
-		var vector = new THREE.Vector3( ( event.clientX / container.dom.offsetWidth ) * 2 - 1, - ( event.clientY / container.dom.offsetHeght ) * 2 + 1, 0.5 );
+		var vector = new THREE.Vector3(
+			( ( event.clientX - container.dom.offsetLeft ) / container.dom.offsetWidth ) * 2 - 1,
+			- ( ( event.clientY - container.dom.offsetTop ) / container.dom.offsetHeight ) * 2 + 1,
+			0.5
+		);
 		projector.unprojectVector( vector, camera );
 
 		var ray = new THREE.Ray( camera.position, vector.subSelf( camera.position ).normalize() );
-		var intersects = ray.intersectObjects( scene.children );
+		var intersects = ray.intersectObjects( objects );
 
 		if ( intersects.length ) {
 
@@ -84,7 +101,23 @@ var Viewport = function ( signals ) {
 
 	signals.objectAdded.add( function ( object ) {
 
+		THREE.SceneUtils.traverseHierarchy( object, function ( child ) {
+
+			objects.push( child );
+
+		} );
+
+		objects.push( object );
+
 		scene.add( object );
+		render();
+
+	} );
+
+	signals.objectChanged.add( function ( object ) {
+
+		selectionBox.matrixWorld.copy( object.matrixWorld );
+
 		render();
 
 	} );
@@ -95,7 +128,7 @@ var Viewport = function ( signals ) {
 
 			selectionBox.visible = false;
 
-		} else {
+		} else if ( object.geometry ) {
 
 			var geometry = object.geometry;
 
@@ -105,9 +138,43 @@ var Viewport = function ( signals ) {
 
 			}
 
-			selectionBox.scale.x = geometry.boundingBox.max.x - geometry.boundingBox.min.x;
-			selectionBox.scale.y = geometry.boundingBox.max.y - geometry.boundingBox.min.y;
-			selectionBox.scale.z = geometry.boundingBox.max.z - geometry.boundingBox.min.z;
+			selectionBox.geometry.vertices[ 0 ].x = geometry.boundingBox.max.x;
+			selectionBox.geometry.vertices[ 0 ].y = geometry.boundingBox.max.y;
+			selectionBox.geometry.vertices[ 0 ].z = geometry.boundingBox.max.z;
+
+			selectionBox.geometry.vertices[ 1 ].x = geometry.boundingBox.max.x;
+			selectionBox.geometry.vertices[ 1 ].y = geometry.boundingBox.max.y;
+			selectionBox.geometry.vertices[ 1 ].z = geometry.boundingBox.min.z;
+
+			selectionBox.geometry.vertices[ 2 ].x = geometry.boundingBox.max.x;
+			selectionBox.geometry.vertices[ 2 ].y = geometry.boundingBox.min.y;
+			selectionBox.geometry.vertices[ 2 ].z = geometry.boundingBox.max.z;
+
+			selectionBox.geometry.vertices[ 3 ].x = geometry.boundingBox.max.x;
+			selectionBox.geometry.vertices[ 3 ].y = geometry.boundingBox.min.y;
+			selectionBox.geometry.vertices[ 3 ].z = geometry.boundingBox.min.z;
+
+			selectionBox.geometry.vertices[ 4 ].x = geometry.boundingBox.min.x;
+			selectionBox.geometry.vertices[ 4 ].y = geometry.boundingBox.max.y;
+			selectionBox.geometry.vertices[ 4 ].z = geometry.boundingBox.min.z;
+
+			selectionBox.geometry.vertices[ 5 ].x = geometry.boundingBox.min.x;
+			selectionBox.geometry.vertices[ 5 ].y = geometry.boundingBox.max.y;
+			selectionBox.geometry.vertices[ 5 ].z = geometry.boundingBox.max.z;
+
+			selectionBox.geometry.vertices[ 6 ].x = geometry.boundingBox.min.x;
+			selectionBox.geometry.vertices[ 6 ].y = geometry.boundingBox.min.y;
+			selectionBox.geometry.vertices[ 6 ].z = geometry.boundingBox.min.z;
+
+			selectionBox.geometry.vertices[ 7 ].x = geometry.boundingBox.min.x;
+			selectionBox.geometry.vertices[ 7 ].y = geometry.boundingBox.min.y;
+			selectionBox.geometry.vertices[ 7 ].z = geometry.boundingBox.max.z;
+
+			selectionBox.geometry.computeBoundingSphere();
+
+			selectionBox.geometry.verticesNeedUpdate = true;
+
+			selectionBox.matrixWorld.copy( object.matrixWorld );
 
 			selectionBox.visible = true;
 
@@ -132,6 +199,7 @@ var Viewport = function ( signals ) {
 
 	var renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false, clearColor: 0xaaaaaa, clearAlpha: 1 } );
 	renderer.autoClear = false;
+	renderer.autoUpdateScene = false;
 	container.dom.appendChild( renderer.domElement );
 
 	animate();
@@ -147,9 +215,12 @@ var Viewport = function ( signals ) {
 
 	function render() {
 
+		scene.updateMatrixWorld();
+		sceneHelpers.updateMatrixWorld();
+
 		renderer.clear();
-		renderer.render( sceneHelpers, camera );
 		renderer.render( scene, camera );
+		renderer.render( sceneHelpers, camera );
 
 	}
 

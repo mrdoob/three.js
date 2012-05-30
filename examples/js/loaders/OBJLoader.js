@@ -298,6 +298,8 @@ THREE.OBJLoader.prototype = {
 			}
 
 			geometry.computeCentroids();
+			geometry.computeFaceNormals();
+			geometry.computeBoundingSphere();
 
 			group.add( new THREE.Mesh( geometry, new THREE.MeshLambertMaterial() ) );
 
