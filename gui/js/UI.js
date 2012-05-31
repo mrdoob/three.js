@@ -176,7 +176,15 @@ UI.Element.prototype = {
 		this.setStyle( 'display', arguments );
 		return this;
 
+	},
+
+	setOverflow: function () {
+
+		this.setStyle( 'overflow', arguments );
+		return this;
+
 	}
+
 
 }
 

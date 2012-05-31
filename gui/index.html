@@ -49,6 +49,7 @@
 				objectAdded: new SIGNALS.Signal(),
 				objectSelected: new SIGNALS.Signal(),
 				objectChanged: new SIGNALS.Signal(),
+				materialChanged: new SIGNALS.Signal(),
 				windowResize: new SIGNALS.Signal()
 
 			};
@@ -105,9 +106,7 @@
 
 						case 'js':
 
-							var loader = new THREE.GeometryLoader();
-
-							var geometry = loader.parse( JSON.parse( contents ) );
+							var geometry = new THREE.GeometryLoader().parse( JSON.parse( contents ) );
 							var material = new THREE.MeshLambertMaterial( { color: 0xffffff } );
 							var mesh = new THREE.Mesh( geometry, material );
 
@@ -118,9 +117,7 @@
 
 						case 'obj':
 
-							var loader = new THREE.OBJLoader();
-
-							var object = loader.parse( contents );
+							var object = new THREE.OBJLoader().parse( contents );
 
 							signals.objectAdded.dispatch( object );
 							signals.objectSelected.dispatch( object );
@@ -135,9 +132,7 @@
 
 						case 'vtk':
 
-							var loader = new THREE.VTKLoader();
-
-							var geometry = loader.parse( contents );
+							var geometry = new THREE.VTKLoader().parse( contents );
 							var material = new THREE.MeshLambertMaterial( { color: 0xffffff } );
 							var mesh = new THREE.Mesh( geometry, material );
 
