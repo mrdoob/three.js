@@ -4,40 +4,27 @@ Sidebar.Properties.Geometry = function ( signals ) {
 	container.setDisplay( 'none' );
 
 	container.add( new UI.Text().setText( 'GEOMETRY' ).setColor( '#666' ) );
-
-	var button = new UI.Button( 'absolute' ).setRight( '0px' ).setText( 'Export' ).onClick( exportGeometry );
-	button.download = 'test.js';
-	container.add( button );
-
+	container.add( new UI.Button( 'absolute' ).setRight( '0px' ).setText( 'Export' ).onClick( exportGeometry ) );
 	container.add( new UI.Break(), new UI.Break() );
 
 	container.add( new UI.Text().setText( 'Name' ).setColor( '#666' ) );
-
 	var geometryName = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' ).setFontSize( '12px' );
-
 	container.add( geometryName );
-
 	container.add( new UI.HorizontalRule() );
 
 	container.add( new UI.Text().setText( 'Class' ).setColor( '#666' ) );
-
 	var geometryClass = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' ).setFontSize( '12px' );
 	container.add( geometryClass );
-
 	container.add( new UI.HorizontalRule() );
 
 	container.add( new UI.Text().setText( 'Vertices' ).setColor( '#666' ) );
-	
 	var verticesCount = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' ).setFontSize( '12px' );
 	container.add( verticesCount );
-
 	container.add( new UI.HorizontalRule() );
 
 	container.add( new UI.Text().setText( 'Faces' ).setColor( '#666' ) );
-
 	var facesCount = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' ).setFontSize( '12px' );
 	container.add( facesCount );
-
 	container.add( new UI.Break(), new UI.Break(), new UI.Break() );
 
 	//
@@ -107,6 +94,7 @@ Sidebar.Properties.Geometry = function ( signals ) {
 		var faces = [];
 		var uvs = [[]];
 		var normals = [];
+		var normalsHash = {};
 
 		for ( var i = 0; i < geometry.faces.length; i ++ ) {
 
@@ -123,15 +111,14 @@ Sidebar.Properties.Geometry = function ( signals ) {
 
 			var faceType = 0
 			faceType = setBit( faceType, 0, ! isTriangle );
-			/*
-			faceType = setBit( faceType, 1, hasMaterial );
-			faceType = setBit( faceType, 2, hasFaceUv );
-			faceType = setBit( faceType, 3, hasFaceVertexUv );
+			
+			// faceType = setBit( faceType, 1, hasMaterial );
+			// faceType = setBit( faceType, 2, hasFaceUv );
+			// faceType = setBit( faceType, 3, hasFaceVertexUv );
 			faceType = setBit( faceType, 4, hasFaceNormal );
 			faceType = setBit( faceType, 5, hasFaceVertexNormal );
-			faceType = setBit( faceType, 6, hasFaceColor );
-			faceType = setBit( faceType, 7, hasFaceVertexColor );
-			*/
+			// faceType = setBit( faceType, 6, hasFaceColor );
+			// faceType = setBit( faceType, 7, hasFaceVertexColor );
 
 			faces.push( faceType );
 
@@ -189,37 +176,33 @@ Sidebar.Properties.Geometry = function ( signals ) {
 
 			if ( hasFaceNormal ) {
 
-				/*
-				var normal = face.normal;
-				faces.push( normal.x, normal.y, normal.z );
-				*/
+				var faceNormal = face.normal;
+				faces.push( getNormalIndex( faceNormal.x, faceNormal.y, faceNormal.z ) );
 
 			}
 
 			if ( hasFaceVertexNormal ) {
 
-				/*
-				var normals = face.vertexNormals;
+				var vertexNormals = face.vertexNormals;
 
 				if ( isTriangle ) {
 
 					faces.push(
-						normals[ 0 ].u, normals[ 0 ].y, normals[ 0 ].z,
-						normals[ 1 ].u, normals[ 1 ].y, normals[ 1 ].z,
-						normals[ 2 ].u, normals[ 2 ].y, normals[ 2 ].z
+						getNormalIndex( vertexNormals[ 0 ].x, vertexNormals[ 0 ].y, vertexNormals[ 0 ].z ),
+						getNormalIndex( vertexNormals[ 1 ].x, vertexNormals[ 1 ].y, vertexNormals[ 1 ].z ),
+						getNormalIndex( vertexNormals[ 2 ].x, vertexNormals[ 2 ].y, vertexNormals[ 2 ].z )
 					);
 
 				} else {
 
 					faces.push(
-						normals[ 0 ].x, normals[ 0 ].y, normals[ 0 ].z,
-						normals[ 1 ].x, normals[ 1 ].y, normals[ 1 ].z,
-						normals[ 2 ].x, normals[ 2 ].y, normals[ 2 ].z,
-						normals[ 3 ].x, normals[ 3 ].y, normals[ 3 ].z
+						getNormalIndex( vertexNormals[ 0 ].x, vertexNormals[ 0 ].y, vertexNormals[ 0 ].z ),
+						getNormalIndex( vertexNormals[ 1 ].x, vertexNormals[ 1 ].y, vertexNormals[ 1 ].z ),
+						getNormalIndex( vertexNormals[ 2 ].x, vertexNormals[ 2 ].y, vertexNormals[ 2 ].z ),
+						getNormalIndex( vertexNormals[ 3 ].x, vertexNormals[ 3 ].y, vertexNormals[ 3 ].z )
 					);
 
 				}
-				*/
 
 			}
 
@@ -228,6 +211,23 @@ Sidebar.Properties.Geometry = function ( signals ) {
 		function setBit( value, position, enabled ) {
 
 			return enabled ? value | ( 1 << position ) : value & ( ~ ( 1 << position) );
+
+		}
+
+		function getNormalIndex( x, y, z ) {
+
+				var hash = x.toString() + y.toString() + z.toString();
+
+				if ( normalsHash[ hash ] !== undefined ) { 
+
+					return normalsHash[ hash ];
+
+				}
+
+				normalsHash[ hash ] = normals.length / 3;
+				normals.push( x, y, z );
+
+				return normalsHash[ hash ];
 
 		}
 
