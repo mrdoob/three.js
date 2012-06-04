@@ -164,7 +164,7 @@ THREE.RollControls = function ( object, domElement ) {
 
 	function onKeyDown( event ) {
 
-		event.preventDefault();
+		//event.preventDefault();
 
 		switch ( event.keyCode ) {
 

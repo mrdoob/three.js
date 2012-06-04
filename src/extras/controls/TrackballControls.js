@@ -223,7 +223,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 			_this.rotateCamera();
 
 		}
-		
+
 		if ( !_this.noZoom ) {
 
 			_this.zoomCamera();
@@ -243,7 +243,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 		_this.object.lookAt( _this.target );
 
 		if ( lastPosition.distanceTo( _this.object.position ) > 0 ) {
-			
+
 			_this.dispatchEvent( changeEvent );
 
 			lastPosition.copy( _this.object.position );
@@ -258,7 +258,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		if ( ! _this.enabled ) return;
 
-		event.preventDefault();
+		//event.preventDefault();
 
 		if ( _state !== STATE.NONE ) {
 
