@@ -23,9 +23,9 @@ THREE.SceneLoader.prototype.load = function( url, callbackFinished ) {
 
 	xhr.onreadystatechange = function () {
 
-		if ( xhr.readyState == 4 ) {
+		if ( xhr.readyState === 4 ) {
 
-			if ( xhr.status == 200 || xhr.status == 0 ) {
+			if ( xhr.status === 200 || xhr.status === 0 ) {
 
 				var json = JSON.parse( xhr.responseText );
 				context.createScene( json, callbackFinished, url );
@@ -182,32 +182,32 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 
 						object = new THREE.Mesh( geometry, material );
 						object.name = dd;
-						
+
 						if ( m ) {
-							
+
 							object.matrixAutoUpdate = false;
 							object.matrix.set( m[0], m[1], m[2], m[3],
 											   m[4], m[5], m[6], m[7],
 											   m[8], m[9], m[10], m[11],
 											   m[12], m[13], m[14], m[15]);
-							
+
 						} else {
-							
+
 							object.position.set( p[0], p[1], p[2] );
-	
+
 							if ( q ) {
-	
+
 								object.quaternion.set( q[0], q[1], q[2], q[3] );
 								object.useQuaternion = true;
-	
+
 							} else {
-	
+
 								object.rotation.set( r[0], r[1], r[2] );
-	
+
 							}
-	
+
 							object.scale.set( s[0], s[1], s[2] );
-							
+
 						}
 
 						object.visible = o.visible;
@@ -313,7 +313,7 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 
 		scope.onLoadProgress();
 
-		if( counter_models == 0 && counter_textures == 0 ) {
+		if( counter_models === 0 && counter_textures === 0 ) {
 
 			callbackFinished( result );
 
@@ -321,12 +321,25 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 
 	};
 
-	var callbackTexture = function( images ) {
+	var callbackTexture = function ( count ) {
 
-		counter_textures -= 1;
+		counter_textures -= count;
 		async_callback_gate();
 
 		scope.onLoadComplete();
+
+	};
+
+	// must use this instead of just directly calling callbackTexture
+	// because of closure in the calling context loop
+
+	var generateTextureCallback = function ( count ) {
+
+		return function() {
+
+			callbackTexture( count );
+
+		};
 
 	};
 
@@ -338,11 +351,11 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 
 		c = data.cameras[ dc ];
 
-		if ( c.type == "perspective" ) {
+		if ( c.type === "perspective" ) {
 
 			camera = new THREE.PerspectiveCamera( c.fov, c.aspect, c.near, c.far );
 
-		} else if ( c.type == "ortho" ) {
+		} else if ( c.type === "ortho" ) {
 
 			camera = new THREE.OrthographicCamera( c.left, c.right, c.top, c.bottom, c.near, c.far );
 
@@ -371,7 +384,7 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 		hex = ( l.color !== undefined ) ? l.color : 0xffffff;
 		intensity = ( l.intensity !== undefined ) ? l.intensity : 1;
 
-		if ( l.type == "directional" ) {
+		if ( l.type === "directional" ) {
 
 			p = l.direction;
 
@@ -379,7 +392,7 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 			light.position.set( p[0], p[1], p[2] );
 			light.position.normalize();
 
-		} else if ( l.type == "point" ) {
+		} else if ( l.type === "point" ) {
 
 			p = l.position;
 			d = l.distance;
@@ -387,7 +400,7 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 			light = new THREE.PointLight( hex, intensity, d );
 			light.position.set( p[0], p[1], p[2] );
 
-		} else if ( l.type == "ambient" ) {
+		} else if ( l.type === "ambient" ) {
 
 			light = new THREE.AmbientLight( hex );
 
@@ -405,11 +418,11 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 
 		f = data.fogs[ df ];
 
-		if ( f.type == "linear" ) {
+		if ( f.type === "linear" ) {
 
 			fog = new THREE.Fog( 0x000000, f.near, f.far );
 
-		} else if ( f.type == "exp2" ) {
+		} else if ( f.type === "exp2" ) {
 
 			fog = new THREE.FogExp2( 0x000000, f.density );
 
@@ -468,50 +481,51 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 
 		g = data.geometries[ dg ];
 
-		if ( g.type == "cube" ) {
+		if ( g.type === "cube" ) {
 
 			geometry = new THREE.CubeGeometry( g.width, g.height, g.depth, g.segmentsWidth, g.segmentsHeight, g.segmentsDepth, null, g.flipped, g.sides );
 			result.geometries[ dg ] = geometry;
 
-		} else if ( g.type == "plane" ) {
+		} else if ( g.type === "plane" ) {
 
 			geometry = new THREE.PlaneGeometry( g.width, g.height, g.segmentsWidth, g.segmentsHeight );
 			result.geometries[ dg ] = geometry;
 
-		} else if ( g.type == "sphere" ) {
+		} else if ( g.type === "sphere" ) {
 
 			geometry = new THREE.SphereGeometry( g.radius, g.segmentsWidth, g.segmentsHeight );
 			result.geometries[ dg ] = geometry;
 
-		} else if ( g.type == "cylinder" ) {
+		} else if ( g.type === "cylinder" ) {
 
 			geometry = new THREE.CylinderGeometry( g.topRad, g.botRad, g.height, g.radSegs, g.heightSegs );
 			result.geometries[ dg ] = geometry;
 
-		} else if ( g.type == "torus" ) {
+		} else if ( g.type === "torus" ) {
 
 			geometry = new THREE.TorusGeometry( g.radius, g.tube, g.segmentsR, g.segmentsT );
 			result.geometries[ dg ] = geometry;
 
-		} else if ( g.type == "icosahedron" ) {
+		} else if ( g.type === "icosahedron" ) {
 
 			geometry = new THREE.IcosahedronGeometry( g.radius, g.subdivisions );
 			result.geometries[ dg ] = geometry;
 
-		} else if ( g.type == "bin_mesh" ) {
+		} else if ( g.type === "bin_mesh" ) {
 
 			binLoader.load( get_url( g.url, data.urlBaseType ), create_callback( dg ) );
 
-		} else if ( g.type == "ascii_mesh" ) {
+		} else if ( g.type === "ascii_mesh" ) {
 
 			jsonLoader.load( get_url( g.url, data.urlBaseType ), create_callback( dg ) );
 
-		} else if ( g.type == "embedded_mesh" ) {
+		} else if ( g.type === "embedded_mesh" ) {
 
 			var modelJson = data.embeds[ g.id ],
 				texture_path = "";
 
-			// Pass metadata along to jsonLoader so it knows the format version.
+			// pass metadata along to jsonLoader so it knows the format version
+
 			modelJson.metadata = data.metadata;
 
 			if ( modelJson ) {
@@ -558,7 +572,7 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 
 		tt = data.textures[ dt ];
 
-		if ( tt.mapping != undefined && THREE[ tt.mapping ] != undefined  ) {
+		if ( tt.mapping !== undefined && THREE[ tt.mapping ] !== undefined  ) {
 
 			tt.mapping = new THREE[ tt.mapping ]();
 
@@ -566,24 +580,25 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 
 		if( tt.url instanceof Array ) {
 
+			var count = tt.url.length;
 			var url_array = [];
 
-			for( var i = 0; i < tt.url.length; i ++ ) {
+			for( var i = 0; i < count; i ++ ) {
 
 				url_array[ i ] = get_url( tt.url[ i ], data.urlBaseType );
 
 			}
 
-			texture = THREE.ImageUtils.loadTextureCube( url_array, tt.mapping, callbackTexture );
+			texture = THREE.ImageUtils.loadTextureCube( url_array, tt.mapping, generateTextureCallback( count ) );
 
 		} else {
 
-			texture = THREE.ImageUtils.loadTexture( get_url( tt.url, data.urlBaseType ), tt.mapping, callbackTexture );
+			texture = THREE.ImageUtils.loadTexture( get_url( tt.url, data.urlBaseType ), tt.mapping, generateTextureCallback( 1 ) );
 
-			if ( THREE[ tt.minFilter ] != undefined )
+			if ( THREE[ tt.minFilter ] !== undefined )
 				texture.minFilter = THREE[ tt.minFilter ];
 
-			if ( THREE[ tt.magFilter ] != undefined )
+			if ( THREE[ tt.magFilter ] !== undefined )
 				texture.magFilter = THREE[ tt.magFilter ];
 
 
@@ -591,8 +606,8 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 
 				texture.repeat.set( tt.repeat[ 0 ], tt.repeat[ 1 ] );
 
-				if ( tt.repeat[ 0 ] != 1 ) texture.wrapS = THREE.RepeatWrapping;
-				if ( tt.repeat[ 1 ] != 1 ) texture.wrapT = THREE.RepeatWrapping;
+				if ( tt.repeat[ 0 ] !== 1 ) texture.wrapS = THREE.RepeatWrapping;
+				if ( tt.repeat[ 1 ] !== 1 ) texture.wrapT = THREE.RepeatWrapping;
 
 			}
 
@@ -630,23 +645,23 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 
 		for ( pp in m.parameters ) {
 
-			if ( pp == "envMap" || pp == "map" || pp == "lightMap" ) {
+			if ( pp === "envMap" || pp === "map" || pp === "lightMap" ) {
 
 				m.parameters[ pp ] = result.textures[ m.parameters[ pp ] ];
 
-			} else if ( pp == "shading" ) {
+			} else if ( pp === "shading" ) {
 
 				m.parameters[ pp ] = ( m.parameters[ pp ] == "flat" ) ? THREE.FlatShading : THREE.SmoothShading;
 
-			} else if ( pp == "blending" ) {
+			} else if ( pp === "blending" ) {
 
 				m.parameters[ pp ] = m.parameters[ pp ] in THREE ? THREE[ m.parameters[ pp ] ] : THREE.NormalBlending;
 
-			} else if ( pp == "combine" ) {
+			} else if ( pp === "combine" ) {
 
 				m.parameters[ pp ] = ( m.parameters[ pp ] == "MixOperation" ) ? THREE.MixOperation : THREE.MultiplyOperation;
 
-			} else if ( pp == "vertexColors" ) {
+			} else if ( pp === "vertexColors" ) {
 
 				if ( m.parameters[ pp ] == "face" ) {
 
@@ -743,8 +758,8 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 
 	scope.callbackSync( result );
 
-	// just in case there are no async elements:
-	async_callback_gate();
+	// just in case there are no async elements
 
+	async_callback_gate();
 
 };
