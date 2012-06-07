@@ -640,7 +640,7 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 
 			} else if ( pp == "blending" ) {
 
-				m.parameters[ pp ] = THREE[ m.parameters[ pp ] ] ? THREE[ m.parameters[ pp ] ] : THREE.NormalBlending;
+				m.parameters[ pp ] = m.parameters[ pp ] in THREE ? THREE[ m.parameters[ pp ] ] : THREE.NormalBlending;
 
 			} else if ( pp == "combine" ) {
 
