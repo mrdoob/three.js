@@ -58,11 +58,6 @@ TEMPLATE_OBJ = u"""\
 # UVs:      %(nuvs)d
 ################################
 
-# material
-
-mtllib %(mtllib)s
-usemtl %(usemtl)s
-
 # vertices
 
 %(vertices)s
@@ -264,8 +259,6 @@ def break_obj(infile, outfile):
         return
 
     faces, vertices, uvs, normals, materials, mtllib = parse_obj(infile)
-    
-    materials_by_index = dict([[v,k] for k,v in materials.items()])
 
     # sort faces by materials
 
@@ -444,8 +437,6 @@ def break_obj(infile, outfile):
         # generate OBJ string
 
         content = TEMPLATE_OBJ % {
-        "mtllib"        : mtllib,
-        "usemtl"        : materials_by_index[material],
         "nfaces"        : len(chunk["faces"]),
         "nvertices"     : len(new_vertices),
         "nnormals"      : len(new_normals),
